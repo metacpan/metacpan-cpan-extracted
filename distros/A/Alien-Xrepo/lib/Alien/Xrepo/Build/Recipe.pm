@@ -2,7 +2,7 @@ use v5.40;
 use feature 'class';
 no warnings 'experimental::class';
 #
-class Alien::Xrepo::Build::Recipe v1.0.9 {
+class Alien::Xrepo::Build::Recipe v1.0.10 {
     use JSON::PP qw[decode_json];
     use Path::Tiny;
     use Scalar::Util qw[looks_like_number];
@@ -53,7 +53,7 @@ class Alien::Xrepo::Build::Recipe v1.0.9 {
         }
     }
     my %DEF_KEYS = map { $_ => 1 } qw[
-        name version
+        name version required
         plat arch mode kind no_kind toolchain toolchain_host
         vs vs_toolset vs_sdkver ndk sdk mingw
         jobs linkjobs force shallow build debugdir
@@ -61,7 +61,8 @@ class Alien::Xrepo::Build::Recipe v1.0.9 {
         configs includes
         system verbose diagnosis
     ];
-    method version_for ($name) { $defs{$name}{version} // undef; }
+    method version_for ($name) { $defs{$name}{version}  // undef }
+    method required    ($name) { $defs{$name}{required} // 1 }
 
     method opts_for ( $name, %ambient ) {
         my $def = $defs{$name};

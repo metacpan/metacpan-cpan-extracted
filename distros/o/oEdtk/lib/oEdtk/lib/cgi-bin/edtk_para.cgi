@@ -16,7 +16,7 @@ if ( !defined( $cfg->{$check_cgi} ) || ( $cfg->{$check_cgi} ) !~ /yes/i ) {
 	die "ERROR: config said 'application not authorized on this server'\n";
 }
 
-sub para_load($$$) {
+sub para_load {
 	my ( $dbh, $app, $corp ) = @_;
 
 	my $sql = 'SELECT * FROM EDTK_TEST_PARA ' . 'WHERE ED_PARA_REFIDDOC = ? AND ED_PARA_CORP = ?';
@@ -24,7 +24,7 @@ sub para_load($$$) {
 	return $row;
 }
 
-sub para_insert($$$$) {
+sub para_insert {
 	my ( $dbh, $app, $corp, $text ) = @_;
 
 	my $sql = 'INSERT INTO EDTK_TEST_PARA '
@@ -33,10 +33,10 @@ sub para_insert($$$$) {
 	if ( !$rv ) {
 		return $dbh->errstr;
 	}
-	return undef;
+	return;
 }
 
-sub para_update($$$$) {
+sub para_update {
 	my ( $dbh, $app, $corp, $text ) = @_;
 
 	my $sql = 'UPDATE EDTK_TEST_PARA SET ED_TEXTBLOC = ? '
@@ -48,10 +48,10 @@ sub para_update($$$$) {
 	if ( $rv != 1 ) {
 		return '0 rows matched';
 	}
-	return undef;
+	return;
 }
 
-sub div($$) {
+sub div {
 	my ( $class, $txt ) = @_;
 	return "<div class=\"$class\">$txt</div>";
 }

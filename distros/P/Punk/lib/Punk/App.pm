@@ -8,7 +8,7 @@ use Punk::Router::Scope;
 use Punk::Context;
 use Punk::Static;
 
-our $VERSION = '0.61';
+our $VERSION = '0.62';
 
 sub compile_extras {
     my ($self) = @_;
@@ -53,25 +53,175 @@ boot; the returned closure is the only code on the request path.
 
 =head1 THE REGISTRAR SURFACE
 
-Plugins receive this object; each method mirrors a DSL keyword:
-C<route>, C<under>, C<api>, C<docs>, C<static>, C<mount>, C<websocket>,
-C<sse>, C<session>, C<logging>, C<views>, C<database>, C<model_class>, C<hook>,
-C<middleware>, C<on_error>, C<on_not_found>, C<helper>, C<plugin>,
-C<config>, C<secret>, C<host>, C<favicon>. Two read back rather than
-record: C<databases>, C<auth_config> and, with no argument, C<host>.
-C<on_compile> registers a callback for C<to_app>.
+Plugins receive this object. Most of its methods are the DSL keywords
+themselves: the keyword in the application class forwards its arguments
+here, so C<< $app->session(expires => '7d') >> from a plugin does what
+C<< session expires => '7d'; >> does in the class. Each records into the
+registry and returns the app, so calls chain, unless its entry says
+otherwise. Two read back rather than record: L</databases> and
+L</auth_config>. L</on_compile> registers a callback for C<to_app>.
 
-C<< $app->host >> with no argument reads the declared origin back (undef
-when the application never declared one), which is how a plugin defaults
-its own base-URL option; a plugin supporting older Punk should guard with
-C<< $app->can('host') >>.
+=head2 The keyword methods
+
+=over 4
+
+=item route($method, $path, $target, \@guards?, \%opts?)
+
+What C<get>, C<post>, C<put>, C<patch>, C<del> and C<any> call, with the
+method spelled out. See L<Punk/"get / post / put / patch / del / any">.
+
+=item under($prefix, $guard?)
+
+Returns a L<Punk::Router::Scope>, not the app. See L<Punk/under>.
+
+=item websocket($path, $target, \%opts?, \@guards?)
+
+See L<Punk/websocket>.
+
+=item sse($path, $target, \%opts?, \@guards?)
+
+See L<Punk/sse>.
+
+=item api($spec, \%opts?, $scope?)
+
+Returns the L<Punk::Mount::OpenAPI> it built, not the app. See L<Punk/api>.
+
+=item docs($path, $mount?, \%opts?)
+
+See L<Punk/docs>.
+
+=item static($prefix, $dir, %opts)
+
+See L<Punk/static>.
+
+=item markdown($prefix, $dir, %opts)
+
+See L<Punk/markdown> and L<Punk::Mount::Markdown>.
+
+=item mount($prefix, $psgi_app)
+
+See L<Punk/mount>.
+
+=item favicon($path, %opts)
+
+See L<Punk/favicon>.
+
+=item views($name, \%opts?)
+
+See L<Punk/views>.
+
+=item database(%opts) / database($name => \%opts)
+
+See L<Punk/"database / model">.
+
+=item model_class(@names)
+
+What the C<model> keyword calls. Names models to load; with no names it
+turns auto-discovery on explicitly (see L</"model_auto($on?)">). See
+L<Punk/"database / model">.
+
+=item hook($phase, $code)
+
+See L<Punk/hook>.
+
+=item middleware($code)
+
+See L<Punk/middleware>.
+
+=item on_not_found($code)
+
+See L<Punk/on_not_found>.
+
+=item plugin($name, \%opts?)
+
+See L<Punk/plugin>.
+
+=item config(...)
+
+With no arguments, the loaded configuration data, or undef when no file
+was loaded. See L<Punk/config>.
+
+=item secret($path)
+
+Returns the resolved secret, not the app. See L<Punk/secret>.
+
+=item session(%opts)
+
+See L<Punk/session>.
+
+=item logging(%opts)
+
+See L<Punk/logging>. A C<to> path is opened here, so a path that cannot be
+written croaks at boot.
+
+=item cache(%opts) / cache($name => \%opts)
+
+See L<Punk/cache>.
+
+=item csrf(%opts)
+
+See L<Punk/csrf>.
+
+=item cors(%opts)
+
+See L<Punk/cors>.
+
+=item headers_scoped($prefix, \%pairs)
+
+The scope form of C<headers>: what C<< $scope->headers(...) >> on an
+L<Punk/under> scope calls, with the scope's prefix. Under that prefix
+these headers apply ahead of the application-wide policy, the longest
+prefix first. A value of undef drops that header there; a reference
+croaks. See L<Punk/headers>.
+
+=item proxy(%opts)
+
+See L<Punk/proxy>.
+
+=item rate_limit(%opts)
+
+See L<Punk/rate_limit> and L<Punk::RateLimit>.
+
+=item max_body($bytes)
+
+See L<Punk/max_body>.
+
+=item auth(%opts)
+
+See L<Punk/auth> and L<Punk::Auth>.
+
+=item auth_guard(%opts)
+
+Returns the guard, not the app. See L<Punk/auth_guard>.
+
+=item ua(%opts) / ua($name => \%opts)
+
+See L<Punk/ua> and L<Punk::UA>.
+
+=item upload_dir($path)
+
+See L<Punk/upload_dir>.
+
+=item host($origin?, allow => \@hosts?)
+
+See L<Punk/host>. With no argument it reads the declared origin back
+(undef when the application never declared one), which is how a plugin
+defaults its own base-URL option; a plugin supporting older Punk should
+guard with C<< $app->can('host') >>.
+
+=item publish($topic, $payload)
+
+=item subscribe($topic, $code, group => $name?)
+
+The cross-worker bus at the application level, where a subscription
+belongs: made at boot, in the parent, before the server forks. Each
+returns what the context methods of the same names return, not the app.
+See L<Punk/"publish / subscribe">.
+
+=back
+
 C<install_kw> gives a plugin a keyword of its own; C<keyword> and
-C<has_keyword> call, and detect, one another plugin installed. C<model_auto>
-toggles auto-discovery of C<MyApp::Model::*> (on unless models are named
-explicitly). C<caller_class> and C<config_object> give a plugin the
-app's controller namespace and its L<Punk::Config>; C<new> and the
-compile-time helpers (C<compile>, C<model_instance>, C<render_view>) are
-called by the framework, not apps.
+C<has_keyword> call, and detect, one another plugin installed.
 
 =head2 databases
 
@@ -198,6 +348,51 @@ builds on the B<declared> host rather than negotiating the C<allow> list,
 because a background job has no C<Host> header to be allowed or refused.
 
 Only meaningful after C<to_app>: the names are resolved when the routes are.
+
+=head2 markdown_pages($prefix)
+
+    my $pages = $app->markdown_pages('/blog');
+
+The pages of the C<markdown> mount at that prefix, in its order, as fresh
+hashrefs (C<url>, C<path>, C<title>, C<date>, C<updated>, C<summary>,
+C<meta>); see L<Punk::Mount::Markdown/LISTING>. Croaks before C<to_app>, and
+for a prefix with no markdown mount.
+
+=head1 FRAMEWORK METHODS
+
+Called by Punk itself; a plugin may read the first three.
+
+=head2 caller_class
+
+The application class this registry belongs to, which is the namespace its
+controllers, models and C<to_app> live under.
+
+=head2 config_object
+
+The loaded L<Punk::Config>, or undef when no configuration file was found.
+
+=head2 model_auto($on?)
+
+With no argument, whether models are found by scanning
+C<< <caller_class>::Model:: >> at compile: true unless models were named
+and auto-discovery was not also asked for. With an argument, sets it and
+returns the app.
+
+=head2 new(caller => $class)
+
+Builds an empty registry. C<use Punk> calls it once per application class.
+
+=head2 model_instance($name)
+
+The model registered as C<$name>, built on first use with its database's
+options and cached for the process. The cache is dropped when the pid
+changes, so a forked worker builds its own instances. Croaks when no model
+is registered, or for an unknown name, listing those there are.
+
+=head2 render_view($c, @args)
+
+Hands C<$c> and C<@args> to the configured view engine's C<render> and
+returns its response. Croaks when no C<views> keyword ran.
 
 =head1 COMPILE
 

@@ -56,17 +56,23 @@ my ($td, $out, $rc);
     ($out, $rc) = run('-o', "$td/packed", '--lib', "$td/lib", "$td/bin/myapp");
     is $rc, 0, 'default (pack) build exits 0';
     ok -f "$td/packed", 'pack output file created';
-    is `"$td/packed"`, "hi\n", 'packed script runs standalone';
+    is `"$^X" "$td/packed"`, "hi\n", 'packed script runs standalone';
+
+    # -- perl -c on a packed script must not run the program
+    my $check = `"$^X" -c "$td/packed" 2>&1`;
+    is $? >> 8, 0, 'perl -c on packed script exits 0';
+    like $check, qr/syntax OK/, 'perl -c reports syntax OK';
+    unlike $check, qr/^hi$/m, 'perl -c does not execute the packed program';
 
     # -- explicit pack
     ($out, $rc) = run('pack', '-o', "$td/packed2", '--lib', "$td/lib", "$td/bin/myapp");
     is $rc, 0, 'explicit pack subcommand exits 0';
-    is `"$td/packed2"`, "hi\n", 'explicit pack script runs standalone';
+    is `"$^X" "$td/packed2"`, "hi\n", 'explicit pack script runs standalone';
 
     # -- bundle subcommand
     ($out, $rc) = run('bundle', '-o', "$td/bundled", '--lib', "$td/lib", "$td/bin/myapp");
     is $rc, 0, 'bundle subcommand exits 0';
-    is `"$td/bundled"`, "hi\n", 'bundle script runs standalone';
+    is `"$^X" "$td/bundled"`, "hi\n", 'bundle script runs standalone';
 
     # -- trace subcommand (module list to stderr)
     ($out, $rc) = run('trace', '--to-stderr', "$td/bin/myapp");

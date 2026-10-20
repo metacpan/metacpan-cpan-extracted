@@ -14,8 +14,7 @@ use Clay::XS qw(
 	Clay_MinMemorySize
 	Clay_GetCurrentContext
 	Clay_SetCurrentContext
-	Clay_SetMaxElementCount
-	Clay_SetMaxMeasureTextCacheWordCount
+	Clay_GetMaxMeasureTextCacheWordCount
 	Clay_SetLayoutDimensions
 	Clay_SetMeasureTextFunction
 	Clay_ResetMeasureTextCache
@@ -39,23 +38,22 @@ use Clay::XS qw(
 	CLAY_ERROR_TYPE_TEXT_MEASUREMENT_CAPACITY_EXCEEDED
 );
 use Clay::UI::_keys qw(camelize_keys);
-use Clay::UI::_validate qw(is_finite_number);
+use Clay::UI::_validate qw(is_finite_number described_value);
 use Clay::UI::Interaction;
 use Clay::UI::_FrameRegistry;
 use Clay::UI::Role::Core::Preparable;
+use Clay::UI::Role::Layout::HasParent qw(is_widget);
 use Clay::UI::Revision qw(bump_revision current_revision);
 use Clay::UI::_error qw(croak_ui);
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 my %RENDER_ARGS  = map { $_ => 1 } qw(pointer_state delta_time scroll_delta enable_drag_scrolling);
 my %POINTER_KEYS = map { $_ => 1 } qw(x y down);
 my %VECTOR_KEYS  = map { $_ => 1 } qw(x y);
 
-# Clay's default element count, and the fewest measure-cache words Clay::XS
-# accepts.
+# Clay's default element count.
 my $DEFAULT_MAX_ELEMENT_COUNT = 8192;
-my $MIN_MEASURE_CACHE_WORDS   = 32;
 
 class Clay::UI :strict(params) {
 	field $root   :param :reader;
@@ -84,11 +82,8 @@ class Clay::UI :strict(params) {
 	field $_laid_out_revision :reader(laid_out_revision);
 
 	ADJUST {
-		unless (blessed $root
-			&& ($root->DOES('Clay::UI::Role::Core::Element')
-			 || $root->DOES('Clay::UI::Role::Core::TextNode'))) {
-			croak_ui "Clay::UI: 'root' must be a widget consuming Clay::UI::Role::Core::Element or TextNode";
-		}
+		croak_ui "Clay::UI: 'root' must be a widget consuming Clay::UI::Role::Core::Element or TextNode"
+			unless is_widget($root);
 		croak_ui "Clay::UI: 'root' must not have a parent; the root is the top of its widget tree"
 			if defined $root->parent;
 		croak_ui "Clay::UI: 'root' is already the root of another Clay::UI"
@@ -96,23 +91,21 @@ class Clay::UI :strict(params) {
 		unless (_is_viewport_size($width) && _is_viewport_size($height)) {
 			croak_ui "Clay::UI: 'width' and 'height' must be positive finite numbers";
 		}
-		unless (is_finite_number($max_element_count) && $max_element_count == int($max_element_count)
-			&& $max_element_count >= 1) {
+		unless (_is_positive_integer($max_element_count)) {
 			croak_ui "Clay::UI: 'max_element_count' must be a positive integer";
 		}
-		$max_measure_text_cache_word_count //= _default_measure_cache_words($max_element_count);
-		unless (is_finite_number($max_measure_text_cache_word_count)
-			&& $max_measure_text_cache_word_count == int($max_measure_text_cache_word_count)
-			&& $max_measure_text_cache_word_count >= $MIN_MEASURE_CACHE_WORDS) {
-			croak_ui "Clay::UI: 'max_measure_text_cache_word_count' must be an integer >= $MIN_MEASURE_CACHE_WORDS";
+		if (defined $max_measure_text_cache_word_count && !_is_positive_integer($max_measure_text_cache_word_count)) {
+			croak_ui "Clay::UI: 'max_measure_text_cache_word_count' must be a positive integer";
 		}
 
-		# The handler closes over the count, not over $self: Clay's context
-		# keeps the handler, and a cycle would keep the UI alive.
+		# The handler does not close over $self: Clay's context keeps the
+		# handler, and a cycle would keep the UI alive. Clay reports an
+		# error with the reporting context current, so the word count it
+		# reads is this UI's.
 		$_uses_default_error_handler = !defined $error_handler;
-		my $measure_cache_error = _measure_cache_error($max_measure_text_cache_word_count);
 		$error_handler //= sub ($err, $userdata) {
-			die $measure_cache_error if $err->{errorType} == CLAY_ERROR_TYPE_TEXT_MEASUREMENT_CAPACITY_EXCEEDED;
+			die _measure_cache_error(Clay_GetMaxMeasureTextCacheWordCount())
+				if $err->{errorType} == CLAY_ERROR_TYPE_TEXT_MEASUREMENT_CAPACITY_EXCEEDED;
 			die "Clay error: $err->{errorText}\n";
 		};
 		$measure_text //= sub ($text, $config, $userdata) {
@@ -153,39 +146,42 @@ class Clay::UI :strict(params) {
 		die $error;
 	}
 
-	# Creates this UI's context, sized for max_element_count, and leaves it
-	# current. Clay_MinMemorySize and Clay_Initialize use the counts of the
-	# current context, so a throwaway seed context carries this UI's counts
-	# to them: setting the counts on another UI's context would disable it
-	# until it is initialised again, and setting them with no current
-	# context would change Clay's process-wide defaults.
+	# Creates this UI's context, sized for its counts, and leaves it
+	# current. The counts go to Clay::XS explicitly, which owns their rules
+	# (the default word count among them) and leaves every other context
+	# and Clay's process-wide defaults alone.
 	method _initialize_context () {
-		my $seed = Clay_Initialize(Clay_MinMemorySize(), { width => $width, height => $height });
-		Clay_SetMaxElementCount($max_element_count);
-		Clay_SetMaxMeasureTextCacheWordCount($max_measure_text_cache_word_count);
+		my %counts = (maxElementCount => $max_element_count);
+		$counts{maxMeasureTextCacheWordCount} = $max_measure_text_cache_word_count
+			if defined $max_measure_text_cache_word_count;
 
-		my $min_memory = Clay_MinMemorySize();
+		my $min_memory = $self->_min_memory_size(\%counts);
 		$memory_size //= $min_memory;
-		unless (is_finite_number($memory_size) && $memory_size == int($memory_size)
-			&& $memory_size >= $min_memory) {
-			croak_ui "Clay::UI: 'memory_size' must be an integer >= Clay_MinMemorySize() ($min_memory)"
-				. " for max_element_count $max_element_count and max_measure_text_cache_word_count $max_measure_text_cache_word_count";
+		unless (_is_positive_integer($memory_size) && $memory_size >= $min_memory) {
+			croak_ui "Clay::UI: 'memory_size' must be an integer >= Clay_MinMemorySize() ($min_memory) for "
+				. $self->_described_counts;
 		}
-		# The new context copies the seed's counts and becomes current.
-		return Clay_Initialize($memory_size, { width => $width, height => $height }, $error_handler);
+		my $context = Clay_Initialize($memory_size, { width => $width, height => $height }, $error_handler, undef, \%counts);
+		$max_measure_text_cache_word_count //= Clay_GetMaxMeasureTextCacheWordCount();
+		return $context;
 	}
 
-	# Clay keeps one element for its own root and never fills its last
-	# slot, so this many widgets fit into one frame.
-	method _widget_capacity () {
-		return $max_element_count > 2 ? $max_element_count - 2 : 0;
+	# Clay_MinMemorySize for this UI's counts. Clay::XS refuses counts Clay
+	# cannot size a context for; its reason is passed on with the names of
+	# this UI's parameters.
+	method _min_memory_size ($counts) {
+		my $minimum = eval { Clay_MinMemorySize($counts) };
+		return $minimum if defined $minimum;
+		(my $reason = $@) =~ s/ at \Q${\ __FILE__}\E line \d+\.\n\z//;
+		croak_ui "Clay::UI: Clay cannot size a context for " . $self->_described_counts . " ($reason)";
 	}
 
-	# Clay's own default: twice as many cached words as elements, and at
-	# least the 32 its hash buckets need.
-	sub _default_measure_cache_words ($element_count) {
-		my $words = 2 * $element_count;
-		return $words > $MIN_MEASURE_CACHE_WORDS ? $words : $MIN_MEASURE_CACHE_WORDS;
+	# This UI's counts as its parameters, for error messages.
+	method _described_counts () {
+		my $words = defined $max_measure_text_cache_word_count
+			? "max_measure_text_cache_word_count $max_measure_text_cache_word_count"
+			: 'the default max_measure_text_cache_word_count';
+		return "max_element_count $max_element_count and $words";
 	}
 
 	# Clay measures every text laid out in a frame word by word and keeps
@@ -198,6 +194,10 @@ class Clay::UI :strict(params) {
 
 	sub _is_viewport_size ($value) {
 		return is_finite_number($value) && $value > 0;
+	}
+
+	sub _is_positive_integer ($value) {
+		return is_finite_number($value) && $value == int($value) && $value >= 1;
 	}
 
 	sub _one_value ($name, @value) {
@@ -331,6 +331,9 @@ class Clay::UI :strict(params) {
 				# any setter: the frame changes all the same.
 				my @scrolled = $_frame->scroll_changes($scroll_before);
 				bump_revision() if @scrolled;
+				# A container that prepares its subtree for the position it
+				# shows is prepared for the new one, as after scroll_to.
+				$_->request_prepare for grep { $_->DOES('Clay::UI::Role::Core::Preparable') } map { $_->[0] } @scrolled;
 
 				my $state = $pointer_data->{state};
 				$interaction->update(
@@ -374,6 +377,9 @@ class Clay::UI :strict(params) {
 		Clay_SetCurrentContext($_ctx);
 		my ($walk_error, $end_error, $commands);
 		Clay_BeginLayout();
+		# Clay's root takes one of these; elements still playing an exit
+		# transition keep theirs until the frame ends.
+		my $capacity = Clay::XS::_declarable_elements();
 		{
 			local $@;
 			eval { $self->_walk($next_frame, $root, '', []); 1 } or $walk_error = $@ || 'unknown walker error';
@@ -383,8 +389,8 @@ class Clay::UI :strict(params) {
 			eval { $commands = Clay_EndLayout($delta_time); 1 }
 				or $end_error = $@ || 'unknown Clay_EndLayout error';
 		}
-		$end_error = $self->_capacity_error($next_frame->element_count)
-			if defined $end_error && $_uses_default_error_handler && $next_frame->element_count > $self->_widget_capacity;
+		$end_error = $self->_capacity_error($next_frame->element_count, $capacity)
+			if defined $end_error && $_uses_default_error_handler && $next_frame->element_count > $capacity;
 
 		if (defined $walk_error) {
 			$walk_error .= "(Clay_EndLayout also failed: $end_error)"
@@ -400,9 +406,9 @@ class Clay::UI :strict(params) {
 	# Clay drops every element past its capacity without a word and then
 	# reports the open elements it could not close; this says what
 	# happened instead.
-	method _capacity_error ($widget_count) {
+	method _capacity_error ($widget_count, $capacity) {
 		return "Clay::UI: the widget tree has more elements than max_element_count ($max_element_count) allows:"
-			. " $widget_count widgets, at most " . $self->_widget_capacity . " fit;"
+			. " $widget_count widgets, at most $capacity fit;"
 			. " pass a larger max_element_count to Clay::UI->new\n";
 	}
 
@@ -410,9 +416,11 @@ class Clay::UI :strict(params) {
 	# Pointer and scroll events.
 	# ---------------------------------------------------------------------
 
-	method _belongs_here ($widget) {
-		my $ui = $widget->ui;
-		return defined $ui && refaddr($ui) == refaddr($self);
+	# True for a widget of this UI's tree.
+	method owns ($widget) {
+		return 0 unless is_widget($widget);
+		my $owner = $widget->ui;
+		return defined $owner && refaddr($owner) == refaddr($self) ? 1 : 0;
 	}
 
 	# The widgets of this UI under the pointer, in Clay's pointer-over order:
@@ -422,7 +430,7 @@ class Clay::UI :strict(params) {
 		my @widgets;
 		for my $id (@{ Clay_GetPointerOverIds() }) {
 			my $widget = $_frame->widget_for_element($id->{id});
-			push @widgets, $widget if defined $widget && $self->_belongs_here($widget);
+			push @widgets, $widget if $self->owns($widget);
 		}
 		return @widgets;
 	}
@@ -439,7 +447,7 @@ class Clay::UI :strict(params) {
 	# The element id the last frame declared the widget with, or undef when
 	# the widget was not part of it.
 	method _laid_out_element ($widget) {
-		croak_ui "Clay::UI: expected a widget, got " . (ref($widget) || (defined $widget ? "'$widget'" : 'undef'))
+		croak_ui "Clay::UI: expected a widget, got " . described_value($widget)
 			unless blessed $widget;
 		return $_frame->element_id_of($widget);
 	}
@@ -452,10 +460,24 @@ class Clay::UI :strict(params) {
 		return { map { $_ => $data->{boundingBox}{$_} + 0 } qw(x y width height) };
 	}
 
+	# The bounding box minus the padding the same frame declared.
+	method content_box ($widget) {
+		my $box     = $self->bounding_box($widget) // return undef;
+		my $padding = $_frame->padding_of($widget);
+		my $width   = $box->{width} - $padding->{left} - $padding->{right};
+		my $height  = $box->{height} - $padding->{top} - $padding->{bottom};
+		return {
+			x      => $box->{x} + $padding->{left},
+			y      => $box->{y} + $padding->{top},
+			width  => $width > 0  ? $width  : 0,
+			height => $height > 0 ? $height : 0,
+		};
+	}
+
 	# ( element id, Clay's scroll data ) of a scroll container, or an empty
 	# list when the last frame did not lay it out.
 	method _scroll_data ($widget) {
-		croak_ui "Clay::UI: " . (ref($widget) || (defined $widget ? "'$widget'" : 'undef'))
+		croak_ui "Clay::UI: " . described_value($widget)
 			. " is not a scroll container (it does not compose Clay::UI::Role::Layout::HasScroll)"
 			unless blessed $widget && $_frame->is_scroll_container($widget);
 		my $element = $self->_laid_out_element($widget) // return;
@@ -476,7 +498,8 @@ class Clay::UI :strict(params) {
 	# Moves a scroll container, kept within its content; an axis left out
 	# keeps its position. Returns the position, or undef when the last frame
 	# did not lay the container out. A container that prepares its subtree
-	# for the position it shows (a Preparable) is prepared for the new one.
+	# for the position it shows (a Preparable) is prepared for the new one,
+	# as _render_frame does after wheel, drag and momentum moves.
 	method scroll_to ($widget, $position) {
 		croak_ui "Clay::UI: scroll_to needs a position { x => ..., y => ... }"
 			unless ref $position eq 'HASH';
@@ -536,7 +559,11 @@ class Clay::UI :strict(params) {
 		if ($node->DOES('Clay::UI::Role::Core::TextNode')) {
 			my %text_config = %{ $node->text_config };
 			_attach_back_reference($frame, \%text_config, $node);
-			Clay__OpenTextElement($node->text, camelize_keys(\%text_config));
+			# The id Clay gave the text gives it a bounding box like any
+			# element; there is none when Clay dropped the text at the
+			# element cap.
+			my $element = Clay__OpenTextElement($node->text, camelize_keys(\%text_config));
+			$frame->add_element($node, $element) if defined $element;
 			return;
 		}
 
@@ -549,7 +576,6 @@ class Clay::UI :strict(params) {
 		my $camelized = camelize_keys(\%config);
 
 		my $element = Clay_GetElementId($node->resolve_id($base, $indices));
-		$frame->add_element($node, $element);
 		my ($child_base, $child_indices) = defined $node->id ? ($node->id, []) : ($base, $indices);
 
 		Clay__OpenElementWithId($element);
@@ -559,6 +585,9 @@ class Clay::UI :strict(params) {
 				$clip->{childOffset} = Clay_GetScrollOffset();
 			}
 			Clay__ConfigureOpenElement($camelized);
+			# Recorded once Clay accepted the declaration, so the padding
+			# is valid; the content box of the frame is cut from it.
+			$frame->add_element($node, $element, ($camelized->{layout} // {})->{padding});
 
 			my @children = @{ $node->layout_children };
 			for my $index (0 .. $#children) {
@@ -786,7 +815,12 @@ The C<scroll_delta>, C<enable_drag_scrolling> and C<delta_time>
 arguments go to Clay. Wheel input moves the scroll container under the
 pointer at once. Drag scrolling moves it while the button is held and,
 after the release, keeps it gliding (momentum) for some frames. Wheel
-input has no momentum.
+input has no momentum. A scroll container that moved and composes
+L<Clay::UI::Role::Core::Preparable> calls C<request_prepare>, so step 4
+prepares it for its new position: a Preparable scroll container is
+prepared however it moved (L</scroll_to>, wheel, drag or momentum). A
+nested scroll container that moved prepares only itself, not the
+Preparable containers around it.
 
 =item 3. Events
 
@@ -819,8 +853,9 @@ tree from here on. Clay computes the layout.
 =item 6. Result
 
 C<render> returns the render commands. The frame is now the I<last
-completed frame>: L</widget_for>, L</bounding_box>, L</scroll_state>,
-L</scroll_to> and the next frame's pointer test refer to it.
+completed frame>: L</widget_for>, L</bounding_box>, L</content_box>,
+L</scroll_state>, L</scroll_to> and the next frame's pointer test refer
+to it.
 
 =back
 
@@ -898,7 +933,7 @@ C<Clay::UI: 'width' and 'height' must be positive finite numbers>.
 Optional. Bytes of memory for the Clay context: an integer of at least
 C<Clay_MinMemorySize()> for this UI's C<max_element_count> and
 C<max_measure_text_cache_word_count>, which is also the default. Dies with
-C<Clay::UI: 'memory_size' must be an integer E<gt>= Clay_MinMemorySize() (...)>.
+C<Clay::UI: 'memory_size' must be an integer E<gt>= Clay_MinMemorySize() (...) for max_element_count ...>.
 
 
 =item max_element_count
@@ -906,26 +941,34 @@ C<Clay::UI: 'memory_size' must be an integer E<gt>= Clay_MinMemorySize() (...)>.
 Optional. How many Clay elements this UI's context holds: a positive
 integer, default 8192 (Clay's default). Every element widget and every
 text widget is one element. Clay keeps two slots for itself, so one
-frame fits C<max_element_count - 2> widgets (none for a count below 3).
+frame fits C<max_element_count - 2> widgets (none for a count below 3),
+and fewer while elements removed from the tree still play an exit
+transition: Clay keeps their elements until the transition ends.
 Clay also wraps at most this many text lines per frame, over all the
 text widgets it lays out; past that it silently stops wrapping. Each
 Clay::UI has its own count, whatever context is current when it is
 constructed. A larger count needs more memory (see C<memory_size>).
-Dies with C<Clay::UI: 'max_element_count' must be a positive integer>.
+Dies with C<Clay::UI: 'max_element_count' must be a positive integer>,
+and with C<Clay::UI: Clay cannot size a context for ...> for counts
+Clay::XS refuses (see C<max_measure_text_cache_word_count>).
 Read it back with L</max_element_count>.
 
 
 =item max_measure_text_cache_word_count
 
 Optional. How many measured words Clay's text cache holds: an integer
-of at least 32, default twice C<max_element_count> (Clay's default).
+of at least 32 and at most 32 per element, default twice
+C<max_element_count> and at least 32 (Clay::XS's default).
 Clay measures every text it lays out word by word and keeps the words
 of the last few frames, visible or not, so a frame whose texts have
 more words than this makes C<render> die with
 C<Clay::UI: the texts laid out in one frame have more words than max_measure_text_cache_word_count (16384) allows; ...>
 (default error handler). A larger count needs more memory (see
 C<memory_size>). Dies with
-C<Clay::UI: 'max_measure_text_cache_word_count' must be an integer E<gt>= 32>.
+C<Clay::UI: 'max_measure_text_cache_word_count' must be a positive integer>
+and, for counts Clay::XS refuses, with
+C<Clay::UI: Clay cannot size a context for max_element_count ... and max_measure_text_cache_word_count ... (...)>,
+which quotes Clay::XS's reason (see L<Clay::XS/Element and word counts>).
 Read it back with L</max_measure_text_cache_word_count>.
 
 
@@ -976,10 +1019,10 @@ the readers C<width>, C<height> and C<measure_text> work.
 
 =item *
 
-C<bounding_box>, C<scroll_state> and C<scroll_to> die with the same
-message for a widget the last completed frame laid out, because they
-ask Clay; for a widget it did not lay out they return undef without
-asking Clay.
+C<bounding_box>, C<content_box>, C<scroll_state> and C<scroll_to> die
+with the same message for a widget the last completed frame laid out,
+because they ask Clay; for a widget it did not lay out they return
+undef without asking Clay.
 
 =back
 
@@ -1010,7 +1053,7 @@ Read-only.
 	my $words = $ui->max_measure_text_cache_word_count;
 
 Returns the C<max_measure_text_cache_word_count> passed to L</new>
-(twice C<max_element_count> by default). Read-only.
+(twice C<max_element_count>, and at least 32, by default). Read-only.
 
 =head2 width
 
@@ -1207,8 +1250,8 @@ settings), the last completed frame is unchanged.
 After a listener error or a preparation error (a dying
 C<prepare_layout>, or the 100 rounds) without a layout error,
 the layout pass completed: that frame becomes the last completed frame
-for L</widget_for>, L</bounding_box>, L</scroll_state> and the next
-frame's pointer test, even though its render commands were discarded.
+for L</widget_for>, L</bounding_box>, L</content_box>, L</scroll_state>
+and the next frame's pointer test, even though its render commands were discarded.
 
 =back
 
@@ -1226,6 +1269,20 @@ commands a C<userData> of 0, so C<widget_for> returns C<undef> for them.
 		my $widget = $ui->widget_for($command->{userData}) or next;
 		# choose how to draw by ref($widget), read its attributes, ...
 	}
+
+=head2 owns
+
+	if ($ui->owns($widget)) { ... }
+
+Returns 1 when C<$widget> is a widget
+(L<Clay::UI::Role::Layout::HasParent/is_widget>) of this UI's tree: its
+C<ui> is this Clay::UI. Returns 0 for a widget of another UI, a
+detached widget, one in a tree that is not a UI's, and for anything
+that is not a widget. It answers for the live tree, not for the last
+frame: a widget added since the last C<render> is owned already. The
+interaction tracker adds one rule on top: a subtree that is being
+removed no longer counts for it while its release events fire (see
+L<Clay::UI::Interaction/can_take_focus>).
 
 =head2 laid_out_revision
 
@@ -1255,16 +1312,17 @@ loop above redraws until the animation is over.
 
 	my $box = $ui->bounding_box($widget);    # { x, y, width, height } or undef
 
-Returns where the last completed frame placed an element widget, as a
-new hashref with C<x>, C<y>, C<width> and C<height> in layout units (the
+Returns where the last completed frame placed a widget, as a new
+hashref with C<x>, C<y>, C<width> and C<height> in layout units (the
 same numbers as the C<boundingBox> of its render commands). Scrolling is
 included, so a widget scrolled out of view lies outside its scroll
 container. Returns C<undef> for a widget that frame did not lay out (one
-added since, one removed, a text widget, or a widget of another UI).
+added since, one removed, or a widget of another UI).
 
-Text widgets have no bounding box of their own: use the C<boundingBox>
-of their C<TEXT> render commands (L</widget_for> maps each command back
-to its text widget).
+A text widget has a bounding box too: the box of all its wrapped
+lines, as Clay laid them out. Where each line was drawn is in the
+C<boundingBox> of its C<TEXT> render commands (L</widget_for> maps
+each command back to its text widget).
 
 The box is the size Clay gave the widget, which can be smaller than
 its sizing asks for: when the children of a parent do not fit into
@@ -1274,6 +1332,22 @@ C<bounding_box> reports the shrunk size. A parent that clips an axis
 along that axis.
 
 Dies when C<$widget> is not an object: C<Clay::UI: expected a widget, got ...>.
+
+=head2 content_box
+
+	my $box = $ui->content_box($widget);    # { x, y, width, height } or undef
+
+Returns the part of a widget's L</bounding_box> inside its padding: the
+area its children are laid out in, as a new hashref with C<x>, C<y>,
+C<width> and C<height>. Both come from the last completed frame: the
+padding is the one that frame declared for the widget, so a padding
+changed since shows only after the next C<render>, together with the
+box it applies to. Width and height are never negative: a padding wider
+or taller than the box leaves C<0>. A text widget has no padding, so
+its content box is its bounding box.
+
+Returns C<undef> for a widget that frame did not lay out, and dies like
+L</bounding_box> when C<$widget> is not an object.
 
 =head2 scroll_state
 
@@ -1334,7 +1408,9 @@ A container that composes L<Clay::UI::Role::Core::Preparable> is
 prepared before the next layout pass when its position changed (its
 C<request_prepare> is called), so a container that builds its children
 for the position it shows can follow a move made from code, or from a
-listener in the same frame.
+listener in the same frame. It is the same rule C<render> applies to
+wheel, drag and momentum scrolling (step 2 of L</HOW A FRAME WORKS>): a Preparable scroll
+container is prepared for the new position however it moved.
 
 Dies with
 C<Clay::UI: scroll_to needs a position { x =E<gt> ..., y =E<gt> ... }>,
@@ -1446,7 +1522,7 @@ C<IF_CONTINUE>. See L<Clay::UI::Events::OnBlur>.
 Clay has one I<current> context per process. Every method of
 Clay::UI that talks to Clay (C<new>, C<render>, the C<width>,
 C<height> and C<measure_text> writers, C<bounding_box>,
-C<scroll_state>, C<scroll_to>) first makes this UI's context current
+C<content_box>, C<scroll_state>, C<scroll_to>) first makes this UI's context current
 and leaves it current. Several Clay::UI objects can coexist; code that
 mixes Clay::UI with direct L<Clay::XS> calls must set the context it
 needs with C<Clay_SetCurrentContext> before its own calls.

@@ -178,7 +178,7 @@ is($C->new(holidays => sub { [ "$_[0]-12-25", 'Christmas Day' ] })->is_holiday(d
 
 # Freezing.
 ok(!eval { freeze($code); 1 }, 'a schedule with a code ref cannot be frozen');
-like($@, qr/^Time::Keeper::Business->STORABLE_freeze: cannot freeze a schedule with a source asked year by year; list its holidays/, '  by name');
+like($@, qr/^Time::Keeper::Business->STORABLE_freeze: cannot freeze a schedule with a code ref or an object among its holiday sources; list its holidays/, '  by name');
 ok(!eval { $code->TO_JSON; 1 }, 'nor given as JSON');
 like($@, qr/^Time::Keeper::Business->TO_JSON: cannot freeze/, '  by name');
 ok(!eval { $code->FREEZE('CBOR'); 1 }, 'nor through FREEZE');
@@ -206,6 +206,49 @@ SKIP: {
     is($thr->join, 'Christmas Day', 'a thread\'s copy asks the code ref for itself');
     my $t2 = threads->create(sub { $y->is_holiday(d('2050-01-01')) });
     is($t2->join, "New Year's Day", 'and a yearly date expands there');
+}
+
+# Sources with arguments.
+{
+    package Fake::Regional;
+    sub new { bless { asked => [] }, shift }
+    sub holidays { my ($self, @a) = @_; push @{ $self->{asked} }, [@a]; my %a = @a; my $all = { '0101' => "New Year's Day", '0102' => '2nd January (Scotland)' };
+        return $a{regions} && $a{regions}[0] eq 'EAW' ? { '0101' => "New Year's Day" } : $all }
+}
+{
+    my $f = Fake::Regional->new;
+    my $b = $C->new(holidays => [ { source => $f, regions => ['EAW'], extra => 1, alpha => 2, zeta => 3, mid => 4 } ]);
+    is($b->is_holiday(d('2026-01-02')), undef, 'a source with regions gives that region alone');
+    is($b->is_holiday(d('2026-01-01')), "New Year's Day", '  and its days');
+    is_deeply($f->{asked}[0], [ year => 2025, alpha => 2, extra => 1, mid => 4, regions => ['EAW'], zeta => 3 ], '  asked with the year first, then the arguments in key order');
+    my $plain = $C->new(holidays => [ Fake::Regional->new ]);
+    is($plain->is_holiday(d('2026-01-02')), '2nd January (Scotland)', '  without them, every region');
+    my @got;
+    my $c = $C->new(holidays => [ { source => sub { push @got, [@_]; ("$_[0]-07-04") }, office => 'leeds' } ]);
+    $c->is_holiday(d('2026-07-04'));
+    is_deeply($got[0], [ 2025, office => 'leeds' ], 'a code ref as the source gets the year, then the pairs');
+    my $regions = ['EAW'];
+    my $f2 = Fake::Regional->new;
+    my $copied = $C->new(holidays => [ { source => $f2, regions => $regions } ]);
+    push @$regions, 'SCT';
+    $copied->is_holiday(d('2026-01-01'));
+    is_deeply($f2->{asked}[0], [ year => 2025, regions => ['EAW'] ], "  the arguments were copied: a change to the caller's array changes nothing");
+    is($C->new(holidays => [ { source => Time::Keeper::Business::Rule->uk } ])->is_holiday(d('2026-12-28')), 'Boxing Day', 'a rule as the source with no arguments');
+    my @bad = (
+        [ { source => Time::Keeper::Business::Rule->uk, regions => ['EAW'] }, qr/a rule as a source takes no arguments/, 'a rule with arguments' ],
+        [ { source => Fake::Regional->new, '2026-12-25' => 'x' }, qr/a hash with a source holds the source's arguments, not the date '2026-12-25'/, 'a date key beside a source' ],
+        [ { source => Fake::Regional->new, '--12-25' => 'x' }, qr/not the date '--12-25'/, 'a yearly key beside a source' ],
+        [ { source => 'x' }, qr/a source with arguments is a code ref or an object with a holidays method/, 'a string as the source' ],
+        [ { source => undef }, qr/a source with arguments needs its source/, 'an undef source' ],
+        [ { source => bless({}, 'Something') }, qr/a code ref or an object with a holidays method/, 'an object without the method' ],
+    );
+    for my $x (@bad) {
+        ok(!eval { $C->new(holidays => [ $x->[0] ]); 1 }, "refused: $x->[2]");
+        like($@, $x->[1], '  by name');
+    }
+    is_deeply([ $b->holiday_sources ]->[0]{regions}, ['EAW'], 'holiday_sources gives the hash as given');
+    is($b->with(weekend => [])->is_holiday(d('2026-01-02')), undef, 'with keeps the arguments');
+    ok(!eval { Storable::freeze($b); 1 }, 'a source with arguments cannot be frozen, as any source asked per year');
 }
 
 done_testing;

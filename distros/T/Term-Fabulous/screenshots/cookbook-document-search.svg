@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="780" height="453" viewBox="0 0 780 453" role="img" aria-label="perl examples/cookbook/document-search.pl">
+<title>perl examples/cookbook/document-search.pl</title>
+<style>
+.terminal text { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 15px; white-space: pre; }
+.terminal .b { font-weight: bold; }
+.terminal .i { font-style: italic; }
+.title { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 13px; }
+</style>
+<defs>
+<filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#000000" flood-opacity="0.3"/></filter>
+<clipPath id="window"><rect x="16" y="16" width="748" height="418" rx="10"/></clipPath>
+</defs>
+<rect x="16" y="16" width="748" height="418" rx="10" fill="#161622" filter="url(#shadow)"/>
+<rect x="16" y="16" width="748" height="34" fill="#1f2430" clip-path="url(#window)"/>
+<circle cx="36" cy="33" r="6" fill="#ff5f57"/>
+<circle cx="56" cy="33" r="6" fill="#febc2e"/>
+<circle cx="76" cy="33" r="6" fill="#28c840"/>
+<text class="title" x="390" y="33" text-anchor="middle" dominant-baseline="central" fill="#9aa3b5">perl examples/cookbook/document-search.pl</text>
+<rect x="16.5" y="16.5" width="747" height="417" rx="10" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1"/>
+<g shape-rendering="crispEdges">
+<rect x="57" y="60" width="675" height="36" fill="#1e2128"/>
+<rect x="264" y="186" width="36" height="18" fill="#264f78"/>
+<rect x="57" y="312" width="675" height="36" fill="#1e2128"/>
+<rect x="57" y="384" width="36" height="18" fill="#e5c07b"/>
+<rect x="39" y="402" width="216" height="18" fill="#242830"/>
+<rect x="745" y="60" width="1" height="36" fill="#464c5a"/>
+<rect x="745" y="96" width="2" height="54" fill="#61afef"/>
+<rect x="745" y="150" width="1" height="252" fill="#464c5a"/>
+</g>
+<g class="terminal">
+<text x="66" y="74" textLength="162" fill="#dcdfe4">cp snapback ~/bin/</text>
+<text x="66" y="92" textLength="207" fill="#dcdfe4">chmod +x ~/bin/snapback</text>
+<text x="57" y="128" textLength="540" fill="#dcdfe4">It needs Perl 5.32 or later and no modules outside the core.</text>
+<text x="39" y="164" textLength="153" class="b" fill="#ebeef3">Your first backup</text>
+<text x="57" y="200" textLength="18" fill="#61afef">1.</text>
+<text x="93" y="200" textLength="585" fill="#dcdfe4">Connect the backup disk and note where it is mounted, for example</text>
+<text x="93" y="218" textLength="99" fill="#e5c07b">/mnt/backup</text>
+<text x="192" y="218" textLength="9" fill="#dcdfe4">.</text>
+<text x="57" y="236" textLength="18" fill="#61afef">2.</text>
+<text x="93" y="236" textLength="612" fill="#dcdfe4">Make a dry run, which lists the files snapback would copy and copies</text>
+<text x="93" y="254" textLength="72" fill="#dcdfe4">nothing.</text>
+<text x="57" y="272" textLength="18" fill="#61afef">3.</text>
+<text x="93" y="272" textLength="594" fill="#dcdfe4">Run the backup itself. The first one copies every file; later ones</text>
+<text x="93" y="290" textLength="198" fill="#dcdfe4">copy only the changes.</text>
+<text x="66" y="326" textLength="378" fill="#dcdfe4">snapback --dry-run ~/Documents /mnt/backup</text>
+<text x="66" y="344" textLength="288" fill="#dcdfe4">snapback ~/Documents /mnt/backup</text>
+<text x="57" y="380" textLength="648" fill="#dcdfe4">Each run creates a directory named after the date and time on the backup</text>
+<text x="57" y="398" textLength="36" fill="#101216">disk</text>
+<text x="93" y="398" textLength="585" fill="#dcdfe4">. Files that did not change are hard links to the copy of the run</text>
+<text x="39" y="416" textLength="36" fill="#dcdfe4">disk</text>
+<text x="273" y="416" textLength="279" fill="#96a0b4">match 3 of 6  Installation  15%</text>
+</g>
+<g shape-rendering="crispEdges">
+</g>
+</svg>

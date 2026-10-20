@@ -8,7 +8,7 @@ use DKIM2SignedFixture;
 use DKIM2TestKeys;
 use Mail::DKIM2::Verifier;
 
-# spec-06 §3.4: Verifiers MUST ignore signatures using algorithms they do
+# -07 §3.5: Verifiers MUST ignore signatures using algorithms they do
 # not implement. Only the exact names rsa-sha256 and ed25519-sha256 are
 # implemented (tag values are case significant, §8); anything else is
 # skipped before any key lookup, and is never verified as RSA.
@@ -28,11 +28,11 @@ sub run {
 
 run('rsa-sha256', [['sel1', 'rsa-sha256']], qr/^pass/, 1);
 run('unknown algorithm, correctly signed with RSA',
-    [['sel1', 'future-alg']], qr/^fail .*DKIM2-Signature i=1 has no signature with a supported algorithm/, 0);
+    [['sel1', 'future-alg']], qr/^permerror \(PERMERROR: DKIM2-Signature i=1 has no signature with a supported algorithm\)$/, 0);
 run('RSA-SHA256 is not rsa-sha256',
-    [['sel1', 'RSA-SHA256']], qr/^fail .*DKIM2-Signature i=1 has no signature with a supported algorithm/, 0);
+    [['sel1', 'RSA-SHA256']], qr/^permerror \(PERMERROR: DKIM2-Signature i=1 has no signature with a supported algorithm\)$/, 0);
 run('ed25519-sha256x is not ed25519-sha256',
-    [['sel1', 'ed25519-sha256x']], qr/^fail .*DKIM2-Signature i=1 has no signature with a supported algorithm/, 0);
+    [['sel1', 'ed25519-sha256x']], qr/^permerror \(PERMERROR: DKIM2-Signature i=1 has no signature with a supported algorithm\)$/, 0);
 run('unknown item beside a good one',
     [['sel2', 'future-alg', 'AAAA'], ['sel1', 'rsa-sha256']], qr/^pass/, 1);
 run('known algorithm, value not base64',
@@ -44,7 +44,7 @@ run('known algorithm, base64 missing its padding',
 run('unknown algorithm, value not base64: still ignored',
     [['sel2', 'future-alg', '!!x!!'], ['sel1', 'rsa-sha256']], qr/^pass/, 1);
 
-# spec-06 §11.5: an absent key is a PERMERROR when nothing else can be
+# -07 §14.5: an absent key is a PERMERROR when nothing else can be
 # checked; an item with no key beside one that verifies is skipped.
 {
     my $absent = sub { $calls++; return undef };
@@ -60,6 +60,21 @@ run('unknown algorithm, value not base64: still ignored',
             items => [['gone', 'rsa-sha256', 'AAAA'], ['sel1', 'rsa-sha256']]),
         PubkeyCallback => $some);
     like($v->result_detail, qr/^pass/, 'one key absent, one verifies: pass');
+}
+
+# -07 section 14.6: every signature that can be checked is; all failing,
+# or some failing beside one that passes, is a FAIL naming the selectors.
+# (sel2's key is test1's sel2 key; the fixture signs every item with sel1's.)
+{
+    my $v = DKIM2SignedFixture::verify(DKIM2SignedFixture::signed(
+        items => [['sel2', 'rsa-sha256']]));
+    is($v->details, 'FAIL: DKIM2-Signature i=1 selector sel2 incorrect signature',
+        'the only signature fails: selector incorrect signature');
+    $v = DKIM2SignedFixture::verify(DKIM2SignedFixture::signed(
+        items => [['sel1', 'rsa-sha256'], ['sel2', 'rsa-sha256']]));
+    is($v->result, 'fail', 'one passes, one fails: fail');
+    is($v->details, 'FAIL: DKIM2-Signature i=1 signature sel1 signature sel2 failed',
+        '... naming the one that passed and the one that failed');
 }
 
 # A key of the wrong type for the algorithm, from a callback.

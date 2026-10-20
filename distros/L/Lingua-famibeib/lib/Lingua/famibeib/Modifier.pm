@@ -13,9 +13,9 @@ use warnings;
 
 use Carp;
 
-our $VERSION = v0.07;
+our $VERSION = v0.08;
 
-use parent qw(Data::Identifier::Interface::Simple Data::Identifier::Interface::Subobjects);
+use parent qw(Data::Identifier::Interface::Simple Data::Identifier::Interface::Subobjects Data::Identifier::Interface::Known);
 
 use constant {
     _GENERATOR => Data::Identifier->new(uuid => '306baa6e-e672-4327-a6b4-ba1d3de89a1e')->register,
@@ -212,6 +212,13 @@ sub displayname {
     return $self->as('Data::Identifier')->displayname(@opts);
 }
 
+sub _known_provider {
+    my ($pkg, $class, %opts) = @_;
+    croak 'Unsupported options passed' if scalar(keys %opts);
+    return ([values %_registered_by_string], rawtype => __PACKAGE__) if $class eq ':all' || $class eq 'registered';
+    croak 'Unsupported class';
+}
+
 1;
 
 __END__
@@ -226,7 +233,7 @@ Lingua::famibeib::Modifier - module to interact with the famibeib word modifiers
 
 =head1 VERSION
 
-version v0.07
+version v0.08
 
 =head1 SYNOPSIS
 
@@ -235,7 +242,10 @@ version v0.07
 This package represents a modifier that is applied to a word.
 See also L<Lingua::famibeib::Word>.
 
-This module inherits from L<Data::Identifier::Interface::Simple>, and L<Data::Identifier::Interface::Subobjects>.
+This module inherits from
+L<Data::Identifier::Interface::Simple> (since v0.01),
+L<Data::Identifier::Interface::Subobjects> (since v0.01),
+and L<Data::Identifier::Interface::Known> (since v0.08).
 Instances are overloaded so they will stringify to their string representation as per L</as_string>.
 
 =head1 METHODS

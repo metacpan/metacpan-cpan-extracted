@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Punk (); 
 
-our $VERSION = '0.61';
+our $VERSION = '0.62';
 
 1;
 
@@ -340,7 +340,12 @@ to them.
 
 =head1 WRITING A BACKEND
 
-L<Punk::Model::DBI> is the default backend, not the only one. A backend is
+L<Punk::Model::DBI> is the default backend, not the only one. Punk ships
+three more: L<Punk::Model::DBIx::Loop> (DBI on the worker's loop, returning
+futures), L<Punk::Model::JSONFile> (rows in a JSON file, read and write) and
+L<Punk::Model::Markdown> (the pages of a C<markdown> mount, read-only). The
+last two evaluate the same filters, ordering and tokens as the DBI ones, in
+memory. A backend is
 any class implementing the six-method contract; point a database at it with
 C<< database $name => { backend => 'Class', ... } >> and a model reaches it
 by selecting that database (L</database>). This is how a model tier over
@@ -357,6 +362,7 @@ The class must provide a constructor and the six methods:
     #   table    => $name    the model's table keyword (here: the index)
     #   primary  => $field   the primary-key field name
     #   columns  => \@names  the declared field names, in order
+    #   app      => $app     the application (weaken it if you keep it)
     sub new {
         my ($class, %args) = @_;
         bless { ... }, $class;
@@ -383,7 +389,8 @@ no C<use Punk::Model>.
 
 =head1 SEE ALSO
 
-L<Punk::Model::DBI>, L<Punk>, L<Punk::Context>, L<JSON::Schema::Fast>.
+L<Punk::Model::DBI>, L<Punk::Model::JSONFile>, L<Punk::Model::Markdown>,
+L<Punk>, L<Punk::Context>, L<JSON::Schema::Fast>.
 
 L<Punk::Validate> is the other half of the same coin: the model
 croaks at write time because bad data reaching it is a bug, while the

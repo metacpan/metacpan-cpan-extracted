@@ -1,5 +1,5 @@
 package Clay::UI::_FrameRegistry;
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 use v5.22;
 use warnings;
 use feature 'signatures';
@@ -11,11 +11,13 @@ use Scalar::Util qw(refaddr weaken);
 class Clay::UI::_FrameRegistry :strict(params) {
 	use Clay::XS qw(Clay_GetScrollContainerData);
 
+	my @PADDING_SIDES = qw(left top right bottom);
+
 	# Every widget reference is weak: a widget freed after its frame looks
 	# like one the frame never saw.
 	field %_by_user_data;   # render-command userData (refaddr) -> widget
 	field %_by_element;     # Clay element id -> widget
-	field %_rank;           # refaddr -> [ position in the walk (pre-order), widget, element id hash ]
+	field %_rank;           # refaddr -> [ position in the walk (pre-order), widget, element id hash, padding ]
 	field @_scroll;         # [ widget, element id hash ] per scroll container
 
 	# Records a widget that emits render commands; returns the userData
@@ -27,12 +29,16 @@ class Clay::UI::_FrameRegistry :strict(params) {
 		return $user_data;
 	}
 
-	# Records an element widget in walk order, with the element id hash
-	# Clay_GetElementId returned for it.
-	method add_element ($widget, $element_id) {
+	# Records a widget Clay declared an element for, in walk order, with
+	# the element id hash Clay named it by and the padding of its
+	# declaration (a Clay_Padding hash; missing sides and a missing hash
+	# are 0, as for Clay).
+	method add_element ($widget, $element_id, $padding = undef) {
+		$padding //= {};
 		$_by_element{ $element_id->{id} } = $widget;
 		weaken $_by_element{ $element_id->{id} };
-		$_rank{ refaddr $widget } = [ scalar keys %_rank, $widget, $element_id ];
+		my %declared = map { $_ => ($padding->{$_} // 0) + 0 } @PADDING_SIDES;
+		$_rank{ refaddr $widget } = [ scalar keys %_rank, $widget, $element_id, \%declared ];
 		weaken $_rank{ refaddr $widget }[1];
 		if ($self->is_scroll_container($widget)) {
 			push @_scroll, [ $widget, $element_id ];
@@ -68,6 +74,13 @@ class Clay::UI::_FrameRegistry :strict(params) {
 		return $_rank{ refaddr $widget }[2];
 	}
 
+	# A copy of the padding the walk declared the widget with ({ left,
+	# top, right, bottom }), or undef if the walk did not reach it.
+	method padding_of ($widget) {
+		return undef unless defined $self->_walk_rank($widget);
+		return { %{ $_rank{ refaddr $widget }[3] } };
+	}
+
 	# Widgets sorted by their position in the walk. Widgets the walk did not
 	# reach (added since) follow, in the pre-order of the tree they are in
 	# now; ties keep their input order.
@@ -77,7 +90,7 @@ class Clay::UI::_FrameRegistry :strict(params) {
 		my %live_rank;
 		for my $root (_distinct_roots(values %unknown)) {
 			my $position = 0;
-			$live_rank{ refaddr $_ } //= $position++ for _pre_order($root);
+			$live_rank{ refaddr $_ } //= $position++ for $root->subtree;
 		}
 		my $rank = sub ($widget) {
 			return $self->_walk_rank($widget) // $walked + ($live_rank{ refaddr $widget } // 9**9**9);
@@ -99,11 +112,6 @@ class Clay::UI::_FrameRegistry :strict(params) {
 		return values %roots;
 	}
 
-	# $root and every widget below it, depth-first pre-order.
-	sub _pre_order ($root) {
-		return ($root, $root->DOES('Clay::UI::Role::Core::Element') ? $root->descendants : ());
-	}
-
 	# [ widget, element id hash ] for every scroll container that still
 	# exists, in walk order.
 	method scroll_containers () {
@@ -117,8 +125,7 @@ class Clay::UI::_FrameRegistry :strict(params) {
 		my %positions;
 		for my $container ($self->scroll_containers) {
 			my ($widget, $element_id) = @$container;
-			my $owner = $widget->ui;
-			next unless defined $owner && refaddr($owner) == refaddr($ui);
+			next unless $ui->owns($widget);
 			my $data = Clay_GetScrollContainerData($element_id);
 			$positions{ refaddr $widget } = [ $widget, $element_id, $data->{scrollPosition} ] if $data->{found};
 		}
@@ -180,10 +187,12 @@ commands.
 
 1 if C<$widget> is a scroll container, else 0.
 
-=item C<add_element($widget, $element_id)>
+=item C<add_element($widget, $element_id, $padding)>
 
-Records an element widget in walk order under the element id hash from
-C<Clay_GetElementId>; a scroll container is also listed by
+Records a widget Clay declared an element for (an element or a text
+widget) in walk order under the element id hash Clay named it by, with
+the padding of its declaration (a C<Clay_Padding> hash, or undef for
+none; missing sides are 0); a scroll container is also listed by
 C<scroll_containers>.
 
 =item C<element_count>
@@ -194,6 +203,12 @@ elements the walk declared, element and text widgets alike.
 =item C<widget_for($user_data)>, C<widget_for_element($id)>
 
 The widget, or undef.
+
+=item C<element_id_of($widget)>, C<padding_of($widget)>
+
+The element id hash, or a copy of the padding
+(C<< { left, top, right, bottom } >>), the walk declared C<$widget>
+with; undef for a widget the walk did not reach.
 
 =item C<in_tree_order(@widgets)>
 

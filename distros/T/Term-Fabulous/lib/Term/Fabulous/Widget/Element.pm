@@ -3,7 +3,7 @@ package Term::Fabulous::Widget::Element;
 use v5.32;
 use warnings;
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 use Object::Pad 0.825;
 

@@ -1,0 +1,252 @@
+Revision history for Clay-UI
+
+0.07    2026-10-19
+        - A widget that loses the focus hands it on instead of leaving
+          nothing focused: when the focused widget is removed from the
+          tree, disabled or told it cannot focus, the focus goes to the
+          nearest ancestor that stays and can take it, or to the widget
+          a focus_heir hook names (a closing popup names what was
+          focused before it). The blur and the heir's focus fire in one
+          batch, so listeners never see a moment without a focus.
+        - A HasFocusOrder owner decides how the focus enters and leaves
+          its subtree. get_entry_focus is asked when Tab or Shift+Tab
+          arrive from outside, so a container can be a Tab stop of its
+          own; focus_scope names the subtree its order covers, and
+          Interaction::focus_after steps on from the end of a subtree,
+          wrapping within the scope, so a modal dialog keeps the focus
+          inside itself.
+        - Text widgets have a bounding box like every other widget,
+          appear under the pointer and may compose Hoverable and
+          Pressable, so a label can react to the pointer without a box
+          around it. Clay__OpenTextElement returns the id Clay gave the
+          text.
+        - Text that does not wrap (CLAY_TEXT_WRAP_NEWLINES and
+          CLAY_TEXT_WRAP_NONE) no longer holds its parent wide: a long
+          URL or path is cut off at its container's width, but only
+          once nothing else in the container can shrink, so every
+          layout that fits today stays as it is. CLAY_TEXT_WRAP_NEWLINES
+          now breaks only at newlines, and CLAY_TEXT_WRAP_NONE keeps the
+          whole text on one line; the documentation of both says so.
+        - $ui->content_box answers the area inside a widget's padding
+          for the last frame, so a composite widget no longer combines
+          a bounding box with a fresh to_config run.
+        - on($name, $handler, owner => $object) binds a listener to an
+          owner it holds weakly: the handler is called with the owner
+          and the event, and stops running once the owner is gone. A
+          widget class can listen on its own parts without weakening a
+          copy of $self in every handler.
+        - HasParent answers every question about the tree: ancestors,
+          closest, subtree, and the exported is_widget predicate;
+          $ui->owns says whether a widget belongs to a UI.
+        - A Preparable scroll container is prepared in the same render
+          whenever it moved, by the wheel, a drag, momentum or
+          scroll_to; no OnScroll listener is needed for that any more.
+        - Clay_MinMemorySize and Clay_Initialize take explicit element
+          and word counts, so a Clay::UI sizes its context without a
+          throwaway seed context and never touches another UI's counts
+          or Clay's defaults. A tree that does not fit max_element_count
+          is reported with the number of widgets that would have fit,
+          exiting transitions included.
+        - The test suite now checks every exported enum constant against
+          clay.h and every wrapper guard against the guard table, so a
+          Clay bump cannot silently lose a constant or a guard. The
+          callback dispatcher is private to the binding; nothing in Perl
+          can call or replace it.
+
+0.06    2026-10-11
+        - First release on CPAN. Earlier versions were only on GitHub.
+        - Requires Perl 5.26 and List::Util 1.45; Clay::UI never loaded
+          on 5.22 and 5.24, although the dist claimed to support them.
+        - Builds and passes its tests on Windows (Strawberry Perl) and
+          macOS. CI tests Perl 5.26 through 5.44 on Linux, macOS and
+          Windows, and make release refuses to upload a commit whose CI
+          run has not passed.
+        - Every module carries the dist version on CPAN, so a newer one
+          can be required.
+        - The documentation is also published as Markdown pages in
+          docs/ for reading on GitHub.
+
+0.05    2026-10-06
+        - Every TEXT render command carries stringOffset, the character
+          offset of its line in the element's text, so a renderer can
+          style ranges of a wrapped text.
+        - max_measure_text_cache_word_count sizes Clay's text
+          measurement cache per UI, next to max_element_count; a frame
+          with more words dies naming the parameter instead of with
+          Clay's C message.
+        - remove_child takes widgets and compares them by identity;
+          remove_child_with_id removes by id, and has_child asks whether
+          a widget is a direct child. A string passed to remove_child
+          dies and names remove_child_with_id.
+        - scroll_to requests the preparation of a Preparable container,
+          so a windowed list learns about moves made from code, and
+          Container gains insert_children to put entering children
+          before the ones it keeps.
+        - Tree questions have one answer each: descendants, contains,
+          has_focus_within and focus scopes (focusables, default_next_
+          focus and default_previous_focus within a subtree). The public
+          tree_changed hook replaces overriding private methods to learn
+          about attachment.
+        - Grid->new(layout => { childGap => 3 }) no longer dies at the
+          first render: slices are stored with snake_case keys, whatever
+          spelling was given, and readers return snake_case keys.
+        - Every exported name and enum range has one source, so a
+          layout direction can no longer be installed but rejected by
+          the struct schemas. Clay_EaseOut raises Clay::XS::StructError
+          like every other struct argument.
+        - Fuzzing under ASan found crashes and hangs in Clay's
+          transition machinery on input the binding allowed: a frame
+          abandoned by an exception, an element declared again without
+          its transition key, exit clones past the element count, and
+          sizing groups that counted exiting copies until their sizes
+          overflowed. All fixed; Clay never sees two Clay_BeginLayout
+          calls without a Clay_EndLayout any more.
+        - exit and loop control (last, next) inside a callback no longer
+          unwind through Clay's frames and wedge the binding: callbacks
+          run on their own Perl stack and an exit is re-issued once Clay
+          returns.
+        - Clay_GetScrollContainerData may be called while a frame is
+          declared, as upstream's scrollbar pattern does. Query wrappers
+          no longer re-throw held errors while a frame is open; the
+          error surfaces from Clay_EndLayout.
+        - make dist works: the dist has a MANIFEST and ships the
+          pristine clay.h plus the patches, which make applies on the
+          installing machine.
+
+0.04    2026-10-04
+        - Flow layout: the new layout direction CLAY_LEFT_TO_RIGHT_WRAP
+          wraps children into lines like text, with line_gap and
+          line_sizing to space and size the lines. Toolbars, tag clouds
+          and galleries no longer have to be split into rows by hand.
+        - Stack layout: CLAY_BACK_TO_FRONT lays children on top of each
+          other in one box, sized by the largest of them, for badges,
+          captions and backgrounds. Where Pressables overlap, the one
+          drawn on top receives the press.
+        - The Disableable role: a disabled widget is never hovered,
+          armed, pressed or focused. can_focus answers "wanted, accepted
+          by the class and not disabled"; setting can_focus(0) on the
+          focused widget blurs it at once, and 'disabled' is a derived
+          state.
+        - Grids can share their columns and width (share_columns_with),
+          hold rows that span every column, reorder rows in place, and
+          take styled cells of any class through the GridCell marker
+          role. Grid rows are now sizing_grow wide, so grow cells share
+          the space left in a wide grid; fit grids look as before.
+        - Composite widgets can ask where things landed and rebuild
+          once per frame: bounding_box, scroll_state and scroll_to
+          answer from the last frame, Preparable widgets run
+          prepare_layout right before the layout pass, and
+          laid_out_revision tells renderers which revision they drew,
+          so changes made during render need no second frame.
+        - A widget can lay out internal children of its own, such as a
+          scrollbar floating over a scroll container, which its user's
+          children list and the Container mutators never see.
+        - Sizing groups share their largest minimum instead of their
+          largest size, so grid columns compress and wrap when their
+          grid is too narrow.
+        - Transitions move the revision, so renderers following the
+          documented loop no longer freeze on the first animated frame,
+          and they run only while Perl handlers are installed: a
+          transition key no longer delays every change by a frame.
+        - Several upstream Clay bugs are fixed in a patch instead of
+          being worked around: a completing exit transition no longer
+          skips the next one, an exit starts from the current state,
+          image and custom elements get no background rectangle, every
+          command of a floating element carries its zIndex,
+          CLAY_TEXT_WRAP_NONE never breaks, lineHeight boxes stack from
+          the element's top, a culled clip container still emits its
+          scissor commands, a floating element may attach to an element
+          declared later in the frame, and calling
+          Clay_UpdateScrollContainers twice between frames no longer
+          forgets every scroll position.
+        - A BORDER command is emitted for any positive width again; the
+          colour's alpha decides how a border looks, not whether the
+          renderer hears about it.
+        - Clay::UI errors name the caller's line instead of a line in
+          the library.
+        - The documentation is rewritten: Clay::Manual introduces the
+          concepts in order, Clay::Cookbook answers concrete tasks,
+          Clay::XS::Structs covers every struct key, and each function,
+          method, parameter, event and constant has its own heading.
+          Eighteen headless examples show the features, including a
+          PNG card and a paginated PDF invoice, and the layout model is
+          illustrated with figures that Clay itself laid out.
+
+0.03    2026-10-02
+        - A full review found ways to crash the interpreter from plain
+          Perl: text Clay still held was freed, a second context handle
+          double-freed the context, most functions ran without a live
+          context, and dying with an element open crashed
+          Clay_EndLayout. All fixed; every function checks its context,
+          its arguments and the open/close balance before touching Clay.
+        - A dying callback now fails the call instead of being
+          downgraded to a warning, and callbacks cannot re-enter Clay.
+          The error is held and re-thrown once Clay has returned.
+        - Clay::XS tracks the frame state, so a frame left open by an
+          exception is finished before the next one begins, and the
+          text arena keeps exactly what Clay's exiting elements still
+          show.
+        - check_struct validates a Clay struct strictly, and Clay::UI
+          uses it where an attribute is set, so negative padding or an
+          oversized child gap dies at the caller with the snake_case
+          path, not at render time. Struct errors are
+          Clay::XS::StructError objects that stringify as before.
+        - Clay::UI::Revision counts every change a frame would show,
+          including scroll positions, so a renderer can skip frames in
+          which nothing moved instead of redrawing on a timer.
+        - max_element_count sizes each UI's context; a larger tree dies
+          naming the parameter instead of with an unrelated Clay error
+          at 8192 elements.
+        - Pointer and focus state live in one interaction tracker,
+          $ui->interaction: hover, armed, pressed and focus, with the
+          widget readers and the hovered / pressed / focused states
+          derived from it. get_hovered is replaced by
+          $ui->interaction->under_pointer, and the focus methods live
+          on the tracker. Removing a hovered or focused widget fires
+          OnHoverStopped and OnBlur during the removal, not on the next
+          render.
+        - Press semantics are fixed: press and release fire in the
+          first frame, a release needs a press on the same widget, and
+          hover events no longer bubble. Events are claimed right before
+          delivery, so an event made stale by an earlier listener is
+          dropped and start/stop and focus/blur stay paired.
+        - fire_event reports whether a handler took the event (HANDLED
+          or CONTINUE), and the event remembers who handled it, so a
+          mouse wheel report can still scroll the box under the pointer
+          when nothing consumed it.
+        - A removed widget can be attached again, so a dialog that
+          detaches itself on close can be opened a second time. Child
+          mutators moved to the Container role.
+        - Widget style and layout attributes are mutable: a box can be
+          rethemed, a label's text changed and a container's layout
+          switched without rebuilding the widget. Readers return copies,
+          so no value is shared with the caller, and to_config output is
+          read-only.
+        - Box, Grid and Text are roles, so an application composes them
+          into its own widget classes; the Button and ScrollPanel
+          classes are gone, and HasClip merged into HasScroll. Grids are
+          mutable: rows can be appended, inserted, replaced and removed
+          at any time, and the children and rows constructor parameters
+          are gone.
+        - A clip slice from a widget that does not compose HasScroll
+          still clips but no longer scrolls.
+        - The vendored Clay header follows upstream main, which fixes
+          four bugs in exit transitions.
+
+0.02    2026-05-18
+        - The distribution is Clay-UI and the binding is Clay::XS; the
+          modules are grouped into Core, Style, Layout, Interaction,
+          Events and Enum.
+        - Focus: the Focusable role, OnFocus and OnBlur, and
+          HasFocusOrder to override the default Tab order.
+        - The HasStates role: every widget composing an interaction role
+          reports its hovered, pressed and focused states for themes.
+        - Not released; only on GitHub.
+
+0.01    2026-05-16
+        - First version, never released: Clay::XS binds the header-only
+          Clay v0.14 C layout library under its exact C names, and
+          Clay::UI builds widget trees from Object::Pad roles, lays them
+          out and turns pointer input into events. Sizing groups, added
+          to Clay by a patch, align widgets across the tree and drive
+          the Grid widget. Examples render the layout to SVG and PNG.

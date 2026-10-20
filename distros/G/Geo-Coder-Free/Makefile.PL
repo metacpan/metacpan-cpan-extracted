@@ -40,7 +40,17 @@ BEGIN {
 		}
 		print "Installing $list\n";
 		# system("cpan -i $list");
-		system('perl -MCPAN -e \'CPAN::Shell->install("' . join('", "', @needfull) . '")\'');
+		# The list form and $^X keep the shell out of it: cmd.exe does not
+		# treat single quotes as quotes, so a one-string command that used
+		# them silently installed nothing on Windows
+		if($ENV{'PERL5_CPANM_IS_RUNNING'}) {
+			# Running under cpanm, which is on the PATH, so use it rather
+			# than CPAN.pm, which may stop to ask for its configuration
+			system($^X, '-S', 'cpanm', '--notest', @needfull);
+		} else {
+			local $ENV{'PERL_MM_USE_DEFAULT'} = 1;
+			system($^X, '-MCPAN', '-e', "CPAN::Shell->install(qw($list))");
+		}
 	}
 }
 
@@ -291,7 +301,8 @@ my $build_requires = {
 	'File::Spec' => 0,
 	'autodie' => 0,
 	'Geo::Coder::Abbreviations' => 0.03,
-	'Geo::Location::Point' => 0.18,	# 0.18 defines the accuracy vocabulary
+	'Geo::Location::Point' => 0.19,	# 0.19 defines the accuracy vocabulary and derives a level from matched fields
+	'Geo::Location::Predicate' => 0.01,	# the location rule, a distribution of its own since 0.48
 	'IPC::System::Simple' => 0,
 	'JSON::MaybeXS' => 0,
 	'LWP::ConnCache' => 0,
@@ -378,6 +389,7 @@ WriteMakefile(
 	BUILD_REQUIRES => $build_requires,
 	CONFIGURE_REQUIRES => {
 		'ExtUtils::MakeMaker' => 6.64,	# Minimum version for TEST_REQUIRES
+		'LWP::Protocol::https' => 0,	# Loaded by the BEGIN block above
 	}, TEST_REQUIRES => $test_requires,
 	PREREQ_PM => {
 		'Carp' => 0,
@@ -393,8 +405,9 @@ WriteMakefile(
 		'DBD::SQLite' => 0,
 		'Encode' => 0,
 		'Geo::Coder::Abbreviations' => 0.03,
+		'Geo::Location::Predicate' => 0.01,	# the location rule, a distribution of its own since 0.48
 		'Geo::Hash' => 0,
-		'Geo::Location::Point' => 0.18,	# 0.18 defines the accuracy vocabulary
+		'Geo::Location::Point' => 0.19,	# 0.19 defines the accuracy vocabulary and derives a level from matched fields
 		'Geo::StreetAddress::US' => 0,
 		'Lingua::EN::AddressParse' => 0,
 		'Locale::CA' => 0,

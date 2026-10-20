@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="780" height="489" viewBox="0 0 780 489" role="img" aria-label="perl examples/cookbook/code-highlighting.pl">
+<title>perl examples/cookbook/code-highlighting.pl</title>
+<style>
+.terminal text { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 15px; white-space: pre; }
+.terminal .b { font-weight: bold; }
+.terminal .i { font-style: italic; }
+.title { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 13px; }
+</style>
+<defs>
+<filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#000000" flood-opacity="0.3"/></filter>
+<clipPath id="window"><rect x="16" y="16" width="748" height="454" rx="10"/></clipPath>
+</defs>
+<rect x="16" y="16" width="748" height="454" rx="10" fill="#161622" filter="url(#shadow)"/>
+<rect x="16" y="16" width="748" height="34" fill="#1f2430" clip-path="url(#window)"/>
+<circle cx="36" cy="33" r="6" fill="#ff5f57"/>
+<circle cx="56" cy="33" r="6" fill="#febc2e"/>
+<circle cx="76" cy="33" r="6" fill="#28c840"/>
+<text class="title" x="390" y="33" text-anchor="middle" dominant-baseline="central" fill="#9aa3b5">perl examples/cookbook/code-highlighting.pl</text>
+<rect x="16.5" y="16.5" width="747" height="453" rx="10" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1"/>
+<g shape-rendering="crispEdges">
+<rect x="57" y="150" width="675" height="108" fill="#1e2128"/>
+<rect x="57" y="276" width="675" height="18" fill="#1e2128"/>
+<rect x="57" y="312" width="675" height="54" fill="#1e2128"/>
+</g>
+<g class="terminal">
+<text x="39" y="74" textLength="144" class="b" fill="#ebeef3">Highlighted code</text>
+<text x="57" y="110" textLength="666" fill="#dcdfe4">Each code block names its language, and the highlighter colors its tokens.</text>
+<text x="57" y="128" textLength="504" fill="#dcdfe4">Left and Right scroll all code blocks sideways together.</text>
+<text x="66" y="164" textLength="171" class="i" fill="#7f848e">#!/usr/bin/env perl</text>
+<text x="66" y="182" textLength="27" class="b" fill="#c678dd">use</text>
+<text x="102" y="182" textLength="54" fill="#dcdfe4">v5.32;</text>
+<text x="66" y="200" textLength="27" class="b" fill="#c678dd">use</text>
+<text x="102" y="200" textLength="81" fill="#dcdfe4">warnings;</text>
+<text x="66" y="236" textLength="18" class="b" fill="#c678dd">my</text>
+<text x="93" y="236" textLength="9" fill="#dcdfe4">(</text>
+<text x="102" y="236" textLength="63" fill="#e06c75">$backup</text>
+<text x="165" y="236" textLength="27" fill="#dcdfe4">) =</text>
+<text x="201" y="236" textLength="45" fill="#e06c75">@ARGV</text>
+<text x="255" y="236" textLength="54" class="b" fill="#c678dd">or die</text>
+<text x="318" y="236" textLength="270" fill="#98c379">&quot;usage: $0 BACKUP-DIRECTORY\n&quot;</text>
+<text x="588" y="236" textLength="9" fill="#dcdfe4">;</text>
+<text x="66" y="254" textLength="27" fill="#dcdfe4">say</text>
+<text x="102" y="254" textLength="297" fill="#98c379">&quot;snapback: new backup in $backup&quot;</text>
+<text x="399" y="254" textLength="9" fill="#dcdfe4">;</text>
+<text x="444" y="254" textLength="279" class="i" fill="#7f848e"># a long comment that runs past</text>
+<text x="727.5" y="254" text-anchor="middle" fill="#8c929e">›</text>
+<text x="66" y="290" textLength="72" class="b" fill="#61afef">snapback</text>
+<text x="147" y="290" textLength="81" fill="#d19a66">--dry-run</text>
+<text x="237" y="290" textLength="207" fill="#dcdfe4">~/Documents /mnt/backup</text>
+<text x="480" y="290" textLength="207" class="i" fill="#7f848e"># lists, copies nothing</text>
+<text x="66" y="326" textLength="117" class="i" fill="#7f848e"># ~/.snapback</text>
+<text x="66" y="344" textLength="54" fill="#e06c75">target</text>
+<text x="129" y="344" textLength="117" fill="#dcdfe4">= /mnt/backup</text>
+<text x="66" y="362" textLength="36" fill="#e06c75">keep</text>
+<text x="129" y="362" textLength="36" fill="#dcdfe4">= 14</text>
+</g>
+<g shape-rendering="crispEdges">
+</g>
+</svg>

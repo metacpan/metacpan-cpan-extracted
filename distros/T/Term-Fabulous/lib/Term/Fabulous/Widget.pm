@@ -5,7 +5,7 @@ use warnings;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 use Object::Pad 0.825;
 
@@ -15,8 +15,9 @@ class Term::Fabulous::Widget
 	:does(Term::Fabulous::Role::Themed)
 	:abstract
 {
-	use List::Util qw(first);
-	use Term::Fabulous::Check qw(boolean class_names color);
+	use Clay::XS qw(CLAY__SIZING_TYPE_FIXED);
+	use List::Util qw(first max);
+	use Term::Fabulous::Check qw(boolean class_names color describe positive_integer string);
 	use Term::Fabulous::Theme;
 
 	my @COLOR_PARAMS = qw(background_color border_color);
@@ -27,6 +28,10 @@ class Term::Fabulous::Widget
 
 	field $classes             :param = [];
 	field $glyphs_show_through :param = 0;
+
+	# Work asked for with each_frame while the widget was in no UI, as
+	# [ code, { options } ]: handed to the UI the widget joins.
+	field @_waiting_frame_work;
 
 	# Clay::UI validates the colors before any ADJUST of this class runs,
 	# so they are converted while the arguments are still a plain list.
@@ -79,6 +84,79 @@ class Term::Fabulous::Widget
 		return ref $sides ? $sides : $sides ? \%EVERY_SIDE : \%NO_SIDE;
 	}
 
+	# ---------------------------------------------------------------------
+	# Work after a frame
+	# ---------------------------------------------------------------------
+
+	# The widget's own each_draw registration (Term::Fabulous::Render):
+	# called with the widget after every frame until the code returns
+	# true, the frames run out or the widget leaves the UI. Outside a UI
+	# the work waits until the widget joins one; false in a UI that draws
+	# no frames.
+	method each_frame ( $code, %options ) {
+		my @unknown = grep { $_ ne 'name' && $_ ne 'frames' } sort keys %options;
+		die ref($self) . ": each_frame does not take @unknown (known: name frames)" if @unknown;
+		die ref($self) . ": each_frame needs a code reference, got " . describe($code) unless ref $code eq 'CODE';
+		string( $self, name => $options{name} ) if exists $options{name};
+		positive_integer( $self, frames => $options{frames} ) if exists $options{frames};
+
+		my $ui = $self->ui;
+		if ( !defined $ui ) {
+			@_waiting_frame_work = grep { !defined $options{name} || ( $_->[1]{name} // '' ) ne $options{name} } @_waiting_frame_work if exists $options{name};
+			push @_waiting_frame_work, [ $code, {%options} ];
+			return 1;
+		}
+		return 0 unless $ui->can('each_draw');
+		$ui->each_draw( $code, %options, owner => $self );
+		return 1;
+	}
+
+	# The work that waited for a UI goes to the one the widget joined; a
+	# UI that draws no frames drops it.
+	method _hand_over_frame_work () {
+		my $ui      = $self->ui // return;
+		my @waiting = splice @_waiting_frame_work;
+		return unless $ui->can('each_draw');
+		$ui->each_draw( $_->[0], %{ $_->[1] }, owner => $self ) foreach @waiting;
+		return;
+	}
+
+	# ---------------------------------------------------------------------
+	# Height before layout
+	# ---------------------------------------------------------------------
+
+	# The rows the widget will take in the given number of columns, before
+	# Clay has laid it out: a fixed height as given; else the padding and
+	# the border around what the content takes, which a subclass knows
+	# (estimated_content_rows). A guess for the scrollbar of a list that
+	# builds only the items near its viewport; Clay's layout corrects it.
+	method estimated_rows ($columns) {
+		$columns = positive_integer( $self, columns => $columns );
+		my $layout = $self->layout;
+		my $height = $layout->{sizing}{height};
+		return $height->{min} if defined $height && $height->{type} == CLAY__SIZING_TYPE_FIXED;
+
+		my $padding = $self->content_padding;
+		my $sides   = $self->drawn_border_sides;
+		my $rows    = $padding->{top} + $padding->{bottom} + $sides->{top} + $sides->{bottom};
+		my $frame   = $padding->{left} + $padding->{right} + $sides->{left} + $sides->{right};
+		return $rows + $self->estimated_content_rows( max( 1, $columns - $frame ) );
+	}
+
+	# The padding around the content, all four sides: the layout's. A
+	# widget that keeps more room of its own (a scroll box for its
+	# scrollbars) adds it.
+	method content_padding () {
+		my $padding = $self->layout->{padding} // {};
+		return { map { $_ => $padding->{$_} // 0 } qw(top right bottom left) };
+	}
+
+	# The rows the content inside the padding and the border takes, in
+	# the columns left for it: one, unless a subclass knows better.
+	method estimated_content_rows ($columns) {
+		return 1;
+	}
+
 	# The color this widget lies on: the background of the widget itself
 	# or of its nearest ancestor that has one, else the screen background
 	# of its UI, painted opaque, else undef. A background counts when it is
@@ -88,7 +166,7 @@ class Term::Fabulous::Widget
 		my @unknown = grep { $_ ne 'translucent' } sort keys %options;
 		die ref($self) . ": background_below does not take @unknown (known: translucent)" if @unknown;
 		my $lowest_alpha = $options{translucent} ? 1 : 255;
-		for ( my $node = $self; defined $node; $node = $node->parent ) {
+		foreach my $node ( $self, $self->ancestors ) {
 			next unless $node->can('background_color');
 			my $color = $node->background_color // next;
 			return [@$color] if $color->[3] >= $lowest_alpha;
@@ -144,6 +222,7 @@ class Term::Fabulous::Widget
 	method tree_changed :override () {
 		$self->SUPER::tree_changed;
 		$self->_forget_own_looks;
+		$self->_hand_over_frame_work;
 		return;
 	}
 
@@ -167,13 +246,13 @@ class Term::Fabulous::Widget
 	# is $id.
 	method find_by_id ($id) {
 		die "Term::Fabulous::Widget: find_by_id needs an id, got undef" unless defined $id;
-		return first { _has_id( $_, $id ) } $self, $self->descendants;
+		return first { _has_id( $_, $id ) } $self->subtree;
 	}
 
 	# The inputs at or below this one, in layout pre-order, whose value is
 	# not valid.
 	method invalid_inputs () {
-		return grep { $_->DOES('Term::Fabulous::Role::Validatable') && !$_->is_valid } $self, $self->descendants;
+		return grep { $_->DOES('Term::Fabulous::Role::Validatable') && !$_->is_valid } $self->subtree;
 	}
 
 	# Text leaves have an id too.
@@ -537,6 +616,14 @@ C<left>) whose glyphs are drawn on the background outside the widget
 instead of the widget's own. Default: C<[]>. See
 L<Term::Fabulous::Role::HasBorderStyle/outer_border_sides>.
 
+=item C<border_background_colors>
+
+C<undef> (the default) or a hash reference of colors under side names
+(C<top>, C<right>, C<bottom>, C<left>) and corner names (C<top_left>,
+...), each drawn under the glyphs of that side or corner instead of the
+widget's own background. See
+L<Term::Fabulous::Role::HasBorderStyle/border_background_colors>.
+
 =item C<width_group>
 
 =item C<height_group>
@@ -568,10 +655,13 @@ theme slot each of their colors reads.
 
 =head1 METHODS
 
-The methods fall into four groups: children (C<add_child> to C<ui>),
-events (C<on>, C<fire_event>, C<handlers_for>), layout and style
-accessors (C<layout> to C<height_group>) and states (C<add_state> to
-C<get_classes>).
+The methods fall into these groups: children (C<add_child> to
+C<contains>), events (C<on>, C<fire_event>, C<handlers_for>), row
+estimates for widget authors (C<estimated_rows> to
+C<estimated_content_rows>), layout and style accessors (C<layout> to
+C<height_group>), states (C<add_state> to C<get_classes>) and methods
+for widget authors (C<reset_look> to C<reverse_video>; programs use
+C<reset_look> too).
 
 States: every widget has a set of state names. C<hovered>, C<pressed>,
 C<focused> and C<disabled> are I<derived> states: they follow the
@@ -769,6 +859,45 @@ A new array reference with the listeners registered on this widget for
 an event name, in the order they were added (an empty array reference
 when there are none). Changing the array does not change the widget.
 Mostly useful in tests.
+
+=head2 estimated_rows
+
+	my $rows = $widget->estimated_rows($columns);
+
+The rows the widget will take when it is laid out in that many
+columns, before Clay has laid it out: a guess for a list that builds
+only the items near its viewport and needs the height of the others
+for its scrollbar (a L<Term::Fabulous::Widget::DocumentView> asks its
+items). A fixed height in the layout is the answer; otherwise it is
+the padding (L</content_padding>) and the border sides that are drawn
+(a C<Hidden> side takes no room, see
+L<Term::Fabulous::Role::HasBorderStyle/drawn_border_sides>) around
+what L</estimated_content_rows> says the content takes. Clay's layout
+corrects a guess that was off. C<$columns> must be a positive integer.
+L<Term::Fabulous::Widget::Text> has the same method, since a text is
+not a Widget.
+
+=head2 content_padding
+
+	my $padding = $widget->content_padding;    # { top => 1, right => 2, bottom => 1, left => 2 }
+
+The padding around the widget's content on all four sides, as a new
+hash: the C<padding> of its layout. A widget that keeps more room
+inside its border overrides it to add that room
+(L<Term::Fabulous::Widget::ScrollBox> adds a column or a row for each
+scrollbar it shows), so that L</estimated_rows> counts it.
+
+=head2 estimated_content_rows
+
+	method estimated_content_rows :override ($columns) { ... }
+
+The rows the content inside the padding and the border takes, given
+the columns left for it: one, unless a subclass knows better. A
+L<Term::Fabulous::Widget::Box> composes the estimates of its children,
+a L<Term::Fabulous::Widget::Display> answers from its C<natural_size>,
+a L<Term::Fabulous::Widget::Table> counts its header and the rows of
+its page. Override it in a widget of your own whose height is known
+before the layout.
 
 =head2 layout
 
@@ -1052,6 +1181,51 @@ call it themselves. Returns the widget. See
 L<Clay::UI::Role::Core::Element/mark_changed> and
 L<Term::Fabulous::Manual::CustomWidgets>.
 
+=head2 each_frame
+
+	$self->each_frame( sub ($self) { $self->check_layout; return 0 }, name => 'check' );
+	$self->each_frame( sub ($self) { return $self->try_to_show_it }, name => 'show', frames => 4 );
+
+For widget authors: work after frames. Registers C<$code> with the UI's
+L<Term::Fabulous::Render/each_draw>, bound to the widget: it is called
+with the widget after every frame from the next one on, until it
+returns a true value, until C<frames> calls were made (when given), or
+until the widget is freed or leaves the UI. A second registration of
+this widget with the same C<name> replaces the first; names of
+different widgets do not clash. C<name> (a string) and C<frames>
+(a positive integer) are the only options; another one, or anything
+but a code reference, dies. The closure gets the widget as its
+argument, so it need not capture it (which would keep the widget
+alive). For one call, return true or give C<< frames => 1 >>.
+L<Term::Fabulous::Render/after_draw> makes one call, with
+C<< owner => $widget >> bound to the widget; the guide is
+L<Term::Fabulous::Manual::CustomWidgets/Work after a frame>.
+
+Work asked for while the widget is in no UI waits: it is registered
+when the widget joins a UI (a name replaces waiting work of that name
+too), so a widget may ask for it from its constructor or from setters
+called before the UI is built. Returns 1, or 0 without registering
+anything when the widget's UI draws no frames (a plain L<Clay::UI>);
+waiting work is dropped when the widget joins such a UI.
+
+=head2 focus_heir
+
+The container of
+L<Term::Fabulous::Manual::CustomWidgets/A container widget>, which
+shows one of its buttons, defines it so:
+
+	method focus_heir () { return $buttons[$shown] }
+
+For widget authors: not defined here. A container that takes children
+out of the tree while one of them may have the focus can define
+C<focus_heir>, returning the widget that gets the focus then, or
+C<undef> to let the walk up the tree go on; see
+L<Term::Fabulous::Manual::Events/When the focused widget goes away>
+and L<Term::Fabulous::Manual::CustomWidgets/A container widget>.
+L<Term::Fabulous::Widget::Tabs>, L<Term::Fabulous::Widget::Accordion::Item>,
+L<Term::Fabulous::Widget::Menu> and
+L<Term::Fabulous::Widget::Dialog::Backdrop> define it.
+
 =head2 tree_changed
 
 	class My::Counter :isa(Term::Fabulous::Widget::Box) {
@@ -1071,7 +1245,8 @@ L<Clay::UI::Role::Layout::HasParent/tree_changed>). Here the widget
 forgets the looks it fetched, since its new place may be in a UI with
 another theme, and when that place is in a UI, calls
 L<looks_changed|Term::Fabulous::Role::Themed/looks_changed> with all
-its looks. An override calls C<< $self->SUPER::tree_changed >> first,
+its looks; it also hands that UI the work L</each_frame> kept while the
+widget was in no UI. An override calls C<< $self->SUPER::tree_changed >> first,
 as L<Term::Fabulous::Widget::VirtualList> does to rebuild its items for
 the new place.
 

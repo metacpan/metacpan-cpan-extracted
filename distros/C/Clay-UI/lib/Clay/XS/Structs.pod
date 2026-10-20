@@ -834,7 +834,7 @@ Its own size and its children are laid out as usual.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-clay-xs/v0.06/images/floating.png" alt="A row of three buttons Edit, View and Help. The View button has a dark tooltip above it, a white menu with the entries Zoom in and Zoom out hanging below it and a red badge on its top right corner; Edit and Help stay where they are. The legend gives the attach points: tooltip, element CENTER_BOTTOM at parent CENTER_TOP with offset y -6; menu, element LEFT_TOP at parent LEFT_BOTTOM with offset y 4; badge, element CENTER_CENTER at parent RIGHT_TOP."></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-clay-xs/v0.07/images/floating.png" alt="A row of three buttons Edit, View and Help. The View button has a dark tooltip above it, a white menu with the entries Zoom in and Zoom out hanging below it and a red badge on its top right corner; Edit and Help stay where they are. The legend gives the attach points: tooltip, element CENTER_BOTTOM at parent CENTER_TOP with offset y -6; menu, element LEFT_TOP at parent LEFT_BOTTOM with offset y 4; badge, element CENTER_CENTER at parent RIGHT_TOP."></p>
 
 =end html
 
@@ -1380,14 +1380,18 @@ element can be compressed down to its longest word.
 
 =item C<CLAY_TEXT_WRAP_NEWLINES> (1)
 
-Only at newlines. The element is never compressed below its widest
-line.
+Only at newlines. The element keeps the width of its widest line while
+the other children of its parent can still shrink; when they cannot,
+it gets narrower, down to nothing, and its lines are cut off: the box of
+a C<TEXT> command is never wider than the element, and the renderer
+draws only what fits into it.
 
 =item C<CLAY_TEXT_WRAP_NONE> (2)
 
 Never wraps: the whole text is one line and one C<TEXT> command,
 newline characters included (the measure function sees them as ordinary
-characters of one string).
+characters of one string). It is cut off like C<CLAY_TEXT_WRAP_NEWLINES>
+when its parent is too narrow.
 
 =back
 
@@ -1656,8 +1660,9 @@ copies; changing them changes nothing in Clay.
 =head2 element id hash
 
 C<Clay_GetElementId>, C<Clay_GetElementIdWithIndex>, C<Clay__HashString>,
-C<Clay__HashStringWithOffset> and C<Clay_GetPointerOverIds> return
-element ids (C<Clay_ElementId>) as hashes:
+C<Clay__HashStringWithOffset>, C<Clay__OpenTextElement> and
+C<Clay_GetPointerOverIds> return element ids (C<Clay_ElementId>) as
+hashes:
 
     { id => 2466489830, offset => 0, baseId => 2466489830, stringId => 'x' }
 
@@ -1671,18 +1676,21 @@ in their C<id> key; C<Clay_GetOpenElementId> returns it alone.
 =item offset
 
 U32: the index given to C<Clay_GetElementIdWithIndex> or
-C<Clay__HashStringWithOffset>, 0 otherwise.
+C<Clay__HashStringWithOffset>, 0 otherwise. In the id of a text
+element (from C<Clay__OpenTextElement>), the number Clay named the text
+by.
 
 =item baseId
 
 U32: the hash of the string and seed, before the offset was applied
-(equal to C<id> when C<offset> is 0).
+(equal to C<id> when C<offset> is 0). In the id of a text element, the
+seed Clay named the text with.
 
 =item stringId
 
 The string the id was made from, as a character string. Present only for
 ids made from a non-empty string; ids of elements opened with
-C<Clay__OpenElement> have none.
+C<Clay__OpenElement> and of text elements have none.
 
 =back
 

@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Punk ();
 
-our $VERSION = '0.61';
+our $VERSION = '0.62';
 
 # All of it is C (include/punk/punk_cachefront.h + xs/cache.xs).
 
@@ -269,6 +269,19 @@ a filename directly - the file store hashes it - so C<../../etc/passwd> is
 simply a key like any other.
 
 =head1 METHODS
+
+=head2 new($backend, %opts)
+
+    my $cache = Punk::Cache->new(file => dir => '/var/cache/app',
+                                 max_bytes => '512M');
+
+What the C<cache> keyword builds at C<to_app>; an application reaches the
+result through C<< $c->cache >>. C<$backend> is C<memory>, C<file>, a class
+name or a ready-made backend object. The options go to the backend, with
+C<max_bytes> converted from a size such as C<'512M'> to bytes, except
+C<name>, which is the store's invalidation topic: a store without one
+invalidates only in its own process. Croaks on a backend that does not load
+or lacks one of the five contract methods.
 
 =head2 get($key) / set($key, $bytes, $ttl) / delete($key) / clear / stats
 

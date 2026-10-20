@@ -4,7 +4,7 @@ no warnings 'experimental::class';
 use Alien::Xrepo::Runtime;
 use Config ();
 #
-class Alien::SDL3 v3.4.20 : isa(Alien::Xrepo::Runtime) {
+class Alien::SDL3 v3.4.21 : isa(Alien::Xrepo::Runtime) {
 
     # SDL3 is bound as a family: core + the common extension libraries. Each is installed
     # separately (as a SHARED library; xrepo builds SDL3 static by default, and Affix/FFI::Platypus
@@ -34,9 +34,9 @@ class Alien::SDL3 v3.4.20 : isa(Alien::Xrepo::Runtime) {
             name     => 'Alien-SDL3',
             packages => [
                 { name => 'libsdl3',       kind => 'shared' },
-                { name => 'libsdl3_image', kind => 'shared' },
-                { name => 'libsdl3_ttf',   kind => 'shared' },
-                { name => 'libsdl3_mixer', kind => 'shared' }
+                { name => 'libsdl3_image', kind => 'shared', required => 0 },
+                { name => 'libsdl3_ttf',   kind => 'shared', required => 0 },
+                { name => 'libsdl3_mixer', kind => 'shared', required => 0 }
             ],
 
             # Ask for system packages explicitly: package-manager copies of SDL3 and friends (apt, brew,

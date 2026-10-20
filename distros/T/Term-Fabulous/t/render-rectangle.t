@@ -75,7 +75,7 @@ subtest 'oversized box is clipped to the viewport' => sub {
 subtest 'invisible boxes draw nothing' => sub {
 	is fill( [], x => -10, y => 0, width => 5,   height => 2 ), [], 'left of the viewport';
 	is fill( [], x =>  0,  y => 7, width => 5,   height => 2 ), [], 'below the viewport';
-	is fill( [], x =>  2,  y => 2, width => 0.5, height => 2 ), [], 'narrower than a cell';
+	is fill( [], x =>  2,  y => 2, width => 0.4, height => 2 ), [], 'narrower than half a cell';
 };
 
 subtest 'background attributes' => sub {

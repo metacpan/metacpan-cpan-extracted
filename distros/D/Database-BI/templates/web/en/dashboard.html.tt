@@ -249,7 +249,7 @@
           title="Tell the app how date columns are formatted so YEAR(), MONTH() and date sorting work correctly. Saved patterns apply automatically.">&#x1F4C5; Date format&hellip;</button>
   <span class="toolbar-sep" role="separator" aria-hidden="true"></span>
   <button class="btn-save-analysis" id="btn-save-analysis" type="button"
-          title="Create a new canvas and save the current view into it">&#x1F4BE; New canvas&hellip;</button>
+          title="A canvas is a dashboard where you can arrange multiple charts and data views side by side. Click to create one and add the current view.">&#x1F4BE; New canvas&hellip;</button>
   [%- END -%]
   <span class="toolbar-sep" role="separator" aria-hidden="true"></span>
   <button class="btn-dedup[% IF dedup %] btn-dedup--active[% END %]" id="btn-dedup" type="button"
@@ -907,7 +907,7 @@
     <div class="graph-fields-row">
       <div class="join-field">
         <label for="combo-x-sel">X axis</label>
-        <select id="combo-x-sel" name="x" required>
+        <select id="combo-x-sel" name="cat" required>
           <option value="">&#x2014; select column &#x2014;</option>
           [%- FOREACH col IN columns -%]
           <option value="[% col | html %]">[% col | html %]</option>
@@ -916,13 +916,13 @@
       </div>
       <div class="join-field">
         <label for="combo-bar-sel">Bar column (numeric)</label>
-        <select id="combo-bar-sel" name="bar" required>
+        <select id="combo-bar-sel" name="bar_val" required>
           <option value="">&#x2014; select column &#x2014;</option>
         </select>
       </div>
       <div class="join-field">
         <label for="combo-line-sel">Line column (numeric)</label>
-        <select id="combo-line-sel" name="line" required>
+        <select id="combo-line-sel" name="line_val" required>
           <option value="">&#x2014; select column &#x2014;</option>
         </select>
       </div>
@@ -1226,12 +1226,18 @@
 [%- END -%]
 
 [% IF records.size %]
+<p class="sr-only" id="table-head-help">Sort a column: focus its header, then press Enter or
+Space.  Select the column for deletion: Ctrl+Enter or Ctrl+Space.  Move the column one place left
+or right: Shift+Left or Shift+Right.  Clicking a header sorts it, Ctrl+click selects it, and
+dragging it moves it.</p>
+<p class="sr-only" id="table-live" role="status"></p>
 <div class="table-scroll">
 <table id="bi-table" data-table="[% table | html %]">
   <thead>
     <tr>
       [% FOREACH col IN columns -%]
-      <th draggable="true" aria-sort="none">[% col | html %]</th>
+      <th draggable="true" aria-sort="none" tabindex="0"
+          aria-describedby="table-head-help">[% col | html %]</th>
       [%- END %]
     </tr>
   </thead>
@@ -1417,6 +1423,36 @@ function parseAccounting(v) {
       setColHighlight(idx, true);
     }
     updateDeleteBtn();
+  }
+
+  // The name a column is known by, for an announcement.
+  function columnName(idx) {
+    return headers[idx] ? headers[idx].textContent.trim() : '';
+  }
+
+  // A header is a control now, so what it does from the keyboard is said the
+  // same way the canvas grips say what they did.  It is a live region rather
+  // than a title: a title is read on hover, which a keyboard reader is not
+  // doing.
+  function announceTable(message) {
+    var live = document.getElementById('table-live');
+    if (live) live.textContent = message;
+  }
+
+  function sortColumn(th) {
+    var idx = colIndex(th);
+    if (sortColIdx === idx) { sortAsc = !sortAsc; }
+    else { sortColIdx = idx; sortAsc = true; }
+    sortByCol(sortColIdx, sortAsc);
+    saveState();
+    announceTable('Sorted by ' + columnName(idx) + (sortAsc ? ' ascending' : ' descending'));
+  }
+
+  function selectColumn(th) {
+    var idx = colIndex(th);
+    toggleColSel(idx);
+    announceTable((selectedCols.has(idx) ? 'Selected column ' : 'Deselected column ')
+      + columnName(idx));
   }
 
   function toggleRowSel(tr, checked) {
@@ -1628,16 +1664,39 @@ function parseAccounting(v) {
   headers.forEach(function (th) {
     th.addEventListener('click', function (e) {
       if (dragSrcIdx !== null) return;
-      var idx = colIndex(th);
       if (e.ctrlKey || e.metaKey) {
         // Ctrl/Cmd+click: select/deselect the column (does not sort).
-        toggleColSel(idx);
+        selectColumn(th);
         return;
       }
-      if (sortColIdx === idx) { sortAsc = !sortAsc; }
-      else { sortColIdx = idx; sortAsc = true; }
-      sortByCol(sortColIdx, sortAsc);
+      sortColumn(th);
+    });
+
+    // The same control from the keyboard.  A columnheader is not a button, so
+    // the browser does not activate it by itself: Enter and Space are handled
+    // here, Shift+Left/Right is the keyboard equivalent of the drag that moves
+    // the column, and the live region says which of them happened.
+    th.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        if (e.ctrlKey || e.metaKey) { selectColumn(th); } else { sortColumn(th); }
+        return;
+      }
+
+      var delta = 0;
+      if (e.shiftKey && e.key === 'ArrowLeft')  delta = -1;
+      if (e.shiftKey && e.key === 'ArrowRight') delta =  1;
+      if (!delta) return;
+
+      e.preventDefault();
+      var from = colIndex(th);
+      var to   = from + delta;
+      if (from < 0 || to < 0 || to >= headers.length) return;
+
+      moveCol(from, to);
       saveState();
+      announceTable('Moved ' + columnName(to) + ' to column ' + (to + 1)
+        + ' of ' + headers.length);
     });
 
     th.addEventListener('dragstart', function (e) {
@@ -1703,10 +1762,11 @@ function parseAccounting(v) {
     deleteSelected();
   });
 
-  // Add a title hint to data column headers indicating Ctrl+click selects.
+  // Add a title hint to data column headers: what a pointer does, and what the
+  // same control does from the keyboard.
   headers.forEach(function (th) {
     th.title = (th.title ? th.title + '\n' : '') +
-               'Click to sort | Ctrl+click to select column';
+               'Click to sort | Ctrl+click to select column | Shift+Left/Right to move column';
   });
 }());
 

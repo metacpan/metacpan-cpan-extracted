@@ -10,6 +10,7 @@ use Test2::V0;
 use File::Temp qw(tempfile);
 use Term::Fabulous::Enum::BorderStyle;
 use Term::Fabulous::Theme;
+use Term::Fabulous::Theme::Document;
 
 my $Theme = 'Term::Fabulous::Theme';
 
@@ -115,6 +116,7 @@ subtest 'invalid theme files die with the node' => sub {
 		'palette "x" { }'                                         => qr/the 'palette' node takes no arguments or properties/,
 		'palette { pink "#ff00ff" }'                              => qr/palette: unknown token 'pink' \(known: /,
 		'palette { accent }'                                      => qr/palette token 'accent' needs exactly one string argument/,
+		'palette { accent "#ffffff" { x } }'                      => qr/palette token 'accent' needs exactly one string argument/,
 		'palette { accent "redd" }'                               => qr/palette token accent must be a color, got 'redd'/,
 		'palette { accent "#ff0000"; accent "#00ff00" }'          => qr/palette: the token 'accent' is set twice/,
 		'lamp { }'                                                => qr/unknown top-level node 'lamp' \(known: theme, palette and the families /,
@@ -152,6 +154,18 @@ subtest 'invalid theme files die with the node' => sub {
 	foreach my $kdl ( sort keys %error_of ) {
 		like dies { theme($kdl) }, qr/\ATerm::Fabulous::Theme: theme: /, "'$kdl' dies naming the theme";
 		like dies { theme($kdl) }, $error_of{$kdl},                      "'$kdl' says why";
+		ok( !Term::Fabulous::Theme::Document->parse($kdl)->is_valid, "'$kdl' is invalid in the editor's document too" );
+	}
+};
+
+subtest 'valid theme files are valid in the editor too' => sub {
+	foreach my $kdl (
+		'palette { accent "#ff8800" }', 'theme "mine" extends="light"', 'button { text "accent"; focused { text "danger" } }', 'button { variant "primary" { text "accent" } }',
+		'input { border enabled=#true style="Round" }'
+		)
+	{
+		ok lives { theme($kdl) }, "'$kdl' loads";
+		ok( Term::Fabulous::Theme::Document->parse($kdl)->is_valid, "and is valid in the editor's document" );
 	}
 };
 

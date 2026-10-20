@@ -25,4 +25,8 @@ void sha1_init  (sha1_ctx_t *ctx);
 void sha1_update(sha1_ctx_t *ctx, const void *data, size_t len);
 void sha1_final (sha1_ctx_t *ctx, unsigned char out[SHA1_DIGEST_SIZE]);
 
+/* As sha256_select / sha256_implementation. */
+void        sha1_select(int portable);
+const char *sha1_implementation(void);
+
 #endif /* FILE_RAW_HASH_SHA1_H */

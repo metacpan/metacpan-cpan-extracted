@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use version;
 
-our $VERSION   = qv('v1.0.0');
+our $VERSION   = qv('v1.0.1');
 our $AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -13,7 +13,7 @@ Map::Tube::CLI - Command Line Interface for Map::Tube::* map.
 
 =head1 VERSION
 
-Version v1.0.0
+Version v1.0.1
 
 =cut
 
@@ -31,8 +31,78 @@ use Map::Tube::Exception::MissingStationName;
 use Map::Tube::Exception::MissingMapName;
 use Map::Tube::Exception::MissingSupportedMap;
 use Map::Tube::CLI::Option;
+# Defined in a BEGIN block because Module::Pluggable's 'only' option below is
+# evaluated at compile time, i.e. before any ordinary sub further down this file
+# would exist.
+BEGIN {
+    my %SUPPORTED_MAPS = (
+        'ATHENS'          => 'Map::Tube::Athens',
+        'BARCELONA'       => 'Map::Tube::Barcelona',
+        'BEIJING'         => 'Map::Tube::Beijing',
+        'BERLIN'          => 'Map::Tube::Berlin',
+        'BIELEFELD'       => 'Map::Tube::Bielefeld',
+        'BUCHAREST'       => 'Map::Tube::Bucharest',
+        'BRUSSELS'        => 'Map::Tube::Brussels',
+        'BUDAPEST'        => 'Map::Tube::Budapest',
+        'CHICAGO'         => 'Map::Tube::Chicago',
+        'COPENHAGEN'      => 'Map::Tube::Copenhagen',
+        'DELHI'           => 'Map::Tube::Delhi',
+        'DNIPROPETROVSK'  => 'Map::Tube::Dnipropetrovsk',
+        'FRANKFURT'       => 'Map::Tube::Frankfurt',
+        'GLASGOW'         => 'Map::Tube::Glasgow',
+        'HAMBURG'         => 'Map::Tube::Hamburg',
+        'HONGKONG'        => 'Map::Tube::Hongkong',
+        'KAZAN'           => 'Map::Tube::Kazan',
+        'KHARKIV'         => 'Map::Tube::Kharkiv',
+        'KIEV'            => 'Map::Tube::Kiev',
+        'KOELNBONN'       => 'Map::Tube::KoelnBonn',
+        'KOLKATTA'        => 'Map::Tube::Kolkatta',
+        'KUALALUMPUR'     => 'Map::Tube::KualaLumpur',
+        'LEIPZIG'         => 'Map::Tube::Leipzig',
+        'LONDON'          => 'Map::Tube::London',
+        'LYON'            => 'Map::Tube::Lyon',
+        'MADRID'          => 'Map::Tube::Madrid',
+        'MALAGA'          => 'Map::Tube::Malaga',
+        'MILAN'           => 'Map::Tube::Milan',
+        'MINSK'           => 'Map::Tube::Minsk',
+        'MOSCOW'          => 'Map::Tube::Moscow',
+        'MUENCHEN'        => 'Map::Tube::Muenchen',
+        'NAPOLI'          => 'Map::Tube::Napoli',
+        'NUREMBERG'       => 'Map::Tube::Nuremberg',
+        'NYC'             => 'Map::Tube::NYC',
+        'NANJING'         => 'Map::Tube::Nanjing',
+        'NIZHNYNOVGOROD'  => 'Map::Tube::NizhnyNovgorod',
+        'NOVOSIBIRSK'     => 'Map::Tube::Novosibirsk',
+        'OSLO'            => 'Map::Tube::Oslo',
+        'PARIS'           => 'Map::Tube::Paris',
+        'PRAGUE'          => 'Map::Tube::Prague',
+        'RHEINRUHR'       => 'Map::Tube::RheinRuhr',
+        'ROME'            => 'Map::Tube::Rome',
+        'SAINTPETERSBURG' => 'Map::Tube::SaintPetersburg',
+        'SAMARA'          => 'Map::Tube::Samara',
+        'SANFRANCISCO'    => 'Map::Tube::SanFrancisco',
+        'SINGAPORE'       => 'Map::Tube::Singapore',
+        'SOFIA'           => 'Map::Tube::Sofia',
+        'STOCKHOLM'       => 'Map::Tube::Stockholm',
+        'STUTTGART'       => 'Map::Tube::Stuttgart',
+        'SYDNEY'          => 'Map::Tube::Sydney',
+        'TBILISI'         => 'Map::Tube::Tbilisi',
+        'TOKYO'           => 'Map::Tube::Tokyo',
+        'TOULOUSE'        => 'Map::Tube::Toulouse',
+        'VIENNA'          => 'Map::Tube::Vienna',
+        'WARSAW'          => 'Map::Tube::Warsaw',
+        'YEKATERINBURG'   => 'Map::Tube::Yekaterinburg',
+    );
+
+    sub _supported_maps { return { %SUPPORTED_MAPS } }
+}
+
+# Only the officially supported maps are scanned and loaded. Everything else
+# under Map::Tube::* (Map::Tube::Server, Map::Tube::Node, ...) is skipped, so a
+# missing dependency of an unrelated module cannot produce warnings here.
 use Module::Pluggable
     search_path => [ 'Map::Tube' ],
+    only        => [ values %{ _supported_maps() } ],
     require     => 1,
     inner       => 0,
     max_depth   => 3;
@@ -328,7 +398,22 @@ sub BUILD {
 
     if ($self->force) {
         if ($map =~ /^[A-Za-z]+$/) {
-            $self->{maps}->{uc($map)} = "Map::Tube::$map"->new;
+            # Unsupported maps are not loaded by Module::Pluggable, so load it here.
+            my $class = "Map::Tube::$map";
+            (my $file = "$class.pm") =~ s{::}{/}g;
+            unless (eval { require $file; 1 }) {
+                my $error  = $@ || 'unknown error';
+                $error =~ s/\s+\z//;
+                my @caller = caller(0);
+                @caller = caller(2) if $caller[3] eq '(eval)';
+
+                Map::Tube::Exception::FoundUnsupportedMap->throw({
+                    method      => __PACKAGE__."::BUILD",
+                    message     => "ERROR: Can't load forced map [$map]: $error",
+                    filename    => $caller[1],
+                    line_number => $caller[2] });
+            }
+            $self->{maps}->{uc($map)} = $class->new;
         }
         else {
             my @caller = caller(0);
@@ -740,67 +825,6 @@ sub _clean_path {
     return $clean_path;
 }
 
-sub _supported_maps {
-
-    return {
-        'ATHENS'          => 'Map::Tube::Athens',
-        'BARCELONA'       => 'Map::Tube::Barcelona',
-        'BEIJING'         => 'Map::Tube::Beijing',
-        'BERLIN'          => 'Map::Tube::Berlin',
-        'BIELEFELD'       => 'Map::Tube::Bielefeld',
-        'BUCHAREST'       => 'Map::Tube::Bucharest',
-        'BRUSSELS'        => 'Map::Tube::Brussels',
-        'BUDAPEST'        => 'Map::Tube::Budapest',
-        'CHICAGO'         => 'Map::Tube::Chicago',
-        'COPENHAGEN'      => 'Map::Tube::Copenhagen',
-        'DELHI'           => 'Map::Tube::Delhi',
-        'DNIPROPETROVSK'  => 'Map::Tube::Dnipropetrovsk',
-        'FRANKFURT'       => 'Map::Tube::Frankfurt',
-        'GLASGOW'         => 'Map::Tube::Glasgow',
-        'HAMBURG'         => 'Map::Tube::Hamburg',
-        'HONGKONG'        => 'Map::Tube::Hongkong',
-        'KAZAN'           => 'Map::Tube::Kazan',
-        'KHARKIV'         => 'Map::Tube::Kharkiv',
-        'KIEV'            => 'Map::Tube::Kiev',
-        'KOELNBONN'       => 'Map::Tube::KoelnBonn',
-        'KOLKATTA'        => 'Map::Tube::Kolkatta',
-        'KUALALUMPUR'     => 'Map::Tube::KualaLumpur',
-        'LEIPZIG'         => 'Map::Tube::Leipzig',
-        'LONDON'          => 'Map::Tube::London',
-        'LYON'            => 'Map::Tube::Lyon',
-        'MADRID'          => 'Map::Tube::Madrid',
-        'MALAGA'          => 'Map::Tube::Malaga',
-        'MILAN'           => 'Map::Tube::Milan',
-        'MINSK'           => 'Map::Tube::Minsk',
-        'MOSCOW'          => 'Map::Tube::Moscow',
-        'MUENCHEN'        => 'Map::Tube::Muenchen',
-        'NAPOLI'          => 'Map::Tube::Napoli',
-        'NUREMBERG'       => 'Map::Tube::Nuremberg',
-        'NYC'             => 'Map::Tube::NYC',
-        'NANJING'         => 'Map::Tube::Nanjing',
-        'NIZHNYNOVGOROD'  => 'Map::Tube::NizhnyNovgorod',
-        'NOVOSIBIRSK'     => 'Map::Tube::Novosibirsk',
-        'OSLO'            => 'Map::Tube::Oslo',
-        'PARIS'           => 'Map::Tube::Paris',
-        'PRAGUE'          => 'Map::Tube::Prague',
-        'RHEINRUHR'       => 'Map::Tube::RheinRuhr',
-        'ROME'            => 'Map::Tube::Rome',
-        'SAINTPETERSBURG' => 'Map::Tube::SaintPetersburg',
-        'SAMARA'          => 'Map::Tube::Samara',
-        'SANFRANCISCO'    => 'Map::Tube::SanFrancisco',
-        'SINGAPORE'       => 'Map::Tube::Singapore',
-        'SOFIA'           => 'Map::Tube::Sofia',
-        'STOCKHOLM'       => 'Map::Tube::Stockholm',
-        'STUTTGART'       => 'Map::Tube::Stuttgart',
-        'SYDNEY'          => 'Map::Tube::Sydney',
-        'TBILISI'         => 'Map::Tube::Tbilisi',
-        'TOKYO'           => 'Map::Tube::Tokyo',
-        'TOULOUSE'        => 'Map::Tube::Toulouse',
-        'VIENNA'          => 'Map::Tube::Vienna',
-        'WARSAW'          => 'Map::Tube::Warsaw',
-        'YEKATERINBURG'   => 'Map::Tube::Yekaterinburg',
-    };
-}
 
 =head1 AUTHOR
 

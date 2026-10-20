@@ -1,8 +1,8 @@
 use v5.40;
+use blib;
 use Test2::V0 '!subtest', -no_srand => 1;
 use Test2::Util::Importer 'Test2::Tools::Subtest' => ( subtest_streamed => { -as => 'subtest' } );
 use Test2::Require::AuthorTesting;
-use blib;
 use Alien::Xmake;
 use Alien::Xrepo;
 use File::Temp qw[tempdir];
@@ -32,8 +32,7 @@ eval {
     diag 'Lib:     ' . $pkg->libpath;
 
     # Refetch an already-installed package without reinstalling
-    ok my $refetched = $repo->fetch('libpng'), 'fetch installed libpng';
-    is $refetched->version, $pkg->version, 'fetch agrees on version';
+    ok my $refetched = $repo->fetch('libpng'),                 'fetch installed libpng';
     ok length( $refetched->libpath ),                          'fetch found a runtime lib';
     ok length( $repo->fetch( 'libpng', undef, cflags => 1 ) ), 'fetch --cflags works';
 

@@ -7,7 +7,7 @@ no warnings 'experimental::signatures';
 
 use Object::Pad 0.825;
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 class Term::Fabulous::Widget::Box
 	:isa(Term::Fabulous::Widget)
@@ -24,7 +24,10 @@ class Term::Fabulous::Widget::Box
 		CLAY_ATTACH_POINT_RIGHT_TOP CLAY_ATTACH_POINT_RIGHT_CENTER CLAY_ATTACH_POINT_RIGHT_BOTTOM
 		CLAY_POINTER_CAPTURE_MODE_CAPTURE CLAY_POINTER_CAPTURE_MODE_PASSTHROUGH
 		CLAY_CLIP_TO_NONE CLAY_CLIP_TO_ATTACHED_PARENT
+		CLAY__SIZING_TYPE_FIXED
 	);
+	use List::Util qw(max sum0);
+	use Scalar::Util qw(refaddr);
 	use Term::Fabulous::Check qw(border_style describe integer non_negative_integer one_of sizing);
 
 	my %DIRECTION_BY_NAME = (
@@ -98,6 +101,42 @@ class Term::Fabulous::Widget::Box
 
 	sub _sizing ( $axis, $spec ) {
 		return sizing( 'Term::Fabulous::Widget::Box', "sizing $axis", $spec // '' );
+	}
+
+	# ---------------------------------------------------------------------
+	# Height before layout
+	# ---------------------------------------------------------------------
+
+	# The rows the children take: one under the other, their rows and the
+	# gaps between them add up; side by side, each child gets its fixed
+	# width or an equal share of the rest, and the tallest decides. Other
+	# directions take the tallest child too. A child without an estimate
+	# counts one row.
+	method estimated_content_rows :override ($columns) {
+		my @children = @{ $self->layout_children };
+		return 0 unless @children;
+		my $layout    = $self->layout;
+		my $direction = $layout->{layout_direction} // CLAY_LEFT_TO_RIGHT;
+		my $gap       = $layout->{child_gap}        // 0;
+		return sum0( map { _estimated_rows_of( $_, $columns ) } @children ) + $gap * ( @children - 1 ) if $direction == CLAY_TOP_TO_BOTTOM;
+		return max( map { _estimated_rows_of( $_, $columns ) } @children ) unless $direction == CLAY_LEFT_TO_RIGHT;
+
+		my %fixed     = map  { refaddr($_) => _fixed_columns_of($_) } @children;
+		my @flexible  = grep { !defined $fixed{ refaddr $_ } } @children;
+		my $remaining = max( 1, $columns - sum0( grep { defined } values %fixed ) - $gap * ( @children - 1 ) );
+		my $share     = max( 1, int( $remaining / max( 1, scalar @flexible ) ) );
+		return max( map { _estimated_rows_of( $_, $fixed{ refaddr $_ } // $share ) } @children );
+	}
+
+	sub _estimated_rows_of ( $child, $columns ) {
+		return $child->can('estimated_rows') ? $child->estimated_rows($columns) : 1;
+	}
+
+	# The width a child was given as a fixed sizing, or undef.
+	sub _fixed_columns_of ($child) {
+		return undef unless $child->can('layout');
+		my $width = $child->layout->{sizing}{width};
+		return defined $width && $width->{type} == CLAY__SIZING_TYPE_FIXED ? $width->{min} : undef;
 	}
 
 	method layout_properties :common () {
@@ -231,7 +270,7 @@ Term::Fabulous::Widget::Box - The general-purpose container widget
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-box.svg" alt="A card with a title and body text, and three boxes labeled fit, grow and fixed(14)"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.05/screenshots/widget-box.svg" alt="A card with a title and body text, and three boxes labeled fit, grow and fixed(14)"></p>
 
 =end html
 
@@ -373,11 +412,28 @@ A Box has all methods of L<Term::Fabulous::Widget>: children
 (C<add_child>, C<remove_child>, C<children>, ...), events (C<on>,
 C<fire_event>), the search L<Term::Fabulous::Widget/find_by_id>, the
 accessors C<layout>, C<floating>, C<background_color>,
-C<glyphs_show_through>, C<border_color>, C<bordered>, C<border_style_top>,
-C<border_style_right>, C<border_style_bottom>, C<border_style_left>,
-C<width_group> and C<height_group>, and the state methods. It adds
-nothing for applications; the methods in L</SUBCLASS INTERFACE> are for
-widget authors.
+C<glyphs_show_through>, C<border_color>, C<bordered>,
+C<border_style_top>, C<border_style_right>, C<border_style_bottom>,
+C<border_style_left>, C<width_group> and C<height_group>, and the state
+methods. It adds nothing of its own except how it estimates its rows
+(L</estimated_rows>), which matters to widget authors, as do the methods
+in L</SUBCLASS INTERFACE>.
+
+=head2 estimated_rows
+
+	my $rows = $box->estimated_rows($columns);
+
+The rows the box will take in that many columns, before Clay has laid
+it out (see L<Term::Fabulous::Widget/estimated_rows>). A fixed height
+in the layout is the answer; otherwise it is its padding and border
+around its children's estimates. Children one under the other add up,
+with the child gap between them; side by side, a child with a fixed
+width gets that width, the others share the rest, and the tallest
+decides. In any other direction (stacked, wrapping) the tallest child
+decides; a box without children counts only its padding and border. A
+child without an estimate counts one row. Box does this in
+C<estimated_content_rows> (see
+L<Term::Fabulous::Widget/estimated_content_rows>).
 
 =head1 EVENTS
 

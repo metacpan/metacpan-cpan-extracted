@@ -2,7 +2,7 @@ package oEdtk::TexDoc;
 use strict;
 use utf8;
 
-our $VERSION = 2.1126;
+our $VERSION = 2.1129;
 
 use base 'oEdtk::Doc';
 use oEdtk::Config qw(config_read);
@@ -12,7 +12,6 @@ use Carp         qw(croak);
 use Data::Dumper qw(Dumper);
 use JSON::PP     qw(encode_json);
 use YAML::Tiny;
-use Text::QRCode;
 use Readonly;
 
 use strict;
@@ -75,6 +74,11 @@ sub append_qr_code {
 	my @log    = ( encode_json( [$string] ) );
 	unshift @log, encode_json($obj) if ref $obj;
 
+	# Text::QRCode is optional: it needs libqrencode to build. Load it only
+	# when a QR code is requested, so the module tree stays usable without it.
+	eval { require Text::QRCode; 1 }
+		or croak
+		'append_qr_code requires the optional Text::QRCode module (which needs libqrencode)';
 	my $aoa = Text::QRCode->new( level => $level )->plot($string);
 	my $n   = scalar @{$aoa};
 	die 'Empty QR code' if !$n;
@@ -199,6 +203,10 @@ Render C<$obj> (a scalar, or a reference serialised to YAML) as a QR code
 written to the main output file as a LaTeX C<textblock*>. C<$tag> must be a
 lowercase macro name; the geometry arguments default to the module's C<Readonly>
 constants. For each line it calls C<oEdtk::Main::oe_print_to_output_file>.
+
+C<Text::QRCode> is an optional dependency (it builds against the native
+C<libqrencode> library): it is loaded on first use and the method croaks with an
+explicit message when it is not installed.
 
 =head2 line_break
 

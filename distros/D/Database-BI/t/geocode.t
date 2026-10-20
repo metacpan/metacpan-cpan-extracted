@@ -129,7 +129,10 @@ sub dirty_column {
 
 subtest 'a dirty column is skipped end to end' => sub {
 	my $geocoder = stub();
-	my $geocode  = Database::BI::Model::Geocode->new(geocoder => $geocoder);
+	# openaddr suppresses warn_map_geocoder_unavailable_data, which fires when
+	# OPENADDR_HOME is not set in the environment (common in CI); the stub
+	# geocoder ignores the path, so any truthy string is fine here.
+	my $geocode  = Database::BI::Model::Geocode->new(geocoder => $geocoder, openaddr => 'test');
 
 	my $cache  = {};
 	my $result = $geocode->resolve_column(dirty_column(), 'place', cache => $cache, region => 'GB');
@@ -278,7 +281,7 @@ subtest 'a backend exception is still an exception' => sub {
 
 subtest 'the cap counts new lookups, and holds the rest back for the next request' => sub {
 	my $geocoder = stub();
-	my $geocode  = Database::BI::Model::Geocode->new(geocoder => $geocoder);
+	my $geocode  = Database::BI::Model::Geocode->new(geocoder => $geocoder, openaddr => 'test');
 
 	my @column = map { { 'place' => $_ } }
 		('Ramsgate, Kent', 'Sittingbourne', 'Canterbury', 'Dover', 'Margate');
@@ -480,6 +483,12 @@ subtest 'the model store keeps the answers, and this module never writes it' => 
 };
 
 subtest 'without the module there is a sentence, not an exception' => sub {
+	# Test::Without::Module cannot un-load a module already in %INC (see CLAUDE.md).
+	# If an earlier subtest loaded Geo::Coder::Free, we cannot simulate its absence.
+	if (exists $INC{'Geo/Coder/Free.pm'}) {
+		plan skip_all => 'Geo::Coder::Free already loaded; cannot simulate absence in this process';
+	}
+
 	Test::Without::Module->import('Geo::Coder::Free');
 
 	my $geocode = Database::BI::Model::Geocode->new();
@@ -503,6 +512,11 @@ subtest 'without the module there is a sentence, not an exception' => sub {
 	is_deeply([ map { $_->{'key'} } @{ $result->{'messages'} } ],
 		['error_map_geocoder_missing', 'warn_map_rows_skipped'],
 		'and the page is told why, before it is told about the rows');
+
+	my ($missing) = grep { $_->{'key'} eq 'error_map_geocoder_missing' } @{ $result->{'messages'} };
+	my @mentions = ($missing->{'text'} =~ /Geo::Coder::Free/g);
+	is(scalar @mentions, 1,
+		'and says it once: the finished sentence is not formatted a second time');
 };
 
 subtest 'an installed module older than the floor is the same state' => sub {

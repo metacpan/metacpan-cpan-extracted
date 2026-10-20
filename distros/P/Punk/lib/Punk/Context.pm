@@ -7,7 +7,7 @@ use Punk::Request;
 use Punk::Response;
 use Punk ();
 
-our $VERSION = '0.61';
+our $VERSION = '0.62';
 
 1;
 
@@ -475,6 +475,17 @@ hashref for a template. See L<Punk::Session/FLASH> for the lifecycle.
 
 Re-arm this request's inbound flash for one more request. Chainable.
 
+=head2 csrf_token
+
+The live CSRF token, minted into the session on first ask, which sends the
+session cookie with this response. Requires the C<csrf> keyword. See
+L<Punk::CSRF/CONTEXT METHODS>.
+
+=head2 csrf_field
+
+The hidden input carrying L</csrf_token>, escaped and ready to print with
+C<raw> in a template. See L<Punk::CSRF/CONTEXT METHODS>.
+
 =head2 validate($schema?, $data?)
 
     my $v = $c->validate(\%json_schema);    # run a validation now
@@ -549,6 +560,55 @@ On a L<Hyperman> worker this runs on the next pass of the event loop, and on
 a C<psgix.cleanup> server the server runs it; anywhere else it runs inline,
 just before the response is returned. See L<Punk/after_response> for what
 that means and for why this is not a job queue.
+
+=head2 cache($name?)
+
+    my $html = $c->cache->compute("profile:$id", 300, sub { ... });
+    $c->cache('sessions')->set($sid => $blob, 3600);
+
+A store the C<cache> keyword declared: the default one, or the one named.
+Built once at C<to_app> and shared by every request on the worker. Croaks
+for a name no C<cache> keyword declared. See L<Punk/cache> and
+L<Punk::Cache>.
+
+=head2 publish($topic, $payload)
+
+Sends C<$payload> to every subscriber of C<$topic> across the worker pool.
+Returns C<1> when it went on the shared ring, C<0> when there is no pool and
+only this process saw it, and C<-1> when it was refused as too big for a bus
+slot. See L<Punk/"publish / subscribe">.
+
+=head2 subscribe($topic, $code, group => $name?)
+
+Calls C<< $code->($topic, $payload) >> in this worker for each message on
+C<$topic>; with C<group>, exactly one member of the group sees each one.
+Returns the subscription id, or C<-1> when there is no bus or C<$code> is
+not a code reference. Subscribe at boot through C<< $app->subscribe >>: one
+made in a request lasts only as long as the worker that made it. See
+L<Punk/"publish / subscribe">.
+
+=head2 block_ip($ip?, $ttl?)
+
+Adds C<$ip> to L<Hyperman>'s shared denylist for C<$ttl> seconds (C<0>, the
+default, is permanent); the server drops the address at C<accept> on its
+next connection. C<$ip> defaults to this request's C<REMOTE_ADDR>. Returns
+C<1> when the ban took, and C<0> when there is no Hyperman arena to hold it.
+Behind a L<Punk/proxy> it croaks rather than ban the proxy's own address.
+See L<Punk::RateLimit>.
+
+=head2 unblock_ip($ip?)
+
+Lifts a L</block_ip> ban. Same default and return value.
+
+=head2 rate_hit($key, $limit, $window)
+
+    my ($ok, $remaining, $reset) = $c->rate_hit("login:$user", 5, 300);
+
+Counts one hit against C<$key>, allowing C<$limit> per C<$window> seconds
+across the worker pool. Returns whether this hit is within the limit, the
+hits left and the epoch second the window resets. A C<$limit> of C<0> or less is
+unlimited, and with no Hyperman arena every hit is allowed. See
+L<Punk::RateLimit>.
 
 =head2 match
 

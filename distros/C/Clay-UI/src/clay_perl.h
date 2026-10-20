@@ -323,19 +323,21 @@ void clay_perl_raise_held_error(pTHX_ clay_perl_context *ctx);
 /* Scalar parsing shared by the XS wrappers. */
 double   clay_perl_parse_float(pTHX_ SV *sv, const char *what);
 double   clay_perl_parse_float_in(pTHX_ SV *sv, const char *what, double min, double max);
-double   clay_perl_parse_max_float(pTHX_ SV *sv, const char *what);
 UV       clay_perl_parse_uint(pTHX_ SV *sv, const char *what, UV max);
 NV       clay_perl_parse_integer(pTHX_ SV *sv, const char *what, NV min, NV max);
 
 /* Optional arguments: fallback for undef. Get-magic runs once, before
  * the definedness test. */
 double   clay_perl_parse_float_or(pTHX_ SV *sv, const char *what, double fallback);
-double   clay_perl_parse_max_float_or(pTHX_ SV *sv, const char *what, double fallback);
 UV       clay_perl_parse_uint_or(pTHX_ SV *sv, const char *what, UV max, UV fallback);
 
 /* NULL for undef when allow_undef, else a mortal, non-magical copy of a
  * CODE reference; croaks for anything else. */
 SV      *clay_perl_require_code(pTHX_ SV *sv, const char *what, bool allow_undef);
+
+/* NULL for undef, else the hash a hash reference points to; croaks for
+ * anything else. Get-magic runs once. */
+HV      *clay_perl_optional_hash(pTHX_ SV *sv, const char *what);
 
 Clay_Color           clay_color_from_sv(pTHX_ SV *sv, const char *what);
 SV                  *clay_color_to_sv(pTHX_ Clay_Color value);
@@ -353,6 +355,13 @@ SV                  *clay_padding_to_sv(pTHX_ Clay_Padding value);
 SV                  *clay_border_width_to_sv(pTHX_ Clay_BorderWidth value);
 SV                  *clay_sizing_axis_to_sv(pTHX_ Clay_SizingAxis value);
 
+/* The axes of the sizing helpers (func names the helper in errors). Each
+ * argument is read by the rule of the Clay_SizingAxis key it fills, so a
+ * key's range is written once, in its schema row; errors are plain
+ * "func: key: expected ..." strings. An undef min or max is 0. */
+Clay_SizingAxis      clay_sizing_min_max_axis(pTHX_ Clay__SizingType type, SV *min, SV *max, const char *func);
+Clay_SizingAxis      clay_sizing_percent_axis(pTHX_ SV *percent, const char *func);
+
 Clay_TextElementConfig  clay_text_element_config_from_sv(pTHX_ SV *sv);
 SV                     *clay_text_element_config_to_sv(pTHX_ Clay_TextElementConfig value);
 
@@ -366,11 +375,12 @@ Clay_ElementDeclaration clay_element_declaration_from_sv(pTHX_ SV *sv);
 void clay_perl_check_struct(pTHX_ const char *type, SV *value, const char *root);
 
 /* Every struct schema, for Clay::XS::_struct_schemas:
- * { name => [ { name, kind, min, max, nested }, ... ] } with the fields in
- * schema order. Named schemas appear under their C type name, the
- * anonymous ones (transition enter and exit) under "<outer>.<field>".
+ * { name => [ { name, kind, min, max, nested, enum }, ... ] } with the
+ * fields in schema order. Named schemas appear under their C type name,
+ * the anonymous ones (transition enter and exit) under "<outer>.<field>".
  * min and max are set for integers and bounded floats, nested (a schema
- * name) for nested structs; they are undef otherwise. */
+ * name) for nested structs, enum (a group of src/clay_perl_enums.h) for
+ * integers holding an enum or flags; they are undef otherwise. */
 SV *clay_perl_struct_schemas(pTHX);
 
 /* Transition data: from_sv starts from base and overrides the keys present
@@ -424,28 +434,14 @@ const char *clay_perl_sv_utf8_bytes(pTHX_ SV *sv, STRLEN *length);
  * Callback trampolines (src/callbacks.c).
  *
  * Clay holds these as function pointers. Each one pushes its arguments and
- * calls the dispatcher (clay_perl_dispatcher, the body of the internal
- * Clay::XS::_dispatch XSUB) once under G_EVAL; the
- * dispatcher calls the user's coderef and parses its return value, so any
- * exception (from the callback or from parsing its result) lands in the
- * trampoline's G_EVAL and never unwinds through Clay's C frames.
+ * calls the dispatcher (clay_perl_dispatcher, an anonymous XSUB of
+ * src/callbacks.c) once under G_EVAL; the dispatcher calls the user's
+ * coderef and parses its return value, so any exception (from the
+ * callback or from parsing its result) lands in the trampoline's G_EVAL
+ * and never unwinds through Clay's C frames. The dispatch protocol (the
+ * result slots, the dispatch a trampoline has started, the parsing of
+ * results) is private to src/callbacks.c.
  * ------------------------------------------------------------------------ */
-
-/* Result slot a trampoline hands to the dispatcher. The trampoline fills
- * in the defaults; the dispatcher overwrites the member for its kind. */
-typedef struct clay_perl_dispatch_result {
-    Clay_Dimensions     dimensions;
-    Clay_Vector2        vector;
-    Clay_TransitionData transition_data;
-    bool                complete;
-} clay_perl_dispatch_result;
-
-/* Body of the Clay::XS::_dispatch XSUB: parses the callback's return
- * value (ret) for the given kind into *result. args_sv is the argument
- * hash the transition handler may have modified (NULL otherwise). */
-void clay_perl_dispatch_store_result(pTHX_ clay_perl_dispatch_kind kind,
-                                     clay_perl_dispatch_result *result,
-                                     SV *ret, SV *args_sv);
 
 Clay_Dimensions clay_perl_measure_text_trampoline(
     Clay_StringSlice text,
@@ -479,8 +475,10 @@ Clay_TransitionData clay_perl_transition_set_final_trampoline(
 
 /* Thread-local pointer to the context currently inside Clay_EndLayout.
  * The transition trampolines read this to find their per-context handlers
- * (Clay passes them no userData). The Clay_EndLayout XS wrapper sets it
- * around the Clay_EndLayout call. */
+ * (Clay passes them no userData). The frame module sets it around every
+ * Clay_EndLayout call it makes (finish_frame in src/clay_perl_context.c):
+ * the one of Clay_EndLayout and the one that finishes an unfinished frame
+ * in Clay_BeginLayout. */
 extern CLAY_PERL_THREAD_LOCAL clay_perl_context *clay_perl_active_transition_ctx;
 
 /* How often Clay called the transition handler trampoline: once per
@@ -496,21 +494,13 @@ extern UV clay_perl_transition_handler_calls;
  * that change Clay's state croak (see the guards in lib/Clay/XS.xs). */
 extern CLAY_PERL_THREAD_LOCAL uint32_t clay_perl_callback_depth;
 
-/* The dispatch a trampoline has started: set by the trampoline for the
- * duration of its call into Clay::XS::_dispatch, which takes it (and
- * clears .result, so only that one call can use it). */
-typedef struct clay_perl_active_dispatch {
-    clay_perl_dispatch_kind    kind;
-    clay_perl_dispatch_result *result;
-} clay_perl_active_dispatch;
+/* A new dispatcher (src/callbacks.c): an anonymous XSUB, reachable from
+ * no glob, that only a trampoline's call can use. BOOT makes one for the
+ * interpreter that loads Clay::XS and Clay::XS::CLONE one for each new
+ * thread's; lib/Clay/XS.xs keeps it in the interpreter's MY_CXT. */
+CV *clay_perl_new_dispatcher(pTHX);
 
-extern CLAY_PERL_THREAD_LOCAL clay_perl_active_dispatch clay_perl_pending_dispatch;
-
-/* The dispatcher every trampoline calls (lib/Clay/XS.xs): an anonymous
- * XSUB running the body of Clay::XS::_dispatch, made by BOOT for the
- * interpreter that loads Clay::XS and by Clay::XS::CLONE for each new
- * thread's, and kept in the interpreter's MY_CXT. No glob holds it, so
- * replacing *Clay::XS::_dispatch changes nothing for callbacks. */
+/* The current interpreter's dispatcher (lib/Clay/XS.xs, from MY_CXT). */
 CV *clay_perl_dispatcher(pTHX);
 
 /* An exit a callback called, caught before it could unwind Clay's C

@@ -1,0 +1,40 @@
+do { my $x = {
+       'build' => {
+                    'requires' => {
+                                    'ExtUtils::CBuilder' => '0',
+                                    'Test::More' => '0'
+                                  }
+                  },
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::CBuilder' => '0',
+                                        'ExtUtils::Depends' => '0.301'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'Devel::PPPort' => '3.23',
+                                      'Test::Pod' => '1.41'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'Exporter' => '0',
+                                      'Scalar::Util' => '0',
+                                      'Task::Weaken' => '0',
+                                      'perl' => 'v5.6.0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'Test::More' => '0'
+                                 }
+                 }
+     };
+  $x;
+ }

@@ -39,7 +39,21 @@ typedef struct tkb_hours {
     tkb_day    week[7];            /* Monday first */
     tkb_dated *dated; size_t n_dated;   /* sorted by day */
     int32_t    weekly_total;       /* seconds of business time in a plain week */
+    int        has_overnight;      /* a span ends the next morning somewhere in the table */
+    int        elapsed;            /* business time is the instants' difference, not the wall clock's */
+    SV       **rule_svs;           /* by_rule: the rules, counted RVs */
+    tkb_day   *rule_hours;         /* and the spans each gives its days */
+    size_t     n_rules;
+    int64_t   *rule_days;          /* the days the rules give, sorted, materialised by year */
+    int       *rule_idx;           /* which rule gave each: the first listed wins */
+    size_t     n_rule_days;
+    int64_t    rule_lo, rule_hi;   /* the years materialised; lo > hi for none */
 } tkb_hours;
+
+/* A joined schedule's day of hours, cached by day in a fixed table so a
+ * pointer to one stays valid while the days near it are asked for. */
+#define TKB_JCACHE 512
+typedef struct tkb_jslot { int64_t day; int valid; tkb_day hours; } tkb_jslot;
 
 typedef struct tkb_yearly {
     unsigned month, day;
@@ -55,8 +69,11 @@ typedef struct tkb_schedule {
     tkb_named  *names;   size_t n_names;    /* every holiday, named or not */
     tkb_yearly *yearly;  size_t n_yearly;   /* dates that are holidays every year */
     AV         *gens;                       /* code refs and objects asked per year; NULL for none */
+    AV         *gen_args;                   /* beside each: undef, or an RV to its argument pairs */
     SV         *join_a, *join_b;            /* the two parts of a join; NULL otherwise */
     int         join_both;                  /* closed only when both parts are */
+    int         join_hours;                 /* 0 none, 1 both, 2 either, 3 first, 4 second */
+    tkb_jslot  *jcache;                     /* TKB_JCACHE slots, made on the first ask */
     int         lazy;                       /* years come on demand */
     tkb_hours   hours;
     int64_t     year_lo, year_hi;           /* the years materialised; lo > hi for none yet */
@@ -236,9 +253,22 @@ tkb_day_free(tkb_day *d)
 }
 
 static void
-tkb_hours_free(tkb_hours *h)
+tkb_hours_free(pTHX_ tkb_hours *h)
 {
     size_t i;
+    for (i = 0; i < h->n_rules; i++) {
+        SvREFCNT_dec(h->rule_svs[i]);
+        tkb_day_free(&h->rule_hours[i]);
+    }
+    Safefree(h->rule_svs);
+    Safefree(h->rule_hours);
+    Safefree(h->rule_days);
+    Safefree(h->rule_idx);
+    h->rule_svs = NULL;
+    h->rule_hours = NULL;
+    h->rule_days = NULL;
+    h->rule_idx = NULL;
+    h->n_rules = h->n_rule_days = 0;
     for (i = 0; i < 7; i++)
         tkb_day_free(&h->week[i]);
     for (i = 0; i < h->n_dated; i++)
@@ -283,11 +313,18 @@ tkb_schedule_free(pTHX_ tkb_schedule *s)
     if (!s)
         return;
     tkb_schedule_clear_days(aTHX_ s);
-    tkb_hours_free(&s->hours);
+    tkb_hours_free(aTHX_ &s->hours);
+    if (s->jcache) {
+        for (i = 0; i < TKB_JCACHE; i++)
+            if (s->jcache[i].valid)
+                tkb_day_free(&s->jcache[i].hours);
+        Safefree(s->jcache);
+    }
     for (i = 0; i < s->n_yearly; i++)
         SvREFCNT_dec(s->yearly[i].name);
     Safefree(s->yearly);
     SvREFCNT_dec((SV *)s->gens);
+    SvREFCNT_dec((SV *)s->gen_args);
     SvREFCNT_dec(s->join_a);
     SvREFCNT_dec(s->join_b);
     Safefree(s);
@@ -321,7 +358,24 @@ tkb_schedule_dup(pTHX_ const tkb_schedule *s, CLONE_PARAMS *param)
         }
     }
     tkb_hours_copy(&c->hours, &s->hours);
+    c->hours.rule_svs = NULL;
+    c->hours.rule_hours = NULL;
+    c->hours.rule_days = NULL;
+    c->hours.rule_idx = NULL;
+    c->hours.n_rule_days = 0;
+    c->hours.rule_lo = 1;
+    c->hours.rule_hi = 0;
+    if (s->hours.n_rules) {
+        Newx(c->hours.rule_svs, s->hours.n_rules, SV *);
+        Newx(c->hours.rule_hours, s->hours.n_rules, tkb_day);
+        for (i = 0; i < s->hours.n_rules; i++) {
+            c->hours.rule_svs[i] = sv_dup_inc(s->hours.rule_svs[i], param);
+            tkb_day_copy(&c->hours.rule_hours[i], &s->hours.rule_hours[i]);
+        }
+    }
+    c->jcache = NULL;
     c->gens = s->gens ? (AV *)sv_dup_inc((SV *)s->gens, param) : NULL;
+    c->gen_args = s->gen_args ? (AV *)sv_dup_inc((SV *)s->gen_args, param) : NULL;
     c->join_a = s->join_a ? sv_dup_inc(s->join_a, param) : NULL;
     c->join_b = s->join_b ? sv_dup_inc(s->join_b, param) : NULL;
     return c;
@@ -349,6 +403,9 @@ tkb_mg_dup(pTHX_ MAGIC *mg, CLONE_PARAMS *param)
 /* Filled at BOOT by tkb_vtbl_init rather than by an initialiser, since
  * the members after svt_dup differ between perls from 5.10.0 on. */
 static MGVTBL tkb_vtbl;
+
+/* Marks an iterator's code ref; its state is the magic's counted object. */
+static MGVTBL tkb_iter_vtbl;
 
 static void
 tkb_vtbl_init(void)

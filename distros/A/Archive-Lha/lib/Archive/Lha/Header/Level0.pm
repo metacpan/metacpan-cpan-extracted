@@ -19,9 +19,7 @@ sub new {
   my $buf = $stream->read($size);
 
   my $checksum  = ord(substr($buf, 1, 1));
-  my $checksum1 = defined &Archive::Lha::Header::Utils::checksum
-    ? Archive::Lha::Header::Utils::checksum($buf, 2)
-    : do { my $s = 0; $s += $_ for unpack 'C*', substr($buf, 2); $s & CHAR_MAX };
+  my $checksum1 = _checksum($buf, 2);
   croak "Header is broken: pos:$start checksum $checksum/$checksum1"
     unless $checksum == $checksum1;
 

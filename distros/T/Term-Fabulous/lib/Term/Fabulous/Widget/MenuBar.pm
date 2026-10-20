@@ -9,7 +9,7 @@ use Object::Pad 0.825;
 
 use Term::Fabulous::Widget::Input;
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 class Term::Fabulous::Widget::MenuBar
 	:isa(Term::Fabulous::Widget::Input)
@@ -42,13 +42,13 @@ class Term::Fabulous::Widget::MenuBar
 		# A choice bubbles from the open menu through the bar, which closes
 		# there, and goes on to the bar's ancestors. A listener on the menu
 		# that stops it leaves the closing to menu_chosen.
-		weaken( my $weak_self = $self );
-		$self->on( Choose => sub ($event) { $weak_self->menu_chosen( $event->target ); return Clay::UI::Enum::Result->CONTINUE } );
+		$self->on( Choose => sub ( $self, $event ) { $self->menu_chosen( $event->target ); return Clay::UI::Enum::Result->CONTINUE }, owner => $self );
 		$self->on(
-			MouseMove => sub ($event) {
-				$weak_self->_pointer_over($event) if refaddr( $event->target ) == refaddr($weak_self);
+			MouseMove => sub ( $self, $event ) {
+				$self->_pointer_over($event) if refaddr( $event->target ) == refaddr($self);
 				return Clay::UI::Enum::Result->CONTINUE;
-			}
+			},
+			owner => $self
 		);
 	}
 
@@ -204,7 +204,9 @@ class Term::Fabulous::Widget::MenuBar
 	}
 
 	# Closes the open menu. The focus goes back to the widget that had it
-	# when the bar opened, unless it went elsewhere already.
+	# when the bar opened, unless it went elsewhere already. The bar gives
+	# it back itself: the bar holds the focus and stays in the tree, so
+	# no focus heir is asked when its menu leaves.
 	method close () {
 		return $self unless defined $_open;
 		my $menu      = $_menus[$_open]{menu};
@@ -261,8 +263,7 @@ class Term::Fabulous::Widget::MenuBar
 	# Opens menus for the keys that reach a widget, usually the root.
 	method listen ($widget) {
 		die ref($self) . ": listen needs a widget that fires events, got " . describe($widget) unless blessed $widget && $widget->can('on');
-		weaken( my $weak_self = $self );
-		$widget->on( KeyPress => sub ($event) { return $weak_self && $weak_self->handle_shortcut($event) ? Clay::UI::Enum::Result->HANDLED : Clay::UI::Enum::Result->CONTINUE } );
+		$widget->on( KeyPress => sub ( $self, $event ) { return $self->handle_shortcut($event) ? Clay::UI::Enum::Result->HANDLED : Clay::UI::Enum::Result->CONTINUE }, owner => $self );
 		return $self;
 	}
 
@@ -398,7 +399,7 @@ screen
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-menu-bar.svg" alt="A notes editor with a menu bar of File, Edit, View and Help, each with its first letter underlined, and the caption notes.txt. The Edit menu is open below its title with Undo highlighted, Redo, Cut and Copy dimmed, Paste and Select all, each with its key. The status bar at the bottom says F10 opens the menus, Ctrl+Q quits. on the left and modified and Ln 6, Col 7 on the right"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.05/screenshots/widget-menu-bar.svg" alt="A notes editor with a menu bar of File, Edit, View and Help, each with its first letter underlined, and the caption notes.txt. The Edit menu is open below its title with Undo highlighted, Redo, Cut and Copy dimmed, Paste and Select all, each with its key. The status bar at the bottom says F10 opens the menus, Ctrl+Q quits. on the left and modified and Ln 6, Col 7 on the right"></p>
 
 =end html
 
@@ -474,9 +475,9 @@ clicked.
 =head2 Where the menus go
 
 A menu opens just below its title. Near the right edge of the screen it
-moves left as far as it must to stay on the screen, and when there is
-no room below the bar, it opens above it. The menus float over every
-other widget, dialogs included.
+moves left as far as it must to stay on the screen, and when it does
+not fit below the bar and there is more room above, it opens above it.
+The menus float over every other widget, dialogs included.
 
 =head1 CONSTRUCTOR
 
@@ -627,6 +628,14 @@ Accessor for the parameter of the same name.
 =head2 caption_color, highlight_text_color, highlight_background_color
 
 Accessors for the colors.
+
+=head2 menu_chosen
+
+	$menu_bar->menu_chosen($menu);
+
+Called by a menu shown with L<Term::Fabulous::Widget::Menu/show_below>
+when an item was chosen: closes the bar if that menu is the open one.
+You do not call it yourself.
 
 =head1 EVENTS
 

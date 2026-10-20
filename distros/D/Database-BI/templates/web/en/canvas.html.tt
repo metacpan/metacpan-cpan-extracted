@@ -52,6 +52,14 @@
 	max-width: 100%;
 	height: auto;
 }
+/* A cross-filter mark is a control: it filters the canvas by its value from
+ * the keyboard too, so a focused one is stroked.  A fill cannot say which
+ * mark has focus, because the fill is the value it encodes. */
+.visual-card-body svg [role="button"]:focus-visible {
+	stroke: #0d6efd;
+	stroke-width: 2px;
+	outline: none;
+}
 .visual-error {
 	color: #dc3545;
 	padding: 0.5rem;
@@ -80,6 +88,12 @@
 	gap: 0.5rem;
 	margin-bottom: 0.75rem;
 	flex-wrap: wrap;
+}
+.visual-count {
+	font-size: 0.8rem;
+	color: #666;
+	white-space: nowrap;
+	flex: 0 0 auto;
 }
 /* Cross-filter chip */
 .cf-chip {
@@ -220,31 +234,38 @@
 }
 .bm-item a:hover { text-decoration: underline; }
 .bm-empty { font-size: 0.82rem; color: var(--muted, #6c757d); padding: 0.25rem 0; margin: 0; }
-/* Undo / redo buttons (3.6) */
-.btn-undo, .btn-redo {
-	font-size: 0.8rem;
-	padding: 0.2rem 0.5rem;
-	border: 1px solid var(--border, #dee2e6);
-	border-radius: 4px;
-	background: var(--header-bg, #f8f9fa);
-	cursor: pointer;
-	white-space: nowrap;
-}
-.btn-undo:disabled, .btn-redo:disabled { opacity: 0.35; cursor: not-allowed; }
-/* "Add visual" button in canvas toolbar (P3) */
-.btn-add-visual {
+/* Canvas toolbar buttons: same look as virtual table page toolbar buttons */
+.canvas-toolbar > button,
+.canvas-toolbar > .bm-wrap > button,
+.canvas-toolbar .btn-add-visual {
+	flex-shrink: 0;
+	padding: 0.28rem 0.75rem;
+	border: 1px solid #888;
+	border-radius: 6px;
+	background: transparent;
+	color: #444;
 	font-size: 0.82rem;
-	padding: 0.2rem 0.55rem;
-	border: 1px solid var(--border, #dee2e6);
-	border-radius: 4px;
-	background: var(--header-bg, #f8f9fa);
-	color: var(--body-color, #212529);
-	text-decoration: none;
 	white-space: nowrap;
 	cursor: pointer;
+	transition: background 0.12s;
+	text-decoration: none;
+	display: inline-flex;
+	align-items: center;
 }
-.btn-add-visual:hover { background: #e2e6ea; text-decoration: none; }
-/* Drag handle affordance on visual card headers (P7) */
+.canvas-toolbar > button:hover,
+.canvas-toolbar > .bm-wrap > button:hover,
+.canvas-toolbar .btn-add-visual:hover {
+	background: #f0f0f0;
+	text-decoration: none;
+}
+.canvas-toolbar > button:disabled {
+	opacity: 0.45;
+	cursor: not-allowed;
+}
+/* Drag handle affordance on visual card headers: the grab area that moves the
+ * card to a chosen grid cell (P7/P8).  A control as well as a grab area - it
+ * takes focus and the arrow keys move the card - so it is in the tab order and
+ * is named for assistive technology rather than hidden from it. */
 .drag-handle {
 	color: var(--muted, #6c757d);
 	font-size: 0.75rem;
@@ -255,6 +276,72 @@
 	flex-shrink: 0;
 }
 .drag-handle:active { cursor: grabbing; }
+.drag-handle:focus-visible {
+	outline: 2px solid var(--link, #0d6efd);
+	outline-offset: 2px;
+	border-radius: 3px;
+}
+/* Where a dragged card will land.  The pointer only has to be over a cell, and a
+ * cell can be a twelfth of the grid, so the destination is drawn for the whole
+ * card rather than left to the pointer's judgement. */
+.visual-drop-ghost {
+	border: 2px dashed var(--link, #0d6efd);
+	border-radius: 4px;
+	background: rgba(13, 110, 253, 0.06);
+	pointer-events: none;
+}
+/* The card being dragged keeps its place in the grid, dimmed, until the drop. */
+.visual-card.moving { opacity: 0.6; }
+/* The first-visit tip (3.2): what a card's header and its corner grip do.  It
+ * is rendered hidden and uncovered by the script, so a returning reader never
+ * sees it flash on the way in; while it is up the two affordances it names are
+ * drawn on the first card, because a name in a sentence is not a thing on the
+ * screen. */
+.canvas-hint {
+	display: flex;
+	align-items: flex-start;
+	gap: 0.75rem;
+	margin-bottom: 0.75rem;
+	padding: 0.6rem 0.75rem;
+	background: var(--header-bg, #f8f9fa);
+	border: 1px solid var(--border, #dee2e6);
+	border-left: 3px solid var(--link, #0d6efd);
+	border-radius: 6px;
+	font-size: 0.88rem;
+	line-height: 1.45;
+}
+.canvas-hint[hidden] { display: none; }
+.canvas-hint-text { margin: 0; flex: 1; }
+.canvas-hint-grip {
+	font-size: 0.75rem;
+	letter-spacing: -1px;
+	color: var(--muted, #6c757d);
+}
+.canvas-hint-close {
+	flex-shrink: 0;
+	font-size: 0.82rem;
+	padding: 0.2rem 0.6rem;
+	border: 1px solid var(--border, #dee2e6);
+	border-radius: 4px;
+	background: var(--card-bg, #fff);
+	color: var(--body-color, #212529);
+	cursor: pointer;
+	white-space: nowrap;
+}
+.canvas-hint-close:hover { background: #e2e6ea; }
+/* The card the tip is talking about, marked while the tip is up and unmarked
+ * when it goes: a ring rather than a colour of its own around the header it can
+ * be dragged by, and a tint over the grip it can be resized from. */
+.visual-card.pointing .visual-card-header {
+	outline: 2px solid var(--link, #0d6efd);
+	outline-offset: 1px;
+	border-radius: 3px;
+}
+.visual-card.pointing .visual-resize-handle {
+	background: rgba(13, 110, 253, 0.12);
+	border-radius: 4px;
+}
+.visual-card.pointing .visual-resize-handle::after { opacity: 1; }
 /* Resize handle: drags the card's grid span (P8) */
 .visual-resize-handle {
 	position: absolute;
@@ -288,12 +375,68 @@
 .visual-card:hover .visual-resize-handle::after,
 .visual-resize-handle:hover::after { opacity: 1; }
 .visual-resize-handle:hover::after { background-color: #e2e6ea; }
+/* Keyboard focus.  The handle is the only way to resize without a pointer, so
+ * once it has focus it has to be findable, and the card it belongs to has to be
+ * obvious: the arrow keys resize the focused card.  :focus-visible rather than
+ * :focus, so a pointer drag does not leave a ring behind -- the .resizing
+ * outline below is what a drag shows. */
+.visual-resize-handle:focus-visible {
+	outline: 2px solid var(--link, #0d6efd);
+	outline-offset: 2px;
+	border-radius: 3px;
+}
+.visual-resize-handle:focus-visible::after { opacity: 1; }
+.visual-card:focus-within { outline: 2px solid var(--link, #0d6efd); }
 .visual-card.resizing { outline: 2px solid var(--link, #0d6efd); }
 .visual-card.resizing .visual-card-body {
 	/* Keep the drag from selecting chart text or hitting chart marks. */
 	pointer-events: none;
 	user-select: none;
 }
+/* Size menu (3.2): preset widths and heights per card, so a visual can be sized
+ * without the corner grip and without a pointer at all.  A native select rather
+ * than a panel of our own, for two reasons: it is keyboard operable and
+ * announced everywhere without a line of code from us, and a card clips its own
+ * contents (overflow: hidden), so a panel positioned inside the header would be
+ * cut off at the card's edge.  Wide enough for the longest size it can report
+ * ("11 columns wide, 3 rows high"); on a card too narrow for that it shrinks and
+ * the text clips, which is the one place the size can be missed - the option is
+ * still announced in full. */
+.visual-size-select {
+	font-size: 0.7rem;
+	padding: 0.05rem 0.2rem;
+	margin-left: 0.3rem;
+	max-width: 11.5rem;
+	min-width: 5rem;
+	border: 1px solid var(--border, #dee2e6);
+	border-radius: 3px;
+	background: var(--header-bg, #f8f9fa);
+	color: var(--body-color, #212529);
+	cursor: pointer;
+	flex-shrink: 1;
+}
+.visual-size-select:focus-visible {
+	outline: 2px solid var(--link, #0d6efd);
+	outline-offset: 1px;
+}
+/* The size, on the card (3.2): the same two numbers the menu's first option
+ * reports, so the size a card was left at by a drag is readable at a glance
+ * without opening anything.  Columns first, then rows, and the title spells
+ * both out in the menu's own words.  It is five characters and does not shrink,
+ * where the menu is wide enough for the longest size it can report and shrinks
+ * on a narrow card, which is the one place the size could be missed.  Empty
+ * until there is a size to show - a card the browser places has none until it
+ * has been laid out - and the :empty rule is what keeps that from being a small
+ * blank pill of padding rather than nothing. */
+.visual-size-badge {
+	font-size: 0.7rem;
+	color: var(--muted, #6c757d);
+	white-space: nowrap;
+	flex-shrink: 0;
+	margin-left: 0.3rem;
+	font-variant-numeric: tabular-nums;
+}
+.visual-size-badge:empty { display: none; }
 /* Per-visual PNG download button (3.7) */
 .visual-dl-btn {
 	font-size: 0.7rem;
@@ -313,6 +456,7 @@
 	.canvas-toolbar button,
 	.canvas-toolbar .bm-wrap,
 	.param-bar,
+	.canvas-hint,
 	#bm-panel { display: none !important; }
 	.canvas-toolbar {
 		flex-wrap: nowrap;
@@ -336,6 +480,10 @@
 	.visual-card-header { cursor: default; }
 	.visual-dl-btn { display: none; }
 	.visual-resize-handle { display: none; }
+	.visual-size-select { display: none; }
+	/* The printed canvas is two columns whatever the canvas is, so the size on
+	 * the card would be a number that does not describe the page. */
+	.visual-size-badge { display: none; }
 	.visual-card-body {
 		overflow: visible;
 		padding: 0.25rem;
@@ -344,6 +492,9 @@
 }
 </style>
 
+[%- IF back_url.length -%]
+<p class="back-link"><a href="[% back_url | html %]">&larr; [% back_label | html %]</a> &rsaquo; <span>[% canvas_name | html %]</span></p>
+[%- END -%]
 <div class="canvas-toolbar">
 	<h2 style="margin:0;flex:1">[% title | html %]</h2>
 	[% IF drill_name.length %]
@@ -394,11 +545,17 @@
 	<a href="[% canvas_data_url | html %]" class="btn-add-visual" id="btn-add-visual"
 	   title="Go to the data source to add another chart to this canvas">&#x2295; Add visual&hellip;</a>
 	[% END %]
-	<span style="color:var(--muted,#6c757d);font-size:0.85rem">
+	<button id="btn-copy-link" type="button" title="Copy a shareable link to this canvas view">&#x1F517; Copy link</button>
+	<button id="btn-print" type="button" title="Print or save as PDF (Ctrl+P)">&#x1F5A8; Print</button>
+	[% IF canvas_id.length %]
+	<button id="btn-delete-canvas" type="button"
+	        data-canvas-name="[% canvas_name | html %]"
+	        title="Permanently delete this canvas"
+	        style="color:var(--danger-fg,#c0392b)">&#x1F5D1; Delete canvas</button>
+	[% END %]
+	<span class="visual-count">
 		[% visuals.size %] visual[% visuals.size != 1 ? 's' : '' %]
 	</span>
-	<button id="btn-copy-link" type="button" title="Copy a shareable link to this canvas view" style="margin-left:auto">&#x1F517; Copy link</button>
-	<button id="btn-print" type="button" title="Print or save as PDF (Ctrl+P)">&#x1F5A8; Print</button>
 </div>
 
 [% IF canvas_params.size %]
@@ -419,6 +576,20 @@
 </div>
 [% END %]
 
+[% IF canvas_id.length && visuals.size %]
+<div class="canvas-hint" id="canvas-hint" hidden>
+	<p class="canvas-hint-text" id="canvas-hint-text">
+		<strong>Arrange this canvas:</strong> drag a visual by the
+		<span class="canvas-hint-grip" aria-hidden="true">::</span> handle in its header to move it
+		to another cell, and drag the grip in the card's bottom right corner to resize it.  Both
+		work from the keyboard as well: focus the header to move the visual, the corner grip
+		to resize it, and the Size menu in its header to set its width and height without a drag.
+	</p>
+	<button type="button" class="canvas-hint-close" id="canvas-hint-close"
+	        aria-describedby="canvas-hint-text">&#x2715; Got it</button>
+</div>
+[% END %]
+
 <div class="canvas-grid" id="canvas-grid" data-canvas-id="[% canvas_id | html %]"
 [% IF drill_name.length %]     data-drill-name="[% drill_name | html %]" data-drill-level="[% drill_level %]" data-drill-max="[% drill_max %]" data-drill-col="[% drill_col | html %]"[% END %]>
 [% FOREACH v IN visuals %]
@@ -426,13 +597,56 @@
 	     id="visual-[% v.id %]"
 	     data-visual="[% v.id %]"
 	     [% IF v.cf_col %]data-cf-col="[% v.cf_col | html %]"[% END %]
-	     [% IF v.style %]style="[% v.style | html %]"[% END %]
-	     draggable="true">
+	     [% IF v.style %]style="[% v.style | html %]"[% END %]>
 		<div class="visual-card-header">
+			[% IF canvas_id.length %]
+			<span class="drag-handle" role="button" tabindex="0"
+			      aria-label="Move [% v.title | html %]"
+			      aria-describedby="move-help"
+			      title="Drag, or focus and use the arrow keys, to move this visual">::</span>
+			[% ELSE %]
+			<!-- No canvas id: nothing here can be moved or saved, so the grip is
+			     decoration rather than a control, and claims nothing to a screen
+			     reader. -->
 			<span class="drag-handle" aria-hidden="true">::</span>
-			<span class="sr-only">Drag to reorder</span>
-			<span class="visual-card-title">[% v.title | html %]</span>
+			[% END %]
+			<span class="visual-card-title" id="visual-title-[% v.id %]">[% v.title | html %]</span>
 			<span style="font-size:0.75rem;opacity:0.5;margin-left:0.5rem">[% v.kind | html %]</span>
+			[% IF canvas_id.length %]
+			<!-- A card's size is part of its canvas layout, and this is the same
+			     write as the corner grip without the drag: one menu per card, named
+			     for the card it sizes, whose entries are widths in grid columns and
+			     heights in grid rows.  The first option is written by the script and
+			     says the size the card actually is, because a drag can leave any
+			     width and any height at all; the two groups below it are the sizes
+			     that can be chosen. -->
+			<select class="visual-size-select" id="visual-size-[% v.id %]"
+			        aria-label="Size of [% v.title | html %]"
+			        aria-describedby="size-help">
+				<option value="" data-current="1">Size</option>
+				<optgroup label="Width">
+					<option value="12">Full width</option>
+					<option value="6">Half width</option>
+					<option value="4">Third width</option>
+					<option value="3">Quarter width</option>
+				</optgroup>
+				<optgroup label="Height">
+					<option value="h1">1 row high</option>
+					<option value="h2">2 rows high</option>
+					<option value="h3">3 rows high</option>
+					<option value="h6">6 rows high</option>
+				</optgroup>
+			</select>
+			<!-- The size, on the card (3.2): the same two numbers the menu's first
+			     option reports, so a card left at a width by a drag says so without
+			     the menu having to be opened.  The template writes it when the card
+			     has a saved span; a card the browser places has none until it has
+			     been laid out, and the script fills that one in, as it does when a
+			     size is dragged or chosen.  The title is in words here and is
+			     replaced with the menu's words once the script runs - only the menu
+			     knows what a preset is called. -->
+			<span class="visual-size-badge" data-size-badge="1"[%- IF v.w %] title="[% v.w %] column[% v.w == 1 ? '' : 's' %] wide, [% v.h %] row[% v.h == 1 ? '' : 's' %] high"[%- END %]>[% IF v.w %][% v.w %] &times; [% v.h %][% END %]</span>
+			[% END %]
 			<button class="visual-dl-btn" data-title="[% v.title | html %]" title="Download as PNG" hidden>&#x2B07; Save image</button>
 		</div>
 		<div class="visual-card-body">
@@ -444,98 +658,310 @@
 		</div>
 		[% IF canvas_id.length %]
 		<span class="visual-resize-handle" data-resize-handle="1"
-		      aria-hidden="true" title="Drag to resize this visual"></span>
+		      role="slider" tabindex="0"
+		      aria-labelledby="visual-title-[% v.id %]"
+		      aria-describedby="resize-help"
+		      aria-orientation="horizontal"
+		      aria-valuemin="1"
+		      title="Drag, or focus and use the arrow keys, to resize this visual"></span>
 		[% END %]
 	</div>
 [% END %]
 </div>
+
+[% IF canvas_id.length %]
+<p class="sr-only" id="move-help">Move a visual: drag its header, or focus the header and use
+the arrow keys to move it one grid cell at a time.  Hold Shift with an arrow key to jump to the
+edge of the canvas in that direction.  The new position is saved as you go, and reads out as
+the column and row it was moved to, along with any visual the move pushed down.</p>
+<p class="sr-only" id="canvas-live" role="status"></p>
+<p class="sr-only" id="cf-help">Filter by a chart mark: focus a bar, slice or point with
+Tab, then press Enter or Space to filter the canvas by its value.</p>
+[% END %]
+
+[% IF canvas_id.length %]
+<p class="sr-only" id="resize-help">Resize a visual: focus its handle at the bottom right of
+the card, then use the left and right arrow keys to change its width in grid columns and the
+up and down arrow keys to change its height in rows.  Home and End go to the narrowest and
+widest the card can be.  The new size is saved as you go.</p>
+[% END %]
+
+[% IF canvas_id.length %]
+<p class="sr-only" id="size-help">Size a visual without dragging: the Size menu in the card's
+header sets its width to the full width of the canvas, a half, a third or a quarter, and its
+height to one, two, three or six rows.  A card that has to move to be that wide is moved,
+anything it grows over moves down out of the way, and the choice is saved as soon as it is
+made.  The option the menu shows is the size the card is, so a card sized by dragging reads as
+the width and height it was left at, and the same size is written on the card itself, beside the
+menu, so it reads without the menu being opened.</p>
+[% END %]
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
 <script>
 (function () {
 	'use strict';
 
-	/* ---- drag-to-reorder ---- */
+	/* ---- dragging a card to a grid cell (3.2) ----
+	 *
+	 * The card header is the grab area; the corner handle owns resizing.  A drag
+	 * snaps the card's top-left corner to the cell the pointer is over, draws
+	 * where it will land in a ghost cell, and on release the card is placed there
+	 * - the card it lands on, and anything else in the way, is pushed down out of
+	 * the way.
+	 *
+	 * Pointer events rather than HTML5 drag-and-drop, for the same reason the
+	 * resize handle uses them: they report the pointer position the snapping
+	 * needs, and they cover mouse, pen and touch (a touch drag never fires the
+	 * native drag events at all).
+	 *
+	 * Nothing is invented on the way to the server: saveLayout() reads x, y, w and
+	 * h back out of the rendered grid, so what is PATCHed is what is on screen, and
+	 * a reload renders the same arrangement server-side with no JavaScript
+	 * involved.
+	 *
+	 * The DOM order is left alone.  A layout entry addresses a visual by its index
+	 * in the visuals array, so reordering the cards would renumber them and
+	 * scramble every saved position; the position is what a drag changes, and the
+	 * move is announced for anyone not reading the screen.
+	 */
 	var grid       = document.getElementById('canvas-grid');
 	var anaId      = grid ? grid.getAttribute('data-canvas-id') : '';
 	var drillName  = grid ? (grid.getAttribute('data-drill-name')  || '') : '';
 	var drillLevel = grid ? parseInt(grid.getAttribute('data-drill-level') || '0', 10) : 0;
 	var drillMax   = grid ? parseInt(grid.getAttribute('data-drill-max')   || '0', 10) : 0;
 	var drillCol   = grid ? (grid.getAttribute('data-drill-col')   || '') : '';
-	var dragSrc    = null;
+	var liveRegion = document.getElementById('canvas-live');
 
-	function onDragStart(e) {
-		dragSrc = this.closest('.visual-card');
-		e.dataTransfer.effectAllowed = 'move';
-		e.dataTransfer.setData('text/plain', dragSrc.getAttribute('data-visual'));
+	function titleOf(card) {
+		var el = card.querySelector('.visual-card-title');
+		return el ? el.textContent.trim() : 'Visual';
 	}
 
-	function onDragOver(e) {
-		e.preventDefault();
-		e.dataTransfer.dropEffect = 'move';
+	function overlaps(a, b) {
+		return a.x < b.x + b.w && b.x < a.x + a.w &&
+		       a.y < b.y + b.h && b.y < a.y + a.h;
 	}
 
-	function onDrop(e) {
+	/* The card that was moved keeps the cell it was put in; every other card that
+	 * shares a cell with it - or with a card already placed - moves down until it
+	 * does not.  Only cards that collide move: a card in row 3 stays in row 3 when
+	 * something is dropped in row 1, because a canvas is a place and not a list.
+	 * It returns the cards it had to move down, so a move can be announced in
+	 * full: a reader who hears about only the card they moved loses track of
+	 * the rest, and the next key press starts from a canvas they do not have.
+	 *
+	 * A card that is not in the way is left alone, style attribute and all: only
+	 * a card that actually moves is written, so a card the canvas placed for
+	 * itself stays placed by the canvas.  Writing a span to every card would
+	 * turn the browser's placement of the cards it laid out into a fixed
+	 * arrangement measured from whichever render - filtered or not - was on
+	 * screen at the time. */
+	function pushApart(placed) {
+		var used  = [spanOf(placed)];
+		var moved = [];
+		Array.from(grid.querySelectorAll('.visual-card')).forEach(function (card) {
+			if (card === placed) return;
+			var sp   = spanOf(card);
+			var from = sp.y;
+			while (used.some(function (u) { return overlaps(sp, u); })) {
+				sp.y++;
+			}
+			if (sp.y !== from) {
+				applySpan(card, sp.x, sp.w, sp.y, sp.h);
+				moved.push({ card: card, to: sp.y });
+			}
+			used.push(sp);
+		});
+		return moved;
+	}
+
+	/* What a move or a resize did to the cards it got in the way of, as a clause
+	 * the announcement can carry; empty when nothing was in the way. */
+	function displacedText(moved) {
+		if (!moved.length) return '';
+		return '. ' + moved.map(function (m) {
+			return titleOf(m.card) + ' moved down to row ' + m.to;
+		}).join(', ');
+	}
+
+	function placeGhost(ghost, at) {
+		ghost.style.setProperty('grid-column', at.x + '/span ' + at.w);
+		ghost.style.setProperty('grid-row',    at.y + '/span ' + at.h);
+	}
+
+	function onMoveStart(e) {
+		if (e.button) return;
+		var card = e.target.closest('.visual-card');
+		/* The corner handle and the card's own buttons own their presses. */
+		if (!card || e.target.closest('.visual-resize-handle, button, a, select')) return;
+
 		e.preventDefault();
-		if (!dragSrc) return;
-		var target = e.target.closest('.visual-card');
-		if (!target || target === dragSrc) return;
-		var parent = grid;
-		var cards  = Array.from(parent.children);
-		var srcIdx = cards.indexOf(dragSrc);
-		var tgtIdx = cards.indexOf(target);
-		if (srcIdx < 0 || tgtIdx < 0) return;
-		if (srcIdx < tgtIdx) {
-			parent.insertBefore(dragSrc, target.nextSibling);
-		} else {
-			parent.insertBefore(dragSrc, target);
+
+		var sp       = spanOf(card);
+		var startX   = e.clientX;
+		var startY   = e.clientY;
+		var colPitch = columnPitch() || 1;
+		var rPitch   = rowPitch(card)  || 1;
+		var at       = { x: sp.x, y: sp.y, w: sp.w, h: sp.h };
+		var maxX     = GRID_COLS - sp.w + 1;
+
+		card.classList.add('moving');
+		var ghost = document.createElement('div');
+		ghost.className = 'visual-drop-ghost';
+		grid.appendChild(ghost);
+		placeGhost(ghost, at);
+
+		function onMoveMove(ev) {
+			/* Rounded, so the card snaps to the nearest cell rather than to the one
+			 * the pointer happens to be inside: halfway across a cell is the point
+			 * of no return. */
+			at.x = clampSpan(sp.x + Math.round((ev.clientX - startX) / colPitch), 1, maxX);
+			at.y = Math.max(1, sp.y + Math.round((ev.clientY - startY) / rPitch));
+			placeGhost(ghost, at);
 		}
-		saveLayout();
+
+		function onMoveEnd() {
+			document.removeEventListener('pointermove',   onMoveMove);
+			document.removeEventListener('pointerup',     onMoveEnd);
+			document.removeEventListener('pointercancel', onMoveEnd);
+			if (ghost.parentNode) ghost.parentNode.removeChild(ghost);
+			card.classList.remove('moving');
+
+			if (at.x === sp.x && at.y === sp.y) return;
+			commitMove(card, at);
+		}
+
+		document.addEventListener('pointermove',   onMoveMove);
+		document.addEventListener('pointerup',     onMoveEnd);
+		document.addEventListener('pointercancel', onMoveEnd);
 	}
+
+	/* Place a card at x/y and say where it went.  Shared by the drag and by the
+	 * arrow keys, so both end in the same writes. */
+	function commitMove(card, at, defer) {
+		applySpan(card, at.x, at.w, at.y, at.h);
+		var moved = pushApart(card);
+		/* The width a card may be resized to depends on the column it starts in,
+		 * which this has just changed. */
+		var handle = card.querySelector('.visual-resize-handle');
+		if (handle) updateResizeAria(handle, card);
+
+		if (defer) scheduleSave(); else saveLayout();
+
+		announce(titleOf(card) + ' moved to column ' + at.x + ', row ' + at.y + ': ' +
+			at.w + (at.w === 1 ? ' column' : ' columns') + ' wide and ' +
+			at.h + (at.h === 1 ? ' row' : ' rows') + ' tall' + displacedText(moved));
+	}
+
+	function announce(message) {
+		if (liveRegion) liveRegion.textContent = message;
+	}
+
+	/* ---- moving a card from the keyboard (3.2) ----
+	 *
+	 * The header handle is a control as well as a grab area: it takes focus, and
+	 * the arrow keys move the card one cell at a time, Shift with an arrow key
+	 * going to that edge of the canvas.  Every move is announced in #canvas-live:
+	 * a position is two numbers and a button has no value attribute to carry them
+	 * (which is why the resize handle, which has a slider's value attributes, puts
+	 * both of its dimensions in aria-valuetext).
+	 */
+	function onMoveKey(e) {
+		var handle = e.target.closest('.drag-handle');
+		var card   = handle && handle.closest('.visual-card');
+		if (!card) return;
+
+		var st   = resizeState(card);
+		var maxX = GRID_COLS - st.w + 1;
+		var x    = st.x;
+		var y    = st.y;
+
+		if      (e.key === 'ArrowRight') x = e.shiftKey ? maxX : clampSpan(x + 1, 1, maxX);
+		else if (e.key === 'ArrowLeft')  x = e.shiftKey ? 1    : clampSpan(x - 1, 1, maxX);
+		else if (e.key === 'ArrowDown')  y = e.shiftKey ? gridBottom() : y + 1;
+		else if (e.key === 'ArrowUp')    y = e.shiftKey ? 1 : Math.max(1, y - 1);
+		else return;
+
+		e.preventDefault();
+		if (x === st.x && y === st.y) return;
+
+		commitMove(card, { x: x, y: y, w: st.w, h: st.h }, true);
+	}
+
+	/* One row past the last card on the canvas: below everything, which is where a
+	 * card sent to the end belongs. */
+	function gridBottom() {
+		var bottom = 1;
+		Array.from(grid.querySelectorAll('.visual-card')).forEach(function (card) {
+			var sp = spanOf(card);
+			if (sp.y + sp.h > bottom) bottom = sp.y + sp.h;
+		});
+		return bottom;
+	}
+
+	function initMoveHandles() {
+		if (!grid || !anaId) return;
+		grid.querySelectorAll('.visual-card-header').forEach(function (header) {
+			header.addEventListener('pointerdown', onMoveStart);
+		});
+		grid.querySelectorAll('.drag-handle').forEach(function (handle) {
+			handle.addEventListener('keydown', onMoveKey);
+			handle.addEventListener('blur',    flushSave);
+		});
+	}
+
+	initMoveHandles();
 
 	function saveLayout() {
 		if (!anaId) return;
-		/* Pack the cards in DOM order: x and y come from the flow, w and h from
-		 * whatever the user last resized each card to.  Packing rather than
-		 * reusing stored coordinates is what makes drag-to-reorder and
-		 * drag-to-resize compose: a card that moves keeps its width and cannot
-		 * end up stacked on top of a neighbour, which a stale grid-row would
-		 * otherwise do as soon as one card spans more than one row. */
-		var col = 1, row = 1;
+		/* The layout is what the canvas is showing, read back out of the rendered
+		 * grid: x and y are the cell the user dragged a card to, w and h the size
+		 * they dragged its corner to.  Nothing is packed or re-derived here - a card
+		 * put in row 4 stays in row 4, with a gap above it if that is where it was
+		 * put - and nothing is written that the server would reject (see
+		 * _validate_layout: inside the grid, and no two cards sharing a cell).
+		 *
+		 * Only a card carrying a span of its own is written: one the canvas
+		 * placed from the saved layout, or one a move, a resize or a push has
+		 * just placed.  A card with no style attribute is placed by the browser,
+		 * and the same way on every visit, so it is left out of the layout
+		 * rather than measured into it - measuring it would freeze whatever the
+		 * render in hand happens to show, which on a cross-filtered or drilled
+		 * canvas is the filtered arrangement and not the one the canvas was
+		 * given.  Its position is the browser's to decide until the reader moves
+		 * it themselves. */
 		var layout = [];
-		Array.from(grid.children).forEach(function (c) {
+		Array.from(grid.querySelectorAll('.visual-card')).forEach(function (c) {
 			var vid = parseInt(c.getAttribute('data-visual'), 10);
 			if (isNaN(vid)) return;
+			if (!c.getAttribute('style')) return;
 			var sp = spanOf(c);
-			var w  = clampSpan(sp.w, 1, GRID_COLS);
-			var h  = clampSpan(sp.h, 1, MAX_ROW_SPAN);
-			if (col + w - 1 > GRID_COLS) { col = 1; row++; }
-			applySpan(c, col, w, row, h);
-			layout.push({ visual: vid, x: col, y: row, w: w, h: h });
-			if (h > 1) {
-				/* A tall card owns the whole band of rows under it. */
-				row += h;
-				col  = 1;
-			} else {
-				col += w;
-				if (col > GRID_COLS) { col = 1; row++; }
-			}
+			var x  = clampSpan(sp.x, 1, GRID_COLS);
+			layout.push({
+				visual : vid,
+				x      : x,
+				y      : Math.max(1, sp.y),
+				w      : clampSpan(sp.w, 1, GRID_COLS - x + 1),
+				h      : clampSpan(sp.h, 1, MAX_ROW_SPAN),
+			});
 		});
 		var body = JSON.stringify({ layout: layout });
 		fetch('/api/analyses/' + encodeURIComponent(anaId), {
 			method  : 'PATCH',
 			headers : { 'Content-Type': 'application/json' },
 			body    : body,
-		}).catch(function () {});
-	}
-
-	if (grid) {
-		var headers = grid.querySelectorAll('.visual-card-header');
-		headers.forEach(function (h) {
-			h.addEventListener('dragstart', onDragStart);
+		}).then(function (r) {
+			/* The server refuses a layout in which two cards share a cell (see
+			 * _validate_layout), leaving the saved one alone.  Saying so is the
+			 * difference between a size that is lost and a size the reader knows
+			 * has to be redone: the change is on screen either way, and only the
+			 * saved arrangement was refused. */
+			if (!r.ok) {
+				announce('The layout was not saved: the server refused it (' + r.status + ')');
+			}
+		}).catch(function () {
+			announce('The layout was not saved: the server could not be reached');
 		});
-		grid.addEventListener('dragover', onDragOver);
-		grid.addEventListener('drop',     onDrop);
 	}
 
 	/* ---- grid span helpers (3.2 canvas layout) ---- */
@@ -590,14 +1016,26 @@
 		var cr    = card.getBoundingClientRect();
 		var gr    = grid.getBoundingClientRect();
 		var order = Array.prototype.indexOf.call(grid.children, card) + 1;
+
+		/* A row has a pixel minimum (grid-auto-rows: minmax(15rem, auto)), so a row
+		 * span can be measured the same way a column span is.  Without a pixel row
+		 * height there is nothing to measure a row against, and the card's index in
+		 * the DOM is the only row that can be reported. */
+		var m  = (window.getComputedStyle(grid).gridAutoRows || '').match(/([\d.]+)px/);
+		var rp = m ? parseFloat(m[1]) + gap.row : 0;
+
 		return {
 			/* Line 0 means the browser had to auto-place the card (a card with
 			 * no saved position, or a width-only rule): fall back to the
-			 * geometry, which is what the user can see either way. */
+			 * geometry, which is what the user can see either way.  Measuring y
+			 * and h as well as x and w matters once a card can be dragged to a
+			 * chosen cell: the DOM index is not where the card is, and writing it
+			 * as the row would persist a position that collides with a
+			 * neighbour's. */
 			x: col.line || Math.round((cr.left - gr.left) / columnPitch()) + 1,
 			w: col.span || Math.max(1, Math.round((cr.width + gap.col) / columnPitch())),
-			y: row.line || order,
-			h: row.span || 1,
+			y: row.line || (rp ? Math.round((cr.top - gr.top) / rp) + 1 : order),
+			h: row.span || (rp ? Math.max(1, Math.round((cr.height + gap.row) / rp)) : 1),
 		};
 	}
 
@@ -617,22 +1055,205 @@
 
 	/* ---- resize handles (3.2 grid span) ----
 	 *
-	 * Each card's bottom-right handle drags its grid-column span (w) and
+	 * Each card's bottom-right handle resizes its grid-column span (w) and
 	 * grid-row span (h), snapped to whole columns and rows.  The spans are
-	 * written to the card's inline style as the drag happens, so the cards
+	 * written to the card's inline style as the size changes, so the cards
 	 * reflow live, and the complete layout is PATCHed to
-	 * /api/analyses/:id on release by saveLayout().  A reload renders the
-	 * same geometry server-side, with no JavaScript involved.
+	 * /api/analyses/:id by saveLayout().  A reload renders the same geometry
+	 * server-side, with no JavaScript involved.
 	 *
-	 * x is never dragged (the canvas has no drag-to-position), so the widest a
-	 * card can be is the columns left of it: 1 <= w <= 13 - x.
+	 * A corner drag resizes and does not move: x is left where the header drag put
+	 * it (see "dragging a card to a grid cell"), so the widest a card can be is
+	 * the columns left of it: 1 <= w <= 13 - x.
 	 *
 	 * Pointer events cover mouse, pen and touch; the handle sets
 	 * touch-action: none so a touch drag resizes instead of scrolling.  The
-	 * handle is deliberately hidden from assistive technology -- there is no
-	 * keyboard equivalent, and advertising a control that cannot be operated
-	 * is worse than omitting it.
+	 * handle is also a focusable control (role="slider", tabindex="0"), so the
+	 * same resize can be done from the keyboard and is announced: the arrow keys
+	 * move one column or one row at a time.
+	 *
+	 * A 2-D resize has no ARIA role of its own.  slider is the nearest one -- a
+	 * focusable control with a numeric value the arrow keys change -- and the
+	 * value it carries is the width in columns, the axis left and right move.
+	 * The height has no value attribute to live in, so both dimensions go into
+	 * aria-valuetext ("6 columns wide, 2 rows high"), which is what a screen
+	 * reader announces when either changes, and the keys themselves are
+	 * described by #resize-help.
 	 */
+	function resizeState(card) {
+		var sp = spanOf(card);
+		return {
+			x    : sp.x,
+			y    : sp.y,
+			w    : clampSpan(sp.w, 1, GRID_COLS - sp.x + 1),
+			h    : clampSpan(sp.h, 1, MAX_ROW_SPAN),
+			maxW : GRID_COLS - sp.x + 1,
+		};
+	}
+
+	/* The handle's value attributes, from the measured span.  They cannot be
+	 * written server-side: a card with no saved position is placed by the
+	 * browser, so its width is only known once it has been rendered. */
+	function updateResizeAria(handle, card, state) {
+		var st = state || resizeState(card);
+		handle.setAttribute('aria-valuenow', String(st.w));
+		handle.setAttribute('aria-valuemax', String(st.maxW));
+		handle.setAttribute('aria-valuetext',
+			st.w + (st.w === 1 ? ' column wide, ' : ' columns wide, ') +
+			st.h + (st.h === 1 ? ' row high' : ' rows high'));
+
+		/* Everything that reports this card's size is told together: a drag outside
+		 * the menu leaves the menu and the badge on the card wrong otherwise. */
+		updateSizeControls(card, st);
+	}
+
+	/* The label of a preset, taken from the menu itself so the option list is the
+	 * only place a preset's words are written. */
+	function presetLabel(sel, value) {
+		var opt = sel.querySelector('option[value="' + value + '"]');
+		return opt ? opt.textContent.trim() : '';
+	}
+
+	/* A size in the words the menu uses: a preset's own words when the card is on
+	 * one, the count when it is not - a card 7 columns wide must not claim to be
+	 * half - and the height in rows either way. */
+	function sizeSummary(sel, w, h) {
+		var width  = presetLabel(sel, String(w)) ||
+			(w + (w === 1 ? ' column wide' : ' columns wide'));
+		var height = presetLabel(sel, 'h' + h) ||
+			(h + (h === 1 ? ' row high' : ' rows high'));
+		return width + ', ' + height;
+	}
+
+	/* The summary is written to be read as a menu entry, so it starts with a
+	 * capital; a sentence needs it lower case. */
+	function lowerFirst(text) {
+		return text.charAt(0).toLowerCase() + text.slice(1);
+	}
+
+	/* The menu and the size on the card show the size the card is, not the size it
+	 * was last set to: a drag can leave any width and any height at all, and a card
+	 * 7 columns wide must not claim to be half.  Both run at load too, so they show
+	 * the size the browser laid out rather than the size the template guessed - a
+	 * card with no saved position is placed by the browser. */
+	function updateSizeSelect(card, state) {
+		var sel = card.querySelector('.visual-size-select');
+		if (!sel) return;
+
+		var st      = state || resizeState(card);
+		var current = sel.querySelector('option[data-current="1"]');
+		if (!current) return;
+
+		current.textContent = sizeSummary(sel, st.w, st.h);
+		sel.value = current.value;
+	}
+
+	/* The size, on the card (3.2): the same two numbers the menu's first option
+	 * spells out in words, written in the card's header so the size a drag left the
+	 * card at is readable without opening anything.  Columns first, then rows.  A
+	 * card the browser placed has no size until it has been laid out, so this runs
+	 * at load as well as on every change, and a card with no menu - a page with no
+	 * canvas id, where nothing can be sized - has no badge either. */
+	function updateSizeBadge(card, state) {
+		var badge = card.querySelector('[data-size-badge="1"]');
+		if (!badge) return;
+
+		var st  = state || resizeState(card);
+		var sel = card.querySelector('.visual-size-select');
+
+		badge.textContent = st.w + ' × ' + st.h;
+		badge.setAttribute('title', sel
+			? sizeSummary(sel, st.w, st.h)
+			: st.w + ' columns wide, ' + st.h + ' rows high');
+	}
+
+	/* Everything that reports this card's size - the menu's first option and the
+	 * badge on the card - is written together, so no path can leave one of them
+	 * claiming a size the other disagrees with. */
+	function updateSizeControls(card, state) {
+		updateSizeSelect(card, state);
+		updateSizeBadge(card, state);
+	}
+
+	/* Size a card from the menu.  The same writes the corner grip makes, with the
+	 * two things a menu entry has to promise and a drag does not: the size it
+	 * names is the size that lands, so a card in column 9 slides left to be 12
+	 * columns wide instead of being quietly cut to 4, and whatever it has grown
+	 * over is pushed down (pushApart), which is what keeps the PATCH acceptable:
+	 * the server rejects a layout in which two cards share a cell, and a rejected
+	 * layout is a size that is lost at the next reload. */
+	function commitSize(card, w, h) {
+		var sp = spanOf(card);
+		w = clampSpan(w, 1, GRID_COLS);
+		h = clampSpan(h, 1, MAX_ROW_SPAN);
+		var x = clampSpan(sp.x, 1, GRID_COLS - w + 1);
+
+		applySpan(card, x, w, sp.y, h);
+		var moved = pushApart(card);
+
+		var handle = card.querySelector('.visual-resize-handle');
+		if (handle) updateResizeAria(handle, card);
+
+		scheduleSave();
+
+		var sel = card.querySelector('.visual-size-select');
+		announce(titleOf(card) + ' is now ' +
+			lowerFirst(sel ? sizeSummary(sel, w, h) : w + ' columns wide, ' + h + ' rows high') +
+			' in column ' + x + displacedText(moved));
+	}
+
+	/* One PATCH per burst of key presses rather than one per press: a held arrow
+	 * key would otherwise send a request per column.  Focus leaving the handle
+	 * writes the last change immediately. */
+	var saveTimer = null;
+
+	function scheduleSave() {
+		if (saveTimer) clearTimeout(saveTimer);
+		saveTimer = setTimeout(function () {
+			saveTimer = null;
+			saveLayout();
+		}, 400);
+	}
+
+	function flushSave() {
+		if (!saveTimer) return;
+		clearTimeout(saveTimer);
+		saveTimer = null;
+		saveLayout();
+	}
+
+	/* The keyboard equivalent of the drag: the same writes, the same save, the
+	 * same limits, one unit at a time.  preventDefault() runs even at a limit, so
+	 * an arrow key on the handle never scrolls the page out from under the card
+	 * being resized. */
+	function onResizeKey(e) {
+		var card = e.target.closest('.visual-card');
+		if (!card) return;
+
+		var st = resizeState(card);
+		var w  = st.w;
+		var h  = st.h;
+
+		if      (e.key === 'ArrowRight') w = clampSpan(w + 1, 1, st.maxW);
+		else if (e.key === 'ArrowLeft')  w = clampSpan(w - 1, 1, st.maxW);
+		else if (e.key === 'ArrowDown')  h = clampSpan(h + 1, 1, MAX_ROW_SPAN);
+		else if (e.key === 'ArrowUp')    h = clampSpan(h - 1, 1, MAX_ROW_SPAN);
+		else if (e.key === 'Home')       w = 1;
+		else if (e.key === 'End')        w = st.maxW;
+		else return;
+
+		e.preventDefault();
+		if (w === st.w && h === st.h) return;
+
+		applySpan(card, st.x, w, st.y, h);
+		/* Anything the card has grown over moves down, the same as a drop: the
+		 * server rejects a layout in which two cards share a cell, so a resize that
+		 * overlapped a neighbour would be lost at the next reload. */
+		pushApart(card);
+		updateResizeAria(e.target, card, { w: w, h: h, maxW: st.maxW });
+		scheduleSave();
+	}
+
 	function onResizeStart(e) {
 		if (e.button) return;
 		var card = e.target.closest('.visual-card');
@@ -647,22 +1268,49 @@
 		var rPitch   = rowPitch(card)  || 1;
 
 		card.classList.add('resizing');
-		/* The header drag must not start while the handle is being used. */
-		card.setAttribute('draggable', 'false');
 		document.body.style.userSelect = 'none';
+
+		/* Whether the corner was actually dragged anywhere.  A press on the grip
+		 * that never moves it is not a resize - the grip is 26px of the card's
+		 * corner and a click can land on it - and a save from that press would
+		 * rewrite the arrangement from the render in hand. */
+		var changed = false;
+		/* What the badge on the card was last told, so a pointer move that does not
+		 * cross a column or row boundary costs nothing. */
+		var shownW  = sp.w;
+		var shownH  = sp.h;
 
 		function onResizeMove(ev) {
 			var w = clampSpan(sp.w + Math.round((ev.clientX - startX) / colPitch), 1, GRID_COLS - sp.x + 1);
 			var h = clampSpan(sp.h + Math.round((ev.clientY - startY) / rPitch),   1, MAX_ROW_SPAN);
+			changed = (w !== sp.w || h !== sp.h) || changed;
 			applySpan(card, sp.x, w, sp.y, h);
+
+			/* The size on the card follows the grip: a drag that leaves the card 7
+			 * columns wide says so while it is being dragged, not only once it is let
+			 * go.  The numbers come from the drag rather than from a measurement, so
+			 * nothing has to be read back mid-drag. */
+			if (w !== shownW || h !== shownH) {
+				shownW = w;
+				shownH = h;
+				updateSizeBadge(card, { w: w, h: h });
+			}
 		}
 
 		function onResizeEnd() {
 			document.removeEventListener('pointermove', onResizeMove);
 			document.removeEventListener('pointerup',   onResizeEnd);
 			card.classList.remove('resizing');
-			card.setAttribute('draggable', 'true');
 			document.body.style.userSelect = '';
+			/* A press that left the size where it was has nothing to save, and
+			 * saving it anyway would write a layout no one asked for. */
+			if (!changed) return;
+			/* The same tidy-up the keyboard does: what the card grew over is pushed
+			 * down, so the layout that is saved is one the server will take. */
+			pushApart(card);
+			/* A drag changes the same value the keyboard does. */
+			var handle = card.querySelector('.visual-resize-handle');
+			if (handle) updateResizeAria(handle, card);
 			saveLayout();
 		}
 
@@ -674,10 +1322,64 @@
 		if (!grid || !anaId) return;
 		grid.querySelectorAll('.visual-resize-handle').forEach(function (handle) {
 			handle.addEventListener('pointerdown', onResizeStart);
+			handle.addEventListener('keydown',     onResizeKey);
+			handle.addEventListener('blur',        flushSave);
+			var card = handle.closest('.visual-card');
+			if (card) updateResizeAria(handle, card);
 		});
 	}
 
 	initResizeHandles();
+
+	/* ---- the size menu (3.2): width and height without a drag ----
+	 *
+	 * Each entry is a width in grid columns or a height in grid rows, applied
+	 * through commitSize, so the menu and the corner grip end in the same layout
+	 * and the same PATCH.  Focus stays on the menu after a choice, which is where
+	 * the reader already is: the size can be changed again, or tabbed away from,
+	 * without hunting for the card again.  The first option is not a choice but
+	 * the size the card is; it is what the menu shows when the size came from
+	 * somewhere else (a drag, an arrow key, a reload), while a choice made here
+	 * stays selected, so the arrow keys walk the entries one after another
+	 * instead of being pulled back to the top after every one.
+	 */
+	function initSizeMenus() {
+		if (!grid || !anaId) return;
+		grid.querySelectorAll('.visual-size-select').forEach(function (sel) {
+			var card = sel.closest('.visual-card');
+			if (!card) return;
+
+			updateSizeControls(card);
+
+			sel.addEventListener('change', function () {
+				var raw   = sel.value;
+				var index = sel.selectedIndex;
+
+				/* The first option says what the card is, not what it should
+				 * become: choosing it again is not a choice. */
+				if (!raw) return;
+
+				var st      = resizeState(card);
+				var isRow   = raw.charAt(0) === 'h';
+				var value   = parseInt(isRow ? raw.slice(1) : raw, 10);
+
+				/* Choosing the size the card already is should do nothing rather
+				 * than re-announce itself, and leave the entry selected so the next
+				 * arrow key carries on down the list. */
+				if (isNaN(value) || value === (isRow ? st.h : st.w)) return;
+
+				if (isRow) commitSize(card, st.w, value);
+				else       commitSize(card, value, st.h);
+
+				/* The entry that was chosen stays chosen: the commit re-selects the
+				 * summary, and a reader stepping down the list with the arrow keys
+				 * would otherwise be pulled back to the top after every change. */
+				sel.selectedIndex = index;
+			});
+		});
+	}
+
+	initSizeMenus();
 
 	/* ---- cross-filter (3.3 URL-stage) ----
 	 *
@@ -723,39 +1425,72 @@
 			if (!cfCol || visId === null) return;
 			var svg = card.querySelector('svg');
 			if (!svg) return;
-			d3.select(svg)
-				.selectAll('rect, path.arc, path.slice, circle.dot, g.bar > rect')
-				.on('click.cf', function (event, d) {
-					event.stopPropagation();
-					var val = extractCfValue(d);
-					if (val === null || val === '') return;
-					var u = new URL(window.location.href);
+			/* What a mark does, in the words the state it is in calls for: filter
+			 * normally, drill down when this is the drill column, and show the rows
+			 * at the deepest level. */
+			function cfLabel(d) {
+				var val = extractCfValue(d);
+				if (val === null || val === '') return null;
+				if (drillName && cfCol === drillCol && drillLevel >= drillMax) {
+					return 'Show rows for ' + cfCol + ': ' + val;
+				}
+				return (drillName ? 'Drill into ' : 'Filter by ') + cfCol + ': ' + val;
+			}
 
-					if (drillName && cfCol === drillCol) {
-						/* Drill-down mode: clicking the current-level column
-						 * advances one level.  At the deepest level, open the
-						 * drill-through URL to see the raw matching rows. */
-						if (drillLevel >= drillMax) {
-							var dtLink = document.querySelector('a.drill-through-link');
-							if (dtLink) { pushUndo(window.location.search); window.location.href = dtLink.href; }
-							return;
-						}
-						u.searchParams.delete('cv');
-						u.searchParams.delete('dl');
-						u.searchParams.set('dl', drillLevel + 1);
-						u.searchParams.append('cf', drillCol + ':eq:' + encodeURIComponent(val));
-						pushUndo(window.location.search);
-						window.location.href = u.toString();
-					} else if (!drillName) {
-						/* Normal cross-filter mode: replace any existing filter. */
-						u.searchParams.delete('cf');
-						u.searchParams.delete('cv');
-						u.searchParams.append('cf', cfCol + ':eq:' + encodeURIComponent(val));
-						u.searchParams.set('cv', visId);
-						pushUndo(window.location.search);
-						window.location.href = u.toString();
+			function applyCf(event, d) {
+				event.stopPropagation();
+				var val = extractCfValue(d);
+				if (val === null || val === '') return;
+				var u = new URL(window.location.href);
+
+				if (drillName && cfCol === drillCol) {
+					/* Drill-down mode: choosing the current-level column
+					 * advances one level.  At the deepest level, open the
+					 * drill-through URL to see the raw matching rows. */
+					if (drillLevel >= drillMax) {
+						var dtLink = document.querySelector('a.drill-through-link');
+						if (dtLink) { pushUndo(window.location.search); window.location.href = dtLink.href; }
+						return;
 					}
-					/* drillName set but cfCol !== drillCol: ignore click. */
+					u.searchParams.delete('cv');
+					u.searchParams.delete('dl');
+					u.searchParams.set('dl', drillLevel + 1);
+					u.searchParams.append('cf', drillCol + ':eq:' + encodeURIComponent(val));
+					pushUndo(window.location.search);
+					window.location.href = u.toString();
+				} else if (!drillName) {
+					/* Normal cross-filter mode: replace any existing filter. */
+					u.searchParams.delete('cf');
+					u.searchParams.delete('cv');
+					u.searchParams.append('cf', cfCol + ':eq:' + encodeURIComponent(val));
+					u.searchParams.set('cv', visId);
+					pushUndo(window.location.search);
+					window.location.href = u.toString();
+				}
+				/* drillName set but cfCol !== drillCol: ignore the choice. */
+			}
+
+			/* The marks are the controls, so they are in the tab order and say what
+			 * they do.  A mark with no value to filter by is not a control and is
+			 * left out of both the tab order and the accessibility tree's buttons. */
+			var marks = d3.select(svg)
+				.selectAll('rect, path.arc, path.slice, circle.dot, g.bar > rect');
+			marks
+				.attr('tabindex', function (event, d) {
+					return cfLabel(d) === null ? null : 0;
+				})
+				.attr('role', function (event, d) {
+					return cfLabel(d) === null ? null : 'button';
+				})
+				.attr('aria-label', function (event, d) { return cfLabel(d); })
+				.attr('aria-describedby', function (event, d) {
+					return cfLabel(d) === null ? null : 'cf-help';
+				})
+				.on('click.cf', applyCf)
+				.on('keydown.cf', function (event, d) {
+					if (event.key !== 'Enter' && event.key !== ' ') return;
+					event.preventDefault();
+					applyCf(event, d);
 				});
 		});
 	}
@@ -801,6 +1536,32 @@
 	var btnPrint = document.getElementById('btn-print');
 	if (btnPrint) {
 		btnPrint.addEventListener('click', function () { window.print(); });
+	}
+
+	/* ---- delete canvas button ---- */
+	var btnDeleteCanvas = document.getElementById('btn-delete-canvas');
+	if (btnDeleteCanvas) {
+		btnDeleteCanvas.addEventListener('click', function () {
+			var name = btnDeleteCanvas.getAttribute('data-canvas-name') || 'this canvas';
+			if (!confirm('Delete canvas "' + name + '"?\n\nThis cannot be undone.')) return;
+			btnDeleteCanvas.disabled = true;
+			btnDeleteCanvas.textContent = 'Deleting…';
+			fetch('/api/analyses/[% canvas_id | uri %]', { method: 'DELETE' })
+				.then(function (r) {
+					if (r.ok) {
+						window.location.href = '/';
+					} else {
+						alert('Could not delete canvas (server error).');
+						btnDeleteCanvas.disabled = false;
+						btnDeleteCanvas.innerHTML = '&#x1F5D1; Delete canvas';
+					}
+				})
+				.catch(function () {
+					alert('Could not delete canvas (network error).');
+					btnDeleteCanvas.disabled = false;
+					btnDeleteCanvas.innerHTML = '&#x1F5D1; Delete canvas';
+				});
+		});
 	}
 
 	/* ---- per-visual PNG download (3.7) ----
@@ -995,6 +1756,56 @@
 				if (r.ok) { onSuccess(); }
 			}).catch(function () {});
 		}
+	}());
+
+	/* ---- the first-visit tip (3.2) ----
+	 *
+	 * Shown to a reader who has not dismissed it before, and never again once
+	 * they have.  The flag is not per canvas: what the tip explains - the header
+	 * drag and the corner grip - belongs to the page rather than to this
+	 * analysis, so a second canvas is not a second first visit.  localStorage is
+	 * wrapped because it throws in a browser with storage turned off: the tip is
+	 * shown there and the dismissal holds for the visit, which is as much as can
+	 * be promised with nowhere to remember it.
+	 */
+	var HINT_KEY = 'bi:canvas:hint';
+
+	function hintSeen() {
+		try { return localStorage.getItem(HINT_KEY) === '1'; } catch (e) { return false; }
+	}
+
+	(function () {
+		var hint     = document.getElementById('canvas-hint');
+		var closeBtn = document.getElementById('canvas-hint-close');
+		if (!hint || !grid || !anaId) return;
+
+		/* Nothing to point at: a canvas with no cards is redirected to its data
+		 * view today, but the tip is not worth showing if that ever changes. */
+		var card = grid.querySelector('.visual-card');
+		if (!card || hintSeen()) return;
+
+		hint.hidden = false;
+		card.classList.add('pointing');
+
+		/* The tip is about the header handle, and the button the reader was on
+		 * goes away with the tip: leave them on the control it named rather than
+		 * on a hidden button. */
+		function dismiss() {
+			hint.hidden = true;
+			card.classList.remove('pointing');
+			try { localStorage.setItem(HINT_KEY, '1'); } catch (e) {}
+			announce('Canvas tip dismissed');
+
+			var handle = card.querySelector('.drag-handle[role="button"]');
+			if (handle) handle.focus();
+		}
+
+		if (closeBtn) closeBtn.addEventListener('click', dismiss);
+
+		/* Escape, from either the button or the text, dismisses it too. */
+		hint.addEventListener('keydown', function (e) {
+			if (e.key === 'Escape') { e.preventDefault(); dismiss(); }
+		});
 	}());
 
 }());

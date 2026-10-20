@@ -21,7 +21,7 @@ t/00-load.t
 t/map.t
 xt/manifest.t
 xt/pod.t
-xt/meta-yml.t
-xt/meta-json.t
+xt/provides.t
+xt/version.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -19,17 +19,17 @@
 <rect x="16.5" y="16.5" width="567" height="219" rx="10" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1"/>
 <g shape-rendering="crispEdges">
 <rect x="30" y="60" width="540" height="162" fill="#14192d"/>
-<rect x="138" y="122" width="315" height="1" fill="#78aaff"/>
-<rect x="133" y="132" width="1" height="18" fill="#78aaff"/>
-<rect x="457" y="132" width="1" height="18" fill="#78aaff"/>
-<rect x="138" y="158" width="315" height="1" fill="#78aaff"/>
+<rect x="147" y="122" width="315" height="1" fill="#78aaff"/>
+<rect x="142" y="132" width="1" height="18" fill="#78aaff"/>
+<rect x="466" y="132" width="1" height="18" fill="#78aaff"/>
+<rect x="147" y="158" width="315" height="1" fill="#78aaff"/>
 </g>
-<polyline points="133.5 132 133.5 127 133.538 126.413 133.653 125.835 133.843 125.278 134.103 124.75 134.43 124.261 134.818 123.818 135.261 123.43 135.75 123.103 136.278 122.843 136.835 122.653 137.413 122.538 138 122.5 138 122.5" fill="none" stroke="#78aaff" stroke-width="1" stroke-linejoin="round"/>
-<polyline points="457.5 132 457.5 127 457.462 126.413 457.347 125.835 457.157 125.278 456.897 124.75 456.57 124.261 456.182 123.818 455.739 123.43 455.25 123.103 454.722 122.843 454.165 122.653 453.587 122.538 453 122.5 453 122.5" fill="none" stroke="#78aaff" stroke-width="1" stroke-linejoin="round"/>
-<polyline points="133.5 150 133.5 154 133.538 154.587 133.653 155.165 133.843 155.722 134.103 156.25 134.43 156.739 134.818 157.182 135.261 157.57 135.75 157.897 136.278 158.157 136.835 158.347 137.413 158.462 138 158.5 138 158.5" fill="none" stroke="#78aaff" stroke-width="1" stroke-linejoin="round"/>
-<polyline points="457.5 150 457.5 154 457.462 154.587 457.347 155.165 457.157 155.722 456.897 156.25 456.57 156.739 456.182 157.182 455.739 157.57 455.25 157.897 454.722 158.157 454.165 158.347 453.587 158.462 453 158.5 453 158.5" fill="none" stroke="#78aaff" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="142.5 132 142.5 127 142.538 126.413 142.653 125.835 142.843 125.278 143.103 124.75 143.43 124.261 143.818 123.818 144.261 123.43 144.75 123.103 145.278 122.843 145.835 122.653 146.413 122.538 147 122.5 147 122.5" fill="none" stroke="#78aaff" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="466.5 132 466.5 127 466.462 126.413 466.347 125.835 466.157 125.278 465.897 124.75 465.57 124.261 465.182 123.818 464.739 123.43 464.25 123.103 463.722 122.843 463.165 122.653 462.587 122.538 462 122.5 462 122.5" fill="none" stroke="#78aaff" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="142.5 150 142.5 154 142.538 154.587 142.653 155.165 142.843 155.722 143.103 156.25 143.43 156.739 143.818 157.182 144.261 157.57 144.75 157.897 145.278 158.157 145.835 158.347 146.413 158.462 147 158.5 147 158.5" fill="none" stroke="#78aaff" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="466.5 150 466.5 154 466.462 154.587 466.347 155.165 466.157 155.722 465.897 156.25 465.57 156.739 465.182 157.182 464.739 157.57 464.25 157.897 463.722 158.157 463.165 158.347 462.587 158.462 462 158.5 462 158.5" fill="none" stroke="#78aaff" stroke-width="1" stroke-linejoin="round"/>
 <g class="terminal">
-<text x="147" y="146" textLength="297" fill="#ffffff">Hello, terminal! Press q to quit.</text>
+<text x="156" y="146" textLength="297" fill="#ffffff">Hello, terminal! Press q to quit.</text>
 </g>
 <g shape-rendering="crispEdges">
 </g>

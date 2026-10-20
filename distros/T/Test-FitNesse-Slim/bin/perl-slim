@@ -1,0 +1,137 @@
+#! /usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Test::FitNesse::Slim::Server;
+
+sub usage {
+  "Usage: $0 [-v] [-s seconds] [--bind-address IPv4] port (1 uses stdin/stdout pipes)\n"
+}
+
+my($verbose,$statement_timeout,$bind_address,$bind_address_set,$port);
+while (@ARGV) {
+  my $argument = shift @ARGV;
+  if ($argument eq '-v') {
+    $verbose = 1;
+  }
+  elsif ($argument eq '-s') {
+    die usage if defined($statement_timeout)
+      || !@ARGV || $ARGV[0] !~ /\A[1-9][0-9]{0,8}\z/
+      || $ARGV[0] > 2_147_483_647;
+    $statement_timeout = 0 + shift @ARGV;
+  }
+  elsif ($argument eq '--bind-address') {
+    die usage if $bind_address_set || !@ARGV;
+    $bind_address = shift @ARGV;
+    $bind_address_set = 1;
+  }
+  elsif ($argument =~ /\A-/ || defined $port) {
+    die usage;
+  }
+  else {
+    $port = $argument;
+  }
+}
+
+die usage unless defined($port) && $port =~ /\A[0-9]+\z/;
+die usage if $bind_address_set && $port eq '1';
+
+Test::FitNesse::Slim::Server->new(
+  verbose => $verbose,
+  statement_timeout => $statement_timeout,
+  ($bind_address_set ? (bind_address => $bind_address) : ()),
+)->run($port);
+
+__END__
+
+=head1 NAME
+
+perl-slim - Run the Perl FitNesse SLiM server
+
+=head1 SYNOPSIS
+
+    perl-slim [-v] [-s SECONDS] [--bind-address IPv4] PORT
+
+=head1 DESCRIPTION
+
+Start the Test::FitNesse::Slim server. Port C<1> selects a single SLiM v0.5 session
+over the inherited stdin/stdout pipes, as used when FitNesse starts the
+server as a test-runner child. Other valid port numbers start the v0.5 TCP
+listener on that port. TCP listens on IPv4 loopback (C<127.0.0.1>) by
+default.
+
+The executable must be able to load L<Test::FitNesse::Slim::Server> and its runtime
+dependency L<HTML::TreeBuilder>. External fixture modules must be on the
+Perl module search path inherited by the process, normally C<PERL5LIB>.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-v>
+
+Write request and response diagnostics to stderr. In pipe mode, fixture
+stdout and stderr are captured and tunneled separately so that protocol
+frames remain on stdout.
+
+=item B<-s> I<SECONDS>
+
+Set an integer timeout for each fixture statement. The value must be
+positive and fit in a signed 32-bit integer. A timed-out invocation is
+returned as a SLiM exception.
+
+=item B<--bind-address> I<IPv4>
+
+Bind the TCP listener to the specified numeric IPv4 address. The default is
+C<127.0.0.1>. A non-loopback address emits a warning because the listener is
+unauthenticated and permits clients to invoke Perl fixtures. Use it only on
+a trusted network. This option cannot be used with port C<1>.
+
+=item I<PORT>
+
+Select the transport. Port C<1> means pipes; other accepted decimal ports
+select TCP. Exactly one port is required.
+
+=back
+
+=head1 EXIT STATUS
+
+The pipe process exits zero after a clean C<bye> or clean EOF. Invalid
+arguments, startup failures, truncated messages, framing failures, and
+broken protocol output result in a nonzero exit. TCP serves clients in
+child processes; a malformed client is isolated from the listener.
+
+=head1 EXAMPLES
+
+FitNesse-managed pipe configuration:
+
+    !define TEST_SYSTEM {slim}
+    !define COMMAND_PATTERN {%m}
+    !define TEST_RUNNER {/absolute/path/to/perl-slim}
+    !define SLIM_PORT {1}
+
+Standalone TCP listener:
+
+    perl-slim 8099
+
+Explicit all-interface listener for a trusted network:
+
+    perl-slim --bind-address 0.0.0.0 8099
+
+=head1 SEE ALSO
+
+L<Test::FitNesse::Slim>, L<Test::FitNesse::Slim::Server>,
+C<docs/slim-pipe-transport.md>, and C<docs/fixture-conversion.md>.
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2010-2026 Greg Bacon.
+
+This program is free software; it may be redistributed and modified under
+the terms of either the GNU General Public License, version 1 or any later
+version, or the Artistic License 1.0. Test-only FitNesse fixture adaptations
+are separately licensed under the Common Public License 1.0. See the
+distribution's license files and C<THIRD-PARTY-NOTICES.md>.
+
+=cut

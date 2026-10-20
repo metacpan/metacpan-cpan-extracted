@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 #
 # Recipe copy ranges must ascend: across the "c" steps of one Recipe, each
-# start is greater than the previous end (spec-06 section 5.1 says so for
+# start is greater than the previous end (-07 section 5.1 says so for
 # header Recipes; the agreed extension applies the same rule to body
 # Recipes). Together with 1 <= start <= end <= count, that is the whole
 # well-formedness rule for "c". A Recipe that breaks it is malformed and
@@ -50,7 +50,7 @@ sub verify_result {
     $v->set_pubkey_callback(DKIM2TestKeys::pubkey_callback());
     my $ok = eval { $v->load($text); 1 };
     return ('died', $@) unless $ok;
-    return ($v->result, $v->details);
+    return ($v->result, $v->details, $v->diagnostic);
 }
 
 our $ORIGINAL = join('',
@@ -117,21 +117,21 @@ my @bad = (
     [ '{"b":[{"c":[1,2]},{"c":[2,3]}]}',   qr/copies lines 2-2 twice/, 'overlapping ranges' ],
     [ '{"b":[{"c":[1,3]},{"c":[1,3]}]}',   qr/copies lines 1-3 twice/, 'the same range twice' ],
     [ '{"b":[{"c":[2,2]},{"c":[2,2]}]}',   qr/copies lines 2-2 twice/, 'the same line twice' ],
-    [ '{"b":[{"c":[0,3]}]}',               qr/copies lines 0-3 of 5/, 'a range from line 0' ],
+    [ '{"b":[{"c":[0,3]}]}',               qr/contains invalid JSON/, 'a range from line 0' ],
     [ '{"b":[{"c":[1,6]}]}',               qr/copies lines 1-6 of 5/, 'a range past the end' ],
-    [ '{"b":[{"c":[3,1]}]}',               qr/copies lines 3-1 of 5/, 'a range that runs backwards' ],
-    [ '{"b":[{"c":[1.5,3]}]}',             qr/malformed copy range/, 'a fractional bound' ],
-    [ '{"b":[{"c":["x",3]}]}',             qr/malformed copy range/, 'a non-numeric bound' ],
-    [ '{"b":[{"c":[true,3]}]}',            qr/malformed copy range/, 'a boolean bound' ],
-    [ '{"b":[{"c":[-1,3]}]}',              qr/malformed copy range/, 'a negative bound' ],
-    [ '{"b":[{"c":["1","3"]}]}',           qr/malformed copy range/, 'bounds that are JSON strings' ],
-    [ '{"b":[{"c":[1,"3"]}]}',             qr/malformed copy range/, 'one bound that is a JSON string' ],
-    [ '{"b":[{"c":[1.0,3]}]}',             qr/malformed copy range/, 'a bound with a fraction part of zero' ],
-    [ '{"b":[{"c":[1e0,3]}]}',             qr/malformed copy range/, 'a bound in exponent form' ],
-    [ '{"b":[{"c":[null,3]}]}',            qr/malformed copy range/, 'a null bound' ],
-    [ '{"b":[{"c":[1]}]}',                 qr/malformed copy range/, 'one bound' ],
-    [ '{"b":[{"c":[1,2,3]}]}',             qr/malformed copy range/, 'three bounds' ],
-    [ '{"b":[{"c":[]}]}',                  qr/malformed copy range/, 'no bounds' ],
+    [ '{"b":[{"c":[3,1]}]}',               qr/(?:copies lines 3-1 of 5|invalid copy range 3-1)/, 'a range that runs backwards' ],
+    [ '{"b":[{"c":[1.5,3]}]}',             qr/contains invalid JSON/, 'a fractional bound' ],
+    [ '{"b":[{"c":["x",3]}]}',             qr/contains invalid JSON/, 'a non-numeric bound' ],
+    [ '{"b":[{"c":[true,3]}]}',            qr/contains invalid JSON/, 'a boolean bound' ],
+    [ '{"b":[{"c":[-1,3]}]}',              qr/contains invalid JSON/, 'a negative bound' ],
+    [ '{"b":[{"c":["1","3"]}]}',           qr/contains invalid JSON/, 'bounds that are JSON strings' ],
+    [ '{"b":[{"c":[1,"3"]}]}',             qr/contains invalid JSON/, 'one bound that is a JSON string' ],
+    [ '{"b":[{"c":[1.0,3]}]}',             qr/contains invalid JSON/, 'a bound with a fraction part of zero' ],
+    [ '{"b":[{"c":[1e0,3]}]}',             qr/contains invalid JSON/, 'a bound in exponent form' ],
+    [ '{"b":[{"c":[null,3]}]}',            qr/contains invalid JSON/, 'a null bound' ],
+    [ '{"b":[{"c":[1]}]}',                 qr/contains invalid JSON/, 'one bound' ],
+    [ '{"b":[{"c":[1,2,3]}]}',             qr/contains invalid JSON/, 'three bounds' ],
+    [ '{"b":[{"c":[]}]}',                  qr/contains invalid JSON/, 'no bounds' ],
     [ '{"h":{"subject":[{"c":[1,1]},{"c":[1,1]}]}}', qr/copies lines 1-1 twice/,
       'a header range used twice' ],
     [ '{"h":{"comments":[{"c":[2,2]},{"c":[1,1]}]}}', qr/out of order/,
@@ -146,14 +146,18 @@ for my $case (@bad) {
     my $err = eval { Mail::DKIM2::MessageInstance->undo($text); 1 } ? '' : $@;
     like($err, $error, "undo refuses $name");
 
-    my ($ok, $why) = Mail::DKIM2::MessageInstance->chain_verifies($text);
+    # Every Recipe error is "contains invalid JSON"; which one is detail.
+    my $invalid = 'PERMERROR: Message-Instance m=2 contains invalid JSON';
+    my ($ok, $why, $detail) = Mail::DKIM2::MessageInstance->chain_verifies($text);
     ok(!$ok, "... chain_verifies does not pass");
-    like($why, $error, "... and says why");
+    is($why, $invalid, "... and says why");
+    like($detail // $why, $error, "... with the detail") unless $error =~ /invalid JSON/;
 
-    my ($result, $details) = verify_result($text);
+    my ($result, $details, $diag) = verify_result($text);
     isnt($result, 'died', "... the Verifier does not throw");
     isnt($result, 'pass', "... and does not accept the message") or diag($details);
-    like($details, $error, "... naming the problem");
+    is($details, $invalid, "... naming the problem");
+    like($diag // $details, $error, "... with the detail in diagnostic()") unless $error =~ /invalid JSON/;
 }
 
 # The honest footer Recipe still passes, so the failures above are the

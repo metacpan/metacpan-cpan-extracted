@@ -95,7 +95,7 @@ my $text = build_chain(MAX_CHAIN_LENGTH);
     $signer->PRINT($text); $signer->CLOSE;
     is($signer->result, 'fail',
         'the signer will not add signature ' . (MAX_CHAIN_LENGTH + 1));
-    like($signer->details, qr/^PERMERROR more than 32 DKIM2-Signature fields/,
+    like($signer->details, qr/^PERMERROR: more than 32 DKIM2-Signature fields/,
         '... and says why');
 
     my $current = Email::MIME->new($text);
@@ -113,7 +113,7 @@ my ($top_mi)  = $text =~ /^(Message-Instance:.*?\r\n)(?=\S)/ms;
 {
     my ($v, $lookups) = verify($top_sig . $text, "more body\r\n");
     is($v->result, 'permerror', 'one signature too many is a permerror');
-    is($v->details, 'PERMERROR more than 32 DKIM2-Signature fields',
+    is($v->details, 'PERMERROR: more than 32 DKIM2-Signature fields',
         '... naming the field');
     is($lookups, 0, '... with no key fetched');
     ok($v->stopped, '... and nothing more read');
@@ -124,23 +124,23 @@ my ($top_mi)  = $text =~ /^(Message-Instance:.*?\r\n)(?=\S)/ms;
     my $long = $top_mi . $text;
     my ($v, $lookups) = verify($long);
     is($v->result, 'permerror', 'one instance too many is a permerror');
-    is($v->details, 'PERMERROR more than 32 Message-Instance fields',
+    is($v->details, 'PERMERROR: more than 32 Message-Instance fields',
         '... naming the field');
     is($lookups, 0, '... with no key fetched');
 
     my ($ok, $why) = Mail::DKIM2::MessageInstance->chain_verifies($long);
     ok(!$ok, 'chain_verifies refuses it');
-    is($why, 'PERMERROR more than 32 Message-Instance fields', '... and says why');
+    is($why, 'PERMERROR: more than 32 Message-Instance fields', '... and says why');
 
     ok(!Mail::DKIM2::MessageInstance->verify($long), 'verify refuses it');
     ok(!eval { Mail::DKIM2::MessageInstance->undo($long); 1 },
         'undo refuses it');
-    like($@, qr/^PERMERROR more than 32 Message-Instance fields/, '... and says why');
+    like($@, qr/^PERMERROR: more than 32 Message-Instance fields/, '... and says why');
 }
 
 {
     my ($v, $lookups) = verify(join q{}, ($top_sig) x 1000, $text);
-    is($v->details, 'PERMERROR more than 32 DKIM2-Signature fields',
+    is($v->details, 'PERMERROR: more than 32 DKIM2-Signature fields',
         'a thousand signatures are refused the same way');
     is($lookups, 0, '... with no key fetched');
 }
@@ -159,24 +159,24 @@ my ($top_mi)  = $text =~ /^(Message-Instance:.*?\r\n)(?=\S)/ms;
     my $lookups;
     ($v, $lookups) = verify($sig . $short);
     is($v->result, 'permerror', 'a repeated i= is a permerror');
-    is($v->details, 'PERMERROR DKIM2-Signature i=2 appears more than once',
+    is($v->details, 'PERMERROR: DKIM2-Signature i=2 appears more than once',
         '... naming the number');
     is($lookups, 0, '... with no key fetched');
 
     my $signer = signer();
     $signer->PRINT($sig . $short); $signer->CLOSE;
     is($signer->result, 'fail', 'the signer will not extend a chain with a repeated i=');
-    like($signer->details, qr/^PERMERROR DKIM2-Signature i=2 appears more than once/,
+    like($signer->details, qr/^PERMERROR: DKIM2-Signature i=2 appears more than once/,
         '... and says why');
 
     my $twice = $mi . $short;
     ($v, $lookups) = verify($twice);
-    is($v->details, 'PERMERROR Message-Instance m=2 appears more than once',
+    is($v->details, 'PERMERROR: Message-Instance m=2 appears more than once',
         'a repeated m= is a permerror');
     is($lookups, 0, '... with no key fetched');
 
     my ($ok, $why) = Mail::DKIM2::MessageInstance->chain_verifies($twice);
-    is($why, 'PERMERROR Message-Instance m=2 appears more than once',
+    is($why, 'PERMERROR: Message-Instance m=2 appears more than once',
         'chain_verifies refuses it');
     ok(!Mail::DKIM2::MessageInstance->verify($twice), 'verify refuses it');
     ok(!eval { Mail::DKIM2::MessageInstance->undo($twice); 1 },
@@ -185,7 +185,7 @@ my ($top_mi)  = $text =~ /^(Message-Instance:.*?\r\n)(?=\S)/ms;
     # The same number with different content is no better.
     (my $other = $mi) =~ s/\bm=2\b/m=1/;
     ($v) = verify($other . $short);
-    is($v->details, 'PERMERROR Message-Instance m=1 appears more than once',
+    is($v->details, 'PERMERROR: Message-Instance m=1 appears more than once',
         'a second m=1 with other content is refused too');
 }
 

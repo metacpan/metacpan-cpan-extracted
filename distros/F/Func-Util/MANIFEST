@@ -107,6 +107,7 @@ t/049-leak-util-specialized.t
 t/050-leak-util-callbacks.t
 t/051-leak-util-misc.t
 t/052-leak-util-extended.t
+t/053-install-files.t
 t/xs/funcutil_export_test/funcutil_export_test.c
 t/xs/funcutil_export_test/lib/funcutil_export_test.pm
 t/xs/funcutil_export_test/Makefile.PL

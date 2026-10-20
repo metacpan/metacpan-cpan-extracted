@@ -28,21 +28,53 @@ my $ok = eval { $bad = parse_dkim_pubkey('v=DKIM1; k=ed25519; p=bm90YWtleQ=='); 
 ok($ok, 'malformed ed25519 key does not die');
 is($bad, undef, 'malformed ed25519 key returns undef');
 
-# spec-06 §4: names added by the HDRMAINT survey
+# -07 §4: names added by the HDRMAINT survey
 for my $h (qw(Apparently-To Auto-Submitted DL-Expansion-History
               Original-Recipient SIO-Label-History VBR-Info
               X400-Received X400-Trace)) {
-    ok(Mail::DKIM2::Common::should_skip($h), "spec-06 §4: $h is unsigned");
+    ok(Mail::DKIM2::Common::should_skip($h), "-07 §4: $h is unsigned");
 }
 
-# spec-06 §4: any Received-* field is a trace field
-ok(Mail::DKIM2::Common::should_skip('Received-SPF'), 'spec-06 §4: Received-SPF is unsigned');
-ok(Mail::DKIM2::Common::should_skip('Received-Anything'), 'spec-06 §4: Received-* is unsigned');
+# -07 §4: any Received-* field is a trace field
+ok(Mail::DKIM2::Common::should_skip('Received-SPF'), '-07 §4: Received-SPF is unsigned');
+ok(Mail::DKIM2::Common::should_skip('Received-Anything'), '-07 §4: Received-* is unsigned');
 
 # spec-05 §4: the ARC- prefix narrowed to exactly three names
-ok(Mail::DKIM2::Common::should_skip('ARC-Seal'), 'spec-06 §4: ARC-Seal is unsigned');
-ok(Mail::DKIM2::Common::should_skip('ARC-Message-Signature'), 'spec-06 §4: ARC-Message-Signature is unsigned');
-ok(Mail::DKIM2::Common::should_skip('ARC-Authentication-Results'), 'spec-06 §4: ARC-Authentication-Results is unsigned');
-ok(!Mail::DKIM2::Common::should_skip('ARC-Something-Else'), 'spec-06 §4: the ARC- prefix match is gone');
+ok(Mail::DKIM2::Common::should_skip('ARC-Seal'), '-07 §4: ARC-Seal is unsigned');
+ok(Mail::DKIM2::Common::should_skip('ARC-Message-Signature'), '-07 §4: ARC-Message-Signature is unsigned');
+ok(Mail::DKIM2::Common::should_skip('ARC-Authentication-Results'), '-07 §4: ARC-Authentication-Results is unsigned');
+ok(!Mail::DKIM2::Common::should_skip('ARC-Something-Else'), '-07 §4: the ARC- prefix match is gone');
+
+# -07 section 7.2 and 18: address domains, A-labels, the relaxed match.
+{
+    use Mail::DKIM2::Common qw(domain_of to_alabel relaxed_domain_match);
+    is_deeply([domain_of('<A@Example.COM.>')], ['example.com', 0], 'domain_of: lowercased, one trailing dot off');
+    is_deeply([domain_of('"a@b"@c.example')], ['c.example', 0], 'domain_of: after the last @');
+    is_deeply([domain_of('<x@[192.0.2.1]>')], ['[192.0.2.1]', 1], 'domain_of: a domain literal is marked');
+    is_deeply([domain_of('<>')], [], 'domain_of: the null path has none');
+    is(to_alabel("b\xc3\xbccher.Example"), 'xn--bcher-kva.Example', 'to_alabel: only the non-ASCII label');
+    is(to_alabel("B\xc3\x9cCHER.example"), 'xn--bcher-kva.example', 'to_alabel: lowercased first');
+    is(to_alabel("bad\xff.example"), "bad\xff.example", 'to_alabel: not UTF-8, left alone');
+    ok(relaxed_domain_match('mail.example.org', 'example.org'), 'relaxed: p1 below p2');
+    ok(!relaxed_domain_match('example.org', 'mail.example.org'), 'relaxed: only p1 is shortened');
+    ok(relaxed_domain_match('Example.ORG.', 'example.org'), 'relaxed: case and a trailing dot');
+    ok(!relaxed_domain_match('[192.0.2.1]', '[192.0.2.1]'), 'relaxed: a literal never matches');
+    ok(relaxed_domain_match("u.b\xc3\xbccher.example", 'xn--bcher-kva.example'), 'relaxed: compared as A-labels');
+    ok(!relaxed_domain_match('xample.org', 'example.org'), 'relaxed: whole labels only');
+}
+
+# from_refusal_note: the milters' log line for a From refusal (final review I3).
+{
+    use Mail::DKIM2::Common qw(from_refusal_note);
+    is(from_refusal_note('lists.example.org', '"A via list" <list@lists.example.net>'),
+       "From domain lists.example.net is not d=lists.example.org or below it: a DKIM2 "
+       . "list's posting address must be in the domain this milter signs with",
+       'from_refusal_note: names the From domain and d=');
+    like(from_refusal_note('example.org', "A a\@example.org\r\n"),
+         qr/\AFrom domain \(not one mailbox: A a\@example\.org\) is not d=example\.org /,
+         'from_refusal_note: a From that is not one mailbox, as one line');
+    like(from_refusal_note('example.org', 'a@example.org', 'b@example.org'),
+         qr/\AFrom domain \(2 From fields\) is not/, 'from_refusal_note: two From fields');
+}
 
 done_testing;

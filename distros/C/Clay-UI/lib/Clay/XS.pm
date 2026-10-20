@@ -8,7 +8,7 @@ no warnings 'experimental::signatures';
 use Exporter 5.57 'import';
 use XSLoader;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 XSLoader::load(__PACKAGE__, $VERSION);
 
@@ -136,7 +136,7 @@ for every frame. Clay remembers what it needs between frames (element
 positions for hit testing, scroll positions, text measurements,
 transitions) on its own.
 
-This distribution vendors Clay v0.14 together with four patches. Three
+This distribution vendors Clay v0.14 together with five patches. Three
 add features: sizing groups, a wrapping flow layout and a stack layout
 (see L</SIZING GROUPS>, L</FLOW LAYOUT> and L</STACK LAYOUT>). The
 fourth fixes upstream bugs and so changes some of Clay's behaviour: every
@@ -148,8 +148,11 @@ rectangle, an exit transition starts from the element's current look,
 a floating element may attach to an element declared later in the
 frame, and frames that reach the element count, exit transitions and
 large sizes can no longer crash or hang Clay (see
-L</FUNCTIONS: TRANSITIONS> and L</SIZING GROUPS>). No system library is
-needed.
+L</FUNCTIONS: TRANSITIONS> and L</SIZING GROUPS>). The fifth cuts off
+text that does not wrap (C<CLAY_TEXT_WRAP_NEWLINES>,
+C<CLAY_TEXT_WRAP_NONE>) when its parent is too narrow even after
+everything else shrank, instead of letting it run past the parent (see
+L</Text wrap modes>). No system library is needed.
 
 =head2 What this module is
 
@@ -373,14 +376,55 @@ plain strings of the form C<< <function>: <argument>: expected <what>, got <valu
 Returns the number of bytes Clay needs for a context.
 
     my $bytes = Clay_MinMemorySize();
+    my $bytes = Clay_MinMemorySize(\%counts);
 
-The size depends on the element and measure-cache word counts that the
-next C<Clay_Initialize> will use: those of the current context, or
-Clay's process-wide defaults (8192 elements and 16384 words, unless
+The size depends on the element and measure-cache word counts of the
+context:
+
+=over 4
+
+=item C<\%counts>
+
+Optional. The counts to size a context for, given explicitly; the same
+hash makes L</Clay_Initialize> create a context with them. Nothing
+else changes: not the current context, not Clay's process-wide
+defaults. Undef or missing means the configured counts, as in C: those
+the next C<Clay_Initialize> without counts uses, of the current context,
+or Clay's process-wide defaults (8192 elements and 16384 words, unless
 changed with C<Clay_SetMaxElementCount> or
 C<Clay_SetMaxMeasureTextCacheWordCount>) when no context is current.
 
-Croaks C<< Clay_MinMemorySize: <n> elements and <m> measure-cache words need about <bytes> bytes of arena; Clay's arena arithmetic is limited to 4 GiB >> for counts that large.
+=over 4
+
+=item C<maxElementCount>
+
+Required. The element count, an integer in C<1 .. 2**31 - 1> (see
+L</Clay_SetMaxElementCount>).
+
+=item C<maxMeasureTextCacheWordCount>
+
+Optional. The measure-cache word count, an integer in
+C<32 .. 2**31 - 1> (see L</Clay_SetMaxMeasureTextCacheWordCount>).
+Default: twice the element count, and at least 32.
+
+=back
+
+The keys are named like the getters. Explicit counts must fit together
+(see L</Element and word counts>); configured counts are sized as they
+are, also when C<Clay_Initialize> would refuse them.
+
+=back
+
+    my %counts = (maxElementCount => 20_000);
+    my $ctx = Clay_Initialize(Clay_MinMemorySize(\%counts), [800, 600], undef, undef, \%counts);
+
+Croaks C<< Clay_MinMemorySize: <n> elements and <m> measure-cache words need about <bytes> bytes of arena; Clay's arena arithmetic is limited to 4 GiB >> for counts that large. Explicit counts also croak
+C<Clay_MinMemorySize: counts: expected a hash reference or undef, got ...>,
+C<< Clay_MinMemorySize: counts: unknown key '<key>'; ... >>,
+C<Clay_MinMemorySize: counts: maxElementCount is required>,
+C<< Clay_MinMemorySize: counts: <key>: expected an integer in <min>..2147483647, got ... >>,
+C<< Clay_MinMemorySize: <n> elements would overflow the default measure-cache word count (2 x elements) >>
+and C<< Clay_MinMemorySize: <n> measure-cache words need <b> hash buckets but only <e> elements are configured; ... >>.
 
 I<Context:> none. I<Frame:> any time. I<In a callback:> allowed.
 I<Held errors:> never.
@@ -391,13 +435,16 @@ Creates a new context, makes it current and returns it.
 
     my $ctx = Clay_Initialize($capacity, $dimensions);
     my $ctx = Clay_Initialize($capacity, $dimensions, $error_handler, $userdata);
+    my $ctx = Clay_Initialize($capacity, $dimensions, $error_handler, $userdata, \%counts);
 
 =over 4
 
 =item C<$capacity>
 
-The arena size in bytes: an integer of at least C<Clay_MinMemorySize()>.
-Clay::XS allocates the arena and frees it with the context.
+The arena size in bytes: an integer of at least C<Clay_MinMemorySize()>
+for the counts the context is sized for (C<Clay_MinMemorySize(\%counts)>
+with explicit counts). Clay::XS allocates the arena and frees it with
+the context.
 
 =item C<$dimensions>
 
@@ -414,14 +461,20 @@ L</CALLBACKS>). Without one, Clay errors are ignored, as in C.
 
 Any scalar; a copy is passed to the error handler as its last argument.
 
+=item C<\%counts> (Clay_Initialize)
+
+Optional. The element and measure-cache word counts of the new context,
+the hash L</Clay_MinMemorySize> takes. The context gets exactly these
+counts; the previous current context keeps its counts and Clay's
+process-wide defaults stay as they are. Undef or missing: the new
+context is sized, as in C, for the counts of the current context, or
+for Clay's process-wide defaults when no context is current (see
+L</Clay_SetMaxElementCount>).
+
 =back
 
 Returns a C<Clay::XS::Context>. Keep it: the context is freed when the
 last reference goes away (see L</CONTEXTS>).
-
-The new context is sized for the counts of the current context, or for
-Clay's process-wide defaults when no context is current (see
-L</Clay_SetMaxElementCount>).
 
 Croaks:
 
@@ -429,7 +482,7 @@ Croaks:
 
 =item *
 
-C<Clay_Initialize: capacity must be a non-negative integer number of bytes, got '...'> and C<< Clay_Initialize: capacity <n> is below Clay_MinMemorySize() = <m> bytes >>.
+C<Clay_Initialize: capacity must be a non-negative integer number of bytes, got '...'> and C<< Clay_Initialize: capacity <n> is below Clay_MinMemorySize() = <m> bytes for <e> elements and <w> measure-cache words >>.
 
 =item *
 
@@ -437,8 +490,10 @@ C<Clay_Initialize: dimensions: ...> and C<Clay_Initialize: error handler: expect
 
 =item *
 
-C<< Clay_Initialize: <n> measure-cache words are below the minimum of 32 ... >> and C<< Clay_Initialize: <n> measure-cache words need <b> hash buckets but only <e> elements are configured; ... >>: the configured
-counts do not fit together (see L</Clay_SetMaxElementCount>).
+C<< Clay_Initialize: <n> measure-cache words are below the minimum of 32 ... >> and C<< Clay_Initialize: <n> measure-cache words need <b> hash buckets but only <e> elements are configured; ... >>: the
+counts do not fit together (see L</Element and word counts>). Explicit
+counts croak like those of L</Clay_MinMemorySize>, with
+C<Clay_Initialize> in the message.
 
 =item *
 
@@ -520,7 +575,7 @@ C<Clay_Initialize> refuses counts that do not fit together: fewer than
 32 words, or more than 32 words per element (Clay sizes one part of its
 measure cache by C<words / 32> and indexes it by element).
 
-Croaks C<Clay_SetMaxElementCount: expected an integer in 1..2147483647, got ...>, C<< Clay_SetMaxElementCount: <n> elements would overflow Clay's default measure-cache word count (2 x elements) >>
+Croaks C<Clay_SetMaxElementCount: expected an integer in 1..2147483647, got ...>, C<< Clay_SetMaxElementCount: <n> elements would overflow the default measure-cache word count (2 x elements) >>
 and, for counts whose arena would exceed 4 GiB, C<< Clay_SetMaxElementCount: <n> elements and <m> measure-cache words need about <bytes> bytes of arena; ... >>.
 
     Clay_SetMaxElementCount(20_000);              # no context yet
@@ -756,7 +811,7 @@ Adds a text element to the open element, like the C C<CLAY_TEXT()>
 macro.
 
     Clay__OpenTextElement($text);
-    Clay__OpenTextElement($text, \%text_config);
+    my $id = Clay__OpenTextElement($text, \%text_config);
 
 A text element is a leaf: it has no children and needs no
 C<Clay__CloseElement>. C<$text> is a character string; Clay::XS copies
@@ -769,6 +824,16 @@ the zero config.
 Clay measures the text's words during this call, so the measure
 function (see L</Clay_SetMeasureTextFunction>) may run here. Its errors
 are held and re-thrown by C<Clay_EndLayout>.
+
+Returns the element id Clay gave the text, an element id hash reference
+(see L<Clay::XS::Structs/element id hash>): a text has no id of its
+own, so Clay names it. Once the frame has ended, the id finds the text
+through L</Clay_GetElementData>; its bounding box covers all its
+wrapped lines, which are the C<TEXT> render commands. Returns undef
+when Clay keeps no element under an id for the text: it dropped the
+text because the frame reached its element count (see
+L</Clay_SetMaxElementCount>), or another element of this frame already
+holds that id (Clay reports C<CLAY_ERROR_TYPE_DUPLICATE_ID>).
 
 Croaks C<Clay__OpenTextElement: called outside Clay_BeginLayout/Clay_EndLayout>, C<Clay__OpenTextElement: text must be a defined string>, C<< Clay__OpenTextElement: text length <n> exceeds INT32_MAX >> and L</STRUCT ERRORS> objects such as
 C<Clay_TextElementConfig.fontSize: expected an integer in 0..65535, got '-1'>.
@@ -1767,12 +1832,15 @@ Wraps at spaces and newlines when the text does not fit (the default).
 
 =item CLAY_TEXT_WRAP_NEWLINES
 
-Breaks lines only at newline characters.
+Breaks lines only at newline characters. A line wider than the parent
+leaves is cut off: the element shrinks only after the other children
+reached their minimum, and its C<TEXT> boxes are never wider than the
+element (see L<Clay::XS::Structs/wrapMode>).
 
 =item CLAY_TEXT_WRAP_NONE
 
-Never wraps at spaces. In this Clay version newline characters still
-start a new line, as with C<CLAY_TEXT_WRAP_NEWLINES>.
+Never wraps: the whole text, newline characters included, is one line.
+It is cut off like C<CLAY_TEXT_WRAP_NEWLINES>.
 
 =back
 
@@ -2349,7 +2417,9 @@ one of the thread's own contexts works.
 
 C<Clay_SetMaxElementCount> and C<Clay_SetMaxMeasureTextCacheWordCount>
 take effect at the next C<Clay_Initialize>, which sizes the new context
-for them.
+for them. Explicit counts (the C<\%counts> argument of
+L</Clay_MinMemorySize> and L</Clay_Initialize>) bypass the setters:
+they size one context and change no other counts.
 
 =over 4
 
@@ -3211,7 +3281,7 @@ L<Clay::XS::Structs/sizingGroup>). L<Clay::UI::Grid> builds on it.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-clay-xs/v0.06/images/sizing-groups.png" alt="Two forms with the rows Name, E-mail address and City, each a grey label followed by a blue input box. Without a sizing group every label is as wide as its text and the inputs start at different positions. With the labels in width_group 1 every label is as wide as E-mail address and the inputs line up."></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-clay-xs/v0.07/images/sizing-groups.png" alt="Two forms with the rows Name, E-mail address and City, each a grey label followed by a blue input box. Without a sizing group every label is as wide as its text and the inputs start at different positions. With the labels in width_group 1 every label is as wide as E-mail address and the inputs line up."></p>
 
 =end html
 
@@ -3282,7 +3352,7 @@ inner width.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-clay-xs/v0.06/images/flow-layout.png" alt="Two wrap containers of the same size holding the same eight tags, which wrap onto three lines. With lineSizing GROW the lines share the container's extra height and the tags grow taller; with lineSizing FIT the lines stay as tall as their tags and the bottom of the container stays empty."></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-clay-xs/v0.07/images/flow-layout.png" alt="Two wrap containers of the same size holding the same eight tags, which wrap onto three lines. With lineSizing GROW the lines share the container's extra height and the tags grow taller; with lineSizing FIT the lines stay as tall as their tags and the bottom of the container stays empty."></p>
 
 =end html
 
@@ -3371,7 +3441,7 @@ its padding.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-clay-xs/v0.06/images/stack-layout.png" alt="A stack container: a blue picture fills it, a red badge sits in its top right corner and a dark caption bar runs along its bottom. The legend lists the three children: the picture, GROW on both axes; a layer aligned x RIGHT and y TOP holding the badge; a layer aligned y BOTTOM holding the caption bar."></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-clay-xs/v0.07/images/stack-layout.png" alt="A stack container: a blue picture fills it, a red badge sits in its top right corner and a dark caption bar runs along its bottom. The legend lists the three children: the picture, GROW on both axes; a layer aligned x RIGHT and y TOP holding the badge; a layer aligned y BOTTOM holding the caption bar."></p>
 
 =end html
 

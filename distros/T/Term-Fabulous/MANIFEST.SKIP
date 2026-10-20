@@ -82,6 +82,7 @@
 ^\.git/
 ^\.gitignore$
 ^\.github/
+^\.githooks/
 
 # Build artefacts
 ^Term-Fabulous-[\d.]+

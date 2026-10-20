@@ -8,6 +8,7 @@ WriteMakefile(
     EXE_FILES => [ 'bin/zx81_make_p', 'bin/zx81_dump_p', 'bin/zx81_list_p' ],
     LICENSE   => 'perl_5',
     PREREQ_PM => {
+        'CPU::Z80::Assembler'  => 2.25,
         'Modern::Perl'         => 1.20250607,
         'Object::Tiny::RW'     => 1.07,
         'Path::Tiny'           => 0.150,

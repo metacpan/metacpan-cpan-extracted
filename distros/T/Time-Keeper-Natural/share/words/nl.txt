@@ -1,0 +1,21 @@
+# Time::Keeper::Natural word table: nl
+#
+# UNREVIEWED: written 18 Oct 2026 by a session, as the p2p site's catalogues were.
+# A native reader should review it before release. The format is en.txt's.
+#
+start_of	begin|begin van|het begin van|aan het begin van
+end_of	eind|einde|eind van|einde van|het eind van|het einde van|aan het eind van|aan het einde van
+at	om
+on	op
+skip	de|het
+and
+of	van
+last	laatste
+# test: eind volgende maand => 2026-11-30T23:59:59.999999999+00:00
+# test: begin volgende week => 2026-10-19T00:00:00+01:00
+# test: het einde van het jaar => 2026-12-31T23:59:59.999999999+00:00
+# test: eind oktober => 2026-10-31T23:59:59.999999999+00:00
+# test: morgen om 15:30 => 2026-10-16T15:30:00+01:00
+# test: op dinsdag => 2026-10-20T00:00:00+01:00
+# test: de derde vrijdag van volgende maand => 2026-11-20T00:00:00+00:00
+# test: de laatste vrijdag van oktober => 2026-10-30T00:00:00+00:00

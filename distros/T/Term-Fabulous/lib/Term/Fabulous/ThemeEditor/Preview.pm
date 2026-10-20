@@ -5,7 +5,7 @@ use warnings;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 use Object::Pad 0.825;
 
@@ -16,8 +16,7 @@ use Term::Fabulous::Widget::Box;
 class Term::Fabulous::ThemeEditor::Preview :isa(Term::Fabulous::Widget::Box) :strict(params) {
 	use Clay::UI::Enum::Result;
 	use Clay::XS qw(sizing_fixed sizing_grow CLAY_LEFT_TO_RIGHT CLAY_TOP_TO_BOTTOM CLAY_LEFT_TO_RIGHT_WRAP CLAY_TEXT_WRAP_NONE);
-	use List::Util qw(max min);
-	use Scalar::Util qw(blessed refaddr weaken);
+	use Term::Fabulous::Scrolling qw(scroll_by_key);
 	use Term::Fabulous::Theme;
 	use Term::Fabulous::Widget::Accordion;
 	use Term::Fabulous::Widget::Accordion::Item;
@@ -34,7 +33,7 @@ class Term::Fabulous::ThemeEditor::Preview :isa(Term::Fabulous::Widget::Box) :st
 	use Term::Fabulous::Widget::ProgressBar;
 	use Term::Fabulous::Widget::RadioButton;
 	use Term::Fabulous::Widget::RadioGroup;
-	use Term::Fabulous::Widget::RichText;
+	use Term::Fabulous::Widget::Text;
 	use Term::Fabulous::Widget::ScrollBox;
 	use Term::Fabulous::Widget::SegmentedControl;
 	use Term::Fabulous::Widget::Slider;
@@ -44,7 +43,6 @@ class Term::Fabulous::ThemeEditor::Preview :isa(Term::Fabulous::Widget::Box) :st
 	use Term::Fabulous::Widget::Table;
 	use Term::Fabulous::Widget::Tabs;
 	use Term::Fabulous::Widget::Tabs::Page;
-	use Term::Fabulous::Widget::Text;
 	use Term::Fabulous::Widget::TextArea;
 	use Term::Fabulous::Widget::TextField;
 	use Term::Fabulous::Widget::Toast;
@@ -136,9 +134,7 @@ class Term::Fabulous::ThemeEditor::Preview :isa(Term::Fabulous::Widget::Box) :st
 		}
 		$variant_box = $section{variants};
 
-		weaken( my $weak_self = $self );
-		$self->on( OnFocus  => sub ($event) { $weak_self->_reveal( $event->target ); return Clay::UI::Enum::Result->CONTINUE } );
-		$self->on( KeyPress => sub ($event) { return $weak_self->_scroll_key($event) ? Clay::UI::Enum::Result->HANDLED : Clay::UI::Enum::Result->CONTINUE } );
+		$self->on( KeyPress => sub ( $self, $event ) { return $self->_scroll_key($event) ? Clay::UI::Enum::Result->HANDLED : Clay::UI::Enum::Result->CONTINUE }, owner => $self );
 	}
 
 	sub _column (@kids) {
@@ -185,8 +181,7 @@ class Term::Fabulous::ThemeEditor::Preview :isa(Term::Fabulous::Widget::Box) :st
 			tabs    => [ { title => 'notes' }, { title => 'draft', modified => 1 }, { title => 'broken', error => 1 }, { title => 'pinned', closable => 0 } ],
 			layout  => { sizing => { width => sizing_grow() } },
 		);
-		weaken( my $weak_tabs = $tabs );
-		$tabs->on( Select => sub ($event) { $weak_tabs->active( $event->index ); return } );
+		$tabs->on( Select => sub ( $tabs, $event ) { $tabs->active( $event->index ); return }, owner => $tabs );
 		return $tabs;
 	}
 
@@ -218,7 +213,7 @@ class Term::Fabulous::ThemeEditor::Preview :isa(Term::Fabulous::Widget::Box) :st
 	}
 
 	method _build_text () {
-		my $links = Term::Fabulous::Widget::RichText->new(
+		my $links = Term::Fabulous::Widget::Text->new(
 			markup => 'Body text in the text color, with [link=one]a link[/link] and [link=two]another one[/link]. Point at a link to see it hovered; Tab to the text and Right to select one.',
 		);
 		return _column( Term::Fabulous::Widget::Text->new( text => 'Plain text, as most widgets draw it.' ), $links );
@@ -325,8 +320,7 @@ class Term::Fabulous::ThemeEditor::Preview :isa(Term::Fabulous::Widget::Box) :st
 
 	method _build_toast () {
 		my $show = _button('Show a toast');
-		weaken( my $weak_self = $self );
-		$show->on( Activate => sub ($event) { $weak_self->_show_toast; return } );
+		$show->on( Activate => sub ( $self, $event ) { $self->_show_toast; return }, owner => $self );
 		return _column(
 			(
 				map { Term::Fabulous::Widget::Toast->new( kind => $_->[0], title => $_->[1], message => $_->[2], closable => 0 ) } [ info => 'Info', 'Good to know.' ],
@@ -375,8 +369,7 @@ class Term::Fabulous::ThemeEditor::Preview :isa(Term::Fabulous::Widget::Box) :st
 
 	method _build_dialog () {
 		my $open = _button('Open a dialog');
-		weaken( my $weak_self = $self );
-		$open->on( Activate => sub ($event) { $weak_self->_open_dialog; return } );
+		$open->on( Activate => sub ( $self, $event ) { $self->_open_dialog; return }, owner => $self );
 		return $open;
 	}
 
@@ -468,51 +461,15 @@ class Term::Fabulous::ThemeEditor::Preview :isa(Term::Fabulous::Widget::Box) :st
 	# Scrolls the gallery so that a section starts at its top.
 	method show_section ($id) {
 		my $box = $section{$id} // return $self;
-		$self->_scroll_into_view( $box, 1 );
+		$gallery->reveal( $box, align => 'top' );
 		return $self;
-	}
-
-	method _scroll_into_view ( $widget, $to_top = 0 ) {
-		my $ui       = $self->ui                   // return;
-		my $view     = $ui->bounding_box($gallery) // return;
-		my $target   = $ui->bounding_box($widget)  // return;
-		my $state    = $ui->scroll_state($gallery) // return;
-		my $position = $state->{position}{y}       // 0;
-		my $top      = $view->{y};
-		my $bottom   = $view->{y} + $view->{height};
-		my $wanted   = $position;
-
-		if ( $to_top || $target->{y} < $top ) {
-			$wanted = $position - ( $target->{y} - $top );
-		}
-		elsif ( $target->{y} + $target->{height} > $bottom ) {
-			$wanted = $position - ( $target->{y} + min( $target->{height}, $view->{height} ) - $bottom );
-		}
-		my $lowest = min( 0, $view->{height} - ( $state->{content}{height} // 0 ) );
-		$wanted = max( $lowest, min( 0, $wanted ) );
-		$ui->scroll_to( $gallery, { y => $wanted } ) if $wanted != $position;
-		return;
-	}
-
-	method _reveal ($target) {
-		return unless blessed $target && $gallery->contains($target);
-		$self->_scroll_into_view($target);
-		return;
 	}
 
 	# PageUp, PageDown, Ctrl+Home and Ctrl+End scroll the gallery when the
 	# focused widget does not use them.
 	method _scroll_key ($event) {
-		my $name     = $event->main_key_name       // return 0;
-		my $ui       = $self->ui                   // return 0;
-		my $view     = $ui->bounding_box($gallery) // return 0;
-		my $state    = $ui->scroll_state($gallery) // return 0;
-		my $position = $state->{position}{y}       // 0;
-		my $lowest   = min( 0, $view->{height} - ( $state->{content}{height} // 0 ) );
-		my %target   = ( PageUp => $position + $view->{height} - 1, PageDown => $position - $view->{height} + 1, 'Ctrl+Home' => 0, 'Ctrl+End' => $lowest );
-		return 0 unless exists $target{$name};
-		$ui->scroll_to( $gallery, { y => max( $lowest, min( 0, $target{$name} ) ) } );
-		return 1;
+		my $ui = $self->ui // return 0;
+		return defined scroll_by_key( $ui, $gallery, $event->main_key_name, keys => 'pager' ) ? 1 : 0;
 	}
 }
 

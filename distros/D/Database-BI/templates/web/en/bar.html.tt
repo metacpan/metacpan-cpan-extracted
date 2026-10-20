@@ -4,6 +4,13 @@
   /* Allow axis labels to escape the container without causing horizontal scroll. */
   #bar_chart { overflow: visible; }
   .bar-container { padding-left: 3rem; }
+  /* A bar is a control: it opens the matching rows.  A focused one is drawn
+     with an outline stroke, since a fill alone does not say which bar has it. */
+  #bar_chart .bc-bar:focus-visible {
+    stroke: #0d6efd;
+    stroke-width: 2px;
+    outline: none;
+  }
   .chart-source {
     margin: 0.25rem 0 0;
     font-size: 0.82rem;
@@ -23,6 +30,9 @@
   <button class="btn-graph-export" id="btn-copy-chart-link" onclick="navigator.clipboard.writeText(window.location.href).then(function(){var b=document.getElementById('btn-copy-chart-link');var t=b.textContent;b.textContent='Copied!';setTimeout(function(){b.textContent=t;},1500)}).catch(function(){})">&#x1F517; Copy link</button>
   <span class="graph-point-count">[% bar_count %] bar[% IF bar_count != 1 %]s[% END %]</span>
 </div>
+
+<p class="sr-only" id="bar-drill-help">Drill into a bar: press Tab until a bar has focus,
+then press Enter or Space to open the matching rows in the table.</p>
 
 <div class="bar-container">
   <script src="https://d3js.org/d3.v7.min.js"></script>
@@ -57,7 +67,20 @@
       if (!d || !d.label) return;
       rect.style.cursor = 'pointer';
       rect.setAttribute('title', 'Filter table to: ' + d.label);
+      // The bar is the control, so it is in the tab order and says what it
+      // does: a title is only read on hover, which a keyboard reader is not
+      // doing.
+      rect.setAttribute('tabindex', '0');
+      rect.setAttribute('role', 'button');
+      rect.setAttribute('aria-label', 'Filter table to ' + d.label);
+      rect.setAttribute('aria-describedby', 'bar-drill-help');
       rect.addEventListener('click', function () { drillDown(d.label); });
+      rect.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          drillDown(d.label);
+        }
+      });
     });
   }, 50);
 }());

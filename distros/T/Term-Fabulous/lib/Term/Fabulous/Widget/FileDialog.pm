@@ -9,7 +9,7 @@ use Object::Pad 0.825;
 
 use Term::Fabulous::Widget::Dialog;
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 class Term::Fabulous::Widget::FileDialog
 	:isa(Term::Fabulous::Widget::Dialog)
@@ -25,9 +25,8 @@ class Term::Fabulous::Widget::FileDialog
 	use POSIX qw(strftime);
 	use Scalar::Util qw(weaken);
 	use Term::Fabulous::Check qw(boolean describe one_of positive_integer string);
-	use Term::Fabulous::Event::Answer;
+	use Term::Fabulous::Text::Markup qw(escape_markup);
 	use Term::Fabulous::Widget::Box;
-	use Term::Fabulous::Widget::Button;
 	use Term::Fabulous::Widget::Checkbox;
 	use Term::Fabulous::Widget::Dropdown;
 	use Term::Fabulous::Widget::FileDialog::FolderLine;
@@ -55,7 +54,6 @@ class Term::Fabulous::Widget::FileDialog
 	field $mode              :param = 'open';
 	field $directory         :param = undef;    # bytes, as the file system has them
 	field $current_file      :param = undef;    # bytes
-	field $title             :param = undef;
 	field $list_rows         :param = 10;
 	field $show_hidden       :param = 0;
 	field $default_extension :param = undef;
@@ -68,15 +66,16 @@ class Term::Fabulous::Widget::FileDialog
 	field $_field;
 	field $_filter_choice;    # the Dropdown, undef with fewer than two filters
 	field $_hidden_box;
-	field $_message;
 	field $_replace_question;    # the open Replace question, a weak reference
 
 	# A file dialog is a dialog with room at its sides and no gaps between
 	# its parts (it has many), as wide as the program asks or as the
 	# screen when that is narrower, with an id the id of its list derives
-	# from.
+	# from. Its title and its two buttons come from its mode, and its
+	# notice line always takes its row, so that a message does not move
+	# the buttons.
 	sub BUILDARGS ( $class, %params ) {
-		my $width  = positive_integer( $class, width => $params{width} // DEFAULT_WIDTH );
+		my $width  = positive_integer( $class, width => delete $params{width} // DEFAULT_WIDTH );
 		my $layout = $params{layout} // {};
 		$params{id} //= 'file-dialog-' . ++$generated_ids;
 		$params{layout} = {
@@ -85,10 +84,17 @@ class Term::Fabulous::Widget::FileDialog
 			%$layout,
 			sizing => { width => sizing_grow( 0, $width ), %{ $layout->{sizing} // {} } },
 		};
+		my @own = grep { exists $params{$_} } qw(buttons notice_line);
+		die "$class: a file dialog has its own @own" if @own;
+		$params{notice_line} = 'row';
+		if ( my $words = $MODE{ $params{mode} // 'open' } ) {    # an unknown mode dies in ADJUST
+			$params{title} //= $words->{title};
+			$params{buttons} = [ { id => $words->{answer}, label => $words->{button}, primary => 1 }, { id => CANCEL, label => 'Cancel' } ];
+		}
 		return $class->SUPER::BUILDARGS(%params);
 	}
 
-	ADJUST :params ( :$filters = undef, :$name = undef, :$width = undef ) {
+	ADJUST :params ( :$filters = undef, :$name = undef ) {
 		$mode = one_of( $self, mode => $mode, sort keys %MODE );
 		if ( $mode eq 'folder' ) {
 			my %meaningless = ( filters => $filters, default_extension => $default_extension, name => $name, confirm_overwrite => $confirm_overwrite );
@@ -97,7 +103,6 @@ class Term::Fabulous::Widget::FileDialog
 		}
 		$directory         = $self->_checked_directory( $directory // getcwd() );
 		$current_file      = $self->_checked_current_file($current_file);
-		$title             = string( $self, title => $title // $MODE{$mode}{title} );
 		$list_rows         = positive_integer( $self, list_rows => $list_rows );
 		$show_hidden       = boolean( $self, show_hidden => $show_hidden );
 		$default_extension = $self->_checked_extension($default_extension);
@@ -166,7 +171,6 @@ class Term::Fabulous::Widget::FileDialog
 	# ---------------------------------------------------------------------
 
 	method _build ($name) {
-		weaken( my $weak_self = $self );
 		my @size_column = $mode eq 'folder' ? () : ( { key => 'size', title => 'Size', width => 'fit', sortable => 0, align => 'right' } );
 		$_folder_line = Term::Fabulous::Widget::FileDialog::FolderLine->new;
 		$_list        = Term::Fabulous::Widget::Table->new(
@@ -183,32 +187,30 @@ class Term::Fabulous::Widget::FileDialog
 			],
 			layout => { sizing => { width => sizing_grow(), height => sizing_grow() } },
 		);
-		$_list->on( RowActivate => sub ($event) { $weak_self->_enter( $event->row_id );   return } );
-		$_list->on( CursorMove  => sub ($event) { $weak_self->_pointed( $event->row_id ); return Clay::UI::Enum::Result->CONTINUE } );
-		$_list->on( KeyPress    => sub ($event) { return ( $event->main_key_name // '' ) eq 'Backspace' && $weak_self->_up ? Clay::UI::Enum::Result->HANDLED : Clay::UI::Enum::Result->CONTINUE } );
+		$_list->on( RowActivate => sub ( $self, $event ) { $self->_enter( $event->row_id );   return },                                  owner => $self );
+		$_list->on( CursorMove  => sub ( $self, $event ) { $self->_pointed( $event->row_id ); return Clay::UI::Enum::Result->CONTINUE }, owner => $self );
+		$_list->on(
+			KeyPress => sub ( $self, $event ) { return ( $event->main_key_name // '' ) eq 'Backspace' && $self->_up ? Clay::UI::Enum::Result->HANDLED : Clay::UI::Enum::Result->CONTINUE },
+			owner    => $self
+		);
 
 		$_field = Term::Fabulous::Widget::TextField->new( value => $name, placeholder => $MODE{$mode}{placeholder}, layout => { sizing => { width => sizing_grow() } } );
-		$_field->on( Submit => sub ($event) { $weak_self->_submitted( $event->value ); return } );
+		$_field->on( Submit => sub ( $self, $event ) { $self->_submitted( $event->value ); return }, owner => $self );
 		my $field_row = Term::Fabulous::Widget::Box->new( layout => { sizing => { width => sizing_grow() }, child_gap => 1 } );
 		$field_row->add_child( Term::Fabulous::Widget::Text->new( text => $MODE{$mode}{field} ), $_field );
 
 		my $options_row = Term::Fabulous::Widget::Box->new( layout => { sizing => { width => sizing_grow() }, child_gap => 2 } );
 		if ( @_filters > 1 ) {
 			$_filter_choice = Term::Fabulous::Widget::Dropdown->new( options => [ map { $_->{label} } @_filters ], value => $_filters[0]{label} );
-			$_filter_choice->on( Change => sub ($event) { $weak_self->filter( $event->value ); return Clay::UI::Enum::Result->CONTINUE } );
+			$_filter_choice->on( Change => sub ( $self, $event ) { $self->filter( $event->value ); return Clay::UI::Enum::Result->CONTINUE }, owner => $self );
 			$options_row->add_child($_filter_choice);
 		}
 		$_hidden_box = Term::Fabulous::Widget::Checkbox->new( label => 'Show hidden files', checked => $show_hidden );
-		$_hidden_box->on( Change => sub ($event) { $weak_self->show_hidden( $event->value ); return Clay::UI::Enum::Result->CONTINUE } );
+		$_hidden_box->on( Change => sub ( $self, $event ) { $self->show_hidden( $event->value ); return Clay::UI::Enum::Result->CONTINUE }, owner => $self );
 		$options_row->add_child($_hidden_box);
 
 		# The list counts its header and the line below it as rows.
-		$_message = Term::Fabulous::Widget::FileDialog::FolderLine->new( label => '' );
-		$self->add_child(
-			Term::Fabulous::Widget::Text->new( text => $title, bold => 1 ),
-			$_folder_line, framed( $_list, $list_rows + 2, min( $list_rows, FEWEST_ROWS ) + 2 ),
-			$field_row,    $options_row, $_message, $self->_button_row,
-		);
+		$self->add_child( $_folder_line, framed( $_list, $list_rows + 2, min( $list_rows, FEWEST_ROWS ) + 2 ), $field_row, $options_row );
 		return;
 	}
 
@@ -218,24 +220,10 @@ class Term::Fabulous::Widget::FileDialog
 		return Term::Fabulous::Widget::FileDialog::FolderLine->new( label => '', path => $cell->{display} );
 	}
 
-	method _button_row () {
-		weaken( my $weak_self = $self );
-		my $row = Term::Fabulous::Widget::Box->new( layout => { child_gap => 2 } );
-		foreach my $definition ( [ $MODE{$mode}{button}, ['primary'], sub { $weak_self->choose( $weak_self->typed ) } ], [ 'Cancel', [], sub { $weak_self->_cancel } ] ) {
-			my ( $label, $classes, $action ) = @$definition;
-			my $button = Term::Fabulous::Widget::Button->new( bordered => 1, classes => $classes, layout => { padding => { left => 1, right => 1 } } );
-			$button->add_child( Term::Fabulous::Widget::Text->new( text => $label ) );
-			$button->on( Activate => sub ($event) { $action->(); return } );
-			$row->add_child($button);
-		}
-		return $row;
-	}
-
-	# The line above the buttons: one row, empty while all is well. A path
-	# in it is cut from the left to fit, like the folder line.
+	# The notice line above the buttons, empty while all is well: a text
+	# and the path it is about, as given.
 	method _say ( $text, $path = '', $after = '' ) {
-		$_message->say( $text, $path, $after );
-		return $self;
+		return $self->notice( join '', map { escape_markup($_) } $text, $path, $after );
 	}
 
 	# A file or folder that is not there, named as the user typed it.
@@ -468,7 +456,6 @@ class Term::Fabulous::Widget::FileDialog
 	# A question above the dialog, starting on Cancel: Replace answers
 	# with the path, Cancel or Escape leave the dialog open.
 	method _ask_to_replace ($path) {
-		weaken( my $weak_self = $self );
 		my $question = Term::Fabulous::Widget::Prompt->confirm(
 			$self->ui,
 			title   => 'Replace the file?',
@@ -478,10 +465,11 @@ class Term::Fabulous::Widget::FileDialog
 			z_index => $self->z_index + 1,
 		);
 		$question->on(
-			Answer => sub ($event) {
-				$weak_self->_answer($path) if $event->button eq 'ok' && $weak_self && $weak_self->is_open;
+			Answer => sub ( $self, $event ) {
+				$self->_answer($path) if $event->button eq 'ok' && $self->is_open;
 				return;
-			}
+			},
+			owner => $self
 		);
 		weaken( $_replace_question = $question );
 		return $self;
@@ -515,29 +503,27 @@ class Term::Fabulous::Widget::FileDialog
 		return;
 	}
 
-	# The dialog's close, then the answer: a choice is no dismissal.
+	# A choice answers with the button of the mode and the path.
 	method _answer ($path) {
-		$self->_close_question;
-		$self->SUPER::close;
-		$self->fire_event( Term::Fabulous::Event::Answer->new( button => $MODE{$mode}{answer}, values => { path => $path } ) );
-		return $self;
+		return $self->answer( $MODE{$mode}{answer}, path => $path );
 	}
 
-	method _cancel () {
-		$self->_close_question;
-		$self->SUPER::close;
-		$self->fire_event( Term::Fabulous::Event::Answer->new( button => CANCEL ) );
-		return $self;
+	# The button of the mode chooses what the field names; Cancel answers.
+	method press_button :override ($id) {
+		return $self->choose( $self->typed ) if $id eq $MODE{$mode}{answer};
+		return $self->SUPER::press_button($id);
 	}
 
-	# Escape, or close from the program: the question above closes too,
-	# and the dialog answers cancel, after the dialog's Close.
+	# Whatever closes the dialog (an answer, Escape, close from the
+	# program) closes the question above it first.
+	method answer :override ( $id, %values ) {
+		$self->_close_question;
+		return $self->SUPER::answer( $id, %values );
+	}
+
 	method close :override () {
-		return $self unless $self->is_open;
 		$self->_close_question;
-		$self->SUPER::close;
-		$self->fire_event( Term::Fabulous::Event::Answer->new( button => CANCEL, dismissed => 1 ) );
-		return $self;
+		return $self->SUPER::close;
 	}
 }
 
@@ -586,7 +572,7 @@ open or save, or for a folder
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-file-dialog.svg" alt="An Open a file dialog over a dimmed notes program: the folder line ends in Documents/Projects/analytical-engine/notes, the list shows two folders and four notes with their sizes and modification times, the cursor is on reading-list.txt, which is also in the File field, and below it are the Notes filter, the Show hidden files checkbox and the Open and Cancel buttons"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.05/screenshots/widget-file-dialog.svg" alt="An Open a file dialog over a dimmed notes program: the folder line ends in Documents/Projects/analytical-engine/notes, the list shows two folders and four notes with their sizes and modification times, the cursor is on reading-list.txt, which is also in the File field, and below it are the Notes filter, the Show hidden files checkbox and the Open and Cancel buttons"></p>
 
 =end html
 
@@ -600,17 +586,20 @@ filter C<Notes> hides the files that are no notes.
 A file dialog is a L<Term::Fabulous::Widget::Dialog> that lists the
 folders and files of a folder and lets the user walk through the
 folders, pick an entry or type a name. Like a
-L<Term::Fabulous::Widget::Prompt>, it reports the result with one
+L<Term::Fabulous::Widget::Prompt>, it reports the answer with one
 event, L<Answer|Term::Fabulous::Event::Answer>, after it closed.
 
 From the top, it shows its title, the folder it lists, the list, a
 field for a name or a path (C<File>, or C<Name> in folder mode), a row
-with the filter dropdown and the C<Show hidden files> checkbox, a line
-that says what is wrong while something is (one row, empty otherwise,
-so the dialog keeps its height), and the buttons. The folder line
-shows as much of the end of the path as fits the width the dialog
-gets, after C<...> when its start had to go; so does the message line
-for a path it names.
+with the filter dropdown and the C<Show hidden files> checkbox, the
+dialog's notice line, which says what is wrong while something is
+(always at least one row, so a one-row message does not change the
+dialog's height:
+C<< notice_line => 'row' >>, see
+L<Term::Fabulous::Widget::Dialog/notice_line>), and the buttons. The
+folder line shows as much of the end of the path as fits the width the
+dialog gets, after C<...> when its start had to go. The notice names a
+path as typed, and wraps when it is too long for one row.
 
 On a screen too low for the whole dialog, the list gives up rows
 first, down to two entries; on a narrower screen than C<width>, the
@@ -724,9 +713,10 @@ the file?>, with the buttons C<Replace> and C<Cancel>) that opens above
 the file dialog, which is dimmed behind it, with the focus on
 C<Cancel>. C<Replace> closes both and the file dialog answers.
 C<Cancel> or C<Escape> on the question puts the focus back into the
-file dialog, which stays open. Closing the file dialog from the
-program closes the question too. An untitled document has no
-C<current_file>, so saving it over any existing file asks.
+file dialog, which stays open. Closing or answering the file dialog
+from the program (L</close>, C<answer>) closes the question too.
+An untitled document has no C<current_file>, so saving it over any
+existing file asks.
 C<< confirm_overwrite => 0 >> never asks.
 
 =head2 Answers
@@ -742,8 +732,12 @@ is not a folder: reading and writing are up to the program.
 
 The C<Cancel> button answers C<cancel>, with C<dismissed> false.
 C<Escape>, or L</close> from the program, answers C<cancel> as well,
-with C<dismissed> true. A cancelled dialog's values are C<{}>. A file
-dialog answers once each time it is opened.
+with C<dismissed> true. A cancelled dialog's values are C<{}>: a file
+dialog has no values of its own (see
+L<Term::Fabulous::Widget::Dialog/Answers>). A file dialog answers once
+each time it is opened. Its buttons are the dialog's: the mode's
+(C<open>, C<save> or C<choose>, primary) chooses what the field names
+(see L</choose>), and C<cancel> answers.
 
 =head1 CONSTRUCTOR
 
@@ -789,8 +783,10 @@ this file asks no question. Default: C<undef>. A relative path dies.
 
 =item C<title>
 
-A character string, drawn in bold on the first row. Default: C<Open a
-file>, C<Save the file as> or C<Choose a folder>, after the mode.
+The dialog's title (L<Term::Fabulous::Widget::Dialog/title>), drawn in
+bold on the first row. Default: C<Open a file>, C<Save the file as> or
+C<Choose a folder>, after the mode. The C<buttons> and C<notice_line>
+of a dialog are the file dialog's own; giving them dies.
 
 =item C<filters>
 
@@ -899,29 +895,26 @@ dialog is closed.
 
 =head1 EVENTS
 
-Besides the events of every dialog, a file dialog fires:
-
-=over
-
-=item C<Answer> (L<Term::Fabulous::Event::Answer>)
-
-The user chose a file or a folder, or cancelled. Fired on the dialog
-after it closed and gave the focus back, once per opening; the
-dialog's C<Close> comes first. See L</Answers>.
-
-=back
+A file dialog fires the events of every dialog
+(L<Term::Fabulous::Widget::Dialog/EVENTS>): C<Close>, then C<Answer>
+(L<Term::Fabulous::Event::Answer>, see L</Answers>), once per opening.
+The C<Answer> says that the user chose a file or a folder, or
+cancelled; it is fired on the dialog after it closed and gave the focus
+back.
 
 The C<Change> events of the filter dropdown and the checkbox bubble
 through the dialog as usual.
 
 =head1 KDL PROPERTIES
 
-A file dialog is built in Perl only. Its answer comes as an event,
-which a layout file cannot express.
+A file dialog is built in Perl only: its paths are byte strings and
+its filters structured, which a layout file cannot pass to C<new>.
 
 =head1 SEE ALSO
 
 L<Term::Fabulous::Event::Answer>, L<Term::Fabulous::Widget::Dialog>,
-L<Term::Fabulous::Widget::Prompt>, L<Term::Fabulous::Widget::Table>.
+L<Term::Fabulous::Widget::Prompt>, L<Term::Fabulous::Widget::Table>,
+L<Term::Fabulous::Manual::Feedback/FILE DIALOGS>,
+L<Term::Fabulous::Cookbook::Forms/Open and save a file (FileDialog)>.
 
 =cut

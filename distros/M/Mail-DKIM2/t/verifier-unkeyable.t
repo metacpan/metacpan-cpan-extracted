@@ -48,32 +48,33 @@ sub verify {
 
 is(verify($signed)->result, 'pass', 'control: the signed message passes');
 
+# -07 C6: a missing i= is "i= tag=i missing"; one that is not a positive
+# integer is named as written, "i=<value> syntax error".
 my %junk = (
-    'no i='      => 'DKIM2-Signature: m=1; d=evil.example',
-    'empty i='   => 'DKIM2-Signature: i=; m=1; d=evil.example',
-    'i=0'        => 'DKIM2-Signature: i=0; m=1; d=evil.example',
-    'i=abc'      => 'DKIM2-Signature: i=abc; m=1; d=evil.example',
-    'i=-1'       => 'DKIM2-Signature: i=-1; m=1; d=evil.example',
-    'i=1.5'      => 'DKIM2-Signature: i=1.5; m=1; d=evil.example',
-    'empty'      => 'DKIM2-Signature: ',
+    'no i='      => ['DKIM2-Signature: m=1; d=evil.example', 'i= tag=i missing'],
+    'empty i='   => ['DKIM2-Signature: i=; m=1; d=evil.example', 'i= syntax error'],
+    'i=0'        => ['DKIM2-Signature: i=0; m=1; d=evil.example', 'i=0 syntax error'],
+    'i=abc'      => ['DKIM2-Signature: i=abc; m=1; d=evil.example', 'i=abc syntax error'],
+    'i=-1'       => ['DKIM2-Signature: i=-1; m=1; d=evil.example', 'i=-1 syntax error'],
+    'i=1.5'      => ['DKIM2-Signature: i=1.5; m=1; d=evil.example', 'i=1.5 syntax error'],
+    'empty'      => ['DKIM2-Signature: ', 'i= tag=i missing'],
 );
 for my $name (sort keys %junk) {
     my @warn;
     local $SIG{__WARN__} = sub { push @warn, @_ };
-    my $v = verify($junk{$name} . $EOL . $signed);
+    my ($field, $why) = @{$junk{$name}};
+    my $v = verify($field . $EOL . $signed);
     is($v->result, 'permerror', "$name: permerror");
-    is($v->result_detail,
-       'permerror (PERMERROR DKIM2-Signature has a missing or malformed i= tag)',
-       "$name: says why");
+    is($v->result_detail, "permerror (PERMERROR: DKIM2-Signature $why)", "$name: says why");
 
     my $s2 = Mail::DKIM2::Signer->new(
         Domain => 'test2.dkim2.com', Selector => 'sel1',
         Key => DKIM2TestKeys::private_key('test2.dkim2.com', 'sel1'),
         MailFrom => 'user@test2.dkim2.com', RcptTo => ['x@test3.dkim2.com'],
         Timestamp => time());
-    $s2->PRINT($junk{$name} . $EOL . $signed); $s2->CLOSE;
+    $s2->PRINT($field . $EOL . $signed); $s2->CLOSE;
     isnt($s2->result, 'pass', "$name: Signer does not sign over it");
-    like($s2->result_detail // '', qr/missing or malformed i= tag/,
+    like($s2->result_detail // '', qr/\QPERMERROR: DKIM2-Signature $why\E/,
         "$name: Signer says why");
     is_deeply(\@warn, [], "$name: no warnings");
 }

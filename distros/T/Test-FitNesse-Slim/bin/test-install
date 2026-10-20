@@ -1,0 +1,626 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Cwd qw(abs_path getcwd);
+use Config ();
+use File::Copy qw(copy);
+use File::Find qw(find);
+use File::Path qw(make_path remove_tree);
+use File::Spec;
+use File::Temp qw(tempdir);
+use FindBin qw($Bin);
+use HTTP::Tiny;
+use IO::Select;
+use IO::Socket::INET;
+use IPC::Open3;
+use JSON::PP qw(decode_json);
+use Symbol qw(gensym);
+use Time::HiRes qw(sleep time);
+use lib "$Bin/../t/lib";
+use Test::FitNesse::Slim::FitNesseAcceptance qw(
+  free_port owned_process_exited preserve_exit_status start_owned_process
+  stop_owned_processes wait_until
+);
+use Test::FitNesse::Slim::FitNesseSuiteAcceptance qw(
+  configure_pipe_wiki extract_wiki_from_jar
+);
+use Test::FitNesse::Slim::InstallDocumentation qw(
+  installed_manpage_paths render_installed_pod
+);
+use Test::FitNesse::Slim::InstallPath qw(verify_installed_path);
+use Test::FitNesse::Slim::RunnerPath qw(validate_runner_file);
+
+$| = 1;
+my $ROOT = abs_path("$Bin/..") or die "resolve source root: $!";
+open my $version_fh, '<', "$ROOT/lib/Test/FitNesse/Slim.pm" or die "read version: $!";
+my $version_source = do { local $/; <$version_fh> };
+close $version_fh or die "close version source: $!";
+my ($VERSION) = $version_source =~ /our \$VERSION = '([^']+)'/;
+die 'could not read distribution version' unless defined $VERSION;
+my $MINIMUM_PERL = '5.36.0';
+my $TEMP;
+
+END {
+  preserve_exit_status(sub {
+    stop_owned_processes();
+    remove_tree($TEMP) if defined($TEMP) && -d $TEMP;
+  });
+}
+
+my $ok = eval { main(); 1 };
+unless ($ok) {
+  my $error = $@ || 'installed distribution test failed';
+  $error =~ s/\s+\z//;
+  print STDERR "test-install: $error\n";
+  exit 1;
+}
+exit 0;
+
+sub main {
+  verify_source_perl_minimum();
+  $TEMP = tempdir('test-slim-install-XXXXXX', TMPDIR => 1, CLEANUP => 0);
+  my $stage = "$TEMP/stage";
+  my $archive_dir = "$TEMP/archive";
+  my $install_source = "$TEMP/install-source";
+  my $prefix = "$TEMP/prefix";
+  my $external = "$TEMP/external/lib";
+  my $run_dir = "$TEMP/outside-checkout";
+  make_path($stage, $archive_dir, $install_source, $prefix, $external, $run_dir);
+
+  my @manifest = read_manifest();
+  copy_distribution_sources($stage, @manifest);
+  run_command($stage, $^X, 'Build.PL');
+  run_command($stage, './Build', 'dist');
+  my $archive = "$stage/Test-FitNesse-Slim-$VERSION.tar.gz";
+  die "distribution archive was not created" unless -f $archive;
+  my @archive_files = archive_files($archive);
+  verify_archive_contents(\@archive_files, $archive);
+  copy($archive, "$archive_dir/Test-FitNesse-Slim-$VERSION.tar.gz")
+    or die "copy release archive: $!";
+  run_command($install_source, 'tar', '-xzf', "$archive_dir/Test-FitNesse-Slim-$VERSION.tar.gz");
+
+  my $source = "$install_source/Test-FitNesse-Slim-$VERSION";
+  my $fixture_source = "$source/examples/lib/Example/Counter.pm";
+  make_path("$external/Example");
+  copy($fixture_source, "$external/Example/Counter.pm")
+    or die "copy standalone fixture outside distribution: $!";
+  run_command($source, $^X, 'Build.PL', "--install_base=$prefix");
+  run_command($source, './Build');
+  run_command($source, './Build', 'install');
+
+  my $runner = verify_installed_path(
+    "$prefix/bin/perl-slim", "$prefix/bin/perl-slim", $prefix,
+    'installed perl-slim executable',
+  );
+  validate_runner_file($runner);
+  my $installed_lib = "$prefix/lib/perl5";
+  verify_installed_manpages($prefix);
+  for my $module (production_modules()) {
+    (my $relative = $module) =~ s{\Alib/}{};
+    my $path = "$installed_lib/$relative";
+    die "installed production module missing: $relative" unless -f $path;
+  }
+
+  my @runtime_libs = runtime_include_dirs($ROOT, $source);
+  local $ENV{PERL5LIB} = join $Config::Config{path_sep},
+    $installed_lib, $external, @runtime_libs;
+  delete $ENV{PERL5OPT};
+  unshift @INC, $installed_lib;
+  my %module_paths;
+  for my $module (production_modules()) {
+    (my $relative = $module) =~ s{\Alib/}{};
+    (my $require_path = $relative) =~ s{\\}{/}g;
+    require $require_path;
+    $module_paths{$require_path} = verify_installed_path(
+      $INC{$require_path}, "$installed_lib/$relative", $prefix,
+      "loaded production module $require_path",
+    );
+  }
+  my $slim_path = $module_paths{'Test/FitNesse/Slim.pm'};
+  my $list_path = $module_paths{'Test/FitNesse/Slim/List.pm'};
+  my $doc_path = $slim_path;
+  my $rendered_pod = render_installed_pod($doc_path);
+  die 'installed Test::FitNesse::Slim POD rendered without expected content'
+    unless $rendered_pod =~ /FitNesse/;
+  verify_perldoc_render($doc_path, $rendered_pod);
+  print "Installed module source: $slim_path\n";
+  print "Installed protocol module source: $list_path\n";
+  print "Installed POD source: $doc_path\n";
+  print "External fixture source: ", abs_path("$external/Example/Counter.pm"), "\n";
+
+  run_portable_transport_smoke($runner, $installed_lib, $external, $prefix, $run_dir);
+  run_tcp_bind_option($runner, $run_dir, $TEMP);
+  run_fitnesse_example($runner, $external, $source, $TEMP);
+  print "Installed distribution smoke test passed\n";
+  return;
+}
+
+sub verify_installed_manpages {
+  my ($prefix) = @_;
+  my @module_names = map {
+    my $name = $_;
+    $name =~ s{\Alib/}{};
+    $name =~ s{\.pm\z}{};
+    $name =~ s{/}{::}g;
+    $name;
+  } production_modules();
+  my ($paths, $disabled) = installed_manpage_paths(
+    $prefix, \%Config::Config, \@module_names,
+  );
+  for my $kind (sort keys %$paths) {
+    for my $documentation (@{ $paths->{$kind} }) {
+      die "installed $kind manual page missing or empty: $documentation"
+        unless -s $documentation;
+      print "Installed Module::Build $kind manual page: $documentation\n";
+    }
+  }
+  for my $kind (@$disabled) {
+    my $source = $kind eq 'bindoc' ? 'man1dir' : 'man3dir';
+    my $configured = defined($Config::Config{$source})
+      ? $Config::Config{$source} : '<unset>';
+    print "Module::Build $kind manpage target disabled by Perl Config ($source=$configured); "
+      . "no $kind manual pages were generated, and installed POD is verified with Pod::Text\n";
+  }
+  return;
+}
+
+sub verify_perldoc_render {
+  my ($path, $expected_text) = @_;
+  if ($> == 0 || $< == 0) {
+    print "perldoc subprocess skipped for root: it drops privileges to nobody, "
+      . "which cannot traverse the private installation prefix; Pod::Text rendered the installed POD\n";
+    return;
+  }
+
+  my ($perldoc_dir) = grep { -x "$_/perldoc" } File::Spec->path;
+  my $perldoc = defined($perldoc_dir) ? "$perldoc_dir/perldoc" : undef;
+  unless ($perldoc) {
+    print "perldoc CLI is not on PATH; installed POD was parsed with Pod::Text\n";
+    return;
+  }
+
+  my ($version_status, $version_output, $version_error) =
+    capture_command($perldoc, '-F', '-V');
+  if ($version_status != 0) {
+    my $reason = $version_error || $version_output || "exit status $version_status";
+    $reason =~ s/\s+/ /g;
+    if ($reason =~ /install the perl-doc package/i) {
+      print "perldoc CLI unavailable ($reason); installed POD was parsed with Pod::Text\n";
+      return;
+    }
+    die "perldoc version probe failed (status $version_status): $reason";
+  }
+
+  # -F makes perldoc render the exact installed file rather than searching
+  # for a module name. This check runs only as a non-root user; root's
+  # perldoc would drop privileges and lose access to the private prefix.
+  my ($status, $rendered, $error) = capture_command($perldoc, '-F', '-T', $path);
+  die "perldoc could not render installed POD $path (status $status): $error"
+    if $status != 0;
+  die "perldoc output did not contain the installed module documentation from $path"
+    unless $rendered =~ /FitNesse/ && length($expected_text);
+  print "perldoc rendered installed POD without dropping privileges\n";
+  return;
+}
+
+sub capture_command {
+  my (@command) = @_;
+  my $error_fh = gensym;
+  my ($input, $output);
+  my $pid = eval { open3($input, $output, $error_fh, @command) };
+  die "start @command: $@" unless $pid;
+  close $input or die "close stdin for @command: $!";
+  my $select = IO::Select->new($output, $error_fh);
+  my ($output_text, $error_text) = ('', '');
+  my %stream = (fileno($output) => \$output_text, fileno($error_fh) => \$error_text);
+  while ($select->count) {
+    for my $fh ($select->can_read) {
+      my $read = sysread($fh, my $buffer, 8192);
+      die "read @command output: $!" unless defined $read;
+      if ($read == 0) {
+        $select->remove($fh);
+        next;
+      }
+      ${$stream{fileno($fh)}} .= $buffer;
+    }
+  }
+  waitpid($pid, 0);
+  return ($?, $output_text, $error_text);
+}
+
+sub read_manifest {
+  open my $fh, '<', "$ROOT/MANIFEST" or die "read MANIFEST: $!";
+  my @files = grep { length && !/^\s*#/ } map { chomp; $_ } <$fh>;
+  close $fh or die "close MANIFEST: $!";
+  die 'MANIFEST is empty' unless @files;
+  my %listed = map { $_ => 1 } @files;
+  for my $file (@files) {
+    die "unsafe MANIFEST path: $file"
+      if File::Spec->file_name_is_absolute($file) || $file =~ m{(?:\A|/)\.\.(?:/|\z)};
+    die "MANIFEST entry does not exist: $file" unless -f "$ROOT/$file";
+  }
+  for my $module (production_modules()) {
+    die "MANIFEST omits production module $module" unless $listed{$module};
+  }
+  return @files;
+}
+
+sub production_modules {
+  my @modules;
+  find({
+    wanted => sub {
+      return unless -f $_ && /\.pm\z/;
+      my $path = $File::Find::name;
+      $path =~ s{\A\Q$ROOT/\E}{};
+      push @modules, $path;
+    },
+    no_chdir => 1,
+  }, "$ROOT/lib");
+  return sort @modules;
+}
+
+sub copy_distribution_sources {
+  my ($destination, @files) = @_;
+  for my $file (@files) {
+    my $target = "$destination/$file";
+    my ($volume, $directories) = File::Spec->splitpath($target);
+    make_path($directories) if length $directories;
+    copy("$ROOT/$file", $target) or die "copy $file into build stage: $!";
+    my $mode = (stat "$ROOT/$file")[2] & 07777;
+    chmod $mode, $target or die "chmod $target: $!";
+  }
+  return;
+}
+
+sub run_command {
+  my ($directory, @command) = @_;
+  my $old = getcwd();
+  chdir $directory or die "chdir $directory: $!";
+  print '+ ', join(' ', @command), "\n";
+  system @command;
+  my $status = $?;
+  chdir $old or die "restore cwd $old: $!";
+  die "command failed (status $status): @command" if $status != 0;
+  return;
+}
+
+sub archive_files {
+  my ($archive) = @_;
+  open my $tar, '-|', 'tar', '-tzf', $archive
+    or die "list release archive: $!";
+  my @files = <$tar>;
+  chomp @files;
+  close $tar or die 'release archive listing failed';
+  return @files;
+}
+
+sub verify_archive_contents {
+  my ($files, $archive) = @_;
+  my %entries = map { $_ => 1 } @$files;
+  my $root = "Test-FitNesse-Slim-$VERSION";
+  for my $required (qw(
+    README.md Changes LICENSE LICENSE.GPL-1.0-or-later LICENSE.Artistic-1.0
+    LICENSE.CPL THIRD-PARTY-NOTICES.md
+    Build.PL MANIFEST.SKIP META.json META.yml MANIFEST bin/perl-slim
+    examples/lib/Example/Counter.pm examples/fitnesse/CounterTest.wiki
+  )) {
+    die "release archive omitted $root/$required" unless $entries{"$root/$required"};
+  }
+  for my $obsolete (qw(README demo/PingFixture.pm .gitignore)) {
+    die "release archive contains obsolete or repository-only file $root/$obsolete"
+      if $entries{"$root/$obsolete"};
+  }
+  for my $file (@$files) {
+    die "release archive contains Git metadata: $file" if $file =~ m{\A\Q$root\E/\.git(?:/|\z)};
+    die "release archive contains transient build output: $file"
+      if $file =~ m{\A\Q$root\E/(?:Build|MYMETA\.(?:json|yml)|MANIFEST\.bak)(?:\z|/)};
+  }
+  die 'release archive contains the old Test::Slim production namespace'
+    if grep { m{\A\Q$root\E/lib/Test/Slim(?:/.*|\.pm)\z} } @$files;
+  my @archived_modules = grep { m{\A\Q$root\E/lib/Test/FitNesse/Slim(?:/.*|\.pm)\z} } @$files;
+  die 'release archive does not contain exactly nine Test::FitNesse::Slim modules'
+    unless @archived_modules == 9;
+  verify_archive_metadata($archive, $root);
+  verify_archive_perl_minimum($archive, $root);
+  for my $module (production_modules()) {
+    die "release archive omitted production module $module"
+      unless $entries{"$root/$module"};
+  }
+  die 'release archive contains FitNesse runtime state'
+    if grep {
+      m{(?:\A|/)\.runtime(?:/|\z)}
+        || $_ eq "$root/FitNesseRoot"
+        || m{\A\Q$root\E/FitNesseRoot(?:/|\z)}
+    } @$files;
+  return;
+}
+
+sub verify_archive_metadata {
+  my ($archive, $root) = @_;
+  my $json_text = read_archive_member($archive, "$root/META.json");
+  my $meta = eval { decode_json($json_text) };
+  die "release archive has invalid META.json: $@" unless ref($meta) eq 'HASH';
+  die 'release archive metadata distribution name is not Test-FitNesse-Slim'
+    unless ($meta->{name} // '') eq 'Test-FitNesse-Slim';
+  die "release archive metadata version is not $VERSION"
+    unless ($meta->{version} // '') eq $VERSION;
+  die 'release archive metadata author is incorrect'
+    unless grep { $_ eq 'Greg Bacon <gbacon@gbacon.com>' } @{ $meta->{author} // [] };
+  my %licenses = map { $_ => 1 } @{ $meta->{license} // [] };
+  die 'release archive metadata omits the Perl 5 dual license'
+    unless $licenses{perl_5};
+  die 'release archive metadata omits the separately licensed open-source test fixtures'
+    unless $licenses{open_source};
+  my %license_urls = map { $_ => 1 } @{ $meta->{resources}{license} // [] };
+  die 'release archive metadata omits the package license choice notice'
+    unless $license_urls{'https://github.com/gbacon/test-slim/blob/main/LICENSE'};
+  die 'release archive metadata omits the GNU GPL v1 license reference'
+    unless $license_urls{'https://www.gnu.org/licenses/old-licenses/gpl-1.0.en.html'};
+  die 'release archive metadata omits the Artistic License 1.0 reference'
+    unless $license_urls{'https://dev.perl.org/licenses/artistic.html'};
+  die 'release archive metadata omits the FitNesse CPL license reference'
+    unless $license_urls{'https://github.com/unclebob/fitnesse/blob/v20251025/LICENSE.txt'};
+  my $yaml_text = read_archive_member($archive, "$root/META.yml");
+  die 'release archive META.yml distribution name is not Test-FitNesse-Slim'
+    unless $yaml_text =~ /^name:\s*Test-FitNesse-Slim\s*$/m;
+  my ($yaml_version) = $yaml_text =~ /^version:\s*['"]?([^'"\s]+)['"]?\s*$/m;
+  my ($yaml_license) = $yaml_text =~ /^license:\s*['"]?([^'"\s]+)['"]?\s*$/m;
+  die 'release archive META.yml version does not match Test::FitNesse::Slim'
+    unless defined($yaml_version) && $yaml_version eq $VERSION;
+  die 'release archive META.yml omits its open-source license declaration'
+    unless defined($yaml_license) && $yaml_license eq 'open_source';
+  die 'release archive META.yml does not link to the package license choice notice'
+    unless $yaml_text =~ m{^  license: https://github\.com/gbacon/test-slim/blob/main/LICENSE$}m;
+  my $license_notice = read_archive_member($archive, "$root/LICENSE");
+  $license_notice =~ s/\s+/ /g;
+  for my $term (
+    'GNU General Public License, version 1 or (at your option) any later version',
+    'Artistic License 1.0',
+    'LICENSE.GPL-1.0-or-later', 'LICENSE.Artistic-1.0', 'LICENSE.CPL',
+  ) {
+    die "release archive LICENSE does not explain '$term'"
+      unless index($license_notice, $term) >= 0;
+  }
+  my $gpl = read_archive_member($archive, "$root/LICENSE.GPL-1.0-or-later");
+  die 'release archive GPL text is not GNU GPL version 1'
+    unless $gpl =~ /GNU GENERAL PUBLIC LICENSE\s+Version 1,/;
+  die 'release archive GPL text omits the later-version option'
+    unless $gpl =~ /either version 1, or \(at your option\)\s+any later version/;
+  my $artistic = read_archive_member($archive, "$root/LICENSE.Artistic-1.0");
+  die 'release archive Artistic text is not Artistic License 1.0'
+    unless $artistic =~ /The "Artistic License"/;
+  die 'release archive Artistic text omits the license ending'
+    unless $artistic =~ /The End/;
+  my $cpl = read_archive_member($archive, "$root/LICENSE.CPL");
+  die 'release archive CPL text is not the Common Public License 1.0'
+    unless $cpl =~ /Common Public License\s+Version 1\.0/i;
+  die 'release archive CPL text omits its full terms'
+    unless $cpl =~ /7\. GENERAL/ && $cpl =~ /jury trial in\s+any resulting litigation\./;
+  print "Archive metadata: version $VERSION, canonical author, GPL v1-or-later, Artistic 1.0, and scoped CPL fixture licenses\n";
+  return;
+}
+
+sub verify_archive_perl_minimum {
+  my ($archive, $root) = @_;
+  my $json_text = read_archive_member($archive, "$root/META.json");
+  my $meta = eval { decode_json($json_text) };
+  die "release archive has invalid META.json: $@" unless ref($meta) eq 'HASH';
+  my $json_minimum = $meta->{prereqs}{runtime}{requires}{perl};
+  my $yaml_text = read_archive_member($archive, "$root/META.yml");
+  my ($yaml_minimum) = $yaml_text =~ /^\s+perl:\s*['"]?([^'"\s]+)['"]?\s*$/m;
+  die 'release archive META.yml omits the runtime Perl minimum'
+    unless defined $yaml_minimum;
+  for my $entry ([META_json => $json_minimum], [META_yml => $yaml_minimum]) {
+    my ($source, $minimum) = @$entry;
+    die "release archive $source declares no runtime Perl minimum"
+      unless defined $minimum;
+    my $version = eval { require version; version->parse($minimum) };
+    die "release archive $source has invalid Perl minimum '$minimum'"
+      unless $version;
+    die "release archive $source declares Perl $minimum instead of $MINIMUM_PERL"
+      unless $version == version->parse($MINIMUM_PERL);
+  }
+  print "Archive META.json and META.yml require Perl $MINIMUM_PERL\n";
+  return;
+}
+
+sub verify_source_perl_minimum {
+  my ($build, $cpan);
+  open my $build_fh, '<', "$ROOT/Build.PL" or die "read Build.PL: $!";
+  $build = do { local $/; <$build_fh> };
+  close $build_fh or die 'close Build.PL';
+  open my $cpan_fh, '<', "$ROOT/cpanfile" or die "read cpanfile: $!";
+  $cpan = do { local $/; <$cpan_fh> };
+  close $cpan_fh or die 'close cpanfile';
+  my ($build_minimum) = $build =~ /'perl'\s*=>\s*'([^']+)'/;
+  my ($cpan_minimum) = $cpan =~ /requires\s+'perl'\s*=>\s*'([^']+)'/;
+  die 'Build.PL omits the runtime Perl minimum' unless defined $build_minimum;
+  die 'cpanfile omits the runtime Perl minimum' unless defined $cpan_minimum;
+  for my $entry ([Build_PL => $build_minimum], [cpanfile => $cpan_minimum]) {
+    my ($source, $minimum) = @$entry;
+    my $version = eval { require version; version->parse($minimum) };
+    die "$source declares invalid Perl minimum '$minimum'" unless $version;
+    die "$source declares Perl $minimum instead of $MINIMUM_PERL"
+      unless $version == version->parse($MINIMUM_PERL);
+  }
+  print "Build.PL and cpanfile consistently require Perl $MINIMUM_PERL\n";
+  return;
+}
+
+sub read_archive_member {
+  my ($archive, $member) = @_;
+  open my $tar, '-|', 'tar', '-xOzf', $archive, $member
+    or die "read $member from distribution archive: $!";
+  my $content = do { local $/; <$tar> };
+  close $tar or die "extract $member from distribution archive failed";
+  die "distribution archive member is empty: $member" unless defined $content;
+  return $content;
+}
+
+sub run_portable_transport_smoke {
+  my ($runner, $module_dir, $fixture_dir, $prefix, $cwd) = @_;
+  my $test = "$ROOT/t/portable-transport-smoke.t";
+  my @command = (
+    $^X, "-I$module_dir", "-I$fixture_dir", $test,
+    '--runner', $runner,
+    '--module-dir', $module_dir,
+    '--fixture-dir', $fixture_dir,
+    '--install-prefix', $prefix,
+  );
+  run_command($cwd, @command);
+  return;
+}
+
+sub runtime_include_dirs {
+  my ($repository, $build_source) = @_;
+  my %seen;
+  my @paths;
+  for my $entry (@INC) {
+    next if ref($entry) || !-d $entry;
+    my $path = abs_path($entry) or next;
+    next if $path eq $repository || path_is_beneath($path, $build_source);
+    next if path_is_beneath($path, "$repository/lib");
+    next if path_is_beneath($path, "$repository/t/lib");
+    next if $seen{$path}++;
+    push @paths, $path;
+  }
+  return @paths;
+}
+
+sub path_is_beneath {
+  my ($path, $parent) = @_;
+  $parent = abs_path($parent) or return;
+  my $relative = File::Spec->abs2rel($path, $parent);
+  my @parts = File::Spec->splitdir($relative);
+  return !File::Spec->file_name_is_absolute($relative)
+    && @parts && $parts[0] ne File::Spec->updir;
+}
+
+sub run_tcp_bind_option {
+  my ($runner, $cwd, $temp) = @_;
+  my $port = free_port('127.0.0.1');
+  my $log = "$temp/installed-tcp-bind-option.log";
+  start_owned_process($runner, '--bind-address', '0.0.0.0', $port,
+    { log_file => $log, cwd => $cwd });
+  my $socket;
+  my $deadline = time + 15;
+  while (time < $deadline) {
+    die 'installed explicitly bound TCP listener exited before readiness'
+      if owned_process_exited();
+    $socket = IO::Socket::INET->new(
+      PeerAddr => '127.0.0.1', PeerPort => $port, Proto => 'tcp', Timeout => 0.5,
+    );
+    last if $socket;
+    sleep 0.1;
+  }
+  die 'installed --bind-address listener did not start' unless $socket;
+  my $greeting = read_exact($socket, 13, 10);
+  die "unexpected explicitly bound TCP greeting: $greeting"
+    unless $greeting eq "Slim -- V0.5\n";
+  write_all($socket, frame('bye'));
+  close $socket;
+  open my $log_fh, '<', $log or die "read installed bind warning: $!";
+  my $log_text = do { local $/; <$log_fh> };
+  close $log_fh or die 'close installed bind warning log';
+  die 'installed remote bind did not emit the unauthenticated-listener warning'
+    unless $log_text =~ /0\.0\.0\.0.*unauthenticated.*trusted network/;
+  print "Installed CLI explicitly bound to 0.0.0.0; warning stayed on stderr\n";
+  return;
+}
+
+sub frame {
+  my ($payload) = @_;
+  return sprintf('%06d:', length($payload)) . $payload;
+}
+
+sub write_all {
+  my ($fh, $bytes) = @_;
+  while (length $bytes) {
+    my $written = syswrite($fh, $bytes);
+    die "protocol write failed: $!" unless defined($written) && $written > 0;
+    substr($bytes, 0, $written, '');
+  }
+  return;
+}
+
+sub read_exact {
+  my ($fh, $length, $timeout) = @_;
+  my $result = '';
+  my $deadline = time + $timeout;
+  my $select = IO::Select->new($fh);
+  while (length($result) < $length) {
+    my $remaining = $deadline - time;
+    die 'timed out waiting for protocol bytes' if $remaining <= 0;
+    die 'timed out waiting for protocol bytes' unless $select->can_read($remaining);
+    my $read = sysread($fh, my $part, $length - length($result));
+    die "protocol read failed: $!" unless defined $read;
+    die 'unexpected EOF in protocol stream' if $read == 0;
+    $result .= $part;
+  }
+  return $result;
+}
+
+sub run_fitnesse_example {
+  my ($runner, $external, $archive_source, $temp) = @_;
+  my $jar = $ENV{FITNESSE_JAR} || '/opt/fitnesse/fitnesse.jar';
+  die "FitNesse v20251025 JAR is unavailable at $jar" unless -f $jar;
+  my $wiki = "$temp/wiki/FitNesseRoot";
+  extract_wiki_from_jar($jar, $wiki);
+  configure_pipe_wiki($wiki, $runner);
+  open my $root, '>>', "$wiki/content.txt" or die "open FitNesse root page: $!";
+  print {$root} "\n!define TEST_SYSTEM {slim}\n";
+  close $root or die "close FitNesse root page: $!";
+
+  my $page_dir = "$wiki/InstalledFixture/CounterTest";
+  make_path($page_dir);
+  open my $page, '>', "$page_dir/content.txt" or die "create FitNesse smoke page: $!";
+  open my $example, '<', "$archive_source/examples/fitnesse/CounterTest.wiki"
+    or die "read packaged FitNesse example: $!";
+  my $content = do { local $/; <$example> };
+  close $example or die "close packaged FitNesse example: $!";
+  $content =~ s{\Q/absolute/path/to/perl-slim\E}{$runner}g;
+  $content =~ s{\Q/absolute/path/to/examples/lib\E}{$external}g;
+  print {$page} $content or die "write FitNesse smoke page: $!";
+  close $page or die "close FitNesse smoke page: $!";
+
+  my $host = '127.0.0.1';
+  my $port = free_port($host);
+  my $url = "http://$host:$port";
+  my $log = "$temp/fitnesse-installed-smoke.log";
+  my $java = $ENV{JAVA} || 'java';
+  start_owned_process($java, '-Dslim.pool.size=1', '-jar', $jar,
+    '-p', $port, '-d', "$temp/wiki", '-r', 'FitNesseRoot',
+    { log_file => $log, cwd => $temp });
+  my $http = HTTP::Tiny->new(timeout => 15, agent => 'test-slim-installed-smoke/1.0');
+  my $deadline = time + 30;
+  my $ready = 0;
+  while (time < $deadline) {
+    die 'FitNesse exited before the installed fixture test' if owned_process_exited();
+    my $response = $http->get("$url/");
+    if ($response->{status} == 200 && $response->{content} =~ /<html\b/i) {
+      $ready = 1;
+      last;
+    }
+    sleep 0.2;
+  }
+  die 'FitNesse did not start for the installed fixture test' unless $ready;
+  my $response = $http->get("$url/InstalledFixture.CounterTest?test&format=xml");
+  die "FitNesse smoke page returned HTTP $response->{status}"
+    unless $response->{status} == 200;
+  require Test::FitNesse::Slim::FitNesseAcceptance;
+  my $result = Test::FitNesse::Slim::FitNesseAcceptance::parse_page_result(
+    $response->{content}, $response->{status}, $host, 1, 'pipe', $runner
+  );
+  die "installed Perl child was not confirmed: " . ($result->{command} // 'no command')
+    unless $result->{perlExecutionConfirmed};
+  my $counts = $result->{counts};
+  die sprintf('FitNesse installed fixture result was %d/%d/%d/%d, expected 2/0/0/0',
+    @$counts{qw(right wrong ignored exceptions)})
+    unless $counts->{right} == 2 && !$counts->{wrong}
+      && !$counts->{ignored} && !$counts->{exceptions};
+  print "FitNesse installed fixture: $counts->{right} right, $counts->{wrong} wrong; ",
+    "child command=$result->{command}; exit=$result->{exitCode}\n";
+  return;
+}

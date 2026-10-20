@@ -22,13 +22,14 @@ clock, without a timer of their own (see L</ANIMATION>).
 
 The section L</PROMPTS> is about the other direction: a prompt stops
 the user to ask a question, and reports the answer. L</FILE DIALOGS>
-are prompts of a special kind, which ask for a file to open or save,
-or for a folder.
+are dialogs of a special kind, which answer the same way as prompts
+and ask for a file to open or save, or for a folder.
 
 The reference pages are the class pages: L<Term::Fabulous::Widget::ProgressBar>,
 L<Term::Fabulous::Widget::Spinner>, L<Term::Fabulous::Widget::Toast>,
-L<Term::Fabulous::Widget::StatusBar>, L<Term::Fabulous::Widget::Prompt>
-and L<Term::Fabulous::Widget::FileDialog>.
+L<Term::Fabulous::Widget::StatusBar>, L<Term::Fabulous::Widget::Prompt>,
+L<Term::Fabulous::Widget::FileDialog> and the base class of every
+dialog, L<Term::Fabulous::Widget::Dialog>.
 The class the first two share, L<Term::Fabulous::Widget::Display>, is
 the base of every widget that paints itself from its own state, and
 the one to derive from for a feedback widget of your own
@@ -54,7 +55,7 @@ The picture shows the forms a bar can take
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-progress-bar.svg" alt="Progress bars: a block bar at 42 percent, one with the value inside, a thin line bar, a striped bar, a bar of three colored segments, an indeterminate bar with its runner, and a two-row ASCII bar"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.05/screenshots/widget-progress-bar.svg" alt="Progress bars: a block bar at 42 percent, one with the value inside, a thin line bar, a striped bar, a bar of three colored segments, an indeterminate bar with its runner, and a two-row ASCII bar"></p>
 
 =end html
 
@@ -138,7 +139,7 @@ picture shows every style (F<examples/widgets/spinner.pl>):
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-spinner.svg" alt="Spinners in every style, each with its name: dots, line, arc, circle, arrow, box, pulse and bar in one cell, dots3, bounce and wave in several, and the three-row ring; a stopped one and one with frames of its own"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.05/screenshots/widget-spinner.svg" alt="Spinners in every style, each with its name: dots, line, arc, circle, arrow, box, pulse and bar in one cell, dots3, bounce and wave in several, and the three-row ring; a stopped one and one with frames of its own"></p>
 
 =end html
 
@@ -183,7 +184,7 @@ shows toasts of every kind, an important one and an alert box
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-toast.svg" alt="Toasts stacked in the top right corner: an info, a success and a warning toast with titles, messages and close marks, a filled danger toast in the bottom right corner, and an alert box inside the form"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.05/screenshots/widget-toast.svg" alt="Toasts stacked in the top right corner: an info, a success and a warning toast with titles, messages and close marks, a filled danger toast in the bottom right corner, and an alert box inside the form"></p>
 
 =end html
 
@@ -236,7 +237,7 @@ C<warning> and C<danger> (F<examples/widgets/status-bar.pl>):
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-status-bar.svg" alt="A list of files with the cursor on budget.csv and, at the bottom, a status bar with the green message Saved budget.csv. and the parts file 3 of 6 and Ctrl+C quits. Above the list, status bars with a success message, a yellow warning with a blue modified part, and a red error with a red read-only part"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.05/screenshots/widget-status-bar.svg" alt="A list of files with the cursor on budget.csv and, at the bottom, a status bar with the green message Saved budget.csv. and the parts file 3 of 6 and Ctrl+C quits. Above the list, status bars with a success message, a yellow warning with a blue modified part, and a red error with a red read-only part"></p>
 
 =end html
 
@@ -289,7 +290,8 @@ asks for one value:
 When the user presses a button, the prompt closes, gives the focus back
 to the widget that had it, and fires C<Answer>
 (L<Term::Fabulous::Event::Answer>) with the id of the button and the
-values of the fields. C<Escape> answers with the button C<cancel>.
+values of the fields. C<Escape> answers with the button C<cancel> and
+the values as well, as a I<dismissed> answer.
 
 A prompt of your own takes any input widgets as its fields, each with a
 name and a label. The inputs check their own values, with C<required>
@@ -303,7 +305,7 @@ whose e-mail field holds an address that is not valid
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-prompt.svg" alt="A New contact prompt over the dimmed list of contacts: Name holds Ada Lovelace, E-mail holds ada@engine in red, and the red line E-mail: Please enter an e-mail address. sits above the Add and Cancel buttons"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.05/screenshots/widget-prompt.svg" alt="A New contact prompt over the dimmed list of contacts: Name holds Ada Lovelace, E-mail holds ada@engine in red, and the red line E-mail: Please enter an e-mail address. sits above the Add and Cancel buttons"></p>
 
 =end html
 
@@ -311,7 +313,10 @@ The recipes
 L<Term::Fabulous::Cookbook::Forms/Confirm before quitting (Prompt)> and
 L<Term::Fabulous::Cookbook::Forms/Ask for a number and check it (Prompt, validator)>
 are complete programs. For a dialog that is not a question, build a
-L<Term::Fabulous::Widget::Dialog> and fill it with any widgets.
+L<Term::Fabulous::Widget::Dialog> and fill it with any widgets. It takes
+a C<title>, C<buttons> and a notice line of its own, and answers with
+the same C<Answer> event (see
+L<Term::Fabulous::Widget::Dialog/Title, buttons and the notice line>).
 
 =head1 FILE DIALOGS
 
@@ -321,7 +326,7 @@ and files of a folder, with their sizes and the times they were last
 modified, and has a field for a name or a path. The user walks through
 the folders with C<Enter> and C<Backspace> or the mouse, picks an entry
 with the cursor, or types a name. Like a prompt, it opens over the
-screen, keeps the focus while it is open, and reports the result with
+screen, keeps the focus while it is open, and reports the answer with
 one C<Answer> event after it closed:
 
 =for highlighter language=perl
@@ -361,7 +366,7 @@ dialog to open a note, with the cursor on a file
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-file-dialog.svg" alt="An Open a file dialog over a dimmed notes program: the folder line ends in Documents/Projects/analytical-engine/notes, the list shows two folders and four notes with their sizes and modification times, the cursor is on reading-list.txt, which is also in the File field, and below it are the Notes filter, the Show hidden files checkbox and the Open and Cancel buttons"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.05/screenshots/widget-file-dialog.svg" alt="An Open a file dialog over a dimmed notes program: the folder line ends in Documents/Projects/analytical-engine/notes, the list shows two folders and four notes with their sizes and modification times, the cursor is on reading-list.txt, which is also in the File field, and below it are the Notes filter, the Show hidden files checkbox and the Open and Cancel buttons"></p>
 
 =end html
 
@@ -391,7 +396,8 @@ This page is part of L<Term::Fabulous::Manual>. Previous page: L<Term::Fabulous:
 The class pages: L<Term::Fabulous::Widget::ProgressBar>,
 L<Term::Fabulous::Widget::Spinner>, L<Term::Fabulous::Widget::Toast>,
 L<Term::Fabulous::Widget::StatusBar>, L<Term::Fabulous::Widget::Prompt>,
-L<Term::Fabulous::Widget::FileDialog>, L<Term::Fabulous::Widget::Display>.
+L<Term::Fabulous::Widget::FileDialog>, L<Term::Fabulous::Widget::Dialog>,
+L<Term::Fabulous::Widget::Display>.
 L<Term::Fabulous::Manual::Programs/Timers and other asynchronous work>
 for the timers that drive a bar, and
 L<Term::Fabulous::Cookbook::LiveData> for complete programs that update

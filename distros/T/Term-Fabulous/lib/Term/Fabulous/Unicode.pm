@@ -5,16 +5,17 @@ use warnings;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 use Exporter 'import';
-our @EXPORT_OK = qw(sanitize_text grapheme_clusters cluster_columns string_columns terminal_is_utf8);
+our @EXPORT_OK = qw(sanitize_text grapheme_clusters cluster_columns string_columns fit_columns terminal_is_utf8 ELLIPSIS);
 
 use I18N::Langinfo qw(langinfo CODESET);
 use Term::Fabulous::Termbox qw(tb_cluster_width);
 use Unicode::GCString;
 
 use constant CACHE_LIMIT => 4096;
+use constant ELLIPSIS    => "\x{2026}";
 
 # The same texts are segmented and measured on every frame (layout
 # callbacks, text and canvas drawing), so each result is remembered per
@@ -54,8 +55,47 @@ sub string_columns ($text) {
 	return $columns_by_text{$text} = $columns;
 }
 
+sub fit_columns ( $text, $columns, %options ) {
+	my @unknown = grep { $_ ne 'mark' && $_ ne 'cut' } sort keys %options;
+	die "Term::Fabulous::Unicode: fit_columns does not take @unknown (known: cut mark)" if @unknown;
+	die "Term::Fabulous::Unicode: fit_columns needs a text, got " . _named($text) unless _is_text($text);
+	die "Term::Fabulous::Unicode: fit_columns needs a whole number of columns, got " . _named($columns) unless _is_text($columns) && $columns =~ /\A-?[0-9]+\z/;
+	my $mark = $options{mark} // ELLIPSIS;
+	my $cut  = $options{cut}  // 'end';
+	die "Term::Fabulous::Unicode: fit_columns mark must be a text, got " . _named($mark) unless _is_text($mark);
+	die "Term::Fabulous::Unicode: fit_columns cut must be 'end' or 'start', got " . _named($cut) unless _is_text($cut) && ( $cut eq 'end' || $cut eq 'start' );
+
+	return '' if $columns <= 0;
+	return $text if string_columns($text) <= $columns;
+	my $room = $columns - string_columns($mark);
+	return join '', _clusters_within( $columns, grapheme_clusters($mark) ) if $room < 0;
+	return join( '', _clusters_within( $room, grapheme_clusters($text) ) ) . $mark if $cut eq 'end';
+	return $mark . join '', reverse _clusters_within( $room, reverse grapheme_clusters($text) );
+}
+
 sub terminal_is_utf8 () {
 	return langinfo(CODESET) =~ /\Autf-?8\z/i ? 1 : 0;
+}
+
+# The leading clusters that fit into $room columns together.
+sub _clusters_within ( $room, @clusters ) {
+	my @kept;
+	foreach my $cluster (@clusters) {
+		$room -= cluster_columns($cluster);
+		last if $room < 0;
+		push @kept, $cluster;
+	}
+	return @kept;
+}
+
+sub _is_text ($value) {
+	return defined $value && !ref $value;
+}
+
+sub _named ($value) {
+	return 'undef' unless defined $value;
+	return ( ref($value) =~ /\A[AEIOU]/ ? 'an ' : 'a ' ) . ref($value) . ' reference' if ref $value;
+	return "'$value'";
 }
 
 # Mirrors termbox2's tb_present(): a cluster advances by tb_cluster_width()
@@ -78,12 +118,14 @@ termbox2 draws it
 
 =head1 SYNOPSIS
 
-	use Term::Fabulous::Unicode qw(sanitize_text grapheme_clusters cluster_columns string_columns terminal_is_utf8);
+	use Term::Fabulous::Unicode qw(sanitize_text grapheme_clusters cluster_columns string_columns fit_columns terminal_is_utf8 ELLIPSIS);
 
 	my $columns  = string_columns("\x{3042}!");          # 3: a wide Hiragana letter and '!'
 	my @clusters = grapheme_clusters("e\x{301}x");       # ("e\x{301}", "x"): e with a combining accent, x
 	my $width    = cluster_columns("\x{1F600}");          # 2 under a UTF-8 locale
 	my $safe     = sanitize_text("a\tb\e]0;title\a");      # "a b\x{FFFD}]0;title\x{FFFD}"
+	my $label    = fit_columns( 'Quarterly report', 8 );   # "Quarter\x{2026}"
+	my $folder   = fit_columns( '/home/ada/notes', 9, mark => '...', cut => 'start' );    # ".../notes"
 
 	warn "Wide characters will be misaligned\n" unless terminal_is_utf8();
 
@@ -105,7 +147,7 @@ L<Term::Fabulous::Termbox>, so the widths it computes are exactly the
 widths termbox2 uses, on every platform. Term::Fabulous uses it to
 measure text for the layout and to draw text and canvas cells; use it
 yourself when you need to know how wide a string will be on screen, for
-example to pad or truncate a label.
+example to pad a label, or cut it to the room it has with L</fit_columns>.
 
 All functions take and return Perl character strings (decoded text),
 not UTF-8 encoded bytes.
@@ -211,6 +253,59 @@ for layout.
 
 Results are cached per text; the cache is emptied when it reaches 4096
 entries.
+
+=head2 fit_columns
+
+	my $shown = fit_columns( $text, $columns );
+	my $shown = fit_columns( $text, $columns, mark => '~', cut => 'start' );
+
+Returns C<$text> cut to at most C<$columns> columns (measured by
+L</string_columns>), with a mark where it was cut:
+
+=over
+
+=item *
+
+A text that fits is returned unchanged.
+
+=item *
+
+Otherwise as many whole grapheme clusters as fit together with the mark
+are kept: from the start of the text followed by the mark (C<< cut =>
+'end' >>, the default), or from its end after the mark (C<< cut =>
+'start' >>, for a path whose end matters). A cluster is never split, so a
+wide character that does not fit leaves its column empty and the result
+is a column narrower than the room. The clusters come from
+L</grapheme_clusters>, so a cut text is sanitized.
+
+=item *
+
+C<mark> is the text that shows the cut, by default L</ELLIPSIS>. When
+the mark alone is wider than the room, the mark itself is cut at its
+end to the room (C<'...'> into two columns gives C<'..'>).
+
+=item *
+
+No room (C<$columns> 0 or less) gives the empty string.
+
+=back
+
+The result is never wider than C<$columns>. Dies with a message that
+starts with C<Term::Fabulous::Unicode: fit_columns> when C<$text> or
+C<mark> is not a string, C<$columns> is not a whole number, C<cut> is
+neither C<'end'> nor C<'start'>, or another option is given.
+
+The status bar, the document tabs, chart texts, the C<truncate> mutator
+(L<Term::Fabulous::Widget::Table::Mutator/truncate>), the file dialog's
+folder line and the theme editor's settings list cut their texts with
+it.
+
+=head2 ELLIPSIS
+
+	use Term::Fabulous::Unicode qw(ELLIPSIS);
+
+The constant C<"\x{2026}"> (HORIZONTAL ELLIPSIS, one column): the mark
+L</fit_columns> puts where it cuts unless it is given another.
 
 =head2 terminal_is_utf8
 

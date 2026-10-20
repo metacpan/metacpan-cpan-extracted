@@ -38,7 +38,7 @@ for my $c (@checks) {
     else { is($got, $want, "$stmt gives $want") }
 }
 
-for my $eg (qw(uk us-federal target2)) {
+for my $eg (qw(uk us-federal target2 japan sweden)) {
     my $out = `"$^X" -Mblib "$FindBin::Bin/../eg/$eg.pl" 2027 2>&1`;
     is($?, 0, "eg/$eg.pl runs");
     like($out, qr/the ten business days after 2027-12-20:\n(?:  \d{4}-\d\d-\d\d  \w+\n){10}/, "  and prints ten business days");

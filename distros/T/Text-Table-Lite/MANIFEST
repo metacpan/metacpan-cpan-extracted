@@ -1,0 +1,13 @@
+Changes
+examples/basic.pl
+lib/Text/Table/Lite.pm
+LICENSE
+Makefile.PL
+MANIFEST
+META.json
+META.yml
+README.md
+t/00-load.t
+t/10-render.t
+t/20-validation.t
+t/30-encoding.t

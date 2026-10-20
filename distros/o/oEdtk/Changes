@@ -1,5 +1,26 @@
 Revision history for oEdtk
 
+2.1129      2026-10-19
+    - Tracking: ED_SOURCE now names the input file actually processed by the packaged tracker (its --csvInsert, --csvDistrib or --csvIdCheck file). A run that handles no file (--insert, --stats, --sql, table maintenance) leaves the field empty instead of writing the old "input-file" placeholder. oEdtk::Tracking->new keeps an explicit empty source and falls back to @ARGV only when the source is omitted.
+    - Tracking: a row written without a message now carries the name of the function that recorded it in ED_MESSAGE, instead of a blank or a lone space. The Tracking package and its signal-handler closures are skipped so the caller's code is named; both oEdtk::Tracking and the legacy duplicate oEdtk::Tracking2 follow the rule.
+    - tracker: an --insert row without ED_MESSAGE names main::insert_trackline, and the show_table helper passes ED_SOURCE as the positional source (the old named source parameter was ignored by the constructor).
+    - tests: new t/41_tracking_fields.t pins the source and message rules against an in-memory SQLite database, including the empty-source constructor path.
+    - All modules of the oEdtk package are realigned on the package version 2.1129; the frozen duplicate lib/oEdtk/logger2.pm follows, so its sha256 pin in t/int/67_logger_normalization.t is re-baselined.
+
+2.1128      2026-10-19
+    - Style: every Perl file under lib/, t/, tools/ and tracker/ is now perltidy-clean with the repository .perltidyrc. The 15 files that were not (8 under tools/, 7 under tracker/) were reformatted; tools/deparse_equiv.sh proves the pass semantics-preserving for all 212 files.
+    - perlcritic: severity-5 violations drop from 41 to 1 across the tree. Legacy scripts lose subroutine prototypes, explicit 'return undef', two-argument open calls, a bareword filehandle and an unnecessary 'no strict refs'; strictures are enabled where they were missing. The remaining violation is the deliberate leading-zero octal '01' in lib/oEdtk/lib/cob2pm.pl, left untouched on request.
+    - tests: T05, T09, d33 and T67 stay green, as does the full suite apart from the four known pre-existing failures (T03, T15, T50, T58).
+    - All modules of the oEdtk package are realigned on the package version 2.1128; the frozen duplicate lib/oEdtk/logger2.pm follows, so its sha256 pin in t/int/67_logger_normalization.t is re-baselined.
+
+2.1127      2026-10-19
+    - Dependencies: Text::QRCode becomes an optional runtime dependency. It builds against the native libqrencode library, so making it mandatory made a plain 'cpan oEdtk' fail on hosts without it (notably Windows) before anything was installed. oEdtk::TexDoc no longer loads it at compile time; append_qr_code requires it on first use and croaks with an explicit message when it is absent. The module now sits under META_MERGE runtime recommends, so a recommended module is still never eagerly used (T06).
+    - Dependencies: DBD::mysql and DBD::Pg leave TEST_REQUIRES; they were already runtime recommends. 'cpan oEdtk' no longer tries to build the MySQL driver (which needs mysql_config) or the PostgreSQL driver just to install the package. DBD::Oracle was already out, and DBD::MariaDB was never declared (MariaDB is reached through DBD::mysql).
+    - tests: the PostgreSQL integration facets (d02, d20 to d28) and the MySQL facet (d30) skip with an explicit reason when the driver is missing; t/int/37_texdoc.t skips the QR emission facet when Text::QRCode is absent while still checking the argument errors. When the driver and its OEDTK_TEST_*_ON flag are present, the tests run unchanged.
+    - cpanfile regenerated from Makefile.PL: Text::QRCode moves to recommends and the test block no longer declares DBD::Pg / DBD::mysql.
+    - README: Text::QRCode moves to a new 'Optional modules' section, and the database-driver and test-extra sections state that the engine drivers are optional and the facets skip without them.
+    - All modules of the oEdtk package are realigned on the package version 2.1127; the frozen duplicate lib/oEdtk/logger2.pm follows, so its sha256 pin in t/int/67_logger_normalization.t is re-baselined.
+
 2.1126      2026-10-18
     - oEdtk::DBAdmin: new caller parameter force_copy (true) forces the parsed PostgreSQL COPY path ahead of pg_copy_staging, burst_mo and EDTK_DB_BURST_MO, so an operator can bypass the ELT staging path before a large import starts. The decision reason is logged as 'force_copy => 1'. The packaged tracker exposes it as --forceCopy for --csvInsert, --csvDistrib and --csvIdCheck.
     - POD: EDTK_DB_BURST_MO now documents the shipped 50 MiB default; the old '0 is the shipped value' claim was stale.

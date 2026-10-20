@@ -1,5 +1,19 @@
 Revision history for Map::Tube::CLI
 
+v1.0.1 Tue Oct 20 2026
+      - Map::Tube::CLI now loads only the officially supported maps (the
+        list in _supported_maps()) instead of every module found under the
+        Map::Tube:: namespace. This fixes spurious "Couldn't require ..."
+        warnings on startup when an unrelated Map::Tube::* module, such as
+        Map::Tube::Server, is installed but one of its dependencies (e.g.
+        Dancer2) is missing.
+      - _supported_maps() is now defined in a BEGIN block, because it is
+        needed at compile time by Module::Pluggable.
+      - --force now loads the requested Map::Tube::<Name> module itself, and
+        reports a clear error if it cannot be loaded.
+      - Added unit tests: xt/version.t and xt/provides.t
+      - Removed unit tests: xt/meta-json.t and xt/meta-yml.t
+
 v1.0.0 Fri Jul 10 2026
       This release prepared by @GWS
       - Corrected the --line_mappings so it truly limits the "Connected To"

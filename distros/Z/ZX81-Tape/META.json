@@ -32,6 +32,7 @@
       },
       "runtime" : {
          "requires" : {
+            "CPU::Z80::Assembler" : "2.25",
             "Modern::Perl" : "1.20250607",
             "Object::Tiny::RW" : "1.07",
             "Path::Tiny" : "0.15",
@@ -44,6 +45,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.004",
+   "version" : "0.005",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

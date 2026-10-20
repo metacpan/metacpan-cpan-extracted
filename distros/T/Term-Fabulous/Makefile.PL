@@ -71,8 +71,8 @@ WriteMakefile(
 		'Test2::V0' => '0',
 	},
 	PREREQ_PM => {
-		'Clay::UI'                        => '0.06',
-		'Clay::XS'                        => '0.05',
+		'Clay::UI'                        => '0.07',
+		'Clay::XS'                        => '0.07',
 		'Encode'                          => '0',
 		'Exporter'                        => '0',
 		'Feature::Compat::Try'            => '0',
@@ -132,6 +132,27 @@ WriteMakefile(
 	clean     => { FILES => 'Term-Fabulous-* lib/Term/Fabulous/Termbox.c lib/Term/Fabulous/Termbox.o lib/Term/Fabulous/Termbox.bs src/*.o' },
 );
 
+installGitHooks();
+
+# In a git checkout, points core.hooksPath at .githooks, whose
+# pre-commit hook refuses a commit that leaves README.md or docs/ out
+# of date with the pod. The tarball has no .git, so this does nothing
+# for a CPAN build. A hooksPath set to something else is left alone.
+sub installGitHooks {
+	return unless -e '.git' && -d '.githooks';
+	my $hooksPath = `git config --get core.hooksPath 2>/dev/null`;
+	return if $? && $? != 256;    # 256: git ran and the key is unset
+	chomp $hooksPath;
+	return if $hooksPath eq '.githooks';
+	if ( length $hooksPath ) {
+		warn "core.hooksPath is '$hooksPath'; not pointing it at .githooks (see tools/README.md)\n";
+		return;
+	}
+	system( 'git', 'config', 'core.hooksPath', '.githooks' ) == 0
+		or warn "Cannot set core.hooksPath to .githooks: $?\n";
+	print "Installed the git hooks of .githooks (core.hooksPath)\n";
+}
+
 sub MY::postamble {
 	return <<'MAKE_FRAG';
 
@@ -154,7 +175,8 @@ lib/Term/Fabulous/Termbox$(OBJ_EXT) : src/termbox2.h src/tf_termbox.h
 # indentation of code blocks, fences them with the language set by
 # '=for highlighter' and turns tables in 'text' blocks into Markdown
 # tables. README.md is shipped and shown on MetaCPAN, docs/ is not (see
-# MANIFEST.SKIP). Regenerate them after any pod change.
+# MANIFEST.SKIP). Regenerate them after any pod change; the pre-commit
+# hook in .githooks refuses a commit that leaves them out of date.
 
 .PHONY: readme
 

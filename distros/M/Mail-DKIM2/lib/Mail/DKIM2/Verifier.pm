@@ -2,7 +2,7 @@ package Mail::DKIM2::Verifier;
 use strict;
 use warnings;
 
-our $VERSION = '0.22';
+our $VERSION = '0.25';
 
 use base 'Mail::DKIM2::HeaderParser';
 use Crypt::Digest::SHA256 qw(sha256);
@@ -10,22 +10,27 @@ use MIME::Base64 qw(encode_base64 decode_base64);
 use Carp;
 use POSIX qw();
 use Time::HiRes ();
+use Scalar::Util ();
 
 use Mail::DKIM2::Common qw(
+    MI_MISSING_M_ERROR
     parse_mime
     dkim2_canonicalize_header
     decode_tag_json
     encode_tag_json
     build_signing_input
     extract_mi_version
-    extract_domain
+    domain_of
+    to_alabel
     relaxed_domain_match
     check_ignore_prefixes
     MAX_CHAIN_LENGTH
+    FUTURE_LIMIT
+    EXPIRY
     chain_length_error
     duplicate_number_error
     valid_sequence
-    UNKEYABLE_SIGNATURE_ERROR
+    unkeyable_signature_error
     chain_number_error
     mi_version_tag
 );
@@ -35,8 +40,8 @@ use Mail::DKIM2::MessageInstance;
 use Mail::DKIM2::BodyPlan;
 use Mail::DKIM2::HeaderPlan;
 
-# The signing algorithms this verifier implements (spec-06 §3.2, §3.3), and
-# the key class each needs. Every other s= item is ignored (§3.4).
+# The signing algorithms this verifier implements (-07 §3.2, §3.3), and
+# the key class each needs. Every other s= item is ignored (§3.5).
 my %IMPLEMENTED_ALG = (
     'rsa-sha256'     => 'Crypt::PK::RSA',
     'ed25519-sha256' => 'Crypt::PK::Ed25519',
@@ -44,17 +49,20 @@ my %IMPLEMENTED_ALG = (
 
 # How long a key lookup sent in the background at the end of the headers is
 # waited for, from when it was sent, before it is asked again the ordinary
-# way (with the resolver's retries and other servers): Net::DNS's own first
-# retransmit interval.
-our $PREFETCH_WAIT = 5;
+# way (query(), with the resolver's retries and other nameservers). The
+# answer normally arrives while the body is hashed; one that has not come in
+# a second is treated as lost, not waited out.
+our $PREFETCH_WAIT = 1;
 
-sub _extract_mi_hash_sets {
-    my ($raw) = @_;
-    $raw =~ s/^[^:]+://;        # strip "Message-Instance:" field name
-    $raw =~ s/\r?\n[ \t]/ /g;   # unfold continuation lines
-    return [] unless $raw =~ /(?:\A|;)\s*h\s*=([^;]*)/i;    # §7: any case
-    return Mail::DKIM2::MessageInstance::parse_hash_sets($1) // [];    # malformed: MI parse reports it
-}
+# How often a background lookup still in flight is polled while waiting.
+our $PREFETCH_POLL = 0.005;
+
+# The most keys asked for in the background per message, the top signature's
+# first. The prefetch runs before any field is judged, so a message naming
+# thousands of selectors must not open thousands of sockets; a key not
+# prefetched is asked for with query() if it is ever needed.
+our $PREFETCH_MAX = 8;
+
 
 sub known_options {
     return qw(SkipTimestampCheck AllowUnsignedMI MidProcess HeadersOnly
@@ -69,6 +77,7 @@ sub init {
     $self->{_chain_counts}       = {};
     $self->{result}              = undef;
     $self->{details}             = undef;
+    $self->{diagnostic}          = undef;
     # Options the constructor was given stay; the rest get their defaults.
     $self->{$_} //= 0 for qw(SkipTimestampCheck MidProcess AllowUnsignedMI HeadersOnly);
     $self->{StreamBody} //= 1;
@@ -82,7 +91,7 @@ sub skip_timestamp_check {
 }
 
 # allow_unsigned_mi: permit a Message-Instance whose m= is higher than any
-# DKIM2-Signature's m=, which spec-06 §11 otherwise makes a PERMERROR (see
+# DKIM2-Signature's m=, which -07 §14 otherwise makes a PERMERROR (see
 # finish_body).
 #
 # Set this on an OUTBOUND path. A Signer legitimately holds the new
@@ -125,7 +134,7 @@ sub mid_process {
 }
 
 # headers_only: the message being verified has no body, as with the returned
-# original in a DSN's text/rfc822-headers part (spec-06 §12.1.2). Signatures
+# original in a DSN's text/rfc822-headers part (-07 §16.3). Signatures
 # and the chain are checked as usual; of the Message-Instance content check,
 # only the header hash of the top instance can be, so only that is.
 sub headers_only {
@@ -158,8 +167,12 @@ sub handle_header {
             # Bounded here, before finish_body walks 1..m= for gaps. Keyed
             # by number, so m=01 is m=1.
             my $v = extract_mi_version($contents);
-            if (my $e = chain_number_error('Message-Instance', 'm', $raw)) {
-                $self->{_range_error} //= $e;
+            if (!defined $raw) {
+                # No m= at all: nothing to place it in the chain by.
+                $self->{_mi_unusable} //= MI_MISSING_M_ERROR;
+            }
+            elsif (my $e = chain_number_error('Message-Instance', 'm', $raw)) {
+                $self->{_mi_unusable} //= $e;
             }
             elsif ($v) {
                 push @{$self->{_numbers}{'message-instance'}}, $v;
@@ -168,7 +181,9 @@ sub handle_header {
             1;
         } or do {
             die $@ if ref $@;
-            $self->{_mi_parse_error} = $@;
+            # Defensive: neither helper dies on a string today, but a field
+            # that could not be read has no m= to place it in the chain by.
+            $self->{_mi_unusable} //= MI_MISSING_M_ERROR;
         };
     }
     elsif ($lc_name eq 'dkim2-signature') {
@@ -182,10 +197,10 @@ sub handle_header {
         my $i = $sig ? $sig->sequence : undef;
         my $range = valid_sequence($i)
             && (chain_number_error('DKIM2-Signature', 'i', $i)
-                // chain_number_error('DKIM2-Signature', 'm', $sig->version));
+                // chain_number_error('DKIM2-Signature', 'm', $sig->version, $i));
         if ($range) {
             # Bounded here, before finish_body walks 1..i= for gaps.
-            $self->{_range_error} //= $range;
+            $self->{_sig_unusable} //= $range;
         }
         elsif (valid_sequence($i)) {
             push @{$self->{_numbers}{'dkim2-signature'}}, $i;
@@ -194,7 +209,7 @@ sub handle_header {
                 sig => $sig,
             };
         } else {
-            $self->{_dk2_unkeyable} //= UNKEYABLE_SIGNATURE_ERROR;
+            $self->{_sig_unusable} //= unkeyable_signature_error($contents);
         }
     }
 }
@@ -203,24 +218,17 @@ sub handle_header {
 # decide the result.
 sub finish_header {
     my $self = shift;
-    my $numbers = $self->{_numbers};
-    my $error = chain_length_error($self->{_chain_counts})
-        // $self->{_dk2_unkeyable}
-        // $self->{_range_error}
-        // duplicate_number_error('Message-Instance', 'm',
-               @{$numbers->{'message-instance'} || []})
-        // duplicate_number_error('DKIM2-Signature', 'i',
-               @{$numbers->{'dkim2-signature'} || []});
-    if ($error) {
+    if (my $error = $self->_structure_error) {
         $self->{result}  = 'permerror';
         $self->{details} = $error;
         $self->stop;
         return;
     }
 
-    # With no signature the verdict is already known -- 'none', or the
-    # unsigned-instance PERMERROR -- and finish_body reaches it before it
-    # looks at the body, so do not keep one. Most mail carries no DKIM2 at
+    # With no signature the verdict is already known -- 'none' (a structure
+    # fault, such as the unsigned-instance PERMERROR, has stopped above) --
+    # and finish_body reaches it before it looks at the body, so do not keep
+    # one. Most mail carries no DKIM2 at
     # all, and a verifier run on every message would otherwise hold a copy
     # of each.
     unless (%{$self->{_dk2_headers}}) {
@@ -232,6 +240,52 @@ sub finish_header {
     $self->_prefetch_keys;
 
     $self->_start_plans if $self->{StreamBody} && !$self->{HeadersOnly};
+}
+
+# -07 section 14.2, structure: what the fields' names and m=/i= numbers
+# alone decide, in the interop contract's fixed order (C9: a..h), so every
+# verifier names the same fault first. The faults that decide which fields
+# are in the chain at all (a..e) come before the gaps and coverage worked
+# out from them (f..h). undef if the chain's shape is sound.
+sub _structure_error {
+    my ($self) = @_;
+    my $numbers = $self->{_numbers};
+    my %mi  = %{$self->{_mi_headers}};
+    my %dk2 = %{$self->{_dk2_headers}};
+    my $error = chain_length_error($self->{_chain_counts})              # a
+        // $self->{_mi_unusable}                                        # b
+        // duplicate_number_error('Message-Instance', 'm',              # c
+               @{$numbers->{'message-instance'} || []})
+        // $self->{_sig_unusable}                                       # d
+        // duplicate_number_error('DKIM2-Signature', 'i',               # e
+               @{$numbers->{'dkim2-signature'} || []});
+    return $error if $error;
+
+    # f: every instance from m=1 up to the highest there is, or the highest
+    # the top signature covers -- a signature naming an absent instance is
+    # the same gap.
+    my ($max_v) = sort { $b <=> $a } keys %mi;
+    my ($max_i) = sort { $b <=> $a } keys %dk2;
+    my $top_m = defined $max_i ? ($dk2{$max_i}{sig}->version || 0) : 0;
+    my $upto = ($max_v // 0) > $top_m ? $max_v : $top_m;
+    for my $v (1 .. $upto) {
+        return "PERMERROR: Message-Instance m=$v missing" unless $mi{$v};
+    }
+
+    # g: an instance above every signature's m= is one nothing vouches for.
+    # Not for an outbound signer (AllowUnsignedMI: it holds the instance it
+    # is about to sign) or a partial chain view (MidProcess).
+    if (defined $max_v && !$self->{AllowUnsignedMI} && !$self->{MidProcess}) {
+        my ($top_signed) = sort { $b <=> $a } grep { defined }
+                           map { $_->{sig}->version } values %dk2;
+        return "PERMERROR: Message-Instance m=$max_v is not signed"
+            if !defined $top_signed || $max_v > $top_signed;
+    }
+
+    for my $i (1 .. ($max_i // 0)) {                                     # h
+        return "PERMERROR: DKIM2-Signature i=$i missing" unless $dk2{$i};
+    }
+    return;
 }
 
 # StreamBody: from the header fields, parsed once as the undo walk's parser
@@ -270,32 +324,10 @@ sub finish_body {
     my %mi_map  = %{$self->{_mi_headers}};
     my %dk2_map = %{$self->{_dk2_headers}};
 
-    # spec-06 §11: "As a special case, there MUST NOT be a Message-Instance
-    # field with a higher m= value than occurs in any DKIM2-Signature field",
-    # reported as "PERMERROR Message-Instance m=<x> is not signed".
-    #
-    # An unsigned Message-Instance records hashes that nothing vouches for, so
-    # accepting one lets a hop assert an instance with no accountability --
-    # which is the whole thing DKIM2 exists to prevent. This must run BEFORE
-    # the no-signatures 'none' return below, or a message carrying only an MI
-    # reads as "no DKIM2 here" instead of as malformed.
-    #
-    # Suppressed by allow_unsigned_mi (an outbound signer holds the new MI
-    # before its signature exists) and by mid_process (a partial chain view
-    # keeps every MI while higher signatures are stripped).
-    unless ($self->{AllowUnsignedMI} || $self->{MidProcess}) {
-        if (keys %mi_map) {
-            my ($top_mi) = sort { $b <=> $a } keys %mi_map;
-            my ($top_signed) = sort { $b <=> $a }
-                               grep { defined }
-                               map  { $_->{sig} ? $_->{sig}->version : undef }
-                               values %dk2_map;
-            if (!defined $top_signed || $top_mi > $top_signed) {
-                $self->{result}  = 'permerror';
-                $self->{details} = "PERMERROR Message-Instance m=$top_mi is not signed";
-                return;
-            }
-        }
+    # -07 section 14.2, structure (also checked at the end of the headers,
+    # which stops there on a fault).
+    if (my $error = $self->_structure_error) {
+        return $self->_outcome($error);
     }
 
     unless (keys %dk2_map) {
@@ -304,29 +336,42 @@ sub finish_body {
         return;
     }
 
-    # spec-06 §7.3: reject a Message-Instance whose h= names the same
-    # algorithm twice, before any DNS lookup or crypto work. Checked against
-    # the LIST of hash-sets (via _extract_mi_hash_sets/parse_hash_sets), not
-    # a hash keyed by algorithm, since a hash would let a later occurrence
-    # silently overwrite an earlier one and hide the duplicate. Matching is
-    # case-insensitive (parse_hash_sets already lowercases algorithm names).
-    for my $v (sort keys %mi_map) {
-        my $sets = _extract_mi_hash_sets($mi_map{$v});
-        my %seen;
-        for my $s (@$sets) {
-            if ($seen{$s->[0]}++) {
-                $self->{result}  = 'permerror';
-                $self->{details} = "PERMERROR Message-Instance m=$v has a duplicate hash algorithm";
-                return;
-            }
+    # Section 14.2, content: every Message-Instance on its own, by ascending
+    # m= (contract C9) -- its tag list, then a duplicate hash algorithm, then
+    # its Recipe (MessageInstance->parse checks in that order), then the
+    # Recipe's copy ranges -- before any signature is worked out. Only the
+    # bound a message gives a range is left for the chain walk.
+    for my $v (sort { $a <=> $b } keys %mi_map) {
+        (my $value = $mi_map{$v}) =~ s/\A[^:]*:[ \t]*//;
+        my $obj = eval { Mail::DKIM2::MessageInstance->parse($value) };
+        die $@ if ref $@;
+        return $self->_outcome(Mail::DKIM2::MessageInstance::_parse_error($@)) unless $obj;
+        if (defined(my $why = $obj->recipe_order_error)) {
+            $self->{diagnostic} = $why;
+            return $self->_error(permerror => "Message-Instance m=$v contains invalid JSON");
         }
     }
 
     my $max_i = (sort { $b <=> $a } keys %dk2_map)[0];
-    my $dk2_entry = $dk2_map{$max_i};
-    my $signature = $dk2_entry->{sig};
+    my $signature = $dk2_map{$max_i}{sig};
 
-    # Local policy (stricter than spec-06 §"Check the Chain of Custody"): the
+    # Contract C9: the signatures are checked in -07 section 14 order,
+    # each section over every signature from i=1 up, so the first error
+    # found is the primary one. Section 14.2: each field on its own.
+    for my $i (1..$max_i) {
+        return unless $self->_check_sig_field($i);
+    }
+
+    # Section 14.3: the timestamps.
+    for my $i (1..$max_i) {
+        return unless $self->_check_sig_time($i);
+    }
+
+    # Section 14.4: the top signature's nd=, then the Chain of Custody
+    # (each signature against the one below it, and its own mf= against
+    # its d=).
+    #
+    # Local policy (-07 sections 13.1, 14.4: a top nd= needs an out-of-band arrangement): the
     # highest-numbered DKIM2-Signature MUST NOT carry nd=. The only legitimate
     # nd= producer is reflector-brand-nd, which always emits the matching
     # higher-i= signature too, so nd= never appears on top.
@@ -344,116 +389,25 @@ sub finish_body {
         my $ok = $self->{NextDomainOK};
         if (defined $ok && length $ok) {
             if (lc $signature->next_domain ne lc $ok) {
-                $self->{result}  = 'permerror';
-                $self->{details} = "not signing: top signature nd="
-                    . $signature->next_domain . " names another domain";
-                return;
+                return $self->_error(permerror => "not signing: top signature nd="
+                    . $signature->next_domain . " names another domain");
             }
             # nd= names us: carry on
         } else {
-            $self->{result}  = 'permerror';
-            $self->{details} = "DKIM2-Signature i=$max_i unexpected nd= tag";
-            return;
+            return $self->_error(permerror => "DKIM2-Signature i=$max_i unexpected nd= tag");
         }
     }
+    return unless $self->_verify_chain();
 
-    # Validate chain completeness - check for gaps
+    # Section 14.5 (every key), then section 14.6 (every signature).
     for my $i (1..$max_i) {
-        unless ($dk2_map{$i}) {
-            $self->{result} = 'fail';
-            $self->{details} = "missing DKIM2-Signature i=$i";
-            return;
-        }
+        return unless $self->_check_sig_keys($i);
     }
-
-    # Check MI completeness and coverage if there are MI headers
-    if (keys %mi_map) {
-        my $max_v = (sort { $b <=> $a } keys %mi_map)[0];
-        for my $v (1..$max_v) {
-            unless ($mi_map{$v}) {
-                $self->{result} = 'fail';
-                $self->{details} = "missing Message-Instance m=$v";
-                return;
-            }
-        }
-        # The other direction: a signature claiming to cover an instance that
-        # is not present. The completeness loop above only walks up to the
-        # topmost MI that EXISTS, so it cannot see this.
-        #
-        # The reverse case -- an MI above the top signature -- is spec-06 §11's
-        # "is not signed" PERMERROR, checked at the top of finish_body, because
-        # it must also fire when there are no signatures at all.
-        my $top_sig = $dk2_map{$max_i}{sig};
-        my $top_m   = $top_sig->version || 0;
-        if ($top_m > $max_v) {
-            $self->{result} = 'fail';
-            $self->{details} =
-                "top signature i=$max_i covers m=$top_m but no Message-Instance m=$top_m exists";
-            return;
-        }
-    }
-
-    # Verify ALL signatures in the chain, from i=1 to max_i
     for my $i (1..$max_i) {
-        my $result = $self->_verify_signature($i);
-        return unless $result;
+        return unless $self->_check_sig_crypto($i);
     }
 
-    # Check Chain of Custody between consecutive signatures
-    if ($max_i > 1) {
-        my $chain_result = $self->_verify_chain();
-        return unless $chain_result;
-    }
-
-    # §10.8: Check donotmodify and donotexplode requests
-    for my $i (1..$max_i) {
-        my $sig   = $dk2_map{$i}{sig};
-        my $flags = $sig->flags // [];
-
-        if (grep { $_ eq 'donotmodify' } @$flags) {
-            my $m = 0 + ($sig->version || 0);
-            if ($m >= 1 && $mi_map{$m} && $mi_map{$m + 1}) {
-                # spec-06 §3.4/§7.3: an MI may carry several hash-sets. Only
-                # compare hash-sets whose algorithm we implement; if the two
-                # instances share none, we cannot tell whether the message
-                # changed and fail closed rather than silently accept.
-                my %by_alg_m  = map { $_->[0] => $_ } @{ _extract_mi_hash_sets($mi_map{$m}) };
-                my %by_alg_m1 = map { $_->[0] => $_ } @{ _extract_mi_hash_sets($mi_map{$m + 1}) };
-                my $impl = Mail::DKIM2::MessageInstance::hash_algs();
-                my @common = grep { $by_alg_m{$_} && $by_alg_m1{$_} && $impl->{$_} }
-                             keys %by_alg_m;
-
-                unless (@common) {
-                    $self->{result}  = 'permerror';
-                    $self->{details} = "Message-Instance m=$m no supported hash algorithm";
-                    return;
-                }
-
-                for my $alg (@common) {
-                    my (undef, $hh_m,  $bh_m)  = @{ $by_alg_m{$alg}  };
-                    my (undef, $hh_m1, $bh_m1) = @{ $by_alg_m1{$alg} };
-                    if ($hh_m ne $hh_m1 || $bh_m ne $bh_m1) {
-                        $self->{result}  = 'fail';
-                        $self->{details} = 'Message modified despite donotmodify request at i=' . $i;
-                        return;
-                    }
-                }
-            }
-        }
-
-        if (grep { $_ eq 'donotexplode' } @$flags) {
-            for my $j ($i + 1 .. $max_i) {
-                my $later_flags = $dk2_map{$j}{sig}->flags // [];
-                if (grep { $_ eq 'exploded' } @$later_flags) {
-                    $self->{result}  = 'fail';
-                    $self->{details} = 'Message exploded despite donotexplode request at i=' . $i;
-                    return;
-                }
-            }
-        }
-    }
-
-    # §10.7: the cryptographic chain proves the MI headers are authentic, but
+    # §13.7: the cryptographic chain proves the MI headers are authentic, but
     # NOT that the current body/headers still match them. Walk the MI chain:
     # verify the top instance against the current content, then undo each
     # instance and verify the reconstructed content against the next one down,
@@ -461,7 +415,7 @@ sub finish_body {
     # unrecoverable) the walk continues over the header history only.
     #
     # MessageInstance::parse() dies (rather than returning an error) on a
-    # malformed r= payload -- e.g. the §11.2 invalid-JSON PERMERROR -- so
+    # malformed r= payload -- e.g. the §14.2 invalid-JSON PERMERROR -- so
     # this must run under eval or that die would propagate uncaught out of
     # finish_body() and crash the caller instead of yielding a clean
     # permerror result.
@@ -471,14 +425,79 @@ sub finish_body {
     if (my $err = $@) {
         die $err if ref $err;
         chomp $err;
-        $self->{result}  = ($err =~ /^PERMERROR/) ? 'permerror' : 'fail';
-        $self->{details} = $err;
-        return;
+        return $self->_outcome($err);
     }
     return unless $mi_chain_ok;
 
+    # -07 section 11, 14.8: every From the message has had must be
+    # Authentic for the signature that answers for it.
+    return unless $self->_verify_from;
+
     $self->{result} = 'pass';
     $self->{details} = "i=1..$max_i verified";
+}
+
+# From must be Authentic (-07 sections 11 and 14.8): the From in effect
+# when each signature was made (see the pairs below). A version of the header comes from the undo walk if that ran, else from the
+# header plan (made here if the body was hashed without one). An instance
+# no signature covers (AllowUnsignedMI, MidProcess) has no signature to
+# answer for its From: the signer gate leaves that to the Signer, which
+# checks the From it is about to sign.
+sub _verify_from {
+    my ($self) = @_;
+    my %dk2_map = %{$self->{_dk2_headers}};
+    my @sigs = map { [$_, 0 + ($dk2_map{$_}{sig}->version // 0)] } sort { $a <=> $b } keys %dk2_map;
+    return 1 unless @sigs;
+
+    my ($hplan, @parsed);
+    if ($self->{_planned} && $self->{_header_plan}) {
+        $hplan  = $self->{_header_plan};
+        @parsed = values %{ $self->{_planned}{parsed} };
+    } else {
+        $hplan = Mail::DKIM2::HeaderPlan->new($self->{headers},
+            IgnorePrefixes => $self->{IgnorePrefixes});
+        for my $value ($hplan->values('Message-Instance')) {
+            my $mi = eval { Mail::DKIM2::MessageInstance->parse($value) };
+            die $@ if ref $@;
+            push @parsed, $mi if $mi;
+        }
+        @parsed = sort { $b->get_tag('m') <=> $a->get_tag('m') } @parsed;
+        $hplan->plan(@parsed);
+    }
+    my $from_at = sub {
+        my ($m) = @_;
+        return $self->{_from_at}{$m} if $self->{_from_at} && $self->{_from_at}{$m};
+        return $hplan->values_at($m, 'From') // [];
+    };
+
+    # -07 §11, contract C5 as corrected by Ruling 19: the From in effect when
+    # each signature was made. i=1 against the From at state m(i=1); each
+    # i >= 2 against the From at state m(i) when an instance k with
+    # m(i-1) < k <= m(i) replaced From. A From replaced before any signature
+    # covered it (an unsigned ingress m=1 a list rewrote in m=2 before
+    # signing i=1) is never checked.
+    my %changes_from;
+    for my $mi (@parsed) {
+        my $k = 0 + $mi->get_tag('m');
+        $changes_from{$k} = 1
+            if $k >= 2 && $mi->get_tag('rh') && exists $mi->get_tag('rh')->{from};
+    }
+    my @pairs;
+    my $prev_m;
+    for my $sig (@sigs) {
+        my ($i, $m) = @$sig;
+        my $due = $i == 1
+            || (defined $prev_m && grep { $_ > $prev_m && $_ <= $m } keys %changes_from);
+        $prev_m = $m;
+        push @pairs, [$m, $i] if $due;
+    }
+    for my $pair (@pairs) {
+        my ($k, $i) = @$pair;
+        my $d = $dk2_map{$i}{sig}->domain // '';
+        next if Mail::DKIM2::Common::from_authentic($d, @{ $from_at->($k) });
+        return $self->_error(permerror => "DKIM2-Signature i=$i matching From is not authentic");
+    }
+    return 1;
 }
 
 # The headers-only half of _verify_mi_chain: the top instance's header hash
@@ -497,18 +516,13 @@ sub _verify_top_mi_headers {
     my $hashes = $mi->get_tag('hashes') || {};
     my $impl   = Mail::DKIM2::MessageInstance::hash_algs();
     my @usable = sort grep { $impl->{$_} } keys %$hashes;
-    unless (@usable) {
-        $self->{result}  = 'permerror';
-        $self->{details} = "Message-Instance m=$num no supported hash algorithm";
-        return 0;
-    }
+    return $self->_error(permerror => "Message-Instance m=$num no supported hash algorithm")
+        unless @usable;
     for my $alg (@usable) {
         my $want = $hashes->{$alg}[0];
         my $have = Mail::DKIM2::MessageInstance::h_digest($msg, $alg, $self->{IgnorePrefixes});
         next if $want eq $have;
-        $self->{result}  = 'fail';
-        $self->{details} = "Message-Instance m=$num header hash mismatch ($alg)";
-        return 0;
+        return $self->_error(fail => "Message-Instance m=$num header hash $alg mismatch");
     }
     return 1;
 }
@@ -534,6 +548,8 @@ sub _verify_mi_chain {
         my %by_v = map { (extract_mi_version($_) // 0) => $_ } @mi;
         my $num = %by_v ? (sort { $b <=> $a } keys %by_v)[0] : 0;
         last unless $num;
+        # This version's From fields, for the -07 section 11 check.
+        $self->{_from_at}{$num} = [ $msg->header_raw('From') ];
 
         my %body = (HeadersOnly => $headers_only);
         if ($plan && !$headers_only) {
@@ -606,28 +622,35 @@ sub _verify_mi_chain_planned {
 # Instance $num does not match the content it describes.
 sub _mi_mismatch {
     my ($self, $num, $err) = @_;
-    # A malformed instance is a PERMERROR in its own words (§11.2 names the
-    # strings); a hash that does not match is a fail.
-    if (($err // '') =~ /^PERMERROR/) {
-        $self->{result}  = 'permerror';
-        $self->{details} = $err;
-        return 0;
-    }
-    $self->{result}  = 'fail';
-    $self->{details} = "Message-Instance m=$num does not match content"
-                     . ($err ? " ($err)" : '');
-    return 0;
+    # MessageInstance's reasons carry their state and -07 section 14.2 /
+    # 14.7 words: a malformed instance is a PERMERROR, a hash that does
+    # not match ("FAIL: Message-Instance m=N header hash sha256 mismatch")
+    # a FAIL.
+    return $self->_outcome($err // "FAIL: Message-Instance m=$num header hash mismatch");
 }
 
+# Instance $num's Recipe does not undo: a copy range past the end, out of
+# order or overlapping -- every Recipe error is "contains invalid JSON"
+# (the -07 contract). Which range is kept for diagnostic().
 sub _mi_undo_failed {
     my ($self, $num, $err) = @_;
-    $self->{result}  = 'fail';
-    $self->{details} = "Message-Instance m=$num did not undo cleanly"
-                     . ($err ? ": $err" : '');
-    return 0;
+    if (defined $err) {
+        (my $why = "$err") =~ s/\s+\z//;
+        # Already a verdict (the instances do not form a chain, say).
+        return $self->_outcome($why) if $why =~ /\A(?:PERMERROR|FAIL|TEMPERROR): /;
+        $self->{diagnostic} = $why;
+    }
+    return $self->_error(permerror => "Message-Instance m=$num contains invalid JSON");
 }
 
-sub _verify_signature {
+# Signature $i's checks, one -07 section 14 step at a time (contract C9:
+# finish_body runs each step over every signature before the next). Each
+# returns 1, or 0 with the outcome recorded.
+
+# Section 14.2: the field on its own -- its tags, mf=/rt= form, the
+# section 10.9 duplicate and limit rules, and every implemented item's
+# value. Keeps the items to check and the signing input for the later steps.
+sub _check_sig_field {
     my ($self, $i) = @_;
 
     my %mi_map  = %{$self->{_mi_headers}};
@@ -635,19 +658,11 @@ sub _verify_signature {
     my $dk2_entry = $dk2_map{$i};
     my $signature = $dk2_entry->{sig};
 
-    # §8: "there MUST be only one of each kind" of tag.
-    if (my $dup = $signature->duplicate_tag) {
-        $self->{result}  = 'permerror';
-        $self->{details} = "DKIM2-Signature i=$i duplicate tag $dup not permitted (spec 8)";
-        return 0;
-    }
-    # §11.2: a field that does not parse is a syntax error -- never verified
-    # with its malformed parts dropped (follow-up review F3, F4).
-    if ($signature->syntax_error) {
-        $self->{result}  = 'permerror';
-        $self->{details} = "DKIM2-Signature i=$i syntax error";
-        return 0;
-    }
+    # -07 section 8: a tag given twice, in any case, makes the whole list
+    # invalid; and a field that does not parse is a syntax error -- never
+    # verified with its malformed parts dropped (follow-up review F3, F4).
+    return $self->_error(permerror => "DKIM2-Signature i=$i syntax error")
+        if $signature->duplicate_tag || $signature->syntax_error;
 
     # Only include headers that existed when signature $i was created:
     # - DKIM2-Sig headers with i <= $i
@@ -679,7 +694,7 @@ sub _verify_signature {
         signing_header => $sig_hdr_for_input,
     );
 
-    # draft-06: every DKIM2-Signature MUST carry i=, m=, t=, d=, s=. Checked
+    # -07 section 10: every DKIM2-Signature MUST carry i=, m=, t=, d=, s=. Checked
     # via get_tag() (not the sequence/version/timestamp/domain accessors)
     # because those accessors just proxy get_tag() and would themselves
     # return undef for an absent tag anyway -- get_tag() is used directly
@@ -692,138 +707,107 @@ sub _verify_signature {
               $t eq 's' ? ($signature->sig_count ? 1 : 0)
             : $t eq 'd' ? (defined($signature->get_tag('d')) && length $signature->get_tag('d'))
             :             defined $signature->get_tag($t);
-        unless ($present) {
-            $self->{result}  = 'permerror';
-            $self->{details} = "DKIM2-Signature i=$i tag=$t missing";
-            return 0;
-        }
+        return $self->_error(permerror => "DKIM2-Signature i=$i tag=$t missing")
+            unless $present;
     }
 
-    # spec-06 §8.9: reject a duplicate Selector, or the same algorithm 3+
+    # -07 section 10.9: reject a duplicate Selector, or the same algorithm 3+
     # times, within this signature's s= tag -- before any DNS lookup or
     # crypto work.
     if (my @dup_errors = $signature->check_duplicates) {
-        $self->{result}  = 'permerror';
-        $self->{details} = $dup_errors[0];
-        return 0;
+        return $self->_outcome($dup_errors[0]);
     }
 
-    # draft-06 §8: a signature carries either nd= or both mf= and rt=, never
-    # both forms. nd= together with mf=/rt= is a PERMERROR.
+    # -07 section 10: a signature carries either nd= or both mf= and rt=,
+    # never both forms. nd= together with mf= or rt= makes the mf= (or rt=)
+    # the unexpected tag.
     my $nd_tag = $signature->get_tag('nd');
     my $mf_tag = $signature->get_tag('mf');
     my $rt_tag = $signature->get_tag('rt');
-    if (defined $nd_tag && (defined $mf_tag || defined $rt_tag)) {
-        $self->{result}  = 'permerror';
-        $self->{details} = "DKIM2-Signature i=$i tag=nd was unexpected";
-        return 0;
-    }
-    if (!defined $nd_tag && !(defined $mf_tag && defined $rt_tag)) {
-        $self->{result}  = 'permerror';
-        $self->{details} = "DKIM2-Signature i=$i tag=mf missing";
-        return 0;
+    if (defined $nd_tag) {
+        return $self->_error(permerror => "DKIM2-Signature i=$i tag=mf was unexpected")
+            if defined $mf_tag;
+        return $self->_error(permerror => "DKIM2-Signature i=$i tag=rt was unexpected")
+            if defined $rt_tag;
+    } else {
+        return $self->_error(permerror => "DKIM2-Signature i=$i tag=mf missing")
+            unless defined $mf_tag;
+        return $self->_error(permerror => "DKIM2-Signature i=$i tag=rt missing")
+            unless defined $rt_tag;
     }
 
-    # §8.3 SHOULD: n= nonce must not exceed 64 characters
+    # Local check: n= nonce must not exceed 64 characters (no -07 string).
     my $nonce = $signature->get_tag('n');
-    if (defined $nonce && length($nonce) > 64) {
-        $self->{result}  = 'fail';
-        $self->{details} = "n= nonce exceeds 64 characters at i=$i";
-        return 0;
-    }
+    return $self->_error(permerror => "n= nonce exceeds 64 characters at i=$i")
+        if defined $nonce && length($nonce) > 64;
 
-    # §8.4: t= is 1*DIGIT. A malformed value is a syntax error even when the
+    # t= is 1*DIGIT. A malformed value is a syntax error even when the
     # age check is skipped; it used to numify to 0 and skip that check.
     my $ts = $signature->timestamp;
-    unless (defined $ts && $ts =~ /\A[0-9]+\z/) {
-        $self->{result}  = 'permerror';
-        $self->{details} = "DKIM2-Signature i=$i syntax error (t= is not a decimal timestamp)";
-        return 0;
-    }
+    return $self->_error(permerror => "DKIM2-Signature i=$i syntax error")
+        unless defined $ts && $ts =~ /\A[0-9]+\z/;
 
-    # §11.3 SHOULD: reject signatures more than 14 days old or in the future
-    unless ($self->{SkipTimestampCheck}) {
-        my $now = time();
-        if ($ts > $now + 300) {
-            $self->{result}  = 'fail';
-            $self->{details} = "DKIM2-Signature i=$i timestamp is in the future";
-            return 0;
-        }
-        if ($now > $ts + 14 * 24 * 3600) {
-            $self->{result}  = 'fail';
-            $self->{details} = "DKIM2-Signature i=$i has expired (age > 14 days)";
-            return 0;
-        }
-    }
-
-    # Spec §7.5/§7.6: mf= and each rt= MUST be a bracketed RFC5321 path.
+    # -07 sections 10.5, 10.6: mf= and each rt= MUST be a bracketed RFC 5321
+    # path; one that is not is malformed.
     my $mf_raw = $signature->mail_from;
-    if (defined $mf_raw && length $mf_raw && $mf_raw !~ /^<.*>$/s) {
-        $self->{result}  = 'fail';
-        $self->{details} = "mf= is not a bracketed RFC5321 reverse-path at i=$i (spec 7.5)";
-        return 0;
-    }
-    my $rt_raw = $signature->rcpt_to;
-    if ($rt_raw) {
-        for my $r (@$rt_raw) {
-            next if defined $r && $r =~ /^<.*>$/s;
-            $self->{result}  = 'fail';
-            $self->{details} = "rt= entry is not a bracketed RFC5321 forward-path at i=$i (spec 7.6)";
-            return 0;
-        }
-    }
-
-    # Validate d= matches mf= domain (skip for null sender / DSN)
-    my $mf = $signature->mail_from;
-    my $sig_domain = $signature->domain;
-    if ($mf && $mf ne '<>') {
-        my $mf_domain = extract_domain($mf);
-        unless ($mf_domain && relaxed_domain_match($mf_domain, $sig_domain)) {
-            $self->{result} = 'fail';
-            $self->{details} = "DKIM2-Signature i=$i MAIL FROM and d= do not match";
-            return 0;
-        }
-    }
-
-    # Verify all signature items we support
-    my $sig_count = $signature->sig_count;
-    unless ($sig_count) {
-        $self->{result} = 'fail';
-        $self->{details} = 'no signature items in s= tag';
-        return 0;
+    return $self->_error(permerror => "DKIM2-Signature i=$i syntax error")
+        if defined $mf_raw && length $mf_raw && $mf_raw !~ /^<.*>$/s;
+    for my $r (@{ $signature->rcpt_to || [] }) {
+        return $self->_error(permerror => "DKIM2-Signature i=$i syntax error")
+            unless defined $r && $r =~ /^<.*>$/s;
     }
 
     # The items' outcome, in the order every implementation in this
     # repository follows (docs/superpowers/specs/
     # 2026-10-09-verifier-strictness-review-fixes.md, section E).
     #
-    # §3.4: an algorithm this verifier does not implement is ignored --
-    # before any key lookup, so a list of unknown names costs nothing. Names
-    # match exactly: tag values are case significant (§8), and a name that
-    # is merely like a known one must never be verified as it. A known
-    # algorithm's value must be a padded base64string (§2.13).
+    # -07 section 3.5: an algorithm this verifier does not implement is
+    # ignored -- before any key lookup, so a list of unknown names costs
+    # nothing. Names match exactly: tag values are case significant, and a
+    # name that is merely like a known one must never be verified as it. A
+    # known algorithm's value must be a padded base64string (section 2.14).
+    my $sig_count = $signature->sig_count;
     my @items;
     for my $idx (0 .. $sig_count - 1) {
         my $alg = $signature->algorithm($idx) // '';
         next unless $IMPLEMENTED_ALG{$alg};
         my $sig_b64 = $signature->signature_value($idx) // '';
-        unless (Mail::DKIM2::Common::_is_base64string($sig_b64)) {
-            $self->{result}  = 'permerror';
-            $self->{details} = "DKIM2-Signature i=$i syntax error ($alg signature value is not base64)";
-            return 0;
-        }
+        return $self->_error(permerror => "DKIM2-Signature i=$i syntax error")
+            unless Mail::DKIM2::Common::_is_base64string($sig_b64);
         push @items, [$idx, $alg, $sig_b64];
     }
-    # §11.6: when every signature that can be checked fails, FAIL -- here
-    # vacuously, as none can be.
-    unless (@items) {
-        $self->{result}  = 'fail';
-        $self->{details} = "DKIM2-Signature i=$i has no signature with a supported algorithm";
-        return 0;
-    }
+    $dk2_entry->{items} = \@items;
+    $dk2_entry->{signing_input} = $signing_input;
+    return 1;
+}
 
-    my ($verified_any, $first_absent);
-    for my $item (@items) {
+# Section 14.3: a signature made more than 14 days before delivery, or more
+# than a day after it, is not Validly Signed.
+sub _check_sig_time {
+    my ($self, $i) = @_;
+    return 1 if $self->{SkipTimestampCheck};
+    my $ts  = $self->{_dk2_headers}{$i}{sig}->timestamp;
+    my $now = time();
+    return $self->_error(permerror => "DKIM2-Signature i=$i signature is from the future")
+        if $ts > $now + FUTURE_LIMIT;
+    return $self->_error(permerror => "DKIM2-Signature i=$i signature expired")
+        if $now > $ts + EXPIRY;
+    return 1;
+}
+
+# Section 14.5: every implemented item's public key. A key that cannot be
+# had ends the check at once, in section 14.5's words; an absent one only
+# skips its item, unless every item's is absent.
+sub _check_sig_keys {
+    my ($self, $i) = @_;
+    my $dk2_entry = $self->{_dk2_headers}{$i};
+    my $signature = $dk2_entry->{sig};
+    # Local check: none of the algorithms is one this verifier implements.
+    return $self->_error(permerror => "DKIM2-Signature i=$i has no signature with a supported algorithm")
+        unless @{ $dk2_entry->{items} };
+
+    my ($first_absent, @keyed);
+    for my $item (@{ $dk2_entry->{items} }) {
         my ($idx, $alg, $sig_b64) = @$item;
 
         # Get the public key for this signature item.  The fetch is eval'd
@@ -842,24 +826,21 @@ sub _verify_signature {
         my $sel = $signature->selector($idx) // '?';
         unless ($fetched) {
             die $@ if ref $@;
-            # Drop croak's " at FILE line N." tail: this reason is reported in
-            # Authentication-Results on mail we send out, and our source paths
-            # are nobody else's business.
+            # Drop croak's " at FILE line N." tail: this reason may be
+            # reported in Authentication-Results on mail we send out, and our
+            # source paths are nobody else's business.
             (my $why = $@) =~ s/\s+at\s+\S+\s+line\s+\d+\.?\s*\z//;
             $why =~ s/\s+\z//;
-            # A key record that is there but unusable (spec-06 §11.5:
+            # A key record that is there but unusable (-07 section 14.5:
             # several records, a syntax error, revoked, the wrong key type).
-            if ($why =~ /\APERMERROR:\s*(.*)\z/s) {
-                $self->{result}  = 'permerror';
-                $self->{details} = "DKIM2-Signature i=$i public key $sel $1";
-                return 0;
-            }
-            # A transient DNS failure is a TEMPERROR per spec-06 §10 --
-            # retryable, not a permanent "does not exist", and emphatically
-            # not a 'fail', which reads as a forged signature.
-            $self->{result}  = 'temperror';
-            $self->{details} = "DKIM2-Signature i=$i public key $sel could not be fetched ($why)";
-            return 0;
+            return $self->_error(permerror => "DKIM2-Signature i=$i public key $sel $1")
+                if $why =~ /\APERMERROR:\s*(.*)\z/s;
+            # A transient DNS failure is a TEMPERROR -- retryable, not a
+            # permanent "does not exist", and emphatically not a FAIL, which
+            # reads as a forged signature. The resolver's reason goes to
+            # diagnostic(), not into the -07 string.
+            $self->{diagnostic} = $why;
+            return $self->_error(temperror => "DKIM2-Signature i=$i public key $sel could not be fetched");
         }
 
         unless ($pubkey) {
@@ -869,25 +850,44 @@ sub _verify_signature {
             next;
         }
 
-        # §8.9: the key must be of the signature's algorithm. A
-        # PubkeyCallback hands back any key object, so check what it is.
-        unless ($pubkey->isa($IMPLEMENTED_ALG{$alg})) {
-            $self->{result}  = 'permerror';
-            $self->{details} = "DKIM2-Signature i=$i public key $sel algorithm mismatch";
-            return 0;
-        }
+        # The key must be of the signature's algorithm. A PubkeyCallback
+        # hands back any key object, so check what it is.
+        return $self->_error(permerror => "DKIM2-Signature i=$i public key $sel algorithm mismatch")
+            unless $pubkey->isa($IMPLEMENTED_ALG{$alg});
 
-        # §3.2: RSA keys MUST be at least 1024 bits; reject shorter keys
-        # (permerror) rather than trusting a weak signature.
+        # -07 section 3.2: RSA keys MUST be at least 1024 bits; a shorter key
+        # is a local PERMERROR rather than a weak signature trusted.
         if ($alg eq 'rsa-sha256') {
             my $bits = $pubkey->size * 8;
-            if ($bits < 1024) {
-                $self->{result}  = 'permerror';
-                $self->{details} = "DKIM2-Signature i=$i public key $sel is shorter than 1024 bits ($bits)";
-                return 0;
-            }
+            return $self->_error(permerror =>
+                "DKIM2-Signature i=$i public key $sel is shorter than 1024 bits ($bits)")
+                if $bits < 1024;
         }
 
+        push @keyed, [@$item, $pubkey];
+    }
+
+    # -07 section 14.5: "a DNS result that indicates the key is absent MUST
+    # be reported as a PERMERROR" -- when no item had a key to check.
+    return $self->_error(permerror => "DKIM2-Signature i=$i public key $first_absent does not exist")
+        unless @keyed;
+    $dk2_entry->{keyed} = \@keyed;
+    return 1;
+}
+
+# Section 14.6: every signature that can be checked is checked. All of them
+# failing is "selector <s1> incorrect signature"; some passing and some
+# failing is "signature <s1> signature <s2> failed" (s1 passed, s2 failed).
+# Both are FAIL.
+sub _check_sig_crypto {
+    my ($self, $i) = @_;
+    my $dk2_entry = $self->{_dk2_headers}{$i};
+    my $signature = $dk2_entry->{sig};
+    my $signing_input = $dk2_entry->{signing_input};
+    my (@passed, @failed);
+    for my $k (@{ $dk2_entry->{keyed} }) {
+        my ($idx, $alg, $sig_b64, $pubkey) = @$k;
+        my $sel = $signature->selector($idx) // '?';
         my $sig_raw = decode_base64($sig_b64);
         my $verified = eval {
             if ($alg eq 'ed25519-sha256') {
@@ -901,105 +901,98 @@ sub _verify_signature {
         };
         if ($@) {
             die $@ if ref $@;
-            $self->{result} = 'fail';
-            $self->{details} = "signature verification error for sig item $idx ($alg): $@";
-            return 0;
+            ($self->{diagnostic} = "$@") =~ s/\s+\z//;
+            $verified = 0;
         }
-        unless ($verified) {
-            # §11.6's wording, naming the selector.
-            $self->{result} = 'fail';
-            $self->{details} = "DKIM2-Signature i=$i $sel incorrect signature";
-            return 0;
-        }
-
-        $verified_any = 1;
+        push @{ $verified ? \@passed : \@failed }, $sel;
     }
 
-    # §11.5: "a DNS result that indicates the key is absent MUST be reported
-    # as a PERMERROR" -- when no item had a key to check.
-    unless ($verified_any) {
-        $self->{result} = 'permerror';
-        $self->{details} = "DKIM2-Signature i=$i public key $first_absent does not exist";
-        return 0;
+    if (@failed) {
+        return $self->_error(fail => "DKIM2-Signature i=$i signature $passed[0] signature $failed[0] failed")
+            if @passed;
+        return $self->_error(fail => "DKIM2-Signature i=$i selector $failed[0] incorrect signature");
     }
 
     return 1;
 }
 
+# Chain of Custody (-07 section 7.1 item 1, section 14.4). Every failure is
+# a PERMERROR. For each signature S, from i=1 up:
+#
+# - S against the one below it, P (from i=2): if P carries nd=, S's d= must
+#   be that domain (without regard to case), and nothing else is compared.
+#   Otherwise some rt= address of P must relaxed-match (section 7.2) --
+#   when S has nd= or a null mf=, S's d= (the rt= domain shortened);
+#   otherwise S's mf= domain (shortened) against the rt= domain.
+# - S's own mf= domain must relaxed-match its d=, unless the mf= is null or
+#   S has nd= (and so no mf=).
+#
+# Which of the two tests runs first only matters for which error is
+# reported when both fail; the link to P comes first.
 sub _verify_chain {
     my ($self) = @_;
     my %dk2_map = %{$self->{_dk2_headers}};
     my @dk2_is = sort { $a <=> $b } keys %dk2_map;
 
-    for my $idx (1..$#dk2_is) {
-        my $cur_i = $dk2_is[$idx];
-        my $prev_i = $dk2_is[$idx - 1];
-        my $cur_sig = $dk2_map{$cur_i}{sig};
-        my $prev_sig = $dk2_map{$prev_i}{sig};
+    my $has_nd = sub { my $nd = $_[0]->next_domain; defined $nd && length $nd };
+    for my $idx (0 .. $#dk2_is) {
+        my $i   = $dk2_is[$idx];
+        my $sig = $dk2_map{$i}{sig};
+        my $d   = $sig->domain // '';
+        my $mf  = $sig->mail_from;
+        my $null_mf = defined $mf && $mf =~ /\A<\s*>\z/;
 
-        # draft-06 §11.4: an nd= hop declares the domain that signs the next
-        # signature; nd= MUST exactly match that signature's d=.
-        my $prev_nd = $prev_sig->next_domain;
-        if (defined $prev_nd && length $prev_nd) {
-            my $cur_d = $cur_sig->domain // '';
-            unless (lc($prev_nd) eq lc($cur_d)) {
-                $self->{result} = 'fail';
-                $self->{details} = "DKIM2-Signature i=$prev_i MAIL nd= does not match";
-                return 0;
-            }
-            next;
-        }
-
-        my $prev_rt = $prev_sig->rcpt_to;
-        unless ($prev_rt) {
-            $self->{result} = 'fail';
-            $self->{details} = "DKIM2-Signature i=$prev_i RCPT TO <> did not match";
-            return 0;
-        }
-        my @prev_rts = ref($prev_rt) eq 'ARRAY' ? @$prev_rt : ($prev_rt);
-
-        # draft-06 §9.3: an nd= hop after a real one is a Forwarder bridging
-        # the gap between the domain it received the message at and the
-        # domain it sends from, and it has to be made with a key for a
-        # domain in the RCPT TO the message arrived with. So what has to
-        # match the previous rt= here is the hop's d=, since it has no mf=.
-        my $cur_nd = $cur_sig->next_domain;
-        if (defined $cur_nd && length $cur_nd) {
-            my $cur_d = $cur_sig->domain // '';
-            unless (grep { relaxed_domain_match($cur_d, extract_domain($_)) } @prev_rts) {
-                $self->{result} = 'fail';
-                $self->{details} = "DKIM2-Signature i=$cur_i nd= hop d=$cur_d did not match RCPT TO";
-                return 0;
-            }
-            next;
-        }
-
-        my $cur_mf = $cur_sig->mail_from;
-
-        # Chain of Custody: mf of N must relaxed-domain-match an rt of N-1
-        unless ($cur_mf) {
-            $self->{result} = 'fail';
-            $self->{details} = "DKIM2-Signature i=$cur_i MAIL FROM <> did not match";
-            return 0;
-        }
-
-        my $cur_mf_domain = extract_domain($cur_mf);
-        my $match = 0;
-        for my $rt (@prev_rts) {
-            my $rt_domain = extract_domain($rt);
-            if (relaxed_domain_match($cur_mf_domain, $rt_domain)) {
-                $match = 1;
-                last;
+        if ($idx > 0) {
+            my $p_i  = $dk2_is[$idx - 1];
+            my $prev = $dk2_map{$p_i}{sig};
+            if ($has_nd->($prev)) {
+                return $self->_error(permerror => "DKIM2-Signature i=$p_i nd= does not match")
+                    unless (to_alabel($prev->next_domain) =~ tr/A-Z/a-z/r) eq (to_alabel($d) =~ tr/A-Z/a-z/r);
+            } else {
+                my @rt = map { [domain_of($_)] } @{ $prev->rcpt_to || [] };
+                if ($has_nd->($sig) || $null_mf) {
+                    return $self->_error(permerror =>
+                        "DKIM2-Signature i=$i d= does not match the rt= of i=$p_i")
+                        unless grep { $_->[0] && !$_->[1] && relaxed_domain_match($_->[0], $d) } @rt;
+                } else {
+                    my ($mfd, $lit) = domain_of($mf);
+                    return $self->_error(permerror =>
+                        "DKIM2-Signature i=$i mf= does not match the rt= of i=$p_i")
+                        unless $mfd && !$lit
+                            && grep { $_->[0] && !$_->[1] && relaxed_domain_match($mfd, $_->[0]) } @rt;
+                }
             }
         }
-        unless ($match) {
-            $self->{result} = 'fail';
-            $self->{details} = "DKIM2-Signature i=$cur_i MAIL FROM $cur_mf did not match";
-            return 0;
+
+        if (defined $mf && !$null_mf && !$has_nd->($sig)) {
+            my ($mfd, $lit) = domain_of($mf);
+            return $self->_error(permerror => "DKIM2-Signature i=$i MAIL FROM and d= do not match")
+                unless $mfd && !$lit && relaxed_domain_match($mfd, $d);
         }
     }
 
     return 1;
+}
+
+# Record an outcome: result $state, details "STATE: $text" (-07 section
+# 14.1's form). Returns 0, for "return $self->_error(...)".
+sub _error {
+    my ($self, $state, $text) = @_;
+    $self->{result}  = $state;
+    $self->{details} = uc($state) . ": $text";
+    return 0;
+}
+
+# Record a reason that may already carry its state ("FAIL: ...", as
+# MessageInstance reports a hash mismatch): that state, else PERMERROR.
+# Returns 0.
+sub _outcome {
+    my ($self, $reason) = @_;
+    $reason //= 'unknown error';
+    if ($reason =~ /\A(PERMERROR|FAIL|TEMPERROR): (.*)\z/s) {
+        return $self->_error(lc $1 => $2);
+    }
+    return $self->_error(permerror => $reason);
 }
 
 # --- Public key lookup ---
@@ -1010,11 +1003,11 @@ sub _verify_chain {
 # was given). Returns a Crypt::PK object, or undef when the answer positively
 # says there is no such record. Anything else -- a timeout, SERVFAIL, REFUSED,
 # a network error, or an errorstring this code has never seen -- dies with a
-# TEMPERROR: spec-06 §10 makes a DNS failure retryable, never a permanent "no
+# TEMPERROR: -07 §13 makes a DNS failure retryable, never a permanent "no
 # verifiable signature items", and emphatically never a 'fail', which reads as
-# a forged signature. _verify_signature's eval maps the die to temperror.
+# a forged signature. _check_sig_keys's eval maps the die to temperror.
 # A record that is there but unusable dies with "PERMERROR: <why>" instead
-# (spec-06 §11.5): more than one TXT record, a record that does not validate
+# (-07 §14.5): more than one TXT record, a record that does not validate
 # (parse_dkim_key_record), revoked, or a key type that is not the signature
 # algorithm's -- mapped to permerror, with the selector.
 #
@@ -1036,7 +1029,7 @@ sub fetch_public_key {
         croak "TEMPERROR: DNS lookup for $fqdn failed: $err";
     }
     # One TXT RR may hold several strings, joined with nothing between;
-    # several RRs for one selector are an error (spec-06 §11.5).
+    # several RRs for one selector are an error (-07 §14.5).
     my @txt = map { join '', $_->txtdata } grep { $_->type eq 'TXT' } $reply->answer;
     return unless @txt;
     croak "PERMERROR: has multiple records\n" if @txt > 1;
@@ -1044,7 +1037,7 @@ sub fetch_public_key {
     $why = 'algorithm mismatch'
         if $why && $why eq 'has an unsupported key type';
     croak "PERMERROR: $why\n" if $why;
-    # §8.9: the key's type must be the signature's algorithm's.
+    # §10.9: the key's type must be the signature's algorithm's.
     my $alg = $signature->algorithm($idx) // '';
     croak "PERMERROR: algorithm mismatch\n"
         if $IMPLEMENTED_ALG{$alg} && !$key->isa($IMPLEMENTED_ALG{$alg});
@@ -1059,26 +1052,49 @@ sub _resolver {
     };
 }
 
+# Whether $resolver's background calls can be used for the prefetch. A
+# subclass of Net::DNS::Resolver that overrides send or query (its own
+# transport, caching, metrics -- FastMTA's and authentication_milter's do)
+# but not bgsend would have Net::DNS's bgsend bypass it, and that asks only
+# the first nameserver; such a resolver gets every lookup through query().
+# One that provides its own bgsend is trusted with it.
+sub _can_prefetch {
+    my ($resolver) = @_;
+    return 0 unless Scalar::Util::blessed($resolver);
+    my $bgsend = $resolver->can('bgsend') or return 0;
+    require Net::DNS::Resolver;
+    return 1 if $bgsend != (Net::DNS::Resolver->can('bgsend') // 0);
+    for my $method (qw(send query)) {
+        my $own = $resolver->can($method) // 0;
+        return 0 unless $own == (Net::DNS::Resolver->can($method) // -1);
+    }
+    return 1;
+}
+
 # Every key the signatures name, asked for at once, in the background, as
 # soon as the header fields are in: the answers come back while the body
-# arrives and is hashed. Only with a resolver that can (Net::DNS's bgsend),
-# and not when a PubkeyCallback fetches the keys. Never fatal: a key not
-# asked for here is asked for when it is wanted.
+# arrives and is hashed. Only with a resolver whose background calls are
+# safe to use (_can_prefetch), and not when a PubkeyCallback fetches the
+# keys. Never fatal: a key not asked for here is asked for when it is wanted.
 sub _prefetch_keys {
     my ($self) = @_;
     return if $self->{PubkeyCallback};
     my $resolver = $self->_resolver;
-    return unless $resolver->can('bgsend');
+    return unless _can_prefetch($resolver);
+    my $sent = 0;
     for my $entry (sort { $b->{sig}->sequence <=> $a->{sig}->sequence }
                    values %{$self->{_dk2_headers}}) {
+        last if $sent >= $PREFETCH_MAX;
         my $sig = $entry->{sig};
         eval {
             my $dom = $sig->domain or return;
             for my $idx (0 .. ($sig->sig_count || 0) - 1) {
+                return if $sent >= $PREFETCH_MAX;
                 next unless $IMPLEMENTED_ALG{$sig->algorithm($idx) // ''};
                 my $sel = $sig->selector($idx) or next;
                 my $fqdn = "$sel._domainkey.$dom";
                 next if $self->{_key_queries}{lc $fqdn};
+                $sent++;
                 my $handle = $resolver->bgsend($fqdn, 'TXT') or next;
                 $self->{_key_queries}{lc $fqdn} =
                     [$handle, Time::HiRes::time() + $PREFETCH_WAIT];
@@ -1097,11 +1113,15 @@ sub _key_reply {
     if (my $q = delete $self->{_key_queries}{lc $fqdn}) {
         my $ready = 1;
         while ($resolver->bgbusy($q->[0])) {    # may swap in a TCP handle
-            next if Time::HiRes::time() < $q->[1];
-            $ready = 0;
-            last;
+            my $left = $q->[1] - Time::HiRes::time();
+            if ($left <= 0) { $ready = 0; last }
+            # Sleep between polls: a resolver's bgbusy need not block.
+            my $poll = $PREFETCH_POLL > 0.001 ? $PREFETCH_POLL : 0.001;
+            Time::HiRes::sleep($left < $poll ? $left : $poll);
         }
-        if (my $packet = $ready && $resolver->bgread($q->[0])) {
+        # A truncated answer (Net::DNS's TCP retry failed) settles nothing.
+        my $packet = $ready && $resolver->bgread($q->[0]);
+        if ($packet && !$packet->header->tc) {
             my $rcode = $packet->header->rcode;
             return [$packet] if $packet->header->ancount;
             return [undef, $rcode] if $rcode eq 'NXDOMAIN' || $rcode eq 'NOERROR';
@@ -1160,6 +1180,74 @@ sub details {
     return $self->{details};
 }
 
+# provisionally_verified(): -07 section 13.1. After CLOSE, true when the
+# highest i= DKIM2-Signature is correct and the highest m= Message-Instance's
+# hashes match the message -- the initial assessment that lets a receiver
+# accept a message, and the only kind of message a DSN may be sent for
+# (section 16.1). A pass is; otherwise the top signature and the top
+# instance are checked on their own, whatever went wrong lower down. A top
+# signature with nd=, or one that does not cover the top instance, is not.
+# The verdict (result, details, diagnostic) is left as it was.
+sub provisionally_verified {
+    my ($self) = @_;
+    return $self->{_provisional} //= $self->_provisionally_verified ? 1 : 0;
+}
+
+sub _provisionally_verified {
+    my ($self) = @_;
+    return 1 if ($self->{result} // '') eq 'pass';
+    return 0 if $self->{_stopped} && !$self->{result};
+    my %dk2 = %{ $self->{_dk2_headers} || {} };
+    my %mi  = %{ $self->{_mi_headers}  || {} };
+    my ($max_i) = sort { $b <=> $a } keys %dk2;
+    my ($top_m) = sort { $b <=> $a } keys %mi;
+    return 0 unless $max_i && $top_m;
+    my $sig = $dk2{$max_i}{sig};
+    my $nd  = $sig->next_domain;
+    return 0 if defined $nd && length $nd;
+    return 0 unless ($sig->version // '') =~ /\A[0-9]+\z/ && $sig->version == $top_m;
+
+    local @{$self}{qw(result details diagnostic)};
+    my $sig_ok = eval {
+        $self->_check_sig_field($max_i) && $self->_check_sig_time($max_i)
+            && $self->_check_sig_keys($max_i) && $self->_check_sig_crypto($max_i);
+    };
+    die $@ if ref $@;
+    return 0 unless $sig_ok;
+
+    (my $value = $mi{$top_m}) =~ s/\A[^:]*:[ \t]*//;
+    my $obj = eval { Mail::DKIM2::MessageInstance->parse($value) };
+    die $@ if ref $@;
+    return 0 unless $obj;
+
+    my ($header_cb, $body_cb);
+    if (my $hplan = $self->{_header_plan}) {
+        $header_cb = sub { $hplan->header_hash($top_m, $_[0]) // '' };
+    } else {
+        my $msg = parse_mime(join('', @{$self->{headers}}) . "\r\n");
+        $header_cb = sub { Mail::DKIM2::MessageInstance::h_digest($msg, $_[0], $self->{IgnorePrefixes}) };
+    }
+    if ($self->{HeadersOnly}) {
+        $body_cb = undef;
+    } elsif (my $plan = $self->{_body_plan}) {
+        $plan->finish;
+        $body_cb = sub { $plan->body_hash($top_m, $_[0]) // '' };
+    } else {
+        my $body = $self->{_buf} // '';
+        $body_cb = sub { Mail::DKIM2::MessageInstance::body_digest_raw($body, $_[0]) };
+    }
+    my ($ok) = $obj->_check_hashes($top_m, $header_cb, $body_cb);
+    return $ok ? 1 : 0;
+}
+
+# More about the reason, for a log, where there is more: the resolver's
+# error behind a key that could not be fetched, the copy range behind a
+# Recipe that does not undo. Never part of the -07 string in details().
+sub diagnostic {
+    my $self = shift;
+    return $self->{diagnostic};
+}
+
 1;
 
 __END__
@@ -1194,7 +1282,7 @@ Mail::DKIM2::Verifier - Verify the DKIM2-Signature chain on a message
 Verifies every DKIM2-Signature on a message, not only the outermost: the
 chain must be complete (C<i=1> to C<i=N> with no gaps), each signature must
 verify over the headers that existed when it was made, consecutive hops must
-satisfy the chain-of-custody rules of spec-06 section 11.4, and the
+satisfy the chain-of-custody rules of -07 section 14.4, and the
 Message-Instance chain must undo cleanly back to the first instance, each
 one matching the content it describes. Past a null body Recipe (the previous
 body is gone) only the header history is checked. The outcome is a result and
@@ -1204,7 +1292,7 @@ Extends L<Mail::DKIM2::HeaderParser>, which provides C<PRINT>, C<CLOSE>,
 C<load> and the tie interface. A message with no DKIM2-Signature is decided
 from its headers alone and its body is not kept.
 
-This module implements draft-ietf-dkim-dkim2-spec-06; see L<Mail::DKIM2/STATUS>
+This module implements draft-ietf-dkim-dkim2-spec-07; see L<Mail::DKIM2/STATUS>
 for what that means for the wire format and the API, and
 L<Mail::DKIM2/CONVENTIONS> for the option, input and error conventions every
 module here follows.
@@ -1230,9 +1318,19 @@ the signatures name is asked for at once, in the background, as soon as
 the header fields are in, and the answers are read when the signatures
 are checked: the lookups overlap each other, the body's arrival and the
 hashing. An answer that settles nothing -- none within
-C<$Mail::DKIM2::Verifier::PREFETCH_WAIT> seconds (5) of being sent, or
-SERVFAIL -- is asked again with C<query>, so the verdicts are those of
-one C<query> at a time. Not with a C<PubkeyCallback>.
+C<$Mail::DKIM2::Verifier::PREFETCH_WAIT> seconds (1) of being sent, or
+SERVFAIL, or truncated -- is asked again with C<query>, so the verdicts
+are those of one C<query> at a time. At most
+C<$Mail::DKIM2::Verifier::PREFETCH_MAX> keys (8) are prefetched per
+message, the top signature's first; any other key is asked for with
+C<query> when it is needed. Not with a C<PubkeyCallback>.
+
+A subclass of L<Net::DNS::Resolver> that overrides C<send> (its own
+transport, caching or metrics) but not C<bgsend> gets no prefetch:
+Net::DNS's C<bgsend> would bypass that C<send>, and asks only the first
+nameserver. Every key is then asked for with C<query>, and so through the
+subclass's C<send>. A resolver that provides its own C<bgsend> is used for
+the prefetch.
 
 =item PubkeyCallback
 
@@ -1256,7 +1354,7 @@ arrayref croaks. See L<Mail::DKIM2/Operator-local header fields>.
 =item AllowUnsignedMI
 
 Permit a Message-Instance with a higher C<m=> than any signature covers,
-which spec-06 section 11 otherwise makes a permerror. For an outbound path
+which -07 section 14.2 otherwise makes a permerror ("is not signed"). For an outbound path
 that verifies the message it is about to sign, where the new instance
 legitimately exists before its signature does. Never set it on inbound
 mail.
@@ -1265,7 +1363,8 @@ mail.
 
 An outbound signer's own C<d=>. A top signature carrying C<nd=> is then
 accepted when C<nd=> equals it (case-insensitive), and refused with
-"not signing: top signature nd=X names another domain" otherwise. Unset, a
+"PERMERROR: not signing: top signature nd=X names another domain"
+otherwise. Unset, a
 top C<nd=> is the usual permerror.
 
 =item MidProcess
@@ -1287,7 +1386,7 @@ the same.
 =item HeadersOnly
 
 The message has no body, as with the returned original in a DSN's
-C<text/rfc822-headers> part (spec-06 section 12.1.2). Signatures and the
+C<text/rfc822-headers> part (-07 section 16.3). Signatures and the
 chain are checked as usual; of the Message-Instance content check, only
 the top instance's header hash can be, so only that is.
 
@@ -1303,31 +1402,33 @@ Feed the message; see L<Mail::DKIM2::HeaderParser>.
 
 =head2 result()
 
-One of:
+One of the -07 section 14.1 states, in lower case:
 
 =over 4
 
 =item C<pass>
 
-Every signature verified, the chain is complete and consistent, and the
-Message-Instance chain undoes cleanly.
+Every signature verified, the chain is complete and consistent, the
+Message-Instance chain undoes cleanly, and every From is Authentic.
 
 =item C<fail>
 
-A signature did not verify, the chain has a gap or a chain-of-custody
-mismatch, a Message-Instance does not match the content, or a Recipe did
-not undo.
+A hash or signature was not correct: a signature did not verify, or a
+Message-Instance does not match the content it describes.
 
 =item C<none>
 
-No DKIM2-Signature headers.
+No DKIM2-Signature header fields (and no Message-Instance either: a
+Message-Instance with no signature is "is not signed", a C<permerror>).
 
 =item C<permerror>
 
-The message is malformed in a way no retry will fix: too many fields, a
-repeated number, a duplicate tag, an unsigned Message-Instance, a
-required tag missing, a Message-Instance whose hash sets do not parse, a
-key too short.
+The message is malformed or not Validly Signed in a way no retry will fix:
+a missing or malformed field or tag, a gap in the chain, a broken Chain of
+Custody, a timestamp too old or too far ahead, an unusable or absent key, a
+Recipe that is not valid JSON or does not undo, a From that is not
+Authentic, and the local limits (too many fields, a repeated number, a key
+too short, no algorithm this verifier implements).
 
 =item C<temperror>
 
@@ -1339,10 +1440,33 @@ Before C<CLOSE> this is C<none>.
 
 =head2 details()
 
-The reason, with no result word wrapped around it, e.g. C<"i=1..3
-verified"> or C<"missing DKIM2-Signature i=2">; undef when there is none.
-Use this when embedding the reason in something that already states the
-result, such as an Authentication-Results comment.
+The reason, with no result word wrapped around it; undef when there is
+none. For any result but C<pass> and C<none> it is the -07 human-readable
+string, state included, e.g. C<"PERMERROR: DKIM2-Signature i=2 d= does not
+match the rt= of i=1"> or C<"FAIL: Message-Instance m=1 body hash sha256
+mismatch"> (sections 14.2 to 14.8). A check -07 has no string for keeps
+its own words, with the C<PERMERROR: > prefix. For C<pass> it is
+C<"i=1..N verified">, and for C<none> C<"no DKIM2-Signature headers
+found">. Use this when embedding the reason in something that already
+states the result, such as an Authentication-Results comment.
+
+=head2 diagnostic()
+
+More about the reason, for a log, when there is more; undef otherwise:
+the resolver's error behind C<TEMPERROR: ... could not be fetched>, the
+copy range behind a Recipe that does not undo. Never part of C<details>.
+New in 0.23 (0.22 appended the resolver's error to the key-fetch reason).
+
+=head2 provisionally_verified()
+
+After C<CLOSE>: true when the message is Provisionally Verified (-07
+section 13.1) -- the highest C<i=> DKIM2-Signature is correct and the
+highest C<m=> Message-Instance matches the message -- whatever else went
+wrong. A receiver may accept such a message and decide later; a DSN may
+only be sent for one (section 16.1, L<Mail::DKIM2::DSN>). A C<pass> is
+always Provisionally Verified; a top signature with C<nd=>, or one that does
+not cover the top instance, never is. Leaves C<result>, C<details> and
+C<diagnostic> as they were. New in 0.23.
 
 =head2 result_detail()
 
@@ -1367,13 +1491,13 @@ C<Resolver>). Each name is looked up once per message. Returns a key
 object, undef when the answer positively says there is no such record
 (NXDOMAIN, NOERROR or NODATA), and dies with a C<TEMPERROR:> message for
 anything else, including a resolver error string it has never seen. The
-verifier maps that die to C<temperror>: spec-06 section 10 makes a DNS
+verifier maps that die to C<temperror>: -07 section 13 makes a DNS
 failure retryable, never a C<fail>, which would read as a forged
 signature.
 
 A record that is present but unusable dies with C<PERMERROR: E<lt>whyE<gt>>,
-which the verifier reports as C<permerror> naming the selector (spec-06
-section 11.5): C<has multiple records> (more than one TXT RR; several
+which the verifier reports as C<permerror> naming the selector (-07
+section 14.5): C<has multiple records> (more than one TXT RR; several
 strings in one RR are joined), C<has a syntax error> and C<has been
 revoked> (see L<Mail::DKIM2::Common/parse_dkim_key_record>), or
 C<algorithm mismatch> (a C<k=> that is not the signature algorithm's).
@@ -1390,46 +1514,52 @@ Get or set the constructor options of the same names.
 
 B<Shape.> At most 32 Message-Instance and 32 DKIM2-Signature fields, every
 DKIM2-Signature parses with an C<i=> that is a positive integer (one that
-does not is never skipped: "PERMERROR DKIM2-Signature has a missing or
+does not is never skipped: "PERMERROR: DKIM2-Signature has a missing or
 malformed i= tag"), every C<i=> and C<m=> a chain number (1*DIGIT, at
 most three digits naming 1 to 100, and no more than 32; C<01> is 1), no
 C<i=> or C<m=> twice, and no Message-Instance above
 the highest signed C<m=>. Any of these is a C<permerror> decided from the headers alone,
-before any key is fetched. A tag repeated within one signature is a
-C<permerror> found when that signature is checked.
+before any key is fetched. A tag repeated within one signature, in any
+case, is a syntax error found when that signature is checked.
 
 =item 2.
 
 B<Chain completeness.> C<i=1> to C<i=N> with no gaps; likewise C<m=1> to
-the highest instance.
+the highest instance, or the highest a signature covers.
 
 =item 3.
 
-B<Each signature.> The signing input for C<i=K> is the canonicalized
+B<Each signature.> Its tags (C<i=>, C<m=>, C<t=>, C<d=>, C<s=>, and either
+C<nd=> or both C<mf=> and C<rt=>), its timestamp (no more than 14 days
+before now, no more than a day after), then its signature: the signing input for C<i=K> is the canonicalized
 Message-Instance headers up to the C<m=> it names, the DKIM2-Signature
 headers below it, and itself with an empty C<s=> value, in that order
-(spec-06 section 8.5). Every item in C<s=> whose algorithm is known and
-whose key can be fetched must verify; an item whose key is absent is
+(-07 section 12.8). Every item in C<s=> whose algorithm is known and
+whose key can be fetched is checked and must verify; an item whose key is absent is
 skipped if another item verifies.
 
 =item 4.
 
-B<Chain of custody.> For consecutive hops, the C<mf=> domain of C<i=K>
-must be the same as or below a C<rt=> domain of C<i=K-1>; an C<nd=> hop
-instead names the C<d=> of the hop that follows (spec-06 sections 9.3 and
-11.4).
+B<Chain of custody> (-07 section 7.1). After an C<nd=> hop, the next
+C<d=> must be the C<nd=> domain. Otherwise an C<nd=> hop, or one with a
+null C<mf=>, must have its C<d=> the same as or above a C<rt=> domain of
+the hop before; any other hop its C<mf=> domain the same as or below one.
+Every non-null C<mf=> must be the same as or below its own C<d=>. Domains
+are compared as A-labels; a domain literal never matches.
 
 =item 5.
-
-B<Flags.> A hop that changed the message after a C<donotmodify>, or
-exploded it after a C<donotexplode>, is a C<fail>.
-
-=item 6.
 
 B<Content.> The top Message-Instance must match the message; its Recipe
 is applied and the next instance down checked against the result, back to
 C<m=1>; past an instance with a null body Recipe the walk continues over the
 header history only.
+
+=item 6.
+
+B<From> (-07 section 11). The From at C<m=1> must be Authentic for
+C<i=1>, and a From changed at C<m=k> for the lowest C<i=> whose C<m=> is
+C<k> or more: one From field, one mailbox, its domain the same as or below
+C<d=>.
 
 =back
 

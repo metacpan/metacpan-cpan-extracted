@@ -7,10 +7,12 @@ use Test2::V0;
 use FindBin;
 use lib "$FindBin::Bin/lib";
 
-use Clay::XS qw(sizing_fixed CLAY_TOP_TO_BOTTOM);
+use Clay::XS qw(sizing_fixed sizing_grow CLAY_ALIGN_X_RIGHT CLAY_TOP_TO_BOTTOM);
 use InputTest;
 use Term::Fabulous::Termbox qw(TB_KEY_MOUSE_RELEASE TB_KEY_MOUSE_WHEEL_DOWN);
+use Term::Fabulous;
 use Term::Fabulous::Layout;
+use Term::Fabulous::Terminal::Memory;
 use Term::Fabulous::Static;
 use Term::Fabulous::Widget::Box;
 use Term::Fabulous::Widget::Dropdown;
@@ -66,6 +68,20 @@ subtest 'keys while closed' => sub {
 	is $dropdown->value, 'Cyan', 'typing selects by the start of the label';
 	press( $dropdown, 'Escape' );
 	ok !$dropdown->is_open, 'Escape does not open';
+};
+
+subtest 'typing searches on the clock of the UI' => sub {
+	my $now      = 1000;
+	my $dropdown = Term::Fabulous::Widget::Dropdown->new( options => [qw(Black Blue Brown Red)], value => 'Red' );
+	my $ui       = layout_ui( $dropdown, { clock => sub { $now } } );
+	press( $dropdown, 'b' );
+	is $dropdown->value, 'Black', 'a letter finds the next label that starts with it';
+	$now += 0.5;
+	press( $dropdown, 'r' );
+	is $dropdown->value, 'Brown', 'letters typed within a second search together';
+	$now += 1.5;
+	press( $dropdown, 'r' );
+	is $dropdown->value, 'Red', 'a letter typed later starts a new search';
 };
 
 subtest 'the open list' => sub {
@@ -160,6 +176,50 @@ subtest 'the list opens upwards without room below' => sub {
 	my @lines = $ui->render_lines( colors => 0 );
 	is $lines[0], "\x{256D}" . ( "\x{2500}" x 9 ) . "\x{256E}", 'the list ends above the dropdown';
 	is $lines[8], ( ' ' x 8 ) . "\x{25B4}", 'the arrow points up';
+};
+
+subtest 'an open list turns round when the terminal shrinks' => sub {
+	my $root     = Term::Fabulous::Widget::Box->new( layout => { layout_direction => CLAY_TOP_TO_BOTTOM, padding => { top => 10 } } );
+	my $dropdown = Term::Fabulous::Widget::Dropdown->new( options => [@COLORS] );
+	$root->add_child($dropdown);
+	my $terminal = Term::Fabulous::Terminal::Memory->new( width => 20, height => 20 );
+	my $ui       = Term::Fabulous->new( root => $root, width => 20, height => 20, terminal => $terminal );
+	$ui->step;
+	$dropdown->open;
+	$ui->step;
+	my ($list) = @{ $dropdown->children };
+	is $ui->bounding_box($list)->{y}, 11, 'the list of 8 rows opens below the dropdown at row 10';
+	$terminal->resize( 20, 15 );
+	$ui->step;
+	is $ui->bounding_box($list)->{y}, 2, 'with 4 rows left below it, it turns to the room above';
+	like( ( $terminal->lines )[10], qr/\x{25B4}/, 'and the arrow turns with it' );
+};
+
+subtest 'a list wider than the room on its right moves left' => sub {
+	my $dropdown = Term::Fabulous::Widget::Dropdown->new( options => [ 'A rather long option label here', 'Short' ], layout => { sizing => { width => sizing_fixed(6) } } );
+	my $row      = Term::Fabulous::Widget::Box->new( layout => { sizing => { width => sizing_grow() }, child_alignment => { x => CLAY_ALIGN_X_RIGHT } } );
+	$row->add_child($dropdown);
+	my $ui = layout_ui($row);
+	is $ui->bounding_box($dropdown)->{x}, 34, 'the dropdown is at the right edge of the 40 columns';
+	press( $dropdown, 'Enter' );
+	$ui->step;
+	my ($list) = @{ $dropdown->children };
+	my $box = $ui->bounding_box($list);
+	is [ @{$box}{qw(x y width)} ], [ 5, 1, 35 ], 'its list of 35 columns ends at the right edge of the screen, below the dropdown';
+	like( ( $ui->terminal->lines )[2], qr/ A rather long option label here +\x{2502}\z/, 'and shows the whole label' );
+};
+
+subtest 'a list wider than the screen is as wide as the screen' => sub {
+	my $dropdown = Term::Fabulous::Widget::Dropdown->new(
+		options => [ 'An option label that is much wider than the forty columns of the screen', 'Short' ],
+		layout  => { sizing => { width => sizing_fixed(6) } }
+	);
+	my $ui = layout_ui($dropdown);
+	press( $dropdown, 'Enter' );
+	$ui->step;
+	my ($list) = @{ $dropdown->children };
+	is [ @{ $ui->bounding_box($list) }{qw(x width)} ], [ 0, 40 ], 'the list starts at the left edge and ends at the right one';
+	like( ( $ui->terminal->lines )[2], qr/\A\x{2502} An option label that is much wider \x{2026} \x{2502}\z/, 'and cuts its label with an ellipsis before the frame' );
 };
 
 subtest 'required means a selection' => sub {

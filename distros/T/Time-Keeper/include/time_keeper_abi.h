@@ -91,7 +91,7 @@
 #include <stdint.h>
 #include <stddef.h>
 
-#define TIME_KEEPER_ABI_VERSION 2
+#define TIME_KEEPER_ABI_VERSION 3
 
 #define TIME_KEEPER_ABI_OK(t) ((t) && (t)->abi_version >= TIME_KEEPER_ABI_VERSION)
 
@@ -151,6 +151,63 @@ typedef struct time_keeper_calfields {
     int32_t offset;                     /* seconds east of UTC */
     int     is_dst;
 } time_keeper_calfields;
+
+/* ---- version 3: arithmetic, CLDR parsing, durations, dates, zone changes -
+ *
+ * A point is a value as the methods hold one: an instant, its zone, its
+ * locale and the calendar it is read in. The arithmetic entries read one and
+ * write another with the same zone, locale and calendar.
+ *
+ * Each version 3 entry that can fail writes the reason it failed, as the
+ * method of that name would croak it but without the method's name in front,
+ * into err (errlen bytes, NUL-terminated, cut short if longer); err may be
+ * NULL. */
+typedef struct time_keeper_point {
+    time_keeper_instant inst;
+    time_keeper_zone    zone;
+    int                 locale;
+    int                 calendar;
+} time_keeper_point;
+
+/* A duration's parts by the names Duration->new takes. years count twelve
+ * months, weeks seven days and hours sixty minutes, except that plus in a
+ * calendar other than the Gregorian adds years first by month code, as the
+ * method does. end_of_month is one of the TIME_KEEPER_EOM_ values. */
+typedef struct time_keeper_parts {
+    int64_t years, months, weeks, days, hours, minutes, seconds, nanoseconds;
+    int     end_of_month;
+} time_keeper_parts;
+
+#define TIME_KEEPER_EOM_DEFAULT  0   /* wrap, or preserve when the months are negative */
+#define TIME_KEEPER_EOM_WRAP     1
+#define TIME_KEEPER_EOM_LIMIT    2
+#define TIME_KEEPER_EOM_PRESERVE 3
+
+/* Units for truncate and end_of. */
+#define TIME_KEEPER_UNIT_YEAR        0
+#define TIME_KEEPER_UNIT_QUARTER     1
+#define TIME_KEEPER_UNIT_MONTH       2
+#define TIME_KEEPER_UNIT_WEEK        3
+#define TIME_KEEPER_UNIT_DAY         4
+#define TIME_KEEPER_UNIT_HOUR        5
+#define TIME_KEEPER_UNIT_MINUTE      6
+#define TIME_KEEPER_UNIT_SECOND      7
+#define TIME_KEEPER_UNIT_MILLISECOND 8
+#define TIME_KEEPER_UNIT_MICROSECOND 9
+#define TIME_KEEPER_UNIT_NANOSECOND  10
+
+/* week_start: 1 Monday to 7 Sunday, or the point's locale's first day. */
+#define TIME_KEEPER_WEEK_LOCALE 0
+
+/* What parse_cldr makes: a value, a time of day (Time::Keeper::Time) or a
+ * date (Time::Keeper::Date). date_from_sv and new_date_sv take a date, a
+ * year and month (Time::Keeper::YearMonth) or a month and day
+ * (Time::Keeper::MonthDay). */
+#define TIME_KEEPER_KIND_VALUE      0
+#define TIME_KEEPER_KIND_DATE       1
+#define TIME_KEEPER_KIND_TIME       2
+#define TIME_KEEPER_KIND_YEAR_MONTH 3
+#define TIME_KEEPER_KIND_MONTH_DAY  4
 
 typedef struct time_keeper_abi {
     int abi_version;
@@ -234,6 +291,63 @@ typedef struct time_keeper_abi {
      * calendar a value is read in (0 for one version 1 made). */
     SV *   (*new_sv_cal)(pTHX_ const time_keeper_instant *in, const time_keeper_zone *zone, int locale, int calendar);
     int    (*from_sv_cal)(pTHX_ SV *sv, time_keeper_instant *out, time_keeper_zone *zone, int *locale, int *calendar);
+
+    /* ---- version 3 ---- */
+    /* plus with a duration's parts; gap and overlap as from_civil. */
+    int    (*plus)(pTHX_ const time_keeper_point *in, const time_keeper_parts *parts, int gap, int overlap,
+                   time_keeper_point *out, char *err, size_t errlen);
+    /* truncate and end_of to a TIME_KEEPER_UNIT_, weeks from week_start. */
+    int    (*truncate)(pTHX_ const time_keeper_point *in, int unit, int week_start, time_keeper_point *out,
+                       char *err, size_t errlen);
+    int    (*end_of)(pTHX_ const time_keeper_point *in, int unit, int week_start, time_keeper_point *out,
+                     char *err, size_t errlen);
+    /* next (direction 1) and previous (-1) day of the week dow, 1 Monday
+     * to 7 Sunday, the point's own day counting when or_same. */
+    int    (*adjust_dow)(pTHX_ const time_keeper_point *in, int dow, int direction, int or_same, int gap,
+                         int overlap, time_keeper_point *out, char *err, size_t errlen);
+    /* nth_in_month, n 1 to 5, or -1 for last_in_month. */
+    int    (*nth_in_month)(pTHX_ const time_keeper_point *in, int dow, int n, int gap, int overlap,
+                           time_keeper_point *out, char *err, size_t errlen);
+    /* with(hour => ..., minute => ..., second => ..., nanosecond => ...). */
+    int    (*with_time)(pTHX_ const time_keeper_point *in, int hour, int minute, int second, int32_t nanosecond,
+                        int gap, int overlap, time_keeper_point *out, char *err, size_t errlen);
+    /* parse_cldr: UTF-8 text against a CLDR pattern in a locale (and, for a
+     * value, a calendar), digits of any script read. kind is a
+     * TIME_KEEPER_KIND_. A value is found in zone (NULL is UTC) unless the
+     * text names its own; out takes it. A date or a time of day is floating,
+     * and clock takes its fields, as it does for a value. TIME_KEEPER_PARSE
+     * when the text does not match, TIME_KEEPER_BAD when it matches and is
+     * not a date, with the method's reason ("2026-10-15 was a Thursday"). */
+    int    (*parse_cldr)(pTHX_ const char *text, size_t len, const char *pattern, size_t plen, int kind,
+                         const time_keeper_zone *zone, int locale, int calendar, int gap, int overlap,
+                         time_keeper_point *out, time_keeper_civil *clock, char *err, size_t errlen);
+    /* A Time::Keeper::Duration with a reference count of one, which the
+     * caller owns; NULL when a part is out of range. */
+    SV *   (*new_duration_sv)(pTHX_ const time_keeper_parts *parts);
+    /* A duration's parts as it holds them (months, days, minutes, seconds,
+     * nanoseconds; the rest 0) and its end_of_month. */
+    int    (*duration_from_sv)(pTHX_ SV *sv, time_keeper_parts *out);
+    /* The canonical code of a locale's id, "en-GB". */
+    int    (*locale_code)(int locale, const char **out);
+    /* A date's kind, its day as epoch_days (0 is 1970-01-01), and its
+     * locale: the first of the month for a year and month, the day in 1972
+     * for a month and day. TIME_KEEPER_BAD for anything else, a time of day
+     * too. Any pointer but sv may be NULL. */
+    int    (*date_from_sv)(pTHX_ SV *sv, int *kind, int64_t *epoch_days, int *locale);
+    /* A date of the kind on that day, with a reference count of one, which
+     * the caller owns, blessed into stash (NULL is the kind's own class); a
+     * year and month keeps the month, a month and day the month and day.
+     * NULL if an argument is out of range. */
+    SV *   (*new_date_sv)(pTHX_ int kind, int64_t epoch_days, int locale, HV *stash);
+    /* The first and last days of a locale's weekend, 1 Monday to 7 Sunday,
+     * as Time::Keeper::Locale->weekend_start and weekend_end. */
+    int    (*locale_weekend)(pTHX_ int locale, int *start, int *end, char *err, size_t errlen);
+    /* The zone's next change of offset, DST flag or abbreviation after in,
+     * as next_transition finds it, and the offsets either side of it (either
+     * may be NULL). TIME_KEEPER_RANGE when there is none: UTC, a fixed
+     * offset and floating time never change. */
+    int    (*next_change)(pTHX_ const time_keeper_instant *in, const time_keeper_zone *zone,
+                          time_keeper_instant *at, int32_t *before, int32_t *after);
 } time_keeper_abi;
 
 #endif

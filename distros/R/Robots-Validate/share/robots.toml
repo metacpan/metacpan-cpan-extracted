@@ -108,6 +108,26 @@ network=[
   "202.94.84.112/31",
 ]
 
+[alphalens-bot]
+## Date: 2026-10-19
+## About: https://alphalensbot.com/
+## Network: https://alphalensbot.com/public-ips.json
+## Query: .
+
+agents="alphalens-bot"
+network=[
+  "151.240.201.100",
+  "23.27.32.98",
+  "69.91.184.29"
+]
+
+[alpostbot]
+## Date: 2026-10-19
+## About: https://alpost.ch/en/bot/
+agents="AlpostBot"
+domain=".alpost.ch"
+network=[ "46.105.236.247" ]
+
 [amazonbot]
 ## Date: 2026-08-22
 ## About: https://developer.amazon.com/support/amazonbot
@@ -2262,6 +2282,12 @@ agents="Arquivo-web-crawler"
 domain=".archivo.pt"
 network="194.210.235.0/24"
 
+[askrobots]
+## Date: 2026-10-16
+## About: https://search.askrobots.com/bot
+agents="AskRobotsBot"
+network="162.224.53.162"
+
 [awario]
 ## About: https://awario.com/bots.html
 
@@ -2280,15 +2306,13 @@ agents="Baiduspider"
 domain=".crawl.baidu.com"
 
 [banquisebot]
-## Date: 2026-09-20
+## Date: 2026-10-19
 ## About: https://www.banquise.ca/bot
 
 agents="BanquiseBot"
 network=[
-  "2602:f417:1::20",
-  "23.153.132.25",
-  "2602:f417:21::20",
-  "23.153.132.79",
+  "2602:f417:30:2::135",
+  "23.153.132.71"
 ]
 
 [barkrowler]
@@ -2798,12 +2822,31 @@ network=[
 ]
 
 [cotoyogi]
+## Date: 2026-10-19
 ## About: https://ds.rois.ac.jp/en_center8/en_crawler/
 
 agents="Cotoyogi"
 network=[
   "157.1.136.4/30",
   "157.1.136.8/30",
+]
+
+[criteobot]
+## Date: 2026-10-19
+## About: https://www.criteo.com/criteo-crawler/
+agents="CriteoBot"
+network=[
+  "178.250.0.0/21",
+  "185.235.84.0/22",
+  "91.212.98.0/24",
+  "91.199.242.0/24",
+  "2a02:2638::/32",
+  "74.119.116.0/22",
+  "199.204.168.0/22",
+  "2620:100:a000::/44",
+  "116.213.20.0/22",
+  "182.161.72.0/22",
+  "2406:2600::/32"
 ]
 
 [crawlengine]
@@ -6212,22 +6255,23 @@ agents="GreenFaceLabsCensus"
 network=["45.76.84.221"]
 
 [harambis]
-## Date: 2026-10-13
+## Date: 2026-10-15
 ## About: https://harambis.com/bot
 ## Network: https://harambis.com/bot/ips.txt
-agents="harambis"
+agents="HarambisBot"
 network=[
-  "104.237.134.224/32",
-  "139.162.121.234/32",
-  "139.162.54.193/32",
-  "172.104.151.116/32",
-  "172.233.21.89/32",
-  "172.236.125.5/32",
-  "172.237.100.40/32",
-  "192.81.129.118/32",
-  "194.195.126.109/32",
-  "45.33.84.221/32"
+  "172.104.234.148/32",
+  "172.238.171.79/32",
+  "97.107.142.130/32"
 ]
+
+[harkbot]
+## Date: 2026-10-19
+## About: https://app.hark.com/about/bot
+## Network: https://hark.com/agent/ipranges/harkbot.json
+
+agents="HarkBot"
+network=["161.114.88.0/22"]
 
 [headline]
 agents="ev-crawler"
@@ -6515,7 +6559,24 @@ network=[
   "35.202.5.108/32",
 ]
 
+[linerbot]
+## Date: 2026-10-19
+## About: https://docs.getliner.com/docs/linerbot
+## Network: https://docs.getliner.com/linerbot.json
 
+agents="LinerBot"
+network=[
+  "35.226.131.201/32",
+  "34.29.249.74/32",
+  "35.224.198.28/32",
+  "34.121.11.68/32",
+  "34.29.23.49/32",
+  "34.134.213.56/32",
+  "34.171.199.186/32",
+  "34.16.62.88/32",
+  "34.66.1.86/32",
+  "34.29.166.174/32",
+]
 
 [linkedin]
 agents="LinkedInBot"
@@ -6553,7 +6614,7 @@ network=[
 ]
 
 [loaded]
-## Date: 2026-09-25
+## Date: 2026-10-19
 ## About: https://www.loaded.ai/bot
 ## Network: https://www.loaded.ai/bot/ips.json
 
@@ -6638,6 +6699,12 @@ network=[
   "193.183.0.172/31",
   "193.183.0.174/32",
 ]
+
+[mecildi]
+## Date: 2026-10-19
+## About: https://www.obdilci.org/projects/mecildi/detector/
+agents="MecildiLanguageDetector"
+network=[ "23.239.12.119", "209.42.24.4" ]
 
 [medllybot]
 ## Date: 2026-09-25
@@ -6733,6 +6800,19 @@ network=[
   "35.226.117.128",
   "130.211.65.55",
   "35.189.0.46",
+]
+
+[netapi]
+## Date: 2026-10-18
+## About: https://netapi.com/bot.html
+## Network: https://netapi.com/bot-ips.json
+agents="NetAPI"
+domain=".bot.netapi.com"
+network=[
+  "136.243.61.201/32",
+  "162.55.129.246/32",
+  "162.55.132.97/32",
+  "188.40.66.190/32"
 ]
 
 [notherebot]
@@ -7916,6 +7996,93 @@ network=[
   "2a01:4f8:171:1550::2",
 ]
 
+[serpstatbot]
+## Date: 2026-10-15
+## About: https://serpstatbot.com/
+## Network: https://serpstatbot.com/serpstatbot-ip.txt
+agents="serpstatbot"
+network=[
+  "136.243.144.81",
+  "136.243.145.46",
+  "136.243.153.17",
+  "136.243.155.105",
+  "136.243.176.156",
+  "136.243.212.110",
+  "136.243.212.93",
+  "136.243.214.34",
+  "138.199.229.125",
+  "138.201.194.13",
+  "138.201.203.132",
+  "138.201.36.87",
+  "144.76.13.100",
+  "144.76.151.42",
+  "144.76.151.45",
+  "144.76.61.84",
+  "144.76.67.108",
+  "144.76.67.110",
+  "144.76.67.169",
+  "144.76.67.25",
+  "144.76.67.250",
+  "144.76.68.124",
+  "144.76.68.14",
+  "144.76.68.17",
+  "144.76.68.20",
+  "144.76.68.70",
+  "144.76.68.76",
+  "144.76.68.88",
+  "144.76.69.39",
+  "144.76.72.24",
+  "144.76.72.99",
+  "144.76.73.122",
+  "144.76.88.54",
+  "144.76.98.154",
+  "148.251.11.147",
+  "148.251.168.205",
+  "148.251.241.12",
+  "159.69.87.104",
+  "159.69.87.105",
+  "159.69.87.109",
+  "159.69.87.121",
+  "159.69.87.155",
+  "159.69.87.165",
+  "159.69.87.166",
+  "159.69.87.192",
+  "159.69.87.206",
+  "159.69.87.233",
+  "159.69.87.26",
+  "159.69.87.61",
+  "159.69.87.7",
+  "159.69.87.78",
+  "159.69.87.79",
+  "159.69.87.80",
+  "159.69.87.90",
+  "162.55.54.91",
+  "168.119.237.219",
+  "176.9.17.6",
+  "176.9.18.183",
+  "188.245.168.21",
+  "188.245.233.162",
+  "188.34.166.212",
+  "195.201.12.243",
+  "195.201.174.92",
+  "195.201.235.74",
+  "23.88.116.199",
+  "49.13.192.12",
+  "49.13.90.11",
+  "5.9.110.227",
+  "5.9.55.228",
+  "88.99.149.173",
+  "88.99.164.109",
+  "88.99.193.224",
+  "88.99.215.210",
+  "88.99.244.56",
+  "88.99.250.124",
+  "88.99.95.199",
+  "94.130.10.218",
+  "94.130.23.168",
+  "94.130.237.182",
+]
+
 [seznambot]
 ## Date: 2026-09-25
 ## About: https://o-seznam.cz/napoveda/vyhledavani/en/seznambot-crawler/
@@ -8157,13 +8324,14 @@ network=[
 ]
 
 [turnitin]
-## Date: 2026-08-14
+## Date: 2026-10-17
 ## About: https://www.turnitin.com/robot/crawlerinfo.html
+## Note: The IPs all resolve to crawler.turnitin.com but that hostname does not resolve.
 
 agents="Turnitin"
 network=[
-  "199.47.80.0/24",
-  "199.47.82.16/28",
+  "199.47.87.132/30",
+  "199.47.82.0/28"
 ]
 
 [webxtrendbot]

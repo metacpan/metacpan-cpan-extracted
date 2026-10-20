@@ -5,13 +5,14 @@ use warnings;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 use Object::Pad 0.825;
 
 use Clay::UI::Events::Event;
 
 class Term::Fabulous::Event::Mouse :isa(Clay::UI::Events::Event) :strict(params) {
+	use Term::Fabulous::Check qw(positive_integer);
 	use Term::Fabulous::Termbox qw(TB_KEY_MOUSE_LEFT TB_KEY_MOUSE_MIDDLE TB_KEY_MOUSE_RIGHT TB_KEY_MOUSE_RELEASE);
 
 	my %IS_BUTTON = map { $_ => 1 } TB_KEY_MOUSE_LEFT, TB_KEY_MOUSE_MIDDLE, TB_KEY_MOUSE_RIGHT;
@@ -21,10 +22,12 @@ class Term::Fabulous::Event::Mouse :isa(Clay::UI::Events::Event) :strict(params)
 	field $y               :param :reader;
 	field $modifiers       :param :reader = 0;
 	field $released_button :param :reader = undef;
+	field $click_count     :param :reader = 1;
 	field $wheel_used      :reader = 0;
 
 	ADJUST {
 		_check_released_button( $key, $released_button ) if defined $released_button;
+		$click_count = positive_integer( $self, click_count => $click_count );
 	}
 
 	sub _check_released_button ( $key, $button ) {
@@ -37,13 +40,14 @@ class Term::Fabulous::Event::Mouse :isa(Clay::UI::Events::Event) :strict(params)
 
 	method event_name :common { 'Mouse' }
 
-	method of :common ($ev) {
+	method of :common ( $ev, %options ) {
 		return $class->new(
 			key             => $ev->key,
 			x               => $ev->x,
 			y               => $ev->y,
 			modifiers       => $ev->mod,
 			released_button => $ev->key == TB_KEY_MOUSE_RELEASE && $ev->ch ? $ev->ch : undef,
+			%options,
 		);
 	}
 
@@ -180,6 +184,12 @@ released, C<TB_KEY_MOUSE_LEFT>, C<TB_KEY_MOUSE_MIDDLE> or
 C<TB_KEY_MOUSE_RIGHT>. Default: C<undef>, the terminal did not say.
 Anything else dies.
 
+=item C<click_count>
+
+Optional. A positive integer: the place of a button press in a run of
+quick clicks, 2 for the second press of a double click (see
+L</click_count>). Default: 1. Anything else dies.
+
 =back
 
 An event object can be fired only once. Build a new one for every
@@ -188,11 +198,13 @@ C<fire_event> call.
 =head2 of
 
 	my $event = Term::Fabulous::Event::Mouse->of($termbox_event);
+	my $event = Term::Fabulous::Event::Mouse->of( $termbox_event, click_count => 2 );
 
 Builds an event from a C<Term::Fabulous::Termbox::Event>: C<key>, C<x>, C<y> and
 C<modifiers> from its C<key>, C<x>, C<y> and C<mod>, and for a release
 C<released_button> from its C<ch> (see
-L<Term::Fabulous::Termbox/tf_install_input_parser>). Called by
+L<Term::Fabulous::Termbox/tf_install_input_parser>). Further parameters
+of L</new>, such as C<click_count>, follow the event. Called by
 L<Term::Fabulous>; class method.
 
 =head1 METHODS
@@ -263,6 +275,21 @@ C<TB_KEY_MOUSE_LEFT>, C<TB_KEY_MOUSE_MIDDLE> or C<TB_KEY_MOUSE_RIGHT>;
 C<undef> when the terminal did not say. L<Term::Fabulous> takes a
 release that names no button for a release of the left button. For
 every other key: C<undef>.
+
+=head2 click_count
+
+	$self->open_item if $event->key == TB_KEY_MOUSE_LEFT && $event->click_count == 2;
+
+For a button press: its place in a run of clicks. L<Term::Fabulous>
+counts a press of the same button in the same cell at most
+L<double_click_seconds|Term::Fabulous/double_click_seconds> after the
+press before it as the next click of a run, on the UI's clock
+(L<Term::Fabulous/now>): 1 for a single click, 2 for a double click, 3
+for a triple click. A press of another button or in another cell, or
+one that comes later, starts a new run at 1. Releases, drags and wheel
+notches are 1. What a cell shows can change between two presses (a
+table that sorts itself, a list that scrolls), so a widget that acts on
+a double click also checks that both presses hit the same part of it.
 
 =head2 use_wheel
 

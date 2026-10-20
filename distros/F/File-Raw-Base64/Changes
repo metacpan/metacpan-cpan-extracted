@@ -1,5 +1,8 @@
 Revision history for File-Raw-Base64
 
+0.05    2026-10-19
+        - Faster decoding and encoding.
+
 0.04    2026-05-17
         - Bumped File::Raw prereq to 0.13 to pick up the streaming
           O_BINARY fix on Windows.

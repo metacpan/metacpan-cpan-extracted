@@ -64,7 +64,7 @@ takes:
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/example-text-features.svg" alt="Text wrapped at spaces in a narrow panel and text broken only at newlines; a two-line text with line height 2; plain, bold, italic, underlined and combined styles; Latin, Japanese, emoji and combining accents ending in the same column; a tab shown as a space and control characters shown as replacement characters"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.05/screenshots/example-text-features.svg" alt="Text wrapped at spaces in a narrow panel and text broken only at newlines; a two-line text with line height 2; plain, bold, italic, underlined and combined styles; Latin, Japanese, emoji and combining accents ending in the same column; a tab shown as a space and control characters shown as replacement characters"></p>
 
 =end html
 
@@ -118,18 +118,18 @@ L</TEXT> shows it: a text in a box 24 columns wide, wrapped at spaces.
 =item C<CLAY_TEXT_WRAP_NEWLINES>
 
 Breaks only at C<"\n">. The Text is as wide as its longest line: a parent
-with C<fit> sizing grows to it (the second panel in the picture), while
-a line that is wider than a fixed-size parent runs past the parent's
-right edge and is cut off only at the edge of the terminal or of an
-enclosing L<Term::Fabulous::Widget::ScrollBox>.
+with C<fit> sizing grows to it (the second panel in the picture). A line
+that is wider than a fixed-size parent keeps its width as long as the
+widgets beside it can still get narrower; after that it is cut off at
+the parent's right edge (inside a box that scrolls sideways it keeps
+its width).
 
 =item C<CLAY_TEXT_WRAP_NONE>
 
-The same as C<CLAY_TEXT_WRAP_NEWLINES>: C<"\n"> still starts a new
-line, and nothing else does. The layout engine Clay lays out both modes
-alike (it only distinguishes C<CLAY_TEXT_WRAP_WORDS> from the others), so
-use C<CLAY_TEXT_WRAP_NEWLINES>; to show text on one line, remove its
-newlines.
+Never breaks: the whole text is one line, and a C<"\n"> in it is shown
+as the replacement character U+FFFD (see L</Control characters>). Like
+C<CLAY_TEXT_WRAP_NEWLINES>, a line too wide for its parent is cut off
+once the widgets beside it cannot get narrower.
 
 =back
 
@@ -143,9 +143,11 @@ newlines.
 
 Only spaces are break points. A word longer than the available width
 is not broken, and neither is text without spaces, such as a Japanese
-sentence: it runs past the right edge of its parent and is cut off only
-at the edge of the terminal or of an enclosing ScrollBox. A tab is not a
-break point either (see L</Control characters>).
+sentence. With C<CLAY_TEXT_WRAP_WORDS> it runs past the right edge of
+its parent and is cut off only at the edge of the terminal or of an
+enclosing ScrollBox; with the other modes it is cut off at the parent's
+edge like any long line. A tab is not a break point either (see
+L</Control characters>).
 
 In a KDL layout file, write C<wrap_mode newlines> (C<words>,
 C<newlines> or C<none>).
@@ -171,7 +173,7 @@ wrapped sentence aligned left, centered and aligned right:
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-text.svg" alt="Colored words, a sentence wrapped left-aligned, centered and right-aligned, and text in five scripts"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.05/screenshots/widget-text.svg" alt="Colored words, a sentence wrapped left-aligned, centered and right-aligned, and text in five scripts"></p>
 
 =end html
 
@@ -224,20 +226,20 @@ In a KDL layout file:
 		underline #true
 	}
 
-These are the only text styles a Text widget has, and they apply to
-the whole text. For a bold word inside a sentence, a colored phrase or
-reverse video, use a RichText.
+These styles apply to the whole text. For a bold word inside a
+sentence, a colored phrase or reverse video, give the Text spans or
+markup (see the next section).
 
 =head2 Styled spans inside one text
 
-A L<Term::Fabulous::Widget::RichText> is a Text whose I<spans> give
+The I<spans> of a L<Term::Fabulous::Widget::Text> give
 ranges of its characters a look of their own: style bits (bold, italic,
 underline, reverse, dim, blink, strike, overline, conceal), a text
-color and a background. The text wraps and aligns exactly like a Text;
-a span simply continues on the next line. The shortest way to write
-one is markup in the syntax of Python's C<rich> library:
+color and a background. Spans do not change how the text wraps and
+aligns; a span simply continues on the next line. The shortest way to
+write one is markup in the syntax of Python's C<rich> library:
 
-	my $hint = Term::Fabulous::Widget::RichText->new(
+	my $hint = Term::Fabulous::Widget::Text->new(
 		markup => 'Press [bold]Enter[/] to save, [bold #e06c75]Esc[/] to leave.',
 	);
 
@@ -250,20 +252,27 @@ background, and C<default> for the terminal's own color. See
 L<Term::Fabulous::Text::Style> for the words and
 L<Term::Fabulous::Text::Markup> for the tags.
 
+A color in a style may be a palette token of the theme, such as
+C<'bold accent on surface_low'>; it is looked up when the text paints,
+so a theme switch recolors it (see
+L<Term::Fabulous::Text::Style/Palette tokens>).
+
 Spans can also be given as character ranges, or added later:
 
-	my $line = Term::Fabulous::Widget::RichText->new(
+	my $line = Term::Fabulous::Widget::Text->new(
 		text  => 'error: config.kdl not found',
 		spans => [ [ 0, 6, 'bold #e06c75' ] ],
 	);
 	$line->stylize( 'underline', 7, 17 );    # the file name, shown in the next frame
+	$line->spans( [ [ 0, 5, 'bold' ] ] );    # or replace them all
 
 Later spans win where spans overlap, and setting C<text> drops them.
+A L<Term::Fabulous::Widget::CodeBlock> takes its spans the same way.
 In a KDL layout file:
 
 =for highlighter language=kdl
 
-	RichText {
+	Text {
 		markup "Press [bold]Enter[/] to save"
 	}
 
@@ -274,14 +283,19 @@ the base look that the spans change. The program
 F<examples/widgets/rich-text.pl> shows markup, spans, every style word
 and a wrapped paragraph side by side.
 
+I<Highlights> are a layer of their own over the spans: ranges with a
+style, such as the matches a search marks, that are set and cleared
+without touching the spans (see
+L<Term::Fabulous::Widget::Text/highlights>).
+
 =head2 Links inside a text
 
-A RichText can also hold I<links>, ranges of its text that the user
+A Text can also hold I<links>, ranges of its text that the user
 follows with a click, or with C<Tab>, C<Left>/C<Right> and C<Enter>. The
 widget fires L<LinkActivate|Term::Fabulous::Event::LinkActivate> with
 the link's target and leaves the rest to the program:
 
-	my $help = Term::Fabulous::Widget::RichText->new(
+	my $help = Term::Fabulous::Widget::Text->new(
 		markup => 'Read the [link=faq]FAQ[/link] or [link=https://perl.org]perl.org[/link].',
 	);
 	$help->on( LinkActivate => sub ($event) { show_page( $event->link ); return } );
@@ -292,9 +306,9 @@ theme changes the look with the slots C<text.link> (the color of the
 words) and C<text.link.background>, each in the states normal,
 C<hovered> and C<selected>, such as
 C<< 'text.link.selected' => 'text_inverse' >>. See
-L<Term::Fabulous::Widget::RichText/Looks> for the defaults and a
+L<Term::Fabulous::Widget::Text/Looks> for the defaults and a
 picture, and
-L<Term::Fabulous::Cookbook::KeyboardAndMouse/Follow links in a text (RichText links)>
+L<Term::Fabulous::Cookbook::KeyboardAndMouse/Follow links in a text (Text links)>
 for a program with links in colors of its own.
 
 =head2 Wide characters and emoji
@@ -316,13 +330,16 @@ a zero-width joiner or a pair of regional indicators makes a cluster two
 cells wide. Use
 L<string_columns|Term::Fabulous::Unicode/string_columns> from
 L<Term::Fabulous::Unicode> to find out
-how many columns a string takes, for example to pad a label:
+how many columns a string takes, for example to pad a label, and
+L<fit_columns|Term::Fabulous::Unicode/fit_columns> to cut one to the
+columns it has without splitting a cluster:
 
 =for highlighter language=perl
 
-	use Term::Fabulous::Unicode qw(string_columns);
+	use Term::Fabulous::Unicode qw(fit_columns string_columns);
 
 	my $columns = string_columns('日本語');    # 6
+	my $shown   = fit_columns( '日本語', 5 );     # "日本\x{2026}": 5 columns at most
 
 =head2 Control characters
 
@@ -332,7 +349,8 @@ space; every other control character (U+0000 to U+001F except tab and
 newline, U+007F to U+009F) is shown as U+FFFD, the replacement
 character. That includes a carriage return: remove the C<"\r"> of
 Windows line ends (C<s/\r\n/\n/g>) before you show such text. In Text
-widgets, a newline starts a new line, as described in L</Wrapping>.
+widgets, a newline starts a new line, as described in L</Wrapping>,
+except with C<CLAY_TEXT_WRAP_NONE>, which shows it as U+FFFD.
 The last line of the picture at the start of L</TEXT> shows a tab, a
 bell character and an escape sequence. See
 L<Term::Fabulous::Unicode/sanitize_text> for the exact rules.
@@ -426,7 +444,7 @@ and less alpha, and the terminal's default text color:
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/example-colors.svg" alt="Six orange swatches written in different formats; a blue darkened, lightened and blended with white in steps; red swatches with alpha 255, 192, 128, 64 and 0 over a light panel; a line in the terminal's default text color"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.05/screenshots/example-colors.svg" alt="Six orange swatches written in different formats; a blue darkened, lightened and blended with white in steps; red swatches with alpha 255, 192, 128, 64 and 0 over a light panel; a line in the terminal's default text color"></p>
 
 =end html
 
@@ -501,7 +519,7 @@ orbiting over a screen of text:
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/example-translucency.svg" alt="A green, a red and a blue translucent box over a screen of text; the text shows through the green and the blue one"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.05/screenshots/example-translucency.svg" alt="A green, a red and a blue translucent box over a screen of text; the text shows through the green and the blue one"></p>
 
 =end html
 
@@ -617,7 +635,7 @@ F<examples/border-showcase.pl> shows all styles:
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/example-border-showcase.svg" alt="Twenty boxes, one in each border style, labeled with the style's name"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.05/screenshots/example-border-showcase.svg" alt="Twenty boxes, one in each border style, labeled with the style's name"></p>
 
 =end html
 
@@ -681,7 +699,7 @@ the two parameters of L</Joining borders>:
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/example-border-options.svg" alt="Six bordered panels: a border on the left and top only; a solid border with a double top and a thick left side; a round border with a cell of padding inside; a round border with a hidden bottom side; a title box and a body box sharing one line; a round border drawn on the parent's background"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.05/screenshots/example-border-options.svg" alt="Six bordered panels: a border on the left and top only; a solid border with a double top and a thick left side; a round border with a cell of padding inside; a round border with a hidden bottom side; a title box and a body box sharing one line; a round border drawn on the parent's background"></p>
 
 =end html
 
@@ -733,8 +751,8 @@ returns it to the theme. See L<Term::Fabulous::Theme/Borders>.
 
 =head2 Joining borders
 
-Two more parameters let a border join the lines around it. Both are set
-in Perl code only; KDL layout files have no property for them.
+Three more parameters let a border join the lines around it. They are
+set in Perl code only; KDL layout files have no property for them.
 
 =over
 
@@ -753,6 +771,12 @@ Draws some sides on the background just outside the widget instead of
 the widget's own, so the border looks like part of its surroundings and
 a colored widget starts inside it (the last panel in the picture of
 L</Borders and space>).
+
+=item C<border_background_colors>
+
+Draws some sides and corners on a background color of their own instead
+of the widget's, for a line that two differently colored widgets share
+and that should belong to neither.
 
 =back
 
@@ -798,8 +822,8 @@ under the C<ocean> theme file:
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/example-themes-light.svg" alt="The panel in the light theme: dark text on a near-white screen, a white text field holding Ada, a checked check box, a blue progress bar at 65 percent, a Save button and a Cancel button with a red border"></p>
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/example-themes-ocean.svg" alt="The panel in the ocean theme: teal accents on a deep blue screen, a text field holding Ada, a checked check box, a progress bar at 65 percent, a Save button in the accent and a Cancel button with a red border"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.05/screenshots/example-themes-light.svg" alt="The panel in the light theme: dark text on a near-white screen, a white text field holding Ada, a checked check box, a blue progress bar at 65 percent, a Save button and a Cancel button with a red border"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.05/screenshots/example-themes-ocean.svg" alt="The panel in the ocean theme: teal accents on a deep blue screen, a text field holding Ada, a checked check box, a progress bar at 65 percent, a Save button in the accent and a Cancel button with a red border"></p>
 
 =end html
 

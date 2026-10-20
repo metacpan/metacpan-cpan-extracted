@@ -178,8 +178,39 @@ b64_encode(const unsigned char *in, size_t in_len,
     } \
 } while (0)
 
+    /* Whole lines: when a line holds whole quartets (no wrap, or a wrap
+     * that is a multiple of 4, as 64 and 76 are), each line is written
+     * in one tight loop and its line end copied after it; the space for
+     * both was reserved above. Any other wrap takes the loop below. */
+    i = 0;
+    if (wrap == 0 || wrap % 4 == 0) {
+        size_t per_line = wrap ? (size_t)wrap / 4 : (size_t)-1;
+        size_t elen = strlen(eol);
+        while (i + 3 <= in_len) {
+            size_t n = (in_len - i) / 3;
+            if (n > per_line) n = per_line;
+            wrap_col = (int)(n * 4);
+            while (n--) {
+                uint32_t triplet = ((uint32_t)in[i]   << 16)
+                                 | ((uint32_t)in[i+1] <<  8)
+                                 |  (uint32_t)in[i+2];
+                o[0] = alpha[(triplet >> 18) & 0x3F];
+                o[1] = alpha[(triplet >> 12) & 0x3F];
+                o[2] = alpha[(triplet >>  6) & 0x3F];
+                o[3] = alpha[ triplet        & 0x3F];
+                o += 4;
+                i += 3;
+            }
+            if (wrap > 0 && wrap_col == wrap) {
+                memcpy(o, eol, elen);
+                o += elen;
+                wrap_col = 0;
+            }
+        }
+    }
+
     /* Main loop: 3 bytes -> 4 chars. */
-    for (i = 0; i + 3 <= in_len; i += 3) {
+    for (; i + 3 <= in_len; i += 3) {
         uint32_t triplet = ((uint32_t)in[i]   << 16)
                          | ((uint32_t)in[i+1] <<  8)
                          |  (uint32_t)in[i+2];
@@ -355,8 +386,36 @@ b64_decode(const char *in, size_t in_len,
     o = *out + *out_len;
 
     for (i = 0; i < body_len; i++) {
-        unsigned char c = (unsigned char)body[i];
-        signed char v = rev[c];
+        unsigned char c;
+        signed char v;
+
+        /* Fast path: at a quartet boundary with nothing pending, four
+         * alphabet bytes are three output bytes. A byte outside the
+         * alphabet (a line end, padding, noise) fails the sign test, and
+         * from it on the careful step below runs, which decides every
+         * error, offset and lenient skip as it always has. */
+        if (bits == 0 && !saw_pad) {
+            while (i + 4 <= body_len) {
+                int v0 = rev[(unsigned char)body[i]];
+                int v1 = rev[(unsigned char)body[i + 1]];
+                int v2 = rev[(unsigned char)body[i + 2]];
+                int v3 = rev[(unsigned char)body[i + 3]];
+                uint32_t q;
+                if ((v0 | v1 | v2 | v3) < 0) break;
+                q = ((uint32_t)v0 << 18) | ((uint32_t)v1 << 12)
+                  | ((uint32_t)v2 <<  6) |  (uint32_t)v3;
+                o[0] = (unsigned char)(q >> 16);
+                o[1] = (unsigned char)(q >>  8);
+                o[2] = (unsigned char) q;
+                o += 3;
+                i += 4;
+            }
+            if (i >= body_len) break;
+        }
+
+        /* The careful step: one byte. */
+        c = (unsigned char)body[i];
+        v = rev[c];
 
         if (v == PAD) {
             saw_pad++;

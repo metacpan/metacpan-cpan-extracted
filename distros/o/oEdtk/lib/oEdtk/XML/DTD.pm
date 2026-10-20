@@ -11,7 +11,7 @@ use Try::Tiny qw(try catch);
 
 use Readonly;
 
-our $VERSION = 2.1126;
+our $VERSION = 2.1129;
 
 Readonly my $TYPE_FILE   => 'file';
 Readonly my $TYPE_STRING => 'string';

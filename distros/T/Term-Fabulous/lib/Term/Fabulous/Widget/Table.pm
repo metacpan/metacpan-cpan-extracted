@@ -5,7 +5,7 @@ use warnings;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 use Object::Pad 0.825;
 
@@ -19,7 +19,8 @@ use Term::Fabulous::Widget::TextField;
 use Term::Fabulous::Widget::Table::Cell;
 use Term::Fabulous::Widget::Table::ColumnChooser;
 use Term::Fabulous::Widget::Table::Grid;
-use Term::Fabulous::Widget::Table::HeaderView;
+use Term::Fabulous::Widget::Table::EdgeView;
+use Term::Fabulous::Role::Searchable qw(searchables_in nested_search_texts nested_search_revision nested_highlight_text nested_clear_text_highlights nested_reveal_text);
 use Term::Fabulous::Widget::Table::Model;
 use Term::Fabulous::Widget::Table::Pager;
 use Term::Fabulous::Widget::Scrollbar;
@@ -30,9 +31,11 @@ class Term::Fabulous::Widget::Table
 	:does(Clay::UI::Role::Interaction::Focusable)
 	:does(Clay::UI::Role::Interaction::Hoverable)
 	:does(Clay::UI::Role::Core::Preparable)
+	:does(Term::Fabulous::Role::Searchable)
 	:strict(params)
 {
 	use Clay::UI::Enum::Result;
+	use Clay::UI::Role::Layout::HasParent qw(is_widget);
 	use Feature::Compat::Try;
 	use Clay::XS qw(
 		sizing_fit sizing_fixed sizing_grow sizing_percent CLAY_LEFT_TO_RIGHT CLAY_TOP_TO_BOTTOM
@@ -41,10 +44,8 @@ class Term::Fabulous::Widget::Table
 		CLAY_TEXT_WRAP_WORDS CLAY_TEXT_WRAP_NEWLINES CLAY_TEXT_WRAP_NONE
 		CLAY_TEXT_ALIGN_LEFT CLAY_TEXT_ALIGN_CENTER CLAY_TEXT_ALIGN_RIGHT
 	);
-	use List::Util qw(any first max min none);
-	use Term::Fabulous::Viewport qw(reveal_range);
+	use List::Util qw(all any first max min none);
 	use Scalar::Util qw(blessed refaddr weaken);
-	use Time::HiRes ();
 	use Term::Fabulous::Check qw(boolean border_style describe non_negative_integer one_of optional string);
 	use Term::Fabulous::Enum::BorderStyle;
 	use Term::Fabulous::Event::CursorMove;
@@ -57,6 +58,7 @@ class Term::Fabulous::Widget::Table
 	use Term::Fabulous::Event::SelectionChange;
 	use Term::Fabulous::Event::SortChange;
 	use Term::Fabulous::Termbox qw(TB_KEY_MOUSE_LEFT TB_KEY_MOUSE_RIGHT TB_MOD_MOTION TB_MOD_SHIFT TB_MOD_CTRL TB_MOD_ALT);
+	use Term::Fabulous::Text::Marks;
 	use Term::Fabulous::Widget::Table::Borders qw(resolve_borders);
 	use Term::Fabulous::Widget::Table::Filter;
 	use Term::Fabulous::Widget::Table::Style qw(style_hash merge_styles);
@@ -123,21 +125,20 @@ class Term::Fabulous::Widget::Table
 	field $selection        :param = 'none';
 	field $selection_column :param = undef;
 	field $_explicit_selection_column;    # selection_column as the user set it, else undef
-	field $show_header          :param(header) = 1;
-	field $filter_row           :param         = 0;
-	field $page_sizes           :param         = [ 10, 25, 50, 100 ];
-	field $show_pager           :param(pager)  = undef;
-	field $scrollbar            :param         = 1;
-	field $hover                :param         = 1;
-	field $tree_column          :param         = undef;
-	field $group_label          :param         = undef;
-	field $row_style            :param         = undef;
-	field $header_style         :param         = undef;
-	field $group_style          :param         = undef;
-	field $empty_text           :param         = 'No rows';
-	field $no_match_text        :param         = 'No rows match';
-	field $cell_padding         :param         = 1;
-	field $double_click_seconds :param         = 0.4;
+	field $show_header   :param(header) = 1;
+	field $filter_row    :param         = 0;
+	field $page_sizes    :param         = [ 10, 25, 50, 100 ];
+	field $show_pager    :param(pager)  = undef;
+	field $scrollbar     :param         = 1;
+	field $hover         :param         = 1;
+	field $tree_column   :param         = undef;
+	field $group_label   :param         = undef;
+	field $row_style     :param         = undef;
+	field $header_style  :param         = undef;
+	field $group_style   :param         = undef;
+	field $empty_text    :param         = 'No rows';
+	field $no_match_text :param         = 'No rows match';
+	field $cell_padding  :param         = 1;
 
 	field $border        :param = 'Round';
 	field $border_top    :param = undef;
@@ -155,25 +156,48 @@ class Term::Fabulous::Widget::Table
 	field $model :reader;
 	field %_line_style;    # table-wide lines: border_* , column_lines, row_lines, header_line
 
-	# The widgets of the table.
-	field $_header_row;    # the header view and, with a scrollbar, a spacer as wide as it
+	# The widgets of the table: three rows, each a view of a grid (the
+	# header, the scrolling body, the footer) and, while the rows scroll,
+	# a strip of the scrollbar column beside it, which draws the frame's
+	# right side there. The strips of the header and the footer hold a
+	# blank column, the body's the scrollbar.
+	field $_header_row;
 	field $_header_view;
-	field $_header_spacer;
 	field $_header_grid;
+	field $_header_strip;
 	field $_body_row;
 	field $_body;
 	field $_body_grid;
+	field $_body_strip;
 	field $_scrollbar;
+	field $_footer_row;
+	field $_footer_view;
+	field $_footer_grid;
+	field $_footer_strip;
 	field $_pager;
 	field $_chooser;
 
 	# The header as built: a signature of what it was built from, and per
-	# grid column { cell, title, marker, mark } and { cell, field }.
+	# grid column { cell, title, marker, mark } and { cell, field }; or,
+	# without header rows, the cells of the ledge that draws the frame's
+	# top. The footer is the ledge that draws its bottom.
 	field $_header_signature = '';
 	field @_header_cells;
 	field @_filter_cells;
+	field @_top_ledge_cells;
 	field %_filter_text;
 	field %_filter_error;
+	field $_footer_signature = '';
+	field @_footer_cells;
+
+	# Whether the scrollbar column is shown: wanted, and the rows did not
+	# fit in the last frame. The strips as dressed, by part, and the
+	# column inside the header strip that fills the header rows'
+	# backgrounds, with what it was filled from.
+	field $_gutter_shown = 0;
+	field %_strip_dressed;
+	field $_header_fills;
+	field $_header_fills_signature = '';
 
 	# The body as built: the signature of its columns, the lines by key
 	# (see _build_line) and the order of the grid's rows.
@@ -181,11 +205,20 @@ class Term::Fabulous::Widget::Table
 	field %_built;
 	field @_grid_keys;
 
-	# The grid lines as last worked out, what they were worked out from,
-	# and a count that tells the lines' looks they changed. Changes of
-	# styles count in _style_revision.
+	# What a search marked, by "id\0column": for a text cell the ranges
+	# and the row revision they were set at, for a custom cell the
+	# highlights of the widgets inside it, [ index, key, ranges ] by the
+	# index and key.
+	field %_text_highlights;
+	field %_cell_highlights;
+
+	# The grid lines as last worked out (per line, and the strips of the
+	# scrollbar column), what they were worked out from, and a count that
+	# tells the lines' looks they changed. Changes of styles count in
+	# _style_revision.
 	field $_borders_signature  = '';
 	field $_borders            = [];
+	field $_strip_borders      = undef;
 	field $_borders_generation = 0;
 	field $_style_revision     = 0;
 
@@ -193,9 +226,8 @@ class Term::Fabulous::Widget::Table
 	field %_cell_style_of;    # "id\0key" => style hash
 	field $_hover_key;
 	field $_header_cursor;    # grid column index while the header has the keyboard, else undef
-	field @_last_press;    # ( time, line key ) of the last left press on a line
-	field $_reveal_cursor = 0;
-	field $_shown_page    = 0;
+	field $_last_press_key;    # the line of the last single left press, which a double click must repeat
+	field $_shown_page = 0;
 
 	method theme_family :common () {
 		return 'table';
@@ -260,6 +292,7 @@ class Term::Fabulous::Widget::Table
 
 		$self->_build_frame;
 		$self->_listen;
+		$self->_watch_gutter;
 		$self->request_prepare;
 	}
 
@@ -286,8 +319,6 @@ class Term::Fabulous::Widget::Table
 		$empty_text    = string( $self, empty_text    => $empty_text );
 		$no_match_text = string( $self, no_match_text => $no_match_text );
 		$cell_padding  = $self->_padding($cell_padding);
-		die "Term::Fabulous::Widget::Table: double_click_seconds must be a number of at least 0, got " . describe($double_click_seconds)
-			unless defined $double_click_seconds && !ref $double_click_seconds && $double_click_seconds =~ /\A[0-9]*\.?[0-9]+\z/;
 
 		my $outer = optional( \&border_style, $self, border => $border, @NONE_IS_HIDDEN );
 		my %line  = (
@@ -345,28 +376,41 @@ class Term::Fabulous::Widget::Table
 		$_body_grid   = Term::Fabulous::Widget::Table::Grid->new( layout => { sizing => { width => sizing_grow(), height => sizing_fit() } }, share_columns_with => $_header_grid );
 		$_body->add_child($_body_grid);
 
-		$_header_view = Term::Fabulous::Widget::Table::HeaderView->new(
-			follows => $_body,
-			layout  => { sizing => { width => sizing_grow(), height => sizing_fit() } },
-		);
+		$_footer_grid = Term::Fabulous::Widget::Table::Grid->new( layout => { sizing => { width => sizing_grow(), height => sizing_fit() } }, share_columns_with => $_header_grid );
+		( $_header_view, $_footer_view ) = map { Term::Fabulous::Widget::Table::EdgeView->new( follows => $_body, layout => { sizing => { width => sizing_grow(), height => sizing_fit() } } ) } 1 .. 2;
 		$_header_view->add_child($_header_grid);
-		$_header_row    = Term::Fabulous::Widget::Box->new( layout => { layout_direction => CLAY_LEFT_TO_RIGHT, sizing => { width => sizing_grow(), height => sizing_fit() } } );
-		$_header_spacer = Term::Fabulous::Widget::Box->new( layout => { sizing => { width => sizing_fixed(1), height => sizing_grow() } } );
-		$_header_row->add_child($_header_view);
+		$_footer_view->add_child($_footer_grid);
 
-		$_body_row = Term::Fabulous::Widget::Box->new( layout => { layout_direction => CLAY_LEFT_TO_RIGHT, sizing => { width => sizing_grow(), height => sizing_fit() } } );
-		$_body_row->add_child($_body);
 		$_scrollbar = Term::Fabulous::Widget::Scrollbar->new(
 			follows     => $_body,
 			thumb_color => $self->text_color,
 			track_color => $self->line_color,
 			layout      => { sizing => { width => sizing_fixed(1), height => sizing_grow() } },
 		);
+		$_header_fills = Term::Fabulous::Widget::Box->new( layout => { layout_direction => CLAY_TOP_TO_BOTTOM, sizing => { width => sizing_fixed(1), height => sizing_grow() } } );
+		$_header_strip = _new_strip($_header_fills);
+		$_body_strip   = _new_strip($_scrollbar);
+		$_footer_strip = _new_strip( Term::Fabulous::Widget::Box->new( layout => { sizing => { width => sizing_fixed(1), height => sizing_fit() } } ) );
 
+		( $_header_row, $_body_row, $_footer_row ) = map { _new_row($_) } $_header_view, $_body, $_footer_view;
 		$_pager = $self->_new_pager;
 		$self->_wire_pager;
-		$self->add_child( $_header_row, $_body_row );
+		$self->add_child( $_header_row, $_body_row, $_footer_row );
 		return;
+	}
+
+	sub _new_row ($view) {
+		my $row = Term::Fabulous::Widget::Box->new( layout => { layout_direction => CLAY_LEFT_TO_RIGHT, sizing => { width => sizing_grow(), height => sizing_fit() } } );
+		$row->add_child($view);
+		return $row;
+	}
+
+	# A strip of the scrollbar column: its content (a blank column or the
+	# scrollbar) and, once dressed, the frame's right side.
+	sub _new_strip ($content) {
+		my $strip = Term::Fabulous::Widget::Box->new( layout => { sizing => { width => sizing_fit(), height => sizing_grow() } } );
+		$strip->add_child($content);
+		return $strip;
 	}
 
 	method _new_pager () {
@@ -388,12 +432,11 @@ class Term::Fabulous::Widget::Table
 	}
 
 	method _wire_pager () {
-		weaken( my $weak = $self );
-		my %step = ( first => sub { 1 }, previous => sub { $weak->page - 1 }, next => sub { $weak->page + 1 }, last => sub { $weak->page_count } );
+		my %step = ( first => sub ($self) { 1 }, previous => sub ($self) { $self->page - 1 }, next => sub ($self) { $self->page + 1 }, last => sub ($self) { $self->page_count } );
 		foreach my $name ( sort keys %step ) {
-			$_pager->button($name)->on( Activate => sub ($event) { $weak->_turn_page( $step{$name}->() ); return } );
+			$_pager->button($name)->on( Activate => sub ( $self, $event ) { $self->_turn_page( $step{$name}->($self) ); return }, owner => $self );
 		}
-		$_pager->size_list->on( Change => sub ($event) { $weak->_change_page_size( $event->value ); return } );
+		$_pager->size_list->on( Change => sub ( $self, $event ) { $self->_change_page_size( $event->value ); return }, owner => $self );
 		return;
 	}
 
@@ -428,44 +471,39 @@ class Term::Fabulous::Widget::Table
 		return;
 	}
 
+	# A focused widget in a cell that is built again or removed hands the
+	# focus to its focus heir, the table.
 	method prepare_layout () {
-		my $focus_in_cell = $self->_focus_in_cell;
-		my @grid_columns  = $self->_grid_columns;
-		my @lines         = $self->_body_lines;
+		my @grid_columns = $self->_grid_columns;
+		my @lines        = $self->_body_lines;
 		$self->_prepare_width( \@grid_columns );
+		$self->_prepare_gutter;
 		$self->_prepare_header( \@grid_columns );
+		$self->_prepare_footer( \@grid_columns );
 		$self->_prepare_body( \@grid_columns, \@lines );
 		$self->_dress( \@grid_columns, \@lines );
-		$self->_prepare_scrollbar;
 		$self->_prepare_pager;
 		$self->_prepare_scrolling;
-
-		# A focused widget in a cell that was built again or removed takes
-		# the focus with it; the table takes it back.
-		$self->_focus_self if $focus_in_cell && !$self->_has_focus_within;
 		return;
 	}
 
-	# Whether a widget inside one of the body's cells has the focus.
-	method _focus_in_cell () {
-		my $ui      = $self->ui                            // return 0;
-		my $focused = $ui->interaction->get_focused_widget // return 0;
-		return refaddr($focused) != refaddr($self) && $self->_region_of($focused) eq 'body' ? 1 : 0;
-	}
-
 	# The grids are as wide as their columns, unless a column grows (or is
-	# a share of the width): then they take the width of the table.
+	# a share of the width): then they take the width of the table, and the
+	# body no longer scrolls sideways, since Clay squeezes the columns (and
+	# wraps their text) only inside a box that does not clip them.
 	method _prepare_width ($grid_columns) {
 		my $stretch = any {
 			my $type = defined $_->{column} ? $_->{column}->width->{type} : -1;
 			$type == CLAY__SIZING_TYPE_GROW || $type == CLAY__SIZING_TYPE_PERCENT;
 		} @$grid_columns;
 		my $width = $stretch ? sizing_grow() : sizing_fit();
-		foreach my $widget ( $_header_row, $_header_view, $_header_grid, $_body_row, $_body, $_body_grid ) {
+		foreach my $widget ( $_header_row, $_header_view, $_header_grid, $_body_row, $_body, $_body_grid, $_footer_row, $_footer_view, $_footer_grid ) {
 			my $layout = $widget->layout;
 			next if _same( $layout->{sizing}{width}, $width );
 			$widget->layout( { %$layout, sizing => { %{ $layout->{sizing} // {} }, width => $width } } );
 		}
+		my $sideways = $stretch ? 0 : 1;
+		$_body->horizontal($sideways) if $_body->horizontal != $sideways;
 		return;
 	}
 
@@ -491,15 +529,35 @@ class Term::Fabulous::Widget::Table
 			$_header_grid->append_row( [ map { $_->{cell} } @_filter_cells ] ) if @_filter_cells;
 		}
 
-		# Without header rows, a row no taller than nothing keeps the header
-		# grid, and with it the body, as wide as the columns.
-		$_header_grid->append_row( [ map { $self->_ruler_cell($_) } @$grid_columns ] ) unless @_header_cells || @_filter_cells;
+		# Without header rows, the frame's top is a ledge, which also keeps
+		# the header grid, and with it the body, as wide as the columns.
+		@_top_ledge_cells = @_header_cells || @_filter_cells ? () : map { { cell => $self->_ledge_cell($_) } } @$grid_columns;
+		$_header_grid->append_row( [ map { $_->{cell} } @_top_ledge_cells ] ) if @_top_ledge_cells;
 		return;
 	}
 
-	method _ruler_cell ($grid_column) {
-		my $cell = $self->_new_cell( header => undef, $grid_column->{key}, $grid_column->{column} );
-		$cell->layout( { %{ $cell->layout }, sizing => { %{ $cell->layout->{sizing} }, height => sizing_fixed(0) } } );
+	# The footer: the ledge that draws the frame's bottom.
+	method _prepare_footer ($grid_columns) {
+		my $signature = join "\0", $model->columns_revision, $selection, map { $_->{key} } @$grid_columns;
+		return if $signature eq $_footer_signature;
+		$_footer_signature = $signature;
+		$_footer_grid->clear_rows;
+		@_footer_cells = map { { cell => $self->_ledge_cell($_) } } @$grid_columns;
+		$_footer_grid->append_row( [ map { $_->{cell} } @_footer_cells ] );
+		return;
+	}
+
+	# A cell of a ledge: a child of no height inside (Clay gives a childless
+	# box no height, border or not), so it is as high as the one frame side
+	# it draws.
+	method _ledge_cell ($grid_column) {
+		my $column = $grid_column->{column};
+		my $cell   = Term::Fabulous::Widget::Table::Cell->new(
+			part       => 'ledge',
+			column_key => $grid_column->{key},
+			layout     => { sizing => { width => defined $column ? $column->width : sizing_fit(), height => sizing_fit() } },
+		);
+		$cell->add_child( Term::Fabulous::Widget::Box->new( layout => { sizing => { width => sizing_grow(), height => sizing_fixed(0) } } ) );
 		return $cell;
 	}
 
@@ -552,16 +610,15 @@ class Term::Fabulous::Widget::Table
 			focus_background_color => $self->cursor_color,
 			layout                 => { sizing => { width => sizing_grow(0) } },    # one row high, as wide as the column
 		);
-		weaken( my $weak = $self );
-		$field->on( Change => sub ($event) { $weak->_filter_typed( $key, $event->value ); return } );
-		$field->on( Submit => sub ($event) { $weak->_focus_self;                          return } );
+		$field->on( Change => sub ( $self, $event ) { $self->_filter_typed( $key, $event->value ); return }, owner => $self );
+		$field->on( Submit => sub ( $self, $event ) { $self->_focus_self;                          return }, owner => $self );
 		$cell->add_child($field);
 		return { cell => $cell, field => $field };
 	}
 
 	sub _widget_from ( $what, $widget ) {
 		die "Term::Fabulous::Widget::Table: $what must return a widget, got " . describe($widget)
-			unless blessed $widget && ( $widget->DOES('Clay::UI::Role::Core::Element') || $widget->DOES('Clay::UI::Role::Core::TextNode') );
+			unless is_widget($widget);
 		return $widget;
 	}
 
@@ -672,12 +729,16 @@ class Term::Fabulous::Widget::Table
 		return \%built;
 	}
 
-	# The widget showing a cell: the column's cell widget, or a Text.
+	# The widget showing a cell: the column's cell widget, or a Text. The
+	# highlights a search left for the cell go onto the new widget.
 	method _cell_content ( $built, $column ) {
-		my $key = $column->key;
+		my $key  = $column->key;
+		my $slot = "$built->{id}\0$key";
 		if ( defined $column->cell ) {
 			my $widget = _widget_from( "the cell of column '$key'", $column->cell->( $self->_cell_context( $built->{id}, $column ) ) );
 			delete $built->{text}{$key};
+			my @searchables = searchables_in($widget);
+			nested_highlight_text( \@searchables, [ $_->[0], $_->[1] ], $_->[2] ) foreach values %{ $_cell_highlights{$slot} // {} };
 			return $built->{content}{$key} = $widget;
 		}
 		my $text = Term::Fabulous::Widget::Text->new(
@@ -685,14 +746,18 @@ class Term::Fabulous::Widget::Table
 			wrap_mode      => $WRAP{ $column->wrap },
 			text_alignment => $TEXT_ALIGN{ $column->align },
 		);
+		my $kept = $_text_highlights{$slot};
+		$text->highlights( $kept->{ranges} ) if defined $kept && $kept->{revision} == $model->row_revision( $built->{id} );
 		$built->{text}{$key} = $text;
 		return $built->{content}{$key} = $text;
 	}
 
 	# A row whose data changed: texts are updated, cell widgets brought up
-	# to date by update_cell or built again.
+	# to date by update_cell or built again. What a search marked in the
+	# row pointed into the old data and goes.
 	method _refresh_row ( $built, $grid_columns ) {
 		$built->{revision} = $model->row_revision( $built->{id} );
+		$self->_drop_row_highlights( $built->{id} );
 		foreach my $column ( map { $_->{column} } grep { defined $_->{column} } @$grid_columns ) {
 			my $key = $column->key;
 			if ( my $text = $built->{text}{$key} ) {
@@ -818,33 +883,33 @@ class Term::Fabulous::Widget::Table
 
 	# Colors, lines and marks of every cell. The grid lines are worked out
 	# again only when something they depend on changed; a body line is
-	# dressed again only when its look or the lines changed, so moving the
-	# cursor dresses two lines.
+	# dressed again only when its look, the backgrounds of the lines next
+	# to it (see _line_backdrops) or the lines changed, so moving the
+	# cursor dresses the two lines and their neighbours.
 	method _dress ( $grid_columns, $lines ) {
 		my $follows_data = $self->_styles_follow_data($grid_columns);
-		my @header_rows  = ( ( @_header_cells ? [ \@_header_cells, 'header' ] : () ), ( @_filter_cells ? [ \@_filter_cells, 'filter' ] : () ) );
-		my $signature    = join "\0", $model->columns_revision, $_style_revision, scalar @header_rows, scalar @$grid_columns,
+		my @header_rows  = $self->_header_rows;
+		my $signature    = join "\0", $model->columns_revision, $_style_revision, $_gutter_shown, scalar @header_rows, scalar @$grid_columns,
 			map { $_->{key} . ( $follows_data && $_->{kind} eq 'row' ? ':' . $model->row_revision( $_->{id} ) : '' ) } @$lines;
 		if ( $signature ne $_borders_signature ) {
 			$_borders_signature = $signature;
-			$_borders           = $self->_resolve_lines( $grid_columns, \@header_rows, $lines );
+			my $resolved = $self->_resolve_lines( $grid_columns, \@header_rows, $lines );
+			( $_borders, $_strip_borders ) = @{$resolved}{qw(lines gutter)};
 			$_borders_generation++;
 		}
 
-		foreach my $index ( 0 .. $#header_rows ) {
-			my ( $cells, $part ) = @{ $header_rows[$index] };
-			foreach my $column ( 0 .. $#$cells ) {
-				my $look = $part eq 'header' ? $self->_header_look( $column, $grid_columns->[$column] ) : $self->_filter_look( $cells->[$column], $grid_columns->[$column] );
-				$self->_dress_cell( $cells->[$column]{cell}, $look, $_borders->[$index][$column], \$cells->[$column]{dressed} );
-			}
-		}
-		$self->_mark_header($grid_columns) if @_header_cells;
+		my $column_count = scalar @$grid_columns;
+		my $ledge_look   = $self->_ledge_look;
+		my @header_looks = map {
+			my ( $cells, $part ) = @$_;
+			[ map { $part eq 'header' ? $self->_header_look( $_, $grid_columns->[$_] ) : $part eq 'filter' ? $self->_filter_look( $cells->[$_], $grid_columns->[$_] ) : $ledge_look } 0 .. $#$cells ]
+		} @header_rows;
+		my @footer_looks = ($ledge_look) x $column_count;
 
 		my $focused    = $self->_has_focus_within;
 		my $cursor     = $model->cursor;
 		my $data_index = 0;
-		foreach my $index ( 0 .. $#$lines ) {
-			my $line  = $lines->[$index];
+		foreach my $line (@$lines) {
 			my $built = $_built{ $line->{key} };
 			my $state
 				= $focused               && !defined $_header_cursor && defined $cursor && $cursor eq $line->{key} ? 'cursor'
@@ -854,10 +919,111 @@ class Term::Fabulous::Widget::Table
 			my $stripe   = $line->{kind} eq 'row' && defined $self->stripe_color && $data_index++ % 2 ? 1 : 0;
 			my $look_key = join "\0", $_borders_generation, $state, $stripe, $self->_line_look_key($line);
 			next if defined $built->{look_key} && $built->{look_key} eq $look_key;
-			$built->{look_key} = $look_key;
-			$self->_dress_line( $built, $line, $grid_columns, $state, $stripe, $_borders->[ @header_rows + $index ] );
+			$built->{look_key}    = $look_key;
+			$built->{looks}       = $self->_line_looks( $line, $grid_columns, $state, $stripe );
+			$built->{backgrounds} = _backgrounds( $built->{looks}, $column_count );
+		}
+
+		my @backgrounds  = ( ( map { _backgrounds( $_, $column_count ) } @header_looks ), ( map { $_built{ $_->{key} }{backgrounds} } @$lines ), _backgrounds( \@footer_looks, $column_count ) );
+		my $base         = $self->_base_background;
+		my $backdrops_of = sub ($at) {
+			my $borders = $_borders->[$at];
+			my @spans   = @$borders == $column_count ? map { [ $_, $_ ] } 0 .. $column_count - 1 : ( [ 0, $column_count - 1 ] );
+			return [ map { _line_backdrops( \@backgrounds, scalar @header_rows, $at, @{ $spans[$_] }, $borders->[$_], $base ) } 0 .. $#$borders ];
+		};
+
+		foreach my $index ( 0 .. $#header_rows ) {
+			my $cells     = $header_rows[$index][0];
+			my $backdrops = $backdrops_of->($index);
+			foreach my $column ( 0 .. $#$cells ) {
+				$self->_dress_cell( $cells->[$column]{cell}, $header_looks[$index][$column], $_borders->[$index][$column], $backdrops->[$column], \$cells->[$column]{dressed} );
+			}
+		}
+		$self->_mark_header($grid_columns) if @_header_cells;
+
+		my $footer_at        = @header_rows + @$lines;
+		my $footer_backdrops = $backdrops_of->($footer_at);
+		$self->_dress_cell( $_footer_cells[$_]{cell}, $footer_looks[$_], $_borders->[$footer_at][$_], $footer_backdrops->[$_], \$_footer_cells[$_]{dressed} ) foreach 0 .. $#_footer_cells;
+		$self->_dress_strips( \@header_rows, $base ) if $_gutter_shown;
+
+		my @background_keys = map { join "\x{1F}", @$_ } @backgrounds;
+		my $base_key        = _flat($base);
+		foreach my $index ( 0 .. $#$lines ) {
+			my ( $line, $at ) = ( $lines->[$index], @header_rows + $index );
+			my $built     = $_built{ $line->{key} };
+			my $dress_key = join "\0", $built->{look_key}, $base_key, map { $background_keys[$_] // '' } grep { $_ >= 0 } $at - 1, $at + 1;
+			next if defined $built->{dress_key} && $built->{dress_key} eq $dress_key;
+			$built->{dress_key} = $dress_key;
+			$self->_dress_line( $built, $line, $grid_columns, $built->{looks}, $_borders->[$at], $backdrops_of->($at) );
 		}
 		return;
+	}
+
+	# The rows of the header grid as built, [ cells, part ] each: the
+	# column titles and the filter row, or the ledge instead of both.
+	method _header_rows () {
+		return ( ( @_header_cells ? [ \@_header_cells, 'header' ] : () ), ( @_filter_cells ? [ \@_filter_cells, 'filter' ] : () ), ( @_top_ledge_cells ? [ \@_top_ledge_cells, 'ledge' ] : () ) );
+	}
+
+	# The strips of the scrollbar column: the frame's right side and the
+	# lines that run on beside the header and the footer, on the table's
+	# background. Inside the header strip, a blank column in the background
+	# of each header row, so that the rows reach the frame.
+	method _dress_strips ( $header_rows, $base ) {
+		my $look  = { background_color => $base, border_color => $self->line_color };
+		my %strip = ( header => $_header_strip, body => $_body_strip, footer => $_footer_strip );
+		$self->_dress_cell( $strip{$_}, $look, $_strip_borders->{$_}, undef, \$_strip_dressed{$_} ) foreach sort keys %strip;
+
+		my $filter_height = 1 + $cell_padding->{top} + $cell_padding->{bottom};
+		my @fills         = map {
+			my $part = $_->[1];
+				  $part eq 'header' ? [ $header_style->{background_color} // $self->header_background_color, sizing_grow() ]
+				: $part eq 'filter' ? [ $self->filter_background_color, sizing_fixed($filter_height) ]
+				: ()
+		} @$header_rows;
+		my $signature = join "\0", map { _flat($_) } @fills;
+		return if $signature eq $_header_fills_signature;
+		$_header_fills_signature = $signature;
+		$_header_fills->clear_children;
+		$_header_fills->add_child( Term::Fabulous::Widget::Box->new( background_color => $_->[0], layout => { sizing => { width => sizing_grow(), height => $_->[1] } } ) ) foreach @fills;
+		return;
+	}
+
+	# The background of every grid column of a line, as comparable keys: a
+	# line across the table has one look for all columns.
+	sub _backgrounds ( $looks, $column_count ) {
+		my @keys = map { _flat( $_->{background_color} ) } @$looks;
+		return @keys == 1 ? [ ( $keys[0] ) x $column_count ] : \@keys;
+	}
+
+	# A line between two cells of different backgrounds takes neither: the
+	# drawn sides and corners of a cell inside the frame whose cells around
+	# them do not all share one background get the table's background
+	# ($base). The line below the header rows always does, as the body
+	# scrolls under it. Takes the background keys of every line (header
+	# rows first) per grid column, the number of header rows, the cell (its
+	# line and first and last grid column) and its lines (from
+	# resolve_borders); returns a hash for border_background_colors, or
+	# undef when every line keeps the cell's own background.
+	sub _line_backdrops ( $backgrounds, $header_lines, $line, $first, $last, $border, $base ) {
+		my $sides      = $border->{sides};
+		my %inside     = ( top => $line > 0, bottom => $line < $#$backgrounds, left => $first > 0, right => $last < $#{ $backgrounds->[$line] } );
+		my %lines_of   = ( top => [ $line - 1, $line ], bottom => [ $line, $line + 1 ] );
+		my %columns_of = ( left => [ $first - 1, $first ], right => [ $last, $last + 1 ] );
+		my %backdrops;
+		foreach my $name (qw(top bottom left right top_left top_right bottom_left bottom_right)) {
+			my @parts = split /_/, $name;
+			next unless all { $sides->{$_} && $inside{$_} } @parts;
+			my ($across) = grep { $lines_of{$_} } @parts;
+			my ($along)  = grep { $columns_of{$_} } @parts;
+			my @lines    = defined $across ? @{ $lines_of{$across} }  : ($line);
+			my @columns  = defined $along  ? @{ $columns_of{$along} } : ( $first .. $last );
+			my @around   = map { @{ $backgrounds->[$_] }[@columns] } @lines;
+			my $scrolls  = defined $across && $lines[0] == $header_lines - 1;
+			next if !$scrolls && all { $_ eq $around[0] } @around;
+			$backdrops{$name} = $base;
+		}
+		return %backdrops ? \%backdrops : undef;
 	}
 
 	# What else a line's look depends on.
@@ -871,11 +1037,11 @@ class Term::Fabulous::Widget::Table
 		return $state eq 'cursor' ? $self->cursor_color : $state eq 'selected' ? $self->selected_color : $state eq 'hover' ? $self->hover_color : undef;
 	}
 
-	# The grid lines of the header rows and the lines.
+	# The grid lines of the header rows, the lines and the footer, and the
+	# strips of the scrollbar column while it is shown.
 	method _resolve_lines ( $grid_columns, $header_rows, $lines ) {
-		my @border_lines = map {
-			{ style => $header_style, cells => [ map { {} } @$grid_columns ] }
-		} @$header_rows;
+		my @no_styles    = map { {} } @$grid_columns;
+		my @border_lines = map { $_->[1] eq 'ledge' ? { ledge => 1, cells => [@no_styles] } : { style => $header_style, cells => [@no_styles] } } @$header_rows;
 		foreach my $line (@$lines) {
 			if ( $line->{kind} eq 'row' ) {
 				my $id = $line->{id};
@@ -887,31 +1053,41 @@ class Term::Fabulous::Widget::Table
 			}
 			push @border_lines, { spanning => 1, style => $line->{kind} eq 'group' ? $group_style : {}, cells => [ {} ] };
 		}
+		push @border_lines, { ledge => 1, cells => [@no_styles] };
 		return resolve_borders(
 			columns       => scalar @$grid_columns,
 			header        => scalar @$header_rows,
+			gutter        => $_gutter_shown,
 			table         => \%_line_style,
 			column_styles => [ map { defined $_->{column} ? $_->{column}->style : {} } @$grid_columns ],
 			lines         => \@border_lines,
 		);
 	}
 
-	method _dress_line ( $built, $line, $grid_columns, $state, $stripe, $borders ) {
+	# The look of every cell of a line: one per grid column for a data
+	# row, one for a line across the table.
+	method _line_looks ( $line, $grid_columns, $state, $stripe ) {
 		my $state_color = $self->_state_color($state);
-		if ( $line->{kind} eq 'row' ) {
-			my $id    = $line->{id};
-			my $row   = $self->_row_style_for($id);
-			my @looks = map {
+		return [ $line->{kind} eq 'group' ? $self->_group_look($state_color) : $self->_empty_look ] unless $line->{kind} eq 'row';
+		my $id  = $line->{id};
+		my $row = $self->_row_style_for($id);
+		return [
+			map {
 				my $cell = defined $grid_columns->[$_]{column} ? $self->_cell_style_for( $id, $grid_columns->[$_]{column} ) : {};
 				$self->_body_look( $state_color // ( $stripe ? $self->stripe_color : undef ), $row, $cell, $grid_columns->[$_]{column}, defined $state_color );
-			} 0 .. $#$grid_columns;
+			} 0 .. $#$grid_columns
+		];
+	}
+
+	method _dress_line ( $built, $line, $grid_columns, $looks, $borders, $backdrops ) {
+		if ( $line->{kind} eq 'row' ) {
 			$built->{dressed} //= [];
-			$self->_dress_cell( $built->{cells}[$_], $looks[$_], $borders->[$_], \$built->{dressed}[$_] ) foreach 0 .. $#looks;
-			$self->_mark_row( $built, $line, $grid_columns, \@looks );
+			$self->_dress_cell( $built->{cells}[$_], $looks->[$_], $borders->[$_], $backdrops->[$_], \$built->{dressed}[$_] ) foreach 0 .. $#$looks;
+			$self->_mark_row( $built, $line, $grid_columns, $looks );
 			return;
 		}
-		my $look = $line->{kind} eq 'group' ? $self->_group_look($state_color) : $self->_empty_look;
-		$self->_dress_cell( $built->{cells}[0], $look, $borders->[0], \$built->{dressed} );
+		my $look = $looks->[0];
+		$self->_dress_cell( $built->{cells}[0], $look, $borders->[0], $backdrops->[0], \$built->{dressed} );
 		if ( $line->{kind} eq 'group' ) {
 			$self->_refresh_group_label($built);
 			_set( $built->{toggle}, text => $line->{expanded} ? OPEN : CLOSED );
@@ -974,16 +1150,19 @@ class Term::Fabulous::Widget::Table
 		};
 	}
 
-	# Gives a cell its look and lines; $memo holds what it was given last
-	# time, so an unchanged cell costs one string comparison.
-	method _dress_cell ( $cell, $look, $border, $memo ) {
+	# Gives a cell its look and lines, and the background of the lines it
+	# draws between itself and cells of other backgrounds ($backdrops, see
+	# _line_backdrops); $memo holds what it was given last time, so an
+	# unchanged cell costs one string comparison.
+	method _dress_cell ( $cell, $look, $border, $backdrops, $memo ) {
 		my $sides      = $border->{sides};
 		my %properties = (
-			background_color   => $look->{background_color},
-			border_color       => $look->{border_color},
-			bordered           => { map { $_ => $sides->{$_} ? 1 : 0 } qw(top right bottom left) },
-			border_corners     => %{ $border->{corners} } ? $border->{corners} : undef,
-			outer_border_sides => $border->{outer},
+			background_color         => $look->{background_color},
+			border_background_colors => $backdrops,
+			border_color             => $look->{border_color},
+			bordered                 => { map { $_ => $sides->{$_} ? 1 : 0 } qw(top right bottom left) },
+			border_corners           => %{ $border->{corners} } ? $border->{corners} : undef,
+			outer_border_sides       => $border->{outer},
 			map { ( "border_style_$_" => $sides->{$_} ) } qw(top right bottom left),
 		);
 		my $signature = join "\x{1E}", map { "$_=" . ( defined $properties{$_} ? _flat( $properties{$_} ) : '' ) } sort keys %properties;
@@ -1017,6 +1196,10 @@ class Term::Fabulous::Widget::Table
 			_set( $built->{toggle_box}, background_color => $look->{background_color} );
 		}
 		return;
+	}
+
+	method _ledge_look () {
+		return { background_color => $self->_base_background, border_color => $self->line_color };
 	}
 
 	method _empty_look () {
@@ -1061,11 +1244,33 @@ class Term::Fabulous::Widget::Table
 	# Scrollbar, pager, scrolling
 	# ---------------------------------------------------------------------
 
-	# The scrollbar right of the body, and a spacer as wide as it right of
-	# the header, so that header and body are clipped at the same width.
-	method _prepare_scrollbar () {
-		_show_child( $_body_row,   $_scrollbar,     $scrollbar );
-		_show_child( $_header_row, $_header_spacer, $scrollbar );
+	# The scrollbar column, while the rows did not fit in the last frame:
+	# the strips beside the header, the body and the footer.
+	method _prepare_gutter () {
+		$_gutter_shown = $self->_gutter_wanted;
+		_show_child( $_header_row, $_header_strip, $_gutter_shown );
+		_show_child( $_body_row,   $_body_strip,   $_gutter_shown );
+		_show_child( $_footer_row, $_footer_strip, $_gutter_shown );
+		return;
+	}
+
+	method _gutter_wanted () {
+		return 0 unless $scrollbar;
+		my $ui    = $self->ui                 // return 0;
+		my $state = $ui->scroll_state($_body) // return 0;
+		return $state->{content}{height} > $state->{viewport}{height} ? 1 : 0;
+	}
+
+	# Whether the rows fit is known after a frame; one that changes it
+	# prepares the next.
+	method _watch_gutter () {
+		$self->each_frame(
+			sub ($table) {
+				$table->request_prepare if $table->_gutter_wanted != $_gutter_shown;
+				return 0;
+			},
+			name => 'gutter'
+		);
 		return;
 	}
 
@@ -1093,40 +1298,28 @@ class Term::Fabulous::Widget::Table
 		return;
 	}
 
-	# A new page starts at the top; a cursor that moved is scrolled into
-	# view once the frame that lays its line out is drawn.
+	# A new page starts at the top.
 	method _prepare_scrolling () {
 		my $ui = $self->ui // return;
-		if ( $model->page != $_shown_page ) {
-			$_shown_page = $model->page;
-			$ui->scroll_to( $_body, { x => 0, y => 0 } );
-		}
-		return unless $_reveal_cursor;
-		$_reveal_cursor = 0;
-		weaken( my $weak = $self );
-		$ui->after_draw( sub { $weak->_scroll_cursor_into_view if $weak } ) if $ui->can('after_draw');
+		return if $model->page == $_shown_page;
+		$_shown_page = $model->page;
+		$ui->scroll_to( $_body, { x => 0, y => 0 } );
 		return;
 	}
 
-	# The rows of the body's content and viewport, how far it is scrolled
-	# (Clay keeps a negative position) and where a line lies in the
-	# content, in the last frame.
-	method _line_box ($key) {
-		my $ui     = $self->ui                               // return undef;
-		my $built  = $_built{ $key // '' }                   // return undef;
-		my $box    = $ui->bounding_box( $built->{cells}[0] ) // return undef;
-		my $state  = $ui->scroll_state($_body)               // return undef;
-		my $body   = $ui->bounding_box($_body)               // return undef;
-		my $offset = -$state->{position}{y};
-		my $from   = $box->{y} - $body->{y} + $offset;
-		return { content => $state->{content}{height}, viewport => $state->{viewport}{height}, offset => $offset, from => $from, to => $from + $box->{height} };
+	# A cursor that moved is scrolled into view once the frame that lays
+	# its line out is drawn: the line's cells may be new, or the last
+	# frame put them elsewhere (a sort, a new page). Before the table is
+	# in a UI, that is the first frame.
+	method _reveal_cursor_after_frame () {
+		$self->each_frame( sub ($table) { $table->_reveal_cursor_line; return 1 }, name => 'cursor' );
+		return;
 	}
 
-	method _scroll_cursor_into_view () {
-		my $ui     = $self->ui                          // return;
-		my $box    = $self->_line_box( $model->cursor ) // return;
-		my $offset = reveal_range( @{$box}{qw(content viewport offset from to)} );
-		$ui->scroll_to( $_body, { y => -$offset } ) if $offset != $box->{offset};
+	# The body reveals the first cell of the cursor's line.
+	method _reveal_cursor_line () {
+		my $built = $_built{ $model->cursor // '' } // return;
+		$_body->reveal( $built->{cells}[0] );
 		return;
 	}
 
@@ -1146,28 +1339,22 @@ class Term::Fabulous::Widget::Table
 	# ---------------------------------------------------------------------
 
 	method _listen () {
-		weaken( my $weak = $self );
-		$self->on( KeyPress  => sub ($event) { return $weak ? $weak->_on_key($event)   : $CONTINUE } );
-		$self->on( Mouse     => sub ($event) { return $weak ? $weak->_on_mouse($event) : $CONTINUE } );
-		$self->on( MouseMove => sub ($event) { $weak->_on_mouse_move($event) if $weak; return $CONTINUE } );
+		$self->on( KeyPress  => sub ( $self, $event ) { return $self->_on_key($event) },                   owner => $self );
+		$self->on( Mouse     => sub ( $self, $event ) { return $self->_on_mouse($event) },                 owner => $self );
+		$self->on( MouseMove => sub ( $self, $event ) { $self->_on_mouse_move($event); return $CONTINUE }, owner => $self );
 		foreach my $name (qw(OnFocus OnBlur)) {
-			$self->on( $name => sub ($event) { $weak->_changed if $weak; return $CONTINUE } );
+			$self->on( $name => sub ( $self, $event ) { $self->_changed; return $CONTINUE }, owner => $self );
 		}
-		$self->on( OnHoverStopped => sub ($event) { $weak->_hover_line(undef) if $weak && refaddr( $event->target ) == refaddr($weak); return $CONTINUE } );
+		$self->on( OnHoverStopped => sub ( $self, $event ) { $self->_hover_line(undef) if refaddr( $event->target ) == refaddr($self); return $CONTINUE }, owner => $self );
 		return;
 	}
 
 	# Which part of the table a widget belongs to.
 	method _region_of ($widget) {
-		for ( my $node = $widget; defined $node; $node = $node->parent ) {
-			my $address = refaddr $node;
-			return 'body' if $address == refaddr($_body_row);
-			return 'header' if $address == refaddr($_header_view);
-			return 'pager' if $address == refaddr($_pager);
-			return 'chooser' if defined $_chooser && $address == refaddr($_chooser);
-			return 'table' if $address == refaddr($self);
-		}
-		return 'table';
+		my %region = ( refaddr($_body_row) => 'body', refaddr($_header_view) => 'header', refaddr($_pager) => 'pager', refaddr($self) => 'table' );
+		$region{ refaddr $_chooser } = 'chooser' if defined $_chooser;
+		my $part = $widget->closest( sub ($node) { exists $region{ refaddr $node } } ) // return 'table';
+		return $region{ refaddr $part };
 	}
 
 	# Whether a widget between $widget and the table takes input of its own
@@ -1176,7 +1363,9 @@ class Term::Fabulous::Widget::Table
 	# click on such a button makes its cell the target, so the widgets of
 	# the cell under the pointer count, too.
 	method _inside_input ($event) {
-		for ( my $node = $event->target; defined $node && refaddr($node) != refaddr($self); $node = $node->parent ) {
+		my $target = $event->target;
+		foreach my $node ( $target, $target->ancestors ) {
+			last if refaddr($node) == refaddr($self);
 			return 1 if _takes_input($node);
 			return $self->_input_under_pointer( $node, $event->x, $event->y ) if $node->isa('Term::Fabulous::Widget::Table::Cell');
 		}
@@ -1184,7 +1373,7 @@ class Term::Fabulous::Widget::Table
 	}
 
 	sub _takes_input ($widget) {
-		return $widget->DOES('Clay::UI::Role::Interaction::Focusable') || $widget->DOES('Clay::UI::Role::Interaction::Pressable') ? 1 : 0;
+		return $widget->DOES('Clay::UI::Role::Interaction::Pressable') || ( $widget->DOES('Clay::UI::Role::Interaction::Focusable') && $widget->can_focus ) ? 1 : 0;
 	}
 
 	method _input_under_pointer ( $widget, $x, $y ) {
@@ -1373,7 +1562,7 @@ class Term::Fabulous::Widget::Table
 
 	method _after_cursor_moved ( $moved, $page_before ) {
 		return unless $moved || $model->page != $page_before;
-		$_reveal_cursor = 1;
+		$self->_reveal_cursor_after_frame;
 		$self->_changed;
 		if ($moved) {
 			my $line = $model->line( $model->cursor );
@@ -1411,7 +1600,7 @@ class Term::Fabulous::Widget::Table
 
 	method _change_page_size ($size) {
 		return unless $model->set_page_size($size);
-		$_reveal_cursor = 1;
+		$self->_reveal_cursor_after_frame;
 		$self->_changed;
 		$self->_fire_page_change;
 		return;
@@ -1467,7 +1656,7 @@ class Term::Fabulous::Widget::Table
 
 	method _leave_header () {
 		$_header_cursor = undef;
-		$_reveal_cursor = 1;
+		$self->_reveal_cursor_after_frame;
 		$self->_changed;
 		return $HANDLED;
 	}
@@ -1501,7 +1690,7 @@ class Term::Fabulous::Widget::Table
 	method _sort_by_user ( $key, $add ) {
 		return unless $model->column($key)->sortable;
 		return unless $model->cycle_sort( $key, $add );
-		$_reveal_cursor = 1;
+		$self->_reveal_cursor_after_frame;
 		$self->_changed;
 		$self->fire_event( Term::Fabulous::Event::SortChange->new( sort => $model->sort_spec ) );
 		return;
@@ -1514,7 +1703,8 @@ class Term::Fabulous::Widget::Table
 	# The table widget a mouse event is about: a toggle or a cell, and the
 	# widget it hit. The scrollbar handles its own clicks.
 	method _hit ($target) {
-		for ( my $node = $target; defined $node && refaddr($node) != refaddr($self); $node = $node->parent ) {
+		foreach my $node ( $target, $target->ancestors ) {
+			last if refaddr($node) == refaddr($self);
 			return ( toggle => $node ) if $node->isa('Term::Fabulous::Widget::Table::Toggle');
 			return ( cell   => $node ) if $node->isa('Term::Fabulous::Widget::Table::Cell');
 		}
@@ -1559,10 +1749,9 @@ class Term::Fabulous::Widget::Table
 
 	method _click_line ( $cell, $event ) {
 		my $line   = $model->line( $cell->line_key // '' ) // return $HANDLED;
-		my $now    = Time::HiRes::time();
-		my $double = @_last_press && $_last_press[1] eq $line->{key} && $now - $_last_press[0] <= $double_click_seconds;
-		@_last_press    = $double ? () : ( $now, $line->{key} );
-		$_header_cursor = undef;
+		my $double = $event->click_count >= 2 && defined $_last_press_key && $_last_press_key eq $line->{key};
+		$_last_press_key = $double ? undef : $line->{key};
+		$_header_cursor  = undef;
 
 		if ( $line->{kind} eq 'group' ) {
 			$self->_move_cursor( $line->{key} );
@@ -1631,7 +1820,7 @@ class Term::Fabulous::Widget::Table
 		}
 		$model->set_filter( "column:$key" => $filter );
 		$model->expand_to_matches;
-		$_reveal_cursor = 1;
+		$self->_reveal_cursor_after_frame;
 		$self->_changed;
 		return $_filter_error{$key};
 	}
@@ -1822,15 +2011,8 @@ class Term::Fabulous::Widget::Table
 		return $self unless defined $_chooser;
 		my $closing = $_chooser;
 		undef $_chooser;
-		my $refocus = $self->_focus_is_inside($closing);
-		$self->remove_child($closing);
-		$self->_focus_self if $refocus;
+		$self->remove_child($closing);    # a focus inside goes to its heir, the table
 		return $self;
-	}
-
-	method _focus_is_inside ($widget) {
-		my $ui = $self->ui // return 0;
-		return $ui->interaction->has_focus_within($widget);
 	}
 
 	method is_column_chooser_open () {
@@ -1851,7 +2033,7 @@ class Term::Fabulous::Widget::Table
 	}
 
 	method sort_by (@spec) {
-		$_reveal_cursor = 1 if $model->set_sort(@spec);
+		$self->_reveal_cursor_after_frame if $model->set_sort(@spec);
 		$self->_changed;
 		return $self;
 	}
@@ -1867,7 +2049,7 @@ class Term::Fabulous::Widget::Table
 			if defined $name && !ref $name && $name =~ /\Acolumn:/;
 		$model->set_filter( $name, $filter );
 		$model->expand_to_matches;
-		$_reveal_cursor = 1;
+		$self->_reveal_cursor_after_frame;
 		$self->_changed;
 		return $self;
 	}
@@ -1895,7 +2077,7 @@ class Term::Fabulous::Widget::Table
 		return $model->search unless @new;
 		$model->search( $new[0] );
 		$model->expand_to_matches;
-		$_reveal_cursor = 1;
+		$self->_reveal_cursor_after_frame;
 		$self->_changed;
 		return $self;
 	}
@@ -2004,6 +2186,26 @@ class Term::Fabulous::Widget::Table
 
 	method page_count () { return $model->page_count }
 
+	# The rows the table takes before it is laid out: the header rows, the
+	# lines of the current page (or the one line that says there are
+	# none), the lines of the frame around them (the top, the line under
+	# the header rows and the bottom ledge, each when its style draws a
+	# line) and the pager when it shows. The lines between rows are not
+	# counted.
+	method estimated_content_rows :override ($columns) {
+		my $header_rows = ( $show_header ? 1 : 0 ) + ( $filter_row ? 1 : 0 );
+		my $rows        = $header_rows + max( 1, scalar $model->page_lines );
+		$rows++ if _draws_line( $_line_style{border_top} );
+		$rows++ if $header_rows && _draws_line( $_line_style{header_line} // $_line_style{row_lines} );
+		$rows++ if _draws_line( $_line_style{border_bottom} );
+		$rows += $_pager->estimated_rows($columns) if $self->_pager_shown;
+		return $rows;
+	}
+
+	sub _draws_line ($style) {
+		return defined $style && $style->name ne 'Hidden' ? 1 : 0;
+	}
+
 	method page_size (@new) {
 		return $model->page_size unless @new;
 		$model->set_page_size( $new[0] );
@@ -2111,7 +2313,7 @@ class Term::Fabulous::Widget::Table
 		die "Term::Fabulous::Widget::Table: row '$new[0]' is not shown (filtered out, or below a collapsed row or group)" unless defined $model->line_index($key);
 		$model->set_cursor($key);
 		$model->set_anchor($key);
-		$_reveal_cursor = 1;
+		$self->_reveal_cursor_after_frame;
 		$self->_changed;
 		return $self;
 	}
@@ -2423,6 +2625,110 @@ class Term::Fabulous::Widget::Table
 
 	# --- Widgets ---------------------------------------------------------
 
+	# ---------------------------------------------------------------------
+	# Searching (Term::Fabulous::Role::Searchable): every filtered row,
+	# on any page, shown or collapsed
+	# ---------------------------------------------------------------------
+
+	# The texts of the plain columns come from the model, so a search
+	# reaches rows the table never built; the widgets of a custom cell
+	# answer only while the row is built.
+	method search_texts () {
+		my @columns = $model->visible_columns;
+		my @entries;
+		foreach my $id ( $model->filtered_row_ids ) {
+			my $built = $_built{ Term::Fabulous::Widget::Table::Model::row_key($id) };
+			foreach my $column (@columns) {
+				my $key = $column->key;
+				if ( !defined $column->cell ) {
+					push @entries, [ [ $id, $key ], $model->display_of( $id, $key ) ];
+					next;
+				}
+				my $content = defined $built ? $built->{content}{$key} : undef;
+				next unless defined $content;
+				push @entries, map { [ [ $id, $key, @{ $_->[0] } ], $_->[1] ] } nested_search_texts( [ searchables_in($content) ] );
+			}
+		}
+		return @entries;
+	}
+
+	# A key: [ row id, column key ] for a text cell, with the index and the
+	# key of the widget inside for a custom cell.
+	method _search_target ( $what, $key ) {
+		die ref($self) . ": $what needs a key of [ row id, column key ] (and the index and key of a widget in a custom cell), got " . describe($key)
+			unless ref $key eq 'ARRAY' && ( @$key == 2 || @$key == 4 ) && defined $key->[0] && !ref $key->[0] && defined $key->[1] && !ref $key->[1];
+		my ( $id, $column, @nested ) = @$key;
+		return ( $id, $column, @nested ? [@nested] : undef );
+	}
+
+	method search_revision ($key) {
+		my ( $id, $column, $nested ) = $self->_search_target( search_revision => $key );
+		return 'gone' unless $model->has_row($id) && $model->has_column($column);
+		my $revision = join ':', $model->row_revision($id), $model->columns_revision;
+		return $revision unless defined $nested;
+		my $content = $self->cell_widget( $id, $column ) // return 'gone';
+		return join ':', $revision, nested_search_revision( [ searchables_in($content) ], $nested );
+	}
+
+	method highlight_text ( $key, $ranges ) {
+		my ( $id, $column, $nested ) = $self->_search_target( highlight_text => $key );
+		return unless $model->has_row($id);
+		my $slot  = "$id\0$column";
+		my $built = $_built{ Term::Fabulous::Widget::Table::Model::row_key($id) };
+		if ( defined $nested ) {
+			$_cell_highlights{$slot}{ join "\0", map { $_ // '' } @$nested } = [ @$nested, $ranges ];
+			my $content = defined $built ? $built->{content}{$column} : undef;
+			nested_highlight_text( [ searchables_in($content) ], $nested, $ranges ) if defined $content;
+			return;
+		}
+
+		# The ranges are checked against the cell's text now, whether or
+		# not the row is built: the text the cell shows is the model's.
+		Term::Fabulous::Text::Marks->new( owner => ref($self), text => $model->display_of( $id, $column ) )->check_spans( highlight => $ranges );
+		$_text_highlights{$slot} = { ranges => $ranges, revision => $model->row_revision($id) };
+		my $text = defined $built ? $built->{text}{$column} : undef;
+		$text->highlights($ranges) if defined $text;
+		return;
+	}
+
+	method clear_text_highlights () {
+		%_text_highlights = ();
+		%_cell_highlights = ();
+		foreach my $built ( grep { $_->{kind} eq 'row' } values %_built ) {
+			$_->clear_highlights foreach values %{ $built->{text} };
+			nested_clear_text_highlights( [ map { searchables_in($_) } grep { !$_->isa('Term::Fabulous::Widget::Text') } values %{ $built->{content} } ] );
+		}
+		return;
+	}
+
+	method _drop_row_highlights ($id) {
+		delete @_text_highlights{ grep { index( $_, "$id\0" ) == 0 } keys %_text_highlights };
+		delete @_cell_highlights{ grep { index( $_, "$id\0" ) == 0 } keys %_cell_highlights };
+		return;
+	}
+
+	# Shows the row: the rows and groups above it are expanded, the cursor
+	# goes to it, which turns to its page and scrolls the body. The cell's
+	# widget is there once the table was prepared again.
+	method reveal_text ( $key, $offset ) {
+		my ( $id, $column, $nested ) = $self->_search_target( reveal_text => $key );
+		return [ undef, undef ] unless $model->has_row($id);
+		for ( my $parent = $model->parent_of($id); defined $parent; $parent = $model->parent_of($parent) ) {
+			$model->set_expanded( $parent, 1 );
+		}
+		my @path;
+		foreach my $group_key ( $model->group_by ) {
+			push @path, $model->value_of( $id, $group_key );
+			$model->set_group_collapsed( [@path], 0 );
+		}
+		return [ undef, undef ] unless defined $model->line_index( Term::Fabulous::Widget::Table::Model::row_key($id) );
+		$self->cursor($id);
+		my $built = $_built{ Term::Fabulous::Widget::Table::Model::row_key($id) } // return [ undef, undef ];
+		return [ $built->{text}{$column}, undef ] unless defined $nested;
+		my $content = $built->{content}{$column} // return [ undef, undef ];
+		return nested_reveal_text( [ searchables_in($content) ], $nested, $offset );
+	}
+
 	# The widget a cell shows (its column's cell widget or a Text), once
 	# the row is on the page and the table was prepared.
 	method cell_widget ( $id, $key ) {
@@ -2486,7 +2792,7 @@ grouping, trees, pages and selection
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-table.svg" alt="A table of staff with a filter row, sorted by the start date, two rows selected with check boxes and a pager below"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.05/screenshots/widget-table.svg" alt="A table of staff with a filter row, sorted by the start date, two rows selected with check boxes and a pager below"></p>
 
 =end html
 
@@ -2736,12 +3042,6 @@ Never shown with C<'none'>.
 A boolean. Default: 1. Whether the line under the mouse pointer is
 highlighted with the C<hover_color>.
 
-=item C<double_click_seconds>
-
-A number of seconds, at least 0. Default: 0.4. Two clicks on the same
-line at most this far apart are a double click. Only a parameter; there
-is no accessor.
-
 =back
 
 =head3 Parts shown
@@ -2756,8 +3056,8 @@ header.
 
 =item C<scrollbar>
 
-A boolean. Default: 1. Whether the scrollbar column is shown right of
-the rows.
+A boolean. Default: 1. Whether the scrollbar column is shown inside
+the frame, right of the rows, while they do not fit.
 
 =item C<empty_text>
 
@@ -3545,8 +3845,11 @@ Accessor for the C<group_style> style hash, like C<header_style>.
 
 The line accessors below take a line style name, a
 L<Term::Fabulous::Enum::BorderStyle> object, C<'none'> or C<undef> (see
-L<Term::Fabulous::Manual::TableStyles/Lines between and around the cells>). They return the style as an
-object (the C<Hidden> style for C<'none'>), or C<undef> for no line.
+L<Term::Fabulous::Manual::TableStyles/Lines between and around the cells>).
+They return the style as an object (the C<Hidden> style for C<'none'>),
+or C<undef> for no line. L<Term::Fabulous::Widget::Table::Borders>
+explains how the lines are worked out, who draws which side, and the
+scrollbar column.
 
 =head3 border
 
@@ -3663,7 +3966,8 @@ The text shown in an empty table, and the pager's count.
 =head3 line_color
 
 Every line that no style gives a C<border_color>, and the scrollbar's
-track.
+track; while the scrollbar column is shown, also the right side of the
+frame.
 
 =head3 stripe_color
 
@@ -3689,7 +3993,7 @@ Whether the column titles are shown.
 
 	$table->scrollbar(0);
 
-Whether the scrollbar column is shown.
+Whether the scrollbar column is shown while the rows do not fit.
 
 =head3 hover
 
@@ -3715,6 +4019,77 @@ The text of a table whose rows all are filtered out.
 
 Where row ids come from (see L<Term::Fabulous::Manual::Tables/Row ids>). Setting it dies while the
 table has rows.
+
+=head3 estimated_rows
+
+	my $rows = $table->estimated_rows($columns);
+
+The rows the table will take before it is laid out (see
+L<Term::Fabulous::Widget/estimated_rows>): the header, the rows of
+the current page and the pager when there are pages, inside the
+border. The lines between the rows are not counted.
+
+=head2 Methods for searching
+
+The table does L<Term::Fabulous::Role::Searchable>, so a widget that
+searches its contents, such as L<Term::Fabulous::Widget::DocumentView>,
+reaches every row of the table: the rows on other pages, and the rows
+below collapsed rows and groups.
+
+=head3 search_texts
+
+	my @entries = $table->search_texts;    # ( [ [ $id, $key ], $text ], ... )
+	                                       # [ $id, $key, $index, $inner ] in a custom cell
+
+The text of every visible column of every row the filters let through,
+in the order of the rows and the columns, as the cells show it
+(L<Term::Fabulous::Widget::Table::Column/display_of>): the key is the
+row id and the column key. A column with a C<cell> widget has no text
+of its own; the texts of the searchable widgets inside the cell follow
+instead, with the index and the key of the widget added, and only
+while the row is built (on the current page, after a frame). Group
+labels and column titles are not searched.
+
+=head3 search_revision
+
+	my $revision = $table->search_revision( [ $id, $key ] );
+
+Changes when the row or the columns change; C<'gone'> for a row or a
+column that no longer exists, and for a widget in a custom cell that is
+not built.
+
+=head3 highlight_text
+
+	$table->highlight_text( [ $id, $key ], [ [ $start, $end, 'on selection' ] ] );
+
+Marks ranges of a cell's text, now and whenever the cell is built again
+(on another page, after sorting), until the row's data change or
+L</clear_text_highlights> is called. Offsets past the cell's text die
+at the call, also for a row that is not built. For a widget in a custom
+cell the highlights go to that widget whenever the cell is built, and
+the widget checks them then: its text exists only while the row is
+built.
+
+=head3 clear_text_highlights
+
+	$table->clear_text_highlights;
+
+Removes every highlight of every cell.
+
+=head3 reveal_text
+
+	my ( $text, $row ) = @{ $table->reveal_text( [ $id, $key ], $offset ) };
+
+Shows the row: expands the rows and the groups above it, and moves the
+cursor to it, which turns to its page and scrolls the body to it; it
+fires no event and the selection does not change. Returns the cell's
+L<Text|Term::Fabulous::Widget::Text> once the row is built, which is
+after the next frame when the page turned, else C<undef>; the second
+value (the row of the offset, see
+L<Term::Fabulous::Role::Searchable/reveal_text>) is C<undef> for a text
+cell. For a key into a custom cell, both values are those the widget
+inside returns, once the row is built. A row the filters keep out cannot
+be shown and gives C<undef> too.
 
 =head2 Widgets of the table
 
@@ -3862,9 +4237,13 @@ selection column selects or deselects that row and keeps the others.
 
 =item *
 
-B<Double click on a row> (two clicks on the same line within
-C<double_click_seconds>): each click does what a click does (moves the
-cursor, selects), then the second one fires C<RowActivate>.
+B<Double click on a row> (two presses of the left button on the same
+character of a line, without moving the pointer, a
+L<click_count|Term::Fabulous::Event::Mouse/click_count> of 2 within the
+UI's L<double_click_seconds|Term::Fabulous/double_click_seconds>): each
+click does what a click does (moves the cursor, selects), then the
+second one fires C<RowActivate>. A third quick click is a single click
+again, a fourth a double click.
 
 =item *
 
@@ -3890,7 +4269,9 @@ centered where the pointer is.
 =item *
 
 B<Wheel>: scrolls the rows up and down; a horizontal wheel scrolls them
-sideways, and the titles follow.
+sideways, and the titles and the bottom of the frame follow (not while
+a column is C<grow> or C<percent>: such a table wraps the text of its
+columns instead).
 
 =item *
 
@@ -3987,8 +4368,8 @@ A table can be part of a KDL layout (see
 L<Term::Fabulous::Manual::KDL/KDL LAYOUT FILES>). The layout describes the
 table: its columns, sort, grouping, lines, colors and options. The rows,
 everything that is a code reference (mutators, cell widgets,
-callbacks), the style hashes C<header_style> and C<group_style> of the
-table, and C<double_click_seconds> come from Perl.
+callbacks) and the style hashes C<header_style> and C<group_style> of
+the table come from Perl.
 
 =for highlighter language=kdl
 
@@ -4177,6 +4558,8 @@ L<Term::Fabulous::Widget::Table::Filter>, L<Term::Fabulous::Widget::Table::Value
 L<Term::Fabulous::Widget::Table::Model>, L<Term::Fabulous::Widget::Table::Style>,
 L<Term::Fabulous::Widget::Table::Borders>, L<Term::Fabulous::Widget::Table::Pager>,
 L<Term::Fabulous::Widget::Table::ColumnChooser>,
+L<Term::Fabulous::Widget::Table::EdgeView>,
+L<Term::Fabulous::Widget::Table::Cell>,
 L<Term::Fabulous::Manual::Tables>, L<Term::Fabulous::Manual::TableRows>,
 L<Term::Fabulous::Manual::TableStyles>, L<Term::Fabulous::Cookbook::Tables>,
 L<Term::Fabulous::Cookbook::TableRows>, L<Term::Fabulous::Cookbook::TableStyles>,

@@ -3,7 +3,7 @@ package Validator::LIVR::Rules::Modifiers;
 use strict;
 use warnings;
 
-our $VERSION = '2.0';
+our $VERSION = '2.1';
 
 sub trim {
     return sub {
@@ -83,3 +83,17 @@ sub default {
 }
 
 1;
+
+=head1 NAME
+
+Validator::LIVR::Rules::Modifiers - Modifiers of Validator::LIVR: trim, to_lc, to_uc, remove, leave_only and default
+
+=head1 DESCRIPTION
+
+This module has the code of the modifiers, which are documented in
+L<Validator::LIVR/Modifiers>.
+
+Each sub is the builder of the rule with the same name. The code is a good
+example for L<writing your own rules|Validator::LIVR/WRITING RULES IN PERL>.
+
+=cut

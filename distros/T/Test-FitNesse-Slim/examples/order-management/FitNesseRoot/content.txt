@@ -1,0 +1,4 @@
+!1 Order management examples
+
+This is a business-readable acceptance suite for a small in-memory order
+service. Start at [[OrderManagementSuite]].

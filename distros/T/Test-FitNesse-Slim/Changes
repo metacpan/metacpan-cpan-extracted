@@ -1,0 +1,14 @@
+Revision history for Test::FitNesse::Slim
+
+1.00 2026-10-18
+    First public release candidate. Provides a Perl SLiM v0.5 server with
+    FitNesse-managed pipe and TCP transports, Perl fixture construction and
+    method dispatch, symbols, and metadata-driven argument and result
+    conversion for supported scalar, enum, array, and collection types.
+    Includes FitNesse integration tests, independent installed-distribution
+    checks, and a business-oriented order-management example. Requires Perl
+    5.36.0 or later. This entry records release-candidate preparation; it is
+    not a publication date or release announcement.
+    The unpublished development namespace was Test::Slim; the public module
+    namespace and distribution are Test::FitNesse::Slim and
+    Test-FitNesse-Slim. No compatibility alias is installed.

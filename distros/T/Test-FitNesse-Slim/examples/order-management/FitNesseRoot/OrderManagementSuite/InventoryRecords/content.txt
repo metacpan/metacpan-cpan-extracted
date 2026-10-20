@@ -1,0 +1,10 @@
+!1 Inventory records
+
+Query results are unordered when the business does not require a particular
+display order.
+
+|Query:inventory records|||
+|sku|product|unit price|on hand|reserved|available|
+|COFFEE|House coffee|5.00|10|0|10|
+|TEA|Breakfast tea|3.00|5|0|5|
+|MUG|Ceramic mug|12.00|2|0|2|

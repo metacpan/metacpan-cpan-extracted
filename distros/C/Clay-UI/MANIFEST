@@ -1,3 +1,4 @@
+Changes
 examples/01-minimal.pl
 examples/02-sidebar-demo.pl
 examples/03-svg-render.pl
@@ -87,6 +88,7 @@ patches/0001-clay-sizing-groups.patch
 patches/0002-clay-flow-layout.patch
 patches/0003-clay-back-to-front.patch
 patches/0004-clay-upstream-fixes.patch
+patches/0005-clay-text-cut-off.patch
 README.md
 src/callbacks.c
 src/clay/clay.h.orig
@@ -133,6 +135,7 @@ t/34-stack-layout.t
 t/35-ui-disableable.t
 t/36-ui-geometry.t
 t/37-ui-preparable.t
+t/38-text-cut-off.t
 t/99-golden.t
 t/fixtures/01-single-rect.json
 t/fixtures/01-single-rect.pl
@@ -157,6 +160,7 @@ t/fixtures/10-flow.pl
 t/fixtures/11-stack.json
 t/fixtures/11-stack.pl
 t/lib/Clay/Test/ChildPerl.pm
+t/lib/Clay/Test/Guards.pm
 t/lib/Clay/UI/Test/Box.pm
 t/lib/Clay/UI/Test/Grid.pm
 t/lib/Clay/UI/Test/GridCell.pm

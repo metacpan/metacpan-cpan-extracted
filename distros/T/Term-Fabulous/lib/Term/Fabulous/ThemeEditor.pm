@@ -5,7 +5,7 @@ use warnings;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 use Object::Pad 0.825;
 
@@ -26,6 +26,7 @@ class Term::Fabulous::ThemeEditor :strict(params) {
 	use Term::Fabulous::Check qw(describe);
 	use Term::Fabulous::Commands;
 	use Term::Fabulous::Editor;
+	use Term::Fabulous::Scrolling qw(scroll_by_key);
 	use Term::Fabulous::Theme;
 	use Term::Fabulous::Theme::Document;
 	use Term::Fabulous::ThemeEditor::Form;
@@ -40,11 +41,10 @@ class Term::Fabulous::ThemeEditor :strict(params) {
 	use Term::Fabulous::Widget::KeyReference;
 	use Term::Fabulous::Widget::MenuBar;
 	use Term::Fabulous::Widget::Prompt;
-	use Term::Fabulous::Widget::RichText;
+	use Term::Fabulous::Widget::Text;
 	use Term::Fabulous::Widget::ScrollBox;
 	use Term::Fabulous::Widget::SegmentedControl;
 	use Term::Fabulous::Widget::StatusBar;
-	use Term::Fabulous::Widget::Text;
 	use Term::Fabulous::Widget::TextField;
 
 	# How long the text must rest before it is parsed again, in seconds.
@@ -201,9 +201,9 @@ class Term::Fabulous::ThemeEditor :strict(params) {
 		return $commands->command($id)->run;
 	}
 
-	# Every command: its id, its label in the menus and its keys.
+	# Every command: its id, its plain label and its keys.
 	method commands () {
-		return map { { id => $_->id, label => $_->label =~ s/\.\.\.\z//r, keys => [ $_->keys ] } } $commands->commands;
+		return map { { id => $_->id, label => $_->plain_label, keys => [ $_->keys ] } } $commands->commands;
 	}
 
 	method command_enabled ($id) {
@@ -215,7 +215,7 @@ class Term::Fabulous::ThemeEditor :strict(params) {
 	# ---------------------------------------------------------------------
 
 	method _build_screen () {
-		weaken( my $editor = $self );
+		weaken( my $editor = $self );    # for the callbacks the parts keep
 		my $root = Term::Fabulous::Widget::Box->new( layout => { layout_direction => CLAY_TOP_TO_BOTTOM, sizing => { width => sizing_grow(), height => sizing_grow() } } );
 
 		$menu = Term::Fabulous::Widget::MenuBar->new(
@@ -228,19 +228,19 @@ class Term::Fabulous::ThemeEditor :strict(params) {
 			tabs   => sub { $editor->_tab_summaries },
 			layout => { sizing => { width => sizing_grow(), height => sizing_fixed(1) } },
 		);
-		$strip->on( Select   => sub ($event) { $editor->select_tab( $event->index ); return } );
-		$strip->on( TabClose => sub ($event) { $editor->close_tab( $event->index );  return } );
-		$strip->on( TabAdd   => sub ($event) { $editor->_ask_new_theme;              return } );
+		$strip->on( Select   => sub ( $self, $event ) { $self->select_tab( $event->index ); return }, owner => $self );
+		$strip->on( TabClose => sub ( $self, $event ) { $self->close_tab( $event->index );  return }, owner => $self );
+		$strip->on( TabAdd   => sub ( $self, $event ) { $self->_ask_new_theme;              return }, owner => $self );
 
 		# The preview pane: the editor draws its frame and title, the preview
 		# inside it draws in the theme being edited.
-		$preview_title = Term::Fabulous::Widget::RichText->new( text => 'Preview' );
+		$preview_title = Term::Fabulous::Widget::Text->new( text => 'Preview' );
 		$preview_root  = $self->_preview_widget;
 		$preview_pane  = $self->_pane( $preview_title, $preview_root );
 
-		$settings_title = Term::Fabulous::Widget::RichText->new( text => 'Settings' );
+		$settings_title = Term::Fabulous::Widget::Text->new( text => 'Settings' );
 		$mode_switch    = Term::Fabulous::Widget::SegmentedControl->new( options => [ [ Form => 'form' ], [ Text => 'text' ] ], value => 'form', can_focus => 0 );
-		$mode_switch->on( Change => sub ($event) { $editor->set_mode( $event->value ); return Clay::UI::Enum::Result->CONTINUE } );
+		$mode_switch->on( Change => sub ( $self, $event ) { $self->set_mode( $event->value ); return Clay::UI::Enum::Result->CONTINUE }, owner => $self );
 		my $title_box = Term::Fabulous::Widget::Box->new( layout => { sizing => { width => sizing_grow() } } );
 		$title_box->add_child($settings_title);
 		my $settings_head = Term::Fabulous::Widget::Box->new( layout => { sizing => { width => sizing_grow() }, child_gap => 1 } );
@@ -254,8 +254,8 @@ class Term::Fabulous::ThemeEditor :strict(params) {
 		);
 		$form->explain_with( sub ($row) { $editor->_explain($row) } );
 		$text_box    = Term::Fabulous::Widget::Box->new( layout => { layout_direction => CLAY_TOP_TO_BOTTOM, sizing => { width => sizing_grow(), height => sizing_grow() } } );
-		$errors_text = Term::Fabulous::Widget::RichText->new( text => '' );
-		$welcome     = Term::Fabulous::Widget::RichText->new(
+		$errors_text = Term::Fabulous::Widget::Text->new( text => '' );
+		$welcome     = Term::Fabulous::Widget::Text->new(
 			markup => "No theme is open.\n\n[bold]Ctrl+N[/] makes a new theme, [bold]Ctrl+O[/] opens a theme file, [bold]F1[/] lists every key, [bold]Ctrl+Q[/] quits.",
 		);
 
@@ -274,20 +274,22 @@ class Term::Fabulous::ThemeEditor :strict(params) {
 			( defined $terminal ? ( terminal => $terminal ) : () ),
 		);
 		$ui->add_preview_root($preview_root);
-		$root->on( KeyPress => sub ($event) { return $editor->_key($event) ? Clay::UI::Enum::Result->HANDLED : Clay::UI::Enum::Result->CONTINUE } );
-		$root->on( OnFocus  => sub ($event) { $editor->_focus_moved; return Clay::UI::Enum::Result->CONTINUE } );
+		$root->on( KeyPress => sub ( $self, $event ) { return $self->_key($event) ? Clay::UI::Enum::Result->HANDLED : Clay::UI::Enum::Result->CONTINUE }, owner => $self );
+		$root->on( OnFocus  => sub ( $self, $event ) { $self->_focus_moved; return Clay::UI::Enum::Result->CONTINUE },                                    owner => $self );
 		$root->on(
-			Start => sub ($event) {
-				$editor->status->message('The terminal is narrow: F7 hides the preview, so the settings get the whole width.') if $event->width < 100;
+			Start => sub ( $self, $event ) {
+				$self->status->message('The terminal is narrow: F7 hides the preview, so the settings get the whole width.') if $event->width < 100;
 				return Clay::UI::Enum::Result->CONTINUE;
-			}
+			},
+			owner => $self
 		);
 		$root->on(
-			MouseMove => sub ($event) {
-				my $list = $editor->form->list;
+			MouseMove => sub ( $self, $event ) {
+				my $list = $self->form->list;
 				$list->hover(undef) unless blessed $event->target && $list->contains( $event->target );
 				return Clay::UI::Enum::Result->CONTINUE;
-			}
+			},
+			owner => $self
 		);
 		$status->message('Welcome. F1 lists every key; F10 or Alt with an underlined letter opens a menu.');
 		return;
@@ -342,24 +344,17 @@ class Term::Fabulous::ThemeEditor :strict(params) {
 			layout     => { layout_direction => CLAY_TOP_TO_BOTTOM, sizing => { width => sizing_grow(), height => sizing_grow() } },
 		);
 		$holder->add_child($widget);
-		weaken( my $weak_holder = $holder );
-		$holder->on( KeyPress => sub ($event) { return _scroll_by_key( $weak_holder, $event ) ? Clay::UI::Enum::Result->HANDLED : Clay::UI::Enum::Result->CONTINUE } );
-		return $holder;
-	}
 
-	# PageUp, PageDown, Ctrl+Home and Ctrl+End scroll a scroll box when the
-	# focused widget in it does not use them.
-	sub _scroll_by_key ( $box, $event ) {
-		my %page = ( PageUp => 1, PageDown => -1 );
-		my $name = $event->main_key_name // return 0;
-		return 0 unless exists $page{$name} || $name eq 'Ctrl+Home' || $name eq 'Ctrl+End';
-		my $ui     = $box->ui                // return 0;
-		my $view   = $ui->bounding_box($box) // return 0;
-		my $state  = $ui->scroll_state($box) // return 0;
-		my $lowest = min( 0, $view->{height} - ( $state->{content}{height} // 0 ) );
-		my $target = $name eq 'Ctrl+Home' ? 0 : $name eq 'Ctrl+End' ? $lowest : ( $state->{position}{y} // 0 ) + $page{$name} * ( $view->{height} - 1 );
-		$ui->scroll_to( $box, { y => max( $lowest, min( 0, $target ) ) } );
-		return 1;
+		# PageUp, PageDown, Ctrl+Home and Ctrl+End scroll it when the
+		# focused widget in it does not use them.
+		$holder->on(
+			KeyPress => sub ( $holder, $event ) {
+				my $ui = $holder->ui // return Clay::UI::Enum::Result->CONTINUE;
+				return defined scroll_by_key( $ui, $holder, $event->main_key_name, keys => 'pager' ) ? Clay::UI::Enum::Result->HANDLED : Clay::UI::Enum::Result->CONTINUE;
+			},
+			owner => $holder
+		);
+		return $holder;
 	}
 
 	# ---------------------------------------------------------------------
@@ -451,9 +446,8 @@ class Term::Fabulous::ThemeEditor :strict(params) {
 	}
 
 	method _add_tab ($tab) {
-		weaken( my $editor   = $self );
-		weaken( my $weak_tab = $tab );
-		$tab->area->on( Change => sub ($event) { $editor->_text_changed($weak_tab); return Clay::UI::Enum::Result->CONTINUE } );
+		weaken( my $weak_tab = $tab );    # the tab holds its area, which keeps the listener
+		$tab->area->on( Change => sub ( $self, $event ) { $self->_text_changed($weak_tab); return Clay::UI::Enum::Result->CONTINUE }, owner => $self );
 		push @tabs, $tab;
 		$self->select_tab($#tabs);
 		return $tab;
@@ -765,7 +759,7 @@ class Term::Fabulous::ThemeEditor :strict(params) {
 			$self->_focus_settings;
 			return;
 		}
-		my $first = first { $_->can('can_focus') && $ui->interaction->can_take_focus($_) } $preview_root->descendants;
+		my ($first) = $ui->interaction->focusables( within => $preview_root );
 		$ui->interaction->set_focused_widget($first) if defined $first;
 		$status->message('In the preview: Tab moves between the widgets, PageUp and PageDown scroll, F6 goes back.');
 		return;
@@ -784,10 +778,12 @@ class Term::Fabulous::ThemeEditor :strict(params) {
 	# The form's cursor moved: the preview shows the family of the row.
 	method _cursor_moved ($id) {
 		return unless defined $gallery && defined $id;
-		my $section = $form->section_of($id) // return;
-		my ( $kind, $family ) = $section =~ /\A#(\w+)(?::(\w+))?/;
-		my $target = $kind eq 'palette' ? 'palette' : $kind eq 'theme' ? 'palette' : $gallery->section_of_family($family);
-		$target = 'variants' if $kind eq 'variant';
+		my $info = $form->section_info( $form->section_of($id) ) // return;
+		my $kind = $info->{kind};
+		my $target
+			= $kind eq 'variant'                     ? 'variants'
+			: $kind eq 'palette' || $kind eq 'theme' ? 'palette'
+			:                                          $gallery->section_of_family( $info->{family} );
 		$gallery->show_section($target) if defined $target;
 		return;
 	}
@@ -832,7 +828,7 @@ class Term::Fabulous::ThemeEditor :strict(params) {
 			find_next  => 'Find something first (Ctrl+F).',
 			next_error => 'The theme has no errors.',
 		);
-		$status->message( $why{$id} // ( $commands->command($id)->label =~ s/\.\.\.\z//r ) . ' is not available now.', 'warning' );
+		$status->message( $why{$id} // $commands->command($id)->plain_label . ' is not available now.', 'warning' );
 		return;
 	}
 
@@ -881,21 +877,28 @@ class Term::Fabulous::ThemeEditor :strict(params) {
 		my $effective = $document->effective_setting($key);
 		my $fallback  = $document->without_setting($key)->effective_setting($key);
 		my $palette   = $tab->preview_theme->palette;
-		weaken( my $editor = $self );
-		my $dialog = Term::Fabulous::ThemeEditor::ValueDialog->new(
-			key        => $key,
-			current    => $effective->{spec},
-			is_set     => $effective->{origin} eq 'set' ? 1 : 0,
-			default    => $fallback->{spec},
-			palette    => $palette,
-			on_preview => sub ($value) { $editor->_preview_value( $key, $value ) },
-			on_apply   => sub ($value) { $editor->set_setting( $key, $value ) },
-			on_reset   => sub () { $editor->reset_setting($key) },
-			list_rows  => $self->_list_rows(19),
+		my $dialog    = Term::Fabulous::ThemeEditor::ValueDialog->new(
+			key       => $key,
+			current   => $effective->{spec},
+			is_set    => $effective->{origin} eq 'set' ? 1 : 0,
+			default   => $fallback->{spec},
+			palette   => $palette,
+			list_rows => $self->_list_rows(19),
 		);
+		$dialog->on( Change => sub ( $self, $event ) { $self->_preview_value( $key, $event->value ); return }, owner => $self );
+		$dialog->on( Answer => sub ( $self, $event ) { $self->_value_answered( $key, $event );       return }, owner => $self );
 		$dialog->open($ui);
 		$status->message('Choose a value: the preview shows it. Enter applies, Escape leaves the theme as it was.');
 		return $dialog;
+	}
+
+	# Apply writes the value, Reset removes the setting; anything else
+	# leaves the theme as it was, and the preview shows it again.
+	method _value_answered ( $key, $answer ) {
+		my $button = $answer->button;
+		return $self->set_setting( $key, $answer->value('value') ) if $button eq 'apply';
+		return $self->reset_setting($key) if $button eq 'reset';
+		return $self->_preview_value( $key, undef );
 	}
 
 	# Shows a value in the preview before it is applied (undef: the theme
@@ -957,8 +960,9 @@ class Term::Fabulous::ThemeEditor :strict(params) {
 		my $row     = $form->current                  // return;
 		my $section = $form->section_of( $row->{id} ) // return;
 		my @keys    = grep { defined $tab->document->setting($_) } $form->keys_in($section);
-		my $name    = $section =~ s/\A#\w+:?//r =~ s/:/[/r;
-		$name = $section eq '#theme' ? 'the theme node' : $section eq '#palette' ? 'the palette' : $section =~ /\A#variant/ ? "the variant $name]" : "the family $name";
+		my $info    = $form->section_info($section);
+		my %name_of = ( theme => 'the theme node', palette => 'the palette', variant => "the variant $info->{family}\[" . ( $info->{variant} // '' ) . ']', family => "the family $info->{family}" );
+		my $name    = $name_of{ $info->{kind} };
 		if ( !@keys ) {
 			$status->message("Nothing to reset: $name sets nothing.");
 			return;
@@ -1009,17 +1013,17 @@ class Term::Fabulous::ThemeEditor :strict(params) {
 	# ---------------------------------------------------------------------
 
 	method _current_variant () {
-		my $row     = $form->current                  // return undef;
-		my $section = $form->section_of( $row->{id} ) // return undef;
-		my ( $family, $variant ) = $section =~ /\A#variant:(\w+):(.+)\z/ or return undef;
-		return [ $family, $variant ];
+		my $row  = $form->current                                         // return undef;
+		my $info = $form->section_info( $form->section_of( $row->{id} ) ) // return undef;
+		return undef unless $info->{kind} eq 'variant';
+		return [ @{$info}{qw(family variant)} ];
 	}
 
 	method _ask_add_variant () {
-		my $tab      = $self->_writable_tab // return;
-		my $row      = $form->current;
-		my $section  = defined $row ? $form->section_of( $row->{id} ) // '' : '';
-		my ($family) = $section =~ /\A#(?:family|variant):(\w+)/;
+		my $tab    = $self->_writable_tab // return;
+		my $row    = $form->current;
+		my $info   = defined $row  ? $form->section_info( $form->section_of( $row->{id} ) ) : undef;
+		my $family = defined $info ? $info->{family}                                        : undef;
 		$self->_ask(
 			title   => 'Add variant',
 			message => 'A variant changes some settings of a family for the widgets whose [bold]classes[/] name it, such as a button made with classes => [\'primary\'].',
@@ -1340,7 +1344,6 @@ class Term::Fabulous::ThemeEditor :strict(params) {
 	}
 
 	method _ask_open () {
-		weaken( my $editor = $self );
 		my $tab    = $self->active_tab;
 		my $start  = defined $tab && defined $tab->path ? dirname( abs_path( $tab->path ) // $tab->path ) : $directory;
 		my $dialog = Term::Fabulous::Widget::FileDialog->new(
@@ -1351,18 +1354,19 @@ class Term::Fabulous::ThemeEditor :strict(params) {
 			directory => -d $start ? $start : $directory,
 		);
 		$dialog->on(
-			Answer => sub ($event) {
+			Answer => sub ( $self, $event ) {
 				return if $event->button eq 'cancel';
 				try {
-					$editor->open_file( $event->values->{path} );
-					$editor->_focus_settings;
+					$self->open_file( $event->values->{path} );
+					$self->_focus_settings;
 				}
 				catch ($error) {
 					$error =~ s/\ATerm::Fabulous::Theme::Document: //;
-					$editor->_tell( 'Cannot open the file', $error );
+					$self->_tell( 'Cannot open the file', $error );
 				}
 				return;
-			}
+			},
+			owner => $self
 		);
 		$dialog->open($ui);
 		return;
@@ -1430,7 +1434,6 @@ class Term::Fabulous::ThemeEditor :strict(params) {
 
 	method _save_as ( $tab = $self->active_tab, $then = undef ) {
 		return unless defined $tab;
-		weaken( my $editor = $self );
 		my $start  = defined $tab->path ? dirname( abs_path( $tab->path ) // $tab->path ) : $directory;
 		my $name   = defined $tab->path ? basename( $tab->path )                          : encode( 'UTF-8', ( $tab->document->name // _title_of($tab) ) . '.kdl' );
 		my $dialog = Term::Fabulous::Widget::FileDialog->new(
@@ -1444,11 +1447,12 @@ class Term::Fabulous::ThemeEditor :strict(params) {
 			name              => $name,
 		);
 		$dialog->on(
-			Answer => sub ($event) {
+			Answer => sub ( $self, $event ) {
 				return if $event->button eq 'cancel';
-				$editor->_write( $tab, $event->values->{path} ) && $then && $then->();
+				$self->_write( $tab, $event->values->{path} ) && $then && $then->();
 				return;
-			}
+			},
+			owner => $self
 		);
 		$dialog->open($ui);
 		return;
@@ -1575,8 +1579,7 @@ class Term::Fabulous::ThemeEditor :strict(params) {
 	}
 
 	method key_list () {
-		my @command_keys = map { [ COMMAND_GROUP, $_->keys_text, $_->label =~ s/\.\.\.\z//r ] } grep { $_->keys } $self->_commands_everywhere;
-		return ( @command_keys, _other_keys() );
+		return ( Term::Fabulous::Widget::KeyReference->command_rows( COMMAND_GROUP, $self->_commands_everywhere ), _other_keys() );
 	}
 
 	# The keys that are no commands' (and the form's commands, under The
@@ -1741,7 +1744,7 @@ shows in the preview at once, and every change can be undone.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/example-theme-editor.svg" alt="The theme editor with four themes in tabs: the menu bar, the tab strip with ocean.kdl active, the preview on the left with the palette swatches, text with links and a box in the ocean theme, and the form on the right listing the theme's name and base and the palette tokens with their swatches, values and where they come from, the cursor on accent"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.05/screenshots/example-theme-editor.svg" alt="The theme editor with four themes in tabs: the menu bar, the tab strip with ocean.kdl active, the preview on the left with the palette swatches, text with links and a box in the ocean theme, and the form on the right listing the theme's name and base and the palette tokens with their swatches, values and where they come from, the cursor on accent"></p>
 
 =end html
 
@@ -1902,7 +1905,8 @@ a field for the name, and the built-in themes to extend.
 
 Every choice shows in the preview while the dialog is open; a state
 such as C<focused> or C<hovered> shows on a widget of the preview that
-has the focus or is under the pointer (C<F6> goes into the preview).
+has the focus or is under the pointer (C<F6> goes into the preview, to
+its first widget in Tab order).
 C<Apply> (or C<Enter> in the list or a field) writes the value to the
 theme, C<Reset to default> removes the setting, and C<Cancel> or
 C<Escape> leaves the theme as it was. A value the setting cannot take,
@@ -1912,7 +1916,7 @@ while it has the keyboard focus.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/example-theme-editor-dialog.svg" alt="The dialog of button.border.color at the right edge: a color picker with the palette's tokens in a list, danger chosen, a field, an RGB and HSL switch and red, green, blue and alpha sliders for a color of its own; on the left, the preview shows the Cancel button of the bordered row with a red border"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.05/screenshots/example-theme-editor-dialog.svg" alt="The dialog of button.border.color at the right edge: a color picker with the palette's tokens in a list, danger chosen, a field, an RGB and HSL switch and red, green, blue and alpha sliders for a color of its own; on the left, the preview shows the Cancel button of the bordered row with a red border"></p>
 
 =end html
 
@@ -1975,7 +1979,7 @@ it again.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/example-theme-editor-text.svg" alt="The theme editor in text mode: the end of ocean.kdl with a new line button { text "acent" }, the message Line 51: button.text must be a color, got 'acent' (unrecognized color string 'acent') under the text, an exclamation mark on the tab, and the preview marked stale"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.05/screenshots/example-theme-editor-text.svg" alt="The theme editor in text mode: the end of ocean.kdl with a new line button { text "acent" }, the message Line 51: button.text must be a color, got 'acent' (unrecognized color string 'acent') under the text, an exclamation mark on the tab, and the preview marked stale"></p>
 
 =end html
 
@@ -2131,7 +2135,8 @@ dialog) do what that widget does; the others reach the editor.
 	  (and the keys of a text area: selection, Ctrl+A, Ctrl+U, Ctrl+K, ...)
 
 	The preview
-	  F6                   Into the preview, back to the settings
+	  F6                   Into the preview (its first widget in Tab
+	                       order), back to the settings
 	  Tab, Shift+Tab       Between the widgets
 	  PageUp, PageDown     Scroll
 	  Ctrl+Home, Ctrl+End  To the top, to the end
@@ -2253,17 +2258,18 @@ form, with the editor drawn in the light theme:
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-theme-editor-preview.svg" alt="The theme editor drawn in the light theme, its preview showing a sign-in form in the dark theme being edited: an e-mail field with an invalid address in red, a password field, a check box and Sign in and Cancel buttons; the form on the right lists the palette"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.05/screenshots/cookbook-theme-editor-preview.svg" alt="The theme editor drawn in the light theme, its preview showing a sign-in form in the dark theme being edited: an e-mail field with an invalid address in red, a password field, a check box and Sign in and Cancel buttons; the form on the right lists the palette"></p>
 
 =end html
 
 The widgets of the preview are yours: they can have listeners, change
 while the editor runs, and take the keyboard (C<F6> goes into the
-preview). Give them no colors of their own where the theme should
-decide. The preview scrolls in both directions when it is larger than
-its pane, with the mouse wheel and with C<PageUp>, C<PageDown>,
-C<Ctrl+Home> and C<Ctrl+End>. Unlike the gallery, it does not scroll to
-the family of the setting under the form's cursor.
+preview, to its first widget in Tab order). Give them no colors of
+their own where the theme should decide. The preview scrolls in both
+directions when it is larger than its pane, with the mouse wheel and
+with C<PageUp>, C<PageDown>, C<Ctrl+Home> and C<Ctrl+End>. Unlike the
+gallery, it does not scroll to the family of the setting under the
+form's cursor.
 
 =head2 Using the theme
 
@@ -2455,7 +2461,7 @@ changed, else 0.
 
 Run a command by its id as its menu entry would (commands that ask, ask
 in a dialog); whether a command can run now; and every command with
-its label (without a trailing C<...>) and keys, in the order of the
+its plain label (L<Term::Fabulous::Command/plain_label>) and keys, in the order of the
 menus. C<run_command> returns
 1 when the command ran, 0 when it could not run now; an unknown id
 dies.
@@ -2466,7 +2472,9 @@ dies.
 		my ( $where, $keys, $action ) = @$key;
 	}
 
-Every key of the editor, as the key reference (C<F1>) lists it.
+Every key of the editor, as the key reference (C<F1>) lists it: the
+rows of L<Term::Fabulous::Widget::KeyReference/command_rows> for its
+commands, then the keys that are no commands'.
 
 =head2 form, status
 

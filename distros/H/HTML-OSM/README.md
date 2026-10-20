@@ -1,23 +1,25 @@
-# NAME
+## Name
 
 HTML::OSM - Generate an interactive OpenStreetMap with Leaflet.js
 
-# VERSION
+## Version
 
-Version 0.10
+Version 0.11
 
-# SYNOPSIS
+## Synopsis
 
-    use HTML::OSM;
+```perl
+use HTML::OSM;
 
-    my $map = HTML::OSM->new(
-        coordinates => [
-            [37.7749, -122.4194, 'San Francisco'],
-            [undef,   undef,     'Paris'],
-        ],
-        zoom => 10,
-    );
-    my ($head, $body) = $map->onload_render();
+my $map = HTML::OSM->new(
+    coordinates => [
+        [37.7749, -122.4194, 'San Francisco'],
+        [undef,   undef,     'Paris'],
+    ],
+    zoom => 10,
+);
+my ($head, $body) = $map->onload_render();
+```
 
 - Caching
 
@@ -29,387 +31,515 @@ Version 0.10
     Set `min_interval` (seconds) to throttle outbound Nominatim calls
     and comply with the API fair-use policy.
 
-# SUBROUTINES/METHODS
+- Tile server
 
-## new
+    `tile_url` replaces the OpenStreetMap tile layer, so a map can use an
+    internal tile server or run on an air-gapped network.  It accepts the same
+    Leaflet placeholders as the default, for example
+    `http://tiles.internal/{z}/{x}/{y}.png`.  The attribution remains the
+    OpenStreetMap credit, which is the usual requirement for OSM-derived tiles.
+    The optional in-page search box still calls Nominatim when a reader uses it.
+
+- Tile attribution
+
+    `tile_attribution` replaces the credit shown in the corner of the map.
+    Set it when the tiles come from a provider that asks for a different
+    credit.  The value is HTML that Leaflet renders as it is, so pass only
+    trusted text.
+
+- Nominatim contact address
+
+    `email` is added to every Nominatim request the module makes, as the
+    Nominatim usage policy asks of heavy users.  It is not put into the rendered
+    page, so the in-page search box sends no address.
+
+## Description
+
+`HTML::OSM` builds an interactive map from OpenStreetMap tiles and the
+Leaflet.js library.  Give it points as latitude and longitude, as place
+names, or as geocoder result objects.  It can also draw GeoJSON shapes,
+heatmaps, GPX tracks and choropleth (colour-filled region) layers, and can
+group nearby markers into clusters.
+
+Place names are turned into coordinates by an injected geocoder or, without
+one, by the Nominatim service.  The answers are cached, and requests can be
+spaced out with `min_interval`.
+
+`onload_render()` returns two HTML fragments: one for the page's
+`<head>` and one for its `<body>`.  The interface follows
+[HTML::GoogleMaps::V3](https://metacpan.org/pod/HTML%3A%3AGoogleMaps%3A%3AV3), so code written for that module needs few changes.
+
+## Subroutines/Methods
+
+### New
 
 Construct a new `HTML::OSM` object.
 
-    my $map = HTML::OSM->new(%params);
-    my $map = HTML::OSM->new(\%params);
+```perl
+my $map = HTML::OSM->new(%params);
+my $map = HTML::OSM->new(\%params);
+```
 
 Both method-style (`HTML::OSM->new(...)`) and function-style
 (`HTML::OSM::new(...)`) calls are supported.
 Calling `$existing_obj->new(%overrides)` performs a shallow clone,
 merging `%overrides` onto the existing object's state without re-validating.
 
-### API SPECIFICATION
+#### Api Specification
 
-#### INPUT
+##### Input
 
-    {
-      cache                   => { type => object, can => [get, set], optional },
-      cluster                 => { type => boolean,                   optional },
-      cluster_css_url         => { type => string,                    optional },
-      cluster_default_css_url => { type => string,                    optional },
-      cluster_js_url          => { type => string,                    optional },
-      config_file             => { type => string,                    optional },
-      coordinates             => { type => arrayref,                  optional },
-      css_url                 => { type => string,                    optional },
-      geocoder                => { type => object, can => geocode,    optional },
-      gpx_js_url              => { type => string,                    optional },
-      heatmap_js_url          => { type => string,                    optional },
-      height                  => { type => string,                    optional },
-      host                    => { type => string,                    optional },
-      js_url                  => { type => string,                    optional },
-      logger                  => { type => object,                    optional },
-      min_interval            => { type => number,  min => 0,         optional },
-      ua                      => { type => object,                    optional },
-      width                   => { type => string,                    optional },
-      zoom                    => { type => integer, min => 0, max => 19, optional },
-    }
+```perl
+{
+  cache                   => { type => object, can => [get, set], optional },
+  cluster                 => { type => boolean,                   optional },
+  cluster_css_url         => { type => string,                    optional },
+  cluster_default_css_url => { type => string,                    optional },
+  cluster_js_url          => { type => string,                    optional },
+  config_file             => { type => string,                    optional },
+  coordinates             => { type => arrayref,                  optional },
+  css_url                 => { type => string,                    optional },
+  email                   => { type => string,                    optional },
+  geocoder                => { type => object, can => geocode,    optional },
+  gpx_js_url              => { type => string,                    optional },
+  heatmap_js_url          => { type => string,                    optional },
+  height                  => { type => string,                    optional },
+  host                    => { type => string,                    optional },
+  js_url                  => { type => string,                    optional },
+  logger                  => { type => object,                    optional },
+  min_interval            => { type => number,  min => 0,         optional },
+  tile_attribution        => { type => string,                    optional },
+  tile_url                => { type => string,                    optional },
+  ua                      => { type => object,                    optional },
+  width                   => { type => string,                    optional },
+  zoom                    => { type => integer, min => 0, max => 19, optional },
+}
+```
 
-#### OUTPUT
+##### Output
 
-    { type => object, isa => 'HTML::OSM' }
+```perl
+{ type => object, isa => 'HTML::OSM' }
+```
 
-### MESSAGES
+#### Messages
 
-    | Message                                        | Meaning / Resolution                          |
-    |------------------------------------------------|-----------------------------------------------|
-    | (validation error from Params::Validate::Strict) | A param has the wrong type or is out of range |
+```
+| Message                                        | Meaning / Resolution                          |
+|------------------------------------------------|-----------------------------------------------|
+| (validation error from Params::Validate::Strict) | A param has the wrong type or is out of range |
+```
 
-### PSEUDOCODE
+#### Pseudocode
 
-    1. If $class is neither a package name nor a blessed ref, treat as
-       function-style call: prepend $class back onto @_ and use __PACKAGE__.
-    2. If $class is a blessed ref (clone call): merge override params onto a
-       shallow copy and return immediately, bypassing schema validation.
-    3. Validate all supplied args against the declared schema.
-    4. Merge config-file settings via Object::Configure.
-    5. Resolve the cache: caller-supplied object, or in-memory CHI instance.
-    6. Bless and return with Readonly CDN constants as defaults.
+```perl
+1. If $class is neither a package name nor a blessed ref, treat as
+   function-style call: prepend $class back onto @_ and use __PACKAGE__.
+2. If $class is a blessed ref (clone call): merge override params onto a
+   shallow copy and return immediately, bypassing schema validation.
+3. Validate all supplied args against the declared schema.
+4. Merge config-file settings via Object::Configure.
+5. Resolve the cache: caller-supplied object, or in-memory CHI instance.
+6. Bless and return with Readonly CDN constants as defaults.
+```
 
-## add\_marker
+### Add\_Marker
 
 Add a point marker to the map.
 
-    $map->add_marker([51.5074, -0.1278], html => 'London');
-    $map->add_marker('Paris, France',    html => 'Paris');
-    $map->add_marker($geo_coder_result);
+```perl
+$map->add_marker([51.5074, -0.1278], html => 'London');
+$map->add_marker('Paris, France',    html => 'Paris');
+$map->add_marker($geo_coder_result);
+```
 
 Returns 1 on success, 0 if the point cannot be resolved or is out of range.
+An empty address, or an arrayref that does not hold exactly two elements,
+also returns 0.
 
-### API SPECIFICATION
+#### Api Specification
 
-#### INPUT
+##### Input
 
-    point : arrayref [lat, lon] | string address | object with latitude()/longitude()
-    html  : string   (optional popup label)
-    icon  : string   (optional icon URL)
+```
+point : arrayref [lat, lon] | string address | object with latitude()/longitude()
+html  : string   (optional popup label)
+icon  : string   (optional icon URL)
+```
 
-#### OUTPUT
+##### Output
 
-    { type => integer, enum => [0, 1] }
+```perl
+{ type => integer, enum => [0, 1] }
+```
 
-### MESSAGES
+#### Messages
 
-    | Message                              | Meaning / Resolution                        |
-    |--------------------------------------|---------------------------------------------|
-    | add_marker(): unknown point type     | Point is a ref type with no lat/lon methods |
+```
+| Message                                 | Meaning / Resolution                        |
+|-----------------------------------------|---------------------------------------------|
+| add_marker(): unknown point type: TYPE | Point is a ref type with no lat/lon methods |
+| Skipping invalid coordinate: (LAT, LON) | Warning: the point is not numeric or is out of range; 0 is returned |
+```
 
-### EXAMPLES
+#### Examples
 
-    # Coordinate array with a popup label
-    $map->add_marker([51.5074, -0.1278], html => 'London');
+```perl
+# Coordinate array with a popup label
+$map->add_marker([51.5074, -0.1278], html => 'London');
 
-    # String address geocoded via the injected geocoder or Nominatim
-    $map->add_marker('Paris, France', html => 'Paris');
+# String address geocoded via the injected geocoder or Nominatim
+$map->add_marker('Paris, France', html => 'Paris');
 
-    # Custom icon URL with a popup
-    $map->add_marker(
-        [40.7128, -74.0060],
-        html => 'New York',
-        icon => 'https://example.com/pin.png',
-    );
+# Custom icon URL with a popup
+$map->add_marker(
+    [40.7128, -74.0060],
+    html => 'New York',
+    icon => 'https://example.com/pin.png',
+);
 
-    # Geo::Coder result object that implements latitude()/longitude()
-    my $result = $geocoder->geocode('Berlin, Germany');
-    $map->add_marker($result, html => 'Berlin');
+# Geo::Coder result object that implements latitude()/longitude()
+my $result = $geocoder->geocode('Berlin, Germany');
+$map->add_marker($result, html => 'Berlin');
 
-    # Accumulate several markers, warn on geocode failure
-    for my $city (@cities) {
-        $map->add_marker($city->{coords}, html => $city->{name})
-            or warn "Could not place $city->{name}";
-    }
+# Accumulate several markers, warn on geocode failure
+for my $city (@cities) {
+    $map->add_marker($city->{coords}, html => $city->{name})
+        or warn "Could not place $city->{name}";
+}
+```
 
-## add\_geojson
+### Add\_Geojson
 
 Add a GeoJSON layer to the map.
 
-    $map->add_geojson(\%data, style => { color => '#ff0000' }, popup => 'name');
+```perl
+$map->add_geojson(\%data, style => { color => '#ff0000' }, popup => 'name');
+```
 
 The first argument may be a hashref/arrayref (GeoJSON structure) or a JSON string.
 Returns 1 on success.
 
-### API SPECIFICATION
+#### Api Specification
 
-#### INPUT
+##### Input
 
-    data  : hashref | arrayref | string (JSON)
-    style : hashref   Leaflet path-style options (color, weight, fillColor, fillOpacity)
-    popup : string    Feature property name whose value becomes the popup text
+```
+data  : hashref | arrayref | string (JSON)
+style : hashref   Leaflet path-style options (color, weight, fillColor, fillOpacity)
+popup : string    Feature property name whose value becomes the popup text
+```
 
-#### OUTPUT
+##### Output
 
-    { type => integer, value => 1 }
+```perl
+{ type => integer, value => 1 }
+```
 
-### MESSAGES
+#### Messages
 
-    | Message              | Meaning / Resolution            |
-    |----------------------|---------------------------------|
-    | (JSON parse error)   | data string is not valid JSON   |
+```
+| Message              | Meaning / Resolution            |
+|----------------------|---------------------------------|
+| (JSON parse error)   | data string is not valid JSON   |
+```
 
-### EXAMPLES
+#### Examples
 
-    # Pre-parsed GeoJSON structure with style and popup property
-    $map->add_geojson(
-        { type => 'FeatureCollection', features => \@features },
-        style => { color => '#ff0000', weight => 2, fillOpacity => 0.4 },
-        popup => 'name',
-    );
+```perl
+# Pre-parsed GeoJSON structure with style and popup property
+$map->add_geojson(
+    { type => 'FeatureCollection', features => \@features },
+    style => { color => '#ff0000', weight => 2, fillOpacity => 0.4 },
+    popup => 'name',
+);
 
-    # Raw JSON string — decoded automatically
-    $map->add_geojson('{"type":"FeatureCollection","features":[]}');
+# Raw JSON string - decoded automatically
+$map->add_geojson('{"type":"FeatureCollection","features":[]}');
 
-    # Multiple GeoJSON layers with different styles on the same map
-    $map->add_geojson(\%country_borders, style => { color => '#333333', fillOpacity => 0 });
-    $map->add_geojson(\%river_data,      style => { color => '#0099ff', weight => 1    });
+# Multiple GeoJSON layers with different styles on the same map
+$map->add_geojson(\%country_borders, style => { color => '#333333', fillOpacity => 0 });
+$map->add_geojson(\%river_data,      style => { color => '#0099ff', weight => 1    });
+```
 
-## add\_heatmap
+### Add\_Heatmap
 
 Add a heatmap layer to the map.
 
-    $map->add_heatmap([[51.5, -0.1, 0.8], [51.6, -0.2, 0.5]], radius => 25);
+```perl
+$map->add_heatmap([[51.5, -0.1, 0.8], [51.6, -0.2, 0.5]], radius => 25);
+```
 
 Each point is `[$lat, $lon]` or `[$lat, $lon, $intensity]` (intensity: 0-1).
 Requires the Leaflet.heat plugin (`heatmap_js_url`).
 Returns 1 on success.
 
-### API SPECIFICATION
+#### Api Specification
 
-#### INPUT
+##### Input
 
-    points : arrayref of ([lat, lon] | [lat, lon, intensity])
-    radius : integer  default 25
-    blur   : integer  default 15
+```
+points : arrayref of ([lat, lon] | [lat, lon, intensity])
+radius : number  default 25 (a value that is not a positive number uses the default)
+blur   : number  default 15 (a value that is not a positive number uses the default)
+```
 
-#### OUTPUT
+##### Output
 
-    { type => integer, value => 1 }
+```perl
+{ type => integer, value => 1 }
+```
 
-### MESSAGES
+#### Messages
 
-    | Message                              | Meaning / Resolution              |
-    |--------------------------------------|-----------------------------------|
-    | add_heatmap: points must be arrayref | First argument is not an arrayref |
+```
+| Message                                 | Meaning / Resolution              |
+|-----------------------------------------|-----------------------------------|
+| add_heatmap: points must be an arrayref | First argument is not an arrayref |
+```
 
-### EXAMPLES
+#### Examples
 
-    # Basic heatmap — [lat, lon] per point
-    $map->add_heatmap([
-        [51.5074, -0.1278],
-        [51.6000, -0.2000],
-        [51.4000,  0.0000],
-    ]);
+```perl
+# Basic heatmap - [lat, lon] per point
+$map->add_heatmap([
+    [51.5074, -0.1278],
+    [51.6000, -0.2000],
+    [51.4000,  0.0000],
+]);
 
-    # With intensity values (0..1) and custom radius/blur
-    $map->add_heatmap(
-        [ [51.5, -0.1, 0.9], [51.6, -0.2, 0.5], [51.4, 0.0, 0.2] ],
-        radius => 30,
-        blur   => 20,
-    );
+# With intensity values (0..1) and custom radius/blur
+$map->add_heatmap(
+    [ [51.5, -0.1, 0.9], [51.6, -0.2, 0.5], [51.4, 0.0, 0.2] ],
+    radius => 30,
+    blur   => 20,
+);
+```
 
-## add\_gpx
+### Add\_Gpx
 
 Add a GPX track to the map from a URL.
 
-    $map->add_gpx('https://example.com/track.gpx');
+```
+$map->add_gpx('https://example.com/track.gpx');
+```
 
 The map view is auto-fitted to the track bounds after loading.
 Requires the leaflet-gpx plugin (`gpx_js_url`).
 Returns 1 on success.
 
-### API SPECIFICATION
+#### Api Specification
 
-#### INPUT
+##### Input
 
-    url : string  URL of the GPX file (required)
+```
+url : string  URL of the GPX file (required)
+```
 
-#### OUTPUT
+##### Output
 
-    { type => integer, value => 1 }
+```perl
+{ type => integer, value => 1 }
+```
 
-### MESSAGES
+#### Messages
 
-    | Message              | Meaning / Resolution       |
-    |----------------------|----------------------------|
-    | add_gpx: url required | No URL argument supplied  |
+```
+| Message                  | Meaning / Resolution     |
+|--------------------------|--------------------------|
+| add_gpx: url is required | No URL argument supplied |
+```
 
-### EXAMPLES
+#### Examples
 
-    # Add a GPX track from a public URL; the map auto-fits to its bounds
-    $map->add_gpx('https://example.com/route.gpx');
+```
+# Add a GPX track from a public URL; the map auto-fits to its bounds
+$map->add_gpx('https://example.com/route.gpx');
 
-    # Multiple tracks on the same map
-    $map->add_gpx('https://example.com/morning-run.gpx');
-    $map->add_gpx('https://example.com/evening-walk.gpx');
+# Multiple tracks on the same map
+$map->add_gpx('https://example.com/morning-run.gpx');
+$map->add_gpx('https://example.com/evening-walk.gpx');
+```
 
-## add\_choropleth
+### Add\_Choropleth
 
 Add a choropleth (data-driven colour fill) layer to the map.
 
-    $map->add_choropleth(
-        \@geojson_features,
-        { England => 100, Scotland => 80, Wales => 60 },
-        key   => 'name',
-        scale => ['#ffffcc', '#a1dab4', '#41b6c4', '#2c7fb8', '#253494'],
-    );
+```perl
+$map->add_choropleth(
+    \@geojson_features,
+    { England => 100, Scotland => 80, Wales => 60 },
+    key   => 'name',
+    scale => ['#ffffcc', '#a1dab4', '#41b6c4', '#2c7fb8', '#253494'],
+);
+```
 
 Colours are pre-computed in Perl and baked into the emitted JavaScript.
 No extra browser plugin is required.
 Returns 1 on success.
 
-### API SPECIFICATION
+#### Api Specification
 
-#### INPUT
+##### Input
 
-    features : arrayref of GeoJSON Feature hashrefs  (required)
-    values   : hashref  { feature_property_value => numeric_value }  (required)
-    key      : string   feature property to match against values  (default: 'name')
-    scale    : arrayref hex-colour strings low-to-high  (default: 5-step YlGnBu)
+```perl
+features : arrayref of GeoJSON Feature hashrefs  (required)
+values   : hashref  { feature_property_value => numeric_value }  (required)
+key      : string   feature property to match against values  (default: 'name')
+scale    : arrayref hex-colour strings low-to-high  (default: 5-step YlGnBu)
+```
 
-#### OUTPUT
+##### Output
 
-    { type => integer, value => 1 }
+```perl
+{ type => integer, value => 1 }
+```
 
-### MESSAGES
+#### Messages
 
-    | Message                                  | Meaning / Resolution                   |
-    |------------------------------------------|----------------------------------------|
-    | add_choropleth: features must be arrayref | First argument is not an arrayref      |
-    | add_choropleth: values must be hashref    | Second argument is not a hashref       |
+```
+| Message                                     | Meaning / Resolution              |
+|---------------------------------------------|-----------------------------------|
+| add_choropleth: features must be an arrayref | First argument is not an arrayref |
+| add_choropleth: values must be a hashref     | Second argument is not a hashref  |
+```
 
-### EXAMPLES
+#### Examples
 
-    # Default 5-step YlGnBu scale, key property "name"
-    $map->add_choropleth(
-        \@geojson_features,
-        { England => 100, Scotland => 80, Wales => 60 },
-    );
+```perl
+# Default 5-step YlGnBu scale, key property "name"
+$map->add_choropleth(
+    \@geojson_features,
+    { England => 100, Scotland => 80, Wales => 60 },
+);
 
-    # Custom 3-step scale and a different GeoJSON property as the key
-    $map->add_choropleth(
-        \@geojson_features,
-        { England => 100, Scotland => 80, Wales => 60 },
-        key   => 'country',
-        scale => ['#f7fbff', '#6baed6', '#08519c'],
-    );
+# Custom 3-step scale and a different GeoJSON property as the key
+$map->add_choropleth(
+    \@geojson_features,
+    { England => 100, Scotland => 80, Wales => 60 },
+    key   => 'country',
+    scale => ['#f7fbff', '#6baed6', '#08519c'],
+);
 
-    # choropleth-only map — center() must be called explicitly
-    $map->center([54.0, -2.0]);
-    $map->add_choropleth(\@uk_features, \%population_by_region);
-    my ($head, $body) = $map->onload_render();
+# choropleth-only map - center() must be called explicitly
+$map->center([54.0, -2.0]);
+$map->add_choropleth(\@uk_features, \%population_by_region);
+my ($head, $body) = $map->onload_render();
+```
 
-## center
+### Center
 
 Set the map centre to a given point.
 
-    $map->center([40.7128, -74.0060]);
-    $map->center($geo_object);
-    $map->center('Berlin, Germany');
+```
+$map->center([40.7128, -74.0060]);
+$map->center($geo_object);
+$map->center('Berlin, Germany');
+```
 
-Returns 1 on success, 0 if the point cannot be resolved.
+Returns 1 on success, 0 if the point cannot be resolved or is out of range.
+An empty address also returns 0.
 
-### API SPECIFICATION
+#### Api Specification
 
-#### INPUT
+##### Input
 
-    point : arrayref [lat, lon] | object with latitude()/longitude() | string address
+```
+point : arrayref [lat, lon] | object with latitude()/longitude() | string address
+```
 
-#### OUTPUT
+##### Output
 
-    { type => integer, enum => [0, 1] }
+```perl
+{ type => integer, enum => [0, 1] }
+```
 
-### MESSAGES
+#### Messages
 
-    | Message                                        | Meaning / Resolution                     |
-    |------------------------------------------------|------------------------------------------|
-    | center(): usage: point => [lat, lon]           | No point argument supplied               |
-    | center(): point must have latitude & longitude | Arrayref has != 2 elements               |
-    | center(): unknown point type                   | Ref type has no lat/lon methods          |
+```perl
+| Message                                            | Meaning / Resolution            |
+|----------------------------------------------------|---------------------------------|
+| center(): usage: point => [ latitude, longitude ]  | No point argument supplied      |
+| center(): point must have latitude and longitude   | Arrayref has != 2 elements      |
+| center(): unknown point type: TYPE                 | Ref type has no lat/lon methods |
+| Skipping invalid coordinate: (LAT, LON)            | Warning: point is not numeric or is out of range; 0 is returned |
+```
 
-### EXAMPLES
+#### Examples
 
-    # Coordinate array
-    $map->center([40.7128, -74.0060]);
+```perl
+# Coordinate array
+$map->center([40.7128, -74.0060]);
 
-    # Object that implements latitude()/longitude() (e.g. a Geo::Coder result)
-    $map->center($geocoder->geocode('Berlin, Germany'));
+# Object that implements latitude()/longitude() (e.g. a Geo::Coder result)
+$map->center($geocoder->geocode('Berlin, Germany'));
 
-    # String address resolved via the injected geocoder or Nominatim
-    $map->center('Eiffel Tower, Paris, France');
+# String address resolved via the injected geocoder or Nominatim
+$map->center('Eiffel Tower, Paris, France');
 
-    # Required when rendering without point markers (GeoJSON-only, choropleth, etc.)
-    $map->center([54.0, -2.0]);
-    $map->add_geojson(\%uk_regions, popup => 'name');
-    my ($head, $body) = $map->onload_render();
+# Required when rendering without point markers (GeoJSON-only, choropleth, etc.)
+$map->center([54.0, -2.0]);
+$map->add_geojson(\%uk_regions, popup => 'name');
+my ($head, $body) = $map->onload_render();
+```
 
-## zoom
+### Zoom
 
 Get or set the zoom level (0 = world, 19 = building).
 
-    $map->zoom(10);
-    my $z = $map->zoom();
+```perl
+$map->zoom(10);
+my $z = $map->zoom();
+```
 
-### API SPECIFICATION
+#### Api Specification
 
-#### INPUT
+##### Input
 
-    { zoom => { type => integer, min => 0, max => 19, optional => 1 } }
+```perl
+{ zoom => { type => integer, min => 0, max => 19, optional => 1 } }
+```
 
-#### OUTPUT
+##### Output
 
-    { type => integer, min => 0, max => 19 }
+```perl
+{ type => integer, min => 0, max => 19 }
+```
 
-### MESSAGES
+#### Messages
 
-    | Message                      | Meaning / Resolution                      |
-    |------------------------------|-------------------------------------------|
-    | (Params::Validate::Strict)   | zoom is not an integer or is out of range |
+```
+| Message                      | Meaning / Resolution                      |
+|------------------------------|-------------------------------------------|
+| (Params::Validate::Strict)   | zoom is not an integer or is out of range |
+```
 
-### EXAMPLES
+#### Examples
 
-    # Setter: store the zoom level
-    $map->zoom(14);
+```perl
+# Setter: store the zoom level
+$map->zoom(14);
 
-    # Getter: retrieve the current level
-    my $level = $map->zoom();
-    print "Current zoom: $level\n";    # 14
+# Getter: retrieve the current level
+my $level = $map->zoom();
+print "Current zoom: $level\n";    # 14
 
-    # Setter return value equals the new level
-    my $confirmed = $map->zoom(10);
-    die 'unexpected' unless $confirmed == 10;
+# Setter return value equals the new level
+my $confirmed = $map->zoom(10);
+die 'unexpected' unless $confirmed == 10;
 
-    # Chain: set via new(), read back via zoom()
-    my $m = HTML::OSM->new(zoom => 6);
-    $m->zoom($m->zoom() + 2);   # nudge up by 2
+# Chain: set via new(), read back via zoom()
+my $m = HTML::OSM->new(zoom => 6);
+$m->zoom($m->zoom() + 2);   # nudge up by 2
+```
 
-## onload\_render
+### Onload\_Render
 
 Render the map and return a two-element list suitable for embedding in HTML.
 
-    my ($head_html, $body_html) = $map->onload_render();
+```perl
+my ($head_html, $body_html) = $map->onload_render();
+```
 
 `$head_html` contains the Leaflet CSS, JavaScript, and plugin assets.
 Place it inside `<head>...</head>`.
@@ -425,61 +555,85 @@ The rendered page provides:
 leaving static markers (added via `add_marker`) intact.
 - A "Reset Map" button that returns the view to the initial centre and zoom.
 
-### API SPECIFICATION
+Values that reach the object without going through `new()`'s checks (from a
+config file or a clone) are checked again here.  A `zoom` that is not an
+integer from 0 to 19 is replaced by 12, and a `width` or `height` that is
+not a CSS length (such as `600px`, `100%` or `auto`) is replaced by the
+default.  Each replacement gives a warning.
 
-#### INPUT
+#### Api Specification
 
-    (none - uses object state)
+##### Input
 
-#### OUTPUT
+```
+(none - uses object state)
+```
 
-    { type => list, elements => [string, string] }
+##### Output
 
-### MESSAGES
+```perl
+{ type => list, elements => [string, string] }
+```
 
-    | Message                                          | Meaning / Resolution                        |
-    |--------------------------------------------------|---------------------------------------------|
-    | No map data provided                             | No markers, GeoJSON, heatmap, GPX, or choropleth added yet |
-    | center() must be called when no point markers    | Non-marker-only render needs explicit centre |
+#### Messages
 
-### EXAMPLES
+```
+| Message                                          | Meaning / Resolution                        |
+|--------------------------------------------------|---------------------------------------------|
+| No map data provided                             | No markers, GeoJSON, heatmap, GPX, or choropleth added yet |
+| center() must be called when no point markers are provided | Non-marker-only render needs explicit centre |
+| Skipping invalid coordinate: (LAT, LON)          | Warning: a marker is not numeric or out of range; it is left off the map |
+| onload_render: invalid zoom 'Z', using 12        | Warning: zoom from a config file or clone is out of range |
+| onload_render: invalid width 'W', using 600px    | Warning: width is not a CSS length |
+| onload_render: invalid height 'H', using 400px   | Warning: height is not a CSS length |
+| _fetch_coordinates: failed to decode Nominatim response: ERROR | Warning: Nominatim returned something that is not JSON; the marker is skipped |
+| _fetch_coordinates: unrecognised geocoder result type: TYPE | Warning: the injected geocoder returned an unknown type; the marker is skipped |
+```
 
-    # Minimal: one marker, embed in a CGI response
-    use HTML::OSM;
-    my $map = HTML::OSM->new(zoom => 12);
-    $map->add_marker([51.5074, -0.1278], html => 'London');
-    my ($head, $body) = $map->onload_render();
-    print "Content-Type: text/html\n\n";
-    print "<html><head>$head</head><body>$body</body></html>\n";
+#### Examples
 
-    # Mixed layers: markers + GeoJSON, explicit center
-    $map->center([51.5, -0.1]);
-    $map->add_geojson(\%borough_data, popup => 'name', style => { color => '#333' });
-    $map->add_marker([51.5074, -0.1278], html => 'City of London');
-    my ($head_html, $body_html) = $map->onload_render();
+```perl
+# Minimal: one marker, embed in a CGI response
+use HTML::OSM;
+my $map = HTML::OSM->new(zoom => 12);
+$map->add_marker([51.5074, -0.1278], html => 'London');
+my ($head, $body) = $map->onload_render();
+print "Content-Type: text/html\n\n";
+print "<html><head>$head</head><body>$body</body></html>\n";
 
-    # Template Toolkit integration
-    $tt->process('map.tt', {
-        map_head => scalar(($map->onload_render())[0]),
-        map_body => scalar(($map->onload_render())[1]),
-    });
+# Mixed layers: markers + GeoJSON, explicit center
+$map->center([51.5, -0.1]);
+$map->add_geojson(\%borough_data, popup => 'name', style => { color => '#333' });
+$map->add_marker([51.5074, -0.1278], html => 'City of London');
+my ($head_html, $body_html) = $map->onload_render();
 
-### PSEUDOCODE
+# Template Toolkit integration
+$tt->process('map.tt', {
+    map_head => scalar(($map->onload_render())[0]),
+    map_body => scalar(($map->onload_render())[1]),
+});
+```
 
-    1. Gather all data layers; croak if none populated.
-    2. Geocode/validate each coordinate tuple; discard invalids with a warning.
-    3. Determine map centre: caller-supplied > computed midpoint of marker bounds.
-       Croak if neither is available.
-    4. Build <head>: Leaflet CSS + JS; inject cluster/heatmap/GPX plugin assets
-       only when the corresponding layer type is present.
-    5. Build <body>: search box, clear-search button, reset button, map <div>.
-    6. Initialise Leaflet map, tile layer, searchMarkers array.
-    7. Emit JS for each marker (via clusterGroup when cluster is set).
-    8. Emit JS for each GeoJSON, heatmap, GPX, and choropleth layer.
-    9. Attach event listeners: reset-view, clear-search-markers, search-on-Enter.
-    10. Return ($head, $body).
+#### Pseudocode
 
-# LIMITATIONS
+```
+1. Gather all data layers; croak if none populated.
+2. Geocode/validate each coordinate tuple; discard invalids with a warning.
+   A tuple with no coordinates and no address is discarded.
+   Re-check zoom, width and height; fall back to defaults with a warning.
+3. Determine map centre: caller-supplied > computed midpoint of marker bounds.
+   Croak if neither is available.
+4. Build <head>: Leaflet CSS + JS; inject cluster/heatmap/GPX plugin assets
+   only when the corresponding layer type is present.
+5. Build <body>: search box, clear-search button, reset button, map <div>.
+6. Initialise Leaflet map, tile layer, searchMarkers array.
+7. Emit JS for each marker (via clusterGroup when cluster is set).
+8. Emit JS for each GeoJSON, heatmap, GPX, and choropleth layer.
+9. Attach event listeners: reset-view, clear-search-markers, search-on-Enter.
+10. Return ($head, $body).
+```
+
+## Limitations
 
 - **Per-marker removal**: Markers added via `add_marker()` cannot yet be
 removed individually by clicking them.  The "Clear search markers" button only
@@ -490,6 +644,11 @@ can merge arbitrary state.  Callers are responsible for passing valid overrides.
 - **Config-file params unvalidated**: Keys injected by
 [Object::Configure](https://metacpan.org/pod/Object%3A%3AConfigure) from a config file are not re-run through the schema, so
 a malformed config file can introduce invalid types at runtime.
+`onload_render()` checks `zoom`, `width` and `height` again and
+HTML-escapes the CDN URLs, so a bad value cannot inject markup into the page.
+- **One map per page**: The rendered HTML uses fixed element IDs
+(`map`, `search-box`, `clear-search-button` and `reset-button`), so two
+maps on the same page will clash.
 - **Private-method encapsulation**: `_fetch_coordinates`, `_validate`,
 and `_js_string` are named with a leading underscore by convention only.
 Using [Sub::Private](https://metacpan.org/pod/Sub%3A%3APrivate) in `enforce` mode would make the contract explicit, but
@@ -498,15 +657,15 @@ in `t/mock.t`.
 - **Routing**: Turn-by-turn routing (Leaflet Routing Machine / OSRM) is
 explicitly out of scope for this module and will not be added here.
 
-# AUTHOR
+## Author
 
 Nigel Horne, `<njh at nigelhorne.com>`
 
-# BUGS
+## Bugs
 
 Please report bugs at [https://github.com/nigelhorne/HTML-OSM/issues](https://github.com/nigelhorne/HTML-OSM/issues).
 
-# SEE ALSO
+## See Also
 
 - [https://wiki.openstreetmap.org/wiki/API](https://wiki.openstreetmap.org/wiki/API)
 - [HTML::GoogleMaps::V3](https://metacpan.org/pod/HTML%3A%3AGoogleMaps%3A%3AV3) - the interface this module mirrors for compatibility.
@@ -514,126 +673,146 @@ Please report bugs at [https://github.com/nigelhorne/HTML-OSM/issues](https://gi
 - [Configure an Object at Runtime](https://metacpan.org/pod/Object%3A%3AConfigure)
 - [Test Dashboard](https://nigelhorne.github.io/HTML-OSM/coverage/)
 
-# SUPPORT
+## Support
 
 This module is provided as-is without any warranty.
 
-[https://rt.cpan.org/NoAuth/Bugs.html?Dist=HTML-OSM](https://rt.cpan.org/NoAuth/Bugs.html?Dist=HTML-OSM)
+Please report problems and ask questions at
+[https://github.com/nigelhorne/HTML-OSM/issues](https://github.com/nigelhorne/HTML-OSM/issues).
 
-## TODO
+You can find documentation for this module with the perldoc command.
+
+```
+perldoc HTML::OSM
+```
+
+You can also look for information at MetaCPAN:
+[https://metacpan.org/dist/HTML-OSM](https://metacpan.org/dist/HTML-OSM).
+
+### Todo
 
 Allow per-marker removal via clicking on a marker.
 
-# FORMAL SPECIFICATION
+## Formal Specification
 
-## new
+### New
 
-    HTML_OSM
-      coordinates     : iseq (ℝ x ℝ x S x S)
-      zoom            : Z
-      cluster         : B
-    ----------------------------------------
-      ZOOM_MIN <= zoom <= ZOOM_MAX
+```
+HTML_OSM
+  coordinates     : iseq (ℝ x ℝ x S x S)
+  zoom            : Z
+  cluster         : B
+----------------------------------------
+  ZOOM_MIN <= zoom <= ZOOM_MAX
 
-    new ≙
-      params? : Params
-      osm!    : HTML_OSM
-    ----------------------------------------
-      osm!.zoom     = params?.zoom     ∨ 12
-      osm!.cluster  = params?.cluster  ∨ false
+new ≙
+  params? : Params
+  osm!    : HTML_OSM
+----------------------------------------
+  osm!.zoom     = params?.zoom     ∨ 12
+  osm!.cluster  = params?.cluster  ∨ false
+```
 
-## add\_marker
+### Add\_Marker
 
-    AddMarker
-      ΔHTML_OSM
-      point? : (ℝ x ℝ) ∪ S ∪ GeoObject
-      result! : {0, 1}
-    -----------------------------------------
-      result! = 1 ⟺ point? resolves to (lat, lon) ∈ ValidCoord
-      result! = 1 ⟹ coordinates' = coordinates ⌢ ⟨(lat, lon, label, icon)⟩
+```
+AddMarker
+  ΔHTML_OSM
+  point? : (ℝ x ℝ) ∪ S ∪ GeoObject
+  result! : {0, 1}
+-----------------------------------------
+  result! = 1 ⟺ point? resolves to (lat, lon) ∈ ValidCoord
+  result! = 1 ⟹ coordinates' = coordinates ⌢ ⟨(lat, lon, label, icon)⟩
+```
 
-## add\_geojson
+### Add\_Geojson
 
-    AddGeoJSON
-      ΔHTML_OSM
-      data?  : GeoJSONStruct ∪ S
-      style? : StyleMap ∪ {∅}
-      popup? : S ∪ {∅}
-    -----------------------------------------
-      geojson' = geojson ⌢ ⟨{data, style, popup}⟩
+```
+AddGeoJSON
+  ΔHTML_OSM
+  data?  : GeoJSONStruct ∪ S
+  style? : StyleMap ∪ {∅}
+  popup? : S ∪ {∅}
+-----------------------------------------
+  geojson' = geojson ⌢ ⟨{data, style, popup}⟩
+```
 
-## add\_heatmap
+### Add\_Heatmap
 
-    AddHeatmap
-      ΔHTML_OSM
-      points? : iseq (ℝ x ℝ x [0,1])
-    -----------------------------------------
-      heatmap_layers' = heatmap_layers ⌢ ⟨{points, radius, blur}⟩
+```
+AddHeatmap
+  ΔHTML_OSM
+  points? : iseq (ℝ x ℝ x [0,1])
+-----------------------------------------
+  heatmap_layers' = heatmap_layers ⌢ ⟨{points, radius, blur}⟩
+```
 
-## add\_gpx
+### Add\_Gpx
 
-    AddGPX
-      ΔHTML_OSM
-      url? : S | url? ≠ ''
-    -----------------------------------------
-      gpx_tracks' = gpx_tracks ⌢ ⟨url?⟩
+```
+AddGPX
+  ΔHTML_OSM
+  url? : S | url? ≠ ''
+-----------------------------------------
+  gpx_tracks' = gpx_tracks ⌢ ⟨url?⟩
+```
 
-## add\_chropleth
+### Add\_Choropleth
 
-    AddChoropleth
-      ΔHTML_OSM
-      features? : iseq GeoFeature
-      values?   : S --> ℝ
-      key?      : S
-      scale?    : iseq S
-    -----------------------------------------
-      Let min = min(ran values?), max = max(ran values?) ∪ {min+1}
-      ∀ k ∈ dom values? •
-        color(k) = scale?[floor((values?(k)-min)/(max-min) * (#scale?-1))]
-      choropleth_layers' = choropleth_layers ⌢ ⟨{features, values, colors, key}⟩
+```
+AddChoropleth
+  ΔHTML_OSM
+  features? : iseq GeoFeature
+  values?   : S --> ℝ
+  key?      : S
+  scale?    : iseq S
+-----------------------------------------
+  Let min = min(ran values?), max = max(ran values?) ∪ {min+1}
+  ∀ k ∈ dom values? •
+    color(k) = scale?[floor((values?(k)-min)/(max-min) * (#scale?-1))]
+  choropleth_layers' = choropleth_layers ⌢ ⟨{features, values, colors, key}⟩
+```
 
-## center
+### Center
 
-    Center
-      ΔHTML_OSM
-      point? : (ℝ x ℝ) ∪ S ∪ GeoObject
-      result! : {0, 1}
-    -----------------------------------------
-      result! = 1 ⟺ point? resolves to (lat, lon) ∈ ValidCoord
-      result! = 1 ⟹ center' = (lat, lon)
+```
+Center
+  ΔHTML_OSM
+  point? : (ℝ x ℝ) ∪ S ∪ GeoObject
+  result! : {0, 1}
+-----------------------------------------
+  result! = 1 ⟺ point? resolves to (lat, lon) ∈ ValidCoord
+  result! = 1 ⟹ center' = (lat, lon)
+```
 
-## zoom
+### Zoom
 
-    Zoom
-      ΔHTML_OSM
-      zoom? : Z ∪ {∅}
-      zoom! : Z
-    -----------------------------------------
-      zoom? ≠ ∅ ⟹ ZOOM_MIN <= zoom? <= ZOOM_MAX
-      zoom! = (zoom? ≠ ∅ ∧ zoom' = zoom?) ∨ zoom
+```
+Zoom
+  ΔHTML_OSM
+  zoom? : Z ∪ {∅}
+  zoom! : Z
+-----------------------------------------
+  zoom? ≠ ∅ ⟹ ZOOM_MIN <= zoom? <= ZOOM_MAX
+  zoom! = (zoom? ≠ ∅ ∧ zoom' = zoom?) ∨ zoom
+```
 
-## onload\_render
+### Onload\_Render
 
-    OnloadRender
-      HTML_OSM
-      head! : S
-      body! : S
-    -----------------------------------------
-      (#coordinates + #geojson + #heatmap_layers + #gpx_tracks + #choropleth_layers) > 0
-      center ≠ ∅  ∨  ∃ valid ∈ coordinates • valid ∈ ValidCoord
+```
+OnloadRender
+  HTML_OSM
+  head! : S
+  body! : S
+-----------------------------------------
+  (#coordinates + #geojson + #heatmap_layers + #gpx_tracks + #choropleth_layers) > 0
+  center ≠ ∅  ∨  ∃ valid ∈ coordinates • valid ∈ ValidCoord
+```
 
-# LICENSE AND COPYRIGHT
+## License and Copyright
 
 Copyright 2025-2026 Nigel Horne.
 
 This program is released under the following licence: GPL2
 If you use it,
 please let me know.
-
-# POD ERRORS
-
-Hey! **The above document had some coding errors, which are explained below:**
-
-- Around line 357:
-
-    Non-ASCII character seen before =encoding in '—'. Assuming UTF-8

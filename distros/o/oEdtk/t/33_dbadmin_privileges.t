@@ -48,7 +48,7 @@ quiet_require('oEdtk::DBAdmin');
 		for my $frag ( keys %{ $self->{$table} } ) {
 			return $self->{$table}{$frag} if index( $sql, $frag ) >= 0;
 		}
-		return undef;
+		return;
 	}
 
 	sub selectrow_array {

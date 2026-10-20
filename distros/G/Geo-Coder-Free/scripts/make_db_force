@@ -1,0 +1,1 @@
+rm -f $OPENADDR_HOME/openaddresses.sql; DR5HN_HOME= WHOSONFIRST_HOME= REDIS_SERVER= make

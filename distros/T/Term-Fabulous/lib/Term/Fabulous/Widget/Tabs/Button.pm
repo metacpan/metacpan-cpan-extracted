@@ -7,11 +7,10 @@ no warnings 'experimental::signatures';
 
 use Object::Pad 0.825;
 
-use Term::Fabulous::Theme;
 use Term::Fabulous::Widget::Button;
 use Term::Fabulous::Widget::Text;
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 class Term::Fabulous::Widget::Tabs::Button
 	:isa(Term::Fabulous::Widget::Button)
@@ -19,7 +18,7 @@ class Term::Fabulous::Widget::Tabs::Button
 {
 	use Clay::UI::Enum::Result;
 	use Clay::XS qw(CLAY_LEFT_TO_RIGHT CLAY_TOP_TO_BOTTOM CLAY_TEXT_WRAP_NONE CLAY_TEXT_WRAP_NEWLINES);
-	use Scalar::Util qw(weaken);
+	use List::Util qw(first);
 	use Term::Fabulous::Check qw(optional string);
 	use Term::Fabulous::Enum::BorderStyle;
 	use Term::Fabulous::Unicode qw(grapheme_clusters);
@@ -28,10 +27,11 @@ class Term::Fabulous::Widget::Tabs::Button
 	# bar's defaults are these as well. The colors and the line style come
 	# from the theme's tabs family (see Term::Fabulous::Widget::Tabs::Bar).
 	my %DEFAULT_LOOK = (
-		side        => 'top',
-		orientation => 'horizontal',
-		tab_padding => 1,
-		active_bold => 0,
+		side           => 'top',
+		orientation    => 'horizontal',
+		tab_padding    => 1,
+		active_padding => 0,
+		active_bold    => 0,
 	);
 
 	# The side of a tab that faces the page, by the side of the bar.
@@ -57,26 +57,23 @@ class Term::Fabulous::Widget::Tabs::Button
 		$_icon_text  = Term::Fabulous::Widget::Text->new( text => '' );
 		$_title_text = Term::Fabulous::Widget::Text->new( text => '' );
 
-		weaken( my $weak_self = $self );
 		my $continue = Clay::UI::Enum::Result->CONTINUE;
-		$self->on( Activate => sub ($event) { $weak_self->_activated if $weak_self;   return $continue } );
-		$self->on( $_       => sub ($event) { $weak_self->refresh_look if $weak_self; return $continue } ) foreach qw(OnFocus OnBlur OnHoverStart OnHoverStopped);
+		$self->on( Activate => sub ( $self, $event ) { $self->_activated;   return $continue }, owner => $self );
+		$self->on( $_       => sub ( $self, $event ) { $self->refresh_look; return $continue }, owner => $self ) foreach qw(OnFocus OnBlur OnHoverStart OnHoverStopped);
 		$self->refresh_look;
 	}
 
 	# The bar the tab belongs to, if any: the tab's parent is the bar's row.
 	method bar () {
-		for ( my $node = $self->parent; defined $node; $node = $node->parent ) {
-			return $node if $node->isa('Term::Fabulous::Widget::Tabs::Bar');
-		}
-		return undef;
+		return first { $_->isa('Term::Fabulous::Widget::Tabs::Bar') } $self->ancestors;
 	}
 
 	method is_active () {
 		return $_active;
 	}
 
-	# Set by the bar: the active tab is one cell larger toward the page.
+	# Set by the bar: the active tab is open toward the page and grows
+	# active_padding cells that way.
 	method _set_active ($flag) {
 		$_active = $flag ? 1 : 0;
 		$self->refresh_look;
@@ -120,13 +117,13 @@ class Term::Fabulous::Widget::Tabs::Button
 	# ---------------------------------------------------------------------
 
 	# One setting of the look: the bar's; without a bar, the default
-	# setting, or the default theme's tabs look.
+	# setting, or the tabs look of the theme the tab draws with.
 	method _look ($name) {
 		my $bar = $self->bar;
 		return $bar->$name if defined $bar;
 		return $DEFAULT_LOOK{$name} if exists $DEFAULT_LOOK{$name};
 		my %themed = Term::Fabulous::Widget::Tabs::Bar->themed_params;
-		return Term::Fabulous::Theme->default->look( 'tabs', @{ $themed{$name} }[ 0, 1 ] );    # slot and state
+		return $self->family_look( tabs => @{ $themed{$name} }[ 0, 1 ] );    # slot and state
 	}
 
 	# The tab's border and background follow the bar's colors and the
@@ -169,11 +166,11 @@ class Term::Fabulous::Widget::Tabs::Button
 		my $vertical  = $self->_look('orientation') eq 'vertical';
 		my $page_side = $PAGE_SIDE{$side};
 
-		# The padding lies along the label; the active tab gets a cell more
-		# toward the page.
+		# The padding lies along the label; the active tab gets
+		# active_padding cells more toward the page.
 		my $padding = $self->_look('tab_padding');
 		my %padding = $vertical ? ( top => $padding, bottom => $padding ) : ( left => $padding, right => $padding );
-		$padding{$page_side} = ( $padding{$page_side} // 0 ) + 1 if $_active;
+		$padding{$page_side} = ( $padding{$page_side} // 0 ) + $self->_look('active_padding') if $_active;
 		$self->layout( { %{ $self->layout }, layout_direction => $vertical ? CLAY_TOP_TO_BOTTOM : CLAY_LEFT_TO_RIGHT, child_gap => 1, padding => \%padding } );
 
 		my $wrap_mode = $vertical ? CLAY_TEXT_WRAP_NEWLINES : CLAY_TEXT_WRAP_NONE;
@@ -216,11 +213,13 @@ bar
 
 A tab button is one tab of a L<Term::Fabulous::Widget::Tabs::Bar>: a
 L<Term::Fabulous::Widget::Button> with a border on three sides, open
-toward the page, that shows a title and an optional icon. The bar
-makes one tab the I<active> one: it is drawn one cell larger toward
-the page, so that it joins the page's border, and its label is drawn
-in the bar's C<active_text_color>. The other tabs are closed by the
-line of the bar and show their labels in C<text_color>.
+toward the page, that shows a title and an optional icon. The bar makes
+one tab the I<active> one: it is open toward the page, so that it joins
+the page's border. It has C<active_padding> more cells of padding on
+that side than the other tabs, so it rises that far out of the row, and
+its label is drawn in the C<active_text_color> of its bar or, without a
+bar, of the theme it draws with. The other tabs are closed by the line
+of the bar and show their labels in C<text_color>.
 
 The look (the side the bar is on, whether the label is written
 horizontally or downwards, the padding, the line style and the
@@ -313,11 +312,11 @@ behind its back. Returns the tab.
 
 	my %look = Term::Fabulous::Widget::Tabs::Button->default_look;
 
-Class method: the look a tab shows outside a bar, as a hash of the
-bar's look parameters (C<side>, C<orientation>, C<tab_padding>,
-C<line_style>, C<line_color>, C<text_color>, C<active_text_color>,
-C<active_bold>, C<hover_background_color>, C<focus_border_color>,
-C<disabled_color>) and their defaults.
+Class method: the settings a tab uses outside a bar that are not
+themed, as a hash (C<side>, C<orientation>, C<tab_padding>,
+C<active_padding>, C<active_bold>) with their defaults; the line style
+and the colors come from the C<tabs> family of the theme the tab draws
+with.
 
 =head1 EVENTS
 

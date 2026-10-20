@@ -1,5 +1,5 @@
 package Clay::UI::Role::Interaction::Hoverable;
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 use v5.22;
 use warnings;
 use feature 'signatures';
@@ -12,17 +12,10 @@ use Clay::UI::Role::Events::Emitter;
 use Clay::UI::Role::Style::HasStates;
 use Clay::UI::Events::OnHoverStart;
 use Clay::UI::Events::OnHoverStopped;
-use Clay::UI::_error qw(croak_ui);
 
 role Clay::UI::Role::Interaction::Hoverable :does(Clay::UI::Role::Layout::HasParent)
                                             :does(Clay::UI::Role::Events::Emitter)
                                             :does(Clay::UI::Role::Style::HasStates) {
-	ADJUST {
-		croak_ui "Clay::UI: " . ref($self) . " composes Clay::UI::Role::Interaction::Hoverable on a text node;"
-			. " Clay cannot report the pointer over text elements - wrap the text in an Element"
-			if $self->DOES('Clay::UI::Role::Core::TextNode');
-	}
-
 	# The UI's interaction tracker owns the state; a widget outside a
 	# UI is never hovered.
 	method is_hovered () {
@@ -100,12 +93,9 @@ L<Clay::UI/HOW A FRAME WORKS>), so listeners may change the tree. The
 pointer is tested against the previous frame's layout, so a widget can
 be hovered from the frame after the one that first lays it out.
 
-Hovering needs an element: composing Hoverable (or
-L<Clay::UI::Role::Interaction::Pressable>) into a text widget dies at
-construction with
-C<Clay::UI: E<lt>classE<gt> composes Clay::UI::Role::Interaction::Hoverable on a text node;
-Clay cannot report the pointer over text elements - wrap the text in an Element>.
-Make the element around the text hoverable instead.
+Text widgets can be hovered like elements: Clay reports the pointer over
+the box a text was laid out in, so a text widget that composes Hoverable
+(or L<Clay::UI::Role::Interaction::Pressable>) gets the same events.
 
 
 The role composes L<Clay::UI::Role::Layout::HasParent>,

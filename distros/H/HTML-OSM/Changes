@@ -1,8 +1,58 @@
 Revision history for HTML-OSM
 
+0.11	Mon Oct 19 09:48:31 PM EDT 2026
+	[ Bug Fixes ]
+	- Heatmap radius and blur are now forced to positive numbers, so they can
+	  no longer inject JavaScript
+	- onload_render() checks zoom, width and height again (values from a
+	  config file or a clone skip new()'s checks) and falls back to the
+	  defaults with a warning
+	- CDN URLs are HTML-escaped in the <head> fragment
+	- A lone carriage return in a label no longer breaks the JavaScript
+	- add_marker('') and center('') return 0 instead of croaking from a
+	  private helper; a coordinate with no lat/lon and no address is skipped
+	- A user agent passed in by the caller is no longer reconfigured
+	- Some perls (seen with 5.38.0 on macOS) print and read numbers with the
+	  locale's decimal point, so under de_DE 51.5074 printed as "51,5074" and
+	  "51.5074" was read as 51.  Coordinates were rejected, and the computed
+	  map centre lost its fractions.  Coordinates are now always written with
+	  a '.', converted to numbers without the locale, and range-checked
+	  correctly ("90.5" was read as 90 and accepted).  JSON layers are
+	  encoded under the C numeric locale, and heatmap radius/blur accept
+	  decimals such as "12.5"
+	  Fixes https://matrix.perl-magpie.org/results/97965e64-9dc9-11f1-963c-fccfcb508d96
+
+	[ Enhancements ]
+	- new(tile_url => ...) replaces the OpenStreetMap tile layer, so maps can
+	  use an internal tile server or run on an air-gapped network
+	- new(tile_attribution => ...) replaces the map credit; the default now
+	  links to the OpenStreetMap copyright page
+	- new(email => ...) adds a contact address to Nominatim requests, as the
+	  Nominatim usage policy asks
+
+	[ Documentation ]
+	- Add a DESCRIPTION section
+	- MESSAGES tables now match the exact croak text and list the warnings
+	- Document that only one map can be rendered per page
+
+	[ Build ]
+	- Declare IPC::System::Simple as a runtime prerequisite: autodie qw(:all)
+	  needs it when the module loads
+	- Set MIN_PERL_VERSION to 5.010
+	- Remove ExtUtils::MakeMaker from PREREQ_PM (it stays in CONFIGURE_REQUIRES)
+	- Declare HTTP::Response for tests; drop unused Test::JSON,
+	  Test::HTML::Lint and Test::Warnings
+
+	[ Tests ]
+	- Cover the default tile URL, a configured tile URL and JS-string escaping
+	- Cover tile_attribution, email, the render-time checks and the new
+	  escaping helpers
+	- Simulate comma-decimal number printing so the locale fix is tested on
+	  every platform, and check the rendered output under real locales
+
 0.10	Sun Jul 12 21:23:33 EDT 2026
 	[ Bug Fixes ]
-	- Don't try to call a method on an ininitialized variable
+	- Don't try to call a method on an uninitialized variable
 	- Use consistent default sizes
 	- Bump minimum versions
 	- Set maximum zoom to 19

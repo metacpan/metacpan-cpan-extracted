@@ -6,8 +6,11 @@ no warnings 'experimental::signatures';
 
 use Test2::V0;
 
+use Object::Pad 0.825;
+use Clay::UI::Role::Interaction::Focusable;
+
 use Clay::UI::Enum::Result;
-use Clay::XS qw(sizing_grow);
+use Clay::XS qw(sizing_fixed sizing_grow);
 use Scalar::Util qw(refaddr);
 use Term::Fabulous;
 use Term::Fabulous::Terminal::Memory;
@@ -176,6 +179,34 @@ subtest 'a smaller count forgets the heights of the dropped items' => sub {
 	$list->count(100);
 	$h->{ui}->step;
 	is $h->{ui}->scroll_state($list)->{content}{height}, 2 * 3 + 98, 'the two kept items are three rows tall, the 98 new ones one row';
+};
+
+# A focusable box, like a widget that keeps its keys while its list
+# scrolls.
+class Test::FocusableBox :isa(Term::Fabulous::Widget::Box) :does(Clay::UI::Role::Interaction::Focusable) { }
+
+subtest 'the focus comes back to the list\'s focusable ancestor when the window drops its holder' => sub {
+	require Term::Fabulous::Widget::Button;
+	my $owner = Test::FocusableBox->new( layout => { sizing => { width => sizing_grow(), height => sizing_grow() } } );
+	my @buttons;
+	my $list = Term::Fabulous::Widget::VirtualList->new(
+		id     => 'buttons',
+		count  => 200,
+		build  => sub ($index) { return $buttons[$index] = Term::Fabulous::Widget::Button->new( layout => { sizing => { width => sizing_grow(), height => sizing_fixed(1) } } ) },
+		layout => { sizing => { width => sizing_grow(), height => sizing_grow() } },
+	);
+	$owner->add_child($list);
+	my $terminal = Term::Fabulous::Terminal::Memory->new( width => 30, height => 8 );
+	my $ui       = Term::Fabulous->new( root => $owner, width => 30, height => 8, terminal => $terminal );
+	$ui->step;
+	$ui->interaction->set_focused_widget( $buttons[1] );
+	$ui->step;
+	ref_is $ui->interaction->get_focused_widget, $buttons[1], 'a button in the window has the focus';
+	$list->scroll_to_item(150);
+	$ui->step;
+	$ui->step;
+	ok !defined $buttons[1]->parent, 'far away, its slot left the window';
+	ref_is $ui->interaction->get_focused_widget, $owner, 'and the focusable box around the list took the focus';
 };
 
 done_testing;

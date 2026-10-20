@@ -1,4 +1,4 @@
-package SDL3 v0.0.5 {
+package SDL3 v0.0.6 {
     use v5.40;
     use base 'Exporter';
     use Affix qw[:all];
@@ -59,9 +59,15 @@ Each feature listed below is a tag you may use.
 
 =cut
 
-    my ( $lib, @etc ) = Alien::SDL3->dynamic_libs;
-    croak 'Could not find library' unless $lib;
-    Affix::load_library($_) or die 'Could not find ' . $_ for $lib, @etc;
+    my $alien = Alien::SDL3->new;
+    my $sdl3  = $alien->alt('libsdl3')->package_info;
+    croak 'Could not find SDL3' unless $sdl3;
+    my ( $lib, @etc ) = @{ $sdl3->libfiles };
+
+    #~ print Dumper $sdl3->runtime_deps;
+    $ENV{PATH} = join( $Config{path_sep}, ( map { @{ $_->bindirs // [] } } $sdl3 ), $ENV{PATH} // '' );
+
+    #~ Affix::load_library($_) or die 'Could not find ' . $_ for $lib, @etc;
     our ( %EXPORT_TAGS, @EXPORT_OK );
     my $main_hook;
 
@@ -75,12 +81,12 @@ Each feature listed below is a tag you may use.
         require List::Util;
         @EXPORT_OK = sort map {@$_} values %EXPORT_TAGS;
         $EXPORT_TAGS{all} = [@EXPORT_OK];
-        SDL3->export_to_level( 1, $pkg, @wants );
+        __PACKAGE__->export_to_level( 1, $pkg, @wants );
     }
     #
     sub _affix_and_export( $name, $args, $ret ) {
         my ( $n, $r ) = ref $name ? @$name : ( $name, $name );
-        confess 'Failed to affix ' . $name . ': ' . $n unless affix $lib, $name, $args, $ret;
+        confess "Failed to affix $n" unless affix( $lib, $name, $args, $ret );
         push @{ $EXPORT_TAGS{ [ caller(1) ]->[3] =~ s/^.+?_//r } }, $n;
     }
 
@@ -100,7 +106,6 @@ Each feature listed below is a tag you may use.
 
     sub _typedef_and_export( $name, $type //= () ) {
         no strict 'refs';
-        my ( undef, undef, undef, $tag ) = caller;
         if ( defined $type ) {
             typedef $name, $type;
         }
@@ -120,6 +125,10 @@ Each feature listed below is a tag you may use.
         for my $enum (@$values) {
             push @{ $EXPORT_TAGS{ [ caller(1) ]->[3] =~ s/^.+?_//r } }, ref $enum ? $enum->[0] : $enum;
         }
+    }
+
+    sub _internal() {
+        __PACKAGE__->export_to_level( 1, [caller]->[0], qw[_enum_and_export _typedef_and_export _func_and_export _export _affix_and_export] );
     }
 
 =head3 C<:all>
@@ -4119,6 +4128,7 @@ See L<SDL3: CategoryRect|https://wiki.libsdl.org/SDL3/CategoryRect>
                 )
             ) ? 1 : 0;
         };
+        _const_and_export SDL_FLT_EPSILON => 1.1920928955078125e-07;
         _func_and_export SDL_RectsEqualFloat => sub ( $a, $b ) {
             SDL_RectsEqualEpsilon( $a, $b, SDL_FLT_EPSILON() );
         };
@@ -4429,7 +4439,14 @@ See L<SDL3: CategoryRender|https://wiki.libsdl.org/SDL3/CategoryRender>
         #~ ],
         #~ Bool;
         _affix_and_export
-            SDL_RenderGeometry => [ Pointer [ SDL_Renderer() ], Pointer [ SDL_Texture() ], Pointer [ SDL_Vertex() ], Int, Pointer [Int], Int ],
+            SDL_RenderGeometry => [
+            Const [ Pointer [ SDL_Renderer() ] ],
+            Const [ Pointer [ SDL_Texture() ] ],
+            Const [ Pointer [ SDL_Vertex() ] ],
+            Int,
+            Const [ Pointer [Int] ],
+            Int
+            ],
             Bool;
         _affix_and_export
             SDL_RenderGeometryRaw => [
@@ -5310,8 +5327,9 @@ See L<SDL3: CategoryThread|https://wiki.libsdl.org/SDL3/CategoryThread>
             SDL_CreateThreadRuntime => [ SDL_ThreadFunction(), String, Pointer [Void], Pointer [Void], Pointer [Void] ],
             Pointer [ SDL_Thread() ];
         _func_and_export SDL_CreateThread => sub ( $fn, $name, $data ) {
-            SDL_CreateThreadRuntime( $fn, $name, $data, SDL_BeginThreadFunction(), SDL_EndThreadFunction() );
+            SDL_CreateThreadRuntime( $fn, $name, $data, undef, undef );
 
+            #~ SDL_CreateThreadRuntime( $fn, $name, $data, SDL_BeginThreadFunction(), SDL_EndThreadFunction() );
             # Since SDL_CreateThread is defined as a preprocessor macro wrapping
             # SDL_CreateThreadRuntime in the C header, I have bound
             # SDL_CreateThreadRuntime but aliased it to SDL_CreateThread. Callers will need
@@ -5322,7 +5340,9 @@ See L<SDL3: CategoryThread|https://wiki.libsdl.org/SDL3/CategoryThread>
             SDL_CreateThreadWithPropertiesRuntime => [ SDL_PropertiesID(), Pointer [Void], Pointer [Void] ],
             Pointer [ SDL_Thread() ];
         _func_and_export SDL_CreateThreadWithProperties => sub ($props) {
-            SDL_CreateThreadWithPropertiesRuntime( $props, SDL_BeginThreadFunction(), SDL_EndThreadFunction() );
+            SDL_CreateThreadWithPropertiesRuntime( $props, undef, undef );
+
+            #~ SDL_CreateThreadWithPropertiesRuntime( $props, SDL_BeginThreadFunction(), SDL_EndThreadFunction() );
         };
         _const_and_export SDL_PROP_THREAD_CREATE_ENTRY_FUNCTION_POINTER => 'SDL.thread.create.entry_function';
         _const_and_export SDL_PROP_THREAD_CREATE_NAME_STRING            => 'SDL.thread.create.name';
@@ -5945,13 +5965,14 @@ See L<SDL3: CategoryVulkan|https://wiki.libsdl.org/SDL3/CategoryVulkan>
     }
 
     END {    # For :main
-        return if $? != 0;    # Don't run hook, we're crashing or exiting with an error
+        return if $? != 0;                     # Don't run hook, we're crashing or exiting with an error
         $main_hook // return;
         my $SDL_AppInit    = $main_hook->can('SDL_AppInit')    // sub { SDL_Log('Missing SDL_AppInit callback for :main');    SDL_APP_FAILURE() };
         my $SDL_AppEvent   = $main_hook->can('SDL_AppEvent')   // sub { SDL_Log('Missing SDL_AppEvent callback for :main');   SDL_APP_FAILURE() };
         my $SDL_AppIterate = $main_hook->can('SDL_AppIterate') // sub { SDL_Log('Missing SDL_AppIterate callback for :main'); SDL_APP_FAILURE() };
         my $SDL_AppQuit    = $main_hook->can('SDL_AppQuit')    // sub { SDL_Log('Missing SDL_AppQuit callback for :main');    SDL_APP_FAILURE() };
-        SDL_EnterAppMainCallbacks( scalar(@ARGV), \@ARGV, $SDL_AppInit, $SDL_AppIterate, $SDL_AppEvent, $SDL_AppQuit );
+        my @args           = ( $0, @ARGV );    # Inject script name as argv[0]
+        SDL_EnterAppMainCallbacks( scalar(@args), \@args, $SDL_AppInit, $SDL_AppIterate, $SDL_AppEvent, $SDL_AppQuit );
     }
 }
 1;

@@ -1,5 +1,5 @@
 package Clay::UI::Role::Interaction::HasFocusOrder;
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 use v5.22;
 use warnings;
 use feature 'signatures';
@@ -126,6 +126,25 @@ C<focus_previous> then die with
 C<Clay::UI::Interaction: E<lt>classE<gt> returned ...>, naming the class
 and the problem.
 
+The order decides what happens while the focus is inside the subtree.
+Two optional methods say how the focus gets in and out:
+
+=over 4
+
+=item *
+
+L</get_entry_focus> is asked when the default order, coming from
+outside, would land at or below this widget: for example a view that
+wants Tab to stop on itself before it steps through its content.
+
+=item *
+
+L<focus_after|Clay::UI::Interaction/focus_after> hands the focus on
+after the subtree, inside the scope of the enclosing order
+(L</focus_scope>): for example that view, once Tab passed its last
+widget.
+
+=back
 
 The role composes L<Clay::UI::Role::Layout::HasParent> (for C<ui>).
 
@@ -148,6 +167,40 @@ tells where the focus is now (C<undef> when nothing is focused).
 Returns the widget that should get the focus on C<focus_previous>, or
 C<undef>; the mirror of L</get_next_focus>.
 
+=head1 OPTIONAL METHODS
+
+The composing class may implement these; the tracker checks for them
+with C<can>. The role does not provide them, so a class is free to
+define them.
+
+=head2 get_entry_focus
+
+	method get_entry_focus ($direction) { return $self }
+
+Called when the default order (L<Clay::UI::Interaction/focus_next>,
+L</default_next_focus>, L<Clay::UI::Interaction/focus_after>), coming
+from outside this widget's subtree, would focus a widget at or below
+it. C<$direction> is C<'next'> or C<'previous'>. Returns the widget
+that should get the focus instead, validated like the result of
+L</get_next_focus>, or C<undef> to let the default order continue into
+the subtree. It is not called while the focus is inside the subtree,
+nor for a walk whose scope is this widget or below it, so a class may
+use L</default_next_focus> with C<< within => $self >> freely. With
+such widgets nested, the outermost one that does not hold the focus is
+asked.
+
+=head2 focus_scope
+
+	method focus_scope () { return $dialog }
+
+The subtree this widget's order covers, when it is not the widget's own
+subtree: a widget of the same Clay::UI. L<Clay::UI::Interaction/focus_after>
+steps inside it when it hands the focus on after a subtree below this
+widget. A modal backdrop whose order keeps Tab inside its dialog returns
+the dialog here, so a view at the end of the dialog hands the focus to
+the dialog's first widget and never to the backdrop or the window
+behind it. Without this method the scope is the widget itself.
+
 =head1 PROVIDED METHODS
 
 =head2 default_next_focus
@@ -156,7 +209,8 @@ C<undef>; the mirror of L</get_next_focus>.
 	return $self->default_next_focus(within => $self);
 
 Returns the widget the default order would focus next from the
-currently focused widget, ignoring every HasFocusOrder (see
+currently focused widget, ignoring the orders of other HasFocusOrder
+widgets but honouring their entry hooks (see
 L<Clay::UI::Interaction/default_next_focus>), or C<undef> when no
 widget can take the focus or this widget does not belong to a
 Clay::UI. Use it for partial overrides: handle the special case, and

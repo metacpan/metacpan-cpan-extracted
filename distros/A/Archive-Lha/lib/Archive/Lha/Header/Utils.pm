@@ -4,13 +4,17 @@ use strict;
 use warnings;
 use Carp;
 use Time::Local ();
-use POSIX ();
 eval { require Archive::Lha::Decode::Base };  # bootstrap XS functions
 use Exporter::Lite;
 
 our @EXPORT = qw(
-  _int _short _dostime2utime dostime_fields _os_id _extended_header _extended_header_buf
+  _int _short _checksum _dostime2utime _dostime_fields _os_id _extended_header _extended_header_buf
 );
+
+# Prefer the XS implementations (installed by the bootstrap above);
+# fall back to the pure-Perl versions when the XS is unavailable.
+*_checksum      = \&_checksum_pp      unless defined &_checksum;
+*_dostime2utime = \&_dostime2utime_pp unless defined &_dostime2utime;
 
 sub _int   { unpack 'V', ( pack 'aaaa', @_ ) }
 sub _short { unpack 'v', ( pack 'aa',   @_ ) }
@@ -19,8 +23,15 @@ sub _short { unpack 'v', ( pack 'aa',   @_ ) }
 sub _int_at   { unpack 'V', substr($_[0], $_[1], 4) }
 sub _short_at { unpack 'v', substr($_[0], $_[1], 2) }
 
+# Sum of all bytes from offset to end of buffer, truncated to one byte
+sub _checksum_pp {
+  my $sum = 0;
+  $sum += $_ for unpack 'C*', substr($_[0], $_[1]);
+  return $sum & 0xFF;
+}
+
 # Decode DOS timestamp into (sec, min, hour, mday, mon_0based, year_since_1900)
-sub dostime_fields {
+sub _dostime_fields {
   return (0) x 6 unless @_ && $_[0];
   my $v = $_[0];
   return (
@@ -33,20 +44,13 @@ sub dostime_fields {
   );
 }
 
-sub _dostime2utime {
+sub _dostime2utime_pp {
   return 0 unless @_ && $_[0];
-  return Archive::Lha::Header::Utils::dostime2utime($_[0])
-    if defined &Archive::Lha::Header::Utils::dostime2utime;
-  my $v = $_[0];
-  my @t = (
-    ($v & 0x1F) * 2,
-    ($v >>  5) & 0x3F,
-    ($v >> 11) & 0x1F,
-    ($v >> 16) & 0x1F,
-    (($v >> 21) & 0x0F) - 1,
-    (($v >> 25) & 0x7F) + 80,
-  );
-  eval { Time::Local::timegm(@t) } // 0;
+  my @t = _dostime_fields($_[0]);
+  # DOS timestamps are local time, like the XS mktime. Pass a full year
+  # to avoid Time::Local's two-digit-year heuristic.
+  $t[5] += 1900;
+  eval { Time::Local::timelocal(@t) } // 0;
 }
 
 sub _os_id {

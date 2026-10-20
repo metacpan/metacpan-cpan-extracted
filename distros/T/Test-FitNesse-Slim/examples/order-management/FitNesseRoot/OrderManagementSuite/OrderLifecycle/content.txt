@@ -1,0 +1,17 @@
+!include -setup .OrderManagementSuite.OrderScenarios
+
+!1 Submit an order
+
+This workflow uses FitNesse scenarios for repeated business steps. The same
+table also verifies a two-line order and the resulting total.
+
+|script|Order workflow|
+|$order=|create order for|C-100|
+|add item|COFFEE|quantity|2|to order|$order|
+|add item|TEA|quantity|1|to order|$order|
+|check|subtotal of order|$order|1300|
+|check|total of order|$order|18.00|
+|check|reserve inventory for|$order|true|
+|check|submit order|$order|true|
+|check|status of order|$order|submitted|
+|submit eligible order|C-200|for item|MUG|quantity|1|

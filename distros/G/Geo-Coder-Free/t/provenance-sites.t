@@ -117,7 +117,7 @@ sub complete {
 		geocoder   => GEOCODER,
 		database   => __PACKAGE__,
 		confidence => 1.0,
-		accuracy   => _accuracy_for(qw(house_number road)),
+		accuracy   => Geo::Location::Point::accuracy_for(qw(house_number road)),
 	});
 }
 
@@ -140,7 +140,7 @@ sub from_a_hash {
 	$attributes{'geocoder'}   = GEOCODER;
 	$attributes{'database'}   = __PACKAGE__;
 	$attributes{'confidence'} = 1.0;
-	$attributes{'accuracy'}   = _accuracy_for(keys %attributes);
+	$attributes{'accuracy'}   = Geo::Location::Point::accuracy_for(keys %attributes);
 
 	return Geo::Location::Point->new(\%attributes);
 }
@@ -242,7 +242,7 @@ foreach my $file(_files()) {
 		diag('        geocoder   => GEOCODER,');
 		diag('        database   => __PACKAGE__,');
 		diag('        confidence => $confidence,');
-		diag('        accuracy   => _accuracy_for(@matched_columns),   # the fields that matched');
+		diag('        accuracy   => Geo::Location::Point::accuracy_for(@matched_columns),   # the fields that matched');
 		diag('    A site that is not a result - one built only to render a string, say - goes in');
 		diag('    %EXEMPT at the top of this test with the reason it has none.');
 	}

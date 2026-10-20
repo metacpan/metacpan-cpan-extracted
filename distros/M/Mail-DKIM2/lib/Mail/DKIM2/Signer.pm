@@ -2,7 +2,7 @@ package Mail::DKIM2::Signer;
 use strict;
 use warnings;
 
-our $VERSION = '0.22';
+our $VERSION = '0.25';
 
 use base 'Mail::DKIM2::HeaderParser';
 use Crypt::Digest::SHA256 qw(sha256);
@@ -18,16 +18,18 @@ use Mail::DKIM2::Common qw(
     chain_length_error
     duplicate_number_error
     valid_sequence
-    UNKEYABLE_SIGNATURE_ERROR
+    unkeyable_signature_error
     chain_number_error
     mi_version_tag
+    from_authentic
 );
 use Mail::DKIM2::Signature;
 use Mail::DKIM2::MessageInstance;
+use Mail::DKIM2::HeaderPlan;
 
 sub known_options {
     return qw(Domain Selector KeyFile Key Algorithm MailFrom RcptTo
-              Nonce Flags Timestamp NextDomain);
+              Nonce Flags Exploded Timestamp NextDomain);
 }
 
 sub init {
@@ -74,14 +76,14 @@ sub finish_header {
             # chain a PERMERROR, so do not sign over it.
             my $e = $sig && valid_sequence($sig->sequence)
                 && (chain_number_error('DKIM2-Signature', 'i', $sig->sequence)
-                    // chain_number_error('DKIM2-Signature', 'm', $sig->version));
+                    // chain_number_error('DKIM2-Signature', 'm', $sig->version, $sig->sequence));
             if ($e) {
                 $range //= $e;
             }
             elsif ($sig && valid_sequence($sig->sequence)) {
                 push @dk2_headers, { i => $sig->sequence, raw => $header, sig => $sig };
             } else {
-                $unkeyable = UNKEYABLE_SIGNATURE_ERROR;
+                $unkeyable = unkeyable_signature_error($val);
             }
         }
     }
@@ -110,6 +112,13 @@ sub finish_header {
     # rejects one that names none (tag=m missing), so a message with no
     # instance cannot be signed: compute one first (dkim2sign does).
     $error //= 'no Message-Instance field to sign over' unless @mi_headers;
+    # -07 sections 11 and 12.4: a hop that originates the message, or whose
+    # instances changed From, signs with a d= the From is Authentic for.
+    $error //= "From header field is not Authentic for d=$self->{Domain}"
+        if $self->_from_must_match(\@mi_headers, \@dk2_headers)
+        && !from_authentic($self->{Domain},
+               map { $_->[1] } grep { lc $_->[0] eq 'from' }
+               @{ Mail::DKIM2::HeaderPlan::fields($self->{headers}) });
     if ($error) {
         # A protocol outcome, not a programming error: reported through
         # result/details like the Verifier's, so a streaming host is not
@@ -122,34 +131,72 @@ sub finish_header {
     # Determine highest MI version
     my $mi_version = @mi_headers ? $mi_headers[-1]{v} : 0;
 
-    # Build initial signature items as [selector, algorithm, value] arrays
-    my @sig_items;
-    push @sig_items, [
-        $self->{Selector},
-        $self->{Algorithm},
-        '',
-    ];
-
-    # Create the signature object
-    # draft-06 §9.3: when NextDomain is set this is an imaginary forwarding
-    # hop — emit nd= and omit mf=/rt= (Signature->new enforces the exclusion).
-    my $signature = Mail::DKIM2::Signature->new(
-        Sequence   => $next_i,
-        Version    => $mi_version || undef,
-        Timestamp  => $self->{Timestamp} || time(),
-        Domain     => $self->{Domain},
-        ($self->{NextDomain}
-            ? (NextDomain => $self->{NextDomain})
-            : (MailFrom => $self->{MailFrom}, RcptTo => $self->{RcptTo})),
-        Signatures => \@sig_items,
-        ($self->{Nonce} ? (Nonce => $self->{Nonce}) : ()),
-        ($self->{Flags} ? (Flags => $self->{Flags}) : ()),
-    );
-
-    $self->{_signature} = $signature;
+    $self->{_mi_version} = $mi_version;
+    $self->{_timestamp}  = $self->{Timestamp} || time();
     $self->{_mi_headers} = \@mi_headers;
     $self->{_dk2_headers} = \@dk2_headers;
     $self->{_next_i} = $next_i;
+    $self->{_signature} = $self->_new_signature($self->{RcptTo});
+}
+
+# The signature object for this hop with rt= set to $rcpt (an arrayref, or
+# undef for none). -07 §12.3: when NextDomain is set this is an
+# imaginary forwarding hop -- emit nd= and omit mf=/rt= (Signature->new
+# enforces the exclusion).
+#
+# f= (-07 section 12.5): "exploded" MUST be set by a hop sending the message
+# to more than one address and MUST NOT be set at i=1. So it is set when
+# i > 1 and the caller asked for it (Exploded, or "exploded" among its
+# Flags) or rt= holds more than one address, and dropped at i=1 whatever
+# the caller said. Built afresh for each recipient set, since the flag
+# depends on rt=.
+sub _new_signature {
+    my ($self, $rcpt) = @_;
+    my $i = $self->{_next_i};
+    my @rcpt = !defined $rcpt ? () : ref $rcpt eq 'ARRAY' ? @$rcpt : ($rcpt);
+    my @flags = grep { $_ ne 'exploded' } @{ $self->{Flags} || [] };
+    my $asked = $self->{Exploded}
+             || grep { $_ eq 'exploded' } @{ $self->{Flags} || [] };
+    push @flags, 'exploded'
+        if $i > 1 && ($asked || (!$self->{NextDomain} && @rcpt > 1));
+    return Mail::DKIM2::Signature->new(
+        Sequence   => $i,
+        Version    => $self->{_mi_version} || undef,
+        Timestamp  => $self->{_timestamp},
+        Domain     => $self->{Domain},
+        ($self->{NextDomain}
+            ? (NextDomain => $self->{NextDomain})
+            : (MailFrom => $self->{MailFrom},
+               (defined $rcpt ? (RcptTo => \@rcpt) : ()))),
+        Signatures => [[ $self->{Selector}, $self->{Algorithm}, '' ]],
+        ($self->{Nonce} ? (Nonce => $self->{Nonce}) : ()),
+        (@flags ? (Flags => \@flags) : ()),
+    );
+}
+
+# True when this signature answers for the From the message carries: there
+# is no signature yet (this hop is i=1), or a Message-Instance no existing
+# signature covers (m= above every signature's m=) has a header Recipe that
+# names From -- this hop, or a list manager on its host, changed it. One
+# that does not parse is left to the verifiers (and Mail::DKIM2::Gate),
+# which refuse it: the Signer checks only what it needs to sign.
+sub _from_must_match {
+    my ($self, $mi_headers, $dk2_headers) = @_;
+    return 1 unless @$dk2_headers;
+    my $covered = 0;
+    for my $d (@$dk2_headers) {
+        my $m = $d->{sig}->version // 0;
+        $covered = 0 + $m if $m =~ /\A[0-9]+\z/ && $m > $covered;
+    }
+    for my $mi (grep { $_->{v} > $covered } @$mi_headers) {
+        (my $value = $mi->{raw}) =~ s/\A[^:]*:\s*//;
+        my $obj = eval { Mail::DKIM2::MessageInstance->parse($value) };
+        die $@ if ref $@;
+        next unless $obj;
+        my $rh = $obj->get_tag('rh');
+        return 1 if $rh && exists $rh->{from};
+    }
+    return 0;
 }
 
 sub finish_body {
@@ -161,7 +208,7 @@ sub finish_body {
 # Re-sign the same message for a different envelope recipient, returning the
 # folded DKIM2-Signature header to prepend for that recipient.
 #
-# This is the cheap half of signing. §9.6 signs solely the Message-Instance and
+# This is the cheap half of signing. §12.8 signs solely the Message-Instance and
 # DKIM2-Signature header fields, so everything expensive -- the body hash and
 # the hash of every other header field -- lives in the Message-Instance and is
 # identical for every recipient. Only rt= changes, so an additional recipient
@@ -176,12 +223,16 @@ sub finish_body {
 #     }
 #
 # Takes one address or an arrayref of them. Not usable on a signature carrying
-# nd=, which excludes rt= by §8.7; Signature::rcpt_to croaks in that case.
+# nd=, which excludes rt= by §10.7; Signature::rcpt_to croaks in that case.
 sub sign_for_recipient {
     my ($self, $rcpt) = @_;
     croak "sign_for_recipient: no signature: " . ($self->{details} // 'CLOSE has not run')
         unless $self->{_signature};
-    $self->{_signature}->rcpt_to($rcpt);
+    croak "cannot set rt= on a signature carrying nd= (-07 §10.7)"
+        if $self->{NextDomain};
+    my @list = ref $rcpt eq 'ARRAY' ? @$rcpt : ($rcpt);
+    croak "rcpt_to requires at least one recipient" unless @list;
+    $self->{_signature} = $self->_new_signature(\@list);
     $self->_compute_signature;
     $self->{result} = 'signed';
     return $self->as_string;
@@ -197,7 +248,7 @@ sub _compute_signature {
     # Reset s= to the empty placeholder before building the signing input.
     # Without this a second call would sign an input containing the FIRST
     # call's signature bytes, which no verifier can reproduce -- the signing
-    # input must always carry an empty s= value (§9.6).
+    # input must always carry an empty s= value (§12.8).
     $signature->set_tag('s', join(':', $self->{Selector}, $self->{Algorithm}, ''));
 
     # Include the new signature as the signing_i entry
@@ -240,9 +291,13 @@ sub signature {
     return $self->{_signature};
 }
 
+# No signature (before CLOSE, or a refused message) croaks: an empty string
+# prepended to the message by a caller that did not check result() is a
+# blank line that ends its header block.
 sub as_string {
     my $self = shift;
-    return '' unless $self->{_signature};
+    croak 'no signature: ' . ($self->{details} // 'the message has not been signed') . "\n"
+        unless $self->{_signature};
     return $self->{_signature}->as_folded_string();
 }
 
@@ -316,13 +371,13 @@ the Message-Instance header this hop wants to sign over (see
 L<Mail::DKIM2::MessageInstance>; a message with none is a C<fail>); the
 Signer reads the existing
 Message-Instance and DKIM2-Signature headers, chooses the next C<i=>, builds
-the signing input of spec-06 section 8.5, and signs it. It does not alter
+the signing input of -07 section 10.5, and signs it. It does not alter
 the message: the caller prepends the header C<as_string> returns.
 
 Extends L<Mail::DKIM2::HeaderParser>, which provides C<PRINT>, C<CLOSE>,
 C<load> and the tie interface.
 
-This module implements draft-ietf-dkim-dkim2-spec-06; see L<Mail::DKIM2/STATUS>
+This module implements draft-ietf-dkim-dkim2-spec-07; see L<Mail::DKIM2/STATUS>
 for what that means for the wire format and the API, and
 L<Mail::DKIM2/CONVENTIONS> for the option, input and error conventions every
 module here follows.
@@ -371,7 +426,7 @@ An arrayref of this hop's envelope recipients, recorded in C<rt=>.
 =item NextDomain
 
 The C<d=> of the hop that will sign next, recorded in C<nd=> for an
-imaginary forwarding hop (spec-06 section 9.3). Excludes C<MailFrom> and
+imaginary forwarding hop (-07 section 12.3). Excludes C<MailFrom> and
 C<RcptTo>.
 
 =item Timestamp
@@ -384,7 +439,16 @@ The C<n=> value, at most 64 characters.
 
 =item Flags
 
-An arrayref of C<f=> flags, such as C<donotmodify>.
+An arrayref of C<f=> flags, such as C<feedback>. An C<exploded> among
+them is a request for the flag, as C<Exploded> is.
+
+=item Exploded
+
+True when this hop sends the message to more than one address, as a list
+manager does (-07 section 12.5). The signature then carries the
+C<exploded> flag, which it also gets whenever C<rt=> holds more than one
+address. Never at C<i=1>: there the flag, requested this way or in
+C<Flags>, is dropped.
 
 =back
 
@@ -403,7 +467,12 @@ cannot be signed: no Message-Instance to sign over, a chain already at the
 length limit, a DKIM2-Signature with a missing or malformed C<i=> (or one
 that does not parse), an C<i=> or C<m=> that is not a chain number (see
 L<Mail::DKIM2::Common/"chain_number_error($field, $tag, $n)">), or a
-repeated C<i=> or C<m=>. L</"details()"> says which. A failure is a result, not
+repeated C<i=> or C<m=>; or, when the message has no DKIM2-Signature yet or
+a Message-Instance no signature covers changed From, a From that is not
+Authentic for C<Domain> (-07 sections 11 and 12.4: exactly one From field
+holding one mailbox whose domain is C<Domain> or below it), with details
+C<From header field is not Authentic for d=E<lt>DomainE<gt>>.
+L</"details()"> says which. A failure is a result, not
 an exception: C<PRINT> and C<CLOSE> return normally.
 
 =head2 details()
@@ -416,9 +485,14 @@ C<result> and C<details> together, e.g. C<"fail (PERMERROR ...)">.
 
 =head2 as_string()
 
-The complete C<DKIM2-Signature: ...> header, folded for insertion, or the
-empty string if there is no signature. The folding is part of what was
-signed and must not be changed.
+The complete C<DKIM2-Signature: ...> header, folded for insertion. The
+folding is part of what was signed and must not be changed.
+
+Croaks C<no signature: REASON> when there is no signature: before
+C<CLOSE>, or when C<result> is C<fail> (REASON is C<details>). Check
+C<result> first. (Before 0.24 it returned the empty string, which a caller
+that prepended it unchecked turned into a blank line ending the message's
+header block.)
 
 =head2 signature()
 
@@ -427,7 +501,7 @@ The L<Mail::DKIM2::Signature> object, available after C<CLOSE>.
 =head2 sign_for_recipient($rcpt)
 
 Re-signs for a different envelope recipient (one address or an arrayref of
-them) and returns the folded header. Spec-06 section 9.6 signs only the
+them) and returns the folded header. -07 section 12.8 signs only the
 Message-Instance and DKIM2-Signature fields, so the body and header hashes
 in the Message-Instance are the same for every recipient and only C<rt=>
 changes; an extra recipient costs one signature over a few hundred bytes,

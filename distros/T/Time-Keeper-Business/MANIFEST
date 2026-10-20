@@ -15,6 +15,13 @@ bench/08-deadline.pl
 bench/09-bytes.pl
 bench/10-construct.pl
 bench/11-rule-year.pl
+bench/12-calendar-rule.pl
+bench/13-japan-year.pl
+bench/14-rule-data.pl
+bench/15-overnight.pl
+bench/16-elapsed.pl
+bench/17-join-hours.pl
+bench/18-iterate.pl
 bench/README
 bench/common.pl
 bench/run.pl
@@ -31,6 +38,8 @@ include/tkb/tkb_value.h
 lib/Time/Keeper/Business.pm
 lib/Time/Keeper/Business/Rule.pm
 eg/target2.pl
+eg/japan.pl
+eg/sweden.pl
 eg/uk.pl
 eg/us-federal.pl
 t/00-load.t
@@ -40,13 +49,21 @@ t/03-sources.t
 t/04-rules.t
 t/05-days.t
 t/06-hours.t
+t/10-calendar-rules.t
+t/11-japan.t
+t/12-join-hours.t
+t/13-elapsed.t
+t/14-counts.t
 t/07-time.t
 t/easter-1900-2199.tsv
+t/japan-holidays-2016-2027.tsv
 t/opm-federal-holidays-2026.tsv
 t/uk-bank-holidays.tsv
+t/15-core-paths.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
+xs/counts.xs
 xs/days.xs
 xs/hours.xs
 xs/rule.xs
@@ -58,6 +75,7 @@ xt/04-rule-oracle.t
 xt/07-time-oracle.t
 xt/08-bench-smoke.t
 xt/09-pod-examples.t
+xt/10-calendar-oracle.t
 xt/RuleOracle.pl
 xt/boilerplate.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

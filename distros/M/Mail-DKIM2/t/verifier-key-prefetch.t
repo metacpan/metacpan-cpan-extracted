@@ -30,6 +30,7 @@ package BgResolver {
         my ($self, $fqdn, $bg) = @_;
         my $p = Net::DNS::Packet->new($fqdn, 'TXT', 'IN');
         $p->header->qr(1);
+        $p->header->tc(1) if $bg && $self->{tc};
         my $rcode = $self->{rcode}{$fqdn} // ($bg && $self->{all_rcode});
         if ($rcode) {
             $p->header->rcode($rcode);
@@ -50,7 +51,7 @@ package BgResolver {
         push @{$self->{log}}, ['bgsend', $fqdn];
         return { fqdn => $fqdn };
     }
-    sub bgbusy { return $_[0]{hang} ? 1 : 0 }
+    sub bgbusy { $_[0]{busy_calls}++; return $_[0]{hang} ? 1 : 0 }
     sub bgread {
         my ($self, $h) = @_;
         push @{$self->{log}}, ['bgread', $h->{fqdn}];
@@ -121,9 +122,105 @@ sub run {
 
 {
     no warnings "once";
-    local $Mail::DKIM2::Verifier::PREFETCH_WAIT = 0.05;
+    local $Mail::DKIM2::Verifier::PREFETCH_WAIT = 0.2;
     my ($v, $res) = run(resolver => { hang => 1 });
     is($v->result, 'pass', 'an answer still not in by the deadline: asked again');
+    is_deeply([sort @{ $res->calls('query') }], \@names, '... once per key');
+    # Waiting for it sleeps between polls rather than spinning: a spin
+    # calls bgbusy hundreds of thousands of times in 0.2s per key.
+    cmp_ok($res->{busy_calls}, '<', 100 * @names, '... waiting without a busy spin');
+}
+
+# A resolver that subclasses Net::DNS::Resolver and overrides only send --
+# as FastMTA's and authentication_milter's do, for their own transport,
+# caching and metrics. Net::DNS's bgsend would bypass that send (and ask
+# only the first nameserver), so the Verifier must not prefetch with it:
+# every key goes through query(), and so through the subclass's send.
+package SendOnlyResolver {
+    use parent -norequire, 'Net::DNS::Resolver';
+    sub send {
+        my ($self, $fqdn, $type) = @_;
+        push @{$self->{sent}}, $fqdn;
+        return BgResolver::_answer({ dns => $self->{dns} }, $fqdn);
+    }
+}
+
+{
+    my $bgsends = 0;
+    no warnings 'redefine';
+    local *Net::DNS::Resolver::Base::bgsend = sub { $bgsends++; return };
+    my $res = SendOnlyResolver->new(nameservers => ['192.0.2.1'], retry => 1, tcp_timeout => 1, udp_timeout => 1);
+    $res->{dns} = $dns;
+    my $v = Mail::DKIM2::Verifier->new(SkipTimestampCheck => 1, Resolver => $res);
+    $v->PRINT($raw);
+    $v->CLOSE;
+    is($v->result, 'pass', 'a resolver overriding only send: the chain verifies');
+    is($bgsends, 0, '... and Net::DNS\'s bgsend, which would bypass that send, is never used');
+    is_deeply([sort @{ $res->{sent} }], \@names, '... every key asked through its send, once');
+}
+
+# A plain Net::DNS::Resolver (or a subclass that changes nothing) is
+# prefetched with Net::DNS's own background calls.
+package PlainResolver { use parent -norequire, 'Net::DNS::Resolver' }
+
+{
+    my @bg;
+    no warnings 'redefine';
+    local *Net::DNS::Resolver::Base::bgsend = sub { push @bg, $_[1]; return { fqdn => $_[1] } };
+    local *Net::DNS::Resolver::Base::bgbusy = sub { 0 };
+    local *Net::DNS::Resolver::Base::bgread = sub { BgResolver::_answer({ dns => $dns }, $_[1]{fqdn}, 1) };
+    my $res = PlainResolver->new(nameservers => ['192.0.2.1']);
+    my $v = Mail::DKIM2::Verifier->new(SkipTimestampCheck => 1, Resolver => $res);
+    $v->PRINT($raw);
+    $v->CLOSE;
+    is($v->result, 'pass', 'a plain Net::DNS::Resolver subclass: the chain verifies');
+    is_deeply([sort @bg], \@names, '... on keys prefetched with Net::DNS\'s bgsend');
+}
+
+# A message may name any number of selectors, and the prefetch runs before
+# any of its fields are judged: it sends for at most PREFETCH_MAX keys, the
+# top signature's first; the rest are asked for if they are ever needed.
+{
+    no warnings 'once';
+    my $many = join(',', map { "s$_:rsa-sha256:AAAA" } 1 .. 200);
+    (my $hostile = $raw) =~ s/\A/DKIM2-Signature: i=7; m=5; t=1; d=test1.dkim2.com; mf=PD4=; rt=PD4=; s=$many;\r\n/;
+    my $res = BgResolver->new(dns => $dns);
+    my $v = Mail::DKIM2::Verifier->new(SkipTimestampCheck => 1, Resolver => $res);
+    $v->PRINT($hostile);
+    $v->CLOSE;
+    is(scalar @{ $res->calls('bgsend') }, $Mail::DKIM2::Verifier::PREFETCH_MAX,
+        '200 selectors in one signature: PREFETCH_MAX background lookups, no more');
+    isnt($v->result, 'pass', '... and the message does not verify');
+}
+
+# The same for a subclass that overrides query rather than send.
+package QueryOnlyResolver {
+    use parent -norequire, 'Net::DNS::Resolver';
+    sub query {
+        my ($self, $fqdn) = @_;
+        push @{$self->{asked}}, $fqdn;
+        my $p = BgResolver::_answer({ dns => $self->{dns} }, $fqdn);
+        return $p->header->ancount ? $p : undef;
+    }
+}
+
+{
+    my $bgsends = 0;
+    no warnings 'redefine';
+    local *Net::DNS::Resolver::Base::bgsend = sub { $bgsends++; return };
+    my $res = QueryOnlyResolver->new(nameservers => ['192.0.2.1']);
+    $res->{dns} = $dns;
+    my $v = Mail::DKIM2::Verifier->new(SkipTimestampCheck => 1, Resolver => $res);
+    $v->PRINT($raw);
+    $v->CLOSE;
+    is($v->result, 'pass', 'a resolver overriding only query: the chain verifies');
+    is($bgsends, 0, '... with no background lookup');
+    is_deeply([sort @{ $res->{asked} }], \@names, '... every key asked through its query, once');
+}
+
+{
+    my ($v, $res) = run(resolver => { tc => 1 });
+    is($v->result, 'pass', 'a truncated answer in the background: asked again, and verifies');
     is_deeply([sort @{ $res->calls('query') }], \@names, '... once per key');
 }
 

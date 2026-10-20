@@ -7,7 +7,7 @@ use Carp ();
 
 use VPNDetection::Error;
 
-our $VERSION = '3.8.0';
+our $VERSION = '3.9.0';
 
 # The formats a dataset is published in. Anything else is refused before it
 # reaches the API, whose 400 would cost a round trip and name nothing to act on.
@@ -202,10 +202,48 @@ sub _transfer_p {
 
 # The member each call returns from one level down, and what it must be; a call
 # not named here returns the whole answer.
+# The member each call returns from one level down, or undef for a call that
+# returns the whole answer, and the shape the whole answer must have: the pinned
+# spec's schemas, as VPNDetection's _nonconforming reads them. A member the spec
+# requires and never sends as null is required, a nullable or optional one may be
+# absent or null, and every one present has the spec's type at every depth, so a
+# version served as "3" fails the call rather than reaching the caller as a
+# string (3.8.0). `standing`, `license_type`, `format` and `outcome` stay
+# strings, open sets as the spec documents them, and a sample row is a hash
+# whatever its columns.
+my $VERSION_SHAPE = [fields => [
+    [id => ['string'], 1], [version => ['integer'], 1], [summary => ['string']],
+    [formats => [list => [fields => [[format => ['string'], 1], [bytes => ['integer']]]]], 1],
+    [sample_formats => [list => ['string']]],
+]];
+my $DATABASE_SHAPE = [fields => [
+    [base => ['string'], 1], [name => ['string'], 1], [summary => ['string'], 1],
+    [license_type => ['string']], [starts => ['string']], [expires => ['string']],
+    [renews_at => ['string']], [notice_due_at => ['string']], [in_term => ['boolean'], 1],
+    [standing => ['string'], 1], [versions => [list => $VERSION_SHAPE], 1],
+]];
+my $COLUMN_SHAPE = [fields => [[name => ['string'], 1], [type => ['string'], 1], [description => ['string']]]];
+my $METADATA_SHAPE = [fields => [
+    [id => ['string'], 1], [update_freq => ['string']], [updated => ['string'], 1],
+    [entries => ['integer'], 1], [schema => [map_of => [list => $COLUMN_SHAPE]], 1],
+    [sample => [map_of => [list => ['object']]]], [size => [map_of => ['integer']]],
+    [sample_size => [map_of => ['integer']]], [sample_entries => ['integer']],
+]];
+my $CHECKSUMS_SHAPE = [fields => [
+    [id => ['string'], 1], [format => ['string'], 1],
+    [checksums => [fields => [map { [$_ => ['string'], 1] } qw(md5 sha1 sha256 sha512)]], 1],
+]];
+my $DOWNLOAD_SHAPE = [fields => [
+    [dataset_id => ['string'], 1], [format => ['string'], 1], [outcome => ['string'], 1],
+    [sample => ['boolean'], 1], [bytes => ['integer']], [http_status => ['integer']],
+    [apikey_id => ['string']], [client_ip => ['string']], [user_agent => ['string']],
+    [created => ['string'], 1],
+]];
 my %UNWRAP = (
-    list => [databases => 'ARRAY'],
-    checksums => [checksums => 'HASH'],
-    downloads => [downloads => 'ARRAY'],
+    list => [databases => [fields => [[databases => [list => $DATABASE_SHAPE], 1]]]],
+    metadata => [undef, $METADATA_SHAPE],
+    checksums => [checksums => $CHECKSUMS_SHAPE],
+    downloads => [downloads => [fields => [[downloads => [list => $DOWNLOAD_SHAPE], 1]]]],
 );
 
 sub _body_p {

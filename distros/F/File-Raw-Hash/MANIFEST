@@ -1,4 +1,5 @@
 blake3.c
+bench/compare.pl
 Changes
 crc32.c
 Hash.xs
@@ -11,6 +12,7 @@ include/hashx.h
 include/md5.h
 include/sha1.h
 include/sha2.h
+include/sha_hw.h
 include/xxh64.h
 lib/File/Raw/Hash.pm
 Makefile.PL
@@ -18,6 +20,7 @@ MANIFEST			This list of files
 md5.c
 README
 sha1.c
+sha_hw.c
 sha2.c
 t/00-load.t
 t/01-known-vectors.t
@@ -35,10 +38,13 @@ t/12-hmac.t
 t/13-record.t
 t/14-raw-parity.t
 t/15-abi.t
+t/16-long-vectors.t
+t/17-implementation.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
 xt/boilerplate.t
+xt/oracle.t
 xxh64.c
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

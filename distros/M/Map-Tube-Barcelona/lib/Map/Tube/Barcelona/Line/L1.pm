@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use version;
 
-our $VERSION   = qv('v1.0.0');
+our $VERSION   = qv('v1.0.1');
 our $AUTHORITY = 'cpan:MANWAR';
 
 use 5.006;
@@ -15,7 +15,7 @@ Map::Tube::Barcelona::Line::L1 - Barcelona Metro Map: L1 Line.
 
 =head1 VERSION
 
-Version v1.0.0
+Version v1.0.1
 
 =encoding utf8
 

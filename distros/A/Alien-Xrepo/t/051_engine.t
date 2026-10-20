@@ -122,7 +122,7 @@ subtest 'a failed package isolates: siblings install, error recorded' => sub {
     $b->run;
     my (@installs) = grep { $_->{action} eq 'install' } @{ $spy->calls };
     is scalar @installs, 3, 'all packages attempted';
-    like $b->runtime_prop->{errors}{libsdl3}, qr/boom/, 'failure captured in runtime_prop';
+    like $b->runtime_prop->{errors}{libsdl3}{error}, qr/boom/, 'failure captured in runtime_prop';
     ok exists $b->runtime_prop->{packages}{zstd},  'sibling before the failure installed';
     ok exists $b->runtime_prop->{packages}{ninja}, 'sibling after the failure installed';
     is $b->install_type, 'share', 'a partial success is still a share install';
@@ -156,7 +156,7 @@ subtest 'a still-failing install records the error after one refresh' => sub {
     my (@installs) = grep { $_->{action} eq 'install' } @{ $spy->calls };
     is scalar @updates,  1, 'refresh ran before the final attempt';
     is scalar @installs, 2, 'two attempts total';
-    like $b->runtime_prop->{errors}{raylib}, qr/boom/, 'failure recorded after the retry limit';
+    like $b->runtime_prop->{errors}{raylib}{error}, qr/boom/, 'failure recorded after the retry limit';
 };
 subtest 'a resumed build cannot refresh and retry the same package again' => sub {
     my $cp  = path($dir)->child('retry-state.json');
@@ -181,7 +181,7 @@ subtest 'a resumed build cannot refresh and retry the same package again' => sub
     my (@installs2) = grep { $_->{action} eq 'install' } @{ $spy2->calls };
     is scalar @updates2,  0, 'the resumed run does not refresh the registry again';
     is scalar @installs2, 1, 'the resumed run makes one attempt and no retry';
-    like $b2->runtime_prop->{errors}{raylib}, qr/boom/, 'the failure is still recorded on the resumed run';
+    like $b2->runtime_prop->{errors}{raylib}{error}, qr/boom/, 'the failure is still recorded on the resumed run';
 };
 subtest 'gather fetches anything the install did not produce' => sub {
     my $spy = Alien::Xrepo::Build::TestSpy->new;
@@ -224,6 +224,26 @@ subtest 'assert_installed passes and keeps the snapshot when everything installe
     $b->run;
     ok lives { $b->assert_installed }, 'no die when no package failed';
     ok -e $snap,                       'a clean snapshot is left in place';
+};
+subtest 'optional package failure is non-fatal: warns instead of dying' => sub {
+    my $spy = Alien::Xrepo::Build::TestSpy->new( fail => { optpkg => 1 } );
+    my $b   = build( [ 'zstd', { name => 'optpkg', required => 0 } ], repo => $spy, probe_policy => 'off' );
+    $b->run;
+
+    # Ensure required sibling installed and optional package was isolated
+    ok exists $b->runtime_prop->{packages}{zstd},    'required sibling package installed';
+    ok !exists $b->runtime_prop->{packages}{optpkg}, 'failed optional package not in packages';
+
+    # Verify error was recorded and flagged as non-fatal (fatal => 0)
+    ok exists $b->runtime_prop->{errors}{optpkg}, 'failure captured in errors';
+    is $b->runtime_prop->{errors}{optpkg}{fatal}, 0, 'optional package failure marked non-fatal';
+    my $ret;
+    my $warn = warning {    # assert_installed must NOT die, must emit a warning, and must return $b
+        ok lives { $ret = $b->assert_installed }, 'assert_installed does not die for non-fatal failure';
+    };
+    is $warn, D(), 'assert_installed emitted a warning instead of dying';
+    like $warn, qr[optpkg], 'warning identifies the optional package that failed';
+    is $ret, $b, 'assert_installed returns $self on non-fatal failure';
 };
 subtest 'a checkpoint records the stage it just finished' => sub {
     my $cp  = path($dir)->child('stage-state.json');
@@ -274,17 +294,16 @@ subtest 'hooks run for every registered stage' => sub {
 our @HOOK_RAN;
 subtest 'recipe hooks load once and register stage callbacks' => sub {
     my $hdir = Path::Tiny->tempdir;
-    $hdir->child('RecipeHooksDemo.pm')->spew_utf8(
-        q{
-        package RecipeHooksDemo;
-        sub register_hooks {
-            my ($build) = @_;
-            push @main::HOOK_RAN, 'register';
-            $build->register_hook( install => sub { push @main::HOOK_RAN, 'install' } );
-        }
+    $hdir->child('RecipeHooksDemo.pm')->spew_utf8(<<~'END');
+        package RecipeHooksDemo {
+            sub register_hooks {
+                my ($build) = @_;
+                push @main::HOOK_RAN, 'register';
+                $build->register_hook( install => sub { push @main::HOOK_RAN, 'install' } );
+            }
+        };
         1;
-    }
-    );
+        END
     local @INC = ( @INC, $hdir->stringify );
     my $spy = Alien::Xrepo::Build::TestSpy->new;
     my $b   = build( ['zstd'], repo => $spy, probe_policy => 'off', recipe_extra => { hooks => ['RecipeHooksDemo'] } );
@@ -409,7 +428,7 @@ subtest 'share_dir shallow-installs packages and records share-relative paths' =
         repo         => $spy,
         share_dir    => $share->stringify,
         snapshot     => $snap,
-        probe_policy => 'off',
+        probe_policy => 'off'
     );
     $b->run;
     my (@installs) = grep { $_->{action} eq 'install' } @{ $spy->calls };

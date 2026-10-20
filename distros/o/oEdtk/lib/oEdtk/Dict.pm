@@ -4,7 +4,7 @@ use warnings;
 
 use Config::IniFiles;
 use Exporter;
-our $VERSION = 2.1126;
+our $VERSION = 2.1129;
 our @ISA     = qw(Exporter);
 
 # Create a dictionary from an INI file.

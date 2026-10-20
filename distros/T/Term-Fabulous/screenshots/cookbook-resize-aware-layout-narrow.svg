@@ -19,25 +19,25 @@
 <rect x="16.5" y="16.5" width="567" height="237" rx="10" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1"/>
 <g shape-rendering="crispEdges">
 <rect x="39" y="68" width="522" height="1" fill="#78a0dc"/>
-<rect x="34" y="78" width="1" height="36" fill="#78a0dc"/>
-<rect x="565" y="78" width="1" height="36" fill="#78a0dc"/>
-<rect x="39" y="122" width="522" height="1" fill="#78a0dc"/>
-<rect x="39" y="158" width="522" height="1" fill="#78a0dc"/>
-<rect x="34" y="168" width="1" height="54" fill="#78a0dc"/>
-<rect x="565" y="168" width="1" height="54" fill="#78a0dc"/>
+<rect x="34" y="78" width="1" height="54" fill="#78a0dc"/>
+<rect x="565" y="78" width="1" height="54" fill="#78a0dc"/>
+<rect x="39" y="140" width="522" height="1" fill="#78a0dc"/>
+<rect x="39" y="176" width="522" height="1" fill="#78a0dc"/>
+<rect x="34" y="186" width="1" height="36" fill="#78a0dc"/>
+<rect x="565" y="186" width="1" height="36" fill="#78a0dc"/>
 <rect x="39" y="230" width="522" height="1" fill="#78a0dc"/>
 </g>
 <polyline points="34.5 78 34.5 73 34.538 72.413 34.653 71.835 34.843 71.278 35.103 70.75 35.43 70.261 35.818 69.818 36.261 69.43 36.75 69.103 37.278 68.843 37.835 68.653 38.413 68.538 39 68.5 39 68.5" fill="none" stroke="#78a0dc" stroke-width="1" stroke-linejoin="round"/>
 <polyline points="565.5 78 565.5 73 565.462 72.413 565.347 71.835 565.157 71.278 564.897 70.75 564.57 70.261 564.182 69.818 563.739 69.43 563.25 69.103 562.722 68.843 562.165 68.653 561.587 68.538 561 68.5 561 68.5" fill="none" stroke="#78a0dc" stroke-width="1" stroke-linejoin="round"/>
-<polyline points="34.5 114 34.5 118 34.538 118.587 34.653 119.165 34.843 119.722 35.103 120.25 35.43 120.739 35.818 121.182 36.261 121.57 36.75 121.897 37.278 122.157 37.835 122.347 38.413 122.462 39 122.5 39 122.5" fill="none" stroke="#78a0dc" stroke-width="1" stroke-linejoin="round"/>
-<polyline points="565.5 114 565.5 118 565.462 118.587 565.347 119.165 565.157 119.722 564.897 120.25 564.57 120.739 564.182 121.182 563.739 121.57 563.25 121.897 562.722 122.157 562.165 122.347 561.587 122.462 561 122.5 561 122.5" fill="none" stroke="#78a0dc" stroke-width="1" stroke-linejoin="round"/>
-<polyline points="34.5 168 34.5 163 34.538 162.413 34.653 161.835 34.843 161.278 35.103 160.75 35.43 160.261 35.818 159.818 36.261 159.43 36.75 159.103 37.278 158.843 37.835 158.653 38.413 158.538 39 158.5 39 158.5" fill="none" stroke="#78a0dc" stroke-width="1" stroke-linejoin="round"/>
-<polyline points="565.5 168 565.5 163 565.462 162.413 565.347 161.835 565.157 161.278 564.897 160.75 564.57 160.261 564.182 159.818 563.739 159.43 563.25 159.103 562.722 158.843 562.165 158.653 561.587 158.538 561 158.5 561 158.5" fill="none" stroke="#78a0dc" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="34.5 132 34.5 136 34.538 136.587 34.653 137.165 34.843 137.722 35.103 138.25 35.43 138.739 35.818 139.182 36.261 139.57 36.75 139.897 37.278 140.157 37.835 140.347 38.413 140.462 39 140.5 39 140.5" fill="none" stroke="#78a0dc" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="565.5 132 565.5 136 565.462 136.587 565.347 137.165 565.157 137.722 564.897 138.25 564.57 138.739 564.182 139.182 563.739 139.57 563.25 139.897 562.722 140.157 562.165 140.347 561.587 140.462 561 140.5 561 140.5" fill="none" stroke="#78a0dc" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="34.5 186 34.5 181 34.538 180.413 34.653 179.835 34.843 179.278 35.103 178.75 35.43 178.261 35.818 177.818 36.261 177.43 36.75 177.103 37.278 176.843 37.835 176.653 38.413 176.538 39 176.5 39 176.5" fill="none" stroke="#78a0dc" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="565.5 186 565.5 181 565.462 180.413 565.347 179.835 565.157 179.278 564.897 178.75 564.57 178.261 564.182 177.818 563.739 177.43 563.25 177.103 562.722 176.843 562.165 176.653 561.587 176.538 561 176.5 561 176.5" fill="none" stroke="#78a0dc" stroke-width="1" stroke-linejoin="round"/>
 <polyline points="34.5 222 34.5 226 34.538 226.587 34.653 227.165 34.843 227.722 35.103 228.25 35.43 228.739 35.818 229.182 36.261 229.57 36.75 229.897 37.278 230.157 37.835 230.347 38.413 230.462 39 230.5 39 230.5" fill="none" stroke="#78a0dc" stroke-width="1" stroke-linejoin="round"/>
 <polyline points="565.5 222 565.5 226 565.462 226.587 565.347 227.165 565.157 227.722 564.897 228.25 564.57 228.739 564.182 229.182 563.739 229.57 563.25 229.897 562.722 230.157 562.165 230.347 561.587 230.462 561 230.5 561 230.5" fill="none" stroke="#78a0dc" stroke-width="1" stroke-linejoin="round"/>
 <g class="terminal">
 <text x="48" y="92" textLength="45" fill="#e6e6e6">Inbox</text>
-<text x="48" y="182" textLength="63" fill="#e6e6e6">Message</text>
+<text x="48" y="200" textLength="63" fill="#e6e6e6">Message</text>
 </g>
 <g shape-rendering="crispEdges">
 </g>

@@ -6,7 +6,7 @@ no warnings 'experimental::signatures';
 
 use Test2::V0;
 
-use Clay::XS qw(sizing_grow CLAY_TOP_TO_BOTTOM);
+use Clay::XS qw(sizing_fixed sizing_grow CLAY_TOP_TO_BOTTOM);
 use Term::Fabulous;
 use Term::Fabulous::Enum::BorderStyle;
 use Term::Fabulous::Layout;
@@ -122,6 +122,64 @@ ScrollBox "log" {
 }
 KDL
 	is [ $built->scrollbar, $built->thumb_color ], [ 0, [ 1, 2, 3, 255 ] ], 'scrollbar and the colors are KDL properties';
+};
+
+subtest 'reveal' => sub {
+	my ( $box, $h ) = box_ui(30);
+	my $ui    = $h->{ui};
+	my @lines = @{ $box->children };
+	ref_is $box->reveal( $lines[19] ), $box, 'returns the box';
+	$ui->step;
+	is $ui->bounding_box( $lines[19] )->{y}, 6, 'nearest: a line below the view lands on the last inner row';
+	$box->reveal( $lines[9], align => 'top' );
+	$ui->step;
+	is $ui->bounding_box( $lines[9] )->{y}, 1, 'top: its first row at the top of the view';
+	$box->reveal( $lines[28], align => 'top' );
+	$ui->step;
+	is [ $ui->bounding_box( $lines[28] )->{y}, $ui->bounding_box( $lines[-1] )->{y} ], [ 5, 6 ], 'as far as the content allows';
+
+	my $added = Term::Fabulous::Widget::Text->new( text => 'Line 31' );
+	$box->insert_children( 0, $added );
+	$box->reveal($added);
+	$ui->step;
+	$ui->step;
+	is $ui->bounding_box($added)->{y}, 1, 'a widget laid out one frame later is revealed after that frame';
+
+	like dies { $box->reveal( Term::Fabulous::Widget::Text->new( text => 'elsewhere' ) ) }, qr/reveal needs a widget inside the box/, 'a widget outside the box dies';
+	like dies { $box->reveal( $added, align  => 'bottom' ) }, qr/align must be/,                     'so does another align';
+	like dies { $box->reveal( $added, frames => 0 ) },        qr/frames must be a positive integer/, 'and frames that are not a positive integer';
+	like dies { $box->reveal( $added, slowly => 1 ) },        qr/reveal does not take slowly/,       'and another option';
+};
+
+subtest 'a focused descendant is scrolled into view' => sub {
+	require Term::Fabulous::Widget::Button;
+	my $box     = Term::Fabulous::Widget::ScrollBox->new( id => 'form', layout => { layout_direction => CLAY_TOP_TO_BOTTOM, sizing => { width => sizing_grow(), height => sizing_grow() } } );
+	my @buttons = map { Term::Fabulous::Widget::Button->new( layout => { sizing => { width => sizing_grow(), height => sizing_fixed(1) } } ) } 1 .. 20;
+	$box->add_child(@buttons);
+	my $root = Term::Fabulous::Widget::Box->new( layout => { sizing => { width => sizing_grow(), height => sizing_grow() } } );
+	$root->add_child($box);
+	my $terminal = Term::Fabulous::Terminal::Memory->new( width => 30, height => 8 );
+	my $ui       = Term::Fabulous->new( root => $root, width => 30, height => 8, terminal => $terminal );
+	$ui->step;
+	$ui->interaction->set_focused_widget( $buttons[15] );
+	$ui->step;
+	my $shown = $ui->bounding_box( $buttons[15] );
+	ok $shown->{y} >= 0 && $shown->{y} + $shown->{height} <= 8, 'the focused button far below lies in the viewport';
+	is $ui->bounding_box( $buttons[15] )->{y}, 7, 'the box scrolled the smallest way: the button is on the last row';
+	$ui->interaction->set_focused_widget( $buttons[2] );
+	$ui->step;
+	ok $ui->bounding_box( $buttons[2] )->{y} >= 0, 'and back up for a button above the viewport';
+
+	my $text = Term::Fabulous::Widget::Text->new( markup => '[link=x]a link[/]' );
+	$box->add_child($text);
+	$ui->interaction->set_focused_widget($text);
+	$ui->step;
+	$ui->step;
+	my $parent_row = $ui->bounding_box($box)->{y};
+	my $frame      = $ui->last_frame;
+	my @rows       = $frame->text_rows($text);
+	is scalar(@rows), 1, 'a text added and focused in one step is revealed after the frame that laid it out';
+	ok $rows[0][0] >= $parent_row && $rows[0][0] < 8, 'on a row of the viewport';
 };
 
 done_testing;

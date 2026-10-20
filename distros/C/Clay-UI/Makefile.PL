@@ -46,6 +46,7 @@ my @clay_patches = qw(
     patches/0002-clay-flow-layout.patch
     patches/0003-clay-back-to-front.patch
     patches/0004-clay-upstream-fixes.patch
+    patches/0005-clay-text-cut-off.patch
 );
 
 # -----------------------------------------------------------------------------

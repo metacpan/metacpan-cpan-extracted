@@ -10,18 +10,19 @@ use Object::Pad 0.825;
 use Clay::UI::Role::Core::Preparable;
 use Term::Fabulous::Widget::ScrollBox;
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 class Term::Fabulous::Widget::VirtualList
 	:isa(Term::Fabulous::Widget::ScrollBox)
 	:does(Clay::UI::Role::Core::Preparable)
 	:strict(params)
 {
-	use Clay::UI::Enum::Result;
+	use Clay::UI::Role::Layout::HasParent qw(is_widget);
 	use Clay::XS qw(sizing_fit sizing_fixed sizing_grow CLAY_TOP_TO_BOTTOM CLAY_ALIGN_X_LEFT);
 	use List::Util qw(max min);
-	use Scalar::Util qw(blessed refaddr weaken);
+	use Scalar::Util qw(refaddr);
 	use Term::Fabulous::Check qw(describe non_negative_integer optional);
+	use Term::Fabulous::Scrolling qw(scroll_offset);
 	use Term::Fabulous::Widget::Box;
 
 	field $count    :param = 0;
@@ -56,11 +57,9 @@ class Term::Fabulous::Widget::VirtualList
 	field $_window_stale = 1;
 
 	# The item scroll_to_item wants at the top, until a frame shows it
-	# measured; the anchor rebuild took before it forgot the heights; and
-	# whether an after_draw callback is queued.
+	# measured; and the anchor rebuild took before it forgot the heights.
 	field $_target;
 	field $_kept_anchor;
-	field $_watching = 0;
 
 	ADJUST {
 		$count    = non_negative_integer( $self, count => $count );
@@ -71,9 +70,6 @@ class Term::Fabulous::Widget::VirtualList
 		$_column = Term::Fabulous::Widget::Box->new( layout => $self->_column_layout );
 		%_spacer = map { $_ => Term::Fabulous::Widget::Box->new( layout => { sizing => { width => sizing_fixed(0), height => sizing_fixed(0) } } ) } qw(above below);
 		$self->add_internal_children($_column);
-
-		weaken( my $weak = $self );
-		$self->on( OnScroll => sub { $weak->request_prepare if defined $weak; return Clay::UI::Enum::Result->CONTINUE } );    # the event bubbles on
 		$self->request_prepare;
 	}
 
@@ -212,7 +208,7 @@ class Term::Fabulous::Widget::VirtualList
 	method _build_item ($index) {
 		my $widget = $build->($index);
 		die ref($self) . ": build must return a widget for item $index, got " . describe($widget)
-			unless blessed $widget && ( $widget->DOES('Clay::UI::Role::Core::Element') || $widget->DOES('Clay::UI::Role::Core::TextNode') );
+			unless is_widget($widget);
 		die ref($self) . ": build returned a widget that already has a parent for item $index" if defined $widget->parent;
 		my $other = $_index_by_widget{ refaddr $widget };
 		die ref($self) . ": build returned the widget of item $other again for item $index" if defined $other;
@@ -220,9 +216,9 @@ class Term::Fabulous::Widget::VirtualList
 		return $widget;
 	}
 
-	# A text widget has no Clay element of its own, so it has no bounding
-	# box to measure: it is laid out inside a box. Any other widget is
-	# attached as it is.
+	# A text widget is laid out inside a box of its own, so that the slot
+	# can carry padding and a border some day; any other widget is attached
+	# as it is.
 	method _slot ($index) {
 		return $_slot[$index] //= _new_slot( $self->_item($index) );
 	}
@@ -312,7 +308,7 @@ class Term::Fabulous::Widget::VirtualList
 		return {
 			columns  => int( $column->{width} + 0.5 ),
 			viewport => int( $state->{viewport}{height} + 0.5 ),
-			top      => int( -$state->{position}{y} + 0.5 ),
+			top      => int( scroll_offset( $ui, $self ) + 0.5 ),
 		};
 	}
 
@@ -343,7 +339,7 @@ class Term::Fabulous::Widget::VirtualList
 
 		$self->_choose_window( $top, $viewport );
 		$self->_arrange;
-		$self->_watch($ui);
+		$self->each_frame( sub ($list) { $list->_frame_drawn; return 0 }, name => 'window' );
 		return;
 	}
 
@@ -459,7 +455,9 @@ class Term::Fabulous::Widget::VirtualList
 
 	# Makes the column's children the spacers and the window: what leaves
 	# is detached, what enters is inserted where it belongs, what stays is
-	# not touched (so it keeps focus and hover).
+	# not touched (so it keeps focus and hover). A slot that leaves with
+	# the focus hands it to its focus heir, the list itself or the nearest
+	# ancestor that can take it, so the keys keep working where they did.
 	method _arrange () {
 		my @wanted;
 		if ( defined $_first ) {
@@ -515,20 +513,10 @@ class Term::Fabulous::Widget::VirtualList
 	# After every frame the list checks whether the frame showed something
 	# it was not prepared for: a new width, items still unmeasured, or a
 	# position the window does not cover (reached by scroll_to or by Clay's
-	# own clamping). The callback stays queued while the list is in a UI.
-	method _watch ($ui) {
-		return if $_watching || !$ui->can('after_draw');
-		weaken( my $weak = $self );
-		$ui->after_draw( sub { $weak->_frame_drawn if defined $weak; return } );
-		$_watching = 1;
-		return;
-	}
-
+	# own clamping). Each preparation registers the check (each_frame), so
+	# it runs while the list is in a UI.
 	method _frame_drawn () {
-		$_watching = 0;
-		my $ui = $self->ui // return;
-		$self->request_prepare if $self->_needs_prepare($ui);
-		$self->_watch($ui);
+		$self->request_prepare if $self->_needs_prepare( $self->ui );
 		return;
 	}
 
@@ -560,7 +548,7 @@ Term::Fabulous::Widget::VirtualList - A ScrollBox that attaches only the items n
 
 	use Clay::XS qw(sizing_grow CLAY_TOP_TO_BOTTOM);
 	use Term::Fabulous::Widget::VirtualList;
-	use Term::Fabulous::Widget::RichText;
+	use Term::Fabulous::Widget::Text;
 
 	my @paragraphs = ...;    # tens of thousands of markup strings
 
@@ -568,7 +556,7 @@ Term::Fabulous::Widget::VirtualList - A ScrollBox that attaches only the items n
 		id       => 'document',                                   # required
 		count    => scalar @paragraphs,
 		build    => sub ($index) {
-			return Term::Fabulous::Widget::RichText->new( markup => $paragraphs[$index] );
+			return Term::Fabulous::Widget::Text->new( markup => $paragraphs[$index] );
 		},
 		estimate => sub ( $index, $columns ) {                    # rows, before the item was laid out
 			return 1 + int( length( $paragraphs[$index] ) / $columns );
@@ -599,7 +587,7 @@ viewport and keeps the widget it returns, so an item is built once. The
 widgets of the items above and below the attached ones are replaced by
 two invisible spacers as tall as those items would be, so the scrollbar,
 the mouse wheel and
-L<scroll_state and scroll_to|Term::Fabulous/"bounding_box, scroll_state, scroll_to">
+L<scroll_state and scroll_to|Term::Fabulous/"bounding_box, content_box, scroll_state, scroll_to">
 see the whole list.
 
 How tall an item is becomes known when it was laid out once at the
@@ -612,9 +600,12 @@ A good estimate keeps the scrollbar's thumb steady; an exact one (the
 line count of a text that does not wrap, say) makes jumps impossible.
 
 Scrolling and the scrollbar work as on a ScrollBox. Keys do not scroll
-the list; L</scroll_to_item> and
-L<scroll_to|Term::Fabulous/"bounding_box, scroll_state, scroll_to">
-move it from code. A VirtualList needs an C<id>, like every ScrollBox.
+the list by themselves; L<Term::Fabulous::Scrolling> (C<scroll_by_key>,
+C<scroll_to_start>, C<scroll_to_end>), L</scroll_to_item> and
+L<scroll_to|Term::Fabulous/"bounding_box, content_box, scroll_state, scroll_to">
+move it from code; L<Term::Fabulous::Widget::DocumentView> is a
+VirtualList with keys. A VirtualList needs an C<id>, like every
+ScrollBox.
 
 =head1 CONSTRUCTOR
 
@@ -633,11 +624,10 @@ B<Required>. A code reference called as C<< $build->($index) >> with
 the index of an item, from 0 to C<count - 1>, when the item comes near
 the viewport. It returns the item's widget: any widget without a
 parent, a L<Term::Fabulous::Widget::Text>, a
-L<Term::Fabulous::Widget::RichText>, a L<Term::Fabulous::Widget::Box>
-with children, anything. The list keeps the widget and never calls
-C<build> for that index again until L</rebuild>. A return value that
-is not a widget, a widget that has a parent, or the widget of another
-item dies when the item is built.
+L<Term::Fabulous::Widget::Box> with children, anything. The list keeps
+the widget and never calls C<build> for that index again until
+L</rebuild>. A return value that is not a widget, a widget that has a
+parent, or the widget of another item dies when the item is built.
 
 =item C<count>
 
@@ -650,7 +640,8 @@ an item takes before it was laid out: a number of rows for every item,
 or a code reference called as C<< $estimate->($index, $columns) >> with
 the index of the item and the columns the items wrap to, which returns
 a non-negative integer. It is called once per item and width. Anything
-else dies.
+else dies. Before the list was first laid out, C<$columns> is the
+width of the UI.
 
 =item C<overscan>
 
@@ -718,10 +709,9 @@ the item at the top of the viewport stays there. Returns the list.
 The widget of an item, built now if the list has not built it yet. Dies
 for an index the list does not have. The widget is attached while the
 item is near the viewport and detached otherwise; it is the same object
-each time. A text widget (a L<Term::Fabulous::Widget::Text> or
-L<Term::Fabulous::Widget::RichText>) is laid out inside a
-L<Term::Fabulous::Widget::Box> of its own, because a text has no box
-the list could measure; its C<parent> is that box.
+each time. A text widget (a L<Term::Fabulous::Widget::Text>) is laid
+out inside a L<Term::Fabulous::Widget::Box> of its own, because a text
+has no box the list could measure; its C<parent> is that box.
 
 =head2 scroll_to_item
 
@@ -762,8 +752,14 @@ every frame in which the mouse wheel or the scrollbar moved the list,
 and C<Mouse> for wheel notches and clicks.
 
 A widget inside an item receives events like any widget while the item
-is attached. When its item is detached it loses the focus and the hover,
-like any removed widget.
+is attached. When its item is detached it loses the hover, like any
+removed widget, and the focus goes to its heir: the nearest widget above
+it that can take the focus (the list itself only when it takes the
+focus, as a L<Term::Fabulous::Widget::DocumentView> does; see
+L<Clay::UI::Interaction/Focus heirs>), so that the keys keep working
+where they did; without such a widget, nothing has the focus. A focused
+widget inside an item is scrolled into view like in every
+L<ScrollBox|Term::Fabulous::Widget::ScrollBox/FOCUS>.
 
 =head1 KDL PROPERTIES
 
@@ -790,7 +786,8 @@ items until they are attached again.
 
 =head1 SEE ALSO
 
-L<Term::Fabulous::Widget::ScrollBox>, L<Term::Fabulous/LIMITATIONS>,
+L<Term::Fabulous::Widget::ScrollBox>, L<Term::Fabulous::Scrolling>,
+L<Term::Fabulous/LIMITATIONS>,
 L<Term::Fabulous::Manual::Layout/Scrolling content>, the example
 program F<examples/widgets/virtual-list.pl>.
 

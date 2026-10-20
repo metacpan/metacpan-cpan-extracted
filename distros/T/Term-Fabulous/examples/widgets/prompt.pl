@@ -19,6 +19,7 @@ use FindBin;
 use lib "$FindBin::Bin/../../lib/";
 
 use Term::Fabulous;
+use Term::Fabulous::Text::Markup qw(escape_markup);
 use Term::Fabulous::Widget::Box;
 use Term::Fabulous::Widget::Prompt;
 use Term::Fabulous::Widget::Text;
@@ -75,19 +76,14 @@ sub add_contact () {
 	return;
 }
 
-# A message is markup: a backslash keeps a [ in a name from starting a
-# tag.
-sub escaped ($text) {
-	return $text =~ s/\[/\\[/gr;
-}
-
-# A question in one call, which starts on its Cancel button.
+# A question in one call, which starts on its Cancel button. The message
+# is markup: escape_markup keeps a [ in a name from starting a tag.
 sub delete_contact () {
 	return unless @contacts;
 	Term::Fabulous::Widget::Prompt->confirm(
 		$ui,
 		title   => 'Delete a contact?',
-		message => '[bold]' . escaped( $contacts[-1] ) . '[/] is deleted for good.',
+		message => '[bold]' . escape_markup( $contacts[-1] ) . '[/] is deleted for good.',
 		ok      => 'Delete',
 		focus   => 'cancel',
 	)->on(

@@ -11,6 +11,13 @@
   }
   .chart-source a { color: inherit; }
   .tm-cell-g { cursor: pointer; }
+  /* A tile is a control: it opens the matching rows.  The focus ring has to be
+     drawn on the cell's own rectangle, since a <g> has no box of its own. */
+  #treemap .tm-cell-g:focus-visible { outline: none; }
+  #treemap .tm-cell-g:focus-visible rect {
+    stroke: #0d6efd;
+    stroke-width: 2px;
+  }
 </style>
 
 <p class="back-link"><a href="/">&larr; Home</a> &rsaquo; <a href="[% back_url | html %]">[% back_label || 'Back' | html %]</a>[%- IF back2_url -%] &rsaquo; <a href="[% back2_url | html %]">[% back2_label || 'Back' | html %]</a>[%- END -%]</p>
@@ -23,6 +30,9 @@
   <button class="btn-graph-export" id="btn-copy-chart-link" onclick="navigator.clipboard.writeText(window.location.href).then(function(){var b=document.getElementById('btn-copy-chart-link');var t=b.textContent;b.textContent='Copied!';setTimeout(function(){b.textContent=t;},1500)}).catch(function(){})">&#x1F517; Copy link</button>
   <span class="graph-point-count">[% tile_count %] tile[% IF tile_count != 1 %]s[% END %]</span>
 </div>
+
+<p class="sr-only" id="treemap-drill-help">Drill into a tile: press Tab until a tile has focus,
+then press Enter or Space to open the matching rows in the table.</p>
 
 <div class="treemap-container">
   <script src="https://d3js.org/d3.v7.min.js"></script>
@@ -71,6 +81,31 @@
   var catCol  = meta ? meta.getAttribute('data-cat-col')  : '';
   if (!backUrl || !catCol) return;
 
+  // The tooltip D3 shows on hover, shown on focus as well: a tile reached from
+  // the keyboard gets the name and the value a pointer gets, not just the name
+  // in a title attribute.  Positioned from the tile, since there is no pointer
+  // to take a position from.
+  function showTileTip(g, label, value) {
+    var tip = document.getElementById('treemap_tip');
+    if (!tip) return;
+    var name = document.createElement('b');
+    name.textContent = label;
+    tip.textContent = '';
+    tip.appendChild(name);
+    tip.appendChild(document.createElement('br'));
+    tip.appendChild(document.createTextNode(String(value)));
+    var r = g.getBoundingClientRect();
+    tip.style.position = 'fixed';
+    tip.style.display  = 'block';
+    tip.style.left     = (r.left + 12) + 'px';
+    tip.style.top      = (r.top  + 8)  + 'px';
+  }
+
+  function hideTileTip() {
+    var tip = document.getElementById('treemap_tip');
+    if (tip) tip.style.display = 'none';
+  }
+
   function drillDown(label) {
     var tmUrl  = window.location.href;
     var sep    = backUrl.indexOf('?') >= 0 ? '&' : '?';
@@ -87,9 +122,25 @@
       if (!d || !d.id) return;
       var label = d.id.split('/').pop();
       if (!label) return;
+      var value = (d.value == null) ? '' : d.value;
       g.style.cursor = 'pointer';
-      g.setAttribute('title', 'Filter table to: ' + label);
+      g.setAttribute('title', 'Filter table to: ' + label + ' (' + value + ')');
+      // The tile is the control: in the tab order, named, and answering Enter
+      // and Space, so it is not reachable only with a pointer.  The value is
+      // part of the name because the area that encodes it is not read out.
+      g.setAttribute('tabindex', '0');
+      g.setAttribute('role', 'button');
+      g.setAttribute('aria-label', 'Filter table to ' + label + ' (' + value + ')');
+      g.setAttribute('aria-describedby', 'treemap-drill-help');
       g.addEventListener('click', function () { drillDown(label); });
+      g.addEventListener('focus', function () { showTileTip(g, label, value); });
+      g.addEventListener('blur',  hideTileTip);
+      g.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          drillDown(label);
+        }
+      });
     });
   }, 50);
 }());

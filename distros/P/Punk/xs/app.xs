@@ -1365,6 +1365,19 @@ markdown(self, prefix, dir, ...)
     OUTPUT:
         RETVAL
 
+# markdown_pages($prefix): the pages of the markdown mount at that prefix,
+# in its order, as fresh hashrefs (punk_markdown.h, pmd_pages_av). The site
+# is built by compile, so before to_app there is nothing to list.
+SV *
+markdown_pages(self, prefix)
+        SV *self
+        SV *prefix
+    CODE:
+        RETVAL = newRV_noinc((SV *)pmd_pages_av(aTHX_
+                     pmd_mount_cap(aTHX_ self, prefix, "Punk: markdown_pages")));
+    OUTPUT:
+        RETVAL
+
 # mount($prefix, $psgi_app): mount a PSGI coderef. Chains.
 SV *
 mount(self, prefix, app)

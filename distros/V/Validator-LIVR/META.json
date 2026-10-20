@@ -4,20 +4,19 @@
       "Viktor Turskyi <koorchik@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "unknown"
+      "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Validator-LIVR",
    "no_index" : {
       "directory" : [
          "t",
-         "inc",
-         "t"
+         "inc"
       ]
    },
    "prereqs" : {
@@ -25,7 +24,7 @@
          "requires" : {
             "JSON" : "0",
             "Test::Exception" : "0",
-            "Test::More" : "0"
+            "Test::More" : "0.96"
          }
       },
       "configure" : {
@@ -35,18 +34,21 @@
       },
       "runtime" : {
          "requires" : {
-            "Email::Valid" : "0",
-            "Regexp::Common" : "0",
-            "perl" : "5.01"
+            "Carp" : "0",
+            "Scalar::Util" : "0",
+            "perl" : "5.010"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/koorchik/Validator-LIVR/issues"
+      },
       "repository" : {
          "url" : "https://github.com/koorchik/Validator-LIVR"
       }
    },
-   "version" : "2.0",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "2.1",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

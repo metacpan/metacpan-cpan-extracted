@@ -5,7 +5,7 @@ use warnings;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 use Object::Pad 0.825;
 
@@ -23,10 +23,12 @@ class Term::Fabulous::Widget::Table::Model :strict(params) {
 	# across rebuilds: "r" or "g", a NUL, then the row id or the group key.
 	use constant { ROW_PREFIX => "r\0", GROUP_PREFIX => "g\0" };
 
-	field $row_id       :param :reader = undef;    # a key, a code reference, or undef for ids of our own
-	field $children_key :param :reader = undef;    # the key of nested rows, or undef for flat data
-	field $page_size    :param :reader = 0;
-	field $expand_new   :param = 0;    # whether rows added with children start expanded
+	field $row_id             :param :reader = undef;    # a key, a code reference, or undef for ids of our own
+	field $children_key       :param :reader = undef;    # the key of nested rows, or undef for flat data
+	field $page_size          :param :reader = 0;
+	field $expand_new         :param = 0;    # whether rows added with children start expanded
+	field $open_when_filtered :param = 0;    # whether a filtered view shows every passing row, closed rows opened
+	field $only_leaves_match  :param = 0;    # whether a row with children passes only for a matching descendant
 
 	# Columns, in order, and the keys of the hidden ones.
 	field @_columns;
@@ -77,8 +79,10 @@ class Term::Fabulous::Widget::Table::Model :strict(params) {
 			if defined $row_id && !( ref $row_id eq 'CODE' || ( !ref $row_id && length $row_id ) );
 		die "Term::Fabulous::Widget::Table::Model: children_key must be a non-empty string, got " . describe($children_key)
 			if defined $children_key && ( ref $children_key || !length $children_key );
-		$page_size  = _page_size($page_size);
-		$expand_new = $expand_new ? 1 : 0;
+		$page_size          = _page_size($page_size);
+		$expand_new         = $expand_new         ? 1 : 0;
+		$open_when_filtered = $open_when_filtered ? 1 : 0;
+		$only_leaves_match  = $only_leaves_match  ? 1 : 0;
 	}
 
 	# How rows are read can change only while there are none.
@@ -108,6 +112,20 @@ class Term::Fabulous::Widget::Table::Model :strict(params) {
 		return $expand_new unless @new;
 		$expand_new = $new[0] ? 1 : 0;
 		return $expand_new;
+	}
+
+	method open_when_filtered (@new) {
+		return $open_when_filtered unless @new;
+		$open_when_filtered = $new[0] ? 1 : 0;
+		$self->_changed;
+		return $open_when_filtered;
+	}
+
+	method only_leaves_match (@new) {
+		return $only_leaves_match unless @new;
+		$only_leaves_match = $new[0] ? 1 : 0;
+		$self->_changed;
+		return $only_leaves_match;
 	}
 
 	sub _page_size ($size) {
@@ -692,13 +710,15 @@ class Term::Fabulous::Widget::Table::Model :strict(params) {
 	}
 
 	# The rows a filter lets through: those that match, and their
-	# ancestors, so a matching row is never cut off from its tree.
+	# ancestors, so a matching row is never cut off from its tree. With
+	# only_leaves_match a row with children is only ever an ancestor.
 	method _passing () {
 		return { map { $_ => 1 } keys %_row } unless $self->is_filtered;
-		my @searched = map { $_->key } $self->visible_columns;
-		my $wanted   = fc $_search;
+		my @searched  = map { $_->key } $self->visible_columns;
+		my $wanted    = fc $_search;
+		my @candidate = $only_leaves_match ? grep { !@{ $_row{$_}{children} } } keys %_row : keys %_row;
 		my %passing;
-		foreach my $id ( grep { $self->_matches( $_, \@searched, $wanted ) } keys %_row ) {
+		foreach my $id ( grep { $self->_matches( $_, \@searched, $wanted ) } @candidate ) {
 			for ( my $node = $id; defined $node && !$passing{$node}; $node = $_row{$node}{parent} ) {
 				$passing{$node} = 1;
 			}
@@ -804,14 +824,15 @@ class Term::Fabulous::Widget::Table::Model :strict(params) {
 	# The view: every passing row in order, grouped and sorted once; the
 	# lines are what of it is open, the filtered ids all of it.
 	method _compute_view () {
-		my $tree = $self->_ordered_tree;
+		my $tree        = $self->_ordered_tree;
+		my $forced_open = $open_when_filtered && $self->is_filtered;
 		my ( @lines, @filtered );
 		my $walk_rows;
 		$walk_rows = sub ( $ids, $depth, $shown ) {
 			foreach my $id (@$ids) {
 				push @filtered, $id;
 				my $children = $tree->{children}{$id};
-				my $open     = @$children && $_expanded{$id} ? 1 : 0;
+				my $open     = @$children && ( $forced_open || $_expanded{$id} ) ? 1 : 0;
 				push @lines, { kind => 'row', key => ROW_PREFIX . $id, id => $id, depth => $depth, has_children => @$children ? 1 : 0, expanded => $open } if $shown;
 				$walk_rows->( $children, $depth + 1, $shown && $open );
 			}
@@ -1246,7 +1267,8 @@ L</View>) convert.
 
 Rows pass when they match every filter and the search (see
 L<Term::Fabulous::Manual::TableRows/FILTERING>); in a tree, the ancestors
-of a passing row pass too, so nothing is cut off from its parent.
+of a passing row pass too, so nothing is cut off from its parent. With
+C<only_leaves_match>, only rows without children are tested.
 
 =item 2.
 
@@ -1262,7 +1284,9 @@ by the sort; rows that compare equal keep their data order.
 =item 4.
 
 The lines are listed: each group header, then its contents unless it is
-collapsed; each row, then its children if it is expanded.
+collapsed; each row, then its children if it is expanded (or, with
+C<open_when_filtered>, if the view is filtered; rows inside a collapsed
+group stay hidden).
 
 =item 5.
 
@@ -1281,10 +1305,15 @@ the row or the column changes, so mutators run once per cell.
 		children_key => 'children',    # or undef for flat rows
 		page_size    => 25,            # 0: one page
 		expand_new   => 0,             # rows with children start expanded?
+		open_when_filtered => 0,       # a filtered view opens every passing row?
+		only_leaves_match  => 0,       # rows with children pass only as ancestors?
 	);
 
-The table makes its model from its own parameters of the same names;
-see L<Term::Fabulous::Widget::Table/new>.
+The table makes its model from its parameters C<row_id>,
+C<children_key>, C<page_size> and C<tree_expanded> (as C<expand_new>);
+see L<Term::Fabulous::Widget::Table/new>. C<open_when_filtered> and
+C<only_leaves_match> are options of a model used on its own (the theme
+editor's settings list is one); a table leaves them off.
 
 =head1 METHODS
 
@@ -1327,6 +1356,29 @@ rows, and for a value that is neither C<undef> nor a non-empty string.
 Accessor for the C<expand_new> parameter: whether rows with children
 start expanded when they are added (by C<set_rows> or C<add_rows>).
 Returns 1 or 0; writing affects only rows added later.
+
+=item C<open_when_filtered>
+
+=item C<open_when_filtered($bool)>
+
+Accessor for the C<open_when_filtered> parameter. With 1, a view that
+is filtered or searched (see L</is_filtered>) shows every passing row:
+rows with passing children are open in it (their lines say
+C<expanded>), whatever their own expansion; it opens only tree rows
+(rows inside a collapsed group stay hidden). The expansion itself does
+not change, so the view is back as it was when the filters are gone.
+Returns 1 or 0; default 0. A settings list in sections uses it, so that
+a search shows what it found.
+
+=item C<only_leaves_match>
+
+=item C<only_leaves_match($bool)>
+
+Accessor for the C<only_leaves_match> parameter. With 1, the filters
+and the search look only at rows without children; a row with children
+passes only as the ancestor of a row that passes. A section heading
+that happens to contain the search text then shows nothing by itself.
+Returns 1 or 0; default 0.
 
 =back
 

@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.06';
+our $VERSION = '0.09';
 
 our $CLOCK;
 
@@ -39,7 +39,7 @@ Time::Keeper - dates and times with time zones, leap seconds and locales
 
 =head1 VERSION
 
-Version 0.06
+Version 0.09
 
 =head1 SYNOPSIS
 
@@ -1458,11 +1458,15 @@ module. A consuming distribution finds it with L<ExtUtils::Depends>:
 
 and resolves the table once, when it first needs it; the header shows how.
 Nothing is linked against, and the table is versioned, so the two
-distributions can be upgraded independently. It is at version 2: the
+distributions can be upgraded independently. It is at version 3: the
 second version appended the calendars (an instant's fields read in any
 calendar and back, formatting in one, the calendar a value is read in, a
-calendar by its id) after the first version's entries, so a consumer built
-against version 1 keeps working.
+calendar by its id), and the third the arithmetic the methods do (plus,
+truncate, end_of, the weekday adjusters, a time set on a day), parse_cldr,
+durations, a locale's code and weekend, a date (Time::Keeper::Date,
+YearMonth and MonthDay) read and made, and a zone's next change of offset,
+each failing with the reason its method would give. Each was appended after the entries before it, so a consumer
+built against an older version keeps working.
 
 =head1 THREADS
 

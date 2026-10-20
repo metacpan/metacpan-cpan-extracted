@@ -1,7 +1,7 @@
 package App::week;
-our $VERSION = "1.0303";
+our $VERSION = "1.0701";
 
-use v5.14;
+use v5.24;
 use warnings;
 
 use utf8;
@@ -16,6 +16,13 @@ use Getopt::EX::Colormap;
 
 use App::week::Util;
 use App::week::CalYear qw(@calyear);
+
+use Exporter 'import';
+our @EXPORT_OK = qw(week);
+
+sub week {
+    __PACKAGE__->new->run(@_);
+}
 
 my @DOW_LABELS = qw(
     DOW_SU
@@ -48,13 +55,12 @@ use Getopt::EX::Hashed; {
     has COLORMAP => ;
     has CM       => ;
 
-    my($sec, $min, $hour, $mday, $mon, $year) = CORE::localtime(time);
-    has year => default => $year + 1900;
-    has mday => default => $mday;
-    has mon  => default => $mon + 1;
+    has year => ;
+    has mday => ;
+    has mon  => ;
 
     has cell_width   => default => undef;
-    has frame        => default => '  ';
+    has frame        => default => "\N{NBSP}\N{NBSP}";
     has frame_height => default => 1;
 
     # option params
@@ -130,13 +136,23 @@ sub run {
     my $app = shift;
     local @ARGV = decode_argv @_;
 
-    $app->read_option()
+    $app->initialize()
+	->read_option()
 	->argv()
 	->deal_option()
 	->prepare()
 	->show();
 
     return 0;
+}
+
+sub initialize {
+    my $app = shift;
+    my $t = localtime;
+    $app->year = $t->year + 1900;
+    $app->mon  = $t->mon + 1;
+    $app->mday = $t->mday;
+    return $app;
 }
 
 sub read_option {
@@ -163,9 +179,10 @@ sub deal_option {
 
     # load --colormap option
     my %colormap = %DEFAULT_COLORMAP;
-    $app->COLORMAP(\%colormap);
-    $app->CM(Getopt::EX::Colormap->new(HASH => \%colormap)
-	     ->load_params(@{$app->colormap}));
+    $app->COLORMAP = \%colormap;
+    $app->CM = Getopt::EX::Colormap
+	->new(HASH => \%colormap)
+	->load_params(@{$app->colormap});
 
     # --colordump
     if ($app->colordump) {
@@ -272,7 +289,7 @@ sub display {
 sub h_rule {
     my $obj = shift;
     my $column = shift;
-    my $hr1 = " " x $obj->cell_width;
+    my $hr1 = "\N{NBSP}" x $obj->cell_width;
     my $s = join($obj->frame, '', ($hr1) x $column, '');
     my $rule = $obj->color(FRAME => $s) . "\n";
     print $rule x $obj->frame_height;
@@ -304,7 +321,7 @@ sub cell {
     $cal[0] = $obj->color($label{month}, $cal[0]);
     $cal[1] = $obj->color($label{week},
 			  state $week = $obj->week_line($cal[1]));
-    my $day_re = $d ? qr/^(?: [ \d]{2}){0,6} \K(${\(sprintf '%2d', $d)})\b/ : undef;
+    my $day_re = $d ? qr/^(?:.[ \d]{2}){0,6}.\K(${\(sprintf '%2d', $d)})\b/ : undef;
     for (@cal[ 2 .. $#cal ]) {
 	s/$day_re/$obj->color("THISDAY", $1)/e if $day_re;
 	$_ = $obj->color($label{days}, $_);
@@ -343,7 +360,7 @@ B<week> [ -MI<module> ] [ option ] [ date ]
 
 =head1 VERSION
 
-Version 1.0303
+Version 1.0701
 
 =head1 DESCRIPTION
 

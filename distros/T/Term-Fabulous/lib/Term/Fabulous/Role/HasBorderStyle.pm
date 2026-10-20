@@ -5,13 +5,14 @@ use warnings;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 use Object::Pad 0.825;
 
 role Term::Fabulous::Role::HasBorderStyle {
 	use Scalar::Util qw(refaddr);
-	use Term::Fabulous::Check qw(border_style describe glyph optional);
+	use Term::Fabulous::Check qw(border_style color describe glyph optional);
+	use Term::Fabulous::Color;
 	use Term::Fabulous::Enum::BorderStyle;
 
 	# The theme's value of a slot of the widget's family
@@ -22,14 +23,16 @@ role Term::Fabulous::Role::HasBorderStyle {
 
 	# The style the program gave each side, or none.
 	field %_style_of_side;
-	field $border_corners     :param = undef;
-	field $outer_border_sides :param = [];
+	field $border_corners           :param = undef;
+	field $outer_border_sides       :param = [];
+	field $border_background_colors :param = undef;
 
 	my @CORNERS = qw(top_left top_right bottom_left bottom_right);
 
 	ADJUST {
-		$border_corners     = _corner_glyphs( $self, $border_corners );
-		$outer_border_sides = _side_names( $self, $outer_border_sides );
+		$border_corners           = _corner_glyphs( $self, $border_corners );
+		$outer_border_sides       = _side_names( $self, $outer_border_sides );
+		$border_background_colors = _background_colors( $self, $border_background_colors );
 	}
 
 	# A side parameter wins over border_style, which fills the others.
@@ -115,6 +118,35 @@ role Term::Fabulous::Role::HasBorderStyle {
 	# undef. Read by Term::Fabulous::Render::Border.
 	method border_corner_glyph ($corner) {
 		return defined $border_corners ? $border_corners->{$corner} : undef;
+	}
+
+	# A copy of a background color hash: undef, or a hash of colors as
+	# Term::Fabulous::Color objects under the names in @SIDES and @CORNERS.
+	sub _background_colors ( $owner, $colors ) {
+		return undef unless defined $colors;
+		die ref($owner) . ": border_background_colors must be undef or a hash reference of colors, got " . describe($colors)
+			unless ref $colors eq 'HASH';
+		my %is_known = map  { $_ => 1 } @SIDES, @CORNERS;
+		my @unknown  = grep { !$is_known{$_} } sort keys %$colors;
+		die ref($owner) . ": border_background_colors does not know @unknown (known: @SIDES @CORNERS)" if @unknown;
+		my @named = grep { defined $colors->{$_} } sort keys %$colors;
+		return { map { $_ => Term::Fabulous::Color->new( color => color( $owner, "border_background_colors $_", $colors->{$_} ) ) } @named };
+	}
+
+	method border_background_colors (@new) {
+		if (@new) {
+			$border_background_colors = _background_colors( $self, $new[0] );
+			$self->mark_changed;
+		}
+		return undef unless defined $border_background_colors;
+		return { map { $_ => [ $border_background_colors->{$_}->to_rgba ] } keys %$border_background_colors };
+	}
+
+	# The background under the glyphs of a side or corner instead of the
+	# widget's own, a Term::Fabulous::Color, or undef. Read by
+	# Term::Fabulous::Render::Border.
+	method border_background_color_of ($name) {
+		return defined $border_background_colors ? $border_background_colors->{$name} : undef;
 	}
 
 	# The sides the widget has a border on (Term::Fabulous::Widget/bordered),
@@ -233,7 +265,7 @@ C<Hidden> side, C<border_corners> and C<outer_border_sides>:
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/example-border-options.svg" alt="Six bordered panels: a border on the left and top only; a solid border with a double top and a thick left side; a round border with a cell of padding inside; a round border with a hidden bottom side; a title box and a body box sharing one line; a round border drawn on the parent's background"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.05/screenshots/example-border-options.svg" alt="Six bordered panels: a border on the left and top only; a solid border with a double top and a thick left side; a round border with a cell of padding inside; a round border with a hidden bottom side; a title box and a body box sharing one line; a round border drawn on the parent's background"></p>
 
 =end html
 
@@ -371,10 +403,27 @@ top or bottom side. Unknown side names die.
 L<Term::Fabulous::Widget::Table> draws its outer frame this way, so a
 highlighted row ends at the frame.
 
+=item C<border_background_colors>
+
+C<undef> (the default) or a hash reference with any of the side names
+and corner names above as keys, each a color (anything
+L<Term::Fabulous::Color> takes). The glyphs of a side or corner named
+here are drawn on that color instead of the widget's own background (a
+translucent color is blended over it); the others keep the widget's
+background. A corner takes only the color named for it, not that of the
+side it is drawn with. A side drawn on the outer background (see
+C<outer_border_sides>) ignores its color, and so does a corner drawn
+like it. Unknown keys and invalid colors die.
+L<Term::Fabulous::Widget::Table> uses it for a line between two cells
+of different backgrounds: the line is drawn on the table's background,
+so neither cell's color spills onto it.
+
+	border_background_colors => { top => '#16191f', top_left => '#16191f' },
+
 =back
 
-C<border_corners> and C<outer_border_sides> cannot be set from a KDL
-layout file.
+C<border_corners>, C<outer_border_sides> and
+C<border_background_colors> cannot be set from a KDL layout file.
 
 =head1 METHODS
 
@@ -471,6 +520,25 @@ L<Term::Fabulous::Render::Border>.
 
 The glyph drawn at one corner instead of the style's corner glyph, or
 C<undef> when the style's glyph is drawn. Used by
+L<Term::Fabulous::Render::Border>.
+
+=head2 border_background_colors
+
+	my $colors = $box->border_background_colors;    # a copy, or undef
+	$box->border_background_colors( { left => '#16191f' } );
+	$box->border_background_colors(undef);          # the widget's own background again
+
+Accessor for the C<border_background_colors> parameter. The reader
+returns a new hash of C<[ $r, $g, $b, $a ]> colors (or C<undef>); the
+writer takes what the parameter takes, replaces all colors at once and
+returns the new value. The change shows in the next frame.
+
+=head2 border_background_color_of
+
+	my $color = $box->border_background_color_of('top_left');    # or undef
+
+The background drawn under the glyphs of one side or corner instead of
+the widget's own, a L<Term::Fabulous::Color>, or C<undef>. Used by
 L<Term::Fabulous::Render::Border>.
 
 =head2 contribute_border_sides

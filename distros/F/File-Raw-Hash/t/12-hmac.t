@@ -31,6 +31,23 @@ sub spew_bytes {
        'HMAC-SHA-256 RFC 4231 test 1');
 }
 
+# RFC 4231 test cases 1 and 2 for HMAC-SHA-512 (128-byte block).
+{
+    my $d;
+    my $path = spew_bytes("Hi There");
+    file_slurp($path, plugin => 'hash', algo => 'sha512',
+               hmac_key => "\x0b" x 20, into => \$d);
+    is($d, '87aa7cdea5ef619d4ff0b4241a1d6cb02379f4e2ce4ec2787ad0b30545e17cde'
+         . 'daa833b7d6b8a702038b274eaea3f4e4be9d914eeb61f1702e696c203a126854',
+       'HMAC-SHA-512 RFC 4231 test 1');
+    $path = spew_bytes("what do ya want for nothing?");
+    file_slurp($path, plugin => 'hash',
+               algo => 'sha512', hmac_key => 'Jefe', into => \$d);
+    is($d, '164b7a7bfcf819e2e395fbe73b56e0a387bd64222e831fd610270cd7ea250554'
+         . '9758bf75c05a994a6d034f65f8f0e6fdcaeab1a34d4a6b4b636e070a38bce737',
+       'HMAC-SHA-512 RFC 4231 test 2 (short key)');
+}
+
 # RFC 4231 test case 2 (short key, ASCII): key = "Jefe"
 {
     my $path = spew_bytes('what do ya want for nothing?');

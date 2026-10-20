@@ -299,7 +299,7 @@ subtest 'a theme switch reaches the tabs' => sub {
 	is $ui->cell( 1,  0 )->[1], 0x102030,   'the tab border takes tabs.line.color';
 	is $ui->cell( 1,  0 )->[0], "\x{250F}", 'and tabs.line.style';
 	is $ui->cell( 3,  1 )->[1], 0x708090,   'the active label takes tabs.text.active';
-	is $ui->cell( 11, 2 )->[1], 0x405060,   'the other label tabs.text';
+	is $ui->cell( 11, 1 )->[1], 0x405060,   'the other label tabs.text';
 	is $ui->cell( 0,  4 )->[1], 0x102030,   'the page border takes the line color';
 
 	$ui->theme( $Theme->new( palette => { outline => '#ff0000' } ) );

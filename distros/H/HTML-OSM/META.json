@@ -4,7 +4,7 @@
       "Nigel Horne <njh@nigelhorne.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013",
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150015",
    "license" : [
       "gpl_2"
    ],
@@ -32,36 +32,36 @@
       },
       "runtime" : {
          "requires" : {
+            "B" : "0",
             "CHI" : "0",
             "Carp" : "0",
-            "ExtUtils::MakeMaker" : "6.64",
+            "IPC::System::Simple" : "0",
             "JSON::MaybeXS" : "0",
             "LWP::UserAgent" : "0",
             "Object::Configure" : "0.15",
+            "POSIX" : "0",
             "Params::Get" : "0.13",
             "Params::Validate::Strict" : "0.28",
             "Readonly" : "0",
             "Scalar::Util" : "0",
             "Time::HiRes" : "0",
-            "URI::Escape" : "0"
+            "URI::Escape" : "0",
+            "perl" : "5.010"
          }
       },
       "test" : {
          "requires" : {
             "File::Temp" : "0",
-            "IPC::System::Simple" : "0",
+            "HTTP::Response" : "0",
             "Test::Compile" : "0",
             "Test::DescribeMe" : "0",
-            "Test::HTML::Lint" : "0",
             "Test::HTTPStatus" : "0",
-            "Test::JSON" : "0",
             "Test::Memory::Cycle" : "0",
             "Test::Mockingbird" : "0",
             "Test::Most" : "0",
             "Test::Needs" : "0",
             "Test::RequiresInternet" : "0",
             "Test::Returns" : "0",
-            "Test::Warnings" : "0",
             "Test::Which" : "0",
             "Test::Without::Module" : "0"
          }
@@ -69,6 +69,6 @@
    },
    "release_status" : "stable",
    "resources" : {},
-   "version" : "0.10",
+   "version" : "0.11",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

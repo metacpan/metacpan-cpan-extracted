@@ -29,12 +29,12 @@
          "requires" : {
             "ExtUtils::Depends" : "0.404",
             "ExtUtils::MakeMaker" : "0",
-            "File::Raw" : "0.13"
+            "File::Raw" : "0.15"
          }
       },
       "runtime" : {
          "requires" : {
-            "File::Raw" : "0.12",
+            "File::Raw" : "0.15",
             "perl" : "5.008003"
          }
       },
@@ -45,6 +45,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.04",
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

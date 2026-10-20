@@ -58,6 +58,7 @@ use lib File::HomeDir->my_home() . '/lib/perl5';
 use Geo::Coder::Free;
 use Geo::Coder::Free::Allow;
 use Geo::Coder::Free::Config;
+use Geo::Coder::Free::Display;	# For the CSRF token check; the page itself is loaded by name
 use Geo::Coder::Free::Utils;
 
 # $TAINT = 1;
@@ -483,21 +484,22 @@ sub doit
 			};
 		}
 		if($reason) {
-			# Return a minimal plain-text 403 - no template rendering so that
-			# a blocked attacker receives no information about site structure.
-			print "Status: 403 Forbidden\n",
-				"Content-type: text/plain\n",
-				"Pragma: no-cache\n\n";
-
-			# Suppress the body on HEAD requests per RFC 7231 §4.3.2.
-			unless($ENV{'REQUEST_METHOD'} && ($ENV{'REQUEST_METHOD'} eq 'HEAD')) {
-				print "Access Denied\n";
-			}
-			$logger->info("$remote_addr: access denied: $reason");
-			$info->status(403);
+			deny($reason);
 			vwflog($vwflog, $info, $lingua, $syslog, $reason, $log, $request_start);
 			return;
 		}
+	}
+
+	# ── CSRF token ────────────────────────────────────────────────────────
+	# The query page's form posts back to this page, and the token it carries
+	# must be one this configuration signed.  A token that does not verify is
+	# refused with the same answer as any other denial, and recorded with its
+	# own reason, so a forged submission is turned away and an operator can see
+	# which layer did it.
+	if(my $reason = csrf_denial($info, $config)) {
+		deny($reason);
+		vwflog($vwflog, $info, $lingua, $syslog, $reason, $log, $request_start);
+		return;
 	}
 
 	# ── FCGI::Buffer setup ────────────────────────────────────────────────
@@ -753,6 +755,46 @@ sub choose
 			"/cgi-bin/page.fcgi?page=query\n",
 			"/cgi-bin/page.fcgi?page=meta_data\n";
 	}
+}
+
+# Refuse the request with the page's block page: a minimal plain-text 403,
+# written rather than rendered so that a blocked client receives no information
+# about the site's structure.  The caller records the refusal in the vwf log;
+# this writes the answer and the error log line naming the reason.
+sub deny
+{
+	my ($reason) = @_;
+
+	print "Status: 403 Forbidden\n",
+		"Content-type: text/plain\n",
+		"Pragma: no-cache\n\n";
+
+	# Suppress the body on HEAD requests per RFC 7231 §4.3.2.
+	unless($ENV{'REQUEST_METHOD'} && ($ENV{'REQUEST_METHOD'} eq 'HEAD')) {
+		print "Access Denied\n";
+	}
+	$logger->info("$ENV{REMOTE_ADDR}: access denied: $reason");
+	$info->status(403);
+}
+
+# The reason to refuse a request carrying a CSRF token, or undef to serve it.
+#
+# Only a token that was actually sent is judged.  The page's forms are rendered
+# by templates this distribution does not ship - query.txt ships empty and the
+# live site supplies the real one - so a request without a token cannot be told
+# apart from one whose form predates tokens, and refusing those would break
+# every existing form rather than protect it.  A token that is sent, though,
+# must be one this configuration signed: the page documents that a failed
+# validation is reported on submit, and this is that refusal.
+sub csrf_denial
+{
+	my ($info, $config) = @_;
+
+	my $token = $info->param('csrf_token');
+	return unless defined($token) && length($token);
+
+	return 'Rejected CSRF token' unless Geo::Coder::Free::Display->csrf_token_valid($token, $config);
+	return;
 }
 
 # Check whether the current request looks like a SQL injection attempt.

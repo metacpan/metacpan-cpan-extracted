@@ -13,7 +13,7 @@ use Clay::UI::Role::Interaction::Hoverable;
 use Clay::UI::Role::Interaction::Pressable;
 use Term::Fabulous::Widget::Box;
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 class Term::Fabulous::Widget::Button
 	:isa(Term::Fabulous::Widget::Box)
@@ -24,7 +24,7 @@ class Term::Fabulous::Widget::Button
 	:strict(params)
 {
 	use Clay::UI::Enum::Result;
-	use Scalar::Util qw(refaddr weaken);
+	use Scalar::Util qw(refaddr);
 	use Term::Fabulous::Check qw(color optional);
 	use Term::Fabulous::Event::Activate;
 
@@ -33,20 +33,21 @@ class Term::Fabulous::Widget::Button
 	my %ACTIVATES = map { $_ => 1 } qw(Enter Space);
 
 	ADJUST {
-		weaken( my $weak_self = $self );
 		my $continue = Clay::UI::Enum::Result->CONTINUE;
 		$self->on(
-			OnRelease => sub ($event) {
-				$weak_self->activate if refaddr( $event->target ) == refaddr($weak_self) && $weak_self->is_enabled;
+			OnRelease => sub ( $self, $event ) {
+				$self->activate if refaddr( $event->target ) == refaddr($self) && $self->is_enabled;
 				return $continue;
-			}
+			},
+			owner => $self
 		);
 		$self->on(
-			KeyPress => sub ($event) {
-				return $continue unless $ACTIVATES{ $event->main_key_name // '' } && $weak_self->is_enabled;
-				$weak_self->activate;
+			KeyPress => sub ( $self, $event ) {
+				return $continue unless $ACTIVATES{ $event->main_key_name // '' } && $self->is_enabled;
+				$self->activate;
 				return;
-			}
+			},
+			owner => $self
 		);
 	}
 
@@ -164,7 +165,7 @@ activated
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-button.svg" alt="Save, Cancel, Delete and Archive buttons: Save focused with a blue border, Archive disabled and drawn in gray, and the line Save was pressed"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.05/screenshots/widget-button.svg" alt="Save, Cancel, Delete and Archive buttons: Save focused with a blue border, Archive disabled and drawn in gray, and the line Save was pressed"></p>
 
 =end html
 

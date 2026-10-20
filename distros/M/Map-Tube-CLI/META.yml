@@ -21,10 +21,10 @@ no_index:
 provides:
   Map::Tube::CLI:
     file: lib/Map/Tube/CLI.pm
-    version: v1.0.0
+    version: v1.0.1
   Map::Tube::CLI::Option:
     file: lib/Map/Tube/CLI/Option.pm
-    version: v1.0.0
+    version: v1.0.1
 recommends:
   Unicode::Collate: '0'
 requires:
@@ -46,5 +46,5 @@ requires:
 resources:
   bugtracker: https://github.com/manwar/Map-Tube-CLI/issues
   repository: https://github.com/manwar/Map-Tube-CLI.git
-version: v1.0.0
+version: v1.0.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -198,6 +198,91 @@ cal_value(calendar, year, month, day, zone)
             croak("new_sv_cal refused");
     OUTPUT:
         RETVAL
+
+SV *
+tomorrow_at(value, hour)
+        SV *value
+        int hour
+    PREINIT:
+        time_keeper_point p, q;
+        time_keeper_parts parts;
+        char err[160];
+    CODE:
+        if ((tk(aTHX)->from_sv_cal)(aTHX_ value, &p.inst, &p.zone, &p.locale, &p.calendar) != TIME_KEEPER_OK)
+            croak("not a Time::Keeper value");
+        Zero(&parts, 1, time_keeper_parts);
+        parts.days = 1;
+        if ((tk(aTHX)->plus)(aTHX_ &p, &parts, TIME_KEEPER_GAP_FORWARD, TIME_KEEPER_OVERLAP_EARLIER, &q, err, sizeof err)
+            || (tk(aTHX)->truncate)(aTHX_ &q, TIME_KEEPER_UNIT_DAY, TIME_KEEPER_WEEK_LOCALE, &p, err, sizeof err)
+            || (tk(aTHX)->with_time)(aTHX_ &p, hour, 0, 0, 0, TIME_KEEPER_GAP_FORWARD, TIME_KEEPER_OVERLAP_EARLIER, &q, err, sizeof err))
+            croak("%s", err);
+        RETVAL = (tk(aTHX)->new_sv_cal)(aTHX_ &q.inst, &q.zone, q.locale, q.calendar);
+    OUTPUT:
+        RETVAL
+
+SV *
+read_cldr(text, pattern, locale)
+        SV *text
+        SV *pattern
+        const char *locale
+    PREINIT:
+        time_keeper_point q;
+        char err[160];
+        STRLEN tl, pl;
+        const char *tx, *pt;
+        int l;
+    CODE:
+        tx = SvPVutf8(text, tl);
+        pt = SvPVutf8(pattern, pl);
+        l = (tk(aTHX)->locale_find)(locale, strlen(locale));
+        if ((tk(aTHX)->parse_cldr)(aTHX_ tx, tl, pt, pl, TIME_KEEPER_KIND_VALUE, NULL, l, 0, TIME_KEEPER_GAP_FORWARD,
+                                   TIME_KEEPER_OVERLAP_EARLIER, &q, NULL, err, sizeof err) != TIME_KEEPER_OK) {
+            RETVAL = newSVpv(err, 0);
+            SvUTF8_on(RETVAL);
+        }
+        else
+            RETVAL = (tk(aTHX)->new_sv_cal)(aTHX_ &q.inst, &q.zone, q.locale, q.calendar);
+    OUTPUT:
+        RETVAL
+
+SV *
+next_working_date(date)
+        SV *date
+    PREINIT:
+        int kind, l, s, e, dow;
+        int64_t d;
+        char err[128];
+    CODE:
+        if ((tk(aTHX)->date_from_sv)(aTHX_ date, &kind, &d, &l) != TIME_KEEPER_OK || kind != TIME_KEEPER_KIND_DATE)
+            croak("not a Time::Keeper::Date");
+        if ((tk(aTHX)->locale_weekend)(aTHX_ l, &s, &e, err, sizeof err) != TIME_KEEPER_OK)
+            croak("%s", err);
+        for (;;) {
+            d++;
+            dow = (int)(((d % 7) + 7 + 3) % 7) + 1;
+            if (s <= e ? (dow < s || dow > e) : (dow < s && dow > e))
+                break;
+        }
+        RETVAL = (tk(aTHX)->new_date_sv)(aTHX_ TIME_KEEPER_KIND_DATE, d, l, NULL);
+    OUTPUT:
+        RETVAL
+
+void
+change_after(value)
+        SV *value
+    PREINIT:
+        time_keeper_instant t, at;
+        time_keeper_zone z;
+        int32_t before, after;
+    PPCODE:
+        if ((tk(aTHX)->from_sv)(aTHX_ value, &t, &z, NULL) != TIME_KEEPER_OK)
+            croak("not a Time::Keeper value");
+        if ((tk(aTHX)->next_change)(aTHX_ &t, &z, &at, &before, &after) != TIME_KEEPER_OK)
+            XSRETURN_EMPTY;
+        EXTEND(SP, 3);
+        mPUSHi(at.sec);
+        mPUSHi(before);
+        mPUSHi(after);
 XS
 close $fh;
 
@@ -218,6 +303,16 @@ SKIP: {
     my $xsub = DynaLoader::dl_install_xsub('TKConsumer::bootstrap', $boot, $lib);
     &$xsub('TKConsumer');
     is(TKConsumer::version(), Time::Keeper::_abi_version(), 'the consumer sees the table\'s version');
+    my $thu = Time::Keeper->new(year => 2026, month => 10, day => 15, hour => 9, zone => 'Europe/London', locale => 'en-GB');
+    is('' . TKConsumer::tomorrow_at($thu, 15), '2026-10-16T15:00:00+01:00', 'the consumer adds a day, truncates and sets the hour through version 3');
+    is('' . TKConsumer::next_working_date(Time::Keeper::Date->new(year => 2026, month => 10, day => 16, locale => 'en-GB')), '2026-10-19',
+       'version 3 dates: Friday to Monday in en-GB, through date_from_sv, locale_weekend and new_date_sv');
+    is('' . TKConsumer::next_working_date(Time::Keeper::Date->new(year => 2026, month => 10, day => 15, locale => 'ar-EG')), '2026-10-18',
+       'and Thursday to Sunday in ar-EG');
+    is(join(' ', TKConsumer::change_after($thu)), '1792890000 3600 0', 'next_change: London leaves summer time on 25 October 2026');
+    is(scalar(() = TKConsumer::change_after($thu->in_zone('UTC'))), 0, 'and UTC never changes');
+    is('' . TKConsumer::read_cldr('15 October 2026', 'd MMMM y', 'en'), '2026-10-15T00:00:00Z', 'and reads a CLDR pattern');
+    is(TKConsumer::read_cldr('Tuesday 15 October 2026', 'EEEE d MMMM y', 'en'), "'Tuesday 15 October 2026': 2026-10-15 was a Thursday", 'with the method\'s reason when it cannot');
     is(TKConsumer::http_date(1760000000), 'Thu, 09 Oct 2025 08:53:20 GMT', 'http_date from another extension');
     my $v = TKConsumer::local_value(1760000000, 'Europe/Paris', 'de');
     isa_ok($v, 'Time::Keeper', 'a value it made');
@@ -242,7 +337,7 @@ SKIP: {
     open my $in, '<', "$inc/time_keeper_abi.h" or die;
     my $h = do { local $/; <$in> };
     close $in;
-    $h =~ s/#define TIME_KEEPER_ABI_VERSION 2/#define TIME_KEEPER_ABI_VERSION 1/ or die 'no version line';
+    $h =~ s/#define TIME_KEEPER_ABI_VERSION \d+/#define TIME_KEEPER_ABI_VERSION 1/ or die 'no version line';
     $h =~ s/\n    \/\* ---- version 2 ---- \*\/.*?(\n\} time_keeper_abi;)/$1/s or die 'no version 2 block';
     open my $out, '>', "$old/time_keeper_abi.h" or die;
     print $out $h;
@@ -263,7 +358,7 @@ SKIP: {
     my $boot = DynaLoader::dl_find_symbol($libref, 'boot_TKOld') or die DynaLoader::dl_error();
     my $xsub = DynaLoader::dl_install_xsub('TKOld::bootstrap', $boot, $olib);
     &$xsub('TKOld');
-    is(TKOld::version(), 2, 'it accepts the version 2 table (>= 1)');
+    is(TKOld::version(), Time::Keeper::_abi_version(), 'it accepts the current table (>= 1)');
     is(TKOld::stamp(Time::Keeper->new(year => 2026, month => 10, day => 15, zone => 'UTC'), 'y-MM-dd'), '2026-10-15', 'and its version 1 entries work');
 }
 

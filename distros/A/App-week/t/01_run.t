@@ -1,4 +1,4 @@
-use v5.14;
+use v5.24;
 use strict;
 use warnings;
 use utf8;
@@ -103,9 +103,9 @@ SKIP: {
     	Script->new([qw(--config shortmonth=1), @default])->run;
     compare $sm->result, $result{"175209_re"}, "solaris short month emulation";
 
-    my $sm =
+    my $wn =
     	Script->new([qw(--weeknumber), @default])->run;
-    compare $sm->result, $result{"175209W_re"}, "--weeknumber";
+    compare $wn->result, $result{"175209W_re"}, "--weeknumber";
 }
 
 done_testing;

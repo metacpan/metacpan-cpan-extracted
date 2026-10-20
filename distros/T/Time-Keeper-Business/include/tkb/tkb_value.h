@@ -4,8 +4,8 @@
 /* What goes in comes out. A Time::Keeper is read through the core's table:
  * its day is the date its own zone shows, and its clock, zone, locale and
  * calendar are kept for the value written back on another day. A
- * Time::Keeper::Date is read through one method call, since the table has
- * no entry for a plain date, and written back the same way; a YearMonth is
+ * Time::Keeper::Date is read and written through the table's version 3
+ * entries, or one method call where the table is older; a YearMonth is
  * read as its first day and always written back as a Date. */
 
 #define TKB_KIND_KEEPER     0
@@ -20,7 +20,8 @@ typedef struct tkb_val {
     int locale, calendar;
     time_keeper_civil civil;         /* kind 0: the wall clock in its zone */
     int64_t day;
-    SV *locale_sv;                   /* kinds 1 and 2: the locale's code, mortal */
+    SV *locale_sv;                   /* kinds 1 and 2 without has_lid: the locale's code, mortal */
+    int has_lid;                     /* kinds 1 and 2: locale is the locale's id */
 } tkb_val;
 
 /* One method call on an object or a class, in scalar context; the result
@@ -67,6 +68,62 @@ tkb_sv_to_i64(pTHX_ SV *sv, int64_t *out)
     }
 }
 
+/* A Time::Keeper::Date's day and locale id through the table, or its day
+ * through epoch_days with *locale -1. 0 when the day cannot be read. */
+static int
+tkb_date_day(pTHX_ SV *sv, int64_t *day, int *locale)
+{
+#if TKB_HAVE_V3
+    if (TKB_V3) {
+        int kind;
+        if (TKB(date_from_sv)(aTHX_ sv, &kind, day, locale) == TIME_KEEPER_OK && kind == TIME_KEEPER_KIND_DATE)
+            return 1;
+    }
+#endif
+    *locale = -1;
+    return tkb_sv_to_i64(aTHX_ tkb_call(aTHX_ sv, "epoch_days", NULL, 0), day);
+}
+
+/* A Time::Keeper::Date on a day, mortal: in stash (NULL for the class
+ * itself) and the locale by id, or by locale_sv's code where the table is
+ * older (en when neither is given). */
+static SV *
+tkb_date_new(pTHX_ int64_t day, int locale, HV *stash, SV *locale_sv)
+{
+    SV *args[3];
+    int n = 1;
+#if TKB_HAVE_V3
+    if (TKB_V3 && (locale >= 0 || !locale_sv)) {
+        SV *out = TKB(new_date_sv)(aTHX_ TIME_KEEPER_KIND_DATE, day, locale >= 0 ? locale : 0, stash);
+        if (!out)
+            croak("Time::Keeper::Date->from_epoch_days: out of range");
+        return sv_2mortal(out);
+    }
+#endif
+    args[0] = sv_2mortal(tkb_i64_sv(aTHX_ day));
+    if (locale_sv) {
+        args[1] = sv_2mortal(newSVpvs("locale"));
+        args[2] = locale_sv;
+        n = 3;
+    }
+    return tkb_call(aTHX_ sv_2mortal(newSVpv(stash ? HvNAME(stash) : "Time::Keeper::Date", 0)), "from_epoch_days", args, n);
+}
+
+/* The locale id a Date was read with: 0 (en) when it cannot be told. */
+static int
+tkb_val_locale_id(pTHX_ const tkb_val *v)
+{
+    if (v->has_lid)
+        return v->locale;
+    if (v->locale_sv && SvOK(v->locale_sv)) {
+        STRLEN len;
+        const char *code = SvPV(v->locale_sv, len);
+        int id = TKB(locale_find)(code, len);
+        return id < 0 ? 0 : id;
+    }
+    return 0;
+}
+
 /* 1 when read; 0 when sv is neither kind, with the reason in *why. */
 static int
 tkb_in(pTHX_ SV *sv, tkb_val *v, const char **why)
@@ -90,6 +147,16 @@ tkb_in(pTHX_ SV *sv, tkb_val *v, const char **why)
         SV *date = sv;
         SV *days;
         v->kind = sv_derived_from(sv, "Time::Keeper::Date") ? TKB_KIND_DATE : TKB_KIND_YEAR_MONTH;
+#if TKB_HAVE_V3
+        if (TKB_V3) {
+            int kind;
+            if (TKB(date_from_sv)(aTHX_ sv, &kind, &v->day, &v->locale) == TIME_KEEPER_OK
+                && (kind == TIME_KEEPER_KIND_DATE || kind == TIME_KEEPER_KIND_YEAR_MONTH)) {
+                v->has_lid = 1;
+                return 1;
+            }
+        }
+#endif
         if (v->kind == TKB_KIND_YEAR_MONTH) {
             SV *one = sv_2mortal(newSViv(1));
             date = tkb_call(aTHX_ sv, "on", &one, 1);
@@ -149,13 +216,9 @@ tkb_out(pTHX_ const tkb_val *v, int64_t day, const char *what)
         return out;
     }
     else {
-        SV *args[3];
-        SV *cls = sv_2mortal(newSVpv(v->kind == TKB_KIND_DATE ? HvNAME(SvSTASH(SvRV(v->sv))) : "Time::Keeper::Date", 0));
-        SV *out;
-        args[0] = sv_2mortal(tkb_i64_sv(aTHX_ day));
-        args[1] = sv_2mortal(newSVpvs("locale"));
-        args[2] = v->locale_sv ? v->locale_sv : sv_2mortal(newSVpvs("en"));
-        out = tkb_call(aTHX_ cls, "from_epoch_days", args, 3);
+        HV *stash = v->kind == TKB_KIND_DATE ? SvSTASH(SvRV(v->sv)) : NULL;
+        SV *out = tkb_date_new(aTHX_ day, v->has_lid ? v->locale : -1, stash,
+                               v->has_lid ? NULL : v->locale_sv ? v->locale_sv : sv_2mortal(newSVpvs("en")));
         return SvREFCNT_inc_simple_NN(out);
     }
 }

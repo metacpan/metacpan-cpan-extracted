@@ -5,7 +5,8 @@ use utf8;
 use Test2::V0;
 
 use Term::Fabulous::Termbox qw(TB_BOLD TB_ITALIC TB_UNDERLINE TB_REVERSE TB_DIM TB_BLINK TB_STRIKEOUT TB_OVERLINE TB_INVISIBLE);
-use Term::Fabulous::Text::Style qw(parse_style style compose_styles apply_style);
+use Term::Fabulous::Text::Style qw(parse_style style compose_styles apply_style resolve_style);
+use Term::Fabulous::Theme;
 
 my $untouched = { set => 0, clear => 0, color => undef, background => undef };
 
@@ -73,6 +74,17 @@ subtest 'apply_style' => sub {
 	is apply_style( $look, parse_style('underline not bold red') ), { attrs => TB_ITALIC | TB_UNDERLINE, color => [ 255, 0, 0, 255 ], background => undef }, 'bits cleared and set, color replaced';
 	is apply_style( $look, parse_style('on #000000') ), { attrs => TB_ITALIC | TB_BOLD, color => [ 1, 1, 1, 255 ], background => [ 0, 0, 0, 255 ] }, 'untouched parts stay';
 	is $look, { attrs => TB_ITALIC | TB_BOLD, color => [ 1, 1, 1, 255 ], background => undef }, 'the given look is not changed';
+};
+
+subtest 'palette tokens' => sub {
+	is parse_style('bold accent on surface_low'), { set => TB_BOLD, clear => 0, color => 'accent', background => 'surface_low' }, 'a token stays a word';
+	is style( { color => 'text_muted' } ), { set => 0, clear => 0, color => 'text_muted', background => undef }, 'also in a style hash';
+	like dies { style( { color => 'no_such_token' } ) }, qr/color must be a color, got 'no_such_token'/, 'an unknown word is no color';
+	my $theme = Term::Fabulous::Theme->default;
+	is resolve_style( parse_style('accent on surface_low'), $theme ), { set => 0, clear => 0, color => $theme->token('accent'), background => $theme->token('surface_low') },
+		'resolve_style asks the theme';
+	my $plain = parse_style('bold #ff0000');
+	ref_is resolve_style( $plain, $theme ), $plain, 'a style without tokens comes back as it is';
 };
 
 done_testing;

@@ -5,7 +5,7 @@ use warnings;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 use Object::Pad 0.825;
 
@@ -42,10 +42,10 @@ role Term::Fabulous::Render::Text {
 	# advance by the same widths the measure callback reported. Drawing stops
 	# before a cluster that would cross the box's right edge or the clip
 	# rect; clusters left of the clip rect are skipped but still advance.
-	# A widget with line_styles (a RichText) paints the line in runs: each
+	# A widget with line_styles (a Text) paints the line in runs: each
 	# cluster takes the look of the run its first character lies in. A run
 	# is [ $characters, $set, $clear, $fg_attr, $bg_attr ] (see
-	# Term::Fabulous::Widget::RichText::_runs_of_text): a style whose
+	# Term::Fabulous::Widget::Text::_runs_of_text): a style whose
 	# colors are termbox attributes, applied onto the widget's own look.
 	method render_text ( $command, $widget, $buffer ) {
 		my ( $x, $y, $x1 ) = cell_rect( $command->{boundingBox} );
@@ -152,7 +152,7 @@ was painted there before in this frame, or the terminal default.
 =item *
 
 When the widget has a C<line_styles> method (a
-L<Term::Fabulous::Widget::RichText>), it is asked for the runs of the
+L<Term::Fabulous::Widget::Text>), it is asked for the runs of the
 line, C<< $widget->line_styles( $offset, $length ) >> with the
 command's C<stringOffset> (where the line starts in the widget's text,
 in characters) and the line's length, and each cluster is painted in
@@ -160,7 +160,7 @@ the look of the run its first character lies in: the run's style bits
 set and cleared on the widget's, its text color in place of the
 command's, and its background in place of the one recorded in
 C<$buffer>, which is updated to it. See
-L<Term::Fabulous::Widget::RichText/line_styles> for the runs.
+L<Term::Fabulous::Widget::Text/line_styles> for the runs.
 
 =back
 

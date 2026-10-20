@@ -3,7 +3,7 @@ package oEdtk::DisseminationPlan;
 use strict;
 use warnings;
 
-our $VERSION   = 2.1126;
+our $VERSION   = 2.1129;
 our @ISA       = qw(Exporter);
 our @EXPORT_OK = qw(idx1_app_idlot idx1_line call_plan);
 

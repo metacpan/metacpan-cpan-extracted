@@ -112,6 +112,15 @@ subtest 'sizing axis keys follow the axis type' => sub {
 		qr/expected only the keys min, max, type, got the unknown key 'percent'/, 'fixed axis has no percent' );
 };
 
+subtest 'the sizing axis schema describes its rows' => sub {
+	my %row = map { $_->{name} => $_ } @{ $SCHEMAS->{Clay_SizingAxis} };
+	is( [ map { [ $_->{name}, $_->{kind} ] } @{ $SCHEMAS->{Clay_SizingAxis} } ],
+		[ [ min => 'float' ], [ max => 'maximum' ], [ type => 'integer' ], [ percent => 'float_in' ] ],
+		'min is a float, max finite or +Inf, percent a bounded float' );
+	is( [ @{ $row{percent} }{qw(min max)} ], [ 0, 1 ], 'percent runs 0..1' );
+	is( $row{type}{enum}, 'SizingType', 'type holds a SizingType' );
+};
+
 subtest 'arrays need one element per field' => sub {
 	like( check_error('Clay_Color', [ 1, 2, 3 ]), qr/^Clay_Color: expected an array of 4 numbers, got an array of 3 elements/,
 		'short colour' );

@@ -14,7 +14,7 @@ This page shows how a program reacts to the user: key bindings for
 the whole program, buttons that can be clicked or pressed with the
 keyboard, links inside a text, and clicks on single words. It uses
 L<Term::Fabulous::Event::KeyPress>, L<Term::Fabulous::Widget::Button>,
-L<Term::Fabulous::Widget::RichText> and
+L<Term::Fabulous::Widget::Text> and
 L<Term::Fabulous::Event::TextClick>. The concepts (key names, bubbling,
 focus, clicks and hover) are explained in
 L<Term::Fabulous::Manual::Events>. Drawing with the mouse is shown in
@@ -34,7 +34,7 @@ L</Add buttons for the mouse and the keyboard (Button)>
 
 =item *
 
-L</Follow links in a text (RichText links)>
+L</Follow links in a text (Text links)>
 
 =item *
 
@@ -95,7 +95,7 @@ This program is shipped as F<examples/cookbook/key-bindings.pl>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-key-bindings.svg" alt="The key bindings program after Ctrl+R: the help line says reloaded and the second line shows the key name"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.05/screenshots/cookbook-key-bindings.svg" alt="The key bindings program after Ctrl+R: the help line says reloaded and the second line shows the key name"></p>
 
 =end html
 
@@ -287,7 +287,7 @@ F<examples/buttons-and-keys.pl>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/example-buttons-and-keys.svg" alt="Three buttons, the first focused and the last under the mouse pointer, a counter at 3 and a clock"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.05/screenshots/example-buttons-and-keys.svg" alt="Three buttons, the first focused and the last under the mouse pointer, a counter at 3 and a clock"></p>
 
 =end html
 
@@ -338,7 +338,7 @@ L<the recipe Update the screen from a timer|Term::Fabulous::Cookbook::LiveData/U
 
 =back
 
-=head1 Follow links in a text (RichText links)
+=head1 Follow links in a text (Text links)
 
 Goal: a help text with links that the user follows with the mouse or
 the keyboard, links whose targets are pages of the program, a URL and
@@ -356,7 +356,6 @@ This program is shipped as F<examples/cookbook/follow-links.pl>.
 	use Term::Fabulous;
 	use Term::Fabulous::Theme;
 	use Term::Fabulous::Widget::Box;
-	use Term::Fabulous::Widget::RichText;
 	use Term::Fabulous::Widget::Text;
 	use Clay::XS qw(sizing_grow sizing_fixed CLAY_TOP_TO_BOTTOM);
 
@@ -405,13 +404,13 @@ This program is shipped as F<examples/cookbook/follow-links.pl>.
 
 	# The page wraps at 60 columns: the width of the box around it.
 	my $page_box = Term::Fabulous::Widget::Box->new( layout => { sizing => { width => sizing_fixed(60) } } );
-	my $page     = Term::Fabulous::Widget::RichText->new( markup => $markup_of_page{start} );
+	my $page     = Term::Fabulous::Widget::Text->new( markup => $markup_of_page{start} );
 	$page_box->add_child($page);
 	my $status = Term::Fabulous::Widget::Text->new( text => 'Tab selects a link, Enter follows it.', text_color => [ 150, 160, 180, 255 ] );
 
 	# A footer whose links are given from Perl: any value can be a target,
 	# here the code to run.
-	my $footer = Term::Fabulous::Widget::RichText->new( text => 'Back   Quit' );
+	my $footer = Term::Fabulous::Widget::Text->new( text => 'Back   Quit' );
 	$root->add_child( $page_box, $footer, $status );
 
 	my $ui = Term::Fabulous->new( width => 80, height => 24, root => $root, theme => $theme );
@@ -438,7 +437,7 @@ This program is shipped as F<examples/cookbook/follow-links.pl>.
 	$footer->add_link( \&go_back,               0, 4 );
 	$footer->add_link( sub { $ui->loop->stop }, 7, 11 );
 
-	# LinkActivate bubbles up from both RichTexts, so one listener on the
+	# LinkActivate bubbles up from both Texts, so one listener on the
 	# root follows every link, clicked or chosen with the keyboard.
 	$root->on(
 		LinkActivate => sub ($event) {
@@ -450,7 +449,7 @@ This program is shipped as F<examples/cookbook/follow-links.pl>.
 		}
 	);
 
-	# Keys the focused RichText does not use bubble on to the root.
+	# Keys the focused Text does not use bubble on to the root.
 	$root->on(
 		KeyPress => sub ($event) {
 			my $key = $event->key_name // '';
@@ -464,7 +463,7 @@ This program is shipped as F<examples/cookbook/follow-links.pl>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-follow-links.svg" alt="The Keys page of the help text: its link the start page selected in dark text on green, and the footer links Back in green and Quit hovered in white on gray"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.05/screenshots/cookbook-follow-links.svg" alt="The Keys page of the help text: its link the start page selected in dark text on green, and the footer links Back in green and Quit hovered in white on gray"></p>
 
 =end html
 
@@ -477,7 +476,7 @@ the only link of the new page. The mouse pointer is over C<Quit>.
 =item *
 
 C<[link=TARGET]words[/link]> in the markup of a
-L<Term::Fabulous::Widget::RichText> makes C<words> a link to
+L<Term::Fabulous::Widget::Text> makes C<words> a link to
 C<TARGET>, which is the text between C<=> and C<]> (see
 L<Term::Fabulous::Text::Markup>). The widget does not go anywhere by
 itself: following a link fires
@@ -494,13 +493,13 @@ the code they run, and the listener calls it.
 
 =item *
 
-C<LinkActivate> bubbles from the RichText to its ancestors, so one
-listener on the root follows the links of both RichTexts. It fires the
+C<LinkActivate> bubbles from the Text to its ancestors, so one
+listener on the root follows the links of both Texts. It fires the
 same way for a left click on a link and for Enter on the selected link.
 
 =item *
 
-A RichText with links is a Tab stop. When it gets the focus, its first
+A Text with links is a Tab stop. When it gets the focus, its first
 link is selected; Left and Right select the previous and the next one.
 Keys it does not use, such as Backspace and Escape here, go on to the
 root. Giving the page new markup keeps the focus, but selects no link
@@ -514,14 +513,18 @@ C<hovered> (under the mouse pointer) and C<selected> (the link Enter
 follows); this program's theme draws links in the C<success> green and
 the selected link as dark text on that green. The defaults, an
 underline in the accent color, are in the picture of
-L<Term::Fabulous::Widget::RichText>. A link changes only the color, the
+L<Term::Fabulous::Widget::Text>. A link changes only the color, the
 background and the underline of its words: the bold link on the page
-C<links> stays bold. See L<Term::Fabulous::Widget::RichText/Looks>.
+C<links> stays bold. See L<Term::Fabulous::Widget::Text/Looks>.
 
 =item *
 
-For many RichTexts that share one selection, as in a document viewer,
-see L<Term::Fabulous::Widget::RichText/Links in a bigger widget>.
+For many Texts that share one selection, as in a document viewer,
+see L<Term::Fabulous::Widget::Text/Links in a bigger widget>. A
+L<Term::Fabulous::Widget::DocumentView> does that for a whole
+document; the recipe
+L<Term::Fabulous::Cookbook::Documents/Follow links: jump to sections, open other pages, go back (LinkActivate)>
+follows its links.
 
 =back
 
@@ -542,14 +545,13 @@ This program is shipped as F<examples/cookbook/click-a-word.pl>.
 	use Term::Fabulous;
 	use Term::Fabulous::Termbox qw(TB_KEY_MOUSE_LEFT TB_KEY_MOUSE_MIDDLE TB_KEY_MOUSE_RIGHT);
 	use Term::Fabulous::Widget::Box;
-	use Term::Fabulous::Widget::RichText;
 	use Term::Fabulous::Widget::Text;
 	use Clay::XS qw(sizing_grow sizing_fixed CLAY_TOP_TO_BOTTOM);
 
 	my %meaning_of = (
 		cell     => 'one character position of the terminal',
 		grapheme => 'what a reader sees as one character',
-		span     => 'a range of a RichText with a look of its own',
+		span     => 'a range of a Text with a look of its own',
 		terminal => 'the program that shows this one',
 		widget   => 'a part of the screen that draws itself',
 	);
@@ -563,12 +565,12 @@ This program is shipped as F<examples/cookbook/click-a-word.pl>.
 		},
 	);
 
-	# A plain Text and a RichText, wrapped at 48 columns by the box around
+	# A plain Text and one with a span, wrapped at 48 columns by the box around
 	# them. A click on either fires TextClick on it.
 	my $article = Term::Fabulous::Widget::Box->new( layout => { layout_direction => CLAY_TOP_TO_BOTTOM, sizing => { width => sizing_fixed(48) }, child_gap => 1 } );
 	$article->add_child(
-		Term::Fabulous::Widget::Text->new( text => 'Every widget draws into the cells of the terminal. A wide grapheme takes two cells.' ),
-		Term::Fabulous::Widget::RichText->new( markup => 'A [bold #e5c07b]span[/] changes the look of part of a text; the click reports the spans under the pointer.' ),
+		Term::Fabulous::Widget::Text->new( text   => 'Every widget draws into the cells of the terminal. A wide grapheme takes two cells.' ),
+		Term::Fabulous::Widget::Text->new( markup => 'A [bold #e5c07b]span[/] changes the look of part of a text; the click reports the spans under the pointer.' ),
 	);
 
 	my $meaning = Term::Fabulous::Widget::Text->new( text => 'Left-click a word to look it up.',                       text_color => [ 152, 195, 121, 255 ] );
@@ -613,7 +615,7 @@ This program is shipped as F<examples/cookbook/click-a-word.pl>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-click-a-word.svg" alt="Two paragraphs, the second with the word span in bold yellow; below them the line terminal: the program that shows this one, and the line right button at column 5, row 4: offset 3, word span (2 to 6), spans [2-6]"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.05/screenshots/cookbook-click-a-word.svg" alt="Two paragraphs, the second with the word span in bold yellow; below them the line terminal: the program that shows this one, and the line right button at column 5, row 4: offset 3, word span (2 to 6), spans [2-6]"></p>
 
 =end html
 
@@ -625,8 +627,7 @@ right click on the bold C<span>.
 =item *
 
 A mouse button pressed on a character of a
-L<Term::Fabulous::Widget::Text> or a
-L<Term::Fabulous::Widget::RichText> fires
+L<Term::Fabulous::Widget::Text> fires
 L<TextClick|Term::Fabulous::Event::TextClick> on that text. Every
 button counts, the left, the middle and the right one; dragging,
 releasing and the wheel fire nothing. A click on the empty part of a
@@ -644,9 +645,9 @@ word's first character and of the character after its last.
 
 =item *
 
-For a RichText, C<< $event->spans >> lists the spans under the pointer
-as C<[ $start, $end, $style ]>, and C<< $event->link >> is the target of
-the link there, if any.
+For a text with spans (here the second one), C<< $event->spans >>
+lists the spans under the pointer as C<[ $start, $end, $style ]>, and
+C<< $event->link >> is the target of the link there, if any.
 
 =item *
 
@@ -654,7 +655,10 @@ C<TextClick> bubbles, so a listener on any box around the texts hears
 every one of them; C<< $event->target >> is the Text that was clicked.
 The C<Mouse> event of the same press still goes to the box behind the
 text, before the C<TextClick>, so programs that listen for C<Mouse>
-see no change.
+see no change. A C<Mouse> listener tells a double click from a single
+one with C<< $event->click_count >>
+(L<Term::Fabulous::Event::Mouse/click_count>); C<TextClick> does not
+carry it.
 
 =back
 

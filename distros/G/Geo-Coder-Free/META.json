@@ -38,7 +38,8 @@
             "File::Slurp" : "0",
             "File::Spec" : "0",
             "Geo::Coder::Abbreviations" : "0.03",
-            "Geo::Location::Point" : "0.18",
+            "Geo::Location::Point" : "0.19",
+            "Geo::Location::Predicate" : "0.01",
             "IO::AIO" : "0",
             "IPC::System::Simple" : "0",
             "JSON::MaybeXS" : "0",
@@ -57,7 +58,8 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "6.64"
+            "ExtUtils::MakeMaker" : "6.64",
+            "LWP::Protocol::https" : "0"
          }
       },
       "runtime" : {
@@ -80,7 +82,8 @@
             "File::pfopen" : "0.02",
             "Geo::Coder::Abbreviations" : "0.03",
             "Geo::Hash" : "0",
-            "Geo::Location::Point" : "0.18",
+            "Geo::Location::Point" : "0.19",
+            "Geo::Location::Predicate" : "0.01",
             "Geo::StreetAddress::US" : "0",
             "Lingua::EN::AddressParse" : "0",
             "Locale::CA" : "0",
@@ -137,6 +140,6 @@
          "x_repository" : "https://github.com/nigelhorne/Geo-Coder-Free"
       }
    },
-   "version" : "0.47",
+   "version" : "0.48",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

@@ -5,6 +5,7 @@ use warnings;
 
 use Test::Needs {
 	'App::Test::Generator' => '0.33',
+	'IPC::Run3' => 0,
 	'perl' => 5.036,	# Later A::T::G need this version
 };
 

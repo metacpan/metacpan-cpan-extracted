@@ -40,7 +40,7 @@
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0"
+            "Test::More" : "0.88"
          }
       }
    },
@@ -53,6 +53,6 @@
          "url" : "https://github.com/nicomen/App-SlimPacker"
       }
    },
-   "version" : "0.04",
+   "version" : "0.07",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

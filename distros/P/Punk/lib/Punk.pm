@@ -7,7 +7,7 @@ use warnings;
 our $VERSION;
 
 BEGIN {
-    $VERSION = '0.61';
+    $VERSION = '0.62';
     require XSLoader;
     XSLoader::load('Punk', $VERSION);
 }
@@ -530,6 +530,19 @@ in the cookie, which takes the ~4KB ceiling away and makes
 C<< $c->session_expire >> a revocation rather than a request to the browser.
 See L<Punk::Session>, and L<Punk::Session::Store> for the store half.
 
+=head2 logging
+
+    logging level => 'debug', format => 'json';
+    logging to => '/var/log/myapp.log';
+
+Configures C<< $c->log >> and C<< $app->log >>: C<level> (C<debug>, C<info>,
+C<warn>, C<error> or C<fatal>; default C<info>), C<format> (C<plain> or
+C<json>) and C<to> (a filehandle, a coderef, the name of an open handle such
+as C<STDERR>, or a path). A path is opened for append when the keyword runs,
+so one that cannot be written is a boot error. Also from a C<logging:> block
+in F<punk.yml>. With no C<logging> at all the loggers write plain lines at
+C<info> to the server's C<psgix.logger>, else C<STDERR>. See L<Punk::Logger>.
+
 =head2 csrf
 
     csrf;
@@ -931,6 +944,14 @@ Serve a nested directory of markdown files as a documentation site, with
 navigation, per-page contents, syntax highlighting and search. The whole site
 is rendered at boot and frozen, so a request is a hash lookup; see
 L<Punk::Mount::Markdown>.
+
+The mount's pages can be listed, for a landing page, an index or a feed:
+
+    my $pages = $c->app->markdown_pages('/blog');     # in a route
+    my $pages = MyApp->punk_app->markdown_pages('/blog');   # after to_app
+
+Each is C<< { url, path, title, date, updated, summary, meta } >>, in the
+mount's order; see L<Punk::Mount::Markdown/LISTING>.
 
 =head2 mount
 

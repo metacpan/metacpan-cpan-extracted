@@ -5,7 +5,7 @@ use warnings;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 use Exporter 'import';
 our @EXPORT_OK = qw(resolve_borders);
@@ -58,40 +58,52 @@ sub _first_style (@levels) {
 # Works out the lines of a table. Takes
 #   columns => the number of grid columns
 #   header  => how many of the lines are header lines (they come first)
+#   gutter  => whether a scrollbar column follows the last grid column
 #   table   => { border_top, border_right, border_bottom, border_left,
 #                column_lines, row_lines, header_line }
 #   column_styles => [ per column { border_left, border_right, row_lines } ]
-#   lines   => [ per line { spanning, style => { border_top, border_right,
-#                border_bottom, border_left, column_lines },
+#   lines   => [ per line { spanning, ledge, style => { border_top,
+#                border_right, border_bottom, border_left, column_lines },
 #                cells => [ per cell { border_top, border_right,
 #                border_bottom, border_left } ] } ]  (a spanning line has
-#                one cell)
-# and returns, per line, per cell: { sides => { top, right, bottom, left }
-# (a BorderStyle per drawn side, Blank where a line passes elsewhere but
-# not here), corners => { top_left, ... } (the glyph of every drawn
-# corner that does not keep the glyph of its style) }.
+#                one cell; a ledge is the first or the last line, holds
+#                nothing and has no line between itself and its neighbour,
+#                so it draws the frame's top or bottom and nothing else)
+# and returns { lines => per line, per cell { sides => { top, right,
+# bottom, left } (a BorderStyle per drawn side, Blank where a line passes
+# elsewhere but not here), corners => { top_left, ... } (the glyph of
+# every drawn corner that does not keep the glyph of its style), outer =>
+# [ the frame sides drawn outside ] }, gutter => the same for the strips
+# of the scrollbar column, { header, body, footer }, or undef }.
 sub resolve_borders (%args) {
 	my ( $columns, $lines ) = @args{qw(columns lines)};
 	my $header_lines = $args{header}        // 0;
+	my $gutter       = $args{gutter}        // 0;
 	my $table        = $args{table}         // {};
 	my $column_style = $args{column_styles} // [];
 	my $last_line    = $#$lines;
 	my $line_count   = scalar @$lines;
+
+	my @ledges = grep { $lines->[$_]{ledge} } 0 .. $last_line;
+	die "Term::Fabulous::Widget::Table::Borders: a ledge must be the first or the last line" if grep { $_ != 0 && $_ != $last_line } @ledges;
 
 	my $cell_style = sub ( $line, $column ) {
 		my $cells = $lines->[$line]{cells} // [];
 		return ( $lines->[$line]{spanning} ? $cells->[0] : $cells->[$column] ) // {};
 	};
 	my $row_style = sub ($line) { $lines->[$line]{style} // {} };
+	my $is_ledge  = sub ($line) { $line >= 0 && $line < $line_count && $lines->[$line]{ledge} ? 1 : 0 };
 
 	# The horizontal segment above line $boundary ($line_count: below the
-	# last line) in a column.
+	# last line) in a column ($columns: in the scrollbar column, which has
+	# no cells and no column style).
 	my $horizontal = sub ( $boundary, $column ) {
 		my ( $above, $below ) = ( $boundary - 1, $boundary );
+		my $inner = $boundary > 0 && $boundary < $line_count;
+		return undef if $inner && ( $is_ledge->($above) || $is_ledge->($below) );
 		my @cells   = ( ( $above >= 0 ? $cell_style->( $above, $column )->{border_bottom} : undef ), ( $below < $line_count ? $cell_style->( $below, $column )->{border_top} : undef ) );
 		my @rows    = ( ( $above >= 0 ? $row_style->($above)->{border_bottom}             : undef ), ( $below < $line_count ? $row_style->($below)->{border_top}             : undef ) );
-		my $inner   = $boundary > 0 && $boundary < $line_count;
-		my @columns = $inner        && $boundary != $header_lines ? ( ( $column_style->[$column] // {} )->{row_lines} ) : ();
+		my @columns = $inner && $boundary != $header_lines ? ( ( $column_style->[$column] // {} )->{row_lines} ) : ();
 		my $table_line
 			= $boundary == 0             ? $table->{border_top}
 			: $boundary == $line_count   ? $table->{border_bottom}
@@ -101,8 +113,10 @@ sub resolve_borders (%args) {
 	};
 
 	# The vertical segment of a line left of grid column $boundary
-	# ($columns: right of the last column).
+	# ($columns: right of the last column, which is no line when the
+	# scrollbar column follows; the strips draw the frame there).
 	my $vertical = sub ( $line, $boundary ) {
+		return undef if $gutter && $boundary == $columns;
 		my $spanning = $lines->[$line]{spanning};
 		my $outer    = $boundary == 0 || $boundary == $columns;
 		return undef if $spanning && !$outer;
@@ -123,16 +137,17 @@ sub resolve_borders (%args) {
 		return _first_style( \@cells, \@rows, \@column_levels, [$table_line] );
 	};
 
-	my ( @h, @v );
+	my ( @h, @v, @h_gutter );
 	foreach my $boundary ( 0 .. $line_count ) {
-		$h[$boundary] = [ map { $horizontal->( $boundary, $_ ) } 0 .. $columns - 1 ];
+		$h[$boundary]        = [ map { $horizontal->( $boundary, $_ ) } 0 .. $columns - 1 ];
+		$h_gutter[$boundary] = $gutter ? $horizontal->( $boundary, $columns ) : undef;
 	}
 	foreach my $line ( 0 .. $last_line ) {
 		$v[$line] = [ map { $vertical->( $line, $_ ) } 0 .. $columns ];
 	}
 	my @row_line_exists = map {
 		my $boundary = $_;
-		( any { defined } @{ $h[$boundary] } ) ? 1 : 0
+		( any { defined } @{ $h[$boundary] }, $h_gutter[$boundary] ) ? 1 : 0
 	} 0 .. $line_count;
 	my @column_line_exists = map {
 		my $boundary = $_;
@@ -194,6 +209,43 @@ sub resolve_borders (%args) {
 		return $style // $BLANK;
 	};
 
+	# The strips of the scrollbar column, beside the header lines, the
+	# body and the last line: each draws the frame's right side, in the
+	# table's style, and the horizontal lines that run on beside it (the
+	# top and the line below the header, the bottom). The side the body
+	# strip shares with the header and footer strips is one unbroken
+	# line, so its ends are arms of their corners.
+	my $strips = sub () {
+		my $right  = _first_style( [ $table->{border_right} ] );
+		my $side   = sub ($boundary) { $side_style->( $row_line_exists[$boundary], $h_gutter[$boundary] ) };
+		my $corner = sub ( $boundary, %arms ) {
+			my ( $on_frame, $frame_glyph ) = $frame_point->( $boundary, $columns, \%arms );
+			return $frame_glyph if $on_frame;
+			return Term::Fabulous::Enum::BorderStyle->junction(%arms) // ' ';
+		};
+		my $strip = sub ( $sides, $corners, @frame_sides ) {
+			my %drawn   = map  { $_ => $sides->{$_} } grep   { defined $sides->{$_} } keys %$sides;
+			my %corners = map  { $_ => $corners->{$_} } grep { defined $corners->{$_} } keys %$corners;
+			my @outer   = grep { defined $drawn{$_} && _drawn_outside( $drawn{$_}, $_ ) } @frame_sides;
+			return { sides => \%drawn, corners => \%corners, outer => \@outer };
+		};
+		my %header = ( top    => $side->(0), bottom => ( $header_lines ? $side->($header_lines) : undef ), right => $right );
+		my %footer = ( bottom => $side->($line_count), right => $right );
+		return {
+			header => $strip->(
+				\%header,
+				{
+					top_right => ( $header{top} && $header{right} ? $corner->( 0, left => $h_gutter[0], down => $right ) : undef ),
+					bottom_right => ( $header{bottom} && $header{right} ? $corner->( $header_lines, left => $h_gutter[$header_lines], up => $right, down => $right ) : undef ),
+				},
+				qw(top right)
+			),
+			body   => $strip->( { right => $right }, {}, qw(right) ),
+			footer =>
+				$strip->( \%footer, { bottom_right => ( $footer{bottom} && $footer{right} ? $corner->( $line_count, left => $h_gutter[$line_count], up => $right ) : undef ) }, qw(bottom right) ),
+		};
+	};
+
 	my @result;
 	foreach my $line ( 0 .. $last_line ) {
 		my $spanning     = $lines->[$line]{spanning};
@@ -226,7 +278,7 @@ sub resolve_borders (%args) {
 		}
 		push @result, \@cells;
 	}
-	return \@result;
+	return { lines => \@result, gutter => $gutter ? $strips->() : undef };
 }
 
 1;
@@ -243,13 +295,13 @@ Term::Fabulous::Widget::Table::Borders - Work out the grid lines of a table
 	use Term::Fabulous::Enum::BorderStyle;
 	my $Solid = Term::Fabulous::Enum::BorderStyle->Solid;
 
-	my $cells = resolve_borders(
+	my $resolved = resolve_borders(
 		columns => 2,
 		header  => 1,
 		table   => { map( { $_ => $Solid } qw(border_top border_right border_bottom border_left column_lines) ) },
 		lines   => [ {}, {}, { spanning => 1 }, {} ],
 	);
-	my $first = $cells->[0][0];    # { sides => { top, left }, corners => { top_left => "\x{250C}" } }
+	my $first = $resolved->{lines}[0][0];    # { sides => { top, left }, corners => { top_left => "\x{250C}" } }
 
 =head1 DESCRIPTION
 
@@ -266,7 +318,7 @@ L<Term::Fabulous::Manual::TableStyles/Lines between and around the cells>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-table-line-styles.svg" alt="Nine small tables with different lines: the default round frame, a full grid, no lines, a double frame with a heavy title line, a heavy frame with dashed row lines, ASCII lines, and Outer, Inner and Thick block frames"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.05/screenshots/cookbook-table-line-styles.svg" alt="Nine small tables with different lines: the default round frame, a full grid, no lines, a double frame with a heavy title line, a heavy frame with dashed row lines, ASCII lines, and Outer, Inner and Thick block frames"></p>
 
 =end html
 
@@ -298,6 +350,24 @@ the header), and a non-spanning line draws the line below it when the
 next line spans the columns, so that the junctions of its columns are
 part of its own corners.
 
+A I<ledge> is a line that holds nothing and draws only an edge of the
+frame: the table's footer, which draws the bottom edge below the
+scrolling rows, and its top without column titles. A ledge is the
+first or the last line (any other dies), and there is no line between
+it and its neighbour, whatever the styles say.
+
+=head2 The scrollbar column
+
+With C<gutter>, a column for the scrollbar follows the last grid
+column. The cells of the last column then draw no right side: the
+frame's right side, in the table's C<border_right>, is drawn by three
+I<strips> beside the header lines, the body and the last line, which
+the result returns under C<gutter>. The horizontal lines that reach the
+frame run on beside the strips: the header strip draws the top edge
+and the line below the header lines, the footer strip the bottom edge,
+each with the corner or junction where it meets the right side. Lines
+between rows end at the last cell.
+
 =head2 A frame in a block style
 
 A frame side in a style without joint glyphs (C<Outer>, C<Inner>,
@@ -314,26 +384,34 @@ C<Thick>. Frame sides in line styles are always in C<outer>.
 
 =head2 resolve_borders
 
-	my $cells = resolve_borders(%arguments);
+	my $resolved = resolve_borders(%arguments);
+	my $cells    = $resolved->{lines};
+	my $strips   = $resolved->{gutter};
 
 Arguments: C<columns> (the number of grid columns), C<header> (how many
-of the lines are header lines, default 0), C<table>, C<column_styles>
-(one hash per column) and C<lines> (one hash per line, header lines
-first, each with C<spanning>, C<style> and C<cells>, one hash per cell
-or one for a spanning line), with the keys named above. Every hash and
-key is optional; styles are L<Term::Fabulous::Enum::BorderStyle> items.
+of the lines are header lines, default 0), C<gutter> (whether the
+scrollbar column follows the last grid column, default 0), C<table>,
+C<column_styles> (one hash per column) and C<lines> (one hash per
+line, header lines first, each with C<spanning>, C<ledge>, C<style>
+and C<cells>, one hash per cell or one for a spanning line), with the
+keys named above. Every hash and key is optional; styles are
+L<Term::Fabulous::Enum::BorderStyle> items.
 
-Returns an array reference with one entry per line, an array reference
-with one hash per cell: C<sides> maps each side the cell draws
-(C<top>, C<right>, C<bottom>, C<left>) to its style (C<Blank> for a
-segment without a line on a line that exists), C<corners> maps each
-corner the cell draws (C<top_left>, C<top_right>, C<bottom_left>,
-C<bottom_right>; a corner is drawn where two drawn sides meet) to its
-glyph (a space where no line passes; a corner of a block-style frame
-is left out, see L</A frame in a block style>), and C<outer> lists the
-drawn sides of the outer frame of the table that are drawn on the
-background outside it (for
-L<Term::Fabulous::Role::HasBorderStyle/outer_border_sides>).
+Returns a hash reference. C<lines> is an array reference with one
+entry per line, an array reference with one hash per cell: C<sides>
+maps each side the cell draws (C<top>, C<right>, C<bottom>, C<left>)
+to its style (C<Blank> for a segment without a line on a line that
+exists), C<corners> maps each corner the cell draws (C<top_left>,
+C<top_right>, C<bottom_left>, C<bottom_right>; a corner is drawn where
+two drawn sides meet) to its glyph (a space where no line passes; a
+corner of a block-style frame is left out, see L</A frame in a block
+style>), and C<outer> lists the drawn sides of the outer frame of the
+table that are drawn on the background outside it (for
+L<Term::Fabulous::Role::HasBorderStyle/outer_border_sides>). C<gutter>
+is C<undef> without the C<gutter> argument; with it, a hash with the
+keys C<header>, C<body> and C<footer>, one for each strip of the
+scrollbar column (see L</The scrollbar column>), each a hash like a
+cell's (C<sides>, C<corners>, C<outer>).
 
 =head1 SEE ALSO
 

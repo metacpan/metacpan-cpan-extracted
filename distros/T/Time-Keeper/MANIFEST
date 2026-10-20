@@ -183,6 +183,7 @@ xt/21-cal-sweep.t
 xt/22-cal-oracle.t
 xt/23-cal-arith-oracle.t
 xt/25-cal-format-oracle.t
+xt/26-calendar-dates-roundtrip.t
 xt/boilerplate.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

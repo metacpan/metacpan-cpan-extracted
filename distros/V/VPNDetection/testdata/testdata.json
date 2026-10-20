@@ -6815,6 +6815,497 @@
           }
         }
       ]
+    },
+    "register": {
+      "why": "Vectors for register, RFC 7591 dynamic client registration: the client_id a client gets when it cannot serve a Client ID Metadata Document. The one OAuth request whose body is JSON. Nothing is stored until a person approves the client, so registering again consumes nothing and the operation takes the client's retries. noCredential holds for it as for every OAuth operation. A runner that has not shipped register never reads this key; nothing outside it names the operation.",
+      "endpoint": {
+        "method": "POST",
+        "path": "/oauth/register"
+      },
+      "contentType": "application/json",
+      "bodies": {
+        "why": "Decode the received body as JSON and compare it EXACTLY: same members, no extras, same values, redirect_uris in the order given. An optional argument given empty is left out, never sent empty. Values carrying a quote, a backslash, + & = % / space and non-ASCII catch an encoder that builds JSON by hand.",
+        "cases": [
+          {
+            "name": "redirect-uris-only",
+            "args": {
+              "redirectUris": [
+                "http://127.0.0.1:8765/callback"
+              ]
+            },
+            "body": {
+              "redirect_uris": [
+                "http://127.0.0.1:8765/callback"
+              ]
+            }
+          },
+          {
+            "name": "several-uris-and-a-name",
+            "args": {
+              "redirectUris": [
+                "https://app.example.com/oauth/callback",
+                "http://localhost/cb?a=1&b=two words%2B"
+              ],
+              "clientName": "Exämple \"CLI\" + tools/\\ 中"
+            },
+            "body": {
+              "redirect_uris": [
+                "https://app.example.com/oauth/callback",
+                "http://localhost/cb?a=1&b=two words%2B"
+              ],
+              "client_name": "Exämple \"CLI\" + tools/\\ 中"
+            }
+          },
+          {
+            "name": "an-empty-client-name-is-left-out",
+            "args": {
+              "redirectUris": [
+                "http://[::1]/cb"
+              ],
+              "clientName": ""
+            },
+            "body": {
+              "redirect_uris": [
+                "http://[::1]/cb"
+              ]
+            }
+          }
+        ]
+      },
+      "refusals": {
+        "why": "Refused before anything is sent, the way the SDK refuses a required value given empty in the code flow's methods: no request reaches the server. Only emptiness is checked here; which URIs are acceptable is the server's to say (invalid_redirect_uri).",
+        "cases": [
+          {
+            "name": "no-redirect-uris",
+            "args": {
+              "redirectUris": []
+            }
+          },
+          {
+            "name": "an-empty-redirect-uri",
+            "args": {
+              "redirectUris": [
+                "http://127.0.0.1:8765/callback",
+                ""
+              ]
+            }
+          }
+        ]
+      },
+      "responses": {
+        "why": "Decoding a 2xx, as the other responses sections do: every listed member present with that value, every absent one the language's absence. client_id_issued_at is Unix seconds, so a 32-bit integer holds it only until 2038.",
+        "cases": [
+          {
+            "name": "as-served",
+            "status": 201,
+            "body": {
+              "client_id": "dcr_eyJ2IjoxLCJhIjoiaW50ZXJuZXRkYXRhIiwibiI6IkV4YW1wbGUgQ0xJIn0.bm90LWEtcmVhbC1tYWMtZXhhbXBsZS1vbmx5LTAxMjM",
+              "client_id_issued_at": 1792304178,
+              "client_name": "Example CLI",
+              "redirect_uris": [
+                "http://127.0.0.1:8765/callback"
+              ],
+              "grant_types": [
+                "authorization_code",
+                "refresh_token"
+              ],
+              "response_types": [
+                "code"
+              ],
+              "token_endpoint_auth_method": "none",
+              "scope": "apikeys.use"
+            },
+            "expect": {
+              "present": {
+                "client_id": "dcr_eyJ2IjoxLCJhIjoiaW50ZXJuZXRkYXRhIiwibiI6IkV4YW1wbGUgQ0xJIn0.bm90LWEtcmVhbC1tYWMtZXhhbXBsZS1vbmx5LTAxMjM",
+                "client_id_issued_at": 1792304178,
+                "client_name": "Example CLI",
+                "redirect_uris": [
+                  "http://127.0.0.1:8765/callback"
+                ],
+                "grant_types": [
+                  "authorization_code",
+                  "refresh_token"
+                ],
+                "response_types": [
+                  "code"
+                ],
+                "token_endpoint_auth_method": "none",
+                "scope": "apikeys.use"
+              },
+              "absent": []
+            }
+          },
+          {
+            "name": "rfc-minimum",
+            "status": 201,
+            "body": {
+              "client_id": "dcr_eyJ2IjoxLCJhIjoiaW50ZXJuZXRkYXRhIiwibiI6IkV4YW1wbGUgQ0xJIn0.bm90LWEtcmVhbC1tYWMtZXhhbXBsZS1vbmx5LTAxMjM",
+              "client_id_issued_at": 1792304178,
+              "client_name": "Example CLI",
+              "redirect_uris": [
+                "http://127.0.0.1:8765/callback"
+              ],
+              "token_endpoint_auth_method": "none"
+            },
+            "expect": {
+              "present": {
+                "client_id": "dcr_eyJ2IjoxLCJhIjoiaW50ZXJuZXRkYXRhIiwibiI6IkV4YW1wbGUgQ0xJIn0.bm90LWEtcmVhbC1tYWMtZXhhbXBsZS1vbmx5LTAxMjM",
+                "client_id_issued_at": 1792304178,
+                "client_name": "Example CLI",
+                "redirect_uris": [
+                  "http://127.0.0.1:8765/callback"
+                ],
+                "token_endpoint_auth_method": "none"
+              },
+              "absent": [
+                "grant_types",
+                "response_types",
+                "scope"
+              ]
+            }
+          },
+          {
+            "name": "issued-after-2038",
+            "status": 201,
+            "body": {
+              "client_id": "dcr_eyJ2IjoxLCJhIjoiaW50ZXJuZXRkYXRhIiwibiI6IkV4YW1wbGUgQ0xJIn0.bm90LWEtcmVhbC1tYWMtZXhhbXBsZS1vbmx5LTAxMjM",
+              "client_id_issued_at": 4102444800,
+              "client_name": "Example CLI",
+              "redirect_uris": [
+                "http://127.0.0.1:8765/callback"
+              ],
+              "token_endpoint_auth_method": "none"
+            },
+            "expect": {
+              "present": {
+                "client_id_issued_at": 4102444800
+              },
+              "absent": [
+                "scope"
+              ]
+            }
+          },
+          {
+            "name": "unknown-members-ignored",
+            "status": 200,
+            "body": {
+              "client_id": "dcr_eyJ2IjoxLCJhIjoiaW50ZXJuZXRkYXRhIiwibiI6IkV4YW1wbGUgQ0xJIn0.bm90LWEtcmVhbC1tYWMtZXhhbXBsZS1vbmx5LTAxMjM",
+              "client_id_issued_at": 1792304178,
+              "client_name": "Example CLI",
+              "redirect_uris": [
+                "http://127.0.0.1:8765/callback"
+              ],
+              "grant_types": [
+                "authorization_code",
+                "refresh_token"
+              ],
+              "response_types": [
+                "code"
+              ],
+              "token_endpoint_auth_method": "none",
+              "scope": "apikeys.use",
+              "client_secret_expires_at": 0,
+              "software_id": "example"
+            },
+            "expect": {
+              "present": {
+                "client_id": "dcr_eyJ2IjoxLCJhIjoiaW50ZXJuZXRkYXRhIiwibiI6IkV4YW1wbGUgQ0xJIn0.bm90LWEtcmVhbC1tYWMtZXhhbXBsZS1vbmx5LTAxMjM",
+                "scope": "apikeys.use"
+              },
+              "absent": []
+            }
+          }
+        ]
+      },
+      "unreadable": {
+        "why": "A 2xx register cannot read as its answer, with the client's retries at 0: the SDK's ordinary error (type client), kind server_error, carrying the status, after one request. Never a raw parser error, and never an empty registration. A member of the wrong type is unreadable at any depth, inside redirect_uris included, and an optional one too.",
+        "cases": [
+          {
+            "name": "html-page",
+            "status": 200,
+            "rawBody": "<html><body>Sign in</body></html>"
+          },
+          {
+            "name": "empty-body",
+            "status": 201,
+            "rawBody": ""
+          },
+          {
+            "name": "cut-off",
+            "status": 201,
+            "rawBody": "{\"client_id\":\"dcr_x\",\"client_id_is"
+          },
+          {
+            "name": "an-array",
+            "status": 201,
+            "body": []
+          },
+          {
+            "name": "empty-object",
+            "status": 201,
+            "body": {}
+          },
+          {
+            "name": "no-client-id",
+            "status": 201,
+            "body": {
+              "client_id_issued_at": 1792304178,
+              "client_name": "Example CLI",
+              "redirect_uris": [
+                "http://127.0.0.1:8765/callback"
+              ],
+              "token_endpoint_auth_method": "none"
+            }
+          },
+          {
+            "name": "no-client-id-issued-at",
+            "status": 201,
+            "body": {
+              "client_id": "dcr_eyJ2IjoxLCJhIjoiaW50ZXJuZXRkYXRhIiwibiI6IkV4YW1wbGUgQ0xJIn0.bm90LWEtcmVhbC1tYWMtZXhhbXBsZS1vbmx5LTAxMjM",
+              "client_name": "Example CLI",
+              "redirect_uris": [
+                "http://127.0.0.1:8765/callback"
+              ],
+              "token_endpoint_auth_method": "none"
+            }
+          },
+          {
+            "name": "no-client-name",
+            "status": 201,
+            "body": {
+              "client_id": "dcr_eyJ2IjoxLCJhIjoiaW50ZXJuZXRkYXRhIiwibiI6IkV4YW1wbGUgQ0xJIn0.bm90LWEtcmVhbC1tYWMtZXhhbXBsZS1vbmx5LTAxMjM",
+              "client_id_issued_at": 1792304178,
+              "redirect_uris": [
+                "http://127.0.0.1:8765/callback"
+              ],
+              "token_endpoint_auth_method": "none"
+            }
+          },
+          {
+            "name": "no-redirect-uris",
+            "status": 201,
+            "body": {
+              "client_id": "dcr_eyJ2IjoxLCJhIjoiaW50ZXJuZXRkYXRhIiwibiI6IkV4YW1wbGUgQ0xJIn0.bm90LWEtcmVhbC1tYWMtZXhhbXBsZS1vbmx5LTAxMjM",
+              "client_id_issued_at": 1792304178,
+              "client_name": "Example CLI",
+              "token_endpoint_auth_method": "none"
+            }
+          },
+          {
+            "name": "no-token-endpoint-auth-method",
+            "status": 201,
+            "body": {
+              "client_id": "dcr_eyJ2IjoxLCJhIjoiaW50ZXJuZXRkYXRhIiwibiI6IkV4YW1wbGUgQ0xJIn0.bm90LWEtcmVhbC1tYWMtZXhhbXBsZS1vbmx5LTAxMjM",
+              "client_id_issued_at": 1792304178,
+              "client_name": "Example CLI",
+              "redirect_uris": [
+                "http://127.0.0.1:8765/callback"
+              ]
+            }
+          },
+          {
+            "name": "issued-at-as-a-string",
+            "status": 201,
+            "body": {
+              "client_id": "dcr_eyJ2IjoxLCJhIjoiaW50ZXJuZXRkYXRhIiwibiI6IkV4YW1wbGUgQ0xJIn0.bm90LWEtcmVhbC1tYWMtZXhhbXBsZS1vbmx5LTAxMjM",
+              "client_id_issued_at": "1792304178",
+              "client_name": "Example CLI",
+              "redirect_uris": [
+                "http://127.0.0.1:8765/callback"
+              ],
+              "token_endpoint_auth_method": "none"
+            }
+          },
+          {
+            "name": "redirect-uris-not-a-list",
+            "status": 201,
+            "body": {
+              "client_id": "dcr_eyJ2IjoxLCJhIjoiaW50ZXJuZXRkYXRhIiwibiI6IkV4YW1wbGUgQ0xJIn0.bm90LWEtcmVhbC1tYWMtZXhhbXBsZS1vbmx5LTAxMjM",
+              "client_id_issued_at": 1792304178,
+              "client_name": "Example CLI",
+              "redirect_uris": "http://127.0.0.1:8765/callback",
+              "token_endpoint_auth_method": "none"
+            }
+          },
+          {
+            "name": "a-redirect-uri-not-a-string",
+            "status": 201,
+            "body": {
+              "client_id": "dcr_eyJ2IjoxLCJhIjoiaW50ZXJuZXRkYXRhIiwibiI6IkV4YW1wbGUgQ0xJIn0.bm90LWEtcmVhbC1tYWMtZXhhbXBsZS1vbmx5LTAxMjM",
+              "client_id_issued_at": 1792304178,
+              "client_name": "Example CLI",
+              "redirect_uris": [
+                1
+              ],
+              "token_endpoint_auth_method": "none"
+            }
+          },
+          {
+            "name": "scope-not-a-string",
+            "status": 201,
+            "body": {
+              "client_id": "dcr_eyJ2IjoxLCJhIjoiaW50ZXJuZXRkYXRhIiwibiI6IkV4YW1wbGUgQ0xJIn0.bm90LWEtcmVhbC1tYWMtZXhhbXBsZS1vbmx5LTAxMjM",
+              "client_id_issued_at": 1792304178,
+              "client_name": "Example CLI",
+              "redirect_uris": [
+                "http://127.0.0.1:8765/callback"
+              ],
+              "token_endpoint_auth_method": "none",
+              "scope": [
+                "apikeys.use"
+              ]
+            }
+          }
+        ]
+      },
+      "retries": [
+        {
+          "name": "register-retries-a-5xx",
+          "args": {
+            "redirectUris": [
+              "http://127.0.0.1:8765/callback"
+            ]
+          },
+          "responses": [
+            {
+              "status": 503,
+              "rawBody": ""
+            },
+            {
+              "status": 201,
+              "body": {
+                "client_id": "dcr_eyJ2IjoxLCJhIjoiaW50ZXJuZXRkYXRhIiwibiI6IkV4YW1wbGUgQ0xJIn0.bm90LWEtcmVhbC1tYWMtZXhhbXBsZS1vbmx5LTAxMjM",
+                "client_id_issued_at": 1792304178,
+                "client_name": "Example CLI",
+                "redirect_uris": [
+                  "http://127.0.0.1:8765/callback"
+                ],
+                "grant_types": [
+                  "authorization_code",
+                  "refresh_token"
+                ],
+                "response_types": [
+                  "code"
+                ],
+                "token_endpoint_auth_method": "none",
+                "scope": "apikeys.use"
+              }
+            }
+          ],
+          "expect": {
+            "requests": 2,
+            "outcome": "ok"
+          }
+        },
+        {
+          "name": "register-retries-an-unreadable-2xx",
+          "args": {
+            "redirectUris": [
+              "http://127.0.0.1:8765/callback"
+            ]
+          },
+          "responses": [
+            {
+              "status": 200,
+              "rawBody": "<html><body>Sign in</body></html>"
+            },
+            {
+              "status": 201,
+              "body": {
+                "client_id": "dcr_eyJ2IjoxLCJhIjoiaW50ZXJuZXRkYXRhIiwibiI6IkV4YW1wbGUgQ0xJIn0.bm90LWEtcmVhbC1tYWMtZXhhbXBsZS1vbmx5LTAxMjM",
+                "client_id_issued_at": 1792304178,
+                "client_name": "Example CLI",
+                "redirect_uris": [
+                  "http://127.0.0.1:8765/callback"
+                ],
+                "grant_types": [
+                  "authorization_code",
+                  "refresh_token"
+                ],
+                "response_types": [
+                  "code"
+                ],
+                "token_endpoint_auth_method": "none",
+                "scope": "apikeys.use"
+              }
+            }
+          ],
+          "expect": {
+            "requests": 2,
+            "outcome": "ok"
+          }
+        },
+        {
+          "name": "register-oauth-error-is-never-retried",
+          "args": {
+            "redirectUris": [
+              "http://127.0.0.1:8765/callback"
+            ]
+          },
+          "responses": [
+            {
+              "status": 400,
+              "body": {
+                "error": "slow_down",
+                "error_description": "too many requests; slow down and try again"
+              }
+            }
+          ],
+          "expect": {
+            "requests": 1,
+            "outcome": "oauth",
+            "errorCode": "slow_down"
+          }
+        }
+      ],
+      "errors": [
+        {
+          "name": "a-refused-redirect-uri",
+          "status": 400,
+          "body": {
+            "error": "invalid_redirect_uri",
+            "error_description": "redirect_uris[0] must be https, or http on a loopback address"
+          },
+          "expect": {
+            "type": "oauth",
+            "errorCode": "invalid_redirect_uri",
+            "errorDescription": "redirect_uris[0] must be https, or http on a loopback address",
+            "status": 400,
+            "kind": "bad_request",
+            "retryable": false,
+            "message": "invalid_redirect_uri: redirect_uris[0] must be https, or http on a loopback address"
+          }
+        },
+        {
+          "name": "refused-metadata",
+          "status": 400,
+          "body": {
+            "error": "invalid_client_metadata",
+            "error_description": "grant_types must include authorization_code"
+          },
+          "expect": {
+            "type": "oauth",
+            "errorCode": "invalid_client_metadata",
+            "errorDescription": "grant_types must include authorization_code",
+            "status": 400,
+            "kind": "bad_request",
+            "retryable": false,
+            "message": "invalid_client_metadata: grant_types must include authorization_code"
+          }
+        },
+        {
+          "name": "a-server-without-registration",
+          "status": 404,
+          "rawBody": "Not Found",
+          "expect": {
+            "type": "client",
+            "status": 404,
+            "kind": "bad_request",
+            "retryable": false
+          }
+        }
+      ]
     }
   },
   "bogons": {

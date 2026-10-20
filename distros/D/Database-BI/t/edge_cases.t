@@ -1335,4 +1335,659 @@ subtest 'upload_file -- two sequential uploads both succeed (no $@ accumulation)
 	isnt $res_a->{path}, $res_b->{path},    'the two paths are distinct (no collision)';
 };
 
+# ===========================================================================
+# Section 24: Geocode.pm -- hostile constructor inputs
+#
+# Strategy: exhaust every documented croak path in new(), then confirm that
+# harmless-looking bad inputs (undef geocoder, unknown key) are either
+# silently accepted or rejected cleanly rather than causing a segfault,
+# a half-initialised object, or a misleading error message.
+# ===========================================================================
+
+use_ok('Database::BI::Model::Geocode');
+
+Readonly my $GEOCODE => 'Database::BI::Model::Geocode';
+
+# Stubs defined at file scope so they survive `package main;` restoration.
+{
+	package EC::GeoPoint;
+	sub new  { my ($cls, %h) = @_; bless \%h, $cls }
+	sub latitude  { $_[0]->{latitude}  }
+	sub longitude { $_[0]->{longitude} }
+	sub database  { $_[0]->{database}  }
+
+	package EC::FullGeocoder;
+	sub new  { bless { calls => [] }, shift }
+	sub valid_location { defined $_[1] && length $_[1] && $_[1] !~ /\A\d+\z/ }
+	sub geocode_many   {
+		my ($self, $vals, %o) = @_;
+		push @{ $self->{calls} }, [@$vals];
+		return {};
+	}
+
+	package EC::OnlyValidLocation;
+	sub new  { bless {}, shift }
+	sub valid_location { 1 }
+	# geocode_many intentionally absent
+
+	package EC::OnlyGeocodeManyNotValid;
+	sub new  { bless {}, shift }
+	sub geocode_many { return {} }
+	# valid_location intentionally absent
+}
+
+subtest 'Geocode new() -- geocoder=string (non-object) croaks error_geocoder_interface' => sub {
+	# A scalar is not an object; blessed() will be false; ->can() will fail.
+	throws_ok { $GEOCODE->new(geocoder => 'not_an_object') }
+		qr/geocoder/i,
+		'plain string rejected as geocoder';
+};
+
+subtest 'Geocode new() -- geocoder=0 (false scalar) croaks' => sub {
+	throws_ok { $GEOCODE->new(geocoder => 0) }
+		qr/geocoder|interface/i,
+		'zero rejected as geocoder';
+};
+
+subtest 'Geocode new() -- geocoder missing geocode_many() croaks naming the method' => sub {
+	throws_ok { $GEOCODE->new(geocoder => EC::OnlyValidLocation->new()) }
+		qr/geocode_many/,
+		'missing geocode_many named in error';
+};
+
+subtest 'Geocode new() -- geocoder missing valid_location() croaks naming the method' => sub {
+	throws_ok { $GEOCODE->new(geocoder => EC::OnlyGeocodeManyNotValid->new()) }
+		qr/valid_location/,
+		'missing valid_location named in error';
+};
+
+subtest 'Geocode new() -- undef geocoder key is silently ignored (loads real geocoder lazily)' => sub {
+	# An explicitly undef geocoder= is a no-op; the object builds fine.
+	my $g;
+	lives_ok { $g = $GEOCODE->new(geocoder => undef) }
+		'undef geocoder= does not croak';
+	ok defined($g) && ref($g), 'object returned';
+};
+
+subtest 'Geocode new() -- unknown constructor key is rejected by Params::Validate::Strict' => sub {
+	throws_ok { $GEOCODE->new(totally_unknown => 'value') }
+		qr/unknown|unexpected|not.*allowed|invalid/i,
+		'unknown key rejected at construction';
+};
+
+subtest 'Geocode new() -- circular reference as geocoder croaks interface error' => sub {
+	my $circ = {};
+	$circ->{self} = $circ;    # circular, but still a plain hashref -- not an object
+	throws_ok { $GEOCODE->new(geocoder => $circ) }
+		qr/geocoder|interface/i,
+		'circular-ref hashref (not a blessed object) rejected';
+};
+
+# ===========================================================================
+# Section 25: Geocode.pm -- hostile resolve_values inputs
+#
+# Strategy: exhaust every early-exit guard; verify count invariants under
+# pathological inputs; confirm that huge value lists do not trigger runaway
+# memory or CPU via the cap; check that invalid "max=" values all croak
+# with the documented error, not a confusing Perl numeric warning.
+# ===========================================================================
+
+Readonly my $STUB => EC::FullGeocoder->new();
+Readonly my $G    => $GEOCODE->new(geocoder => $STUB, openaddr => 'test');
+
+subtest 'resolve_values -- undef input croaks error_values_arrayref' => sub {
+	throws_ok { $G->resolve_values(undef) }
+		qr/values.*arrayref|arrayref.*values/i,
+		'undef rejected';
+};
+
+subtest 'resolve_values -- scalar string input croaks error_values_arrayref' => sub {
+	throws_ok { $G->resolve_values('Ramsgate') }
+		qr/values.*arrayref|arrayref.*values/i,
+		'plain string rejected';
+};
+
+subtest 'resolve_values -- hashref input croaks error_values_arrayref' => sub {
+	throws_ok { $G->resolve_values({ city => 'Ramsgate' }) }
+		qr/values.*arrayref|arrayref.*values/i,
+		'hashref rejected';
+};
+
+subtest 'resolve_values -- empty arrayref returns zero counts without croak' => sub {
+	my $r;
+	lives_ok { $r = $G->resolve_values([]) } 'empty arrayref does not croak';
+	is $r->{counts}{distinct},     0, 'distinct=0';
+	is $r->{counts}{attempted},    0, 'attempted=0';
+	is $r->{counts}{not_attempted},0, 'not_attempted=0';
+};
+
+subtest 'resolve_values -- arrayref of all-undef values: all skipped, no geocoder call' => sub {
+	my $stub = EC::FullGeocoder->new();
+	my $g    = $GEOCODE->new(geocoder => $stub, openaddr => 'test');
+	my $r    = $g->resolve_values([undef, undef, undef]);
+
+	is $r->{counts}{skipped}, 1, 'three undefs deduplicate to one skipped (empty-key)';
+	is scalar(@{ $stub->{calls} }), 0, 'geocoder not called for all-undef input';
+};
+
+subtest 'resolve_values -- binary junk bytes do not crash (treated as a place name)' => sub {
+	# An invalid UTF-8 byte sequence is still a defined, non-empty string; it
+	# must be handed to valid_location() without causing Perl to die.
+	my $r;
+	lives_ok {
+		$r = $G->resolve_values(["\x80\xFF\xFE"]);
+	} 'binary junk bytes do not crash';
+	# valid_location likely refuses it (digits-only check passes, but geocoder
+	# returns no result), so it ends up in unresolved or resolved; either is fine.
+	ok defined($r->{counts}), 'counts key present';
+};
+
+subtest 'resolve_values -- max=0 croaks error_max_invalid' => sub {
+	throws_ok { $G->resolve_values(['Ramsgate'], max => 0) }
+		qr/max.*0|0.*invalid|positive.*integer/i,
+		'max=0 rejected';
+};
+
+subtest 'resolve_values -- max=-1 croaks error_max_invalid' => sub {
+	throws_ok { $G->resolve_values(['Ramsgate'], max => -1) }
+		qr/max.*-1|-1.*invalid|positive.*integer/i,
+		'max=-1 rejected';
+};
+
+subtest 'resolve_values -- max=1.5 (non-integer) croaks error_max_invalid' => sub {
+	throws_ok { $G->resolve_values(['Ramsgate'], max => 1.5) }
+		qr/max|invalid|positive.*integer/i,
+		'fractional max rejected';
+};
+
+subtest 'resolve_values -- max="abc" croaks error_max_invalid' => sub {
+	throws_ok { $G->resolve_values(['Ramsgate'], max => 'abc') }
+		qr/max|invalid|positive.*integer/i,
+		'non-numeric max rejected';
+};
+
+subtest 'resolve_values -- max="" (empty string) croaks error_max_invalid' => sub {
+	throws_ok { $G->resolve_values(['Ramsgate'], max => '') }
+		qr/max|invalid|positive.*integer/i,
+		'empty-string max rejected';
+};
+
+subtest 'resolve_values -- pure-digit string is refused by valid_location and skipped' => sub {
+	# "42" matches /\A\d+\z/ in the stub's valid_location -> @skipped
+	# It must NOT appear in the cache or counts.attempted.
+	my $stub = EC::FullGeocoder->new();
+	my $g    = $GEOCODE->new(geocoder => $stub, openaddr => 'test');
+	my $r    = $g->resolve_values(['42', '100', '0']);
+
+	is $r->{counts}{attempted}, 0,
+		'pure-digit values are all skipped; geocoder never called';
+	is scalar(@{ $stub->{calls} }), 0,
+		'geocode_many not called when every value is digit-only';
+	ok !exists($r->{cache}{'42'}), '"42" absent from returned cache';
+};
+
+subtest 'resolve_values -- circular ref in values array is treated as undef/skipped' => sub {
+	my $circ = [];
+	push @$circ, $circ;    # self-referential arrayref
+	my $r;
+	lives_ok { $r = $G->resolve_values([$circ]) } 'circular ref in values does not crash';
+	# A reference is not a valid location; it should be skipped.
+	is $r->{counts}{skipped}, 1, 'circular-ref value counted as skipped';
+};
+
+subtest 'resolve_values -- 5000-element list capped to DEFAULT_MAX; no runaway' => sub {
+	my @big = map { "City$_" } 1..5000;
+	my $stub = EC::FullGeocoder->new();
+	my $g    = $GEOCODE->new(geocoder => $stub, openaddr => 'test');
+	my $r;
+	lives_ok { $r = $g->resolve_values(\@big) } '5000 values do not crash';
+	# DEFAULT_MAX = 500; at most 500 should be attempted.
+	cmp_ok $r->{counts}{attempted}, '<=', 500, 'attempted <= DEFAULT_MAX';
+	cmp_ok $r->{counts}{not_attempted}, '>=', 4500, 'rest held back';
+};
+
+# ===========================================================================
+# Section 26: Geocode.pm -- hostile resolve_column inputs
+# ===========================================================================
+
+subtest 'resolve_column -- non-arrayref rows argument croaks error_rows_arrayref' => sub {
+	throws_ok { $G->resolve_column('not_an_array', 'city') }
+		qr/rows.*arrayref|arrayref.*rows/i,
+		'scalar rows rejected';
+
+	throws_ok { $G->resolve_column(undef, 'city') }
+		qr/rows.*arrayref|arrayref.*rows/i,
+		'undef rows rejected';
+};
+
+subtest 'resolve_column -- empty column name croaks error_column_required' => sub {
+	throws_ok { $G->resolve_column([], '') }
+		qr/column|required/i,
+		'empty column string rejected';
+};
+
+subtest 'resolve_column -- undef column name croaks error_column_required' => sub {
+	throws_ok { $G->resolve_column([], undef) }
+		qr/column|required/i,
+		'undef column rejected';
+};
+
+subtest 'resolve_column -- column not in any row croaks error_map_loc_column' => sub {
+	throws_ok { $G->resolve_column([{ name => 'Alice' }], 'city') }
+		qr/city/,
+		'missing column name embedded in error';
+};
+
+subtest 'resolve_column -- XSS payload as column name -> croak embeds it verbatim (not executed)' => sub {
+	my $xss = '<script>alert(1)</script>';
+	my $err = '';
+	eval { $G->resolve_column([{ name => 'Alice' }], $xss) };
+	$err = $@;
+	like $err, qr/\Q$xss\E/, 'XSS payload appears verbatim in croaked error (not parsed as HTML)';
+};
+
+subtest 'resolve_column -- column NUL byte: treated as distinct name, not found -> croak' => sub {
+	my $col_nul = "city\x00name";
+	throws_ok { $G->resolve_column([{ city => 'Ramsgate' }], $col_nul) }
+		qr/column|not in/i,
+		'NUL-byte column name produces croak, not crash';
+};
+
+subtest 'resolve_column -- empty rows array returns empty result without croak' => sub {
+	my $r;
+	lives_ok { $r = $G->resolve_column([], 'city') } 'empty rows do not croak';
+	is $r->{counts}{rows}, 0, 'rows=0';
+};
+
+subtest 'resolve_column -- rows that are not hashrefs produce undef cells (skipped)' => sub {
+	# A row that is not a hashref contributes an undef cell; it must not crash.
+	# The column IS found in at least one actual hashref row, so no croak.
+	my $r;
+	lives_ok {
+		$r = $G->resolve_column(
+			[
+				'a string',            # not a hashref -- contributes undef cell
+				42,                    # not a hashref
+				{ city => 'Ramsgate' },# valid row -- establishes column presence
+			],
+			'city',
+		);
+	} 'non-hashref rows do not crash resolve_column';
+
+	is $r->{counts}{rows}, 3, 'all three rows counted';
+};
+
+# ===========================================================================
+# Section 27: Geocode.pm -- cache poisoning
+#
+# Strategy: inject crafted cache entries that should NOT be treated as
+# resolved positions (wrong type, undef elements, out-of-range coords).
+# Confirm that _has_position() rejects them cleanly.
+# ===========================================================================
+
+subtest 'resolve_values -- cache entry [undef, 1.0] is NOT treated as resolved' => sub {
+	my $stub = EC::FullGeocoder->new();
+	my $g    = $GEOCODE->new(geocoder => $stub, openaddr => 'test');
+	# Inject a poisoned cache: [undef, 1.0] should fail _has_position.
+	my $r = $g->resolve_values(['Ramsgate'],
+		cache => { 'Ramsgate' => [undef, 1.0] });
+	# The position is invalid -> must not be counted as cached-resolved.
+	# It should be treated the same as the 0-sentinel (cached-unresolved).
+	is $r->{counts}{resolved}, 0,
+		'[undef, 1.0] cache entry is NOT counted as resolved';
+};
+
+subtest 'resolve_values -- cache entry [] (empty array) is NOT treated as resolved' => sub {
+	my $stub = EC::FullGeocoder->new();
+	my $g    = $GEOCODE->new(geocoder => $stub, openaddr => 'test');
+	my $r = $g->resolve_values(['Ramsgate'],
+		cache => { 'Ramsgate' => [] });
+	is $r->{counts}{resolved}, 0,
+		'empty-array cache entry is NOT counted as resolved';
+};
+
+subtest 'resolve_values -- cache entry 0 (zero sentinel) means already-tried-unresolved' => sub {
+	# 0 means "looked up and not found"; it must NOT be re-attempted.
+	my $stub = EC::FullGeocoder->new();
+	my $g    = $GEOCODE->new(geocoder => $stub, openaddr => 'test');
+	my $r    = $g->resolve_values(['Ramsgate'],
+		cache => { 'Ramsgate' => 0 });
+	is scalar(@{ $stub->{calls} }), 0, 'geocoder not called for 0-sentinel entry';
+	is $r->{counts}{unresolved}, 1, 'value counted as unresolved from cache';
+	is $r->{counts}{cached},     1, 'cached=1 (the 0 sentinel counts as a cache hit)';
+};
+
+subtest 'resolve_values -- cache entry "string" (not array, not 0) is treated as a cache hit but not resolved' => sub {
+	# A truthy non-array, non-zero value must NOT cause _has_position to return true.
+	my $stub = EC::FullGeocoder->new();
+	my $g    = $GEOCODE->new(geocoder => $stub, openaddr => 'test');
+	my $r    = $g->resolve_values(['Ramsgate'],
+		cache => { 'Ramsgate' => 'some string' });
+	# "some string" is truthy but not an arrayref -> _has_position false
+	# -> treated as unresolved-from-cache; geocoder must not be called.
+	is scalar(@{ $stub->{calls} }), 0,
+		'geocoder not called when cache has non-array entry';
+};
+
+# ===========================================================================
+# Section 28: /map route -- hostile HTTP inputs
+#
+# Strategy: probe every documented guard condition via HTTP; verify that XSS
+# payloads in URL parameters are HTML-encoded in the response and never
+# reflected raw; confirm that the route never 500s on hostile input.
+# ===========================================================================
+
+# Build one reusable test CSV in the shared temp directory.
+Readonly my $MAP_TMPDIR   => tempdir(CLEANUP => 1);
+Readonly my $MAP_PLACE_CSV => "$MAP_TMPDIR/map_edge.csv";
+Mojo::File->new($MAP_PLACE_CSV)->spew(
+	"id,city,lat,lon\n"
+	. "1,Ramsgate,51.336,1.416\n"
+	. "2,Margate,51.384,1.386\n"
+	. "3,<script>alert(1)<\/script>,51.5,0.1\n"    # XSS in data value
+);
+Readonly my $MAP_SPEC => 'path:' . $MAP_PLACE_CSV;
+
+# Stub geocoder that knows Ramsgate and Margate.
+{
+	package EC::MapGeocoder;
+	sub new  { bless { calls => 0 }, shift }
+	sub valid_location { defined $_[1] && length $_[1] && $_[1] !~ /\A\d+\z/ }
+	sub geocode_many   {
+		my ($self, $vals, %o) = @_;
+		$self->{calls}++;
+		return {
+			'Ramsgate'         => EC::GeoPoint->new(latitude => 51.336, longitude => 1.416, database => 'T'),
+			'Margate'          => EC::GeoPoint->new(latitude => 51.384, longitude => 1.386, database => 'T'),
+			'<script>alert(1)</script>' => undef,
+		};
+	}
+}
+
+subtest 'GET /map -- back=javascript:alert(1) is blocked, not reflected in href' => sub {
+	$t->app->config->{geocoder}  = EC::MapGeocoder->new();
+	$t->app->config->{openaddr}  = 'test';
+	$t->app->config->{model_dir} = tempdir(CLEANUP => 1);
+
+	my $l = url_escape($MAP_SPEC);
+	my $body = $t->get_ok("/map?l=$l&lat=lat&lon=lon&back=" . url_escape('javascript:alert(1)'))
+	             ->status_is(200)
+	             ->tx->res->body;
+
+	unlike $body // '', qr/href=['"]javascript:/i,
+		'javascript: scheme not reflected in any href attribute';
+
+	delete $t->app->config->{geocoder};
+	delete $t->app->config->{openaddr};
+};
+
+subtest 'GET /map -- back=data:text/html,XSS is blocked' => sub {
+	$t->app->config->{geocoder}  = EC::MapGeocoder->new();
+	$t->app->config->{openaddr}  = 'test';
+	$t->app->config->{model_dir} = tempdir(CLEANUP => 1);
+
+	my $l = url_escape($MAP_SPEC);
+	my $body = $t->get_ok("/map?l=$l&lat=lat&lon=lon&back=" . url_escape('data:text/html,<script>'))
+	             ->status_is(200)
+	             ->tx->res->body;
+
+	unlike $body // '', qr/href=['"]data:/i,
+		'data: scheme not reflected in any href attribute';
+
+	delete $t->app->config->{geocoder};
+	delete $t->app->config->{openaddr};
+};
+
+subtest 'GET /map -- XSS payload in city name data cell is HTML-encoded in response' => sub {
+	$t->app->config->{geocoder}  = EC::MapGeocoder->new();
+	$t->app->config->{openaddr}  = 'test';
+	$t->app->config->{model_dir} = tempdir(CLEANUP => 1);
+
+	my $l = url_escape($MAP_SPEC);
+	my $body = $t->get_ok("/map?l=$l&loc=city")
+	             ->status_is(200)
+	             ->tx->res->body;
+
+	# The raw (un-encoded) <script> tag must never appear verbatim in the response.
+	# If the geocoder did not resolve the XSS city (it returned undef), the value
+	# may not appear in the response at all -- that is also safe.
+	unlike $body // '', qr/<script>alert\(1\)<\/script>/,
+		'raw <script> tag absent from response';
+
+	delete $t->app->config->{geocoder};
+	delete $t->app->config->{openaddr};
+};
+
+subtest 'GET /map -- popup= with XSS column name does not inject into href' => sub {
+	$t->app->config->{geocoder}  = EC::MapGeocoder->new();
+	$t->app->config->{openaddr}  = 'test';
+	$t->app->config->{model_dir} = tempdir(CLEANUP => 1);
+
+	my $l    = url_escape($MAP_SPEC);
+	my $body = $t->get_ok(
+		"/map?l=$l&loc=city&popup=" . url_escape('<script>alert(2)</script>')
+	)->status_is(200)->tx->res->body;
+
+	unlike $body // '', qr/<script>alert\(2\)/,
+		'XSS in popup= is not reflected raw';
+
+	delete $t->app->config->{geocoder};
+	delete $t->app->config->{openaddr};
+};
+
+subtest 'GET /map -- loc= with empty string returns 400 error_map_source' => sub {
+	my $l = url_escape($MAP_SPEC);
+	$t->get_ok("/map?l=$l&loc=")
+	  ->status_is(400, '400 for empty loc=');
+};
+
+subtest 'GET /map -- lat= without lon= returns 400 error_map_coordinates' => sub {
+	my $l = url_escape($MAP_SPEC);
+	$t->get_ok("/map?l=$l&lat=lat")
+	  ->status_is(400, '400 for lat= alone');
+};
+
+subtest 'GET /map -- lon= without lat= returns 400 error_map_coordinates' => sub {
+	my $l = url_escape($MAP_SPEC);
+	$t->get_ok("/map?l=$l&lon=lon")
+	  ->status_is(400, '400 for lon= alone');
+};
+
+subtest 'GET /map -- l= missing entirely returns 404' => sub {
+	$t->get_ok('/map?lat=lat&lon=lon')
+	  ->status_is(404, '404 when data source absent');
+};
+
+subtest 'GET /map -- max=0 does not croak: 0 is clamped or ignored' => sub {
+	# The controller reads max via _map_limit which clamps to DEFAULT_MAP_MAX_MARKERS;
+	# a user-supplied max=0 should not cause a 500.
+	$t->app->config->{geocoder}  = EC::MapGeocoder->new();
+	$t->app->config->{openaddr}  = 'test';
+	$t->app->config->{model_dir} = tempdir(CLEANUP => 1);
+
+	my $l = url_escape($MAP_SPEC);
+	my $res = $t->get_ok("/map?l=$l&lat=lat&lon=lon&max=0");
+	# Controller accepts max=0 at the HTTP layer; it is clamped by _map_limit.
+	cmp_ok $res->tx->res->code, '!=', 500, 'max=0 does not produce 500';
+
+	delete $t->app->config->{geocoder};
+	delete $t->app->config->{openaddr};
+};
+
+subtest 'GET /map -- NUL byte in loc= column name returns 400 (column not found)' => sub {
+	$t->app->config->{geocoder}  = EC::MapGeocoder->new();
+	$t->app->config->{openaddr}  = 'test';
+	$t->app->config->{model_dir} = tempdir(CLEANUP => 1);
+
+	my $l = url_escape($MAP_SPEC);
+	$t->get_ok("/map?l=$l&loc=city%00injected")
+	  ->status_is(400, '400 when NUL-byte column name is not found');
+
+	delete $t->app->config->{geocoder};
+	delete $t->app->config->{openaddr};
+};
+
+# ===========================================================================
+# Section 29: Geocode.pm -- models.json filesystem hostility
+#
+# Strategy: point model_dir at hostile filesystem targets and confirm that
+# map_view returns 200 (not 500) with warn_map_cache_unwritten message rather
+# than crashing the server.  Uses Test::Permissions so the test skips
+# gracefully on systems where permission-revoking is impossible (e.g. root).
+# ===========================================================================
+
+use Test::Permissions qw(skip_unless_can_revoke with_revoked);
+
+subtest 'GET /map -- unwritable model_dir: 200 + warn_map_cache_unwritten' => sub {
+	my $ro_dir = tempdir(CLEANUP => 1);
+
+	SKIP: {
+		# 'create' revokes the ability to create new files inside the directory
+		# (chmod 0500).  'write' is for file content; 'create' is for directories.
+		# skip_unless_can_revoke skips when the OS cannot actually revoke access
+		# (running as root, fakeroot, some FUSE mounts).
+		skip_unless_can_revoke('create', 3, $ro_dir);
+
+		my $stub = EC::MapGeocoder->new();
+		$t->app->config->{geocoder} = $stub;
+		$t->app->config->{openaddr} = 'test';
+
+		with_revoked('create', $ro_dir, sub {
+			$t->app->config->{model_dir} = $ro_dir;
+
+			my $l    = url_escape($MAP_SPEC);
+			my $body = $t->get_ok("/map?l=$l&loc=city")
+			             ->status_is(200, '200 even when model_dir is unwritable')
+			             ->tx->res->body;
+
+			like $body // '', qr/cache|model|remember/i,
+				'warn_map_cache_unwritten message appears in rendered page';
+		});
+
+		delete $t->app->config->{geocoder};
+		delete $t->app->config->{openaddr};
+	}
+
+	# Always run at least one assertion so Test::Most sees a non-empty subtest
+	# even when skip_unless_can_revoke skips all the inner assertions.
+	pass('section 29.1 filesystem-hostility check completed (or skipped on this OS)');
+};
+
+subtest 'GET /map -- model_dir is a file (not a directory): 200 + warn_map_cache_unwritten' => sub {
+	# When model_dir points at a plain file, mkdir will fail and the write is
+	# refused.  map_view must survive and report the condition.
+	my $not_a_dir = File::Temp->new(UNLINK => 1)->filename;
+	Mojo::File->new($not_a_dir)->spew('{}');   # make it a regular file
+
+	$t->app->config->{geocoder}  = EC::MapGeocoder->new();
+	$t->app->config->{openaddr}  = 'test';
+	$t->app->config->{model_dir} = $not_a_dir;
+
+	my $l    = url_escape($MAP_SPEC);
+	my $body = $t->get_ok("/map?l=$l&loc=city")
+	             ->status_is(200, '200 when model_dir is a plain file, not a directory')
+	             ->tx->res->body;
+
+	like $body // '', qr/cache|model|remember|Ramsgate|Margate/i,
+		'response contains map content or cache warning';
+
+	$t->app->config->{model_dir} = tempdir(CLEANUP => 1);
+	delete $t->app->config->{geocoder};
+	delete $t->app->config->{openaddr};
+};
+
+subtest 'GET /map -- pre-existing corrupted models.json is overwritten safely' => sub {
+	# A corrupted (non-JSON) models.json must not crash _read_models(); the
+	# controller must treat it as an empty model store and proceed.
+	my $dir = tempdir(CLEANUP => 1);
+	Mojo::File->new("$dir/models.json")->spew('NOT VALID JSON {{{{');
+
+	$t->app->config->{geocoder}  = EC::MapGeocoder->new();
+	$t->app->config->{openaddr}  = 'test';
+	$t->app->config->{model_dir} = $dir;
+
+	my $l = url_escape($MAP_SPEC);
+	my $body = $t->get_ok("/map?l=$l&loc=city")
+	             ->status_is(200, '200 even with corrupted models.json')
+	             ->tx->res->body;
+
+	# After a successful request the file must now be valid JSON.
+	my $raw = Mojo::File->new("$dir/models.json")->slurp;
+	my $ok  = eval { Mojo::JSON::decode_json($raw); 1 };
+	ok $ok, 'models.json replaced with valid JSON after corrupted-file recovery';
+
+	$t->app->config->{model_dir} = tempdir(CLEANUP => 1);
+	delete $t->app->config->{geocoder};
+	delete $t->app->config->{openaddr};
+};
+
+# ===========================================================================
+# Section 30: _numeric_cell hostile inputs
+#
+# Strategy: probe the boundary between "valid numeric" and "unparseable"
+# with every edge value that has historically caused silent mis-parses or
+# incorrect sign handling.
+# ===========================================================================
+
+Readonly my $NUMERIC_CELL =>
+	\&Database::BI::Controller::Dashboard::_numeric_cell;
+
+subtest '_numeric_cell -- standard positive integer' => sub {
+	is $NUMERIC_CELL->('42'),   42,   'plain integer';
+	is $NUMERIC_CELL->('0'),     0,   'zero';
+	is $NUMERIC_CELL->('1000'), 1000, 'four-digit integer';
+};
+
+subtest '_numeric_cell -- currency and comma-separated values' => sub {
+	is $NUMERIC_CELL->('$1,234.56'), 1234.56, 'dollar sign and commas stripped';
+	is $NUMERIC_CELL->('1,000'),     1000,    'commas only stripped';
+	is $NUMERIC_CELL->('GBP 9.99'),  9.99,    'currency prefix stripped';
+};
+
+subtest '_numeric_cell -- accounting-notation negatives' => sub {
+	is $NUMERIC_CELL->('(1234.56)'), -1234.56, 'plain accounting negative';
+	is $NUMERIC_CELL->('($1,234)'),  -1234,    'dollar accounting negative';
+};
+
+subtest '_numeric_cell -- standard negatives' => sub {
+	is $NUMERIC_CELL->('-50'),     -50,    'dash-negative integer';
+	is $NUMERIC_CELL->('-1.23'),   -1.23,  'dash-negative float';
+};
+
+subtest '_numeric_cell -- undef/empty/whitespace returns undef' => sub {
+	is $NUMERIC_CELL->(undef), undef, 'undef -> undef';
+	is $NUMERIC_CELL->(''),    undef, 'empty string -> undef';
+	is $NUMERIC_CELL->('   '), undef, 'whitespace-only -> undef';
+};
+
+subtest '_numeric_cell -- non-numeric strings return undef' => sub {
+	is $NUMERIC_CELL->('Ramsgate'),  undef, 'place name -> undef';
+	is $NUMERIC_CELL->('N/A'),       undef, 'N/A -> undef';
+	is $NUMERIC_CELL->('<script>'),  undef, 'XSS payload -> undef';
+};
+
+# _numeric_cell strips every character that is not \d, '.', or '-', so
+# scientific notation '1e5' loses the 'e' and becomes '15', not 100000 and
+# not undef.  This is intentional for financial-data columns where 'e' has
+# no meaning.
+subtest '_numeric_cell -- scientific notation: e stripped, not interpreted' => sub {
+	is $NUMERIC_CELL->('1e5'),   15, '1e5 -> 15 (e stripped)';
+	is $NUMERIC_CELL->('2.5e3'), 2.53, '2.5e3 -> 2.53 (e stripped)';
+};
+
+subtest '_numeric_cell -- large values do not overflow or warn' => sub {
+	my $big = '9' x 30;
+	my $r;
+	lives_ok { $r = $NUMERIC_CELL->($big) } '30-digit string does not crash';
+	ok defined($r), '30-digit value parses as a number';
+};
+
+subtest '_numeric_cell -- dot-only string returns undef' => sub {
+	is $NUMERIC_CELL->('.'), undef, '"." alone is not a valid number';
+};
+
+subtest '_numeric_cell -- multiple dots return undef' => sub {
+	is $NUMERIC_CELL->('1.2.3'), undef, '"1.2.3" is not a valid number';
+};
+
 done_testing();

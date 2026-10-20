@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.61';
+our $VERSION = '0.62';
 our @ISA = ('DBI::db');
 
 # The wrappers are C (include/punk/punk_dbiobs.h + xs/dbi.xs), installed into
@@ -63,6 +63,26 @@ A statement is reported as having succeeded when it ran. These methods return
 data rather than a status, and a query that matched no rows has not failed;
 one that went wrong raised, because C<RaiseError> is this framework's default,
 and the wrapper reports that before rethrowing.
+
+=head1 METHODS
+
+Each takes the arguments and returns the values of the L<DBI> method of the
+same name, which it calls; each reports the statement to the observer,
+before and after, and rethrows a die once that is reported.
+
+=head2 do($sql, \%attr?, @bind)
+
+=head2 selectall_arrayref($sql, \%attr?, @bind)
+
+=head2 selectall_hashref($sql, $key_field, \%attr?, @bind)
+
+=head2 selectcol_arrayref($sql, \%attr?, @bind)
+
+=head2 selectrow_array($sql, \%attr?, @bind)
+
+=head2 selectrow_arrayref($sql, \%attr?, @bind)
+
+=head2 selectrow_hashref($sql, \%attr?, @bind)
 
 =head1 SEE ALSO
 

@@ -36,8 +36,7 @@ class WebUI {
     use JSON::PP qw[encode_json];
     #
     my $lib = $webui->libpath;
-    typedef webui_events =>
-        Enum [ 'WEBUI_EVENT_DISCONNECTED', 'WEBUI_EVENT_CONNECTED', 'WEBUI_EVENT_MOUSE_CLICK', 'WEBUI_EVENT_NAVIGATION', 'WEBUI_EVENT_CALLBACK' ];
+    typedef webui_events  => Enum [ map { 'WEBUI_EVENT_' . $_ } qw[DISCONNECTED CONNECTED MOUSE_CLICK NAVIGATION CALLBACK] ];
     typedef webui_event_t => Struct [ window => Size_t, event_type => Size_t, element => String, event_number => Size_t, bind_id => Size_t ];
     affix $lib, webui_new_window => [], Size_t;
     affix $lib, webui_show       => [ Size_t, String ], Bool;
@@ -143,7 +142,7 @@ my $html = <<~'HTML';
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>WebUI - Modern Perl Demo</title>
+    <title>WebUI · Modern Perl Demo</title>
     <script src="webui.js"></script>
     <style>
       :root {

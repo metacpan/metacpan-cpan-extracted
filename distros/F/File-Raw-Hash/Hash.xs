@@ -685,6 +685,35 @@ BOOT:
     hash_plugin.record_fn = hash_record_cb;
     hash_plugin.stream_fn = hash_stream_cb;
     file_register_plugin(aTHX_ &hash_plugin);
+    {
+        /* The CPU's SHA instructions when it has them; FRH_PORTABLE set true
+         * in the environment keeps the C. Read from %ENV, not getenv(), which
+         * does not see %ENV everywhere. */
+        SV **svp = hv_fetchs(GvHVn(PL_envgv), "FRH_PORTABLE", 0);
+        int portable = svp && SvTRUE(*svp);
+        sha256_select(portable);
+        sha1_select(portable);
+    }
+
+SV *
+implementation()
+    CODE:
+    {
+        /* Which code computes each algorithm: "portable" (C), or the name of
+         * the CPU instructions in use. */
+        HV *hv = newHV();
+        int i, n = FRH_ABI.algo_count();
+        for (i = 0; i < n; i++) {
+            const frh_algo_t *a = FRH_ABI.algo_by_id(i);
+            const char *impl = !strcmp(a->name, "sha256") ? sha256_implementation()
+                             : !strcmp(a->name, "sha1")   ? sha1_implementation()
+                             : "portable";
+            (void)hv_store(hv, a->name, (I32)strlen(a->name), newSVpv(impl, 0), 0);
+        }
+        RETVAL = newRV_noinc((SV *)hv);
+    }
+    OUTPUT:
+        RETVAL
 
 IV
 _abi_ptr()
@@ -877,5 +906,59 @@ _test_record_one(record_sv, ...)
         } else {
             RETVAL = result;
         }
+    OUTPUT:
+        RETVAL
+
+SV *
+_test_feed(algo_sv, data_sv, offset, ...)
+        SV *algo_sv
+        SV *data_sv
+        IV offset
+    PREINIT:
+        STRLEN nlen, len, done = 0;
+        const char *name, *data;
+        const frh_algo_t *a;
+        void *r;
+        unsigned char *mem, *buf, out[HASH_MAX_DIGEST_SIZE], *outs[1];
+        char hex[HASH_MAX_DIGEST_SIZE * 2 + 1];
+        int id, k = 3;
+        size_t j;
+    CODE:
+        /* For the oracle tests: digest data_sv through the C ABI's
+         * runner, from a buffer offset bytes past an aligned start,
+         * fed in the chunk sizes given after the offset (cycled; the
+         * rest in one call when none are given). Returns hex. */
+        name = SvPV(algo_sv, nlen);
+        a = FRH_ABI.algo_by_name(name, nlen);
+        if (!a) croak("File::Raw::Hash::_test_feed: unknown algorithm");
+        if (offset < 0 || offset > 63) croak("File::Raw::Hash::_test_feed: offset 0-63");
+        data = SvPVbyte(data_sv, len);
+        Newx(mem, len + 64 + 1, unsigned char);
+        buf = mem + offset;
+        if (len) Copy(data, buf, len, unsigned char);
+        id = a->id;
+        r = FRH_ABI.new_runner(&id, 1, 0);
+        if (!r) { Safefree(mem); croak("File::Raw::Hash::_test_feed: no runner"); }
+        while (done < len) {
+            STRLEN take = len - done;
+            if (items > 3) {
+                IV want = SvIV(ST(k));
+                if (++k >= items) k = 3;
+                if (want > 0 && (STRLEN)want < take) take = (STRLEN)want;
+            }
+            FRH_ABI.runner_update(r, buf + done, take);
+            done += take;
+        }
+        outs[0] = out;
+        if (FRH_ABI.runner_finish(r, outs) != 0) {
+            FRH_ABI.runner_free(r);
+            Safefree(mem);
+            croak("File::Raw::Hash::_test_feed: finish failed");
+        }
+        FRH_ABI.runner_free(r);
+        Safefree(mem);
+        for (j = 0; j < a->digest_size; j++)
+            sprintf(hex + 2 * j, "%02x", out[j]);
+        RETVAL = newSVpvn(hex, a->digest_size * 2);
     OUTPUT:
         RETVAL

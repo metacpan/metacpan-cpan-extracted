@@ -72,4 +72,58 @@ subtest 'scroll_state and scroll_to' => sub {
 	like( dies { $ui->scroll_to($scroll, [ 0, 1 ]) },       qr/needs a position/,                         'a non-hash dies' );
 };
 
+subtest 'a text widget has a bounding box' => sub {
+	require Clay::UI::Test::Text;
+	my $root  = Clay::UI::Test::Box->new(id => 'root', layout => { layout_direction => CLAY_TOP_TO_BOTTOM, padding => { top => 10, left => 5 } });
+	my $box   = fixed_box(100, 20);
+	my $text  = Clay::UI::Test::Text->new(text => 'hello');
+	my $later = Clay::UI::Test::Text->new(text => 'world');
+	$root->add_child($box, $text, $later);
+	my $ui = Clay::UI->new(root => $root, width => 200, height => 200, measure_text => sub { { width => 10 * length $_[0], height => 8 } });
+	$ui->render;
+	is $ui->bounding_box($text),  { x => 5, y => 30, width => 50, height => 8 }, 'the text after a box lies below it';
+	is $ui->bounding_box($later), { x => 5, y => 38, width => 50, height => 8 }, 'and the next text below that';
+	my $alone = Clay::UI::Test::Text->new(text => 'root text');
+	my $only  = Clay::UI->new(root => $alone, width => 200, height => 200, measure_text => sub { { width => 10 * length $_[0], height => 8 } });
+	$only->render;
+	is $only->bounding_box($alone), { x => 0, y => 0, width => 90, height => 8 }, 'a text that is the root';
+	is $ui->bounding_box(Clay::UI::Test::Text->new(text => 'x')), undef, 'a text that was not laid out has none';
+};
+
+subtest 'content_box' => sub {
+	my $padded = Clay::UI::Test::Box->new(
+		layout => { sizing => { width => sizing_fixed(100), height => sizing_fixed(50) }, padding => { left => 2, top => 3, right => 4, bottom => 5 } },
+	);
+	my $plain = fixed_box(30, 10);
+	my $tight = Clay::UI::Test::Box->new(layout => { sizing => { width => sizing_fixed(10), height => sizing_fixed(10) }, padding => { left => 8, right => 8 } });
+	my $root  = Clay::UI::Test::Box->new(id => 'root', layout => { layout_direction => CLAY_TOP_TO_BOTTOM, padding => { top => 10 } });
+	$root->add_child($padded, $plain, $tight);
+	my $ui = Clay::UI->new(root => $root, width => 200, height => 200, measure_text => sub { { width => 0, height => 0 } });
+
+	is( $ui->content_box($padded), undef, 'nothing before the first frame' );
+	$ui->render;
+	is( $ui->content_box($padded), { x => 2, y => 13, width => 94, height => 42 }, 'the bounding box inside the padding' );
+	is( $ui->content_box($plain), $ui->bounding_box($plain), 'without padding it is the bounding box' );
+	is( $ui->content_box($tight), { x => 8, y => 70, width => 0, height => 10 }, 'a padding wider than the box leaves no width' );
+
+	$padded->layout({ sizing => { width => sizing_fixed(100), height => sizing_fixed(50) }, padding => { left => 20 } });
+	is( $ui->content_box($padded), { x => 2, y => 13, width => 94, height => 42 }, 'a padding changed since the frame shows only after the next one' );
+	$ui->render;
+	is( $ui->content_box($padded), { x => 20, y => 10, width => 80, height => 50 }, 'which declares it' );
+
+	is( $ui->content_box(fixed_box(1, 1)), undef, 'undef for a widget the frame did not lay out' );
+	like( dies { $ui->content_box('row') }, qr/expected a widget, got 'row'/, 'a non-widget dies' );
+};
+
+subtest 'a text widget has a content box' => sub {
+	require Clay::UI::Test::Text;
+	my $root = Clay::UI::Test::Box->new(id => 'root', layout => { padding => { top => 10, left => 5 } });
+	my $text = Clay::UI::Test::Text->new(text => 'hello');
+	$root->add_child($text);
+	my $ui = Clay::UI->new(root => $root, width => 200, height => 200, measure_text => sub { { width => 10 * length $_[0], height => 8 } });
+	$ui->render;
+	is $ui->content_box($text), { x => 5, y => 10, width => 50, height => 8 }, 'its bounding box: a text has no padding';
+	is $ui->content_box($root), { x => 5, y => 10, width => 50, height => 8 }, 'and it fills its parent inside the padding';
+};
+
 done_testing;

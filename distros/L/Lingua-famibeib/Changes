@@ -1,3 +1,7 @@
+v0.08  2026-10-19Z
+    - Allow tailing dash in prefix string format
+    - Added Data::Identifier::Interface::Known as parent to Lingua::famibeib::Modifier and Lingua::famibeib::Prefix
+
 v0.07  2026-08-16Z
     - Updated dependencies
     - Implemented Lingua::Generic::Interface::Word

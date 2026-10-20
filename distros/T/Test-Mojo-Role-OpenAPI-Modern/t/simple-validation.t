@@ -66,7 +66,7 @@ subtest 'openapi object is constructed using provided configs' => sub {
     })
     ->test_openapi_verbose(1);
 
-  is($t->openapi->document_get('/info/title'), 'Test API using overridden configs',
+  is($t->openapi->entry_document->get('/info/title'), 'Test API using overridden configs',
     'test role constructs its own OpenAPI::Modern object');
 
   $t->post_ok('/foo/1', json => {})

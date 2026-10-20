@@ -7,7 +7,7 @@ use Carp qw( carp croak );
 use Readonly;
 use Data::Dumper qw( Dumper );
 
-our $VERSION = 2.1126;
+our $VERSION = 2.1129;
 
 our @EXPORT_OK = qw( follow_path restitution_value );
 

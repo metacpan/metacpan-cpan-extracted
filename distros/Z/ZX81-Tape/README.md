@@ -47,6 +47,8 @@ to the tape format. The start line number is 10 by default and the increment
 between consecutive lines is also 10 by default. A line with a line number
 resets the numbering from there on. Line numbers from 0 to 9999 are accepted.
 
+BASIC code can use numbers in hexadecimal with the notation $hh and 0xhh.
+
 ## LABELS
 
 Labels can be written before the BASIC statement as '@' NAME ':', and can be
@@ -124,6 +126,19 @@ file is defined by a separate #DFILE pragma.
     #DFILE_COLLAPSED=[0|1]
 
 Saves the display file in collapsed form.
+
+### #ASM
+
+    #ASM
+    start:
+        ld bc, 1234
+        ret
+    #ENDASM
+        PRINT USR &start
+
+The lines between #ASM and #ENDASM are collected and assembled with an ORG
+of 0x4082, and a 0 REM line is created with the binary image of the assembled
+code. BASIC can use ASM labels via '&' NAME.
 
 # SEE ALSO
 

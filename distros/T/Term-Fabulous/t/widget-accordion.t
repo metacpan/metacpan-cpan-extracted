@@ -13,6 +13,7 @@ use Clay::XS qw(sizing_grow CLAY_TOP_TO_BOTTOM);
 use Term::Fabulous;
 use Term::Fabulous::Layout;
 use Term::Fabulous::Terminal::Memory;
+use Term::Fabulous::Theme;
 use Term::Fabulous::Widget::Accordion;
 use Term::Fabulous::Widget::Accordion::Item;
 use Term::Fabulous::Widget::Box;
@@ -116,6 +117,31 @@ subtest 'keys and clicks' => sub {
 	is $events->[-1], [ 0, 1, 'General' ], 'choose acts as the user does';
 };
 
+subtest 'closing an item over a focused field focuses its header' => sub {
+	my ( $accordion, $terminal, $ui ) = accordion();
+	my $item = $accordion->item(0);
+	$item->open(1);
+	$ui->interaction->set_focused_widget( $item->body->children->[1] );
+	$item->open(0);
+	ref_is $ui->interaction->get_focused_widget, $item->header, 'the header has the focus';
+	$terminal->press_key('Down');
+	$ui->step;
+	ok $accordion->item(1)->is_focused, 'and the next Down still reaches the accordion';
+};
+
+subtest 'an item without an accordion draws in the theme of its UI' => sub {
+	my $item = Term::Fabulous::Widget::Accordion::Item->new( title => 'Lone' );
+	my $root = Term::Fabulous::Widget::Box->new( layout => { sizing => { width => sizing_grow(), height => sizing_grow() } } );
+	$root->add_child($item);
+	my $ui     = Term::Fabulous->new( root => $root, width => 20, height => 5, terminal => Term::Fabulous::Terminal::Memory->new( width => 20, height => 5 ), theme => 'light' );
+	my %themed = Term::Fabulous::Widget::Accordion->themed_params;
+	my ( $light, $dark ) = map { Term::Fabulous::Theme->builtin($_)->look( accordion => @{ $themed{title_color} }[ 0, 1 ] ) } qw(light dark);
+	isnt $light,                                 $dark,  'the themes have other title colors';
+	is $item->header->children->[1]->text_color, $light, 'its title is in the UI theme\'s color';
+	$ui->theme('dark');
+	is $item->header->children->[1]->text_color, $dark, 'and follows a theme switch';
+};
+
 subtest 'looks' => sub {
 	my ( $accordion, $terminal, $ui ) = accordion( toggle_position => 'end', open_glyph => '-', closed_glyph => '+', item_borders => 1, body_indent => 0 );
 	$accordion->open(1);
@@ -152,6 +178,23 @@ Accordion "settings" {
 KDL
 	is [ $built->multiple, $built->title_bold, map { [ $_->title, $_->is_open, $_->disabled, scalar $_->body->children->@* ] } $built->items ],
 		[ 1, 1, [ 'General', 1, 0, 1 ], [ 'Network', 0, 1, 1 ] ], 'the items with their bodies';
+};
+
+subtest 'a search reaches a closed item, and revealing a match opens it' => sub {
+	my ( $accordion, $terminal, $ui ) = accordion();
+	my ( $general, $network ) = @{ $accordion->children };
+	ok $network->DOES('Term::Fabulous::Role::Searchable'), 'an item is searchable';
+	is $network->is_open, 0, 'the second item is closed';
+	my ($hostname) = grep { $_->[1] eq 'Hostname: example.org' } $network->search_texts;
+	is $hostname->[0], [ 0, undef ], 'the text of its body is among the texts, with its place in the body as the key';
+	$accordion->open(0);
+	my ($text) = @{ $network->reveal_text( $hostname->[0], 0 ) };
+	is [ $network->is_open, $text->text ], [ 1, 'Hostname: example.org' ], 'revealing it opens the item and names its text';
+	is [ map { $_->is_open } $accordion->items ], [ 0, 1, 0 ], 'and closes the item that was open, as the accordion opens one at a time';
+	$network->highlight_text( $hostname->[0], [ [ 0, 8, 'on accent' ] ] );
+	is $text->highlights->[0][1], 8, 'highlight_text reaches the text';
+	$network->clear_text_highlights;
+	is $text->highlights, [], 'clear_text_highlights clears it';
 };
 
 done_testing;

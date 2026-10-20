@@ -1,0 +1,97 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="561" viewBox="0 0 960 561" role="img" aria-label="perl examples/cookbook/document-contents.pl">
+<title>perl examples/cookbook/document-contents.pl</title>
+<style>
+.terminal text { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 15px; white-space: pre; }
+.terminal .b { font-weight: bold; }
+.terminal .i { font-style: italic; }
+.title { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 13px; }
+</style>
+<defs>
+<filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#000000" flood-opacity="0.3"/></filter>
+<clipPath id="window"><rect x="16" y="16" width="928" height="526" rx="10"/></clipPath>
+</defs>
+<rect x="16" y="16" width="928" height="526" rx="10" fill="#161622" filter="url(#shadow)"/>
+<rect x="16" y="16" width="928" height="34" fill="#1f2430" clip-path="url(#window)"/>
+<circle cx="36" cy="33" r="6" fill="#ff5f57"/>
+<circle cx="56" cy="33" r="6" fill="#febc2e"/>
+<circle cx="76" cy="33" r="6" fill="#28c840"/>
+<text class="title" x="480" y="33" text-anchor="middle" dominant-baseline="central" fill="#9aa3b5">perl examples/cookbook/document-contents.pl</text>
+<rect x="16.5" y="16.5" width="927" height="525" rx="10" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1"/>
+<g shape-rendering="crispEdges">
+<rect x="372" y="276" width="531" height="198" fill="#1e2128"/>
+<rect x="39" y="68" width="288" height="1" fill="#46556e"/>
+<rect x="345" y="68" width="576" height="1" fill="#46556e"/>
+<rect x="34" y="78" width="1" height="432" fill="#46556e"/>
+<rect x="331" y="78" width="1" height="432" fill="#46556e"/>
+<rect x="340" y="78" width="1" height="432" fill="#46556e"/>
+<rect x="916" y="78" width="1" height="234" fill="#464c5a"/>
+<rect x="925" y="78" width="1" height="432" fill="#46556e"/>
+<rect x="916" y="312" width="2" height="90" fill="#61afef"/>
+<rect x="916" y="402" width="1" height="108" fill="#464c5a"/>
+<rect x="39" y="518" width="288" height="1" fill="#46556e"/>
+<rect x="345" y="518" width="576" height="1" fill="#46556e"/>
+</g>
+<polyline points="34.5 78 34.5 73 34.538 72.413 34.653 71.835 34.843 71.278 35.103 70.75 35.43 70.261 35.818 69.818 36.261 69.43 36.75 69.103 37.278 68.843 37.835 68.653 38.413 68.538 39 68.5 39 68.5" fill="none" stroke="#46556e" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="331.5 78 331.5 73 331.462 72.413 331.347 71.835 331.157 71.278 330.897 70.75 330.57 70.261 330.182 69.818 329.739 69.43 329.25 69.103 328.722 68.843 328.165 68.653 327.587 68.538 327 68.5 327 68.5" fill="none" stroke="#46556e" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="340.5 78 340.5 73 340.538 72.413 340.653 71.835 340.843 71.278 341.103 70.75 341.43 70.261 341.818 69.818 342.261 69.43 342.75 69.103 343.278 68.843 343.835 68.653 344.413 68.538 345 68.5 345 68.5" fill="none" stroke="#46556e" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="925.5 78 925.5 73 925.462 72.413 925.347 71.835 925.157 71.278 924.897 70.75 924.57 70.261 924.182 69.818 923.739 69.43 923.25 69.103 922.722 68.843 922.165 68.653 921.587 68.538 921 68.5 921 68.5" fill="none" stroke="#46556e" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="34.5 510 34.5 514 34.538 514.587 34.653 515.165 34.843 515.722 35.103 516.25 35.43 516.739 35.818 517.182 36.261 517.57 36.75 517.897 37.278 518.157 37.835 518.347 38.413 518.462 39 518.5 39 518.5" fill="none" stroke="#46556e" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="331.5 510 331.5 514 331.462 514.587 331.347 515.165 331.157 515.722 330.897 516.25 330.57 516.739 330.182 517.182 329.739 517.57 329.25 517.897 328.722 518.157 328.165 518.347 327.587 518.462 327 518.5 327 518.5" fill="none" stroke="#46556e" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="340.5 510 340.5 514 340.538 514.587 340.653 515.165 340.843 515.722 341.103 516.25 341.43 516.739 341.818 517.182 342.261 517.57 342.75 517.897 343.278 518.157 343.835 518.347 344.413 518.462 345 518.5 345 518.5" fill="none" stroke="#46556e" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="925.5 510 925.5 514 925.462 514.587 925.347 515.165 925.157 515.722 924.897 516.25 924.57 516.739 924.182 517.182 923.739 517.57 923.25 517.897 922.722 518.157 922.165 518.347 921.587 518.462 921 518.5 921 518.5" fill="none" stroke="#46556e" stroke-width="1" stroke-linejoin="round"/>
+<g class="terminal">
+<text x="66" y="92" textLength="72" fill="#61afef">snapback</text>
+<text x="372" y="92" textLength="144" fill="#dcdfe4">fourteen remain,</text>
+<text x="525" y="92" textLength="45" class="i" fill="#dcdfe4">after</text>
+<text x="579" y="92" textLength="279" fill="#dcdfe4">the new backup has finished. It</text>
+<text x="84" y="110" textLength="108" fill="#61afef">Installation</text>
+<text x="372" y="110" textLength="468" fill="#dcdfe4">never deletes the backup it has just made, even with</text>
+<text x="849" y="110" textLength="36" fill="#e5c07b">keep</text>
+<text x="84" y="128" textLength="153" fill="#61afef">Your first backup</text>
+<text x="372" y="128" textLength="27" fill="#e5c07b">= 0</text>
+<text x="399" y="128" textLength="9" fill="#dcdfe4">.</text>
+<text x="84" y="146" textLength="72" fill="#61afef">Settings</text>
+<text x="102" y="164" textLength="135" fill="#61afef">Excluding files</text>
+<text x="354" y="164" textLength="45" class="b" fill="#ebeef3">Hooks</text>
+<text x="48" y="182" textLength="9" class="b" fill="#dcdfe4">&gt;</text>
+<text x="102" y="182" textLength="171" fill="#61afef">Keeping old backups</text>
+<text x="84" y="200" textLength="45" fill="#61afef">Hooks</text>
+<text x="372" y="200" textLength="486" fill="#dcdfe4">A hook is a Perl script that snapback runs after every</text>
+<text x="84" y="218" textLength="135" fill="#61afef">Restoring files</text>
+<text x="372" y="218" textLength="459" fill="#dcdfe4">backup, with the directory of the new backup as its</text>
+<text x="84" y="236" textLength="135" fill="#61afef">Troubleshooting</text>
+<text x="372" y="236" textLength="486" fill="#dcdfe4">argument. Use it to send a message, to copy the backup</text>
+<text x="102" y="254" textLength="144" fill="#61afef">The disk is full</text>
+<text x="372" y="254" textLength="216" fill="#dcdfe4">further, or to check it.</text>
+<text x="102" y="272" textLength="198" fill="#61afef">A file is copied every</text>
+<text x="48" y="290" textLength="36" fill="#61afef">time</text>
+<text x="381" y="290" textLength="171" fill="#dcdfe4">#!/usr/bin/env perl</text>
+<text x="84" y="308" textLength="72" fill="#61afef">See also</text>
+<text x="381" y="308" textLength="396" fill="#dcdfe4"># ~/.snapback-hook: report every new backup.</text>
+<text x="381" y="326" textLength="90" fill="#dcdfe4">use v5.32;</text>
+<text x="381" y="344" textLength="117" fill="#dcdfe4">use warnings;</text>
+<text x="381" y="380" textLength="135" fill="#dcdfe4">use File::Find;</text>
+<text x="381" y="416" textLength="513" fill="#dcdfe4">my ($backup) = @ARGV or die &quot;usage: $0 BACKUP-DIRECTORY\n</text>
+<text x="898.5" y="416" text-anchor="middle" fill="#8c929e">›</text>
+<text x="381" y="434" textLength="126" fill="#dcdfe4">my $files = 0;</text>
+<text x="381" y="452" textLength="513" fill="#dcdfe4">find( sub { $files++ if -f $_ }, $backup );    # every fi</text>
+<text x="898.5" y="452" text-anchor="middle" fill="#8c929e">›</text>
+<text x="381" y="470" textLength="477" fill="#dcdfe4">say &quot;snapback: new backup $backup with $files files&quot;;</text>
+<text x="372" y="506" textLength="486" fill="#dcdfe4">Make the script executable and name it in the settings</text>
+</g>
+<g shape-rendering="crispEdges">
+<rect x="66" y="93" width="72" height="1" fill="#61afef"/>
+<rect x="84" y="111" width="108" height="1" fill="#61afef"/>
+<rect x="84" y="129" width="153" height="1" fill="#61afef"/>
+<rect x="84" y="147" width="72" height="1" fill="#61afef"/>
+<rect x="102" y="165" width="135" height="1" fill="#61afef"/>
+<rect x="102" y="183" width="171" height="1" fill="#61afef"/>
+<rect x="84" y="201" width="45" height="1" fill="#61afef"/>
+<rect x="84" y="219" width="135" height="1" fill="#61afef"/>
+<rect x="84" y="237" width="135" height="1" fill="#61afef"/>
+<rect x="102" y="255" width="144" height="1" fill="#61afef"/>
+<rect x="102" y="273" width="198" height="1" fill="#61afef"/>
+<rect x="48" y="291" width="36" height="1" fill="#61afef"/>
+<rect x="84" y="309" width="72" height="1" fill="#61afef"/>
+</g>
+</svg>

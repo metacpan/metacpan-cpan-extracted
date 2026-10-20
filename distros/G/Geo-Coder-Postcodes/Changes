@@ -1,5 +1,32 @@
 Revision history for Geo-Coder-Postcodes
 
+0.09	Mon Oct 19 01:53:47 PM EDT 2026
+	geocode(): the location rule is Geo::Location::Predicate's, which is a
+		distribution of its own now, so this module declares it as a recommendation in
+		META instead of requiring Geo::Coder::Free, and nothing here decides the rule
+		again.  It is looked for when it is first needed rather than when this module
+		loads, so importing this module reads no file it may not need.  Without it a
+		reference is still refused and a string of digits is looked up as it was
+		before the rule existed; with it the rule decides everything, and it is called
+		by name rather than imported, which is what lets t/reference.t swap it for a
+		spy and prove that it is the rule being consulted.
+	[ CI ]
+	.github/workflows/location-predicates.yml runs the location-predicate fuzz
+		here, on a schedule and on a push, with --sibling Geo-Coder-Postcodes: this
+		distribution is graded against Geo::Location::Predicate and the other five
+		are not, so a drift here fails in the repository that would have to fix it
+		rather than only in Geo-Coder-Free's daily run.
+
+	geocode(): refuse a reference; it used to be accepted because the string it
+		turns into contains a non-digit
+	Check a reference against Geo::Location::Predicate's rule when that module
+		is installed, so that the check cannot drift away from Geo::Coder::Free
+	Added t/reference.t, the same test as the other Geo::Coder distributions
+	geocode(): croak when input is just a set of numbers
+	Use Params::Get and Object::Configure
+	Use gtar to create a distribution on Macs
+	Fix t/ua.t when not online
+
 0.08	Thu Jul 11 14:32:42 EDT 2024
 	Use JSON::MaybeXS instead of JSON
 	Calling new on an object now returns a clone rather than setting the defaults in the new object

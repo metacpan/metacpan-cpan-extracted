@@ -1,0 +1,90 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="780" height="741" viewBox="0 0 780 741" role="img" aria-label="perl examples/widgets/document-view.pl">
+<title>perl examples/widgets/document-view.pl</title>
+<style>
+.terminal text { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 15px; white-space: pre; }
+.terminal .b { font-weight: bold; }
+.terminal .i { font-style: italic; }
+.title { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 13px; }
+</style>
+<defs>
+<filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#000000" flood-opacity="0.3"/></filter>
+<clipPath id="window"><rect x="16" y="16" width="748" height="706" rx="10"/></clipPath>
+</defs>
+<rect x="16" y="16" width="748" height="706" rx="10" fill="#161622" filter="url(#shadow)"/>
+<rect x="16" y="16" width="748" height="34" fill="#1f2430" clip-path="url(#window)"/>
+<circle cx="36" cy="33" r="6" fill="#ff5f57"/>
+<circle cx="56" cy="33" r="6" fill="#febc2e"/>
+<circle cx="76" cy="33" r="6" fill="#28c840"/>
+<text class="title" x="390" y="33" text-anchor="middle" dominant-baseline="central" fill="#9aa3b5">perl examples/widgets/document-view.pl</text>
+<rect x="16.5" y="16.5" width="747" height="705" rx="10" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1"/>
+<g shape-rendering="crispEdges">
+<rect x="156" y="96" width="45" height="18" fill="#e5c07b"/>
+<rect x="75" y="150" width="639" height="72" fill="#1e2128"/>
+<rect x="210" y="276" width="234" height="18" fill="#61afef"/>
+<rect x="84" y="456" width="279" height="18" fill="#242832"/>
+<rect x="291" y="492" width="45" height="18" fill="#264f78"/>
+<rect x="309" y="510" width="45" height="18" fill="#264f78"/>
+<rect x="264" y="528" width="45" height="18" fill="#264f78"/>
+<rect x="399" y="654" width="45" height="18" fill="#264f78"/>
+<rect x="48" y="68" width="684" height="1" fill="#46556e"/>
+<rect x="43" y="78" width="1" height="594" fill="#46556e"/>
+<rect x="727" y="78" width="1" height="54" fill="#464c5a"/>
+<rect x="736" y="78" width="1" height="594" fill="#46556e"/>
+<rect x="727" y="132" width="2" height="108" fill="#61afef"/>
+<rect x="727" y="240" width="1" height="432" fill="#464c5a"/>
+<rect x="84" y="446" width="279" height="1" fill="#586070"/>
+<rect x="187" y="446" width="1" height="109" fill="#586070"/>
+<rect x="79" y="456" width="1" height="90" fill="#586070"/>
+<rect x="367" y="456" width="1" height="90" fill="#586070"/>
+<rect x="79" y="482" width="289" height="1" fill="#586070"/>
+<rect x="84" y="554" width="279" height="1" fill="#586070"/>
+<rect x="57" y="608" width="657" height="1" fill="#5a606e"/>
+<rect x="48" y="680" width="684" height="1" fill="#46556e"/>
+</g>
+<polyline points="43.5 78 43.5 73 43.538 72.413 43.653 71.835 43.843 71.278 44.103 70.75 44.43 70.261 44.818 69.818 45.261 69.43 45.75 69.103 46.278 68.843 46.835 68.653 47.413 68.538 48 68.5 48 68.5" fill="none" stroke="#46556e" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="736.5 78 736.5 73 736.462 72.413 736.347 71.835 736.157 71.278 735.897 70.75 735.57 70.261 735.182 69.818 734.739 69.43 734.25 69.103 733.722 68.843 733.165 68.653 732.587 68.538 732 68.5 732 68.5" fill="none" stroke="#46556e" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="79.5 456 79.5 451 79.538 450.413 79.653 449.835 79.843 449.278 80.103 448.75 80.43 448.261 80.818 447.818 81.261 447.43 81.75 447.103 82.278 446.843 82.835 446.653 83.413 446.538 84 446.5 84 446.5" fill="none" stroke="#586070" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="367.5 456 367.5 451 367.462 450.413 367.347 449.835 367.157 449.278 366.897 448.75 366.57 448.261 366.182 447.818 365.739 447.43 365.25 447.103 364.722 446.843 364.165 446.653 363.587 446.538 363 446.5 363 446.5" fill="none" stroke="#586070" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="79.5 546 79.5 550 79.538 550.587 79.653 551.165 79.843 551.722 80.103 552.25 80.43 552.739 80.818 553.182 81.261 553.57 81.75 553.897 82.278 554.157 82.835 554.347 83.413 554.462 84 554.5 84 554.5" fill="none" stroke="#586070" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="367.5 546 367.5 550 367.462 550.587 367.347 551.165 367.157 551.722 366.897 552.25 366.57 552.739 366.182 553.182 365.739 553.57 365.25 553.897 364.722 554.157 364.165 554.347 363.587 554.462 363 554.5 363 554.5" fill="none" stroke="#586070" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="43.5 672 43.5 676 43.538 676.587 43.653 677.165 43.843 677.722 44.103 678.25 44.43 678.739 44.818 679.182 45.261 679.57 45.75 679.897 46.278 680.157 46.835 680.347 47.413 680.462 48 680.5 48 680.5" fill="none" stroke="#46556e" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="736.5 672 736.5 676 736.462 676.587 736.347 677.165 736.157 677.722 735.897 678.25 735.57 678.739 735.182 679.182 734.739 679.57 734.25 679.897 733.722 680.157 733.165 680.347 732.587 680.462 732 680.5 732 680.5" fill="none" stroke="#46556e" stroke-width="1" stroke-linejoin="round"/>
+<g class="terminal">
+<text x="75" y="110" textLength="72" fill="#dcdfe4">The code</text>
+<text x="156" y="110" textLength="45" fill="#101216">block</text>
+<text x="201" y="110" textLength="495" fill="#dcdfe4">s scroll sideways together with Left and Right, or with</text>
+<text x="75" y="128" textLength="171" fill="#dcdfe4">a horizontal wheel:</text>
+<text x="84" y="164" textLength="477" fill="#dcdfe4">my $view = Term::Fabulous::Widget::DocumentView-&gt;new(</text>
+<text x="120" y="182" textLength="207" fill="#dcdfe4">id       =&gt; &quot;document&quot;,</text>
+<text x="120" y="200" textLength="504" fill="#dcdfe4">document =&gt; $document,    # from a parser of your format</text>
+<text x="84" y="218" textLength="18" fill="#dcdfe4">);</text>
+<text x="57" y="254" textLength="45" class="b" fill="#ebeef3">Links</text>
+<text x="75" y="290" textLength="126" fill="#dcdfe4">A link such as</text>
+<text x="210" y="290" textLength="234" fill="#101216">Term::Fabulous on MetaCPAN</text>
+<text x="453" y="290" textLength="252" fill="#dcdfe4">is selected with l and L and</text>
+<text x="75" y="308" textLength="414" fill="#dcdfe4">followed with Enter or a click; the text fires</text>
+<text x="498" y="308" textLength="108" fill="#e5c07b">LinkActivate</text>
+<text x="615" y="308" textLength="63" fill="#dcdfe4">and the</text>
+<text x="75" y="326" textLength="234" fill="#dcdfe4">program does the rest. The</text>
+<text x="318" y="326" textLength="45" fill="#61afef">Items</text>
+<text x="372" y="326" textLength="252" fill="#dcdfe4">section above is a link too.</text>
+<text x="57" y="362" textLength="90" class="b" fill="#ebeef3">Any widget</text>
+<text x="75" y="398" textLength="594" fill="#dcdfe4">Any other widget is an item as it is, this table for one; a search</text>
+<text x="75" y="416" textLength="432" fill="#dcdfe4">finds the text of its cells, and Tab reaches it.</text>
+<text x="93" y="470" textLength="63" class="b" fill="#ebeef3">Factory</text>
+<text x="201" y="470" textLength="45" class="b" fill="#ebeef3">Makes</text>
+<text x="93" y="506" textLength="63" fill="#dcdfe4">heading</text>
+<text x="201" y="506" textLength="135" fill="#dcdfe4">a heading block</text>
+<text x="93" y="524" textLength="81" fill="#dcdfe4">paragraph</text>
+<text x="201" y="524" textLength="153" fill="#dcdfe4">a paragraph block</text>
+<text x="93" y="542" textLength="36" fill="#dcdfe4">code</text>
+<text x="201" y="542" textLength="108" fill="#dcdfe4">a code block</text>
+<text x="57" y="596" textLength="36" class="b" fill="#61afef">MORE</text>
+<text x="75" y="650" textLength="630" fill="#dcdfe4">Paragraph 1 of a longer document, so that there is something to scroll</text>
+<text x="75" y="668" textLength="639" fill="#dcdfe4">through and to search for: the word block appears in every one of them.</text>
+<text x="39" y="704" textLength="612" fill="#96a0b4">Code   12%  |  Enter follows https://metacpan.org/pod/Term::Fabulous</text>
+</g>
+<g shape-rendering="crispEdges">
+<rect x="318" y="327" width="45" height="1" fill="#61afef"/>
+</g>
+</svg>

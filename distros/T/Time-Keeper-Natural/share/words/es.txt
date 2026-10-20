@@ -1,0 +1,22 @@
+# Time::Keeper::Natural word table: es
+#
+# UNREVIEWED: written 18 Oct 2026 by a session, as the p2p site's catalogues were.
+# A native reader should review it before release. The format is en.txt's.
+#
+# Spanish contracts "de el" to "del": "fin del mes pasado" is read by putting
+# the swallowed "el" back, since CLDR's own words carry it ("el mes pasado").
+start_of	principio de|principio del|principios de|principios del|inicio de|inicio del|comienzo de|comienzo del|a principios de|a principios del|al principio de|al principio del|al inicio de|al inicio del
+end_of	fin de|fin del|final de|final del|finales de|finales del|a fin de|a fin del|a finales de|a finales del|al final de|al final del
+at	a las|a la
+on
+skip	el|la|los|las
+and
+of	de|del
+last	último|última
+# test: fin del mes pasado => 2026-09-30T23:59:59.999999999+01:00
+# test: principio de la próxima semana => 2026-10-19T00:00:00+01:00
+# test: final del año => 2026-12-31T23:59:59.999999999+00:00
+# test: a finales de octubre => 2026-10-31T23:59:59.999999999+00:00
+# test: mañana a las 15:30 => 2026-10-16T15:30:00+01:00
+# test: el tercer viernes del próximo mes => 2026-11-20T00:00:00+00:00
+# test: el último viernes de octubre => 2026-10-30T00:00:00+00:00

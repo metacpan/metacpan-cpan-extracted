@@ -45,7 +45,7 @@ $cur->body_set($cur->body_raw . "footer line\r\n");
     $bad->header_raw_prepend('Message-Instance', "m=2; h=sha256:$hh:$bh;");
     my ($ok, $why) = Mail::DKIM2::MessageInstance->chain_verifies($bad->as_string);
     ok(!$ok, 'non-reversible chain is rejected');
-    like($why, qr/m=1 does not match|did not undo/, 'failure names the broken instance');
+    like($why, qr/\APERMERROR: Message-Instance m=2 contains invalid JSON\z|\AFAIL: Message-Instance m=1 (?:header|body) hash sha256 mismatch\z/, 'failure names the broken instance');
 }
 
 # --- Recipe-less m=2 over UNCHANGED content: legal, and must be accepted ---
@@ -59,6 +59,51 @@ $cur->body_set($cur->body_raw . "footer line\r\n");
     $same->header_raw_prepend('Message-Instance', "m=2; h=sha256:$hh:$bh;");
     my ($ok, $why) = Mail::DKIM2::MessageInstance->chain_verifies($same->as_string);
     ok($ok, 'recipe-less instance asserting no change is accepted') or diag($why);
+}
+
+# --- -07 §12.1: a first instance may carry Recipes (ruling 17) ---
+# A list host that stamped an unsigned m=1 on arrival, then changed the post
+# (a From munge, a footer), sends it as ONE m=1: hashes of what it sends and
+# Recipes back to the message as it arrived.
+{
+    my $arrived = "From: Author <a\@example.com>\r\nSubject: hi\r\n\r\nbody line\r\n";
+    my $sent    = "From: Author via list <list\@example.net>\r\nReply-To: a\@example.com\r\n"
+                . "Subject: [list] hi\r\n\r\nbody line\r\nfooter\r\n";
+
+    # calculate() with a previous message and no instances on either: m=1.
+    my $mi = Mail::DKIM2::MessageInstance->calculate(Email::MIME->new($sent), Email::MIME->new($arrived));
+    is($mi->get_tag('m'), 1, 'calculate: no instances on either gives m=1');
+    ok($mi->get_tag('rh') && $mi->get_tag('rb'), 'calculate: that m=1 carries header and body Recipes');
+    my $out = "Message-Instance: " . $mi->as_string . "\r\n" . $sent;
+    ok(scalar Mail::DKIM2::MessageInstance->verify($out), 'calculate: the m=1 matches what is sent');
+    my $undone = Mail::DKIM2::MessageInstance->undo($out);
+    is($undone->header('From'), 'Author <a@example.com>', 'calculate: undo restores the From');
+    is($undone->body_raw, "body line\r\n", 'calculate: undo restores the body');
+
+    # calculate_first(): the arrival snapshot carries the stamped m=1 and a
+    # local m=2 (a wrap); the message carries both, unchanged. The result is
+    # m=1 back to the message before its first instance.
+    my $s1  = Mail::DKIM2::MessageInstance->calculate(Email::MIME->new($arrived));
+    my $st1 = "Message-Instance: " . $s1->as_string . "\r\n" . $arrived;
+    (my $wrapped = $st1) =~ s/body line/wrapped line/;
+    my $s2  = Mail::DKIM2::MessageInstance->calculate(Email::MIME->new($wrapped), Email::MIME->new($st1));
+    my $snap = "Message-Instance: " . $s2->as_string . "\r\n" . $wrapped;
+    (my $listed = $snap) =~ s/^From: [^\r\n]*/From: Author via list <list\@example.net>/m;
+    $listed .= "footer\r\n";
+    my $first = Mail::DKIM2::MessageInstance->calculate_first($listed, $snap);
+    is($first->get_tag('m'), 1, 'calculate_first: m=1');
+    my $sent2 = "Message-Instance: " . $first->as_string . "\r\n"
+              . ($listed =~ s/^Message-Instance:[^\r\n]*\r\n(?:[ \t][^\r\n]*\r\n)*//mgr);
+    ok(scalar Mail::DKIM2::MessageInstance->verify($sent2), 'calculate_first: matches the message less its instances');
+    my $back = Mail::DKIM2::MessageInstance->undo($sent2);
+    is($back->header('From'), 'Author <a@example.com>', 'calculate_first: undo restores the arrival From');
+    is($back->body_raw, "body line\r\n", 'calculate_first: undo goes back past the wrap');
+    ok(!$back->header_raw('Message-Instance'), 'calculate_first: nothing left to undo');
+
+    # A previous message whose chain does not undo is refused.
+    (my $bad = $snap) =~ s/wrapped line/tampered line/;
+    ok(!eval { Mail::DKIM2::MessageInstance->calculate_first($listed, $bad); 1 },
+       'calculate_first: a previous message whose chain does not verify is refused');
 }
 
 done_testing;

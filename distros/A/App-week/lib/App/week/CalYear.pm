@@ -1,6 +1,6 @@
 package App::week::CalYear;
 
-use v5.14;
+use v5.24;
 use warnings;
 use utf8;
 
@@ -37,6 +37,7 @@ my %config = (
     tabify     => undef,
     shortmonth => undef,
     weeknumber => 0,	# 0)none 1)us 2)standard 3)iso
+    stripe     => 0,
 );
 lock_keys %config;
 
@@ -55,7 +56,7 @@ sub CalYear {
     my @monthline = do {
 	map  { $_ - 2 }                 # 2 lines up
 	grep { $cal[$_] =~ /\s 1 \s/x } # find 1st day
-	0 .. $#cal;
+	keys @cal;
     };
     @monthline == 4 or die "cal(1) command format error.\n";
 
@@ -65,8 +66,7 @@ sub CalYear {
     };
 
     my @month = ( [ $cal[0] ], map [], 1..12 );
-    for my $i (0 .. $#monthline) {
-	my $start = $monthline[$i];
+    while (my($i, $start) = each @monthline) {
 	for my $n (0..7) {
 	    my @m = $fielder->($cal[$start + $n]);
 	    push @{$month[$i * 3 + 1]}, $m[0];
@@ -137,10 +137,19 @@ sub insert_week_number {
     }
 }
 
+use Unicode::EastAsianWidth;
+
 sub tidy_up {
     for my $month (@_) {
 	# insert frame
-	$_ = " $_ " for @$month;
+	$_ = " $_ " for @{$month}[0..1];
+	for (@{$month}[2..$#{$month}]) {
+	    my $c = ' ';
+	    if (my $stripe = $config{stripe}) {
+		$c = $stripe =~ /\D/ ? $stripe : '│';
+	    }
+	    $_ = $c . s/(\p{InFullwidth}|..)( )/$1$c/gr . $c;
+	}
 	# fix month name:
 	for ($month->[0]) {
 	    # 1) Take care of cal(1) multibyte string bug.

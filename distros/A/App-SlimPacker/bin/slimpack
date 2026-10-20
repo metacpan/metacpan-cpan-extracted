@@ -14,7 +14,7 @@ use lib "$FindBin::Bin/../lib";
 # By default ('pack') drives the whole fatpack pipeline internally by calling
 # App::FatPacker's methods (no shelling out to the fatpack binary):
 #
-#   1. trace       — run the boot script, record every module it loads
+#   1. trace       — compile the boot script, record every module it loads
 #   2. core filter — drop core modules via Module::CoreList
 #   3. packlists   — map the surviving modules to their .packlist files
 #   4. tree        — copy module sources into a (temporary) fatlib/
@@ -38,7 +38,93 @@ sub _load_fatpacker {
 
 sub _load_slimpacker {
     require App::SlimPacker;
-    App::SlimPacker->import(qw(process process_deps minify_file pack_string perl_switches inline_plugins module_deps plugin_search_paths));
+    App::SlimPacker->import(qw(process process_deps minify_file pack_string perl_switches inline_plugins module_deps plugin_search_paths collect_bundle_globals rename_module_name rename_module_path));
+}
+
+my (%resolved, %copying, %SLIMIFIED, %SLIMIFIED_DEPS, %RTEXT);
+
+# Lazy dependencies that are only needed when another module is in the
+# bundle: module => gate.  Moo::sification loads Moo::HandleMoose, and with it
+# all of Moose, only once Moose itself has been loaded.
+my %GATED = ('Moo::HandleMoose' => 'Moose');
+# Gated modules met by a dependency walk, held back until their gate is
+# bundled (%DEFERRED), and the ones let through since (%RELEASED).
+my (%DEFERRED, %RELEASED);
+
+# Module name for a module path: Foo/Bar.pm -> Foo::Bar.
+sub _path_to_mod {
+    (my $mod = shift) =~ s{/}{::}g;
+    $mod =~ s{\.pm$}{};
+    return $mod;
+}
+
+# Whether $mod matches one of the --include/--exclude patterns: module names
+# with * and ? as wildcards.
+sub _matches {
+    my ($mod, $patterns) = @_;
+    for my $p (@{ $patterns || [] }) {
+        (my $re = quotemeta $p) =~ s/\\\*/.*/g;
+        $re =~ s/\\\?/./g;
+        return 1 if $mod =~ /\A$re\z/;
+    }
+    return 0;
+}
+
+# Whether a dependency walk should leave $mod out: excluded modules always,
+# gated ones until _release_gated finds their gate in the bundle.
+sub _held_back {
+    my ($mod) = @_;
+    return 1 if _matches($mod, $O{exclude});
+    return 0 if !$GATED{$mod} || $RELEASED{$mod} || _matches($mod, $O{include});
+    $DEFERRED{$mod} = 1;
+    return 1;
+}
+
+# Walk the held-back modules whose gate is bundled, until none is left.
+sub _release_gated {
+    my ($bundled, $walk) = @_;
+    while (my @ready = grep { $bundled->($GATED{$_}) } sort keys %DEFERRED) {
+        delete @DEFERRED{@ready};
+        @RELEASED{@ready} = (1) x @ready;
+        $walk->($_) for @ready;
+    }
+}
+
+# Whether the final bundle should drop $mod: it is excluded, or gated on a
+# module that is not in the bundle (%$in holds the bundled module names).
+sub _dropped {
+    my ($mod, $in) = @_;
+    return 1 if _matches($mod, $O{exclude});
+    my $gate = $GATED{$mod};
+    return $gate && !$in->{$gate} && !_matches($mod, $O{include});
+}
+
+# Module names for the --include patterns.  A pattern with wildcards is
+# matched against the modules installed under @dirs.
+sub _included_modules {
+    my (@dirs) = @_;
+    my %mods;
+    for my $p (@{ $O{include} || [] }) {
+        if ($p !~ /[*?]/) {
+            $mods{$p} = 1;
+            next;
+        }
+        # only scan the namespace in front of the first wildcard
+        (my $base = $p) =~ s/[*?].*//s;
+        $base =~ s/[^:]*\z//;
+        $base =~ s/::\z//;
+        $base =~ s{::}{/}g;
+        for my $root (grep { !ref && -d } @dirs) {
+            my $top = length $base ? "$root/$base" : $root;
+            next unless -d $top;
+            File::Find::find({ no_chdir => 1, wanted => sub {
+                return unless /\.pm\z/;
+                my $mod = _path_to_mod(substr $File::Find::name, length($root) + 1);
+                $mods{$mod} = 1 if _matches($mod, [$p]);
+            } }, $top);
+        }
+    }
+    return sort keys %mods;
 }
 
 # ---------------------------------------------------------------- pack ----
@@ -53,15 +139,12 @@ sub cmd_pack {
     my $trace = $fp->trace(args => [$script, @args]);
     my @modules = grep { length } split /\r?\n/, $trace;
 
-    # 2. drop core modules (is_core expects the "Foo::Bar" form)
+    # 2. drop core and --exclude modules (both match the "Foo::Bar" form)
     require Module::CoreList;
-    my @noncore;
-    for my $m (@modules) {
-        (my $name = $m) =~ s{/}{::}g;
-        $name =~ s{\.pm$}{};
-        push @noncore, $m unless Module::CoreList::is_core($name);
-    }
-    @modules = @noncore;
+    @modules = grep {
+        my $name = _path_to_mod($_);
+        !Module::CoreList::is_core($name) && !_matches($name, $O{exclude});
+    } @modules;
 
     # 3+4. packlists -> tree, into a temp dir we throw away. Debian- and
     # hand-installed modules have no .packlist, so any noncore dep that fatpack
@@ -70,6 +153,11 @@ sub cmd_pack {
     my $fatlib = "$tmp/fatlib";
     my @packlists = $fp->packlists_containing(\@modules);
     $fp->packlists_to_tree($fatlib, \@packlists);
+    # The temp fatlib is a private per-run copy assembled for this script, so
+    # its modules get variable-renamed like any other bundled source; only a
+    # user-supplied --fatlib stays verbatim.  Set BEFORE _bundle_unpacklisted:
+    # the tree build stashes minified bodies, and they must be renamed too.
+    local $O{fatlib_verbatim} = 0;
     _bundle_unpacklisted($fp, $fatlib, $_) for @modules;
 
     # 5. bundle from that temp fatlib
@@ -80,11 +168,8 @@ sub cmd_pack {
 # Copy modules that fatpack couldn't locate a .packlist for into the fatlib,
 # resolving each from its real @INC path. Recurses into any dependency of those
 # modules that is loadable, non-core, and likewise missing a reachable packlist.
-my (%resolved, %copying);
+
 # Minified output and dependencies stashed per fatlib/lib path while the
-# module graph is walked, so each module is PPI-parsed exactly once instead of
-# once for dependencies and again for the minified body.
-my (%SLIMIFIED, %SLIMIFIED_DEPS);
 # Normalize a module name or module-path (e.g. `File::HomeDir`, `File/HomeDir.pm`)
 # to the filename form used in @INC lookups and as a fatlib-relative target path.
 sub _mod_to_path {
@@ -122,13 +207,16 @@ sub _bundle_unpacklisted {
             $min = $src;
             @deps = module_deps($src);
         } else {
-            ($min, @deps) = process_deps($src, rename => 0, rewrite => $O{rewrite});
+            ($min, @deps) = process_deps($src,
+                rename_vars => $O{rename_vars} && !$O{fatlib_verbatim},
+                rename_subs => 0,
+                rewrite => $O{rewrite});
         }
-        $SLIMIFIED{$target}   = $min;
+        $SLIMIFIED{$target} = $min;
         $SLIMIFIED_DEPS{$target} = \@deps;
         for my $dep (@deps) {
             require Module::CoreList;
-            next if Module::CoreList::is_core($dep);
+            next if Module::CoreList::is_core($dep) || _held_back($dep);
             local $SIG{__WARN__} = sub {};
             my ($dpath) = $fp->packlists_containing([$dep]);
             _bundle_unpacklisted($fp, $fatlib, $dep) unless $dpath;
@@ -193,8 +281,10 @@ sub cmd_minify {
     die "slimpack minify: -o needs exactly one source file\n" if $minout && @files > 1;
 
     my @out = map {
-        my $m = minify_file($_, rename => $O{no_rename} ? 0 : 1,
-                               rewrite => $O{rewrite} ? 1 : 0);
+        my $m = minify_file($_, rename_vars => $O{rename_vars},
+                               rename_subs => $O{rename_subs},
+                               rename_exports => $O{rename_exports},
+                               rewrite => $O{rewrite});
         $m .= "\n" unless $m =~ /\n\z/;
         $m;
     } @files;
@@ -208,17 +298,39 @@ sub cmd_minify {
 }
 
 # ------------------------------------------------------------- bundle ----
-# Best-level deflate of a module source, base64-encoded so installation of the
-# source literal is robust on any platform / encoding.
-sub _zlib_base64 {
+# Best-level deflate of a module source.
+sub _deflate {
     my ($src) = @_;
     require Compress::Raw::Zlib;
-    require MIME::Base64;
     my $d   = Compress::Raw::Zlib::Deflate->new(-Level => 9);
     my $out = '';
     $d->deflate(\$src, $out);
     $d->flush(my $tail);
-    return MIME::Base64::encode_base64($out . $tail, '');
+    return $out . $tail;
+}
+
+# Deflate, base64-encoded so installation of the source literal is robust on
+# any platform / encoding.
+sub _zlib_base64 {
+    my ($src) = @_;
+    require MIME::Base64;
+    return MIME::Base64::encode_base64(_deflate($src), '');
+}
+
+# Deflate, stored as escaped binary (--binary): instead of base64 only the
+# bytes a text-mode read or the single-quoted literal could mangle are
+# escaped -- \x01 (the escape byte itself), LF and CR (so no line-ending
+# translation ever touches the payload), ^Z (EOF in Windows text mode),
+# backslash and the quote delimiter.  ~2% overhead instead of base64's 33%,
+# but the bundle is no longer a viewable text file.  Returns the complete
+# single-quoted literal.
+my %BIN_ESC = ("\x01" => "\x01\x01", "\x0a" => "\x01n", "\x0d" => "\x01r",
+               "\x1a" => "\x01z", "\\" => "\x01b", "'" => "\x01q");
+sub _zlib_binary {
+    my ($src) = @_;
+    my $out = _deflate($src);
+    $out =~ s/([\x01\x0a\x0d\x1a\\'])/$BIN_ESC{$1}/g;
+    return "'" . $out . "'";
 }
 
 sub cmd_bundle {
@@ -234,37 +346,80 @@ sub cmd_bundle {
         warn "slimpack: ignoring script $script (using -e/-E)\n";
     }
 
+    my $boot_text = _boot_text($script);
+    my $strip_re = qr{^(?:\Q$lib\E|\Q$fatlib\E)/}x;
+    my @pm_files = _collect_pm_files($lib, $fatlib);
+    my $classes = _lib_class_index(\@pm_files, $strip_re, $lib);
+
+    # Decide which files to bundle, then re-minify the whole bundle from maps
+    # built on the ORIGINAL sources (see _reminify_bundle), then emit.
+    my ($main, @paths_to_bundle) =
+        _decide_bundle_set($boot_text, $lib, $fatlib, \@pm_files, $strip_re, $classes);
+
+    # path -> meta for rename decision and %INC keys
+    my %meta;
+    for my $path (@paths_to_bundle) {
+        my $is_fatlib = ($path =~ m{^\Q$fatlib\E/});
+        (my $inc = $path) =~ s/$strip_re//;
+        $meta{$path} = { fatlib => $is_fatlib, inc_key => $inc };
+    }
+
+    my ($use_mods, $gmap, $glex, $gsubs) =
+        _reminify_bundle(\$main, \@paths_to_bundle, \%meta);
+
+    _emit_bundle($main, \@paths_to_bundle, \%meta, $use_mods, $gmap, $glex, $gsubs);
+}
+
+# Collect every .pm under --lib and --fatlib into one file list.  A root that
+# does not exist as a directory is skipped (as find(1) itself does).
+sub _collect_pm_files {
+    my ($lib, $fatlib) = @_;
     my @pm_files;
     File::Find::find({ wanted => sub {
         return unless /\.pm$/;
         push @pm_files, $File::Find::name;
     }, no_chdir => 1 }, grep { -d } ($fatlib, $lib));
+    return @pm_files;
+}
 
-    my $boot_text = _boot_text($script);
-    my $strip_re = qr{^(?:\Q$lib\E|\Q$fatlib\E)/}x;
-
-    # lib class index for plugin inlining
+# Index every package class under --lib (module name => 1) for the
+# inline_plugins() class list.  Only --lib sources count: the fatlib holds
+# third-party modules, not the application's plugin classes.
+sub _lib_class_index {
+    my ($pm_files, $strip_re, $lib) = @_;
     my %classes;
-    for my $path (@pm_files) {
+    for my $path (@$pm_files) {
         next unless $path =~ m{^\Q$lib\E/};
-        (my $cp = $path) =~ s/$strip_re//;
-        $cp =~ s{/}{::}g;
-        $cp =~ s{\.pm$}{};
-        $classes{$cp} = 1;
+        (my $rel = $path) =~ s/$strip_re//;
+        $classes{ _path_to_mod($rel) } = 1;
     }
+    return \%classes;
+}
 
-    # Decide which files to bundle
+# Decide which bundled .pm files to include and process the boot program,
+# stashing each module's ORIGINAL source in %RTEXT and its minified body in
+# %SLIMIFIED so the re-minify and emit passes never re-read or re-parse them.
+#
+# Two modes:
+#   --bundle-lib-all  every --lib .pm goes in; the boot program is minified
+#                     on its own (no dependency walk).
+#   default           walk the boot program's dependency graph against the
+#                     lib/fatlib index, enqueueing each dependency exactly
+#                     once and resolving packlist-less modules from @INC.
+# Returns ($main, @paths_to_bundle).
+sub _decide_bundle_set {
+    my ($boot_text, $lib, $fatlib, $pm_files, $strip_re, $classes) = @_;
     my $main;
     my @paths_to_bundle;
     if ($O{bundle_lib_all}) {
-        @paths_to_bundle = sort @pm_files;
+        $RTEXT{'--boot--'} = $boot_text;
+        @paths_to_bundle = sort @$pm_files;
         $main = $O{no_minify} ? $boot_text : process($boot_text, rewrite => $O{rewrite});
     } else {
         my (%lib_path, %fatlib_mod);
-        for my $path (@pm_files) {
-            (my $mod = $path) =~ s/$strip_re//;
-            $mod =~ s{/}{::}g;
-            $mod =~ s{\.pm$}{};
+        for my $path (@$pm_files) {
+            (my $rel = $path) =~ s/$strip_re//;
+            my $mod = _path_to_mod($rel);
             if ($path =~ m{^\Q$fatlib\E/}) {
                 $fatlib_mod{$mod} = 1;
             } elsif ($path =~ m{^\Q$lib\E/}) {
@@ -272,7 +427,7 @@ sub cmd_bundle {
             }
         }
         my %to_bundle;
-        for my $path (@pm_files) {
+        for my $path (@$pm_files) {
             next unless $path =~ m{^\Q$fatlib\E/};
             $to_bundle{$path} = 1;
         }
@@ -290,25 +445,34 @@ sub cmd_bundle {
                 %inlined_finder = map { $_ => 1 } qw(Module::Pluggable);
             }
         }
+        # Inline the plugin-finder's result into the boot text now so the
+        # static class list and its requires flow through the same rename
+        # passes as every other bundle module name (module renaming otherwise
+        # leaves search_path stranded and drops the plugins() list entirely).
+        $boot_text = inline_plugins($boot_text, $classes) if $O{inline_plugins};
         my ($stash_and_enqueue, $enqueue);
         # Minify a source once and enqueue its dependencies in that same parse.
         # The minified body is stashed per path so the emit pass below never
         # re-parses it.
         $stash_and_enqueue = sub {
             my ($path, $src) = @_;
+            $RTEXT{$path} = $src;
             if ($O{no_minify}) {
                 $SLIMIFIED{$path} = $src;
                 $enqueue->($_) for module_deps($src);
             } else {
                 my $is_fat = $path =~ m{^\Q$fatlib\E/};
-                my ($min, @deps) = process_deps($src, rename => $O{no_rename} ? 0 : !$is_fat,
-                                                       rewrite => $O{rewrite});
+                my ($min, @deps) = process_deps($src,
+                    rename_vars => $O{rename_vars} && (!$is_fat || !$O{fatlib_verbatim}),
+                    rename_subs => 0,
+                    rewrite => $O{rewrite});
                 $SLIMIFIED{$path} = $min;
                 $enqueue->($_) for @deps;
             }
         };
         $enqueue = sub {
             my ($mod) = @_;
+            return if _held_back($mod);
             return if $seen{$mod}++;
             return if $inlined_finder{$mod};
             require Module::CoreList;
@@ -355,23 +519,28 @@ sub cmd_bundle {
             ($main, my @boot_deps) = process_deps($boot_text, rewrite => $O{rewrite});
             $enqueue->($_) for @boot_deps;
         }
+        $RTEXT{'--boot--'} = $boot_text;
         if ($O{inline_plugins}) {
             my $searched = plugin_search_paths($boot_text);
             if (%$searched) {
                 for my $ns (sort keys %$searched) {
-                    for my $cp (sort grep { m{^\Q$ns\E::[^:]+$} } keys %classes) {
+                    for my $cp (sort grep { m{^\Q$ns\E::[^:]+$} } keys %$classes) {
                         $enqueue->($cp);
                     }
                 }
             }
         }
+        $enqueue->($_) for _included_modules($lib, $fatlib, @INC);
+        _release_gated(sub {
+            my ($mod) = @_;
+            return $fatlib_mod{$mod} || -f "$fatlib/" . _mod_to_path($mod)
+                || ($lib_path{$mod} && $to_bundle{$lib_path{$mod}});
+        }, $enqueue);
         if (@unresolved) {
             my @genuine;
             require Module::CoreList;
             for my $mod (@unresolved) {
-                (my $name = $mod) =~ s{/}{::}g;
-                $name =~ s{\.pm$}{};
-                push @genuine, $mod unless Module::CoreList::is_core($name);
+                push @genuine, $mod unless Module::CoreList::is_core(_path_to_mod($mod));
             }
             if (@genuine) {
                 warn "slimpack: unresolved dependencies: @genuine\n";
@@ -379,81 +548,159 @@ sub cmd_bundle {
         }
         @paths_to_bundle = sort keys %to_bundle;
     }
+    my %mod_of = map { (my $rel = $_) =~ s/$strip_re//; ($_ => _path_to_mod($rel)) } @paths_to_bundle;
+    my %in = map { $_ => 1 } grep { !_matches($_, $O{exclude}) } values %mod_of;
+    @paths_to_bundle = grep { !_dropped($mod_of{$_}, \%in) } @paths_to_bundle;
+    return ($main, @paths_to_bundle);
+}
 
-    # path -> meta for rename decision and %INC keys
-    my %meta;
-    for my $path (@paths_to_bundle) {
-        my $is_fatlib = ($path =~ m{^\Q$fatlib\E/});
-        (my $inc = $path) =~ s/$strip_re//;
-        $meta{$path} = { fatlib => $is_fatlib, inc_key => $inc };
+# Bundle-aware re-minify.  --rewrite renames `our` package globals too;
+# --rename-subs renames sub/method names (and, with --rename-exports, the
+# export/import protocol strings — on by default).  Both need the whole
+# dependency graph packed together so every module (and the boot program)
+# agrees on one short name — declaration and all references — which
+# per-file minification alone never dare to touch.  --rename-modules (on
+# by default) likewise renames the namespace components of every bundled
+# package consistently, INCLUDING each package's leaf (file) name; the
+# loader's %INC keys are rewritten with the same component map in the emit
+# pass.  Build the maps from the ORIGINAL sources (the walk may already
+# have minified them), then re-minify every bundled module and the boot
+# program so the renames are applied consistently across the whole bundle.
+# Updates $main_ref in place.  Returns ($use_mods, $gmap, $glex, $gsubs).
+sub _reminify_bundle {
+    my ($main_ref, $paths, $meta) = @_;
+    my ($gmap, $glex, $gsubs, $gmods);
+    my $use_mods;
+    if (($O{rewrite} || $O{rename_subs} || $O{rename_modules}) && !$O{no_minify}) {
+        my @srcs = map {
+            defined $RTEXT{$_} ? $RTEXT{$_} : do {
+                open my $fh, '<', $_ or die "Cannot read $_: $!";
+                my $s = do { local $/; <$fh> }; close $fh; $s;
+            }
+        } @$paths;
+        push @srcs, $RTEXT{'--boot--'} if defined $RTEXT{'--boot--'};
+        ($gmap, $glex, $gsubs, $gmods) = collect_bundle_globals(@srcs,
+            { rename_exports => $O{rename_exports} });
+        $use_mods = $O{rename_modules} && $gmods && %$gmods ? $gmods : undef;
+        # Module renames move package namespaces, so the global map keys follow.
+        my $gmap_mod = $gmap;
+        if ($use_mods) {
+            my %m;
+            for my $pkg (keys %$gmap) {
+                $m{ rename_module_name($pkg, $use_mods) } = $gmap->{$pkg};
+            }
+            $gmap_mod = \%m;
+        }
+        if (%$gmap || %$gsubs || $use_mods) {
+            for my $path (@$paths) {
+                my $src = $RTEXT{$path};
+                if (!defined $src) {
+                    open my $fh, '<', $path or die "Cannot read $path: $!";
+                    $src = do { local $/; <$fh> }; close $fh;
+                }
+                $SLIMIFIED{$path} = process($src,
+                    rename_vars => $O{rename_vars} && (!$meta->{$path}{fatlib} || !$O{fatlib_verbatim}),
+                    rename_subs => $O{rename_subs},
+                    rename_exports => $O{rename_exports},
+                    rewrite => $O{rewrite},
+                    (%$gmap_mod ? (global_rename_vars => $gmap_mod) : ()),
+                    global_lexicals => $glex,
+                    global_subs => $gsubs,
+                    ($use_mods ? (global_modules => $use_mods) : ()));
+            }
+            $$main_ref = process($RTEXT{'--boot--'},
+                rename_vars => $O{rename_vars}, rename_subs => $O{rename_subs},
+                rename_exports => $O{rename_exports},
+                rewrite => $O{rewrite},
+                (%$gmap_mod ? (global_rename_vars => $gmap_mod) : ()),
+                global_lexicals => $glex,
+                global_subs => $gsubs,
+                ($use_mods ? (global_modules => $use_mods) : ()));
+        }
     }
+    return ($use_mods, $gmap, $glex, $gsubs);
+}
+
+# Assemble and write the standalone bundle from the final minified bodies:
+# a lazy @INC hook (mirrors App::FatPacker) that evaluates each bundled
+# source exactly when `require`d, so intra-module dependency ordering is
+# preserved instead of emitting everything top-to-bottom eagerly.  Module
+# sources are embedded with pack_string() (single-quoted / q<delim>
+# literals) instead of B::perlstring's always-double-quoted form, which
+# escapes every `$`/`@`/`%` and inflates the table by ~15%.  By default each
+# source is also deflate-compressed (best level) and base64-encoded before
+# embedding; --no-compress keeps the raw source literal.  The loader is
+# written literally below in a single-quoted heredoc so its own sigils never
+# need escaping; the only dynamic piece is the module table, spliced in at
+# the __SLPACK_ENTRIES__ placeholder.
+sub _emit_bundle {
+    my ($main, $paths, $meta, $use_mods, $gmap, $glex, $gsubs) = @_;
 
     my @modules;
-    for my $path (@paths_to_bundle) {
+    for my $path (@$paths) {
         # Reuse the minified body produced while walking the graph; only
-        # modules that were never reached that way (e.g. --bundle-lib-all)
-        # fall back to reading and processing here.
+        # modules that were never reached that way fall back to reading and
+        # processing here.
         my $out = $SLIMIFIED{$path};
         if (!defined $out) {
             open my $fh, '<', $path or die "Cannot read $path: $!";
             my $src = do { local $/; <$fh> };
             close $fh;
-            $out = $O{no_minify} ? $src : process($src, rename => $O{no_rename} ? 0 : !$meta{$path}{fatlib},
-                                                         rewrite => $O{rewrite});
+            $out = $O{no_minify} ? $src : process($src,
+                rename_vars => $O{rename_vars} && (!$meta->{$path}{fatlib} || !$O{fatlib_verbatim}),
+                rename_subs => $O{rename_subs},
+                rewrite => $O{rewrite},
+                (defined $gmap ? (global_rename_vars => $gmap, global_lexicals => $glex) : ()),
+                (defined $gsubs ? (global_subs => $gsubs) : ()));
         }
         $out =~ s/^#!\S+//;
         push @modules, $out;
     }
 
-    $main =~ s/^#!\S+//;
+    # The bundle keeps the boot script's own shebang line, captured in
+    # _boot_text before minification eats it (--shebang overrides it); a boot
+    # program without one gets the portable env form, since /usr/bin/perl
+    # does not exist everywhere (FreeBSD, custom perls).
+    my $shebang = $O{shebang} // '/usr/bin/env perl';
+    $shebang = "#!$shebang" if $shebang !~ /^#!/;
+    $main =~ s/\A#![^\n]*\n?//;
     $main =~ s{use lib[^;]+;}{}g;
-    $main = inline_plugins($main, \%classes) if $O{inline_plugins};
 
-    # The boot program is compressed the same way as modules unless it
-    # contains __DATA__ or __END__, which can't survive string-eval.
-    my $main_compressed = $O{compress} && $main !~ /^__(?:DATA|END)__\b/m;
-    if ($O{compress} && !$main_compressed) {
-        warn "slimpack: boot program has a __DATA__/__END__ section; leaving the boot program uncompressed\n";
+    # The boot program is compressed the same way as modules.  A
+    # __DATA__/__END__ section can't survive string-eval, so it is split off
+    # and bundled as its own '__DATA__' entry; the loader opens an in-memory
+    # handle over it and aliases *main::DATA before the boot program runs
+    # (semantics are the same except fileno(DATA), which has no OS
+    # descriptor, and tell(DATA), which counts from the data, not the file).
+    my $main_compressed = $O{compress};
+    my $data_section;
+    if ($main_compressed && $main =~ /^__(?:DATA|END)__[^\n]*\n?/m) {
+        $data_section = substr($main, $+[0]);
+        $main         = substr($main, 0, $-[0]);
     }
 
-    # Lazy @INC hook (mirrors App::FatPacker): bundled module sources are
-    # evaluated exactly when `require`d, so intra-module dependency ordering is
-    # preserved instead of emitting everything top-to-bottom eagerly.
-    my @inc_entries = map { $meta{$_}{inc_key} } @paths_to_bundle;
+    my @inc_entries = map { $meta->{$_}{inc_key} } @$paths;
+    if ($use_mods) {
+        @inc_entries = map { rename_module_path($_, $use_mods) } @inc_entries;
+    }
     my %code_by_file;
     @code_by_file{@inc_entries} = @modules;
 
-    # Module sources are embedded with pack_string() (single-quoted / q<delim>
-    # literals) instead of B::perlstring's always-double-quoted form, which
-    # escapes every `$`/`@`/`%` and inflates the table by ~15%.  By default each
-    # source is also deflate-compressed (best level) and base64-encoded before
-    # embedding; --no-compress keeps the raw source literal.  The loader is
-    # written literally below in a single-quoted heredoc so its own sigils never
-    # need escaping; the only dynamic piece is the module table, spliced in at
-    # the __SLPACK_ENTRIES__ placeholder.
     use B qw(perlstring);
-    my $entries = join ',',
-        map { perlstring($_) . " => " . pack_string(
-                 $O{compress} ? _zlib_base64($code_by_file{$_}) : $code_by_file{$_}) }
+    my $literal = $O{binary}   ? \&_zlib_binary
+                : $O{compress} ? sub { pack_string(_zlib_base64($_[0])) }
+                :                \&pack_string;
+    my @entries = map { perlstring($_) . "=>" . $literal->($code_by_file{$_}) }
         @inc_entries;
-    $entries .= ',' . perlstring('__MAIN__') . ' => ' . pack_string(_zlib_base64($main))
+    push @entries, perlstring('__MAIN__') . '=>' . $literal->($main)
         if $main_compressed;
-    my $loader;
-    if ($O{compress}) {
-        $loader = <<'LOADER';
-#!/usr/bin/perl
-use Compress::Raw::Zlib ();
-use MIME::Base64 qw(decode_base64);
-BEGIN{my%sl=(__SLPACK_ENTRIES__);my$class='SlimPacked::' . (0+%sl);no strict 'refs';*{($class).'::INC'}=sub{my($self,$file)=@_;return unless my$b=$sl{$file};my$i=Compress::Raw::Zlib::Inflate->new;my$code="";$i->inflate(decode_base64($b),\$code);open my$fh,'<',\$code or die"slimpack load $file: $!";return$fh;};unshift@INC,bless\%sl,$class;my$mb=$sl{'__MAIN__'};my$mi=Compress::Raw::Zlib::Inflate->new;my$mc="";$mi->inflate(decode_base64($mb),\$mc);eval$mc;die$@ if$@;};
-LOADER
-    } else {
-        $loader = <<'LOADER';
-#!/usr/bin/perl
-BEGIN{my%sl=(__SLPACK_ENTRIES__);my$class='SlimPacked::' . (0+%sl);no strict 'refs';*{($class).'::INC'}=sub{my($self,$file)=@_;return unless my$code=$sl{$file};open my$fh,'<',\$code or die"slimpack load $file: $!";return$fh;};unshift@INC,bless\%sl,$class;};
-LOADER
-    }
+    push @entries, perlstring('__DATA__') . '=>' . $literal->($data_section)
+        if defined $data_section;
+    my $entries = join ',', @entries;
+
+    my $loader = $O{compress} ? _loader_text_compressed() : _loader_text_plain();
     my ($pre, $post) = split /__SLPACK_ENTRIES__/, $loader, 2;
-    my $out = $pre . $entries . $post;
+    my $out = $shebang . "\n" . $pre . $entries . $post;
     $out .= $main unless $main_compressed;
 
     if ($O{output} eq '-') {
@@ -466,6 +713,34 @@ LOADER
     }
 }
 
+# Loader for compressed bundles.  Only the head differs between base64
+# (default) and --binary entries: the decoder closure $x, and whether
+# MIME::Base64 is needed.  The shared tail installs the lazy @INC hook,
+# aliases *main::DATA to the '__DATA__' entry if the boot program had a data
+# section (leaving an already-open main::DATA alone, with a warning), and
+# decodes the '__MAIN__' entry into a lexical that the last statement evals
+# AFTER the BEGIN block, at run phase — inside BEGIN, `perl -c bundle`
+# would execute the program.
+sub _loader_text_compressed {
+    my $head = $O{binary} ? <<'HEAD_BINARY' : <<'HEAD_BASE64';
+use Compress::Raw::Zlib ();
+my$m;BEGIN{my%c=(__SLPACK_ENTRIES__);my%u=("\x01"=>"\x01",n=>"\n",r=>"\r",z=>"\x1a",b=>"\\",q=>"'");my$x=sub{my($b)=@_;$b=~s/\x01(.)/$u{$1}/g;my$i=Compress::Raw::Zlib::Inflate->new;my$g="";$i->inflate($b,\$g);$g};
+HEAD_BINARY
+use Compress::Raw::Zlib ();
+use MIME::Base64 qw(decode_base64);
+my$m;BEGIN{my%c=(__SLPACK_ENTRIES__);my$x=sub{my$i=Compress::Raw::Zlib::Inflate->new;my$g="";$i->inflate(decode_base64($_[0]),\$g);$g};
+HEAD_BASE64
+    chomp $head;
+    return $head . <<'TAIL';
+my$d='SlimPacked::'.(0+%c);no strict 'refs';*{($d).'::INC'}=sub{my($e,$f)=@_;return unless my$b=$c{$f};my$g=$x->($b);open my$h,'<',\$g or die"slimpack load $f: $!";return$h};unshift@INC,bless\%c,$d;if(defined(my$D=$c{'__DATA__'})){if(defined fileno*main::DATA){warn"slimpack: main::DATA already open; leaving it\n"}else{my$v=$x->($D);open my$h,'<',\$v or die"slimpack DATA: $!";*main::DATA=$h}}if(defined(my$j=delete$c{'__MAIN__'})){$m=$x->($j)}};if(defined$m){eval$m;die$@ if$@}
+TAIL
+}
+
+sub _loader_text_plain {
+    return <<'LOADER';
+BEGIN{my%c=(__SLPACK_ENTRIES__);my$d='SlimPacked::'.(0+%c);no strict 'refs';*{($d).'::INC'}=sub{my($e,$f)=@_;return unless my$lit=$c{$f};my$g=eval$lit;die"slimpack decode $f: $@"if$@;open my$h,'<',\$g or die"slimpack load $f: $!";return$h};unshift@INC,bless\%c,$d;};
+LOADER
+}
 sub _boot_text {
     my ($script) = @_;
     if (@{$O{e}||[]} || @{$O{E}||[]}) {
@@ -474,6 +749,8 @@ sub _boot_text {
     open my $fh, '<', $script or die "Cannot read boot script $script: $!";
     my $content = do { local $/; <$fh> };
     close $fh;
+    # Remember the script's shebang for the bundle; the minifier strips it.
+    $O{shebang} //= $1 if $content =~ /\A(#![^\n]*)/;
     return perl_switches($O{m}||[], $O{M}||[], []) . $content;
 }
 
@@ -502,22 +779,41 @@ Options (pack and bundle):
   -o, --output FILE    write the bundled script to FILE (default: a.out)
   --lib DIR            project .pm sources (default: lib)
   --fatlib DIR         fatpacked module tree (default: fatlib; pack uses a temp one)
-  --no-minify          bundle verbatim, skipping the PPI minification pass
-  --no-rename          minify but leave variable names untouched
-  --rewrite            additionally shorten keywords/operators to equivalent
-                       forms (foreach->for, m/->/, +=1->++, etc.); experimental
-  --no-compress        embed module sources verbatim (compression with core
-                       deflate + base64 is ON by default; the boot program is
-                       compressed too unless it has a __DATA__/__END__ section)
+--no-minify          bundle verbatim, skipping the PPI minification pass
+  --rename-vars / --no-rename-vars  rename my variables (on by default)
+  --rename-subs / --no-rename-subs  rename sub/method names (on by default)
+  --rename-modules / --no-rename-modules  rename bundled module/class names
+                       (on by default; keeps each package's leaf component)
+  --rename-exports / --no-rename-exports  also rename names in qw() import /
+                       export lists and can()/import() strings (on by default)
+  --rewrite / --no-rewrite  additionally shorten keywords/operators to
+                       equivalent forms (foreach->for, m/->, +=1->++, etc.);
+                       experimental, off by default
+  --compress / --no-compress  deflate module sources and the boot program,
+                       including its __DATA__/__END__ section (on by default;
+                       --no-compress embeds them verbatim)
+  --binary / --no-binary  store the compressed sources as escaped binary
+                       (default, smallest) or base64 with --no-binary, which
+                       keeps the bundle a plain text file (~33% bigger payload)
+                       that survives git, diff, mail and copy-paste; neither
+                       is readable -- for that, use --no-compress
+  --shebang LINE       shebang for the bundle (default: the boot script's
+                       own; without one, #!/usr/bin/env perl)
   --no-inline-plugins  keep Module::Pluggable as a runtime dependency
   --bundle-lib-all     include every .pm under --lib, even if unreferenced
+  --include MODULE     also bundle MODULE (repeatable; * and ? are wildcards)
+  --exclude MODULE     never bundle MODULE (repeatable; * and ? are wildcards)
   -m/-M/-e/-E          build the boot program from perl-binary switches
 
 Options (minify):
-  -o, --output FILE    write minified output to FILE (needs one script)
-  --no-rename          minify but leave variable names untouched
-  --rewrite            additionally shorten keywords/operators to equivalent
-                       forms (foreach->for, m/->/, +=1->++, etc.); experimental
+-o, --output FILE    write minified output to FILE (needs one script)
+  --rename-vars / --no-rename-vars  rename my variables (on by default)
+  --rename-subs / --no-rename-subs  rename sub/method names (on by default)
+  --rename-exports / --no-rename-exports  also rename names in qw() import /
+                       export lists and can()/import() strings (on by default)
+  --rewrite / --no-rewrite  additionally shorten keywords/operators to
+                       equivalent forms (foreach->for, m/->, +=1->++, etc.);
+                       experimental, off by default
 USAGE
 }
 
@@ -538,8 +834,12 @@ if (@ARGV && $ARGV[0] =~ /^(?:pack|trace|packlists-for|tree|bundle|minify)$/) {
 # pack and bundle. trace / packlists-for / tree / minify parse their own.
 %O = (lib => 'lib', fatlib => 'fatlib', output => 'a.out',
        inline_plugins => 1, no_minify => 0, bundle_lib_all => 0,
-       no_rename => 0, rewrite => 0, compress => 1,
-       m => [], M => [], e => [], E => []);
+       rename_vars => 1, rename_subs => 1, rewrite => 0, compress => 1,
+       binary => undef,   # default: follow compress; --no-binary forces base64
+       shebang => undef,  # default: the boot script's own, else env perl
+       rename_modules => 1, rename_exports => 1,
+       fatlib_verbatim => 1,
+       m => [], M => [], e => [], E => [], include => [], exclude => []);
 
 if ($subcmd eq 'pack' or $subcmd eq 'bundle') {
     Getopt::Long::Configure('no_ignorecase');
@@ -548,11 +848,19 @@ if ($subcmd eq 'pack' or $subcmd eq 'bundle') {
         'fatlib=s'          => \$O{fatlib},
         'o|output=s'        => \$O{output},
         'no-minify'         => \$O{no_minify},
-        'no-rename'         => \$O{no_rename},
-        'rewrite'           => \$O{rewrite},
+        'rename!'           => \$O{rename_vars},   # legacy alias
+        'rename-vars!'      => \$O{rename_vars},
+        'rename-subs!'      => \$O{rename_subs},
+        'rename-modules!'   => \$O{rename_modules},
+        'rename-exports!'   => \$O{rename_exports},
+        'rewrite!'          => \$O{rewrite},
         'compress!'         => \$O{compress},
+        'binary!'           => \$O{binary},
+        'shebang=s'         => \$O{shebang},
         'no-inline-plugins' => sub { $O{inline_plugins} = 0 },
         'bundle-lib-all'    => \$O{bundle_lib_all},
+        'include=s@'        => $O{include},
+        'exclude=s@'        => $O{exclude},
         'm=s@'              => $O{m},
         'M=s@'              => $O{M},
         'e=s@'              => $O{e},
@@ -560,16 +868,22 @@ if ($subcmd eq 'pack' or $subcmd eq 'bundle') {
         'help'              => \my $help,
     ) or exit 2;
     if ($help) { print _usage(); exit 0; }
+    die "slimpack: --binary needs compression; drop --no-compress\n"
+        if $O{binary} && !$O{compress};
+    $O{binary} //= $O{compress};
 }
 
 my $minify_out;
 if ($subcmd eq 'minify') {
     Getopt::Long::Configure('no_ignorecase');
     Getopt::Long::GetOptionsFromArray(\@ARGV,
-        'o|output=s' => \$minify_out,
-        'no-rename'  => \$O{no_rename},
-        'rewrite'    => \$O{rewrite},
-        'help'       => \my $help,
+        'o|output=s'  => \$minify_out,
+        'rename!'     => \$O{rename_vars},   # legacy alias
+        'rename-vars!' => \$O{rename_vars},
+        'rename-subs!' => \$O{rename_subs},
+        'rename-exports!' => \$O{rename_exports},
+        'rewrite!'    => \$O{rewrite},
+        'help'        => \my $help,
     ) or exit 2;
     if ($help) { print _usage(); exit 0; }
 }
@@ -640,31 +954,121 @@ Fatpacked module tree (default C<fatlib>; C<pack> uses a temporary one).
 
 Bundle modules and boot program verbatim, skipping the PPI minification pass.
 
-=item --no-rename
+=item --rename-vars, --no-rename-vars
 
-Minify but leave variable names untouched (perl C<process(..., rename => 0)>).
-The default minifies and renames C<my> variables.  Applies to bundling and to
-the C<minify> mode.
+Minify and rename C<my> variables (default), or with C<--no-rename-vars>
+leave variable names untouched (perl C<process(..., rename_vars => 0)>).
+Applies to bundling and to the C<minify> mode.  The legacy spelling
+C<--rename>/C<--no-rename> is still accepted as an alias.
 
-=item --rewrite
+=item --rename-subs, --no-rename-subs
+
+Also rename sub and method names to short names (default): definitions,
+plain calls, C<< ->method >> chains, C<&name>/C<\&name> code-references and
+fully-qualified C<< Pkg::name(...) >> calls are all shortened in step, so the
+bundle shrinks further than variable renaming alone reaches.  Names are kept
+verbatim when Perl dispatches or reads them by name: keywords and builtins,
+magic methods (C<new>, C<DESTROY>, C<AUTOLOAD>, C<import>, C<can>, C<isa>,
+C<tie> methods, serialization hooks), string arguments to C<< ->can(...) >>
+and friends, hashed-deref keys and label/goto targets.
+Variable-method dispatch C<< $obj->$name >> is unchanged, but a method that is
+only invoked through C<$obj->can('method')> plus a string would stop matching
+after the rename; such modules should be packed with C<--no-rename-subs>.
+
+When C<bundle>ing, the whole dependency graph is renamed consistently with
+one shared name map (the C<minify> mode renames each file independently).
+
+=item --rename-modules, --no-rename-modules
+
+On by default when bundling: rename the namespace components of every bundled
+package to short names, keeping each package's leaf (final) component verbatim.
+A bundle controls its own dependency graph, so C<< package App::Thing >>,
+C<< use App::Thing >>, C<< App::Thing->new >>, qualified C<< App::Thing::sub >>
+and module/namespace strings (C<"App/Thing.pm">) can all agree on one short
+name, shrinking the file further than sub renaming alone.  The leaf is kept so
+that filename-based plugin discovery (C<< Module::Pluggable >> search paths
+built from a namespace string plus a C<.pm> leaf) and loader keys C<App/Thing.pm>
+stay coherent.  Only names that are statically visible are rewritten; a module
+name assembled at runtime (from user config, directory globbing or
+C<string-eval>) cannot be followed and must be handled by the app author, so
+bundles that do that should be packed with C<--no-rename-modules>.
+
+=item --rename-exports, --no-rename-exports
+
+On by default.  With C<--rename-subs>, names in the export/import protocol are
+renamed in step with the sub they refer to: C<use ... qw(foo)>, C<< @EXPORT_OK
+= qw(foo) >>, C<< $o->can('foo') >>, C<< $o->import('foo') >> and the
+corresponding bareword forms.  Pragma import arguments (C<use lib 'path'>,
+C<use parent>, C<use constant>) and any string that is not a single word are
+left alone.  A program that builds method names from other strings at runtime
+should be packed with C<--no-rename-exports>.
+
+=item --rewrite, --no-rewrite
 
 Additionally shorten keywords and operators into equivalent forms
 (C<foreach> -> C<for>, C<m/.../> -> C</.../> after C<=~>/C<!~>, trailing C<;>
 before C<}>, C<$x += 1> -> C<$x++>, C<$x = $x OP $y> -> C<$x OP= $y>,
-C<print($x)> -> C<print $x>).  Opt-in and experimental; disabled by default.
+C<print($x)> -> C<print $x>).  Opt-in and experimental; C<--rewrite> enables
+it, C<--no-rewrite> restores the default (off).
 
-=item --no-compress
+When C<bundle>ing, C<--rewrite> also renames C<our>-declared package globals
+across the whole bundle (declaration and all references, fully-qualified
+C<$PKG::name> or not), since the bundle controls its entire dependency graph.
+Postfix declarations (C<return if our $flag>) count too.  C<$VERSION>/
+C<$AUTOLOAD>/C<@ISA>, ALL_CAPS, control-variable (C<$^...>) and single-character
+names are never renamed, and a global is skipped if its name is a C<my>/
+C<state> lexical anywhere in the bundle -- so an unqualified reference can
+never become ambiguous.  Interpolating strings follow the rename while
+quoted: C<"$name">, C<qq{_${name}}>, C<< <<"EOF" >> heredoc bodies, C<< <$fh> >>
+readlines and backticks are written with the short name (escaped dollars and
+literal-only tokens stay as they are), so names quoted in templates shrink
+too.
 
-Embed module sources and the boot program verbatim instead of deflate + base64
-compression.  By default the minified source of each bundled module -- and the
-boot program, unless it contains a C<__DATA__>/C<__END__> section -- is
-compressed at install time (best level) with the core C<Compress::Raw::Zlib>
-module and C<MIME::Base64>, and decompressed lazily by the embedded loader (also
-core-only) exactly when a module is C<require>d (or just before the boot
-program is C<eval>d).  A boot program with a data section cannot be
-string-eval'd, so it is kept verbatim and a warning is issued.  Raw
-C<--no-compress> bundles keep the sources and boot program visible and
+=item --compress, --no-compress
+
+Deflate the minified source of each bundled module -- and the boot program
+(default), or embed them verbatim with C<--no-compress>.  Compression happens
+at install time at the best level with the core C<Compress::Raw::Zlib>
+module, and the embedded loader (also core-only) decompresses lazily exactly
+when a module is C<require>d (or just before the boot program is C<eval>d).
+How the compressed bytes are stored is picked with L</--binary, --no-binary>.
+Raw C<--no-compress> bundles keep the sources and boot program visible and
 readable, at the cost of a larger file.
+
+A boot-program C<__DATA__>/C<__END__> section is compressed too: it is split
+off, bundled on its own, and served through an in-memory handle the loader
+installs as C<*main::DATA> before the boot program runs (a C<main::DATA>
+that something already opened is left alone, with a warning).  Reading,
+C<seek>, C<tell> and C<eof> work as usual; the differences are that
+C<fileno(DATA)> is -1, as there is no OS file descriptor behind it, and that
+C<tell> counts from the start of the data rather than of the script file.
+
+=item --binary, --no-binary
+
+Store the compressed sources as escaped binary (the default), or
+base64-encoded with C<--no-binary>.  In binary form only the bytes that could
+be mangled in transit or by the Perl parser are escaped (CR, LF, ctrl-Z,
+backslash, the quote), so the payload is about 2% larger than the raw deflate
+output instead of base64's 33%, making the bundle roughly 25% smaller; the
+loader also drops the C<MIME::Base64> dependency.  The escaping keeps the
+payload free of CR, LF and ctrl-Z bytes, so running the bundle is safe on
+every platform, including Windows text-mode reads.
+
+A binary bundle still contains NUL and high-bit bytes, so treat it as an
+opaque artifact and move it byte-for-byte: an editor that re-saves it as
+UTF-8, a copy-paste, or a transfer in text mode corrupts it silently.  Use
+C<--no-binary> when the bundle must stay a plain text file that survives
+those channels -- checked into a repository and diffed, sent by mail, pasted
+into a terminal.  Neither form makes the sources readable; to inspect or
+debug what a bundle runs, use C<--no-compress> (and C<--no-minify> for the
+verbatim sources).
+
+=item --shebang LINE
+
+The shebang line for the bundle.  The default is the boot script's own
+shebang; a boot script without one (or a C<-e>/C<-E> program) gets
+C<#!/usr/bin/env perl>, which also works on systems without
+C</usr/bin/perl>, such as FreeBSD.  The leading C<#!> may be left out.
 
 =item --no-inline-plugins
 
@@ -674,6 +1078,22 @@ Keep Module::Pluggable as a runtime dependency instead of inlining plugins.
 
 Include every C<.pm> under --lib, even if not referenced. By default only
 statically-reachable lib modules are bundled; fatlib is always fully included.
+
+=item --include MODULE
+
+Also bundle MODULE and what it loads, for modules the script loads in a way
+slimpack can't see, such as a plugin chosen at runtime.  Repeat it for more
+modules.  C<*> and C<?> work as wildcards, so C<--include 'DateTime::TimeZone::*'>
+takes all of them.
+
+=item --exclude MODULE
+
+Never bundle MODULE, even when something loads it.  Takes the same patterns
+as C<--include>.  Use it to leave out optional parts of a dependency the
+script never uses.
+
+Moo's Moose support is left out without this: C<Moo::HandleMoose>, which
+loads Moose, is only bundled when Moose is in the bundle anyway.
 
 =item -m MODULE
 

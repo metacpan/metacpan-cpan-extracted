@@ -1,5 +1,5 @@
 package Clay::UI::Role::Interaction::Focusable;
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 use v5.22;
 use warnings;
 use feature 'signatures';
@@ -168,8 +168,8 @@ is enabled, and one built with C<< can_focus => 0 >> stays unable to
 take it when it is enabled. A write takes one plain boolean value,
 returns what reading returns now, and does not bump the revision
 (nothing drawn depends on it). When the widget has the focus and can no
-longer take it, it loses the focus at once and gets C<OnBlur> (see
-L<Clay::UI::Interaction/release_ineligible>). Dies with
+longer take it, it loses the focus at once to its heir and gets
+C<OnBlur> (see L<Clay::UI::Interaction/release_ineligible>). Dies with
 C<Clay::UI: 'can_focus' must be a plain boolean value> or
 C<Clay::UI: 'can_focus' takes one value>.
 
@@ -208,8 +208,8 @@ L</focus_eligibility_changed>.
 
 For a class whose L</accepts_focus> answer depends on its own state:
 call it from the setter of that state, after the state changed. A
-focused widget that can no longer take the focus loses it at once and
-gets C<OnBlur> before this returns (see
+focused widget that can no longer take the focus loses it at once to
+its heir and gets C<OnBlur> before this returns (see
 L<Clay::UI::Interaction/release_ineligible>); a widget outside a
 L<Clay::UI> is left alone. Bumps the revision
 (L<Clay::UI::Revision>), since such state usually changes how the

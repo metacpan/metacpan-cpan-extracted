@@ -8,8 +8,8 @@ our $VERSION = '0.01';
 
 use Time::Keeper;
 
-my %KEYS = map { $_ => 1 } qw(kind month day day_of_week n offset orthodox rule days members name observed weekend from to only_if);
-my %FORMS = map { $_ => 1 } qw(none next_business_day nearest_business_day next_monday);
+my %KEYS = map { $_ => 1 } qw(kind month day day_of_week n offset orthodox rule days members name observed weekend from to only_if except also keep);
+my %FORMS = map { $_ => 1 } qw(none next_business_day nearest_business_day next_monday previous_business_day next_business_day_if_sunday);
 
 sub _croak {
     require Carp;
@@ -93,6 +93,37 @@ sub set {
     return $class->_new(%a, kind => 'set', members => \@members);
 }
 
+sub weekday_on_or_after  { my $class = shift; $class->_weekday('on_after', 'weekday_on_or_after', @_) }
+sub weekday_on_or_before { my $class = shift; $class->_weekday('on_before', 'weekday_on_or_before', @_) }
+
+sub _weekday {
+    my ($class, $kind, $method, %a) = @_;
+    my $what = "Time::Keeper::Business::Rule->$method";
+    _croak("$what: rule must be a Time::Keeper::Business::Rule") unless _is_rule($a{rule});
+    _croak("$what: rule must not be a set") if $a{rule}{kind} eq 'set';
+    _croak("$what: rule must not be a sandwiched day") if $a{rule}{kind} eq 'sandwich';
+    my $days = defined $a{days} ? _int($what, 'days', $a{days}, -366, 366) : 0;
+    my $dow = _int($what, 'day_of_week', $a{day_of_week}, 1, 7);
+    my $n = defined $a{n} ? _int($what, 'n', $a{n}, 1, 5) : 1;
+    return $class->_new(%a, kind => $kind, days => $days, day_of_week => $dow, n => $n);
+}
+
+sub sandwiched {
+    my ($class, %a) = @_;
+    return $class->_new(%a, kind => 'sandwich');
+}
+
+sub except {
+    my ($self, %a) = @_;
+    return $self->_with(except => [ @{ $self->{except} || [] }, @{ $a{years} } ]);
+}
+
+sub also {
+    my ($self, %a) = @_;
+    my @d = map { ref $_ ? $_ : Time::Keeper::Date->parse($_) } @{ $a{dates} };
+    return $self->_with(also => [ @{ $self->{also} || [] }, @d ]);
+}
+
 sub _with {
     my ($self, %c) = @_;
     my $new = bless { %$self, %c }, ref $self;
@@ -106,13 +137,13 @@ sub observed {
     _croak("$what: the form is none, next_business_day, nearest_business_day, next_monday or a code ref")
         unless defined $form && (ref $form eq 'CODE' || (!ref $form && $FORMS{$form}));
     for my $k (keys %a) {
-        _croak("$what: unknown argument '$k'") unless $k eq 'weekend';
+        _croak("$what: unknown argument '$k'") unless $k eq 'weekend' || $k eq 'keep';
     }
     if (exists $a{weekend}) {
         _croak("$what: weekend is a list of days, 1 to 7") unless ref $a{weekend} eq 'ARRAY';
         _int($what, 'a weekend day', $_, 1, 7) for @{ $a{weekend} };
     }
-    return $self->_with(observed => $form, (exists $a{weekend} ? (weekend => [ @{ $a{weekend} } ]) : ()));
+    return $self->_with(observed => $form, keep => ($a{keep} ? 1 : 0), (exists $a{weekend} ? (weekend => [ @{ $a{weekend} } ]) : ()));
 }
 
 sub between {
@@ -163,10 +194,18 @@ sub _holidays {
 
 sub _applies {
     my ($self, $year) = @_;
+    return 0 if grep { $_ == $year } @{ $self->{except} || [] };
     return 0 if defined $self->{from} && $year < $self->{from};
     return 0 if defined $self->{to} && $year > $self->{to};
     return 0 if $self->{only_if} && !$self->{only_if}->($year);
     return 1;
+}
+
+sub _also_nodes {
+    my ($self, $year) = @_;
+    my @here = $self->{also} ? ($self) : ();
+    return @here unless $self->_applies($year) && $self->{kind} eq 'set';
+    return (@here, map { $_->_also_nodes($year) } @{ $self->{members} });
 }
 
 sub _leaves {
@@ -185,20 +224,35 @@ sub _compute {
     my ($self, $year) = @_;
     my $weekend = $self->_weekend;
     my (@rows, %taken, @out);
-    for my $m ($self->_leaves($year)) {
+    my @leaves = $self->_leaves($year);
+    for my $m (@leaves) {
         my $d = $m->_base($year) // next;
         push @rows, [ $m, $d ];
     }
+    for my $node ($self->_also_nodes($year)) {
+        push @rows, [ $node, $_, 'stays' ] for grep { $_->year == $year } @{ $node->{also} };
+    }
     for my $r (@rows) {
-        $taken{ $r->[1]->epoch_days } = 1 unless $r->[0]->_moves($r->[1], $weekend);
+        $taken{ $r->[1]->epoch_days } = 1 if $r->[2] || $r->[0]{keep} || !$r->[0]->_moves($r->[1], $weekend);
     }
     for my $r (@rows) {
         my ($m, $d) = @$r;
-        if ($m->_moves($d, $weekend)) {
+        if (!$r->[2] && $m->_moves($d, $weekend)) {
+            push @out, [ $d, $m->{name} ] if $m->{keep};
             $d = $m->_move($d, \%taken, $weekend) // next;
             $taken{ $d->epoch_days } = 1;
         }
         push @out, [ $d, $m->{name} ];
+    }
+    my %base = map { $_->[1]->epoch_days => 1 } @rows;
+    for my $sw (grep { $_->{kind} eq 'sandwich' } @leaves) {
+        for my $r (@rows) {
+            my $c = $r->[1]->plus(days => 1);
+            next unless $base{ $c->epoch_days + 1 };
+            next if $taken{ $c->epoch_days } || $weekend->{ $c->day_of_week };
+            $taken{ $c->epoch_days } = 1;
+            push @out, [ $c, $sw->{name} ];
+        }
     }
     return @out;
 }
@@ -208,6 +262,7 @@ sub _moves {
     my $o = $self->{observed} // 'none';
     return 0 if $o eq 'none';
     return 1 if ref $o eq 'CODE';
+    return $d->day_of_week == 7 ? 1 : 0 if $o eq 'next_business_day_if_sunday';
     return $weekend->{ $d->day_of_week } ? 1 : 0;
 }
 
@@ -220,7 +275,11 @@ sub _move {
             if defined $r && !(ref $r && eval { $r->isa('Time::Keeper::Date') });
         return $r;
     }
-    if ($o eq 'next_business_day') {
+    if ($o eq 'previous_business_day') {
+        do { $d = $d->plus(days => -1) } while $weekend->{ $d->day_of_week } || $taken->{ $d->epoch_days };
+        return $d;
+    }
+    if ($o eq 'next_business_day' || $o eq 'next_business_day_if_sunday') {
         do { $d = $d->plus(days => 1) } while $weekend->{ $d->day_of_week } || $taken->{ $d->epoch_days };
         return $d;
     }
@@ -248,6 +307,15 @@ sub _base {
     if ($kind eq 'easter') {
         my $e = $self->{orthodox} ? _julian_easter($year) : _gregorian_easter($year);
         return $self->{offset} ? $e->plus(days => $self->{offset}) : $e;
+    }
+    return undef if $kind eq 'sandwich';
+    if ($kind eq 'on_after' || $kind eq 'on_before') {
+        my $base = $self->{rule}->_base($year) // return undef;
+        my $start = $base->plus(days => $self->{days});
+        my $d = $start;
+        if ($kind eq 'on_after') { $d = $d->plus(days => 1) while $d->day_of_week != $self->{day_of_week}; return $d->plus(days => 7 * ($self->{n} - 1)) }
+        $d = $d->plus(days => -1) while $d->day_of_week != $self->{day_of_week};
+        return $d->plus(days => -7 * ($self->{n} - 1));
     }
     if ($kind eq 'relative') {
         my $base = $self->{rule}->_base($year) // return undef;

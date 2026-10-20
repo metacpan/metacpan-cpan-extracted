@@ -2,8 +2,8 @@
  * clay_impl_helpers.h - Binding helpers compiled together with the Clay
  * implementation in src/clay_impl.c.
  *
- * They read Clay internals (struct Clay_Context, the default counts, the
- * arena allocation routines) that the public clay.h API does not expose.
+ * They read Clay internals (struct Clay_Context, the default counts) that
+ * the public clay.h API does not expose.
  * This header is Perl-free so src/clay_impl.c stays a pure Clay
  * compilation unit; src/clay_perl.h includes it for the rest of the
  * binding.
@@ -14,6 +14,8 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+
+#include "clay/clay.h"
 
 /* Receives one buffer Clay keeps reading (see the visit function below). */
 typedef void (*clay_perl_buffer_visitor)(const char *chars, void *data);
@@ -31,10 +33,39 @@ void clay_perl_clay_visit_exiting_buffers(clay_perl_buffer_visitor visit, void *
  * Clay_Initialize when no context is current. */
 void clay_perl_clay_default_counts(int32_t *element_count, int32_t *word_count);
 
+/* Clay_MinMemorySize() for explicit counts: Clay's own computation,
+ * whatever context is current and whatever Clay's defaults are (both are
+ * left as they were). Exact only while the arena fits Clay's 32-bit size
+ * arithmetic: callers check clay_perl_clay_arena_bytes_upper_bound first. */
+uint32_t clay_perl_clay_min_memory_size(int32_t element_count, int32_t word_count);
+
+/* Clay_Initialize(arena, dimensions, handler) for a context with exactly
+ * these counts. Clay's defaults and the counts of the previous current
+ * context stay as they were. Leaves the new context current; when Clay
+ * returns NULL, no context is current. */
+Clay_Context *clay_perl_clay_initialize(Clay_Arena arena, Clay_Dimensions dimensions, Clay_ErrorHandler handler,
+                                        int32_t element_count, int32_t word_count);
+
+/* Calls Clay__OpenTextElement(text, config) on the current context and
+ * reports the id Clay gave the new text element: true with *id the
+ * complete id as Clay computed it (read from the element's hash-map item,
+ * never recomputed), false when Clay keeps no element under an id for
+ * the text: it dropped the text at the element cap, or another element of
+ * this frame already holds the id. (Clay also adds no item when its id
+ * hash map is full, which its element count keeps from happening: the
+ * map is pruned every frame and has a slot per element.) */
+bool clay_perl_clay_open_text_element(Clay_String text, Clay_TextElementConfig config, Clay_ElementId *id);
+
 /* True while the current context's frame has more elements than its
  * element count allows: Clay then drops every further element, and
  * configuring or hovering one does nothing. */
 bool clay_perl_clay_max_elements_exceeded(void);
+
+/* How many more elements the frame being declared on the current context
+ * can hold: Clay stops declaring one slot short of its element count and
+ * keeps the slots of the elements still playing an exit transition (see
+ * Clay__LayoutElementsFull); 0 once Clay dropped an element. */
+int32_t clay_perl_clay_declarable_elements(void);
 
 /* True when the current context's scroll container with that element id
  * was declared in the current frame (or, between frames, in the last

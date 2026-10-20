@@ -256,14 +256,6 @@ double clay_perl_parse_float_in(pTHX_ SV *sv, const char *what, double min, doub
     croak_bad_argument(aTHX_ what, SvPV_nolen(expected), sv);
 }
 
-double clay_perl_parse_max_float(pTHX_ SV *sv, const char *what)
-{
-    SvGETMAGIC(sv);
-    float value;
-    if (!read_maximum(aTHX_ sv, &value)) croak_bad_argument(aTHX_ what, "a finite number or +Inf", sv);
-    return value;
-}
-
 UV clay_perl_parse_uint(pTHX_ SV *sv, const char *what, UV max)
 {
     return (UV) clay_perl_parse_integer(aTHX_ sv, what, 0, (NV) max);
@@ -275,15 +267,6 @@ double clay_perl_parse_float_or(pTHX_ SV *sv, const char *what, double fallback)
     if (!SvOK(sv)) return fallback;
     float value;
     if (!read_finite(aTHX_ sv, &value)) croak_bad_argument(aTHX_ what, "a finite number", sv);
-    return value;
-}
-
-double clay_perl_parse_max_float_or(pTHX_ SV *sv, const char *what, double fallback)
-{
-    SvGETMAGIC(sv);
-    if (!SvOK(sv)) return fallback;
-    float value;
-    if (!read_maximum(aTHX_ sv, &value)) croak_bad_argument(aTHX_ what, "a finite number or +Inf", sv);
     return value;
 }
 
@@ -306,6 +289,14 @@ NV clay_perl_parse_integer(pTHX_ SV *sv, const char *what, NV min, NV max)
     croak_bad_argument(aTHX_ what, SvPV_nolen(expected), sv);
 }
 
+HV *clay_perl_optional_hash(pTHX_ SV *sv, const char *what)
+{
+    SvGETMAGIC(sv);
+    if (!SvOK(sv)) return NULL;
+    if (!SvROK(sv) || SvTYPE(SvRV(sv)) != SVt_PVHV) croak_bad_argument(aTHX_ what, "a hash reference or undef", sv);
+    return (HV *) SvRV(sv);
+}
+
 SV *clay_perl_require_code(pTHX_ SV *sv, const char *what, bool allow_undef)
 {
     SvGETMAGIC(sv);
@@ -325,31 +316,6 @@ SV *clay_perl_require_code(pTHX_ SV *sv, const char *what, bool allow_undef)
 /* ===========================================================================
  * Struct field values: the scalar readers, croaking a struct error.
  * ======================================================================== */
-
-static float field_float(pTHX_ SV *sv, const marshal_label *what, const char *field)
-{
-    float value;
-    if (!read_finite(aTHX_ sv, &value)) croak_bad_value(aTHX_ what, field, "a finite number", sv);
-    return value;
-}
-
-/* A finite number in min..max; a max of FLT_MAX means "no upper bound". */
-static float field_float_in(pTHX_ SV *sv, const marshal_label *what, const char *field, NV min, NV max)
-{
-    float value;
-    if (read_finite(aTHX_ sv, &value) && value >= min && value <= max) return value;
-    SV *expected = max >= FLT_MAX
-        ? newSVpvf("a number >= %g", (double) min)
-        : newSVpvf("a number in %g..%g", (double) min, (double) max);
-    croak_struct_error(aTHX_ what, field, expected, describe_value(aTHX_ sv), NULL);
-}
-
-static float field_maximum(pTHX_ SV *sv, const marshal_label *what, const char *field)
-{
-    float value;
-    if (!read_maximum(aTHX_ sv, &value)) croak_bad_value(aTHX_ what, field, "a finite number or +Inf", sv);
-    return value;
-}
 
 static NV field_integer(pTHX_ SV *sv, const marshal_label *what, const char *field, NV min, NV max)
 {
@@ -388,11 +354,6 @@ static SV *fetch_defined(pTHX_ HV *hv, const char *key)
     if (!slot || !*slot) return NULL;
     SvGETMAGIC(*slot);
     return SvOK(*slot) ? *slot : NULL;
-}
-
-static void hv_store_nv(pTHX_ HV *hv, const char *key, NV value)
-{
-    (void) hv_store(hv, key, (I32) strlen(key), newSVnv(value), 0);
 }
 
 static void hv_store_iv(pTHX_ HV *hv, const char *key, IV value)
@@ -513,7 +474,8 @@ static UV clay_string_slice_offset(pTHX_ const Clay_StringSlice *slice, slice_of
  * mode). Each field names its C member, where it lives in the struct and
  * how its value is read and written. Integers carry their range and are
  * stored at the member's size; enums run 0..CLAY_PERL_ENUM_MAX and flags
- * 0..CLAY_PERL_FLAGS_ALL of their group (src/clay_perl_enums.h). A custom
+ * 0..CLAY_PERL_FLAGS_ALL of their group (src/clay_perl_enums.h), and name
+ * that group. A custom
  * field has its own reader and writer; a schema may also replace the
  * whole hash walk in both directions (a union) or finish a parsed struct
  * (fields that are not in the hash).
@@ -521,7 +483,8 @@ static UV clay_string_slice_offset(pTHX_ const Clay_StringSlice *slice, slice_of
 
 typedef enum {
     FIELD_FLOAT,
-    FIELD_FLOAT_IN,     /* a float within min..max */
+    FIELD_FLOAT_IN,     /* a float within min..max; a max of FLT_MAX means "no upper bound" */
+    FIELD_MAXIMUM,      /* a size maximum: a finite float or +Inf */
     FIELD_INTEGER,
     FIELD_BOOL,
     FIELD_POINTER,
@@ -547,6 +510,7 @@ typedef struct schema_field {
     const struct_schema *nested;  /* FIELD_STRUCT; a FIELD_CUSTOM holding a struct */
     field_reader read;            /* FIELD_CUSTOM */
     field_writer write;           /* FIELD_CUSTOM */
+    const char *enum_group;       /* a FIELD_INTEGER holding an enum or flags group's values */
 } schema_field;
 
 enum {
@@ -571,33 +535,36 @@ struct struct_schema {
 #define MEMBER_SIZE(type, member) sizeof(((type *) 0)->member)
 
 #define F_FLOAT(type, member) \
-    { #member, offsetof(type, member), MEMBER_SIZE(type, member), FIELD_FLOAT, 0, 0, NULL, NULL, NULL }
+    { #member, offsetof(type, member), MEMBER_SIZE(type, member), FIELD_FLOAT, 0, 0, NULL, NULL, NULL, NULL }
 #define F_FLOAT_IN(type, member, lo, hi) \
-    { #member, offsetof(type, member), MEMBER_SIZE(type, member), FIELD_FLOAT_IN, (lo), (hi), NULL, NULL, NULL }
+    { #member, offsetof(type, member), MEMBER_SIZE(type, member), FIELD_FLOAT_IN, (lo), (hi), NULL, NULL, NULL, NULL }
 #define F_NON_NEGATIVE(type, member) F_FLOAT_IN(type, member, 0, FLT_MAX)
 #define F_INT(type, member, lo, hi) \
-    { #member, offsetof(type, member), MEMBER_SIZE(type, member), FIELD_INTEGER, (lo), (hi), NULL, NULL, NULL }
+    { #member, offsetof(type, member), MEMBER_SIZE(type, member), FIELD_INTEGER, (lo), (hi), NULL, NULL, NULL, NULL }
 #define F_U16(type, member)       F_INT(type, member, 0, UINT16_MAX)
 #define F_U32(type, member)       F_INT(type, member, 0, (NV) UINT32_MAX)
-#define F_ENUM(type, member, max) F_INT(type, member, 0, (max))
+#define F_GROUP(type, member, max, group) \
+    { #member, offsetof(type, member), MEMBER_SIZE(type, member), FIELD_INTEGER, 0, (max), NULL, NULL, NULL, #group }
+#define F_ENUM(type, member, group) F_GROUP(type, member, CLAY_PERL_ENUM_MAX(group), group)
 /* Any OR of a flags group's members: their bits fill 0..all. */
-#define F_FLAGS(type, member, all) F_INT(type, member, 0, (all))
+#define F_FLAGS(type, member, group) F_GROUP(type, member, CLAY_PERL_FLAGS_ALL(group), group)
 #define F_BOOL(type, member) \
-    { #member, offsetof(type, member), MEMBER_SIZE(type, member), FIELD_BOOL, 0, 0, NULL, NULL, NULL }
+    { #member, offsetof(type, member), MEMBER_SIZE(type, member), FIELD_BOOL, 0, 0, NULL, NULL, NULL, NULL }
 #define F_POINTER(type, member) \
-    { #member, offsetof(type, member), MEMBER_SIZE(type, member), FIELD_POINTER, 0, 0, NULL, NULL, NULL }
+    { #member, offsetof(type, member), MEMBER_SIZE(type, member), FIELD_POINTER, 0, 0, NULL, NULL, NULL, NULL }
 #define F_STRUCT(type, member, schema) \
-    { #member, offsetof(type, member), MEMBER_SIZE(type, member), FIELD_STRUCT, 0, 0, &(schema), NULL, NULL }
+    { #member, offsetof(type, member), MEMBER_SIZE(type, member), FIELD_STRUCT, 0, 0, &(schema), NULL, NULL, NULL }
 #define F_CUSTOM(name, type, member, reader, writer) \
-    { (name), offsetof(type, member), MEMBER_SIZE(type, member), FIELD_CUSTOM, 0, 0, NULL, (reader), (writer) }
+    { (name), offsetof(type, member), MEMBER_SIZE(type, member), FIELD_CUSTOM, 0, 0, NULL, (reader), (writer), NULL }
 
 /* Members of an anonymous struct nested in `type` (transition enter and
  * exit), with offsets relative to that inner struct. */
 #define INNER_OFFSET(type, inner, member) (offsetof(type, inner.member) - offsetof(type, inner))
-#define F_INNER_ENUM(type, inner, member, max) \
-    { #member, INNER_OFFSET(type, inner, member), MEMBER_SIZE(type, inner.member), FIELD_INTEGER, 0, (max), NULL, NULL, NULL }
+#define F_INNER_ENUM(type, inner, member, group) \
+    { #member, INNER_OFFSET(type, inner, member), MEMBER_SIZE(type, inner.member), FIELD_INTEGER, 0, \
+      CLAY_PERL_ENUM_MAX(group), NULL, NULL, NULL, #group }
 #define F_INNER_CUSTOM(name, type, inner, member, reader, writer) \
-    { (name), INNER_OFFSET(type, inner, member), MEMBER_SIZE(type, inner.member), FIELD_CUSTOM, 0, 0, NULL, (reader), (writer) }
+    { (name), INNER_OFFSET(type, inner, member), MEMBER_SIZE(type, inner.member), FIELD_CUSTOM, 0, 0, NULL, (reader), (writer), NULL }
 
 #define SCHEMA(c_name, type, fields, shapes, read_hash, write_hash, finish, hint) \
     { (c_name), sizeof(type), (fields), FIELD_COUNT(fields), (shapes), (read_hash), (write_hash), (finish), (hint) }
@@ -626,13 +593,39 @@ static void store_integer(pTHX_ const schema_field *field, void *slot, NV value)
     croak("marshal.c: field '%s' has unsupported integer size %d", field->name, (int) field->size);
 }
 
-/* A FIELD_FLOAT or FIELD_FLOAT_IN value; name is NULL when the whole
- * struct was given as one number. */
+/* Whether sv (get-magic has run) holds a value of a FIELD_FLOAT,
+ * FIELD_FLOAT_IN or FIELD_MAXIMUM field; stores it in *out. */
+static bool read_float_for(pTHX_ const schema_field *field, SV *sv, float *out)
+{
+    if (field->kind == FIELD_MAXIMUM) return read_maximum(aTHX_ sv, out);
+    if (!read_finite(aTHX_ sv, out)) return false;
+    return field->kind != FIELD_FLOAT_IN || (*out >= field->min && *out <= field->max);
+}
+
+/* What read_float_for accepts for the field, as a new SV. */
+static SV *float_expectation(pTHX_ const schema_field *field)
+{
+    switch (field->kind) {
+    case FIELD_MAXIMUM:
+        return newSVpvs("a finite number or +Inf");
+    case FIELD_FLOAT_IN:
+        return field->max >= FLT_MAX
+            ? newSVpvf("a number >= %g", (double) field->min)
+            : newSVpvf("a number in %g..%g", (double) field->min, (double) field->max);
+    default:
+        return newSVpvs("a finite number");
+    }
+}
+
+/* A float field's value; name is NULL when the whole struct was given as
+ * one number. */
 static float read_float_field(pTHX_ const schema_field *field, SV *sv, const marshal_label *what, const char *name)
 {
-    return field->kind == FIELD_FLOAT_IN
-        ? field_float_in(aTHX_ sv, what, name, field->min, field->max)
-        : field_float(aTHX_ sv, what, name);
+    float value;
+    if (!read_float_for(aTHX_ field, sv, &value)) {
+        croak_struct_error(aTHX_ what, name, float_expectation(aTHX_ field), describe_value(aTHX_ sv), NULL);
+    }
+    return value;
 }
 
 /* Reads a defined value (get-magic has run) into the field's member. */
@@ -643,6 +636,7 @@ static void read_field(pTHX_ const schema_field *field, SV *sv, char *base,
     switch (field->kind) {
     case FIELD_FLOAT:
     case FIELD_FLOAT_IN:
+    case FIELD_MAXIMUM:
         *(float *) slot = read_float_field(aTHX_ field, sv, what, field->name);
         return;
     case FIELD_INTEGER:
@@ -817,6 +811,7 @@ static SV *write_field(pTHX_ const schema_field *field, const char *base)
     switch (field->kind) {
     case FIELD_FLOAT:
     case FIELD_FLOAT_IN:
+    case FIELD_MAXIMUM:
         return newSVnv(*(const float *) slot);
     case FIELD_INTEGER:
         return integer_sv(aTHX_ field, slot);
@@ -961,64 +956,113 @@ static const struct_schema border_width_schema =
     SCHEMA("Clay_BorderWidth", Clay_BorderWidth, border_width_fields, SHAPE_HASH, NULL, NULL, NULL, NULL);
 
 static const schema_field child_alignment_fields[] = {
-    F_ENUM(Clay_ChildAlignment, x, CLAY_PERL_ENUM_MAX(LayoutAlignmentX)),
-    F_ENUM(Clay_ChildAlignment, y, CLAY_PERL_ENUM_MAX(LayoutAlignmentY)),
+    F_ENUM(Clay_ChildAlignment, x, LayoutAlignmentX),
+    F_ENUM(Clay_ChildAlignment, y, LayoutAlignmentY),
 };
 static const struct_schema child_alignment_schema =
     SCHEMA("Clay_ChildAlignment", Clay_ChildAlignment, child_alignment_fields, SHAPE_HASH, NULL, NULL, NULL, NULL);
 
 /* { type, min, max } for fit/grow/fixed (union member minMax) or
- * { type, percent } for percent. The order matters: the keys of a
- * min/max axis are fields 0..2, those of a percent axis fields 2..3. */
-/* min, max and percent share a union, so the hash reader and writer
- * below handle them; their entries only name the keys. */
+ * { type, percent } for percent. min, max and percent share a union, so
+ * the hash reader and writer below pick the rows of the member the axis
+ * type selects (sizing_axis_rows) and read and write only those. The
+ * order matters: the rows of a min/max axis are 0..2, those of a percent
+ * axis 2..3. The sizing helpers read their arguments by these rows too. */
+#define F_UNION_MEMBER(name, type, member, kind, lo, hi) \
+    { (name), offsetof(type, member), MEMBER_SIZE(type, member), (kind), (lo), (hi), NULL, NULL, NULL, NULL }
+enum { SIZING_AXIS_MIN, SIZING_AXIS_MAX, SIZING_AXIS_TYPE, SIZING_AXIS_PERCENT };
 static const schema_field sizing_axis_fields[] = {
-    { "min",     0, 0, FIELD_FLOAT, 0, 0, NULL, NULL, NULL },
-    { "max",     0, 0, FIELD_FLOAT, 0, 0, NULL, NULL, NULL },
-    F_ENUM(Clay_SizingAxis, type, CLAY_PERL_ENUM_MAX(SizingType)),
-    { "percent", 0, 0, FIELD_FLOAT_IN, 0, 1, NULL, NULL, NULL },
+    F_UNION_MEMBER("min",     Clay_SizingAxis, size.minMax.min, FIELD_FLOAT,    0, 0),
+    F_UNION_MEMBER("max",     Clay_SizingAxis, size.minMax.max, FIELD_MAXIMUM,  0, 0),
+    F_ENUM        (Clay_SizingAxis, type, SizingType),
+    F_UNION_MEMBER("percent", Clay_SizingAxis, size.percent,    FIELD_FLOAT_IN, 0, 1),
 };
 
 static const char sizing_axis_hint[] = "sizing_fit, sizing_grow, sizing_fixed or sizing_percent build one";
 
-/* The axis type selects the union member, so only that member's keys are
- * read (and, in check mode, allowed). */
+/* The rows an axis of the given type has, its type row included. */
+static const schema_field *sizing_axis_rows(Clay__SizingType type, size_t *count)
+{
+    if (type == CLAY__SIZING_TYPE_PERCENT) {
+        *count = 2;
+        return &sizing_axis_fields[SIZING_AXIS_TYPE];
+    }
+    *count = 3;
+    return &sizing_axis_fields[SIZING_AXIS_MIN];
+}
+
+/* The type (default fit) selects the union member, so only that member's
+ * keys are read (and, in check mode, allowed). */
 static void read_sizing_axis(pTHX_ HV *hv, void *out, const marshal_label *what, bool strict)
 {
+    const schema_field *type_row = &sizing_axis_fields[SIZING_AXIS_TYPE];
     Clay_SizingAxis *axis = (Clay_SizingAxis *) out;
-    SV *type = fetch_defined(aTHX_ hv, "type");
-    axis->type = type
-        ? (Clay__SizingType) field_integer(aTHX_ type, what, "type", 0, CLAY_PERL_ENUM_MAX(SizingType))
-        : CLAY__SIZING_TYPE_FIT;
+    axis->type = CLAY__SIZING_TYPE_FIT;
+    SV *type = fetch_defined(aTHX_ hv, type_row->name);
+    if (type) read_field(aTHX_ type_row, type, (char *) out, what, strict);
 
-    if (axis->type == CLAY__SIZING_TYPE_PERCENT) {
-        if (strict) reject_unknown_keys(aTHX_ hv, sizing_axis_fields + 2, 2, what, sizing_axis_hint);
-        SV *percent = fetch_defined(aTHX_ hv, "percent");
-        axis->size.percent = percent ? field_float_in(aTHX_ percent, what, "percent", 0, 1) : 0.0f;
-        return;
+    size_t count;
+    const schema_field *rows = sizing_axis_rows(axis->type, &count);
+    if (strict) reject_unknown_keys(aTHX_ hv, rows, count, what, sizing_axis_hint);
+    for (size_t i = 0; i < count; i++) {
+        if (&rows[i] == type_row) continue;
+        SV *value = fetch_defined(aTHX_ hv, rows[i].name);
+        if (value) read_field(aTHX_ &rows[i], value, (char *) out, what, strict);
     }
-    if (strict) reject_unknown_keys(aTHX_ hv, sizing_axis_fields, 3, what, sizing_axis_hint);
-    SV *min = fetch_defined(aTHX_ hv, "min");
-    SV *max = fetch_defined(aTHX_ hv, "max");
-    axis->size.minMax.min = min ? field_float(aTHX_ min, what, "min") : 0.0f;
-    axis->size.minMax.max = max ? field_maximum(aTHX_ max, what, "max") : 0.0f;
 }
 
 static void write_sizing_axis(pTHX_ HV *hv, const void *in)
 {
-    const Clay_SizingAxis *axis = (const Clay_SizingAxis *) in;
-    hv_store_iv(aTHX_ hv, "type", (IV) axis->type);
-    if (axis->type == CLAY__SIZING_TYPE_PERCENT) {
-        hv_store_nv(aTHX_ hv, "percent", axis->size.percent);
-        return;
+    const schema_field *type_row = &sizing_axis_fields[SIZING_AXIS_TYPE];
+    hv_store_sv(aTHX_ hv, type_row->name, write_field(aTHX_ type_row, (const char *) in));
+
+    size_t count;
+    const schema_field *rows = sizing_axis_rows(((const Clay_SizingAxis *) in)->type, &count);
+    for (size_t i = 0; i < count; i++) {
+        if (&rows[i] == type_row) continue;
+        hv_store_sv(aTHX_ hv, rows[i].name, write_field(aTHX_ &rows[i], (const char *) in));
     }
-    hv_store_nv(aTHX_ hv, "min", axis->size.minMax.min);
-    hv_store_nv(aTHX_ hv, "max", axis->size.minMax.max);
 }
 
 static const struct_schema sizing_axis_schema =
     SCHEMA("Clay_SizingAxis", Clay_SizingAxis, sizing_axis_fields, SHAPE_HASH, read_sizing_axis, write_sizing_axis,
            NULL, sizing_axis_hint);
+
+/* A sizing helper's argument for one row (any value, get-magic not yet
+ * run), read by the row's kind and range. Function arguments croak plain
+ * strings: "func: key: expected ...". An optional argument is 0 when
+ * undef. */
+static float sizing_axis_argument(pTHX_ const schema_field *row, SV *sv, const char *func, bool optional)
+{
+    SvGETMAGIC(sv);
+    if (optional && !SvOK(sv)) return 0.0f;
+    float value;
+    if (!read_float_for(aTHX_ row, sv, &value)) {
+        SV *what = sv_2mortal(newSVpvf("%s: %s", func, row->name));
+        SV *expected = sv_2mortal(float_expectation(aTHX_ row));
+        croak_bad_argument(aTHX_ SvPV_nolen(what), SvPV_nolen(expected), sv);
+    }
+    return value;
+}
+
+Clay_SizingAxis clay_sizing_min_max_axis(pTHX_ Clay__SizingType type, SV *min, SV *max, const char *func)
+{
+    Clay_SizingAxis axis;
+    memset(&axis, 0, sizeof(axis));
+    axis.type = type;
+    axis.size.minMax.min = sizing_axis_argument(aTHX_ &sizing_axis_fields[SIZING_AXIS_MIN], min, func, true);
+    axis.size.minMax.max = sizing_axis_argument(aTHX_ &sizing_axis_fields[SIZING_AXIS_MAX], max, func, true);
+    return axis;
+}
+
+Clay_SizingAxis clay_sizing_percent_axis(pTHX_ SV *percent, const char *func)
+{
+    Clay_SizingAxis axis;
+    memset(&axis, 0, sizeof(axis));
+    axis.type = CLAY__SIZING_TYPE_PERCENT;
+    axis.size.percent = sizing_axis_argument(aTHX_ &sizing_axis_fields[SIZING_AXIS_PERCENT], percent, func, false);
+    return axis;
+}
 
 static const schema_field sizing_fields[] = {
     F_STRUCT(Clay_Sizing, width,  sizing_axis_schema),
@@ -1032,9 +1076,9 @@ static const schema_field layout_config_fields[] = {
     F_STRUCT(Clay_LayoutConfig, padding,        padding_schema),
     F_U16   (Clay_LayoutConfig, childGap),
     F_STRUCT(Clay_LayoutConfig, childAlignment, child_alignment_schema),
-    F_ENUM  (Clay_LayoutConfig, layoutDirection, CLAY_PERL_ENUM_MAX(LayoutDirection)),
+    F_ENUM  (Clay_LayoutConfig, layoutDirection, LayoutDirection),
     F_U16   (Clay_LayoutConfig, lineGap),
-    F_ENUM  (Clay_LayoutConfig, lineSizing, CLAY_PERL_ENUM_MAX(LineSizing)),
+    F_ENUM  (Clay_LayoutConfig, lineSizing, LineSizing),
 };
 static const struct_schema layout_config_schema =
     SCHEMA("Clay_LayoutConfig", Clay_LayoutConfig, layout_config_fields, SHAPE_HASH, NULL, NULL, NULL, NULL);
@@ -1048,8 +1092,8 @@ static const schema_field text_element_config_fields[] = {
     F_U16    (Clay_TextElementConfig, fontSize),
     F_U16    (Clay_TextElementConfig, letterSpacing),
     F_U16    (Clay_TextElementConfig, lineHeight),
-    F_ENUM   (Clay_TextElementConfig, wrapMode,      CLAY_PERL_ENUM_MAX(TextWrapMode)),
-    F_ENUM   (Clay_TextElementConfig, textAlignment, CLAY_PERL_ENUM_MAX(TextAlignment)),
+    F_ENUM   (Clay_TextElementConfig, wrapMode,      TextWrapMode),
+    F_ENUM   (Clay_TextElementConfig, textAlignment, TextAlignment),
 };
 static const struct_schema text_element_config_schema =
     SCHEMA("Clay_TextElementConfig", Clay_TextElementConfig, text_element_config_fields, SHAPE_HASH, NULL, NULL, NULL, NULL);
@@ -1089,8 +1133,8 @@ static const struct_schema border_schema =
     SCHEMA("Clay_BorderElementConfig", Clay_BorderElementConfig, border_fields, SHAPE_HASH, NULL, NULL, NULL, NULL);
 
 static const schema_field attach_points_fields[] = {
-    F_ENUM(Clay_FloatingAttachPoints, element, CLAY_PERL_ENUM_MAX(FloatingAttachPointType)),
-    F_ENUM(Clay_FloatingAttachPoints, parent,  CLAY_PERL_ENUM_MAX(FloatingAttachPointType)),
+    F_ENUM(Clay_FloatingAttachPoints, element, FloatingAttachPointType),
+    F_ENUM(Clay_FloatingAttachPoints, parent,  FloatingAttachPointType),
 };
 static const struct_schema attach_points_schema =
     SCHEMA("Clay_FloatingAttachPoints", Clay_FloatingAttachPoints, attach_points_fields, SHAPE_HASH, NULL, NULL, NULL, NULL);
@@ -1101,9 +1145,9 @@ static const schema_field floating_fields[] = {
     F_CUSTOM("parentId", Clay_FloatingElementConfig, parentId, read_parent_id, write_parent_id),
     F_INT   (Clay_FloatingElementConfig, zIndex, INT16_MIN, INT16_MAX),
     F_STRUCT(Clay_FloatingElementConfig, attachPoints, attach_points_schema),
-    F_ENUM  (Clay_FloatingElementConfig, pointerCaptureMode, CLAY_PERL_ENUM_MAX(PointerCaptureMode)),
-    F_ENUM  (Clay_FloatingElementConfig, attachTo, CLAY_PERL_ENUM_MAX(FloatingAttachToElement)),
-    F_ENUM  (Clay_FloatingElementConfig, clipTo,   CLAY_PERL_ENUM_MAX(FloatingClipToElement)),
+    F_ENUM  (Clay_FloatingElementConfig, pointerCaptureMode, PointerCaptureMode),
+    F_ENUM  (Clay_FloatingElementConfig, attachTo, FloatingAttachToElement),
+    F_ENUM  (Clay_FloatingElementConfig, clipTo,   FloatingClipToElement),
 };
 static const struct_schema floating_schema =
     SCHEMA("Clay_FloatingElementConfig", Clay_FloatingElementConfig, floating_fields, SHAPE_HASH, NULL, NULL, NULL, NULL);
@@ -1143,15 +1187,15 @@ static SV *write_current_transition_data(pTHX_ const void *slot)
 
 /* What a transition handler receives and Clay_EaseOut takes. */
 static const schema_field transition_arguments_fields[] = {
-    F_ENUM  (Clay_TransitionCallbackArguments, transitionState, CLAY_PERL_ENUM_MAX(TransitionState)),
+    F_ENUM  (Clay_TransitionCallbackArguments, transitionState, TransitionState),
     F_STRUCT(Clay_TransitionCallbackArguments, initial, transition_data_schema),
     F_STRUCT(Clay_TransitionCallbackArguments, target,  transition_data_schema),
     { "current", offsetof(Clay_TransitionCallbackArguments, current),
       MEMBER_SIZE(Clay_TransitionCallbackArguments, current), FIELD_CUSTOM, 0, 0,
-      &transition_data_schema, read_current_transition_data, write_current_transition_data },
+      &transition_data_schema, read_current_transition_data, write_current_transition_data, NULL },
     F_NON_NEGATIVE(Clay_TransitionCallbackArguments, elapsedTime),
     F_FLOAT (Clay_TransitionCallbackArguments, duration),
-    F_FLAGS (Clay_TransitionCallbackArguments, properties, CLAY_PERL_FLAGS_ALL(TransitionProperty)),
+    F_FLAGS (Clay_TransitionCallbackArguments, properties, TransitionProperty),
 };
 static const struct_schema transition_arguments_schema =
     SCHEMA("Clay_TransitionCallbackArguments", Clay_TransitionCallbackArguments, transition_arguments_fields,
@@ -1172,7 +1216,7 @@ static const struct_schema transition_arguments_schema =
  * clay.h, so their schemas have no C type name and check_struct cannot
  * name them. */
 static const schema_field transition_enter_fields[] = {
-    F_INNER_ENUM(Clay_TransitionElementConfig, enter, trigger, CLAY_PERL_ENUM_MAX(TransitionEnterTriggerType)),
+    F_INNER_ENUM(Clay_TransitionElementConfig, enter, trigger, TransitionEnterTriggerType),
     F_INNER_CUSTOM("hasSetInitial", Clay_TransitionElementConfig, enter, setInitialState,
                    read_has_set_initial, write_has_state_function),
 };
@@ -1182,8 +1226,8 @@ static const struct_schema transition_enter_schema = {
 };
 
 static const schema_field transition_exit_fields[] = {
-    F_INNER_ENUM(Clay_TransitionElementConfig, exit, trigger, CLAY_PERL_ENUM_MAX(TransitionExitTriggerType)),
-    F_INNER_ENUM(Clay_TransitionElementConfig, exit, siblingOrdering, CLAY_PERL_ENUM_MAX(ExitTransitionSiblingOrdering)),
+    F_INNER_ENUM(Clay_TransitionElementConfig, exit, trigger, TransitionExitTriggerType),
+    F_INNER_ENUM(Clay_TransitionElementConfig, exit, siblingOrdering, ExitTransitionSiblingOrdering),
     F_INNER_CUSTOM("hasSetFinal", Clay_TransitionElementConfig, exit, setFinalState,
                    read_has_set_final, write_has_state_function),
 };
@@ -1194,8 +1238,8 @@ static const struct_schema transition_exit_schema = {
 
 static const schema_field transition_config_fields[] = {
     F_FLOAT (Clay_TransitionElementConfig, duration),
-    F_FLAGS (Clay_TransitionElementConfig, properties, CLAY_PERL_FLAGS_ALL(TransitionProperty)),
-    F_ENUM  (Clay_TransitionElementConfig, interactionHandling, CLAY_PERL_ENUM_MAX(TransitionInteractionHandlingType)),
+    F_FLAGS (Clay_TransitionElementConfig, properties, TransitionProperty),
+    F_ENUM  (Clay_TransitionElementConfig, interactionHandling, TransitionInteractionHandlingType),
     F_STRUCT(Clay_TransitionElementConfig, enter, transition_enter_schema),
     F_STRUCT(Clay_TransitionElementConfig, exit,  transition_exit_schema),
 };
@@ -1331,7 +1375,7 @@ void clay_perl_check_struct(pTHX_ const char *type, SV *value, const char *root)
  * ======================================================================== */
 
 static const char *const field_kind_names[] = {
-    "float", "float_in", "integer", "bool", "pointer", "struct", "custom"
+    "float", "float_in", "maximum", "integer", "bool", "pointer", "struct", "custom"
 };
 
 /* Adds the schema and every schema nested in it to all, unless all has
@@ -1350,6 +1394,7 @@ static void describe_schema(pTHX_ HV *all, const struct_schema *schema, const ch
         hv_store_sv(aTHX_ description, "kind", newSVpv(field_kind_names[field->kind], 0));
         hv_store_sv(aTHX_ description, "min",  ranged ? newSVnv(field->min) : newSV(0));
         hv_store_sv(aTHX_ description, "max",  ranged ? newSVnv(field->max) : newSV(0));
+        hv_store_sv(aTHX_ description, "enum", field->enum_group ? newSVpv(field->enum_group, 0) : newSV(0));
         if (field->nested) {
             SV *nested_name = field->nested->c_name
                 ? newSVpv(field->nested->c_name, 0)

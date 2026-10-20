@@ -1,0 +1,5 @@
+#! /bin/bash
+
+set -e
+
+prove --lib --verbose $(find ./t -name '*.t' -a \! -name '*pod*' | sort)

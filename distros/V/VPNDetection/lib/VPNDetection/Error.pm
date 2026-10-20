@@ -3,18 +3,25 @@ package VPNDetection::Error;
 use strict;
 use warnings;
 
-use Mojo::Date;
 use Mojo::Headers;
 use Scalar::Util ();
+use Time::Local ();
 
 use overload
     '""' => sub { $_[0]->{message} },
     'bool' => sub { 1 },
     fallback => 1;
 
-our $VERSION = '3.8.0';
+our $VERSION = '3.9.0';
 
 my %RETRYABLE = (rate_limited => 1, server_error => 1, network => 1);
+
+my %MONTH;
+@MONTH{qw(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec)} = 0 .. 11;
+my $DAY = join '|', qw(Mon Tue Wed Thu Fri Sat Sun);
+my $WEEKDAY = join '|', qw(Monday Tuesday Wednesday Thursday Friday Saturday Sunday);
+my $MON = join '|', keys %MONTH;
+my $TIME = '([0-9]{2}):([0-9]{2}):([0-9]{2})';
 
 sub new {
     my ($class, %args) = @_;
@@ -90,27 +97,63 @@ sub retryable {
     return $RETRYABLE{ $_[0]->{kind} } ? 1 : 0;
 }
 
+# An empty field says nothing, so it gives way to the other envelope, then to
+# the status, rather than reading as a message of nothing at all (3.8.0 answered
+# `{"error": "", "rc": "NOT_LICENSED"}` with an empty message).
 sub _message {
     my ($body) = @_;
     return undef unless ref $body eq 'HASH';
     for my $key (qw(error rc)) {
-        return $body->{$key} if defined $body->{$key} && !ref $body->{$key};
+        return $body->{$key} if defined $body->{$key} && !ref $body->{$key} && length $body->{$key};
     }
     return undef;
 }
 
+# Seconds as digits, or an HTTP date, and nothing else, so a value that is
+# neither is no Retry-After at all and the 429 a spent quota. RFC 9110 allows
+# exactly three date forms, all in GMT. Through 3.8.0 a fraction was read as
+# seconds, and Mojo::Date read ISO 8601, any zone as GMT and a day or month it
+# does not know as Monday or January, each of which held a call on a date the
+# server never sent.
 sub _retry_after {
     my ($value) = @_;
     return undef unless defined $value;
     $value =~ s/^\s+|\s+\z//g;
-    return undef unless length $value;
-    return $value + 0 if $value =~ /\A[0-9]+(?:\.[0-9]+)?\z/;
+    return $value + 0 if $value =~ /\A[0-9]+\z/;
 
-    # The header also permits an HTTP date.
-    my $epoch = Mojo::Date->new($value)->epoch;
+    my $epoch = _http_date($value);
     return undef unless defined $epoch;
     my $seconds = $epoch - time;
     return $seconds > 0 ? $seconds : 0;
+}
+
+# IMF-fixdate (Sun, 06 Nov 1994 08:49:37 GMT), RFC 850 (Sunday, 06-Nov-94
+# 08:49:37 GMT) and asctime (Sun Nov  6 08:49:37 1994), as epoch seconds.
+sub _http_date {
+    my ($value) = @_;
+    my ($day, $month, $year, $hour, $minute, $second);
+    if ($value =~ /\A(?:$DAY), ([0-9]{2}) ($MON) ([0-9]{4}) $TIME GMT\z/) {
+        ($day, $month, $year, $hour, $minute, $second) = ($1, $2, $3, $4, $5, $6);
+    }
+    elsif ($value =~ /\A(?:$WEEKDAY), ([0-9]{2})-($MON)-([0-9]{2}) $TIME GMT\z/) {
+        ($day, $month, $year, $hour, $minute, $second) = ($1, $2, $3, $4, $5, $6);
+        # A two-digit year more than 50 years ahead is the most recent past one
+        # with those digits, as RFC 9110 has a recipient read it.
+        my $now = (gmtime)[5] + 1900;
+        $year += $now - $now % 100;
+        $year -= 100 if $year > $now + 50;
+    }
+    elsif ($value =~ /\A(?:$DAY) ($MON) ( [1-9]|[0-9]{2}) $TIME ([0-9]{4})\z/) {
+        ($month, $day, $hour, $minute, $second, $year) = ($1, $2, $3, $4, $5, $6);
+    }
+    else {
+        return undef;
+    }
+    # Already past, and Time::Local reads a year below 1000 as one after 1900.
+    return 0 if $year < 1970;
+    # Time::Local refuses a day, hour or minute out of range, which is no date.
+    my $epoch = eval { Time::Local::timegm($second, $minute, $hour, $day + 0, $MONTH{$month}, $year) };
+    return $epoch;
 }
 
 1;

@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="780" height="381" viewBox="0 0 780 381" role="img" aria-label="perl examples/cookbook/document-styles.pl">
+<title>perl examples/cookbook/document-styles.pl</title>
+<style>
+.terminal text { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 15px; white-space: pre; }
+.terminal .b { font-weight: bold; }
+.terminal .i { font-style: italic; }
+.title { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 13px; }
+</style>
+<defs>
+<filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#000000" flood-opacity="0.3"/></filter>
+<clipPath id="window"><rect x="16" y="16" width="748" height="346" rx="10"/></clipPath>
+</defs>
+<rect x="16" y="16" width="748" height="346" rx="10" fill="#161622" filter="url(#shadow)"/>
+<rect x="16" y="16" width="748" height="34" fill="#1f2430" clip-path="url(#window)"/>
+<circle cx="36" cy="33" r="6" fill="#ff5f57"/>
+<circle cx="56" cy="33" r="6" fill="#febc2e"/>
+<circle cx="76" cy="33" r="6" fill="#28c840"/>
+<text class="title" x="390" y="33" text-anchor="middle" dominant-baseline="central" fill="#9aa3b5">perl examples/cookbook/document-styles.pl</text>
+<rect x="16.5" y="16.5" width="747" height="345" rx="10" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1"/>
+<g shape-rendering="crispEdges">
+<rect x="30" y="60" width="720" height="72" fill="#fafaf7"/>
+<rect x="30" y="132" width="99" height="18" fill="#fafaf7"/>
+<rect x="129" y="132" width="54" height="18" fill="#e4e7ee"/>
+<rect x="183" y="132" width="198" height="18" fill="#fafaf7"/>
+<rect x="381" y="132" width="54" height="18" fill="#e4e7ee"/>
+<rect x="435" y="132" width="315" height="18" fill="#fafaf7"/>
+<rect x="30" y="150" width="720" height="36" fill="#fafaf7"/>
+<rect x="30" y="186" width="351" height="18" fill="#fafaf7"/>
+<rect x="381" y="186" width="153" height="18" fill="#be8214"/>
+<rect x="534" y="186" width="9" height="18" fill="#fafaf7"/>
+<rect x="543" y="186" width="18" height="18" fill="#e4e7ee"/>
+<rect x="561" y="186" width="189" height="18" fill="#fafaf7"/>
+<rect x="30" y="204" width="720" height="72" fill="#fafaf7"/>
+<rect x="30" y="276" width="45" height="18" fill="#fafaf7"/>
+<rect x="75" y="276" width="36" height="18" fill="#e4e7ee"/>
+<rect x="111" y="276" width="45" height="18" fill="#fafaf7"/>
+<rect x="156" y="276" width="27" height="18" fill="#e4e7ee"/>
+<rect x="183" y="276" width="567" height="18" fill="#fafaf7"/>
+<rect x="30" y="294" width="720" height="54" fill="#fafaf7"/>
+<rect x="39" y="104" width="693" height="1" fill="#afb6c4"/>
+</g>
+<g class="terminal">
+<text x="39" y="92" textLength="162" class="b" fill="#3c8c32">Keys of the editor</text>
+<text x="75" y="146" textLength="45" fill="#1e222a">Press</text>
+<text x="129" y="146" textLength="54" class="b" fill="#0a0c10">Ctrl+S</text>
+<text x="192" y="146" textLength="180" fill="#1e222a">to save the file and</text>
+<text x="381" y="146" textLength="54" class="b" fill="#0a0c10">Ctrl+Q</text>
+<text x="444" y="146" textLength="252" fill="#1e222a">to quit. Unsaved changes are</text>
+<text x="75" y="164" textLength="306" fill="#1e222a">never lost: the editor asks first.</text>
+<text x="75" y="200" textLength="180" fill="#1e222a">The settings live in</text>
+<text x="264" y="200" textLength="99" fill="#1e6ec8">~/.editorrc</text>
+<text x="363" y="200" textLength="9" fill="#1e222a">.</text>
+<text x="381" y="200" textLength="153" fill="#fafafa">New in version 3:</text>
+<text x="543" y="200" textLength="18" class="b" fill="#0a0c10">F2</text>
+<text x="570" y="200" textLength="144" fill="#1e222a">switches between</text>
+<text x="75" y="218" textLength="261" fill="#1e222a">the dark and the light theme.</text>
+<text x="39" y="254" textLength="117" class="b" fill="#0a0c10">Moving around</text>
+<text x="75" y="290" textLength="36" class="b" fill="#0a0c10">Home</text>
+<text x="120" y="290" textLength="27" fill="#1e222a">and</text>
+<text x="156" y="290" textLength="27" class="b" fill="#0a0c10">End</text>
+<text x="192" y="290" textLength="342" fill="#1e222a">go to the start and the end of a line,</text>
+<text x="543" y="290" textLength="36" class="b" fill="#1e222a">Ctrl</text>
+<text x="588" y="290" textLength="108" fill="#1e222a">with them to</text>
+<text x="75" y="308" textLength="306" fill="#1e222a">the start and the end of the file.</text>
+</g>
+<g shape-rendering="crispEdges">
+<rect x="75" y="165" width="45" height="1" fill="#1e222a"/>
+</g>
+</svg>

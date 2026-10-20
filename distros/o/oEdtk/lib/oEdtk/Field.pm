@@ -2,7 +2,7 @@ package oEdtk::Field;
 
 use strict;
 use warnings;
-our $VERSION = 2.1126;
+our $VERSION = 2.1129;
 
 sub new {
 	my ( $class, $name, $len ) = @_;

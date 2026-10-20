@@ -11,7 +11,7 @@ use Term::Fabulous::Role::HasOptions;
 use Term::Fabulous::Widget::Dropdown::List;
 use Term::Fabulous::Widget::Input;
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 class Term::Fabulous::Widget::Dropdown
 	:isa(Term::Fabulous::Widget::Input)
@@ -23,27 +23,24 @@ class Term::Fabulous::Widget::Dropdown
 	use Scalar::Util qw(refaddr);
 	use Term::Fabulous::Check qw(positive_integer string);
 	use Term::Fabulous::OptionList;
+	use Term::Fabulous::Placement qw(place_popup TOPMOST_Z_INDEX);
 	use Term::Fabulous::Roving qw(roving_target);
 	use Term::Fabulous::Termbox qw(TB_KEY_MOUSE_LEFT TB_MOD_MOTION);
-	use Time::HiRes qw(time);
 	use Term::Fabulous::Unicode qw(string_columns);
 
 	use constant ARROW_DOWN        => "\x{25BE}";
 	use constant ARROW_UP          => "\x{25B4}";
 	use constant TYPEAHEAD_SECONDS => 1;
 
-	# The highest z_index Clay has (int16): an open list belongs to the
-	# focused widget, so it floats over everything, a dialog it is in
-	# included.
-	use constant LIST_Z_INDEX => 32767;
-
 	field $option_list = Term::Fabulous::OptionList->new( owner => __CLASS__ );
 
 	field $placeholder         :param = '';
 	field $max_visible_options :param = 8;
 
-	# The open list, the option it highlights and whether it opened upwards.
+	# The open list, its size with the border, the option it highlights
+	# and whether it opened upwards.
 	field $list;
+	field @list_size;
 	field $highlighted;
 	field $opens_upwards = 0;
 
@@ -165,12 +162,22 @@ class Term::Fabulous::Widget::Dropdown
 		my $selected = $option_list->selected_index;
 		$highlighted = defined $selected && !$option_list->is_disabled($selected) ? $selected : ( $option_list->enabled_indexes )[0];
 
-		my ( $visible, $upwards ) = $self->_list_rows;
-		my $scrolls = $visible < $option_list->count;
-		my $width   = max( $self->_box_width, 2 + ( max map { string_columns( $_->{label} ) } $option_list->options ) + 2 + ( $scrolls ? 1 : 0 ) );
-		$opens_upwards = $upwards;
+		# The list shows as many options as the side it opens to has room
+		# for (its width does not decide the side), and a scrollbar when
+		# that is not all of them.
+		my $wanted  = min( $option_list->count, $max_visible_options );
+		my $placed  = $self->_list_place( 0, $wanted + 2, 'below' );
+		my $visible = defined $placed ? max( 1, min( $wanted, $placed->{rows} - 2 ) ) : $wanted;
+		my $widest  = max map { string_columns( $_->{label} ) } $option_list->options;
+		my $width   = max( $self->_box_width, 2 + $widest + 2 + ( $visible < $option_list->count ? 1 : 0 ) );
+		my $ui      = $self->ui;
+		$width         = min( $width, $ui->width ) if defined $ui;    # never wider than the screen: the list cuts its labels
+		$opens_upwards = defined $placed ? $placed->{flipped} : 0;
+		@list_size     = ( $width, $visible + 2 );
 
-		my ( $element, $parent ) = $upwards ? ( CLAY_ATTACH_POINT_LEFT_BOTTOM, CLAY_ATTACH_POINT_LEFT_TOP ) : ( CLAY_ATTACH_POINT_LEFT_TOP, CLAY_ATTACH_POINT_LEFT_BOTTOM );
+		# Until the dropdown has a box, the list hangs from it as Clay
+		# attaches it; Dropdown::List moves it to its place on the screen.
+		my ( $element, $parent ) = $opens_upwards ? ( CLAY_ATTACH_POINT_LEFT_BOTTOM, CLAY_ATTACH_POINT_LEFT_TOP ) : ( CLAY_ATTACH_POINT_LEFT_TOP, CLAY_ATTACH_POINT_LEFT_BOTTOM );
 		$list = Term::Fabulous::Widget::Dropdown::List->new(
 			dropdown     => $self,
 			visible_rows => $visible,
@@ -179,7 +186,7 @@ class Term::Fabulous::Widget::Dropdown
 			floating     => {
 				attach_to     => CLAY_ATTACH_TO_PARENT,
 				attach_points => { element => $element, parent => $parent },
-				z_index       => LIST_Z_INDEX,
+				z_index       => TOPMOST_Z_INDEX,
 			},
 		);
 		$self->add_child($list);
@@ -197,27 +204,34 @@ class Term::Fabulous::Widget::Dropdown
 	}
 
 	# The width of the whole widget in the last frame (its natural width
-	# before the first one).
+	# before the first one). Without a frame only the declaration knows
+	# the insets.
 	method _box_width () {
-		my ( $left, undef, $right ) = $self->content_insets;
+		my ( $left, undef, $right ) = $self->_laid_out_insets;
+		( $left, undef, $right ) = $self->content_insets unless defined $left;
 		return $left + ( $self->columns || ( $self->natural_size )[0] ) + $right;
 	}
 
-	# How many options the list shows, and whether it opens upwards: below
-	# the widget when they fit there or there is at least as much room
-	# below as above.
-	method _list_rows () {
-		my $wanted = min( $option_list->count, $max_visible_options );
-		my $ui     = $self->ui;
-		my @origin = $self->content_origin;
-		return ( $wanted, 0 ) unless defined $ui && @origin;
+	# Where a list of that size goes (Term::Fabulous::Placement): below
+	# the dropdown when it fits there or there is at least as much room
+	# below as above, else above; undef before the dropdown has a box.
+	method _list_place ( $width, $height, $prefer ) {
+		my $ui  = $self->ui                // return undef;
+		my $box = $ui->bounding_box($self) // return undef;
+		return place_popup( anchor => $box, size => [ $width, $height ], screen => [ $ui->width, $ui->height ], prefer => $prefer );
+	}
 
-		my ( undef, $top, undef, $bottom ) = $self->content_insets;
-		my $room_above = $origin[1] - $top;
-		my $room_below = $ui->height - ( $origin[1] + $self->rows + $bottom );
-		my $upwards    = $room_below < $wanted + 2 && $room_above > $room_below;
-		my $room       = $upwards ? $room_above : $room_below;
-		return ( max( 1, min( $wanted, $room - 2 ) ), $upwards ? 1 : 0 );
+	# Where the open list floats in this frame (Dropdown::List asks): on
+	# the side it opened to, kept on the screen. A screen that changed
+	# while the list is open may turn it round, and the arrow with it.
+	method list_position () {
+		my $placed  = $self->_list_place( @list_size, $opens_upwards ? 'above' : 'below' ) // return undef;
+		my $upwards = $placed->{flipped} ? 1 - $opens_upwards : $opens_upwards;
+		if ( $upwards != $opens_upwards ) {
+			$opens_upwards = $upwards;
+			$self->mark_changed;
+		}
+		return { x => $placed->{x}, y => $placed->{y} };
 	}
 
 	# Chooses an option as the user does; a disabled option cannot be
@@ -301,7 +315,7 @@ class Term::Fabulous::Widget::Dropdown
 	method _type_ahead ($character) {
 		my @options = $option_list->options;
 		return 0 unless @options;
-		my $now = time;
+		my $now = $self->now;
 		$typed    = $now - $typed_at <= TYPEAHEAD_SECONDS ? $typed . $character : $character;
 		$typed_at = $now;
 
@@ -388,7 +402,7 @@ list that opens
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-dropdown.svg" alt="Three dropdowns: a placeholder, France selected, and an open list of colors with Blue highlighted"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.05/screenshots/widget-dropdown.svg" alt="Three dropdowns: a placeholder, France selected, and an open list of colors with Blue highlighted"></p>
 
 =end html
 
@@ -397,8 +411,8 @@ list that opens
 The picture shows three dropdowns: one without a selection, showing its
 placeholder; one with France selected; and a focused one whose list is
 open, with the selected option Green in the C<accent_color> and the
-highlighted option Blue on the C<accent_color>. The program is
-F<examples/widgets/dropdown.pl>.
+highlighted option Blue on the theme's C<dropdown.highlight.background>.
+The program is F<examples/widgets/dropdown.pl>.
 
 A dropdown shows the label of the selected option (or a placeholder)
 and a small arrow. When the user opens it, the options appear in a list
@@ -408,7 +422,13 @@ the dropdown, unless
 it does not fit there and there is more room above the dropdown; then it
 opens above. The list shows up to C<max_visible_options> options at a
 time; when the terminal has less room on the chosen side, it shrinks to
-that room, but always shows at least one option. It scrolls through the
+that room, but always shows at least one option. A list wider than the
+room right of the dropdown moves left as far as it must to stay on the
+screen (L<Term::Fabulous::Placement>); one wider than the screen is as
+wide as the screen and cuts its labels with an ellipsis
+(L<Term::Fabulous::Unicode/fit_columns>). The list finds its place
+again in every frame, so it stays on the screen when the terminal
+shrinks while it is open. It scrolls through the
 rest and has a scrollbar when it scrolls, drawn like every scrollbar
 (L<Term::Fabulous::Widget::Scrollbar>) in the theme's
 C<scrollbar.track> and C<scrollbar.thumb> colors. Choosing an option
@@ -513,8 +533,9 @@ theme, a very dark gray.
 
 A color, as above. The text color of the highlighted option in the open
 list, which is painted on the theme's C<dropdown.highlight.background>
-(the accent). Default: the theme's C<dropdown.highlight.text>,
-C<[16, 18, 22, 255]> in the dark theme, nearly black.
+(or on the C<accent_color> when the program gave one). Default: the
+theme's C<dropdown.highlight.text>, C<[16, 18, 22, 255]> in the dark
+theme, nearly black.
 
 =item C<background_color>
 
@@ -604,8 +625,8 @@ and leaves the old one.
 	$dropdown->list_background_color([ 20, 20, 30, 255 ]);
 
 Accessor for the C<list_background_color> parameter. Writing returns the
-new color as C<[r, g, b, a]>; it takes effect the next time the list opens. An
-invalid color dies and leaves the old one.
+new color as C<[r, g, b, a]>; an open list shows it in the next frame.
+An invalid color dies and leaves the old one.
 
 =head2 highlight_text_color
 
@@ -726,7 +747,8 @@ with it, ignoring case: it selects that option while the list is closed
 (firing C<Change>) and highlights it while the list is open. The
 current option is the selected one while the list is closed and the
 highlighted one while it is open. Characters typed at most one second
-apart form one search string, so typing C<d>, C<a> quickly finds "Dark
+apart (on the UI's clock, L<Term::Fabulous/now>) form one search
+string, so typing C<d>, C<a> quickly finds "Dark
 green" rather than the next option starting with C<a>. A search for a
 single character starts after the current option, so pressing C<d>
 again moves on to the next label starting with C<d>; a longer search
@@ -846,9 +868,11 @@ options look.
 	my ( $fg, $bg ) = $self->option_attrs($index);
 
 The termbox2 attributes of an option's row in the list: the
-C<highlight_text_color> on the C<accent_color> for the highlighted
-option, the C<accent_color> for the selected one, the C<text_color> for
-the others (C<undef> background: the list background shows).
+C<highlight_text_color> on the theme's C<dropdown.highlight.background>
+(or on the C<accent_color> when the program gave one) for the
+highlighted option, the C<disabled_color> for a disabled one, the
+C<accent_color> for the selected one, the C<text_color> for the others
+(C<undef> background: the list background shows).
 
 =head2 option_label
 
@@ -861,6 +885,17 @@ The label of the option at an index.
 	my $count = $self->option_count;
 
 The number of options.
+
+=head2 list_position
+
+	my $position = $self->list_position;    # { x => 5, y => 1 }
+
+Where the open list floats in this frame, on the screen
+(L<Term::Fabulous::Placement>): on the side it opened to, moved left or
+up as far as it must to stay on the screen; undef before the dropdown
+was drawn. A list that no longer fits on its side after the terminal
+changed size turns to the other side, and the arrow of the dropdown
+turns with it.
 
 =head2 layout_properties
 

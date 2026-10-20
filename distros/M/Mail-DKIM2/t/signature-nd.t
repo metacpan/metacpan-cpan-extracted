@@ -39,7 +39,7 @@ my $signer = Mail::DKIM2::Signer->new(
     NextDomain => 'mx.dest.example',
     Timestamp  => 1740000000,
 );
-$signer->PRINT("Message-Instance: m=1; h=sha256:AAA:BBB;\r\nSubject: hi\r\n\r\nbody\r\n");
+$signer->PRINT("Message-Instance: m=1; h=sha256:AAA:BBB;\r\nFrom: a\@fwd.example\r\nSubject: hi\r\n\r\nbody\r\n");
 $signer->CLOSE;
 my $sigout = $signer->as_string;
 like($sigout,   qr/nd=mx\.dest\.example/, 'Signer emits nd= for imaginary hop');

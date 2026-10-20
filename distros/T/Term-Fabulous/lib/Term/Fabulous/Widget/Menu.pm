@@ -7,15 +7,18 @@ no warnings 'experimental::signatures';
 
 use Object::Pad 0.825;
 
+use Term::Fabulous::Role::Popup;
 use Term::Fabulous::Widget::Input;
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 class Term::Fabulous::Widget::Menu
 	:isa(Term::Fabulous::Widget::Input)
+	:does(Term::Fabulous::Role::Popup)
 	:strict(params)
 {
 	use Clay::UI::Enum::Result;
+	use Clay::UI::Role::Layout::HasParent qw(is_widget);
 	use Clay::XS qw(CLAY_ATTACH_TO_ROOT);
 	use List::Util qw(first max min);
 	use Scalar::Util qw(blessed refaddr weaken);
@@ -23,6 +26,7 @@ class Term::Fabulous::Widget::Menu
 	use Term::Fabulous::Command;
 	use Term::Fabulous::Event::Choose;
 	use Term::Fabulous::Event::Close;
+	use Term::Fabulous::Placement qw(place_popup TOPMOST_Z_INDEX);
 	use Term::Fabulous::Roving qw(roving_target);
 	use Term::Fabulous::Termbox qw(TB_KEY_MOUSE_RELEASE);
 	use Term::Fabulous::Unicode qw(string_columns);
@@ -31,10 +35,6 @@ class Term::Fabulous::Widget::Menu
 	use constant SEPARATOR_GLYPH => "\x{2500}";
 	use constant CHECK_MARK      => "\x{2713}";
 	use constant KEYS_GAP        => 3;    # columns between the longest label and the keys
-
-	# The highest z_index Clay has (int16): an open menu belongs to the
-	# focused widget, so it floats over everything, a dialog included.
-	use constant Z_INDEX => 32767;
 
 	# PageUp and PageDown go to the ends of a menu, as Home and End do.
 	my %MOVE_KEY = ( PageUp => 'Home', PageDown => 'End' );
@@ -52,12 +52,12 @@ class Term::Fabulous::Widget::Menu
 		die ref($self) . ": commands must be a Term::Fabulous::Commands, got " . describe($commands) if defined $commands && !( blessed $commands && $commands->isa('Term::Fabulous::Commands') );
 		@_items     = $self->_parsed_items($items);
 		$_highlight = $self->_first_enabled;
-		weaken( my $weak_self = $self );
 		$self->on(
-			MouseMove => sub ($event) {
-				$weak_self->_pointer_at($event) if refaddr( $event->target ) == refaddr($weak_self);
+			MouseMove => sub ( $self, $event ) {
+				$self->_pointer_at($event) if refaddr( $event->target ) == refaddr($self);
 				return Clay::UI::Enum::Result->CONTINUE;
-			}
+			},
+			owner => $self
 		);
 	}
 
@@ -74,6 +74,11 @@ class Term::Fabulous::Widget::Menu
 			highlight_background_color => [ 'highlight.background', 'normal', 'cell_color' ],
 		);
 	}
+
+	method keys_color                 (@new) { return @new ? $self->set_look( keys_color                 => $new[0] ) : $self->look_value('keys_color') }
+	method separator_color            (@new) { return @new ? $self->set_look( separator_color            => $new[0] ) : $self->look_value('separator_color') }
+	method highlight_text_color       (@new) { return @new ? $self->set_look( highlight_text_color       => $new[0] ) : $self->look_value('highlight_text_color') }
+	method highlight_background_color (@new) { return @new ? $self->set_look( highlight_background_color => $new[0] ) : $self->look_value('highlight_background_color') }
 
 	# ---------------------------------------------------------------------
 	# Items
@@ -161,7 +166,7 @@ class Term::Fabulous::Widget::Menu
 		die ref($self) . ": a menu that is a child of another widget cannot open" if defined $self->parent;
 		die ref($self) . ": a disabled menu cannot open" unless $self->is_enabled;
 		my $anchor = $self->_parsed_anchor(%where);
-		die ref($self) . ": below needs a widget that the last frame drew; a text has no box of its own, so open the menu below the box that holds it"
+		die ref($self) . ": below needs a widget that the last frame drew"
 			if exists $anchor->{below} && !defined $ui->bounding_box( $anchor->{below} );
 
 		my $focused = $ui->interaction->get_focused_widget;
@@ -177,7 +182,7 @@ class Term::Fabulous::Widget::Menu
 	method _parsed_anchor (%where) {
 		if ( exists $where{below} ) {
 			my $widget = delete $where{below};
-			die ref($self) . ": below must be a widget, got " . describe($widget) unless blessed $widget && $widget->can('parent');
+			die ref($self) . ": below must be a widget, got " . describe($widget) unless is_widget($widget);
 			die ref($self) . ": open takes x and y, or below, got " . join( ', ', sort keys %where ) if %where;
 			return { below => $widget, column => 0 };
 		}
@@ -210,26 +215,30 @@ class Term::Fabulous::Widget::Menu
 		$_armed     = 0;
 		$_highlight = $self->_first_enabled;
 		weaken $_anchor->{below} if defined $_anchor->{below};
-		$self->floating( { attach_to => CLAY_ATTACH_TO_ROOT, offset => { x => 0, y => 0 }, z_index => Z_INDEX } );
+		$self->floating( { attach_to => CLAY_ATTACH_TO_ROOT, offset => { x => 0, y => 0 }, z_index => TOPMOST_Z_INDEX } );
 		$self->mark_changed;
 		return;
 	}
 
-	# Takes a popup off the screen and gives the focus back; Close fires.
-	# A close because the focus went elsewhere leaves the focus there.
+	# Takes a popup off the screen; Close fires. A popup that has the focus
+	# gives it back as it leaves, through its focus heir; a close because
+	# the focus went elsewhere leaves the focus there.
 	method close () {
 		return $self unless $_is_open;
-		my $ui        = $self->ui;
-		my $give_back = defined $ui && $self->is_focused ? $_focus_before : undef;
-		$_is_open      = 0;
-		$_focus_before = undef;
+		$_is_open = 0;
 		my $holder = $self->parent;
 		$holder->remove_child($self) if defined $holder;
+		$_focus_before = undef;
 		$self->floating(undef);
 		$_anchor = undef;
-		$ui->interaction->set_focused_widget($give_back) if defined $give_back && $ui->interaction->can_take_focus($give_back);
 		$self->fire_event( Term::Fabulous::Event::Close->new );
 		return $self;
+	}
+
+	# Who takes the focus when an open popup leaves with the focus: the
+	# widget that had it when the popup opened.
+	method focus_heir () {
+		return $_focus_before;
 	}
 
 	method focus_changed :override ($is_focused) {
@@ -249,29 +258,35 @@ class Term::Fabulous::Widget::Menu
 		return ( $columns + $sides->{left} + $sides->{right}, $rows + $sides->{top} + $sides->{bottom} );
 	}
 
-	# Where the menu floats in this frame: at its anchor, kept on the
-	# screen. Below a widget it opens upwards when there is no room
-	# below; at a point it moves up until its last row is on the screen.
 	method contribute_floating :override ($config) {
 		$self->SUPER::contribute_floating($config);
-		return unless defined $_anchor && defined $config->{floating};
-		my $ui = $self->ui // return;
-		my ( $width, $height ) = $self->outer_size;
-		my ( $x, $y );
-		if ( exists $_anchor->{below} ) {
-			my $box = defined $_anchor->{below} ? $ui->bounding_box( $_anchor->{below} ) : undef;
-			$box //= { x => 0, y => 0, width => 0, height => 0 };
-			$x = $box->{x} + $_anchor->{column};
-			$y = $box->{y} + $box->{height};
-			$y = $box->{y} - $height if $y + $height > $ui->height && $box->{y} >= $height;
-		}
-		else {
-			( $x, $y ) = @{$_anchor}{qw(x y)};
-		}
-		$x                  = max( 0, min( $x, $ui->width - $width ) );
-		$y                  = max( 0, min( $y, $ui->height - $height ) );
-		$config->{floating} = { %{ $config->{floating} }, offset => { x => $x, y => $y } };
+		$self->float_popup($config) if defined $_anchor && defined $config->{floating};
 		return;
+	}
+
+	# Where the menu floats in this frame (Term::Fabulous::Placement,
+	# Term::Fabulous::Role::Popup): below its widget, or over it when
+	# there is no room below, or at its point; kept on the screen.
+	method popup_position () {
+		return undef unless defined $_anchor;
+		my $ui    = $self->ui // return undef;
+		my $place = place_popup(
+			anchor => $self->_anchor_box($ui),
+			size   => [ $self->outer_size ],
+			screen => [ $ui->width, $ui->height ],
+			prefer => exists $_anchor->{below} ? 'below' : 'at',
+		);
+		return { x => $place->{x}, y => $place->{y} };
+	}
+
+	# The box the menu opens from: its point, or its widget's (open
+	# checks that it was drawn; one that went away since leaves the top
+	# left corner) moved right by the column.
+	method _anchor_box ($ui) {
+		return { x => $_anchor->{x}, y => $_anchor->{y}, width => 0, height => 0 } unless exists $_anchor->{below};
+		my $box = defined $_anchor->{below} ? $ui->bounding_box( $_anchor->{below} ) : undef;
+		$box //= { x => 0, y => 0, width => 0, height => 0 };
+		return { %$box, x => $box->{x} + $_anchor->{column} };
 	}
 
 	# ---------------------------------------------------------------------
@@ -435,7 +450,7 @@ in a menu bar or on its own
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-menu.svg" alt="A list of files with a context menu opened over budget.csv where it was right-clicked: Open with Enter, Rename... with F2, a line, Cut with Ctrl+X, a dimmed Paste with Ctrl+V, a line, and Show hidden files with a check mark and Alt+h. The pointer highlights Rename..."></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.05/screenshots/widget-menu.svg" alt="A list of files with a context menu opened over budget.csv where it was right-clicked: Open with Enter, Rename... with F2, a line, Cut with Ctrl+X, a dimmed Paste with Ctrl+V, a line, and Show hidden files with a check mark and Alt+h. The pointer highlights Rename..."></p>
 
 =end html
 
@@ -519,10 +534,10 @@ items, and going round at the ends.
 
 Highlight the first or the last item.
 
-=item a letter or digit
+=item a printable character
 
-Highlights the next enabled item whose label starts with it. The item
-does not run until C<Enter> or a click chooses it.
+Highlights the next enabled item whose label starts with it, ignoring
+case. The item does not run until C<Enter> or a click chooses it.
 
 =item C<Enter>, C<Space>
 
@@ -552,8 +567,9 @@ L</open> adds the menu to the root of the UI as a floating widget, over
 everything else (dialogs included), and focuses it. At a point, the
 menu's top left corner is at that point. Below a widget, the menu
 starts at the widget's left edge, just below it, or just above it when
-there is no room below. Either way, the menu moves left and up as far
-as it must to stay on the screen. It finds its place again in every
+it does not fit below and there is more room above. Either way, the
+menu moves left and up as far as it must to stay on the screen (one
+rule for every popup, L<Term::Fabulous::Placement>). It finds its place again in every
 frame, so a menu that is open while the terminal shrinks stays on the
 screen. A menu does not scroll: one that is taller than the screen
 starts at the top row, and its last items are cut off. Keep menus
@@ -641,10 +657,9 @@ A menu has the methods of L<Term::Fabulous::Widget::Input> plus these.
 
 Opens the menu as a popup, as described under L</POPUP MENUS>: at the
 cell C<x>, C<y> of the screen (both non-negative integers), or below a
-widget. The widget must have been drawn in the last frame, so that its
-place is known. A text widget has no box of its own, so open the menu
-below the box that holds the text, or at the text's cell with C<x> and
-C<y>. The first enabled item is highlighted. Opening an open menu does
+widget, a text included. The widget must have been drawn in the last
+frame, so that its place is known. The first enabled item is
+highlighted. Opening an open menu does
 nothing. Dies when C<$ui> is not a L<Term::Fabulous>, when the place is
 not C<x> and C<y> or C<below> alone, for a widget the last frame did
 not draw, for a disabled menu, and when the menu is a child of another
@@ -656,8 +671,17 @@ widget. Returns the menu.
 
 Closes a popup menu: takes it off the screen, gives the focus back to
 the widget that had it when the menu opened (if the menu still had the
-focus and that widget can still take it) and fires C<Close>. Closing a
-menu that is not open as a popup does nothing. Returns the menu.
+focus and that widget can still take it; see L</focus_heir>) and fires
+C<Close>. Closing a menu that is not open as a popup does nothing.
+Returns the menu.
+
+=head2 focus_heir
+
+The widget that had the focus when the popup opened (held weakly), or
+C<undef> while the menu is not open as a popup. When the popup leaves
+the tree with the focus, the focus goes there if that widget can still
+take it (see L<Clay::UI::Interaction/Focus heirs>). You do not call it
+yourself.
 
 =head2 is_open
 
@@ -712,6 +736,15 @@ Handles a L<Term::Fabulous::Event::KeyPress> as described under
 L</Keys>, and returns 1 when the menu used the key and 0 when not. A
 menu calls it for the keys it receives while it has the focus. An owner
 that keeps the focus itself, like a menu bar, passes its keys on with
+it.
+
+=head2 popup_position
+
+	my $position = $menu->popup_position;    # { x => 3, y => 2 }
+
+Where an open menu floats in this frame, on the screen (see
+L</POPUP MENUS> and L</show_below>); undef for a menu that is neither
+open nor shown below a widget. The menu composes L<Term::Fabulous::Role::Popup>, which calls
 it.
 
 =head2 outer_size

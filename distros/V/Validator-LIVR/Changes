@@ -42,3 +42,32 @@ v2.0
  - Added modifier "default"
  - Add more edge cases to test suite
  - Add experimental status to the "like" rule
+
+v2.1 2026-10-19
+ - Updated the test suite to the current LIVR test suite
+ - A rule with several names, such as { like => '^\w+$', max_length => 20 }, dies.
+   Only one of the rules was used, a random one (GitHub issue #11).
+ - A validator that died on a wrong rule dies again on the next validate(). Before,
+   the next validate() checked no fields and passed any data.
+ - "or" passes empty values to its rule sets too, so "required" and "not_empty" in them work
+ - No dependencies: "email" and "url" are checked as in the other LIVR implementations,
+   without Email::Valid and Regexp::Common. The module loads in 9 ms instead of 21.
+ - "email" rejects names and comments, such as "John <john@example.com>", spaces around
+   the address, line breaks, and TLDs that start with a digit, as in an IP address without
+   brackets. It accepts letters of other languages in the local part.
+ - "url" accepts a user and password, a query without a path, any characters in the path
+   and domain names in other languages. It rejects IP addresses with numbers over 255 and
+   a trailing newline.
+ - "url" checks a long wrong URL fast. A path of 100 KB took more than 20 seconds.
+ - "iso_date" rejects a trailing newline
+ - "iso_date" checks dates without Time::Piece, which printed "Garbage at end of string" warnings
+ - "equal_to_field" does not warn when the other field is missing
+ - "length_between" does not print debug output anymore
+ - Faster: validation of a form is 3.5 times faster, "email" 14 times, "url" 5.7 times,
+   building a validator and validating 2.6 times
+ - The license in META is Artistic 2.0, it was "unknown"
+ - Tests run on GitHub Actions with Perl from 5.10 to the newest one
+ - README.pod is not installed anymore. MakeMaker before 7.32 installed it as Validator/README.pod
+ - New documentation: a quick tour, all rules with their error codes, "prepare" and
+   how to write rules in Perl
+ - Bugs are reported in GitHub Issues, and META links to them

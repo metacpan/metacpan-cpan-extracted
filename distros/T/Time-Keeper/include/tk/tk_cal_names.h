@@ -264,11 +264,20 @@ tk_cn_resolve(pTHX_ tk_cal_names *n, const char *code, const char *cal, int dept
         const char *parent;
         unsigned char *b;
         size_t len;
+        char cut[32];
         tk_cn_open(aTHX);
         parent = tk_cn_parent(code);
         if (!parent) {
-            TK_LOCALE_UNLOCK;
-            croak("Time::Keeper: the locale %s has no calendar names", code);
+            /* a code the table lists no parent for inherits by truncation,
+               as CLDR's does: ca-ES-valencia's parent ca-ES, then ca */
+            const char *dash = strrchr(code, '-');
+            if (!dash || (size_t)(dash - code) >= sizeof cut) {
+                TK_LOCALE_UNLOCK;
+                croak("Time::Keeper: the locale %s has no calendar names", code);
+            }
+            memcpy(cut, code, (size_t)(dash - code));
+            cut[dash - code] = '\0';
+            parent = cut;
         }
         if (*parent)
             tk_cn_resolve(aTHX_ n, parent, cal, depth + 1);

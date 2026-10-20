@@ -9,13 +9,13 @@ use Object::Pad 0.825;
 
 use Term::Fabulous::Widget::Input;
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 class Term::Fabulous::Widget::RadioButton
 	:isa(Term::Fabulous::Widget::Input)
 	:strict(params)
 {
-	use List::Util qw(max);
+	use List::Util qw(first max);
 	use Scalar::Util qw(refaddr);
 	use Term::Fabulous::Check qw(optional string);
 	use Term::Fabulous::Unicode qw(string_columns);
@@ -61,10 +61,7 @@ class Term::Fabulous::Widget::RadioButton
 	}
 
 	method group () {
-		for ( my $node = $self->parent; defined $node; $node = $node->parent ) {
-			return $node if $node->isa('Term::Fabulous::Widget::RadioGroup');
-		}
-		return undef;
+		return first { $_->isa('Term::Fabulous::Widget::RadioGroup') } $self->ancestors;
 	}
 
 	method is_selected () {
@@ -143,7 +140,7 @@ Term::Fabulous::Widget::RadioButton - One choice of a radio group
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-radio.svg" alt="Radio buttons in a row with Medium chosen, in a column with Express shipping chosen, and a disabled group"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.05/screenshots/widget-radio.svg" alt="Radio buttons in a row with Medium chosen, in a column with Express shipping chosen, and a disabled group"></p>
 
 =end html
 

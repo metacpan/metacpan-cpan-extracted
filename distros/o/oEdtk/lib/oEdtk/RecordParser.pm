@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Data::Dumper;
 use Scalar::Util qw(blessed);
-our $VERSION = 2.1126;
+our $VERSION = 2.1129;
 
 # FINE-TUNE PARAMETRIZATION
 my $_denormalized_record = "OPTION";

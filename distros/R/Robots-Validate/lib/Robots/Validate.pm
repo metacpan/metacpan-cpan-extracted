@@ -10,6 +10,7 @@ use Algorithm::AhoCorasick::SearchMachine;
 use File::ShareDir qw( dist_file );
 use File::Slurper  qw( read_binary );
 use List::Util     1.33 qw( all any none );
+use Module::Load qw( load );
 use Net::DNS::Resolver;
 use Net::IP qw( ip_expand_address ip_is_ipv4 ip_is_ipv6 ip_splitprefix );
 use Net::IP::LPM;
@@ -29,7 +30,7 @@ use experimental qw( lexical_subs signatures );
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.4.9';
+our $VERSION = 'v0.4.11';
 
 
 has resolver => (
@@ -89,7 +90,7 @@ sub _build_agents($self) {
     my @names = keys $self->_validators->%*;
 
 
-    if ( eval { require "Algorithm::AhoCorasick::XS" } ) {
+    if ( eval { load "Algorithm::AhoCorasick::XS" } ) {
 
         *_first_match = set_subname "_first_match", sub( $self, $str ) {
             return $self->_agents->first_match($str)
@@ -104,15 +105,21 @@ sub _build_agents($self) {
     }
     else {
 
+        *_reset_feed = set_subname "_reset_feed", sub( $self, $str, $cb ) {
+            my $machine = $self->_agents;
+            $machine->{state} = $machine->{root};
+            $machine->feed( $str, $cb );
+        };
+
         *_first_match = set_subname "_first_match", sub( $self, $str ) {
             my $match;
-            $self->_agents->feed($str, sub( $, $name ) { $match //= $name }  );
+            $self->_reset_feed( $str, sub( $, $name ) { $match //= $name } );
             return $match;
         };
 
         *_all_matches = set_subname "_all_matches", sub( $self, $str ) {
             my @matches;
-            $self->_agents->feed($str, sub( $, $name ) { push @matches, $name; return undef } );
+            $self->_reset_feed( $str, sub( $, $name ) { push @matches, $name; return undef } );
             return @matches;
         };
 
@@ -576,7 +583,7 @@ sub _init_validators_from_config($self) {
 
 BEGIN {
 
-    if ( eval { require "TOML::XS" } ) {
+    if ( eval { load "TOML::XS" } ) {
         *_from_toml = sub($toml) { TOML::XS::from_toml($toml)->get() };
     }
     else {
@@ -601,7 +608,7 @@ Robots::Validate - Validate that IP addresses are associated with known robots
 
 =head1 VERSION
 
-version v0.4.9
+version v0.4.11
 
 =head1 SYNOPSIS
 

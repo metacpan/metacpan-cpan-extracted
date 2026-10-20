@@ -1,5 +1,5 @@
 /*
- * util_export.h - C API for registering exports with util
+ * funcutil_export.h - C API for registering exports with Func::Util
  *
  * Include this header in your XS module to register functions that can be
  * imported via `use Func::Util qw(your_function)`.
@@ -8,7 +8,7 @@
  *
  *   In your XS file:
  *
- *     #include "util_export.h"
+ *     #include "funcutil_export.h"
  *
  *     static XS(xs_my_function) {
  *         dXSARGS;

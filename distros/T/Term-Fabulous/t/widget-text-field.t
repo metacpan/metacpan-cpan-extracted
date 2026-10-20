@@ -116,8 +116,27 @@ subtest 'mouse' => sub {
 	click( $field, 6, 0, modifiers => TB_MOD_SHIFT );
 	is $field->editor->selected_text, 'ne tw', 'a click with Shift extends the selection';
 	click( $field, 5, 0 );
-	click( $field, 5, 0 );
+	click( $field, 5, 0, click_count => 2 );
 	is $field->editor->selected_text, 'two', 'a double click selects a word';
+	click( $field, 5, 0, click_count => 3 );
+	is [ $field->editor->selected_text, $field->editor->cursor ], [ '', 0, 5 ], 'a third quick click places the cursor again';
+	click( $field, 1, 0 );
+	click( $field, 5, 0, click_count => 2 );
+	is $field->editor->selected_text, '', 'the second press of a double click must hit the same place';
+};
+
+subtest 'double clicks on the clock of the UI' => sub {
+	my $now   = 1000;
+	my $field = Term::Fabulous::Widget::TextField->new( preferred_columns => 8, value => 'one two' );
+	my $ui    = layout_ui( $field, { clock => sub { $now } } );
+	screen_click( $field, 5, 0 );
+	$now += 0.3;
+	screen_click( $field, 5, 0 );
+	is $field->editor->selected_text, 'two', 'two clicks 0.3 seconds apart are a double click';
+	screen_click( $field, 1, 0 );
+	$now += 0.5;
+	screen_click( $field, 1, 0 );
+	is [ $field->editor->selected_text, $field->editor->cursor ], [ '', 0, 1 ], 'two clicks 0.5 seconds apart are two clicks';
 };
 
 subtest 'a masked field keeps its words to itself' => sub {
@@ -137,7 +156,7 @@ subtest 'a masked field keeps its words to itself' => sub {
 
 	$field->value('open sesame');
 	click( $field, 1, 0 );
-	click( $field, 1, 0 );
+	click( $field, 1, 0, click_count => 2 );
 	is $field->editor->selected_text, 'open sesame', 'a double click selects all of it';
 
 	$field->mask(undef);

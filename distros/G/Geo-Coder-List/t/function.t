@@ -1177,4 +1177,822 @@ subtest '_cache: set() is not called on L2 for a not-found result' => sub {
 	is(scalar @set_calls, 0, 'set() not called on L2 for a not-found result');
 };
 
+# =============================================================================
+# HOSTILE-CONDITION TESTS
+#
+# Everything below tries to break, bypass or corrupt the module: malformed
+# and malicious input, backends and caches that fail mid-flight, results that
+# are incomplete or oversized, and callers whose global state must survive a
+# call.  Each subtest states the behaviour it insists on, not the behaviour the
+# code happened to have.
+# =============================================================================
+
+# Messages the module is documented to produce; matched exactly so that a
+# changed or missing guard is noticed
+Readonly::Scalar my $MSG_PUSH_USAGE  => 'Geo::Coder::List::push: Usage: ($geocoder)';
+Readonly::Scalar my $MSG_RG_USAGE    => 'Usage: reverse_geocode(latlng => $location)';
+Readonly::Scalar my $MSG_INVALID     => 'Usage: Geo::Coder::List: invalid input to geocode(), ';
+Readonly::Scalar my $MSG_NOT_A_LOC   => 'a reference is not a location';
+Readonly::Scalar my $MSG_NO_GEOCODER => 'No geocoder found';
+
+# Values a caller's globals hold before a call, to prove they hold them after
+Readonly::Scalar my $OUTER_EVAL_ERROR => "outer error\n";
+Readonly::Scalar my $OUTER_TOPIC      => 'outer topic';
+
+# Sizes for resource-exhaustion tests: big enough to expose quadratic or
+# recursive handling, small enough to run in well under a second
+my %hostile = (
+	many_results  => 10_000,
+	long_location => 100_000,
+	limit_one     => 1,
+	limit_zero    => 0,
+	limit_neg     => -1,
+);
+
+# The TTLs the module defaults to, by result quality
+Readonly::Scalar my $TTL_HIT  => '1 month';
+Readonly::Scalar my $TTL_PART => '1 day';
+Readonly::Scalar my $TTL_MISS => '1 week';
+
+# A CHI-like store that records every call and can be told to fail
+{
+	package Hostile::CHI;
+	sub new { my ($class, %args) = @_; bless { data => {}, sets => [], gets => 0, %args }, $class }
+	sub get {
+		my ($self, $key) = @_;
+		$self->{gets}++;
+		die "cache get exploded\n" if $self->{die_on_get};
+		return $self->{data}{$key};
+	}
+	sub set {
+		my ($self, $key, $val, $ttl) = @_;
+		die "cache set exploded\n" if $self->{die_on_set};
+		push @{$self->{sets}}, { key => $key, val => $val, ttl => $ttl };
+		$self->{data}{$key} = $val;
+	}
+}
+
+# A logger that records what it is given instead of printing it
+{
+	package Hostile::Logger;
+	sub new   { bless { debug => [], warn => [], error => [] }, shift }
+	sub debug { my $self = shift; push @{$self->{debug}}, join('', @_) }
+	sub warn  { my $self = shift; push @{$self->{warn}},  join('', @_) }
+	sub error { my $self = shift; push @{$self->{error}}, join('', @_) }
+}
+
+# A list whose warnings and errors go to Carp rather than the configured
+# logger, so that warnings_like and throws_ok can see them
+sub _carping_list {
+	my $list = Geo::Coder::List->new();
+	delete $list->{logger};
+	$list->push($_) for @_;
+	return $list;
+}
+
+# Run a block with STDOUT captured, returning what it printed
+sub _stdout_of {
+	my $code = shift;
+	my $out  = '';
+	{
+		local *STDOUT;
+		open(STDOUT, '>', \$out) or die "cannot capture STDOUT: $!";
+		$code->();
+		close(STDOUT);
+	}
+	return $out;
+}
+
+# Count calls to a mock geocoder method while returning a fixed answer.  In
+# scalar context a backend returns its first answer, or undef for none, as a
+# real one would; returning the array would hand back its length.
+sub _counting {
+	my ($counter, @answer) = @_;
+	return sub { ${$counter}++; return wantarray ? @answer : $answer[0] };
+}
+
+# =============================================================================
+# _could_be_a_location() - internal helper
+# =============================================================================
+
+subtest '_could_be_a_location: accepts an ordinary place name' => sub {
+	# Purpose: the baseline the negative tests below are measured against
+	returns_ok(Geo::Coder::List::_could_be_a_location($LOC_LONDON),
+		{ type => 'integer', min => 1, max => 1 }, 'place name is a location');
+};
+
+subtest '_could_be_a_location: refuses every kind of non-string' => sub {
+	# Purpose: a reference must be refused however it would stringify; the
+	# hole this guards is looking up 'HASH(0x...)' as if it were a place
+	my %refs = (
+		'array ref'  => [ $LOC_LONDON ],
+		'hash ref'   => { location => $LOC_LONDON },
+		'code ref'   => sub { $LOC_LONDON },
+		'scalar ref' => \$LOC_LONDON,
+		'object'     => bless({}, 'Some::Object'),
+	);
+	for my $name (sort keys %refs) {
+		is(Geo::Coder::List::_could_be_a_location($refs{$name}), 0, "$name refused");
+	}
+};
+
+subtest '_could_be_a_location: refuses undef, empty and digit-only strings' => sub {
+	# Purpose: a digit string is what a numeric column holds when the wrong
+	# column has been read; it must never reach a paid backend
+	for my $bad (undef, '', '12345', '0') {
+		is(Geo::Coder::List::_could_be_a_location($bad), 0,
+			'refused: ' . (defined($bad) ? "'$bad'" : 'undef'));
+	}
+};
+
+subtest '_could_be_a_location: the shared rule is consulted exactly once per call' => sub {
+	# Strategy: replace the rule with a spy that accepts everything.  If the
+	# module has its own private copy of the rule, digits are still refused;
+	# if it asks the rule more than once, the spy count shows it.
+	my $asked = 0;
+	my $g = mock_scoped 'Geo::Location::Predicate::_valid_location' => sub { $asked++; return 1 };
+
+	is(Geo::Coder::List::_could_be_a_location('12345'), 1, 'the rule, not a copy, decides');
+	is($asked, 1, 'the rule was asked once');
+};
+
+# =============================================================================
+# geocode() - hostile input
+# =============================================================================
+
+subtest 'geocode: HTML-entity-encoded digits cannot bypass the location rule' => sub {
+	# Purpose: '&#49;&#50;&#51;' decodes to '123'.  The rule must be applied
+	# to the decoded string, which is what would be sent to the backend.
+	my $calls = 0;
+	my $list  = _make_list(MockGeocoder::Alpha->new());
+	my $m     = mock_scoped 'MockGeocoder::Alpha::geocode' => _counting(\$calls, _osm_result($LAT_DC, $LNG_DC));
+
+	for my $encoded ('&#49;&#50;&#51;', '&#x31;&#x32;&#x33;') {
+		throws_ok { $list->geocode($encoded) }
+			qr/^\Q${MSG_INVALID}123\E/,
+			"'$encoded' refused as the digits it decodes to";
+	}
+	is($calls, 0, 'the backend was never asked');
+};
+
+subtest 'geocode: references are refused with the documented message' => sub {
+	# Purpose: whichever calling form is used, a reference must not reach a
+	# geocoder.  A scalar ref is the one exception: it means its string.
+	my $calls = 0;
+	my $list  = _make_list(MockGeocoder::Alpha->new());
+	my $m     = mock_scoped 'MockGeocoder::Alpha::geocode' => _counting(\$calls, _osm_result($LAT_DC, $LNG_DC));
+
+	for my $ref ([ $LOC_LONDON ], { a => 1 }, sub { 1 }) {
+		throws_ok { $list->geocode(location => $ref) }
+			qr/^\Q$MSG_INVALID$MSG_NOT_A_LOC\E/,
+			ref($ref) . ' ref refused';
+	}
+	throws_ok { $list->geocode(location => \'12345') }
+		qr/^\Q${MSG_INVALID}12345\E/,
+		'scalar ref to digits refused as the digits';
+	is($calls, 0, 'the backend was never asked');
+};
+
+subtest 'geocode: markup and control characters reach the backend inert' => sub {
+	# Purpose: the module is not an HTML sink, but it must pass hostile text
+	# through unchanged rather than crash or half-decode it
+	my $seen;
+	my $list = _make_list(MockGeocoder::Alpha->new());
+	my $m    = mock_scoped 'MockGeocoder::Alpha::geocode' => sub {
+		my (undef, %args) = @_;
+		$seen = $args{location};
+		return _osm_result($LAT_DC, $LNG_DC);
+	};
+
+	my $hostile = "<script>alert(1)</script>\t'; DROP TABLE x; --, Paris";
+	lives_ok { $list->geocode($hostile) } 'hostile string does not crash geocode()';
+	is($seen, $hostile, 'backend received the string unchanged');
+};
+
+subtest 'geocode: every candidate in a wrapped result list is considered' => sub {
+	# Purpose: Geo::GeoNames wraps results in arrays.  A usable candidate
+	# that is not the first element of its array must not be thrown away,
+	# and a wrapped empty hash must be a miss, not a crash.
+	my $list = _make_list(MockGeocoder::Alpha->new());
+	my $m    = mock_scoped 'MockGeocoder::Alpha::geocode' => sub {
+		return [ { name => 'no coordinates' }, _osm_result($LAT_DC, $LNG_DC) ];
+	};
+	my $r = $list->geocode($LOC_DC);
+	is($r->{lat}, $LAT_DC, 'the second element of the array answered');
+
+	my @all = Geo::Coder::List->new()->push(MockGeocoder::Alpha->new())->geocode($LOC_LONDON);
+	is(scalar(@all), 2, 'list context: both wrapped candidates returned');
+
+	my $empty = _make_list(MockGeocoder::Beta->new());
+	my $e = mock_scoped 'MockGeocoder::Beta::geocode' => sub { return [ {} ] };
+	my $miss;
+	lives_ok { $miss = $empty->geocode($LOC_DC) } 'a wrapped empty hash does not crash';
+	ok(!defined($miss), 'and is not found');
+};
+
+subtest 'geocode: a very long location is collapsed and passed once' => sub {
+	# Purpose: resource exhaustion - a huge input must be handled in one pass,
+	# with whitespace runs collapsed, not rejected or truncated silently
+	my ($calls, $seen) = (0, undef);
+	my $list = _make_list(MockGeocoder::Alpha->new());
+	my $m    = mock_scoped 'MockGeocoder::Alpha::geocode' => sub {
+		my (undef, %args) = @_;
+		$calls++;
+		$seen = $args{location};
+		return _osm_result($LAT_DC, $LNG_DC);
+	};
+
+	my $long = join('   ', ('Street') x ($hostile{long_location} / length('Street   ')));
+	lives_ok { $list->geocode($long) } 'long location does not crash';
+	is($calls, 1, 'backend asked exactly once');
+	unlike($seen, qr/\s\s/, 'whitespace runs were collapsed before dispatch');
+	diag('long location length sent: ', length($seen)) if $ENV{TEST_VERBOSE};
+};
+
+subtest 'geocode: an enormous result list is handled without loss' => sub {
+	# Purpose: a misbehaving backend returning thousands of rows must not
+	# break scalar context (first row) or list context (every row)
+	my @rows = map { _osm_result($LAT_DC + $_ / 1e6, $LNG_DC) } 1 .. $hostile{many_results};
+	my $list = _make_list(MockGeocoder::Alpha->new());
+	my $m    = mock_scoped 'MockGeocoder::Alpha::geocode' => sub { return @rows };
+
+	my $first = $list->geocode($LOC_DC);
+	is($first->{lat}, $rows[0]{lat}, 'scalar context: the first row');
+
+	my @all = Geo::Coder::List->new()->push(MockGeocoder::Alpha->new())->geocode($LOC_DC);
+	is(scalar(@all), $hostile{many_results}, 'list context: every row');
+};
+
+# =============================================================================
+# geocode() - backends failing mid-flight
+# =============================================================================
+
+subtest 'geocode: a backend dying with an exception object does not stop the chain' => sub {
+	# Purpose: exception objects are common (HTTP::Exception, Throwable);
+	# they must be logged, not stringified into a crash
+	my $list = _carping_list(MockGeocoder::Alpha->new(), MockGeocoder::Beta->new());
+	my $ma   = mock_scoped 'MockGeocoder::Alpha::geocode' => sub { die { code => 503 } };
+	my $mb   = mock_scoped 'MockGeocoder::Beta::geocode'  => sub { _osm_result($LAT_NY, $LNG_NY) };
+
+	my $r;
+	warnings_like { $r = $list->geocode($LOC_DC) } [ qr/MockGeocoder::Alpha/ ],
+		'the failure is reported once';
+	is(ref($r->{geocoder}), 'MockGeocoder::Beta', 'the next geocoder answered');
+
+	my ($err) = grep { exists $_->{error} } @{$list->log()};
+	is(ref($err->{error}), 'HASH', 'the exception object is kept in the log');
+	is($err->{error}{code}, 503, 'with its contents intact');
+};
+
+subtest 'geocode: a provider-level error key moves on to the next geocoder' => sub {
+	# Purpose: { error => ... } is a refusal, not a result, however it looks
+	my $list = Geo::Coder::List->new()->push(MockGeocoder::Alpha->new())->push(MockGeocoder::Beta->new());
+	my $ma   = mock_scoped 'MockGeocoder::Alpha::geocode' => sub {
+		return { error => 'OVER_QUERY_LIMIT', lat => $LAT_DC, lon => $LNG_DC };
+	};
+	my $mb   = mock_scoped 'MockGeocoder::Beta::geocode' => sub { _osm_result($LAT_NY, $LNG_NY) };
+
+	my $r = $list->geocode($LOC_DC);
+	is($r->{lat}, $LAT_NY, 'the erroring geocoder was not believed');
+	ok((grep { ($_->{error} // '') eq 'OVER_QUERY_LIMIT' } @{$list->log()}), 'the error was logged');
+};
+
+subtest 'geocode: every geocoder failing returns undef and caches the miss' => sub {
+	# Purpose: total failure is a clean undef, and a repeat call must not
+	# hammer every backend again
+	my $calls = 0;
+	my $list  = _carping_list(MockGeocoder::Alpha->new());
+	my $m     = mock_scoped 'MockGeocoder::Alpha::geocode' => sub { $calls++; die "down\n" };
+
+	my $r;
+	warnings_like { $r = $list->geocode($LOC_DC) } [ qr/down/ ], 'failure reported';
+	ok(!defined($r), 'undef when nothing answered');
+
+	$r = $list->geocode($LOC_DC);
+	ok(!defined($r), 'still undef on repeat');
+	is($calls, 1, 'the backend was not asked again');
+};
+
+# =============================================================================
+# geocode() / reverse_geocode() - caller's globals
+# =============================================================================
+
+subtest "geocode: the caller's \$@ survives a failing backend" => sub {
+	# Purpose: geocode() runs backends in eval; a caller inspecting $@ after
+	# the call must see their own error, not the backend's
+	my $list = Geo::Coder::List->new()->push(MockGeocoder::Alpha->new());
+	my $m    = mock_scoped 'MockGeocoder::Alpha::geocode' => sub { die "backend broke\n" };
+
+	local $SIG{__WARN__} = sub { };
+	$@ = $OUTER_EVAL_ERROR;
+	$list->geocode($LOC_DC);
+	is($@, $OUTER_EVAL_ERROR, '$@ unchanged after geocode()');
+};
+
+subtest "reverse_geocode: the caller's \$@ survives a failing backend" => sub {
+	my $list = Geo::Coder::List->new()->push(MockGeocoder::Alpha->new());
+	my $m    = mock_scoped 'MockGeocoder::Alpha::reverse_geocode' => sub { die "backend broke\n" };
+
+	local $SIG{__WARN__} = sub { };
+	$@ = $OUTER_EVAL_ERROR;
+	$list->reverse_geocode(latlng => $LATLNG_DC);
+	is($@, $OUTER_EVAL_ERROR, '$@ unchanged after reverse_geocode()');
+};
+
+subtest "geocode: the caller's \$_ survives a call" => sub {
+	# Purpose: the module uses grep and map internally; $_ must be localised
+	my $list = Geo::Coder::List->new()->push(MockGeocoder::Alpha->new());
+	my $m    = mock_scoped 'MockGeocoder::Alpha::geocode' => sub { (0, _osm_result($LAT_DC, $LNG_DC)) };
+
+	local $_ = $OUTER_TOPIC;
+	my @r = $list->geocode($LOC_DC);
+	is($_, $OUTER_TOPIC, '$_ unchanged after list-context geocode()');
+};
+
+# =============================================================================
+# geocode() - limits and regex routing
+# =============================================================================
+
+subtest 'geocode: a location outside the regex does not spend the limit' => sub {
+	# Purpose: limit caps the queries a geocoder serves.  A location it is
+	# never asked about is not a query and must not use up its allowance.
+	my $calls = 0;
+	my $entry = { regex => qr/USA$/, geocoder => MockGeocoder::Alpha->new(), limit => $hostile{limit_one} };
+	my $list  = Geo::Coder::List->new()->push($entry);
+	my $m     = mock_scoped 'MockGeocoder::Alpha::geocode' => _counting(\$calls, _osm_result($LAT_DC, $LNG_DC));
+
+	$list->geocode($LOC_LONDON);
+	is($entry->{limit}, $hostile{limit_one}, 'limit untouched by a non-matching location');
+
+	my $r = $list->geocode($LOC_USA);
+	ok(defined($r), 'the matching location is still served');
+	is($calls, 1, 'and it was the only query');
+};
+
+subtest 'geocode: a zero or negative limit is never served' => sub {
+	# Purpose: an exhausted or misconfigured limit must block the geocoder
+	# outright, not wrap around or count up
+	for my $limit ($hostile{limit_zero}, $hostile{limit_neg}) {
+		my $calls = 0;
+		my $list  = Geo::Coder::List->new()->push({ geocoder => MockGeocoder::Alpha->new(), limit => $limit });
+		my $m     = mock_scoped 'MockGeocoder::Alpha::geocode' => _counting(\$calls, _osm_result($LAT_DC, $LNG_DC));
+
+		ok(!defined($list->geocode($LOC_DC)), "limit $limit: no result");
+		is($calls, 0, "limit $limit: backend never asked");
+	}
+};
+
+# =============================================================================
+# geocode() with an L2 cache - what the caller is given
+# =============================================================================
+
+subtest 'geocode: with an L2 cache the caller still gets the full result' => sub {
+	# Purpose: L2 entries are stripped to geometry for storage.  That is the
+	# store's business; the caller's result, and L1, must keep every field
+	# and the geocoder object.
+	my %l2;
+	my $g    = MockGeocoder::Alpha->new();
+	my $list = Geo::Coder::List->new(cache => \%l2)->push($g);
+	my $m    = mock_scoped 'MockGeocoder::Alpha::geocode' => sub {
+		return { lat => $LAT_DC, lon => $LNG_DC, display_name => 'The White House' };
+	};
+
+	my $r = $list->geocode($LOC_DC);
+	is($r->{lat}, $LAT_DC, 'lat alias kept');
+	is($r->{lng}, $LNG_DC, 'lng alias kept');
+	is($r->{display_name}, 'The White House', 'provider field kept');
+	is($r->{geocoder}, $g, 'geocoder object kept');
+
+	is_deeply([ sort keys %{$l2{$LOC_DC}} ], [ 'geometry' ], 'L2 copy holds only geometry');
+	is($list->{locations}{$LOC_DC}{display_name}, 'The White House', 'L1 entry not stripped');
+	memory_cycle_ok($list, 'no cycles after a cached lookup');
+};
+
+subtest 'geocode: an L2 store that dies on get() is a miss, not a failure' => sub {
+	# Purpose: the cache is an optimisation.  A store that is down must not
+	# take geocoding down with it.
+	my $chi  = Hostile::CHI->new(die_on_get => 1);
+	my $list = Geo::Coder::List->new(cache => $chi);
+	delete $list->{logger};
+	$list->push(MockGeocoder::Alpha->new());
+	my $m = mock_scoped 'MockGeocoder::Alpha::geocode' => sub { _osm_result($LAT_DC, $LNG_DC) };
+
+	my $r;
+	warnings_like { $r = $list->geocode($LOC_DC) } [ qr/cache get failed for '\Q$LOC_DC\E': cache get exploded/ ],
+		'the failure is reported';
+	is($r->{lat}, $LAT_DC, 'the geocoder answered anyway');
+};
+
+subtest 'geocode: an L2 store that dies on set() still returns the result' => sub {
+	my $chi  = Hostile::CHI->new(die_on_set => 1);
+	my $list = Geo::Coder::List->new(cache => $chi);
+	delete $list->{logger};
+	$list->push(MockGeocoder::Alpha->new());
+	my $m = mock_scoped 'MockGeocoder::Alpha::geocode' => sub { _osm_result($LAT_DC, $LNG_DC) };
+
+	my $r;
+	warnings_like { $r = $list->geocode($LOC_DC) } [ qr/cache set failed for '\Q$LOC_DC\E': cache set exploded/ ],
+		'the failure is reported';
+	is($r->{lat}, $LAT_DC, 'the result found is not lost');
+};
+
+subtest 'geocode: a plain string in L2 is not returned as a result' => sub {
+	# Purpose: a corrupted store, or a reverse_geocode() address under the
+	# same key, must not come back from geocode() as if it were a hashref
+	my $calls = 0;
+	my $list  = Geo::Coder::List->new(cache => { $LOC_DC => 'not a result' })->push(MockGeocoder::Alpha->new());
+	my $m     = mock_scoped 'MockGeocoder::Alpha::geocode' => _counting(\$calls, _osm_result($LAT_DC, $LNG_DC));
+
+	my $r = $list->geocode($LOC_DC);
+	is(ref($r), 'HASH', 'a hashref is returned');
+	is($r->{lat}, $LAT_DC, 'from the geocoder');
+	is($calls, 1, 'which was asked because the cache entry was unusable');
+};
+
+# =============================================================================
+# new() - cloning
+# =============================================================================
+
+subtest 'new: pushing onto a clone leaves the original chain alone' => sub {
+	# Purpose: a clone that shares the chain arrayref would make every push
+	# onto it a push onto the original
+	my $orig  = Geo::Coder::List->new()->push(MockGeocoder::Alpha->new());
+	my $clone = $orig->new();
+	$clone->push(MockGeocoder::Beta->new());
+
+	is(scalar(@{$orig->{geocoders}}),  1, 'original chain unchanged');
+	is(scalar(@{$clone->{geocoders}}), 2, 'clone chain extended');
+};
+
+subtest "new: spending a clone's limit leaves the original's alone" => sub {
+	# Purpose: hashref entries hold mutable counters; sharing them would let
+	# one object exhaust another's allowance
+	my $orig = Geo::Coder::List->new()->push({ geocoder => MockGeocoder::Alpha->new(), limit => $hostile{limit_one} });
+	my $clone = $orig->new();
+	my $m = mock_scoped 'MockGeocoder::Alpha::geocode' => sub { _osm_result($LAT_DC, $LNG_DC) };
+
+	$clone->geocode($LOC_DC);
+	is($orig->{geocoders}[0]{limit}, $hostile{limit_one}, "original's limit unspent");
+	is($clone->{geocoders}[0]{limit}, $hostile{limit_one} - 1, "clone's limit spent");
+};
+
+subtest 'new: a clone starts with an empty log' => sub {
+	my $orig = Geo::Coder::List->new()->push(MockGeocoder::Alpha->new());
+	my $m = mock_scoped 'MockGeocoder::Alpha::geocode' => sub { _osm_result($LAT_DC, $LNG_DC) };
+	$orig->geocode($LOC_DC);
+
+	my $clone = $orig->new();
+	is(scalar(@{$clone->log()}), 0, 'clone log empty');
+	ok(scalar(@{$orig->log()}) > 0, 'original log kept');
+	memory_cycle_ok($clone, 'no cycles in a clone');
+};
+
+# =============================================================================
+# push()
+# =============================================================================
+
+subtest 'push: undef croaks with the exact usage message' => sub {
+	my $list = Geo::Coder::List->new();
+	throws_ok { $list->push(undef) } qr/^\Q$MSG_PUSH_USAGE\E/, 'push(undef) croaks';
+	is(scalar(@{$list->{geocoders}}), 0, 'nothing was added');
+};
+
+subtest 'push: a compiled regex survives being pushed' => sub {
+	# Purpose: push() deliberately avoids Params::Get, which would stringify
+	# qr//; the stored regex must be the very object passed in
+	my $re   = qr/USA$/;
+	my $list = Geo::Coder::List->new()->push({ regex => $re, geocoder => MockGeocoder::Alpha->new() });
+	is(refaddr($list->{geocoders}[0]{regex}), refaddr($re), 'same Regexp object');
+};
+
+# =============================================================================
+# reverse_geocode() - hostile input
+# =============================================================================
+
+subtest 'reverse_geocode: anything but a numeric pair croaks before any backend' => sub {
+	# Purpose: a malformed latlng would be split into nonsense coordinates
+	# and sent to every backend in the chain
+	my $calls = 0;
+	my $list  = _make_list(MockGeocoder::Alpha->new());
+	my $m     = mock_scoped 'MockGeocoder::Alpha::reverse_geocode' => _counting(\$calls, { display_name => 'X' });
+
+	my @bad = (
+		'abc', '51.5', '51.5,', ',-0.1', '1,2,3', '51.5;-0.1', 'NaN,NaN',
+		'1e5,2', "51.5,-0.1\n; rm -rf /", '51.5 -0.1', [ 51.5, -0.1 ],
+	);
+	for my $latlng (@bad) {
+		throws_ok { $list->reverse_geocode(latlng => $latlng) }
+			qr/^\Q$MSG_RG_USAGE\E/,
+			'refused: ' . (ref($latlng) ? 'array ref' : "'$latlng'");
+	}
+	is($calls, 0, 'the backend was never asked');
+};
+
+subtest 'reverse_geocode: non-ASCII digits are not a numeric pair' => sub {
+	# Purpose: \d matches Unicode digits unless told not to; a backend reads
+	# none of them as numbers, so they must be refused like any other junk
+	my $calls = 0;
+	my $list  = _make_list(MockGeocoder::Alpha->new());
+	my $m     = mock_scoped 'MockGeocoder::Alpha::reverse_geocode' => _counting(\$calls, { display_name => 'X' });
+
+	# U+0665 U+0661 is Arabic-Indic 51; U+FF15 U+FF11 is fullwidth 51
+	for my $latlng ("\x{665}\x{661},\x{660}", "\x{FF15}\x{FF11},0") {
+		throws_ok { $list->reverse_geocode(latlng => $latlng) }
+			qr/^\Q$MSG_RG_USAGE\E/, 'Unicode digits refused';
+	}
+	is($calls, 0, 'the backend was never asked');
+};
+
+subtest 'reverse_geocode: a numeric pair with spaces and signs is accepted' => sub {
+	# Purpose: the guard must not be so strict that real input is refused
+	my $list = _make_list(MockGeocoder::Alpha->new());
+	my $m    = mock_scoped 'MockGeocoder::Alpha::reverse_geocode' => sub { { display_name => 'Here' } };
+
+	is($list->reverse_geocode(latlng => " +$LAT_LONDON , $LNG_LONDON "), 'Here', 'accepted');
+};
+
+# =============================================================================
+# reverse_geocode() - cache and context
+# =============================================================================
+
+subtest 'reverse_geocode: a list-context cache hit returns a list' => sub {
+	# Purpose: list context caches an arrayref; handing that arrayref back as
+	# the only element of the list is a different answer from the first call
+	my $calls = 0;
+	my $list  = _make_list(MockGeocoder::Alpha->new());
+	my $m     = mock_scoped 'MockGeocoder::Alpha::reverse_geocode' =>
+		_counting(\$calls, { display_name => 'One' }, { display_name => 'Two' });
+
+	my @first  = $list->reverse_geocode(latlng => $LATLNG_DC);
+	my @second = $list->reverse_geocode(latlng => $LATLNG_DC);
+	is_deeply(\@second, \@first, 'cache hit returns the same list');
+	is($calls, 1, 'from the cache');
+
+	my $scalar = $list->reverse_geocode(latlng => $LATLNG_DC);
+	is($scalar, 'One', 'scalar context after list context: the first address, not an arrayref');
+};
+
+subtest 'reverse_geocode: list context moves past a geocoder with no address' => sub {
+	# Purpose: an empty answer is not an answer; the next geocoder may have one
+	my $list = Geo::Coder::List->new()->push(MockGeocoder::Alpha->new())->push(MockGeocoder::Beta->new());
+	my $ma   = mock_scoped 'MockGeocoder::Alpha::reverse_geocode' => sub { return () };
+	my $mb   = mock_scoped 'MockGeocoder::Beta::reverse_geocode'  => sub { { display_name => 'From Beta' } };
+
+	my @r = $list->reverse_geocode(latlng => $LATLNG_DC);
+	is_deeply(\@r, [ 'From Beta' ], 'the second geocoder answered');
+};
+
+subtest 'reverse_geocode: list context with no address anywhere does not cache the miss as a hit' => sub {
+	# Purpose: caching an empty arrayref would make the next call return an
+	# arrayref from the cache instead of trying again
+	my $calls = 0;
+	my $list  = _make_list(MockGeocoder::Alpha->new());
+	my $m     = mock_scoped 'MockGeocoder::Alpha::reverse_geocode' => _counting(\$calls);
+
+	my @r = $list->reverse_geocode(latlng => $LATLNG_DC);
+	is(scalar(@r), 0, 'nothing returned');
+	my $s = $list->reverse_geocode(latlng => $LATLNG_DC);
+	ok(!defined($s), 'scalar context: undef, not a cached arrayref');
+	is($calls, 2, 'the backend was asked again');
+};
+
+subtest 'reverse_geocode: list context takes plain-string addresses and skips junk' => sub {
+	# Purpose: scalar context already accepts a plain string as the address;
+	# list context used to dereference it as a HASH and die
+	my $list = _make_list(MockGeocoder::Alpha->new());
+	my $m    = mock_scoped 'MockGeocoder::Alpha::reverse_geocode' => sub {
+		return ('1 Main St', undef, '', [ 'not an address' ], { display_name => '2 High St' });
+	};
+
+	my @r;
+	lives_ok { @r = $list->reverse_geocode(latlng => $LATLNG_DC) } 'mixed answers do not die';
+	is_deeply(\@r, [ '1 Main St', '2 High St' ], 'strings and display_name kept; undef, empty and array refs skipped');
+};
+
+subtest 'reverse_geocode: a backend dying for another reason is not retried' => sub {
+	# Purpose: the latlng retry is for one specific complaint; any other
+	# error must be reported and the next geocoder tried
+	my $alpha = 0;
+	my $list  = _carping_list(MockGeocoder::Alpha->new(), MockGeocoder::Beta->new());
+	my $ma    = mock_scoped 'MockGeocoder::Alpha::reverse_geocode' => sub { $alpha++; die "quota exceeded\n" };
+	my $mb    = mock_scoped 'MockGeocoder::Beta::reverse_geocode'  => sub { { display_name => 'From Beta' } };
+
+	my $r;
+	warnings_like { $r = $list->reverse_geocode(latlng => $LATLNG_DC) } [ qr/quota exceeded/ ], 'reported';
+	is($r, 'From Beta', 'the next geocoder answered');
+	is($alpha, 1, 'the failing geocoder was asked once, not retried');
+};
+
+subtest 'reverse_geocode: a zero limit is never served' => sub {
+	my $calls = 0;
+	my $list  = Geo::Coder::List->new()->push({ geocoder => MockGeocoder::Alpha->new(), limit => $hostile{limit_zero} });
+	my $m     = mock_scoped 'MockGeocoder::Alpha::reverse_geocode' => _counting(\$calls, { display_name => 'X' });
+
+	ok(!defined($list->reverse_geocode(latlng => $LATLNG_DC)), 'no address');
+	is($calls, 0, 'backend never asked');
+};
+
+# =============================================================================
+# _cache() - the write path must not corrupt what it is given
+# =============================================================================
+
+subtest '_cache: writing a HASH to L2 does not strip the caller\'s copy' => sub {
+	# Purpose: the returned value and L1 are the caller's; only the L2 copy
+	# is reduced to geometry and has its geocoder turned into a class name
+	my %l2;
+	my $g   = MockGeocoder::Alpha->new();
+	my $obj = Geo::Coder::List->new(cache => \%l2);
+	my $val = { geometry => { location => { lat => $LAT_DC, lng => $LNG_DC } }, geocoder => $g, extra => 1 };
+
+	my $rc = $obj->_cache($LOC_DC, $val);
+	is($rc, $val, 'the value written is returned');
+	is($val->{geocoder}, $g, 'caller keeps the geocoder object');
+	is($val->{extra}, 1, 'caller keeps provider fields');
+	is_deeply([ sort keys %{$l2{$LOC_DC}} ], [ 'geometry' ], 'L2 copy is stripped');
+	isnt(refaddr($l2{$LOC_DC}), refaddr($val), 'L2 holds a copy, not the original');
+};
+
+subtest '_cache: writing an ARRAY to L2 leaves every caller item intact' => sub {
+	my %l2;
+	my $g     = MockGeocoder::Alpha->new();
+	my $obj   = Geo::Coder::List->new(cache => \%l2);
+	my @items = map { { geometry => { location => { lat => $_, lng => $LNG_DC } }, geocoder => $g, n => $_ } } (1, 2);
+
+	$obj->_cache($LOC_DC, \@items);
+	is($items[$_]{geocoder}, $g, "item $_ keeps its geocoder") for (0, 1);
+	is($items[$_]{n}, $_ + 1, "item $_ keeps its fields") for (0, 1);
+	ok(!exists $l2{$LOC_DC}[0]{n}, 'L2 items are stripped');
+};
+
+subtest '_cache: TTL depends on how much of a result there is' => sub {
+	# Purpose: found, partial and missing results are cached for different
+	# lengths of time, so a transient failure is retried soon and a place
+	# that does not exist is not asked about every day
+	my %cases = (
+		found   => [ { geometry => { location => { lat => $LAT_DC, lng => $LNG_DC } } }, $TTL_HIT,  1 ],
+		partial => [ { geometry => { location => {} } },                                  $TTL_PART, 0 ],
+		missing => [ { name => 'no geometry at all' },                                     $TTL_MISS, 0 ],
+	);
+	for my $case (sort keys %cases) {
+		my ($val, $ttl, $returned) = @{$cases{$case}};
+		my $chi = Hostile::CHI->new();
+		my $rc  = Geo::Coder::List->new(cache => $chi)->_cache($case, $val);
+		is($chi->{sets}[0]{ttl}, $ttl, "$case: TTL $ttl");
+		is(defined($rc) ? 1 : 0, $returned, "$case: " . ($returned ? 'value returned' : 'undef returned'));
+	}
+};
+
+subtest '_cache: an ARRAY item with no geometry is a miss, not a partial result' => sub {
+	my $chi = Hostile::CHI->new();
+	Geo::Coder::List->new(cache => $chi)->_cache($LOC_DC, [ { name => 'no geometry' } ]);
+	is($chi->{sets}[0]{ttl}, $TTL_MISS, "TTL $TTL_MISS");
+};
+
+subtest '_cache: the not-found sentinel never leaves L1 or reaches the caller' => sub {
+	# Purpose: the sentinel is an implementation detail; an external store
+	# must never see it and a read must report it as undef
+	my $chi = Hostile::CHI->new();
+	my $obj = Geo::Coder::List->new(cache => $chi);
+
+	ok(!defined($obj->_cache($LOC_DC, undef)), 'write of undef returns undef');
+	is(scalar(@{$chi->{sets}}), 0, 'L2 not written');
+	ok(!defined($obj->_cache($LOC_DC)), 'read returns undef');
+	is($chi->{gets}, 0, 'L1 answered without consulting L2');
+};
+
+subtest '_cache: an L2 entry with no latitude reads as a miss' => sub {
+	# Purpose: a stale or truncated L2 entry must not be served as a result
+	my $obj = Geo::Coder::List->new(cache => { $LOC_DC => { geometry => { location => {} } } });
+	ok(!defined($obj->_cache($LOC_DC)), 'undef for a geometry with no lat');
+};
+
+# =============================================================================
+# _l2_copy() and _has_lat() - internal helpers
+# =============================================================================
+
+subtest '_l2_copy: non-HASH values are returned as they are' => sub {
+	# Purpose: strings and array-based objects have nothing to strip, and
+	# dereferencing them as a HASH would die
+	my $aref = [ 1, 2 ];
+	my $aobj = bless [ 1 ], 'Array::Based';
+	is(Geo::Coder::List::_l2_copy('An address', 0), 'An address', 'string unchanged');
+	is(Geo::Coder::List::_l2_copy($aref, 0), $aref, 'array ref unchanged');
+	is(Geo::Coder::List::_l2_copy($aobj, 0), $aobj, 'array-based object unchanged');
+	ok(!defined(Geo::Coder::List::_l2_copy(undef, 0)), 'undef unchanged');
+};
+
+subtest '_l2_copy: a blessed result keeps its class and fields' => sub {
+	# Purpose: an object's accessors may need fields other than geometry
+	my $g    = MockGeocoder::Alpha->new();
+	my $obj  = bless { lat => $LAT_DC, geocoder => $g }, 'Some::Point';
+	my $copy = Geo::Coder::List::_l2_copy($obj, 0);
+	isa_ok($copy, 'Some::Point');
+	is($copy->{lat}, $LAT_DC, 'fields kept');
+	is($copy->{geocoder}, 'MockGeocoder::Alpha', 'geocoder stringified in the copy');
+	is($obj->{geocoder}, $g, 'original untouched');
+};
+
+subtest '_l2_copy: keep_all keeps provider fields' => sub {
+	my $copy = Geo::Coder::List::_l2_copy({ geometry => {}, extra => 1, geocoder => 'cache' }, 1);
+	is($copy->{extra}, 1, 'extra kept');
+	is($copy->{geocoder}, 'cache', 'a geocoder that is already a string is left alone');
+};
+
+subtest '_has_lat: malformed structures answer 0 without dying or auto-vivifying' => sub {
+	# Purpose: the check runs on data that may be shared with the caller;
+	# it must not create keys in it or die on unexpected types
+	my %cases = (
+		'no geometry'           => {},
+		'geometry is a string'  => { geometry => 'nowhere' },
+		'geometry is an array'  => { geometry => [] },
+		'location is a string'  => { geometry => { location => 'x' } },
+		'location has no lat'   => { geometry => { location => {} } },
+	);
+	for my $name (sort keys %cases) {
+		my $before = Dumper($cases{$name});
+		my $rc;
+		lives_ok { $rc = Geo::Coder::List::_has_lat($cases{$name}) } "$name: lives";
+		is($rc, 0, "$name: 0");
+		is(Dumper($cases{$name}), $before, "$name: structure unchanged");
+	}
+	is(Geo::Coder::List::_has_lat({ geometry => { location => { lat => 0 } } }), 1, 'lat 0 is a latitude');
+};
+
+# =============================================================================
+# _warn(), _error(), _debug() - internal helpers
+# =============================================================================
+
+subtest '_warn: with no logger, carps the message' => sub {
+	my $obj = Geo::Coder::List->new();
+	delete $obj->{logger};
+	warning_like { $obj->_warn('something ', 'odd') } qr/^something odd at /, 'carped';
+};
+
+subtest '_warn: with a logger, logs and does not carp' => sub {
+	my $obj = Geo::Coder::List->new();
+	$obj->{logger} = Hostile::Logger->new();
+	warnings_are { $obj->_warn('something odd') } [], 'nothing carped';
+	is_deeply($obj->{logger}{warn}, [ 'something odd' ], 'logged once');
+};
+
+subtest '_error: with no logger, croaks the exact message' => sub {
+	my $obj = Geo::Coder::List->new();
+	delete $obj->{logger};
+	throws_ok { $obj->_error('fatal ', 'thing') } qr/^fatal thing at /, 'croaked';
+};
+
+subtest '_error: with a logger, logs and still dies' => sub {
+	# Purpose: a logger must not turn a fatal error into a silent one
+	my $obj = Geo::Coder::List->new();
+	$obj->{logger} = Hostile::Logger->new();
+	throws_ok { $obj->_error('fatal thing') } qr/^fatal thing/, 'died';
+	is_deeply($obj->{logger}{error}, [ 'fatal thing' ], 'logged once');
+};
+
+subtest '_debug: prints only when debug is set, and always logs' => sub {
+	my $obj = Geo::Coder::List->new(debug => 0);
+	$obj->{logger} = Hostile::Logger->new();
+	is(_stdout_of(sub { $obj->_debug('quiet') }), '', 'debug=0: nothing printed');
+	is_deeply($obj->{logger}{debug}, [ 'quiet' ], 'debug=0: still logged');
+
+	$obj->{debug} = 1;
+	is(_stdout_of(sub { $obj->_debug('loud') }), "loud\n", 'debug=1: printed with a newline');
+};
+
+# =============================================================================
+# ua(), log(), flush() - hostile state
+# =============================================================================
+
+subtest 'ua: a false UA changes nothing' => sub {
+	# Purpose: ua(undef) or ua(0) must not wipe the geocoders' agents
+	my $g    = MockGeocoder::Alpha->new();
+	my $list = _make_list($g);
+	$g->{ua} = 'original';
+	for my $false (undef, 0, '') {
+		ok(!defined($list->ua($false)), 'returns nothing');
+	}
+	is($g->{ua}, 'original', 'geocoder UA untouched');
+};
+
+subtest 'ua: a chain entry with no geocoder croaks with the exact message' => sub {
+	my $list = Geo::Coder::List->new();
+	push @{$list->{geocoders}}, { regex => qr/x/ };
+	throws_ok { $list->ua(bless {}, 'Plain::UA') } qr/^\Q$MSG_NO_GEOCODER\E/, 'croaked';
+};
+
+subtest 'log: an object whose log has been removed still returns an arrayref' => sub {
+	# Purpose: callers dereference log() unconditionally
+	my $obj = Geo::Coder::List->new();
+	delete $obj->{log};
+	returns_ok($obj->log(), { type => 'arrayref' }, 'arrayref');
+	is(scalar(@{$obj->log()}), 0, 'and it is empty');
+};
+
+subtest 'flush: repairs a corrupted log' => sub {
+	my $obj = Geo::Coder::List->new();
+	$obj->{log} = 'not an array';
+	$obj->flush();
+	is_deeply($obj->log(), [], 'log is an empty arrayref again');
+};
+
 done_testing();

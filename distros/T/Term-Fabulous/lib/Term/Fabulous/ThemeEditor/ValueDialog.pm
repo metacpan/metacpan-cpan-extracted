@@ -5,7 +5,7 @@ use warnings;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 use Object::Pad 0.825;
 
@@ -13,20 +13,23 @@ use Term::Fabulous::Widget::Dialog;
 
 # The dialog that edits one setting of a theme: a color picker with the
 # palette's tokens as swatches for a color, a list of border styles or
-# other choices, or a field for the name. Every change shows in the
-# preview at once; Apply writes it to the theme, Cancel takes it back.
-class Term::Fabulous::ThemeEditor::ValueDialog :isa(Term::Fabulous::Widget::Dialog) :strict(params) {
+# other choices, or a field for the name. Every change fires Change for
+# the preview at once; the answer apply carries the value, reset asks to
+# remove the setting, and every other answer takes the preview back.
+class Term::Fabulous::ThemeEditor::ValueDialog
+	:isa(Term::Fabulous::Widget::Dialog)
+	:strict(params)
+{
 	use Clay::UI::Enum::Result;
-	use Clay::XS qw(sizing_grow CLAY_TOP_TO_BOTTOM CLAY_ATTACH_TO_ROOT CLAY_ATTACH_POINT_RIGHT_CENTER);
+	use Clay::XS qw(sizing_grow CLAY_TOP_TO_BOTTOM);
 	use Feature::Compat::Try;
 	use List::Util qw(any min);
-	use Scalar::Util qw(weaken);
 	use Term::Fabulous::Check qw(color);
 	use Term::Fabulous::Enum::BorderStyle;
+	use Term::Fabulous::Event::Change;
+	use Term::Fabulous::Text::Markup qw(escape_markup);
 	use Term::Fabulous::Theme;
 	use Term::Fabulous::Theme::Document;
-	use Term::Fabulous::Widget::Box;
-	use Term::Fabulous::Widget::Button;
 	use Term::Fabulous::Widget::ColorPicker;
 	use Term::Fabulous::Widget::Table;
 	use Term::Fabulous::Widget::Table::Frame qw(framed);
@@ -36,21 +39,31 @@ class Term::Fabulous::ThemeEditor::ValueDialog :isa(Term::Fabulous::Widget::Dial
 	use constant LIST_ID   => 'theme-editor-value-list';
 	use constant PICKER_ID => 'theme-editor-color';
 
-	field $key        :param :reader;
-	field $current    :param;    # the value the theme has now (effective)
-	field $is_set     :param = 0;    # whether the theme sets it
-	field $default    :param = undef;    # what the key falls back to, for the hint
-	field $palette    :param;    # token => [r, g, b, a], for the swatches
-	field $on_preview :param;    # code: shows a value (undef: the theme as it is)
-	field $on_apply   :param;    # code: writes a value
-	field $on_reset   :param;    # code: removes the setting
-	field $list_rows  :param = 12;    # how many rows the list shows
+	field $key       :param :reader;
+	field $current   :param;    # the value the theme has now (effective)
+	field $is_set    :param = 0;    # whether the theme sets it
+	field $default   :param = undef;    # what the key falls back to, for the hint
+	field $palette   :param;    # token => [r, g, b, a], for the swatches
+	field $list_rows :param = 12;    # how many rows the list shows
 
 	field $kind;    # color, palette, style, boolean, name, base
 	field $value;    # the value chosen now
 	field $list;
 	field $picker;
-	field $message;
+
+	# At the right edge of the screen, titled with the key, with Reset only
+	# for a setting the theme has; the line above the buttons keeps its
+	# place.
+	sub BUILDARGS ( $class, %params ) {
+		my $key = $params{key} // die "$class: a key is required";
+		return $class->SUPER::BUILDARGS(
+			%params,
+			title       => "Edit $key",
+			placement   => 'right',
+			notice_line => 'kept',
+			buttons     => [ { id => 'apply', label => 'Apply', primary => 1 }, ( $params{is_set} ? { id => 'reset', label => 'Reset to default' } : () ), { id => 'cancel', label => 'Cancel' } ],
+		);
+	}
 
 	ADJUST {
 		my $parsed = Term::Fabulous::Theme::Document::parse_key($key);
@@ -60,28 +73,13 @@ class Term::Fabulous::ThemeEditor::ValueDialog :isa(Term::Fabulous::Widget::Dial
 			:                                   Term::Fabulous::Theme::slot_info( @{$parsed}{qw(family slot)} )->{kind};
 		$value = $current;
 
-		# At the right edge of the screen and without dimming it, so the
-		# preview on the left shows the value being chosen in its true
-		# colors.
+		# Without dimming the screen, so the preview on the left shows the
+		# value being chosen in its true colors.
 		$self->backdrop_color( [ 0, 0, 0, 0 ] );
-		$self->floating(
-			{
-				attach_to     => CLAY_ATTACH_TO_ROOT,
-				attach_points => { element => CLAY_ATTACH_POINT_RIGHT_CENTER, parent => CLAY_ATTACH_POINT_RIGHT_CENTER },
-				offset        => { x       => -1,                             y      => 0 },
-				z_index       => $self->z_index + 1,
-			}
-		);
 		$self->layout( { layout_direction => CLAY_TOP_TO_BOTTOM, sizing => { width => sizing_grow( 0, 64 ) }, padding => { left => 2, right => 2, top => 1, bottom => 1 }, child_gap => 1 } );
 
-		$self->add_child( Term::Fabulous::Widget::Text->new( text => "Edit $key", bold => 1 ) );
 		$self->add_child( Term::Fabulous::Widget::Text->new( text => $self->_hint($parsed) ) );
 		$self->add_child( $self->_chooser($parsed) );
-		$message = Term::Fabulous::Widget::Text->new( text => '' );
-		$self->add_child( $message, $self->_buttons );
-
-		weaken( my $weak_self = $self );
-		$self->on( Close => sub ($event) { $weak_self->_closed; return Clay::UI::Enum::Result->CONTINUE } );
 	}
 
 	method value () {
@@ -124,9 +122,8 @@ class Term::Fabulous::ThemeEditor::ValueDialog :isa(Term::Fabulous::Widget::Dial
 	method _name_field () {
 		my $field = Term::Fabulous::Widget::TextField->new( value => $current // '', placeholder => 'The theme\'s name', layout => { sizing => { width => sizing_grow() } } );
 		$field->editor->select_all;
-		weaken( my $weak_self = $self );
-		$field->on( Change => sub ($event) { $weak_self->_choose( $event->value ); return Clay::UI::Enum::Result->CONTINUE } );
-		$field->on( Submit => sub ($event) { $weak_self->apply;                    return } );
+		$field->on( Change => sub ( $self, $event ) { $self->_choose( $event->value ); return Clay::UI::Enum::Result->HANDLED }, owner => $self );
+		$field->on( Submit => sub ( $self, $event ) { $self->apply;                    return },                                 owner => $self );
 		return $field;
 	}
 
@@ -165,9 +162,8 @@ class Term::Fabulous::ThemeEditor::ValueDialog :isa(Term::Fabulous::Widget::Dial
 			$list->cursor( $choices[$chosen][0] );
 			$list->set_selection( $choices[$chosen][0] );
 		}
-		weaken( my $weak_self = $self );
-		$list->on( CursorMove  => sub ($event) { $weak_self->_choose( $event->row_id ) if defined $event->row_id; return Clay::UI::Enum::Result->CONTINUE } );
-		$list->on( RowActivate => sub ($event) { $weak_self->apply;                                               return } );
+		$list->on( CursorMove  => sub ( $self, $event ) { $self->_choose( $event->row_id ) if defined $event->row_id; return Clay::UI::Enum::Result->CONTINUE }, owner => $self );
+		$list->on( RowActivate => sub ( $self, $event ) { $self->apply;                                               return },                                  owner => $self );
 		return framed( $list, $list_rows );    # no header
 	}
 
@@ -180,9 +176,8 @@ class Term::Fabulous::ThemeEditor::ValueDialog :isa(Term::Fabulous::Widget::Dial
 			swatches  => @swatches ? \@swatches : undef,
 			list_rows => $list_rows,
 		);
-		weaken( my $weak_self = $self );
-		$picker->on( Change => sub ($event) { $weak_self->_choose( $event->value ); return Clay::UI::Enum::Result->CONTINUE } );
-		$picker->on( Submit => sub ($event) { $weak_self->apply;                    return } );
+		$picker->on( Change => sub ( $self, $event ) { $self->_choose( $event->value ); return Clay::UI::Enum::Result->HANDLED }, owner => $self );
+		$picker->on( Submit => sub ( $self, $event ) { $self->apply;                    return },                                 owner => $self );
 		return $picker;
 	}
 
@@ -200,31 +195,17 @@ class Term::Fabulous::ThemeEditor::ValueDialog :isa(Term::Fabulous::Widget::Dial
 		return $spec;
 	}
 
-	method _buttons () {
-		my $row = Term::Fabulous::Widget::Box->new( layout => { child_gap => 2 } );
-		weaken( my $weak_self = $self );
-		my @buttons = ( [ 'Apply', ['primary'], sub { $weak_self->apply } ], [ 'Reset to default', [], sub { $weak_self->reset } ], [ 'Cancel', [], sub { $weak_self->cancel } ] );
-		foreach my $definition (@buttons) {
-			my ( $label, $classes, $action ) = @$definition;
-			next if $label =~ /\AReset/ && !$is_set;
-			my $button = Term::Fabulous::Widget::Button->new( bordered => 1, classes => $classes, layout => { padding => { left => 1, right => 1 } } );
-			$button->add_child( Term::Fabulous::Widget::Text->new( text => $label ) );
-			$button->on( Activate => sub ($event) { $action->(); return } );
-			$row->add_child($button);
-		}
-		return $row;
-	}
-
 	# ---------------------------------------------------------------------
 	# Choosing
 	# ---------------------------------------------------------------------
 
-	# A value was chosen in the list, the picker or the field; the preview
-	# shows it.
+	# A value was chosen in the list, the picker or the field: the dialog
+	# fires Change with it for the preview, or with undef for a value the
+	# key cannot take (the preview shows the theme as it is).
 	method _choose ($chosen) {
 		$value = $chosen;
-		$message->text('');
-		$on_preview->( $self->_checked($chosen) ? $chosen : undef );
+		$self->notice('');
+		$self->fire_event( Term::Fabulous::Event::Change->new( value => $self->_checked($chosen) ? $chosen : undef ) );
 		return;
 	}
 
@@ -236,7 +217,7 @@ class Term::Fabulous::ThemeEditor::ValueDialog :isa(Term::Fabulous::Widget::Dial
 		catch ($error) {
 			$error =~ s/\ATerm::Fabulous::Theme::Document: //;
 			$error =~ s/\n\z//;
-			$message->text($error);
+			$self->notice( escape_markup($error) );
 			return 0;
 		}
 		return 1;
@@ -246,39 +227,20 @@ class Term::Fabulous::ThemeEditor::ValueDialog :isa(Term::Fabulous::Widget::Dial
 	# Leaving
 	# ---------------------------------------------------------------------
 
-	field $finished = 0;
+	method press_button :override ($id) {
+		return $self->apply if $id eq 'apply';
+		return $self->SUPER::press_button($id);
+	}
 
 	# A text in the picker's field that is no color is not applied; the
-	# message line says what the field wants.
+	# notice line says what the field wants.
 	method apply () {
 		if ( defined $picker && !$picker->is_valid ) {
-			$message->text( $picker->error );
+			$self->notice( escape_markup( $picker->error ) );
 			return $self;
 		}
 		return $self unless defined $value && length $value && $self->_checked($value);
-		$finished = 1;
-		$self->close;
-		$on_apply->($value);
-		return $self;
-	}
-
-	method reset () {
-		$finished = 1;
-		$self->close;
-		$on_reset->();
-		return $self;
-	}
-
-	method cancel () {
-		$self->close;
-		return $self;
-	}
-
-	# Closed without Apply or Reset (Cancel, Escape): the preview shows the
-	# theme as it is again.
-	method _closed () {
-		$on_preview->(undef) unless $finished;
-		return;
+		return $self->answer( apply => value => $value );
 	}
 }
 
@@ -340,16 +302,20 @@ above the buttons says why.
 =head2 new
 
 	my $dialog = Term::Fabulous::ThemeEditor::ValueDialog->new(
-		key        => 'button.border.color.focused',
-		current    => 'accent',
-		is_set     => 0,
-		default    => 'accent',
-		palette    => $theme->palette,
-		on_preview => sub ($value) { ... },    # undef: show the theme as it is
-		on_apply   => sub ($value) { ... },
-		on_reset   => sub () { ... },
-		list_rows  => 12,    # the rows of the list of tokens or styles
+		key       => 'button.border.color.focused',
+		current   => 'accent',
+		is_set    => 0,
+		default   => 'accent',
+		palette   => $theme->palette,
+		list_rows => 12,    # the rows of the list of tokens or styles
 	);
+	$dialog->on( Change => sub ($event) { preview( $event->value ); return } );    # undef: the theme as it is
+	$dialog->on( Answer => sub ($event) { ... } );
+
+The dialog is a L<Term::Fabulous::Widget::Dialog> with the title
+C<Edit KEY>, on the right (C<< placement => 'right' >>), with the
+buttons C<apply> (primary), C<reset> (only for a setting the theme
+sets) and C<cancel>, and a notice line that keeps its place.
 
 =head1 METHODS
 
@@ -357,9 +323,27 @@ above the buttons says why.
 
 The setting's key and the value chosen now.
 
-=head2 apply, reset, cancel
+=head2 apply
 
-What the buttons do.
+What C<Apply> and C<Enter> do: answers C<apply> with the value, unless
+the value cannot be applied; then the notice line says why.
+
+=head1 EVENTS
+
+=over
+
+=item C<Change> (L<Term::Fabulous::Event::Change>)
+
+A value was chosen: the value to preview, or C<undef> for one the key
+cannot take. Fired on the dialog; the C<Change> events of its inputs do
+not bubble past it.
+
+=item C<Answer> (L<Term::Fabulous::Event::Answer>)
+
+C<apply> with C<< { value => $value } >>, C<reset>, C<cancel>, or
+C<cancel> dismissed (Escape).
+
+=back
 
 =head1 SEE ALSO
 

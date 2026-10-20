@@ -21,7 +21,7 @@
 #   - the error messages for invalid attributes, and the error object
 #     check_struct dies with
 #
-# Features: Clay::UI::Box, Clay::UI::Text, contribute_, to_config, image, image_data, aspect_ratio, overlay_color, check_struct, Clay::XS::StructError, mark_changed, current_revision, add_internal_children, internal_children, floating, attach_to, attach_points, CLAY_ATTACH_TO_PARENT, layout_children, children, clear_children, width_group, Clay::UI::Role::Core::Stateful, resolve_id, Clay_GetElementId, Clay_GetElementData, bounding_box, measure_text, error_handler, max_element_count, errorType, errorText, CLAY_ERROR_TYPE_UNBALANCED_OPEN_CLOSE, path, expected, CLAY_RENDER_COMMAND_TYPE_IMAGE, CLAY_RENDER_COMMAND_TYPE_OVERLAY_COLOR_START, CLAY_RENDER_COMMAND_TYPE_OVERLAY_COLOR_END, CLAY_RENDER_COMMAND_TYPE_TEXT
+# Features: Clay::UI::Box, Clay::UI::Text, contribute_, to_config, image, image_data, aspect_ratio, overlay_color, check_struct, Clay::XS::StructError, mark_changed, current_revision, add_internal_children, internal_children, floating, attach_to, attach_points, CLAY_ATTACH_TO_PARENT, layout_children, children, clear_children, closest, ancestors, width_group, Clay::UI::Role::Core::Stateful, resolve_id, Clay_GetElementId, Clay_GetElementData, bounding_box, measure_text, error_handler, max_element_count, errorType, errorText, CLAY_ERROR_TYPE_UNBALANCED_OPEN_CLOSE, path, expected, CLAY_RENDER_COMMAND_TYPE_IMAGE, CLAY_RENDER_COMMAND_TYPE_OVERLAY_COLOR_START, CLAY_RENDER_COMMAND_TYPE_OVERLAY_COLOR_END, CLAY_RENDER_COMMAND_TYPE_TEXT
 #
 # Requires: nothing beyond this distribution.
 #
@@ -292,15 +292,14 @@ for my $row (@rows) {
 # at the place bounding_box reports for the widget.
 
 sub derived_id_of ($widget) {
+	my $base = $widget->closest(sub ($node) { defined $node->id || !defined $node->parent });
 	my @indices;
-	my $node = $widget;
-	while (!defined $node->id && defined $node->parent) {
+	for my $node ($widget, $widget->ancestors) {
+		last if refaddr($node) == refaddr($base);
 		my $siblings = $node->parent->layout_children;
-		my ($index)  = grep { refaddr($siblings->[$_]) == refaddr($node) } 0 .. $#$siblings;
-		unshift @indices, $index;
-		$node = $node->parent;
+		unshift @indices, grep { refaddr($siblings->[$_]) == refaddr($node) } 0 .. $#$siblings;
 	}
-	return $widget->resolve_id($node->id // '', \@indices);
+	return $widget->resolve_id($base->id // '', \@indices);
 }
 
 heading('4. Ids');

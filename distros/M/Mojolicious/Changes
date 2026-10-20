@@ -1,4 +1,20 @@
 
+9.51  2026-10-19
+  - Fixed a bug in Mojo::DOM where CDATA sections, processing instructions and DOCTYPE declarations did not end at the
+    first ">" in HTML documents.
+  - Fixed a bug in Mojo::DOM where the content of "<style>" and "<script>" elements in "<svg>" and "<math>" blocks was
+    not parsed as markup.
+  - Fixed a bug in Mojo::DOM where end tags like "</style/>" did not end "<style>" and "<script>" elements.
+  - Fixed a bug in Mojo::DOM where raw text moved out of "<style>" and "<script>" elements, for example with strip, was
+    not escaped.
+  - Fixed a bug in Mojo::DOM where any processing instruction containing "xml" would activate XML mode.
+  - Fixed a bug in Mojo::Message::Request where the SCRIPT_NAME prefix was sometimes incorrectly removed from
+    PATH_INFO in CGI and PSGI environments.
+  - Fixed a bug in Mojo::Asset::Memory where an end_range of 0 was ignored, causing range requests for the first
+    byte of an asset to return the whole asset.
+  - Fixed a bug in Mojo::Server::Daemon where WebSocket frames sent together with the handshake would be parsed as
+    a new HTTP request, preventing the finish event from being emitted.
+
 9.50  2026-10-16
   - Added SECURITY.md policy for reporting security issues.
   - Fixed a security issue in Mojo::DOM where the content of title and textarea elements was not escaped during

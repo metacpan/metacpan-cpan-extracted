@@ -25,7 +25,7 @@ unlike($json, qr/"c"\s*:/, 'no copy steps remain in body recipe');
 # instance whose "h" is null (or empty) MUST now be rejected.
 my $nullh = encode_base64('{"h":null}', '');
 eval { Mail::DKIM2::MessageInstance->parse("m=2; h=sha256:AAA:BBB; r=$nullh;") };
-like($@, qr/header recipe/i, '"h": null rejected on parse (draft-03 §5.1)');
+like($@, qr/^PERMERROR: Message-Instance m=2 contains invalid JSON$/, '"h": null rejected on parse (draft-03 §5.1)');
 
 # A null body Recipe ("b": null) is still permitted and must still parse.
 my $nullb = encode_base64('{"b":null}', '');
@@ -36,14 +36,14 @@ ok(eval { Mail::DKIM2::MessageInstance->parse("m=2; h=sha256:AAA:BBB; r=$nullb;"
 for my $bad ('5', '"x"', '{}', 'true') {
     my $enc = encode_base64(qq({"b":$bad}), '');
     eval { Mail::DKIM2::MessageInstance->parse("m=2; h=sha256:AAA:BBB; r=$enc;") };
-    like($@, qr/^PERMERROR Message-Instance m=2 Recipe body is neither null nor an array/,
+    like($@, qr/^PERMERROR: Message-Instance m=2 contains invalid JSON$/,
         "\"b\": $bad is a PERMERROR");
 }
 # Likewise a header Recipe that is not an object (null/empty keep their own error).
 for my $bad ('5', '"x"', '[]') {
     my $enc = encode_base64(qq({"h":$bad}), '');
     eval { Mail::DKIM2::MessageInstance->parse("m=2; h=sha256:AAA:BBB; r=$enc;") };
-    like($@, qr/^PERMERROR Message-Instance m=2 Recipe header is not an object/,
+    like($@, qr/^PERMERROR: Message-Instance m=2 contains invalid JSON$/,
         "\"h\": $bad is a PERMERROR");
 }
 

@@ -4,7 +4,7 @@ use 5.008003;
 use strict;
 use warnings;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 use base 'File::Raw';
 
@@ -21,7 +21,7 @@ File::Raw::Hash - Cryptographic and integrity digests as a File::Raw plugin
 
 =head1 VERSION
 
-Version 0.06
+Version 0.07
 
 =head1 SYNOPSIS
 
@@ -226,6 +226,26 @@ enhancement.
 
 All algorithms are vendored, public-domain reference implementations.
 There is B<no> external library dependency (no OpenSSL, no libsodium).
+
+SHA-1 and SHA-256 use the CPU's SHA instructions where it has them (ARMv8
+processors with the cryptography extension, which includes Apple silicon).
+The choice is made when the module loads, from what the running CPU
+reports, so one build runs everywhere; a CPU without the instructions uses
+the portable code, which gives the same digests.
+
+=head2 implementation
+
+    my $impl = File::Raw::Hash::implementation();
+    # { sha256 => 'armv8', sha1 => 'armv8', md5 => 'portable', ... }
+
+A hashref naming, per algorithm, the code in use: C<armv8>, or
+C<portable>.
+
+=head2 FRH_PORTABLE
+
+Set C<FRH_PORTABLE> to a true value in the environment before the module
+loads to use the portable code for every algorithm, for example to compare
+the two paths.
 
 =head1 THE C ABI
 

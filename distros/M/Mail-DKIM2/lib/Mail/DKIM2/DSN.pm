@@ -2,20 +2,20 @@ package Mail::DKIM2::DSN;
 use strict;
 use warnings;
 
-our $VERSION = '0.22';
+our $VERSION = '0.25';
 
 use Email::MIME;
 use Carp;
 use List::Util qw(max);
 
-use Mail::DKIM2::Common qw(extract_domain relaxed_domain_match parse_mime extract_mi_version);
+use Mail::DKIM2::Common qw(domain_of relaxed_domain_match parse_mime extract_mi_version);
 use Mail::DKIM2::MessageInstance;
 use Mail::DKIM2::Signature;
 use Mail::DKIM2::Signer;
 use Mail::DKIM2::Verifier;
 
 # Mail::DKIM2::DSN - propagate a DKIM2-signed DSN upstream (RFC 6522 DSN
-# structure; DKIM2 draft-06 §12.1.1 propagation procedure).
+# structure; DKIM2 -07 §16.2 propagation procedure).
 #
 # When a Forwarder receives a Delivery Status Notification for a message it
 # forwarded, it may propagate that DSN back towards the original sender. The
@@ -35,7 +35,7 @@ sub _top_sig {
 }
 
 # Remove the Forwarder's hop from an Email::MIME: the highest-sequence
-# DKIM2-Signature, and then any nd= signature left on top, since a §9.3
+# DKIM2-Signature, and then any nd= signature left on top, since a §12.3
 # bridge belongs to the hop it was made for and an nd= signature is never
 # valid as the top of a chain. (header_filter mishandles long folded values,
 # so filter on header_raw and re-set the survivors.)
@@ -76,6 +76,8 @@ sub _sign_as_new {
     my $with_mi = "Message-Instance: " . $mi->as_string . "\r\n" . $dsn_text;
     $signer->PRINT($with_mi);
     $signer->CLOSE;
+    croak "DSN not signed: " . ($signer->result_detail // 'no result')
+        unless ($signer->result // '') eq 'signed';
     my $sig_hdr = $signer->as_string;
     $sig_hdr =~ s/\r?\n$//;
     return $sig_hdr . "\r\n" . $with_mi;
@@ -102,37 +104,68 @@ sub _set_report_type {
     $msg->header_str_set('Content-Type', $ct);
 }
 
+# may_generate(Message => $raw, PubkeyCallback|Resolver, SkipTimestampCheck):
+# whether a DSN may be sent for this message at all (-07 section 16): its
+# top DKIM2-Signature's mf= is not <>, and it is Provisionally Verified
+# (section 13.1: the top signature is correct and the top Message-Instance
+# matches). Returns ($ok, $why); $why says what is missing.
+sub may_generate {
+    my ($class, %args) = @_;
+    Mail::DKIM2::Common::_check_options("$class->may_generate", \%args,
+        qw(Message PubkeyCallback Resolver SkipTimestampCheck));
+    my $raw = $args{Message} // croak "may_generate: need Message";
+    (my $text = $raw) =~ s/\r?\n/\r\n/g;
+    my $top = eval { _top_sig(parse_mime($text)) };
+    die $@ if ref $@;
+    return (0, 'the message has no DKIM2-Signature, so it is not Provisionally Verified')
+        unless $top;
+    my $mf = $top->mail_from;
+    return (0, 'the top DKIM2-Signature mf= is <>, so no DSN may be sent')
+        if !defined $mf || $mf =~ /\A<\s*>\z/;
+    my $v = Mail::DKIM2::Verifier->new(
+        map { exists $args{$_} ? ($_ => $args{$_}) : () } qw(PubkeyCallback Resolver));
+    $v->skip_timestamp_check(1) if $args{SkipTimestampCheck};
+    $v->load($text);
+    return (0, 'the message is not Provisionally Verified ('
+             . ($v->details // $v->result) . ')')
+        unless $v->provisionally_verified;
+    return (1, undef);
+}
+
 # Generate a fresh DKIM2-signed DSN for an inbound message, sent back to the
 # original sender (RFC 6522 three-part multipart/report structure; DKIM2
-# draft-06 §12.1). Used by the reflector-dsn address, which
+# -07 §16.1). Used by the reflector-dsn address, which
 # bounces every message regardless of whether it arrived DKIM2-signed.
 #
 # Args: Message (inbound message), Signer (MailFrom => '<>'), To (envelope
-# sender to bounce to; if omitted, derived from the top DKIM2-Signature mf= or
-# From:), ReportingMTA, Status, Reason.
+# sender to bounce to; if omitted, the top DKIM2-Signature's mf=, never the
+# From: header field), ReportingMTA, Status, Reason.
 sub generate {
     my ($class, %args) = @_;
     Mail::DKIM2::Common::_check_options("$class->generate", \%args,
-        qw(Message Signer To ReportingMTA Status Reason FinalRecipient));
+        qw(Message Signer To ReportingMTA Status Reason FinalRecipient
+           PubkeyCallback Resolver SkipTimestampCheck));
     my $raw    = $args{Message}    or croak "generate: need Message";
     my $signer = $args{Signer} or croak "generate: need Signer";
     my $mta    = $args{ReportingMTA} // 'dkim2.com';
     my $status = $args{Status}        // '5.7.1';
     my $reason = $args{Reason}        // 'message rejected by reflector-dsn (demo bounce)';
 
+    # -07 section 16: never for a message with a null top mf=, nor for one
+    # that is not Provisionally Verified.
+    my ($may, $why) = $class->may_generate(Message => $raw,
+        map { exists $args{$_} ? ($_ => $args{$_}) : () }
+            qw(PubkeyCallback Resolver SkipTimestampCheck));
+    croak "generate: not sending a DSN: $why" unless $may;
+
     my $orig = parse_mime($raw);
 
-    # Where to send the bounce: explicit envelope sender, else top sig mf=,
-    # else the From: header.
+    # Where to send the bounce: the explicit envelope sender, else the top
+    # signature's mf= (section 16). Never the From: header field.
     my $to = $args{To};
     if (!defined $to || !length $to || $to eq '<>') {
-        my $top = _top_sig($orig);
-        $to = $top->mail_from if $top;
+        $to = _top_sig($orig)->mail_from;
     }
-    if (!defined $to || !length $to || $to eq '<>') {
-        $to = $orig->header('From');
-    }
-    croak "generate: cannot determine bounce destination" unless defined $to && length $to;
 
     my $final_rcpt = $args{FinalRecipient} // $orig->header('To') // $to;
 
@@ -169,7 +202,9 @@ sub generate {
     my $dsn = Email::MIME->create(
         attributes => { content_type => 'multipart/report', encoding => '7bit' },
         header => [
-            From    => "Mail Delivery System <postmaster\@$mta>",
+            # The signer's own address: -07 section 11 requires a From
+            # Authentic for this, the DSN's i=1 signature.
+            From    => "Mail Delivery System <postmaster\@$signer->{Domain}>",
             To      => $to,
             Subject => 'Delivery Status Notification (Failure)',
         ],
@@ -219,7 +254,7 @@ sub _parse_report {
 }
 
 # Return the LOWEST-sequence DKIM2-Signature (parsed) of an Email::MIME msg.
-# For a DSN that is the signature of the system that generated it: §12.1.1
+# For a DSN that is the signature of the system that generated it: §16.2
 # makes a DSN a new message with exactly one signature, and if that DSN is
 # itself forwarded onwards, i=1 is still its originator.
 sub _origin_sig {
@@ -230,7 +265,7 @@ sub _origin_sig {
     return $bottom;
 }
 
-# spec-06 §12.1.2 point 1: "The DSN's DKIM2-Signature will have a signing
+# -07 §16.3 point 1: "The DSN's DKIM2-Signature will have a signing
 # domain that is aligned with the recipient of the message that is being
 # returned. The recipient's address is located in the rt= tag of the last
 # (highest i= tag) DKIM2-Signature in the returned message."
@@ -240,7 +275,7 @@ sub _origin_sig {
 # verified -- anyone can write d=. authenticate() therefore verifies the DSN
 # as well, and only compares the d= it has proved.
 #
-# The direction is §9.4's: labels come off the left of the ADDRESS domain, so
+# The direction is §7.2's: labels come off the left of the ADDRESS domain, so
 # d= may be equal to or a parent of the rt= domain, never a child of it. A
 # system with a dedicated bounce domain signs as its organizational domain
 # (d=example.com) and puts the bounce address on the subdomain
@@ -261,8 +296,8 @@ sub _check_alignment {
         unless @rts;
 
     for my $r (@rts) {
-        my $rd = extract_domain($r) // '';
-        next unless length $rd;
+        my ($rd, $literal) = domain_of($r);
+        next unless $rd && !$literal;
         return ('pass', "DSN d=$d is aligned with rt= $r")
             if relaxed_domain_match($rd, $d);
     }
@@ -270,7 +305,7 @@ sub _check_alignment {
                   . join(', ', @rts) . ')');
 }
 
-# Authenticate an inbound DSN before propagating it (spec-06 §12.1.2):
+# Authenticate an inbound DSN before propagating it (-07 §16.3):
 #
 #   * the returned original's DKIM2 chain must verify, from its headers alone
 #     when the DSN carries only headers (point 3);
@@ -280,7 +315,7 @@ sub _check_alignment {
 #   * deciding whether that top signature is one the CALLER made (d= and mf=)
 #     is left to the caller (point 2), since only it knows its own domains.
 #
-# A DSN that carries no DKIM2-Signature at all is not what §12.1.2 is about
+# A DSN that carries no DKIM2-Signature at all is not what §16.3 is about
 # ("When a system receives a DKIM2 signed DSN"), so it is reported as
 # dsn_result 'none' with alignment 'none' rather than failed: a caller that
 # wants to insist on a signed DSN can require them, and one still handling
@@ -355,9 +390,9 @@ sub authenticate {
     };
 }
 
-# Propagate a received DSN upstream (spec-06 §12.1.1).
+# Propagate a received DSN upstream (-07 §16.2).
 #
-# §12.1.2 is not optional here: "If the verification fails then the DSN MUST
+# §16.3 is not optional here: "If the verification fails then the DSN MUST
 # NOT be propagated any further", so propagate authenticates first and croaks
 # rather than re-signing a DSN it could not authenticate as ours. That needs a
 # PubkeyCallback; a caller that has authenticated already (or is exercising
@@ -380,7 +415,7 @@ sub propagate {
                 qw(PubkeyCallback Resolver),
         );
         unless ($auth->{ok}) {
-            croak "propagate: DSN did not authenticate (§12.1.2), not propagating: "
+            croak "propagate: DSN did not authenticate (§16.3), not propagating: "
                 . ($auth->{alignment} eq 'fail' ? $auth->{alignment_detail}
                                                 : ($auth->{details} // $auth->{result}));
         }
@@ -426,6 +461,9 @@ sub propagate {
     my $upstream = $top ? $top->mail_from : undef;
     croak "propagate: no remaining DKIM2-Signature to derive upstream MAIL FROM"
         unless defined $upstream;
+    # -07 section 16: no DSN goes to a null MAIL FROM.
+    croak "propagate: the now-top DKIM2-Signature mf= is <>, so no DSN may be sent"
+        if $upstream =~ /\A<\s*>\z/;
 
     # 4. Rebuild the embedded part. If the body is unrecoverable, emit
     #    text/rfc822-headers (headers only); otherwise message/rfc822.
@@ -449,11 +487,16 @@ sub propagate {
     # 6. The propagated DSN is a NEW message: one Message-Instance (v=1) and one
     #    DKIM2-Signature, signed by the Forwarder with MAIL FROM <>. So the
     #    inbound DSN's OWN instance and signature go: they belong to the DSN we
-    #    received, which we have already authenticated (§12.1.2) and are not
+    #    received, which we have already authenticated (§16.3) and are not
     #    continuing. Leaving them makes the new instance m=2 on a chain whose
     #    i=1 is somebody else's, which is not a chain at all.
     $dsn->header_raw_set('Message-Instance');
     $dsn->header_raw_set('DKIM2-Signature');
+    # 7. A new message from the Forwarder, so its From is the Forwarder's:
+    #    -07 section 11 requires a From Authentic for the i=1 signature,
+    #    and the reporting MTA's From would name the destination the
+    #    message went to, which section 16.2 says to remove.
+    $dsn->header_raw_set('From', "Mail Delivery System <postmaster\@$signer->{Domain}>");
 
     $signer->{MailFrom} = '<>';
     $signer->{RcptTo}   = [$upstream];
@@ -482,7 +525,7 @@ Mail::DKIM2::DSN - DKIM2-signed Delivery Status Notifications
         Status       => '5.7.1',
         Reason       => 'rejected by policy',
     );
-    # $out->{raw}, $out->{to}
+    # $out->{raw}, $out->{send_to}
 
     # Is this DSN about a message we forwarded, and genuine?
     my $auth = Mail::DKIM2::DSN->authenticate(
@@ -502,7 +545,7 @@ Mail::DKIM2::DSN - DKIM2-signed Delivery Status Notifications
 
 =head1 DESCRIPTION
 
-Spec-06 section 12 describes how a DSN (RFC 3464, structured per RFC 6522)
+-07 section 16 describes how a DSN (RFC 3464, structured per RFC 6522)
 is signed, checked and passed back along the chain. A forwarder that
 receives a DSN for a message it forwarded rebuilds the enclosed original
 to the state it was in when it went out (undoing its own Message-Instance
@@ -510,7 +553,7 @@ and removing the signature and instance it added), then re-signs the whole
 DSN as a new message with MAIL FROM C<< <> >>, so it carries exactly one
 Message-Instance and one DKIM2-Signature.
 
-This module implements draft-ietf-dkim-dkim2-spec-06; see L<Mail::DKIM2/STATUS>
+This module implements draft-ietf-dkim-dkim2-spec-07; see L<Mail::DKIM2/STATUS>
 for what that means for the wire format and the API, and
 L<Mail::DKIM2/CONVENTIONS> for the option, input and error conventions every
 module here follows.
@@ -523,15 +566,30 @@ message that is not an RFC 6522 DSN or on a missing required argument.
 =head2 generate(%args)
 
 Builds a three-part C<multipart/report> DSN returning C<Message>, signed
-by C<Signer> (which must have C<< MailFrom => '<>' >>). C<To> is the
-envelope sender to bounce to; if omitted it is taken from the top
-DKIM2-Signature's C<mf=>, failing that from C<From:>. C<ReportingMTA>,
+by C<Signer> (which must have C<< MailFrom => '<>' >>), From
+C<postmaster@> the signer's C<Domain> (-07 section 11). C<To> is the
+envelope sender to bounce to; if omitted it is the top DKIM2-Signature's
+C<mf=> (never the C<From:> header field, as before 0.23). C<ReportingMTA>,
 C<Status> (default C<5.7.1>) and C<Reason> fill the delivery-status part.
-Returns C<< { raw => $bytes, to => $address } >>.
+Returns C<< { raw => $bytes, send_to => $address } >>.
+
+Croaks, sending nothing, unless C<may_generate> allows it: never for a
+message whose top C<mf=> is C<< <> >>, nor for one that is not
+Provisionally Verified (-07 section 16), checked with C<PubkeyCallback> or
+C<Resolver> (DNS when neither is given) and C<SkipTimestampCheck>, which
+are new in 0.23.
+
+=head2 may_generate(%args)
+
+Whether a DSN may be sent for C<Message> at all: its top DKIM2-Signature's
+C<mf=> is not C<< <> >>, and it is Provisionally Verified (see
+L<Mail::DKIM2::Verifier/provisionally_verified()>), with keys from
+C<PubkeyCallback> or C<Resolver> and C<SkipTimestampCheck> as above.
+Returns C<(1, undef)>, or C<(0, $why)>. New in 0.23.
 
 =head2 authenticate(%args)
 
-Checks C<Message>, a DSN, per section 12.1.2: the returned original's
+Checks C<Message>, a DSN, per -07 section 16.3: the returned original's
 chain verifies (from its headers alone if that is all the DSN carries),
 the DSN's own signature verifies, and the DSN's C<d=> is aligned with the
 returned original's top C<rt=>. Keys come from C<PubkeyCallback> if given,
@@ -558,11 +616,13 @@ your own.
 
 Authenticates C<Message> as above (pass C<< SkipAuthentication => 1 >> if
 the caller already has), then rebuilds and re-signs it as described. Croaks
-rather than propagate a DSN that does not authenticate: section 12.1.2
+rather than propagate a DSN that does not authenticate: -07 section 16.3
 says such a DSN MUST NOT be propagated; C<PubkeyCallback> and C<Resolver>
 are passed to C<authenticate>. C<ForwarderDomain> is the C<d=> of the hop
 to strip, and must be the C<d=> of the returned original's top
 DKIM2-Signature: propagate croaks rather than strip another domain's hop.
+Croaks rather than propagate towards a null C<mf=> (C<< <> >>, -07 section
+16). The propagated DSN is From C<postmaster@> the signer's C<Domain>.
 Returns C<< { raw => $bytes, upstream_mailfrom => $address } >>.
 
 =head1 AUTHOR

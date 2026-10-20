@@ -2,7 +2,7 @@ package Mail::DKIM2::Split;
 use strict;
 use warnings;
 
-our $VERSION = '0.22';
+our $VERSION = '0.25';
 
 use Email::MIME;
 use Mail::DKIM2::Common qw(parse_mime);

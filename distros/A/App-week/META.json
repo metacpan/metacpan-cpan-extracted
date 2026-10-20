@@ -4,7 +4,7 @@
       "Kazumasa Utashiro"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.20",
+   "generated_by" : "Minilla/v3.1.29",
    "license" : [
       "perl_5"
    ],
@@ -51,7 +51,7 @@
             "List::Util" : "1.45",
             "Text::ANSI::Fold" : "2.13",
             "Text::VisualWidth::PP" : "0.05",
-            "perl" : "v5.14.0"
+            "perl" : "v5.24.0"
          }
       },
       "test" : {
@@ -63,7 +63,7 @@
    "provides" : {
       "App::week" : {
          "file" : "lib/App/week.pm",
-         "version" : "1.0303"
+         "version" : "1.0701"
       },
       "App::week::CalYear" : {
          "file" : "lib/App/week/CalYear.pm"
@@ -73,6 +73,9 @@
       },
       "App::week::default" : {
          "file" : "lib/App/week/default.pm"
+      },
+      "App::week::mlb" : {
+         "file" : "lib/App/week/mlb.pm"
       },
       "App::week::npb" : {
          "file" : "lib/App/week/npb.pm"
@@ -93,12 +96,12 @@
          "web" : "https://github.com/kaz-utashiro/App-week"
       }
    },
-   "version" : "1.0303",
+   "version" : "1.0701",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>",
       "Shlomi Fish <shlomif@shlomifish.org>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.12",
+   "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 0
 }

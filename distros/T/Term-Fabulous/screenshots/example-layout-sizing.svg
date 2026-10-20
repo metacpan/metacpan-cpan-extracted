@@ -24,15 +24,15 @@
 <rect x="507" y="114" width="189" height="18" fill="#282e40"/>
 <rect x="237" y="150" width="180" height="18" fill="#98c379"/>
 <rect x="417" y="150" width="279" height="18" fill="#282e40"/>
-<rect x="237" y="186" width="225" height="18" fill="#98c379"/>
-<rect x="462" y="186" width="234" height="18" fill="#282e40"/>
+<rect x="237" y="186" width="234" height="18" fill="#98c379"/>
+<rect x="471" y="186" width="225" height="18" fill="#282e40"/>
 <rect x="237" y="222" width="459" height="18" fill="#e5c07b"/>
 <rect x="237" y="258" width="270" height="18" fill="#e5c07b"/>
 <rect x="507" y="258" width="189" height="18" fill="#282e40"/>
 <rect x="237" y="294" width="180" height="18" fill="#98c379"/>
 <rect x="417" y="294" width="279" height="18" fill="#e5c07b"/>
-<rect x="237" y="330" width="225" height="18" fill="#e5c07b"/>
-<rect x="462" y="330" width="234" height="18" fill="#61afef"/>
+<rect x="237" y="330" width="234" height="18" fill="#e5c07b"/>
+<rect x="471" y="330" width="225" height="18" fill="#61afef"/>
 </g>
 <g class="terminal">
 <text x="48" y="92" textLength="108" fill="#dcdcdc">sizing_fit()</text>
@@ -50,7 +50,7 @@
 <text x="48" y="308" textLength="162" fill="#dcdcdc">fixed(20) + grow()</text>
 <text x="246" y="308" textLength="252" fill="#141923">20 columns          the rest</text>
 <text x="48" y="344" textLength="135" fill="#dcdcdc">grow() + grow()</text>
-<text x="246" y="344" textLength="315" fill="#141923">one half                 other half</text>
+<text x="246" y="344" textLength="324" fill="#141923">one half                  other half</text>
 </g>
 <g shape-rendering="crispEdges">
 </g>

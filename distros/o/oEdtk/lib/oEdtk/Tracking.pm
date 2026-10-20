@@ -45,7 +45,7 @@ use DBI;
 #use JSON;
 use Exporter;
 
-our $VERSION   = 2.1126;
+our $VERSION   = 2.1129;
 our @ISA       = qw(Exporter);
 our @EXPORT_OK = qw(stats_iddest stats_week stats_month);
 
@@ -54,16 +54,21 @@ our @EXPORT_OK = qw(stats_iddest stats_week stats_month);
 sub new {
 
 	# example call
-	# 	$TRK = oEdtk::Tracking->new($ARGV[1] // "input file",
+	# 	$TRK = oEdtk::Tracking->new($ARGV[1] // '',
 	#		user => "utest",
 	#		entity => "Society",
 	#		keys => ['T_CALLID', 'T_TYPE', 'O_TT_TYP', 'O_TT_ID', 'T_PARAM', 'O_DESIGN', 'T_STATUT' ]
 	#		);
 
 	my ( $class, $source, %params ) = @_;
-	$source = $source || ( $ARGV[1] || $ARGV[0] );
+
+	# An explicit empty source means "no input file" and must stay empty; only
+	# an omitted source falls back to the command line.
+	if ( !defined $source ) {
+		$source = $ARGV[1] || $ARGV[0] || '';
+	}
 	if ( $source =~ /^\-/ ) {
-		$source = $ARGV[0];
+		$source = $ARGV[0] // '';
 	}
 	my $cfg = config_read('EDTK_DB');
 
@@ -252,20 +257,26 @@ sub track {
 	}
 
 	if ( $job eq 'W' || $job eq 'H' ) {    # Halt or Warn event
-			# if job_evt is 'Warning' or 'Halt' we handle the messages and the source
-		chomp $values->{'ED_MESSAGE'};
-		$values->{'ED_MESSAGE'} =~ s/\s+/ /g;
-		$values->{'ED_MESSAGE'} =~ s/^(.{256}).*$/$1/;
 		$values->{'ED_SOURCE'} = $self->{'source'} if ( $job eq 'H' );
 
 	}
-	elsif ( $job eq 'J' ) {    # JOB event
+	elsif ( $job eq 'J' ) {                # JOB event
 		$values->{'ED_SOURCE'} = $self->{'source'};
 
 	}
 	else {
 		undef( $values->{'ED_MESSAGE'} );
 	}
+
+	# Normalize the message. When the caller supplied none, name the function
+	# that recorded the event so the row stays informative.
+	my $message = $values->{'ED_MESSAGE'} // '';
+	$message =~ s/\s+/ /g;
+	$message =~ s/^ //;
+	$message =~ s/ $//;
+	$message = _caller_name() if $message eq '';
+	$message =~ s/^(.{256}).*$/$1/;
+	$values->{'ED_MESSAGE'} = $message;
 
 	my $dbh   = $self->{'dbh'};
 	my @cols  = keys(%$values);
@@ -288,6 +299,20 @@ sub track {
 	}
 
 	#if ($_TRACK_JSON[0] ne "no") { push (@_TRACK_JSON, $values) };
+}
+
+# Name of the function that recorded the event. The Tracking package and its
+# signal-handler closures are skipped, so the caller's code is named instead.
+sub _caller_name {
+	for my $depth ( 1 .. 10 ) {
+		my @frame = caller($depth);
+		last unless @frame;
+		my $name = $frame[3] // '';
+		next if $name eq '' || $name =~ /__ANON__/;
+		next if $name                =~ /^oEdtk::Tracking::/;
+		return $name;
+	}
+	return 'main';
 }
 
 # Run the tracking INSERT. On failure, report a stale schema (READ-ONLY) and
@@ -569,8 +594,9 @@ package C<oEdtk::Tracking>.
 
 Build a tracker. C<$source> names the input, and C<%params> may carry C<user>,
 C<entity>, C<keys>, C<edmode>, C<account>, C<obj_typ>, C<child_typ>,
-C<child_id> and C<parent_id>. Dies when there are too many keys or a duplicate
-key.
+C<child_id> and C<parent_id>. An omitted C<$source> falls back to C<@ARGV>; an
+explicit empty string means no input file and is kept. Dies when there are too
+many keys or a duplicate key.
 
 =head2 track
 
@@ -578,7 +604,8 @@ key.
 
 Record one event: the job event, the number of objects, and the values of the
 configured user keys (an optional trailing value is the message). Values longer
-than the schema allows are truncated.
+than the schema allows are truncated. When no message is supplied, C<ED_MESSAGE>
+names the function that recorded the event.
 
 =head2 set_entity
 

@@ -126,6 +126,24 @@ subtest 'sides on the outer background' => sub {
 	like dies { $box->outer_border_sides( ['middle'] ) }, qr/outer_border_sides knows only the sides left right top bottom, got 'middle'/, 'an unknown side dies';
 };
 
+subtest 'background colors of sides and corners' => sub {
+	my $buffer = [];
+	$buffer->[$_] = [ (0x0A0B0C) x 6 ] for 1 .. 4;    # the widget's background
+	$buffer->[0] = [ (0x020202) x 6 ];    # the parent's, above the box
+	my $box = Term::Fabulous::Widget::Box->new(
+		bordered                 => 1,
+		border_style             => Term::Fabulous::Enum::BorderStyle->Solid,
+		border_background_colors => { top => '#102030', top_left => [ 64, 80, 96, 255 ] },
+	);
+	draw_border( widget => $box, buffer => $buffer );
+	is [ map { $cells{$_}[2] } '2,1', '1,1', '4,1', '1,2' ], [ 0x102030, 0x405060, 0x0A0B0C, 0x0A0B0C ], 'named sides and corners take their color, a corner not that of its side';
+	is $box->border_background_colors, { top => [ 16, 32, 48, 255 ], top_left => [ 64, 80, 96, 255 ] }, 'the reader returns them';
+	$box->outer_border_sides( ['top'] );
+	draw_border( widget => $box, buffer => $buffer );
+	is $cells{'2,1'}[2], 0x020202, 'a side on the outer background ignores its color';
+	like dies { $box->border_background_colors( { middle => '#000000' } ) }, qr/border_background_colors does not know middle/, 'an unknown name dies';
+};
+
 subtest 'location colors' => sub {
 	my $buffer = [];
 	$buffer->[$_] = [ (0x0A0B0C) x 6 ] for 1 .. 3;    # widget background inside the box

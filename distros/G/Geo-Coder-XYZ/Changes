@@ -1,6 +1,31 @@
 Revision history for Geo-Coder-XYZ
 
-0.10
+0.11	Mon Oct 19 02:35:52 PM EDT 2026
+	geocode(): the location rule is Geo::Location::Predicate's, which is a
+		distribution of its own now, so this module declares it as a recommendation in
+		META instead of requiring Geo::Coder::Free, and nothing here decides the rule
+		again.  It is looked for when it is first needed rather than when this module
+		loads, so importing this module reads no file it may not need.  Without it a
+		reference is still refused and a string of digits is looked up as it was
+		before the rule existed; with it the rule decides everything, and it is called
+		by name rather than imported, which is what lets t/reference.t swap it for a
+		spy and prove that it is the rule being consulted.
+	[ CI ]
+	.github/workflows/location-predicates.yml runs the location-predicate fuzz
+		here, on a schedule and on a push, with --sibling Geo-Coder-XYZ: this
+		distribution is graded against Geo::Location::Predicate and the other five
+		are not, so a drift here fails in the repository that would have to fix it
+		rather than only in Geo-Coder-Free's daily run.
+
+	geocode(): pass @_ to Params::Get rather than a reference to it, which
+		put the whole argument list in place of a reference location
+	geocode(): refuse a reference; it used to be accepted because the string it
+		turns into contains a non-digit
+	Check a reference against Geo::Location::Predicate's rule when that module
+		is installed, so that the check cannot drift away from Geo::Coder::Free
+	Added t/reference.t, the same test as the other Geo::Coder distributions
+
+0.10	Sun 13 Jul 17:26:15 EDT 2025
 	geocode(): croak when input is just a set of numbers
 	Compress the traffic
 	Use JSON::MaybeXS instead of JSON

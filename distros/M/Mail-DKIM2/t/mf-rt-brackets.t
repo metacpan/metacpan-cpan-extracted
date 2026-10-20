@@ -43,8 +43,8 @@ my $brkt_b64 = encode_base64('<sender@test1.dkim2.com>','');
 (my $bad = $signed_ok) =~ s/\Q$brkt_b64\E/$bare_b64/;
 my $v = Mail::DKIM2::Verifier->new; $v->set_pubkey_callback(DKIM2TestKeys::pubkey_callback()); $v->skip_timestamp_check(1);
 $v->PRINT($bad); $v->CLOSE;
-is($v->result, 'fail', 'bare mf= fails verification');
-like($v->result_detail, qr/7\.5|bracket/i, 'failure reason cites mf= bracket rule');
+is($v->result, 'permerror', 'bare mf= fails verification');
+is($v->details, 'PERMERROR: DKIM2-Signature i=1 syntax error', 'an unbracketed mf= is a syntax error');
 
 # 4. the well-formed (bracketed) message verifies pass
 my $v2 = Mail::DKIM2::Verifier->new; $v2->set_pubkey_callback(DKIM2TestKeys::pubkey_callback()); $v2->skip_timestamp_check(1);

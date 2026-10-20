@@ -1,5 +1,7 @@
 #!./perl
 use lib qw(t );
+use strict;
+use warnings;
 use Test::More;
 plan tests => 23;
 

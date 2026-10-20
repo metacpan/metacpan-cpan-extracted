@@ -1,0 +1,10 @@
+!1 Customer eligibility
+
+Active customers are eligible. An inactive or unknown customer is rejected.
+
+|Customer eligibility|
+|customer ID|eligible?|
+|C-100|true|
+|C-200|true|
+|C-300|false|
+|C-999|false|

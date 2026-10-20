@@ -1,10 +1,13 @@
 #!/usr/bin/perl -w
 use oEdtk::Main 0.42;
 use oEdtk::libXls;
+use strict;
 
 #################################################################################
 # MAIN BODY OF THE APPLICATION:
 #################################################################################
+
+my $FH;
 
 sub run() {
 
@@ -17,7 +20,7 @@ sub run() {
 	# DOCUMENT-SPECIFIC INITIALIZATION
 	&initDoc();
 
-	while ( my $ligne = <IN> && $. < 2000 ) {
+	while ( my $ligne = <$FH> && $. < 2000 ) {
 		chomp($ligne);
 
 		if ( oe_trt_ref_rec( 'X', $ligne, 0, ) ) {
@@ -96,10 +99,11 @@ sub trtEnr() {
 	1;
 }
 
-sub fXlsOpen ($) {    # TO BE REPLACED SEE PACKAGE
+sub fXlsOpen {    # TO BE REPLACED SEE PACKAGE
 	my $fi = shift;
 
-	open( IN, "$fi" ) or die "failed to open $fi, return code $!\n";
+	open( my $fh, '<', $fi ) or die "failed to open $fi, return code $!\n";
+	$FH = $fh;
 	1;
 }
 

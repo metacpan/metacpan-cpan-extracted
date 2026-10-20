@@ -7,7 +7,7 @@ use parent 'Punk::Plugin';
 use Carp ();
 use Punk ();
 
-our $VERSION = '0.61';
+our $VERSION = '0.62';
 
 # The id path itself is C - include/punk/punk_reqid.h and xs/reqid.xs.
 
@@ -157,6 +157,12 @@ than writing a malformed header.
 =back
 
 =head1 METHODS
+
+=head2 register($app, \%opts)
+
+Called once by C<plugin>. Installs L</request_id> and the id on every
+response. Croaks on a C<header> that is not a header name, and on
+C<trust_header> with C<< header => 0 >>.
 
 =head2 request_id
 

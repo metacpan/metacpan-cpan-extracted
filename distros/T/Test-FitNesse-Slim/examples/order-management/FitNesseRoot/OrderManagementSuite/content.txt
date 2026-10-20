@@ -1,0 +1,6 @@
+!1 Order management acceptance suite
+
+The tests cover customer eligibility, pricing, stock availability, order
+submission, and inventory reporting.
+
+!contents -R2

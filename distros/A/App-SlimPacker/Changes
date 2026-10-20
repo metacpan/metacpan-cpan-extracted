@@ -1,77 +1,68 @@
 Revision history for App-SlimPacker
 
-0.04  2026-09-07
-    - Compression is ON by default: each bundled module source — and the boot
-      program itself — is deflate-compressed (best level) with core
-      Compress::Raw::Zlib, MIME::Base64-encoded, and decompressed lazily by the
-      embedded loader (also core-only) when require'd (modules) or eval'd (boot
-      program).  A boot program with a __DATA__/__END__ section cannot be
-      string-eval'd, so it is kept verbatim with a warning while modules stay
-      compressed.  Disable with --no-compress to keep the (still minified,
-      pack_string-quoted) sources and boot program visible and readable.
-      Compressed and plain bundles are behaviourally identical and covered side
-      by side in t/bundle.t.
-    - Fix: the whitespace collapser re-merged the line before a __END__/
-      __DATA__ marker into it (`;__DATA__`), silently killing the data section
-      (a mid-line marker is no marker).  The newline before the marker is now
-      frozen too, so the marker keeps its own line in minified output.
+0.07  2026-10-19
+    - Fix: perl -c on a packed script no longer runs the program.
 
-0.03  2026-09-06
-    - New opt-in minifier pass (rewrite => 1) that shortens code into
-      value-preserving equivalent forms: foreach -> for, m/.../ -> /.../ after
-      =~ / !~, drops trailing `;` before `}`, $x += 1 -> $x++ (non-final
-      statements only), $x = $x OP $y -> $x OP= $y, and drops parens from
-      statement-terminal builtin calls (print($x) -> print $x). Disabled by
-      default; implemented as a self-contained method so it can be removed
-      wholesale if it proves unsafe. --rewrite flag on slimpack and minify.
-      Tested in t/rewrite.t against the parser and by running minified code.
-    - New minify-only mode: slimpack minify FILE... (or slimpack --minify FILE...)
-      runs just the PPI minification pass, no tracing or bundling
-    - New standalone minify script installed alongside slimpack
-    - minify_file() exported by App::SlimPacker; minify-only output preserves
-      the #! shebang line
-    - New exported process_deps() performs PPI minification and dependency
-      resolution in a single parse; the bundler uses it so each bundled module
-      is parsed exactly once instead of twice (measurably faster pack/bundle)
-    - Documented in README, POD and the new t/minify-cli.t
-    - Fix: whitespace collapser no longer merges the __END__ / __DATA__
-      marker into the following data on the same line. Previously
-      `__DATA__` + newline + data collapsed to `__DATA__ <data>`
-      (changing what <DATA> yields) or worse `__DATA__{...}` when the
-      data started with punctuation. The marker now keeps its own line.
-    - New t/syntax.t regression suite: minified output must compile and
-      behave identically to the source for __DATA__/__END__ sections,
-      heredocs, block/statement terminators and a differential corpus
-    - Smaller bundles: bundled module sources are now emitted with the new
-      exported pack_string() instead of B::perlstring's always-double-quoted
-      form, and the injector/tracer prologue is emitted from a single-quoted
-      heredoc template (no escaping needed).  pack_string never perlstrings:
-      backslashes in the content are escaped in place inside single or q<delim>
-      literals (keeping $ @ % " raw), so embedded sources shrink even when the
-      module contains \\ sequences — previously those fell through to
-      perlstring's full sigil escaping.  Round-trip validated against a 5000-
-      string differential corpus; embedded modules run byte-for-byte
-      identically.
+0.06  2026-10-19
+    - New: compressed sources are stored as escaped binary, about 25% smaller.
+      Use --no-binary for a plain-text (base64) bundle that survives diff,
+      mail and copy-paste.
+    - New: a boot program's __DATA__/__END__ section is compressed too, read
+      through an in-memory DATA handle; it is no longer left verbatim with a
+      warning.
+    - Fix: bundling a program with no modules produced a syntax error.
+    - New: the bundle keeps the boot script's shebang line; without one it
+      gets #!/usr/bin/env perl, so bundles run on systems without
+      /usr/bin/perl (e.g. FreeBSD). --shebang LINE overrides it.
+    - Fix: the test suite ran bundles through their shebang and failed on
+      machines without /usr/bin/perl; it now uses the perl running the tests.
+    - Fix: embedded sources could use `;` as a q-literal delimiter, which is
+      a syntax error on perl 5.16 and older.
+
+0.05  2026-10-19
+    - Minifier moved to its own module, App::SlimPacker::Minify.
+    - New: rename sub and method names across the whole bundle
+      (--rename-subs, on by default). Names Perl looks up by string
+      (builtins, new, DESTROY, tie/serialization methods, can('...')) are kept.
+    - New: rename bundled package names (--rename-modules, on by default),
+      e.g. App::Foo::UI becomes bk::bl::UI.
+    - New: rename subs in import/export lists and can() strings
+      (--rename-exports, on by default).
+    - New: --include and --exclude add modules to the bundle or leave them out.
+    - --rename-vars is the new name for --rename (old name still works).
+    - Moo programs no longer bundle Moose unless they use it.
+    - ALL_CAPS lexicals (my $ROWS) are now renamed too.
+    - Variables interpolated in regexes (qr/\Q$query\E/) are now renamed.
+    - Plugins are inlined before renaming, so they get renamed consistently.
+    - Fix: ternaries with a bareword branch were mistaken for labels.
+    - Fix: --bundle-lib-all could drop the main program from the output.
+    - Fix: module-only renaming could break "$Pkg::var" strings.
+    - Fix: Moo programs failed to run when bundled with sub or module renaming.
+    - Fix: XS modules keep their package names, so their compiled code loads.
+
+0.04  2026-09-07
+    - Compression is on by default: bundled modules and the main program are
+      deflated and decompressed on load (core modules only).
+      Use --no-compress to keep the sources readable.
+    - New: --rewrite (opt-in, experimental) shortens code, e.g.
+      foreach -> for, $x += 1 -> $x++, print($x) -> print $x.
+    - --rewrite renames our globals across the whole bundle, including
+      inside interpolated strings and heredocs.
+    - Smaller bundles: embedded sources are quoted more compactly.
+    - All on/off options accept a --no-* form.
+    - Fix: __END__/__DATA__ could merge with the surrounding lines and
+      lose the data section.
+
+0.03  2026-09-05
+    - New: minify-only mode (slimpack minify FILE, or the minify script).
+    - Faster: each module is parsed once instead of twice.
+    - Shebang lines are kept when minifying.
 
 0.02  2026-09-05
-    - Minifier: never rename local/our globals (only my) so fully-qualified
-      $PKG::name references stay valid (fixes silent value loss)
-    - Minifier: fix bare-sigil Cast merge (print $fh $$source), package-globals
-      now guarded by the :: name check
-    - bundle: pull modules without a .packlist from @INC (Debian / hand-installed)
-    - bundle: never bundle core modules (Module::CoreList filter) even when a
-      bundled dep uses them
-    - bundle: normalise module-name arguments (Carp, File::HomeDir) to path form
-      for FatPacker's require
-    - Tests split into t/{minify,deps,bundle,cli}.t with subcommand-dispatch
-      coverage for the default 'pack' pipeline
+    - Only my variables are renamed; local/our globals are left alone.
+    - Modules without a .packlist are found in @INC.
+    - Core modules are never bundled.
+    - Fix: minifier broke print $fh $$source.
 
 0.01  2026-09-04
-    - Initial release
-    - PPI-based minifier (process) with variable renaming
-    - CLI bundler (slimpack) with static dependency resolution
-    - Module::Pluggable search_path inlining
-    - Default 'pack' pipeline calls App::FatPacker's methods internally
-      (trace -> Module::CoreList filter -> packlists -> tree -> bundle)
-    - trace / packlists-for / tree / bundle exposed as subcommands
-      with the same arguments as fatpack
+    - Initial release.

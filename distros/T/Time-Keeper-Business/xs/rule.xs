@@ -10,14 +10,19 @@ fixed(class, ...)
         nth = 1
         easter = 2
         relative = 3
+        weekday_on_or_after = 5
+        weekday_on_or_before = 6
+        sandwiched = 7
     PREINIT:
         static const char *const names[] = {
             "Time::Keeper::Business::Rule->fixed", "Time::Keeper::Business::Rule->nth",
-            "Time::Keeper::Business::Rule->easter", "Time::Keeper::Business::Rule->relative" };
+            "Time::Keeper::Business::Rule->easter", "Time::Keeper::Business::Rule->relative", "",
+            "Time::Keeper::Business::Rule->weekday_on_or_after", "Time::Keeper::Business::Rule->weekday_on_or_before",
+            "Time::Keeper::Business::Rule->sandwiched" };
         const char *what = names[ix];
         tkb_rule *r;
         SV *rv, *month = NULL, *day = NULL, *dow = NULL, *n = NULL, *offset = NULL, *orthodox = NULL, *rule = NULL, *days = NULL;
-        SV *from = NULL, *to = NULL;
+        SV *from = NULL, *to = NULL, *calendar = NULL, *code = NULL, *leap = NULL;
         I32 i;
     CODE:
         if ((items - 1) % 2)
@@ -29,24 +34,48 @@ fixed(class, ...)
             SV *v = ST(i + 1);
             if ((ix == 0 || ix == 1) && strEQ(k, "month")) month = v;
             else if (ix == 0 && strEQ(k, "day")) day = v;
-            else if (ix == 1 && strEQ(k, "day_of_week")) dow = v;
-            else if (ix == 1 && strEQ(k, "n")) n = v;
+            else if ((ix == 1 || ix == 5 || ix == 6) && strEQ(k, "day_of_week")) dow = v;
+            else if ((ix == 1 || ix == 5 || ix == 6) && strEQ(k, "n")) n = v;
+            else if ((ix == 5 || ix == 6) && strEQ(k, "rule")) rule = v;
+            else if ((ix == 5 || ix == 6) && strEQ(k, "days")) days = v;
             else if (ix == 2 && strEQ(k, "offset")) offset = v;
             else if (ix == 2 && strEQ(k, "orthodox")) orthodox = v;
             else if (ix == 3 && strEQ(k, "rule")) rule = v;
             else if (ix == 3 && strEQ(k, "days")) days = v;
+            else if (ix <= 1 && strEQ(k, "calendar")) calendar = v;
+            else if (ix <= 1 && strEQ(k, "month_code")) code = v;
+            else if (ix <= 1 && strEQ(k, "leap_month")) leap = v;
             else if (!tkb_rule_common_key(aTHX_ r, k, v, &from, &to, what))
                 croak("%s: unknown argument '%s'", what, k);
         }
+        if (ix <= 1) {
+            if (month && SvOK(month) && code && SvOK(code))
+                croak("%s: month and month_code are one or the other", what);
+            tkb_rule_set_calendar(aTHX_ r, calendar, code, leap, what);
+            if (r->calendar && month && SvOK(month))
+                croak("%s: in another calendar a month is given by its month_code", what);
+            if (r->calendar && !(code && SvOK(code)))
+                croak("%s: month_code is needed", what);
+            if (!r->calendar && code && SvOK(code)) {
+                if (r->month_leap || r->month_number > 12)
+                    croak("%s: the gregory calendar has no month %s", what, SvPV_nolen(code));
+                month = sv_2mortal(newSViv(r->month_number));
+            }
+        }
         switch (ix) {
         case 0:
+            if (r->calendar) {
+                r->day = (int)tkb_rule_int(aTHX_ what, "day", day, 1, 30);
+                break;
+            }
             r->month = (int)tkb_rule_int(aTHX_ what, "month", month, 1, 12);
             r->day = (int)tkb_rule_int(aTHX_ what, "day", day, 1, 31);
             if (!tkb_valid_civil(2000, (unsigned)r->month, (unsigned)r->day))
                 croak("%s: --%02d-%02d is not a date", what, r->month, r->day);
             break;
         case 1:
-            r->month = (int)tkb_rule_int(aTHX_ what, "month", month, 1, 12);
+            if (!r->calendar)
+                r->month = (int)tkb_rule_int(aTHX_ what, "month", month, 1, 12);
             r->dow = (int)tkb_rule_int(aTHX_ what, "day_of_week", dow, 1, 7);
             r->n = (int)tkb_rule_int(aTHX_ what, "n", n, -1, 5);
             if (r->n == 0)
@@ -56,14 +85,24 @@ fixed(class, ...)
             r->offset = offset && SvOK(offset) ? (int)tkb_rule_int(aTHX_ what, "offset", offset, -366, 366) : 0;
             r->orthodox = orthodox && SvTRUE(orthodox) ? 1 : 0;
             break;
+        case 7:
+            break;
         default: {
             tkb_rule *base = tkb_rule_magic(aTHX_ rule);
             if (!base)
                 croak("%s: rule must be a Time::Keeper::Business::Rule", what);
             if (base->kind == TKB_RULE_SET)
                 croak("%s: rule must not be a set", what);
+            if (base->kind == TKB_RULE_SANDWICH)
+                croak("%s: rule must not be a sandwiched day", what);
             r->child = newSVsv(rule);
-            r->days = (int)tkb_rule_int(aTHX_ what, "days", days, -366, 366);
+            if (ix == 3)
+                r->days = (int)tkb_rule_int(aTHX_ what, "days", days, -366, 366);
+            else {
+                r->days = days && SvOK(days) ? (int)tkb_rule_int(aTHX_ what, "days", days, -366, 366) : 0;
+                r->dow = (int)tkb_rule_int(aTHX_ what, "day_of_week", dow, 1, 7);
+                r->n = n && SvOK(n) ? (int)tkb_rule_int(aTHX_ what, "n", n, 1, 5) : 1;
+            }
         }
         }
         if (from || to)
@@ -117,10 +156,15 @@ observed(self, form, ...)
         r = tkb_rule_copy(aTHX_ tkb_rule_of(aTHX_ self, what));
         rv = sv_2mortal(tkb_rule_wrap(aTHX_ r, SvSTASH(SvRV(self))));
         tkb_rule_set_observed(aTHX_ r, form, what);
+        r->observed_keep = 0;
         if ((items - 2) % 2)
             croak("%s: needs key/value pairs after the form", what);
         for (i = 2; i < items; i += 2) {
             const char *k = SvPV_nolen(ST(i));
+            if (strEQ(k, "keep")) {
+                r->observed_keep = SvTRUE(ST(i + 1)) ? 1 : 0;
+                continue;
+            }
             if (!strEQ(k, "weekend"))
                 croak("%s: unknown argument '%s'", what, k);
             r->weekend = tkb_rule_weekend_of(aTHX_ ST(i + 1), what);
@@ -230,12 +274,113 @@ uk(class)
     OUTPUT:
         RETVAL
 
-void
-STORABLE_freeze(self, ...)
+SV *
+TO_JSON(self)
         SV *self
+    CODE:
+        RETVAL = tkb_rule_spec_sv(aTHX_ self, "Time::Keeper::Business::Rule->TO_JSON");
+    OUTPUT:
+        RETVAL
+
+SV *
+from_spec(class, spec)
+        SV *class
+        SV *spec
+    CODE:
+        RETVAL = newSVsv(tkb_rule_from_spec(aTHX_ class, spec, "Time::Keeper::Business::Rule->from_spec", 0));
+    OUTPUT:
+        RETVAL
+
+void
+STORABLE_freeze(self, cloning)
+        SV *self
+        SV *cloning
     ALIAS:
         FREEZE = 1
+    PPCODE:
+        PERL_UNUSED_VAR(cloning);
+        if (!ix)
+            mXPUSHs(newSVpvs(""));
+        mXPUSHs(tkb_rule_spec_sv(aTHX_ self, ix ? "Time::Keeper::Business::Rule->FREEZE" : "Time::Keeper::Business::Rule->STORABLE_freeze"));
+
+void
+STORABLE_thaw(self, cloning, serialized, spec)
+        SV *self
+        SV *cloning
+        SV *serialized
+        SV *spec
+    PREINIT:
+        const char *what = "Time::Keeper::Business::Rule->STORABLE_thaw";
+        SV *built, *cls;
+        tkb_rule *r;
+        MAGIC *mg;
     CODE:
-        PERL_UNUSED_VAR(self);
-        croak("Time::Keeper::Business::Rule->%s: a rule is not serialised; build it again from its constructors",
-              ix ? "FREEZE" : "STORABLE_freeze");
+        PERL_UNUSED_VAR(cloning);
+        PERL_UNUSED_VAR(serialized);
+        if (!SvROK(self))
+            croak("%s: not a frozen rule", what);
+        cls = sv_2mortal(newSVpv(HvNAME(SvSTASH(SvRV(self))), 0));
+        built = tkb_rule_from_spec(aTHX_ cls, spec, what, 0);
+        r = tkb_rule_copy(aTHX_ tkb_rule_of(aTHX_ built, what));
+        mg = sv_magicext(SvRV(self), NULL, PERL_MAGIC_ext, &tkb_rule_vtbl, (const char *)r, 0);
+#ifdef USE_ITHREADS
+        mg->mg_flags |= MGf_DUP;
+#else
+        PERL_UNUSED_VAR(mg);
+#endif
+
+SV *
+THAW(class, serialiser, spec)
+        SV *class
+        SV *serialiser
+        SV *spec
+    CODE:
+        PERL_UNUSED_VAR(serialiser);
+        RETVAL = newSVsv(tkb_rule_from_spec(aTHX_ class, spec, "Time::Keeper::Business::Rule->THAW", 0));
+    OUTPUT:
+        RETVAL
+
+SV *
+except(self, ...)
+        SV *self
+    ALIAS:
+        also = 1
+    PREINIT:
+        const char *what = ix ? "Time::Keeper::Business::Rule->also" : "Time::Keeper::Business::Rule->except";
+        const char *key = ix ? "dates" : "years";
+        tkb_rule *r;
+        SV *rv, *list = NULL;
+        AV *av;
+        SSize_t j, n;
+        I32 i;
+    CODE:
+        r = tkb_rule_copy(aTHX_ tkb_rule_of(aTHX_ self, what));
+        rv = sv_2mortal(tkb_rule_wrap(aTHX_ r, SvSTASH(SvRV(self))));
+        if ((items - 1) % 2)
+            croak("%s: needs key/value pairs", what);
+        for (i = 1; i < items; i += 2) {
+            const char *k = SvPV_nolen(ST(i));
+            if (!strEQ(k, key))
+                croak("%s: unknown argument '%s'", what, k);
+            list = ST(i + 1);
+        }
+        if (!list || !SvROK(list) || SvTYPE(SvRV(list)) != SVt_PVAV || sv_isobject(list))
+            croak("%s: %s is a list", what, key);
+        av = (AV *)SvRV(list);
+        n = av_len(av) + 1;
+        for (j = 0; j < n; j++) {
+            SV **e = av_fetch(av, j, 0);
+            int64_t v = ix ? tkb_day_from_sv(aTHX_ e ? *e : NULL, what)
+                           : tkb_rule_int(aTHX_ what, "a year", e ? *e : NULL, -999999999, 999999999);
+            if (ix) {
+                Renew(r->also, r->n_also + 1, int64_t);
+                r->also[r->n_also++] = v;
+            }
+            else {
+                Renew(r->except, r->n_except + 1, int64_t);
+                r->except[r->n_except++] = v;
+            }
+        }
+        RETVAL = SvREFCNT_inc_simple_NN(rv);
+    OUTPUT:
+        RETVAL

@@ -25,12 +25,12 @@ use Term::Fabulous::Widget::Canvas;
 use Term::Fabulous::Widget::Checkbox;
 use Term::Fabulous::Widget::TextArea;
 use Term::Fabulous::Widget::ScrollBox;
-use Term::Fabulous::Widget::RichText;
 use Term::Fabulous::Widget::Text;
-use Term::Fabulous::Widget::TextNode;
+use Clay::UI::Text;
 
-# A Clay::UI text node that fires no events.
-class Test::PlainTextNode :isa(Term::Fabulous::Widget::TextNode) { }
+# A Clay::UI text node that fires no events (a Term::Fabulous text does,
+# since it can take the focus).
+class Test::PlainTextNode :does(Clay::UI::Text) { }
 
 # A Term::Fabulous on a 20x5 memory terminal, and the terminal.
 sub memory_ui {
@@ -98,6 +98,41 @@ subtest 'a press and a release within one frame both reach Clay' => sub {
 	ok $ui->step >= 2, 'the step draws a frame for the press and one for the release';
 	is [ map { refaddr $_ } $targets{OnPress}[0], $targets{OnRelease}[0] ], [ ( refaddr $button ) x 2 ], 'the frames show the press and then the release';
 	is $ui->pointer_state, { x => 2, y => 1, down => 0 }, 'and leave the newest report as the pointer';
+};
+
+subtest 'presses count their clicks on the clock of the UI' => sub {
+	my $now = 1000;
+	my $box = Term::Fabulous::Widget::Box->new( background_color => [ 1, 1, 1, 255 ], layout => { sizing => { width => sizing_grow(), height => sizing_grow() } } );
+	my ( $clocked, $clocked_terminal ) = memory_ui( root => $box, clock => sub { $now } );
+	my @counts;
+	$box->on( Mouse => sub { push @counts, $_[0]->click_count; return } );
+	my $press = sub { mouse( $clocked, key => TB_KEY_MOUSE_LEFT, x => 1, y => 1, @_ ); return };
+
+	$press->() foreach 1 .. 3;
+	is [ splice @counts ], [ 1, 2, 3 ], 'quick presses in one cell count 1, 2, 3';
+	$now += 0.4;
+	$press->();
+	is [ splice @counts ], [4], 'a press double_click_seconds after the one before continues the run';
+	$now += 0.41;
+	$press->();
+	is [ splice @counts ], [1], 'a slower one starts a new run';
+	$press->( x => 2 );
+	is [ splice @counts ], [1], 'so does a press in another cell';
+	$press->( x => 2, key => TB_KEY_MOUSE_RIGHT );
+	is [ splice @counts ], [1], 'and a press of another button';
+	mouse( $clocked, key => TB_KEY_MOUSE_RELEASE, x => 2, y => 1 );
+	$press->( x => 2, key => TB_KEY_MOUSE_RIGHT, mod => TB_MOD_MOTION );
+	mouse( $clocked, key => TB_KEY_MOUSE_WHEEL_UP, x => 2, y => 1 );
+	is [ splice @counts ], [ 1, 1, 1 ], 'releases, drags and wheel notches count 1';
+	$press->( x => 2, key => TB_KEY_MOUSE_RIGHT );
+	is [ splice @counts ], [2], 'and do not end a run';
+
+	my ($slow) = memory_ui( root => Term::Fabulous::Widget::Box->new, double_click_seconds => 1.5 );
+	is $slow->double_click_seconds, 1.5, 'double_click_seconds is a parameter';
+	is $ui->double_click_seconds,   0.4, 'with a default of 0.4 seconds';
+	like dies { memory_ui( root => Term::Fabulous::Widget::Box->new, double_click_seconds => -1 ) }, qr/\ATerm::Fabulous: double_click_seconds must be a number of at least 0, got '-1'/,
+		'a negative interval dies';
+	like dies { Term::Fabulous::Event::Mouse->new( key => TB_KEY_MOUSE_LEFT, x => 0, y => 0, click_count => 0 ) }, qr/click_count must be a positive integer/, 'a click_count of 0 dies';
 };
 
 subtest 'MouseMove follows the pointer without a button' => sub {
@@ -457,7 +492,7 @@ subtest 'clicks on text fire TextClick, clicks on links LinkActivate' => sub {
 		layout           => { layout_direction => CLAY_TOP_TO_BOTTOM, sizing => { width => sizing_fixed(10), height => sizing_grow() } },
 	);
 	my $plain = Term::Fabulous::Widget::Text->new( text => 'one two three' );    # wraps after 'two'
-	my $rich = Term::Fabulous::Widget::RichText->new( markup => 'see [link=perl.org]perl[/]' );
+	my $rich = Term::Fabulous::Widget::Text->new( markup => 'see [link=perl.org]perl[/]' );
 	$text_root->add_child( $plain, $rich );
 	my ($text_ui) = memory_ui( root => $text_root );
 	my ( @mouse_targets, @clicks, @activated );
@@ -478,7 +513,7 @@ subtest 'clicks on text fire TextClick, clicks on links LinkActivate' => sub {
 	mouse( $text_ui, key => TB_KEY_MOUSE_LEFT, x => 5, y => 2 );
 	is [ $clicks[-1]->link, $clicks[-1]->link_index ],      [ 'perl.org', 0 ],                 'TextClick names the link under the pointer';
 	is [ map { [ refaddr $_->[0], $_->[1] ] } @activated ], [ [ refaddr $rich, 'perl.org' ] ], 'a left click on a link activates it';
-	ref_is $text_ui->interaction->get_focused_widget, $rich, 'and focuses the RichText';
+	ref_is $text_ui->interaction->get_focused_widget, $rich, 'and focuses the Text';
 	is $rich->selected_link, 0, 'which selects the clicked link';
 
 	mouse( $text_ui, key => TF_KEY_MOUSE_MOVE, x => 4, y => 2, mod => TB_MOD_MOTION );
@@ -487,9 +522,21 @@ subtest 'clicks on text fire TextClick, clicks on links LinkActivate' => sub {
 	is $rich->hovered_link, undef, 'and leaving it drops the hover';
 };
 
-subtest 'a focused RichText moves between its links with the keyboard' => sub {
+subtest 'a click on either column of a wide character is on that character' => sub {
+	my $wide_root = Term::Fabulous::Widget::Box->new( background_color => [ 1, 1, 1, 255 ], layout => { sizing => { width => sizing_grow(), height => sizing_grow() } } );
+	my $text      = Term::Fabulous::Widget::Text->new( text => "\x{3042}b" );
+	$wide_root->add_child($text);
+	my ($wide_ui) = memory_ui( root => $wide_root );
+	my @offsets;
+	$wide_root->on( TextClick => sub { push @offsets, $_[0]->offset; return } );
+	$wide_ui->step;
+	mouse( $wide_ui, key => TB_KEY_MOUSE_RIGHT, x => $_, y => 0 ) foreach 0 .. 2;
+	is \@offsets, [ 0, 0, 1 ], 'both columns of the wide character give its offset, the next column the next character';
+};
+
+subtest 'a focused Text moves between its links with the keyboard' => sub {
 	my $key_root = Term::Fabulous::Widget::Box->new( layout => { sizing => { width => sizing_grow(), height => sizing_grow() } } );
-	my $rich     = Term::Fabulous::Widget::RichText->new( markup => '[link=a]A[/] [link=b]B[/]' );
+	my $rich     = Term::Fabulous::Widget::Text->new( markup => '[link=a]A[/] [link=b]B[/]' );
 	my $next     = Term::Fabulous::Widget::Button->new( layout => { sizing => { width => sizing_fixed(4), height => sizing_fixed(1) } } );
 	$key_root->add_child( $rich, $next );
 	my ( $key_ui,    $key_terminal ) = memory_ui( root => $key_root );
@@ -500,7 +547,7 @@ subtest 'a focused RichText moves between its links with the keyboard' => sub {
 	$key_ui->step;
 
 	$press->('Tab');
-	ref_is $key_ui->interaction->get_focused_widget, $rich, 'Tab focuses a RichText with links';
+	ref_is $key_ui->interaction->get_focused_widget, $rich, 'Tab focuses a Text with links';
 	is $rich->selected_link, 0, 'which selects its first link';
 	$press->($_) foreach qw(Right Enter Right);
 	is \@activated, ['b'],              'Right selects the next link, Enter follows it';
@@ -526,6 +573,21 @@ subtest 'root must be an event emitter' => sub {
 		qr/Unrecognised parameters.*use_termbox/, 'unknown constructor parameters are rejected';
 	like dies { Term::Fabulous->new( width => 20, height => 5, root => Term::Fabulous::Widget::Box->new, terminal => 'tty' ) },
 		qr/terminal must consume Term::Fabulous::Role::Terminal, got 'tty'/, 'the terminal must be a terminal';
+};
+
+subtest 'a text that gets its first link later handles the keys' => sub {
+	my $late_root = Term::Fabulous::Widget::Box->new( layout => { sizing => { width => sizing_grow(), height => sizing_grow() } } );
+	my $late      = Term::Fabulous::Widget::Text->new( text => 'A B' );
+	$late_root->add_child($late);
+	my ( $late_ui, $late_terminal ) = memory_ui( root => $late_root );
+	$late_ui->step;
+	is $late->can_focus, 0, 'without links a text cannot take the focus';
+	$late->add_link( 'a', 0, 1 )->add_link( 'b', 2, 3 );
+	$late_ui->interaction->set_focused_widget($late);
+	is $late->selected_link, 0, 'the focus selects the first link';
+	$late_terminal->press_key('Right');
+	$late_ui->step;
+	is $late->selected_link, 1, 'and Right selects the next one';
 };
 
 done_testing;

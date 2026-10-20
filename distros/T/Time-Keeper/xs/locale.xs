@@ -459,20 +459,59 @@ day_periods(class, locale, ...)
         const char *me = "Time::Keeper::Locale->day_periods";
         const char *w = "wide";
         const tk_locale_data *d;
-        int wi, k;
+        int wi, k, alone = 0;
         HV *hv;
     CODE:
         PERL_UNUSED_VAR(class);
         d = tk_locale_get(aTHX_ tk_locale_id_from_sv(aTHX_ locale, me));
-        if (items > 2) w = SvPV_nolen(ST(2));
+        if (items > 2 && SvOK(ST(2))) w = SvPV_nolen(ST(2));
         wi = strEQ(w, "wide") ? TK_W_WIDE : strEQ(w, "abbreviated") ? TK_W_ABBR : strEQ(w, "narrow") ? TK_W_NARROW : -1;
         if (wi < 0)
             croak("%s: the width is 'wide', 'abbreviated' or 'narrow', not '%s'", me, w);
+        if (items > 3 && SvOK(ST(3))) {
+            const char *c = SvPV_nolen(ST(3));
+            if (strEQ(c, "stand-alone"))
+                alone = 1;
+            else if (strNE(c, "format"))
+                croak("%s: the context is 'format' or 'stand-alone', not '%s'", me, c);
+        }
         hv = newHV();
-        for (k = 0; k < TK_DP_COUNT; k++)
-            if (d->s.periods[wi][k])
-                (void)hv_store(hv, names[k], (I32)strlen(names[k]), tk_newSVstr(aTHX_ d->s.periods[wi][k]), 0);
+        for (k = 0; k < TK_DP_COUNT; k++) {
+            const char *s = alone ? d->s.periods_alone[wi][k] : d->s.periods[wi][k];
+            if (s)
+                (void)hv_store(hv, names[k], (I32)strlen(names[k]), tk_newSVstr(aTHX_ s), 0);
+        }
         RETVAL = newRV_noinc((SV *)hv);
+    OUTPUT:
+        RETVAL
+
+SV *
+number_symbols(class, locale)
+        SV *class
+        SV *locale
+    PREINIT:
+        static const char *const names[3] = { "decimal", "group", "minus" };
+        const tk_locale_data *d;
+        HV *hv;
+        int k;
+    CODE:
+        PERL_UNUSED_VAR(class);
+        d = tk_locale_get(aTHX_ tk_locale_id_from_sv(aTHX_ locale, "Time::Keeper::Locale->number_symbols"));
+        hv = newHV();
+        for (k = 0; k < 3; k++)
+            if (d->s.number_symbols[k])
+                (void)hv_store(hv, names[k], (I32)strlen(names[k]), tk_newSVstr(aTHX_ d->s.number_symbols[k]), 0);
+        RETVAL = newRV_noinc((SV *)hv);
+    OUTPUT:
+        RETVAL
+
+SV *
+ascii_digits(class, text)
+        SV *class
+        SV *text
+    CODE:
+        PERL_UNUSED_VAR(class);
+        RETVAL = SvOK(text) ? newSVsv(tk_ascii_digits(aTHX_ text)) : &PL_sv_undef;
     OUTPUT:
         RETVAL
 

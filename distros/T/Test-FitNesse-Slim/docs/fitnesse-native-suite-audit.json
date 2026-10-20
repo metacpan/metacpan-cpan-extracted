@@ -1,0 +1,3913 @@
+{
+  "baselineStatusComparison": {
+    "individualPageRunExitStatus": 0,
+    "pages": 50,
+    "pagesWithSameConformanceState": 50,
+    "statusChanges": []
+  },
+  "controlledRuns": [
+    {
+      "assertionCounts": {
+        "exceptions": 321,
+        "ignored": 4,
+        "right": 525,
+        "wrong": 51
+      },
+      "elapsedMs": 127423,
+      "fitnessePid": 69796,
+      "fitnessePostRunTermination": "Orchestrator sent SIGTERM only after successful XML response; strace records signal and exit 143.",
+      "fitnesseProcessExecve": "java FitNesse JVM only",
+      "httpStatus": 200,
+      "initialMySuitePresent": false,
+      "pageOrderAndCountsIdenticalToOtherCleanRun": true,
+      "pages": 93,
+      "perlPid": 69795,
+      "run": "clean1",
+      "suitePageOutcomeCounts": {
+        "exceptions": 12,
+        "ignores": 1,
+        "right": 70,
+        "wrong": 10
+      },
+      "wikiState": "Independent copy; generated MySuite directory removed before FitNesse startup"
+    },
+    {
+      "assertionCounts": {
+        "exceptions": 321,
+        "ignored": 4,
+        "right": 525,
+        "wrong": 51
+      },
+      "elapsedMs": 125626,
+      "fitnessePid": 71872,
+      "fitnessePostRunTermination": "Orchestrator sent SIGTERM only after successful XML response; strace records signal and exit 143.",
+      "fitnesseProcessExecve": "java FitNesse JVM only",
+      "httpStatus": 200,
+      "initialMySuitePresent": false,
+      "pageOrderAndCountsIdenticalToOtherCleanRun": true,
+      "pages": 93,
+      "perlPid": 71871,
+      "run": "clean2",
+      "suitePageOutcomeCounts": {
+        "exceptions": 12,
+        "ignores": 1,
+        "right": 70,
+        "wrong": 10
+      },
+      "wikiState": "Independent copy; generated MySuite directory removed before FitNesse startup"
+    }
+  ],
+  "date": "2026-10-16",
+  "directRunNotes": {
+    "all93ExternalPerlConfirmed": true,
+    "directPageRunsClearedGeneratedMySuite": true,
+    "nativeSuiteRetainedSharedGeneratedWikiState": true,
+    "nativeVersusDirectDifferences": [
+      "StopSuite",
+      "StopTest"
+    ]
+  },
+  "fitNesseVersion": "v20251025",
+  "individual50ExecutionOrder": [
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.BaseLineDecisionTable.ComparatorsAreSupported",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.BaseLineDecisionTable.MakingTheBaselineTableTheDefaultDecisionTable",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.BaseLineDecisionTable.ScenariosAreSupported",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.BaseLineDecisionTable.TestFailuresAreMarked",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.BaseLineDecisionTable",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.ChainWithInstanceTest",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.CustomTableRenderingAddedByPluginTest",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.DefineAliasInPluginTest",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.DefineAliasTest",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.HashTableTests.HashTableWithHtmlContent",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.HashTableTests.ShouldReturnHashTable",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.HybridDecisionTable.ImplementDynamicDecisionTableWithHybridTable",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.IgnoredTestsShouldColorGray",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.LibrarySuite.HowToAddFixturesWithParametersToTheLibrary",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.LibrarySuite.LastLibraryPreceedsEarlierLibraryTest",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.LibrarySuite.LibraryInSetUpSuite.LibraryInSetUpAndPageTest",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.LibrarySuite.LibraryInSetUpSuite.LibraryInSetUpTest",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.LibrarySuite.OneLibraryTest",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.QueryTableSuite.SetContextValue",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.QueryTableSuite.TestMatching",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.ScenarioTestSuite.ScenarioWithOutputParametersInDecisionTables",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.ScenarioTestSuite.ScenarioWithOutputParametersInScripts",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.ScenarioTestSuite.ScriptSubclassUsedForDecisionTable",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.ScenarioTestSuite.UsingConstructorArgumentsFromDecisionTablesInScenarios",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.SegregationOfRequirementsAndImplementation",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.SlimSymbols.NamingConvention",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.SlimSymbols.SlimSymbolManipulation",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.StopSuite",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.StopTest",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.StopTestInSuiteSetUp",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TableTableSuite.SymbolsInTableTableManagedByTheFixture",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestChineseWords",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestComparators",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestCustomComparators",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestCustomConverter",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestDetailedDiff",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestExceptionIsDisplayed",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestOrderedQueryWithDuplicateRows",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestPageWithInclude",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestScriptTable",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestScriptTableDisplayParameterValue",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestSequentialArgumentProcessing",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestSubsetQuery",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestSystemSlimSuite.ErrorSituationsDuringSlimServerStartup.B_TimeoutAsSlimServerDiesBeforeConnecting",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestSystemSlimSuite.ErrorSituationsDuringSlimServerStartup.C_TimeoutAsNoServerAtGivenSocket",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestSystemSlimSuite.HowtoEnforceA_TimelimitPerTestCommand.NotWorking_SettingSlimTimeout",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestSystemSlimSuite.HowtoEnforceA_TimelimitPerTestCommand.PartiallyWorking_SettingSlimFlags",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestSystemSlimSuite.TimeoutInSlimTestSystem",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestTryingParameterizationIsntTooGreedy",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestTwoIdenticalTablesOnPageDontConflict"
+  ],
+  "knownPageAnalysis": {
+    "SlimSymbols.SlimSymbolsCanBeExpressionsToEvaluate": {
+      "finding": "Confirmed Perl interoperability gap: Java reference passes, Perl does not. No implementation change was made in this audit.",
+      "javaReference": {
+        "exceptions": 0,
+        "ignored": 0,
+        "right": 30,
+        "wrong": 0
+      },
+      "nativeSuite": {
+        "exceptions": 0,
+        "ignored": 0,
+        "right": 9,
+        "wrong": 21
+      },
+      "perlIndividual": {
+        "exceptions": 0,
+        "ignored": 0,
+        "right": 9,
+        "wrong": 21
+      }
+    },
+    "TestIgnoreAll": {
+      "finding": "4 right and 1 exception; page intentionally raises the ignore-all control marker."
+    },
+    "TestIgnoreInScriptTable": {
+      "finding": "4 right and 1 exception; page intentionally raises the ignore control marker."
+    }
+  },
+  "nativeBackendEvidence": {
+    "additionalPerPageCheck": "A separate direct ?test run for each of the 93 selected pages confirmed its execution log connected to external Perl at 127.0.0.1:18097. This establishes backend attribution, not native-suite result equivalence.",
+    "classification": "All SLiM traffic in both controlled native-suite runs was handled by external Perl. slim/SLIM/remote_debug labels alone do not distinguish server processes.",
+    "perlRequestTrace": "External Perl server logs contain SLiM request/response traffic.",
+    "postRunCleanup": "The controller terminated FitNesse and Perl after receiving the complete successful XML response; the Java process trace confirms its intentional post-run SIGTERM. This is harness cleanup, not a test server crash.",
+    "processTrace": "For each clean run, strace records exactly one execve: the FitNesse JVM, with no Java SlimService child. It records the FitNesse JVM receiving orchestrator SIGTERM and exiting 143 after successful XML completion. SLiM connections target external Perl listener 18105 (clean1) / 18106 (clean2).",
+    "suiteExecutionLogs": [
+      {
+        "command": "Connection to running SlimService: 127.0.0.1:18105",
+        "exitCode": "0",
+        "testSystem": "slim:fitnesse.slim.SlimService"
+      },
+      {
+        "command": "Connection to running SlimService: 127.0.0.1:18105",
+        "exitCode": "0",
+        "testSystem": "SLIM:fitnesse.slim.SlimService"
+      },
+      {
+        "command": "Connection to running SlimService: 127.0.0.1:18105",
+        "exitCode": "0",
+        "testSystem": "SLIM:remote_debug:fitnesse.slim.SlimService"
+      }
+    ]
+  },
+  "nativeExecutionOrder": [
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.BaseLineDecisionTable",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.BaseLineDecisionTable.ComparatorsAreSupported",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.BaseLineDecisionTable.HowtoIgnoreResultValues",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.BaseLineDecisionTable.MakingTheBaselineTableTheDefaultDecisionTable",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.BaseLineDecisionTable.ScenariosAreSupported",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.BaseLineDecisionTable.TestFailuresAreMarked",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.ChainTest",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.ChainWithInstanceTest",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.CustomTableRenderingAddedByPluginTest",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.DefineAliasInPluginTest",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.DefineAliasTest",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.DefineTableTypeTest",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.DisgracerTest",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.ErikPragtBug",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.HashTableTests.HashTableWithHtmlContent",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.HashTableTests.ShouldConvertHashWidgetToHashTable",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.HashTableTests.ShouldReturnHashTable",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.HybridDecisionTable",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.HybridDecisionTable.ImplementDynamicDecisionTableWithHybridTable",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.HybridDecisionTable.MethodExtractorRuleTest",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.IgnoredTestsShouldColorGray",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.LibrarySuite.HowToAddFixturesWithParametersToTheLibrary",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.LibrarySuite.LastLibraryPreceedsEarlierLibraryTest",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.LibrarySuite.LibraryInSetUpSuite.LibraryInSetUpAndPageTest",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.LibrarySuite.LibraryInSetUpSuite.LibraryInSetUpTest",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.LibrarySuite.OneLibraryTest",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.MultiByteCharsInSlim",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.ParameterizedScenarios",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.QueryTableSuite.SetContextValue",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.QueryTableSuite.TestMatching",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.RegularExpressionMatching",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.ScenarioLibraryTestSuite.BlankCellsInNestedScenariosShouldWork",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.ScenarioLibraryTestSuite.BrotherScenarioLibraryIsIncluded",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.ScenarioLibraryTestSuite.NoScenarioSectionIfThereAreNone",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.ScenarioLibraryTestSuite.ScenarioLibrariesAreIncludedInTheCorrectOrder",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.ScenarioLibraryTestSuite.ScenarioLibrariesOnlyIncludedInTestPages",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.ScenarioLibraryTestSuite.ScenarioLibrariesOrderTests.ScenarioLibraryOrderSuite.ScenarioLibraryOrderTestParent.ScenarioLibraryOrderIsCorrect",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.ScenarioLibraryTestSuite.ScenarioLibraryShouldIncludeIncludedPages",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.ScenarioLibraryTestSuite.ScenariosOnlyInSlimTests",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.ScenarioLibraryTestSuite.ShouldBeAbleToDealWithPlaceholderScenarios",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.ScenarioTestSuite.ScenarioWithOutputParametersInDecisionTables",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.ScenarioTestSuite.ScenarioWithOutputParametersInScripts",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.ScenarioTestSuite.ScriptSubclassUsedForDecisionTable",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.ScenarioTestSuite.StopTestExceptionInDescisionTable",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.ScenarioTestSuite.UnknownOutputParameterInDescisionTable",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.ScenarioTestSuite.UsingConstructorArgumentsFromDecisionTablesInScenarios",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.SegregationOfRequirementsAndImplementation",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.SlimSymbols.NamingConvention",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.SlimSymbols.SlimSymbolCanHoldInstanceUsedAsParameter",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.SlimSymbols.SlimSymbolManipulation",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.SlimSymbols.SlimSymbolShouldShowRawContents",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.SlimSymbols.SlimSymbolsCanBeBlankOrNull",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.SlimSymbols.SlimSymbolsCanBeExpressionsToEvaluate",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.SlimSymbols.SlimSymbolsWithSecretPrefixAreNotExpandedInHtml",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.SlimSymbols.TestCanPassSymbolsIntoConstructors",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.SlimSymbols.TestSymbolsDontGetTurnedToStringsInTheOutput",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.StopSuite",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.StopTest",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.StopTestInSuiteSetUp",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.SystemExitIsPrevented",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.SystemUnderTestTest",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TableTableSuite.SymbolsInTableTable",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TableTableSuite.SymbolsInTableTableManagedByTheFixture",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TableTableSuite.TestReturnsNull",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestChineseWords",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestComparators",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestCustomComparators",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestCustomConverter",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestDetailedDiff",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestExceptionCount",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestExceptionIsDisplayed",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestExceptionIsDisplayed.DisableExceptionTesting",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestExceptionIsDisplayed.ParameterConversionExceptions",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestExceptionIsDisplayed.SlimExceptionResult",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestHtmlContent",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestIgnoreAll",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestIgnoreInScriptTable",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestOrderedQueryWithDuplicateRows",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestPageWithInclude",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestScriptTable",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestScriptTableDisplayParameterValue",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestSequentialArgumentProcessing",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestSubsetQuery",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestSystemSlimSuite.JavaSlimServer.CallStaticJavaMethod",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestSystemSlimSuite.ManualStartofSlimService",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestSystemSlimSuite.TimeoutInSlimTestSystem",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestTryingParameterizationIsntTooGreedy",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestTwoIdenticalTablesOnPageDontConflict",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.VariablesUsedInSubSubpage",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestSystemSlimSuite.ErrorSituationsDuringSlimServerStartup.A_TimeoutAsSlimHeaderNotReceived",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestSystemSlimSuite.ErrorSituationsDuringSlimServerStartup.B_TimeoutAsSlimServerDiesBeforeConnecting",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestSystemSlimSuite.ErrorSituationsDuringSlimServerStartup.C_TimeoutAsNoServerAtGivenSocket",
+    "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestSystemSlimSuite.TextBeforeSlimHeaderIsIgnored"
+  ],
+  "nativeSuiteOutcomeCounts": {
+    "perPageOutcomeBins": {
+      "exceptions": 12,
+      "ignores": 1,
+      "right": 70,
+      "wrong": 10
+    },
+    "summedAssertions": {
+      "exceptions": 321,
+      "ignored": 4,
+      "right": 525,
+      "wrong": 51
+    }
+  },
+  "nativeSuiteRequest": "/FitNesse.SuiteAcceptanceTests.SuiteSlimTests?suite&format=xml",
+  "newlyDiscoveredCoverage": {
+    "applicablePagesIncludingConfirmedGap": 31,
+    "applicablePagesWithNoUnexpectedMismatch": 30,
+    "confirmedPerlInteroperabilityGaps": 1,
+    "controlledHarnessConfigurationNeeded": 2,
+    "directPerlCandidatesWithZeroWrongAndExceptions": 28,
+    "intentionalIgnoreMarkerPages": 2,
+    "javaFixtureOrTestSystemPages": 8,
+    "nativeOnlyPages": 45,
+    "perlFixtureOrAdapterNeeded": 4
+  },
+  "pages": [
+    {
+      "backendAttribution": "external Perl confirmed for direct run; native suite endpoint evidence confirms the same external listener",
+      "expectedBehavior": "The page completed without wrong assertions or exceptions.",
+      "expectedBehaviorAssessment": "Observed page result matches the committed conformant baseline.",
+      "inIndividual50": true,
+      "inNativeSuite": true,
+      "individualCurrentRun": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 17,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "individualResult": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 17,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "nativeSelectionEvidence": "Test property: true",
+      "nativeSuiteResult": {
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 17,
+          "wrong": 0
+        },
+        "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.BaseLineDecisionTable"
+      },
+      "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.BaseLineDecisionTable",
+      "recommendedClassification": "existing 50-page Perl baseline: conformant",
+      "rootCause": "The acceptance page completed with no wrong assertions or exceptions through the external Perl SLiM server.",
+      "scopeCategory": "Current 50-page baseline",
+      "scopeClassification": "Existing 50-page Perl baseline; see baseline conformance/root-cause fields."
+    },
+    {
+      "backendAttribution": "external Perl confirmed for direct run; native suite endpoint evidence confirms the same external listener",
+      "expectedBehavior": "The page completed without wrong assertions or exceptions.",
+      "expectedBehaviorAssessment": "Observed page result matches the committed conformant baseline.",
+      "inIndividual50": true,
+      "inNativeSuite": true,
+      "individualCurrentRun": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 10,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "individualResult": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 10,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "nativeSelectionEvidence": "Test property: true",
+      "nativeSuiteResult": {
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 10,
+          "wrong": 0
+        },
+        "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.BaseLineDecisionTable.ComparatorsAreSupported"
+      },
+      "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.BaseLineDecisionTable.ComparatorsAreSupported",
+      "recommendedClassification": "existing 50-page Perl baseline: conformant",
+      "rootCause": "The acceptance page completed with no wrong assertions or exceptions through the external Perl SLiM server.",
+      "scopeCategory": "Current 50-page baseline",
+      "scopeClassification": "Existing 50-page Perl baseline; see baseline conformance/root-cause fields."
+    },
+    {
+      "backendAttribution": "external Perl confirmed for direct run; native suite endpoint evidence confirms the same external listener",
+      "expectedBehavior": null,
+      "expectedBehaviorAssessment": "All visible assertions pass in the direct Perl run; this is evidence for this page, not broad conformance.",
+      "inIndividual50": false,
+      "inNativeSuite": true,
+      "individualCurrentRun": null,
+      "individualResult": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 2,
+          "right": 1,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "nativeSelectionEvidence": "Test property: empty/self-closing",
+      "nativeSuiteResult": {
+        "counts": {
+          "exceptions": 0,
+          "ignored": 2,
+          "right": 1,
+          "wrong": 0
+        },
+        "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.BaseLineDecisionTable.HowtoIgnoreResultValues"
+      },
+      "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.BaseLineDecisionTable.HowtoIgnoreResultValues",
+      "recommendedClassification": "new native-suite page; see applicability categories in audit",
+      "rootCause": null,
+      "scopeCategory": "Candidate direct Perl interoperability",
+      "scopeClassification": "Direct Perl candidate: no wrong assertions or unexpected exceptions; still requires explicit applicability review."
+    },
+    {
+      "backendAttribution": "external Perl confirmed for direct run; native suite endpoint evidence confirms the same external listener",
+      "expectedBehavior": "The page completed without wrong assertions or exceptions.",
+      "expectedBehaviorAssessment": "Observed page result matches the committed conformant baseline.",
+      "inIndividual50": true,
+      "inNativeSuite": true,
+      "individualCurrentRun": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 7,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "individualResult": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 7,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "nativeSelectionEvidence": "Test property: true",
+      "nativeSuiteResult": {
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 7,
+          "wrong": 0
+        },
+        "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.BaseLineDecisionTable.MakingTheBaselineTableTheDefaultDecisionTable"
+      },
+      "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.BaseLineDecisionTable.MakingTheBaselineTableTheDefaultDecisionTable",
+      "recommendedClassification": "existing 50-page Perl baseline: conformant",
+      "rootCause": "The acceptance page completed with no wrong assertions or exceptions through the external Perl SLiM server.",
+      "scopeCategory": "Current 50-page baseline",
+      "scopeClassification": "Existing 50-page Perl baseline; see baseline conformance/root-cause fields."
+    },
+    {
+      "backendAttribution": "external Perl confirmed for direct run; native suite endpoint evidence confirms the same external listener",
+      "expectedBehavior": "The page completed without wrong assertions or exceptions.",
+      "expectedBehaviorAssessment": "Observed page result matches the committed conformant baseline.",
+      "inIndividual50": true,
+      "inNativeSuite": true,
+      "individualCurrentRun": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 10,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "individualResult": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 10,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "nativeSelectionEvidence": "Test property: true",
+      "nativeSuiteResult": {
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 10,
+          "wrong": 0
+        },
+        "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.BaseLineDecisionTable.ScenariosAreSupported"
+      },
+      "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.BaseLineDecisionTable.ScenariosAreSupported",
+      "recommendedClassification": "existing 50-page Perl baseline: conformant",
+      "rootCause": "The acceptance page completed with no wrong assertions or exceptions through the external Perl SLiM server.",
+      "scopeCategory": "Current 50-page baseline",
+      "scopeClassification": "Existing 50-page Perl baseline; see baseline conformance/root-cause fields."
+    },
+    {
+      "backendAttribution": "external Perl confirmed for direct run; native suite endpoint evidence confirms the same external listener",
+      "expectedBehavior": "The nested page has 8 right, 2 wrong, 2 ignored, and 0 exceptions; the outer page verifies totals and representative cell classes.",
+      "expectedBehaviorAssessment": "Observed page result matches the committed conformant baseline.",
+      "inIndividual50": true,
+      "inNativeSuite": true,
+      "individualCurrentRun": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 8,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "individualResult": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 8,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "nativeSelectionEvidence": "Test property: true",
+      "nativeSuiteResult": {
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 8,
+          "wrong": 0
+        },
+        "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.BaseLineDecisionTable.TestFailuresAreMarked"
+      },
+      "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.BaseLineDecisionTable.TestFailuresAreMarked",
+      "recommendedClassification": "existing 50-page Perl baseline: conformant",
+      "rootCause": "ResponseExaminer extracts nested assertion totals and rendered cells; every outer assertion passes. The embedded target page intentionally contains two wrong and two ignored checks.",
+      "scopeCategory": "Current 50-page baseline",
+      "scopeClassification": "Existing 50-page Perl baseline; see baseline conformance/root-cause fields."
+    },
+    {
+      "backendAttribution": "external Perl confirmed for direct run; native suite endpoint evidence confirms the same external listener",
+      "expectedBehavior": null,
+      "expectedBehaviorAssessment": "Not assessed as protocol conformance: the page cannot reach its intended assertions without its named fixture/adapter.",
+      "inIndividual50": false,
+      "inNativeSuite": true,
+      "individualCurrentRun": null,
+      "individualResult": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 1,
+          "ignored": 0,
+          "right": 3,
+          "wrong": 0
+        },
+        "status": "nonconformant"
+      },
+      "nativeSelectionEvidence": "Test property: empty/self-closing",
+      "nativeSuiteResult": {
+        "counts": {
+          "exceptions": 1,
+          "ignored": 0,
+          "right": 3,
+          "wrong": 0
+        },
+        "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.ChainTest"
+      },
+      "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.ChainTest",
+      "recommendedClassification": "new native-suite page; see applicability categories in audit",
+      "rootCause": null,
+      "scopeCategory": "Perl fixture/adaptor coverage needed",
+      "scopeClassification": "Missing echo_boolean method in Perl TestSlim fixture; fixture coverage gap, not evidence of wire protocol defect"
+    },
+    {
+      "backendAttribution": "external Perl confirmed for direct run; native suite endpoint evidence confirms the same external listener",
+      "expectedBehavior": "The page completes without wrong assertions or exceptions.",
+      "expectedBehaviorAssessment": "Observed page result matches the committed conformant baseline.",
+      "inIndividual50": true,
+      "inNativeSuite": true,
+      "individualCurrentRun": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 7,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "individualResult": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 7,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "nativeSelectionEvidence": "Test property: true",
+      "nativeSuiteResult": {
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 7,
+          "wrong": 0
+        },
+        "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.ChainWithInstanceTest"
+      },
+      "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.ChainWithInstanceTest",
+      "recommendedClassification": "existing 50-page Perl baseline: conformant",
+      "rootCause": "The page now passes with automatic SlimHelperLibrary actor-stack support.",
+      "scopeCategory": "Current 50-page baseline",
+      "scopeClassification": "Existing 50-page Perl baseline; see baseline conformance/root-cause fields."
+    },
+    {
+      "backendAttribution": "external Perl confirmed for direct run; native suite endpoint evidence confirms the same external listener",
+      "expectedBehavior": "See the page content and its listed fixture dependencies; raw nonzero counts alone do not establish an engine defect.",
+      "expectedBehaviorAssessment": "Observed page result matches its documented non-conformant baseline; it is not treated as a regression.",
+      "inIndividual50": true,
+      "inNativeSuite": true,
+      "individualCurrentRun": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 5,
+          "wrong": 1
+        },
+        "status": "nonconformant"
+      },
+      "individualResult": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 5,
+          "wrong": 1
+        },
+        "status": "harness_limited"
+      },
+      "nativeSelectionEvidence": "Test property: true",
+      "nativeSuiteResult": {
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 5,
+          "wrong": 1
+        },
+        "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.CustomTableRenderingAddedByPluginTest"
+      },
+      "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.CustomTableRenderingAddedByPluginTest",
+      "recommendedClassification": "existing 50-page Perl baseline: harness_limited",
+      "rootCause": "Two direct runs each produced 5 right, 1 wrong, 0 ignored, 0 exceptions. The sole wrong outer assertion expects table class=\"myUseCase\" in the nested response, but that markup is absent. SetUp registers the alias and rendering plugin in its configured context; Perl PageDriver requests the generated page from the main server, where those registrations are unavailable. FitNesse reports Could not find class MyUseCase and MyFixture. This is a configured-context harness limitation, not a Perl SLiM protocol or fixture defect.",
+      "scopeCategory": "Current 50-page baseline",
+      "scopeClassification": "Existing 50-page Perl baseline; see baseline conformance/root-cause fields."
+    },
+    {
+      "backendAttribution": "external Perl confirmed for direct run; native suite endpoint evidence confirms the same external listener",
+      "expectedBehavior": "The page completed without wrong assertions or exceptions.",
+      "expectedBehaviorAssessment": "Observed page result matches the committed conformant baseline.",
+      "inIndividual50": true,
+      "inNativeSuite": true,
+      "individualCurrentRun": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 2,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "individualResult": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 2,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "nativeSelectionEvidence": "Test property: true",
+      "nativeSuiteResult": {
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 2,
+          "wrong": 0
+        },
+        "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.DefineAliasInPluginTest"
+      },
+      "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.DefineAliasInPluginTest",
+      "recommendedClassification": "existing 50-page Perl baseline: conformant",
+      "rootCause": "The acceptance page completed with no wrong assertions or exceptions through the external Perl SLiM server.",
+      "scopeCategory": "Current 50-page baseline",
+      "scopeClassification": "Existing 50-page Perl baseline; see baseline conformance/root-cause fields."
+    },
+    {
+      "backendAttribution": "external Perl confirmed for direct run; native suite endpoint evidence confirms the same external listener",
+      "expectedBehavior": "See the page content and its listed fixture dependencies; raw nonzero counts alone do not establish an engine defect.",
+      "expectedBehaviorAssessment": "Observed page result matches the committed conformant baseline.",
+      "inIndividual50": true,
+      "inNativeSuite": true,
+      "individualCurrentRun": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 22,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "individualResult": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 22,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "nativeSelectionEvidence": "Test property: true",
+      "nativeSuiteResult": {
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 22,
+          "wrong": 0
+        },
+        "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.DefineAliasTest"
+      },
+      "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.DefineAliasTest",
+      "recommendedClassification": "existing 50-page Perl baseline: conformant",
+      "rootCause": "Upstream AddUpChange coin accumulation resolves all alias examples; the prior missing-class cascade is gone.",
+      "scopeCategory": "Current 50-page baseline",
+      "scopeClassification": "Existing 50-page Perl baseline; see baseline conformance/root-cause fields."
+    },
+    {
+      "backendAttribution": "external Perl confirmed for direct run; native suite endpoint evidence confirms the same external listener",
+      "expectedBehavior": null,
+      "expectedBehaviorAssessment": "Not assessed as protocol conformance: the page cannot reach its intended assertions without its named fixture/adapter.",
+      "inIndividual50": false,
+      "inNativeSuite": true,
+      "individualCurrentRun": null,
+      "individualResult": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 6,
+          "ignored": 0,
+          "right": 0,
+          "wrong": 0
+        },
+        "status": "nonconformant"
+      },
+      "nativeSelectionEvidence": "Test property: empty/self-closing",
+      "nativeSuiteResult": {
+        "counts": {
+          "exceptions": 6,
+          "ignored": 0,
+          "right": 0,
+          "wrong": 0
+        },
+        "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.DefineTableTypeTest"
+      },
+      "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.DefineTableTypeTest",
+      "recommendedClassification": "new native-suite page; see applicability categories in audit",
+      "rootCause": null,
+      "scopeCategory": "Perl fixture/adaptor coverage needed",
+      "scopeClassification": "TableOrDecisionFixture absent; fixture coverage needed before protocol assessment"
+    },
+    {
+      "backendAttribution": "external Perl confirmed for direct run; native suite endpoint evidence confirms the same external listener",
+      "expectedBehavior": null,
+      "expectedBehaviorAssessment": "Perl run cannot assess the intended Java fixture/test-system behavior; missing Java-side class or runtime capability.",
+      "inIndividual50": false,
+      "inNativeSuite": true,
+      "individualCurrentRun": null,
+      "individualResult": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 22,
+          "ignored": 0,
+          "right": 0,
+          "wrong": 0
+        },
+        "status": "nonconformant"
+      },
+      "nativeSelectionEvidence": "cross-reference/support page (no local Test marker observed)",
+      "nativeSuiteResult": {
+        "counts": {
+          "exceptions": 22,
+          "ignored": 0,
+          "right": 0,
+          "wrong": 0
+        },
+        "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.DisgracerTest"
+      },
+      "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.DisgracerTest",
+      "recommendedClassification": "new native-suite page; see applicability categories in audit",
+      "rootCause": null,
+      "scopeCategory": "Java fixture or test-system behavior",
+      "scopeClassification": "FitNesse Java Disgracer helper, not a Perl server behavior"
+    },
+    {
+      "backendAttribution": "external Perl confirmed for direct run; native suite endpoint evidence confirms the same external listener",
+      "expectedBehavior": null,
+      "expectedBehaviorAssessment": "All visible assertions pass in the direct Perl run; this is evidence for this page, not broad conformance.",
+      "inIndividual50": false,
+      "inNativeSuite": true,
+      "individualCurrentRun": null,
+      "individualResult": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 3,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "nativeSelectionEvidence": "Test property: empty/self-closing",
+      "nativeSuiteResult": {
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 3,
+          "wrong": 0
+        },
+        "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.ErikPragtBug"
+      },
+      "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.ErikPragtBug",
+      "recommendedClassification": "new native-suite page; see applicability categories in audit",
+      "rootCause": null,
+      "scopeCategory": "Candidate direct Perl interoperability",
+      "scopeClassification": "Direct Perl candidate: no wrong assertions or unexpected exceptions; still requires explicit applicability review."
+    },
+    {
+      "backendAttribution": "external Perl confirmed for direct run; native suite endpoint evidence confirms the same external listener",
+      "expectedBehavior": "See the page content and its listed fixture dependencies; raw nonzero counts alone do not establish an engine defect.",
+      "expectedBehaviorAssessment": "Observed page result matches the committed conformant baseline.",
+      "inIndividual50": true,
+      "inNativeSuite": true,
+      "individualCurrentRun": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 1,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "individualResult": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 1,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "nativeSelectionEvidence": "Test property: true",
+      "nativeSuiteResult": {
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 1,
+          "wrong": 0
+        },
+        "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.HashTableTests.HashTableWithHtmlContent"
+      },
+      "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.HashTableTests.HashTableWithHtmlContent",
+      "recommendedClassification": "existing 50-page Perl baseline: conformant",
+      "rootCause": "HashFixture.hash_is and EchoFixture.echo_and_log reproduce the upstream stored-value return and output behavior; nested HTML content passes unchanged.",
+      "scopeCategory": "Current 50-page baseline",
+      "scopeClassification": "Existing 50-page Perl baseline; see baseline conformance/root-cause fields."
+    },
+    {
+      "backendAttribution": "external Perl confirmed for direct run; native suite endpoint evidence confirms the same external listener",
+      "expectedBehavior": null,
+      "expectedBehaviorAssessment": "All visible assertions pass in the direct Perl run; this is evidence for this page, not broad conformance.",
+      "inIndividual50": false,
+      "inNativeSuite": true,
+      "individualCurrentRun": null,
+      "individualResult": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 2,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "nativeSelectionEvidence": "Test property: empty/self-closing",
+      "nativeSuiteResult": {
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 2,
+          "wrong": 0
+        },
+        "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.HashTableTests.ShouldConvertHashWidgetToHashTable"
+      },
+      "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.HashTableTests.ShouldConvertHashWidgetToHashTable",
+      "recommendedClassification": "new native-suite page; see applicability categories in audit",
+      "rootCause": null,
+      "scopeCategory": "Candidate direct Perl interoperability",
+      "scopeClassification": "Direct Perl candidate: no wrong assertions or unexpected exceptions; still requires explicit applicability review."
+    },
+    {
+      "backendAttribution": "external Perl confirmed for direct run; native suite endpoint evidence confirms the same external listener",
+      "expectedBehavior": "The map returned by HashFixture.hash is converted to FitNesse hash-table HTML with ordered keys.",
+      "expectedBehaviorAssessment": "Observed page result matches the committed conformant baseline.",
+      "inIndividual50": true,
+      "inNativeSuite": true,
+      "individualCurrentRun": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 1,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "individualResult": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 1,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "nativeSelectionEvidence": "Test property: true",
+      "nativeSuiteResult": {
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 1,
+          "wrong": 0
+        },
+        "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.HashTableTests.ShouldReturnHashTable"
+      },
+      "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.HashTableTests.ShouldReturnHashTable",
+      "recommendedClassification": "existing 50-page Perl baseline: conformant",
+      "rootCause": "The fixture returns its Map as a deterministic FitNesse hash_table representation via MapResult; the unchanged page now passes.",
+      "scopeCategory": "Current 50-page baseline",
+      "scopeClassification": "Existing 50-page Perl baseline; see baseline conformance/root-cause fields."
+    },
+    {
+      "backendAttribution": "external Perl confirmed for direct run; native suite endpoint evidence confirms the same external listener",
+      "expectedBehavior": null,
+      "expectedBehaviorAssessment": "Not assessed as protocol conformance: the page cannot reach its intended assertions without its named fixture/adapter.",
+      "inIndividual50": false,
+      "inNativeSuite": true,
+      "individualCurrentRun": null,
+      "individualResult": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 44,
+          "ignored": 0,
+          "right": 14,
+          "wrong": 0
+        },
+        "status": "nonconformant"
+      },
+      "nativeSelectionEvidence": "Test property: empty/self-closing",
+      "nativeSuiteResult": {
+        "counts": {
+          "exceptions": 46,
+          "ignored": 0,
+          "right": 14,
+          "wrong": 0
+        },
+        "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.HybridDecisionTable"
+      },
+      "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.HybridDecisionTable",
+      "recommendedClassification": "new native-suite page; see applicability categories in audit",
+      "rootCause": null,
+      "scopeCategory": "Perl fixture/adaptor coverage needed",
+      "scopeClassification": "Properties fixture unavailable; table behavior needs Perl fixture coverage first"
+    },
+    {
+      "backendAttribution": "external Perl confirmed for direct run; native suite endpoint evidence confirms the same external listener",
+      "expectedBehavior": "See the page content and its listed fixture dependencies; raw nonzero counts alone do not establish an engine defect.",
+      "expectedBehaviorAssessment": "Observed page result matches the committed conformant baseline.",
+      "inIndividual50": true,
+      "inNativeSuite": true,
+      "individualCurrentRun": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 5,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "individualResult": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 5,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "nativeSelectionEvidence": "Test property: true",
+      "nativeSuiteResult": {
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 5,
+          "wrong": 0
+        },
+        "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.HybridDecisionTable.ImplementDynamicDecisionTableWithHybridTable"
+      },
+      "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.HybridDecisionTable.ImplementDynamicDecisionTableWithHybridTable",
+      "recommendedClassification": "existing 50-page Perl baseline: conformant",
+      "rootCause": "Upstream AddUpChange state and getter/setter behavior satisfy the hybrid decision table.",
+      "scopeCategory": "Current 50-page baseline",
+      "scopeClassification": "Existing 50-page Perl baseline; see baseline conformance/root-cause fields."
+    },
+    {
+      "backendAttribution": "external Perl confirmed for direct run; native suite endpoint evidence confirms the same external listener",
+      "expectedBehavior": null,
+      "expectedBehaviorAssessment": "Perl run cannot assess the intended Java fixture/test-system behavior; missing Java-side class or runtime capability.",
+      "inIndividual50": false,
+      "inNativeSuite": true,
+      "individualCurrentRun": null,
+      "individualResult": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 94,
+          "ignored": 0,
+          "right": 0,
+          "wrong": 0
+        },
+        "status": "nonconformant"
+      },
+      "nativeSelectionEvidence": "Test property: empty/self-closing",
+      "nativeSuiteResult": {
+        "counts": {
+          "exceptions": 85,
+          "ignored": 0,
+          "right": 0,
+          "wrong": 0
+        },
+        "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.HybridDecisionTable.MethodExtractorRuleTest"
+      },
+      "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.HybridDecisionTable.MethodExtractorRuleTest",
+      "recommendedClassification": "new native-suite page; see applicability categories in audit",
+      "rootCause": null,
+      "scopeCategory": "Java fixture or test-system behavior",
+      "scopeClassification": "Java method-extractor/configuration fixtures unavailable in Perl"
+    },
+    {
+      "backendAttribution": "external Perl confirmed for direct run; native suite endpoint evidence confirms the same external listener",
+      "expectedBehavior": "The nested test reports one stop-test exception and marks later script statements as not run. The outer checks additionally expect an older ignore CSS markup shape.",
+      "expectedBehaviorAssessment": "Observed page result matches its documented non-conformant baseline; it is not treated as a regression.",
+      "inIndividual50": true,
+      "inNativeSuite": true,
+      "individualCurrentRun": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 5,
+          "wrong": 2
+        },
+        "status": "nonconformant"
+      },
+      "individualResult": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 5,
+          "wrong": 2
+        },
+        "status": "harness_limited"
+      },
+      "nativeSelectionEvidence": "Test property: true",
+      "nativeSuiteResult": {
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 5,
+          "wrong": 2
+        },
+        "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.IgnoredTestsShouldColorGray"
+      },
+      "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.IgnoredTestsShouldColorGray",
+      "recommendedClassification": "existing 50-page Perl baseline: harness_limited",
+      "rootCause": "Perl reports 5 right, 2 wrong, 0 ignored, 0 exceptions; a matched Java v20251025 run reports 7 right, 0 wrong. The two wrong outer checks expect class=\"ignore\">Not Executed and should be ignored< and class=\"ignore\">Not Executed and should be ignored as well<. Java's nested response contains the expected scenario cells; Perl's HTTP-based nested request lacks the active FitNesse scenario context and shows ordinary unexecuted script rows with the not-run span. This is a PageDriver context-fidelity limitation, not an obsolete renderer expectation or Perl ignore-marker defect.",
+      "scopeCategory": "Current 50-page baseline",
+      "scopeClassification": "Existing 50-page Perl baseline; see baseline conformance/root-cause fields."
+    },
+    {
+      "backendAttribution": "external Perl confirmed for direct run; native suite endpoint evidence confirms the same external listener",
+      "expectedBehavior": "The page completes without wrong assertions or exceptions.",
+      "expectedBehaviorAssessment": "Observed page result matches the committed conformant baseline.",
+      "inIndividual50": true,
+      "inNativeSuite": true,
+      "individualCurrentRun": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 5,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "individualResult": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 5,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "nativeSelectionEvidence": "Test property: true",
+      "nativeSuiteResult": {
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 5,
+          "wrong": 0
+        },
+        "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.LibrarySuite.HowToAddFixturesWithParametersToTheLibrary"
+      },
+      "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.LibrarySuite.HowToAddFixturesWithParametersToTheLibrary",
+      "recommendedClassification": "existing 50-page Perl baseline: conformant",
+      "rootCause": "The page now passes with automatic SlimHelperLibrary actor-stack support.",
+      "scopeCategory": "Current 50-page baseline",
+      "scopeClassification": "Existing 50-page Perl baseline; see baseline conformance/root-cause fields."
+    },
+    {
+      "backendAttribution": "external Perl confirmed for direct run; native suite endpoint evidence confirms the same external listener",
+      "expectedBehavior": "The page completed without wrong assertions or exceptions.",
+      "expectedBehaviorAssessment": "Observed page result matches the committed conformant baseline.",
+      "inIndividual50": true,
+      "inNativeSuite": true,
+      "individualCurrentRun": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 2,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "individualResult": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 2,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "nativeSelectionEvidence": "Test property: true",
+      "nativeSuiteResult": {
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 2,
+          "wrong": 0
+        },
+        "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.LibrarySuite.LastLibraryPreceedsEarlierLibraryTest"
+      },
+      "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.LibrarySuite.LastLibraryPreceedsEarlierLibraryTest",
+      "recommendedClassification": "existing 50-page Perl baseline: conformant",
+      "rootCause": "The acceptance page completed with no wrong assertions or exceptions through the external Perl SLiM server.",
+      "scopeCategory": "Current 50-page baseline",
+      "scopeClassification": "Existing 50-page Perl baseline; see baseline conformance/root-cause fields."
+    },
+    {
+      "backendAttribution": "external Perl confirmed for direct run; native suite endpoint evidence confirms the same external listener",
+      "expectedBehavior": "See the page content and its listed fixture dependencies; raw nonzero counts alone do not establish an engine defect.",
+      "expectedBehaviorAssessment": "Observed page result matches the committed conformant baseline.",
+      "inIndividual50": true,
+      "inNativeSuite": true,
+      "individualCurrentRun": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 2,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "individualResult": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 2,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "nativeSelectionEvidence": "Test property: true",
+      "nativeSuiteResult": {
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 2,
+          "wrong": 0
+        },
+        "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.LibrarySuite.LibraryInSetUpSuite.LibraryInSetUpAndPageTest"
+      },
+      "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.LibrarySuite.LibraryInSetUpSuite.LibraryInSetUpAndPageTest",
+      "recommendedClassification": "existing 50-page Perl baseline: conformant",
+      "rootCause": "The registry retains both objects when setup and page libraries reuse library1; fallback dispatch finds the page library first and the setup library when its method is absent.",
+      "scopeCategory": "Current 50-page baseline",
+      "scopeClassification": "Existing 50-page Perl baseline; see baseline conformance/root-cause fields."
+    },
+    {
+      "backendAttribution": "external Perl confirmed for direct run; native suite endpoint evidence confirms the same external listener",
+      "expectedBehavior": "See the page content and its listed fixture dependencies; raw nonzero counts alone do not establish an engine defect.",
+      "expectedBehaviorAssessment": "Observed page result matches the committed conformant baseline.",
+      "inIndividual50": true,
+      "inNativeSuite": true,
+      "individualCurrentRun": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 1,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "individualResult": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 1,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "nativeSelectionEvidence": "Test property: true",
+      "nativeSuiteResult": {
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 1,
+          "wrong": 0
+        },
+        "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.LibrarySuite.LibraryInSetUpSuite.LibraryInSetUpTest"
+      },
+      "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.LibrarySuite.LibraryInSetUpSuite.LibraryInSetUpTest",
+      "recommendedClassification": "existing 50-page Perl baseline: conformant",
+      "rootCause": "LibraryInSetUp tracks delegated echo calls on its own instance.",
+      "scopeCategory": "Current 50-page baseline",
+      "scopeClassification": "Existing 50-page Perl baseline; see baseline conformance/root-cause fields."
+    },
+    {
+      "backendAttribution": "external Perl confirmed for direct run; native suite endpoint evidence confirms the same external listener",
+      "expectedBehavior": "The page completed without wrong assertions or exceptions.",
+      "expectedBehaviorAssessment": "Observed page result matches the committed conformant baseline.",
+      "inIndividual50": true,
+      "inNativeSuite": true,
+      "individualCurrentRun": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 1,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "individualResult": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 1,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "nativeSelectionEvidence": "Test property: true",
+      "nativeSuiteResult": {
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 1,
+          "wrong": 0
+        },
+        "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.LibrarySuite.OneLibraryTest"
+      },
+      "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.LibrarySuite.OneLibraryTest",
+      "recommendedClassification": "existing 50-page Perl baseline: conformant",
+      "rootCause": "The acceptance page completed with no wrong assertions or exceptions through the external Perl SLiM server.",
+      "scopeCategory": "Current 50-page baseline",
+      "scopeClassification": "Existing 50-page Perl baseline; see baseline conformance/root-cause fields."
+    },
+    {
+      "backendAttribution": "external Perl confirmed for direct run; native suite endpoint evidence confirms the same external listener",
+      "expectedBehavior": null,
+      "expectedBehaviorAssessment": "All visible assertions pass in the direct Perl run; this is evidence for this page, not broad conformance.",
+      "inIndividual50": false,
+      "inNativeSuite": true,
+      "individualCurrentRun": null,
+      "individualResult": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 2,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "nativeSelectionEvidence": "Test property: empty/self-closing",
+      "nativeSuiteResult": {
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 2,
+          "wrong": 0
+        },
+        "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.MultiByteCharsInSlim"
+      },
+      "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.MultiByteCharsInSlim",
+      "recommendedClassification": "new native-suite page; see applicability categories in audit",
+      "rootCause": null,
+      "scopeCategory": "Candidate direct Perl interoperability",
+      "scopeClassification": "Direct Perl candidate: no wrong assertions or unexpected exceptions; still requires explicit applicability review."
+    },
+    {
+      "backendAttribution": "external Perl confirmed for direct run; native suite endpoint evidence confirms the same external listener",
+      "expectedBehavior": null,
+      "expectedBehaviorAssessment": "All visible assertions pass in the direct Perl run; this is evidence for this page, not broad conformance.",
+      "inIndividual50": false,
+      "inNativeSuite": true,
+      "individualCurrentRun": null,
+      "individualResult": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 15,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "nativeSelectionEvidence": "Test property: empty/self-closing",
+      "nativeSuiteResult": {
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 15,
+          "wrong": 0
+        },
+        "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.ParameterizedScenarios"
+      },
+      "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.ParameterizedScenarios",
+      "recommendedClassification": "new native-suite page; see applicability categories in audit",
+      "rootCause": null,
+      "scopeCategory": "Candidate direct Perl interoperability",
+      "scopeClassification": "Direct Perl candidate: no wrong assertions or unexpected exceptions; still requires explicit applicability review."
+    },
+    {
+      "backendAttribution": "external Perl confirmed for direct run; native suite endpoint evidence confirms the same external listener",
+      "expectedBehavior": "Query data matches the unchanged upstream acceptance expectations, including row ordering, duplicate multiplicity, subset matching, and constructor-derived symbol values.",
+      "expectedBehaviorAssessment": "Observed page result matches the committed conformant baseline.",
+      "inIndividual50": true,
+      "inNativeSuite": true,
+      "individualCurrentRun": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 2,
+          "right": 4,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "individualResult": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 2,
+          "right": 4,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "nativeSelectionEvidence": "Test property: true",
+      "nativeSuiteResult": {
+        "counts": {
+          "exceptions": 0,
+          "ignored": 2,
+          "right": 4,
+          "wrong": 0
+        },
+        "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.QueryTableSuite.SetContextValue"
+      },
+      "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.QueryTableSuite.SetContextValue",
+      "recommendedClassification": "existing 50-page Perl baseline: conformant",
+      "rootCause": "The upstream query fixture now returns its expected column/value rows; both query matching and duplicate-row checks pass through the external Perl SLiM server.",
+      "scopeCategory": "Current 50-page baseline",
+      "scopeClassification": "Existing 50-page Perl baseline; see baseline conformance/root-cause fields."
+    },
+    {
+      "backendAttribution": "external Perl confirmed for direct run; native suite endpoint evidence confirms the same external listener",
+      "expectedBehavior": "Query data matches the unchanged upstream acceptance expectations, including row ordering, duplicate multiplicity, subset matching, and constructor-derived symbol values.",
+      "expectedBehaviorAssessment": "Observed page result matches the committed conformant baseline.",
+      "inIndividual50": true,
+      "inNativeSuite": true,
+      "individualCurrentRun": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 27,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "individualResult": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 27,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "nativeSelectionEvidence": "Test property: true",
+      "nativeSuiteResult": {
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 27,
+          "wrong": 0
+        },
+        "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.QueryTableSuite.TestMatching"
+      },
+      "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.QueryTableSuite.TestMatching",
+      "recommendedClassification": "existing 50-page Perl baseline: conformant",
+      "rootCause": "The upstream query fixture now returns its expected column/value rows; both query matching and duplicate-row checks pass through the external Perl SLiM server.",
+      "scopeCategory": "Current 50-page baseline",
+      "scopeClassification": "Existing 50-page Perl baseline; see baseline conformance/root-cause fields."
+    },
+    {
+      "backendAttribution": "external Perl confirmed for direct run; native suite endpoint evidence confirms the same external listener",
+      "expectedBehavior": null,
+      "expectedBehaviorAssessment": "All visible assertions pass in the direct Perl run; this is evidence for this page, not broad conformance.",
+      "inIndividual50": false,
+      "inNativeSuite": true,
+      "individualCurrentRun": null,
+      "individualResult": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 4,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "nativeSelectionEvidence": "Test property: empty/self-closing",
+      "nativeSuiteResult": {
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 4,
+          "wrong": 0
+        },
+        "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.RegularExpressionMatching"
+      },
+      "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.RegularExpressionMatching",
+      "recommendedClassification": "new native-suite page; see applicability categories in audit",
+      "rootCause": null,
+      "scopeCategory": "Candidate direct Perl interoperability",
+      "scopeClassification": "Direct Perl candidate: no wrong assertions or unexpected exceptions; still requires explicit applicability review."
+    },
+    {
+      "backendAttribution": "external Perl confirmed for direct run; native suite endpoint evidence confirms the same external listener",
+      "expectedBehavior": null,
+      "expectedBehaviorAssessment": "All visible assertions pass in the direct Perl run; this is evidence for this page, not broad conformance.",
+      "inIndividual50": false,
+      "inNativeSuite": true,
+      "individualCurrentRun": null,
+      "individualResult": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 1,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "nativeSelectionEvidence": "Test property: empty/self-closing",
+      "nativeSuiteResult": {
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 1,
+          "wrong": 0
+        },
+        "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.ScenarioLibraryTestSuite.BlankCellsInNestedScenariosShouldWork"
+      },
+      "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.ScenarioLibraryTestSuite.BlankCellsInNestedScenariosShouldWork",
+      "recommendedClassification": "new native-suite page; see applicability categories in audit",
+      "rootCause": null,
+      "scopeCategory": "Candidate direct Perl interoperability",
+      "scopeClassification": "Direct Perl candidate: no wrong assertions or unexpected exceptions; still requires explicit applicability review."
+    },
+    {
+      "backendAttribution": "external Perl confirmed for direct run; native suite endpoint evidence confirms the same external listener",
+      "expectedBehavior": null,
+      "expectedBehaviorAssessment": "All visible assertions pass in the direct Perl run; this is evidence for this page, not broad conformance.",
+      "inIndividual50": false,
+      "inNativeSuite": true,
+      "individualCurrentRun": null,
+      "individualResult": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 2,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "nativeSelectionEvidence": "Test property: empty/self-closing",
+      "nativeSuiteResult": {
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 2,
+          "wrong": 0
+        },
+        "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.ScenarioLibraryTestSuite.BrotherScenarioLibraryIsIncluded"
+      },
+      "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.ScenarioLibraryTestSuite.BrotherScenarioLibraryIsIncluded",
+      "recommendedClassification": "new native-suite page; see applicability categories in audit",
+      "rootCause": null,
+      "scopeCategory": "Candidate direct Perl interoperability",
+      "scopeClassification": "Direct Perl candidate: no wrong assertions or unexpected exceptions; still requires explicit applicability review."
+    },
+    {
+      "backendAttribution": "external Perl confirmed for direct run; native suite endpoint evidence confirms the same external listener",
+      "expectedBehavior": null,
+      "expectedBehaviorAssessment": "All visible assertions pass in the direct Perl run; this is evidence for this page, not broad conformance.",
+      "inIndividual50": false,
+      "inNativeSuite": true,
+      "individualCurrentRun": null,
+      "individualResult": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 2,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "nativeSelectionEvidence": "Test property: empty/self-closing",
+      "nativeSuiteResult": {
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 2,
+          "wrong": 0
+        },
+        "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.ScenarioLibraryTestSuite.NoScenarioSectionIfThereAreNone"
+      },
+      "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.ScenarioLibraryTestSuite.NoScenarioSectionIfThereAreNone",
+      "recommendedClassification": "new native-suite page; see applicability categories in audit",
+      "rootCause": null,
+      "scopeCategory": "Candidate direct Perl interoperability",
+      "scopeClassification": "Direct Perl candidate: no wrong assertions or unexpected exceptions; still requires explicit applicability review."
+    },
+    {
+      "backendAttribution": "external Perl confirmed for direct run; native suite endpoint evidence confirms the same external listener",
+      "expectedBehavior": null,
+      "expectedBehaviorAssessment": "All visible assertions pass in the direct Perl run; this is evidence for this page, not broad conformance.",
+      "inIndividual50": false,
+      "inNativeSuite": true,
+      "individualCurrentRun": null,
+      "individualResult": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 5,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "nativeSelectionEvidence": "Test property: empty/self-closing",
+      "nativeSuiteResult": {
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 5,
+          "wrong": 0
+        },
+        "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.ScenarioLibraryTestSuite.ScenarioLibrariesAreIncludedInTheCorrectOrder"
+      },
+      "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.ScenarioLibraryTestSuite.ScenarioLibrariesAreIncludedInTheCorrectOrder",
+      "recommendedClassification": "new native-suite page; see applicability categories in audit",
+      "rootCause": null,
+      "scopeCategory": "Candidate direct Perl interoperability",
+      "scopeClassification": "Direct Perl candidate: no wrong assertions or unexpected exceptions; still requires explicit applicability review."
+    },
+    {
+      "backendAttribution": "external Perl confirmed for direct run; native suite endpoint evidence confirms the same external listener",
+      "expectedBehavior": null,
+      "expectedBehaviorAssessment": "All visible assertions pass in the direct Perl run; this is evidence for this page, not broad conformance.",
+      "inIndividual50": false,
+      "inNativeSuite": true,
+      "individualCurrentRun": null,
+      "individualResult": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 2,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "nativeSelectionEvidence": "Test property: empty/self-closing",
+      "nativeSuiteResult": {
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 2,
+          "wrong": 0
+        },
+        "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.ScenarioLibraryTestSuite.ScenarioLibrariesOnlyIncludedInTestPages"
+      },
+      "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.ScenarioLibraryTestSuite.ScenarioLibrariesOnlyIncludedInTestPages",
+      "recommendedClassification": "new native-suite page; see applicability categories in audit",
+      "rootCause": null,
+      "scopeCategory": "Candidate direct Perl interoperability",
+      "scopeClassification": "Direct Perl candidate: no wrong assertions or unexpected exceptions; still requires explicit applicability review."
+    },
+    {
+      "backendAttribution": "external Perl confirmed for direct run; native suite endpoint evidence confirms the same external listener",
+      "expectedBehavior": null,
+      "expectedBehaviorAssessment": "All visible assertions pass in the direct Perl run; this is evidence for this page, not broad conformance.",
+      "inIndividual50": false,
+      "inNativeSuite": true,
+      "individualCurrentRun": null,
+      "individualResult": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 3,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "nativeSelectionEvidence": "Test property: empty/self-closing",
+      "nativeSuiteResult": {
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 3,
+          "wrong": 0
+        },
+        "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.ScenarioLibraryTestSuite.ScenarioLibrariesOrderTests.ScenarioLibraryOrderSuite.ScenarioLibraryOrderTestParent.ScenarioLibraryOrderIsCorrect"
+      },
+      "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.ScenarioLibraryTestSuite.ScenarioLibrariesOrderTests.ScenarioLibraryOrderSuite.ScenarioLibraryOrderTestParent.ScenarioLibraryOrderIsCorrect",
+      "recommendedClassification": "new native-suite page; see applicability categories in audit",
+      "rootCause": null,
+      "scopeCategory": "Candidate direct Perl interoperability",
+      "scopeClassification": "Direct Perl candidate: no wrong assertions or unexpected exceptions; still requires explicit applicability review."
+    },
+    {
+      "backendAttribution": "external Perl confirmed for direct run; native suite endpoint evidence confirms the same external listener",
+      "expectedBehavior": null,
+      "expectedBehaviorAssessment": "All visible assertions pass in the direct Perl run; this is evidence for this page, not broad conformance.",
+      "inIndividual50": false,
+      "inNativeSuite": true,
+      "individualCurrentRun": null,
+      "individualResult": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 0,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "nativeSelectionEvidence": "Test property: empty/self-closing",
+      "nativeSuiteResult": {
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 0,
+          "wrong": 0
+        },
+        "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.ScenarioLibraryTestSuite.ScenarioLibraryShouldIncludeIncludedPages"
+      },
+      "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.ScenarioLibraryTestSuite.ScenarioLibraryShouldIncludeIncludedPages",
+      "recommendedClassification": "new native-suite page; see applicability categories in audit",
+      "rootCause": null,
+      "scopeCategory": "Candidate direct Perl interoperability",
+      "scopeClassification": "Direct Perl candidate: no wrong assertions or unexpected exceptions; still requires explicit applicability review."
+    },
+    {
+      "backendAttribution": "external Perl confirmed for direct run; native suite endpoint evidence confirms the same external listener",
+      "expectedBehavior": null,
+      "expectedBehaviorAssessment": "All visible assertions pass in the direct Perl run; this is evidence for this page, not broad conformance.",
+      "inIndividual50": false,
+      "inNativeSuite": true,
+      "individualCurrentRun": null,
+      "individualResult": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 2,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "nativeSelectionEvidence": "Test property: empty/self-closing",
+      "nativeSuiteResult": {
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 2,
+          "wrong": 0
+        },
+        "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.ScenarioLibraryTestSuite.ScenariosOnlyInSlimTests"
+      },
+      "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.ScenarioLibraryTestSuite.ScenariosOnlyInSlimTests",
+      "recommendedClassification": "new native-suite page; see applicability categories in audit",
+      "rootCause": null,
+      "scopeCategory": "Candidate direct Perl interoperability",
+      "scopeClassification": "Direct Perl candidate: no wrong assertions or unexpected exceptions; still requires explicit applicability review."
+    },
+    {
+      "backendAttribution": "external Perl confirmed for direct run; native suite endpoint evidence confirms the same external listener",
+      "expectedBehavior": null,
+      "expectedBehaviorAssessment": "All visible assertions pass in the direct Perl run; this is evidence for this page, not broad conformance.",
+      "inIndividual50": false,
+      "inNativeSuite": true,
+      "individualCurrentRun": null,
+      "individualResult": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 1,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "nativeSelectionEvidence": "Test property: empty/self-closing",
+      "nativeSuiteResult": {
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 1,
+          "wrong": 0
+        },
+        "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.ScenarioLibraryTestSuite.ShouldBeAbleToDealWithPlaceholderScenarios"
+      },
+      "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.ScenarioLibraryTestSuite.ShouldBeAbleToDealWithPlaceholderScenarios",
+      "recommendedClassification": "new native-suite page; see applicability categories in audit",
+      "rootCause": null,
+      "scopeCategory": "Candidate direct Perl interoperability",
+      "scopeClassification": "Direct Perl candidate: no wrong assertions or unexpected exceptions; still requires explicit applicability review."
+    },
+    {
+      "backendAttribution": "external Perl confirmed for direct run; native suite endpoint evidence confirms the same external listener",
+      "expectedBehavior": "The page completed without wrong assertions or exceptions.",
+      "expectedBehaviorAssessment": "Observed page result matches the committed conformant baseline.",
+      "inIndividual50": true,
+      "inNativeSuite": true,
+      "individualCurrentRun": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 6,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "individualResult": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 6,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "nativeSelectionEvidence": "Test property: true",
+      "nativeSuiteResult": {
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 6,
+          "wrong": 0
+        },
+        "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.ScenarioTestSuite.ScenarioWithOutputParametersInDecisionTables"
+      },
+      "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.ScenarioTestSuite.ScenarioWithOutputParametersInDecisionTables",
+      "recommendedClassification": "existing 50-page Perl baseline: conformant",
+      "rootCause": "The acceptance page completed with no wrong assertions or exceptions through the external Perl SLiM server.",
+      "scopeCategory": "Current 50-page baseline",
+      "scopeClassification": "Existing 50-page Perl baseline; see baseline conformance/root-cause fields."
+    },
+    {
+      "backendAttribution": "external Perl confirmed for direct run; native suite endpoint evidence confirms the same external listener",
+      "expectedBehavior": "The page completed without wrong assertions or exceptions.",
+      "expectedBehaviorAssessment": "Observed page result matches the committed conformant baseline.",
+      "inIndividual50": true,
+      "inNativeSuite": true,
+      "individualCurrentRun": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 4,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "individualResult": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 4,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "nativeSelectionEvidence": "Test property: true",
+      "nativeSuiteResult": {
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 4,
+          "wrong": 0
+        },
+        "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.ScenarioTestSuite.ScenarioWithOutputParametersInScripts"
+      },
+      "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.ScenarioTestSuite.ScenarioWithOutputParametersInScripts",
+      "recommendedClassification": "existing 50-page Perl baseline: conformant",
+      "rootCause": "The acceptance page completed with no wrong assertions or exceptions through the external Perl SLiM server.",
+      "scopeCategory": "Current 50-page baseline",
+      "scopeClassification": "Existing 50-page Perl baseline; see baseline conformance/root-cause fields."
+    },
+    {
+      "backendAttribution": "external Perl confirmed for direct run; native suite endpoint evidence confirms the same external listener",
+      "expectedBehavior": "The page completed without wrong assertions or exceptions.",
+      "expectedBehaviorAssessment": "Observed page result matches the committed conformant baseline.",
+      "inIndividual50": true,
+      "inNativeSuite": true,
+      "individualCurrentRun": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 2,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "individualResult": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 2,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "nativeSelectionEvidence": "Test property: true",
+      "nativeSuiteResult": {
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 2,
+          "wrong": 0
+        },
+        "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.ScenarioTestSuite.ScriptSubclassUsedForDecisionTable"
+      },
+      "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.ScenarioTestSuite.ScriptSubclassUsedForDecisionTable",
+      "recommendedClassification": "existing 50-page Perl baseline: conformant",
+      "rootCause": "The acceptance page completed with no wrong assertions or exceptions through the external Perl SLiM server.",
+      "scopeCategory": "Current 50-page baseline",
+      "scopeClassification": "Existing 50-page Perl baseline; see baseline conformance/root-cause fields."
+    },
+    {
+      "backendAttribution": "external Perl confirmed for direct run; native suite endpoint evidence confirms the same external listener",
+      "expectedBehavior": null,
+      "expectedBehaviorAssessment": "All visible assertions pass in the direct Perl run; this is evidence for this page, not broad conformance.",
+      "inIndividual50": false,
+      "inNativeSuite": true,
+      "individualCurrentRun": null,
+      "individualResult": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 10,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "nativeSelectionEvidence": "legacy wiki Test header",
+      "nativeSuiteResult": {
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 10,
+          "wrong": 0
+        },
+        "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.ScenarioTestSuite.StopTestExceptionInDescisionTable"
+      },
+      "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.ScenarioTestSuite.StopTestExceptionInDescisionTable",
+      "recommendedClassification": "new native-suite page; see applicability categories in audit",
+      "rootCause": null,
+      "scopeCategory": "Candidate direct Perl interoperability",
+      "scopeClassification": "Direct Perl candidate: no wrong assertions or unexpected exceptions; still requires explicit applicability review."
+    },
+    {
+      "backendAttribution": "external Perl confirmed for direct run; native suite endpoint evidence confirms the same external listener",
+      "expectedBehavior": null,
+      "expectedBehaviorAssessment": "All visible assertions pass in the direct Perl run; this is evidence for this page, not broad conformance.",
+      "inIndividual50": false,
+      "inNativeSuite": true,
+      "individualCurrentRun": null,
+      "individualResult": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 5,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "nativeSelectionEvidence": "legacy wiki Test header",
+      "nativeSuiteResult": {
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 5,
+          "wrong": 0
+        },
+        "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.ScenarioTestSuite.UnknownOutputParameterInDescisionTable"
+      },
+      "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.ScenarioTestSuite.UnknownOutputParameterInDescisionTable",
+      "recommendedClassification": "new native-suite page; see applicability categories in audit",
+      "rootCause": null,
+      "scopeCategory": "Candidate direct Perl interoperability",
+      "scopeClassification": "Direct Perl candidate: no wrong assertions or unexpected exceptions; still requires explicit applicability review."
+    },
+    {
+      "backendAttribution": "external Perl confirmed for direct run; native suite endpoint evidence confirms the same external listener",
+      "expectedBehavior": "The page completed without wrong assertions or exceptions.",
+      "expectedBehaviorAssessment": "Observed page result matches the committed conformant baseline.",
+      "inIndividual50": true,
+      "inNativeSuite": true,
+      "individualCurrentRun": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 8,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "individualResult": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 8,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "nativeSelectionEvidence": "Test property: true",
+      "nativeSuiteResult": {
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 8,
+          "wrong": 0
+        },
+        "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.ScenarioTestSuite.UsingConstructorArgumentsFromDecisionTablesInScenarios"
+      },
+      "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.ScenarioTestSuite.UsingConstructorArgumentsFromDecisionTablesInScenarios",
+      "recommendedClassification": "existing 50-page Perl baseline: conformant",
+      "rootCause": "The acceptance page completed with no wrong assertions or exceptions through the external Perl SLiM server.",
+      "scopeCategory": "Current 50-page baseline",
+      "scopeClassification": "Existing 50-page Perl baseline; see baseline conformance/root-cause fields."
+    },
+    {
+      "backendAttribution": "external Perl confirmed for direct run; native suite endpoint evidence confirms the same external listener",
+      "expectedBehavior": "The page completed without wrong assertions or exceptions.",
+      "expectedBehaviorAssessment": "Observed page result matches the committed conformant baseline.",
+      "inIndividual50": true,
+      "inNativeSuite": true,
+      "individualCurrentRun": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 12,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "individualResult": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 12,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "nativeSelectionEvidence": "Test property: true",
+      "nativeSuiteResult": {
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 12,
+          "wrong": 0
+        },
+        "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.SegregationOfRequirementsAndImplementation"
+      },
+      "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.SegregationOfRequirementsAndImplementation",
+      "recommendedClassification": "existing 50-page Perl baseline: conformant",
+      "rootCause": "The acceptance page completed with no wrong assertions or exceptions through the external Perl SLiM server.",
+      "scopeCategory": "Current 50-page baseline",
+      "scopeClassification": "Existing 50-page Perl baseline; see baseline conformance/root-cause fields."
+    },
+    {
+      "backendAttribution": "external Perl confirmed for direct run; native suite endpoint evidence confirms the same external listener",
+      "expectedBehavior": "The page completed without wrong assertions or exceptions.",
+      "expectedBehaviorAssessment": "Observed page result matches the committed conformant baseline.",
+      "inIndividual50": true,
+      "inNativeSuite": true,
+      "individualCurrentRun": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 5,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "individualResult": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 5,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "nativeSelectionEvidence": "Test property: true",
+      "nativeSuiteResult": {
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 5,
+          "wrong": 0
+        },
+        "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.SlimSymbols.NamingConvention"
+      },
+      "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.SlimSymbols.NamingConvention",
+      "recommendedClassification": "existing 50-page Perl baseline: conformant",
+      "rootCause": "The acceptance page completed with no wrong assertions or exceptions through the external Perl SLiM server.",
+      "scopeCategory": "Current 50-page baseline",
+      "scopeClassification": "Existing 50-page Perl baseline; see baseline conformance/root-cause fields."
+    },
+    {
+      "backendAttribution": "external Perl confirmed for direct run; native suite endpoint evidence confirms the same external listener",
+      "expectedBehavior": null,
+      "expectedBehaviorAssessment": "All visible assertions pass in the direct Perl run; this is evidence for this page, not broad conformance.",
+      "inIndividual50": false,
+      "inNativeSuite": true,
+      "individualCurrentRun": null,
+      "individualResult": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 8,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "nativeSelectionEvidence": "Test property: empty/self-closing",
+      "nativeSuiteResult": {
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 8,
+          "wrong": 0
+        },
+        "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.SlimSymbols.SlimSymbolCanHoldInstanceUsedAsParameter"
+      },
+      "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.SlimSymbols.SlimSymbolCanHoldInstanceUsedAsParameter",
+      "recommendedClassification": "new native-suite page; see applicability categories in audit",
+      "rootCause": null,
+      "scopeCategory": "Candidate direct Perl interoperability",
+      "scopeClassification": "Direct Perl candidate: no wrong assertions or unexpected exceptions; still requires explicit applicability review."
+    },
+    {
+      "backendAttribution": "external Perl confirmed for direct run; native suite endpoint evidence confirms the same external listener",
+      "expectedBehavior": "The page completed without wrong assertions or exceptions.",
+      "expectedBehaviorAssessment": "Observed page result matches the committed conformant baseline.",
+      "inIndividual50": true,
+      "inNativeSuite": true,
+      "individualCurrentRun": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 18,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "individualResult": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 18,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "nativeSelectionEvidence": "Test property: true",
+      "nativeSuiteResult": {
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 18,
+          "wrong": 0
+        },
+        "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.SlimSymbols.SlimSymbolManipulation"
+      },
+      "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.SlimSymbols.SlimSymbolManipulation",
+      "recommendedClassification": "existing 50-page Perl baseline: conformant",
+      "rootCause": "The acceptance page completed with no wrong assertions or exceptions through the external Perl SLiM server.",
+      "scopeCategory": "Current 50-page baseline",
+      "scopeClassification": "Existing 50-page Perl baseline; see baseline conformance/root-cause fields."
+    },
+    {
+      "backendAttribution": "external Perl confirmed for direct run; native suite endpoint evidence confirms the same external listener",
+      "expectedBehavior": null,
+      "expectedBehaviorAssessment": "All visible assertions pass in the direct Perl run; this is evidence for this page, not broad conformance.",
+      "inIndividual50": false,
+      "inNativeSuite": true,
+      "individualCurrentRun": null,
+      "individualResult": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 4,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "nativeSelectionEvidence": "Test property: empty/self-closing",
+      "nativeSuiteResult": {
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 4,
+          "wrong": 0
+        },
+        "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.SlimSymbols.SlimSymbolShouldShowRawContents"
+      },
+      "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.SlimSymbols.SlimSymbolShouldShowRawContents",
+      "recommendedClassification": "new native-suite page; see applicability categories in audit",
+      "rootCause": null,
+      "scopeCategory": "Candidate direct Perl interoperability",
+      "scopeClassification": "Direct Perl candidate: no wrong assertions or unexpected exceptions; still requires explicit applicability review."
+    },
+    {
+      "backendAttribution": "external Perl confirmed for direct run; native suite endpoint evidence confirms the same external listener",
+      "expectedBehavior": null,
+      "expectedBehaviorAssessment": "All visible assertions pass in the direct Perl run; this is evidence for this page, not broad conformance.",
+      "inIndividual50": false,
+      "inNativeSuite": true,
+      "individualCurrentRun": null,
+      "individualResult": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 3,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "nativeSelectionEvidence": "Test property: empty/self-closing",
+      "nativeSuiteResult": {
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 3,
+          "wrong": 0
+        },
+        "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.SlimSymbols.SlimSymbolsCanBeBlankOrNull"
+      },
+      "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.SlimSymbols.SlimSymbolsCanBeBlankOrNull",
+      "recommendedClassification": "new native-suite page; see applicability categories in audit",
+      "rootCause": null,
+      "scopeCategory": "Candidate direct Perl interoperability",
+      "scopeClassification": "Direct Perl candidate: no wrong assertions or unexpected exceptions; still requires explicit applicability review."
+    },
+    {
+      "backendAttribution": "external Perl confirmed for direct run; native suite endpoint evidence confirms the same external listener",
+      "expectedBehavior": null,
+      "expectedBehaviorAssessment": "Known difference in FitNesse's documented table-expression feature: Java SlimService passes 30 assertions; Perl preserves the 21 expression arguments as text. Expressions are not part of the SLiM protocol specification.",
+      "inIndividual50": false,
+      "inNativeSuite": true,
+      "individualCurrentRun": null,
+      "individualResult": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 9,
+          "wrong": 21
+        },
+        "status": "nonconformant"
+      },
+      "nativeSelectionEvidence": "legacy wiki Test header",
+      "nativeSuiteResult": {
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 9,
+          "wrong": 21
+        },
+        "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.SlimSymbols.SlimSymbolsCanBeExpressionsToEvaluate"
+      },
+      "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.SlimSymbols.SlimSymbolsCanBeExpressionsToEvaluate",
+      "recommendedClassification": "Keep as a known FitNesse table-expression compatibility difference; do not treat as a SLiM protocol defect or alter upstream assertions",
+      "rootCause": "FitNesse v20251025 Java VariableStore evaluates backtick expression arguments through Nashorn and converts serialized maps/lists to Java objects. Perl implements protocol $NAME substitution and returns these non-protocol expressions unchanged.",
+      "scopeCategory": "Documented FitNesse feature with Java-specific server implementation",
+      "scopeClassification": "FitNesse table expressions are outside the SLiM protocol; Java reference 30/30; Perl 9 right, 21 wrong"
+    },
+    {
+      "backendAttribution": "external Perl confirmed for direct run; native suite endpoint evidence confirms the same external listener",
+      "expectedBehavior": null,
+      "expectedBehaviorAssessment": "All visible assertions pass in the direct Perl run; this is evidence for this page, not broad conformance.",
+      "inIndividual50": false,
+      "inNativeSuite": true,
+      "individualCurrentRun": null,
+      "individualResult": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 3,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "nativeSelectionEvidence": "legacy wiki Test header",
+      "nativeSuiteResult": {
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 3,
+          "wrong": 0
+        },
+        "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.SlimSymbols.SlimSymbolsWithSecretPrefixAreNotExpandedInHtml"
+      },
+      "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.SlimSymbols.SlimSymbolsWithSecretPrefixAreNotExpandedInHtml",
+      "recommendedClassification": "new native-suite page; see applicability categories in audit",
+      "rootCause": null,
+      "scopeCategory": "Candidate direct Perl interoperability",
+      "scopeClassification": "Direct Perl candidate: no wrong assertions or unexpected exceptions; still requires explicit applicability review."
+    },
+    {
+      "backendAttribution": "external Perl confirmed for direct run; native suite endpoint evidence confirms the same external listener",
+      "expectedBehavior": null,
+      "expectedBehaviorAssessment": "All visible assertions pass in the direct Perl run; this is evidence for this page, not broad conformance.",
+      "inIndividual50": false,
+      "inNativeSuite": true,
+      "individualCurrentRun": null,
+      "individualResult": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 3,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "nativeSelectionEvidence": "Test property: empty/self-closing",
+      "nativeSuiteResult": {
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 3,
+          "wrong": 0
+        },
+        "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.SlimSymbols.TestCanPassSymbolsIntoConstructors"
+      },
+      "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.SlimSymbols.TestCanPassSymbolsIntoConstructors",
+      "recommendedClassification": "new native-suite page; see applicability categories in audit",
+      "rootCause": null,
+      "scopeCategory": "Candidate direct Perl interoperability",
+      "scopeClassification": "Direct Perl candidate: no wrong assertions or unexpected exceptions; still requires explicit applicability review."
+    },
+    {
+      "backendAttribution": "external Perl confirmed for direct run; native suite endpoint evidence confirms the same external listener",
+      "expectedBehavior": null,
+      "expectedBehaviorAssessment": "All visible assertions pass in the direct Perl run; this is evidence for this page, not broad conformance.",
+      "inIndividual50": false,
+      "inNativeSuite": true,
+      "individualCurrentRun": null,
+      "individualResult": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 2,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "nativeSelectionEvidence": "Test property: empty/self-closing",
+      "nativeSuiteResult": {
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 2,
+          "wrong": 0
+        },
+        "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.SlimSymbols.TestSymbolsDontGetTurnedToStringsInTheOutput"
+      },
+      "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.SlimSymbols.TestSymbolsDontGetTurnedToStringsInTheOutput",
+      "recommendedClassification": "new native-suite page; see applicability categories in audit",
+      "rootCause": null,
+      "scopeCategory": "Candidate direct Perl interoperability",
+      "scopeClassification": "Direct Perl candidate: no wrong assertions or unexpected exceptions; still requires explicit applicability review."
+    },
+    {
+      "backendAttribution": "external Perl confirmed for direct run; native suite endpoint evidence confirms the same external listener",
+      "expectedBehavior": "StopSuite skips remaining suite tests while running the required per-test and suite teardown.",
+      "expectedBehaviorAssessment": "Observed page result matches the committed conformant baseline.",
+      "inIndividual50": true,
+      "inNativeSuite": true,
+      "individualCurrentRun": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 6,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "individualResult": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 6,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "nativeSelectionEvidence": "Test property: true",
+      "nativeSuiteResult": {
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 6,
+          "wrong": 0
+        },
+        "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.StopSuite"
+      },
+      "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.StopSuite",
+      "recommendedClassification": "existing 50-page Perl baseline: conformant",
+      "rootCause": "PageDriver-created wiki state persisted between page requests. StopTestInSuiteSetUp leaves MySuite.SuiteSetUp; clearing the generated subtree before this page restores the expected per-test teardown rows.",
+      "scopeCategory": "Current 50-page baseline",
+      "scopeClassification": "Existing 50-page Perl baseline; see baseline conformance/root-cause fields."
+    },
+    {
+      "backendAttribution": "external Perl confirmed for direct run; native suite endpoint evidence confirms the same external listener",
+      "expectedBehavior": "StopTest skips the remainder of the current test, allows the next test, and runs per-test and suite teardown.",
+      "expectedBehaviorAssessment": "Observed page result matches the committed conformant baseline.",
+      "inIndividual50": true,
+      "inNativeSuite": true,
+      "individualCurrentRun": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 6,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "individualResult": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 6,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "nativeSelectionEvidence": "Test property: true",
+      "nativeSuiteResult": {
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 6,
+          "wrong": 0
+        },
+        "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.StopTest"
+      },
+      "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.StopTest",
+      "recommendedClassification": "existing 50-page Perl baseline: conformant",
+      "rootCause": "PageDriver-created wiki state persisted between page requests. StopTestInSuiteSetUp leaves MySuite.SuiteSetUp; clearing the generated subtree before this page restores the expected per-test teardown rows.",
+      "scopeCategory": "Current 50-page baseline",
+      "scopeClassification": "Existing 50-page Perl baseline; see baseline conformance/root-cause fields."
+    },
+    {
+      "backendAttribution": "external Perl confirmed for direct run; native suite endpoint evidence confirms the same external listener",
+      "expectedBehavior": "StopTest raised in SuiteSetUp prevents suite test pages from running while suite teardown still executes.",
+      "expectedBehaviorAssessment": "Observed page result matches the committed conformant baseline.",
+      "inIndividual50": true,
+      "inNativeSuite": true,
+      "individualCurrentRun": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 7,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "individualResult": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 7,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "nativeSelectionEvidence": "Test property: true",
+      "nativeSuiteResult": {
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 7,
+          "wrong": 0
+        },
+        "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.StopTestInSuiteSetUp"
+      },
+      "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.StopTestInSuiteSetUp",
+      "recommendedClassification": "existing 50-page Perl baseline: conformant",
+      "rootCause": "The stop exception is returned with ABORT_SLIM_TEST; FitNesse skips suite tests and still executes suite teardown.",
+      "scopeCategory": "Current 50-page baseline",
+      "scopeClassification": "Existing 50-page Perl baseline; see baseline conformance/root-cause fields."
+    },
+    {
+      "backendAttribution": "external Perl confirmed for direct run; native suite endpoint evidence confirms the same external listener",
+      "expectedBehavior": null,
+      "expectedBehaviorAssessment": "Perl run cannot assess the intended Java fixture/test-system behavior; missing Java-side class or runtime capability.",
+      "inIndividual50": false,
+      "inNativeSuite": true,
+      "individualCurrentRun": null,
+      "individualResult": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 11,
+          "ignored": 0,
+          "right": 0,
+          "wrong": 0
+        },
+        "status": "nonconformant"
+      },
+      "nativeSelectionEvidence": "Test property: empty/self-closing",
+      "nativeSuiteResult": {
+        "counts": {
+          "exceptions": 12,
+          "ignored": 0,
+          "right": 0,
+          "wrong": 0
+        },
+        "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.SystemExitIsPrevented"
+      },
+      "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.SystemExitIsPrevented",
+      "recommendedClassification": "new native-suite page; see applicability categories in audit",
+      "rootCause": null,
+      "scopeCategory": "Java fixture or test-system behavior",
+      "scopeClassification": "JVM System.exit prevention, explicitly obsolete for Java 21+"
+    },
+    {
+      "backendAttribution": "external Perl confirmed for direct run; native suite endpoint evidence confirms the same external listener",
+      "expectedBehavior": null,
+      "expectedBehaviorAssessment": "Perl run cannot assess the intended Java fixture/test-system behavior; missing Java-side class or runtime capability.",
+      "inIndividual50": false,
+      "inNativeSuite": true,
+      "individualCurrentRun": null,
+      "individualResult": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 8,
+          "ignored": 0,
+          "right": 0,
+          "wrong": 0
+        },
+        "status": "nonconformant"
+      },
+      "nativeSelectionEvidence": "Test property: empty/self-closing",
+      "nativeSuiteResult": {
+        "counts": {
+          "exceptions": 8,
+          "ignored": 0,
+          "right": 0,
+          "wrong": 0
+        },
+        "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.SystemUnderTestTest"
+      },
+      "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.SystemUnderTestTest",
+      "recommendedClassification": "new native-suite page; see applicability categories in audit",
+      "rootCause": null,
+      "scopeCategory": "Java fixture or test-system behavior",
+      "scopeClassification": "Java MySystemUnderTestDriver fixture absent"
+    },
+    {
+      "backendAttribution": "external Perl confirmed for direct run; native suite endpoint evidence confirms the same external listener",
+      "expectedBehavior": null,
+      "expectedBehaviorAssessment": "Not assessed as protocol conformance: the page cannot reach its intended assertions without its named fixture/adapter.",
+      "inIndividual50": false,
+      "inNativeSuite": true,
+      "individualCurrentRun": null,
+      "individualResult": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 4,
+          "ignored": 0,
+          "right": 0,
+          "wrong": 5
+        },
+        "status": "nonconformant"
+      },
+      "nativeSelectionEvidence": "Test property: empty/self-closing",
+      "nativeSuiteResult": {
+        "counts": {
+          "exceptions": 4,
+          "ignored": 0,
+          "right": 0,
+          "wrong": 5
+        },
+        "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TableTableSuite.SymbolsInTableTable"
+      },
+      "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TableTableSuite.SymbolsInTableTable",
+      "recommendedClassification": "new native-suite page; see applicability categories in audit",
+      "rootCause": "The page imports fitnesse.slim.test and requests the ordinary TableTableIncFirstCol fixture, which is absent. A related fixture exists under statementexecutorconsumer but explicitly manages symbols within the table; it is not a drop-in substitute because this page checks ordinary substitution and row isolation. Four exceptions and five wrong checks cascade from the missing ordinary fixture. The managed-fixture page passes 15 assertions; Java v20251025 passes 13.",
+      "scopeCategory": "Perl fixture/adaptor coverage needed",
+      "scopeClassification": "Ordinary TableTableIncFirstCol adapter absent; existing consumer-managed fixture tests a distinct symbol mode"
+    },
+    {
+      "backendAttribution": "external Perl confirmed for direct run; native suite endpoint evidence confirms the same external listener",
+      "expectedBehavior": "See the page content and its listed fixture dependencies; raw nonzero counts alone do not establish an engine defect.",
+      "expectedBehaviorAssessment": "Observed page result matches the committed conformant baseline.",
+      "inIndividual50": true,
+      "inNativeSuite": true,
+      "individualCurrentRun": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 15,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "individualResult": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 15,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "nativeSelectionEvidence": "Test property: true",
+      "nativeSuiteResult": {
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 15,
+          "wrong": 0
+        },
+        "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TableTableSuite.SymbolsInTableTableManagedByTheFixture"
+      },
+      "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TableTableSuite.SymbolsInTableTableManagedByTheFixture",
+      "recommendedClassification": "existing 50-page Perl baseline: conformant",
+      "rootCause": "TableTableIncFirstCol increments values, assigns symbols inside the table through StatementExecutorConsumer, and restores normal symbol substitution afterward.",
+      "scopeCategory": "Current 50-page baseline",
+      "scopeClassification": "Existing 50-page Perl baseline; see baseline conformance/root-cause fields."
+    },
+    {
+      "backendAttribution": "external Perl confirmed for direct run; native suite endpoint evidence confirms the same external listener",
+      "expectedBehavior": null,
+      "expectedBehaviorAssessment": "Perl run cannot assess the intended Java fixture/test-system behavior; missing Java-side class or runtime capability.",
+      "inIndividual50": false,
+      "inNativeSuite": true,
+      "individualCurrentRun": null,
+      "individualResult": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 2,
+          "ignored": 0,
+          "right": 1,
+          "wrong": 0
+        },
+        "status": "nonconformant"
+      },
+      "nativeSelectionEvidence": "Test property: empty/self-closing",
+      "nativeSuiteResult": {
+        "counts": {
+          "exceptions": 2,
+          "ignored": 0,
+          "right": 1,
+          "wrong": 0
+        },
+        "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TableTableSuite.TestReturnsNull"
+      },
+      "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TableTableSuite.TestReturnsNull",
+      "recommendedClassification": "new native-suite page; see applicability categories in audit",
+      "rootCause": null,
+      "scopeCategory": "Java fixture or test-system behavior",
+      "scopeClassification": "DummyTableTableReturnsNull absent; Java test fixture required"
+    },
+    {
+      "backendAttribution": "external Perl confirmed for direct run; native suite endpoint evidence confirms the same external listener",
+      "expectedBehavior": "See the page content and its listed fixture dependencies; raw nonzero counts alone do not establish an engine defect.",
+      "expectedBehaviorAssessment": "Observed page result matches the committed conformant baseline.",
+      "inIndividual50": true,
+      "inNativeSuite": true,
+      "individualCurrentRun": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 1,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "individualResult": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 1,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "nativeSelectionEvidence": "Test property: true",
+      "nativeSuiteResult": {
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 1,
+          "wrong": 0
+        },
+        "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestChineseWords"
+      },
+      "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestChineseWords",
+      "recommendedClassification": "existing 50-page Perl baseline: conformant",
+      "rootCause": "EchoScript echoes the original Unicode value and writes UTF-8 bytes plus newline to stdout.",
+      "scopeCategory": "Current 50-page baseline",
+      "scopeClassification": "Existing 50-page Perl baseline; see baseline conformance/root-cause fields."
+    },
+    {
+      "backendAttribution": "external Perl confirmed for direct run; native suite endpoint evidence confirms the same external listener",
+      "expectedBehavior": "The page completed without wrong assertions or exceptions.",
+      "expectedBehaviorAssessment": "Observed page result matches the committed conformant baseline.",
+      "inIndividual50": true,
+      "inNativeSuite": true,
+      "individualCurrentRun": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 26,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "individualResult": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 26,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "nativeSelectionEvidence": "Test property: true",
+      "nativeSuiteResult": {
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 26,
+          "wrong": 0
+        },
+        "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestComparators"
+      },
+      "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestComparators",
+      "recommendedClassification": "existing 50-page Perl baseline: conformant",
+      "rootCause": "The acceptance page completed with no wrong assertions or exceptions through the external Perl SLiM server.",
+      "scopeCategory": "Current 50-page baseline",
+      "scopeClassification": "Existing 50-page Perl baseline; see baseline conformance/root-cause fields."
+    },
+    {
+      "backendAttribution": "external Perl confirmed for direct run; native suite endpoint evidence confirms the same external listener",
+      "expectedBehavior": "See the page content and its listed fixture dependencies; raw nonzero counts alone do not establish an engine defect.",
+      "expectedBehaviorAssessment": "Observed page result matches its documented non-conformant baseline; it is not treated as a regression.",
+      "inIndividual50": true,
+      "inNativeSuite": true,
+      "individualCurrentRun": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 1,
+          "wrong": 2
+        },
+        "status": "nonconformant"
+      },
+      "individualResult": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 1,
+          "wrong": 2
+        },
+        "status": "harness_limited"
+      },
+      "nativeSelectionEvidence": "Test property: true",
+      "nativeSuiteResult": {
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 1,
+          "wrong": 2
+        },
+        "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestCustomComparators"
+      },
+      "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestCustomComparators",
+      "recommendedClassification": "existing 50-page Perl baseline: harness_limited",
+      "rootCause": "Perl reports 1 right and 2 wrong; Java on the pinned JAR reports 3 right and 0 wrong. Both Perl failures are outer checks for the nested response text and its 2/0 count: the nested page renders actual test with expected [glob:t*t]. The Java execution log confirms the glob comparator was loaded. The HTTP-based Perl PageDriver request does not run in the active FitNesse context established by SetUp; fixture and SLiM values are correct.",
+      "scopeCategory": "Current 50-page baseline",
+      "scopeClassification": "Existing 50-page Perl baseline; see baseline conformance/root-cause fields."
+    },
+    {
+      "backendAttribution": "external Perl confirmed for direct run; native suite endpoint evidence confirms the same external listener",
+      "expectedBehavior": "Register a List converter that changes ArrayList/Object return values to brace syntax while exact List return values remain nested SLiM lists; parse brace syntax back into List parameters for sameList.",
+      "expectedBehaviorAssessment": "Observed page result matches the committed conformant baseline.",
+      "inIndividual50": true,
+      "inNativeSuite": true,
+      "individualCurrentRun": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 13,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "individualResult": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 13,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "nativeSelectionEvidence": "Test property: true",
+      "nativeSuiteResult": {
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 13,
+          "wrong": 0
+        },
+        "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestCustomConverter"
+      },
+      "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestCustomConverter",
+      "recommendedClassification": "existing 50-page Perl baseline: conformant",
+      "rootCause": "Per-executor converter registration and explicit fixture method signatures reproduce upstream declared-type and runtime-class conversion, including custom List fromString and toString behavior.",
+      "scopeCategory": "Current 50-page baseline",
+      "scopeClassification": "Existing 50-page Perl baseline; see baseline conformance/root-cause fields."
+    },
+    {
+      "backendAttribution": "external Perl confirmed for direct run; native suite endpoint evidence confirms the same external listener",
+      "expectedBehavior": "The outer page verifies detailed diff markup for equal, unequal, symbol, and scenario results from the embedded page.",
+      "expectedBehaviorAssessment": "Observed page result matches the committed conformant baseline.",
+      "inIndividual50": true,
+      "inNativeSuite": true,
+      "individualCurrentRun": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 22,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "individualResult": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 22,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "nativeSelectionEvidence": "Test property: true",
+      "nativeSuiteResult": {
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 22,
+          "wrong": 0
+        },
+        "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestDetailedDiff"
+      },
+      "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestDetailedDiff",
+      "recommendedClassification": "existing 50-page Perl baseline: conformant",
+      "rootCause": "DetailedDiff supplies expected values; ResponseExaminer confirms the nested page intentional 25-pass, 50-fail, 1-ignored result and rendered diff markup.",
+      "scopeCategory": "Current 50-page baseline",
+      "scopeClassification": "Existing 50-page Perl baseline; see baseline conformance/root-cause fields."
+    },
+    {
+      "backendAttribution": "external Perl confirmed for direct run; native suite endpoint evidence confirms the same external listener",
+      "expectedBehavior": null,
+      "expectedBehaviorAssessment": "All visible assertions pass in the direct Perl run; this is evidence for this page, not broad conformance.",
+      "inIndividual50": false,
+      "inNativeSuite": true,
+      "individualCurrentRun": null,
+      "individualResult": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 6,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "nativeSelectionEvidence": "Test property: empty/self-closing",
+      "nativeSuiteResult": {
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 6,
+          "wrong": 0
+        },
+        "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestExceptionCount"
+      },
+      "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestExceptionCount",
+      "recommendedClassification": "new native-suite page; see applicability categories in audit",
+      "rootCause": null,
+      "scopeCategory": "Candidate direct Perl interoperability",
+      "scopeClassification": "Direct Perl candidate: no wrong assertions or unexpected exceptions; still requires explicit applicability review."
+    },
+    {
+      "backendAttribution": "external Perl confirmed for direct run; native suite endpoint evidence confirms the same external listener",
+      "expectedBehavior": "The outer page verifies nested method, constructor, table-hook, and stop-test exceptions and their rendered output.",
+      "expectedBehaviorAssessment": "Observed page result matches the committed conformant baseline.",
+      "inIndividual50": true,
+      "inNativeSuite": true,
+      "individualCurrentRun": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 19,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "individualResult": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 19,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "nativeSelectionEvidence": "Test property: true",
+      "nativeSuiteResult": {
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 19,
+          "wrong": 0
+        },
+        "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestExceptionIsDisplayed"
+      },
+      "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestExceptionIsDisplayed",
+      "recommendedClassification": "existing 50-page Perl baseline: conformant",
+      "rootCause": "The Perl exception fixtures and TestSlim methods now reproduce the expected upstream exception messages, classes, and stop behavior; all 19 outer checks pass.",
+      "scopeCategory": "Current 50-page baseline",
+      "scopeClassification": "Existing 50-page Perl baseline; see baseline conformance/root-cause fields."
+    },
+    {
+      "backendAttribution": "external Perl confirmed for direct run; native suite endpoint evidence confirms the same external listener",
+      "expectedBehavior": null,
+      "expectedBehaviorAssessment": "All visible assertions pass in the direct Perl run; this is evidence for this page, not broad conformance.",
+      "inIndividual50": false,
+      "inNativeSuite": true,
+      "individualCurrentRun": null,
+      "individualResult": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 2,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "nativeSelectionEvidence": "legacy wiki Test header",
+      "nativeSuiteResult": {
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 2,
+          "wrong": 0
+        },
+        "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestExceptionIsDisplayed.DisableExceptionTesting"
+      },
+      "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestExceptionIsDisplayed.DisableExceptionTesting",
+      "recommendedClassification": "new native-suite page; see applicability categories in audit",
+      "rootCause": null,
+      "scopeCategory": "Candidate direct Perl interoperability",
+      "scopeClassification": "Direct Perl candidate: no wrong assertions or unexpected exceptions; still requires explicit applicability review."
+    },
+    {
+      "backendAttribution": "external Perl confirmed for direct run; native suite endpoint evidence confirms the same external listener",
+      "expectedBehavior": null,
+      "expectedBehaviorAssessment": "Perl run cannot assess the intended Java fixture/test-system behavior; missing Java-side class or runtime capability.",
+      "inIndividual50": false,
+      "inNativeSuite": true,
+      "individualCurrentRun": null,
+      "individualResult": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 3,
+          "wrong": 14
+        },
+        "status": "nonconformant"
+      },
+      "nativeSelectionEvidence": "legacy wiki Test header",
+      "nativeSuiteResult": {
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 3,
+          "wrong": 14
+        },
+        "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestExceptionIsDisplayed.ParameterConversionExceptions"
+      },
+      "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestExceptionIsDisplayed.ParameterConversionExceptions",
+      "recommendedClassification": "new native-suite page; see applicability categories in audit",
+      "rootCause": null,
+      "scopeCategory": "Java fixture or test-system behavior",
+      "scopeClassification": "Java converter and static Java method fixtures; expected Java reflection/error text"
+    },
+    {
+      "backendAttribution": "external Perl confirmed for direct run; native suite endpoint evidence confirms the same external listener",
+      "expectedBehavior": null,
+      "expectedBehaviorAssessment": "Perl run cannot assess the intended Java fixture/test-system behavior; missing Java-side class or runtime capability.",
+      "inIndividual50": false,
+      "inNativeSuite": true,
+      "individualCurrentRun": null,
+      "individualResult": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 126,
+          "ignored": 0,
+          "right": 0,
+          "wrong": 0
+        },
+        "status": "nonconformant"
+      },
+      "nativeSelectionEvidence": "legacy wiki Test header",
+      "nativeSuiteResult": {
+        "counts": {
+          "exceptions": 126,
+          "ignored": 0,
+          "right": 0,
+          "wrong": 0
+        },
+        "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestExceptionIsDisplayed.SlimExceptionResult"
+      },
+      "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestExceptionIsDisplayed.SlimExceptionResult",
+      "recommendedClassification": "new native-suite page; see applicability categories in audit",
+      "rootCause": null,
+      "scopeCategory": "Java fixture or test-system behavior",
+      "scopeClassification": "FitNesse Java SlimExceptionResult helper; nested exception behavior is the subject of the page"
+    },
+    {
+      "backendAttribution": "external Perl confirmed for direct run; native suite endpoint evidence confirms the same external listener",
+      "expectedBehavior": null,
+      "expectedBehaviorAssessment": "All visible assertions pass in the direct Perl run; this is evidence for this page, not broad conformance.",
+      "inIndividual50": false,
+      "inNativeSuite": true,
+      "individualCurrentRun": null,
+      "individualResult": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 5,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "nativeSelectionEvidence": "Test property: empty/self-closing",
+      "nativeSuiteResult": {
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 5,
+          "wrong": 0
+        },
+        "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestHtmlContent"
+      },
+      "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestHtmlContent",
+      "recommendedClassification": "new native-suite page; see applicability categories in audit",
+      "rootCause": null,
+      "scopeCategory": "Candidate direct Perl interoperability",
+      "scopeClassification": "Direct Perl candidate: no wrong assertions or unexpected exceptions; still requires explicit applicability review."
+    },
+    {
+      "backendAttribution": "external Perl confirmed for direct run; native suite endpoint evidence confirms the same external listener",
+      "expectedBehavior": null,
+      "expectedBehaviorAssessment": "The exception is the intentional SLiM ignore control marker; visible assertions pass.",
+      "inIndividual50": false,
+      "inNativeSuite": true,
+      "individualCurrentRun": null,
+      "individualResult": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 1,
+          "ignored": 0,
+          "right": 4,
+          "wrong": 0
+        },
+        "status": "nonconformant"
+      },
+      "nativeSelectionEvidence": "cross-reference/support page (no local Test marker observed)",
+      "nativeSuiteResult": {
+        "counts": {
+          "exceptions": 1,
+          "ignored": 0,
+          "right": 4,
+          "wrong": 0
+        },
+        "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestIgnoreAll"
+      },
+      "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestIgnoreAll",
+      "recommendedClassification": "new native-suite page; see applicability categories in audit",
+      "rootCause": null,
+      "scopeCategory": "Applicable: intentional ignore marker",
+      "scopeClassification": "Expected SlimIgnoreAll control marker; exception is intentional"
+    },
+    {
+      "backendAttribution": "external Perl confirmed for direct run; native suite endpoint evidence confirms the same external listener",
+      "expectedBehavior": null,
+      "expectedBehaviorAssessment": "The exception is the intentional SLiM ignore control marker; visible assertions pass.",
+      "inIndividual50": false,
+      "inNativeSuite": true,
+      "individualCurrentRun": null,
+      "individualResult": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 1,
+          "ignored": 0,
+          "right": 4,
+          "wrong": 0
+        },
+        "status": "nonconformant"
+      },
+      "nativeSelectionEvidence": "cross-reference/support page (no local Test marker observed)",
+      "nativeSuiteResult": {
+        "counts": {
+          "exceptions": 1,
+          "ignored": 0,
+          "right": 4,
+          "wrong": 0
+        },
+        "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestIgnoreInScriptTable"
+      },
+      "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestIgnoreInScriptTable",
+      "recommendedClassification": "new native-suite page; see applicability categories in audit",
+      "rootCause": null,
+      "scopeCategory": "Applicable: intentional ignore marker",
+      "scopeClassification": "Expected SlimIgnoreScript control marker; exception is intentional"
+    },
+    {
+      "backendAttribution": "external Perl confirmed for direct run; native suite endpoint evidence confirms the same external listener",
+      "expectedBehavior": "Query data matches the unchanged upstream acceptance expectations, including row ordering, duplicate multiplicity, subset matching, and constructor-derived symbol values.",
+      "expectedBehaviorAssessment": "Observed page result matches the committed conformant baseline.",
+      "inIndividual50": true,
+      "inNativeSuite": true,
+      "individualCurrentRun": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 14,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "individualResult": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 14,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "nativeSelectionEvidence": "Test property: true",
+      "nativeSuiteResult": {
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 14,
+          "wrong": 0
+        },
+        "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestOrderedQueryWithDuplicateRows"
+      },
+      "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestOrderedQueryWithDuplicateRows",
+      "recommendedClassification": "existing 50-page Perl baseline: conformant",
+      "rootCause": "The upstream query fixture now returns its expected column/value rows; both query matching and duplicate-row checks pass through the external Perl SLiM server.",
+      "scopeCategory": "Current 50-page baseline",
+      "scopeClassification": "Existing 50-page Perl baseline; see baseline conformance/root-cause fields."
+    },
+    {
+      "backendAttribution": "external Perl confirmed for direct run; native suite endpoint evidence confirms the same external listener",
+      "expectedBehavior": "See the page content and its listed fixture dependencies; raw nonzero counts alone do not establish an engine defect.",
+      "expectedBehaviorAssessment": "Observed page result matches the committed conformant baseline.",
+      "inIndividual50": true,
+      "inNativeSuite": true,
+      "individualCurrentRun": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 1,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "individualResult": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 1,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "nativeSelectionEvidence": "Test property: true",
+      "nativeSuiteResult": {
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 1,
+          "wrong": 0
+        },
+        "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestPageWithInclude"
+      },
+      "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestPageWithInclude",
+      "recommendedClassification": "existing 50-page Perl baseline: conformant",
+      "rootCause": "EchoFixture stores and returns the name set by the included page.",
+      "scopeCategory": "Current 50-page baseline",
+      "scopeClassification": "Existing 50-page Perl baseline; see baseline conformance/root-cause fields."
+    },
+    {
+      "backendAttribution": "external Perl confirmed for direct run; native suite endpoint evidence confirms the same external listener",
+      "expectedBehavior": "The page completed without wrong assertions or exceptions.",
+      "expectedBehaviorAssessment": "Observed page result matches the committed conformant baseline.",
+      "inIndividual50": true,
+      "inNativeSuite": true,
+      "individualCurrentRun": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 2,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "individualResult": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 2,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "nativeSelectionEvidence": "Test property: true",
+      "nativeSuiteResult": {
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 2,
+          "wrong": 0
+        },
+        "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestScriptTable"
+      },
+      "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestScriptTable",
+      "recommendedClassification": "existing 50-page Perl baseline: conformant",
+      "rootCause": "The acceptance page completed with no wrong assertions or exceptions through the external Perl SLiM server.",
+      "scopeCategory": "Current 50-page baseline",
+      "scopeClassification": "Existing 50-page Perl baseline; see baseline conformance/root-cause fields."
+    },
+    {
+      "backendAttribution": "external Perl confirmed for direct run; native suite endpoint evidence confirms the same external listener",
+      "expectedBehavior": "The page completed without wrong assertions or exceptions.",
+      "expectedBehaviorAssessment": "Observed page result matches the committed conformant baseline.",
+      "inIndividual50": true,
+      "inNativeSuite": true,
+      "individualCurrentRun": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 3,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "individualResult": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 3,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "nativeSelectionEvidence": "Test property: true",
+      "nativeSuiteResult": {
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 3,
+          "wrong": 0
+        },
+        "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestScriptTableDisplayParameterValue"
+      },
+      "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestScriptTableDisplayParameterValue",
+      "recommendedClassification": "existing 50-page Perl baseline: conformant",
+      "rootCause": "The acceptance page completed with no wrong assertions or exceptions through the external Perl SLiM server.",
+      "scopeCategory": "Current 50-page baseline",
+      "scopeClassification": "Existing 50-page Perl baseline; see baseline conformance/root-cause fields."
+    },
+    {
+      "backendAttribution": "external Perl confirmed for direct run; native suite endpoint evidence confirms the same external listener",
+      "expectedBehavior": "See the page content and its listed fixture dependencies; raw nonzero counts alone do not establish an engine defect.",
+      "expectedBehaviorAssessment": "Observed page result matches the committed conformant baseline.",
+      "inIndividual50": true,
+      "inNativeSuite": true,
+      "individualCurrentRun": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 8,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "individualResult": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 8,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "nativeSelectionEvidence": "Test property: true",
+      "nativeSuiteResult": {
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 8,
+          "wrong": 0
+        },
+        "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestSequentialArgumentProcessing"
+      },
+      "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestSequentialArgumentProcessing",
+      "recommendedClassification": "existing 50-page Perl baseline: conformant",
+      "rootCause": "TestSlim concatenates its three supplied values with spaces; the upstream page verifies sequential and mixed argument processing.",
+      "scopeCategory": "Current 50-page baseline",
+      "scopeClassification": "Existing 50-page Perl baseline; see baseline conformance/root-cause fields."
+    },
+    {
+      "backendAttribution": "external Perl confirmed for direct run; native suite endpoint evidence confirms the same external listener",
+      "expectedBehavior": "Query data matches the unchanged upstream acceptance expectations, including row ordering, duplicate multiplicity, subset matching, and constructor-derived symbol values.",
+      "expectedBehaviorAssessment": "Observed page result matches the committed conformant baseline.",
+      "inIndividual50": true,
+      "inNativeSuite": true,
+      "individualCurrentRun": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 11,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "individualResult": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 11,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "nativeSelectionEvidence": "Test property: true",
+      "nativeSuiteResult": {
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 11,
+          "wrong": 0
+        },
+        "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestSubsetQuery"
+      },
+      "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestSubsetQuery",
+      "recommendedClassification": "existing 50-page Perl baseline: conformant",
+      "rootCause": "The upstream query fixture now returns its expected column/value rows; both query matching and duplicate-row checks pass through the external Perl SLiM server.",
+      "scopeCategory": "Current 50-page baseline",
+      "scopeClassification": "Existing 50-page Perl baseline; see baseline conformance/root-cause fields."
+    },
+    {
+      "backendAttribution": "external Perl confirmed for direct run; native suite endpoint evidence confirms the same external listener",
+      "expectedBehavior": null,
+      "expectedBehaviorAssessment": "Expected server startup/port preconditions were not established; result is not a valid test of that condition.",
+      "inIndividual50": false,
+      "inNativeSuite": true,
+      "individualCurrentRun": null,
+      "individualResult": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 2,
+          "wrong": 2
+        },
+        "status": "nonconformant"
+      },
+      "nativeSelectionEvidence": "Test property: empty/self-closing",
+      "nativeSuiteResult": {
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 2,
+          "wrong": 2
+        },
+        "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestSystemSlimSuite.ErrorSituationsDuringSlimServerStartup.A_TimeoutAsSlimHeaderNotReceived"
+      },
+      "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestSystemSlimSuite.ErrorSituationsDuringSlimServerStartup.A_TimeoutAsSlimHeaderNotReceived",
+      "recommendedClassification": "new native-suite page; see applicability categories in audit",
+      "rootCause": null,
+      "scopeCategory": "Controlled harness configuration needed",
+      "scopeClassification": "Startup precondition is not isolated while a shared external Perl listener is running"
+    },
+    {
+      "backendAttribution": "external Perl confirmed for direct run; native suite endpoint evidence confirms the same external listener",
+      "expectedBehavior": "See the page content and its listed fixture dependencies; raw nonzero counts alone do not establish an engine defect.",
+      "expectedBehaviorAssessment": "Observed page result matches its documented non-conformant baseline; it is not treated as a regression.",
+      "inIndividual50": true,
+      "inNativeSuite": true,
+      "individualCurrentRun": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 2,
+          "wrong": 1
+        },
+        "status": "nonconformant"
+      },
+      "individualResult": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 2,
+          "wrong": 1
+        },
+        "status": "harness_limited"
+      },
+      "nativeSelectionEvidence": "Test property: true",
+      "nativeSuiteResult": {
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 2,
+          "wrong": 1
+        },
+        "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestSystemSlimSuite.ErrorSituationsDuringSlimServerStartup.B_TimeoutAsSlimServerDiesBeforeConnecting"
+      },
+      "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestSystemSlimSuite.ErrorSituationsDuringSlimServerStartup.B_TimeoutAsSlimServerDiesBeforeConnecting",
+      "recommendedClassification": "existing 50-page Perl baseline: harness_limited",
+      "rootCause": "PageDriver retrieves a 200 response, but the body does not contain the expected dead-test-runner message; the child test runner setup behavior remains unverified.",
+      "scopeCategory": "Current 50-page baseline",
+      "scopeClassification": "Existing 50-page Perl baseline; see baseline conformance/root-cause fields."
+    },
+    {
+      "backendAttribution": "external Perl confirmed for direct run; native suite endpoint evidence confirms the same external listener",
+      "expectedBehavior": "Nested debug request fails quickly only when its target port is unbound and reports elapsed time.",
+      "expectedBehaviorAssessment": "Observed page result matches its documented non-conformant baseline; it is not treated as a regression.",
+      "inIndividual50": true,
+      "inNativeSuite": true,
+      "individualCurrentRun": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 3,
+          "wrong": 1
+        },
+        "status": "nonconformant"
+      },
+      "individualResult": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 3,
+          "wrong": 1
+        },
+        "status": "environment_limited"
+      },
+      "nativeSelectionEvidence": "Test property: true",
+      "nativeSuiteResult": {
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 3,
+          "wrong": 1
+        },
+        "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestSystemSlimSuite.ErrorSituationsDuringSlimServerStartup.C_TimeoutAsNoServerAtGivenSocket"
+      },
+      "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestSystemSlimSuite.ErrorSituationsDuringSlimServerStartup.C_TimeoutAsNoServerAtGivenSocket",
+      "recommendedClassification": "existing 50-page Perl baseline: environment_limited",
+      "rootCause": "The test expects port 8099 unbound, but the inventory server occupies it; content_matches and PageDriver support are also missing.",
+      "scopeCategory": "Current 50-page baseline",
+      "scopeClassification": "Existing 50-page Perl baseline; see baseline conformance/root-cause fields."
+    },
+    {
+      "backendAttribution": "not run",
+      "expectedBehavior": "The documentation says slim.timeout alone does not interrupt the long command.",
+      "expectedBehaviorAssessment": "Observed page result matches the committed conformant baseline.",
+      "inIndividual50": true,
+      "inNativeSuite": false,
+      "individualCurrentRun": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 1,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "individualResult": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 1,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "nativeSelectionEvidence": null,
+      "nativeSuiteResult": null,
+      "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestSystemSlimSuite.HowtoEnforceA_TimelimitPerTestCommand.NotWorking_SettingSlimTimeout",
+      "recommendedClassification": "existing 50-page Perl baseline: conformant",
+      "rootCause": "Sleep returned WakeUp 12000 as shown by the page documenting that slim.timeout alone does not stop the command.",
+      "scopeCategory": "Current 50-page baseline",
+      "scopeClassification": "Existing 50-page Perl baseline; see baseline conformance/root-cause fields."
+    },
+    {
+      "backendAttribution": "not run",
+      "expectedBehavior": "Short commands pass; an overlong command times out; the page documents teardown and later-command caveats.",
+      "expectedBehaviorAssessment": "Observed page result matches the committed conformant baseline.",
+      "inIndividual50": true,
+      "inNativeSuite": false,
+      "individualCurrentRun": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 9,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "individualResult": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 9,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "nativeSelectionEvidence": null,
+      "nativeSuiteResult": null,
+      "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestSystemSlimSuite.HowtoEnforceA_TimelimitPerTestCommand.PartiallyWorking_SettingSlimFlags",
+      "recommendedClassification": "existing 50-page Perl baseline: conformant",
+      "rootCause": "Sleep responses match all expected table values. Runner startup flags are not independently assessed by this directly connected external-service test.",
+      "scopeCategory": "Current 50-page baseline",
+      "scopeClassification": "Existing 50-page Perl baseline; see baseline conformance/root-cause fields."
+    },
+    {
+      "backendAttribution": "external Perl confirmed for direct run; native suite endpoint evidence confirms the same external listener",
+      "expectedBehavior": null,
+      "expectedBehaviorAssessment": "Perl run cannot assess the intended Java fixture/test-system behavior; missing Java-side class or runtime capability.",
+      "inIndividual50": false,
+      "inNativeSuite": true,
+      "individualCurrentRun": null,
+      "individualResult": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 7,
+          "ignored": 0,
+          "right": 0,
+          "wrong": 0
+        },
+        "status": "nonconformant"
+      },
+      "nativeSelectionEvidence": "legacy wiki Test header",
+      "nativeSuiteResult": {
+        "counts": {
+          "exceptions": 7,
+          "ignored": 0,
+          "right": 0,
+          "wrong": 0
+        },
+        "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestSystemSlimSuite.JavaSlimServer.CallStaticJavaMethod"
+      },
+      "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestSystemSlimSuite.JavaSlimServer.CallStaticJavaMethod",
+      "recommendedClassification": "new native-suite page; see applicability categories in audit",
+      "rootCause": null,
+      "scopeCategory": "Java fixture or test-system behavior",
+      "scopeClassification": "Java static-method reflection/test-system feature"
+    },
+    {
+      "backendAttribution": "external Perl confirmed for direct run; native suite endpoint evidence confirms the same external listener",
+      "expectedBehavior": null,
+      "expectedBehaviorAssessment": "Expected server startup/port preconditions were not established; result is not a valid test of that condition.",
+      "inIndividual50": false,
+      "inNativeSuite": true,
+      "individualCurrentRun": null,
+      "individualResult": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 2,
+          "wrong": 2
+        },
+        "status": "nonconformant"
+      },
+      "nativeSelectionEvidence": "legacy wiki Test header",
+      "nativeSuiteResult": {
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 2,
+          "wrong": 2
+        },
+        "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestSystemSlimSuite.ManualStartofSlimService"
+      },
+      "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestSystemSlimSuite.ManualStartofSlimService",
+      "recommendedClassification": "new native-suite page; see applicability categories in audit",
+      "rootCause": null,
+      "scopeCategory": "Controlled harness configuration needed",
+      "scopeClassification": "Page expects a particular configured port; isolated runner uses a different service port"
+    },
+    {
+      "backendAttribution": "external Perl confirmed for direct run; native suite endpoint evidence confirms the same external listener",
+      "expectedBehavior": null,
+      "expectedBehaviorAssessment": "All visible assertions pass in the direct Perl run; this is evidence for this page, not broad conformance.",
+      "inIndividual50": false,
+      "inNativeSuite": true,
+      "individualCurrentRun": null,
+      "individualResult": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 2,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "nativeSelectionEvidence": "legacy wiki Test header",
+      "nativeSuiteResult": {
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 2,
+          "wrong": 0
+        },
+        "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestSystemSlimSuite.TextBeforeSlimHeaderIsIgnored"
+      },
+      "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestSystemSlimSuite.TextBeforeSlimHeaderIsIgnored",
+      "recommendedClassification": "new native-suite page; see applicability categories in audit",
+      "rootCause": null,
+      "scopeCategory": "Candidate direct Perl interoperability",
+      "scopeClassification": "Direct Perl candidate: no wrong assertions or unexpected exceptions; still requires explicit applicability review."
+    },
+    {
+      "backendAttribution": "external Perl confirmed for direct run; native suite endpoint evidence confirms the same external listener",
+      "expectedBehavior": "The page completed without wrong assertions or exceptions.",
+      "expectedBehaviorAssessment": "Observed page result matches the committed conformant baseline.",
+      "inIndividual50": true,
+      "inNativeSuite": true,
+      "individualCurrentRun": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 4,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "individualResult": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 4,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "nativeSelectionEvidence": "Test property: true",
+      "nativeSuiteResult": {
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 4,
+          "wrong": 0
+        },
+        "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestSystemSlimSuite.TimeoutInSlimTestSystem"
+      },
+      "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestSystemSlimSuite.TimeoutInSlimTestSystem",
+      "recommendedClassification": "existing 50-page Perl baseline: conformant",
+      "rootCause": "The acceptance page completed with no wrong assertions or exceptions through the external Perl SLiM server.",
+      "scopeCategory": "Current 50-page baseline",
+      "scopeClassification": "Existing 50-page Perl baseline; see baseline conformance/root-cause fields."
+    },
+    {
+      "backendAttribution": "external Perl confirmed for direct run; native suite endpoint evidence confirms the same external listener",
+      "expectedBehavior": "See the page content and its listed fixture dependencies; raw nonzero counts alone do not establish an engine defect.",
+      "expectedBehaviorAssessment": "Observed page result matches the committed conformant baseline.",
+      "inIndividual50": true,
+      "inNativeSuite": true,
+      "individualCurrentRun": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 1,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "individualResult": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 1,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "nativeSelectionEvidence": "Test property: true",
+      "nativeSuiteResult": {
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 1,
+          "wrong": 0
+        },
+        "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestTryingParameterizationIsntTooGreedy"
+      },
+      "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestTryingParameterizationIsntTooGreedy",
+      "recommendedClassification": "existing 50-page Perl baseline: conformant",
+      "rootCause": "LoginDialogDriver accepts the shared username/password scenario and records the upstream message and attempt count.",
+      "scopeCategory": "Current 50-page baseline",
+      "scopeClassification": "Existing 50-page Perl baseline; see baseline conformance/root-cause fields."
+    },
+    {
+      "backendAttribution": "external Perl confirmed for direct run; native suite endpoint evidence confirms the same external listener",
+      "expectedBehavior": "The page completed without wrong assertions or exceptions.",
+      "expectedBehaviorAssessment": "Observed page result matches the committed conformant baseline.",
+      "inIndividual50": true,
+      "inNativeSuite": true,
+      "individualCurrentRun": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 1,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "individualResult": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 1,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "nativeSelectionEvidence": "Test property: true",
+      "nativeSuiteResult": {
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 1,
+          "wrong": 0
+        },
+        "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestTwoIdenticalTablesOnPageDontConflict"
+      },
+      "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestTwoIdenticalTablesOnPageDontConflict",
+      "recommendedClassification": "existing 50-page Perl baseline: conformant",
+      "rootCause": "The acceptance page completed with no wrong assertions or exceptions through the external Perl SLiM server.",
+      "scopeCategory": "Current 50-page baseline",
+      "scopeClassification": "Existing 50-page Perl baseline; see baseline conformance/root-cause fields."
+    },
+    {
+      "backendAttribution": "external Perl confirmed for direct run; native suite endpoint evidence confirms the same external listener",
+      "expectedBehavior": null,
+      "expectedBehaviorAssessment": "All visible assertions pass in the direct Perl run; this is evidence for this page, not broad conformance.",
+      "inIndividual50": false,
+      "inNativeSuite": true,
+      "individualCurrentRun": null,
+      "individualResult": {
+        "backend": "external Perl confirmed",
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 22,
+          "wrong": 0
+        },
+        "status": "conformant"
+      },
+      "nativeSelectionEvidence": "Test property: empty/self-closing",
+      "nativeSuiteResult": {
+        "counts": {
+          "exceptions": 0,
+          "ignored": 0,
+          "right": 22,
+          "wrong": 0
+        },
+        "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.VariablesUsedInSubSubpage"
+      },
+      "page": "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.VariablesUsedInSubSubpage",
+      "recommendedClassification": "new native-suite page; see applicability categories in audit",
+      "rootCause": null,
+      "scopeCategory": "Candidate direct Perl interoperability",
+      "scopeClassification": "Direct Perl candidate: no wrong assertions or unexpected exceptions; still requires explicit applicability review."
+    }
+  ],
+  "reconciliation": {
+    "exploratoryStateNote": "Two earlier exploratory runs had the same page order but did not explicitly remove generated MySuite before startup. Four page results differed from the clean state and are excluded from the reproducibility comparison.",
+    "individualOnlyCount": 2,
+    "individualOnlyPages": [
+      "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestSystemSlimSuite.HowtoEnforceA_TimelimitPerTestCommand.NotWorking_SettingSlimTimeout",
+      "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestSystemSlimSuite.HowtoEnforceA_TimelimitPerTestCommand.PartiallyWorking_SettingSlimFlags"
+    ],
+    "individualOnlyReason": "Both pages are Test=true but their parent Suite has <Prune/>.",
+    "individualPageCount": 50,
+    "intersectionCount": 48,
+    "nativeOnlyCount": 45,
+    "nativeOnlyReasonCounts": {
+      "Test property: empty": 32,
+      "cross-reference": 3,
+      "legacy wiki": 10
+    },
+    "nativeSelectedAndExecutedCount": 93,
+    "prunedTestPages": [
+      "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.BaseLineDecisionTable.TestFailuresAreMarked.TestPage",
+      "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.IgnoredTestsShouldColorGray.TestPage",
+      "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.ScenarioLibraryTestSuite.ScenarioLibraryShouldIncludeVariables",
+      "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TableTableSuite.SymbolAssignmentAndReferenceOfTheSameInOneTable",
+      "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestDetailedDiff.TestPage",
+      "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestSystemSlimSuite.HowtoEnforceA_TimelimitPerTestCommand.NotWorking_SettingSlimTimeout",
+      "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestSystemSlimSuite.HowtoEnforceA_TimelimitPerTestCommand.PartiallyWorking_SettingSlimFlags"
+    ],
+    "unionCount": 95
+  },
+  "runnerGateAfterAudit": {
+    "assertionCounts": {
+      "exceptions": 0,
+      "ignored": 2,
+      "right": 373,
+      "wrong": 7
+    },
+    "conformantPages": 45,
+    "exitStatus": 0,
+    "explicitTestTrueWikiPages": 50,
+    "externalPerlConfirmed": 50,
+    "failed": false,
+    "pagesExecuted": 50,
+    "regressions": 0,
+    "serverCrashes": 0
+  },
+  "title": "FitNesse v20251025 native SuiteSlimTests audit"
+}

@@ -137,6 +137,8 @@ sub read_verdict {
         } elsif ($code eq 'p') {           # progress
             next;
         } else {
+            # SMFIR_REPLYCODE: the reply a reject carries.
+            push @$mods, { op => 'reply', value => $data =~ s/\0\z//r } if $code eq 'y';
             return $code;
         }
     }
@@ -231,6 +233,7 @@ sub verify {
 }
 
 sub inserted { my ($mods, $name) = @_; grep { $_->{op} eq 'insert' && lc($_->{name}) eq lc($name) } @$mods }
+sub reply_of { my ($mods) = @_; my ($r) = grep { $_->{op} eq 'reply' } @$mods; $r ? $r->{value} : '' }
 
 # --- Fixtures ---
 
@@ -248,6 +251,11 @@ my $PLAIN = join($EOL,
     '',
     "Here's a test user!",
     '');
+
+# The same post from an author at the list's own domain: a message the
+# outbound milter signs as i=1 must have a From in its domain (-07 section
+# 11), and an unsigned post keeps its From in the m=1 stamped on arrival.
+my $LOCAL = $PLAIN =~ s/<author\@test1\.dkim2\.com>/<author\@test2.dkim2.com>/r;
 
 sub originator_signed {
     my $plain = shift // $PLAIN;
@@ -281,7 +289,7 @@ sub list_modified {
 {
     my ($verdict, $mods) = run_milter(
         from => 'list-bounces@test2.dkim2.com', rcpt => ['subscriber@example.org'],
-        message => $PLAIN);
+        message => $LOCAL);
     is($verdict, 'c', 'plain: milter continues');
     my @sig = inserted($mods, 'DKIM2-Signature');
     is(scalar @sig, 1, 'plain: one DKIM2-Signature inserted');
@@ -297,8 +305,23 @@ sub list_modified {
     like($_, qr/;\z/, 'plain: the last tag is followed by ";"') for @info;
     like("@info", qr/action=mi-m=1; hc=\d+; hn=\S+;/, 'plain: action=mi-m=1 with hc= and hn=');
     like("@info", qr/action=sign d=test2\.dkim2\.com a=rsa-sha256;/, 'plain: action=sign names d= and a=');
-    my $v = verify(assemble($PLAIN, $mods));
+    my $v = verify(assemble($LOCAL, $mods));
     is($v->result, 'pass', 'plain: signed output verifies') or diag($v->result_detail);
+}
+
+# --- 1a. No upstream chain, From in another domain: not ours to originate ---
+# (-07 section 11): the message goes on unsigned, with no instance of ours.
+{
+    my ($verdict, $mods) = run_milter(
+        from => 'list-bounces@test2.dkim2.com', rcpt => ['subscriber@example.org'],
+        message => $PLAIN);
+    is($verdict, 'c', 'foreign From: milter continues');
+    is(scalar(inserted($mods, 'DKIM2-Signature')), 0, 'foreign From: not signed');
+    is(scalar(inserted($mods, 'Message-Instance')), 0, 'foreign From: no Message-Instance');
+    like(milter_log(), qr/From header field is not Authentic for d=test2\.dkim2\.com/,
+        'foreign From: the refusal is logged');
+    like(milter_log(), qr/From domain test1\.dkim2\.com is not d=test2\.dkim2\.com or below it/,
+        'foreign From: the log names the From domain and d= (final review I3)');
 }
 
 # --- 2. THE BUG: signed upstream + list's unsigned m=2 -> must sign i=2 ---
@@ -335,6 +358,59 @@ sub list_modified {
     like($v->result_detail, qr/i=1\.\.2/, 'list: both signatures verified');
 }
 
+# --- 2b. The list changed From (-07 section 11) ---
+# To its own domain: signed, and it verifies. To one it cannot sign for: the
+# Signer refuses, and with the sender's i=1 on it the copy is rejected.
+{
+    my $signed = originator_signed();
+    for my $case (['list@test2.dkim2.com', 1], ['x@elsewhere.example', 0]) {
+        my ($from, $ok) = @$case;
+        (my $mod = $signed) =~ s/^From: [^\r\n]*/From: $from/m;
+        my $mi = Mail::DKIM2::MessageInstance->calculate(Email::MIME->new($mod), Email::MIME->new($signed));
+        my $list = "Message-Instance: " . $mi->as_string . $EOL . $mod;
+        my ($verdict, $mods) = run_milter(
+            from => 'list-bounces@test2.dkim2.com', rcpt => ['subscriber@example.org'], message => $list);
+        if ($ok) {
+            is(scalar(inserted($mods, 'DKIM2-Signature')), 1, 'From to the list domain: signed');
+            is(verify(assemble($list, $mods))->result, 'pass', 'From to the list domain: verifies');
+        } else {
+            is($verdict, 'y', 'From elsewhere: rejected');
+            like(reply_of($mods), qr/^550 5\.7\.1 not signing: From header field is not Authentic for d=test2\.dkim2\.com/,
+                'From elsewhere: 550 5.7.1 with the Signer\'s reason');
+        }
+    }
+}
+
+# --- 2a. The exploded flag (-07 section 12.5) ---
+#
+# The list manager marks each distribution copy X-DKIM2-Exploded: yes; the
+# milter signs it with f=exploded and removes the hint. A copy with two
+# recipients gets the flag without asking.
+{
+    my $list = list_modified(originator_signed());
+    my $f = sub { my ($sig) = inserted($_[0], 'DKIM2-Signature');
+                  $sig && $sig->{value} =~ /\bf=([^;]*)/ ? $1 =~ s/\s+//gr : '' };
+    my ($verdict, $mods) = run_milter(
+        from => 'list-bounces@test2.dkim2.com', rcpt => ['subscriber@example.org'],
+        message => "X-DKIM2-Exploded: yes$EOL$list");
+    is($f->($mods), 'exploded', 'exploded hint: f=exploded');
+    my @gone = grep { $_->{op} eq 'change' && $_->{name} eq 'X-DKIM2-Exploded' } @$mods;
+    is(scalar @gone, 1, 'exploded hint: the hint is deleted');
+    is($gone[0]{value} // 'x', '', 'exploded hint: ... with an empty value');
+    my $out = apply_mods("X-DKIM2-Exploded: yes$EOL$list", $mods);
+    unlike($out, qr/^X-DKIM2-Exploded/mi, 'exploded hint: it does not leave');
+    is(verify($out)->result, 'pass', 'exploded hint: the copy verifies');
+
+    ($verdict, $mods) = run_milter(
+        from => 'list-bounces@test2.dkim2.com', rcpt => ['a@example.org', 'b@example.org'],
+        message => $list);
+    is($f->($mods), 'exploded', 'two recipients: f=exploded');
+    ($verdict, $mods) = run_milter(
+        from => 'list-bounces@test2.dkim2.com', rcpt => ['a@example.org'],
+        message => $list);
+    is($f->($mods), '', 'one recipient, no hint: no f=');
+}
+
 # --- 3. The opt-out must not loosen the chain gate: broken upstream -> refuse ---
 {
     my $signed = originator_signed();
@@ -346,7 +422,10 @@ sub list_modified {
     my ($verdict, $mods) = run_milter(
         from => 'list-bounces@test2.dkim2.com', rcpt => ['subscriber@example.org'],
         message => $list);
-    is($verdict, 'c', 'broken: milter continues (delivers unsigned rather than blocking)');
+    # -07 section 13: a message with DKIM2 header fields that is not Validly
+    # Signed is not sent on: 550 5.7.1, the reason in the reply.
+    is($verdict, 'y', 'broken: rejected');
+    like(reply_of($mods), qr/^550 5\.7\.1 not signing: upstream DKIM2 chain result=fail/, 'broken: 550 5.7.1 with the reason');
     is(scalar(inserted($mods, 'DKIM2-Signature')), 0,
         'broken: refuses to extend a chain whose i=1 does not verify');
     like(milter_log(), qr/not signing <post\@test1\.dkim2\.com>: upstream DKIM2 chain result=fail/,
@@ -363,7 +442,7 @@ SKIP: {
     chmod 0000, "$dir/keys/unreadable.test2.dkim2.com";
     my ($verdict, $mods) = run_milter(
         from => 'list-bounces@unreadable.test2.dkim2.com', rcpt => ['subscriber@example.org'],
-        message => $PLAIN);
+        message => $LOCAL);
     is($verdict, 'c', 'unreadable: milter answers');
     my @sig = inserted($mods, 'DKIM2-Signature');
     is(scalar @sig, 1, 'unreadable: signed with the parent domain key');
@@ -403,10 +482,10 @@ sub info_values {
     my ($verdict, $mods) = run_milter(
         from => 'list-bounces@test2.dkim2.com', rcpt => ['subscriber@example.org'],
         message => null_list_post());
-    is($verdict, 'c', 'null body: milter continues');
+    is($verdict, 'y', 'null body: rejected (the upstream chain is signed)');
     is(scalar(inserted($mods, 'DKIM2-Signature')), 0, 'option off: null body Recipe not signed');
-    like(join("\n", info_values($mods)), qr/not-signed=null-body-recipe/,
-        'option off: X-DKIM2-Info records not-signed=null-body-recipe');
+    like(reply_of($mods), qr/^550 5\.7\.1 not signing: unsigned top Message-Instance m=2 has a null body Recipe/,
+        'option off: the reply says why');
     like(milter_log(), qr/not signing <post\@test1\.dkim2\.com>: unsigned top Message-Instance m=2 has a null body Recipe/,
         'option off: the log says the null top is unsigned');
 }
@@ -492,7 +571,7 @@ sub info_values {
 # --- 6. Malformed Content-Type: parsed quietly, same decision ---
 {
     for my $ct ('text/plain; charset=Windows-1252;', 'text/plain; Windows-1252') {
-        (my $m = $PLAIN) =~ s/^Content-Type: text\/plain(?=\r)/Content-Type: $ct/m;
+        (my $m = $LOCAL) =~ s/^Content-Type: text\/plain(?=\r)/Content-Type: $ct/m;
         my $before = length milter_log();
         my ($verdict, $mods) = run_milter(
             from => 'list-bounces@test2.dkim2.com', rcpt => ['subscriber@example.org'],
@@ -514,7 +593,7 @@ sub info_values {
         from => 'list-bounces@test2.dkim2.com', rcpt => ['subscriber@example.org'],
         message => $msg) };
     is($@, '', 'huge i=: the milter answers');
-    is($verdict, 'c', 'huge i=: milter continues');
+    is($verdict, 'y', 'huge i=: rejected');
     is(scalar(inserted($mods || [], 'DKIM2-Signature')), 0, 'huge i=: not signed');
     like(milter_log(), qr/not signing <post\@test1\.dkim2\.com>: .*exceeds the maximum chain number of 100/,
         'huge i=: refusal is logged with the reason');
@@ -539,7 +618,8 @@ sub info_values {
         from => 'list-bounces@test2.dkim2.com', rcpt => ['subscriber@example.org'],
         message => list_modified(originator_signed())) };
     is($@, '', 'gate fault: the milter answers');
-    is($verdict, 'c', 'gate fault: milter continues');
+    is($verdict, 'y', 'gate fault: rejected');
+    like(reply_of($mods || []), qr/^550 5\.7\.1 not signing: internal error/, 'gate fault: 550 5.7.1');
     is(scalar(inserted($mods || [], 'DKIM2-Signature')), 0, 'gate fault: not signed');
     like(milter_log(), qr/not signing <post\@test1\.dkim2\.com>: .*injected gate fault/,
         'gate fault: refusal is logged');
@@ -674,6 +754,14 @@ for my $c ([qw(--use-epilogue)], [qw(--epilogue-threshold 5)]) {
 }
 like(`$^X -I$LIB $SCRIPT --max-recipe-literals -1 2>&1`,
     qr/--max-recipe-literals must not be negative/, 'negative cap refused');
+# The epilogue options are disabled in this release (final review M5): the
+# milter refuses to start with either.
+for my $c ([qw(--use-epilogue)], [qw(--epilogue-threshold 5)]) {
+    my $err = `$^X -I$LIB $SCRIPT @$c 2>&1`;
+    isnt($? >> 8, 0, "@$c: the milter does not start");
+    like($err, qr/--use-epilogue and --epilogue-threshold are disabled in this release: they produce mail that fails verification/,
+        "@$c: refused, saying why");
+}
 
 # --- Outbound with no key for the sender: add nothing at all ---
 # A list host's single outbound listener carries every list; a list whose
@@ -761,13 +849,18 @@ sub stock_decorate {
 #    signs the unchanged message as i=1 over both.
 {
     my ($verdict, $mods) = run_milter(sock => $in_sock,
-        from => 'author@test1.dkim2.com', rcpt => ['list@test2.dkim2.com'], message => $PLAIN);
-    my $wire = apply_mods($PLAIN, $mods);
+        from => 'author@test1.dkim2.com', rcpt => ['list@test2.dkim2.com'], message => $LOCAL);
+    my $wire = apply_mods($LOCAL, $mods);
     is_deeply([mi_numbers($wire)], [1, 2], 'unsigned wrap: m=1 and m=2');
     my ($v2, $omods) = run_milter(
         from => 'list-bounces@test2.dkim2.com', rcpt => ['subscriber@example.org'], message => $wire);
-    my $rv = verify(assemble($wire, $omods));
+    my $out = apply_mods($wire, $omods);
+    is_deeply([mi_numbers($out)], [1], 'unsigned wrap: leaves with one Message-Instance, m=1 (-07 section 12.1)');
+    my $rv = verify($out);
     is($rv->result, 'pass', 'unsigned wrap: signed copy verifies') or diag($rv->result_detail);
+    my $back = Mail::DKIM2::MessageInstance->undo(Email::MIME->new($out));
+    my ($lbody) = $LOCAL =~ /\r\n\r\n(.*)\z/s;
+    is($back->body_raw, $lbody, 'unsigned wrap: m=1 undoes past the wrap to the body as posted');
 }
 
 # 3. Multipart is left alone: no body, no header change, only the arrival headers.
@@ -802,7 +895,7 @@ sub stock_decorate {
 # 5. A body over one milter packet (65535 bytes) is replaced in several
 #    chunks and reassembles exactly.
 {
-    my $big = $PLAIN;
+    my $big = $LOCAL;
     $big =~ s/Here's a test user!/join($EOL, map { "line $_ " . ('x' x 70) } 1 .. 2000)/e;
     my ($verdict, $mods) = run_milter(sock => $in_sock,
         from => 'author@test1.dkim2.com', rcpt => ['list@test2.dkim2.com'], message => $big);
@@ -812,7 +905,9 @@ sub stock_decorate {
     ok(index($wire, $orig_body) > 0, 'big body: original body carried whole');
     my ($v2, $omods) = run_milter(
         from => 'list-bounces@test2.dkim2.com', rcpt => ['subscriber@example.org'], message => $wire);
-    is(verify(assemble($wire, $omods))->result, 'pass', 'big body: signed copy verifies');
+    my $out = apply_mods($wire, $omods);
+    is_deeply([mi_numbers($out)], [1], 'big body: one Message-Instance, m=1');
+    is(verify($out)->result, 'pass', 'big body: signed copy verifies');
 }
 
 # 6. Startup checks.
@@ -931,8 +1026,48 @@ sub info_has { my ($mods, $re) = @_; scalar grep { $_->{value} =~ $re } inserted
         from => 'list-bounces@test2.dkim2.com', rcpt => ['subscriber@example.org'], message => $listed);
     my $out = apply_mods($listed, $mods);
     is(scalar(inserted($mods, 'DKIM2-Signature')), 0, 'refused: not signed');
-    is_deeply([mi_numbers($out)], [1], 'refused: only the signed m=1 is left');
-    ok(info_has($mods, qr/removed-unsigned-mi=m=2;/), 'refused: removal recorded');
+    is($v, 'y', 'refused: rejected, since the sender\'s i=1 is on it');
+    like(reply_of($mods), qr/^550 5\.7\.1 not signing: /, 'refused: 550 5.7.1');
+}
+
+# --- Stock route, unsigned post with a From munge: one m=1 (-07 section 12.1) ---
+# An unsigned post gets an unsigned m=1 on arrival; stock Mailman munges the
+# From (munge_from, dmarc_mitigate_unconditionally), tags the subject and adds
+# a footer. Sent as m=1 + m=2 + i=1, C5 would check the author's From at m=1
+# against d=list and every receiver would refuse it. It leaves instead with
+# ONE m=1: hashes of the copy sent, Recipes back to the post as it arrived.
+{
+    my ($munge_pid, $munge_sock) = spawn_milter(mode => 'inbound');
+    (my $p = $PLAIN) =~ s/<post\@test1/<munge\@test1/;
+    my ($iv, $imods) = run_milter(sock => $munge_sock,
+        from => 'author@test1.dkim2.com', rcpt => ['list@test2.dkim2.com'], message => $p);
+    my $arrived = apply_mods($p, $imods);
+    is_deeply([mi_numbers($arrived)], [1], 'munge: arrival m=1 stamped');
+    like($arrived, qr/^X-DKIM2-Snapshot:/mi, 'munge: arrival snapshot token added');
+    (my $listed = $arrived) =~ s/^From: [^\r\n]*/From: Author via list <list\@test2.dkim2.com>${EOL}Reply-To: author\@test1.dkim2.com/m
+        or die 'fixture';
+    $listed =~ s/^Subject: /Subject: [list] /m;
+    $listed .= "-- $EOL" . "list footer$EOL";
+    my ($v, $mods) = run_milter(
+        from => 'list-bounces@test2.dkim2.com', rcpt => ['subscriber@example.org'], message => $listed);
+    is($v, 'c', 'munge: milter continues');
+    my $out = apply_mods($listed, $mods);
+    is_deeply([mi_numbers($out)], [1], 'munge: leaves with one Message-Instance, m=1')
+        or diag(join "\n", (split /\n/, milter_log())[-8 .. -1]);
+    my @sig = inserted($mods, 'DKIM2-Signature');
+    is(scalar @sig, 1, 'munge: signed');
+    like($sig[0]{value} // '', qr/\bi=1;/, 'munge: as i=1');
+    like($sig[0]{value} // '', qr/\bd=test2\.dkim2\.com;/, 'munge: with d= the list domain');
+    ok(info_has($mods, qr/action=restarted-unsigned-mi=m=1;/), 'munge: X-DKIM2-Info records the restart');
+    my $rv = verify($out);
+    is($rv->result, 'pass', 'munge: verifies at a receiver') or diag($rv->result_detail);
+    my $back = Mail::DKIM2::MessageInstance->undo(Email::MIME->new($out));
+    is($back->header('From'), 'Author <author@test1.dkim2.com>', 'munge: undo restores the author From');
+    ok(!defined $back->header('Reply-To'), 'munge: undo removes the Reply-To');
+    is($back->header('Subject'), 'a post', 'munge: undo restores the Subject');
+    my ($pbody) = $p =~ /\r\n\r\n(.*)\z/s;
+    is($back->body_raw, $pbody, 'munge: undo restores the body');
+    ok(!$back->header_raw('Message-Instance'), 'munge: nothing below m=1');
 }
 
 done_testing;

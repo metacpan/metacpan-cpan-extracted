@@ -20,6 +20,11 @@ use Clay::UI::Test::Text;
 use Clay::UI::Role::Core::Container;
 use Clay::UI::Role::Interaction::Focusable;
 use Clay::UI::Role::Layout::GridCell;
+use Clay::UI::Role::Layout::HasParent qw(is_widget);
+
+# Has a parent slot, but is no widget: it composes neither Element nor
+# TextNode.
+class ParentOnly :strict(params) :does(Clay::UI::Role::Layout::HasParent) {}
 
 class FocusBox :strict(params)
 	:does(Clay::UI::Role::Core::Container)
@@ -116,6 +121,70 @@ subtest 'root walks a multi-level chain' => sub {
 	same($leaf->root, $root, 'leaf->root reaches the top');
 	same($b->root,    $root, 'mid-chain->root reaches the top');
 	same($a->root,    $root, 'one-from-top->root reaches the top');
+};
+
+# -----------------------------------------------------------------------------
+# Navigation: ancestors, closest and subtree; is_widget and owns.
+# -----------------------------------------------------------------------------
+
+sub ids (@widgets) { return [ map { $_->id // ref $_ } @widgets ] }
+
+# root > (mid > (leaf, text), helper as mid's internal child)
+sub navigation_tree () {
+	my %w = map { $_ => Clay::UI::Test::Box->new(id => $_) } qw(root mid leaf helper);
+	$w{text} = Clay::UI::Test::Text->new(text => 'hi');
+	$w{mid}->add_child($w{leaf}, $w{text});
+	$w{mid}->add_internal_children($w{helper});
+	$w{root}->add_child($w{mid});
+	return %w;
+}
+
+subtest 'ancestors lists the widgets above, nearest first' => sub {
+	my %w = navigation_tree();
+	is( ids($w{leaf}->ancestors),   [qw(mid root)], 'a leaf: its parent, then the root' );
+	is( ids($w{text}->ancestors),   [qw(mid root)], 'a text widget too' );
+	is( ids($w{helper}->ancestors), [qw(mid root)], 'an internal child has its widget as parent' );
+	is( [ $w{root}->ancestors ],    [],             'the root has none' );
+};
+
+subtest 'closest finds the widget itself or its nearest ancestor' => sub {
+	my %w = navigation_tree();
+	same( $w{leaf}->closest(sub ($node) { 1 }), $w{leaf}, 'the widget itself comes first' );
+	same( $w{text}->closest(sub ($node) { defined $node->id }), $w{mid}, 'then the nearest ancestor that matches' );
+	same( $w{leaf}->closest(sub { ($_->id // '') eq 'root' }), $w{root}, 'the predicate also sees the widget in $_' );
+	is( $w{leaf}->closest(sub ($node) { 0 }), undef, 'undef when none matches' );
+	like( dies { $w{leaf}->closest('mid') }, qr/^Clay::UI: closest takes a code reference, got 'mid'/, 'a non-code predicate dies' );
+	like( dies { $w{leaf}->closest(undef) }, qr/^Clay::UI: closest takes a code reference, got undef/, 'so does undef' );
+};
+
+subtest 'subtree is the widget and everything below it in layout pre-order' => sub {
+	my %w = navigation_tree();
+	is( ids($w{root}->subtree), [ qw(root mid leaf), 'Clay::UI::Test::Text', 'helper' ], 'internal children come after the children' );
+	is( ids($w{mid}->subtree), [ qw(mid leaf), 'Clay::UI::Test::Text', 'helper' ], 'a branch' );
+	is( [ $w{text}->subtree ], [ exact_ref($w{text}) ], 'a text widget is its own subtree' );
+};
+
+subtest 'is_widget accepts elements and text widgets only' => sub {
+	is( is_widget(Clay::UI::Test::Box->new), 1, 'an element widget' );
+	is( is_widget(Clay::UI::Test::Text->new(text => 'x')), 1, 'a text widget' );
+	is( is_widget(ParentOnly->new), 0, 'an object with HasParent but no widget role' );
+	is( [ map { is_widget($_) } undef, 'box', {}, bless({}, 'Some::Class') ], [ 0, 0, 0, 0 ], 'non-widgets' );
+	ok( !Clay::UI::Test::Box->can('is_widget'), 'the export does not become a widget method' );
+	is( Clay::UI::Test::Box->can('import'), UNIVERSAL->can('import'), 'nor does the import method (Perl 5.40 gives UNIVERSAL one)' );
+};
+
+subtest 'owns answers whether a widget is in this UI\'s tree' => sub {
+	my %w     = navigation_tree();
+	my $ui    = Clay::UI->new(root => $w{root}, width => 100, height => 100);
+	my $other = Clay::UI->new(root => Clay::UI::Test::Box->new(id => 'other'), width => 100, height => 100);
+	is( [ map { $ui->owns($w{$_}) } qw(root leaf text helper) ], [ 1, 1, 1, 1 ], 'its own widgets, text and internal ones included' );
+	is( $other->owns($w{leaf}), 0, 'another UI does not own them' );
+	is( $ui->owns($other->root), 0, 'nor does this one own the other\'s' );
+	my $loose = Clay::UI::Test::Box->new;
+	is( $ui->owns($loose), 0, 'a widget in no tree' );
+	$w{mid}->remove_child($w{leaf});
+	is( $ui->owns($w{leaf}), 0, 'a detached widget' );
+	is( [ map { $ui->owns($_) } undef, 'root', {} ], [ 0, 0, 0 ], 'non-widgets' );
 };
 
 # -----------------------------------------------------------------------------

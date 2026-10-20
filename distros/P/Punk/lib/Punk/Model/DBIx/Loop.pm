@@ -6,7 +6,7 @@ use warnings;
 use Punk ();
 use DBIx::Loop ();
 
-our $VERSION = '0.61';
+our $VERSION = '0.62';
 
 1;
 
@@ -130,6 +130,41 @@ failing its future.
 
 A query that fails B<in the database> fails the future, and the error reaches
 your C<else> or the dispatcher's error handler.
+
+=head2 new
+
+Built by L<Punk::Model/_instantiate> from the C<database> options and the
+model's table, primary key and columns. Not called directly; connects
+nothing.
+
+Each of the following returns a L<Punk::Future>, and each is the
+L<Punk::Model::DBI> method of the same name with that method's arguments.
+
+=head2 get(%key)
+
+The row hashref, or undef.
+
+=head2 count(\%filter)
+
+The number of rows matching C<\%filter>.
+
+=head2 all
+
+The first page of every row, as L<Punk::Model::DBI/search> with no filter
+returns it.
+
+=head2 create(\%data)
+
+The stored row. A field that fails validation croaks here rather than
+failing the future.
+
+=head2 update(\%key_and_changes)
+
+The stored row, as L</create>.
+
+=head2 delete(%key)
+
+The affected row count.
 
 =head2 Transactions
 

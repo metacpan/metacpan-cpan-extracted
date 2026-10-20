@@ -1,0 +1,492 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Cwd qw(abs_path);
+use File::Basename qw(dirname);
+use File::Copy qw(copy);
+use File::Path qw(make_path remove_tree);
+use File::Temp qw(tempdir);
+use FindBin qw($Bin);
+use HTTP::Tiny;
+use IO::Socket::INET;
+use Time::HiRes qw(sleep time);
+use lib "$Bin/../t/lib";
+use Test::FitNesse::Slim::FitNesseAcceptance qw(
+  free_port owned_process_exited preserve_exit_status start_owned_process stop_owned_processes
+  wait_until
+);
+use Test::FitNesse::Slim::FitNesseSuiteAcceptance qw(
+  configure_pipe_wiki extract_wiki_from_jar parse_suite_result
+  verify_perl_trace verify_suite_execution_logs
+);
+
+$| = 1;
+my $ROOT = abs_path("$Bin/..") or die "resolve repository root: $!";
+my $TEMP;
+my $KEEP_TEMP = 0;
+my $exit = eval { main(); 1 };
+unless ($exit) {
+  my $error = $@ || 'order-management suite failed';
+  $error =~ s/\s+\z//;
+  warn "test-example-order-management: $error\n";
+  warn "Diagnostic files retained under $TEMP\n" if defined $TEMP && -d $TEMP;
+  $KEEP_TEMP = 1;
+  exit 1;
+}
+exit 0;
+
+END {
+  preserve_exit_status(sub {
+    stop_owned_processes();
+    remove_tree($TEMP) if defined($TEMP) && !$KEEP_TEMP && -d $TEMP;
+  });
+}
+
+sub main {
+  my $transport = 'pipe';
+  if (@ARGV == 2 && $ARGV[0] eq '--transport') {
+    $transport = $ARGV[1];
+  }
+  elsif (@ARGV) {
+    die "usage: bin/test-example-order-management [--transport pipe|tcp]\n";
+  }
+  die "unsupported transport '$transport' (choose pipe or tcp)\n"
+    unless $transport eq 'pipe' || $transport eq 'tcp';
+
+  my $jar = $ENV{FITNESSE_JAR} || '/opt/fitnesse/fitnesse.jar';
+  die "FitNesse v20251025 JAR not found: $jar" unless -f $jar;
+  $TEMP = tempdir('test-slim-order-example-XXXXXX', TMPDIR => 1, CLEANUP => 0);
+  my ($version) = _distribution_version();
+  my $stage = "$TEMP/stage";
+  my $install_source = "$TEMP/install-source";
+  my $prefix = "$TEMP/prefix";
+  my $wiki_home = "$TEMP/wiki";
+  my $outside = "$TEMP/outside-checkout";
+  make_path($stage, $install_source, $prefix, $wiki_home, $outside);
+
+  my @manifest = _manifest();
+  for my $file (@manifest) {
+    my $target = "$stage/$file";
+    $target =~ s{/[^/]+\z}{};
+    make_path($target) if $target ne $stage;
+    copy("$ROOT/$file", "$stage/$file") or die "copy $file to build stage: $!";
+    chmod((stat "$ROOT/$file")[2] & 07777, "$stage/$file")
+      or die "copy mode for $file: $!";
+  }
+  _run($stage, $^X, 'Build.PL');
+  _run($stage, './Build', 'dist');
+  my $archive = "$stage/Test-FitNesse-Slim-$version.tar.gz";
+  die "release archive missing: $archive" unless -f $archive;
+  _run($install_source, 'tar', '-xzf', $archive);
+  my $distribution = "$install_source/Test-FitNesse-Slim-$version";
+  _run($distribution, $^X, 'Build.PL', "--install_base=$prefix");
+  _run($distribution, './Build');
+  _run($distribution, './Build', 'install');
+
+  my $runner = "$prefix/bin/perl-slim";
+  my $installed_lib = "$prefix/lib/perl5";
+  die "installed Perl runner missing: $runner" unless -x $runner;
+  my $external_app = "$TEMP/external/order-management";
+  _copy_tree("$distribution/examples/order-management", $external_app);
+  my $example_lib = "$external_app/lib";
+  local $ENV{PERL5LIB} = join ':', $installed_lib, $example_lib;
+  delete $ENV{PERL5OPT};
+  local $ENV{PATH} = join ':', dirname($^X), ($ENV{PATH} // '');
+
+  my $module_check = _capture($outside, $^X, '-MTest::FitNesse::Slim', '-e',
+    'print $INC{"Test/FitNesse/Slim.pm"}, "\n"');
+  die "installed Test::FitNesse::Slim did not load from prefix: $module_check"
+    unless abs_path($module_check) eq abs_path("$installed_lib/Test/FitNesse/Slim.pm");
+  my $fixture_check = _capture($outside, $^X, '-MOrderManagement::Fixtures::OrderWorkflow', '-e',
+    'print $INC{"OrderManagement/Fixtures/OrderWorkflow.pm"}, "\n"');
+  die "external order fixture did not load from extracted application: $fixture_check"
+    unless abs_path($fixture_check) eq abs_path("$example_lib/OrderManagement/Fixtures/OrderWorkflow.pm");
+  _run($external_app, 'prove', '--lib', 't/domain-rules.t');
+  my $store_check = _capture($outside, $^X, '-MOrderManagement::Store', '-e',
+    'print $INC{"OrderManagement/Store.pm"}, "\n"');
+  die "application module did not load from extracted example: $store_check"
+    unless abs_path($store_check) eq abs_path("$example_lib/OrderManagement/Store.pm");
+  print "Installed engine: $module_check\nExternal fixture: $fixture_check\nApplication: $store_check\n";
+
+  my $wiki = "$wiki_home/FitNesseRoot";
+  extract_wiki_from_jar($jar, $wiki);
+  _copy_tree("$external_app/FitNesseRoot", $wiki);
+  if ($transport eq 'pipe') {
+    configure_pipe_wiki($wiki, $runner);
+    open my $root, '>>', "$wiki/content.txt" or die "append wiki root setup: $!";
+    print {$root} "\n!define TEST_SYSTEM {slim}\n";
+    close $root or die "close wiki root setup: $!";
+  }
+
+  my $host = '127.0.0.1';
+  my $http_port = free_port($host);
+  my $slim_port = $transport eq 'tcp' ? free_port($host) : 1;
+  my $fitnesse_url = "http://$host:$http_port";
+  my $fitnesse_log = "$TEMP/fitnesse.log";
+  my $slim_log = "$TEMP/perl-slim.log";
+  my $java = $ENV{JAVA} || 'java';
+  if ($transport eq 'tcp') {
+    start_owned_process($runner, '-v', $slim_port,
+      { log_file => $slim_log, cwd => $outside });
+    _wait_for_tcp($host, $slim_port);
+    open my $root, '>>', "$wiki/content.txt" or die "append TCP wiki config: $!";
+    print {$root} "\n!define TEST_SYSTEM {slim}\n!define SLIM_HOST {$host}\n!define SLIM_PORT {$slim_port}\n";
+    close $root or die "close TCP wiki config: $!";
+  }
+  my @java_args = ('-Dslim.pool.size=1');
+  push @java_args, "-Dslim.port=$slim_port", "-Dslim.host=$host",
+    '-Dmanually.start.test.runner=true' if $transport eq 'tcp';
+  push @java_args, '-jar', $jar,
+    '-p', $http_port, '-d', $wiki_home, '-r', 'FitNesseRoot',
+    { log_file => $fitnesse_log, cwd => $outside };
+  start_owned_process($java, @java_args);
+  my $http = HTTP::Tiny->new(timeout => 180, agent => 'test-slim-order-management/1.0');
+  wait_until("FitNesse at $fitnesse_url", 60, sub {
+    die 'FitNesse exited before readiness' if _children_exited();
+    my $response = $http->get("$fitnesse_url/");
+    return $response->{status} == 200 && $response->{content} =~ /<html\b/i;
+  });
+  my $response = $http->get("$fitnesse_url/OrderManagementSuite?suite&format=xml");
+  die "FitNesse suite returned HTTP $response->{status}" unless $response->{status} == 200;
+  open my $response_fh, '>', "$TEMP/suite.xml" or die "write suite response: $!";
+  print {$response_fh} $response->{content} or die "write suite response: $!";
+  close $response_fh or die "close suite response: $!";
+  my $observed = parse_suite_result($response->{content}, $response->{status}, 'OrderManagementSuite');
+  die "could not parse demo results: " . join('; ', @{$observed->{errors}})
+    unless $observed->{status} eq 'completed';
+  die "expected FitNesse v20251025, got $observed->{version}"
+    unless ($observed->{version} // '') eq 'v20251025';
+
+  my @expected_pages = map { "OrderManagementSuite.$_" }
+    qw(CustomerEligibility InventoryAvailability InventoryRecords InvalidQuantity OrderLifecycle OrdersForCustomer Pricing RejectedOrders ReplenishmentPriority);
+  my @actual_pages = sort keys %{$observed->{results}};
+  my @expected_sorted = sort @expected_pages;
+  die "page inventory differs; expected [@expected_sorted], got [@actual_pages]"
+    unless join("\n", @expected_sorted) eq join("\n", @actual_pages);
+
+  my %expected_right = (
+    'OrderManagementSuite.CustomerEligibility' => 4,
+    'OrderManagementSuite.InventoryAvailability' => 5,
+    'OrderManagementSuite.InventoryRecords' => 18,
+    'OrderManagementSuite.InvalidQuantity' => 3,
+    'OrderManagementSuite.OrderLifecycle' => 11,
+    'OrderManagementSuite.OrdersForCustomer' => 4,
+    'OrderManagementSuite.Pricing' => 18,
+    'OrderManagementSuite.RejectedOrders' => 10,
+    'OrderManagementSuite.ReplenishmentPriority' => 9,
+  );
+  my %totals;
+  my @page_failures;
+  for my $page (@expected_sorted) {
+    my $counts = $observed->{results}{$page}{counts};
+    push @page_failures, "$page has no assertions"
+      unless $counts->{right} + $counts->{wrong} > 0;
+    push @page_failures, sprintf('%s produced %d right/%d wrong/%d ignored/%d exceptions; expected %d right and no nonpassing assertions',
+      $page, @$counts{qw(right wrong ignored exceptions)}, $expected_right{$page})
+      unless $counts->{right} == $expected_right{$page}
+        && !$counts->{wrong} && !$counts->{ignored} && !$counts->{exceptions};
+    $totals{$_} += $counts->{$_} for qw(right wrong ignored exceptions);
+    print sprintf("%-54s %d right\n", $page, $counts->{right});
+  }
+  die join("\n", @page_failures) if @page_failures;
+  die 'FitNesse final page counts do not report every page passing'
+    unless $observed->{finalCounts}
+      && $observed->{finalCounts}{right} == @expected_pages
+      && !$observed->{finalCounts}{wrong}
+      && !$observed->{finalCounts}{ignored}
+      && !$observed->{finalCounts}{exceptions};
+  my @accepted_labels = qw(
+    slim:fitnesse.slim.SlimService
+    SLIM:fitnesse.slim.SlimService
+    SLIM:remote_debug:fitnesse.slim.SlimService
+  );
+  my $logs = verify_suite_execution_logs(
+    $observed->{executionLogs}, $host, $slim_port,
+    \@accepted_labels, $transport, $transport eq 'pipe' ? $runner : undef,
+  );
+  die 'FitNesse did not verify the requested Perl backend: ' . join('; ', @{$logs->{errors}})
+    if $logs->{failed};
+  if ($transport eq 'tcp') {
+    open my $trace_fh, '<', $slim_log or die "read Perl listener trace: $!";
+    my $trace = do { local $/; <$trace_fh> };
+    close $trace_fh or die "close Perl listener trace: $!";
+    my $trace_result = verify_perl_trace($trace);
+    die 'TCP listener trace did not verify SLiM exchanges: ' . join('; ', @{$trace_result->{errors}})
+      if $trace_result->{failed};
+    die 'TCP SLiM response trace contains a fixture exception'
+      if $trace =~ /__EXCEPTION__/;
+    print "TCP Perl listener trace: $trace_result->{commands} requests, $trace_result->{responses} responses\n";
+  }
+  die 'a runner-started process exited during suite execution' if _children_exited();
+  _run_authoring_audit($http, $fitnesse_url, $transport, $runner, $host, $slim_port,
+    $external_app);
+  if ($transport eq 'tcp') {
+    open my $trace_fh, '<', $slim_log or die "read Perl listener trace: $!";
+    my $trace = do { local $/; <$trace_fh> };
+    close $trace_fh or die "close Perl listener trace: $!";
+    my $trace_result = verify_perl_trace($trace);
+    die 'TCP listener trace did not verify SLiM exchanges: ' . join('; ', @{$trace_result->{errors}})
+      if $trace_result->{failed};
+    print "TCP Perl listener trace after authoring audit: $trace_result->{commands} requests, $trace_result->{responses} responses\n";
+  }
+  print "Order-management suite passed: " . scalar(@expected_pages)
+    . " pages, $totals{right} right, $totals{wrong} wrong, $totals{ignored} ignored, "
+    . "$totals{exceptions} exceptions; transport=$transport; backend=installed Perl\n";
+  return;
+}
+
+sub _run_authoring_audit {
+  my ($http, $url, $transport, $runner, $host, $port, $app) = @_;
+  my $wiki = "$TEMP/wiki/FitNesseRoot/OrderManagementSuite";
+  my @editable = qw(Pricing InventoryAvailability InventoryRecords OrdersForCustomer OrderLifecycle);
+  my %original = map { $_ => _read("$wiki/$_/content.txt") } @editable;
+  my $ok = eval {
+    my $pricing = $original{Pricing};
+    $pricing =~ s/\|standard\|50\.00\|0\.00\|0\.00\|50\.00\|/|standard|50.00|0.00|0.00|50.00|\n|preferred|20.01|2.00|5.00|23.01|/
+      or die 'could not add the preferred-customer pricing boundary row';
+    _write("$wiki/Pricing/content.txt", $pricing);
+    _expect_page($http, $url, 'Pricing', $transport, $runner, $host, $port,
+      { right => 21, wrong => 0, ignored => 0, exceptions => 0 });
+    print "Authoring exercise: added a pricing boundary row in FitNesse only\n";
+
+    my $inventory = $original{InventoryAvailability};
+    $inventory =~ s/\|TEA\|0\|false\|/|TEA|0|false|\n|TEA|5|true|/
+      or die 'could not add the inventory boundary row';
+    _write("$wiki/InventoryAvailability/content.txt", $inventory);
+    _expect_page($http, $url, 'InventoryAvailability', $transport, $runner, $host, $port,
+      { right => 6, wrong => 0, ignored => 0, exceptions => 0 });
+    print "Authoring exercise: added an inventory boundary row in FitNesse only\n";
+
+    my $query_without_mug = $original{InventoryRecords};
+    $query_without_mug =~ s/^\|MUG\|Ceramic mug\|12\.00\|2\|0\|2\|\s*\n//m
+      or die 'could not remove the query row for the disposable authoring exercise';
+    _write("$wiki/InventoryRecords/content.txt", $query_without_mug);
+    my $before = _run_page($http, $url, 'InventoryRecords', $transport, $runner, $host, $port);
+    _write("$wiki/InventoryRecords/content.txt", $original{InventoryRecords});
+    _expect_result($before, undef, 'query before expected row was added');
+    die 'removing an expected inventory record did not display a query mismatch'
+      unless $before->{counts}{wrong} > 0;
+    _expect_page($http, $url, 'InventoryRecords', $transport, $runner, $host, $port,
+      { right => 18, wrong => 0, ignored => 0, exceptions => 0 });
+    print "Authoring exercise: a missing expected inventory row is reported; restoring it makes the query pass\n";
+
+    my $orders = $original{OrdersForCustomer};
+    $orders =~ s/\|Query:orders for customer\|C-100\|/|Query:orders for customer|C-200|/
+      or die 'could not select the second customer for the query authoring exercise';
+    $orders =~ s/\|ORD-022\|C-100\|submitted\|23\.00\|/|ORD-021|C-200|submitted|11.00|\n|ORD-023|C-200|submitted|17.00|/
+      or die 'could not add the second customer order to the query table';
+    _write("$wiki/OrdersForCustomer/content.txt", $orders);
+    _expect_page($http, $url, 'OrdersForCustomer', $transport, $runner, $host, $port,
+      { right => 8, wrong => 0, ignored => 0, exceptions => 0 });
+    print "Authoring exercise: selected another customer and added its expected order row in FitNesse only\n";
+
+    my $lifecycle = $original{OrderLifecycle};
+    $lifecycle =~ s/\|check\|status of order\|\$order\|submitted\|/|check|status of order|\$order|reserved|/
+      or die 'could not change the expected order status for the field-inspection exercise';
+    _write("$wiki/OrderLifecycle/content.txt", $lifecycle);
+    my $status_mismatch = _run_page($http, $url, 'OrderLifecycle', $transport, $runner, $host, $port);
+    _expect_result($status_mismatch,
+      { right => 10, wrong => 1, ignored => 0, exceptions => 0 },
+      'deliberately incorrect expected order status');
+    _write("$wiki/OrderLifecycle/content.txt", $original{OrderLifecycle});
+    _expect_page($http, $url, 'OrderLifecycle', $transport, $runner, $host, $port,
+      { right => 11, wrong => 0, ignored => 0, exceptions => 0 });
+    print "Authoring exercise: changing the expected order status produces one wrong field assertion; restoring it passes\n";
+
+    my $workflow = "$wiki/AuditNewWorkflow";
+    make_path($workflow);
+    _write("$workflow/content.txt", <<'WIKI');
+!1 New workflow authored without changing Perl
+
+|script|Order workflow|
+|$order=|create order for|C-200|
+|add item|TEA|quantity|2|to order|$order|
+|check|reserve inventory for|$order|true|
+|check|submit order|$order|true|
+|check|total of order|$order|11.00|
+|check|status of order|$order|submitted|
+WIKI
+    _write("$workflow/properties.xml", _read("$wiki/InvalidQuantity/properties.xml"));
+    _expect_page($http, $url, 'AuditNewWorkflow', $transport, $runner, $host, $port,
+      { right => 5, wrong => 0, ignored => 0, exceptions => 0 });
+    remove_tree($workflow);
+    print "Authoring exercise: added a workflow using existing fixture operations\n";
+
+    _expect_page($http, $url, 'InvalidQuantity', $transport, $runner, $host, $port,
+      { right => 3, wrong => 0, ignored => 0, exceptions => 0 });
+    my $invalid = $http->get("$url/OrderManagementSuite.InvalidQuantity?test");
+    die 'invalid quantity page did not render successfully' unless $invalid->{status} == 200;
+    die 'invalid business value message was not visible in the FitNesse result'
+      unless $invalid->{content} =~ /Quantity must be a positive whole number/;
+    print "Authoring exercise: invalid zero quantity displays its business rejection message\n";
+
+    my $wrong_expected = $original{Pricing};
+    $wrong_expected =~ s/\|preferred\|20\.00\|2\.00\|5\.00\|23\.00\|/|preferred|20.00|2.01|5.00|23.00|/
+      or die 'could not alter the expected pricing result for failure-display exercise';
+    _write("$wiki/Pricing/content.txt", $wrong_expected);
+    my $mismatch = _run_page($http, $url, 'Pricing', $transport, $runner, $host, $port);
+    _expect_result($mismatch, { right => 17, wrong => 1, ignored => 0, exceptions => 0 },
+      'deliberately incorrect expected price');
+    print "Authoring exercise: an incorrect expected discount produces one localized wrong assertion\n";
+    1;
+  };
+  my $error = $@;
+  for my $page (@editable) {
+    eval { _write("$wiki/$page/content.txt", $original{$page}); 1 }
+      or $error .= "\nrestore $page page after authoring audit: $@";
+  }
+  remove_tree("$wiki/AuditNewWorkflow") if -d "$wiki/AuditNewWorkflow";
+  die $error unless $ok;
+  die 'demo FitNesse engine exited during authoring audit' if _children_exited();
+  return;
+}
+
+sub _run_page {
+  my ($http, $url, $page, $transport, $runner, $host, $port) = @_;
+  my $response = $http->get("$url/OrderManagementSuite.$page?test&format=xml");
+  my $result = Test::FitNesse::Slim::FitNesseAcceptance::parse_page_result(
+    $response->{content}, $response->{status}, $host, $port, $transport,
+    $transport eq 'pipe' ? $runner : undef,
+  );
+  return $result;
+}
+
+sub _expect_page {
+  my ($http, $url, $page, $transport, $runner, $host, $port, $expected) = @_;
+  my $result = _run_page($http, $url, $page, $transport, $runner, $host, $port);
+  _expect_result($result, $expected, "$page authoring exercise");
+  return $result;
+}
+
+sub _expect_result {
+  my ($result, $expected, $description) = @_;
+  die "$description did not verify an installed Perl fixture invocation"
+    unless ($result->{perlExecutionConfirmed} // 0);
+  die "$description did not complete: " . ($result->{error} // $result->{status} // 'unknown result')
+    unless ($result->{status} // '') eq 'completed' && $result->{counts};
+  if ($expected) {
+    for my $name (qw(right wrong ignored exceptions)) {
+      die "$description: $name was $result->{counts}{$name}, expected $expected->{$name}"
+        unless $result->{counts}{$name} == $expected->{$name};
+    }
+  }
+  return;
+}
+
+sub _read {
+  my ($path) = @_;
+  open my $fh, '<', $path or die "read $path: $!";
+  my $text = do { local $/; <$fh> };
+  close $fh or die "close $path: $!";
+  return $text;
+}
+
+sub _write {
+  my ($path, $text) = @_;
+  open my $fh, '>', $path or die "write $path: $!";
+  print {$fh} $text or die "write $path: $!";
+  close $fh or die "close $path: $!";
+  return;
+}
+
+sub _manifest {
+  open my $fh, '<', "$ROOT/MANIFEST" or die "read MANIFEST: $!";
+  my @files = grep { length && !/^\s*#/ } map { chomp; $_ } <$fh>;
+  close $fh or die "close MANIFEST: $!";
+  for my $file (@files) {
+    die "unsafe MANIFEST entry: $file" if $file =~ m{(?:\A/|(?:\A|/)\.\.(?:/|\z))};
+    die "MANIFEST entry missing: $file" unless -f "$ROOT/$file";
+  }
+  return @files;
+}
+
+sub _distribution_version {
+  open my $fh, '<', "$ROOT/lib/Test/FitNesse/Slim.pm" or die "read distribution version: $!";
+  my $source = do { local $/; <$fh> };
+  close $fh or die "close distribution version: $!";
+  my ($version) = $source =~ /our \$VERSION = '([^']+)'/;
+  die 'could not find Test::FitNesse::Slim version' unless $version;
+  return $version;
+}
+
+sub _copy_tree {
+  my ($source, $target) = @_;
+  require File::Find;
+  File::Find::find({
+    no_chdir => 1,
+    wanted => sub {
+      my $path = $File::Find::name;
+      return if $path eq $source;
+      my $relative = substr($path, length($source) + 1);
+      my $destination = "$target/$relative";
+      if (-d $path) {
+        make_path($destination);
+      }
+      elsif (-f $path) {
+        $destination =~ s{/[^/]+\z}{};
+        make_path($destination);
+        my $file = "$target/$relative";
+        copy($path, $file) or die "copy $path: $!";
+      }
+    },
+  }, $source);
+  return;
+}
+
+sub _run {
+  my ($directory, @command) = @_;
+  print '+ ', join(' ', @command), "\n";
+  my $pid = fork();
+  die "fork @command: $!" unless defined $pid;
+  if (!$pid) {
+    chdir($directory) or die "chdir $directory: $!";
+    exec {$command[0]} @command;
+    die "exec @command: $!";
+  }
+  waitpid($pid, 0);
+  die "command failed (@command), status $?" if $? != 0;
+  return;
+}
+
+sub _capture {
+  my ($directory, @command) = @_;
+  my $pid = open my $fh, '-|';
+  die "fork @command: $!" unless defined $pid;
+  if (!$pid) {
+    chdir($directory) or die "chdir $directory: $!";
+    exec {$command[0]} @command;
+    die "exec @command: $!";
+  }
+  my $output = do { local $/; <$fh> // '' };
+  close $fh or die "command failed (@command), status $?";
+  $output =~ s/\s+\z//;
+  return $output;
+}
+
+sub _wait_for_tcp {
+  my ($host, $port) = @_;
+  my $deadline = time + 15;
+  while (time < $deadline) {
+    my $socket = IO::Socket::INET->new(
+      PeerAddr => $host, PeerPort => $port, Proto => 'tcp', Timeout => 0.5,
+    );
+    if ($socket) {
+      local $/ = "\n";
+      my $greeting = <$socket> // '';
+      close $socket;
+      die "unexpected TCP greeting: $greeting" unless $greeting eq "Slim -- V0.5\n";
+      return;
+    }
+    die 'installed Perl SLiM listener exited before readiness' if _children_exited();
+    sleep 0.1;
+  }
+  die 'installed Perl TCP listener did not become ready';
+}
+
+sub _children_exited {
+  return owned_process_exited();
+}
+
+1;

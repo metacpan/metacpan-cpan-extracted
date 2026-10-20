@@ -14,7 +14,7 @@ my $EOL = "\r\n";
 
 sub with_mi { my ($mi, $msg) = @_; "Message-Instance: " . $mi->as_string . $EOL . $msg }
 
-my $orig = join($EOL, 'From: a@example.com', 'To: list@example.org',
+my $orig = join($EOL, 'From: a@test1.dkim2.com', 'To: list@example.org',
     'Subject: hello', 'Message-ID: <x@example.com>', '', 'body one', 'body two', '');
 my $m1 = with_mi($MI->calculate($orig), $orig);
 
@@ -56,7 +56,7 @@ sub forge_history {
 {
     my ($ok, $why) = $MI->chain_verifies(forge_history($m1));
     ok(!$ok, 'header changed below a null body Recipe is caught');
-    like($why // '', qr/m=1 does not match content.*header hash/, 'reason names m=1 header hash');
+    like($why // '', qr/^FAIL: Message-Instance m=1 header hash sha256 mismatch$/, 'reason names m=1 header hash');
 }
 
 {
@@ -92,9 +92,9 @@ sub bad_header_recipe_below_null {
 }
 
 {
-    my ($ok, $why) = $MI->chain_verifies(bad_header_recipe_below_null($m1));
+    my ($ok, $why, $detail) = $MI->chain_verifies(bad_header_recipe_below_null($m1));
     ok(!$ok, 'header Recipe that does not apply below a null body Recipe is caught');
-    like($why // '', qr/m=2 did not undo cleanly.*copies lines 5-5 of 1/,
+    like("$why: $detail", qr/^PERMERROR: Message-Instance m=2 contains invalid JSON: .*copies lines 5-5 of 1/,
         'reason names the m=2 header Recipe') or diag $why;
 }
 
@@ -129,7 +129,7 @@ sub ordinary_hop {
 
     ($ok, $why) = $MI->chain_verifies(ordinary_hop(list_hop($m1, 'list'), 1));
     ok(!$ok, 'hidden To change in m=3 header Recipe over null m=2 is caught');
-    like($why // '', qr/m=2 does not match content.*header hash/, 'reason names the failing header hash') or diag $why;
+    like($why // '', qr/^FAIL: Message-Instance m=2 header hash sha256 mismatch$/, 'reason names the failing header hash') or diag $why;
 }
 
 {
@@ -137,7 +137,7 @@ sub ordinary_hop {
     my $m3 = ordinary_hop(forge_history($m1));
     my ($ok, $why) = $MI->chain_verifies($m3);
     ok(!$ok, 'hidden To change in null m=2 header Recipe, ordinary m=3 above, is caught');
-    like($why // '', qr/m=1 does not match content.*header hash/, 'reason names m=1 header hash') or diag $why;
+    like($why // '', qr/^FAIL: Message-Instance m=1 header hash sha256 mismatch$/, 'reason names m=1 header hash') or diag $why;
 }
 
 # Empty-body chain: no body at all, header-only Recipe at m=2.
@@ -149,7 +149,7 @@ my $e1 = with_mi($MI->calculate($empty), $empty);
     ok($ok, 'empty-body chain, header-only m=2 verifies') or diag $why;
     ($ok, $why) = $MI->chain_verifies(ordinary_hop($e1, 1));
     ok(!$ok, 'empty-body chain, hidden To change fails');
-    like($why // '', qr/m=1 does not match content.*header hash/, 'empty-body: reason names m=1 header hash') or diag $why;
+    like($why // '', qr/^FAIL: Message-Instance m=1 header hash sha256 mismatch$/, 'empty-body: reason names m=1 header hash') or diag $why;
 }
 
 # Recipe structure is checked even where the body is gone: m=2 has a body
@@ -163,9 +163,9 @@ sub malformed_body_below_null {
 }
 
 {
-    my ($ok, $why) = $MI->chain_verifies(malformed_body_below_null($m1));
+    my ($ok, $why, $detail) = $MI->chain_verifies(malformed_body_below_null($m1));
     ok(!$ok, 'malformed body Recipe below a null body Recipe is caught');
-    like($why // '', qr/m=2 did not undo cleanly.*out of order/, 'reason names the malformed body Recipe') or diag $why;
+    like("$why: $detail", qr/^PERMERROR: Message-Instance m=2 contains invalid JSON: .*out of order/, 'reason names the malformed body Recipe') or diag $why;
 }
 
 # The structure-only check below a null has no line count: a bad range must
@@ -176,11 +176,16 @@ for my $range ([0, 2], [3, 1]) {
     my $cur2 = $m1 . "footer$EOL";
     my $mi2 = $MI->calculate($cur2, $m1);
     $mi2->{bits}{rb} = [$range];
-    my ($ok, $why) = $MI->chain_verifies(list_hop(with_mi($mi2, $cur2), 'list'));
+    my ($ok, $why, $detail) = $MI->chain_verifies(list_hop(with_mi($mi2, $cur2), 'list'));
     my $r = "[@$range]";
     ok(!$ok, "body Recipe $r below a null is caught");
-    unlike($why // '', qr/\bof\s*(?:$|\))/, "$r: no empty 'of' in reason") or diag $why;
-    like($why // '', qr/m=2 did not undo cleanly.*\Q$range->[0]-$range->[1]\E/, "$r: reason names the range") or diag $why;
+    unlike($detail // '', qr/\bof\s*(?:$|\))/, "$r: no empty 'of' in the detail") or diag $detail;
+    like($detail // '', qr/\Q$range->[0]-$range->[1]\E/, "$r: the detail names the range")
+        if $range->[0];
+    # A copy from 0 is outside the -07 schema (minimum 1): invalid JSON.
+    like($why // '', $range->[0] ? qr/^PERMERROR: Message-Instance m=2 contains invalid JSON$/
+                                 : qr/m=2 contains invalid JSON/,
+        "$r: reason names the range") or diag $why;
     is_deeply(\@warn, [], "$r: no warnings") or diag @warn;
 }
 
@@ -218,9 +223,9 @@ sub verifier_result {
 
     $signed_m1 = $signed;
     my $forged = forge_history($signed);
-    like(verifier_result($forged), qr/^fail.*m=1 does not match content/, 'Verifier: tampered history below null fails on m=1');
+    like(verifier_result($forged), qr/^fail \(FAIL: Message-Instance m=1 header hash sha256 mismatch\)$/, 'Verifier: tampered history below null fails on m=1');
 
-    like(verifier_result(bad_header_recipe_below_null($signed)), qr/^fail.*m=2 did not undo cleanly/,
+    like(verifier_result(bad_header_recipe_below_null($signed)), qr/^permerror \(PERMERROR: Message-Instance m=2 contains invalid JSON\)$/,
         'Verifier: header Recipe that does not apply below null fails');
 }
 

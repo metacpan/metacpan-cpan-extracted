@@ -1,5 +1,10 @@
 Revision history for Func-Util
 
+1.02    2026-10-20
+        - The C API's headers (funcutil_callbacks.h, funcutil_export.h)
+          are installed, with an ExtUtils::Depends configuration, so a
+          dependent XS dist can reach them.
+
 1.01    2026-10-02
         - FIX: the pre-5.22 op_convert_list fallback called Perl_convert,
           which perl never exports, so the DLL link failed on Windows. It

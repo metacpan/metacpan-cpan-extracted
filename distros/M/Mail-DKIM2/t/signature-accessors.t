@@ -25,8 +25,8 @@ is_deeply($sig->rcpt_to('f@example.net'), ['<f@example.net>'], 'a single address
 ok(!eval { $sig->rcpt_to([]); 1 }, 'an empty list croaks');
 
 is($sig->flags, undef, 'no f= means undef');
-is_deeply($sig->flags(['donotmodify', 'feedback']), ['donotmodify', 'feedback'], 'flags sets from a list');
-is($sig->get_tag('f'), 'donotmodify,feedback', '  ... as a comma list on the wire');
+is_deeply($sig->flags(['exploded', 'feedback']), ['exploded', 'feedback'], 'flags sets from a list');
+is($sig->get_tag('f'), 'exploded,feedback', '  ... as a comma list on the wire');
 
 my $nd = Mail::DKIM2::Signature->new(Sequence => 2, Domain => 'fwd.example', NextDomain => 'next.example',
     Signatures => [['sel1', 'rsa-sha256', '']]);

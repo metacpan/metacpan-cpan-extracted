@@ -4,7 +4,7 @@
       "Nigel Horne <njh@nigelhorne.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013",
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150015",
    "license" : [
       "open_source"
    ],
@@ -31,33 +31,40 @@
          }
       },
       "runtime" : {
+         "recommends" : {
+            "Geo::Location::Predicate" : "0.01"
+         },
          "requires" : {
             "Carp" : "0",
+            "Data::Dumper" : "0",
             "HTML::Entities" : "0",
-            "IPC::System::Simple" : "0",
-            "LWP::Protocol::https" : "0",
             "Object::Configure" : "0.13",
             "Params::Get" : "0.04",
             "Readonly" : "0",
             "Scalar::Util" : "0",
             "Time::HiRes" : "0",
+            "constant" : "0",
             "perl" : "5.010001"
          }
       },
       "test" : {
          "requires" : {
+            "Geo::Location::Predicate" : "0",
+            "IPC::System::Simple" : "0",
+            "LWP" : "0",
+            "LWP::Protocol::https" : "0",
+            "LWP::UserAgent" : "0",
+            "Readonly" : "0",
             "Test::Deep" : "0",
             "Test::DescribeMe" : "0",
             "Test::Memory::Cycle" : "0",
-            "Test::MockObject" : "0",
-            "Test::Mockingbird" : "0",
+            "Test::Mockingbird" : "0.14",
             "Test::Most" : "0",
             "Test::Needs" : "0",
             "Test::NoWarnings" : "0",
             "Test::Number::Delta" : "0",
             "Test::RequiresInternet" : "0",
             "Test::Returns" : "0",
-            "Test::Warnings" : "0",
             "Test::Which" : "0",
             "Test::Without::Module" : "0"
          }
@@ -75,6 +82,6 @@
          "web" : "https://github.com/nigelhorne/Geo-Coder-List"
       }
    },
-   "version" : "0.38",
+   "version" : "0.39",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

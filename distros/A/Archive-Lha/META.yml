@@ -25,7 +25,7 @@ no_index:
 provides:
   Archive::Lha:
     file: lib/Archive/Lha.pm
-    version: '0.22'
+    version: '0.23'
   Archive::Lha::CRC:
     file: lib/Archive/Lha/CRC.pm
   Archive::Lha::Constants:
@@ -76,5 +76,5 @@ requires:
 resources:
   bugtracker: https://github.com/nicomen/archive-lha/issues
   repository: https://github.com/nicomen/archive-lha.git
-version: '0.22'
+version: '0.23'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

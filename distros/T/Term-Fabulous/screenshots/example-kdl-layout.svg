@@ -52,7 +52,7 @@
 <text x="228" y="164" textLength="369" fill="#dcdcdc">PostgreSQL 16, 41 days up, 38 connections</text>
 <text x="75" y="200" textLength="18" fill="#dcdcdc">db</text>
 <text x="75" y="236" textLength="36" fill="#dcdcdc">mail</text>
-<text x="84" y="308" textLength="531" fill="#96a0b4">Click a server, or Tab to it and press Enter. Ctrl+C quits.</text>
+<text x="93" y="308" textLength="531" fill="#96a0b4">Click a server, or Tab to it and press Enter. Ctrl+C quits.</text>
 </g>
 <g shape-rendering="crispEdges">
 </g>

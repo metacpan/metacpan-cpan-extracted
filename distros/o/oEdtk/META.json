@@ -33,7 +33,8 @@
       "runtime" : {
          "recommends" : {
             "DBD::Pg" : "0",
-            "DBD::mysql" : "0"
+            "DBD::mysql" : "0",
+            "Text::QRCode" : "0"
          },
          "requires" : {
             "Archive::Zip" : "0",
@@ -82,7 +83,6 @@
             "Term::ReadKey" : "0",
             "Text::CSV" : "1.20",
             "Text::CSV_XS" : "0",
-            "Text::QRCode" : "0",
             "Time::HiRes" : "0",
             "Try::Tiny" : "0",
             "XML::LibXML" : "1.70",
@@ -98,8 +98,6 @@
       },
       "test" : {
          "requires" : {
-            "DBD::Pg" : "0",
-            "DBD::mysql" : "0",
             "IPC::Run3" : "0",
             "Perl::Critic" : "0",
             "Perl::Tidy" : "0",
@@ -111,6 +109,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "2.1126",
+   "version" : "2.1129",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

@@ -21,18 +21,29 @@ if($ENV{AUTHOR_TESTING}) {
 }
 
 my $test_requires = {
+	# The tests assert the rule's own answer - t/edge_cases.t, t/function.t and
+	# t/unit.t all check that a string of digits is refused - so they need it even
+	# though the module does not: Geo-Location-Predicate is a recommendation for
+	# runtime (META_MERGE below), and t/reference.t skips the comparisons it
+	# cannot make when it is absent.
+	'Geo::Location::Predicate' => 0,
+	'IPC::System::Simple' => 0,	# t/fuzz.t
+	# The module makes no web requests itself, but t/canada.t, t/ua.t and the
+	# on-line tests load LWP to build user agents for the geocoders
+	'LWP' => 0,
+	'LWP::Protocol::https' => 0,
+	'LWP::UserAgent' => 0,
+	'Readonly' => 0,
 	'Test::Deep' => 0,
 	'Test::DescribeMe' => 0,
 	'Test::Memory::Cycle' => 0,
-	'Test::Mockingbird' => 0,
-	'Test::MockObject' => 0,
+	'Test::Mockingbird' => 0.14,
 	'Test::Most' => 0,
 	'Test::Needs' => 0,
 	'Test::NoWarnings' => 0,
 	'Test::Number::Delta' => 0,	# Always needed since used in free.t
 	'Test::RequiresInternet' => 0,
 	'Test::Returns' => 0,
-	'Test::Warnings' => 0,
 	'Test::Which' => 0,
 	'Test::Without::Module' => 0,
 };
@@ -78,9 +89,9 @@ WriteMakefile(
     TEST_REQUIRES => $test_requires,
     PREREQ_PM => {
 	'Carp' => 0,
+	'constant' => 0,
+	'Data::Dumper' => 0,
 	'HTML::Entities' => 0,
-	'IPC::System::Simple' => 0,
-	'LWP::Protocol::https' => 0,
 	'Object::Configure' => 0.13,
 	'Params::Get' => 0.04,
 	'Readonly' => 0,
@@ -90,6 +101,16 @@ WriteMakefile(
     clean		=> { FILES => 'Geo-Coder-List-*' },
     META_MERGE		=> {
 	'meta-spec' => { version => 2 },
+	# A real optional dependency: an installer fetches it by default, and an
+	# install that leaves it out still gets the reference refusal.  The code
+	# looks for it the first time it is needed, not when the module loads.
+	prereqs => {
+		runtime => {
+			recommends => {
+				'Geo::Location::Predicate' => '0.01',
+			},
+		},
+	},
 	resources => {
 		repository => {
 			type => 'git',

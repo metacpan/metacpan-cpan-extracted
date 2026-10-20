@@ -1,0 +1,23 @@
+Benchmarks: Time::Keeper::Natural against the marks of
+plan_port_natural_xs/13-benchmarks-and-the-gate.md, set before the port was
+measured (the pure-Perl 0.01's were in plan_time_keeper_natural/11). There is no rival to compare with: no module on CPAN reads these
+phrases in these locales, so each mark is a rate or a size of its own.
+
+From the dist's top, after `perl Makefile.PL && make`, with Time::Keeper 0.07
+or later installed or on PERL5LIB:
+
+    perl -Mblib bench/run.pl            # every mark
+    perl -Mblib bench/03-tomorrow.pl    # one
+
+A rate is calls a second by Benchmark's countit over half a second of CPU, the
+best of five; Benchmark subtracts its own empty-loop overhead, which flatters a
+fast call, so each line also gives the plain wall-clock rate. Every rate is
+the same text parsed again and again, and nothing is cached between calls, so
+repetition does not flatter it.
+
+    TKN_BENCH_SECONDS   seconds a run (0.5)
+    TKN_BENCH_RUNS      runs, the best kept (5)
+    TKN_BENCH_LOADS     fresh processes for the load time (41)
+
+Measured 19 October 2026 on an Apple M5, perl 5.42, Time::Keeper 0.07:
+see the numbers in plan_port_natural_xs/13-benchmarks-and-the-gate.md.

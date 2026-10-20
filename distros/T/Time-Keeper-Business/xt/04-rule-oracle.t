@@ -16,38 +16,45 @@ require "$FindBin::Bin/RuleOracle.pl";
 my ($X, $P) = ('Time::Keeper::Business::Rule', 'Time::Keeper::Business::RuleOracle');
 srand($ENV{TKB_SEED} // 20261018);
 
-my @forms = ('none', 'next_business_day', 'nearest_business_day', 'next_monday');
+my @forms = ('none', 'next_business_day', 'nearest_business_day', 'next_monday', 'previous_business_day', 'next_business_day_if_sunday');
 sub recipe {
     my $depth = shift;
-    my $k = int(rand(5));
+    my $k = int(rand(8));
     my %r;
     if ($k == 0) { my $m = 1 + int(rand(12)); %r = (kind => 'fixed', args => [ month => $m, day => 1 + int(rand($m == 2 ? 29 : 30)) ]) }
     elsif ($k == 1) { %r = (kind => 'nth', args => [ month => 1 + int(rand(12)), day_of_week => 1 + int(rand(7)), n => (-1, 1 .. 5)[int(rand(6))] ]) }
     elsif ($k == 2) { %r = (kind => 'easter', args => [ offset => int(rand(121)) - 60, orthodox => int(rand(2)) ]) }
     elsif ($k == 3) { %r = (kind => 'relative', base => recipe(99), args => [ days => int(rand(21)) - 10 ]) }
+    elsif ($k == 5 || $k == 6) { %r = (kind => ($k == 5 ? 'weekday_on_or_after' : 'weekday_on_or_before'), base => recipe(99), args => [ day_of_week => 1 + int(rand(7)), days => int(rand(11)) - 5, n => 1 + int(rand(3)) ]) }
     else {
         return recipe($depth) if $depth >= 2;
-        %r = (kind => 'set', members => [ map { recipe($depth + 1) } 0 .. int(rand(5)) ], args => [ (rand() < 0.3 ? (weekend => [ grep { rand() < 0.4 } 1 .. 6 ]) : ()) ]);
+        %r = (kind => 'set', members => [ (map { recipe($depth + 1) } 0 .. int(rand(5))), (rand() < 0.4 ? { kind => 'sandwiched', args => [ name => 'sw' ] } : ()) ], args => [ (rand() < 0.3 ? (weekend => [ grep { rand() < 0.4 } 1 .. 6 ]) : ()) ]);
     }
     push @{ $r{args} }, name => "h$k" . int(rand(1000)) if rand() < 0.8;
-    $r{observed} = $forms[ int(rand(@forms)) ] if $r{kind} ne 'set' && rand() < 0.5;
+    $r{observed} = $forms[ int(rand(@forms)) ] if $r{kind} ne 'set' && $r{kind} ne 'sandwiched' && rand() < 0.5;
+    $r{keep} = 1 if $r{observed} && rand() < 0.3;
     $r{obs_weekend} = [ grep { rand() < 0.4 } 1 .. 6 ] if $r{observed} && rand() < 0.2;
     $r{between} = [ (rand() < 0.5 ? (from => 1990 + int(rand(60))) : ()), (rand() < 0.5 ? (to => 2000 + int(rand(60))) : ()) ] if rand() < 0.2;
     $r{only_if} = int(rand(3)) + 2 if rand() < 0.15;
+    $r{except} = [ map { 1900 + int(rand(300)) } 1 .. 1 + int(rand(20)) ] if rand() < 0.15;
+    $r{also} = [ map { sprintf '%04d-%02d-%02d', 1900 + int(rand(300)), 1 + int(rand(12)), 1 + int(rand(28)) } 1 .. 1 + int(rand(20)) ] if rand() < 0.15;
     return \%r;
 }
 sub build {
     my ($class, $r) = @_;
     my $rule;
     if ($r->{kind} eq 'set') { $rule = $class->set((map { build($class, $_) } @{ $r->{members} }), @{ $r->{args} }) }
-    elsif ($r->{kind} eq 'relative') {
+    elsif ($r->{kind} eq 'relative' || $r->{kind} =~ /^weekday_/) {
         my $base = build($class, $r->{base});
-        $base = build($class, { kind => 'fixed', args => [ month => 3, day => 1 ] }) if $r->{base}{kind} eq 'set';
-        $rule = $class->relative(rule => $base, @{ $r->{args} });
+        $base = build($class, { kind => 'fixed', args => [ month => 3, day => 1 ] }) if $r->{base}{kind} eq 'set' || $r->{base}{kind} eq 'sandwiched';
+        my $k = $r->{kind};
+        $rule = $class->$k(rule => $base, @{ $r->{args} });
     }
     else { my $k = $r->{kind}; $rule = $class->$k(@{ $r->{args} }) }
-    $rule = $rule->observed($r->{observed}, ($r->{obs_weekend} ? (weekend => $r->{obs_weekend}) : ())) if $r->{observed};
+    $rule = $rule->observed($r->{observed}, ($r->{obs_weekend} ? (weekend => $r->{obs_weekend}) : ()), ($r->{keep} ? (keep => 1) : ())) if $r->{observed};
     $rule = $rule->between(@{ $r->{between} }) if $r->{between};
+    $rule = $rule->except(years => $r->{except}) if $r->{except};
+    $rule = $rule->also(dates => $r->{also}) if $r->{also};
     if (my $mod = $r->{only_if}) { $rule = $rule->only_if(sub { $_[0] % $mod }) }
     return $rule;
 }

@@ -1,0 +1,6 @@
+|scenario|submit eligible order|customer|for item|sku|quantity|quantity|
+|$order=|create order for|@customer|
+|add item|@sku|quantity|@quantity|to order|$order|
+|check|reserve inventory for|$order|true|
+|check|submit order|$order|true|
+|check|status of order|$order|submitted|

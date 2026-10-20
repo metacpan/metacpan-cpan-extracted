@@ -1,0 +1,22 @@
+# Time::Keeper::Natural word table: pt
+#
+# UNREVIEWED: written 18 Oct 2026 by a session, as the p2p site's catalogues were.
+# A native reader should review it before release. The format is en.txt's.
+#
+# pt-PT reads this file through its chain.
+start_of	início de|início do|início da|começo de|começo do|começo da|no início de|no início do|no início da|no começo de|no começo do|no começo da
+end_of	fim de|fim do|fim da|final de|final do|final da|no fim de|no fim do|no fim da|no final de|no final do|no final da
+at	às|à
+on	na|no
+skip	o|a|os|as
+and
+of	de|do|da
+last	último|última
+# test: fim do mês passado => 2026-09-30T23:59:59.999999999+01:00
+# test: início do próximo mês => 2026-11-01T00:00:00+00:00
+# test: fim do ano => 2026-12-31T23:59:59.999999999+00:00
+# test: no final de outubro => 2026-10-31T23:59:59.999999999+00:00
+# test: amanhã às 15:30 => 2026-10-16T15:30:00+01:00
+# test: na terça-feira => 2026-10-20T00:00:00+01:00
+# test: a terceira sexta-feira do próximo mês => 2026-11-20T00:00:00+00:00
+# test: a última sexta-feira de outubro => 2026-10-30T00:00:00+00:00

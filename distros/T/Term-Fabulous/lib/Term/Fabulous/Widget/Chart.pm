@@ -5,7 +5,7 @@ use warnings;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 use Object::Pad 0.825;
 
@@ -21,7 +21,7 @@ class Term::Fabulous::Widget::Chart
 	use Clay::UI::Enum::Result;
 	use Clay::XS qw(sizing_grow);
 	use List::Util qw(max min sum0);
-	use Scalar::Util qw(refaddr weaken);
+	use Scalar::Util qw(refaddr);
 	use Term::Fabulous::Check qw(boolean describe one_of);
 	use Term::Fabulous::Chart::Palette qw(palette_colors is_palette_name palette_names chart_color mix_rgb is_light_rgb ink_colors);
 	use Term::Fabulous::Chart::Surface;
@@ -74,15 +74,15 @@ class Term::Fabulous::Widget::Chart
 			( $_ink{$name} ) = chart_color( $self, $name, $given{$name} ) if defined $given{$name};
 		}
 
-		weaken( my $weak_self = $self );
 		my $continue = Clay::UI::Enum::Result->CONTINUE;
-		$self->on( MouseMove => sub ($event) { $weak_self->_pointer_moved($event) if defined $weak_self; return $continue } );
-		$self->on( Mouse     => sub ($event) { $weak_self->_pointer_moved($event) if defined $weak_self; return $continue } );
+		$self->on( MouseMove => sub ( $self, $event ) { $self->_pointer_moved($event); return $continue }, owner => $self );
+		$self->on( Mouse     => sub ( $self, $event ) { $self->_pointer_moved($event); return $continue }, owner => $self );
 		$self->on(
-			OnHoverStopped => sub ($event) {
-				$weak_self->_hover_target(undef) if defined $weak_self && refaddr( $event->target ) == refaddr($weak_self);
+			OnHoverStopped => sub ( $self, $event ) {
+				$self->_hover_target(undef) if refaddr( $event->target ) == refaddr($self);
 				return $continue;
-			}
+			},
+			owner => $self
 		);
 	}
 
@@ -552,7 +552,7 @@ title, legend, colors and hover
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-chart.svg" alt="Four bar charts of the same data: the legend at the top, at the bottom under a centered title, at the right with the iOS series highlighted and the others faded, and at the left of a chart on a light panel with a right-aligned title"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.05/screenshots/widget-chart.svg" alt="Four bar charts of the same data: the legend at the top, at the bottom under a centered title, at the right with the iOS series highlighted and the others faded, and at the left of a chart on a light panel with a right-aligned title"></p>
 
 =end html
 

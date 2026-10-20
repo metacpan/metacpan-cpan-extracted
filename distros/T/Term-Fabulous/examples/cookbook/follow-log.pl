@@ -7,9 +7,9 @@ no warnings 'experimental::signatures';
 
 use IO::Async::Loop;
 use IO::Async::Timer::Periodic;
-use List::Util qw(min);
 use Term::Fabulous;
 use Term::Fabulous::Enum::BorderStyle;
+use Term::Fabulous::Scrolling qw(scroll_by_columns scroll_by_rows scroll_to_end);
 use Term::Fabulous::Widget::Box;
 use Term::Fabulous::Widget::ScrollBox;
 use Term::Fabulous::Widget::Text;
@@ -29,9 +29,12 @@ $root->add_child(
 	)
 );
 
+# follow_end keeps the newest line in view until the user scrolls up;
+# back at the end, the box follows again.
 my $log = Term::Fabulous::Widget::ScrollBox->new(
 	id               => 'log',
 	horizontal       => 1,    # vertical scrolling is on by default
+	follow_end       => 1,
 	background_color => [ 30, 35, 50, 255 ],
 	bordered         => 1,
 	border_color     => [ 120, 160, 220, 255 ],
@@ -45,39 +48,19 @@ $root->add_child($log);
 
 my $ui = Term::Fabulous->new( root => $root, width => 80, height => 24 );
 
-# scroll_state describes the last frame: the scroll position, the visible
-# size of the box (viewport) and the size of its content. The position is
-# 0 at the top and left and negative when scrolled down or right; the
-# lowest one shows the bottom of the content.
-sub lowest_y ($state) { return min( 0, $state->{viewport}{height} - $state->{content}{height} ) }
-
-# Moves the view; scroll_to keeps it within the content.
-sub scroll_by ( $columns, $rows ) {
-	my $state = $ui->scroll_state($log) or return;    # not laid out yet
-	$ui->scroll_to( $log, { x => $state->{position}{x} - $columns, y => $state->{position}{y} - $rows } );
-	return;
-}
-
-# Follow the newest line until the user scrolls up; End follows again.
-my $follow = 1;
-$log->on(
-	OnScroll => sub ($event) {
-		$follow = 0 if $event->delta_y > 0;    # positive: the view moved up
-		return;
-	}
-);
-
+# The moves stop at the edges of the content. Moving up leaves the end,
+# which stops the following; End goes back to it, which resumes it.
 my %action_by_key = (
-	Up    => sub { $follow = 0; scroll_by( 0, -1 ) },
-	Down  => sub { scroll_by( 0,  1 ) },
-	Left  => sub { scroll_by( -4, 0 ) },
-	Right => sub { scroll_by( 4,  0 ) },
-	Home  => sub { $follow = 0; $ui->scroll_to( $log, { x => 0, y => 0 } ) },
-	End   => sub { $follow = 1 },
+	Up    => sub { scroll_by_rows( $ui, $log, -1 ) },
+	Down  => sub { scroll_by_rows( $ui, $log,  1 ) },
+	Left  => sub { scroll_by_columns( $ui, $log, -4 ) },
+	Right => sub { scroll_by_columns( $ui, $log,  4 ) },
+	Home  => sub { $ui->scroll_to( $log, { x => 0, y => 0 } ) },
+	End   => sub { scroll_to_end( $ui, $log ) },
 );
 $root->on(
 	KeyPress => sub ($event) {
-		my $action = $action_by_key{ $event->key_name // '' } or return;
+		my $action = $action_by_key{ $event->main_key_name // '' } or return;
 		$action->();
 		return;
 	}
@@ -93,20 +76,6 @@ $loop->add(
 			my $text = sprintf 'Line %4d', $count;
 			$text .= ' ' . ( '-' x 150 ) . ' a wide line' if $count % 5 == 0;    # wider than the box
 			$log->add_child( Term::Fabulous::Widget::Text->new( text => $text, text_color => [ 200, 210, 230, 255 ] ) );
-			return;
-		},
-	)->start
-);
-
-# The content height is known only after the frame that lays out a new
-# line, so keep moving to the bottom as long as the view follows.
-$loop->add(
-	IO::Async::Timer::Periodic->new(
-		interval => 1 / 30,
-		on_tick  => sub {
-			return unless $follow;
-			my $state = $ui->scroll_state($log) or return;
-			$ui->scroll_to( $log, { y => lowest_y($state) } ) if $state->{position}{y} != lowest_y($state);
 			return;
 		},
 	)->start

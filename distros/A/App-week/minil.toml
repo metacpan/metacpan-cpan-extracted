@@ -15,4 +15,8 @@ os = [
 ]
 
 [FileGatherer]
-exclude_match = ['^docs/.*']
+exclude_match = [
+    '^docs/.*',
+    '^images/.*',
+    '^CLAUDE\.md$',
+]

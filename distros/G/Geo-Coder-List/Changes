@@ -1,5 +1,81 @@
 Revision history for Geo-Coder-List
 
+0.39	Mon Oct 19 12:54:37 PM EDT 2026
+	[ Enhancements ]
+	- reverse_geocode(): croak on a latlng that is not a numeric pair written in
+	  the ASCII digits 0-9; it used to be split and sent to every backend
+	- geocode(): a location that does not match a geocoder's regex no longer
+	  spends that geocoder's limit
+	- geocode(): in list context, every answer inside a Geo::GeoNames-style
+	  array is returned, not only the first one of each array
+	- new(): a clone has its own geocoder chain and limits; pushing onto it or
+	  spending a limit no longer changes the original.  It still shares L1 and
+	  L2 with the original
+	- LWP::Protocol::https and IPC::System::Simple are no longer runtime
+	  prerequisites, since the module uses neither; install them yourself if
+	  you relied on this module to pull them in
+	- geocode(): the location rule is Geo::Location::Predicate's, which is a
+	  distribution of its own now, so this module declares it as a
+	  recommendation in META instead of requiring Geo::Coder::Free, and nothing
+	  here decides the rule again.  It is looked for when it is first needed
+	  rather than when this module loads.  Without it a reference is still
+	  refused and a string of digits is looked up as it was before the rule
+	  existed; with it the rule decides everything
+	- Debug messages also go to the configured logger, at debug level
+	- An L2 cache whose get() or set() dies is warned about and treated as a
+	  miss, rather than failing the lookup
+
+	[ Bug fixes ]
+	- geocode(): refuse a reference; it used to be accepted because the string it
+	  turns into contains a non-digit
+	- geocode(): the location rule is asked of the HTML-decoded string, so
+	  '&#49;&#50;' is refused as the digits it is
+	- geocode(): a result with a latitude but no longitude is passed over so the
+	  next geocoder can answer, instead of croaking "BUG: ... not sensible"
+	- geocode(): a bare scalar ahead of a valid result no longer dies with
+	  "Can't use string as a HASH ref"
+	- geocode(): with an L2 cache, the result returned (and held in L1) was
+	  stripped to geometry and lost lat/lng and its geocoder; only the L2 copy is
+	  stripped now
+	- geocode(): a plain string in the cache is not returned as a result
+	- geocode(), reverse_geocode(): the caller's $@ is left alone
+	- _cache(): a result with no geometry is cached for cache_miss_duration; the
+	  lat check auto-vivified geometry, so it was always cache_part_duration
+	- reverse_geocode(): a list-context cache hit returned an arrayref, and a
+	  scalar call after a list call returned one too
+	- reverse_geocode(): in list context a geocoder with no address no longer
+	  ends the search, and the empty answer is not cached
+	- reverse_geocode(): in list context a plain-string address no longer dies
+	  with "Can't use string as a HASH ref"
+	- The module compiles on Perl 5.10.1 again, as Makefile.PL says; a regex
+	  flag needing 5.14 had crept in
+
+	[ Documentation ]
+	- Rewrote the POD: more SYNOPSIS examples, DESCRIPTION, SUPPORTED ANSWER
+	  FORMATS, COMMON PITFALLS, ENCODING, API SPECIFICATION blocks in the form
+	  extract-schemas --strict-pod=fatal reads, FORMAL SPECIFICATION and STATE
+	  DIAGRAM
+
+	[ CI ]
+	- .github/workflows/location-predicates.yml runs the location-predicate fuzz
+	  here, on a schedule and on a push, with --sibling Geo-Coder-List: this
+	  distribution is graded against Geo::Location::Predicate and the other five
+	  are not, so a drift here fails in the repository that would have to fix it
+	  rather than only in Geo-Coder-Free's daily run.
+
+	[ Packaging ]
+	- Declare Data::Dumper and constant at runtime; move LWP::Protocol::https and
+	  IPC::System::Simple to TEST_REQUIRES and add LWP::UserAgent there
+	- Dropped the unused autodie
+	- ignore.txt is no longer shipped; xt/ is skipped by MANIFEST.SKIP
+
+	[ Testing ]
+	- Added t/reference.t, the same test as the other Geo::Coder distributions
+	- t/function.t: hostile-input, mid-flight failure and helper tests
+	- t/30-basics.t uses Test::Mockingbird instead of Test::MockObject
+	- Added t/minimum-version.t, an author test that the module's syntax needs
+	  no later Perl than Makefile.PL declares
+
 0.38	Fri Jul 10 13:35:31 EDT 2026
 	[ Bug fixes ]
 	- Fixed testing prereqs (affected AUTHOR_TESTING only)

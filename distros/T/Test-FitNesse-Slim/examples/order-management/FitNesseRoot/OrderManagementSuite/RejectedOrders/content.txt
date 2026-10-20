@@ -1,0 +1,18 @@
+!1 Rejected orders report a business reason
+
+An inactive customer cannot submit an order. A stock shortage is atomic: it
+does not reserve the available part of an order.
+
+|script|Order workflow|
+|$order=|create order for|C-300|
+|add item|COFFEE|quantity|1|to order|$order|
+|check|reserve inventory for|$order|false|
+|check|last error?|Customer is not eligible to place an order.|
+|check|submit order|$order|false|
+|check|last error?|Customer is not eligible to place an order.|
+|check|status of order|$order|draft|
+|$shortOrder=|create order for|C-100|
+|add item|TEA|quantity|6|to order|$shortOrder|
+|check|reserve inventory for|$shortOrder|false|
+|check|last error?|Insufficient stock for TEA: requested 6, available 5.|
+|check|status of order|$shortOrder|draft|

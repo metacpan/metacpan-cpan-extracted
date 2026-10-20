@@ -5,7 +5,7 @@ use warnings;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 use Object::Pad 0.825;
 
@@ -38,7 +38,7 @@ class Term::Fabulous::ThemeEditor::UI :isa(Term::Fabulous) :strict(params) {
 	}
 
 	method is_in_preview ($widget) {
-		for ( my $node = $widget; defined $node; $node = $node->can('parent') ? $node->parent : undef ) {
+		foreach my $node ( $widget, $widget->ancestors ) {
 			return 1 if defined $preview_roots{ refaddr $node };
 			my $dialog = $node->can('dialog') ? $node->dialog : undef;    # a dialog's backdrop draws as its dialog
 			return 1 if defined $dialog && defined $preview_roots{ refaddr $dialog };

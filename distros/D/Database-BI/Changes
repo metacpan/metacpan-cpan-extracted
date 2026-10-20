@@ -1,5 +1,38 @@
 Revision history for Database-BI
 
+0.014.0	Mon Oct 19 09:49:36 AM EDT 2026
+	[ New Features ]
+	- GET /map renders the filtered dataset on an OpenStreetMap map via
+	  HTML::OSM (optional).  Use lat=/lon= for coordinate columns already in
+	  the data, or loc=<column> to geocode a place-name column.  Rows sharing
+	  a position are collapsed to one marker; out-of-range coordinate columns
+	  return 400; markers and popup columns are configurable.
+	- Database::BI::Model::Geocode resolves place-name columns via
+	  Geo::Coder::Free (optional, >= 0.47).  Lookups are one-per-distinct-value,
+	  cached in the model store (.bi/models.json), capped per request
+	  (map_geocode_max), and skipped rather than failed for blanks and bare
+	  numbers.  Without the geocoder, previously resolved places are still
+	  plotted.
+	[ Enhancements ]
+	- Full keyboard accessibility audit.  Canvas and chart resize handles are
+	  now sliders in the tab order (arrow keys, Shift for bigger steps, Home/End
+	  for min/max); card size can also be set from a Size menu on each card.
+	  Canvas cards are draggable to a chosen grid cell from the keyboard
+	  (arrow keys in the header, Shift+arrow for edge).  Pivot column headers
+	  sort (Enter/Space) and move (Shift+Left/Right) from the keyboard.
+	  Home-page card tooltips appear on focus.  Stacked and multi-series line
+	  chart legends are toggle switches.  Treemap tile values are read in the
+	  tile name.  Every size change and card move is announced via a live region.
+	- Browser test suite (t/browser-*.t) driven by headless Firefox via
+	  Marionette.  Covers canvas keyboard controls, chart resize/export/a11y,
+	  pivot keyboard, and home-page focus behaviour.  Runs as a separate CI
+	  job (.github/workflows/browser.yml); skips automatically when Firefox
+	  is unavailable.
+	[ Bug Fixes ]
+	- GET /combo: ?bar_val= and ?line_val= are now the canonical parameter
+	  names (?bar= and ?line= kept as aliases).  ?cat= is now the canonical
+	  x-axis parameter (?x= kept as alias), consistent with /stacked.
+
 0.013.0 Fri Oct 16 04:08:48 PM EDT 2026
 	[ New Features ]
 	- Saved canvases: multi-visual workspace pages (/a/:id) that combine

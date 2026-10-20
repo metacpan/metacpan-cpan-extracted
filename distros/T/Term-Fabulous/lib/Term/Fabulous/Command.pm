@@ -5,7 +5,7 @@ use warnings;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 use Object::Pad 0.825;
 
@@ -48,6 +48,12 @@ class Term::Fabulous::Command :strict(params) {
 
 	method keys () {
 		return @keys;
+	}
+
+	# The label where the command is named outside a menu: without the
+	# "..." that says it opens a dialog.
+	method plain_label () {
+		return $label =~ s/\.\.\.\z//r;
 	}
 
 	# The keys as a menu shows them.
@@ -148,7 +154,8 @@ L<Term::Fabulous::Commands> table refer to the command by it.
 
 What a menu shows, a string. Required. End it with three dots
 (C<Save as...>) when the command asks for more before it does
-anything, as is the custom in menus.
+anything, as is the custom in menus. L</plain_label> gives the label
+without them.
 
 =item C<keys>
 
@@ -186,6 +193,15 @@ that.
 	say $command->label;
 
 The parameters of the same names.
+
+=head2 plain_label
+
+	say $command->plain_label;    # "Save as" for the label "Save as..."
+
+The label without a trailing C<...>, for the places that name the
+command outside a menu (a key reference, a status message; see
+L<Term::Fabulous::Widget::KeyReference/command_rows>). Menus show
+L</label>, whose C<...> says that the command opens a dialog.
 
 =head2 keys
 

@@ -7,8 +7,8 @@ build_requires:
   Test2::V0: '0'
 configure_requires:
   Alien::Xmake: v1.0.5
-  Alien::Xrepo: v1.0.9
-  Alien::Xrepo::Build: v1.0.9
+  Alien::Xrepo: v1.0.10
+  Alien::Xrepo::Build: v1.0.10
   Alien::Xrepo::MB: '0'
   CPAN::Meta: '0'
   Config: '0'
@@ -38,12 +38,12 @@ no_index:
 provides:
   Alien::SDL3:
     file: lib/Alien/SDL3.pm
-    version: v3.4.20
+    version: v3.4.21
 recommends:
   Affix: '0'
 requires:
-  Alien::Xrepo::Build: v1.0.9
-  Alien::Xrepo::Runtime: v1.0.9
+  Alien::Xrepo::Build: v1.0.10
+  Alien::Xrepo::Runtime: v1.0.10
   File::ShareDir: '1.00'
   Path::Tiny: '0'
   perl: '5.040000'
@@ -52,7 +52,7 @@ resources:
   homepage: https://github.com/Perl-SDL3/Alien-SDL3.pm
   license: http://www.perlfoundation.org/artistic_license_2_0
   repository: https://github.com/Perl-SDL3/Alien-SDL3.pm.git
-version: v3.4.20
+version: v3.4.21
 x_authority: cpan:SANKO
 x_ignore:
   - .tidyallrc

@@ -665,4 +665,362 @@ subtest 'is_focused tracks focus / blur transitions' => sub {
 	is($b->is_focused, 1, 'after focus(b): b focused');
 };
 
+# -----------------------------------------------------------------------------
+# Entry hooks, focus_scope and focus_after: how the focus enters and
+# leaves a subtree with its own order.
+# -----------------------------------------------------------------------------
+
+# A focusable container that decides how the focus enters it, steps
+# through its own content, and hands the focus on past its last widget,
+# like a document view.
+class TestGate
+	:does(Clay::UI::Role::Core::Container)
+	:does(Clay::UI::Role::Interaction::Focusable)
+	:does(Clay::UI::Role::Interaction::HasFocusOrder)
+{
+	use Scalar::Util qw(refaddr);
+	field $entry :param :accessor = 'self';    # 'self', 'default', or a widget
+	field @asked :reader;
+
+	method get_entry_focus ($direction) {
+		push @asked, $direction;
+		return $self if $entry eq 'self';
+		return undef if $entry eq 'default';
+		return $entry;
+	}
+
+	method get_next_focus     { $self->_step('next') }
+	method get_previous_focus { $self->_step('previous') }
+
+	# The default order inside, until it would wrap; then the tracker's
+	# step after the whole subtree.
+	method _step ($direction) {
+		my $interaction = $self->ui->interaction;
+		my @inside      = $interaction->focusables(within => $self);
+		my $focused     = $interaction->get_focused_widget;
+		my ($at) = grep { refaddr($inside[$_]) == refaddr($focused) } 0 .. $#inside;
+		my $wrapped = $direction eq 'next' ? $at == $#inside : $at == 0;
+		return $interaction->focus_after($self, $direction) if $wrapped;
+		return $direction eq 'next' ? $interaction->default_next_focus(within => $self) : $interaction->default_previous_focus(within => $self);
+	}
+}
+
+# A backdrop whose order keeps Tab inside its dialog, which is its only
+# child, and whose scope is that dialog.
+class TestBackdrop
+	:does(Clay::UI::Role::Core::Container)
+	:does(Clay::UI::Role::Interaction::Focusable)
+	:does(Clay::UI::Role::Interaction::HasFocusOrder)
+{
+	field $dialog :param;
+	method focus_scope        { $dialog }
+	method get_next_focus     { $self->default_next_focus(within => $dialog) // $self }
+	method get_previous_focus { $self->default_previous_focus(within => $dialog) // $self }
+}
+
+class BadScope
+	:does(Clay::UI::Role::Core::Container)
+	:does(Clay::UI::Role::Interaction::HasFocusOrder)
+{
+	method focus_scope        { 'nowhere' }
+	method get_next_focus     { $self->default_next_focus }
+	method get_previous_focus { $self->default_previous_focus }
+}
+
+sub ids ($ui) { return $ui->interaction->get_focused_widget->id }
+
+subtest 'Tab from above lands on a gate, not on its first child' => sub {
+	my ($a, $x, $y, $b) = map { TestInput->new(id => $_) } qw(a x y b);
+	my $gate = TestGate->new(id => 'gate');
+	$gate->add_child($x, $y);
+	my $ui = make_ui($a, $gate, $b);
+	$ui->interaction->set_focused_widget($a);
+	$ui->interaction->focus_next;
+	is(ids($ui), 'gate', 'the gate itself gets the focus');
+	is([ $gate->asked ], ['next'], 'the hook was asked once, with the direction');
+	$ui->interaction->focus_next;
+	is(ids($ui), 'x', 'inside the gate, its own order steps to x');
+	$ui->interaction->focus_next;
+	is(ids($ui), 'y', 'then to y');
+	$ui->interaction->focus_next;
+	is(ids($ui), 'b', 'past the last child the focus leaves the gate');
+	is(scalar(() = $gate->asked), 1, 'the hook is not asked while the focus is inside');
+};
+
+subtest 'Shift+Tab from below lands on the gate too' => sub {
+	my ($a, $x, $y, $b) = map { TestInput->new(id => $_) } qw(a x y b);
+	my $gate = TestGate->new(id => 'gate');
+	$gate->add_child($x, $y);
+	my $ui = make_ui($a, $gate, $b);
+	$ui->interaction->set_focused_widget($b);
+	$ui->interaction->focus_previous;
+	is(ids($ui), 'gate', 'the gate, not its last child');
+	is([ $gate->asked ], ['previous'], 'asked with previous');
+	$ui->interaction->focus_previous;
+	is(ids($ui), 'a', 'from the gate, previous leaves it upward');
+};
+
+subtest 'an entry hook returning undef lets the default order in' => sub {
+	my ($a, $x, $b) = map { TestInput->new(id => $_) } qw(a x b);
+	my $gate = TestGate->new(id => 'gate', entry => 'default');
+	$gate->add_child($x);
+	my $ui = make_ui($a, $gate, $b);
+	$ui->interaction->set_focused_widget($a);
+	$ui->interaction->focus_next;
+	is(ids($ui), 'gate', 'the default order reaches the gate, a Focusable, first');
+	$gate->entry('default');
+	$ui->interaction->set_focused_widget($b);
+	$ui->interaction->focus_previous;
+	is(ids($ui), 'x', 'backwards, the default order reaches the last child');
+};
+
+subtest 'an entry hook may redirect to another widget' => sub {
+	my ($a, $x, $y) = map { TestInput->new(id => $_) } qw(a x y);
+	my $gate = TestGate->new(id => 'gate', entry => $y);
+	$gate->add_child($x, $y);
+	my $ui = make_ui($a, $gate);
+	$ui->interaction->set_focused_widget($a);
+	$ui->interaction->focus_next;
+	is(ids($ui), 'y', 'the hook chose y');
+};
+
+subtest 'with nested gates the outermost one is asked' => sub {
+	my ($a, $x) = map { TestInput->new(id => $_) } qw(a x);
+	my $inner = TestGate->new(id => 'inner');
+	$inner->add_child($x);
+	my $outer = TestGate->new(id => 'outer');
+	$outer->add_child($inner);
+	my $ui = make_ui($a, $outer);
+	$ui->interaction->set_focused_widget($a);
+	$ui->interaction->focus_next;
+	is(ids($ui), 'outer', 'the outer gate');
+	is(scalar(() = $inner->asked), 0, 'the inner gate was not asked');
+	$ui->interaction->focus_next;
+	is(ids($ui), 'inner', 'inside the outer gate, the inner gate is entered through its hook');
+	is([ $inner->asked ], ['next'], 'now the inner one was asked');
+};
+
+subtest 'focusables and default_next_focus honour entry hooks but not the scope itself' => sub {
+	my ($a, $x, $y, $b) = map { TestInput->new(id => $_) } qw(a x y b);
+	my $gate = TestGate->new(id => 'gate');
+	$gate->add_child($x, $y);
+	my $ui = make_ui($a, $gate, $b);
+	$ui->interaction->set_focused_widget($a);
+	same($ui->interaction->default_next_focus, $gate, 'default_next_focus stops at the gate');
+	same($ui->interaction->default_next_focus(within => $gate), $gate, 'within the gate, the gate is first and is not asked');
+	is([ $gate->asked ], ['next'], 'asked only by the unscoped walk');
+	is([ map { $_->id } $ui->interaction->focusables ], [qw(a gate x y b)], 'focusables lists everything');
+};
+
+subtest 'focus_after steps past a subtree within the whole tree' => sub {
+	my ($a, $x, $y, $b) = map { TestInput->new(id => $_) } qw(a x y b);
+	my $box = Clay::UI::Test::Box->new(id => 'box');
+	$box->add_child($x, $y);
+	my $ui = make_ui($a, $box, $b);
+	same($ui->interaction->focus_after($box, 'next'),     $b, 'after the box comes b');
+	same($ui->interaction->focus_after($box, 'previous'), $a, 'before the box comes a');
+	same($ui->interaction->focus_after($y, 'next'),       $b, 'after a leaf, the next focusable');
+	$ui->interaction->set_focused_widget($x);
+	same($ui->interaction->focus_after($box, 'next'), $b, 'the focused widget inside does not matter');
+	my ($p, $q) = map { TestInput->new(id => $_) } qw(p q);
+	my $end = Clay::UI::Test::Box->new(id => 'end');
+	$end->add_child($q);
+	my $last = make_ui($p, $end);
+	same($last->interaction->focus_after($end, 'next'), $p, 'past the end it wraps to the first focusable');
+	$b->can_focus(0);
+	same($ui->interaction->focus_after($box, 'next'), $a, 'a widget that cannot focus is skipped');
+};
+
+subtest 'focus_after stays inside the scope of the enclosing order' => sub {
+	my ($a, $c, $x, $d, $b) = map { TestInput->new(id => $_) } qw(a c x d b);
+	my $gate = TestGate->new(id => 'gate');
+	$gate->add_child($x);
+	my $trap = TestTrap->new(id => 'trap');
+	$trap->add_child($c, $gate, $d);
+	my $ui = make_ui($a, $trap, $b);
+	same($ui->interaction->focus_after($gate, 'next'),     $d, 'after the gate, inside the trap');
+	same($ui->interaction->focus_after($gate, 'previous'), $c, 'before the gate, inside the trap');
+	$trap->remove_child($d);
+	same($ui->interaction->focus_after($gate, 'next'), $c, 'at the end of the trap it wraps to c, not to b');
+	$ui->interaction->set_focused_widget($x);
+	$ui->interaction->focus_next;
+	is(ids($ui), 'c', 'Tab past the last widget of the gate wraps inside the trap');
+};
+
+subtest 'focus_scope keeps a backdrop out of its own order' => sub {
+	my ($c, $x) = map { TestInput->new(id => $_) } qw(c x);
+	my $gate = TestGate->new(id => 'gate');
+	$gate->add_child($x);
+	my $dialog = Clay::UI::Test::Box->new(id => 'dialog');
+	$dialog->add_child($c, $gate);
+	my $backdrop = TestBackdrop->new(id => 'backdrop', dialog => $dialog);
+	$backdrop->add_child($dialog);
+	my $ui = make_ui($backdrop);
+	same($ui->interaction->focus_after($gate, 'next'), $c, 'after the gate the dialog wraps to c, never to the backdrop');
+	$ui->interaction->set_focused_widget($x);
+	$ui->interaction->focus_next;
+	is(ids($ui), 'c', 'Tab from the last widget of the gate reaches c');
+	$ui->interaction->focus_next;
+	is(ids($ui), 'gate', 'and Tab from c enters the gate through its hook');
+};
+
+subtest 'focus_after checks its arguments' => sub {
+	my $a  = TestInput->new(id => 'a');
+	my $ui = make_ui($a);
+	like(dies { $ui->interaction->focus_after($a, 'sideways') }, qr/direction must be 'next' or 'previous', got 'sideways'/, 'a bad direction dies');
+	like(dies { $ui->interaction->focus_after('a', 'next') }, qr/focus_after: takes a widget/, 'a non-widget dies');
+	my $other = make_ui(TestInput->new(id => 'o'));
+	my ($o) = $other->interaction->focusables;
+	like(dies { $ui->interaction->focus_after($o, 'next') }, qr/does not belong to this Clay::UI/, 'a widget of another UI dies');
+	my $bad = BadScope->new(id => 'bad');
+	$bad->add_child(my $inside = TestInput->new(id => 'inside'));
+	my $scoped = make_ui($bad);
+	like(dies { $scoped->interaction->focus_after($inside, 'next') }, qr/BadScope returned 'nowhere' from focus_scope/, 'a bad focus_scope dies naming the class');
+};
+
+subtest 'an invalid entry result dies naming the class' => sub {
+	my $a    = TestInput->new(id => 'a');
+	my $gate = TestGate->new(id => 'gate', entry => 'not a widget');
+	$gate->add_child(TestInput->new(id => 'x'));
+	my $ui = make_ui($a, $gate);
+	$ui->interaction->set_focused_widget($a);
+	like(dies { $ui->interaction->focus_next }, qr/TestGate returned a non-widget/, 'dies');
+};
+
+# -----------------------------------------------------------------------------
+# Focus heirs: who takes the focus when the focused widget leaves or can no
+# longer take it.
+# -----------------------------------------------------------------------------
+
+# A container that can take the focus itself, like a list around its rows.
+class TestFocusPanel
+	:does(Clay::UI::Role::Core::Container)
+	:does(Clay::UI::Role::Interaction::Focusable)
+{}
+
+# A container that names its heir, like a tab view naming its active tab.
+class TestHeirNamer :does(Clay::UI::Role::Core::Container) {
+	field $heir :param = undef;
+
+	method set_heir ($widget) { $heir = $widget; return }
+	method focus_heir ()      { return $heir }
+}
+
+sub focus_log (@widgets) {
+	my @log;
+	for my $w (@widgets) {
+		$w->on('OnFocus', sub ($e) { push @log, $w->id . ':focus'; return });
+		$w->on('OnBlur',  sub ($e) { push @log, $w->id . ':blur'; return });
+	}
+	return \@log;
+}
+
+subtest 'the nearest ancestor that can take the focus inherits it' => sub {
+	my $row   = Clay::UI::Test::Box->new(id => 'row');
+	my $field = TestInput->new(id => 'field');
+	my $list  = TestFocusPanel->new(id => 'list');
+	$row->add_child($field);
+	$list->add_child($row);
+	my $ui  = make_ui($list);
+	my $log = focus_log($field, $list);
+	$ui->interaction->set_focused_widget($field);
+	@$log = ();
+	$list->remove_child($row);
+	same( $ui->interaction->get_focused_widget, $list, 'the list has the focus' );
+	is( $log, [ 'field:blur', 'list:focus' ], 'OnBlur first, then OnFocus at the heir' );
+};
+
+subtest 'an ancestor focus_heir names the heir' => sub {
+	my ($tab, $field) = map { TestInput->new(id => $_) } qw(tab field);
+	my $page = Clay::UI::Test::Box->new(id => 'page');
+	$page->add_child($field);
+	my $tabs = TestHeirNamer->new(id => 'tabs', heir => $tab);
+	$tabs->add_child($tab, $page);
+	my $ui  = make_ui($tabs);
+	my $log = focus_log($field, $tab);
+	$ui->interaction->set_focused_widget($field);
+	@$log = ();
+	$tabs->remove_child($page);
+	same( $ui->interaction->get_focused_widget, $tab, 'the named widget has the focus' );
+	is( $log, [ 'field:blur', 'tab:focus' ], 'in one batch' );
+
+	my $seen;
+	my $other = TestInput->new(id => 'other');
+	$tabs->add_child($page);
+	$page->add_child($other);
+	$ui->interaction->set_focused_widget($other);
+	$other->on('OnBlur', sub ($e) { $seen = $ui->interaction->get_focused_widget; return });
+	$page->remove_child($other);
+	same( $seen, $tab, 'OnBlur listeners already see the heir focused' );
+};
+
+subtest 'a leaving widget names who comes after it' => sub {
+	my $behind = TestInput->new(id => 'behind');
+	my $item   = TestInput->new(id => 'item');
+	my $popup  = TestHeirNamer->new(id => 'popup', heir => $behind);
+	$popup->add_child($item);
+	my $ui = make_ui($behind, $popup);
+	$ui->interaction->set_focused_widget($item);
+	$ui->root->remove_child($popup);
+	same( $ui->interaction->get_focused_widget, $behind, 'the removed popup\'s own hook is asked' );
+};
+
+subtest 'an heir that is leaving or cannot take the focus is passed over' => sub {
+	my ($inside, $field, $disabled) = map { TestInput->new(id => $_) } qw(inside field disabled);
+	$disabled->disabled(1);
+	my $panel = TestHeirNamer->new(id => 'panel', heir => $inside);
+	$panel->add_child($inside, $field);
+	my $outer = TestHeirNamer->new(id => 'outer', heir => $disabled);
+	$outer->add_child($panel, $disabled);
+	my $list = TestFocusPanel->new(id => 'list');
+	$list->add_child($outer);
+	my $ui = make_ui($list);
+
+	$ui->interaction->set_focused_widget($field);
+	$outer->remove_child($panel);
+	same( $ui->interaction->get_focused_widget, $list,
+		'a heir inside the leaving subtree and a disabled one are skipped; the walk goes on up' );
+
+	my $alone = TestInput->new(id => 'alone');
+	my $ui2   = make_ui($alone);
+	$ui2->interaction->set_focused_widget($alone);
+	$ui2->root->remove_child($alone);
+	is( $ui2->interaction->get_focused_widget, undef, 'without an heir nothing has the focus' );
+};
+
+subtest 'a focused widget that becomes ineligible hands the focus to its heir' => sub {
+	my ($field, $other) = map { TestInput->new(id => $_) } qw(field other);
+	my $form = TestFocusPanel->new(id => 'form');
+	$form->add_child($field, $other);
+	my $ui  = make_ui($form);
+	my $log = focus_log($field, $form);
+	$ui->interaction->set_focused_widget($field);
+	@$log = ();
+	$field->disabled(1);
+	same( $ui->interaction->get_focused_widget, $form, 'disabling it focuses the form around it' );
+	is( $log, [ 'field:blur', 'form:focus' ], 'OnBlur, then OnFocus' );
+
+	my $namer = TestHeirNamer->new(id => 'namer', heir => $other);
+	my $input = TestInput->new(id => 'input');
+	$namer->add_child($input);
+	$form->add_child($namer);
+	$ui->interaction->set_focused_widget($input);
+	$input->can_focus(0);
+	same( $ui->interaction->get_focused_widget, $other, 'can_focus(0) asks the hooks too' );
+};
+
+subtest 'a focus_heir that returns a non-widget dies after the removal' => sub {
+	my $field = TestInput->new(id => 'field');
+	my $bad   = TestHeirNamer->new(id => 'bad', heir => 'the header');
+	$bad->add_child($field);
+	my $ui = make_ui($bad);
+	$ui->interaction->set_focused_widget($field);
+	my @blurred;
+	$field->on('OnBlur', sub ($e) { push @blurred, 1; return });
+	like( dies { $bad->remove_child($field) }, qr/TestHeirNamer returned 'the header' from focus_heir, which is not a widget/,
+		'dies naming the class' );
+	is( [ $field->parent, $ui->interaction->get_focused_widget, scalar @blurred ], [ undef, undef, 1 ],
+		'the field was removed, nothing is focused and it got its OnBlur' );
+};
+
 done_testing;

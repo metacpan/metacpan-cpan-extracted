@@ -64,6 +64,13 @@ application's clock and ask for a frame when their next one is due
 (L<Term::Fabulous/request_frame_at>). A widget of your own can do the
 same; see L<Term::Fabulous::Widget::Display/ANIMATION>.
 
+Work that needs the layout of a frame, such as reading where a widget
+was drawn, needs no timer either: C<< $ui->after_draw >> calls code
+once after the next frame, and C<< $ui->each_draw >> after every frame
+until it returns true (L<Term::Fabulous::Render/after_draw>,
+L<Term::Fabulous::Render/each_draw>); a widget uses
+L<Term::Fabulous::Widget/each_frame>.
+
 The cookbook has complete programs: the recipes
 L<Update the screen from a timer|Term::Fabulous::Cookbook::LiveData/Update the screen from a timer (a clock)>
 and L<Show the output of a running command|Term::Fabulous::Cookbook::LiveData/Show the output of a running command>.
@@ -139,7 +146,7 @@ would show:
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/example-static-report.svg" alt="Three panels with double, heavy and round borders, printed to the terminal"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.05/screenshots/example-static-report.svg" alt="Three panels with double, heavy and round borders, printed to the terminal"></p>
 
 =end html
 
@@ -228,6 +235,11 @@ the loop do not run (call the code they would run from the test), and a
 resize is applied at once instead of after the size settled. Mouse
 events are dropped when the program runs without the mouse (as a real
 terminal would not send them), for example in inline mode.
+
+Pass C<< clock =E<gt> sub { $now } >> to C<new> to control time (see
+L<Term::Fabulous/new>): clicks count as a double click only within
+C<double_click_seconds> on that clock, and the dropdown's type-ahead
+and the animations move on with it.
 
 To test the key handling of a single widget in isolation, you can fire
 events at it directly with C<fire_event>. Such an event goes to the

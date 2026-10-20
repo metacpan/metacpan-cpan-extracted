@@ -4,7 +4,26 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{% title %} - {% site_title %}</title>
-<link rel="stylesheet" href="{% prefix %}{% assets %}/app.css">
+{% if meta.description %}<meta name="description" content="{% meta.description %}">
+{% end %}{% if meta.keywords %}<meta name="keywords" content="{% meta.keywords %}">
+{% end %}{% if meta.author %}<meta name="author" content="{% meta.author %}">
+{% end %}{% if meta.robots %}<meta name="robots" content="{% meta.robots %}">
+{% end %}{% if canonical %}<link rel="canonical" href="{% canonical %}">
+{% end %}{% if kind eq 'page' %}<meta property="og:type" content="{% og_type %}">
+<meta property="og:title" content="{% title %}">
+<meta property="og:site_name" content="{% site_title %}">
+{% if canonical %}<meta property="og:url" content="{% canonical %}">
+{% end %}{% if meta.description %}<meta property="og:description" content="{% meta.description %}">
+{% end %}{% if image %}<meta property="og:image" content="{% image %}">
+{% end %}{% if meta.image_alt %}<meta property="og:image:alt" content="{% meta.image_alt %}">
+{% end %}{% if date_iso %}<meta property="article:published_time" content="{% date_iso %}">
+{% end %}{% if updated_iso %}<meta property="article:modified_time" content="{% updated_iso %}">
+{% end %}<meta name="twitter:card" content="{% twitter_card %}">
+<meta name="twitter:title" content="{% title %}">
+{% if meta.description %}<meta name="twitter:description" content="{% meta.description %}">
+{% end %}{% if image %}<meta name="twitter:image" content="{% image %}">
+{% end %}{% if meta.image_alt %}<meta name="twitter:image:alt" content="{% meta.image_alt %}">
+{% end %}{% end %}<link rel="stylesheet" href="{% prefix %}{% assets %}/app.css">
 </head>
 <body>
 <header class="punk-md-header">

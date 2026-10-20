@@ -30,4 +30,13 @@ for my $file (@files) {
 }
 cmp_ok($checked, '>', 0, "checked $checked messages");
 
+# Both walks stop at an instance that does not parse, so such a message
+# compares nothing. The -06 charset corpus captures carry "b" Recipe steps,
+# invalid under -07: say how many, and keep it visible until the recapture.
+TODO: {
+    local $TODO = 'recapture the -06 charset corpus after the -07 deploy';
+    is($ChainPlanReference::UNPARSED, 0,
+       "every message was walked ($ChainPlanReference::UNPARSED stopped at an instance -07 cannot parse)");
+}
+
 done_testing;

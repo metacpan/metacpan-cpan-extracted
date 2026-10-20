@@ -10,7 +10,7 @@ use File::Copy ();
 use File::Basename ();
 use Template::Stencil;
 
-our $VERSION = '0.61';
+our $VERSION = '0.62';
 
 sub new {
     my ($class, %args) = @_;
@@ -653,6 +653,57 @@ directory that template came from, so a kit's template cannot include one
 of Punk's. And templates are not C<.pm> files, so a distribution shipping
 them has to add them to C<PM> in its F<Makefile.PL> by hand - MakeMaker
 finds C<.pm> and C<.pod> and nothing else.
+
+=head2 Class methods for kits and commands
+
+Each of these may be called on Punk::Generate or on a kit. Where it
+matters, the template search path is the invocant's, so a kit sees its own
+templates ahead of Punk's.
+
+=over 4
+
+=item vars(\%vars)
+
+The variables every skeleton template is rendered with. This returns
+C<\%vars> unchanged; a kit overrides it to add its own, so the templates it
+overrides by name get the same hash as the rest.
+
+=item render_skel($template, \%vars)
+
+Renders one skeleton template, found on the search path, and returns the
+text. Croaks, listing the directories searched, when no directory has the
+template.
+
+=item write_skel($template, $path, \%vars)
+
+Renders as L</render_skel> does and writes the result to C<$path> as
+UTF-8, creating its directory. Returns C<$path>. How a command such as
+C<punk api sync> adds a stub identical to one C<punk new> would have
+generated.
+
+=item skel_dir
+
+Where this class keeps its templates: F<skel/> beside its own module file,
+found through C<%INC>. Croaks when the module was not loaded from a file.
+
+=item skel_dirs
+
+The search path: the L</skel_dir> of every class in the invocant's
+inheritance chain that has one, most derived first.
+
+=item api_plan($spec_path)
+
+What C<--api> would generate from that document, without writing anything:
+a hashref of C<groups> (the operations, grouped as described under
+L</With a spec>), C<schemes> (the security schemes the document requires),
+C<auth_class> and C<first_op>. Croaks when the file does not exist.
+
+=item ident($string)
+
+The package-name-safe identifier this module makes from a tag or a path
+segment, so a caller grouping operations names them the same way.
+
+=back
 
 =head2 Failure
 

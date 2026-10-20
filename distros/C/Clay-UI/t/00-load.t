@@ -18,33 +18,61 @@ is( CLAY_TOP_TO_BOTTOM,           1, 'CLAY_TOP_TO_BOTTOM == 1' );
 is( CLAY__SIZING_TYPE_FIT,        0, 'CLAY__SIZING_TYPE_FIT == 0' );
 is( CLAY_RENDER_COMMAND_TYPE_RECTANGLE, 1, 'CLAY_RENDER_COMMAND_TYPE_RECTANGLE == 1' );
 
-# Every enum field of the struct schemas accepts its group's last member and
-# nothing past it; for the transition property flags, every flag OR-ed
-# together.
-my $all_properties = 0;
-$all_properties |= Clay::XS->can($_)->() for grep { /^CLAY_TRANSITION_PROPERTY_/ } Clay::XS::_constant_names();
+my $GROUPS = Clay::XS::_constant_groups();
 
-my @enum_fields = (
-	[ Clay_LayoutConfig            => 'layoutDirection',      CLAY_BACK_TO_FRONT ],
-	[ Clay_LayoutConfig            => 'lineSizing',           CLAY_LINE_SIZING_FIT ],
-	[ Clay_ChildAlignment          => 'x',                    CLAY_ALIGN_X_CENTER ],
-	[ Clay_ChildAlignment          => 'y',                    CLAY_ALIGN_Y_CENTER ],
-	[ Clay_SizingAxis              => 'type',                 CLAY__SIZING_TYPE_FIXED ],
-	[ Clay_TextElementConfig       => 'wrapMode',             CLAY_TEXT_WRAP_NONE ],
-	[ Clay_TextElementConfig       => 'textAlignment',        CLAY_TEXT_ALIGN_RIGHT ],
-	[ Clay_FloatingAttachPoints    => 'element',              CLAY_ATTACH_POINT_RIGHT_BOTTOM ],
-	[ Clay_FloatingAttachPoints    => 'parent',               CLAY_ATTACH_POINT_RIGHT_BOTTOM ],
-	[ Clay_FloatingElementConfig   => 'pointerCaptureMode',   CLAY_POINTER_CAPTURE_MODE_PASSTHROUGH ],
-	[ Clay_FloatingElementConfig   => 'attachTo',             CLAY_ATTACH_TO_ROOT ],
-	[ Clay_FloatingElementConfig   => 'clipTo',               CLAY_CLIP_TO_ATTACHED_PARENT ],
-	[ Clay_TransitionElementConfig => 'properties',           $all_properties ],
-	[ Clay_TransitionElementConfig => 'interactionHandling',  CLAY_TRANSITION_ALLOW_INTERACTIONS_WHILE_TRANSITIONING_POSITION ],
-	[ Clay_TransitionElementConfig => 'enter.trigger',        CLAY_TRANSITION_ENTER_TRIGGER_ON_FIRST_PARENT_FRAME ],
-	[ Clay_TransitionElementConfig => 'exit.trigger',         CLAY_TRANSITION_EXIT_TRIGGER_WHEN_PARENT_EXITS ],
-	[ Clay_TransitionElementConfig => 'exit.siblingOrdering', CLAY_EXIT_TRANSITION_ORDERING_ABOVE_SIBLINGS ],
-	[ Clay_TransitionCallbackArguments => 'transitionState', CLAY_TRANSITION_STATE_EXITING ],
-	[ Clay_TransitionCallbackArguments => 'properties',      $all_properties ],
-);
+is( [ sort map { @{ $_->{members} } } values %$GROUPS ], [ sort( Clay::XS::_constant_names() ) ],
+	'the constant groups hold exactly the exported constants' );
+
+# Every exported group lists exactly the members of its enum in the patched
+# clay.h, in declaration order, so a member Clay adds cannot go missing.
+# Explicit values (the flags group's combinations) are not compared.
+sub enums_in_header ($path) {
+	open my $fh, '<', $path or die "cannot read $path: $!";
+	my $source = do { local $/; <$fh> };
+	$source =~ s{/\*.*?\*/}{}gs;
+	$source =~ s{//[^\n]*}{}g;
+	my %enums;
+	while ( $source =~ /typedef\s+(?:CLAY_PACKED_ENUM|enum)\s*\{([^}]*)\}\s*(\w+)\s*;/g ) {
+		my ($body, $type) = ($1, $2);
+		$enums{$type} = [ map { /^\s*(\w+)/ ? $1 : () } split /,/, $body ];
+	}
+	return \%enums;
+}
+
+SKIP: {
+	my $header = 'src/clay/clay.h';
+	skip "$header is not generated (run make first)", scalar keys %$GROUPS unless -f $header;
+	my $enums = enums_in_header($header);
+	for my $group ( sort keys %$GROUPS ) {
+		my ($type, $members) = @{ $GROUPS->{$group} }{qw(type members)};
+		is( $members, $enums->{$type}, "$group lists every member of $type, in order" );
+	}
+}
+
+# Every enum field of the struct schemas accepts its group's largest value
+# and nothing past it: a sequence group's last member, or for a flags group
+# every member OR-ed together.
+sub largest_value ($group) {
+	my $description = $GROUPS->{$group} or die "the schemas name the unknown constant group '$group'";
+	my @values = map { Clay::XS->can($_)->() } @{ $description->{members} };
+	return $values[-1] if $description->{kind} eq 'sequence';
+	my $all = 0;
+	$all |= $_ for @values;
+	return $all;
+}
+
+# Anonymous schemas are listed as '<struct>.<field>'; check_struct takes the
+# struct and reaches them through the path.
+my $SCHEMAS = Clay::XS::_struct_schemas();
+my @enum_fields;
+for my $schema ( sort keys %$SCHEMAS ) {
+	my ($type, @outer) = split /\./, $schema;
+	for my $field ( @{ $SCHEMAS->{$schema} } ) {
+		next unless defined $field->{enum};
+		push @enum_fields, [ $type, join( '.', @outer, $field->{name} ), largest_value( $field->{enum} ) ];
+	}
+}
+ok( scalar @enum_fields, 'the struct schemas name the enum group of their enum fields' );
 
 # { a => { b => $value } } for the path 'a.b'.
 sub nested ($path, $value) {

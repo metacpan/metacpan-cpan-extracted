@@ -46,7 +46,7 @@
 %#
 %# END BPS TAGGED BLOCK }}}
 <form name="QuickCalls" hx-post="<% RT->Config->Get('WebPath') %>/Helpers/QuickCalls" hx-target="closest [hx-get]">
-  <input type="hidden" class="hidden" name="From" value="<% $ARGS{From} %>">
+  <input type="hidden" class="hidden" name="QuickCallsPath" value="<% $ARGS{QuickCallsPath} %>">
 % if ( $quickcall_dashboard_id ) {
   <input type="hidden" class="hidden" name="QuickCallsDashboard" value="<% $quickcall_dashboard_id %>">
 % }
@@ -65,7 +65,7 @@
 my $subtitle = '';
 my $config   = RT->Config->Get('QuickCalls') || [];
 
-my $path = $ARGS{From} || $r->path_info;
+my $path = $ARGS{QuickCallsPath} || $r->path_info;
 my @path = split '/', $path;
 
 my ( $dashboard_id, $dashboard_name ) = @path[2,3];

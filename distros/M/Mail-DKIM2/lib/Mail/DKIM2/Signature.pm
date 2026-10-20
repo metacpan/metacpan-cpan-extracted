@@ -2,12 +2,12 @@ package Mail::DKIM2::Signature;
 use strict;
 use warnings;
 
-our $VERSION = '0.22';
+our $VERSION = '0.25';
 
 use MIME::Base64 qw(encode_base64 decode_base64);
 use Carp;
 
-use Mail::DKIM2::Common qw(encode_tag_json decode_tag_json fold_header to_rfc5321_path);
+use Mail::DKIM2::Common qw(encode_tag_json decode_tag_json fold_header to_rfc5321_path to_alabel);
 
 use base 'Mail::DKIM2::TagValueList';
 
@@ -31,7 +31,7 @@ sub new {
     $self->set_tag('m', $args{Version})   if defined $args{Version};
     $self->set_tag('t', $args{Timestamp}) if defined $args{Timestamp};
     $self->set_tag('d', $args{Domain})    if defined $args{Domain};
-    # nd= (draft-06 §8.7) replaces mf=/rt= for an imaginary forwarding hop.
+    # nd= (-07 §10.7) replaces mf=/rt= for an imaginary forwarding hop.
     $self->set_tag('nd', $args{NextDomain}) if defined $args{NextDomain};
     $self->set_tag('n', $args{Nonce})     if defined $args{Nonce};
 
@@ -42,10 +42,10 @@ sub new {
     # mf= and rt= are base64-encoded SMTP addresses; mutually exclusive with nd=
     if (!defined $args{NextDomain}) {
         if (defined $args{MailFrom}) {
-            $self->set_tag('mf', encode_base64(to_rfc5321_path($args{MailFrom}), ''));
+            $self->set_tag('mf', encode_base64(_path($args{MailFrom}), ''));
         }
         if (defined $args{RcptTo}) {
-            my @encoded = map { encode_base64(to_rfc5321_path($_), '') } @{$args{RcptTo}};
+            my @encoded = map { encode_base64(_path($_), '') } @{$args{RcptTo}};
             $self->set_tag('rt', join(',', @encoded));
         }
     }
@@ -60,6 +60,15 @@ sub new {
     }
 
     return $self;
+}
+
+# An address as mf= or rt= records it: an RFC 5321 path in angle brackets
+# (-07 sections 10.5, 10.6), its domain written as A-labels (section 18).
+sub _path {
+    my ($addr) = @_;
+    my $path = to_rfc5321_path($addr);
+    $path =~ s/\@([^@>]*)>\z/"\@" . to_alabel($1) . ">"/e;
+    return $path;
 }
 
 # --- Parse from header line ---
@@ -99,7 +108,7 @@ sub domain {
     return $self->get_tag('d');
 }
 
-# nd= the domain that signs the next DKIM2-Signature (draft-06 §8.7). Present
+# nd= the domain that signs the next DKIM2-Signature (-07 §10.7). Present
 # only for an imaginary forwarding hop, where it replaces mf=/rt=.
 sub next_domain {
     my $self = shift;
@@ -119,7 +128,7 @@ sub nonce {
 
 # Where the grammar allows FWS inside a value -- within a base64string
 # (§2.13: a signature value folded across lines), and around the "," and ":"
-# that separate s= items and their parts (§8.9's sig-set) -- it is not part
+# that separate s= items and their parts (§10.9's sig-set) -- it is not part
 # of the value.
 sub _strip_fws {
     my ($v) = @_;
@@ -128,7 +137,7 @@ sub _strip_fws {
     return $v;
 }
 
-# f= is a comma-separated list of flags (§8.6). Get as an arrayref, or set
+# f= is a comma-separated list of flags (§10.10). Get as an arrayref, or set
 # from one.
 sub flags {
     my $self = shift;
@@ -141,12 +150,12 @@ sub flags {
     return [grep { length } map { _strip_fws($_) } split /,/, $f];
 }
 
-# One s= item (§8.9): selector [FWS] ":" [FWS] sig-name [FWS] ":"
+# One s= item (§10.9): selector [FWS] ":" [FWS] sig-name [FWS] ":"
 # message-sig. FWS is trimmed from around the selector and algorithm and
 # removed from inside the base64 value -- and nowhere else: whitespace inside
 # a selector or algorithm name makes the item malformed, never a different
 # name ("rsa- sha256" is not rsa-sha256; follow-up review F4). A Selector is
-# a Domain (§3.5) and a sig-name a textstring of letters, digits, "-" and "_".
+# a Domain (§3.6) and a sig-name a textstring of letters, digits, "-" and "_".
 my $FWS = qr/[ \t\r\n]*/;
 sub _parse_sig_item {
     my ($part) = @_;
@@ -190,11 +199,11 @@ sub syntax_error {
 # --- Envelope accessors (mf= and rt= tags) ---
 
 # mf= and rt= are base64-encoded RFC 5321 paths; both are excluded by nd=
-# (§8.7), which marks an imaginary forwarding hop with no envelope of its
+# (§10.7), which marks an imaginary forwarding hop with no envelope of its
 # own. Setting either on an nd= signature is therefore a caller error.
 sub _croak_if_nd {
     my ($self, $tag) = @_;
-    croak "cannot set $tag= on a signature carrying nd= (spec-06 §8.7)"
+    croak "cannot set $tag= on a signature carrying nd= (-07 §10.7)"
         if defined $self->get_tag('nd');
 }
 
@@ -202,7 +211,7 @@ sub mail_from {
     my $self = shift;
     if (@_) {
         $self->_croak_if_nd('mf');
-        $self->set_tag('mf', encode_base64(to_rfc5321_path(shift), ''));
+        $self->set_tag('mf', encode_base64(_path(shift), ''));
     }
     my $mf = $self->get_tag('mf');
     return unless defined $mf;
@@ -210,7 +219,7 @@ sub mail_from {
 }
 
 # rt= is the only tag that differs between recipients of the same message.
-# §9.6 signs solely the Message-Instance and DKIM2-Signature header fields, so
+# §12.8 signs solely the Message-Instance and DKIM2-Signature header fields, so
 # the body hash, the header-fields hash and the Message-Instance are all
 # recipient-invariant: re-signing for another recipient means changing this tag
 # and nothing else. See Mail::DKIM2::Signer::sign_for_recipient. Takes one
@@ -223,7 +232,7 @@ sub rcpt_to {
         my @list = ref $rcpt eq 'ARRAY' ? @$rcpt : ($rcpt);
         croak "rcpt_to requires at least one recipient" unless @list;
         $self->set_tag('rt',
-            join(',', map { encode_base64(to_rfc5321_path($_), '') } @list));
+            join(',', map { encode_base64(_path($_), '') } @list));
     }
     my $rt = $self->get_tag('rt');
     return unless defined $rt;
@@ -279,7 +288,7 @@ sub as_string {
     return "DKIM2-Signature: " . $self->SUPER::as_string();
 }
 
-# Serialize with each s= item's signature value empty (§8.5, §9.6).
+# Serialize with each s= item's signature value empty (§10.5, §12.8).
 # Returns unfolded output. Used by the verifier to reconstruct the
 # signing input from a header read from the message.
 # Format: sel:alg:,sel2:alg2:
@@ -294,7 +303,7 @@ sub as_string_without_data {
     for my $t (@{$self->{order}}) {
         my $v = defined $self->{tags}{$t} ? $self->{tags}{$t} : '';
         if (lc $t eq 's') {
-            # Replace each sel:alg:sig with sel:alg: (empty value per §8.5)
+            # Replace each sel:alg:sig with sel:alg: (empty value per §10.5)
             $v =~ s/([^,:]+:[^,:]+):[^,]*/$1:/g;
         }
         push @parts, "$t=$v";
@@ -303,13 +312,13 @@ sub as_string_without_data {
 }
 
 # Folded header with empty s= values, ready for signing.
-# Used by the Signer: fold first, then canonicalize and sign. §9.6 deletes
+# Used by the Signer: fold first, then canonicalize and sign. §12.8 deletes
 # all WSP from the signing input, so the fold positions are not part of what
 # is signed; they need only be places the grammar allows FWS (fold_header).
 sub as_folded_string_without_data {
     my ($self) = @_;
 
-    # Replace each sel:alg:sig with sel:alg: (null/empty string per spec §8.5)
+    # Replace each sel:alg:sig with sel:alg: (null/empty string per spec §10.5)
     my $saved = $self->get_tag('s');
     my $stripped = $saved;
     $stripped =~ s/([^,:]+:[^,:]+):[^,]*/$1:/g;
@@ -349,7 +358,7 @@ sub sig_count {
     return scalar @$sigs;
 }
 
-# spec-06 §8.9 duplicate/limit rules for one DKIM2-Signature s= tag.
+# -07 §10.9 duplicate/limit rules for one DKIM2-Signature s= tag.
 #
 # A Selector MUST NOT appear more than once. The same signing algorithm MAY
 # appear a second time, but only with a distinct Selector -- three or more
@@ -359,7 +368,7 @@ sub sig_count {
 # not 3+).
 #
 # Matching is case-insensitive for both: hash/algorithm names are RFC 5234
-# ABNF quoted strings (case-insensitive), and a Selector is a Domain (§3.5),
+# ABNF quoted strings (case-insensitive), and a Selector is a Domain (§3.6),
 # and DNS names are case-insensitive.
 #
 # Returns a list of PERMERROR strings (empty if clean).
@@ -377,10 +386,10 @@ sub check_duplicates {
 
     my @errors;
     if (grep { $_ > 1 } values %sel_count) {
-        push @errors, "PERMERROR DKIM2-Signature i=$i_val has a duplicate selector";
+        push @errors, "PERMERROR: DKIM2-Signature i=$i_val has a duplicate selector";
     }
     if (grep { $_ > 2 } values %alg_count) {
-        push @errors, "PERMERROR DKIM2-Signature i=$i_val has more selectors than allowed";
+        push @errors, "PERMERROR: DKIM2-Signature i=$i_val has more selectors than allowed";
     }
     return @errors;
 }
@@ -420,7 +429,7 @@ Mail::DKIM2::Signature - One DKIM2-Signature header, parsed or under constructio
 
 =head1 DESCRIPTION
 
-A DKIM2-Signature header as defined in spec-06 section 8, as a
+A DKIM2-Signature header as defined in -07 section 10, as a
 L<Mail::DKIM2::TagValueList>. The tags:
 
 =over 4
@@ -445,12 +454,12 @@ Signing domain.
 =item C<mf=>, C<rt=>
 
 The envelope of this hop: MAIL FROM, and a comma-separated list of RCPT TO,
-each a base64-encoded RFC 5321 path with angle brackets (section 7.5 and
-7.6). C<< <> >> is the null sender.
+each a base64-encoded RFC 5321 path with angle brackets (-07 section 10.5 and
+10.6). C<< <> >> is the null sender.
 
 =item C<nd=>
 
-For an imaginary forwarding hop (section 9.3), the C<d=> of the hop that
+For an imaginary forwarding hop (-07 section 12.3), the C<d=> of the hop that
 signs next. Replaces C<mf=> and C<rt=>.
 
 =item C<n=>
@@ -459,8 +468,8 @@ A nonce of at most 64 characters.
 
 =item C<f=>
 
-Comma-separated flags: C<donotmodify>, C<donotexplode>, C<feedback>,
-C<feedhere>.
+Comma-separated flags (-07 section 10.10): C<exploded>, C<feedback>,
+C<feedhere>, or any other; an unknown flag has no effect.
 
 =item C<s=>
 
@@ -469,7 +478,7 @@ A selector may appear once; an algorithm at most twice.
 
 =back
 
-This module implements draft-ietf-dkim-dkim2-spec-06; see L<Mail::DKIM2/STATUS>
+This module implements draft-ietf-dkim-dkim2-spec-07; see L<Mail::DKIM2/STATUS>
 for what that means for the wire format and the API, and
 L<Mail::DKIM2/CONVENTIONS> for the option, input and error conventions every
 module here follows.

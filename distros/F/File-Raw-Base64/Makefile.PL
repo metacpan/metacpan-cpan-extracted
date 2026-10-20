@@ -38,13 +38,13 @@ my %WriteMakefileArgs = (
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '0',
         'ExtUtils::Depends'   => '0.404',
-        'File::Raw'           => '0.13',
+        'File::Raw'           => '0.15',
     },
     TEST_REQUIRES => {
         'Test::More' => '0',
     },
     PREREQ_PM => {
-        'File::Raw' => '0.12',
+        'File::Raw' => '0.15',
     },
     OBJECT => 'Base64$(OBJ_EXT) b64$(OBJ_EXT)',
     C      => ['b64.c'],

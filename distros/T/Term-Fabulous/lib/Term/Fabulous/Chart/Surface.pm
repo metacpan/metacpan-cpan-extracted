@@ -5,16 +5,14 @@ use warnings;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 use Object::Pad 0.825;
 
 class Term::Fabulous::Chart::Surface :strict(params) {
 	use Carp qw(croak);
 	use Term::Fabulous::Render::Attr qw(cell_color_attr);
-	use Term::Fabulous::Unicode qw(grapheme_clusters cluster_columns sanitize_text string_columns);
-
-	use constant ELLIPSIS => "\x{2026}";
+	use Term::Fabulous::Unicode qw(grapheme_clusters cluster_columns fit_columns sanitize_text string_columns);
 
 	# Stored in the cell right of a wide glyph.
 	use constant TAIL => '';
@@ -111,20 +109,8 @@ class Term::Fabulous::Chart::Surface :strict(params) {
 	# columns (cut with an ellipsis); returns the columns written.
 	method text ( $x, $y, $text, $fg, %options ) {
 		my ( $bg, $flags, $limit ) = ( $options{bg}, $options{flags} // 0, $options{max} );
-		my @clusters = grapheme_clusters( sanitize_text($text) );
-		my $total    = 0;
-		$total += cluster_columns($_) foreach @clusters;
-		if ( defined $limit && $total > $limit ) {
-			return 0 if $limit < 1;
-			my $room = $limit - 1;
-			my @kept;
-			foreach my $cluster (@clusters) {
-				last if cluster_columns($cluster) > $room;
-				$room -= cluster_columns($cluster);
-				push @kept, $cluster;
-			}
-			@clusters = ( @kept, ELLIPSIS );
-		}
+		my $shown    = sanitize_text($text);
+		my @clusters = grapheme_clusters( defined $limit ? fit_columns( $shown, $limit ) : $shown );
 
 		my $column = $x;
 		foreach my $cluster (@clusters) {
@@ -311,7 +297,8 @@ cell's background; C<$flags> are termbox2 style bits such as C<TB_BOLD>.
 	my $columns = $surface->text( $x, $y, $text, $fg, bg => $rgb, flags => TB_BOLD, max => 20 );
 
 Writes a character string, two cells per wide character. With C<max>, text
-wider than that is cut and ends in an ellipsis. Returns the number of
+wider than that is cut and ends in an ellipsis (see
+L<Term::Fabulous::Unicode/fit_columns>). Returns the number of
 columns written; text that would cross the right edge is cut there.
 
 =head2 text_columns

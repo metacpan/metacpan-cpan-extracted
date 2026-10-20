@@ -13,7 +13,7 @@ use warnings;
 
 use Carp;
 
-our $VERSION = v0.07;
+our $VERSION = v0.08;
 
 use parent qw(Lingua::famibeib::Word);
 
@@ -77,7 +77,7 @@ Lingua::famibeib::ForeignWord - module to interact with words foreign to famibei
 
 =head1 VERSION
 
-version v0.07
+version v0.08
 
 =head1 SYNOPSIS
 

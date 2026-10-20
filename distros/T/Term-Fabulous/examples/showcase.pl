@@ -186,9 +186,11 @@ sub hide_toast () {
 
 # --- The log -------------------------------------------------------------
 
+# follow_end keeps the newest line in view.
 my $log = Term::Fabulous::Widget::ScrollBox->new(
-	id     => 'log',
-	layout => { layout_direction => CLAY_TOP_TO_BOTTOM, sizing => { width => sizing_grow(), height => sizing_grow() } },
+	id         => 'log',
+	follow_end => 1,
+	layout     => { layout_direction => CLAY_TOP_TO_BOTTOM, sizing => { width => sizing_grow(), height => sizing_grow() } },
 );
 my $log_panel = panel( 'Events', { width => sizing_grow(), height => sizing_fixed(10) }, $log );
 
@@ -261,22 +263,6 @@ my $ui = Term::Fabulous->new( width => 100, height => 30, root => $root );
 
 my $loop = IO::Async::Loop->new;
 
-# Keeps the newest line in view (see "Scroll a ScrollBox from code" in
-# Term::Fabulous::Cookbook::LiveData): the content height is known only after the
-# frame that lays out a new line.
-my $log_id = Clay::XS::Clay_GetElementId('log');
-
-sub follow_log () {
-	my $data = Clay::XS::Clay_GetScrollContainerData($log_id);
-	return unless $data->{found};
-	my $lowest = $data->{scrollContainerDimensions}{height} - $data->{contentDimensions}{height};
-	$lowest = 0 if $lowest > 0;
-	return if abs( $data->{scrollPosition}{y} - $lowest ) < 0.5;    # Clay keeps fractions of a cell
-	Clay::XS::set_scroll_position( $log_id, { x => 0, y => $lowest } );
-	$ui->invalidate;    # a new scroll position alone does not ask for a frame
-	return;
-}
-
 my $hide_timer = IO::Async::Timer::Countdown->new( delay => 4, on_expire => sub { hide_toast(); return } );
 $loop->add($hide_timer);
 
@@ -297,8 +283,7 @@ $loop->add(
 		on_tick        => sub { $clock->text( strftime( '%H:%M:%S', localtime ) ); log_event(); return },
 	)->start
 );
-$loop->add( IO::Async::Timer::Periodic->new( interval => 0.25,   on_tick => sub { sample_requests(); return } )->start );
-$loop->add( IO::Async::Timer::Periodic->new( interval => 1 / 30, on_tick => sub { follow_log();      return } )->start );
+$loop->add( IO::Async::Timer::Periodic->new( interval => 0.25, on_tick => sub { sample_requests(); return } )->start );
 
 $ui->interaction->set_focused_widget($name);
 $ui->run;

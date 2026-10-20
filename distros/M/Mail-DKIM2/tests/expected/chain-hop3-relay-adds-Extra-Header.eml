@@ -1,19 +1,19 @@
 DKIM2-Signature: i=3; m=3; t=1740000000; d=test3.dkim2.com;
 	mf=PHJlbGF5QHRlc3QzLmRraW0yLmNvbT4=;
 	rt=PHVzZXJAdGVzdDQuZGtpbTIuY29tPg==;
-	s=sel3:rsa-sha256:hnSzy5Dsr12YMd0MZkkBCO+5CV0u1SgKgJttXJ+FTncNgA
-	bjKqGCD6ODw+tlfBnd0vwqxh26yMdX6/9fH2jy8W2eiMpC+K0hArGJ8kPdh7zn3k
-	ZPjfHM2C7Cny3RGDFh/hqiZznUDp2Ip7SxludwCiVNQkjkSh/DWta4UN8O3j8ZOp
-	XUUqBAqEWnqSfXpdxns65P6jg+xoz/5fGL759oBaETyfU22a5cQLxRb8tKMtFB+u
-	DSoTANVZruTZ3ibArAdjwr+nnj0dpj3b+Fy01nx6Ugr8aNmaY95HlWjjD4HFpc+K
-	sZvwWJGt6R7v9+A6JzI6VO2SnfMIJFz7ysYqeWqA==;
+	s=sel3:rsa-sha256:OA2nzYg+HiN/8CqAJ/F1qfMTC2iVgLX40aoJarB4YrwPp8
+	hp0MFybaRZ0jQg49EZJbijhHKlSvEVz5Tw8jVY/G7wrrsONRtMOIgii35OC9UUam
+	7hg9+oJ5IIu/rKksgPPXY31ce4IXjS9c8s9TbtL0G1dKRLLEyPHkv95qWJrQcwS1
+	t9tISHcJWcO7UH052me5aPsvOFLEMJxJ43p4FF13HETO+QolWPJZ7pqyfow8tRwQ
+	iCr92f8A+jxZkCy9EejLnF58LFEsa7Rq5I3kHqxmMFpBvQYozo2Yl6zaDEP9pyoB
+	dYJ4VdzoEADGaEYZ2cRFxaZTnVs38SkvZCQW856w==;
 Message-Instance: m=3;
-	h=sha256:ElVBaJDUrsU0T5JD/75pQwfTLBnvQ+A7AcFbKt10wRU=:AU2ehAlvQ2
+	h=sha256:hccpVJ4U1/VSIWZcRGKWbqXEFnuTg/ehX4DaML99f0A=:AU2ehAlvQ2
 	g+ZnJf3kTHsCycDFE7sCn6AhpbTGgSYFM=;
 	r=eyJiIjpbeyJjIjpbMSwxNV19LHsiYyI6WzE4LDY1XX1dLCJoIjp7ImV4dHJhLW
 	hlYWRlciI6W119fQ==;
 Message-Instance: m=2;
- h=sha256:hWR2jUhGIbgUk4+GFw4I3YOvmisoa423Fowk/BcJs9M=:4olUkMUi2b
+ h=sha256:esBgJxS9qku8gN8VBM1u/k0sVne4lmxnX700VhvlHYc=:4olUkMUi2b
  CCfVrAOg4rSNpPMBWnWoKd71+94zpiUqo=;
  r=eyJiIjpbeyJkIjpbIi0tMTJiNTNkYzgyOWQyNDUxMWJmYTA0ZjdkNWUzNjc1Zj
  giXX0seyJjIjpbNSw1XX0seyJjIjpbNyw5XX0seyJkIjpbIlRoaXMgZW1haWwgc3
@@ -52,33 +52,33 @@ Message-Instance: m=2;
  JvdW5kYXJ5PTEyYjUzZGM4MjlkMjQ1MTFiZmEwNGY3ZDVlMzY3NWY4Il19XSwiZG
  F0ZSI6W3siZCI6WyJUaHUsIDIxIE1hciAyMDI0IDEyOjA5OjM3ICsxMDAwIl19XS
  wiZmVlZGJhY2staWQiOltdLCJmcm9tIjpbeyJkIjpbIlwiQnJvbiBHb25kd2FuYV
- wiIDxicm9uZ0BmYXN0bWFpbHRlYW0uY29tPiJdfV0sImxpc3QtYXJjaGl2ZSI6W1
- 0sImxpc3QtaGVscCI6W10sImxpc3QtaWQiOltdLCJsaXN0LW93bmVyIjpbXSwibG
- lzdC1wb3N0IjpbXSwibGlzdC1zdWJzY3JpYmUiOltdLCJsaXN0LXVuc3Vic2NyaW
- JlIjpbXSwibWVzc2FnZS1pZCI6W3siZCI6WyI8ZmIxYjEwYWUtZWEzNi00ZWU0LW
- I4NGYtYjYyZjAzNmNmYWY1QGFwcC5mYXN0bWFpbC5jb20+Il19XSwibWVzc2FnZS
- 1pZC1oYXNoIjpbXSwicHJlY2VkZW5jZSI6W10sInN1YmplY3QiOlt7ImQiOlsiV2
- 9ya2luZyBncm91cCBsYXN0IGNhbGwgZHJhZnQtaWV0Zi1qbWFwLXdlYnB1c2gtdm
- FwaWQiXX1dfX0=;
+ wiIDxicm9uZ0B0ZXN0MS5ka2ltMi5jb20+Il19XSwibGlzdC1hcmNoaXZlIjpbXS
+ wibGlzdC1oZWxwIjpbXSwibGlzdC1pZCI6W10sImxpc3Qtb3duZXIiOltdLCJsaX
+ N0LXBvc3QiOltdLCJsaXN0LXN1YnNjcmliZSI6W10sImxpc3QtdW5zdWJzY3JpYm
+ UiOltdLCJtZXNzYWdlLWlkIjpbeyJkIjpbIjxmYjFiMTBhZS1lYTM2LTRlZTQtYj
+ g0Zi1iNjJmMDM2Y2ZhZjVAYXBwLmZhc3RtYWlsLmNvbT4iXX1dLCJtZXNzYWdlLW
+ lkLWhhc2giOltdLCJwcmVjZWRlbmNlIjpbXSwic3ViamVjdCI6W3siZCI6WyJXb3
+ JraW5nIGdyb3VwIGxhc3QgY2FsbCBkcmFmdC1pZXRmLWptYXAtd2VicHVzaC12YX
+ BpZCJdfV19fQ==;
 Message-Instance: m=1;
- h=sha256:tB8uwPQbcCHO6zvU0EnzEFWUKKBtwyzmrxeavy4Jn1g=:XI228V/720
+ h=sha256:MExUPRTBnQsJ/I3XKmPZnnJ5j9Ej5QLgtr3llRGAGZ4=:XI228V/720
  XNelm76DFKQf934iOEQQCt6wZ3uKCIr9Q=;
 DKIM2-Signature: i=2; m=2; t=1740000000; d=test2.dkim2.com;
  mf=PGJvdW5jZXNAdGVzdDIuZGtpbTIuY29tPg==; rt=PHVzZXJAdGVzdDMuZGtpbTIuY29tPg==;
- s=sel2:rsa-sha256:lZEbm5VzEu93SawsvY/aqycOCzE/nG+bPSn2J5ABVwmol7
- Dv+cr5oIrUvxXtuNBBkcvG4hHlbosQJMXtqrrRTViFF4k446quvrUKBHQiCcvTXu
- 7r7LOBof99COvhiqGemKUDVnm6kBzY/2hIVXUQSZnX0Sjs+eaYfPR5SA1zCWKxu2
- TbNM/KSJIgaZv708JHjZ1RiG/PyFHkEHKzwa8CSsrfdOx+5pjdKZ4McKhQPpPidw
- ame6T1fvgujOPsGNf+qvbeAtot2WOnf/OGN5/RAoVQkcYQxHfP6YKaldfEdG55NO
- IuwAtR3iOMQFtqkTUe7SG1rzScsRo6X1LpbQaY0g==;
+ s=sel2:rsa-sha256:VsuQeA1ga67gkZrsIwEOH0Tb+RVYRo4luof1lBRMKazobx
+ BeVqrPWL6jPrXhHi1HhT75Bpd8y7tfSQXBq+TPj0MkIrqwftVF4nfHW8q0bGX5pf
+ MpfIQP7n+2GOal6om0Kxk9fT1SX/DxiYseyIHJpelBY3Ameb7IpRvBqyjcXxf0Yn
+ MOHEVlntvM6YQP9wfEGxbSnjWWTu/UauiyzR7qvPRnh7zrGzhmgn1Tg9hjMHfExH
+ 8VQzDuRQ4s+tNzQywfnNQmAzMcf+WALuA/80J7zwukVzfEcdd6eHyHVgeEJIAKCG
+ eIOjHBBKtPSIUNOmGTwY1u4uqAJpRwdrGP87koQQ==;
 DKIM2-Signature: i=1; m=1; t=1740000000; d=test1.dkim2.com;
  mf=PGJyb25nQHRlc3QxLmRraW0yLmNvbT4=; rt=PGxpc3RAdGVzdDIuZGtpbTIuY29tPg==;
- s=sel1:rsa-sha256:Q66T/3z1H/uGCGVimDr54Jl29ZRNWc5JL+JjJdg4EGeSWP
- Gq1F+ISGrLryzWoUCHWb5sFt2E9Kr+vi1T82DwP8YNdx9dFc2KUF8zIlT8BoQuXi
- spGjX1DKaFuwqFUC71ylCUe+fetALw7XTZrH1UFcYqzQ488jCYNfNKVjUUJt8Rwr
- NugjK5UgQqDrzdrdx0DCUi+g1/6DiQrHIFxhuHs5dSX/HD/vX9InMXj9QWp6RPtx
- YwsuZlfIsERgPp7s6UxrdAUYeOhtzzCWItHw0at5XCBSJMqflEtuzBZNZW/wrlAI
- I+OyP81ooq5NT7m7cBzAz7gxA/ke7Gkl2zpRbs3w==;
+ s=sel1:rsa-sha256:O3hJo5RyB+12I1+VhjEg836M9V6HyMTH5FDLUkc25DnXho
+ xhuBN4/yvpYDMHk1qPyRrAzmwevX2TcsB13nbKwVxA0/A/tewNp14A+7KgU4sHtr
+ 9a/KU4eh3+czPuAouWVlxwZIXoVROUqEvqBvsPZ4b3wxAtVfkkruT6p12eWa/1Sw
+ dEg8yMK9lavMnK1E/KttyK6QJeLUJQLAowXoz4s1lltkXKXvN7IIG3ZlB+VF/Fd2
+ O8T/U7mAb4M2WRXSnlDA4LuhPqixAy21cglQVftbqQAIbM36FP0IVktxnLZzf+cy
+ 7ebk+ShEpVM0hjL+Nh80xC5OiZZpmmFOZfAWn8UA==;
 Extra-Header: yes
 Received: from ietfa.amsl.com (localhost [IPv6:::1])
 	by ietfa.amsl.com (Postfix) with ESMTP id B5BE4C1CAE68
@@ -203,7 +203,7 @@ List-Subscribe: <mailto:jmap-join@ietf.org>
 List-Unsubscribe: <mailto:jmap-leave@ietf.org>
 Content-Type: multipart/mixed; boundary="===============6090836018512317826=="
 X-Original-From: "Bron Gondwana" <brong@fastmailteam.com>
-From: Bron Gondwana <brong=40fastmailteam.com@dmarc.ietf.org>
+From: Bron Gondwana <brong=40test1.dkim2.com@test2.dkim2.com>
 
 --===============6090836018512317826==
 Content-Type: multipart/alternative; boundary=050c6a6ec8c942ab825bbc048ba71c35

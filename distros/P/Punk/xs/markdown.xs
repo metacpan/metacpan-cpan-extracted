@@ -55,6 +55,44 @@ app(class, dir, opts = NULL, prefix = NULL)
 
         index_name  = pmd_opt_str(aTHX_ ohv, "index", "index.md");
         want_search = pmd_opt_bool(aTHX_ ohv, "search", 1);
+        {
+            const char *how = pmd_opt_str(aTHX_ ohv, "sort", "order");
+            SV *sm = pmd_opt(aTHX_ ohv, "sitemap");
+            if (sm) {
+                STRLEN sl;
+                const char *sp = SvPV_const(sm, sl);
+                if (!(sl == 1 && (sp[0] == '0' || sp[0] == '1')))
+                    croak("Punk: markdown sitemap takes 0 or 1, not '%s'", sp);
+            }
+            SV *vars = pmd_opt(aTHX_ ohv, "vars");
+            if (vars) {
+                HV *vh;
+                HE *he;
+                int k;
+                if (!(SvROK(vars) && SvTYPE(SvRV(vars)) == SVt_PVHV))
+                    croak("Punk: markdown vars takes a hashref");
+                vh = (HV *)SvRV(vars);
+                for (k = 0; pmd_reserved[k]; k++)
+                    if (hv_exists(vh, pmd_reserved[k],
+                                  (I32)strlen(pmd_reserved[k])))
+                        croak("Punk: markdown vars may not use '%s', which "
+                              "the mount fills itself", pmd_reserved[k]);
+                /* a shallow copy, so the caller changing its hash after the
+                 * keyword changes nothing the pages were built from */
+                {
+                    HV *copy = newHV();
+                    hv_iterinit(vh);
+                    while ((he = hv_iternext(vh)))
+                        (void)hv_store_ent(copy, hv_iterkeysv(he),
+                                           newSVsv(HeVAL(he)), 0);
+                    (void)hv_stores(ohv, "vars", newRV_noinc((SV *)copy));
+                }
+            }
+            if (!strEQ(how, "order") && !strEQ(how, "alpha")
+                && !strEQ(how, "date"))
+                croak("Punk: markdown sort must be order, alpha or date, "
+                      "not '%s'", how);
+        }
 
         pages  = newHV();
         order  = newAV();
@@ -100,6 +138,15 @@ app(class, dir, opts = NULL, prefix = NULL)
             (void)hv_stores(sopts, "template_dir", newSVsv(tmpl_dir));
             (void)hv_stores(sopts, "wrapper",
                 newSVpv(pmd_opt_str(aTHX_ ohv, "wrapper", "wrapper.tmpl"), 0));
+            {
+                SV *f = pmd_opt(aTHX_ ohv, "filters");
+                if (f) {
+                    if (!(SvROK(f) && SvTYPE(SvRV(f)) == SVt_PVHV))
+                        croak("Punk: markdown filters takes a hashref of "
+                              "name => coderef");
+                    (void)hv_stores(sopts, "filters", newSVsv(f));
+                }
+            }
             /* punk_st resolves the ABI but the constructor below is an
              * ordinary method call, so the class has to be loaded too. */
             (void)punk_st(aTHX);
@@ -157,6 +204,7 @@ app(class, dir, opts = NULL, prefix = NULL)
             av_store(page, PMD_URL,  pmd_url_for(aTHX_ rel, index_name));
             av_store(page, PMD_FILE, newSVsv(full));
             av_store(page, PMD_SECTION, pmd_section_for(aTHX_ rel));
+            pmd_page_dates(aTHX_ page, meta);
 
             if ((v = pmd_opt(aTHX_ meta, "title"))) title = newSVsv(v);
             if (!title) title = pmd_first_h1(aTHX_ bytes + off, blen - off);
@@ -192,6 +240,15 @@ app(class, dir, opts = NULL, prefix = NULL)
                 av_store(page, PMD_ORDER, newSViv(is_index ? IV_MIN : IV_MAX));
             }
 
+            /* A section's index page may name its section and place it
+             * among the others: `section:` is the sidebar group's label,
+             * `section_order:` its position. Kept on every page here; only a
+             * section index's are read, below. */
+            v = pmd_opt(aTHX_ meta, "section");
+            av_store(page, PMD_SECLABEL, v ? newSVsv(v) : newSV(0));
+            v = pmd_opt(aTHX_ meta, "section_order");
+            av_store(page, PMD_SECORDER, v ? newSViv(SvIV(v)) : newSV(0));
+
             av_store(page, PMD_MTIME,
                 newSViv(PerlLIO_stat(SvPV_nolen(full), &pst) == 0
                         ? (IV)pst.st_mtime : 0));
@@ -222,6 +279,59 @@ app(class, dir, opts = NULL, prefix = NULL)
         }
         if (idx) sg->optimize(idx);
 
+        /* ---- name and place every section ----
+         * From its index page (`guide/index.md` for `guide`) when it says;
+         * otherwise the directory's name, prettified, and after every
+         * section that was given a place, in name order as before. Root
+         * pages have no section and come first. */
+        {
+            HV *secs = (HV *)sv_2mortal((SV *)newHV());
+            SSize_t j, m = av_len(order) + 1;
+            for (j = 0; j < m; j++) {
+                SV **u = av_fetch(order, j, 0);
+                HE *he = u ? hv_fetch_ent(pages, *u, 0, 0) : NULL;
+                AV *pg;
+                SV *sec, *url;
+                STRLEN sl, ul;
+                const char *ss, *us;
+                if (!he) continue;
+                pg  = (AV *)SvRV(HeVAL(he));
+                sec = *av_fetch(pg, PMD_SECTION, 0);
+                url = *av_fetch(pg, PMD_URL, 0);
+                ss = SvPV_const(sec, sl);
+                us = SvPV_const(url, ul);
+                if (sl && ul == sl + 1 && us[0] == '/' && memEQ(us + 1, ss, sl))
+                    (void)hv_store(secs, ss, (I32)sl, newRV_inc((SV *)pg), 0);
+            }
+            for (j = 0; j < m; j++) {
+                SV **u = av_fetch(order, j, 0);
+                HE *he = u ? hv_fetch_ent(pages, *u, 0, 0) : NULL;
+                AV *pg, *ix = NULL;
+                SV *sec, **ixp, *label = NULL;
+                IV place;
+                STRLEN sl;
+                const char *ss;
+                if (!he) continue;
+                pg  = (AV *)SvRV(HeVAL(he));
+                sec = *av_fetch(pg, PMD_SECTION, 0);
+                ss  = SvPV_const(sec, sl);
+                if (!sl) {
+                    av_store(pg, PMD_SECLABEL, newSVpvs(""));
+                    av_store(pg, PMD_SECORDER, newSViv(IV_MIN));
+                    continue;
+                }
+                ixp = hv_fetch(secs, ss, (I32)sl, 0);
+                if (ixp) ix = (AV *)SvRV(*ixp);
+                if (ix && SvOK(*av_fetch(ix, PMD_SECLABEL, 0)))
+                    label = newSVsv(*av_fetch(ix, PMD_SECLABEL, 0));
+                place = ix && SvOK(*av_fetch(ix, PMD_SECORDER, 0))
+                      ? SvIV(*av_fetch(ix, PMD_SECORDER, 0)) : IV_MAX;
+                av_store(pg, PMD_SECLABEL,
+                         label ? label : pmd_title_from_name(aTHX_ ss, sl));
+                av_store(pg, PMD_SECORDER, newSViv(place));
+            }
+        }
+
         /* ---- order the nav ---- */
         {
             const char *how = pmd_opt_str(aTHX_ ohv, "sort", "order");
@@ -248,7 +358,12 @@ app(class, dir, opts = NULL, prefix = NULL)
                             SV **b = av_fetch(order, best, 0);
                             HE *bhe = hv_fetch_ent(pages, *b, 0, 0);
                             int c;
+                            IV ps, bs;
                             bp = (AV *)SvRV(HeVAL(bhe));
+                            ps = SvIV(*av_fetch(pg, PMD_SECORDER, 0));
+                            bs = SvIV(*av_fetch(bp, PMD_SECORDER, 0));
+                            if (ps < bs) { best = j; continue; }
+                            if (ps > bs) continue;
                             c = sv_cmp(*av_fetch(pg, PMD_SECTION, 0),
                                        *av_fetch(bp, PMD_SECTION, 0));
                             if (c < 0) { best = j; continue; }
@@ -267,6 +382,36 @@ app(class, dir, opts = NULL, prefix = NULL)
                 for (j = 0; j <= av_len(sorted); j++)
                     av_push(order, newSVsv(*av_fetch(sorted, j, 0)));
                 SvREFCNT_dec((SV *)sorted);
+            }
+            /* `date` is a blog: flat, newest first, sections ignored. Ties go
+             * to the title and then the path, so the order is the same on
+             * every filesystem; undated pages follow, in path order. */
+            else if (strEQ(how, "date")) {
+                SSize_t j, m = av_len(order) + 1;
+                pmd_sortkey *keys;
+                Newx(keys, m > 0 ? m : 1, pmd_sortkey);
+                SAVEFREEPV(keys);
+                for (j = 0; j < m; j++) {
+                    SV *u = *av_fetch(order, j, 0);
+                    HE *he = hv_fetch_ent(pages, u, 0, 0);
+                    AV *pg = (AV *)SvRV(HeVAL(he));
+                    SV *d = *av_fetch(pg, PMD_DATE, 0);
+                    SV *t = *av_fetch(pg, PMD_TITLE, 0);
+                    keys[j].dated = SvOK(d) ? 1 : 0;
+                    keys[j].date  = SvOK(d) ? SvIV(d) : 0;
+                    keys[j].title = SvPV(t, keys[j].tlen);
+                    keys[j].url   = SvPV(u, keys[j].ulen);
+                    keys[j].sv    = u;
+                }
+                qsort(keys, (size_t)m, sizeof *keys, pmd_sortkey_cmp);
+                {
+                    AV *sorted = (AV *)sv_2mortal((SV *)newAV());
+                    for (j = 0; j < m; j++)
+                        av_push(sorted, newSVsv(keys[j].sv));
+                    av_clear(order);
+                    for (j = 0; j < m; j++)
+                        av_push(order, newSVsv(*av_fetch(sorted, j, 0)));
+                }
             }
         }
 
@@ -300,7 +445,7 @@ app(class, dir, opts = NULL, prefix = NULL)
                         sv_2mortal(newSVpvs(
                             "<h1>Not Found</h1>\n<p>There is no page at "
                             "this address.</p>\n")),
-                        NULL, sv_2mortal(newSVpvs("")));
+                        NULL, sv_2mortal(newSVpvs("")), NULL);
             av_store(cap, PMDC_NOTFOUND, body);
         }
 

@@ -5,10 +5,6 @@
 #
 # Each subtest targets a specific branch in lib/Geo/Coder/List.pm that was
 # identified as untested via code reading.  Sections map to module sections.
-#
-# PATHS IDENTIFIED AS POTENTIALLY UNREACHABLE (see bottom of file for detail):
-#   * Line 495: ARRAY empty-first-element branch (auto-vivification hazard)
-#   * Line 734: defined($rc[0]) false while good_result is set (latent bug)
 
 use strict;
 use warnings;
@@ -272,25 +268,64 @@ subtest 'geocode(): legacy "long" key normalised to "lng" and "lon"' => sub {
 };
 
 # =============================================================================
-# SECTION 5: geocode() -- BUG croak path
+# SECTION 5: geocode() -- result with lat but no lng
 #
-# Lines 744-747: if good_result has lat set but lng is undef the module
-# croaks with "BUG: ... HASH exists but is not sensible".
+# A result is usable only when both coordinates are present.  One with lat
+# alone is passed over, so the next geocoder in the chain can answer; it must
+# not croak, since it is the geocoder's answer that is incomplete, not this
+# module.
 # =============================================================================
 
-subtest 'geocode(): BUG croak when result has lat but no lng' => sub {
-	# Purpose: canonical geometry has lat but geometry.location.lng is absent;
-	# the module must croak with the documented BUG error string.
+subtest 'geocode(): lat without lng falls through to the next geocoder' => sub {
+	# Purpose: a half result from the first geocoder must not stop the chain
+	my $list = Geo::Coder::List->new();
+	$list->push(ExtMock::A->new());
+	$list->push(ExtMock::B->new());
+
+	# geometry.location.lat is present; lng is deliberately absent everywhere
+	my $gA = mock_scoped 'ExtMock::A::geocode' => sub {
+		return { geometry => { location => { lat => $LAT_DC } } };
+	};
+	my $gB = mock_scoped 'ExtMock::B::geocode' => sub { _osm($LAT_NY, $LNG_NY) };
+
+	my $r;
+	lives_ok { $r = $list->geocode($LOC_DC) } 'lat without lng does not croak';
+	ok(defined $r, 'Fallback geocoder returned a result');
+	is(ref($r->{geocoder}), 'ExtMock::B', 'Result came from second geocoder');
+	is($r->{lat}, $LAT_NY, 'lat is from the second geocoder');
+};
+
+subtest 'geocode(): lat without lng from the only geocoder is not found' => sub {
+	# Purpose: with nothing to fall back to, the half result is a miss
 	my $list = _list_a();
 	my $g = mock_scoped 'ExtMock::A::geocode' => sub {
-		# geometry.location.lat is present; lng is deliberately absent
 		return { geometry => { location => { lat => $LAT_DC } } };
 	};
 
-	# The module must croak (not just warn) with the exact BUG message
-	throws_ok { $list->geocode($LOC_DC) }
-		qr/BUG:.*HASH exists but is not sensible/,
-		'BUG croak fires when lat set but lng absent';
+	my $r;
+	lives_ok { $r = $list->geocode($LOC_DC) } 'lat without lng does not croak';
+	ok(!defined $r, 'Half result is not returned');
+};
+
+subtest 'geocode(): bare scalar before a valid result is skipped' => sub {
+	# Purpose: a non-reference first element used to be dereferenced as a
+	# HASH after the loop, dying under strict refs
+	for my $lead (0, 'junk') {
+		my $list = _list_a();
+		my $g = mock_scoped 'ExtMock::A::geocode' => sub {
+			return ($lead, _osm($LAT_DC, $LNG_DC));
+		};
+
+		my $r;
+		lives_ok { $r = $list->geocode("$LOC_DC $lead") } "leading '$lead': scalar context does not die";
+		is($r->{lat}, $LAT_DC, "leading '$lead': valid second element returned");
+
+		$list = _list_a();
+		my @r;
+		lives_ok { @r = $list->geocode("$LOC_LONDON $lead") } "leading '$lead': list context does not die";
+		is(scalar(@r), 1, "leading '$lead': only the reference is returned");
+		is($r[0]{lat}, $LAT_DC, "leading '$lead': list result is the valid element");
+	}
 };
 
 # =============================================================================
@@ -613,13 +648,10 @@ subtest '_cache(): HASH with partial geometry uses cache_part_duration TTL' => s
 	is($calls[0]{ttl}, $TTL_PART, "Partial geometry HASH: TTL is '$TTL_PART'");
 };
 
-subtest '_cache(): HASH with no geometry -- auto-vivification collapses to part TTL' => sub {
-	# Purpose: document that the cache_miss_duration 'else' branch is unreachable.
-	# When checking defined($value->{geometry}{location}{lat}), Perl auto-vivifies
-	# $value->{geometry} as an empty hashref.  The subsequent
-	# elsif(defined($value->{geometry})) is then ALWAYS true, so the else branch
-	# (cache_miss_duration / '1 week') can never be reached.
-	# The effective TTL for a no-geometry HASH is therefore cache_part_duration.
+subtest '_cache(): HASH with no geometry uses cache_miss_duration TTL' => sub {
+	# Purpose: a result with no geometry at all is a miss, not a partial
+	# result, so it gets the miss TTL.  The lat check must not auto-vivify
+	# $value->{geometry} and so turn the miss into a partial result.
 	my $chi = ExtMock::CHI->new();
 	my $obj = Geo::Coder::List->new(cache => $chi);
 
@@ -628,9 +660,8 @@ subtest '_cache(): HASH with no geometry -- auto-vivification collapses to part 
 
 	my @calls = @{$chi->{calls}};
 	is(scalar @calls, 1, 'No-geometry HASH: set() called once');
-	# Due to auto-vivification, the effective TTL is cache_part_duration, not miss
-	is($calls[0]{ttl}, $TTL_PART,
-		"No-geometry HASH: TTL is '$TTL_PART' (auto-vivification makes miss branch dead)")
+	is($calls[0]{ttl}, $TTL_MISS, "No-geometry HASH: TTL is '$TTL_MISS'");
+	ok(!exists $val->{geometry}, 'No-geometry HASH: geometry not auto-vivified');
 };
 
 subtest '_cache(): HASH with no geometry -- _cache write returns undef' => sub {
@@ -673,11 +704,9 @@ subtest '_cache(): ARRAY item with partial geometry uses cache_part_duration TTL
 	is($calls[0]{ttl}, $TTL_PART, "Array partial geometry: TTL is '$TTL_PART'");
 };
 
-subtest '_cache(): ARRAY item with no geometry -- auto-vivification collapses to part TTL' => sub {
-	# Purpose: document that the ternary cache_miss_duration arm is unreachable.
-	# defined($item->{geometry}{location}{lat}) auto-vivifies $item->{geometry},
-	# so the subsequent defined($item->{geometry}) ternary test is always TRUE.
-	# The effective TTL is therefore cache_part_duration in all no-lat cases.
+subtest '_cache(): ARRAY item with no geometry uses cache_miss_duration TTL' => sub {
+	# Purpose: as for a HASH, an item with no geometry is a miss, so the
+	# ternary's miss arm must be reachable
 	my $chi = ExtMock::CHI->new();
 	my $obj = Geo::Coder::List->new(cache => $chi);
 
@@ -686,8 +715,7 @@ subtest '_cache(): ARRAY item with no geometry -- auto-vivification collapses to
 
 	my @calls = @{$chi->{calls}};
 	is(scalar @calls, 1, 'Array no-geometry: set() called once');
-	is($calls[0]{ttl}, $TTL_PART,
-		"Array no-geometry: TTL is '$TTL_PART' (auto-vivification makes miss arm dead)")
+	is($calls[0]{ttl}, $TTL_MISS, "Array no-geometry: TTL is '$TTL_MISS'");
 };
 
 subtest '_cache(): ARRAY item with partial geometry -- write returns undef' => sub {
@@ -798,11 +826,16 @@ subtest '_cache(): blessed ARRAY item -- geocoder ref is stringified for L2' => 
 
 	$obj->_cache('blessed-item-key', [ $blessed_item ]);
 
-	# After the write, the item's geocoder field must be a string (class name)
-	ok(!ref($blessed_item->{geocoder}),
-		'Blessed item in ARRAY: geocoder ref stringified after _cache write');
-	is($blessed_item->{geocoder}, 'FakeGeocoder',
-		'Blessed item in ARRAY: geocoder stringified to class name');
+	# The copy stored in L2 has the class name; the caller's item keeps
+	# its geocoder object, since stripping for storage is L2's business
+	my $stored = $l2{'blessed-item-key'}[0];
+	ok(!ref($stored->{geocoder}),
+		'Blessed item in ARRAY: geocoder ref stringified in L2');
+	is($stored->{geocoder}, 'FakeGeocoder',
+		'Blessed item in ARRAY: geocoder stringified to class name in L2');
+	isa_ok($stored, 'SomeResultClass', 'Blessed item in ARRAY: L2 copy keeps its class');
+	is($blessed_item->{geocoder}, $fake_geocoder,
+		"Blessed item in ARRAY: caller's item is not modified");
 };
 
 # =============================================================================
@@ -1174,53 +1207,3 @@ subtest 'reverse_geocode(): scalar context retry -- lat and lon are correct' => 
 };
 
 done_testing();
-
-# =============================================================================
-# UNREACHABLE / DEAD-CODE ANALYSIS
-# Paths identified as unreachable or having unreachable branches.
-# Listed here for author review.
-#
-# 1. lib/Geo/Coder/List.pm line 495:
-#    ((ref($rc[0]) eq 'ARRAY') && (scalar(keys %{$rc[0][0]}) == 0))
-#
-#    REASON: If $rc[0] is an ARRAY ref, $rc[0][0] is its first element.
-#    Under "use strict refs", keys(%{undef}) raises "Not a HASH reference".
-#    The condition is only safe when $rc[0][0] is an explicit empty hashref {}.
-#    No known geocoder produces that structure.
-#    Safer rewrite:
-#        ref($rc[0]) eq 'ARRAY'
-#        && ref($rc[0][0]) eq 'HASH'
-#        && scalar(keys %{$rc[0][0]}) == 0
-#
-# 2. lib/Geo/Coder/List.pm lines 734-756:
-#    if(defined($rc[0])) { ... return $good_result }
-#
-#    REASON: A geocoder returning (undef, {lat=>1,lon=>2}) would cause
-#    $good_result to be set but defined($rc[0]) to be FALSE.  The valid
-#    result is then silently discarded.  No known geocoder produces a
-#    leading undef.  Latent bug: the guard should be "if(defined($good_result))".
-#
-# 3. lib/Geo/Coder/List.pm line 1260-1263 (_cache HASH):
-#    } else {
-#        $duration = $self->{'cache_miss_duration'};   # '1 week'
-#        $rc = undef;
-#    }
-#
-#    REASON: The preceding check
-#        defined($value->{geometry}{location}{lat})
-#    auto-vivifies $value->{geometry} as {}.  The subsequent
-#        elsif(defined($value->{geometry}))
-#    is therefore ALWAYS true.  The else branch can never execute.
-#    Fix: use exists() instead of defined() for the geometry check, or
-#    check for the key before the lat access.
-#
-# 4. lib/Geo/Coder/List.pm lines 1234-1236 (_cache ARRAY):
-#    $duration //= defined($item->{geometry})
-#        ? $self->{'cache_part_duration'}
-#        : $self->{'cache_miss_duration'};
-#
-#    REASON: Same auto-vivification issue.  The access
-#        defined($item->{geometry}{location}{lat})
-#    at line 1232 auto-vivifies $item->{geometry}.  The ternary's false
-#    arm (cache_miss_duration) can never be reached.
-# =============================================================================

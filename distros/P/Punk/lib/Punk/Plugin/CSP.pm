@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Punk ();
 
-our $VERSION = '0.61';
+our $VERSION = '0.62';
 
 # register() and the policy are C - xs/csp.xs and include/punk/punk_csp.h.
 
@@ -208,6 +208,23 @@ It is the mode that makes a strict policy survivable, because a nonced script
 can load its own dependencies without every URL being listed. Be aware that
 supporting browsers B<ignore host allowlists> when it is present, so a policy
 carrying both behaves differently on different browsers.
+
+=head1 METHODS
+
+=head2 register($app, \%opts)
+
+Called once by C<plugin>: checks every directive, croaking at boot on one that
+could split the header, and installs the policy, plus the report endpoint when
+C<report_uri> is a local path.
+
+=head2 stats
+
+    my %s = Punk::Plugin::CSP->stats;
+    # ( reports => 3, malformed => 0, scanned => 120, warned => 1 )
+
+Process-wide counts: reports received at the endpoint, reports that made no
+sense, development responses scanned for inline handlers, and the warnings
+that scan gave.
 
 =head1 AUTHOR
 

@@ -28,6 +28,7 @@ my %WriteMakefileArgs = (
     "File::ShareDir" => 0,
     "File::Slurper" => 0,
     "List::Util" => "1.33",
+    "Module::Load" => 0,
     "Moo" => 1,
     "Net::DNS::Resolver" => 0,
     "Net::IP" => 0,
@@ -49,7 +50,6 @@ my %WriteMakefileArgs = (
     "File::Temp" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
-    "Module::Load" => 0,
     "Module::Metadata" => 0,
     "Net::DNS::Resolver::Mock" => 0,
     "Path::Tiny" => 0,
@@ -62,7 +62,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "v0.4.9",
+  "VERSION" => "v0.4.11",
   "test" => {
     "TESTS" => "t/*.t"
   }

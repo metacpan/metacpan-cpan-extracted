@@ -1,0 +1,10 @@
+!1 Replenishment priority
+
+Buyers review stock from the least available units to the most available.
+This order is business-significant, so this page uses an ordered query.
+
+|Ordered query:replenishment priority|||
+|sku|product|available|
+|MUG|Ceramic mug|2|
+|TEA|Breakfast tea|5|
+|COFFEE|House coffee|10|

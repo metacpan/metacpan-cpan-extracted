@@ -115,6 +115,7 @@ static int pk_require_once(pTHX_ const char *mod, int fatal) {
 #define K_MOUNT    "mount"
 #define K_DIR      "dir"
 #define K_MD_DIR   "md_dir"
+#define K_MD_MOUNT "md_mount"   /* compiled: this mount is a markdown site */
 #define K_APP      "app"
 #define K_PATH     "path"
 #define K_METHOD   "method"

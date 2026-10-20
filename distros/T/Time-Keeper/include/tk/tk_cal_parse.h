@@ -23,7 +23,25 @@ tk_cal_fields_resolve(pTHX_ tk_fields *f, int cal_id, const char *what, const ch
     else if (f->has_year && f->year_kind == 2)
         y = lunisolar ? f->year - 2637 : f->year;
     else if (f->has_year || f->has_y2) {
-        int64_t ey = f->has_year ? f->year : tk_two_digit_year(f->y2);
+        int64_t ey = f->has_year ? f->year : f->y2;
+        if (!f->has_year && !lunisolar) {
+            /* two digits: the years of the calendar that the Gregorian's
+               1969 to 2068 are, where one era spans them (Minguo 58 to 157,
+               BE 2512 to 2611); a calendar whose era changes in them (the
+               Japanese) as written */
+            int64_t gd = tk_calendars[TK_CAL_GREGORY].to_days(1969, 1, 1), ge = tk_calendars[TK_CAL_GREGORY].to_days(2068, 12, 31);
+            int64_t by, bey, ey2, eey;
+            unsigned bm, bd, bera, eera;
+            cal->from_days(gd, &by, &bm, &bd);
+            cal->era_of(by, gd, &bera, &bey);
+            cal->from_days(ge, &ey2, &bm, &bd);
+            cal->era_of(ey2, ge, &eera, &eey);
+            if (bera == eera && (!f->has_era || f->era_index == bera)) {
+                ey = bey - bey % 100 + f->y2;
+                if (ey < bey)
+                    ey += 100;
+            }
+        }
         if (lunisolar) {
             /* the year of the cycle: the one in the cycle 1984 began */
             if (ey < 1 || ey > 60)

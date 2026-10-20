@@ -8,6 +8,7 @@ use warnings;
 use Test::RequiresInternet('geocoder.ca' => 'https');
 
 use LWP;
+use LWP::Protocol::https;	# geocoder.ca is reached over https
 use Test::Most tests => 18;
 
 eval 'use autodie qw(:all)';	# Test for open/close failures

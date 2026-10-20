@@ -1,6 +1,6 @@
 use v5.40;
 
-package Alien::Xrepo::MM v1.0.9 {
+package Alien::Xrepo::MM v1.0.10 {
     use Cwd      qw[getcwd];
     use JSON::PP qw[decode_json encode_json];
     use Path::Tiny;
@@ -72,7 +72,15 @@ package Alien::Xrepo::MM v1.0.9 {
     }
     package    #
         MY {
-        sub postamble { Alien::Xrepo::MM::_postamble() }
+
+        sub postamble ( $self = undef, @args ) {
+            my $prev = '';
+            if ( ref $self ) {
+                my $out = eval { $self->SUPER::postamble(@args) };
+                $prev = $out if defined $out;
+            }
+            return ( length $prev ? "$prev\n" : '' ) . Alien::Xrepo::MM::_postamble();
+        }
     }
 
     # Generate the Makefile. The config below is written first so the pure_all hook the recipe emits has something to read when `make` runs.

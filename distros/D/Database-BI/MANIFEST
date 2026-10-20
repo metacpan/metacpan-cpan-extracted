@@ -22,6 +22,12 @@ README.md
 script/database-bi
 t/basic.t
 t/binned.t
+t/browser-canvas-keys.t
+t/browser-chart-a11y.t
+t/browser-chart-keys.t
+t/browser-home-keys.t
+t/browser-pivot-keys.t
+t/browser-size.t
 t/calc.t
 t/cgi_security.t
 t/data-dir-invariant.t
@@ -33,8 +39,11 @@ t/function.t
 t/geocode-real.t
 t/geocode.t
 t/integration.t
+t/lib/BI/Test/Browser.pm
+t/lib/BI/Test/Marionette.pm
 t/locales.t
 t/manifest.t
+t/map.t
 t/model.t
 t/path.t
 t/pod.t
@@ -44,8 +53,8 @@ t/transaction.t
 t/unit.t
 t/version.t
 templates/web/en/bar.html.tt
-templates/web/en/canvas.html.tt
 templates/web/en/browse.html.tt
+templates/web/en/canvas.html.tt
 templates/web/en/combo.html.tt
 templates/web/en/dashboard.html.tt
 templates/web/en/folder.html.tt
@@ -54,6 +63,7 @@ templates/web/en/heatmap.html.tt
 templates/web/en/histogram.html.tt
 templates/web/en/home.html.tt
 templates/web/en/layouts/default.html.tt
+templates/web/en/map.html.tt
 templates/web/en/pie.html.tt
 templates/web/en/pivot.html.tt
 templates/web/en/scatter.html.tt

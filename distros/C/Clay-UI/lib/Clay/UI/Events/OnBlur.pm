@@ -1,5 +1,5 @@
 package Clay::UI::Events::OnBlur;
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 use v5.22;
 use warnings;
 use feature 'signatures';
@@ -79,6 +79,9 @@ the focused widget was disabled
 set to false (L<Clay::UI::Role::Interaction::Focusable>).
 
 =back
+
+In the last two cases the focus goes to the widget's heir, which gets
+C<OnFocus> after this event (see L<Clay::UI::Interaction/Focus heirs>).
 
 The widget no longer has the focus (C<is_focused> is 0) when its
 listeners run. A widget gets C<OnBlur> only after it got C<OnFocus>.

@@ -1,0 +1,8 @@
+!1 Orders awaiting fulfillment
+
+This query displays submitted orders for one customer. It compares complete
+records while treating row order as irrelevant.
+
+|Query:orders for customer|C-100|
+|order id|customer|status|total|
+|ORD-022|C-100|submitted|23.00|

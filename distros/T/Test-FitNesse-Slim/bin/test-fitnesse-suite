@@ -1,0 +1,265 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Cwd qw(abs_path);
+use File::Path qw(make_path remove_tree);
+use File::Temp qw(tempdir);
+use FindBin qw($Bin);
+use Getopt::Long qw(GetOptions);
+use HTTP::Tiny;
+use JSON::PP qw(decode_json);
+use Time::HiRes qw(time);
+use lib "$Bin/../t/lib";
+use Test::FitNesse::Slim::FitNesseAcceptance qw(
+  bounded_request free_port owned_process_exited preserve_exit_status probe_slim
+  start_owned_process stop_owned_processes wait_until
+);
+use Test::FitNesse::Slim::FitNesseSuiteAcceptance qw(
+  compare_suite_results
+  configure_pipe_wiki
+  extract_wiki_from_jar
+  pipe_query
+  parse_suite_result
+  verify_perl_trace
+  verify_suite_execution_logs
+);
+
+$| = 1;
+my $ROOT = abs_path("$Bin/..");
+my $LOG_DIR = $ENV{TEST_SLIM_SUITE_LOG_DIR} || "$ROOT/.runtime";
+my $TEMP_ROOT;
+$SIG{INT} = sub { die "Interrupted\n" };
+$SIG{TERM} = sub { die "Terminated\n" };
+END {
+  preserve_exit_status(sub {
+    stop_owned_processes();
+    remove_tree($TEMP_ROOT) if defined($TEMP_ROOT) && -d $TEMP_ROOT;
+  });
+}
+
+my $ok = eval { main(); 1 };
+unless ($ok) {
+  my $error = $@ || 'native suite runner failed';
+  $error =~ s/\s+\z//;
+  print STDERR "test-fitnesse-suite: $error\n";
+  exit 1;
+}
+exit 0;
+
+sub main {
+  my $transport = 'pipe';
+  GetOptions('transport=s' => \$transport)
+    or die "usage: bin/test-fitnesse-suite [--transport pipe|tcp]\n";
+  die "unsupported transport '$transport' (choose pipe or tcp)\n"
+    unless $transport eq 'pipe' || $transport eq 'tcp';
+  print "Native-suite transport: $transport\n";
+  make_path($LOG_DIR);
+  my $baseline_path = "$ROOT/docs/fitnesse-slim-native-suite-baseline.json";
+  open my $baseline_fh, '<', $baseline_path or die "read $baseline_path: $!";
+  my $baseline = eval { decode_json(do { local $/; <$baseline_fh> }) };
+  close $baseline_fh;
+  die "invalid native suite baseline: $@" if $@;
+  die "baseline suite page mismatch" unless $baseline->{suitePage} eq 'FitNesse.SuiteAcceptanceTests.SuiteSlimTests';
+  die "native baseline page count does not match its inventory metadata"
+    unless @{$baseline->{expectedPages}} == $baseline->{expectedPageCount};
+  my $transport_baseline = $baseline->{transportExpectations}{$transport} || {};
+  my %transport_pages = %{$transport_baseline->{pages} || {}};
+  my %known_pages = map { $_->{page} => 1 } @{$baseline->{expectedPages}};
+  die "transport baseline names unknown page: $_\n"
+    for grep { !$known_pages{$_} } keys %transport_pages;
+  my @expected_pages = map {
+    my %entry = %$_;
+    if (my $specific = $transport_pages{$entry{page}}) {
+      $entry{counts} = $specific->{counts};
+      $entry{classification} = $specific->{classification}
+        if $specific->{classification};
+    }
+    \%entry;
+  } @{$baseline->{expectedPages}};
+  my $expected_final_counts = $transport_baseline->{suiteFinalCounts}
+    || $baseline->{expectedSuiteFinalCounts};
+
+  my $jar = $ENV{FITNESSE_JAR} || '/opt/fitnesse/fitnesse.jar';
+  die "FitNesse jar not found at $jar" unless -f $jar;
+  my $suite_timeout = $ENV{TEST_SLIM_SUITE_TIMEOUT} || 600;
+  my $total_timeout = $ENV{TEST_SLIM_SUITE_TOTAL_TIMEOUT} || 900;
+  my $startup_timeout = $ENV{TEST_SLIM_SUITE_STARTUP_TIMEOUT} || 60;
+  my $started_at = time;
+  my $host = '127.0.0.1';
+  my $slim_port = $transport eq 'tcp' ? free_port($host) : 1;
+  my $http_port = free_port($host);
+  my $url = "http://$host:$http_port";
+  my $http = HTTP::Tiny->new(timeout => 3, agent => 'test-slim-native-suite/1.0');
+  my $suite_http = HTTP::Tiny->new(timeout => $suite_timeout, agent => 'test-slim-native-suite/1.0');
+
+  $TEMP_ROOT = tempdir('test-slim-native-suite-XXXXXX', TMPDIR => 1, CLEANUP => 0);
+  my $wiki = "$TEMP_ROOT/FitNesseRoot";
+  extract_wiki_from_jar($jar,$wiki);
+  die "generated MySuite was present in the clean FitNesse JAR wiki" if -e "$wiki/MySuite";
+  # PageDriver fixtures issue nested requests from the Perl process; keep them
+  # pointed at this run's isolated FitNesse instance.
+  $ENV{TEST_SLIM_FITNESSE_URL} = $url;
+  my $runner = "$ROOT/bin/perl-slim";
+  if ($transport eq 'pipe') {
+    $runner = configure_pipe_wiki($wiki,$runner);
+    $ENV{PERL5LIB} = join ':', "$ROOT/lib", "$ROOT/t/lib",
+      grep { length } split /:/, ($ENV{PERL5LIB} // '');
+  }
+
+  my $perl_log = "$LOG_DIR/fitnesse-native-suite-perl-$transport.log";
+  my $fitnesse_log = "$LOG_DIR/fitnesse-native-suite-fitnesse-$transport.log";
+  unlink $perl_log, $fitnesse_log;
+  my $perl = $ENV{TEST_SLIM_SUITE_PERL_EXECUTABLE} || 'perl';
+  if ($transport eq 'tcp') {
+    start_owned_process($perl,'-Ilib','-It/lib',"$ROOT/bin/perl-slim",$slim_port,
+      { log_file => $perl_log, cwd => $ROOT });
+    wait_until("external Perl SLiM on $host:$slim_port",$startup_timeout,sub {
+      my $probe = probe_slim($host,$slim_port,0.5);
+      die 'Perl SLiM exited before readiness' if owned_process_exited();
+      return $probe->{ready};
+    });
+    print "Started external Perl SLiM on $host:$slim_port\n";
+  }
+
+  my $java = $ENV{JAVA} || 'java';
+  my @fitnesse_args = ("-Dslim.pool.size=1");
+  push @fitnesse_args, "-Dslim.port=$slim_port", "-Dslim.host=$host",
+    '-Dmanually.start.test.runner=true' if $transport eq 'tcp';
+  push @fitnesse_args, '-jar', $jar, '-p', $http_port,
+    '-d', $TEMP_ROOT, '-r', 'FitNesseRoot',
+    { log_file => $fitnesse_log, cwd => $ROOT };
+  start_owned_process($java,@fitnesse_args);
+  wait_until("FitNesse v20251025 at $url",$startup_timeout,sub {
+    my $response = $http->get("$url/");
+    die 'FitNesse exited before readiness' if owned_process_exited();
+    return $response->{status} == 200 && $response->{content} =~ /<html\b/i;
+  });
+  print "Started isolated FitNesse $transport service from $jar at $url\n";
+
+  my $request = "$url/$baseline->{suitePage}?suite&format=xml"
+    . ($transport eq 'pipe' ? pipe_query($runner) : '');
+  my $remaining = $total_timeout - (time - $started_at);
+  die 'overall native suite timeout expired before request' if $remaining <= 0;
+  my($response,$request_error) = bounded_request(
+    $remaining < $suite_timeout ? $remaining : $suite_timeout,
+    sub { $suite_http->get($request) },
+  );
+  die "native suite request failed: $request_error" if $request_error;
+  die 'FitNesse exited during native suite execution' if owned_process_exited();
+  my $response_file = "$LOG_DIR/fitnesse-native-suite-response-$transport.xml";
+  open my $xml_fh, '>', $response_file
+    or die "write suite XML response: $!";
+  print {$xml_fh} $response->{content};
+  close $xml_fh or die "close suite XML response: $!";
+
+  my $observed = parse_suite_result($response->{content},$response->{status},$baseline->{suitePage});
+  die "could not parse native suite results: " . join('; ',@{$observed->{errors}})
+    unless $observed->{status} eq 'completed';
+  die "FitNesse version is $observed->{version}, expected $baseline->{fitNesseVersion}"
+    unless $observed->{version} eq $baseline->{fitNesseVersion};
+
+  my $comparison = compare_suite_results(
+    \@expected_pages,$observed->{results},
+    $expected_final_counts,$observed->{finalCounts},
+  );
+  my $log_check = verify_suite_execution_logs(
+    $observed->{executionLogs},$host,$slim_port,
+    $baseline->{configuration}{acceptedExecutionLabels},$transport,$runner,
+  );
+  my $trace_text = $transport eq 'tcp' ? read_file($perl_log) : '';
+  my $trace = $transport eq 'tcp' ? verify_perl_trace($trace_text)
+    : { errors => [], failed => 0 };
+  die "Perl SLiM listener became unavailable"
+    if $transport eq 'tcp' && !probe_slim($host,$slim_port,0.5)->{ready};
+  die 'a runner-started service exited before completion' if owned_process_exited();
+
+  my %totals;
+  for my $result (values %{$observed->{results}}) {
+    $totals{$_} += $result->{counts}{$_} for qw(right wrong ignored exceptions);
+  }
+  $totals{$_} ||= 0 for qw(right wrong ignored exceptions);
+  my %expected_by_page = map { $_->{page} => $_ } @expected_pages;
+  my %page_report = map {
+    $_ => {
+      counts => $observed->{results}{$_}{counts},
+      expectedCounts => $expected_by_page{$_}{counts},
+      classification => $expected_by_page{$_}{classification},
+    }
+  } keys %{$observed->{results}};
+  my $report = {
+    fitNesseVersion => $observed->{version}, suitePage => $observed->{rootPath},
+    transport => $transport,
+    expectedPageCount => scalar(@{$baseline->{expectedPages}}),
+    observedPageCount => scalar(keys %{$observed->{results}}),
+    exactPageAndCountMatch => $comparison->{failed} ? JSON::PP::false : JSON::PP::true,
+    comparison => $comparison,
+    assertionTotals => \%totals,
+    baselineAssertionTotals => $transport_baseline->{assertionTotals}
+      || $baseline->{assertionTotals},
+    fitNesseFinalCounts => $observed->{finalCounts},
+    expectedSuiteFinalCounts => $expected_final_counts,
+    executionOrder => $observed->{executionOrder},
+    executionLogs => $observed->{executionLogs},
+    backendAttribution => $transport eq 'tcp'
+      ? { verification => $log_check, perlTrace => $trace }
+      : { verification => $log_check, verifiedChildSessions => scalar(@{$log_check->{verified}}),
+          requestCount => undef },
+    serviceErrors => [@{$log_check->{errors}}, @{$trace->{errors}}],
+    pageResults => \%page_report,
+    interpretation => 'Exact baseline match means no observed native-suite regression; it is not a claim of complete Perl SLiM conformance.',
+    generatedWikiExcluded => JSON::PP::true,
+    responseFile => $response_file,
+  };
+  $report->{failed} = $comparison->{failed} || $log_check->{failed} || $trace->{failed}
+    ? JSON::PP::true : JSON::PP::false;
+  my $report_path = "$LOG_DIR/fitnesse-native-suite-results-$transport.json";
+  write_json($report_path,$report);
+
+  print "FitNesse native SLiM suite results\n";
+  printf "Pages: %d/%d; exact per-page baseline match: %s\n",
+    $report->{observedPageCount},$report->{expectedPageCount},
+    $comparison->{failed} ? 'no' : 'yes';
+  printf "Assertions: %d right, %d wrong, %d ignored, %d exceptions\n",
+    @totals{qw(right wrong ignored exceptions)};
+  if ($transport eq 'tcp') {
+    printf "Perl TCP requests/responses observed: %d/%d; FitNesse execution logs verified: %d\n",
+      $trace->{commands},$trace->{responses},scalar(@{$log_check->{verified}});
+  } else {
+    printf "Perl child sessions verified: %d; per-request count unavailable\n",
+      scalar(@{$log_check->{verified}});
+  }
+  for my $page (@{$comparison->{missingPages}}) { print STDERR "Missing page: $page\n" }
+  for my $page (@{$comparison->{unexpectedPages}}) { print STDERR "Unexpected page: $page\n" }
+  for my $change (@{$comparison->{countChanges}}) {
+    printf STDERR "Count deviation: %s %s expected=%s actual=%s\n",
+      @$change{qw(page count expected actual)};
+  }
+  for my $change (@{$comparison->{finalCountChanges}}) {
+    printf STDERR "Suite final-count deviation: %s expected=%s actual=%s\n",
+      @$change{qw(count expected actual)};
+  }
+  print STDERR "Backend attribution failure: $_\n" for @{$log_check->{errors}};
+  print STDERR "Perl trace failure: $_\n" for @{$trace->{errors}};
+  print "Detailed results: $report_path\n";
+  die 'native suite baseline or backend verification failed' if $report->{failed};
+  return;
+}
+
+sub read_file {
+  my($path) = @_;
+  open my $fh, '<', $path or die "read $path: $!";
+  local $/;
+  my $text = <$fh> // '';
+  close $fh;
+  return $text;
+}
+
+sub write_json {
+  my($path,$data) = @_;
+  open my $fh, '>', $path or die "write $path: $!";
+  print {$fh} JSON::PP->new->pretty->canonical->encode($data);
+  close $fh or die "close $path: $!";
+  return;
+}

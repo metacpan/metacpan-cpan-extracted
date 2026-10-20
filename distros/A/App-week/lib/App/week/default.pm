@@ -10,6 +10,10 @@ __DATA__
 
 autoload -Mcolors --mono --green --lavender --pastel
 
+autoload -Mmlb \
+	--dodgers --dodgers-rev \
+	--yankees --yankees-rev
+
 autoload -Mnpb \
 	--giants --giants-rev \
 	--tigers --tigers-rev \
@@ -22,12 +26,14 @@ autoload -Molympic \
 	--gold-frame \
 	--para2020 --para2020-rev
 
+option --stripe --config stripe=1
+
 option --themecolor::bg \
 	-Mtermcolor::bg(default=100,light=--$<shift>,dark=--$<shift>-rev)
 
 option --theme --themecolor::bg $<copy(0,1)>
 
-option --i18n   -Mi18n::setopt(dash=0,long=0,listopt=-l)
-option --i18n-v -Mi18n::setopt(dash=0,long=0,listopt=-l,verbose)
+option --i18n   -Mi18n::setopt(env=LC_TIME,dash=0,long=0,listopt=-l)
+option --i18n-v -Mi18n::setopt(env=LC_TIME,dash=0,long=0,listopt=-l,verbose)
 
 autoload --i18n -l

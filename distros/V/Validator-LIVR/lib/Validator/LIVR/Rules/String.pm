@@ -3,7 +3,7 @@ package Validator::LIVR::Rules::String;
 use strict;
 use warnings;
 
-our $VERSION = '2.0';
+our $VERSION = '2.1';
 
 sub one_of {
     my $allowed_values;
@@ -133,3 +133,18 @@ sub equal {
 }
 
 1;
+
+=head1 NAME
+
+Validator::LIVR::Rules::String - String rules of Validator::LIVR: string, eq, one_of, min_length, max_length, length_equal, length_between and like
+
+=head1 DESCRIPTION
+
+This module has the code of the string rules, which are documented in
+L<Validator::LIVR/String rules>.
+
+Each sub is the builder of the rule with the same name. The builder of C<eq>
+is C<equal>. The code is a good example for L<writing your own
+rules|Validator::LIVR/WRITING RULES IN PERL>.
+
+=cut

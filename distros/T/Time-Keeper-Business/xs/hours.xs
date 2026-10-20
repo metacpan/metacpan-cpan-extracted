@@ -18,6 +18,7 @@ is_business_hours(self, value)
         tkb_need_hours(aTHX_ s, what);
         tkb_in_or_croak(aTHX_ value, &v, what);
         tkb_split(aTHX_ s, &v, &day, &secs, &nsec, what);
+        tkb_canon(aTHX_ s, &day, &secs, what);
         RETVAL = tkb_span_at(tkb_hours_on(aTHX_ s, day, what), secs) >= 0;
     OUTPUT:
         RETVAL
@@ -44,6 +45,7 @@ next_open(self, value)
         tkb_need_hours(aTHX_ s, what);
         tkb_in_or_croak(aTHX_ value, &v, what);
         tkb_split(aTHX_ s, &v, &day, &secs, &nsec, what);
+        tkb_canon(aTHX_ s, &day, &secs, what);
         if (ix == 0 && tkb_span_at(tkb_hours_on(aTHX_ s, day, what), secs) >= 0)
             RETVAL = newSVsv(value);
         else {
@@ -109,9 +111,19 @@ plus_business_hours(self, value, ...)
         tkb_need_hours(aTHX_ s, what);
         tkb_in_or_croak(aTHX_ value, &v, what);
         tkb_split(aTHX_ s, &v, &day, &secs, &nsec, what);
+        tkb_canon(aTHX_ s, &day, &secs, what);
         tkb_amount(aTHX_ &ST(2), items - 2, 0, &amount, &days, &eod, what);
-        tkb_add_time(aTHX_ s, &day, &secs, &nsec, ix ? -amount : amount, what);
-        RETVAL = tkb_join(aTHX_ s, day, secs, nsec, &v, what);
+        if (s->hours.elapsed) {
+            tkb_inst at, out;
+            at.sec = v.inst.sec;
+            at.nsec = v.inst.nsec;
+            tkb_add_time_elapsed(aTHX_ s, day, secs, nsec, &at, ix ? -amount : amount, &out, what);
+            RETVAL = tkb_inst_out(aTHX_ &out, &v, what);
+        }
+        else {
+            tkb_add_time(aTHX_ s, &day, &secs, &nsec, ix ? -amount : amount, what);
+            RETVAL = tkb_join(aTHX_ s, day, secs, nsec, &v, what);
+        }
     OUTPUT:
         RETVAL
 
@@ -135,23 +147,23 @@ business_hours_between(self, from, to, ...)
         number = tkb_opt(aTHX_ &ST(3), items - 3, "number", what);
         tkb_split(aTHX_ s, &a, &a_day, &a_secs, &a_nsec, what);
         tkb_split(aTHX_ s, &b, &b_day, &b_secs, &b_nsec, what);
-        ns = tkb_time_between(aTHX_ s, a_day, (int64_t)a_secs * TKB_NS_PER_SEC + a_nsec, b_day, (int64_t)b_secs * TKB_NS_PER_SEC + b_nsec, what);
+        tkb_canon(aTHX_ s, &a_day, &a_secs, what);
+        tkb_canon(aTHX_ s, &b_day, &b_secs, what);
+        if (s->hours.elapsed) {
+            tkb_inst ai, bi;
+            ai.sec = a.inst.sec; ai.nsec = a.inst.nsec;
+            bi.sec = b.inst.sec; bi.nsec = b.inst.nsec;
+            if (tkb_zone_steady(aTHX_ &s->hours.zone, tkb_inst_cmp(&ai, &bi) <= 0 ? &ai : &bi, tkb_inst_cmp(&ai, &bi) <= 0 ? &bi : &ai) == 1)
+                ns = tkb_time_between(aTHX_ s, a_day, (int64_t)a_secs * TKB_NS_PER_SEC + a_nsec, b_day, (int64_t)b_secs * TKB_NS_PER_SEC + b_nsec, what);
+            else
+                ns = tkb_time_between_elapsed(aTHX_ s, a_day, &ai, b_day, &bi, what);
+        }
+        else
+            ns = tkb_time_between(aTHX_ s, a_day, (int64_t)a_secs * TKB_NS_PER_SEC + a_nsec, b_day, (int64_t)b_secs * TKB_NS_PER_SEC + b_nsec, what);
         if (number && SvTRUE(number))
             RETVAL = newSVnv((NV)ns / 3.6e12);
-        else {
-            SV *cls = sv_2mortal(newSVpvs("Time::Keeper::Duration"));
-            SV *args[2];
-            SV *dur, *bal[2];
-            args[0] = sv_2mortal(newSVpvs("nanoseconds"));
-            args[1] = sv_2mortal(tkb_i64_sv(aTHX_ ns));
-            dur = tkb_call(aTHX_ cls, "new", args, 2);
-            bal[0] = sv_2mortal(newSVpvs("largest"));
-            bal[1] = sv_2mortal(newSVpvs("hours"));
-            {
-                SV *balanced = tkb_call(aTHX_ dur, "balance", bal, 2);
-                RETVAL = SvREFCNT_inc_simple_NN(balanced);
-            }
-        }
+        else
+            RETVAL = tkb_duration_hours(aTHX_ ns);
     OUTPUT:
         RETVAL
 
@@ -167,14 +179,19 @@ deadline(self, value, ...)
         int32_t secs, nsec;
         int eod;
         const tkb_day *d;
+        int64_t day0;
+        int32_t secs0;
     CODE:
         s = tkb_schedule_of(aTHX_ self, what);
         tkb_need_hours(aTHX_ s, what);
         tkb_in_or_croak(aTHX_ value, &v, what);
         tkb_split(aTHX_ s, &v, &day, &secs, &nsec, what);
+        tkb_canon(aTHX_ s, &day, &secs, what);
         tkb_amount(aTHX_ &ST(2), items - 2, 1, &amount, &days, &eod, what);
         if (amount < 0 || days < 0)
             croak("%s: a deadline lies ahead: the amounts must not be negative", what);
+        day0 = day;
+        secs0 = secs;
         tkb_next_open(aTHX_ s, &day, &secs, &nsec, what);
         if (days) {
             day = tkb_plus(aTHX_ s, day, days, -1, what);
@@ -185,8 +202,18 @@ deadline(self, value, ...)
             secs = d->spans[d->n - 1].end;
             nsec = 0;
         }
-        if (amount)
-            tkb_add_time(aTHX_ s, &day, &secs, &nsec, amount, what);
-        RETVAL = tkb_join(aTHX_ s, day, secs, nsec, &v, what);
+        if (amount && s->hours.elapsed) {
+            tkb_inst at, out;
+            int same = !days && !eod && tkb_span_at(tkb_hours_on(aTHX_ s, day0, what), secs0) >= 0;
+            at.sec = v.inst.sec;
+            at.nsec = v.inst.nsec;
+            tkb_add_time_elapsed(aTHX_ s, day, secs, nsec, same ? &at : NULL, amount, &out, what);
+            RETVAL = tkb_inst_out(aTHX_ &out, &v, what);
+        }
+        else {
+            if (amount)
+                tkb_add_time(aTHX_ s, &day, &secs, &nsec, amount, what);
+            RETVAL = tkb_join(aTHX_ s, day, secs, nsec, &v, what);
+        }
     OUTPUT:
         RETVAL

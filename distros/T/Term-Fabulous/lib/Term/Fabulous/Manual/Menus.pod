@@ -159,7 +159,7 @@ menu open:
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-menu-bar.svg" alt="A notes editor with a menu bar of File, Edit, View and Help, each with its first letter underlined, and the caption notes.txt. The Edit menu is open below its title with Undo highlighted, Redo, Cut and Copy dimmed, Paste and Select all, each with its key. The status bar at the bottom says F10 opens the menus, Ctrl+Q quits. on the left and modified and Ln 6, Col 7 on the right"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.05/screenshots/widget-menu-bar.svg" alt="A notes editor with a menu bar of File, Edit, View and Help, each with its first letter underlined, and the caption notes.txt. The Edit menu is open below its title with Undo highlighted, Redo, Cut and Copy dimmed, Paste and Select all, each with its key. The status bar at the bottom says F10 opens the menus, Ctrl+Q quits. on the left and modified and Ln 6, Col 7 on the right"></p>
 
 =end html
 
@@ -244,14 +244,15 @@ table of the program for that, and give the menu their ids.
 C<< open( $ui, x => ..., y => ... ) >> puts the menu's top left corner
 at a cell of the screen, usually where the user clicked.
 C<< open( $ui, below => $widget ) >> puts it below a widget, or above
-it when there is no room below. Either way, the menu moves left and up
+it when it does not fit below and there is more room above
+(L<Term::Fabulous::Placement>). Either way, the menu moves left and up
 as far as it must to stay on the screen, also when the terminal
 shrinks while it is open. The picture shows the context menu of
 F<examples/widgets/menu.pl>:
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-menu.svg" alt="A list of files with a context menu opened over budget.csv where it was right-clicked: Open with Enter, Rename... with F2, a line, Cut with Ctrl+X, a dimmed Paste with Ctrl+V, a line, and Show hidden files with a check mark and Alt+h. The pointer highlights Rename..."></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.05/screenshots/widget-menu.svg" alt="A list of files with a context menu opened over budget.csv where it was right-clicked: Open with Enter, Rename... with F2, a line, Cut with Ctrl+X, a dimmed Paste with Ctrl+V, a line, and Show hidden files with a check mark and Alt+h. The pointer highlights Rename..."></p>
 
 =end html
 
@@ -274,7 +275,6 @@ nothing has the focus:
 		}
 	);
 
-A text widget has no box of its own, so a menu cannot open below one.
 To open it at a line of text, give the cell with C<x> and C<y>, as
 F<examples/widgets/menu.pl> does for the file under its cursor.
 
@@ -335,7 +335,10 @@ list or a text area:
 
 The commands are listed with their keys as the menus show them and
 with their labels, under the group C<Everywhere> (or the C<group> the
-program names). A label that ends in C<...> is shown without it.
+program names). A label that ends in C<...> is shown without it
+(L<Term::Fabulous::Command/plain_label>;
+L<Term::Fabulous::Widget::KeyReference/command_rows> builds such rows
+for a help page of your own).
 The rows are read from the table when the key reference is made. A
 program that makes a new one each time the user asks for it, as here,
 always lists the commands and keys it has now.
@@ -348,7 +351,7 @@ after the user typed C<ctrl> (F<examples/widgets/key-reference.pl>):
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-key-reference.svg" alt="A Keys of the notes editor dialog over a dimmed notes editor: the search field holds ctrl, and the table below lists only the keys with Ctrl, Ctrl+N New note, Ctrl+S Save, Ctrl+A Select all and Ctrl+Q Quit under Everywhere, and the undo, copy and word keys under Text; a Close button at the bottom"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.05/screenshots/widget-key-reference.svg" alt="A Keys of the notes editor dialog over a dimmed notes editor: the search field holds ctrl, and the table below lists only the keys with Ctrl, Ctrl+N New note, Ctrl+S Save, Ctrl+A Select all and Ctrl+Q Quit under Everywhere, and the undo, copy and word keys under Text; a Close button at the bottom"></p>
 
 =end html
 

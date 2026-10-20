@@ -2,7 +2,7 @@ package Func::Util;
 
 use strict;
 use warnings;
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 use DynaLoader;
 our @ISA = ('DynaLoader');
@@ -94,7 +94,7 @@ Func::Util - Functional programming utilities with XS/OP acceleration
     );
 
     # Lazy evaluation - defer computation
-    my $expensive = lazy { heavy_computation() };
+    my $expensive = lazy(sub { heavy_computation() });
     my $result = force($expensive);
 
     # Safe navigation - no exceptions
@@ -236,10 +236,11 @@ many times from different contexts, or for cleaner functional code.
 
 =head2 lazy
 
-    my $deferred = lazy { expensive_computation() };
+    my $deferred = lazy(sub { expensive_computation() });
 
 Creates a lazy value that defers computation until forced. The computation
-runs at most once; subsequent forces return the cached result.
+runs at most once; subsequent forces return the cached result. C<lazy>
+takes a code reference (C<sub { ... }> or C<\&name>), not a bare block.
 
 =head2 force
 
@@ -540,7 +541,9 @@ Returns an arrayref of all registered callback names.
 =head2 XS Callback Registration
 
 External XS modules can register C-level callbacks for maximum performance.
-Include the header in your XS code:
+The headers are installed with Func::Util and found through
+L<ExtUtils::Depends> (see L</"C API FOR XS MODULES">). Include the header
+in your XS code:
 
     #include "funcutil_callbacks.h"
 
@@ -551,10 +554,11 @@ Then register callbacks:
     }
 
     BOOT:
-        funcutil_register_predicate_xs("my_is_valid", my_is_valid);
+        funcutil_register_predicate_xs(aTHX_ "my_is_valid", my_is_valid);
 
 The C callback avoids all Perl overhead - no call_sv, no stack manipulation.
-See C<xs/util/funcutil_callbacks.h> for the full API.
+See F<funcutil_callbacks.h> for the full API: predicates, mappers and
+reducers.
 
 =head1 DATA MANIPULATION
 
@@ -948,6 +952,23 @@ Returns the last element of the array without slice overhead.
 Returns undef for empty arrays or non-arrayrefs.
 
 =head1 C API FOR XS MODULES
+
+Func::Util installs its two public headers, F<funcutil_export.h> and
+F<funcutil_callbacks.h>, and an L<ExtUtils::Depends> configuration, so a
+dependent XS distribution finds them from its F<Makefile.PL>:
+
+    use ExtUtils::Depends;
+    my $pkg = ExtUtils::Depends->new('My::Module', 'Func::Util');
+    WriteMakefile(
+        NAME => 'My::Module',
+        $pkg->get_makefile_vars,
+        ...
+    );
+
+Func::Util is loaded with its symbols global, so load it before your module
+(C<use Func::Util ();> in your F<.pm>, ahead of your own XSLoader call) and
+the functions below resolve when your module loads. This is not supported on
+Windows or Cygwin, where a DLL's symbols are not resolved this way.
 
 XS modules can register functions with Func::Util's export system by including
 C<funcutil_export.h>:

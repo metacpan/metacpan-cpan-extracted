@@ -32,11 +32,11 @@
 <text x="462" y="92" textLength="36" fill="#61afef">Blue</text>
 <text x="516" y="92" textLength="54" fill="#c678dd">Violet</text>
 <text x="48" y="128" textLength="63" fill="#96a0b4">wrapped</text>
-<text x="156" y="128" textLength="540" fill="#dcdcdc">Text wraps at          Text wraps at           Text wraps at</text>
-<text x="156" y="146" textLength="540" fill="#dcdcdc">spaces to the          spaces to the           spaces to the</text>
-<text x="156" y="164" textLength="540" fill="#dcdcdc">width of its box,    width of its box,     width of its box,</text>
-<text x="156" y="182" textLength="540" fill="#dcdcdc">and each line can    and each line can     and each line can</text>
-<text x="156" y="200" textLength="540" fill="#dcdcdc">be aligned.             be aligned.              be aligned.</text>
+<text x="156" y="128" textLength="540" fill="#dcdcdc">Text wraps at           Text wraps at          Text wraps at</text>
+<text x="156" y="146" textLength="540" fill="#dcdcdc">spaces to the           spaces to the          spaces to the</text>
+<text x="156" y="164" textLength="540" fill="#dcdcdc">width of its box,     width of its box,    width of its box,</text>
+<text x="156" y="182" textLength="540" fill="#dcdcdc">and each line can     and each line can    and each line can</text>
+<text x="156" y="200" textLength="540" fill="#dcdcdc">be aligned.              be aligned.             be aligned.</text>
 <text x="48" y="236" textLength="90" fill="#96a0b4">any script</text>
 <text x="156" y="236" textLength="162" fill="#ffffff">Grüße · Ελληνικά ·</text>
 <text x="336" y="236" text-anchor="middle" fill="#ffffff">こ</text>

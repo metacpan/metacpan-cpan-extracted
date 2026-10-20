@@ -2,7 +2,7 @@ package Map::Tube::Barcelona;
 
 use version;
 
-our $VERSION   = qv('v1.0.0');
+our $VERSION   = qv('v1.0.1');
 our $AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -11,7 +11,7 @@ Map::Tube::Barcelona - Interface to the Barcelona Metro Map.
 
 =head1 VERSION
 
-Version v1.0.0
+Version v1.0.1
 
 =cut
 

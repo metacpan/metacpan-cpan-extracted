@@ -165,6 +165,28 @@ my $names = sub { my ($v, @p) = @_; join ' | ', map { $v->format($_) } @p };
 is($names->($t, qw(z zzzz v vvvv)), 'EDT | Eastern Daylight Time | ET | Eastern Time', 'the specific and generic names');
 is($names->($t, qw(V VV VVV VVVV)), 'usnyc | America/New_York | New York | New York Time', 'the four V forms');
 is($names->($t, qw(O OOOO ZZZZ)), 'GMT-4 | GMT-04:00 | GMT-04:00', 'the GMT format');
+{
+    # Every locale's GMT format reads back, negative and positive: hr writes
+    # its negative half with a space ("GMT -4"), which 0.07 did not read.
+    my @bad;
+    for my $l (Time::Keeper::Locale->codes) {
+        for my $z ('America/New_York', 'Asia/Kolkata') {
+            my $v = Time::Keeper->new(year => 2026, month => 10, day => 15, hour => 15, zone => $z, locale => $l);
+            for my $p ('y-MM-dd HH:mm O', 'y-MM-dd HH:mm OOOO') {
+                my $text = $v->format($p);
+                my $r = eval { Time::Keeper->parse_cldr($text, $p, locale => $l) };
+                push @bad, "$l '$text': " . ($r // $@) unless $r && $r->epoch == $v->epoch;
+            }
+        }
+    }
+    ok(!@bad, 'every locale reads its GMT format back') or diag(join "\n", scalar(@bad) . ' do not:', @bad[0 .. ($#bad < 5 ? $#bad : 5)]);
+}
+# White space inside a name matches any white space: es-AR writes "p. m." with
+# a narrow no-break space, and a person types a plain one.
+for my $sp (' ', "\x{202F}", "\x{A0}") {
+    my $r = eval { $K->parse_cldr("3:05 p.${sp}m.", 'h:mm a', locale => 'es-AR') };
+    is($r ? $r->format('HH:mm') : $@, '15:05', sprintf 'es-AR "p.%sm." with U+%04X', $sp, ord $sp);
+}
 is($names->($t->in_zone('Europe/London'), qw(z zzzz v VVVV)),
    'GMT+1 | British Summer Time | United Kingdom Time | United Kingdom Time', 'a zone with its own name');
 is($names->($t->in_zone('UTC'), qw(z zzzz v vvvv)), 'UTC | Coordinated Universal Time | UTC | Coordinated Universal Time',

@@ -1,0 +1,18 @@
+# Time::Keeper::Natural word table: bn
+#
+# UNREVIEWED: written 18 Oct 2026 by a session, as the p2p site's catalogues were.
+# A native reader should review it before release. The format is en.txt's.
+#
+# Bengali joins the genitive to the period ("মাসের") and "end" after it, so the
+# frames carry the suffix. A time takes no word. An ordinal weekday is not read.
+start_of	{0}ের শুরু|{0}ের শুরুতে|{0}-এর শুরু
+end_of	{0}ের শেষ|{0}ের শেষে|{0}-এর শেষ
+at
+on	{0}ে|{0}-এ
+skip
+and
+# test: গত মাসের শেষ => 2026-09-30T23:59:59.999999999+01:00
+# test: এই মাসের শেষ => 2026-10-31T23:59:59.999999999+00:00
+# test: পরের মাসের শুরু => 2026-11-01T00:00:00+00:00
+# test: অক্টোবরের শেষ => 2026-10-31T23:59:59.999999999+00:00
+# test: মঙ্গলবারে => 2026-10-20T00:00:00+01:00

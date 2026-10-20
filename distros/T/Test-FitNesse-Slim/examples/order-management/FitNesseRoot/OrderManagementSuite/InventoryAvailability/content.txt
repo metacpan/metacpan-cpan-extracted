@@ -1,0 +1,11 @@
+!1 Inventory availability
+
+Availability means on-hand stock less quantities already reserved.
+
+|Inventory availability|
+|SKU|quantity requested|enough stock?|
+|COFFEE|10|true|
+|COFFEE|11|false|
+|MUG|2|true|
+|MUG|3|false|
+|TEA|0|false|

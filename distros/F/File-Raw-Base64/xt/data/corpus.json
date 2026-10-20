@@ -1,0 +1,3441 @@
+{
+  "cases": [
+    {
+      "input": "",
+      "opts": {},
+      "output": "",
+      "plugin": "base64"
+    },
+    {
+      "input": "",
+      "opts": {},
+      "output": "",
+      "plugin": "base64"
+    },
+    {
+      "input": "",
+      "opts": {},
+      "output": "",
+      "plugin": "base64"
+    },
+    {
+      "input": "",
+      "opts": {},
+      "output": "",
+      "plugin": "base64"
+    },
+    {
+      "input": "",
+      "opts": {
+        "strict": 1
+      },
+      "output": "",
+      "plugin": "base64"
+    },
+    {
+      "input": "",
+      "opts": {},
+      "output": "",
+      "plugin": "base64url"
+    },
+    {
+      "input": "",
+      "opts": {
+        "strict": 1
+      },
+      "output": "",
+      "plugin": "base64url"
+    },
+    {
+      "input": "5f20",
+      "opts": {},
+      "output": "",
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: non-alphabet byte in strict mode at byte offset 0",
+      "input": "5f20",
+      "opts": {
+        "strict": 1
+      },
+      "plugin": "base64"
+    },
+    {
+      "input": "41513d3d",
+      "opts": {},
+      "output": "01",
+      "plugin": "base64"
+    },
+    {
+      "input": "41513d3d0a",
+      "opts": {},
+      "output": "01",
+      "plugin": "base64"
+    },
+    {
+      "input": "41513d3d0d0a",
+      "opts": {},
+      "output": "01",
+      "plugin": "base64"
+    },
+    {
+      "input": "4151",
+      "opts": {},
+      "output": "01",
+      "plugin": "base64"
+    },
+    {
+      "input": "4151",
+      "opts": {
+        "strict": 1
+      },
+      "output": "01",
+      "plugin": "base64"
+    },
+    {
+      "input": "4151",
+      "opts": {},
+      "output": "01",
+      "plugin": "base64url"
+    },
+    {
+      "input": "4151",
+      "opts": {
+        "strict": 1
+      },
+      "output": "01",
+      "plugin": "base64url"
+    },
+    {
+      "input": "214151203d3d",
+      "opts": {},
+      "output": "01",
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: non-alphabet byte in strict mode at byte offset 0",
+      "input": "214151203d3d",
+      "opts": {
+        "strict": 1
+      },
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: non-alphabet byte in strict mode at byte offset 4",
+      "input": "41513d3d51513d3d",
+      "opts": {
+        "strict": 1
+      },
+      "plugin": "base64"
+    },
+    {
+      "input": "41513d3d51513d3d",
+      "opts": {},
+      "output": "010410",
+      "plugin": "base64"
+    },
+    {
+      "input": "5475593d",
+      "opts": {},
+      "output": "4ee6",
+      "plugin": "base64"
+    },
+    {
+      "input": "5475593d0a",
+      "opts": {},
+      "output": "4ee6",
+      "plugin": "base64"
+    },
+    {
+      "input": "5475593d0d0a",
+      "opts": {},
+      "output": "4ee6",
+      "plugin": "base64"
+    },
+    {
+      "input": "547559",
+      "opts": {},
+      "output": "4ee6",
+      "plugin": "base64"
+    },
+    {
+      "input": "547559",
+      "opts": {
+        "strict": 1
+      },
+      "output": "4ee6",
+      "plugin": "base64"
+    },
+    {
+      "input": "547559",
+      "opts": {},
+      "output": "4ee6",
+      "plugin": "base64url"
+    },
+    {
+      "input": "547559",
+      "opts": {
+        "strict": 1
+      },
+      "output": "4ee6",
+      "plugin": "base64url"
+    },
+    {
+      "input": "2d5475593d",
+      "opts": {},
+      "output": "4ee6",
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: non-alphabet byte in strict mode at byte offset 0",
+      "input": "2d5475593d",
+      "opts": {
+        "strict": 1
+      },
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: non-alphabet byte in strict mode at byte offset 4",
+      "input": "5475593d51513d3d",
+      "opts": {
+        "strict": 1
+      },
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: truncated base64 input at byte offset 0",
+      "input": "5475593d51513d3d",
+      "opts": {},
+      "plugin": "base64"
+    },
+    {
+      "input": "632f726b",
+      "opts": {},
+      "output": "73fae4",
+      "plugin": "base64"
+    },
+    {
+      "input": "632f726b0a",
+      "opts": {},
+      "output": "73fae4",
+      "plugin": "base64"
+    },
+    {
+      "input": "632f726b0d0a",
+      "opts": {},
+      "output": "73fae4",
+      "plugin": "base64"
+    },
+    {
+      "input": "632f726b",
+      "opts": {},
+      "output": "73fae4",
+      "plugin": "base64"
+    },
+    {
+      "input": "632f726b",
+      "opts": {
+        "strict": 1
+      },
+      "output": "73fae4",
+      "plugin": "base64"
+    },
+    {
+      "input": "635f726b",
+      "opts": {},
+      "output": "73fae4",
+      "plugin": "base64url"
+    },
+    {
+      "input": "635f726b",
+      "opts": {
+        "strict": 1
+      },
+      "output": "73fae4",
+      "plugin": "base64url"
+    },
+    {
+      "input": "632f726b20",
+      "opts": {},
+      "output": "73fae4",
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: non-alphabet byte in strict mode at byte offset 4",
+      "input": "632f726b20",
+      "opts": {
+        "strict": 1
+      },
+      "plugin": "base64"
+    },
+    {
+      "input": "3476323448513d3d",
+      "opts": {},
+      "output": "e2fdb81d",
+      "plugin": "base64"
+    },
+    {
+      "input": "3476323448513d3d0a",
+      "opts": {},
+      "output": "e2fdb81d",
+      "plugin": "base64"
+    },
+    {
+      "input": "3476323448513d3d0d0a",
+      "opts": {},
+      "output": "e2fdb81d",
+      "plugin": "base64"
+    },
+    {
+      "input": "347632344851",
+      "opts": {},
+      "output": "e2fdb81d",
+      "plugin": "base64"
+    },
+    {
+      "input": "347632344851",
+      "opts": {
+        "strict": 1
+      },
+      "output": "e2fdb81d",
+      "plugin": "base64"
+    },
+    {
+      "input": "347632344851",
+      "opts": {},
+      "output": "e2fdb81d",
+      "plugin": "base64url"
+    },
+    {
+      "input": "347632344851",
+      "opts": {
+        "strict": 1
+      },
+      "output": "e2fdb81d",
+      "plugin": "base64url"
+    },
+    {
+      "input": "34090976323448513d3d2d",
+      "opts": {},
+      "output": "e2fdb81d",
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: non-alphabet byte in strict mode at byte offset 1",
+      "input": "34090976323448513d3d2d",
+      "opts": {
+        "strict": 1
+      },
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: non-alphabet byte in strict mode at byte offset 8",
+      "input": "3476323448513d3d51513d3d",
+      "opts": {
+        "strict": 1
+      },
+      "plugin": "base64"
+    },
+    {
+      "input": "3476323448513d3d51513d3d",
+      "opts": {},
+      "output": "e2fdb81d0410",
+      "plugin": "base64"
+    },
+    {
+      "input": "7a5a4c515241633d",
+      "opts": {},
+      "output": "cd92d04407",
+      "plugin": "base64"
+    },
+    {
+      "input": "7a5a4c515241633d0a",
+      "opts": {},
+      "output": "cd92d04407",
+      "plugin": "base64"
+    },
+    {
+      "input": "7a5a4c515241633d0d0a",
+      "opts": {},
+      "output": "cd92d04407",
+      "plugin": "base64"
+    },
+    {
+      "input": "7a5a4c51524163",
+      "opts": {},
+      "output": "cd92d04407",
+      "plugin": "base64"
+    },
+    {
+      "input": "7a5a4c51524163",
+      "opts": {
+        "strict": 1
+      },
+      "output": "cd92d04407",
+      "plugin": "base64"
+    },
+    {
+      "input": "7a5a4c51524163",
+      "opts": {},
+      "output": "cd92d04407",
+      "plugin": "base64url"
+    },
+    {
+      "input": "7a5a4c51524163",
+      "opts": {
+        "strict": 1
+      },
+      "output": "cd92d04407",
+      "plugin": "base64url"
+    },
+    {
+      "input": "7a5a4c5152412e632d3d",
+      "opts": {},
+      "output": "cd92d04407",
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: non-alphabet byte in strict mode at byte offset 6",
+      "input": "7a5a4c5152412e632d3d",
+      "opts": {
+        "strict": 1
+      },
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: non-alphabet byte in strict mode at byte offset 8",
+      "input": "7a5a4c515241633d51513d3d",
+      "opts": {
+        "strict": 1
+      },
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: truncated base64 input at byte offset 0",
+      "input": "7a5a4c515241633d51513d3d",
+      "opts": {},
+      "plugin": "base64"
+    },
+    {
+      "input": "426b485250384f36",
+      "opts": {},
+      "output": "0641d13fc3ba",
+      "plugin": "base64"
+    },
+    {
+      "input": "426b485250384f360a",
+      "opts": {},
+      "output": "0641d13fc3ba",
+      "plugin": "base64"
+    },
+    {
+      "input": "426b485250384f360d0a",
+      "opts": {},
+      "output": "0641d13fc3ba",
+      "plugin": "base64"
+    },
+    {
+      "input": "426b485250384f36",
+      "opts": {},
+      "output": "0641d13fc3ba",
+      "plugin": "base64"
+    },
+    {
+      "input": "426b485250384f36",
+      "opts": {
+        "strict": 1
+      },
+      "output": "0641d13fc3ba",
+      "plugin": "base64"
+    },
+    {
+      "input": "426b485250384f36",
+      "opts": {},
+      "output": "0641d13fc3ba",
+      "plugin": "base64url"
+    },
+    {
+      "input": "426b485250384f36",
+      "opts": {
+        "strict": 1
+      },
+      "output": "0641d13fc3ba",
+      "plugin": "base64url"
+    },
+    {
+      "input": "426b485250384f2136",
+      "opts": {},
+      "output": "0641d13fc3ba",
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: non-alphabet byte in strict mode at byte offset 7",
+      "input": "426b485250384f2136",
+      "opts": {
+        "strict": 1
+      },
+      "plugin": "base64"
+    },
+    {
+      "input": "714d30463979476671773d3d",
+      "opts": {},
+      "output": "a8cd05f7219fab",
+      "plugin": "base64"
+    },
+    {
+      "input": "714d30463979476671773d3d0a",
+      "opts": {},
+      "output": "a8cd05f7219fab",
+      "plugin": "base64"
+    },
+    {
+      "input": "714d30463979476671773d3d0d0a",
+      "opts": {},
+      "output": "a8cd05f7219fab",
+      "plugin": "base64"
+    },
+    {
+      "input": "714d3046397947667177",
+      "opts": {},
+      "output": "a8cd05f7219fab",
+      "plugin": "base64"
+    },
+    {
+      "input": "714d3046397947667177",
+      "opts": {
+        "strict": 1
+      },
+      "output": "a8cd05f7219fab",
+      "plugin": "base64"
+    },
+    {
+      "input": "714d3046397947667177",
+      "opts": {},
+      "output": "a8cd05f7219fab",
+      "plugin": "base64url"
+    },
+    {
+      "input": "714d3046397947667177",
+      "opts": {
+        "strict": 1
+      },
+      "output": "a8cd05f7219fab",
+      "plugin": "base64url"
+    },
+    {
+      "input": "ff714d3046397947206671773d3d",
+      "opts": {},
+      "output": "a8cd05f7219fab",
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: non-alphabet byte in strict mode at byte offset 0",
+      "input": "ff714d3046397947206671773d3d",
+      "opts": {
+        "strict": 1
+      },
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: non-alphabet byte in strict mode at byte offset 12",
+      "input": "714d30463979476671773d3d51513d3d",
+      "opts": {
+        "strict": 1
+      },
+      "plugin": "base64"
+    },
+    {
+      "input": "714d30463979476671773d3d51513d3d",
+      "opts": {},
+      "output": "a8cd05f7219fab0410",
+      "plugin": "base64"
+    },
+    {
+      "input": "323838572b4b4d7a7070493d",
+      "opts": {},
+      "output": "dbcf16f8a333a692",
+      "plugin": "base64"
+    },
+    {
+      "input": "323838572b4b4d7a7070493d0a",
+      "opts": {},
+      "output": "dbcf16f8a333a692",
+      "plugin": "base64"
+    },
+    {
+      "input": "323838572b4b4d7a7070493d0d0a",
+      "opts": {},
+      "output": "dbcf16f8a333a692",
+      "plugin": "base64"
+    },
+    {
+      "input": "323838572b4b4d7a707049",
+      "opts": {},
+      "output": "dbcf16f8a333a692",
+      "plugin": "base64"
+    },
+    {
+      "input": "323838572b4b4d7a707049",
+      "opts": {
+        "strict": 1
+      },
+      "output": "dbcf16f8a333a692",
+      "plugin": "base64"
+    },
+    {
+      "input": "323838572d4b4d7a707049",
+      "opts": {},
+      "output": "dbcf16f8a333a692",
+      "plugin": "base64url"
+    },
+    {
+      "input": "323838572d4b4d7a707049",
+      "opts": {
+        "strict": 1
+      },
+      "output": "dbcf16f8a333a692",
+      "plugin": "base64url"
+    },
+    {
+      "input": "323838572b4b5f4d7a2d7070493d",
+      "opts": {},
+      "output": "dbcf16f8a333a692",
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: non-alphabet byte in strict mode at byte offset 6",
+      "input": "323838572b4b5f4d7a2d7070493d",
+      "opts": {
+        "strict": 1
+      },
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: non-alphabet byte in strict mode at byte offset 12",
+      "input": "323838572b4b4d7a7070493d51513d3d",
+      "opts": {
+        "strict": 1
+      },
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: truncated base64 input at byte offset 0",
+      "input": "323838572b4b4d7a7070493d51513d3d",
+      "opts": {},
+      "plugin": "base64"
+    },
+    {
+      "input": "43705a6565456a427a75466c",
+      "opts": {},
+      "output": "0a965e7848c1cee165",
+      "plugin": "base64"
+    },
+    {
+      "input": "43705a6565456a427a75466c0a",
+      "opts": {},
+      "output": "0a965e7848c1cee165",
+      "plugin": "base64"
+    },
+    {
+      "input": "43705a6565456a427a75466c0d0a",
+      "opts": {},
+      "output": "0a965e7848c1cee165",
+      "plugin": "base64"
+    },
+    {
+      "input": "43705a6565456a427a75466c",
+      "opts": {},
+      "output": "0a965e7848c1cee165",
+      "plugin": "base64"
+    },
+    {
+      "input": "43705a6565456a427a75466c",
+      "opts": {
+        "strict": 1
+      },
+      "output": "0a965e7848c1cee165",
+      "plugin": "base64"
+    },
+    {
+      "input": "43705a6565456a427a75466c",
+      "opts": {},
+      "output": "0a965e7848c1cee165",
+      "plugin": "base64url"
+    },
+    {
+      "input": "43705a6565456a427a75466c",
+      "opts": {
+        "strict": 1
+      },
+      "output": "0a965e7848c1cee165",
+      "plugin": "base64url"
+    },
+    {
+      "input": "43705a6565456a20427a75466c",
+      "opts": {},
+      "output": "0a965e7848c1cee165",
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: non-alphabet byte in strict mode at byte offset 7",
+      "input": "43705a6565456a20427a75466c",
+      "opts": {
+        "strict": 1
+      },
+      "plugin": "base64"
+    },
+    {
+      "input": "4b3356636a6244676573496d6b413d3d",
+      "opts": {},
+      "output": "2b755c8db0e07ac22690",
+      "plugin": "base64"
+    },
+    {
+      "input": "4b3356636a6244676573496d6b413d3d0a",
+      "opts": {},
+      "output": "2b755c8db0e07ac22690",
+      "plugin": "base64"
+    },
+    {
+      "input": "4b3356636a6244676573496d6b413d3d0d0a",
+      "opts": {},
+      "output": "2b755c8db0e07ac22690",
+      "plugin": "base64"
+    },
+    {
+      "input": "4b3356636a6244676573496d6b41",
+      "opts": {},
+      "output": "2b755c8db0e07ac22690",
+      "plugin": "base64"
+    },
+    {
+      "input": "4b3356636a6244676573496d6b41",
+      "opts": {
+        "strict": 1
+      },
+      "output": "2b755c8db0e07ac22690",
+      "plugin": "base64"
+    },
+    {
+      "input": "4b3356636a6244676573496d6b41",
+      "opts": {},
+      "output": "2b755c8db0e07ac22690",
+      "plugin": "base64url"
+    },
+    {
+      "input": "4b3356636a6244676573496d6b41",
+      "opts": {
+        "strict": 1
+      },
+      "output": "2b755c8db0e07ac22690",
+      "plugin": "base64url"
+    },
+    {
+      "input": "4b3356636a5f624467657349096d6b41093d3d",
+      "opts": {},
+      "output": "2b755c8db0e07ac22690",
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: non-alphabet byte in strict mode at byte offset 5",
+      "input": "4b3356636a5f624467657349096d6b41093d3d",
+      "opts": {
+        "strict": 1
+      },
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: non-alphabet byte in strict mode at byte offset 16",
+      "input": "4b3356636a6244676573496d6b413d3d51513d3d",
+      "opts": {
+        "strict": 1
+      },
+      "plugin": "base64"
+    },
+    {
+      "input": "4b3356636a6244676573496d6b413d3d51513d3d",
+      "opts": {},
+      "output": "2b755c8db0e07ac226900410",
+      "plugin": "base64"
+    },
+    {
+      "input": "547a6b56366c652b744631754666773d",
+      "opts": {},
+      "output": "4f3915ea57beb45d6e15fc",
+      "plugin": "base64"
+    },
+    {
+      "input": "547a6b56366c652b744631754666773d0a",
+      "opts": {},
+      "output": "4f3915ea57beb45d6e15fc",
+      "plugin": "base64"
+    },
+    {
+      "input": "547a6b56366c652b744631754666773d0d0a",
+      "opts": {},
+      "output": "4f3915ea57beb45d6e15fc",
+      "plugin": "base64"
+    },
+    {
+      "input": "547a6b56366c652b74463175466677",
+      "opts": {},
+      "output": "4f3915ea57beb45d6e15fc",
+      "plugin": "base64"
+    },
+    {
+      "input": "547a6b56366c652b74463175466677",
+      "opts": {
+        "strict": 1
+      },
+      "output": "4f3915ea57beb45d6e15fc",
+      "plugin": "base64"
+    },
+    {
+      "input": "547a6b56366c652d74463175466677",
+      "opts": {},
+      "output": "4f3915ea57beb45d6e15fc",
+      "plugin": "base64url"
+    },
+    {
+      "input": "547a6b56366c652d74463175466677",
+      "opts": {
+        "strict": 1
+      },
+      "output": "4f3915ea57beb45d6e15fc",
+      "plugin": "base64url"
+    },
+    {
+      "input": "547a6b56366c652b74463175466677093d",
+      "opts": {},
+      "output": "4f3915ea57beb45d6e15fc",
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: non-alphabet byte in strict mode at byte offset 15",
+      "input": "547a6b56366c652b74463175466677093d",
+      "opts": {
+        "strict": 1
+      },
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: non-alphabet byte in strict mode at byte offset 16",
+      "input": "547a6b56366c652b744631754666773d51513d3d",
+      "opts": {
+        "strict": 1
+      },
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: truncated base64 input at byte offset 0",
+      "input": "547a6b56366c652b744631754666773d51513d3d",
+      "opts": {},
+      "plugin": "base64"
+    },
+    {
+      "input": "75434767624a79447a2b65394d536336",
+      "opts": {},
+      "output": "b821a06c9c83cfe7bd31273a",
+      "plugin": "base64"
+    },
+    {
+      "input": "75434767624a79447a2b65394d5363360a",
+      "opts": {},
+      "output": "b821a06c9c83cfe7bd31273a",
+      "plugin": "base64"
+    },
+    {
+      "input": "75434767624a79447a2b65394d5363360d0a",
+      "opts": {},
+      "output": "b821a06c9c83cfe7bd31273a",
+      "plugin": "base64"
+    },
+    {
+      "input": "75434767624a79447a2b65394d536336",
+      "opts": {},
+      "output": "b821a06c9c83cfe7bd31273a",
+      "plugin": "base64"
+    },
+    {
+      "input": "75434767624a79447a2b65394d536336",
+      "opts": {
+        "strict": 1
+      },
+      "output": "b821a06c9c83cfe7bd31273a",
+      "plugin": "base64"
+    },
+    {
+      "input": "75434767624a79447a2d65394d536336",
+      "opts": {},
+      "output": "b821a06c9c83cfe7bd31273a",
+      "plugin": "base64url"
+    },
+    {
+      "input": "75434767624a79447a2d65394d536336",
+      "opts": {
+        "strict": 1
+      },
+      "output": "b821a06c9c83cfe7bd31273a",
+      "plugin": "base64url"
+    },
+    {
+      "input": "75434767624a0979447a212b65395f4d536336",
+      "opts": {},
+      "output": "b821a06c9c83cfe7bd31273a",
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: non-alphabet byte in strict mode at byte offset 6",
+      "input": "75434767624a0979447a212b65395f4d536336",
+      "opts": {
+        "strict": 1
+      },
+      "plugin": "base64"
+    },
+    {
+      "input": "5752384974666770456b35484848776a7a673d3d",
+      "opts": {},
+      "output": "591f08b5f829124e471c7c23ce",
+      "plugin": "base64"
+    },
+    {
+      "input": "5752384974666770456b35484848776a7a673d3d0a",
+      "opts": {},
+      "output": "591f08b5f829124e471c7c23ce",
+      "plugin": "base64"
+    },
+    {
+      "input": "5752384974666770456b35484848776a7a673d3d0d0a",
+      "opts": {},
+      "output": "591f08b5f829124e471c7c23ce",
+      "plugin": "base64"
+    },
+    {
+      "input": "5752384974666770456b35484848776a7a67",
+      "opts": {},
+      "output": "591f08b5f829124e471c7c23ce",
+      "plugin": "base64"
+    },
+    {
+      "input": "5752384974666770456b35484848776a7a67",
+      "opts": {
+        "strict": 1
+      },
+      "output": "591f08b5f829124e471c7c23ce",
+      "plugin": "base64"
+    },
+    {
+      "input": "5752384974666770456b35484848776a7a67",
+      "opts": {},
+      "output": "591f08b5f829124e471c7c23ce",
+      "plugin": "base64url"
+    },
+    {
+      "input": "5752384974666770456b35484848776a7a67",
+      "opts": {
+        "strict": 1
+      },
+      "output": "591f08b5f829124e471c7c23ce",
+      "plugin": "base64url"
+    },
+    {
+      "input": "5752384974666770456b35484848776a7a21673d3d",
+      "opts": {},
+      "output": "591f08b5f829124e471c7c23ce",
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: non-alphabet byte in strict mode at byte offset 17",
+      "input": "5752384974666770456b35484848776a7a21673d3d",
+      "opts": {
+        "strict": 1
+      },
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: non-alphabet byte in strict mode at byte offset 20",
+      "input": "5752384974666770456b35484848776a7a673d3d51513d3d",
+      "opts": {
+        "strict": 1
+      },
+      "plugin": "base64"
+    },
+    {
+      "input": "5752384974666770456b35484848776a7a673d3d51513d3d",
+      "opts": {},
+      "output": "591f08b5f829124e471c7c23ce0410",
+      "plugin": "base64"
+    },
+    {
+      "input": "79512b4a6644595550774f736f756456526d303d",
+      "opts": {},
+      "output": "c90f897c36143f03aca2e755466d",
+      "plugin": "base64"
+    },
+    {
+      "input": "79512b4a6644595550774f736f756456526d303d0a",
+      "opts": {},
+      "output": "c90f897c36143f03aca2e755466d",
+      "plugin": "base64"
+    },
+    {
+      "input": "79512b4a6644595550774f736f756456526d303d0d0a",
+      "opts": {},
+      "output": "c90f897c36143f03aca2e755466d",
+      "plugin": "base64"
+    },
+    {
+      "input": "79512b4a6644595550774f736f756456526d30",
+      "opts": {},
+      "output": "c90f897c36143f03aca2e755466d",
+      "plugin": "base64"
+    },
+    {
+      "input": "79512b4a6644595550774f736f756456526d30",
+      "opts": {
+        "strict": 1
+      },
+      "output": "c90f897c36143f03aca2e755466d",
+      "plugin": "base64"
+    },
+    {
+      "input": "79512d4a6644595550774f736f756456526d30",
+      "opts": {},
+      "output": "c90f897c36143f03aca2e755466d",
+      "plugin": "base64url"
+    },
+    {
+      "input": "79512d4a6644595550774f736f756456526d30",
+      "opts": {
+        "strict": 1
+      },
+      "output": "c90f897c36143f03aca2e755466d",
+      "plugin": "base64url"
+    },
+    {
+      "input": "79512b4a0966445955502e774f732d6f756456526d303d",
+      "opts": {},
+      "output": "c90f897c36143f03aca2e755466d",
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: non-alphabet byte in strict mode at byte offset 4",
+      "input": "79512b4a0966445955502e774f732d6f756456526d303d",
+      "opts": {
+        "strict": 1
+      },
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: non-alphabet byte in strict mode at byte offset 20",
+      "input": "79512b4a6644595550774f736f756456526d303d51513d3d",
+      "opts": {
+        "strict": 1
+      },
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: truncated base64 input at byte offset 0",
+      "input": "79512b4a6644595550774f736f756456526d303d51513d3d",
+      "opts": {},
+      "plugin": "base64"
+    },
+    {
+      "input": "3942394b35677059363370447945426a54737a6f",
+      "opts": {},
+      "output": "f41f4ae60a58eb7a43c840634ecce8",
+      "plugin": "base64"
+    },
+    {
+      "input": "3942394b35677059363370447945426a54737a6f0a",
+      "opts": {},
+      "output": "f41f4ae60a58eb7a43c840634ecce8",
+      "plugin": "base64"
+    },
+    {
+      "input": "3942394b35677059363370447945426a54737a6f0d0a",
+      "opts": {},
+      "output": "f41f4ae60a58eb7a43c840634ecce8",
+      "plugin": "base64"
+    },
+    {
+      "input": "3942394b35677059363370447945426a54737a6f",
+      "opts": {},
+      "output": "f41f4ae60a58eb7a43c840634ecce8",
+      "plugin": "base64"
+    },
+    {
+      "input": "3942394b35677059363370447945426a54737a6f",
+      "opts": {
+        "strict": 1
+      },
+      "output": "f41f4ae60a58eb7a43c840634ecce8",
+      "plugin": "base64"
+    },
+    {
+      "input": "3942394b35677059363370447945426a54737a6f",
+      "opts": {},
+      "output": "f41f4ae60a58eb7a43c840634ecce8",
+      "plugin": "base64url"
+    },
+    {
+      "input": "3942394b35677059363370447945426a54737a6f",
+      "opts": {
+        "strict": 1
+      },
+      "output": "f41f4ae60a58eb7a43c840634ecce8",
+      "plugin": "base64url"
+    },
+    {
+      "input": "3942394b3567705936332170447945426a54737a6f2d",
+      "opts": {},
+      "output": "f41f4ae60a58eb7a43c840634ecce8",
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: non-alphabet byte in strict mode at byte offset 10",
+      "input": "3942394b3567705936332170447945426a54737a6f2d",
+      "opts": {
+        "strict": 1
+      },
+      "plugin": "base64"
+    },
+    {
+      "input": "4d54747336676b32737a49527846785a3945587844673d3d",
+      "opts": {},
+      "output": "313b6cea0936b33211c45c59f445f10e",
+      "plugin": "base64"
+    },
+    {
+      "input": "4d54747336676b32737a49527846785a3945587844673d3d0a",
+      "opts": {},
+      "output": "313b6cea0936b33211c45c59f445f10e",
+      "plugin": "base64"
+    },
+    {
+      "input": "4d54747336676b32737a49527846785a3945587844673d3d0d0a",
+      "opts": {},
+      "output": "313b6cea0936b33211c45c59f445f10e",
+      "plugin": "base64"
+    },
+    {
+      "input": "4d54747336676b32737a49527846785a394558784467",
+      "opts": {},
+      "output": "313b6cea0936b33211c45c59f445f10e",
+      "plugin": "base64"
+    },
+    {
+      "input": "4d54747336676b32737a49527846785a394558784467",
+      "opts": {
+        "strict": 1
+      },
+      "output": "313b6cea0936b33211c45c59f445f10e",
+      "plugin": "base64"
+    },
+    {
+      "input": "4d54747336676b32737a49527846785a394558784467",
+      "opts": {},
+      "output": "313b6cea0936b33211c45c59f445f10e",
+      "plugin": "base64url"
+    },
+    {
+      "input": "4d54747336676b32737a49527846785a394558784467",
+      "opts": {
+        "strict": 1
+      },
+      "output": "313b6cea0936b33211c45c59f445f10e",
+      "plugin": "base64url"
+    },
+    {
+      "input": "4d54747336676b2e32737a2049527846785a3945587844673d3d",
+      "opts": {},
+      "output": "313b6cea0936b33211c45c59f445f10e",
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: non-alphabet byte in strict mode at byte offset 7",
+      "input": "4d54747336676b2e32737a2049527846785a3945587844673d3d",
+      "opts": {
+        "strict": 1
+      },
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: non-alphabet byte in strict mode at byte offset 24",
+      "input": "4d54747336676b32737a49527846785a3945587844673d3d51513d3d",
+      "opts": {
+        "strict": 1
+      },
+      "plugin": "base64"
+    },
+    {
+      "input": "4d54747336676b32737a49527846785a3945587844673d3d51513d3d",
+      "opts": {},
+      "output": "313b6cea0936b33211c45c59f445f10e0410",
+      "plugin": "base64"
+    },
+    {
+      "input": "36795847722b755a4b517275502b7635737559666157733d",
+      "opts": {},
+      "output": "eb25c6afeb99290aee3febf9b2e61f696b",
+      "plugin": "base64"
+    },
+    {
+      "input": "36795847722b755a4b517275502b7635737559666157733d0a",
+      "opts": {},
+      "output": "eb25c6afeb99290aee3febf9b2e61f696b",
+      "plugin": "base64"
+    },
+    {
+      "input": "36795847722b755a4b517275502b7635737559666157733d0d0a",
+      "opts": {},
+      "output": "eb25c6afeb99290aee3febf9b2e61f696b",
+      "plugin": "base64"
+    },
+    {
+      "input": "36795847722b755a4b517275502b763573755966615773",
+      "opts": {},
+      "output": "eb25c6afeb99290aee3febf9b2e61f696b",
+      "plugin": "base64"
+    },
+    {
+      "input": "36795847722b755a4b517275502b763573755966615773",
+      "opts": {
+        "strict": 1
+      },
+      "output": "eb25c6afeb99290aee3febf9b2e61f696b",
+      "plugin": "base64"
+    },
+    {
+      "input": "36795847722d755a4b517275502d763573755966615773",
+      "opts": {},
+      "output": "eb25c6afeb99290aee3febf9b2e61f696b",
+      "plugin": "base64url"
+    },
+    {
+      "input": "36795847722d755a4b517275502d763573755966615773",
+      "opts": {
+        "strict": 1
+      },
+      "output": "eb25c6afeb99290aee3febf9b2e61f696b",
+      "plugin": "base64url"
+    },
+    {
+      "input": "362079ff5847722b09755a4b517275502b7635737559666157733d",
+      "opts": {},
+      "output": "eb25c6afeb99290aee3febf9b2e61f696b",
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: non-alphabet byte in strict mode at byte offset 1",
+      "input": "362079ff5847722b09755a4b517275502b7635737559666157733d",
+      "opts": {
+        "strict": 1
+      },
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: non-alphabet byte in strict mode at byte offset 24",
+      "input": "36795847722b755a4b517275502b7635737559666157733d51513d3d",
+      "opts": {
+        "strict": 1
+      },
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: truncated base64 input at byte offset 0",
+      "input": "36795847722b755a4b517275502b7635737559666157733d51513d3d",
+      "opts": {},
+      "plugin": "base64"
+    },
+    {
+      "input": "56612f764f726378664e375037385a5a347337587033584a",
+      "opts": {},
+      "output": "55afef3ab7317cdecfefc659e2ced7a775c9",
+      "plugin": "base64"
+    },
+    {
+      "input": "56612f764f726378664e375037385a5a347337587033584a0a",
+      "opts": {},
+      "output": "55afef3ab7317cdecfefc659e2ced7a775c9",
+      "plugin": "base64"
+    },
+    {
+      "input": "56612f764f726378664e375037385a5a347337587033584a0d0a",
+      "opts": {},
+      "output": "55afef3ab7317cdecfefc659e2ced7a775c9",
+      "plugin": "base64"
+    },
+    {
+      "input": "56612f764f726378664e375037385a5a347337587033584a",
+      "opts": {},
+      "output": "55afef3ab7317cdecfefc659e2ced7a775c9",
+      "plugin": "base64"
+    },
+    {
+      "input": "56612f764f726378664e375037385a5a347337587033584a",
+      "opts": {
+        "strict": 1
+      },
+      "output": "55afef3ab7317cdecfefc659e2ced7a775c9",
+      "plugin": "base64"
+    },
+    {
+      "input": "56615f764f726378664e375037385a5a347337587033584a",
+      "opts": {},
+      "output": "55afef3ab7317cdecfefc659e2ced7a775c9",
+      "plugin": "base64url"
+    },
+    {
+      "input": "56615f764f726378664e375037385a5a347337587033584a",
+      "opts": {
+        "strict": 1
+      },
+      "output": "55afef3ab7317cdecfefc659e2ced7a775c9",
+      "plugin": "base64url"
+    },
+    {
+      "input": "56612f764f725f5f6378664e37503738ff5a5a347337587033584a",
+      "opts": {},
+      "output": "55afef3ab7317cdecfefc659e2ced7a775c9",
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: non-alphabet byte in strict mode at byte offset 6",
+      "input": "56612f764f725f5f6378664e37503738ff5a5a347337587033584a",
+      "opts": {
+        "strict": 1
+      },
+      "plugin": "base64"
+    },
+    {
+      "input": "4b427856724a475a796458396e516e4742696b373534655151413d3d",
+      "opts": {},
+      "output": "281c55ac9199c9d5fd9d09c606293be7879040",
+      "plugin": "base64"
+    },
+    {
+      "input": "4b427856724a475a796458396e516e4742696b373534655151413d3d0a",
+      "opts": {},
+      "output": "281c55ac9199c9d5fd9d09c606293be7879040",
+      "plugin": "base64"
+    },
+    {
+      "input": "4b427856724a475a796458396e516e4742696b373534655151413d3d0d0a",
+      "opts": {},
+      "output": "281c55ac9199c9d5fd9d09c606293be7879040",
+      "plugin": "base64"
+    },
+    {
+      "input": "4b427856724a475a796458396e516e4742696b37353465515141",
+      "opts": {},
+      "output": "281c55ac9199c9d5fd9d09c606293be7879040",
+      "plugin": "base64"
+    },
+    {
+      "input": "4b427856724a475a796458396e516e4742696b37353465515141",
+      "opts": {
+        "strict": 1
+      },
+      "output": "281c55ac9199c9d5fd9d09c606293be7879040",
+      "plugin": "base64"
+    },
+    {
+      "input": "4b427856724a475a796458396e516e4742696b37353465515141",
+      "opts": {},
+      "output": "281c55ac9199c9d5fd9d09c606293be7879040",
+      "plugin": "base64url"
+    },
+    {
+      "input": "4b427856724a475a796458396e516e4742696b37353465515141",
+      "opts": {
+        "strict": 1
+      },
+      "output": "281c55ac9199c9d5fd9d09c606293be7879040",
+      "plugin": "base64url"
+    },
+    {
+      "input": "4b427856724a475a79645809396e516e4742696b373534655151413d3d",
+      "opts": {},
+      "output": "281c55ac9199c9d5fd9d09c606293be7879040",
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: non-alphabet byte in strict mode at byte offset 11",
+      "input": "4b427856724a475a79645809396e516e4742696b373534655151413d3d",
+      "opts": {
+        "strict": 1
+      },
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: non-alphabet byte in strict mode at byte offset 28",
+      "input": "4b427856724a475a796458396e516e4742696b373534655151413d3d51513d3d",
+      "opts": {
+        "strict": 1
+      },
+      "plugin": "base64"
+    },
+    {
+      "input": "4b427856724a475a796458396e516e4742696b373534655151413d3d51513d3d",
+      "opts": {},
+      "output": "281c55ac9199c9d5fd9d09c606293be78790400410",
+      "plugin": "base64"
+    },
+    {
+      "input": "724550717a3067796c38564b527447355a332f38367648544261383d",
+      "opts": {},
+      "output": "ac43eacf483297c54a46d1b9677ffceaf1d305af",
+      "plugin": "base64"
+    },
+    {
+      "input": "724550717a3067796c38564b527447355a332f38367648544261383d0a",
+      "opts": {},
+      "output": "ac43eacf483297c54a46d1b9677ffceaf1d305af",
+      "plugin": "base64"
+    },
+    {
+      "input": "724550717a3067796c38564b527447355a332f38367648544261383d0d0a",
+      "opts": {},
+      "output": "ac43eacf483297c54a46d1b9677ffceaf1d305af",
+      "plugin": "base64"
+    },
+    {
+      "input": "724550717a3067796c38564b527447355a332f3836764854426138",
+      "opts": {},
+      "output": "ac43eacf483297c54a46d1b9677ffceaf1d305af",
+      "plugin": "base64"
+    },
+    {
+      "input": "724550717a3067796c38564b527447355a332f3836764854426138",
+      "opts": {
+        "strict": 1
+      },
+      "output": "ac43eacf483297c54a46d1b9677ffceaf1d305af",
+      "plugin": "base64"
+    },
+    {
+      "input": "724550717a3067796c38564b527447355a335f3836764854426138",
+      "opts": {},
+      "output": "ac43eacf483297c54a46d1b9677ffceaf1d305af",
+      "plugin": "base64url"
+    },
+    {
+      "input": "724550717a3067796c38564b527447355a335f3836764854426138",
+      "opts": {
+        "strict": 1
+      },
+      "output": "ac43eacf483297c54a46d1b9677ffceaf1d305af",
+      "plugin": "base64url"
+    },
+    {
+      "input": "724550717a3067796c38564b527447355a332f2138367648544261383d",
+      "opts": {},
+      "output": "ac43eacf483297c54a46d1b9677ffceaf1d305af",
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: non-alphabet byte in strict mode at byte offset 19",
+      "input": "724550717a3067796c38564b527447355a332f2138367648544261383d",
+      "opts": {
+        "strict": 1
+      },
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: non-alphabet byte in strict mode at byte offset 28",
+      "input": "724550717a3067796c38564b527447355a332f38367648544261383d51513d3d",
+      "opts": {
+        "strict": 1
+      },
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: truncated base64 input at byte offset 0",
+      "input": "724550717a3067796c38564b527447355a332f38367648544261383d51513d3d",
+      "opts": {},
+      "plugin": "base64"
+    },
+    {
+      "input": "66547864323758444456612f41306d6375725531724f394a70367279",
+      "opts": {},
+      "output": "7d3c5ddbb5c30d56bf03499cbab535acef49a7aaf2",
+      "plugin": "base64"
+    },
+    {
+      "input": "66547864323758444456612f41306d6375725531724f394a703672790a",
+      "opts": {},
+      "output": "7d3c5ddbb5c30d56bf03499cbab535acef49a7aaf2",
+      "plugin": "base64"
+    },
+    {
+      "input": "66547864323758444456612f41306d6375725531724f394a703672790d0a",
+      "opts": {},
+      "output": "7d3c5ddbb5c30d56bf03499cbab535acef49a7aaf2",
+      "plugin": "base64"
+    },
+    {
+      "input": "66547864323758444456612f41306d6375725531724f394a70367279",
+      "opts": {},
+      "output": "7d3c5ddbb5c30d56bf03499cbab535acef49a7aaf2",
+      "plugin": "base64"
+    },
+    {
+      "input": "66547864323758444456612f41306d6375725531724f394a70367279",
+      "opts": {
+        "strict": 1
+      },
+      "output": "7d3c5ddbb5c30d56bf03499cbab535acef49a7aaf2",
+      "plugin": "base64"
+    },
+    {
+      "input": "66547864323758444456615f41306d6375725531724f394a70367279",
+      "opts": {},
+      "output": "7d3c5ddbb5c30d56bf03499cbab535acef49a7aaf2",
+      "plugin": "base64url"
+    },
+    {
+      "input": "66547864323758444456615f41306d6375725531724f394a70367279",
+      "opts": {
+        "strict": 1
+      },
+      "output": "7d3c5ddbb5c30d56bf03499cbab535acef49a7aaf2",
+      "plugin": "base64url"
+    },
+    {
+      "input": "66547864323758ff444456612f204130216d6375725531724f394a70367279",
+      "opts": {},
+      "output": "7d3c5ddbb5c30d56bf03499cbab535acef49a7aaf2",
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: non-alphabet byte in strict mode at byte offset 7",
+      "input": "66547864323758ff444456612f204130216d6375725531724f394a70367279",
+      "opts": {
+        "strict": 1
+      },
+      "plugin": "base64"
+    },
+    {
+      "input": "4d2b455061632b4b512f756a5a46385564535849315545785870735761773d3d",
+      "opts": {},
+      "output": "33e10f69cf8a43fba3645f147525c8d541315e9b166b",
+      "plugin": "base64"
+    },
+    {
+      "input": "4d2b455061632b4b512f756a5a46385564535849315545785870735761773d3d0a",
+      "opts": {},
+      "output": "33e10f69cf8a43fba3645f147525c8d541315e9b166b",
+      "plugin": "base64"
+    },
+    {
+      "input": "4d2b455061632b4b512f756a5a46385564535849315545785870735761773d3d0d0a",
+      "opts": {},
+      "output": "33e10f69cf8a43fba3645f147525c8d541315e9b166b",
+      "plugin": "base64"
+    },
+    {
+      "input": "4d2b455061632b4b512f756a5a4638556453584931554578587073576177",
+      "opts": {},
+      "output": "33e10f69cf8a43fba3645f147525c8d541315e9b166b",
+      "plugin": "base64"
+    },
+    {
+      "input": "4d2b455061632b4b512f756a5a4638556453584931554578587073576177",
+      "opts": {
+        "strict": 1
+      },
+      "output": "33e10f69cf8a43fba3645f147525c8d541315e9b166b",
+      "plugin": "base64"
+    },
+    {
+      "input": "4d2d455061632d4b515f756a5a4638556453584931554578587073576177",
+      "opts": {},
+      "output": "33e10f69cf8a43fba3645f147525c8d541315e9b166b",
+      "plugin": "base64url"
+    },
+    {
+      "input": "4d2d455061632d4b515f756a5a4638556453584931554578587073576177",
+      "opts": {
+        "strict": 1
+      },
+      "output": "33e10f69cf8a43fba3645f147525c8d541315e9b166b",
+      "plugin": "base64url"
+    },
+    {
+      "input": "4d2b45502e61632b4b512f756a5a463855645358492131552145785870735761773d3d",
+      "opts": {},
+      "output": "33e10f69cf8a43fba3645f147525c8d541315e9b166b",
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: non-alphabet byte in strict mode at byte offset 4",
+      "input": "4d2b45502e61632b4b512f756a5a463855645358492131552145785870735761773d3d",
+      "opts": {
+        "strict": 1
+      },
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: non-alphabet byte in strict mode at byte offset 32",
+      "input": "4d2b455061632b4b512f756a5a46385564535849315545785870735761773d3d51513d3d",
+      "opts": {
+        "strict": 1
+      },
+      "plugin": "base64"
+    },
+    {
+      "input": "4d2b455061632b4b512f756a5a46385564535849315545785870735761773d3d51513d3d",
+      "opts": {},
+      "output": "33e10f69cf8a43fba3645f147525c8d541315e9b166b0410",
+      "plugin": "base64"
+    },
+    {
+      "input": "4655356d6179735979433578496b634e48464e56642b5979764a64777a43343d",
+      "opts": {},
+      "output": "154e666b2b18c82e7122470d1c535577e632bc9770cc2e",
+      "plugin": "base64"
+    },
+    {
+      "input": "4655356d6179735979433578496b634e48464e56642b5979764a64777a43343d0a",
+      "opts": {},
+      "output": "154e666b2b18c82e7122470d1c535577e632bc9770cc2e",
+      "plugin": "base64"
+    },
+    {
+      "input": "4655356d6179735979433578496b634e48464e56642b5979764a64777a43343d0d0a",
+      "opts": {},
+      "output": "154e666b2b18c82e7122470d1c535577e632bc9770cc2e",
+      "plugin": "base64"
+    },
+    {
+      "input": "4655356d6179735979433578496b634e48464e56642b5979764a64777a4334",
+      "opts": {},
+      "output": "154e666b2b18c82e7122470d1c535577e632bc9770cc2e",
+      "plugin": "base64"
+    },
+    {
+      "input": "4655356d6179735979433578496b634e48464e56642b5979764a64777a4334",
+      "opts": {
+        "strict": 1
+      },
+      "output": "154e666b2b18c82e7122470d1c535577e632bc9770cc2e",
+      "plugin": "base64"
+    },
+    {
+      "input": "4655356d6179735979433578496b634e48464e56642d5979764a64777a4334",
+      "opts": {},
+      "output": "154e666b2b18c82e7122470d1c535577e632bc9770cc2e",
+      "plugin": "base64url"
+    },
+    {
+      "input": "4655356d6179735979433578496b634e48464e56642d5979764a64777a4334",
+      "opts": {
+        "strict": 1
+      },
+      "output": "154e666b2b18c82e7122470d1c535577e632bc9770cc2e",
+      "plugin": "base64url"
+    },
+    {
+      "input": "465535ff216d6179735979433578496b634e48464e56642b595f79764a64777a43343d",
+      "opts": {},
+      "output": "154e666b2b18c82e7122470d1c535577e632bc9770cc2e",
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: non-alphabet byte in strict mode at byte offset 3",
+      "input": "465535ff216d6179735979433578496b634e48464e56642b595f79764a64777a43343d",
+      "opts": {
+        "strict": 1
+      },
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: non-alphabet byte in strict mode at byte offset 32",
+      "input": "4655356d6179735979433578496b634e48464e56642b5979764a64777a43343d51513d3d",
+      "opts": {
+        "strict": 1
+      },
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: truncated base64 input at byte offset 0",
+      "input": "4655356d6179735979433578496b634e48464e56642b5979764a64777a43343d51513d3d",
+      "opts": {},
+      "plugin": "base64"
+    },
+    {
+      "input": "4b6d4433524c446a357a476f6b74632b4d386e5276723551494149593655546d",
+      "opts": {},
+      "output": "2a60f744b0e3e731a892d73e33c9d1bebe50200218e944e6",
+      "plugin": "base64"
+    },
+    {
+      "input": "4b6d4433524c446a357a476f6b74632b4d386e5276723551494149593655546d0a",
+      "opts": {},
+      "output": "2a60f744b0e3e731a892d73e33c9d1bebe50200218e944e6",
+      "plugin": "base64"
+    },
+    {
+      "input": "4b6d4433524c446a357a476f6b74632b4d386e5276723551494149593655546d0d0a",
+      "opts": {},
+      "output": "2a60f744b0e3e731a892d73e33c9d1bebe50200218e944e6",
+      "plugin": "base64"
+    },
+    {
+      "input": "4b6d4433524c446a357a476f6b74632b4d386e5276723551494149593655546d",
+      "opts": {},
+      "output": "2a60f744b0e3e731a892d73e33c9d1bebe50200218e944e6",
+      "plugin": "base64"
+    },
+    {
+      "input": "4b6d4433524c446a357a476f6b74632b4d386e5276723551494149593655546d",
+      "opts": {
+        "strict": 1
+      },
+      "output": "2a60f744b0e3e731a892d73e33c9d1bebe50200218e944e6",
+      "plugin": "base64"
+    },
+    {
+      "input": "4b6d4433524c446a357a476f6b74632d4d386e5276723551494149593655546d",
+      "opts": {},
+      "output": "2a60f744b0e3e731a892d73e33c9d1bebe50200218e944e6",
+      "plugin": "base64url"
+    },
+    {
+      "input": "4b6d4433524c446a357a476f6b74632d4d386e5276723551494149593655546d",
+      "opts": {
+        "strict": 1
+      },
+      "output": "2a60f744b0e3e731a892d73e33c9d1bebe50200218e944e6",
+      "plugin": "base64url"
+    },
+    {
+      "input": "4b5f6d442d33524c446a357a476f6b74632b4d386e5276723551492e4149593655546d",
+      "opts": {},
+      "output": "2a60f744b0e3e731a892d73e33c9d1bebe50200218e944e6",
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: non-alphabet byte in strict mode at byte offset 1",
+      "input": "4b5f6d442d33524c446a357a476f6b74632b4d386e5276723551492e4149593655546d",
+      "opts": {
+        "strict": 1
+      },
+      "plugin": "base64"
+    },
+    {
+      "input": "4a7a334e5958455056554e444775774a4c534b635a49776e594e373163396b376a513d3d",
+      "opts": {},
+      "output": "273dcd61710f5543431aec092d229c648c2760def573d93b8d",
+      "plugin": "base64"
+    },
+    {
+      "input": "4a7a334e5958455056554e444775774a4c534b635a49776e594e373163396b376a513d3d0a",
+      "opts": {},
+      "output": "273dcd61710f5543431aec092d229c648c2760def573d93b8d",
+      "plugin": "base64"
+    },
+    {
+      "input": "4a7a334e5958455056554e444775774a4c534b635a49776e594e373163396b376a513d3d0d0a",
+      "opts": {},
+      "output": "273dcd61710f5543431aec092d229c648c2760def573d93b8d",
+      "plugin": "base64"
+    },
+    {
+      "input": "4a7a334e5958455056554e444775774a4c534b635a49776e594e373163396b376a51",
+      "opts": {},
+      "output": "273dcd61710f5543431aec092d229c648c2760def573d93b8d",
+      "plugin": "base64"
+    },
+    {
+      "input": "4a7a334e5958455056554e444775774a4c534b635a49776e594e373163396b376a51",
+      "opts": {
+        "strict": 1
+      },
+      "output": "273dcd61710f5543431aec092d229c648c2760def573d93b8d",
+      "plugin": "base64"
+    },
+    {
+      "input": "4a7a334e5958455056554e444775774a4c534b635a49776e594e373163396b376a51",
+      "opts": {},
+      "output": "273dcd61710f5543431aec092d229c648c2760def573d93b8d",
+      "plugin": "base64url"
+    },
+    {
+      "input": "4a7a334e5958455056554e444775774a4c534b635a49776e594e373163396b376a51",
+      "opts": {
+        "strict": 1
+      },
+      "output": "273dcd61710f5543431aec092d229c648c2760def573d93b8d",
+      "plugin": "base64url"
+    },
+    {
+      "input": "4a207a2d334e5958455056554e444775774a4c534b635a49776e594e37203163396b376a513d3d",
+      "opts": {},
+      "output": "273dcd61710f5543431aec092d229c648c2760def573d93b8d",
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: non-alphabet byte in strict mode at byte offset 1",
+      "input": "4a207a2d334e5958455056554e444775774a4c534b635a49776e594e37203163396b376a513d3d",
+      "opts": {
+        "strict": 1
+      },
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: non-alphabet byte in strict mode at byte offset 36",
+      "input": "4a7a334e5958455056554e444775774a4c534b635a49776e594e373163396b376a513d3d51513d3d",
+      "opts": {
+        "strict": 1
+      },
+      "plugin": "base64"
+    },
+    {
+      "input": "4a7a334e5958455056554e444775774a4c534b635a49776e594e373163396b376a513d3d51513d3d",
+      "opts": {},
+      "output": "273dcd61710f5543431aec092d229c648c2760def573d93b8d0410",
+      "plugin": "base64"
+    },
+    {
+      "input": "64785250726f36353366634f674a44524f7442793358794e6c3134776259727a7841633d",
+      "opts": {},
+      "output": "77144fae8eb9ddf70e8090d13ad072dd7c8d975e306d8af3c407",
+      "plugin": "base64"
+    },
+    {
+      "input": "64785250726f36353366634f674a44524f7442793358794e6c3134776259727a7841633d0a",
+      "opts": {},
+      "output": "77144fae8eb9ddf70e8090d13ad072dd7c8d975e306d8af3c407",
+      "plugin": "base64"
+    },
+    {
+      "input": "64785250726f36353366634f674a44524f7442793358794e6c3134776259727a7841633d0d0a",
+      "opts": {},
+      "output": "77144fae8eb9ddf70e8090d13ad072dd7c8d975e306d8af3c407",
+      "plugin": "base64"
+    },
+    {
+      "input": "64785250726f36353366634f674a44524f7442793358794e6c3134776259727a784163",
+      "opts": {},
+      "output": "77144fae8eb9ddf70e8090d13ad072dd7c8d975e306d8af3c407",
+      "plugin": "base64"
+    },
+    {
+      "input": "64785250726f36353366634f674a44524f7442793358794e6c3134776259727a784163",
+      "opts": {
+        "strict": 1
+      },
+      "output": "77144fae8eb9ddf70e8090d13ad072dd7c8d975e306d8af3c407",
+      "plugin": "base64"
+    },
+    {
+      "input": "64785250726f36353366634f674a44524f7442793358794e6c3134776259727a784163",
+      "opts": {},
+      "output": "77144fae8eb9ddf70e8090d13ad072dd7c8d975e306d8af3c407",
+      "plugin": "base64url"
+    },
+    {
+      "input": "64785250726f36353366634f674a44524f7442793358794e6c3134776259727a784163",
+      "opts": {
+        "strict": 1
+      },
+      "output": "77144fae8eb9ddf70e8090d13ad072dd7c8d975e306d8af3c407",
+      "plugin": "base64url"
+    },
+    {
+      "input": "647852502e726f362e353366634f674a44524f2d7442793358794e6c3134776259727a7841633d",
+      "opts": {},
+      "output": "77144fae8eb9ddf70e8090d13ad072dd7c8d975e306d8af3c407",
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: non-alphabet byte in strict mode at byte offset 4",
+      "input": "647852502e726f362e353366634f674a44524f2d7442793358794e6c3134776259727a7841633d",
+      "opts": {
+        "strict": 1
+      },
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: non-alphabet byte in strict mode at byte offset 36",
+      "input": "64785250726f36353366634f674a44524f7442793358794e6c3134776259727a7841633d51513d3d",
+      "opts": {
+        "strict": 1
+      },
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: truncated base64 input at byte offset 0",
+      "input": "64785250726f36353366634f674a44524f7442793358794e6c3134776259727a7841633d51513d3d",
+      "opts": {},
+      "plugin": "base64"
+    },
+    {
+      "input": "7a5873334b7754385a6342316a566345325a4d31776e557a6c73765177724e584e794e56",
+      "opts": {},
+      "output": "cd7b372b04fc65c0758d5704d99335c2753396cbd0c2b357372355",
+      "plugin": "base64"
+    },
+    {
+      "input": "7a5873334b7754385a6342316a566345325a4d31776e557a6c73765177724e584e794e560a",
+      "opts": {},
+      "output": "cd7b372b04fc65c0758d5704d99335c2753396cbd0c2b357372355",
+      "plugin": "base64"
+    },
+    {
+      "input": "7a5873334b7754385a6342316a566345325a4d31776e557a6c73765177724e584e794e560d0a",
+      "opts": {},
+      "output": "cd7b372b04fc65c0758d5704d99335c2753396cbd0c2b357372355",
+      "plugin": "base64"
+    },
+    {
+      "input": "7a5873334b7754385a6342316a566345325a4d31776e557a6c73765177724e584e794e56",
+      "opts": {},
+      "output": "cd7b372b04fc65c0758d5704d99335c2753396cbd0c2b357372355",
+      "plugin": "base64"
+    },
+    {
+      "input": "7a5873334b7754385a6342316a566345325a4d31776e557a6c73765177724e584e794e56",
+      "opts": {
+        "strict": 1
+      },
+      "output": "cd7b372b04fc65c0758d5704d99335c2753396cbd0c2b357372355",
+      "plugin": "base64"
+    },
+    {
+      "input": "7a5873334b7754385a6342316a566345325a4d31776e557a6c73765177724e584e794e56",
+      "opts": {},
+      "output": "cd7b372b04fc65c0758d5704d99335c2753396cbd0c2b357372355",
+      "plugin": "base64url"
+    },
+    {
+      "input": "7a5873334b7754385a6342316a566345325a4d31776e557a6c73765177724e584e794e56",
+      "opts": {
+        "strict": 1
+      },
+      "output": "cd7b372b04fc65c0758d5704d99335c2753396cbd0c2b357372355",
+      "plugin": "base64url"
+    },
+    {
+      "input": "7a587333094b7754385a6342316a566345325a4d31776e5f557a6c73765177724e584e794e56",
+      "opts": {},
+      "output": "cd7b372b04fc65c0758d5704d99335c2753396cbd0c2b357372355",
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: non-alphabet byte in strict mode at byte offset 4",
+      "input": "7a587333094b7754385a6342316a566345325a4d31776e5f557a6c73765177724e584e794e56",
+      "opts": {
+        "strict": 1
+      },
+      "plugin": "base64"
+    },
+    {
+      "input": "68486e36706b4c3251636a3358564c3230443438385345436b55724c6c376e32485a6c3939413d3d",
+      "opts": {},
+      "output": "8479faa642f641c8f75d52f6d03e3cf12102914acb97b9f61d997df4",
+      "plugin": "base64"
+    },
+    {
+      "input": "68486e36706b4c3251636a3358564c3230443438385345436b55724c6c376e32485a6c3939413d3d0a",
+      "opts": {},
+      "output": "8479faa642f641c8f75d52f6d03e3cf12102914acb97b9f61d997df4",
+      "plugin": "base64"
+    },
+    {
+      "input": "68486e36706b4c3251636a3358564c3230443438385345436b55724c6c376e32485a6c3939413d3d0d0a",
+      "opts": {},
+      "output": "8479faa642f641c8f75d52f6d03e3cf12102914acb97b9f61d997df4",
+      "plugin": "base64"
+    },
+    {
+      "input": "68486e36706b4c3251636a3358564c3230443438385345436b55724c6c376e32485a6c393941",
+      "opts": {},
+      "output": "8479faa642f641c8f75d52f6d03e3cf12102914acb97b9f61d997df4",
+      "plugin": "base64"
+    },
+    {
+      "input": "68486e36706b4c3251636a3358564c3230443438385345436b55724c6c376e32485a6c393941",
+      "opts": {
+        "strict": 1
+      },
+      "output": "8479faa642f641c8f75d52f6d03e3cf12102914acb97b9f61d997df4",
+      "plugin": "base64"
+    },
+    {
+      "input": "68486e36706b4c3251636a3358564c3230443438385345436b55724c6c376e32485a6c393941",
+      "opts": {},
+      "output": "8479faa642f641c8f75d52f6d03e3cf12102914acb97b9f61d997df4",
+      "plugin": "base64url"
+    },
+    {
+      "input": "68486e36706b4c3251636a3358564c3230443438385345436b55724c6c376e32485a6c393941",
+      "opts": {
+        "strict": 1
+      },
+      "output": "8479faa642f641c8f75d52f6d03e3cf12102914acb97b9f61d997df4",
+      "plugin": "base64url"
+    },
+    {
+      "input": "68486e36706b4c3251636a3358564c323044342138385345436b55724c6c376e32485a6c3939413d3d",
+      "opts": {},
+      "output": "8479faa642f641c8f75d52f6d03e3cf12102914acb97b9f61d997df4",
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: non-alphabet byte in strict mode at byte offset 19",
+      "input": "68486e36706b4c3251636a3358564c323044342138385345436b55724c6c376e32485a6c3939413d3d",
+      "opts": {
+        "strict": 1
+      },
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: non-alphabet byte in strict mode at byte offset 40",
+      "input": "68486e36706b4c3251636a3358564c3230443438385345436b55724c6c376e32485a6c3939413d3d51513d3d",
+      "opts": {
+        "strict": 1
+      },
+      "plugin": "base64"
+    },
+    {
+      "input": "68486e36706b4c3251636a3358564c3230443438385345436b55724c6c376e32485a6c3939413d3d51513d3d",
+      "opts": {},
+      "output": "8479faa642f641c8f75d52f6d03e3cf12102914acb97b9f61d997df40410",
+      "plugin": "base64"
+    },
+    {
+      "input": "7a665932594438443854426156484d472b3277364838342f6d6b352b36432f4f533635647a58493d",
+      "opts": {},
+      "output": "cdf636603f03f1305a547306fb6c3a1fce3f9a4e7ee82fce4bae5dcd72",
+      "plugin": "base64"
+    },
+    {
+      "input": "7a665932594438443854426156484d472b3277364838342f6d6b352b36432f4f533635647a58493d0a",
+      "opts": {},
+      "output": "cdf636603f03f1305a547306fb6c3a1fce3f9a4e7ee82fce4bae5dcd72",
+      "plugin": "base64"
+    },
+    {
+      "input": "7a665932594438443854426156484d472b3277364838342f6d6b352b36432f4f533635647a58493d0d0a",
+      "opts": {},
+      "output": "cdf636603f03f1305a547306fb6c3a1fce3f9a4e7ee82fce4bae5dcd72",
+      "plugin": "base64"
+    },
+    {
+      "input": "7a665932594438443854426156484d472b3277364838342f6d6b352b36432f4f533635647a5849",
+      "opts": {},
+      "output": "cdf636603f03f1305a547306fb6c3a1fce3f9a4e7ee82fce4bae5dcd72",
+      "plugin": "base64"
+    },
+    {
+      "input": "7a665932594438443854426156484d472b3277364838342f6d6b352b36432f4f533635647a5849",
+      "opts": {
+        "strict": 1
+      },
+      "output": "cdf636603f03f1305a547306fb6c3a1fce3f9a4e7ee82fce4bae5dcd72",
+      "plugin": "base64"
+    },
+    {
+      "input": "7a665932594438443854426156484d472d3277364838345f6d6b352d36435f4f533635647a5849",
+      "opts": {},
+      "output": "cdf636603f03f1305a547306fb6c3a1fce3f9a4e7ee82fce4bae5dcd72",
+      "plugin": "base64url"
+    },
+    {
+      "input": "7a665932594438443854426156484d472d3277364838345f6d6b352d36435f4f533635647a5849",
+      "opts": {
+        "strict": 1
+      },
+      "output": "cdf636603f03f1305a547306fb6c3a1fce3f9a4e7ee82fce4bae5dcd72",
+      "plugin": "base64url"
+    },
+    {
+      "input": "7a665932594438443854426156484d472b327736482038342f6d6b352b36432f214f533635647a58493d",
+      "opts": {},
+      "output": "cdf636603f03f1305a547306fb6c3a1fce3f9a4e7ee82fce4bae5dcd72",
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: non-alphabet byte in strict mode at byte offset 21",
+      "input": "7a665932594438443854426156484d472b327736482038342f6d6b352b36432f214f533635647a58493d",
+      "opts": {
+        "strict": 1
+      },
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: non-alphabet byte in strict mode at byte offset 40",
+      "input": "7a665932594438443854426156484d472b3277364838342f6d6b352b36432f4f533635647a58493d51513d3d",
+      "opts": {
+        "strict": 1
+      },
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: truncated base64 input at byte offset 0",
+      "input": "7a665932594438443854426156484d472b3277364838342f6d6b352b36432f4f533635647a58493d51513d3d",
+      "opts": {},
+      "plugin": "base64"
+    },
+    {
+      "input": "3072336b586e586c4e3245336a514e4a3177647361794232527a38546a59644349517975427a6838",
+      "opts": {},
+      "output": "d2bde45e75e53761378d0349d7076c6b2076473f138d8742210cae07387c",
+      "plugin": "base64"
+    },
+    {
+      "input": "3072336b586e586c4e3245336a514e4a3177647361794232527a38546a59644349517975427a68380a",
+      "opts": {},
+      "output": "d2bde45e75e53761378d0349d7076c6b2076473f138d8742210cae07387c",
+      "plugin": "base64"
+    },
+    {
+      "input": "3072336b586e586c4e3245336a514e4a3177647361794232527a38546a59644349517975427a68380d0a",
+      "opts": {},
+      "output": "d2bde45e75e53761378d0349d7076c6b2076473f138d8742210cae07387c",
+      "plugin": "base64"
+    },
+    {
+      "input": "3072336b586e586c4e3245336a514e4a3177647361794232527a38546a59644349517975427a6838",
+      "opts": {},
+      "output": "d2bde45e75e53761378d0349d7076c6b2076473f138d8742210cae07387c",
+      "plugin": "base64"
+    },
+    {
+      "input": "3072336b586e586c4e3245336a514e4a3177647361794232527a38546a59644349517975427a6838",
+      "opts": {
+        "strict": 1
+      },
+      "output": "d2bde45e75e53761378d0349d7076c6b2076473f138d8742210cae07387c",
+      "plugin": "base64"
+    },
+    {
+      "input": "3072336b586e586c4e3245336a514e4a3177647361794232527a38546a59644349517975427a6838",
+      "opts": {},
+      "output": "d2bde45e75e53761378d0349d7076c6b2076473f138d8742210cae07387c",
+      "plugin": "base64url"
+    },
+    {
+      "input": "3072336b586e586c4e3245336a514e4a3177647361794232527a38546a59644349517975427a6838",
+      "opts": {
+        "strict": 1
+      },
+      "output": "d2bde45e75e53761378d0349d7076c6b2076473f138d8742210cae07387c",
+      "plugin": "base64url"
+    },
+    {
+      "input": "3072335f6b586e586c4e3245336a514e4a3177647361794232527a38546a596443495f517975427a6838",
+      "opts": {},
+      "output": "d2bde45e75e53761378d0349d7076c6b2076473f138d8742210cae07387c",
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: non-alphabet byte in strict mode at byte offset 3",
+      "input": "3072335f6b586e586c4e3245336a514e4a3177647361794232527a38546a596443495f517975427a6838",
+      "opts": {
+        "strict": 1
+      },
+      "plugin": "base64"
+    },
+    {
+      "input": "707249374a484c55376333413446637949774f557a45795037653768527939464c4f594b6473695232513d3d",
+      "opts": {},
+      "output": "a6b23b2472d4edcdc0e05732230394cc4c8fedeee1472f452ce60a76c891d9",
+      "plugin": "base64"
+    },
+    {
+      "input": "707249374a484c55376333413446637949774f557a45795037653768527939464c4f594b6473695232513d3d0a",
+      "opts": {},
+      "output": "a6b23b2472d4edcdc0e05732230394cc4c8fedeee1472f452ce60a76c891d9",
+      "plugin": "base64"
+    },
+    {
+      "input": "707249374a484c55376333413446637949774f557a45795037653768527939464c4f594b6473695232513d3d0d0a",
+      "opts": {},
+      "output": "a6b23b2472d4edcdc0e05732230394cc4c8fedeee1472f452ce60a76c891d9",
+      "plugin": "base64"
+    },
+    {
+      "input": "707249374a484c55376333413446637949774f557a45795037653768527939464c4f594b647369523251",
+      "opts": {},
+      "output": "a6b23b2472d4edcdc0e05732230394cc4c8fedeee1472f452ce60a76c891d9",
+      "plugin": "base64"
+    },
+    {
+      "input": "707249374a484c55376333413446637949774f557a45795037653768527939464c4f594b647369523251",
+      "opts": {
+        "strict": 1
+      },
+      "output": "a6b23b2472d4edcdc0e05732230394cc4c8fedeee1472f452ce60a76c891d9",
+      "plugin": "base64"
+    },
+    {
+      "input": "707249374a484c55376333413446637949774f557a45795037653768527939464c4f594b647369523251",
+      "opts": {},
+      "output": "a6b23b2472d4edcdc0e05732230394cc4c8fedeee1472f452ce60a76c891d9",
+      "plugin": "base64url"
+    },
+    {
+      "input": "707249374a484c55376333413446637949774f557a45795037653768527939464c4f594b647369523251",
+      "opts": {
+        "strict": 1
+      },
+      "output": "a6b23b2472d4edcdc0e05732230394cc4c8fedeee1472f452ce60a76c891d9",
+      "plugin": "base64url"
+    },
+    {
+      "input": "707249374a20484c55376333413446637949774f557a4579503765372d68527939464c4f594b6473695232513d3d",
+      "opts": {},
+      "output": "a6b23b2472d4edcdc0e05732230394cc4c8fedeee1472f452ce60a76c891d9",
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: non-alphabet byte in strict mode at byte offset 5",
+      "input": "707249374a20484c55376333413446637949774f557a4579503765372d68527939464c4f594b6473695232513d3d",
+      "opts": {
+        "strict": 1
+      },
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: non-alphabet byte in strict mode at byte offset 44",
+      "input": "707249374a484c55376333413446637949774f557a45795037653768527939464c4f594b6473695232513d3d51513d3d",
+      "opts": {
+        "strict": 1
+      },
+      "plugin": "base64"
+    },
+    {
+      "input": "707249374a484c55376333413446637949774f557a45795037653768527939464c4f594b6473695232513d3d51513d3d",
+      "opts": {},
+      "output": "a6b23b2472d4edcdc0e05732230394cc4c8fedeee1472f452ce60a76c891d90410",
+      "plugin": "base64"
+    },
+    {
+      "input": "6d334a2f666c502f42537956524371554461694a30773577316661734379657a54584f56304e6e596b45733d",
+      "opts": {},
+      "output": "9b727f7e53ff052c95442a940da889d30e70d5f6ac0b27b34d7395d0d9d8904b",
+      "plugin": "base64"
+    },
+    {
+      "input": "6d334a2f666c502f42537956524371554461694a30773577316661734379657a54584f56304e6e596b45733d0a",
+      "opts": {},
+      "output": "9b727f7e53ff052c95442a940da889d30e70d5f6ac0b27b34d7395d0d9d8904b",
+      "plugin": "base64"
+    },
+    {
+      "input": "6d334a2f666c502f42537956524371554461694a30773577316661734379657a54584f56304e6e596b45733d0d0a",
+      "opts": {},
+      "output": "9b727f7e53ff052c95442a940da889d30e70d5f6ac0b27b34d7395d0d9d8904b",
+      "plugin": "base64"
+    },
+    {
+      "input": "6d334a2f666c502f42537956524371554461694a30773577316661734379657a54584f56304e6e596b4573",
+      "opts": {},
+      "output": "9b727f7e53ff052c95442a940da889d30e70d5f6ac0b27b34d7395d0d9d8904b",
+      "plugin": "base64"
+    },
+    {
+      "input": "6d334a2f666c502f42537956524371554461694a30773577316661734379657a54584f56304e6e596b4573",
+      "opts": {
+        "strict": 1
+      },
+      "output": "9b727f7e53ff052c95442a940da889d30e70d5f6ac0b27b34d7395d0d9d8904b",
+      "plugin": "base64"
+    },
+    {
+      "input": "6d334a5f666c505f42537956524371554461694a30773577316661734379657a54584f56304e6e596b4573",
+      "opts": {},
+      "output": "9b727f7e53ff052c95442a940da889d30e70d5f6ac0b27b34d7395d0d9d8904b",
+      "plugin": "base64url"
+    },
+    {
+      "input": "6d334a5f666c505f42537956524371554461694a30773577316661734379657a54584f56304e6e596b4573",
+      "opts": {
+        "strict": 1
+      },
+      "output": "9b727f7e53ff052c95442a940da889d30e70d5f6ac0b27b34d7395d0d9d8904b",
+      "plugin": "base64url"
+    },
+    {
+      "input": "6d334a2fff666c502e2f42537956524371554461694a3077357731206661734379657a54584f56304e6e596b45733d",
+      "opts": {},
+      "output": "9b727f7e53ff052c95442a940da889d30e70d5f6ac0b27b34d7395d0d9d8904b",
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: non-alphabet byte in strict mode at byte offset 4",
+      "input": "6d334a2fff666c502e2f42537956524371554461694a3077357731206661734379657a54584f56304e6e596b45733d",
+      "opts": {
+        "strict": 1
+      },
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: non-alphabet byte in strict mode at byte offset 44",
+      "input": "6d334a2f666c502f42537956524371554461694a30773577316661734379657a54584f56304e6e596b45733d51513d3d",
+      "opts": {
+        "strict": 1
+      },
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: truncated base64 input at byte offset 0",
+      "input": "6d334a2f666c502f42537956524371554461694a30773577316661734379657a54584f56304e6e596b45733d51513d3d",
+      "opts": {},
+      "plugin": "base64"
+    },
+    {
+      "input": "4f65433150676a4848694b5470547a49556469795775667357765868564854576d346b6d6e77684534697962",
+      "opts": {},
+      "output": "39e0b53e08c71e2293a53cc851d8b25ae7ec5af5e15474d69b89269f0844e22c9b",
+      "plugin": "base64"
+    },
+    {
+      "input": "4f65433150676a4848694b5470547a49556469795775667357765868564854576d346b6d6e776845346979620a",
+      "opts": {},
+      "output": "39e0b53e08c71e2293a53cc851d8b25ae7ec5af5e15474d69b89269f0844e22c9b",
+      "plugin": "base64"
+    },
+    {
+      "input": "4f65433150676a4848694b5470547a49556469795775667357765868564854576d346b6d6e776845346979620d0a",
+      "opts": {},
+      "output": "39e0b53e08c71e2293a53cc851d8b25ae7ec5af5e15474d69b89269f0844e22c9b",
+      "plugin": "base64"
+    },
+    {
+      "input": "4f65433150676a4848694b5470547a49556469795775667357765868564854576d346b6d6e77684534697962",
+      "opts": {},
+      "output": "39e0b53e08c71e2293a53cc851d8b25ae7ec5af5e15474d69b89269f0844e22c9b",
+      "plugin": "base64"
+    },
+    {
+      "input": "4f65433150676a4848694b5470547a49556469795775667357765868564854576d346b6d6e77684534697962",
+      "opts": {
+        "strict": 1
+      },
+      "output": "39e0b53e08c71e2293a53cc851d8b25ae7ec5af5e15474d69b89269f0844e22c9b",
+      "plugin": "base64"
+    },
+    {
+      "input": "4f65433150676a4848694b5470547a49556469795775667357765868564854576d346b6d6e77684534697962",
+      "opts": {},
+      "output": "39e0b53e08c71e2293a53cc851d8b25ae7ec5af5e15474d69b89269f0844e22c9b",
+      "plugin": "base64url"
+    },
+    {
+      "input": "4f65433150676a4848694b5470547a49556469795775667357765868564854576d346b6d6e77684534697962",
+      "opts": {
+        "strict": 1
+      },
+      "output": "39e0b53e08c71e2293a53cc851d8b25ae7ec5af5e15474d69b89269f0844e22c9b",
+      "plugin": "base64url"
+    },
+    {
+      "input": "4f65433150676a4848694b5470547a49556469795775667357765868564854576d346b2d6d6e77684534697962",
+      "opts": {},
+      "output": "39e0b53e08c71e2293a53cc851d8b25ae7ec5af5e15474d69b89269f0844e22c9b",
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: non-alphabet byte in strict mode at byte offset 35",
+      "input": "4f65433150676a4848694b5470547a49556469795775667357765868564854576d346b2d6d6e77684534697962",
+      "opts": {
+        "strict": 1
+      },
+      "plugin": "base64"
+    },
+    {
+      "input": "3377634333676b786d687833696a4248413472577459353766476f734a4b6b76554762365030346b4c61543156773d3d",
+      "opts": {},
+      "output": "df0702de09319a1c778a3047038ad6b58e7b7c6a2c24a92f5066fa3f4e242da4f557",
+      "plugin": "base64"
+    },
+    {
+      "input": "3377634333676b786d687833696a4248413472577459353766476f734a4b6b76554762365030346b4c61543156773d3d0a",
+      "opts": {},
+      "output": "df0702de09319a1c778a3047038ad6b58e7b7c6a2c24a92f5066fa3f4e242da4f557",
+      "plugin": "base64"
+    },
+    {
+      "input": "3377634333676b786d687833696a4248413472577459353766476f734a4b6b76554762365030346b4c61543156773d3d0d0a",
+      "opts": {},
+      "output": "df0702de09319a1c778a3047038ad6b58e7b7c6a2c24a92f5066fa3f4e242da4f557",
+      "plugin": "base64"
+    },
+    {
+      "input": "3377634333676b786d687833696a4248413472577459353766476f734a4b6b76554762365030346b4c6154315677",
+      "opts": {},
+      "output": "df0702de09319a1c778a3047038ad6b58e7b7c6a2c24a92f5066fa3f4e242da4f557",
+      "plugin": "base64"
+    },
+    {
+      "input": "3377634333676b786d687833696a4248413472577459353766476f734a4b6b76554762365030346b4c6154315677",
+      "opts": {
+        "strict": 1
+      },
+      "output": "df0702de09319a1c778a3047038ad6b58e7b7c6a2c24a92f5066fa3f4e242da4f557",
+      "plugin": "base64"
+    },
+    {
+      "input": "3377634333676b786d687833696a4248413472577459353766476f734a4b6b76554762365030346b4c6154315677",
+      "opts": {},
+      "output": "df0702de09319a1c778a3047038ad6b58e7b7c6a2c24a92f5066fa3f4e242da4f557",
+      "plugin": "base64url"
+    },
+    {
+      "input": "3377634333676b786d687833696a4248413472577459353766476f734a4b6b76554762365030346b4c6154315677",
+      "opts": {
+        "strict": 1
+      },
+      "output": "df0702de09319a1c778a3047038ad6b58e7b7c6a2c24a92f5066fa3f4e242da4f557",
+      "plugin": "base64url"
+    },
+    {
+      "input": "3377634333676b786d687833696aff4248413472577459353766476f734a4b6b76554762365030346b4c61543156773d2d3d",
+      "opts": {},
+      "output": "df0702de09319a1c778a3047038ad6b58e7b7c6a2c24a92f5066fa3f4e242da4f557",
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: non-alphabet byte in strict mode at byte offset 14",
+      "input": "3377634333676b786d687833696aff4248413472577459353766476f734a4b6b76554762365030346b4c61543156773d2d3d",
+      "opts": {
+        "strict": 1
+      },
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: non-alphabet byte in strict mode at byte offset 48",
+      "input": "3377634333676b786d687833696a4248413472577459353766476f734a4b6b76554762365030346b4c61543156773d3d51513d3d",
+      "opts": {
+        "strict": 1
+      },
+      "plugin": "base64"
+    },
+    {
+      "input": "3377634333676b786d687833696a4248413472577459353766476f734a4b6b76554762365030346b4c61543156773d3d51513d3d",
+      "opts": {},
+      "output": "df0702de09319a1c778a3047038ad6b58e7b7c6a2c24a92f5066fa3f4e242da4f5570410",
+      "plugin": "base64"
+    },
+    {
+      "input": "526c6c4f6953472f4b4b434d796d6c5347462f64484e582f484b746e7a5868675341776f61507679696572544246773d",
+      "opts": {},
+      "output": "46594e8921bf28a08cca6952185fdd1cd5ff1cab67cd7860480c2868fbf289ead3045c",
+      "plugin": "base64"
+    },
+    {
+      "input": "526c6c4f6953472f4b4b434d796d6c5347462f64484e582f484b746e7a5868675341776f61507679696572544246773d0a",
+      "opts": {},
+      "output": "46594e8921bf28a08cca6952185fdd1cd5ff1cab67cd7860480c2868fbf289ead3045c",
+      "plugin": "base64"
+    },
+    {
+      "input": "526c6c4f6953472f4b4b434d796d6c5347462f64484e582f484b746e7a5868675341776f61507679696572544246773d0d0a",
+      "opts": {},
+      "output": "46594e8921bf28a08cca6952185fdd1cd5ff1cab67cd7860480c2868fbf289ead3045c",
+      "plugin": "base64"
+    },
+    {
+      "input": "526c6c4f6953472f4b4b434d796d6c5347462f64484e582f484b746e7a5868675341776f6150767969657254424677",
+      "opts": {},
+      "output": "46594e8921bf28a08cca6952185fdd1cd5ff1cab67cd7860480c2868fbf289ead3045c",
+      "plugin": "base64"
+    },
+    {
+      "input": "526c6c4f6953472f4b4b434d796d6c5347462f64484e582f484b746e7a5868675341776f6150767969657254424677",
+      "opts": {
+        "strict": 1
+      },
+      "output": "46594e8921bf28a08cca6952185fdd1cd5ff1cab67cd7860480c2868fbf289ead3045c",
+      "plugin": "base64"
+    },
+    {
+      "input": "526c6c4f6953475f4b4b434d796d6c5347465f64484e585f484b746e7a5868675341776f6150767969657254424677",
+      "opts": {},
+      "output": "46594e8921bf28a08cca6952185fdd1cd5ff1cab67cd7860480c2868fbf289ead3045c",
+      "plugin": "base64url"
+    },
+    {
+      "input": "526c6c4f6953475f4b4b434d796d6c5347465f64484e585f484b746e7a5868675341776f6150767969657254424677",
+      "opts": {
+        "strict": 1
+      },
+      "output": "46594e8921bf28a08cca6952185fdd1cd5ff1cab67cd7860480c2868fbf289ead3045c",
+      "plugin": "base64url"
+    },
+    {
+      "input": "526c6c4f6953472f4b4b434d796d6c5347462f64484e582f484b746e7a58686753412e776f6150760979696572544246773d",
+      "opts": {},
+      "output": "46594e8921bf28a08cca6952185fdd1cd5ff1cab67cd7860480c2868fbf289ead3045c",
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: non-alphabet byte in strict mode at byte offset 34",
+      "input": "526c6c4f6953472f4b4b434d796d6c5347462f64484e582f484b746e7a58686753412e776f6150760979696572544246773d",
+      "opts": {
+        "strict": 1
+      },
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: non-alphabet byte in strict mode at byte offset 48",
+      "input": "526c6c4f6953472f4b4b434d796d6c5347462f64484e582f484b746e7a5868675341776f61507679696572544246773d51513d3d",
+      "opts": {
+        "strict": 1
+      },
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: truncated base64 input at byte offset 0",
+      "input": "526c6c4f6953472f4b4b434d796d6c5347462f64484e582f484b746e7a5868675341776f61507679696572544246773d51513d3d",
+      "opts": {},
+      "plugin": "base64"
+    },
+    {
+      "input": "5951705135444b716c50336957476b33794a794e72426675624e49364d564e4747337a6c733975535646417955574b6f",
+      "opts": {},
+      "output": "610a50e432aa94fde2586937c89c8dac17ee6cd23a3153461b7ce5b3db925450325162a8",
+      "plugin": "base64"
+    },
+    {
+      "input": "5951705135444b716c50336957476b33794a794e72426675624e49364d564e4747337a6c733975535646417955574b6f0a",
+      "opts": {},
+      "output": "610a50e432aa94fde2586937c89c8dac17ee6cd23a3153461b7ce5b3db925450325162a8",
+      "plugin": "base64"
+    },
+    {
+      "input": "5951705135444b716c50336957476b33794a794e72426675624e49364d564e4747337a6c733975535646417955574b6f0d0a",
+      "opts": {},
+      "output": "610a50e432aa94fde2586937c89c8dac17ee6cd23a3153461b7ce5b3db925450325162a8",
+      "plugin": "base64"
+    },
+    {
+      "input": "5951705135444b716c50336957476b33794a794e72426675624e49364d564e4747337a6c733975535646417955574b6f",
+      "opts": {},
+      "output": "610a50e432aa94fde2586937c89c8dac17ee6cd23a3153461b7ce5b3db925450325162a8",
+      "plugin": "base64"
+    },
+    {
+      "input": "5951705135444b716c50336957476b33794a794e72426675624e49364d564e4747337a6c733975535646417955574b6f",
+      "opts": {
+        "strict": 1
+      },
+      "output": "610a50e432aa94fde2586937c89c8dac17ee6cd23a3153461b7ce5b3db925450325162a8",
+      "plugin": "base64"
+    },
+    {
+      "input": "5951705135444b716c50336957476b33794a794e72426675624e49364d564e4747337a6c733975535646417955574b6f",
+      "opts": {},
+      "output": "610a50e432aa94fde2586937c89c8dac17ee6cd23a3153461b7ce5b3db925450325162a8",
+      "plugin": "base64url"
+    },
+    {
+      "input": "5951705135444b716c50336957476b33794a794e72426675624e49364d564e4747337a6c733975535646417955574b6f",
+      "opts": {
+        "strict": 1
+      },
+      "output": "610a50e432aa94fde2586937c89c8dac17ee6cd23a3153461b7ce5b3db925450325162a8",
+      "plugin": "base64url"
+    },
+    {
+      "input": "595120705135444b716c50336957476b33794a794e72426675624e49364d564e204747337a6c733975535646417955574b6f",
+      "opts": {},
+      "output": "610a50e432aa94fde2586937c89c8dac17ee6cd23a3153461b7ce5b3db925450325162a8",
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: non-alphabet byte in strict mode at byte offset 2",
+      "input": "595120705135444b716c50336957476b33794a794e72426675624e49364d564e204747337a6c733975535646417955574b6f",
+      "opts": {
+        "strict": 1
+      },
+      "plugin": "base64"
+    },
+    {
+      "input": "394431566e54732f46494b41634a762f39476f686c5a6739332b3758526873625a43747775377a39364e2f653871746136413d3d",
+      "opts": {},
+      "output": "f43d559d3b3f148280709bfff46a2195983ddfeed7461b1b642b70bbbcfde8dfdef2ab5ae8",
+      "plugin": "base64"
+    },
+    {
+      "input": "394431566e54732f46494b41634a762f39476f686c5a6739332b3758526873625a43747775377a39364e2f653871746136413d3d0a",
+      "opts": {},
+      "output": "f43d559d3b3f148280709bfff46a2195983ddfeed7461b1b642b70bbbcfde8dfdef2ab5ae8",
+      "plugin": "base64"
+    },
+    {
+      "input": "394431566e54732f46494b41634a762f39476f686c5a6739332b3758526873625a43747775377a39364e2f653871746136413d3d0d0a",
+      "opts": {},
+      "output": "f43d559d3b3f148280709bfff46a2195983ddfeed7461b1b642b70bbbcfde8dfdef2ab5ae8",
+      "plugin": "base64"
+    },
+    {
+      "input": "394431566e54732f46494b41634a762f39476f686c5a6739332b3758526873625a43747775377a39364e2f65387174613641",
+      "opts": {},
+      "output": "f43d559d3b3f148280709bfff46a2195983ddfeed7461b1b642b70bbbcfde8dfdef2ab5ae8",
+      "plugin": "base64"
+    },
+    {
+      "input": "394431566e54732f46494b41634a762f39476f686c5a6739332b3758526873625a43747775377a39364e2f65387174613641",
+      "opts": {
+        "strict": 1
+      },
+      "output": "f43d559d3b3f148280709bfff46a2195983ddfeed7461b1b642b70bbbcfde8dfdef2ab5ae8",
+      "plugin": "base64"
+    },
+    {
+      "input": "394431566e54735f46494b41634a765f39476f686c5a6739332d3758526873625a43747775377a39364e5f65387174613641",
+      "opts": {},
+      "output": "f43d559d3b3f148280709bfff46a2195983ddfeed7461b1b642b70bbbcfde8dfdef2ab5ae8",
+      "plugin": "base64url"
+    },
+    {
+      "input": "394431566e54735f46494b41634a765f39476f686c5a6739332d3758526873625a43747775377a39364e5f65387174613641",
+      "opts": {
+        "strict": 1
+      },
+      "output": "f43d559d3b3f148280709bfff46a2195983ddfeed7461b1b642b70bbbcfde8dfdef2ab5ae8",
+      "plugin": "base64url"
+    },
+    {
+      "input": "5f394431566e54732f46494b41634a762f39476f68216c5a6739332b375852687362205a43747775377a39364e2f653871746136413d3d",
+      "opts": {},
+      "output": "f43d559d3b3f148280709bfff46a2195983ddfeed7461b1b642b70bbbcfde8dfdef2ab5ae8",
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: non-alphabet byte in strict mode at byte offset 0",
+      "input": "5f394431566e54732f46494b41634a762f39476f68216c5a6739332b375852687362205a43747775377a39364e2f653871746136413d3d",
+      "opts": {
+        "strict": 1
+      },
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: non-alphabet byte in strict mode at byte offset 52",
+      "input": "394431566e54732f46494b41634a762f39476f686c5a6739332b3758526873625a43747775377a39364e2f653871746136413d3d51513d3d",
+      "opts": {
+        "strict": 1
+      },
+      "plugin": "base64"
+    },
+    {
+      "input": "394431566e54732f46494b41634a762f39476f686c5a6739332b3758526873625a43747775377a39364e2f653871746136413d3d51513d3d",
+      "opts": {},
+      "output": "f43d559d3b3f148280709bfff46a2195983ddfeed7461b1b642b70bbbcfde8dfdef2ab5ae80410",
+      "plugin": "base64"
+    },
+    {
+      "input": "7955772b483264507230484579624d667175754d484e47527935396d58727a30774a58776f706b43364752594e5066747075303d",
+      "opts": {},
+      "output": "c94c3e1f674faf41c4c9b31faaeb8c1cd191cb9f665ebcf4c095f0a29902e8645834f7eda6ed",
+      "plugin": "base64"
+    },
+    {
+      "input": "7955772b483264507230484579624d667175754d484e47527935396d58727a30774a58776f706b43364752594e5066747075303d0a",
+      "opts": {},
+      "output": "c94c3e1f674faf41c4c9b31faaeb8c1cd191cb9f665ebcf4c095f0a29902e8645834f7eda6ed",
+      "plugin": "base64"
+    },
+    {
+      "input": "7955772b483264507230484579624d667175754d484e47527935396d58727a30774a58776f706b43364752594e5066747075303d0d0a",
+      "opts": {},
+      "output": "c94c3e1f674faf41c4c9b31faaeb8c1cd191cb9f665ebcf4c095f0a29902e8645834f7eda6ed",
+      "plugin": "base64"
+    },
+    {
+      "input": "7955772b483264507230484579624d667175754d484e47527935396d58727a30774a58776f706b43364752594e506674707530",
+      "opts": {},
+      "output": "c94c3e1f674faf41c4c9b31faaeb8c1cd191cb9f665ebcf4c095f0a29902e8645834f7eda6ed",
+      "plugin": "base64"
+    },
+    {
+      "input": "7955772b483264507230484579624d667175754d484e47527935396d58727a30774a58776f706b43364752594e506674707530",
+      "opts": {
+        "strict": 1
+      },
+      "output": "c94c3e1f674faf41c4c9b31faaeb8c1cd191cb9f665ebcf4c095f0a29902e8645834f7eda6ed",
+      "plugin": "base64"
+    },
+    {
+      "input": "7955772d483264507230484579624d667175754d484e47527935396d58727a30774a58776f706b43364752594e506674707530",
+      "opts": {},
+      "output": "c94c3e1f674faf41c4c9b31faaeb8c1cd191cb9f665ebcf4c095f0a29902e8645834f7eda6ed",
+      "plugin": "base64url"
+    },
+    {
+      "input": "7955772d483264507230484579624d667175754d484e47527935396d58727a30774a58776f706b43364752594e506674707530",
+      "opts": {
+        "strict": 1
+      },
+      "output": "c94c3e1f674faf41c4c9b31faaeb8c1cd191cb9f665ebcf4c095f0a29902e8645834f7eda6ed",
+      "plugin": "base64url"
+    },
+    {
+      "input": "7955772b48326450723020484579624d66717575094d484e47527935396d58727a30774a58776f706b4336470952594e5066747075303d",
+      "opts": {},
+      "output": "c94c3e1f674faf41c4c9b31faaeb8c1cd191cb9f665ebcf4c095f0a29902e8645834f7eda6ed",
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: non-alphabet byte in strict mode at byte offset 10",
+      "input": "7955772b48326450723020484579624d66717575094d484e47527935396d58727a30774a58776f706b4336470952594e5066747075303d",
+      "opts": {
+        "strict": 1
+      },
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: non-alphabet byte in strict mode at byte offset 52",
+      "input": "7955772b483264507230484579624d667175754d484e47527935396d58727a30774a58776f706b43364752594e5066747075303d51513d3d",
+      "opts": {
+        "strict": 1
+      },
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: truncated base64 input at byte offset 0",
+      "input": "7955772b483264507230484579624d667175754d484e47527935396d58727a30774a58776f706b43364752594e5066747075303d51513d3d",
+      "opts": {},
+      "plugin": "base64"
+    },
+    {
+      "input": "56373745536e73707a552f2f76727578382f726d787a43524479515641322b30646e51454d4457562b5742616745635164485161",
+      "opts": {},
+      "output": "57bec44a7b29cd4fffbebbb1f3fae6c730910f2415036fb4767404303595f9605a80471074741a",
+      "plugin": "base64"
+    },
+    {
+      "input": "56373745536e73707a552f2f76727578382f726d787a43524479515641322b30646e51454d4457562b57426167456351644851610a",
+      "opts": {},
+      "output": "57bec44a7b29cd4fffbebbb1f3fae6c730910f2415036fb4767404303595f9605a80471074741a",
+      "plugin": "base64"
+    },
+    {
+      "input": "56373745536e73707a552f2f76727578382f726d787a43524479515641322b30646e51454d4457562b57426167456351644851610d0a",
+      "opts": {},
+      "output": "57bec44a7b29cd4fffbebbb1f3fae6c730910f2415036fb4767404303595f9605a80471074741a",
+      "plugin": "base64"
+    },
+    {
+      "input": "56373745536e73707a552f2f76727578382f726d787a43524479515641322b30646e51454d4457562b5742616745635164485161",
+      "opts": {},
+      "output": "57bec44a7b29cd4fffbebbb1f3fae6c730910f2415036fb4767404303595f9605a80471074741a",
+      "plugin": "base64"
+    },
+    {
+      "input": "56373745536e73707a552f2f76727578382f726d787a43524479515641322b30646e51454d4457562b5742616745635164485161",
+      "opts": {
+        "strict": 1
+      },
+      "output": "57bec44a7b29cd4fffbebbb1f3fae6c730910f2415036fb4767404303595f9605a80471074741a",
+      "plugin": "base64"
+    },
+    {
+      "input": "56373745536e73707a555f5f76727578385f726d787a43524479515641322d30646e51454d4457562d5742616745635164485161",
+      "opts": {},
+      "output": "57bec44a7b29cd4fffbebbb1f3fae6c730910f2415036fb4767404303595f9605a80471074741a",
+      "plugin": "base64url"
+    },
+    {
+      "input": "56373745536e73707a555f5f76727578385f726d787a43524479515641322d30646e51454d4457562d5742616745635164485161",
+      "opts": {
+        "strict": 1
+      },
+      "output": "57bec44a7b29cd4fffbebbb1f3fae6c730910f2415036fb4767404303595f9605a80471074741a",
+      "plugin": "base64url"
+    },
+    {
+      "input": "56373745536e73707a552f2f76727578382f726d20787a43524479515641322b30646e51454d4457562b574261ff67456351642d485161",
+      "opts": {},
+      "output": "57bec44a7b29cd4fffbebbb1f3fae6c730910f2415036fb4767404303595f9605a80471074741a",
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: non-alphabet byte in strict mode at byte offset 20",
+      "input": "56373745536e73707a552f2f76727578382f726d20787a43524479515641322b30646e51454d4457562b574261ff67456351642d485161",
+      "opts": {
+        "strict": 1
+      },
+      "plugin": "base64"
+    },
+    {
+      "input": "73584e36692b7649487454556e4534415a794e6c58306e4f52426d774f576c72716c4f6f7a5843497250794c333448325079684446513d3d",
+      "opts": {},
+      "output": "b1737a8bebc81ed4d49c4e006723655f49ce4419b039696baa53a8cd7088acfc8bdf81f63f284315",
+      "plugin": "base64"
+    },
+    {
+      "input": "73584e36692b7649487454556e4534415a794e6c58306e4f52426d774f576c72716c4f6f7a5843497250794c333448325079684446513d3d0a",
+      "opts": {},
+      "output": "b1737a8bebc81ed4d49c4e006723655f49ce4419b039696baa53a8cd7088acfc8bdf81f63f284315",
+      "plugin": "base64"
+    },
+    {
+      "input": "73584e36692b7649487454556e4534415a794e6c58306e4f52426d774f576c72716c4f6f7a5843497250794c333448325079684446513d3d0d0a",
+      "opts": {},
+      "output": "b1737a8bebc81ed4d49c4e006723655f49ce4419b039696baa53a8cd7088acfc8bdf81f63f284315",
+      "plugin": "base64"
+    },
+    {
+      "input": "73584e36692b7649487454556e4534415a794e6c58306e4f52426d774f576c72716c4f6f7a5843497250794c33344832507968444651",
+      "opts": {},
+      "output": "b1737a8bebc81ed4d49c4e006723655f49ce4419b039696baa53a8cd7088acfc8bdf81f63f284315",
+      "plugin": "base64"
+    },
+    {
+      "input": "73584e36692b7649487454556e4534415a794e6c58306e4f52426d774f576c72716c4f6f7a5843497250794c33344832507968444651",
+      "opts": {
+        "strict": 1
+      },
+      "output": "b1737a8bebc81ed4d49c4e006723655f49ce4419b039696baa53a8cd7088acfc8bdf81f63f284315",
+      "plugin": "base64"
+    },
+    {
+      "input": "73584e36692d7649487454556e4534415a794e6c58306e4f52426d774f576c72716c4f6f7a5843497250794c33344832507968444651",
+      "opts": {},
+      "output": "b1737a8bebc81ed4d49c4e006723655f49ce4419b039696baa53a8cd7088acfc8bdf81f63f284315",
+      "plugin": "base64url"
+    },
+    {
+      "input": "73584e36692d7649487454556e4534415a794e6c58306e4f52426d774f576c72716c4f6f7a5843497250794c33344832507968444651",
+      "opts": {
+        "strict": 1
+      },
+      "output": "b1737a8bebc81ed4d49c4e006723655f49ce4419b039696baa53a8cd7088acfc8bdf81f63f284315",
+      "plugin": "base64url"
+    },
+    {
+      "input": "73584e36692b7649487454556e4534415a794e6c58306e4f52426d774f576c72716c4f6f7a0958434972505f794c333448325079684446513d3d",
+      "opts": {},
+      "output": "b1737a8bebc81ed4d49c4e006723655f49ce4419b039696baa53a8cd7088acfc8bdf81f63f284315",
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: non-alphabet byte in strict mode at byte offset 37",
+      "input": "73584e36692b7649487454556e4534415a794e6c58306e4f52426d774f576c72716c4f6f7a0958434972505f794c333448325079684446513d3d",
+      "opts": {
+        "strict": 1
+      },
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: non-alphabet byte in strict mode at byte offset 56",
+      "input": "73584e36692b7649487454556e4534415a794e6c58306e4f52426d774f576c72716c4f6f7a5843497250794c333448325079684446513d3d51513d3d",
+      "opts": {
+        "strict": 1
+      },
+      "plugin": "base64"
+    },
+    {
+      "input": "73584e36692b7649487454556e4534415a794e6c58306e4f52426d774f576c72716c4f6f7a5843497250794c333448325079684446513d3d51513d3d",
+      "opts": {},
+      "output": "b1737a8bebc81ed4d49c4e006723655f49ce4419b039696baa53a8cd7088acfc8bdf81f63f2843150410",
+      "plugin": "base64"
+    },
+    {
+      "input": "46362b7532386231417674672f64346361596648525155536e6e506e6a554c4f486b66536461347445752b5938362f48376e496967385841553149684d4e306972644664673348512f447766",
+      "opts": {},
+      "output": "17afaedbc6f502fb60fdde1c6987c74505129e73e78d42ce1e47d275ae2d12ef98f3afc7ee722283c5c053522130dd22add15d8371d0fc3c1f",
+      "plugin": "base64"
+    },
+    {
+      "input": "46362b7532386231417674672f64346361596648525155536e6e506e6a554c4f486b66536461347445752b5938362f48376e496967385841553149684d4e306972644664673348512f4477660a",
+      "opts": {},
+      "output": "17afaedbc6f502fb60fdde1c6987c74505129e73e78d42ce1e47d275ae2d12ef98f3afc7ee722283c5c053522130dd22add15d8371d0fc3c1f",
+      "plugin": "base64"
+    },
+    {
+      "input": "46362b7532386231417674672f64346361596648525155536e6e506e6a554c4f486b66536461347445752b5938362f48376e496967385841553149684d4e306972644664673348512f4477660d0a",
+      "opts": {},
+      "output": "17afaedbc6f502fb60fdde1c6987c74505129e73e78d42ce1e47d275ae2d12ef98f3afc7ee722283c5c053522130dd22add15d8371d0fc3c1f",
+      "plugin": "base64"
+    },
+    {
+      "input": "46362b7532386231417674672f64346361596648525155536e6e506e6a554c4f486b66536461347445752b5938362f48376e496967385841553149684d4e306972644664673348512f447766",
+      "opts": {},
+      "output": "17afaedbc6f502fb60fdde1c6987c74505129e73e78d42ce1e47d275ae2d12ef98f3afc7ee722283c5c053522130dd22add15d8371d0fc3c1f",
+      "plugin": "base64"
+    },
+    {
+      "input": "46362b7532386231417674672f64346361596648525155536e6e506e6a554c4f486b66536461347445752b5938362f48376e496967385841553149684d4e306972644664673348512f447766",
+      "opts": {
+        "strict": 1
+      },
+      "output": "17afaedbc6f502fb60fdde1c6987c74505129e73e78d42ce1e47d275ae2d12ef98f3afc7ee722283c5c053522130dd22add15d8371d0fc3c1f",
+      "plugin": "base64"
+    },
+    {
+      "input": "46362d7532386231417674675f64346361596648525155536e6e506e6a554c4f486b66536461347445752d5938365f48376e496967385841553149684d4e306972644664673348515f447766",
+      "opts": {},
+      "output": "17afaedbc6f502fb60fdde1c6987c74505129e73e78d42ce1e47d275ae2d12ef98f3afc7ee722283c5c053522130dd22add15d8371d0fc3c1f",
+      "plugin": "base64url"
+    },
+    {
+      "input": "46362d7532386231417674675f64346361596648525155536e6e506e6a554c4f486b66536461347445752d5938365f48376e496967385841553149684d4e306972644664673348515f447766",
+      "opts": {
+        "strict": 1
+      },
+      "output": "17afaedbc6f502fb60fdde1c6987c74505129e73e78d42ce1e47d275ae2d12ef98f3afc7ee722283c5c053522130dd22add15d8371d0fc3c1f",
+      "plugin": "base64url"
+    },
+    {
+      "input": "46362b7532386231417674672f6434635f61596648525155536e6e506e6a554c4f486b66536461347445752b5938362f48376e496967385841553149684d4e302d6972644664673348512d2f447766",
+      "opts": {},
+      "output": "17afaedbc6f502fb60fdde1c6987c74505129e73e78d42ce1e47d275ae2d12ef98f3afc7ee722283c5c053522130dd22add15d8371d0fc3c1f",
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: non-alphabet byte in strict mode at byte offset 16",
+      "input": "46362b7532386231417674672f6434635f61596648525155536e6e506e6a554c4f486b66536461347445752b5938362f48376e496967385841553149684d4e302d6972644664673348512d2f447766",
+      "opts": {
+        "strict": 1
+      },
+      "plugin": "base64"
+    },
+    {
+      "input": "534252476f714a2f55664b617567614f6b617579764d43775a3448493479386e58414c374b393545656a5672746b3734617079344a684f7a30466362574931483775765433567a7a3249445a45673d3d",
+      "opts": {},
+      "output": "481446a2a27f51f29aba068e91abb2bcc0b06781c8e32f275c02fb2bde447a356bb64ef86a9cb82613b3d0571b588d47eeebd3dd5cf3d880d912",
+      "plugin": "base64"
+    },
+    {
+      "input": "534252476f714a2f55664b617567614f6b617579764d43775a3448493479386e58414c374b393545656a5672746b3734617079344a684f7a30466362574931483775765433567a7a3249445a0a45673d3d0a",
+      "opts": {},
+      "output": "481446a2a27f51f29aba068e91abb2bcc0b06781c8e32f275c02fb2bde447a356bb64ef86a9cb82613b3d0571b588d47eeebd3dd5cf3d880d912",
+      "plugin": "base64"
+    },
+    {
+      "input": "534252476f714a2f55664b617567614f6b617579764d43775a3448493479386e58414c374b393545656a5672746b3734617079344a684f7a30466362574931483775765433567a7a3249445a0d0a45673d3d0d0a",
+      "opts": {},
+      "output": "481446a2a27f51f29aba068e91abb2bcc0b06781c8e32f275c02fb2bde447a356bb64ef86a9cb82613b3d0571b588d47eeebd3dd5cf3d880d912",
+      "plugin": "base64"
+    },
+    {
+      "input": "534252476f714a2f55664b617567614f6b617579764d43775a3448493479386e58414c374b393545656a5672746b3734617079344a684f7a30466362574931483775765433567a7a3249445a4567",
+      "opts": {},
+      "output": "481446a2a27f51f29aba068e91abb2bcc0b06781c8e32f275c02fb2bde447a356bb64ef86a9cb82613b3d0571b588d47eeebd3dd5cf3d880d912",
+      "plugin": "base64"
+    },
+    {
+      "input": "534252476f714a2f55664b617567614f6b617579764d43775a3448493479386e58414c374b393545656a5672746b3734617079344a684f7a30466362574931483775765433567a7a3249445a4567",
+      "opts": {
+        "strict": 1
+      },
+      "output": "481446a2a27f51f29aba068e91abb2bcc0b06781c8e32f275c02fb2bde447a356bb64ef86a9cb82613b3d0571b588d47eeebd3dd5cf3d880d912",
+      "plugin": "base64"
+    },
+    {
+      "input": "534252476f714a5f55664b617567614f6b617579764d43775a3448493479386e58414c374b393545656a5672746b3734617079344a684f7a30466362574931483775765433567a7a3249445a4567",
+      "opts": {},
+      "output": "481446a2a27f51f29aba068e91abb2bcc0b06781c8e32f275c02fb2bde447a356bb64ef86a9cb82613b3d0571b588d47eeebd3dd5cf3d880d912",
+      "plugin": "base64url"
+    },
+    {
+      "input": "534252476f714a5f55664b617567614f6b617579764d43775a3448493479386e58414c374b393545656a5672746b3734617079344a684f7a30466362574931483775765433567a7a3249445a4567",
+      "opts": {
+        "strict": 1
+      },
+      "output": "481446a2a27f51f29aba068e91abb2bcc0b06781c8e32f275c02fb2bde447a356bb64ef86a9cb82613b3d0571b588d47eeebd3dd5cf3d880d912",
+      "plugin": "base64url"
+    },
+    {
+      "input": "534252476f714a2f55664b617567614f6b617579764d43775a3448493479386e58414c374b393545656a5672746b3734617079345f4a684f7a304663622d574931483775765433567a7a3249445a45673d3d",
+      "opts": {},
+      "output": "481446a2a27f51f29aba068e91abb2bcc0b06781c8e32f275c02fb2bde447a356bb64ef86a9cb82613b3d0571b588d47eeebd3dd5cf3d880d912",
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: non-alphabet byte in strict mode at byte offset 52",
+      "input": "534252476f714a2f55664b617567614f6b617579764d43775a3448493479386e58414c374b393545656a5672746b3734617079345f4a684f7a304663622d574931483775765433567a7a3249445a45673d3d",
+      "opts": {
+        "strict": 1
+      },
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: non-alphabet byte in strict mode at byte offset 80",
+      "input": "534252476f714a2f55664b617567614f6b617579764d43775a3448493479386e58414c374b393545656a5672746b3734617079344a684f7a30466362574931483775765433567a7a3249445a45673d3d51513d3d",
+      "opts": {
+        "strict": 1
+      },
+      "plugin": "base64"
+    },
+    {
+      "input": "534252476f714a2f55664b617567614f6b617579764d43775a3448493479386e58414c374b393545656a5672746b3734617079344a684f7a30466362574931483775765433567a7a3249445a45673d3d51513d3d",
+      "opts": {},
+      "output": "481446a2a27f51f29aba068e91abb2bcc0b06781c8e32f275c02fb2bde447a356bb64ef86a9cb82613b3d0571b588d47eeebd3dd5cf3d880d9120410",
+      "plugin": "base64"
+    },
+    {
+      "input": "744a4f644733456c42336d65704c397572704b707935733856664b666179376f6f66747478635644656948483544472f486c516b4b4e77456c4b63507066564841384868704c77573146796a466430703535337137746c7673596c2b46757965526d456830673d3d",
+      "opts": {},
+      "output": "b4939d1b712507799ea4bf6eae92a9cb9b3c55f29f6b2ee8a1fb6dc5c5437a21c7e431bf1e542428dc0494a70fa5f54703c1e1a4bc16d45ca315dd29e79deaeed96fb1897e16ec9e466121d2",
+      "plugin": "base64"
+    },
+    {
+      "input": "744a4f644733456c42336d65704c397572704b707935733856664b666179376f6f66747478635644656948483544472f486c516b4b4e77456c4b63507066564841384868704c77573146796a0a466430703535337137746c7673596c2b46757965526d456830673d3d0a",
+      "opts": {},
+      "output": "b4939d1b712507799ea4bf6eae92a9cb9b3c55f29f6b2ee8a1fb6dc5c5437a21c7e431bf1e542428dc0494a70fa5f54703c1e1a4bc16d45ca315dd29e79deaeed96fb1897e16ec9e466121d2",
+      "plugin": "base64"
+    },
+    {
+      "input": "744a4f644733456c42336d65704c397572704b707935733856664b666179376f6f66747478635644656948483544472f486c516b4b4e77456c4b63507066564841384868704c77573146796a0d0a466430703535337137746c7673596c2b46757965526d456830673d3d0d0a",
+      "opts": {},
+      "output": "b4939d1b712507799ea4bf6eae92a9cb9b3c55f29f6b2ee8a1fb6dc5c5437a21c7e431bf1e542428dc0494a70fa5f54703c1e1a4bc16d45ca315dd29e79deaeed96fb1897e16ec9e466121d2",
+      "plugin": "base64"
+    },
+    {
+      "input": "744a4f644733456c42336d65704c397572704b707935733856664b666179376f6f66747478635644656948483544472f486c516b4b4e77456c4b63507066564841384868704c77573146796a466430703535337137746c7673596c2b46757965526d45683067",
+      "opts": {},
+      "output": "b4939d1b712507799ea4bf6eae92a9cb9b3c55f29f6b2ee8a1fb6dc5c5437a21c7e431bf1e542428dc0494a70fa5f54703c1e1a4bc16d45ca315dd29e79deaeed96fb1897e16ec9e466121d2",
+      "plugin": "base64"
+    },
+    {
+      "input": "744a4f644733456c42336d65704c397572704b707935733856664b666179376f6f66747478635644656948483544472f486c516b4b4e77456c4b63507066564841384868704c77573146796a466430703535337137746c7673596c2b46757965526d45683067",
+      "opts": {
+        "strict": 1
+      },
+      "output": "b4939d1b712507799ea4bf6eae92a9cb9b3c55f29f6b2ee8a1fb6dc5c5437a21c7e431bf1e542428dc0494a70fa5f54703c1e1a4bc16d45ca315dd29e79deaeed96fb1897e16ec9e466121d2",
+      "plugin": "base64"
+    },
+    {
+      "input": "744a4f644733456c42336d65704c397572704b707935733856664b666179376f6f66747478635644656948483544475f486c516b4b4e77456c4b63507066564841384868704c77573146796a466430703535337137746c7673596c2d46757965526d45683067",
+      "opts": {},
+      "output": "b4939d1b712507799ea4bf6eae92a9cb9b3c55f29f6b2ee8a1fb6dc5c5437a21c7e431bf1e542428dc0494a70fa5f54703c1e1a4bc16d45ca315dd29e79deaeed96fb1897e16ec9e466121d2",
+      "plugin": "base64url"
+    },
+    {
+      "input": "744a4f644733456c42336d65704c397572704b707935733856664b666179376f6f66747478635644656948483544475f486c516b4b4e77456c4b63507066564841384868704c77573146796a466430703535337137746c7673596c2d46757965526d45683067",
+      "opts": {
+        "strict": 1
+      },
+      "output": "b4939d1b712507799ea4bf6eae92a9cb9b3c55f29f6b2ee8a1fb6dc5c5437a21c7e431bf1e542428dc0494a70fa5f54703c1e1a4bc16d45ca315dd29e79deaeed96fb1897e16ec9e466121d2",
+      "plugin": "base64url"
+    },
+    {
+      "input": "744a4f6447332d456c4233216d65704c397572704b707935733856664b666179376f6f66747478635644656948483544472f486c516b4b4e77456c4b63507066564841384868704c77573146796a466430703535337137746c767359206c2b46757965526d456830673d3d",
+      "opts": {},
+      "output": "b4939d1b712507799ea4bf6eae92a9cb9b3c55f29f6b2ee8a1fb6dc5c5437a21c7e431bf1e542428dc0494a70fa5f54703c1e1a4bc16d45ca315dd29e79deaeed96fb1897e16ec9e466121d2",
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: non-alphabet byte in strict mode at byte offset 6",
+      "input": "744a4f6447332d456c4233216d65704c397572704b707935733856664b666179376f6f66747478635644656948483544472f486c516b4b4e77456c4b63507066564841384868704c77573146796a466430703535337137746c767359206c2b46757965526d456830673d3d",
+      "opts": {
+        "strict": 1
+      },
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: non-alphabet byte in strict mode at byte offset 104",
+      "input": "744a4f644733456c42336d65704c397572704b707935733856664b666179376f6f66747478635644656948483544472f486c516b4b4e77456c4b63507066564841384868704c77573146796a466430703535337137746c7673596c2b46757965526d456830673d3d51513d3d",
+      "opts": {
+        "strict": 1
+      },
+      "plugin": "base64"
+    },
+    {
+      "input": "744a4f644733456c42336d65704c397572704b707935733856664b666179376f6f66747478635644656948483544472f486c516b4b4e77456c4b63507066564841384868704c77573146796a466430703535337137746c7673596c2b46757965526d456830673d3d51513d3d",
+      "opts": {},
+      "output": "b4939d1b712507799ea4bf6eae92a9cb9b3c55f29f6b2ee8a1fb6dc5c5437a21c7e431bf1e542428dc0494a70fa5f54703c1e1a4bc16d45ca315dd29e79deaeed96fb1897e16ec9e466121d20410",
+      "plugin": "base64"
+    },
+    {
+      "input": "4b4674656a64786e6154625441354e717151386d656b2b6e52623252425533755175673977625a526f63443369346871642b736941507375336e357568656f44376878444c345a6836626b512f6b66686549306d374266666279486c544d3679386c2f704a78553d",
+      "opts": {},
+      "output": "285b5e8ddc676936d303936aa90f267a4fa745bd91054dee42e83dc1b651a1c0f78b886a77eb2200fb2ede7e6e85ea03ee1c432f8661e9b910fe47e1788d26ec17df6f21e54cceb2f25fe92715",
+      "plugin": "base64"
+    },
+    {
+      "input": "4b4674656a64786e6154625441354e717151386d656b2b6e52623252425533755175673977625a526f63443369346871642b736941507375336e357568656f44376878444c345a6836626b510a2f6b66686549306d374266666279486c544d3679386c2f704a78553d0a",
+      "opts": {},
+      "output": "285b5e8ddc676936d303936aa90f267a4fa745bd91054dee42e83dc1b651a1c0f78b886a77eb2200fb2ede7e6e85ea03ee1c432f8661e9b910fe47e1788d26ec17df6f21e54cceb2f25fe92715",
+      "plugin": "base64"
+    },
+    {
+      "input": "4b4674656a64786e6154625441354e717151386d656b2b6e52623252425533755175673977625a526f63443369346871642b736941507375336e357568656f44376878444c345a6836626b510d0a2f6b66686549306d374266666279486c544d3679386c2f704a78553d0d0a",
+      "opts": {},
+      "output": "285b5e8ddc676936d303936aa90f267a4fa745bd91054dee42e83dc1b651a1c0f78b886a77eb2200fb2ede7e6e85ea03ee1c432f8661e9b910fe47e1788d26ec17df6f21e54cceb2f25fe92715",
+      "plugin": "base64"
+    },
+    {
+      "input": "4b4674656a64786e6154625441354e717151386d656b2b6e52623252425533755175673977625a526f63443369346871642b736941507375336e357568656f44376878444c345a6836626b512f6b66686549306d374266666279486c544d3679386c2f704a7855",
+      "opts": {},
+      "output": "285b5e8ddc676936d303936aa90f267a4fa745bd91054dee42e83dc1b651a1c0f78b886a77eb2200fb2ede7e6e85ea03ee1c432f8661e9b910fe47e1788d26ec17df6f21e54cceb2f25fe92715",
+      "plugin": "base64"
+    },
+    {
+      "input": "4b4674656a64786e6154625441354e717151386d656b2b6e52623252425533755175673977625a526f63443369346871642b736941507375336e357568656f44376878444c345a6836626b512f6b66686549306d374266666279486c544d3679386c2f704a7855",
+      "opts": {
+        "strict": 1
+      },
+      "output": "285b5e8ddc676936d303936aa90f267a4fa745bd91054dee42e83dc1b651a1c0f78b886a77eb2200fb2ede7e6e85ea03ee1c432f8661e9b910fe47e1788d26ec17df6f21e54cceb2f25fe92715",
+      "plugin": "base64"
+    },
+    {
+      "input": "4b4674656a64786e6154625441354e717151386d656b2d6e52623252425533755175673977625a526f63443369346871642d736941507375336e357568656f44376878444c345a6836626b515f6b66686549306d374266666279486c544d3679386c5f704a7855",
+      "opts": {},
+      "output": "285b5e8ddc676936d303936aa90f267a4fa745bd91054dee42e83dc1b651a1c0f78b886a77eb2200fb2ede7e6e85ea03ee1c432f8661e9b910fe47e1788d26ec17df6f21e54cceb2f25fe92715",
+      "plugin": "base64url"
+    },
+    {
+      "input": "4b4674656a64786e6154625441354e717151386d656b2d6e52623252425533755175673977625a526f63443369346871642d736941507375336e357568656f44376878444c345a6836626b515f6b66686549306d374266666279486c544d3679386c5f704a7855",
+      "opts": {
+        "strict": 1
+      },
+      "output": "285b5e8ddc676936d303936aa90f267a4fa745bd91054dee42e83dc1b651a1c0f78b886a77eb2200fb2ede7e6e85ea03ee1c432f8661e9b910fe47e1788d26ec17df6f21e54cceb2f25fe92715",
+      "plugin": "base64url"
+    },
+    {
+      "input": "4b4674656a64786e6154625441354e717151386d656b2b6e5262325242553375517567395f77625a526f63443369346871642b736941507375336e357568656f44376878444c345a6836626b512f6b66686549306d37426666620979486c544d3679386c2f70214a78553d",
+      "opts": {},
+      "output": "285b5e8ddc676936d303936aa90f267a4fa745bd91054dee42e83dc1b651a1c0f78b886a77eb2200fb2ede7e6e85ea03ee1c432f8661e9b910fe47e1788d26ec17df6f21e54cceb2f25fe92715",
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: non-alphabet byte in strict mode at byte offset 36",
+      "input": "4b4674656a64786e6154625441354e717151386d656b2b6e5262325242553375517567395f77625a526f63443369346871642b736941507375336e357568656f44376878444c345a6836626b512f6b66686549306d37426666620979486c544d3679386c2f70214a78553d",
+      "opts": {
+        "strict": 1
+      },
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: non-alphabet byte in strict mode at byte offset 104",
+      "input": "4b4674656a64786e6154625441354e717151386d656b2b6e52623252425533755175673977625a526f63443369346871642b736941507375336e357568656f44376878444c345a6836626b512f6b66686549306d374266666279486c544d3679386c2f704a78553d51513d3d",
+      "opts": {
+        "strict": 1
+      },
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: truncated base64 input at byte offset 0",
+      "input": "4b4674656a64786e6154625441354e717151386d656b2b6e52623252425533755175673977625a526f63443369346871642b736941507375336e357568656f44376878444c345a6836626b512f6b66686549306d374266666279486c544d3679386c2f704a78553d51513d3d",
+      "opts": {},
+      "plugin": "base64"
+    },
+    {
+      "input": "6b526a47357348323057357a5a4b6a41635873312b4f6356784f706d4154614267517654356c49414d2f746a4e6630695773732f564c747867714772442b72714b4430524b6c59477a7a716c68305649534c336b53544468424e7845783133382b6c42766a7749376b6f4d386146616648413838584c4f704b65564e7a785278334c57353971496b7a727878717a52306f2b49593553727148326b62486f58712f324e4b6d437046764d454841536848656e4b2b536437754b645146373679534376773035354657764e515a514d4f5a4b2b5076736c7163696c4e4b543258453368416159736a374132457675576d4d416b614d76347932766674707430317073616235313350717a4f5134415037376a3277484b576c4e57726a52526c736b324552427731685a456979507a6d4b54454e4661714a307144495668666e43693075797645323159616b4962414b30764631644d5532794f4d4e53706a37496c575a6d6d4e67697976762b754155767570694b465a4f587a4e5a372f5663596c524f387255554759566578304f357939376a496c746434572f797968616263437874304b6c764e4f4553734c507861375576364965384b2b537377426f4f482f597741784d4f2b686a5330487a5a423939493838684639486671556764524251614963506c526652615a46747776784951516c6632684d644d6d6878314c4b6148496451494f386c4b514e50554a79615466516141345331535368443042353647455a506e74776277654178335a576d6d385a50415172576e473773714c39774f324a693542444b4d6d3954466277762f35784e395651362b4d6f556a307857724334313231462f6963723370582f767a7a4c637a5979385a6b475164436e4a2f73392b4a6a56714567344f4e2b586a55477a725a30654179702f732b61583453547147655970356d696b364c2f4557662f7a6270516d644d6a4f666f4f5936536a645a75584969555a4575726641457738434355736a356b374d323942515a4851753363626c564d6b6d714a4b7943444b6667506776792f744e4753626e6c446e70356c4634746b41494d366733307a4148683161664546737763644254414a533254636578664275426179697a5847526943546552474246386865746d34735969706c59486d412b496a7162494274694249425066742f656a6b393862392f6c43396f34614978486b563442576c626c6777774461594e754670733067786b4761546c6a7068376f39703968336c50574c6b6a446b43434b3379534b3764377973626375797572547470307a486c45356158626b59674563546e6d45395a37653936635a52347a4939466a4f654a3553656c712b542f4f533347494937306e4159306b66546f47574e484d3442346d366e4c526b737a702f6f58374b6f4331764269387377384d35415449307263454966644f4a666f447264725842636547526b4a31674a35392b513265437353355a71786353744846504d5654543646354845353049306c6c564e7152516e475241497177704337434b59633458565156554c38766678577765694562577449315168732b3134367741633652594a77317a7a444e5332426438365273683642545a47622b44683245306f6f59754b672f3844446c32567856547a36335a366d7a566a4234756c6f4a517158722b622b61413957626d48697643376c69702f384373306b363956696f58704f6e637666624f2b467646385275754c6955696344335132707270733438546561666438343765363079432b65463549527134774147426131314c54686256306930445a684b546552566c5543796b4f434174782f414d575a37773d3d",
+      "opts": {},
+      "output": "9118c6e6c1f6d16e7364a8c0717b35f8e715c4ea66013681810bd3e6520033fb6335fd225acb3f54bb7182a1ab0feaea283d112a5606cf3aa587454848bde44930e104dc44c75dfcfa506f8f023b92833c68569f1c0f3c5cb3a929e54dcf1471dcb5b9f6a224cebc71ab3474a3e218e52aea1f691b1e85eaff634a982a45bcc1070128477a72be49deee29d405efac920afc34e79156bcd41940c3992be3efb25a9c8a534a4f65c4de101a62c8fb03612fb9698c02468cbf8cb6bdfb69b74d69b1a6f9d773eacce43800fefb8f6c0729694d5ab8d1465b24d84441c35859122c8fce629310d15aa89d2a0c85617e70a2d2ecaf136d586a421b00ad2f17574c536c8e30d4a98fb2255999a63608b2beffae014beea6228564e5f3359eff55c62544ef2b51419855ec743b9cbdee3225b5de16ff2ca169b702c6dd0a96f34e112b0b3f16bb52fe887bc2be4acc01a0e1ff63003130efa18d2d07cd907df48f3c845f477ea52075105068870f9517d169916dc2fc4841095fda131d326871d4b29a1c875020ef2529034f509c9a4df41a0384b5492843d01e7a18464f9edc1bc1e031dd95a69bc64f010ad69c6eeca8bf703b6262e410ca326f5315bc2fff9c4df5543af8ca148f4c56ac2e35db517f89caf7a57fefcf32dccd8cbc6641907429c9fecf7e26356a120e0e37e5e3506ceb674780ca9fecf9a5f8493a86798a799a293a2ff1167ffcdba5099d32339fa0e63a4a3759b9722251912eadf004c3c08252c8f993b336f414191d0bb771b9553249aa24ac820ca7e03e0bf2fed34649b9e50e7a79945e2d90020cea0df4cc01e1d5a7c416cc1c7414c0252d9371ec5f06e05aca2cd71918824de446045f217ad9b8b188a99581e603e223a9b201b6204804f7edfde8e4f7c6fdfe50bda38688c47915e015a56e5830c0369836e169b34831906693963a61ee8f69f61de53d62e48c390208adf248aeddef2b1b72ecaead3b69d331e51396976e462011c4e7984f59edef7a719478cc8f458ce789e527a5abe4ff392dc6208ef49c063491f4e81963473380789ba9cb464b33a7fa17ecaa02d6f062f2cc3c339013234adc1087dd3897e80eb76b5c171e191909d60279f7e436782b12e59ab1712b4714f3154d3e85e47139d08d2595536a4509c644022ac290bb08a61ce175505542fcbdfc56c1e8846d6b48d5086cfb5e3ac0073a458270d73cc3352d8177ce91b21e814d919bf83876134a2862e2a0ffc0c3976571553cfadd9ea6cd58c1e2e968250a97afe6fe680f566e61e2bc2ee58a9ffc0acd24ebd562a17a4e9dcbdf6cef85bc5f11bae2e2522703dd0da9ae9b38f1379a7ddf38edeeb4c82f9e179211ab8c001816b5d4b4e16d5d22d03661293791565502ca438202dc7f00c599ef",
+      "plugin": "base64"
+    },
+    {
+      "input": "6b526a47357348323057357a5a4b6a41635873312b4f6356784f706d4154614267517654356c49414d2f746a4e6630695773732f564c747867714772442b72714b4430524b6c59477a7a716c0a68305649534c336b53544468424e7845783133382b6c42766a7749376b6f4d386146616648413838584c4f704b65564e7a785278334c57353971496b7a727878717a52306f2b4959355372710a48326b62486f58712f324e4b6d437046764d454841536848656e4b2b536437754b645146373679534376773035354657764e515a514d4f5a4b2b5076736c7163696c4e4b54325845336841610a59736a374132457675576d4d416b614d76347932766674707430317073616235313350717a4f5134415037376a3277484b576c4e57726a52526c736b324552427731685a456979507a6d4b540a454e4661714a307144495668666e43693075797645323159616b4962414b30764631644d5532794f4d4e53706a37496c575a6d6d4e67697976762b754155767570694b465a4f587a4e5a372f0a5663596c524f387255554759566578304f357939376a496c746434572f797968616263437874304b6c764e4f4553734c507861375576364965384b2b537377426f4f482f597741784d4f2b680a6a5330487a5a423939493838684639486671556764524251614963506c526652615a46747776784951516c6632684d644d6d6878314c4b6148496451494f386c4b514e50554a7961546651610a41345331535368443042353647455a506e74776277654178335a576d6d385a50415172576e473773714c39774f324a693542444b4d6d3954466277762f35784e395651362b4d6f556a3078570a724334313231462f6963723370582f767a7a4c637a5979385a6b475164436e4a2f73392b4a6a56714567344f4e2b586a55477a725a30654179702f732b61583453547147655970356d696b360a4c2f4557662f7a6270516d644d6a4f666f4f5936536a645a75584969555a4575726641457738434355736a356b374d323942515a4851753363626c564d6b6d714a4b7943444b6667506776790a2f744e4753626e6c446e70356c4634746b41494d366733307a4148683161664546737763644254414a533254636578664275426179697a5847526943546552474246386865746d34735969700a6c59486d412b496a7162494274694249425066742f656a6b393862392f6c43396f34614978486b563442576c626c6777774461594e754670733067786b4761546c6a7068376f39703968336c0a50574c6b6a446b43434b3379534b3764377973626375797572547470307a486c45356158626b59674563546e6d45395a37653936635a52347a4939466a4f654a3553656c712b542f4f5333470a494937306e4159306b66546f47574e484d3442346d366e4c526b737a702f6f58374b6f4331764269387377384d35415449307263454966644f4a666f447264725842636547526b4a31674a350a392b513265437353355a71786353744846504d5654543646354845353049306c6c564e7152516e475241497177704337434b59633458565156554c38766678577765694562577449315168730a2b3134367741633652594a77317a7a444e5332426438365273683642545a47622b44683245306f6f59754b672f3844446c32567856547a36335a366d7a566a4234756c6f4a517158722b622b0a61413957626d48697643376c69702f384373306b363956696f58704f6e637666624f2b467646385275754c6955696344335132707270733438546561666438343765363079432b65463549520a7134774147426131314c54686256306930445a684b546552566c5543796b4f434174782f414d575a37773d3d0a",
+      "opts": {},
+      "output": "9118c6e6c1f6d16e7364a8c0717b35f8e715c4ea66013681810bd3e6520033fb6335fd225acb3f54bb7182a1ab0feaea283d112a5606cf3aa587454848bde44930e104dc44c75dfcfa506f8f023b92833c68569f1c0f3c5cb3a929e54dcf1471dcb5b9f6a224cebc71ab3474a3e218e52aea1f691b1e85eaff634a982a45bcc1070128477a72be49deee29d405efac920afc34e79156bcd41940c3992be3efb25a9c8a534a4f65c4de101a62c8fb03612fb9698c02468cbf8cb6bdfb69b74d69b1a6f9d773eacce43800fefb8f6c0729694d5ab8d1465b24d84441c35859122c8fce629310d15aa89d2a0c85617e70a2d2ecaf136d586a421b00ad2f17574c536c8e30d4a98fb2255999a63608b2beffae014beea6228564e5f3359eff55c62544ef2b51419855ec743b9cbdee3225b5de16ff2ca169b702c6dd0a96f34e112b0b3f16bb52fe887bc2be4acc01a0e1ff63003130efa18d2d07cd907df48f3c845f477ea52075105068870f9517d169916dc2fc4841095fda131d326871d4b29a1c875020ef2529034f509c9a4df41a0384b5492843d01e7a18464f9edc1bc1e031dd95a69bc64f010ad69c6eeca8bf703b6262e410ca326f5315bc2fff9c4df5543af8ca148f4c56ac2e35db517f89caf7a57fefcf32dccd8cbc6641907429c9fecf7e26356a120e0e37e5e3506ceb674780ca9fecf9a5f8493a86798a799a293a2ff1167ffcdba5099d32339fa0e63a4a3759b9722251912eadf004c3c08252c8f993b336f414191d0bb771b9553249aa24ac820ca7e03e0bf2fed34649b9e50e7a79945e2d90020cea0df4cc01e1d5a7c416cc1c7414c0252d9371ec5f06e05aca2cd71918824de446045f217ad9b8b188a99581e603e223a9b201b6204804f7edfde8e4f7c6fdfe50bda38688c47915e015a56e5830c0369836e169b34831906693963a61ee8f69f61de53d62e48c390208adf248aeddef2b1b72ecaead3b69d331e51396976e462011c4e7984f59edef7a719478cc8f458ce789e527a5abe4ff392dc6208ef49c063491f4e81963473380789ba9cb464b33a7fa17ecaa02d6f062f2cc3c339013234adc1087dd3897e80eb76b5c171e191909d60279f7e436782b12e59ab1712b4714f3154d3e85e47139d08d2595536a4509c644022ac290bb08a61ce175505542fcbdfc56c1e8846d6b48d5086cfb5e3ac0073a458270d73cc3352d8177ce91b21e814d919bf83876134a2862e2a0ffc0c3976571553cfadd9ea6cd58c1e2e968250a97afe6fe680f566e61e2bc2ee58a9ffc0acd24ebd562a17a4e9dcbdf6cef85bc5f11bae2e2522703dd0da9ae9b38f1379a7ddf38edeeb4c82f9e179211ab8c001816b5d4b4e16d5d22d03661293791565502ca438202dc7f00c599ef",
+      "plugin": "base64"
+    },
+    {
+      "input": "6b526a47357348323057357a5a4b6a41635873312b4f6356784f706d4154614267517654356c49414d2f746a4e6630695773732f564c747867714772442b72714b4430524b6c59477a7a716c0d0a68305649534c336b53544468424e7845783133382b6c42766a7749376b6f4d386146616648413838584c4f704b65564e7a785278334c57353971496b7a727878717a52306f2b4959355372710d0a48326b62486f58712f324e4b6d437046764d454841536848656e4b2b536437754b645146373679534376773035354657764e515a514d4f5a4b2b5076736c7163696c4e4b54325845336841610d0a59736a374132457675576d4d416b614d76347932766674707430317073616235313350717a4f5134415037376a3277484b576c4e57726a52526c736b324552427731685a456979507a6d4b540d0a454e4661714a307144495668666e43693075797645323159616b4962414b30764631644d5532794f4d4e53706a37496c575a6d6d4e67697976762b754155767570694b465a4f587a4e5a372f0d0a5663596c524f387255554759566578304f357939376a496c746434572f797968616263437874304b6c764e4f4553734c507861375576364965384b2b537377426f4f482f597741784d4f2b680d0a6a5330487a5a423939493838684639486671556764524251614963506c526652615a46747776784951516c6632684d644d6d6878314c4b6148496451494f386c4b514e50554a7961546651610d0a41345331535368443042353647455a506e74776277654178335a576d6d385a50415172576e473773714c39774f324a693542444b4d6d3954466277762f35784e395651362b4d6f556a3078570d0a724334313231462f6963723370582f767a7a4c637a5979385a6b475164436e4a2f73392b4a6a56714567344f4e2b586a55477a725a30654179702f732b61583453547147655970356d696b360d0a4c2f4557662f7a6270516d644d6a4f666f4f5936536a645a75584969555a4575726641457738434355736a356b374d323942515a4851753363626c564d6b6d714a4b7943444b6667506776790d0a2f744e4753626e6c446e70356c4634746b41494d366733307a4148683161664546737763644254414a533254636578664275426179697a5847526943546552474246386865746d34735969700d0a6c59486d412b496a7162494274694249425066742f656a6b393862392f6c43396f34614978486b563442576c626c6777774461594e754670733067786b4761546c6a7068376f39703968336c0d0a50574c6b6a446b43434b3379534b3764377973626375797572547470307a486c45356158626b59674563546e6d45395a37653936635a52347a4939466a4f654a3553656c712b542f4f5333470d0a494937306e4159306b66546f47574e484d3442346d366e4c526b737a702f6f58374b6f4331764269387377384d35415449307263454966644f4a666f447264725842636547526b4a31674a350d0a392b513265437353355a71786353744846504d5654543646354845353049306c6c564e7152516e475241497177704337434b59633458565156554c38766678577765694562577449315168730d0a2b3134367741633652594a77317a7a444e5332426438365273683642545a47622b44683245306f6f59754b672f3844446c32567856547a36335a366d7a566a4234756c6f4a517158722b622b0d0a61413957626d48697643376c69702f384373306b363956696f58704f6e637666624f2b467646385275754c6955696344335132707270733438546561666438343765363079432b65463549520d0a7134774147426131314c54686256306930445a684b546552566c5543796b4f434174782f414d575a37773d3d0d0a",
+      "opts": {},
+      "output": "9118c6e6c1f6d16e7364a8c0717b35f8e715c4ea66013681810bd3e6520033fb6335fd225acb3f54bb7182a1ab0feaea283d112a5606cf3aa587454848bde44930e104dc44c75dfcfa506f8f023b92833c68569f1c0f3c5cb3a929e54dcf1471dcb5b9f6a224cebc71ab3474a3e218e52aea1f691b1e85eaff634a982a45bcc1070128477a72be49deee29d405efac920afc34e79156bcd41940c3992be3efb25a9c8a534a4f65c4de101a62c8fb03612fb9698c02468cbf8cb6bdfb69b74d69b1a6f9d773eacce43800fefb8f6c0729694d5ab8d1465b24d84441c35859122c8fce629310d15aa89d2a0c85617e70a2d2ecaf136d586a421b00ad2f17574c536c8e30d4a98fb2255999a63608b2beffae014beea6228564e5f3359eff55c62544ef2b51419855ec743b9cbdee3225b5de16ff2ca169b702c6dd0a96f34e112b0b3f16bb52fe887bc2be4acc01a0e1ff63003130efa18d2d07cd907df48f3c845f477ea52075105068870f9517d169916dc2fc4841095fda131d326871d4b29a1c875020ef2529034f509c9a4df41a0384b5492843d01e7a18464f9edc1bc1e031dd95a69bc64f010ad69c6eeca8bf703b6262e410ca326f5315bc2fff9c4df5543af8ca148f4c56ac2e35db517f89caf7a57fefcf32dccd8cbc6641907429c9fecf7e26356a120e0e37e5e3506ceb674780ca9fecf9a5f8493a86798a799a293a2ff1167ffcdba5099d32339fa0e63a4a3759b9722251912eadf004c3c08252c8f993b336f414191d0bb771b9553249aa24ac820ca7e03e0bf2fed34649b9e50e7a79945e2d90020cea0df4cc01e1d5a7c416cc1c7414c0252d9371ec5f06e05aca2cd71918824de446045f217ad9b8b188a99581e603e223a9b201b6204804f7edfde8e4f7c6fdfe50bda38688c47915e015a56e5830c0369836e169b34831906693963a61ee8f69f61de53d62e48c390208adf248aeddef2b1b72ecaead3b69d331e51396976e462011c4e7984f59edef7a719478cc8f458ce789e527a5abe4ff392dc6208ef49c063491f4e81963473380789ba9cb464b33a7fa17ecaa02d6f062f2cc3c339013234adc1087dd3897e80eb76b5c171e191909d60279f7e436782b12e59ab1712b4714f3154d3e85e47139d08d2595536a4509c644022ac290bb08a61ce175505542fcbdfc56c1e8846d6b48d5086cfb5e3ac0073a458270d73cc3352d8177ce91b21e814d919bf83876134a2862e2a0ffc0c3976571553cfadd9ea6cd58c1e2e968250a97afe6fe680f566e61e2bc2ee58a9ffc0acd24ebd562a17a4e9dcbdf6cef85bc5f11bae2e2522703dd0da9ae9b38f1379a7ddf38edeeb4c82f9e179211ab8c001816b5d4b4e16d5d22d03661293791565502ca438202dc7f00c599ef",
+      "plugin": "base64"
+    },
+    {
+      "input": "6b526a47357348323057357a5a4b6a41635873312b4f6356784f706d4154614267517654356c49414d2f746a4e6630695773732f564c747867714772442b72714b4430524b6c59477a7a716c68305649534c336b53544468424e7845783133382b6c42766a7749376b6f4d386146616648413838584c4f704b65564e7a785278334c57353971496b7a727878717a52306f2b49593553727148326b62486f58712f324e4b6d437046764d454841536848656e4b2b536437754b645146373679534376773035354657764e515a514d4f5a4b2b5076736c7163696c4e4b543258453368416159736a374132457675576d4d416b614d76347932766674707430317073616235313350717a4f5134415037376a3277484b576c4e57726a52526c736b324552427731685a456979507a6d4b54454e4661714a307144495668666e43693075797645323159616b4962414b30764631644d5532794f4d4e53706a37496c575a6d6d4e67697976762b754155767570694b465a4f587a4e5a372f5663596c524f387255554759566578304f357939376a496c746434572f797968616263437874304b6c764e4f4553734c507861375576364965384b2b537377426f4f482f597741784d4f2b686a5330487a5a423939493838684639486671556764524251614963506c526652615a46747776784951516c6632684d644d6d6878314c4b6148496451494f386c4b514e50554a79615466516141345331535368443042353647455a506e74776277654178335a576d6d385a50415172576e473773714c39774f324a693542444b4d6d3954466277762f35784e395651362b4d6f556a307857724334313231462f6963723370582f767a7a4c637a5979385a6b475164436e4a2f73392b4a6a56714567344f4e2b586a55477a725a30654179702f732b61583453547147655970356d696b364c2f4557662f7a6270516d644d6a4f666f4f5936536a645a75584969555a4575726641457738434355736a356b374d323942515a4851753363626c564d6b6d714a4b7943444b6667506776792f744e4753626e6c446e70356c4634746b41494d366733307a4148683161664546737763644254414a533254636578664275426179697a5847526943546552474246386865746d34735969706c59486d412b496a7162494274694249425066742f656a6b393862392f6c43396f34614978486b563442576c626c6777774461594e754670733067786b4761546c6a7068376f39703968336c50574c6b6a446b43434b3379534b3764377973626375797572547470307a486c45356158626b59674563546e6d45395a37653936635a52347a4939466a4f654a3553656c712b542f4f533347494937306e4159306b66546f47574e484d3442346d366e4c526b737a702f6f58374b6f4331764269387377384d35415449307263454966644f4a666f447264725842636547526b4a31674a35392b513265437353355a71786353744846504d5654543646354845353049306c6c564e7152516e475241497177704337434b59633458565156554c38766678577765694562577449315168732b3134367741633652594a77317a7a444e5332426438365273683642545a47622b44683245306f6f59754b672f3844446c32567856547a36335a366d7a566a4234756c6f4a517158722b622b61413957626d48697643376c69702f384373306b363956696f58704f6e637666624f2b467646385275754c6955696344335132707270733438546561666438343765363079432b65463549527134774147426131314c54686256306930445a684b546552566c5543796b4f434174782f414d575a3777",
+      "opts": {},
+      "output": "9118c6e6c1f6d16e7364a8c0717b35f8e715c4ea66013681810bd3e6520033fb6335fd225acb3f54bb7182a1ab0feaea283d112a5606cf3aa587454848bde44930e104dc44c75dfcfa506f8f023b92833c68569f1c0f3c5cb3a929e54dcf1471dcb5b9f6a224cebc71ab3474a3e218e52aea1f691b1e85eaff634a982a45bcc1070128477a72be49deee29d405efac920afc34e79156bcd41940c3992be3efb25a9c8a534a4f65c4de101a62c8fb03612fb9698c02468cbf8cb6bdfb69b74d69b1a6f9d773eacce43800fefb8f6c0729694d5ab8d1465b24d84441c35859122c8fce629310d15aa89d2a0c85617e70a2d2ecaf136d586a421b00ad2f17574c536c8e30d4a98fb2255999a63608b2beffae014beea6228564e5f3359eff55c62544ef2b51419855ec743b9cbdee3225b5de16ff2ca169b702c6dd0a96f34e112b0b3f16bb52fe887bc2be4acc01a0e1ff63003130efa18d2d07cd907df48f3c845f477ea52075105068870f9517d169916dc2fc4841095fda131d326871d4b29a1c875020ef2529034f509c9a4df41a0384b5492843d01e7a18464f9edc1bc1e031dd95a69bc64f010ad69c6eeca8bf703b6262e410ca326f5315bc2fff9c4df5543af8ca148f4c56ac2e35db517f89caf7a57fefcf32dccd8cbc6641907429c9fecf7e26356a120e0e37e5e3506ceb674780ca9fecf9a5f8493a86798a799a293a2ff1167ffcdba5099d32339fa0e63a4a3759b9722251912eadf004c3c08252c8f993b336f414191d0bb771b9553249aa24ac820ca7e03e0bf2fed34649b9e50e7a79945e2d90020cea0df4cc01e1d5a7c416cc1c7414c0252d9371ec5f06e05aca2cd71918824de446045f217ad9b8b188a99581e603e223a9b201b6204804f7edfde8e4f7c6fdfe50bda38688c47915e015a56e5830c0369836e169b34831906693963a61ee8f69f61de53d62e48c390208adf248aeddef2b1b72ecaead3b69d331e51396976e462011c4e7984f59edef7a719478cc8f458ce789e527a5abe4ff392dc6208ef49c063491f4e81963473380789ba9cb464b33a7fa17ecaa02d6f062f2cc3c339013234adc1087dd3897e80eb76b5c171e191909d60279f7e436782b12e59ab1712b4714f3154d3e85e47139d08d2595536a4509c644022ac290bb08a61ce175505542fcbdfc56c1e8846d6b48d5086cfb5e3ac0073a458270d73cc3352d8177ce91b21e814d919bf83876134a2862e2a0ffc0c3976571553cfadd9ea6cd58c1e2e968250a97afe6fe680f566e61e2bc2ee58a9ffc0acd24ebd562a17a4e9dcbdf6cef85bc5f11bae2e2522703dd0da9ae9b38f1379a7ddf38edeeb4c82f9e179211ab8c001816b5d4b4e16d5d22d03661293791565502ca438202dc7f00c599ef",
+      "plugin": "base64"
+    },
+    {
+      "input": "6b526a47357348323057357a5a4b6a41635873312b4f6356784f706d4154614267517654356c49414d2f746a4e6630695773732f564c747867714772442b72714b4430524b6c59477a7a716c68305649534c336b53544468424e7845783133382b6c42766a7749376b6f4d386146616648413838584c4f704b65564e7a785278334c57353971496b7a727878717a52306f2b49593553727148326b62486f58712f324e4b6d437046764d454841536848656e4b2b536437754b645146373679534376773035354657764e515a514d4f5a4b2b5076736c7163696c4e4b543258453368416159736a374132457675576d4d416b614d76347932766674707430317073616235313350717a4f5134415037376a3277484b576c4e57726a52526c736b324552427731685a456979507a6d4b54454e4661714a307144495668666e43693075797645323159616b4962414b30764631644d5532794f4d4e53706a37496c575a6d6d4e67697976762b754155767570694b465a4f587a4e5a372f5663596c524f387255554759566578304f357939376a496c746434572f797968616263437874304b6c764e4f4553734c507861375576364965384b2b537377426f4f482f597741784d4f2b686a5330487a5a423939493838684639486671556764524251614963506c526652615a46747776784951516c6632684d644d6d6878314c4b6148496451494f386c4b514e50554a79615466516141345331535368443042353647455a506e74776277654178335a576d6d385a50415172576e473773714c39774f324a693542444b4d6d3954466277762f35784e395651362b4d6f556a307857724334313231462f6963723370582f767a7a4c637a5979385a6b475164436e4a2f73392b4a6a56714567344f4e2b586a55477a725a30654179702f732b61583453547147655970356d696b364c2f4557662f7a6270516d644d6a4f666f4f5936536a645a75584969555a4575726641457738434355736a356b374d323942515a4851753363626c564d6b6d714a4b7943444b6667506776792f744e4753626e6c446e70356c4634746b41494d366733307a4148683161664546737763644254414a533254636578664275426179697a5847526943546552474246386865746d34735969706c59486d412b496a7162494274694249425066742f656a6b393862392f6c43396f34614978486b563442576c626c6777774461594e754670733067786b4761546c6a7068376f39703968336c50574c6b6a446b43434b3379534b3764377973626375797572547470307a486c45356158626b59674563546e6d45395a37653936635a52347a4939466a4f654a3553656c712b542f4f533347494937306e4159306b66546f47574e484d3442346d366e4c526b737a702f6f58374b6f4331764269387377384d35415449307263454966644f4a666f447264725842636547526b4a31674a35392b513265437353355a71786353744846504d5654543646354845353049306c6c564e7152516e475241497177704337434b59633458565156554c38766678577765694562577449315168732b3134367741633652594a77317a7a444e5332426438365273683642545a47622b44683245306f6f59754b672f3844446c32567856547a36335a366d7a566a4234756c6f4a517158722b622b61413957626d48697643376c69702f384373306b363956696f58704f6e637666624f2b467646385275754c6955696344335132707270733438546561666438343765363079432b65463549527134774147426131314c54686256306930445a684b546552566c5543796b4f434174782f414d575a3777",
+      "opts": {
+        "strict": 1
+      },
+      "output": "9118c6e6c1f6d16e7364a8c0717b35f8e715c4ea66013681810bd3e6520033fb6335fd225acb3f54bb7182a1ab0feaea283d112a5606cf3aa587454848bde44930e104dc44c75dfcfa506f8f023b92833c68569f1c0f3c5cb3a929e54dcf1471dcb5b9f6a224cebc71ab3474a3e218e52aea1f691b1e85eaff634a982a45bcc1070128477a72be49deee29d405efac920afc34e79156bcd41940c3992be3efb25a9c8a534a4f65c4de101a62c8fb03612fb9698c02468cbf8cb6bdfb69b74d69b1a6f9d773eacce43800fefb8f6c0729694d5ab8d1465b24d84441c35859122c8fce629310d15aa89d2a0c85617e70a2d2ecaf136d586a421b00ad2f17574c536c8e30d4a98fb2255999a63608b2beffae014beea6228564e5f3359eff55c62544ef2b51419855ec743b9cbdee3225b5de16ff2ca169b702c6dd0a96f34e112b0b3f16bb52fe887bc2be4acc01a0e1ff63003130efa18d2d07cd907df48f3c845f477ea52075105068870f9517d169916dc2fc4841095fda131d326871d4b29a1c875020ef2529034f509c9a4df41a0384b5492843d01e7a18464f9edc1bc1e031dd95a69bc64f010ad69c6eeca8bf703b6262e410ca326f5315bc2fff9c4df5543af8ca148f4c56ac2e35db517f89caf7a57fefcf32dccd8cbc6641907429c9fecf7e26356a120e0e37e5e3506ceb674780ca9fecf9a5f8493a86798a799a293a2ff1167ffcdba5099d32339fa0e63a4a3759b9722251912eadf004c3c08252c8f993b336f414191d0bb771b9553249aa24ac820ca7e03e0bf2fed34649b9e50e7a79945e2d90020cea0df4cc01e1d5a7c416cc1c7414c0252d9371ec5f06e05aca2cd71918824de446045f217ad9b8b188a99581e603e223a9b201b6204804f7edfde8e4f7c6fdfe50bda38688c47915e015a56e5830c0369836e169b34831906693963a61ee8f69f61de53d62e48c390208adf248aeddef2b1b72ecaead3b69d331e51396976e462011c4e7984f59edef7a719478cc8f458ce789e527a5abe4ff392dc6208ef49c063491f4e81963473380789ba9cb464b33a7fa17ecaa02d6f062f2cc3c339013234adc1087dd3897e80eb76b5c171e191909d60279f7e436782b12e59ab1712b4714f3154d3e85e47139d08d2595536a4509c644022ac290bb08a61ce175505542fcbdfc56c1e8846d6b48d5086cfb5e3ac0073a458270d73cc3352d8177ce91b21e814d919bf83876134a2862e2a0ffc0c3976571553cfadd9ea6cd58c1e2e968250a97afe6fe680f566e61e2bc2ee58a9ffc0acd24ebd562a17a4e9dcbdf6cef85bc5f11bae2e2522703dd0da9ae9b38f1379a7ddf38edeeb4c82f9e179211ab8c001816b5d4b4e16d5d22d03661293791565502ca438202dc7f00c599ef",
+      "plugin": "base64"
+    },
+    {
+      "input": "6b526a47357348323057357a5a4b6a41635873312d4f6356784f706d4154614267517654356c49414d5f746a4e6630695773735f564c747867714772442d72714b4430524b6c59477a7a716c68305649534c336b53544468424e7845783133382d6c42766a7749376b6f4d386146616648413838584c4f704b65564e7a785278334c57353971496b7a727878717a52306f2d49593553727148326b62486f58715f324e4b6d437046764d454841536848656e4b2d536437754b645146373679534376773035354657764e515a514d4f5a4b2d5076736c7163696c4e4b543258453368416159736a374132457675576d4d416b614d76347932766674707430317073616235313350717a4f5134415037376a3277484b576c4e57726a52526c736b324552427731685a456979507a6d4b54454e4661714a307144495668666e43693075797645323159616b4962414b30764631644d5532794f4d4e53706a37496c575a6d6d4e67697976762d754155767570694b465a4f587a4e5a375f5663596c524f387255554759566578304f357939376a496c746434575f797968616263437874304b6c764e4f4553734c507861375576364965384b2d537377426f4f485f597741784d4f2d686a5330487a5a423939493838684639486671556764524251614963506c526652615a46747776784951516c6632684d644d6d6878314c4b6148496451494f386c4b514e50554a79615466516141345331535368443042353647455a506e74776277654178335a576d6d385a50415172576e473773714c39774f324a693542444b4d6d3954466277765f35784e395651362d4d6f556a307857724334313231465f6963723370585f767a7a4c637a5979385a6b475164436e4a5f73392d4a6a56714567344f4e2d586a55477a725a30654179705f732d61583453547147655970356d696b364c5f4557665f7a6270516d644d6a4f666f4f5936536a645a75584969555a4575726641457738434355736a356b374d323942515a4851753363626c564d6b6d714a4b7943444b6667506776795f744e4753626e6c446e70356c4634746b41494d366733307a4148683161664546737763644254414a533254636578664275426179697a5847526943546552474246386865746d34735969706c59486d412d496a7162494274694249425066745f656a6b393862395f6c43396f34614978486b563442576c626c6777774461594e754670733067786b4761546c6a7068376f39703968336c50574c6b6a446b43434b3379534b3764377973626375797572547470307a486c45356158626b59674563546e6d45395a37653936635a52347a4939466a4f654a3553656c712d545f4f533347494937306e4159306b66546f47574e484d3442346d366e4c526b737a705f6f58374b6f4331764269387377384d35415449307263454966644f4a666f447264725842636547526b4a31674a35392d513265437353355a71786353744846504d5654543646354845353049306c6c564e7152516e475241497177704337434b59633458565156554c38766678577765694562577449315168732d3134367741633652594a77317a7a444e5332426438365273683642545a47622d44683245306f6f59754b675f3844446c32567856547a36335a366d7a566a4234756c6f4a517158722d622d61413957626d48697643376c69705f384373306b363956696f58704f6e637666624f2d467646385275754c6955696344335132707270733438546561666438343765363079432d65463549527134774147426131314c54686256306930445a684b546552566c5543796b4f434174785f414d575a3777",
+      "opts": {},
+      "output": "9118c6e6c1f6d16e7364a8c0717b35f8e715c4ea66013681810bd3e6520033fb6335fd225acb3f54bb7182a1ab0feaea283d112a5606cf3aa587454848bde44930e104dc44c75dfcfa506f8f023b92833c68569f1c0f3c5cb3a929e54dcf1471dcb5b9f6a224cebc71ab3474a3e218e52aea1f691b1e85eaff634a982a45bcc1070128477a72be49deee29d405efac920afc34e79156bcd41940c3992be3efb25a9c8a534a4f65c4de101a62c8fb03612fb9698c02468cbf8cb6bdfb69b74d69b1a6f9d773eacce43800fefb8f6c0729694d5ab8d1465b24d84441c35859122c8fce629310d15aa89d2a0c85617e70a2d2ecaf136d586a421b00ad2f17574c536c8e30d4a98fb2255999a63608b2beffae014beea6228564e5f3359eff55c62544ef2b51419855ec743b9cbdee3225b5de16ff2ca169b702c6dd0a96f34e112b0b3f16bb52fe887bc2be4acc01a0e1ff63003130efa18d2d07cd907df48f3c845f477ea52075105068870f9517d169916dc2fc4841095fda131d326871d4b29a1c875020ef2529034f509c9a4df41a0384b5492843d01e7a18464f9edc1bc1e031dd95a69bc64f010ad69c6eeca8bf703b6262e410ca326f5315bc2fff9c4df5543af8ca148f4c56ac2e35db517f89caf7a57fefcf32dccd8cbc6641907429c9fecf7e26356a120e0e37e5e3506ceb674780ca9fecf9a5f8493a86798a799a293a2ff1167ffcdba5099d32339fa0e63a4a3759b9722251912eadf004c3c08252c8f993b336f414191d0bb771b9553249aa24ac820ca7e03e0bf2fed34649b9e50e7a79945e2d90020cea0df4cc01e1d5a7c416cc1c7414c0252d9371ec5f06e05aca2cd71918824de446045f217ad9b8b188a99581e603e223a9b201b6204804f7edfde8e4f7c6fdfe50bda38688c47915e015a56e5830c0369836e169b34831906693963a61ee8f69f61de53d62e48c390208adf248aeddef2b1b72ecaead3b69d331e51396976e462011c4e7984f59edef7a719478cc8f458ce789e527a5abe4ff392dc6208ef49c063491f4e81963473380789ba9cb464b33a7fa17ecaa02d6f062f2cc3c339013234adc1087dd3897e80eb76b5c171e191909d60279f7e436782b12e59ab1712b4714f3154d3e85e47139d08d2595536a4509c644022ac290bb08a61ce175505542fcbdfc56c1e8846d6b48d5086cfb5e3ac0073a458270d73cc3352d8177ce91b21e814d919bf83876134a2862e2a0ffc0c3976571553cfadd9ea6cd58c1e2e968250a97afe6fe680f566e61e2bc2ee58a9ffc0acd24ebd562a17a4e9dcbdf6cef85bc5f11bae2e2522703dd0da9ae9b38f1379a7ddf38edeeb4c82f9e179211ab8c001816b5d4b4e16d5d22d03661293791565502ca438202dc7f00c599ef",
+      "plugin": "base64url"
+    },
+    {
+      "input": "6b526a47357348323057357a5a4b6a41635873312d4f6356784f706d4154614267517654356c49414d5f746a4e6630695773735f564c747867714772442d72714b4430524b6c59477a7a716c68305649534c336b53544468424e7845783133382d6c42766a7749376b6f4d386146616648413838584c4f704b65564e7a785278334c57353971496b7a727878717a52306f2d49593553727148326b62486f58715f324e4b6d437046764d454841536848656e4b2d536437754b645146373679534376773035354657764e515a514d4f5a4b2d5076736c7163696c4e4b543258453368416159736a374132457675576d4d416b614d76347932766674707430317073616235313350717a4f5134415037376a3277484b576c4e57726a52526c736b324552427731685a456979507a6d4b54454e4661714a307144495668666e43693075797645323159616b4962414b30764631644d5532794f4d4e53706a37496c575a6d6d4e67697976762d754155767570694b465a4f587a4e5a375f5663596c524f387255554759566578304f357939376a496c746434575f797968616263437874304b6c764e4f4553734c507861375576364965384b2d537377426f4f485f597741784d4f2d686a5330487a5a423939493838684639486671556764524251614963506c526652615a46747776784951516c6632684d644d6d6878314c4b6148496451494f386c4b514e50554a79615466516141345331535368443042353647455a506e74776277654178335a576d6d385a50415172576e473773714c39774f324a693542444b4d6d3954466277765f35784e395651362d4d6f556a307857724334313231465f6963723370585f767a7a4c637a5979385a6b475164436e4a5f73392d4a6a56714567344f4e2d586a55477a725a30654179705f732d61583453547147655970356d696b364c5f4557665f7a6270516d644d6a4f666f4f5936536a645a75584969555a4575726641457738434355736a356b374d323942515a4851753363626c564d6b6d714a4b7943444b6667506776795f744e4753626e6c446e70356c4634746b41494d366733307a4148683161664546737763644254414a533254636578664275426179697a5847526943546552474246386865746d34735969706c59486d412d496a7162494274694249425066745f656a6b393862395f6c43396f34614978486b563442576c626c6777774461594e754670733067786b4761546c6a7068376f39703968336c50574c6b6a446b43434b3379534b3764377973626375797572547470307a486c45356158626b59674563546e6d45395a37653936635a52347a4939466a4f654a3553656c712d545f4f533347494937306e4159306b66546f47574e484d3442346d366e4c526b737a705f6f58374b6f4331764269387377384d35415449307263454966644f4a666f447264725842636547526b4a31674a35392d513265437353355a71786353744846504d5654543646354845353049306c6c564e7152516e475241497177704337434b59633458565156554c38766678577765694562577449315168732d3134367741633652594a77317a7a444e5332426438365273683642545a47622d44683245306f6f59754b675f3844446c32567856547a36335a366d7a566a4234756c6f4a517158722d622d61413957626d48697643376c69705f384373306b363956696f58704f6e637666624f2d467646385275754c6955696344335132707270733438546561666438343765363079432d65463549527134774147426131314c54686256306930445a684b546552566c5543796b4f434174785f414d575a3777",
+      "opts": {
+        "strict": 1
+      },
+      "output": "9118c6e6c1f6d16e7364a8c0717b35f8e715c4ea66013681810bd3e6520033fb6335fd225acb3f54bb7182a1ab0feaea283d112a5606cf3aa587454848bde44930e104dc44c75dfcfa506f8f023b92833c68569f1c0f3c5cb3a929e54dcf1471dcb5b9f6a224cebc71ab3474a3e218e52aea1f691b1e85eaff634a982a45bcc1070128477a72be49deee29d405efac920afc34e79156bcd41940c3992be3efb25a9c8a534a4f65c4de101a62c8fb03612fb9698c02468cbf8cb6bdfb69b74d69b1a6f9d773eacce43800fefb8f6c0729694d5ab8d1465b24d84441c35859122c8fce629310d15aa89d2a0c85617e70a2d2ecaf136d586a421b00ad2f17574c536c8e30d4a98fb2255999a63608b2beffae014beea6228564e5f3359eff55c62544ef2b51419855ec743b9cbdee3225b5de16ff2ca169b702c6dd0a96f34e112b0b3f16bb52fe887bc2be4acc01a0e1ff63003130efa18d2d07cd907df48f3c845f477ea52075105068870f9517d169916dc2fc4841095fda131d326871d4b29a1c875020ef2529034f509c9a4df41a0384b5492843d01e7a18464f9edc1bc1e031dd95a69bc64f010ad69c6eeca8bf703b6262e410ca326f5315bc2fff9c4df5543af8ca148f4c56ac2e35db517f89caf7a57fefcf32dccd8cbc6641907429c9fecf7e26356a120e0e37e5e3506ceb674780ca9fecf9a5f8493a86798a799a293a2ff1167ffcdba5099d32339fa0e63a4a3759b9722251912eadf004c3c08252c8f993b336f414191d0bb771b9553249aa24ac820ca7e03e0bf2fed34649b9e50e7a79945e2d90020cea0df4cc01e1d5a7c416cc1c7414c0252d9371ec5f06e05aca2cd71918824de446045f217ad9b8b188a99581e603e223a9b201b6204804f7edfde8e4f7c6fdfe50bda38688c47915e015a56e5830c0369836e169b34831906693963a61ee8f69f61de53d62e48c390208adf248aeddef2b1b72ecaead3b69d331e51396976e462011c4e7984f59edef7a719478cc8f458ce789e527a5abe4ff392dc6208ef49c063491f4e81963473380789ba9cb464b33a7fa17ecaa02d6f062f2cc3c339013234adc1087dd3897e80eb76b5c171e191909d60279f7e436782b12e59ab1712b4714f3154d3e85e47139d08d2595536a4509c644022ac290bb08a61ce175505542fcbdfc56c1e8846d6b48d5086cfb5e3ac0073a458270d73cc3352d8177ce91b21e814d919bf83876134a2862e2a0ffc0c3976571553cfadd9ea6cd58c1e2e968250a97afe6fe680f566e61e2bc2ee58a9ffc0acd24ebd562a17a4e9dcbdf6cef85bc5f11bae2e2522703dd0da9ae9b38f1379a7ddf38edeeb4c82f9e179211ab8c001816b5d4b4e16d5d22d03661293791565502ca438202dc7f00c599ef",
+      "plugin": "base64url"
+    },
+    {
+      "input": "6b526a47357348323057357a5a4b6a41635873312b4f6356784f706d4154614267517654356c49414d2f746a4e6630695773732f564c747867714772442b72714b4430524b6c59477a7a716c68305649534c336b53544468424e7845783133382b6c42766a7749376b6f4d386146616648413838584c4f704b65564e7a785278334c57353971496b7a727878717a52306f2b49593553727148326b62486f58712f324e4b6d437046764d454841536848656e4b2b536437754b645146373679534376773035354657764e515a514d4f5a4b2b5076736c7163696c4e4b543258453368416159736a374132457675576d4d416b614d76347932766674707430317073616235313350717a4f5134415037376a3277484b576c4e57726a52526c736b324552427731685a456979507a6d4b54454e4661714a307144495668666e43693075797645323159616b4962414b30764631644d5532794f4d4e53706a37496c575a6d6d4e67697976762b754155767570694b465a4f587a4e5a372f5663596c524f387255554759566578304f357939376a496c746434572f797968616263437874304b6c764e4f4553734c507861375576364965384b2b537377426f4f482f597741784d4f2b686a5330487a5a423939493838684639486671556764524251614963506c526652615a46747776784951516c6632684d644d6d6878314c4b6148496451494f386c4b514e50554a79615466516141345331535368443042353647455a506e74776277654178335a576d6d385a50415172576e473773714c39774f324a693542444b4d6d3954466277762f35784e395651362b4d6f556a307857724334313231462f6963723370582f767a7a4c637a5979385a6b475164436e4a2f73392b4a6a56714567344f4e2b586a55477a725a30654179702f732b61583453547147655970356d696b364c2f4557662f7a6270516d644d6a4f666f4f5936536a645a75584969555a4575726641457738434355736a356b374d323942515a4851753363626c564d6b6d714a4b7943444b6667506776792f744e4753626e6c446e70356c4634746b41494d366733307a4148683161664546737763644254414a533254636578664275426179697a5847526943546552474246386865746d34735969706c59486d412b496a7162494274694249425066742f656a6b393862392f6c43396f34614978486b563442576c626c6777774461594e754670733067786b4761546c6a7068376f39703968336c50574c6b6a446b43434b3379534b3764377973626375797572547470307a486c45356158626b59674563546e6d45395a37653936635a52347a4939466a4f654a3553656c712b542f4f533347494937306e4159306b66546f47574e484d3442346d366e4c526b737a702f6f58374b6f4331764269387377384d35415449307263454966644f4a666f447264725842636547526b4a31674a35392b51322065437353355a71786353744846504d5654543646354845353049306c6c564e7152516e475241497177704337434b59633458565156554c38766678577765694562577449315168732b3134367741633652594a77317a7a444e5332426438365273683642545a47622b44683245306f6f59754b672f3844446c32567856547a36335a366d7a566a4234756c6f4a517158722b622b61413957626d48697643376c69702f384373306b363956696f58704f6e637666624f2b467646385275754c6955696344335132707270733438546561666438343765363079432b65463549527134774147426131314c54686256306930445a684b546552566c5543796b4f434174782f414d575a37773d3d",
+      "opts": {},
+      "output": "9118c6e6c1f6d16e7364a8c0717b35f8e715c4ea66013681810bd3e6520033fb6335fd225acb3f54bb7182a1ab0feaea283d112a5606cf3aa587454848bde44930e104dc44c75dfcfa506f8f023b92833c68569f1c0f3c5cb3a929e54dcf1471dcb5b9f6a224cebc71ab3474a3e218e52aea1f691b1e85eaff634a982a45bcc1070128477a72be49deee29d405efac920afc34e79156bcd41940c3992be3efb25a9c8a534a4f65c4de101a62c8fb03612fb9698c02468cbf8cb6bdfb69b74d69b1a6f9d773eacce43800fefb8f6c0729694d5ab8d1465b24d84441c35859122c8fce629310d15aa89d2a0c85617e70a2d2ecaf136d586a421b00ad2f17574c536c8e30d4a98fb2255999a63608b2beffae014beea6228564e5f3359eff55c62544ef2b51419855ec743b9cbdee3225b5de16ff2ca169b702c6dd0a96f34e112b0b3f16bb52fe887bc2be4acc01a0e1ff63003130efa18d2d07cd907df48f3c845f477ea52075105068870f9517d169916dc2fc4841095fda131d326871d4b29a1c875020ef2529034f509c9a4df41a0384b5492843d01e7a18464f9edc1bc1e031dd95a69bc64f010ad69c6eeca8bf703b6262e410ca326f5315bc2fff9c4df5543af8ca148f4c56ac2e35db517f89caf7a57fefcf32dccd8cbc6641907429c9fecf7e26356a120e0e37e5e3506ceb674780ca9fecf9a5f8493a86798a799a293a2ff1167ffcdba5099d32339fa0e63a4a3759b9722251912eadf004c3c08252c8f993b336f414191d0bb771b9553249aa24ac820ca7e03e0bf2fed34649b9e50e7a79945e2d90020cea0df4cc01e1d5a7c416cc1c7414c0252d9371ec5f06e05aca2cd71918824de446045f217ad9b8b188a99581e603e223a9b201b6204804f7edfde8e4f7c6fdfe50bda38688c47915e015a56e5830c0369836e169b34831906693963a61ee8f69f61de53d62e48c390208adf248aeddef2b1b72ecaead3b69d331e51396976e462011c4e7984f59edef7a719478cc8f458ce789e527a5abe4ff392dc6208ef49c063491f4e81963473380789ba9cb464b33a7fa17ecaa02d6f062f2cc3c339013234adc1087dd3897e80eb76b5c171e191909d60279f7e436782b12e59ab1712b4714f3154d3e85e47139d08d2595536a4509c644022ac290bb08a61ce175505542fcbdfc56c1e8846d6b48d5086cfb5e3ac0073a458270d73cc3352d8177ce91b21e814d919bf83876134a2862e2a0ffc0c3976571553cfadd9ea6cd58c1e2e968250a97afe6fe680f566e61e2bc2ee58a9ffc0acd24ebd562a17a4e9dcbdf6cef85bc5f11bae2e2522703dd0da9ae9b38f1379a7ddf38edeeb4c82f9e179211ab8c001816b5d4b4e16d5d22d03661293791565502ca438202dc7f00c599ef",
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: non-alphabet byte in strict mode at byte offset 1068",
+      "input": "6b526a47357348323057357a5a4b6a41635873312b4f6356784f706d4154614267517654356c49414d2f746a4e6630695773732f564c747867714772442b72714b4430524b6c59477a7a716c68305649534c336b53544468424e7845783133382b6c42766a7749376b6f4d386146616648413838584c4f704b65564e7a785278334c57353971496b7a727878717a52306f2b49593553727148326b62486f58712f324e4b6d437046764d454841536848656e4b2b536437754b645146373679534376773035354657764e515a514d4f5a4b2b5076736c7163696c4e4b543258453368416159736a374132457675576d4d416b614d76347932766674707430317073616235313350717a4f5134415037376a3277484b576c4e57726a52526c736b324552427731685a456979507a6d4b54454e4661714a307144495668666e43693075797645323159616b4962414b30764631644d5532794f4d4e53706a37496c575a6d6d4e67697976762b754155767570694b465a4f587a4e5a372f5663596c524f387255554759566578304f357939376a496c746434572f797968616263437874304b6c764e4f4553734c507861375576364965384b2b537377426f4f482f597741784d4f2b686a5330487a5a423939493838684639486671556764524251614963506c526652615a46747776784951516c6632684d644d6d6878314c4b6148496451494f386c4b514e50554a79615466516141345331535368443042353647455a506e74776277654178335a576d6d385a50415172576e473773714c39774f324a693542444b4d6d3954466277762f35784e395651362b4d6f556a307857724334313231462f6963723370582f767a7a4c637a5979385a6b475164436e4a2f73392b4a6a56714567344f4e2b586a55477a725a30654179702f732b61583453547147655970356d696b364c2f4557662f7a6270516d644d6a4f666f4f5936536a645a75584969555a4575726641457738434355736a356b374d323942515a4851753363626c564d6b6d714a4b7943444b6667506776792f744e4753626e6c446e70356c4634746b41494d366733307a4148683161664546737763644254414a533254636578664275426179697a5847526943546552474246386865746d34735969706c59486d412b496a7162494274694249425066742f656a6b393862392f6c43396f34614978486b563442576c626c6777774461594e754670733067786b4761546c6a7068376f39703968336c50574c6b6a446b43434b3379534b3764377973626375797572547470307a486c45356158626b59674563546e6d45395a37653936635a52347a4939466a4f654a3553656c712b542f4f533347494937306e4159306b66546f47574e484d3442346d366e4c526b737a702f6f58374b6f4331764269387377384d35415449307263454966644f4a666f447264725842636547526b4a31674a35392b51322065437353355a71786353744846504d5654543646354845353049306c6c564e7152516e475241497177704337434b59633458565156554c38766678577765694562577449315168732b3134367741633652594a77317a7a444e5332426438365273683642545a47622b44683245306f6f59754b672f3844446c32567856547a36335a366d7a566a4234756c6f4a517158722b622b61413957626d48697643376c69702f384373306b363956696f58704f6e637666624f2b467646385275754c6955696344335132707270733438546561666438343765363079432b65463549527134774147426131314c54686256306930445a684b546552566c5543796b4f434174782f414d575a37773d3d",
+      "opts": {
+        "strict": 1
+      },
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: non-alphabet byte in strict mode at byte offset 1336",
+      "input": "6b526a47357348323057357a5a4b6a41635873312b4f6356784f706d4154614267517654356c49414d2f746a4e6630695773732f564c747867714772442b72714b4430524b6c59477a7a716c68305649534c336b53544468424e7845783133382b6c42766a7749376b6f4d386146616648413838584c4f704b65564e7a785278334c57353971496b7a727878717a52306f2b49593553727148326b62486f58712f324e4b6d437046764d454841536848656e4b2b536437754b645146373679534376773035354657764e515a514d4f5a4b2b5076736c7163696c4e4b543258453368416159736a374132457675576d4d416b614d76347932766674707430317073616235313350717a4f5134415037376a3277484b576c4e57726a52526c736b324552427731685a456979507a6d4b54454e4661714a307144495668666e43693075797645323159616b4962414b30764631644d5532794f4d4e53706a37496c575a6d6d4e67697976762b754155767570694b465a4f587a4e5a372f5663596c524f387255554759566578304f357939376a496c746434572f797968616263437874304b6c764e4f4553734c507861375576364965384b2b537377426f4f482f597741784d4f2b686a5330487a5a423939493838684639486671556764524251614963506c526652615a46747776784951516c6632684d644d6d6878314c4b6148496451494f386c4b514e50554a79615466516141345331535368443042353647455a506e74776277654178335a576d6d385a50415172576e473773714c39774f324a693542444b4d6d3954466277762f35784e395651362b4d6f556a307857724334313231462f6963723370582f767a7a4c637a5979385a6b475164436e4a2f73392b4a6a56714567344f4e2b586a55477a725a30654179702f732b61583453547147655970356d696b364c2f4557662f7a6270516d644d6a4f666f4f5936536a645a75584969555a4575726641457738434355736a356b374d323942515a4851753363626c564d6b6d714a4b7943444b6667506776792f744e4753626e6c446e70356c4634746b41494d366733307a4148683161664546737763644254414a533254636578664275426179697a5847526943546552474246386865746d34735969706c59486d412b496a7162494274694249425066742f656a6b393862392f6c43396f34614978486b563442576c626c6777774461594e754670733067786b4761546c6a7068376f39703968336c50574c6b6a446b43434b3379534b3764377973626375797572547470307a486c45356158626b59674563546e6d45395a37653936635a52347a4939466a4f654a3553656c712b542f4f533347494937306e4159306b66546f47574e484d3442346d366e4c526b737a702f6f58374b6f4331764269387377384d35415449307263454966644f4a666f447264725842636547526b4a31674a35392b513265437353355a71786353744846504d5654543646354845353049306c6c564e7152516e475241497177704337434b59633458565156554c38766678577765694562577449315168732b3134367741633652594a77317a7a444e5332426438365273683642545a47622b44683245306f6f59754b672f3844446c32567856547a36335a366d7a566a4234756c6f4a517158722b622b61413957626d48697643376c69702f384373306b363956696f58704f6e637666624f2b467646385275754c6955696344335132707270733438546561666438343765363079432b65463549527134774147426131314c54686256306930445a684b546552566c5543796b4f434174782f414d575a37773d3d51513d3d",
+      "opts": {
+        "strict": 1
+      },
+      "plugin": "base64"
+    },
+    {
+      "input": "6b526a47357348323057357a5a4b6a41635873312b4f6356784f706d4154614267517654356c49414d2f746a4e6630695773732f564c747867714772442b72714b4430524b6c59477a7a716c68305649534c336b53544468424e7845783133382b6c42766a7749376b6f4d386146616648413838584c4f704b65564e7a785278334c57353971496b7a727878717a52306f2b49593553727148326b62486f58712f324e4b6d437046764d454841536848656e4b2b536437754b645146373679534376773035354657764e515a514d4f5a4b2b5076736c7163696c4e4b543258453368416159736a374132457675576d4d416b614d76347932766674707430317073616235313350717a4f5134415037376a3277484b576c4e57726a52526c736b324552427731685a456979507a6d4b54454e4661714a307144495668666e43693075797645323159616b4962414b30764631644d5532794f4d4e53706a37496c575a6d6d4e67697976762b754155767570694b465a4f587a4e5a372f5663596c524f387255554759566578304f357939376a496c746434572f797968616263437874304b6c764e4f4553734c507861375576364965384b2b537377426f4f482f597741784d4f2b686a5330487a5a423939493838684639486671556764524251614963506c526652615a46747776784951516c6632684d644d6d6878314c4b6148496451494f386c4b514e50554a79615466516141345331535368443042353647455a506e74776277654178335a576d6d385a50415172576e473773714c39774f324a693542444b4d6d3954466277762f35784e395651362b4d6f556a307857724334313231462f6963723370582f767a7a4c637a5979385a6b475164436e4a2f73392b4a6a56714567344f4e2b586a55477a725a30654179702f732b61583453547147655970356d696b364c2f4557662f7a6270516d644d6a4f666f4f5936536a645a75584969555a4575726641457738434355736a356b374d323942515a4851753363626c564d6b6d714a4b7943444b6667506776792f744e4753626e6c446e70356c4634746b41494d366733307a4148683161664546737763644254414a533254636578664275426179697a5847526943546552474246386865746d34735969706c59486d412b496a7162494274694249425066742f656a6b393862392f6c43396f34614978486b563442576c626c6777774461594e754670733067786b4761546c6a7068376f39703968336c50574c6b6a446b43434b3379534b3764377973626375797572547470307a486c45356158626b59674563546e6d45395a37653936635a52347a4939466a4f654a3553656c712b542f4f533347494937306e4159306b66546f47574e484d3442346d366e4c526b737a702f6f58374b6f4331764269387377384d35415449307263454966644f4a666f447264725842636547526b4a31674a35392b513265437353355a71786353744846504d5654543646354845353049306c6c564e7152516e475241497177704337434b59633458565156554c38766678577765694562577449315168732b3134367741633652594a77317a7a444e5332426438365273683642545a47622b44683245306f6f59754b672f3844446c32567856547a36335a366d7a566a4234756c6f4a517158722b622b61413957626d48697643376c69702f384373306b363956696f58704f6e637666624f2b467646385275754c6955696344335132707270733438546561666438343765363079432b65463549527134774147426131314c54686256306930445a684b546552566c5543796b4f434174782f414d575a37773d3d51513d3d",
+      "opts": {},
+      "output": "9118c6e6c1f6d16e7364a8c0717b35f8e715c4ea66013681810bd3e6520033fb6335fd225acb3f54bb7182a1ab0feaea283d112a5606cf3aa587454848bde44930e104dc44c75dfcfa506f8f023b92833c68569f1c0f3c5cb3a929e54dcf1471dcb5b9f6a224cebc71ab3474a3e218e52aea1f691b1e85eaff634a982a45bcc1070128477a72be49deee29d405efac920afc34e79156bcd41940c3992be3efb25a9c8a534a4f65c4de101a62c8fb03612fb9698c02468cbf8cb6bdfb69b74d69b1a6f9d773eacce43800fefb8f6c0729694d5ab8d1465b24d84441c35859122c8fce629310d15aa89d2a0c85617e70a2d2ecaf136d586a421b00ad2f17574c536c8e30d4a98fb2255999a63608b2beffae014beea6228564e5f3359eff55c62544ef2b51419855ec743b9cbdee3225b5de16ff2ca169b702c6dd0a96f34e112b0b3f16bb52fe887bc2be4acc01a0e1ff63003130efa18d2d07cd907df48f3c845f477ea52075105068870f9517d169916dc2fc4841095fda131d326871d4b29a1c875020ef2529034f509c9a4df41a0384b5492843d01e7a18464f9edc1bc1e031dd95a69bc64f010ad69c6eeca8bf703b6262e410ca326f5315bc2fff9c4df5543af8ca148f4c56ac2e35db517f89caf7a57fefcf32dccd8cbc6641907429c9fecf7e26356a120e0e37e5e3506ceb674780ca9fecf9a5f8493a86798a799a293a2ff1167ffcdba5099d32339fa0e63a4a3759b9722251912eadf004c3c08252c8f993b336f414191d0bb771b9553249aa24ac820ca7e03e0bf2fed34649b9e50e7a79945e2d90020cea0df4cc01e1d5a7c416cc1c7414c0252d9371ec5f06e05aca2cd71918824de446045f217ad9b8b188a99581e603e223a9b201b6204804f7edfde8e4f7c6fdfe50bda38688c47915e015a56e5830c0369836e169b34831906693963a61ee8f69f61de53d62e48c390208adf248aeddef2b1b72ecaead3b69d331e51396976e462011c4e7984f59edef7a719478cc8f458ce789e527a5abe4ff392dc6208ef49c063491f4e81963473380789ba9cb464b33a7fa17ecaa02d6f062f2cc3c339013234adc1087dd3897e80eb76b5c171e191909d60279f7e436782b12e59ab1712b4714f3154d3e85e47139d08d2595536a4509c644022ac290bb08a61ce175505542fcbdfc56c1e8846d6b48d5086cfb5e3ac0073a458270d73cc3352d8177ce91b21e814d919bf83876134a2862e2a0ffc0c3976571553cfadd9ea6cd58c1e2e968250a97afe6fe680f566e61e2bc2ee58a9ffc0acd24ebd562a17a4e9dcbdf6cef85bc5f11bae2e2522703dd0da9ae9b38f1379a7ddf38edeeb4c82f9e179211ab8c001816b5d4b4e16d5d22d03661293791565502ca438202dc7f00c599ef0410",
+      "plugin": "base64"
+    },
+    {
+      "input": "51554a443d51554a44",
+      "opts": {},
+      "output": "414243414243",
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: non-alphabet byte in strict mode at byte offset 5",
+      "input": "51554a443d51554a44",
+      "opts": {
+        "strict": 1
+      },
+      "plugin": "base64"
+    },
+    {
+      "input": "51554a443d3d51554a44",
+      "opts": {},
+      "output": "414243414243",
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: non-alphabet byte in strict mode at byte offset 6",
+      "input": "51554a443d3d51554a44",
+      "opts": {
+        "strict": 1
+      },
+      "plugin": "base64"
+    },
+    {
+      "input": "51554a443d3d3d51554a44",
+      "opts": {},
+      "output": "414243414243",
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: non-alphabet byte in strict mode at byte offset 7",
+      "input": "51554a443d3d3d51554a44",
+      "opts": {
+        "strict": 1
+      },
+      "plugin": "base64"
+    },
+    {
+      "input": "51554a443d51554a443d",
+      "opts": {},
+      "output": "414243414243",
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: non-alphabet byte in strict mode at byte offset 5",
+      "input": "51554a443d51554a443d",
+      "opts": {
+        "strict": 1
+      },
+      "plugin": "base64"
+    },
+    {
+      "input": "51554a4451554a443d51554a44",
+      "opts": {},
+      "output": "414243414243414243",
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: non-alphabet byte in strict mode at byte offset 9",
+      "input": "51554a4451554a443d51554a44",
+      "opts": {
+        "strict": 1
+      },
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: truncated base64 input at byte offset 0",
+      "input": "51554a443d51",
+      "opts": {},
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: non-alphabet byte in strict mode at byte offset 5",
+      "input": "51554a443d51",
+      "opts": {
+        "strict": 1
+      },
+      "plugin": "base64"
+    },
+    {
+      "input": "51554a443d51513d3d",
+      "opts": {},
+      "output": "41424341",
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: non-alphabet byte in strict mode at byte offset 5",
+      "input": "51554a443d51513d3d",
+      "opts": {
+        "strict": 1
+      },
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: truncated base64 input at byte offset 0",
+      "input": "51",
+      "opts": {},
+      "plugin": "base64"
+    },
+    {
+      "input": "5151",
+      "opts": {},
+      "output": "41",
+      "plugin": "base64"
+    },
+    {
+      "input": "515151",
+      "opts": {},
+      "output": "4104",
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: truncated base64 input at byte offset 0",
+      "input": "5151515151",
+      "opts": {},
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: truncated base64 input at byte offset 0",
+      "input": "513d3d3d",
+      "opts": {},
+      "plugin": "base64"
+    },
+    {
+      "input": "51513d",
+      "opts": {},
+      "output": "41",
+      "plugin": "base64"
+    },
+    {
+      "input": "5151513d",
+      "opts": {},
+      "output": "4104",
+      "plugin": "base64"
+    },
+    {
+      "input": "3d515151",
+      "opts": {},
+      "output": "4104",
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: truncated base64 input at byte offset 0",
+      "input": "51",
+      "opts": {
+        "strict": 1
+      },
+      "plugin": "base64"
+    },
+    {
+      "input": "5151",
+      "opts": {
+        "strict": 1
+      },
+      "output": "41",
+      "plugin": "base64"
+    },
+    {
+      "input": "515151",
+      "opts": {
+        "strict": 1
+      },
+      "output": "4104",
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: truncated base64 input at byte offset 0",
+      "input": "5151515151",
+      "opts": {
+        "strict": 1
+      },
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: truncated base64 input at byte offset 0",
+      "input": "513d3d3d",
+      "opts": {
+        "strict": 1
+      },
+      "plugin": "base64"
+    },
+    {
+      "input": "51513d",
+      "opts": {
+        "strict": 1
+      },
+      "output": "41",
+      "plugin": "base64"
+    },
+    {
+      "input": "5151513d",
+      "opts": {
+        "strict": 1
+      },
+      "output": "4104",
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: non-alphabet byte in strict mode at byte offset 1",
+      "input": "3d515151",
+      "opts": {
+        "strict": 1
+      },
+      "plugin": "base64"
+    },
+    {
+      "input": "2d2d2d2d2d424547494e2043455254494649434154452d2d2d2d2d0a6e3564645a6943536a6f36764b35374c71465144576a4b3031355a77615846456279357362646f68726c39386a32307277553944424e2f536d6a4243447a6f4979517a4f47555642326e57560a4d51644a65307648675479445575736935714e69374e355548476167474c624b2f495532743359565343325943456930646b634b524d4f6a524a61553845394a4c6f704f4a757a4a614c59530a6e475a706a7967524258596a6379435453446d73356e4f5a42344f6a4273364b666175796678302b4d6a734a645770574c6f6d65735653574c71566e5734784673354e58694576436f704e500a362b7242456250395a79506633457a4635346d304e743750507a584d4d765342676668764a616d76542f4e4b794e6d2f6577542b30466759376e4f366a66346b77547677504e532b7874386f0a4e316a7474527267494d496278535233486f6c75414d684b682f63534661797651794d7230364c4457586a437158514b514e4c655642776752306e31494e652b626d7a2b78553958797776490a38355652684b3468724e594f623036326b5262550a2d2d2d2d2d454e442043455254494649434154452d2d2d2d2d0a",
+      "opts": {
+        "pem": 1
+      },
+      "output": "9f975d6620928e8eaf2b9ecba854035a32b4d796706971446f2e6c6dda21ae5f7c8f6d2bc14f4304dfd29a30420f3a08c90cce194541da75953107497b4bc7813c8352eb22e6a362ecde541c66a018b6cafc8536b77615482d980848b476470a44c3a3449694f04f492e8a4e26ecc968b6129c66698f28110576237320934839ace673990783a306ce8a7dabb27f1d3e323b09756a562e899eb154962ea5675b8c45b39357884bc2a2934febeac111b3fd6723dfdc4cc5e789b436decf3f35cc32f48181f86f25a9af4ff34ac8d9bf7b04fed05818ee73ba8dfe24c13bf03cd4bec6df283758edb51ae020c21bc524771e896e00c84a87f71215acaf43232bd3a2c35978c2a9740a40d2de541c204749f520d7be6e6cfec54f57cb0bc8f3955184ae21acd60e6f4eb69116d4",
+      "plugin": "base64"
+    },
+    {
+      "input": "6a756e6b0a2d2d2d2d2d424547494e2043455254494649434154452d2d2d2d2d0a6e3564645a6943536a6f36764b35374c71465144576a4b3031355a77615846456279357362646f68726c39386a32307277553944424e2f536d6a4243447a6f4979517a4f47555642326e57560a4d51644a65307648675479445575736935714e69374e355548476167474c624b2f495532743359565343325943456930646b634b524d4f6a524a61553845394a4c6f704f4a757a4a614c59530a6e475a706a7967524258596a6379435453446d73356e4f5a42344f6a4273364b666175796678302b4d6a734a645770574c6f6d65735653574c71566e5734784673354e58694576436f704e500a362b7242456250395a79506633457a4635346d304e743750507a584d4d765342676668764a616d76542f4e4b794e6d2f6577542b30466759376e4f366a66346b77547677504e532b7874386f0a4e316a7474527267494d496278535233486f6c75414d684b682f63534661797651794d7230364c4457586a437158514b514e4c655642776752306e31494e652b626d7a2b78553958797776490a38355652684b3468724e594f623036326b5262550a2d2d2d2d2d454e442043455254494649434154452d2d2d2d2d0a",
+      "opts": {
+        "pem": 1
+      },
+      "output": "9f975d6620928e8eaf2b9ecba854035a32b4d796706971446f2e6c6dda21ae5f7c8f6d2bc14f4304dfd29a30420f3a08c90cce194541da75953107497b4bc7813c8352eb22e6a362ecde541c66a018b6cafc8536b77615482d980848b476470a44c3a3449694f04f492e8a4e26ecc968b6129c66698f28110576237320934839ace673990783a306ce8a7dabb27f1d3e323b09756a562e899eb154962ea5675b8c45b39357884bc2a2934febeac111b3fd6723dfdc4cc5e789b436decf3f35cc32f48181f86f25a9af4ff34ac8d9bf7b04fed05818ee73ba8dfe24c13bf03cd4bec6df283758edb51ae020c21bc524771e896e00c84a87f71215acaf43232bd3a2c35978c2a9740a40d2de541c204749f520d7be6e6cfec54f57cb0bc8f3955184ae21acd60e6f4eb69116d4",
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: PEM BEGIN and END labels disagree at byte offset 434",
+      "input": "2d2d2d2d2d424547494e2043455254494649434154452d2d2d2d2d0a6e3564645a6943536a6f36764b35374c71465144576a4b3031355a77615846456279357362646f68726c39386a32307277553944424e2f536d6a4243447a6f4979517a4f47555642326e57560a4d51644a65307648675479445575736935714e69374e355548476167474c624b2f495532743359565343325943456930646b634b524d4f6a524a61553845394a4c6f704f4a757a4a614c59530a6e475a706a7967524258596a6379435453446d73356e4f5a42344f6a4273364b666175796678302b4d6a734a645770574c6f6d65735653574c71566e5734784673354e58694576436f704e500a362b7242456250395a79506633457a4635346d304e743750507a584d4d765342676668764a616d76542f4e4b794e6d2f6577542b30466759376e4f366a66346b77547677504e532b7874386f0a4e316a7474527267494d496278535233486f6c75414d684b682f63534661797651794d7230364c4457586a437158514b514e4c655642776752306e31494e652b626d7a2b78553958797776490a38355652684b3468724e594f623036326b5262550a2d2d2d2d2d454e44204b45592d2d2d2d2d0a",
+      "opts": {
+        "pem": 1
+      },
+      "plugin": "base64"
+    },
+    {
+      "error": "File::Raw::Base64: PEM input missing BEGIN marker at byte offset 0",
+      "input": "6e3564645a6943536a6f36764b35374c71465144576a4b3031355a77615846456279357362646f68726c39386a32307277553944424e2f536d6a4243447a6f4979517a4f47555642326e57560a4d51644a65307648675479445575736935714e69374e355548476167474c624b2f495532743359565343325943456930646b634b524d4f6a524a61553845394a4c6f704f4a757a4a614c59530a6e475a706a7967524258596a6379435453446d73356e4f5a42344f6a4273364b666175796678302b4d6a734a645770574c6f6d65735653574c71566e5734784673354e58694576436f704e500a362b7242456250395a79506633457a4635346d304e743750507a584d4d765342676668764a616d76542f4e4b794e6d2f6577542b30466759376e4f366a66346b77547677504e532b7874386f0a4e316a7474527267494d496278535233486f6c75414d684b682f63534661797651794d7230364c4457586a437158514b514e4c655642776752306e31494e652b626d7a2b78553958797776490a38355652684b3468724e594f623036326b5262550a",
+      "opts": {
+        "pem": 1
+      },
+      "plugin": "base64"
+    }
+  ],
+  "version": "0.04"
+}

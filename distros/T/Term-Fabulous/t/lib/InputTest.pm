@@ -5,7 +5,8 @@ package InputTest;
 # painted. Widgets paint when a frame is drawn: shown and row_text draw
 # the frames that are due first. press and click fire their events at the widget itself, which
 # tests the widget's own handling; screen_click goes through Term::Fabulous
-# like a click on the terminal (hit-testing, focus, OnPress and OnRelease).
+# like a click on the terminal (hit-testing, focus, the click count, OnPress
+# and OnRelease).
 
 use v5.32;
 use warnings;
@@ -25,12 +26,14 @@ use Term::Fabulous::Event::Mouse;
 use Term::Fabulous::Widget::Box;
 
 # A Term::Fabulous on a 40x20 memory terminal with the widgets stacked in
-# a root box, laid out and drawn once.
+# a root box, laid out and drawn once. A hash reference after the widgets
+# holds more parameters of Term::Fabulous->new, such as a clock.
 sub layout_ui (@widgets) {
-	my $root = Term::Fabulous::Widget::Box->new( layout => { layout_direction => CLAY_TOP_TO_BOTTOM, sizing => { width => sizing_grow(), height => sizing_grow() } } );
+	my %options = ref $widgets[-1] eq 'HASH' ? %{ pop @widgets } : ();
+	my $root    = Term::Fabulous::Widget::Box->new( layout => { layout_direction => CLAY_TOP_TO_BOTTOM, sizing => { width => sizing_grow(), height => sizing_grow() } } );
 	$root->add_child(@widgets);
 	my $terminal = Term::Fabulous::Terminal::Memory->new( width => 40, height => 20 );
-	my $ui       = Term::Fabulous->new( root => $root, width => 40, height => 20, terminal => $terminal );
+	my $ui       = Term::Fabulous->new( root => $root, width => 40, height => 20, terminal => $terminal, %options );
 	$ui->step;
 	return $ui;
 }
@@ -50,14 +53,16 @@ sub type_text ( $widget, $text ) {
 }
 
 # A mouse event at a cell of the widget's buffer, as the widget was laid
-# out last. Returns the event.
+# out last; click_count 2 makes it the second press of a double click.
+# Returns the event.
 sub click ( $widget, $x, $y, %options ) {
 	my ( $origin_x, $origin_y ) = $widget->content_origin;
 	my $event = Term::Fabulous::Event::Mouse->new(
-		key       => $options{key} // TB_KEY_MOUSE_LEFT,
-		x         => $origin_x + $x,
-		y         => $origin_y + $y,
-		modifiers => $options{modifiers} // 0,
+		key         => $options{key} // TB_KEY_MOUSE_LEFT,
+		x           => $origin_x + $x,
+		y           => $origin_y + $y,
+		modifiers   => $options{modifiers}   // 0,
+		click_count => $options{click_count} // 1,
 	);
 	$widget->fire_event($event);
 	return $event;

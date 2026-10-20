@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Punk ();
 
-our $VERSION = '0.61';
+our $VERSION = '0.62';
 
 1;
 
@@ -170,6 +170,16 @@ L<Punk::Plugin::Sitemap>: a scrape target is not a page.
 A coderef returning a hashref of C<< name => number >>. See above.
 
 =head1 METHODS
+
+=head2 new
+
+The constructor L<Punk/plugin> calls. It takes nothing; the options go to
+L</register>.
+
+=head2 register($app, \%opts)
+
+Called once by C<plugin>: mounts the scrape route at L</path> and starts
+counting the application's requests.
 
 =head2 Punk::Plugin::Metrics->buckets
 

@@ -49,7 +49,7 @@ my $with = "Message-Instance: " . $mi->as_string . "\r\n$PLAIN";
 {
     my ($v, $kept) = verify_chunks([$with, "more body\r\n"]);
     is($v->result, 'permerror', 'a Message-Instance with no signature is a permerror');
-    like($v->details, qr/^PERMERROR Message-Instance m=1 is not signed/, '... saying so');
+    like($v->details, qr/^PERMERROR: Message-Instance m=1 is not signed/, '... saying so');
     is($kept, 0, '... keeping none of the body');
 
     ($v) = verify_chunks([$with], allow_unsigned_mi => 1);

@@ -7,10 +7,20 @@ use Test2::V0;
 
 use lib 't/lib';
 
-use Clay::XS qw(Clay_MinMemorySize);
+use Object::Pad 0.800;
+use Clay::XS qw(Clay_MinMemorySize Clay_SetTransitionHandlers);
 use Clay::UI;
+use Clay::UI::Box;
 use Clay::UI::Test::Box;
 use Clay::UI::Test::Text;
+
+# A box that plays an exit transition when it leaves the tree.
+class LeavingBox :strict(params) :does(Clay::UI::Box) {
+	method contribute_transition ($config) {
+		$config->{transition} = { duration => 1, properties => Clay::XS::CLAY_TRANSITION_PROPERTY_X(), exit => { has_set_final => 1 } };
+		return;
+	}
+}
 
 # -----------------------------------------------------------------------------
 # max_element_count sizes each Clay::UI's own context; a tree that does not
@@ -46,8 +56,10 @@ subtest "memory_size must fit this UI's count" => sub {
 	make_ui(0);
 	my $default_minimum = Clay_MinMemorySize();
 	like( dies { make_ui(0, max_element_count => 20_000, memory_size => $default_minimum) },
-		qr/'memory_size' must be an integer >= Clay_MinMemorySize\(\) \(\d+\) for max_element_count 20000 and max_measure_text_cache_word_count 40000/,
+		qr/'memory_size' must be an integer >= Clay_MinMemorySize\(\) \(\d+\) for max_element_count 20000 and the default max_measure_text_cache_word_count/,
 		'the minimum for the default count is too small' );
+	like( dies { make_ui(0, max_element_count => 20_000, max_measure_text_cache_word_count => 40_000, memory_size => $default_minimum) },
+		qr/for max_element_count 20000 and max_measure_text_cache_word_count 40000/, 'a given word count is named' );
 };
 
 subtest 'a tree larger than max_element_count fails with a clear error' => sub {
@@ -55,6 +67,22 @@ subtest 'a tree larger than max_element_count fails with a clear error' => sub {
 	like( dies { $ui->render },
 		qr/\AClay::UI: the widget tree has more elements than max_element_count \(8192\) allows: 9001 widgets, at most 8190 fit; pass a larger max_element_count/,
 		'the error names the parameter' );
+};
+
+subtest 'elements still playing an exit transition leave room for fewer widgets' => sub {
+	my $root    = Clay::UI::Test::Box->new(id => 'root');
+	my @leaving = map { LeavingBox->new } 1 .. 4;
+	$root->add_child(@leaving);
+	my $ui = Clay::UI->new(width => 100, height => 100, root => $root, max_element_count => 16);
+	Clay_SetTransitionHandlers(sub { 0 }, undef, sub ($initial, $properties, $userdata) { $initial });
+	ok( lives { $ui->render for 1 .. 2 }, 'the boxes render' ) or note $@;
+
+	# 12 widgets fit 16 elements, but not while the 4 boxes leave.
+	$root->remove_child(@leaving);
+	$root->add_child(map { Clay::UI::Test::Box->new } 1 .. 11);
+	like( dies { $ui->render },
+		qr/\AClay::UI: the widget tree has more elements than max_element_count \(16\) allows: 12 widgets, at most 10 fit;/,
+		'the error counts the elements Clay keeps for them' );
 };
 
 subtest "a user error_handler gets Clay's own error" => sub {
@@ -77,10 +105,16 @@ sub make_text_ui ($word_count, %params) {
 }
 
 subtest 'max_measure_text_cache_word_count is validated' => sub {
-	for my $bad (0, 31, 1.5, 'many', [1]) {
+	for my $bad (0, 1.5, 'many', [1]) {
 		like( dies { make_ui(0, max_measure_text_cache_word_count => $bad) },
-			qr/'max_measure_text_cache_word_count' must be an integer >= 32/, "rejects '$bad'" );
+			qr/'max_measure_text_cache_word_count' must be a positive integer/, "rejects '$bad'" );
 	}
+	like( dies { make_ui(0, max_measure_text_cache_word_count => 31) },
+		qr/\AClay::UI: Clay cannot size a context for max_element_count 8192 and max_measure_text_cache_word_count 31 \(.*expected an integer in 32\.\./,
+		'Clay::XS refuses fewer than 32 words, and the error names the parameters' );
+	like( dies { make_ui(0, max_element_count => 10, max_measure_text_cache_word_count => 1000) },
+		qr/\AClay::UI: Clay cannot size a context for max_element_count 10 and max_measure_text_cache_word_count 1000 \(.*hash buckets/,
+		'and more than 32 words per element' );
 };
 
 subtest 'the default is twice max_element_count' => sub {

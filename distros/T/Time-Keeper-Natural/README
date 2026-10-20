@@ -1,0 +1,53 @@
+Time-Keeper-Natural
+
+The words people use for a time, "next Tuesday at 3 pm", "in two weeks", "end of
+last month", read into Time::Keeper values, relative to a moment called the anchor.
+
+    my $n = Time::Keeper::Natural->new(zone => 'Europe/London', locale => 'en-GB');
+    $n->parse('next Tuesday at 3 pm');
+    $n->in_locale('fr')->parse('il y a 3 heures');
+    $n->parse_duration('1 hour, 30 minutes');
+    my ($from, $to) = $n->parse_interval('15–17 Oct 2026');
+    $n->parse('3 pm EST');
+    $n->parse('the 15th');
+
+WHAT IT READS
+
+In every one of CLDR's 1,121 locales, whatever Time::Keeper writes there: relative
+time ("3 hours ago", "yesterday"), durations ("1 hour, 30 minutes"), intervals
+("15–17 Oct 2026"), and the locale's own date and time formats, with their zone
+names and digits in any script. The tests prove it by writing each and reading it
+back. A zone after a time ("3 pm EST", "15:30 Europe/Paris") and a day written as
+an ordinal ("the 15th", "le 1er octobre", in about forty locales) are read too, and
+with a calendar option the dates of any of CLDR's seventeen calendars ("4 Heshvan
+5787", "令和8年10月15日"), relative phrases counting that calendar's months.
+
+Where a locale has a word table, also "end of", "start of", "at", "on", and
+"from ... to ..." between two times. Tables
+ship for ar bn de el en es fr hi it ja ko nl pt ru th zh; all but English are
+first drafts awaiting a native reader.
+
+WHAT IT DOES NOT READ
+
+Free text, recurrence, vague words ("soon"), idioms CLDR does not have
+("a fortnight"), holidays and business days.
+
+INSTALLATION
+
+Time-Keeper 0.08 or later must be installed first, and a C compiler is needed.
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2026 by LNATION.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+
+The locale data and the spellout rules are from the Unicode Common Locale Data
+Repository, Copyright (c) 1991-2026 Unicode, Inc., under the Unicode License v3.

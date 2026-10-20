@@ -2,6 +2,19 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 3.3.2 are described by their release commits.
 
+## 3.9.0 - 2026-10-20
+
+### Features
+
+- Add oauth->register, for RFC 7591 dynamic client registration ([`1248cc4`](https://github.com/vpndetection-io/sdk-perl/commit/1248cc46329a0f2afea4531e97025e8ee546de6d))
+
+## 3.8.1 - 2026-10-20
+
+### Fixes
+
+- Refuse an answer, a key or a Retry-After the spec does not allow ([`c60e555`](https://github.com/vpndetection-io/sdk-perl/commit/c60e555db3b8a48bb85d25f62ad594744f410e59))
+- Keep credentials off command lines, and check the tarball CPAN serves ([`782f676`](https://github.com/vpndetection-io/sdk-perl/commit/782f676ecfc367c1971dc554878a8688f5a7b23b))
+
 ## 3.8.0 - 2026-10-19
 
 ### Features

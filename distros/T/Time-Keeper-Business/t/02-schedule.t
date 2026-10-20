@@ -308,6 +308,24 @@ is_deeply([Time::Keeper::Business::_open_days($xmas)], ['2026-12-19'], 'the work
     like($@, qr/outside the years Time::Keeper holds|out of range/, "  by the core's word");
 }
 
+# A schedule with rules as data.
+{
+    my $b = $C->new(holidays => [ Time::Keeper::Business::Rule->uk, '2026-12-31' ], weekend => 'en-GB', name => 'uk');
+    my $plain = $b->TO_JSON;
+    is_deeply($plain->{rules}, [ Time::Keeper::Business::Rule->uk->TO_JSON ], 'TO_JSON gives the rules as data');
+    is_deeply($plain->{holidays}, { '2026-12-31' => undef }, '  and the literal days, without the days the rules gave');
+    for my $copy ([ 'new(%TO_JSON)', $C->new(%$plain) ], [ 'Storable', dclone($b) ], [ 'FREEZE/THAW', $C->THAW('CBOR', $b->FREEZE('CBOR')) ]) {
+        my $bad = grep { join(' ', map { "$_->[0]" } $copy->[1]->holidays(year => $_)) ne join(' ', map { "$_->[0]" } $b->holidays(year => $_)) } 2024 .. 2034;
+        is($bad, 0, "$copy->[0]: the same holidays for 2024 to 2034");
+        is($copy->[1]->is_holiday(d('2026-12-31')), 1, '  and the literal day');
+    }
+    my $r = $C->new(rules => [ Time::Keeper::Business::Rule->target2, Time::Keeper::Business::Rule->uk->TO_JSON ]);
+    is(scalar(() = $r->holidays(year => 2026)), 10, 'new takes rules as rules or as data');
+    ok(!eval { $C->new(rules => ['x']); 1 }, '  and nothing else');
+    like($@, qr/rules is a list of rules, or of rules as data/, '  by name');
+    ok(!eval { freeze($C->new(holidays => sub { () })); 1 }, 'a code ref source still refuses to freeze');
+}
+
 # Threads: a copy answers alone after the parent lets go of its own.
 SKIP: {
     skip 'no ithreads', 3 unless $Config{useithreads};

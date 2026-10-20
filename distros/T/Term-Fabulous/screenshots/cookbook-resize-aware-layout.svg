@@ -18,26 +18,26 @@
 <text class="title" x="390" y="33" text-anchor="middle" dominant-baseline="central" fill="#9aa3b5">perl examples/cookbook/resize-aware-layout.pl</text>
 <rect x="16.5" y="16.5" width="747" height="201" rx="10" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1"/>
 <g shape-rendering="crispEdges">
-<rect x="39" y="68" width="333" height="1" fill="#78a0dc"/>
-<rect x="399" y="68" width="342" height="1" fill="#78a0dc"/>
+<rect x="39" y="68" width="342" height="1" fill="#78a0dc"/>
+<rect x="408" y="68" width="333" height="1" fill="#78a0dc"/>
 <rect x="34" y="78" width="1" height="108" fill="#78a0dc"/>
-<rect x="376" y="78" width="1" height="108" fill="#78a0dc"/>
-<rect x="394" y="78" width="1" height="108" fill="#78a0dc"/>
+<rect x="385" y="78" width="1" height="108" fill="#78a0dc"/>
+<rect x="403" y="78" width="1" height="108" fill="#78a0dc"/>
 <rect x="745" y="78" width="1" height="108" fill="#78a0dc"/>
-<rect x="39" y="194" width="333" height="1" fill="#78a0dc"/>
-<rect x="399" y="194" width="342" height="1" fill="#78a0dc"/>
+<rect x="39" y="194" width="342" height="1" fill="#78a0dc"/>
+<rect x="408" y="194" width="333" height="1" fill="#78a0dc"/>
 </g>
 <polyline points="34.5 78 34.5 73 34.538 72.413 34.653 71.835 34.843 71.278 35.103 70.75 35.43 70.261 35.818 69.818 36.261 69.43 36.75 69.103 37.278 68.843 37.835 68.653 38.413 68.538 39 68.5 39 68.5" fill="none" stroke="#78a0dc" stroke-width="1" stroke-linejoin="round"/>
-<polyline points="376.5 78 376.5 73 376.462 72.413 376.347 71.835 376.157 71.278 375.897 70.75 375.57 70.261 375.182 69.818 374.739 69.43 374.25 69.103 373.722 68.843 373.165 68.653 372.587 68.538 372 68.5 372 68.5" fill="none" stroke="#78a0dc" stroke-width="1" stroke-linejoin="round"/>
-<polyline points="394.5 78 394.5 73 394.538 72.413 394.653 71.835 394.843 71.278 395.103 70.75 395.43 70.261 395.818 69.818 396.261 69.43 396.75 69.103 397.278 68.843 397.835 68.653 398.413 68.538 399 68.5 399 68.5" fill="none" stroke="#78a0dc" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="385.5 78 385.5 73 385.462 72.413 385.347 71.835 385.157 71.278 384.897 70.75 384.57 70.261 384.182 69.818 383.739 69.43 383.25 69.103 382.722 68.843 382.165 68.653 381.587 68.538 381 68.5 381 68.5" fill="none" stroke="#78a0dc" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="403.5 78 403.5 73 403.538 72.413 403.653 71.835 403.843 71.278 404.103 70.75 404.43 70.261 404.818 69.818 405.261 69.43 405.75 69.103 406.278 68.843 406.835 68.653 407.413 68.538 408 68.5 408 68.5" fill="none" stroke="#78a0dc" stroke-width="1" stroke-linejoin="round"/>
 <polyline points="745.5 78 745.5 73 745.462 72.413 745.347 71.835 745.157 71.278 744.897 70.75 744.57 70.261 744.182 69.818 743.739 69.43 743.25 69.103 742.722 68.843 742.165 68.653 741.587 68.538 741 68.5 741 68.5" fill="none" stroke="#78a0dc" stroke-width="1" stroke-linejoin="round"/>
 <polyline points="34.5 186 34.5 190 34.538 190.587 34.653 191.165 34.843 191.722 35.103 192.25 35.43 192.739 35.818 193.182 36.261 193.57 36.75 193.897 37.278 194.157 37.835 194.347 38.413 194.462 39 194.5 39 194.5" fill="none" stroke="#78a0dc" stroke-width="1" stroke-linejoin="round"/>
-<polyline points="376.5 186 376.5 190 376.462 190.587 376.347 191.165 376.157 191.722 375.897 192.25 375.57 192.739 375.182 193.182 374.739 193.57 374.25 193.897 373.722 194.157 373.165 194.347 372.587 194.462 372 194.5 372 194.5" fill="none" stroke="#78a0dc" stroke-width="1" stroke-linejoin="round"/>
-<polyline points="394.5 186 394.5 190 394.538 190.587 394.653 191.165 394.843 191.722 395.103 192.25 395.43 192.739 395.818 193.182 396.261 193.57 396.75 193.897 397.278 194.157 397.835 194.347 398.413 194.462 399 194.5 399 194.5" fill="none" stroke="#78a0dc" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="385.5 186 385.5 190 385.462 190.587 385.347 191.165 385.157 191.722 384.897 192.25 384.57 192.739 384.182 193.182 383.739 193.57 383.25 193.897 382.722 194.157 382.165 194.347 381.587 194.462 381 194.5 381 194.5" fill="none" stroke="#78a0dc" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="403.5 186 403.5 190 403.538 190.587 403.653 191.165 403.843 191.722 404.103 192.25 404.43 192.739 404.818 193.182 405.261 193.57 405.75 193.897 406.278 194.157 406.835 194.347 407.413 194.462 408 194.5 408 194.5" fill="none" stroke="#78a0dc" stroke-width="1" stroke-linejoin="round"/>
 <polyline points="745.5 186 745.5 190 745.462 190.587 745.347 191.165 745.157 191.722 744.897 192.25 744.57 192.739 744.182 193.182 743.739 193.57 743.25 193.897 742.722 194.157 742.165 194.347 741.587 194.462 741 194.5 741 194.5" fill="none" stroke="#78a0dc" stroke-width="1" stroke-linejoin="round"/>
 <g class="terminal">
 <text x="48" y="92" textLength="45" fill="#e6e6e6">Inbox</text>
-<text x="408" y="92" textLength="63" fill="#e6e6e6">Message</text>
+<text x="417" y="92" textLength="63" fill="#e6e6e6">Message</text>
 </g>
 <g shape-rendering="crispEdges">
 </g>

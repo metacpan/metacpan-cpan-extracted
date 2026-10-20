@@ -7,7 +7,7 @@ BEGIN {
 	use vars qw($VERSION $YEAR @ISA @EXPORT @EXPORT_OK);    # %EXPORT_TAGS);
 
 	# a.ammr a.a elapsed years, mm months, r release
-	$VERSION = '2.1126';
+	$VERSION = '2.1129';
 	$YEAR    = '2026';
 	@ISA     = qw(Exporter);
 	@EXPORT  = qw(oEdtk_release);

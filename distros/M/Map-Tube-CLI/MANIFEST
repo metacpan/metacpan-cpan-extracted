@@ -12,8 +12,8 @@ t/02-path-check.t
 t/03-as-image.t
 xt/manifest.t
 xt/pod.t
-xt/meta-json.t
-xt/meta-yml.t
+xt/provides.t
+xt/version.t
 script/map-tube
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

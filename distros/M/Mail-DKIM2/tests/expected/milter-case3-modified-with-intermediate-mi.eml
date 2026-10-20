@@ -1,23 +1,23 @@
 DKIM2-Signature: i=2; m=2; t=1740000000; d=test2.dkim2.com;
 	mf=PGZvcndhcmRlckB0ZXN0Mi5ka2ltMi5jb20+;
 	rt=PHJlY2lwaWVudEB0ZXN0Mi5ka2ltMi5jb20+;
-	s=rsa1024:rsa-sha256:IatzzQF8oDQAqdsPVgdcya0ODbPy/nUhnlUmvUPL66L
-	x+9N6tZ4ZKgUhLSOA/Hz70MNm9j1PYKj9Da8P+zadj4cPJTtxgrHtTAKNNBTkHgI
-	ithxpgrFum78jywoUxyUHpSJtXjDcFKvemZDTc+y0V/rNC5nFwdv1olXEZNA5mlM
+	s=rsa1024:rsa-sha256:mnCMkhzRY7uEvgulitxTouWlhyVbxVXdtNuKI+wbXH6
+	y4u93QK7/ot3nIDNop+WsXjhZ+G/0iH+SpnCgP9P3p6t1CTrp5r23rrHoP+sJoXA
+	w2fb9ElJXe0fTcxmxj3MLIvhlTaQB7oF9+pxbKqUiaIJb/pQO5dxkIrh5Mq0H69o
 	=;
-Message-Instance: m=2; h=sha256:bCYYuxJp3pzaFKNnhQiJujI5CDoF6KRxqZ8gC20Te0A=:XI228V/720XNelm76DFKQf934iOEQQCt6wZ3uKCIr9Q=; r=eyJoIjp7Imxpc3QtaWQiOltdfX0=;
+Message-Instance: m=2; h=sha256:fQlVnF1jb8Mw8Zo/cBDo7IVI7QdoRF48LJ32r0nPF7s=:XI228V/720XNelm76DFKQf934iOEQQCt6wZ3uKCIr9Q=; r=eyJoIjp7Imxpc3QtaWQiOltdfX0=;
 DKIM2-Signature: i=1; m=1; t=1740000000; d=test1.dkim2.com;
 	mf=PHNlbmRlckB0ZXN0MS5ka2ltMi5jb20+;
 	rt=PGZvb0B0ZXN0Mi5ka2ltMi5jb20+;
-	s=rsa1024:rsa-sha256:YsKm21yi8PLmXtIRsUuEuRYSO0wgt5XNmR+qEzh9jww
-	znpxjTfOr9VKMLKlb9UYyE43Gf0QzbkO2DAXodXxx8qjWLKnyKkrkgPtNjgHALAI
-	LS5qXjlSiBwsmLMmjqXLKQlt9lzzYVzYl3i3nfw9qTbAVjHUulvOMaQO4yVdHOdE
+	s=rsa1024:rsa-sha256:wWXfQYQV+SeG0hCI7m+eP6B6pdVb5tB+cUWCVOlYrCP
+	77JNX5zPqq8uH2P+d7qOIdu4x+8Ds4Y2d575V4e4GVAxWoOrTRTpxJnvNgC/LPXm
+	0+9B+uMo97G2M4+h7ufM8xT+Gawek1aXX+ZlTMzF5nu0Z2kGyVXuZqxE2nsI+buk
 	=;
-Message-Instance: m=1; h=sha256:tB8uwPQbcCHO6zvU0EnzEFWUKKBtwyzmrxeavy4Jn1g=:XI228V/720XNelm76DFKQf934iOEQQCt6wZ3uKCIr9Q=;
+Message-Instance: m=1; h=sha256:MExUPRTBnQsJ/I3XKmPZnnJ5j9Ej5QLgtr3llRGAGZ4=:XI228V/720XNelm76DFKQf934iOEQQCt6wZ3uKCIr9Q=;
 MIME-Version: 1.0
 Message-Id: <fb1b10ae-ea36-4ee4-b84f-b62f036cfaf5@app.fastmail.com>
 Date: Thu, 21 Mar 2024 12:09:37 +1000
-From: "Bron Gondwana" <brong@fastmailteam.com>
+From: "Bron Gondwana" <brong@test1.dkim2.com>
 To: jmap@ietf.org
 Subject: Working group last call draft-ietf-jmap-webpush-vapid
 Content-Type: multipart/alternative;

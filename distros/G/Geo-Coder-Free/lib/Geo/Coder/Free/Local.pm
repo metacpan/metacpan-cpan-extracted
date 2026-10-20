@@ -5,8 +5,9 @@ use warnings;
 use autodie qw(:all);
 
 use Carp;
-use Geo::Location::Point 0.16;	# 0.16 stores and returns false values, so provenance survives
-use Geo::Coder::Free::Provenance qw(_accuracy_for GEOCODER);
+use Geo::Location::Point 0.19;	# 0.16 stores false values; 0.19 derives an accuracy from the fields matched
+use Geo::Coder::Free::MissCache;
+use Geo::Coder::Free::Provenance qw(GEOCODER);
 use Geo::Coder::Free::Utils qw(_abbreviate _normalize);
 use Geo::StreetAddress::US;
 use Lingua::EN::AddressParse;
@@ -25,11 +26,11 @@ Geo::Coder::Free::Local - Geocode using user-curated local data
 
 =head1 VERSION
 
-Version 0.47
+Version 0.48
 
 =cut
 
-our $VERSION = '0.47';
+our $VERSION = '0.48';
 
 =head1 SYNOPSIS
 
@@ -209,6 +210,44 @@ sub new {
 	return $self;
 }
 
+# What this backend counts as a miss, and where the whole process remembers
+# it.  The data is in __DATA__, so every instance has the same data and a miss
+# found by one is a miss for all of them.
+sub _miss_scope {
+	return Geo::Coder::Free::MissCache->scope_for('Local');
+}
+
+sub _missed {
+	my ($self, $lc) = @_;
+
+	return Geo::Coder::Free::MissCache->missed($self->_miss_scope(), $lc);
+}
+
+sub _remember_miss {
+	my ($self, $lc) = @_;
+
+	Geo::Coder::Free::MissCache->remember($self->_miss_scope(), $lc);
+	return;
+}
+
+=head2 reads
+
+    my $count = $geocoder->reads();
+
+How many times this backend has searched its dataset since the object was
+created.  A lookup answered from the index, from the result cache or from the
+shared miss cache does not increase it, so C<geocode_many()> can take the count
+before and after a value to tell a lookup that cost a search from one that was
+answered from a cache.
+
+=cut
+
+sub reads {
+	my $self = shift;
+
+	return $self->{'reads'} // 0;
+}
+
 =head2 geocode
 
 =head3 SYNOPSIS
@@ -300,9 +339,6 @@ sub geocode {
 	my $location = $params{'location'}
 		or Carp::croak('Usage: geocode(location => $location)');
 
-	# This backend only handles full addresses (at least "road, city, country")
-	return if $location !~ /,.+,/;
-
 	# Normalise the lookup key — "USA" is treated the same as "US"
 	my $lc = lc($location);
 	$lc =~ s/,\s*usa$/, us/i;
@@ -310,6 +346,14 @@ sub geocode {
 	return $self->{'cache'}{$lc}  if exists $self->{'cache'}{$lc};
 	return $self->_cache_and_return($lc, $self->_result_for($self->{'index'}{$lc}))
 		if exists $self->{'index'}{$lc};
+
+	# A miss found by an earlier instance, or an earlier call through this
+	# one, means the same search would find nothing again: the data does not
+	# change while the process runs.  clear_miss_cache() is for when it has.
+	return if $self->_missed($lc);
+
+	# This backend only handles full addresses (at least "road, city, country")
+	return $self->_remember_miss($lc) if $location !~ /,.+,/;
 
 	my $ap;
 	if ($location =~ /USA?$/ || $location =~ /United States$/) {
@@ -322,10 +366,10 @@ sub geocode {
 		);
 	} elsif ($location =~ /Canada$/) {
 		# TODO: Canadian address parsing not yet implemented
-		return;
+		return $self->_remember_miss($lc);
 	} elsif ($location =~ /Australia$/) {
 		# TODO: Australian address parsing not yet implemented
-		return;
+		return $self->_remember_miss($lc);
 	}
 
 	if ($ap) {
@@ -386,7 +430,7 @@ sub geocode {
 			# Minor: if target pair is absent, no _search call can match.
 			# Conclusion: early return is equivalent and faster.
 			my $rk = uc($addr{'state'} // '') . '|' . uc($addr{'country'} // '');
-			return unless $self->{'region_index'}{$rk};
+			return $self->_remember_miss($lc) unless $self->{'region_index'}{$rk};
 		}
 	}
 
@@ -476,7 +520,7 @@ sub geocode {
 
 	# Simple "Town, County, England" — no further sub-parsers will help
 	if (($location =~ /[^,]+,[^,]+,.*England$/) && ($location !~ /[^,]+,[^,]+,[^,]+,.*England$/)) {
-		return;
+		return $self->_remember_miss($lc);
 	}
 
 	# Geo::Address::Parser — optional; load lazily, skip if not installed
@@ -602,7 +646,7 @@ sub geocode {
 		$params{'location'} = $location;
 	}
 
-	return;
+	return $self->_remember_miss($lc);
 }
 
 =head2 reverse_geocode
@@ -764,6 +808,8 @@ sub _to_two_letter_state {
 sub _search {
 	my ($self, $data, @columns) = @_;
 
+	$self->{'reads'}++;
+
 	# M5 (boolean reduction): the $failed flag was set-and-break in the inner loop
 	# then tested in the outer loop — eliminated by using a labeled 'next ROW'
 	# that short-circuits directly, removing one boolean gate per iteration.
@@ -802,7 +848,7 @@ sub _search {
 			database   => __PACKAGE__,
 			%{$row},
 			geocoder   => GEOCODER,
-			accuracy   => _accuracy_for(@matched_columns),
+			accuracy   => Geo::Location::Point::accuracy_for(@matched_columns),
 		);
 	}
 	return;
@@ -818,7 +864,7 @@ row does not already record them.
 
 An index hit is an exact match on the row's string, so the confidence is
 C<$CONF_EXACT>, and the accuracy is what the row's own fields justify, through
-C<_accuracy_for()>.
+C<Geo::Location::Point::accuracy_for()>.
 
 =cut
 
@@ -829,7 +875,7 @@ sub _result_for {
 	$attributes{'geocoder'}   = GEOCODER;
 	$attributes{'database'}   = __PACKAGE__;
 	$attributes{'confidence'} = $CONF_EXACT;
-	$attributes{'accuracy'}   = _accuracy_for(keys %attributes);
+	$attributes{'accuracy'}   = Geo::Location::Point::accuracy_for(keys %attributes);
 
 	return Geo::Location::Point->new(\%attributes);
 }

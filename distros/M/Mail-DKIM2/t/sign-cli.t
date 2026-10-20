@@ -239,7 +239,7 @@ isnt($rc4, 0, 'missing --selector is an error');
         or die 'no nd=';
     ($out, $rc) = $run->($ws, '--ignore-timestamps');
     is($rc, 0, 'gate: "nd = x" with whitespace around "=" is recognised and signed');
-    # Not a tampering hole: spec-06 canonicalises a DKIM2-Signature field by
+    # Not a tampering hole: -07 §12.8 canonicalises a DKIM2-Signature field by
     # removing all whitespace before hashing it, so adding FWS around "=" does
     # not change what i=1's b= covers. The countersigned chain verifies, while
     # changing the domain really does break i=1 (next test).
@@ -253,7 +253,10 @@ isnt($rc4, 0, 'missing --selector is an error');
         my $v2 = Mail::DKIM2::Verifier->new;
         $v2->set_pubkey_callback(DKIM2TestKeys::pubkey_callback());
         $v2->PRINT($changed); $v2->CLOSE;
-        is($v2->result, 'fail', 'gate: changing the nd= domain does break i=1');
+        # The custody check (section 14.4) now names it before the broken
+        # i=1 signature (section 14.6) would: contract C9's order.
+        is($v2->details, 'PERMERROR: DKIM2-Signature i=1 nd= does not match',
+            'gate: changing the nd= domain does break the chain');
     }
     ($out, $rc) = $run->($nd_top->('TEST2.dkim2.com'));
     is($rc, 0, 'gate: nd= match is case-insensitive');
@@ -272,6 +275,23 @@ isnt($rc4, 0, 'missing --selector is an error');
     # Fixtures from the past: --ignore-timestamps is accepted.
     ($out, $rc) = $run->($originator->(), '--ignore-timestamps');
     is($rc, 0, 'gate: --ignore-timestamps accepted');
+}
+
+# --exploded (-07 section 12.5): f=exploded from i=2 on, never at i=1.
+{
+    my $f = sub { my ($sig) = Email::MIME->new($_[0])->header_raw('DKIM2-Signature');
+                  $sig =~ /\bf=([^;]*)/ ? $1 =~ s/\s+//gr : '' };
+    my ($hop1, $rc1) = sign($src, '-s', 'sel1', '-d', 'test1.dkim2.com', '-k', $keyfile,
+        '--mailfrom', '<sender@test1.dkim2.com>', '--rcptto', '<list@test2.dkim2.com>', '--exploded');
+    is($rc1, 0, 'exploded at i=1: signs');
+    is($f->($hop1), '', 'exploded at i=1: no f=');
+    my $in = path($dir)->child('hop1.eml');
+    $in->spew_raw($hop1);
+    my ($hop2, $rc2) = sign($in, '-s', 'sel1', '-d', 'test2.dkim2.com', '-k', $keyfile2,
+        '--mailfrom', '<list@test2.dkim2.com>', '--rcptto', '<a@test3.dkim2.com>', '--exploded');
+    is($rc2, 0, 'exploded at i=2: signs');
+    my ($top) = sort { $b cmp $a } Email::MIME->new($hop2)->header_raw('DKIM2-Signature');
+    like($top, qr/\bf=exploded\b/, 'exploded at i=2: f=exploded');
 }
 
 done_testing();

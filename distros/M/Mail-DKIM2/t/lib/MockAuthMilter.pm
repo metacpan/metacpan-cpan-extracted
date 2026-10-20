@@ -51,6 +51,7 @@ BEGIN {
     # The framework's header-change call (SMFIR_CHGHEADER: an empty value
     # deletes the index'th field of that name), recorded in call order.
     sub change_header      { push @{$_[0]->{_changed_headers}}, { field => $_[1], index => $_[2], value => $_[3] } }
+    sub reject_mail        { $_[0]->{_reject} = $_[1] }
 
     # Stub AuthenticationResults classes
     $INC{'Mail/AuthenticationResults/Header/Entry.pm'} = 1;

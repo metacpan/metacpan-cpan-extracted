@@ -7,7 +7,7 @@ use DKIM2SignedFixture;
 use Mail::DKIM2::Common qw(mi_version_tag extract_mi_version);
 use Mail::DKIM2::MessageInstance;
 
-# spec-06 §7: Message-Instance tag identifiers are case insignificant, and
+# -07 §9: Message-Instance tag identifiers are case insignificant, and
 # there MUST be only one of each kind (review R4, R5). We emit lowercase;
 # we accept any case, and reject a repeat whatever its case.
 

@@ -164,4 +164,28 @@ ok(-f $tkd, 'calendars.tkd is installed beside the module');
 cmp_ok(-s $tkd, '<', 2_500_000, 'and is under the 2.5 MB gate');
 cmp_ok(-s $tkd, '>', 1_000_000, 'and holds the locales');
 
+# The numerals some calendars' patterns are written in read back: Hebrew
+# numerals in he (ד׳ בחשוון תשפ״ז), the lunar days (初六) and Chinese numerals
+# of the Chinese and Korean calendars in ja and zh, and every other calendar
+# in its own four date formats, in twenty locales.
+{
+    my $t = Time::Keeper->new(year => 2026, month => 10, day => 15, zone => 'Europe/London');
+    my @bad;
+    for my $c (Time::Keeper::Calendar->ids) {
+        for my $l (qw(en en-GB fr de es ja zh zh-Hant ko ar fa he hi th ru tr id pt it nl)) {
+            my $v = $t->in_calendar($c)->in_locale($l);
+            my @f = Time::Keeper::Locale->formats($l, 'date', $c);
+            for my $i (0 .. 3) {
+                my $s = $v->format_date((qw(full long medium short))[$i]);
+                next if $f[$i] =~ /yy(?!y)/;   # a two-digit year names no century
+                my $r = eval { Time::Keeper->parse_cldr($s, $f[$i], locale => $l, calendar => $c, zone => 'Europe/London') };
+                push @bad, "$c $l '$s': " . ($r // $@) unless $r && $r == $t;
+            }
+        }
+    }
+    is(eval { $t->in_calendar('hebrew')->in_locale('ca-ES-valencia')->format_date('full') } // $@, 'dijous, 4 Heshvan del 5787 AM',
+       'ca-ES-valencia inherits its calendar names through ca-ES, which has none of its own');
+    ok(!@bad, 'every calendar\'s dates read back in twenty locales') or diag(join "\n", scalar(@bad) . ' do not:', @bad[0 .. ($#bad < 9 ? $#bad : 9)]);
+}
+
 done_testing;

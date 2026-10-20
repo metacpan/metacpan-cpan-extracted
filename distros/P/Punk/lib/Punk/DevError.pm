@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.61';
+our $VERSION = '0.62';
 
 # Development error pages. Loaded only when the application compiles in the
 # development environment (Punk::App::compile_extras) - an opt-in: punk dev,
@@ -346,6 +346,15 @@ An C<on_error> wrapper renders the page - but only when the
 application's own C<on_error> handler (if any) declined: a user handler
 returning a reference keeps absolute priority, in development exactly
 as in production.
+
+=head1 FUNCTIONS
+
+=head2 render($c, $err)
+
+The debug response for C<$err>: the HTML page when the request accepts
+C<text/html> and did not send JSON, otherwise the JSON shape with a
+C<trace>, both with status C<500>. The fallback the C<on_error> wrapper
+calls; an application does not call it.
 
 =head1 WHAT IS REDACTED
 

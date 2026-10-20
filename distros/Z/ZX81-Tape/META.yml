@@ -18,6 +18,7 @@ no_index:
     - t
     - inc
 requires:
+  CPU::Z80::Assembler: '2.25'
   Modern::Perl: '1.20250607'
   Object::Tiny::RW: '1.07'
   Path::Tiny: '0.15'
@@ -26,5 +27,5 @@ requires:
   Text::Diff: '1.46'
   ZX81: '0.001'
   ZX81::Tokenize: '0.004'
-version: '0.004'
+version: '0.005'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

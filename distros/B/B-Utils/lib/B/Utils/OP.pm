@@ -8,7 +8,7 @@ use B::Utils ();
 
 our @ISA = 'Exporter';
 require Exporter;
-our $VERSION = '0.27';
+our $VERSION = '0.28';
 our @EXPORT = qw(parent_op return_op);
 
 
@@ -26,7 +26,7 @@ B::Utils::OP - op related utility functions for perl
 
 =head1 VERSION
 
-version 0.27
+version 0.28
 
 =head1 SYNOPSIS
 

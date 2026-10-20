@@ -191,4 +191,48 @@ subtest 'scroll_to prepares a scroll container that prepares itself' => sub {
 	ok( !$list->is_prepare_pending, 'a move to the current position queues nothing' );
 };
 
+sub scroll_list ($id, @children) {
+	my $list = Clay::UI::Test::ScrollList->new(
+		id     => $id,
+		layout => { layout_direction => CLAY_TOP_TO_BOTTOM, sizing => { width => sizing_fixed(50), height => sizing_fixed(10) } },
+	);
+	$list->add_child(@children);
+	return $list;
+}
+
+sub lines ($count) {
+	return map { Clay::UI::Test::Text->new(text => "line $_") } 1 .. $count;
+}
+
+subtest 'a wheel scroll prepares a scroll container that prepares itself' => sub {
+	my $list = scroll_list(scroll => lines(100));
+	my $ui   = ui_with($list);
+	$ui->render;
+	my $pointer = { x => 5, y => 5 };
+	$ui->render(pointer_state => $pointer);
+	is( $list->prepared, 0, 'pointing at the container prepares nothing' );
+	$ui->render(pointer_state => $pointer, scroll_delta => [ 0, -1 ]);
+	ok( $ui->scroll_state($list)->{position}{y} < 0, 'the wheel moved the container' );
+	is( $list->prepared, 1, 'the same render prepared it' );
+	ok( !$list->is_prepare_pending, 'and left nothing queued' );
+	$ui->render(pointer_state => $pointer);
+	is( $list->prepared, 1, 'a frame without a move prepares nothing' );
+};
+
+subtest 'a nested scroll container that moved prepares only itself' => sub {
+	my $inner = scroll_list(inner => lines(100));
+	my $outer = scroll_list(outer => $inner, lines(20));
+	my $ui    = ui_with($outer);
+	$ui->render;
+	my $pointer = { x => 5, y => 5 };
+	$ui->render(pointer_state => $pointer);
+	$ui->render(pointer_state => $pointer, scroll_delta => [ 0, -1 ]);
+	is(
+		[ map { $ui->scroll_state($_)->{position}{y} < 0 ? 'moved' : 'still' } $inner, $outer ],
+		[ 'moved', 'still' ],
+		'the wheel moved the inner container only'
+	);
+	is( [ $inner->prepared, $outer->prepared ], [ 1, 0 ], 'the inner container was prepared, the outer one was not' );
+};
+
 done_testing;

@@ -17,7 +17,7 @@ statements, and similar high-volume productions.
 - **Main benefits**: one consistent parsing/composition model, a documented
   configuration layer, support for several database engines, and a large
   non-regression suite.
-- **Maturity**: a stable, CPAN-style release (`2.1126`). No module carries an
+- **Maturity**: a stable, CPAN-style release (`2.1129`). No module carries an
   explicit "experimental" label; the runtime environment defaults to `Dev`
   (`EDTK_TYPE_ENV=Dev` in the shipped template). Some modules are legacy and kept
   only for compatibility - see [Limits and constraints](#limits-and-constraints).
@@ -96,7 +96,7 @@ The shortest path to a first run:
    perl -MoEdtk -e 'print oEdtk_release()'
    ```
 
-   Expected output: a banner line `(c) 2005-2026 oedtk@free.fr - oEdtk v2.1126`.
+   Expected output: a banner line `(c) 2005-2026 oedtk@free.fr - oEdtk v2.1129`.
 
 4. **Write a minimal application** (`myapp.pl`) using the fixed-record model
    (see [`lib/oEdtk.pm`](lib/oEdtk.pm) SYNOPSIS):
@@ -166,9 +166,9 @@ Plus, among others: `Archive::Zip`, `Date::Calc`, `Email::Sender::Simple` and
 `Email::Sender::Transport::SMTP`, `JSON`, `JSON::PP`, `Data::UUID`, `File::Slurp`,
 `IPC::Run3`, `LWP::UserAgent` and the `HTTP::*` modules, `IO::Socket::SSL`,
 `Log::Log4perl`, `PDF::Create`, `PDF::Tk`, `Readonly`, `Regexp::Common`,
-`Term::ReadKey`, `Text::CSV_XS`, `Text::QRCode`, `Time::HiRes`, `Try::Tiny`,
-`YAML::Tiny`, and `CGI` + `CGI::FormBuilder` (the CGI front-ends load these at the
-top level, so they are hard requirements). A full install pulls all of them.
+`Term::ReadKey`, `Text::CSV_XS`, `Time::HiRes`, `Try::Tiny`, `YAML::Tiny`, and
+`CGI` + `CGI::FormBuilder` (the CGI front-ends load these at the top level, so they
+are hard requirements). A full install pulls all of them.
 
 ### Database drivers
 
@@ -182,6 +182,18 @@ top level, so they are hard requirements). A full install pulls all of them.
 - **`DBD::Excel`**, **`DBD::MariaDB`** - optional (MariaDB is reached through
   `DBD::mysql`).
 
+Installing the package never requires a database driver beyond `DBD::SQLite`: the
+PostgreSQL and MySQL drivers are recommends, not test requirements, so a plain
+`cpan oEdtk` does not try to build them. The corresponding integration facets skip
+when the driver is absent.
+
+### Optional modules
+
+- **`Text::QRCode`** - *recommended* (declared in `META_MERGE`), needed only by
+  `oEdtk::TexDoc::append_qr_code`. It builds against the native **libqrencode**
+  library; the module is loaded lazily on the first QR code and the call fails
+  with an explicit message when it is absent.
+
 ### External programs (per feature)
 
 - A **LaTeX distribution** providing `pdflatex` / `latex` for PDF/DVI composition
@@ -194,8 +206,9 @@ top level, so they are hard requirements). A full install pulls all of them.
 ### Development and test extras
 
 `Perl::Tidy`, `Perl::Critic`, `Test::Fatal`, `Test::MockModule`, `Test::Fake::HTTPD`,
-`Test::More >= 1.302`, `IPC::Run3`, `DBD::mysql`, `DBD::Pg` (declared in
-`TEST_REQUIRES`).
+`Test::More >= 1.302`, `IPC::Run3` (declared in `TEST_REQUIRES`). The PostgreSQL and
+MySQL integration facets additionally need `DBD::Pg` / `DBD::mysql`; they are
+optional and the facets skip when the driver is absent.
 
 ## Installation
 
@@ -934,7 +947,7 @@ Never weaken a test or a ratchet baseline.
 
 Integration work happens on the `integration/2.1120` branch; post-release steps do not
 bump the version -- a release does, and every module of the package then carries the
-package version (currently **2.1126**). The progress ledger is
+package version (currently **2.1129**). The progress ledger is
 [`docs/integration/STATE.md`](docs/integration/STATE.md).
 
 ### API snapshots

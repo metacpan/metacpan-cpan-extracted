@@ -6,7 +6,7 @@ BEGIN {
 	use Exporter ();
 	use vars     qw($VERSION @ISA @EXPORT @EXPORT_OK);   #backward compatibility for Perls under 5.6
 
-	$VERSION = 2.1126;
+	$VERSION = 2.1129;
 	@ISA     = qw(Exporter);
 	@EXPORT =
 		qw(logger logger_help logger_rc_list *LOGGER_OUT set_warn_to_logger set_logger_level _LEVEL_ _HELP_ _FAIL_ _SUCCESS_ _EXEC_ _WARN_ _INFO_ _FOLLW_ _CONTXT_ _DEBUG_);

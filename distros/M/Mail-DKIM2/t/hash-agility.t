@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 #
-# spec-06 hash agility: sha512 alongside sha256, multi-hash-set h= parsing,
+# -07 hash agility (draft-05 added sha512): sha512 alongside sha256, multi-hash-set h= parsing,
 # and the --hash signer flag (sha256|sha512|both, default sha256).
 
 use 5.020;
@@ -21,11 +21,11 @@ use DKIM2TestKeys;
 # bin/dkim2sign verifies an upstream chain before extending it.
 $ENV{DKIM2_DNS_JSON} = DKIM2TestKeys::dns_json();
 
-# spec-06 §3: both hashing algorithms must be implemented
+# -07 §3: both hashing algorithms must be implemented
 my $algs = Mail::DKIM2::MessageInstance::hash_algs();
-is_deeply([sort keys %$algs], ['sha256', 'sha512'], 'spec-06 §3: both hash algorithms present');
+is_deeply([sort keys %$algs], ['sha256', 'sha512'], '-07 §3: both hash algorithms present');
 
-# spec-06 §7.3: h= is a comma-separated list of hash-sets
+# -07 §9.3: h= is a comma-separated list of hash-sets
 my $sets = Mail::DKIM2::MessageInstance::parse_hash_sets('sha256:AAA:BBB,sha512:CCC:DDD');
 is(scalar @$sets, 2, 'two hash-sets parsed');
 is_deeply($sets->[0], ['sha256', 'AAA', 'BBB'], 'first hash-set');
@@ -91,32 +91,6 @@ is($folded_mid->[0][2], 'BBB', 'FWS stripped from the middle of a body hash');
     ok(!$ok2, 'MI naming only an unimplemented algorithm fails');
     like($err2, qr/no supported hash algorithm/,
         'MI naming only an unimplemented algorithm fails CLOSED, distinct from the sha512-only case');
-}
-
-# §3.4/§7.3 (Verifier.pm donotmodify enforcement): the guard used there --
-# "does either instance name an algorithm we implement, in common?" -- must
-# correctly identify when two instances share NO implemented hash algorithm
-# (fail-closed case) versus when they do (normal comparison case).
-{
-    my $sets1 = Mail::DKIM2::Verifier::_extract_mi_hash_sets(
-        'Message-Instance: m=1; h=unknownalg:AAAA:BBBB;');
-    my $sets2 = Mail::DKIM2::Verifier::_extract_mi_hash_sets(
-        'Message-Instance: m=2; h=unknownalg:AAAA:CCCC;');
-    is_deeply($sets1, [['unknownalg', 'AAAA', 'BBBB']],
-        '_extract_mi_hash_sets parses an unimplemented algorithm too (not silently dropped)');
-
-    my $impl = Mail::DKIM2::MessageInstance::hash_algs();
-    my %by_alg1 = map { $_->[0] => $_ } @$sets1;
-    my %by_alg2 = map { $_->[0] => $_ } @$sets2;
-    my @common = grep { $by_alg1{$_} && $by_alg2{$_} && $impl->{$_} } keys %by_alg1;
-    is(scalar @common, 0,
-        'two MIs sharing only an unimplemented algorithm have no common implemented algorithm (fail-closed trigger)');
-
-    my $sets3 = Mail::DKIM2::MessageInstance::parse_hash_sets('sha256:AAAA:BBBB,unknownalg:XXXX:YYYY');
-    my %by_alg3 = map { $_->[0] => $_ } @$sets3;
-    my @common2 = grep { $by_alg1{$_} && $by_alg3{$_} && $impl->{$_} } keys %by_alg3;
-    is(scalar @common2, 0,
-        'sha256 present in only one of the two instances is still not a common algorithm');
 }
 
 # --- CLI: bin/dkim2sign --hash ------------------------------------------
@@ -225,7 +199,7 @@ sub _unfolded_mi {
 # and must not crash when re-signed unmodified at a second hop.
 my $keyfile2 = 't/data/keys/sel1._domainkey.test2.dkim2.com.pem';
 unless (-e $keyfile2) {
-    ok(1, 't/data/keys/...test2... not available -- sha512/donotmodify e2e checks skipped');
+    ok(1, 't/data/keys/...test2... not available -- sha512 e2e checks skipped');
     done_testing();
     exit 0;
 }
@@ -287,22 +261,20 @@ my $hop1_512;
         or diag $v->result_detail;
 }
 
-# Minor gap the reviewer also flagged: the REAL donotmodify path (through
-# Mail::DKIM2::Verifier, not a white-box internal call), with both
-# algorithms present and only ONE of them mismatching. This is exactly the
-# attack donotmodify exists to catch: a hop copies the old sha256 hash-set
-# forward unchanged (so an sha256-only verifier sees "no change") while the
-# body genuinely changed, so the true sha512 hash-set differs. The check
-# must not stop at the first (matching) algorithm.
+# Both algorithms present and only ONE of them true: a hop copies the old
+# sha256 hash-set forward unchanged (so an sha256-only verifier would see
+# "no change") while the body genuinely changed, and only the sha512
+# hash-set is the real one. Every hash-set is checked against the content,
+# so the copied sha256 one fails. (This was the donotmodify test; -07
+# removed that flag.)
 {
     my ($hop1, $rc1) = sign($src,
         '-s' => 'sel1', '-d' => 'test1.dkim2.com', '-k' => $keyfile,
         '--mailfrom' => '<sender@test1.dkim2.com>',
         '--rcptto'   => '<rcpt@test2.dkim2.com>',
         '--timestamp' => 1740000000,
-        '--hash'     => 'both',
-        '--flag'     => 'donotmodify');
-    is($rc1, 0, 'donotmodify hop1 (both hashes) signs ok');
+        '--hash'     => 'both');
+    is($rc1, 0, 'hop1 (both hashes) signs ok');
 
     my ($mi1_raw) = Email::MIME->new($hop1)->header_raw('Message-Instance');
     my $mi1 = Mail::DKIM2::MessageInstance->parse($mi1_raw);
@@ -347,10 +319,10 @@ my $hop1_512;
     $v->PRINT($msg2->as_string);
     $v->CLOSE;
     is($v->result, 'fail',
-        'donotmodify: sha256 tampered to match m=1 but sha512 genuinely differs -> still fails')
+        'sha256 copied from m=1 but sha512 genuinely differs -> fails')
         or diag $v->result_detail;
-    like($v->result_detail, qr/donotmodify/i,
-        'failure is attributed to the donotmodify enforcement, not something else');
+    like($v->details, qr/^FAIL: Message-Instance m=2 (?:header|body) hash sha256 mismatch$/,
+        'the failure names the copied sha256 hash-set');
 }
 
 done_testing();

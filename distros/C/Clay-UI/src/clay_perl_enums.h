@@ -3,7 +3,8 @@
  *
  * CLAY_PERL_ENUM_<Group>(X) applies X to each member of one Clay enum, in
  * the order clay.h declares them. CLAY_PERL_ENUMS(SEQUENCE, FLAGS) names
- * every group, in export order, with its kind:
+ * every group, in export order, with its kind and the C type of its enum
+ * (SEQUENCE(Group, Type) or FLAGS(Group, Type)):
  *
  *   SEQUENCE  The members are 0 .. N-1 in declaration order (checked at
  *             compile time below), so the last member is the largest
@@ -13,12 +14,14 @@
  *             CLAY_PERL_FLAGS_ALL(Group) is every member OR-ed together,
  *             the largest valid combination.
  *
- * Derived from these lists: the constant subs BOOT installs and the names
+ * Derived from these lists: the constant subs BOOT installs, the names
  * Clay::XS::_constant_names returns (lib/Clay/XS.xs, and from those
- * @EXPORT_OK), and the enum ranges of the struct schemas
- * (src/marshal.c). A new constant goes into its group's list here and
- * gets a POD entry in lib/Clay/XS.pm; a new group also goes into
- * CLAY_PERL_ENUMS.
+ * @EXPORT_OK), the groups Clay::XS::_constant_groups returns, and the
+ * enum ranges of the struct schemas (src/marshal.c). t/00-load.t compares
+ * every group with its enum in the patched clay.h, so a member Clay adds
+ * fails the tests until it is listed. A new constant goes into its
+ * group's list here and gets a POD entry in lib/Clay/XS.pm; a new group
+ * also goes into CLAY_PERL_ENUMS.
  */
 
 #ifndef CLAY_PERL_ENUMS_H
@@ -109,37 +112,41 @@
     X(CLAY_ERROR_TYPE_SIZING_GROUP_CYCLE)
 
 #define CLAY_PERL_ENUMS(SEQUENCE, FLAGS) \
-    SEQUENCE(LayoutDirection) \
-    SEQUENCE(LineSizing) \
-    SEQUENCE(LayoutAlignmentX) \
-    SEQUENCE(LayoutAlignmentY) \
-    SEQUENCE(SizingType) \
-    SEQUENCE(TextWrapMode) \
-    SEQUENCE(TextAlignment) \
-    SEQUENCE(FloatingAttachPointType) \
-    SEQUENCE(PointerCaptureMode) \
-    SEQUENCE(FloatingAttachToElement) \
-    SEQUENCE(FloatingClipToElement) \
-    SEQUENCE(RenderCommandType) \
-    SEQUENCE(PointerDataInteractionState) \
-    SEQUENCE(TransitionState) \
-    FLAGS(TransitionProperty) \
-    SEQUENCE(TransitionEnterTriggerType) \
-    SEQUENCE(TransitionExitTriggerType) \
-    SEQUENCE(TransitionInteractionHandlingType) \
-    SEQUENCE(ExitTransitionSiblingOrdering) \
-    SEQUENCE(ErrorType)
+    SEQUENCE(LayoutDirection, Clay_LayoutDirection) \
+    SEQUENCE(LineSizing, Clay_LineSizing) \
+    SEQUENCE(LayoutAlignmentX, Clay_LayoutAlignmentX) \
+    SEQUENCE(LayoutAlignmentY, Clay_LayoutAlignmentY) \
+    SEQUENCE(SizingType, Clay__SizingType) \
+    SEQUENCE(TextWrapMode, Clay_TextElementConfigWrapMode) \
+    SEQUENCE(TextAlignment, Clay_TextAlignment) \
+    SEQUENCE(FloatingAttachPointType, Clay_FloatingAttachPointType) \
+    SEQUENCE(PointerCaptureMode, Clay_PointerCaptureMode) \
+    SEQUENCE(FloatingAttachToElement, Clay_FloatingAttachToElement) \
+    SEQUENCE(FloatingClipToElement, Clay_FloatingClipToElement) \
+    SEQUENCE(RenderCommandType, Clay_RenderCommandType) \
+    SEQUENCE(PointerDataInteractionState, Clay_PointerDataInteractionState) \
+    SEQUENCE(TransitionState, Clay_TransitionState) \
+    FLAGS(TransitionProperty, Clay_TransitionProperty) \
+    SEQUENCE(TransitionEnterTriggerType, Clay_TransitionEnterTriggerType) \
+    SEQUENCE(TransitionExitTriggerType, Clay_TransitionExitTriggerType) \
+    SEQUENCE(TransitionInteractionHandlingType, Clay_TransitionInteractionHandlingType) \
+    SEQUENCE(ExitTransitionSiblingOrdering, Clay_ExitTransitionSiblingOrdering) \
+    SEQUENCE(ErrorType, Clay_ErrorType)
 
 /* ---------------------------------------------------------------------------
  * Derived values.
  * ------------------------------------------------------------------------ */
 
-#define CLAY_PERL_IGNORE_GROUP(group)
+#define CLAY_PERL_IGNORE_GROUP(group, type)
+
+/* Compile-time check that every group names an existing C type. */
+#define CLAY_PERL_CHECK_TYPE(group, type) typedef type clay_perl_type_of_##group;
+CLAY_PERL_ENUMS(CLAY_PERL_CHECK_TYPE, CLAY_PERL_CHECK_TYPE)
 
 /* The position of every member of a sequential group, and the group's
  * member count: CLAY_PERL_POSITION_OF_<member>, CLAY_PERL_COUNT_OF_<group>. */
 #define CLAY_PERL_POSITION(member) CLAY_PERL_POSITION_OF_##member,
-#define CLAY_PERL_DECLARE_POSITIONS(group) \
+#define CLAY_PERL_DECLARE_POSITIONS(group, type) \
     enum { CLAY_PERL_ENUM_##group(CLAY_PERL_POSITION) CLAY_PERL_COUNT_OF_##group };
 CLAY_PERL_ENUMS(CLAY_PERL_DECLARE_POSITIONS, CLAY_PERL_IGNORE_GROUP)
 
@@ -149,7 +156,7 @@ CLAY_PERL_ENUMS(CLAY_PERL_DECLARE_POSITIONS, CLAY_PERL_IGNORE_GROUP)
 #define CLAY_PERL_CHECK_POSITION(member) \
     typedef char clay_perl_##member##_is_at_its_position \
         [(int) (member) == (int) CLAY_PERL_POSITION_OF_##member ? 1 : -1];
-#define CLAY_PERL_CHECK_POSITIONS(group) CLAY_PERL_ENUM_##group(CLAY_PERL_CHECK_POSITION)
+#define CLAY_PERL_CHECK_POSITIONS(group, type) CLAY_PERL_ENUM_##group(CLAY_PERL_CHECK_POSITION)
 CLAY_PERL_ENUMS(CLAY_PERL_CHECK_POSITIONS, CLAY_PERL_IGNORE_GROUP)
 
 /* The last member of a sequential group: the largest valid value. */

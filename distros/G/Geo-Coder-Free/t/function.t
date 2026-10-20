@@ -31,7 +31,7 @@ BEGIN {
 	use_ok('Geo::Coder::Free')            or BAIL_OUT('Geo::Coder::Free failed to load');
 	use_ok('Geo::Coder::Free::Local')     or BAIL_OUT('Geo::Coder::Free::Local failed to load');
 	use_ok('Geo::Coder::Free::Utils')     or BAIL_OUT('Geo::Coder::Free::Utils failed to load');
-	use_ok('Geo::Coder::Free::Validate')  or BAIL_OUT('Geo::Coder::Free::Validate failed to load');
+	use_ok('Geo::Location::Predicate')  or BAIL_OUT('Geo::Location::Predicate failed to load');
 	use_ok('Geo::Coder::Abbreviations');
 	use_ok('Geo::Location::Point');
 }
@@ -42,7 +42,7 @@ BEGIN {
 Readonly::Scalar my $PKG_FREE     => 'Geo::Coder::Free';
 Readonly::Scalar my $PKG_LOCAL    => 'Geo::Coder::Free::Local';
 Readonly::Scalar my $PKG_UTILS    => 'Geo::Coder::Free::Utils';
-Readonly::Scalar my $PKG_VALIDATE => 'Geo::Coder::Free::Validate';
+Readonly::Scalar my $PKG_VALIDATE => 'Geo::Location::Predicate';
 
 # Coordinates for NYC and LA used across Utils::distance tests
 Readonly::Scalar my $NYC_LAT => 40.7128;
@@ -694,7 +694,7 @@ subtest 'Utils::create_memory_cache: returns a usable CHI object' => sub {
 };
 
 # =====================================================================
-# SECTION 5: Geo::Coder::Free::Validate — the one definition of the rule
+# SECTION 5: Geo::Location::Predicate — the one definition of the rule
 # =====================================================================
 
 # The rule the facade applies before it queries a backend, and the backends apply
@@ -704,7 +704,7 @@ subtest 'Utils::create_memory_cache: returns a usable CHI object' => sub {
 # matter as much as the first: '3.14' and '-' are not addresses, but they are not
 # a numeric column either, and the guard has never rejected them.
 subtest "$PKG_VALIDATE\::_valid_location: the rule, by equivalence class" => sub {
-	use Geo::Coder::Free::Validate qw(_valid_location);
+	use Geo::Location::Predicate qw(_valid_location);
 
 	# The candidates are held as strings so that a case cannot be confused with
 	# the assertion it feeds: '0' and 0 are different questions.

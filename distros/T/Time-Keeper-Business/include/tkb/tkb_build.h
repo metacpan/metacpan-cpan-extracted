@@ -13,8 +13,13 @@
  * for each year (tkb_sources.h). */
 
 static void tkb_hours_parse(pTHX_ tkb_schedule *s, HV *spec, const char *what);
+struct tkb_rule;
+static struct tkb_rule *tkb_rule_magic(pTHX_ SV *sv);
+static int tkb_rule_sv_has_code(pTHX_ SV *rule);
+static SV *tkb_rule_spec_sv(pTHX_ SV *rule, const char *what);
+static SV *tkb_rule_from_spec(pTHX_ SV *class, SV *spec, const char *what, int depth);
 
-static const char *const tkb_spec_keys[] = { "weekend", "holidays", "working", "hours", "zone", "name", NULL };
+static const char *const tkb_spec_keys[] = { "weekend", "holidays", "rules", "working", "hours", "zone", "name", "reckon", NULL };
 
 static void
 tkb_spec_set(pTHX_ HV *spec, SV **args, I32 n, const char *what)
@@ -133,7 +138,8 @@ tkb_day_from_sv(pTHX_ SV *sv, const char *what)
     const char *why;
     if (sv && sv_isobject(sv) && sv_derived_from(sv, "Time::Keeper::Date")) {
         int64_t day;
-        if (!tkb_sv_to_i64(aTHX_ tkb_call(aTHX_ sv, "epoch_days", NULL, 0), &day))
+        int lid;
+        if (!tkb_date_day(aTHX_ sv, &day, &lid))
             croak("%s: the date's day count could not be read", what);
         return day;
     }
@@ -172,11 +178,91 @@ tkb_add_yearly(pTHX_ tkb_schedule *s, unsigned m, unsigned d, SV *name, const ch
 }
 
 static void
-tkb_add_generator(pTHX_ tkb_schedule *s, SV *src)
+tkb_add_generator(pTHX_ tkb_schedule *s, SV *src, AV *args)
 {
-    if (!s->gens)
+    if (!s->gens) {
         s->gens = newAV();
+        s->gen_args = newAV();
+    }
     av_push(s->gens, newSVsv(src));
+    av_push(s->gen_args, args ? newRV_noinc((SV *)args) : newSV(0));
+}
+
+/* A copy of an argument: an unblessed array or hash one level deep, so a
+ * caller who changes theirs later changes nothing here. */
+static SV *
+tkb_arg_copy(pTHX_ SV *v)
+{
+    if (v && SvROK(v) && !sv_isobject(v) && SvTYPE(SvRV(v)) == SVt_PVAV) {
+        AV *from = (AV *)SvRV(v), *to = newAV();
+        SSize_t i, n = av_len(from) + 1;
+        for (i = 0; i < n; i++) {
+            SV **e = av_fetch(from, i, 0);
+            av_push(to, e ? newSVsv(*e) : newSV(0));
+        }
+        return newRV_noinc((SV *)to);
+    }
+    if (v && SvROK(v) && !sv_isobject(v) && SvTYPE(SvRV(v)) == SVt_PVHV) {
+        HV *from = (HV *)SvRV(v), *to = newHV();
+        HE *he;
+        hv_iterinit(from);
+        while ((he = hv_iternext(from)))
+            (void)hv_store_ent(to, hv_iterkeysv(he), newSVsv(hv_iterval(from, he)), 0);
+        return newRV_noinc((SV *)to);
+    }
+    return newSVsv(v);
+}
+
+static int
+tkb_key_cmp(const void *a, const void *b)
+{
+    return strcmp(*(const char *const *)a, *(const char *const *)b);
+}
+
+/* A source with arguments: { source => $obj, %args }, the arguments in key
+ * order so a source is asked the same way every time. */
+static void
+tkb_add_source_with_args(pTHX_ tkb_schedule *s, HV *hv, const char *what)
+{
+    SV **src = hv_fetchs(hv, "source", 0);
+    I32 n = (I32)HvUSEDKEYS(hv) - 1, i = 0, k;
+    const char **keys;
+    AV *args;
+    HE *he;
+    SV *buf;
+    if (!src || !SvOK(*src))
+        croak("%s: a source with arguments needs its source", what);
+    if (tkb_rule_magic(aTHX_ *src)) {
+        if (n)
+            croak("%s: a rule as a source takes no arguments", what);
+        tkb_add_generator(aTHX_ s, *src, NULL);
+        return;
+    }
+    if (!(SvROK(*src) && !sv_isobject(*src) && SvTYPE(SvRV(*src)) == SVt_PVCV) && !tkb_has_method(aTHX_ *src, "holidays"))
+        croak("%s: a source with arguments is a code ref or an object with a holidays method", what);
+    buf = sv_2mortal(newSV((STRLEN)(n + 1) * sizeof(char *)));
+    keys = (const char **)SvPVX(buf);
+    hv_iterinit(hv);
+    while ((he = hv_iternext(hv))) {
+        STRLEN klen;
+        const char *key = HePV(he, klen);
+        unsigned m, d;
+        int64_t day;
+        if (klen == 6 && memEQ(key, "source", 6))
+            continue;
+        if (tkb_yearly_string(key, klen, &m, &d) || tkb_iso_date(key, klen, &day))
+            croak("%s: a hash with a source holds the source's arguments, not the date '%s'", what, key);
+        keys[i++] = key;
+    }
+    qsort(keys, (size_t)n, sizeof(char *), tkb_key_cmp);
+    args = newAV();
+    sv_2mortal((SV *)args);
+    for (k = 0; k < n; k++) {
+        SV **v = hv_fetch(hv, keys[k], (I32)strlen(keys[k]), 0);
+        av_push(args, newSVpv(keys[k], 0));
+        av_push(args, tkb_arg_copy(aTHX_ v ? *v : NULL));
+    }
+    tkb_add_generator(aTHX_ s, *src, (AV *)SvREFCNT_inc_simple_NN((SV *)args));
 }
 
 /* The month and day of a MonthDay object, through its accessors. */
@@ -228,7 +314,7 @@ tkb_add_holiday_source(pTHX_ tkb_schedule *s, SV *src, const char *what, int dep
             return;
         }
         if (tkb_has_method(aTHX_ src, "holidays")) {
-            tkb_add_generator(aTHX_ s, src);
+            tkb_add_generator(aTHX_ s, src, NULL);
             return;
         }
         croak("%s: an object with no holidays method is not a holiday source", what);
@@ -249,6 +335,10 @@ tkb_add_holiday_source(pTHX_ tkb_schedule *s, SV *src, const char *what, int dep
             HE *he;
             unsigned m, d;
             SV *name;
+            if (hv_exists(hv, "source", 6)) {
+                tkb_add_source_with_args(aTHX_ s, hv, what);
+                return;
+            }
             if (tkb_month_day_hash(aTHX_ hv, &m, &d, &name)) {
                 tkb_add_yearly(aTHX_ s, m, d, name, what);
                 return;
@@ -268,7 +358,7 @@ tkb_add_holiday_source(pTHX_ tkb_schedule *s, SV *src, const char *what, int dep
             return;
         }
         if (SvTYPE(inner) == SVt_PVCV) {
-            tkb_add_generator(aTHX_ s, src);
+            tkb_add_generator(aTHX_ s, src, NULL);
             return;
         }
         croak("%s: a holiday source is a date, a name map, a code ref, an object with a holidays method or a list of them, not a reference of that kind", what);
@@ -316,10 +406,21 @@ tkb_weekend_from_spec(pTHX_ tkb_schedule *s, HV *spec, const char *what)
         return;
     }
     if (!SvROK(sv)) {
-        SV *cls = sv_2mortal(newSVpvs("Time::Keeper::Locale"));
-        int ws = tkb_weekday_of_sv(aTHX_ tkb_call(aTHX_ cls, "weekend_start", &sv, 1), what);
-        int we = tkb_weekday_of_sv(aTHX_ tkb_call(aTHX_ cls, "weekend_end", &sv, 1), what);
-        int d;
+        int ws = 0, we = 0, d;
+#if TKB_HAVE_V3
+        if (TKB_V3) {
+            STRLEN len;
+            const char *code = SvPV(sv, len);
+            int id = TKB(locale_find)(code, len);
+            if (id < 0 || TKB(locale_weekend)(aTHX_ id, &ws, &we, NULL, 0) != TIME_KEEPER_OK)
+                ws = 0;
+        }
+#endif
+        if (!ws) {
+            SV *cls = sv_2mortal(newSVpvs("Time::Keeper::Locale"));
+            ws = tkb_weekday_of_sv(aTHX_ tkb_call(aTHX_ cls, "weekend_start", &sv, 1), what);
+            we = tkb_weekday_of_sv(aTHX_ tkb_call(aTHX_ cls, "weekend_end", &sv, 1), what);
+        }
         if (ws <= we)
             for (d = ws; d <= we; d++) s->weekend |= TKB_WEEKEND_BIT(d);
         else {
@@ -349,6 +450,21 @@ tkb_build_into(pTHX_ tkb_schedule *s, HV *spec, const char *what)
         for (j = 0; j < n; j++) {
             SV **e = av_fetch(av, j, 0);
             tkb_add_holiday_source(aTHX_ s, e ? *e : NULL, what, 0);
+        }
+    }
+
+    if ((p = hv_fetchs(spec, "rules", 0)) && SvOK(*p)) {
+        AV *av = tkb_list_of(aTHX_ *p);
+        SSize_t j, n = av_len(av) + 1;
+        SV *cls = sv_2mortal(newSVpvs("Time::Keeper::Business::Rule"));
+        for (j = 0; j < n; j++) {
+            SV **e = av_fetch(av, j, 0);
+            if (e && tkb_rule_magic(aTHX_ *e))
+                tkb_add_generator(aTHX_ s, *e, NULL);
+            else if (e && SvROK(*e) && SvTYPE(SvRV(*e)) == SVt_PVHV && !sv_isobject(*e))
+                tkb_add_generator(aTHX_ s, tkb_rule_from_spec(aTHX_ cls, *e, what, 0), NULL);
+            else
+                croak("%s: rules is a list of rules, or of rules as data", what);
         }
     }
 
@@ -413,8 +529,24 @@ tkb_stash_of(pTHX_ SV *invocant)
 static void
 tkb_freezable(pTHX_ const tkb_schedule *s, const char *what)
 {
-    if (s->gens)
-        croak("%s: cannot freeze a schedule with a source asked year by year; list its holidays", what);
+    size_t r;
+    if (s->join_hours)
+        croak("%s: cannot freeze a join with hours; freeze its parts and join them again", what);
+    for (r = 0; r < s->hours.n_rules; r++)
+        if (tkb_rule_sv_has_code(aTHX_ s->hours.rule_svs[r]))
+            croak("%s: cannot freeze a schedule whose hours rules hold a code ref", what);
+    if (s->gens) {
+        SSize_t g, n = av_len(s->gens) + 1;
+        for (g = 0; g < n; g++) {
+            SV **gen = av_fetch(s->gens, g, 0);
+            SV **a = s->gen_args ? av_fetch(s->gen_args, g, 0) : NULL;
+            if (!gen || !tkb_rule_magic(aTHX_ *gen) || (a && SvOK(*a)))
+                croak("%s: cannot freeze a schedule with a code ref or an object among its holiday sources; list its holidays", what);
+            if (tkb_rule_sv_has_code(aTHX_ *gen))
+                croak("%s: cannot freeze a schedule whose rules hold a code ref; list its holidays", what);
+        }
+    }
+
     if (s->join_a) {
         const tkb_schedule *a = tkb_schedule_of(aTHX_ s->join_a, what), *b = tkb_schedule_of(aTHX_ s->join_b, what);
         if (a->lazy || b->lazy)
@@ -454,12 +586,48 @@ tkb_plain(pTHX_ const tkb_schedule *s, HV *spec)
     (void)hv_stores(out, "weekend", newRV_noinc((SV *)weekend));
     (void)hv_stores(out, "holidays", newRV_noinc((SV *)holidays));
     (void)hv_stores(out, "working", newRV_noinc((SV *)working));
+    if (s->gens) {
+        AV *rules = newAV();
+        SSize_t g, n = av_len(s->gens) + 1;
+        for (g = 0; g < n; g++) {
+            SV **gen = av_fetch(s->gens, g, 0);
+            if (gen && tkb_rule_magic(aTHX_ *gen))
+                av_push(rules, tkb_rule_spec_sv(aTHX_ *gen, "Time::Keeper::Business->TO_JSON"));
+        }
+        (void)hv_stores(out, "rules", newRV_noinc((SV *)rules));
+    }
     if ((p = hv_fetchs(spec, "zone", 0)) && SvOK(*p))
         (void)hv_stores(out, "zone", newSVsv(*p));
     if ((p = hv_fetchs(spec, "name", 0)) && SvOK(*p))
         (void)hv_stores(out, "name", newSVsv(*p));
-    if ((p = hv_fetchs(spec, "hours", 0)) && SvOK(*p))
-        (void)hv_stores(out, "hours", newSVsv(*p));
+    if ((p = hv_fetchs(spec, "reckon", 0)) && SvOK(*p))
+        (void)hv_stores(out, "reckon", newSVsv(*p));
+    if ((p = hv_fetchs(spec, "hours", 0)) && SvOK(*p)) {
+        SV *h = *p;
+        SV **br;
+        if (SvROK(h) && SvTYPE(SvRV(h)) == SVt_PVHV && (br = hv_fetchs((HV *)SvRV(h), "by_rule", 0)) && SvROK(*br) && SvTYPE(SvRV(*br)) == SVt_PVAV) {
+            HV *copy = newHV();
+            HE *he;
+            AV *pairs = newAV(), *from = (AV *)SvRV(*br);
+            SSize_t i, n = av_len(from) + 1;
+            hv_iterinit((HV *)SvRV(h));
+            while ((he = hv_iternext((HV *)SvRV(h))))
+                (void)hv_store_ent(copy, hv_iterkeysv(he), newSVsv(hv_iterval((HV *)SvRV(h), he)), 0);
+            for (i = 0; i < n; i++) {
+                SV **e = av_fetch(from, i, 0);
+                AV *pair = newAV();
+                SV **rule = e && SvROK(*e) ? av_fetch((AV *)SvRV(*e), 0, 0) : NULL;
+                SV **spans = e && SvROK(*e) ? av_fetch((AV *)SvRV(*e), 1, 0) : NULL;
+                av_push(pair, rule && tkb_rule_magic(aTHX_ *rule) ? tkb_rule_spec_sv(aTHX_ *rule, "Time::Keeper::Business->TO_JSON") : newSVsv(rule ? *rule : &PL_sv_undef));
+                av_push(pair, newSVsv(spans ? *spans : &PL_sv_undef));
+                av_push(pairs, newRV_noinc((SV *)pair));
+            }
+            (void)hv_stores(copy, "by_rule", newRV_noinc((SV *)pairs));
+            (void)hv_stores(out, "hours", newRV_noinc((SV *)copy));
+        }
+        else
+            (void)hv_stores(out, "hours", newSVsv(h));
+    }
     return out;
 }
 

@@ -16,7 +16,7 @@ WriteMakefile(
         'Module::CoreList' => 0,
     },
     TEST_REQUIRES    => {
-        'Test::More' => 0,
+        'Test::More' => '0.88',
     },
     META_MERGE       => {
         resources => {

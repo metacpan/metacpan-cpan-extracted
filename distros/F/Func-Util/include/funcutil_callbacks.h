@@ -1,5 +1,5 @@
 /*
- * util_callbacks.h - Public API for XS modules to register loop callbacks
+ * funcutil_callbacks.h - Public API for XS modules to register loop callbacks
  *
  * Include this header in your XS module to register C-level predicates,
  * mappers, or reducers that Func::Util's loop functions can call directly
@@ -7,7 +7,7 @@
  *
  * Example usage in your XS BOOT section:
  *
- *   #include "util_callbacks.h"
+ *   #include "funcutil_callbacks.h"
  *
  *   static bool my_is_valid(pTHX_ SV *elem) {
  *       // your validation logic
@@ -20,7 +20,7 @@
  * Then in Perl:
  *   use MyModule;  # registers callback in BOOT
  *   use util;
- *   my @valid = util::grep_cb(\@items, 'MyModule::is_valid');
+ *   my @valid = Func::Util::grep_cb(\@items, 'MyModule::is_valid');
  */
 
 #ifndef FUNCUTIL_CALLBACKS_H

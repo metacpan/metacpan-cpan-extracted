@@ -25,6 +25,8 @@ subtest 'a command' => sub {
 
 	my $plain = Term::Fabulous::Command->new( id => 'about', label => 'About' );
 	is [ $plain->is_enabled, $plain->is_toggle, $plain->is_checked, $plain->keys_text, $plain->run ], [ 1, 0, 0, '', 1 ], 'without the optional parts';
+	is [ map { Term::Fabulous::Command->new( id => 'x', label => $_ )->plain_label } 'Save as...', 'Wait...for it', 'About' ], [ 'Save as', 'Wait...for it', 'About' ],
+		'plain_label drops a trailing ... only';
 
 	like dies { Term::Fabulous::Command->new( id => 'x', label => 'X', keys => ['Ctrl+Shft+S'] ) }, qr/the command 'x' has a key that does not exist: .*no key is named 'Ctrl\+Shft\+S'/,
 		'a key that does not exist dies';

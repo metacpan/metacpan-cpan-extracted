@@ -5,7 +5,7 @@ use warnings;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 use Object::Pad 0.825;
 
@@ -179,14 +179,14 @@ role Term::Fabulous::Role::Themed {
 		my $generation = Term::Fabulous::Theme::generation();
 		return $_look_table if $_look_generation == $generation;
 
-		$_look_table      = $self->_theme->look_table( ref($self)->theme_family, $self->classes );
+		$_look_table      = $self->drawing_theme->look_table( ref($self)->theme_family, $self->classes );
 		$_look_generation = $generation;
 		return $_look_table;
 	}
 
 	# The theme the UI the widget is in gives it, or the default one
 	# outside a UI.
-	method _theme () {
+	method drawing_theme () {
 		my $ui = $self->ui;
 		return $ui->theme_for($self) if defined $ui && $ui->can('theme_for');
 		return defined $ui && $ui->can('theme') ? $ui->theme : Term::Fabulous::Theme->default;
@@ -237,8 +237,7 @@ role Term::Fabulous::Role::Themed {
 	# A node and every themed widget below it forget their looks; the walk
 	# goes on below nodes that are not themed (the rows of a grid).
 	sub forget_tree_looks ($node) {
-		my @below = $node->can('descendants') ? $node->descendants : ();
-		$_->_forget_own_looks foreach grep { $_->DOES(__PACKAGE__) } $node, @below;
+		$_->_forget_own_looks foreach grep { $_->DOES(__PACKAGE__) } $node->subtree;
 		return;
 	}
 
@@ -250,7 +249,7 @@ role Term::Fabulous::Role::Themed {
 	}
 
 	method family_look ( $family, $slot, $state = 'normal' ) {
-		return $self->_theme->look( $family, $slot, $state );
+		return $self->drawing_theme->look( $family, $slot, $state );
 	}
 
 	# The value a slot has in a state, given what it has in the normal
@@ -577,6 +576,22 @@ The theme's value of a slot of the widget's family in a state
 L<Term::Fabulous::Enum::BorderStyle> item, C<'reverse'> or C<undef>
 for none, 1 or 0 for a boolean slot (C<border.enabled>). A state the
 theme gives no value of its own looks like the normal state.
+
+=head2 drawing_theme
+
+	my $theme = $self->drawing_theme;
+
+The L<Term::Fabulous::Theme> the widget draws with: the one its UI gives
+it (L<Term::Fabulous::Render/theme_for>, which a UI may answer per
+subtree), the UI's C<theme> for a UI without C<theme_for>, or the
+default theme (L<Term::Fabulous::Theme/default>) while the widget is in
+no UI or in a UI that has no theme (a plain L<Clay::UI>). L</look>,
+L</family_look> and L</look_value> read it; a widget that resolves
+styles or palette tokens itself (L<Term::Fabulous::Text::Style>) or
+builds a L<Term::Fabulous::Document::Look> asks it too, so that every
+part of the widget draws in one theme. A widget of your own asks it
+instead of C<< $ui->theme >>; see
+L<Term::Fabulous::Manual::CustomWidgets/Colors from the theme>.
 
 =head2 family_look
 

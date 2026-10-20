@@ -12,8 +12,8 @@
 #
 # A sync copies the master's file over ours and edits the namespace on the way
 # in, so anything we add to one of them is lost the next time it runs.  Local
-# code belongs in a module of its own: Provenance.pm and Validate.pm exist for
-# exactly that reason, and the note at the top of Provenance.pm says so.
+# code belongs in a module of its own: Provenance.pm exists for exactly that
+# reason, and the note at the top of it says so.
 #
 # This test diffs the master's file against ours and fails for every block of
 # lines ours has that the master's has not.  A block rather than a line, so that

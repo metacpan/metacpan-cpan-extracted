@@ -2,7 +2,10 @@ use 5.010;
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
+use ExtUtils::Depends;
 use Config;
+
+mkdir 'Install' unless -d 'Install';
 
 # Platform-specific linker flags for symbol export.
 # Other XS modules can use funcutil_callbacks.h to register C-level callbacks.
@@ -17,6 +20,17 @@ elsif ($^O eq 'MSWin32' || $^O eq 'cygwin' || $^O eq 'msys') {
     $platform_args{LDDLFLAGS} = ($Config{lddlflags} || '') . ' -Wl,--export-all-symbols';
 }
 
+# Install the public headers and an ExtUtils::Depends configuration, so a
+# dependent XS distribution finds them with
+# ExtUtils::Depends->new('My::Module', 'Func::Util').
+my $pkg = ExtUtils::Depends->new('Func::Util');
+$pkg->set_inc('-I. -Iinclude');
+$pkg->install('include/funcutil_callbacks.h', 'include/funcutil_export.h');
+$pkg->save_config('Install/Files.pm');
+my %dep_vars = $pkg->get_makefile_vars;
+# Depends sets PM for the headers: the module itself must be listed too
+$dep_vars{PM}{'lib/Func/Util.pm'} = '$(INST_LIB)/Func/Util.pm';
+
 my %WriteMakefileArgs = (
     NAME             => 'Func::Util',
     AUTHOR           => ['LNATION <email@lnation.org>'],
@@ -27,6 +41,7 @@ my %WriteMakefileArgs = (
     macro => { TARFLAGS   => "--format=ustar -c -v -f" },
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '0',
+        'ExtUtils::Depends'   => '0',
     },
     TEST_REQUIRES => {
         'Test::More' => '0',
@@ -37,8 +52,9 @@ my %WriteMakefileArgs = (
     XS           => {},
     INC          => '-Iinclude',
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
-    clean => { FILES => 'Func-Util-*' },
+    clean => { FILES => 'Func-Util-* Install' },
     %platform_args,
+    %dep_vars,
 );
 
 # Compatibility with old versions of ExtUtils::MakeMaker

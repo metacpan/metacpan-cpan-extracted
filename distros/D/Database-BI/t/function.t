@@ -2956,17 +2956,21 @@ subtest 'combo_view -- missing cat= returns 400' => sub {
 };
 
 subtest 'combo_view -- missing bar= returns 400' => sub {
-	$t->get_ok("/combo?l=$SALES_SPEC&cat=region&line=amount")
+	# bar_val= is the canonical name; bar= is accepted as a legacy alias.
+	# Omitting both -> 400 "Missing bar_val= parameter".
+	$t->get_ok("/combo?l=$SALES_SPEC&cat=region&line_val=amount")
 	  ->status_is(400)
-	  ->content_like(qr/Missing bar=/i,
-		'missing bar= yields 400');
+	  ->content_like(qr/Missing bar_val=/i,
+		'missing bar_val= yields 400');
 };
 
 subtest 'combo_view -- missing line= returns 400' => sub {
-	$t->get_ok("/combo?l=$SALES_SPEC&cat=region&bar=amount")
+	# line_val= is the canonical name; line= is accepted as a legacy alias.
+	# Omitting both -> 400 "Missing line_val= parameter".
+	$t->get_ok("/combo?l=$SALES_SPEC&cat=region&bar_val=amount")
 	  ->status_is(400)
-	  ->content_like(qr/Missing line=/i,
-		'missing line= yields 400');
+	  ->content_like(qr/Missing line_val=/i,
+		'missing line_val= yields 400');
 };
 
 subtest 'combo_view -- valid render returns 200 with SVG' => sub {
@@ -3312,6 +3316,893 @@ subtest 'dates_delete -- deletes all patterns for spec when col= absent' => sub 
 };
 
 } # end MODEL_DIR scope
+
+# ============================================================================
+# PART N: Database::BI::Model::Geocode
+#
+# White-box tests for every internal helper and public method.  A stub geocoder
+# package is defined below and injected through new(geocoder =>), so no real
+# Geo::Coder::Free or network connection is required.  All branches of the
+# classify -> cap -> batch -> count pipeline are exercised, with at least 60%
+# negative / hostile tests.
+# ============================================================================
+
+use_ok('Database::BI::Model::Geocode');
+
+Readonly my $GEO  => 'Database::BI::Model::Geocode';
+Readonly my $GOOD_PLACE => 'Ramsgate';
+Readonly my $GOOD_LAT   => 51.33;
+Readonly my $GOOD_LON   =>  1.42;
+
+# ---------------------------------------------------------------------------
+# Stub geocoder and point -- injected so tests never touch Geo::Coder::Free.
+#
+# The stub records every geocode_many() call in 'calls' and every
+# valid_location() call in 'asked', so we can assert what the module looked
+# up without relying on a real geocoder.
+# ---------------------------------------------------------------------------
+{
+	package Stub::GeoPoint;
+	sub new       { bless { %{ $_[1] } }, $_[0] }
+	sub latitude  { $_[0]{'latitude'} }
+	sub longitude { $_[0]{'longitude'} }
+	sub database  { $_[0]{'database'} }
+
+	package Stub::GeoNoLongitude;
+	# Object with latitude() but NO longitude() accessor -- tests _coordinates fallback.
+	sub new      { bless { %{ $_[1] } }, $_[0] }
+	sub latitude { $_[0]{'latitude'} }
+	sub can      {
+		my ($self, $method) = @_;
+		return ($method eq 'latitude') ? 1 : undef;
+	}
+
+	package Stub::GeoNoBacking;
+	# Has both accessors but latitude() returns undef -- tests _has_position guard.
+	sub new       { bless {}, $_[0] }
+	sub latitude  { return undef }
+	sub longitude { return undef }
+
+	package Stub::Geocoder;
+	sub new {
+		my ($class, %a) = @_;
+		return bless {
+			results => $a{results} // {},
+			asked   => [],
+			calls   => [],
+			# Set skip_value so valid_location() can refuse a specific value.
+			skip    => $a{skip} // '',
+		}, $class;
+	}
+	sub valid_location {
+		my ($self, $v) = @_;
+		push @{ $self->{asked} }, $v;
+		return 0 unless defined($v) && !ref($v) && length($v);
+		return 0 if $v =~ /\A\d+\z/;   # bare number: not a place
+		return 0 if $v eq $self->{skip};
+		return 1;
+	}
+	sub geocode_many {
+		my ($self, $values, %opts) = @_;
+		push @{ $self->{calls} }, { values => [@$values], opts => {%opts} };
+		my %out;
+		for my $v (@$values) {
+			$out{$v} = $self->{results}{$v};   # undef for unknowns
+		}
+		return { %out, lookups => scalar @$values };
+	}
+
+	package Stub::GeoBroken;
+	# Has valid_location but lacks geocode_many -- should cause _check_interface croak.
+	sub new            { bless {}, $_[0] }
+	sub valid_location { 1 }
+}
+
+# ============================================================================
+# Section 1: _fmt -- package-level formatter
+# ============================================================================
+
+subtest 'Geocode::_fmt -- known key with no args returns template text' => sub {
+	my $fn = \&Database::BI::Model::Geocode::_fmt;
+
+	my $msg = $fn->('error_column_required');
+	ok length($msg), '_fmt returns non-empty string for known key';
+	unlike $msg, qr/Internal error/, 'known key does not hit the fallback branch';
+};
+
+subtest 'Geocode::_fmt -- known key with sprintf args interpolates them' => sub {
+	my $fn  = \&Database::BI::Model::Geocode::_fmt;
+	my $msg = $fn->('error_map_loc_column', 'my_col');
+	like $msg, qr/my_col/, 'column name is interpolated into the error message';
+};
+
+subtest 'Geocode::_fmt -- unknown key produces descriptive fallback, does not croak' => sub {
+	my $fn = \&Database::BI::Model::Geocode::_fmt;
+	my $fb = $fn->('no_such_key_xyz');
+	like $fb, qr/Internal error.*no_such_key_xyz/, 'unknown key renders fallback with key embedded';
+};
+
+subtest 'Geocode::_fmt -- undef key still returns a string (does not croak)' => sub {
+	my $fn = \&Database::BI::Model::Geocode::_fmt;
+	my $result = eval { $fn->(undef) };
+	# Either it returns something or it croaks with a message -- the point is no
+	# silent undef being returned when the caller later calls length() on it.
+	ok defined($result) || $@, 'undef key either returns a value or croaks, never silently undef';
+};
+
+# ============================================================================
+# Section 2: _msg -- instance-level i18n delegator
+# ============================================================================
+
+subtest 'Geocode::_msg -- without i18n object delegates to _fmt' => sub {
+	my $g = $GEO->new();
+
+	my $via_msg = $g->_msg('error_column_required');
+	my $via_fmt = Database::BI::Model::Geocode::_fmt('error_column_required');
+	is $via_msg, $via_fmt, '_msg without i18n produces same string as _fmt';
+};
+
+subtest 'Geocode::_msg -- with i18n object forwards key and args via maketext' => sub {
+	my @received;
+	my $i18n = bless {}, 'FakeGeoI18N';
+	{
+		no strict 'refs';
+		*{'FakeGeoI18N::maketext'} = sub {
+			my ($self, $key, @args) = @_;
+			push @received, { key => $key, args => \@args };
+			return "TRANSLATED:$key";
+		};
+	}
+
+	my $g = $GEO->new(i18n => $i18n);
+	my $result = $g->_msg('error_column_required');
+	is scalar(@received), 1, 'maketext called exactly once';
+	is $received[0]{key}, 'error_column_required', 'correct key forwarded';
+	like $result, qr/TRANSLATED/, 'return value comes from i18n object';
+};
+
+# ============================================================================
+# Section 3: _message -- returns { key, text } hashref
+# ============================================================================
+
+subtest 'Geocode::_message -- returns hashref with key and text fields' => sub {
+	my $g   = $GEO->new();
+	my $msg = $g->_message('error_column_required');
+
+	ok ref($msg) eq 'HASH', '_message returns a hashref';
+	is $msg->{key}, 'error_column_required', 'key field preserved';
+	ok length($msg->{text}), 'text field is non-empty';
+};
+
+subtest 'Geocode::_message -- sprintf args are embedded in text field' => sub {
+	my $g   = $GEO->new();
+	my $msg = $g->_message('error_map_loc_column', 'colname_xyz');
+	like $msg->{text}, qr/colname_xyz/, 'sprintf arg embedded in text';
+	is   $msg->{key},  'error_map_loc_column', 'key is unchanged';
+};
+
+# ============================================================================
+# Section 4: new -- constructor guards
+# ============================================================================
+
+subtest 'Geocode::new -- no arguments: constructs with defaults' => sub {
+	my $g = eval { $GEO->new() };
+	is $@, '', 'no-arg constructor does not croak';
+	ok blessed($g), 'returns a blessed object';
+	is ref($g), $GEO, 'correct class';
+};
+
+subtest 'Geocode::new -- injected geocoder with full interface: no croak' => sub {
+	my $stub = Stub::Geocoder->new();
+	my $g = eval { $GEO->new(geocoder => $stub) };
+	is $@, '', 'valid injected geocoder is accepted';
+	ok blessed($g), 'returns object';
+};
+
+subtest 'Geocode::new -- geocoder missing geocode_many() croaks with interface message' => sub {
+	my $broken = Stub::GeoBroken->new();
+	throws_ok { $GEO->new(geocoder => $broken) }
+		qr/geocode_many/,
+		'croaks when injected geocoder lacks geocode_many()';
+};
+
+subtest 'Geocode::new -- geocoder missing both methods: error names first missing' => sub {
+	# A plain hashref has no ->can() and will fail valid_location first.
+	my $empty = bless {}, 'GeoBothMissing';
+	throws_ok { $GEO->new(geocoder => $empty) }
+		qr/valid_location|geocode_many/,
+		'croaks for geocoder missing required methods';
+};
+
+subtest 'Geocode::new -- non-object geocoder is rejected by Params::Validate::Strict' => sub {
+	# A scalar where an object is expected must be rejected before _check_interface.
+	throws_ok { $GEO->new(geocoder => 'not_an_object') }
+		qr//,
+		'scalar geocoder argument triggers validation error';
+};
+
+subtest 'Geocode::new -- openaddr param stored, ENV fallback used when absent' => sub {
+	local $ENV{OPENADDR_HOME} = '/some/path';
+	my $g = $GEO->new();
+	is $g->{'openaddr'}, '/some/path', 'openaddr falls back to OPENADDR_HOME';
+
+	my $g2 = $GEO->new(openaddr => '/explicit/path');
+	is $g2->{'openaddr'}, '/explicit/path', 'explicit openaddr overrides ENV';
+};
+
+subtest 'Geocode::new -- i18n object missing maketext() is rejected' => sub {
+	# Params::Validate::Strict uses can => 'maketext' to validate the i18n object.
+	my $no_maketext = bless {}, 'NoMaketext';
+	throws_ok { $GEO->new(i18n => $no_maketext) }
+		qr//,
+		'i18n object without maketext() triggers validation error';
+};
+
+subtest 'Geocode::new -- accepts hashref argument form' => sub {
+	my $g = eval { $GEO->new({ }) };
+	is $@, '', 'hashref form accepted';
+	ok blessed($g), 'object returned from hashref call';
+};
+
+# ============================================================================
+# Section 5: _check_interface -- guards an injected geocoder
+# ============================================================================
+
+subtest 'Geocode::_check_interface -- returns 1 for a complete interface' => sub {
+	my $g    = $GEO->new();
+	my $stub = Stub::Geocoder->new();
+	my $ok   = $g->_check_interface($stub);
+	is $ok, 1, '_check_interface returns 1 for a geocoder with both methods';
+};
+
+subtest 'Geocode::_check_interface -- croaks when valid_location is missing' => sub {
+	my $g = $GEO->new();
+	my $no_vl = bless {}, 'NoValidLocation';
+	{
+		no strict 'refs';
+		*{'NoValidLocation::geocode_many'} = sub { };
+	}
+	throws_ok { $g->_check_interface($no_vl) }
+		qr/valid_location/,
+		'croak names the missing method when valid_location absent';
+};
+
+subtest 'Geocode::_check_interface -- croaks when geocode_many is missing' => sub {
+	my $g      = $GEO->new();
+	my $broken = Stub::GeoBroken->new();  # has valid_location, lacks geocode_many
+	throws_ok { $g->_check_interface($broken) }
+		qr/geocode_many/,
+		'croak names the missing method when geocode_many absent';
+};
+
+# ============================================================================
+# Section 6: _coordinates -- extracts (lat, lon) from various result shapes
+# ============================================================================
+
+subtest 'Geocode::_coordinates -- blesses object with accessors: reads latitude/longitude' => sub {
+	my $fn    = \&Database::BI::Model::Geocode::_coordinates;
+	my $point = Stub::GeoPoint->new({ latitude => 51.5, longitude => -0.1, database => 'Test' });
+	my ($lat, $lon) = $fn->($point);
+	is $lat,  51.5, 'latitude extracted from accessor';
+	is $lon, -0.1,  'longitude extracted from accessor';
+};
+
+subtest 'Geocode::_coordinates -- plain hashref with lat/long keys' => sub {
+	my $fn   = \&Database::BI::Model::Geocode::_coordinates;
+	my ($lat, $lon) = $fn->({ lat => 10.0, long => 20.0 });
+	is $lat, 10.0, 'lat key read from hashref';
+	is $lon, 20.0, 'long key read from hashref';
+};
+
+subtest 'Geocode::_coordinates -- plain hashref uses lng fallback before lon' => sub {
+	my $fn   = \&Database::BI::Model::Geocode::_coordinates;
+	my ($lat, $lon) = $fn->({ lat => 1.0, lng => 2.0 });
+	is $lat, 1.0, 'lat extracted';
+	is $lon, 2.0, 'lng fallback used';
+};
+
+subtest 'Geocode::_coordinates -- plain hashref uses lon as third fallback' => sub {
+	my $fn   = \&Database::BI::Model::Geocode::_coordinates;
+	my ($lat, $lon) = $fn->({ lat => 3.0, lon => 4.0 });
+	is $lat, 3.0, 'lat extracted';
+	is $lon, 4.0, 'lon third fallback used';
+};
+
+subtest 'Geocode::_coordinates -- undef input returns empty list' => sub {
+	my $fn = \&Database::BI::Model::Geocode::_coordinates;
+	my @r  = $fn->(undef);
+	is scalar(@r), 0, 'undef input returns empty list';
+};
+
+subtest 'Geocode::_coordinates -- non-ref scalar returns empty list' => sub {
+	my $fn = \&Database::BI::Model::Geocode::_coordinates;
+	my @r  = $fn->('just a string');
+	is scalar(@r), 0, 'non-ref scalar returns empty list';
+};
+
+subtest 'Geocode::_coordinates -- arrayref is not a point shape: returns empty list' => sub {
+	# An arrayref [lat, lon] is the *cache* format, not a geocoder result.
+	my $fn = \&Database::BI::Model::Geocode::_coordinates;
+	my @r  = $fn->([51.5, -0.1]);
+	is scalar(@r), 0, 'arrayref not treated as a point';
+};
+
+# ============================================================================
+# Section 7: _backend_of -- reads the database name from a result
+# ============================================================================
+
+subtest 'Geocode::_backend_of -- object with database() accessor' => sub {
+	my $fn    = \&Database::BI::Model::Geocode::_backend_of;
+	my $point = Stub::GeoPoint->new({ latitude => 1, longitude => 2, database => 'OpenAddresses' });
+	is $fn->($point), 'OpenAddresses', 'reads database from accessor';
+};
+
+subtest 'Geocode::_backend_of -- plain hashref with database key' => sub {
+	my $fn = \&Database::BI::Model::Geocode::_backend_of;
+	is $fn->({ database => 'MaxMind' }), 'MaxMind', 'reads database from hashref key';
+};
+
+subtest 'Geocode::_backend_of -- falls back to geocoder key when database absent' => sub {
+	my $fn = \&Database::BI::Model::Geocode::_backend_of;
+	is $fn->({ geocoder => 'FreeGeo' }), 'FreeGeo', 'geocoder key used as fallback';
+};
+
+subtest 'Geocode::_backend_of -- undef backend keys return undef' => sub {
+	my $fn = \&Database::BI::Model::Geocode::_backend_of;
+	is $fn->({}), undef, 'empty hashref returns undef';
+};
+
+subtest 'Geocode::_backend_of -- non-ref input returns undef' => sub {
+	my $fn = \&Database::BI::Model::Geocode::_backend_of;
+	is $fn->('string'), undef, 'scalar returns undef';
+	is $fn->(undef),    undef, 'undef returns undef';
+};
+
+subtest 'Geocode::_backend_of -- arrayref is rejected, returns undef' => sub {
+	my $fn = \&Database::BI::Model::Geocode::_backend_of;
+	is $fn->([1,2,3]), undef, 'arrayref returns undef (cache shape, not a point)';
+};
+
+# ============================================================================
+# Section 8: _has_position -- distinguishes resolved from unresolved cache entry
+# ============================================================================
+
+subtest 'Geocode::_has_position -- arrayref with two coordinates returns true' => sub {
+	my $fn = \&Database::BI::Model::Geocode::_has_position;
+	ok $fn->([51.5, -0.1]), '[lat, lon] is a position';
+};
+
+subtest 'Geocode::_has_position -- zero sentinel (looked up, not found) returns false' => sub {
+	my $fn = \&Database::BI::Model::Geocode::_has_position;
+	ok !$fn->(0), 'zero sentinel returns false';
+};
+
+subtest 'Geocode::_has_position -- undef returns false' => sub {
+	my $fn = \&Database::BI::Model::Geocode::_has_position;
+	ok !$fn->(undef), 'undef returns false';
+};
+
+subtest 'Geocode::_has_position -- [undef, undef] returns false (both coords must be defined)' => sub {
+	my $fn = \&Database::BI::Model::Geocode::_has_position;
+	ok !$fn->([undef, undef]), '[undef, undef] has no position';
+};
+
+subtest 'Geocode::_has_position -- [lat, undef] returns false (one coord missing)' => sub {
+	my $fn = \&Database::BI::Model::Geocode::_has_position;
+	ok !$fn->([51.5, undef]), '[lat, undef] is not a full position';
+};
+
+subtest 'Geocode::_has_position -- empty arrayref returns false' => sub {
+	my $fn = \&Database::BI::Model::Geocode::_has_position;
+	ok !$fn->([]); 'empty arrayref is not a position';
+};
+
+subtest 'Geocode::_has_position -- plain string returns false' => sub {
+	my $fn = \&Database::BI::Model::Geocode::_has_position;
+	ok !$fn->('51.5,-0.1'), 'string is not a position';
+};
+
+# ============================================================================
+# Section 9: _options -- validates max / cache / region
+# ============================================================================
+
+subtest 'Geocode::_options -- defaults: max=500, cache=undef, region=undef' => sub {
+	my $g    = $GEO->new();
+	my $opts = $g->_options({});
+	is $opts->{max}, 500, 'default max is 500';
+	ok !defined($opts->{cache}),  'default cache is undef';
+	ok !defined($opts->{region}), 'default region is undef';
+};
+
+subtest 'Geocode::_options -- explicit max is stored as-is' => sub {
+	my $g    = $GEO->new();
+	my $opts = $g->_options({ max => 10 });
+	is $opts->{max}, 10, 'explicit max preserved';
+};
+
+subtest 'Geocode::_options -- max=0 croaks (not a positive integer)' => sub {
+	my $g = $GEO->new();
+	throws_ok { $g->_options({ max => 0 }) }
+		qr/max.*must be a positive integer/i,
+		'max=0 is rejected with a descriptive croak';
+};
+
+subtest 'Geocode::_options -- max=-1 croaks' => sub {
+	my $g = $GEO->new();
+	throws_ok { $g->_options({ max => -1 }) }
+		qr/max/i,
+		'negative max is rejected';
+};
+
+subtest 'Geocode::_options -- max=abc croaks (non-numeric string)' => sub {
+	my $g = $GEO->new();
+	throws_ok { $g->_options({ max => 'abc' }) }
+		qr/max/i,
+		'non-numeric max is rejected';
+};
+
+subtest 'Geocode::_options -- max=3.5 croaks (non-integer)' => sub {
+	my $g = $GEO->new();
+	throws_ok { $g->_options({ max => '3.5' }) }
+		qr/max/i,
+		'fractional max is rejected';
+};
+
+subtest 'Geocode::_options -- unknown key in options croaks (strict validation)' => sub {
+	my $g = $GEO->new();
+	throws_ok { $g->_options({ bogus => 1 }) }
+		qr//,
+		'unknown option key is rejected by Params::Validate::Strict';
+};
+
+# ============================================================================
+# Section 10: resolve_values -- input validation
+# ============================================================================
+
+subtest 'Geocode::resolve_values -- non-arrayref input croaks' => sub {
+	my $g = $GEO->new(geocoder => Stub::Geocoder->new());
+	throws_ok { $g->resolve_values('not_an_arrayref') }
+		qr/values.*arrayref/i,
+		'scalar input triggers error_values_arrayref croak';
+};
+
+subtest 'Geocode::resolve_values -- undef input croaks' => sub {
+	my $g = $GEO->new(geocoder => Stub::Geocoder->new());
+	throws_ok { $g->resolve_values(undef) }
+		qr/values.*arrayref/i,
+		'undef input triggers croak';
+};
+
+subtest 'Geocode::resolve_values -- hashref input croaks' => sub {
+	my $g = $GEO->new(geocoder => Stub::Geocoder->new());
+	throws_ok { $g->resolve_values({}) }
+		qr/values.*arrayref/i,
+		'hashref input triggers croak';
+};
+
+subtest 'Geocode::resolve_values -- empty arrayref returns zeroed counts' => sub {
+	my $stub = Stub::Geocoder->new();
+	my $g    = $GEO->new(geocoder => $stub);
+	my $r    = $g->resolve_values([]);
+
+	ok ref($r) eq 'HASH', 'returns hashref';
+	is $r->{counts}{distinct},      0, 'distinct=0 for empty input';
+	is $r->{counts}{attempted},     0, 'attempted=0';
+	is $r->{counts}{resolved},      0, 'resolved=0';
+	is scalar(@{ $stub->{calls} }), 0, 'geocoder never called for empty input';
+};
+
+subtest 'Geocode::resolve_values -- bare number is skipped, not looked up' => sub {
+	my $stub = Stub::Geocoder->new(results => {});
+	my $g    = $GEO->new(geocoder => $stub, openaddr => 'test');
+	my $r    = $g->resolve_values(['12345']);
+
+	is $r->{counts}{skipped},   1, 'bare number counted as skipped';
+	is $r->{counts}{attempted}, 0, 'bare number never sent to geocoder';
+};
+
+subtest 'Geocode::resolve_values -- undef cell is skipped silently' => sub {
+	my $stub = Stub::Geocoder->new();
+	my $g    = $GEO->new(geocoder => $stub, openaddr => 'test');
+	my $r    = $g->resolve_values([undef]);
+
+	is $r->{counts}{skipped},   1, 'undef cell is skipped';
+	is $r->{counts}{attempted}, 0, 'undef cell never handed to geocoder';
+};
+
+subtest 'Geocode::resolve_values -- empty string is skipped' => sub {
+	my $stub = Stub::Geocoder->new();
+	my $g    = $GEO->new(geocoder => $stub, openaddr => 'test');
+	my $r    = $g->resolve_values(['']);
+
+	is $r->{counts}{skipped},   1, 'empty string is skipped';
+	is $r->{counts}{attempted}, 0, 'empty string never sent to geocoder';
+};
+
+subtest 'Geocode::resolve_values -- valid place resolves to point in result' => sub {
+	my $stub = Stub::Geocoder->new(results => {
+		$GOOD_PLACE => Stub::GeoPoint->new({
+			latitude => $GOOD_LAT, longitude => $GOOD_LON, database => 'Test',
+		}),
+	});
+	my $g = $GEO->new(geocoder => $stub, openaddr => 'test');
+	my $r = $g->resolve_values([$GOOD_PLACE]);
+
+	is $r->{counts}{resolved},  1, 'one place resolved';
+	ok exists $r->{points}{$GOOD_PLACE}, 'place in points hashref';
+	is $r->{points}{$GOOD_PLACE}{lat}, $GOOD_LAT, 'latitude stored';
+	is $r->{points}{$GOOD_PLACE}{lon}, $GOOD_LON, 'longitude stored';
+};
+
+subtest 'Geocode::resolve_values -- duplicate values counted once, looked up once' => sub {
+	my $stub = Stub::Geocoder->new(results => {
+		$GOOD_PLACE => Stub::GeoPoint->new({ latitude => 1, longitude => 2, database => 'X' }),
+	});
+	my $g = $GEO->new(geocoder => $stub, openaddr => 'test');
+	my $r = $g->resolve_values([$GOOD_PLACE, $GOOD_PLACE, $GOOD_PLACE]);
+
+	is $r->{counts}{distinct},  1, 'three repeats counted as one distinct';
+	is $r->{counts}{attempted}, 1, 'geocoder called for one distinct value';
+};
+
+subtest 'Geocode::resolve_values -- place not found recorded as unresolved and cached as 0' => sub {
+	my $stub = Stub::Geocoder->new(results => {});  # nothing resolves
+	my $g    = $GEO->new(geocoder => $stub, openaddr => 'test');
+	my $r    = $g->resolve_values([$GOOD_PLACE]);
+
+	is $r->{counts}{unresolved},    1, 'unresolved count incremented';
+	is $r->{cache}{$GOOD_PLACE},    0, 'unresolved place cached as 0 sentinel';
+	is scalar(@{ $r->{unresolved} }), 1, 'place in unresolved list';
+};
+
+subtest 'Geocode::resolve_values -- cache hit skips geocoder entirely' => sub {
+	my $stub = Stub::Geocoder->new();
+	my $g    = $GEO->new(geocoder => $stub, openaddr => 'test');
+	my $r    = $g->resolve_values([$GOOD_PLACE], cache => { $GOOD_PLACE => [$GOOD_LAT, $GOOD_LON] });
+
+	is scalar(@{ $stub->{calls} }), 0, 'geocoder not called when value in cache';
+	is $r->{counts}{cached},        1, 'cached count incremented';
+	is $r->{counts}{resolved},      1, 'resolved count includes cached places';
+};
+
+subtest 'Geocode::resolve_values -- zero-sentinel cache hit is unresolved, not resolved' => sub {
+	my $stub = Stub::Geocoder->new();
+	my $g    = $GEO->new(geocoder => $stub, openaddr => 'test');
+	my $r    = $g->resolve_values([$GOOD_PLACE], cache => { $GOOD_PLACE => 0 });
+
+	is scalar(@{ $stub->{calls} }), 0, 'geocoder not called for cached-unresolved';
+	is $r->{counts}{unresolved},    1, 'unresolved count includes cached 0';
+};
+
+subtest 'Geocode::resolve_values -- cap holds excess places in not_attempted' => sub {
+	my @places  = map { "Place$_" } 1 .. 5;
+	my %results = map { $_ => Stub::GeoPoint->new({ latitude => 1, longitude => 2, database => 'T' }) } @places;
+	my $stub    = Stub::Geocoder->new(results => \%results);
+	my $g       = $GEO->new(geocoder => $stub, openaddr => 'test');
+	my $r       = $g->resolve_values(\@places, max => 3);
+
+	is $r->{counts}{attempted},     3, 'only 3 places attempted (cap=3)';
+	is $r->{counts}{not_attempted}, 2, 'remaining 2 are not_attempted';
+	ok $r->{capped}, 'capped flag is set';
+	# Not-attempted places must NOT be in the cache (they will be retried next request).
+	for my $p (@places[3..4]) {
+		ok !exists($r->{cache}{$p}), "not-attempted place $p not recorded in cache";
+	}
+};
+
+subtest 'Geocode::resolve_values -- no geocoder puts all valid places in not_attempted' => sub {
+	# Construct without injected geocoder and without Geo::Coder::Free.
+	# If Geo::Coder::Free IS installed, we still test the same path by using
+	# an invalid min_geocoder_version that forces _load_geocoder to fail.
+	my $g = $GEO->new(min_geocoder_version => '9999.0');
+	my $r = $g->resolve_values([$GOOD_PLACE]);
+
+	is $r->{available},             0, 'available=0 without geocoder';
+	is $r->{counts}{not_attempted}, 1, 'valid place is not_attempted without geocoder';
+	is $r->{counts}{attempted},     0, 'nothing attempted without geocoder';
+};
+
+subtest 'Geocode::resolve_values -- result has no circular references' => sub {
+	my $stub = Stub::Geocoder->new(results => {
+		$GOOD_PLACE => Stub::GeoPoint->new({ latitude => $GOOD_LAT, longitude => $GOOD_LON, database => 'T' }),
+	});
+	my $g = $GEO->new(geocoder => $stub, openaddr => 'test');
+	my $r = $g->resolve_values([$GOOD_PLACE]);
+	memory_cycle_ok($r, 'resolve_values result has no circular references');
+};
+
+subtest 'Geocode::resolve_values -- geocoder valid_location refusal: place in skipped' => sub {
+	# The stub's valid_location returns 0 for the skip value.
+	my $stub = Stub::Geocoder->new(skip => $GOOD_PLACE, results => {});
+	my $g    = $GEO->new(geocoder => $stub, openaddr => 'test');
+	my $r    = $g->resolve_values([$GOOD_PLACE]);
+
+	is $r->{counts}{skipped},   1, 'refused-by-geocoder place is skipped';
+	is $r->{counts}{attempted}, 0, 'refused value never passed to geocode_many';
+};
+
+# ============================================================================
+# Section 11: resolve_column -- input validation and row-level bookkeeping
+# ============================================================================
+
+subtest 'Geocode::resolve_column -- non-arrayref rows croaks' => sub {
+	my $g = $GEO->new(geocoder => Stub::Geocoder->new());
+	throws_ok { $g->resolve_column('not_rows', 'col') }
+		qr/rows.*arrayref/i,
+		'scalar rows triggers error_rows_arrayref croak';
+};
+
+subtest 'Geocode::resolve_column -- undef rows croaks' => sub {
+	my $g = $GEO->new(geocoder => Stub::Geocoder->new());
+	throws_ok { $g->resolve_column(undef, 'col') }
+		qr/rows.*arrayref/i,
+		'undef rows croaks';
+};
+
+subtest 'Geocode::resolve_column -- missing column arg croaks' => sub {
+	my $g = $GEO->new(geocoder => Stub::Geocoder->new());
+	throws_ok { $g->resolve_column([], undef) }
+		qr/column.*required/i,
+		'undef column triggers error_column_required croak';
+	throws_ok { $g->resolve_column([], '') }
+		qr/column.*required/i,
+		'empty string column triggers croak';
+};
+
+subtest 'Geocode::resolve_column -- column not present in rows croaks' => sub {
+	my $g    = $GEO->new(geocoder => Stub::Geocoder->new());
+	my $rows = [{ name => 'Alice' }, { name => 'Bob' }];
+	throws_ok { $g->resolve_column($rows, 'no_such_column') }
+		qr/no_such_column/,
+		'missing column name embedded in error_map_loc_column message';
+};
+
+subtest 'Geocode::resolve_column -- empty rows list returns result with zeroed counts' => sub {
+	my $g = $GEO->new(geocoder => Stub::Geocoder->new());
+	my $r = $g->resolve_column([], 'place');
+
+	is $r->{counts}{rows},    0, 'rows=0 for empty input';
+	is $r->{counts}{plotted}, 0, 'plotted=0';
+};
+
+subtest 'Geocode::resolve_column -- adds rows and first_row to each point' => sub {
+	my $stub = Stub::Geocoder->new(results => {
+		$GOOD_PLACE => Stub::GeoPoint->new({
+			latitude => $GOOD_LAT, longitude => $GOOD_LON, database => 'T'
+		}),
+	});
+	my $g    = $GEO->new(geocoder => $stub, openaddr => 'test');
+	my $rows = [
+		{ place => $GOOD_PLACE },
+		{ place => $GOOD_PLACE },
+		{ place => $GOOD_PLACE },
+	];
+	my $r    = $g->resolve_column($rows, 'place');
+
+	is $r->{points}{$GOOD_PLACE}{rows},      3, 'three rows reported for repeated place';
+	is $r->{points}{$GOOD_PLACE}{first_row}, 0, 'first_row points to index 0';
+	is $r->{counts}{rows},                   3, 'total row count is 3';
+	is $r->{counts}{plotted},                3, 'all three rows plotted';
+};
+
+subtest 'Geocode::resolve_column -- markers in first-seen order' => sub {
+	my $stub = Stub::Geocoder->new(results => {
+		'Ramsgate'    => Stub::GeoPoint->new({ latitude => 51.33, longitude => 1.42, database => 'T' }),
+		'Earls Colne' => Stub::GeoPoint->new({ latitude => 51.92, longitude => 0.75, database => 'T' }),
+	});
+	my $g    = $GEO->new(geocoder => $stub, openaddr => 'test');
+	my $rows = [
+		{ place => 'Ramsgate' },
+		{ place => 'Earls Colne' },
+		{ place => 'Ramsgate' },
+	];
+	my $r = $g->resolve_column($rows, 'place');
+
+	is scalar(@{ $r->{markers} }), 2,            'two distinct places produce two markers';
+	is $r->{markers}[0]{value},   'Ramsgate',    'Ramsgate first (appears first in rows)';
+	is $r->{markers}[1]{value},   'Earls Colne', 'Earls Colne second';
+};
+
+subtest 'Geocode::resolve_column -- warn_map_rows_skipped emitted when some rows not plotted' => sub {
+	my $stub = Stub::Geocoder->new(results => {});  # nothing resolves
+	my $g    = $GEO->new(geocoder => $stub, openaddr => 'test');
+	my $rows = [{ place => $GOOD_PLACE }];
+	my $r    = $g->resolve_column($rows, 'place');
+
+	my @skipped_msgs = grep { $_->{key} eq 'warn_map_rows_skipped' } @{ $r->{messages} };
+	ok scalar(@skipped_msgs), 'warn_map_rows_skipped emitted when rows not plotted';
+};
+
+subtest 'Geocode::resolve_column -- no skip message when all rows plotted' => sub {
+	my $stub = Stub::Geocoder->new(results => {
+		$GOOD_PLACE => Stub::GeoPoint->new({ latitude => 1, longitude => 2, database => 'T' }),
+	});
+	my $g    = $GEO->new(geocoder => $stub, openaddr => 'test');
+	my $rows = [{ place => $GOOD_PLACE }];
+	my $r    = $g->resolve_column($rows, 'place');
+
+	my @skipped = grep { $_->{key} eq 'warn_map_rows_skipped' } @{ $r->{messages} };
+	ok !scalar(@skipped), 'no skip message when every row is plotted';
+};
+
+subtest 'Geocode::resolve_column -- all-non-hashref rows croak with column-not-found' => sub {
+	# When every row is a non-hashref the column is never found, so the guard
+	# fires.  Non-hashref rows are treated as missing cells, not as a signal to
+	# skip the column-present check.
+	my $stub = Stub::Geocoder->new(results => {});
+	my $g    = $GEO->new(geocoder => $stub, openaddr => 'test');
+	throws_ok { $g->resolve_column([[1,2,3]], 'place') }
+		qr/place/,
+		'all-non-hashref rows give column-not-found croak';
+};
+
+subtest 'Geocode::resolve_column -- mixed hashref/non-hashref rows: non-hashref contribute undef' => sub {
+	# A dataset can have one valid hashref row alongside a non-hashref artefact.
+	# The non-hashref row contributes undef (skipped), the hashref row is resolved.
+	my $stub = Stub::Geocoder->new(results => {
+		$GOOD_PLACE => Stub::GeoPoint->new({ latitude => $GOOD_LAT, longitude => $GOOD_LON, database => 'T' }),
+	});
+	my $g    = $GEO->new(geocoder => $stub, openaddr => 'test');
+	my $rows = [
+		{ place => $GOOD_PLACE },   # valid hashref
+		[1, 2, 3],                  # non-hashref: contributes undef cell
+	];
+	my $r = eval { $g->resolve_column($rows, 'place') };
+	is $@, '', 'mixed rows do not croak';
+	is $r->{counts}{rows},    2, 'both rows counted';
+	is $r->{counts}{plotted}, 1, 'only the hashref row is plotted';
+};
+
+subtest 'Geocode::resolve_column -- result has no circular references' => sub {
+	my $stub = Stub::Geocoder->new(results => {
+		$GOOD_PLACE => Stub::GeoPoint->new({ latitude => $GOOD_LAT, longitude => $GOOD_LON, database => 'T' }),
+	});
+	my $g    = $GEO->new(geocoder => $stub, openaddr => 'test');
+	my $rows = [{ place => $GOOD_PLACE }];
+	my $r    = $g->resolve_column($rows, 'place');
+	memory_cycle_ok($r, 'resolve_column result has no circular references');
+};
+
+# ============================================================================
+# Section 12: geocoder_available -- reports availability without croaking
+# ============================================================================
+
+subtest 'Geocode::geocoder_available -- injected geocoder: returns (1, undef)' => sub {
+	my $stub = Stub::Geocoder->new();
+	my $g    = $GEO->new(geocoder => $stub);
+	my ($ok, $reason) = $g->geocoder_available();
+	ok $ok, 'available=1 with injected geocoder';
+	ok !defined($reason), 'reason is undef when available';
+};
+
+subtest 'Geocode::geocoder_available -- no geocoder: returns (0, message)' => sub {
+	# Force _load_geocoder to fail by requesting an impossibly high version.
+	my $g = $GEO->new(min_geocoder_version => '9999.0');
+	my ($ok, $reason) = $g->geocoder_available();
+	ok !$ok, 'available=0 without geocoder';
+	ok defined($reason), 'reason is defined when unavailable';
+	like $reason, qr/Geo::Coder::Free/, 'message names the missing module';
+};
+
+subtest 'Geocode::geocoder_available -- called twice: loads geocoder only once' => sub {
+	# The second call should use the memoized _geocoder, not call _load_geocoder again.
+	my $stub = Stub::Geocoder->new();
+	my $g    = $GEO->new(geocoder => $stub);
+	$g->geocoder_available();
+	$g->geocoder_available();
+	# No assertion possible without mocking, but this must not croak.
+	ok 1, 'calling geocoder_available twice does not croak';
+};
+
+# ============================================================================
+# Section 13: cache_from_models -- extracts the geo cache for a spec
+# ============================================================================
+
+subtest 'Geocode::cache_from_models -- valid models returns copy of places' => sub {
+	my $models = {
+		geo => {
+			'table:sales' => {
+				places  => { Ramsgate => [$GOOD_LAT, $GOOD_LON], Truro => 0 },
+				backend => 'OpenAddresses',
+				built   => '2026-01-01T00:00:00Z',
+			},
+		},
+	};
+	my $cache = $GEO->cache_from_models($models, 'table:sales');
+	ok ref($cache) eq 'HASH', 'returns a hashref';
+	is scalar(keys %$cache), 2, 'both places extracted';
+	is_deeply $cache->{Ramsgate}, [$GOOD_LAT, $GOOD_LON], 'resolved place has [lat,lon]';
+	is $cache->{Truro}, 0, 'unresolved place has 0 sentinel';
+};
+
+subtest 'Geocode::cache_from_models -- unknown spec returns empty hashref' => sub {
+	my $cache = $GEO->cache_from_models({}, 'table:unknown');
+	ok ref($cache) eq 'HASH', 'returns a hashref';
+	ok !scalar(keys %$cache), 'empty for unknown spec';
+};
+
+subtest 'Geocode::cache_from_models -- empty models hashref returns empty hashref' => sub {
+	my $cache = $GEO->cache_from_models({}, 'table:sales');
+	ok !scalar(keys %$cache), 'empty for empty models';
+};
+
+subtest 'Geocode::cache_from_models -- undef models returns empty hashref' => sub {
+	my $cache = $GEO->cache_from_models(undef, 'table:sales');
+	ok ref($cache) eq 'HASH', 'returns hashref for undef models';
+	ok !scalar(keys %$cache), 'empty for undef models';
+};
+
+subtest 'Geocode::cache_from_models -- caller hashref is NOT mutated (returns a copy)' => sub {
+	my $places  = { Ramsgate => [$GOOD_LAT, $GOOD_LON] };
+	my $models  = { geo => { 'k' => { places => $places } } };
+	my $cache   = $GEO->cache_from_models($models, 'k');
+	$cache->{Injected} = 99;
+	ok !exists($models->{geo}{k}{places}{Injected}), 'mutating returned cache does not modify models';
+};
+
+# ============================================================================
+# Section 14: models_with_cache -- returns updated models without mutation
+# ============================================================================
+
+subtest 'Geocode::models_with_cache -- fresh models: geo section created' => sub {
+	my $r = $GEO->models_with_cache({}, 'table:sales',
+		{ Ramsgate => [$GOOD_LAT, $GOOD_LON] },
+		backend => 'OpenAddresses',
+		built   => '2026-01-01T00:00:00Z',
+	);
+	ok ref($r) eq 'HASH', 'returns hashref';
+	ok exists($r->{geo}{'table:sales'}), 'geo section created';
+	is_deeply $r->{geo}{'table:sales'}{places}, { Ramsgate => [$GOOD_LAT, $GOOD_LON] },
+		'places stored';
+	is $r->{geo}{'table:sales'}{backend}, 'OpenAddresses', 'backend stored';
+	is $r->{geo}{'table:sales'}{built},   '2026-01-01T00:00:00Z', 'built stored';
+};
+
+subtest 'Geocode::models_with_cache -- existing spec overwritten without touching others' => sub {
+	my $original = {
+		geo => {
+			'table:other' => { places => { A => [1, 2] } },
+			'table:sales' => { places => { Old => [3, 4] } },
+		},
+		calc => { 'table:sales' => { fields => {} } },
+	};
+	my $r = $GEO->models_with_cache($original, 'table:sales',
+		{ New => [5, 6] },
+		backend => 'MaxMind',
+		built   => '2026-02-01T00:00:00Z',
+	);
+	# Other spec preserved
+	is_deeply $r->{geo}{'table:other'}{places}, { A => [1, 2] },
+		'other geo spec not affected';
+	# Calc section preserved
+	ok exists($r->{calc}), 'calc section preserved';
+	# Updated spec replaced
+	is_deeply $r->{geo}{'table:sales'}{places}, { New => [5, 6] },
+		'target spec updated';
+};
+
+subtest 'Geocode::models_with_cache -- caller hashref is NOT mutated' => sub {
+	my $original = { geo => {} };
+	my $r = $GEO->models_with_cache($original, 'table:sales', { A => [1, 2] });
+	ok !exists($original->{geo}{'table:sales'}), 'original models hashref not modified';
+};
+
+subtest 'Geocode::models_with_cache -- undef models returns correct structure' => sub {
+	my $r = $GEO->models_with_cache(undef, 'table:sales', { A => [1, 2] });
+	ok ref($r) eq 'HASH', 'returns hashref for undef models';
+	ok exists($r->{geo}{'table:sales'}), 'geo section created even with undef models';
+};
+
+subtest 'Geocode::models_with_cache -- empty cache stored as empty hashref' => sub {
+	my $r = $GEO->models_with_cache({}, 'table:sales', {});
+	ok ref($r->{geo}{'table:sales'}{places}) eq 'HASH', 'places is a hashref for empty cache';
+	is scalar(keys %{ $r->{geo}{'table:sales'}{places} }), 0, 'empty cache stored correctly';
+};
+
+subtest 'Geocode::models_with_cache -- result has no circular references' => sub {
+	my $r = $GEO->models_with_cache({}, 'table:sales', { A => [1, 2] });
+	memory_cycle_ok($r, 'models_with_cache result has no circular references');
+};
 
 done_testing();
 

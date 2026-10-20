@@ -37,7 +37,7 @@ use Scalar::Util		qw(blessed);
 use Params::Get			();
 use Params::Validate::Strict	qw(validate_strict);
 
-our $VERSION = '0.013.0';
+our $VERSION = '0.014.0';
 
 # The version of Geo::Coder::Free this module asks for: 0.46 added valid_location()
 # and on_error => 'undef', 0.47 added geocode_many(), and this module asks for both
@@ -81,7 +81,8 @@ Readonly our %MESSAGES => (
 sub _fmt {
 	my ($key, @args) = @_;
 
-	my $tmpl = $MESSAGES{$key} // "Internal error: unknown message key '$key'";
+	my $tmpl = (defined($key) ? $MESSAGES{$key} : undef)
+	         // "Internal error: unknown message key '" . ($key // 'undef') . "'";
 
 	return @args ? sprintf($tmpl, @args) : $tmpl;
 }
@@ -107,6 +108,8 @@ sub _message {
 	return { 'key' => $key, 'text' => $self->_msg($key, @args) };
 }
 
+=encoding utf8
+
 =head1 NAME
 
 Database::BI::Model::Geocode - Resolve a location column to coordinates, once per distinct value
@@ -117,251 +120,324 @@ Database::BI::Model::Geocode - Resolve a location column to coordinates, once pe
 
 =head1 SYNOPSIS
 
-B<Geocode a dataset's place column, with the counts a page needs:>
+B<Geocode a table's place column and build map markers:>
 
     use Database::BI::Model::Geocode;
 
     my $geocode = Database::BI::Model::Geocode->new();
-    my $result  = $geocode->resolve_column($rows, 'place');
+    my $result  = $geocode->resolve_column($rows, 'city');
 
     for my $marker (@{ $result->{'markers'} }) {
-        $map->add_marker([$marker->{'lat'}, $marker->{'lon'}], html => $popup);
+        printf "  %s: lat=%.4f lon=%.4f (%d rows)\n",
+            $marker->{'value'}, $marker->{'lat'}, $marker->{'lon'},
+            $marker->{'rows'};
     }
 
-    my $counts = $result->{'counts'};
-    # { rows => 401, plotted => 3, unusable => 398, distinct => 7, skipped => 4,
-    #   cached => 1, attempted => 2, lookups => 2, resolved => 3, unresolved => 4,
-    #   not_attempted => 0 }
+    my $c = $result->{'counts'};
+    printf "Plotted %d of %d rows (%d skipped, %d unresolved)\n",
+        $c->{'plotted'}, $c->{'rows'}, $c->{'skipped'}, $c->{'unresolved'};
 
-    print "$_->{'text'}\n" for @{ $result->{'messages'} };
+B<Re-use remembered answers so the next request costs nothing:>
 
-B<Remember the answers in the dataset's model store, so the next request is free:>
+    # Load what was stored from a previous run.
+    my $spec   = 'table:sales';
+    my $models = decode_json(Mojo::File->new('.bi/models.json')->slurp);
+    my $cache  = Database::BI::Model::Geocode->cache_from_models($models, $spec);
 
-    my $spec  = 'table:sales|loc=place';
-    my $cache = Database::BI::Model::Geocode->cache_from_models(\%models, $spec);
-    my $result = $geocode->resolve_values(\@places, cache => $cache);
+    # Resolve; cached values are used without asking the geocoder.
+    my $result = $geocode->resolve_column($rows, 'city', cache => $cache);
 
-    my $models = Database::BI::Model::Geocode->models_with_cache(
-        \%models, $spec, $result->{'cache'},
+    # Save the updated cache back to the models file.
+    my $updated = Database::BI::Model::Geocode->models_with_cache(
+        $models, $spec, $result->{'cache'},
         backend => $result->{'backend'},
-        built   => $now,
+        built   => '2026-10-18T12:00:00',
+    );
+    Mojo::File->new('.bi/models.json')->spew(encode_json($updated));
+
+B<Warm the cache for a whole column without needing rows:>
+
+    # Extract unique city values from your own data.
+    my @cities = do { my %s; grep { !$s{$_}++ } map { $_->{'city'} } @{ $rows } };
+
+    my $result = $geocode->resolve_values(\@cities,
+        cache  => $cache,
+        region => 'GB',
+        max    => 1000,
     );
 
-B<Ask whether the panel should offer the option at all:>
+    printf "Resolved %d / %d new places\n",
+        $result->{'counts'}{'resolved'}, $result->{'counts'}{'attempted'};
 
-    my ($available, $reason) = $geocode->geocoder_available();
-    # (0, 'Geocoding a location column needs Geo::Coder::Free 0.47 or later, ...')
+B<Ask whether the geocoder is available before offering it in the UI:>
+
+    my $geocode = Database::BI::Model::Geocode->new();
+    my ($ok, $why) = $geocode->geocoder_available();
+
+    unless ($ok) {
+        warn "Map panel disabled: $why\n";
+    }
+
+B<Inject a test double so geocoding works without a real geocoder:>
+
+    package MyGeocoderStub;
+    sub new            { bless {}, shift }
+    sub valid_location { my ($self, $v) = @_; $v && $v !~ /\A\d+\z/ }
+    sub geocode_many   {
+        my ($self, $places, %opts) = @_;
+        return { 'London' => { lat => 51.5, long => -0.12, database => 'stub' } };
+    }
+
+    my $geocode = Database::BI::Model::Geocode->new(geocoder => MyGeocoderStub->new);
+    my $result  = $geocode->resolve_column($rows, 'city');
 
 =head1 DESCRIPTION
 
-C<Geo::Coder::Free> resolves a place to a C<Geo::Location::Point>.  A table column
-holds something less tidy than a place: names repeated thousands of times, blank
-cells, values that are not places at all.  This module does the three things the
-column then needs:
+C<Geo::Coder::Free> resolves a place name to a C<Geo::Location::Point>.  A table
+column holds something less tidy: values repeated thousands of times, blank cells,
+numbers that drifted in from an adjacent column.  This module does the three things
+the column then needs.
 
 =over 4
 
 =item B<Ask once per distinct value.>
 
-The column is reduced to a set first.  A repeated value costs one lookup, so a
-100,000-row file holding a dozen places costs a dozen lookups, not 100,000.
+The column is reduced to a set before any lookup happens.  A repeated city name
+costs one lookup, so a 100,000-row file with a dozen cities costs twelve lookups,
+not 100,000.
 
 =item B<Refuse a value that is not a location before any backend sees it.>
 
-C<< $geocoder->valid_location($value) >> is the rule the guard inside C<geocode()>
-and the backends themselves apply: false for C<undef>, the empty string, a
-reference, and a string of digits only.  Answering it here means a bare number in
-the wrong column is counted and reported rather than looked up, and the count of
-lookups stays the count of work the request did.
+C<< $geocoder->valid_location($value) >> is the gate the geocoder's own guard
+applies before looking anything up.  This module asks the same question first, so
+a pure-digit string (a row number that ended up in the wrong column), an empty
+cell, or a Perl reference is counted and reported as skipped rather than sent to
+a backend that would reject it anyway.
 
 =item B<Look the rest up without letting one value end the batch.>
 
-The batch is made with C<< on_error => 'undef' >>.  A value the geocoder refuses
-after the pre-filter is a miss; a backend that throws is still a throw, because
-nothing here is wrapped in an C<eval>.
+The batch is requested with C<< on_error => 'undef' >>.  A value the geocoder
+refuses after the pre-filter is a miss; a backend that throws an exception is
+still a throw, because nothing here wraps the geocoder in an C<eval>.
 
 =back
 
-The counts add up, in every path through the module: C<skipped + cached +
-attempted + not_attempted == distinct>, and C<resolved + unresolved == cached +
-attempted>.  C<lookups> is the count the geocoder itself reports for the batch,
-which is C<attempted> unless the geocoder knows something finer.
+The counts the module returns add up, always.
+
+    skipped + cached + attempted + not_attempted  ==  distinct
+    resolved + unresolved                         ==  cached + attempted
+
+C<lookups> is the number the geocoder itself reports for the batch.  With
+C<Geo::Coder::Free> 0.48 and later it may be lower than C<attempted>, because
+the geocoder counts database reads and a value it answered from a warm process
+cache costs zero reads.  It never exceeds C<attempted>.
 
 =head2 The cache
 
-A cache entry is a C<[lat, lon]> arrayref for a place that resolved, or C<0> for a
-place that was looked up and not found - the shape section 6.3 gives the C<geo>
-section of C<.bi/models.json>.  That C<0> is what stops a column of unresolvable
-values from being retried on every request, and it is why C<unresolved> can be
-reported when no lookup happened.
+A cache entry is a C<[lat, lon]> arrayref for a place that resolved, or the
+scalar C<0> for a place that was looked up and not found.  That C<0> sentinel
+prevents a column of unresolvable values from being retried on every page
+request.
 
-The cache is passed per call and returned per call; the caller's hashref is never
-modified, so a request that dies half way through cannot leave a half-written
-cache behind.  Persisting it is the controller's business, which keeps the
-C<model_dir>-inside-C<data_dir> guard in the one place that already owns it
-(section 7: no write to C<data_dir>, ever).  A cache that has been remembered is
-also used when no geocoder can be loaded at all: the places already resolved are
-still plotted, and only new lookups are unavailable.
+The cache is passed per call and returned per call.  The caller's hashref is
+never modified: a request that dies part way through cannot leave a half-written
+cache behind.  The controller is responsible for persisting the returned cache,
+which keeps the C<model_dir>-inside-C<data_dir> guard in the one place that
+already owns it.
+
+A previously stored cache is used even when the geocoder is not available.
+Places already resolved continue to be plotted; only new lookups are unavailable.
 
 =head2 Without the geocoder
 
-C<Geo::Coder::Free> is a recommended dependency, not a required one, and it is
-loaded when it is first needed rather than at compile time.  If it is missing, or
-older than the floor, nothing is looked up and nothing croaks: C<available> is
-false, C<error_map_geocoder_missing> says which version is needed and which is
-installed, and the caller maps explicit coordinate columns instead.
+C<Geo::Coder::Free> is a recommended dependency, not a required one.  It is
+loaded the first time it is needed, not at compile time.  When it is absent or
+older than the minimum version:
+
+=over 4
+
+=item *
+
+C<< $geocode->geocoder_available() >> returns C<(0, $reason)>.
+
+=item *
+
+C<resolve_column> and C<resolve_values> still return a complete result: all
+values are placed in C<not_attempted>, cached answers are still plotted, and
+the C<error_map_geocoder_missing> message explains the situation.
+
+=item *
+
+Nothing croaks.  The page renders with whatever the cache already holds.
+
+=back
 
 =head1 CONSTRUCTOR
 
 =head2 new
 
     my $geocode = Database::BI::Model::Geocode->new(%options);
+    my $geocode = Database::BI::Model::Geocode->new(\%options);  # hashref also accepted
+
+Create a new resolver.  Accepts a flat key/value list or a hashref; both forms
+are handled by C<Params::Get>.
 
 =head3 API SPECIFICATION
 
 =head4 INPUT
 
-    geocoder             => object,   # optional; must provide valid_location() and geocode_many()
-    openaddr             => string,   # optional; OpenAddresses data path (default: $ENV{OPENADDR_HOME})
-    min_geocoder_version => string,   # optional; default 0.47
+    geocoder             => object,   # optional; duck-typed: must provide valid_location() and geocode_many()
+    openaddr             => string,   # optional; path to OpenAddresses data (default: $ENV{OPENADDR_HOME})
+    min_geocoder_version => string,   # optional; minimum version to accept (default: '0.47')
     i18n                 => object,   # optional; must implement maketext($key, @args)
 
-C<geocoder> is the seam the tests use, and the only way to resolve with something
-other than C<Geo::Coder::Free>.  An injected geocoder is used exactly as given -
-it is not version-checked, which is what lets a stub stand in for the module.
+C<geocoder> is the injection seam for tests.  An injected geocoder is used
+exactly as given: it is not version-checked, so any object that responds to
+C<valid_location()> and C<geocode_many()> works.  A geocoder that fails either
+C<can()> check causes an immediate C<croak> (C<error_geocoder_interface>), not
+a silent degradation.
 
-C<min_geocoder_version> is injectable so a caller can pin the floor, and so the
-too-old path can be tested on a machine that has the module installed.
+C<openaddr> overrides C<$ENV{OPENADDR_HOME}>.  It is forwarded to
+C<< Geo::Coder::Free->new(openaddr => ...) >>.  When it is absent and the
+environment variable is not set, the geocoder uses its built-in MaxMind data
+only, which resolves city and country names but not street addresses.
+C<warn_map_geocoder_unavailable_data> is emitted in that case.
 
-Accepts a flat key/value list or a hashref, via C<Params::Get>.
+C<min_geocoder_version> lets the caller pin the floor, or a test simulate
+a too-old installation on a machine that has the current version.
+
+C<i18n> is an optional object whose C<maketext($key, @args)> method is called
+in place of the built-in C<%MESSAGES> table.  The key is one of the constants
+defined in C<%MESSAGES>; the args are the same positional values C<sprintf>
+would receive.
 
 =head4 OUTPUT
 
-Returns C<$self>.  Croaks on an injected geocoder that cannot answer
-C<valid_location()> or C<geocode_many()> (C<error_geocoder_interface>): a geocoder
-that cannot answer the rule is a programming error, unlike a geocoder that is not
-installed.
+Returns C<$self>.
+
+Croaks with C<error_geocoder_interface> if the injected C<geocoder> does not
+provide both C<valid_location()> and C<geocode_many()>.
+
+Never croaks because the geocoder module is absent or too old: that is a
+runtime condition reported by C<geocoder_available()>, not a constructor error.
 
 =head1 SUBROUTINES/METHODS
 
 =head2 resolve_column
 
-    my $result = $geocode->resolve_column($rows, $column, %options);
+    my $result = $geocode->resolve_column(\@rows, $column_name, %options);
 
-Resolve one column of a table: C<$rows> is an arrayref of hashrefs as the pipeline
-produces them, and C<$column> names the one holding the places.
+Resolve one named column of a table.  C<\@rows> is an arrayref of hashrefs
+(the records from the data pipeline), and C<$column_name> is the key to look
+up in each row.
+
+This is the main entry point for the map controller.  It runs the same
+resolution as L</resolve_values>, then adds per-marker row counts and the
+C<markers> list that a map rendering loop needs.
 
 =head3 API SPECIFICATION
 
 =head4 INPUT
 
-    $rows    => arrayref of hashrefs, required
-    $column  => string,   required
-    cache    => hashref,  # optional; value => [lat, lon] | 0
-    region   => string,   # optional; two-letter country hint for the geocoder
-    max      => integer,  # optional; new lookups allowed, default 500
+    \@rows          => arrayref of hashrefs, required
+    $column_name    => non-empty string, required
+    cache    => hashref,            # optional; { value => [lat, lon] | 0 }
+    region   => two-letter string,  # optional; country hint for the geocoder (e.g. 'GB')
+    max      => positive integer,   # optional; max new lookups; default 500
 
-C<max> is C<map_geocode_max>: new lookups, not rows and not cached answers.  A
-value already in C<cache> costs nothing and does not count against it.
+C<\@rows> is the full record set as returned by the pipeline.  Rows that are
+not hashrefs produce an C<undef> cell, which is classified as skipped.
 
-C<region> is passed straight through; it is not derived from the request's
-language, because a language is not a country.
+C<$column_name> must be a non-empty string.  It is used as a hash key; it is
+not validated against a schema, so a column name with spaces or special
+characters is accepted if the data uses one.
+
+C<cache> holds the already-known answers for this column.  Entries are either
+a C<[lat, lon]> arrayref (resolved) or C<0> (looked up and not found).  The
+caller's hashref is never modified; the returned C<cache> key holds the
+updated copy.
+
+C<region> is passed straight through to the geocoder as a country hint.  It
+is not derived from the Accept-Language header, because a language is not a
+country.
+
+C<max> is counted in new lookups, not rows.  A cached answer costs nothing
+and does not count toward it.  Values held back by the cap go into
+C<not_attempted> and are not stored in the cache, so the next request picks
+them up.
 
 =head4 OUTPUT
 
 Returns a hashref:
 
     {
-        available => 1,                    # 0 when no geocoder could be loaded
-        points    => { $value => { lat, lon, rows, first_row, backend } },
-        markers   => [ { value, lat, lon, rows, first_row } ],   # first-seen order
-        counts    => { rows, plotted, unusable, distinct, skipped, cached,
-                       attempted, lookups, resolved, unresolved, not_attempted },
-        skipped        => [ $value ],      # not a location: never looked up
-        unresolved     => [ $value ],      # looked up (now or before) and not found
-        not_attempted  => [ $value ],      # held back by the cap
-        messages  => [ { key, text } ],
-        cache     => { $value => [lat, lon] | 0 },
-        backends  => { 'OpenAddresses' => 3 },
-        backend   => 'OpenAddresses',      # undef when nothing resolved
-        capped    => 0,
+        available     => 1 | 0,
+        points        => { $value => { lat => $n, lon => $n, rows => $n, first_row => $n, backend? => $s } },
+        markers       => [ { value => $s, lat => $n, lon => $n, rows => $n, first_row => $n } ],
+        counts        => {
+            rows          => $n,   # total rows in \@rows
+            plotted       => $n,   # rows whose value resolved to a point
+            unusable      => $n,   # rows - plotted
+            distinct      => $n,   # unique values seen
+            skipped       => $n,   # refused before any lookup (empty, ref, digit-only)
+            cached        => $n,   # found in the cache (resolved or not)
+            attempted     => $n,   # sent to the geocoder this request
+            lookups       => $n,   # lookups the geocoder reports (may be < attempted)
+            resolved      => $n,   # total with a position (cache + new)
+            unresolved    => $n,   # total without (cache + new)
+            not_attempted => $n,   # held back by the cap, or skipped because no geocoder
+        },
+        skipped       => [ $value, ... ],   # values refused before lookup
+        unresolved    => [ $value, ... ],   # values tried (now or before) and not found
+        not_attempted => [ $value, ... ],   # held back by the cap
+        messages      => [ { key => $k, text => $t }, ... ],
+        cache         => { $value => [lat, lon] | 0 },   # updated copy; never the caller's hashref
+        backends      => { $backend_name => $count },
+        backend       => $backend_name | undef,          # undef when nothing resolved
+        capped        => 0 | 1,
     }
 
-C<points> holds one entry per value that produced a position - whether it was
-looked up now or remembered from an earlier request - and C<markers> is the same
-in first-seen order, which is the order a map reads better in.  A value that was
-plotted from the cache carries no C<backend>, because the cache remembers a
-position and not which dataset gave it; only the places looked up in this request
-name one.  C<rows> on an entry is how many rows of the column hold that value, so
-an aggregated marker's popup can say how many events are at it without recounting;
-C<first_row> is the index of the first of them.
+C<points> holds one entry per value that produced a position, whether the
+position came from the cache or from this request.  C<markers> is the same
+data in first-seen row order, which reads better on a map than alphabetical
+order.
 
-A cell that is C<undef>, empty, or a reference is in C<skipped>: no module is
-needed to know it is not a location.  A value the geocoder's C<valid_location()>
-refused is in C<skipped> too, since that method is the rule.  C<unresolved> holds
-the places that were looked up - now or in an earlier request, from the cache -
-and found nothing; C<not_attempted> holds the ones the cap held back, which are
-deliberately *not* recorded in the cache, so the next request or the warm script
-picks them up.  When the geocoder is unavailable, every non-empty value is in
-C<not_attempted>: nothing is refused on its behalf, and nothing is guessed at.
+C<backend> on a point entry is set only for values looked up in this request;
+cached values do not carry one because the cache stores a position, not which
+database gave it.  The top-level C<backend> is the name of the backend that
+answered the most lookups this request.
+
+The count invariant always holds:
+
+    skipped + cached + attempted + not_attempted  ==  distinct
 
 =head3 MESSAGES
 
-    error_map_loc_column               -- the named column is in none of the rows
-    error_map_geocoder_missing         -- no geocoder, or one older than the floor
-    warn_map_rows_skipped              -- some rows have no plottable location
-    warn_map_geocode_capped            -- the cap held some places back
-    warn_map_geocoder_unavailable_data -- no OPENADDR_HOME, so coarse answers only
+    error_rows_arrayref                -- \@rows is not an arrayref
+    error_column_required              -- $column_name is empty or undef
+    error_map_loc_column               -- column not found in any row
+    error_map_geocoder_missing         -- no geocoder, or version below the floor
+    warn_map_rows_skipped              -- some rows could not be plotted
+    warn_map_geocode_capped            -- the cap held some values back
+    warn_map_geocoder_unavailable_data -- OPENADDR_HOME not set; coarse resolution only
 
 =head3 EXAMPLE
 
-    my $result = $geocode->resolve_column($rows, 'place', region => 'GB', max => 500);
-
-    for my $message (grep { $_->{'key'} eq 'warn_map_rows_skipped' } @{ $result->{'messages'} }) {
-        warn $message->{'text'};
-    }
-
-=head2 resolve_values
-
-    my $result = $geocode->resolve_values(\@values, %options);
-
-The same resolution without rows: C<\@values> is a list of cell values, in any
-order and with any repeats, and the returned hashref is the one
-C<resolve_column()> is built on, without C<rows>/C<plotted>/C<unusable>, without
-C<markers>, and without the row-level C<warn_map_rows_skipped> message.  This is
-what a warming script wants: every distinct value of a column, resolved and
-reported as counts.
-
-=head2 geocoder_available
-
-    my ($available, $reason) = $geocode->geocoder_available();
-
-Whether this object can resolve anything new, and why not when it cannot.  It
-loads the geocoder if that has not happened yet, and never croaks: a panel asks
-this to decide whether to offer the location option at all, so the answer is a
-sentence about the installed module rather than an exception.
-
-=head2 cache_from_models
-
-    my $cache = Database::BI::Model::Geocode->cache_from_models(\%models, $spec_key);
-
-The remembered places of one dataset spec, as a copy, from a model store in the
-shape C<_read_models()> returns.  An unknown spec, or one that has never been
-geocoded, gives an empty hashref.
-
-=head2 models_with_cache
-
-    $models = Database::BI::Model::Geocode->models_with_cache(
-        \%models, $spec_key, $cache, backend => 'OpenAddresses', built => $iso8601,
+    my $cache   = Database::BI::Model::Geocode->cache_from_models($models, $spec);
+    my $result  = $geocode->resolve_column($rows, 'city',
+        cache  => $cache,
+        region => 'GB',
+        max    => 200,
     );
 
-A new model store in which those places are recorded under
-C<< geo => { $spec_key => { places, backend, built } } >>, leaving every other key,
-every other spec, and the caller's hashref untouched.  This module never writes
-the file: it returns the structure for the controller to hand to
-C<_write_models()>, which is where the writability and C<data_dir> guards live.
-C<built> is passed in rather than taken from the clock, so a caller decides what
-time it was.
+    if ($result->{'capped'}) {
+        warn "Some cities were not looked up; load the page again to finish them.\n";
+    }
+
+    for my $m (@{ $result->{'markers'} }) {
+        printf "[%.4f, %.4f]  %s (%d rows)\n",
+            $m->{'lat'}, $m->{'lon'}, $m->{'value'}, $m->{'rows'};
+    }
 
 =cut
 
@@ -645,8 +721,12 @@ sub _resolve {
 	# column in a personal dataset is personal data (section 7).
 	my @messages;
 
-	push @messages, $self->_message('error_map_geocoder_missing', $self->{'min_version'}, $reason)
-		unless $available;
+	# geocoder_available() already returns the finished sentence, so it is used as
+	# the text; formatting it again repeated the whole message.
+	push @messages, {
+		'key'  => 'error_map_geocoder_missing',
+		'text' => defined($reason) ? $reason : $self->_msg('error_map_geocoder_missing', $self->{'min_version'}, 'it is not installed'),
+	} unless $available;
 
 	push @messages, $self->_message('warn_map_geocode_capped', scalar @attempt, $wanted)
 		if $capped;
@@ -716,6 +796,78 @@ sub _options {
 
 =head2 resolve_values
 
+    my $result = $geocode->resolve_values(\@values, %options);
+    my $result = $geocode->resolve_values(\@values, \%options);
+
+Resolve a flat list of cell values, without the context of any row structure.
+Use this when you want to warm the cache for a column's distinct values, or
+when you have already extracted the values yourself and do not need per-marker
+row counts.
+
+The returned hashref is identical to L</resolve_column>'s, except that
+C<counts.rows>, C<counts.plotted>, C<counts.unusable>, and C<markers> are
+absent, and C<warn_map_rows_skipped> is never emitted.
+
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+    \@values => arrayref, required;  elements may be any scalar or undef
+    cache    => hashref,             # optional; { value => [lat, lon] | 0 }
+    region   => string,              # optional; two-letter country hint
+    max      => positive integer,    # optional; new lookups allowed; default 500
+
+Duplicate values in C<\@values> cost one lookup each.  C<undef>, references,
+empty strings, and pure-digit strings are refused before any lookup and counted
+as C<skipped>.
+
+=head4 OUTPUT
+
+Returns a hashref (same shape as L</resolve_column> but without C<markers>,
+C<counts.rows>, C<counts.plotted>, and C<counts.unusable>):
+
+    {
+        available     => 1 | 0,
+        points        => { $value => { lat => $n, lon => $n, backend? => $s } },
+        counts        => {
+            distinct      => $n,
+            skipped       => $n,
+            cached        => $n,
+            attempted     => $n,
+            lookups       => $n,
+            resolved      => $n,
+            unresolved    => $n,
+            not_attempted => $n,
+        },
+        skipped       => [ $value, ... ],
+        unresolved    => [ $value, ... ],
+        not_attempted => [ $value, ... ],
+        messages      => [ { key => $k, text => $t }, ... ],
+        cache         => { $value => [lat, lon] | 0 },
+        backends      => { $name => $count },
+        backend       => $name | undef,
+        capped        => 0 | 1,
+    }
+
+Croaks with C<error_values_arrayref> if C<\@values> is not an arrayref.
+
+=head3 EXAMPLE
+
+    # Build the distinct-value list yourself and warm the cache offline.
+    my %seen;
+    my @cities = grep { defined($_) && !$seen{$_}++ } map { $_->{'city'} } @{ $rows };
+
+    my $result = $geocode->resolve_values(\@cities,
+        cache  => $cache,
+        region => 'GB',
+        max    => 2000,
+    );
+
+    printf "New lookups: %d  Resolved: %d  Unresolved: %d\n",
+        $result->{'counts'}{'attempted'},
+        $result->{'counts'}{'resolved'},
+        $result->{'counts'}{'unresolved'};
+
 =cut
 
 sub resolve_values {
@@ -731,6 +883,8 @@ sub resolve_values {
 }
 
 =head2 resolve_column
+
+See full documentation above, in L</SUBROUTINES/METHODS>.
 
 =cut
 
@@ -805,6 +959,41 @@ sub resolve_column {
 
 =head2 geocoder_available
 
+    my ($is_available, $reason) = $geocode->geocoder_available();
+
+Ask whether this object can make new geocoder lookups.  Returns a list of two
+values: a boolean (C<1> or C<0>) and a human-readable reason string when the
+answer is no.
+
+Loads C<Geo::Coder::Free> lazily on the first call if it has not been loaded
+yet.  Never croaks: a panel uses this to decide whether to show the location
+option, so the answer must always be a string, not an exception.
+
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+None.  (No arguments accepted.)
+
+=head4 OUTPUT
+
+    ($available, $reason)
+
+    $available => 1      # geocoder is ready
+    $available => 0      # geocoder is not available
+    $reason    => undef  # when $available is 1
+    $reason    => string # error_map_geocoder_missing text; when $available is 0
+
+=head3 EXAMPLE
+
+    my ($ok, $reason) = $geocode->geocoder_available();
+
+    if (!$ok) {
+        # Disable the "Map by location column" panel option.
+        $stash->{'map_loc_disabled'} = 1;
+        $stash->{'map_loc_disabled_reason'} = $reason;
+    }
+
 =cut
 
 sub geocoder_available {
@@ -819,6 +1008,41 @@ sub geocoder_available {
 
 =head2 cache_from_models
 
+    my $cache = Database::BI::Model::Geocode->cache_from_models(\%models, $spec_key);
+
+Extract the geocode cache for one dataset spec from a model store.  Returns a
+B<copy> of the stored places hashref so the caller cannot accidentally modify
+the model store.
+
+This is a B<class method>: call it on the package name, or on an instance if
+you prefer; either way the invocant is ignored.
+
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+    \%models  => hashref, required;  the structure returned by _read_models()
+    $spec_key => string, required;   the dataset spec (e.g. 'table:sales')
+
+=head4 OUTPUT
+
+Returns a plain hashref:
+
+    { $place_name => [lat, lon] | 0, ... }
+
+Returns an empty hashref C<{}> for an unknown spec, a spec that has never
+been geocoded, or a C<\%models> argument that is not a hashref.  Never
+croaks.
+
+=head3 EXAMPLE
+
+    my $models = decode_json(Mojo::File->new($model_path)->slurp);
+    my $cache  = Database::BI::Model::Geocode->cache_from_models(
+        $models, 'table:sales'
+    );
+
+    # $cache is now { 'Ramsgate' => [51.336, 1.416], 'Paris' => 0, ... }
+
 =cut
 
 sub cache_from_models {
@@ -832,6 +1056,62 @@ sub cache_from_models {
 }
 
 =head2 models_with_cache
+
+    my $updated_models = Database::BI::Model::Geocode->models_with_cache(
+        \%models, $spec_key, \%cache,
+        backend => 'OpenAddresses',
+        built   => '2026-10-18T12:00:00',
+    );
+
+Produce a new model store in which the geocode cache for C<$spec_key> is
+replaced with C<\%cache>.  Every other key in the model store, and every
+other spec's geocode data, is carried over unchanged.
+
+This is a B<class method>; the invocant is ignored.
+
+This module never writes the file.  The caller is responsible for passing
+C<$updated_models> to C<_write_models()> or its equivalent, which is where
+the writability and C<data_dir> guards live.  The separation keeps those
+guards in the one place that already owns them (section 7 of the phase spec).
+
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+    \%models  => hashref, required;  the existing model store (not modified)
+    $spec_key => string, required;   the dataset spec to update
+    \%cache   => hashref, required;  { place => [lat, lon] | 0 }
+    backend   => string, optional;   name of the geocoder backend that resolved
+    built     => string, optional;   ISO-8601 timestamp of when the cache was built
+
+=head4 OUTPUT
+
+Returns a new hashref.  The caller's C<\%models> is never modified.
+
+    {
+        ...all existing model keys...,
+        geo => {
+            ...all existing geo specs...,
+            $spec_key => {
+                places  => \%cache,
+                backend => $backend,  # if supplied
+                built   => $built,    # if supplied
+            },
+        },
+    }
+
+=head3 EXAMPLE
+
+    my $updated = Database::BI::Model::Geocode->models_with_cache(
+        $models,
+        'path:/data/sales.csv',
+        $result->{'cache'},
+        backend => $result->{'backend'},
+        built   => '2026-10-18T09:15:42',
+    );
+
+    # Now write the updated store to disk.
+    Mojo::File->new($model_path)->spew(encode_json($updated));
 
 =cut
 
@@ -854,6 +1134,359 @@ sub models_with_cache {
 }
 
 1;
+
+=head1 COMMON PITFALLS
+
+=over 4
+
+=item B<The cache sentinel 0 is not "false -- never looked up".>
+
+A cache entry of C<0> means the place was looked up and not found.  An absent
+key means it has never been attempted.  The module treats these two states
+differently: a C<0> entry contributes to C<counts.unresolved> without
+triggering a new lookup; an absent key enters the classification loop and may
+reach the geocoder.
+
+    # WRONG -- checking definedness misses the 0 sentinel.
+    my $resolved = defined($cache{$place});
+
+    # CORRECT -- use the internal _has_position logic.
+    my $resolved = (ref($cache{$place}) eq 'ARRAY');
+
+=item B<Pure-digit strings are skipped, not attempted.>
+
+A value like C<'42'> fails C<valid_location()> and goes into C<@skipped>.  It
+is never stored in the cache.  This is the correct behaviour for a row number
+that ended up in the wrong column, but it surprises callers who expect every
+non-empty value to be attempted.
+
+=item B<The returned cache is a copy; the caller's hashref is never modified.>
+
+Do not compare C<$cache_you_passed_in> with C<$result->{'cache'}> expecting
+them to be the same reference.  The update is in C<$result->{'cache'}>.
+
+=item B<resolve_column croaks when the column is absent; resolve_values does not.>
+
+C<resolve_column> checks that the named column appears in at least one row.
+If it does not, it croaks with C<error_map_loc_column>.  C<resolve_values>
+does not do this check, because it receives values, not rows.
+
+=item B<max counts new lookups, not rows or distinct values.>
+
+A value already in C<cache> does not count toward C<max>, even if it was
+looked up in a previous request.  A value skipped by C<valid_location()> does
+not count either.
+
+=item B<new() always succeeds; geocoder load failure is not a constructor error.>
+
+You can always call C<new()> without checking whether C<Geo::Coder::Free> is
+installed.  The load failure is deferred to the first call that needs the
+geocoder, and is reported through C<geocoder_available()> and the
+C<messages> array in the result, not through an exception.
+
+=item B<cache_from_models and models_with_cache are class methods.>
+
+You may call them on an instance for convenience, but the invocant is not used.
+The pattern C<< Database::BI::Model::Geocode->cache_from_models(...) >> is
+clearer.
+
+=item B<The geocoder batch receives on_error => 'undef'.>
+
+A value the geocoder rejects after the C<valid_location()> pre-filter is
+returned as C<undef> from the batch; it does not croak.  A backend that throws
+an exception (a real database error, a network failure) still propagates
+upward, because nothing here wraps the geocoder in an C<eval>.
+
+=back
+
+=head1 ENCODING
+
+=over 4
+
+=item B<Place names (values in the location column)>
+
+Passed to the geocoder as byte strings.  UTF-8 place names such as
+"Koeln" or "Beijing" are supported if the geocoder backend handles them.
+The internal code does not re-encode or validate the bytes; it compares them
+as opaque strings for deduplication and caching.
+
+=item B<Column names>
+
+Matched against row hash keys with a string equality test.  The column name
+must be byte-for-byte identical to the key in the row hashrefs.  Column names
+with non-ASCII bytes are accepted.
+
+=item B<Spec keys (the $spec_key argument)>
+
+Used as hash keys in the model store.  Any byte sequence is safe; UTF-8 spec
+keys are stored and retrieved without modification.
+
+=item B<Message strings>
+
+The built-in C<%MESSAGES> table contains ASCII-only text.  If your application
+needs non-ASCII messages (for example, a French translation), supply an C<i18n>
+object to C<new()> whose C<maketext> method renders the key in the desired
+locale.
+
+=item B<Geocoder result strings (backend names)>
+
+Stored and reported as returned by the geocoder.  The module does not impose
+any encoding on them.
+
+=back
+
+=head1 DIAGNOSTICS
+
+All user-visible messages are keyed in C<%Database::BI::Model::Geocode::MESSAGES>.
+
+=over 4
+
+=item C<error_map_geocoder_missing>
+
+    Geocoding a location column needs Geo::Coder::Free %s or later, and %s
+
+The geocoder module is not installed (the second C<%s> is "it is not
+installed") or is too old (the second C<%s> is the installed version number).
+Install or upgrade C<Geo::Coder::Free>.
+
+=item C<error_map_loc_column>
+
+    Column "%s" is not in this dataset, so there is nothing to geocode
+
+The C<$column_name> argument to C<resolve_column()> did not appear as a key in
+any row.  Check the column name, including case and any spaces.
+
+=item C<error_geocoder_interface>
+
+    Geocode: the geocoder must provide %s; Geo::Coder::Free %s or later does
+
+An injected C<geocoder> object does not respond to C<valid_location()> or
+C<geocode_many()>.  Either use the real C<Geo::Coder::Free> or add the missing
+method to your stub.
+
+=item C<error_max_invalid>
+
+    Geocode: option "max" must be a positive integer, not "%s"
+
+The C<max> option was supplied but is not a positive integer string.  Passing
+C<max => 0> and C<max => 'all'> both trigger this error.
+
+=item C<error_values_arrayref>
+
+    Geocode: the values must be an arrayref, not "%s"
+
+The first argument to C<resolve_values()> is not an arrayref.  Pass
+C<\@values> (a reference), not C<@values> (a flat list).
+
+=item C<error_rows_arrayref>
+
+    Geocode: the rows must be an arrayref, not "%s"
+
+The first argument to C<resolve_column()> is not an arrayref.
+
+=item C<error_column_required>
+
+    Geocode: the column name is required
+
+The C<$column_name> argument to C<resolve_column()> is C<undef> or an empty
+string.
+
+=item C<warn_map_rows_skipped>
+
+    Plotted %d of %d rows; %d hold no location that could be plotted ...
+
+Some rows in the input had a cell that was empty, a bare number, or a place
+that the geocoder could not find.  The count of plotted rows is less than the
+total.  Not an error: the map renders with the rows that could be resolved.
+
+=item C<warn_map_geocode_capped>
+
+    Geocoded %d of the %d places that had not been looked up before; ...
+
+The C<max> cap prevented all pending values from being looked up in this
+request.  The un-looked-up values are in C<not_attempted> and are not stored
+in the cache, so the next request picks them up.
+
+=item C<warn_map_geocoder_unavailable_data>
+
+    The geocoder has no OpenAddresses data configured (OPENADDR_HOME), ...
+
+The geocoder was loaded successfully but C<OPENADDR_HOME> is not set and
+C<openaddr> was not passed to C<new()>.  Resolution will succeed for broad
+place names (cities, countries) but will fail for street-level addresses.
+Set the environment variable or pass C<openaddr => $path> to C<new()>.
+
+=back
+
+=head1 FORMAL SPECIFICATION
+
+The following sections use Z calculus notation to describe the exact state
+transitions and invariants of each public operation.  Notation: ∈ (member of),
+∉ (not member of), ⊆ (subset), ∪ (union), ∩ (intersection), ∧ (and), ∨ (or),
+¬ (not), ∀ (for all), ∃ (there exists), → (maps to), ≤ (less than or equal),
+≠ (not equal).
+
+=head3 FORMAL SPECIFICATION
+
+State transitions and invariants for each operation are described below.
+
+=head2 _resolve -- value classification and batch geocoding
+
+Let V be the multiset of input values.
+
+Define the following disjoint sets that partition distinct(V):
+
+    SKIPPED          = { v | v = undef, ref(v), or len(v) = 0,
+                             or geocoder.valid_location(v) = false }
+    CACHED_RESOLVED  = { v | v in dom(CACHE) and _has_position(CACHE(v)) }
+    CACHED_UNRESOLVED = { v | v in dom(CACHE) and not _has_position(CACHE(v)) }
+    NOT_ATTEMPTED    = { v | geocoder unavailable } (excludes SKIPPED and CACHED)
+    PENDING          = distinct(V) \ (SKIPPED ∪ CACHED_RESOLVED ∪ CACHED_UNRESOLVED
+                                      ∪ NOT_ATTEMPTED)
+
+Partition invariant:
+
+    |SKIPPED| + |CACHED_RESOLVED| + |CACHED_UNRESOLVED|
+        + |NOT_ATTEMPTED| + |PENDING| = |distinct(V)|
+
+Cap application (MAX = the max option, default 500):
+
+    ATTEMPT        = PENDING[0 .. min(MAX, |PENDING|) - 1]
+    CAPPED         = |PENDING| > MAX
+    NOT_ATTEMPTED' = NOT_ATTEMPTED ∪ PENDING[MAX .. |PENDING| - 1]   (when CAPPED)
+
+Geocoding step -- for each v in ATTEMPT:
+
+    BATCH = geocoder.geocode_many(ATTEMPT, on_error => 'undef')
+
+    for v in ATTEMPT:
+        (lat, lon) = coordinates(BATCH(v))
+        if defined(lat) and defined(lon):
+            CACHE'(v)  = [lat, lon]
+            POINTS'(v) = { lat, lon, backend? }
+        else:
+            CACHE'(v)  = 0
+            UNRESOLVED_NEW += {v}
+
+Count invariants (always hold):
+
+    skipped + cached + attempted + not_attempted = distinct(V)
+    resolved + unresolved = cached + attempted
+    resolved  = |CACHED_RESOLVED| + |ATTEMPT ∩ POINTS'|
+    unresolved = |CACHED_UNRESOLVED| + |ATTEMPT \ POINTS'|
+    lookups   <= attempted
+
+Cache monotonicity:
+
+    dom(CACHE') ⊇ dom(CACHE)
+    For all v in dom(CACHE): CACHE'(v) = CACHE(v)  (existing entries not modified)
+
+=head2 resolve_column -- row augmentation
+
+Given the output R of _resolve applied to the column's cell sequence CELLS:
+
+    row_count  : Value -> N   where row_count(v) = |{ i | CELLS[i] = v }|
+    first_row  : Value -> N   where first_row(v)  = min{ i | CELLS[i] = v }
+
+    For each v in dom(R.points):
+        R.points(v).rows      = row_count(v)
+        R.points(v).first_row = first_row(v)
+
+    R.markers = [ { value: v, ...R.points(v) }
+                  | v <- sort_by(first_row, dom(R.points)) ]
+
+    R.counts.rows     = |CELLS|
+    R.counts.plotted  = sum{ row_count(v) | v in dom(R.points) }
+    R.counts.unusable = R.counts.rows - R.counts.plotted
+
+=head2 cache_from_models -- safe extraction
+
+    cache_from_models(models, spec)
+        = if ref(models) = HASH and ref(models.geo.spec) = HASH
+                                and ref(models.geo.spec.places) = HASH
+            then copy(models.geo.spec.places)
+            else {}
+
+The result is a shallow copy: the caller cannot modify the model store by
+modifying the returned hashref, but values inside the cache (the [lat, lon]
+arrayrefs) are shared references.
+
+=head2 models_with_cache -- safe merge
+
+    models_with_cache(models, spec, cache, backend?, built?)
+        = { ...models,
+            geo: { ...models.geo,
+                   spec: { ...models.geo.spec,
+                            places:  copy(cache),
+                            backend: backend (if defined),
+                            built:   built   (if defined) } } }
+
+The caller's models hashref is never modified; a new top-level hashref is
+returned.
+
+=head1 STATE DIAGRAM
+
+The object transitions through three states based on whether the geocoder
+has been loaded yet.
+
+    new()
+      |
+      v
+  +-------------------+
+  |    CONSTRUCTED    |  Geocoder not yet lazy-loaded.
+  |  _geocoder not    |  resolve_*() and geocoder_available()
+  |  yet called       |  may trigger a load on first call.
+  +-------------------+
+       |          |
+  first call,     first call,
+  module OK       module absent or too old
+       |          |
+       v          v
+  +---------+  +------------+
+  |  READY  |  | UNAVAILABLE|
+  |         |  |            |
+  | Geocoder|  | No lookups |
+  | loaded  |  | possible.  |
+  | and     |  | Cache still|
+  | working.|  | served.    |
+  +---------+  +------------+
+       |          |
+  resolve_*()  resolve_*()
+  geocodes +   cache only;
+  cache        not_attempted
+       |          |
+       v          v
+  +---------+  +------------+
+  |  READY  |  | UNAVAILABLE|
+  | (no     |  | (no        |
+  | change) |  | change)    |
+  +---------+  +------------+
+
+Resolution itself is stateless: the object's geocoder-load state does not
+change after the first load attempt.  All state is in the result hashref and
+the cache the caller manages.
+
+Value-level state transitions within a single resolve_* call:
+
+    RECEIVED
+       |
+       +--[undef / ref / empty]-----------> SKIPPED
+       |
+       +--[in cache, has position]---------> CACHED_RESOLVED --> POINTS
+       |
+       +--[in cache, no position (= 0)]----> CACHED_UNRESOLVED --> UNRESOLVED
+       |
+       +--[geocoder unavailable]-----------> NOT_ATTEMPTED
+       |
+       +--[valid_location() = false]-------> SKIPPED
+       |
+       +--[within cap]--------------------> ATTEMPT
+       |                                        |
+       |                                        +--[geocoder returns position]--> RESOLVED_NEW --> POINTS, CACHE==[lat,lon]
+       |                                        |
+       |                                        +--[geocoder returns undef]-----> UNRESOLVED_NEW, CACHE==0
+       |
+       +--[beyond cap]-------------------> NOT_ATTEMPTED
 
 =head1 LICENCE AND COPYRIGHT
 

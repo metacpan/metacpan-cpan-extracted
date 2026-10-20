@@ -442,8 +442,100 @@ static void pks_run_section(pTHX_ SV *code, SV *name, AV *out) {
     }
 }
 
-/* Every entry that goes in the document: the route half first, then each
- * section in declaration order.
+/* The pages of every `markdown` mount, as [loc, lastmod] pairs sorted by loc.
+ *
+ * A mount is invisible to the route table, but a markdown mount is exactly the
+ * content a sitemap is for, and its page table is built by the time this runs
+ * (compile builds the mounts before it wraps the middleware). lastmod is the
+ * page's `updated:`, else its `date:`, as YYYY-MM-DD; an undated page goes in
+ * without one, as a route does.
+ *
+ * `robots:` naming noindex leaves a page out of the sitemap - and it is NOT
+ * added to robots.txt: a page a crawler may not fetch is a page whose noindex
+ * it never reads. `sitemap => 0` on the mount leaves out the whole tree. */
+static int pks_noindex(const char *s, STRLEN l) {
+    STRLEN i;
+    for (i = 0; i + 7 <= l; i++)
+        if (toLOWER(s[i]) == 'n' && toLOWER(s[i + 1]) == 'o'
+            && toLOWER(s[i + 2]) == 'i' && toLOWER(s[i + 3]) == 'n'
+            && toLOWER(s[i + 4]) == 'd' && toLOWER(s[i + 5]) == 'e'
+            && toLOWER(s[i + 6]) == 'x')
+            return 1;
+    return 0;
+}
+
+static AV *pks_md_entries(pTHX_ SV *appsv) {
+    HV *app = app_hv(aTHX_ appsv);
+    SV *mp = app ? app_get(aTHX_ app, K_MOUNTS_C) : NULL;
+    AV *out = newAV();
+    AV *mounts;
+    SSize_t i, n;
+    if (!(mp && SvROK(mp) && SvTYPE(SvRV(mp)) == SVt_PVAV)) return out;
+    mounts = (AV *)SvRV(mp);
+    n = av_len(mounts) + 1;
+    for (i = 0; i < n; i++) {
+        SV **e = av_fetch(mounts, i, 0);
+        HV *m;
+        SV **flag, **mapp, *opt;
+        AV *cap, *order;
+        HV *pages, *opts;
+        SV *prefix;
+        SSize_t j, pn;
+        if (!(e && *e && SvROK(*e))) continue;
+        m = (HV *)SvRV(*e);
+        flag = hv_fetchs(m, K_MD_MOUNT, 0);
+        if (!(flag && *flag && SvTRUE(*flag))) continue;
+        mapp = hv_fetchs(m, K_APP, 0);
+        cap = (mapp && *mapp && SvROK(*mapp) && SvTYPE(SvRV(*mapp)) == SVt_PVCV)
+            ? punk_clos_cap(aTHX_ (CV *)SvRV(*mapp)) : NULL;
+        if (!cap) continue;
+        opts = (HV *)SvRV(*av_fetch(cap, PMDC_OPTS, 0));
+        opt = pmd_opt(aTHX_ opts, "sitemap");
+        if (opt && !SvTRUE(opt)) continue;
+        pages  = (HV *)SvRV(*av_fetch(cap, PMDC_PAGES, 0));
+        order  = (AV *)SvRV(*av_fetch(cap, PMDC_ORDER, 0));
+        prefix = *av_fetch(cap, PMDC_PREFIX, 0);
+        pn = av_len(order) + 1;
+        for (j = 0; j < pn; j++) {
+            SV **u = av_fetch(order, j, 0);
+            HE *he;
+            AV *page, *pair;
+            SV **x, *loc, *lm = NULL;
+            if (!(u && *u)) continue;
+            he = hv_fetch_ent(pages, *u, 0, 0);
+            if (!(he && HeVAL(he) && SvROK(HeVAL(he)))) continue;
+            page = (AV *)SvRV(HeVAL(he));
+            x = av_fetch(page, PMD_META, 0);
+            if (x && *x && SvROK(*x)) {
+                SV *r = pmd_opt(aTHX_ (HV *)SvRV(*x), "robots");
+                if (r) {
+                    STRLEN rl;
+                    const char *rp = SvPV_const(r, rl);
+                    if (pks_noindex(rp, rl)) continue;
+                }
+            }
+            loc = newSVsv(prefix);
+            sv_catsv(loc, *u);
+            if (!SvCUR(loc)) sv_catpvs(loc, "/");
+            x = av_fetch(page, PMD_UPDATED, 0);
+            if (!(x && *x && SvOK(*x))) x = av_fetch(page, PMD_DATE, 0);
+            if (x && *x && SvOK(*x)) {
+                SV *iso = sv_2mortal(pmd_iso(aTHX_ SvIV(*x)));
+                lm = newSVpvn(SvPVX(iso), 10);            /* YYYY-MM-DD */
+            }
+            pair = newAV();
+            av_push(pair, loc);
+            av_push(pair, lm ? lm : newSV(0));
+            av_push(out, newRV_noinc((SV *)pair));
+        }
+    }
+    if (av_len(out) > 0)
+        sortsv(AvARRAY(out), (size_t)(av_len(out) + 1), pks_cmp_pair);
+    return out;
+}
+
+/* Every entry that goes in the document: the route half first, then the
+ * markdown mounts' pages, then each section in declaration order.
  *
  * Both halves are sorted within themselves and de-duplicated across the
  * whole, so a page that is both a static route and a section row appears
@@ -472,6 +564,21 @@ static AV *pks_entries(pTHX_ SV *appsv) {
         av_push(pair, newSVsv(*e));
         av_push(pair, newSV(0));
         av_push(out, newRV_noinc((SV *)pair));
+    }
+
+    {
+        AV *md = (AV *)sv_2mortal((SV *)pks_md_entries(aTHX_ appsv));
+        n = av_len(md) + 1;
+        for (i = 0; i < n; i++) {
+            SV **g = av_fetch(md, i, 0);
+            STRLEN pl;
+            const char *p;
+            if (!(g && *g && SvROK(*g))) continue;
+            p = SvPV_const(*av_fetch((AV *)SvRV(*g), 0, 0), pl);
+            if (hv_exists(seen, p, (I32)pl)) continue;
+            (void)hv_store(seen, p, (I32)pl, newSViv(1), 0);
+            av_push(out, newSVsv(*g));
+        }
     }
 
     secs = app ? app_get(aTHX_ app, "sitemap_sections") : NULL;
@@ -936,6 +1043,15 @@ static AV *pks_disallows(pTHX_ SV *appsv) {
     HV *app = app_hv(aTHX_ appsv);
     AV *listed = (AV *)sv_2mortal((SV *)pks_paths(aTHX_ appsv));
     AV *raw = app ? pks_raw(aTHX_ app) : NULL;
+    {   /* a markdown page the sitemap lists is listed, as a route is */
+        AV *md = (AV *)sv_2mortal((SV *)pks_md_entries(aTHX_ appsv));
+        SSize_t k, kn = av_len(md) + 1;
+        for (k = 0; k < kn; k++) {
+            SV **g = av_fetch(md, k, 0);
+            if (g && *g && SvROK(*g))
+                av_push(listed, newSVsv(*av_fetch((AV *)SvRV(*g), 0, 0)));
+        }
+    }
     AV *cand = (AV *)sv_2mortal((SV *)newAV());
     AV *out = newAV();
     HV *seen = (HV *)sv_2mortal((SV *)newHV());

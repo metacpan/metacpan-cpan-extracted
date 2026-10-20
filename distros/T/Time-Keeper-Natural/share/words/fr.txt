@@ -1,0 +1,23 @@
+# Time::Keeper::Natural word table: fr
+#
+# UNREVIEWED: written 18 Oct 2026 by a session, as the p2p site's catalogues were.
+# A native reader should review it before release. The format is en.txt's.
+#
+# French contracts "de le" to "du": "fin du mois dernier" is read by putting
+# the swallowed "le" back, since CLDR's own words carry it ("le mois dernier").
+start_of	début de|début du|début des|début d'|le début de|le début du|le début des|le début d'|au début de|au début du|au début des|au début d'
+end_of	fin de|fin du|fin des|fin d'|la fin de|la fin du|la fin des|la fin d'|à la fin de|à la fin du|à la fin des|à la fin d'
+at	à
+on
+skip	le|la|les|l'
+and
+of	de|du|d'
+last	dernier|dernière
+# test: fin du mois dernier => 2026-09-30T23:59:59.999999999+01:00
+# test: début de la semaine prochaine => 2026-10-19T00:00:00+01:00
+# test: fin de l'année => 2026-12-31T23:59:59.999999999+00:00
+# test: à la fin du mois => 2026-10-31T23:59:59.999999999+00:00
+# test: fin d'octobre => 2026-10-31T23:59:59.999999999+00:00
+# test: demain à 15:30 => 2026-10-16T15:30:00+01:00
+# test: le troisième vendredi du mois prochain => 2026-11-20T00:00:00+00:00
+# test: le dernier vendredi d'octobre => 2026-10-30T00:00:00+00:00

@@ -62,7 +62,7 @@
    "provides" : {
       "App::Acmeman" : {
          "file" : "lib/App/Acmeman.pm",
-         "version" : "3.10"
+         "version" : "3.12"
       },
       "App::Acmeman::Apache::Layout" : {
          "file" : "lib/App/Acmeman/Apache/Layout.pm"
@@ -105,6 +105,9 @@
       },
       "App::Acmeman::Source::Pound" : {
          "file" : "lib/App/Acmeman/Source/Pound.pm"
+      },
+      "App::Acmeman::Source::Pound::IntStack" : {
+         "file" : "lib/App/Acmeman/Source/Pound.pm"
       }
    },
    "release_status" : "stable",
@@ -119,6 +122,6 @@
          "web" : "http://git.gnu.org.ua/cgit/acmeman.git/"
       }
    },
-   "version" : "3.10",
+   "version" : "3.12",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

@@ -18,15 +18,17 @@
 <text class="title" x="372" y="33" text-anchor="middle" dominant-baseline="central" fill="#9aa3b5">perl examples/cookbook/table-line-styles.pl</text>
 <rect x="16.5" y="16.5" width="711" height="579" rx="10" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1"/>
 <g shape-rendering="crispEdges">
-<rect x="498" y="96" width="99" height="18" fill="#242832"/>
-<rect x="57" y="114" width="108" height="36" fill="#242832"/>
-<rect x="282" y="114" width="108" height="36" fill="#242832"/>
-<rect x="57" y="276" width="108" height="36" fill="#242832"/>
-<rect x="282" y="276" width="108" height="36" fill="#242832"/>
-<rect x="507" y="276" width="108" height="36" fill="#242832"/>
+<rect x="507" y="96" width="99" height="18" fill="#242832"/>
+<rect x="57" y="114" width="108" height="18" fill="#242832"/>
+<rect x="282" y="114" width="108" height="18" fill="#242832"/>
+<rect x="57" y="276" width="108" height="18" fill="#242832"/>
+<rect x="282" y="276" width="108" height="18" fill="#242832"/>
+<rect x="516" y="276" width="108" height="18" fill="#242832"/>
 <rect x="48" y="420" width="117" height="36" fill="#2c3340"/>
-<rect x="498" y="420" width="153" height="54" fill="#242832"/>
+<rect x="507" y="420" width="153" height="36" fill="#242832"/>
 <rect x="282" y="438" width="99" height="18" fill="#2c3340"/>
+<rect x="507" y="456" width="9" height="18" fill="#242832"/>
+<rect x="651" y="456" width="9" height="18" fill="#242832"/>
 <rect x="57" y="104" width="108" height="1" fill="#586070"/>
 <rect x="115" y="104" width="1" height="91" fill="#586070"/>
 <rect x="277" y="104" width="1" height="109" fill="#586070"/>
@@ -88,32 +90,32 @@
 <rect x="51" y="357" width="120" height="1" fill="#586070"/>
 <rect x="277" y="374" width="119" height="2" fill="#586070"/>
 <rect x="48" y="420" width="117" height="9" fill="#586070"/>
-<rect x="498" y="420" width="9" height="108" fill="#586070"/>
-<rect x="507" y="420" width="135" height="9" fill="#586070"/>
-<rect x="642" y="420" width="9" height="108" fill="#586070"/>
+<rect x="507" y="420" width="9" height="108" fill="#586070"/>
+<rect x="516" y="420" width="135" height="9" fill="#586070"/>
+<rect x="651" y="420" width="9" height="108" fill="#586070"/>
 <rect x="48" y="429" width="5" height="72" fill="#586070"/>
 <rect x="161" y="429" width="4" height="72" fill="#586070"/>
 <rect x="278" y="429" width="108" height="9" fill="#586070"/>
 <rect x="278" y="438" width="4" height="54" fill="#586070"/>
 <rect x="381" y="438" width="5" height="54" fill="#586070"/>
-<rect x="507" y="464" width="135" height="1" fill="#586070"/>
+<rect x="516" y="464" width="135" height="1" fill="#586070"/>
 <rect x="278" y="492" width="108" height="9" fill="#586070"/>
 <rect x="48" y="501" width="117" height="9" fill="#586070"/>
-<rect x="507" y="519" width="135" height="9" fill="#586070"/>
+<rect x="516" y="519" width="135" height="9" fill="#586070"/>
 </g>
 <polyline points="52.5 114 52.5 109 52.538 108.413 52.653 107.835 52.843 107.278 53.103 106.75 53.43 106.261 53.818 105.818 54.261 105.43 54.75 105.103 55.278 104.843 55.835 104.653 56.413 104.538 57 104.5 57 104.5" fill="none" stroke="#586070" stroke-width="1" stroke-linejoin="round"/>
 <polyline points="169.5 114 169.5 109 169.462 108.413 169.347 107.835 169.157 107.278 168.897 106.75 168.57 106.261 168.182 105.818 167.739 105.43 167.25 105.103 166.722 104.843 166.165 104.653 165.587 104.538 165 104.5 165 104.5" fill="none" stroke="#586070" stroke-width="1" stroke-linejoin="round"/>
 <polyline points="52.5 186 52.5 190 52.538 190.587 52.653 191.165 52.843 191.722 53.103 192.25 53.43 192.739 53.818 193.182 54.261 193.57 54.75 193.897 55.278 194.157 55.835 194.347 56.413 194.462 57 194.5 57 194.5" fill="none" stroke="#586070" stroke-width="1" stroke-linejoin="round"/>
 <polyline points="169.5 186 169.5 190 169.462 190.587 169.347 191.165 169.157 191.722 168.897 192.25 168.57 192.739 168.182 193.182 167.739 193.57 167.25 193.897 166.722 194.157 166.165 194.347 165.587 194.462 165 194.5 165 194.5" fill="none" stroke="#586070" stroke-width="1" stroke-linejoin="round"/>
 <g class="terminal">
-<text x="48" y="92" textLength="522" fill="#e5c07b">The default              A grid                   No lines</text>
-<text x="507" y="110" textLength="81" class="b" fill="#ebeef3">Item  Qty</text>
+<text x="48" y="92" textLength="531" fill="#e5c07b">The default              A grid                    No lines</text>
+<text x="516" y="110" textLength="81" class="b" fill="#ebeef3">Item  Qty</text>
 <text x="66" y="128" textLength="36" class="b" fill="#ebeef3">Item</text>
 <text x="129" y="128" textLength="27" class="b" fill="#ebeef3">Qty</text>
 <text x="291" y="128" textLength="36" class="b" fill="#ebeef3">Item</text>
 <text x="354" y="128" textLength="27" class="b" fill="#ebeef3">Qty</text>
-<text x="507" y="128" textLength="81" fill="#dcdfe4">Pens   12</text>
-<text x="507" y="146" textLength="81" fill="#dcdfe4">Ink     3</text>
+<text x="516" y="128" textLength="81" fill="#dcdfe4">Pens   12</text>
+<text x="516" y="146" textLength="81" fill="#dcdfe4">Ink     3</text>
 <text x="66" y="164" textLength="36" fill="#dcdfe4">Pens</text>
 <text x="138" y="164" textLength="18" fill="#dcdfe4">12</text>
 <text x="291" y="164" textLength="36" fill="#dcdfe4">Pens</text>
@@ -122,47 +124,47 @@
 <text x="147" y="182" textLength="9" fill="#dcdfe4">3</text>
 <text x="291" y="200" textLength="27" fill="#dcdfe4">Ink</text>
 <text x="372" y="200" textLength="9" fill="#dcdfe4">3</text>
-<text x="48" y="254" textLength="495" fill="#e5c07b">Double, Heavy title      Heavy, Dashed rows       Ascii</text>
-<text x="498" y="272" textLength="126" fill="#586070">+------+-----+</text>
+<text x="48" y="254" textLength="504" fill="#e5c07b">Double, Heavy title      Heavy, Dashed rows        Ascii</text>
+<text x="507" y="272" textLength="126" fill="#586070">+------+-----+</text>
 <text x="66" y="290" textLength="36" class="b" fill="#ebeef3">Item</text>
 <text x="129" y="290" textLength="27" class="b" fill="#ebeef3">Qty</text>
 <text x="291" y="290" textLength="36" class="b" fill="#ebeef3">Item</text>
 <text x="354" y="290" textLength="27" class="b" fill="#ebeef3">Qty</text>
-<text x="498" y="290" textLength="9" fill="#586070">|</text>
-<text x="516" y="290" textLength="36" class="b" fill="#ebeef3">Item</text>
-<text x="561" y="290" textLength="9" fill="#586070">|</text>
-<text x="579" y="290" textLength="27" class="b" fill="#ebeef3">Qty</text>
-<text x="615" y="290" textLength="9" fill="#586070">|</text>
-<text x="498" y="308" textLength="126" fill="#586070">+------+-----+</text>
+<text x="507" y="290" textLength="9" fill="#586070">|</text>
+<text x="525" y="290" textLength="36" class="b" fill="#ebeef3">Item</text>
+<text x="570" y="290" textLength="9" fill="#586070">|</text>
+<text x="588" y="290" textLength="27" class="b" fill="#ebeef3">Qty</text>
+<text x="624" y="290" textLength="9" fill="#586070">|</text>
+<text x="507" y="308" textLength="126" fill="#586070">+------+-----+</text>
 <text x="66" y="326" textLength="36" fill="#dcdfe4">Pens</text>
 <text x="138" y="326" textLength="18" fill="#dcdfe4">12</text>
 <text x="291" y="326" textLength="36" fill="#dcdfe4">Pens</text>
 <text x="363" y="326" textLength="18" fill="#dcdfe4">12</text>
-<text x="498" y="326" textLength="9" fill="#586070">|</text>
-<text x="516" y="326" textLength="36" fill="#dcdfe4">Pens</text>
-<text x="561" y="326" textLength="9" fill="#586070">|</text>
-<text x="588" y="326" textLength="18" fill="#dcdfe4">12</text>
-<text x="615" y="326" textLength="9" fill="#586070">|</text>
+<text x="507" y="326" textLength="9" fill="#586070">|</text>
+<text x="525" y="326" textLength="36" fill="#dcdfe4">Pens</text>
+<text x="570" y="326" textLength="9" fill="#586070">|</text>
+<text x="597" y="326" textLength="18" fill="#dcdfe4">12</text>
+<text x="624" y="326" textLength="9" fill="#586070">|</text>
 <text x="66" y="344" textLength="27" fill="#dcdfe4">Ink</text>
 <text x="147" y="344" textLength="9" fill="#dcdfe4">3</text>
-<text x="498" y="344" textLength="9" fill="#586070">|</text>
-<text x="516" y="344" textLength="27" fill="#dcdfe4">Ink</text>
-<text x="561" y="344" textLength="9" fill="#586070">|</text>
-<text x="597" y="344" textLength="9" fill="#dcdfe4">3</text>
-<text x="615" y="344" textLength="9" fill="#586070">|</text>
+<text x="507" y="344" textLength="9" fill="#586070">|</text>
+<text x="525" y="344" textLength="27" fill="#dcdfe4">Ink</text>
+<text x="570" y="344" textLength="9" fill="#586070">|</text>
+<text x="606" y="344" textLength="9" fill="#dcdfe4">3</text>
+<text x="624" y="344" textLength="9" fill="#586070">|</text>
 <text x="291" y="362" textLength="27" fill="#dcdfe4">Ink</text>
 <text x="372" y="362" textLength="9" fill="#dcdfe4">3</text>
-<text x="498" y="362" textLength="126" fill="#586070">+------+-----+</text>
-<text x="48" y="416" textLength="594" fill="#e5c07b">Outer block frame        Inner block frame        Thick, padding 2</text>
+<text x="507" y="362" textLength="126" fill="#586070">+------+-----+</text>
+<text x="48" y="416" textLength="603" fill="#e5c07b">Outer block frame        Inner block frame         Thick, padding 2</text>
 <text x="66" y="452" textLength="81" class="b" fill="#ebeef3">Item  Qty</text>
 <text x="291" y="452" textLength="81" class="b" fill="#ebeef3">Item  Qty</text>
-<text x="525" y="452" textLength="99" class="b" fill="#ebeef3">Item    Qty</text>
+<text x="534" y="452" textLength="99" class="b" fill="#ebeef3">Item    Qty</text>
 <text x="66" y="470" textLength="81" fill="#dcdfe4">Pens   12</text>
 <text x="291" y="470" textLength="81" fill="#dcdfe4">Pens   12</text>
 <text x="66" y="488" textLength="81" fill="#dcdfe4">Ink     3</text>
 <text x="291" y="488" textLength="81" fill="#dcdfe4">Ink     3</text>
-<text x="525" y="488" textLength="99" fill="#dcdfe4">Pens     12</text>
-<text x="525" y="506" textLength="99" fill="#dcdfe4">Ink       3</text>
+<text x="534" y="488" textLength="99" fill="#dcdfe4">Pens     12</text>
+<text x="534" y="506" textLength="99" fill="#dcdfe4">Ink       3</text>
 </g>
 <g shape-rendering="crispEdges">
 </g>

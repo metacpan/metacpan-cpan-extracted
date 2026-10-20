@@ -1,4 +1,6 @@
 #!/usr/bin/perl
+use strict;
+use warnings;
 use oEdtk::trackEdtk qw (prepare_Tracking_Env edit_Track_Table);
 use oEdtk::logger    qw(logger);
 

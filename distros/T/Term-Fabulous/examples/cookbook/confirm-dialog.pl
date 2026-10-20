@@ -7,11 +7,9 @@ no warnings 'experimental::signatures';
 
 use Term::Fabulous;
 use Term::Fabulous::Widget::Box;
-use Term::Fabulous::Widget::Button;
 use Term::Fabulous::Widget::Dialog;
 use Term::Fabulous::Widget::Text;
 use Term::Fabulous::Widget::TextArea;
-use Term::Fabulous::Enum::BorderStyle;
 use Clay::UI::Enum::Result;
 use Clay::XS qw(sizing_grow sizing_fixed CLAY_TOP_TO_BOTTOM);
 
@@ -33,28 +31,17 @@ $root->add_child( text('Type some notes. Ctrl+Q asks before quitting.'), $notes 
 my $ui = Term::Fabulous->new( root => $root, width => 80, height => 24 );
 
 # The dialog is built once and opened as often as needed. Its look
-# (border, background, padding) comes with the widget.
-my $dialog = Term::Fabulous::Widget::Dialog->new( id => 'confirm', layout => { sizing => { width => sizing_fixed(44) } } );
-
-sub button ( $caption, $action ) {
-	my $button = Term::Fabulous::Widget::Button->new(
-		background_color => [ 43, 58, 85, 255 ],
-		bordered         => 1,
-		border_color     => [ 28, 33, 45, 255 ],    # the dialog background: only the focus shows
-		border_style     => Term::Fabulous::Enum::BorderStyle->Round,
-		layout           => { padding => { left => 1, right => 1 } },
-	);
-	$button->add_child( text($caption) );
-	$button->on( Activate => sub ($event) { $action->(); return } );
-	return $button;
-}
-
-my $buttons = Term::Fabulous::Widget::Box->new( layout => { child_gap => 2 } );
-$buttons->add_child(
-	button( 'Quit',   sub { $ui->loop->stop } ),
-	button( 'Cancel', sub { $dialog->close } ),
+# (border, background, padding), its title and its buttons come with
+# the widget; pressing a button answers with its id, Escape answers
+# cancel.
+my $dialog = Term::Fabulous::Widget::Dialog->new(
+	id      => 'confirm',
+	title   => 'Really quit?',
+	buttons => [ { id => 'quit', label => 'Quit', primary => 1 }, { id => 'cancel', label => 'Cancel' } ],
+	layout  => { sizing => { width => sizing_fixed(44) } },
 );
-$dialog->add_child( text('Really quit? Unsaved notes are lost.'), $buttons );
+$dialog->add_child( text('Unsaved notes are lost.') );
+$dialog->on( Answer => sub ($event) { $ui->loop->stop if $event->button eq 'quit'; return } );
 
 $root->on(
 	KeyPress => sub ($event) {

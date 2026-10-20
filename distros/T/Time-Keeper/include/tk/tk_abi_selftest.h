@@ -195,6 +195,87 @@ tk_abi_selftest(pTHX_ const time_keeper_abi *T, SV **made)
         TKA_CHECK((T->new_sv_cal)(aTHX_ &t, &tokyo, k, 999) == NULL);
     }
     {
+        /* version 3, from Thursday 9 October 2025, 17:53:20.25 in Tokyo, in French */
+        time_keeper_point p, q;
+        time_keeper_parts parts;
+        time_keeper_civil cc;
+        char err[160];
+        SV *dv;
+        const char *lc = NULL;
+        int fr = (T->locale_find)("fr", 2);
+        p.inst.sec = 1760000000;
+        p.inst.nsec = 250000000;
+        p.zone = tokyo;
+        p.locale = fr;
+        p.calendar = 0;
+        Zero(&parts, 1, time_keeper_parts);
+        parts.days = 1;
+        TKA_CHECK((T->plus)(aTHX_ &p, &parts, TIME_KEEPER_GAP_FORWARD, TIME_KEEPER_OVERLAP_EARLIER, &q, err, sizeof err) == TIME_KEEPER_OK
+                  && q.inst.sec == p.inst.sec + 86400 && q.inst.nsec == p.inst.nsec && q.locale == fr);
+        TKA_CHECK((T->truncate)(aTHX_ &p, TIME_KEEPER_UNIT_DAY, 1, &q, err, sizeof err) == TIME_KEEPER_OK
+                  && (q.inst.sec + 9 * 3600) % 86400 == 0 && q.inst.nsec == 0);
+        TKA_CHECK((T->end_of)(aTHX_ &p, TIME_KEEPER_UNIT_MONTH, TIME_KEEPER_WEEK_LOCALE, &q, err, sizeof err) == TIME_KEEPER_OK
+                  && q.inst.nsec == 999999999 && (q.inst.sec + 9 * 3600 + 1) % 86400 == 0);
+        TKA_CHECK((T->adjust_dow)(aTHX_ &p, 1, 1, 0, TIME_KEEPER_GAP_FORWARD, TIME_KEEPER_OVERLAP_EARLIER, &q, err, sizeof err) == TIME_KEEPER_OK
+                  && q.inst.sec == p.inst.sec + 4 * 86400);                               /* to Monday */
+        TKA_CHECK((T->nth_in_month)(aTHX_ &p, 7, 5, TIME_KEEPER_GAP_FORWARD, TIME_KEEPER_OVERLAP_EARLIER, &q, err, sizeof err) == TIME_KEEPER_RANGE
+                  && strstr(err, "has no fifth") != NULL);                                /* four Sundays */
+        TKA_CHECK((T->with_time)(aTHX_ &p, 9, 0, 0, 0, TIME_KEEPER_GAP_FORWARD, TIME_KEEPER_OVERLAP_EARLIER, &q, err, sizeof err) == TIME_KEEPER_OK
+                  && q.inst.sec == p.inst.sec - (8 * 3600 + 53 * 60 + 20) && q.inst.nsec == 0);
+        TKA_CHECK((T->parse_cldr)(aTHX_ "9 octobre 2025", 14, "d MMMM y", 8, TIME_KEEPER_KIND_VALUE, &tokyo, fr, 0,
+                                   TIME_KEEPER_GAP_FORWARD, TIME_KEEPER_OVERLAP_EARLIER, &q, &cc, err, sizeof err) == TIME_KEEPER_OK
+                  && cc.year == 2025 && cc.month == 10 && cc.day == 9 && cc.hour == 0);
+        TKA_CHECK((T->parse_cldr)(aTHX_ "neuf", 4, "d MMMM y", 8, TIME_KEEPER_KIND_VALUE, &tokyo, fr, 0,
+                                   TIME_KEEPER_GAP_FORWARD, TIME_KEEPER_OVERLAP_EARLIER, &q, &cc, err, sizeof err) == TIME_KEEPER_PARSE
+                  && strstr(err, "cannot parse") != NULL);
+        TKA_CHECK((T->parse_cldr)(aTHX_ "15:30", 5, "HH:mm", 5, TIME_KEEPER_KIND_TIME, NULL, fr, 0,
+                                   TIME_KEEPER_GAP_FORWARD, TIME_KEEPER_OVERLAP_EARLIER, &q, &cc, err, sizeof err) == TIME_KEEPER_OK
+                  && cc.hour == 15 && cc.minute == 30);
+        parts.days = 0;
+        parts.hours = 1;
+        parts.minutes = 30;
+        dv = (T->new_duration_sv)(aTHX_ &parts);
+        TKA_CHECK(dv && SvREFCNT(dv) == 1 && sv_isa(dv, "Time::Keeper::Duration"));
+        TKA_CHECK((T->duration_from_sv)(aTHX_ dv, &parts) == TIME_KEEPER_OK && parts.minutes == 90 && parts.hours == 0);
+        SvREFCNT_dec(dv);
+        TKA_CHECK((T->locale_code)(fr, &lc) == TIME_KEEPER_OK && strEQ(lc, "fr"));
+        {
+            /* Monday 19 October 2026 is day 20745; New York leaves DST at
+             * 06:00 UTC on 2 November 2025 */
+            time_keeper_zone ny;
+            time_keeper_instant at;
+            int32_t before = 0, after = 0;
+            int kd = -1, dl = -1, ws = 0, we = 0;
+            int64_t days = 0;
+            SV *dd = (T->new_date_sv)(aTHX_ TIME_KEEPER_KIND_DATE, 20745, fr, NULL);
+            TKA_CHECK(dd && SvREFCNT(dd) == 1 && sv_isa(dd, "Time::Keeper::Date"));
+            TKA_CHECK((T->date_from_sv)(aTHX_ dd, &kd, &days, &dl) == TIME_KEEPER_OK
+                      && kd == TIME_KEEPER_KIND_DATE && days == 20745 && dl == fr);
+            SvREFCNT_dec(dd);
+            dd = (T->new_date_sv)(aTHX_ TIME_KEEPER_KIND_YEAR_MONTH, 20745, 0, NULL);
+            TKA_CHECK(dd && sv_isa(dd, "Time::Keeper::YearMonth")
+                      && (T->date_from_sv)(aTHX_ dd, &kd, &days, NULL) == TIME_KEEPER_OK
+                      && kd == TIME_KEEPER_KIND_YEAR_MONTH && days == 20745 - 18);
+            SvREFCNT_dec(dd);
+            TKA_CHECK((T->date_from_sv)(aTHX_ sv, &kd, &days, &dl) == TIME_KEEPER_BAD
+                      && (T->date_from_sv)(aTHX_ &PL_sv_undef, NULL, NULL, NULL) == TIME_KEEPER_BAD);
+            TKA_CHECK((T->new_date_sv)(aTHX_ TIME_KEEPER_KIND_TIME, 20745, 0, NULL) == NULL
+                      && (T->new_date_sv)(aTHX_ TIME_KEEPER_KIND_DATE, 20745, -1, NULL) == NULL
+                      && (T->new_date_sv)(aTHX_ TIME_KEEPER_KIND_DATE, INT64_C(1) << 60, 0, NULL) == NULL);
+            TKA_CHECK((T->locale_weekend)(aTHX_ (T->locale_find)("ar-EG", 5), &ws, &we, err, sizeof err) == TIME_KEEPER_OK
+                      && ws == 5 && we == 6);
+            TKA_CHECK((T->locale_weekend)(aTHX_ fr, &ws, &we, NULL, 0) == TIME_KEEPER_OK && ws == 6 && we == 7
+                      && (T->locale_weekend)(aTHX_ -1, &ws, &we, err, sizeof err) == TIME_KEEPER_BAD);
+            TKA_CHECK((T->zone_parse)(aTHX_ "America/New_York", 16, &ny) == TIME_KEEPER_OK
+                      && (T->next_change)(aTHX_ &p.inst, &ny, &at, &before, &after) == TIME_KEEPER_OK
+                      && at.sec == 1762063200 && at.nsec == 0 && before == -14400 && after == -18000);
+            TKA_CHECK((T->next_change)(aTHX_ &p.inst, &tokyo, &at, NULL, NULL) == TIME_KEEPER_RANGE
+                      && (T->next_change)(aTHX_ &p.inst, NULL, &at, NULL, NULL) == TIME_KEEPER_RANGE
+                      && (T->next_change)(aTHX_ NULL, &ny, &at, NULL, NULL) == TIME_KEEPER_BAD);
+        }
+        TKA_CHECK((T->plus)(aTHX_ NULL, &parts, TIME_KEEPER_GAP_FORWARD, TIME_KEEPER_OVERLAP_EARLIER, &q, NULL, 0) == TIME_KEEPER_BAD);
+    }
+    {
         time_keeper_abi other = *T;
         other.abi_version = TIME_KEEPER_ABI_VERSION - 1;
         TKA_CHECK(!TIME_KEEPER_ABI_OK(&other));                                     /* an older table is refused */

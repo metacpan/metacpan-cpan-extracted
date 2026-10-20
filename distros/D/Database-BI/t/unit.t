@@ -11,6 +11,46 @@ use Mojo::File;
 use Mojo::Util qw(url_escape);
 
 # ---------------------------------------------------------------------------
+# Minimal stub geocoder and point, injected through the app config so no
+# real Geo::Coder::Free or network connection is required.  Both packages
+# must be defined before Test::Mojo->new loads the app.
+# ---------------------------------------------------------------------------
+{
+	package Unit::GeoPoint;
+	sub new       { bless { %{ $_[1] } }, $_[0] }
+	sub latitude  { $_[0]{latitude}  }
+	sub longitude { $_[0]{longitude} }
+	sub database  { $_[0]{database}  }
+
+	package Unit::Geocoder;
+	sub new {
+		my ($class, %a) = @_;
+		return bless {
+			results => $a{results} // {},
+			calls   => [],
+		}, $class;
+	}
+	sub valid_location {
+		my ($self, $v) = @_;
+		return 0 unless defined($v) && !ref($v) && length($v);
+		return 0 if $v =~ /\A\d+\z/;
+		return 1;
+	}
+	sub geocode_many {
+		my ($self, $values, %opts) = @_;
+		push @{ $self->{calls} }, [ @$values ];
+		my %out;
+		for my $v (@$values) { $out{$v} = $self->{results}{$v} }
+		return { %out, lookups => scalar @$values };
+	}
+
+	package Unit::GeoBroken;
+	# Has valid_location but lacks geocode_many -- tests interface guard.
+	sub new            { bless {}, $_[0] }
+	sub valid_location { 1 }
+}
+
+# ---------------------------------------------------------------------------
 # Constants
 # ---------------------------------------------------------------------------
 Readonly my $SALES_TABLE  => 'sales';
@@ -133,6 +173,35 @@ my %ledger = (
 	'GET./folder.400.no_l'            => 'GET /folder (no l=) 400 plain text',
 	'GET./folder.404.no_source'       => 'GET /folder?l=path:/nonexistent 404 plain text',
 	'GET./folder.400.prefix_too_long' => 'GET /folder?prefix=<21+ chars> 400 plain text',
+
+	# map_view action (Phase 6) -- every documented 400/404/200 return state
+	'GET./map.400.no_source_col'     => 'GET /map no loc= and no lat=/lon= -> 400 error_map_source',
+	'GET./map.400.half_coord'        => 'GET /map only lat= or only lon= -> 400 error_map_coordinates',
+	'GET./map.404.no_source'         => 'GET /map bad l= spec -> 404',
+	'GET./map.400.loc_col_not_found' => 'GET /map loc= column not in dataset -> 400 error_map_loc_column',
+	'GET./map.200.loc'               => 'GET /map?loc=<col> with injected geocoder -> 200 HTML',
+	'GET./map.400.lat_range'         => 'GET /map lat column wholly out of range -> 400 error_map_coordinate_range',
+	'GET./map.400.lon_range'         => 'GET /map lon column wholly out of range -> 400 error_map_coordinate_range',
+	'GET./map.400.no_numeric_pairs'  => 'GET /map non-numeric lat/lon columns -> 400 error_map_coordinate_numeric',
+	'GET./map.200.latlon'            => 'GET /map?lat=&lon= coordinate path -> 200 HTML',
+
+	# Geocode.pm public API -- all documented constructor + method states
+	'Geocode.new.ok'                  => 'Geocode->new() with no args succeeds',
+	'Geocode.new.injected_geocoder'   => 'Geocode->new(geocoder=>) with valid interface succeeds',
+	'Geocode.new.bad_interface'       => 'Geocode->new(geocoder=>) lacking required method croaks',
+	'Geocode.geocoder_available.true' => 'geocoder_available() returns (1, undef) with injected stub',
+	'Geocode.geocoder_available.false'=> 'geocoder_available() returns (0, reason-string) without module',
+	'Geocode.resolve_values.ok'       => 'resolve_values([\@vals]) returns result hashref with counts',
+	'Geocode.resolve_values.bad_input'=> 'resolve_values(non-arrayref) croaks error_values_arrayref',
+	'Geocode.resolve_values.cap'      => 'resolve_values with max= holds back excess in not_attempted',
+	'Geocode.resolve_values.cache_hit'=> 'resolve_values with populated cache skips geocoder',
+	'Geocode.resolve_column.ok'       => 'resolve_column(\@rows, col) populates markers and counts',
+	'Geocode.resolve_column.bad_rows' => 'resolve_column(non-arrayref, col) croaks error_rows_arrayref',
+	'Geocode.resolve_column.col_miss' => 'resolve_column(\@rows, missing-col) croaks error_map_loc_column',
+	'Geocode.cache_from_models.ok'    => 'cache_from_models returns copy of places for known spec',
+	'Geocode.cache_from_models.empty' => 'cache_from_models returns {} for unknown spec',
+	'Geocode.models_with_cache.ok'    => 'models_with_cache stores places + backend + built',
+	'Geocode.models_with_cache.immut' => 'models_with_cache does not mutate the caller hashref',
 );
 
 # ---------------------------------------------------------------------------
@@ -1099,6 +1168,349 @@ subtest 'GET /folder?prefix=A -- drill-down renders items (200)' => sub {
 	  ->content_like(qr/Widget|Gadget/, 'items for prefix A are rendered');
 	delete $ledger{'GET./folder.200.drill'};
 };
+
+# ============================================================================
+# Geocode.pm -- public API black-box coverage
+# ============================================================================
+
+use_ok('Database::BI::Model::Geocode');
+
+Readonly my $GEOCODE_CLASS => 'Database::BI::Model::Geocode';
+Readonly my $MAP_PLACE     => 'Ramsgate';
+Readonly my $MAP_LAT       => 51.33;
+Readonly my $MAP_LON       =>  1.42;
+
+# ---------------------------------------------------------------------------
+# new() -- documented constructor paths
+# ---------------------------------------------------------------------------
+
+subtest 'Geocode.new -- no-argument constructor returns blessed object' => sub {
+	my $g;
+	lives_ok { $g = $GEOCODE_CLASS->new() } 'new() with no args does not croak';
+	ok defined($g) && ref($g), 'returns a defined reference';
+	is ref($g), $GEOCODE_CLASS, 'object is the correct class';
+	delete $ledger{'Geocode.new.ok'};
+};
+
+subtest 'Geocode.new -- injected geocoder with valid interface is accepted' => sub {
+	my $stub = Unit::Geocoder->new();
+	my $g;
+	lives_ok { $g = $GEOCODE_CLASS->new(geocoder => $stub) }
+		'injected geocoder with valid interface does not croak';
+	ok defined($g), 'returns object';
+	delete $ledger{'Geocode.new.injected_geocoder'};
+};
+
+subtest 'Geocode.new -- geocoder lacking geocode_many() croaks with interface message' => sub {
+	my $broken = Unit::GeoBroken->new();
+	throws_ok { $GEOCODE_CLASS->new(geocoder => $broken) }
+		qr/geocode_many/,
+		'error names the missing method';
+	delete $ledger{'Geocode.new.bad_interface'};
+};
+
+# ---------------------------------------------------------------------------
+# geocoder_available() -- documented return paths
+# ---------------------------------------------------------------------------
+
+subtest 'Geocode.geocoder_available -- returns (1, undef) when stub is injected' => sub {
+	my $g  = $GEOCODE_CLASS->new(geocoder => Unit::Geocoder->new());
+	my ($ok, $reason) = $g->geocoder_available();
+	ok $ok, 'available=1 with injected geocoder';
+	ok !defined($reason), 'reason is undef when available';
+	delete $ledger{'Geocode.geocoder_available.true'};
+};
+
+subtest 'Geocode.geocoder_available -- returns (0, sentence) when module absent/old' => sub {
+	# Force the "too old" path by requesting an impossibly high version floor.
+	my $g  = $GEOCODE_CLASS->new(min_geocoder_version => '9999.0');
+	my ($ok, $reason) = $g->geocoder_available();
+	ok !$ok, 'available=0 without a usable geocoder';
+	ok defined($reason) && length($reason), 'reason is a non-empty string';
+	like $reason, qr/Geo::Coder::Free/, 'message names the module';
+	delete $ledger{'Geocode.geocoder_available.false'};
+};
+
+# ---------------------------------------------------------------------------
+# resolve_values() -- documented input-validation and result-shape paths
+# ---------------------------------------------------------------------------
+
+subtest 'Geocode.resolve_values -- valid arrayref returns counts hashref' => sub {
+	my $stub = Unit::Geocoder->new(results => {
+		$MAP_PLACE => Unit::GeoPoint->new({
+			latitude => $MAP_LAT, longitude => $MAP_LON, database => 'Test',
+		}),
+	});
+	my $g = $GEOCODE_CLASS->new(geocoder => $stub, openaddr => 'test');
+	my $r = $g->resolve_values([$MAP_PLACE]);
+
+	ok ref($r) eq 'HASH', 'result is a hashref';
+	ok exists $r->{counts},    'counts key present';
+	ok exists $r->{cache},     'cache key present';
+	ok exists $r->{available}, 'available key present';
+	is $r->{counts}{resolved}, 1, 'one place resolved';
+	delete $ledger{'Geocode.resolve_values.ok'};
+};
+
+subtest 'Geocode.resolve_values -- non-arrayref input croaks error_values_arrayref' => sub {
+	my $g = $GEOCODE_CLASS->new(geocoder => Unit::Geocoder->new());
+	throws_ok { $g->resolve_values('not_an_array') }
+		qr/values.*arrayref/i,
+		'scalar input triggers error_values_arrayref';
+	throws_ok { $g->resolve_values(undef) }
+		qr/values.*arrayref/i,
+		'undef input triggers error_values_arrayref';
+	delete $ledger{'Geocode.resolve_values.bad_input'};
+};
+
+subtest 'Geocode.resolve_values -- max= cap puts excess places in not_attempted' => sub {
+	my @places = map { "Place$_" } 1..5;
+	my %res    = map { $_ => Unit::GeoPoint->new({ latitude => 1, longitude => 2, database => 'T' }) } @places;
+	my $stub   = Unit::Geocoder->new(results => \%res);
+	my $g      = $GEOCODE_CLASS->new(geocoder => $stub, openaddr => 'test');
+	my $r      = $g->resolve_values(\@places, max => 2);
+
+	is $r->{counts}{attempted},     2, 'only 2 places attempted (max=2)';
+	is $r->{counts}{not_attempted}, 3, '3 places held back in not_attempted';
+	ok $r->{capped}, 'capped flag is true';
+	# not_attempted must NOT be cached -- the next request picks them up.
+	for my $p (@places[2..4]) {
+		ok !exists($r->{cache}{$p}), "uncapped place $p absent from cache";
+	}
+	delete $ledger{'Geocode.resolve_values.cap'};
+};
+
+subtest 'Geocode.resolve_values -- cache hit skips geocoder, resolved count includes cached' => sub {
+	my $stub = Unit::Geocoder->new();  # no results needed; geocoder must not be called
+	my $g    = $GEOCODE_CLASS->new(geocoder => $stub, openaddr => 'test');
+	my $r    = $g->resolve_values([$MAP_PLACE],
+		cache => { $MAP_PLACE => [$MAP_LAT, $MAP_LON] });
+
+	is scalar(@{ $stub->{calls} }), 0, 'geocoder not called when value in cache';
+	is $r->{counts}{cached},        1, 'cached count is 1';
+	is $r->{counts}{resolved},      1, 'resolved count includes cached hit';
+	delete $ledger{'Geocode.resolve_values.cache_hit'};
+};
+
+# ---------------------------------------------------------------------------
+# resolve_column() -- documented input-validation and row-level paths
+# ---------------------------------------------------------------------------
+
+subtest 'Geocode.resolve_column -- resolves place column, populates markers + counts' => sub {
+	my $stub = Unit::Geocoder->new(results => {
+		$MAP_PLACE => Unit::GeoPoint->new({ latitude => $MAP_LAT, longitude => $MAP_LON, database => 'Test' }),
+	});
+	my $g    = $GEOCODE_CLASS->new(geocoder => $stub, openaddr => 'test');
+	my $rows = [{ place => $MAP_PLACE }, { place => $MAP_PLACE }, { place => '' }];
+	my $r    = $g->resolve_column($rows, 'place');
+
+	ok ref($r->{markers}) eq 'ARRAY', 'markers key is an arrayref';
+	is scalar(@{ $r->{markers} }), 1, 'one distinct resolved place gives one marker';
+	is $r->{counts}{rows},         3, 'all three rows counted';
+	is $r->{markers}[0]{rows},     2, 'marker reports how many rows hold this place';
+	delete $ledger{'Geocode.resolve_column.ok'};
+};
+
+subtest 'Geocode.resolve_column -- non-arrayref rows croaks error_rows_arrayref' => sub {
+	my $g = $GEOCODE_CLASS->new(geocoder => Unit::Geocoder->new());
+	throws_ok { $g->resolve_column('not_rows', 'place') }
+		qr/rows.*arrayref/i,
+		'scalar rows triggers error_rows_arrayref';
+	delete $ledger{'Geocode.resolve_column.bad_rows'};
+};
+
+subtest 'Geocode.resolve_column -- column not in any row croaks error_map_loc_column' => sub {
+	my $g = $GEOCODE_CLASS->new(geocoder => Unit::Geocoder->new());
+	throws_ok { $g->resolve_column([{name => 'Alice'}], 'place') }
+		qr/place/,
+		'missing column name is embedded in the error';
+	delete $ledger{'Geocode.resolve_column.col_miss'};
+};
+
+# ---------------------------------------------------------------------------
+# cache_from_models() -- documented return paths
+# ---------------------------------------------------------------------------
+
+subtest 'Geocode.cache_from_models -- valid models returns copy of places for spec' => sub {
+	my $models = {
+		geo => {
+			'table:test' => {
+				places  => { $MAP_PLACE => [$MAP_LAT, $MAP_LON], Unknown => 0 },
+				backend => 'Test',
+				built   => '2026-01-01T00:00:00Z',
+			},
+		},
+	};
+	my $cache = $GEOCODE_CLASS->cache_from_models($models, 'table:test');
+	ok ref($cache) eq 'HASH', 'returns a hashref';
+	is scalar(keys %$cache), 2, 'both places returned';
+	is_deeply $cache->{$MAP_PLACE}, [$MAP_LAT, $MAP_LON], 'resolved place has [lat,lon]';
+	is $cache->{Unknown}, 0, 'unresolved place has 0 sentinel';
+	delete $ledger{'Geocode.cache_from_models.ok'};
+};
+
+subtest 'Geocode.cache_from_models -- unknown spec returns empty hashref' => sub {
+	my $cache = $GEOCODE_CLASS->cache_from_models({}, 'table:unknown');
+	ok ref($cache) eq 'HASH', 'returns a hashref';
+	is scalar(keys %$cache), 0, 'empty for unknown spec';
+	delete $ledger{'Geocode.cache_from_models.empty'};
+};
+
+# ---------------------------------------------------------------------------
+# models_with_cache() -- documented return paths
+# ---------------------------------------------------------------------------
+
+subtest 'Geocode.models_with_cache -- stores places + backend + built under spec key' => sub {
+	my $r = $GEOCODE_CLASS->models_with_cache(
+		{}, 'table:test',
+		{ $MAP_PLACE => [$MAP_LAT, $MAP_LON] },
+		backend => 'OpenAddresses',
+		built   => '2026-01-01T00:00:00Z',
+	);
+	ok ref($r) eq 'HASH', 'returns a hashref';
+	ok exists $r->{geo}{'table:test'}, 'spec key created under geo section';
+	is_deeply $r->{geo}{'table:test'}{places}, { $MAP_PLACE => [$MAP_LAT, $MAP_LON] },
+		'places stored correctly';
+	is $r->{geo}{'table:test'}{backend}, 'OpenAddresses', 'backend stored';
+	is $r->{geo}{'table:test'}{built},   '2026-01-01T00:00:00Z', 'built stored';
+	delete $ledger{'Geocode.models_with_cache.ok'};
+};
+
+subtest 'Geocode.models_with_cache -- does not mutate the caller hashref' => sub {
+	my $original = { geo => {} };
+	$GEOCODE_CLASS->models_with_cache($original, 'table:test', { A => [1, 2] });
+	ok !exists($original->{geo}{'table:test'}), 'original models hashref is untouched';
+	delete $ledger{'Geocode.models_with_cache.immut'};
+};
+
+# ============================================================================
+# GET /map -- every documented HTTP return state
+#
+# Fixtures are written to tempfiles so no pre-existing data file is needed.
+# The stub geocoder is injected via app config.
+# ============================================================================
+
+{
+	# Re-use the same app instance but inject the stub geocoder so map_view
+	# exercises the location-column path without Geo::Coder::Free.
+	my $stub_map = Unit::Geocoder->new(results => {
+		$MAP_PLACE => Unit::GeoPoint->new({
+			latitude => $MAP_LAT, longitude => $MAP_LON, database => 'Test',
+		}),
+	});
+	$t->app->config->{geocoder} = $stub_map;
+	$t->app->config->{openaddr} = 'test';    # suppresses warn_map_geocoder_unavailable_data
+
+	my $map_dir  = tempdir(CLEANUP => 1);
+
+	# CSV with a location column (for loc= path).
+	my $places_csv = Mojo::File->new($map_dir, 'places.csv');
+	$places_csv->spew(
+		"id,place,amount\n"
+		. "1,$MAP_PLACE,10\n"
+		. "2,$MAP_PLACE,5\n"
+		. "3,,2\n"
+	);
+
+	# CSV with lat/lon columns (for lat=/lon= path).
+	my $coord_csv = Mojo::File->new($map_dir, 'coords.csv');
+	$coord_csv->spew(
+		"id,lat,lon\n"
+		. "1,51.33,1.42\n"
+		. "2,51.92,0.75\n"
+		. "3,,\n"
+	);
+
+	# CSV with all-out-of-range lat values.
+	my $range_csv = Mojo::File->new($map_dir, 'range.csv');
+	$range_csv->spew("id,lat,lon\n1,200,1\n2,201,2\n");
+
+	# CSV with all-out-of-range lon values.
+	my $range_lon_csv = Mojo::File->new($map_dir, 'range_lon.csv');
+	$range_lon_csv->spew("id,lat,lon\n1,51.0,200\n2,52.0,201\n");
+
+	# CSV with non-numeric lat/lon values.
+	my $text_csv = Mojo::File->new($map_dir, 'text_coords.csv');
+	$text_csv->spew("id,lat,lon\n1,north,east\n2,south,west\n");
+
+	Readonly my $PLACES_SPEC  => 'path:' . $places_csv->to_string;
+	Readonly my $COORD_SPEC   => 'path:' . $coord_csv->to_string;
+	Readonly my $RANGE_SPEC   => 'path:' . $range_csv->to_string;
+	Readonly my $RANGE_LON    => 'path:' . $range_lon_csv->to_string;
+	Readonly my $TEXT_SPEC    => 'path:' . $text_csv->to_string;
+
+	subtest 'GET /map -- no loc= and no lat=/lon= returns 400 error_map_source' => sub {
+		$t->get_ok('/map?l=' . url_escape($PLACES_SPEC))
+		  ->status_is(400, '400 when neither loc= nor lat=/lon= given')
+		  ->content_like(qr/loc=<column>/, 'error_map_source text in response');
+		delete $ledger{'GET./map.400.no_source_col'};
+	};
+
+	subtest 'GET /map -- only lat= without lon= returns 400 error_map_coordinates' => sub {
+		$t->get_ok('/map?l=' . url_escape($COORD_SPEC) . '&lat=lat')
+		  ->status_is(400, '400 for half a coordinate pair')
+		  ->content_like(qr/lon=|lat=/, 'error_map_coordinates text in response');
+		delete $ledger{'GET./map.400.half_coord'};
+	};
+
+	subtest 'GET /map -- non-existent data source returns 404' => sub {
+		$t->get_ok('/map?l=path:/nonexistent/nothing.csv&lat=lat&lon=lon')
+		  ->status_is(404, '404 for unopenable source');
+		delete $ledger{'GET./map.404.no_source'};
+	};
+
+	subtest 'GET /map -- loc= column not in dataset returns 400 error_map_loc_column' => sub {
+		$t->get_ok('/map?l=' . url_escape($PLACES_SPEC) . '&loc=no_such_col')
+		  ->status_is(400, '400 for unknown loc= column')
+		  ->content_like(qr/no_such_col/, 'column name named in error_map_loc_column');
+		delete $ledger{'GET./map.400.loc_col_not_found'};
+	};
+
+	subtest 'GET /map?loc=place -- successful geocode path returns 200 HTML' => sub {
+		my $res = $t->get_ok('/map?l=' . url_escape($PLACES_SPEC) . '&loc=place')
+		            ->status_is(200, '200 for valid loc= geocode')
+		            ->content_type_like(qr{text/html}, 'response is HTML');
+		# Place names appear only inside map_body (Leaflet popup HTML), which
+		# requires HTML::OSM.  Skip this single assertion when the module is absent.
+		SKIP: {
+			eval { require HTML::OSM } or skip 'HTML::OSM not available (no marker HTML)', 1;
+			$res->content_like(qr/$MAP_PLACE/i, 'place name appears in response');
+		}
+		delete $ledger{'GET./map.200.loc'};
+	};
+
+	subtest 'GET /map -- lat column wholly out of range returns 400 error_map_coordinate_range' => sub {
+		$t->get_ok('/map?l=' . url_escape($RANGE_SPEC) . '&lat=lat&lon=lon')
+		  ->status_is(400, '400 when all lat values outside [-90,90]')
+		  ->content_like(qr/latitude/, 'error_map_coordinate_range names latitude');
+		delete $ledger{'GET./map.400.lat_range'};
+	};
+
+	subtest 'GET /map -- lon column wholly out of range returns 400 error_map_coordinate_range' => sub {
+		$t->get_ok('/map?l=' . url_escape($RANGE_LON) . '&lat=lat&lon=lon')
+		  ->status_is(400, '400 when all lon values outside [-180,180]')
+		  ->content_like(qr/longitude/, 'error_map_coordinate_range names longitude');
+		delete $ledger{'GET./map.400.lon_range'};
+	};
+
+	subtest 'GET /map -- non-numeric lat/lon columns returns 400 error_map_coordinate_numeric' => sub {
+		$t->get_ok('/map?l=' . url_escape($TEXT_SPEC) . '&lat=lat&lon=lon')
+		  ->status_is(400, '400 when lat/lon hold no numbers')
+		  ->content_like(qr/numeric coordinate pairs|lat.*lon/, 'error_map_coordinate_numeric text');
+		delete $ledger{'GET./map.400.no_numeric_pairs'};
+	};
+
+	subtest 'GET /map?lat=&lon= -- coordinate column path returns 200 HTML' => sub {
+		$t->get_ok('/map?l=' . url_escape($COORD_SPEC) . '&lat=lat&lon=lon')
+		  ->status_is(200, '200 for valid lat=/lon= coordinate map')
+		  ->content_type_like(qr{text/html}, 'response is HTML');
+		delete $ledger{'GET./map.200.latlon'};
+	};
+
+	# Clean up config so subsequent tests do not see the stub.
+	delete $t->app->config->{geocoder};
+	delete $t->app->config->{openaddr};
+}
 
 # ---------------------------------------------------------------------------
 # Ledger assertion — every documented state must have been exercised.

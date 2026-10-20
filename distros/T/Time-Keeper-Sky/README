@@ -1,0 +1,71 @@
+Time-Keeper-Sky
+
+The sky from a place: the sun, the moon, the planets and the bright stars, where each
+is at an instant and when it rises, sets and crosses the meridian on a civil day;
+twilight, the moon's phases, the seasons, the constellations, lunar and solar
+eclipses, and what is up tonight. Every moment is a Time::Keeper value in the place's
+time zone.
+
+This distribution was Time-Keeper-Sun. It contains Time::Keeper::Sun and
+Time::Keeper::Moon, which work as they did in Time-Keeper-Sun 0.02;
+Time::Keeper::Sky is the observer, and a Time::Keeper::Sun is one.
+
+    use Time::Keeper::Sky;
+
+    my $sky = Time::Keeper::Sky->new(place => 'Europe/London');
+    print $sky->on(year => 2026, month => 10, day => 15)->sunrise, "\n";
+                                            # 2026-10-15T07:24:22+01:00
+
+    my $now = Time::Keeper->now;
+    my $j = $sky->position('jupiter', $now);   # altitude, azimuth, magnitude, ...
+    my $d = $sky->on($now, 'Sirius');          # its rise, transit and set today
+
+    for my $r ($sky->tonight) {
+        printf "%-10s best at %s, %2.0f degrees up\n", $r->{body}, $r->{best}, $r->{altitude};
+    }
+
+    use Time::Keeper::Eclipse;
+    my $e = Time::Keeper::Eclipse->next(kind => 'solar', after => $now, place => $sky);
+
+The modules:
+
+    Time::Keeper::Sky       the observer; the sun; any body by name; tonight
+    Time::Keeper::Sun       the same, under its old name
+    Time::Keeper::Moon      the phases, the moon's place and disc, its days
+    Time::Keeper::Planet    Mercury to Neptune by the full VSOP87D, and Pluto
+    Time::Keeper::Star      the 9,096 stars of the Yale Bright Star Catalogue
+    Time::Keeper::Eclipse   lunar and solar eclipses, and one place's view
+
+The astronomy is Meeus's, with VSOP87D for the planets and the rigorous model of the
+Astronomical Almanac for the stars, all in C, with the tables compiled in: nothing is
+read at run time and nothing outside Time::Keeper is needed. The results are measured
+against the U.S. Naval Observatory, JPL's DE421 ephemeris, IMCCE and NASA's Five
+Millennium Canons of eclipses, and the POD of each module says how close they come.
+
+INSTALLATION
+
+Time::Keeper must be installed first: this distribution is configured against the C
+header it installs. Then:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for each module with the perldoc
+command, starting with:
+
+    perldoc Time::Keeper::Sky
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2026 by LNATION.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+
+The tables it compiles in come from the sources Time::Keeper::Sky's SOURCES section
+names, with their terms.

@@ -5,7 +5,7 @@ use warnings;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 use Object::Pad 0.825;
 
@@ -20,15 +20,15 @@ class Term::Fabulous::Widget::Table::Cell
 	use Term::Fabulous::Check qw(one_of);
 
 	# Which part of the table the cell belongs to ('header', 'filter',
-	# 'body'), the line it shows (a line key of the table's model; undef in
-	# the header) and its column (a column key, '' for the selection column,
-	# undef for a cell that spans the columns).
+	# 'body', 'ledge'), the line it shows (a line key of the table's model;
+	# undef outside the body) and its column (a column key, '' for the
+	# selection column, undef for a cell that spans the columns).
 	field $part       :param :reader = 'body';
 	field $line_key   :param :reader = undef;
 	field $column_key :param :reader = undef;
 
 	ADJUST {
-		one_of( $self, part => $part, qw(header filter body) );
+		one_of( $self, part => $part, qw(header filter body ledge) );
 	}
 }
 
@@ -43,8 +43,11 @@ Term::Fabulous::Widget::Table::Cell - A cell of a table
 =head1 DESCRIPTION
 
 The box L<Term::Fabulous::Widget::Table> puts around every cell it
-shows: header cells, filter fields, data cells and the cells that span
-the columns (group headers, the text of an empty table). It is a
+shows: header cells, filter fields, data cells, the cells that span the
+columns (group headers, the text of an empty table) and the empty cells
+of the I<ledges>, the rows that only draw the top of the frame (without
+column titles) or its bottom (see
+L<Term::Fabulous::Widget::Table::Borders/Who draws it>). It is a
 L<Term::Fabulous::Widget::Box> that composes
 L<Clay::UI::Role::Layout::GridCell>, so the table's grids size it as the
 cell of its column and row. The table gives it its background, padding
@@ -60,13 +63,13 @@ C<column_key> and C<part> tell which cell it is.
 
 =head2 part
 
-C<'header'>, C<'filter'> or C<'body'>.
+C<'header'>, C<'filter'>, C<'body'> or C<'ledge'>.
 
 =head2 line_key
 
 The key of the line of the table's model the cell belongs to (see
-L<Term::Fabulous::Widget::Table::Model/Lines>), or C<undef> in the
-header.
+L<Term::Fabulous::Widget::Table::Model/Lines>), or C<undef> outside the
+body.
 
 =head2 column_key
 

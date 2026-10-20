@@ -10,7 +10,7 @@ use Object::Pad 0.825;
 use Term::Fabulous::Widget::Box;
 use Term::Fabulous::Widget::Accordion::Item;
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 class Term::Fabulous::Widget::Accordion
 	:isa(Term::Fabulous::Widget::Box)
@@ -19,7 +19,7 @@ class Term::Fabulous::Widget::Accordion
 	use Clay::UI::Enum::Result;
 	use Clay::XS qw(sizing_grow CLAY_TOP_TO_BOTTOM);
 	use List::Util qw(first);
-	use Scalar::Util qw(blessed refaddr weaken);
+	use Scalar::Util qw(blessed refaddr);
 	use Term::Fabulous::Check qw(boolean describe non_negative_integer one_of string);
 	use Term::Fabulous::Roving qw(roving_target);
 	use Term::Fabulous::Event::Select;
@@ -48,8 +48,7 @@ class Term::Fabulous::Widget::Accordion
 		my $layout = $self->layout;
 		$self->layout( { %$layout, layout_direction => CLAY_TOP_TO_BOTTOM, sizing => { width => sizing_grow(), %{ $layout->{sizing} // {} } } } );
 
-		weaken( my $weak_self = $self );
-		$self->on( KeyPress => sub ($event) { return $weak_self && $weak_self->_handle_key($event) ? Clay::UI::Enum::Result->HANDLED : Clay::UI::Enum::Result->CONTINUE } );
+		$self->on( KeyPress => sub ( $self, $event ) { return $self->_handle_key($event) ? Clay::UI::Enum::Result->HANDLED : Clay::UI::Enum::Result->CONTINUE }, owner => $self );
 	}
 
 	# ---------------------------------------------------------------------
@@ -281,7 +280,7 @@ their headers
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-accordion.svg" alt="Two accordions: one with the Network section open under General and a disabled Licenses section, one with borders, the toggles at the end and two sections open at once"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.05/screenshots/widget-accordion.svg" alt="Two accordions: one with the Network section open under General and a disabled Licenses section, one with borders, the toggles at the end and two sections open at once"></p>
 
 =end html
 

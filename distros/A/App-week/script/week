@@ -1,10 +1,10 @@
 #!/usr/bin/env perl
 
-use v5.14;
+use v5.24;
 use warnings;
 
-use  App::week;
-exit App::week->new->run(@ARGV);
+use App::week qw(week);
+exit week(@ARGV);
 
 __END__
 
@@ -43,7 +43,7 @@ i18n options:
 
     -l          list i18n options
     --i18n      enable i18n options
-    --i18n-v    display with Territory/Lange information
+    --i18n-v    display with Territory/Language information
 
 Color modules:
 
@@ -53,27 +53,30 @@ Color modules:
 
 =head1 VERSION
 
-Version 1.0303
+Version 1.0701
 
 =head1 DESCRIPTION
 
-By default, B<week> command display the previous, current and next
-month surrounding today, just like B<-3> option of L<cal(1)> command.
+By default, the B<week> command displays the previous, current and next
+month surrounding today, just like the B<-3> option of the L<cal(1)> command.
 
-Number of month can be given with dash, or B<-m> option which can be
-mixed up with other parameters.  B<-c> option specifies number of
+=for html <p>
+<img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/App-week/refs/heads/master/images/dodgers.png">
+
+The number of months can be given with a dash or the B<-m> option,
+which can be combined with other parameters.  B<-c> option specifies number of
 columns.
 
     $ week -12
     $ week -m21c7
 
-Before and after months can be specified with B<-B> and B<-A> option,
-and B<-C> for both.
+The number of months before and after can be specified with the B<-B>
+and B<-A> options, and B<-C> for both.
 
     $ week -B4 -A4
     $ week -C4
 
-Date can given like:
+A date can be given like:
 
     $ week 2019/9/23
     $ week 9/23        # 9/23 of current year
@@ -88,14 +91,14 @@ And also in Japanese format and era:
     $ week 平31
     $ week H31
 
-Greater number is handled as a year.  Next command displays the
-calendar of the year 1752.
+A larger number is treated as a year.  The next command displays the
+calendar for the year 1752.
 
     $ week 1752
 
-Use option B<-y> to show one year calendar.  The number of years can
-be specified by the B<-Y> option (must <= 100), which will implicitly
-set the B<-y> option.
+Use the B<-y> option to show a one-year calendar.  The number of years
+can be specified by the B<-Y> option (must be 100 or less), which
+implicitly sets the B<-y> option.
 
     $ week -y          # display this year's calendar
 
@@ -103,36 +106,51 @@ set the B<-y> option.
 
 =head1 INTERNATIONAL SUPPORT
 
-It is possible display calendar in various language by setting C<LANG>
-environment.
+It is possible to display the calendar in various languages by setting
+locale environment variables.
 
     LANG=et_EE week
+    LC_TIME=et_EE week
 
-This command come with B<-Mi18n> module which provides easy way to
-specify language by command option.  Option B<-l> displays option list
-provided by B<-Mi18n> module and option B<--i18n> and B<--i18n-v>
-enables them.  See L<Getopt::EX::i18n>.
+This command comes with the B<-Mi18n> module, which provides an easy
+way to specify a language by command option.  Option B<-l> displays
+the option list provided by the B<-Mi18n> module, and options
+B<--i18n> and B<--i18n-v> enable them.  When using B<--i18n> options, the C<LC_TIME> environment
+variable is set to control date and time formatting specifically.
+See L<Getopt::EX::i18n>.
 
     $ week --i18n-v --et
 
 =head1 JAPANESE ERA
 
-By default, chronological year is shown on current month and every
-January.  When used in Japanese locale environment, right side year is
-displayed in Japanese era (wareki: 和暦) format.
+By default, the chronological year is shown on the current month and
+every January.  When used in a Japanese locale environment, the year
+on the right side is displayed in Japanese era (wareki: 和暦) format.
 
 =head1 WEEK NUMBER
 
-Using option B<-W> or B<--weeknumber>, week number is printed at the
-end of every week line.  Week number 1 is a week which include January
-1st and count up on every Sunday.
+Using the B<-W> or B<--weeknumber> option, the week number is printed
+at the end of every week line.  Week number 1 is the week that
+includes January 1st, and it counts up every Sunday.
 
-Experimentally option B<-W2> print the I<standard week number> which
-start with the first Sunday of the year, and B<-W3> print ISO 8601
-style week number.  Because ISO week start on Monday, and the command
-shows a number of Sunday of the week, the result is not intuitive and
-therefore, I guess, useless.  This option requires L<gcal(1)> command
-installed.
+=for html <p>
+<img width="250" src="https://raw.githubusercontent.com/kaz-utashiro/App-week/refs/heads/master/images/cw1.png">
+
+Option B<-W2> prints the I<standard week number>, which starts with
+the first Sunday of the year.
+
+=for html <p>
+<img width="250" src="https://raw.githubusercontent.com/kaz-utashiro/App-week/refs/heads/master/images/cw2.png">
+
+Option B<-W3> prints the ISO 8601 style week number.  Because ISO
+weeks start on Monday, and the command shows the number for the Sunday
+of the week, the result is not intuitive and therefore, I guess,
+useless.
+
+=for html <p>
+<img width="250" src="https://raw.githubusercontent.com/kaz-utashiro/App-week/refs/heads/master/images/cw3.png">
+
+Option B<-W2> and B<-W3> require L<gcal(1)> command installed.
 
 =head1 COLORMAP
 
@@ -173,11 +191,11 @@ these labels by default.
     DOW_CW  Week Number
 
 Three digit means 216 RGB values from C<000> to C<555>, and C<L01>
-.. C<L24> mean 24 gray scales.  Colormap is handled by
+.. C<L24> mean 24 gray scale levels.  Colormap is handled by
 L<Getopt::EX::Colormap> module; use `perldoc Getopt::EX::Colormap` for
 detail.
 
-You can add special effect afterward.  For example, put next line in
+You can add a special effect afterward.  For example, put next line in
 your F<~/.weekrc> to blink today.  C<< $<move> >> indicates to move
 all following arguments here, so that insert this option at the end.
 
@@ -191,16 +209,18 @@ all following arguments here, so that insert this option at the end.
 
 =item B<--i18n-v>
 
-Both of these enables I18N options and Territory/Language information
-will be shown if used B<--i18n-v>.
+Both of these enable I18N options, and Territory/Language information
+is shown when B<--i18n-v> is used.  These options set the C<LC_TIME>
+environment variable to control date and time formatting specifically,
+rather than the general C<LANG> variable.
 
 =back
 
 =head1 MODULES
 
 Some modules are included in the distribution.  These options can be
-used without any special action, because they are defined to load
-appropriate module automatically in default start up module
+used without any special action, because they are defined to load the
+appropriate module automatically in the default startup module
 (L<App::week::default>).
 
 =over 4
@@ -211,6 +231,11 @@ appropriate module automatically in default start up module
     --lavender
     --green
     --pastel
+
+=item B<-Mmlb> (Major League Baseball)
+
+    --dodgers, --dodgers-rev
+    --yankees, --yankees-rev
 
 =item B<-Mnpb> (Nippon Professional Baseball Organization)
 
@@ -226,14 +251,14 @@ appropriate module automatically in default start up module
 
 =item B<--theme>
 
-Option B<--theme> is defined in default module, and choose given theme
-option according to the background color of the terminal. If you have
-next setting in your C<~/.weekrc>:
+Option B<--theme> is defined in the default module and chooses the
+appropriate variant of the given theme according to the background
+color of the terminal.  If you have the following setting in your C<~/.weekrc>:
 
     option --theme tokyo2020
 
-Option B<--tokyo2020> is set for light terminal, and
-B<--tokyo2020-rev> is set for dark terminal.
+Option B<--tokyo2020> is set for a light terminal, and
+B<--tokyo2020-rev> is set for a dark terminal.
 
 =back
 
@@ -292,7 +317,7 @@ The following copyright notice applies to all the files provided in
 this distribution, including binary files, unless explicitly noted
 otherwise.
 
-Copyright 2018-2022 Kazumasa Utashiro
+Copyright ©︎ 2018-2026 Kazumasa Utashiro
 
 =cut
 

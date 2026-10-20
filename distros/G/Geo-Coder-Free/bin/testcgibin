@@ -10,7 +10,16 @@ use lib "$Bin/../lib";
 
 my $path = $Bin;
 $path =~ s/^(.+)\/.+/$1/;	# Remove the final directory, probably "/bin"
-$ENV{'root_dir'} = $path;
+
+# Where the page keeps the file caches it roots at $ENV{'root_dir'} - the country
+# it remembers for a visitor among them.  By default that is this distribution,
+# which is where the page would keep them when it is run by hand (the page's own
+# comments show it being run with root_dir=$(pwd)/..).  A caller that has set
+# root_dir has chosen somewhere else for them and is left alone: the test suite
+# points it into the directory it is about to delete, so that a run leaves
+# nothing behind in the checkout and one test's cached country cannot answer for
+# the next.
+$ENV{'root_dir'} = $path unless(defined($ENV{'root_dir'}));
 
 eval {
 	my $testnumber = $ARGV[0];
@@ -26,11 +35,18 @@ sub doit
 	my $test = shift or Carp::croak;
 
 	# Tests 3 and 4 simulate a browser in the US, so that the page infers the
-	# country from the client's IP address.  The IP must be one that the page's
-	# CGI::ACL allow-list trusts (see cgi-bin/page.fcgi): any other address gets
-	# a 403 "Access Denied" instead of an answer, and the test would be checking
-	# the block page rather than the geocoder.
+	# country from the client's IP address.  The IP is one that the page's
+	# CGI::ACL is built to trust (see cgi-bin/page.fcgi), so that those two
+	# tests are the geocoder answering and not a lesson in access control: an
+	# address the ACL cannot place in a country is refused (test 10), and so is
+	# one whose country it blocks (test 11).
 	my $us_ip = '108.44.193.70';
+
+	# The address test 10 asks from: a private address, which CGI::Lingua
+	# places in no country - it skips private and loopback addresses - so
+	# CGI::ACL refuses the client.  It is not chosen to look like an attacker:
+	# the address alone is what the refusal is about.
+	my $unplaceable_ip = '10.0.0.1';
 
 	# The address tests 7 and 8 ask from as well: 7 is refused although it comes
 	# from the same address, so what refuses it is the user agent and nothing
@@ -82,5 +98,61 @@ sub doit
 		$ENV{'SERVER_PROTOCOL'} = 'HTTP/1.1';
 		$ENV{'HTTP_USER_AGENT'} = $browser_agent;
 		system("$^X $Bin/../cgi-bin/page.fcgi page=query q='NASA+TIROS+RD+GREENBELT+MD+US'");
+	} elsif($test == 9) {
+		# Test 7's refusal, asked with HEAD: the page must send the headers and
+		# no body (RFC 7231 §4.3.2, which the block page cites).
+		$ENV{'REMOTE_ADDR'} = $us_ip;
+		$ENV{'SERVER_PROTOCOL'} = 'HTTP/1.1';
+		$ENV{'HTTP_USER_AGENT'} = $blacklisted_agent;
+		$ENV{'REQUEST_METHOD'} = 'HEAD';
+		system("$^X $Bin/../cgi-bin/page.fcgi page=query q='NASA+TIROS+RD+GREENBELT+MD+US'");
+	} elsif($test == 10) {
+		# The page's own ACL refusing a client.  Everything about this request
+		# is test 3's - an ordinary browser, asking the question the stub can
+		# answer - except the address, which no country can be looked up for,
+		# so CGI::ACL refuses it before any other layer is consulted.
+		$ENV{'REMOTE_ADDR'} = $unplaceable_ip;
+		$ENV{'SERVER_PROTOCOL'} = 'HTTP/1.1';
+		$ENV{'HTTP_USER_AGENT'} = $browser_agent;
+		system("$^X $Bin/../cgi-bin/page.fcgi page=query q='NASA+TIROS+RD+GREENBELT+MD+US'");
+	} elsif($test == 11) {
+		# A client from a country the site blocks.  The address is the one the
+		# site trusts, so the ACL serves it and the refusal is the country
+		# list's.  The country is passed the way a web server or proxy passes
+		# it, which is how CGI::Lingua reads the client's country.
+		$ENV{'REMOTE_ADDR'} = $us_ip;
+		$ENV{'SERVER_PROTOCOL'} = 'HTTP/1.1';
+		$ENV{'HTTP_USER_AGENT'} = $browser_agent;
+		$ENV{'HTTP_CF_IPCOUNTRY'} = 'RU';
+		system("$^X $Bin/../cgi-bin/page.fcgi page=query q='NASA+TIROS+RD+GREENBELT+MD+US'");
+	} elsif($test == 12) {
+		# A client the page has blacklisted.  It asks a question - the one the
+		# stub answers - whose wording reads like a SQL injection attempt, so
+		# the page adds the address to its blacklist and refuses it.  The
+		# address and the user agent are test 3's and 8's, which the site
+		# serves, so the query string is the only thing it can be refused for.
+		$ENV{'REMOTE_ADDR'} = $us_ip;
+		$ENV{'SERVER_PROTOCOL'} = 'HTTP/1.1';
+		$ENV{'HTTP_USER_AGENT'} = $browser_agent;
+		system("$^X $Bin/../cgi-bin/page.fcgi page=query q='NASA+TIROS+RD+GREENBELT+MD+US+OR+NOT+1=1'");
+	} elsif($test == 13) {
+		# A query page submission carrying a CSRF token the site did not
+		# issue.  Everything else is test 3's, so the token is what the page
+		# refuses.  The token is well-formed enough to be a token and signed
+		# with nothing, which is what a forgery that guessed the shape looks
+		# like.
+		$ENV{'REMOTE_ADDR'} = $us_ip;
+		$ENV{'SERVER_PROTOCOL'} = 'HTTP/1.1';
+		$ENV{'HTTP_USER_AGENT'} = $browser_agent;
+		system("$^X $Bin/../cgi-bin/page.fcgi page=query q='NASA+TIROS+RD+GREENBELT+MD+US' csrf_token='0123456789abcdef'");
+	} elsif($test == 14) {
+		# The same submission as test 13, with a token this configuration
+		# signed: the page serves the answer.  The token is supplied by the
+		# caller, which knows the stub's secret, because a token is signed
+		# with a configuration this program does not read.
+		$ENV{'REMOTE_ADDR'} = $us_ip;
+		$ENV{'SERVER_PROTOCOL'} = 'HTTP/1.1';
+		$ENV{'HTTP_USER_AGENT'} = $browser_agent;
+		system("$^X $Bin/../cgi-bin/page.fcgi page=query q='NASA+TIROS+RD+GREENBELT+MD+US' csrf_token='$ENV{'CSRF_TOKEN'}'");
 	}
 }

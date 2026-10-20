@@ -8,7 +8,7 @@ Term::Fabulous::Cookbook::Output - Recipes: reports and tests without a terminal
 
 =head1 DESCRIPTION
 
-This page is part of L<Term::Fabulous::Cookbook>. Previous page: L<Term::Fabulous::Cookbook::Canvases>. Next page: L<Term::Fabulous::Cookbook::Extending>.
+This page is part of L<Term::Fabulous::Cookbook>. Previous page: L<Term::Fabulous::Cookbook::DocumentTechniques>. Next page: L<Term::Fabulous::Cookbook::Extending>.
 
 This page shows two uses of Term::Fabulous without an interactive
 terminal: printing a widget tree as text, for reports in pipes, files
@@ -89,7 +89,7 @@ This program is shipped as F<examples/cookbook/report-to-file.pl>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-report-to-file.svg" alt="The sales report: a rounded box with a title and three regions"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.05/screenshots/cookbook-report-to-file.svg" alt="The sales report: a rounded box with a title and three regions"></p>
 
 =end html
 
@@ -261,6 +261,6 @@ L<Term::Fabulous::Manual::Programs/TESTING>.
 
 =head1 SEE ALSO
 
-This page is part of L<Term::Fabulous::Cookbook>. Previous page: L<Term::Fabulous::Cookbook::Canvases>. Next page: L<Term::Fabulous::Cookbook::Extending>.
+This page is part of L<Term::Fabulous::Cookbook>. Previous page: L<Term::Fabulous::Cookbook::DocumentTechniques>. Next page: L<Term::Fabulous::Cookbook::Extending>.
 
 =cut

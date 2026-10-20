@@ -21,7 +21,8 @@ my @files = (
     't/17-empty-domains-config.t',
     't/20-basic-algorithm-ahocorasick.t',
     't/20-basic-toml-tiny.t',
-    't/21-cache_failure-default.t'
+    't/21-cache_failure-default.t',
+    't/22-matcher-state-reset.t'
 );
 
 eol_unix_ok($_, { trailing_whitespace => 1 }) foreach @files;

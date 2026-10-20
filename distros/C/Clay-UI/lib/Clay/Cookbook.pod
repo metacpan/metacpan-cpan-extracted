@@ -274,7 +274,7 @@ technique.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-clay-xs/v0.06/images/example-15-og-card.png" alt="The output of examples/15-og-card.pl: a 1200 by 630 dark card with an orange stripe at the left, the site name Layout Notes with an icon, a 7 MIN READ pill, a three-line white headline, a grey summary, an author avatar with name and date, and four tag pills."></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-clay-xs/v0.07/images/example-15-og-card.png" alt="The output of examples/15-og-card.pl: a 1200 by 630 dark card with an orange stripe at the left, the site name Layout Notes with an icon, a 7 MIN READ pill, a three-line white headline, a grey summary, an author avatar with name and date, and four tag pills."></p>
 
 =end html
 
@@ -400,7 +400,7 @@ F<examples/06-png-render.pl> and F<examples/15-og-card.pl>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-clay-xs/v0.06/images/example-06-png-render.png" alt="The output of examples/06-png-render.pl: a blue header titled Clay -&gt; PNG demo above a white panel with three cards, orange to olive, each holding the same paragraph in a monospace font, aligned left, centred and right."></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-clay-xs/v0.07/images/example-06-png-render.png" alt="The output of examples/06-png-render.pl: a blue header titled Clay -&gt; PNG demo above a white panel with three cards, orange to olive, each holding the same paragraph in a monospace font, aligned left, centred and right."></p>
 
 =end html
 
@@ -415,7 +415,7 @@ axis points up, Clay's down, so flip each box:
 Text is placed at its baseline; a good approximation is
 C<< $page_height - $box->{y} - $font_size * 0.8 >>. A complete renderer
 is in F<examples/16-invoice-pdf.pl>; the invoice it writes is at
-L<https://github.com/davenonymous/perl-clay-xs/blob/v0.06/images/example-16-invoice-pdf.pdf>.
+L<https://github.com/davenonymous/perl-clay-xs/blob/v0.07/images/example-16-invoice-pdf.pdf>.
 
 =head2 Split a long document into pages
 
@@ -441,7 +441,7 @@ footer, table heading) on every page.
 =back
 
 F<examples/16-invoice-pdf.pl> paginates an invoice this way; see the
-PDF at L<https://github.com/davenonymous/perl-clay-xs/blob/v0.06/images/example-16-invoice-pdf.pdf>.
+PDF at L<https://github.com/davenonymous/perl-clay-xs/blob/v0.07/images/example-16-invoice-pdf.pdf>.
 
 =head2 Find the widget or data behind a render command
 
@@ -608,8 +608,11 @@ The tooltip appears in the same C<render> that reports the hover. The
 listeners reach the widget through C<< $event->current_target >>: a
 listener that captures its own widget (C<$help>) in the closure creates
 a reference cycle, and the widget is never freed (see
-L<Clay::UI::Role::Events::Listener/on>). See
-F<examples/13-ui-scroll-floating.pl>.
+L<Clay::UI::Role::Events::Listener/on>). A listener that needs some
+other object that holds the widget, such as the widget class that built
+C<$help>, is registered with C<< owner => $object >> and gets that
+object as its first argument (L<Clay::UI::Role::Events::Listener/owner>).
+See F<examples/13-ui-scroll-floating.pl>.
 
 =head2 Open a dropdown menu below a button
 
@@ -718,7 +721,8 @@ Clay::UI has no keyboard events. Route keys yourself:
 =head2 Disable a button
 
 Compose L<Clay::UI::Role::Interaction::Disableable>. A disabled widget
-cannot be pressed or focused; disabling a focused widget blurs it. A
+cannot be pressed or focused; disabling a focused widget blurs it and
+hands the focus to its heir (L<Clay::UI::Interaction/Focus heirs>). A
 press over a disabled button is absorbed, as in HTML: a pressable card
 around it gets no C<OnPress> either.
 

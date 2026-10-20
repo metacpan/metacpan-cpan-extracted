@@ -27,3 +27,12 @@ input:
     type: number
     min: 0
     optional: true
+  tile_url:
+    type: string
+    optional: true
+  tile_attribution:
+    type: string
+    optional: true
+  email:
+    type: string
+    optional: true

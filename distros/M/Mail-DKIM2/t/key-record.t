@@ -9,7 +9,7 @@ use Mail::DKIM2::Common qw(parse_dkim_pubkey parse_dkim_key_record);
 use Mail::DKIM2::Signature;
 use Mail::DKIM2::Verifier;
 
-# Key records (spec-06 §11.5, draft-ietf-dkim-dkim2-dns §3.2, §3.4): the
+# Key records (-07 §14.5, draft-ietf-dkim-dkim2-dns §3.2, §3.4): the
 # whole record is a tag-list that must validate; v=, if present, is first
 # and exactly DKIM1; k= defaults to rsa and an unrecognised type is not a
 # usable key; p= is required and empty means revoked; a repeated tag makes

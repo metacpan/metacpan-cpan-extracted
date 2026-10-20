@@ -2,9 +2,10 @@ use v5.40;
 use feature qw[class try];
 no warnings 'experimental::class';
 #
-class Alien::Xrepo::Runtime v1.0.9 {
+class Alien::Xrepo::Runtime v1.0.10 {
     use Alien::Xrepo;
     use Alien::Xrepo::Build::Recipe;
+    use Alien::Xrepo::Runtime::Alt;
     use Config   ();
     use JSON::PP qw[decode_json];
     use Path::Tiny;
@@ -22,16 +23,17 @@ class Alien::Xrepo::Runtime v1.0.9 {
     field $cache               : param //= 1;        # forward the engine's warm-start cache to Alien::Xrepo
 
     #
-    field $recipe_obj        = undef;                # resolved Alien::Xrepo::Build::Recipe
-    field $infos             = {};                   # package => Alien::Xrepo::PackageInfo
-    field $snap              = {};                   # package => raw snapshot data
-    field $r                 = undef;                # resolved Alien::Xrepo engine
+    field $recipe_obj        = undef;                        # resolved Alien::Xrepo::Build::Recipe
+    field $infos             = {};                           # package => Alien::Xrepo::PackageInfo
+    field $snap              = {};                           # package => raw snapshot data
+    field $r                 = undef;                        # resolved Alien::Xrepo engine
     field $snap_install_type = undef;
-    field $snap_file      :reader(snapshot_path)   = undef;                # path of the snapshot actually loaded, if any
-    field $snap_errors    :reader(snapshot_errors)   = {};                   # package => build error recorded in that snapshot
-    field $rdeps          = {};                                              # package => discovered runtime deps (aref)
-    field $closure        = {};                                              # package => raw fetch --deps closure (aref)
-    field $check_runtime_deps : param //= 1;                                 # surface the diagnostic through package_info
+    field $snap_file   : reader(snapshot_path)   = undef;    # path of the snapshot actually loaded, if any
+    field $snap_errors : reader(snapshot_errors) = {};       # package => build error recorded in that snapshot
+    field $rdeps   = {};                                     # package => discovered runtime deps (aref)
+    field $closure = {};                                     # package => raw fetch --deps closure (aref)
+    field $check_runtime_deps : param //= 1;                 # surface the diagnostic through package_info
+
     #
     ADJUST {
         if ( !defined $pkg_name && !defined $recipe ) {
@@ -62,7 +64,7 @@ class Alien::Xrepo::Runtime v1.0.9 {
     method package_names () { $recipe_obj->packages }
     method package_defs ()  { $recipe_obj->package_defs }
     #
-    method has_snapshot    () { defined $snap_file }
+    method has_snapshot () { defined $snap_file }
     #
     # Hermetic mode: a snapshot file wins entirely (no xrepo subprocess).
     method _load_snapshot () {
@@ -80,6 +82,7 @@ class Alien::Xrepo::Runtime v1.0.9 {
         $snap_file         = "$file";
         $snap_errors       = $data->{errors} // {};
         my $base = path($file)->parent;
+
         for my $name ( keys %$snap ) {
             my %pkg = %{ $snap->{$name} };
             $self->_rebase_relative( $base, \%pkg );
@@ -121,6 +124,7 @@ class Alien::Xrepo::Runtime v1.0.9 {
     # for and remember them. An unresolvable package settles at undef (safe defaults) instead of killing the caller, so
     # a cold checkout (no snapshot, no store) yields safe defaults.
     method _ensure_info ($pkg) {
+        return $infos->{$pkg} if exists $infos->{$pkg};
         my $info = $infos->{$pkg};
         return $info if defined $info;
         my $version = $recipe_obj->version_for($pkg);
@@ -207,7 +211,6 @@ class Alien::Xrepo::Runtime v1.0.9 {
         return $i ? $i->find_header($filename) : undef;
     }
 
-
     # An Alien hands Perl a library to dlopen; the dynamic linker resolves that library's *own* dependencies
     # before our symbols are usable, so a vendored provider (freetype behind libsdl3_ttf) has to be findable
     # first. The engine can read those tables (see Alien::Xrepo::runtime_deps); these accessors wrap that with
@@ -239,7 +242,7 @@ class Alien::Xrepo::Runtime v1.0.9 {
     # Classified direct runtime dependencies of the package's FFI library, e.g.
     #   { name => 'libfreetype.6.dylib', path => '/store/f/freetype/.../lib/...', dir => '...', scope => 'store' }
     # scope is one of store / host / system / unresolved (see Alien::Xrepo::runtime_deps). Cached.
-    method runtime_deps ($pkg = undef) {
+    method runtime_deps ( $pkg = undef ) {
         my $name = $pkg // ( $recipe_obj->packages )[0];
         die "Unknown package '$name'. Known: @{[ $recipe_obj->packages ]}" unless grep { $_ eq $name } $recipe_obj->packages;
         return $rdeps->{$name} if exists $rdeps->{$name};
@@ -248,44 +251,43 @@ class Alien::Xrepo::Runtime v1.0.9 {
         my $libpath = $info ? $info->libpath : undef;
         return $rdeps->{$name} = [] unless defined $libpath && length $libpath && -f $libpath;
         my ( $search, $store ) = $self->_closure_dirs($name);
+
         if ( $info->libfiles && @{ $info->libfiles } ) {
             unshift @$search, map { path($_)->parent->stringify } @{ $info->libfiles };
         }
         unshift @$search, map { path($_)->stringify } $info->bin_dir;
-        unshift @$store, $info->installdir if defined $info->installdir && length $info->installdir;
+        unshift @$store,  $info->installdir if defined $info->installdir && length $info->installdir;
         my $deps = $r->runtime_deps( $libpath, search_dirs => $search, store_dirs => $store );
         return $rdeps->{$name} = ( $deps // [] );
     }
 
     # Everything the loader would NOT find on its own (store / host / unresolved).
-    method foreign_runtime_deps ($pkg = undef) {
+    method foreign_runtime_deps ( $pkg = undef ) {
         return grep { ( $_->{scope} // '' ) ne 'system' } @{ $self->runtime_deps($pkg) };
     }
 
     # Directories to put on the loader search path so foreign_runtime_deps resolve.
-    method runtime_dep_dirs ($pkg = undef) {
+    method runtime_dep_dirs ( $pkg = undef ) {
         my %seen;
         return grep { defined && length && !$seen{$_}++ } map { $_->{dir} } $self->foreign_runtime_deps($pkg);
     }
 
     # The env var this platform's loader consults at dlopen time.
     method loader_env_var () {
-        return $r->loader_env_var if $r->can('loader_env_var');
+        return $r->loader_env_var  if $r->can('loader_env_var');
         return 'PATH'              if $^O eq 'MSWin32';
         return 'DYLD_LIBRARY_PATH' if $^O eq 'darwin';
         return 'LD_LIBRARY_PATH';
     }
 
     # A post-install summary of the extra libraries a consumer must make loadable, or '' when none.
-    method runtime_dep_report ($pkg = undef) {
+    method runtime_dep_report ( $pkg = undef ) {
         my @d = $self->foreign_runtime_deps($pkg);
         return '' unless @d;
         my @lines = ('runtime dependencies that must be loadable before this library is dlopen\'d:');
-        push @lines, sprintf( '  - %s [%s]%s', $_->{name}, $_->{scope}, defined $_->{path} ? " -> $_->{path}" : '' )
-            for @d;
+        push @lines, sprintf( '  - %s [%s]%s', $_->{name}, $_->{scope}, defined $_->{path} ? " -> $_->{path}" : '' ) for @d;
         my @dirs = $self->runtime_dep_dirs($pkg);
-        push @lines, '  add to ' . $self->loader_env_var . ': ' . join( ( $^O eq 'MSWin32' ? ';' : ':' ), @dirs )
-            if @dirs;
+        push @lines, '  add to ' . $self->loader_env_var . ': ' . join( ( $^O eq 'MSWin32' ? ';' : ':' ), @dirs ) if @dirs;
         return join "\n", @lines;
     }
 
@@ -296,41 +298,13 @@ class Alien::Xrepo::Runtime v1.0.9 {
         my $info = $self->_pkg_info($name);
         return $info unless $info;
         return $info if @{ $info->runtime_deps // [] };
-        return $info if $self->has_snapshot;    # a snapshot is authoritative (and must stay hermetic)
+        return $info if $self->has_snapshot;              # a snapshot is authoritative (and must stay hermetic)
         return $info unless $check_runtime_deps;
         return $info unless defined $info->libpath && length $info->libpath;
         my $deps = $self->runtime_deps($name);
         return $info unless $deps && @$deps;
         return $info->with_runtime_deps($deps);
     }
-};
-#
-class Alien::Xrepo::Runtime::Alt v1.0.9 {
-    field $base : param;
-    field $pkg : reader(pkg_name) : param;
-    method package_names ()      { $base->package_names }
-    method package_info ()       { $base->package_info($pkg) }
-    method alt ( $name = undef ) { $base->alt( $name // $pkg ) }
-    method libpath ()            { $base->libpath($pkg) }
-    method ffi_lib ()            { $base->libpath($pkg) }
-    method bin_dir ()            { $base->bin_dir($pkg) }
-    method version ()            { $base->version($pkg) }
-    method kind ()               { $base->kind($pkg) }
-    method cflags ()             { $base->cflags($pkg) }
-    method cflags_static ()      { $base->cflags($pkg) }
-    method libs ()               { $base->libs($pkg) }
-    method libs_static ()        { $base->libs($pkg) }
-    method dynamic_libs ()       { $base->dynamic_libs($pkg) }
-    method dist_dir ()           { $base->dist_dir($pkg) }
-    method install_type ()       { $base->install_type($pkg) }
-    method prepend_to_path ()    { $base->prepend_to_path($pkg) }
-    method split_flags ($flags)    { $base->split_flags( $flags, $pkg ) }
-    method find_header ($filename) { $base->find_header( $filename, $pkg ) }
-    method runtime_deps ()         { $base->runtime_deps($pkg) }
-    method foreign_runtime_deps () { $base->foreign_runtime_deps($pkg) }
-    method runtime_dep_dirs ()     { $base->runtime_dep_dirs($pkg) }
-    method loader_env_var ()       { $base->loader_env_var }
-    method runtime_dep_report ()   { $base->runtime_dep_report($pkg) }
 };
 #
 1;

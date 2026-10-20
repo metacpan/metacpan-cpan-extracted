@@ -4,7 +4,7 @@ Geo::Coder::Free - Geocoding using free, locally-hosted databases
 
 ## Version
 
-Version 0.47
+Version 0.48
 
 ## Synopsis
 
@@ -152,7 +152,7 @@ It is the public form of the rule `geocode()` applies before it touches a
 backend, so a caller working down a spreadsheet column can skip a row whose
 value is a bare number - or is empty - instead of catching the croak that
 would otherwise kill the whole run.  That rule is defined once, in
-[Geo::Coder::Free::Validate](https://metacpan.org/pod/Geo%3A%3ACoder%3A%3AFree%3A%3AValidate), and the backends apply it too: what
+[Geo::Location::Predicate](https://metacpan.org/pod/Geo%3A%3ALocation%3A%3APredicate), and the backends apply it too: what
 `valid_location()` refuses is refused wherever it is looked up.
 
 Only that cheap syntactic test is answered.  A true result means the string is
@@ -332,28 +332,39 @@ printf "geocoded %d of %d places in %d lookups\n",
 
 The loop a batch caller writes around `geocode()`, run for it: one lookup per
 **distinct** value, with the same options and the same results, plus the counts
-that caller would otherwise keep itself - how many values were looked up, how
-many resolved, how many did not, and which ones
+that caller would otherwise keep itself - how many values made a backend read,
+how many resolved, how many did not, which ones, and which backend read for them
 
 The hashref returned holds one entry per distinct value given, keyed by the
-value, plus four keys of its own:
+value, plus five keys of its own:
 
 - `$batch->{$value}` - the `Geo::Location::Point` the value resolved
 to, or `undef` if nothing did.  Every distinct value in the input is keyed, so
 a caller walking a column can look each row up without first asking whether the
 batch covered it.  An `undef` in the input has no key of its own and shares the
 entry of the empty string, which is not a location either.
-- `lookups` - how many values were looked up: one per distinct value this
-module agreed to query a backend for.  A value it refuses before any backend is
-touched - a bare number, `''`, `undef`, a reference - is not looked up, so it
-is not counted, which is what makes this the number a caller caps its work by.
-A value repeated in the batch is one lookup.  A lookup that is counted may still
-be answered without reading a database: the backends cache their answers, and
-OpenAddresses remembers the values it has already missed for the life of the
-process (`%unknown_locations`, shared across instances and cannot be cleared), so
-this is the number of lookups asked for rather than of rows read.  A later batch
-in the same process is answered from those caches and does correspondingly less
-work.
+- `lookups` - how many distinct values made a backend read to answer
+them: one per value, however many backends looked at it.  A value the module
+refuses before any backend is touched - a bare number, `''`, `undef`, a
+reference - is not counted, and neither is a value a backend answered from a
+cache or from a hand-curated entry, because nothing was read for it.  This is
+what makes the count the work a caller is capping rather than the work it asked
+for.  A value repeated in the batch is one lookup.  Every backend reports its
+reads through `reads()`, and a value every backend has already missed is
+remembered in [Geo::Coder::Free::MissCache](https://metacpan.org/pod/Geo%3A%3ACoder%3A%3AFree%3A%3AMissCache), one process-level cache that all
+backends and instances share, whose entries expire after an hour and can be
+emptied early with ["clear\_miss\_cache"](#clear_miss_cache).  A later batch in the same process is
+answered from those caches and so reports the reads it needed, often none, in
+place of the ones the first batch made.
+- `reads` - how many reads each backend made for the batch, keyed by the
+name `provenance()` reports that backend under: `MaxMind`, `Local` or
+`OpenAddresses`.  Every backend the object holds is named, at zero for one that
+read nothing, so a batch answered from a cache names its backends at zero rather
+than naming none.  `lookups` counts values and this counts reads - a value that
+made two backends read is one lookup and a read for each of them, so these
+numbers can add up to more than `lookups` - and the two vocabularies are the
+same, so a caller can put the backend that read a value beside the backend a
+result came from.
 - `resolved` - how many distinct values produced a point.
 - `unresolved` - how many produced nothing, the refused values included.
 - `unresolved_values` - those values, in the order they were first seen,
@@ -363,7 +374,7 @@ here `unresolved` is the count a "geocoded N of M" message needs and the values
 themselves are `unresolved_values`.
 
 `resolved` and `unresolved` always add up to the number of distinct values
-given, and the four keys above are reserved: a value equal to one of them is
+given, and the five keys above are reserved: a value equal to one of them is
 refused by name, before anything is looked up, rather than allowed to overwrite
 a count.
 
@@ -401,6 +412,7 @@ on_error => { type => 'scalar', optional => 1 }     # 'croak' (the default) or '
 { type => 'hashref' }
 #   $result->{$value}            => { isa => 'Geo::Location::Point', optional => 1 }
 #   $result->{lookups}           => { type => 'integer' }
+#   $result->{reads}             => { type => 'hashref' }
 #   $result->{resolved}          => { type => 'integer' }
 #   $result->{unresolved}        => { type => 'integer' }
 #   $result->{unresolved_values} => { type => 'arrayref' }
@@ -414,7 +426,7 @@ Usage: ...::geocode_many(...)   No values argument, one that is not an arrayref,
 invalid location to geocode()   A value refused under on_error => 'croak', with the
                                 message geocode() gives for that value.
 on_error must be ...            on_error is neither 'croak' nor 'undef'.
-<value> is one of the keys ...  A value spelled like one of the four returned keys.
+<value> is one of the keys ...  A value spelled like one of the five returned keys.
 ```
 
 #### Example
@@ -433,10 +445,35 @@ printf "geocoded %d of %d distinct places in %d lookups\n",
     $batch->{'resolved'} + $batch->{'unresolved'},
     $batch->{'lookups'};        # 4 distinct places, 2 of them looked up
 
+# Which backend did the reading, and which answered from a cache: a backend
+# at zero answered nothing by reading.
+while (my ($backend, $reads) = each %{$batch->{'reads'}}) {
+    print "$backend read $reads times\n";
+}
+
 for my $place ($batch->{'unresolved_values'}) {
     warn "no coordinates for '" . (defined($place) ? $place : '') . "'\n";
 }
 ```
+
+### Clear\_Miss\_Cache
+
+```
+Geo::Coder::Free->clear_miss_cache();
+$geo->clear_miss_cache();
+Geo::Coder::Free->clear_miss_cache('OpenAddresses');
+```
+
+Forgets the lookups that found nothing.  Each backend remembers a miss in
+[Geo::Coder::Free::MissCache](https://metacpan.org/pod/Geo%3A%3ACoder%3A%3AFree%3A%3AMissCache), one process-level cache that every backend and
+every instance shares, so an address that is not in the data is searched for
+once per process rather than once per call.  Entries expire after an hour; this
+method empties them now, for a caller that has rebuilt a database or downloaded
+a data set while the process is running.
+
+With a scope - `OpenAddresses`, `Local` or `MaxMind` - only that backend's
+entries go; `OpenAddresses` covers every OpenAddresses directory this process
+has opened.  Returns true.
 
 ### Provenance
 

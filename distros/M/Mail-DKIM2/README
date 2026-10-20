@@ -2,7 +2,7 @@ Mail::DKIM2 - DKIM2 signing and verification for email
 
 DESCRIPTION
 
-Mail::DKIM2 implements DKIM2 (draft-ietf-dkim-dkim2-spec-06), in which every
+Mail::DKIM2 implements DKIM2 (draft-ietf-dkim-dkim2-spec-07), in which every
 hop that handles a message signs it, each signature covers the ones before
 it, and a Message-Instance header records hashes of the message at each hop
 together with a Recipe for undoing that hop's changes.

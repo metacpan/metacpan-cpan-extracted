@@ -1,5 +1,5 @@
 package Clay::UI::Role::Core::Container;
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 use v5.22;
 use warnings;
 use feature 'signatures';
@@ -8,8 +8,9 @@ no warnings 'experimental::signatures';
 use Object::Pad 0.800;
 
 use Clay::UI::Role::Core::Element;
+use Clay::UI::Role::Layout::HasParent qw(is_widget);
 use Clay::UI::_error qw(croak_ui);
-use Clay::UI::_validate qw(described_value);
+use Clay::UI::_validate qw(described_value require_predicate);
 
 role Clay::UI::Role::Core::Container :does(Clay::UI::Role::Core::Element) {
 	method add_child (@kids) {
@@ -31,9 +32,9 @@ role Clay::UI::Role::Core::Container :does(Clay::UI::Role::Core::Element) {
 	# remove_child_with_id, and ignoring it would hide that mistake.
 	method remove_child (@kids) {
 		for my $kid (@kids) {
-			next if Clay::UI::Role::Core::Element::_is_widget($kid);
+			next if is_widget($kid);
 			croak_ui "Clay::UI: remove_child takes widgets, got "
-				. ( ref($kid) || ( defined $kid ? "'$kid'" : 'undef' ) )
+				. described_value($kid)
 				. "; remove a child by its id with remove_child_with_id";
 		}
 		$self->_detach_children(@kids);
@@ -50,7 +51,7 @@ role Clay::UI::Role::Core::Container :does(Clay::UI::Role::Core::Element) {
 	}
 
 	method remove_children_with ($predicate) {
-		Clay::UI::Role::Core::Element::_require_predicate(remove_children_with => $predicate);
+		require_predicate(remove_children_with => $predicate);
 		$self->_detach_children(grep { $predicate->($_) } @{ $self->children });
 		return $self;
 	}

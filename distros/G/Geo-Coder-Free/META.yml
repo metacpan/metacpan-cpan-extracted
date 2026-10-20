@@ -25,7 +25,8 @@ build_requires:
   File::Spec: '0'
   File::Temp: '0'
   Geo::Coder::Abbreviations: '0.03'
-  Geo::Location::Point: '0.18'
+  Geo::Location::Point: '0.19'
+  Geo::Location::Predicate: '0.01'
   IO::AIO: '0'
   IPC::System::Simple: '0'
   JSON::MaybeXS: '0'
@@ -55,6 +56,7 @@ build_requires:
   autodie: '0'
 configure_requires:
   ExtUtils::MakeMaker: '6.64'
+  LWP::Protocol::https: '0'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150015'
 license: open_source
@@ -84,7 +86,8 @@ requires:
   File::pfopen: '0.02'
   Geo::Coder::Abbreviations: '0.03'
   Geo::Hash: '0'
-  Geo::Location::Point: '0.18'
+  Geo::Location::Point: '0.19'
+  Geo::Location::Predicate: '0.01'
   Geo::StreetAddress::US: '0'
   Lingua::EN::AddressParse: '0'
   Locale::CA: '0'
@@ -104,5 +107,5 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Geo-Coder-Free
   homepage: https://geocode.nigelhorne.com
   repository: git://github.com/nigelhorne/Geo-Coder-Free.git
-version: '0.47'
+version: '0.48'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

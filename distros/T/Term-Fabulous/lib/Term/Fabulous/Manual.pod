@@ -44,7 +44,7 @@ event loop, testing and writing widgets of your own.
 
 Recipes: complete, runnable programs for common tasks, each with a
 picture and notes on the lines that matter. Its index page lists every
-recipe; the recipes themselves are on fifteen topic pages, from
+recipe; the recipes themselves are on seventeen topic pages, from
 L<Term::Fabulous::Cookbook::GettingStarted> to
 L<Term::Fabulous::Cookbook::Extending>.
 
@@ -101,14 +101,15 @@ the L</FEATURE INDEX>.
 
 The widgets and the widget tree, widget ids, and how the layout engine
 sizes and places widgets: direction, sizing, padding, gaps, alignment,
-flow and stack layouts, floating widgets and equal sizes across the
-tree. Dividers between widgets, accordions whose sections open and
-close, tabs, and the tabs of the open documents of a program.
+flow and stack layouts, floating widgets, scrolling content, documents
+(the document view) and equal sizes across the tree. Dividers between
+widgets, accordions whose sections open and close, tabs, and the tabs
+of the open documents of a program.
 
 =item L<Term::Fabulous::Manual::Looks>
 
-Text (character strings, wrapping, alignment, wide characters and
-emoji), colors (formats, alpha, the terminal's default colors, lighter
+Text (character strings, wrapping, alignment, styled spans and links
+inside a text, wide characters and emoji), colors (formats, alpha, the terminal's default colors, lighter
 and darker colors), borders and themes.
 
 =item L<Term::Fabulous::Manual::Events>
@@ -402,7 +403,7 @@ L<Term::Fabulous::Examples/RUNNING THE EXAMPLES>).
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-first-program.svg" alt="The first program: a greeting in a box with a rounded blue border, centered on a dark blue screen"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.05/screenshots/cookbook-first-program.svg" alt="The first program: a greeting in a box with a rounded blue border, centered on a dark blue screen"></p>
 
 =end html
 
@@ -513,9 +514,11 @@ L<Term::Fabulous::Cookbook::Layout/Change the layout with the terminal size (Sta
 
 L<Term::Fabulous::Manual::Programs/Errors and terminal restore>.
 
-=item Draw a frame now, or after the next frame
+=item Ask for a new frame; run code after the next frame or after every frame
 
-L<Term::Fabulous/invalidate>, L<Term::Fabulous::Render/after_draw>.
+L<Term::Fabulous/invalidate>, L<Term::Fabulous/request_frame_at>,
+L<Term::Fabulous/draw>, L<Term::Fabulous/after_draw, each_draw>,
+L<Term::Fabulous::Render/after_draw>, L<Term::Fabulous::Render/each_draw>.
 
 =back
 
@@ -563,14 +566,45 @@ L<Term::Fabulous::Cookbook::Layout/Line up labels with equal widths (width_group
 
 L<Term::Fabulous::Manual::Layout/Changing the layout at run time>.
 
-=item Scroll content that is larger than its box; scroll it from code
+=item Scroll content that is larger than its box; scroll it from code; pager keys; follow the end of a log
 
 L<Term::Fabulous::Manual::Layout/Scrolling content>,
 L<Term::Fabulous::Manual::Events/SCROLLING>,
 L<Term::Fabulous::Widget::ScrollBox>,
-L<Term::Fabulous/bounding_box, scroll_state, scroll_to>,
+L<Term::Fabulous::Widget::ScrollBox/follow_end>,
+L<Term::Fabulous::Widget::ScrollBox/reveal>,
+L<Term::Fabulous::Scrolling>,
+L<Term::Fabulous/"bounding_box, content_box, scroll_state, scroll_to">,
 L<Term::Fabulous::Cookbook::LiveData/Add lines to a scrolling log (ScrollBox)>,
-L<Term::Fabulous::Cookbook::LiveData/Scroll a ScrollBox from code (keep a log at the newest line)>.
+L<Term::Fabulous::Cookbook::LiveData/Scroll a ScrollBox from code (keep a log at the newest line)>,
+L<Term::Fabulous::Cookbook::DocumentTechniques/Scroll any scroll box like a pager (Term::Fabulous::Scrolling)>.
+
+=item Show a long document of headings, paragraphs, lists, quotes, code, links and any widgets; scroll it with the keys, follow its links, search it
+
+L<Term::Fabulous::Manual::Layout/Documents>,
+L<Term::Fabulous::Widget::DocumentView>, L<Term::Fabulous::Document>,
+L<Term::Fabulous::Widget::CodeBlock>, L<Term::Fabulous::Event::ViewChange>,
+L<Term::Fabulous/Documents>, and the recipes of
+L<Term::Fabulous::Cookbook::Documents> and
+L<Term::Fabulous::Cookbook::DocumentTechniques>:
+L<Term::Fabulous::Cookbook::Documents/Show a document built in Perl (Document, factories, marks)>,
+L<Term::Fabulous::Cookbook::Documents/Follow links: jump to sections, open other pages, go back (LinkActivate)>,
+L<Term::Fabulous::Cookbook::Documents/Search a document and show the reader's position (search, ViewChange)>,
+L<Term::Fabulous::Cookbook::DocumentTechniques/Show a table of contents beside the document (sections, KDL)>,
+L<Term::Fabulous::Cookbook::DocumentTechniques/Highlight the syntax of code blocks (highlighter, CodeBlock)>,
+L<Term::Fabulous::Cookbook::DocumentTechniques/Change the styles of a document and add mark kinds (Look)>,
+L<Term::Fabulous::Cookbook::DocumentTechniques/Put any widget into a document (a table and a picture)>.
+
+=item Search the text of any widget and highlight the matches
+
+L<Term::Fabulous::Role::Searchable>,
+L<Term::Fabulous::Role::SearchContainer>,
+L<Term::Fabulous::Widget::DocumentView/search>,
+L<Term::Fabulous::Widget::Text/highlights>,
+L<Term::Fabulous::Document/find_text>,
+L<Term::Fabulous::Manual::CustomWidgets/Widgets a search finds>,
+L<Term::Fabulous::Cookbook::Documents/Search a document and show the reader's position (search, ViewChange)>,
+L<Term::Fabulous::Cookbook::DocumentTechniques/Put any widget into a document (a table and a picture)>.
 
 =item Mark widgets with states and classes and style them by those
 
@@ -610,6 +644,26 @@ L<Term::Fabulous::Manual::Looks/TEXT>,
 L<Term::Fabulous::Manual::Looks/Bold, italic and underline>,
 L<Term::Fabulous::Widget::Text>,
 L<Term::Fabulous::Cookbook::GettingStarted/Wrap, align and space text>.
+
+=item Bold words, colors and other styles inside one text (spans, markup); palette tokens in styles; put user text into markup safely
+
+L<Term::Fabulous::Manual::Looks/Styled spans inside one text>,
+L<Term::Fabulous::Widget::Text/spans>, L<Term::Fabulous::Widget::Text/markup>,
+L<Term::Fabulous::Text::Markup>, L<Term::Fabulous::Text::Markup/escape_markup>,
+L<Term::Fabulous::Text::Style>.
+
+=item Links in a text; react to a click on a word
+
+L<Term::Fabulous::Manual::Looks/Links inside a text>,
+L<Term::Fabulous::Manual::Events/Clicks on text and links>,
+L<Term::Fabulous::Widget::Text/LINKS>,
+L<Term::Fabulous::Event::LinkActivate>, L<Term::Fabulous::Event::TextClick>,
+L<Term::Fabulous::Cookbook::KeyboardAndMouse/Follow links in a text (Text links)>,
+L<Term::Fabulous::Cookbook::KeyboardAndMouse/React to a click on a word (TextClick)>.
+
+=item Cut a text to a number of columns, with an ellipsis
+
+L<Term::Fabulous::Unicode/fit_columns>.
 
 =item Non-ASCII text, wide characters, emoji, combining characters
 
@@ -699,6 +753,18 @@ L<Term::Fabulous::Manual::Events/Clicks, hover and press>,
 L<Term::Fabulous::Widget::Button>,
 L<Term::Fabulous::Cookbook::KeyboardAndMouse/Add buttons for the mouse and the keyboard (Button)>.
 
+=item Double and triple clicks
+
+L<Term::Fabulous::Manual::Events/Mouse events>,
+L<Term::Fabulous::Event::Mouse/click_count>,
+L<Term::Fabulous/new> (C<double_click_seconds>).
+
+=item Where the focus goes when the focused widget is removed, hidden or disabled (focus heirs)
+
+L<Term::Fabulous::Manual::Events/When the focused widget goes away>,
+L<Term::Fabulous/KEYBOARD AND FOCUS>,
+L<Term::Fabulous::Widget::Tabs/focus_heir>.
+
 =item Low-level mouse handling: buttons, dragging, pointer movement
 
 L<Term::Fabulous::Manual::Events/MOUSE>, L<Term::Fabulous::Event::Mouse>,
@@ -714,24 +780,6 @@ L<Term::Fabulous/MOUSE WHEEL SCROLLING>.
 
 L<Term::Fabulous/new> (C<mouse>),
 L<Term::Fabulous::Cookbook::GettingStarted/Let the terminal handle the mouse (select and copy text)>.
-
-=item Dialogs and modal windows
-
-L<Term::Fabulous::Widget::Dialog>,
-L<Term::Fabulous::Cookbook::Forms/Ask a question in a dialog (Dialog widget)>.
-
-=item Ask a question, ask for a value, say that something happened (prompts)
-
-L<Term::Fabulous::Manual::Feedback/PROMPTS>,
-L<Term::Fabulous::Widget::Prompt>,
-L<Term::Fabulous::Cookbook::Forms/Confirm before quitting (Prompt)>,
-L<Term::Fabulous::Cookbook::Forms/Ask for a number and check it (Prompt, validator)>.
-
-=item Ask for a file to open or save, or for a folder (file dialogs)
-
-L<Term::Fabulous::Manual::Feedback/FILE DIALOGS>,
-L<Term::Fabulous::Widget::FileDialog>,
-L<Term::Fabulous::Cookbook::Forms/Open and save a file (FileDialog)>.
 
 =item Keep a widget from taking the focus when it is clicked (toolbars)
 
@@ -794,9 +842,29 @@ L<Term::Fabulous::Manual::Forms/Checking input>.
 
 =back
 
-=head2 Progress and feedback
+=head2 Progress, feedback and dialogs
 
 =over
+
+=item Dialogs and modal windows: a title, buttons, a notice line, the answer
+
+L<Term::Fabulous::Widget::Dialog>,
+L<Term::Fabulous::Widget::Dialog/Title, buttons and the notice line>,
+L<Term::Fabulous::Widget::Dialog/Answers>, L<Term::Fabulous::Event::Answer>,
+L<Term::Fabulous::Cookbook::Forms/Ask a question in a dialog (Dialog widget)>.
+
+=item Ask a question, ask for a value, say that something happened (prompts)
+
+L<Term::Fabulous::Manual::Feedback/PROMPTS>,
+L<Term::Fabulous::Widget::Prompt>,
+L<Term::Fabulous::Cookbook::Forms/Confirm before quitting (Prompt)>,
+L<Term::Fabulous::Cookbook::Forms/Ask for a number and check it (Prompt, validator)>.
+
+=item Ask for a file to open or save, or for a folder (file dialogs)
+
+L<Term::Fabulous::Manual::Feedback/FILE DIALOGS>,
+L<Term::Fabulous::Widget::FileDialog>,
+L<Term::Fabulous::Cookbook::Forms/Open and save a file (FileDialog)>.
 
 =item Show how much of a task is done; a bar for a task of unknown extent
 
@@ -1084,10 +1152,41 @@ L<Term::Fabulous::Manual::CustomWidgets/WRITING YOUR OWN WIDGETS>,
 L<Term::Fabulous::Widget::Input>,
 L<Term::Fabulous::Cookbook::Extending/Write a custom input widget (a toggle switch)>.
 
+=item Colors from the theme in a widget of your own
+
+L<Term::Fabulous::Manual::CustomWidgets/Colors from the theme>,
+L<Term::Fabulous::Role::Themed/drawing_theme>.
+
+=item Work after a frame in a widget of your own
+
+L<Term::Fabulous::Manual::CustomWidgets/Work after a frame>,
+L<Term::Fabulous::Widget/each_frame>,
+L<Term::Fabulous::Widget::ScrollBox/reveal>.
+
+=item Tell a list the height of a widget before its layout (estimated_rows)
+
+L<Term::Fabulous::Manual::CustomWidgets/Height before layout>,
+L<Term::Fabulous::Widget/estimated_rows>,
+L<Term::Fabulous::Widget/estimated_content_rows>,
+L<Term::Fabulous::Widget/content_padding>.
+
+=item Dialogs and popups of your own
+
+L<Term::Fabulous::Manual::CustomWidgets/A dialog of your own>,
+L<Term::Fabulous::Widget::Dialog>,
+L<Term::Fabulous::Role::Popup>, L<Term::Fabulous::Placement>.
+
 =item Use your own widgets in KDL layout files
 
 L<Term::Fabulous::Role::CanParseLayout>,
 L<Term::Fabulous::Cookbook::Extending/Make a widget usable from KDL>.
+
+=item Show documents of a format of your own: fill a document with its factories and any widgets
+
+L<Term::Fabulous::Document/FACTORIES>, L<Term::Fabulous::Document::Look>,
+L<Term::Fabulous::Role::Searchable>, L<Term::Fabulous::Role::SearchContainer>,
+L<Term::Fabulous::Cookbook::Documents/Turn Markdown into a document (Markdent)>,
+L<Term::Fabulous::Cookbook::DocumentTechniques/Put any widget into a document (a table and a picture)>.
 
 =item Check property values the way the built-in widgets do
 

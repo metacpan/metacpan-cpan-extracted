@@ -125,9 +125,11 @@ lib/Alien/Xrepo/MB.pm
 lib/Alien/Xrepo/MB.pod
 lib/Alien/Xrepo/MM.pm
 lib/Alien/Xrepo/MM.pod
+lib/Alien/Xrepo/PackageInfo.pm
 lib/Alien/Xrepo/PackageInfo.pod
 lib/Alien/Xrepo/Runtime.pm
 lib/Alien/Xrepo/Runtime.pod
+lib/Alien/Xrepo/Runtime/Alt.pm
 lib/Alien/Xrepo/Runtime/Alt.pod
 t/001_xrepo.t
 t/002_argv.t
@@ -141,3 +143,4 @@ t/056_process_info.t
 t/057_runtime_deps.t
 t/102_ffi.t
 t/103_tools.t
+t/105_dist.t

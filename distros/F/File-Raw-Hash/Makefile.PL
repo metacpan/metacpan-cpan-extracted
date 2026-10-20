@@ -36,6 +36,35 @@ if ($^O eq 'linux' || $^O eq 'freebsd' || $^O eq 'openbsd'
         OTHERLDFLAGS => '-Wl,--allow-shlib-undefined'
     };
 }
+# The ARMv8 SHA path (sha_hw.c) is used only when the CPU has it, chosen at
+# run time; this checks the compiler can build it at all. A compiler that
+# knows the attribute but not the instructions (or an assembler that does
+# not) fails here rather than mid-build, and the dist is then portable only.
+my $hw_define = '';
+if ($Config{archname} =~ /aarch64|arm64/ || `uname -m 2>/dev/null` =~ /aarch64|arm64/) {
+    my $src = "frh_probe_$$.c";
+    open my $fh, '>', $src or die "cannot write $src: $!";
+    print {$fh} <<'C';
+#include <arm_neon.h>
+#if defined(__ARM_FEATURE_SHA2)
+#  define T
+#elif defined(__clang__)
+#  define T __attribute__((target("sha2")))
+#else
+#  define T __attribute__((target("+sha2")))
+#endif
+T uint32x4_t frh_probe(uint32x4_t a, uint32x4_t b, uint32x4_t c) {
+    return vsha256h2q_u32(vsha256hq_u32(a, b, c), a, vsha1cq_u32(a, vgetq_lane_u32(b, 0), c));
+}
+C
+    close $fh;
+    my $ok = system("$Config{cc} $Config{ccflags} -c -o frh_probe_$$.o $src >/dev/null 2>&1") == 0;
+    unlink $src, "frh_probe_$$.o";
+    $hw_define = '-DFRH_NO_HW' unless $ok;
+    print $ok ? "ARMv8 SHA instructions: the compiler can build them\n"
+              : "ARMv8 SHA instructions: the compiler cannot; portable only\n";
+}
+
 # Windows / Cygwin / msys: nothing to do here. File::Raw 0.13+ ships a
 # MinGW import library (libRaw.dll.a) and publishes its location via
 # ExtUtils::Depends's set_libs(). The LIBS string flows in through
@@ -61,18 +90,19 @@ my %WriteMakefileArgs = (
     PREREQ_PM => {
         'File::Raw' => '0.15',
     },
-    OBJECT => 'Hash$(OBJ_EXT) hashx$(OBJ_EXT) sha2$(OBJ_EXT) '
+    OBJECT => 'Hash$(OBJ_EXT) hashx$(OBJ_EXT) sha2$(OBJ_EXT) sha_hw$(OBJ_EXT) '
             . 'sha1$(OBJ_EXT) md5$(OBJ_EXT) crc32$(OBJ_EXT) '
             . 'xxh64$(OBJ_EXT) blake3$(OBJ_EXT)',
-    C      => ['hashx.c', 'sha2.c', 'sha1.c', 'md5.c', 'crc32.c',
+    C      => ['hashx.c', 'sha2.c', 'sha_hw.c', 'sha1.c', 'md5.c', 'crc32.c',
                'xxh64.c', 'blake3.c'],
     XS     => { 'Hash.xs' => 'Hash.c' },
+    ($hw_define ? (DEFINE => $hw_define) : ()),
     dist   => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     macro => { TARFLAGS => "--format=ustar -c -v -f" },
     depend => { 'Hash$(OBJ_EXT)'  => join(' ', glob 'include/*.h'),
                 'hashx$(OBJ_EXT)' => join(' ', glob 'include/*.h') },
     clean  => { FILES => 'File-Raw-Hash-* Hash.c Hash.o '
-                       . 'hashx.o sha2.o sha1.o md5.o crc32.o '
+                       . 'hashx.o sha2.o sha_hw.o sha1.o md5.o crc32.o '
                        . 'xxh64.o blake3.o Install/Files.pm' },
     %platform_args,
     $pkg->get_makefile_vars,

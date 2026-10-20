@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Punk ();
 
-our $VERSION = '0.61';
+our $VERSION = '0.62';
 
 # Capture a command's standard output. Called from C for { $exec: ... }; a
 # non-zero exit is fatal, so a broken secret store stops the boot rather than

@@ -11,7 +11,7 @@ use Term::Fabulous::Widget::Box;
 use Term::Fabulous::Widget::Tabs::Button;
 use Term::Fabulous::Widget::Tabs::Line;
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 class Term::Fabulous::Widget::Tabs::Bar
 	:isa(Term::Fabulous::Widget::Box)
@@ -46,14 +46,15 @@ class Term::Fabulous::Widget::Tabs::Bar
 	my %ALIGN_X      = ( start => CLAY_ALIGN_X_LEFT, center => CLAY_ALIGN_X_CENTER, end => CLAY_ALIGN_X_RIGHT );
 	my %ALIGN_Y      = ( start => CLAY_ALIGN_Y_TOP,  center => CLAY_ALIGN_Y_CENTER, end => CLAY_ALIGN_Y_BOTTOM );
 
-	field $side          :param = $DEFAULT_LOOK{side};
-	field $orientation   :param = $DEFAULT_LOOK{orientation};
-	field $tab_alignment :param = 'start';
-	field $tab_gap       :param = 1;
-	field $tab_margin    :param = 1;
-	field $tab_padding   :param = $DEFAULT_LOOK{tab_padding};
-	field $active_bold   :param = $DEFAULT_LOOK{active_bold};
-	field $page_border   :param = 0;
+	field $side           :param = $DEFAULT_LOOK{side};
+	field $orientation    :param = $DEFAULT_LOOK{orientation};
+	field $tab_alignment  :param = 'start';
+	field $tab_gap        :param = 1;
+	field $tab_margin     :param = 1;
+	field $tab_padding    :param = $DEFAULT_LOOK{tab_padding};
+	field $active_padding :param = $DEFAULT_LOOK{active_padding};
+	field $active_bold    :param = $DEFAULT_LOOK{active_bold};
+	field $page_border    :param = 0;
 
 	# The row of tabs and the line toward the page; the active tab; the
 	# sizing the layout asked for, which wins over the side's.
@@ -66,22 +67,22 @@ class Term::Fabulous::Widget::Tabs::Bar
 	field $_owner;
 
 	ADJUST {
-		$side          = one_of( $self, side          => $side,          keys %SIDE );
-		$orientation   = one_of( $self, orientation   => $orientation,   @ORIENTATIONS );
-		$tab_alignment = one_of( $self, tab_alignment => $tab_alignment, keys %ALIGN_X );
-		$tab_gap       = non_negative_integer( $self, tab_gap     => $tab_gap );
-		$tab_margin    = non_negative_integer( $self, tab_margin  => $tab_margin );
-		$tab_padding   = non_negative_integer( $self, tab_padding => $tab_padding );
-		$active_bold   = boolean( $self, active_bold => $active_bold );
-		$page_border   = boolean( $self, page_border => $page_border );
+		$side           = one_of( $self, side          => $side,          keys %SIDE );
+		$orientation    = one_of( $self, orientation   => $orientation,   @ORIENTATIONS );
+		$tab_alignment  = one_of( $self, tab_alignment => $tab_alignment, keys %ALIGN_X );
+		$tab_gap        = non_negative_integer( $self, tab_gap        => $tab_gap );
+		$tab_margin     = non_negative_integer( $self, tab_margin     => $tab_margin );
+		$tab_padding    = non_negative_integer( $self, tab_padding    => $tab_padding );
+		$active_padding = non_negative_integer( $self, active_padding => $active_padding );
+		$active_bold    = boolean( $self, active_bold => $active_bold );
+		$page_border    = boolean( $self, page_border => $page_border );
 
 		$_sizing_wish = $self->layout->{sizing} // {};
 		$_row         = Term::Fabulous::Widget::Box->new;
 		$_line        = Term::Fabulous::Widget::Tabs::Line->new;
 		$self->_arrange;
 
-		weaken( my $weak_self = $self );
-		$self->on( KeyPress => sub ($event) { return $weak_self && $weak_self->_handle_key($event) ? Clay::UI::Enum::Result->HANDLED : Clay::UI::Enum::Result->CONTINUE } );
+		$self->on( KeyPress => sub ( $self, $event ) { return $self->_handle_key($event) ? Clay::UI::Enum::Result->HANDLED : Clay::UI::Enum::Result->CONTINUE }, owner => $self );
 	}
 
 	# ---------------------------------------------------------------------
@@ -336,14 +337,15 @@ class Term::Fabulous::Widget::Tabs::Bar
 		return $$field_ref;
 	}
 
-	method side          (@new) { return @new ? $self->_set( \$side, one_of( $self, side => $new[0], keys %SIDE ), 1 )                      : $side }
-	method orientation   (@new) { return @new ? $self->_set( \$orientation, one_of( $self, orientation => $new[0], @ORIENTATIONS ), 1 )     : $orientation }
-	method tab_alignment (@new) { return @new ? $self->_set( \$tab_alignment, one_of( $self, tab_alignment => $new[0], keys %ALIGN_X ), 1 ) : $tab_alignment }
-	method tab_gap       (@new) { return @new ? $self->_set( \$tab_gap, non_negative_integer( $self, tab_gap => $new[0] ), 1 )              : $tab_gap }
-	method tab_margin    (@new) { return @new ? $self->_set( \$tab_margin, non_negative_integer( $self, tab_margin => $new[0] ), 1 )        : $tab_margin }
-	method tab_padding   (@new) { return @new ? $self->_set( \$tab_padding, non_negative_integer( $self, tab_padding => $new[0] ) )         : $tab_padding }
-	method active_bold   (@new) { return @new ? $self->_set( \$active_bold, boolean( $self, active_bold => $new[0] ) )                      : $active_bold }
-	method page_border   (@new) { return @new ? $self->_set( \$page_border, boolean( $self, page_border => $new[0] ) )                      : $page_border }
+	method side           (@new) { return @new ? $self->_set( \$side, one_of( $self, side => $new[0], keys %SIDE ), 1 )                      : $side }
+	method orientation    (@new) { return @new ? $self->_set( \$orientation, one_of( $self, orientation => $new[0], @ORIENTATIONS ), 1 )     : $orientation }
+	method tab_alignment  (@new) { return @new ? $self->_set( \$tab_alignment, one_of( $self, tab_alignment => $new[0], keys %ALIGN_X ), 1 ) : $tab_alignment }
+	method tab_gap        (@new) { return @new ? $self->_set( \$tab_gap, non_negative_integer( $self, tab_gap => $new[0] ), 1 )              : $tab_gap }
+	method tab_margin     (@new) { return @new ? $self->_set( \$tab_margin, non_negative_integer( $self, tab_margin => $new[0] ), 1 )        : $tab_margin }
+	method tab_padding    (@new) { return @new ? $self->_set( \$tab_padding, non_negative_integer( $self, tab_padding => $new[0] ) )         : $tab_padding }
+	method active_padding (@new) { return @new ? $self->_set( \$active_padding, non_negative_integer( $self, active_padding => $new[0] ) )   : $active_padding }
+	method active_bold    (@new) { return @new ? $self->_set( \$active_bold, boolean( $self, active_bold => $new[0] ) )                      : $active_bold }
+	method page_border    (@new) { return @new ? $self->_set( \$page_border, boolean( $self, page_border => $new[0] ) )                      : $page_border }
 
 	method line_style (@new) {
 		return @new ? $self->set_look( line_style => $new[0] ) : $self->look_value('line_style');    # set_look and the theme both check for joints
@@ -358,7 +360,7 @@ class Term::Fabulous::Widget::Tabs::Bar
 	method layout_properties :common () {
 		return (
 			$class->SUPER::layout_properties,
-			( map { $_ => 'scalar' } qw(side orientation tab_alignment tab_gap tab_margin tab_padding) ),
+			( map { $_ => 'scalar' } qw(side orientation tab_alignment tab_gap tab_margin tab_padding active_padding) ),
 			( map { $_ => 'boolean' } qw(active_bold page_border) ),
 		);
 	}
@@ -408,10 +410,21 @@ Term::Fabulous::Widget::Tabs::Bar - A row of tabs, one of them active
 
 A tab bar is the strip of tabs of a L<Term::Fabulous::Widget::Tabs>:
 a row of L<Term::Fabulous::Widget::Tabs::Button>s and the line that
-joins them with the page. One tab is the I<active> one. It is drawn
-one cell larger toward the page and open on that side, so that it and
-the page are one shape, while the other tabs are closed by the line
-and so look as if they stood behind the page:
+joins them with the page. One tab is the I<active> one. It is open
+toward the page, so that it and the page are one shape, while the
+other tabs are closed by the line and so look as if they stood behind
+the page:
+
+=for highlighter language=text
+
+	 ╭─────────╮ ╭─────────╮ ╭───────╮
+	 │ General │ │ Network │ │ Users │
+	╭╯         ╰─┴─────────┴─┴───────┴───────╮
+
+With C<active_padding>, the active tab has that many more cells of
+padding on its page side, so it stands that many cells taller (wider
+on a bar at the left or right) than the others and rises out of the
+row:
 
 =for highlighter language=text
 
@@ -487,6 +500,14 @@ need one.
 A non-negative integer. Default: 1. The cells on each side of a label
 along its writing direction: left and right of a horizontal label,
 above and below a vertical one.
+
+=item C<active_padding>
+
+A non-negative integer. Default: 0. The cells of padding the active
+tab has on its page side beyond the other tabs, so that it stands that
+many cells taller (wider on a bar at the left or right) than the
+others, rising out of the row; 0 keeps all tabs the same size. See
+L<Term::Fabulous::Manual::Layout/TABS>.
 
 =item C<line_style>
 
@@ -658,6 +679,12 @@ Accessor for the C<tab_margin> parameter.
 
 Accessor for the C<tab_padding> parameter.
 
+=head2 active_padding
+
+	$bar->active_padding(1);
+
+Accessor for the C<active_padding> parameter.
+
 =head2 line_style
 
 	$bar->line_style('Heavy');
@@ -775,8 +802,8 @@ as well.
 
 The properties of L<Term::Fabulous::Widget::Box/KDL PROPERTIES>, plus
 C<side>, C<orientation>, C<tab_alignment>, C<tab_gap>, C<tab_margin>,
-C<tab_padding> and C<line_style> (strings and numbers),
-C<active_bold> and C<page_border> (C<#true> / C<#false>),
+C<tab_padding>, C<active_padding> and C<line_style> (strings and
+numbers), C<active_bold> and C<page_border> (C<#true> / C<#false>),
 C<focus_border_color> (a color string, or C<#null> for no focus look)
 and the colors C<line_color>, C<text_color>, C<active_text_color>,
 C<hover_background_color> and C<disabled_color>. The tabs are child

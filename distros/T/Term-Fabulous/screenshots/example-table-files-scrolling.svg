@@ -18,7 +18,8 @@
 <text class="title" x="435" y="33" text-anchor="middle" dominant-baseline="central" fill="#9aa3b5">perl examples/table-files.pl</text>
 <rect x="16.5" y="16.5" width="837" height="417" rx="10" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1"/>
 <g shape-rendering="crispEdges">
-<rect x="48" y="114" width="621" height="36" fill="#242832"/>
+<rect x="48" y="114" width="612" height="18" fill="#242832"/>
+<rect x="48" y="132" width="621" height="18" fill="#242832"/>
 <rect x="48" y="150" width="18" height="18" fill="#1e2128"/>
 <rect x="66" y="150" width="189" height="18" fill="#242830"/>
 <rect x="255" y="150" width="18" height="18" fill="#1e2128"/>
@@ -28,18 +29,18 @@
 <rect x="516" y="150" width="18" height="18" fill="#1e2128"/>
 <rect x="534" y="150" width="117" height="18" fill="#242830"/>
 <rect x="651" y="150" width="18" height="18" fill="#1e2128"/>
-<rect x="48" y="168" width="621" height="18" fill="#1c2029"/>
-<rect x="48" y="204" width="621" height="18" fill="#1c2029"/>
-<rect x="48" y="240" width="621" height="18" fill="#1c2029"/>
-<rect x="48" y="276" width="621" height="18" fill="#1c2029"/>
-<rect x="48" y="312" width="621" height="18" fill="#1c2029"/>
-<rect x="48" y="348" width="621" height="18" fill="#343a48"/>
-<rect x="48" y="114" width="621" height="9" fill="#586070"/>
-<rect x="48" y="123" width="5" height="243" fill="#586070"/>
-<rect x="665" y="123" width="4" height="243" fill="#586070"/>
-<rect x="673" y="168" width="1" height="36" fill="#586070"/>
-<rect x="673" y="204" width="2" height="108" fill="#dcdfe4"/>
-<rect x="673" y="312" width="1" height="54" fill="#586070"/>
+<rect x="48" y="186" width="612" height="18" fill="#1c2029"/>
+<rect x="48" y="222" width="612" height="18" fill="#1c2029"/>
+<rect x="48" y="258" width="612" height="18" fill="#1c2029"/>
+<rect x="48" y="294" width="612" height="18" fill="#1c2029"/>
+<rect x="48" y="330" width="612" height="18" fill="#343a48"/>
+<rect x="48" y="114" width="630" height="9" fill="#586070"/>
+<rect x="48" y="123" width="5" height="234" fill="#586070"/>
+<rect x="674" y="123" width="4" height="234" fill="#586070"/>
+<rect x="664" y="168" width="1" height="36" fill="#586070"/>
+<rect x="664" y="204" width="2" height="90" fill="#dcdfe4"/>
+<rect x="664" y="294" width="1" height="54" fill="#586070"/>
+<rect x="48" y="357" width="630" height="9" fill="#586070"/>
 </g>
 <g class="terminal">
 <text x="48" y="92" textLength="405" fill="#8c96aa">e opens all folders, c closes them, Esc quits</text>
@@ -52,20 +53,19 @@
 <text x="277.5" y="164" text-anchor="middle" fill="#787e8a">…</text>
 <text x="376.5" y="164" text-anchor="middle" fill="#787e8a">…</text>
 <text x="538.5" y="164" text-anchor="middle" fill="#787e8a">…</text>
-<text x="120" y="182" textLength="531" fill="#dcdfe4">manual.pod        86.0 KiB  2026-04-22 09:41  documentation</text>
-<text x="88.5" y="200" text-anchor="middle" class="b" fill="#61afef">▾</text>
-<text x="102" y="200" textLength="486" class="b" fill="#61afef">lib                 57.1 KiB  2026-05-30 09:41  folder</text>
-<text x="106.5" y="218" text-anchor="middle" class="b" fill="#61afef">▾</text>
-<text x="120" y="218" textLength="468" class="b" fill="#61afef">App               39.2 KiB  2026-05-29 09:41  folder</text>
-<text x="138" y="236" textLength="495" fill="#dcdfe4">Config.pm        6.1 KiB  2026-05-29 09:41  Perl module</text>
-<text x="138" y="254" textLength="495" fill="#dcdfe4">Server.pm       23.4 KiB  2026-05-27 09:41  Perl module</text>
-<text x="138" y="272" textLength="495" fill="#dcdfe4">Util.pm          9.6 KiB  2026-05-20 09:41  Perl module</text>
-<text x="120" y="290" textLength="513" fill="#dcdfe4">App.pm            18.0 KiB  2026-05-30 09:41  Perl module</text>
-<text x="88.5" y="308" text-anchor="middle" class="b" fill="#61afef">▾</text>
-<text x="102" y="308" textLength="486" class="b" fill="#61afef">t                   10.5 KiB  2026-05-28 09:41  folder</text>
-<text x="120" y="326" textLength="450" fill="#dcdfe4">basic.t            2.3 KiB  2026-05-28 09:41  test</text>
-<text x="120" y="344" textLength="450" fill="#dcdfe4">config.t           4.4 KiB  2026-05-02 09:41  test</text>
-<text x="120" y="362" textLength="450" fill="#dcdfe4">util.t             3.8 KiB  2026-05-20 09:41  test</text>
+<text x="88.5" y="182" text-anchor="middle" class="b" fill="#61afef">▾</text>
+<text x="102" y="182" textLength="486" class="b" fill="#61afef">lib                 57.1 KiB  2026-05-30 09:41  folder</text>
+<text x="106.5" y="200" text-anchor="middle" class="b" fill="#61afef">▾</text>
+<text x="120" y="200" textLength="468" class="b" fill="#61afef">App               39.2 KiB  2026-05-29 09:41  folder</text>
+<text x="138" y="218" textLength="495" fill="#dcdfe4">Config.pm        6.1 KiB  2026-05-29 09:41  Perl module</text>
+<text x="138" y="236" textLength="495" fill="#dcdfe4">Server.pm       23.4 KiB  2026-05-27 09:41  Perl module</text>
+<text x="138" y="254" textLength="495" fill="#dcdfe4">Util.pm          9.6 KiB  2026-05-20 09:41  Perl module</text>
+<text x="120" y="272" textLength="513" fill="#dcdfe4">App.pm            18.0 KiB  2026-05-30 09:41  Perl module</text>
+<text x="88.5" y="290" text-anchor="middle" class="b" fill="#61afef">▾</text>
+<text x="102" y="290" textLength="486" class="b" fill="#61afef">t                   10.5 KiB  2026-05-28 09:41  folder</text>
+<text x="120" y="308" textLength="450" fill="#dcdfe4">basic.t            2.3 KiB  2026-05-28 09:41  test</text>
+<text x="120" y="326" textLength="450" fill="#dcdfe4">config.t           4.4 KiB  2026-05-02 09:41  test</text>
+<text x="120" y="344" textLength="450" fill="#dcdfe4">util.t             3.8 KiB  2026-05-20 09:41  test</text>
 <text x="48" y="398" textLength="234" fill="#8c96aa">/project/t/util.t  3.8 KiB</text>
 </g>
 <g shape-rendering="crispEdges">

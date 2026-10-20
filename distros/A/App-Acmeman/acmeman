@@ -823,6 +823,7 @@ from the input files will form the list of its alternative names.
 
     [core]
 	source = pound [--config=FILE] [--host=HOST] \
+		       [--alt=service|listener|file] \
 		       [--type=http|https] [--listener=NAME] \
 		       [--comment=TEXT]
 
@@ -839,27 +840,49 @@ enable scanning both types of listeners, use B<--type=http --type=https>.
 When scanning B<ListenHTTPS>, the module collects all domain names that
 appear as arguments to B<Host> statements.
 
-If B<--listener> option is used, module will scan only the named listener.
-To select multiple listeners, use several B<--listener> options.
+If the B<--listener> option is used, the module will scan only the listener
+identified by that option argument.  To select multiple listeners, use
+several B<--listener> options.
 
-The B<--comment> option defines a text, which, when appearing at the
-start of a comment line, enables host name collection.  Such I<pragmatical>
-comments may appear anywhere within listener and service sections and their
-scope is limited by the corresponding section.  When this option is used,
-host collection is disabled by default.  For example, assuming
-B<--comment=acme>, the following configuration snippet (with irrelevant
-statements replaced by ellipses) will result in issuing certificate for
-C<example.org> and C<www.example.org>:
+By default, each B<Service> section produces a single certificate.  If
+several hostnames are configured, the first name be used as B<CN>, and
+remaining ones as alternative names.  This behavior can be controlled
+using B<--alt>, B<--host>, and B<--comment> options.
+
+The B<--alt> option defines the strategy to use for selecting alternative
+names.  The default value B<--alt=service> corresponds to the behavior
+defined above.  Setting it to B<--alt=listener> will create one certificate
+for each listener.  The first hostname defined within that listener will
+become its B<CN> and remaining ones will be added as alternatives.
+
+Using B<--alt=file> takes effect for sections and listeners defined in
+files included to the main configuration.  When this option is given, each
+included file will produce a single certificate.
+
+If the B<--host> (B<-h>) option is used, only one certificate will be
+issued. The I<HOST> will be used as its B<CN>. All domain names read
+from the input files will form the list of its alternative names.
+
+Finally, the B<--comment> option provides fine-grained control over what
+is used as B<CN> and what names are stored as alternatives.  Its argument
+defines a text, which, when appearing at the beginning of a comment line,
+controls host name collection.  Such I<pragmatic> comments may appear
+anywhere within listener and service sections and their scope is limited
+to the corresponding section.  A comment string without additional arguments
+enables host collection.  For example, assuming B<--comment=acme>, the
+following configuration snippet (with irrelevant statements replaced by
+ellipses) will result in issuing certificate for C<example.org> and
+C<www.example.org>:
 
   ListenerHTTP
      # acme
      Service
-	Host -exact "example.org"
+	Host "example.org"
 	...
      End
 
      Service
-	Host -exact "www.example.org"
+	Host "www.example.org"
 	...
      End
   End
@@ -870,52 +893,72 @@ certificate for C<example.org> only:
   ListenerHTTP
      Service
 	# acme
-	Host -exact "example.org"
+	Host "example.org"
 	...
      End
 
      Service
-	Host -exact "www.example.org"
+	Host "www.example.org"
 	...
      End
   End
 
-Furthermore, using B<no-I<TEXT>> at the start of a comment cancels
-the effect of the previous pragmatic comment.  This can be used for
+The comment starter can be followed by an equals sign and a word C<on>
+to enable host collection and C<off> to disable it.  This can be used for
 better control of host selection:
 
   ListenerHTTP
      Service
 	Match OR
-	   # acme
+	   # acme=on
 	   Host -exact "example.org"
 	   Host -exact "www.example.org"
-	   # no-acme
+	   # acme=off
 	   Host -exact "test.example.org"
 	 End
 	 ...
      End
   End
 
+Furthermore, the construct can be followed by C<cn=> and a domain name.
+In this case, the collected host names will be used as alternative DNS names
+in the certificate issued for that domain.  Consider the example below:
 
-If the B<--host> (B<-h>) option is used, only one certificate will be
-issued. The I<HOST> will be used as its B<CN>. All the domain names read
-from the input files will form the list of its alternative names.
+  ListenerHTTP
+     Service
+	Match OR
+	   # acme=on cn=example.com
+	   Host -exact "example.org"
+	   Host -exact "www.example.org"
+	   # acme=off
+	   Host -exact "test.example.org"
+	 End
+	 ...
+     End
+  End
+
+In this case, B<acmeman> will issue one certificate.  Its B<CN> will be
+C<example.com> and it will have two alternative names: C<example.org> and
+C<www.example.org>.
+
+The B<--comment> option can be used together with B<--alt> or B<--host>,
+modifying the behavior defined by these.
 
 Notice the limitations of this module:
 
 =over 4
 
-=item 1. Only B<Host> statements with exact string matching can be used.
-When declaring multiple hosts it might be tempting to use regular expression
+=item 1. Only B<Host> statements with exact string matching (including those
+using external files via -file or -filewatch options) can be used.  When
+declaring multiple hosts it might be tempting to use regular expression
 matching instead.  Due to obvious reasons, the module won't be able to
 cope with it.  When declaring multiple hosts, always use the B<Match OR>
 section, like this:
 
     Match OR
-	Host -exact "host1"
-	Host -exact "host2"
-	Host -exact "host3"
+	Host "host1"
+	Host "host2"
+	Host "host3"
     End
 
 =item 2. These B<Host> statements (or the enclosing B<Match OR> section)

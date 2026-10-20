@@ -136,10 +136,19 @@ package My::Pod::Markdown {
 		my ($indent) = sort { $a <=> $b } map { /\A( *)/; length $1 } grep { /\S/ } @lines;
 		$indent //= 0;
 		my $code = join "\n", map { length > $indent ? substr( $_, $indent ) : '' } @lines;
-		return "```$self->{highlighterLanguage}\n$code\n```" unless $self->{highlighterLanguage} eq 'text';
+		return fenced( $code, $self->{highlighterLanguage} ) unless $self->{highlighterLanguage} eq 'text';
 
-		my @parts = map { isTable($_) ? markdownTable( withoutEscapes($_) ) : "```text\n$_\n```" } split /\n\s*\n/, $code;
+		my @parts = map { isTable($_) ? markdownTable( withoutEscapes($_) ) : fenced( $_, 'text' ) } split /\n\s*\n/, $code;
 		return join "\n\n", @parts;
+	}
+
+	# The code between fences longer than any run of backticks that
+	# starts one of its lines, so that code which shows a fence (a
+	# Markdown example) does not end the block early.
+	sub fenced( $code, $language ) {
+		my ($longest) = sort { $b <=> $a } map { length } $code =~ /^(`{3,})/mg;
+		my $fence = '`' x ( $longest ? $longest + 1 : 3 );
+		return "$fence$language\n$code\n$fence";
 	}
 
 	# Pod::Markdown escapes every '<' and '&' of a verbatim block as
@@ -376,7 +385,9 @@ highlighting. A paragraph
 sets the language of all following verbatim blocks of the page, until
 the next such paragraph; C<=for highlighter sh> works too. This is the
 marker MetaCPAN uses for its own highlighting. Blocks before the first
-marker are C<perl>.
+marker are C<perl>. A block that itself contains a line starting with
+three or more backticks, such as a Markdown example, is fenced with a
+longer run of backticks, so that the line does not end the block.
 
 =item *
 

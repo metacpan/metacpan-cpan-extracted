@@ -5,7 +5,7 @@ use warnings;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 use Exporter 'import';
 our @EXPORT_OK   = qw(datetime date number percent bytes duration boolean lookup truncate sprintf_format chain);
@@ -14,7 +14,7 @@ our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 use Carp qw(croak);
 use POSIX ();
 use Term::Fabulous::Widget::Table::Value qw(is_blank number_of date_epoch);
-use Term::Fabulous::Unicode qw(grapheme_clusters cluster_columns string_columns);
+use Term::Fabulous::Unicode qw(ELLIPSIS fit_columns string_columns);
 
 sub _options ( $function, $known, %options ) {
 	my @unknown = grep { !exists $known->{$_} } sort keys %options;
@@ -129,21 +129,12 @@ sub lookup ( $table, %options ) {
 
 sub truncate ( $columns, %options ) {
 	$columns = _non_negative_integer( truncate => columns => $columns );
-	my $settings = _options( truncate => { ellipsis => "\x{2026}" }, %options );
+	my $settings = _options( truncate => { ellipsis => ELLIPSIS }, %options );
 	my $ellipsis = $settings->{ellipsis};
-	my $room     = $columns - string_columns($ellipsis);
-	croak "Term::Fabulous::Widget::Table::Mutator: truncate needs more columns than the ellipsis takes" if $room < 0;
+	croak "Term::Fabulous::Widget::Table::Mutator: truncate needs more columns than the ellipsis takes" if string_columns($ellipsis) > $columns;
 	return sub ( $value, $row = undef ) {
 		return '' unless defined $value;
-		return "$value" if string_columns("$value") <= $columns;
-		my ( $kept, $used ) = ( '', 0 );
-		foreach my $cluster ( grapheme_clusters("$value") ) {
-			my $width = cluster_columns($cluster);
-			last if $used + $width > $room;
-			$kept .= $cluster;
-			$used += $width;
-		}
-		return $kept . $ellipsis;
+		return fit_columns( "$value", $columns, mark => $ellipsis );
 	};
 }
 
@@ -295,8 +286,10 @@ copied.
 	truncate( 20, ellipsis => '...' )
 
 Text that is wider than that many terminal columns is cut so that it
-fits with the ellipsis (default C<"\x{2026}">, one column). Wide
-characters count as two columns; no character is cut in half. To keep
+fits with the ellipsis (default C<"\x{2026}">, one column), by
+L<Term::Fabulous::Unicode/fit_columns>. Wide characters count as two
+columns; no character is cut in half. Dies when the ellipsis is wider
+than the columns. To keep
 long text whole but narrow, give the column a maximum width instead
 (C<< width => 'fit(0, 20)' >>), and it wraps.
 

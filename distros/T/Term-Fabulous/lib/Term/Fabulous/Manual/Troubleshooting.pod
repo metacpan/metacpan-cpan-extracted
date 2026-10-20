@@ -43,9 +43,28 @@ L</Wide characters (CJK, emoji) shift the rest of the line>.
 
 =head2 My text does not show (invisible text)
 
-The default C<text_color> of a Text widget is opaque black, which is
-invisible on a dark background. Always pass a C<text_color>, or
-C<[0, 0, 0, 0]> for the terminal's default text color. See L<Term::Fabulous::Manual::Looks/TEXT>.
+A Text widget takes the theme's text color unless it is given a
+C<text_color>, so the text is invisible only when its C<text_color>
+matches the background, for example a fixed dark color on a dark
+theme. Leave the C<text_color> out, pick one that stands out from the
+background, or pass C<[0, 0, 0, 0]> for the terminal's default text
+color. See L<Term::Fabulous::Manual::Looks/TEXT>.
+
+=head2 A newline shows as a replacement character
+
+The Text has the C<wrap_mode> C<CLAY_TEXT_WRAP_NONE>, which keeps the
+whole text on one line and shows a C<"\n"> as U+FFFD. Use
+C<CLAY_TEXT_WRAP_NEWLINES> to break the text only at its newlines. See
+L<Term::Fabulous::Manual::Looks/Wrapping>.
+
+=head2 A long line is cut off at the edge of its box
+
+A text with the C<wrap_mode> C<CLAY_TEXT_WRAP_NEWLINES> or
+C<CLAY_TEXT_WRAP_NONE> keeps its width only while the widgets beside
+it can get narrower; after that it is cut off at its parent's edge.
+Put it in a L<Term::Fabulous::Widget::ScrollBox> with
+C<< horizontal =E<gt> 1 >> to keep it whole and let the user scroll
+sideways. See L<Term::Fabulous::Manual::Looks/Wrapping>.
 
 =head2 "the widget tree has more elements than max_element_count (8192) allows"
 
@@ -123,6 +142,33 @@ L<Telling Term::Fabulous that something changed|Term::Fabulous::Manual::CustomWi
 Every Term::Fabulous class rejects constructor parameters it does not
 know, to catch typos. Check the spelling against the class's
 documentation.
+
+=head2 "Unrecognised parameters for Term::Fabulous::Widget::Table constructor: 'double_click_seconds'"
+
+A table no longer has a C<double_click_seconds> parameter: the time
+between the presses of a double click is set once for the whole
+program. Pass it to C<< Term::Fabulous->new >> instead; see
+L<Term::Fabulous/new>.
+
+=head2 "Can't locate Term/Fabulous/Widget/RichText.pm"
+
+The classes Term::Fabulous::Widget::RichText and
+Term::Fabulous::Widget::FocusableText are gone. Use
+L<Term::Fabulous::Widget::Text>, which takes markup, spans and links
+itself (see L<Term::Fabulous::Manual::Looks/Styled spans inside one text>).
+After an upgrade with C<make install>, the old F<RichText.pm> may still
+be on disk; loading it then dies with C<Already have a named constructor
+parameter called 'markup' inherited from Term::Fabulous::Widget::Text>.
+Delete the stale F<Term/Fabulous/Widget/RichText.pm> and
+F<FocusableText.pm> from the installed library.
+
+=head2 "palette token '...' needs exactly one string argument"
+
+A theme file gives a palette token properties or child nodes, or more
+than one argument. A token takes exactly one string, its color, and
+nothing else: C<accent "#5fafff">. Earlier versions read such a file
+without complaint; the theme editor always rejected it. See
+L<Term::Fabulous::Theme/Tokens>.
 
 =head2 The program dies with "is still attached to a parent"
 

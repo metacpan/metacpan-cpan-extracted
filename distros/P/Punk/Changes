@@ -1,5 +1,24 @@
 Revision history for Punk
 
+0.62    2026-10-19
+        - markdown: front matter reaches the templates as `meta`.
+        - markdown: the shipped wrapper writes description, canonical,
+          robots, Open Graph and Twitter tags from front matter; the origin
+          is the app's `host`, never the request.
+        - markdown: `date:`/`updated:` keys and `sort => 'date'`; a bad
+          date or an unknown `sort` croaks at boot.
+        - markdown: `vars` and `filters` options, for templates shared
+          with the rest of a site; `sitemap => 0`.
+        - markdown: a section index's `section:` and `section_order:` name
+          and place its sidebar group.
+        - `$app->markdown_pages($prefix)` lists a mount's pages.
+        - Sitemap lists markdown pages; `robots: noindex` leaves one out.
+        - Punk::Model::JSONFile: a model backend over a JSON file, read
+          and write.
+        - Punk::Model::Markdown: a read-only model backend over a markdown
+          mount's pages.
+        - A model backend's `new` receives the application as `app`.
+
 0.61    2026-10-17
         - Fix: t/0317-static-dotfiles.t failed where two writes share one
           inode stamp (Linux before 6.13).

@@ -43,6 +43,8 @@
 \.tmp$
 \.#
 \.rej$
+# Also leaves out t/conf/*.yml, the App::Test::Generator schemas that t/fuzz.t
+# runs: the generator is an author tool, and t/fuzz.t passes without them
 \.yml$
 \.swp$
 
@@ -71,3 +73,15 @@ t/online.enabled
 CLAUDE.md
 \.claude
 mutation.json
+
+# Super-linter per-repo tuning files - not for distribution
+^\.perlcriticrc$
+^\.jscpd\.json$
+^\.markdown-lint\.yml$
+# Super-linter tuning files - not for distribution
+^\.prettierignore$
+^\.textlintrc$
+# Generated mutation-testing stubs - not for distribution
+^xt/
+# An old ignore list that nothing in the distribution reads
+^ignore\.txt$

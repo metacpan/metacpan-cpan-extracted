@@ -1,0 +1,105 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Cwd qw(getcwd);
+use ExtUtils::Manifest qw(fullcheck);
+use File::Basename qw(dirname);
+use File::Find qw(find);
+use File::Spec;
+use FindBin qw($Bin);
+
+my $root = File::Spec->rel2abs("$Bin/..");
+my (@pod_files, @markdown_files);
+for my $path ("$root/lib", "$root/bin") {
+  find({
+    wanted => sub {
+      return unless -f $_;
+      my $file = $File::Find::name;
+      push @pod_files, $file if $file =~ /\.pm\z/ || $file eq "$root/bin/perl-slim";
+    },
+    no_chdir => 1,
+  }, $path);
+}
+@markdown_files = (
+  "$root/README.md",
+  "$root/DESIGN.md",
+  "$root/AGENTS.md",
+  "$root/THIRD-PARTY-NOTICES.md",
+);
+find({
+  wanted => sub {
+    push @markdown_files, $File::Find::name if -f $_ && /\.md\z/;
+  },
+  no_chdir => 1,
+}, "$root/docs");
+
+my @errors;
+for my $file (sort @pod_files) {
+  open my $source, '<', $file
+    or do { push @errors, "cannot read production source $file: $!"; next };
+  my $source_text = do { local $/; <$source> };
+  close $source or do { push @errors, "cannot close production source $file: $!"; next };
+  push @errors, "stale Test::Slim production namespace in $file"
+    if $source_text =~ /\bTest::Slim(?:::|\b)/;
+  push @errors, "stale Test/Slim production module path in $file"
+    if $source_text =~ m{Test/Slim(?:/|\.pm)};
+}
+
+for my $file (sort @pod_files) {
+  print "POD $file\n";
+  if (system('podchecker', $file) != 0) {
+    push @errors, "POD syntax failed: $file";
+    next;
+  }
+  open my $rendered, '-|', 'pod2text', $file
+    or do { push @errors, "cannot render POD: $file"; next };
+  my $text = do { local $/; <$rendered> };
+  push @errors, "POD rendered empty: $file" unless defined($text) && $text =~ /\S/;
+  push @errors, "POD renderer failed: $file" unless close $rendered;
+  open my $source, '<', $file
+    or do { push @errors, "cannot read POD source: $file"; next };
+  my $pod = do { local $/; <$source> };
+  close $source;
+  while ($pod =~ /L<(Test::FitNesse::Slim(?:::\w+)*)>/g) {
+    (my $module = $1) =~ s{::}{/}g;
+    $module .= '.pm';
+    push @errors, "unknown POD module reference in $file: $1"
+      unless -f "$root/lib/$module";
+  }
+}
+
+for my $file (sort @markdown_files) {
+  open my $fh, '<', $file or do { push @errors, "cannot read $file: $!"; next };
+  local $/;
+  my $content = <$fh>;
+  close $fh;
+  while ($content =~ /\[[^\]]*\]\(\s*(?:<([^>]+)>|([^\s)]+))(?:\s+[^)]*)?\s*\)/g) {
+    my $target = defined($1) ? $1 : $2;
+    next if $target =~ m{\A(?:[A-Za-z][A-Za-z0-9+.-]*:|//)};
+    next if $target =~ /\A#/;
+    $target =~ s/[?#].*\z//;
+    next unless length $target;
+    my $base = dirname($file);
+    my $resolved = File::Spec->rel2abs($target, $base);
+    push @errors, "broken Markdown link in $file: $target"
+      unless -e $resolved;
+  }
+}
+
+my $old_directory = getcwd();
+chdir $root or die "chdir $root: $!";
+my ($missing,$unlisted) = fullcheck();
+chdir $old_directory or die "restore working directory: $!";
+push @errors, "file is not in MANIFEST: $_" for @$unlisted;
+push @errors, "MANIFEST entry is missing: $_" for @$missing;
+
+if (@errors) {
+  print STDERR "Documentation checks failed:\n", map { "  $_\n" } @errors;
+  exit 1;
+}
+print scalar(@pod_files), " production POD files checked and rendered; ",
+  scalar(@markdown_files), " Markdown files and their local links checked; ",
+  "MANIFEST complete\n";
+exit 0;

@@ -5,6 +5,7 @@ use Test2::Util::Importer 'Test2::Tools::Subtest' => ( subtest_streamed => { -as
 use File::Temp qw[tempdir];
 use Path::Tiny;
 use Alien::Xrepo::MB;
+#
 my $dir = tempdir( CLEANUP => 1 );
 
 sub make_mini_dist {
@@ -33,7 +34,7 @@ sub make_builder {
         dist_abstract => 'x',
         dist_version  => 'v1.0.0',
         license       => 'artistic_2',
-        ( defined $args{snapshot} ? ( xrepo_snapshot => $args{snapshot} ) : () ),
+        ( defined $args{snapshot} ? ( xrepo_snapshot => $args{snapshot} ) : () )
     );
 }
 subtest 'loads as a Module::Build subclass' => sub {
@@ -89,4 +90,5 @@ subtest '_recipe loads lib/<class>.pm and forwards recipe()' => sub {
     my $b    = make_builder( root => $root );
     is $b->_recipe, { name => 'Exotic-Foo', packages => ['zstd'] }, 'recipe hashref from the class';
 };
+#
 done_testing;

@@ -769,16 +769,26 @@ for my $c (
     (my $msg = $signed_msg) =~ s/\r//gs;
     $msg =~ s/\n/\r\n/gs;
     # An unsigned m=2 (wrong hashes) over the signed m=1, and no token: the
-    # gate refuses; the unsigned m=2 must go.
+    # gate refuses. The message carries the sender's i=1, so it is not sent
+    # on (-07 section 13): 550 5.7.1.
     my $bad = 'A' x 43 . '=';
     my $with = "Message-Instance: m=2; h=sha256:$bad:$bad\r\n" . $msg;
-    my (undef, $mock) = run_outbound_sign($with, $snapshot_dir);
+    my ($h, $mock) = run_outbound_sign($with, $snapshot_dir);
     ok(!grep({ $_->{field} eq 'DKIM2-Signature' } @{$mock->{pre_headers}}), 'unsigned: refused');
+    like($h->{_reject} // '', qr/\A550 5\.7\.1 not signing: /, 'unsigned: rejected 550 5.7.1');
+
+    # With no signature under it, the unsigned instances go and the message
+    # goes on.
+    my $plain = "From: sender\@test1.dkim2.com\r\nTo: x\@test2.dkim2.com\r\nSubject: s\r\n\r\nbody\r\n";
+    my $mi1 = Mail::DKIM2::MessageInstance->calculate(Email::MIME->new($plain));
+    my $unsigned = "Message-Instance: m=2; h=sha256:$bad:$bad\r\n"
+                 . "Message-Instance: " . $mi1->as_string . "\r\n" . $plain;
+    ($h, $mock) = run_outbound_sign($unsigned, $snapshot_dir);
+    ok(!defined $h->{_reject}, 'no signature: not rejected');
     my @rem = grep { lc $_->{field} eq 'message-instance' && $_->{value} eq '' } @{$mock->{changed_headers}};
-    is(scalar @rem, 1, 'unsigned: one Message-Instance removed');
-    is($rem[0]{index}, 1, 'unsigned: the m=2 (first field), not the signed m=1');
-    ok(grep({ $_->{field} eq 'X-DKIM2-Info' && $_->{value} =~ /removed-unsigned-mi=m=2;/ } @{$mock->{pre_headers}}),
-       'unsigned: removal recorded');
+    is(scalar @rem, 2, 'no signature: both unsigned instances removed');
+    ok(grep({ $_->{field} eq 'X-DKIM2-Info' && $_->{value} =~ /removed-unsigned-mi=m=1,m=2;/ } @{$mock->{pre_headers}}),
+       'no signature: removal recorded');
 }
 
 done_testing();

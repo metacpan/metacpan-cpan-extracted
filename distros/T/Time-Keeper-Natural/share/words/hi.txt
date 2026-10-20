@@ -1,0 +1,19 @@
+# Time::Keeper::Natural word table: hi
+#
+# UNREVIEWED: written 18 Oct 2026 by a session, as the p2p site's catalogues were.
+# A native reader should review it before release. The format is en.txt's.
+#
+# Hindi puts "end" after the period with a postposition, and the period goes
+# into the oblique case, which CLDR has only where its own word already is
+# ("इस माह"); "अगले माह का अंत" is not read. A time takes no word. An ordinal
+# weekday is not read.
+start_of	{0} की शुरुआत|{0} के शुरू में|{0} की शुरुआत में
+end_of	{0} का अंत|{0} के अंत में|{0} के आखिर में
+at
+on	{0} को
+skip
+and
+# test: इस माह का अंत => 2026-10-31T23:59:59.999999999+00:00
+# test: अक्टूबर का अंत => 2026-10-31T23:59:59.999999999+00:00
+# test: 2027 की शुरुआत => 2027-01-01T00:00:00+00:00
+# test: मंगलवार को => 2026-10-20T00:00:00+01:00

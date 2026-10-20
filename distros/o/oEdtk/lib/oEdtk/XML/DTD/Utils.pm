@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 use oEdtk::XML::DTD;
-our $VERSION = '2.1126';
+our $VERSION = '2.1129';
 
 # oEdtk::XML::DTD::Utils was the fork's name for the DTD validator; it was merged
 # into oEdtk::XML::DTD at S21 (the two were about 90% identical). This module stays

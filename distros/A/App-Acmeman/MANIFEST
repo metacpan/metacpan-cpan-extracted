@@ -1,6 +1,5 @@
 acmeman
 Changes
-inc/ExtUtils/AutoInstall.pm
 lib/App/Acmeman.pm
 lib/App/Acmeman/Apache/Layout.pm
 lib/App/Acmeman/Apache/Layout/debian.pm

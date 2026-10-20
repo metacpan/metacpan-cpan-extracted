@@ -9,9 +9,9 @@ package Geo::Coder::Free::Provenance;
 use strict;
 use warnings;
 
-use Geo::Location::Point ();	# Defines the accuracy vocabulary this module speaks
+use Geo::Location::Point 0.19 ();	# Defines the accuracy vocabulary this module speaks
 use Exporter qw(import);
-our @EXPORT_OK = qw(GEOCODER ACCURACY_LEVELS _accuracy_for);
+our @EXPORT_OK = qw(GEOCODER ACCURACY_LEVELS);
 
 =encoding utf-8
 
@@ -25,29 +25,29 @@ Which distribution and which backend produced a result, how good the match was
 and how precise the coordinate is: the keys of section 2.1 of
 F<BI-Phase6-Dependency-Specs.md>, and the vocabulary they speak.
 
-    use Geo::Coder::Free::Provenance qw(GEOCODER _accuracy_for);
+    use Geo::Coder::Free::Provenance qw(GEOCODER);
 
     my $point = Geo::Location::Point->new({
         geocoder   => GEOCODER,
         database   => 'OpenAddresses',
         confidence => 1.0,
-        accuracy   => _accuracy_for(qw(house_number road city)),
+        accuracy   => Geo::Location::Point::accuracy_for(qw(house_number road city)),
     });
 
 C<< Geo::Coder::Free->provenance($point) >> reads the four keys back, so a
 consumer does not have to know them.
 
-These three live here rather than in L<Geo::Coder::Free::Utils> because Utils is
+These two live here rather than in L<Geo::Coder::Free::Utils> because Utils is
 synced from VWF master, where the provenance of a geocoder result has no
 meaning; an addition there would be lost the next time that sync runs.
 
 =head1 VERSION
 
-Version 0.47
+Version 0.48
 
 =cut
 
-our $VERSION = '0.47';
+our $VERSION = '0.48';
 
 # The distribution that produced a result.  Every backend stamps this on the
 # Geo::Location::Point it hands back, so a consumer can tell a result from this
@@ -56,13 +56,14 @@ our $VERSION = '0.47';
 use constant GEOCODER => 'Geo::Coder::Free';
 
 # How precise the coordinates behind a match can claim to be, most precise
-# first.  _accuracy_for() returns one of these, and anything that validates an
-# accuracy (section 3.2) validates against this list.
+# first.  Geo::Location::Point::accuracy_for() returns one of these, and anything
+# that validates an accuracy (section 3.2) validates against this list.
 #
 # The vocabulary is not written down here.  Geo::Location::Point defines it and
 # refuses an accuracy outside it, so this module reads that one list: the levels
 # a backend reports and the levels a point accepts cannot drift apart, and this
-# constant is the same list object rather than a copy that agrees today.
+# constant is the same list object rather than a copy that agrees today.  The
+# rule that turns matched fields into a level lives there too, with the list.
 use constant ACCURACY_LEVELS => Geo::Location::Point::ACCURACY_LEVELS();
 
 =head1 SUBROUTINES/METHODS
@@ -83,38 +84,12 @@ validates an accuracy against, re-exported here so that a backend can describe
 the match it made without knowing which module the vocabulary is defined in.
 There is one list behind both names, not a copy of it.
 
-=head2 _accuracy_for
-
-The precision a match can claim, from the fields that made it.  The most
-precise field present decides: a house number makes it an C<address>, a road a
-C<street>, a postcode a C<postcode>, a name or a city a C<locality>, a state or
-region a C<region>, and a country a C<country>.  So a dataset row carrying only
-a city, state and country is a C<locality>, which is what the geographic centres
-C<Local.pm> derives are.
-
-Always returns one of the C<ACCURACY_LEVELS>: a match on a row with none of the
-fields above is still a named place, so it is reported as a C<locality> rather
-than left unsaid, because every result promises an accuracy.
-
-Exported so that a backend can describe the match it made without repeating the
-vocabulary.
+The rule that turns the fields a match was made on into one of these levels is
+C<Geo::Location::Point::accuracy_for()>, which lives beside the list it returns
+a level from.  This module reports the C<accuracy> key; it does not decide what
+the key may hold.
 
 =cut
-
-sub _accuracy_for {
-	my @fields = @_;
-
-	my %field = map { lc($_) => 1 } @fields;
-
-	return 'address'  if($field{'house_number'} || $field{'number'});
-	return 'street'   if($field{'road'} || $field{'street'});
-	return 'postcode' if($field{'postcode'} || $field{'post_code'} || $field{'zip'});
-	return 'locality' if($field{'city'} || $field{'town'} || $field{'name'});
-	return 'region'   if($field{'state'} || $field{'state_district'} || $field{'county'} || $field{'region'});
-	return 'country'  if($field{'country'});
-
-	return 'locality';
-}
 
 1;
 

@@ -23,6 +23,12 @@
 #
 #     ADJUST :params ( :$text = '' ) {
 #
+# perltidy knows the class keyword but not role: a role with attributes
+# (":does(...)") ends up indented one level too deep from its header on,
+# its closing brace and the "1;" after it included. This script shows
+# perltidy every role as a class of a stand-in name and puts the role
+# back afterwards.
+#
 # See tools/README.md.
 #
 # Copyright (C) 2026 davenonymous.
@@ -59,6 +65,20 @@ sub unjoin_class_braces ($code) {
 	return $code =~ s/$JOINED_CLASS_BRACE/$1$2\n$1\{/gr;
 }
 
+# A role header, and the class header perltidy sees in its place: the
+# role's name with a suffix no code of this distribution uses.
+use constant ROLE_STAND_IN => '__TIDY_ROLE__';
+my $ROLE_HEADER          = qr/^([ \t]*)role([ \t]+[A-Za-z_][\w:]*)/m;
+my $ROLE_HEADER_AS_CLASS = qr/^([ \t]*)class([ \t]+[A-Za-z_][\w:]*)::\Q${\ ROLE_STAND_IN}\E/m;
+
+sub hide_roles ($code) {
+	return $code =~ s/$ROLE_HEADER/$1class$2::${\ ROLE_STAND_IN}/gr;
+}
+
+sub restore_roles ($code) {
+	return $code =~ s/$ROLE_HEADER_AS_CLASS/$1role$2/gr;
+}
+
 sub hide_adjust_params ($code) {
 	return $code =~ s/$ADJUST_PARAMS/method ${\ ADJUST_PARAMS_STAND_IN} (/gr;
 }
@@ -67,8 +87,12 @@ sub restore_adjust_params ($code) {
 	return $code =~ s/$ADJUST_PARAMS_AS_METHOD/ADJUST :params (/gr;
 }
 
+sub hide_source_syntax ($code) {
+	return hide_roles( hide_adjust_params($code) );
+}
+
 sub restore_source_syntax ($code) {
-	return unjoin_class_braces( restore_adjust_params($code) );
+	return unjoin_class_braces( restore_roles( restore_adjust_params($code) ) );
 }
 
 sub read_raw ($file) {
@@ -95,7 +119,7 @@ sub tidied ($file) {
 		errorfile   => \$errors,
 		perltidyrc  => PERLTIDYRC,
 		argv        => [],
-		prefilter   => \&hide_adjust_params,
+		prefilter   => \&hide_source_syntax,
 		postfilter  => \&restore_source_syntax,
 	);
 	die "tidy: perltidy failed on $file:\n$errors" if $failed;

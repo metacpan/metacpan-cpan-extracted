@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="780" height="525" viewBox="0 0 780 525" role="img" aria-label="perl examples/widgets/code-block.pl">
+<title>perl examples/widgets/code-block.pl</title>
+<style>
+.terminal text { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 15px; white-space: pre; }
+.terminal .b { font-weight: bold; }
+.terminal .i { font-style: italic; }
+.title { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 13px; }
+</style>
+<defs>
+<filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#000000" flood-opacity="0.3"/></filter>
+<clipPath id="window"><rect x="16" y="16" width="748" height="490" rx="10"/></clipPath>
+</defs>
+<rect x="16" y="16" width="748" height="490" rx="10" fill="#161622" filter="url(#shadow)"/>
+<rect x="16" y="16" width="748" height="34" fill="#1f2430" clip-path="url(#window)"/>
+<circle cx="36" cy="33" r="6" fill="#ff5f57"/>
+<circle cx="56" cy="33" r="6" fill="#febc2e"/>
+<circle cx="76" cy="33" r="6" fill="#28c840"/>
+<text class="title" x="390" y="33" text-anchor="middle" dominant-baseline="central" fill="#9aa3b5">perl examples/widgets/code-block.pl</text>
+<rect x="16.5" y="16.5" width="747" height="489" rx="10" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1"/>
+<g shape-rendering="crispEdges">
+<rect x="48" y="114" width="684" height="72" fill="#1e2128"/>
+<rect x="48" y="240" width="684" height="54" fill="#1e2128"/>
+<rect x="48" y="348" width="684" height="54" fill="#1e2128"/>
+</g>
+<g class="terminal">
+<text x="48" y="92" textLength="243" fill="#96a0b4">A highlighted Perl snippet:</text>
+<text x="57" y="128" textLength="27" class="b" fill="#c678dd">sub</text>
+<text x="93" y="128" textLength="63" fill="#dcdfe4">greet (</text>
+<text x="156" y="128" textLength="45" fill="#e06c75">$name</text>
+<text x="201" y="128" textLength="27" fill="#dcdfe4">) {</text>
+<text x="93" y="146" textLength="18" class="b" fill="#c678dd">my</text>
+<text x="120" y="146" textLength="45" fill="#e06c75">$line</text>
+<text x="174" y="146" textLength="81" fill="#dcdfe4">= &quot;Hello,</text>
+<text x="264" y="146" textLength="45" fill="#e06c75">$name</text>
+<text x="309" y="146" textLength="27" fill="#dcdfe4">!&quot;;</text>
+<text x="93" y="164" textLength="54" class="b" fill="#c678dd">return</text>
+<text x="156" y="164" textLength="45" fill="#e06c75">$line</text>
+<text x="201" y="164" textLength="9" fill="#dcdfe4">;</text>
+<text x="57" y="182" textLength="9" fill="#dcdfe4">}</text>
+<text x="48" y="218" textLength="378" fill="#96a0b4">Long lines are cut at the edge and marked:</text>
+<text x="57" y="254" textLength="18" class="b" fill="#c678dd">my</text>
+<text x="84" y="254" textLength="72" fill="#e06c75">%options</text>
+<text x="165" y="254" textLength="558" fill="#dcdfe4">= ( verbose =&gt; 1, output =&gt; &quot;report.txt&quot;, columns =&gt; [ qw(name</text>
+<text x="727.5" y="254" text-anchor="middle" fill="#8c929e">›</text>
+<text x="57" y="272" textLength="90" class="b" fill="#c678dd">foreach my</text>
+<text x="156" y="272" textLength="36" fill="#e06c75">$row</text>
+<text x="201" y="272" textLength="72" fill="#dcdfe4">( sort {</text>
+<text x="282" y="272" textLength="18" fill="#e06c75">$a</text>
+<text x="300" y="272" textLength="135" fill="#dcdfe4">-&gt;{started} cmp</text>
+<text x="444" y="272" textLength="18" fill="#e06c75">$b</text>
+<text x="462" y="272" textLength="117" fill="#dcdfe4">-&gt;{started} }</text>
+<text x="588" y="272" textLength="45" fill="#e06c75">@rows</text>
+<text x="642" y="272" textLength="81" fill="#dcdfe4">) { print</text>
+<text x="727.5" y="272" text-anchor="middle" fill="#8c929e">›</text>
+<text x="57" y="290" textLength="99" fill="#dcdfe4">say &quot;done&quot;;</text>
+<text x="48" y="326" textLength="666" fill="#96a0b4">The same block, scrolled 24 columns sideways (Left and Right scroll both):</text>
+<text x="52.5" y="362" text-anchor="middle" fill="#8c929e">‹</text>
+<text x="57" y="362" textLength="666" fill="#dcdfe4">=&gt; 1, output =&gt; &quot;report.txt&quot;, columns =&gt; [ qw(name team started salary) ],</text>
+<text x="727.5" y="362" text-anchor="middle" fill="#8c929e">›</text>
+<text x="52.5" y="380" text-anchor="middle" fill="#8c929e">‹</text>
+<text x="66" y="380" textLength="18" fill="#e06c75">$a</text>
+<text x="84" y="380" textLength="135" fill="#dcdfe4">-&gt;{started} cmp</text>
+<text x="228" y="380" textLength="18" fill="#e06c75">$b</text>
+<text x="246" y="380" textLength="117" fill="#dcdfe4">-&gt;{started} }</text>
+<text x="372" y="380" textLength="45" fill="#e06c75">@rows</text>
+<text x="426" y="380" textLength="90" fill="#dcdfe4">) { printf</text>
+<text x="525" y="380" textLength="72" fill="#e06c75">$options</text>
+<text x="597" y="380" textLength="108" fill="#dcdfe4">{format}, @{</text>
+<text x="705" y="380" textLength="18" fill="#e06c75">$r</text>
+<text x="727.5" y="380" text-anchor="middle" fill="#8c929e">›</text>
+<text x="52.5" y="398" text-anchor="middle" fill="#8c929e">‹</text>
+<text x="48" y="434" textLength="117" fill="#96a0b4">Ctrl+C quits.</text>
+</g>
+<g shape-rendering="crispEdges">
+</g>
+</svg>

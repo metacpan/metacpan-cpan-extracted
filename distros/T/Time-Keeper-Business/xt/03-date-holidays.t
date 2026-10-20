@@ -29,4 +29,17 @@ my @h = $b->holidays(year => 2026);
 cmp_ok(scalar @h, '>=', 8, 'England has at least eight bank holidays in 2026');
 diag(join ', ', map { "$_->[0] " . ($_->[1] // '') } @h);
 
+my @eaw = Time::Keeper::Business->new(holidays => [ { source => $dh, regions => ['EAW'] } ])->holidays(year => 2026);
+is_deeply([ map { "$_->[0]" } @eaw ], [qw(2026-01-01 2026-04-03 2026-04-06 2026-05-04 2026-05-25 2026-08-31 2026-12-25 2026-12-28)],
+          'with regions => [EAW], the eight days gov.uk lists for England and Wales in 2026');
+is(scalar(() = $b->holidays(year => 2026)) > 8 ? 1 : 0, 1, 'without regions, more: every region\'s days, which is the wrong schedule for London');
+my $sct = Time::Keeper::Business->new(holidays => [ { source => $dh, regions => ['SCT'] } ]);
+ok($sct->is_holiday(Time::Keeper::Date->parse('2026-11-30')), 'Scotland has St Andrew\'s Day');
+ok(!$sct->is_holiday(Time::Keeper::Date->parse('2026-04-06')), '  and not Easter Monday');
+my $uk = Time::Keeper::Business->new(holidays => Time::Keeper::Business::Rule->uk);
+for my $year (2026, 2027) {
+    my $via = Time::Keeper::Business->new(holidays => [ { source => $dh, regions => ['EAW'] } ]);
+    is_deeply([ map { "$_->[0]" } $via->holidays(year => $year) ], [ map { "$_->[0]" } $uk->holidays(year => $year) ], "$year: Date::Holidays::GB for EAW and Rule->uk agree");
+}
+
 done_testing;

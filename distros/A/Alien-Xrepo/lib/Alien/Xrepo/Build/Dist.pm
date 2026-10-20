@@ -1,47 +1,42 @@
 use v5.40;
-
-package Alien::Xrepo::Build::Dist v1.0.9 {
+use feature 'class';
+no warnings 'experimental::class';
+#
+class Alien::Xrepo::Build::Dist v1.0.10 {
     use File::Find;
     use Path::Tiny;
-
-    sub new ( $class, %attr ) {
-        $attr{base_dir} //= '.';
-        $attr{script}   //= 'Build.PL';    # XXX - I could do this with caller()
-        die 'Alien::Xrepo::Build::Dist: module_name is required' unless defined $attr{module_name};
-        my %self = map { $_ => $attr{$_} } qw[base_dir module_name script];
-        return bless \%self, $class;
-    }
-    sub base_dir    { $_[0]{base_dir} }
-    sub module_name { $_[0]{module_name} }
-    sub script      { $_[0]{script} }
+    #
+    field $base_dir    : reader : param //= '.';
+    field $script      : reader : param //= 'Build.PL';    # XXX - I could do this with caller()
+    field $module_name : reader : param;                   # Required
 
     # lib/Alien/Foo.pm for Alien::Foo
-    sub module_rel ($self) {
-        ( my $rel = $self->{module_name} . '.pm' ) =~ s{::}{/}g;
-        return $rel;
+    method module_rel () {
+        ( my $rel = $module_name . '.pm' ) =~ s{::}{/}g;
+        $rel;
     }
-    sub module_path ($self) { return path( $self->{base_dir} )->child( 'lib', $self->module_rel )->stringify }
-    sub dist_name   ($self) { ( my $dist = $self->{module_name} ) =~ s{::}{-}g; return $dist }
+    method module_path () { path($base_dir)->child( 'lib', $self->module_rel )->stringify }
+    method dist_name ()   { $module_name =~ s{::}{-}gr }
 
     # The conventional place the hermetic snapshot lands: blib/lib/auto/share/dist/<Dist>/xrepo-snapshot.json
-    sub snapshot_path ($self) {
-        path( $self->{base_dir} )->child( 'blib', 'lib', 'auto', 'share', 'dist', $self->dist_name, 'xrepo-snapshot.json' )->stringify;
+    method snapshot_path () {
+        path($base_dir)->child( 'blib', 'lib', 'auto', 'share', 'dist', $self->dist_name, 'xrepo-snapshot.json' )->stringify;
     }
 
     # The dist's single declaration: the Alien::<Tail> subclass's recipe() (a hashref, an Alien::Xrepo::Build::Recipe
     # object, or a path). The engine normalizes whatever comes back.  Requires lib/<class>.pm by its absolute path so
     # it wins over any pre-installed copy.
-    sub recipe ($self) {
+    method recipe () {
         require( path( $self->module_path )->absolute->stringify );
-        return $self->{module_name}->new->recipe;
+        return $module_name->new->recipe;
     }
 
     # Inputs whose freshness determines whether the snapshot needs regenerating: the dist's own recipe inputs (the
     # build script and lib/<class>.pm), whatever engine modules from the given list are loaded into THIS process (%INC,
     # so a parent install bump re-runs the examples), and any local recipes/ tree is folded in by snapshot_stale, not
     # here.
-    sub inputs ( $self, @engine_mods ) {
-        my @inputs = ( path( $self->{base_dir} )->child( $self->{script} )->stringify, $self->module_path, );
+    method inputs (@engine_mods) {
+        my @inputs = ( path($base_dir)->child($script)->stringify, $self->module_path );
         for my $mod (@engine_mods) {
             push @inputs, $INC{$mod} if defined $INC{$mod};
         }
@@ -50,7 +45,7 @@ package Alien::Xrepo::Build::Dist v1.0.9 {
 
     # True when the snapshot is missing or older than any input (mirroring Module::Build's copy_if_modified semantics)
     # or any file under a local recipes/ tree.
-    sub snapshot_stale ( $self, $snapshot, @engine_mods ) {
+    method snapshot_stale ( $snapshot, @engine_mods ) {
         return 1 unless -e $snapshot;
         return 1 if !-f $snapshot || -z $snapshot;    # a directory or empty file can't be a valid snapshot
         my $mtime = _mtime($snapshot);
@@ -58,7 +53,7 @@ package Alien::Xrepo::Build::Dist v1.0.9 {
             next unless -e $file;
             return 1 if _mtime($file) > $mtime;
         }
-        my $base  = path( $self->{base_dir} );
+        my $base  = path($base_dir);
         my $stale = 0;
         if ( -d $base->child('recipes') ) {
             find(
@@ -72,7 +67,7 @@ package Alien::Xrepo::Build::Dist v1.0.9 {
     }
 
     sub _mtime ($path) {
-        my @st = stat($path);
+        my @st = stat $path;
         return $st[9] // -1;
     }
 };

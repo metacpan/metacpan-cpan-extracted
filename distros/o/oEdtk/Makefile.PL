@@ -99,15 +99,12 @@ WriteMakefile(
 		IO::Socket::SSL			=> 0,
 		LWP::UserAgent			=> 0,
 		PDF::Tk				=> 0,
-		Text::QRCode			=> 0,
 		# CGI front-end, loaded by the shipped lib/oEdtk/lib/cgi-bin/*.cgi at
 		# the top level, so a hard requirement (never a recommends).
 		CGI				=> 0,
 		CGI::FormBuilder		=> 0,
 	},
 	TEST_REQUIRES		=> {
-		DBD::mysql			=> 0,
-		DBD::Pg				=> 0,
 		IPC::Run3			=> 0,
 		Perl::Critic			=> 0,
 		Perl::Tidy			=> 0,
@@ -118,14 +115,18 @@ WriteMakefile(
 	},
 	META_MERGE		=> {
 		'meta-spec'	=> { version => 2 },
-		# Optional runtime database drivers: installed by default (a plain
-		# install pulls the driver of the engine in use) but never mandatory.
+		# Optional runtime dependencies: absent means degraded, not broken.
+		# The database drivers are needed only by the engine in use; the
+		# integration tests that drive them skip when the driver is missing.
 		# DBD::Oracle is left out: it needs the Oracle client to build.
+		# Text::QRCode backs oEdtk::TexDoc::append_qr_code, which requires it
+		# lazily; it needs libqrencode to build.
 		prereqs		=> {
 			runtime	=> {
 				recommends	=> {
-					'DBD::Pg'	=> 0,
+					'DBD::Pg'		=> 0,
 					'DBD::mysql'	=> 0,
+					'Text::QRCode'	=> 0,
 				},
 			},
 		},

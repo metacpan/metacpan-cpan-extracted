@@ -221,3 +221,15 @@ _hours_table(self)
             mXPUSHs(line);
         }
         mXPUSHi(s->hours.weekly_total);
+
+# Whether the table's version 3 entries are called: on (1) or off (0) for
+# the test that compares the two ways; undef only asks. -1 when the header
+# this was built against has no such entries.
+IV
+_abi_v3_paths(...)
+    CODE:
+        if (items > 0 && SvOK(ST(0)))
+            tkb_v3_off = !SvTRUE(ST(0));
+        RETVAL = TKB_HAVE_V3 ? (TKB_V3 ? 1 : 0) : -1;
+    OUTPUT:
+        RETVAL

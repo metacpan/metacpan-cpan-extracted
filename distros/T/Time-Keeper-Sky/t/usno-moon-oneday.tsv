@@ -1,0 +1,36 @@
+# USNO api/rstt/oneday, the Moon: fracillum (the fraction illuminated at noon in the local zone, a whole percent), curphase (the phase name for the day) and closestphase, fetched 18 October 2026; tz is the offset at local noon.
+# place	date	lat	lon	zone	tz	fracillum	curphase	closest_phase	closest_date	closest_time
+London	2026-01-03	51.5074	-0.1278	Europe/London	0	100%	Full Moon	Full Moon	2026-01-03	10:03
+London	2026-01-10	51.5074	-0.1278	Europe/London	0	52%	Waning Gibbous	Last Quarter	2026-01-10	15:48
+London	2026-01-18	51.5074	-0.1278	Europe/London	0	0%	New Moon	New Moon	2026-01-18	19:52
+London	2026-01-26	51.5074	-0.1278	Europe/London	0	54%	Waxing Gibbous	First Quarter	2026-01-26	04:47
+London	2026-02-01	51.5074	-0.1278	Europe/London	0	100%	Full Moon	Full Moon	2026-02-01	22:09
+London	2026-03-15	51.5074	-0.1278	Europe/London	0	14%	Waning Crescent	New Moon	2026-03-19	01:23
+London	2026-04-20	51.5074	-0.1278	Europe/London	1	13%	Waxing Crescent	New Moon	2026-04-17	12:52
+London	2026-05-05	51.5074	-0.1278	Europe/London	1	88%	Waning Gibbous	Full Moon	2026-05-01	18:23
+London	2026-06-21	51.5074	-0.1278	Europe/London	1	45%	Waxing Crescent	First Quarter	2026-06-21	22:55
+London	2026-07-29	51.5074	-0.1278	Europe/London	1	100%	Full Moon	Full Moon	2026-07-29	15:36
+London	2026-08-12	51.5074	-0.1278	Europe/London	1	0%	New Moon	New Moon	2026-08-12	18:37
+London	2026-09-03	51.5074	-0.1278	Europe/London	1	60%	Waning Gibbous	Last Quarter	2026-09-04	08:51
+London	2026-10-10	51.5074	-0.1278	Europe/London	1	0%	New Moon	New Moon	2026-10-10	16:50
+London	2026-10-15	51.5074	-0.1278	Europe/London	1	22%	Waxing Crescent	First Quarter	2026-10-18	17:12
+London	2026-10-18	51.5074	-0.1278	Europe/London	1	48%	Waxing Crescent	First Quarter	2026-10-18	17:12
+London	2026-10-26	51.5074	-0.1278	Europe/London	0	100%	Full Moon	Full Moon	2026-10-26	04:12
+London	2026-11-30	51.5074	-0.1278	Europe/London	0	58%	Waning Gibbous	Last Quarter	2026-12-01	06:08
+London	2026-12-21	51.5074	-0.1278	Europe/London	0	90%	Waxing Gibbous	Full Moon	2026-12-24	01:28
+Sydney	2026-01-18	-33.8688	151.2093	Australia/Sydney	11	1%	Waning Crescent	New Moon	2026-01-19	06:52
+Sydney	2026-01-19	-33.8688	151.2093	Australia/Sydney	11	0%	New Moon	New Moon	2026-01-19	06:52
+Sydney	2026-10-10	-33.8688	151.2093	Australia/Sydney	11	1%	Waning Crescent	New Moon	2026-10-11	02:50
+Sydney	2026-10-11	-33.8688	151.2093	Australia/Sydney	11	0%	New Moon	New Moon	2026-10-11	02:50
+Sydney	2026-10-26	-33.8688	151.2093	Australia/Sydney	11	100%	Full Moon	Full Moon	2026-10-26	15:12
+Sydney	2026-10-27	-33.8688	151.2093	Australia/Sydney	11	99%	Waning Gibbous	Full Moon	2026-10-26	15:12
+Sydney	2026-06-01	-33.8688	151.2093	Australia/Sydney	10	99%	Waning Gibbous	Full Moon	2026-05-31	18:45
+Honolulu	2026-10-10	21.3069	-157.8583	Pacific/Honolulu	-10	0%	New Moon	New Moon	2026-10-10	05:50
+Honolulu	2026-10-26	21.3069	-157.8583	Pacific/Honolulu	-10	99%	Waning Gibbous	Full Moon	2026-10-25	18:12
+Honolulu	2026-04-01	21.3069	-157.8583	Pacific/Honolulu	-10	100%	Full Moon	Full Moon	2026-04-01	16:12
+Kiritimati	2026-10-10	1.8721	-157.4278	Pacific/Kiritimati	14	1%	Waning Crescent	New Moon	2026-10-11	05:50
+Kiritimati	2026-10-11	1.8721	-157.4278	Pacific/Kiritimati	14	0%	New Moon	New Moon	2026-10-11	05:50
+Kiritimati	2026-10-26	1.8721	-157.4278	Pacific/Kiritimati	14	100%	Full Moon	Full Moon	2026-10-26	18:12
+London	1950-06-15	51.5074	-0.1278	Europe/London	1	0%	New Moon	New Moon	1950-06-15	16:53
+London	2050-06-15	51.5074	-0.1278	Europe/London	1	16%	Waning Crescent	Last Quarter	2050-06-12	05:39
+London	2100-07-04	51.5074	-0.1278	Europe/London	1	9%	Waning Crescent	New Moon	2100-07-07	13:08

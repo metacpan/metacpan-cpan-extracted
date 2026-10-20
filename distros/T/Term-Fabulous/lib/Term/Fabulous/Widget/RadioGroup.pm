@@ -11,7 +11,7 @@ use Clay::UI::Role::Interaction::Disableable;
 use Clay::UI::Role::Interaction::Focusable;
 use Term::Fabulous::Widget::Box;
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 class Term::Fabulous::Widget::RadioGroup
 	:isa(Term::Fabulous::Widget::Box)
@@ -23,7 +23,7 @@ class Term::Fabulous::Widget::RadioGroup
 	use Clay::XS qw(CLAY_TOP_TO_BOTTOM);
 	use List::Util qw(first);
 	use Term::Fabulous::Roving qw(roving_target);
-	use Scalar::Util qw(blessed refaddr weaken);
+	use Scalar::Util qw(blessed refaddr);
 	use Term::Fabulous::Event::Change;
 
 	use constant BUTTON_CLASS => 'Term::Fabulous::Widget::RadioButton';
@@ -34,14 +34,13 @@ class Term::Fabulous::Widget::RadioGroup
 		my $layout = $self->layout;
 		$self->layout( { %$layout, layout_direction => CLAY_TOP_TO_BOTTOM } ) unless exists $layout->{layout_direction};
 
-		weaken( my $weak_self = $self );
 		my $continue = Clay::UI::Enum::Result->CONTINUE;
-		my $own      = sub ($event) { defined $weak_self && refaddr( $event->target ) == refaddr($weak_self) };
 		$self->on(
-			KeyPress => sub ($event) {
-				return Clay::UI::Enum::Result->HANDLED if $weak_self->is_enabled && $weak_self->handle_key($event);
+			KeyPress => sub ( $self, $event ) {
+				return Clay::UI::Enum::Result->HANDLED if $self->is_enabled && $self->handle_key($event);
 				return $continue;
-			}
+			},
+			owner => $self
 		);
 	}
 
@@ -135,7 +134,7 @@ one is selected
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-radio.svg" alt="Radio buttons in a row with Medium chosen, in a column with Express shipping chosen, and a disabled group"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.05/screenshots/widget-radio.svg" alt="Radio buttons in a row with Medium chosen, in a column with Express shipping chosen, and a disabled group"></p>
 
 =end html
 

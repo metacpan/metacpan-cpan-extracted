@@ -92,25 +92,32 @@ tkb_add_answer(pTHX_ tkb_schedule *s, SV *item, int64_t year, const char *what)
 /* A generator asked for one year: a code ref called with the year, or an
  * object's holidays(year => $year); the list it gives, copied. */
 static void
-tkb_ask(pTHX_ SV *gen, int64_t year, AV *out, const char *what)
+tkb_ask(pTHX_ SV *gen, SV *args, int64_t year, AV *out, const char *what)
 {
     dSP;
     int count, i, is_code;
     SV *err;
+    AV *pairs = args && SvROK(args) ? (AV *)SvRV(args) : NULL;
+    SSize_t np = pairs ? av_len(pairs) + 1 : 0, j;
     is_code = SvROK(gen) && SvTYPE(SvRV(gen)) == SVt_PVCV && !tkb_has_method(aTHX_ gen, "holidays");
     ENTER;
     SAVETMPS;
     PUSHMARK(SP);
     if (is_code) {
-        XPUSHs(sv_2mortal(tkb_i64_sv(aTHX_ year)));
+        EXTEND(SP, 1 + np);
+        PUSHs(sv_2mortal(tkb_i64_sv(aTHX_ year)));
+        for (j = 0; j < np; j++)
+            PUSHs(*av_fetch(pairs, j, 0));
         PUTBACK;
         count = call_sv(gen, G_LIST | G_EVAL);
     }
     else {
-        EXTEND(SP, 3);
+        EXTEND(SP, 3 + np);
         PUSHs(gen);
         mPUSHp("year", 4);
         mPUSHs(tkb_i64_sv(aTHX_ year));
+        for (j = 0; j < np; j++)
+            PUSHs(*av_fetch(pairs, j, 0));
         PUTBACK;
         count = call_method("holidays", G_LIST | G_EVAL);
     }
@@ -163,7 +170,10 @@ tkb_materialise_year(pTHX_ tkb_schedule *s, int64_t year, const char *what)
                 continue;
             }
             answers = (AV *)sv_2mortal((SV *)newAV());
-            tkb_ask(aTHX_ *gen, year, answers, what);
+            {
+                SV **a = s->gen_args ? av_fetch(s->gen_args, g, 0) : NULL;
+                tkb_ask(aTHX_ *gen, a ? *a : NULL, year, answers, what);
+            }
             m = av_len(answers) + 1;
             for (j = 0; j < m; j++) {
                 SV **item = av_fetch(answers, j, 0);
@@ -230,14 +240,12 @@ tkb_push_holidays(pTHX_ SV **sp_in, tkb_schedule *s, int64_t from, int64_t to, c
     SV **sp = sp_in;
     size_t i;
     int n = 0;
-    SV *cls = sv_2mortal(newSVpvs("Time::Keeper::Date"));
     tkb_ensure_span(aTHX_ s, from, to, what);
     for (i = tkb_named_lower_bound(s->names, s->n_names, from); i < s->n_names && s->names[i].day <= to; i++) {
-        SV *days = sv_2mortal(tkb_i64_sv(aTHX_ s->names[i].day));
         SV *date;
         AV *pair;
         PL_stack_sp = sp;
-        date = tkb_call(aTHX_ cls, "from_epoch_days", &days, 1);
+        date = tkb_date_new(aTHX_ s->names[i].day, -1, NULL, NULL);
         sp = PL_stack_sp;
         pair = newAV();
         av_push(pair, newSVsv(date));

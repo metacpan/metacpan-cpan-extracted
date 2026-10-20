@@ -15,10 +15,13 @@ This page explains how to write widget classes of your own: a container
 with a fixed structure (derived from Box), a widget that draws itself
 (derived from Display), an input widget (derived from Input) and a box
 that takes the focus and reacts to the mouse (a Box with the Clay::UI
-interaction roles). It lists the methods each base class lets you
-override, explains how a widget tells Term::Fabulous that it must be
-drawn again, and shows how to fire events of your own, how to make a
-widget usable from KDL layout files and how to test it.
+interaction roles), a dialog (derived from Dialog) and a popup. It
+lists the methods each base class lets you override, explains how a
+widget names its focus heir, how it tells Term::Fabulous that it must
+be drawn again, how it does work after a frame and how it tells its
+height before the layout, and shows how to make widgets a search
+finds, how to fire events of your own, how to make a widget usable
+from KDL layout files and how to test it.
 
 Complete programs are in the cookbook, on
 L<Term::Fabulous::Cookbook::Extending>:
@@ -59,6 +62,24 @@ the right time. See L</An input widget>.
 for a container that takes the focus or reacts to hover and clicks,
 like L<Term::Fabulous::Widget::Button>. See
 L</A box that takes the focus and reacts to the mouse>.
+
+=item L<Term::Fabulous::Widget::Dialog>
+
+for a dialog with a title, buttons and an answer of its own. See
+L</A dialog of your own>.
+
+=item L<Term::Fabulous::Role::Popup> with L<Term::Fabulous::Placement>
+
+for a widget that floats over everything next to another one, like a
+dropdown's list. The widget works out its place in
+L<popup_position|Term::Fabulous::Role::Popup/popup_position>
+(L<place_popup|Term::Fabulous::Placement/place_popup> puts it next to
+its anchor and keeps it on the screen), calls
+L<float_popup|Term::Fabulous::Role::Popup/float_popup> from its
+C<contribute_floating>, and is made with
+C<< floating => { z_index => TOPMOST_Z_INDEX } >> (see
+L<TOPMOST_Z_INDEX|Term::Fabulous::Placement/TOPMOST_Z_INDEX>). See the
+SYNOPSIS of L<Term::Fabulous::Role::Popup>.
 
 =item Any built-in widget
 
@@ -151,6 +172,26 @@ The accessors a Box inherits (C<layout>, C<bordered>, ...) record
 the change themselves, so the next frame shows it. A container whose
 look depends on fields of its own must say so when they change; see
 L</Telling Term::Fabulous that something changed>.
+
+A container that takes children out of the tree while one of them may
+have the focus (it shows one page at a time, or collapses) can name who
+gets the focus then, with a method C<focus_heir>. When the focused
+widget leaves the tree or can no longer take the focus, Clay::UI walks
+up from it: the first widget that stays and can take the focus gets
+it, unless a container on the way names a widget of its own first (see
+L<Term::Fabulous::Manual::Events/When the focused widget goes away>).
+A pager whose pages share a row of buttons hands the focus to the
+button of the shown page:
+
+	class My::Pager :isa(Term::Fabulous::Widget::Box) :strict(params) {
+		field @buttons;    # one Button per page, always in the tree
+		field $shown = 0;
+
+		method focus_heir () { return $buttons[$shown] }
+	}
+
+Return C<undef> to let the walk go on; a widget that cannot take the
+focus right now counts as C<undef>.
 
 =head2 A widget that draws itself
 
@@ -362,6 +403,15 @@ L<Term::Fabulous::Theme/Families, slots and states>; a widget whose
 look needs none of them, such as a canvas drawn by its program, needs
 nothing here.
 
+A widget that needs the theme itself, to resolve the palette tokens of
+a style (L<Term::Fabulous::Text::Style/resolve_style>) or to take a
+look of a whole family, asks C<< $self->drawing_theme >> (see
+L<Term::Fabulous::Role::Themed/drawing_theme>), never C<< $ui->theme >>:
+a UI may give a part of its tree another theme
+(L<Term::Fabulous::Render/theme_for>), and outside a UI, or in a plain
+L<Clay::UI>, the widget draws in the default theme. C<look>,
+C<family_look> and L<Term::Fabulous::Document::Look/of> already ask it.
+
 =head2 A box that takes the focus and reacts to the mouse
 
 The focus, hover and press states come from roles of L<Clay::UI>.
@@ -419,23 +469,24 @@ like a Button:
 		:strict(params)
 	{
 		use Clay::UI::Enum::Result;
-		use Scalar::Util qw(refaddr weaken);
+		use Scalar::Util qw(refaddr);
 		use Term::Fabulous::Event::Activate;
 
 		ADJUST {
-			weaken( my $weak_self = $self );    # a listener must not keep its widget alive
 			$self->on(
-				OnRelease => sub ($event) {
-					$weak_self->activate if refaddr( $event->target ) == refaddr($weak_self);
+				OnRelease => sub ( $self, $event ) {    # the owner: the tile
+					$self->activate if refaddr( $event->target ) == refaddr($self);
 					return Clay::UI::Enum::Result->CONTINUE;
-				}
+				},
+				owner => $self
 			);
 			$self->on(
-				KeyPress => sub ($event) {
+				KeyPress => sub ( $self, $event ) {
 					return Clay::UI::Enum::Result->CONTINUE unless ( $event->main_key_name // '' ) eq 'Enter';
-					$weak_self->activate;
+					$self->activate;
 					return;    # used: stop here
-				}
+				},
+				owner => $self
 			);
 		}
 
@@ -455,9 +506,15 @@ like a Button:
 	$tile->on( Activate => sub ($event) { open_details(); return } );
 
 The listeners check C<< $event->target >>, because events of the
-children bubble through the widget too. They hold a weak reference to
-the widget: a listener that refers to its own widget directly keeps it
-alive forever.
+children bubble through the widget too. They are registered with
+C<< owner => $self >>: a widget keeps its listeners, so a listener that
+refers to its own widget directly would keep it alive forever. An
+owner-bound listener holds its owner weakly and gets it as its first
+argument, named C<$self> here so that the closure cannot reach the
+method's own C<$self> by mistake (see
+L<Clay::UI::Role::Events::Listener/owner>). The same goes for a
+listener a widget puts on one of its parts, such as a button inside
+it.
 
 Two more methods change how Term::Fabulous draws a widget and its
 children. L<Term::Fabulous::Widget::Button> uses both:
@@ -512,6 +569,138 @@ C<mark_changed>, and the frame that it makes due calls C<paint> (see
 L<Term::Fabulous::Widget::Display/Painting>).
 
 =back
+
+=head2 Work after a frame
+
+Some work needs the layout of a frame: where a child landed, how far
+the box scrolled. Register it with C<each_frame> (see
+L<Term::Fabulous::Widget/each_frame>): the code is called with the
+widget after every frame until it returns true, at most C<frames>
+times, and never once the widget left the UI. The widget is passed in,
+so the closure keeps no reference to it, and a C<name> makes a second
+request replace the first:
+
+	method show_later ($child) {
+		$self->each_frame( sub ($self) { return $self->child_is_placed($child) }, name => 'show', frames => 4 );
+		return $self;
+	}
+
+Work asked for with C<each_frame> before the widget is in a UI waits
+until it joins one, so a constructor or a setter called before the UI
+is built may ask for it. For one call after the next frame, the UI's
+L<after_draw|Term::Fabulous::Render/after_draw> takes
+C<< owner => $self >> and calls the code once with the widget.
+
+To scroll a child of a ScrollBox into view, call the box's
+L<reveal|Term::Fabulous::Widget::ScrollBox/reveal>, which waits for the
+child's layout by itself.
+
+=head2 Height before layout
+
+A list that builds only the items near its viewport needs the height
+of the others before Clay lays them out, for its scrollbar: a
+L<Term::Fabulous::Widget::DocumentView> asks its items with
+L<estimated_rows|Term::Fabulous::Widget/estimated_rows>. With a fixed
+height in its layout, C<estimated_rows> returns that height; otherwise
+it asks
+L<estimated_content_rows|Term::Fabulous::Widget/estimated_content_rows>
+how many rows the content takes in the columns left inside the padding
+and the border, and adds the padding
+(L<content_padding|Term::Fabulous::Widget/content_padding>) and the
+drawn border sides. That is one row, unless the class knows better: a
+Box combines its children's estimates (children below each other add
+up, children side by side take the tallest), a Display answers from its
+C<natural_size>, a Table counts its header and the rows of its page. A
+widget that knows how tall its content is overrides
+C<estimated_content_rows($columns)>:
+
+	method estimated_content_rows :override ($columns) {
+		return scalar @lines;    # a field of the widget: one row per line
+	}
+
+A widget that keeps room of its own inside its border, as a ScrollBox
+does for its scrollbars, overrides C<content_padding> to add that room
+(calling SUPER), so that the estimate counts it. Clay's layout corrects a guess that was off.
+
+=head2 Widgets a search finds
+
+A L<Term::Fabulous::Widget::DocumentView> searches the widgets of its
+items that do L<Term::Fabulous::Role::Searchable>; Text and CodeBlock
+do it for their text, a Table from its rows. A widget of your own that
+shows text it builds only later does the role itself: it provides
+C<search_texts>, C<search_revision>, C<highlight_text>,
+C<clear_text_highlights> and C<reveal_text> (see
+L<Term::Fabulous::Role::Searchable/REQUIRED METHODS>). A container that
+holds searchable widgets which are not always in the tree (pages,
+a collapsible body) composes L<Term::Fabulous::Role::SearchContainer>
+instead: it lists them in C<searchable_parts> and makes one visible in
+C<reveal_part>, and the role answers the search for all of them, as
+Tabs and Accordion::Item do:
+
+	use Term::Fabulous::Role::SearchContainer;
+
+	class My::Drawer :isa(Term::Fabulous::Widget::Box) :does(Term::Fabulous::Role::SearchContainer) {
+		use Term::Fabulous::Role::Searchable qw(searchables_in);    # a class block is a package of its own
+
+		field $content = Term::Fabulous::Widget::Box->new;
+
+		method searchable_parts () { return searchables_in($content) }
+		method reveal_part ($part) { $self->add_child($content) unless $self->has_child($content); return }
+	}
+
+A search remembers its matches with the key and the revision of each
+text; before it uses a key again it compares the revision, and searches
+again when it changed. The container's revisions name the part at each
+index, so removing a part makes the old keys stale instead of letting
+them reach the part that took its place.
+
+=head2 A dialog of your own
+
+A subclass of L<Term::Fabulous::Widget::Dialog> declares its title and
+buttons and adds its content; the dialog draws the title, the row of
+buttons and the notice line, and reports every way of closing with one
+L<Answer|Term::Fabulous::Event::Answer> event. A button that should do
+more than answer is handled in
+L<press_button|Term::Fabulous::Widget::Dialog/press_button>, the inputs
+the answer carries come from
+L<values|Term::Fabulous::Widget::Dialog/values>:
+
+	use Term::Fabulous::Widget::Dialog;
+
+	class My::RenameDialog :isa(Term::Fabulous::Widget::Dialog) {
+		use Term::Fabulous::Text::Markup qw(escape_markup);
+		use Term::Fabulous::Widget::TextField;
+
+		field $field = Term::Fabulous::Widget::TextField->new;
+
+		sub BUILDARGS ( $class, %params ) {
+			return $class->SUPER::BUILDARGS( %params, title => 'Rename', buttons => [ { id => 'rename', label => 'Rename', primary => 1 }, { id => 'cancel', label => 'Cancel' } ] );
+		}
+
+		ADJUST {
+			$self->add_child($field);
+
+			# Enter in the field presses the default button, Rename.
+			$self->on( Submit => sub ( $self, $event ) { $self->press_button( $self->default_button ); return }, owner => $self );
+		}
+
+		method values :override () { return { name => $field->value } }
+
+		# Rename answers only with a name that is free.
+		method press_button :override ($id) {
+			return $self->SUPER::press_button($id) unless $id eq 'rename' && -e $field->value;
+			return $self->notice( escape_markup( $field->value ) . ' is taken.', 'error' );
+		}
+	}
+
+C<Escape> and C<close> answer C<cancel> as dismissed, with the values
+too. A dialog does not press a button for C<Enter> in a text field by
+itself: the C<Submit> listener in C<ADJUST> presses the
+L<default_button|Term::Fabulous::Widget::Dialog/"button, button_ids, is_primary, default_button">.
+The dialog puts its title first and the notice line and buttons last
+when it opens
+(L<place_parts|Term::Fabulous::Widget::Dialog/place_parts>), so the
+children added in C<ADJUST> end up between them.
 
 =head2 Events of your own
 
@@ -590,7 +779,12 @@ This page is part of L<Term::Fabulous::Manual>. Previous page: L<Term::Fabulous:
 L<Term::Fabulous::Cookbook::Extending>, L<Term::Fabulous::Widget::Box>,
 L<Term::Fabulous::Widget::Canvas>, L<Term::Fabulous::Widget::Display>,
 L<Term::Fabulous::Widget::Input>,
-L<Term::Fabulous::Widget::Button>, L<Term::Fabulous::Role::CanParseLayout>,
+L<Term::Fabulous::Widget::Button>, L<Term::Fabulous::Widget::Dialog>,
+L<Term::Fabulous::Role::CanParseLayout>,
+L<Term::Fabulous::Role::Searchable>,
+L<Term::Fabulous::Role::SearchContainer>,
+L<Term::Fabulous::Role::Themed>, L<Term::Fabulous::Role::Popup>,
+L<Term::Fabulous::Placement>, L<Term::Fabulous::Widget/each_frame>,
 L<Term::Fabulous::Manual::Events>.
 
 =cut

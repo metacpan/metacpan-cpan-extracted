@@ -5,6 +5,37 @@ All notable changes to SDL.pm will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v0.0.6] - 2026-10-20
+
+Finally getting around to SDL3::Mixer, SDL3::Image, and SDL3::TTF.
+
+### Added
+
+- SDL3::Mixer - Load audio files (wav, mp3, ogg, many others), mix multiple sounds, apply effects to them.
+- SDL3::Image - Load image files (bmp, gif, jpg, many others) into an SDL_Surface or SDL_Texture.
+- SDL3::TTF - Load font files (ttf, etc) and render text with them.
+- Loads of demos:
+    - `eg/basics/rope.pl` - a port of [rope-jai](https://github.com/tsoding/rope-jai/tree/master)
+    - `eg/image/pretty.pl` - displays randomly generated bitmaps.
+    - `eg/image/showanim.pl` - displays an animated gif.
+    - `eg/image/showclipboard.pl` - displays whatever image is currently on the system clipboard.
+    - `eg/image/showimage.pl` - displays a list of image files.
+    - `eg/mixer/3d-position.pl` - a quick 3d audio example
+    - `eg/mixer/load-and-play.pl` - creates a mixer, loads a single sound, and plays it once
+    - `eg/mixer/metadata.pl` - loads a single sound, and displays metadata.
+    - `eg/mixer/play-multiple-sounds.pl` - creates a mixer, loads two sounds, and mixes them.
+    - `eg/mixer/play-with-options.pl` - creates a mixer, loads a single sound, and plays it with several playback options (fade-in, loop, etc).
+    - `eg/mixer/sinewave.pl` - creates a mixer and plays a sinewave forever.
+    - `eg/mixer/seeking.pl` - creates a mixer, loads a single sound, and plays it on loop. Also lets the user seek around in playback with an on-screen slider.
+    - `eg/mixer/tag-tracks.pl` - a background music track and a pile of sound effects share the mixer just like an actual game.
+    - `eg/ttf/hello.pl` - displays 'Hello, World' on screen in a TTF.
+    - `eg/ttf/font-styles.pl` - renders a sample string through every font setting that showfont supports and lets you change them while it runs
+    - `eg/ttf/showfps.pl` - draws a live frames-per-second counter using a TTF_Text object held on a renderer text engine
+
+### Fixed
+
+- `SDL_RenderGeometry`'s Affix prototype now marks its pointer arguments `Const`, matching the `const SDL_*` parameters in SDL3's headers.
+
 ## [v0.0.5] - 2026-08-07
 
 I'm going to bundle all the demos I had hidden away on github to the main SDL3 dist. Maybe someone will actually use this if finding working examples was easier...
@@ -72,7 +103,8 @@ I'm going to bundle all the demos I had hidden away on github to the main SDL3 d
 
   - It exists!
 
-[Unreleased]: https://github.com/Perl-SDL3/SDL3.pm/compare/v0.0.5...HEAD
+[Unreleased]: https://github.com/Perl-SDL3/SDL3.pm/compare/v0.0.6...HEAD
+[v0.0.6]: https://github.com/Perl-SDL3/SDL3.pm/compare/v0.0.5...v0.0.6
 [v0.0.5]: https://github.com/Perl-SDL3/SDL3.pm/compare/v0.0.4...v0.0.5
 [v0.0.4]: https://github.com/Perl-SDL3/SDL3.pm/compare/v0.0.3...v0.0.4
 [v0.0.3]: https://github.com/Perl-SDL3/SDL3.pm/compare/v0.0.2...v0.0.3

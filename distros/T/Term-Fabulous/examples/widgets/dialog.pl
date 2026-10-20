@@ -2,9 +2,10 @@
 
 # Term::Fabulous::Widget::Dialog: a dialog that opens over the screen,
 # centered, behind a translucent backdrop that dims everything else, and
-# keeps the focus inside itself: Tab moves between its two buttons (the
-# focused one has a blue border), Escape or a button closes it. It is
-# open when the program starts; d opens it again. Ctrl+C quits.
+# keeps the focus inside itself. It brings its own title and buttons:
+# Tab moves between the two buttons, Escape or a button closes it, and
+# the dialog answers with the button pressed. It is open when the
+# program starts; d opens it again. Ctrl+C quits.
 #
 #     perl examples/widgets/dialog.pl
 
@@ -18,9 +19,7 @@ use FindBin;
 use lib "$FindBin::Bin/../../lib/";
 
 use Term::Fabulous;
-use Term::Fabulous::Enum::BorderStyle;
 use Term::Fabulous::Widget::Box;
-use Term::Fabulous::Widget::Button;
 use Term::Fabulous::Widget::Dialog;
 use Term::Fabulous::Widget::Text;
 
@@ -44,28 +43,16 @@ $root->add_child( text(''), $status );
 
 my $ui = Term::Fabulous->new( width => 80, height => 24, root => $root );
 
-my $dialog = Term::Fabulous::Widget::Dialog->new( layout => { sizing => { width => sizing_fixed(44) } } );
-
-sub button ( $caption, $background, $action ) {
-	my $button = Term::Fabulous::Widget::Button->new(
-		background_color => $background,
-		bordered         => 1,
-		border_color     => [ 90, 110, 140, 255 ],
-		border_style     => Term::Fabulous::Enum::BorderStyle->Round,
-		layout           => { padding => { left => 1, right => 1 } },
-	);
-	$button->add_child( text( $caption, [ 255, 255, 255, 255 ] ) );
-	$button->on( Activate => sub ($event) { $action->(); return } );
-	return $button;
-}
-
-my $buttons = Term::Fabulous::Widget::Box->new( layout => { child_gap => 2 } );
-$buttons->add_child(
-	button( 'Delete', [ 140, 45, 50, 255 ], sub { $status->text('3 files deleted.'); $dialog->close } ),
-	button( 'Cancel', [ 43,  58, 85, 255 ], sub { $dialog->close } ),
+# The title and the buttons come with the dialog; the text between them
+# is its content. Pressing a button answers with its id, Escape answers
+# cancel.
+my $dialog = Term::Fabulous::Widget::Dialog->new(
+	title   => 'Delete 3 files?',
+	buttons => [ { id => 'delete', label => 'Delete', primary => 1 }, { id => 'cancel', label => 'Cancel' } ],
+	layout  => { sizing => { width => sizing_fixed(44) } },
 );
-$dialog->add_child( text( 'Delete 3 files?', [ 255, 255, 255, 255 ] ), text('They take 9.2 GB. This cannot be undone.'), $buttons );
-$dialog->on( Close => sub ($event) { $status->text('Nothing was deleted.') unless length $status->text; return } );
+$dialog->add_child( text('They take 9.2 GB. This cannot be undone.') );
+$dialog->on( Answer => sub ($event) { $status->text( $event->button eq 'delete' ? '3 files deleted.' : 'Nothing was deleted.' ); return } );
 
 $root->on( Start => sub ($event) { $dialog->open($ui); return } );
 $root->on(

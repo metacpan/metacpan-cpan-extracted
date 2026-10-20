@@ -1,6 +1,5 @@
 bin/address_lookup
 Changes
-ignore.txt
 lib/Geo/Coder/List.pm
 LICENSE
 Makefile.PL
@@ -41,6 +40,7 @@ t/kwalitee.t
 t/list.t
 t/manifest.t
 t/mapbox.t
+t/minimum-version.t
 t/mock.t
 t/mutant_killers.t
 t/no404s.t
@@ -57,6 +57,7 @@ t/pod-synopsis.t
 t/pod.t
 t/postcodes.t
 t/rand.t
+t/reference.t
 t/ua.t
 t/unit.t
 t/unused.t

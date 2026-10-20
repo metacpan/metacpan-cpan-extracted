@@ -35,7 +35,7 @@ subtest 'openapi object from the Mojo plugin' => sub {
     ->new($::app)
     ->test_openapi_verbose(1);
 
-  is($t->app->openapi->document_get('/info/title'), 'Test API using config from the plugin',
+  is($t->app->openapi->entry_document->get('/info/title'), 'Test API using config from the plugin',
     'openapi object on the application is constructed correctly');
   is($t->openapi, $t->app->openapi, 'the test openapi object is the same as in the application');
 

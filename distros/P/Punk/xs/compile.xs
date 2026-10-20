@@ -96,9 +96,10 @@ model_instance(self, name)
         if (inst && *inst && SvTRUE(*inst)) RETVAL = newSVsv(*inst);
         else {
             SV *opts = pc_db_opts_for(aTHX_ self, *classp);
-            SV *argv[1], *obj;
+            SV *argv[2], *obj;
             argv[0] = sv_2mortal(opts);
-            obj = pcx_call_meth(aTHX_ *classp, "_instantiate", argv, 1, 1);
+            argv[1] = self;
+            obj = pcx_call_meth(aTHX_ *classp, "_instantiate", argv, 2, 1);
             (void)hv_store(cache, n, (I32)nl,
                            obj ? SvREFCNT_inc(obj) : newSV(0), 0);
             RETVAL = obj ? obj : newSV(0);
@@ -897,13 +898,33 @@ compile(self)
                  * of the configuration rather than on the first request. */
                 SV *argv[3], *mapp;
                 SV **op = hv_fetchs(m, K_OPTS, 0);
+                HV *mo = newHV();
+                /* A copy, so the app's `host` can ride along for the
+                 * canonical URLs without editing the caller's options. An
+                 * explicit `host` on the mount wins. */
+                if (op && *op && SvROK(*op)
+                    && SvTYPE(SvRV(*op)) == SVt_PVHV) {
+                    HV *src = (HV *)SvRV(*op);
+                    HE *he;
+                    hv_iterinit(src);
+                    while ((he = hv_iternext(src)))
+                        (void)hv_store_ent(mo, hv_iterkeysv(he),
+                                           newSVsv(HeVAL(he)), 0);
+                }
+                if (!hv_exists(mo, "host", 4)) {
+                    SV *host = app_get(aTHX_ h, "host");
+                    if (host && SvOK(host) && SvCUR(host))
+                        (void)hv_stores(mo, "host", newSVsv(host));
+                }
                 argv[0] = *mdir;
-                argv[1] = (op && *op) ? *op
-                        : sv_2mortal(newRV_noinc((SV *)newHV()));
+                argv[1] = sv_2mortal(newRV_noinc((SV *)mo));
                 argv[2] = *hv_fetchs(m, K_PREFIX, 0);
                 mapp = pcx_call_meth(aTHX_ sv_2mortal(newSVpvs(PK_MOUNT_MD)),
                                      K_APP, argv, 3, 1);
                 (void)hv_stores(m, K_APP, mapp ? mapp : newSV(0));
+                /* what $app->markdown_pages looks for: a closure's capture
+                 * says nothing about whose it is */
+                (void)hv_stores(m, K_MD_MOUNT, newSViv(1));
             }
             av_push(mounts_out, newRV_noinc((SV *)m));
         }

@@ -64,7 +64,7 @@ my @hops = (
         # brong-final.eml differs from brong-mm3.eml by a pile of prepended
         # MTA trace/spam headers (Received, ARC-*, Authentication-Results,
         # Received-SPF, X-*) plus a "[test5] " tag hand-added to the front
-        # of the Subject header's value. Under spec-06 §4, every one of
+        # of the Subject header's value. Under -07 §4, every one of
         # those prepended headers is unsigned (the last holdout,
         # Received-SPF, moved to unsigned when the `received-` prefix rule
         # landed) -- without the Subject tag, this hop's header+body hash
@@ -273,7 +273,7 @@ diag("=== Negative tests ===");
 
     my ($result, $error) = Mail::DKIM2::MessageInstance->verify($msg);
     is($result, 0, "MI verify returns 0 on tampered header");
-    like($error, qr/header hash mismatch/, "MI verify reports hash mismatch");
+    like($error, qr/header hash sha256 mismatch/, "MI verify reports hash mismatch");
 }
 
 # Tamper with the signature and verify DKIM2 fails
@@ -360,6 +360,12 @@ diag("=== Unchanged message re-sign ===");
 # ============================================================
 # Phase 5: UseEpilogue — body-changing transitions
 # ============================================================
+
+# UseEpilogue and EpilogueThreshold croak in 0.23 (final review M5: callers
+# sign the original bytes, not the rewritten message). Phases 5 to 7 keep
+# testing the epilogue code itself, which hands in Email::MIME objects and
+# signs the rewritten message, until the bug is fixed.
+$Mail::DKIM2::MessageInstance::ENABLE_BROKEN_EPILOGUE = 1;
 
 diag("=== UseEpilogue body recipe tests ===");
 

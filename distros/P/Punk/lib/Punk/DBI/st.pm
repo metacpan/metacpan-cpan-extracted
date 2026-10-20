@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.61';
+our $VERSION = '0.62';
 our @ISA = ('DBI::st');
 
 # execute is C (include/punk/punk_dbiobs.h + xs/dbi.xs), installed into this
@@ -31,6 +31,15 @@ passed on.
 C<prepare_cached> is unaffected: the subclass changes the class of the handle,
 not its caching, and one statement handle per distinct SQL string is still what
 a connection holds.
+
+=head1 METHODS
+
+=head2 execute(@bind)
+
+L<DBI>'s C<execute>, with the same arguments and return. The observer is
+told the statement before it runs and, after, whether C<execute> returned
+true. Inside one of the L<Punk::DBI::db> wrappers it reports nothing, since
+that wrapper has already reported the statement.
 
 =head1 SEE ALSO
 

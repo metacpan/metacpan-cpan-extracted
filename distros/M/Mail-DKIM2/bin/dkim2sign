@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 #
-# Standalone DKIM2 signer CLI (draft-ietf-dkim-dkim2-spec-06).
+# Standalone DKIM2 signer CLI (draft-ietf-dkim-dkim2-spec-07).
 #
 # Reads a message, computes a Message-Instance when the content has changed
 # since the top instance, signs, and writes the result to stdout. The
@@ -9,7 +9,7 @@
 #
 #   dkim2sign -s SELECTOR -d DOMAIN -k KEYFILE [--mailfrom '<a@b>']
 #                [--rcptto '<c@d>']... [--timestamp N] [--next-domain D]
-#                [--flag F]... [--allow-null-body-recipe]
+#                [--flag F]... [--exploded] [--allow-null-body-recipe]
 #                [--ignore-timestamps] [--dns-json PATH] [MESSAGE|-]
 #
 # Before extending an existing DKIM2 chain it runs the same verify-before-sign
@@ -21,7 +21,7 @@
 # nd= is extended only when nd= equals DOMAIN. On refusal it prints the reason
 # on stderr and exits 1 with nothing on stdout.
 #
-# Per §9.1/§9.2.5 an unmodified hop adds no Message-Instance: if the top
+# Per §12.1/§12.2.5 an unmodified hop adds no Message-Instance: if the top
 # instance already matches the content, its m= is reused and only a
 # DKIM2-Signature is added.
 
@@ -42,7 +42,7 @@ my ($selector, $domain, $keyfile, $timestamp, $next_domain);
 my $mailfrom = '<>';
 my $hash_algs = 'sha256';
 my (@rcptto, @flags);
-my ($allow_null, $ignore_ts, $dns_json);
+my ($allow_null, $ignore_ts, $dns_json, $exploded);
 $dns_json = $ENV{DKIM2_DNS_JSON} if defined $ENV{DKIM2_DNS_JSON} && length $ENV{DKIM2_DNS_JSON};
 
 GetOptions(
@@ -54,6 +54,7 @@ GetOptions(
     'timestamp=i'     => \$timestamp,
     'next-domain=s'   => \$next_domain,
     'flag=s'          => \@flags,
+    'exploded'        => \$exploded,
     'hash=s'          => \$hash_algs,
     'allow-null-body-recipe' => \$allow_null,
     'ignore-timestamps'      => \$ignore_ts,
@@ -62,7 +63,7 @@ GetOptions(
 
 die _usage() unless defined $selector && defined $domain && defined $keyfile;
 
-# spec-06 §3.1: signer chooses one or both hash algorithms for the
+# -07 §3.1: signer chooses one or both hash algorithms for the
 # Message-Instance h= tag. Default MUST remain sha256 (byte-identical to
 # pre-spec-06 output).
 my %HASH_ALG_SETS = (
@@ -115,7 +116,7 @@ unless ($gate->{ok}) {
 
 my $msg = parse_mime($raw);
 
-# §9.1/§9.2.5: only add an instance if this hop actually changed something.
+# §12.1/§12.2.5: only add an instance if this hop actually changed something.
 # MessageInstance->verify returns the version it matched, so a true result means
 # the top instance still describes the message and must be reused.
 my $mi_header;
@@ -135,6 +136,7 @@ my $signer = Mail::DKIM2::Signer->new(
         : (MailFrom => $mailfrom, RcptTo => (@rcptto ? \@rcptto : ['<>']))),
     (defined $timestamp ? (Timestamp => $timestamp) : ()),
     (@flags ? (Flags => \@flags) : ()),
+    ($exploded ? (Exploded => 1) : ()),
 );
 $signer->PRINT($msg->as_string);
 $signer->CLOSE;
@@ -164,6 +166,8 @@ usage: $0 -s SELECTOR -d DOMAIN -k KEYFILE [options] [MESSAGE|-]
       --timestamp N  fixed t= (default: now)
       --next-domain D  emit nd= for an imaginary forwarding hop, omitting mf=/rt=
       --flag F       f= flag; repeatable
+      --exploded     this hop sends the message to more than one address: f=exploded
+                     (-07 section 12.5; also set when --rcptto is given twice; never at i=1)
       --allow-null-body-recipe  sign even if a Message-Instance has a null body
                      Recipe that no upstream signature covers (its m= is above
                      every signature's m=; a signed null needs no option)

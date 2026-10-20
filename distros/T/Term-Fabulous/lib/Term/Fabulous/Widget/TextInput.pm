@@ -11,7 +11,7 @@ use Term::Fabulous::Editor;
 use Term::Fabulous::TextView;
 use Term::Fabulous::Widget::Input;
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 class Term::Fabulous::Widget::TextInput
 	:isa(Term::Fabulous::Widget::Input)
@@ -21,10 +21,7 @@ class Term::Fabulous::Widget::TextInput
 	use Scalar::Util qw(weaken);
 	use Term::Fabulous::Check qw(boolean string);
 	use Term::Fabulous::Termbox qw(TB_KEY_MOUSE_LEFT TB_KEY_MOUSE_RELEASE TB_MOD_MOTION TB_MOD_SHIFT);
-	use Time::HiRes qw(time);
 	use Term::Fabulous::Unicode qw(sanitize_text grapheme_clusters);
-
-	use constant DOUBLE_CLICK_SECONDS => 0.4;
 
 	# Cursor movement: key name => [ editor method, extend the selection ].
 	my %MOVEMENT_BY_KEY = (
@@ -87,8 +84,8 @@ class Term::Fabulous::Widget::TextInput
 	# unless a subclass says otherwise.
 	field $view :reader;
 
-	# Mouse: whether a press in the widget started a drag, and the time and
-	# position of the last press, for double clicks.
+	# Mouse: whether a press in the widget started a drag, and the text
+	# position of the last single press, which a double click must repeat.
 	field $dragging = 0;
 	field @last_press;
 
@@ -288,18 +285,17 @@ class Term::Fabulous::Widget::TextInput
 			return $self->_view_changed;
 		}
 
-		my $now = time;
 		if ( $event->modifiers & TB_MOD_SHIFT ) {
 			$editor->move_to( @position, 1 );
 			@last_press = ();
 		}
-		elsif ( @last_press && $now - $last_press[0] <= DOUBLE_CLICK_SECONDS && "@last_press[1, 2]" eq "@position" ) {
+		elsif ( $event->click_count >= 2 && "@last_press" eq "@position" ) {
 			$self->hides_text ? $editor->select_all : $editor->select_word_at(@position);
 			@last_press = ();
 		}
 		else {
 			$editor->move_to( @position, 0 );
-			@last_press = ( $now, @position );
+			@last_press = @position;
 		}
 		$dragging = 1;
 		return $self->_view_changed;

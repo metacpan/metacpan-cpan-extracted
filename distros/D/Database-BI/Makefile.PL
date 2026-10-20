@@ -21,6 +21,7 @@ WriteMakefile(
 	EXE_FILES	=> ['script/database-bi'],
 	PREREQ_PM => {
 		'Carp'		=> 0,
+		'Cwd'		=> 0,		# For realpath() in the data_dir guard (Dashboard.pm)
 		'CHI'			=> 0,
 		'CGI::Info'	=> 0,
 		'CGI::Lingua'		=> '0.85',
@@ -54,12 +55,14 @@ WriteMakefile(
 	}, TEST_REQUIRES => {
 		'DBD::CSV' => 0,
 		'Encode' => 0,
+		'JSON::MaybeXS' => 0,	# The browser tests speak Marionette and decode its frames
 		'Test::DescribeMe' => 0,	# Author tests (t/pod.t, t/manifest.t, t/version.t) declare themselves with this; the tools they need are optional and skipped without them
 		'Test::Memory::Cycle' => 0,
 		'Test::Mockingbird' => 0,
 		'Test::Most' => 0,
 		'Test::Mojo' => 0,
 		'Test::Needs' => 0,
+		'Test::Permissions' => 0,
 		'Test::Returns' => 0,
 		'Test::Without::Module' => 0,
 		'Text::xSV::Slurp' => 0,
@@ -84,7 +87,10 @@ WriteMakefile(
 					# valid_location() and 0.47 added geocode_many(), and the app
 					# installs, starts and tests without the module, hiding the
 					# location option and saying which version is needed.
-					'Geo::Coder::Free' => '0.47'
+					'Geo::Coder::Free' => '0.47',
+					# Rendering the map itself (Phase 6.1).  Also runtime-required: the
+					# rest of the application installs, starts and tests without it.
+					'HTML::OSM' => '0.10'
 				}
 			},
 			test => {

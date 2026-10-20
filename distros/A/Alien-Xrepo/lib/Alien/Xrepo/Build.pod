@@ -82,7 +82,7 @@ L<Alien::Xrepo::Runtime> C<pkg_name> declaration:
 
 =item * A plain string is a bare C<xrepo> package name.
 
-=item * A hashref adds install flags, e.g., C<< { name => 'zstd', version => '1.5.6', kind => 'shared', configs => { legacy => true } } >>.
+=item * A hashref adds install flags, e.g., C<< { name => 'zstd', version => '1.5.6', kind => 'shared', required => 0, configs => { legacy => true } } >>.
 
 =back
 
@@ -158,15 +158,23 @@ call C<assert_installed( )> straight afterwards to convert that per-package repo
 
 =head2 C<assert_installed( )>
 
-Turns this run's outcome into a pass/fail decision. Returns C<$self> when C<< runtime_prop->{errors} >> is empty.
-Otherwise it removes the snapshot this run just wrote (so C<snapshot_stale( )> cannot mistake the incomplete result for
-a fresh one and skip the rebuild next time) and dies with one line per failed package:
+Turns this run's outcome into an install verdict:
 
-    Alien::Xrepo: failed to install libsdl3_image:
-      libsdl3_image: <the error recorded for that package>
+=over
 
-Call it whenever you need a guarantee that the I<whole> recipe installed, not just a partial report. This is what makes
-a distribution whose snapshot was written but is incomplete fail its test suite instead of passing silently.
+=item * Returns C<$self> immediately when C<< runtime_prop->{errors} >> is empty.
+
+=item * If any B<required> package failed (the default), it removes any generated C<snapshot> file (so stale/partial runs are not cached) and dies:
+
+    Alien::Xrepo: failed to install zstd:
+      zstd: <error message>
+
+=item * If only B<optional> packages (C<< required => 0 >>) failed, it removes any generated C<snapshot> file, emits a warning with the failed package names and errors, and returns C<$self> without dying.
+
+=back
+
+Call this method whenever you need to ensure the required components of your distribution are in place before
+proceeding (e.g. in C<Build.PL>, C<Makefile.PL>, or a post-build test).
 
 =head2 C<configure( %opts )>
 
@@ -186,18 +194,23 @@ C<probe_policy =E<gt> 'off'>.
 
 Runs one C<xrepo install> per package (with per-package options merged over the profile). A package with a usable
 C<pkg_roots> entry is recorded directly from its root and never passed to the engine. A package the probe found
-satisfied is skipped when C<probe_policy =E<gt> 'skip'> (the default) unless C<force> is set. A failing package
-generates a warning, is recorded in C<< runtime_prop->{errors} >>, and does not abort the remaining packages. Each
-successful install is recorded in C<< runtime_prop->{packages} >> and bumps C<install_type> to C<'share'>. When
-C<update_repo =E<gt> 1> is set, the repository index is refreshed (C<xrepo update-repo>) once, and a failed package is
-retried a single time before the error is recorded; useful when a stale or corrupt registry (e.g., a precompiled
-artifact whose checksum changed on the mirror) is the cause of the failure.
+satisfied is skipped when C<probe_policy =E<gt> 'skip'> (the default) unless C<force> is set.
+
+A failing package generates a warning and is recorded in C<< runtime_prop->{errors} >> with its requirement status (C<<
+fatal => 1 >> by default, or C<< 0 >> if marked C<< required => 0 >> in the recipe). Sibling packages continue to
+install regardless of whether a failure was fatal or non-fatal. Each successful install is recorded in C<<
+runtime_prop->{packages} >> and bumps C<install_type> to C<'share'>.
+
+When C<update_repo =E<gt> 1> is set, the repository index is refreshed (C<xrepo update-repo>) once, and a failed
+package is retried a single time before the error is recorded; useful when a stale or corrupt registry (e.g., a
+precompiled artifact whose checksum changed on the mirror) is the cause of the failure.
 
 =head2 C<gather( )>
 
 Ensures every package not already recorded (installed, root-provided, or failed) has consumer-facing paths. It fetches
 each one through the engine and stores the resolution data in C<< runtime_prop->{packages} >>. A root-provided package
-is recorded from its C<pkg_roots> entry directly. A failed fetch is recorded in C<< runtime_prop->{errors} >>.
+is recorded from its C<pkg_roots> entry directly. A failed fetch is recorded in C<< runtime_prop->{errors} >> with its
+requirement status.
 
 =head2 C<export( )>
 

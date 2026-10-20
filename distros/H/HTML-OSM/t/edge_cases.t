@@ -102,6 +102,12 @@ subtest 'new: min_interval must be >= 0 — negative rejected' => sub {
 		'negative min_interval croaks';
 };
 
+subtest 'new: tile_url must be a string' => sub {
+	throws_ok { HTML::OSM->new(tile_url => []) }
+		qr/\b(?:invalid|not|string|tile_url)\b/i,
+		'tile_url as an arrayref croaks';
+};
+
 subtest 'new: geocoder must respond to geocode() — unqualified object rejected' => sub {
 	# An object without the required method should fail schema validation.
 	my $bad_geo = bless {}, 'ECBadGeo';   # no geocode() method
@@ -209,12 +215,12 @@ subtest 'add_marker: no arguments croaks from Params::Get usage guard' => sub {
 		'add_marker() with no args croaks';
 };
 
-subtest 'add_marker: empty string triggers croak from _fetch_coordinates' => sub {
-	# The empty string is falsy — _fetch_coordinates guards against it.
+subtest 'add_marker: empty string returns 0 without geocoding' => sub {
+	# An empty address cannot be resolved, so add_marker returns 0 rather than
+	# letting the private _fetch_coordinates guard croak.
 	my $m = HTML::OSM->new();
-	throws_ok { $m->add_marker('') }
-		qr/address not given/i,
-		'add_marker("") croaks';
+	is($m->add_marker(''), 0, 'add_marker("") returns 0');
+	is(scalar @{$m->{coordinates}}, 0, 'nothing stored');
 };
 
 subtest 'add_marker: undef coordinate array → 0' => sub {
@@ -274,14 +280,13 @@ subtest 'add_marker: origin (0, 0) is valid' => sub {
 	is($m->add_marker([0, 0]), 1, '[0, 0] accepted');
 };
 
-subtest 'add_marker: unblessed hashref arg parsed as empty params, croaks from geocoder' => sub {
+subtest 'add_marker: unblessed hashref arg parsed as empty params, returns 0' => sub {
 	# An unblessed hashref is treated by Params::Get as the params hash, not as
-	# the 'point'.  With no 'point' key in the hash, $point is undef → geocoder
-	# receives undef → "address not given" croak.
+	# the 'point'.  With no 'point' key in the hash, $point is undef, which
+	# cannot be resolved, so add_marker returns 0.
 	my $m = HTML::OSM->new();
-	throws_ok { $m->add_marker({lat => 51.5, lon => -0.1}) }
-		qr/address not given/i,
-		'hashref arg → point=undef → "address not given" croak';
+	is($m->add_marker({lat => 51.5, lon => -0.1}), 0,
+		'hashref arg → point=undef → returns 0');
 };
 
 subtest 'add_marker: blessed ref without latitude() method croaks' => sub {

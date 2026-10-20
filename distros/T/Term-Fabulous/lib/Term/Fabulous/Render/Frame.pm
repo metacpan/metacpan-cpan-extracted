@@ -5,7 +5,7 @@ use warnings;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 use Object::Pad 0.825;
 
@@ -23,7 +23,7 @@ class Term::Fabulous::Render::Frame :strict(params) {
 		CLAY_RENDER_COMMAND_TYPE_CUSTOM
 	);
 	use List::Util qw(any);
-	use Scalar::Util qw(looks_like_number);
+	use Scalar::Util qw(looks_like_number refaddr);
 	use Term::Fabulous::Render::Geometry qw(cell_rect intersect_cell_rects rects_overlap);
 
 	my %command_type_name = (
@@ -187,6 +187,18 @@ class Term::Fabulous::Render::Frame :strict(params) {
 		return grep { rects_overlap( $_, $_ ) } map { intersect_cell_rects( $_, $rect ) } map { @$_ } @{$painted}[ $index + 1 .. $#_commands ];
 	}
 
+	# The painted lines of a text widget: for each TEXT command the widget
+	# emitted, the screen row and the offset in its text of the line's
+	# first character, in the order of the rows. A text that was not laid
+	# out, or whose lines Clay left out below the window, has fewer lines
+	# here than it has; a line without characters has none.
+	method text_rows ($widget) {
+		my $user_data = refaddr $widget;
+		return map { [ ( cell_rect( $_->{boundingBox} ) )[1], $_->{renderData}{stringOffset} // 0 ] }
+			sort { $a->{boundingBox}{y} <=> $b->{boundingBox}{y} }
+			grep { $_->{commandType} == CLAY_RENDER_COMMAND_TYPE_TEXT && ( $_->{userData} // -1 ) == $user_data } @_commands;
+	}
+
 	method topmost_at ( $x, $y ) {
 		my $painted = $self->_all_painted_rects;
 		return grep {
@@ -347,6 +359,19 @@ C<$index> paint into, as C<[x0, y0, x1, y1]> rectangles, one per
 painted rectangle of those commands; they may overlap. Empty when
 nothing is painted over the rectangle. A sixel picture leaves these
 cells out.
+
+=head2 text_rows
+
+	my @rows = $frame->text_rows($text);    # ( [ $row, $first_offset ], ... )
+
+The painted lines of a L<Term::Fabulous::Widget::Text>: for every TEXT
+command the widget emitted, the screen row it was painted on and the
+offset in the widget's text of the line's first character, ordered by
+row. A text that was not laid out in this frame has none; one whose
+lower lines Clay left out below the window has fewer than it shows;
+a line without characters has none. A caller that scrolls a character
+into view takes the row of the last line whose offset is not past the
+character's, and treats an offset past the last line as below it.
 
 =head2 topmost_at
 

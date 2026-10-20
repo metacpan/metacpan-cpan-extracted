@@ -1,4 +1,14 @@
 Revision history for Time-Keeper-Business
 
+0.02    2026-10-19
+        - A holiday source with arguments: { source => $obj, regions => [...] }, passed to its holidays method after the year.
+        - Rules in other calendars: fixed and nth take calendar, month_code and leap_month; a lunar holiday can fall twice in a year.
+        - Rule shapes: weekday_on_or_after, weekday_on_or_before, sandwiched, except, also; observed takes previous_business_day, next_business_day_if_sunday and keep.
+        - Hours by rule (by_rule), and a join's hours: join($other, hours => 'both' | 'either' | 'first' | 'second').
+        - Overnight spans: '22:00-06:00' runs to the next morning and belongs to the day it starts on.
+        - reckon => 'elapsed': business time as the time that passes, across clock changes.
+        - business_days_in and business_hours_in a month or a year; iterate_business_days, an iterator with no limit on how many it gives.
+        - Examples: eg/sweden.pl, and eg/japan.pl prints the ten business days after 20 December as the others do.
+
 0.01    2026-10-19
 	- First version

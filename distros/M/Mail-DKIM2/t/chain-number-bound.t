@@ -34,19 +34,19 @@ is(MAX_CHAIN_LENGTH, 32, 'MAX_CHAIN_LENGTH is 32');
 is(MAX_CHAIN_NUMBER, 100, 'MAX_CHAIN_NUMBER is 100');
 is(chain_number_error('DKIM2-Signature', 'i', $_), undef, "i=$_ is in range")
     for qw(1 9 32 01 001 032);
-is(chain_number_error('DKIM2-Signature', 'm', $_),
-   'PERMERROR DKIM2-Signature m= exceeds the maximum chain length of 32',
+is(chain_number_error('DKIM2-Signature', 'm', $_, 2),
+   "PERMERROR: DKIM2-Signature i=2 m=$_ exceeds the maximum chain length of 32",
    "m=$_ is a chain number but past the chain length")
     for qw(33 99 100 099);
 is(chain_number_error('DKIM2-Signature', 'i', $_),
-   'PERMERROR DKIM2-Signature i= exceeds the maximum chain number of 100',
+   "PERMERROR: DKIM2-Signature i=$_ exceeds the maximum chain number of 100",
    "i=$_ is out of range")
     for qw(101 999 0001 4294967297 99999999999999999999);
-is(chain_number_error('Message-Instance', 'm', $_), 'PERMERROR Message-Instance has a malformed m= tag',
+is(chain_number_error('Message-Instance', 'm', $_), "PERMERROR: Message-Instance m=$_ syntax error",
    "m=" . join('', map { sprintf('\\x%X', ord) } split //) . " is malformed")
     for ('abc', '', '1.5', '0', '00', '000', '1x', '4294967297x', '30000000x', '0_1', "\x{FF11}", '+1', '-1');
 is(chain_number_error('DKIM2-Signature', 'i', 'abc'),
-   'PERMERROR DKIM2-Signature has a missing or malformed i= tag', 'malformed i= says so');
+   'PERMERROR: DKIM2-Signature i=abc syntax error', 'malformed i= says so');
 is(chain_number_error('Message-Instance', 'm', undef), undef, 'a missing m= is left to the callers');
 is(extract_mi_version(" m=01; h=x"), 1, 'extract_mi_version: m=01 is 1');
 is(extract_mi_version(" m=001; h=x"), 1, 'extract_mi_version: m=001 is 1');
@@ -78,20 +78,20 @@ is(verify($signed)->result, 'pass', 'control: the signed message passes');
 my $range = 'exceeds the maximum chain length of 32';
 my $number = 'exceeds the maximum chain number of 100';
 my %cases = (
-    'signature i=33' => [ sub { $_[0] =~ s/^(DKIM2-Signature: i=)1;/${1}33;/m }, "DKIM2-Signature i= $range" ],
-    'signature i=101' => [ sub { $_[0] =~ s/^(DKIM2-Signature: i=)1;/${1}101;/m }, "DKIM2-Signature i= $number" ],
-    'signature i=huge' => [ sub { $_[0] =~ s/^(DKIM2-Signature: i=)1;/${1}99999999999999999999;/m }, "DKIM2-Signature i= $number" ],
-    'signature i=2^32+1' => [ sub { $_[0] =~ s/^(DKIM2-Signature: i=)1;/${1}4294967297;/m }, "DKIM2-Signature i= $number" ],
-    'signature m=huge' => [ sub { $_[0] =~ s/^(DKIM2-Signature: i=1; m=)1;/${1}99999999999999999999;/m }, "DKIM2-Signature m= $number" ],
-    'signature m=4294967297x' => [ sub { $_[0] =~ s/^(DKIM2-Signature: i=1; m=)1;/${1}4294967297x;/m }, "DKIM2-Signature has a malformed m= tag" ],
-    'signature m=abc' => [ sub { $_[0] =~ s/^(DKIM2-Signature: i=1; m=)1;/${1}abc;/m }, "DKIM2-Signature has a malformed m= tag" ],
-    'signature m=0_1' => [ sub { $_[0] =~ s/^(DKIM2-Signature: i=1; m=)1;/${1}0_1;/m }, "DKIM2-Signature has a malformed m= tag" ],
-    'instance m=huge' => [ sub { $_[0] =~ s/^(Message-Instance: m=)1;/${1}99999999999999999999;/m }, "Message-Instance m= $number" ],
-    'instance m=33' => [ sub { $_[0] =~ s/^(Message-Instance: m=)1;/${1}33;/m }, "Message-Instance m= $range" ],
-    'instance m=101' => [ sub { $_[0] =~ s/^(Message-Instance: m=)1;/${1}101;/m }, "Message-Instance m= $number" ],
-    'instance m=4294967297x' => [ sub { $_[0] =~ s/^(Message-Instance: m=)1;/${1}4294967297x;/m }, "Message-Instance has a malformed m= tag" ],
-    'instance m=abc' => [ sub { $_[0] =~ s/^(Message-Instance: m=)1;/${1}abc;/m }, "Message-Instance has a malformed m= tag" ],
-    'extra junk i=huge' => [ sub { $_[0] = "DKIM2-Signature: i=99999999999999999999; m=2; d=evil.example$EOL$_[0]" }, "DKIM2-Signature i= $number" ],
+    'signature i=33' => [ sub { $_[0] =~ s/^(DKIM2-Signature: i=)1;/${1}33;/m }, "DKIM2-Signature i=33 $range" ],
+    'signature i=101' => [ sub { $_[0] =~ s/^(DKIM2-Signature: i=)1;/${1}101;/m }, "DKIM2-Signature i=101 $number" ],
+    'signature i=huge' => [ sub { $_[0] =~ s/^(DKIM2-Signature: i=)1;/${1}99999999999999999999;/m }, "DKIM2-Signature i=99999999999999999999 $number" ],
+    'signature i=2^32+1' => [ sub { $_[0] =~ s/^(DKIM2-Signature: i=)1;/${1}4294967297;/m }, "DKIM2-Signature i=4294967297 $number" ],
+    'signature m=huge' => [ sub { $_[0] =~ s/^(DKIM2-Signature: i=1; m=)1;/${1}99999999999999999999;/m }, "DKIM2-Signature i=1 m=99999999999999999999 $number" ],
+    'signature m=4294967297x' => [ sub { $_[0] =~ s/^(DKIM2-Signature: i=1; m=)1;/${1}4294967297x;/m }, "DKIM2-Signature i=1 syntax error" ],
+    'signature m=abc' => [ sub { $_[0] =~ s/^(DKIM2-Signature: i=1; m=)1;/${1}abc;/m }, "DKIM2-Signature i=1 syntax error" ],
+    'signature m=0_1' => [ sub { $_[0] =~ s/^(DKIM2-Signature: i=1; m=)1;/${1}0_1;/m }, "DKIM2-Signature i=1 syntax error" ],
+    'instance m=huge' => [ sub { $_[0] =~ s/^(Message-Instance: m=)1;/${1}99999999999999999999;/m }, "Message-Instance m=99999999999999999999 $number" ],
+    'instance m=33' => [ sub { $_[0] =~ s/^(Message-Instance: m=)1;/${1}33;/m }, "Message-Instance m=33 $range" ],
+    'instance m=101' => [ sub { $_[0] =~ s/^(Message-Instance: m=)1;/${1}101;/m }, "Message-Instance m=101 $number" ],
+    'instance m=4294967297x' => [ sub { $_[0] =~ s/^(Message-Instance: m=)1;/${1}4294967297x;/m }, "Message-Instance m=4294967297x syntax error" ],
+    'instance m=abc' => [ sub { $_[0] =~ s/^(Message-Instance: m=)1;/${1}abc;/m }, "Message-Instance m=abc syntax error" ],
+    'extra junk i=huge' => [ sub { $_[0] = "DKIM2-Signature: i=99999999999999999999; m=2; d=evil.example$EOL$_[0]" }, "DKIM2-Signature i=99999999999999999999 $number" ],
 );
 for my $name (sort keys %cases) {
     my ($edit, $detail) = @{$cases{$name}};
@@ -103,7 +103,7 @@ for my $name (sort keys %cases) {
     my $v = eval { verify($msg) };
     is($@, '', "$name: the Verifier does not die");
     is($v && $v->result, 'permerror', "$name: permerror");
-    is($v && $v->result_detail, "permerror (PERMERROR $detail)", "$name: says why");
+    is($v && $v->result_detail, "permerror (PERMERROR: $detail)", "$name: says why");
 
     my $s2 = Mail::DKIM2::Signer->new(
         Domain => 'test2.dkim2.com', Selector => 'sel1',
@@ -126,17 +126,17 @@ for my $name (sort keys %cases) {
     local $SIG{__WARN__} = sub { push @warn, @_ };
     my ($ok, $why) = Mail::DKIM2::MessageInstance->verify($msg);
     ok(!$ok, 'MessageInstance->verify: huge m= fails');
-    like($why // '', qr/Message-Instance m= $number/, 'MessageInstance->verify: says why');
+    like($why // '', qr/Message-Instance m=99999999999999999999 $number/, 'MessageInstance->verify: says why');
     ($ok, $why) = Mail::DKIM2::MessageInstance->chain_verifies($msg);
     ok(!$ok, 'MessageInstance->chain_verifies: huge m= fails');
-    like($why // '', qr/Message-Instance m= $number/, 'MessageInstance->chain_verifies: says why');
+    like($why // '', qr/Message-Instance m=99999999999999999999 $number/, 'MessageInstance->chain_verifies: says why');
     is_deeply(\@warn, [], 'MessageInstance: no warnings');
 
     $msg = $unsigned;
     $msg =~ s/^(Message-Instance: m=)1;/${1}4294967297x;/m or die;
     ($ok, $why) = Mail::DKIM2::MessageInstance->chain_verifies($msg);
     ok(!$ok, 'MessageInstance->chain_verifies: m=4294967297x fails');
-    like($why // '', qr/Message-Instance has a malformed m= tag/, '... as a malformed m= tag');
+    like($why // '', qr/Message-Instance m=4294967297x syntax error/, '... as a malformed m= tag');
 }
 
 # Item: m=01 / m=001 / i=001 are 1 everywhere (the Verifier used to key its

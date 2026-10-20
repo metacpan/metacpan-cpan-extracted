@@ -138,8 +138,10 @@ start with the manual's first page and its first program.
     layout), [Term::Fabulous::Manual::Looks](https://github.com/davenonymous/perl-term-fabulous/blob/master/docs/Term/Fabulous/Manual/Looks.md) (text, colors, borders),
     [Term::Fabulous::Manual::Events](https://github.com/davenonymous/perl-term-fabulous/blob/master/docs/Term/Fabulous/Manual/Events.md) (events, keyboard, focus, mouse,
     scrolling), [Term::Fabulous::Manual::Forms](https://github.com/davenonymous/perl-term-fabulous/blob/master/docs/Term/Fabulous/Manual/Forms.md) (input widgets),
-    [Term::Fabulous::Manual::Feedback](https://github.com/davenonymous/perl-term-fabulous/blob/master/docs/Term/Fabulous/Manual/Feedback.md) (progress bars, spinners and
-    toasts), [Term::Fabulous::Manual::Charts](https://github.com/davenonymous/perl-term-fabulous/blob/master/docs/Term/Fabulous/Manual/Charts.md) (canvases and charts),
+    [Term::Fabulous::Manual::Feedback](https://github.com/davenonymous/perl-term-fabulous/blob/master/docs/Term/Fabulous/Manual/Feedback.md) (progress bars, spinners, toasts,
+    status bars, prompts and file dialogs), [Term::Fabulous::Manual::Menus](https://github.com/davenonymous/perl-term-fabulous/blob/master/docs/Term/Fabulous/Manual/Menus.md)
+    (commands, menu bars, context menus and key references),
+    [Term::Fabulous::Manual::Charts](https://github.com/davenonymous/perl-term-fabulous/blob/master/docs/Term/Fabulous/Manual/Charts.md) (canvases and charts),
     [Term::Fabulous::Manual::Tables](https://github.com/davenonymous/perl-term-fabulous/blob/master/docs/Term/Fabulous/Manual/Tables.md), [Term::Fabulous::Manual::TableRows](https://github.com/davenonymous/perl-term-fabulous/blob/master/docs/Term/Fabulous/Manual/TableRows.md)
     and [Term::Fabulous::Manual::TableStyles](https://github.com/davenonymous/perl-term-fabulous/blob/master/docs/Term/Fabulous/Manual/TableStyles.md) (the table widget),
     [Term::Fabulous::Manual::KDL](https://github.com/davenonymous/perl-term-fabulous/blob/master/docs/Term/Fabulous/Manual/KDL.md) (layout files),
@@ -244,6 +246,18 @@ add timers first. Unknown parameters die
     `Mouse` or `MouseMove` events are fired. Inline mode has no mouse
     support: `mouse` with a true value and `inline` together die.
 
+- `double_click_seconds`
+
+    A number of seconds, at least 0; anything else dies. Default: 0.4. A
+    press of the same button in the same cell as the press just before it,
+    at most this long after it (on the `clock`), continues a run of
+    clicks, and any other press starts a new one. The `Mouse` event of a
+    double click has a
+    [click\_count](https://github.com/davenonymous/perl-term-fabulous/blob/master/docs/Term/Fabulous/Event/Mouse.md#click_count) of 2, of a
+    triple click 3; every widget that tells double clicks apart
+    ([Term::Fabulous::Widget::Table](https://github.com/davenonymous/perl-term-fabulous/blob/master/docs/Term/Fabulous/Widget/Table.md), [Term::Fabulous::Widget::TextField](https://github.com/davenonymous/perl-term-fabulous/blob/master/docs/Term/Fabulous/Widget/TextField.md),
+    [Term::Fabulous::Widget::TextArea](https://github.com/davenonymous/perl-term-fabulous/blob/master/docs/Term/Fabulous/Widget/TextArea.md)) reads that count.
+
 - `kitty_keyboard`
 
     A boolean. Default: 1. With 1, ["run"](#run) asks the terminal whether it
@@ -283,8 +297,9 @@ add timers first. Unknown parameters die
 
     Optional, for tests. A code reference that returns the current time in
     seconds, default `Time::HiRes::time`. Frame pacing reads it: how long
-    a frame took and when it ended (see ["run"](#run)), and so do ["now"](#now) and
-    the widgets that animate (see ["request\_frame\_at"](#request_frame_at)). A test gives it a
+    a frame took and when it ended (see ["run"](#run)), and so do ["now"](#now), the
+    widgets that animate (see ["request\_frame\_at"](#request_frame_at)) and the count of a run
+    of clicks (see `double_click_seconds`). A test gives it a
     clock it controls to check the pacing with `step( paced => 1 )`
     or to move an animation on. Anything but a code reference dies.
 
@@ -562,6 +577,15 @@ my $enabled = $ui->mouse;
 Returns whether the mouse is reported: the `mouse` constructor
 parameter, or its default (1, or 0 in inline mode). Read only.
 
+## double\_click\_seconds
+
+```perl
+my $seconds = $ui->double_click_seconds;
+```
+
+Returns the `double_click_seconds` constructor parameter, or its
+default (0.4). Read only.
+
 ## kitty\_keyboard
 
 ```perl
@@ -732,31 +756,48 @@ not need it; see ["invalidate"](#invalidate) to ask for a frame instead. With th
 real terminal, it only has a visible effect while the terminal is open.
 See ["draw" in Term::Fabulous::Render](https://github.com/davenonymous/perl-term-fabulous/blob/master/docs/Term/Fabulous/Render.md#draw).
 
-## bounding\_box, scroll\_state, scroll\_to
+## bounding\_box, content\_box, scroll\_state, scroll\_to
 
 ```perl
 my $box   = $ui->bounding_box($widget);       # { x, y, width, height } in cells, or undef
+my $inner = $ui->content_box($widget);        # the same inside padding, border and scrollbars
 my $state = $ui->scroll_state($scroll_box);   # { position, viewport, content }
 $ui->scroll_to( $scroll_box, { y => -10 } );  # ten rows down from the top
 ```
 
-`bounding_box` returns where the last frame placed a widget.
+`bounding_box` returns where the last frame placed a widget, and
+`content_box` the part of that box inside the padding the frame
+declared, which in Term::Fabulous holds the border and the scrollbars
+too.
 `scroll_state` and `scroll_to` read and set the scroll position of a
 scroll container such as a [Term::Fabulous::Widget::ScrollBox](https://github.com/davenonymous/perl-term-fabulous/blob/master/docs/Term/Fabulous/Widget/ScrollBox.md), in
 cells: 0 at the top and left, negative when scrolled down or right.
+[Term::Fabulous::Scrolling](https://github.com/davenonymous/perl-term-fabulous/blob/master/docs/Term/Fabulous/Scrolling.md) scrolls by rows, pages and to the ends and
+reports the position as positive rows (`scroll_offset`), so a program
+need not flip the sign.
 Inherited from [Clay::UI](https://metacpan.org/pod/Clay%3A%3AUI); see ["bounding\_box" in Clay::UI](https://metacpan.org/pod/Clay%3A%3AUI#bounding_box),
-["scroll\_state" in Clay::UI](https://metacpan.org/pod/Clay%3A%3AUI#scroll_state) and ["scroll\_to" in Clay::UI](https://metacpan.org/pod/Clay%3A%3AUI#scroll_to), and the recipe
+["content\_box" in Clay::UI](https://metacpan.org/pod/Clay%3A%3AUI#content_box), ["scroll\_state" in Clay::UI](https://metacpan.org/pod/Clay%3A%3AUI#scroll_state) and
+["scroll\_to" in Clay::UI](https://metacpan.org/pod/Clay%3A%3AUI#scroll_to), and the recipe
 [Scroll a ScrollBox from code](https://github.com/davenonymous/perl-term-fabulous/blob/master/docs/Term/Fabulous/Cookbook/LiveData.md#scroll-a-scrollbox-from-code-keep-a-log-at-the-newest-line).
 
-## after\_draw
+## after\_draw, each\_draw
 
 ```perl
 $ui->after_draw( sub { ... } );
+$ui->after_draw( sub ($widget) { ... }, owner => $widget );
+$ui->each_draw( sub ($widget) { ...; return $done }, owner => $widget, name => 'retry', frames => 4 );
 ```
 
-Queues a code reference to call once after the next frame has been
-drawn, for work that needs the layout of that frame. See
-["after\_draw" in Term::Fabulous::Render](https://github.com/davenonymous/perl-term-fabulous/blob/master/docs/Term/Fabulous/Render.md#after_draw).
+`after_draw` queues a code reference to call once after the next frame
+has been drawn, for work that needs the layout of that frame;
+`each_draw` registers one to call after every frame until it returns
+true, its `frames` ran out, its owner was freed or left the UI, it
+died, or a later registration with the same `name` (and the same
+owner, or none) replaced it. With an
+owner, the UI holds the widget weakly and passes it in. See
+["after\_draw" in Term::Fabulous::Render](https://github.com/davenonymous/perl-term-fabulous/blob/master/docs/Term/Fabulous/Render.md#after_draw) and
+["each\_draw" in Term::Fabulous::Render](https://github.com/davenonymous/perl-term-fabulous/blob/master/docs/Term/Fabulous/Render.md#each_draw); widgets use
+["each\_frame" in Term::Fabulous::Widget](https://github.com/davenonymous/perl-term-fabulous/blob/master/docs/Term/Fabulous/Widget.md#each_frame).
 
 ## Other inherited methods
 
@@ -797,7 +838,7 @@ widget it is fired on to the root, as described in
     For every button press (not a drag) whose cell holds a character of a
     text that is the topmost thing drawn there, on the
     [Term::Fabulous::Widget::Text](https://github.com/davenonymous/perl-term-fabulous/blob/master/docs/Term/Fabulous/Widget/Text.md), after the `Mouse` event. A left press
-    on a link of a [Term::Fabulous::Widget::RichText](https://github.com/davenonymous/perl-term-fabulous/blob/master/docs/Term/Fabulous/Widget/RichText.md) then fires
+    on a link of a [Term::Fabulous::Widget::Text](https://github.com/davenonymous/perl-term-fabulous/blob/master/docs/Term/Fabulous/Widget/Text.md) then fires
     `LinkActivate` ([Term::Fabulous::Event::LinkActivate](https://github.com/davenonymous/perl-term-fabulous/blob/master/docs/Term/Fabulous/Event/LinkActivate.md)) on it. See
     ["Clicks on text and links" in Term::Fabulous::Manual::Events](https://github.com/davenonymous/perl-term-fabulous/blob/master/docs/Term/Fabulous/Manual/Events.md#clicks-on-text-and-links).
 
@@ -805,7 +846,7 @@ widget it is fired on to the root, as described in
 
     For every report of the pointer moving with no button held, on the same
     widget a `Mouse` event would go to. The hover state of the widgets,
-    and the hovered link of a [Term::Fabulous::Widget::RichText](https://github.com/davenonymous/perl-term-fabulous/blob/master/docs/Term/Fabulous/Widget/RichText.md), follow
+    and the hovered link of a [Term::Fabulous::Widget::Text](https://github.com/davenonymous/perl-term-fabulous/blob/master/docs/Term/Fabulous/Widget/Text.md), follow
     these moves.
 
 - `Start` ([Term::Fabulous::Event::Start](https://github.com/davenonymous/perl-term-fabulous/blob/master/docs/Term/Fabulous/Event/Start.md))
@@ -882,6 +923,13 @@ focus where it is when it is pressed: a click on the title of a
 [Term::Fabulous::Widget::MenuBar](https://github.com/davenonymous/perl-term-fabulous/blob/master/docs/Term/Fabulous/Widget/MenuBar.md) opens the menu without taking the
 focus from the text field the user was typing in, so the menu can give
 it back when it closes.
+
+When the focused widget is removed from the tree, disabled or hidden,
+the focus goes to its heir: the nearest widget above it that can take
+the focus, unless a container on the way names another with
+`focus_heir` (a Tabs names its active tab, a closing Accordion::Item
+its header). See
+["When the focused widget goes away" in Term::Fabulous::Manual::Events](https://github.com/davenonymous/perl-term-fabulous/blob/master/docs/Term/Fabulous/Manual/Events.md#when-the-focused-widget-goes-away).
 
 See ["KEYBOARD" in Term::Fabulous::Manual::Events](https://github.com/davenonymous/perl-term-fabulous/blob/master/docs/Term/Fabulous/Manual/Events.md#keyboard) and
 ["FOCUS" in Term::Fabulous::Manual::Events](https://github.com/davenonymous/perl-term-fabulous/blob/master/docs/Term/Fabulous/Manual/Events.md#focus).
@@ -984,13 +1032,10 @@ Term::Fabulous, and programs do not use them directly.
 
 - [Term::Fabulous::Widget::Text](https://github.com/davenonymous/perl-term-fabulous/blob/master/docs/Term/Fabulous/Widget/Text.md)
 
-    Shows text in one color; wraps and aligns it.
-
-- [Term::Fabulous::Widget::RichText](https://github.com/davenonymous/perl-term-fabulous/blob/master/docs/Term/Fabulous/Widget/RichText.md)
-
-    A Text whose spans set bold, colors and other styles on ranges of it,
-    from markup such as `[bold]Enter[/]`, and whose links the user follows
-    with a click or the keyboard.
+    Shows text, wrapped and aligned. Its spans set bold, colors and other
+    styles on ranges of it, from markup such as `[bold]Enter[/]`,
+    highlights mark search matches over them, and the user follows its
+    links with a click or the keyboard.
 
 - [Term::Fabulous::Widget::Button](https://github.com/davenonymous/perl-term-fabulous/blob/master/docs/Term/Fabulous/Widget/Button.md)
 
@@ -1041,6 +1086,20 @@ Term::Fabulous, and programs do not use them directly.
     say: it builds and lays out only the items near the viewport, with
     spacers standing in for the rest.
 
+- [Term::Fabulous::Widget::DocumentView](https://github.com/davenonymous/perl-term-fabulous/blob/master/docs/Term/Fabulous/Widget/DocumentView.md)
+
+    A VirtualList that shows a [Term::Fabulous::Document](https://github.com/davenonymous/perl-term-fabulous/blob/master/docs/Term/Fabulous/Document.md): headings,
+    paragraphs with bold, italic and code marks, lists, quotes and code
+    blocks in the styles of the theme, scrolled with the keys, its links
+    selected and followed, its text searched. The main pane of a reader for
+    any documentation format (see ["Documents"](#documents)).
+
+- [Term::Fabulous::Widget::CodeBlock](https://github.com/davenonymous/perl-term-fabulous/blob/master/docs/Term/Fabulous/Widget/CodeBlock.md)
+
+    Lines of code on a background of their own, never wrapped, cut at the
+    edge and scrolled sideways, each character in the style a highlighter
+    gives it.
+
 - [Term::Fabulous::Widget::Scrollbar](https://github.com/davenonymous/perl-term-fabulous/blob/master/docs/Term/Fabulous/Widget/Scrollbar.md)
 
     The scrollbar of a scroll container: a track with a thumb that shows
@@ -1063,7 +1122,8 @@ Term::Fabulous, and programs do not use them directly.
     labels; the active tab joins the page's border.
     [Term::Fabulous::Widget::Tabs::Bar](https://github.com/davenonymous/perl-term-fabulous/blob/master/docs/Term/Fabulous/Widget/Tabs/Bar.md) and
     [Term::Fabulous::Widget::Tabs::Button](https://github.com/davenonymous/perl-term-fabulous/blob/master/docs/Term/Fabulous/Widget/Tabs/Button.md) are the bar and its tabs, also
-    usable on their own.
+    usable on their own; [Term::Fabulous::Widget::Tabs::Line](https://github.com/davenonymous/perl-term-fabulous/blob/master/docs/Term/Fabulous/Widget/Tabs/Line.md) is the line
+    that joins the bar to the page, used internally.
 
 - [Term::Fabulous::Widget::DocumentTabs](https://github.com/davenonymous/perl-term-fabulous/blob/master/docs/Term/Fabulous/Widget/DocumentTabs.md)
 
@@ -1105,11 +1165,10 @@ Term::Fabulous, and programs do not use them directly.
     the input widgets), with the
     animation helpers; derive from it to write your own.
 
-- [Term::Fabulous::Widget::Element](https://github.com/davenonymous/perl-term-fabulous/blob/master/docs/Term/Fabulous/Widget/Element.md), [Term::Fabulous::Widget::TextNode](https://github.com/davenonymous/perl-term-fabulous/blob/master/docs/Term/Fabulous/Widget/TextNode.md), [Term::Fabulous::Widget::FocusableText](https://github.com/davenonymous/perl-term-fabulous/blob/master/docs/Term/Fabulous/Widget/FocusableText.md)
+- [Term::Fabulous::Widget::Element](https://github.com/davenonymous/perl-term-fabulous/blob/master/docs/Term/Fabulous/Widget/Element.md), [Term::Fabulous::Widget::TextNode](https://github.com/davenonymous/perl-term-fabulous/blob/master/docs/Term/Fabulous/Widget/TextNode.md)
 
-    The [Clay::UI](https://metacpan.org/pod/Clay%3A%3AUI) roles behind Term::Fabulous::Widget,
-    Term::Fabulous::Widget::Text and Term::Fabulous::Widget::RichText.
-    Used internally.
+    The [Clay::UI](https://metacpan.org/pod/Clay%3A%3AUI) roles behind Term::Fabulous::Widget and
+    Term::Fabulous::Widget::Text. Used internally.
 
 - [Term::Fabulous::Widget::Dialog::Backdrop](https://github.com/davenonymous/perl-term-fabulous/blob/master/docs/Term/Fabulous/Widget/Dialog/Backdrop.md)
 
@@ -1256,7 +1315,7 @@ Term::Fabulous, and programs do not use them directly.
     How a table checks its style hashes and works out its grid lines. Used
     internally by the table.
 
-- [Term::Fabulous::Widget::Table::Cell](https://github.com/davenonymous/perl-term-fabulous/blob/master/docs/Term/Fabulous/Widget/Table/Cell.md), [Term::Fabulous::Widget::Table::Toggle](https://github.com/davenonymous/perl-term-fabulous/blob/master/docs/Term/Fabulous/Widget/Table/Toggle.md), [Term::Fabulous::Widget::Table::Grid](https://github.com/davenonymous/perl-term-fabulous/blob/master/docs/Term/Fabulous/Widget/Table/Grid.md), [Term::Fabulous::Widget::Table::HeaderView](https://github.com/davenonymous/perl-term-fabulous/blob/master/docs/Term/Fabulous/Widget/Table/HeaderView.md), [Term::Fabulous::Widget::Table::Pager](https://github.com/davenonymous/perl-term-fabulous/blob/master/docs/Term/Fabulous/Widget/Table/Pager.md), [Term::Fabulous::Widget::Table::ColumnChooser](https://github.com/davenonymous/perl-term-fabulous/blob/master/docs/Term/Fabulous/Widget/Table/ColumnChooser.md)
+- [Term::Fabulous::Widget::Table::Cell](https://github.com/davenonymous/perl-term-fabulous/blob/master/docs/Term/Fabulous/Widget/Table/Cell.md), [Term::Fabulous::Widget::Table::Toggle](https://github.com/davenonymous/perl-term-fabulous/blob/master/docs/Term/Fabulous/Widget/Table/Toggle.md), [Term::Fabulous::Widget::Table::Grid](https://github.com/davenonymous/perl-term-fabulous/blob/master/docs/Term/Fabulous/Widget/Table/Grid.md), [Term::Fabulous::Widget::Table::EdgeView](https://github.com/davenonymous/perl-term-fabulous/blob/master/docs/Term/Fabulous/Widget/Table/EdgeView.md), [Term::Fabulous::Widget::Table::Pager](https://github.com/davenonymous/perl-term-fabulous/blob/master/docs/Term/Fabulous/Widget/Table/Pager.md), [Term::Fabulous::Widget::Table::ColumnChooser](https://github.com/davenonymous/perl-term-fabulous/blob/master/docs/Term/Fabulous/Widget/Table/ColumnChooser.md)
 
     The widgets a table is built of: cells, the open and close markers,
     the grids, the header, the page controls and the column chooser (the
@@ -1353,6 +1412,11 @@ Term::Fabulous, and programs do not use them directly.
 
     A canvas got a new size from the layout.
 
+- [Term::Fabulous::Event::ViewChange](https://github.com/davenonymous/perl-term-fabulous/blob/master/docs/Term/Fabulous/Event/ViewChange.md)
+
+    What a document view shows has changed: the blocks in view, the
+    section, the percentage, the selected link and the search.
+
 - [Term::Fabulous::Event::Change](https://github.com/davenonymous/perl-term-fabulous/blob/master/docs/Term/Fabulous/Event/Change.md)
 
     The user changed the value of an input widget.
@@ -1376,7 +1440,7 @@ Term::Fabulous, and programs do not use them directly.
 
 - [Term::Fabulous::Event::LinkActivate](https://github.com/davenonymous/perl-term-fabulous/blob/master/docs/Term/Fabulous/Event/LinkActivate.md)
 
-    The user followed a link of a RichText, by click or key.
+    The user followed a link of a Text, by click or key.
 
 - [Term::Fabulous::Event::Close](https://github.com/davenonymous/perl-term-fabulous/blob/master/docs/Term/Fabulous/Event/Close.md)
 
@@ -1439,6 +1503,44 @@ Term::Fabulous, and programs do not use them directly.
 
     The user showed or hid a table column in the column chooser.
 
+## Documents
+
+The document view shows a document: a list of widgets, the common ones
+made by the document's factories from text and marks, any other added
+as it is. A parser fills the document, and the view shows, searches
+and links it. [Pod::Fabulous](https://metacpan.org/pod/Pod%3A%3AFabulous) reads POD this way.
+[Term::Fabulous::Cookbook::Documents](https://github.com/davenonymous/perl-term-fabulous/blob/master/docs/Term/Fabulous/Cookbook/Documents.md) has recipes for documents, from
+a Markdown reader built on [Markdent](https://metacpan.org/pod/Markdent) to links and search, and
+[Term::Fabulous::Cookbook::DocumentTechniques](https://github.com/davenonymous/perl-term-fabulous/blob/master/docs/Term/Fabulous/Cookbook/DocumentTechniques.md) continues with a
+table of contents, syntax highlighting, styles, pager keys and tables
+and pictures inside a document.
+
+- [Term::Fabulous::Document](https://github.com/davenonymous/perl-term-fabulous/blob/master/docs/Term/Fabulous/Document.md)
+
+    A document as a list of widgets with the options a view lays them out
+    with: factories for headings, paragraphs, list items, terms, code and
+    rules, its sections and anchors, and searching its text.
+
+- [Term::Fabulous::Document::Look](https://github.com/davenonymous/perl-term-fabulous/blob/master/docs/Term/Fabulous/Document/Look.md)
+
+    The styles the kinds of marks are shown in, as palette tokens of the
+    theme.
+
+- [Term::Fabulous::Role::Searchable](https://github.com/davenonymous/perl-term-fabulous/blob/master/docs/Term/Fabulous/Role/Searchable.md)
+
+    The texts a widget shows, for search and highlights, also those it
+    builds only later or does not show (a table's other pages).
+
+- [Term::Fabulous::Role::SearchContainer](https://github.com/davenonymous/perl-term-fabulous/blob/master/docs/Term/Fabulous/Role/SearchContainer.md)
+
+    A container that lists the searchable widgets it holds, also those
+    out of view, and shows the one with a match: tabs and accordion items.
+
+- [Term::Fabulous::Scrolling](https://github.com/davenonymous/perl-term-fabulous/blob/master/docs/Term/Fabulous/Scrolling.md)
+
+    Scroll any container by rows, by pages, to its ends and to a range of
+    rows, as a pager does.
+
 ## Colors, borders and text
 
 - [Term::Fabulous::Color](https://github.com/davenonymous/perl-term-fabulous/blob/master/docs/Term/Fabulous/Color.md)
@@ -1485,11 +1587,17 @@ Term::Fabulous, and programs do not use them directly.
 - [Term::Fabulous::Text::Style](https://github.com/davenonymous/perl-term-fabulous/blob/master/docs/Term/Fabulous/Text/Style.md)
 
     Style strings such as `bold red on #202020` and the style hashes
-    behind the spans of a RichText.
+    behind the spans of a Text.
 
 - [Term::Fabulous::Text::Markup](https://github.com/davenonymous/perl-term-fabulous/blob/master/docs/Term/Fabulous/Text/Markup.md)
 
-    The `[bold red]text[/]` markup of a RichText.
+    The `[bold red]text[/]` markup of a Text.
+
+- [Term::Fabulous::Text::Marks](https://github.com/davenonymous/perl-term-fabulous/blob/master/docs/Term/Fabulous/Text/Marks.md), [Term::Fabulous::Role::MarkedText](https://github.com/davenonymous/perl-term-fabulous/blob/master/docs/Term/Fabulous/Role/MarkedText.md)
+
+    The spans, highlights and links of one text, checked and cut into
+    styled runs in one place, and the role through which Text and CodeBlock
+    share the spans and highlights. Used internally.
 
 ## Themes
 
@@ -1530,6 +1638,23 @@ from layout files, or your own terminal or output class.
 - [Term::Fabulous::Role::CanParseLayout](https://github.com/davenonymous/perl-term-fabulous/blob/master/docs/Term/Fabulous/Role/CanParseLayout.md)
 
     Makes a widget class usable in KDL layout files.
+
+- [Term::Fabulous::Role::Themed](https://github.com/davenonymous/perl-term-fabulous/blob/master/docs/Term/Fabulous/Role/Themed.md)
+
+    How a widget reads its colors, border styles and borders from the
+    theme, and the theme it draws with (`drawing_theme`); composed by
+    every widget.
+
+- [Term::Fabulous::Placement](https://github.com/davenonymous/perl-term-fabulous/blob/master/docs/Term/Fabulous/Placement.md)
+
+    Where a popup goes on the screen: below, above or at its anchor, kept
+    on the screen; the z\_index of popups.
+
+- [Term::Fabulous::Role::Popup](https://github.com/davenonymous/perl-term-fabulous/blob/master/docs/Term/Fabulous/Role/Popup.md)
+
+    Floats a widget from the root at the position Placement works out and
+    moves it back when a frame moved it; composed by the dropdown's list,
+    popup menus and the table's column chooser.
 
 - [Term::Fabulous::Check](https://github.com/davenonymous/perl-term-fabulous/blob/master/docs/Term/Fabulous/Check.md)
 

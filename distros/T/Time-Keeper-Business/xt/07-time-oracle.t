@@ -6,7 +6,9 @@ use Test::More;
 
 # Author test: the business-time arithmetic against a walker that sums
 # spans from business_hours_on, over random schedules in zones without
-# a clock change, so the wall clock and the epoch agree.
+# a clock change (so the wall clock and the epoch agree), and over
+# schedules reckoned elapsed in zones that change, where the epoch is the
+# reckoning.
 
 use Time::Keeper;
 use Time::Keeper::Business;
@@ -16,8 +18,8 @@ srand($ENV{TKB_SEED} // 20261018);
 my $base = Time::Keeper->new(year => 2026, month => 1, day => 1, zone => 'UTC')->epoch;
 
 my @pool;
-for my $i (1 .. 8) {
-    my @spans = $i % 3 == 0 ? ('09:00-12:30', '13:30-17:30') : $i % 3 == 1 ? ('08:00-16:00') : ('00:00-24:00');
+for my $i (1 .. 12) {
+    my @spans = $i % 4 == 0 ? ('09:00-12:30', '13:30-17:30') : $i % 4 == 1 ? ('08:00-16:00') : $i % 4 == 2 ? ('00:00-24:00') : ('07:00-12:00', '21:00-05:00');
     my %hours = (default => [@spans]);
     $hours{fri} = ['09:00-13:00'] if $i % 2;
     my @hol = map { Time::Keeper::Date->from_epoch_days(20454 + int(rand(1500))) } 1 .. int(rand(30));
@@ -26,6 +28,7 @@ for my $i (1 .. 8) {
         $hours{"$d"} = rand() < 0.3 ? [] : ['10:00-11:00'];
     }
     push @pool, $C->new(zone => ($i % 2 ? 'UTC' : 'Asia/Tokyo'), hours => \%hours, holidays => \@hol, weekend => ($i % 4 == 0 ? [5, 6] : [6, 7]));
+    push @pool, $C->new(zone => ($i % 2 ? 'America/New_York' : 'Europe/London'), hours => \%hours, holidays => \@hol, weekend => ($i % 4 == 0 ? [5, 6] : [6, 7]), reckon => 'elapsed');
 }
 
 sub T { Time::Keeper->from_epoch($_[0], zone => 'UTC') }
@@ -55,7 +58,7 @@ sub walk_plus {
     my ($b, $a, $n) = @_;
     my $t = $b->next_open(T($a))->epoch;
     return $t if $n == 0;
-    my $day = T($t)->in_zone($b->zone)->to_date;
+    my $day = T($t)->in_zone($b->zone)->to_date->plus(days => -1);
     while (1) {
         for my $span ($b->business_hours_on($day)) {
             my ($o, $c) = ($span->[0]->epoch, $span->[1]->epoch);

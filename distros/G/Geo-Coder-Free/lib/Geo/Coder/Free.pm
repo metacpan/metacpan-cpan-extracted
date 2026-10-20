@@ -7,10 +7,11 @@ use autodie qw(:all);
 use Carp;
 use Config::Auto;
 use Geo::Coder::Free::Local;
+use Geo::Coder::Free::MissCache;
 use Geo::Coder::Free::MaxMind;
 use Geo::Coder::Free::OpenAddresses;
 use Geo::Coder::Free::Utils qw(_abbreviate _normalize);
-use Geo::Coder::Free::Validate qw(_valid_location);
+use Geo::Location::Predicate qw(_valid_location);
 use Object::Configure;
 use Params::Get;
 use Readonly;
@@ -22,11 +23,11 @@ Geo::Coder::Free - Geocoding using free, locally-hosted databases
 
 =head1 VERSION
 
-Version 0.47
+Version 0.48
 
 =cut
 
-our $VERSION = '0.47';
+our $VERSION = '0.48';
 
 =encoding utf-8
 
@@ -147,7 +148,18 @@ Readonly::Scalar my $CONF_REGEX   => 0.7;
 # The keys geocode_many() answers with besides the values themselves.  The map
 # and the counts share one hashref, so a value spelled like one of these would
 # overwrite what the name stands for, and it is refused by name instead
-Readonly::Array my @RESULT_KEYS => qw(lookups resolved unresolved unresolved_values);
+Readonly::Array my @RESULT_KEYS => qw(lookups reads resolved unresolved unresolved_values);
+
+# The backends geocode_many() reports its reads for: the slots of the facade
+# that hold them, and the name each is reported under.  The names are the short
+# vocabulary provenance() reports a result's backend in, so that the backend
+# that read a value and the backend a result came from are spelled the same way
+# and a caller can read the two together.
+Readonly::Hash my %_BACKEND_NAMES => (
+	maxmind  => 'MaxMind',
+	local    => 'Local',
+	openaddr => 'OpenAddresses',
+);
 
 # Stopwords excluded from word-window scantext searches.
 my %_COMMON_WORDS = map { $_ => 1 } qw(
@@ -275,7 +287,7 @@ It is the public form of the rule C<geocode()> applies before it touches a
 backend, so a caller working down a spreadsheet column can skip a row whose
 value is a bare number - or is empty - instead of catching the croak that
 would otherwise kill the whole run.  That rule is defined once, in
-L<Geo::Coder::Free::Validate>, and the backends apply it too: what
+L<Geo::Location::Predicate>, and the backends apply it too: what
 C<valid_location()> refuses is refused wherever it is looked up.
 
 Only that cheap syntactic test is answered.  A true result means the string is
@@ -471,7 +483,7 @@ sub geocode {
 		unless $on_error eq 'croak' || $on_error eq 'undef';
 
 	# Reject pure-numeric inputs early — they are never valid addresses.
-	# The rule is Geo::Coder::Free::Validate's, the same one the backends
+	# The rule is Geo::Location::Predicate's, the same one the backends
 	# apply, and valid_location() answers it in public, so a caller can
 	# pre-filter with it and never reach this croak at all.
 	if (defined($params{'location'}) && !_valid_location($params{'location'})) {
@@ -642,11 +654,11 @@ sub geocode {
 
 The loop a batch caller writes around C<geocode()>, run for it: one lookup per
 B<distinct> value, with the same options and the same results, plus the counts
-that caller would otherwise keep itself - how many values were looked up, how
-many resolved, how many did not, and which ones
+that caller would otherwise keep itself - how many values made a backend read,
+how many resolved, how many did not, which ones, and which backend read for them
 
 The hashref returned holds one entry per distinct value given, keyed by the
-value, plus four keys of its own:
+value, plus five keys of its own:
 
 =over 4
 
@@ -656,17 +668,29 @@ a caller walking a column can look each row up without first asking whether the
 batch covered it.  An C<undef> in the input has no key of its own and shares the
 entry of the empty string, which is not a location either.
 
-=item * C<lookups> - how many values were looked up: one per distinct value this
-module agreed to query a backend for.  A value it refuses before any backend is
-touched - a bare number, C<''>, C<undef>, a reference - is not looked up, so it
-is not counted, which is what makes this the number a caller caps its work by.
-A value repeated in the batch is one lookup.  A lookup that is counted may still
-be answered without reading a database: the backends cache their answers, and
-OpenAddresses remembers the values it has already missed for the life of the
-process (C<%unknown_locations>, shared across instances and cannot be cleared), so
-this is the number of lookups asked for rather than of rows read.  A later batch
-in the same process is answered from those caches and does correspondingly less
-work.
+=item * C<lookups> - how many distinct values made a backend read to answer
+them: one per value, however many backends looked at it.  A value the module
+refuses before any backend is touched - a bare number, C<''>, C<undef>, a
+reference - is not counted, and neither is a value a backend answered from a
+cache or from a hand-curated entry, because nothing was read for it.  This is
+what makes the count the work a caller is capping rather than the work it asked
+for.  A value repeated in the batch is one lookup.  Every backend reports its
+reads through C<reads()>, and a value every backend has already missed is
+remembered in L<Geo::Coder::Free::MissCache>, one process-level cache that all
+backends and instances share, whose entries expire after an hour and can be
+emptied early with L</clear_miss_cache>.  A later batch in the same process is
+answered from those caches and so reports the reads it needed, often none, in
+place of the ones the first batch made.
+
+=item * C<reads> - how many reads each backend made for the batch, keyed by the
+name C<provenance()> reports that backend under: C<MaxMind>, C<Local> or
+C<OpenAddresses>.  Every backend the object holds is named, at zero for one that
+read nothing, so a batch answered from a cache names its backends at zero rather
+than naming none.  C<lookups> counts values and this counts reads - a value that
+made two backends read is one lookup and a read for each of them, so these
+numbers can add up to more than C<lookups> - and the two vocabularies are the
+same, so a caller can put the backend that read a value beside the backend a
+result came from.
 
 =item * C<resolved> - how many distinct values produced a point.
 
@@ -681,7 +705,7 @@ themselves are C<unresolved_values>.
 =back
 
 C<resolved> and C<unresolved> always add up to the number of distinct values
-given, and the four keys above are reserved: a value equal to one of them is
+given, and the five keys above are reserved: a value equal to one of them is
 refused by name, before anything is looked up, rather than allowed to overwrite
 a count.
 
@@ -716,6 +740,7 @@ the same handful of places thousands of times costs the handful of lookups.
     { type => 'hashref' }
     #   $result->{$value}            => { isa => 'Geo::Location::Point', optional => 1 }
     #   $result->{lookups}           => { type => 'integer' }
+    #   $result->{reads}             => { type => 'hashref' }
     #   $result->{resolved}          => { type => 'integer' }
     #   $result->{unresolved}        => { type => 'integer' }
     #   $result->{unresolved_values} => { type => 'arrayref' }
@@ -727,7 +752,7 @@ the same handful of places thousands of times costs the handful of lookups.
     invalid location to geocode()   A value refused under on_error => 'croak', with the
                                     message geocode() gives for that value.
     on_error must be ...            on_error is neither 'croak' nor 'undef'.
-    <value> is one of the keys ...  A value spelled like one of the four returned keys.
+    <value> is one of the keys ...  A value spelled like one of the five returned keys.
 
 =head3 EXAMPLE
 
@@ -743,6 +768,12 @@ the same handful of places thousands of times costs the handful of lookups.
         $batch->{'resolved'},
         $batch->{'resolved'} + $batch->{'unresolved'},
         $batch->{'lookups'};        # 4 distinct places, 2 of them looked up
+
+    # Which backend did the reading, and which answered from a cache: a backend
+    # at zero answered nothing by reading.
+    while (my ($backend, $reads) = each %{$batch->{'reads'}}) {
+        print "$backend read $reads times\n";
+    }
 
     for my $place ($batch->{'unresolved_values'}) {
         warn "no coordinates for '" . (defined($place) ? $place : '') . "'\n";
@@ -794,6 +825,7 @@ sub geocode_many {
 
 	my %results = map { $_ => 0 } @RESULT_KEYS;
 	$results{'unresolved_values'} = [];
+	$results{'reads'} = {};
 
 	# A batch is a set: a value repeated in the input is looked up once, and
 	# every row holding it is keyed to the same object.
@@ -806,16 +838,32 @@ sub geocode_many {
 
 		# What geocode() makes of this value on this setting is asked of
 		# geocode() rather than written out again here: the guard, its message and
-		# the choice of backend are all its own.
+		# the choice of backend are all its own.  The backends' read counters are
+		# taken around the call, so the value is counted as a lookup only if one of
+		# them actually read: a value answered from a cache, or from a hand-curated
+		# entry, is not counted as work the batch did not do.  Taking them per
+		# backend rather than in total says which backend read, and which answered
+		# from somewhere else: a read is added to the name of the backend that made
+		# it, so a value two backends read through is one lookup and a read each.
+		my $reads_before = $self->_backend_reads();
 		my $point = $self->geocode(
 			location => $key,
 			defined($region) ? (region => $region) : (),
 			on_error => $on_error,
 		);
+		my $reads_after = $self->_backend_reads();
+
+		my $read = 0;
+		foreach my $backend (keys %{$reads_after}) {
+			my $reads = $reads_after->{$backend} - ($reads_before->{$backend} // 0);
+			next unless $reads > 0;
+			$results{'reads'}{$backend} += $reads;
+			$read += $reads;
+		}
 
 		# A value the module refuses is not a lookup: it never reached a backend,
 		# so it does not count against the work a caller is capping.
-		$results{'lookups'}++ if _valid_location($key);
+		$results{'lookups'}++ if _valid_location($key) && $read;
 		$results{$key} = $point;
 
 		if (defined($point)) {
@@ -826,7 +874,61 @@ sub geocode_many {
 		}
 	}
 
+	# A backend that read nothing is reported as well, at zero: what a caller is
+	# asking is which backend read and which answered from a cache, and a backend
+	# left out of the answer cannot be told from one that answered from one.
+	# Local is built the first time a lookup falls through to it, so it appears
+	# once it has been consulted, whether or not it found anything.
+	foreach my $backend (keys %{$self->_backend_reads()}) {
+		$results{'reads'}{$backend} //= 0;
+	}
+
 	return \%results;
+}
+
+# How much reading each backend has done so far, by the name it is reported
+# under.  Counters rather than flags: the change across a call says which
+# backend read for that value, and a backend that was never called cannot leave
+# a stale flag behind.  A backend object may not exist yet - Local is built on
+# first use - and a test may hand the facade a stand-in, so each slot is asked
+# only if it holds something that can answer.
+sub _backend_reads {
+	my $self = shift;
+
+	my %reads;
+	foreach my $slot (sort keys %_BACKEND_NAMES) {
+		my $backend = $self->{$slot} or next;
+		next unless Scalar::Util::blessed($backend) && $backend->can('reads');
+		$reads{$_BACKEND_NAMES{$slot}} = $backend->reads() // 0;
+	}
+
+	return \%reads;
+}
+
+=head2 clear_miss_cache
+
+    Geo::Coder::Free->clear_miss_cache();
+    $geo->clear_miss_cache();
+    Geo::Coder::Free->clear_miss_cache('OpenAddresses');
+
+Forgets the lookups that found nothing.  Each backend remembers a miss in
+L<Geo::Coder::Free::MissCache>, one process-level cache that every backend and
+every instance shares, so an address that is not in the data is searched for
+once per process rather than once per call.  Entries expire after an hour; this
+method empties them now, for a caller that has rebuilt a database or downloaded
+a data set while the process is running.
+
+With a scope - C<OpenAddresses>, C<Local> or C<MaxMind> - only that backend's
+entries go; C<OpenAddresses> covers every OpenAddresses directory this process
+has opened.  Returns true.
+
+=cut
+
+sub clear_miss_cache {
+	# The invocant is $_[0] and is not needed; anything after it is the scope.
+	Geo::Coder::Free::MissCache->clear(@_ > 1 ? $_[1] : undef);
+
+	return 1;
 }
 
 =head2 provenance
@@ -986,7 +1088,7 @@ sub run {
 # -----------------------------------------------------------------------
 
 # The rule geocode() rejects on - whether a string could be a location at all -
-# is defined in Geo::Coder::Free::Validate, and imported above.  It is not
+# is defined in Geo::Location::Predicate, and imported above.  It is not
 # written out here as well: the backends ask the same question of what a caller
 # hands them, so one definition is what keeps valid_location(), the guard that
 # croaks and the backends from disagreeing about it.
@@ -1056,7 +1158,7 @@ sub _resolve_scan_candidates {
 # Purpose:  Slide a window of $n words across $text and return all comma-joined
 #           n-grams, excluding pure-numeric tokens and stopwords.  A token of
 #           digits only is not a word of a place name, which is the question
-#           Geo::Coder::Free::Validate::_valid_location() answers, so it is asked
+#           Geo::Location::Predicate::_valid_location() answers, so it is asked
 #           there rather than spelled out here (t/location-rule.t fails if the
 #           rule is written out again).
 #           Replaces the former _find_word_triplets ($n=3) and

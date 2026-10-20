@@ -10,7 +10,7 @@ BEGIN {
 	use Exporter ();
 	use vars     qw ($VERSION @ISA @EXPORT @EXPORT_OK);
 
-	$VERSION = 2.1126;
+	$VERSION = 2.1129;
 	@ISA     = qw (Exporter);
 	@EXPORT  = qw (unpackCopygroup cpyOccurs);
 }

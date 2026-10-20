@@ -1,0 +1,117 @@
+#!/usr/bin/env perl
+# tools/wordcheck --locale fr
+#
+# What a locale's lexicon looks like from the outside: the normalised phrases
+# that mean more than one thing (the grammar must resolve them), the counted
+# patterns whose literal is a prefix of another's, and the forward check that
+# every pattern reads back its own output at a handful of counts. Exit 0 when
+# the forward check is clean; ties and prefixes are reported, not failed.
+use 5.010;
+use strict;
+use warnings;
+use utf8;
+use Getopt::Long;
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+use Time::Keeper;
+use Time::Keeper::Natural::Lexicon;
+binmode STDOUT, ':encoding(UTF-8)';
+
+my %opt;
+GetOptions(\%opt, 'locale=s', 'quiet') or die "usage: wordcheck --locale CODE [--quiet]\n";
+die "--locale is required\n" unless $opt{locale};
+
+my $L = 'Time::Keeper::Locale';
+my $lex = Time::Keeper::Natural::Lexicon->for($opt{locale});
+my $code = $lex->code;
+print "$code: ", ($lex->spaceless ? 'spaceless' : 'spaced'), "\n";
+
+my $ties = $lex->ties;
+for my $k (sort keys %$ties) {
+    unless ($opt{quiet}) {
+        my @m;
+        for my $m (@{ $ties->{$k} }) { push @m, join ' ', map { "$_=$m->{$_}" } grep { exists $m->{$_} } qw(field n weekday month period) }
+        print "tie: '$k' = ", join(' | ', @m), "\n";
+    }
+}
+print scalar(keys %$ties), " ties\n";
+
+my @prefixes = $lex->prefixes;
+my $overlaps = 0;
+for my $a (@prefixes) {
+    next if $a eq '';
+    for my $b (@prefixes) {
+        next if $a eq $b || length $b <= length $a;
+        next unless substr($b, 0, length $a) eq $a;
+        $overlaps++;
+        print "prefix: '$a' is a prefix of '$b'\n" unless $opt{quiet};
+    }
+}
+print "$overlaps prefix overlaps\n";
+
+my @digits = $L->digits($code);
+my %FIXED = (zero => 0, one => 1, two => 2);
+my ($asks, @bad) = (0);
+for my $f (qw(year quarter month week day hour minute second mon tue wed thu fri sat sun)) {
+    for my $w (qw(long short narrow)) {
+        my $r = $L->relative_names($code, $f, $w);
+        for my $k (keys %{ $r->{at} }) {
+            $asks++;
+            push @bad, "$f $w at $k '$r->{at}{$k}'" unless grep { ($_->{field} || '') eq $f && $_->{n} == $k } $lex->fixed($r->{at}{$k});
+        }
+        for my $dir ([future => 1], [past => -1]) {
+            my ($d, $sign) = @$dir;
+            for my $cat (sort keys %{ $r->{$d} }) {
+                my $p = $r->{$d}{$cat};
+                for my $c (0, 1, 2, 3, 5, 11, 21) {
+                    $asks++;
+                    if ($p =~ /\{0\}/) {
+                        (my $s = $p) =~ s/\{0\}/join '', map { $digits[$_] } split m{}, $c/e;
+                        push @bad, "$f $w $d $cat '$s'" unless grep { ($_->{field} || '') eq $f && $_->{n} == $sign * $c } $lex->counted($s);
+                    }
+                    else {
+                        push @bad, "$f $w $d $cat '$p'" unless grep { ($_->{field} || '') eq $f && $_->{n} == $sign * $FIXED{$cat} } $lex->fixed($p);
+                        last;
+                    }
+                }
+            }
+        }
+    }
+}
+print "forward check: $asks asks, ", scalar(@bad), " misses\n";
+print "  $_\n" for @bad;
+
+# The word table, where the locale has one.
+require Time::Keeper::Natural;
+require Time::Keeper::Natural::Words;
+my $w = eval { Time::Keeper::Natural::Words->for($code) };
+if ($@) { print "word table: REFUSED: $@"; exit 1 }
+if ($w) {
+    print "word table: ", $w->file, "\n";
+    for my $key ($w->keys) {
+        my @p = $w->phrases($key);
+        print "  $key: ", (@p ? join(' | ', @p) : '(none needed)'), "\n" unless $opt{quiet};
+        for my $p (@p) {
+            my $k = $lex->normalise($p);
+            my @pre = grep { length $_ > length $k && substr($_, 0, length $k) eq $k } $lex->phrases;
+            print "  prefix: '$p' begins the CLDR word(s) ", join(', ', map { "'$_'" } @pre), "\n" if @pre && !$opt{quiet};
+        }
+    }
+    my $anchor = Time::Keeper->new(year => 2026, month => 10, day => 15, hour => 9, zone => 'Europe/London', locale => $w->code);
+    local $Time::Keeper::CLOCK = $anchor;
+    my $n = Time::Keeper::Natural->new(zone => 'Europe/London', locale => $w->code);
+    print "  (the test lines run in ", $w->code, ", the file's locale)\n" if $w->code ne $code;
+    my ($ran, @miss) = (0);
+    for my $t ($w->tests) {
+        $ran++;
+        my $got = eval { $t->[1] =~ m{ / } ? join(' / ', $n->parse_interval($t->[0])) : '' . $n->parse($t->[0]) };
+        push @miss, "'$t->[0]' => " . ($got // "died: $@") . " (wanted $t->[1])" unless defined $got && $got eq $t->[1];
+    }
+    print "word table tests: $ran run, ", scalar(@miss), " misses\n";
+    print "  $_\n" for @miss;
+    push @bad, @miss;
+}
+else {
+    print "word table: none (coverage data)\n";
+}
+exit(@bad ? 1 : 0);

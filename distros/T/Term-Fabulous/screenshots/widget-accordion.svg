@@ -22,28 +22,28 @@
 <rect x="156" y="114" width="126" height="18" fill="#242830"/>
 <rect x="156" y="132" width="54" height="18" fill="#242830"/>
 <rect x="390" y="86" width="324" height="1" fill="#6c7078"/>
-<rect x="385" y="96" width="1" height="36" fill="#6c7078"/>
-<rect x="718" y="96" width="1" height="36" fill="#6c7078"/>
-<rect x="390" y="140" width="324" height="1" fill="#6c7078"/>
-<rect x="390" y="176" width="324" height="1" fill="#6c7078"/>
-<rect x="385" y="186" width="1" height="18" fill="#6c7078"/>
-<rect x="718" y="186" width="1" height="18" fill="#6c7078"/>
-<rect x="390" y="212" width="324" height="1" fill="#6c7078"/>
-<rect x="390" y="248" width="324" height="1" fill="#6c7078"/>
-<rect x="385" y="258" width="1" height="54" fill="#6c7078"/>
-<rect x="718" y="258" width="1" height="54" fill="#6c7078"/>
+<rect x="385" y="96" width="1" height="54" fill="#6c7078"/>
+<rect x="718" y="96" width="1" height="54" fill="#6c7078"/>
+<rect x="390" y="158" width="324" height="1" fill="#6c7078"/>
+<rect x="390" y="194" width="324" height="1" fill="#6c7078"/>
+<rect x="385" y="204" width="1" height="18" fill="#6c7078"/>
+<rect x="718" y="204" width="1" height="18" fill="#6c7078"/>
+<rect x="390" y="230" width="324" height="1" fill="#6c7078"/>
+<rect x="390" y="266" width="324" height="1" fill="#6c7078"/>
+<rect x="385" y="276" width="1" height="36" fill="#6c7078"/>
+<rect x="718" y="276" width="1" height="36" fill="#6c7078"/>
 <rect x="390" y="320" width="324" height="1" fill="#6c7078"/>
 </g>
 <polyline points="385.5 96 385.5 91 385.538 90.413 385.653 89.835 385.843 89.278 386.103 88.75 386.43 88.261 386.818 87.818 387.261 87.43 387.75 87.103 388.278 86.843 388.835 86.653 389.413 86.538 390 86.5 390 86.5" fill="none" stroke="#6c7078" stroke-width="1" stroke-linejoin="round"/>
 <polyline points="718.5 96 718.5 91 718.462 90.413 718.347 89.835 718.157 89.278 717.897 88.75 717.57 88.261 717.182 87.818 716.739 87.43 716.25 87.103 715.722 86.843 715.165 86.653 714.587 86.538 714 86.5 714 86.5" fill="none" stroke="#6c7078" stroke-width="1" stroke-linejoin="round"/>
-<polyline points="385.5 132 385.5 136 385.538 136.587 385.653 137.165 385.843 137.722 386.103 138.25 386.43 138.739 386.818 139.182 387.261 139.57 387.75 139.897 388.278 140.157 388.835 140.347 389.413 140.462 390 140.5 390 140.5" fill="none" stroke="#6c7078" stroke-width="1" stroke-linejoin="round"/>
-<polyline points="718.5 132 718.5 136 718.462 136.587 718.347 137.165 718.157 137.722 717.897 138.25 717.57 138.739 717.182 139.182 716.739 139.57 716.25 139.897 715.722 140.157 715.165 140.347 714.587 140.462 714 140.5 714 140.5" fill="none" stroke="#6c7078" stroke-width="1" stroke-linejoin="round"/>
-<polyline points="385.5 186 385.5 181 385.538 180.413 385.653 179.835 385.843 179.278 386.103 178.75 386.43 178.261 386.818 177.818 387.261 177.43 387.75 177.103 388.278 176.843 388.835 176.653 389.413 176.538 390 176.5 390 176.5" fill="none" stroke="#6c7078" stroke-width="1" stroke-linejoin="round"/>
-<polyline points="718.5 186 718.5 181 718.462 180.413 718.347 179.835 718.157 179.278 717.897 178.75 717.57 178.261 717.182 177.818 716.739 177.43 716.25 177.103 715.722 176.843 715.165 176.653 714.587 176.538 714 176.5 714 176.5" fill="none" stroke="#6c7078" stroke-width="1" stroke-linejoin="round"/>
-<polyline points="385.5 204 385.5 208 385.538 208.587 385.653 209.165 385.843 209.722 386.103 210.25 386.43 210.739 386.818 211.182 387.261 211.57 387.75 211.897 388.278 212.157 388.835 212.347 389.413 212.462 390 212.5 390 212.5" fill="none" stroke="#6c7078" stroke-width="1" stroke-linejoin="round"/>
-<polyline points="718.5 204 718.5 208 718.462 208.587 718.347 209.165 718.157 209.722 717.897 210.25 717.57 210.739 717.182 211.182 716.739 211.57 716.25 211.897 715.722 212.157 715.165 212.347 714.587 212.462 714 212.5 714 212.5" fill="none" stroke="#6c7078" stroke-width="1" stroke-linejoin="round"/>
-<polyline points="385.5 258 385.5 253 385.538 252.413 385.653 251.835 385.843 251.278 386.103 250.75 386.43 250.261 386.818 249.818 387.261 249.43 387.75 249.103 388.278 248.843 388.835 248.653 389.413 248.538 390 248.5 390 248.5" fill="none" stroke="#6c7078" stroke-width="1" stroke-linejoin="round"/>
-<polyline points="718.5 258 718.5 253 718.462 252.413 718.347 251.835 718.157 251.278 717.897 250.75 717.57 250.261 717.182 249.818 716.739 249.43 716.25 249.103 715.722 248.843 715.165 248.653 714.587 248.538 714 248.5 714 248.5" fill="none" stroke="#6c7078" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="385.5 150 385.5 154 385.538 154.587 385.653 155.165 385.843 155.722 386.103 156.25 386.43 156.739 386.818 157.182 387.261 157.57 387.75 157.897 388.278 158.157 388.835 158.347 389.413 158.462 390 158.5 390 158.5" fill="none" stroke="#6c7078" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="718.5 150 718.5 154 718.462 154.587 718.347 155.165 718.157 155.722 717.897 156.25 717.57 156.739 717.182 157.182 716.739 157.57 716.25 157.897 715.722 158.157 715.165 158.347 714.587 158.462 714 158.5 714 158.5" fill="none" stroke="#6c7078" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="385.5 204 385.5 199 385.538 198.413 385.653 197.835 385.843 197.278 386.103 196.75 386.43 196.261 386.818 195.818 387.261 195.43 387.75 195.103 388.278 194.843 388.835 194.653 389.413 194.538 390 194.5 390 194.5" fill="none" stroke="#6c7078" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="718.5 204 718.5 199 718.462 198.413 718.347 197.835 718.157 197.278 717.897 196.75 717.57 196.261 717.182 195.818 716.739 195.43 716.25 195.103 715.722 194.843 715.165 194.653 714.587 194.538 714 194.5 714 194.5" fill="none" stroke="#6c7078" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="385.5 222 385.5 226 385.538 226.587 385.653 227.165 385.843 227.722 386.103 228.25 386.43 228.739 386.818 229.182 387.261 229.57 387.75 229.897 388.278 230.157 388.835 230.347 389.413 230.462 390 230.5 390 230.5" fill="none" stroke="#6c7078" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="718.5 222 718.5 226 718.462 226.587 718.347 227.165 718.157 227.722 717.897 228.25 717.57 228.739 717.182 229.182 716.739 229.57 716.25 229.897 715.722 230.157 715.165 230.347 714.587 230.462 714 230.5 714 230.5" fill="none" stroke="#6c7078" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="385.5 276 385.5 271 385.538 270.413 385.653 269.835 385.843 269.278 386.103 268.75 386.43 268.261 386.818 267.818 387.261 267.43 387.75 267.103 388.278 266.843 388.835 266.653 389.413 266.538 390 266.5 390 266.5" fill="none" stroke="#6c7078" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="718.5 276 718.5 271 718.462 270.413 718.347 269.835 718.157 269.278 717.897 268.75 717.57 268.261 717.182 267.818 716.739 267.43 716.25 267.103 715.722 266.843 715.165 266.653 714.587 266.538 714 266.5 714 266.5" fill="none" stroke="#6c7078" stroke-width="1" stroke-linejoin="round"/>
 <polyline points="385.5 312 385.5 316 385.538 316.587 385.653 317.165 385.843 317.722 386.103 318.25 386.43 318.739 386.818 319.182 387.261 319.57 387.75 319.897 388.278 320.157 388.835 320.347 389.413 320.462 390 320.5 390 320.5" fill="none" stroke="#6c7078" stroke-width="1" stroke-linejoin="round"/>
 <polyline points="718.5 312 718.5 316 718.462 316.587 718.347 317.165 718.157 317.722 717.897 318.25 717.57 318.739 717.182 319.182 716.739 319.57 716.25 319.897 715.722 320.157 715.165 320.347 714.587 320.462 714 320.5 714 320.5" fill="none" stroke="#6c7078" stroke-width="1" stroke-linejoin="round"/>
 <g class="terminal">
@@ -58,15 +58,15 @@
 <text x="408" y="128" textLength="243" fill="#c8cdd7">A toolkit for terminal user</text>
 <text x="66" y="146" textLength="36" fill="#c8cdd7">Port</text>
 <text x="156" y="146" textLength="27" fill="#dcdfe4">443</text>
+<text x="408" y="146" textLength="171" fill="#c8cdd7">interfaces in Perl.</text>
 <text x="52.5" y="164" text-anchor="middle" fill="#dcdfe4">▸</text>
 <text x="66" y="164" textLength="45" class="b" fill="#dcdfe4">Users</text>
 <text x="52.5" y="182" text-anchor="middle" fill="#6c7078">▸</text>
 <text x="66" y="182" textLength="72" class="b" fill="#6c7078">Licenses</text>
-<text x="390" y="200" textLength="324" fill="#dcdfe4">Does the mouse work?               +</text>
-<text x="390" y="272" textLength="126" fill="#dcdfe4">Can I use KDL?</text>
-<text x="705" y="272" textLength="9" fill="#61afef">-</text>
-<text x="408" y="290" textLength="288" fill="#c8cdd7">Every widget can be built from a</text>
-<text x="408" y="308" textLength="108" fill="#c8cdd7">layout file.</text>
+<text x="390" y="218" textLength="324" fill="#dcdfe4">Does the mouse work?               +</text>
+<text x="390" y="290" textLength="126" fill="#dcdfe4">Can I use KDL?</text>
+<text x="705" y="290" textLength="9" fill="#61afef">-</text>
+<text x="408" y="308" textLength="288" fill="#c8cdd7">Every widget can be built from a</text>
 </g>
 <g shape-rendering="crispEdges">
 </g>

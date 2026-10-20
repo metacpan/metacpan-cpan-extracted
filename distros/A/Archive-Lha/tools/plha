@@ -390,14 +390,14 @@ sub _header_date {
     my ($h) = @_;
     return $h->{timestamp_is_unix}
         ? strftime("%d-%b-%y", localtime($h->{timestamp}))
-        : strftime("%d-%b-%y", Archive::Lha::Header::Utils::dostime_fields($h->{timestamp}));
+        : strftime("%d-%b-%y", Archive::Lha::Header::Utils::_dostime_fields($h->{timestamp}));
 }
 
 sub _header_time {
     my ($h) = @_;
     return $h->{timestamp_is_unix}
         ? strftime("%T", localtime($h->{timestamp}))
-        : strftime("%T", Archive::Lha::Header::Utils::dostime_fields($h->{timestamp}));
+        : strftime("%T", Archive::Lha::Header::Utils::_dostime_fields($h->{timestamp}));
 }
 
 # ls-style date from Unix epoch (stat mtime etc)

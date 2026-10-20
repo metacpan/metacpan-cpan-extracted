@@ -5,7 +5,7 @@ use warnings;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 use Object::Pad 0.825;
 
@@ -32,22 +32,23 @@ Term::Fabulous::Event::Close - A dialog, a toast or a popup menu went away
 
 =head1 DESCRIPTION
 
-A L<Term::Fabulous::Widget::Dialog> fires C<Close> on itself when it
-closes, whether the user pressed C<Escape> or the program called
-C<< $dialog->close >>. When the listeners run, the dialog is no longer
-part of the widget tree, and the keyboard focus has gone back to the
-widget that had it before the dialog opened, if that widget can still
-take the focus.
+A L<Term::Fabulous::Widget::Dialog> (a Prompt, a FileDialog, a
+KeyReference included) fires C<Close> on itself whenever it closes: when
+a button or the C<answer> method answers it, when the user presses
+C<Escape>, or when the program calls C<< $dialog->close >>. C<Answer>
+(L<Term::Fabulous::Event::Answer>) follows right after. When the
+listeners run, the dialog is no longer part of the widget tree, and the
+keyboard focus has gone back to the widget that had it before the dialog
+opened, if that widget can still take the focus.
 
 A L<Term::Fabulous::Widget::Toast> fires it on itself when it goes
 away: when its timeout runs out, when the user clicks its close mark,
 or when the program calls C<< $toast->hide >>.
 
-A L<Term::Fabulous::Widget::Menu> that was opened as a popup fires it
-on itself when it closes: when the user chooses an item, presses
-C<Escape> or moves the focus elsewhere, or when the program calls
-C<< $menu->close >>. A L<Term::Fabulous::Widget::Prompt> fires it like
-every dialog, before its C<Answer>.
+A L<Term::Fabulous::Widget::Menu> that was opened as a popup fires it on
+itself when it closes: when the user chooses an item, presses C<Escape>
+or moves the focus elsewhere, or when the program calls
+C<< $menu->close >>.
 
 The event has no fields of its own; C<< $event->target >> is the
 dialog, the toast or the menu. It is a L<Clay::UI::Events::Event>

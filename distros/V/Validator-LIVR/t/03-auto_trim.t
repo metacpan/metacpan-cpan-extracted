@@ -11,6 +11,7 @@ use Validator::LIVR;
 my $validator = Validator::LIVR->new({
     code           => 'required',
     password       => ['required', { min_length => 3 }],
+    list           => { list_of => ['string'] },
     address        => { nested_object  => {
         street   => { 'min_length' => 5 },
     } }
@@ -42,6 +43,7 @@ subtest 'Validate data with automatic trim' => sub {
     ok( my $clean_data = $validator->validate({
         code => ' A ',
         password => ' 123  ',
+        list => [' aaa ', ' bbb '],
         address => {
             street   => '  hello '
         }
@@ -50,6 +52,7 @@ subtest 'Validate data with automatic trim' => sub {
     is_deeply($clean_data, {
         code     =>'A',
         password => '123',
+        list     => ['aaa', 'bbb'],
         address  => {
             street   => 'hello',
         }

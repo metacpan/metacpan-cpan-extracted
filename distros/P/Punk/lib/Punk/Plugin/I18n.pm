@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.61';
+our $VERSION = '0.62';
 
 use Punk ();
 use File::Spec ();
@@ -379,6 +379,21 @@ The consequence is worth stating plainly: B<translation files are code.> They
 are reviewed as code, deployed as code, and must not be writable by anything a
 user can reach. "Let the translators edit them in the admin" is a natural next
 request, and it converts a trusted input into an untrusted one.
+
+=head1 METHODS
+
+=head2 register($app, \%opts)
+
+Called once by C<plugin>. Reads every catalogue in C<dir> and croaks, naming
+the file, if the directory is missing or empty or a catalogue does not
+parse as a JSON object.
+
+=head2 stats
+
+    my %s = Punk::Plugin::I18n->stats;
+
+Process-wide counts of C<missing>, C<untranslated> and C<warned>; see
+L</What it counts>.
 
 =head1 SEE ALSO
 

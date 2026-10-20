@@ -4,6 +4,7 @@ use feature 'signatures';
 no warnings 'experimental::signatures';
 
 use Test2::V0;
+use Scalar::Util qw(weaken);
 
 use lib "t/lib";
 
@@ -277,6 +278,72 @@ subtest 'on() rejects bad inputs' => sub {
 	my $box = Clay::UI::Test::Box->new;
 	like( dies { $box->on('', sub { }) },        qr/non-empty string/, 'empty event name' );
 	like( dies { $box->on('X', 'nope') },        qr/coderef/,          'non-coderef handler' );
+};
+
+# -----------------------------------------------------------------------------
+# Owner-bound listeners: the owner is held weakly and passed first.
+# -----------------------------------------------------------------------------
+
+# An object that listens on a part it holds, as a widget class listens on
+# its internal children.
+package Clay::Test::PartOwner {
+	sub new ($class, $part) { return bless { part => $part, seen => [] }, $class }
+}
+
+subtest 'an owner-bound listener gets its owner and the event' => sub {
+	my $part  = Clay::UI::Test::Box->new(id => 'part');
+	my $owner = Clay::Test::PartOwner->new($part);
+	$part->on('Ping', sub ($self, $event) {
+		push @{ $self->{seen} }, [ $self, $event->current_target ];
+		return $HANDLED;
+	}, owner => $owner);
+	my $result = $part->fire_event(Clay::UI::Events::Event->new(name => 'Ping'));
+	is( $owner->{seen}, [ [ exact_ref($owner), exact_ref($part) ] ], 'the handler got the owner, then the event' );
+	ok( $result == $HANDLED, "a live handler's return value passes through" );
+};
+
+subtest 'a listener whose owner is gone is skipped and dropped' => sub {
+	my $parent = Clay::UI::Test::Box->new(id => 'parent');
+	my $part   = Clay::UI::Test::Box->new(id => 'part');
+	$parent->add_child($part);
+	my $ran = 0;
+	my $owner = Clay::Test::PartOwner->new($part);
+	$part->on('Ping', sub ($self, $event) { $ran++; return $HANDLED }, owner => $owner);
+	$part->on('Ping', sub ($event) { return $CONTINUE });
+	my @bubbled;
+	$parent->on('Ping', sub ($event) { push @bubbled, $event->current_target->id; return $CONTINUE });
+	my $call = $part->handlers_for('Ping')->[0];
+
+	my $watch = $owner;
+	weaken $watch;
+	undef $owner;
+	is( $watch, undef, 'the owner was freed: the listener keeps no reference to it' );
+
+	$part->fire_event(Clay::UI::Events::Event->new(name => 'Ping', bubble_mode => $IF_CONTINUE));
+	is( $ran, 0, 'its handler did not run' );
+	is( \@bubbled, ['parent'], 'and the event bubbled on' );
+	ok( $call->(Clay::UI::Events::Event->new(name => 'Ping')) == $CONTINUE, 'a call taken before the owner went answers CONTINUE' );
+	is( scalar @{ $part->handlers_for('Ping') }, 1, 'the entry is gone from handlers_for; the plain listener stays' );
+};
+
+subtest 'on() checks its options' => sub {
+	my $box = Clay::UI::Test::Box->new;
+	my $handler = sub ($self, $event) { return };
+	like( dies { $box->on('X', $handler, owner => 'me') }, qr/^Clay::UI::Role::Events::Listener: owner must be an object, got 'me'/, 'a non-object owner' );
+	like( dies { $box->on('X', $handler, owner => undef) }, qr/owner must be an object, got undef/, 'an undef owner' );
+	like( dies { $box->on('X', $handler, owner => {}) }, qr/owner must be an object, got HASH/, 'an unblessed reference' );
+	like( dies { $box->on('X', $handler, ownr => $box) }, qr/^Clay::UI::Role::Events::Listener: unknown option\(s\): ownr \(the only option is owner\)/, 'an unknown option' );
+	like( dies { $box->on('X', $handler, 'owner') }, qr/options must be name => value pairs/, 'an odd number of values' );
+	is( $box->handlers_for('X'), [], 'nothing was registered' );
+};
+
+subtest 'a plain listener is called with the event only' => sub {
+	my $box = Clay::UI::Test::Box->new(id => 'box');
+	my @args;
+	$box->on('Ping', sub (@got) { @args = @got; return $CONTINUE });
+	$box->fire_event(Clay::UI::Events::Event->new(name => 'Ping'));
+	is( scalar @args, 1, 'one argument' );
+	isa_ok( $args[0], 'Clay::UI::Events::Event' );
 };
 
 subtest 'fire_event() rejects non-event arg' => sub {

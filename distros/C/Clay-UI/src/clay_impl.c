@@ -6,9 +6,9 @@
  * Clay is a header-only library. The convention requires exactly one .c
  * file in the project to define CLAY_IMPLEMENTATION before including
  * clay.h; every other file includes clay.h normally and gets only the
- * declarations. The helpers below live here because struct Clay_Context,
- * the default counts and the arena routines are only visible inside the
- * implementation section. This file includes no Perl headers.
+ * declarations. The helpers below live here because struct Clay_Context
+ * and the default counts are only visible inside the implementation
+ * section. This file includes no Perl headers.
  *
  * The diagnostic suppression below silences four categories of warning
  * that Clay v0.14 emits under -Wall -Wextra. They are upstream issues
@@ -131,9 +131,32 @@ void clay_perl_clay_default_counts(int32_t *element_count, int32_t *word_count)
     *word_count    = Clay__defaultMaxMeasureTextWordCacheCount;
 }
 
+bool clay_perl_clay_open_text_element(Clay_String text, Clay_TextElementConfig config, Clay_ElementId *id)
+{
+    Clay_Context *context = Clay_GetCurrentContext();
+    int32_t index = context->layoutElements.length;
+    Clay__OpenTextElement(text, config);
+    if (context->layoutElements.length == index) return false;   /* dropped at the cap */
+
+    Clay_LayoutElement *element = &context->layoutElements.internalArray[index];
+    const Clay_LayoutElementHashMapItem *item = Clay__GetHashMapItem(element->id);
+    if (item->layoutElement != element) return false;
+    *id = item->elementId;
+    return true;
+}
+
 bool clay_perl_clay_max_elements_exceeded(void)
 {
     return Clay_GetCurrentContext()->booleanWarnings.maxElementsExceeded;
+}
+
+int32_t clay_perl_clay_declarable_elements(void)
+{
+    Clay_Context *context = Clay_GetCurrentContext();
+    if (context->booleanWarnings.maxElementsExceeded) return 0;
+    int32_t free_slots = context->layoutElements.capacity - 1 - context->exitingElementsLength
+                       - context->layoutElements.length;
+    return free_slots > 0 ? free_slots : 0;
 }
 
 bool clay_perl_clay_scroll_container_declared(uint32_t element_id)
@@ -162,23 +185,46 @@ void clay_perl_clay_cancel_scroll_momentum(uint32_t element_id)
     }
 }
 
-/* Clay_MinMemorySize() for explicit counts. Exact while every array fits
- * Clay's 32-bit size arithmetic, which holds for the small counts the
- * upper-bound computation below uses. */
-static uint64_t min_memory_size_for(int32_t element_count, int32_t word_count)
+/* Clay_MinMemorySize and Clay_Initialize read the counts of the current
+ * context or, with none, Clay's process-wide defaults. Both helpers below
+ * hand them explicit counts that way: they make the counts the defaults,
+ * call Clay with no current context and put the defaults back. No Perl
+ * code can change the defaults meanwhile (the callbacks Clay_Initialize
+ * may run cannot call the setters), so they always come back. */
+typedef struct {
+    int32_t element_count;
+    int32_t word_count;
+} default_counts;
+
+static default_counts swap_default_counts(default_counts counts)
 {
-    Clay_Context fake_context = {
-        .maxElementCount = element_count,
-        .maxMeasureTextCacheWordCount = word_count,
-        .internalArena = {
-            .capacity = SIZE_MAX,
-            .memory = NULL,
-        }
-    };
-    Clay__Context_Allocate_Arena(&fake_context.internalArena);
-    Clay__InitializePersistentMemory(&fake_context);
-    Clay__InitializeEphemeralMemory(&fake_context);
-    return (uint64_t) fake_context.internalArena.nextAllocation + 128;
+    default_counts previous = { Clay__defaultMaxElementCount, Clay__defaultMaxMeasureTextWordCacheCount };
+    Clay__defaultMaxElementCount              = counts.element_count;
+    Clay__defaultMaxMeasureTextWordCacheCount = counts.word_count;
+    return previous;
+}
+
+uint32_t clay_perl_clay_min_memory_size(int32_t element_count, int32_t word_count)
+{
+    default_counts counts = { element_count, word_count };
+    Clay_Context *current = Clay_GetCurrentContext();
+    default_counts previous = swap_default_counts(counts);
+    Clay_SetCurrentContext(NULL);
+    uint32_t size = Clay_MinMemorySize();
+    Clay_SetCurrentContext(current);
+    swap_default_counts(previous);
+    return size;
+}
+
+Clay_Context *clay_perl_clay_initialize(Clay_Arena arena, Clay_Dimensions dimensions, Clay_ErrorHandler handler,
+                                        int32_t element_count, int32_t word_count)
+{
+    default_counts counts = { element_count, word_count };
+    default_counts previous = swap_default_counts(counts);
+    Clay_SetCurrentContext(NULL);
+    Clay_Context *context = Clay_Initialize(arena, dimensions, handler);
+    swap_default_counts(previous);
+    return context;
 }
 
 /* Bytes the sizing-group patch spends beyond 2 x element_count int32 slots:
@@ -201,9 +247,9 @@ static uint64_t sizing_group_slot_rounding(int32_t element_count)
  * for arbitrary counts. */
 uint64_t clay_perl_clay_arena_bytes_upper_bound(int32_t element_count, int32_t word_count)
 {
-    uint64_t base        = min_memory_size_for(64, 64);
-    uint64_t per_element = (min_memory_size_for(128, 64) - base) / 64;
-    uint64_t per_word    = (min_memory_size_for(64, 128) - base) / 64;
+    uint64_t base        = clay_perl_clay_min_memory_size(64, 64);
+    uint64_t per_element = (clay_perl_clay_min_memory_size(128, 64) - base) / 64;
+    uint64_t per_word    = (clay_perl_clay_min_memory_size(64, 128) - base) / 64;
     uint64_t fixed       = base - 64 * per_element - 64 * per_word;
 
     return fixed

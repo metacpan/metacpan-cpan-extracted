@@ -470,14 +470,14 @@ subtest 'onload_render: calling twice produces identical output' => sub {
 
 # ─────────────────────────────────────────────────────────────────────────────
 # 18. _js_string() — standalone CR without LF
-#     The regex s/\r?\n/\\n/g requires a LF to match.  A bare \r (carriage
-#     return only, as produced by old Mac line endings) is NOT replaced.
-#     This documents current behavior; a future hardening pass might change it.
+#     A bare \r (carriage return only, as produced by old Mac line endings)
+#     ends a JS string literal, so it is escaped as \\r.
 # ─────────────────────────────────────────────────────────────────────────────
 
-subtest '_js_string: standalone CR (without LF) is NOT escaped' => sub {
+subtest '_js_string: standalone CR (without LF) is escaped' => sub {
 	my $got = HTML::OSM::_js_string("a\rb");
-	is($got, "a\rb", 'standalone \\r passes through unchanged (no LF → no match)');
+	is($got, 'a\\rb', 'standalone \\r becomes the two characters \\ and r');
+	is(HTML::OSM::_js_string("a\r\nb"), 'a\\nb', 'CRLF still becomes a single \\n');
 };
 
 # ─────────────────────────────────────────────────────────────────────────────

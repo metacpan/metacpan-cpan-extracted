@@ -52,7 +52,7 @@ sub draw_text {
 }
 
 is draw_text( 'abc', x => 2, y => 1 ),        [ [ 2, 1, 'a' ], [ 3, 1, 'b' ], [ 4, 1, 'c' ] ], 'drawn at the bounding box origin';
-is draw_text( 'abc', x => 2.7, y => 1.2 ),    [ [ 2, 1, 'a' ], [ 3, 1, 'b' ], [ 4, 1, 'c' ] ], 'fractional origin is floored';
+is draw_text( 'abc', x => 2.7, y => 1.2 ),    [ [ 3, 1, 'a' ], [ 4, 1, 'b' ], [ 5, 1, 'c' ] ], 'fractional origin rounds to the nearest cell';
 is draw_text( 'abcd', width => 2 ),           [ [ 0, 0, 'a' ], [ 1, 0, 'b' ] ],                'clipped at the bounding box right edge';
 is draw_text( 'abcd', x => 18, width => 10 ), [ [ 18, 0, 'a' ], [ 19, 0, 'b' ] ],              'clipped at the viewport right edge';
 is draw_text( 'abc', x => -1 ),               [ [ 0, 0, 'b' ], [ 1, 0, 'c' ] ],                'clusters left of the viewport are skipped';

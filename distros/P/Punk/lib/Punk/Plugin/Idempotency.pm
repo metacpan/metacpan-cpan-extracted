@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Punk ();
 
-our $VERSION = '0.61';
+our $VERSION = '0.62';
 
 1;
 
@@ -246,6 +246,13 @@ L<Punk::Plugin::ConditionalGet>.
 
 A request with no C<Idempotency-Key> proceeds normally. Requiring one is
 an API design decision you make in a guard, not one a plugin imposes.
+
+=head1 METHODS
+
+=head2 register($app, \%opts)
+
+Called once by C<plugin> with the L</OPTIONS>. Croaks without a C<scope>,
+and on an option it does not know.
 
 =head1 SEE ALSO
 

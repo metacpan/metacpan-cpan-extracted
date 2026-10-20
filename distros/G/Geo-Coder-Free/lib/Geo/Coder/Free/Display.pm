@@ -5,7 +5,7 @@ package Geo::Coder::Free::Display;
 
 =head1 VERSION
 
-Version 0.47
+Version 0.48
 
 =cut
 
@@ -93,7 +93,7 @@ server-side form handling and do not need CSRF tokens at all:
 
 # -----------------------------------------------------------------------
 
-our $VERSION = '0.47';
+our $VERSION = '0.48';
 
 use v5.20;
 use strict;
@@ -944,27 +944,80 @@ sub _types
 	return @rc;
 }
 
-sub _generate_csrf_token($self) {
-	# Prefer an explicitly configured HMAC secret from security.csrf.secret.
-	# If absent, fall back to a per-process random secret generated at first use
-	# and warn once so the operator knows to configure a persistent one.
-	# A per-process secret is still cryptographically strong (no hardcoded value),
-	# but tokens will be invalidated whenever the FastCGI process restarts.
-	my $secret = $self->{config}->{security}->{csrf}->{secret};
-	unless(defined $secret) {
-		unless(defined $_csrf_fallback_secret) {
-			$_csrf_fallback_secret = unpack('H*', urandom(32));
-			my $config_path = $self->{config}->{config_path}
-				? join(', ', @{$self->{config}->{config_path}})
-				: 'conf/' . ($self->{info} ? ($self->{info}->domain_name() // 'unknown') : 'unknown');
-			carp "VWF: security.csrf.secret is not configured; "
-			   . 'using a per-process random secret. '
-			   . 'CSRF tokens will not survive process restarts. '
-			   . "Add <security><csrf><secret>...</secret></csrf></security> "
-			   . "to $config_path to suppress this warning.";
-		}
-		$secret = $_csrf_fallback_secret;
+=head2 csrf_secret
+
+The secret a CSRF token is signed with: the configured
+C<security.csrf.secret>, or a per-process random secret generated on first use
+when none is configured, with a warning that tokens will not survive a restart.
+Called as a class method with the configuration, or on an object, whose own
+configuration and information are used.  It is public because the page that
+checks a submitted token can only re-derive the signature, never read it back.
+
+=cut
+
+# One place knows where the secret comes from, so that the generator and the
+# checker cannot sign with different ones.  A per-process fallback is still
+# cryptographically strong, but tokens will not survive a FastCGI restart.
+sub csrf_secret
+{
+	my $self = shift;
+	my $config = shift // (ref($self) ? $self->{config} : undef);
+	my $info = ref($self) ? $self->{info} : undef;
+
+	if(my $secret = $config->{security}->{csrf}->{secret}) {
+		return $secret;
 	}
+
+	unless(defined $_csrf_fallback_secret) {
+		$_csrf_fallback_secret = unpack('H*', urandom(32));
+		my $config_path = $config->{config_path}
+			? join(', ', @{$config->{config_path}})
+			: 'conf/' . ($info ? ($info->domain_name() // 'unknown') : 'unknown');
+		carp "VWF: security.csrf.secret is not configured; "
+		   . 'using a per-process random secret. '
+		   . 'CSRF tokens will not survive process restarts. '
+		   . "Add <security><csrf><secret>...</secret></csrf></security> "
+		   . "to $config_path to suppress this warning.";
+	}
+
+	return $_csrf_fallback_secret;
+}
+
+=head2 csrf_token_valid
+
+    if(Geo::Coder::Free::Display->csrf_token_valid($token, $config)) { ... }
+
+Whether a token was issued with this configuration's secret and has not been
+altered.  The signature is compared in constant time, so an attacker cannot
+learn a valid signature one byte at a time by timing the check.
+
+=cut
+
+# A token is "timestamp:random:signature", where the signature is
+# sha256(timestamp:random:secret): one that does not parse or does not match
+# was not issued here.
+sub csrf_token_valid
+{
+	my ($self, $token, $config) = @_;
+
+	return 0 unless defined($token) && !ref($token);
+
+	my($token_data, $signature) = $token =~ /^([0-9]+:[0-9a-f]{64}):([0-9a-f]{64})$/;
+	return 0 unless defined($signature);
+
+	my $expected = sha256_hex("$token_data:" . $self->csrf_secret($config));
+
+	# SECURITY - constant-time comparison: a byte-by-byte comparison that stops
+	# at the first difference would let an attacker learn a valid signature one
+	# byte at a time.
+	my $diff = 0;
+	$diff |= ord(substr($signature, $_, 1)) ^ ord(substr($expected, $_, 1)) for 0 .. 63;
+
+	return $diff == 0 ? 1 : 0;
+}
+
+sub _generate_csrf_token($self) {
+	my $secret = $self->csrf_secret($self->{config});
 
 	# SECURITY — use a cryptographically secure RNG, not rand().
 	#   Perl's built-in rand() is a predictable PRNG; if an attacker knows the

@@ -1,0 +1,257 @@
+#!/usr/bin/env perl
+# tools/numbercompile --rbnf DIR --ordinals FILE [--out share/numbers] [--report]
+#
+# Number words for Time::Keeper::Natural, from CLDR's RBNF rules (the
+# cldr-rbnf package's rbnf/<locale>.json). Each locale's spellout-cardinal*
+# and spellout-numbering* rule sets are run forward for 0 to 99, and its
+# spellout-ordinal* sets for 1 to 31, by an interpreter that knows exactly:
+# integer base values with an optional /radix; the rule text; the modulus
+# and quotient substitutions with the owning set or a named one; the
+# same-value substitution with a named set; optional [text], omitted at an
+# even multiple of the divisor; the rollback of a rule whose base is not a
+# multiple of its divisor; and $(cardinal,...)$ plural blocks, through
+# Time::Keeper's plural rules. Anything else met for a value in range (a
+# number format, the >>> substitution, an ordinal plural block) leaves that
+# rule set out, and --report names it. Soft hyphens are dropped.
+#
+# Day ordinals in digits ("15th", "1er", "1.º") come from the
+# %digits-ordinal* sets of the OrdinalRules group, run for 1 to 31: the
+# number format =#,##0= is the digits, and a $(ordinal,...)$ block takes its
+# category from cldr-core's supplemental/ordinals.json (--ordinals), whose
+# rules are evaluated here (operands n and i, the only ones the file uses;
+# every rule's @integer samples are checked against the evaluator first).
+# They are kind d.
+#
+# Year and day-of-month sets (-year, -days) are not counted forms and are
+# skipped. The output is one file a locale, <out>/<locale>.txt, so a locale
+# with no rules reads nothing: one row a kind and value, c|d|o TAB value TAB
+# word|word, sorted. English gets one hand-written row, the article "a"
+# and "an" as one; it is the only one.
+use 5.010;
+use strict;
+use warnings;
+use utf8;
+use Getopt::Long;
+use JSON::PP;
+use Time::Keeper;
+use Time::Keeper::Locale;
+
+my %opt = (out => 'share/numbers');
+GetOptions(\%opt, 'rbnf=s', 'ordinals=s', 'out=s', 'report') or die "usage: numbercompile --rbnf DIR --ordinals FILE [--out DIR] [--report]\n";
+die "--rbnf and --ordinals are required\n" unless $opt{rbnf} && $opt{ordinals};
+
+my $json = JSON::PP->new->utf8;
+our $DIGITS = 0;
+my (%rows, @report, %kept);
+
+sub load {
+    my ($file) = @_;
+    open my $fh, '<:raw', $file or die "$file: $!\n";
+    local $/;
+    my $j = $json->decode(scalar <$fh>);
+    my $sets = { map { %{ $j->{rbnf}{rbnf}{$_} || {} } } qw(SpelloutRules OrdinalRules) };
+    my %out;
+    for my $name (keys %$sets) {
+        next if $name =~ /^_/;
+        my @rules;
+        for my $r (@{ $sets->{$name} }) {
+            my ($base, $text) = ref $r eq 'ARRAY' ? @$r : %$r;
+            $text =~ s/;\s*\z//;
+            next unless $base =~ m{^(\d+)(?:/(\d+))?\z};
+            my ($value, $radix) = ($1, $2 // 10);
+            my ($div, $exp) = (1, 0);
+            while ($value && $div * $radix <= $value) { $div *= $radix; $exp++ }
+            push @rules, { base => 0 + $value, radix => $radix, div => $div, text => $text };
+        }
+        $out{$name} = [ sort { $a->{base} <=> $b->{base} } @rules ];
+    }
+    return \%out;
+}
+
+sub plural {
+    my ($code, $n) = @_;
+    my $c = eval { Time::Keeper::Locale->code($code) } // 'en';
+    return Time::Keeper::Locale->plural_category($c, $n);
+}
+
+# CLDR's plural rule syntax, for the ordinal rules: or of and of relations,
+# an operand (n or i) with an optional modulus, = or != a list of values
+# and ranges.
+my %ORD;
+sub ord_rules {
+    my ($file) = @_;
+    open my $fh, '<:raw', $file or die "$file: $!\n";
+    local $/;
+    my $o = $json->decode(scalar <$fh>)->{supplemental}{'plurals-type-ordinal'} or die "$file: no ordinal rules\n";
+    for my $lang (keys %$o) {
+        for my $k (keys %{ $o->{$lang} }) {
+            my ($cat) = $k =~ /^pluralRule-count-(\w+)\z/ or next;
+            my ($rule, $samples) = split /\@integer/, $o->{$lang}{$k};
+            $samples //= '';
+            $samples =~ s/\@.*//s;
+            $rule =~ s/^\s+|\s+\z//g;
+            $ORD{$lang}{$cat} = $rule;
+            for my $s (split /,/, $samples) {
+                $s =~ s/^\s+|\s+\z//g;
+                next if $s eq '' || $s eq '…';
+                my ($a, $b) = $s =~ /^(\d+)(?:~(\d+))?\z/ or die "$lang $cat: sample '$s'\n";
+                for my $n ($a .. ($b // $a)) {
+                    my $got = ord_category($lang, $n);
+                    die "$lang: $n is $got by the rules, $cat by the samples\n" if $got ne $cat;
+                }
+            }
+        }
+    }
+}
+sub ord_test {
+    my ($rule, $n) = @_;
+    return 1 if $rule eq '';
+    for my $or (split /\s+or\s+/, $rule) {
+        my $all = 1;
+        for my $rel (split /\s+and\s+/, $or) {
+            my ($op, $mod, $neg, $list) = $rel =~ /^([ni])(?:\s*%\s*(\d+))?\s*(!?)=\s*([\d.,]+)\z/
+                or die "a relation '$rel'\n";
+            my $v = $n;
+            $v %= $mod if $mod;
+            my $in = grep { my ($a, $b) = /^(\d+)(?:\.\.(\d+))?\z/ or die "a range '$_'\n"; $v >= $a && $v <= ($b // $a) } split /,/, $list;
+            $all = 0 unless $neg ? !$in : $in;
+        }
+        return 1 if $all;
+    }
+    return 0;
+}
+sub ord_category {
+    my ($code, $n) = @_;
+    my $lang = $code;
+    $lang =~ s/-[^-]+\z// until exists $ORD{$lang} || $lang !~ /-/;
+    my $r = $ORD{$lang} or die "no ordinal rules for $code\n";
+    for my $cat (qw(zero one two few many)) {
+        return $cat if defined $r->{$cat} && ord_test($r->{$cat}, $n);
+    }
+    return 'other';
+}
+
+sub ordinal_block {
+    my ($forms, $code, $n) = @_;
+    my %f = $forms =~ /([a-z]+)\{([^\}]*)\}/g;
+    my $cat = ord_category($code, $n);
+    return $f{$cat} // $f{other} // die "no ordinal form $cat\n";
+}
+
+sub plural_block {
+    my ($forms, $code, $q) = @_;
+    my %f = $forms =~ /([a-z]+)\{([^\}]*)\}/g;
+    my $cat = plural($code, $q);
+    return $f{$cat} // $f{other} // die "no plural form $cat\n";
+}
+
+sub format_n {
+    my ($sets, $set, $n, $code, $depth) = @_;
+    die "too deep\n" if $depth > 40;
+    my $rules = $sets->{$set} or die "no rule set $set\n";
+    my $i = -1;
+    for my $k (0 .. $#$rules) { $i = $k if $rules->[$k]{base} <= $n }
+    die "no rule for $n in $set\n" if $i < 0;
+    my $r = $rules->[$i];
+    if ($i > 0 && $r->{text} =~ /→/ && $n % $r->{div} == 0 && $r->{base} % $r->{div} != 0) {
+        $r = $rules->[ $i - 1 ];
+    }
+    my $text = $r->{text};
+    my ($div, $q, $m) = ($r->{div}, int($n / $r->{div}), $n % $r->{div});
+    die "the >>> substitution\n" if $text =~ /→→→|←←←/;
+    $text =~ s/^'//;
+    $text =~ s/\[([^\[\]]*)\]/$m == 0 ? '' : $1/ge;
+    $text =~ s/\$\(cardinal,((?:[a-z]+\{[^\}]*\})+)\)\$/plural_block($1, $code, $q)/ge;
+    $text =~ s/\$\(ordinal,((?:[a-z]+\{[^\}]*\})+)\)\$/ordinal_block($1, $code, $n)/ge;
+    $text =~ s/=#(?:,##)*,##0=/$n/g if $DIGITS;
+    my $out = '';
+    while (length $text) {
+        if ($text =~ s/^→(%%?[\w-]+)?→//) {
+            $out .= format_n($sets, $1 // $set, $m, $code, $depth + 1);
+        }
+        elsif ($text =~ s/^←(%%?[\w-]+)?←//) {
+            $out .= format_n($sets, $1 // $set, $q, $code, $depth + 1);
+        }
+        elsif ($text =~ s/^=(%%?[\w-]+)=//) {
+            $out .= format_n($sets, $1, $n, $code, $depth + 1);
+        }
+        elsif ($text =~ /^[=←→]/) {
+            die "a number format in '$r->{text}'\n";
+        }
+        else {
+            $text =~ s/^([^=←→]+)//;
+            $out .= $1;
+        }
+    }
+    return $out;
+}
+
+ord_rules($opt{ordinals});
+opendir my $dh, $opt{rbnf} or die "$opt{rbnf}: $!\n";
+my @files = sort grep { /\.json\z/ && $_ ne 'und.json' } readdir $dh;
+closedir $dh;
+for my $f (@files) {
+    (my $code = $f) =~ s/\.json\z//;
+    my $sets = load("$opt{rbnf}/$f");
+    for my $set (sort keys %$sets) {
+        my ($kind, @range);
+        next if $set =~ /-(?:year|days)\b/;
+        if ($set =~ /^%spellout-(?:cardinal|numbering)/) { ($kind, @range) = ('c', 0 .. 99) }
+        elsif ($set =~ /^%spellout-ordinal/) { ($kind, @range) = ('o', 1 .. 31) }
+        elsif ($set =~ /^%digits-ordinal/) { ($kind, @range) = ('d', 1 .. 31) }
+        else { next }
+        my %words;
+        local $DIGITS = $kind eq 'd';
+        my $ok = eval {
+            for my $n (@range) {
+                my $w = format_n($sets, $set, $n, $code, 0);
+                $w =~ s/\x{00ad}//g;
+                $w =~ s/\s+/ /g;
+                $w =~ s/^ | \z//g;
+                die "an empty word for $n\n" if $w eq '';
+                next if $kind eq 'd' && $w =~ /^\d+\z/;
+                $words{$n} = $w;
+            }
+            1;
+        };
+        unless ($ok) {
+            chomp(my $why = $@);
+            push @report, "$code $set: left out: $why";
+            next;
+        }
+        $kept{$code}{$set} = 1;
+        for my $n (keys %words) { $rows{$code}{$kind}{$n}{ $words{$n} } = 1 }
+    }
+}
+$rows{en}{c}{1}{$_} = 1 for qw(a an);
+# A locale's file is the first in its chain, so a child with rows of one
+# kind only (es-419 has day ordinals and no number words) takes the kinds
+# it lacks from its nearest ancestor that has them.
+for my $code (grep { /-/ } keys %rows) {
+    for my $kind (qw(c d o)) {
+        next if $rows{$code}{$kind};
+        (my $up = $code) =~ s/-[^-]+\z//;
+        $up =~ s/-[^-]+\z// until $rows{$up}{$kind} || $up !~ /-/;
+        $rows{$code}{$kind} = $rows{$up}{$kind} if $rows{$up}{$kind};
+    }
+}
+
+mkdir $opt{out} unless -d $opt{out};
+unlink glob("$opt{out}/*.txt");
+my ($n_rows, $n_words) = (0, 0);
+for my $code (sort keys %rows) {
+    open my $out, '>:encoding(UTF-8)', "$opt{out}/$code.txt" or die "$opt{out}/$code.txt: $!\n";
+    print $out "# Generated by tools/numbercompile from CLDR RBNF. Do not edit: regenerate.\n";
+    for my $kind (sort keys %{ $rows{$code} }) {
+        for my $n (sort { $a <=> $b } keys %{ $rows{$code}{$kind} }) {
+            my @w = sort keys %{ $rows{$code}{$kind}{$n} };
+            print $out join("\t", $kind, $n, join('|', @w)), "\n";
+            $n_rows++;
+            $n_words += @w;
+        }
+    }
+    close $out;
+}
+printf "%d locales, %d rows, %d words, %d rule sets kept, %d left out; %s\n",
+    scalar(keys %rows), $n_rows, $n_words, scalar(map { keys %$_ } values %kept), scalar(@report), $opt{out};
+if ($opt{report}) { binmode STDOUT, ':encoding(UTF-8)'; print "  $_\n" for @report }

@@ -10,6 +10,13 @@
     word-break: break-all;
   }
   .chart-source a { color: inherit; }
+  /* A legend entry is a switch, not a caption.  A <g> has no box of its own,
+     so the focus ring is drawn on the swatch it toggles. */
+  #stacked_bar .sb-legend-item:focus-visible { outline: none; }
+  #stacked_bar .sb-legend-item:focus-visible rect {
+    stroke: #0d6efd;
+    stroke-width: 2px;
+  }
 </style>
 
 <p class="back-link"><a href="/">&larr; Home</a> &rsaquo; <a href="[% back_url | html %]">[% back_label || 'Back' | html %]</a>[%- IF back2_url -%] &rsaquo; <a href="[% back2_url | html %]">[% back2_label || 'Back' | html %]</a>[%- END -%]</p>
@@ -23,10 +30,61 @@
   <span class="graph-point-count">[% bar_count %] categor[% IF bar_count == 1 %]y[% ELSE %]ies[% END %]</span>
 </div>
 
+<p class="sr-only" id="stacked-legend-help">Show or hide a series: press Tab until a legend
+entry has focus, then press Enter or Space to toggle it.</p>
+<p class="sr-only" id="stacked-live" role="status" aria-live="polite"></p>
+
 <div class="stacked-container">
   <script src="https://d3js.org/d3.v7.min.js"></script>
   [% chart_html %]
 </div>
+
+<script>
+// D3 draws a clickable legend: each entry hides or shows its series.  A click
+// is not something a keyboard reader can make, so each entry is made a switch
+// - in the tab order, named for the series it toggles, aria-pressed saying
+// whether that series is drawn, and Enter or Space sending the same click the
+// pointer sends.
+(function () {
+  var live = document.getElementById('stacked-live');
+
+  // A button's pressed state is announced by a screen reader that is on it;
+  // the series appearing or disappearing is not, so it is said here too.
+  function say(name, pressed) {
+    if (!live) return;
+    live.textContent = '';
+    setTimeout(function () {
+      live.textContent = name + (pressed ? ' shown' : ' hidden');
+    }, 30);
+  }
+
+  setTimeout(function () {
+    document.querySelectorAll('#stacked_bar .sb-legend-item').forEach(function (item) {
+      var textEl = item.querySelector('text');
+      var name   = textEl ? textEl.textContent.trim() : '';
+      if (!name) return;
+
+      item.setAttribute('tabindex', '0');
+      item.setAttribute('role', 'button');
+      item.setAttribute('aria-label', 'Toggle ' + name);
+      item.setAttribute('aria-pressed', 'true');
+      item.setAttribute('aria-describedby', 'stacked-legend-help');
+
+      item.addEventListener('click', function () {
+        var pressed = item.getAttribute('aria-pressed') !== 'true';
+        item.setAttribute('aria-pressed', pressed ? 'true' : 'false');
+        say(name, pressed);
+      });
+      item.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          item.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+        }
+      });
+    });
+  }, 50);
+}());
+</script>
 
 <script>
 (function () {

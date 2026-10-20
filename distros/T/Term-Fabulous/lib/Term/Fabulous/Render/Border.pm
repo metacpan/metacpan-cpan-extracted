@@ -5,13 +5,13 @@ use warnings;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 use Object::Pad 0.825;
 
 role Term::Fabulous::Render::Border {
 	use List::Util qw(min max);
-	use Term::Fabulous::Render::Attr qw(color_attr clay_color);    # checks truecolor support first
+	use Term::Fabulous::Render::Attr qw(blended_bg_attr color_attr clay_color);    # checks truecolor support first
 	use Term::Fabulous::Termbox qw(TB_DEFAULT TB_REVERSE);
 	use Term::Fabulous::Render::Geometry qw(cell_rect);
 
@@ -46,6 +46,8 @@ role Term::Fabulous::Render::Border {
 	# "inner" background of a cell is the shadow buffer at that cell, the
 	# "outer" one is the cell just outside the box on the same side. Each
 	# side is drawn in the style HasBorderStyle's border_style_of answers.
+	# A side or corner with a border_background_color_of has that color
+	# painted over its inner background.
 	method render_border ( $command, $widget, $buffer ) {
 		return unless defined $widget && $widget->DOES('Term::Fabulous::Role::HasBorderStyle');
 
@@ -71,9 +73,10 @@ role Term::Fabulous::Render::Border {
 			my $shade_row = $buffer->[$y] // return TB_DEFAULT;
 			return $shade_row->[$x] // TB_DEFAULT;
 		};
-		my $paint = sub ( $x, $y, $glyph, $location, $outer_x, $outer_y ) {
+		my $paint = sub ( $x, $y, $glyph, $location, $outer_x, $outer_y, $backdrop ) {
 			return if $y < $clip_y0 || $y >= $clip_y1;
-			my ( $fg, $bg ) = _location_attrs( $location, $border_attr, $shade_at->( $x, $y ), $shade_at->( $outer_x, $outer_y ) );
+			my $inner = defined $backdrop ? blended_bg_attr( $backdrop, $shade_at->( $x, $y ) ) : $shade_at->( $x, $y );
+			my ( $fg, $bg ) = _location_attrs( $location, $border_attr, $inner, $shade_at->( $outer_x, $outer_y ) );
 			$target->set_cell( $x, $y, $glyph, $fg, $bg );
 		};
 		my %outer = map { $_ => $widget->is_outer_border_side($_) } qw(top right bottom left);
@@ -82,17 +85,18 @@ role Term::Fabulous::Render::Border {
 		# that side is drawn on the outer background, so is the corner, on the
 		# background beside the box.
 		my $paint_row = sub ( $y, $outer_y, $glyphs, $locations, $edge ) {
-			my @corners = map { $widget->border_corner_glyph("${edge}_$_") } qw(left right);
+			my @corners   = map { $widget->border_corner_glyph("${edge}_$_") } qw(left right);
+			my @backdrops = map { $widget->border_background_color_of($_) } "${edge}_left", $edge, "${edge}_right";
 			foreach my $x ( max( $x0, $clip_x0 ) .. min( $last_x, $clip_x1 - 1 ) ) {
 				my $slot     = $x == $x0 && $left ? 0            : $x == $last_x && $right ? 2 : 1;
 				my $glyph    = $slot == 1         ? $glyphs->[1] : $corners[ $slot / 2 ] // $glyphs->[$slot];
 				my $side     = $slot == 0         ? 'left'       : $slot == 2 ? 'right' : undef;
 				my $location = $locations->[$slot];
 				if ( defined $side && $outer{$side} ) {
-					$paint->( $x, $y, $glyph, _on_outer($location), $slot == 0 ? $x - 1 : $x + 1, $y );
+					$paint->( $x, $y, $glyph, _on_outer($location), $slot == 0 ? $x - 1 : $x + 1, $y, undef );
 					next;
 				}
-				$paint->( $x, $y, $glyph, $outer{$edge} ? _on_outer($location) : $location, $x, $outer_y );
+				$paint->( $x, $y, $glyph, $outer{$edge} ? _on_outer($location) : $location, $x, $outer_y, $backdrops[$slot] );
 			}
 		};
 		my $paint_column = sub ( $x, $outer_x, $glyph, $location, $side ) {
@@ -100,8 +104,9 @@ role Term::Fabulous::Render::Border {
 			my $from = $top    ? $y0 + 1     : $y0;
 			my $to   = $bottom ? $last_y - 1 : $last_y;
 			$location = _on_outer($location) if $outer{$side};
+			my $backdrop = $widget->border_background_color_of($side);
 			foreach my $y ( max( $from, $clip_y0 ) .. min( $to, $clip_y1 - 1 ) ) {
-				$paint->( $x, $y, $glyph, $location, $outer_x, $y );
+				$paint->( $x, $y, $glyph, $location, $outer_x, $y, $backdrop );
 			}
 		};
 
@@ -210,6 +215,15 @@ code 1, those with code 3 as code 2, and codes 1 and 2 stay. A corner is
 drawn this way, with the background of the cell beside the box, when
 the left or right side next to it is listed; otherwise it follows its
 top or bottom side.
+
+=item *
+
+A side or corner the widget names in C<border_background_colors> (see
+L<Term::Fabulous::Role::HasBorderStyle/border_background_colors>) has
+that color painted over the widget's own background under its glyphs
+(blended when the color is translucent); a corner gets only the color
+named for it, not that of its side. A side drawn on the parent's
+background, and a corner drawn like it, ignores the color.
 
 =item *
 

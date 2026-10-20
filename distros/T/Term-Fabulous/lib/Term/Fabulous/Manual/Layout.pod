@@ -312,7 +312,7 @@ the program is F<examples/layout-direction.pl>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/example-layout-direction.svg" alt="Four panels: three boxes side by side, three boxes in a column, seven boxes wrapped onto two lines, and three boxes of different sizes on top of each other"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.05/screenshots/example-layout-direction.svg" alt="Four panels: three boxes side by side, three boxes in a column, seven boxes wrapped onto two lines, and three boxes of different sizes on top of each other"></p>
 
 =end html
 
@@ -360,7 +360,7 @@ dies. Values with parentheses must be quoted in KDL.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/example-layout-sizing.svg" alt="Eight rows, each a track with colored boxes sized by fit, fit with a minimum, fixed, percent, grow, grow with a maximum, fixed plus grow, and two grow boxes"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.05/screenshots/example-layout-sizing.svg" alt="Eight rows, each a track with colored boxes sized by fit, fit with a minimum, fixed, percent, grow, grow with a maximum, fixed plus grow, and two grow boxes"></p>
 
 =end html
 
@@ -428,7 +428,7 @@ for all four sides.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/example-layout-padding.svg" alt="Three boxes with the same three children: without padding and gap, with padding and a gap of one row, and with a border and one cell of padding"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.05/screenshots/example-layout-padding.svg" alt="Three boxes with the same three children: without padding and gap, with padding and a gap of one row, and with a border and one cell of padding"></p>
 
 =end html
 
@@ -486,7 +486,7 @@ out.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/example-layout-alignment.svg" alt="Nine boxes in a grid, each with one child placed at a different combination of left, center, right and top, center, bottom"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.05/screenshots/example-layout-alignment.svg" alt="Nine boxes in a grid, each with one child placed at a different combination of left, center, right and top, center, bottom"></p>
 
 =end html
 
@@ -530,7 +530,7 @@ In KDL:
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/example-flow.svg" alt="Twenty colored tags in a rounded box, wrapped onto several lines"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.05/screenshots/example-flow.svg" alt="Twenty colored tags in a rounded box, wrapped onto several lines"></p>
 
 =end html
 
@@ -627,7 +627,7 @@ In KDL:
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/example-stack.svg" alt="Three bordered cards with colored badges in their top right corners above a log with a bordered message centered over it"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.05/screenshots/example-stack.svg" alt="Three bordered cards with colored badges in their top right corners above a log with a bordered message centered over it"></p>
 
 =end html
 
@@ -700,7 +700,7 @@ id directly:
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/example-layout-floating.svg" alt="A File menu open below its button over a panel, a red badge on the panel's top right corner and a green message in the bottom row of the screen"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.05/screenshots/example-layout-floating.svg" alt="A File menu open below its button over a panel, a red badge on the panel's top right corner and a green message in the bottom row of the screen"></p>
 
 =end html
 
@@ -759,6 +759,13 @@ floating widget, add and remove it, as the File button of the example
 does. C<< $widget->floating(undef) >> puts a widget back into the
 normal layout.
 
+Clay places a floating widget where its attach points say, also when
+that is off the screen. The popups of Term::Fabulous (dropdown lists,
+menus, the column chooser of a table) are kept on the screen by
+L<Term::Fabulous::Placement>: they work out their position from the box
+of their anchor and float from the root there, with
+L<Term::Fabulous::Role::Popup>. A popup of your own can do the same.
+
 =head2 Scrolling content
 
 A L<Term::Fabulous::Widget::ScrollBox> is a box whose content may be
@@ -792,7 +799,7 @@ In KDL:
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/example-scroll-box.svg" alt="Two framed boxes scrolled down, one with numbered lines, one with squares, each with a scrollbar in its last column whose thumb shows the visible part"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.05/screenshots/example-scroll-box.svg" alt="Two framed boxes scrolled down, one with numbered lines, one with squares, each with a scrollbar in its last column whose thumb shows the visible part"></p>
 
 =end html
 
@@ -803,6 +810,18 @@ events page describes the wheel, sideways scrolling, the C<OnScroll>
 event and how to read and set the scroll position from code; the recipe
 L<Scroll a ScrollBox from code|Term::Fabulous::Cookbook::LiveData/Scroll a ScrollBox from code (keep a log at the newest line)>
 keeps a log at its newest line.
+
+With C<< follow_end =E<gt> 1 >>, a ScrollBox stays at the end of its
+content while the content grows; scrolling up stops following,
+scrolling back to the last row resumes it
+(L<Term::Fabulous::Widget::ScrollBox/follow_end>).
+C<< $box->reveal($widget) >> scrolls a widget inside it into view
+(L<Term::Fabulous::Widget::ScrollBox/reveal>), and a widget inside it
+that gets the focus is scrolled into view by itself. The box has no
+keys of its own; L<Term::Fabulous::Scrolling> scrolls it, or any other
+scroll container, by rows, by pages and to its ends, and gives it the
+keys of a pager (see
+L<Term::Fabulous::Cookbook::DocumentTechniques/Scroll any scroll box like a pager (Term::Fabulous::Scrolling)>).
 
 A ScrollBox lays out every child in every frame, visible or not, and
 Clay measures every text it lays out (see
@@ -820,9 +839,46 @@ frame costs what the visible part costs.
 	my $document = Term::Fabulous::Widget::VirtualList->new(
 		id     => 'document',
 		count  => scalar @paragraphs,
-		build  => sub ($index) { Term::Fabulous::Widget::RichText->new( markup => $paragraphs[$index] ) },
+		build  => sub ($index) { Term::Fabulous::Widget::Text->new( markup => $paragraphs[$index] ) },
 		layout => { sizing => { width => sizing_grow(), height => sizing_grow() }, child_gap => 1 },
 	);
+
+=head2 Documents
+
+A document with headings, paragraphs, lists, quotes, code and links,
+read from POD, Markdown or another format, and any other widget between
+them, is shown by a L<Term::Fabulous::Widget::DocumentView>, a
+VirtualList of the items of a L<Term::Fabulous::Document>. A reader
+makes the document with its factories, which turn text and marks
+(bold, code, a link) into texts in the styles of the theme, and adds
+tables, pictures or forms as they are; the view wraps the paragraphs,
+scrolls with the keys, the wheel and the scrollbar, selects links with
+C<l> and C<L> and follows them with C<Enter> or a click, searches the
+text of every item, lets Tab reach the widgets inside, and fires a
+L<ViewChange|Term::Fabulous::Event::ViewChange> after every frame that
+shows something new:
+
+	my $view = Term::Fabulous::Widget::DocumentView->new(
+		id       => 'document',
+		document => $document,    # a Term::Fabulous::Document from a parser
+		layout   => { sizing => { width => sizing_grow(), height => sizing_grow() } },
+	);
+	$view->on( LinkActivate => sub ($event) { open_page( $event->link ); return } );
+
+=begin html
+
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.05/screenshots/widget-document-view.svg" alt="A framed document view scrolled to its Code section: a code block on a darker background, a paragraph with a selected link in inverse colors, a table of factories under the heading Any widget, every match of the word block highlighted, and a status line that names the selected link"></p>
+
+=end html
+
+The picture shows F<examples/widgets/document-view.pl>. Code is shown
+by L<Term::Fabulous::Widget::CodeBlock> widgets, which never wrap and
+scroll sideways together. L<Pod::Fabulous> is a reader built on the
+view. L<Term::Fabulous::Cookbook::Documents> has recipes that build
+documents in Perl and from Markdown, follow links and search;
+L<Term::Fabulous::Cookbook::DocumentTechniques> continues with a
+table of contents, syntax highlighting, styles and the keys of a pager,
+and puts a table and a picture inside a document.
 
 =head2 Equal sizes across the tree
 
@@ -898,7 +954,7 @@ one character per row. The picture shows the forms
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-divider.svg" alt="Dividers: a plain line, texts at the start, the center and the end, double and heavy lines in colors, and a vertical divider with a text between two columns"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.05/screenshots/widget-divider.svg" alt="Dividers: a plain line, texts at the start, the center and the end, double and heavy lines in colors, and a vertical divider with a text between two columns"></p>
 
 =end html
 
@@ -944,7 +1000,7 @@ both looks (F<examples/widgets/accordion.pl>):
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-accordion.svg" alt="Two accordions: one with the Network section open under General and a disabled Licenses section, one with borders, the toggles at the end and two sections open at once"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.05/screenshots/widget-accordion.svg" alt="Two accordions: one with the Network section open under General and a disabled Licenses section, one with borders, the toggles at the end and two sections open at once"></p>
 
 =end html
 
@@ -979,15 +1035,22 @@ no space and their widgets cannot take the focus:
 	}
 
 The tabs are drawn as boxes that join the border of the page: the
-active tab is one cell larger and open toward the page, so that the
-two are one shape, while the other tabs are closed by the page's line
-and look as if they stood behind it. The user switches with a click,
-with C<Left>, C<Right>, C<Up>, C<Down>, C<Home> and C<End> while the
-active tab has the focus (only the active tab takes the focus, so
-C<Tab> stops at the bar once), and with C<Ctrl+PageUp> and
-C<Ctrl+PageDown> from anywhere inside the Tabs. The Tabs fires
-L<Term::Fabulous::Event::Select> for every change the user makes;
-C<select> changes the page from the program.
+active tab is open toward the page, so that the two are one shape,
+while the other tabs are closed by the page's line and look as if
+they stood behind it (C<active_padding>, 0 by default, makes the
+active tab that many cells taller than the others (wider on a bar at
+the side), rising out of the row). The user switches with a click, with
+C<Left>, C<Right>, C<Up>, C<Down>, C<Home> and C<End> while the active
+tab has the focus (only the active tab takes the focus, so C<Tab> stops
+at the bar once), and with C<Ctrl+PageUp> and C<Ctrl+PageDown> from
+anywhere inside the Tabs. The Tabs fires L<Term::Fabulous::Event::Select>
+for every change the user makes; C<select> changes the page from the
+program. A search, such as a document view's, reaches the pages the
+Tabs does not show and selects the page with the match (see
+L<search_texts|Term::Fabulous::Widget::Tabs/"search_texts, search_revision, highlight_text, clear_text_highlights, reveal_text">),
+and when the page of the focused widget is hidden, the focus goes to
+the active tab (see
+L<Term::Fabulous::Manual::Events/When the focused widget goes away>).
 
 The bar can be on any side of the page (C<side>), the labels can be
 written from left to right or downwards (C<orientation>), the tabs can
@@ -999,7 +1062,7 @@ sit at the start, in the center or at the end of the bar
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-tabs.svg" alt="Four Tabs widgets: tabs along the top with the Network page shown and a disabled Licenses tab, a sidebar of tabs along the left side, a tab bar at the bottom in the Heavy style with the tabs in the center, and tall tabs with downward labels without a page border"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.05/screenshots/widget-tabs.svg" alt="Four Tabs widgets: tabs along the top with the Network page shown and a disabled Licenses tab, a sidebar of tabs along the left side, a tab bar at the bottom in the Heavy style with the tabs in the center, and tall tabs with downward labels without a page border"></p>
 
 =end html
 
@@ -1064,7 +1127,7 @@ unsaved changes and an error, and an arrow to a tab that does not fit
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-document-tabs.svg" alt="A row of document tabs at the top: notes.txt with a blue dot for unsaved changes, config.kdl with a red exclamation mark for errors, todo.md, and the active tab budget.csv in bold on a lighter background with a blue dot, each with a close mark, then an arrow to a hidden tab and a plus button. Below, the text of budget.csv, a dim line with the keys that switch, close and add tabs, and a status bar with the message Closed README.md."></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.05/screenshots/widget-document-tabs.svg" alt="A row of document tabs at the top: notes.txt with a blue dot for unsaved changes, config.kdl with a red exclamation mark for errors, todo.md, and the active tab budget.csv in bold on a lighter background with a blue dot, each with a close mark, then an arrow to a hidden tab and a plus button. Below, the text of budget.csv, a dim line with the keys that switch, close and add tabs, and a status bar with the message Closed README.md."></p>
 
 =end html
 

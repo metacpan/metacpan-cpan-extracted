@@ -135,6 +135,7 @@ t/36_outmngr_seqlot.t
 t/37_dbadmin_backup_agent.t
 t/38_dbadmin_meta_cache.t
 t/40_tracking_validate.t
+t/41_tracking_fields.t
 t/50_edms_pure.t
 t/cp_fr
 t/cp_fr.dat

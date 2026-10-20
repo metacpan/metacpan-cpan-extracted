@@ -14,9 +14,9 @@ use warnings;
 use Carp;
 use Data::Identifier;
 
-our $VERSION = v0.07;
+our $VERSION = v0.08;
 
-use parent qw(Data::Identifier::Interface::Simple Data::Identifier::Interface::Subobjects);
+use parent qw(Data::Identifier::Interface::Simple Data::Identifier::Interface::Subobjects Data::Identifier::Interface::Known);
 
 use constant {
     _GENERATOR          => Data::Identifier->new(uuid => '6574c0af-1389-4db7-96ac-3087b6202bd2')->register,
@@ -81,6 +81,7 @@ sub new {
             croak 'Multi prefix string passed. Consider using Lingua::famibeib::Text if this is what you wanted';
         }
 
+        $value =~ s/-\z//;
         $value = lc($value);
 
         if ($value =~ /^[bfklmst][aeiou](?:[bfklmst][aeiou])*\z/m) {
@@ -181,6 +182,13 @@ sub as {
     return $id->as($as, @opts);
 }
 
+sub _known_provider {
+    my ($pkg, $class, %opts) = @_;
+    croak 'Unsupported options passed' if scalar(keys %opts);
+    return ([values %_registered_by_string], rawtype => __PACKAGE__) if $class eq ':all' || $class eq 'registered';
+    croak 'Unsupported class';
+}
+
 1;
 
 __END__
@@ -195,7 +203,7 @@ Lingua::famibeib::Prefix - module to interact with famibeib word prefixes
 
 =head1 VERSION
 
-version v0.07
+version v0.08
 
 =head1 SYNOPSIS
 
@@ -205,7 +213,10 @@ version v0.07
 
 This package is used to store famibeib word prefixes and query them about their properties.
 
-This module inherits from L<Data::Identifier::Interface::Simple>, and L<Data::Identifier::Interface::Subobjects>.
+This module inherits from
+L<Data::Identifier::Interface::Simple> (since v0.06),
+L<Data::Identifier::Interface::Subobjects> (since v0.06),
+and L<Data::Identifier::Interface::Known> (since v0.08).
 Instances are overloaded so they will stringify to their string representation as per L</as_string>.
 
 =head1 METHODS

@@ -2,7 +2,7 @@
 # Chain of Custody forgery detection.
 #
 # A conformant DKIM2 verifier MUST reconstruct each lower Message-Instance from
-# the higher instance's Recipe and re-check its hashes (spec-06 §5, §10-11).
+# the higher instance's Recipe and re-check its hashes (-07 §5, §13-14).
 # These vectors each have a TOP instance (m=2) whose hashes are correct AND
 # whose signature is valid, but a Recipe that does NOT reconstruct the signed
 # m=1 state.  A verifier that only trusts the top instance accepts them; a
@@ -38,11 +38,11 @@ sub validate {
 # Each forgery must be rejected, and for the right reason (a reconstruction
 # hash mismatch, not a signature or parse failure).
 for my $case (
-    ['chain-fraud-header.eml',        qr/header hash mismatch/,
+    ['chain-fraud-header.eml',        qr/header hash sha256 mismatch/,
         'header lie: recipe omits an added Reply-To'],
-    ['chain-fraud-body.eml',          qr/body hash mismatch/,
+    ['chain-fraud-body.eml',          qr/body hash sha256 mismatch/,
         'body lie: body changed, recipe declares no body change'],
-    ['chain-fraud-body-truncate.eml', qr/body hash mismatch/,
+    ['chain-fraud-body-truncate.eml', qr/body hash sha256 mismatch/,
         'body lie: innocent-looking truncating copy-range hides an edited line'],
 ) {
     my ($file, $re, $desc) = @$case;

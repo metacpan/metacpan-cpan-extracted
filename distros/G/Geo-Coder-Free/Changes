@@ -1,5 +1,31 @@
 Revision history for Geo-Coder-Free
 
+0.48	Mon Oct 19 07:35:53 PM EDT 2026
+	[ Enhancements ]
+	- The location rule has moved to a distribution of its own, Geo-Location-Predicate
+	  (Geo::Location::Predicate::_valid_location()), so the sibling geocoders can use it
+	  without depending on Geo-Coder-Free.  Its answers are unchanged
+	- Requires Geo-Location-Predicate 0.01 and Geo::Location::Point 0.19
+	- Makefile.PL installs a missing configure-time prerequisite correctly on Windows
+	- Added Geo::Coder::Free::MissCache, replacing the never-expiring miss hash in
+	  OpenAddresses.  OpenAddresses, Local and MaxMind all use it, so an address that is
+	  not in the data is searched for once per process rather than once per call.
+	  Entries expire after an hour (expires_after()), and
+	  Geo::Coder::Free->clear_miss_cache() empties the cache or one backend's part of it
+	- Each backend has reads(), the number of reads it has made.  geocode_many()'s
+	  lookups now counts only values that caused a read, and a new reads key gives the
+	  reads made by each backend
+	- The field-to-accuracy rule has moved from Geo::Coder::Free::Provenance to
+	  Geo::Location::Point::accuracy_for().  Provenance still exports ACCURACY_LEVELS
+	- cgi-bin/page.fcgi now validates a CSRF token when a client sends one, as documented
+	[ Tests ]
+	- t/location-rule.t also scans the six sibling geocoders for copies of the location rule
+	- Added scripts/location-predicate-fuzz.pl, which compares the sibling geocoders'
+	  verdicts with the rule, and t/location-predicates.t and t/location-fuzz-doc.t,
+	  which test it and LOCATION-PREDICATE-FUZZ.md
+	- Added .github/workflows/location-predicates.yml and geocoder-suites.yml, which run
+	  the fuzz and the sibling geocoders' test suites against this distribution
+
 0.47	Fri Oct 16 09:34:18 PM EDT 2026
 	[ Enhancements ]
 	- Added geocode_many(), the loop a batch caller writes around geocode() 

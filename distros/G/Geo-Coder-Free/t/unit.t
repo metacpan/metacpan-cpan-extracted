@@ -116,6 +116,7 @@ my %LEDGER = (
 	# Geo::Coder::Free::geocode_many
 	'GCF::geocode_many map'              => 1,
 	'GCF::geocode_many counts'           => 1,
+	'GCF::geocode_many backend reads'    => 1,
 	'GCF::geocode_many unresolved list'  => 1,
 	'GCF::geocode_many distinct'         => 1,
 	'GCF::geocode_many region'           => 1,
@@ -355,6 +356,10 @@ subtest 'GCF::geocode_many — the batch loop, its counts and its refusals' => s
 	mock('Geo::Coder::Free::MaxMind', 'geocode', sub {
 		my ($mm, $params) = @_;
 		push @asked, { location => $params->{'location'}, region => $params->{'region'} };
+		# This mock stands in for a backend that reads: geocode_many() counts a
+		# lookup by the reads the backends report, so a mock that read nothing
+		# would be a cache hit and would not be counted.
+		$mm->{'reads'}++;
 		return $params->{'location'} =~ /Ramsgate/ ? $MOCK_PT : undef;
 	});
 	mock('Geo::Coder::Free::MaxMind', 'reverse_geocode', sub { return undef });
@@ -374,15 +379,27 @@ subtest 'GCF::geocode_many — the batch loop, its counts and its refusals' => s
 		'and so is a value the module refuses');
 	delete $LEDGER{'GCF::geocode_many map'};
 
-	# The counts.  Two of the four values are worth looking up - the repetition
-	# is not a second lookup and the refused value is no lookup at all - and one
-	# of those two resolved.
-	is($batch->{'lookups'}, 2, 'lookups counts the distinct values worth looking up');
+	# The counts.  Two of the four values made the backend read - the repetition
+	# is not a second lookup and the refused value never reaches a backend - and
+	# one of those two resolved.
+	is($batch->{'lookups'}, 2, 'lookups counts the distinct values that made a backend read');
 	is($batch->{'resolved'}, 1, 'resolved counts the values that produced a point');
 	is($batch->{'unresolved'}, 2, 'unresolved counts the values that produced nothing');
 	is($batch->{'resolved'} + $batch->{'unresolved'}, 3,
 		'and the two add up to the number of distinct values');
 	delete $LEDGER{'GCF::geocode_many counts'};
+
+	# Which backend did the reading, and which answered from a cache.  The mock
+	# stands in for MaxMind and reports a read for each value that reached it, so
+	# the batch names MaxMind - in the vocabulary provenance() uses - and credits
+	# it with those two reads; the fourth value was refused before any backend, so
+	# nothing is credited with it either.
+	is_deeply([sort keys %{$batch->{'reads'}}], ['MaxMind'],
+		'the reads are reported per backend, by the name provenance() reports');
+	is($batch->{'reads'}{'MaxMind'}, 2, 'and hold the reads that backend made');
+	is_deeply([grep { $_ != 0 } values %{$batch->{'reads'}}], [2],
+		'which is what the one lookup per reading value adds up to');
+	delete $LEDGER{'GCF::geocode_many backend reads'};
 
 	# The ordered list of what produced nothing, which is what a caller records
 	# as tried-and-failed instead of retrying it on every request.
@@ -437,9 +454,11 @@ subtest 'GCF::geocode_many — the batch loop, its counts and its refusals' => s
 
 	# A batch of nothing is a batch of nothing, not an error.
 	my $none = $geo->geocode_many([], on_error => 'undef');
-	is_deeply([sort keys %{$none}], [sort qw(lookups resolved unresolved unresolved_values)],
+	is_deeply([sort keys %{$none}], [sort qw(lookups reads resolved unresolved unresolved_values)],
 		'an empty batch answers with the counts and nothing else');
 	is_deeply([map { $none->{$_} } qw(lookups resolved unresolved)], [0, 0, 0], 'as zeroes');
+	is_deeply($none->{'reads'}, { MaxMind => 0 },
+		'as a read count of zero for the backend the object holds');
 	is_deeply($none->{'unresolved_values'}, [], 'and an empty list');
 	delete $LEDGER{'GCF::geocode_many empty'};
 

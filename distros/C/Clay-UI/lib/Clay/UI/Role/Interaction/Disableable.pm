@@ -1,5 +1,5 @@
 package Clay::UI::Role::Interaction::Disableable;
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 use v5.22;
 use warnings;
 use feature 'signatures';
@@ -114,8 +114,8 @@ L<Clay::UI::Role::Style::HasStates>), so a style can depend on it.
 
 Disabling a widget that has the focus, or that is armed or pressed,
 takes that away at once: it is disarmed and unpressed, and a focused
-widget gets C<OnBlur> before the C<disabled> writer returns (see
-L<Clay::UI::Interaction/release_ineligible>).
+widget gets C<OnBlur> before the C<disabled> writer returns, while its
+heir takes the focus (see L<Clay::UI::Interaction/release_ineligible>).
 
 Disabling a widget does not disable its children; each widget has its
 own C<disabled> value.

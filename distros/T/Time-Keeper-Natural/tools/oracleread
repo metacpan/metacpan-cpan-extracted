@@ -1,0 +1,83 @@
+#!/usr/bin/env perl
+# tools/oracleread [--sorted] [--every N] [--offset K] OUT CORPUS...
+#
+# Reads the differential oracle's corpus (tools/oraclecorpus) with whichever
+# Time::Keeper::Natural is first on @INC, and writes one line a text: the
+# locale and text, then parse, parse_duration and match, each the value or
+# "died: " and the whole death, the Match as its precision and assumptions.
+# The clock is the line's, else Thursday 15 October 2026 09:00 in London.
+# --sorted makes a pure-Perl 0.01 read a phrase's offsets sorted, as the port
+# does (0.01 read them in a hash's order); --every N reads one line in N.
+use 5.010;
+use strict;
+use warnings;
+use Getopt::Long;
+use Time::Keeper;
+use Time::Keeper::Natural;
+
+my %opt = (every => 1, offset => 0);
+GetOptions(\%opt, 'sorted', 'every=i', 'offset=i') or die "usage: oracleread [--sorted] [--every N] OUT CORPUS...\n";
+my ($out, @files) = @ARGV;
+die "usage: oracleread [--sorted] [--every N] OUT CORPUS...\n" unless defined $out && @files;
+
+if ($opt{sorted}) {
+    package Sorted::Hash;
+    require Tie::Hash;
+    our @ISA = ('Tie::StdHash');
+    our (%K, %I);
+    sub FIRSTKEY { my ($h) = @_; $K{$h} = [ sort keys %$h ]; $I{$h} = 0; return $K{$h}[0] }
+    sub NEXTKEY { my ($h) = @_; return $K{$h}[ ++$I{$h} ] }
+    package main;
+    no warnings 'redefine';
+    my $orig = \&Time::Keeper::Locale::relative_names;
+    *Time::Keeper::Locale::relative_names = sub {
+        my $r = $orig->(@_);
+        return $r unless ref $r eq 'HASH' && ref $r->{at} eq 'HASH';
+        tie my %at, 'Sorted::Hash';
+        %at = %{ $r->{at} };
+        return { %$r, at => \%at };
+    };
+}
+
+my $DEFAULT = Time::Keeper->new(year => 2026, month => 10, day => 15, hour => 9, zone => 'Europe/London');
+sub unesc { my ($s) = @_; $s =~ s/\\(.)/$1 eq 't' ? "\t" : $1 eq 'n' ? "\n" : $1 eq 'r' ? "\r" : $1/ge; return $s }
+sub esc { my ($s) = @_; $s =~ s/\\/\\\\/g; $s =~ s/\t/\\t/g; $s =~ s/\n/\\n/g; $s =~ s/\r/\\r/g; return $s }
+sub ask { my ($code) = @_; my $v = eval { $code->() }; return defined $v ? "$v" : 'died: ' . $@ }
+
+# The corpus is read whole and its handles closed before any text is
+# parsed: a death names the last handle read (", <$in> line N") while one
+# is open, and 0.01's weekday reason is lost when it does.
+my @lines;
+my $i = 0;
+for my $file (@files) {
+    open my $in, '<:encoding(UTF-8)', $file or die "$file: $!";
+    while (my $line = <$in>) {
+        push @lines, $line unless ($i++ - $opt{offset}) % $opt{every};
+    }
+    close $in;
+}
+open my $fh, '>:encoding(UTF-8)', $out or die "$out: $!";
+for my $line (@lines) {
+    {
+        chomp $line;
+        my ($loc, $zone, $bare, $prefer, $now, $clock, $text) = split /\t/, $line, 7;
+        $text = unesc($text);
+        local $Time::Keeper::CLOCK = $clock ne '-' ? Time::Keeper->parse($clock) : $DEFAULT;
+        my @o;
+        push @o, locale => $loc if $loc ne '-';
+        push @o, zone => $zone if $zone ne '-';
+        push @o, bare_hour => $bare if $bare ne '-';
+        push @o, prefer => $prefer if $prefer ne '-';
+        push @o, now => Time::Keeper->parse($now) if $now ne '-';
+        my $n = eval { Time::Keeper::Natural->new(@o) };
+        my @row = ($loc, esc($text));
+        if (!$n) { push @row, 'new died: ' . $@ }
+        else {
+            push @row, ask(sub { $n->parse($text) }), ask(sub { $n->parse_duration($text) });
+            my $m = eval { $n->match($text) };
+            push @row, $m ? join(' ', 'match', $m->precision, join(',', $m->assumed), $m->start, $m->end) : 'no match';
+        }
+        print $fh esc(join "\t", @row), "\n";
+    }
+}
+close $fh;

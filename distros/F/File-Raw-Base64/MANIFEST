@@ -1,6 +1,7 @@
 b64.c
 b64.h
 Base64.xs
+bench/compare.pl
 Changes
 lib/File/Raw/Base64.pm
 Makefile.PL
@@ -19,5 +20,8 @@ t/09-bad-options.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
+xt/data/corpus.json
+xt/make-corpus.pl
+xt/oracle.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

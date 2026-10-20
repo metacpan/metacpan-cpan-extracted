@@ -1,0 +1,88 @@
+# USNO api/rstt/oneday (https://aa.usno.navy.mil/api/rstt/oneday?date=D&coords=LAT,LON&tz=TZ), the Sun, fetched 18 October 2026.
+# tz is the zone offset at local noon of the date, in hours, from Time::Keeper; times are local to that offset, to the minute; sundata lists the events USNO gave in its order; notes carry its text on days without them.
+# place	date	lat	lon	zone	tz	isdst	sundata	notes
+London	2026-10-15	51.5074	-0.1278	Europe/London	1	false	Begin Civil Twilight=06:51;Rise=07:24;Upper Transit=12:46;Set=18:07;End Civil Twilight=18:41	
+London	2026-06-21	51.5074	-0.1278	Europe/London	1	false	Begin Civil Twilight=03:55;Rise=04:43;Upper Transit=13:02;Set=21:22;End Civil Twilight=22:09	
+London	2026-12-21	51.5074	-0.1278	Europe/London	0	false	Begin Civil Twilight=07:23;Rise=08:04;Upper Transit=11:59;Set=15:53;End Civil Twilight=16:34	
+London	2026-03-29	51.5074	-0.1278	Europe/London	1	false	Begin Civil Twilight=06:09;Rise=06:43;Upper Transit=13:05;Set=19:29;End Civil Twilight=20:02	
+London	2026-10-25	51.5074	-0.1278	Europe/London	0	false	Begin Civil Twilight=06:07;Rise=06:42;Upper Transit=11:45;Set=16:47;End Civil Twilight=17:21	
+London	2026-01-01	51.5074	-0.1278	Europe/London	0	false	Begin Civil Twilight=07:26;Rise=08:06;Upper Transit=12:04;Set=16:02;End Civil Twilight=16:42	
+London	2100-01-15	51.5074	-0.1278	Europe/London	0	false	Begin Civil Twilight=07:21;Rise=07:59;Upper Transit=12:10;Set=16:21;End Civil Twilight=16:59	
+Utqiagvik	2026-05-09	71.2906	-156.7886	America/Anchorage	-8	false	Object continuously above the Twilight Limit=;Set=01:30;Rise=03:16;Upper Transit=14:24	
+Utqiagvik	2026-05-10	71.2906	-156.7886	America/Anchorage	-8	false	Object continuously above the Twilight Limit=;Set=01:48;Rise=02:58;Upper Transit=14:24	
+Utqiagvik	2026-05-11	71.2906	-156.7886	America/Anchorage	-8	false	Object continuously above the Horizon=;Object continuously above the Twilight Limit=;Lower Transit=02:24;Upper Transit=14:23	
+Utqiagvik	2026-05-12	71.2906	-156.7886	America/Anchorage	-8	false	Object continuously above the Horizon=;Object continuously above the Twilight Limit=;Lower Transit=02:23;Upper Transit=14:23	
+Utqiagvik	2026-08-01	71.2906	-156.7886	America/Anchorage	-8	false	Object continuously above the Horizon=;Object continuously above the Twilight Limit=;Lower Transit=02:34;Upper Transit=14:33	
+Utqiagvik	2026-08-02	71.2906	-156.7886	America/Anchorage	-8	false	Object continuously above the Twilight Limit=;Set=02:00;Rise=03:08;Upper Transit=14:33	
+Utqiagvik	2026-08-03	71.2906	-156.7886	America/Anchorage	-8	false	Object continuously above the Twilight Limit=;Set=01:42;Rise=03:26;Upper Transit=14:33	
+Utqiagvik	2026-08-04	71.2906	-156.7886	America/Anchorage	-8	false	Object continuously above the Twilight Limit=;Set=01:28;Rise=03:39;Upper Transit=14:33	
+Utqiagvik	2026-11-17	71.2906	-156.7886	America/Anchorage	-9	false	Begin Civil Twilight=10:03;Rise=12:23;Upper Transit=13:12;Set=14:00;End Civil Twilight=16:20	
+Utqiagvik	2026-11-18	71.2906	-156.7886	America/Anchorage	-9	false	Begin Civil Twilight=10:08;Rise=12:42;Upper Transit=13:12;Set=13:42;End Civil Twilight=16:16	
+Utqiagvik	2026-11-19	71.2906	-156.7886	America/Anchorage	-9	false	Object continuously below the Horizon=;Begin Civil Twilight=10:12;End Civil Twilight=16:12	
+Utqiagvik	2026-01-21	71.2906	-156.7886	America/Anchorage	-9	false	Object continuously below the Horizon=;Begin Civil Twilight=10:41;End Civil Twilight=16:37	
+Utqiagvik	2026-01-22	71.2906	-156.7886	America/Anchorage	-9	false	Begin Civil Twilight=10:37;Rise=13:24;Upper Transit=13:39;Set=13:55;End Civil Twilight=16:42	
+Utqiagvik	2026-01-23	71.2906	-156.7886	America/Anchorage	-9	false	Begin Civil Twilight=10:33;Rise=12:59;Upper Transit=13:39;Set=14:21;End Civil Twilight=16:46	
+Utqiagvik	2026-06-21	71.2906	-156.7886	America/Anchorage	-8	false	Object continuously above the Horizon=;Object continuously above the Twilight Limit=;Lower Transit=02:29;Upper Transit=14:29	
+Utqiagvik	2026-12-21	71.2906	-156.7886	America/Anchorage	-9	false	Object continuously below the Horizon=;Begin Civil Twilight=11:56;End Civil Twilight=14:55	
+Longyearbyen	2026-04-18	78.2232	15.6267	Arctic/Longyearbyen	2	false	Object continuously above the Twilight Limit=;Set=00:12;Rise=01:39;Upper Transit=12:57	
+Longyearbyen	2026-04-19	78.2232	15.6267	Arctic/Longyearbyen	2	false	Object continuously above the Horizon=;Object continuously above the Twilight Limit=;Lower Transit=00:57;Upper Transit=12:57	
+Longyearbyen	2026-04-20	78.2232	15.6267	Arctic/Longyearbyen	2	false	Object continuously above the Horizon=;Object continuously above the Twilight Limit=;Lower Transit=00:56;Upper Transit=12:56	
+Longyearbyen	2026-08-23	78.2232	15.6267	Arctic/Longyearbyen	2	false	Object continuously above the Horizon=;Object continuously above the Twilight Limit=;Lower Transit=01:00;Upper Transit=13:00	
+Longyearbyen	2026-08-24	78.2232	15.6267	Arctic/Longyearbyen	2	false	Object continuously above the Horizon=;Object continuously above the Twilight Limit=;Lower Transit=01:00;Upper Transit=13:00	
+Longyearbyen	2026-08-25	78.2232	15.6267	Arctic/Longyearbyen	2	false	Object continuously above the Twilight Limit=;Set=00:29;Rise=01:33;Upper Transit=13:00;Set=23:56	
+Longyearbyen	2026-06-21	78.2232	15.6267	Arctic/Longyearbyen	2	false	Object continuously above the Horizon=;Object continuously above the Twilight Limit=;Lower Transit=00:59;Upper Transit=12:59	
+Longyearbyen	2026-12-21	78.2232	15.6267	Arctic/Longyearbyen	1	false	Object continuously below the Horizon=;Object continuously below the Twilight Limit=	
+Longyearbyen	2026-02-15	78.2232	15.6267	Arctic/Longyearbyen	1	false	Begin Civil Twilight=08:25;Rise=11:58;Upper Transit=12:12;Set=12:27;End Civil Twilight=16:00	
+Longyearbyen	2026-02-16	78.2232	15.6267	Arctic/Longyearbyen	1	false	Begin Civil Twilight=08:17;Rise=11:14;Upper Transit=12:12;Set=13:11;End Civil Twilight=16:08	
+Longyearbyen	2026-10-26	78.2232	15.6267	Arctic/Longyearbyen	1	false	Begin Civil Twilight=07:51;Rise=11:12;Upper Transit=11:41;Set=12:09;End Civil Twilight=15:29	
+Longyearbyen	2026-10-27	78.2232	15.6267	Arctic/Longyearbyen	1	false	Object continuously below the Horizon=;Begin Civil Twilight=07:59;End Civil Twilight=15:21	
+Tromso	2026-05-19	69.6492	18.9553	Europe/Oslo	2	false	Object continuously above the Horizon=;Object continuously above the Twilight Limit=;Lower Transit=00:41;Upper Transit=12:41	
+Tromso	2026-05-20	69.6492	18.9553	Europe/Oslo	2	false	Object continuously above the Horizon=;Object continuously above the Twilight Limit=;Lower Transit=00:41;Upper Transit=12:41	
+Tromso	2026-07-22	69.6492	18.9553	Europe/Oslo	2	false	Object continuously above the Horizon=;Object continuously above the Twilight Limit=;Lower Transit=00:51;Upper Transit=12:51	
+Tromso	2026-07-23	69.6492	18.9553	Europe/Oslo	2	false	Object continuously above the Horizon=;Object continuously above the Twilight Limit=;Lower Transit=00:51;Upper Transit=12:51	
+Tromso	2026-11-27	69.6492	18.9553	Europe/Oslo	1	false	Begin Civil Twilight=08:36;Rise=11:20;Upper Transit=11:32;Set=11:42;End Civil Twilight=14:27	
+Tromso	2026-01-15	69.6492	18.9553	Europe/Oslo	1	false	Begin Civil Twilight=08:57;Rise=11:29;Upper Transit=11:54;Set=12:19;End Civil Twilight=14:51	
+Tromso	2026-06-21	69.6492	18.9553	Europe/Oslo	2	false	Object continuously above the Horizon=;Object continuously above the Twilight Limit=;Lower Transit=00:46;Upper Transit=12:46	
+McMurdo	2026-10-24	-77.8419	166.6863	Antarctica/McMurdo	13	false	Object continuously above the Horizon=;Object continuously above the Twilight Limit=;Lower Transit=01:38;Upper Transit=13:38	
+McMurdo	2026-10-25	-77.8419	166.6863	Antarctica/McMurdo	13	false	Object continuously above the Horizon=;Object continuously above the Twilight Limit=;Lower Transit=01:37;Upper Transit=13:37	
+McMurdo	2026-02-20	-77.8419	166.6863	Antarctica/McMurdo	13	false	Object continuously above the Twilight Limit=;Set=01:29;Rise=02:47;Upper Transit=14:07	
+McMurdo	2026-02-21	-77.8419	166.6863	Antarctica/McMurdo	13	false	Object continuously above the Twilight Limit=;Set=00:59;Rise=03:17;Upper Transit=14:07	
+McMurdo	2026-04-24	-77.8419	166.6863	Antarctica/McMurdo	12	false	Begin Civil Twilight=09:03;Rise=12:10;Upper Transit=12:51;Set=13:31;End Civil Twilight=16:38	
+McMurdo	2026-04-25	-77.8419	166.6863	Antarctica/McMurdo	12	false	Object continuously below the Horizon=;Begin Civil Twilight=09:10;End Civil Twilight=16:30	
+McMurdo	2026-08-19	-77.8419	166.6863	Antarctica/McMurdo	12	false	Begin Civil Twilight=09:11;Rise=12:19;Upper Transit=12:57;Set=13:37;End Civil Twilight=16:45	
+McMurdo	2026-08-20	-77.8419	166.6863	Antarctica/McMurdo	12	false	Begin Civil Twilight=09:03;Rise=11:51;Upper Transit=12:57;Set=14:04;End Civil Twilight=16:53	
+McMurdo	2026-06-21	-77.8419	166.6863	Antarctica/McMurdo	12	false	Object continuously below the Horizon=;Object continuously below the Twilight Limit=	
+McMurdo	2026-12-21	-77.8419	166.6863	Antarctica/McMurdo	13	false	Object continuously above the Horizon=;Object continuously above the Twilight Limit=;Lower Transit=01:51;Upper Transit=13:51	
+Quito	2026-03-20	-0.1807	-78.4678	America/Guayaquil	-5	false	Begin Civil Twilight=05:57;Rise=06:18;Upper Transit=12:21;Set=18:24;End Civil Twilight=18:45	
+Quito	2026-06-21	-0.1807	-78.4678	America/Guayaquil	-5	false	Begin Civil Twilight=05:50;Rise=06:12;Upper Transit=12:16;Set=18:19;End Civil Twilight=18:42	
+Quito	2026-12-21	-0.1807	-78.4678	America/Guayaquil	-5	false	Begin Civil Twilight=05:45;Rise=06:08;Upper Transit=12:12;Set=18:16;End Civil Twilight=18:39	
+Kiritimati	2026-01-15	1.8721	-157.4278	Pacific/Kiritimati	14	false	Begin Civil Twilight=06:16;Rise=06:38;Upper Transit=12:39;Set=18:40;End Civil Twilight=19:02	
+Kiritimati	2026-07-15	1.8721	-157.4278	Pacific/Kiritimati	14	false	Begin Civil Twilight=06:07;Rise=06:29;Upper Transit=12:36;Set=18:42;End Civil Twilight=19:04	
+Santiago	2026-04-04	-33.4489	-70.6693	America/Santiago	-3	false	Begin Civil Twilight=07:32;Rise=07:57;Upper Transit=13:46;Set=19:34;End Civil Twilight=19:59	
+Santiago	2026-04-05	-33.4489	-70.6693	America/Santiago	-4	false	Begin Civil Twilight=06:33;Rise=06:58;Upper Transit=12:45;Set=18:32;End Civil Twilight=18:57	
+Santiago	2026-09-05	-33.4489	-70.6693	America/Santiago	-4	false	Begin Civil Twilight=06:30;Rise=06:55;Upper Transit=12:41;Set=18:28;End Civil Twilight=18:53	
+Santiago	2026-09-06	-33.4489	-70.6693	America/Santiago	-3	false	Begin Civil Twilight=07:29;Rise=07:54;Upper Transit=13:41;Set=19:29;End Civil Twilight=19:53	
+Santiago	2026-09-07	-33.4489	-70.6693	America/Santiago	-3	false	Begin Civil Twilight=07:28;Rise=07:53;Upper Transit=13:41;Set=19:29;End Civil Twilight=19:54	
+LordHowe	2026-04-05	-31.5553	159.0821	Australia/Lord_Howe	10.5	false	Begin Civil Twilight=05:43;Rise=06:07;Upper Transit=11:56;Set=17:45;End Civil Twilight=18:10	
+LordHowe	2026-10-04	-31.5553	159.0821	Australia/Lord_Howe	11	false	Begin Civil Twilight=05:34;Rise=05:58;Upper Transit=12:13;Set=18:27;End Civil Twilight=18:52	
+Sydney	2026-01-01	-33.8688	151.2093	Australia/Sydney	11	false	Begin Civil Twilight=05:18;Rise=05:48;Upper Transit=12:59;Set=20:09;End Civil Twilight=20:38	
+Sydney	2026-07-01	-33.8688	151.2093	Australia/Sydney	10	false	Begin Civil Twilight=06:33;Rise=07:01;Upper Transit=11:59;Set=16:57;End Civil Twilight=17:25	
+Reykjavik	2026-06-21	64.1466	-21.9426	Atlantic/Reykjavik	0	false	Object continuously above the Twilight Limit=;Set=00:04;Rise=02:55;Upper Transit=13:30	
+Reykjavik	2026-12-21	64.1466	-21.9426	Atlantic/Reykjavik	0	false	Begin Civil Twilight=10:03;Rise=11:22;Upper Transit=13:26;Set=15:29;End Civil Twilight=16:49	
+Kashgar	2026-06-21	39.4704	75.9898	Asia/Shanghai	8	false	Begin Civil Twilight=06:57;Rise=07:29;Upper Transit=14:58;Set=22:27;End Civil Twilight=22:59	
+Kashgar	2026-12-21	39.4704	75.9898	Asia/Shanghai	8	false	Begin Civil Twilight=09:42;Rise=10:13;Upper Transit=14:54;Set=19:35;End Civil Twilight=20:06	
+Anchorage	2026-11-01	61.2181	-149.9003	America/Anchorage	-9	false	Begin Civil Twilight=07:41;Rise=08:28;Upper Transit=12:43;Set=16:57;End Civil Twilight=17:44	
+Anchorage	2026-03-08	61.2181	-149.9003	America/Anchorage	-8	false	Begin Civil Twilight=07:55;Rise=08:38;Upper Transit=14:10;Set=19:44;End Civil Twilight=20:27	
+Honolulu	2026-03-10	21.3069	-157.8583	Pacific/Honolulu	-10	false	Begin Civil Twilight=06:22;Rise=06:44;Upper Transit=12:42;Set=18:39;End Civil Twilight=19:01	
+Graze65.7	2026-06-21	65.7	0	UTC	0	false	Object continuously above the Twilight Limit=;Rise=00:15;Upper Transit=12:02;Set=23:49	
+Graze65.7	2026-06-20	65.7	0	UTC	0	false	Object continuously above the Twilight Limit=;Rise=00:16;Upper Transit=12:02;Set=23:49	
+Graze65.9	2026-06-21	65.9	0	UTC	0	false	Object continuously above the Horizon=;Object continuously above the Twilight Limit=;Lower Transit=00:02;Upper Transit=12:02	
+Graze66.1	2026-06-21	66.1	0	UTC	0	false	Object continuously above the Horizon=;Object continuously above the Twilight Limit=;Lower Transit=00:02;Upper Transit=12:02	
+Graze65.5	2026-06-21	65.5	0	UTC	0	false	Object continuously above the Twilight Limit=;Rise=00:35;Upper Transit=12:02;Set=23:28	
+London	1800-06-15	51.5074	-0.1278	Europe/London	0	false	Begin Civil Twilight=02:55;Rise=03:42;Upper Transit=12:00;Set=20:19;End Civil Twilight=21:07	
+London	1700-03-01	51.5074	-0.1278	Europe/London	0	false	Begin Civil Twilight=06:13;Rise=06:46;Upper Transit=12:13;Set=17:41;End Civil Twilight=18:15	
+Dateline	2026-10-15	0	180	UTC	0	false	Set=05:49;End Civil Twilight=06:10;Begin Civil Twilight=17:21;Rise=17:42;Upper Transit=23:46	
+Pole	2026-03-19	89.99	0	UTC	0	false	Object continuously above the Horizon=;Object continuously above the Twilight Limit=;Lower Transit=00:08;Upper Transit=12:08	
+Pole	2026-09-25	89.99	0	UTC	0	false	Object continuously above the Twilight Limit=;Set=02:50	
+East90	2026-10-15	0	90	UTC	0	false	Upper Transit=05:46;Set=11:49;End Civil Twilight=12:10;Begin Civil Twilight=23:21;Rise=23:42	
+East90	2026-06-21	0	90	UTC	0	false	Upper Transit=06:02;Set=12:05;End Civil Twilight=12:28;Begin Civil Twilight=23:36;Rise=23:58	

@@ -7,21 +7,23 @@ no warnings 'experimental::signatures';
 
 use Object::Pad 0.825;
 
+use Term::Fabulous::Role::Searchable qw(searchables_in);
+use Term::Fabulous::Role::SearchContainer;
 use Term::Fabulous::Widget::Box;
 use Term::Fabulous::Widget::Button;
 use Term::Fabulous::Widget::Text;
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 class Term::Fabulous::Widget::Accordion::Item
 	:isa(Term::Fabulous::Widget::Box)
+	:does(Term::Fabulous::Role::SearchContainer)
 	:strict(params)
 {
 	use Clay::UI::Enum::Result;
 	use Clay::XS qw(sizing_grow CLAY_TOP_TO_BOTTOM);
-	use Scalar::Util qw(blessed weaken);
+	use Scalar::Util qw(blessed);
 	use Term::Fabulous::Check qw(boolean optional string);
-	use Term::Fabulous::Theme;
 
 	# The settings an item shows while it has no accordion to take them
 	# from; the colors come from the default theme's accordion family.
@@ -51,11 +53,10 @@ class Term::Fabulous::Widget::Accordion::Item
 		$icon  = optional( \&string, $self, icon => $icon );
 		$self->layout( { %{ $self->layout }, layout_direction => CLAY_TOP_TO_BOTTOM, sizing => { width => sizing_grow(), %{ $self->layout->{sizing} // {} } } } );
 
-		weaken( my $weak_self = $self );
 		my $continue = Clay::UI::Enum::Result->CONTINUE;
 		$_header = Term::Fabulous::Widget::Button->new( layout => { sizing => { width => sizing_grow() }, child_gap => 1 }, pressed_background_color => undef );
-		$_header->on( Activate => sub ($event) { $weak_self->_activated if $weak_self;   return } );
-		$_header->on( $_       => sub ($event) { $weak_self->refresh_look if $weak_self; return $continue } ) foreach qw(OnFocus OnBlur OnHoverStart OnHoverStopped);
+		$_header->on( Activate => sub ( $self, $event ) { $self->_activated;   return },           owner => $self );
+		$_header->on( $_       => sub ( $self, $event ) { $self->refresh_look; return $continue }, owner => $self ) foreach qw(OnFocus OnBlur OnHoverStart OnHoverStopped);
 		$_body        = Term::Fabulous::Widget::Box->new( layout => { layout_direction => CLAY_TOP_TO_BOTTOM, sizing => { width => sizing_grow() } } );
 		$_toggle_text = Term::Fabulous::Widget::Text->new( text => '' );
 		$_icon_text   = Term::Fabulous::Widget::Text->new( text => $icon // '' );
@@ -80,6 +81,13 @@ class Term::Fabulous::Widget::Accordion::Item
 
 	method header () { return $_header }
 	method body ()   { return $_body }
+
+	# Who takes the focus when the focus inside the item is lost, for
+	# example when it closes over a focused field (Clay::UI::Interaction's
+	# focus heirs): the header, where the user can open it again.
+	method focus_heir () {
+		return $_header;
+	}
 
 	# The item's children live in its body; the header is its own.
 	method add_child :override (@kids) {
@@ -191,33 +199,47 @@ class Term::Fabulous::Widget::Accordion::Item
 	# ---------------------------------------------------------------------
 
 	# One setting of the look: the accordion's; without one, the default
-	# setting, or the default theme's accordion look.
+	# setting, or the accordion look of the theme the item draws with.
 	method _look ($name) {
 		my $accordion = $self->accordion;
 		return $accordion->$name if defined $accordion;
 		return $DEFAULT_LOOK{$name} if exists $DEFAULT_LOOK{$name};
 		require Term::Fabulous::Widget::Accordion;
 		my %themed = Term::Fabulous::Widget::Accordion->themed_params;
-		return Term::Fabulous::Theme->default->look( 'accordion', @{ $themed{$name} }[ 0, 1 ] );    # slot and state
+		return $self->family_look( accordion => @{ $themed{$name} }[ 0, 1 ] );    # slot and state
 	}
 
 	# Updates the header's texts, order and colors from the state and the
 	# accordion's settings. Called by the accordion when they change.
 	method refresh_look () {
-		my $enabled = $_header->is_enabled;
-		my $at_end  = $self->_look('toggle_position') eq 'end';
+		$self->_show_look;
+		my @parts = ( ( defined $icon ? $_icon_text : () ), $_title_text );
+		my @order
+			= $self->_look('toggle_position') eq 'end'
+			? ( @parts, Term::Fabulous::Widget::Box->new( layout => { sizing => { width => sizing_grow() } } ), $_toggle_text )
+			: ( $_toggle_text, @parts );
+		$_header->clear_children;
+		$_header->add_child(@order);
+		return $self;
+	}
 
+	# The item joined a UI, or its theme changed (Term::Fabulous::Role::Themed):
+	# the texts and colors follow the theme it draws with now. The order
+	# of the parts depends on no theme.
+	method looks_changed (@names) {
+		$self->_show_look;
+		return;
+	}
+
+	# The glyph, the colors and the indent, from the state and the look.
+	method _show_look () {
+		my $enabled = $_header->is_enabled;
 		$_toggle_text->text( $_is_open      ? $self->_look('open_glyph')                                                 : $self->_look('closed_glyph') );
 		$_toggle_text->text_color( $enabled ? ( $_is_open ? $self->_look('accent_color') : $self->_look('title_color') ) : $self->_look('disabled_color') );
 		$_title_text->text_color( $self->_look('title_color') );
 		$_title_text->bold( $self->_look('title_bold') );
 		$_icon_text->text_color( $self->_look('title_color') );
 		$_header->disabled_color( $self->_look('disabled_color') );
-
-		my @parts = ( ( defined $icon ? $_icon_text : () ), $_title_text );
-		my @order = $at_end ? ( @parts, Term::Fabulous::Widget::Box->new( layout => { sizing => { width => sizing_grow() } } ), $_toggle_text ) : ( $_toggle_text, @parts );
-		$_header->clear_children;
-		$_header->add_child(@order);
 
 		my $background
 			= !$enabled            ? $self->_look('header_background_color')
@@ -228,7 +250,24 @@ class Term::Fabulous::Widget::Accordion::Item
 
 		my $indent = $self->_look('body_indent');
 		$_body->layout( { %{ $_body->layout }, padding => { %{ $_body->layout->{padding} // {} }, left => $indent } } );
-		return $self;
+		return;
+	}
+
+	# ---------------------------------------------------------------------
+	# Searching (Term::Fabulous::Role::SearchContainer): the texts of the
+	# body, open or closed; revealing one opens the item
+	# ---------------------------------------------------------------------
+
+	method searchable_parts () {
+		return searchables_in($_body);
+	}
+
+	# Opens the item the way its accordion opens one, so that the others
+	# close unless several may be open.
+	method reveal_part ($part) {
+		my $accordion = $self->accordion;
+		defined $accordion ? $accordion->open($self) : $self->open(1);
+		return;
 	}
 }
 
@@ -325,8 +364,11 @@ header and, while open, the body), plus:
 
 Accessor. Writing opens or closes the item without an event and
 without regard to the accordion's C<multiple>; the accordion's
-L<Term::Fabulous::Widget::Accordion/open> keeps that rule. Returns 1 or
-0.
+L<Term::Fabulous::Widget::Accordion/open> keeps that rule. Closing an
+item whose body holds the focus moves the focus to its header (see
+L</focus_heir> and
+L<Term::Fabulous::Manual::Events/When the focused widget goes away>).
+Returns 1 or 0.
 
 =head2 is_open
 
@@ -381,6 +423,17 @@ style it further.
 
 The body L<Term::Fabulous::Widget::Box>, also while the item is closed.
 
+=head2 focus_heir
+
+	my $header = $item->focus_heir;
+
+The L</header>. When the widget with the focus leaves the item (the
+item closes, or the widget is removed from its body), the focus goes to
+the header when it can take the focus, else to the nearest widget above
+the item that can (see
+L<Term::Fabulous::Manual::Events/When the focused widget goes away> and
+L<Clay::UI::Interaction/Focus heirs>). You do not call it yourself.
+
 =head2 accordion
 
 	my $accordion = $item->accordion;
@@ -394,6 +447,29 @@ The L<Term::Fabulous::Widget::Accordion> the item is in, or C<undef>.
 Updates the header from the item's state and the accordion's settings.
 The accordion calls it when its settings change; call it yourself
 after changing the header's look behind its back. Returns the item.
+
+=head2 search_texts, search_revision, highlight_text, clear_text_highlights, reveal_text
+
+	my @entries = $item->search_texts;    # ( [ [ $index, $key ], $text ], ... )
+	my ($text) = @{ $item->reveal_text( $entries[0][0], 0 ) };
+
+The methods of L<Term::Fabulous::Role::Searchable>, from
+L<Term::Fabulous::Role::SearchContainer>: an item answers for the
+searchable widgets of its body, open or closed, with keys of the
+widget's index among them and the widget's own key (see
+L<Term::Fabulous::Role::Searchable/Nested keys>). C<search_serial> comes
+from L<Term::Fabulous::Role::Searchable/search_serial>.
+C<reveal_text> opens the item as L<Term::Fabulous::Widget::Accordion/open>
+does, without firing C<Select>, so in an accordion that opens one item
+at a time the others close, and returns what the widget returns.
+
+=head2 searchable_parts, reveal_part
+
+	my @widgets = $item->searchable_parts;
+
+For L<Term::Fabulous::Role::SearchContainer>: the searchable widgets of
+the body, in order, and the step that opens the item before one of them
+reveals a text. You do not call them yourself.
 
 =head1 EVENTS
 

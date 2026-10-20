@@ -3,7 +3,7 @@ package oEdtk::TexTag;
 use strict;
 use utf8;
 
-our $VERSION = '2.1126';
+our $VERSION = '2.1129';
 my $_FLAG_DIGITS = 1;
 
 # A SIMPLE OBJECT THAT DESCRIBES A TEX TAG.

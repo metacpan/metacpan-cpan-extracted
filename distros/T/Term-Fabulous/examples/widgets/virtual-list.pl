@@ -2,8 +2,9 @@
 
 # Term::Fabulous::Widget::VirtualList: a document of fifty thousand
 # paragraphs, built paragraph by paragraph as the viewport reaches them.
-# Scroll with the mouse wheel or the scrollbar; Home, End, PageUp and
-# PageDown jump. The status line counts the paragraphs built so far.
+# Scroll with the mouse wheel, the scrollbar or the keys of less: Up and
+# Down or j and k, PageUp and PageDown or b and Space, Home and End or g
+# and G. The status line counts the paragraphs built so far.
 # Ctrl+C quits.
 #
 #     perl examples/widgets/virtual-list.pl
@@ -21,8 +22,8 @@ use lib "$FindBin::Bin/../../lib/";
 use List::Util qw(max);
 use Term::Fabulous;
 use Term::Fabulous::Enum::BorderStyle;
+use Term::Fabulous::Scrolling qw(scroll_by_key);
 use Term::Fabulous::Widget::Box;
-use Term::Fabulous::Widget::RichText;
 use Term::Fabulous::Widget::Text;
 use Term::Fabulous::Widget::VirtualList;
 
@@ -52,7 +53,7 @@ my $document = Term::Fabulous::Widget::VirtualList->new(
 	count => PARAGRAPHS,
 	build => sub ($index) {
 		$built++;
-		return Term::Fabulous::Widget::RichText->new( markup => markup_of($index) );
+		return Term::Fabulous::Widget::Text->new( markup => markup_of($index) );
 	},
 	estimate => sub ( $index, $columns ) { 1 + int( length( markup_of($index) ) / max( 1, $columns ) ) },
 	layout   => {
@@ -76,38 +77,27 @@ $root->add_child( $document, $status );
 
 my $ui = Term::Fabulous->new( width => 80, height => 24, root => $root );
 
-# Keys reach the root: nothing in this program takes the focus. A page
-# is the viewport less one row, so the last row stays as a landmark.
-my %action_by_key = (
-	Home     => sub { $document->scroll_to_item(0) },
-	End      => sub { $document->scroll_to_item( PARAGRAPHS - 1 ) },
-	PageUp   => sub { page(1) },
-	PageDown => sub { page(-1) },
-);
+# Keys reach the root: nothing in this program takes the focus. The keys
+# of less scroll the list: Home and End go to its first and last
+# paragraph, a page is the rows inside the border less one, so the last
+# row stays as a landmark.
 $root->on(
 	KeyPress => sub ($event) {
-		my $action = $action_by_key{ $event->main_key_name // '' } or return;
-		$action->();
+		scroll_by_key( $ui, $document, $event->main_key_name, keys => 'less' );
 		return;
 	}
 );
-
-sub page ($direction) {
-	my $state = $ui->scroll_state($document) // return;
-	$ui->scroll_to( $document, { y => $state->{position}{y} + $direction * ( $state->{viewport}{height} - 1 ) } );
-	return;
-}
 
 # After every frame the status line tells what the frame showed; a
 # frame follows only when the text changed.
 sub refresh_status () {
 	my $visible = $document->visible_items;
-	my $text    = sprintf 'Paragraphs %s of %d, %d built  |  Home End PgUp PgDn, Ctrl+C quits',
+	my $text    = sprintf 'Paragraphs %s of %d, %d built  |  keys of less, Ctrl+C quits',
 		( defined $visible ? "$visible->{first}-$visible->{last}" : 'none' ), PARAGRAPHS, $built;
 	$status->text($text) if $text ne $status->text;
-	$ui->after_draw( \&refresh_status );
-	return;
+	return 0;    # keeps it for the next frame
 }
 refresh_status();
+$ui->each_draw( \&refresh_status );
 
 $ui->run;

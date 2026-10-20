@@ -1,4 +1,4 @@
-requires 'perl', '5.014';
+requires 'perl', '5.024';
 
 requires 'List::Util', '1.45';
 requires 'Hash::Util';

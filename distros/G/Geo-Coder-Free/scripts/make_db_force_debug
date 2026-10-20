@@ -1,0 +1,1 @@
+bash -xe scripts/make_db_force 2> /tmp/stderr

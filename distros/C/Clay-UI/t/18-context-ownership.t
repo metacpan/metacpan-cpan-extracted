@@ -7,12 +7,16 @@ use Test2::V0;
 use Config;
 use POSIX ();
 
+use lib "t/lib";
+use Clay::Test::Guards qw(call_guarded guarded_names);
+
 use Clay::XS qw(:all);
 
 # -----------------------------------------------------------------------------
 # Context ownership, lifetime and validation: every Perl handle to a context
 # shares one referent, copies and forgeries are rejected, Clay-touching calls
-# croak without a usable context, and Clay_Initialize / the capacity setters
+# croak without a usable context (the wrapper guard table's context, frame
+# and counts columns, every row), and Clay_Initialize / the capacity setters
 # validate their input before anything is allocated.
 # -----------------------------------------------------------------------------
 
@@ -41,46 +45,60 @@ sub text_of ($cmds) {
 	return $text->{renderData}{stringContents};
 }
 
-subtest 'Clay-touching calls croak without a current context' => sub {
-	my @calls = (
-		[ Clay_SetLayoutDimensions         => sub { Clay_SetLayoutDimensions([10, 10]) } ],
-		[ Clay_GetLayoutDimensions         => sub { Clay_GetLayoutDimensions() } ],
-		[ Clay_BeginLayout                 => sub { Clay_BeginLayout() } ],
-		[ Clay_EndLayout                   => sub { Clay_EndLayout() } ],
-		[ Clay__OpenElement                => sub { Clay__OpenElement() } ],
-		[ Clay__OpenElementWithId          => sub { Clay__OpenElementWithId({ id => 1 }) } ],
-		[ Clay__CloseElement               => sub { Clay__CloseElement() } ],
-		[ Clay__ConfigureOpenElement       => sub { Clay__ConfigureOpenElement({}) } ],
-		[ Clay__OpenTextElement            => sub { Clay__OpenTextElement('x', {}) } ],
-		[ Clay_GetOpenElementId            => sub { Clay_GetOpenElementId() } ],
-		[ Clay_GetElementData              => sub { Clay_GetElementData({ id => 1 }) } ],
-		[ Clay_SetMeasureTextFunction      => sub { Clay_SetMeasureTextFunction(sub { }) } ],
-		[ Clay_ResetMeasureTextCache       => sub { Clay_ResetMeasureTextCache() } ],
-		[ Clay_SetPointerState             => sub { Clay_SetPointerState([0, 0], 0) } ],
-		[ Clay_GetPointerState             => sub { Clay_GetPointerState() } ],
-		[ Clay_Hovered                     => sub { Clay_Hovered() } ],
-		[ Clay_OnHover                     => sub { Clay_OnHover(sub { }) } ],
-		[ Clay_PointerOver                 => sub { Clay_PointerOver({ id => 1 }) } ],
-		[ Clay_GetPointerOverIds           => sub { Clay_GetPointerOverIds() } ],
-		[ Clay_UpdateScrollContainers      => sub { Clay_UpdateScrollContainers(0, [0, 0], 0) } ],
-		[ Clay_GetScrollOffset             => sub { Clay_GetScrollOffset() } ],
-		[ Clay_GetScrollContainerData      => sub { Clay_GetScrollContainerData({ id => 1 }) } ],
-		[ Clay_SetQueryScrollOffsetFunction => sub { Clay_SetQueryScrollOffsetFunction(sub { }) } ],
-		[ Clay_SetExternalScrollHandlingEnabled => sub { Clay_SetExternalScrollHandlingEnabled(0) } ],
-		[ set_scroll_position              => sub { set_scroll_position({ id => 1 }, [0, 0]) } ],
-		[ Clay_SetDebugModeEnabled         => sub { Clay_SetDebugModeEnabled(1) } ],
-		[ Clay_IsDebugModeEnabled          => sub { Clay_IsDebugModeEnabled() } ],
-		[ Clay_SetCullingEnabled           => sub { Clay_SetCullingEnabled(1) } ],
-		[ Clay_SetTransitionHandlers       => sub { Clay_SetTransitionHandlers() } ],
-	);
-	for my $call (@calls) {
-		my ($name, $code) = @$call;
-		like( dies { $code->() }, qr/\Q$name\E: no current Clay context/, "$name croaks" );
+# The wrapper guard table (Clay::XS::_wrapper_guards) drives the guard
+# tests: every row of a column is called with as many undef arguments as it
+# needs (call_guarded), so only its guard can refuse the call.
+subtest 'the context guard: current rows need a current context' => sub {
+	is( Clay_GetCurrentContext(), undef, 'no current context' );
+	my @current = guarded_names(sub ($guard) { $guard->{context} eq 'current' });
+	ok( scalar @current, 'the table lists functions that need a context' );
+	for my $name (@current) {
+		like( dies { call_guarded($name) }, qr/^\Q$name\E: no current Clay context/, "$name croaks" );
 	}
+	for my $name (guarded_names(sub ($guard) { $guard->{context} ne 'current' })) {
+		my $error = dies { call_guarded($name) };
+		unlike( $error // '', qr/no current Clay context/, "$name needs no context" );
+	}
+	is( Clay_GetCurrentContext(), undef, 'the calls left no current context' );
+};
 
-	is( Clay_GetCurrentContext(), undef, 'Clay_GetCurrentContext is undef without a context' );
-	ok( lives { Clay_GetElementId('x'); Clay__HashString('x', 3); Clay_EaseOut({}) },
-		'pure helpers need no context' );
+subtest 'the frame guard: in_frame, open_element and complete_layout rows' => sub {
+	my $ctx = new_context();
+	my %rows = map { my $frame = $_; ($frame => [ guarded_names(sub ($guard) { $guard->{frame} eq $frame }) ]) }
+		qw(in_frame open_element complete_layout);
+	ok( scalar @{ $rows{$_} }, "the table lists $_ functions" ) for sort keys %rows;
+
+	for my $name (@{ $rows{in_frame} }) {
+		like( dies { call_guarded($name) }, qr/^\Q$name\E: called outside Clay_BeginLayout\/Clay_EndLayout/,
+			"$name croaks outside a frame" );
+	}
+	Clay_BeginLayout();
+	for my $name (@{ $rows{open_element} }) {
+		like( dies { call_guarded($name) }, qr/^\Q$name\E: no element is open/, "$name croaks with nothing open" );
+	}
+	for my $name (@{ $rows{complete_layout} }) {
+		like( dies { call_guarded($name) }, qr/^\Q$name\E: cannot be called between Clay_BeginLayout and Clay_EndLayout/,
+			"$name croaks inside a frame" );
+	}
+	ok( lives { Clay_EndLayout(0) }, 'the frame still ends' );
+	is( text_of(build_frame('after the guards')), 'after the guards', 'and the next one renders' );
+};
+
+subtest 'the counts guard: rows with counts croak once a count changed' => sub {
+	my $ctx = new_context();
+	Clay_SetMaxElementCount(16384);
+	my @counted = guarded_names(sub ($guard) { $guard->{counts} });
+	ok( scalar @counted, 'the table lists functions that need the initial counts' );
+	for my $name (@counted) {
+		like( dies { call_guarded($name) }, qr/^\Q$name\E: element\/word counts changed since Clay_Initialize/,
+			"$name croaks" );
+	}
+	for my $name (guarded_names(sub ($guard) { !$guard->{counts} })) {
+		my $error = dies { call_guarded($name) };
+		unlike( $error // '', qr/counts changed/, "$name does not check the counts" );
+	}
+	Clay_SetMaxElementCount(8192);
+	is( text_of(build_frame('counts restored')), 'counts restored', 'restoring the count lets the calls through again' );
 };
 
 subtest 'an alias from Clay_GetCurrentContext shares the context' => sub {
@@ -235,13 +253,77 @@ subtest 'counts whose arena exceeds 4 GiB are rejected' => sub {
 	ok( lives { new_context() }, 'Clay_Initialize still works' );
 };
 
+subtest 'Clay_MinMemorySize sizes explicit counts by the count rules' => sub {
+	my $ctx = new_context();
+	is( Clay_MinMemorySize({ maxElementCount => 8192, maxMeasureTextCacheWordCount => 16384 }), Clay_MinMemorySize(),
+		'the counts of the current context need what Clay_MinMemorySize() reports' );
+	is( Clay_MinMemorySize(undef), Clay_MinMemorySize(), 'undef stands for the configured counts' );
+	is( Clay_MinMemorySize({ maxElementCount => 1000 }), Clay_MinMemorySize({ maxElementCount => 1000, maxMeasureTextCacheWordCount => 2000 }),
+		'the word count defaults to twice the elements' );
+	is( Clay_MinMemorySize({ maxElementCount => 10 }), Clay_MinMemorySize({ maxElementCount => 10, maxMeasureTextCacheWordCount => 32 }),
+		'and to at least 32 words' );
+	ok( Clay_MinMemorySize({ maxElementCount => 2000 }) > Clay_MinMemorySize({ maxElementCount => 1000 }),
+		'more elements need more memory' );
+
+	like( dies { Clay_MinMemorySize({ maxElementCount => 100, maxMeasureTextCacheWordCount => 31 }) },
+		qr/^Clay_MinMemorySize: counts: maxMeasureTextCacheWordCount: expected an integer in 32\.\.2147483647, got '31'/,
+		'fewer than 32 words croak' );
+	ok( lives { Clay_MinMemorySize({ maxElementCount => 10, maxMeasureTextCacheWordCount => 351 }) },
+		'32 words per element or fewer fit' );
+	like( dies { Clay_MinMemorySize({ maxElementCount => 10, maxMeasureTextCacheWordCount => 352 }) },
+		qr/^Clay_MinMemorySize: 352 measure-cache words need 11 hash buckets but only 10 elements are configured/,
+		'more croak: Clay would index its measure cache past its elements' );
+	like( dies { Clay_MinMemorySize({ maxElementCount => 6_500_000 }) }, qr/^Clay_MinMemorySize: .*limited to 4 GiB/,
+		'counts whose arena exceeds 4 GiB croak' );
+	like( dies { Clay_MinMemorySize({ maxElementCount => 2**30 }) }, qr/would overflow the default measure-cache word count/,
+		'so do elements whose default word count overflows' );
+
+	like( dies { Clay_MinMemorySize({ maxElementCount => 0 }) },
+		qr/^Clay_MinMemorySize: counts: maxElementCount: expected an integer in 1\.\.2147483647, got '0'/, 'no elements croak' );
+	like( dies { Clay_MinMemorySize({ maxMeasureTextCacheWordCount => 64 }) },
+		qr/^Clay_MinMemorySize: counts: maxElementCount is required/, 'the element count is required' );
+	like( dies { Clay_MinMemorySize({ maxElementCount => 10, maxElements => 10 }) },
+		qr/^Clay_MinMemorySize: counts: unknown key 'maxElements'; the keys are maxElementCount and maxMeasureTextCacheWordCount/,
+		'unknown keys croak' );
+	like( dies { Clay_MinMemorySize(10) }, qr/^Clay_MinMemorySize: counts: expected a hash reference or undef, got '10'/,
+		'counts must be a hash' );
+	is( [ Clay_GetMaxElementCount(), Clay_GetMaxMeasureTextCacheWordCount() ], [ 8192, 16384 ],
+		'the current context keeps its counts' );
+};
+
+subtest 'Clay_Initialize with counts changes no other counts' => sub {
+	my %counts = (maxElementCount => 100, maxMeasureTextCacheWordCount => 64);
+	my $ctx = new_context();
+	like( dies { Clay_Initialize(Clay_MinMemorySize(\%counts) - 1, [10, 10], undef, undef, \%counts) },
+		qr/^Clay_Initialize: capacity \d+ is below Clay_MinMemorySize\(\) = \d+ bytes for 100 elements and 64 measure-cache words/,
+		'the capacity must fit the given counts' );
+	ok( Clay_GetCurrentContext() == $ctx, 'a refused call leaves the previous context current' );
+
+	my $small = Clay_Initialize(Clay_MinMemorySize(\%counts), [100, 100], undef, undef, \%counts);
+	Clay_SetMeasureTextFunction(sub { return { width => 1, height => 1 } });
+	ok( Clay_GetCurrentContext() == $small, 'the new context is current' );
+	is( [ Clay_GetMaxElementCount(), Clay_GetMaxMeasureTextCacheWordCount() ], [ 100, 64 ], 'with exactly the counts' );
+	is( text_of(build_frame('small')), 'small', 'and renders' );
+
+	Clay_SetCurrentContext($ctx);
+	is( [ Clay_GetMaxElementCount(), Clay_GetMaxMeasureTextCacheWordCount() ], [ 8192, 16384 ],
+		'the previous context keeps its counts' );
+	is( text_of(build_frame('previous')), 'previous', 'and still renders' );
+
+	undef $ctx;
+	undef $small;
+	is( Clay_GetCurrentContext(), undef, 'no context is current' );
+	my $alone = Clay_Initialize(Clay_MinMemorySize(\%counts), [10, 10], undef, undef, \%counts);
+	is( Clay_GetMaxElementCount(), 100, 'without a current context the counts still reach the new context' );
+	undef $alone;
+	is( [ Clay_GetMaxElementCount(), Clay_GetMaxMeasureTextCacheWordCount() ], [ 8192, 16384 ],
+		"Clay's process-wide defaults are unchanged" );
+};
+
 subtest 'changing a count requires a new Clay_Initialize' => sub {
 	my $ctx = new_context();
 	Clay_SetMaxElementCount(16384);
 	is( Clay_GetMaxElementCount(), 16384, 'the getter reports the new count' );
-	like( dies { Clay_BeginLayout() }, qr/element\/word counts changed since Clay_Initialize/,
-		'Clay_BeginLayout croaks after a count change' );
-	like( dies { Clay_SetPointerState([0, 0], 0) }, qr/counts changed/, 'so does every Clay-touching call' );
 
 	my $bigger = Clay_Initialize(Clay_MinMemorySize(), { width => 100, height => 100 });
 	Clay_SetMeasureTextFunction(sub { return { width => 1, height => 1 } });

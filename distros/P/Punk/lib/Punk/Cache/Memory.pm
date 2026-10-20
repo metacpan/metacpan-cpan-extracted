@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Punk ();
 
-our $VERSION = '0.61';
+our $VERSION = '0.62';
 
 # This store lives in ONE process, so a write here is invisible to every
 # other worker. Punk::Cache invalidates across the pool on its behalf.
@@ -80,9 +80,38 @@ nothing.
 
 =head1 METHODS
 
-The L<Punk::Cache> backend contract: C<get>, C<set>, C<delete>, C<clear>,
-C<stats>. See L<Punk::Cache> for the rules that go with it - in particular
-that values are B<bytes>.
+The L<Punk::Cache> backend contract. See L<Punk::Cache> for the rules that
+go with it - in particular that values are B<bytes>.
+
+=head2 new(max_bytes => $bytes)
+
+The budget in bytes, default 64 MB; croaks on C<0>. Through the C<cache>
+keyword a size such as C<'64M'> is converted to bytes before it gets here.
+
+=head2 get($key)
+
+The bytes stored under C<$key>, or undef when there are none or they have
+expired.
+
+=head2 set($key, $bytes, $ttl)
+
+Stores C<$bytes> for C<$ttl> seconds; C<0> means no expiry.
+
+=head2 delete($key)
+
+Removes C<$key>.
+
+=head2 clear
+
+Removes every entry.
+
+=head2 stats
+
+A list of pairs; see L</Statistics>.
+
+=head2 is_shared
+
+False: every worker holds its own copy. See L<Punk::Cache/is_shared>.
 
 =head1 SEE ALSO
 

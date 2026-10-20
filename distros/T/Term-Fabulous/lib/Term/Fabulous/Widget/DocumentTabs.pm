@@ -9,7 +9,7 @@ use Object::Pad 0.825;
 
 use Term::Fabulous::Widget::Display;
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 class Term::Fabulous::Widget::DocumentTabs
 	:isa(Term::Fabulous::Widget::Display)
@@ -18,13 +18,12 @@ class Term::Fabulous::Widget::DocumentTabs
 	use Clay::UI::Enum::Result;
 	use Clay::XS qw(sizing_grow);
 	use List::Util qw(sum0);
-	use Scalar::Util qw(weaken);
 	use Term::Fabulous::Check qw(boolean describe non_negative_integer optional string);
 	use Term::Fabulous::Event::Select;
 	use Term::Fabulous::Event::TabAdd;
 	use Term::Fabulous::Event::TabClose;
 	use Term::Fabulous::Termbox qw(TB_BOLD TB_KEY_MOUSE_LEFT TB_KEY_MOUSE_MIDDLE TB_MOD_MOTION);
-	use Term::Fabulous::Unicode qw(cluster_columns grapheme_clusters string_columns);
+	use Term::Fabulous::Unicode qw(fit_columns string_columns);
 
 	use constant MODIFIED   => "\x{25CF}";    # a dot: unsaved changes
 	use constant ERROR      => '!';
@@ -32,7 +31,6 @@ class Term::Fabulous::Widget::DocumentTabs
 	use constant NEW        => ' + ';
 	use constant MORE_LEFT  => "\x{25C2}";
 	use constant MORE_RIGHT => "\x{25B8}";
-	use constant ELLIPSIS   => "\x{2026}";
 
 	# The columns of a tab besides its title: " title mark " and, when it
 	# can be closed, "x ".
@@ -53,8 +51,7 @@ class Term::Fabulous::Widget::DocumentTabs
 		$_tabs      = $self->_checked_tabs($tabs);
 		$active     = $self->_checked_active($active);
 		$new_button = boolean( $self, new_button => $new_button );
-		weaken( my $weak_self = $self );
-		$self->on( Mouse => sub ($event) { return $weak_self ? $weak_self->_on_mouse($event) : $CONTINUE } );
+		$self->on( Mouse => sub ( $self, $event ) { return $self->_on_mouse($event) }, owner => $self );
 	}
 
 	method theme_family :common () {
@@ -206,7 +203,7 @@ class Term::Fabulous::Widget::DocumentTabs
 		my $attrs        = $self->_attrs;
 		my $tabs_end     = $width - 1 - ( $new_button ? length NEW : 0 );
 		my $room         = $tabs_end - 1;
-		my @titles       = map { _cut( $_->{title}, $room - _columns_besides_title($_) ) } @_shown_tabs;
+		my @titles       = map { fit_columns( $_->{title}, $room - _columns_besides_title($_) ) } @_shown_tabs;
 		my @labels       = map { _label( $_shown_tabs[$_], $titles[$_] ) } 0 .. $#_shown_tabs;
 		my @widths       = map { string_columns($_) } @labels;
 		my $shown_active = $self->_shown_active;
@@ -268,19 +265,6 @@ class Term::Fabulous::Widget::DocumentTabs
 		my $first = 0;
 		$first++ while $first < $target && sum0( @{$widths}[ $first .. $target ] ) + ( $first > 0 ? 1 : 0 ) > $room;
 		return $first;
-	}
-
-	# A text cut to a number of columns, ending in an ellipsis when cut.
-	sub _cut ( $text, $room ) {
-		return '' if $room <= 0;
-		return $text if string_columns($text) <= $room;
-		my ( $kept, $width ) = ( '', 0 );
-		foreach my $cluster ( grapheme_clusters($text) ) {
-			my $columns = cluster_columns($cluster);
-			last if $width + $columns > $room - 1;
-			( $kept, $width ) = ( $kept . $cluster, $width + $columns );
-		}
-		return $kept . ELLIPSIS;
 	}
 
 	# ---------------------------------------------------------------------
@@ -356,7 +340,7 @@ documents of a program
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-document-tabs.svg" alt="A row of document tabs at the top: notes.txt with a blue dot for unsaved changes, config.kdl with a red exclamation mark for errors, todo.md, and the active tab budget.csv in bold on a lighter background with a blue dot, each with a close mark, then an arrow to a hidden tab and a plus button. Below, the text of budget.csv, a dim line with the keys that switch, close and add tabs, and a status bar with the message Closed README.md."></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.05/screenshots/widget-document-tabs.svg" alt="A row of document tabs at the top: notes.txt with a blue dot for unsaved changes, config.kdl with a red exclamation mark for errors, todo.md, and the active tab budget.csv in bold on a lighter background with a blue dot, each with a close mark, then an arrow to a hidden tab and a plus button. Below, the text of budget.csv, a dim line with the keys that switch, close and add tabs, and a status bar with the message Closed README.md."></p>
 
 =end html
 

@@ -4,7 +4,8 @@ use strict;
 use warnings;
 
 use Test::Most;
-use POSIX qw(locale_h setlocale LC_ALL);
+use POSIX qw(locale_h setlocale LC_ALL LC_NUMERIC);
+use Scalar::Util qw(dualvar);
 
 # POSIX::ENOENT is in a different import group on some platforms.
 # Import it conditionally so the file compiles everywhere.
@@ -70,15 +71,68 @@ for my $spec (@locales) {
 			local $SIG{__WARN__} = sub { };    # suppress _validate carp
 			ok(!$m->add_marker([999, 999], html => 'Out of range'),
 				"out-of-range coords rejected under $lang locale");
+			# Read as 90 by perls that parse with the locale's decimal point
+			ok(!$m->add_marker(['90.5', '0'], html => 'Just out of range'),
+				"latitude 90.5 rejected under $lang locale");
 		}
 
 		# Coord with leading decimal point (documented as valid since 0.05)
 		ok($m->add_marker([0.5, -0.1278], html => 'Leading zero lat'),
 			"leading-zero decimal accepted under $lang locale");
 
+		# The rendered JavaScript must use '.' too: '[51,5074, -0,1278]' is
+		# four numbers in JS.  The centre is computed, so it is checked as well.
+		my $numeric_before = setlocale(LC_NUMERIC);
+		my (undef, $body) = $m->onload_render();
+		like($body, qr/L\.marker\(\[51\.5074, -0\.1278\]\)/,
+			"marker written with '.' decimals under $lang locale");
+		# Midpoint of 51.5074 and 0.5 is 26.0037.  Some perls read '51.5074'
+		# as 51 under a comma locale, which gave [25.5, 0] here.
+		like($body, qr/setView\(\[26\.0037, -0\.1278\], \d+\)/,
+			"computed centre is the true midpoint under $lang locale");
+		unlike($body, qr/\d,\d{3,}/, "no comma-decimal numbers under $lang locale");
+		is(setlocale(LC_NUMERIC), $numeric_before, "LC_NUMERIC restored after render under $lang locale");
+
 		setlocale(LC_ALL, $saved_locale // 'C');
 	};
 }
+
+# ── Simulated comma-decimal stringification ───────────────────────────────────
+#
+# Some Perl builds (seen with 5.38.0 on macOS) print numbers with the locale's
+# decimal point even outside 'use locale', so 51.5074 becomes '51,5074'.  Most
+# machines can't reproduce that, so simulate it: a dualvar holds the number
+# 51.5074 but prints as '51,5074', exactly like the broken stringification.
+# These tests run everywhere, whatever locales are installed.
+
+subtest 'numbers printed with a comma decimal point are still accepted and rendered with a dot' => sub {
+	my $m = HTML::OSM->new();
+	ok($m->add_marker([dualvar(51.5074, '51,5074'), dualvar(-0.1278, '-0,1278')], html => 'London'),
+		'add_marker accepts comma-printed numbers');
+	ok($m->center([dualvar(51.5, '51,5'), dualvar(-0.1, '-0,1')]),
+		'center accepts comma-printed numbers');
+
+	my (undef, $body) = $m->onload_render();
+	like($body, qr/L\.marker\(\[51\.5074, -0\.1278\]\)/, "marker written with '.' decimals");
+	like($body, qr/setView\(\[51\.5, -0\.1\], \d+\)/,    "centre written with '.' decimals");
+	unlike($body, qr/51,5/, 'no comma decimals in the output');
+};
+
+subtest 'coordinates passed to new() are normalised at render time' => sub {
+	my $m = HTML::OSM->new(coordinates => [ [dualvar(48.8566, '48,8566'), dualvar(2.3522, '2,3522'), 'Paris'] ]);
+	my (undef, $body) = $m->onload_render();
+	like($body, qr/L\.marker\(\[48\.8566, 2\.3522\]\)/, "marker written with '.' decimals");
+};
+
+subtest 'a real string with a comma is still rejected' => sub {
+	# '51,5074' typed as text is not a number; only values Perl holds as
+	# numbers have a comma treated as a decimal point.
+	my $m = HTML::OSM->new();
+	my @warnings;
+	local $SIG{__WARN__} = sub { push @warnings, @_ };
+	ok(!$m->add_marker(['51,5074', '-0,1278']), 'comma string rejected');
+	like($warnings[0] // '', qr/Skipping invalid coordinate/, 'with the usual warning');
+};
 
 # ── POSIX error strings change with locale ─────────────────────────────────────
 #

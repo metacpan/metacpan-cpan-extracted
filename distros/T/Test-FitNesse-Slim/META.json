@@ -1,0 +1,130 @@
+{
+   "abstract" : "Perl implementation of the FitNesse SLiM protocol",
+   "author" : [
+      "Greg Bacon <gbacon@gbacon.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4234",
+   "license" : [
+      "perl_5",
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Test-FitNesse-Slim",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "HTTP::Tiny" : "0.070",
+            "IPC::Run" : "20260322.0",
+            "Pod::Text" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0.88",
+            "Test::Pod" : "1.22",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.20"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTML::TreeBuilder" : "5.07",
+            "perl" : "v5.36.0"
+         }
+      }
+   },
+   "provides" : {
+      "Test::FitNesse::Slim" : {
+         "file" : "lib/Test/FitNesse/Slim.pm",
+         "version" : "1.00"
+      },
+      "Test::FitNesse::Slim::ConverterRegistry" : {
+         "file" : "lib/Test/FitNesse/Slim/ConverterRegistry.pm"
+      },
+      "Test::FitNesse::Slim::ConverterRegistry::Boolean" : {
+         "file" : "lib/Test/FitNesse/Slim/ConverterRegistry.pm"
+      },
+      "Test::FitNesse::Slim::ConverterRegistry::Character" : {
+         "file" : "lib/Test/FitNesse/Slim/ConverterRegistry.pm"
+      },
+      "Test::FitNesse::Slim::ConverterRegistry::Date" : {
+         "file" : "lib/Test/FitNesse/Slim/ConverterRegistry.pm"
+      },
+      "Test::FitNesse::Slim::ConverterRegistry::Double" : {
+         "file" : "lib/Test/FitNesse/Slim/ConverterRegistry.pm"
+      },
+      "Test::FitNesse::Slim::ConverterRegistry::Enum" : {
+         "file" : "lib/Test/FitNesse/Slim/ConverterRegistry.pm"
+      },
+      "Test::FitNesse::Slim::ConverterRegistry::Integer" : {
+         "file" : "lib/Test/FitNesse/Slim/ConverterRegistry.pm"
+      },
+      "Test::FitNesse::Slim::ConverterRegistry::List" : {
+         "file" : "lib/Test/FitNesse/Slim/ConverterRegistry.pm"
+      },
+      "Test::FitNesse::Slim::ConverterRegistry::Long" : {
+         "file" : "lib/Test/FitNesse/Slim/ConverterRegistry.pm"
+      },
+      "Test::FitNesse::Slim::ConverterRegistry::PrimitiveBoolean" : {
+         "file" : "lib/Test/FitNesse/Slim/ConverterRegistry.pm"
+      },
+      "Test::FitNesse::Slim::ConverterRegistry::PrimitiveCharacter" : {
+         "file" : "lib/Test/FitNesse/Slim/ConverterRegistry.pm"
+      },
+      "Test::FitNesse::Slim::ConverterRegistry::PrimitiveDouble" : {
+         "file" : "lib/Test/FitNesse/Slim/ConverterRegistry.pm"
+      },
+      "Test::FitNesse::Slim::ConverterRegistry::PrimitiveInteger" : {
+         "file" : "lib/Test/FitNesse/Slim/ConverterRegistry.pm"
+      },
+      "Test::FitNesse::Slim::ConverterRegistry::PrimitiveLong" : {
+         "file" : "lib/Test/FitNesse/Slim/ConverterRegistry.pm"
+      },
+      "Test::FitNesse::Slim::ConverterRegistry::String" : {
+         "file" : "lib/Test/FitNesse/Slim/ConverterRegistry.pm"
+      },
+      "Test::FitNesse::Slim::ConverterRegistry::TypedSequence" : {
+         "file" : "lib/Test/FitNesse/Slim/ConverterRegistry.pm"
+      },
+      "Test::FitNesse::Slim::ConverterRegistry::Void" : {
+         "file" : "lib/Test/FitNesse/Slim/ConverterRegistry.pm"
+      },
+      "Test::FitNesse::Slim::List" : {
+         "file" : "lib/Test/FitNesse/Slim/List.pm"
+      },
+      "Test::FitNesse::Slim::ListExecutor" : {
+         "file" : "lib/Test/FitNesse/Slim/ListExecutor.pm"
+      },
+      "Test::FitNesse::Slim::MapResult" : {
+         "file" : "lib/Test/FitNesse/Slim/MapResult.pm"
+      },
+      "Test::FitNesse::Slim::Server" : {
+         "file" : "lib/Test/FitNesse/Slim/Server.pm"
+      },
+      "Test::FitNesse::Slim::SlimHelperLibrary" : {
+         "file" : "lib/Test/FitNesse/Slim/SlimHelperLibrary.pm"
+      },
+      "Test::FitNesse::Slim::Statement" : {
+         "file" : "lib/Test/FitNesse/Slim/Statement.pm"
+      },
+      "Test::FitNesse::Slim::StatementExecutor" : {
+         "file" : "lib/Test/FitNesse/Slim/StatementExecutor.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "https://github.com/gbacon/test-slim/blob/main/LICENSE",
+         "https://www.gnu.org/licenses/old-licenses/gpl-1.0.en.html",
+         "https://dev.perl.org/licenses/artistic.html",
+         "https://github.com/unclebob/fitnesse/blob/v20251025/LICENSE.txt"
+      ]
+   },
+   "version" : "1.00",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

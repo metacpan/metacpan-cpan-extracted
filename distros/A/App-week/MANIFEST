@@ -9,6 +9,7 @@ lib/App/week/CalYear.pm
 lib/App/week/Util.pm
 lib/App/week/colors.pm
 lib/App/week/default.pm
+lib/App/week/mlb.pm
 lib/App/week/npb.pm
 lib/App/week/olympic.pm
 minil.toml

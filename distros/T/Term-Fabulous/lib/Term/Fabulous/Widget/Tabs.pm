@@ -7,21 +7,24 @@ no warnings 'experimental::signatures';
 
 use Object::Pad 0.825;
 
+use Term::Fabulous::Role::Searchable qw(searchables_in);
+use Term::Fabulous::Role::SearchContainer;
 use Term::Fabulous::Widget::Box;
 use Term::Fabulous::Widget::Tabs::Bar;
 use Term::Fabulous::Widget::Tabs::Button;
 use Term::Fabulous::Widget::Tabs::Page;
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 class Term::Fabulous::Widget::Tabs
 	:isa(Term::Fabulous::Widget::Box)
+	:does(Term::Fabulous::Role::SearchContainer)
 	:strict(params)
 {
 	use Clay::UI::Enum::Result;
 	use Clay::XS qw(sizing_grow CLAY_LEFT_TO_RIGHT CLAY_TOP_TO_BOTTOM);
 	use List::Util qw(first);
-	use Scalar::Util qw(blessed refaddr weaken);
+	use Scalar::Util qw(blessed refaddr);
 	use Term::Fabulous::Check qw(describe);
 	use Term::Fabulous::Roving qw(roving_target);
 	use Term::Fabulous::Event::Select;
@@ -31,7 +34,7 @@ class Term::Fabulous::Widget::Tabs
 	# The look is the bar's; these constructor parameters go to it. The
 	# themed ones live on the bar (see forwarded_looks).
 	my @BAR_LOOKS  = qw(line_style line_color text_color active_text_color hover_background_color focus_border_color disabled_color);
-	my @BAR_PARAMS = ( qw(side orientation tab_alignment tab_gap tab_margin tab_padding active_bold page_border), @BAR_LOOKS );
+	my @BAR_PARAMS = ( qw(side orientation tab_alignment tab_gap tab_margin tab_padding active_padding active_bold page_border), @BAR_LOOKS );
 
 	# The bar, the slot that shows the active page, and the pages, in the
 	# order of the bar's tabs.
@@ -49,9 +52,8 @@ class Term::Fabulous::Widget::Tabs
 		$self->layout( { %$layout, sizing => { width => sizing_grow(), height => sizing_grow(), %{ $layout->{sizing} // {} } } } );
 		$self->_arrange;
 
-		weaken( my $weak_self = $self );
-		$_bar->on( Select   => sub ($event) { $weak_self->_tab_chosen($event) if $weak_self; return } );
-		$self->on( KeyPress => sub ($event) { return $weak_self && $weak_self->_handle_key($event) ? Clay::UI::Enum::Result->HANDLED : Clay::UI::Enum::Result->CONTINUE } );
+		$_bar->on( Select   => sub ( $self, $event ) { $self->_tab_chosen($event); return },                                                                     owner => $self );
+		$self->on( KeyPress => sub ( $self, $event ) { return $self->_handle_key($event) ? Clay::UI::Enum::Result->HANDLED : Clay::UI::Enum::Result->CONTINUE }, owner => $self );
 	}
 
 	# ---------------------------------------------------------------------
@@ -206,6 +208,14 @@ class Term::Fabulous::Widget::Tabs
 		return;
 	}
 
+	# Who takes the focus when the focus inside the Tabs is lost, for
+	# example with the page that held it (Clay::UI::Interaction's focus
+	# heirs): the active tab, so Ctrl+PageUp and Ctrl+PageDown keep
+	# working.
+	method focus_heir () {
+		return $_bar->active;
+	}
+
 	# A page changed its title, icon or disabled flag: its tab follows.
 	method _page_changed ($page) {
 		my $button = $self->_button_for($page);
@@ -239,14 +249,15 @@ class Term::Fabulous::Widget::Tabs
 		return $value;
 	}
 
-	method side          (@new) { return $self->_forward( side          => 1, 1, @new ) }
-	method orientation   (@new) { return $self->_forward( orientation   => 0, 0, @new ) }
-	method tab_alignment (@new) { return $self->_forward( tab_alignment => 0, 0, @new ) }
-	method tab_gap       (@new) { return $self->_forward( tab_gap       => 0, 0, @new ) }
-	method tab_margin    (@new) { return $self->_forward( tab_margin    => 0, 0, @new ) }
-	method tab_padding   (@new) { return $self->_forward( tab_padding   => 0, 0, @new ) }
-	method active_bold   (@new) { return $self->_forward( active_bold   => 0, 0, @new ) }
-	method page_border   (@new) { return $self->_forward( page_border   => 0, 1, @new ) }
+	method side           (@new) { return $self->_forward( side           => 1, 1, @new ) }
+	method orientation    (@new) { return $self->_forward( orientation    => 0, 0, @new ) }
+	method tab_alignment  (@new) { return $self->_forward( tab_alignment  => 0, 0, @new ) }
+	method tab_gap        (@new) { return $self->_forward( tab_gap        => 0, 0, @new ) }
+	method tab_margin     (@new) { return $self->_forward( tab_margin     => 0, 0, @new ) }
+	method tab_padding    (@new) { return $self->_forward( tab_padding    => 0, 0, @new ) }
+	method active_padding (@new) { return $self->_forward( active_padding => 0, 0, @new ) }
+	method active_bold    (@new) { return $self->_forward( active_bold    => 0, 0, @new ) }
+	method page_border    (@new) { return $self->_forward( page_border    => 0, 1, @new ) }
 
 	# The looks live on the bar (Term::Fabulous::Role::Themed): the bar
 	# takes them from the constructor, and reset_look returns them to the
@@ -266,7 +277,7 @@ class Term::Fabulous::Widget::Tabs
 	method layout_properties :common () {
 		return (
 			$class->SUPER::layout_properties,
-			( map { $_ => 'scalar' } qw(side orientation tab_alignment tab_gap tab_margin tab_padding) ),
+			( map { $_ => 'scalar' } qw(side orientation tab_alignment tab_gap tab_margin tab_padding active_padding) ),
 			( map { $_ => 'boolean' } qw(active_bold page_border) ),
 		);
 	}
@@ -281,6 +292,21 @@ class Term::Fabulous::Widget::Tabs
 		my $target  = roving_target( \@enabled, $self->active_index, $event->main_key_name, keys => 'pages' ) // return 0;
 		$self->choose($target);
 		return 1;
+	}
+
+	# ---------------------------------------------------------------------
+	# Searching (Term::Fabulous::Role::SearchContainer): the texts of every
+	# page, shown or not; revealing one activates its page
+	# ---------------------------------------------------------------------
+
+	method searchable_parts () {
+		return map { searchables_in($_) } @_pages;
+	}
+
+	method reveal_part ($part) {
+		my $page = first { $_->contains($part) } @_pages;
+		$self->select($page) if defined $page;
+		return;
 	}
 }
 
@@ -316,29 +342,30 @@ Term::Fabulous::Widget::Tabs - Pages behind a row of tabs
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-tabs.svg" alt="Four Tabs widgets: tabs along the top with the Network page shown and a disabled Licenses tab, tabs with vertical labels along the left side, a tab bar at the bottom in the Heavy style, and tabs on the right without a page border"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.05/screenshots/widget-tabs.svg" alt="Four Tabs widgets: tabs along the top with the Network page shown and a disabled Licenses tab, a tab bar at the bottom in the Heavy style, tabs along the left side, and tabs with vertical labels without a page border"></p>
 
 =end html
 
 =head1 DESCRIPTION
 
 The picture shows the Tabs widget in four forms: tabs along the top
-with its second page shown and a disabled tab, tabs with downward
-labels along the left side, a bar at the bottom in another line
-style, and tabs on the right without a border around the page. The
-program is F<examples/widgets/tabs.pl>.
+with its second page shown and a disabled tab, a bar at the bottom in
+another line style, tabs along the left side, and tabs with downward
+labels without a border around the page. The program is
+F<examples/widgets/tabs.pl>.
 
 A Tabs widget shows one of several pages at a time, chosen with the
 tabs of its bar. The bar is drawn as a row of boxes that join the
-border of the page: the active tab is one cell larger and open toward
-the page, so that it and the page are one shape, while the others are
-closed by the page's line and look as if they stood behind it:
+border of the page: the active tab is open toward the page, so that it
+and the page are one shape, while the others are closed by the page's
+line and look as if they stood behind it (with C<active_padding>, the
+active tab has that many more cells of padding on its page side and
+rises that many cells out of the row):
 
 =for highlighter language=text
 
-	 ╭─────────╮
-	 │ General │ ╭─────────╮ ╭───────╮
-	 │         │ │ Network │ │ Users │
+	 ╭─────────╮ ╭─────────╮ ╭───────╮
+	 │ General │ │ Network │ │ Users │
 	╭╯         ╰─┴─────────┴─┴───────┴───────╮
 	│                                        │
 	│  Language   en                         │
@@ -411,6 +438,14 @@ the bar.
 Non-negative integers, all 1 by default: the cells between two tabs,
 between the ends of the bar and the outer tabs, and on each side of a
 label along its writing direction.
+
+=item C<active_padding>
+
+A non-negative integer. Default: 0. The cells of padding the active
+tab has on its page side beyond the other tabs, so that it stands that
+many cells taller (wider on a bar at the left or right) than the
+others, rising out of the row; 0 keeps all tabs the same size. See
+L<Term::Fabulous::Manual::Layout/TABS>.
 
 =item C<line_style>
 
@@ -516,8 +551,10 @@ Its index.
 	$tabs->select(undef);    # no page
 
 Shows a page from the program. Fires nothing. A tab that had the
-focus passes it on to the new active tab. Dies for an index outside
-the pages or a page of another Tabs. Returns the Tabs.
+focus passes it on to the new active tab, and a focused widget on the
+page that leaves hands it to the active tab (see L</focus_heir>).
+Dies for an index outside the pages or a page of another Tabs. Returns
+the Tabs.
 
 =head2 choose
 
@@ -526,6 +563,18 @@ the pages or a page of another Tabs. Returns the Tabs.
 Chooses a page as the user does: shows it, focuses its tab and fires
 C<Select> when the active page changed. A disabled page changes
 nothing. Returns the Tabs.
+
+=head2 focus_heir
+
+	my $tab = $tabs->focus_heir;
+
+The active tab (a L<Term::Fabulous::Widget::Tabs::Button>), or C<undef>
+without pages. When the widget with the focus leaves the Tabs (its page
+is no longer shown, or it is removed), the focus goes to this tab when
+it can take the focus (else to the nearest widget above the Tabs that
+can), so the keys keep reaching the Tabs (see
+L<Term::Fabulous::Manual::Events/When the focused widget goes away> and
+L<Clay::UI::Interaction/Focus heirs>). You do not call it yourself.
 
 =head2 bar
 
@@ -572,6 +621,12 @@ Accessor for the C<tab_margin> parameter.
 	$tabs->tab_padding(2);
 
 Accessor for the C<tab_padding> parameter.
+
+=head2 active_padding
+
+	$tabs->active_padding(1);
+
+Accessor for the C<active_padding> parameter.
 
 =head2 line_style
 
@@ -641,6 +696,31 @@ Every writer passes the value to the bar (see
 L<Term::Fabulous::Widget::Tabs::Bar/METHODS>) and shows its change in
 the next frame.
 
+=head2 search_texts, search_revision, highlight_text, clear_text_highlights, reveal_text
+
+	my @entries = $tabs->search_texts;    # ( [ [ $index, $key ], $text ], ... )
+	my ($text) = @{ $tabs->reveal_text( $entries[0][0], 0 ) };
+
+The methods of L<Term::Fabulous::Role::Searchable>, from
+L<Term::Fabulous::Role::SearchContainer>: a Tabs answers for the
+searchable widgets of all its pages, the pages not shown included,
+with keys of the widget's index among them and the widget's own key
+(see L<Term::Fabulous::Role::Searchable/Nested keys>). C<search_serial>
+comes from L<Term::Fabulous::Role::Searchable/search_serial>.
+C<reveal_text> selects the page of the widget, without firing
+C<Select>, and returns what the widget returns. The indices change when
+pages or their widgets are added or removed; C<search_revision> then
+changes too (it names the widget at the index), so a search that
+compares revisions runs again.
+
+=head2 searchable_parts, reveal_part
+
+	my @widgets = $tabs->searchable_parts;
+
+For L<Term::Fabulous::Role::SearchContainer>: the searchable widgets of
+all pages, in order, and the step that selects the page holding one of
+them before it reveals a text. You do not call them yourself.
+
 =head1 KEYS
 
 While the active tab has the focus, C<Left> and C<Up> choose the
@@ -688,8 +768,8 @@ bubble through the Tabs as well.
 
 The properties of L<Term::Fabulous::Widget::Box/KDL PROPERTIES>, plus
 C<side>, C<orientation>, C<tab_alignment>, C<tab_gap>, C<tab_margin>,
-C<tab_padding> and C<line_style> (strings and numbers),
-C<active_bold> and C<page_border> (C<#true> / C<#false>),
+C<tab_padding>, C<active_padding> and C<line_style> (strings and
+numbers), C<active_bold> and C<page_border> (C<#true> / C<#false>),
 C<focus_border_color> (a color string, or C<#null> for no focus look)
 and the colors C<line_color>, C<text_color>, C<active_text_color>,
 C<hover_background_color> and C<disabled_color>. The pages are C<Page>

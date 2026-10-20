@@ -1,5 +1,19 @@
 Revision history for Time-Keeper
 
+0.09    2026-10-20
+        - parse_cldr reads the numerals some calendars are written in: Hebrew numerals, the lunar days and Chinese numerals, and the first year of a Japanese era.
+        - parse_cldr reads back every date it writes in every calendar and locale
+        - The calendar names of a locale whose parent has none of its own (ca-ES-valencia) are inherited by truncation.
+
+0.08    2026-10-19
+        - Time::Keeper::Locale: number_symbols, the decimal, group and minus signs, and ascii_digits.
+        - Time::Keeper::Locale: day_periods takes a context, giving the stand-alone names.
+        - parse_cldr reads every locale's GMT format back: a space before the sign (hr), an en dash for minus (eu), hours and minutes run together (am).
+        - parse_cldr matches white space inside a name with any white space: "p. m." typed with a plain space reads.
+
+0.07    2026-10-19
+        - Update the C ABI to version 3: plus, truncate, end_of, the weekday adjusters, with_time, parse_cldr, durations, locale codes and weekends, plain dates read and made, and a zone's next change, each giving the method's reason when it fails.
+
 0.06    2026-10-19
         - The locale archive carries CLDR's weekday relative words ("last Tuesday", "next Tuesday", "in {0} Tuesdays")
         - Time::Keeper::Locale: day_periods, the names of the parts of a day, and day_period_rules, when each is.

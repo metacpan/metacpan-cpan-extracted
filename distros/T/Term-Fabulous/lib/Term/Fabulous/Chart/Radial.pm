@@ -5,7 +5,7 @@ use warnings;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 use Exporter 'import';
 our @EXPORT_OK = qw(CELL_ASPECT TAU circle_frame polar_of point_at);
@@ -16,6 +16,9 @@ use List::Util qw(min);
 # measure in cell widths and stretch rows by this factor.
 use constant CELL_ASPECT => 2;
 use constant TAU         => 8 * atan2( 1, 1 );
+
+# How far from a whole number a coordinate may be and still count as it.
+use constant WHOLE_TOLERANCE => 1e-9;
 
 # The largest circle that fits an area of cells: its center in cells
 # (continuous) and its radius in cell widths. $margin cell widths stay
@@ -39,9 +42,18 @@ sub polar_of ( $frame, $x, $y, $start = 0 ) {
 
 # The point in cells at a distance (cell widths) and an angle (turns
 # clockwise from 12 o'clock, after $start).
+# A coordinate that is mathematically whole comes back whole: the
+# rounding noise of sin and cos at a quarter turn differs between
+# platforms (long double perls get the other sign), and a label or
+# point must not land in the cell before or after its own for that.
 sub point_at ( $frame, $distance, $angle, $start = 0 ) {
 	my $radians = ( $angle + $start ) * TAU;
-	return ( $frame->{center_x} + $distance * sin($radians), $frame->{center_y} - $distance * cos($radians) / CELL_ASPECT );
+	return map { _whole_when_close($_) } $frame->{center_x} + $distance * sin($radians), $frame->{center_y} - $distance * cos($radians) / CELL_ASPECT;
+}
+
+sub _whole_when_close ($coordinate) {
+	my $nearest = sprintf '%.0f', $coordinate;
+	return abs( $coordinate - $nearest ) < WHOLE_TOLERANCE ? $nearest + 0 : $coordinate;
 }
 
 1;
@@ -116,6 +128,9 @@ clockwise from C<$start> (in turns; default 0, 12 o'clock).
 
 The reverse: the point in cells at C<$distance> cell widths from the
 center and C<$angle> turns clockwise from C<$start> (default 0).
+A coordinate that is mathematically whole, such as the row of a point
+at a quarter turn, is returned as a whole number, free of the rounding
+noise of C<sin> and C<cos>.
 
 =head1 SEE ALSO
 

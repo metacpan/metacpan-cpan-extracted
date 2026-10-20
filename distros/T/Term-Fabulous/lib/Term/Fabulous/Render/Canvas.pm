@@ -5,7 +5,7 @@ use warnings;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 use Object::Pad 0.825;
 
@@ -50,7 +50,8 @@ role Term::Fabulous::Render::Canvas {
 			unless defined $canvas && $canvas->isa('Term::Fabulous::Widget::Canvas');
 
 		my ( $x0,   $y0,  $x1,    $y1 )     = cell_rect( $command->{boundingBox} );
-		my ( $left, $top, $right, $bottom ) = $canvas->content_insets;
+		my ( $left, $top, $right, $bottom ) = $canvas->_laid_out_insets
+			or die "Term::Fabulous::Render::Canvas: the frame did not lay out the canvas of a custom render command";
 		my @content = ( $x0 + $left, $y0 + $top );
 		push @content, max( $content[0], $x1 - $right ), max( $content[1], $y1 - $bottom );
 		$canvas->set_content_origin( @content[ 0, 1 ] );

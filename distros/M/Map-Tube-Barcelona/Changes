@@ -1,5 +1,10 @@
 Revision history for Map::Tube::Barcelona
 
+v1.0.1  2026-10-20
+        - Fixed path in the provides list in Makefile.PL
+        - Added unit tests: xt/version.t and xt/provides.t
+        - Removed unit tests: xt/meta-json.t and xt/meta-yml.t
+
 v1.0.0  2026-07-11
         - Updated dependency on Map::Tube v5.1.0.
         - Updated copyright year information.

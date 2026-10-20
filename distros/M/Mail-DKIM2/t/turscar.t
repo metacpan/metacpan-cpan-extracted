@@ -6,7 +6,7 @@
 #
 # The vectors target draft-02, but the tag rules (case-insensitive identifiers,
 # any order, single occurrence, FWS) and the >=1024-bit key requirement (§3.2)
-# are unchanged in draft-06, so they apply to us directly.
+# are unchanged in draft-07, so they apply to us directly.
 #
 # Exact status-code differences (we may say 'fail' where a vector says
 # 'permerror') are reported as diagnostics but do not fail the gate; the
@@ -28,13 +28,8 @@ eval { require TOML::Parser; 1 }
     or plan skip_all => "TOML::Parser not available";
 
 # Upstream vectors we knowingly diverge from, with the reason (not gated).
-my %KNOWN_DIVERGENCE = (
-    # Steve's signer emitted an EMPTY s= signature value here (the .signed file
-    # ends "...s = rsa2048:rsa-sha256:" with no bytes) — its own signature
-    # insertion tripped over the very header whitespace this test exercises.
-    # With no signature present, ExpectedState 'pass' is unachievable.
-    tags_whitespace => 'upstream vector has an empty s= signature value',
-);
+# (None at present: dkim2tests a382236 fixed tags_whitespace (it had an empty s= value at 9c48edf).)
+my %KNOWN_DIVERGENCE = ();
 
 my $parser = TOML::Parser->new;
 

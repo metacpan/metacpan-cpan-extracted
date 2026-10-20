@@ -338,7 +338,7 @@ subtest "GCF geocode() — on_error => 'undef' skips the row" => sub {
 # out a second time in MaxMind.pm (with a croak) and a third in
 # OpenAddresses.pm (with a miss), so a string the facade refused could still be
 # looked up by a backend called directly.  The rule now lives once, in
-# Geo::Coder::Free::Validate, and all three callers hold that one sub.  A second
+# Geo::Location::Predicate, and all three callers hold that one sub.  A second
 # copy of the sub fails the identity assertions below, and a backend that goes
 # back to testing for a digit in the stringified value - the shape of the old
 # guard - fails the reference case; both are the failure mode section 2.4 of
@@ -353,14 +353,14 @@ subtest 'One rule for the facade and both backends' => sub {
 	my $geo = Geo::Coder::Free->new();
 
 	# The rule, and the public predicate that is its public form.
-	ok(!Geo::Coder::Free::Validate::_valid_location('0044'), 'the rule refuses a bare number');
-	ok(Geo::Coder::Free::Validate::_valid_location('Ramsgate, Kent'), 'the rule accepts an address');
+	ok(!Geo::Location::Predicate::_valid_location('0044'), 'the rule refuses a bare number');
+	ok(Geo::Location::Predicate::_valid_location('Ramsgate, Kent'), 'the rule accepts an address');
 	ok(!$geo->valid_location('0044'), 'and the public predicate gives the same answer');
 
 	# One definition, not three: each package's _valid_location is the same code
 	# reference as the others', so a backend that pasted the rule back in as a sub
 	# of its own fails here even though its answers would be identical.
-	my $rule = refaddr(\&Geo::Coder::Free::Validate::_valid_location);
+	my $rule = refaddr(\&Geo::Location::Predicate::_valid_location);
 	is(refaddr(\&Geo::Coder::Free::_valid_location), $rule,
 		'the facade calls the shared rule, not a copy of it');
 	is(refaddr(\&Geo::Coder::Free::MaxMind::_valid_location), $rule,
@@ -419,6 +419,10 @@ subtest 'GCF geocode_many() — one lookup per distinct value, and none for garb
 	mock('Geo::Coder::Free::MaxMind', 'geocode', sub {
 		my ($mm, $params) = @_;
 		push @asked, $params->{'location'};
+		# A mock stands in for a backend that reads; geocode_many() counts a
+		# lookup by the reads the backends report, so this mock has to report one
+		# or the two values worth looking up would look like cache hits.
+		$mm->{'reads'}++;
 		return $params->{'location'} =~ /Ramsgate/
 			? Geo::Location::Point->new({ lat => 51.3341, long => -1.4159 })
 			: undef;
@@ -439,7 +443,9 @@ subtest 'GCF geocode_many() — one lookup per distinct value, and none for garb
 	is($batch->{'lookups'},    2, 'and exactly the two worth looking up were counted');
 	is($batch->{'resolved'},   1, 'one distinct value resolved');
 	is($batch->{'unresolved'}, 3, 'the miss and the two refused values did not');
-	is(scalar keys %{$batch},  8, 'four values and the four keys of the answer itself');
+	is($batch->{'reads'}{'MaxMind'}, 2,
+		'the backend that read for them is named, with the reads it made for 401 rows');
+	is(scalar keys %{$batch},  9, 'four values and the five keys of the answer itself');
 
 	_remock_maxmind();
 };
@@ -472,7 +478,7 @@ subtest 'GCF geocode_many() — the dirty column, in the words geocode() uses' =
 	ok(exists($dirty->{''}) && !defined($dirty->{''}),
 		'so is the empty cell: undef and \'\' share one entry');
 	is_deeply([sort keys %{$dirty}],
-		[sort ('', '0044', qw(lookups resolved unresolved unresolved_values))],
+		[sort ('', '0044', qw(lookups reads resolved unresolved unresolved_values))],
 		'and nothing else was invented');
 	is(scalar @{$dirty->{'unresolved_values'}}, 2,
 		'both are listed, which is what the caller records to stop retrying them');

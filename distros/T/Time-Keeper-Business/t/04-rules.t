@@ -103,7 +103,7 @@ is_deeply(dates($xmas->observed('nearest_business_day', weekend => [5, 6])->holi
 is_deeply(dates($xmas->observed('nearest_business_day', weekend => [5, 6])->holidays(year => 2026)), ['2026-12-24'],
           '  a Friday goes back to the Thursday');
 ok(!eval { $xmas->observed('sometime'); 1 }, 'an unknown form is refused');
-like($@, qr/^Time::Keeper::Business::Rule->observed: the form is none, next_business_day, nearest_business_day, next_monday or a code ref/, '  by name');
+like($@, qr/^Time::Keeper::Business::Rule->observed: the form is none, next_business_day, nearest_business_day, next_monday, previous_business_day, next_business_day_if_sunday or a code ref/, '  by name');
 ok(!eval { $xmas->observed('none', weekend => [8]); 1 }, 'a weekend day of 8 is refused');
 
 # the collision in a set
@@ -181,16 +181,116 @@ is($b->is_holiday(d('2027-12-28')), 'Boxing Day', 'a rule as a schedule source, 
 is($b->is_business_day(d('2027-12-28')), 0, '  closes the day');
 is($b->is_business_day(d('2027-12-29')), 1, '  and not the next');
 is($b->is_holiday(d('2027-12-25')), undef, '  the Saturday itself is not a holiday: the substitute is');
-ok(!eval { Storable::freeze($b); 1 }, 'a schedule with a rule cannot be frozen');
+require Storable;
+my $thawed = Storable::thaw(Storable::freeze($b));
+is($thawed->is_holiday(d('2027-12-28')), 'Boxing Day', 'a schedule with a rule freezes and thaws with its rule');
+ok(!eval { Storable::freeze(Time::Keeper::Business->new(holidays => $R->uk->only_if(sub { 1 }))); 1 }, '  but not with a code ref in the rule');
+like($@, qr/cannot freeze a schedule whose rules hold a code ref/, '  by name');
+ok(!eval { Storable::freeze(Time::Keeper::Business->new(holidays => $R->relative(rule => $R->fixed(month => 1, day => 1)->only_if(sub { 1 }), days => 1))); 1 }, '  nor with one deep in a rule it counts from');
+like($@, qr/cannot freeze a schedule whose rules hold a code ref/, '  by the schedule\'s message');
 my @fr = Time::Keeper::Business->new(holidays => [ $R->uk, $R->target2 ])->holidays(year => 2026);
 is(scalar @fr, 10, 'two sets as sources merge: 8 UK plus May Day and 26 December');
+
+# The shapes of 0.02: a weekday on or after, a sandwiched day, except and also, two observed forms, keep.
+{
+    my $election = $R->weekday_on_or_after(rule => $R->nth(month => 11, day_of_week => 1, n => 1), day_of_week => 2, days => 1, name => 'Election Day');
+    is_deeply([ map { dates($election->holidays(year => $_))->[0] } 2024, 2026, 2030 ], [qw(2024-11-05 2026-11-03 2030-11-05)], 'Election Day, the Tuesday after the first Monday in November');
+    my $midsummer = $R->weekday_on_or_after(rule => $R->fixed(month => 6, day => 19), day_of_week => 5, name => 'Midsummer Eve');
+    is_deeply([ map { dates($midsummer->holidays(year => $_))->[0] } 2026, 2027 ], [qw(2026-06-19 2027-06-25)], 'Midsummer Eve, the Friday from 19 June');
+    is(dates($R->weekday_on_or_after(rule => $R->fixed(month => 10, day => 31), day_of_week => 6)->holidays(year => 2026))->[0], '2026-10-31', 'All Saints\' Day in Sweden, the Saturday from 31 October: the day itself when it is one');
+    is(dates($R->weekday_on_or_before(rule => $R->fixed(month => 5, day => 24), day_of_week => 1)->holidays(year => 2026))->[0], '2026-05-18', 'weekday_on_or_before: the Monday on or before 24 May (Victoria Day)');
+    is(dates($R->weekday_on_or_after(rule => $R->fixed(month => 1, day => 1), day_of_week => 1, n => 3)->holidays(year => 2026))->[0], '2026-01-19', '  n counts on: the third Monday from 1 January');
+    is(dates($R->weekday_on_or_before(rule => $R->fixed(month => 12, day => 31), day_of_week => 5, n => 2)->holidays(year => 2026))->[0], '2026-12-18', '  and back: the second Friday on or before 31 December');
+    for my $bad ([ [rule => $R->set($xmas), day_of_week => 1], qr/rule must not be a set/ ], [ [rule => $R->sandwiched, day_of_week => 1], qr/rule must not be a sandwiched day/ ],
+                  [ [rule => $xmas, day_of_week => 8], qr/day_of_week must be 1 to 7/ ], [ [rule => $xmas, day_of_week => 1, n => 6], qr/n must be 1 to 5/ ], [ [day_of_week => 1], qr/rule must be a Time::Keeper::Business::Rule/ ]) {
+        ok(!eval { $R->weekday_on_or_after(@{ $bad->[0] }); 1 }, 'weekday_on_or_after refuses');
+        like($@, $bad->[1], '  by name');
+    }
+
+    my $sw = $R->set($R->fixed(month => 3, day => 2), $R->fixed(month => 3, day => 4), $R->sandwiched(name => 'between'));
+    is_deeply(pairs($sw->holidays(year => 2026)), [['2026-03-02', undef], ['2026-03-03', 'between'], ['2026-03-04', undef]], 'a weekday between two holidays of the set becomes one');
+    is_deeply(dates($R->set($R->fixed(month => 3, day => 6), $R->fixed(month => 3, day => 8), $R->sandwiched)->holidays(year => 2026)), [qw(2026-03-06 2026-03-08)], '  but not a Saturday');
+    is_deeply(dates($R->set($R->fixed(month => 3, day => 2), $R->fixed(month => 3, day => 3), $R->fixed(month => 3, day => 4), $R->sandwiched)->holidays(year => 2026)), [qw(2026-03-02 2026-03-03 2026-03-04)], '  nor a day already a holiday');
+    is_deeply(dates($R->set($R->fixed(month => 3, day => 2), $R->fixed(month => 3, day => 5), $R->sandwiched)->holidays(year => 2026)), [qw(2026-03-02 2026-03-05)], '  and two days apart is no sandwich');
+    is_deeply(dates($R->sandwiched->holidays(year => 2026)), [], 'a sandwiched day alone gives nothing');
+    is_deeply(dates($R->set($R->fixed(month => 3, day => 2), $R->fixed(month => 3, day => 4), $R->sandwiched->between(from => 2027))->holidays(year => 2026)), [qw(2026-03-02 2026-03-04)], '  and between applies to it');
+
+    my $may = $R->nth(month => 5, day_of_week => 1, n => 1, name => 'Early May')->except(years => [2020])->also(dates => ['2020-05-08']);
+    is_deeply(pairs($may->holidays(year => 2020)), [['2020-05-08', 'Early May']], "except a year and also a date: 2020's VE Day bank holiday");
+    is_deeply(dates($may->holidays(year => 2021)), ['2021-05-03'], '  other years as the rule says');
+    is_deeply(dates($may->also(dates => ['2021-05-04'])->holidays(year => 2021)), [qw(2021-05-03 2021-05-04)], '  also adds to also');
+    is_deeply(dates($R->set($xmas, $boxing)->except(years => [2026])->holidays(year => 2026)), [], 'except on a set holds for every member');
+    is_deeply(dates($R->set($xmas->except(years => [2026]), $boxing)->holidays(year => 2026)), ['2026-12-26'], '  on a member for that member');
+    is_deeply(dates($R->set($xmas)->also(dates => [ Time::Keeper::Date->parse('2026-08-31') ])->holidays(year => 2026)), [qw(2026-08-31 2026-12-25)], 'also on a set, with a Date');
+    is_deeply(dates($xmas->observed('next_business_day')->also(dates => ['2027-12-25'])->holidays(year => 2027)), [qw(2027-12-25 2027-12-27)], 'an also date never moves');
+    ok(!eval { $xmas->except(years => 2020); 1 }, 'except needs a list');
+    like($@, qr/years is a list/, '  by name');
+    ok(!eval { $xmas->also(dates => ['not a date']); 1 }, 'also needs dates');
+    ok(!eval { $xmas->except(when => [2020]); 1 }, 'except refuses another key');
+
+    my $prev = $xmas->observed('previous_business_day');
+    my $ifsun = $xmas->observed('next_business_day_if_sunday');
+    my %want_prev = (2021 => '2021-12-24', 2022 => '2022-12-23', 2023 => '2023-12-25', 2024 => '2024-12-25', 2025 => '2025-12-25', 2026 => '2026-12-25', 2027 => '2027-12-24');
+    my %want_sun  = (2021 => '2021-12-25', 2022 => '2022-12-26', 2023 => '2023-12-25', 2024 => '2024-12-25', 2025 => '2025-12-25', 2026 => '2026-12-25', 2027 => '2027-12-25');
+    for my $y (sort keys %want_prev) {
+        is(dates($prev->holidays(year => $y))->[0], $want_prev{$y}, "previous_business_day in $y (Christmas on a " . Time::Keeper::Date->new(year => $y, month => 12, day => 25)->format('EEEE') . ')');
+        is(dates($ifsun->holidays(year => $y))->[0], $want_sun{$y}, '  next_business_day_if_sunday');
+    }
+    is_deeply(dates($xmas->observed('next_business_day_if_sunday', keep => 1)->holidays(year => 2022)), [qw(2022-12-25 2022-12-26)], 'keep: the Sunday stays a holiday and the Monday is added');
+    is_deeply(dates($xmas->observed('next_business_day', keep => 1)->observed('next_business_day')->holidays(year => 2022)), ['2022-12-26'], '  and a later observed without keep drops it');
+    is_deeply(dates($R->set($R->fixed(month => 3, day => 2)->observed(sub { $_[0]->plus(days => 7) }, keep => 1), $R->fixed(month => 3, day => 1)->observed('next_business_day'))->holidays(year => 2026)), [qw(2026-03-02 2026-03-03 2026-03-09)],
+              '  a kept weekday is taken: Sunday 1 March moves past Monday the 2nd, kept by the other rule, to the 3rd');
+    is_deeply(dates($R->set($xmas->observed('next_business_day', keep => 1), $R->fixed(month => 12, day => 26)->observed('next_business_day', keep => 1))->holidays(year => 2021)), [qw(2021-12-25 2021-12-26 2021-12-27 2021-12-28)], '  two kept and moved in a set do not collide');
+}
 
 # Not serialised, threads, subclasses.
 {
     require Storable;
-    ok(!eval { Storable::dclone($xmas); 1 }, 'a rule is not frozen');
-    like($@, qr/a rule is not serialised; build it again from its constructors/, '  by name');
-    ok(!eval { $xmas->FREEZE('CBOR'); 1 }, '  nor through FREEZE');
+    is_deeply($xmas->TO_JSON, { kind => 'fixed', month => 12, day => 25, name => 'Christmas Day' }, 'a rule as data');
+    is_deeply($xmas->observed('next_business_day', keep => 1, weekend => [5, 6])->between(from => 2000)->except(years => [2001])->also(dates => ['2001-12-24'])->TO_JSON,
+              { kind => 'fixed', month => 12, day => 25, name => 'Christmas Day', observed => 'next_business_day', keep => 1, weekend => [5, 6], from => 2000, except => [2001], also => ['2001-12-24'] },
+              '  with every change');
+    my @every = (
+        $xmas, $R->nth(month => 11, day_of_week => 4, n => 4), $R->nth(month => 5, day_of_week => 1, n => -1)->observed('nearest_business_day'),
+        $R->easter, $R->easter(offset => -2, orthodox => 1), $R->relative(rule => $xmas, days => 1, name => 'Boxing Day'),
+        $R->weekday_on_or_after(rule => $R->fixed(month => 6, day => 19), day_of_week => 5, n => 2, days => -1),
+        $R->weekday_on_or_before(rule => $R->fixed(month => 5, day => 24), day_of_week => 1),
+        $R->fixed(calendar => 'hebrew', month_code => 'M05L', day => 14, leap_month => 'common'),
+        $R->nth(calendar => 'chinese', month_code => 'M08', day_of_week => 6, n => 2),
+        $R->set($R->fixed(month => 9, day => 21), $R->fixed(month => 9, day => 23), $R->sandwiched(name => 'sw'), weekend => [6, 7], name => 'set', to => 2100),
+        $R->nth(month => 5, day_of_week => 1, n => 1, name => 'Early May')->except(years => [2020])->also(dates => ['2020-05-08', '2045-01-02']),
+        $R->uk, $R->us_federal, $R->target2,
+    );
+    for my $rule (@every) {
+        my $back = $R->from_spec($rule->TO_JSON);
+        my $clone = Storable::dclone($rule);
+        my @frozen = $rule->FREEZE('CBOR');
+        my $thawed = $R->THAW('CBOR', @frozen);
+        my ($bad, $bad2, $bad3) = (0, 0, 0);
+        for my $y (1990 .. 2060) {
+            my $want = join ' ', map { "$_->[0]=" . ($_->[1] // '') } $rule->holidays(year => $y);
+            $bad++ if $want ne join ' ', map { "$_->[0]=" . ($_->[1] // '') } $back->holidays(year => $y);
+            $bad2++ if $want ne join ' ', map { "$_->[0]=" . ($_->[1] // '') } $clone->holidays(year => $y);
+            $bad3++ if $want ne join ' ', map { "$_->[0]=" . ($_->[1] // '') } $thawed->holidays(year => $y);
+        }
+        my $k = $rule->TO_JSON->{kind};
+        is("$bad/$bad2/$bad3", '0/0/0', "a $k rule round-trips through from_spec, Storable and FREEZE/THAW, 1990 to 2060");
+        is_deeply($back->TO_JSON, $rule->TO_JSON, '  and its data is the same');
+    }
+    { package My::FrozenRule; our @ISA = ('Time::Keeper::Business::Rule'); }
+    is(ref Storable::dclone(My::FrozenRule->fixed(month => 1, day => 1)), 'My::FrozenRule', 'a subclass thaws in itself');
+    is(ref My::FrozenRule->from_spec({ kind => 'fixed', month => 1, day => 1 }), 'My::FrozenRule', '  and from_spec builds in it');
+    for my $bad (['observed', $xmas->observed(sub { $_[0] })], ['only_if', $xmas->only_if(sub { 1 })], ['a member', $R->set($xmas->only_if(sub { 1 }))], ['a base rule', $R->relative(rule => $xmas->only_if(sub { 1 }), days => 1)]) {
+        ok(!eval { $bad->[1]->TO_JSON; 1 }, "a code ref in $bad->[0] has no data form");
+        like($@, qr/a rule with a code ref \(observed or only_if\) cannot be written as data/, '  by name');
+    }
+    ok(!eval { Storable::dclone($xmas->only_if(sub { 1 })); 1 }, '  nor freezes');
+    for my $bad ([ 'x', qr/a rule's data is a hash/ ], [ {}, qr/a rule's data needs its kind/ ], [ { kind => 'lunar' }, qr/a rule of kind 'lunar' needs a later release of Time::Keeper::Business/ ],
+                 [ { kind => 'fixed', month => 13, day => 1 }, qr/^Time::Keeper::Business::Rule->fixed: month must be 1 to 12/ ], [ { kind => 'set' }, qr/a set's data needs its members/ ],
+                 [ { kind => 'fixed', month => 1, day => 1, colour => 'red' }, qr/unknown argument 'colour'/ ], [ { kind => 'fixed', month => 1, day => 1, observed => 'later' }, qr/the form is none/ ]) {
+        ok(!eval { $R->from_spec($bad->[0]); 1 }, 'from_spec refuses damaged data');
+        like($@, $bad->[1], '  with the constructor\'s own message');
+    }
     ok(!eval { Time::Keeper::Business::Rule::name(\1); 1 }, 'a plain ref is not a rule');
     like($@, qr/not a Time::Keeper::Business::Rule/, '  by name');
     {

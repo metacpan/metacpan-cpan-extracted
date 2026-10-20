@@ -1060,11 +1060,13 @@ subtest 'COND_INV_1265: blessed ARRAY item geocoder ref is stringified' => sub {
 
 	$obj->_cache($LOC_DC, [$item]);
 
-	# After the write, the geocoder field must be the string class name
-	ok(!ref($item->{geocoder}),
+	# After the write, the geocoder field of the L2 copy must be the string
+	# class name; the caller's item is left alone
+	ok(!ref($l2{$LOC_DC}[0]{geocoder}),
 		'Blessed ARRAY item: geocoder ref stringified to class name');
-	is($item->{geocoder}, 'FakeGeocoderRef',
+	is($l2{$LOC_DC}[0]{geocoder}, 'FakeGeocoderRef',
 		'Blessed ARRAY item: geocoder stringified correctly');
+	is($item->{geocoder}, $fake_gc, "Blessed ARRAY item: caller's item not modified");
 };
 
 subtest 'BOOL_NEGATE_1283/RETURN_UNDEF_1283: ARRAY with partial geometry -> _cache returns undef' => sub {

@@ -272,19 +272,11 @@ subtest 'a duplicate id without a transition leaves the transition of the first 
 };
 
 # A context with a small element count and an error handler collecting
-# error types. Clay_Initialize takes the counts of the current context, so
-# they are set on $ctx for the call and restored.
+# error types, current.
 sub small_context ($element_count, $errors) {
-    my ($elements, $words) = (Clay_GetMaxElementCount(), Clay_GetMaxMeasureTextCacheWordCount());
-    Clay_SetMaxElementCount($element_count);
-    Clay_SetMaxMeasureTextCacheWordCount(64);
-    my $small = Clay_Initialize(Clay_MinMemorySize(), { width => 400, height => 300 },
-        sub ($error, $userdata) { push @$errors, $error->{errorType} });
-    Clay_SetCurrentContext($ctx);
-    Clay_SetMaxElementCount($elements);
-    Clay_SetMaxMeasureTextCacheWordCount($words);
-    Clay_SetCurrentContext($small);
-    return $small;
+    my %counts = (maxElementCount => $element_count, maxMeasureTextCacheWordCount => 64);
+    return Clay_Initialize(Clay_MinMemorySize(\%counts), { width => 400, height => 300 },
+        sub ($error, $userdata) { push @$errors, $error->{errorType} }, undef, \%counts);
 }
 
 subtest 'exiting elements that do not fit into the element count lose their exit' => sub {

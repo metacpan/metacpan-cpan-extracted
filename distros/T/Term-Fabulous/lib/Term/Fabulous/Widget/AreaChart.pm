@@ -5,7 +5,7 @@ use warnings;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 use Object::Pad 0.825;
 
@@ -45,7 +45,7 @@ Term::Fabulous::Widget::AreaChart - Lines with the area below them filled
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-area-chart.svg" alt="Three stacked areas for Search, Social and Direct over the months of a year, with a title and a legend at the top"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.05/screenshots/widget-area-chart.svg" alt="Three stacked areas for Search, Social and Direct over the months of a year, with a title and a legend at the top"></p>
 
 =end html
 

@@ -5,7 +5,7 @@ use warnings;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 use Object::Pad 0.825;
 
@@ -296,6 +296,10 @@ class Term::Fabulous::Theme :strict(params) {
 	sub tokens () {
 		my @names = sort keys %PALETTE;
 		return @names;
+	}
+
+	sub has_token ($name) {
+		return defined $name && !ref $name && exists $PALETTE{$name} ? 1 : 0;
 	}
 
 	sub states () {
@@ -726,7 +730,7 @@ class Term::Fabulous::Theme :strict(params) {
 			my $token = $kid->name;
 			die "palette: unknown token '$token' (known: " . join( ', ', tokens() ) . ")" unless exists $PALETTE{$token};
 			die "palette: the token '$token' is set twice" if exists $palette{$token};
-			$palette{$token} = _single_string( $kid, "palette token '$token'" );
+			$palette{$token} = _single_string( $kid, "palette token '$token'", childless => 1 );
 		}
 		return \%palette;
 	}
@@ -788,9 +792,11 @@ class Term::Fabulous::Theme :strict(params) {
 		return $value->value;
 	}
 
-	sub _single_string ( $kid, $what ) {
+	# The one string argument of a node without properties (and, for a
+	# palette token, without children).
+	sub _single_string ( $kid, $what, %options ) {
 		my @args = $kid->args->@*;
-		die "$what needs exactly one string argument" unless @args == 1 && $args[0]->is_string && !$kid->props->@*;
+		die "$what needs exactly one string argument" unless @args == 1 && $args[0]->is_string && !$kid->props->@* && !( $options{childless} && $kid->children->@* );
 		return $args[0]->value;
 	}
 }
@@ -1044,19 +1050,23 @@ node, a C<palette> node and one node per family, all optional:
 		focused { background "focus_background" }
 	}
 
-Inside a family node, C<name "value"> sets the slot C<name> and C<name
-key="value"> sets the slot C<name.key> for every property, so C<border
-style=Round color="border"> sets C<border.style> and C<border.color>,
-and C<border enabled=#true> sets C<border.enabled>. A node named after a
-state holds the slots of that state. A C<variant "NAME"> node holds the
-slots and states of a variant. C<#null> means C<none>. C<border.enabled>
-takes C<#true> or C<#false> only; every other slot takes a string or
-C<#null>. An unknown family, slot, state, token or style dies with the
-known names, and so does C<none> or C<#null> for a required slot (see
-L</Values>). A palette token, or a slot of a family, state or variant,
-that is set twice in one document dies too (C<palette: the token
-'accent' is set twice>, C<button: the slot 'text.focused' is set
-twice>), also when the two settings are in two nodes of the same family.
+Inside a family node, C<name "value"> sets the slot C<name> and
+C<name key="value"> sets the slot C<name.key> for every property, so
+C<border style=Round color="border"> sets C<border.style> and
+C<border.color>, and C<border enabled=#true> sets C<border.enabled>. A
+node named after a state holds the slots of that state. A
+C<variant "NAME"> node holds the slots and states of a variant. C<#null>
+means C<none>. C<border.enabled> takes C<#true> or C<#false> only; every
+other slot takes a string or C<#null>. An unknown family, slot, state,
+token or style dies with the known names, and so does C<none> or
+C<#null> for a required slot (see L</Values>). A palette token takes
+exactly one string, its color, and no properties or children; anything
+else dies with
+C<palette token 'accent' needs exactly one string argument>. A palette
+token, or a slot of a family, state or variant, that is set twice in one
+document dies too (C<palette: the token 'accent' is set twice>,
+C<button: the slot 'text.focused' is set twice>), also when the two
+settings are in two nodes of the same family.
 
 =head1 CONSTRUCTORS
 
@@ -1180,6 +1190,14 @@ Plain functions, called as C<Term::Fabulous::Theme::NAME(...)>.
 
 The names of the families, the tokens, the states (C<normal> first)
 and the built-in themes.
+
+=head2 has_token
+
+	if ( Term::Fabulous::Theme::has_token('accent') ) { ... }
+
+Whether the word names a token of the palette; every theme has the
+same tokens. L<Term::Fabulous::Text::Style> uses it to read a token as
+a color.
 
 =head2 slots
 

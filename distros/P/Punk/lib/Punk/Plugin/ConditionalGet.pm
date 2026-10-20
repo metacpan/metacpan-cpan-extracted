@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Punk ();
 
-our $VERSION = '0.61';
+our $VERSION = '0.62';
 
 1;
 
@@ -278,6 +278,13 @@ C<to_app>.
 
 None. The plugin takes no configuration - the decision is per route, as
 C<etag> - and an option handed to it croaks rather than being ignored.
+
+=head1 METHODS
+
+=head2 register($app, \%opts)
+
+Called once by C<plugin>: makes the C<etag> route option available. Croaks if
+given any option.
 
 =head1 SEE ALSO
 

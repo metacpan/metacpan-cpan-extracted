@@ -72,7 +72,11 @@ typescript
 mutation.json
 ^xt/mutant_\d
 # The bare-environment check the CI job runs: an author's tool, not shipped
-^xt/bare-environment\.pl$
+^t/bare-environment\.pl$
+# The location-predicate fuzz, for the same reason: the scheduled job runs it
+# against the six sibling checkouts, which an install of this distribution does
+# not have
+^t/location-predicate-fuzz\.pl$
 CLAUDE.md
 \.claude
 \.circleci

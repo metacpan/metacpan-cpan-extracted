@@ -137,7 +137,7 @@ _instantiate(class, ...)
             }
             ENTER; SAVETMPS;
             PUSHMARK(SP);
-            EXTEND(SP, 9);
+            EXTEND(SP, 11);
             PUSHs(backend_class);
             mPUSHs(newSVpvs("database"));
             mPUSHs(newRV_noinc((SV *)conn));
@@ -147,6 +147,12 @@ _instantiate(class, ...)
             mPUSHs(newSVsv(pm_get(aTHX_ m, "primary")));
             mPUSHs(newSVpvs("columns"));
             mPUSHs(newSVsv(pm_get(aTHX_ m, "fields")));
+            /* the application, for a backend that reads from it (the
+             * markdown one reads a mount's pages); the others ignore it */
+            if (items > 2 && SvROK(ST(2))) {
+                mPUSHs(newSVpvs("app"));
+                PUSHs(ST(2));
+            }
             PUTBACK;
             count = call_method("new", G_SCALAR);
             SPAGAIN;

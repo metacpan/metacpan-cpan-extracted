@@ -4,18 +4,17 @@ author:
   - 'Nigel Horne <njh@nigelhorne.com>'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  Geo::Location::Predicate: '0'
+  IPC::System::Simple: '0'
   LWP::UserAgent::Throttled: '0'
-  Test::Carp: '0'
   Test::DescribeMe: '0'
-  Test::LWP::UserAgent: '0'
   Test::Most: '0'
   Test::Needs: '0'
   Test::NoWarnings: '0'
-  Test::Number::Delta: '0'
 configure_requires:
   ExtUtils::MakeMaker: '6.64'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150015'
 license: open_source
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -25,6 +24,8 @@ no_index:
   directory:
     - t
     - inc
+recommends:
+  Geo::Location::Predicate: '0.01'
 requires:
   Encode: '0'
   HTTP::Request: '0'
@@ -37,5 +38,5 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Geo-Coder-XYZ
   repository: git://github.com/nigelhorne/Geo-Coder-XYZ.git
-version: '0.10'
+version: '0.11'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

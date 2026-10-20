@@ -258,10 +258,11 @@ see L</TEXT>.
 =item *
 
 C<widget_for> maps each render command back to the widget that
-produced it. To ask where an element widget ended up, call
-C<< $ui->bounding_box($widget) >>; text widgets have no bounding box of
-their own, their position is the C<boundingBox> of their C<TEXT>
-commands.
+produced it. To ask where a widget ended up, call
+C<< $ui->bounding_box($widget) >>; a text widget's box holds all its
+lines, and where each line went is the C<boundingBox> of its C<TEXT>
+commands. C<< $ui->content_box($widget) >> is the part of that box
+inside the padding the same frame declared, where the children go.
 
 =back
 
@@ -498,7 +499,7 @@ children and its size comes from the measure function (see L</TEXT>).
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-clay-xs/v0.06/images/layout-direction.png" alt="Two grey parent elements, each with three numbered coloured children. With CLAY_LEFT_TO_RIGHT the children sit side by side in a row at the top left of the parent; with CLAY_TOP_TO_BOTTOM they form a column."></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-clay-xs/v0.07/images/layout-direction.png" alt="Two grey parent elements, each with three numbered coloured children. With CLAY_LEFT_TO_RIGHT the children sit side by side in a row at the top left of the parent; with CLAY_TOP_TO_BOTTOM they form a column."></p>
 
 =end html
 
@@ -555,7 +556,7 @@ gives:
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-clay-xs/v0.06/images/sizing.png" alt="A 300 wide row with padding 10 and childGap 10 holding four coloured children. The labels under them give each sizing rule and the width Clay computed: GROW 45, FIXED 50 is 50, PERCENT 0.5 is 125, GROW with max 30 is 30."></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-clay-xs/v0.07/images/sizing.png" alt="A 300 wide row with padding 10 and childGap 10 holding four coloured children. The labels under them give each sizing rule and the width Clay computed: GROW 45, FIXED 50 is 50, PERCENT 0.5 is 125, GROW with max 30 is 30."></p>
 
 =end html
 
@@ -588,7 +589,7 @@ size.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-clay-xs/v0.06/images/padding-and-child-gap.png" alt="A grey parent with three numbered children. Brackets mark the 16 units of padding between the parent's left edge and the first child, the 4 units of childGap between the first and the second child, and the 8 units of padding between the parent's top edge and the children."></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-clay-xs/v0.07/images/padding-and-child-gap.png" alt="A grey parent with three numbered children. Brackets mark the 16 units of padding between the parent's left edge and the first child, the 4 units of childGap between the first and the second child, and the 8 units of padding between the parent's top edge and the children."></p>
 
 =end html
 
@@ -611,7 +612,7 @@ table cell, give the cell C<< child_alignment => { x => CLAY_ALIGN_X_RIGHT } >>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-clay-xs/v0.06/images/child-alignment.png" alt="Nine grey elements in three rows of three, each with one small blue child. The child sits at the left, the centre or the right of its element depending on x, and at the top, the centre or the bottom depending on y."></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-clay-xs/v0.07/images/child-alignment.png" alt="Nine grey elements in three rows of three, each with one small blue child. The child sits at the left, the centre or the right of its element depending on x, and at the top, the centre or the bottom depending on y."></p>
 
 =end html
 
@@ -648,7 +649,7 @@ F<examples/07-ui-flow.pl>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-clay-xs/v0.06/images/flow-layout.png" alt="Two wrap containers of the same size holding the same eight tags, which wrap onto three lines. With lineSizing GROW the lines share the container's extra height and the tags grow taller; with lineSizing FIT the lines stay as tall as their tags and the bottom of the container stays empty."></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-clay-xs/v0.07/images/flow-layout.png" alt="Two wrap containers of the same size holding the same eight tags, which wrap onto three lines. With lineSizing GROW the lines share the container's extra height and the tags grow taller; with lineSizing FIT the lines stay as tall as their tags and the bottom of the container stays empty."></p>
 
 =end html
 
@@ -665,7 +666,7 @@ picture". See L<Clay::XS/STACK LAYOUT> and F<examples/08-ui-stack.pl>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-clay-xs/v0.06/images/stack-layout.png" alt="A stack container: a blue picture fills it, a red badge sits in its top right corner and a dark caption bar runs along its bottom. The legend lists the three children: the picture, GROW on both axes; a layer aligned x RIGHT and y TOP holding the badge; a layer aligned y BOTTOM holding the caption bar."></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-clay-xs/v0.07/images/stack-layout.png" alt="A stack container: a blue picture fills it, a red badge sits in its top right corner and a dark caption bar runs along its bottom. The legend lists the three children: the picture, GROW on both axes; a layer aligned x RIGHT and y TOP holding the badge; a layer aligned y BOTTOM holding the caption bar."></p>
 
 =end html
 
@@ -681,7 +682,7 @@ badges are floating elements.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-clay-xs/v0.06/images/floating.png" alt="A row of three buttons Edit, View and Help. The View button has a dark tooltip above it, a white menu with the entries Zoom in and Zoom out hanging below it and a red badge on its top right corner; Edit and Help stay where they are. The legend gives the attach points: tooltip, element CENTER_BOTTOM at parent CENTER_TOP with offset y -6; menu, element LEFT_TOP at parent LEFT_BOTTOM with offset y 4; badge, element CENTER_CENTER at parent RIGHT_TOP."></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-clay-xs/v0.07/images/floating.png" alt="A row of three buttons Edit, View and Help. The View button has a dark tooltip above it, a white menu with the entries Zoom in and Zoom out hanging below it and a red badge on its top right corner; Edit and Help stay where they are. The legend gives the attach points: tooltip, element CENTER_BOTTOM at parent CENTER_TOP with offset y -6; menu, element LEFT_TOP at parent LEFT_BOTTOM with offset y 4; badge, element CENTER_CENTER at parent RIGHT_TOP."></p>
 
 =end html
 
@@ -753,7 +754,7 @@ turns into a clip region.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-clay-xs/v0.06/images/clipping-and-scrolling.png" alt="Two lists of eight coloured rows in parents of the same size. Without clipping, rows 5 to 8 are drawn below the parent's bottom edge. With vertical clipping and a scroll position of y -44, only rows 2 to 6 are visible, the first and the last of them cut off at the parent's edges."></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-clay-xs/v0.07/images/clipping-and-scrolling.png" alt="Two lists of eight coloured rows in parents of the same size. Without clipping, rows 5 to 8 are drawn below the parent's bottom edge. With vertical clipping and a scroll position of y -44, only rows 2 to 6 are visible, the first and the last of them cut off at the parent's edges."></p>
 
 =end html
 
@@ -807,7 +808,7 @@ combined with C<image>. See L<Clay::XS::Structs/aspectRatio>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-clay-xs/v0.06/images/aspect-ratio.png" alt="Three blue boxes 120 wide. With aspectRatio 16 / 9 the box is 67.5 tall, with aspectRatio 1 it is a 120 by 120 square, with aspectRatio 4 / 3 it is 90 tall."></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-clay-xs/v0.07/images/aspect-ratio.png" alt="Three blue boxes 120 wide. With aspectRatio 16 / 9 the box is 67.5 tall, with aspectRatio 1 it is a 120 by 120 square, with aspectRatio 4 / 3 it is 90 tall."></p>
 
 =end html
 
@@ -826,7 +827,7 @@ and L<Clay::UI::Grid> uses them to build tables.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-clay-xs/v0.06/images/sizing-groups.png" alt="Two forms with the rows Name, E-mail address and City, each a grey label followed by a blue input box. Without a sizing group every label is as wide as its text and the inputs start at different positions. With the labels in width_group 1 every label is as wide as E-mail address and the inputs line up."></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-clay-xs/v0.07/images/sizing-groups.png" alt="Two forms with the rows Name, E-mail address and City, each a grey label followed by a blue input box. Without a sizing group every label is as wide as its text and the inputs start at different positions. With the labels in width_group 1 every label is as wide as E-mail address and the inputs line up."></p>
 
 =end html
 
@@ -844,7 +845,7 @@ F<examples/05-ui-grid.pl> and F<examples/16-invoice-pdf.pl>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-clay-xs/v0.06/images/grid.png" alt="A table with a dark header row Name, E-mail, Amount; the rows Alice and Bob; a grey row reading Guests (a spanning row) across all columns; and the row Carol. Every column is as wide as its widest cell and the amounts are right-aligned."></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-clay-xs/v0.07/images/grid.png" alt="A table with a dark header row Name, E-mail, Amount; the rows Alice and Bob; a grey row reading Guests (a spanning row) across all columns; and the row Carol. Every column is as wide as its widest cell and the amounts are right-aligned."></p>
 
 =end html
 
@@ -1000,6 +1001,13 @@ With C<CLAY_TEXT_WRAP_NEWLINES>, it breaks only at newlines. With
 C<CLAY_TEXT_WRAP_NONE>, it never breaks: the whole text, newlines
 included, is one line.
 
+Text that does not break at spaces keeps its width as long as the other
+children of its parent can still shrink. When they cannot, the text
+element gets narrower than its lines, and each C<TEXT> box is no wider
+than the element: a renderer that draws only what fits into the box cuts
+the text off at the parent's edge. In the figure below, the renderer
+draws every line whole, so the lines run past the parents.
+
 Each line becomes its own C<TEXT> render command with its own bounding
 box, so a renderer simply draws every C<TEXT> command at its position.
 A parent with a FIT width takes the width of the longest line it does
@@ -1010,7 +1018,7 @@ C<$max> on FIT) to make text wrap.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-clay-xs/v0.06/images/text-wrapping.png" alt="The same text, which contains one newline, in three grey parents 200 wide. With CLAY_TEXT_WRAP_WORDS it breaks at a space and at the newline into three lines inside the parent. With CLAY_TEXT_WRAP_NEWLINES it breaks only at the newline and the first line runs past the parent's right edge. With CLAY_TEXT_WRAP_NONE it is one line that runs far past the parent."></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-clay-xs/v0.07/images/text-wrapping.png" alt="The same text, which contains one newline, in three grey parents 200 wide. With CLAY_TEXT_WRAP_WORDS it breaks at a space and at the newline into three lines inside the parent. With CLAY_TEXT_WRAP_NEWLINES it breaks only at the newline and the first line runs past the parent's right edge. With CLAY_TEXT_WRAP_NONE it is one line that runs far past the parent."></p>
 
 =end html
 
@@ -1257,6 +1265,20 @@ event simply returns; a listener that only observes returns C<CONTINUE>.
 The rules, and how to fire events of your own, are in
 L<Clay::UI::Role::Events::Emitter> and L<Clay::UI::Events::Event>.
 
+A widget keeps its listeners, so a listener must not capture its own
+widget, or an object that holds it, in its closure: the two would keep
+each other alive. Read the widget from C<< $event->current_target >>.
+A listener that needs another object, such as a widget class listening
+on one of its parts, is registered with C<< owner => $object >>: the
+widget keeps the owner weakly, passes it to the handler as its first
+argument and skips the handler once the owner is gone (see
+L<Clay::UI::Role::Events::Listener/owner>).
+
+    $_button->on(OnRelease => sub ($self, $event) {
+    	$self->submit;    # the owner
+    	return;
+    }, owner => $self);
+
 =head2 Interaction states
 
 Widgets do not store hover or press flags. Ask the UI instead:
@@ -1291,7 +1313,11 @@ L<Clay::UI::Role::Interaction::HasFocusOrder> can define its own order.
 A widget with L<Clay::UI::Role::Interaction::Disableable> that is
 disabled cannot take the focus and cannot be pressed (a press over it
 goes to the nearest enabled Pressable under the pointer instead). Focus changes fire
-C<OnBlur> on the old and C<OnFocus> on the new widget. Clicking does not
+C<OnBlur> on the old and C<OnFocus> on the new widget. When the focused
+widget is removed or disabled, the focus goes to its I<heir>: the
+nearest ancestor that can take it, or the widget an ancestor's
+C<focus_heir> method names (a tab view names its active tab); see
+L<Clay::UI::Interaction/Focus heirs>. Clicking does not
 move the focus by itself; call C<set_focused_widget> from an C<OnPress>
 listener if you want that. See L<Clay::UI::Interaction/FOCUS>.
 
@@ -1454,7 +1480,10 @@ back to widgets. Full details: L<Clay::UI::Role::Core::Element/to_config>.
 A widget whose children follow from its own data (a list, a table)
 composes L<Clay::UI::Role::Core::Preparable>: its setters call
 C<request_prepare>, and C<render> calls its C<prepare_layout> once
-before the layout pass, however many changes came before.
+before the layout pass, however many changes came before. A Preparable
+scroll container is also prepared whenever it moved (C<scroll_to>,
+wheel, drag or momentum), so one that builds its children for the
+position it shows needs no C<OnScroll> listener for that.
 
 A widget that must react when its place in a tree changes (it joined a
 tree, left one, or its tree became a UI) overrides the hook
@@ -1638,7 +1667,11 @@ C<Clay_SetMaxElementCount> before C<Clay_Initialize>, while no context
 is current (with a context current, the setter changes that context's
 count and makes it unusable until it is initialised again), or with
 C<< Clay::UI->new(max_element_count => $n) >>. C<Clay_MinMemorySize>
-reports the memory needed for the current settings.
+reports the memory needed for the current settings. Explicit counts
+size one context and change no setting:
+C<< Clay_MinMemorySize({ maxElementCount => $n }) >> reports the memory
+they need, and the same hash as the last argument of C<Clay_Initialize>
+creates a context with them (Clay::UI does this).
 
 =item Text measurement cache
 
@@ -1679,6 +1712,7 @@ L<Clay::Cookbook>; role names are short for C<Clay::UI::Role::...>.
 
     Feature                       Reference                                     Examples
     ----------------------------  --------------------------------------------  -----------------------------
+    ancestors, nearest match      Layout::HasParent ancestors, closest          14
     aspect ratio                  Structs aspectRatio                           11, 14, 15
     background colour             Structs backgroundColor; HasBackground        most
     borders                       Structs border; HasBorder                     01, 03, 05-08, 11, 14, 15, 16
@@ -1687,6 +1721,7 @@ L<Clay::Cookbook>; role names are short for C<Clay::UI::Role::...>.
     bubbling events               Manual Bubbling; Events::Event bubble_mode    12
     check a struct                XS check_struct                               11, 14, 15
     clipping                      Structs clip                                  09, 11, 13, 15, 16
+    content box of a widget       UI content_box                                -
     contexts, several             XS CONTEXTS; XS Clay_SetCurrentContext        17
     corner radius                 Structs cornerRadius; HasCornerRadius         01, 03, 06-08, 11, 15, 16
     culling                       XS Clay_SetCullingEnabled                     17
@@ -1695,6 +1730,7 @@ L<Clay::Cookbook>; role names are short for C<Clay::UI::Role::...>.
     custom widget classes         Core::Element to_config; Manual WIDGETS       12, 14, 15, 16
     debug view                    XS Clay_SetDebugModeEnabled                   17
     disabled widgets              Interaction::Disableable                      12
+    element and word counts       XS Element and word counts; UI new            -
     element ids                   XS Clay_GetElementId; Manual ELEMENT IDS      01-03, 14, 17
     error handler                 XS Clay_Initialize; UI new error_handler      01, 04-08, 14, 17
     external scroll handling      XS Clay_SetExternalScrollHandlingEnabled      17
@@ -1710,6 +1746,7 @@ L<Clay::Cookbook>; role names are short for C<Clay::UI::Role::...>.
     max element count             XS Clay_SetMaxElementCount; UI new            14, 17
     measure text                  XS Clay_SetMeasureTextFunction; Manual TEXT   06, 14, 15, 16, 18
     overlay colour                Structs overlayColor                          10, 11, 14, 15
+    owner-bound listeners         Events::Listener owner                        -
     pagination                    Cookbook "Split a long document into pages"   16
     PDF output                    Cookbook "Render to a PDF document"           16
     PNG output                    Cookbook "Render to a PNG image"              06, 15
@@ -1724,7 +1761,7 @@ L<Clay::Cookbook>; role names are short for C<Clay::UI::Role::...>.
     sizing groups                 XS SIZING GROUPS; HasSizingGroup              14, 18
     stack layout                  XS STACK LAYOUT                               08, 15
     states (user and derived)     Style::HasStates                              12, 18
-    subtree of a widget           Core::Element descendants                     -
+    subtree of a widget           Layout::HasParent subtree; descendants        -
     subtree test (is X below Y)   Layout::HasParent contains                    -
     tree changes (joined/left)    Layout::HasParent tree_changed                -
     SVG output                    Cookbook "Render to SVG"                      03, 05, 07, 08, 11, 13
@@ -1732,6 +1769,8 @@ L<Clay::Cookbook>; role names are short for C<Clay::UI::Role::...>.
     tooltips                      Cookbook "Show a tooltip on hover"            09, 13
     transitions                   XS Clay_SetTransitionHandlers; TRANSITIONS    10
     validation errors             XS STRUCT ERRORS; UI KEYS AND VALIDATION      11, 14, 15
+    widget of a UI (owns)         UI owns                                       -
+    widget test (is_widget)       Layout::HasParent is_widget                   -
 
 The examples by number:
 

@@ -22,14 +22,46 @@ tk_unicode_digit(UV cp)
     return at >= 0 && cp - tk_digit_zeros[at] < 10 ? (int)(cp - tk_digit_zeros[at]) : -1;
 }
 
-/* How much of the text the next character of a name matches, ignoring
- * ASCII case, and reading a digit of another script in the name as the
- * ASCII digit the text was folded to: 1 and the bytes of each it takes,
+/* The bytes of a white space character here (a space, a tab, a no-break,
+ * narrow no-break, thin or other fixed-width space, an ideographic space),
  * or 0. */
+static STRLEN
+tk_ws_at(const char *p, STRLEN left)
+{
+    const unsigned char *u = (const unsigned char *)p;
+    if (left >= 1 && (u[0] == ' ' || u[0] == '\t'))
+        return 1;
+    if (left >= 2 && u[0] == 0xC2 && u[1] == 0xA0)
+        return 2;
+    if (left >= 3 && u[0] == 0xE2 && u[1] == 0x80 && ((u[2] >= 0x80 && u[2] <= 0x8A) || u[2] == 0xAF))
+        return 3;
+    if (left >= 3 && u[0] == 0xE3 && u[1] == 0x80 && u[2] == 0x80)
+        return 3;
+    return 0;
+}
+
+/* How much of the text the next character of a name matches, ignoring
+ * ASCII case, reading a digit of another script in the name as the ASCII
+ * digit the text was folded to, and white space in the name as any run of
+ * white space ("p. m." with the narrow no-break space CLDR writes, or the
+ * space a person types): 1 and the bytes of each it takes, or 0. */
 static int
 tk_name_char(const char *t, STRLEN tleft, const char *n, STRLEN nleft, STRLEN *tl, STRLEN *nl)
 {
     const unsigned char *u = (const unsigned char *)n;
+    STRLEN w = tk_ws_at(n, nleft);
+    if (w) {
+        STRLEN a = 0, b = 0, k;
+        while ((k = tk_ws_at(n + b, nleft - b)))
+            b += k;
+        while ((k = tk_ws_at(t + a, tleft - a)))
+            a += k;
+        if (!a)
+            return 0;
+        *tl = a;
+        *nl = b;
+        return 1;
+    }
     if (u[0] >= 0xC0) {
         STRLEN cl = u[0] >= 0xF0 ? 4 : u[0] >= 0xE0 ? 3 : 2, k;
         if (cl <= nleft) {
@@ -330,16 +362,41 @@ tk_parse_gmt(tk_cursor *c, tk_fields *f, const tk_locale_data *loc)
         STRLEN before = c->i;
         int sign = 0;
         tk_skip_marks(c);
+        {
+            /* a space before the sign, as hr's hour format writes its
+               negative half (" -HH:mm"): "GMT -4" */
+            STRLEN sp = c->i;
+            while (c->i < c->len && (c->s[c->i] == ' '
+                   || (c->i + 2 <= c->len && (unsigned char)c->s[c->i] == 0xC2 && (unsigned char)c->s[c->i + 1] == 0xA0)
+                   || (c->i + 3 <= c->len && (unsigned char)c->s[c->i] == 0xE2 && (unsigned char)c->s[c->i + 1] == 0x80
+                       && (unsigned char)c->s[c->i + 2] == 0xAF)))
+                c->i += c->s[c->i] == ' ' ? 1 : (unsigned char)c->s[c->i] == 0xC2 ? 2 : 3;
+            if (!(tk_peek(c) == '+' || tk_peek(c) == '-'
+                  || (c->i + 3 <= c->len && (unsigned char)c->s[c->i] == 0xE2
+                      && (((unsigned char)c->s[c->i + 1] == 0x88 && (unsigned char)c->s[c->i + 2] == 0x92)
+                          || ((unsigned char)c->s[c->i + 1] == 0x80 && (unsigned char)c->s[c->i + 2] == 0x93)))))
+                c->i = sp;
+        }
         if (tk_peek(c) == '+' || tk_peek(c) == '-')
             sign = c->s[c->i++] == '-' ? -1 : 1;
         else if (c->i + 3 <= c->len && (unsigned char)c->s[c->i] == 0xE2
-                 && (unsigned char)c->s[c->i + 1] == 0x88 && (unsigned char)c->s[c->i + 2] == 0x92) {
-            sign = -1;                                  /* U+2212 MINUS SIGN */
+                 && (((unsigned char)c->s[c->i + 1] == 0x88 && (unsigned char)c->s[c->i + 2] == 0x92)
+                     || ((unsigned char)c->s[c->i + 1] == 0x80 && (unsigned char)c->s[c->i + 2] == 0x93))) {
+            sign = -1;                                  /* U+2212 MINUS SIGN, or eu's U+2013 EN DASH */
             c->i += 3;
         }
         if (sign) {
             int64_t h, mi = 0, s = 0;
-            if (!tk_digits_range(c, 1, 2, &h)
+            /* hours and minutes run together with no colon, "+530" (am's
+               HHmm): three digits are one for the hour, four are two */
+            STRLEN run = tk_digit_run(c);
+            if (run == 3 || run == 4) {
+                if (!tk_digits(c, (int)run - 2, &h) || !tk_digits(c, 2, &mi)) {
+                    c->i = save;
+                    return 0;
+                }
+            }
+            else if (!tk_digits_range(c, 1, 2, &h)
                 || ((tk_eat(c, ':') || tk_eat(c, '.'))
                     ? !tk_digits(c, 2, &mi) || (tk_eat(c, ':') && !tk_digits(c, 2, &s))
                     : tk_digit_run(c) >= 2 && !tk_digits(c, 2, &mi))) {
@@ -651,6 +708,109 @@ tk_strptime(tk_cursor *c, tk_fields *f, const tk_locale_data *loc, const char *p
 
 /* ---- CLDR patterns ------------------------------------------------------------ */
 
+/* A number in one of the systems CLDR attaches to some calendars' patterns,
+ * where digits were wanted: the days of a lunar month (hanidays, 初六),
+ * Chinese numerals as digits (hanidec, 二〇二六), lower-case Roman numerals
+ * (romanlow), the first year of a Japanese era (元), and Hebrew numerals (hebr: ד׳, תשפ״ז, ה׳תשפ״ז), a
+ * year written without its thousands being in the sixth millennium, as the
+ * writer leaves them out. The patterns handed out carry no numbering, so
+ * the reader takes these wherever a day, a month or a year is wanted. */
+static int
+tk_alt_number(tk_cursor *c, int is_year, int64_t *v)
+{
+    static const int hebr[27] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20, 20, 30, 40, 40, 50, 50, 60, 70, 80, 80, 90, 90, 100, 200, 300, 400 };
+    const unsigned char *u = (const unsigned char *)c->s;
+    STRLEN i = c->i, best = 0;
+    int k, bi = -1;
+    for (k = 1; k <= 30; k++) {
+        STRLEN took = tk_name_at(c, tk_hanidays[k], strlen(tk_hanidays[k]));
+        if (took > best) {
+            best = took;
+            bi = k;
+        }
+    }
+    if (bi > 0) {
+        c->i += best;
+        *v = bi;
+        return 1;
+    }
+    {
+        int64_t n = 0;
+        int got = 0;
+        while (c->i + 3 <= c->len) {
+            int d = -1;
+            for (k = 0; k < 10; k++)
+                if (memEQ(c->s + c->i, tk_hanidec_digits[k], 3))
+                    d = k;
+            if (d < 0)
+                break;
+            n = n * 10 + d;
+            c->i += 3;
+            got++;
+        }
+        if (got) {
+            *v = n;
+            return 1;
+        }
+    }
+    {
+        /* romanlow, CLDR's lower-case Roman numerals (haw's months: x, iii) */
+        static const char ro[] = "ivxlcdm";
+        static const int rv[] = { 1, 5, 10, 50, 100, 500, 1000 };
+        int64_t n = 0;
+        int prev = 0, got = 0;
+        STRLEN j = c->i;
+        while (j < c->len && strchr(ro, c->s[j]) && c->s[j]) {
+            int val = rv[strchr(ro, c->s[j]) - ro];
+            n += val;
+            if (prev && val > prev)
+                n -= 2 * prev;
+            prev = val;
+            j++;
+            got++;
+        }
+        if (got && (j == c->len || !isALPHA(c->s[j]))) {
+            c->i = j;
+            *v = n;
+            return 1;
+        }
+    }
+    if (i + 3 <= c->len && memEQ(c->s + i, "\345\205\203", 3)) {
+        c->i += 3;
+        *v = 1;
+        return 1;
+    }
+    {
+        int64_t sum = 0, thousands = 0;
+        int letters = 0;
+        while (i + 2 <= c->len && u[i] == 0xD7) {
+            if (u[i + 1] >= 0x90 && u[i + 1] <= 0xAA) {
+                sum += hebr[u[i + 1] - 0x90];
+                letters++;
+                i += 2;
+            }
+            else if (u[i + 1] == 0xB3 || u[i + 1] == 0xB4) {
+                /* a geresh after a group with letters after it: thousands */
+                i += 2;
+                if (u[i - 1] == 0xB3 && i + 2 <= c->len && u[i] == 0xD7 && u[i + 1] >= 0x90 && u[i + 1] <= 0xAA) {
+                    thousands = sum;
+                    sum = 0;
+                }
+            }
+            else
+                break;
+        }
+        if (letters) {
+            c->i = i;
+            *v = thousands * 1000 + sum;
+            if (is_year && !thousands && *v < 1000)
+                *v += 5000;
+            return 1;
+        }
+    }
+    return 0;
+}
+
 /* A run of digits for a field of n letters: exactly n when the next part
  * of the pattern is another field with no text between, else 1 to max. */
 static int
@@ -695,7 +855,16 @@ tk_parse_cldr(tk_cursor *c, tk_fields *f, const tk_locale_data *loc, const char 
             int n = 0, adjacent;
             int64_t v;
             while (k < plen && p[k] == ch) { n++; k++; }
-            adjacent = k < plen && ((p[k] >= 'a' && p[k] <= 'z') || (p[k] >= 'A' && p[k] <= 'Z'));
+            /* a numeric field met by another with nothing between reads its
+               own width; one met by a name ("d" then "EEEE", "25星期三")
+               reads all its digits */
+            adjacent = 0;
+            if (k < plen && ((p[k] >= 'a' && p[k] <= 'z') || (p[k] >= 'A' && p[k] <= 'Z'))) {
+                STRLEN r = 1;
+                while (k + r < plen && p[k + r] == p[k])
+                    r++;
+                adjacent = strchr("yuYrdDHhKkmsSwWeQq", p[k]) || ((p[k] == 'M' || p[k] == 'L') && r <= 2) || (p[k] == 'c' && r <= 2);
+            }
             switch (ch) {
             case 'G': {
                 const char *all[6];
@@ -743,7 +912,10 @@ tk_parse_cldr(tk_cursor *c, tk_fields *f, const tk_locale_data *loc, const char 
             case 'y': case 'u':
                 if (f->calendar)
                     f->year_kind = ch == 'u' ? 2 : 1;
-                if (n == 2) {
+                if (f->calendar && tk_alt_number(c, 1, &v)) {
+                    f->has_year = 1; f->year = v;
+                }
+                else if (n == 2) {
                     if (!tk_digits(c, 2, &v)) return 0;
                     f->has_y2 = 1; f->y2 = (int)v;
                 }
@@ -758,6 +930,19 @@ tk_parse_cldr(tk_cursor *c, tk_fields *f, const tk_locale_data *loc, const char 
                 }
                 break;
             case 'Y':
+                if (f->calendar) {
+                    /* the calendar's year, as the writer writes it */
+                    f->year_kind = 1;
+                    if (n == 2) {
+                        if (!tk_digits(c, 2, &v)) return 0;
+                        f->has_y2 = 1; f->y2 = (int)v;
+                    }
+                    else {
+                        if (!tk_signed(c, 9, &v)) return 0;
+                        f->has_year = 1; f->year = v;
+                    }
+                    break;
+                }
                 if (!tk_signed(c, 9, &v)) return 0;
                 if (n == 2) v = v < 69 ? 2000 + v : 1900 + v;
                 f->has_isoweek = 1; f->week_year = v;
@@ -798,7 +983,10 @@ tk_parse_cldr(tk_cursor *c, tk_fields *f, const tk_locale_data *loc, const char 
                             c->err = NULL;
                         }
                     }
-                    if (!leap && !tk_cldr_digits(c, n, adjacent, 2, &v)) return 0;
+                    if (!leap && !tk_cldr_digits(c, n, adjacent, 2, &v)) {
+                        if (!tk_alt_number(c, 0, &v)) return 0;
+                        c->err = NULL;
+                    }
                     f->has_month = 1; f->month = (unsigned)v; f->leap_month_text = leap; f->month_slot = 0;
                 }
                 else if (f->calendar) {
@@ -817,7 +1005,12 @@ tk_parse_cldr(tk_cursor *c, tk_fields *f, const tk_locale_data *loc, const char 
                 }
                 break;
             case 'w': if (!tk_cldr_digits(c, n, adjacent, 2, &v)) return 0; f->has_isoweek = 1; f->week = (unsigned)v; break;
-            case 'd': if (!tk_cldr_digits(c, n, adjacent, 2, &v)) return 0; f->has_day = 1; f->day = (unsigned)v; break;
+            case 'd':
+                if (!tk_cldr_digits(c, n, adjacent, 2, &v)) {
+                    if (!tk_alt_number(c, 0, &v)) return 0;
+                    c->err = NULL;
+                }
+                f->has_day = 1; f->day = (unsigned)v; break;
             case 'D': if (!tk_cldr_digits(c, n, adjacent, 3, &v)) return 0; f->has_doy = 1; f->doy = (unsigned)v; break;
             case 'E':
                 {
@@ -939,6 +1132,12 @@ tk_parse_cldr(tk_cursor *c, tk_fields *f, const tk_locale_data *loc, const char 
                 }
                 continue;
             }
+        }
+        /* a full stop after a name that ends in one ("d. MMM. y" with ksh's
+           "Okt."): the writer writes one, as ICU does */
+        if (ch == '.' && c->i > 0 && c->s[c->i - 1] == '.' && (c->i >= c->len || c->s[c->i] != '.')) {
+            k++;
+            continue;
         }
         if (!tk_eat_ci(c, ch))
             return tk_fail(c, "the text does not match the pattern");

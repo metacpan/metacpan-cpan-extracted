@@ -5,7 +5,7 @@ use warnings;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 use Object::Pad 0.825;
 
@@ -335,18 +335,23 @@ L<Term::Fabulous::Check/sizing>):
 	'grow(10, 40)'  the same, between 10 and 40 columns
 	'percent(25)'   a quarter of the table's width
 
-The width includes the cell padding. Header cells, the filter field
-and every cell of the column are sized together, so the column is as
-wide as the widest of them (within the limits). A C<grow> or
-C<percent> column needs a table with a width of its own; see
-L<Term::Fabulous::Manual::Tables/Column widths>.
+The width includes the cell padding. Header cells, the filter field and
+every cell of the column are sized together, so the column is as wide as
+the widest of them (within the limits). A C<grow> or C<percent> column
+needs a table with a width of its own, and stops the table from
+scrolling sideways: when the table is too narrow, the table's C<fit> and
+C<grow> columns get narrower, down to their longest word, and their text
+wraps; see L<Term::Fabulous::Manual::Tables/Column widths>.
 
 =item C<wrap>
 
-C<'words'> (the default), C<'newlines'> or C<'none'>: how the text of
-a default cell breaks into lines when the column is narrower than the
-text (see L<Term::Fabulous::Widget::Text/wrap_mode>). Rows grow to the
-height of their tallest cell.
+C<'words'> (the default), C<'newlines'> or C<'none'>: how the text of a
+default cell breaks into lines when the column is narrower than the text
+(see L<Term::Fabulous::Widget::Text/wrap_mode>). Rows grow to the height
+of their tallest cell. In a table with a C<grow> or C<percent> column, a
+line with C<'newlines'> or C<'none'> keeps its width while the other
+columns can still get narrower; then it is cut off inside the cell
+padding, a single long word too. Other tables scroll sideways instead.
 
 =item C<sortable>
 

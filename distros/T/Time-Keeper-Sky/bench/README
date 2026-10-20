@@ -1,0 +1,17 @@
+Benchmarks: Time::Keeper::Sun against Astro::Sunrise and Astro::MoonPhase.
+
+From the dist's top, after `perl Makefile.PL && make`, with Time::Keeper installed
+(or its blib on PERL5LIB) and the two Astro modules somewhere on TK_BENCH_LIB:
+
+    perl -Mblib bench/run.pl           # every mark
+    perl -Mblib bench/02-sunrise.pl    # one
+
+Each line says PASS or FAIL, our rate, theirs, how many times faster, and the
+mark set in plan_time_keeper_sun/08-benchmarks-and-gate.md before any number was
+seen. A rate is calls a second over a fixed CPU time, the best of five.
+
+    TK_BENCH_SECONDS   seconds a run (0.5)
+    TK_BENCH_RUNS      runs, the best kept (5)
+    TK_BENCH_LOADS     fresh processes for the load time (41)
+    TK_BENCH_VALUES    objects for bytes per object (100000)
+    TK_BENCH_LIB       directories searched last, for Astro::Sunrise and Astro::MoonPhase

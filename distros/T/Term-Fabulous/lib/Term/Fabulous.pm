@@ -5,7 +5,7 @@ use warnings;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 use Object::Pad 0.825;
 
@@ -59,8 +59,14 @@ class Term::Fabulous
 	# frame would never settle.
 	use constant MAX_FRAME_BATCHES_PER_STEP => 100;
 
+	# How far past double_click_seconds, in seconds, a press still counts
+	# as within it: the difference of two clock readings on the boundary
+	# carries the rounding noise of the platform's floating point.
+	use constant CLICK_INTERVAL_TOLERANCE => 1e-9;
+
 	field $inline                           :param :reader = undef;    # the rows of the inline region, or undef for the full screen
 	field $mouse                            :param :reader = undef;
+	field $double_click_seconds             :param :reader = 0.4;
 	field $kitty_keyboard                   :param :reader = 1;
 	field $stop_on_ctrl_c                   :param :reader = 1;
 	field $terminal                         :param :reader //= Term::Fabulous::Terminal::Termbox->new;
@@ -86,7 +92,8 @@ class Term::Fabulous
 	field $_shown_down     = 0;    # the button state the last frame showed Clay
 	field $_frame_seconds  = 0;    # how long the last frame took to draw
 	field $_frame_ended_at = 0;    # when it was drawn, on the clock
-	field $_hovered_text;    # the RichText whose link is under the pointer, weakened
+	field $_hovered_text;    # the Text whose link is under the pointer, weakened
+	field $_last_press;    # { key, x, y, at, count } of the last button press
 
 	sub BUILDARGS ( $class, %params ) {
 		die "Term::Fabulous: measure_text cannot be replaced; text is always measured in terminal columns" if exists $params{measure_text};
@@ -110,6 +117,8 @@ class Term::Fabulous
 			unless ref $clock eq 'CODE';
 		die "Term::Fabulous: stop_on_ctrl_c must be a boolean, got a " . ref($stop_on_ctrl_c) . " reference" if ref $stop_on_ctrl_c;
 		$stop_on_ctrl_c = $stop_on_ctrl_c ? 1 : 0;
+		die "Term::Fabulous: double_click_seconds must be a number of at least 0, got " . ( defined $double_click_seconds ? "'$double_click_seconds'" : 'undef' )
+			unless defined $double_click_seconds && !ref $double_click_seconds && looks_like_number($double_click_seconds) && $double_click_seconds >= 0;
 	}
 
 	method cell_target () {
@@ -440,11 +449,11 @@ class Term::Fabulous
 		my $is_press = $IS_BUTTON{$key} && !( $event->mod & TB_MOD_MOTION );
 		$self->interaction->set_focused_widget( $self->_focusable_at_or_above( $text // $target ) )
 			if $is_press && $key == TB_KEY_MOUSE_LEFT && !_keeps_focus_on_click($target);
-		my $mouse_event = Term::Fabulous::Event::Mouse->of($event);
+		my $mouse_event = Term::Fabulous::Event::Mouse->of( $event, click_count => $is_press ? $self->_count_press( $key, $x, $y ) : 1 );
 		$target->fire_event($mouse_event);
 
 		# A Mouse listener may have taken the text out of the tree.
-		$text->click_at( $offset, $key, $x, $y ) if $is_press && defined $text && $self->_owns($text);
+		$text->click_at( $offset, $key, $x, $y ) if $is_press && defined $text && $self->owns($text);
 
 		# A widget that scrolled itself has used the wheel notch.
 		return if $mouse_event->wheel_used;
@@ -453,6 +462,20 @@ class Term::Fabulous
 		$_wheel_columns += WHEEL_NOTCH_COLUMNS if $key == TF_KEY_MOUSE_WHEEL_LEFT;
 		$_wheel_columns -= WHEEL_NOTCH_COLUMNS if $key == TF_KEY_MOUSE_WHEEL_RIGHT;
 		return;
+	}
+
+	# A press of the same button in the same cell at most
+	# double_click_seconds after the one before continues its run of
+	# clicks; any other press starts a new run. Returns the press's place
+	# in its run, 1 for a single click. A press a rounding error past the
+	# interval still continues the run, so a clock exactly on the boundary
+	# counts the same on every platform (long doubles round 1000.4 - 1000
+	# above 0.4).
+	method _count_press ( $key, $x, $y ) {
+		my ( $now, $last ) = ( $self->now, $_last_press );
+		my $continues = defined $last && $last->{key} == $key && $last->{x} == $x && $last->{y} == $y && $now - $last->{at} <= $double_click_seconds + CLICK_INTERVAL_TOLERANCE;
+		$_last_press = { key => $key, x => $x, y => $y, at => $now, count => $continues ? $last->{count} + 1 : 1 };
+		return $_last_press->{count};
 	}
 
 	# Motion replaces the newest queued state; a press or a release adds
@@ -477,19 +500,13 @@ class Term::Fabulous
 	# Whether a press on a widget leaves the focus where it is: the widget
 	# or one of its ancestors says so (a menu bar does).
 	sub _keeps_focus_on_click ($widget) {
-		for ( my $node = $widget; defined $node; $node = $node->parent ) {
-			return 1 if $node->can('keeps_focus_on_click') && $node->keeps_focus_on_click;
-		}
-		return 0;
+		return defined $widget->closest( sub ($node) { $node->can('keeps_focus_on_click') && $node->keeps_focus_on_click } ) ? 1 : 0;
 	}
 
 	# The widget a click focuses: the nearest one that can take focus now.
 	method _focusable_at_or_above ($widget) {
 		my $interaction = $self->interaction;
-		for ( my $node = $widget; defined $node; $node = $node->parent ) {
-			return $node if $interaction->can_take_focus($node);
-		}
-		return undef;
+		return $widget->closest( sub ($node) { $interaction->can_take_focus($node) } );
 	}
 
 	method _on_resize ($event) {
@@ -530,7 +547,7 @@ class Term::Fabulous
 			my $command = $frame->command($index);
 			next if $command->{commandType} == CLAY_RENDER_COMMAND_TYPE_TEXT;
 			my $widget = $self->widget_for( $command->{userData} );
-			return $widget if defined $widget && $widget->DOES('Clay::UI::Role::Events::Emitter') && $self->_owns($widget);
+			return $widget if defined $widget && $widget->DOES('Clay::UI::Role::Events::Emitter') && $self->owns($widget);
 		}
 		return undef;
 	}
@@ -543,7 +560,7 @@ class Term::Fabulous
 		my $command = $frame->command($index);
 		return () unless $command->{commandType} == CLAY_RENDER_COMMAND_TYPE_TEXT;
 		my $widget = $self->widget_for( $command->{userData} );
-		return () unless defined $widget && $widget->isa('Term::Fabulous::Widget::Text') && $self->_owns($widget);
+		return () unless defined $widget && $widget->isa('Term::Fabulous::Widget::Text') && $self->owns($widget);
 		my $offset = _offset_at_column( $command, $x ) // return ();
 		return ( $widget, $offset );
 	}
@@ -575,11 +592,6 @@ class Term::Fabulous
 		weaken $_hovered_text;
 		$hovered->hover_link($link);
 		return;
-	}
-
-	method _owns ($widget) {
-		my $ui = $widget->can('ui') ? $widget->ui : undef;
-		return defined $ui && refaddr($ui) == refaddr($self) ? 1 : 0;
 	}
 }
 
@@ -637,7 +649,7 @@ distribution (see L<Term::Fabulous::Examples>):
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/overview.svg" alt="A Term::Fabulous program: a sign-up form with text fields, radio buttons, a dropdown, a slider, a check box and buttons, a chart of requests per second with a translucent notification, an event log and text in several scripts"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.05/screenshots/overview.svg" alt="A Term::Fabulous program: a sign-up form with text fields, radio buttons, a dropdown, a slider, a check box and buttons, a chart of requests per second with a translucent notification, an event log and text in several scripts"></p>
 
 =end html
 
@@ -774,8 +786,10 @@ L<Term::Fabulous::Manual::Layout> (widgets, the widget tree and
 layout), L<Term::Fabulous::Manual::Looks> (text, colors, borders),
 L<Term::Fabulous::Manual::Events> (events, keyboard, focus, mouse,
 scrolling), L<Term::Fabulous::Manual::Forms> (input widgets),
-L<Term::Fabulous::Manual::Feedback> (progress bars, spinners and
-toasts), L<Term::Fabulous::Manual::Charts> (canvases and charts),
+L<Term::Fabulous::Manual::Feedback> (progress bars, spinners, toasts,
+status bars, prompts and file dialogs), L<Term::Fabulous::Manual::Menus>
+(commands, menu bars, context menus and key references),
+L<Term::Fabulous::Manual::Charts> (canvases and charts),
 L<Term::Fabulous::Manual::Tables>, L<Term::Fabulous::Manual::TableRows>
 and L<Term::Fabulous::Manual::TableStyles> (the table widget),
 L<Term::Fabulous::Manual::KDL> (layout files),
@@ -882,6 +896,18 @@ for itself, so the user can select and copy text as usual, and no
 C<Mouse> or C<MouseMove> events are fired. Inline mode has no mouse
 support: C<mouse> with a true value and C<inline> together die.
 
+=item C<double_click_seconds>
+
+A number of seconds, at least 0; anything else dies. Default: 0.4. A
+press of the same button in the same cell as the press just before it,
+at most this long after it (on the C<clock>), continues a run of
+clicks, and any other press starts a new one. The C<Mouse> event of a
+double click has a
+L<click_count|Term::Fabulous::Event::Mouse/click_count> of 2, of a
+triple click 3; every widget that tells double clicks apart
+(L<Term::Fabulous::Widget::Table>, L<Term::Fabulous::Widget::TextField>,
+L<Term::Fabulous::Widget::TextArea>) reads that count.
+
 =item C<kitty_keyboard>
 
 A boolean. Default: 1. With 1, L</run> asks the terminal whether it
@@ -921,8 +947,9 @@ else dies (C<Term::Fabulous: terminal must consume Term::Fabulous::Role::Termina
 
 Optional, for tests. A code reference that returns the current time in
 seconds, default C<Time::HiRes::time>. Frame pacing reads it: how long
-a frame took and when it ended (see L</run>), and so do L</now> and
-the widgets that animate (see L</request_frame_at>). A test gives it a
+a frame took and when it ended (see L</run>), and so do L</now>, the
+widgets that animate (see L</request_frame_at>) and the count of a run
+of clicks (see C<double_click_seconds>). A test gives it a
 clock it controls to check the pacing with C<< step( paced => 1 ) >>
 or to move an animation on. Anything but a code reference dies.
 
@@ -1227,6 +1254,13 @@ Returns the C<inline> constructor parameter. Read only.
 Returns whether the mouse is reported: the C<mouse> constructor
 parameter, or its default (1, or 0 in inline mode). Read only.
 
+=head2 double_click_seconds
+
+	my $seconds = $ui->double_click_seconds;
+
+Returns the C<double_click_seconds> constructor parameter, or its
+default (0.4). Read only.
+
 =head2 kitty_keyboard
 
 	my $wanted = $ui->kitty_keyboard;
@@ -1369,27 +1403,44 @@ not need it; see L</invalidate> to ask for a frame instead. With the
 real terminal, it only has a visible effect while the terminal is open.
 See L<Term::Fabulous::Render/draw>.
 
-=head2 bounding_box, scroll_state, scroll_to
+=head2 bounding_box, content_box, scroll_state, scroll_to
 
 	my $box   = $ui->bounding_box($widget);       # { x, y, width, height } in cells, or undef
+	my $inner = $ui->content_box($widget);        # the same inside padding, border and scrollbars
 	my $state = $ui->scroll_state($scroll_box);   # { position, viewport, content }
 	$ui->scroll_to( $scroll_box, { y => -10 } );  # ten rows down from the top
 
-C<bounding_box> returns where the last frame placed a widget.
+C<bounding_box> returns where the last frame placed a widget, and
+C<content_box> the part of that box inside the padding the frame
+declared, which in Term::Fabulous holds the border and the scrollbars
+too.
 C<scroll_state> and C<scroll_to> read and set the scroll position of a
 scroll container such as a L<Term::Fabulous::Widget::ScrollBox>, in
 cells: 0 at the top and left, negative when scrolled down or right.
+L<Term::Fabulous::Scrolling> scrolls by rows, pages and to the ends and
+reports the position as positive rows (C<scroll_offset>), so a program
+need not flip the sign.
 Inherited from L<Clay::UI>; see L<Clay::UI/bounding_box>,
-L<Clay::UI/scroll_state> and L<Clay::UI/scroll_to>, and the recipe
+L<Clay::UI/content_box>, L<Clay::UI/scroll_state> and
+L<Clay::UI/scroll_to>, and the recipe
 L<Scroll a ScrollBox from code|Term::Fabulous::Cookbook::LiveData/Scroll a ScrollBox from code (keep a log at the newest line)>.
 
-=head2 after_draw
+=head2 after_draw, each_draw
 
 	$ui->after_draw( sub { ... } );
+	$ui->after_draw( sub ($widget) { ... }, owner => $widget );
+	$ui->each_draw( sub ($widget) { ...; return $done }, owner => $widget, name => 'retry', frames => 4 );
 
-Queues a code reference to call once after the next frame has been
-drawn, for work that needs the layout of that frame. See
-L<Term::Fabulous::Render/after_draw>.
+C<after_draw> queues a code reference to call once after the next frame
+has been drawn, for work that needs the layout of that frame;
+C<each_draw> registers one to call after every frame until it returns
+true, its C<frames> ran out, its owner was freed or left the UI, it
+died, or a later registration with the same C<name> (and the same
+owner, or none) replaced it. With an
+owner, the UI holds the widget weakly and passes it in. See
+L<Term::Fabulous::Render/after_draw> and
+L<Term::Fabulous::Render/each_draw>; widgets use
+L<Term::Fabulous::Widget/each_frame>.
 
 =head2 Other inherited methods
 
@@ -1432,7 +1483,7 @@ the event.
 For every button press (not a drag) whose cell holds a character of a
 text that is the topmost thing drawn there, on the
 L<Term::Fabulous::Widget::Text>, after the C<Mouse> event. A left press
-on a link of a L<Term::Fabulous::Widget::RichText> then fires
+on a link of a L<Term::Fabulous::Widget::Text> then fires
 C<LinkActivate> (L<Term::Fabulous::Event::LinkActivate>) on it. See
 L<Term::Fabulous::Manual::Events/Clicks on text and links>.
 
@@ -1440,7 +1491,7 @@ L<Term::Fabulous::Manual::Events/Clicks on text and links>.
 
 For every report of the pointer moving with no button held, on the same
 widget a C<Mouse> event would go to. The hover state of the widgets,
-and the hovered link of a L<Term::Fabulous::Widget::RichText>, follow
+and the hovered link of a L<Term::Fabulous::Widget::Text>, follow
 these moves.
 
 =item C<Start> (L<Term::Fabulous::Event::Start>)
@@ -1524,6 +1575,13 @@ L<Term::Fabulous::Widget::MenuBar> opens the menu without taking the
 focus from the text field the user was typing in, so the menu can give
 it back when it closes.
 
+When the focused widget is removed from the tree, disabled or hidden,
+the focus goes to its heir: the nearest widget above it that can take
+the focus, unless a container on the way names another with
+C<focus_heir> (a Tabs names its active tab, a closing Accordion::Item
+its header). See
+L<Term::Fabulous::Manual::Events/When the focused widget goes away>.
+
 See L<Term::Fabulous::Manual::Events/KEYBOARD> and
 L<Term::Fabulous::Manual::Events/FOCUS>.
 
@@ -1535,7 +1593,7 @@ L<Term::Fabulous::Manual::Events/FOCUS>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-inline-prompt.svg" alt="An inline prompt in the three rows below a shell's earlier output: a question, a text field holding Ada Lovelace and a help line"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.05/screenshots/cookbook-inline-prompt.svg" alt="An inline prompt in the three rows below a shell's earlier output: a question, a text field holding Ada Lovelace and a help line"></p>
 
 =end html
 
@@ -1649,13 +1707,10 @@ The general container, with layout options, a background and a border.
 
 =item L<Term::Fabulous::Widget::Text>
 
-Shows text in one color; wraps and aligns it.
-
-=item L<Term::Fabulous::Widget::RichText>
-
-A Text whose spans set bold, colors and other styles on ranges of it,
-from markup such as C<[bold]Enter[/]>, and whose links the user follows
-with a click or the keyboard.
+Shows text, wrapped and aligned. Its spans set bold, colors and other
+styles on ranges of it, from markup such as C<[bold]Enter[/]>,
+highlights mark search matches over them, and the user follows its
+links with a click or the keyboard.
 
 =item L<Term::Fabulous::Widget::Button>
 
@@ -1706,6 +1761,20 @@ A ScrollBox for thousands of items, the paragraphs of a long document
 say: it builds and lays out only the items near the viewport, with
 spacers standing in for the rest.
 
+=item L<Term::Fabulous::Widget::DocumentView>
+
+A VirtualList that shows a L<Term::Fabulous::Document>: headings,
+paragraphs with bold, italic and code marks, lists, quotes and code
+blocks in the styles of the theme, scrolled with the keys, its links
+selected and followed, its text searched. The main pane of a reader for
+any documentation format (see L</Documents>).
+
+=item L<Term::Fabulous::Widget::CodeBlock>
+
+Lines of code on a background of their own, never wrapped, cut at the
+edge and scrolled sideways, each character in the style a highlighter
+gives it.
+
 =item L<Term::Fabulous::Widget::Scrollbar>
 
 The scrollbar of a scroll container: a track with a thumb that shows
@@ -1728,7 +1797,8 @@ Pages behind a row of tabs on any side, with horizontal or downward
 labels; the active tab joins the page's border.
 L<Term::Fabulous::Widget::Tabs::Bar> and
 L<Term::Fabulous::Widget::Tabs::Button> are the bar and its tabs, also
-usable on their own.
+usable on their own; L<Term::Fabulous::Widget::Tabs::Line> is the line
+that joins the bar to the page, used internally.
 
 =item L<Term::Fabulous::Widget::DocumentTabs>
 
@@ -1770,11 +1840,10 @@ own state (the divider, the progress bar, the charts, the scrollbar,
 the input widgets), with the
 animation helpers; derive from it to write your own.
 
-=item L<Term::Fabulous::Widget::Element>, L<Term::Fabulous::Widget::TextNode>, L<Term::Fabulous::Widget::FocusableText>
+=item L<Term::Fabulous::Widget::Element>, L<Term::Fabulous::Widget::TextNode>
 
-The L<Clay::UI> roles behind Term::Fabulous::Widget,
-Term::Fabulous::Widget::Text and Term::Fabulous::Widget::RichText.
-Used internally.
+The L<Clay::UI> roles behind Term::Fabulous::Widget and
+Term::Fabulous::Widget::Text. Used internally.
 
 =item L<Term::Fabulous::Widget::Dialog::Backdrop>
 
@@ -1933,7 +2002,7 @@ The rows of a table and the lines it shows, without widgets.
 How a table checks its style hashes and works out its grid lines. Used
 internally by the table.
 
-=item L<Term::Fabulous::Widget::Table::Cell>, L<Term::Fabulous::Widget::Table::Toggle>, L<Term::Fabulous::Widget::Table::Grid>, L<Term::Fabulous::Widget::Table::HeaderView>, L<Term::Fabulous::Widget::Table::Pager>, L<Term::Fabulous::Widget::Table::ColumnChooser>
+=item L<Term::Fabulous::Widget::Table::Cell>, L<Term::Fabulous::Widget::Table::Toggle>, L<Term::Fabulous::Widget::Table::Grid>, L<Term::Fabulous::Widget::Table::EdgeView>, L<Term::Fabulous::Widget::Table::Pager>, L<Term::Fabulous::Widget::Table::ColumnChooser>
 
 The widgets a table is built of: cells, the open and close markers,
 the grids, the header, the page controls and the column chooser (the
@@ -2038,6 +2107,11 @@ The terminal changed size.
 
 A canvas got a new size from the layout.
 
+=item L<Term::Fabulous::Event::ViewChange>
+
+What a document view shows has changed: the blocks in view, the
+section, the percentage, the selected link and the search.
+
 =item L<Term::Fabulous::Event::Change>
 
 The user changed the value of an input widget.
@@ -2061,7 +2135,7 @@ character, word, spans and link.
 
 =item L<Term::Fabulous::Event::LinkActivate>
 
-The user followed a link of a RichText, by click or key.
+The user followed a link of a Text, by click or key.
 
 =item L<Term::Fabulous::Event::Close>
 
@@ -2126,6 +2200,48 @@ The user showed or hid a table column in the column chooser.
 
 =back
 
+=head2 Documents
+
+The document view shows a document: a list of widgets, the common ones
+made by the document's factories from text and marks, any other added
+as it is. A parser fills the document, and the view shows, searches
+and links it. L<Pod::Fabulous> reads POD this way.
+L<Term::Fabulous::Cookbook::Documents> has recipes for documents, from
+a Markdown reader built on L<Markdent> to links and search, and
+L<Term::Fabulous::Cookbook::DocumentTechniques> continues with a
+table of contents, syntax highlighting, styles, pager keys and tables
+and pictures inside a document.
+
+=over
+
+=item L<Term::Fabulous::Document>
+
+A document as a list of widgets with the options a view lays them out
+with: factories for headings, paragraphs, list items, terms, code and
+rules, its sections and anchors, and searching its text.
+
+=item L<Term::Fabulous::Document::Look>
+
+The styles the kinds of marks are shown in, as palette tokens of the
+theme.
+
+=item L<Term::Fabulous::Role::Searchable>
+
+The texts a widget shows, for search and highlights, also those it
+builds only later or does not show (a table's other pages).
+
+=item L<Term::Fabulous::Role::SearchContainer>
+
+A container that lists the searchable widgets it holds, also those
+out of view, and shows the one with a match: tabs and accordion items.
+
+=item L<Term::Fabulous::Scrolling>
+
+Scroll any container by rows, by pages, to its ends and to a range of
+rows, as a pager does.
+
+=back
+
 =head2 Colors, borders and text
 
 =over
@@ -2174,11 +2290,17 @@ safe for the terminal.
 =item L<Term::Fabulous::Text::Style>
 
 Style strings such as C<bold red on #202020> and the style hashes
-behind the spans of a RichText.
+behind the spans of a Text.
 
 =item L<Term::Fabulous::Text::Markup>
 
-The C<[bold red]text[/]> markup of a RichText.
+The C<[bold red]text[/]> markup of a Text.
+
+=item L<Term::Fabulous::Text::Marks>, L<Term::Fabulous::Role::MarkedText>
+
+The spans, highlights and links of one text, checked and cut into
+styled runs in one place, and the role through which Text and CodeBlock
+share the spans and highlights. Used internally.
 
 =back
 
@@ -2227,6 +2349,23 @@ from layout files, or your own terminal or output class.
 =item L<Term::Fabulous::Role::CanParseLayout>
 
 Makes a widget class usable in KDL layout files.
+
+=item L<Term::Fabulous::Role::Themed>
+
+How a widget reads its colors, border styles and borders from the
+theme, and the theme it draws with (C<drawing_theme>); composed by
+every widget.
+
+=item L<Term::Fabulous::Placement>
+
+Where a popup goes on the screen: below, above or at its anchor, kept
+on the screen; the z_index of popups.
+
+=item L<Term::Fabulous::Role::Popup>
+
+Floats a widget from the root at the position Placement works out and
+moves it back when a frame moved it; composed by the dropdown's list,
+popup menus and the table's column chooser.
 
 =item L<Term::Fabulous::Check>
 

@@ -1,0 +1,1077 @@
+{
+   "fitNesseVersion" : "v20251025",
+   "intentionalExceptionAssertions" : 2,
+   "intentionalExceptionPages" : 2,
+   "nativeSuiteBaseline" : {
+      "counts" : {
+         "exceptions" : 321,
+         "ignored" : 4,
+         "right" : 525,
+         "wrong" : 51
+      },
+      "pageCount" : 93,
+      "perPageCountValidated" : true
+   },
+   "pages" : [
+      {
+         "baselineCounts" : {
+            "exceptions" : 0,
+            "ignored" : 2,
+            "right" : 1,
+            "wrong" : 0
+         },
+         "behaviorArea" : "FitNesse table result interpretation",
+         "candidateCapability" : "none",
+         "confidence" : "high",
+         "directPerlCounts" : {
+            "exceptions" : 0,
+            "ignored" : 2,
+            "right" : 1,
+            "wrong" : 0
+         },
+         "estimatedRecoverableAssertions" : 0,
+         "evidence" : [
+            "upstream wiki page: FitNesse.SuiteAcceptanceTests.SuiteSlimTests.BaseLineDecisionTable.HowtoIgnoreResultValues",
+            "docs/fitnesse-native-suite-audit.md",
+            "docs/fitnesse-slim-native-suite-baseline.json",
+            "Perl backend: native suite XML plus balanced listener request/response trace"
+         ],
+         "exceptionsIntentional" : true,
+         "javaReference" : {
+            "status" : "not run in this triage; see stated evidence/uncertainty"
+         },
+         "page" : "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.BaseLineDecisionTable.HowtoIgnoreResultValues",
+         "purpose" : "Exercises the baseline decision table ignore-value comparison behavior.",
+         "recommendedDisposition" : "No implementation work; retain as a passing interoperability page.",
+         "relevantFixtures" : [
+            "upstream baseline decision fixture"
+         ],
+         "rootCause" : "The two ignored assertions are the page’s intentional ignored-value cases; there are no wrong assertions or exceptions.",
+         "rootCauseClassification" : "expected_ignored_result"
+      },
+      {
+         "baselineCounts" : {
+            "exceptions" : 1,
+            "ignored" : 0,
+            "right" : 3,
+            "wrong" : 0
+         },
+         "behaviorArea" : "fixture method availability and common scalar conversion",
+         "candidateCapability" : "chain_test_fixture_echo_boolean",
+         "confidence" : "high",
+         "directPerlCounts" : {
+            "exceptions" : 1,
+            "ignored" : 0,
+            "right" : 3,
+            "wrong" : 0
+         },
+         "estimatedRecoverableAssertions" : 1,
+         "evidence" : [
+            "upstream wiki page: FitNesse.SuiteAcceptanceTests.SuiteSlimTests.ChainTest",
+            "docs/fitnesse-native-suite-audit.md",
+            "docs/fitnesse-slim-native-suite-baseline.json",
+            "Perl backend: native suite XML plus balanced listener request/response trace"
+         ],
+         "exceptionsIntentional" : false,
+         "javaReference" : {
+            "backend" : "Java SlimService verified by execution log",
+            "counts" : {
+               "exceptions" : 0,
+               "ignored" : 0,
+               "right" : 4,
+               "wrong" : 0
+            },
+            "fitNesseVersion" : "v20251025"
+         },
+         "page" : "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.ChainTest",
+         "purpose" : "Chains script-table fixture objects, constructor arguments, query fixture results, and boolean result conversion.",
+         "recommendedDisposition" : "A focused fixture adapter addition is possible; it would close one assertion but adds little reusable behavior beyond the existing declared Boolean converter.",
+         "relevantFixtures" : [
+            "Fitnesse::Slim::Test::TestSlim",
+            "Fitnesse::Slim::Test::TestQuery",
+            "Fitnesse::Fixtures::EchoFixture"
+         ],
+         "rootCause" : "The sole exception is `Method echo_boolean[1] not found in Fitnesse::Slim::Test::TestSlim`; the upstream page calls a fixture method absent from the Perl TestSlim adapter.",
+         "rootCauseClassification" : "fixture_method_missing"
+      },
+      {
+         "baselineCounts" : {
+            "exceptions" : 0,
+            "ignored" : 0,
+            "right" : 5,
+            "wrong" : 1
+         },
+         "behaviorArea" : "FitNesse request context and plugin rendering",
+         "candidateCapability" : "context_aware_nested_page_bridge",
+         "confidence" : "high",
+         "directPerlCounts" : {
+            "exceptions" : 0,
+            "ignored" : 0,
+            "right" : 5,
+            "wrong" : 1
+         },
+         "estimatedRecoverableAssertions" : 0,
+         "evidence" : [
+            "upstream wiki page: FitNesse.SuiteAcceptanceTests.SuiteSlimTests.CustomTableRenderingAddedByPluginTest",
+            "docs/fitnesse-native-suite-audit.md",
+            "docs/fitnesse-slim-native-suite-baseline.json",
+            "Perl backend: native suite XML plus balanced listener request/response trace"
+         ],
+         "exceptionsIntentional" : false,
+         "javaReference" : {
+            "backend" : "Java SlimService verified by execution log",
+            "counts" : {
+               "exceptions" : 0,
+               "ignored" : 0,
+               "right" : 6,
+               "wrong" : 0
+            },
+            "fitNesseVersion" : "v20251025"
+         },
+         "page" : "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.CustomTableRenderingAddedByPluginTest",
+         "purpose" : "Checks a SetUp-registered table alias and rendering decorator through a nested PageDriver request.",
+         "recommendedDisposition" : "Defer; requires the documented FitNesse context-aware bridge, explicitly out of scope.",
+         "relevantFixtures" : [
+            "Perl Fitnesse::Fixtures::PageDriver",
+            "Perl Fitnesse::Fixtures::ResponseExaminer",
+            "upstream Java plugin classes"
+         ],
+         "rootCause" : "The Perl HTTP PageDriver nested request does not inherit the active FitnesseFixtureContext; the alias and decorator are absent. Java v20251025 passes.",
+         "rootCauseClassification" : "fitnesse_nested_context"
+      },
+      {
+         "baselineCounts" : {
+            "exceptions" : 6,
+            "ignored" : 0,
+            "right" : 0,
+            "wrong" : 0
+         },
+         "behaviorArea" : "FitNesse parser behavior plus a test-only fixture",
+         "candidateCapability" : "define_table_type_test_fixture",
+         "confidence" : "medium",
+         "directPerlCounts" : {
+            "exceptions" : 6,
+            "ignored" : 0,
+            "right" : 0,
+            "wrong" : 0
+         },
+         "estimatedRecoverableAssertions" : 6,
+         "evidence" : [
+            "upstream wiki page: FitNesse.SuiteAcceptanceTests.SuiteSlimTests.DefineTableTypeTest",
+            "docs/fitnesse-native-suite-audit.md",
+            "docs/fitnesse-slim-native-suite-baseline.json",
+            "Perl backend: native suite XML plus balanced listener request/response trace"
+         ],
+         "exceptionsIntentional" : false,
+         "javaReference" : {
+            "backend" : "Java SlimService verified by execution log",
+            "counts" : {
+               "exceptions" : 0,
+               "ignored" : 0,
+               "right" : 4,
+               "wrong" : 0
+            },
+            "fitNesseVersion" : "v20251025"
+         },
+         "page" : "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.DefineTableTypeTest",
+         "purpose" : "Checks FitNesse Define Table Type changes parsing between decision, table, and script table forms.",
+         "recommendedDisposition" : "Defer; a fixture could unblock the page, but its core behavior is FitNesse-side table parsing.",
+         "relevantFixtures" : [
+            "missing TableOrDecisionFixture"
+         ],
+         "rootCause" : "Every row fails at fixture loading (`Could not find class TableOrDecisionFixture`) or dependent method calls. Java v20251025 returns 4 right assertions; no SLiM instruction incompatibility is isolated.",
+         "rootCauseClassification" : "missing_fixture_adapter"
+      },
+      {
+         "baselineCounts" : {
+            "exceptions" : 22,
+            "ignored" : 0,
+            "right" : 0,
+            "wrong" : 0
+         },
+         "behaviorArea" : "FitNesse Java name translation before SLiM dispatch",
+         "candidateCapability" : "none",
+         "confidence" : "high",
+         "directPerlCounts" : {
+            "exceptions" : 22,
+            "ignored" : 0,
+            "right" : 0,
+            "wrong" : 0
+         },
+         "estimatedRecoverableAssertions" : 0,
+         "evidence" : [
+            "upstream wiki page: FitNesse.SuiteAcceptanceTests.SuiteSlimTests.DisgracerTest",
+            "docs/fitnesse-native-suite-audit.md",
+            "docs/fitnesse-slim-native-suite-baseline.json",
+            "Perl backend: native suite XML plus balanced listener request/response trace"
+         ],
+         "exceptionsIntentional" : false,
+         "javaReference" : {
+            "backend" : "Java SlimService verified by execution log",
+            "counts" : {
+               "exceptions" : 0,
+               "ignored" : 0,
+               "right" : 22,
+               "wrong" : 0
+            },
+            "fitNesseVersion" : "v20251025"
+         },
+         "page" : "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.DisgracerTest",
+         "purpose" : "Tests FitNesse Disgracer graceful-name conversion for Java class and method names.",
+         "recommendedDisposition" : "Do not emulate a FitNesse Java utility in the Perl SLiM core.",
+         "relevantFixtures" : [
+            "fitnesse.testsystems.slim.tables.Disgracer",
+            "missing DisgracerTest fixture/scenario"
+         ],
+         "rootCause" : "The page imports FitNesse Java table utilities and its scenario cannot invoke the Disgracer methods on the Perl backend. Java v20251025 passes all 22 assertions.",
+         "rootCauseClassification" : "java_only_fitnesse_utility"
+      },
+      {
+         "baselineCounts" : {
+            "exceptions" : 46,
+            "ignored" : 0,
+            "right" : 14,
+            "wrong" : 0
+         },
+         "behaviorArea" : "FitNesse hybrid-table client behavior plus fixture methods",
+         "candidateCapability" : "properties_fixture_for_hybrid_table",
+         "confidence" : "medium",
+         "directPerlCounts" : {
+            "exceptions" : 44,
+            "ignored" : 0,
+            "right" : 14,
+            "wrong" : 0
+         },
+         "estimatedRecoverableAssertions" : 46,
+         "evidence" : [
+            "upstream wiki page: FitNesse.SuiteAcceptanceTests.SuiteSlimTests.HybridDecisionTable",
+            "docs/fitnesse-native-suite-audit.md",
+            "docs/fitnesse-slim-native-suite-baseline.json",
+            "Perl backend: native suite XML plus balanced listener request/response trace"
+         ],
+         "exceptionsIntentional" : false,
+         "javaReference" : {
+            "backend" : "Java SlimService verified by execution log",
+            "counts" : {
+               "exceptions" : 0,
+               "ignored" : 1,
+               "right" : 40,
+               "wrong" : 0
+            },
+            "fitNesseVersion" : "v20251025"
+         },
+         "page" : "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.HybridDecisionTable",
+         "purpose" : "Exercises hybrid decision-table method extraction and property-style dynamic fixture calls.",
+         "recommendedDisposition" : "Defer; avoid imitating java.util.Properties solely to recover this Java-oriented page. Consider a separately justified idiomatic property-map fixture only if real fixture use cases emerge.",
+         "relevantFixtures" : [
+            "missing Java `java.util.Properties` fixture; existing Fitnesse::Slim::Test::ShouldIBuyMilk",
+            "HybridDecisionTable SetUp/TearDown"
+         ],
+         "rootCause" : "The Perl run reports `Could not find class Properties`; resulting dynamic setter/getter rows cascade into exceptions. Direct Perl run had 44 exceptions and native suite context had 46. Java v20251025 reports 40 right, 1 ignored, 0 exceptions. This does not isolate protocol failure.",
+         "rootCauseClassification" : "missing_fixture_adapter"
+      },
+      {
+         "baselineCounts" : {
+            "exceptions" : 85,
+            "ignored" : 0,
+            "right" : 0,
+            "wrong" : 0
+         },
+         "behaviorArea" : "FitNesse Java table parser/method-extraction helpers",
+         "candidateCapability" : "none",
+         "confidence" : "high",
+         "directPerlCounts" : {
+            "exceptions" : 94,
+            "ignored" : 0,
+            "right" : 0,
+            "wrong" : 0
+         },
+         "estimatedRecoverableAssertions" : 0,
+         "evidence" : [
+            "upstream wiki page: FitNesse.SuiteAcceptanceTests.SuiteSlimTests.HybridDecisionTable.MethodExtractorRuleTest",
+            "docs/fitnesse-native-suite-audit.md",
+            "docs/fitnesse-slim-native-suite-baseline.json",
+            "Perl backend: native suite XML plus balanced listener request/response trace"
+         ],
+         "exceptionsIntentional" : false,
+         "javaReference" : {
+            "backend" : "Java SlimService verified by execution log",
+            "counts" : {
+               "exceptions" : 0,
+               "ignored" : 0,
+               "right" : 35,
+               "wrong" : 0
+            },
+            "fitNesseVersion" : "v20251025"
+         },
+         "page" : "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.HybridDecisionTable.MethodExtractorRuleTest",
+         "purpose" : "Tests JSON method-extractor rule classes and FitNesse method-name extraction.",
+         "recommendedDisposition" : "Do not reproduce FitNesse internals in the Perl core.",
+         "relevantFixtures" : [
+            "fitnesse.testsystems.slim.tables.MethodExtractor",
+            "Test Json Method Extractor Configuration",
+            "Test Object Method Extractor Configuration"
+         ],
+         "rootCause" : "Java helper classes and table operations (`MethodExtractor`, `add`, `toJson`) are unavailable to the Perl fixture classpath; Java v20251025 passes 35 assertions. The 85 Perl exceptions are cascades from missing helper fixtures.",
+         "rootCauseClassification" : "java_only_fitnesse_utility"
+      },
+      {
+         "baselineCounts" : {
+            "exceptions" : 0,
+            "ignored" : 0,
+            "right" : 5,
+            "wrong" : 2
+         },
+         "behaviorArea" : "FitNesse nested scenario context and rendering",
+         "candidateCapability" : "context_aware_nested_page_bridge",
+         "confidence" : "high",
+         "directPerlCounts" : {
+            "exceptions" : 0,
+            "ignored" : 0,
+            "right" : 5,
+            "wrong" : 2
+         },
+         "estimatedRecoverableAssertions" : 0,
+         "evidence" : [
+            "upstream wiki page: FitNesse.SuiteAcceptanceTests.SuiteSlimTests.IgnoredTestsShouldColorGray",
+            "docs/fitnesse-native-suite-audit.md",
+            "docs/fitnesse-slim-native-suite-baseline.json",
+            "Perl backend: native suite XML plus balanced listener request/response trace"
+         ],
+         "exceptionsIntentional" : false,
+         "javaReference" : {
+            "backend" : "Java SlimService verified by execution log",
+            "counts" : {
+               "exceptions" : 0,
+               "ignored" : 0,
+               "right" : 7,
+               "wrong" : 0
+            },
+            "fitNesseVersion" : "v20251025"
+         },
+         "page" : "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.IgnoredTestsShouldColorGray",
+         "purpose" : "Checks stop/ignore behavior and ignored scenario cell markup in a nested page.",
+         "recommendedDisposition" : "Defer; same substantial context bridge as plugin/comparator pages.",
+         "relevantFixtures" : [
+            "Perl TestSlim stop/ignore markers",
+            "Perl HTTP PageDriver",
+            "FitNesse scenario renderer"
+         ],
+         "rootCause" : "Perl stop/ignore protocol behavior runs, but nested HTTP PageDriver loses the active scenario context. Java v20251025 passes 7/0 and emits expected cells.",
+         "rootCauseClassification" : "fitnesse_nested_context"
+      },
+      {
+         "baselineCounts" : {
+            "exceptions" : 0,
+            "ignored" : 2,
+            "right" : 4,
+            "wrong" : 0
+         },
+         "behaviorArea" : "FitNesse query-table semantics",
+         "candidateCapability" : "none",
+         "confidence" : "medium",
+         "directPerlCounts" : {
+            "exceptions" : 0,
+            "ignored" : 2,
+            "right" : 4,
+            "wrong" : 0
+         },
+         "estimatedRecoverableAssertions" : 0,
+         "evidence" : [
+            "upstream wiki page: FitNesse.SuiteAcceptanceTests.SuiteSlimTests.QueryTableSuite.SetContextValue",
+            "docs/fitnesse-native-suite-audit.md",
+            "docs/fitnesse-slim-native-suite-baseline.json",
+            "Perl backend: native suite XML plus balanced listener request/response trace"
+         ],
+         "exceptionsIntentional" : true,
+         "javaReference" : {
+            "status" : "not run in this triage; see stated evidence/uncertainty"
+         },
+         "page" : "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.QueryTableSuite.SetContextValue",
+         "purpose" : "Tests query-table context setting and row matching.",
+         "recommendedDisposition" : "No compatibility gap indicated; retain as baseline behavior.",
+         "relevantFixtures" : [
+            "Perl Fitnesse::Slim::Test::TestQuery"
+         ],
+         "rootCause" : "Four assertions pass and two rows are intentionally ignored according to the page’s query-table result selection; no wrong assertions or exceptions occur.",
+         "rootCauseClassification" : "expected_ignored_result"
+      },
+      {
+         "baselineCounts" : {
+            "exceptions" : 0,
+            "ignored" : 0,
+            "right" : 9,
+            "wrong" : 21
+         },
+         "behaviorArea" : "FitNesse-specific expression evaluation outside the SLiM protocol",
+         "candidateCapability" : "javascript_expression_evaluator",
+         "confidence" : "high",
+         "directPerlCounts" : {
+            "exceptions" : 0,
+            "ignored" : 0,
+            "right" : 9,
+            "wrong" : 21
+         },
+         "estimatedRecoverableAssertions" : 0,
+         "evidence" : [
+            "upstream wiki page: FitNesse.SuiteAcceptanceTests.SuiteSlimTests.SlimSymbols.SlimSymbolsCanBeExpressionsToEvaluate",
+            "docs/fitnesse-native-suite-audit.md",
+            "docs/fitnesse-slim-native-suite-baseline.json",
+            "Perl backend: native suite XML plus balanced listener request/response trace"
+         ],
+         "exceptionsIntentional" : false,
+         "javaReference" : {
+            "backend" : "Java SlimService verified by execution log",
+            "counts" : {
+               "exceptions" : 0,
+               "ignored" : 0,
+               "right" : 30,
+               "wrong" : 0
+            },
+            "fitNesseVersion" : "v20251025"
+         },
+         "page" : "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.SlimSymbols.SlimSymbolsCanBeExpressionsToEvaluate",
+         "purpose" : "Uses JavaScript backtick expressions in FitNesse table cells and symbol arguments.",
+         "recommendedDisposition" : "Defer; prior investigation rejected a safe bounded evaluator and this assignment excludes it.",
+         "relevantFixtures" : [
+            "FitNesse Java VariableStore / Nashorn expression evaluator"
+         ],
+         "rootCause" : "Perl performs SLiM `$NAME` symbol substitution but not Java’s Nashorn expression evaluation. Java v20251025 passes 30 assertions; Perl has 21 wrong. This is a documented non-protocol Java extension.",
+         "rootCauseClassification" : "fitnesse_expression_extension"
+      },
+      {
+         "baselineCounts" : {
+            "exceptions" : 12,
+            "ignored" : 0,
+            "right" : 0,
+            "wrong" : 0
+         },
+         "behaviorArea" : "Java runtime/security behavior",
+         "candidateCapability" : "none",
+         "confidence" : "high",
+         "directPerlCounts" : {
+            "exceptions" : 11,
+            "ignored" : 0,
+            "right" : 0,
+            "wrong" : 0
+         },
+         "estimatedRecoverableAssertions" : 0,
+         "evidence" : [
+            "upstream wiki page: FitNesse.SuiteAcceptanceTests.SuiteSlimTests.SystemExitIsPrevented",
+            "docs/fitnesse-native-suite-audit.md",
+            "docs/fitnesse-slim-native-suite-baseline.json",
+            "Perl backend: native suite XML plus balanced listener request/response trace"
+         ],
+         "exceptionsIntentional" : false,
+         "javaReference" : {
+            "status" : "not run in this triage; see stated evidence/uncertainty"
+         },
+         "page" : "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.SystemExitIsPrevented",
+         "purpose" : "Tests interception of JVM `System.exit` calls.",
+         "recommendedDisposition" : "Defer/prune according to upstream Java runtime guidance; do not emulate JVM exit interception.",
+         "relevantFixtures" : [
+            "SystemExitTableConfiguration",
+            "SystemExitTable"
+         ],
+         "rootCause" : "Perl cannot load Java-specific fixture classes. The wiki itself says this test should be removed or pruned on Java 21+; the pinned environment is OpenJDK 25. The 12 exceptions do not demonstrate a Perl defect.",
+         "rootCauseClassification" : "java_jvm_feature"
+      },
+      {
+         "baselineCounts" : {
+            "exceptions" : 8,
+            "ignored" : 0,
+            "right" : 0,
+            "wrong" : 0
+         },
+         "behaviorArea" : "fixture adapter coverage; core SUT dispatch already has unit coverage",
+         "candidateCapability" : "sut_acceptance_fixture_adapter",
+         "confidence" : "medium",
+         "directPerlCounts" : {
+            "exceptions" : 8,
+            "ignored" : 0,
+            "right" : 0,
+            "wrong" : 0
+         },
+         "estimatedRecoverableAssertions" : 8,
+         "evidence" : [
+            "upstream wiki page: FitNesse.SuiteAcceptanceTests.SuiteSlimTests.SystemUnderTestTest",
+            "docs/fitnesse-native-suite-audit.md",
+            "docs/fitnesse-slim-native-suite-baseline.json",
+            "Perl backend: native suite XML plus balanced listener request/response trace"
+         ],
+         "exceptionsIntentional" : false,
+         "javaReference" : {
+            "backend" : "Java SlimService verified by execution log",
+            "counts" : {
+               "exceptions" : 0,
+               "ignored" : 0,
+               "right" : 4,
+               "wrong" : 0
+            },
+            "fitNesseVersion" : "v20251025"
+         },
+         "page" : "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.SystemUnderTestTest",
+         "purpose" : "Exercises actor versus SUT dispatch precedence in two test fixture instances.",
+         "recommendedDisposition" : "Possible test-only fixture, but adds little implementation evidence beyond focused SUT tests; rank below the table-symbol adapter.",
+         "relevantFixtures" : [
+            "missing upstream MySystemUnderTestDriver",
+            "existing generic Fitnesse::Slim::Test::SystemUnderTestDriver and t/sut-delegation.t"
+         ],
+         "rootCause" : "All eight exceptions cascade from `Could not find class MySystemUnderTestDriver`. A differently named generic Perl SUT fixture and direct SUT delegation tests exist; this page-specific Java fixture is absent. Java v20251025 passes 4 assertions.",
+         "rootCauseClassification" : "missing_fixture_adapter"
+      },
+      {
+         "baselineCounts" : {
+            "exceptions" : 4,
+            "ignored" : 0,
+            "right" : 0,
+            "wrong" : 5
+         },
+         "behaviorArea" : "fixture class path plus Table Table symbol interoperability",
+         "candidateCapability" : "default_namespace_table_table_fixture",
+         "confidence" : "high",
+         "directPerlCounts" : {
+            "exceptions" : 4,
+            "ignored" : 0,
+            "right" : 0,
+            "wrong" : 5
+         },
+         "estimatedRecoverableAssertions" : 9,
+         "evidence" : [
+            "upstream wiki page: FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TableTableSuite.SymbolsInTableTable",
+            "docs/fitnesse-native-suite-audit.md",
+            "docs/fitnesse-slim-native-suite-baseline.json",
+            "Perl backend: native suite XML plus balanced listener request/response trace"
+         ],
+         "exceptionsIntentional" : false,
+         "javaReference" : {
+            "backend" : "Java SlimService verified by execution log",
+            "counts" : {
+               "exceptions" : 0,
+               "ignored" : 0,
+               "right" : 13,
+               "wrong" : 0
+            },
+            "fitNesseVersion" : "v20251025"
+         },
+         "page" : "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TableTableSuite.SymbolsInTableTable",
+         "purpose" : "Checks ordinary symbol substitution and assignment around a Table Table fixture, without fixture-managed symbol handling.",
+         "recommendedDisposition" : "Implemented as a separate ordinary-mode fixture; the consumer-managed fixture remains distinct.",
+         "relevantFixtures" : [
+            "implemented Fitnesse::Slim::Test::TableTableIncFirstCol for ordinary symbol handling",
+            "existing Fitnesse::Slim::Test::Statementexecutorconsumer::TableTableIncFirstCol"
+         ],
+         "rootCause" : "The ordinary TableTableIncFirstCol fixture was absent. Once added, imports of fitnesse.slim.test could mask the more specific statementexecutorconsumer fixture because the page also imports the parent package from included content. Preferring the most-specific imported package resolves the managed fixture without aliasing modes. Ordinary row inputs are substituted by the existing executor before one doTable call; FitNesse applies output-cell symbol assignments after the returned rows, so same-table assignments do not affect later rows.",
+         "rootCauseClassification" : "missing_fixture_adapter_and_nested_import_precedence",
+         "implementationResults" : {
+            "perlCounts" : {
+               "exceptions" : 0,
+               "ignored" : 0,
+               "right" : 13,
+               "wrong" : 0
+            },
+            "managedFixturePageCounts" : {
+               "exceptions" : 0,
+               "ignored" : 0,
+               "right" : 15,
+               "wrong" : 0
+            },
+            "javaCounts" : {
+               "exceptions" : 0,
+               "ignored" : 0,
+               "right" : 13,
+               "wrong" : 0
+            },
+            "nativeSuiteAggregateAfter" : {
+               "exceptions" : 317,
+               "ignored" : 4,
+               "right" : 538,
+               "wrong" : 46
+            },
+            "recoveredFailureOutcomes" : 9,
+            "rightAssertions" : 13,
+            "fixtureClasses" : [
+               "Fitnesse::Slim::Test::TableTableIncFirstCol",
+               "Fitnesse::Slim::Test::Statementexecutorconsumer::TableTableIncFirstCol"
+            ],
+            "perlProtocolTrace" : "724 requests and 724 responses; no server errors",
+            "baselineReviewed" : true
+         }
+      },
+      {
+         "baselineCounts" : {
+            "exceptions" : 2,
+            "ignored" : 0,
+            "right" : 1,
+            "wrong" : 0
+         },
+         "behaviorArea" : "test fixture plus SLiM null result serialization",
+         "candidateCapability" : "null_table_fixture",
+         "confidence" : "high",
+         "directPerlCounts" : {
+            "exceptions" : 0,
+            "ignored" : 1,
+            "right" : 1,
+            "wrong" : 0
+         },
+         "verifiedAfterCounts" : {
+            "exceptions" : 0,
+            "ignored" : 1,
+            "right" : 1,
+            "wrong" : 0
+         },
+         "estimatedRecoverableAssertions" : 2,
+         "evidence" : [
+            "upstream wiki page: FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TableTableSuite.TestReturnsNull",
+            "docs/fitnesse-native-suite-audit.md",
+            "docs/fitnesse-slim-native-suite-baseline.json",
+            "Perl backend: native suite XML plus balanced listener request/response trace"
+         ],
+         "exceptionsIntentional" : false,
+         "javaReference" : {
+            "backend" : "Java SlimService verified by execution log",
+            "counts" : {
+               "exceptions" : 0,
+               "ignored" : 1,
+               "right" : 1,
+               "wrong" : 0
+            },
+            "fitNesseVersion" : "v20251025"
+         },
+         "page" : "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TableTableSuite.TestReturnsNull",
+         "purpose" : "Checks null result handling from a Table Table fixture.",
+         "recommendedDisposition" : "Implemented: a minimal fixture returns undef through existing SLiM null serialization; FitNesse records the table result as ignored, matching Java v20251025.",
+         "relevantFixtures" : [
+            "Fitnesse::Slim::Test::DummyTableTableReturnsNull",
+            "Perl NullFixture separately covers script getNull/getBlank"
+         ],
+         "rootCause" : "The required Perl table fixture was absent, causing fixture construction and its call to fail. The executor and serializer already handled undef correctly; the adapter's undef result yields the same `ignore(No results from table)` result and page counts as Java.",
+         "rootCauseClassification" : "missing_fixture_adapter"
+      },
+      {
+         "baselineCounts" : {
+            "exceptions" : 0,
+            "ignored" : 0,
+            "right" : 1,
+            "wrong" : 2
+         },
+         "behaviorArea" : "FitNesse active test-system context",
+         "candidateCapability" : "context_aware_nested_page_bridge",
+         "confidence" : "high",
+         "directPerlCounts" : {
+            "exceptions" : 0,
+            "ignored" : 0,
+            "right" : 1,
+            "wrong" : 2
+         },
+         "estimatedRecoverableAssertions" : 0,
+         "evidence" : [
+            "upstream wiki page: FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestCustomComparators",
+            "docs/fitnesse-native-suite-audit.md",
+            "docs/fitnesse-slim-native-suite-baseline.json",
+            "Perl backend: native suite XML plus balanced listener request/response trace"
+         ],
+         "exceptionsIntentional" : false,
+         "javaReference" : {
+            "backend" : "Java SlimService verified by execution log",
+            "counts" : {
+               "exceptions" : 0,
+               "ignored" : 0,
+               "right" : 3,
+               "wrong" : 0
+            },
+            "fitNesseVersion" : "v20251025"
+         },
+         "page" : "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestCustomComparators",
+         "purpose" : "Checks a custom comparator registered in suite setup through nested PageDriver requests.",
+         "recommendedDisposition" : "Defer; same substantial context bridge as plugin/ignore pages.",
+         "relevantFixtures" : [
+            "Perl HTTP PageDriver",
+            "FitNesse CustomComparatorRegistry",
+            "EchoFixture"
+         ],
+         "rootCause" : "The Perl nested HTTP request lacks the active custom comparator registry; Java v20251025 passes 3/0. Fixture values and SLiM results are correct.",
+         "rootCauseClassification" : "fitnesse_nested_context"
+      },
+      {
+         "baselineCounts" : {
+            "exceptions" : 0,
+            "ignored" : 0,
+            "right" : 3,
+            "wrong" : 14
+         },
+         "behaviorArea" : "Java reflection, Java fixture types, and harness exception inspection",
+         "candidateCapability" : "java_reflection_converter_emulation",
+         "confidence" : "high",
+         "directPerlCounts" : {
+            "exceptions" : 0,
+            "ignored" : 0,
+            "right" : 3,
+            "wrong" : 14
+         },
+         "estimatedRecoverableAssertions" : 0,
+         "evidence" : [
+            "upstream wiki page: FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestExceptionIsDisplayed.ParameterConversionExceptions",
+            "docs/fitnesse-native-suite-audit.md",
+            "docs/fitnesse-slim-native-suite-baseline.json",
+            "Perl backend: native suite XML plus balanced listener request/response trace"
+         ],
+         "exceptionsIntentional" : false,
+         "javaReference" : {
+            "backend" : "Java SlimService verified by execution log",
+            "counts" : {
+               "exceptions" : 0,
+               "ignored" : 0,
+               "right" : 17,
+               "wrong" : 0
+            },
+            "fitNesseVersion" : "v20251025"
+         },
+         "page" : "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestExceptionIsDisplayed.ParameterConversionExceptions",
+         "purpose" : "Tests Java constructor/static-method conversion errors and FitNesse exception display through nested generated-page HTML.",
+         "recommendedDisposition" : "Defer; do not emulate Java static invocation or stack traces. Add a focused core regression only if a protocol-level conversion mismatch is independently isolated.",
+         "relevantFixtures" : [
+            "TestSlim",
+            "java.time.Instant",
+            "java.lang.String.valueOf",
+            "nested PageDriver/ResponseExaminer"
+         ],
+         "rootCause" : "Java v20251025 passes 17 assertions. Perl reports 3 right, 14 wrong because the nested page requests Java static methods/classes and Java-specific converter diagnostics (`java.time.*`, `String.valueOf`, reflection wording); several failures are missing fixture/method resolution, not a demonstrated error serialization defect. Perl numeric converter behavior is separately unit-tested.",
+         "rootCauseClassification" : "java_conversion_reflection"
+      },
+      {
+         "baselineCounts" : {
+            "exceptions" : 126,
+            "ignored" : 0,
+            "right" : 0,
+            "wrong" : 0
+         },
+         "behaviorArea" : "FitNesse Java client-side exception interpretation",
+         "candidateCapability" : "none",
+         "confidence" : "high",
+         "directPerlCounts" : {
+            "exceptions" : 126,
+            "ignored" : 0,
+            "right" : 0,
+            "wrong" : 0
+         },
+         "estimatedRecoverableAssertions" : 0,
+         "evidence" : [
+            "upstream wiki page: FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestExceptionIsDisplayed.SlimExceptionResult",
+            "docs/fitnesse-native-suite-audit.md",
+            "docs/fitnesse-slim-native-suite-baseline.json",
+            "Perl backend: native suite XML plus balanced listener request/response trace"
+         ],
+         "exceptionsIntentional" : false,
+         "javaReference" : {
+            "backend" : "Java SlimService verified by execution log",
+            "counts" : {
+               "exceptions" : 0,
+               "ignored" : 0,
+               "right" : 24,
+               "wrong" : 0
+            },
+            "fitNesseVersion" : "v20251025"
+         },
+         "page" : "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestExceptionIsDisplayed.SlimExceptionResult",
+         "purpose" : "Unit-tests FitNesse Java SlimExceptionResult parsing/flag behavior from synthetic exception strings.",
+         "recommendedDisposition" : "Do not port FitNesse client exception presentation into the Perl SLiM server.",
+         "relevantFixtures" : [
+            "fitnesse.testsystems.slim.results.SlimExceptionResult",
+            "Transform Exception with StackTrace to Message scenario"
+         ],
+         "rootCause" : "The helper under test is FitNesse Java code, not a fixture protocol feature. Java v20251025 passes 24 assertions; Perl cannot load/use the Java implementation, and 126 exceptions are fixture/scenario cascades.",
+         "rootCauseClassification" : "java_only_fitnesse_utility"
+      },
+      {
+         "baselineCounts" : {
+            "exceptions" : 1,
+            "ignored" : 0,
+            "right" : 4,
+            "wrong" : 0
+         },
+         "behaviorArea" : "SLiM v0.5 ignore marker",
+         "candidateCapability" : "none",
+         "confidence" : "high",
+         "directPerlCounts" : {
+            "exceptions" : 1,
+            "ignored" : 0,
+            "right" : 4,
+            "wrong" : 0
+         },
+         "estimatedRecoverableAssertions" : 0,
+         "evidence" : [
+            "upstream wiki page: FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestIgnoreAll",
+            "docs/fitnesse-native-suite-audit.md",
+            "docs/fitnesse-slim-native-suite-baseline.json",
+            "Perl backend: native suite XML plus balanced listener request/response trace"
+         ],
+         "exceptionsIntentional" : true,
+         "javaReference" : {
+            "status" : "not run in this triage; see stated evidence/uncertainty"
+         },
+         "page" : "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestIgnoreAll",
+         "purpose" : "Verifies ignore-all marker stops later script assertions while teardown/rest of suite continues.",
+         "recommendedDisposition" : "Keep as useful passing ignore-semantics coverage; do not suppress the exception.",
+         "relevantFixtures" : [
+            "Perl TestSlim::throw_ignore_all_stopping",
+            "EchoFixture"
+         ],
+         "rootCause" : "The single exception is the intended `IGNORE_ALL_TESTS` control response; the four other assertions pass.",
+         "rootCauseClassification" : "intentional_ignore_control_exception"
+      },
+      {
+         "baselineCounts" : {
+            "exceptions" : 1,
+            "ignored" : 0,
+            "right" : 4,
+            "wrong" : 0
+         },
+         "behaviorArea" : "SLiM v0.5 ignore marker",
+         "candidateCapability" : "none",
+         "confidence" : "high",
+         "directPerlCounts" : {
+            "exceptions" : 1,
+            "ignored" : 0,
+            "right" : 4,
+            "wrong" : 0
+         },
+         "estimatedRecoverableAssertions" : 0,
+         "evidence" : [
+            "upstream wiki page: FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestIgnoreInScriptTable",
+            "docs/fitnesse-native-suite-audit.md",
+            "docs/fitnesse-slim-native-suite-baseline.json",
+            "Perl backend: native suite XML plus balanced listener request/response trace"
+         ],
+         "exceptionsIntentional" : true,
+         "javaReference" : {
+            "status" : "not run in this triage; see stated evidence/uncertainty"
+         },
+         "page" : "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestIgnoreInScriptTable",
+         "purpose" : "Verifies ignore-script marker stops the current script table.",
+         "recommendedDisposition" : "Keep as useful passing ignore-semantics coverage; do not suppress the exception.",
+         "relevantFixtures" : [
+            "Perl TestSlim::throw_ignore_script_stopping",
+            "EchoFixture"
+         ],
+         "rootCause" : "The single exception is the intended `IGNORE_SCRIPT_TEST` control response; the four other assertions pass.",
+         "rootCauseClassification" : "intentional_ignore_control_exception"
+      },
+      {
+         "baselineCounts" : {
+            "exceptions" : 0,
+            "ignored" : 0,
+            "right" : 2,
+            "wrong" : 2
+         },
+         "behaviorArea" : "harness port setup and test-runner lifecycle",
+         "candidateCapability" : "isolated_startup_test_harness",
+         "confidence" : "high",
+         "directPerlCounts" : {
+            "exceptions" : 0,
+            "ignored" : 0,
+            "right" : 2,
+            "wrong" : 2
+         },
+         "estimatedRecoverableAssertions" : 0,
+         "evidence" : [
+            "upstream wiki page: FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestSystemSlimSuite.ErrorSituationsDuringSlimServerStartup.A_TimeoutAsSlimHeaderNotReceived",
+            "docs/fitnesse-native-suite-audit.md",
+            "docs/fitnesse-slim-native-suite-baseline.json",
+            "Perl backend: native suite XML plus balanced listener request/response trace"
+         ],
+         "exceptionsIntentional" : false,
+         "javaReference" : {
+            "status" : "not run in this triage; see stated evidence/uncertainty"
+         },
+         "page" : "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestSystemSlimSuite.ErrorSituationsDuringSlimServerStartup.A_TimeoutAsSlimHeaderNotReceived",
+         "purpose" : "Connects to the FitNesse HTTP port and expects no SLiM handshake before timeout.",
+         "recommendedDisposition" : "Defer as separate harness/environment workstream.",
+         "relevantFixtures" : [
+            "PageDriver",
+            "FitNesse test-system startup configuration"
+         ],
+         "rootCause" : "The page requires a client connection to FitNesse’s HTTP port with a one-second timeout and expects bind/startup diagnostics. Native runner port ownership and manually-started service settings do not reproduce the intended isolated startup environment; two content assertions fail. This is not Perl fixture behavior.",
+         "rootCauseClassification" : "harness_startup_precondition"
+      },
+      {
+         "baselineCounts" : {
+            "exceptions" : 0,
+            "ignored" : 0,
+            "right" : 2,
+            "wrong" : 1
+         },
+         "behaviorArea" : "harness child-process configuration",
+         "candidateCapability" : "isolated_startup_test_harness",
+         "confidence" : "high",
+         "directPerlCounts" : {
+            "exceptions" : 0,
+            "ignored" : 0,
+            "right" : 2,
+            "wrong" : 1
+         },
+         "estimatedRecoverableAssertions" : 0,
+         "evidence" : [
+            "upstream wiki page: FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestSystemSlimSuite.ErrorSituationsDuringSlimServerStartup.B_TimeoutAsSlimServerDiesBeforeConnecting",
+            "docs/fitnesse-native-suite-audit.md",
+            "docs/fitnesse-slim-native-suite-baseline.json",
+            "Perl backend: native suite XML plus balanced listener request/response trace"
+         ],
+         "exceptionsIntentional" : false,
+         "javaReference" : {
+            "status" : "not run in this triage; see stated evidence/uncertainty"
+         },
+         "page" : "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestSystemSlimSuite.ErrorSituationsDuringSlimServerStartup.B_TimeoutAsSlimServerDiesBeforeConnecting",
+         "purpose" : "Uses an invalid nested test runner and expects FitNesse to report that the SLiM server died before connecting.",
+         "recommendedDisposition" : "Defer; explicitly excluded by user.",
+         "relevantFixtures" : [
+            "PageDriver",
+            "nested generated TestPage"
+         ],
+         "rootCause" : "The shared manually-started Perl service changes nested runner startup: the page connects to the already running listener instead of exercising the invalid child runner. Existing individual baseline documents this precondition mismatch.",
+         "rootCauseClassification" : "harness_startup_precondition"
+      },
+      {
+         "baselineCounts" : {
+            "exceptions" : 0,
+            "ignored" : 0,
+            "right" : 3,
+            "wrong" : 1
+         },
+         "behaviorArea" : "harness socket configuration",
+         "candidateCapability" : "isolated_startup_test_harness",
+         "confidence" : "high",
+         "directPerlCounts" : {
+            "exceptions" : 0,
+            "ignored" : 0,
+            "right" : 3,
+            "wrong" : 1
+         },
+         "estimatedRecoverableAssertions" : 0,
+         "evidence" : [
+            "upstream wiki page: FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestSystemSlimSuite.ErrorSituationsDuringSlimServerStartup.C_TimeoutAsNoServerAtGivenSocket",
+            "docs/fitnesse-native-suite-audit.md",
+            "docs/fitnesse-slim-native-suite-baseline.json",
+            "Perl backend: native suite XML plus balanced listener request/response trace"
+         ],
+         "exceptionsIntentional" : false,
+         "javaReference" : {
+            "status" : "not run in this triage; see stated evidence/uncertainty"
+         },
+         "page" : "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestSystemSlimSuite.ErrorSituationsDuringSlimServerStartup.C_TimeoutAsNoServerAtGivenSocket",
+         "purpose" : "Expects connection refusal at a socket with no SLiM service.",
+         "recommendedDisposition" : "Defer; explicitly excluded by user.",
+         "relevantFixtures" : [
+            "PageDriver",
+            "nested generated TestPage"
+         ],
+         "rootCause" : "The externally running service occupies the page’s expected unused port in the shared configuration; nested request connects instead of refusing. Existing individual baseline documents this environment mismatch.",
+         "rootCauseClassification" : "harness_startup_precondition"
+      },
+      {
+         "baselineCounts" : {
+            "exceptions" : 7,
+            "ignored" : 0,
+            "right" : 0,
+            "wrong" : 0
+         },
+         "behaviorArea" : "Java class loading and static reflection",
+         "candidateCapability" : "java_static_method_reflection",
+         "confidence" : "high",
+         "directPerlCounts" : {
+            "exceptions" : 7,
+            "ignored" : 0,
+            "right" : 0,
+            "wrong" : 0
+         },
+         "estimatedRecoverableAssertions" : 0,
+         "evidence" : [
+            "upstream wiki page: FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestSystemSlimSuite.JavaSlimServer.CallStaticJavaMethod",
+            "docs/fitnesse-native-suite-audit.md",
+            "docs/fitnesse-slim-native-suite-baseline.json",
+            "Perl backend: native suite XML plus balanced listener request/response trace"
+         ],
+         "exceptionsIntentional" : false,
+         "javaReference" : {
+            "backend" : "Java SlimService verified by execution log",
+            "counts" : {
+               "exceptions" : 0,
+               "ignored" : 0,
+               "right" : 2,
+               "wrong" : 0
+            },
+            "fitNesseVersion" : "v20251025"
+         },
+         "page" : "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestSystemSlimSuite.JavaSlimServer.CallStaticJavaMethod",
+         "purpose" : "Invokes static Java methods and java.time factories from SLiM script tables.",
+         "recommendedDisposition" : "Do not implement Java reflection in the Perl core.",
+         "relevantFixtures" : [
+            "EchoFixture",
+            "java.time.temporal.ChronoUnit",
+            "java.time.Instant",
+            "FitNesse Java static method lookup"
+         ],
+         "rootCause" : "Perl name resolution treats the qualified Java class/method cells as fixture/class names and reports missing methods/classes; Java v20251025 reports 2 right and no exceptions. Static Java invocation is not a SLiM protocol operation.",
+         "rootCauseClassification" : "java_only_test_system_feature"
+      },
+      {
+         "baselineCounts" : {
+            "exceptions" : 0,
+            "ignored" : 0,
+            "right" : 2,
+            "wrong" : 2
+         },
+         "behaviorArea" : "manual service and port configuration",
+         "candidateCapability" : "manual_service_harness_configuration",
+         "confidence" : "high",
+         "directPerlCounts" : {
+            "exceptions" : 0,
+            "ignored" : 0,
+            "right" : 2,
+            "wrong" : 2
+         },
+         "estimatedRecoverableAssertions" : 0,
+         "evidence" : [
+            "upstream wiki page: FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestSystemSlimSuite.ManualStartofSlimService",
+            "docs/fitnesse-native-suite-audit.md",
+            "docs/fitnesse-slim-native-suite-baseline.json",
+            "Perl backend: native suite XML plus balanced listener request/response trace"
+         ],
+         "exceptionsIntentional" : false,
+         "javaReference" : {
+            "status" : "not run in this triage; see stated evidence/uncertainty"
+         },
+         "page" : "FitNesse.SuiteAcceptanceTests.SuiteSlimTests.TestSystemSlimSuite.ManualStartofSlimService",
+         "purpose" : "Demonstrates manually started SLiM service connection and expected invalid-header diagnostics.",
+         "recommendedDisposition" : "Defer; keep outside Perl protocol compatibility gate.",
+         "relevantFixtures" : [
+            "PageDriver",
+            "main FitNesse service",
+            "external Perl service"
+         ],
+         "rootCause" : "The example uses `${FITNESSE_PORT}` as an unused socket but in the configured environment that port/service is owned by the active listener or setup differs; counts are 2 right, 2 wrong. It tests installation guidance and environment configuration rather than fixture interoperability.",
+         "rootCauseClassification" : "harness_configuration_page"
+      }
+   ],
+   "rootCausePageCounts" : {
+      "expected_ignored_result" : 2,
+      "fitnesse_expression_extension" : 1,
+      "fitnesse_nested_context" : 3,
+      "fixture_method_missing" : 1,
+      "harness_configuration_page" : 1,
+      "harness_startup_precondition" : 3,
+      "intentional_ignore_control_exception" : 2,
+      "java_conversion_reflection" : 1,
+      "java_jvm_feature" : 1,
+      "java_only_fitnesse_utility" : 3,
+      "java_only_test_system_feature" : 1,
+      "missing_fixture_adapter" : 5
+   },
+   "scope" : {
+      "fixtureOrProtocolImplementationChanged" : false,
+      "pagesInvestigated" : 24,
+      "selection" : "every native baseline page with wrong, ignored, or exception count greater than zero"
+   },
+   "sourceCommit" : "faec66ed216df90c2ae8a23d336bedec56ac3dfd",
+   "title" : "FitNesse v20251025 native fixture gap triage"
+}

@@ -1,10 +1,10 @@
 {
    "abstract" : "Provides a geocoding functionality using L<https://postcodes.io>.",
    "author" : [
-      "Nigel Horne <njh@bandsman.co.uk>"
+      "Nigel Horne <njh@nigelhorne.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150015",
    "license" : [
       "open_source"
    ],
@@ -31,25 +31,29 @@
          }
       },
       "runtime" : {
+         "recommends" : {
+            "Geo::Location::Predicate" : "0.01"
+         },
          "requires" : {
             "Encode" : "0",
             "HTTP::Request" : "0",
             "JSON::MaybeXS" : "0",
             "LWP::Protocol::https" : "0",
             "LWP::UserAgent" : "0",
+            "Object::Configure" : "0.14",
+            "Params::Get" : "0.13",
             "URI" : "0",
             "perl" : "5.006002"
          }
       },
       "test" : {
          "requires" : {
-            "Test::Carp" : "0",
+            "Geo::Location::Predicate" : "0",
             "Test::Compile" : "0",
-            "Test::LWP::UserAgent" : "0",
+            "Test::DescribeMe" : "0",
             "Test::Most" : "0",
             "Test::Needs" : "0",
-            "Test::NoWarnings" : "0",
-            "Test::Number::Delta" : "0"
+            "Test::NoWarnings" : "0"
          }
       }
    },
@@ -57,8 +61,8 @@
    "resources" : {
       "bugtracker" : {
          "mailto" : "bug-Geo-Coder-Postcodes@rt.cpan.org",
-         "web" : "https://github.com/nigelhorne/Geo-Coder-Postcodes/issues",
-         "x_url" : "https://github.com/nigelhorne/Geo-Coder-Postcodes/issues"
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Geo-Coder-Postcodes",
+         "x_url" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Geo-Coder-Postcodes"
       },
       "repository" : {
          "type" : "git",
@@ -67,6 +71,6 @@
          "x_repository" : "https://github.com/nigelhorne/Geo-Coder-Postcodes"
       }
    },
-   "version" : "0.08",
-   "x_serialization_backend" : "JSON::PP version 4.16"
+   "version" : "0.09",
+   "x_serialization_backend" : "JSON::PP version 4.18"
 }

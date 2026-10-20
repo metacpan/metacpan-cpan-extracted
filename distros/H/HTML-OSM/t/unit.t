@@ -3,6 +3,7 @@
 use strict;
 use warnings;
 
+use CHI;
 use File::Temp qw(tempfile);
 use Readonly;
 use Test::Memory::Cycle;
@@ -536,6 +537,73 @@ subtest 'add_heatmap: custom radius and blur appear in rendered body' => sub {
 	like($body, qr/blur:\s*25/,   'custom blur 25');
 };
 
+# POD INPUT: "a value that is not a positive number uses the default"
+subtest 'add_heatmap: non-numeric radius and blur cannot inject script' => sub {
+	my $m = HTML::OSM->new();
+	$m->center([$C{LAT_LONDON}, $C{LON_LONDON}]);
+	$m->add_heatmap([[$C{LAT_LONDON}, $C{LON_LONDON}]],
+		radius => '1}).addTo(map);alert(1);//', blur => -3);
+	my (undef, $body) = $m->onload_render();
+	like($body, qr/radius:\s*25/, 'hostile radius replaced by default');
+	like($body, qr/blur:\s*15/,   'negative blur replaced by default');
+	unlike($body, qr/alert\(1\)/, 'injected text is absent');
+};
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Empty addresses (POD: "An empty address ... also returns 0")
+# ─────────────────────────────────────────────────────────────────────────────
+
+subtest 'add_marker: empty address returns 0' => sub {
+	my $m = HTML::OSM->new();
+	is($m->add_marker(''), 0, 'empty string -> 0');
+	is($m->add_marker(point => undef), 0, 'undef point -> 0');
+};
+
+subtest 'center: empty address returns 0' => sub {
+	my $m = HTML::OSM->new();
+	is($m->center(''), 0, 'empty string -> 0');
+};
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Nominatim requests: email parameter and caller-supplied UA
+# ─────────────────────────────────────────────────────────────────────────────
+
+subtest 'new: email is sent to Nominatim and a caller UA is not reconfigured' => sub {
+	my ($url, $configured);
+	my $resp = bless {}, 'UnitEmailResp';
+	mock 'UnitEmailResp::is_success'      => sub { 1 };
+	mock 'UnitEmailResp::decoded_content' => sub { '[{"lat":"48.8566","lon":"2.3522"}]' };
+	my $ua = bless {}, 'UnitEmailUA';
+	mock 'UnitEmailUA::default_header' => sub { $configured++ };
+	mock 'UnitEmailUA::env_proxy'      => sub { $configured++ };
+	mock 'UnitEmailUA::get'            => sub { $url = $_[1]; $resp };
+
+	my $m = HTML::OSM->new(email => 'maps@example.com');
+	$m->{ua}    = $ua;
+	$m->{cache} = CHI->new(driver => 'Memory', global => 0);
+	is($m->add_marker('Paris'), 1, 'geocoded marker added');
+	like($url, qr/[?&]email=maps%40example\.com(?:&|\z)/, 'email in the request URL');
+	ok(!$configured, 'caller-supplied UA left as supplied');
+
+	my ($head, $body) = $m->onload_render();
+	unlike($head . $body, qr/maps\@example\.com|maps%40example/, 'email not put into the page');
+};
+
+subtest 'new: no email means no email parameter' => sub {
+	my $url;
+	my $resp = bless {}, 'UnitNoEmailResp';
+	mock 'UnitNoEmailResp::is_success'      => sub { 1 };
+	mock 'UnitNoEmailResp::decoded_content' => sub { '[{"lat":"48.8566","lon":"2.3522"}]' };
+	my $ua = bless {}, 'UnitNoEmailUA';
+	mock 'UnitNoEmailUA::get' => sub { $url = $_[1]; $resp };
+
+	my $m = HTML::OSM->new();
+	$m->{ua}    = $ua;
+	$m->{cache} = CHI->new(driver => 'Memory', global => 0);
+	$m->add_marker('Paris');
+	unlike($url, qr/email=/, 'no email parameter');
+};
+
 subtest 'add_heatmap: plugin injected in head only when layer present' => sub {
 	my $with = HTML::OSM->new();
 	$with->add_marker([$C{LAT_LONDON}, $C{LON_LONDON}]);
@@ -759,6 +827,98 @@ subtest 'onload_render: body contains OpenStreetMap tile layer URL' => sub {
 	$m->add_marker([$C{LAT_LONDON}, $C{LON_LONDON}]);
 	my (undef, $body) = $m->onload_render();
 	like($body, qr/openstreetmap\.org/, 'OSM tile URL in body');
+};
+
+subtest 'onload_render: tile_url replaces the default tile server' => sub {
+	my $m = HTML::OSM->new(
+		tile_url => 'http://tiles.internal/{z}/{x}/{y}.png',
+	);
+	$m->add_marker([$C{LAT_LONDON}, $C{LON_LONDON}]);
+	my (undef, $body) = $m->onload_render();
+	like($body, qr{L\.tileLayer\('http://tiles\.internal/\{z\}/\{x\}/\{y\}\.png'},
+		'the configured tile URL is used');
+	unlike($body, qr/tile\.openstreetmap\.org/, 'the default tile server is gone');
+};
+
+subtest 'onload_render: tile_url is escaped for a JS string' => sub {
+	my $m = HTML::OSM->new(
+		tile_url => q{http://tiles.internal/o'Reilly/{z}/{x}/{y}.png},
+	);
+	$m->add_marker([$C{LAT_LONDON}, $C{LON_LONDON}]);
+	my (undef, $body) = $m->onload_render();
+	like($body, qr{o\\'Reilly}, 'the apostrophe is escaped');
+	unlike($body, qr{o'Reilly}, 'the raw apostrophe cannot end the literal');
+};
+
+subtest 'onload_render: default tile attribution credits OpenStreetMap' => sub {
+	my $m = HTML::OSM->new();
+	$m->add_marker([$C{LAT_LONDON}, $C{LON_LONDON}]);
+	my (undef, $body) = $m->onload_render();
+	like($body, qr{attribution: '&copy; <a href="https://www\.openstreetmap\.org/copyright">OpenStreetMap<\\/a> contributors'},
+		'default attribution links to the OSM copyright page');
+};
+
+subtest 'onload_render: tile_attribution replaces the credit and is JS-escaped' => sub {
+	my $m = HTML::OSM->new(tile_attribution => q{Tiles &copy; O'Neil Maps});
+	$m->add_marker([$C{LAT_LONDON}, $C{LON_LONDON}]);
+	my (undef, $body) = $m->onload_render();
+	like($body, qr{attribution: 'Tiles &copy; O\\'Neil Maps'}, 'custom attribution, apostrophe escaped');
+};
+
+# POD onload_render: values that skip new()'s checks are checked again.
+subtest 'onload_render: invalid zoom from a clone falls back to 12 with a warning' => sub {
+	my $m = HTML::OSM->new()->new(zoom => '1);alert(1);//');
+	$m->add_marker([$C{LAT_LONDON}, $C{LON_LONDON}]);
+	my (undef, $body);
+	warning_like { (undef, $body) = $m->onload_render() }
+		qr/onload_render: invalid zoom '1\);alert\(1\);\/\/', using 12/,
+		'POD MESSAGES warning';
+	like($body, qr/setView\(\[[^\]]+\], $C{ZOOM_DEFAULT}\)/, 'default zoom used');
+	unlike($body, qr/alert\(1\)/, 'injected text is absent');
+};
+
+subtest 'onload_render: out-of-range zoom from a clone falls back to 12' => sub {
+	my $m = HTML::OSM->new()->new(zoom => 25);
+	$m->add_marker([$C{LAT_LONDON}, $C{LON_LONDON}]);
+	my (undef, $body);
+	warning_like { (undef, $body) = $m->onload_render() } qr/invalid zoom '25'/, 'warned';
+	like($body, qr/setView\(\[[^\]]+\], $C{ZOOM_DEFAULT}\)/, 'default zoom used');
+};
+
+subtest 'onload_render: invalid width/height from a clone fall back with warnings' => sub {
+	my $m = HTML::OSM->new()->new(width => '1px}</style><script>', height => 'tall');
+	$m->add_marker([$C{LAT_LONDON}, $C{LON_LONDON}]);
+	my $head;
+	warnings_like { ($head) = $m->onload_render() }
+		[ qr/invalid height 'tall', using 400px/, qr/invalid width '1px\}<\/style><script>', using 600px/ ],
+		'POD MESSAGES warnings';
+	like($head, qr/width:\s*$C{WIDTH_DEF}/,   'default width used');
+	like($head, qr/height:\s*$C{HEIGHT_DEF}/, 'default height used');
+	unlike($head, qr/<script>'/, 'injected markup absent');
+};
+
+subtest 'onload_render: percentage and auto sizes are accepted' => sub {
+	my $m = HTML::OSM->new(width => '100%', height => 'auto');
+	$m->add_marker([$C{LAT_LONDON}, $C{LON_LONDON}]);
+	my ($head) = $m->onload_render();
+	like($head, qr/width:\s*100%/,  'percentage width kept');
+	like($head, qr/height:\s*auto/, 'auto height kept');
+};
+
+subtest 'onload_render: CDN URLs are HTML-escaped in the head' => sub {
+	my $m = HTML::OSM->new(css_url => 'x.css" onload="alert(1)', js_url => 'a.js?v=1&b=2');
+	$m->add_marker([$C{LAT_LONDON}, $C{LON_LONDON}]);
+	my ($head) = $m->onload_render();
+	like($head, qr/href="x\.css&quot; onload=&quot;alert\(1\)"/, 'double quote cannot close the attribute');
+	like($head, qr/src="a\.js\?v=1&amp;b=2"/, 'ampersand escaped');
+};
+
+subtest 'onload_render: coordinate with no lat/lon and no address is skipped' => sub {
+	my $m = HTML::OSM->new(coordinates => [ [undef, undef, undef], [$C{LAT_LONDON}, $C{LON_LONDON}, 'London'] ]);
+	my (undef, $body);
+	lives_ok { (undef, $body) = $m->onload_render() } 'no croak from the private geocoding helper';
+	my @markers = $body =~ /L\.marker\(/g;
+	is(scalar @markers, 2, 'one static marker plus the search-box marker template');
 };
 
 subtest 'onload_render: body contains map setView call' => sub {

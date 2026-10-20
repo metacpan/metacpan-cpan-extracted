@@ -1,0 +1,65 @@
+# -*-n3-*-
+
+@prefix :			<http://usefulinc.com/ns/doap#> .
+@prefix dc:			<http://purl.org/dc/terms/> .
+@prefix dcs:		<http://ontologi.es/doap-changeset#> .
+@prefix foaf:		<http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:		<http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:		<http://www.w3.org/2001/XMLSchema#> .
+@prefix dcterms:	<http://purl.org/dc/terms/> .
+@prefix doap:		<http://usefulinc.com/ns/doap#> .
+@prefix my:			<http://purl.org/NET/cpan-uri/dist/RDF-EARL/> .
+
+<>
+	dc:title			"Changes for RDF::EARL" ;
+	dc:description		"Changes for RDF::EARL" ;
+	dc:subject			my:project ;
+	dc:creator			my:developer ;
+	.
+
+my:project
+	a 						:Project ;
+	:name					"RDF::EARL" ;
+	:shortdesc				"Generate W3C Evaluation and Report Language (EARL) test reports" ;
+	:programming-language	"Perl" ;
+	:created				"2012-08-26"^^xsd:date ;
+	:maintainer				my:developer ;
+	:homepage				<https://metacpan.org/release/RDF-EARL> ;
+	:bug-database			<https://github.com/kasei/rdf-earl/issues> ;
+	:download-page			<https://metacpan.org/release/RDF-EARL/> ;
+	:download-mirror		<http://kasei.us/code/files/> ;
+	:release				my:v_0-001 , my:v_0-002 ;
+	.
+
+
+my:v_0-002
+	a					:Version ;
+	dc:issued			"2026-10-19"^^xsd:date ;
+	:revision			"0.002" ;
+	dcterms:replaces	my:v_0-001 ;
+	dcs:changeset [
+		dcs:item
+			[ a dcs:Update ; rdfs:label "Update to replace RDF::Trine dependency with Attean." ] ,
+			[ a dcs:Update ; rdfs:label "Fix GitHub links in Makefile.PL." ]
+	]
+	.
+
+my:v_0-001
+	a					:Version ;
+	dc:issued			"2012-08-26"^^xsd:date ;
+	:revision			"0.001" ;
+	dcs:changeset [
+		dcs:item
+			[ a dcs:Addition ; rdfs:label "Initial release." ]
+	]
+	.
+
+my:developer
+	a               foaf:Person ;
+	foaf:name       "Gregory Todd Williams" ;
+	foaf:homepage   <http://kasei.us/> ;
+	foaf:page		<https://metacpan.org/author/GWILLIAMS> , <https://github.com/kasei/> ;
+	foaf:page       <http://search.cpan.org/~gwilliams/> ;
+	foaf:mbox       <mailto:gwilliams@cpan.org> ;
+	<http://www.w3.org/2002/07/owl#sameAs> <http://purl.org/NET/cpan-uri/person/gwilliams> ;
+	.

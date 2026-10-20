@@ -3,7 +3,7 @@ package Validator::LIVR::Rules::Meta;
 use strict;
 use warnings;
 
-our $VERSION = '2.0';
+our $VERSION = '2.1';
 
 sub nested_object {
     my ($livr, $rule_builders) = @_;
@@ -190,8 +190,8 @@ sub livr_or { # we call it livr_or to avoid conflicts with the "or" operator
 
     return sub {
         my ($value, undef, $output_ref) = @_;
-        return if !defined($value) || $value eq '';
 
+        # Empty values go to the rule sets too, so "required" and "not_empty" in them work
         my $last_error;
 
         for my $validator (@validators) {
@@ -211,3 +211,18 @@ sub livr_or { # we call it livr_or to avoid conflicts with the "or" operator
 }
 
 1;
+
+=head1 NAME
+
+Validator::LIVR::Rules::Meta - Metarules of Validator::LIVR: nested_object, list_of, list_of_objects, variable_object, list_of_different_objects and or
+
+=head1 DESCRIPTION
+
+This module has the code of the metarules, which are documented in
+L<Validator::LIVR/Metarules>.
+
+Each sub is the builder of the rule with the same name. The builder of C<or>
+is C<livr_or>, as C<or> is a Perl operator. The code is a good example for
+L<writing your own rules|Validator::LIVR/WRITING RULES IN PERL>.
+
+=cut

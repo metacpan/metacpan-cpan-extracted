@@ -2,6 +2,8 @@ use v5.32;
 use warnings;
 
 use Test2::V0;
+use feature 'signatures';
+no warnings 'experimental::signatures';
 
 use Object::Pad 0.825;
 use Clay::XS qw(
@@ -20,6 +22,7 @@ use Term::Fabulous::Static;
 use Term::Fabulous::Widget::Box;
 use Term::Fabulous::Widget::Canvas;
 use Term::Fabulous::Widget::ScrollBox;
+use Term::Fabulous::Widget::Text;
 
 sub command {
 	my ( $type, $x, $y, $width, $height, %extra ) = @_;
@@ -144,6 +147,29 @@ subtest 'the last frame is complete when painting dies partway' => sub {
 	my $frame = $ui->last_frame;
 	my ($top) = $frame->topmost_at( 2, 0 );
 	ref_is $ui->widget_for( $frame->command($top)->{userData} ), $after, 'the frame also holds the commands after the one that failed';
+};
+
+# A text in a box of eight columns, with a line above it, in a window
+# of the given height.
+sub painted_text ( $height, $text ) {
+	my $root  = Term::Fabulous::Widget::Box->new( layout => { layout_direction => CLAY_TOP_TO_BOTTOM, sizing => { width => sizing_fixed(8), height => sizing_grow() } } );
+	my $other = Term::Fabulous::Widget::Text->new( text => 'x' );
+	my $shown = Term::Fabulous::Widget::Text->new( text => $text );
+	$root->add_child( $other, $shown );
+	my $ui = Term::Fabulous::Static->new( root => $root, width => 8, height => $height );
+	$ui->draw;
+	return ( $ui->last_frame, $shown, $other );
+}
+
+subtest 'text_rows lists the painted lines of a text' => sub {
+	my ( $frame, $text, $other ) = painted_text( 5, 'aaa bbb ccc ddd eee fff' );
+	is [ $frame->text_rows($text) ],  [ [ 1, 0 ], [ 2, 8 ], [ 3, 16 ] ], 'the rows and the offsets of the wrapped lines';
+	is [ $frame->text_rows($other) ], [ [ 0, 0 ] ],                      'each widget its own lines';
+	is [ $frame->text_rows( Term::Fabulous::Widget::Text->new( text => 'never' ) ) ], [], 'a text that was not painted has none';
+	my ($short) = painted_text( 2, 'aaa bbb ccc ddd eee fff' );
+	is [ $short->text_rows($text) ], [], 'another frame knows nothing of it';
+	my ( $culled, $cut ) = painted_text( 2, 'aaa bbb ccc ddd eee fff' );
+	is [ $culled->text_rows($cut) ], [ [ 1, 0 ], [ 2, 8 ] ], 'the lines Clay left out below the window are missing';
 };
 
 done_testing;

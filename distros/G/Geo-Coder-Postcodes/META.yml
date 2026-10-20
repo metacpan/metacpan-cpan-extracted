@@ -1,20 +1,19 @@
 ---
 abstract: 'Provides a geocoding functionality using L<https://postcodes.io>.'
 author:
-  - 'Nigel Horne <njh@bandsman.co.uk>'
+  - 'Nigel Horne <njh@nigelhorne.com>'
 build_requires:
   ExtUtils::MakeMaker: '0'
-  Test::Carp: '0'
+  Geo::Location::Predicate: '0'
   Test::Compile: '0'
-  Test::LWP::UserAgent: '0'
+  Test::DescribeMe: '0'
   Test::Most: '0'
   Test::Needs: '0'
   Test::NoWarnings: '0'
-  Test::Number::Delta: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150015'
 license: open_source
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -24,16 +23,20 @@ no_index:
   directory:
     - t
     - inc
+recommends:
+  Geo::Location::Predicate: '0.01'
 requires:
   Encode: '0'
   HTTP::Request: '0'
   JSON::MaybeXS: '0'
   LWP::Protocol::https: '0'
   LWP::UserAgent: '0'
+  Object::Configure: '0.14'
+  Params::Get: '0.13'
   URI: '0'
   perl: '5.006002'
 resources:
-  bugtracker: https://github.com/nigelhorne/Geo-Coder-Postcodes/issues
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Geo-Coder-Postcodes
   repository: git://github.com/nigelhorne/Geo-Coder-Postcodes.git
-version: '0.08'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+version: '0.09'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

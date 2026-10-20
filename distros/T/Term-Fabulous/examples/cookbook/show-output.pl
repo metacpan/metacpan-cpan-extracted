@@ -8,8 +8,6 @@ no warnings 'experimental::signatures';
 use Encode qw(decode);
 use IO::Async::Loop;
 use IO::Async::Process;
-use IO::Async::Timer::Periodic;
-use List::Util qw(min);
 use Term::Fabulous;
 use Term::Fabulous::Enum::BorderStyle;
 use Term::Fabulous::Widget::Box;
@@ -29,9 +27,13 @@ my $root = Term::Fabulous::Widget::Box->new(
 );
 
 # The arguments are bytes, like the command's output.
-my $title  = Term::Fabulous::Widget::Text->new( text => decode( 'UTF-8', "Running: @command" ), text_color => [ 255, 200, 80, 255 ] );
+my $title = Term::Fabulous::Widget::Text->new( text => decode( 'UTF-8', "Running: @command" ), text_color => [ 255, 200, 80, 255 ] );
+
+# follow_end keeps the newest line in view (see the recipe "Scroll a
+# ScrollBox from code").
 my $output = Term::Fabulous::Widget::ScrollBox->new(
 	id               => 'output',
+	follow_end       => 1,
 	background_color => [ 30, 35, 50, 255 ],
 	bordered         => 1,
 	border_color     => [ 120, 160, 220, 255 ],
@@ -85,19 +87,5 @@ my $process = IO::Async::Process->new(
 $loop->add($process);
 
 my $ui = Term::Fabulous->new( root => $root, width => 80, height => 24 );
-
-# Keep the newest line in view (see the recipe "Scroll a ScrollBox from
-# code").
-$loop->add(
-	IO::Async::Timer::Periodic->new(
-		interval => 1 / 30,
-		on_tick  => sub {
-			my $state  = $ui->scroll_state($output) or return;
-			my $lowest = min( 0, $state->{viewport}{height} - $state->{content}{height} );
-			$ui->scroll_to( $output, { y => $lowest } ) if $state->{position}{y} != $lowest;
-			return;
-		},
-	)->start
-);
 
 $ui->run;

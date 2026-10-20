@@ -21,6 +21,12 @@
   .pivot-table thead th.dim-header {
     text-align: left;
   }
+  /* A header is a control: sorting it and moving it are reachable from the
+     keyboard, so focus has to be findable on the dark blue header it sits on. */
+  .pivot-table thead th:focus-visible {
+    outline: 2px solid #ffd24d;
+    outline-offset: -2px;
+  }
   .pivot-table thead th.total-header {
     /* inherits background/color from default.html.tt thead tr rule */
   }
@@ -74,6 +80,13 @@
 <p class="back-link"><a href="/">&larr; Home</a>[% IF back_url && back_url != '/' %] &rsaquo; <a href="[% back_url | html %]">[% back_label | html %]</a>[% END %][%- IF back2_url -%] &rsaquo; <a href="[% back2_url | html %]">[% back2_label || 'Back' | html %]</a>[%- END -%]</p>
 
 <h2 style="margin-bottom:0.75rem">[% title | html %]</h2>
+
+[%- IF grid_rows.size > 0 -%]
+<p class="sr-only" id="pivot-head-help">Sort a column: focus its header, then press Enter or
+Space.  Move the column one place left or right: Shift+Left or Shift+Right, where the table has a
+single header row.  Clicking a header sorts it, and dragging it moves it.</p>
+<p class="sr-only" id="pivot-live" role="status" aria-live="polite"></p>
+[%- END -%]
 
 <div class="pivot-export">
   [%- SET base = request.url -%]
@@ -219,6 +232,21 @@
   var sortColIdx = -1;
   var sortAsc    = true;
 
+  // What just happened, said out loud.  Sorting and moving both change the
+  // table without changing the focus, so a screen reader has nothing else to
+  // notice.
+  var live = document.getElementById('pivot-live');
+  function announce(text) {
+    if (!live) return;
+    live.textContent = '';
+    setTimeout(function () { live.textContent = text; }, 30);
+  }
+
+  function headerName(leafIdx) {
+    var th = leafHeaders[leafIdx];
+    return th ? th.textContent.trim() : '';
+  }
+
   // Compute the DOM cell index in tbody/tfoot for a leaf-header position.
   // In the 2-level case the dim cells (rowspan=2) occupy positions 0..NDIMS-1
   // in the tbody but are absent from tHead row 1, so offset by NDIMS.
@@ -258,6 +286,8 @@
     leafHeaders.forEach(function (h, i) {
       h.setAttribute('aria-sort', i === leafIdx ? (asc ? 'ascending' : 'descending') : 'none');
     });
+
+    announce('Sorted by ' + headerName(leafIdx) + ', ' + (asc ? 'ascending' : 'descending'));
   }
 
   // Move leaf column from -> to (flat mode only: no col-dim group structure to break).
@@ -281,7 +311,14 @@
   leafHeaders.forEach(function (th) {
     th.setAttribute('aria-sort', 'none');
     th.style.cursor = 'pointer';
-    th.title = 'Click to sort' + (!HASTWO ? ' | Drag to reorder' : '');
+    th.title = 'Click to sort | Enter to sort'
+             + (!HASTWO ? ' | Drag to reorder | Shift+Left/Right to move column' : '');
+
+    // A <th> is not a button, so the browser does not put it in the tab order
+    // or activate it by itself: it says here that it is a control, which
+    // header it controls, and that the instructions below apply to it.
+    th.setAttribute('tabindex', '0');
+    th.setAttribute('aria-describedby', 'pivot-head-help');
 
     th.addEventListener('click', function () {
       if (dragSrcIdx !== null) return;
@@ -289,6 +326,37 @@
       if (sortColIdx === idx) { sortAsc = !sortAsc; }
       else { sortColIdx = idx; sortAsc = true; }
       sortByCol(sortColIdx, sortAsc);
+    });
+
+    // The keyboard equivalent of the two pointer gestures.  Enter and Space
+    // sort, because that is what a click does; Shift+Left/Right is the drag,
+    // and only where a drag is offered at all - a column moved inside a
+    // two-row header would leave its group label over the wrong measures.
+    th.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        var idx = leafHeaders.indexOf(th);
+        if (sortColIdx === idx) { sortAsc = !sortAsc; }
+        else { sortColIdx = idx; sortAsc = true; }
+        sortByCol(sortColIdx, sortAsc);
+        return;
+      }
+
+      if (HASTWO || !e.shiftKey) return;
+      var delta = 0;
+      if (e.key === 'ArrowLeft')  delta = -1;
+      if (e.key === 'ArrowRight') delta =  1;
+      if (!delta) return;
+
+      var from = leafHeaders.indexOf(th);
+      var to   = from + delta;
+      if (from < 0 || to < 0 || to >= leafHeaders.length) return;
+
+      e.preventDefault();
+      moveCol(from, to);
+      announce('Moved ' + headerName(to) + ' to column ' + (to + 1)
+        + ' of ' + leafHeaders.length);
+      th.focus();
     });
 
     // Drag-to-reorder only works in flat (single-row header) mode -- in the

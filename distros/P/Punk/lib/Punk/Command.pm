@@ -10,7 +10,7 @@ use File::Basename ();
 use Getopt::Long ();
 use Punk ();
 
-our $VERSION = '0.61';
+our $VERSION = '0.62';
 
 # The whole punk command line. bin/punk is two lines - `exit
 # Punk::Command->main(@ARGV)` - and everything else is here: a registry of
@@ -2096,6 +2096,48 @@ needs; without it the caller's directory is restored.
 
 C<main> returns the exit code and honours the two filehandle globals, so
 a test gets code, stdout and stderr with no process spawn.
+
+=head1 METHODS
+
+=head2 register($name, \%spec, $owner?)
+
+Adds a command; see L</THE REGISTRY>. C<$owner> defaults to the calling
+package. Returns the class.
+
+=head2 register_doctor($label, \&probe, $owner?)
+
+Adds a C<doctor> row. The probe returns C<($ok, $detail)>. A label already
+registered by another owner croaks naming both. Returns the class.
+
+=head2 commands
+
+The registered command names in display order, less the hidden ones.
+
+=head2 main(@argv)
+
+Runs C<punk> with C<@argv> and returns the exit code; see L</TESTING>.
+
+=head2 load_app(dir => $dir, chdir => $bool)
+
+See L</LOADING THE APPLICATION>.
+
+=head1 FUNCTIONS
+
+The bodies of two commands, callable without the argument parsing. Each
+takes the command's options as a hash (with C<root> to skip finding the
+application, C<dir> to start the search somewhere else) and returns the
+exit code: C<0> success, C<1> a failure reported, C<2> no application
+found or nothing to work on.
+
+=head2 api_sync(%opt)
+
+L</api sync>. C<spec> is the document, default F<openapi.json> in the
+application root; C<dry_run> reports without writing.
+
+=head2 config_check(%opt)
+
+L</config check>. C<file>, C<env>, C<secrets> (C<strict>, C<warn> or
+C<off>) and C<dump>, as the command's options.
 
 =head1 COMMANDS
 

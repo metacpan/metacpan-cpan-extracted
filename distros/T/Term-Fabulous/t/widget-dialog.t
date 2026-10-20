@@ -19,6 +19,7 @@ use Term::Fabulous::Widget::Box;
 use Term::Fabulous::Widget::Button;
 use Term::Fabulous::Widget::Dialog;
 use Term::Fabulous::Widget::Dropdown;
+use Term::Fabulous::Widget::Text;
 use Term::Fabulous::Widget::TextField;
 use Term::Fabulous::Widget::VirtualList;
 
@@ -232,14 +233,127 @@ subtest 'defaults and errors' => sub {
 	is $dialog->layout->{sizing}{width}, sizing_fixed(12), 'the given layout keys win';
 	my $fresh = Term::Fabulous::Widget::Dialog->new;
 	is [ $fresh->backdrop_color, $fresh->z_index, $fresh->close_on_escape ], [ [ 0, 0, 0, 128 ], 1000, 1 ], 'the dialog parameters';
-	like dies { $dialog->open('nope') }, qr/open needs the Term::Fabulous object/, 'open wants the UI';
-	like dies { Term::Fabulous::Widget::Dialog->new( z_index        => 'top' ) },  qr/z_index must be an integer/,                                                   'z_index is checked';
+	like dies { $dialog->open('nope') },                                           qr/open needs the Term::Fabulous object/,                        'open wants the UI';
+	like dies { Term::Fabulous::Widget::Dialog->new( z_index => 'top' ) },         qr/z_index must be an integer/,                                  'z_index is checked';
+	like dies { Term::Fabulous::Widget::Dialog->new( z_index => 40000 ) },         qr/z_index must be an integer from -32768 to 32767, got 40000/,  'z_index stays in the range Clay has';
+	like dies { $fresh->z_index(-40000) },                                         qr/z_index must be an integer from -32768 to 32767, got -40000/, 'also when it is set later';
 	like dies { Term::Fabulous::Widget::Dialog->new( backdrop_color => 'nope' ) }, qr/\ATerm::Fabulous::Widget::Dialog: backdrop_color must be a color, got 'nope'/, 'backdrop_color is checked';
 
 	my $child  = Term::Fabulous::Widget::Dialog->new;
 	my $holder = Term::Fabulous::Widget::Box->new;
 	$holder->add_child($child);
 	like dies { $child->open($ui) }, qr/child of another widget cannot open/, 'a dialog inside the tree cannot open';
+};
+
+# A dialog with a title, a text and two buttons, open on the screen; its
+# answers as [ button, values, dismissed ] and the events in order.
+sub answering_dialog (%params) {
+	my $asking = Term::Fabulous::Widget::Dialog->new(
+		title   => 'Export',
+		buttons => [ { id => 'export', label => 'Export', primary => 1 }, { id => 'cancel', label => 'Cancel' } ],
+		layout  => { sizing => { width => sizing_fixed(24) } },
+		%params,
+	);
+	$asking->add_child( Term::Fabulous::Widget::Text->new( text => 'All rows' ) );
+	my ( @answers, @events );
+	$asking->on( Close => sub { push @events, 'Close'; return } );
+	$asking->on( Answer => sub ($event) { push @events, 'Answer'; push @answers, [ $event->button, $event->values, $event->dismissed ]; return } );
+	$ui->interaction->set_focused_widget($behind);
+	$asking->open($ui);
+	$ui->step;
+	return ( $asking, \@answers, \@events );
+}
+
+sub screen_lines () {
+	return [ map { s/\s+\z//r } $terminal->lines ];
+}
+
+subtest 'title, content, notice line and buttons in their places' => sub {
+	my ($asking) = answering_dialog();
+	is [ map { ref } @{ $asking->children } ],                     [ ('Term::Fabulous::Widget::Text') x 2, 'Term::Fabulous::Widget::Box' ], 'the title, the content and the button row';
+	is [ map { $asking->button($_)->classes } qw(export cancel) ], [ ['primary'], [] ],                                                     'a primary button has the class primary';
+	is [ map { $asking->is_primary($_) } qw(export cancel) ],      [ 1, 0 ],                                                                'is_primary';
+	is [ $asking->button_ids ],                                    [qw(export cancel)],                                                     'the buttons in order';
+	is $asking->default_button,                                    'export',                                                                'the default button is the first primary one';
+	like dies { $asking->button('nope') }, qr/\ATerm::Fabulous::Widget::Dialog: the dialog has no button with the id 'nope'/, 'an unknown button dies';
+	my $lines = screen_lines();
+	like $lines->[1], qr/Export/,   'the title is the first row inside the border';
+	like $lines->[3], qr/All rows/, 'then the content';
+
+	$asking->notice( 'Nothing to export: the [bold]table[/] is empty.', 'error' );
+	$ui->step;
+	is $asking->children->[-2]->children->[0]->text,       'Nothing to export: the table is empty.',                                                        'the notice line comes above the buttons';
+	is [ $asking->notice, $asking->notice_text ],          [ 'Nothing to export: the [bold]table[/] is empty.', 'Nothing to export: the table is empty.' ], 'notice and notice_text';
+	is $asking->children->[-2]->children->[0]->text_color, $asking->family_look( input => 'text', 'invalid' ),                                              'an error in the color of an invalid input';
+	$asking->notice('Two rows are hidden.');
+	is $asking->children->[-2]->children->[0]->text_color, Term::Fabulous::Widget::Text->new->text_color, 'an info notice in the text color';
+	$asking->notice('');
+	is [ scalar @{ $asking->children }, $asking->notice, $asking->notice_text ], [ 3, undef, undef ], 'an empty notice takes the line away';
+	like dies { $asking->notice( 'x', 'loud' ) }, qr/the kind of a notice must be one of error, info, got 'loud'/, 'an unknown kind dies';
+	$asking->title('');
+	is scalar @{ $asking->children }, 2, 'an empty title takes the title away';
+	$asking->title('Export again');
+	is $asking->children->[0]->text, 'Export again', 'a new title comes back first';
+	$asking->close;
+};
+
+subtest 'the notice line keeps its place when asked' => sub {
+	my %rows;
+	foreach my $notice_line (qw(shown kept row)) {
+		my ($asking) = answering_dialog( notice_line => $notice_line );
+		$rows{$notice_line} = $ui->bounding_box($asking)->{height};
+		$asking->close;
+	}
+	is [ @rows{qw(kept row)} ], [ $rows{shown} + 1, $rows{shown} + 2 ], 'kept adds the gap above the line, row also a row';
+	my ($asking) = answering_dialog( notice_line => 'row' );
+	my $height = $ui->bounding_box($asking)->{height};
+	$asking->notice('Saved.');
+	$ui->step;
+	is $ui->bounding_box($asking)->{height}, $height, 'with row a short notice does not change the height';
+	$asking->close;
+	like dies { Term::Fabulous::Widget::Dialog->new( notice_line => 'always' ) }, qr/notice_line must be one of kept, row, shown, got 'always'/, 'an unknown notice_line dies';
+};
+
+subtest 'a button answers, Escape and close dismiss' => sub {
+	my ( $asking, $answers, $events ) = answering_dialog();
+	press( $asking->button('export'), 'Enter' );
+	ok !$asking->is_open, 'pressing a button closes the dialog';
+	is $answers, [ [ 'export', {}, 0 ] ], 'and answers with its id';
+	is $events,  [qw(Close Answer)],      'after Close';
+	ref_is $ui->interaction->get_focused_widget, $behind, 'with the focus back';
+
+	( $asking, $answers ) = answering_dialog();
+	press( $asking->button('export'), 'Escape' );
+	is $answers, [ [ 'cancel', {}, 1 ] ], 'Escape answers cancel, dismissed';
+
+	( $asking, $answers ) = answering_dialog();
+	$asking->answer( export => path => '/tmp/x.csv' );
+	is $answers, [ [ 'export', { path => '/tmp/x.csv' }, 0 ] ], 'answer carries the values given';
+	like dies { $asking->answer('export') }, qr/answer needs an open dialog/, 'a closed dialog cannot answer';
+	$asking->open($ui);
+	like dies { $asking->answer('nope') }, qr/the dialog has no button with the id 'nope'/, 'nor with an id that is no button';
+	$asking->close;
+	is $answers->[-1], [ 'cancel', {}, 1 ], 'close dismisses';
+
+	my $plain = Term::Fabulous::Widget::Dialog->new;
+	my @plain;
+	$plain->on( Answer => sub ($event) { push @plain, [ $event->button, $event->dismissed ]; return } );
+	$plain->open($ui);
+	$plain->answer('done');
+	is \@plain, [ [ 'done', 0 ] ], 'a dialog without buttons answers with any id';
+};
+
+subtest 'a dialog on the right' => sub {
+	my ($asking) = answering_dialog( placement => 'right' );
+	my $box = $ui->bounding_box($asking);
+	is $box->{x} + $box->{width},    29,                   'it ends a column before the right edge';
+	is $asking->floating->{z_index}, $asking->z_index + 1, 'over its backdrop';
+	$asking->z_index(50);
+	is $asking->floating->{z_index}, 51, 'also when the z_index changes';
+	$asking->placement('center');
+	is $asking->floating, undef, 'back in the middle it does not float';
+	$asking->close;
+	like dies { Term::Fabulous::Widget::Dialog->new( placement => 'left' ) }, qr/placement must be one of center, right, got 'left'/, 'an unknown placement dies';
 };
 
 subtest 'KDL properties' => sub {
@@ -249,9 +363,13 @@ Dialog "about" {
 	backdrop_color "#000000"
 	z_index 7
 	close_on_escape #false
+	title "About"
+	notice_line row
+	placement right
 }
 KDL
-	is [ $built->backdrop_color, $built->z_index, $built->close_on_escape ], [ [ 0, 0, 0, 255 ], 7, 0 ], 'all three properties';
+	is [ $built->backdrop_color, $built->z_index, $built->close_on_escape ], [ [ 0, 0, 0, 255 ], 7, 0 ], 'backdrop_color, z_index and close_on_escape';
+	is [ $built->title, $built->notice_line, $built->placement ], [ 'About', 'row', 'right' ], 'title, notice_line and placement';
 };
 
 done_testing;

@@ -5,7 +5,7 @@ use warnings;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 use Object::Pad 0.825;
 
@@ -186,7 +186,9 @@ The command with an id. Dies for an id the table has no command of.
 	}
 
 Every command, in the order they were added. A list of keys for a
-help screen comes from here.
+help screen comes from here, or from
+L<Term::Fabulous::Widget::KeyReference/command_rows>, which makes the
+rows of a key reference from it.
 
 =head2 command_for_key
 
@@ -220,6 +222,6 @@ table.
 
 L<Term::Fabulous::Command>, L<Term::Fabulous::Widget::MenuBar>,
 L<Term::Fabulous::Widget::Menu>, L<Term::Fabulous::Manual::Menus>,
-L<Term::Fabulous::Cookbook::Menus>.
+L<Term::Fabulous::Cookbook::Menus>, L<Term::Fabulous::Widget::KeyReference>.
 
 =cut

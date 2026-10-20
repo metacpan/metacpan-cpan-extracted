@@ -44,6 +44,11 @@ class Button :strict(params)
 	:does(Clay::UI::Role::Layout::HasFloating)
 {}
 
+class PressableText :strict(params)
+	:does(Clay::UI::Text)
+	:does(Clay::UI::Role::Interaction::Pressable)
+{}
+
 class ScrollPanel :strict(params)
 	:does(Clay::UI::Role::Layout::HasScroll)
 	:does(Clay::UI::Role::Layout::HasLayout)
@@ -204,6 +209,29 @@ subtest 'a removed widget added to another parent renders and is hovered again' 
 	pointer($ui, 80, 10);
 	is( \@log, [ 'hb:OnHoverStart', 'hb:OnHoverStopped', 'hb:OnHoverStart' ], 'it is hovered at its new place' );
 	is( $box->is_hovered, 1, 'is_hovered agrees' );
+};
+
+subtest 'text widgets are under the pointer and can be hovered and pressed' => sub {
+	my $plain = Clay::UI::Test::Text->new(text => 'plain');
+	my $label = PressableText->new(text => 'label');
+	my $box   = HoverBox->new(id => 'box', layout => { %{ fixed(100, 100) }, layout_direction => CLAY_TOP_TO_BOTTOM });
+	$box->add_child($plain, $label);
+	my @log;
+	$label->on($_, sub ($event) { push @log, $event->name; return }) for qw(OnHoverStart OnPress OnHoverStopped);
+	my $ui = make_ui(page($box));
+	$ui->render;
+
+	pointer($ui, 0.5, 0.5);
+	is( [ map { refaddr $_ } @{ $ui->interaction->under_pointer } ], [ map { refaddr $_ } $box->parent, $box, $plain ],
+		'a plain text widget is under the pointer' );
+	ok( !$label->is_hovered, 'the pressable text beside it is not hovered' );
+
+	pointer($ui, 0.5, 1.5);
+	ok( $label->is_hovered, 'the pointer over the pressable text hovers it' );
+	pointer($ui, 0.5, 1.5, 1);
+	pointer($ui, 0.5, 1.5);
+	pointer($ui, 50, 50);
+	is( \@log, [qw(OnHoverStart OnPress OnHoverStopped)], 'and it gets the events of an element' );
 };
 
 subtest 'hover events do not bubble' => sub {

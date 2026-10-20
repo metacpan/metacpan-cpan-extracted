@@ -51,6 +51,9 @@ subtest 'items and how they look' => sub {
 	is row_text( $menu, 3 ), " \x{2713} Wrap            ", 'a toggle that is on shows its check mark';
 	is $menu->highlighted,   0,                            'the first enabled item is highlighted';
 	ok $menu->bordered->{top}, 'a menu has a border from the theme';
+	ok( ( !grep { !defined $menu->$_ } qw(keys_color separator_color highlight_text_color highlight_background_color) ), 'the color accessors read the theme' );
+	$menu->separator_color('#ff0000');
+	ok $menu->has_look_override('separator_color'), 'and set a color of their own';
 };
 
 subtest 'keys move over enabled items and choose' => sub {
@@ -199,8 +202,11 @@ subtest 'checks' => sub {
 	my $label = Term::Fabulous::Widget::Text->new( text => 'a label' );
 	$root->add_child($label);
 	$ui->step;
-	like dies { $menu->open( $ui, below => $label ) }, qr/below needs a widget that the last frame drew; a text has no box of its own/, 'a text has no box to open below';
+	ok lives { $menu->open( $ui, below => $label ) }, 'a text is a widget the frame drew, so a menu opens below it';
+	$menu->close;
 	$root->remove_child($label);
+	like dies { $menu->open( $ui, below => Term::Fabulous::Widget::Text->new( text => 'never drawn' ) ) }, qr/below needs a widget that the last frame drew/,
+		'a widget the frame did not draw has no box';
 	like dies { $menu->highlight(9) }, qr/there is no item 9/, 'highlight past the end dies';
 	my $box = Term::Fabulous::Widget::Box->new;
 	$box->add_child($menu);

@@ -2,7 +2,7 @@ use v5.40;
 use feature 'class';
 no warnings 'experimental::class';
 #
-class Alien::Xrepo::Build v1.0.9 {
+class Alien::Xrepo::Build v1.0.10 {
     use Alien::Xrepo;
     use Alien::Xrepo::Build::Recipe;
     use Path::Tiny;
@@ -66,7 +66,7 @@ class Alien::Xrepo::Build v1.0.9 {
     method has_hook ($stage) { return $hooks->{$stage} && @{ $hooks->{$stage} } ? 1 : 0 }
 
     method run_hooks ($stage) {
-        $self->$_($self) for @{ $hooks->{$stage} // [] };
+        $_->($self) for @{ $hooks->{$stage} // [] };
         return;
     }
 
@@ -88,7 +88,13 @@ class Alien::Xrepo::Build v1.0.9 {
             $file->remove if -e $file;
         }
         my @failed = sort keys %$errors;
-        die 'Alien::Xrepo: failed to install ' . join( ', ', @failed ) . ":\n" . join( "\n", map {"  $_: $errors->{$_}"} @failed ) . "\n";
+        my $fatal  = grep { $errors->{$_}{fatal} // 0 } @failed;
+        my $line
+            = 'Alien::Xrepo: failed to install ' .
+            join( ', ', @failed ) . ":\n" .
+            join( "\n", map { "  $_: " . ( ref $errors->{$_} eq 'HASH' ? $errors->{$_}{error} : $errors->{$_} ) } @failed ) . "\n";
+        $fatal ? die $line : warn $line;
+        $self;    # In case it's non-fatal...
     }
 
     method configure (%opts) {
@@ -193,7 +199,7 @@ class Alien::Xrepo::Build v1.0.9 {
                     next;
                 }
                 warn "[!] $name failed to install: $@\n";
-                $runtime_prop->{errors}{$name} = "$@";
+                $runtime_prop->{errors}{$name} //= { name => $name, error => "$@", fatal => $recipe->required($name) };
                 last;
             }
             if ( ref $info eq 'Alien::Xrepo::PackageInfo' ) {
@@ -229,7 +235,7 @@ class Alien::Xrepo::Build v1.0.9 {
 
             if ($@) {
                 warn "[!] $name could not be gathered: $@\n";
-                $runtime_prop->{errors}{$name} //= "$@";
+                $runtime_prop->{errors}{$name} //= { name => $name, error => "$@", fatal => $recipe->required($name) };
                 next;
             }
             if ( ref $info eq 'Alien::Xrepo::PackageInfo' ) {

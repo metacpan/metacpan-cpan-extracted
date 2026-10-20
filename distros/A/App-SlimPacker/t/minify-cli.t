@@ -68,6 +68,19 @@ is $rc, 0, 'minify --no-rename exits 0';
 like $out, qr/\$longname/, 'minify --no-rename keeps variable names';
 unlike $out, qr/trailing comment/, 'minify --no-rename still strips comments';
 
+# -- --rename matches the default (both spellings negatable)
+my ($ren_out, $ren_rc) = run_cli($CLI, 'minify', '--rename', "$TD/hello.pl");
+is $ren_rc, 0, 'minify --rename exits 0';
+unlike $ren_out, qr/\$longname/, 'minify --rename renames variables (like default)';
+
+# -- --no-rewrite and --rewrite are both accepted (rewrite is off by default)
+my ($def_out) = run_cli($CLI, 'minify', "$TD/hello.pl");
+($out, $rc) = run_cli($CLI, 'minify', '--rewrite', "$TD/hello.pl");
+is $rc, 0, 'minify --rewrite exits 0';
+($out, $rc) = run_cli($CLI, 'minify', '--no-rewrite', "$TD/hello.pl");
+is $rc, 0, 'minify --no-rewrite exits 0';
+is $out, $def_out, 'minify --no-rewrite matches the default (off) output';
+
 # -- -o writes a file (single input)
 ($out, $rc) = run_cli($CLI, 'minify', '-o', "$TD/out.pl", "$TD/hello.pl");
 is $rc, 0, 'minify -o exits 0';

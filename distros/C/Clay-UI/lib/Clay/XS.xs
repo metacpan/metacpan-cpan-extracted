@@ -55,6 +55,9 @@
  * Constants: every member of every group in src/clay_perl_enums.h, in
  * declaration order. BOOT installs them as constant subs under Clay::XS::,
  * and Clay::XS::_constant_names returns their names for @EXPORT_OK.
+ * constant_groups describes the groups in the same order, so each group's
+ * members are the next member_count entries of all_constants;
+ * Clay::XS::_constant_groups returns them for t/00-load.t.
  * ======================================================================== */
 
 typedef struct {
@@ -63,9 +66,25 @@ typedef struct {
 } clay_perl_constant;
 
 #define CLAY_PERL_CONSTANT(member) { #member, (IV) (member) },
-#define CLAY_PERL_GROUP_CONSTANTS(group) CLAY_PERL_ENUM_##group(CLAY_PERL_CONSTANT)
+#define CLAY_PERL_GROUP_CONSTANTS(group, type) CLAY_PERL_ENUM_##group(CLAY_PERL_CONSTANT)
 static const clay_perl_constant all_constants[] = {
     CLAY_PERL_ENUMS(CLAY_PERL_GROUP_CONSTANTS, CLAY_PERL_GROUP_CONSTANTS)
+};
+
+typedef struct {
+    const char *name;
+    const char *type;
+    const char *kind;
+    size_t      member_count;
+} clay_perl_constant_group;
+
+#define CLAY_PERL_COUNT_MEMBER(member) + 1
+#define CLAY_PERL_GROUP(group, type, kind) \
+    { #group, #type, (kind), 0 CLAY_PERL_ENUM_##group(CLAY_PERL_COUNT_MEMBER) },
+#define CLAY_PERL_SEQUENCE_GROUP(group, type) CLAY_PERL_GROUP(group, type, "sequence")
+#define CLAY_PERL_FLAGS_GROUP(group, type)    CLAY_PERL_GROUP(group, type, "flags")
+static const clay_perl_constant_group constant_groups[] = {
+    CLAY_PERL_ENUMS(CLAY_PERL_SEQUENCE_GROUP, CLAY_PERL_FLAGS_GROUP)
 };
 
 /* ===========================================================================
@@ -74,7 +93,8 @@ static const clay_perl_constant all_constants[] = {
  * Every exported Clay::XS function has one descriptor in
  * CLAY_PERL_WRAPPERS below; wrapper_enter and wrapper_leave apply it, and
  * Clay::XS::_wrapper_guards returns the whole table. lib/Clay/XS.pm builds
- * @EXPORT_OK from its names, and t/19 checks the POD against it. The
+ * @EXPORT_OK from its names, t/19 checks the POD against it, and t/18
+ * and t/19 test every row's context, frame, counts and mutates guard. The
  * internal XSUBs (names starting with _) are not exported and have none.
  *
  *   context  CURRENT:  croaks unless clay_perl_current_ctx (which mirrors
@@ -271,43 +291,148 @@ static void wrapper_leave(pTHX_ const clay_perl_wrapper *w, clay_perl_context *c
 }
 
 /* ===========================================================================
- * Capacity validation shared by Clay_Initialize and the count setters.
+ * Capacity: the element and measure-cache word counts a context is sized
+ * for. Every count rule lives in this section: the ranges, the 32-word
+ * minimum, the bucket rule, the 4 GiB bound, the default word count of
+ * explicit counts and the memory the counts need.
+ *
+ * Clay_MinMemorySize and Clay_Initialize take explicit counts (a hash,
+ * parse_counts) or, as in C, the configured ones: those of Clay's current
+ * context, else Clay's process-wide defaults. Explicit counts reach Clay
+ * without touching either (src/clay_impl.c). The count setters check
+ * what they would configure.
  * ======================================================================== */
 
 #define MIN_MEASURE_TEXT_CACHE_WORDS 32
 
+typedef struct {
+    int32_t element_count;
+    int32_t word_count;
+} capacity_counts;
+
 /* Clay's arena size arithmetic is 32-bit and wraps silently; counts whose
  * arena would not fit 4 GiB corrupt memory instead of failing. */
-static void require_counts_fit(pTHX_ const char *func, int32_t element_count, int32_t word_count)
+static void require_counts_fit(pTHX_ const char *func, capacity_counts counts)
 {
-    uint64_t needed = clay_perl_clay_arena_bytes_upper_bound(element_count, word_count);
+    uint64_t needed = clay_perl_clay_arena_bytes_upper_bound(counts.element_count, counts.word_count);
     if (needed > (uint64_t) UINT32_MAX) {
         croak("%s: %d elements and %d measure-cache words need about %.0f bytes of arena; "
               "Clay's arena arithmetic is limited to 4 GiB",
-              func, (int) element_count, (int) word_count, (double) needed);
+              func, (int) counts.element_count, (int) counts.word_count, (double) needed);
     }
 }
 
-/* The counts Clay_MinMemorySize and the next Clay_Initialize use: those of
- * Clay's current context, or Clay's defaults when there is none. */
-static void configured_counts(int32_t *element_count, int32_t *word_count)
+/* Croaks unless Clay_Initialize can size a context for the counts. Clay
+ * sizes its measure-cache hash buckets by word_count / 32 and indexes them
+ * by element, so there must be at least one bucket and no more buckets
+ * than elements; and the arena must fit. */
+static void require_initializable(pTHX_ const char *func, capacity_counts counts)
 {
+    require_counts_fit(aTHX_ func, counts);
+    /* Only configured counts can have too few words: Clay_SetMaxElementCount
+     * without a context sets them to 2 x elements, past the setter's minimum. */
+    if (counts.word_count < MIN_MEASURE_TEXT_CACHE_WORDS) {
+        croak("%s: %d measure-cache words are below the minimum of %d "
+              "(without a context, Clay_SetMaxElementCount sets them to 2 x elements; "
+              "call Clay_SetMaxMeasureTextCacheWordCount afterwards)",
+              func, (int) counts.word_count, MIN_MEASURE_TEXT_CACHE_WORDS);
+    }
+    if (counts.word_count / MIN_MEASURE_TEXT_CACHE_WORDS > counts.element_count) {
+        croak("%s: %d measure-cache words need %d hash buckets but only %d elements "
+              "are configured; Clay would index its measure cache out of bounds",
+              func, (int) counts.word_count, (int) (counts.word_count / MIN_MEASURE_TEXT_CACHE_WORDS),
+              (int) counts.element_count);
+    }
+}
+
+/* The counts Clay uses without explicit ones: those of Clay's current
+ * context, or Clay's defaults when there is none. */
+static capacity_counts configured_counts(void)
+{
+    capacity_counts counts;
     if (Clay_GetCurrentContext()) {
-        *element_count = Clay_GetMaxElementCount();
-        *word_count    = Clay_GetMaxMeasureTextCacheWordCount();
+        counts.element_count = Clay_GetMaxElementCount();
+        counts.word_count    = Clay_GetMaxMeasureTextCacheWordCount();
     } else {
-        clay_perl_clay_default_counts(element_count, word_count);
+        clay_perl_clay_default_counts(&counts.element_count, &counts.word_count);
     }
+    return counts;
 }
 
-static int32_t parse_count(pTHX_ SV *sv, const char *func, int32_t minimum)
+static int32_t parse_count(pTHX_ SV *sv, const char *what, int32_t minimum)
 {
-    return (int32_t) clay_perl_parse_integer(aTHX_ sv, func, (NV) minimum, (NV) INT32_MAX);
+    return (int32_t) clay_perl_parse_integer(aTHX_ sv, what, (NV) minimum, (NV) INT32_MAX);
+}
+
+/* Twice the element count: the word count Clay_SetMaxElementCount gives
+ * Clay's defaults, and the base of default_word_count. */
+static int32_t twice_element_count(pTHX_ const char *func, int32_t element_count)
+{
+    if (element_count > INT32_MAX / 2) {
+        croak("%s: %d elements would overflow the default measure-cache word count (2 x elements)",
+              func, (int) element_count);
+    }
+    return element_count * 2;
+}
+
+/* The word count of explicit counts without one: twice the elements, and
+ * at least the minimum. */
+static int32_t default_word_count(pTHX_ const char *func, int32_t element_count)
+{
+    int32_t words = twice_element_count(aTHX_ func, element_count);
+    return words > MIN_MEASURE_TEXT_CACHE_WORDS ? words : MIN_MEASURE_TEXT_CACHE_WORDS;
+}
+
+/* A defined value of the counts hash, or NULL. */
+static SV *counts_value(pTHX_ HV *hv, const char *key)
+{
+    SV **slot = hv_fetch(hv, key, (I32) strlen(key), 0);
+    if (!slot) return NULL;
+    SvGETMAGIC(*slot);
+    return SvOK(*slot) ? *slot : NULL;
+}
+
+/* Explicit counts: { maxElementCount => n, maxMeasureTextCacheWordCount => m },
+ * the element count required, the word count default_word_count. Unknown
+ * keys and values out of range croak; the counts are initializable. */
+static capacity_counts parse_counts(pTHX_ HV *hv, const char *func)
+{
+    static const char element_key[] = "maxElementCount";
+    static const char word_key[]    = "maxMeasureTextCacheWordCount";
+
+    HE *entry;
+    hv_iterinit(hv);
+    while ((entry = hv_iternext(hv))) {
+        const char *key = SvPV_nolen(hv_iterkeysv(entry));
+        if (strNE(key, element_key) && strNE(key, word_key)) {
+            croak("%s: counts: unknown key '%s'; the keys are %s and %s", func, key, element_key, word_key);
+        }
+    }
+
+    capacity_counts counts;
+    SV *elements = counts_value(aTHX_ hv, element_key);
+    if (!elements) croak("%s: counts: %s is required", func, element_key);
+    counts.element_count = parse_count(aTHX_ elements,
+                                       SvPV_nolen(sv_2mortal(newSVpvf("%s: counts: %s", func, element_key))), 1);
+    SV *words = counts_value(aTHX_ hv, word_key);
+    counts.word_count = words
+        ? parse_count(aTHX_ words, SvPV_nolen(sv_2mortal(newSVpvf("%s: counts: %s", func, word_key))),
+                      MIN_MEASURE_TEXT_CACHE_WORDS)
+        : default_word_count(aTHX_ func, counts.element_count);
+    require_initializable(aTHX_ func, counts);
+    return counts;
+}
+
+/* The bytes Clay needs for the counts; they must have passed
+ * require_counts_fit, below which the size is exact. */
+static uint32_t min_memory_size(capacity_counts counts)
+{
+    return clay_perl_clay_min_memory_size(counts.element_count, counts.word_count);
 }
 
 /* The capacity argument of Clay_Initialize: a non-negative integer of at
- * least Clay_MinMemorySize() bytes. */
-static size_t parse_capacity(pTHX_ SV *sv)
+ * least the memory the counts need. */
+static size_t parse_capacity(pTHX_ SV *sv, capacity_counts counts)
 {
     SvGETMAGIC(sv);
     NV bytes = (SvOK(sv) && (!SvROK(sv) || SvAMAGIC(sv)) && looks_like_number(sv))
@@ -317,10 +442,11 @@ static size_t parse_capacity(pTHX_ SV *sv)
         croak("Clay_Initialize: capacity must be a non-negative integer number of bytes, got '%" SVf "'",
               SVfARG(sv));
     }
-    uint32_t minimum = Clay_MinMemorySize();
+    uint32_t minimum = min_memory_size(counts);
     if (bytes < (NV) minimum) {
-        croak("Clay_Initialize: capacity %.0f is below Clay_MinMemorySize() = %u bytes",
-              (double) bytes, (unsigned) minimum);
+        croak("Clay_Initialize: capacity %.0f is below Clay_MinMemorySize() = %u bytes for %d elements "
+              "and %d measure-cache words",
+              (double) bytes, (unsigned) minimum, (int) counts.element_count, (int) counts.word_count);
     }
     return (size_t) bytes;
 }
@@ -367,10 +493,10 @@ static UV scroll_position_writes = 0;
 
 /* ===========================================================================
  * The dispatcher the trampolines call (clay_perl_dispatcher): an anonymous
- * XSUB with the body of Clay::XS::_dispatch, one per interpreter, kept in
- * its MY_CXT for the interpreter's lifetime. CLONE runs with the new
- * thread's interpreter but on the creating OS thread, so this cannot be a
- * thread-local variable.
+ * XSUB from src/callbacks.c (clay_perl_new_dispatcher), one per
+ * interpreter, kept in its MY_CXT for the interpreter's lifetime. CLONE
+ * runs with the new thread's interpreter but on the creating OS thread,
+ * so this cannot be a thread-local variable.
  * ======================================================================== */
 
 #define MY_CXT_KEY "Clay::XS::_guts" XS_VERSION
@@ -380,16 +506,6 @@ typedef struct {
 } my_cxt_t;
 
 START_MY_CXT
-
-/* The C body of the Clay::XS::_dispatch XSUB, taken from it by BOOT
- * before any Perl code could replace the glob. Process-wide: every
- * interpreter runs the same code. */
-static XSUBADDR_t dispatch_body = NULL;
-
-static CV *new_dispatcher(pTHX)
-{
-    return newXS(NULL, dispatch_body, __FILE__);
-}
 
 CV *clay_perl_dispatcher(pTHX)
 {
@@ -408,10 +524,9 @@ BOOT:
     for (i = 0; i < sizeof(all_constants) / sizeof(all_constants[0]); i++) {
         newCONSTSUB(stash, all_constants[i].name, newSViv(all_constants[i].value));
     }
-    dispatch_body = CvXSUB(get_cv("Clay::XS::_dispatch", 0));
     {
         MY_CXT_INIT;
-        MY_CXT.dispatcher = new_dispatcher(aTHX);
+        MY_CXT.dispatcher = clay_perl_new_dispatcher(aTHX);
     }
 }
 
@@ -420,23 +535,32 @@ BOOT:
 # =============================================================================
 
 uint32_t
-xs_Clay_MinMemorySize()
+xs_Clay_MinMemorySize(counts_sv = &PL_sv_undef)
+        SV *counts_sv
     PREINIT:
-        int32_t element_count;
-        int32_t word_count;
+        HV *counts_hv;
+        capacity_counts counts;
     CODE:
-        configured_counts(&element_count, &word_count);
-        require_counts_fit(aTHX_ "Clay_MinMemorySize", element_count, word_count);
-        RETVAL = Clay_MinMemorySize();
+        /* Like C, the configured counts are sized even when Clay_Initialize
+         * would refuse them; explicit counts must be initializable. */
+        counts_hv = clay_perl_optional_hash(aTHX_ counts_sv, "Clay_MinMemorySize: counts");
+        if (counts_hv) {
+            counts = parse_counts(aTHX_ counts_hv, "Clay_MinMemorySize");
+        } else {
+            counts = configured_counts();
+            require_counts_fit(aTHX_ "Clay_MinMemorySize", counts);
+        }
+        RETVAL = min_memory_size(counts);
     OUTPUT:
         RETVAL
 
 SV *
-xs_Clay_Initialize(capacity_sv, dimensions_sv, error_handler_sv = &PL_sv_undef, error_userdata_sv = &PL_sv_undef)
+xs_Clay_Initialize(capacity_sv, dimensions_sv, error_handler_sv = &PL_sv_undef, error_userdata_sv = &PL_sv_undef, counts_sv = &PL_sv_undef)
         SV *capacity_sv
         SV *dimensions_sv
         SV *error_handler_sv
         SV *error_userdata_sv
+        SV *counts_sv
     PREINIT:
         clay_perl_context *ctx;
         clay_perl_context *previous_ctx;
@@ -445,31 +569,22 @@ xs_Clay_Initialize(capacity_sv, dimensions_sv, error_handler_sv = &PL_sv_undef, 
         Clay_ErrorHandler handler;
         SV *error_handler;
         size_t capacity;
-        int32_t element_count;
-        int32_t word_count;
+        HV *counts_hv;
+        capacity_counts counts;
         SV *failure;
     CODE:
         /* Pinned by the guard; it is restored if initialisation fails. */
         previous_ctx  = wrapper_enter(aTHX_ &GUARD_Clay_Initialize);
         previous_clay = Clay_GetCurrentContext();
-        configured_counts(&element_count, &word_count);
-        require_counts_fit(aTHX_ "Clay_Initialize", element_count, word_count);
-        /* Clay_SetMaxElementCount without a context sets the word count to
-         * 2 x elements, past the setter's minimum; Clay divides by
-         * word_count / 32. */
-        if (word_count < MIN_MEASURE_TEXT_CACHE_WORDS) {
-            croak("Clay_Initialize: %d measure-cache words are below the minimum of %d "
-                  "(without a context, Clay_SetMaxElementCount sets them to 2 x elements; "
-                  "call Clay_SetMaxMeasureTextCacheWordCount afterwards)",
-                  (int) word_count, MIN_MEASURE_TEXT_CACHE_WORDS);
-        }
-        if (word_count / MIN_MEASURE_TEXT_CACHE_WORDS > element_count) {
-            croak("Clay_Initialize: %d measure-cache words need %d hash buckets but only %d elements "
-                  "are configured; Clay would index its measure cache out of bounds",
-                  (int) word_count, (int) (word_count / MIN_MEASURE_TEXT_CACHE_WORDS), (int) element_count);
+        counts_hv     = clay_perl_optional_hash(aTHX_ counts_sv, "Clay_Initialize: counts");
+        if (counts_hv) {
+            counts = parse_counts(aTHX_ counts_hv, "Clay_Initialize");
+        } else {
+            counts = configured_counts();
+            require_initializable(aTHX_ "Clay_Initialize", counts);
         }
 
-        capacity      = parse_capacity(aTHX_ capacity_sv);
+        capacity      = parse_capacity(aTHX_ capacity_sv, counts);
         dim           = clay_dimensions_from_sv(aTHX_ dimensions_sv, "Clay_Initialize: dimensions");
         error_handler = clay_perl_require_code(aTHX_ error_handler_sv, "Clay_Initialize: error handler", true);
 
@@ -481,7 +596,8 @@ xs_Clay_Initialize(capacity_sv, dimensions_sv, error_handler_sv = &PL_sv_undef, 
 
         handler.errorHandlerFunction = clay_perl_error_handler_trampoline;
         handler.userData             = ctx;
-        ctx->clay_ctx = Clay_Initialize(ctx->clay_arena, dim, handler);
+        ctx->clay_ctx = clay_perl_clay_initialize(ctx->clay_arena, dim, handler,
+                                                  counts.element_count, counts.word_count);
         if (clay_perl_pending_exit.pending) {
             /* The error handler called exit: the new context never becomes
              * current (and is not freed, which could run Perl code). */
@@ -644,7 +760,7 @@ xs_Clay__ConfigureOpenElement(decl_sv)
         Clay__ConfigureOpenElement(decl);
         wrapper_leave(aTHX_ &GUARD_Clay__ConfigureOpenElement, ctx);
 
-void
+SV *
 xs_Clay__OpenTextElement(text_sv, config_sv = &PL_sv_undef)
         SV *text_sv
         SV *config_sv
@@ -652,13 +768,18 @@ xs_Clay__OpenTextElement(text_sv, config_sv = &PL_sv_undef)
         clay_perl_context *ctx;
         Clay_String text;
         Clay_TextElementConfig config;
+        Clay_ElementId id;
+        bool has_id;
     CODE:
         ctx    = wrapper_enter(aTHX_ &GUARD_Clay__OpenTextElement);
         config = clay_text_element_config_from_sv(aTHX_ config_sv);
         text   = clay_perl_arena_copy_text(aTHX_ ctx, text_sv, "Clay__OpenTextElement");
         clay_perl_frame_text_element_opened(ctx);
-        Clay__OpenTextElement(text, config);
+        has_id = clay_perl_clay_open_text_element(text, config, &id);
         wrapper_leave(aTHX_ &GUARD_Clay__OpenTextElement, ctx);
+        RETVAL = has_id ? clay_element_id_to_sv(aTHX_ id) : &PL_sv_undef;
+    OUTPUT:
+        RETVAL
 
 # =============================================================================
 # Element ids. Hashing needs no context.
@@ -828,15 +949,14 @@ xs_Clay_OnHover(cb_sv, userdata_sv = &PL_sv_undef)
         cb = clay_perl_require_code(aTHX_ cb_sv, "Clay_OnHover: callback", false);
         /* Past the element cap Clay dropped the open element; the element
          * Clay_GetOpenElementId names is its parent (or none). */
-        if (clay_perl_clay_max_elements_exceeded()) {
-            XSRETURN_EMPTY;
+        if (!clay_perl_clay_max_elements_exceeded()) {
+            open_id = Clay_GetOpenElementId();
+            if (open_id == 0) {
+                croak("Clay_OnHover: the open element has no id");
+            }
+            clay_perl_hover_register(aTHX_ ctx, open_id, cb, userdata_sv);
+            Clay_OnHover(clay_perl_on_hover_trampoline, ctx);
         }
-        open_id = Clay_GetOpenElementId();
-        if (open_id == 0) {
-            croak("Clay_OnHover: the open element has no id");
-        }
-        clay_perl_hover_register(aTHX_ ctx, open_id, cb, userdata_sv);
-        Clay_OnHover(clay_perl_on_hover_trampoline, ctx);
         wrapper_leave(aTHX_ &GUARD_Clay_OnHover, ctx);
 
 bool
@@ -1038,13 +1158,10 @@ IV
 xs_Clay_GetMaxElementCount()
     PREINIT:
         clay_perl_context *ctx;
-        int32_t element_count;
-        int32_t word_count;
     CODE:
         ctx = wrapper_enter(aTHX_ &GUARD_Clay_GetMaxElementCount);
-        configured_counts(&element_count, &word_count);
+        RETVAL = (IV) configured_counts().element_count;
         wrapper_leave(aTHX_ &GUARD_Clay_GetMaxElementCount, ctx);
-        RETVAL = (IV) element_count;
     OUTPUT:
         RETVAL
 
@@ -1053,34 +1170,25 @@ xs_Clay_SetMaxElementCount(count_sv)
         SV *count_sv
     PREINIT:
         clay_perl_context *ctx;
-        int32_t count;
+        capacity_counts counts;
     CODE:
-        ctx   = wrapper_enter(aTHX_ &GUARD_Clay_SetMaxElementCount);
-        count = parse_count(aTHX_ count_sv, "Clay_SetMaxElementCount", 1);
-        if (!ctx) {
-            /* Clay derives the default word count from the element count. */
-            if (count > INT32_MAX / 2) {
-                croak("Clay_SetMaxElementCount: %d elements would overflow Clay's default "
-                      "measure-cache word count (2 x elements)", (int) count);
-            }
-            require_counts_fit(aTHX_ "Clay_SetMaxElementCount", count, count * 2);
-        } else {
-            require_counts_fit(aTHX_ "Clay_SetMaxElementCount", count, Clay_GetMaxMeasureTextCacheWordCount());
-        }
-        Clay_SetMaxElementCount(count);
+        ctx    = wrapper_enter(aTHX_ &GUARD_Clay_SetMaxElementCount);
+        counts = configured_counts();
+        counts.element_count = parse_count(aTHX_ count_sv, "Clay_SetMaxElementCount", 1);
+        /* Without a context Clay derives its default word count from it. */
+        if (!ctx) counts.word_count = twice_element_count(aTHX_ "Clay_SetMaxElementCount", counts.element_count);
+        require_counts_fit(aTHX_ "Clay_SetMaxElementCount", counts);
+        Clay_SetMaxElementCount(counts.element_count);
         wrapper_leave(aTHX_ &GUARD_Clay_SetMaxElementCount, ctx);
 
 IV
 xs_Clay_GetMaxMeasureTextCacheWordCount()
     PREINIT:
         clay_perl_context *ctx;
-        int32_t element_count;
-        int32_t word_count;
     CODE:
         ctx = wrapper_enter(aTHX_ &GUARD_Clay_GetMaxMeasureTextCacheWordCount);
-        configured_counts(&element_count, &word_count);
+        RETVAL = (IV) configured_counts().word_count;
         wrapper_leave(aTHX_ &GUARD_Clay_GetMaxMeasureTextCacheWordCount, ctx);
-        RETVAL = (IV) word_count;
     OUTPUT:
         RETVAL
 
@@ -1089,19 +1197,14 @@ xs_Clay_SetMaxMeasureTextCacheWordCount(count_sv)
         SV *count_sv
     PREINIT:
         clay_perl_context *ctx;
-        int32_t count;
-        int32_t element_count;
-        int32_t unused_word_count;
+        capacity_counts counts;
     CODE:
-        ctx   = wrapper_enter(aTHX_ &GUARD_Clay_SetMaxMeasureTextCacheWordCount);
-        count = parse_count(aTHX_ count_sv, "Clay_SetMaxMeasureTextCacheWordCount", MIN_MEASURE_TEXT_CACHE_WORDS);
-        if (!ctx) {
-            clay_perl_clay_default_counts(&element_count, &unused_word_count);
-        } else {
-            element_count = Clay_GetMaxElementCount();
-        }
-        require_counts_fit(aTHX_ "Clay_SetMaxMeasureTextCacheWordCount", element_count, count);
-        Clay_SetMaxMeasureTextCacheWordCount(count);
+        ctx    = wrapper_enter(aTHX_ &GUARD_Clay_SetMaxMeasureTextCacheWordCount);
+        counts = configured_counts();
+        counts.word_count = parse_count(aTHX_ count_sv, "Clay_SetMaxMeasureTextCacheWordCount",
+                                        MIN_MEASURE_TEXT_CACHE_WORDS);
+        require_counts_fit(aTHX_ "Clay_SetMaxMeasureTextCacheWordCount", counts);
+        Clay_SetMaxMeasureTextCacheWordCount(counts.word_count);
         wrapper_leave(aTHX_ &GUARD_Clay_SetMaxMeasureTextCacheWordCount, ctx);
 
 SV *
@@ -1157,14 +1260,8 @@ SV *
 xs_sizing_fit(min_sv = &PL_sv_undef, max_sv = &PL_sv_undef)
         SV *min_sv
         SV *max_sv
-    PREINIT:
-        Clay_SizingAxis axis;
     CODE:
-        memset(&axis, 0, sizeof(axis));
-        axis.type = CLAY__SIZING_TYPE_FIT;
-        axis.size.minMax.min = (float) clay_perl_parse_float_or(aTHX_ min_sv, "sizing_fit: min", 0.0);
-        axis.size.minMax.max = (float) clay_perl_parse_max_float_or(aTHX_ max_sv, "sizing_fit: max", 0.0);
-        RETVAL = clay_sizing_axis_to_sv(aTHX_ axis);
+        RETVAL = clay_sizing_axis_to_sv(aTHX_ clay_sizing_min_max_axis(aTHX_ CLAY__SIZING_TYPE_FIT, min_sv, max_sv, "sizing_fit"));
     OUTPUT:
         RETVAL
 
@@ -1172,14 +1269,8 @@ SV *
 xs_sizing_grow(min_sv = &PL_sv_undef, max_sv = &PL_sv_undef)
         SV *min_sv
         SV *max_sv
-    PREINIT:
-        Clay_SizingAxis axis;
     CODE:
-        memset(&axis, 0, sizeof(axis));
-        axis.type = CLAY__SIZING_TYPE_GROW;
-        axis.size.minMax.min = (float) clay_perl_parse_float_or(aTHX_ min_sv, "sizing_grow: min", 0.0);
-        axis.size.minMax.max = (float) clay_perl_parse_max_float_or(aTHX_ max_sv, "sizing_grow: max", 0.0);
-        RETVAL = clay_sizing_axis_to_sv(aTHX_ axis);
+        RETVAL = clay_sizing_axis_to_sv(aTHX_ clay_sizing_min_max_axis(aTHX_ CLAY__SIZING_TYPE_GROW, min_sv, max_sv, "sizing_grow"));
     OUTPUT:
         RETVAL
 
@@ -1202,13 +1293,8 @@ xs_sizing_fixed(size_sv)
 SV *
 xs_sizing_percent(percent_sv)
         SV *percent_sv
-    PREINIT:
-        Clay_SizingAxis axis;
     CODE:
-        memset(&axis, 0, sizeof(axis));
-        axis.type = CLAY__SIZING_TYPE_PERCENT;
-        axis.size.percent = (float) clay_perl_parse_float_in(aTHX_ percent_sv, "sizing_percent: percent", 0, 1);
-        RETVAL = clay_sizing_axis_to_sv(aTHX_ axis);
+        RETVAL = clay_sizing_axis_to_sv(aTHX_ clay_sizing_percent_axis(aTHX_ percent_sv, "sizing_percent"));
     OUTPUT:
         RETVAL
 
@@ -1262,49 +1348,6 @@ xs_corner_radius_all(radius_sv)
         RETVAL
 
 # =============================================================================
-# Internal: the single Perl entry point of every callback trampoline (see
-# src/callbacks.c). The trampolines call an anonymous copy of this XSUB
-# (clay_perl_dispatcher), never the glob. Called as _dispatch($callback,
-# @args) by a trampoline
-# that has published its dispatch kind and C result slot in
-# clay_perl_pending_dispatch; takes them (so no other call can), calls
-# $callback->(@args) and parses its return value into the slot. Any
-# exception propagates to the trampoline's G_EVAL. Called any other way,
-# it croaks.
-# =============================================================================
-
-void
-xs__dispatch(...)
-    PREINIT:
-        clay_perl_active_dispatch dispatch;
-        SV *callback;
-        SV *args_sv;
-        SV *ret;
-        I32 i;
-        int count;
-    PPCODE:
-        dispatch = clay_perl_pending_dispatch;
-        if (!dispatch.result || items < 1) {
-            croak("Clay::XS::_dispatch is internal to the Clay::XS callback trampolines");
-        }
-        clay_perl_pending_dispatch.result = NULL;
-        callback = ST(0);
-        args_sv  = items > 1 ? ST(1) : NULL;
-
-        PUSHMARK(SP);
-        for (i = 1; i < items; i++) {
-            XPUSHs(ST(i));
-        }
-        PUTBACK;
-        count = call_sv(callback, G_SCALAR);
-        SPAGAIN;
-        ret = count > 0 ? POPs : &PL_sv_undef;
-        PUTBACK;
-
-        clay_perl_dispatch_store_result(aTHX_ dispatch.kind, dispatch.result, ret, args_sv);
-        XSRETURN_EMPTY;
-
-# =============================================================================
 # Internal: a new thread's interpreter is a copy that BOOT never ran in and
 # that holds no copy of the anonymous dispatcher; give it its own.
 # =============================================================================
@@ -1314,7 +1357,7 @@ xs_CLONE(...)
     CODE:
         {
             MY_CXT_CLONE;
-            MY_CXT.dispatcher = new_dispatcher(aTHX);
+            MY_CXT.dispatcher = clay_perl_new_dispatcher(aTHX);
         }
 
 # =============================================================================
@@ -1363,6 +1406,34 @@ xs__constant_names()
         }
 
 # =============================================================================
+# Internal: every constant group, for the tests: { Group => { type => 'Clay_...',
+# kind => 'sequence' | 'flags', members => [ names in declaration order ] } }.
+# =============================================================================
+
+SV *
+xs__constant_groups()
+    PREINIT:
+        HV *groups;
+        size_t g, m, next_constant = 0;
+    CODE:
+        groups = newHV();
+        for (g = 0; g < sizeof(constant_groups) / sizeof(constant_groups[0]); g++) {
+            const clay_perl_constant_group *group = &constant_groups[g];
+            HV *description = newHV();
+            AV *members = newAV();
+            for (m = 0; m < group->member_count; m++, next_constant++) {
+                av_push(members, newSVpv(all_constants[next_constant].name, 0));
+            }
+            (void) hv_stores(description, "type",    newSVpv(group->type, 0));
+            (void) hv_stores(description, "kind",    newSVpv(group->kind, 0));
+            (void) hv_stores(description, "members", newRV_noinc((SV *) members));
+            (void) hv_store(groups, group->name, (I32) strlen(group->name), newRV_noinc((SV *) description), 0);
+        }
+        RETVAL = newRV_noinc((SV *) groups);
+    OUTPUT:
+        RETVAL
+
+# =============================================================================
 # Internal: every struct schema, for the tests (see clay_perl_struct_schemas
 # in src/clay_perl.h for the shape).
 # =============================================================================
@@ -1371,6 +1442,27 @@ SV *
 xs__struct_schemas()
     CODE:
         RETVAL = clay_perl_struct_schemas(aTHX);
+    OUTPUT:
+        RETVAL
+
+# =============================================================================
+# Internal: how many more elements the frame being declared can hold, for
+# Clay::UI's capacity error. Clay reserves the slots of the elements that
+# play an exit transition when a frame ends, for the next frame, so the
+# answer holds only between Clay_BeginLayout and Clay_EndLayout.
+# =============================================================================
+
+int
+xs__declarable_elements()
+    PREINIT:
+        clay_perl_context *ctx;
+    CODE:
+        ctx = clay_perl_current_ctx;
+        if (!ctx || !ctx->clay_ctx || ctx->layout_state != CLAY_PERL_LAYOUT_DECLARING) {
+            croak("Clay::XS::_declarable_elements: needs a frame being declared "
+                  "(between Clay_BeginLayout and Clay_EndLayout)");
+        }
+        RETVAL = clay_perl_clay_declarable_elements();
     OUTPUT:
         RETVAL
 

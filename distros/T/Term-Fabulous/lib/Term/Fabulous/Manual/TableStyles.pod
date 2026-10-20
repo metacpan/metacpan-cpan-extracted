@@ -54,8 +54,7 @@ and return C<[ $r, $g, $b, $a ]>.
 	text_color                [220, 223, 228]  text of the data cells, of the filter fields and of
 	                                           the pager; the scrollbar's thumb
 	header_text_color         [235, 238, 243]  text of the column titles
-	header_background_color   [ 36,  40,  50]  background of the column titles, also behind the
-	                                           line below them
+	header_background_color   [ 36,  40,  50]  background of the column titles
 	group_text_color          [ 97, 175, 239]  text of group headers
 	group_background_color    [ 28,  32,  41]  background of group headers and the column chooser
 	cursor_color              [ 52,  58,  72]  background of the cursor's line (while focused), of
@@ -86,7 +85,7 @@ C<hover> (default 1) turns the hover highlight on or off.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/example-table-directory.svg" alt="A staff directory: a grouped table with a search field above it, two rows selected, the cursor on a third row, a pager below and a details panel on the right"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.05/screenshots/example-table-directory.svg" alt="A staff directory: a grouped table with a search field above it, two rows selected, the cursor on a third row, a pager below and a details panel on the right"></p>
 
 =end html
 
@@ -310,7 +309,7 @@ clean.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-table-line-styles.svg" alt="Nine small tables with different lines: the default round frame, a full grid, no lines, a double frame with a heavy title line, a heavy frame with dashed row lines, ASCII lines, and Outer, Inner and Thick block frames"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.05/screenshots/cookbook-table-line-styles.svg" alt="Nine small tables with different lines: the default round frame, a full grid, no lines, a double frame with a heavy title line, a heavy frame with dashed row lines, ASCII lines, and Outer, Inner and Thick block frames"></p>
 
 =end html
 
@@ -333,11 +332,13 @@ table's own frame is the only one.
 =head2 Tables with colored backgrounds
 
 A thin line glyph (C<│>, C<─>) sits in the middle of its terminal cell,
-and the whole cell has one background color. So with colored cells
-(column titles on a background, striped rows, a highlighted row), the
-color of a cell next to a line also shows on the line's other side,
-half a cell beyond it: a highlighted row's color runs through the
-column lines, and the line under the titles sits inside the titles'
+and the whole cell has one background color. A line between cells of
+one color (the column lines of a highlighted row, the row lines of a
+colored column) takes that color, so the color runs through it. A line
+between cells of different colors (the line under the titles, the row
+lines above and below a highlighted row) takes the table's background
+(see L</Colors>) instead, so neither color reaches half a cell beyond
+it; so does every junction whose cells around it do not all share one
 color.
 
 For tables whose rows and titles have colors of their own, a frame in
@@ -360,7 +361,7 @@ titles from the rows and the rows from each other:
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-table-colors.svg" alt="A table with an Outer block frame, no inner lines, colored column titles, striped rows and a highlighted row whose color reaches the frame"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.05/screenshots/cookbook-table-colors.svg" alt="A table with an Outer block frame, no inner lines, colored column titles, striped rows and a highlighted row whose color reaches the frame"></p>
 
 =end html
 
@@ -369,8 +370,8 @@ the frame's cells, and the cells' colors fill the inner half up to the
 blocks; C<Inner> draws on the inner half,
 right next to the cells, with the background around the table on the
 outer half. Column lines can still be used with a block frame (they end
-at it), but they carry the cell colors as described at the start of
-this section.
+at it); they take the cell colors as described at the start of this
+section.
 The recipe
 L<A table with colored rows and titles|Term::Fabulous::Cookbook::TableStyles/A table with colored rows and titles (block frame, no grid lines)>
 has the complete program.
@@ -398,7 +399,7 @@ takes):
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-table-lines.svg" alt="A budget table: a heavy line and dashed lines in the Left column, negative amounts in red, a cancelled row in gray italics and a bold totals row under a double line"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.05/screenshots/cookbook-table-lines.svg" alt="A budget table: a heavy line and dashed lines in the Left column, negative amounts in red, a cancelled row in gray italics and a bold totals row under a double line"></p>
 
 =end html
 
@@ -426,10 +427,17 @@ level has one.
 A piece of line takes the C<border_color> of the cell that draws it:
 the cell to its right for a vertical line (the last cell of a row for
 the right side of the frame), and the cell below it for a horizontal
-line, with three exceptions: the column titles draw the line below
-them, the last row draws the bottom of the frame, and the row above a
-group header draws the line between them. So C<< border_color >> in a
-row style colors the line above the row and the lines left of its cells.
+line, with two exceptions: the column titles draw the line below
+them, and the row above a group header draws the line between them. So
+C<< border_color >> in a row style colors the line above the row and
+the lines left of its cells. The top of the frame without column
+titles and its bottom belong to no row: the table draws them in its
+C<line_color>, and they stay while the rows scroll. While the scrollbar
+column is shown, the frame's right side belongs to no row either and
+is drawn in the C<line_color> (see
+L<Term::Fabulous::Widget::Table::Borders/The scrollbar column>). Which
+cell draws which piece, in detail:
+L<Term::Fabulous::Widget::Table::Borders/Who draws it>.
 
 =head2 Cell padding
 
@@ -458,6 +466,9 @@ room, it gets smaller and its rows scroll: the column titles stay at
 the top, the rows scroll up and down below them, and sideways together
 with the titles. The frame stays around the visible part: its four
 sides stay at the edges of the table while the rows scroll inside it.
+A table with a C<grow> or C<percent> column does not scroll sideways:
+its columns get narrower instead, down to their longest word, and their
+text wraps (see L<Term::Fabulous::Manual::Tables/Column widths>).
 
 To make a table fill its parent, or take part of it, give it a sizing
 like any L<Term::Fabulous::Widget::Box> (see
@@ -479,29 +490,32 @@ the table's background shows to their right. A table higher than its
 lines shows its background below the last line (or the pager).
 
 The rows scroll with the mouse wheel over them (a horizontal wheel, or
-a sideways tilt, scrolls sideways) and follow the cursor: when the
-cursor moves out of sight, the rows scroll until its line is visible.
+a sideways tilt, scrolls sideways unless a column is C<grow> or
+C<percent>) and follow the cursor: when the cursor moves out of sight,
+the rows scroll until its line is visible.
 A new page starts at its top. From Perl, C<< $table->scroll_to_row($id) >>
 moves the cursor to a row and scrolls it into view.
 
-The I<scrollbar> is one column right of the frame. While the rows do
-not fit, it shows a track with a thumb for the visible part; clicking
-or dragging on it scrolls. C<< scrollbar => 0 >> removes it, and the
-column it takes. Its colors are the table's C<line_color> (the track)
-and C<text_color> (the thumb); see
+While the rows do not fit, a I<scrollbar> column appears inside the
+frame, right of the last column and without a line of its own: the
+scrollbar shows a track with a thumb for the visible part, and
+clicking or dragging on it scrolls. The column goes away when the rows
+fit again, so a table that does not scroll is exactly as wide as its
+columns. C<< scrollbar => 0 >> never shows it. Its colors are the
+table's C<line_color> (the track) and C<text_color> (the thumb); see
 L<Term::Fabulous::Widget::Scrollbar>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/example-table-files-scrolling.svg" alt="A file tree table with all folders open, scrolled down: the column titles and the filter row stay at the top, and the scrollbar right of the frame shows a thumb in its middle"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.05/screenshots/example-table-files-scrolling.svg" alt="A file tree table with all folders open, scrolled down: the column titles and the filter row stay at the top, the bottom of the frame at the bottom, and the scrollbar inside the frame shows a thumb in its middle"></p>
 
 =end html
 
 The picture shows a table higher than its room, scrolled down to the
 cursor's line: the column titles and the filter row stay at the top,
-and the thumb of the scrollbar shows which part of the rows is visible.
-It is F<examples/table-files.pl>, described in
-L<Term::Fabulous::Examples>.
+the frame's bottom stays at the bottom, and the thumb of the scrollbar
+shows which part of the rows is visible. It is
+F<examples/table-files.pl>, described in L<Term::Fabulous::Examples>.
 
 =head1 PRINTING A TABLE
 
@@ -534,7 +548,7 @@ them.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-table-report.svg" alt="The printed sales report: products sorted by revenue, units and amounts formatted, shares in percent and a bold totals row under a double line"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.05/screenshots/cookbook-table-report.svg" alt="The printed sales report: products sorted by revenue, units and amounts formatted, shares in percent and a bold totals row under a double line"></p>
 
 =end html
 

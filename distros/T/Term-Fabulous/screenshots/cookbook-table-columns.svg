@@ -18,52 +18,52 @@
 <text class="title" x="444" y="33" text-anchor="middle" dominant-baseline="central" fill="#9aa3b5">perl examples/cookbook/table-columns.pl</text>
 <rect x="16.5" y="16.5" width="855" height="345" rx="10" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1"/>
 <g shape-rendering="crispEdges">
-<rect x="48" y="78" width="504" height="36" fill="#242832"/>
-<rect x="552" y="78" width="135" height="54" fill="#1c2029"/>
-<rect x="48" y="132" width="639" height="18" fill="#1c2029"/>
-<rect x="552" y="150" width="135" height="18" fill="#1c2029"/>
-<rect x="48" y="168" width="639" height="18" fill="#1c2029"/>
-<rect x="552" y="186" width="18" height="18" fill="#1c2029"/>
-<rect x="570" y="186" width="90" height="18" fill="#343a48"/>
-<rect x="660" y="186" width="27" height="18" fill="#1c2029"/>
-<rect x="48" y="204" width="639" height="36" fill="#1c2029"/>
-<rect x="552" y="240" width="135" height="54" fill="#1c2029"/>
-<rect x="48" y="78" width="504" height="9" fill="#586070"/>
-<rect x="561" y="86" width="117" height="1" fill="#dcdfe4"/>
+<rect x="48" y="78" width="495" height="36" fill="#242832"/>
+<rect x="543" y="78" width="135" height="54" fill="#1c2029"/>
+<rect x="48" y="132" width="630" height="18" fill="#1c2029"/>
+<rect x="543" y="150" width="135" height="18" fill="#1c2029"/>
+<rect x="48" y="168" width="630" height="18" fill="#1c2029"/>
+<rect x="543" y="186" width="18" height="18" fill="#1c2029"/>
+<rect x="561" y="186" width="90" height="18" fill="#343a48"/>
+<rect x="651" y="186" width="27" height="18" fill="#1c2029"/>
+<rect x="48" y="204" width="630" height="18" fill="#1c2029"/>
+<rect x="543" y="222" width="135" height="72" fill="#1c2029"/>
+<rect x="48" y="78" width="495" height="9" fill="#586070"/>
+<rect x="552" y="86" width="117" height="1" fill="#dcdfe4"/>
 <rect x="48" y="87" width="5" height="144" fill="#586070"/>
-<rect x="556" y="96" width="1" height="180" fill="#dcdfe4"/>
-<rect x="682" y="96" width="1" height="180" fill="#dcdfe4"/>
-<rect x="48" y="231" width="504" height="9" fill="#586070"/>
-<rect x="561" y="284" width="117" height="1" fill="#dcdfe4"/>
+<rect x="547" y="96" width="1" height="180" fill="#dcdfe4"/>
+<rect x="673" y="96" width="1" height="180" fill="#dcdfe4"/>
+<rect x="48" y="231" width="495" height="9" fill="#586070"/>
+<rect x="552" y="284" width="117" height="1" fill="#dcdfe4"/>
 </g>
-<polyline points="556.5 96 556.5 91 556.538 90.413 556.653 89.835 556.843 89.278 557.103 88.75 557.43 88.261 557.818 87.818 558.261 87.43 558.75 87.103 559.278 86.843 559.835 86.653 560.413 86.538 561 86.5 561 86.5" fill="none" stroke="#dcdfe4" stroke-width="1" stroke-linejoin="round"/>
-<polyline points="682.5 96 682.5 91 682.462 90.413 682.347 89.835 682.157 89.278 681.897 88.75 681.57 88.261 681.182 87.818 680.739 87.43 680.25 87.103 679.722 86.843 679.165 86.653 678.587 86.538 678 86.5 678 86.5" fill="none" stroke="#dcdfe4" stroke-width="1" stroke-linejoin="round"/>
-<polyline points="556.5 276 556.5 280 556.538 280.587 556.653 281.165 556.843 281.722 557.103 282.25 557.43 282.739 557.818 283.182 558.261 283.57 558.75 283.897 559.278 284.157 559.835 284.347 560.413 284.462 561 284.5 561 284.5" fill="none" stroke="#dcdfe4" stroke-width="1" stroke-linejoin="round"/>
-<polyline points="682.5 276 682.5 280 682.462 280.587 682.347 281.165 682.157 281.722 681.897 282.25 681.57 282.739 681.182 283.182 680.739 283.57 680.25 283.897 679.722 284.157 679.165 284.347 678.587 284.462 678 284.5 678 284.5" fill="none" stroke="#dcdfe4" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="547.5 96 547.5 91 547.538 90.413 547.653 89.835 547.843 89.278 548.103 88.75 548.43 88.261 548.818 87.818 549.261 87.43 549.75 87.103 550.278 86.843 550.835 86.653 551.413 86.538 552 86.5 552 86.5" fill="none" stroke="#dcdfe4" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="673.5 96 673.5 91 673.462 90.413 673.347 89.835 673.157 89.278 672.897 88.75 672.57 88.261 672.182 87.818 671.739 87.43 671.25 87.103 670.722 86.843 670.165 86.653 669.587 86.538 669 86.5 669 86.5" fill="none" stroke="#dcdfe4" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="547.5 276 547.5 280 547.538 280.587 547.653 281.165 547.843 281.722 548.103 282.25 548.43 282.739 548.818 283.182 549.261 283.57 549.75 283.897 550.278 284.157 550.835 284.347 551.413 284.462 552 284.5 552 284.5" fill="none" stroke="#dcdfe4" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="673.5 276 673.5 280 673.462 280.587 673.347 281.165 673.157 281.722 672.897 282.25 672.57 282.739 672.182 283.182 671.739 283.57 671.25 283.897 670.722 284.157 670.165 284.347 669.587 284.462 669 284.5 669 284.5" fill="none" stroke="#dcdfe4" stroke-width="1" stroke-linejoin="round"/>
 <g class="terminal">
 <text x="66" y="110" textLength="387" class="b" fill="#ebeef3">Name            Team      Role       E-mail</text>
-<text x="570" y="110" textLength="63" class="b" fill="#dcdfe4">Columns</text>
+<text x="561" y="110" textLength="63" class="b" fill="#dcdfe4">Columns</text>
 <text x="66" y="128" textLength="468" fill="#dcdfe4">Ada Lovelace    Core      Engineer   ada@example.com</text>
-<text x="570" y="128" textLength="27" fill="#61afef">[x]</text>
-<text x="606" y="128" textLength="36" fill="#dcdfe4">Name</text>
-<text x="66" y="146" textLength="486" fill="#dcdfe4">Grace Hopper    Web       Lead       grace@example.com</text>
-<text x="570" y="146" textLength="27" fill="#61afef">[x]</text>
-<text x="606" y="146" textLength="36" fill="#dcdfe4">Team</text>
-<text x="66" y="164" textLength="486" fill="#dcdfe4">Linus Torvalds  Core      Engineer   linus@example.com</text>
-<text x="570" y="164" textLength="27" fill="#61afef">[x]</text>
-<text x="606" y="164" textLength="36" fill="#dcdfe4">Role</text>
-<text x="66" y="182" textLength="486" fill="#dcdfe4">Radia Perlman   Network   Engineer   radia@example.com</text>
-<text x="570" y="182" textLength="72" fill="#dcdfe4">[ ] City</text>
-<text x="66" y="200" textLength="486" fill="#dcdfe4">Barbara Liskov  Platform  Architect  barbara@example.c</text>
-<text x="570" y="200" textLength="27" fill="#61afef">[x]</text>
-<text x="606" y="200" textLength="54" fill="#dcdfe4">E-mail</text>
+<text x="561" y="128" textLength="27" fill="#61afef">[x]</text>
+<text x="597" y="128" textLength="36" fill="#dcdfe4">Name</text>
+<text x="66" y="146" textLength="477" fill="#dcdfe4">Grace Hopper    Web       Lead       grace@example.co</text>
+<text x="561" y="146" textLength="27" fill="#61afef">[x]</text>
+<text x="597" y="146" textLength="36" fill="#dcdfe4">Team</text>
+<text x="66" y="164" textLength="477" fill="#dcdfe4">Linus Torvalds  Core      Engineer   linus@example.co</text>
+<text x="561" y="164" textLength="27" fill="#61afef">[x]</text>
+<text x="597" y="164" textLength="36" fill="#dcdfe4">Role</text>
+<text x="66" y="182" textLength="477" fill="#dcdfe4">Radia Perlman   Network   Engineer   radia@example.co</text>
+<text x="561" y="182" textLength="72" fill="#dcdfe4">[ ] City</text>
+<text x="66" y="200" textLength="477" fill="#dcdfe4">Barbara Liskov  Platform  Architect  barbara@example.</text>
+<text x="561" y="200" textLength="27" fill="#61afef">[x]</text>
+<text x="597" y="200" textLength="54" fill="#dcdfe4">E-mail</text>
 <text x="66" y="218" textLength="468" fill="#dcdfe4">Ken Thompson    Core      Engineer   ken@example.com</text>
-<text x="570" y="218" textLength="81" fill="#dcdfe4">[ ] Phone</text>
-<text x="570" y="236" textLength="27" fill="#61afef">[x]</text>
-<text x="606" y="236" textLength="63" fill="#dcdfe4">Started</text>
-<text x="570" y="254" textLength="90" fill="#dcdfe4">[ ] Salary</text>
+<text x="561" y="218" textLength="81" fill="#dcdfe4">[ ] Phone</text>
+<text x="561" y="236" textLength="27" fill="#61afef">[x]</text>
+<text x="597" y="236" textLength="63" fill="#dcdfe4">Started</text>
+<text x="561" y="254" textLength="90" fill="#dcdfe4">[ ] Salary</text>
 <text x="48" y="272" textLength="396" fill="#96a0b4">Would save: name, team, role, email, started</text>
-<text x="570" y="272" textLength="90" fill="#8c929e">Esc closes</text>
+<text x="561" y="272" textLength="90" fill="#8c929e">Esc closes</text>
 <text x="48" y="308" textLength="783" fill="#6e788c">F2 or c in the header: choose columns   F3: name and contact   F4: all   F5: no contact</text>
 </g>
 <g shape-rendering="crispEdges">

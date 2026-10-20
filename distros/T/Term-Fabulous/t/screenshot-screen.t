@@ -22,7 +22,7 @@ use Term::Fabulous::Screenshot::Screen;
 use Term::Fabulous::Screenshot::Theme;
 use Term::Fabulous::Static;
 use Term::Fabulous::Widget::Box;
-use Term::Fabulous::Widget::RichText;
+use Term::Fabulous::Widget::Text;
 
 # What a program prints for a row of cells [ glyph, fg, bg ], as bytes.
 sub printed (@cells) {
@@ -39,7 +39,7 @@ subtest 'from_output reads every style Static writes' => sub {
 	}
 
 	my $root = Term::Fabulous::Widget::Box->new;
-	$root->add_child( Term::Fabulous::Widget::RichText->new( markup => '[italic]a[/][dim]b[/][strike]c[/][overline]d[/][conceal]e[/][blink]f[/]' ) );
+	$root->add_child( Term::Fabulous::Widget::Text->new( markup => '[italic]a[/][dim]b[/][strike]c[/][overline]d[/][conceal]e[/][blink]f[/]' ) );
 	my $report = Term::Fabulous::Static->new( root => $root, width => 6, height => 1 );
 	$report->draw;
 	my $bytes  = encode( 'UTF-8', join '', map { "$_\r\n" } $report->render_lines( colors => 1 ) );

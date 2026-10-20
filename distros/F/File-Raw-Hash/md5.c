@@ -1,41 +1,15 @@
 /*
  * md5.c - MD5 implementation per RFC 1321.
  *
- * Plain C99, no external deps. Endian-agnostic (reads/writes go through
- * byte-by-byte loaders/storers). Round constants and shift amounts come
- * directly from the spec.
+ * Plain C99, no external deps. The 64 steps are written out with their
+ * constants and shifts literal, as in the RFC's reference; blocks load
+ * with one copy on little-endian hosts and byte by byte elsewhere.
  */
 
 #include "md5.h"
 #include <string.h>
 
 #define ROL32(x, n) (((x) << (n)) | ((x) >> (32 - (n))))
-
-static const uint32_t MD5_K[64] = {
-    0xd76aa478u, 0xe8c7b756u, 0x242070dbu, 0xc1bdceeeu,
-    0xf57c0fafu, 0x4787c62au, 0xa8304613u, 0xfd469501u,
-    0x698098d8u, 0x8b44f7afu, 0xffff5bb1u, 0x895cd7beu,
-    0x6b901122u, 0xfd987193u, 0xa679438eu, 0x49b40821u,
-    0xf61e2562u, 0xc040b340u, 0x265e5a51u, 0xe9b6c7aau,
-    0xd62f105du, 0x02441453u, 0xd8a1e681u, 0xe7d3fbc8u,
-    0x21e1cde6u, 0xc33707d6u, 0xf4d50d87u, 0x455a14edu,
-    0xa9e3e905u, 0xfcefa3f8u, 0x676f02d9u, 0x8d2a4c8au,
-    0xfffa3942u, 0x8771f681u, 0x6d9d6122u, 0xfde5380cu,
-    0xa4beea44u, 0x4bdecfa9u, 0xf6bb4b60u, 0xbebfbc70u,
-    0x289b7ec6u, 0xeaa127fau, 0xd4ef3085u, 0x04881d05u,
-    0xd9d4d039u, 0xe6db99e5u, 0x1fa27cf8u, 0xc4ac5665u,
-    0xf4292244u, 0x432aff97u, 0xab9423a7u, 0xfc93a039u,
-    0x655b59c3u, 0x8f0ccc92u, 0xffeff47du, 0x85845dd1u,
-    0x6fa87e4fu, 0xfe2ce6e0u, 0xa3014314u, 0x4e0811a1u,
-    0xf7537e82u, 0xbd3af235u, 0x2ad7d2bbu, 0xeb86d391u
-};
-
-static const unsigned MD5_S[64] = {
-    7, 12, 17, 22,  7, 12, 17, 22,  7, 12, 17, 22,  7, 12, 17, 22,
-    5,  9, 14, 20,  5,  9, 14, 20,  5,  9, 14, 20,  5,  9, 14, 20,
-    4, 11, 16, 23,  4, 11, 16, 23,  4, 11, 16, 23,  4, 11, 16, 23,
-    6, 10, 15, 21,  6, 10, 15, 21,  6, 10, 15, 21,  6, 10, 15, 21
-};
 
 static uint32_t
 load32_le(const unsigned char *p)
@@ -55,43 +29,120 @@ store32_le(unsigned char *p, uint32_t v)
     p[3] = (unsigned char)((v >> 24) & 0xFFu);
 }
 
+/* The four round functions, in the forms that need fewest operations: F and
+ * G as selects, H and I as written in RFC 1321. */
+#define MD5_F(x, y, z) ((z) ^ ((x) & ((y) ^ (z))))
+#define MD5_G(x, y, z) ((y) ^ ((z) & ((x) ^ (y))))
+#define MD5_H(x, y, z) ((x) ^ (y) ^ (z))
+#define MD5_I(x, y, z) ((y) ^ ((x) | ~(z)))
+
+/* One step: the 64 are written out, so every constant, shift and message
+ * index is literal and the four words rotate by name, not by copying. */
+#define MD5_STEP(f, a, b, c, d, x, k, s) do {     \
+    (a) += (x) + (uint32_t)(k);                    \
+    (a) += f((b), (c), (d));                       \
+    (a) = ROL32((a), (s)) + (b);                   \
+} while (0)
+
+/* G's two halves share no bit, so they are added, not ORed: the CPU can
+ * start on (~d & c) before b is known. */
+#define MD5_STEP_G(a, b, c, d, x, k, s) do {      \
+    (a) += (x) + (uint32_t)(k) + (~(d) & (c));     \
+    (a) += (d) & (b);                              \
+    (a) = ROL32((a), (s)) + (b);                   \
+} while (0)
+
 static void
 md5_compress(md5_ctx_t *ctx, const unsigned char *block)
 {
     uint32_t M[16];
     uint32_t a = ctx->state[0], b = ctx->state[1],
              c = ctx->state[2], d = ctx->state[3];
-    uint32_t f, g, t;
-    int i;
 
-    for (i = 0; i < 16; i++) M[i] = load32_le(block + i * 4);
-
-    for (i = 0; i < 64; i++) {
-        if (i < 16) {
-            f = (b & c) | (~b & d);
-            g = (uint32_t)i;
-        } else if (i < 32) {
-            f = (d & b) | (~d & c);
-            g = (uint32_t)(5 * i + 1) & 15u;
-        } else if (i < 48) {
-            f = b ^ c ^ d;
-            g = (uint32_t)(3 * i + 5) & 15u;
-        } else {
-            f = c ^ (b | ~d);
-            g = (uint32_t)(7 * i) & 15u;
-        }
-        t = d;
-        d = c;
-        c = b;
-        b = b + ROL32(a + f + MD5_K[i] + M[g], MD5_S[i]);
-        a = t;
+#if defined(__BYTE_ORDER__) && defined(__ORDER_LITTLE_ENDIAN__) \
+    && __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+    memcpy(M, block, sizeof M);
+#else
+    {
+        int i;
+        for (i = 0; i < 16; i++) M[i] = load32_le(block + i * 4);
     }
+#endif
+
+    MD5_STEP(MD5_F, a, b, c, d, M[ 0], 0xd76aa478,  7);
+    MD5_STEP(MD5_F, d, a, b, c, M[ 1], 0xe8c7b756, 12);
+    MD5_STEP(MD5_F, c, d, a, b, M[ 2], 0x242070db, 17);
+    MD5_STEP(MD5_F, b, c, d, a, M[ 3], 0xc1bdceee, 22);
+    MD5_STEP(MD5_F, a, b, c, d, M[ 4], 0xf57c0faf,  7);
+    MD5_STEP(MD5_F, d, a, b, c, M[ 5], 0x4787c62a, 12);
+    MD5_STEP(MD5_F, c, d, a, b, M[ 6], 0xa8304613, 17);
+    MD5_STEP(MD5_F, b, c, d, a, M[ 7], 0xfd469501, 22);
+    MD5_STEP(MD5_F, a, b, c, d, M[ 8], 0x698098d8,  7);
+    MD5_STEP(MD5_F, d, a, b, c, M[ 9], 0x8b44f7af, 12);
+    MD5_STEP(MD5_F, c, d, a, b, M[10], 0xffff5bb1, 17);
+    MD5_STEP(MD5_F, b, c, d, a, M[11], 0x895cd7be, 22);
+    MD5_STEP(MD5_F, a, b, c, d, M[12], 0x6b901122,  7);
+    MD5_STEP(MD5_F, d, a, b, c, M[13], 0xfd987193, 12);
+    MD5_STEP(MD5_F, c, d, a, b, M[14], 0xa679438e, 17);
+    MD5_STEP(MD5_F, b, c, d, a, M[15], 0x49b40821, 22);
+
+    MD5_STEP_G(a, b, c, d, M[ 1], 0xf61e2562,  5);
+    MD5_STEP_G(d, a, b, c, M[ 6], 0xc040b340,  9);
+    MD5_STEP_G(c, d, a, b, M[11], 0x265e5a51, 14);
+    MD5_STEP_G(b, c, d, a, M[ 0], 0xe9b6c7aa, 20);
+    MD5_STEP_G(a, b, c, d, M[ 5], 0xd62f105d,  5);
+    MD5_STEP_G(d, a, b, c, M[10], 0x02441453,  9);
+    MD5_STEP_G(c, d, a, b, M[15], 0xd8a1e681, 14);
+    MD5_STEP_G(b, c, d, a, M[ 4], 0xe7d3fbc8, 20);
+    MD5_STEP_G(a, b, c, d, M[ 9], 0x21e1cde6,  5);
+    MD5_STEP_G(d, a, b, c, M[14], 0xc33707d6,  9);
+    MD5_STEP_G(c, d, a, b, M[ 3], 0xf4d50d87, 14);
+    MD5_STEP_G(b, c, d, a, M[ 8], 0x455a14ed, 20);
+    MD5_STEP_G(a, b, c, d, M[13], 0xa9e3e905,  5);
+    MD5_STEP_G(d, a, b, c, M[ 2], 0xfcefa3f8,  9);
+    MD5_STEP_G(c, d, a, b, M[ 7], 0x676f02d9, 14);
+    MD5_STEP_G(b, c, d, a, M[12], 0x8d2a4c8a, 20);
+
+    MD5_STEP(MD5_H, a, b, c, d, M[ 5], 0xfffa3942,  4);
+    MD5_STEP(MD5_H, d, a, b, c, M[ 8], 0x8771f681, 11);
+    MD5_STEP(MD5_H, c, d, a, b, M[11], 0x6d9d6122, 16);
+    MD5_STEP(MD5_H, b, c, d, a, M[14], 0xfde5380c, 23);
+    MD5_STEP(MD5_H, a, b, c, d, M[ 1], 0xa4beea44,  4);
+    MD5_STEP(MD5_H, d, a, b, c, M[ 4], 0x4bdecfa9, 11);
+    MD5_STEP(MD5_H, c, d, a, b, M[ 7], 0xf6bb4b60, 16);
+    MD5_STEP(MD5_H, b, c, d, a, M[10], 0xbebfbc70, 23);
+    MD5_STEP(MD5_H, a, b, c, d, M[13], 0x289b7ec6,  4);
+    MD5_STEP(MD5_H, d, a, b, c, M[ 0], 0xeaa127fa, 11);
+    MD5_STEP(MD5_H, c, d, a, b, M[ 3], 0xd4ef3085, 16);
+    MD5_STEP(MD5_H, b, c, d, a, M[ 6], 0x04881d05, 23);
+    MD5_STEP(MD5_H, a, b, c, d, M[ 9], 0xd9d4d039,  4);
+    MD5_STEP(MD5_H, d, a, b, c, M[12], 0xe6db99e5, 11);
+    MD5_STEP(MD5_H, c, d, a, b, M[15], 0x1fa27cf8, 16);
+    MD5_STEP(MD5_H, b, c, d, a, M[ 2], 0xc4ac5665, 23);
+
+    MD5_STEP(MD5_I, a, b, c, d, M[ 0], 0xf4292244,  6);
+    MD5_STEP(MD5_I, d, a, b, c, M[ 7], 0x432aff97, 10);
+    MD5_STEP(MD5_I, c, d, a, b, M[14], 0xab9423a7, 15);
+    MD5_STEP(MD5_I, b, c, d, a, M[ 5], 0xfc93a039, 21);
+    MD5_STEP(MD5_I, a, b, c, d, M[12], 0x655b59c3,  6);
+    MD5_STEP(MD5_I, d, a, b, c, M[ 3], 0x8f0ccc92, 10);
+    MD5_STEP(MD5_I, c, d, a, b, M[10], 0xffeff47d, 15);
+    MD5_STEP(MD5_I, b, c, d, a, M[ 1], 0x85845dd1, 21);
+    MD5_STEP(MD5_I, a, b, c, d, M[ 8], 0x6fa87e4f,  6);
+    MD5_STEP(MD5_I, d, a, b, c, M[15], 0xfe2ce6e0, 10);
+    MD5_STEP(MD5_I, c, d, a, b, M[ 6], 0xa3014314, 15);
+    MD5_STEP(MD5_I, b, c, d, a, M[13], 0x4e0811a1, 21);
+    MD5_STEP(MD5_I, a, b, c, d, M[ 4], 0xf7537e82,  6);
+    MD5_STEP(MD5_I, d, a, b, c, M[11], 0xbd3af235, 10);
+    MD5_STEP(MD5_I, c, d, a, b, M[ 2], 0x2ad7d2bb, 15);
+    MD5_STEP(MD5_I, b, c, d, a, M[ 9], 0xeb86d391, 21);
 
     ctx->state[0] += a;
     ctx->state[1] += b;
     ctx->state[2] += c;
     ctx->state[3] += d;
 }
+
 
 void
 md5_init(md5_ctx_t *ctx)

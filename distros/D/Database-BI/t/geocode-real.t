@@ -112,6 +112,17 @@ subtest 'the rule is the installed module\'s own, not a second copy of it' => su
 	is($refused->{'lookups'}, 0, 'a refused value is not a lookup');
 	is($refused->{'unresolved'}, 2, 'and is unresolved rather than an answer');
 
+	# 0.48 counts the reads the backends made, so a value answered from a cache
+	# is not a lookup at all: a value no catalogue has been asked about yet is
+	# one read, and asking for it again in the same process is none.  This is
+	# the finer count the module's own documentation promises when it says
+	# lookups is C<attempted> unless the geocoder knows better.
+	my $fresh = $real->geocode_many(['Nowhere Else, Imaginary, ZZ'], region => $REGION, on_error => 'undef');
+
+	is($fresh->{'lookups'}, 1, 'a value no backend has been asked about costs one lookup');
+	is($real->geocode_many(['Nowhere Else, Imaginary, ZZ'], region => $REGION, on_error => 'undef')->{'lookups'}, 0,
+		'and the same batch again is answered from the cache, at no cost');
+
 	# The trap the module exists to avoid: the same batch with the geocoder's own
 	# default dies on the dirty column instead of skipping it.
 	throws_ok { $real->geocode_many([@JUNK], region => $REGION) }
@@ -139,7 +150,15 @@ subtest 'a dirty column comes back with the places plotted and the junk counted'
 	is($dirty->{'counts'}{'skipped'}, @JUNK + 1, 'the two bare numbers and the empty cell are skipped');
 	is($dirty->{'counts'}{'distinct'}, @places + @JUNK + 2, 'the distinct values are the places, the junk, the empty cell and the unknown place');
 	is($dirty->{'counts'}{'attempted'}, @places + 1, 'so one batch holds the places and the unresolvable one');
-	is($dirty->{'counts'}{'lookups'}, @places + 1, 'and the geocoder reports exactly that many lookups');
+
+	# The probe above has already asked the geocoder for the places, so this
+	# batch reads for fewer of them than it was handed: the count is the reads
+	# made, never more than the values attempted, and the value no catalogue had
+	# been asked about is one of them.
+	cmp_ok($dirty->{'counts'}{'lookups'}, '<=', @places + 1,
+		'the geocoder reports no more lookups than the values it was handed');
+	cmp_ok($dirty->{'counts'}{'lookups'}, '>', 0,
+		'and the value no cache had seen cost a read');
 	is($dirty->{'counts'}{'resolved'}, @places, 'every probe place resolved again');
 	is($dirty->{'counts'}{'unresolved'}, 1, 'and the place with no answer is a miss rather than a death');
 

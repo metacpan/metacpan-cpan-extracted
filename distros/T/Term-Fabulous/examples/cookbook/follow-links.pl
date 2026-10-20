@@ -8,7 +8,6 @@ no warnings 'experimental::signatures';
 use Term::Fabulous;
 use Term::Fabulous::Theme;
 use Term::Fabulous::Widget::Box;
-use Term::Fabulous::Widget::RichText;
 use Term::Fabulous::Widget::Text;
 use Clay::XS qw(sizing_grow sizing_fixed CLAY_TOP_TO_BOTTOM);
 
@@ -57,13 +56,13 @@ my $root = Term::Fabulous::Widget::Box->new(
 
 # The page wraps at 60 columns: the width of the box around it.
 my $page_box = Term::Fabulous::Widget::Box->new( layout => { sizing => { width => sizing_fixed(60) } } );
-my $page     = Term::Fabulous::Widget::RichText->new( markup => $markup_of_page{start} );
+my $page     = Term::Fabulous::Widget::Text->new( markup => $markup_of_page{start} );
 $page_box->add_child($page);
 my $status = Term::Fabulous::Widget::Text->new( text => 'Tab selects a link, Enter follows it.', text_color => [ 150, 160, 180, 255 ] );
 
 # A footer whose links are given from Perl: any value can be a target,
 # here the code to run.
-my $footer = Term::Fabulous::Widget::RichText->new( text => 'Back   Quit' );
+my $footer = Term::Fabulous::Widget::Text->new( text => 'Back   Quit' );
 $root->add_child( $page_box, $footer, $status );
 
 my $ui = Term::Fabulous->new( width => 80, height => 24, root => $root, theme => $theme );
@@ -90,7 +89,7 @@ sub go_back () {
 $footer->add_link( \&go_back,               0, 4 );
 $footer->add_link( sub { $ui->loop->stop }, 7, 11 );
 
-# LinkActivate bubbles up from both RichTexts, so one listener on the
+# LinkActivate bubbles up from both Texts, so one listener on the
 # root follows every link, clicked or chosen with the keyboard.
 $root->on(
 	LinkActivate => sub ($event) {
@@ -102,7 +101,7 @@ $root->on(
 	}
 );
 
-# Keys the focused RichText does not use bubble on to the root.
+# Keys the focused Text does not use bubble on to the root.
 $root->on(
 	KeyPress => sub ($event) {
 		my $key = $event->key_name // '';

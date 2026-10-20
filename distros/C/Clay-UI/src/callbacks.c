@@ -18,7 +18,7 @@
  * Each is bridged by a fixed C function defined here. Clay calls them in
  * the middle of its own C code, which must never be unwound by a Perl
  * exception. Every trampoline therefore makes exactly one Perl call: the
- * internal Clay::XS::_dispatch XSUB, under G_EVAL. The dispatcher calls
+ * dispatcher, an anonymous XSUB defined below, under G_EVAL. It calls
  * the user's coderef and parses its return value into a C result slot;
  * any exception - from the callback, from overloaded or tied return
  * values, from FATAL warnings, or from a malformed result - lands in that
@@ -44,8 +44,9 @@
  *     registered Perl coderef in ctx->hover_callbacks.
  *
  *   - For transitions, the callback signatures lack any way to pass our
- *     context pointer. The Clay_EndLayout wrapper sets the thread-local
- *     clay_perl_active_transition_ctx around the Clay_EndLayout call.
+ *     context pointer. The frame module sets the thread-local
+ *     clay_perl_active_transition_ctx around every Clay_EndLayout call it
+ *     makes (finish_frame in clay_perl_context.c).
  *
  * Clay forgets an element's hover function whenever the element is
  * declared again (Clay__AddHashMapItem clears onHoverFunction), so hover
@@ -69,16 +70,14 @@ UV clay_perl_transition_handler_calls = 0;
 /* ---------------------------------------------------------------------------
  * Thread-local active transition context.
  *
- * Set by the Clay_EndLayout wrapper around Clay_EndLayout. The transition
- * trampolines fall back to identity behaviour if it is NULL, which keeps
- * them safe to call even outside an EndLayout.
+ * Set by the frame module's finish_frame around Clay_EndLayout. The
+ * transition trampolines fall back to identity behaviour if it is NULL,
+ * which keeps them safe to call even outside an EndLayout.
  * ------------------------------------------------------------------------ */
 
 CLAY_PERL_THREAD_LOCAL clay_perl_context *clay_perl_active_transition_ctx = NULL;
 
 CLAY_PERL_THREAD_LOCAL uint32_t clay_perl_callback_depth = 0;
-
-CLAY_PERL_THREAD_LOCAL clay_perl_active_dispatch clay_perl_pending_dispatch = { 0, NULL };
 
 CLAY_PERL_THREAD_LOCAL clay_perl_deferred_exit clay_perl_pending_exit = { false, 0 };
 
@@ -171,8 +170,13 @@ void clay_perl_exit_if_pending(pTHX_ clay_perl_context *ctx)
 /* ---------------------------------------------------------------------------
  * Dispatch.
  *
- * call_dispatcher publishes (kind, result slot) in clay_perl_pending_dispatch,
- * pushes (callback, args...) and calls Clay::XS::_dispatch under G_EVAL, on
+ * The dispatch protocol lives in this section only. A trampoline hands the
+ * dispatcher a result slot (dispatch_result), which it fills in with the
+ * defaults Clay gets when the callback fails; the dispatcher overwrites
+ * the member for the callback's kind.
+ *
+ * call_dispatcher publishes (kind, result slot) in pending_dispatch,
+ * pushes (callback, args...) and calls the dispatcher under G_EVAL, on
  * a Perl stack of its own (as perl runs magic methods): loop control in a
  * callback cannot reach a loop outside it, so "last LABEL" dies inside
  * the eval like any other error. An exit is caught by the JMPENV around
@@ -182,6 +186,23 @@ void clay_perl_exit_if_pending(pTHX_ clay_perl_context *ctx)
  * FREETMPS/LEAVE, with $@ localised there, so the caller's $@ survives the
  * callback.
  * ------------------------------------------------------------------------ */
+
+typedef struct dispatch_result {
+    Clay_Dimensions     dimensions;
+    Clay_Vector2        vector;
+    Clay_TransitionData transition_data;
+    bool                complete;
+} dispatch_result;
+
+/* The dispatch a trampoline has started: set by call_dispatcher for the
+ * duration of its call into the dispatcher, which takes it (and clears
+ * .result, so only that one call can use it). */
+typedef struct active_dispatch {
+    clay_perl_dispatch_kind kind;
+    dispatch_result        *result;
+} active_dispatch;
+
+static CLAY_PERL_THREAD_LOCAL active_dispatch pending_dispatch = { 0, NULL };
 
 typedef enum {
     DISPATCH_RETURNED = 0,   /* the callback returned a result */
@@ -219,18 +240,18 @@ static int dispatch_catching_exit(pTHX_ CV *dispatch_cv, SV *callback, SV **args
 }
 
 static dispatch_outcome call_dispatcher(pTHX_ clay_perl_context *ctx, clay_perl_dispatch_kind kind,
-                                        clay_perl_dispatch_result *result, SV *callback,
+                                        dispatch_result *result, SV *callback,
                                         SV **args, int argc)
 {
-    clay_perl_active_dispatch saved = clay_perl_pending_dispatch;
+    active_dispatch saved = pending_dispatch;
     {
         dSP;
         PUSHSTACKi(PERLSI_MAGIC);
     }
-    clay_perl_pending_dispatch.kind   = kind;
-    clay_perl_pending_dispatch.result = result;
+    pending_dispatch.kind   = kind;
+    pending_dispatch.result = result;
     int jump = dispatch_catching_exit(aTHX_ clay_perl_dispatcher(aTHX), callback, args, argc);
-    clay_perl_pending_dispatch = saved;
+    pending_dispatch = saved;
 
     /* my_exit has popped every Perl stack down to the main one and unwound
      * the scopes already. */
@@ -267,7 +288,7 @@ typedef int (*callback_args_builder)(pTHX_ const void *data, SV **args);
  * Clay is still inside its own function while they run. After an exit
  * that scope is gone already, and only the depth is restored. */
 static bool invoke_callback(pTHX_ clay_perl_context *ctx, clay_perl_dispatch_kind kind,
-                            clay_perl_dispatch_result *result, const clay_perl_callback *callback,
+                            dispatch_result *result, const clay_perl_callback *callback,
                             callback_args_builder build_args, const void *data)
 {
     if (clay_perl_pending_exit.pending) return true;
@@ -300,9 +321,10 @@ static SV *required_result(pTHX_ SV *ret, const char *what)
     return ret;
 }
 
-void clay_perl_dispatch_store_result(pTHX_ clay_perl_dispatch_kind kind,
-                                     clay_perl_dispatch_result *result,
-                                     SV *ret, SV *args_sv)
+/* Parses the callback's return value (ret) for the given kind into
+ * *result. args_sv is the argument hash the transition handler may have
+ * modified (NULL otherwise). */
+static void store_result(pTHX_ clay_perl_dispatch_kind kind, dispatch_result *result, SV *ret, SV *args_sv)
 {
     switch (kind) {
     case CLAY_PERL_DISPATCH_MEASURE_TEXT:
@@ -347,6 +369,43 @@ void clay_perl_dispatch_store_result(pTHX_ clay_perl_dispatch_kind kind,
         break;
     }
     croak("Clay::XS: internal error: unknown dispatch kind %d", (int) kind);
+}
+
+/* The dispatcher: called as ($callback, @args) by call_dispatcher, which
+ * has published its dispatch kind and result slot in pending_dispatch.
+ * Takes them (so no other call can), calls $callback->(@args) and parses
+ * its return value into the slot. Any exception propagates to the
+ * trampoline's G_EVAL. Called any other way, it croaks. */
+XS_INTERNAL(dispatch_xsub)
+{
+    dXSARGS;
+    PERL_UNUSED_VAR(cv);
+    active_dispatch dispatch = pending_dispatch;
+    if (!dispatch.result || items < 1) {
+        croak("Clay::XS: the callback dispatcher is internal to the callback trampolines");
+    }
+    pending_dispatch.result = NULL;
+    SV *callback = ST(0);
+    SV *args_sv  = items > 1 ? ST(1) : NULL;
+
+    SP -= items;
+    PUSHMARK(SP);
+    for (I32 i = 1; i < items; i++) {
+        XPUSHs(ST(i));
+    }
+    PUTBACK;
+    int count = call_sv(callback, G_SCALAR);
+    SPAGAIN;
+    SV *ret = count > 0 ? POPs : &PL_sv_undef;
+    PUTBACK;
+
+    store_result(aTHX_ dispatch.kind, dispatch.result, ret, args_sv);
+    XSRETURN_EMPTY;
+}
+
+CV *clay_perl_new_dispatcher(pTHX)
+{
+    return newXS(NULL, dispatch_xsub, __FILE__);
 }
 
 /* ---------------------------------------------------------------------------
@@ -462,7 +521,7 @@ Clay_Dimensions clay_perl_measure_text_trampoline(Clay_StringSlice text,
         return zero;
     }
 
-    clay_perl_dispatch_result result;
+    dispatch_result result;
     memset(&result, 0, sizeof(result));
     measure_text_call call = { text, config };
     if (invoke_callback(aTHX_ ctx, CLAY_PERL_DISPATCH_MEASURE_TEXT, &result, callback,
@@ -498,7 +557,7 @@ void clay_perl_error_handler_trampoline(Clay_ErrorData error)
     clay_perl_context *ctx = (clay_perl_context *) error.userData;
     if (!ctx || !ctx->callbacks[CLAY_PERL_DISPATCH_ERROR_HANDLER].code) return;
 
-    clay_perl_dispatch_result result;
+    dispatch_result result;
     memset(&result, 0, sizeof(result));
     (void) invoke_callback(aTHX_ ctx, CLAY_PERL_DISPATCH_ERROR_HANDLER, &result,
                            &ctx->callbacks[CLAY_PERL_DISPATCH_ERROR_HANDLER],
@@ -532,7 +591,7 @@ Clay_Vector2 clay_perl_query_scroll_offset_trampoline(uint32_t element_id,
         return zero;
     }
 
-    clay_perl_dispatch_result result;
+    dispatch_result result;
     memset(&result, 0, sizeof(result));
     bool failed = invoke_callback(aTHX_ ctx, CLAY_PERL_DISPATCH_QUERY_SCROLL_OFFSET, &result,
                                   callback, query_scroll_offset_args, &element_id);
@@ -574,7 +633,7 @@ void clay_perl_on_hover_trampoline(Clay_ElementId element_id,
     AV *entry = (AV *) SvRV(*entry_slot);
     clay_perl_callback callback = { *av_fetch(entry, 0, 0), *av_fetch(entry, 1, 0) };
 
-    clay_perl_dispatch_result result;
+    dispatch_result result;
     memset(&result, 0, sizeof(result));
     hover_call call = { element_id, pointer };
     (void) invoke_callback(aTHX_ ctx, CLAY_PERL_DISPATCH_HOVER, &result, &callback, hover_args, &call);
@@ -606,7 +665,7 @@ bool clay_perl_transition_handler_trampoline(Clay_TransitionCallbackArguments ar
     clay_perl_context *ctx = clay_perl_active_transition_ctx;
     if (!ctx || !ctx->callbacks[CLAY_PERL_DISPATCH_TRANSITION_HANDLER].code) return true;
 
-    clay_perl_dispatch_result result;
+    dispatch_result result;
     memset(&result, 0, sizeof(result));
     result.complete        = true;
     result.transition_data = *args.current;
@@ -643,7 +702,7 @@ static Clay_TransitionData dispatch_transition_state(clay_perl_dispatch_kind kin
     clay_perl_context *ctx = clay_perl_active_transition_ctx;
     if (!ctx || !ctx->callbacks[kind].code) return state;
 
-    clay_perl_dispatch_result result;
+    dispatch_result result;
     memset(&result, 0, sizeof(result));
     result.transition_data = state;
     transition_state_call call = { state, properties };

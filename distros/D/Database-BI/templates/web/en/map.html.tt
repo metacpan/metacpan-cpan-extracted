@@ -1,0 +1,73 @@
+[%- WRAPPER 'web/en/layouts/default.html.tt' -%]
+
+<style>
+  .map-panel {
+    background: #fff;
+    border: 1px solid #d8dee9;
+    border-radius: 8px;
+    padding: 0.5rem;
+    margin: 0.75rem 0 1rem;
+  }
+  .map-panel #search-box {
+    padding: 0.3rem 0.5rem;
+    border: 1px solid #c3cad6;
+    border-radius: 4px;
+    min-width: 16rem;
+  }
+  .map-panel #reset-button,
+  .map-panel #clear-search-button {
+    border: 1px solid #c3cad6;
+    border-radius: 4px;
+    background: #f4f6f9;
+  }
+  .map-notes {
+    margin: 0.5rem 0 0;
+    padding: 0.5rem 0.75rem;
+    border-left: 3px solid #c9a227;
+    background: #fdf8e6;
+    font-size: 0.88rem;
+    color: #5c4a11;
+  }
+  .map-notes ul { margin: 0; padding-left: 1.1rem; }
+  .map-summary {
+    font-size: 0.85rem;
+    color: #555;
+    margin: 0.25rem 0 0;
+  }
+  .chart-source {
+    margin: 0.25rem 0 0;
+    font-size: 0.82rem;
+    color: #666;
+    word-break: break-all;
+  }
+  .chart-source a { color: inherit; }
+</style>
+
+<p class="back-link"><a href="/">&larr; Home</a> &rsaquo; <a href="[% back_url | html %]">[% back_label || 'Back' | html %]</a>[%- IF back2_url -%] &rsaquo; <a href="[% back2_url | html %]">[% back2_label || 'Back' | html %]</a>[%- END -%]</p>
+
+<h2 class="graph-title">[% title | html %]</h2>
+
+[% IF messages.size %]
+<div class="map-notes" role="status">
+  <ul>
+    [%- FOREACH message IN messages %]
+    <li class="map-note" data-key="[% message.key | html %]">[% message.text | html %]</li>
+    [%- END %]
+  </ul>
+</div>
+[% END %]
+
+<p class="map-summary">Plotting [% marker_count %] marker[% marker_count == 1 ? '' : 's' %] for [% row_count %] of [% source_rows %] row[% source_rows == 1 ? '' : 's' %][% IF loc_col %] from column [% loc_col | html %][% END %][% IF lat_col %] from columns [% lat_col | html %] and [% lon_col | html %][% END %][% IF backend %]; resolved by [% backend | html %][% END %].</p>
+
+[% IF map_body %]
+<div class="map-panel">
+  [% map_body %]
+</div>
+[% END %]
+
+[% IF source_url %]
+<p class="chart-source">Source: <a href="[% source_url | html %]" rel="noopener noreferrer">[% source_url | html %]</a></p>
+<p class="chart-source">Accessed on [% source_accessed | html %]</p>
+[% END %]
+
+[%- END -%]

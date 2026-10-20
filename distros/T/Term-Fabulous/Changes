@@ -1,5 +1,305 @@
 Revision history for Term::Fabulous
 
+0.05    2026-10-19
+        - Fix from CPAN Testers: on perls built with long doubles, a press
+          exactly double_click_seconds after the one before continues
+          the run of clicks, as documented; the difference of the two
+          clock readings rounded a hair above the interval there and
+          started a new run.
+        - A Term::Fabulous::Range snaps a number exactly halfway between
+          two grid values to the higher one on every perl (0.35 with a
+          step of 0.1 gives 0.4); before, the rounding noise of the
+          division by the step decided, and perls built with long
+          doubles went up where the others went down.
+
+0.04    2026-10-19
+        - A Widget::DocumentView counts the items added to its document
+          as soon as it is asked: count, show_item, scroll_to_bottom
+          and a search reach an item added since the last frame instead
+          of dying with "item N does not exist". A code block the
+          document gets after the view showed it takes the view's
+          highlighter and the sideways offset of the other code blocks
+          when the view builds it.
+        - Term::Fabulous::Scrolling's scroll_to_end (and End, G and
+          Ctrl+End of a document view, and a VirtualList with
+          follow_end) scrolls a VirtualList to the end of its content
+          once its last item is in view, so a last item taller than the
+          view ends at the bottom of the view instead of starting at
+          its top; before, such a list never reached its end and with
+          follow_end never settled.
+        - Widget::Table's highlight_text checks the offsets against the
+          cell's text at the call, also for a row that is not built;
+          before, offsets past the text died in the frame that built
+          the row. Its estimated_rows counts the lines of its frame
+          (the top, the line under the header rows, the bottom ledge)
+          and the filter row, so a DocumentView holding a table no
+          longer guesses it about three rows too short.
+        - Widget::Accordion::Item's reveal_text opens the item through
+          its accordion, so the item that was open closes unless
+          multiple are allowed; before, revealing a match left both
+          open.
+        - Widget::Menu has the documented keys_color, separator_color,
+          highlight_text_color and highlight_background_color
+          accessors.
+        - Widget::Dialog checks z_index against the range Clay has,
+          -32768 to 32767, in new and in the accessor, instead of dying
+          inside Clay::UI at open.
+        - A Widget::Dropdown's list is never wider than the screen and
+          cuts its labels with an ellipsis (fit_columns); before, a
+          list wider than the screen was cut at the right edge with no
+          mark.
+        - examples/widgets/dialog.pl and
+          examples/cookbook/confirm-dialog.pl use the dialog's own title,
+          buttons and Answer; examples/widgets/prompt.pl and
+          examples/cookbook/document-contents.pl escape with
+          Term::Fabulous::Text::Markup::escape_markup; the Right key of
+          examples/widgets/code-block.pl starts from shown_offset, so
+          Left reacts at once after scrolling past the longest line.
+        - Render::Geometry::cell_rect rounds every edge of a box to the
+          nearest cell instead of flooring it. A layout at fractional
+          positions (a percent-wide sidebar, say) gave two boxes that
+          meet edges of 70.9999 and 71, which floored to different
+          cells, so tables showed a blank column with broken lines
+          between two cells and a body one cell wider than its header.
+        - Widget::Tabs and Tabs::Bar have active_padding, the cells the
+          active tab grows toward the page beyond the other tabs; it was
+          always one cell and is 0 by default now, so all tabs are the
+          same size unless asked otherwise.
+        - The frame of a Widget::Table stays while its rows scroll: the
+          bottom (and, without column titles, the top) is a ledge of its
+          own below (above) the scrolling body, drawn in the table's
+          line_color, instead of a side of the last (first) row. The
+          scrollbar moved inside the frame, into a column right of the
+          last column without a line of its own, which appears only
+          while the rows do not fit, so a table that does not scroll is
+          as wide as its columns. Table::Borders::resolve_borders takes
+          ledge lines and a gutter flag and returns { lines, gutter };
+          Table::HeaderView is Table::EdgeView, the view of the header
+          and of the footer.
+        - Widget::estimated_rows counts only the border sides that are
+          drawn (a Hidden side takes no room) and the room a ScrollBox
+          keeps for its scrollbars, through the new content_padding
+          (which ScrollBox extends), so a VirtualList or DocumentView no
+          longer guesses such items too tall or too short.
+        - A theme file whose palette token has child nodes is rejected
+          with "palette token '...' needs exactly one string argument",
+          as the theme editor's document always did; a test now runs
+          every invalid and valid sample through both readers.
+        - The theme editor's form keeps the kind, family and variant of
+          each section row (ThemeEditor::Form::section_info) instead of
+          the editor parsing them out of the row ids, and F6 focuses the
+          first widget of the preview the way Tab orders them.
+        - Term::Fabulous::Command::plain_label is the label without a
+          trailing "..." (menus keep label), and the class method
+          Term::Fabulous::Widget::KeyReference->command_rows($group,
+          @commands) builds the key rows of commands; the key reference
+          and the theme editor's key_list, commands and messages use them
+          instead of stripping the dots themselves.
+        - Term::Fabulous::Widget::Table::Model has two options for
+          trees in sections: open_when_filtered (a filtered or searched
+          view shows every passing row with its parents open, without
+          changing which rows are expanded) and only_leaves_match (a row
+          with children passes only as the ancestor of one that
+          matches). The theme editor's settings list keeps its rows,
+          sections, search, filters and cursor in a Table::Model with
+          both, instead of a second tree model of its own; its row gives
+          a copy without the children.
+        - Term::Fabulous::Widget::Dialog owns the parts most dialogs
+          have: a title, buttons (one row; pressing one calls
+          press_button, which answers with its id), a notice line above
+          the buttons (notice($markup, 'info' or 'error'), notice_text,
+          and notice_line => 'shown', 'kept' or 'row' for the room it
+          takes), placement => 'center' or 'right', answer($id,
+          %values) and values. Every dialog now fires Answer after Close
+          whenever it closes: with the button that answered, or as
+          cancel and dismissed for Escape and close, carrying the
+          dialog's values in both cases (a Prompt's fields, nothing for
+          a FileDialog or a plain Dialog). Prompt, FileDialog,
+          KeyReference and the theme editor's value dialog declare their
+          titles and buttons instead of building them; the key
+          reference answers close from its Close button, and the value
+          dialog reports through Change (the preview) and Answer
+          instead of its on_preview, on_apply and on_reset callbacks.
+          The file dialog's notice wraps instead of cutting a long path
+          from the left, and its FolderLine no longer has say, text or
+          after. Prompt's errors for a closed prompt or an unknown
+          button read "answer needs an open dialog" and "the dialog has
+          no button with the id ...". Term::Fabulous::Text::Markup
+          exports escape_markup.
+        - Term::Fabulous::Placement::place_popup is the one rule for
+          where a popup goes: below or above its anchor (flipping when it
+          does not fit and the other side has more room, reporting the
+          rows it has there) or at it, aligned left or right, and always
+          kept on the screen; TOPMOST_Z_INDEX is the z_index of popups.
+          Term::Fabulous::Role::Popup floats a widget from the root at
+          the position it works out, and checks after each frame whether
+          that frame moved it. The dropdown's list, popup menus and the
+          table's column chooser compose it. A
+          dropdown's list no longer runs off the right edge of the
+          screen, and a column chooser near the bottom of the screen
+          moves up instead of hiding its last check boxes; a dropdown's
+          list also stays on the screen when the terminal shrinks while
+          it is open, turning to the other side (with its arrow) when its
+          side has no room left.
+        - Term::Fabulous counts clicks: every Mouse press has a
+          click_count, 2 for the second press of a double click, 3 for a
+          triple click, for presses of the same button in the same cell
+          at most double_click_seconds apart (a new parameter of
+          Term::Fabulous->new, default 0.4) on the UI's clock. Table,
+          TextField, TextArea and the theme editor's settings list read
+          it instead of timing presses on the system clock, and the
+          dropdown's type-ahead runs on the UI's clock too, so a test
+          with its own clock can click or type slowly. Table's
+          double_click_seconds parameter is gone; the UI's applies.
+        - Term::Fabulous::Unicode::fit_columns($text, $columns, mark =>
+          ..., cut => 'end' or 'start') cuts a text to a number of
+          columns with a mark where it was cut (an ellipsis, exported as
+          ELLIPSIS, by default), never splits a grapheme cluster and is
+          never wider than the room; a mark wider than the room is cut
+          itself. The status bar, the document tabs, chart texts, the
+          truncate mutator, the file dialog's folder line, the theme
+          editor's settings list and the dropdown list cut through it.
+          The settings list no longer splits an emoji from its variation
+          selector, and the folder line's "..." no longer takes three
+          columns where it has one or two. FileDialog::FolderLine's
+          cut_from_the_left is gone.
+        - Term::Fabulous::Text::Marks keeps the spans, highlights and
+          links of one text, checks their ranges with one wording and
+          cuts the text into runs in one sweep; Text and CodeBlock keep
+          their marks in it and share their methods through
+          Term::Fabulous::Role::MarkedText. Both now have spans as an
+          accessor (Text gains the setter), stylize and clear_spans
+          (CodeBlock gains them), highlights and clear_highlights.
+          CodeBlock's range errors read like Text's ("span end 3 lies
+          past the text (2 characters)", "highlighter spans must be an
+          array reference ..."), and setting a code block's spans counts
+          as a change of its content_revision, as on a Text.
+        - Term::Fabulous::Role::Themed's drawing_theme (until now the
+          private _theme) is the one answer to "the theme a widget draws
+          with". Term::Fabulous::Document::Look->of asks it, so a
+          CodeBlock under a theme_for subtree paints its background and
+          clipped marker in the subtree's theme like its spans, and a
+          DocumentView with a quote builds in a plain Clay::UI instead of
+          dying. A Tabs::Button without a bar and an Accordion::Item
+          without an accordion take the looks of their UI's theme
+          instead of the default theme, and the item follows a theme
+          switch.
+        - Term::Fabulous::Role::SearchContainer: a container lists the
+          searchable widgets it holds (searchable_parts) and may show
+          one (reveal_part); the role answers the search for them. Tabs
+          and Accordion::Item compose it. The revision of a nested key
+          names the widget at its index (search_serial), so a search
+          that kept a key into a page that was removed searches again
+          instead of dying in highlight_text on the page that took its
+          place. Role::Searchable exports nested_part.
+        - Term::Fabulous::Scrolling has the keys of pagers:
+          scroll_by_key($ui, $box, $key_name, keys => 'pager' or
+          'less') scrolls by rows, by pages or to the ends and returns
+          undef for a key that is not in the set; scroll_offset and
+          max_scroll_offset report the position in positive rows, and
+          scroll_by_columns scrolls sideways. scroll_to_start and
+          scroll_to_end send a VirtualList to its first or last item. A
+          ScrollBox with follow_end => 1 keeps the end of its content in
+          view until the user scrolls up, and follows again at the end.
+          DocumentView, the theme editor, the pager, log, command output
+          and showcase examples use them instead of their own key tables,
+          timers and sign flips. The theme editor's custom preview pages
+          by the rows its content shows, without its horizontal
+          scrollbar, as every pager does.
+        - Work after a frame is bound to a widget: after_draw takes an
+          owner (held weakly, passed in, skipped once it is gone or out
+          of the UI), the new each_draw calls its code after every frame
+          until it returns true, its frames run out or its owner leaves,
+          with a name so that a new request replaces the old one, and
+          Term::Fabulous::Widget::each_frame registers such work for a
+          widget (work asked for before the widget is in a UI waits for
+          one). A callback that dies no longer drops the ones queued
+          after it. ScrollBox has reveal($widget, align => 'nearest' or
+          'top'), which waits for the widget's layout by itself, and
+          Scrolling's reveal_rows takes the same align. The widgets that
+          kept their own watchers and retry counters (ScrollBox,
+          VirtualList, DocumentView, Table, the column chooser and the
+          theme editor's preview) use them.
+        - The focus no longer vanishes when the focused widget is
+          removed, disabled or hidden: it goes to its heir (Clay::UI
+          0.07 focus heirs), the nearest widget above it that can take
+          the focus, or the widget a container names with focus_heir.
+          Tabs names its active tab, so a field on a page that select
+          or choose hides no longer leaves Ctrl+PageUp and
+          Ctrl+PageDown without the Tabs; Accordion::Item names its
+          header when it closes over a focused field; a Dialog's
+          backdrop and a popup Menu name the widget that had the focus
+          before they opened. Before, nothing had the focus and the keys
+          went to the root widget.
+        - A Text with wrap_mode CLAY_TEXT_WRAP_NONE stays on one line,
+          as Clay::UI 0.07 lays it out: a "\n" in it is shown as the
+          replacement character U+FFFD instead of starting a new line,
+          and estimated_rows and row_of_offset count the whole text as
+          one row. Before, it broke at newlines like
+          CLAY_TEXT_WRAP_NEWLINES.
+        - Text that does not wrap (wrap_mode newlines or none) is cut
+          off when its parent is too narrow, once everything beside it
+          has shrunk; a newlines text still breaks only at its newlines.
+          A long word in a grow or percent Table column with wrap
+          'none' or 'newlines' no longer pushes the table past its
+          parent. Needs the cut-off patch of Clay::UI 0.07.
+        - Text in a grow or percent column of a Table wraps: such a
+          table no longer scrolls sideways, so its columns get narrower
+          when it is too narrow for them. Before, the text stayed on one
+          line and the rows scrolled sideways.
+        - Term::Fabulous::Widget::Table, Tabs and Accordion::Item do
+          Term::Fabulous::Role::Searchable: a search reaches the cells on
+          every page and under collapsed rows and groups, the pages a
+          Tabs does not show and the bodies of closed accordion items,
+          and revealing a match turns the page, expands the rows and
+          groups, activates the tab or opens the item.
+        - A widget that gets the focus inside a ScrollBox is scrolled into
+          view, and a VirtualList whose window drops the focused widget
+          hands the focus to the list or the nearest widget above it
+          that takes it. Clay::UI 0.07 gives text widgets a bounding box,
+          so a menu opens below a text too.
+        - Term::Fabulous::Widget::Text absorbs RichText: one text widget
+          with spans, links, markup and the keys and looks of links; the
+          RichText and FocusableText classes are gone. A text also has
+          highlights, a layer over its spans that a search marks without
+          touching them, a content_revision for callers that recorded
+          offsets, and an estimated_rows for lists that need its height
+          before a layout. A color in any style may be a palette token of
+          the theme (bold accent on surface_low), looked up when the text
+          paints, so a theme switch recolors it. Term::Fabulous::Role::
+          Searchable names the texts a widget shows, for search and
+          highlights; Text and CodeBlock do it. Every widget estimates its
+          rows before a layout (Term::Fabulous::Widget::estimated_rows),
+          boxes from their children. Render::Frame::text_rows gives the
+          painted lines of a text.
+        - Term::Fabulous::Widget::DocumentView shows a document whose
+          items are any widgets: headings, paragraphs, lists, quotes and
+          code from the factories of Term::Fabulous::Document, and
+          tables, pictures or forms added as they are. It scrolls with
+          the keys, selects the links of every text with l and L and
+          follows them with Enter or a click, searches the text of every
+          item (table cells on other pages included), lets Tab reach the
+          buttons and fields inside, and fires a ViewChange after every
+          frame that shows something new. With it the document
+          (Term::Fabulous::Document: items, sections, anchors, find_text),
+          its styles (::Document::Look, as palette tokens), the scrolling
+          functions of Term::Fabulous::Scrolling,
+          Term::Fabulous::Widget::CodeBlock and
+          Term::Fabulous::Event::ViewChange. Extracted from Pod::Fabulous,
+          so that readers for other formats share them.
+        - Two new cookbook pages. Term::Fabulous::Cookbook::Documents
+          builds a document in Perl and from Markdown read with Markdent,
+          follows links and searches;
+          Term::Fabulous::Cookbook::DocumentTechniques shows a table of
+          contents, highlights code, changes the styles and adds mark
+          kinds, pages through any scroll box, and puts a table and a
+          picture into a document and searches into the table.
+        - Fixes from CPAN Testers: on perls built with long doubles, the
+          labels of a radar chart at a quarter turn no longer land one
+          row off (Term::Fabulous::Chart::Radial::point_at returns whole
+          coordinates as whole numbers), and animation_frame counts a
+          clock a rounding error short of a frame boundary as that frame.
+
 0.03    2026-10-15
         - Fixes from CPAN Testers: the theme editor no longer needs the PNG
           support of Imager; its preview picture is a TGA, which Imager

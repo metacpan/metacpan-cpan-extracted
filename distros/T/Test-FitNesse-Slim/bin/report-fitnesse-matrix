@@ -1,0 +1,307 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use File::Path qw(make_path);
+use FindBin qw($Bin);
+use JSON::PP qw(decode_json);
+
+my $root = "$Bin/..";
+my $runtime = "$root/.runtime";
+my $suite = 'FitNesse.SuiteAcceptanceTests.SuiteSlimTests';
+my $coverage = read_json("$root/docs/fitnesse-acceptance-coverage.json");
+die "coverage manifest inventory totals are inconsistent\n"
+  unless $coverage->{setCounts}{union} == @{$coverage->{pages}}
+    && $coverage->{inventories}{individual}{count}
+      == @{$coverage->{inventories}{individual}{pages}}
+    && $coverage->{inventories}{native}{count}
+      == @{$coverage->{inventories}{native}{pages}};
+
+my %runs;
+for my $mode (qw(individual native)) {
+  for my $transport (qw(pipe tcp)) {
+    my $path = $mode eq 'individual'
+      ? "$runtime/fitnesse-acceptance-results-$transport.json"
+      : "$runtime/fitnesse-native-suite-results-$transport.json";
+    $runs{"$mode-$transport"} = -f $path ? read_json($path) : undef;
+    $runs{"$mode-$transport"}{reportFile} = $path if $runs{"$mode-$transport"};
+  }
+}
+
+my(@gate_rows,@issues,@differences);
+my(%actual_for,%expected_for);
+for my $name (qw(individual-pipe individual-tcp native-pipe native-tcp)) {
+  my($mode,$transport) = split /-/, $name;
+  my $run = $runs{$name};
+  if (!$run) {
+    push @issues, { category => 'runner_infrastructure_failure', gate => $name,
+      detail => 'result report is missing; its runner did not complete or artifact collection failed' };
+    push @gate_rows, { gate => $name, status => 'missing report' };
+    next;
+  }
+  my($expected,$actual,$classifications) = result_pages($mode,$run,$suite);
+  my @missing = sort grep { !exists $actual->{$_} } keys %$expected;
+  my @unexpected = sort grep { !exists $expected->{$_} } keys %$actual;
+  my(@count_changes,@regressions);
+  for my $page (sort keys %$expected) {
+    next unless $actual->{$page};
+    for my $count (qw(right wrong ignored exceptions)) {
+      my($want,$got) = ($expected->{$page}{$count},$actual->{$page}{$count});
+      push @count_changes,{ page=>$page,count=>$count,expected=>$want,actual=>$got }
+        if !defined($got) || !defined($want) || $want != $got;
+    }
+    if ($expected->{$page}{wrong} == 0 && $expected->{$page}{exceptions} == 0
+        && ($actual->{$page}{wrong} || $actual->{$page}{exceptions})) {
+      push @regressions,$page;
+    }
+  }
+  my $gate_failed = $run->{failed} || @missing || @unexpected || @count_changes;
+  push @gate_rows, {
+    gate => $name,
+    status => $gate_failed ? 'failed' : 'baseline match',
+    selected => scalar(keys %$expected),
+    executed => scalar(keys %$actual),
+    missing => \@missing,
+    unexpected => \@unexpected,
+    countChanges => \@count_changes,
+    regressions => \@regressions,
+    pageResults => [ map {
+      my $page = $_;
+      {
+        page => $page,
+        expectedCounts => $expected->{$page},
+        actualCounts => $actual->{$page},
+        matches => $actual->{$page} && tuple($actual->{$page}) eq tuple($expected->{$page})
+          ? JSON::PP::true() : JSON::PP::false(),
+        expectedClassification => $classifications->{$page},
+      }
+    } sort keys %$expected ],
+    assertionTotals => $run->{rawCounts} || $run->{assertionTotals},
+    perlBackendEvidence => $mode eq 'individual'
+      ? $run->{perlExecutionVerified} : $run->{backendAttribution},
+    serverCrashes => $run->{serverCrashes} // 0,
+    serviceFailures => $run->{serviceFailures} || $run->{serviceErrors} || [],
+    runnerFailedFlag => $run->{failed} ? JSON::PP::true() : JSON::PP::false(),
+  };
+  push @issues, map { { category => 'missing_or_skipped_page', gate => $name, page => $_,
+    expectedBehavior => 'page must be selected and produce a result' } } @missing;
+  push @issues, map { { category => 'unexpected_page_selection', gate => $name, page => $_ } } @unexpected;
+  my %regression = map { ($_ => 1) } @regressions;
+  push @issues, map {
+    { category => $regression{$_->{page}} ? 'unexpected_regression' : 'baseline_mismatch', gate => $name, %$_ }
+  } @count_changes;
+  push @issues, { category => 'runner_or_backend_failure', gate => $name,
+    detail => 'runner marked this execution as failed; inspect its detailed report and logs' }
+    if $run->{failed};
+  push @issues, { category => 'runner_infrastructure_failure', gate => $name,
+    detail => "$run->{serverCrashes} Perl server crash(es) reported" }
+    if ($run->{serverCrashes} // 0) > 0;
+  push @issues, map { { category => 'runner_or_backend_failure', gate => $name, detail => $_ } }
+    @{$run->{serviceFailures} || $run->{serviceErrors} || []};
+  $actual_for{$name} = $actual;
+  $expected_for{$name} = $expected;
+}
+
+for my $mode (qw(individual native)) {
+  my($pipe,$tcp) = ("$mode-pipe","$mode-tcp");
+  next unless $actual_for{$pipe} && $actual_for{$tcp};
+  for my $page (sort grep { exists $actual_for{$tcp}{$_} } keys %{$actual_for{$pipe}}) {
+    my $p = tuple($actual_for{$pipe}{$page});
+    my $t = tuple($actual_for{$tcp}{$page});
+    next if $p eq $t;
+    my $reviewed = tuple($expected_for{$pipe}{$page}) eq $p
+      && tuple($expected_for{$tcp}{$page}) eq $t;
+    push @differences, {
+      category => $reviewed ? 'reviewed_transport_difference' : 'baseline_mismatch',
+      mode => $mode, page => $page,
+      pipe => $actual_for{$pipe}{$page}, tcp => $actual_for{$tcp}{$page},
+      expectedPipe => $expected_for{$pipe}{$page}, expectedTcp => $expected_for{$tcp}{$page},
+      expectedBehavior => expectation_note($mode,$page),
+    };
+    push @issues, $differences[-1] unless $reviewed;
+  }
+}
+
+for my $transport (qw(pipe tcp)) {
+  my($individual,$native) = ("individual-$transport","native-$transport");
+  next unless $actual_for{$individual} && $actual_for{$native};
+  for my $page (@{$coverage->{intersection}}) {
+    next unless $actual_for{$individual}{$page} && $actual_for{$native}{$page};
+    my($direct,$suite_result) = (tuple($actual_for{$individual}{$page}),tuple($actual_for{$native}{$page}));
+    next if $direct eq $suite_result;
+    my $reviewed = tuple($expected_for{$individual}{$page}) ne tuple($expected_for{$native}{$page})
+      && $direct eq tuple($expected_for{$individual}{$page})
+      && $suite_result eq tuple($expected_for{$native}{$page});
+    my($coverage_page) = grep { $_->{page} eq $page } @{$coverage->{pages}};
+    push @differences, {
+      category => $reviewed ? 'reviewed_execution_mode_difference' : 'baseline_mismatch',
+      transport => $transport, page => $page,
+      individual => $actual_for{$individual}{$page}, native => $actual_for{$native}{$page},
+      individualExpected => $expected_for{$individual}{$page}, nativeExpected => $expected_for{$native}{$page},
+      context => $coverage_page->{auditedModeDifferenceNote}
+        || $coverage_page->{individualOnlyReason} || $coverage_page->{nativeOnlyReason},
+    };
+    push @issues, $differences[-1] unless $reviewed;
+  }
+}
+
+my $report = {
+  formatVersion => 1,
+  coverageManifest => 'docs/fitnesse-acceptance-coverage.json',
+  executionModes => [qw(isolated_pages native_suite)],
+  transports => [qw(pipe tcp)],
+  coverageDifference => {
+    category => 'discovery_difference',
+    counts => $coverage->{setCounts},
+    individualOnly => $coverage->{individualOnly},
+    nativeOnly => $coverage->{nativeOnly},
+  },
+  gates => \@gate_rows,
+  differences => \@differences,
+  issues => \@issues,
+  overallPass => @issues ? JSON::PP::false() : JSON::PP::true(),
+};
+make_path($runtime);
+my $json_path = "$runtime/fitnesse-acceptance-matrix.json";
+my $md_path = "$runtime/fitnesse-acceptance-matrix.md";
+write_file($json_path,JSON::PP->new->canonical->pretty->encode($report));
+write_file($md_path,render_markdown($report));
+print read_file($md_path);
+exit(@issues ? 1 : 0);
+
+sub result_pages {
+  my($mode,$run,$suite) = @_;
+  my(%expected,%actual,%classification);
+  if ($mode eq 'individual') {
+    my $entries = read_json("$root/docs/fitnesse-slim-acceptance-baseline.json");
+    my $transport = $entries->{transportExpectations}{ $run->{transport} } || {};
+    my $override = $transport->{pages} || {};
+    for my $entry (@{$entries->{pages}}) {
+      my $page = "$suite.$entry->{page}";
+      my $specific = $override->{$entry->{page}};
+      $expected{$page} = $specific->{rawCounts}
+        || $entry->{rawCounts} || $entry->{conformance}{rawCounts};
+      $classification{$page} = {
+        status => $specific->{status} || $entry->{conformance}{status},
+        reason => $specific->{reason} || $entry->{rootCause},
+      };
+    }
+    for my $relative (keys %{$run->{pageResults} || {}}) {
+      my $page = $relative =~ /^\Q$suite\E\./ ? $relative : "$suite.$relative";
+      $actual{$page} = $run->{pageResults}{$relative}{counts}
+        if $run->{pageResults}{$relative}{counts};
+    }
+  }
+  else {
+    my $baseline = read_json("$root/docs/fitnesse-slim-native-suite-baseline.json");
+    my $transport = $baseline->{transportExpectations}{ $run->{transport} } || {};
+    my $override = $transport->{pages} || {};
+    for my $entry (@{$baseline->{expectedPages}}) {
+      my $specific = $override->{$entry->{page}} || {};
+      $expected{$entry->{page}} = $specific->{counts} || $entry->{counts};
+      $classification{$entry->{page}} = $specific->{classification} || $entry->{classification};
+    }
+    for my $page (keys %{$run->{pageResults} || {}}) {
+      $actual{$page} = $run->{pageResults}{$page}{counts}
+        if $run->{pageResults}{$page}{counts};
+    }
+  }
+  return (\%expected,\%actual,\%classification);
+}
+
+sub tuple {
+  my($counts) = @_;
+  return join '/', map { defined($counts->{$_}) ? $counts->{$_} : 'NA' }
+    qw(right wrong ignored exceptions);
+}
+
+sub expectation_note {
+  my($mode,$page) = @_;
+  if ($mode eq 'individual') {
+    my $baseline = read_json("$root/docs/fitnesse-slim-acceptance-baseline.json");
+    (my $relative = $page) =~ s/^\Q$suite.\E//;
+    return $baseline->{transportExpectations}{pipe}{pages}{$relative}{reason}
+      || 'This page has no separately reviewed transport-specific expectation.';
+  }
+  my $baseline = read_json("$root/docs/fitnesse-slim-native-suite-baseline.json");
+  return $baseline->{transportExpectations}{pipe}{pages}{$page}{classification}{assessment}
+    || 'This page has no separately reviewed transport-specific expectation.';
+}
+
+sub read_json {
+  my($path) = @_;
+  open my $fh, '<', $path or return undef;
+  local $/;
+  my $data = eval { decode_json(<$fh>) };
+  close $fh;
+  die "invalid JSON in $path: $@" if $@;
+  return $data;
+}
+
+sub read_file {
+  my($path) = @_;
+  open my $fh, '<', $path or die "read $path: $!";
+  local $/;
+  my $text = <$fh> // '';
+  close $fh;
+  return $text;
+}
+
+sub write_file {
+  my($path,$text) = @_;
+  open my $fh, '>', $path or die "write $path: $!";
+  print {$fh} $text or die "write $path: $!";
+  close $fh or die "close $path: $!";
+  return;
+}
+
+sub render_markdown {
+  my($report) = @_;
+  my $md = "# Four-way FitNesse acceptance comparison\n\n";
+  $md .= "Each gate compares exact page inventories and per-page assertion tuples with its reviewed baseline. A baseline-matching run means no observed regression, not complete SLiM conformance.\n\n";
+  $md .= "| Mode | Transport | Status | Pages | Assertion totals (R/W/I/E) |\n|---|---|---|---:|---|\n";
+  for my $gate (@{$report->{gates}}) {
+    my($mode,$transport) = split /-/, $gate->{gate};
+    my $total = $gate->{assertionTotals} || {};
+    my $totals = join '/', map { $total->{$_} // '-' } qw(right wrong ignored exceptions);
+    $md .= "| $mode | $transport | $gate->{status} | "
+      . ($gate->{executed} // '-') . '/' . ($gate->{selected} // '-') . " | $totals |\n";
+  }
+  $md .= "\n## Differences\n\n";
+  my $coverage = $report->{coverageDifference}{counts};
+  $md .= "Discovery difference: $coverage->{intersection} shared, $coverage->{individualOnly} individual-only, "
+    . "$coverage->{nativeOnly} native-only pages (see the coverage manifest for full paths).\n\n";
+  if (!@{$report->{differences}}) { $md .= "No per-page differences between available runs.\n" }
+  for my $difference (@{$report->{differences}}) {
+    my $expected = $difference->{category} =~ /^reviewed_/ ? 'Reviewed difference' : 'Needs investigation';
+    $md .= "- **$expected** ($difference->{category}) — `$difference->{page}`: ";
+    $md .= $difference->{mode}
+      ? "pipe observed " . tuple($difference->{pipe}) . ", TCP observed " . tuple($difference->{tcp})
+        . "; expected pipe " . tuple($difference->{expectedPipe})
+        . ", TCP " . tuple($difference->{expectedTcp}) . "."
+      : $difference->{transport}
+        ? "$difference->{transport}: isolated observed " . tuple($difference->{individual})
+          . ", native observed " . tuple($difference->{native})
+          . "; expected isolated " . tuple($difference->{individualExpected})
+          . ", native " . tuple($difference->{nativeExpected}) . "."
+        : 'exact assertion tuple differs from its expected value.';
+    $md .= " Expected behavior: $difference->{expectedBehavior}"
+      if $difference->{expectedBehavior};
+    $md .= " $difference->{context}" if $difference->{context};
+    $md .= "\n";
+  }
+  $md .= "\n## Issues\n\n";
+  $md .= "No missing pages, baseline mismatches, or runner failures.\n" unless @{$report->{issues}};
+  for my $issue (@{$report->{issues}}) {
+    $md .= "- $issue->{category}: `$issue->{gate}`";
+    $md .= " `$issue->{page}`" if $issue->{page};
+    $md .= " $issue->{count}: expected $issue->{expected}, observed $issue->{actual}."
+      if $issue->{count};
+    $md .= " ($issue->{detail})" if $issue->{detail};
+    $md .= " Expected behavior: $issue->{expectedBehavior}." if $issue->{expectedBehavior};
+    $md .= "\n";
+  }
+  $md .= "\nMachine-readable details: `.runtime/fitnesse-acceptance-matrix.json`.\n";
+  return $md;
+}

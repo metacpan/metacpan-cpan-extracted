@@ -2,9 +2,10 @@ package ZX81::Tape;
 
 use Modern::Perl;
 use Path::Tiny;
+use CPU::Z80::Assembler;
 use ZX81::Tokenize qw( tokenize_basic encode_chars encode_float );
 
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 
 use Exporter qw(import);
 
@@ -913,11 +914,14 @@ sub decode_var {
 #------------------------------------------------------------------------------
 use Object::Tiny::RW qw(
   lines
+  labels
+  asm_lines
+  asm_labels
+  asm_bytes
   vars
   dfile
   dfile_collapsed
   last_line_num
-  labels
   autostart autostart_line
   increment
   reminvert
@@ -928,16 +932,19 @@ sub new {
     my ($class) = @_;
     my $self = bless {
         lines           => [],
+        labels          => {},
+        asm_lines       => [],
+        asm_labels      => {},
+        asm_bytes       => '',
         vars            => [],
         dfile           => [],
         dfile_collapsed =>  0,
         last_line_num   => -1,
-        labels          => {},
-        autostart       => 0,
-        autostart_line  => 0,
+        autostart       =>  0,
+        autostart_line  =>  0,
         increment       => 10,
-        reminvert       => 0,
-        fast            => 0,
+        reminvert       =>  0,
+        fast            =>  0,
     }, $class;
     return $self;
 }
@@ -964,6 +971,25 @@ sub parse_file {
             splice( @lines, $i + 1, 1 );
         }
     }
+
+    # separate ASM and BASIC source
+    my @new_lines;
+    my $in_asm = 0;
+    for my $line (@lines) {
+        if ( $line->text =~ /^\s*\#\s*ASM\b/ ) {
+            $in_asm = 1;
+        }
+        elsif ( $line->text =~ /^\s*\#\s*ENDASM\b/ ) {
+            $in_asm = 0;
+        }
+        elsif ($in_asm) {
+            push @{ $self->asm_lines }, $line;
+        }
+        else {
+            push @new_lines, $line;
+        }
+    }
+    @lines = @new_lines;
 
     # parse labels and line numbers
     for my $line (@lines) {
@@ -1219,9 +1245,9 @@ sub compile {
     # remove empty lines
     @{ $self->lines } = grep { $_->text !~ /^\s*$/ } @{ $self->lines };
 
-    # replace all labels with line numbers
+    # replace all @labels with line numbers
     for my $line ( @{ $self->lines } ) {
-        while ( $line->{text} =~ /\@([a-z_]\w+)/ ) {
+        while ( $line->{text} =~ /\@([a-z_]\w+)/i ) {
             my $label = $1;
             if ( !exists $self->labels->{$label} ) {
                 $line->error( "undefined label: " . $label );
@@ -1236,6 +1262,14 @@ sub compile {
     my $old_size = 0;
     for ( my $pass = 1 ; $pass <= 2 ; $pass++ ) {
         my $bin = '';
+
+        # assemble ASM code
+        if ( @{ $self->asm_lines } ) {
+            my $asm_bytes = $self->assemble_asm(%line_addr);
+            $self->asm_bytes($asm_bytes);
+            $bin .= $asm_bytes;
+        }
+
         for my $line ( @{ $self->lines } ) {
 
             # calculate the address of the line
@@ -1243,15 +1277,21 @@ sub compile {
                 $line_addr{ $line->label } = 0x407D + length($bin);
             }
 
-            # replace &label with line address
+            # replace &label with line address or asm label value
             my $text = $line->line_num . " " . $line->text;
             while ( $text =~ /\&([a-z_]\w+)/i ) {
                 my $label = $1;
-                if ( !exists $self->labels->{$label} ) {
+                if ( exists $self->labels->{$label} ) {    # BASIC label
+                    my $addr = $line_addr{$label} // 0;
+                    $text =~ s/\&$label/$addr/g;
+                }
+                elsif ( exists $self->asm_labels->{$label} ) {    # ASM label
+                    my $value = $self->asm_labels->{$label};
+                    $text =~ s/\&$label/$value/g;
+                }
+                else {
                     $line->error( "undefined label: " . $label );
                 }
-                my $addr = $line_addr{$label} // 0;
-                $text =~ s/\&$label/$addr/g;
             }
 
             # apply reminvert if requested
@@ -1259,11 +1299,17 @@ sub compile {
                 $text = $self->invert_rem($text);
             }
 
+            # convert hex notation to decimal
+            $text =~ s/0x([0-9A-Fa-f]+)/hex($1)/ge;
+            $text =~ s/\$([0-9A-Fa-f]+)/hex($1)/ge;
+
+            # convert BASIC to ZX81 tokens
             my $line_bytes = tokenize_basic($text);
             $line->bytes($line_bytes);
             $bin .= $line_bytes;
         }
 
+        # check if size changed; recompute if yes
         my $new_size = length($bin);
         if ( $old_size != $new_size ) {
             $old_size = $new_size;
@@ -1292,11 +1338,64 @@ sub invert_rem {
     return $text;
 }
 
+sub assemble_asm {
+    my ( $self, %line_addr ) = @_;
+
+    my @asm_lines;
+
+    # add ORG
+    push @asm_lines, " org 0x407D";
+
+    # add EQU for all BASIC labels
+    for my $label ( sort keys %{ $self->labels } ) {
+        my $addr = $line_addr{$label} // 0;
+        push @asm_lines, "$label equ $addr";
+    }
+
+    # add 0 REM line
+    push @asm_lines, " defw 0";                        # line number
+    push @asm_lines, " defw end_rem0 - start_rem0";    # size
+    push @asm_lines, "start_rem0:";
+    push @asm_lines, " defb 0xEA";                     # REM
+
+    # add assembly lines
+    for my $line ( @{ $self->asm_lines } ) {
+        my $text = $line->text;
+
+        # convert strings to zx81 characters
+        while ( $text =~ /( (['"]) ( (?: [^\\] | \\.)* ) \2 )/x ) {
+            my ( $match, $char ) = ( $1, $3 );
+            my $encoded = join ",", map { ord } split //, encode_chars($char);
+            $text =~ s/$match/$encoded/g;
+        }
+
+        push @asm_lines, $text;
+    }
+
+    # add newline and end label
+    push @asm_lines, " defb 0x76";
+    push @asm_lines, "end_rem0:";
+
+    # assemble
+    my $program      = CPU::Z80::Assembler::Program->new();
+    my $token_stream = z80lexer(@asm_lines);
+    $program->parse($token_stream);
+    my $bytes = $program->bytes();
+
+    # extract asm labels
+    for my $label ( sort keys %{ $program->symbols } ) {
+        my $value = $program->symbols->{$label}->evaluate;
+        $self->asm_labels->{$label} = $value;
+    }
+
+    return $bytes;
+}
+
 sub as_bytes {
     my ($self) = @_;
 
     # Convert the stored BASIC lines to a byte string
-    my $prog = '';
+    my $prog = $self->asm_bytes;
     my @line_addr;
     for my $line ( @{ $self->lines } ) {
         push @line_addr, [ $line->line_num, $sysvars{PROG} + length($prog) ];
@@ -1591,6 +1690,8 @@ to the tape format. The start line number is 10 by default and the increment
 between consecutive lines is also 10 by default. A line with a line number
 resets the numbering from there on. Line numbers from 0 to 9999 are accepted.
 
+BASIC code can use numbers in hexadecimal with the notation $hh and 0xhh.
+
 =head2 LABELS
 
 Labels can be written before the BASIC statement as '@' NAME ':', and can be
@@ -1668,6 +1769,19 @@ file is defined by a separate #DFILE pragma.
     #DFILE_COLLAPSED=[0|1]
 
 Saves the display file in collapsed form.
+
+=head3 #ASM
+
+    #ASM
+    start:
+        ld bc, 1234
+        ret
+    #ENDASM
+        PRINT USR &start
+
+The lines between #ASM and #ENDASM are collected and assembled with an ORG
+of 0x4082, and a 0 REM line is created with the binary image of the assembled
+code. BASIC can use ASM labels via '&' NAME.
 
 =head1 SEE ALSO
 

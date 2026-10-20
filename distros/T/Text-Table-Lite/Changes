@@ -1,0 +1,12 @@
+Revision history for Text::Table::Lite
+
+1.002  2026-10-20
+    - Rename distribution and module to Text::Table::Lite.
+    - Replace input_encoding/output_encoding with one encoding option.
+    - Use the requested Chinese multiline sample data in tests and example.
+
+1.001  2026-10-20
+    - Add explicit input and output encoding options using Encode.
+
+1.000  2026-10-20
+    - Initial release.

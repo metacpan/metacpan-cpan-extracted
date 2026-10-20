@@ -5,7 +5,7 @@ use Path::Tiny;
 use Email::MIME;
 use lib 'lib';
 use Mail::DKIM2::Common qw(extract_mi_version parse_dkim_pubkey parse_mime
-                           valid_sequence chain_number_error mi_version_tag UNKEYABLE_SIGNATURE_ERROR);
+                           valid_sequence chain_number_error mi_version_tag unkeyable_signature_error);
 use Mail::DKIM2::Signature;
 use Mail::DKIM2::MessageInstance;
 use Mail::DKIM2::Verifier;
@@ -38,9 +38,9 @@ my $dns = decode_json(path($dns_json)->slurp);
 for my $h ($msg1->header_raw('DKIM2-Signature')) {
   my $sig = eval { Mail::DKIM2::Signature->parse($h) };
   my $i = $sig ? $sig->sequence : undef;
-  die UNKEYABLE_SIGNATURE_ERROR . "\n" unless valid_sequence($i);
+  die unkeyable_signature_error($h) . "\n" unless valid_sequence($i);
   my $e = chain_number_error('DKIM2-Signature', 'i', $i)
-       // chain_number_error('DKIM2-Signature', 'm', $sig->version);
+       // chain_number_error('DKIM2-Signature', 'm', $sig->version, $i);
   die "$e\n" if $e;
 }
 for my $h ($msg1->header_raw('Message-Instance')) {
@@ -58,7 +58,7 @@ my $instance = %mimap ? max(keys %mimap) : 0;
 # which the locally-highest i= is not the real top -- see mid_process below.
 my $top_i = $num;
 
-# spec-06 §11: "there MUST NOT be a Message-Instance field with a higher m=
+# -07 §14: "there MUST NOT be a Message-Instance field with a higher m=
 # value than occurs in any DKIM2-Signature field" -- reported as "PERMERROR
 # Message-Instance m=<x> is not signed". Checked up front because the walk
 # below happily verifies and reports "OK Message-Instance" for an instance
@@ -67,7 +67,7 @@ my $top_i = $num;
 # even though our own inbound path stamps an unsigned MI internally.
 if ($instance) {
   my $top_signed = %map ? max(map { _getv($_) } values %map) : 0;
-  die "PERMERROR Message-Instance m=$instance is not signed\n"
+  die "PERMERROR: Message-Instance m=$instance is not signed\n"
     if $instance > $top_signed;
 }
 
@@ -107,7 +107,7 @@ while (1) {
   # After the first step this is a partial view (higher DKIM2-Signature
   # headers have been stripped), so its locally-highest i= is not the real
   # top of the chain and Verifier.pm's top-nd= rejection must not fire: a
-  # legitimate §9.3 nd= bridge below the top looks locally topmost here.
+  # legitimate §12.3 nd= bridge below the top looks locally topmost here.
   # The first step still sees the whole chain, so a true top nd= is caught.
   $verifier->mid_process(1) if $num < $top_i;
   $verifier->headers_only(1) if $hdr_only;
@@ -118,7 +118,10 @@ while (1) {
   if ($verifier->result eq 'pass') {
     say "OK DKIM2-Signature: i=$num; m=$instance";
   } else {
-    die "DKIM2-Signature i=$num: " . $verifier->result_detail();
+    # The primary error (contract C9) on a line of its own, first, then
+    # the result word with it.
+    say STDERR $verifier->details if $verifier->details;
+    die "DKIM2-Signature i=$num: " . $verifier->result_detail() . "\n";
   }
   $msg1->header_raw_set('DKIM2-Signature', grep { _geti($_) < $num } $msg1->header('DKIM2-Signature'));
   $num--;

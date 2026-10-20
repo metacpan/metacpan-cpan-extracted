@@ -20,7 +20,7 @@ no_index:
 provides:
   App::Acmeman:
     file: lib/App/Acmeman.pm
-    version: '3.10'
+    version: '3.12'
   App::Acmeman::Apache::Layout:
     file: lib/App/Acmeman/Apache/Layout.pm
   App::Acmeman::Apache::Layout::debian:
@@ -48,6 +48,8 @@ provides:
   App::Acmeman::Source::Null:
     file: lib/App/Acmeman/Source/Null.pm
   App::Acmeman::Source::Pound:
+    file: lib/App/Acmeman/Source/Pound.pm
+  App::Acmeman::Source::Pound::IntStack:
     file: lib/App/Acmeman/Source/Pound.pm
 requires:
   Apache::Config::Preproc: '1.04'
@@ -77,5 +79,5 @@ requires:
 resources:
   bugtracker: https://puszcza.gnu.org.ua/bugs/?group=acmeman
   repository: git://git.gnu.org.ua/acmeman.git
-version: '3.10'
+version: '3.12'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

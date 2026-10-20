@@ -1,0 +1,13 @@
+!define TEST_SYSTEM {slim}
+!define SLIM_PORT {1}
+!define COMMAND_PATTERN {%m}
+!define TEST_RUNNER {/absolute/path/to/perl-slim}
+!path /absolute/path/to/examples/lib
+
+|import|
+|Example|
+
+|script|Counter|4|
+|check|value?|4|
+|addAmount|3|
+|check|value?|7|

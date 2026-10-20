@@ -47,6 +47,13 @@
     word-break: break-all;
   }
   .chart-source a { color: inherit; }
+  /* A multi-series legend entry is a switch, not a caption.  A <g> has no box
+     of its own, so the focus ring is drawn on the swatch it toggles. */
+  #chart .msl-leg-item:focus-visible { outline: none; }
+  #chart .msl-leg-item:focus-visible rect {
+    stroke: #0d6efd;
+    stroke-width: 2px;
+  }
 </style>
 
 <p class="back-link"><a href="/">&larr; Home</a> &rsaquo; <a href="[% back_url | html %]">[% back_label || 'Back' | html %]</a>[%- IF back2_url -%] &rsaquo; <a href="[% back2_url | html %]">[% back2_label || 'Back' | html %]</a>[%- END -%]</p>
@@ -67,10 +74,68 @@
   [% END %]
 </div>
 
+[% IF chart && chart.encode && chart.encode.series %]
+<p class="sr-only" id="line-legend-help">Show or hide a series: press Tab until a legend entry
+has focus, then press Enter or Space to toggle it.</p>
+<p class="sr-only" id="line-live" role="status" aria-live="polite"></p>
+[% END %]
+
 <div class="graph-container">
   <script src="https://d3js.org/d3.v7.min.js"></script>
   [% chart_html %]
 </div>
+
+<script>
+// D3 draws the multi-series legend as clickable entries: each hides or shows
+// its line.  A click is not something a keyboard reader can make, so each entry
+// is made a switch - in the tab order, named for the series it toggles,
+// aria-pressed saying whether that line is drawn, and Enter or Space sending
+// the same click the pointer sends.  A single-series chart has no legend, and
+// this finds nothing.
+(function () {
+  var live = document.getElementById('line-live');
+
+  // The pressed state is announced by a screen reader that is on the entry;
+  // the line coming and going is not, so it is said here as well.
+  function say(name, pressed) {
+    if (!live) return;
+    live.textContent = '';
+    setTimeout(function () {
+      live.textContent = name + (pressed ? ' shown' : ' hidden');
+    }, 30);
+  }
+
+  function wireLegend() {
+    document.querySelectorAll('#chart .msl-leg-item').forEach(function (item) {
+      var textEl = item.querySelector('text');
+      var name   = textEl ? textEl.textContent.trim() : '';
+      if (!name) return;
+
+      item.setAttribute('tabindex', '0');
+      item.setAttribute('role', 'button');
+      item.setAttribute('aria-label', 'Toggle ' + name);
+      item.setAttribute('aria-pressed', 'true');
+      if (document.getElementById('line-legend-help')) {
+        item.setAttribute('aria-describedby', 'line-legend-help');
+      }
+
+      item.addEventListener('click', function () {
+        var pressed = item.getAttribute('aria-pressed') !== 'true';
+        item.setAttribute('aria-pressed', pressed ? 'true' : 'false');
+        say(name, pressed);
+      });
+      item.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          item.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+        }
+      });
+    });
+  }
+
+  setTimeout(wireLegend, 50);
+}());
+</script>
 
 <script>
 (function () {

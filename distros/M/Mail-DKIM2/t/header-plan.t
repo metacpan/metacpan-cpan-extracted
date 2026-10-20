@@ -83,9 +83,10 @@ same('field names in mixed case are one name',
     message([mi(2, { h => { subject => [{ c => [2, 2] }] } }), mi(1)],
             'SUBJECT: upper', 'subject: lower', @base[0, 1]));
 
-same('Recipe keys in mixed case apply in turn',
-    message([mi(2, { h => { Subject => [{ c => [1, 1] }, { d => ['added'] }],
-                            subject => [{ c => [2, 2] }] } }), mi(1)],
+# Two keys differing only in case are a duplicate, invalid JSON (t/spec07.t
+# K2); one key in any case names the field (K1).
+same('a Recipe key in mixed case names the field',
+    message([mi(2, { h => { SUBJECT => [{ c => [1, 1] }, { d => ['added'] }] } }), mi(1)],
             'Subject: one', @base[0, 1]));
 
 same('a name with a space before the colon',

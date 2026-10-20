@@ -1,0 +1,21 @@
+# Time::Keeper::Natural word table: ru
+#
+# UNREVIEWED: written 18 Oct 2026 by a session, as the p2p site's catalogues were.
+# A native reader should review it before release. The format is en.txt's.
+#
+# Russian puts a period after "конец" in the genitive, and CLDR's relative
+# words are prepositional ("в прошлом месяце"), so the edges read with a month
+# name, whose format form is the genitive ("конец октября"). "в" before a day
+# reads where the accusative is the nominative ("во вторник", not "в среду").
+# An ordinal weekday ("в третью пятницу октября") has no "of" to split on and
+# is not read.
+start_of	начало|в начале
+end_of	конец|в конце
+at	в
+on	в|во
+skip
+and
+# test: конец октября => 2026-10-31T23:59:59.999999999+00:00
+# test: в начале ноября => 2026-11-01T00:00:00+00:00
+# test: завтра в 15:30 => 2026-10-16T15:30:00+01:00
+# test: во вторник => 2026-10-20T00:00:00+01:00

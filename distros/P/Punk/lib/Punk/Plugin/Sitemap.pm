@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Punk ();
 
-our $VERSION = '0.61';
+our $VERSION = '0.62';
 
 1;
 
@@ -150,6 +150,20 @@ There is no C<< <lastmod> >> on routes. "When did this static page last
 change" is not something the route table knows, and stamping boot time would
 tell crawlers every page changed on every deploy, which is the fastest way to
 have the file ignored.
+
+=head1 MARKDOWN MOUNTS
+
+A C<markdown> mount's pages are listed with no section to write: a docs tree
+or a blog is exactly what a sitemap is for, and the mount's pages are built
+before the sitemap is. Each page's C<< <lastmod> >> is its front-matter
+C<updated:>, else its C<date:>, as C<YYYY-MM-DD>; an undated page goes in
+without one. Drafts are not listed, since they are not pages.
+
+A page whose C<robots:> names C<noindex> is left out of the sitemap, and is
+B<not> added to C<robots.txt>: a crawler that may not fetch a page never
+reads its noindex. C<< sitemap => 0 >> on the C<markdown> keyword leaves out
+the whole tree. A page that is also a route, or that a section returns, is
+listed once.
 
 =head1 THE DYNAMIC HALF
 
@@ -391,6 +405,19 @@ a page is public anyway.
 The method and the shape are B<not> overridable. C<< sitemap => 1 >> on a
 C<POST> or on C<< /users/:id >> does nothing, because a POST is not a page and
 a pattern is not a URL - those are mistakes rather than instructions.
+
+=head1 METHODS
+
+=head2 new
+
+The constructor L<Punk/plugin> calls. It takes nothing; the options go to
+L</register>.
+
+=head2 register($app, \%opts)
+
+Called once by C<plugin>: records the L</OPTIONS> and mounts
+F</sitemap.xml> and F</robots.txt>. The C<base> is resolved and checked at
+C<to_app>, since C<host> may be declared after the C<plugin> line.
 
 =head1 SEE ALSO
 

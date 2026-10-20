@@ -18,51 +18,45 @@
 <text class="title" x="354" y="33" text-anchor="middle" dominant-baseline="central" fill="#9aa3b5">perl examples/widgets/dialog.pl</text>
 <rect x="16.5" y="16.5" width="675" height="309" rx="10" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1"/>
 <g shape-rendering="crispEdges">
-<rect x="30" y="60" width="648" height="18" fill="#0b0b11"/>
-<rect x="30" y="78" width="126" height="198" fill="#0b0b11"/>
-<rect x="156" y="78" width="396" height="108" fill="#1c212d"/>
-<rect x="552" y="78" width="126" height="198" fill="#0b0b11"/>
-<rect x="156" y="186" width="18" height="54" fill="#1c212d"/>
-<rect x="174" y="186" width="90" height="54" fill="#8c2d32"/>
-<rect x="264" y="186" width="18" height="54" fill="#1c212d"/>
-<rect x="282" y="186" width="90" height="54" fill="#2b3a55"/>
-<rect x="372" y="186" width="180" height="54" fill="#1c212d"/>
-<rect x="156" y="240" width="396" height="36" fill="#1c212d"/>
-<rect x="30" y="276" width="648" height="36" fill="#0b0b11"/>
-<rect x="165" y="86" width="378" height="1" fill="#61afef"/>
-<rect x="160" y="96" width="1" height="162" fill="#61afef"/>
-<rect x="547" y="96" width="1" height="162" fill="#61afef"/>
-<rect x="183" y="194" width="72" height="1" fill="#61afef"/>
-<rect x="291" y="194" width="72" height="1" fill="#5a6e8c"/>
-<rect x="178" y="204" width="1" height="18" fill="#61afef"/>
-<rect x="259" y="204" width="1" height="18" fill="#61afef"/>
-<rect x="286" y="204" width="1" height="18" fill="#5a6e8c"/>
-<rect x="367" y="204" width="1" height="18" fill="#5a6e8c"/>
-<rect x="183" y="230" width="72" height="1" fill="#61afef"/>
-<rect x="291" y="230" width="72" height="1" fill="#5a6e8c"/>
-<rect x="165" y="266" width="378" height="1" fill="#61afef"/>
+<rect x="30" y="60" width="648" height="36" fill="#0b0b11"/>
+<rect x="30" y="96" width="126" height="198" fill="#0b0b11"/>
+<rect x="156" y="96" width="396" height="198" fill="#1c212d"/>
+<rect x="552" y="96" width="126" height="198" fill="#0b0b11"/>
+<rect x="30" y="294" width="648" height="18" fill="#0b0b11"/>
+<rect x="165" y="104" width="378" height="1" fill="#61afef"/>
+<rect x="160" y="114" width="1" height="162" fill="#61afef"/>
+<rect x="547" y="114" width="1" height="162" fill="#61afef"/>
+<rect x="183" y="212" width="72" height="1" fill="#61afef"/>
+<rect x="291" y="212" width="72" height="1" fill="#46556e"/>
+<rect x="178" y="222" width="1" height="18" fill="#61afef"/>
+<rect x="259" y="222" width="1" height="18" fill="#61afef"/>
+<rect x="286" y="222" width="1" height="18" fill="#46556e"/>
+<rect x="367" y="222" width="1" height="18" fill="#46556e"/>
+<rect x="183" y="248" width="72" height="1" fill="#61afef"/>
+<rect x="291" y="248" width="72" height="1" fill="#46556e"/>
+<rect x="165" y="284" width="378" height="1" fill="#61afef"/>
 </g>
-<polyline points="160.5 96 160.5 91 160.538 90.413 160.653 89.835 160.843 89.278 161.103 88.75 161.43 88.261 161.818 87.818 162.261 87.43 162.75 87.103 163.278 86.843 163.835 86.653 164.413 86.538 165 86.5 165 86.5" fill="none" stroke="#61afef" stroke-width="1" stroke-linejoin="round"/>
-<polyline points="547.5 96 547.5 91 547.462 90.413 547.347 89.835 547.157 89.278 546.897 88.75 546.57 88.261 546.182 87.818 545.739 87.43 545.25 87.103 544.722 86.843 544.165 86.653 543.587 86.538 543 86.5 543 86.5" fill="none" stroke="#61afef" stroke-width="1" stroke-linejoin="round"/>
-<polyline points="178.5 204 178.5 199 178.538 198.413 178.653 197.835 178.843 197.278 179.103 196.75 179.43 196.261 179.818 195.818 180.261 195.43 180.75 195.103 181.278 194.843 181.835 194.653 182.413 194.538 183 194.5 183 194.5" fill="none" stroke="#61afef" stroke-width="1" stroke-linejoin="round"/>
-<polyline points="259.5 204 259.5 199 259.462 198.413 259.347 197.835 259.157 197.278 258.897 196.75 258.57 196.261 258.182 195.818 257.739 195.43 257.25 195.103 256.722 194.843 256.165 194.653 255.587 194.538 255 194.5 255 194.5" fill="none" stroke="#61afef" stroke-width="1" stroke-linejoin="round"/>
-<polyline points="286.5 204 286.5 199 286.538 198.413 286.653 197.835 286.843 197.278 287.103 196.75 287.43 196.261 287.818 195.818 288.261 195.43 288.75 195.103 289.278 194.843 289.835 194.653 290.413 194.538 291 194.5 291 194.5" fill="none" stroke="#5a6e8c" stroke-width="1" stroke-linejoin="round"/>
-<polyline points="367.5 204 367.5 199 367.462 198.413 367.347 197.835 367.157 197.278 366.897 196.75 366.57 196.261 366.182 195.818 365.739 195.43 365.25 195.103 364.722 194.843 364.165 194.653 363.587 194.538 363 194.5 363 194.5" fill="none" stroke="#5a6e8c" stroke-width="1" stroke-linejoin="round"/>
-<polyline points="178.5 222 178.5 226 178.538 226.587 178.653 227.165 178.843 227.722 179.103 228.25 179.43 228.739 179.818 229.182 180.261 229.57 180.75 229.897 181.278 230.157 181.835 230.347 182.413 230.462 183 230.5 183 230.5" fill="none" stroke="#61afef" stroke-width="1" stroke-linejoin="round"/>
-<polyline points="259.5 222 259.5 226 259.462 226.587 259.347 227.165 259.157 227.722 258.897 228.25 258.57 228.739 258.182 229.182 257.739 229.57 257.25 229.897 256.722 230.157 256.165 230.347 255.587 230.462 255 230.5 255 230.5" fill="none" stroke="#61afef" stroke-width="1" stroke-linejoin="round"/>
-<polyline points="286.5 222 286.5 226 286.538 226.587 286.653 227.165 286.843 227.722 287.103 228.25 287.43 228.739 287.818 229.182 288.261 229.57 288.75 229.897 289.278 230.157 289.835 230.347 290.413 230.462 291 230.5 291 230.5" fill="none" stroke="#5a6e8c" stroke-width="1" stroke-linejoin="round"/>
-<polyline points="367.5 222 367.5 226 367.462 226.587 367.347 227.165 367.157 227.722 366.897 228.25 366.57 228.739 366.182 229.182 365.739 229.57 365.25 229.897 364.722 230.157 364.165 230.347 363.587 230.462 363 230.5 363 230.5" fill="none" stroke="#5a6e8c" stroke-width="1" stroke-linejoin="round"/>
-<polyline points="160.5 258 160.5 262 160.538 262.587 160.653 263.165 160.843 263.722 161.103 264.25 161.43 264.739 161.818 265.182 162.261 265.57 162.75 265.897 163.278 266.157 163.835 266.347 164.413 266.462 165 266.5 165 266.5" fill="none" stroke="#61afef" stroke-width="1" stroke-linejoin="round"/>
-<polyline points="547.5 258 547.5 262 547.462 262.587 547.347 263.165 547.157 263.722 546.897 264.25 546.57 264.739 546.182 265.182 545.739 265.57 545.25 265.897 544.722 266.157 544.165 266.347 543.587 266.462 543 266.5 543 266.5" fill="none" stroke="#61afef" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="160.5 114 160.5 109 160.538 108.413 160.653 107.835 160.843 107.278 161.103 106.75 161.43 106.261 161.818 105.818 162.261 105.43 162.75 105.103 163.278 104.843 163.835 104.653 164.413 104.538 165 104.5 165 104.5" fill="none" stroke="#61afef" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="547.5 114 547.5 109 547.462 108.413 547.347 107.835 547.157 107.278 546.897 106.75 546.57 106.261 546.182 105.818 545.739 105.43 545.25 105.103 544.722 104.843 544.165 104.653 543.587 104.538 543 104.5 543 104.5" fill="none" stroke="#61afef" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="178.5 222 178.5 217 178.538 216.413 178.653 215.835 178.843 215.278 179.103 214.75 179.43 214.261 179.818 213.818 180.261 213.43 180.75 213.103 181.278 212.843 181.835 212.653 182.413 212.538 183 212.5 183 212.5" fill="none" stroke="#61afef" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="259.5 222 259.5 217 259.462 216.413 259.347 215.835 259.157 215.278 258.897 214.75 258.57 214.261 258.182 213.818 257.739 213.43 257.25 213.103 256.722 212.843 256.165 212.653 255.587 212.538 255 212.5 255 212.5" fill="none" stroke="#61afef" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="286.5 222 286.5 217 286.538 216.413 286.653 215.835 286.843 215.278 287.103 214.75 287.43 214.261 287.818 213.818 288.261 213.43 288.75 213.103 289.278 212.843 289.835 212.653 290.413 212.538 291 212.5 291 212.5" fill="none" stroke="#46556e" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="367.5 222 367.5 217 367.462 216.413 367.347 215.835 367.157 215.278 366.897 214.75 366.57 214.261 366.182 213.818 365.739 213.43 365.25 213.103 364.722 212.843 364.165 212.653 363.587 212.538 363 212.5 363 212.5" fill="none" stroke="#46556e" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="178.5 240 178.5 244 178.538 244.587 178.653 245.165 178.843 245.722 179.103 246.25 179.43 246.739 179.818 247.182 180.261 247.57 180.75 247.897 181.278 248.157 181.835 248.347 182.413 248.462 183 248.5 183 248.5" fill="none" stroke="#61afef" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="259.5 240 259.5 244 259.462 244.587 259.347 245.165 259.157 245.722 258.897 246.25 258.57 246.739 258.182 247.182 257.739 247.57 257.25 247.897 256.722 248.157 256.165 248.347 255.587 248.462 255 248.5 255 248.5" fill="none" stroke="#61afef" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="286.5 240 286.5 244 286.538 244.587 286.653 245.165 286.843 245.722 287.103 246.25 287.43 246.739 287.818 247.182 288.261 247.57 288.75 247.897 289.278 248.157 289.835 248.347 290.413 248.462 291 248.5 291 248.5" fill="none" stroke="#46556e" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="367.5 240 367.5 244 367.462 244.587 367.347 245.165 367.157 245.722 366.897 246.25 366.57 246.739 366.182 247.182 365.739 247.57 365.25 247.897 364.722 248.157 364.165 248.347 363.587 248.462 363 248.5 363 248.5" fill="none" stroke="#46556e" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="160.5 276 160.5 280 160.538 280.587 160.653 281.165 160.843 281.722 161.103 282.25 161.43 282.739 161.818 283.182 162.261 283.57 162.75 283.897 163.278 284.157 163.835 284.347 164.413 284.462 165 284.5 165 284.5" fill="none" stroke="#61afef" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="547.5 276 547.5 280 547.462 280.587 547.347 281.165 547.157 281.722 546.897 282.25 546.57 282.739 546.182 283.182 545.739 283.57 545.25 283.897 544.722 284.157 544.165 284.347 543.587 284.462 543 284.5 543 284.5" fill="none" stroke="#61afef" stroke-width="1" stroke-linejoin="round"/>
 <g class="terminal">
-<text x="48" y="92" textLength="108" fill="#4b505a">Selected fil</text>
+<text x="48" y="92" textLength="351" fill="#4b505a">Selected files (d asks to delete them):</text>
 <text x="66" y="110" textLength="90" fill="#6e6e6e">holiday-ph</text>
 <text x="66" y="128" textLength="90" fill="#6e6e6e">notes-2026</text>
-<text x="174" y="128" textLength="135" fill="#ffffff">Delete 3 files?</text>
 <text x="66" y="146" textLength="90" fill="#6e6e6e">old-backup</text>
-<text x="174" y="164" textLength="360" fill="#dcdcdc">They take 9.2 GB. This cannot be undone.</text>
-<text x="192" y="218" textLength="54" fill="#ffffff">Delete</text>
-<text x="300" y="218" textLength="54" fill="#ffffff">Cancel</text>
+<text x="174" y="146" textLength="135" class="b" fill="#dcdfe4">Delete 3 files?</text>
+<text x="174" y="182" textLength="360" fill="#dcdcdc">They take 9.2 GB. This cannot be undone.</text>
+<text x="192" y="236" textLength="54" fill="#dcdfe4">Delete</text>
+<text x="300" y="236" textLength="54" fill="#dcdfe4">Cancel</text>
 </g>
 <g shape-rendering="crispEdges">
 </g>

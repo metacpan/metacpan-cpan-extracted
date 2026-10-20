@@ -4,14 +4,13 @@ use Test::More;
 use lib 'lib';
 use Mail::DKIM2::Signature;
 
-# draft-03 §8.10: feedhere joins the recognised flag set; it round-trips with
-# no verifier enforcement (like feedback).
+# -07 section 10.10: flags round-trip, with no verifier enforcement.
 my $built = Mail::DKIM2::Signature->new(
     Sequence => 1, Version => 1, Timestamp => 1, Domain => 'ex.example',
     MailFrom => 'a@x.example', RcptTo => ['b@y.example'],
-    Flags => ['donotmodify', 'feedhere'],
+    Flags => ['exploded', 'feedhere'],
 );
-like($built->as_string, qr/f=donotmodify,feedhere/, 'flags serialized incl. feedhere');
+like($built->as_string, qr/f=exploded,feedhere/, 'flags serialized incl. feedhere');
 
 my $parsed = Mail::DKIM2::Signature->parse(
     'DKIM2-Signature: i=1; m=1; t=1; d=ex.example; '

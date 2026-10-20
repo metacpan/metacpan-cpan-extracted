@@ -51,6 +51,8 @@ typedef struct tk_locale_strings {
     const char *datetime_formats[TK_LEN_COUNT];  /* {1} the date, {0} the time */
     const char *zone_formats[TK_ZF_COUNT];
     const char *digits[10];
+    const char *periods_alone[TK_W_COUNT][TK_DP_COUNT];   /* the stand-alone forms (TKL5) */
+    const char *number_symbols[3];    /* decimal, group, minus of the default numbering system (TKL5) */
 } tk_locale_strings;
 
 #define TK_LOCALE_SLOTS (sizeof(tk_locale_strings) / sizeof(const char *))

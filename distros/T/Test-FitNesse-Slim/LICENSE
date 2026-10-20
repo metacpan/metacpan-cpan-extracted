@@ -1,0 +1,10 @@
+Test::FitNesse::Slim's original implementation is offered under either the GNU General
+Public License, version 1 or (at your option) any later version, or the
+Artistic License 1.0. The recipient may choose either license. The complete
+license texts are in LICENSE.GPL-1.0-or-later and LICENSE.Artistic-1.0.
+
+Test-only fixture material adapted from FitNesse is separately identified in
+THIRD-PARTY-NOTICES.md and distributed under the Common Public License 1.0;
+its complete text is in LICENSE.CPL.
+
+Copyright 2010-2026 Greg Bacon.

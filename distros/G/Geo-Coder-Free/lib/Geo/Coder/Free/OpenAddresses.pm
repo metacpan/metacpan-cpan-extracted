@@ -8,7 +8,8 @@ use autodie qw(:all);
 
 use Geo::Coder::Free::Provenance qw(GEOCODER);
 use Geo::Coder::Free::Utils qw(_abbreviate _normalize);
-use Geo::Coder::Free::Validate qw(_valid_location);
+use Geo::Location::Predicate qw(_valid_location);
+use Geo::Coder::Free::MissCache;
 use Geo::Coder::Free::DB::OpenAddr;	# SQLite database
 use Geo::Coder::Free::DB::openaddresses;	# The original CSV files
 use Geo::Hash;
@@ -38,8 +39,6 @@ our %known_locations = (
 	},
 );
 
-our %unknown_locations;
-
 # Lazily-initialised Locale singletons.  Locale::US->new() and
 # Locale::CA->new() were being called up to five times per geocode()
 # invocation for US/Canadian addresses.  These module-level variables
@@ -59,11 +58,11 @@ Provides a geocoding functionality to a local SQLite database containing geo-cod
 
 =head1 VERSION
 
-Version 0.47
+Version 0.48
 
 =cut
 
-our $VERSION = '0.47';
+our $VERSION = '0.48';
 
 =head1 SYNOPSIS
 
@@ -134,6 +133,23 @@ sub new {
 		return bless { openaddr => $openaddr, cache => $param{'cache'} }, $class;
 	}
 	Carp::croak(__PACKAGE__, ": Usage: new(openaddr => '/path/to/openaddresses')");
+}
+
+=head2 reads
+
+    my $count = $geocoder->reads();
+
+How many times this backend has read its database since the object was created.
+A lookup answered from the result cache or from the shared miss cache does not
+increase it, so C<geocode_many()> can take the count before and after a value to
+tell a lookup that cost a read from one that was answered from a cache.
+
+=cut
+
+sub reads {
+	my $self = shift;
+
+	return $self->{'reads'} // 0;
 }
 
 =head2 geocode
@@ -313,7 +329,7 @@ sub geocode
 	}
 
 	# Fail when the input is just a set of numbers.  The rule is the one
-	# Geo::Coder::Free::Validate defines and the facade applies too, so what this
+	# Geo::Location::Predicate defines and the facade applies too, so what this
 	# backend refuses cannot drift away from what valid_location() answers.  As
 	# before, the answer is a miss rather than an error, because the caller may
 	# have another backend to try.
@@ -979,6 +995,12 @@ sub _search {
 }
 
 # State must be the abbreviated form
+sub _miss_scope {
+	my $self = shift;
+
+	return Geo::Coder::Free::MissCache->scope_for('OpenAddresses', $self->{'openaddr'} // '');
+}
+
 sub _get {
 	my ($self, @location) = @_;
 
@@ -1003,9 +1025,6 @@ sub _get {
 	# @call_details = caller(1);
 	# print "\t", ' called from line ', $call_details[2], "\n";
 
-	if(defined($unknown_locations{$digest})) {
-		return;
-	}
 	# my @call_details = caller(0);
 	# print "line ", $call_details[2], "\n";
 	# print "$location: $digest\n";
@@ -1014,6 +1033,11 @@ sub _get {
 			return Storable::thaw($rc->value());
 		}
 	}
+
+	# A miss is remembered for the whole process, and per data set: another
+	# directory is another database and says nothing about this one.
+	my $miss_scope = $self->_miss_scope();
+	return if Geo::Coder::Free::MissCache->missed($miss_scope, $digest);
 	my $openaddr_db = $self->{openaddr_db} ||
 		Geo::Coder::Free::DB::openaddresses->new(
 			cache => $self->{cache} || CHI->new(driver => 'Memory', datastore => {}),
@@ -1022,6 +1046,7 @@ sub _get {
 			no_entry => 1,
 		);
 	$self->{openaddr_db} = $openaddr_db;
+	$self->{'reads'}++;
 	if(my $geohash = $openaddr_db->geohash(md5 => $digest)) {
 		$self->{'geo_hash'} ||= Geo::Hash->new();
 		my ($latitude, $longitude) = $self->{'geo_hash'}->decode($geohash);
@@ -1045,7 +1070,7 @@ sub _get {
 
 		return $rc;
 	}
-	$unknown_locations{$digest} = 1;
+	Geo::Coder::Free::MissCache->remember($miss_scope, $digest);
 	return;
 }
 

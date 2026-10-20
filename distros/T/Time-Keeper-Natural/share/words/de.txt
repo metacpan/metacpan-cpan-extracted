@@ -1,0 +1,26 @@
+# Time::Keeper::Natural word table: de
+#
+# UNREVIEWED: written 18 Oct 2026 by a session, as the p2p site's catalogues were.
+# A native reader should review it before release. The format is en.txt's.
+#
+# German puts a period after "Ende" in the genitive ("Ende des Jahres", "Ende
+# nächsten Monats"), and CLDR has no genitive forms, so the edges read with a
+# month, a year, a date or a noun the genitive leaves alone ("Ende der Woche").
+# "am" before a day is not taken: it is CLDR's AM in German, and a table may
+# not take a CLDR word. A bare weekday reads ("Dienstag").
+start_of	Anfang|am Anfang|zu Anfang|Beginn|zu Beginn
+end_of	Ende|am Ende|zum Ende
+at	um
+on
+skip	der|die|das|den|dem|des
+and
+of	im
+last	letzte|letzten
+# test: Ende Oktober => 2026-10-31T23:59:59.999999999+00:00
+# test: Anfang 2027 => 2027-01-01T00:00:00+00:00
+# test: Ende der Woche => 2026-10-18T23:59:59.999999999+01:00
+# test: morgen um 15:30 => 2026-10-16T15:30:00+01:00
+# test: Dienstag => 2026-10-20T00:00:00+01:00
+# test: Dienstag um 9 Uhr => 2026-10-20T09:00:00+01:00
+# test: der dritte Freitag im nächsten Monat => 2026-11-20T00:00:00+00:00
+# test: der letzte Freitag im Oktober => 2026-10-30T00:00:00+00:00

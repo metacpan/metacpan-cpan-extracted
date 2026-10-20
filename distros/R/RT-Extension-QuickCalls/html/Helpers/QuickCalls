@@ -45,7 +45,7 @@
 %# those contributions and any derivatives thereof.
 %#
 %# END BPS TAGGED BLOCK }}}
-<& /Views/Component/QuickCalls, From => $ARGS{From} &>
+<& /Views/Component/QuickCalls, QuickCallsPath => $ARGS{QuickCallsPath} &>
 % $m->abort; # No footer
 <%init>
 if ( $QuickCall ) {

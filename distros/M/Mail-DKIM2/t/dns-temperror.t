@@ -11,7 +11,7 @@ use Mail::DKIM2::Verifier;
 use DKIM2TestKeys;
 
 # A transient DNS failure (timeout / SERVFAIL / network unreachable) MUST be
-# reported as TEMPERROR (retryable), per draft-ietf-dkim-dkim2-spec-06 §10 —
+# reported as TEMPERROR (retryable), per draft-ietf-dkim-dkim2-spec-07 §13 —
 # NOT as a permanent "does not exist". Only an answer that
 # positively says the name has no TXT record (NXDOMAIN, NOERROR, NODATA) is
 # permanent and returns undef (no key). Anything else -- including an error
@@ -124,8 +124,10 @@ sub signed_message {
         or diag("verifier died: $@");
     is($v->result, 'temperror', '  ... the result is temperror');
     isnt($v->result, 'fail', '  ... and NOT fail (a DNS blip is not forgery)');
-    like($v->result_detail // '', qr/SERVFAIL/,
-        '  ... and the reason is carried through to result_detail');
+    is($v->details, 'TEMPERROR: DKIM2-Signature i=1 public key sel1 could not be fetched',
+        '  ... in the -07 words');
+    like($v->diagnostic // '', qr/SERVFAIL/,
+        '  ... and the resolver\'s reason is in diagnostic()');
 }
 
 # A callback that returns undef (genuinely no such key) is still a permanent

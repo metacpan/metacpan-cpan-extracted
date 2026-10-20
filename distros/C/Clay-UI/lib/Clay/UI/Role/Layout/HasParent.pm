@@ -1,13 +1,25 @@
 package Clay::UI::Role::Layout::HasParent;
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 use v5.22;
 use warnings;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
 use Object::Pad 0.800;
+use Exporter 'import';
+use List::Util qw(first);
 use Scalar::Util qw(blessed refaddr weaken);
 use Clay::UI::_error qw(croak_ui);
+use Clay::UI::_validate qw(described_value require_predicate);
+
+our @EXPORT_OK = qw(is_widget);
+
+# A widget is an element or a text widget: only those can be in a tree.
+# The roles are named, not loaded, so this needs no use of them.
+sub is_widget ($thing) {
+	return blessed($thing)
+		&& ($thing->DOES('Clay::UI::Role::Core::Element') || $thing->DOES('Clay::UI::Role::Core::TextNode')) ? 1 : 0;
+}
 
 role Clay::UI::Role::Layout::HasParent {
 	field $parent :reader = undef;
@@ -30,22 +42,38 @@ role Clay::UI::Role::Layout::HasParent {
 		return;
 	}
 
-	method root () {
-		my $node = $self;
-		while (defined(my $next = $node->parent)) {
-			$node = $next;
+	# The widgets above this one, nearest first; the widget itself is not
+	# one of them.
+	method ancestors () {
+		my @chain;
+		for (my $node = $parent; defined $node; $node = $node->parent) {
+			push @chain, $node;
 		}
-		return $node;
+		return @chain;
+	}
+
+	# The widget itself or its nearest ancestor that $predicate accepts,
+	# or undef.
+	method closest ($predicate) {
+		require_predicate(closest => $predicate);
+		return first { $predicate->($_) } $self, $self->ancestors;
+	}
+
+	# The widget, then every widget below it in layout pre-order.
+	method subtree () {
+		return ($self, $self->DOES('Clay::UI::Role::Core::Element') ? $self->descendants : ());
+	}
+
+	method root () {
+		my @ancestors = $self->ancestors;
+		return @ancestors ? $ancestors[-1] : $self;
 	}
 
 	# True when $widget is this widget or below it.
 	method contains ($widget) {
-		croak_ui "Clay::UI: contains takes a widget, got " . (ref($widget) || (defined $widget ? "'$widget'" : 'undef'))
-			unless blessed $widget && $widget->DOES('Clay::UI::Role::Layout::HasParent');
-		for (my $node = $widget; defined $node; $node = $node->parent) {
-			return 1 if refaddr($node) == refaddr($self);
-		}
-		return 0;
+		croak_ui "Clay::UI: contains takes a widget, got " . described_value($widget)
+			unless is_widget($widget);
+		return defined $widget->closest(sub ($node) { refaddr($node) == refaddr($self) }) ? 1 : 0;
 	}
 
 	method _set_ui_controller ($ui) {
@@ -75,9 +103,8 @@ role Clay::UI::Role::Layout::HasParent {
 	# layout pre-order. Every hook runs even if one dies; returns the
 	# first error, or undef.
 	method _announce_tree_change () {
-		my @subtree = ($self, $self->DOES('Clay::UI::Role::Core::Element') ? $self->descendants : ());
 		my $first_error;
-		for my $widget (@subtree) {
+		for my $widget ($self->subtree) {
 			local $@;
 			eval { $widget->tree_changed; 1 } or $first_error //= $@ || 'unknown tree_changed error';
 		}
@@ -110,10 +137,17 @@ Clay::UI::Role::Layout::HasParent - parent, root and UI of a Clay::UI widget
 
 	my $ui = Clay::UI->new(width => 800, height => 600, root => $root);
 
-	$child->parent;    # $panel
-	$child->root;      # $root
-	$child->ui;        # $ui
+	$child->parent;       # $panel
+	$child->ancestors;    # ($panel, $root)
+	$child->root;         # $root
+	$child->ui;           # $ui
 	$panel->contains($child);    # 1
+	$child->closest(sub { defined $_->id });    # $panel
+	$panel->subtree;      # ($panel, $child)
+
+	use Clay::UI::Role::Layout::HasParent qw(is_widget);
+	is_widget($child);    # 1
+	$ui->owns($child);    # 1
 
 	$root->remove_child($panel);
 	$child->root;      # $panel: the removed subtree stands alone
@@ -121,11 +155,20 @@ Clay::UI::Role::Layout::HasParent - parent, root and UI of a Clay::UI widget
 
 =head1 DESCRIPTION
 
-C<Clay::UI::Role::Layout::HasParent> gives every widget its way up the
-tree: C<parent>, C<root>, C<ui> and C<contains>, and the hook
-C<tree_changed> that tells a widget its place in a tree changed. L<Clay::UI::Role::Core::Element>
+C<Clay::UI::Role::Layout::HasParent> gives every widget its way through
+the tree: C<parent>, C<ancestors>, C<closest>, C<root>, C<ui>,
+C<contains> and C<subtree>, and the hook C<tree_changed> that tells a
+widget its place in a tree changed. L<Clay::UI::Role::Core::Element>
 and L<Clay::UI::Role::Core::TextNode> compose it, so every element
-widget and every text widget has these methods.
+widget and every text widget has these methods. Its package also
+exports the function L</is_widget>, the one test for "is this a
+widget".
+
+Each tree question has one answer: the widgets above a widget are its
+C<ancestors>, the nearest one with some property is what C<closest>
+returns, the widget and everything below it is its C<subtree>, and
+whether a widget is in a UI's tree is L<Clay::UI/owns>. Use these
+instead of walking C<parent> or C<children> yourself.
 
 The parent reference is weak: it does not keep the parent alive. A
 widget tree is held together by parents holding their children, and a
@@ -141,6 +184,38 @@ Returns the widget this one is a child (or internal child) of. Returns
 undef when the widget was never attached, was removed from its parent,
 or its parent has been freed. Read-only: attaching and removing
 (L</ATTACHING AND REMOVING>) set it.
+
+=head2 ancestors
+
+	my @above = $widget->ancestors;
+
+Returns the widgets above this one, nearest first: its parent, the
+parent's parent, and so on up to the root. The widget itself is not
+included, so a widget without a parent returns the empty list. Internal
+children have their widget as parent like any child. If an ancestor has
+been freed, the list ends at the highest ancestor still reachable. The
+walk runs on every call.
+
+=head2 closest
+
+	my $scroller = $widget->closest(sub ($node) { $node->DOES('Clay::UI::Role::Layout::HasScroll') });
+
+Returns the widget itself, or else its nearest ancestor, for which the
+predicate returns true; undef when none does. The predicate is called
+with one widget at a time (also in C<$_>), the widget itself first,
+then up through L</ancestors> until it accepts one. To start strictly
+above the widget, call it on the parent, or search C<ancestors>. Dies
+with C<Clay::UI: closest takes a code reference, got ...> when the
+predicate is not a code reference.
+
+=head2 subtree
+
+	my @all = $widget->subtree;
+
+Returns the widget itself followed by every widget below it in layout
+pre-order (L<Clay::UI::Role::Core::Element/descendants>, internal
+children included). For a text widget, which has no children, that is
+the widget alone.
 
 =head2 root
 
@@ -168,9 +243,9 @@ reference to the UI is weak).
 Returns 1 when C<$widget> is this widget or below it (it walks up from
 C<$widget> through C<parent>, so internal children count), 0
 otherwise. Works for element and text widgets on both sides. Dies with
-C<Clay::UI: contains takes a widget, got ...> for anything else. For
-the list of widgets below an element, see
-L<Clay::UI::Role::Core::Element/descendants>.
+C<Clay::UI: contains takes a widget, got ...> for anything else (see
+L</is_widget>). For the list of widgets below a widget, see
+L</subtree>.
 
 =head2 tree_changed
 
@@ -234,6 +309,20 @@ subclass of the class that composes the role (as in the example, and
 as for L<Clay::UI::Role::Interaction::Focusable/accepts_focus>).
 C<_set_parent> and C<_detach_parent>, which set and clear the parent
 slot, are private to Clay::UI; do not override them.
+
+=head1 FUNCTIONS
+
+=head2 is_widget
+
+	use Clay::UI::Role::Layout::HasParent qw(is_widget);
+
+	if (is_widget($thing)) { ... }
+
+Returns 1 when C<$thing> is a widget: a blessed object composing
+L<Clay::UI::Role::Core::Element> or L<Clay::UI::Role::Core::TextNode>.
+Only those can be part of a widget tree. Returns 0 for anything else,
+also for an object that composes only some of the roles a widget is
+made of (C<HasParent> alone, say). Exported on request.
 
 =head1 ATTACHING AND REMOVING
 

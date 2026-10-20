@@ -176,4 +176,32 @@ sub dies_like {
     is(join(',', $L->names('de', 'months', 'abbreviated')), 'Jan.,Feb.,März,Apr.,Mai,Juni,Juli,Aug.,Sept.,Okt.,Nov.,Dez.', 'names still read');
 }
 
+# Number symbols, ascii_digits and the stand-alone day periods (0.08).
+{
+    my $L = 'Time::Keeper::Locale';
+    is_deeply($L->number_symbols('en'), { decimal => '.', group => ',', minus => '-' }, 'number_symbols: en');
+    is_deeply($L->number_symbols('de'), { decimal => ',', group => '.', minus => '-' }, 'de');
+    is($L->number_symbols('fr')->{group}, "\x{202F}", 'fr groups with a narrow no-break space');
+    is_deeply($L->number_symbols('ar-EG'), { decimal => "\x{066B}", group => "\x{066C}", minus => "\x{061C}-" }, 'ar-EG: Arabic separators, the minus after a letter mark');
+    is($L->number_symbols('ar')->{minus}, "\x{200E}-", 'ar: the minus after a left-to-right mark');
+    is($L->number_symbols('fa')->{minus}, "\x{200E}\x{2212}", 'fa: the minus sign itself');
+    is($L->number_symbols('en-GB')->{decimal}, '.', 'a child locale inherits');
+    ok(!eval { $L->number_symbols('xx-nowhere'); 1 }, 'number_symbols: a locale that is not there dies');
+    like($@, qr/^Time::Keeper::Locale->number_symbols: there is no locale 'xx-nowhere'/, 'naming the method and the locale');
+
+    is($L->ascii_digits("\x{0662}\x{0660}\x{0662}\x{0666}"), '2026', 'ascii_digits: Arabic-Indic');
+    is($L->ascii_digits("\x{06F1}\x{06F4}\x{06F0}\x{06F5}"), '1405', 'Persian');
+    is($L->ascii_digits("\x{0968}\x{0966} \x{092E}\x{093F}\x{0928}\x{091F}"), "20 \x{092E}\x{093F}\x{0928}\x{091F}", 'Devanagari, the letters kept');
+    is($L->ascii_digits('in 3 days'), 'in 3 days', 'ASCII as it was');
+    is($L->ascii_digits(undef), undef, 'undef as it was');
+
+    is($L->day_periods('en', 'wide')->{afternoon1}, 'in the afternoon', 'day_periods: the format form by default');
+    is($L->day_periods('en', 'wide', 'format')->{afternoon1}, 'in the afternoon', 'and by name');
+    is($L->day_periods('en', 'wide', 'stand-alone')->{afternoon1}, 'afternoon', 'the stand-alone form');
+    is($L->day_periods('en', 'wide', 'stand-alone')->{noon}, 'noon', 'the same where the two agree');
+    is($L->day_periods('en', undef, 'stand-alone')->{morning1}, 'morning', 'an undef width is wide');
+    ok(!eval { $L->day_periods('en', 'wide', 'alone'); 1 }, 'a context that is not one dies');
+    like($@, qr/the context is 'format' or 'stand-alone', not 'alone'/, 'naming it');
+}
+
 done_testing;

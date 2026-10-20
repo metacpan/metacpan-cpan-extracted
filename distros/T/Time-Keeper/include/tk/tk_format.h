@@ -845,6 +845,16 @@ tk_cldr_field(pTHX_ tk_out *o, SV *self, tk_value *v, const tk_locale_data *loc,
         tk_out_field_num(aTHX_ o, ch, other ? tk_cal_related_year(cal, cf.year) : c->year, n);
         break;
     case 'Y':
+        if (other) {
+            /* the calendar's year: CLDR's gl patterns write Y for it, and the
+               ISO week year is the Gregorian's */
+            int64_t yy = lunisolar ? tk_lunisolar_cyclic_year(cf.year) : cf.era_year;
+            if (n == 2)
+                tk_out_field_num(aTHX_ o, ch, (yy < 0 ? -yy : yy) % 100, 2);
+            else
+                tk_out_field_num(aTHX_ o, ch, yy, n);
+            break;
+        }
         tk_locale_week(loc, c, &wy, &wk);
         if (n == 2)
             tk_out_field_num(aTHX_ o, ch, (wy < 0 ? -wy : wy) % 100, 2);

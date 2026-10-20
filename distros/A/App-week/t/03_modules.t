@@ -1,4 +1,4 @@
-use v5.14;
+use v5.24;
 use warnings;
 use utf8;
 use Test::More;
@@ -20,6 +20,9 @@ SKIP: {
     }
 
     for my $opt (
+	'-Mmlb',
+	'-Mmlb --dodgers',
+	'-Mmlb --dodgers-rev',
 	'-Mnpb',
 	'-Mnpb --lions',
 	'-Mnpb --lions-rev',

@@ -15,7 +15,7 @@ use XML::LibXML;
 use File::Basename;
 use English qw( -no_match_vars );
 
-our $VERSION = 2.1126;
+our $VERSION = 2.1129;
 
 use Exporter 'import';
 our @EXPORT_OK = qw(xml_open xml_verif);

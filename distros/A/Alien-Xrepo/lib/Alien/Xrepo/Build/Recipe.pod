@@ -13,7 +13,7 @@ Alien::Xrepo::Build::Recipe - Load and validate an xrepo.json recipe
     my $recipe = Alien::Xrepo::Build::Recipe->new(
         packages => [
             'zstd',
-            { name => 'libsdl3', version => '3.4.12', kind => 'shared', configs => { wayland => 1 } }
+            { name => 'libsdl3', version => '3.4.12', kind => 'shared', configs => { wayland => 1 }, required => 1 }
         ],
         defaults => { mode => 'release' }
     );
@@ -50,6 +50,34 @@ environment variable (mirroring C<Alien::Build>'s C<pkg_roots>): when the variab
 L<Alien::Xrepo::Build> treats the package as system-provided there and never touches C<xrepo> for it. C<hooks> names
 recipe hook modules; each is loaded once at the configure stage and invited to register its own stage hooks (see
 L<Alien::Xrepo::Build>).
+
+=head2 Required vs. Optional Packages
+
+By default, every package in C<packages> is considered mandatory (C<< required => 1 >>). If a package fails to install
+or gather, C<Alien::Xrepo::Build> marks the failure as fatal.
+
+To mark an auxiliary library or optional plugin as optional, set C<< required => 0 >> (or C<"required": false> in
+JSON):
+
+    # In xrepo.json
+    {
+       "packages" : [
+          { "name" : "zstd" },
+          { "name" : "libsdl3_image", "required" : false }
+       ]
+    }
+
+    # Or inline in Perl
+    Alien::Xrepo::Build::Recipe->new(
+        packages => [
+            'zstd',
+            { name => 'libsdl3_image', required => 0 }
+        ]
+    );
+
+When an optional package fails to install or gather, the build records the failure as non-fatal. Sibling packages
+continue to build, and L<Alien::Xrepo::Build/assert_installed( )> will issue a warning rather than aborting the
+process.
 
 =head1 METHODS
 
@@ -97,6 +125,11 @@ The per-package version constraint, or C<undef> when the recipe does not pin one
 
 Ambient options with the package's per-package def merged over them. Flag keys override, while C<configs> merge on a
 per-key basis.
+
+=item C<required( $name )>
+
+Returns the requirement status boolean for C<$name> (defaults to C<1> if omitted in the package definition). When
+false, install or gather failures for this package are treated as non-fatal by L<Alien::Xrepo::Build>.
 
 =back
 

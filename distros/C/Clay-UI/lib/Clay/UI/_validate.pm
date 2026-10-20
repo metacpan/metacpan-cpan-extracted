@@ -1,5 +1,5 @@
 package Clay::UI::_validate;
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 use v5.22;
 use warnings;
 use feature 'signatures';
@@ -23,6 +23,7 @@ our @EXPORT_OK = qw(
 	is_index
 	shown_value
 	described_value
+	require_predicate
 	validate_border_width
 	validate_id
 	validate_group_id
@@ -61,6 +62,13 @@ sub shown_value ($value) {
 # The same for a "got ..." message: a string is quoted.
 sub described_value ($value) {
 	return ref($value) || (defined $value ? "'$value'" : 'undef');
+}
+
+# Dies unless $predicate, an argument of $method, is a code reference.
+sub require_predicate ($method, $predicate) {
+	croak_ui "Clay::UI: $method takes a code reference, got " . described_value($predicate)
+		unless ref $predicate && reftype($predicate) eq 'CODE';
+	return;
 }
 
 # A deep copy of the hashes and arrays in $value, as plain (unblessed)

@@ -1,0 +1,17 @@
+RDF::EARL
+=========
+
+Created:      2012-08-26
+Home page:    <https://metacpan.org/release/RDF-EARL>
+Bug tracker:  <https://github.com/kasei/rdf-earl/issues>
+Maintainer:   Gregory Todd Williams <mailto:gwilliams@cpan.org>
+
+0.002  2026-10-20
+
+ - (Update) Fix GitHub links in Makefile.PL.
+ - (Update) Update to replace RDF::Trine dependency with Attean.
+
+0.001  2012-08-26
+
+ - (Addition) Initial release.
+

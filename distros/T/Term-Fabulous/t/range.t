@@ -28,13 +28,13 @@ subtest 'checks' => sub {
 
 subtest 'snapping to the grid' => sub {
 	my $range = range( step => 0.1 );
-	is [ map { $range->snapped($_) } 0.34, 0.36, 0.71, 0.7, -3, 9 ],                  [ 0.3, 0.4, 0.7, 0.7, 0, 1 ], 'float steps snap without noise, limited to the range';
-	is $range->set_value(0.30000000000000004),                                        0.3,                          'a value is snapped';
-	is range( min => 1, max => 2, step => 0.3 )->top_value,                           1.9,                          'the top grid value of a range that is no whole number of steps';
-	is range( max => 1e-9, step => 1e-12, value => 3e-12 )->value,                    3e-12,                        'a tiny step keeps its decimals';
-	is range( min => 0.5, max => 3, step => 1 )->snapped(2.2),                        2.5,                          'the grid starts at min';
-	is range()->snapped(0.123),                                                       0.123,                        'without a step a value is only limited to the range';
-	is [ range( min => 0.25, step => 0.1 )->decimals, range( step => 5 )->decimals ], [ 2, 0 ],                     'the decimals of step and min';
+	is [ map { $range->snapped($_) } 0.34, 0.36, 0.35, 0.71, 0.7, -3, 9 ],            [ 0.3, 0.4, 0.4, 0.7, 0.7, 0, 1 ], 'float steps snap without noise, halfway goes up, limited to the range';
+	is $range->set_value(0.30000000000000004),                                        0.3,                               'a value is snapped';
+	is range( min => 1, max => 2, step => 0.3 )->top_value,                           1.9,                               'the top grid value of a range that is no whole number of steps';
+	is range( max => 1e-9, step => 1e-12, value => 3e-12 )->value,                    3e-12,                             'a tiny step keeps its decimals';
+	is range( min => 0.5, max => 3, step => 1 )->snapped(2.2),                        2.5,                               'the grid starts at min';
+	is range()->snapped(0.123),                                                       0.123,                             'without a step a value is only limited to the range';
+	is [ range( min => 0.25, step => 0.1 )->decimals, range( step => 5 )->decimals ], [ 2, 0 ],                          'the decimals of step and min';
 };
 
 subtest 'moving and change reporting' => sub {

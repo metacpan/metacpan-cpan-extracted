@@ -1,34 +1,40 @@
-Revision history for Perl extension B::Utils.
+Revision history for B-Utils
 
+0.28  2026-10-19
+   - update ppport.h to the latest version, and keep it updated
+   - adjust tests to handle a change in perl 5.45.4 (see perl issue
+     #24845) (PR #2, Richard Leach)
+
+0.27  2015-07-22
    - remove build/IFiles.pm from the shipped dist, as it is meant to be
      auto-generated at install time (was added in 0.26)
    - Support native B::OP::parent with 5.21.2 -DPERL_OP_PARENT (Reini Urban)
    - fix t/utils/40walk.t with 5.6 (Reini Urban)
    - Add $op->_parent method as fallback to our parent method since 5.21.2.
 
-0.26
+0.26  2015-04-26
    - fix tests for perl 5.21.7 (change to nulled COPs) (RT#100508, Father
      Chrysostomos)
 
-0.25
+0.25  2014-04-25
    - Re-expose symbols by setting dl_load_flags. Hope this is ok for HP-UX
 
-0.24
+0.24  2014-04-22
    - Export C symbols, breakage from 0.22
 
-0.23
+0.23  2014-04-21
    - 5.10, 5.12, 5.14 compatibile syntax
 
-0.22
+0.22  2014-04-20
    - resolve nameclashes with CORE, fix hpux and openbsd failures (Reini Urban)
    - remove unneeded ExtUtils::CBuilder req (Reini Urban)
    - do not use FUNCLIST on hpux (Reini Urban)
    - Use FUNCLIST to declare exported symbols (Alexandr Ciornii)
 
-0.21
+0.21  2012-03-25
    - Avoid undeclared dependency on Test::Exception introduced by 0.19
 
-0.19
+0.19  2012-03-12
    - Fix typo in in walkallops_filtered function call
 
 0.16 Fri Jul 08 2011

@@ -24,7 +24,11 @@
 <rect x="30" y="168" width="441" height="18" fill="#16191f"/>
 <rect x="30" y="186" width="441" height="18" fill="#1c2029"/>
 <rect x="30" y="204" width="441" height="18" fill="#16191f"/>
-<rect x="30" y="222" width="441" height="54" fill="#1c2029"/>
+<rect x="30" y="222" width="9" height="18" fill="#1c2029"/>
+<rect x="39" y="222" width="423" height="18" fill="#16191f"/>
+<rect x="462" y="222" width="9" height="18" fill="#1c2029"/>
+<rect x="30" y="240" width="441" height="18" fill="#1c2029"/>
+<rect x="30" y="258" width="441" height="18" fill="#16191f"/>
 <rect x="30" y="96" width="441" height="9" fill="#586070"/>
 <rect x="30" y="105" width="5" height="162" fill="#586070"/>
 <rect x="467" y="105" width="4" height="162" fill="#586070"/>

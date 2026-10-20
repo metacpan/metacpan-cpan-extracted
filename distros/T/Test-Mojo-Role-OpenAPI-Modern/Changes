@@ -1,5 +1,8 @@
 Revision history for Test-Mojo-Role-OpenAPI-Modern
 
+0.014     2026-10-19 18:39:03Z
+          - switch to the non-deprecated forms of OpenAPI::Modern accessors
+
 0.013     2026-06-28 21:08:39Z
           - update tests for changes in OpenAPI::Modern 0.139
 

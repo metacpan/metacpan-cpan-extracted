@@ -6,9 +6,13 @@ use warnings;
 use File::Temp qw/tempfile/;
 use Test::HTTPStatus;
 use Test::Most;
-use Test::RequiresInternet ('nominatim.openstreetmap.org' => 'https');
+use Test::RequiresInternet ();
 
-BEGIN { use_ok('HTML::OSM') }
+# Check at run time, not compile time, so 'perl -c' (t/cover.t) still passes
+# when NO_NETWORK_TESTING is set
+Test::RequiresInternet->import('nominatim.openstreetmap.org' => 'https');
+
+use_ok('HTML::OSM');
 
 # Test for broken smokers that don't set AUTOMATED_TESTING
 if(my $reporter = $ENV{'PERL_CPAN_REPORTER_CONFIG'}) {

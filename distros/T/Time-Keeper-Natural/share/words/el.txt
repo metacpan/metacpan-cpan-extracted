@@ -1,0 +1,23 @@
+# Time::Keeper::Natural word table: el
+#
+# UNREVIEWED: written 18 Oct 2026 by a session, as the p2p site's catalogues were.
+# A native reader should review it before release. The format is en.txt's.
+#
+# Greek puts a period after "τέλος" in the genitive, and CLDR has the genitive
+# only for month names ("τέλος Οκτωβρίου"), so the edges read with a month or a
+# year; "τέλος του επόμενου μήνα" is not read. An ordinal weekday reads with a
+# month name for the same reason.
+start_of	αρχές|αρχή|στις αρχές|στην αρχή
+end_of	τέλος|τέλη|στο τέλος|στα τέλη
+at	στις|στη|στην
+on	την|το
+skip	ο|η|το|του|της|τον|την|τα|των|τις
+and
+of	του|της
+last	τελευταία|τελευταίο|τελευταίος
+# test: τέλος Οκτωβρίου => 2026-10-31T23:59:59.999999999+00:00
+# test: αρχές του 2027 => 2027-01-01T00:00:00+00:00
+# test: αύριο στις 3:30 μ.μ. => 2026-10-16T15:30:00+01:00
+# test: την Τρίτη => 2026-10-20T00:00:00+01:00
+# test: την τρίτη Παρασκευή του Νοεμβρίου => 2026-11-20T00:00:00+00:00
+# test: την τελευταία Παρασκευή του Οκτωβρίου => 2026-10-30T00:00:00+00:00

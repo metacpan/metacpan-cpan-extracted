@@ -14,7 +14,7 @@ use Mail::DKIM2::Signer;
 use Mail::DKIM2::Verifier;
 use DKIM2TestKeys;
 
-# spec-06 canonical error-string forms (Task 3.1). Each case below builds a
+# -07 canonical error-string forms (contract C6). Each case below builds a
 # purpose-built failing message and asserts the verifier's result_detail
 # matches the exact canonical wording, byte-for-byte (including the
 # deliberate "MAIL nd=" spec typo for the nd= adjacency case).
@@ -82,7 +82,7 @@ sub verify_text {
           rcptto => ['rcpt@test5.dkim2.com'] },
     );
     my $v = verify_text($msg->as_string);
-    is($v->result, 'fail', 'd=/mf= domain mismatch fails');
+    is($v->result, 'permerror', 'd=/mf= domain mismatch fails');
     like($v->result_detail, qr/\QDKIM2-Signature i=1 MAIL FROM and d= do not match\E/,
         'canonical d=/mf= mismatch detail');
 }
@@ -98,9 +98,8 @@ sub verify_text {
           rcptto => ['rcpt@test5.dkim2.com'] },
     );
     my $v = verify_text($msg->as_string);
-    is($v->result, 'fail', 'nd= adjacency mismatch fails');
-    like($v->result_detail, qr/\QDKIM2-Signature i=1 MAIL nd= does not match\E/,
-        'canonical nd= adjacency detail (verbatim MAIL typo preserved)');
+    is($v->result, 'permerror', 'nd= adjacency mismatch fails');
+    is($v->details, 'PERMERROR: DKIM2-Signature i=1 nd= does not match', 'nd= adjacency detail');
 }
 
 # ------------------------------------------------------------------
@@ -115,10 +114,9 @@ sub verify_text {
           rcptto => ['rcpt@test5.dkim2.com'] },
     );
     my $v = verify_text($msg->as_string);
-    is($v->result, 'fail', 'chain of custody break fails');
-    like($v->result_detail,
-        qr/\QDKIM2-Signature i=2 MAIL FROM <sender\E\@\Qtest2.dkim2.com> did not match\E/,
-        'canonical chain-of-custody detail cites offending mf= value');
+    is($v->result, 'permerror', 'chain of custody break fails');
+    is($v->details, 'PERMERROR: DKIM2-Signature i=2 mf= does not match the rt= of i=1',
+        'chain-of-custody detail');
 }
 
 # ------------------------------------------------------------------
@@ -159,8 +157,8 @@ sub verify_text {
     $v->{_dk2_headers} = { 1 => { sig => $sig1 }, 2 => { sig => $sig2 } };
     my $ok = $v->_verify_chain();
     ok(!$ok, 'chain check rejects empty mf= on non-nd hop');
-    like($v->result_detail, qr/\QDKIM2-Signature i=2 MAIL FROM <> did not match\E/,
-        'canonical missing-MAIL-FROM custody detail');
+    is($v->details, 'PERMERROR: DKIM2-Signature i=2 mf= does not match the rt= of i=1',
+        'missing-MAIL-FROM custody detail');
 }
 
 # ------------------------------------------------------------------
@@ -189,8 +187,90 @@ sub verify_text {
     $v->{_dk2_headers} = { 1 => { sig => $sig1 }, 2 => { sig => $sig2 } };
     my $ok = $v->_verify_chain();
     ok(!$ok, 'chain check rejects empty rt= on non-nd hop');
-    like($v->result_detail, qr/\QDKIM2-Signature i=1 RCPT TO <> did not match\E/,
-        'canonical missing-RCPT-TO custody detail');
+    is($v->details, 'PERMERROR: DKIM2-Signature i=2 mf= does not match the rt= of i=1',
+        'missing-RCPT-TO custody detail');
+}
+
+# ------------------------------------------------------------------
+# -07 sections 14.2 to 14.8: the exact strings, one message each (built
+# with t/lib/Spec07Fixture.pm, which signs whatever it is asked to).
+# ------------------------------------------------------------------
+{
+    require Spec07Fixture;
+    my %h1 = (d => 'example.com', mf => '<a@example.com>', rt => ['<list@lists.example.org>']);
+    my %h2 = (d => 'example.org', mf => '<x@lists.example.org>', rt => ['<b@example.net>']);
+    my $m1 = Spec07Fixture::add_mi(Spec07Fixture::message());
+    my $one = Spec07Fixture::add_sig($m1, %h1);
+    my $fresh = sub { my $v = Spec07Fixture::verify($_[0]); [$v->result, $v->details] };
+    my $key_from = sub {    # a PubkeyCallback dying as fetch_public_key does
+        my ($why) = @_;
+        return sub { die "PERMERROR: $why\n" };
+    };
+
+    my @cases = (
+        [ 'no DKIM2 header fields',
+          Spec07Fixture::message(), ['none', 'no DKIM2-Signature headers found'] ],
+        [ 'instances but no signature', $m1,
+          ['permerror', 'PERMERROR: Message-Instance m=1 is not signed'] ],
+        [ 'an instance above the top signature',
+          Spec07Fixture::add_mi(($one =~ s/^Subject: test/Subject: x/mr), $one),
+          ['permerror', 'PERMERROR: Message-Instance m=2 is not signed'] ],
+        [ 'a missing instance',
+          Spec07Fixture::add_sig($one, %h2, m => 2),
+          ['permerror', 'PERMERROR: Message-Instance m=2 missing'] ],
+        [ 'a missing signature',
+          ($one =~ s/^DKIM2-Signature: i=1;/DKIM2-Signature: i=2;/mr),
+          ['permerror', 'PERMERROR: DKIM2-Signature i=1 missing'] ],
+        [ 'an instance with no h=',
+          Spec07Fixture::add_sig("Message-Instance: m=1;\r\n" . Spec07Fixture::message(), %h1),
+          ['permerror', 'PERMERROR: Message-Instance m=1 tag=h missing'] ],
+        [ 'an instance with ";;"',
+          ($one =~ s/^Message-Instance: m=1;/Message-Instance: m=1;;/mr),
+          ['permerror', 'PERMERROR: Message-Instance m=1 syntax error'] ],
+        [ 'an instance tag twice in different case',
+          ($one =~ s/^Message-Instance: m=1;/Message-Instance: m=1; M=1;/mr),
+          ['permerror', 'PERMERROR: Message-Instance m=1 syntax error'] ],
+        [ 'a signature tag twice in different case',
+          ($one =~ s/^DKIM2-Signature: i=1;/DKIM2-Signature: i=1; D=example.com;/mr),
+          ['permerror', 'PERMERROR: DKIM2-Signature i=1 syntax error'] ],
+        [ 'no t=',
+          ($one =~ s/\bt=\d+; //r),
+          ['permerror', 'PERMERROR: DKIM2-Signature i=1 tag=t missing'] ],
+        [ 'nd= with mf=',
+          Spec07Fixture::add_sig(Spec07Fixture::add_sig($m1, %h1, nd => 'example.org'), %h2),
+          ['permerror', 'PERMERROR: DKIM2-Signature i=1 tag=mf was unexpected'] ],
+        [ 'nd= with rt=',
+          Spec07Fixture::add_sig(Spec07Fixture::add_sig($m1, d => 'example.com',
+              rt => ['<b@example.org>'], nd => 'example.org'), %h2),
+          ['permerror', 'PERMERROR: DKIM2-Signature i=1 tag=rt was unexpected'] ],
+        [ 'no rt=',
+          Spec07Fixture::add_sig($m1, d => 'example.com', mf => '<a@example.com>'),
+          ['permerror', 'PERMERROR: DKIM2-Signature i=1 tag=rt missing'] ],
+    );
+    for my $c (@cases) {
+        my ($name, $text, $want) = @$c;
+        is_deeply($fresh->($text), $want, "-07 string: $name");
+    }
+
+    # The key strings, from what fetch_public_key dies with.
+    for my $why ('has multiple records', 'has a syntax error', 'has been revoked', 'algorithm mismatch') {
+        my $v = Spec07Fixture::verify($one, PubkeyCallback => $key_from->($why));
+        is($v->details, "PERMERROR: DKIM2-Signature i=1 public key sel1 $why", "-07 string: key $why");
+    }
+    my $v = Spec07Fixture::verify($one, PubkeyCallback => sub { undef });
+    is($v->details, 'PERMERROR: DKIM2-Signature i=1 public key sel1 does not exist', '-07 string: no key');
+    $v = Spec07Fixture::verify($one, PubkeyCallback => sub { die "TEMPERROR: timed out\n" });
+    is_deeply([$v->result, $v->details, $v->diagnostic],
+        ['temperror', 'TEMPERROR: DKIM2-Signature i=1 public key sel1 could not be fetched', 'TEMPERROR: timed out'],
+        '-07 string: key not fetched, the reason in diagnostic()');
+
+    # Selector rules (section 10.9).
+    (my $dupsel = $one) =~ s/(s=sel1:rsa-sha256:[^;]*)/$1,sel1:ed25519-sha256:AAAA/;
+    is(Spec07Fixture::verify($dupsel)->details, 'PERMERROR: DKIM2-Signature i=1 has a duplicate selector',
+        '-07 string: duplicate selector');
+    (my $three = $one) =~ s/(s=sel1:rsa-sha256:[^;]*)/$1,s2:rsa-sha256:AAAA,s3:rsa-sha256:AAAA/;
+    is(Spec07Fixture::verify($three)->details, 'PERMERROR: DKIM2-Signature i=1 has more selectors than allowed',
+        '-07 string: more selectors than allowed');
 }
 
 done_testing;

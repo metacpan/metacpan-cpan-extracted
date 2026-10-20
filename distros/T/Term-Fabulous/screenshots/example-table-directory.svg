@@ -19,28 +19,28 @@
 <rect x="16.5" y="16.5" width="1107" height="597" rx="10" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1"/>
 <g shape-rendering="crispEdges">
 <rect x="201" y="78" width="270" height="18" fill="#242830"/>
-<rect x="48" y="114" width="765" height="36" fill="#242832"/>
-<rect x="48" y="150" width="765" height="18" fill="#1c2029"/>
-<rect x="48" y="186" width="765" height="36" fill="#263e5c"/>
-<rect x="48" y="222" width="765" height="18" fill="#343a48"/>
-<rect x="48" y="240" width="765" height="18" fill="#1c2029"/>
-<rect x="48" y="276" width="765" height="18" fill="#1a1f29"/>
-<rect x="48" y="312" width="765" height="18" fill="#1a1f29"/>
-<rect x="48" y="330" width="765" height="18" fill="#1c2029"/>
-<rect x="48" y="366" width="765" height="18" fill="#1a1f29"/>
-<rect x="48" y="402" width="765" height="36" fill="#1a1f29"/>
+<rect x="48" y="114" width="774" height="36" fill="#242832"/>
+<rect x="48" y="150" width="774" height="18" fill="#1c2029"/>
+<rect x="48" y="186" width="774" height="36" fill="#263e5c"/>
+<rect x="48" y="222" width="774" height="18" fill="#343a48"/>
+<rect x="48" y="240" width="774" height="18" fill="#1c2029"/>
+<rect x="48" y="276" width="774" height="18" fill="#1a1f29"/>
+<rect x="48" y="312" width="774" height="18" fill="#1a1f29"/>
+<rect x="48" y="330" width="774" height="18" fill="#1c2029"/>
+<rect x="48" y="366" width="774" height="18" fill="#1a1f29"/>
+<rect x="48" y="402" width="774" height="18" fill="#1a1f29"/>
 <rect x="48" y="438" width="27" height="18" fill="#2c313c"/>
 <rect x="84" y="438" width="27" height="18" fill="#2c313c"/>
 <rect x="228" y="438" width="27" height="18" fill="#2c313c"/>
 <rect x="264" y="438" width="27" height="18" fill="#2c313c"/>
 <rect x="444" y="438" width="36" height="18" fill="#242830"/>
-<rect x="48" y="114" width="765" height="9" fill="#586070"/>
+<rect x="48" y="114" width="774" height="9" fill="#586070"/>
 <rect x="840" y="114" width="252" height="9" fill="#586070"/>
 <rect x="48" y="123" width="5" height="306" fill="#586070"/>
-<rect x="809" y="123" width="4" height="306" fill="#586070"/>
+<rect x="818" y="123" width="4" height="306" fill="#586070"/>
 <rect x="840" y="123" width="5" height="414" fill="#586070"/>
 <rect x="1088" y="123" width="4" height="414" fill="#586070"/>
-<rect x="48" y="429" width="765" height="9" fill="#586070"/>
+<rect x="48" y="429" width="774" height="9" fill="#586070"/>
 <rect x="840" y="537" width="252" height="9" fill="#586070"/>
 </g>
 <g class="terminal">
@@ -49,37 +49,37 @@
 <text x="489" y="92" textLength="297" fill="#8c96aa">F2 columns  F3 grouping  Esc quit</text>
 <text x="66" y="146" textLength="81" class="b" fill="#ebeef3">[-]  Name</text>
 <text x="160.5" y="146" text-anchor="middle" class="b" fill="#ebeef3">▴</text>
-<text x="363" y="146" textLength="432" class="b" fill="#ebeef3">Team      Role       Office    Started    Salary</text>
+<text x="372" y="146" textLength="432" class="b" fill="#ebeef3">Team      Role       Office    Started    Salary</text>
 <text x="858" y="146" textLength="63" class="b" fill="#61afef">Details</text>
 <text x="70.5" y="164" text-anchor="middle" class="b" fill="#61afef">▾</text>
 <text x="84" y="164" textLength="306" class="b" fill="#61afef">Core  -  4 people, payroll 355,570</text>
 <text x="858" y="164" textLength="117" fill="#dcdfe4">John McCarthy</text>
-<text x="66" y="182" textLength="729" fill="#dcdfe4">[ ]  Ada Lovelace                Core      Engineer   Berlin    Jan 2014   64,000</text>
-<text x="66" y="200" textLength="648" fill="#dcdfe4">[x]  Barbara Liskov              Core      Engineer   Remote    Feb 2018</text>
-<text x="732" y="200" textLength="63" fill="#e5c07b">103,595</text>
+<text x="66" y="182" textLength="738" fill="#dcdfe4">[ ]  Ada Lovelace                 Core      Engineer   Berlin    Jan 2014   64,000</text>
+<text x="66" y="200" textLength="657" fill="#dcdfe4">[x]  Barbara Liskov               Core      Engineer   Remote    Feb 2018</text>
+<text x="741" y="200" textLength="63" fill="#e5c07b">103,595</text>
 <text x="858" y="200" textLength="108" fill="#dcdfe4">Id      E111</text>
-<text x="66" y="218" textLength="729" fill="#dcdfe4">[x]  Joan Clarke                 Core      Lead       London    Apr 2015   90,785</text>
+<text x="66" y="218" textLength="738" fill="#dcdfe4">[x]  Joan Clarke                  Core      Lead       London    Apr 2015   90,785</text>
 <text x="858" y="218" textLength="108" fill="#dcdfe4">Team    Core</text>
-<text x="66" y="236" textLength="729" fill="#dcdfe4">[ ]  John McCarthy               Core      Engineer   New York  Mar 2022   97,190</text>
+<text x="66" y="236" textLength="738" fill="#dcdfe4">[ ]  John McCarthy                Core      Engineer   New York  Mar 2022   97,190</text>
 <text x="858" y="236" textLength="144" fill="#dcdfe4">Role    Engineer</text>
 <text x="70.5" y="254" text-anchor="middle" class="b" fill="#61afef">▾</text>
 <text x="84" y="254" textLength="333" class="b" fill="#61afef">Network  -  4 people, payroll 326,922</text>
 <text x="858" y="254" textLength="144" fill="#dcdfe4">Office  New York</text>
-<text x="66" y="272" textLength="729" fill="#dcdfe4">[ ]  Edsger Dijkstra             Network   Engineer   Berlin    Jan 2017   67,028</text>
+<text x="66" y="272" textLength="738" fill="#dcdfe4">[ ]  Edsger Dijkstra              Network   Engineer   Berlin    Jan 2017   67,028</text>
 <text x="858" y="272" textLength="144" fill="#dcdfe4">Since   Mar 2022</text>
-<text x="66" y="290" textLength="729" fill="#dcdfe4">[ ]  Linus Torvalds              Network   Architect  New York  Nov 2020   79,838</text>
+<text x="66" y="290" textLength="738" fill="#dcdfe4">[ ]  Linus Torvalds               Network   Architect  New York  Nov 2020   79,838</text>
 <text x="858" y="290" textLength="126" fill="#dcdfe4">Salary  97,190</text>
-<text x="66" y="308" textLength="729" fill="#dcdfe4">[ ]  Radia Perlman               Network   Fellow     London    Dec 2024   73,433</text>
+<text x="66" y="308" textLength="738" fill="#dcdfe4">[ ]  Radia Perlman                Network   Fellow     London    Dec 2024   73,433</text>
 <text x="858" y="308" textLength="216" fill="#dcdfe4">E-mail  john@example.com</text>
-<text x="66" y="326" textLength="648" fill="#dcdfe4">[ ]  Sophie Wilson               Network   Engineer   Remote    Feb 2021</text>
-<text x="732" y="326" textLength="63" fill="#e5c07b">106,623</text>
+<text x="66" y="326" textLength="657" fill="#dcdfe4">[ ]  Sophie Wilson                Network   Engineer   Remote    Feb 2021</text>
+<text x="741" y="326" textLength="63" fill="#e5c07b">106,623</text>
 <text x="70.5" y="344" text-anchor="middle" class="b" fill="#61afef">▾</text>
 <text x="84" y="344" textLength="342" class="b" fill="#61afef">Platform  -  4 people, payroll 341,246</text>
-<text x="66" y="362" textLength="729" fill="#dcdfe4">[ ]  Dennis Ritchie              Platform  Engineer   New York  Jul 2021   65,514</text>
-<text x="66" y="380" textLength="729" fill="#dcdfe4">[ ]  Donald Knuth                Platform  Engineer   Berlin    Sep 2018   98,704</text>
-<text x="66" y="398" textLength="729" fill="#dcdfe4">[ ]  Grace Hopper                Platform  Fellow     Remote    Jun 2017   71,919</text>
-<text x="66" y="416" textLength="648" fill="#dcdfe4">[ ]  Hedy Lamarr                 Platform  Engineer   London    Aug 2014</text>
-<text x="732" y="416" textLength="63" fill="#e5c07b">105,109</text>
+<text x="66" y="362" textLength="738" fill="#dcdfe4">[ ]  Dennis Ritchie               Platform  Engineer   New York  Jul 2021   65,514</text>
+<text x="66" y="380" textLength="738" fill="#dcdfe4">[ ]  Donald Knuth                 Platform  Engineer   Berlin    Sep 2018   98,704</text>
+<text x="66" y="398" textLength="738" fill="#dcdfe4">[ ]  Grace Hopper                 Platform  Fellow     Remote    Jun 2017   71,919</text>
+<text x="66" y="416" textLength="657" fill="#dcdfe4">[ ]  Hedy Lamarr                  Platform  Engineer   London    Aug 2014</text>
+<text x="741" y="416" textLength="63" fill="#e5c07b">105,109</text>
 <text x="57" y="452" textLength="9" fill="#8c929e">«</text>
 <text x="97.5" y="452" text-anchor="middle" fill="#8c929e">‹</text>
 <text x="120" y="452" textLength="99" fill="#dcdfe4">Page 1 of 2</text>

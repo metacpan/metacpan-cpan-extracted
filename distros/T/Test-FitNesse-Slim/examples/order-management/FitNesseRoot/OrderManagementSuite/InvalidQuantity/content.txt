@@ -1,0 +1,11 @@
+!1 Invalid quantity is rejected as a business input
+
+Quantity must be positive. Zero is a valid integer input but not a valid
+order quantity, so the fixture reports a business rejection rather than a
+conversion exception.
+
+|script|Order workflow|
+|$order=|create order for|C-100|
+|check|add item|COFFEE|quantity|0|to order|$order|false|
+|check|last error?|Quantity must be a positive whole number.|
+|check|status of order|$order|draft|

@@ -32,7 +32,7 @@ use warnings;
 # to an even length, so the pool may reach 128 KB; ff-Adlm passed 64 KB with
 # the weekday words); a string offset 0xFFFF means "the parent's", 0xFFFE "none":
 #
-#   "TKL4" parent nfixed nskel nzone nmeta nterr nrule first_day min_days hc24 ascii
+#   "TKL5" parent nfixed nskel nzone nmeta nterr nrule first_day min_days hc24 ascii
 #          nwords nival weekend_start weekend_end plural
 #   fixed[nfixed]                      the slots of tk_locale_strings, in order; nfixed
 #                                      0xFFFF is all the parent's, with no table
@@ -365,6 +365,12 @@ sub record {
     my @d = split //, $need->($numsys->{$ns}{_digits}, "the digits of $ns");
     die "$code: $ns has ", scalar(@d), " digits\n" unless @d == 10;
     push @fixed, @d;
+    for my $w (@wid) {
+        my $d = $g->{dayPeriods}{'stand-alone'}{$w} // {};
+        push @fixed, map { $d->{ $periods[$_] } } 0 .. $#periods;
+    }
+    my $sym = $num->{"symbols-numberSystem-$ns"} // $num->{'symbols-numberSystem-latn'} // {};
+    push @fixed, map { $sym->{$_} } qw(decimal group minusSign);
     $r{fixed} = \@fixed;
 
     my $avail = $need->($g->{dateTimeFormats}{availableFormats}, 'availableFormats');
@@ -500,7 +506,7 @@ sub section {
     my @head = (($pc ? $code_id{$pc} : 0xFFFF), ($inherit_fixed ? 0xFFFF : scalar(@fixed)), scalar(@skel), scalar(@zones), scalar(@metas),
                 scalar(@terrs), ($inherit_rules ? 0xFFFF : scalar(@rules)), @{ $r->{head} },
                 ($inherit_words ? 0xFFFF : scalar(@words)), scalar(@ival), @{ $r->{tail} });
-    return 'TKL4' . pack('v*', @head, @fixed, map({ @$_ } @skel, @zones, @metas, @terrs, @rules), @words, map({ @$_ } @ival)) . join('', @pool);
+    return 'TKL5' . pack('v*', @head, @fixed, map({ @$_ } @skel, @zones, @metas, @terrs, @rules), @words, map({ @$_ } @ival)) . join('', @pool);
 
 }
 

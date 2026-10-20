@@ -1,5 +1,5 @@
 package Clay::UI::Text;
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 use v5.22;
 use warnings;
 use feature 'signatures';
@@ -230,12 +230,15 @@ the element; renderers should centre the glyphs in the box.
 
 How the text wraps: C<CLAY_TEXT_WRAP_WORDS> (at spaces and newlines),
 C<CLAY_TEXT_WRAP_NEWLINES> (only at newlines) or C<CLAY_TEXT_WRAP_NONE>
-(meant to never wrap; see below). Default undef: the setting is left out and Clay uses
+(never wraps; see below). Default undef: the setting is left out and Clay uses
 C<CLAY_TEXT_WRAP_WORDS>.
 
-In the Clay version this distribution ships, C<CLAY_TEXT_WRAP_NONE>
-behaves like C<CLAY_TEXT_WRAP_NEWLINES>: it still breaks lines at
-C<"\n">, although Clay describes it as disabling wrapping.
+C<CLAY_TEXT_WRAP_NONE> never breaks: the whole text, newline characters
+included, is one line (see L<Clay::XS::Structs/wrapMode>).
+
+With C<CLAY_TEXT_WRAP_NEWLINES> and C<CLAY_TEXT_WRAP_NONE>, a text too
+wide for its parent is cut off once the other widgets beside it cannot
+shrink any further (see L<Clay::XS::Structs/wrapMode>).
 
 =head2 text_alignment
 

@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Punk ();
 
-our $VERSION = '0.61';
+our $VERSION = '0.62';
 1;
 
 __END__
@@ -66,6 +66,10 @@ a plausible number that is not the truth is precisely the fault this replaced.
 =head2 named($name)
 
 The worker's room of that name, created on first use.
+
+=head2 name
+
+The name the room was created with.
 
 =head2 join($ws) / leave($ws) / has($ws)
 

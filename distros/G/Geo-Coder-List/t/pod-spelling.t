@@ -18,5 +18,10 @@ CPAN
 GPL
 RT
 geocode
+geocoder
 geocoders
+geocoding
+MetaCPAN
+UA
+ua
 OpenStreetMap

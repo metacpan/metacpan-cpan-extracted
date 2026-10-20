@@ -5,15 +5,16 @@ use warnings;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 use Exporter 'import';
-our @EXPORT_OK = qw(parse_style style compose_styles apply_style);
+our @EXPORT_OK = qw(parse_style style compose_styles apply_style resolve_style);
 
 use Feature::Compat::Try;
-use Term::Fabulous::Check qw(color non_negative_integer optional);
+use Term::Fabulous::Check qw(color describe non_negative_integer optional);
 use Term::Fabulous::Color;
 use Term::Fabulous::Termbox qw(TB_BOLD TB_ITALIC TB_UNDERLINE TB_REVERSE TB_DIM TB_BLINK TB_STRIKEOUT TB_OVERLINE TB_INVISIBLE);
+use Term::Fabulous::Theme ();
 
 my %BIT_BY_WORD = (
 	bold          => TB_BOLD,
@@ -35,14 +36,21 @@ my $DEFAULT_COLOR = [ 0, 0, 0, 0 ];
 my @STYLE_KEYS = qw(set clear color background);
 
 sub _fail ( $what, $style ) {
-	die "Term::Fabulous::Text::Style: $what in '$style' (known: $KNOWN_WORDS, and any color)";
+	die "Term::Fabulous::Text::Style: $what in '$style' (known: $KNOWN_WORDS, any color, and the palette tokens of the theme)";
+}
+
+# Whether a word names a color of the theme's palette, which the widget
+# that paints the style turns into a color (see resolve_style).
+sub _is_token ($word) {
+	return defined $word && !ref $word && Term::Fabulous::Theme::has_token($word) ? 1 : 0;
 }
 
 # The [r, g, b, a] a word of a style string names (any string
-# Term::Fabulous::Color reads, web color names included), or undef when
-# it is not a color.
+# Term::Fabulous::Color reads, web color names included), the word
+# itself when it is a palette token, or undef when it is neither.
 sub _color_of_word ($word) {    ## no critic (Subroutines::RequireFinalReturn) PPI does not parse try/catch
 	return $DEFAULT_COLOR if $word eq 'default';
+	return $word if _is_token($word);
 
 	my $parsed;
 	try {
@@ -52,6 +60,19 @@ sub _color_of_word ($word) {    ## no critic (Subroutines::RequireFinalReturn) P
 		$parsed = undef;    # not a color either
 	}
 	return $parsed;
+}
+
+# A color of a style hash: a color, or a palette token kept as the word.
+sub _color_or_token ( $owner, $name, $value ) {
+	return $value if _is_token($value);
+	return color( $owner, $name, $value );
+}
+
+# The style with its palette tokens replaced by the colors the theme
+# gives them; a style without tokens comes back as it is.
+sub resolve_style ( $style, $theme ) {
+	return $style unless grep { defined $_ && !ref $_ } @{$style}{qw(color background)};
+	return { %$style, map { $_ => ( ref $style->{$_} || !defined $style->{$_} ? $style->{$_} : $theme->token( $style->{$_} ) ) } qw(color background) };
 }
 
 sub parse_style ($string) {
@@ -98,8 +119,8 @@ sub style ($value) {
 	return {
 		set        => non_negative_integer( $owner, set   => $value->{set}   // 0 ),
 		clear      => non_negative_integer( $owner, clear => $value->{clear} // 0 ),
-		color      => optional( \&color, $owner, color      => $value->{color} ),
-		background => optional( \&color, $owner, background => $value->{background} ),
+		color      => optional( \&_color_or_token, $owner, color      => $value->{color} ),
+		background => optional( \&_color_or_token, $owner, background => $value->{background} ),
 	};
 }
 
@@ -147,16 +168,16 @@ Term::Fabulous::Text::Style - Parse style strings such as "bold red on
 
 =head1 DESCRIPTION
 
-A I<style> is what a span of a L<Term::Fabulous::Widget::RichText>
+A I<style> is what a span of a L<Term::Fabulous::Widget::Text>
 adds to the look of the characters it covers: style bits to set or
 clear, a text color and a background. It is written as a string of
 words, in the manner of Python's C<rich> library, or given as a hash.
 This module turns both into one normalized hash, stacks such hashes
 (L</compose_styles>) and applies one to a look (L</apply_style>). These
 two functions are the only place where style bits are combined:
-L<Term::Fabulous::Widget::RichText> composes the styles of nested spans
-with the first, and L<Term::Fabulous::Render::Text> paints each run of
-a line with the second.
+L<Term::Fabulous::Text::Marks/runs> composes the styles of overlapping
+ranges with the first, and L<Term::Fabulous::Render::Text> and
+L<Term::Fabulous::Widget::CodeBlock> paint each run with the second.
 
 =head2 Style strings
 
@@ -196,19 +217,31 @@ The background, a color as above: C<on #202020>, C<on default>.
 The last word wins where words contradict (C<bold not bold> clears
 bold). Unknown words die with the known ones.
 
+=head2 Palette tokens
+
+A word that names a token of the theme's palette (C<accent>,
+C<text_muted>, C<selection>, ... ; see L<Term::Fabulous::Theme/Tokens>)
+is a color too: C<'bold accent on surface_low'>. It stays the token's
+name in the style, and the widget that paints the style asks its
+theme for the color (L</resolve_style>), so a theme switch recolors
+the text. A word that is both a token and a color name is read as the
+token.
+
 =head2 Style hashes
 
 The normalized form has exactly these keys:
 
 	{
-		set        => $bits,            # style bits to set
-		clear      => $bits,            # style bits to clear
-		color      => $rgba | undef,    # [ r, g, b, a ], undef leaves the color alone
-		background => $rgba | undef,
+		set        => $bits,                     # style bits to set
+		clear      => $bits,                     # style bits to clear
+		color      => $rgba | $token | undef,    # [r, g, b, a] or a palette token's name;
+		                                         # undef leaves it alone
+		background => $rgba | $token | undef,
 	}
 
 Colors are C<[r, g, b, a]> with alpha 0 for the terminal's default
-color; C<undef> means the style does not touch that color.
+color, or the name of a palette token (see L</Palette tokens>);
+C<undef> means the style does not touch that color.
 
 =head1 FUNCTIONS
 
@@ -229,9 +262,10 @@ C<Term::Fabulous::Text::Style:>.
 
 Returns a normalized style hash for a style string or a hash with any
 of the keys of L</Style hashes>; missing keys are 0 or C<undef>, and
-the colors may be in any format L<Term::Fabulous::Color> accepts. The
-result is a new hash. Unknown keys, invalid bits (not a non-negative
-integer) and invalid colors die.
+the colors may be in any format L<Term::Fabulous::Color> accepts, or a
+palette token's name, kept as it is. The result is a new hash.
+Unknown keys, invalid bits (not a non-negative integer) and invalid
+colors die.
 
 =head2 compose_styles
 
@@ -256,11 +290,22 @@ look: the bits with C<clear> removed and C<set> added, and each color
 replaced when the style has one. The given look is not changed. The
 colors are passed through as they are, so they may be in any one form
 as long as the look and the style agree: L<Term::Fabulous::Render::Text>
-applies RichText runs whose colors are termbox attributes.
+applies Text runs whose colors are termbox attributes.
+
+=head2 resolve_style
+
+	my $resolved = resolve_style( $style, $theme );
+
+The style with every palette token among its C<color> and
+C<background> replaced by the C<[r, g, b, a]> the
+L<theme|Term::Fabulous::Theme> gives it (C<< $theme->token >>); a style
+without tokens comes back as it is. A token the theme does not know
+dies. L<Term::Fabulous::Text::Marks/runs> calls it with the theme the
+widget draws with.
 
 =head1 SEE ALSO
 
-L<Term::Fabulous::Text::Markup>, L<Term::Fabulous::Widget::RichText>,
+L<Term::Fabulous::Text::Markup>, L<Term::Fabulous::Widget::Text>,
 L<Term::Fabulous::Color>, L<Term::Fabulous::Enum::WebColor>,
 L<Term::Fabulous::Termbox>.
 

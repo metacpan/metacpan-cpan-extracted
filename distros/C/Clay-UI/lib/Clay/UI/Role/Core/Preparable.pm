@@ -1,5 +1,5 @@
 package Clay::UI::Role::Core::Preparable;
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 use v5.22;
 use warnings;
 use feature 'signatures';
@@ -63,9 +63,8 @@ sub _due_in_order ($ui) {
 }
 
 sub _depth ($widget) {
-	my $depth = 0;
-	$depth++ while defined( $widget = $widget->parent );
-	return $depth;
+	my @ancestors = $widget->ancestors;
+	return scalar @ancestors;
 }
 
 # Queues $widget (weakly) under a request number, unless it is queued.
@@ -95,9 +94,7 @@ sub _pending_count () {
 }
 
 sub _belongs_to ($widget, $ui) {
-	return 0 unless defined $widget;
-	my $owner = $widget->ui;
-	return defined $owner && refaddr($owner) == refaddr($ui) ? 1 : 0;
+	return defined $widget && $ui->owns($widget) ? 1 : 0;
 }
 
 role Clay::UI::Role::Core::Preparable {
@@ -203,6 +200,15 @@ C<Clay::UI: widgets kept requesting preparation; 100 rounds of prepare_layout di
 
 =item *
 
+A scroll container (L<Clay::UI::Role::Layout::HasScroll>) that composes
+this role is prepared for its new position however it moved:
+L<Clay::UI/scroll_to>, wheel, drag or momentum. C<render> calls its
+C<request_prepare> when it detects the move, before the frame's events,
+so the container is prepared in the same C<render>. A nested scroll
+container that moved does not prepare the containers around it.
+
+=item *
+
 The queue is shared by all UIs of the process and holds widgets
 weakly: a widget freed while it is queued is forgotten (its entry goes
 at the next C<render> of any UI).
@@ -211,7 +217,7 @@ at the next C<render> of any UI).
 
 Compose this role together with a widget role
 (L<Clay::UI::Role::Core::Element>, L<Clay::UI::Box>, ...); it uses the
-widget's C<ui> method.
+widget's C<ancestors> and the L<Clay::UI/owns> of the rendering UI.
 
 =head1 METHODS
 

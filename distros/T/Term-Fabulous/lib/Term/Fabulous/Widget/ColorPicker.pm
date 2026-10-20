@@ -9,7 +9,7 @@ use Object::Pad 0.825;
 
 use Term::Fabulous::Widget::Box;
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 # A color chooser built from other widgets: a field for the color as
 # text, a sample of it, sliders for its channels (RGB or HSL, switched by
@@ -135,9 +135,8 @@ class Term::Fabulous::Widget::ColorPicker
 			rows   => [ map { { value => $_->{value}, label => $_->{label}, sample => defined $_->{rgba} ? SAMPLE : '' } } @_swatches ],
 			layout => { sizing => { width => sizing_grow(), height => sizing_grow() } },
 		);
-		weaken( my $weak_self = $self );
-		$_list->on( CursorMove  => sub ($event) { $weak_self->_swatch_chosen( $event->row_id ) if $weak_self && defined $event->row_id; return } );
-		$_list->on( RowActivate => sub ($event) { $weak_self->_swatch_submitted( $event->row_id ) if $weak_self;                        return } );
+		$_list->on( CursorMove  => sub ( $self, $event ) { $self->_swatch_chosen( $event->row_id ) if defined $event->row_id; return }, owner => $self );
+		$_list->on( RowActivate => sub ( $self, $event ) { $self->_swatch_submitted( $event->row_id );                        return }, owner => $self );
 		$_frame = framed( $_list, $list_rows );
 		my $layout = $_frame->layout;
 		$_frame->layout( { %$layout, sizing => { %{ $layout->{sizing} }, width => sizing_grow( $self->_list_minimum_width ) } } );
@@ -154,7 +153,7 @@ class Term::Fabulous::Widget::ColorPicker
 	# The field and the sample, the RGB/HSL switch, the channel sliders and
 	# the alpha slider.
 	method _editor () {
-		weaken( my $weak_self = $self );
+		weaken( my $weak_self = $self );    # for the validator, which the field keeps
 		$_column = Term::Fabulous::Widget::Box->new( layout => { layout_direction => CLAY_TOP_TO_BOTTOM, sizing => { width => sizing_grow() } } );
 
 		$_field = Term::Fabulous::Widget::TextField->new(
@@ -166,11 +165,11 @@ class Term::Fabulous::Widget::ColorPicker
 		$_sample = Term::Fabulous::Widget::Box->new( layout => { sizing => { width => sizing_fixed(SAMPLE_WIDTH), height => sizing_fixed(1) } } );
 		my $top = Term::Fabulous::Widget::Box->new( layout => { sizing => { width => sizing_grow() }, child_gap => 1, padding => { bottom => 1 } } );
 		$top->add_child( $_field, $_sample );
-		$_field->on( Change => sub ($event) { $weak_self->_typed( $event->value ) if $weak_self; return } );
-		$_field->on( Submit => sub ($event) { $weak_self->_submit if $weak_self;                 return } );
+		$_field->on( Change => sub ( $self, $event ) { $self->_typed( $event->value ); return }, owner => $self );
+		$_field->on( Submit => sub ( $self, $event ) { $self->_submit;                 return }, owner => $self );
 
 		$_switch = Term::Fabulous::Widget::SegmentedControl->new( options => [ [ RGB => 'rgb' ], [ HSL => 'hsl' ] ], value => $sliders );
-		$_switch->on( Change => sub ($event) { $weak_self->sliders( $event->value ) if $weak_self; return } );
+		$_switch->on( Change => sub ( $self, $event ) { $self->sliders( $event->value ); return }, owner => $self );
 		$_column->add_child( $top, $_switch );
 
 		foreach ( 1 .. 3 ) {
@@ -188,12 +187,11 @@ class Term::Fabulous::Widget::ColorPicker
 
 	# A label and a slider in a row; moving the slider writes the value.
 	method _slider_row () {
-		weaken( my $weak_self = $self );
 		my $label  = Term::Fabulous::Widget::Text->new( text => ' ' );
 		my $slider = Term::Fabulous::Widget::Slider->new( min => 0, max => 255, value_format => '%3d', layout => { sizing => { width => sizing_grow() } } );
 		my $row    = Term::Fabulous::Widget::Box->new( layout => { sizing => { width => sizing_grow() }, child_gap => 1 } );
 		$row->add_child( $label, $slider );
-		$slider->on( Change => sub ($event) { $weak_self->_slid if $weak_self; return } );
+		$slider->on( Change => sub ( $self, $event ) { $self->_slid; return }, owner => $self );
 		return ( $row, $label, $slider );
 	}
 
@@ -378,8 +376,8 @@ class Term::Fabulous::Widget::ColorPicker
 		die ref($self) . ": cannot turn alpha off while the value " . describe($chosen) . " is translucent"
 			if !$wanted && defined $_rgba && $_rgba->[3] != 255 && !defined $self->_swatch_of($chosen);
 		$alpha = $wanted;
-		$_column->add_child($_alpha_row) if $alpha     && !$_column->has_child($_alpha_row);
-		$_column->remove_child($_alpha_row) if !$alpha && $_column->has_child($_alpha_row);
+		$_column->add_child($_alpha_row) if $alpha && !$_column->has_child($_alpha_row);
+		$_column->remove_child($_alpha_row) unless $alpha;
 		$_field->placeholder( $self->_placeholder );
 		$_field->validate;
 		return $alpha;
@@ -437,7 +435,7 @@ choosing a color
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-color-picker.svg" alt="Two color pickers. The upper one has a framed list of named swatches with color samples on the left, Orange selected, an empty field with a sample of the orange next to it, the RGB/HSL switch on RGB and the red, green, blue and alpha sliders at the orange. The lower one has no list and no alpha slider, its field shows #2e8b57 and its sliders show hue, saturation and lightness. Below each picker a line names the chosen value and its channels"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.05/screenshots/widget-color-picker.svg" alt="Two color pickers. The upper one has a framed list of named swatches with color samples on the left, Orange selected, an empty field with a sample of the orange next to it, the RGB/HSL switch on RGB and the red, green, blue and alpha sliders at the orange. The lower one has no list and no alpha slider, its field shows #2e8b57 and its sliders show hue, saturation and lightness. Below each picker a line names the chosen value and its channels"></p>
 
 =end html
 

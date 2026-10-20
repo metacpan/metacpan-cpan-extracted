@@ -40,6 +40,18 @@ default). See `perldoc tools/pod2markdown`.
 `make docs-check` does the same without writing anything and lists what
 is out of date.
 
+## The pre-commit hook
+
+`perl Makefile.PL` points `core.hooksPath` at `.githooks` in a git
+checkout (unless it is already set to something else, which it reports
+and leaves alone). Its `pre-commit` hook runs `tools/pod2markdown
+--check` whenever the staged files touch a `.pm` or `.pod` file under
+`lib/`, `README.md`, `docs/` or the tool itself, and refuses the commit
+when the Markdown pages do not match the pod; run `make readme` and
+stage the result. It takes about a second and regenerates nothing, so
+partially staged pod cannot slip into the pages unnoticed. The CI
+workflow runs the same check. `git commit --no-verify` skips the hook.
+
 ## How a screenshot is taken
 
 `screenshots/screenshots.kdl` describes each screenshot: the program,
@@ -171,4 +183,7 @@ line. With `--check` it writes nothing, lists the files that are not
 tidy and exits with status 1. It also hides `ADJUST :params (` from
 perltidy, which would read it as a label before a call and indent the
 rest of the class one level deeper, by showing it a method with a
-signature instead.
+signature instead, and shows it every `role` as a `class` of a stand-in
+name: perltidy does not know the `role` keyword and indents a role with
+attributes (`:does(...)`) one level too deep, its closing brace and the
+`1;` after it included.

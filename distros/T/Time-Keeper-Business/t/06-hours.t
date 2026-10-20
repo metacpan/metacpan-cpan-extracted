@@ -3,6 +3,7 @@ use 5.010;
 use strict;
 use warnings;
 use Test::More;
+use Storable ();
 
 use Time::Keeper;
 use Time::Keeper::Business;
@@ -33,10 +34,13 @@ my @refused = (
     [[hours => ['09:00-17:00']],                              qr/^Time::Keeper::Business->new: business hours need a zone/, 'hours without a zone'],
     [[zone => 'UTC', hours => 'nine to five'],                qr/hours are a list of 'HH:MM-HH:MM' spans, or a hash/, 'hours as a string'],
     [[zone => 'UTC', hours => ['nine-five']],                 qr/'nine-five' is not a span of hours 'HH:MM-HH:MM' for every day/, 'a span that is not one'],
-    [[zone => 'UTC', hours => ['09:00-08:00']],               qr/the span '09:00-08:00' for every day ends before it starts/, 'a reversed span'],
-    [[zone => 'UTC', hours => ['09:00-09:00']],               qr/ends before it starts/, 'an empty span'],
+    [[zone => 'UTC', hours => ['09:00-09:00']],               qr/the span '09:00-09:00' for every day is empty/, 'an empty span'],
     [[zone => 'UTC', hours => ['09:00-25:00']],               qr/'09:00-25:00' is not a span/, 'past 24:00'],
-    [[zone => 'UTC', hours => ['24:00-24:00']],               qr/ends before it starts/, 'a start of 24:00'],
+    [[zone => 'UTC', hours => ['24:00-24:00']],               qr/starts at 24:00: start it at 00:00 the next day/, 'a start of 24:00'],
+    [[zone => 'UTC', hours => ['24:00-06:00']],               qr/starts at 24:00/, 'a start of 24:00 with a morning end'],
+    [[zone => 'UTC', hours => { default => ['09:00-17:00'], fri => ['22:00-10:00'] }], qr/the overnight span of Friday runs into the hours of Saturday/, 'a Friday night into Saturday\'s default hours'],
+    [[zone => 'UTC', hours => { default => ['09:00-17:00'], '2026-12-24' => ['20:00-10:00'] }], qr/the overnight span of 2026-12-24 runs into the hours of 2026-12-25/, 'a dated night into the next day'],
+    [[zone => 'UTC', hours => { default => ['22:00-06:00'], '2026-12-25' => ['05:00-07:00'] }], qr/the overnight span of 2026-12-24 runs into the hours of 2026-12-25/, 'a dated morning under the night before'],
     [[zone => 'UTC', hours => ['09:60-10:00']],               qr/is not a span/, 'a minute of 60'],
     [[zone => 'UTC', hours => ['09:00-12:00', '11:00-13:00']], qr/two spans of hours for every day overlap/, 'overlapping spans'],
     [[zone => 'UTC', hours => { mon => ['09:00-17:00'] }],     qr/the hours for Tuesday are not given and there is no default/, 'a weekday missing with no default'],
@@ -179,5 +183,84 @@ my $moved = $b->with(zone => 'America/New_York');
 is($moved->next_open(L(12, 45)) . '', '2026-10-15T14:00:00+01:00', 'with(zone) keeps the table and moves the wall clock: 12:45 London is 07:45 New York, before the open, so 09:00 New York is 14:00 London');
 is($moved->zone, 'America/New_York', '  and says so');
 is($b->with(hours => ['10:00-11:00'])->next_open(L(9)) . '', '2026-10-15T10:00:00+01:00', 'with(hours) replaces the table');
+
+# Overnight spans.
+{
+    my $n = $C->new(zone => 'Europe/London', hours => ['22:00-06:00'], holidays => ['2026-12-25']);
+    sub N { Time::Keeper->new(year => 2026, month => $_[0], day => $_[1], hour => $_[2], minute => $_[3] // 0, zone => 'Europe/London') }
+    is_deeply([ (Time::Keeper::Business::_hours_table($n))[0] ], ['Monday: 79200-108000'], 'a span ending before it starts ends the next morning: stored past 86400');
+    is($n->is_business_hours(N(10, 15, 23)), 1, 'Thursday 23:00 is open');
+    is($n->is_business_hours(N(10, 16, 3)), 1, 'Friday 03:00 is open: Thursday\'s shift');
+    is($n->is_business_hours(N(10, 16, 6)), 0, 'Friday 06:00 is the close');
+    is($n->is_business_hours(N(10, 16, 7)), 0, 'Friday 07:00 is closed');
+    is($n->is_business_hours(N(10, 12, 3)), 0, 'Monday 03:00 is closed: Sunday is not worked');
+    is($n->is_business_hours(N(10, 17, 3)), 1, 'Saturday 03:00 is open: Friday\'s shift');
+    is($n->is_business_hours(N(12, 25, 3)), 1, 'Christmas morning 03:00 is open: Christmas Eve\'s shift');
+    is($n->is_business_hours(N(12, 25, 23)), 0, 'Christmas night is closed');
+    is($n->is_business_hours(N(12, 26, 3)), 0, '  and so the 26th at 03:00');
+    is($n->is_business_day(d('2026-12-25')), 0, 'is_business_day stays about the day: Christmas is not one, though 03:00 on it is business hours');
+    is($n->next_open(N(10, 16, 7)) . '', '2026-10-16T22:00:00+01:00', 'next_open from Friday 07:00 is Friday 22:00');
+    is($n->next_open(N(10, 16, 3)) . '', '2026-10-16T03:00:00+01:00', 'next_open at 03:00 inside the night is the moment');
+    is($n->next_close(N(10, 15, 23)) . '', '2026-10-16T06:00:00+01:00', 'next_close from Thursday 23:00 is Friday 06:00');
+    is($n->next_close(N(10, 16, 3)) . '', '2026-10-16T06:00:00+01:00', '  and from Friday 03:00');
+    is($n->previous_open(N(10, 16, 3)) . '', '2026-10-15T22:00:00+01:00', 'previous_open from Friday 03:00 is Thursday 22:00');
+    is($n->previous_close(N(10, 16, 12)) . '', '2026-10-16T06:00:00+01:00', 'previous_close from Friday noon is 06:00');
+    is($n->previous_close(N(10, 15, 23)) . '', '2026-10-15T06:00:00+01:00', 'previous_close from Thursday 23:00 is Thursday 06:00, Wednesday\'s shift');
+    is_deeply(spans($n->business_hours_on(d('2026-10-15'))), [['2026-10-15T22:00:00+01:00', '2026-10-16T06:00:00+01:00']], 'business_hours_on gives the night whole on its start day');
+    is_deeply(spans($n->business_hours_on(N(10, 16, 3))), [['2026-10-16T22:00:00+01:00', '2026-10-17T06:00:00+01:00']], '  and a value is read by its own day, not the shift it is in');
+    is($n->business_hours_between(N(10, 12, 0), N(10, 19, 0))->total('hours'), 40, 'a week of weekday nights is forty hours');
+    is($n->business_hours_between(N(10, 15, 23), N(10, 16, 3))->total('hours'), 4, 'between inside one night');
+    is($n->business_hours_between(N(10, 16, 3), N(10, 16, 23))->total('hours'), 4, 'between from inside a night to inside the next');
+    is($n->plus_business_hours(N(10, 15, 23), hours => 10) . '', '2026-10-17T01:00:00+01:00', 'ten hours from Thursday 23:00: seven that night, three into Friday\'s');
+    is($n->plus_business_hours(N(10, 16, 3), hours => 3) . '', '2026-10-16T06:00:00+01:00', 'three from 03:00 lands on the close');
+    is($n->minus_business_hours(N(10, 16, 3), hours => 6) . '', '2026-10-15T05:00:00+01:00', 'back six from Friday 03:00: five to Thursday 22:00, one into Wednesday\'s night');
+    is($n->deadline(N(10, 16, 7), hours => 2) . '', '2026-10-17T00:00:00+01:00', 'a deadline from a closed morning starts at the night\'s open');
+    is($n->deadline(N(10, 15, 23), days => 1, end_of_day => 1) . '', '2026-10-17T06:00:00+01:00', 'end_of_day is the night\'s close, the next morning');
+    my $ny = $C->new(zone => 'America/New_York', hours => ['22:00-06:00'], weekend => []);
+    sub Y { Time::Keeper->new(year => $_[0], month => $_[1], day => $_[2], hour => $_[3], zone => 'America/New_York') }
+    is($ny->business_hours_between(Y(2026, 3, 7, 22), Y(2026, 3, 8, 6))->total('hours'), 8, 'a night over the spring change is eight hours on the wall clock');
+    is($ny->business_hours_between(Y(2026, 10, 31, 22), Y(2026, 11, 1, 6))->total('hours'), 8, '  and over the autumn change');
+    my $mixed = $C->new(zone => 'UTC', hours => ['08:00-12:00', '20:00-02:00'], weekend => []);
+    is($mixed->business_hours_between(Time::Keeper->parse('2026-10-15T00:00:00Z'), Time::Keeper->parse('2026-10-16T00:00:00Z'))->total('hours'), 10,
+       'a day with a morning and a night: from midnight, the night before\'s two hours, the morning\'s four, the night\'s first four');
+}
+
+# Hours by rule.
+{
+    my $R = 'Time::Keeper::Business::Rule';
+    my $eve = $R->fixed(month => 12, day => 24);
+    my $hb = $C->new(zone => 'Europe/London', holidays => [ '2026-12-25', '2028-12-25' ],
+        hours => { default => ['09:00-17:30'], by_rule => [ [ $eve, ['09:00-12:00'] ], [ $R->fixed(month => 12, day => 31), [] ] ], '2029-12-24' => ['10:00-11:00'] });
+    for my $y (2026 .. 2028, 2030) {
+        my $d = Time::Keeper::Date->new(year => $y, month => 12, day => 24);
+        next unless $hb->is_business_day($d);
+        is_deeply(spans($hb->business_hours_on($d)), [[ "$y-12-24T09:00:00+00:00", "$y-12-24T12:00:00+00:00" ]], "Christmas Eve $y by rule");
+    }
+    is_deeply(spans($hb->business_hours_on(d('2029-12-24'))), [['2029-12-24T10:00:00+00:00', '2029-12-24T11:00:00+00:00']], 'a dated key beats a rule');
+    is_deeply(spans($hb->business_hours_on(d('2026-12-31'))), [], 'a rule with no spans closes its day early');
+    is($hb->is_business_day(d('2026-12-31')), 1, '  and it is still a business day');
+    is_deeply(spans($hb->business_hours_on(d('2026-12-23'))), [['2026-12-23T09:00:00+00:00', '2026-12-23T17:30:00+00:00']], 'other days keep the default');
+    my $two = $C->new(zone => 'UTC', hours => { default => ['09:00-17:00'], by_rule => [ [ $eve, ['09:00-10:00'] ], [ $eve, ['09:00-11:00'] ] ] });
+    is_deeply(spans($two->business_hours_on(d('2026-12-24'))), [['2026-12-24T09:00:00Z', '2026-12-24T10:00:00Z']], 'two rules on a day: the first listed');
+    my $hol = $C->new(zone => 'UTC', holidays => [ $eve ], hours => { default => ['09:00-17:00'], by_rule => [ [ $eve, ['09:00-12:00'] ] ] });
+    is_deeply(spans($hol->business_hours_on(d('2026-12-24'))), [], 'a holiday stays closed whatever a rule says');
+    my $data = $C->new(zone => 'UTC', hours => { default => ['09:00-17:00'], by_rule => [ [ { kind => 'fixed', month => 12, day => 24 }, ['09:00-12:00'] ] ] });
+    is_deeply(spans($data->business_hours_on(d('2026-12-24'))), [['2026-12-24T09:00:00Z', '2026-12-24T12:00:00Z']], 'a rule as data');
+    is($hb->business_hours_between(Time::Keeper->parse('2026-12-21T09:00:00Z'), Time::Keeper->parse('2026-12-28T09:00:00Z'))->total('hours'), 3 * 8.5 + 3, 'a week holding a rule day: the fast path steps aside');
+    is($hb->business_hours_between(Time::Keeper->parse('2026-11-30T09:00:00Z'), Time::Keeper->parse('2026-12-07T09:00:00Z'))->total('hours'), 5 * 8.5, '  and a plain week is still plain');
+    is($hb->plus_business_hours(Time::Keeper->parse('2026-12-24T11:00:00Z'), hours => 2) . '', '2026-12-28T10:00:00Z', 'business time across the half day: one hour to noon, then Monday the 28th');
+    is($hb->business_hours_between(Time::Keeper->parse('2027-12-13T09:00:00Z'), Time::Keeper->parse('2028-01-03T09:00:00Z'))->total('hours'), 13 * 8.5 + 3,
+       'three weeks over a week whose only change is a rule day (Christmas Eve 2027) and a rule\'s closed New Year\'s Eve: the fast path must not take that week');
+    my $plain = $hb->TO_JSON;
+    is_deeply($plain->{hours}{by_rule}[0], [ { kind => 'fixed', month => 12, day => 24 }, ['09:00-12:00'] ], 'TO_JSON gives a by_rule rule as data');
+    my $thawed = Storable::thaw(Storable::freeze($hb));
+    is_deeply(spans($thawed->business_hours_on(d('2027-12-24'))), [['2027-12-24T09:00:00+00:00', '2027-12-24T12:00:00+00:00']], '  and Storable carries it');
+    ok(!eval { Storable::freeze($C->new(zone => 'UTC', hours => { default => ['09:00-17:00'], by_rule => [ [ $eve->only_if(sub { 1 }), [] ] ] })); 1 }, 'a by_rule rule with a code ref cannot be frozen');
+    like($@, qr/cannot freeze a schedule whose hours rules hold a code ref/, '  by name');
+    for my $bad ([ 'x', qr/by_rule is a list of \[rule, spans\] pairs/ ], [ [ 'x' ], qr/by_rule is a list of \[rule, spans\] pairs/ ], [ [ [ 'x', [] ] ], qr/by_rule's first of a pair is a rule, or a rule as data/ ], [ [ [ $eve, ['9-12'] ] ], qr/is not a span of hours/ ]) {
+        ok(!eval { $C->new(zone => 'UTC', hours => { default => ['09:00-17:00'], by_rule => $bad->[0] }); 1 }, 'by_rule refuses');
+        like($@, $bad->[1], '  by name');
+    }
+}
 
 done_testing;

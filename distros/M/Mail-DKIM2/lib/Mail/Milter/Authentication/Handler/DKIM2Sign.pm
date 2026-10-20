@@ -4,11 +4,11 @@ use strict;
 use warnings;
 use Mail::Milter::Authentication::Pragmas;
 # ABSTRACT: Handler class for DKIM2 signing
-our $VERSION = '0.22';
+our $VERSION = '0.25';
 use base 'Mail::Milter::Authentication::Handler';
 
 use Mail::DKIM2::Common qw(extract_mi_version strip_mi_versions load_private_key fold_header parse_mime
-    parse_dkim_pubkey chain_number_error mi_version_tag DKIM2_DRAFT DKIM2_REPO DKIM2_DATE);
+    parse_dkim_pubkey chain_number_error mi_version_tag from_refusal_note DKIM2_DRAFT DKIM2_REPO DKIM2_DATE);
 use Mail::DKIM2::Gate;
 use Mail::DKIM2::MessageInstance;
 use Mail::DKIM2::MessageStore;
@@ -148,6 +148,13 @@ sub addheader_callback {
     $self->change_header( 'X-DKIM2-Snapshot', $_, q{} ) for reverse 1 .. @tokens;
     $self->{'_snapshot_token'} = ( @tokens == 1 && $tokens[0] =~ /\A[0-9a-f]{32}\z/ ) ? $tokens[0] : undef;
 
+    # X-DKIM2-Exploded: a list manager on this host (Mailman, Sympa) marks
+    # each distribution copy, asking for the -07 "exploded" flag (section
+    # 12.5). Its presence, whatever the value, is the request. It never
+    # leaves either.
+    my $exploded = grep { /\AX-DKIM2-Exploded[ \t]*:/i } @{ $self->{'headers'} || [] };
+    $self->change_header( 'X-DKIM2-Exploded', $_, q{} ) for reverse 1 .. $exploded;
+
     # Determine if we should sign this message
     my $should_sign = 0;
     if ( $config->{'sign_authenticated'} && $self->is_authenticated() ) {
@@ -209,8 +216,9 @@ sub addheader_callback {
             $message_data .= _fmtheader($h);
         }
 
-        # Original headers (less X-DKIM2-Snapshot, removed above)
-        foreach my $chunk (grep { !/\AX-DKIM2-Snapshot[ \t]*:/i } @{$self->{'headers'} || []}) {
+        # Original headers (less X-DKIM2-Snapshot and X-DKIM2-Exploded,
+        # removed above)
+        foreach my $chunk (grep { !/\AX-DKIM2-(?:Snapshot|Exploded)[ \t]*:/i } @{$self->{'headers'} || []}) {
             $message_data .= $chunk;
         }
 
@@ -234,6 +242,7 @@ sub addheader_callback {
         if ( $config->{'add_message_instance'} ) {
             delete $self->{'_stripped_mi_versions'};
             delete $self->{'_clean_message_data'};
+            delete $self->{'_restarted_mi'};
             my $mi = $self->_compute_message_instance($message_data, $config);
             if ( $self->{'_stripped_mi_versions'} ) {
                 # Broken intermediate MIs were stripped; use the cleaned message data
@@ -256,6 +265,7 @@ sub addheader_callback {
             Domain   => $sign_domain,
             Selector => $selector,
             Key      => $key,
+            ( $exploded ? ( Exploded => 1 ) : () ),
         );
 
         # Pin t= when configured.  Only the test suite sets this, so that the
@@ -301,6 +311,14 @@ sub addheader_callback {
             $self->metric_count( 'dkim2_sign_total', { 'result' => $reason } );
             $self->dbgout( 'DKIM2Sign',
                 "Not signing for $sign_domain: $gate->{message}", LOG_INFO );
+            # -07 section 13: a message carrying an upstream DKIM2-Signature
+            # that this hop cannot sign MUST NOT be sent on. As
+            # bin/dkim2-milter: 550 5.7.1 with the reason (section 13.2).
+            if ( grep { /\ADKIM2-Signature[ \t]*:/i } @{ $self->{'headers'} || [] } ) {
+                ( my $text = "not signing: $gate->{message}" ) =~ s/[\r\n]+/ /g;
+                $self->reject_mail( "550 5.7.1 $text" );
+                return;
+            }
             # As bin/dkim2-milter: a broken upstream chain is already reported
             # by the verifier's Authentication-Results; the two refusals that
             # are this hop's own business are flagged on the message.
@@ -325,6 +343,13 @@ sub addheader_callback {
 
         if ( $sig_result eq 'signed' ) {
             $self->_delete_mi_versions(@mi_removals);
+            if ( @mi_removals && $self->{'_restarted_mi'} ) {
+                push @{$handler->{pre_headers}}, {
+                    'field' => 'X-DKIM2-Info',
+                    'value' => _dkim2_info('restarted-unsigned-mi='
+                        . join( ',', map { "m=$_" } @mi_removals )),
+                };
+            }
             if ( defined $mi_value ) {
                 push @{$handler->{pre_headers}}, {
                     'field' => 'Message-Instance',
@@ -359,11 +384,24 @@ sub addheader_callback {
                 . ( $over_null ? ' over a null body Recipe' : '' ), LOG_INFO );
         }
         else {
-            # The Signer refuses (result fail) rather than dying, e.g. over a
+            # The Signer refuses (result fail) rather than dying: a From that
+            # is not Authentic for this domain (-07 section 11), or a
             # DKIM2-Signature it cannot key -- which the gate has already
-            # refused.  Either way nothing is added to the message.
+            # refused.  Either way nothing is added to the message, and one
+            # carrying an upstream DKIM2-Signature is not sent on (section 13).
             $self->metric_count( 'dkim2_sign_total', { 'result' => 'error' } );
             $self->log_error( "DKIM2 signing failed: " . ($signer->result_detail // 'no result') );
+            # A list posting domain that is not the signing domain (or
+            # below it) has every rewritten post refused here: say which.
+            if ( ( $signer->details // '' ) =~ /From header field is not Authentic/ ) {
+                my @from = map { /\AFrom[ \t]*:(.*)\z/is ? $1 : () } @{ $self->{'headers'} || [] };
+                $self->log_error( from_refusal_note( $sign_domain, @from ) );
+            }
+            if ( grep { /\ADKIM2-Signature[ \t]*:/i } @{ $self->{'headers'} || [] } ) {
+                ( my $text = 'not signing: ' . ( $signer->details // 'signer refused' ) ) =~ s/[\r\n]+/ /g;
+                $self->reject_mail( "550 5.7.1 $text" );
+                return;
+            }
             $self->_remove_unsigned_instances($handler);
         }
     };
@@ -444,30 +482,42 @@ sub close_callback {
 
 # Compute Message-Instance header for the message.
 #
-# 1. If the topmost MI already matches, return undef (no new MI needed).
-# 2. If the message carries the X-DKIM2-Snapshot token DKIM2Verify gave it,
+# 1. A message with no DKIM2-Signature whose instances (all this host's own,
+#    all unsigned) are more than one matching m=1: restart them as ONE m=1
+#    (-07 section 12.1), hashes of the message less its instances and
+#    Recipes back to the message as it arrived -- from the instances
+#    themselves when the top matches, else from the snapshot (step 3).
+# 2. If the topmost MI already matches, return undef (no new MI needed).
+# 3. If the message carries the X-DKIM2-Snapshot token DKIM2Verify gave it,
 #    compute a diff MI between that snapshot and the current message.
-# 3. Otherwise, fall back to a hash-only MI (no Recipes).
+# 4. Otherwise, fall back to a hash-only MI (no Recipes).
 sub _compute_message_instance {
     my ( $self, $message_data, $config ) = @_;
 
     my $mi = eval {
         my $msg = parse_mime($message_data);
 
-        # Skip if the topmost MI already matches current content
         my @ignore = ( IgnorePrefixes => $config->{'ignore_header_prefixes'} );
-        if ( Mail::DKIM2::MessageInstance->verify($msg, @ignore) ) {
+        my @mi_headers = $msg->header_raw('Message-Instance');
+        my $matched = @mi_headers && Mail::DKIM2::MessageInstance->verify($msg, @ignore);
+        my $restart = @mi_headers && !$msg->header_raw('DKIM2-Signature')
+                   && !( $matched && @mi_headers == 1 );
+
+        # Skip if the topmost MI already matches current content
+        if ( $matched && !$restart ) {
             $self->dbgout( 'DKIM2MI', 'Message unchanged, skipping MI', LOG_DEBUG );
             return undef;
         }
 
-        my @mi_headers = $msg->header_raw('Message-Instance');
         # An m= above MAX_CHAIN_LENGTH is never a loop bound below (the gate
         # refuses the message on it).
         return undef if grep { chain_number_error('Message-Instance', 'm', mi_version_tag($_)) }
                         @mi_headers;
         my %mi_by_v = map { (extract_mi_version($_) || 0) => $_ } @mi_headers;
         my $max_v = @mi_headers ? (sort { $b <=> $a } keys %mi_by_v)[0] : 0;
+
+        return $self->_restart_instances($message_data, $message_data, \%mi_by_v, $config)
+            if $restart && $matched;
 
         # The snapshot DKIM2Verify took of this very message, named by its
         # X-DKIM2-Snapshot token -- never one found by Message-Instance value
@@ -493,6 +543,9 @@ sub _compute_message_instance {
                         return undef;
                     }
                 }
+
+                return $self->_restart_instances($message_data, $snapshot_data, \%mi_by_v, $config)
+                    if $restart;
 
                 # If the current message has more MI headers than the snapshot,
                 # upstream added intermediate MIs.  Since verify() already told us
@@ -535,6 +588,29 @@ sub _compute_message_instance {
         return;
     }
 
+    return $mi;
+}
+
+# The ONE m=1 an unsigned message leaves with (step 1 above): Recipes back to
+# $previous (the message itself, or the snapshot) as it was before its first
+# instance. Every instance the message carries goes; a chain that does not
+# undo cleanly gives no instance, and the gate refuses on it as before.
+sub _restart_instances {
+    my ( $self, $message_data, $previous, $mi_by_v, $config ) = @_;
+    my @ignore = ( IgnorePrefixes => $config->{'ignore_header_prefixes'} );
+    my ( $ok, $why ) = Mail::DKIM2::MessageInstance->chain_verifies($previous, @ignore);
+    unless ( $ok ) {
+        $self->dbgout( 'DKIM2MI', "Not restarting the unsigned instances as m=1: $why", LOG_INFO );
+        return undef;
+    }
+    my $mi = Mail::DKIM2::MessageInstance->calculate_first($message_data, $previous, @ignore,
+        MaxRecipeLiterals => $config->{'max_recipe_literals'});
+    my @versions = sort { $a <=> $b } keys %$mi_by_v;
+    $self->{'_stripped_mi_versions'} = \@versions;
+    $self->{'_restarted_mi'} = 1;
+    $self->{'_clean_message_data'} = strip_mi_versions($message_data, @versions);
+    $self->dbgout( 'DKIM2MI',
+        'Restarting unsigned ' . join(',', map { "m=$_" } @versions) . ' as one m=1', LOG_INFO );
     return $mi;
 }
 
@@ -700,7 +776,10 @@ broken intermediate Message-Instances on the way, it deletes those fields from
 the message once it has signed, through the framework's C<change_header()>
 (an empty value: C<SMFIR_CHGHEADER> in milter mode).
 
-On a refusal nothing is signed and no Message-Instance is added; every
+On a refusal nothing is signed and no Message-Instance is added. A refused
+message that carries an upstream DKIM2-Signature is rejected with
+C<reject_mail("550 5.7.1 not signing: E<lt>reasonE<gt>")> (-07 sections 13
+and 13.2: it must not be sent on; new in 0.23). Otherwise every
 Message-Instance no DKIM2-Signature covers (an C<m=> above every signature's
 C<m=>) is removed, with C<X-DKIM2-Info: ... action=removed-unsigned-mi=...;>,
 as also when the domain has no signing configuration or the Signer fails.
@@ -712,8 +791,12 @@ When it signs over a null body Recipe (a null top, or an unsigned null under
 the top) it prepends C<X-DKIM2-Info: ... action=null-body-recipe;>.  If the Signer itself refuses
 (result C<fail>, e.g. over a DKIM2-Signature it cannot key, which the gate has
 already refused), nothing is added and the failure is logged as an error.
+That includes a From that is not Authentic for the signing domain when
+this hop originates the message or a Message-Instance it signs changed
+From (-07 section 11): the message then goes on unsigned, or, when it
+carries an upstream DKIM2-Signature, is rejected C<550 5.7.1> as above.
 
-This module implements draft-ietf-dkim-dkim2-spec-06; see L<Mail::DKIM2/STATUS>
+This module implements draft-ietf-dkim-dkim2-spec-07; see L<Mail::DKIM2/STATUS>
 for what that means for the wire format and the API, and
 L<Mail::DKIM2/CONVENTIONS> for the option, input and error conventions every
 module here follows.
@@ -732,7 +815,7 @@ origination and each copy carries a disclosed recipient set.  But at
 B<origination / submission>, a message with undisclosed (Bcc) recipients —
 envelope recipients that do not appear in the C<To:>/C<Cc:> headers — will have
 those Bcc addresses recorded in C<rt=>, visible to every recipient.  That
-B<leaks the Bcc>, contrary to draft-ietf-dkim-dkim2-spec-06, whose C<rt=>
+B<leaks the Bcc>, contrary to draft-ietf-dkim-dkim2-spec-07, whose C<rt=>
 description requires that Bcc recipients not be revealed to other recipients.
 
 The milter cannot fix this itself: the Postfix milter protocol modifies a
@@ -797,12 +880,27 @@ diff-based MI is computed capturing header and body changes made during local
 processing.  A message whose top Message-Instance does not match and that has
 no such snapshot gets no new MI (and the gate refuses it); one with no
 Message-Instance at all gets C<m=1>.  The handler removes C<X-DKIM2-Snapshot>
-from every message it sees, signed or not.  A snapshot diff whose body Recipe would need more
+from every message it sees, signed or not, and C<X-DKIM2-Exploded> too: a
+message that carried one (Mailman and Sympa mark each distribution copy
+C<X-DKIM2-Exploded: yes>) is signed with the C<exploded> flag (-07 section
+12.5), as is one with more than one recipient, never at C<i=1>.  A snapshot diff whose body Recipe would need more
 than C<max_recipe_literals> literal lines declares the body unrecoverable
 (a null body Recipe): this handler only adds header fields, so it cannot
 move the old body into the MIME epilogue.  Like any null this hop adds, it is
 signed only with C<allow_null_body_recipe>; without it the message goes out
 unsigned.
+
+A message with no DKIM2-Signature whose Message-Instances (all unsigned:
+an C<m=1> stamped on arrival, a list manager's instance over it) are more
+than one matching C<m=1> is signed with B<one> Message-Instance, C<m=1>
+(-07 section 12.1): the hashes of the copy sent and Recipes back to the
+message as it arrived, a From munge included. The instances it carried are
+removed, with C<X-DKIM2-Info: action=restarted-unsigned-mi=m=1,...;>. The
+message as it arrived comes from those instances when the top one matches
+the content, else from the snapshot; a chain that does not undo cleanly
+gets no instance and the gate refuses the message. The From sent must still
+be Authentic for the signing domain (-07 section 11). A message that
+arrived signed is extended with C<m=N+1> as before.
 
 =head1 HTTP KEY ENDPOINT
 

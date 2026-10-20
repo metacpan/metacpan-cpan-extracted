@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use Time::Keeper;
 
@@ -30,7 +30,7 @@ Time::Keeper::Business - business days, business hours and holidays on Time::Kee
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 SYNOPSIS
 
@@ -63,6 +63,16 @@ Version 0.01
     $b->plus_business_hours($t, hours => 4);       # 2026-12-19T11:00, the worked Saturday
     $b->business_hours_between($t, $t->plus(days => 3))->total('hours');   # 11.5
     $b->deadline($t, days => 2, end_of_day => 1);  # 2026-12-21T17:30
+
+    my $eid = Time::Keeper::Business::Rule->fixed(calendar => 'islamic-umalqura',
+        month_code => 'M10', day => 1, name => 'Eid al-Fitr');
+    my $dubai = Time::Keeper::Business->new(weekend => 'ar-AE', holidays => [ $eid ]);
+    $dubai->is_holiday(Time::Keeper::Date->new(year => 2026, month => 3, day => 20));   # Eid al-Fitr
+
+    my $night = Time::Keeper::Business->new(hours => ['22:00-06:00'], zone => 'Europe/London');
+    my $fri = Time::Keeper->new(year => 2026, month => 12, day => 18, hour => 23, zone => 'Europe/London');
+    $night->next_close($fri);                      # 2026-12-19T06:00, the morning after
+    $night->plus_business_hours($fri, hours => 8); # 2026-12-21T23:00, Monday night
 
 =head1 DESCRIPTION
 
@@ -119,6 +129,12 @@ give C<< { MMDD => name } >>, a L<Time::Keeper::Business::Rule> (a fixed date, t
 nth weekday, Easter, with observed days; three countries ship as examples), or
 another schedule;
 
+=item * a source with arguments: C<< { source => $object, regions => ['EAW'] } >>,
+asked C<< holidays(year => $y, regions => ['EAW']) >>, every key but C<source>
+passed on after the year, in key order; a code ref as the source is called
+with the year and then the pairs. The arguments are copied, an array or hash
+one level deep. A rule as the source takes none;
+
 =item * a list of any of these.
 
 =back
@@ -130,6 +146,25 @@ for that year; a question that would span more than about a thousand
 years of such sources is refused, since a list is the right form for
 that. A Date::Holidays object is used, never loaded: it is not a
 prerequisite of this module.
+
+A country with regions or states needs them. C<< Date::Holidays->new(countrycode
+=> 'gb') >> asked for 2026 gives thirteen days, the holidays of England and
+Wales, Scotland and Northern Ireland together, each named with its region;
+asked with C<< regions => ['EAW'] >> it gives England and Wales's eight. A
+schedule for London is
+
+    Time::Keeper::Business->new(
+        holidays => [ { source => Date::Holidays->new(countrycode => 'gb'), regions => ['EAW'] } ],
+    );
+
+and one for Melbourne passes C<< state => 'VIC' >> to Date::Holidays's
+Australian module in the same way.
+
+=item rules
+
+L<Time::Keeper::Business::Rule>s, or rules as data as their C<TO_JSON>
+gives them, as holiday sources. It is how the plain form (L</TO_JSON>)
+carries a schedule's rules, and the same as giving them in C<holidays>.
 
 =item working
 
@@ -157,8 +192,33 @@ not named, and a list for a date that overrides its weekday, which may be
 empty for a day closed early. A weekday that is worked must have hours or
 a default; a weekend day without either has none, so a worked Saturday is
 a business day with no business hours. A holiday has no hours whatever the
-table says. A shift over midnight is written as two spans, C<22:00-24:00>
-on the day and C<00:00-06:00> on the next.
+table says.
+
+    hours => ['22:00-06:00']      # a night desk
+
+A span that ends before it starts runs over midnight to the next morning
+and belongs to the day it starts on: open when that day is a business day,
+whatever the next day is, so Christmas Eve's night is worked into Christmas
+morning and Christmas night is not. It may not run into the next day's own
+hours, nor last twenty-four hours or more; a span may not start at 24:00.
+L</is_business_day> is still a statement about the day: 03:00 on Christmas
+morning is business hours, Christmas Eve's, on a day that is not a business
+day.
+
+    hours => { default => ['09:00-17:30'],
+               by_rule => [ [ Time::Keeper::Business::Rule->fixed(month => 12, day => 24), ['09:00-12:00'] ],
+                            [ Time::Keeper::Business::Rule->fixed(month => 12, day => 31), [] ] ] }
+
+C<by_rule> gives hours to the days of a rule, every year: a list of pairs of
+a L<Time::Keeper::Business::Rule> (or a rule as data) and its spans, an empty
+list closing the day early. A date key beats a rule, a rule beats the
+weekday, and of two rules on one day the first listed wins; a holiday stays
+closed whatever a rule says, and a rule's days are not holidays.
+
+=item reckon
+
+C<wall> (the default) or C<elapsed>: how business time is counted across a
+clock change; see L</HOW TIME IS RECKONED>.
 
 =item name
 
@@ -256,6 +316,21 @@ the two and a holiday of either counts: a settlement needs both markets
 open. With C<< mode => 'both' >> a day is closed only when both have it
 closed. C<< name => >> names the result.
 
+    my $desk = $london->join($new_york, hours => 'both');     # open while both are
+    $desk->deadline($t, hours => 4);
+
+C<< hours => >> gives the join business hours: C<both>, the times both
+schedules are open, read as instants so each keeps its own zone and its
+own clock changes (London and New York overlap from 14:00 to 17:30 London
+time most of the year, and from 13:00 in the weeks of March when New York
+has changed its clocks and London has not); C<either>, the times either is
+open; C<first> or C<second>, one side's hours on the days the join is open.
+The join reads its hours on the first schedule's clock (the second's for
+C<second>), so an evening in Los Angeles is cut at London's midnight into
+two days' spans. The schedules it needs must have hours. Without the key a
+join has none, as before. A join with hours cannot be frozen: freeze its
+parts and join them again.
+
 =head1 BUSINESS DAYS
 
 Every method here takes a L<Time::Keeper> or a L<Time::Keeper::Date> and
@@ -332,6 +407,29 @@ the end with a negative n; the value may be a L<Time::Keeper::YearMonth>,
 which gives a Date. A month with fewer business days than asked dies with
 the count.
 
+=head2 business_days_in
+
+    my $n = $b->business_days_in($year_month);   # or any date or value of the month
+    my $n = $b->business_days_in(year => 2026);
+
+The business days in a month or a year. A L<Time::Keeper> gives the month
+its own zone shows.
+
+=head2 iterate_business_days
+
+    my $next = $b->iterate_business_days($from);         # no end
+    my $next = $b->iterate_business_days($from, $to);    # both ends included
+    while (my $d = $next->()) { ... }
+
+A code ref that gives the business days from C<$from> on, one each call, of
+C<$from>'s class (a L<Time::Keeper> keeps its clock, zone, locale and
+calendar), and undef after C<$to> when there is one. Unlike
+L</business_days> it holds no list, so it has no limit. Each iterator keeps
+its own place, and a copy made for a thread continues on its own.
+On a schedule whose holidays come from rules or other sources asked year by
+year, the years it reaches are materialised as it goes, and the thousand-year
+limit on those (see C<holidays> under L</new>) holds for an iterator too.
+
 =head1 BUSINESS HOURS
 
 The methods here take a L<Time::Keeper>: a date has no clock, and a
@@ -341,13 +439,25 @@ locale, calendar and class.
 
 =head2 HOW TIME IS RECKONED
 
-Business time is the wall clock's, not elapsed time. Nine to five is eight
-hours on the day the clocks go forward as on any other, a repeated hour
-counts once, and a leap second is part of 23:59:59. An open or a close
-that falls on a time the clocks skipped is the first moment after it, and
-one in a repeated hour is the earlier reading, as L<Time::Keeper/new>
-would choose. So on 8 March 2026 in New York a span C<02:00-04:00> opens
-at 03:00.
+By default business time is the wall clock's, not elapsed time. Nine to
+five is eight hours on the day the clocks go forward as on any other, a
+repeated hour counts once, and a leap second is part of 23:59:59. That is
+how an SLA of four business hours is read, and a schedule of office hours
+never meets a clock change.
+
+    Time::Keeper::Business->new(..., reckon => 'elapsed');
+
+With C<< reckon => 'elapsed' >> business time is the time that passes, the
+difference of the instants: a night shift of C<22:00-06:00> over the spring
+change is seven hours and over the autumn change nine, as it is paid. Opens,
+closes and whether a moment is business hours are the same either way; the
+counts and the additions differ only across a change.
+
+An open or a close that falls on a time the clocks skipped is moved forward
+by the length of the skip, and one in a repeated hour is the earlier
+reading, as L<Time::Keeper/new>'s C<< gap => 'forward' >> and default would
+choose. So on 8 March 2026 in New York a span C<02:00-04:00> opens at 03:00,
+and one of C<02:30-04:00> at 03:30.
 
 =head2 is_business_hours
 
@@ -431,13 +541,25 @@ the close of that day's last span; and the clock units, as
 L</plus_business_hours> takes them, then run as business time. Every key
 is optional and none may be negative.
 
+=head2 business_hours_in
+
+    my $d = $b->business_hours_in($date);                 # a day
+    my $d = $b->business_hours_in($year_month);           # a month
+    my $d = $b->business_hours_in(year => 2026, number => 1);
+
+The business time in a day, a month or a year, as a
+L<Time::Keeper::Duration> in hours and below, or a number of hours with
+C<< number => 1 >>, reckoned as the schedule reckons. An overnight span
+counts on the day it starts. A L<Time::Keeper> is refused, since its day
+and its month would both be meant: give a Date or a YearMonth.
+
 =head1 SERIALISATION
 
 =head2 TO_JSON
 
 A plain hash: C<weekend> as a list of numbers, C<holidays> as a hash of
 C<YYYY-MM-DD> to the name or undef, C<working> as the list of worked
-weekend days, and C<zone>, C<name> and C<hours> where given. It is what
+weekend days, C<rules> as the rules' data where there are any, and C<zone>, C<name> and C<hours> where given. It is what
 L</new> takes, so C<< Time::Keeper::Business->new(%$json) >> is the same
 schedule.
 
@@ -451,10 +573,11 @@ schedule.
 
 L<Storable>, and L<Sereal> and L<CBOR::XS> through C<FREEZE> and C<THAW>,
 carry the plain form, so a thawed schedule is the same schedule. A yearly
-date travels as its C<--MM-DD> key. A schedule with a code ref or an
-object among its sources cannot be frozen, nor a join of schedules with
-yearly or such sources: list the holidays, or join the thawed schedules
-again.
+date travels as its C<--MM-DD> key and a rule as its data, under
+C<rules>. A schedule with a code ref or an object among its sources, a rule
+holding a code ref, or a source with arguments cannot be frozen, nor a join
+of schedules with yearly or generated sources: list the holidays, or join
+the thawed schedules again.
 
 =head1 THREADS
 
@@ -466,12 +589,14 @@ thread answers on its own.
 =head1 EXAMPLES
 
 The distribution's F<eg/> scripts print a year's holidays and the ten
-business days after 20 December for the three rule sets of
-L<Time::Keeper::Business::Rule>:
+business days after 20 December: the three rule sets of
+L<Time::Keeper::Business::Rule>, and Japan and Sweden written out as rules:
 
     perl eg/uk.pl 2027
     perl eg/us-federal.pl 2027
     perl eg/target2.pl 2027
+    perl eg/japan.pl 2027
+    perl eg/sweden.pl 2027
 
 An SLA desk in New York, open nine to six on weekdays, closed on the
 federal holidays, answering within four business hours and resolving by

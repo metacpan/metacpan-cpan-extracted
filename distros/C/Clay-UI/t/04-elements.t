@@ -352,22 +352,35 @@ subtest 'a floating element may attach to an element declared later in the frame
     is( \@errors, [CLAY_ERROR_TYPE_FLOATING_CONTAINER_PARENT_NOT_FOUND], 'a target that is never declared is still reported' );
 };
 
+subtest 'Clay__OpenTextElement returns the id Clay gave the text' => sub {
+    Clay_SetCurrentContext($ctx);
+    my @ids;
+    Clay_BeginLayout();
+    element('root', { layout => { sizing => { width => sizing_fixed(200), height => sizing_fixed(100) }, layoutDirection => CLAY_TOP_TO_BOTTOM } }, sub {
+        element('float', { layout => $square, floating => { attachTo => CLAY_ATTACH_TO_PARENT } });
+        push @ids, Clay__OpenTextElement('after a floating sibling', { fontSize => 10 });
+        push @ids, Clay__OpenTextElement('second text', { fontSize => 10 });
+    });
+    my @texts = grep { $_->{commandType} == CLAY_RENDER_COMMAND_TYPE_TEXT } @{ Clay_EndLayout(0) };
+    is( scalar @texts, 2, 'two texts were laid out' );
+    isnt( $ids[0]{id}, $ids[1]{id}, 'each text has its own id' );
+    for my $index (0, 1) {
+        my $text = $texts[$index]{renderData}{stringContents};
+        is( Clay_GetElementData($ids[$index]), { found => 1, boundingBox => $texts[$index]{boundingBox} },
+            "the id finds '$text' and its box" );
+        ok( !exists $ids[$index]{stringId}, "the id of '$text' has no string" );
+    }
+};
+
 # -----------------------------------------------------------------------------
 # Frames that reach the element count (fixed by
 # patches/0004-clay-upstream-fixes.patch).
 # -----------------------------------------------------------------------------
 
-# A context with a small element count. Clay_Initialize takes the counts of
-# the current context, so they are set on $ctx for the call and restored.
+# A context with a small element count, current.
 sub small_context ($element_count) {
-    my ($elements, $words) = (Clay_GetMaxElementCount(), Clay_GetMaxMeasureTextCacheWordCount());
-    Clay_SetMaxElementCount($element_count);
-    Clay_SetMaxMeasureTextCacheWordCount(32);
-    my $small = Clay_Initialize(Clay_MinMemorySize(), { width => 800, height => 600 }, sub { });
-    Clay_SetCurrentContext($ctx);
-    Clay_SetMaxElementCount($elements);
-    Clay_SetMaxMeasureTextCacheWordCount($words);
-    Clay_SetCurrentContext($small);
+    my %counts = (maxElementCount => $element_count, maxMeasureTextCacheWordCount => 32);
+    my $small = Clay_Initialize(Clay_MinMemorySize(\%counts), { width => 800, height => 600 }, sub { }, undef, \%counts);
     Clay_SetMeasureTextFunction(sub { return [10, 10] });
     return $small;
 }
@@ -400,6 +413,45 @@ subtest 'elements past the element count configure nothing' => sub {
     ok( lives { Clay_OnHover(sub { }) }, 'Clay_OnHover does nothing for them, also with no element open' );
     Clay__CloseElement();
     Clay_EndLayout();
+    Clay_SetCurrentContext($ctx);
+};
+
+subtest 'a text dropped at the element count has no id' => sub {
+    my $small = small_context(8);
+    my ($kept, $dropped);
+    Clay_BeginLayout();
+    element('P', { layout => $square }, sub {
+        $kept = Clay__OpenTextElement('kept', {});
+        for (1 .. 10) { Clay__OpenElement(); Clay__CloseElement() }
+        $dropped = Clay__OpenTextElement('dropped', {});
+    });
+    Clay_EndLayout();
+    ok( defined $kept, 'a text within the count has an id' );
+    is( $dropped, undef, 'a text past it returns undef' );
+    Clay_SetCurrentContext($ctx);
+};
+
+subtest 'a text whose id another element of the frame holds has no id' => sub {
+    my @errors;
+    my $own = Clay_Initialize(Clay_MinMemorySize(), { width => 200, height => 200 }, sub ($error, $userdata) { push @errors, $error->{errorType} });
+    Clay_SetMeasureTextFunction(sub { return [10, 10] });
+    my $frame = sub ($decoy_id) {
+        Clay_BeginLayout();
+        if ($decoy_id) {
+            Clay__OpenElementWithId($decoy_id);
+            Clay__CloseElement();
+        }
+        my $text;
+        element('P', { layout => $square }, sub { $text = Clay__OpenTextElement('named', {}) });
+        Clay_EndLayout();
+        return $text;
+    };
+    my $id = $frame->(undef);
+    ok( defined $id, 'the text has an id' );
+    # The text gets the same id next frame; an element declared before it
+    # under that id holds it.
+    is( $frame->($id), undef, 'a text after an element holding its id returns undef' );
+    is( \@errors, [CLAY_ERROR_TYPE_DUPLICATE_ID], 'and Clay reports the duplicate id' );
     Clay_SetCurrentContext($ctx);
 };
 

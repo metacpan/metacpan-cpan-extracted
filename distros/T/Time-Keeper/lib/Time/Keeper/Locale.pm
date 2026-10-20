@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.06';
+our $VERSION = '0.09';
 
 use Time::Keeper;
 
@@ -20,7 +20,7 @@ Time::Keeper::Locale - what CLDR says of every locale Time::Keeper knows
 
 =head1 VERSION
 
-Version 0.06
+Version 0.09
 
 =head1 SYNOPSIS
 
@@ -120,7 +120,12 @@ The locale's names for the parts of a day, as a hash reference keyed by
 CLDR's ids: C<am>, C<pm>, C<midnight>, C<noon>, C<morning1>, C<morning2>,
 C<afternoon1>, C<afternoon2>, C<evening1>, C<evening2>, C<night1> and
 C<night2>, those the locale has. A width may follow, C<wide> (the default),
-C<abbreviated> or C<narrow>. These are the words C<B> writes in a pattern.
+C<abbreviated> or C<narrow>, and a context, C<format> (the default), the
+form inside a time, or C<stand-alone>, the form used alone; where a language
+has one form the two are the same. These are the words C<B> writes in a
+pattern.
+
+    Time::Keeper::Locale->day_periods('es', 'wide', 'stand-alone');
 
 =head2 day_period_rules
 
@@ -173,6 +178,24 @@ The locale's subtags, C<language>, C<script>, C<territory> and C<variant>
 
 The ten digits the locale writes, 0 to 9: C<0> to C<9> in most, C<٠> to
 C<٩> in C<ar-EG>, C<০> to C<৯> in C<bn>.
+
+=head2 number_symbols
+
+    my $s = Time::Keeper::Locale->number_symbols('de');
+    $s->{decimal};          # ,
+    $s->{group};            # .
+    $s->{minus};            # -
+
+The symbols the locale writes numbers with, in its default numbering
+system: the decimal separator, the group separator and the minus sign. Some
+carry a Unicode mark, as Arabic's minus does.
+
+=head2 ascii_digits
+
+    Time::Keeper::Locale->ascii_digits('٢٠٢٦');   # 2026
+
+The text with the digits of every script written as 0 to 9, as the parsers
+read them; anything else is left as it is.
 
 =head2 weekend_start
 

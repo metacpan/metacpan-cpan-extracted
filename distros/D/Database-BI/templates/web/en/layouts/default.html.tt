@@ -61,6 +61,13 @@
       user-select: none;
     }
 
+    /* A column header is a control: it sorts, selects and moves its column from
+       the keyboard, so a focused one has to be findable on the dark header. */
+    thead th:focus-visible {
+      outline: 2px solid #ffffff;
+      outline-offset: -3px;
+    }
+
     thead th.dragging {
       opacity: 0.4;
     }
@@ -565,8 +572,18 @@
       z-index: 2;
       transition: opacity 0.1s, background 0.1s, color 0.1s;
     }
-    .db-list li:hover .recent-remove {
+    /* Hover and focus are the same reveal.  The button is in the tab order as
+       soon as it exists, so it must not be focusable while it is invisible. */
+    .db-list li:hover .recent-remove,
+    .db-list li:focus-within .recent-remove {
       opacity: 0.5;
+    }
+    .recent-remove:focus-visible {
+      opacity: 1;
+      background: rgba(192, 57, 43, 0.12);
+      color: #c0392b;
+      outline: 2px solid #c0392b;
+      outline-offset: 1px;
     }
     .recent-remove:hover {
       opacity: 1 !important;
@@ -1243,6 +1260,9 @@
       word-break: break-all;
     }
   </style>
+  [%- IF extra_head %]
+  [% extra_head %]
+  [%- END %]
 </head>
 <body>
   <header>
@@ -1473,6 +1493,21 @@
 }
 .chart-resize-handle:hover,
 .chart-svg-wrap:hover .chart-resize-handle { opacity: 0.85; }
+/* Keyboard focus.  The grip is the only way to resize a chart without a
+   pointer, so once it has focus it has to be findable, and the chart it
+   belongs to has to be obvious: the arrow keys resize the focused chart.
+   :focus-visible rather than :focus, so a pointer drag does not leave a ring
+   behind. */
+.chart-resize-handle:focus-visible {
+  outline: 2px solid #0d6efd;
+  outline-offset: 2px;
+  border-radius: 3px;
+  /* The grip rests at 35% so it does not compete with the data; a focused
+     control has to be the opposite of that. */
+  opacity: 1;
+}
+.chart-resize-handle:focus-visible::after { opacity: 1; }
+.chart-svg-wrap:focus-within { outline: 2px solid #0d6efd; outline-offset: 4px; }
 </style>
 <button id="add-to-canvas-btn" title="Add this chart to an existing canvas">+ Add to Existing Canvas</button>
 <div id="add-to-canvas-panel">
@@ -1591,14 +1626,68 @@
   });
 }());
 </script>
+<p class="sr-only" id="chart-resize-help">Resize a chart: focus its handle at the bottom right
+of the chart, then use the left and right arrow keys to change its width and the up and down
+arrow keys to change its height.  Hold Shift for bigger steps, and Home and End to go to the
+narrowest and widest the chart can be.  The new size is announced as it changes, and it is
+remembered: the next chart page of the same kind opens at the size this one was left at.  To
+forget it, use the Reset size button in the page's export bar, which puts the chart back at the
+size the server sent.</p>
+<p class="sr-only" id="chart-resize-status" role="status" aria-live="polite"></p>
 <script>
 /* Chart resize handle -- injected after D3 and the viewBox-widening JS
    (graph.html.tt setTimeout 0) have both run.  Wraps each chart SVG in a
    relative-positioned div and appends a draggable triangle grip at the
    bottom-right corner.  Dragging updates the SVG width/height while keeping
-   the viewBox fixed so D3 content scales proportionally. */
+   the viewBox fixed so D3 content scales proportionally.
+
+   The grip is a control as well as a grab area, the same as the canvas card
+   handles: it takes focus, the arrow keys resize the chart, and the size is
+   announced.  A 2-D resize has no ARIA role of its own, so it carries slider
+   semantics -- the value is the width in pixels, the axis left and right move --
+   and the height goes into aria-valuetext ("640 pixels wide, 480 pixels
+   high"), which is what a screen reader announces when either dimension
+   changes.  The keys themselves are described by #chart-resize-help. */
 (function () {
-  var MIN_W = 200, MIN_H = 120;
+  var MIN_W = 200, MIN_H = 120, STEP = 10, BIG_STEP = 50;
+
+  /* Where the size a chart page was left at is kept.  One key per kind of
+     chart - its path - rather than per URL: the size is how this reader wants
+     to look at a bar chart, not a property of one dataset, so changing a
+     filter does not lose it. */
+  var SIZE_KEY = 'bi:chart-size:';
+
+  /* The boxes a chart is drawn in.  Kept in one place: the resize controls
+     use it to find the chart, and maxWidth() uses it to find the box whose
+     edges the grip has to stay inside. */
+  var CONTAINERS = '.graph-container, .pie-container, .bar-container, .heatmap-container, .scatter-container, .stacked-container, .combo-container, .treemap-container, .histogram-container';
+
+  /* Every chart on the page, with the size the server sent it at, so the
+     Reset size control can put each one back.  Filled in by
+     initChartResize(). */
+  var charts = [];
+
+  function sizeKey() { return SIZE_KEY + location.pathname; }
+
+  /* The saved size, if there is one and it is still usable.  It is clamped to
+     what this window allows, so a size kept on a larger screen opens within
+     the one the chart is read on now. */
+  function savedChartSize(wrap) {
+    var raw;
+    try { raw = window.localStorage.getItem(sizeKey()); }
+    catch (e) { return null; }
+    if (!raw) return null;
+    var size = null;
+    try { size = JSON.parse(raw); } catch (e) { size = null; }
+    if (!size || typeof size.w !== 'number' || typeof size.h !== 'number') return null;
+    return { w: clampWidth(size.w, wrap), h: clampHeight(size.h) };
+  }
+
+  function saveChartSize(w, h) {
+    try {
+      window.localStorage.setItem(sizeKey(), JSON.stringify({ w: w, h: h }));
+    } catch (e) { /* a browser that cannot store it still resizes */ }
+  }
 
   function ensureViewBox(svg) {
     if (svg.getAttribute('viewBox')) return;
@@ -1607,8 +1696,114 @@
     if (w && h) svg.setAttribute('viewBox', '0 0 ' + w + ' ' + h);
   }
 
+  /* The chart's name, for the handle's label: the page's visible title, which
+     is what tells a reader which chart this handle sizes. */
+  function chartTitle() {
+    var heading = document.querySelector('.graph-title');
+    var text = heading && heading.textContent ? heading.textContent.replace(/\s+/g, ' ').trim() : '';
+    return text || 'this chart';
+  }
+
+  function chartSize(svg, wrap) {
+    var w = parseFloat(svg.getAttribute('width'))  || wrap.getBoundingClientRect().width  || MIN_W;
+    var h = parseFloat(svg.getAttribute('height')) || wrap.getBoundingClientRect().height || MIN_H;
+    return { w: clampWidth(w, wrap), h: clampHeight(h) };
+  }
+
+  /* The widest the chart can be with its own grip still on screen: from where
+     the chart starts to the right edge of the box that holds it.  A chart
+     page's container can indent its chart (the bar, heatmap, scatter, stacked,
+     combo and histogram pages pad 3rem) or centre it (pie, line), and the page
+     around it has padding of its own, so the width of the window would put the
+     grip past the right edge - clipped by the page's scroll container and out
+     of reach of a pointer.  The container's content box is the space the chart
+     is drawn in, and its left edge is the chart's own left offset. */
+  function maxWidth(wrap) {
+    var viewport = Math.max(MIN_W, Math.round(document.documentElement.clientWidth));
+    var container = wrap && wrap.closest ? wrap.closest(CONTAINERS) : null;
+    var left = 0;
+    var right = viewport;
+
+    if (container) {
+      var rect = container.getBoundingClientRect();
+      var style = window.getComputedStyle(container);
+      left  = rect.left  + (parseFloat(style.paddingLeft)  || 0);
+      right = rect.right - (parseFloat(style.paddingRight) || 0);
+    }
+
+    if (!isFinite(left) || left < 0) left = 0;
+    if (!isFinite(right) || right > viewport) right = viewport;
+
+    return Math.max(MIN_W, Math.floor(right - left));
+  }
+
+  function clampWidth(w, wrap) { return Math.max(MIN_W, Math.min(Math.round(w), maxWidth(wrap))); }
+  function clampHeight(h) { return Math.max(MIN_H, Math.round(h)); }
+
+  /* The handle's value attributes, from the size the SVG is drawn at.  They
+     cannot be written in the markup: the handle is created here, once the
+     chart exists and its size is known. */
+  function updateChartAria(handle, svg, wrap, size) {
+    var st = size || chartSize(svg, wrap);
+    handle.setAttribute('aria-valuenow', String(st.w));
+    handle.setAttribute('aria-valuemax', String(maxWidth(wrap)));
+    handle.setAttribute('aria-valuetext',
+      st.w + ' pixels wide, ' + st.h + ' pixels high');
+  }
+
+  /* The one write both the drag and the keyboard make. */
+  function applyChartSize(svg, wrap, w, h, handle) {
+    w = clampWidth(w, wrap);
+    h = clampHeight(h);
+    svg.setAttribute('width',  w);
+    svg.setAttribute('height', h);
+    wrap.style.width  = w + 'px';
+    wrap.style.height = h + 'px';
+    if (handle) updateChartAria(handle, svg, wrap, { w: w, h: h });
+    return { w: w, h: h };
+  }
+
+  /* The forgotten size is removed rather than overwritten with the default:
+     the next visit has to open at what the server sends, not at a remembered
+     size that happens to equal it today. */
+  function resetChartSizes() {
+    try { window.localStorage.removeItem(sizeKey()); }
+    catch (e) { /* a browser that cannot store it has nothing to forget */ }
+
+    var applied = null;
+    for (var i = 0; i < charts.length; i++) {
+      var chart = charts[i];
+      var size = applyChartSize(chart.svg, chart.wrap, chart.defaults.w, chart.defaults.h, chart.handle);
+      if (!applied) applied = size;
+    }
+
+    var status = document.getElementById('chart-resize-status');
+    if (status && applied) {
+      status.textContent = 'Chart size reset to ' + applied.w + ' by ' + applied.h + ' pixels.';
+    }
+  }
+
+  /* The control that forgets the remembered size.  A visible button, not
+     another key on the grip: the size outlives the visit, so the way to get
+     rid of it has to be findable on the page rather than something a reader
+     has to be told about.  It sits with the export controls, which every
+     chart page already has. */
+  function addChartResetButton() {
+    var bar = document.querySelector('.graph-export-bar');
+    if (!bar || bar.querySelector('.chart-reset-size')) return;
+
+    var button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'btn-graph-export chart-reset-size';
+    button.textContent = 'Reset size';
+    button.title = 'Forget the size this chart was left at and use the size the page was served at';
+    button.addEventListener('click', resetChartSizes);
+    bar.appendChild(button);
+  }
+
   function initChartResize() {
-    var containers = document.querySelectorAll('.graph-container, .pie-container, .bar-container, .heatmap-container, .scatter-container, .stacked-container, .combo-container, .treemap-container, .histogram-container');
+    var containers = document.querySelectorAll(CONTAINERS);
+    var title = chartTitle();
     for (var ci = 0; ci < containers.length; ci++) {
       var container = containers[ci];
       var svg = container.querySelector('svg');
@@ -1620,12 +1815,39 @@
       wrap.className = 'chart-svg-wrap';
       if (svgW) wrap.style.width  = svgW + 'px';
       if (svgH) wrap.style.height = svgH + 'px';
-      container.insertBefore(wrap, svg);
+      /* The SVG is not always a child of the container - HTML::D3 puts the
+         pie inside #pie_chart_wrap - so the wrap goes where the SVG actually
+         is.  insertBefore() on the container would throw for a grandchild,
+         and that page would have no grip and no Reset size control. */
+      svg.parentNode.insertBefore(wrap, svg);
       wrap.appendChild(svg);
+
+      /* The size the server sent, before a remembered one is applied: it is
+         what Reset size goes back to.  Kept unclamped, so the reset asks for
+         the server's size and applyChartSize() clamps it to this window the
+         same way it clamps a remembered one. */
+      var defaults = {
+        w: svgW || wrap.getBoundingClientRect().width || MIN_W,
+        h: svgH || wrap.getBoundingClientRect().height || MIN_H
+      };
+
+      /* The size this kind of chart was last left at, applied before the grip
+         exists so the grip opens saying the size the chart is drawn at. */
+      var saved = savedChartSize(wrap);
+      if (saved) applyChartSize(svg, wrap, saved.w, saved.h);
+
       var handle = document.createElement('div');
       handle.className = 'chart-resize-handle';
-      handle.setAttribute('title', 'Drag to resize chart');
+      handle.setAttribute('role', 'slider');
+      handle.setAttribute('tabindex', '0');
+      handle.setAttribute('aria-label', 'Resize ' + title);
+      handle.setAttribute('aria-describedby', 'chart-resize-help');
+      handle.setAttribute('aria-orientation', 'horizontal');
+      handle.setAttribute('aria-valuemin', String(MIN_W));
+      handle.setAttribute('title', 'Drag, or focus and use the arrow keys, to resize this chart');
       wrap.appendChild(handle);
+      updateChartAria(handle, svg, wrap);
+      charts.push({ svg: svg, wrap: wrap, handle: handle, defaults: defaults });
       (function (svg, handle, wrap) {
         var startX, startY, startW, startH;
         function onDown(e) {
@@ -1645,23 +1867,50 @@
           var touch = e.touches && e.touches[0];
           var cx = touch ? touch.clientX : e.clientX;
           var cy = touch ? touch.clientY : e.clientY;
-          var newW = Math.max(MIN_W, startW + cx - startX);
-          var newH = Math.max(MIN_H, startH + cy - startY);
-          svg.setAttribute('width',  newW);
-          svg.setAttribute('height', newH);
-          wrap.style.width  = newW + 'px';
-          wrap.style.height = newH + 'px';
+          applyChartSize(svg, wrap, startW + cx - startX, startH + cy - startY);
         }
         function onUp() {
           document.removeEventListener('mousemove', onMove);
           document.removeEventListener('mouseup',   onUp);
           document.removeEventListener('touchmove', onMove);
           document.removeEventListener('touchend',  onUp);
+          /* A drag changes the same value the keyboard does, and the same size
+             is kept: written once, when the grip is let go, rather than on
+             every pointer move. */
+          var st = chartSize(svg, wrap);
+          saveChartSize(st.w, st.h);
+          updateChartAria(handle, svg, wrap);
+        }
+        /* The keyboard equivalent of the drag: the same write, the same limits,
+           one step at a time.  preventDefault() runs even at a limit, so an
+           arrow key on the handle never scrolls the page out from under the
+           chart being resized. */
+        function onChartResizeKey(e) {
+          var st   = chartSize(svg, wrap);
+          var step = e.shiftKey ? BIG_STEP : STEP;
+          var w    = st.w;
+          var h    = st.h;
+
+          if      (e.key === 'ArrowRight') w = clampWidth(w + step, wrap);
+          else if (e.key === 'ArrowLeft')  w = clampWidth(w - step, wrap);
+          else if (e.key === 'ArrowDown')  h = clampHeight(h + step);
+          else if (e.key === 'ArrowUp')    h = clampHeight(h - step);
+          else if (e.key === 'Home')       w = MIN_W;
+          else if (e.key === 'End')        w = maxWidth(wrap);
+          else return;
+
+          e.preventDefault();
+          if (w === st.w && h === st.h) return;
+          var applied = applyChartSize(svg, wrap, w, h, handle);
+          saveChartSize(applied.w, applied.h);
         }
         handle.addEventListener('mousedown',  onDown);
         handle.addEventListener('touchstart', onDown, { passive: false });
+        handle.addEventListener('keydown',     onChartResizeKey);
       }(svg, handle, wrap));
     }
+
+    if (charts.length) addChartResetButton();
   }
 
   setTimeout(initChartResize, 100);

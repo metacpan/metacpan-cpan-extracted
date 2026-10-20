@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.06';
+our $VERSION = '0.09';
 
 use Time::Keeper;
 
@@ -28,7 +28,7 @@ Time::Keeper::Duration - an amount of time: months, days, minutes and seconds
 
 =head1 VERSION
 
-Version 0.06
+Version 0.09
 
 =head1 SYNOPSIS
 

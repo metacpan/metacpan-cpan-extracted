@@ -4,13 +4,13 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.61';
+our $VERSION = '0.62';
 
 use Test::Builder ();
 use Scalar::Util ();
 use Socket qw(AF_UNIX SOCK_STREAM PF_UNSPEC);
 use POSIX ();
-use File::Raw::JSON qw(file_json_encode file_json_decode);
+use File::Raw::JSON ();
 use File::Raw::XML ();
 use Punk::Test::WS ();
 use Punk::Test::WS::Conn ();
@@ -157,7 +157,7 @@ sub _build_env {
         ($in, $clen, $type) = $self->_multipart_input($o{form}, $o{upload});
     }
     elsif (exists $o{json}) {
-        $body = file_json_encode($o{json});
+        $body = File::Raw::JSON::file_json_encode($o{json});
         $type //= 'application/json';
     }
     elsif (exists $o{xml}) {
@@ -453,7 +453,7 @@ sub header {
 sub json {
     my ($self) = @_;
     return unless $self->{res};
-    return $self->{json} //= eval { file_json_decode($self->{res}{body}) };
+    return $self->{json} //= eval { File::Raw::JSON::file_json_decode($self->{res}{body}) };
 }
 
 sub xml {
@@ -602,8 +602,8 @@ sub json_is {
     my $got = $$slot;
     if (ref $got || ref $want) {
         # deep-compare through canonical JSON, wrapped so scalars encode
-        $TB->is_eq(file_json_encode([$got],  sort_keys => 1),
-                   file_json_encode([$want], sort_keys => 1), $name);
+        $TB->is_eq(File::Raw::JSON::file_json_encode([$got],  sort_keys => 1),
+                   File::Raw::JSON::file_json_encode([$want], sort_keys => 1), $name);
     }
     else {
         $TB->is_eq($got, $want, $name);
@@ -750,7 +750,7 @@ sub sse_json_is {
     local $Test::Builder::Level = $Test::Builder::Level + 1;
     $name //= "event $i json at '$ptr'";
     my $ev = $self->_sse_event($i, $name) or return $self;
-    my $doc = eval { file_json_decode($ev->{data} // '') };
+    my $doc = eval { File::Raw::JSON::file_json_decode($ev->{data} // '') };
     unless (defined $doc) {
         $TB->ok(0, $name);
         $TB->diag("event $i data is not JSON: " . ($ev->{data} // ''));
@@ -763,8 +763,8 @@ sub sse_json_is {
         return $self;
     }
     if (ref $got || ref $want) {
-        $TB->is_eq(file_json_encode([$got],  sort_keys => 1),
-                   file_json_encode([$want], sort_keys => 1), $name);
+        $TB->is_eq(File::Raw::JSON::file_json_encode([$got],  sort_keys => 1),
+                   File::Raw::JSON::file_json_encode([$want], sort_keys => 1), $name);
     }
     else {
         $TB->is_eq($got, $want, $name);

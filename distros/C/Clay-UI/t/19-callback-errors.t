@@ -5,10 +5,12 @@ no warnings 'experimental::signatures';
 
 use Test2::V0;
 
+use Config;
 use Scalar::Util ();
 
 use lib "t/lib";
 use Clay::Test::ChildPerl qw(child_perl);
+use Clay::Test::Guards qw(call_guarded call_with_fewest_arguments guarded_names);
 
 use Clay::XS qw(:all);
 
@@ -371,30 +373,11 @@ subtest 'a callback cannot destroy the running context explicitly' => sub {
 
 # The wrapper guard table (Clay::XS::_wrapper_guards) says which functions
 # change Clay's state. Arguments are never parsed before the guard refuses
-# the call, so a call needs only the right number of them.
-my $GUARDS = Clay::XS::_wrapper_guards();
-my %ARGC = (
-	Clay_Initialize => 2, Clay_SetPointerState => 2, set_scroll_position => 2,
-	Clay_UpdateScrollContainers => 3,
-	map { $_ => 1 } qw(
-		Clay_SetCurrentContext Clay_SetLayoutDimensions Clay__OpenElementWithId
-		Clay__ConfigureOpenElement Clay__OpenTextElement Clay_SetMeasureTextFunction
-		Clay_OnHover Clay_SetQueryScrollOffsetFunction Clay_SetExternalScrollHandlingEnabled
-		Clay_SetDebugModeEnabled Clay_SetCullingEnabled Clay_SetMaxElementCount
-		Clay_SetMaxMeasureTextCacheWordCount
-	),
-);
-
-sub guarded ($predicate) {
-	return sort grep { $predicate->($GUARDS->{$_}) } keys %$GUARDS;
-}
-
+# the call, so call_guarded's undef arguments are enough.
 subtest 'calls that change Clay state croak inside callbacks' => sub {
-	for my $name (guarded(sub ($guard) { $guard->{mutates} })) {
-		my $call = Clay::XS->can($name);
-		my @args = (undef) x ($ARGC{$name} // 0);
+	for my $name (guarded_names(sub ($guard) { $guard->{mutates} })) {
 		my $ctx = fresh_context(measure => sub ($text, $config, $userdata) {
-			$call->(@args);
+			call_guarded($name);
 			return { width => 1, height => 1 };
 		});
 		like( dies { text_frame() }, qr/^\Q$name\E: cannot be called from inside a Clay callback/,
@@ -423,13 +406,14 @@ subtest 'calls that change Clay state croak inside callbacks' => sub {
 };
 
 subtest 'read-only queries work inside callbacks' => sub {
+	# Every query that takes arguments takes element ids.
 	my $id = Clay_GetElementId('somewhere');
-	my %args = map { $_ => [$id] } qw(Clay_GetElementData Clay_PointerOver Clay_GetScrollContainerData);
-	my @queries = guarded(sub ($guard) { !$guard->{mutates} && $guard->{context} ne 'none' });
+	my @queries = guarded_names(sub ($guard) { !$guard->{mutates} && $guard->{context} ne 'none' });
 	my %failed;
 	my $ctx = fresh_context(measure => sub ($text, $config, $userdata) {
 		for my $name (@queries) {
-			eval { Clay::XS->can($name)->(@{ $args{$name} // [] }); 1 } or $failed{$name} = $@;
+			my $error = dies { call_with_fewest_arguments($name, $id) };
+			$failed{$name} = $error if defined $error;
 		}
 		return { width => 1, height => 1 };
 	});
@@ -445,22 +429,49 @@ subtest 'every export has a POD heading and the POD matches the wrapper guard ta
 	is( [ grep { !$headed{$_} } @Clay::XS::EXPORT_OK ], [], 'every exported function and constant has its own heading' );
 
 	my @paragraphs = split /\n\s*\n/, $pod;
+	my $guards = Clay::XS::_wrapper_guards();
 	my $named = sub ($marker) {
 		my ($paragraph) = grep { /\Q$marker\E/ } @paragraphs;
-		return sort grep { exists $GUARDS->{$_} } $paragraph =~ /C<(\w+)>/g;
+		return sort grep { exists $guards->{$_} } $paragraph =~ /C<(\w+)>/g;
 	};
 
 	is( [ $named->('cannot be called from inside a Clay callback') ],
-		[ guarded(sub ($guard) { $guard->{mutates} }) ], 'the POD names every mutating function' );
+		[ guarded_names(sub ($guard) { $guard->{mutates} }) ], 'the POD names every mutating function' );
 	is( [ $named->('Read-only queries work') ],
-		[ guarded(sub ($guard) { !$guard->{mutates} && $guard->{context} ne 'none' }) ],
+		[ guarded_names(sub ($guard) { !$guard->{mutates} && $guard->{context} ne 'none' }) ],
 		'the POD names every query' );
-	my %never = map { $_ => 1 } guarded(sub ($guard) { $guard->{rethrow} eq 'never' });
+	my %never = map { $_ => 1 } guarded_names(sub ($guard) { $guard->{rethrow} eq 'never' });
 	my @named_never = $named->('These never re-throw a held error');
 	is( [ grep { !$never{$_} } @named_never ], [], 'what the POD says never re-throws does not' );
 	my %named_never = map { $_ => 1 } @named_never;
-	is( [ grep { !$named_never{$_} } guarded(sub ($guard) { $guard->{rethrow} eq 'never' && $guard->{context} ne 'none' }) ],
+	is( [ grep { !$named_never{$_} } guarded_names(sub ($guard) { $guard->{rethrow} eq 'never' && $guard->{context} ne 'none' }) ],
 		[], 'the POD names every function with a context that never re-throws' );
+};
+
+# The rethrow policy of a row takes effect in wrapper_leave, which reads
+# the descriptor it is given: a wrapper that enters and leaves through its
+# own guard, and never returns in between, applies its row's policy.
+subtest 'every guarded wrapper enters and leaves through its own guard' => sub {
+	my $xs_file = 'lib/Clay/XS.xs';
+	skip_all "$xs_file is not in the working directory" unless -r $xs_file;
+	open my $fh, '<', $xs_file or die "cannot read $xs_file: $!";
+	my $source = do { local $/; <$fh> };
+
+	# Every XSUB of the Clay::XS package starts with its prefixed name at
+	# the start of a line; a body runs to the next one.
+	my (undef, %bodies) = split /^xs_(\w+)\(/m, $source;
+
+	my $guards = Clay::XS::_wrapper_guards();
+	for my $name (guarded_names(sub ($guard) { $guard->{mutates} || $guard->{context} ne 'none' })) {
+		my $body = $bodies{$name} // '';
+		my @enters = $body =~ /wrapper_enter\(aTHX_ &GUARD_(\w+)\)/g;
+		my @leaves = $body =~ /wrapper_leave\(aTHX_ &GUARD_(\w+),/g;
+		is( \@enters, [$name], "$name enters through its own guard once" );
+		ok( @leaves && !grep( { $_ ne $name } @leaves ), "$name leaves through its own guard" );
+		my ($between) = $body =~ /(wrapper_enter\(.*wrapper_leave\()/s;
+		unlike( $between // '', qr/\b(?:XSRETURN\w*|return)\b/, "$name does not return between entering and leaving" );
+	}
+	is( [ grep { !exists $guards->{$_} } map { /GUARD_(\w+)/g } values %bodies ], [], 'every guard a wrapper names is a row of the table' );
 };
 
 subtest 'an exception object with a dying bool overload is re-thrown as is' => sub {
@@ -496,15 +507,18 @@ subtest 'destroying a context with a held error warns' => sub {
 		'the error is not lost' );
 };
 
-subtest 'Clay::XS::_dispatch cannot be called directly' => sub {
-	like( dies { Clay::XS::_dispatch(1, 0, sub { [1, 2] }) }, qr/_dispatch is internal/, 'outside a callback' );
-	my $inner;
+subtest 'the callback dispatcher cannot be reached from Perl' => sub {
+	ok( !defined &Clay::XS::_dispatch, 'no Clay::XS::_dispatch sub exists' );
+	ok( !Clay::XS->can('_dispatch'), 'and Clay::XS cannot find one' );
+	my @frames;
 	my $ctx = fresh_context(measure => sub ($text, $config, $userdata) {
-		$inner = dies { Clay::XS::_dispatch(sub { [1, 2] }) };
+		for (my $depth = 0; my @frame = caller($depth); $depth++) { push @frames, $frame[3] }
 		return { width => 1, height => 1 };
 	});
 	text_frame();
-	like( $inner, qr/_dispatch is internal/, 'inside a callback' );
+	ok( scalar @frames, 'the measure callback ran' );
+	is( [ grep { /Clay::XS/ } @frames ], [], 'no frame a callback sees belongs to the dispatcher' );
+	is( $frames[1], '(eval)', 'the frame above the callback is the dispatch eval: the dispatcher leaves no frame' );
 };
 
 subtest 'code that runs while callback arguments are freed cannot re-enter Clay' => sub {
@@ -520,26 +534,38 @@ subtest 'code that runs while callback arguments are freed cannot re-enter Clay'
 	is( $commands->[0]{renderData}{stringContents}, 'guarded', 'the frame finished intact' );
 };
 
-subtest 'replacing the internal dispatcher does not break callbacks' => sub {
-	# In a process of its own: the replacement frees the glob's original.
+subtest 'a sub named Clay::XS::_dispatch changes nothing for callbacks' => sub {
+	# In a process of its own, so the definition stays there.
 	my $code = <<'PERL';
 use Clay::XS qw(:all);
+sub Clay::XS::_dispatch { die "a sub of that name was called\n" }
 my $ctx = Clay_Initialize(Clay_MinMemorySize(), [100, 100]);
 Clay_SetMeasureTextFunction(sub { [1, 1] });
-{ no warnings 'redefine'; *Clay::XS::_dispatch = sub { die "replacement called\n" }; }
 Clay_BeginLayout(); Clay__OpenTextElement('measured', {});
 print eval { Clay_EndLayout(); 1 } ? "measured\n" : "died: $@";
-undef $ctx;
-my $later = Clay_Initialize(Clay_MinMemorySize(), [100, 100]);
-Clay_SetMeasureTextFunction(sub { [1, 1] });
-Clay_BeginLayout(); Clay__OpenTextElement('measured', {});
-print eval { Clay_EndLayout(); 1 } ? "measured later\n" : "died: $@";
 PERL
 	open my $child, '-|', child_perl($code) or die "cannot run $^X: $!";
 	my $output = do { local $/; <$child> };
 	close $child;
-	is( $output, "measured\nmeasured later\n",
-		'the trampolines keep calling the original dispatcher, also for a context made after the replacement' );
+	is( $output, "measured\n", 'the trampolines call the anonymous dispatcher' );
+};
+
+subtest 'every thread gets a dispatcher of its own' => sub {
+	skip_all 'perl built without ithreads' unless $Config{useithreads};
+	require threads;
+	# Clay has one current context, so the thread makes its own while none is.
+	my $before = fresh_context();
+	$before->DESTROY;
+	my $measured = threads->create(sub {
+		my $own = fresh_context(measure => sub ($text, $config, $userdata) { return { width => length($text), height => 10 } });
+		my ($command) = grep { $_->{commandType} == CLAY_RENDER_COMMAND_TYPE_TEXT } @{ text_frame('in a thread') };
+		return $command->{renderData}{stringContents};
+	})->join;
+	is( $measured, 'in a thread', 'a callback runs in a new thread' );
+	my $calls = 0;
+	my $ctx = fresh_context(measure => sub ($text, $config, $userdata) { $calls++; return { width => 1, height => 1 } });
+	text_frame('after the thread');
+	ok( $calls, "and the creating thread's callbacks still run once that thread is gone" );
 };
 
 subtest 'a measure function returning undef is an error' => sub {

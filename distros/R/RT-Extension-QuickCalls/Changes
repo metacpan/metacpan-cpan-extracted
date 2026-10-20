@@ -1,3 +1,6 @@
+2.01 2026-10-19
+ - Pass dashboard path explicitly instead of relying on core RT
+
 2.00 2025-09-12
  - Update for RT 6.0
 

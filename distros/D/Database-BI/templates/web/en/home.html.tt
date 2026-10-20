@@ -65,7 +65,7 @@
     return 'Data file';
   }
 
-  document.querySelectorAll('.db-card[data-path]').forEach(function (card) {
+  document.querySelectorAll('.db-card[data-path]').forEach(function (card, i) {
     var path = card.getAttribute('data-path');
     var li   = card.parentNode;
     li.style.position = 'relative';
@@ -74,12 +74,21 @@
     // Always display below the card: the file-list sits near the page top so
     // the default above-positioning would be clipped by the viewport edge.
     tip.className    = 'file-tooltip tip-below';
+    tip.id           = 'db-tip-' + i;
+    tip.setAttribute('role', 'tooltip');
+    // The size and date are fetched once the tip is shown, so what is said
+    // about the file arrives after the card has been focused.
+    tip.setAttribute('aria-live', 'polite');
     tip.style.display = 'none';
     li.appendChild(tip);
 
+    // Focus and hover ask the same question, so they get the same answer: a
+    // keyboard reader who tabs onto the card is shown what a pointer reader is.
+    card.setAttribute('aria-describedby', tip.id);
+
     var statDone = false;
 
-    card.addEventListener('mouseenter', function () {
+    function showTip() {
       tip.style.display = 'block';
 
       if (statDone) return;
@@ -99,9 +108,14 @@
             + '<div class="tip-muted">' + txt(fmtSize(d.size)) + '</div>';
         })
         .catch(function () { tip.innerHTML = ''; });
-    });
+    }
 
-    card.addEventListener('mouseleave', function () { tip.style.display = 'none'; });
+    function hideTip() { tip.style.display = 'none'; }
+
+    card.addEventListener('mouseenter', showTip);
+    card.addEventListener('focus',      showTip);
+    card.addEventListener('mouseleave', hideTip);
+    card.addEventListener('blur',       hideTip);
   });
 }());
 </script>
@@ -220,7 +234,7 @@
       var ul = document.createElement('ul');
       ul.className = 'db-list';
 
-      entries.forEach(function (r) {
+      entries.forEach(function (r, i) {
         var path = r.path || (function () {
           var m = r.href ? r.href.match(/[?&]path=([^&]+)/) : null;
           return m ? decodeURIComponent(m[1]) : null;
@@ -242,7 +256,14 @@
 
         var tip = document.createElement('div');
         tip.className = 'file-tooltip';
+        tip.id        = containerId + '-tip-' + i;
+        tip.setAttribute('role', 'tooltip');
+        tip.setAttribute('aria-live', 'polite');
         tip.style.display = 'none';
+
+        // The card names the tip it is described by, so tabbing to it says what
+        // hovering it shows - including the size and date a fetch adds later.
+        card.setAttribute('aria-describedby', tip.id);
 
         var timeLabel = r.lastSaved ? 'Saved: ' : 'Opened: ';
         var timeVal   = r.lastSaved || r.lastOpened;
@@ -282,7 +303,8 @@
             .catch(function () { statDone = true; });
         }
 
-        card.addEventListener('mouseenter', function () {
+        // Focus and hover ask the same question, so they get the same answer.
+        function showTip() {
           tip.style.display = 'block';
           var rect = tip.getBoundingClientRect();
           tip.classList.toggle('tip-below', rect.top < 0);
@@ -305,9 +327,14 @@
               }
             })
             .catch(function () { mtimeEl.textContent = ''; });
-        });
+        }
 
-        card.addEventListener('mouseleave', function () { tip.style.display = 'none'; });
+        function hideTip() { tip.style.display = 'none'; }
+
+        card.addEventListener('mouseenter', showTip);
+        card.addEventListener('focus',      showTip);
+        card.addEventListener('mouseleave', hideTip);
+        card.addEventListener('blur',       hideTip);
 
         // Trash-can remove button -- hidden until the card is hovered (CSS).
         var removeBtn = document.createElement('button');
@@ -349,11 +376,27 @@
 </script>
 
 <script>
-/* Saved canvases section -- fetches /api/analyses and renders links.
+/* Saved canvases section -- fetches /api/analyses and renders db-card tiles.
  * Only shown when at least one saved analysis exists. */
 (function () {
   var container = document.getElementById('bi-canvases');
   if (!container) return;
+
+  function fmtDate(iso) {
+    try {
+      return new Date(iso).toLocaleString(undefined, {
+        year: 'numeric', month: 'short', day: 'numeric',
+        hour: '2-digit', minute: '2-digit',
+      });
+    } catch (e) { return iso; }
+  }
+
+  function txt(s) {
+    var d = document.createElement('span');
+    d.textContent = String(s || '');
+    return d.innerHTML;
+  }
+
   fetch('/api/analyses')
     .then(function (r) { return r.json(); })
     .then(function (data) {
@@ -362,33 +405,90 @@
       var section = document.createElement('section');
       section.className = 'recent-section';
       var h2 = document.createElement('h2');
-      h2.className = 'recent-heading';
-      h2.innerHTML = '&#x1F5BC; Saved canvases';
+      h2.className = 'section-heading';
+      h2.textContent = 'Saved canvases';
       section.appendChild(h2);
       var ul = document.createElement('ul');
-      ul.className = 'recent-list';
-      list.forEach(function (a) {
+      ul.className = 'db-list';
+      list.forEach(function (a, i) {
         var li = document.createElement('li');
-        li.className = 'recent-item';
-        var link = document.createElement('a');
-        link.href = '/a/' + encodeURIComponent(a.id);
-        link.className = 'recent-link';
-        var icon = document.createElement('span');
-        icon.setAttribute('aria-hidden', 'true');
-        icon.textContent = '🖼';   /* framed picture */
-        var name = document.createElement('span');
-        name.className = 'recent-name';
-        name.textContent = a.name || a.id;
-        link.appendChild(icon);
-        link.appendChild(name);
-        if (a.datasets && a.datasets.length) {
-          var meta = document.createElement('span');
-          meta.className = 'recent-meta';
-          meta.textContent = a.datasets.length + ' dataset'
-            + (a.datasets.length !== 1 ? 's' : '');
-          link.appendChild(meta);
+        li.style.position = 'relative';
+
+        var card = document.createElement('a');
+        card.href      = '/a/' + encodeURIComponent(a.id);
+        card.className = 'db-card';
+
+        var nDatasets = (a.datasets && a.datasets.length) ? a.datasets.length : 0;
+        var fileLine  = nDatasets + ' dataset' + (nDatasets !== 1 ? 's' : '');
+        card.innerHTML = '<span class="db-icon" aria-hidden="true">&#x1F5BC;</span>'
+                       + '<span class="db-name">' + txt(a.name || a.id) + '</span>'
+                       + '<span class="db-file">' + txt(fileLine) + '</span>';
+        li.appendChild(card);
+
+        /* details tooltip, shown for the same reason on hover and on focus */
+        var tip = document.createElement('div');
+        tip.className    = 'file-tooltip tip-below';
+        tip.id            = 'bi-canvases-tip-' + i;
+        tip.setAttribute('role', 'tooltip');
+        tip.style.display = 'none';
+
+        var updLine = a.updated ? '&#x1F4C5; Updated: ' + txt(fmtDate(new Date(a.updated * 1000).toISOString())) : '';
+        var crtLine = a.created ? '&#x1F551; Created: ' + txt(fmtDate(new Date(a.created * 1000).toISOString())) : '';
+        var idLine  = '<div class="tip-muted">ID: ' + txt(a.id) + '</div>';
+        var dsLine  = nDatasets
+          ? '<div>' + txt(nDatasets + ' dataset' + (nDatasets !== 1 ? 's' : '')) + '</div>'
+          : '';
+        tip.innerHTML = '<div class="tip-name">' + txt(a.name || a.id) + '</div>'
+          + dsLine
+          + (updLine ? '<div>' + updLine + '</div>' : '')
+          + (crtLine ? '<div>' + crtLine + '</div>' : '')
+          + idLine;
+
+        li.appendChild(tip);
+        card.setAttribute('aria-describedby', tip.id);
+
+        function showTip() {
+          tip.style.display = 'block';
+          /* flip above when near the bottom of the viewport */
+          var rect = tip.getBoundingClientRect();
+          if (rect.bottom > window.innerHeight) {
+            tip.classList.remove('tip-below');
+          } else {
+            tip.classList.add('tip-below');
+          }
         }
-        li.appendChild(link);
+
+        function hideTip() { tip.style.display = 'none'; }
+
+        card.addEventListener('mouseenter', showTip);
+        card.addEventListener('focus',      showTip);
+        card.addEventListener('mouseleave', hideTip);
+        card.addEventListener('blur',       hideTip);
+
+        /* trash-can delete button -- hidden until card is hovered (CSS .recent-remove) */
+        var delBtn = document.createElement('button');
+        delBtn.type      = 'button';
+        delBtn.className = 'recent-remove';
+        delBtn.title     = 'Delete this canvas';
+        delBtn.setAttribute('aria-label', 'Delete canvas ' + txt(a.name || a.id));
+        delBtn.innerHTML = '&#x1F5D1;';
+        delBtn.addEventListener('click', function (e) {
+          e.stopPropagation();
+          e.preventDefault();
+          if (!confirm('Delete canvas "' + (a.name || a.id) + '"?\n\nThis cannot be undone.')) return;
+          fetch('/api/analyses/' + encodeURIComponent(a.id), { method: 'DELETE' })
+            .then(function (r) {
+              if (r.ok) {
+                li.remove();
+                if (!ul.querySelector('li')) section.remove();
+              } else {
+                alert('Could not delete canvas (server error).');
+              }
+            })
+            .catch(function () { alert('Could not delete canvas (network error).'); });
+        });
+        li.appendChild(delBtn);
+
         ul.appendChild(li);
       });
       section.appendChild(ul);

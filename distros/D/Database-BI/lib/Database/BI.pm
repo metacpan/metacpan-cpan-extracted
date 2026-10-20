@@ -12,7 +12,7 @@ use Readonly;
 
 use Database::BI::Model::DataSource;
 
-our $VERSION = '0.013.0';
+our $VERSION = '0.014.0';
 
 # Default config values used by the Config plugin and referenced explicitly
 # in startup() so callers always get a resolved value.
@@ -33,7 +33,7 @@ Database::BI - Web-based Business Intelligence viewer for data files
 
 =head1 VERSION
 
-0.013.0
+0.014.0
 
 =head1 DESCRIPTION
 
@@ -103,8 +103,17 @@ axes, count or sum mode), bar chart (horizontal or vertical, sort,
 top-N), scatter/bubble plot (optional categorical colour and numeric
 size dimensions), stacked bar chart, combo bar+line chart, treemap, and
 histogram (server-side binning, C<?bins=N>).  All charts can be resized
-by dragging the bottom-right corner grip.  All chart pages include
-Copy-link and Export SVG/PNG buttons.
+by dragging the bottom-right corner grip, or from the keyboard: the grip
+takes focus, the arrow keys resize the chart (Shift takes bigger steps,
+Home and End go to the narrowest and widest it can be) and the size is announced
+as it changes.  All chart pages include Copy-link and Export SVG/PNG buttons.
+
+=item *
+
+B<Maps> -- C<GET /map> plots the filtered view on an OpenStreetMap map, either
+from latitude and longitude columns or from a place column geocoded locally
+with L<Geo::Coder::Free> (one lookup per distinct place, remembered in the
+dataset's model store).  Rows sharing a position become one marker.
 
 =item *
 
@@ -130,10 +139,20 @@ are applied before aggregation on all chart and pivot routes.
 =item *
 
 B<Saved canvases> -- the "Save as Canvas" panel saves the current data
-configuration as a named multi-visual canvas (C</a/:id>).  Canvases
-support cross-filtering, drill-through hierarchies, parameterisation,
-bookmarks with undo/redo, per-visual PNG download, and print to
-PDF/paper.
+configuration as a named multi-visual canvas (C</a/:id>).  Visuals are
+arranged on a 12-column grid: drag a card by its header to any free cell
+(the header also takes focus, and the arrow keys move the card a cell at a
+time, Shift going to the edge), and resize it from the corner handle.  A
+card's width and height can also be set without a drag from the Size menu in
+its header: full, half, a third or a quarter of the width, and one, two,
+three or six rows high.  The size the card is sits on the card itself, beside
+that menu, so a width the corner grip left it at reads without the menu being
+opened.  Each move is announced -- the column and row the
+card landed in, and any card the move pushed down -- and saved as you go.  The whole position and size is
+saved with the canvas, so a card put in row 4 stays in row 4 rather than
+being packed up the page.  Canvases support
+cross-filtering, drill-through hierarchies, parameterisation, bookmarks
+with undo/redo, per-visual PNG download, and print to PDF/paper.
 
 =item *
 
@@ -485,6 +504,22 @@ D3.js v7 histogram with server-side binning.  Parameters:
   back=<url>, back2=<url>, back2_label=<text>  breadcrumb links
   f=         result filters (repeatable)
 
+=item C<GET /map>
+
+OpenStreetMap map of the filtered view, drawn with HTML::OSM.  A row's position
+comes from a location column that is geocoded (C<loc=>, one lookup per distinct
+value, remembered in the dataset's model store) or from coordinate columns
+(C<lat=> and C<lon=>).  Rows sharing a position become one marker.  Parameters:
+
+  l=<spec>      left table (required)
+  loc=<col>     column of places to geocode (required unless lat= and lon= are)
+  lat=<col>     latitude column, -90..90
+  lon=<col>     longitude column, -180..180
+  popup=<col>   column shown in the marker popup (repeatable)
+  max=N         markers to draw (default map_max_markers, 2000)
+  back=<url>, back2=<url>, back2_label=<text>  breadcrumb links
+  f=            result filters (repeatable)
+
 =item C<GET /line>
 
 Alias for C<GET /graph>.  All C</graph> parameters accepted.
@@ -517,7 +552,14 @@ Full replacement of an analysis document.
 =item C<PATCH /api/analyses/:id>
 
 Partial update; merges the supplied top-level keys.  C<id> and C<created>
-are immutable.
+are immutable.  The C<layout> key places the visuals on the canvas grid: an
+array of C<{ visual, x, y, w, h }>, where C<visual> indexes the C<visuals>
+array and C<x>, C<y>, C<w> and C<h> are 1-based grid columns and rows (the
+grid is 12 columns wide, C<x + w - 1> cannot exceed 12, and one visual may
+span at most 6 rows).  Positions are
+stored as given - a gap is a gap - but two visuals may not share a cell, so
+an overlapping set is rejected with C<400> and the stored layout is left
+alone.
 
 =item C<DELETE /api/analyses/:id>
 
@@ -959,6 +1001,7 @@ sub startup ($self) {
 	$r->get('/combo')         ->to('Dashboard#combo_view');
 	$r->get('/treemap')       ->to('Dashboard#treemap_view');
 	$r->get('/histogram')     ->to('Dashboard#histogram_view');
+	$r->get('/map')           ->to('Dashboard#map_view');
 	$r->get('/line')          ->to('Dashboard#graph_view');	# alias for /graph
 
 	# Phase 3.1 -- Saved analyses

@@ -142,6 +142,18 @@ is_deeply(diff([qw(a b)], [qw(b a)], 1000), [[2, 2], 'a'],
     ok(Mail::DKIM2::MessageInstance->parse($mi->as_string)->unrecoverable,
         '1200 literals, default: null body recipe');
 
+    # The epilogue options are disabled in 0.23 (final review M5): they
+    # croak, saying why ...
+    for my $opt ([UseEpilogue => 1], [EpilogueThreshold => 100]) {
+        eval { Mail::DKIM2::MessageInstance->calculate($small, $prev, @$opt) };
+        like($@, qr/\AUseEpilogue and EpilogueThreshold are disabled in Mail::DKIM2 0\.23: .* fails verification/,
+            "$opt->[0] croaks: disabled");
+        eval { Mail::DKIM2::MessageInstance->calculate_first($small, $prev, @$opt) };
+        like($@, qr/are disabled in Mail::DKIM2 0\.23/, "calculate_first with $opt->[0] croaks: disabled");
+    }
+    # ... and the epilogue code itself is still tested, until it is fixed.
+    local $Mail::DKIM2::MessageInstance::ENABLE_BROKEN_EPILOGUE = 1;
+
     my $msg = Mail::DKIM2::Common::parse_mime($small);
     $mi = Mail::DKIM2::MessageInstance->calculate($msg, $prev,
         EpilogueThreshold => 100);

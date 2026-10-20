@@ -1,0 +1,13 @@
+!1 Order pricing
+
+Preferred pricing begins at $20.00 of merchandise. Shipping becomes free at
+$50.00 after any discount.
+
+|Order pricing|
+|customer tier|merchandise subtotal|discount amount?|shipping amount?|total amount?|
+|preferred|19.99|0.00|5.00|24.99|
+|preferred|20.00|2.00|5.00|23.00|
+|preferred|55.54|5.55|5.00|54.99|
+|preferred|55.55|5.55|0.00|50.00|
+|standard|20.00|0.00|5.00|25.00|
+|standard|50.00|0.00|0.00|50.00|

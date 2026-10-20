@@ -14,11 +14,12 @@ use strict;
 use warnings;
 use autodie qw(:all);
 
+use Geo::Coder::Free::MissCache;
 use Geo::Coder::Free::DB::MaxMind::admin1;
 use Geo::Coder::Free::DB::MaxMind::admin2;
 use Geo::Coder::Free::DB::MaxMind::cities;
 use Geo::Coder::Free::Provenance qw(GEOCODER);
-use Geo::Coder::Free::Validate qw(_valid_location);
+use Geo::Location::Predicate qw(_valid_location);
 use Geo::Location::Point;
 use Module::Info;
 use Carp;
@@ -58,11 +59,11 @@ Geo::Coder::Free::MaxMind - Provides a geocoding functionality using the MaxMind
 
 =head1 VERSION
 
-Version 0.47
+Version 0.48
 
 =cut
 
-our $VERSION = '0.47';
+our $VERSION = '0.48';
 
 =head1 SYNOPSIS
 
@@ -150,10 +151,39 @@ sub new
 		cache => $args->{'cache'} || CHI->new(driver => 'Memory', global => 1)
 	});
 
-	# Return the blessed object
+	# Return the blessed object.  The directory is kept so that misses can be
+	# remembered per data set: two installs, or two directories, do not share
+	# an answer.
 	return bless {
 		cache => $args->{'cache'} || CHI->new(driver => 'Memory', global => 1),
+		directory => $directory,
 	}, $class;
+}
+
+=head2 reads
+
+    my $count = $geocoder->reads();
+
+How many times this backend has read its databases since the object was
+created - a query on cities, admin1 or admin2.  A lookup answered without
+reading anything - from the result cache, or from a hand-curated
+C<%known_locations> entry - does not increase it.  C<geocode_many()> takes the
+count before and after a value to tell a lookup that cost a read from one that
+was answered from a cache.
+
+=cut
+
+sub reads {
+	my $self = shift;
+
+	return $self->{'reads'} // 0;
+}
+
+sub _read {
+	my $self = shift;
+
+	$self->{'reads'}++;
+	return;
 }
 
 =head2 geocode
@@ -216,7 +246,7 @@ sub geocode {
 		or Carp::croak('Usage: geocode(location => $location)');
 
 	# Fail when the input is just a set of numbers.  The rule is the one
-	# Geo::Coder::Free::Validate defines and the facade applies too, so what this
+	# Geo::Location::Predicate defines and the facade applies too, so what this
 	# backend refuses cannot drift away from what valid_location() answers.
 	if(!_valid_location($location)) {
 		Carp::croak('Usage: ', __PACKAGE__, ": invalid input to geocode(), $location");
@@ -248,6 +278,14 @@ sub geocode {
 	# Check cache first
 	my $cached_result = $self->{'cache'}->get($location);
 	return $cached_result if($cached_result);
+
+	# A miss is remembered for the whole process.  The key is the location as
+	# given (it is rewritten below into its component parts) together with the
+	# region hint, which is part of what the lookup asks: a bare town name in
+	# one region can be found where the same name in another is not.
+	my $miss_scope = Geo::Coder::Free::MissCache->scope_for('MaxMind', $self->{'directory'} // '');
+	my $miss_key = join("\0", $location, $params{'region'} // '');
+	return if Geo::Coder::Free::MissCache->missed($miss_scope, $miss_key);
 
 	my $county;
 	my $state;
@@ -286,6 +324,7 @@ sub geocode {
 		$country =~ s/\s$//g;
 	} elsif($location =~ /^[\w\s-],[\w\s-]/) {
 		Carp::carp(__PACKAGE__, ": can't parse and handle $location");
+		Geo::Coder::Free::MissCache->remember($miss_scope, $miss_key);
 		return;
 	} elsif(($location =~ /^[\w\s-]+$/) && (my $region = $params{'region'})) {
 		$location =~ s/^\s//g;
@@ -302,6 +341,7 @@ sub geocode {
 		$region_only = 1;	# Will only return one match, not every match in the region
 	} else {
 		# Carp::croak(__PACKAGE__, ' only supports towns, not full addresses');
+		Geo::Coder::Free::MissCache->remember($miss_scope, $miss_key);
 		return;
 	}
 	my $countrycode;
@@ -321,6 +361,7 @@ sub geocode {
 		} else {
 			$self->{'admin1'} //= Geo::Coder::Free::DB::MaxMind::admin1->new(no_entry => 1) or Carp::croak("Can't open the admin1 database");
 
+			$self->_read();
 			if(my $admin1 = $self->{'admin1'}->fetchrow_hashref(asciiname => $country)) {
 				$concatenated_codes = $admin1->{'concatenated_codes'};
 				$admin1cache{$country} = $concatenated_codes;
@@ -330,6 +371,7 @@ sub geocode {
 					$concatenated_codes .= ".$state";
 				} else {
 					$country_code = $concatenated_codes;
+					$self->_read();
 					my @admin1s = @{$self->{'admin1'}->selectall_hashref(asciiname => $state)};
 					foreach my $admin1(@admin1s) {
 						if($admin1->{'concatenated_codes'} =~ /^\Q$concatenated_codes\E\./i) {
@@ -348,7 +390,10 @@ sub geocode {
 			}
 		}
 	}
-	return unless(defined($concatenated_codes));
+	if(!defined($concatenated_codes)) {
+		Geo::Coder::Free::MissCache->remember($miss_scope, $miss_key);
+		return;
+	}
 
 	my @admin2s;
 	my $region;
@@ -367,7 +412,10 @@ sub geocode {
 	} elsif(($country eq 'Canada') && $state && (length($state) > 2)) {
 		if(($_locale_ca //= Locale::CA->new())->{province2code}{uc($state)}) {
 			# FIXME:  I can't see that province locations are stored in cities.csv
-			return unless(defined($location));	# OK if searching for a city, that works
+			if(!defined($location)) {	# OK if searching for a city, that works
+				Geo::Coder::Free::MissCache->remember($miss_scope, $miss_key);
+				return;
+			}
 		}
 	}
 
@@ -384,8 +432,10 @@ sub geocode {
 		$region = $admin2cache{$state};
 	} else {
 		if(defined($county) && ($county eq 'London')) {
+			$self->_read();
 			@admin2s = $self->{'admin2'}->selectall_hash(asciiname => $location);
 		} elsif(defined($county)) {
+			$self->_read();
 			@admin2s = $self->{'admin2'}->selectall_hash(asciiname => $county);
 		}
 		foreach my $admin2(@admin2s) {
@@ -413,6 +463,7 @@ sub geocode {
 				$region = $state;
 				@regions = ();
 			} else {
+				$self->_read();
 				@admin2s = $self->{'admin2'}->selectall_hash(asciiname => $state);
 				foreach my $admin2(@admin2s) {
 					if($admin2->{'concatenated_codes'} =~ $concatenated_codes) {
@@ -427,9 +478,11 @@ sub geocode {
 	if((scalar(@regions) == 0) && !defined($region)) {
 		# e.g. Unitary authorities in the UK
 		# admin[12].db columns are labelled ['concatenated_codes', 'name', 'asciiname', 'geonameId']
+		$self->_read();
 		@admin2s = $self->{'admin2'}->selectall_hash(asciiname => $location);
 		if((scalar(@admin2s) == 0) && ($country =~ /^(Canada|United States|USA|US)$/) && ($location !~ /\sCounty/i)) {
 			$location .= ' County';
+			$self->_read();
 			@admin2s = $self->{'admin2'}->selectall_hash(asciiname => $location);
 		}
 		if(scalar(@admin2s) && defined($admin2s[0]->{'concatenated_codes'})) {
@@ -449,6 +502,7 @@ sub geocode {
 			if(!defined($self->{'admin1'})) {
 				$self->{'admin1'} = Geo::Coder::Free::DB::MaxMind::admin1->new(no_entry => 1) or Carp::croak("Can't open the admin1 database");
 			}
+			$self->_read();
 			my @admin1s = $self->{'admin1'}->selectall_hash(asciiname => $county);
 			foreach my $admin1(@admin1s) {
 				if($admin1->{'concatenated_codes'} =~ /^\Q$concatenated_codes\E\./i) {
@@ -579,6 +633,7 @@ sub geocode {
 		#
 		# return @locations;
 	# }
+	$self->_read();
 	my $city = $self->{'cities'}->fetchrow_hashref($options);
 	if(!defined($city)) {
 		foreach $region(@regions) {
@@ -587,6 +642,7 @@ sub geocode {
 				next unless($region =~ /^[A-Z]{2}$/);	# In the US, the regions are the states
 			}
 			$options->{'Region'} = $region;
+			$self->_read();
 			$city = $self->{'cities'}->fetchrow_hashref($options);
 			last if(defined($city));
 		}
@@ -609,6 +665,7 @@ sub geocode {
 		return $rc;
 	}
 	# return $city;
+	Geo::Coder::Free::MissCache->remember($miss_scope, $miss_key);
 	return;
 }
 
@@ -681,6 +738,7 @@ sub reverse_geocode
 	}
 
 	if(wantarray) {
+		$self->_read();
 		my @locs = $self->{'cities'}->execute("SELECT * FROM cities WHERE ((ABS(Latitude - $latitude)) < 0.01) AND ((ABS(Longitude - $longitude)) < 0.01)");
 		foreach my $loc(@locs) {
 			$self->_prepare($loc);
@@ -692,6 +750,7 @@ sub reverse_geocode
 	# widening radii (0.000001 → 0.01).  Replace with a single query that
 	# orders by Manhattan distance and caps at the maximum radius (0.01°).
 	# This eliminates 4 round-trips to SQLite on the common miss-until-last case.
+	$self->_read();
 	my $rc = $self->{'cities'}->execute(
 		"SELECT * FROM cities" .
 		" WHERE ABS(Latitude - $latitude) < 0.01 AND ABS(Longitude - $longitude) < 0.01" .
@@ -727,6 +786,7 @@ sub _prepare {
 			my $_reg     = uc($region // '');
 			my $row;
 			if($_country =~ /^[A-Z]{2}$/ && $_reg =~ /^[A-Z0-9]{1,10}$/) {
+				$self->_read();
 				$row = $self->{'admin2'}->execute("SELECT name FROM admin2 WHERE concatenated_codes LIKE '$_country.%.$_reg' LIMIT 1");
 			}
 			if(ref($row) && $row->{'name'}) {

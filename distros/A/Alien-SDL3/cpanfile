@@ -1,13 +1,13 @@
-requires 'Alien::Xrepo::Build',   'v1.0.9';
-requires 'Alien::Xrepo::Runtime', 'v1.0.9';
+requires 'Alien::Xrepo::Build',   'v1.0.10';
+requires 'Alien::Xrepo::Runtime', 'v1.0.10';
 requires 'File::ShareDir',        '1.00';
 requires 'Path::Tiny';
 requires 'perl', '5.040000';
 recommends 'Affix';
 on configure => sub {
     requires 'Alien::Xmake',        'v1.0.5';
-    requires 'Alien::Xrepo',        'v1.0.9';
-    requires 'Alien::Xrepo::Build', 'v1.0.9';
+    requires 'Alien::Xrepo',        'v1.0.10';
+    requires 'Alien::Xrepo::Build', 'v1.0.10';
     requires 'Alien::Xrepo::MB';
     requires 'CPAN::Meta';
     requires 'Config';

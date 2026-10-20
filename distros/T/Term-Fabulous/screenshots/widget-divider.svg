@@ -31,8 +31,8 @@
 <rect x="354" y="159" width="234" height="1" fill="#61afef"/>
 <rect x="48" y="176" width="234" height="2" fill="#98c379"/>
 <rect x="345" y="176" width="243" height="2" fill="#98c379"/>
-<rect x="313" y="204" width="1" height="18" fill="#5a606e"/>
-<rect x="313" y="330" width="1" height="36" fill="#5a606e"/>
+<rect x="322" y="204" width="1" height="18" fill="#5a606e"/>
+<rect x="322" y="330" width="1" height="36" fill="#5a606e"/>
 </g>
 <g class="terminal">
 <text x="282" y="110" textLength="72" fill="#96a0b4">Settings</text>
@@ -44,13 +44,13 @@
 <text x="291" y="200" textLength="45" fill="#96a0b4">glyph</text>
 <text x="345" y="200" textLength="243" fill="#e5c07b">~~~~~~~~~~~~~~~~~~~~~~~~~~~</text>
 <text x="48" y="218" textLength="45" fill="#dcdfe4">Inbox</text>
-<text x="327" y="218" textLength="81" fill="#dcdfe4">From: Ada</text>
-<text x="48" y="236" textLength="531" fill="#dcdfe4">Drafts                         Subject: Notes on the engine</text>
+<text x="336" y="218" textLength="81" fill="#dcdfe4">From: Ada</text>
+<text x="48" y="236" textLength="540" fill="#dcdfe4">Drafts                          Subject: Notes on the engine</text>
 <text x="48" y="254" textLength="36" fill="#dcdfe4">Sent</text>
-<text x="309" y="254" textLength="9" fill="#96a0b4">m</text>
-<text x="309" y="272" textLength="9" fill="#96a0b4">a</text>
-<text x="309" y="290" textLength="9" fill="#96a0b4">i</text>
-<text x="309" y="308" textLength="9" fill="#96a0b4">l</text>
+<text x="318" y="254" textLength="9" fill="#96a0b4">m</text>
+<text x="318" y="272" textLength="9" fill="#96a0b4">a</text>
+<text x="318" y="290" textLength="9" fill="#96a0b4">i</text>
+<text x="318" y="308" textLength="9" fill="#96a0b4">l</text>
 </g>
 <g shape-rendering="crispEdges">
 </g>

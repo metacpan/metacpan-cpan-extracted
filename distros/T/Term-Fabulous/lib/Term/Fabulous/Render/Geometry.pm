@@ -5,18 +5,29 @@ use warnings;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 use Exporter 'import';
 our @EXPORT_OK = qw(cell_rect intersect_cell_rects visible_cell_rect rects_overlap row_spans_outside cell_coordinate line_steps);
 
 use List::Util qw(min max);
-use POSIX qw(floor);
 use Scalar::Util qw(looks_like_number);
 
+# Every edge is rounded to the nearest cell on its own. Two boxes that
+# meet share the same edge value up to float32 noise (one's x + width is
+# the other's x), so they land on the same cell, while flooring would
+# leave a blank column between an edge of 70.9999 and one of 71.
 sub cell_rect ($bbox) {
 	my ( $x, $y ) = @{$bbox}{qw(x y)};
-	return ( floor($x), floor($y), floor( $x + $bbox->{width} ), floor( $y + $bbox->{height} ) );
+	return ( _cell_edge($x), _cell_edge($y), _cell_edge( $x + $bbox->{width} ), _cell_edge( $y + $bbox->{height} ) );
+}
+
+# Rounds to the nearest cell, halves up; int() and a comparison are much
+# cheaper than POSIX::floor.
+sub _cell_edge ($value) {
+	my $shifted = $value + 0.5;
+	my $whole   = int $shifted;
+	return $whole <= $shifted ? $whole : $whole - 1;
 }
 
 sub intersect_cell_rects ( $first, $second ) {
@@ -101,7 +112,7 @@ cells, and step lines through a raster
 
 	use Term::Fabulous::Render::Geometry qw(cell_rect intersect_cell_rects visible_cell_rect);
 
-	my ( $x0, $y0, $x1, $y1 ) = cell_rect( { x => 1.7, y => 2, width => 3.6, height => 2 } );    # (1, 2, 5, 4)
+	my ( $x0, $y0, $x1, $y1 ) = cell_rect( { x => 1.7, y => 2, width => 3.6, height => 2 } );    # (2, 2, 5, 4)
 	my $both    = intersect_cell_rects( [ 0, 0, 10, 5 ], [ 8, 3, 12, 9 ] );                      # [8, 3, 10, 5]
 	my @visible = visible_cell_rect( $command->{boundingBox}, $ui->clip_rect );
 
@@ -112,9 +123,13 @@ roles and the canvas widgets.
 
 Clay places boxes at fractional positions, which may be negative or
 reach past the viewport. Terminal output needs whole cells. These
-functions convert boxes to cells the same way everywhere: the left edge
-is C<floor(x)>, the right edge C<floor(x + width)>, and likewise for the
-top and bottom.
+functions convert boxes to cells the same way everywhere: every edge
+is rounded to the nearest cell (halves up), the left edge from C<x>,
+the right edge from C<x + width>, and likewise for the top and bottom.
+Boxes that meet, such as the cells of a table row, share an edge value
+up to the noise of Clay's single-precision floats, so rounding puts
+them on the same cell where flooring would open a blank column between
+an edge of 70.9999 and one of 71.
 
 Cell rectangles are written C<[x0, y0, x1, y1]>: C<x0>, C<y0> is the
 top-left cell, and C<x1>, C<y1> are I<exclusive>, so the rectangle
@@ -132,8 +147,9 @@ of any raster.
 	my ( $x0, $y0, $x1, $y1 ) = cell_rect($bbox);
 
 The cell rectangle of a Clay bounding box, a hash reference with C<x>,
-C<y>, C<width> and C<height>, as a list. It is not clipped, so it may
-lie partly or fully outside the viewport.
+C<y>, C<width> and C<height>, as a list, each edge rounded to the
+nearest cell. It is not clipped, so it may lie partly or fully outside
+the viewport. A box narrower than half a cell may come out empty.
 
 =head2 intersect_cell_rects
 

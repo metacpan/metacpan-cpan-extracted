@@ -161,7 +161,7 @@ tk_section_decode(const unsigned char *b, size_t len, const tk_locale_data *pare
     tk_terr_name *tn;
     tk_interval *iv;
 
-    if (len < TK_SECTION_HEAD || memNE(b, "TKL4", 4)) {
+    if (len < TK_SECTION_HEAD || memNE(b, "TKL5", 4)) {
         *err = "the section is not one this Time::Keeper reads";
         return NULL;
     }

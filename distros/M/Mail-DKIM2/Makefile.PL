@@ -29,6 +29,8 @@ WriteMakefile(
         'List::Util'                             => '0',
         'MIME::Base64'                           => '0',
         'Net::DNS'                               => '0',
+        'URI'                                    => '0',    # URI::_punycode
+        'Encode'                                 => '0',
     },
 
     TEST_REQUIRES => {

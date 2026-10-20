@@ -72,6 +72,11 @@ subtest 'rows from a list of Command objects, in a group of their own' => sub {
 	$reference->close;
 };
 
+subtest 'command_rows builds the rows of commands' => sub {
+	is [ $KeyReference->command_rows( 'Files', $commands->commands ) ], [ [ 'Files', 'Ctrl+O', 'Open' ], [ 'Files', 'Ctrl+S, F2', 'Save' ] ], 'commands with keys, their plain labels, in the group';
+	is [ $KeyReference->command_rows('Files') ],                        [],                                                                   'no commands, no rows';
+};
+
 subtest 'more rows from keys, groups in the order they first appear' => sub {
 	my $reference = $KeyReference->new(
 		commands => $commands,

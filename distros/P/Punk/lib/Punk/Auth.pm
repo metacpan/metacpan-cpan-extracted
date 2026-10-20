@@ -6,7 +6,7 @@ use warnings;
 use Punk ();
 use Punk::Auth::Password;
 
-our $VERSION = '0.61';
+our $VERSION = '0.62';
 
 # The whole battery is C (punk_auth.h + xs/auth.xs): the guard fast path,
 # current_user and the await seam, check_password with the dummy-verify

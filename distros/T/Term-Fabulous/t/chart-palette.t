@@ -61,8 +61,9 @@ subtest 'radial geometry' => sub {
 	is [ polar_of( $circle, 30, 10, 0.25 ) ], [ 10, 0 ],    'angles count from the start';
 	is [ polar_of( $circle, 20, 5, 0.25 ) ],  [ 10, 0.75 ], 'and stay between 0 and 1';
 
-	is [ point_at( $circle, 10, 0.5 ) ], [ float(20), float(15) ], 'point_at: 6 o\'clock';
+	is [ point_at( $circle, 10, 0.5 ) ],     [ float(20), float(15) ], 'point_at: 6 o\'clock';
 	is [ point_at( $circle, 10, 0, 0.25 ) ], [ float(30), float(10) ], 'after the start';
+	is [ point_at( circle_frame( 6, 1, 28, 12 ), 13, 0.75 ) ], [ 7, 7 ], 'a whole coordinate is whole, no rounding noise of cos';
 	foreach my $case ( [ 3, 0.1, 0 ], [ 7.5, 0.4, 0.2 ], [ 12, 0.85, 0.6 ] ) {
 		my ( $distance, $angle, $start ) = @$case;
 		is [ polar_of( $circle, point_at( $circle, $distance, $angle, $start ), $start ) ], [ float($distance), float($angle) ], "polar_of inverts point_at: $distance at $angle after $start";

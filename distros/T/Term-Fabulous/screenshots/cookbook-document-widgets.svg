@@ -1,0 +1,96 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="780" height="525" viewBox="0 0 780 525" role="img" aria-label="perl examples/cookbook/document-widgets.pl 5.10">
+<title>perl examples/cookbook/document-widgets.pl 5.10</title>
+<style>
+.terminal text { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 15px; white-space: pre; }
+.terminal .b { font-weight: bold; }
+.terminal .i { font-style: italic; }
+.title { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 13px; }
+</style>
+<defs>
+<filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#000000" flood-opacity="0.3"/></filter>
+<clipPath id="window"><rect x="16" y="16" width="748" height="490" rx="10"/></clipPath>
+</defs>
+<rect x="16" y="16" width="748" height="490" rx="10" fill="#161622" filter="url(#shadow)"/>
+<rect x="16" y="16" width="748" height="34" fill="#1f2430" clip-path="url(#window)"/>
+<circle cx="36" cy="33" r="6" fill="#ff5f57"/>
+<circle cx="56" cy="33" r="6" fill="#febc2e"/>
+<circle cx="76" cy="33" r="6" fill="#28c840"/>
+<text class="title" x="390" y="33" text-anchor="middle" dominant-baseline="central" fill="#9aa3b5">perl examples/cookbook/document-widgets.pl 5.10</text>
+<rect x="16.5" y="16.5" width="747" height="489" rx="10" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1"/>
+<g shape-rendering="crispEdges">
+<rect x="66" y="96" width="576" height="18" fill="#242832"/>
+<rect x="597" y="150" width="36" height="18" fill="#e5c07b"/>
+<rect x="57" y="204" width="27" height="18" fill="#2c313c"/>
+<rect x="93" y="204" width="27" height="18" fill="#2c313c"/>
+<rect x="237" y="204" width="27" height="18" fill="#2c313c"/>
+<rect x="273" y="204" width="27" height="18" fill="#2c313c"/>
+<rect x="453" y="204" width="45" height="18" fill="#242830"/>
+<rect x="745" y="60" width="1" height="126" fill="#464c5a"/>
+<rect x="66" y="86" width="576" height="1" fill="#586070"/>
+<rect x="151" y="86" width="1" height="109" fill="#586070"/>
+<rect x="268" y="86" width="1" height="109" fill="#586070"/>
+<rect x="61" y="96" width="1" height="90" fill="#586070"/>
+<rect x="646" y="96" width="1" height="90" fill="#586070"/>
+<rect x="61" y="122" width="586" height="1" fill="#586070"/>
+<rect x="745" y="186" width="2" height="180" fill="#61afef"/>
+<rect x="66" y="194" width="576" height="1" fill="#586070"/>
+<rect x="745" y="366" width="1" height="126" fill="#464c5a"/>
+<rect x="57" y="428" width="675" height="1" fill="#5a606e"/>
+</g>
+<polyline points="61.5 96 61.5 91 61.538 90.413 61.653 89.835 61.843 89.278 62.103 88.75 62.43 88.261 62.818 87.818 63.261 87.43 63.75 87.103 64.278 86.843 64.835 86.653 65.413 86.538 66 86.5 66 86.5" fill="none" stroke="#586070" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="646.5 96 646.5 91 646.462 90.413 646.347 89.835 646.157 89.278 645.897 88.75 645.57 88.261 645.182 87.818 644.739 87.43 644.25 87.103 643.722 86.843 643.165 86.653 642.587 86.538 642 86.5 642 86.5" fill="none" stroke="#586070" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="61.5 186 61.5 190 61.538 190.587 61.653 191.165 61.843 191.722 62.103 192.25 62.43 192.739 62.818 193.182 63.261 193.57 63.75 193.897 64.278 194.157 64.835 194.347 65.413 194.462 66 194.5 66 194.5" fill="none" stroke="#586070" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="646.5 186 646.5 190 646.462 190.587 646.347 191.165 646.157 191.722 645.897 192.25 645.57 192.739 645.182 193.182 644.739 193.57 644.25 193.897 643.722 194.157 643.165 194.347 642.587 194.462 642 194.5 642 194.5" fill="none" stroke="#586070" stroke-width="1" stroke-linejoin="round"/>
+<g class="terminal">
+<text x="75" y="110" textLength="63" class="b" fill="#ebeef3">Version</text>
+<text x="165" y="110" textLength="72" class="b" fill="#ebeef3">Released</text>
+<text x="282" y="110" textLength="108" class="b" fill="#ebeef3">What changed</text>
+<text x="75" y="146" textLength="27" fill="#dcdfe4">1.5</text>
+<text x="165" y="146" textLength="90" fill="#dcdfe4">2025-06-20</text>
+<text x="282" y="146" textLength="297" fill="#dcdfe4">a dry run shows what keep deletes</text>
+<text x="75" y="164" textLength="27" fill="#dcdfe4">1.4</text>
+<text x="165" y="164" textLength="90" fill="#dcdfe4">2025-01-10</text>
+<text x="282" y="164" textLength="306" fill="#dcdfe4">the last release that runs on Perl</text>
+<text x="597" y="164" textLength="36" fill="#101216">5.10</text>
+<text x="75" y="182" textLength="27" fill="#dcdfe4">1.3</text>
+<text x="165" y="182" textLength="90" fill="#dcdfe4">2024-08-05</text>
+<text x="282" y="182" textLength="144" fill="#dcdfe4">exclude patterns</text>
+<text x="66" y="218" textLength="9" fill="#dcdfe4">«</text>
+<text x="106.5" y="218" text-anchor="middle" fill="#dcdfe4">‹</text>
+<text x="129" y="218" textLength="99" fill="#dcdfe4">Page 2 of 3</text>
+<text x="250.5" y="218" text-anchor="middle" fill="#dcdfe4">›</text>
+<text x="282" y="218" textLength="9" fill="#dcdfe4">»</text>
+<text x="327" y="218" textLength="117" fill="#8c929e">Rows per page</text>
+<text x="453" y="218" textLength="9" fill="#dcdfe4">3</text>
+<text x="493.5" y="218" text-anchor="middle" fill="#61afef">▾</text>
+<text x="525" y="218" textLength="9" fill="#8c929e">4</text>
+<text x="538.5" y="218" text-anchor="middle" fill="#8c929e">–</text>
+<text x="543" y="218" textLength="54" fill="#8c929e">6 of 7</text>
+<text x="39" y="254" textLength="27" class="b" fill="#ebeef3">2.1</text>
+<text x="61.5" y="290" text-anchor="middle" fill="#61afef">•</text>
+<text x="75" y="290" textLength="54" fill="#e5c07b">--keep</text>
+<text x="138" y="290" textLength="63" fill="#dcdfe4">accepts</text>
+<text x="210" y="290" textLength="27" fill="#e5c07b">all</text>
+<text x="246" y="290" textLength="189" fill="#dcdfe4">to keep every backup.</text>
+<text x="61.5" y="308" text-anchor="middle" fill="#61afef">•</text>
+<text x="75" y="308" textLength="468" fill="#dcdfe4">The report lists the biggest files that were copied.</text>
+<text x="61.5" y="326" text-anchor="middle" fill="#61afef">•</text>
+<text x="75" y="326" textLength="387" fill="#dcdfe4">Hooks get the name of the backup directory:</text>
+<text x="79.5" y="344" text-anchor="middle" fill="#61afef">•</text>
+<text x="93" y="344" textLength="54" fill="#e5c07b">before</text>
+<text x="156" y="344" textLength="18" fill="#dcdfe4">as</text>
+<text x="183" y="344" textLength="126" fill="#e5c07b">$SNAPBACK_NEXT</text>
+<text x="309" y="344" textLength="243" fill="#dcdfe4">, which does not exist yet;</text>
+<text x="79.5" y="362" text-anchor="middle" fill="#61afef">•</text>
+<text x="93" y="362" textLength="45" fill="#e5c07b">after</text>
+<text x="147" y="362" textLength="18" fill="#dcdfe4">as</text>
+<text x="174" y="362" textLength="126" fill="#e5c07b">$SNAPBACK_LAST</text>
+<text x="300" y="362" textLength="9" fill="#dcdfe4">.</text>
+<text x="57" y="398" textLength="333" fill="#dcdfe4">Upgrading from 2.0 needs no change to</text>
+<text x="399" y="398" textLength="99" fill="#e5c07b">~/.snapback</text>
+<text x="498" y="398" textLength="9" fill="#dcdfe4">.</text>
+<text x="39" y="470" textLength="27" class="b" fill="#ebeef3">2.0</text>
+</g>
+<g shape-rendering="crispEdges">
+</g>
+</svg>

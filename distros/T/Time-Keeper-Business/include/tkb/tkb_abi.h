@@ -61,4 +61,19 @@ tkb_abi(pTHX)
  * PERL_IMPLICIT_SYS, and a member's name must not be read as one. */
 #define TKB(entry) (tkb_abi(aTHX)->entry)
 
+/* Version 3 of the table reads and makes a plain date, gives a locale's
+ * weekend and a zone's next change, and makes a Duration from its parts. A
+ * build against a header that has those entries calls them when the table
+ * it finds is at version 3, and the methods otherwise, as with version 2. */
+/* Set only by a test, to compare the two ways on one perl. */
+static int tkb_v3_off = 0;
+
+#ifdef TIME_KEEPER_KIND_MONTH_DAY
+#define TKB_HAVE_V3 1
+#define TKB_V3 (!tkb_v3_off && tkb_abi(aTHX)->abi_version >= 3)
+#else
+#define TKB_HAVE_V3 0
+#define TKB_V3 0
+#endif
+
 #endif

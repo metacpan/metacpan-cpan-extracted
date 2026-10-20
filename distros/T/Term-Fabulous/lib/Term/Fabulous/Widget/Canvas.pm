@@ -9,7 +9,7 @@ use Object::Pad 0.825;
 
 use Term::Fabulous::Widget::Box;
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 class Term::Fabulous::Widget::Canvas
 	:isa(Term::Fabulous::Widget::Box)
@@ -264,6 +264,22 @@ class Term::Fabulous::Widget::Canvas
 		return map { $padding->{$_} // 0 } qw(left top right bottom);
 	}
 
+	# The cells between the outer box and the content box on each side, as
+	# the last frame laid the canvas out (its content_box against its
+	# bounding_box), for the renderer and subclasses; the empty list when
+	# that frame did not lay it out.
+	method _laid_out_insets () {
+		my $ui      = $self->ui                // return;
+		my $outer   = $ui->bounding_box($self) // return;
+		my $content = $ui->content_box($self);
+		return (
+			$content->{x} - $outer->{x},
+			$content->{y} - $outer->{y},
+			$outer->{x} + $outer->{width} - $content->{x} - $content->{width},
+			$outer->{y} + $outer->{height} - $content->{y} - $content->{height},
+		);
+	}
+
 	method fit_to ( $new_columns, $new_rows ) {
 		die "Term::Fabulous::Widget::Canvas: fit_to needs a non-negative integer size, got " . describe($new_columns) . " x " . describe($new_rows)
 			unless grep( { defined && /\A[0-9]+\z/ } $new_columns, $new_rows ) == 2;
@@ -365,7 +381,7 @@ Term::Fabulous::Widget::Canvas - A widget you draw on cell by cell
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/example-canvas.svg" alt="Three waves in red, blue and green on a canvas, drawn with half blocks"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.05/screenshots/example-canvas.svg" alt="Three waves in red, blue and green on a canvas, drawn with half blocks"></p>
 
 =end html
 
@@ -683,18 +699,24 @@ must be termbox2 attributes or C<undef>, as L</cell> returns them
 C<Term::Fabulous::Render::Attr::cell_color_attr>). An C<undef> glyph
 unsets the cell. Returns the canvas.
 
-=head1 RENDERER INTERFACE
-
-These methods are called by L<Term::Fabulous::Render::Canvas> while a
-frame is drawn. Applications do not call them.
-
 =head2 content_insets
 
 	my ( $left, $top, $right, $bottom ) = $canvas->content_insets;
 
-The number of cells between the widget's outer box and its content box
-on each side: padding plus one cell where a border is drawn on the side
-(see L<Term::Fabulous::Role::HasBorderStyle/drawn_border_sides>).
+The number of cells the widget's declaration puts between its outer
+box and its content box on each side, as its configuration says now:
+padding plus one cell where a border is drawn on the side (see
+L<Term::Fabulous::Role::HasBorderStyle/drawn_border_sides>). It is for
+a canvas that no frame has laid out yet, such as the natural width of
+a L<Term::Fabulous::Widget::Dropdown> before its first frame. Once a
+frame laid the canvas out, the renderer and the subclasses take the
+insets of that frame from L<Clay::UI/content_box> instead, so a change
+made since that frame does not mix with its box.
+
+=head1 RENDERER INTERFACE
+
+These methods are called by L<Term::Fabulous::Render::Canvas> while a
+frame is drawn. Applications do not call them.
 
 =head2 set_content_origin
 

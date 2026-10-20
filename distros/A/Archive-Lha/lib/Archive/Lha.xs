@@ -563,7 +563,7 @@ MODULE = Archive::Lha PACKAGE = Archive::Lha::Header::Utils PREFIX = xs_
 PROTOTYPES: DISABLE
 
 unsigned char
-xs_checksum(SV * buf, STRLEN offset)
+xs__checksum(SV * buf, STRLEN offset)
   CODE:
     STRLEN len;
     unsigned char * s = (unsigned char *) SvPV(buf, len);
@@ -576,7 +576,7 @@ xs_checksum(SV * buf, STRLEN offset)
     RETVAL
 
 IV
-xs_dostime2utime(U32 v)
+xs__dostime2utime(U32 v)
   CODE:
     struct tm t;
     time_t result;

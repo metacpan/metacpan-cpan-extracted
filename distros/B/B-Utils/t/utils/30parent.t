@@ -55,7 +55,7 @@ walkoptree_simple(
         my $op = shift;
         my $parent;
 
-        if ($] >= 5.021002 and exists &B::OP::parent) {
+        if ("$]" >= 5.021002 and exists &B::OP::parent) {
             $parent = $op->_parent;
         } else {
             $parent = $op->parent;

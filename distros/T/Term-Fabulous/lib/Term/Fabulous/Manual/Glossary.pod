@@ -30,6 +30,12 @@ L<Term::Fabulous::Manual::KDL/Declaring widget classes>.
 
 A widget's parent, the parent's parent, and so on up to the root.
 
+=item anchor (document)
+
+A name in a document that links can lead to besides the section
+titles, such as the text of a term; an item's C<anchor> option sets
+it. See L<Term::Fabulous::Document/Item options>.
+
 =item application object
 
 The L<Term::Fabulous> object of a program: it holds the widget tree,
@@ -93,6 +99,13 @@ L<Term::Fabulous::Manual::Charts/CHARTS>.
 =item Clay
 
 The layout engine Term::Fabulous uses; see L<Clay::XS> and L<Clay::UI>.
+
+=item click count
+
+The place of a button press in a run of quick clicks of the same
+button in the same cell: 1 for a single click, 2 for a double click, 3
+for a triple click; releases, drags and the wheel have 1. See
+L<Term::Fabulous::Event::Mouse/click_count>.
 
 =item column, row
 
@@ -160,6 +173,20 @@ terminal resizes, see L<Term::Fabulous::Manual::Events/Event reference>.
 The text a table cell shows: its raw value after the column's mutators.
 See L<Term::Fabulous::Manual::Tables/DISPLAY TEXT AND MUTATORS>.
 
+=item document
+
+What a L<Term::Fabulous::Widget::DocumentView> shows: a
+L<Term::Fabulous::Document>, an ordered list of items with the
+sections and anchors that links lead to, made by a parser from POD,
+Markdown or another format. See
+L<Term::Fabulous::Manual::Layout/Documents>.
+
+=item drawing theme
+
+The L<Term::Fabulous::Theme> a widget draws with: the one its UI gives
+it, which may differ per subtree, or the default theme while the widget
+is in no UI. See L<Term::Fabulous::Role::Themed/drawing_theme>.
+
 =item event
 
 Something that happened, as an object: a key press, a click, a changed
@@ -185,6 +212,14 @@ L<Term::Fabulous::Manual::TableRows/The filter row>.
 =item focus
 
 Which widget receives key presses. See L<Term::Fabulous::Manual::Events/FOCUS>.
+
+=item focus heir
+
+The widget that gets the focus when the focused widget goes away: the
+nearest widget above it that can take the focus, or one a container
+on the way names with its C<focus_heir> method, such as the active tab
+of a Tabs. See
+L<Term::Fabulous::Manual::Events/When the focused widget goes away>.
 
 =item frame
 
@@ -217,6 +252,13 @@ The rows of a table that share the value of a group column
 number of rows; the user opens and closes a group there. See
 L<Term::Fabulous::Manual::TableRows/GROUPING>.
 
+=item highlight (text)
+
+A range of a text with a style, painted over the spans and under the
+links and kept apart from them, so that a search can mark its matches
+and clear them again without touching the spans. See
+L<Term::Fabulous::Widget::Text/highlights>.
+
 =item hoverable, pressable, focusable
 
 Widgets that track whether the pointer is over them, whether they are
@@ -239,6 +281,13 @@ it knows which widget has the focus, which is hovered and which is
 pressed, and moves the focus from code. See
 L<Term::Fabulous::Manual::Events/Moving the focus>.
 
+=item item (document)
+
+One entry of a document, a widget that had no parent when it was
+added: a heading, a paragraph, a list item, code, or any other widget such as a table or a
+form, with options that say how the view lays it out. See
+L<Term::Fabulous::Document/Item options>.
+
 =item KDL
 
 A configuration language (L<https://kdl.dev>) in which widget trees can
@@ -250,6 +299,13 @@ The readable name of a key press, such as C<q>, C<Enter> or
 C<Ctrl+Left>, as the method
 L<C<key_name>|Term::Fabulous::Event::KeyPress/key_name> of a KeyPress
 event returns it. See L<Term::Fabulous::Manual::Events/Key names>.
+
+=item kind (document look)
+
+The name of one style of a document's look, such as C<bold>, C<code>,
+C<heading1> or C<match>. A mark names the kind of its text; the view
+and the code blocks ask for the other kinds by name. See
+L<Term::Fabulous::Document::Look/KINDS>.
 
 =item kitty keyboard protocol
 
@@ -267,10 +323,52 @@ L<Term::Fabulous::Manual::Layout/LAYOUT>.
 One entry of a table's view: a data row or a group header. Pages count
 lines. See L<Term::Fabulous::Manual::Tables/Table terms>.
 
+=item link (text)
+
+A range of a L<Term::Fabulous::Widget::Text> with a target, which the
+user follows with a click or with C<Enter>; the text then fires
+L<LinkActivate|Term::Fabulous::Event::LinkActivate> and leaves the
+rest to the program. See L<Term::Fabulous::Widget::Text/LINKS>.
+
 =item listener
 
 A code reference registered with C<< $widget->on( $event_name => $code ) >>.
 See L<Term::Fabulous::Manual::Events/Listening to events>.
+
+=item look (document)
+
+A L<Term::Fabulous::Document::Look>: the style of every kind (see
+L<kind|/"kind (document look)">) a document and its view use, its
+colors taken from the palette tokens of the theme,
+so that a theme switch restyles the document. See
+L<Term::Fabulous::Document::Look/KINDS>.
+
+=item mark
+
+The word has three meanings:
+
+=over
+
+=item 1.
+
+(document) What a parser records about a range of a text: the kind of
+formatting it had in the source, C<[ $start, $end, $kind ]>, or a link
+with its target. The document's look turns a mark of a kind into a
+span; a link mark becomes a link of the Text. See
+L<Term::Fabulous::Document/FACTORIES>.
+
+=item 2.
+
+(document view) The selected link and the search matches, drawn over
+the items' own styles. See
+L<Term::Fabulous::Widget::DocumentView/Marks>.
+
+=item 3.
+
+(text) The spans, highlights and links of one text, as
+L<Term::Fabulous::Text::Marks> keeps them for a Text or a CodeBlock.
+
+=back
 
 =item mnemonic
 
@@ -305,7 +403,17 @@ inside every cell. See L<Term::Fabulous::Manual::Layout/Padding>.
 
 The bar below a table with pages: buttons to turn the pages, the page
 number, a list of page sizes and a count of the lines. See
-L<Term::Fabulous::Manual::TableRows/PAGES>.
+L<Term::Fabulous::Manual::TableRows/PAGES>. Not the same as the pager
+keys.
+
+=item pager keys
+
+The keys a pager scrolls with, which a program hands to
+L<scroll_by_key|Term::Fabulous::Scrolling/scroll_by_key> of
+L<Term::Fabulous::Scrolling> for any scroll container: PageUp,
+PageDown, Ctrl+Home and Ctrl+End (the set C<pager>), or, as in
+C<less>, Up or C<j>, Down or C<k>, PageUp or C<b>, PageDown or
+C<Space>, Home or C<g> and End or C<G> (the set C<less>).
 
 =item palette (chart)
 
@@ -313,11 +421,22 @@ The list of colors a chart gives its series or slices in turn:
 C<default>, C<classic>, C<pastel>, C<vivid> or colors of your own. See
 L<Term::Fabulous::Manual::Charts/Colors, palettes and themes>.
 
+=item palette token
+
+A named color of a theme's palette; see L<token (theme)|/"token (theme)">.
+
 =item pixel (PixelCanvas)
 
 Half a terminal cell: a L<Term::Fabulous::Widget::PixelCanvas> shows two
 pixels per cell, one above the other. See
 L<Term::Fabulous::Manual::Charts/Drawing pixels>.
+
+=item popup
+
+A widget that floats over everything at a position it works out from
+the box of its anchor and the size of the screen: the list of a
+dropdown, a menu opened as a popup, a table's column chooser. See
+L<Term::Fabulous::Role::Popup> and L<Term::Fabulous::Placement>.
 
 =item property (KDL)
 
@@ -340,6 +459,13 @@ widget tree.
 
 The name of a row of a L<Term::Fabulous::Widget::Table>, used by every
 method and event. See L<Term::Fabulous::Manual::Tables/Row ids>.
+
+=item section (document)
+
+A part of a document that starts at an item with a level from 1 to 6
+and a title, usually a heading. Sections make the table of contents
+and the position a document view reports. See
+L<Term::Fabulous::Document/"sections, section_count">.
 
 =item selection (table)
 
@@ -370,9 +496,22 @@ One part of a pie, donut or polar area chart: a unique label and a
 value. The slices are the chart's series. See
 L<Term::Fabulous::Manual::Charts/Series and data>.
 
+=item slot (document view)
+
+The box a document view shows one item in: it gives the item its gap,
+its indent and its quote bars. See
+L<Term::Fabulous::Widget::DocumentView/How items are shown>.
+
 =item slot (theme)
 
 One part of a widget family that a theme decides, a color, a border style or whether there is a border: C<button.border.color>, C<input.placeholder>, C<divider.line.style>, C<text_input.border.enabled>. A slot has a value for the normal state and may have one for each state the widget shows (C<focused>, C<disabled>, ...). It defaults to a token, a style name, or C<true> or C<false>. See L<Term::Fabulous::Theme/Families, slots and states>.
+
+=item span (text)
+
+A range of a L<Term::Fabulous::Widget::Text> with a style of its own,
+such as C<[ 0, 6, 'bold red' ]>, written as markup or given as
+character ranges. See
+L<Term::Fabulous::Manual::Looks/Styled spans inside one text>.
 
 =item style hash (table)
 
@@ -436,7 +575,7 @@ L<Term::Fabulous::Manual::Menus/Settings that are on or off>.
 
 =item token (theme)
 
-A named color of a theme's palette, such as C<accent>, C<surface> or C<text>, which the slots default to. The C<background> token is the screen behind the widgets, which every frame paints first. See L<Term::Fabulous::Theme/Tokens>.
+A named color of a theme's palette, such as C<accent>, C<surface> or C<text>, which the slots default to. The C<background> token is the screen behind the widgets, which every frame paints first. A style string accepts a token as a color (C<'bold accent on surface_low'>), looked up when the text paints. See L<Term::Fabulous::Theme/Tokens> and L<Term::Fabulous::Text::Style/Palette tokens>.
 
 =item tree row, child row (table)
 

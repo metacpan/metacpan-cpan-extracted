@@ -5,6 +5,7 @@ use warnings;
 
 use CHI;
 use Readonly;
+use POSIX ();
 use Scalar::Util qw(blessed refaddr);
 use Test::Memory::Cycle;
 use Test::Mockingbird qw(mock restore_all);
@@ -100,6 +101,142 @@ subtest '_js_string: combined — backslash then quote escaped in correct order'
 	is($got, "\\\\\\'", 'backslash then quote: order preserved');
 };
 
+subtest '_js_string: lone CR -> literal \r sequence' => sub {
+	is(HTML::OSM::_js_string("a\rb"), 'a\\rb', 'lone CR escaped');
+};
+
+# ─────────────────────────────────────────────────────────────────────────────
+# _num_str() — numbers as text with a '.' decimal point, whatever the locale.
+# A dualvar simulates Perl builds that print 51.5074 as '51,5074'.
+# ─────────────────────────────────────────────────────────────────────────────
+
+subtest '_num_str: number printed with a comma comes back with a dot' => sub {
+	is(HTML::OSM::_num_str(Scalar::Util::dualvar(51.5074, '51,5074')), '51.5074', 'positive');
+	is(HTML::OSM::_num_str(Scalar::Util::dualvar(-0.1278, '-0,1278')), '-0.1278', 'negative');
+};
+
+subtest '_num_str: ordinary numbers and numeric strings are unchanged' => sub {
+	is(HTML::OSM::_num_str(51.5074), '51.5074', 'number');
+	is(HTML::OSM::_num_str(-90),     '-90',     'integer');
+	is(HTML::OSM::_num_str('.5'),    '.5',      'numeric string');
+};
+
+subtest '_num_str: strings, undef and refs are returned as they are' => sub {
+	is(HTML::OSM::_num_str('51,5074'), '51,5074', 'comma string is not a number, so it is left alone');
+	is(HTML::OSM::_num_str(undef), undef, 'undef');
+	my $ref = [1];
+	is(HTML::OSM::_num_str($ref), $ref, 'ref');
+	is(HTML::OSM::_num_str(Scalar::Util::dualvar(1, 'abc')), 'abc', 'non-numeric text of a dualvar is left for _validate to reject');
+};
+
+subtest '_num_val: decimal strings convert without Perl string parsing' => sub {
+	is(HTML::OSM::_num_val('51.5074'), 51.5074, 'positive');
+	is(HTML::OSM::_num_val('-0.1278'), -0.1278, 'negative');
+	is(HTML::OSM::_num_val('.5'),      0.5,     'leading decimal point');
+	is(HTML::OSM::_num_val('-.5'),     -0.5,    'negative leading decimal point');
+	is(HTML::OSM::_num_val('90'),      90,      'integer');
+	is(HTML::OSM::_num_val('0.0001'),  0.0001,  'leading zeros in the fraction');
+	is(HTML::OSM::_num_val(Scalar::Util::dualvar(51.5, '51,5')), 51.5, 'comma-printed number');
+};
+
+subtest '_num_val: other text falls back to Perl conversion' => sub {
+	is(HTML::OSM::_num_val('1e2'), 100, 'exponent');
+	is(HTML::OSM::_num_val('-'),   0,   'lone sign');
+};
+
+subtest '_validate: 90.5 is out of range (not read as 90)' => sub {
+	local $SIG{__WARN__} = sub { };
+	is(HTML::OSM::_validate('90.5', '0'),   0, 'latitude 90.5 rejected');
+	is(HTML::OSM::_validate('0', '-180.5'), 0, 'longitude -180.5 rejected');
+	is(HTML::OSM::_validate('90', '180'),   1, 'exact limits accepted');
+};
+
+subtest '_validate: comma-printed numbers pass' => sub {
+	is(HTML::OSM::_validate(Scalar::Util::dualvar(51.5, '51,5'), Scalar::Util::dualvar(-0.1, '-0,1')), 1, 'accepted');
+};
+
+# ─────────────────────────────────────────────────────────────────────────────
+# _html_json() — encodes under the C numeric locale and restores everything.
+# ─────────────────────────────────────────────────────────────────────────────
+
+subtest '_html_json: restores LC_NUMERIC and $@' => sub {
+	my $before = POSIX::setlocale(POSIX::LC_NUMERIC());
+	eval { die "sentinel\n" };
+	is(HTML::OSM::_html_json([0.5, -0.1278]), '[0.5,-0.1278]', 'numbers encoded with dots');
+	is($@, "sentinel\n", '$@ preserved');
+	is(POSIX::setlocale(POSIX::LC_NUMERIC()), $before, 'LC_NUMERIC restored');
+};
+
+subtest '_html_json: an encode error still propagates and the locale is restored' => sub {
+	my $before = POSIX::setlocale(POSIX::LC_NUMERIC());
+	throws_ok { HTML::OSM::_html_json(\*STDOUT) } qr/./, 'unencodable data dies';
+	is(POSIX::setlocale(POSIX::LC_NUMERIC()), $before, 'LC_NUMERIC restored after the error');
+};
+
+# ─────────────────────────────────────────────────────────────────────────────
+# _html_attr() — escapes a value for a double-quoted HTML attribute.
+# ─────────────────────────────────────────────────────────────────────────────
+
+subtest '_html_attr: undef becomes empty string' => sub {
+	is(HTML::OSM::_html_attr(undef), '', 'undef input gives empty string');
+};
+
+subtest '_html_attr: plain URL passes through unchanged' => sub {
+	is(HTML::OSM::_html_attr('https://unpkg.com/leaflet.js'), 'https://unpkg.com/leaflet.js', 'URL unchanged');
+};
+
+subtest '_html_attr: &, <, > and " become entities, & first' => sub {
+	is(HTML::OSM::_html_attr(q{a&b"c<d>}), 'a&amp;b&quot;c&lt;d&gt;', 'all four escaped');
+	is(HTML::OSM::_html_attr('&lt;'), '&amp;lt;', 'existing entity is not left as-is');
+};
+
+# ─────────────────────────────────────────────────────────────────────────────
+# _css_length() — validates width/height before they reach the <style> block.
+# ─────────────────────────────────────────────────────────────────────────────
+
+subtest '_css_length: valid lengths are returned unchanged' => sub {
+	for my $v (qw(600px 100% 2.5em 50vh auto 300)) {
+		is(HTML::OSM::_css_length('width', $v, $CFG{DEFAULT_WIDTH}), $v, "'$v' accepted");
+	}
+};
+
+subtest '_css_length: undef and empty fall back to the default silently' => sub {
+	my @warnings;
+	local $SIG{__WARN__} = sub { push @warnings, @_ };
+	is(HTML::OSM::_css_length('width', undef, $CFG{DEFAULT_WIDTH}), $CFG{DEFAULT_WIDTH}, 'undef -> default');
+	is(HTML::OSM::_css_length('width', '',    $CFG{DEFAULT_WIDTH}), $CFG{DEFAULT_WIDTH}, 'empty -> default');
+	is(scalar @warnings, 0, 'no warning for a missing value');
+};
+
+subtest '_css_length: hostile value falls back to the default with a warning' => sub {
+	my @warnings;
+	local $SIG{__WARN__} = sub { push @warnings, @_ };
+	is(HTML::OSM::_css_length('height', '1px}</style><script>', $CFG{DEFAULT_HEIGHT}),
+		$CFG{DEFAULT_HEIGHT}, 'injection attempt replaced');
+	is(HTML::OSM::_css_length('height', "600px\n", $CFG{DEFAULT_HEIGHT}),
+		$CFG{DEFAULT_HEIGHT}, 'trailing newline rejected');
+	is(scalar @warnings, 2, 'one warning per replacement');
+	like($warnings[0], qr/onload_render: invalid height/, 'warning names the field');
+};
+
+# ─────────────────────────────────────────────────────────────────────────────
+# _positive_number() — heatmap radius/blur are embedded raw in JS.
+# ─────────────────────────────────────────────────────────────────────────────
+
+subtest '_positive_number: positive numbers are returned as numbers' => sub {
+	is(HTML::OSM::_positive_number(30, 25),     30,  'integer');
+	is(HTML::OSM::_positive_number('12.5', 25), 12.5, 'numeric string');
+	is(HTML::OSM::_positive_number(' 7', 25),   7,   'surrounding space is trimmed');
+	is(HTML::OSM::_positive_number('.5', 25),   0.5, 'leading decimal point');
+	is(HTML::OSM::_positive_number(Scalar::Util::dualvar(12.5, '12,5'), 25), '12.5', 'comma-printed number');
+};
+
+subtest '_positive_number: everything else gives the default' => sub {
+	for my $v (undef, '', 0, -5, 'abc', '1});alert(1);//', 'Inf', 'NaN', 1e9, '1e2', '12,5', [1]) {
+		is(HTML::OSM::_positive_number($v, 25), 25, 'default for ' . ($v // 'undef'));
+	}
+};
+
 # ─────────────────────────────────────────────────────────────────────────────
 # _validate() — private helper, called as a plain function (not a method).
 # ─────────────────────────────────────────────────────────────────────────────
@@ -174,6 +311,7 @@ subtest 'new: method-style with no args produces correct defaults' => sub {
 	like($m->{cluster_css_url},     qr/MarkerCluster/, 'cluster_css_url');
 	like($m->{heatmap_js_url},      qr/leaflet.heat/,  'heatmap_js_url');
 	like($m->{gpx_js_url},          qr/gpx/i,          'gpx_js_url');
+	like($m->{tile_url},            qr/openstreetmap/, 'tile_url');
 	returns_ok($m, { type => 'object', isa => 'HTML::OSM' }, 'returns HTML::OSM');
 	memory_cycle_ok($m->{coordinates}, 'no cycles in coordinates');
 	diag("defaults: zoom=$m->{zoom} h=$m->{height} w=$m->{width}") if $ENV{TEST_VERBOSE};
@@ -210,9 +348,11 @@ subtest 'new: coordinates must be arrayref' => sub {
 
 subtest 'new: CDN URLs overridable' => sub {
 	my $m = HTML::OSM->new(css_url => 'https://my.cdn/leaflet.css',
-	                        gpx_js_url => 'https://my.cdn/gpx.js');
+	                        gpx_js_url => 'https://my.cdn/gpx.js',
+	                        tile_url  => 'https://tiles.internal/{z}/{x}/{y}.png');
 	is($m->{css_url},    'https://my.cdn/leaflet.css', 'css_url overridden');
 	is($m->{gpx_js_url}, 'https://my.cdn/gpx.js',     'gpx_js_url overridden');
+	is($m->{tile_url},   'https://tiles.internal/{z}/{x}/{y}.png', 'tile_url overridden');
 };
 
 subtest 'new: clone merges overrides, skips validation, is a distinct object' => sub {

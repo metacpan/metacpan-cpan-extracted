@@ -10,7 +10,7 @@ use 5.020; use strict; use warnings;
 # That DSN is DKIM2-signed on the way out by the outbound milter (main.cf:
 # internal_mail_filter_classes = bounce), demonstrating a genuinely
 # MTA-generated, DKIM2-signed delayed bounce (RFC 6522 DSN structure; DKIM2
-# draft §11/§12).
+# draft §14/§16).
 #
 # This is deliberately NOT the "error:" transport: error: rejects the
 # recipient at RCPT time for SMTP clients (a synchronous 550), which is not a

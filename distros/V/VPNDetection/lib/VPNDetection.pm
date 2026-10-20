@@ -19,7 +19,7 @@ use VPNDetection::Error;
 use VPNDetection::Oauth;
 use VPNDetection::Result;
 
-our $VERSION = '3.8.0';
+our $VERSION = '3.9.0';
 our @EXPORT_OK = ('is_bogon');
 
 use constant DEFAULT_BASE_URL => 'https://api.vpndetection.io';
@@ -39,6 +39,42 @@ my %OPTIONS = map { $_ => 1 } qw(
     api_key base_url cache_size cache_ttl concurrency retries timeout ua
 );
 
+# The shapes of the answers, from the pinned spec's schemas: a member it requires
+# and never sends as null is required, a nullable or optional one may be absent
+# or null, and every one present has the spec's type at every depth. A detail is
+# as optional as the plan makes it, so `{}` is one.
+my $VPN_DETAIL = [fields => [map { [$_ => ['string']] } qw(provider last_seen confidence method)]];
+my $CLASS_DETAIL = [fields => [map { [$_ => ['string']] } qw(provider confidence last_seen)]];
+my $PROXY_DETAIL = [fields => [
+    (map { [$_ => ['string']] } qw(provider first_seen last_seen)),
+    (map { [$_ => ['integer']] } qw(hits hits_days_pct providers_num)),
+]];
+my $PUBPROXY_DETAIL = [fields => [
+    [entry => ['boolean']], [exit => ['boolean']], [protocols => [list => ['string']]],
+    [num_ports => ['integer']], [num_proxies => ['integer']], [last_seen => ['string']],
+    [last_usable => ['string']],
+]];
+our $LOOKUP = [fields => [
+    [ip => ['string'], 1], [is_vpn => ['boolean'], 1],
+    (map { [$_ => ['boolean']] } qw(is_hosting is_relay is_tor is_cdn is_resproxy is_dcproxy is_mobproxy is_pubproxy)),
+    [vpn => $VPN_DETAIL],
+    (map { [$_ => $CLASS_DETAIL] } qw(hosting relay tor cdn)),
+    (map { [$_ => $PROXY_DETAIL] } qw(resproxy dcproxy mobproxy)),
+    [pubproxy => $PUBPROXY_DETAIL],
+]];
+our $BATCH_ERROR = [fields => [[status => ['integer'], 1], [error => ['string'], 1]]];
+# Each entry is judged alone, by _lookup_chunk_p.
+our $BATCH = [fields => [[results => [map_of => ['any']], 1], [errors => [map_of => ['any']], 1]]];
+our $ENTITLEMENT = [fields => [
+    [org_id => ['string'], 1],
+    [apikey => [fields => [[id => ['string'], 1], [expires => ['string']], [allowed_cidrs => [list => ['string']], 1]]], 1],
+    [plan => [fields => [[key => ['string'], 1], [tier => ['string'], 1]]], 1],
+    [usage => [fields => [
+        [requests => ['integer'], 1], [quota => ['integer'], 1], [hard_limit => ['integer']],
+        [window_start => ['string'], 1], [window_end => ['string'], 1],
+    ]], 1],
+]];
+
 sub new {
     my ($class, %args) = @_;
     my @unknown = sort grep { !$OPTIONS{$_} } keys %args;
@@ -55,8 +91,20 @@ sub new {
     Carp::croak('VPNDetection->new: timeout must be a number of seconds, 0 or more')
         unless Scalar::Util::looks_like_number($timeout) && $timeout >= 0;
 
+    # Trimmed, so a key read from a file loses its newline, and blanks alone are
+    # no key. Mojo refuses a CR or LF in a header with a raw string from every
+    # call and sends any other control character, so one left inside is refused
+    # here, naming the cause and not the key.
+    my $api_key = $args{api_key};
+    if (defined $api_key) {
+        $api_key =~ s/\A\s+|\s+\z//g;
+        $api_key = undef unless length $api_key;
+    }
+    Carp::croak('VPNDetection->new: api_key holds a control character')
+        if defined $api_key && $api_key =~ /[\x00-\x1f\x7f]/;
+
     my $self = bless {
-        api_key => $args{api_key},
+        api_key => $api_key,
         base_url => _base_url($args{base_url}),
         concurrency => $concurrency,
         retries => $retries,
@@ -120,7 +168,15 @@ sub lookup_p {
     my $flight = $self->_board($ip);
     my $url = $self->_url('/' . Mojo::Util::url_escape($ip, '^A-Za-z0-9\-._~:'));
     my $retries = defined $options{retries} ? $options{retries} : $self->{retries};
-    return $self->_retry_p($retries, sub { $self->_json_p($url, undef, $options{timeout}) })->then(
+    # Anything that dies before a request is under way lands the flight too, or
+    # every later lookup of the address would wait on it forever (3.8.0).
+    my $sent = eval { $self->_retry_p($retries, sub { $self->_json_p($url, undef, $options{timeout}, undef, $LOOKUP) }) };
+    if (!$sent) {
+        my $error = $@;
+        $self->_land($ip, $flight, 0, $error);
+        die $error;
+    }
+    return $sent->then(
         sub {
             my $result = VPNDetection::Result->from_wire(shift);
             # Only a served answer is cached, and before it lands, so a miss
@@ -178,7 +234,7 @@ sub my_ip_p {
 
     my $url = $self->_url('/myip');
     my $retries = defined $options{retries} ? $options{retries} : $self->{retries};
-    return $self->_retry_p($retries, sub { $self->_json_p($url, undef, $options{timeout}) })
+    return $self->_retry_p($retries, sub { $self->_json_p($url, undef, $options{timeout}, undef, $LOOKUP) })
         ->then(sub { VPNDetection::Result->from_wire(shift) });
 }
 
@@ -196,7 +252,7 @@ sub my_entitlement_p {
 
     my $url = $self->_url('/api/v1/entitlement');
     my $retries = defined $options{retries} ? $options{retries} : $self->{retries};
-    return $self->_retry_p($retries, sub { $self->_json_p($url, undef, $options{timeout}) });
+    return $self->_retry_p($retries, sub { $self->_json_p($url, undef, $options{timeout}, undef, $ENTITLEMENT) });
 }
 
 # Classify many addresses concurrently, keyed by address rather than positional,
@@ -323,19 +379,21 @@ sub _dispatch {
 sub _lookup_chunk_p {
     my ($self, $chunk, $retries, $timeout) = @_;
     my $url = $self->_url('/batch');
-    return $self->_retry_p($retries, sub { $self->_json_p($url, { ips => $chunk }, $timeout) })->then(
+    return $self->_retry_p($retries, sub { $self->_json_p($url, { ips => $chunk }, $timeout, undef, $BATCH) })->then(
         sub {
             my $body = shift;
-            my $results = ref $body->{results} eq 'HASH' ? $body->{results} : {};
-            my $errors = ref $body->{errors} eq 'HASH' ? $body->{errors} : {};
+            my $results = $body->{results};
+            my $errors = $body->{errors};
             my %answers;
+            # An entry is judged alone: one that is not an answer is that
+            # address's error, and the rest of the chunk keeps its answers.
             for my $ip (@$chunk) {
-                if (ref $results->{$ip} eq 'HASH') {
+                if (defined $results->{$ip} && !defined _nonconforming($LOOKUP, $results->{$ip}, [])) {
                     my $result = VPNDetection::Result->from_wire($results->{$ip});
                     $self->{cache}->set($ip, $result) if $self->{cache};
                     $answers{$ip} = $result;
                 }
-                elsif (ref $errors->{$ip} eq 'HASH') {
+                elsif (defined $errors->{$ip} && !defined _nonconforming($BATCH_ERROR, $errors->{$ip}, [])) {
                     $answers{$ip} = VPNDetection::Error->from_entry(
                         $errors->{$ip}{status}, $errors->{$ip}{error},
                     );
@@ -395,29 +453,82 @@ sub _retry_delay {
 }
 
 # $timeout is the call's own bound, or undef for the client's. $member, when
-# given, is the one member of the answer the call returns, a reference of type
-# $type: an object without it is no answer at all, so it fails inside the attempt
-# as a retried server_error, like any other 2xx that cannot be read, rather than
-# reaching the caller as undef.
+# given, is the one member of the answer the call returns; $shape is what the
+# whole answer must be (see _nonconforming), members the call never reads
+# included. An answer that is
+# not fails inside the attempt as a retried server_error, like any other 2xx that
+# cannot be read, rather than reaching the caller: through 3.8.0 a lookup's
+# `"is_hosting": "yes"`, a version of "3" and a list entry of null came back as
+# served, and `{}` as a lookup's answer.
 sub _json_p {
-    my ($self, $url, $body, $timeout, $member, $type) = @_;
+    my ($self, $url, $body, $timeout, $member, $shape) = @_;
     my $sent = defined $body ? $self->_post_p($url, $body, $timeout) : $self->_get_p($url, $timeout);
     return $sent->then(sub {
         my $res = shift->res;
         die VPNDetection::Error->from_response($res->code, $res->headers, $res->json)
             unless $res->is_success;
         my $decoded = $res->json;
-        die VPNDetection::Error->new(
-            kind => 'server_error', status => $res->code,
-            message => 'the API did not answer with a JSON object',
-        ) unless ref $decoded eq 'HASH';
-        return $decoded unless defined $member;
-        return $decoded->{$member} if ref $decoded->{$member} eq $type;
-        die VPNDetection::Error->new(
-            kind => 'server_error', status => $res->code,
-            message => "the API answered with no $member",
-        );
+        my $unreadable = sub {
+            die VPNDetection::Error->new(kind => 'server_error', status => $res->code, message => shift);
+        };
+        $unreadable->('the API did not answer with a JSON object') unless ref $decoded eq 'HASH';
+        return $decoded unless $shape;
+        my $wrong = _nonconforming($shape, $decoded, []);
+        $unreadable->($wrong) if defined $wrong;
+        return defined $member ? $decoded->{$member} : $decoded;
     });
+}
+
+# undef when the value has the shape, else what the API answered wrong, naming
+# the member by its path. A string is told from a number by the scalar Mojo::JSON
+# decoded it into, as VPNDetection::Oauth does, since nothing else in Perl tells
+# `"7"` from `7`. No list entry or map value may be null.
+sub _nonconforming {
+    my ($shape, $value, $at) = @_;
+    my ($kind, $inner) = @$shape;
+    my $wrong = sub { 'the API answered ' . (@$at ? join('.', @$at) : 'the answer') . ' of the wrong type' };
+    return $wrong->() unless defined $value;
+    return undef if $kind eq 'any';
+    if ($kind eq 'string') {
+        return VPNDetection::Oauth::_is_string($value) ? undef : $wrong->();
+    }
+    if ($kind eq 'integer') {
+        return !ref $value && !VPNDetection::Oauth::_is_string($value) && $value =~ /\A-?[0-9]+\z/
+            ? undef : $wrong->();
+    }
+    if ($kind eq 'boolean') {
+        return Scalar::Util::blessed($value) && $value->isa('JSON::PP::Boolean') ? undef : $wrong->();
+    }
+    if ($kind eq 'object') {
+        return ref $value eq 'HASH' ? undef : $wrong->();
+    }
+    if ($kind eq 'list') {
+        return $wrong->() unless ref $value eq 'ARRAY';
+        for my $i (0 .. $#$value) {
+            my $w = _nonconforming($inner, $value->[$i], [@$at, $i]);
+            return $w if defined $w;
+        }
+        return undef;
+    }
+    if ($kind eq 'map_of') {
+        return $wrong->() unless ref $value eq 'HASH';
+        for my $key (sort keys %$value) {
+            my $w = _nonconforming($inner, $value->{$key}, [@$at, $key]);
+            return $w if defined $w;
+        }
+        return undef;
+    }
+    return $wrong->() unless ref $value eq 'HASH';
+    for my $field (@$inner) {
+        my ($name, $member_shape, $required) = @$field;
+        if (!defined $value->{$name}) {
+            return 'the API answered with no ' . join('.', @$at, $name) if $required;
+            next;
+        }
+        my $w = _nonconforming($member_shape, $value->{$name}, [@$at, $name]);
+        return $w if defined $w;
+    }
+    return undef;
 }
 
 sub _get_p {
@@ -520,9 +631,9 @@ sub _headers {
     my %headers = (Accept => 'application/json');
     # One scheme, though the API offers three. Sending the same key as a bearer
     # token, a header and a query parameter at once is three times the exposure
-    # for one credential, and query strings end up in logs.
-    $headers{Authorization} = "Bearer $self->{api_key}"
-        if defined $self->{api_key} && length $self->{api_key};
+    # for one credential, and query strings end up in logs. A blank key is none
+    # at all (see new).
+    $headers{Authorization} = "Bearer $self->{api_key}" if defined $self->{api_key};
     return \%headers;
 }
 
@@ -610,7 +721,10 @@ before writing an C<if>.
 =item api_key
 
 Your API key. Omit it for the free tier, which answers C<ip> and C<is_vpn> and
-allows 1000 requests per day per source address.
+allows 1000 requests per day per source address; an empty or blank key is the
+same, and sends no C<Authorization> header. The key is trimmed, so one read from
+a file with its newline works; a key still holding a control character croaks
+here.
 
 =item base_url
 

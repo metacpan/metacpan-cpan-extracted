@@ -1,5 +1,5 @@
 #!perl
-use Test::More;
+use Test::More 0.88;
 
 
 use B qw(class);
@@ -17,13 +17,15 @@ my $callback = sub
 foreach my $op (values %{all_roots()}) {
   walkoptree_simple( $op, $callback );
 }
-my $expected = [8, 15, 17, 18, 20, 25, 29,
+my $expected = [8, 15, 17, 18, 20, 24, 27, 31,
                 # 30,    # See FIXME: below
-                34, 37, 40
-                # 37,
+                36, 42
                ];
-if ($] < 5.007) {
-  $expected =  [8, 15, 17, 18, 17, 20, 25, 29, 34, 37, 40];
+if ("$]" < 5.045003) {
+  $expected =  [8, 15, 17, 18, 20, 24, 27, 31, 36, 39, 42];
+}
+if ("$]" < 5.007) {
+  $expected =  [8, 15, 17, 18, 17, 20, 24, 27, 31, 36, 39, 42];
 }
 
 is_deeply(\@lines,

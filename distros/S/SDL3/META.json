@@ -2,7 +2,7 @@
    "X_No_Archive" : "Yes",
    "abstract" : "Perl Wrapper for the Simple DirectMedia Layer 3.0",
    "author" : [
-      "Sanko Robinson <sanko@cpan.org>"
+      "Sanko Robinson"
    ],
    "description" : "FFI Wrapper of SDL3",
    "dynamic_config" : 0,
@@ -45,8 +45,8 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Affix" : "v1.1.0",
-            "Alien::SDL3" : "v2.24.0"
+            "Affix" : "v1.2.7",
+            "Alien::SDL3" : "0"
          }
       },
       "configure" : {
@@ -62,6 +62,7 @@
             "File::Spec::Functions" : "0",
             "Getopt::Long" : "2.36",
             "JSON::PP" : "2",
+            "Module::Build::Tiny" : "0",
             "Path::Tiny" : "0.144"
          }
       },
@@ -91,8 +92,8 @@
       },
       "runtime" : {
          "requires" : {
-            "Affix" : "v1.1.0",
-            "Alien::SDL3" : "v2.24.0",
+            "Affix" : "v1.2.7",
+            "Alien::SDL3" : "0",
             "Carp" : "0",
             "Data::Dump" : "0",
             "perl" : "v5.40.0"
@@ -112,7 +113,19 @@
    "provides" : {
       "SDL3" : {
          "file" : "lib/SDL3.pm",
-         "version" : "v0.0.5"
+         "version" : "v0.0.6"
+      },
+      "SDL3::Image" : {
+         "file" : "lib/SDL3/Image.pm",
+         "version" : "v0.0.6"
+      },
+      "SDL3::Mixer" : {
+         "file" : "lib/SDL3/Mixer.pm",
+         "version" : "v0.0.6"
+      },
+      "SDL3::TTF" : {
+         "file" : "lib/SDL3/TTF.pm",
+         "version" : "v0.0.6"
       }
    },
    "release_status" : "stable",
@@ -130,7 +143,7 @@
          "web" : "https://github.com/Perl-SDL3/SDL3.pm"
       }
    },
-   "version" : "v0.0.5",
+   "version" : "v0.0.6",
    "x_help_wanted" : [
       "Tester",
       "Documenter"

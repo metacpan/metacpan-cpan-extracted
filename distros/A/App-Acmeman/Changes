@@ -1,3 +1,13 @@
+3.12 2026-10-20
+
+	- Further improvements in the Pound module
+
+3.11 2026-10-19
+
+	- Improvements in the Pound module:
+	- New options: --alt and --include-dir.
+	- Correct handling of pound v4.23 syntax.
+
 3.10 2024-05-08
 
 	- Catch fatal errors from the Net::ACME2 module.

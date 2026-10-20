@@ -121,7 +121,7 @@ subtest 'open: Enter on a file, a missing file, Backspace and ~' => sub {
 
 	$dialog->choose('nothing.txt');
 	ok $dialog->is_open, 'a missing file keeps the dialog open';
-	is $dialog->children->[-2]->text, 'There is no file nothing.txt in this folder.', 'and says so above the buttons, naming what was typed';
+	is $dialog->notice_text, 'There is no file nothing.txt in this folder.', 'and says so above the buttons, naming what was typed';
 
 	{
 		local $ENV{HOME} = "$top/notes";
@@ -162,7 +162,7 @@ subtest 'folder mode' => sub {
 	is $dialog->typed, '', 'and on ../ empties it';
 
 	$dialog->choose('missing');
-	is $dialog->children->[-2]->text, 'There is no folder missing in this folder.', 'a missing folder is a message';
+	is $dialog->notice_text, 'There is no folder missing in this folder.', 'a missing folder is a message';
 	$dialog->choose('notes');
 	is $answers, [ { button => 'choose', values => { path => "$top/notes" }, dismissed => 0 } ], 'Choose answers the folder in the field';
 
@@ -189,9 +189,9 @@ subtest 'save: the default extension and a missing folder' => sub {
 	my ( $dialog, $answers ) = opened( mode => 'save', default_extension => 'txt', name => 'draft' );
 	is $dialog->typed, 'draft', 'the field starts with the name';
 	$dialog->choose('nowhere/draft');
-	is $dialog->children->[-2]->text, 'There is no folder nowhere in this folder.', 'a missing folder is a message';
+	is $dialog->notice_text, 'There is no folder nowhere in this folder.', 'a missing folder is a message';
 	$dialog->choose("$top/nowhere/draft");
-	is $dialog->children->[-2]->text, "There is no folder $top/nowhere.", 'an absolute path is named as typed';
+	is $dialog->notice_text, "There is no folder $top/nowhere.", 'an absolute path is named as typed';
 	$dialog->choose('draft');
 	is $answers, [ { button => 'save', values => { path => File::Spec->catfile( $top, 'draft.txt' ) }, dismissed => 0 } ], 'a name without a dot gets the default extension';
 };
@@ -201,7 +201,7 @@ subtest 'save: a name that becomes a folder with the extension' => sub {
 	make_path("$folder/archive.kdl");
 	my ( $dialog, $answers ) = opened( mode => 'save', directory => $folder, default_extension => 'kdl' );
 	$dialog->choose('archive');
-	is $dialog->children->[-2]->text, 'archive.kdl is a folder.', 'is a message, not the Replace question';
+	is $dialog->notice_text, 'archive.kdl is a folder.', 'is a message, not the Replace question';
 	ok $dialog->is_open, 'the dialog stays open';
 	is $answers, [], 'and does not answer';
 	ref_is dialog_around( focused() ), $dialog, 'no question opened above it';

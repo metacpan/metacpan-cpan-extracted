@@ -5,7 +5,7 @@ use warnings;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 use Object::Pad 0.825;
 
@@ -31,9 +31,10 @@ role Term::Fabulous::Render
 		CLAY_RENDER_COMMAND_TYPE_CUSTOM
 	);
 	use Clay::UI::Revision qw(bump_revision);
+	use Clay::UI::Role::Layout::HasParent qw(is_widget);
 	use Feature::Compat::Try;
-	use Scalar::Util qw(blessed looks_like_number);
-	use Term::Fabulous::Check qw(describe);
+	use Scalar::Util qw(blessed looks_like_number refaddr weaken);
+	use Term::Fabulous::Check qw(describe positive_integer string);
 	use Term::Fabulous::Termbox qw(TB_OUTPUT_TRUECOLOR TB_DEFAULT);
 	use Term::Fabulous::Render::Attr qw(color_attr);
 	use Term::Fabulous::Render::Frame;
@@ -71,13 +72,18 @@ role Term::Fabulous::Render
 	# commands.
 	field $_painting_index;
 
-	# Code references to call once the next frame has been drawn.
-	field @_after_draw;
+	# The work to do after frames, in the order it was registered (see
+	# after_draw and each_draw): { code, owner, bound, key, repeat,
+	# frames, calls, done }. An owner is held weakly.
+	field @_frame_work;
+
+	my %FRAME_WORK_OPTIONS = ( after_draw => [qw(owner)], each_draw => [qw(owner name frames)] );
 
 	# Provided by Clay::UI.
 	method render;
 	method widget_for;
 	method measure_text;
+	method owns;
 
 	# Provided by the consumer: undef, or { x, y, down } of the pointer.
 	method pointer_state;
@@ -209,8 +215,45 @@ role Term::Fabulous::Render
 		$target->end_frame;
 		$self->finish_canvases;
 
-		# A callback may queue another one for the frame after this one.
-		$_->() foreach splice @_after_draw;
+		$self->_run_frame_work;
+		return;
+	}
+
+	# Runs the work that was registered when the frame was drawn; work
+	# registered meanwhile (a callback may queue more) waits for the next
+	# frame. Every due callback runs even if an earlier one dies, a dying
+	# one ends, and the first error is rethrown afterwards.
+	method _run_frame_work () {
+		my $first_error;
+		my @due = grep { !$_->{done} } @_frame_work;    # copies: callbacks change the list
+		foreach my $entry (@due) {
+			next if $entry->{done};    # replaced by a callback that ran before it
+			try { $self->_run_frame_entry($entry) }
+			catch ($error) {
+				$entry->{done} = 1;
+				$first_error //= $error;
+			}
+		}
+		@_frame_work = grep { !$_->{done} } @_frame_work;
+		die $first_error if defined $first_error;
+		return;
+	}
+
+	# Work bound to an owner ends unseen once the owner is gone or no
+	# longer in this UI; it is called with the owner.
+	method _run_frame_entry ($entry) {
+		my @arguments;
+		if ( $entry->{bound} ) {
+			my $owner = $entry->{owner};
+			if ( !defined $owner || !$self->owns($owner) ) {
+				$entry->{done} = 1;
+				return;
+			}
+			@arguments = ($owner);
+		}
+		$entry->{calls}++;
+		my $finished = $entry->{code}->(@arguments);
+		$entry->{done} = 1 if !$entry->{repeat} || $finished || ( defined $entry->{frames} && $entry->{calls} >= $entry->{frames} );
 		return;
 	}
 
@@ -228,15 +271,47 @@ role Term::Fabulous::Render
 		return;
 	}
 
-	method after_draw ($callback) {
-		die "Term::Fabulous::Render: after_draw needs a code reference, got " . ( ref $callback || ( defined $callback ? "'$callback'" : 'undef' ) )
-			unless ref $callback eq 'CODE';
-		push @_after_draw, $callback;
+	method after_draw ( $code, %options ) {
+		push @_frame_work, $self->_frame_work_entry( after_draw => $code, %options );
 		return $self;
 	}
+
+	# A registration with the owner and name of one still queued replaces
+	# it: the old one ends, the new one is queued last.
+	method each_draw ( $code, %options ) {
+		my $entry = $self->_frame_work_entry( each_draw => $code, %options );
+		$entry->{repeat} = 1;
+		if ( defined $entry->{key} ) {
+			$_->{done} = 1 foreach grep { defined $_->{key} && $_->{key} eq $entry->{key} } @_frame_work;
+			@_frame_work = grep { !$_->{done} } @_frame_work;
+		}
+		push @_frame_work, $entry;
+		return $self;
 	}
 
-	1;
+	method _frame_work_entry ( $method, $code, %options ) {
+		my %known   = map  { $_ => 1 } @{ $FRAME_WORK_OPTIONS{$method} };
+		my @unknown = grep { !$known{$_} } sort keys %options;
+		die "Term::Fabulous::Render: $method does not take @unknown (known: @{ $FRAME_WORK_OPTIONS{$method} })" if @unknown;
+		die "Term::Fabulous::Render: $method needs a code reference, got " . describe($code) unless ref $code eq 'CODE';
+		my $bound = exists $options{owner};
+		die "Term::Fabulous::Render: $method takes a widget as its owner, got " . describe( $options{owner} ) if $bound && !is_widget( $options{owner} );
+		my $name   = exists $options{name}   ? string( "Term::Fabulous::Render: $method", name => $options{name} )               : undef;
+		my $frames = exists $options{frames} ? positive_integer( "Term::Fabulous::Render: $method", frames => $options{frames} ) : undef;
+		my $entry  = {
+			code   => $code,
+			bound  => $bound,
+			owner  => $options{owner},
+			key    => defined $name ? ( $bound ? refaddr( $options{owner} ) : '' ) . "\0$name" : undef,
+			frames => $frames,
+			calls  => 0,
+		};
+		weaken $entry->{owner} if $bound;
+		return $entry;
+	}
+}
+
+1;
 
 __END__
 
@@ -429,9 +504,9 @@ frame paints every canvas in full.
 
 =item 6.
 
-Calls the code references queued with L</after_draw>, in the order
-they were queued. If painting died, they stay queued for the next
-frame.
+Runs the work registered with L</after_draw> and L</each_draw>, in
+the order it was registered. If painting died, it stays registered for
+the next frame.
 
 =back
 
@@ -458,16 +533,76 @@ otherwise termbox2 ignores the drawing.
 		...;    # the geometry of the frame just drawn
 	} );
 
-Queues a code reference that L</draw> calls once, with no arguments,
-after the next frame has been painted completely. Use it for work that
-needs the layout of a frame that has not been drawn yet, for example to
-scroll a row into view that was only just added: Clay::UI's
-C<bounding_box> and C<scroll_state> then answer for that frame. A
-change the callback makes (a scroll position, a widget property) shows
-in the frame after it, which is due at once. A callback may queue
-another one; it runs after the following frame. Anything but a code
-reference dies. Returns the UI object. An exception from a callback
-leaves C<draw> with it; the callbacks queued after it are dropped.
+	$ui->after_draw( sub ($chooser) { $chooser->close_unless_focused }, owner => $chooser );
+
+Queues a code reference that L</draw> calls once, after the next frame
+has been painted completely. Use it for work that needs the layout of a
+frame that has not been drawn yet, for example to scroll a row into
+view that was only just added: Clay::UI's C<bounding_box> and
+C<scroll_state> then answer for that frame. A change the callback makes
+(a scroll position, a widget property) shows in the frame after it,
+which is due at once. A callback may queue another one; it runs after
+the following frame.
+
+Without options the code is called with no arguments. With
+C<< owner => $widget >> it is I<owner-bound>: the UI holds the widget
+weakly and calls C<< $code->($widget) >>, or skips the call when the
+widget has been freed or is no longer part of this UI by then (see
+L<Clay::UI/owns>). That is how a widget asks for work after a frame
+without a closure that keeps it alive. Widgets usually go through
+L<Term::Fabulous::Widget/each_frame>.
+
+Anything but a code reference, an owner that is not a widget or
+another option dies. Returns the UI object. Every callback that is due
+runs even if an earlier one dies; the first exception then leaves
+C<draw>.
+
+=head2 each_draw
+
+	$ui->each_draw( sub ($view) { $view->report_position; return 0 }, owner => $view, name => 'report' );
+	$ui->each_draw( sub ($box) { return $box->try_again }, owner => $box, name => 'retry', frames => 8 );
+	$ui->each_draw( \&refresh_status );
+
+Registers a code reference that L</draw> calls after every frame from
+the next one on, until the registration ends. It ends
+
+=over
+
+=item *
+
+when the code returns a true value (return 0 to keep it);
+
+=item *
+
+after C<frames> calls, when C<frames> is given: the code runs after the
+first C<frames> frames drawn after the registration at most, whatever
+it returns. Without C<frames> there is no limit;
+
+=item *
+
+for an owner-bound registration (C<< owner => $widget >>, as for
+L</after_draw>), when the owner has been freed or is no longer part of
+this UI, without a call;
+
+=item *
+
+when a callback dies (see L</after_draw>);
+
+=item *
+
+when another registration with the same C<name> replaces it: one with
+the same owner, or, for a registration without an owner, another one
+without an owner. The old one ends, the new one is queued last. Give a
+name to work a widget may ask for repeatedly, such as a retry, so that
+only the latest request runs.
+
+=back
+
+The code is called with the owner, or with no arguments without one.
+Registrations run in the order they were made, after-draw and
+each-draw work together. C<name> must be a string and C<frames> a
+positive integer; another option dies, as for L</after_draw>. Returns
+the UI object.
 
 =head2 last_frame
 

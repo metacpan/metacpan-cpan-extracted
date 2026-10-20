@@ -386,12 +386,17 @@ subtest 'database responses are unwrapped at the right depth' => sub {
     my $family = {
         base => 'vpn_ip', name => 'VPN IP', summary => 'IP ranges observed as VPN infrastructure.',
         license_type => 'standard', starts => '2026-09-04T07:49:45.118Z', expires => undef,
-        in_term => 1, standing => 'licensed',
+        in_term => Mojo::JSON::true, standing => 'licensed',
         versions => [{
             id => 'vpn_ip_v1', version => 1, summary => 'IP ranges observed as VPN infrastructure.',
             formats => [{ format => 'csvgz', bytes => 111013959 }],
             sample_formats => ['csvgz'],
         }],
+    };
+    my $download = {
+        dataset_id => 'vpn_ip_v1', format => 'csvgz', outcome => 'ok', sample => Mojo::JSON::false,
+        bytes => 10, http_status => 302, apikey_id => undef, client_ip => undef, user_agent => undef,
+        created => '2026-09-02T10:00:00Z',
     };
     my %bodies = (
         '/api/v1/database/checksum' => {
@@ -399,8 +404,11 @@ subtest 'database responses are unwrapped at the right depth' => sub {
             checksums => { md5 => 'm', sha1 => 's1', sha256 => 's256', sha512 => 's512' },
         },
         '/api/v1/database/list' => { databases => [$family] },
-        '/api/v1/database/downloads' => { downloads => [{ dataset_id => 'vpn_ip_v1' }] },
-        '/api/v1/database/metadata' => { id => 'vpn_ip_v1', entries => 42 },
+        '/api/v1/database/downloads' => { downloads => [$download] },
+        '/api/v1/database/metadata' => {
+            id => 'vpn_ip_v1', updated => '2026-09-02', entries => 42,
+            schema => { csvgz => [{ name => 'ip', type => 'string' }] },
+        },
     );
     my $origin = VPNDetectionTest::Origin->new(sub {
         my ($c) = @_;
@@ -419,7 +427,7 @@ subtest 'database responses are unwrapped at the right depth' => sub {
     is($databases->[0]{base}, 'vpn_ip', 'a family is keyed by base, not by a dataset id');
     is($databases->[0]{versions}[0]{id}, 'vpn_ip_v1', 'and the id to download hangs off versions');
     ok(!exists $databases->[0]{docsGroup}, 'docsGroup is a docs-site slug, not API surface');
-    is_deeply($db->downloads, [{ dataset_id => 'vpn_ip_v1' }], 'downloads unwraps downloads');
+    is_deeply($db->downloads, [$download], 'downloads unwraps downloads');
     is($db->metadata('vpn_ip_v1')->{entries}, 42, 'metadata is the whole document');
 };
 
@@ -705,6 +713,201 @@ subtest 'my_entitlement surfaces an unauthorized key' => sub {
     eval { $client->my_entitlement };
     isa_ok($@, 'VPNDetection::Error', 'refused');
     is($@->kind, 'unauthorized', 'and says why');
+};
+
+# Through 3.8.0 each of these came back as the answer after one request: a
+# lookup's `"is_hosting": "yes"` and a detail of "x", an entitlement's requests
+# of "1", a version of "3", a list entry of null and a size of "760".
+subtest 'a member of the wrong type or a null is a retried server_error' => sub {
+    my $family = {
+        base => 'vpn_ip', name => 'VPN IP', summary => 's', license_type => undef, starts => undef,
+        expires => undef, renews_at => undef, notice_due_at => undef, in_term => \1, standing => 'licensed',
+        versions => [{ id => 'vpn_ip_v1', version => 1, formats => [{ format => 'csvgz', bytes => undef }] }],
+    };
+    my $version = $family->{versions}[0];
+    my $metadata = {
+        id => 'vpn_ip_v1', updated => '2026-09-02', entries => 42,
+        schema => { csvgz => [{ name => 'ip', type => 'string' }] }, size => { csvgz => 760 },
+        sample => { csvgz => [{ ip => '1.1.1.1' }] },
+    };
+    my $entitlement = {
+        org_id => 'o', apikey => { id => 'k', expires => undef, allowed_cidrs => [] },
+        plan => { key => 'max', tier => 'max' },
+        usage => { requests => 1, quota => 10, hard_limit => undef, window_start => 's', window_end => 'e' },
+    };
+    my $lookup = { ip => '9.9.9.9', is_vpn => \1 };
+    my @cases = (
+        ['lookup, a flag of "yes"', 'lookup', { %$lookup, is_hosting => 'yes' }],
+        ['lookup, a flag of 1', 'lookup', { %$lookup, is_tor => 1 }],
+        ['lookup, is_vpn of null', 'lookup', { %$lookup, is_vpn => undef }],
+        ['lookup, an empty object', 'lookup', {}],
+        ['lookup, a detail of "x"', 'lookup', { %$lookup, vpn => 'x' }],
+        ['lookup, a numeric string in a detail', 'lookup', { %$lookup, dcproxy => { hits => '3' } }],
+        ['lookup, a null protocol', 'lookup', { %$lookup, pubproxy => { entry => \1, protocols => [undef] } }],
+        ['my_ip, a flag of "yes"', 'my_ip', { %$lookup, is_relay => 'yes' }],
+        ['my_entitlement, requests of "1"', 'my_entitlement', { %$entitlement, usage => { %{ $entitlement->{usage} }, requests => '1' } }],
+        ['my_entitlement, a null CIDR', 'my_entitlement', { %$entitlement, apikey => { %{ $entitlement->{apikey} }, allowed_cidrs => [undef] } }],
+        ['my_entitlement, an empty object', 'my_entitlement', {}],
+        ['list, a version of "3"', 'list', { databases => [{ %$family, versions => [{ %$version, version => '3' }] }] }],
+        ['list, a version of "x"', 'list', { databases => [{ %$family, versions => [{ %$version, version => 'x' }] }] }],
+        ['list, in_term of "yes"', 'list', { databases => [{ %$family, in_term => 'yes' }] }],
+        ['list, a null family', 'list', { databases => [$family, undef] }],
+        ['list, versions of null', 'list', { databases => [{ %$family, versions => undef }] }],
+        ['list, a null format', 'list', { databases => [{ %$family, versions => [{ %$version, formats => [undef] }] }] }],
+        ['metadata, entries of "42"', 'metadata', { %$metadata, entries => '42' }],
+        ['metadata, a size of "760"', 'metadata', { %$metadata, size => { csvgz => '760' } }],
+        ['metadata, a size of null', 'metadata', { %$metadata, size => { csvgz => undef } }],
+        ['metadata, a null sample row', 'metadata', { %$metadata, sample => { csvgz => [undef] } }],
+        ['metadata, no updated', 'metadata', { %$metadata, updated => undef }],
+        ['checksums, no id', 'checksums', { format => 'csvgz', checksums => { md5 => 'a', sha1 => 'b', sha256 => 'c', sha512 => 'd' } }],
+        ['checksums, a sha256 of 5', 'checksums', { id => 'i', format => 'csvgz', checksums => { md5 => 'a', sha1 => 'b', sha256 => 5, sha512 => 'd' } }],
+        ['downloads, a null download', 'downloads', { downloads => [undef] }],
+        ['downloads, bytes of "10"', 'downloads', { downloads => [{
+            dataset_id => 'vpn_ip_v1', format => 'csvgz', outcome => 'ok', sample => \0, bytes => '10',
+            created => '2026-09-02T10:00:00Z',
+        }] }],
+    );
+    my $body;
+    my $origin = VPNDetectionTest::Origin->new(sub { $_[0]->render(json => $body) });
+    my $client = VPNDetection->new(base_url => $origin->url, api_key => 'k', retries => 1, cache_size => 0);
+    my %calls = (
+        lookup => sub { $client->lookup('9.9.9.9') },
+        my_ip => sub { $client->my_ip },
+        my_entitlement => sub { $client->my_entitlement },
+        list => sub { $client->database->list },
+        metadata => sub { $client->database->metadata('vpn_ip_v1') },
+        checksums => sub { $client->database->checksums('vpn_ip_v1', 'csvgz') },
+        downloads => sub { $client->database->downloads },
+    );
+    for my $case (@cases) {
+        my ($name, $call);
+        ($name, $call, $body) = @$case;
+        $origin->reset;
+        my $answer = eval { $calls{$call}->() };
+        my $error = $@;
+        ok(!defined $answer, "$name: no answer");
+        is(ref $error && $error->kind, 'server_error', "$name: a server_error");
+        is(ref $error && $error->status, 200, "$name: carrying the status");
+        is($origin->count, 2, "$name: retried");
+    }
+
+    # A member the spec makes nullable still reads as undef.
+    $body = { databases => [$family] };
+    is($client->database->list->[0]{expires}, undef, 'a nullable member reads');
+};
+
+# Through 3.8.0 a batch entry of the wrong type came back as a Result, and an
+# error entry whose status was "400" as an error of no known kind.
+subtest 'a batch entry of the wrong type is that address error alone' => sub {
+    my %results = (
+        '9.9.9.1' => { ip => '9.9.9.1', is_vpn => \1, is_cdn => 'yes' },
+        '9.9.9.2' => { ip => '9.9.9.2', is_vpn => \1, pubproxy => { num_ports => '3' } },
+        '9.9.9.3' => { ip => '9.9.9.3', is_vpn => undef },
+        '1.1.1.1' => { ip => '1.1.1.1', is_vpn => \0, pubproxy => {} },
+    );
+    my %errors = ('9.9.9.4' => { status => '400', error => 'bad' }, '9.9.9.5' => { status => 400, error => undef });
+    my $origin = VPNDetectionTest::Origin->new(sub { $_[0]->render(json => { results => \%results, errors => \%errors }) });
+    my $client = VPNDetection->new(base_url => $origin->url, retries => 1, cache_size => 0);
+    my $answers = $client->lookup_batch([sort(keys %results, keys %errors)]);
+
+    is($answers->{'1.1.1.1'}->is_vpn, 0, 'the readable entry is the answer');
+    for my $ip (qw(9.9.9.1 9.9.9.2 9.9.9.3 9.9.9.4 9.9.9.5)) {
+        isa_ok($answers->{$ip}, 'VPNDetection::Error', $ip);
+        is($answers->{$ip}->kind, 'server_error', "$ip: a server_error");
+        is($answers->{$ip}->status, 200, "$ip: carrying the status");
+    }
+    is($origin->count, 1, 'one unreadable entry does not retry the chunk');
+
+    %results = ();
+    %errors = ();
+    $origin->reset;
+    my $empty = VPNDetectionTest::Origin->new(sub { $_[0]->render(json => {}) });
+    $answers = VPNDetection->new(base_url => $empty->url, retries => 1, cache_size => 0)->lookup_batch(['9.9.9.9']);
+    is($answers->{'9.9.9.9'}->kind, 'server_error', 'a chunk of {} is unreadable');
+    is($empty->count, 2, 'and retried as a whole');
+};
+
+# Seconds as digits or RFC 9110's three date forms in GMT, and nothing else:
+# through 3.8.0 a fraction, ISO 8601, another zone and a day or month Mojo::Date
+# did not know were each read as a wait.
+subtest 'a Retry-After is digits or an HTTP date, and nothing else' => sub {
+    my $value;
+    my $origin = VPNDetectionTest::Origin->new(sub {
+        my ($c) = @_;
+        $c->res->headers->header('Retry-After' => $value);
+        $c->render(json => { error => 'slow' }, status => 429);
+    });
+    my $client = VPNDetection->new(base_url => $origin->url, retries => 0, cache_size => 0);
+    for my $v ('1.5', '2030-01-01T00:00:00Z', 'Sun, 06 Nov 2030 08:49:37 +0000', 'Sun, 06 Nov 2030 08:49:37 EST',
+        'Foo, 06 Nov 2030 08:49:37 GMT', 'Wed, 06 Xyz 2030 08:49:37 GMT', 'Tue, 31 Nov 2026 10:00:00 GMT') {
+        $value = $v;
+        eval { $client->lookup('9.9.9.9') };
+        is($@->kind, 'quota_exceeded', "$v is no wait");
+    }
+    for my $v ('Wed, 06 Nov 2030 08:49:37 GMT', 'Wednesday, 06-Nov-30 08:49:37 GMT', 'Wed Nov  6 08:49:37 2030', '7') {
+        $value = $v;
+        eval { $client->lookup('9.9.9.9') };
+        is($@->kind, 'rate_limited', "$v is a wait");
+        ok($@->retry_after > 0, "$v: a wait ahead");
+    }
+};
+
+# Through 3.8.0 a blank key went out as `Authorization: Bearer` and its blanks,
+# a key ending in a newline failed every call with Mojo's raw string, and
+# another control character went out on the wire.
+subtest 'a key is trimmed, blanks are none, and a control character is refused' => sub {
+    my @auth;
+    my $origin = VPNDetectionTest::Origin->new(sub {
+        my ($c) = @_;
+        push @auth, $c->req->headers->authorization;
+        $c->render(json => { ip => '9.9.9.9', is_vpn => \0 });
+    });
+    for my $key ('   ', "\t", '') {
+        @auth = ();
+        VPNDetection->new(base_url => $origin->url, api_key => $key, cache_size => 0)->lookup('9.9.9.9');
+        is($auth[0], undef, 'no Authorization for ' . Mojo::JSON::encode_json($key));
+    }
+    for my $key ("key\n", "key\r\n", ' key ') {
+        @auth = ();
+        VPNDetection->new(base_url => $origin->url, api_key => $key, cache_size => 0)->lookup('9.9.9.9');
+        is($auth[0], 'Bearer key', 'trimmed: ' . Mojo::JSON::encode_json($key));
+    }
+    for my $key ("key\x01", "k\ney", "k\x7fy") {
+        ok(!eval { VPNDetection->new(api_key => $key); 1 }, 'refused: ' . Mojo::JSON::encode_json($key));
+        like($@, qr/control character/, 'naming the cause');
+        unlike($@, qr/\Q$key\E/, 'and not the key');
+    }
+};
+
+# An empty field says nothing: through 3.8.0 `{"error": "", "rc": "NOT_LICENSED"}`
+# was an error with an empty message.
+subtest 'an empty envelope field gives way to the other' => sub {
+    my $body;
+    my $origin = VPNDetectionTest::Origin->new(sub { $_[0]->render(data => $body, status => 403) });
+    my $client = VPNDetection->new(base_url => $origin->url, cache_size => 0);
+    for my $case (['{"error":"","rc":"NOT_LICENSED"}', 'NOT_LICENSED'], ['{"rc":"","error":"bad"}', 'bad'],
+        ['{"error":"","rc":""}', 'request failed with status 403']) {
+        $body = $case->[0];
+        eval { $client->lookup('9.9.9.9') };
+        is($@->message, $case->[1], $case->[0]);
+    }
+};
+
+# Anything that died after an address boarded left its flight on the board
+# through 3.8.0, so every later lookup of the address waited forever.
+subtest 'a lookup that dies before its request leaves no flight behind' => sub {
+    {
+        package VPNDetectionTest::DyingAgent;
+        use parent -norequire, 'Mojo::UserAgent';
+        sub build_tx { die "no agent\n" }
+    }
+    my $client = VPNDetection->new(ua => VPNDetectionTest::DyingAgent->new, retries => 0);
+    ok(!eval { $client->lookup_p('9.9.9.9'); 1 }, 'the first lookup dies');
+    my $settled = 0;
+    my $second = eval { $client->lookup_p('9.9.9.9') };
+    $second->then(sub { $settled = 1 }, sub { $settled = 2 }) if $second;
+    Mojo::Promise->timer(0.2)->wait;
+    ok(!$second || $settled, 'the second is not left waiting on the first');
 };
 
 done_testing();

@@ -10,3 +10,8 @@
 0.004 2026-10-18
     - Add DFILE and DFILE_COLLAPSED pragmas
 
+0.005 2026-10-19
+    - Accept hex notation $hh and 0xhh in BASIC
+    - Add #ASM / #ENDASM to insert assembly code in line 0 REM
+
+

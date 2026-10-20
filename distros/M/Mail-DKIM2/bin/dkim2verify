@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# Standalone DKIM2 verifier CLI (draft-ietf-dkim-dkim2-spec-06).
+# Standalone DKIM2 verifier CLI (draft-ietf-dkim-dkim2-spec-07).
 #
 # Reads a message, verifies its DKIM2-Signature chain and Message-Instance
 # chain with Mail::DKIM2::Verifier, prints the result, and exits with the

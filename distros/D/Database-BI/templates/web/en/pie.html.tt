@@ -16,6 +16,17 @@
     word-break: break-all;
   }
   .chart-source a { color: inherit; }
+  /* A slice and its legend entry are controls: both open the matching rows. */
+  #pie_chart path:focus-visible {
+    stroke: #0d6efd;
+    stroke-width: 2px;
+    outline: none;
+  }
+  #pie_chart_legend .bi-pie-legend-entry:focus-visible {
+    outline: 2px solid #0d6efd;
+    outline-offset: 2px;
+    border-radius: 3px;
+  }
 </style>
 
 <p class="back-link"><a href="/">&larr; Home</a> &rsaquo; <a href="[% back_url | html %]">[% back_label || 'Back' | html %]</a>[%- IF back2_url -%] &rsaquo; <a href="[% back2_url | html %]">[% back2_label || 'Back' | html %]</a>[%- END -%]</p>
@@ -31,6 +42,9 @@
     [% IF slice_count > 12 %](top 12 shown)[% END %]
   </span>
 </div>
+
+<p class="sr-only" id="pie-drill-help">Drill into a slice: press Tab until the slice or its
+legend entry has focus, then press Enter or Space to open the matching rows in the table.</p>
 
 <div class="pie-container">
   <script src="https://d3js.org/d3.v7.min.js"></script>
@@ -58,6 +72,26 @@
     window.location.href = target;
   }
 
+  // A slice and its legend entry are the same control: both open the matching
+  // rows.  A keyboard reader gets the same thing a pointer reader does - the
+  // element is in the tab order, carries the category's name, and answers
+  // Enter and Space - rather than a title that is only read on hover.
+  function makeDrillable(el, label) {
+    el.style.cursor = 'pointer';
+    el.setAttribute('title', 'Filter table to: ' + label);
+    el.setAttribute('tabindex', '0');
+    el.setAttribute('role', 'button');
+    el.setAttribute('aria-label', 'Filter table to ' + label);
+    el.setAttribute('aria-describedby', 'pie-drill-help');
+    el.addEventListener('click', function () { drillDown(label); });
+    el.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        drillDown(label);
+      }
+    });
+  }
+
   // D3 creates the path elements synchronously; only the transition is deferred.
   // A short delay ensures the elements are in the DOM before we query them.
   setTimeout(function () {
@@ -65,9 +99,7 @@
     document.querySelectorAll('#pie_chart path').forEach(function (path) {
       var d = path.__data__;
       if (!d || !d.data || !d.data.label) return;
-      path.style.cursor = 'pointer';
-      path.setAttribute('title', 'Filter table to: ' + d.data.label);
-      path.addEventListener('click', function () { drillDown(d.data.label); });
+      makeDrillable(path, d.data.label);
     });
 
     // Wire legend entries: capture label text BEFORE any currency post-processing
@@ -77,9 +109,7 @@
       var slash = text.indexOf(' / ');
       var label = slash >= 0 ? text.substring(0, slash).trim() : text;
       if (!label) return;
-      el.style.cursor = 'pointer';
-      el.setAttribute('title', 'Filter table to: ' + label);
-      el.addEventListener('click', function () { drillDown(label); });
+      makeDrillable(el, label);
     });
 
     // Prepend the currency symbol to each legend amount after the ' / ' separator.

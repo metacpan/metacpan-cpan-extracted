@@ -111,6 +111,7 @@ include/punk/punk_markdown.h
 include/punk/punk_metrics.h
 include/punk/punk_model.h
 include/punk/punk_mpstream.h
+include/punk/punk_mrows.h
 include/punk/punk_multipart.h
 include/punk/punk_names.h
 include/punk/punk_oamount.h
@@ -205,6 +206,8 @@ lib/Punk/Logger.pm
 lib/Punk/Model.pm
 lib/Punk/Model/DBI.pm
 lib/Punk/Model/DBIx/Loop.pm
+lib/Punk/Model/JSONFile.pm
+lib/Punk/Model/Markdown.pm
 lib/Punk/Mount/Markdown.pm
 lib/Punk/Mount/Markdown/templates/app.css
 lib/Punk/Mount/Markdown/templates/page.tmpl
@@ -310,6 +313,8 @@ t/0520-model-dbil.t
 t/0521-model-dbil-fork.t
 t/0530-model-query.t
 t/0540-txn.t
+t/0550-model-jsonfile.t
+t/0551-model-markdown.t
 t/0600-openapi.t
 t/0601-under-openapi.t
 t/0602-oa-security.t
@@ -318,6 +323,12 @@ t/0610-docs-ui.t
 t/0620-markdown.t
 t/0621-markdown-search.t
 t/0622-markdown-abi.t
+t/0623-markdown-meta.t
+t/0624-markdown-seo.t
+t/0625-markdown-date.t
+t/0626-markdown-pages.t
+t/0627-markdown-vars.t
+t/0628-markdown-sections.t
 t/0700-csrf.t
 t/0710-cors.t
 t/0711-headers.t
@@ -380,6 +391,7 @@ t/1130-health.t
 t/1131-metrics.t
 t/1140-sitemap.t
 t/1141-sitemap-host.t
+t/1142-sitemap-markdown.t
 t/1150-i18n.t
 t/1151-i18n-negotiate.t
 t/1152-i18n-template.t
@@ -462,6 +474,7 @@ xs/log.xs
 xs/markdown.xs
 xs/metrics.xs
 xs/model.xs
+xs/mrows.xs
 xs/oamount.xs
 xs/password.xs
 xs/ratelimit.xs
@@ -486,6 +499,8 @@ xs/views.xs
 xs/websocket.xs
 xs/wshandshake.xs
 xs/wsroom.xs
+xt/0550-model-rows-oracle.t
 xt/boilerplate.t
+xt/lib/RowsOracle.pm
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -5,7 +5,7 @@ use warnings;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 use Object::Pad 0.825;
 
@@ -74,18 +74,17 @@ of a text
 =head1 DESCRIPTION
 
 L<Term::Fabulous> fires C<TextClick> on a L<Term::Fabulous::Widget::Text>
-(a L<Term::Fabulous::Widget::RichText> too) when a mouse button is
-pressed on one of its characters: the topmost thing painted in the
-cell under the pointer in the last frame is a line of the text, and
-the cell holds a character (not the empty rest of the line). Drags,
-releases and the wheel fire none.
+when a mouse button is pressed on one of its characters: the topmost
+thing painted in the cell under the pointer in the last frame is a
+line of the text, and the cell holds a character (not the empty rest
+of the line). Drags, releases and the wheel fire none.
 
 It comes after the C<Mouse> event of the same press, which goes to the
 widget around the text as always (see
 L<Term::Fabulous::Manual::Events/MOUSE>), and it bubbles from the text
 to its ancestors, so a container can listen for clicks on any text
 inside it: C<< $event->target >> is the text widget. A left press on a
-link of a RichText fires L<LinkActivate|Term::Fabulous::Event::LinkActivate>
+link of a Text fires L<LinkActivate|Term::Fabulous::Event::LinkActivate>
 after it.
 
 The event is a L<Clay::UI::Events::Event> whose name is C<TextClick>.
@@ -134,14 +133,14 @@ blank.
 
 =item C<spans>
 
-The spans of a RichText that cover the character, as
-L<Term::Fabulous::Widget::RichText/spans> gives them. Default: C<[]>.
+The spans of a Text that cover the character, as
+L<Term::Fabulous::Widget::Text/spans> gives them. Default: C<[]>.
 
 =item C<link>, C<link_index>
 
-The target of the RichText's link the character lies in, and the
+The target of the Text's link the character lies in, and the
 link's index among the widget's links (see
-L<Term::Fabulous::Widget::RichText/links>). Given together or not at
+L<Term::Fabulous::Widget::Text/links>). Given together or not at
 all; default C<undef>.
 
 =back
@@ -200,7 +199,7 @@ The offset after the word's last character.
 		...
 	}
 
-The spans of a RichText that cover the clicked character, in the order
+The spans of a Text that cover the clicked character, in the order
 they apply: C<[ $start, $end, $style ]> with the normalized style hash.
 Empty for a plain Text. The result is a copy.
 

@@ -8,18 +8,23 @@ use lib "$FindBin::Bin/../lib";
 
 # minify — PPI-minify Perl source files (comments, POD, whitespace).
 #
-# Thin front-end for App::SlimPacker::minify_file: reads each file, runs it
+# Thin front-end for App::SlimPacker::Minify::minify_file: reads each file, runs it
 # through the PPI minifier and prints the result to STDOUT (or -o FILE). The
-# default renames my variables to short names; --no-rename keeps them and
-# --rewrite enables the optional keyword/operator shortening pass.
+# default renames my variables and sub/method names to short names;
+# --no-rename-vars / --no-rename-subs keep them and --rewrite enables the
+# optional keyword/operator shortening pass.  The legacy --rename toggle still
+# works as a spelling of --rename-vars.  All toggles accept their --no-* form.
 
-my ($output, $no_rename, $rewrite);
+my ($output, $rename_vars, $rename_subs, $rename_exports, $rewrite) = (undef, 1, 1, 0, 0);
 Getopt::Long::Configure('no_ignorecase');
 Getopt::Long::GetOptionsFromArray(\@ARGV,
-    'o|output=s' => \$output,
-    'no-rename'  => \$no_rename,
-    'rewrite'    => \$rewrite,
-    'help'       => \my $help,
+    'o|output=s'    => \$output,
+    'rename!'       => \$rename_vars,   # legacy alias
+    'rename-vars!'  => \$rename_vars,
+    'rename-subs!'  => \$rename_subs,
+    'rename-exports!' => \$rename_exports,
+    'rewrite!'      => \$rewrite,
+    'help'          => \my $help,
 ) or exit 2;
 
 if ($help) {
@@ -28,16 +33,21 @@ minify — PPI-minify Perl source files (comments, POD, whitespace).
 
 Usage: minify [OPTIONS] FILE...
 
-  -o, --output FILE  write minified FILE to FILE (needs exactly one input;
-                     default: print to STDOUT)
-  --no-rename        minify but leave variable names untouched
-  --rewrite          also rewrite keywords/operators into shorter equivalent
-                     forms (foreach->for, m/->/, drop ; before }, +=1->++,
-                     $x=$x+$y->$x+=$y, print($x)->print $x); experimental
-  -h, --help         this help
+  -o, --output FILE       write minified FILE to FILE (needs exactly one input;
+                          default: print to STDOUT)
+  --rename-vars / --no-rename-vars   rename my variables (on by default)
+  --rename-subs / --no-rename-subs   rename sub/method names (on by default)
+  --rename-exports / --no-rename-exports  also rename names in qw() import /
+                          export lists and can()/import() strings (off by
+                          default; only meaningful together with --rename-subs)
+  --rewrite / --no-rewrite  rewrite keywords/operators into shorter equivalent
+                          forms (foreach->for, m/->, drop ; before }, +=1->++,
+                          $x=$x+$y->$x+=$y, print($x)->print $x); experimental,
+                          off by default
+  -h, --help              this help
 
-The default renames my variables to short names (a, b, ...). See
-App::SlimPacker's process() documentation for what is skipped.
+The default renames my variables and sub/method names to short names (a, b,
+...). See App::SlimPacker's process() documentation for what is skipped.
 USAGE
     exit 0;
 }
@@ -49,8 +59,10 @@ die "minify: missing source file\n" unless @ARGV;
 die "minify: -o needs exactly one source file\n" if $output && @ARGV > 1;
 
 my @out = map {
-    my $m = minify_file($_, rename => $no_rename ? 0 : 1,
-                           rewrite => $rewrite ? 1 : 0);
+    my $m = minify_file($_, rename_vars => $rename_vars,
+                           rename_subs => $rename_subs,
+                           rename_exports => $rename_exports,
+                           rewrite => $rewrite);
     $m .= "\n" unless $m =~ /\n\z/;
     $m;
 } @ARGV;
@@ -61,3 +73,73 @@ if ($output) {
 } else {
     print for @out;
 }
+__END__
+
+=head1 NAME
+
+minify - PPI-minify Perl source files
+
+=head1 SYNOPSIS
+
+  minify [options] FILE...
+  minify -o OUT FILE
+
+=head1 DESCRIPTION
+
+Thin front-end for L<App::SlimPacker::Minify>: each FILE is read, run through
+the PPI minifier (comments, POD and redundant whitespace are removed) and
+printed to STDOUT, or written to C<-o> FILE.  By default C<my> variables and
+sub/method names are renamed to short names.  Nothing is traced or bundled;
+see L<slimpack> for building standalone scripts.  C<slimpack minify> offers
+the same mode.
+
+=head1 OPTIONS
+
+=over 8
+
+=item -o, --output FILE
+
+Write the minified source to FILE instead of STDOUT.  Needs exactly one input
+file.
+
+=item --rename-vars, --no-rename-vars
+
+Rename C<my> variables to short names (default on).  The legacy spelling
+C<--rename>/C<--no-rename> is still accepted as an alias.
+
+=item --rename-subs, --no-rename-subs
+
+Rename sub and method names to short names (default on).  Names Perl
+dispatches or reads by name (builtins, magic methods, string arguments to
+C<< ->can(...) >>, ...) are kept verbatim.
+
+=item --rename-exports, --no-rename-exports
+
+Also rename names in C<qw()> import/export lists and C<can()>/C<import()>
+strings (default off; only meaningful together with C<--rename-subs>).
+
+=item --rewrite, --no-rewrite
+
+Rewrite keywords and operators into shorter equivalent forms (C<foreach> ->
+C<for>, C<m/.../> -> C</.../>, dropped C<;> before C<}>, C<$x += 1> ->
+C<$x++>, ...).  Experimental, default off.
+
+=item -h, --help
+
+Print a usage summary and exit.
+
+=back
+
+=head1 AUTHOR
+
+Nicolas Mendoza E<lt>mendoza@pvv.ntnu.noE<gt>
+
+=head1 LICENSE
+
+Artistic License 2.0.
+
+=head1 SEE ALSO
+
+L<slimpack>, L<App::SlimPacker>, L<App::SlimPacker::Minify>
+
+=cut

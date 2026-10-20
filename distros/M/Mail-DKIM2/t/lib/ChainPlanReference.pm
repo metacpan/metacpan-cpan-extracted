@@ -18,6 +18,9 @@ use warnings;
 use Exporter 'import';
 our @EXPORT_OK = qw(reference_walk plan_walk);
 
+# How many reference walks stopped at a Message-Instance that does not parse.
+our $UNPARSED = 0;
+
 use Mail::DKIM2::Common qw(parse_mime extract_mi_version);
 use Mail::DKIM2::MessageInstance;
 use Mail::DKIM2::BodyPlan;
@@ -40,7 +43,16 @@ sub reference_walk {
     while (1) {
         my ($num, $field) = _top_mi($msg);
         last unless $num;
-        my $mi = Mail::DKIM2::MessageInstance->parse($field);
+        # An instance that does not parse ends the walk, as in plan_walk,
+        # and is counted in $UNPARSED so a caller can say how many messages
+        # were not really compared. (The -06 charset corpus carries "b"
+        # Recipe steps, which -07 parses as invalid JSON; it needs
+        # recapturing after the -07 deploy.)
+        my $mi = eval { Mail::DKIM2::MessageInstance->parse($field) };
+        unless ($mi) {
+            $UNPARSED++;
+            last;
+        }
         my $hashes = $mi->get_tag('hashes') || {};
         for my $alg (grep { $hashes->{$_} } @ALGS) {
             $out{heads}{$num}{$alg} =

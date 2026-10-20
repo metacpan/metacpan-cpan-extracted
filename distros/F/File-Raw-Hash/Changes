@@ -1,5 +1,10 @@
 Revision history for File-Raw-Hash
 
+0.07    2026-10-19
+        - Faster md5, sha1, sha256 and sha512.
+        - sha1 and sha256 use ARMv8 SHA instructions when the CPU has them
+          (FRH_PORTABLE=1 disables).
+
 0.06    2026-08-31
         - Fix: build failures on Windows perls
 

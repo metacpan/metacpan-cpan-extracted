@@ -284,6 +284,54 @@ my $AUTHSERV = 'mail.dkim2.com';
     is(reflected_verifies($r->{message}), 'pass', 'T2: bridge-signed message verifies');
 }
 
+# --- -07 section 11: the reflector's From when it originates or changes ---
+sub from_of     { my $m = Email::MIME->new($_[0]); scalar $m->header_raw('From') }
+sub reply_to_of { my $m = Email::MIME->new($_[0]); scalar $m->header_raw('Reply-To') }
+{
+    # A DKIM1 bridge originates (our signature is i=1): From is ours, the
+    # sender's kept as Reply-To, the message starts again at m=1, and it
+    # verifies -- the From check (A1) included.
+    my $in = mi_only_input(
+        "From: \"A Sender\" <a\@test1.dkim2.com>\r\nTo: reflector-raw\@dkim2.com\r\nSubject: hi\r\n\r\nbody\r\n",
+        "$AUTHSERV; dkim=pass header.d=test1.dkim2.com");
+    my $r = Mail::DKIM2::Reflector::reflect(
+        %common, authserv_id => $AUTHSERV, mode => 'raw', message => $in);
+    is($r->{basis}, 'dkim1', 'bridge From: basis dkim1');
+    is(from_of($r->{message}), '"A Sender via DKIM2 reflector" <reflector-raw@test2.dkim2.com>',
+        'bridge From: rewritten to the reflector');
+    is(reply_to_of($r->{message}), '"A Sender" <a@test1.dkim2.com>', 'bridge From: sender kept as Reply-To');
+    my @mi = Email::MIME->new($r->{message})->header_raw('Message-Instance');
+    is(scalar @mi, 1, 'bridge From: one Message-Instance');
+    like($mi[0], qr/\bm=1;/, 'bridge From: ... m=1');
+    is(reflected_verifies($r->{message}), 'pass', 'bridge From: verifies, From Authentic for i=1');
+}
+{
+    # Continuing a DKIM2 chain and changing the message: From rewritten in
+    # the new instance, which our signature covers; the sender's From stays
+    # Authentic for i=1 at m=1.
+    my $in = signed_input("From: a\@test1.dkim2.com\r\nReply-To: list\@test1.dkim2.com\r\n"
+        . "To: reflector-body\@test2.dkim2.com\r\nSubject: hi\r\n\r\nbody\r\n");
+    my $r = Mail::DKIM2::Reflector::reflect(%common, mode => 'body', message => $in);
+    is(from_of($r->{message}), '"a@test1.dkim2.com via DKIM2 reflector" <reflector-body@test2.dkim2.com>',
+        'chain From: rewritten, named by the address when there is no display name');
+    is(reply_to_of($r->{message}), 'list@test1.dkim2.com', 'chain From: an existing Reply-To is kept');
+    is(reflected_verifies($r->{message}), 'pass', 'chain From: verifies');
+    my $undone = Mail::DKIM2::MessageInstance->undo(Email::MIME->new($r->{message}));
+    is(scalar $undone->header_raw('From'), 'a@test1.dkim2.com', 'chain From: undo gives the sender\'s From back');
+
+    # raw continuing a chain changes nothing.
+    my $raw = Mail::DKIM2::Reflector::reflect(%common, mode => 'raw', message => $in);
+    is(from_of($raw->{message}), 'a@test1.dkim2.com', 'raw chain: From unchanged');
+
+    # A display name that is not ASCII is RFC 2047 encoded.
+    my $utf = signed_input("From: =?UTF-8?Q?Caf=C3=A9?= <a\@test1.dkim2.com>\r\n"
+        . "To: reflector-subject\@test2.dkim2.com\r\nSubject: hi\r\n\r\nbody\r\n");
+    my $u = Mail::DKIM2::Reflector::reflect(%common, mode => 'subject', message => $utf);
+    like(from_of($u->{message}), qr/\A=\?UTF-8\?Q\?Caf=C3=A9_via_DKIM2_reflector\?= <reflector-subject\@test2\.dkim2\.com>\z/i,
+        'non-ASCII display name: encoded');
+    is(reflected_verifies($u->{message}), 'pass', 'non-ASCII display name: verifies');
+}
+
 # --- T2 negative: DKIM1 present but not aligned -> not signed ---
 {
     my $in = mi_only_input(
@@ -338,7 +386,10 @@ my $AUTHSERV = 'mail.dkim2.com';
         %common, authserv_id => $AUTHSERV, mode => 'body', message => $in);
     is($r->{signed}, 0, 'T3: unsigned (no DKIM2, no DKIM1)');
     my @mi = (Email::MIME->new($r->{message}))->header_raw('Message-Instance');
-    is(scalar @mi, 2, 'T3: change-recording MI added even though unsigned');
+    # Originating (no chain): the inbound m=1 is dropped and the message,
+    # From rewritten, starts again at m=1 (-07 section 11, 13).
+    is(scalar @mi, 1, 'T3: one MI, m=1, even though unsigned');
+    like($mi[0], qr/\bm=1;/, 'T3: ... started again at m=1');
     like($r->{message}, qr/Reflected and signed by the DKIM2 reflector/, 'T3: footer applied');
 }
 

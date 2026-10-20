@@ -25,7 +25,7 @@ use Text::ParseWords;
 use App::Acmeman::Log qw(:all :sysexits);
 use feature 'state';
 
-our $VERSION = '3.10';
+our $VERSION = '3.12';
 
 my $progdescr = "manages ACME certificates";
 

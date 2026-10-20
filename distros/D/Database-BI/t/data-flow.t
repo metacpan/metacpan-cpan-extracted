@@ -17,6 +17,7 @@ use Scalar::Util	qw(blessed);
 my $t = Test::Mojo->new('Database::BI');
 require Database::BI::Model::DataSource;
 require Database::BI::Controller::Dashboard;
+require Database::BI::Model::Geocode;
 
 # Direct references to :Private package functions (intact post-CHECK).
 my $DETECT_INFO  = \&Database::BI::Model::DataSource::_detect_file_info;
@@ -34,6 +35,9 @@ my $GET_COLS     = \&Database::BI::Controller::Dashboard::_get_columns;
 my $BUILD_URL    = \&Database::BI::Controller::Dashboard::_build_export_url;
 my $IS_SAFE      = \&Database::BI::Controller::Dashboard::_is_safe_url;
 my $SAFE_BACK    = \&Database::BI::Controller::Dashboard::_safe_back_url;
+my $HAS_POSITION = \&Database::BI::Model::Geocode::_has_position;
+my $COORDINATES  = \&Database::BI::Model::Geocode::_coordinates;
+my $BACKEND_OF   = \&Database::BI::Model::Geocode::_backend_of;
 
 Readonly my $DIR  => tempdir(CLEANUP => 1);
 
@@ -44,6 +48,93 @@ Readonly my @RECS => (
 	{ name => 'Carol', amount => '300', region => 'North' },
 );
 Readonly my @COLS => qw(name amount region);
+
+# ======================================================================
+# Geocode stub packages (duck-typed; no Geo::Coder::Free needed).
+# Used by sections 22-34.
+# ======================================================================
+
+{
+	package DF::GeoPoint;
+	# Minimal Geo::Location::Point-like object providing lat/lon/database.
+	sub new {
+		my ($class, %args) = @_;
+		return bless \%args, $class;
+	}
+	sub latitude  { return $_[0]->{lat} }
+	sub longitude { return $_[0]->{lon} }
+	sub database  { return $_[0]->{database} }
+}
+
+{
+	package DF::Geocoder;
+	# Known-answers geocoder: returns DF::GeoPoint for recognised cities.
+	# Increments $self->{calls} on each geocode_many invocation.
+	sub new {
+		my ($class, %known) = @_;
+		return bless { known => \%known, calls => 0 }, $class;
+	}
+	sub valid_location {
+		my ($self, $v) = @_;
+		return 0 unless defined($v) && length($v);
+		return 0 if $v =~ /\A\d+\z/;
+		return 1;
+	}
+	sub geocode_many {
+		my ($self, $places, %opts) = @_;
+		$self->{calls}++;
+		my %batch;
+		for my $p (@{$places}) {
+			$batch{$p} = $self->{known}{$p} if exists $self->{known}{$p};
+		}
+		return \%batch;
+	}
+}
+
+{
+	package DF::MissGeocoder;
+	# All-miss geocoder: valid_location is permissive; geocode_many returns {}.
+	sub new            { return bless { calls => 0 }, shift }
+	sub valid_location {
+		my ($self, $v) = @_;
+		return defined($v) && length($v) && $v !~ /\A\d+\z/ ? 1 : 0;
+	}
+	sub geocode_many {
+		my ($self, $places, %opts) = @_;
+		$self->{calls}++;
+		return {};
+	}
+}
+
+{
+	package DF::CountGeocoder;
+	# Reports a custom 'lookups' integer; all values are misses (no position).
+	sub new            { return bless { report_lookups => $_[1] }, $_[0] }
+	sub valid_location { return 1 }
+	sub geocode_many {
+		my ($self, $places, %opts) = @_;
+		return { lookups => $self->{report_lookups} };
+	}
+}
+
+# Coordinates for two known English seaside towns, used throughout sections 22-34.
+Readonly my $RAM_LAT =>  51.336;
+Readonly my $RAM_LON =>   1.416;
+Readonly my $MAR_LAT =>  51.384;
+Readonly my $MAR_LON =>   1.386;
+
+# _fresh_geo() -> ($geo, $gc)
+#
+# Creates a fresh Geocode object and its DF::Geocoder each call, so that the
+# geocoder's call counter ($gc->{calls}) starts at 0 for every subtest.
+sub _fresh_geo {
+	my $gc = DF::Geocoder->new(
+		Ramsgate => DF::GeoPoint->new(lat => $RAM_LAT, lon => $RAM_LON, database => 'stub'),
+		Margate  => DF::GeoPoint->new(lat => $MAR_LAT, lon => $MAR_LON, database => 'stub'),
+	);
+	my $geo = Database::BI::Model::Geocode->new(geocoder => $gc, openaddr => 'test');
+	return ($geo, $gc);
+}
 
 # ======================================================================
 # Section 1: _detect_file_info -- file handle Open-Use-Close lifecycle
@@ -1308,6 +1399,642 @@ subtest 'XLSX all-unsafe column headers -- opens without error_no_safe_id croak'
 		my $records = eval { $ds->fetch_all };
 		is scalar(@$records), 1, 'one data row read from XLSX with unsafe column names';
 	}
+};
+
+# ======================================================================
+# Section 22: Geocode _resolve -- cache copy-on-entry immutability
+#
+# DU chain:
+#   $opts->{'cache'}  D:caller -> U:_resolve (copied to %cache on entry)
+#   %cache            D:copy -> U:exists check -> D:new entries added
+#   $result->{'cache'} D:\%cache -> returned to caller
+#
+# The caller's hashref must NEVER be modified.  A mid-flight exception
+# must not leave a half-written cache in the caller's hashref.
+# ======================================================================
+
+subtest 'Geocode _resolve -- caller hashref unchanged after resolve_values' => sub {
+	my ($geo, $gc) = _fresh_geo();
+	my %caller_cache = (Ramsgate => [$RAM_LAT, $RAM_LON]);
+	my $caller_ref   = \%caller_cache;
+
+	$geo->resolve_values(['Ramsgate', 'Margate'], cache => $caller_ref);
+
+	is_deeply $caller_ref, { Ramsgate => [$RAM_LAT, $RAM_LON] },
+		'caller cache: Margate not added to caller hashref';
+	ok !exists($caller_ref->{'Margate'}), 'Margate key absent from caller hashref';
+};
+
+subtest 'Geocode _resolve -- returned cache is a separate reference' => sub {
+	my ($geo) = _fresh_geo();
+	my %input_cache;
+	my $result = $geo->resolve_values(['Ramsgate'], cache => \%input_cache);
+	isnt $result->{'cache'}, \%input_cache,
+		'returned cache hashref is not the same ref as caller cache';
+};
+
+subtest 'Geocode _resolve -- new resolved entries appear in returned cache' => sub {
+	my ($geo) = _fresh_geo();
+	my $result = $geo->resolve_values(['Ramsgate', 'Margate'], cache => {});
+	is_deeply $result->{'cache'}{'Ramsgate'}, [$RAM_LAT, $RAM_LON],
+		'Ramsgate in returned cache with correct coordinates';
+	ok exists($result->{'cache'}{'Margate'}), 'Margate also in returned cache';
+};
+
+subtest 'Geocode _resolve -- pre-existing [lat,lon] entry survives in returned cache' => sub {
+	my ($geo) = _fresh_geo();
+	my $result = $geo->resolve_values(
+		['Ramsgate'],
+		cache => { Ramsgate => [$RAM_LAT, $RAM_LON] },
+	);
+	is_deeply $result->{'cache'}{'Ramsgate'}, [$RAM_LAT, $RAM_LON],
+		'seeded [lat,lon] entry preserved in returned cache unchanged';
+};
+
+subtest 'Geocode _resolve -- 0 sentinel preserved and not re-attempted' => sub {
+	my ($geo, $gc) = _fresh_geo();
+	# Seed Ramsgate as a prior miss (0); it must not be sent to the geocoder.
+	my $result = $geo->resolve_values(['Ramsgate'], cache => { Ramsgate => 0 });
+	is $result->{'cache'}{'Ramsgate'}, 0, '0 sentinel not overwritten';
+	is $gc->{calls}, 0,                   'geocoder not called (prior miss remembered)';
+	is $result->{'counts'}{'unresolved'}, 1, 'prior miss counted as unresolved';
+	is $result->{'counts'}{'attempted'},  0, 'nothing attempted (all were cached)';
+};
+
+# ======================================================================
+# Section 23: Geocode _resolve -- %seen deduplication DU chain
+#
+# DU chain:
+#   %seen      D:empty -> D+U:$seen{$key}++ (post-increment)
+#   $distinct  D:0 -> U:++ on first occurrence only
+#
+# Post-increment semantics: $seen{$key}++ evaluates to 0 (falsy) for the
+# FIRST occurrence of each key (the "next if" does not fire), then to >=1
+# (truthy) for all subsequent occurrences (the "next if" fires).
+# undef and '' map to the same key '': only the first of them is counted
+# as distinct and pushed to @skipped; the rest are deduplicated silently.
+# ======================================================================
+
+subtest 'Geocode %seen -- duplicate values counted once in distinct' => sub {
+	my ($geo) = _fresh_geo();
+	my $result = $geo->resolve_values(['Ramsgate', 'Ramsgate', 'Ramsgate']);
+	is $result->{'counts'}{'distinct'}, 1, 'three copies: distinct == 1';
+	is $result->{'counts'}{'attempted'}, 1, 'only one lookup attempted';
+};
+
+subtest 'Geocode %seen -- undef and empty-string share the same seen key' => sub {
+	my ($geo) = _fresh_geo();
+	# undef, '', and a second undef all map to key ''.
+	# First occurrence: distinct++, push @skipped.  Others: "next if" fires.
+	my $result = $geo->resolve_values([undef, '', undef, '']);
+	is $result->{'counts'}{'distinct'}, 1,
+		'undef + empty-string: both map to key "", distinct == 1';
+	is $result->{'counts'}{'skipped'}, 1,
+		'only the first occurrence pushed to @skipped (not 4)';
+	is scalar(@{ $result->{'skipped'} }), 1, 'skipped arrayref has exactly 1 entry';
+};
+
+subtest 'Geocode %seen -- count invariant holds after deduplication' => sub {
+	my ($geo) = _fresh_geo();
+	# Input: [Ramsgate, Margate, Ramsgate, undef, undef]
+	# Distinct: Ramsgate=1, Margate=1, ''=1 -> distinct==3
+	my $result = $geo->resolve_values(
+		['Ramsgate', 'Margate', 'Ramsgate', undef, undef],
+	);
+	my $c = $result->{'counts'};
+	my $sum = $c->{'skipped'} + $c->{'cached'} + $c->{'attempted'} + $c->{'not_attempted'};
+	is $sum, $c->{'distinct'},
+		'invariant: skipped+cached+attempted+not_attempted == distinct (post-dedup)';
+};
+
+# ======================================================================
+# Section 24: Geocode _resolve -- $wanted vs $max cap DU chain
+#
+# DU chain:
+#   @pending  D:push -> U:scalar @pending -> $wanted (before truncation)
+#   $wanted   D:$wanted -> U:compare with $max, U:message arg
+#   @attempt  D:copy of @pending -> D:truncated to $max elements
+#   @not_attempted D:[] -> D:push overflow
+#   $capped   D:0 -> D:1 (when $wanted > $max)
+#
+# $wanted captures the PRE-TRUNCATION count; the cap message reports
+# "Geocoded M of the N places" where N==$wanted, M==scalar @attempt.
+# Overflow values must NOT appear in the returned cache (they are held
+# back so the next request can retry them).
+# ======================================================================
+
+subtest 'Geocode cap -- $wanted reflects total pending before truncation' => sub {
+	my $gc  = DF::MissGeocoder->new;
+	my $geo = Database::BI::Model::Geocode->new(geocoder => $gc, openaddr => 'test');
+	# 5 new values, max=2: $wanted==5, @attempt has 2, @not_attempted has 3.
+	my $result = $geo->resolve_values([qw(A B C D E)], max => 2, cache => {});
+	my $c = $result->{'counts'};
+	is $c->{'attempted'},     2, 'attempted == 2 (cap applied)';
+	is $c->{'not_attempted'}, 3, 'not_attempted == 3 (overflow)';
+	is $result->{'capped'},   1, 'capped flag set';
+	my @cap = grep { $_->{'key'} eq 'warn_map_geocode_capped' } @{ $result->{'messages'} };
+	is scalar(@cap), 1, 'exactly one cap message emitted';
+	like $cap[0]{'text'}, qr/2 of the 5/, 'cap message says "2 of the 5"';
+};
+
+subtest 'Geocode cap -- overflow values absent from returned cache' => sub {
+	my $gc  = DF::MissGeocoder->new;
+	my $geo = Database::BI::Model::Geocode->new(geocoder => $gc, openaddr => 'test');
+	my $result = $geo->resolve_values([qw(A B C D E)], max => 2, cache => {});
+	# C, D, E were held back -- must NOT appear in the returned cache at all.
+	ok !exists($result->{'cache'}{'C'}), 'C (overflow) not in returned cache';
+	ok !exists($result->{'cache'}{'D'}), 'D (overflow) not in returned cache';
+	ok !exists($result->{'cache'}{'E'}), 'E (overflow) not in returned cache';
+};
+
+subtest 'Geocode cap -- $capped is 0 when attempt count <= max' => sub {
+	my ($geo) = _fresh_geo();
+	my $result = $geo->resolve_values(['Ramsgate', 'Margate'], max => 500, cache => {});
+	is $result->{'capped'}, 0, 'capped == 0 when attempt count <= max';
+	my @cap = grep { $_->{'key'} eq 'warn_map_geocode_capped' } @{ $result->{'messages'} };
+	is scalar(@cap), 0, 'no cap message when not capped';
+};
+
+# ======================================================================
+# Section 25: Geocode _resolve -- count invariants
+#
+# DU chains for all count variables traced end-to-end.
+#
+# Invariant 1: skipped + cached + attempted + not_attempted  ==  distinct
+# Invariant 2: resolved + unresolved  ==  cached + attempted
+#
+# These must hold for every input shape: empty, all-cached, all-miss, mixed.
+# ======================================================================
+
+subtest 'Geocode count invariants -- empty input' => sub {
+	my ($geo) = _fresh_geo();
+	my $result = $geo->resolve_values([]);
+	my $c = $result->{'counts'};
+	is $c->{'distinct'}, 0, 'distinct == 0 for empty input';
+	my $sum = $c->{'skipped'} + $c->{'cached'} + $c->{'attempted'} + $c->{'not_attempted'};
+	is $sum, 0, 'sum == 0 for empty input';
+	is $c->{'resolved'} + $c->{'unresolved'}, $c->{'cached'} + $c->{'attempted'},
+		'invariant 2 holds for empty input';
+};
+
+subtest 'Geocode count invariants -- mixed input (cached, skipped, new-miss)' => sub {
+	my ($geo) = _fresh_geo();
+	# Ramsgate: cached resolved.  London: cached miss (0).  Oxford: new miss.
+	# undef: skipped.
+	my $result = $geo->resolve_values(
+		['Ramsgate', undef, 'London', 'Oxford'],
+		cache => { Ramsgate => [$RAM_LAT, $RAM_LON], London => 0 },
+	);
+	my $c = $result->{'counts'};
+	my $sum = $c->{'skipped'} + $c->{'cached'} + $c->{'attempted'} + $c->{'not_attempted'};
+	is $sum, $c->{'distinct'},
+		'invariant 1: skipped+cached+attempted+not_attempted == distinct';
+	is $c->{'resolved'} + $c->{'unresolved'}, $c->{'cached'} + $c->{'attempted'},
+		'invariant 2: resolved+unresolved == cached+attempted';
+};
+
+# ======================================================================
+# Section 26: Geocode resolve_column -- $found guard DU chain
+#
+# DU chain:
+#   $found  D:0 -> D:1 (when column key exists in any hashref row)
+#   Guard   croak if @{$rows} && !$found
+#
+# Edge cases:
+#   1. Empty @rows: guard body never reached (no croak for absent column).
+#   2. Column present with undef value: exists returns true -> $found=1.
+#   3. Column absent from ALL rows: $found stays 0 -> croak.
+#   4. Column present in SOME rows: $found=1 at first occurrence -> no croak.
+# ======================================================================
+
+subtest 'Geocode resolve_column -- empty rows: no croak regardless of column' => sub {
+	my ($geo) = _fresh_geo();
+	my $result;
+	lives_ok { $result = $geo->resolve_column([], 'nonexistent_col') }
+		'empty @rows: no croak even for absent column';
+	is $result->{'counts'}{'rows'}, 0, 'rows == 0';
+};
+
+subtest 'Geocode resolve_column -- column present with undef value: no croak' => sub {
+	my ($geo) = _fresh_geo();
+	lives_ok {
+		$geo->resolve_column(
+			[{ city => undef }, { city => 'Ramsgate' }], 'city',
+		);
+	} 'column present (even with undef value): $found==1, no croak';
+};
+
+subtest 'Geocode resolve_column -- column absent from all rows: croak' => sub {
+	my ($geo) = _fresh_geo();
+	throws_ok {
+		$geo->resolve_column([{ name => 'Alice' }, { name => 'Bob' }], 'city');
+	} qr/city.*is not in this dataset/i,
+		'croak error_map_loc_column when column absent from all rows';
+};
+
+subtest 'Geocode resolve_column -- column in SOME rows: $found=1, no croak' => sub {
+	my ($geo) = _fresh_geo();
+	lives_ok {
+		$geo->resolve_column(
+			[{ city => 'Ramsgate' }, { name => 'no city key here' }], 'city',
+		);
+	} 'column present in at least one row: $found=1, no croak';
+};
+
+# ======================================================================
+# Section 27: Geocode resolve_column -- $plotted counts rows, not values
+#
+# DU chain:
+#   %row_count  D:{} -> D:++ per @cells index (counts ALL occurrences)
+#   %first_row  D:{} -> D:set only on first occurrence
+#   $plotted    D:0 -> D:+= $row_count{$key} per plotted key
+#
+# $plotted is the SUM of per-value row counts, not the number of distinct
+# resolved values.  Three rows for "Ramsgate" contribute 3 to $plotted.
+# markers[] are ordered by first_row (ascending), not alphabetically.
+# ======================================================================
+
+subtest 'Geocode resolve_column -- $plotted counts rows not distinct values' => sub {
+	my ($geo) = _fresh_geo();
+	my $rows = [
+		{ city => 'Ramsgate' },
+		{ city => 'Ramsgate' },
+		{ city => 'Margate'  },
+		{ city => 'Ramsgate' },
+	];
+	my $result = $geo->resolve_column($rows, 'city');
+	# 2 distinct resolved cities, but 4 total rows -> plotted == 4.
+	is $result->{'counts'}{'plotted'}, 4,
+		'plotted == 4 (row count, not distinct resolved count)';
+	is $result->{'counts'}{'rows'}, 4, 'rows == 4';
+};
+
+subtest 'Geocode resolve_column -- markers ordered by first_row not alphabetically' => sub {
+	my ($geo) = _fresh_geo();
+	# Margate appears first; Ramsgate second (alphabetically Ramsgate < Margate reversed).
+	my $rows = [{ city => 'Margate' }, { city => 'Ramsgate' }];
+	my $result = $geo->resolve_column($rows, 'city');
+	my @m = @{ $result->{'markers'} };
+	is $m[0]{'value'}, 'Margate',  'first marker is Margate (first_row==0)';
+	is $m[1]{'value'}, 'Ramsgate', 'second marker is Ramsgate (first_row==1)';
+};
+
+subtest 'Geocode resolve_column -- marker rows field is per-value row count' => sub {
+	my ($geo) = _fresh_geo();
+	my $rows = [
+		{ city => 'Ramsgate' },
+		{ city => 'Ramsgate' },
+		{ city => 'Margate'  },
+	];
+	my $result = $geo->resolve_column($rows, 'city');
+	my %by_val = map { $_->{'value'} => $_ } @{ $result->{'markers'} };
+	is $by_val{'Ramsgate'}{'rows'}, 2, 'Ramsgate marker rows == 2';
+	is $by_val{'Margate'}{'rows'},  1, 'Margate marker rows == 1';
+};
+
+# ======================================================================
+# Section 28: Geocode _resolve -- $lookups default-then-override DU chain
+#
+# DU chain:
+#   $lookups  D:0 (outer scope) -> D:689 (batch->{'lookups'} OR scalar @attempt)
+#
+# The initializer D:677 ($lookups = 0 inside the if (@attempt) block) is
+# reached only when @attempt is non-empty.  When @attempt is empty the
+# outer D:0 stays.
+#
+# Two override paths:
+#   Path A: batch is a hashref with a 'lookups' key -> use that value
+#   Path B: batch has no 'lookups' key -> use scalar @attempt
+# ======================================================================
+
+subtest 'Geocode $lookups -- batch with lookups key: uses reported count' => sub {
+	# DF::CountGeocoder returns { lookups => 7 } regardless of input size.
+	my $gc  = DF::CountGeocoder->new(7);
+	my $geo = Database::BI::Model::Geocode->new(geocoder => $gc, openaddr => 'test');
+	my $result = $geo->resolve_values([qw(A B C)], cache => {});
+	is $result->{'counts'}{'lookups'}, 7,
+		'lookups == 7 (geocoder-reported, not scalar @attempt which is 3)';
+};
+
+subtest 'Geocode $lookups -- batch without lookups key: uses scalar @attempt' => sub {
+	my $gc  = DF::MissGeocoder->new;
+	my $geo = Database::BI::Model::Geocode->new(geocoder => $gc, openaddr => 'test');
+	# DF::MissGeocoder returns {} (no 'lookups' key) -> lookups == scalar @attempt.
+	my $result = $geo->resolve_values([qw(A B C)], cache => {});
+	is $result->{'counts'}{'lookups'}, 3,
+		'lookups == 3 (scalar @attempt; no geocoder-reported count)';
+};
+
+subtest 'Geocode $lookups -- empty @attempt: lookups stays at 0' => sub {
+	my ($geo) = _fresh_geo();
+	# Ramsgate already in cache -> nothing to attempt -> $lookups stays at 0.
+	my $result = $geo->resolve_values(
+		['Ramsgate'],
+		cache => { Ramsgate => [$RAM_LAT, $RAM_LON] },
+	);
+	is $result->{'counts'}{'lookups'}, 0,
+		'lookups == 0 when @attempt is empty (all cached)';
+};
+
+# ======================================================================
+# Section 29: Geocode models_with_cache -- DU immutability
+#
+# DU chain:
+#   \%models  D:caller -> U:1120 (read to copy $spec) -> never modified
+#   \%cache   D:caller -> U:1122 (copied to $spec->{'places'}) -> never modified
+#   $spec     D:shallow copy -> D:'places' set -> D:geo key inserted
+#   \%updated D:shallow copy of \%models -> D:'geo' replaced
+#
+# The caller's \%models and \%cache are never modified.
+# All other keys in \%models and all other geo specs are carried through.
+# ======================================================================
+
+subtest 'Geocode models_with_cache -- caller $models not modified' => sub {
+	my $models = {
+		calc => { foo => 1 },
+		geo  => { 'table:x' => { places => { A => 0 } } },
+	};
+	Database::BI::Model::Geocode->models_with_cache(
+		$models, 'table:x', { A => [$RAM_LAT, $RAM_LON] },
+	);
+	is_deeply $models->{'geo'}{'table:x'}{'places'}, { A => 0 },
+		'original $models not modified: A still 0 in caller hashref';
+};
+
+subtest 'Geocode models_with_cache -- caller $cache not modified' => sub {
+	my %orig_cache = (Ramsgate => [$RAM_LAT, $RAM_LON]);
+	Database::BI::Model::Geocode->models_with_cache(
+		{}, 'table:x', \%orig_cache, backend => 'test',
+	);
+	is_deeply \%orig_cache, { Ramsgate => [$RAM_LAT, $RAM_LON] },
+		'caller cache hashref not modified by models_with_cache';
+};
+
+subtest 'Geocode models_with_cache -- other models keys preserved' => sub {
+	my $models = { calc => { formula => 'x+y' }, groups => { col => {} } };
+	my $updated = Database::BI::Model::Geocode->models_with_cache(
+		$models, 'table:sales', { London => [$RAM_LAT, $RAM_LON] },
+	);
+	is_deeply $updated->{'calc'},   { formula => 'x+y' }, 'calc key preserved';
+	is_deeply $updated->{'groups'}, { col => {} },        'groups key preserved';
+};
+
+subtest 'Geocode models_with_cache -- other geo specs preserved' => sub {
+	my $models = {
+		geo => {
+			'table:sales' => { places => { A => [1.0, 2.0] } },
+			'table:other' => { places => { B => 0 } },
+		},
+	};
+	my $updated = Database::BI::Model::Geocode->models_with_cache(
+		$models, 'table:sales', { A => [$RAM_LAT, $RAM_LON] },
+	);
+	is_deeply $updated->{'geo'}{'table:other'}, { places => { B => 0 } },
+		'other geo spec (table:other) preserved';
+};
+
+subtest 'Geocode models_with_cache -- returned struct has correct places/backend/built' => sub {
+	my $updated = Database::BI::Model::Geocode->models_with_cache(
+		{}, 'table:x',
+		{ Ramsgate => [$RAM_LAT, $RAM_LON], Paris => 0 },
+		backend => 'MaxMind',
+		built   => '2026-10-18T12:00:00',
+	);
+	is_deeply $updated->{'geo'}{'table:x'}{'places'},
+		{ Ramsgate => [$RAM_LAT, $RAM_LON], Paris => 0 },
+		'places set correctly in returned struct';
+	is $updated->{'geo'}{'table:x'}{'backend'}, 'MaxMind',              'backend set';
+	is $updated->{'geo'}{'table:x'}{'built'},   '2026-10-18T12:00:00', 'built set';
+};
+
+# ======================================================================
+# Section 30: Geocode cache_from_models -- shallow copy DU chain
+#
+# DU chain:
+#   $entry  D:1050 (models->geo->spec) -> U:1052 (ref check) -> U:1054 (copy)
+#   return { %{ $entry->{'places'} } }  -- one level of copy only
+#
+# The returned hashref is a different reference from the original places.
+# Adding top-level keys to it does not affect $models.
+# But the inner [lat,lon] arrayrefs ARE shared (shallow copy of one level).
+# ======================================================================
+
+subtest 'Geocode cache_from_models -- returns a different hashref reference' => sub {
+	my $models = { geo => { 'table:x' => { places => { A => [1.0, 2.0] } } } };
+	my $cache  = Database::BI::Model::Geocode->cache_from_models($models, 'table:x');
+	isnt $cache, $models->{'geo'}{'table:x'}{'places'},
+		'returned hashref is a copy, not the original places hashref';
+};
+
+subtest 'Geocode cache_from_models -- adding key to returned cache does not modify models' => sub {
+	my $models = { geo => { 'table:x' => { places => { A => 0 } } } };
+	my $cache  = Database::BI::Model::Geocode->cache_from_models($models, 'table:x');
+	$cache->{'B'} = [9.0, 9.0];
+	ok !exists($models->{'geo'}{'table:x'}{'places'}{'B'}),
+		'adding key to returned cache does not modify $models';
+};
+
+subtest 'Geocode cache_from_models -- inner arrayrefs are shared (shallow copy)' => sub {
+	# DD anomaly note: modifying an inner [lat,lon] WOULD affect $models.
+	# This is documented behaviour (one level of copy), not a bug.
+	my $inner  = [51.3, 1.4];
+	my $models = { geo => { 'table:x' => { places => { A => $inner } } } };
+	my $cache  = Database::BI::Model::Geocode->cache_from_models($models, 'table:x');
+	is $cache->{'A'}, $inner,
+		'inner arrayref is the same reference (shallow copy -- one level only)';
+};
+
+subtest 'Geocode cache_from_models -- unknown spec returns {}' => sub {
+	my $models = { geo => { 'table:x' => { places => { A => 0 } } } };
+	my $cache  = Database::BI::Model::Geocode->cache_from_models($models, 'table:z');
+	is_deeply $cache, {}, 'unknown spec returns empty hashref';
+};
+
+# ======================================================================
+# Section 31: Global state integrity through Geocode operations
+#
+# DU anomaly targets:
+#   $_ -- must not be clobbered by any Geocode operation
+#   $@ -- must be clean after a successful call
+#
+# A function that uses $_ without localising it has a DU anomaly: it
+# modifies the caller's $_, an implicit write to a global with no
+# corresponding "kill" scoped to the function boundary.
+# ======================================================================
+
+subtest 'Geocode -- $_ not clobbered by resolve_values' => sub {
+	my ($geo) = _fresh_geo();
+	local $_ = 'sentinel';
+	$geo->resolve_values(['Ramsgate', 'Margate']);
+	is $_, 'sentinel', '$_ unchanged after resolve_values';
+};
+
+subtest 'Geocode -- $@ clean after a successful resolve_values' => sub {
+	my ($geo) = _fresh_geo();
+	$@ = '';  ## no critic
+	$geo->resolve_values(['Ramsgate']);
+	is $@, '', '$@ still empty after a successful call';
+};
+
+subtest 'Geocode -- $_ not clobbered by models_with_cache' => sub {
+	local $_ = 'sentinel';
+	Database::BI::Model::Geocode->models_with_cache(
+		{}, 'table:x', { A => [1.0, 2.0] },
+	);
+	is $_, 'sentinel', '$_ unchanged after models_with_cache';
+};
+
+subtest 'Geocode -- $_ not clobbered by cache_from_models' => sub {
+	local $_ = 'sentinel';
+	Database::BI::Model::Geocode->cache_from_models(
+		{ geo => { 'table:x' => { places => { A => 0 } } } }, 'table:x',
+	);
+	is $_, 'sentinel', '$_ unchanged after cache_from_models';
+};
+
+# ======================================================================
+# Section 32: Concurrent Geocode object isolation
+#
+# DU chain:
+#   $self->{'_geocoder'}  D:construction (injected geocoder pre-stored)
+#                         D:_load_geocoder (lazy load, once per object)
+#
+# Two Geocode objects with different geocoder stubs must not share the
+# _geocoder slot: each object's lazy-load cache is per-instance.
+# ======================================================================
+
+subtest 'Geocode concurrent objects -- different geocoders resolve independently' => sub {
+	my $gc_a = DF::Geocoder->new(
+		Ramsgate => DF::GeoPoint->new(lat => $RAM_LAT, lon => $RAM_LON, database => 'a'),
+	);
+	my $gc_b = DF::MissGeocoder->new;
+	my $geo_a = Database::BI::Model::Geocode->new(geocoder => $gc_a, openaddr => 'a');
+	my $geo_b = Database::BI::Model::Geocode->new(geocoder => $gc_b, openaddr => 'b');
+
+	my $ra = $geo_a->resolve_values(['Ramsgate'], cache => {});
+	my $rb = $geo_b->resolve_values(['Ramsgate'], cache => {});
+
+	ok  $HAS_POSITION->($ra->{'cache'}{'Ramsgate'}),
+		'geo_a resolved Ramsgate (known to its geocoder)';
+	ok !$HAS_POSITION->($rb->{'cache'}{'Ramsgate'}),
+		'geo_b did not resolve Ramsgate (miss geocoder)';
+};
+
+subtest 'Geocode concurrent objects -- _geocoder slot is per-instance' => sub {
+	my $gc_a = DF::Geocoder->new();
+	my $gc_b = DF::MissGeocoder->new;
+	my $geo_a = Database::BI::Model::Geocode->new(geocoder => $gc_a, openaddr => 'a');
+	my $geo_b = Database::BI::Model::Geocode->new(geocoder => $gc_b, openaddr => 'b');
+
+	$geo_a->geocoder_available();
+	$geo_b->geocoder_available();
+
+	isnt $geo_a->{'_geocoder'}, $geo_b->{'_geocoder'},
+		'_geocoder slot is a different reference between two objects';
+};
+
+# ======================================================================
+# Section 33: Geocode _geocoder -- lazy-load loaded at most once per object
+#
+# DU chain:
+#   $self->{'_geocoder'}  D:set on FIRST call to _geocoder()
+#   exists check in _geocoder() gates re-entry: the second call returns
+#   the cached value without calling _load_geocoder again.
+#
+# DD anomaly check: assigning to $self->{'_geocoder'} a second time
+# without reading it in between would be a DD.  The exists guard prevents
+# this: _load_geocoder is called once, and the result is stored once.
+# ======================================================================
+
+subtest 'Geocode _geocoder -- loaded at most once per object' => sub {
+	my ($geo) = _fresh_geo();
+
+	# First call: triggers the pre-set (injected geocoder path).
+	$geo->geocoder_available();
+
+	# Replace the stored geocoder with a sentinel to detect any re-assignment.
+	my $sentinel = DF::MissGeocoder->new;
+	$geo->{'_geocoder'} = $sentinel;
+
+	# Second call: must return the sentinel (no re-load overwrites it).
+	$geo->geocoder_available();
+	is $geo->{'_geocoder'}, $sentinel,
+		'_geocoder not reassigned on second call (loaded once, not again)';
+};
+
+subtest 'Geocode _geocoder -- injected geocoder is pre-set at construction' => sub {
+	my $gc  = DF::MissGeocoder->new;
+	my $geo = Database::BI::Model::Geocode->new(geocoder => $gc, openaddr => 'test');
+	is $geo->{'_geocoder'}, $gc,
+		'_geocoder slot pre-set to injected geocoder at construction (no lazy load needed)';
+};
+
+# ======================================================================
+# Section 34: Geocode -- TOCTOU: cache state mutation between resolve calls
+#
+# TOCTOU scenario: _resolve copies the caller's cache hashref on entry.
+# Even if the caller mutates that hashref after the call returns, the
+# RETURNED cache from that call is a separate copy and is unaffected.
+#
+# The property tested: once the function returns a cache, that returned
+# value is stable and does not change if the input hashref is later mutated.
+# ======================================================================
+
+subtest 'Geocode TOCTOU -- mutating caller cache after call does not corrupt returned cache' => sub {
+	my ($geo) = _fresh_geo();
+	my %shared;
+	my $result = $geo->resolve_values(['Ramsgate'], cache => \%shared);
+
+	# After the call: corrupt the caller's hashref.
+	$shared{'Ramsgate'} = 'CORRUPTED';
+
+	# The returned cache is a separate copy -- still holds the valid entry.
+	ok $HAS_POSITION->($result->{'cache'}{'Ramsgate'}),
+		'returned cache unaffected by post-call mutation of the input hashref';
+};
+
+subtest 'Geocode TOCTOU -- second call uses the cache state at its own call time' => sub {
+	my ($geo) = _fresh_geo();
+	my %shared;
+
+	# First call: Ramsgate is new, gets resolved and added to returned cache.
+	my $r1 = $geo->resolve_values(['Ramsgate'], cache => \%shared);
+	is $r1->{'counts'}{'attempted'}, 1, 'first call: Ramsgate attempted';
+
+	# Feed the first result back into the shared hashref.
+	%shared = %{ $r1->{'cache'} };
+
+	# Second call (fresh object to reset geocoder call count):
+	# Ramsgate is now cached -- must not be attempted again.
+	my ($geo2) = _fresh_geo();
+	my $r2 = $geo2->resolve_values(['Ramsgate'], cache => \%shared);
+	is $r2->{'counts'}{'attempted'}, 0, 'second call: Ramsgate not re-attempted (cached)';
+	is $r2->{'counts'}{'cached'},    1, 'second call: Ramsgate counted as cached';
+};
+
+subtest 'Geocode TOCTOU -- two resolve calls with same input cache each get their own copy' => sub {
+	# Simulates two parallel requests over the same shared cache hashref.
+	# Each resolve_values() copies the cache on entry: the two operations do not
+	# interfere even though they share the same input pointer.
+	my $gc = DF::Geocoder->new(
+		Ramsgate => DF::GeoPoint->new(lat => $RAM_LAT, lon => $RAM_LON, database => 'stub'),
+		Margate  => DF::GeoPoint->new(lat => $MAR_LAT, lon => $MAR_LON, database => 'stub'),
+	);
+	my $geo1 = Database::BI::Model::Geocode->new(geocoder => $gc, openaddr => 'test');
+	my $geo2 = Database::BI::Model::Geocode->new(geocoder => $gc, openaddr => 'test');
+	my %shared;
+
+	my $r1 = $geo1->resolve_values(['Ramsgate'], cache => \%shared);
+	my $r2 = $geo2->resolve_values(['Margate'],  cache => \%shared);
+
+	# The shared input hashref was never modified by either call.
+	is_deeply \%shared, {}, 'shared input hashref unchanged by both calls';
+
+	# Each returned cache contains only what THAT call resolved.
+	ok  $HAS_POSITION->($r1->{'cache'}{'Ramsgate'}), 'r1 cache has Ramsgate';
+	ok !exists($r1->{'cache'}{'Margate'}),            'r1 cache has no Margate';
+	ok  $HAS_POSITION->($r2->{'cache'}{'Margate'}),   'r2 cache has Margate';
+	ok !exists($r2->{'cache'}{'Ramsgate'}),            'r2 cache has no Ramsgate';
 };
 
 done_testing;

@@ -8,14 +8,13 @@ no warnings 'experimental::signatures';
 use Term::Fabulous;
 use Term::Fabulous::Termbox qw(TB_KEY_MOUSE_LEFT TB_KEY_MOUSE_MIDDLE TB_KEY_MOUSE_RIGHT);
 use Term::Fabulous::Widget::Box;
-use Term::Fabulous::Widget::RichText;
 use Term::Fabulous::Widget::Text;
 use Clay::XS qw(sizing_grow sizing_fixed CLAY_TOP_TO_BOTTOM);
 
 my %meaning_of = (
 	cell     => 'one character position of the terminal',
 	grapheme => 'what a reader sees as one character',
-	span     => 'a range of a RichText with a look of its own',
+	span     => 'a range of a Text with a look of its own',
 	terminal => 'the program that shows this one',
 	widget   => 'a part of the screen that draws itself',
 );
@@ -29,12 +28,12 @@ my $root = Term::Fabulous::Widget::Box->new(
 	},
 );
 
-# A plain Text and a RichText, wrapped at 48 columns by the box around
+# A plain Text and one with a span, wrapped at 48 columns by the box around
 # them. A click on either fires TextClick on it.
 my $article = Term::Fabulous::Widget::Box->new( layout => { layout_direction => CLAY_TOP_TO_BOTTOM, sizing => { width => sizing_fixed(48) }, child_gap => 1 } );
 $article->add_child(
-	Term::Fabulous::Widget::Text->new( text => 'Every widget draws into the cells of the terminal. A wide grapheme takes two cells.' ),
-	Term::Fabulous::Widget::RichText->new( markup => 'A [bold #e5c07b]span[/] changes the look of part of a text; the click reports the spans under the pointer.' ),
+	Term::Fabulous::Widget::Text->new( text   => 'Every widget draws into the cells of the terminal. A wide grapheme takes two cells.' ),
+	Term::Fabulous::Widget::Text->new( markup => 'A [bold #e5c07b]span[/] changes the look of part of a text; the click reports the spans under the pointer.' ),
 );
 
 my $meaning = Term::Fabulous::Widget::Text->new( text => 'Left-click a word to look it up.',                       text_color => [ 152, 195, 121, 255 ] );

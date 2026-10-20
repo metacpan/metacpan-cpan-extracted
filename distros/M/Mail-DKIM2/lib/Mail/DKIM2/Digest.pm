@@ -2,7 +2,7 @@ package Mail::DKIM2::Digest;
 use strict;
 use warnings;
 
-our $VERSION = '0.22';
+our $VERSION = '0.25';
 
 use Carp;
 use Crypt::Digest::SHA256 ();

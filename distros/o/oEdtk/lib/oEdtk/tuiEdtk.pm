@@ -9,7 +9,7 @@ BEGIN {
 	use Term::ReadKey;
 	use oEdtk::trackEdtk qw(env_Var_Completion);
 
-	$VERSION = 2.1126;
+	$VERSION = 2.1129;
 	@ISA     = qw(Exporter);
 	@EXPORT  = qw(
 		clear_Screen	start_Screen	stop_Screen

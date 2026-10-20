@@ -1,5 +1,5 @@
 package Clay::UI::Grid;
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 use v5.22;
 use warnings;
 use feature 'signatures';
@@ -546,7 +546,7 @@ the same layout pass as the rest of the UI.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-clay-xs/v0.06/images/grid.png" alt="A table with a dark header row Name, E-mail, Amount; the rows Alice and Bob; a grey row reading Guests (a spanning row) across all columns; and the row Carol. Every column is as wide as its widest cell and the amounts are right-aligned."></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-clay-xs/v0.07/images/grid.png" alt="A table with a dark header row Name, E-mail, Amount; the rows Alice and Bob; a grey row reading Guests (a spanning row) across all columns; and the row Carol. Every column is as wide as its widest cell and the amounts are right-aligned."></p>
 
 =end html
 
@@ -690,6 +690,12 @@ them like any other children down to that minimum. Every row of a grid
 compresses alike, so the columns stay aligned. To wrap a column at a
 chosen width instead, give it a maximum (C<sizing_fit(0, 200)>,
 C<sizing_grow(0, 200)>) or a fixed width in every row.
+
+Text that does not wrap (C<CLAY_TEXT_WRAP_NEWLINES>,
+C<CLAY_TEXT_WRAP_NONE>) keeps its width while other columns can still
+shrink. When they cannot, its column gets narrower too and the text is
+cut off, a long word as well; the cells of a column share how far they
+can get, so the columns stay aligned.
 
 =head1 SPANNING ROWS
 

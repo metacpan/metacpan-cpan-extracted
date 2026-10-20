@@ -2,7 +2,7 @@ package Mail::DKIM2::HeaderPlan;
 use strict;
 use warnings;
 
-our $VERSION = '0.22';
+our $VERSION = '0.25';
 
 use Carp;
 use Scalar::Util qw(refaddr);
@@ -36,6 +36,7 @@ sub new {
         by_m     => {},
         raw      => {},    # lc name => its fields, bottom up
         literals => [],
+        raw_literals => [],
     }, $class;
     for my $raw (reverse @{ _raw_fields($header) }) {
         push @{$self->{raw}{lc substr($raw, 0, index($raw, ':'))}}, $raw;
@@ -111,7 +112,7 @@ sub plan {
     for my $mi (@mis) {
         my $m = 0 + $mi->get_tag('m');    # m=01 is 1
         my $hashes = $mi->get_tag('hashes') || {};
-        my $inst = $self->{by_m}{$m} = {};
+        my $inst = $self->{by_m}{$m} = { lists => $lists };
         if ($lists) {
             my $data = join '', map {
                 ($text{refaddr $lists->{$_}} //= [$lists->{$_}, $self->_text($_, $lists->{$_})])->[1]
@@ -138,6 +139,8 @@ sub plan {
             }
             my $first = @{$self->{literals}};
             $next{$lc} = Mail::DKIM2::BodyPlan::compose($cur, $rh->{$h}, $self->{literals});
+            # values_at() wants them as they are.
+            push @{$self->{raw_literals}}, @{$self->{literals}}[$first .. $#{$self->{literals}}];
             # Literals are values of this name: canonicalize them as such.
             $_ = dkim2_canonicalize_header("$lc: $_\r\n")
                 for @{$self->{literals}}[$first .. $#{$self->{literals}}];
@@ -178,6 +181,22 @@ sub recipe_error {
     my ($self, $m) = @_;
     my $inst = $self->{by_m}{0 + $m} or return undef;
     return $inst->{error};
+}
+
+# values_at($m, $name): the values of the fields named $name in the header
+# as it was when instance m= was the highest (the header Recipes above it
+# applied), each as Email::Simple's header_raw gives it; undef if a header
+# Recipe on the way down does not undo. Bottom up, as Recipes number them.
+sub values_at {
+    my ($self, $m, $name) = @_;
+    my $inst = $self->{by_m}{0 + $m} or return undef;
+    my $lists = $inst->{lists} or return undef;
+    my $lc = lc $name;
+    my $raw = $self->{raw}{$lc} || [];
+    return [ map {
+        my ($type, $s, $e) = @$_;
+        $type ? @{$self->{raw_literals}}[$s .. $e] : map { _value($raw->[$_ - 1]) } $s .. $e
+    } @{ $lists->{$lc} || [] } ];
 }
 
 # rewrites_instances(): a header Recipe names Message-Instance. Undoing it
@@ -259,6 +278,14 @@ Recipe that does not undo, or for an algorithm the instance does not use.
 
 Why instance C<$m>'s header Recipe does not undo, in
 L<Mail::DKIM2::MessageInstance/undo>'s words; undef if it does.
+
+=head2 values_at($m, $name)
+
+An arrayref of the values of the fields named C<$name> in the header as it
+was when instance C<$m> was the highest -- the header Recipes above it
+applied -- each as Email::Simple's C<header_raw> gives it, bottom up; undef
+if a header Recipe on the way down does not undo. The Verifier reads each
+version's From fields from it (-07 section 11). New in 0.23.
 
 =head2 rewrites_instances()
 

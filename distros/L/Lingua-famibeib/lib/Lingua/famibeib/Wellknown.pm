@@ -19,7 +19,7 @@ use Data::Identifier::Util;
 use Data::Displaycolour v0.07;
 use Data::IconText v0.06;
 
-our $VERSION = v0.07;
+our $VERSION = v0.08;
 
 use parent qw(Data::Identifier::Interface::Known);
 
@@ -150,7 +150,7 @@ Lingua::famibeib::Wellknown - database of famibeib words
 
 =head1 VERSION
 
-version v0.07
+version v0.08
 
 =head1 SYNOPSIS
 

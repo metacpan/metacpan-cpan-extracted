@@ -16,6 +16,7 @@ use Term::Fabulous::Editor;
 use Term::Fabulous::Terminal::Memory;
 use Term::Fabulous::Theme::Document;
 use Term::Fabulous::ThemeEditor;
+use Term::Fabulous::ThemeEditor::ValueDialog;
 use Term::Fabulous::Widget::Box;
 use Term::Fabulous::Widget::Text;
 
@@ -170,6 +171,36 @@ subtest 'editing a setting in the form' => sub {
 	is $tab->document->setting('text_input.border.enabled'), 'true', 'the list chooses true';
 	like $tab->text, qr/enabled=#true/, 'which the file holds as #true';
 	is $editor->ui->preview_theme->look( 'text_input', 'border.enabled' ), 1, 'and the preview frames text fields';
+};
+
+subtest 'the value dialog reports through Change and Answer' => sub {
+	my ( $editor, $press ) = editor();
+	my $ui           = $editor->ui;
+	my $value_dialog = sub (%params) {
+		my $dialog = Term::Fabulous::ThemeEditor::ValueDialog->new( key => 'palette.accent', current => '#5fd3c0', palette => {}, %params );
+		my ( @previews, @answers );
+		$dialog->on( Change => sub ($event) { push @previews, $event->value;                                         return } );
+		$dialog->on( Answer => sub ($event) { push @answers,  [ $event->button, $event->values, $event->dismissed ]; return } );
+		$dialog->open($ui);
+		$ui->step;
+		return ( $dialog, \@previews, \@answers );
+	};
+
+	my ( $dialog, $previews, $answers ) = $value_dialog->();
+	is [ $dialog->title, $dialog->button_ids, $dialog->placement ], [ 'Edit palette.accent', 'apply', 'cancel', 'right' ], 'the title, Apply and Cancel, on the right';
+	$press->( 'Ctrl+A', 'type:#ff0000' );
+	is $previews->[-1], '#ff0000', 'a value typed fires Change for the preview';
+	$press->('Enter');
+	is $answers, [ [ 'apply', { value => '#ff0000' }, 0 ] ], 'Enter answers apply with the value';
+
+	( $dialog, $previews, $answers ) = $value_dialog->( is_set => 1 );
+	is [ $dialog->button_ids ], [qw(apply reset cancel)], 'a setting the theme has offers Reset';
+	$dialog->press_button('reset');
+	is $answers, [ [ 'reset', {}, 0 ] ], 'Reset answers reset';
+
+	( $dialog, $previews, $answers ) = $value_dialog->();
+	$press->('Escape');
+	is $answers, [ [ 'cancel', {}, 1 ] ], 'Escape answers cancel, dismissed';
 };
 
 subtest 'resetting settings' => sub {
@@ -399,11 +430,29 @@ subtest 'variants' => sub {
 	$editor->ui->step;
 	ok $editor->form->has_row('button[danger].text'), 'a new variant shows in the form';
 	is [ $tab->document->variants ], [], 'without settings it is not in the file yet';
+	my $form = $editor->form;
+	is $form->section_info('#variant:button:danger'), { kind => 'variant', family => 'button', variant => 'danger' }, 'a variant section knows its family and name';
+	is $form->section_info('#palette'),               { kind => 'palette', family => undef,    variant => undef },    'the palette section has neither';
+	is [ $form->section_info('button.text'), $form->section_info('nothing') ], [ undef, undef ], 'a setting or an unknown id is no section';
+	$form->go_to('#variant:button:danger');
+	$editor->run_command('reset_section');
+	is $editor->status->message, 'Nothing to reset: the variant button[danger] sets nothing.', 'a section is named from what it knows';
 	$editor->set_setting( 'button[danger].text', 'danger' );
 	is [ $tab->document->variants ], [ [ 'button', 'danger' ] ], 'the first setting writes it';
 	$editor->form->go_to('button[danger].text');
 	$editor->run_command('remove_variant');
 	is [ $tab->document->variants ], [], 'Remove variant takes it out';
+};
+
+subtest 'F6 goes to the preview and back' => sub {
+	my ( $editor, $press ) = editor();
+	my $interaction = $editor->ui->interaction;
+	$press->('F6');
+	my $focused = $interaction->get_focused_widget;
+	ok defined $focused && !$editor->form->contains($focused), 'F6 focuses a widget of the preview';
+	like $editor->status->message, qr/\AIn the preview: /, 'and says how to get around there';
+	$press->('F6');
+	ok $editor->form->contains( $interaction->get_focused_widget ), 'F6 again goes back to the settings';
 };
 
 subtest 'recovery after a signal' => sub {

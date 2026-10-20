@@ -200,7 +200,7 @@ This program is shipped as F<examples/cookbook/login-form.pl>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-login-form.svg" alt="A centered login dialog with a user name, a masked password, a checked box and the welcome message"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.05/screenshots/cookbook-login-form.svg" alt="A centered login dialog with a user name, a masked password, a checked box and the welcome message"></p>
 
 =end html
 
@@ -375,7 +375,7 @@ This program is shipped as F<examples/cookbook/check-form.pl>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-check-form.svg" alt="A form of eleven inputs; ada@example, perl.org, 192.0.2.300, 70000 and 2026-02-29 are red with a message beside each, the empty color dropdown and the unchecked terms box have messages too, and the status line says 7 fields need your attention"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.05/screenshots/cookbook-check-form.svg" alt="A form of eleven inputs; ada@example, perl.org, 192.0.2.300, 70000 and 2026-02-29 are red with a message beside each, the empty color dropdown and the unchecked terms box have messages too, and the status line says 7 fields need your attention"></p>
 
 =end html
 
@@ -558,7 +558,7 @@ This program is shipped as F<examples/cookbook/own-checks.pl>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-own-checks.svg" alt="Five fields with messages below them: ABC12 with Three letters and three digits, such as ABC123; the name José Saramago without a message; 7 with Please enter an even number; mail.perl.org with Please use a host in example.com; and a text area of two hosts with Line 2: Please enter a host name"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.05/screenshots/cookbook-own-checks.svg" alt="Five fields with messages below them: ABC12 with Three letters and three digits, such as ABC123; the name José Saramago without a message; 7 with Please enter an even number; mail.perl.org with Please use a host in example.com; and a text area of two hosts with Line 2: Please enter a host name"></p>
 
 =end html
 
@@ -629,10 +629,14 @@ Goal: a "Really quit?" dialog that opens over the screen when the user
 presses Ctrl+Q, keeps the keyboard focus inside itself, and closes on Escape
 or a button.
 
-This recipe builds the dialog from its parts, which shows how a dialog
-works. For a question with a few buttons, a
+The dialog brings its own C<title> and C<buttons>: pressing a button
+answers with its id through an C<Answer> event, and Escape answers
+C<cancel> (see
+L<Term::Fabulous::Widget::Dialog/Title, buttons and the notice line>).
+For a question with a few buttons, a
 L<Term::Fabulous::Widget::Prompt> does the same in one call: see the
-next recipe, L</Confirm before quitting (Prompt)>.
+next recipe, L</Confirm before quitting (Prompt)>, and
+L<Term::Fabulous::Manual::Feedback/PROMPTS>.
 
 This program is shipped as F<examples/cookbook/confirm-dialog.pl>.
 
@@ -645,11 +649,9 @@ This program is shipped as F<examples/cookbook/confirm-dialog.pl>.
 
 	use Term::Fabulous;
 	use Term::Fabulous::Widget::Box;
-	use Term::Fabulous::Widget::Button;
 	use Term::Fabulous::Widget::Dialog;
 	use Term::Fabulous::Widget::Text;
 	use Term::Fabulous::Widget::TextArea;
-	use Term::Fabulous::Enum::BorderStyle;
 	use Clay::UI::Enum::Result;
 	use Clay::XS qw(sizing_grow sizing_fixed CLAY_TOP_TO_BOTTOM);
 
@@ -671,28 +673,17 @@ This program is shipped as F<examples/cookbook/confirm-dialog.pl>.
 	my $ui = Term::Fabulous->new( root => $root, width => 80, height => 24 );
 
 	# The dialog is built once and opened as often as needed. Its look
-	# (border, background, padding) comes with the widget.
-	my $dialog = Term::Fabulous::Widget::Dialog->new( id => 'confirm', layout => { sizing => { width => sizing_fixed(44) } } );
-
-	sub button ( $caption, $action ) {
-		my $button = Term::Fabulous::Widget::Button->new(
-			background_color => [ 43, 58, 85, 255 ],
-			bordered         => 1,
-			border_color     => [ 28, 33, 45, 255 ],    # the dialog background: only the focus shows
-			border_style     => Term::Fabulous::Enum::BorderStyle->Round,
-			layout           => { padding => { left => 1, right => 1 } },
-		);
-		$button->add_child( text($caption) );
-		$button->on( Activate => sub ($event) { $action->(); return } );
-		return $button;
-	}
-
-	my $buttons = Term::Fabulous::Widget::Box->new( layout => { child_gap => 2 } );
-	$buttons->add_child(
-		button( 'Quit',   sub { $ui->loop->stop } ),
-		button( 'Cancel', sub { $dialog->close } ),
+	# (border, background, padding), its title and its buttons come with
+	# the widget; pressing a button answers with its id, Escape answers
+	# cancel.
+	my $dialog = Term::Fabulous::Widget::Dialog->new(
+		id      => 'confirm',
+		title   => 'Really quit?',
+		buttons => [ { id => 'quit', label => 'Quit', primary => 1 }, { id => 'cancel', label => 'Cancel' } ],
+		layout  => { sizing => { width => sizing_fixed(44) } },
 	);
-	$dialog->add_child( text('Really quit? Unsaved notes are lost.'), $buttons );
+	$dialog->add_child( text('Unsaved notes are lost.') );
+	$dialog->on( Answer => sub ($event) { $ui->loop->stop if $event->button eq 'quit'; return } );
 
 	$root->on(
 		KeyPress => sub ($event) {
@@ -707,7 +698,7 @@ This program is shipped as F<examples/cookbook/confirm-dialog.pl>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-confirm-dialog.svg" alt="The Really quit? dialog with Quit and Cancel buttons over the dimmed notes; Quit has the focus and a blue border"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.05/screenshots/cookbook-confirm-dialog.svg" alt="The Really quit? dialog with Quit and Cancel buttons over the dimmed notes; Quit has the focus and a blue border"></p>
 
 =end html
 
@@ -723,18 +714,22 @@ outside it reach nothing behind it. See L<Term::Fabulous::Widget::Dialog>.
 
 =item *
 
-A button shows the focus only through its border, which turns blue
-(C<focus_border_color>). So the buttons get a rounded border in the
-color of the dialog's background, which does not stand out until the
-button has the focus. In the picture, the blue border shows that Enter would
-press Quit. See L<Term::Fabulous::Widget::Button/focus_border_color>.
+The dialog builds its buttons from the C<buttons> list: bordered
+buttons in a row below the content, the C<primary> one (Quit) in the
+theme's primary button colors. A button shows the focus through its
+border, which turns blue (C<focus_border_color>): in the picture, the
+blue border shows that Enter would press Quit. See
+L<Term::Fabulous::Widget::Button/focus_border_color>.
 
 =item *
 
-Escape closes the dialog (C<close_on_escape>, on by default), and so
-does C<< $dialog->close >>; the Cancel button calls it. Closing puts the
-focus back on the text area and fires
-L<Close|Term::Fabulous::Event::Close> on the dialog.
+Pressing a button closes the dialog and fires
+L<Close|Term::Fabulous::Event::Close> on it, then
+L<Answer|Term::Fabulous::Event::Answer> with the button's id; the
+program stops only for C<quit>. Escape closes it too
+(C<close_on_escape>, on by default), and so does C<< $dialog->close >>:
+both answer C<cancel> as dismissed. Closing puts the focus back on the
+text area.
 
 =item *
 
@@ -812,7 +807,7 @@ This program is shipped as F<examples/cookbook/confirm-prompt.pl>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-confirm-prompt.svg" alt="A Quit? prompt with the message Your notes are not saved anywhere. and the buttons Quit and Keep writing over the dimmed notes. Keep writing has the focus"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.05/screenshots/cookbook-confirm-prompt.svg" alt="A Quit? prompt with the message Your notes are not saved anywhere. and the buttons Quit and Keep writing over the dimmed notes. Keep writing has the focus"></p>
 
 =end html
 
@@ -825,6 +820,7 @@ title, a message and two buttons, opens it, and returns it. The buttons
 have the ids C<ok> and C<cancel>, and C<ok> and C<cancel> set their
 labels. The prompt is a L<Term::Fabulous::Widget::Dialog>, so it keeps
 the focus while it is open, as the dialog of the previous recipe does.
+See L<Term::Fabulous::Manual::Feedback/PROMPTS>.
 
 =item *
 
@@ -927,7 +923,7 @@ This program is shipped as F<examples/cookbook/ask-prompt.pl>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-ask-prompt.svg" alt="A Session length prompt asking How many minutes should the next session last?, with 300 typed in the Minutes field, the red message A session lasts 1 to 120 minutes. and the buttons OK and Cancel"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.05/screenshots/cookbook-ask-prompt.svg" alt="A Session length prompt asking How many minutes should the next session last?, with 300 typed in the Minutes field, the red message A session lasts 1 to 120 minutes. and the buttons OK and Cancel"></p>
 
 =end html
 
@@ -938,7 +934,7 @@ This program is shipped as F<examples/cookbook/ask-prompt.pl>.
 C<< Term::Fabulous::Widget::Prompt->ask >> builds a prompt with one text
 field, named C<value>, and the buttons C<ok> and C<cancel>. The field
 starts with the text of C<value>, all of it selected, so typing
-replaces it.
+replaces it. See L<Term::Fabulous::Manual::Feedback/PROMPTS>.
 
 =item *
 
@@ -947,14 +943,17 @@ C<required> and C<validator> go to the text field and work as in a form
 must not be empty and must hold a whole number. C<Enter> in the field
 presses OK, and OK checks the field before it answers. While something
 is wrong, the prompt stays open, shows the label of the field and what
-is wrong with it in red, and puts the cursor back in the field.
+is wrong with it in the notice line above the buttons
+(L<Term::Fabulous::Widget::Dialog/notice>), in the theme's invalid
+input color, and puts the cursor back in the field.
 
 =item *
 
 C<check> runs after the field found nothing wrong. It gets the values
 of all fields, so it can check a range, as here, or compare two fields.
 It returns what is wrong, as a sentence, or C<undef> when everything is
-fine.
+fine. The prompt shows the sentence in the same notice line, without a
+label, as in the picture.
 
 =item *
 
@@ -1114,7 +1113,7 @@ directory and deletes when it ends, so it never writes your files.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-open-and-save.svg" alt="An Open a file dialog over the empty notes editor: the folder line ends in garden-club/season-2026/notes, the list shows garden.txt, groceries.txt and ideas.md with sizes and dates, the cursor is on groceries.txt, which is also in the File field, and below are the Notes filter, the Show hidden files checkbox and the Open and Cancel buttons"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.05/screenshots/cookbook-open-and-save.svg" alt="An Open a file dialog over the empty notes editor: the folder line ends in garden-club/season-2026/notes, the list shows garden.txt, groceries.txt and ideas.md with sizes and dates, the cursor is on groceries.txt, which is also in the File field, and below are the Notes filter, the Show hidden files checkbox and the Open and Cancel buttons"></p>
 
 =end html
 
@@ -1128,7 +1127,8 @@ statement. The dialog reports the result with an C<Answer> event
 (L<Term::Fabulous::Event::Answer>), as a prompt does: the button is the
 mode, C<open> or C<save>, and C<< $event->value('path') >> is the
 absolute path. C<Cancel> and C<Escape> answer C<cancel>, which the
-listeners simply ignore.
+listeners simply ignore. See
+L<Term::Fabulous::Manual::Feedback/FILE DIALOGS>.
 
 =item *
 
@@ -1265,7 +1265,7 @@ This program is shipped as F<examples/cookbook/color-prompt.pl>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-color-prompt.svg" alt="A Highlight color prompt over the dimmed setting: on the left the label Color and a framed list of six named colors with samples, Mint selected; on the right the field with #98c379 and a green sample, the RGB/HSL switch on RGB and the red, green and blue sliders at 152, 195 and 121; the buttons Use it and Cancel below"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.05/screenshots/cookbook-color-prompt.svg" alt="A Highlight color prompt over the dimmed setting: on the left the label Color and a framed list of six named colors with samples, Mint selected; on the right the field with #98c379 and a green sample, the RGB/HSL switch on RGB and the red, green and blue sliders at 152, 195 and 121; the buttons Use it and Cancel below"></p>
 
 =end html
 
@@ -1368,7 +1368,7 @@ This program is shipped as F<examples/cookbook/inline-prompt.pl>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-inline-prompt.svg" alt="The inline prompt in the three rows below a shell's earlier output: the question, a text field holding Ada Lovelace and a help line"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.05/screenshots/cookbook-inline-prompt.svg" alt="The inline prompt in the three rows below a shell's earlier output: the question, a text field holding Ada Lovelace and a help line"></p>
 
 =end html
 
@@ -1471,7 +1471,7 @@ This program is shipped as F<examples/cookbook/choose-options.pl>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-choose-options.svg" alt="A dropdown showing France, radio buttons with Express chosen, a slider at 15 percent and the status line"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.05/screenshots/cookbook-choose-options.svg" alt="A dropdown showing France, radio buttons with Express chosen, a slider at 15 percent and the status line"></p>
 
 =end html
 
@@ -1740,7 +1740,7 @@ ends. This program is also shipped as F<examples/kdl-form.pl>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/example-kdl-form.svg" alt="The KDL form filled in, with all values shown in the status line after F2"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.05/screenshots/example-kdl-form.svg" alt="The KDL form filled in, with all values shown in the status line after F2"></p>
 
 =end html
 
@@ -1851,7 +1851,7 @@ This program is shipped as F<examples/cookbook/disable-inputs.pl>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-disable-inputs.svg" alt="An unchecked check box and the grayed out VAT number field below it"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.05/screenshots/cookbook-disable-inputs.svg" alt="An unchecked check box and the grayed out VAT number field below it"></p>
 
 =end html
 
@@ -1937,7 +1937,7 @@ This program is shipped as F<examples/cookbook/focus-help-line.pl>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-focus-help-line.svg" alt="A title, notes being typed, a slider and the help line for the notes"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.05/screenshots/cookbook-focus-help-line.svg" alt="A title, notes being typed, a slider and the help line for the notes"></p>
 
 =end html
 
@@ -2014,7 +2014,7 @@ This program is shipped as F<examples/cookbook/tab-order.pl>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-tab-order.svg" alt="Three text fields side by side: Street filled in, City still empty, and the Zip field focused with 12345 typed, because Tab went from Street straight to Zip"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.05/screenshots/cookbook-tab-order.svg" alt="Three text fields side by side: Street filled in, City still empty, and the Zip field focused with 12345 typed, because Tab went from Street straight to Zip"></p>
 
 =end html
 

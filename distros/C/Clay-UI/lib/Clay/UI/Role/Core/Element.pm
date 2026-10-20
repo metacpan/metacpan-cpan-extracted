@@ -1,5 +1,5 @@
 package Clay::UI::Role::Core::Element;
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 use v5.22;
 use warnings;
 use feature 'signatures';
@@ -8,13 +8,13 @@ no warnings 'experimental::signatures';
 use Object::Pad 0.800;
 use Object::Pad::MOP::Class;
 use List::Util qw(any uniq);
-use Scalar::Util qw(blessed refaddr reftype);
+use Scalar::Util qw(blessed refaddr);
 no warnings 'experimental';
 
-use Clay::UI::_validate qw(validate_id is_index shown_value described_value);
+use Clay::UI::_validate qw(validate_id is_index shown_value described_value require_predicate);
 use Clay::UI::Revision qw(bump_revision);
 use Clay::UI::Role::Layout::HasSizingGroup;
-use Clay::UI::Role::Layout::HasParent;
+use Clay::UI::Role::Layout::HasParent qw(is_widget);
 use Clay::UI::Role::Events::Listener;
 use Clay::UI::_error qw(croak_ui);
 
@@ -32,21 +32,15 @@ sub _contributors_of ($class) {
 	];
 }
 
-sub _is_widget ($thing) {
-	return blessed($thing)
-		&& ( $thing->DOES('Clay::UI::Role::Core::Element')
-		  || $thing->DOES('Clay::UI::Role::Core::TextNode') );
-}
-
 # Validates widgets that are about to be attached somewhere below $anchor
 # (the future parent, or the Grid they end up in). Dies before anything is
 # written if any of them cannot be attached.
 sub _validate_attachment ($anchor, @kids) {
-	my %ancestor = map { refaddr($_) => 1 } _self_and_ancestors($anchor);
+	my %ancestor = map { refaddr($_) => 1 } $anchor, $anchor->ancestors;
 	my %seen;
 	for my $kid (@kids) {
 		croak_ui "Clay::UI: child is not a widget (got " . (ref($kid) || 'non-ref') . ")"
-			unless _is_widget($kid);
+			unless is_widget($kid);
 		my $addr = refaddr($kid);
 		croak_ui "Clay::UI: the same widget (" . ref($kid) . ") is attached twice in one call"
 			if $seen{$addr}++;
@@ -82,21 +76,6 @@ sub _is_permutation ($order, $count) {
 	return 1;
 }
 
-# Dies unless $predicate is a code reference.
-sub _require_predicate ($method, $predicate) {
-	croak_ui "Clay::UI: $method takes a code reference, got " . described_value($predicate)
-		unless ref $predicate && reftype($predicate) eq 'CODE';
-	return;
-}
-
-sub _self_and_ancestors ($node) {
-	my @chain;
-	for (my $cursor = $node; defined $cursor; $cursor = $cursor->parent) {
-		push @chain, $cursor;
-	}
-	return @chain;
-}
-
 role Clay::UI::Role::Core::Element :does(Clay::UI::Role::Layout::HasSizingGroup)
                               :does(Clay::UI::Role::Layout::HasParent)
                               :does(Clay::UI::Role::Events::Listener) {
@@ -123,13 +102,13 @@ role Clay::UI::Role::Core::Element :does(Clay::UI::Role::Layout::HasSizingGroup)
 	}
 
 	method get_children_with ($predicate) {
-		_require_predicate(get_children_with => $predicate);
+		require_predicate(get_children_with => $predicate);
 		return grep { $predicate->($_) } @_children;
 	}
 
 	method has_child ($widget) {
-		croak_ui "Clay::UI: has_child takes a widget, got " . ( ref($widget) || ( defined $widget ? "'$widget'" : 'undef' ) )
-			unless _is_widget($widget);
+		croak_ui "Clay::UI: has_child takes a widget, got " . described_value($widget)
+			unless is_widget($widget);
 		return ( any { refaddr($_) == refaddr($widget) } @_children ) ? 1 : 0;
 	}
 
@@ -178,7 +157,7 @@ role Clay::UI::Role::Core::Element :does(Clay::UI::Role::Layout::HasSizingGroup)
 	method remove_internal_children (@kids) {
 		for my $kid (@kids) {
 			croak_ui "Clay::UI: remove_internal_children takes widgets, got " . described_value($kid)
-				unless _is_widget($kid);
+				unless is_widget($kid);
 		}
 		my %leaving = map { refaddr($_) => 1 } @kids;
 		my @removed = grep { $leaving{ refaddr($_) } } @_internal_children;
@@ -523,8 +502,10 @@ in layout pre-order: each entry of L</layout_children> followed by its
 own subtree. Internal children and the widgets below them are
 included, so this is the order in which a frame declares the subtree
 and the default focus order walks it. Element widgets and text
-widgets are listed alike. To ask whether one widget is below another,
-use L<Clay::UI::Role::Layout::HasParent/contains>, which walks up
+widgets are listed alike. For the widget and everything below it, use
+L<Clay::UI::Role::Layout::HasParent/subtree>, which works for text
+widgets too. To ask whether one widget is below another, use
+L<Clay::UI::Role::Layout::HasParent/contains>, which walks up
 instead.
 
 =head2 add_internal_children
@@ -835,7 +816,8 @@ a new child:
 
 is not a widget: C<Clay::UI: child is not a widget (got ...)>. A widget
 is a blessed object composing C<Clay::UI::Role::Core::Element> or
-L<Clay::UI::Role::Core::TextNode>;
+L<Clay::UI::Role::Core::TextNode>
+(L<Clay::UI::Role::Layout::HasParent/is_widget>);
 
 =item *
 
@@ -876,8 +858,9 @@ error.
 A removed child is detached: its C<parent> becomes undef and its
 subtree is no longer part of the UI until it is attached again. Hover,
 press and focus inside the subtree are released first: a hovered
-widget gets C<OnHoverStopped>, the focused widget gets C<OnBlur> (see
-L<Clay::UI::Interaction>). A listener of those events that dies does
+widget gets C<OnHoverStopped>, the focused widget gets C<OnBlur> and
+the focus goes to its heir outside the subtree (see
+L<Clay::UI::Interaction/Focus heirs>). A listener of those events that dies does
 not stop the removal: the call completes (the C<tree_changed> hooks
 included) and then dies with the listener's error.
 

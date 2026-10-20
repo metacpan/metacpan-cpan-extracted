@@ -1,0 +1,17 @@
+Revision history for Time-Keeper-Natural
+
+0.03    2026-10-20
+        - A calendar option, or a -u-ca- extension: dates read in any of the seventeen calendars as Time::Keeper writes them, relative phrases count its months, values come back in it.
+        - Fractions in durations and relative counts, in the locale's decimal sign: "1.5 hours", "1,5 Stunden", "in 2.5 days"; a month, quarter or year dies.
+        - Builds on perls whose headers lack MAX (Strawberry 5.42): UTF8_MAXBYTES_CASE needs it.
+        - Relative to a point: "3 days after tomorrow", "the day before 15 October", "tomorrow evening", "demain soir", "this weekend" and "next weekend".
+
+0.02    2026-10-19
+        - A phrase CLDR writes for two days (Hindi's one word for yesterday and tomorrow) dies naming both unless prefer picks
+        - parse_interval, try_parse_interval and match_interval: the ISO form, what format_interval writes in every locale, and "Monday to Friday" where a table has the words.
+        - Day ordinals in digits from CLDR's rules, in about forty locales: "the 15th", "October 15th", "le 1er octobre"; match assumes the month.
+        - A zone after a time: IANA names, offsets, the locale's CLDR zone names and abbreviations; "3 pm EST" keeps its offset out of season; keep_zone.
+        - Every locale's full and long date and time, as Time::Keeper writes them with their zone, read back: Traditional Chinese, Cantonese, Thai and others whose day and time a space sets apart, and Basque's bracketed zone.
+
+0.01    2026-10-19
+        - First release

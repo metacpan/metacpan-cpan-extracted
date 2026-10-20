@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="780" height="777" viewBox="0 0 780 777" role="img" aria-label="perl examples/cookbook/document-basics.pl">
+<title>perl examples/cookbook/document-basics.pl</title>
+<style>
+.terminal text { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 15px; white-space: pre; }
+.terminal .b { font-weight: bold; }
+.terminal .i { font-style: italic; }
+.title { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 13px; }
+</style>
+<defs>
+<filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#000000" flood-opacity="0.3"/></filter>
+<clipPath id="window"><rect x="16" y="16" width="748" height="742" rx="10"/></clipPath>
+</defs>
+<rect x="16" y="16" width="748" height="742" rx="10" fill="#161622" filter="url(#shadow)"/>
+<rect x="16" y="16" width="748" height="34" fill="#1f2430" clip-path="url(#window)"/>
+<circle cx="36" cy="33" r="6" fill="#ff5f57"/>
+<circle cx="56" cy="33" r="6" fill="#febc2e"/>
+<circle cx="76" cy="33" r="6" fill="#28c840"/>
+<text class="title" x="390" y="33" text-anchor="middle" dominant-baseline="central" fill="#9aa3b5">perl examples/cookbook/document-basics.pl</text>
+<rect x="16.5" y="16.5" width="747" height="741" rx="10" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1"/>
+<g shape-rendering="crispEdges">
+<rect x="57" y="240" width="675" height="36" fill="#1e2128"/>
+<rect x="39" y="104" width="693" height="1" fill="#5a606e"/>
+<rect x="43" y="600" width="1" height="90" fill="#8c929e"/>
+<rect x="61" y="636" width="1" height="54" fill="#8c929e"/>
+</g>
+<g class="terminal">
+<text x="39" y="92" textLength="72" class="b" fill="#61afef">snapback</text>
+<text x="57" y="146" textLength="72" class="b" fill="#dcdfe4">snapback</text>
+<text x="138" y="146" textLength="477" fill="#dcdfe4">copies the files of a directory to a backup disk, but</text>
+<text x="624" y="146" textLength="36" class="i" fill="#dcdfe4">only</text>
+<text x="669" y="146" textLength="45" fill="#dcdfe4">those</text>
+<text x="57" y="164" textLength="531" fill="#dcdfe4">that changed since the last run. It reads its settings from</text>
+<text x="597" y="164" textLength="99" class="i" fill="#98c379">~/.snapback</text>
+<text x="696" y="164" textLength="9" fill="#dcdfe4">.</text>
+<text x="57" y="182" textLength="261" fill="#dcdfe4">The old option --all is gone.</text>
+<text x="39" y="218" textLength="45" class="b" fill="#ebeef3">Usage</text>
+<text x="66" y="254" textLength="288" fill="#dcdfe4">snapback ~/Documents /mnt/backup</text>
+<text x="66" y="272" textLength="351" fill="#dcdfe4">snapback --dry-run ~/Photos /mnt/backup</text>
+<text x="39" y="308" textLength="63" class="b" fill="#ebeef3">Options</text>
+<text x="57" y="344" textLength="81" class="b" fill="#ebeef3">--dry-run</text>
+<text x="93" y="362" textLength="450" fill="#dcdfe4">Lists the files it would copy, and copies nothing.</text>
+<text x="57" y="398" textLength="72" class="b" fill="#ebeef3">--keep N</text>
+<text x="93" y="416" textLength="126" fill="#dcdfe4">Keeps the last</text>
+<text x="228" y="416" textLength="9" fill="#e5c07b">N</text>
+<text x="246" y="416" textLength="279" fill="#dcdfe4">backups and deletes older ones.</text>
+<text x="39" y="452" textLength="180" class="b" fill="#ebeef3">Before the first run</text>
+<text x="57" y="488" textLength="9" fill="#61afef">-</text>
+<text x="75" y="488" textLength="216" fill="#dcdfe4">Connect the backup disk.</text>
+<text x="57" y="506" textLength="9" fill="#61afef">-</text>
+<text x="75" y="506" textLength="324" fill="#dcdfe4">Check that it has enough free space:</text>
+<text x="75" y="524" textLength="18" fill="#61afef">1.</text>
+<text x="102" y="524" textLength="27" fill="#dcdfe4">Run</text>
+<text x="138" y="524" textLength="153" fill="#e5c07b">df -h /mnt/backup</text>
+<text x="291" y="524" textLength="9" fill="#dcdfe4">.</text>
+<text x="75" y="542" textLength="18" fill="#61afef">2.</text>
+<text x="102" y="542" textLength="378" fill="#dcdfe4">Compare it with the size of the directory.</text>
+<text x="57" y="560" textLength="9" fill="#61afef">-</text>
+<text x="75" y="560" textLength="216" fill="#dcdfe4">Try a dry run first (see</text>
+<text x="300" y="560" textLength="63" fill="#61afef">Options</text>
+<text x="363" y="560" textLength="18" fill="#dcdfe4">).</text>
+<text x="39" y="596" textLength="189" class="b" fill="#dcdfe4">From the mailing list</text>
+<text x="75" y="632" textLength="90" fill="#dcdfe4">Ada wrote:</text>
+<text x="93" y="668" textLength="594" fill="#dcdfe4">Restore a file now and then. A backup that was never restored is a</text>
+<text x="93" y="686" textLength="171" fill="#dcdfe4">hope, not a backup.</text>
+<text x="57" y="722" textLength="63" fill="#dcdfe4">More at</text>
+<text x="129" y="722" textLength="180" fill="#61afef">snapback.example.org</text>
+<text x="309" y="722" textLength="9" fill="#dcdfe4">.</text>
+</g>
+<g shape-rendering="crispEdges">
+<rect x="192" y="177" width="45" height="1" fill="#dcdfe4"/>
+<rect x="300" y="561" width="63" height="1" fill="#61afef"/>
+<rect x="129" y="723" width="180" height="1" fill="#61afef"/>
+</g>
+</svg>

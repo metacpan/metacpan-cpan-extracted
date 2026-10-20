@@ -6,7 +6,7 @@ use warnings;
 use Open::API;
 use Punk ();            
 
-our $VERSION = '0.61';
+our $VERSION = '0.62';
 
 1;
 
@@ -60,13 +60,45 @@ holding the typed parameters and C<< $c->param >> reading them first.
 
 =head1 METHODS
 
-The mount is an internal object - the C<api> keyword returns it and the
-framework drives it. C<new(spec =E<gt> ..., opts =E<gt> ..., prefix =E<gt>
-..., guards =E<gt> ...)> constructs one; C<compile($app, $resolve)>
-resolves it at boot; C<dispatch($c, $before, $op_id, $caps)> runs one
-matched operation per request. C<prefix>, C<api> (the compiled
-L<Open::API>), C<ops>, C<max_body_size> and C<on_error> are read-only
-accessors onto what C<compile> froze.
+The mount is an internal object: the C<api> keyword returns it and the
+framework drives it.
+
+=head2 new(spec => $spec, opts => \%opts, prefix => $prefix, guards => \@guards)
+
+Records a mount; nothing is resolved until L</compile>.
+
+=head2 compile($app, $resolve)
+
+Run at C<to_app>: resolves every operationId to its controller method and
+freezes each operation's guard chain (the scope's guards, then the spec's
+security requirement, then the C<under> guards). Croaks on anything
+unresolved. Returns the mount.
+
+=head2 dispatch($c, $before, $op_id, \%captures)
+
+Runs one matched operation for a request: the C<before_dispatch> hooks, the
+guards, the body-size check, validation and the controller. Returns
+C<($ret, $err)> for the application's response path.
+
+=head2 prefix
+
+The path the mount is under.
+
+=head2 api
+
+The compiled L<Open::API>.
+
+=head2 ops
+
+The compiled operations, a hashref keyed by operationId.
+
+=head2 max_body_size
+
+The body ceiling in bytes; see L</OPTIONS>.
+
+=head2 on_error
+
+The mount's own error handler, or undef.
 
 =head1 OPTIONS
 

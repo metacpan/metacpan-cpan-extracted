@@ -7,19 +7,20 @@ no warnings 'experimental::signatures';
 
 use Object::Pad 0.825;
 
+use Term::Fabulous::Role::Popup;
 use Term::Fabulous::Widget::Display;
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 class Term::Fabulous::Widget::Dropdown::List
 	:isa(Term::Fabulous::Widget::Display)
+	:does(Term::Fabulous::Role::Popup)
 	:strict(params)
 {
 	use Clay::UI::Enum::Result;
 	use List::Util qw(max);
-	use Scalar::Util qw(weaken);
 	use Term::Fabulous::Termbox qw(TB_KEY_MOUSE_LEFT TB_KEY_MOUSE_RELEASE TB_KEY_MOUSE_WHEEL_UP TB_KEY_MOUSE_WHEEL_DOWN);
-	use Term::Fabulous::Unicode qw(grapheme_clusters cluster_columns string_columns);
+	use Term::Fabulous::Unicode qw(fit_columns string_columns);
 	use Term::Fabulous::Viewport qw(clamp_offset reveal_range scroll_thumb);
 	use Term::Fabulous::Widget::Scrollbar;
 
@@ -30,11 +31,11 @@ class Term::Fabulous::Widget::Dropdown::List
 	field $top = 0;
 
 	ADJUST {
-		weaken( my $weak_self = $self );
 		$self->on(
-			Mouse => sub ($event) {
-				return $weak_self->_handle_mouse($event) ? Clay::UI::Enum::Result->HANDLED : Clay::UI::Enum::Result->CONTINUE;
-			}
+			Mouse => sub ( $self, $event ) {
+				return $self->_handle_mouse($event) ? Clay::UI::Enum::Result->HANDLED : Clay::UI::Enum::Result->CONTINUE;
+			},
+			owner => $self
 		);
 	}
 
@@ -114,6 +115,19 @@ class Term::Fabulous::Widget::Dropdown::List
 		return 1;
 	}
 
+	method contribute_floating :override ($config) {
+		$self->SUPER::contribute_floating($config);
+		$self->float_popup($config) if defined $dropdown && defined $config->{floating};
+		return;
+	}
+
+	# Where the list floats in this frame (Term::Fabulous::Role::Popup):
+	# where the dropdown places it on the screen. Before the dropdown has
+	# a box, the list hangs from it as the dropdown attached it.
+	method popup_position () {
+		return defined $dropdown ? $dropdown->list_position : undef;
+	}
+
 	method _text_columns () {
 		return $self->columns - ( $self->_scrolls ? 1 : 0 );
 	}
@@ -146,21 +160,9 @@ class Term::Fabulous::Widget::Dropdown::List
 		foreach my $row ( 0 .. $#rows ) {
 			my ( $label, $fg, $bg ) = @{ $rows[$row] };
 			$self->put_attrs( $_, $row, ' ', undef, $bg ) foreach 0 .. $width - 1;
-			$self->_paint_label( $row, $label, $fg, $bg, $width - 1 );
+			$self->paint_text( 1, $row, fit_columns( $label, $width - 2 ), $fg, $bg, $width - 1 );    # a column of margin on either side
 		}
 		$self->_paint_scrollbar if $self->_scrolls;
-		return;
-	}
-
-	# One space of margin on either side of the label.
-	method _paint_label ( $row, $label, $fg, $bg, $limit ) {
-		my $x = 1;
-		foreach my $cluster ( grapheme_clusters($label) ) {
-			my $columns = cluster_columns($cluster);
-			last if $x + $columns > $limit;
-			$self->put_attrs( $x, $row, $cluster, $fg, $bg );
-			$x += $columns;
-		}
 		return;
 	}
 
@@ -191,8 +193,10 @@ Term::Fabulous::Widget::Dropdown::List - The option list of an open dropdown
 This class is internal to L<Term::Fabulous::Widget::Dropdown>.
 Applications never create a list themselves: the dropdown creates one
 each time it opens, adds it as a floating child of itself (so it is
-drawn over the other widgets, attached below or above the dropdown), and
-removes it when it closes.
+drawn over the other widgets), and removes it when it closes. In every
+frame the list floats where the dropdown places it
+(L<Term::Fabulous::Placement>): below or above the dropdown, attached to
+the root and kept on the screen.
 
 The list is a L<Term::Fabulous::Widget::Display> that paints the
 dropdown's options with a one-column margin on both sides, highlights
@@ -215,10 +219,10 @@ for tests.
 		...
 	);
 
-Called by the dropdown with these parameters, plus C<background_color>,
-C<border_color>, C<bordered>, C<border_style>, C<layout> and
-C<floating> (see L<Term::Fabulous::Widget/floating>). Unknown
-parameters die.
+Called by the dropdown with these parameters, plus C<bordered>,
+C<layout> and C<floating> (see L<Term::Fabulous::Widget/floating>).
+Its background, border color and border style follow the dropdown when
+they are not given. Unknown parameters die.
 
 =over
 
@@ -268,16 +272,24 @@ within the options. Returns the list.
 The index of the option shown at a row of the list's content (from 0),
 or C<undef> for a row without an option.
 
+=head2 popup_position
+
+	my $position = $list->popup_position;    # { x => 34, y => 6 }
+
+Where the list floats in this frame: the dropdown's
+L<list_position|Term::Fabulous::Widget::Dropdown/list_position>. The
+list composes L<Term::Fabulous::Role::Popup>, which calls it.
+
 =head2 paint, paint_key, natural_size
 
 The L<Term::Fabulous::Widget::Display> interface. C<paint> draws the
 visible options and, when the list scrolls, the scrollbar. The paint key
-adds the first option shown, what the shown rows display and the
-scrollbar's colors, so the list paints again whenever that changed, also
-when the change came from the dropdown (its colors, its highlight, its
-options). The natural size (the widest label with its margins and the
-scrollbar column, by C<visible_rows>) is used only for an axis the
-dropdown leaves unsized; it always sizes both.
+adds the first option shown, the number of options and the label and
+colors of each shown row, so the list paints again whenever that
+changed, also when the change came from the dropdown (its colors, its
+highlight, its options). The natural size (the widest label with its
+margins and the scrollbar column, by C<visible_rows>) is used only for
+an axis the dropdown leaves unsized; it always sizes both.
 
 =head1 MOUSE
 

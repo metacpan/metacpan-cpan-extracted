@@ -144,7 +144,7 @@ join(self, other, ...)
         tkb_schedule *a, *b, *s;
         HV *spec;
         AV *parts;
-        int both = 0;
+        int both = 0, hours = 0;
         I32 i;
         SV *rv;
     CODE:
@@ -165,6 +165,15 @@ join(self, other, ...)
             }
             else if (klen == 4 && memEQ(key, "name", 4))
                 (void)hv_stores(spec, "name", newSVsv(ST(i + 1)));
+            else if (klen == 5 && memEQ(key, "hours", 5)) {
+                const char *h = SvPV_nolen(ST(i + 1));
+                if (strEQ(h, "both")) hours = 1;
+                else if (strEQ(h, "either")) hours = 2;
+                else if (strEQ(h, "first")) hours = 3;
+                else if (strEQ(h, "second")) hours = 4;
+                else { SvREFCNT_dec((SV *)spec); croak("%s: hours is 'both', 'either', 'first' or 'second', not '%s'", what, h); }
+                (void)hv_stores(spec, "hours", newSVsv(ST(i + 1)));
+            }
             else { SvREFCNT_dec((SV *)spec); croak("%s: unknown argument '%s'", what, key); }
         }
         if (!hv_fetchs(spec, "mode", 0))
@@ -179,6 +188,18 @@ join(self, other, ...)
         s->join_b = newSVsv(other);
         s->join_both = both;
         tkb_join_refresh(aTHX_ s, what);
+        if (hours) {
+            if ((hours != 4 && !a->hours.has) || (hours != 3 && !b->hours.has))
+                croak("%s: hours => '%s' needs %s to have hours", what, hours == 1 || hours == 2 ? (hours == 1 ? "both" : "either") : (hours == 3 ? "first" : "second"),
+                      hours <= 2 ? "both schedules" : (hours == 3 ? "the first schedule" : "the second schedule"));
+            s->join_hours = hours;
+            s->hours.has = 1;
+            s->hours.has_zone = 1;
+            s->hours.zone = hours == 4 ? b->hours.zone : a->hours.zone;
+            s->hours.weekly_total = 0;
+            s->hours.rule_lo = 1;
+            s->hours.rule_hi = 0;
+        }
         PERL_UNUSED_VAR(a);
         PERL_UNUSED_VAR(b);
         RETVAL = rv;

@@ -55,7 +55,7 @@
    "provides" : {
       "Archive::Lha" : {
          "file" : "lib/Archive/Lha.pm",
-         "version" : "0.22"
+         "version" : "0.23"
       },
       "Archive::Lha::CRC" : {
          "file" : "lib/Archive/Lha/CRC.pm"
@@ -126,6 +126,6 @@
          "web" : "https://github.com/nicomen/archive-lha"
       }
    },
-   "version" : "0.22",
+   "version" : "0.23",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

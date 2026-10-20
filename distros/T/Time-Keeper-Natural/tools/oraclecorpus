@@ -1,0 +1,209 @@
+#!/usr/bin/env perl
+# tools/oraclecorpus [--out xt/oracle-corpus] [--tests PURE_PERL_TREE] [--only NAME]
+#
+# The corpus the differential oracle reads (xt/12-oracle.t): one text a line,
+# with the parser it is read by. Six files, each kept once written:
+#
+#   tests.txt      every text 0.01's own tests hand to parse, match and the
+#                  rest, recorded by running the pure-Perl tree's t/ (--tests)
+#   relative.txt   everything format_relative writes in every locale, every
+#                  unit, count -3..3, width and numeric, and every weekday
+#                  phrase CLDR has (what xt/01 reads back)
+#   duration.txt   what Duration->format writes for nine durations in every
+#                  locale and style (what xt/02 reads back)
+#   tables.txt     every word table's test lines, and each in capitals
+#   formats.txt    format_date, format_time and every format_skeleton of 60
+#                  locales on three dates
+#   generated.txt  200,000 seeded two- and three-part texts from each of 60
+#                  locales' phrases, number words, digits and table phrases
+#
+# A line: locale, zone, bare_hour, prefer, now, clock, text, tab-separated,
+# '-' where unset; now and clock as ISO 8601 with offset; the text with
+# backslash, tab and newline escaped. The reader is tools/oracleread.
+use 5.010;
+use strict;
+use warnings;
+use utf8;
+use Getopt::Long;
+use File::Spec;
+use File::Temp ();
+use Cwd ();
+use Time::Keeper;
+use Time::Keeper::Natural;
+use Time::Keeper::Natural::Lexicon;
+use Time::Keeper::Natural::Words;
+use Time::Keeper::Natural::Numbers;
+
+my %opt = (out => 'xt/oracle-corpus');
+GetOptions(\%opt, 'out=s', 'tests=s', 'only=s') or die "usage: oraclecorpus [--out DIR] [--tests TREE] [--only NAME]\n";
+mkdir $opt{out} unless -d $opt{out};
+my $L = 'Time::Keeper::Locale';
+our %lex_spaceless;
+my $ANCHOR = Time::Keeper->new(year => 2026, month => 10, day => 15, hour => 9, zone => 'Europe/London');
+
+sub esc { my ($s) = @_; $s =~ s/\\/\\\\/g; $s =~ s/\t/\\t/g; $s =~ s/\n/\\n/g; $s =~ s/\r/\\r/g; return $s }
+sub line { my ($loc, $text, %o) = @_; return join("\t", $loc, map({ defined $o{$_} ? $o{$_} : '-' } qw(zone bare_hour prefer now clock)), esc($text)) . "\n" }
+sub write_file {
+    my ($name, $lines) = @_;
+    my $file = File::Spec->catfile($opt{out}, "$name.txt");
+    open my $fh, '>:encoding(UTF-8)', $file or die "$file: $!";
+    my %seen;
+    my $n = 0;
+    for (@$lines) { next if $seen{$_}++; print $fh $_; $n++ }
+    close $fh;
+    printf "%-14s %8d lines\n", "$name.txt", $n;
+}
+sub want { my ($name) = @_; return !$opt{only} || $opt{only} eq $name }
+
+if (want('tests') && $opt{tests}) {
+    my $tree = Cwd::abs_path($opt{tests});
+    my $dir = File::Temp->newdir;
+    my $rec = File::Spec->catfile($dir, 'TknRecord.pm');
+    my $log = File::Spec->catfile($dir, 'log.txt');
+    open my $fh, '>:encoding(UTF-8)', $rec or die "$rec: $!";
+    print $fh <<'REC';
+package TknRecord;
+use strict;
+use warnings;
+require Time::Keeper::Natural;
+my $LOG = $ENV{TKN_RECORD};
+sub esc { my ($s) = @_; $s =~ s/\\/\\\\/g; $s =~ s/\t/\\t/g; $s =~ s/\n/\\n/g; $s =~ s/\r/\\r/g; return $s }
+sub iso { my ($v) = @_; return '-' unless defined $v && ref $v && eval { $v->isa('Time::Keeper') }; return "$v" }
+no strict 'refs';
+no warnings 'redefine';
+for my $m (qw(parse parse_date parse_duration match match_date match_duration try_parse try_parse_date try_parse_duration)) {
+    my $orig = \&{"Time::Keeper::Natural::$m"};
+    *{"Time::Keeper::Natural::$m"} = sub {
+        my ($self, $text, @opts) = @_;
+        if (defined $text && !ref $text) {
+            my %o = ref $self ? %$self : (@opts % 2 ? () : @opts);
+            my $loc = defined $o{locale} ? $o{locale} : '-';
+            my $clock = ref $Time::Keeper::CLOCK && eval { $Time::Keeper::CLOCK->isa('Time::Keeper') } ? "$Time::Keeper::CLOCK" : '-';
+            if (open my $fh, '>>:encoding(UTF-8)', $LOG) {
+                print $fh join("\t", $loc, map({ defined $o{$_} && !ref $o{$_} ? $o{$_} : '-' } qw(zone bare_hour prefer)), iso($o{now}), $clock, esc($text)), "\n";
+                close $fh;
+            }
+        }
+        goto &$orig;
+    };
+}
+1;
+REC
+    close $fh;
+    local $ENV{TKN_RECORD} = $log;
+    my $cwd = Cwd::getcwd();
+    chdir $tree or die "$tree: $!";
+    for my $t (sort glob('t/*.t')) {
+        system($^X, "-I$dir", "-I$tree/lib", '-MTknRecord', $t) == 0 or 1;
+    }
+    chdir $cwd;
+    open my $in, '<:encoding(UTF-8)', $log or die "$log: $!";
+    my @lines = <$in>;
+    write_file('tests', \@lines);
+}
+
+if (want('relative')) {
+    my %by_unit = (year => 'years', quarter => 'months', month => 'months', week => 'weeks', day => 'days',
+                   hour => 'hours', minute => 'minutes', second => 'seconds');
+    my @lines;
+    for my $loc ($L->codes) {
+        my $v = $ANCHOR->in_locale($loc);
+        for my $unit (sort keys %by_unit) {
+            for my $count (-3 .. 3) {
+                my $t = $v->plus($by_unit{$unit} => ($unit eq 'quarter' ? 3 * $count : $count));
+                for my $style (qw(long short narrow)) {
+                    push @lines, line($loc, $t->format_relative(to => $v, unit => $unit, style => $style, numeric => $_)) for qw(auto always);
+                }
+            }
+        }
+        my @digits = $L->digits($loc);
+        for my $f (qw(mon tue wed thu fri sat sun)) {
+            for my $w (qw(long short narrow)) {
+                my $r = $L->relative_names($loc, $f, $w);
+                push @lines, map { line($loc, $r->{at}{$_}) } sort keys %{ $r->{at} };
+                for my $d (qw(future past)) {
+                    for my $cat (sort keys %{ $r->{$d} || {} }) {
+                        my $p = $r->{$d}{$cat};
+                        push @lines, map { my $c = $_; line($loc, $p =~ s/\{0\}/join '', map { $digits[$_] } split m{}, $c/er) } 1, 2, 3, 5, 21;
+                    }
+                }
+            }
+        }
+    }
+    write_file('relative', \@lines);
+}
+
+if (want('duration')) {
+    my @lines;
+    for my $loc ($L->codes) {
+        for my $iso (qw(P1Y P2M P3W P4D PT5H PT6M PT7S PT1H30M P1Y2M3DT4H5M6S)) {
+            my $d = Time::Keeper::Duration->parse($iso);
+            push @lines, map { line($loc, $d->format(locale => $loc, style => $_)) } qw(long short narrow), ($iso =~ /^PT/ ? 'digital' : ());
+        }
+    }
+    write_file('duration', \@lines);
+}
+
+if (want('tables')) {
+    my @lines;
+    for my $code (Time::Keeper::Natural::Words->locales) {
+        my $w = Time::Keeper::Natural::Words->for($code) or next;
+        push @lines, map { (line($code, $_->[0]), line($code, uc $_->[0])) } $w->tests;
+    }
+    write_file('tables', \@lines);
+}
+
+my @SIXTY = do {
+    my %seen;
+    grep { !$seen{$_}++ } Time::Keeper::Natural::Words->locales,
+        qw(en-GB en-US en-AU en-IN fr-CA de-AT es-MX pt-PT zh-Hant ar-EG sv da fi nb pl cs sk hu ro bg uk tr he fa ur id vi ms sw ta te mr gu kn ml am yo zu cy ga eu ca gl et lv lt is);
+};
+@SIXTY = @SIXTY[0 .. 59] if @SIXTY > 60;
+
+if (want('formats')) {
+    my @lines;
+    my @dates = (Time::Keeper->new(year => 2026, month => 3, day => 7, hour => 15, minute => 5, second => 9, zone => 'Europe/London'),
+                 Time::Keeper->new(year => 2027, month => 11, day => 23, hour => 4, minute => 45, zone => 'Europe/London'),
+                 Time::Keeper->new(year => 2026, month => 10, day => 15, hour => 0, zone => 'Europe/London'));
+    for my $loc (@SIXTY) {
+        my $af = $L->available_formats($loc) || {};
+        for my $d (@dates) {
+            my $v = $d->in_locale($loc);
+            for my $w (qw(full long medium short)) {
+                push @lines, map { defined $_ ? line($loc, $_) : () } eval { $v->format_date($w) }, eval { $v->format_time($w) }, eval { $v->format_datetime($w) };
+            }
+            push @lines, map { my $s = $_; my $t = eval { $v->format_skeleton($s) }; defined $t ? line($loc, $t) : () } sort keys %$af;
+        }
+    }
+    write_file('formats', \@lines);
+}
+
+if (want('generated')) {
+    srand(20261019);
+    my %pool;
+    for my $loc (@SIXTY) {
+        my $lex = Time::Keeper::Natural::Lexicon->for($loc);
+        my @p = $lex->phrases;
+        my $nw = Time::Keeper::Natural::Numbers->for($loc);
+        my %c = $nw ? $nw->cardinals : ();
+        my $w = Time::Keeper::Natural::Words->for($loc);
+        my @table = $w ? map { my $k = $_; map { s/\s*\{0\}\s*//r } $w->phrases($k) } $w->keys : ();
+        my @joiners = $lex->joiners;
+        $pool{$loc} = [ @p, (sort keys %c)[0 .. 20], @table, @joiners, qw(3 15 2026 9:30 1:05:09 21 0 12), map { $lex->markers($_) } qw(future past) ];
+        $pool{$loc} = [ grep { defined && length } @{ $pool{$loc} } ];
+    }
+    my @lines;
+    while (@lines < 200_000) {
+        my $loc = $SIXTY[ int rand @SIXTY ];
+        my $pool = $pool{$loc};
+        my $n = 2 + int rand 2;
+        my $sep = $lex_spaceless{$loc} //= Time::Keeper::Natural::Lexicon->for($loc)->spaceless ? '' : ' ';
+        my $text = join $sep, map { $pool->[ int rand @$pool ] } 1 .. $n;
+        my %o;
+        my $r = rand;
+        $o{bare_hour} = 'next' if $r < 0.1;
+        $o{prefer} = 'past' if $r > 0.9;
+        push @lines, line($loc, $text, %o);
+    }
+    write_file('generated', \@lines);
+}

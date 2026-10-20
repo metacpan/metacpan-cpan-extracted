@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use base 'oEdtk::Field';
-our $VERSION = 2.1126;
+our $VERSION = 2.1129;
 
 sub process {
 	my ( $self, $data ) = @_;

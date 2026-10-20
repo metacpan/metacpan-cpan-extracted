@@ -5,7 +5,7 @@ use warnings;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 use Object::Pad 0.825;
 
@@ -13,6 +13,12 @@ class Term::Fabulous::Range :strict(params) {
 	use List::Util ();    # min and max are methods here
 	use POSIX qw(floor);
 	use Term::Fabulous::Check qw(boolean number optional);
+
+	# How far past the middle between two grid values, in steps, a number
+	# still rounds up: the division by the step carries the rounding noise
+	# of the platform's floating point, so a number exactly halfway
+	# would otherwise go up on some perls and down on others.
+	use constant HALF_STEP_TOLERANCE => 1e-9;
 
 	# Key name => [ unit, direction ]: steps, pages or an end of the range.
 	my %MOVE_BY_KEY = (
@@ -89,12 +95,18 @@ class Term::Fabulous::Range :strict(params) {
 		return List::Util::max( _decimal_places( $step // 1 ), _decimal_places($min) );
 	}
 
+	# The whole number of steps nearest to a count of steps; a count
+	# halfway between two goes up.
+	sub _whole_steps ($steps) {
+		return floor( $steps + 0.5 + HALF_STEP_TOLERANCE );
+	}
+
 	# The nearest value on the grid min, min + step, ... inside the range;
 	# without a step, the number limited to the range.
 	method snapped ($number) {
 		my $inside = List::Util::min( List::Util::max( $number, $min ), $max );
 		return $inside unless defined $step;
-		my $snapped = $min + floor( ( $inside - $min ) / $step + 0.5 ) * $step;
+		my $snapped = $min + _whole_steps( ( $inside - $min ) / $step ) * $step;
 		$snapped -= $step while $snapped > $max + $step / 1e6;
 		$snapped = $min if $snapped < $min;
 		return 0 + sprintf '%.*f', $self->decimals, $snapped;
@@ -109,7 +121,7 @@ class Term::Fabulous::Range :strict(params) {
 	method page_step () {
 		return $page_step if defined $page_step;
 		my $unit = $step // ( $max - $min ) / 100;
-		return List::Util::max( $unit, $unit * floor( ( $max - $min ) / $unit / 10 + 0.5 ) );
+		return List::Util::max( $unit, $unit * _whole_steps( ( $max - $min ) / $unit / 10 ) );
 	}
 
 	method set_page_step ($size) {
@@ -371,7 +383,8 @@ Where a number lies in the range, from 0 at C<min> to 1 at C<max>.
 
 	my $on_grid = $range->snapped($number);
 
-The grid value nearest to a number, limited to the range; without a
+The grid value nearest to a number, limited to the range; a number
+halfway between two grid values goes to the higher one. Without a
 step, the number limited to the range.
 
 =head2 top_value

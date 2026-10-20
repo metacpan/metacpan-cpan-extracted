@@ -1,6 +1,6 @@
 package App::week;
 
-use v5.14;
+use v5.24;
 use warnings;
 use utf8;
 
@@ -34,7 +34,7 @@ my %abbr = do {
 };
 
 my @month_name = qw(JAN FEB MAR APR MAY JUN JUL AUG SEP OCT NOV DEC);
-my %month = map { $month_name[$_] => $_ + 1 } 0 .. $#month_name;
+my %month = map { $month_name[$_] => $_ + 1 } keys @month_name;
 my $month_re = do { local $" = '|'; qr/(?:@month_name)/i };
 
 sub guess_date {

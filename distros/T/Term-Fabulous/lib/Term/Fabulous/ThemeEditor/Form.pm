@@ -5,7 +5,7 @@ use warnings;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 use Object::Pad 0.825;
 
@@ -24,9 +24,8 @@ class Term::Fabulous::ThemeEditor::Form :isa(Term::Fabulous::Widget::Box) :stric
 	use Term::Fabulous::Theme;
 	use Term::Fabulous::Theme::Document;
 	use Term::Fabulous::Widget::Checkbox;
-	use Term::Fabulous::Widget::RichText;
-	use Term::Fabulous::ThemeEditor::SettingsList;
 	use Term::Fabulous::Widget::Text;
+	use Term::Fabulous::ThemeEditor::SettingsList;
 	use Term::Fabulous::Widget::TextField;
 
 	use constant LIST_ID => 'theme-editor-settings';
@@ -51,12 +50,12 @@ class Term::Fabulous::ThemeEditor::Form :isa(Term::Fabulous::Widget::Box) :stric
 		my $tools = Term::Fabulous::Widget::Box->new( layout => { sizing => { width => sizing_grow() }, child_gap => 2, padding => { bottom => 1 } } );
 		$tools->add_child( $search, $only_set );
 
-		$banner  = Term::Fabulous::Widget::RichText->new( text => '' );
-		$details = Term::Fabulous::Widget::RichText->new( text => '' );
+		$banner  = Term::Fabulous::Widget::Text->new( text => '' );
+		$details = Term::Fabulous::Widget::Text->new( text => '' );
 		my $details_box = Term::Fabulous::Widget::Box->new( layout => { sizing => { width => sizing_grow(), height => sizing_fixed(2) }, padding => { top => 0 } } );
 		$details_box->add_child($details);
 
-		weaken( my $weak_self = $self );
+		weaken( my $weak_self = $self );    # for the list's callbacks, which it keeps
 		$list = Term::Fabulous::ThemeEditor::SettingsList->new(
 			id          => LIST_ID,
 			on_activate => sub ($id) { $weak_self->_activate($id) },
@@ -64,16 +63,17 @@ class Term::Fabulous::ThemeEditor::Form :isa(Term::Fabulous::Widget::Box) :stric
 		);
 		$self->add_child( $tools, $list, $details_box );
 
-		$search->on( Change => sub ($event) { $weak_self->list->search( $event->value ); return Clay::UI::Enum::Result->CONTINUE } );
-		$search->on( Submit => sub ($event) { $weak_self->focus_list;                    return } );
+		$search->on( Change => sub ( $self, $event ) { $self->list->search( $event->value ); return Clay::UI::Enum::Result->CONTINUE }, owner => $self );
+		$search->on( Submit => sub ( $self, $event ) { $self->focus_list;                    return },                                  owner => $self );
 		$search->on(
-			KeyPress => sub ($event) {
+			KeyPress => sub ( $self, $event ) {
 				return Clay::UI::Enum::Result->CONTINUE unless ( $event->main_key_name // '' ) eq 'Down';
-				$weak_self->focus_list;
+				$self->focus_list;
 				return Clay::UI::Enum::Result->HANDLED;
-			}
+			},
+			owner => $self
 		);
-		$only_set->on( Change => sub ($event) { $weak_self->_filter_only_set( $event->value ); return Clay::UI::Enum::Result->CONTINUE } );
+		$only_set->on( Change => sub ( $self, $event ) { $self->_filter_only_set( $event->value ); return Clay::UI::Enum::Result->CONTINUE }, owner => $self );
 	}
 
 	method _filter_only_set ($on) {
@@ -115,8 +115,18 @@ class Term::Fabulous::ThemeEditor::Form :isa(Term::Fabulous::Widget::Box) :stric
 		return join ':', "#$kind", @names;
 	}
 
-	method _section_row ( $id, $label, @children ) {
-		return { id => $id, setting => $label, value => '', origin => '', swatch => '', section => 1, children => \@children };
+	# A section row knows what it is: its kind (theme, palette, family or
+	# variant), and the family and variant it is about.
+	method _section_row ( $place, $label, @children ) {
+		my ( $kind, $family, $variant ) = @{$place}{qw(kind family variant)};
+		return {
+			id      => section_id( $kind, grep { defined } $family, $variant ),
+			kind    => $kind,
+			family  => $family,
+			variant => $variant,
+			setting => $label,
+			value   => '', origin => '', swatch => '', section => 1, children => \@children,
+		};
 	}
 
 	method _setting_row ( $key, $label ) {
@@ -127,8 +137,8 @@ class Term::Fabulous::ThemeEditor::Form :isa(Term::Fabulous::Widget::Box) :stric
 	# those the user added without settings yet.
 	method _rows ( $document, @extra_variants ) {
 		my @rows = (
-			$self->_section_row( section_id('theme'),   'Theme',   map { $self->_setting_row( "theme.$_",   $_ ) } qw(name extends) ),
-			$self->_section_row( section_id('palette'), 'Palette', map { $self->_setting_row( "palette.$_", $_ ) } Term::Fabulous::Theme::tokens() ),
+			$self->_section_row( { kind => 'theme' },   'Theme',   map { $self->_setting_row( "theme.$_",   $_ ) } qw(name extends) ),
+			$self->_section_row( { kind => 'palette' }, 'Palette', map { $self->_setting_row( "palette.$_", $_ ) } Term::Fabulous::Theme::tokens() ),
 		);
 		my %variants;
 		push @{ $variants{ $_->[0] } }, $_->[1] foreach $document->variants, @extra_variants;
@@ -138,11 +148,11 @@ class Term::Fabulous::ThemeEditor::Form :isa(Term::Fabulous::Widget::Box) :stric
 			my @variant_rows = map {
 				my $variant = $_;
 				$self->_section_row(
-					section_id( 'variant', $family, $variant ), "variant $variant",
+					{ kind => 'variant', family => $family, variant => $variant }, "variant $variant",
 					map { $self->_setting_row( $_, $_ =~ s/\A\Q$family\E\[\Q$variant\E\]\.//r ) } slot_keys( $family, $variant )
 				)
 			} grep { !$seen{$_}++ } @{ $variants{$family} // [] };
-			push @rows, $self->_section_row( section_id( 'family', $family ), $family, @slots, @variant_rows );
+			push @rows, $self->_section_row( { kind => 'family', family => $family }, $family, @slots, @variant_rows );
 		}
 		return @rows;
 	}
@@ -276,6 +286,14 @@ class Term::Fabulous::ThemeEditor::Form :isa(Term::Fabulous::Widget::Box) :stric
 		return $row->{section} ? $id : $list->parent_of($id);
 	}
 
+	# What a section is about: { kind, family, variant }, undef for an id
+	# that is no section.
+	method section_info ($id) {
+		my $row = $shown{ $id // '' } // return undef;
+		return undef unless $row->{section};
+		return { map { $_ => $row->{$_} } qw(kind family variant) };
+	}
+
 	# The keys of the settings in a section (a family's include its
 	# variants').
 	method keys_in ($section) {
@@ -346,7 +364,7 @@ class Term::Fabulous::ThemeEditor::Form :isa(Term::Fabulous::Widget::Box) :stric
 	}
 
 	method hide_banner () {
-		$self->remove_child($banner) if $self->has_child($banner);
+		$self->remove_child($banner);
 		return $self;
 	}
 
@@ -434,6 +452,15 @@ C<section>), and its setting key.
 
 The section of a row, the setting keys inside a section, and whether
 a row exists.
+
+=head2 section_info
+
+	my $info = $form->section_info( $form->section_of($id) );    # { kind => 'variant', family => 'button', variant => 'primary' }
+
+What a section is about: its C<kind> (C<theme>, C<palette>, C<family>
+or C<variant>) and the C<family> and C<variant> it belongs to (C<undef>
+where the kind has none), as a new hash; C<undef> for an id that is no
+section.
 
 =head2 focus_list
 

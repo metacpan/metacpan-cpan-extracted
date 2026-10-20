@@ -86,7 +86,7 @@ sub WriteMakefile1 {
     delete $params{META_MERGE} if $eumm_version < 6.46;
     delete $params{META_ADD} if $eumm_version < 6.46;
     delete $params{LICENSE} if $eumm_version < 6.31;
-    delete $params{AUTHOR} if $] < 5.005;
-    delete $params{ABSTRACT_FROM} if $] < 5.005;
+    delete $params{AUTHOR} if "$]" < 5.005;
+    delete $params{ABSTRACT_FROM} if "$]" < 5.005;
     WriteMakefile(%params);
 }

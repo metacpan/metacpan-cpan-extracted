@@ -2,10 +2,10 @@
 X_No_Archive: Yes
 abstract: 'Perl Wrapper for the Simple DirectMedia Layer 3.0'
 author:
-  - 'Sanko Robinson <sanko@cpan.org>'
+  - 'Sanko Robinson'
 build_requires:
-  Affix: v1.1.0
-  Alien::SDL3: v2.24.0
+  Affix: v1.2.7
+  Alien::SDL3: '0'
   IPC::Cmd: '0'
   TAP::Harness::Env: '0'
   Test2::Plugin::UTF8: '0'
@@ -23,6 +23,7 @@ configure_requires:
   File::Spec::Functions: '0'
   Getopt::Long: '2.36'
   JSON::PP: '2'
+  Module::Build::Tiny: '0'
   Path::Tiny: '0.144'
 dynamic_config: 0
 generated_by: 'App::mii v1.0.0, CPAN::Meta::Converter version 2.150013'
@@ -51,10 +52,19 @@ optional_features:
 provides:
   SDL3:
     file: lib/SDL3.pm
-    version: v0.0.5
+    version: v0.0.6
+  SDL3::Image:
+    file: lib/SDL3/Image.pm
+    version: v0.0.6
+  SDL3::Mixer:
+    file: lib/SDL3/Mixer.pm
+    version: v0.0.6
+  SDL3::TTF:
+    file: lib/SDL3/TTF.pm
+    version: v0.0.6
 requires:
-  Affix: v1.1.0
-  Alien::SDL3: v2.24.0
+  Affix: v1.2.7
+  Alien::SDL3: '0'
   Carp: '0'
   Data::Dump: '0'
   perl: v5.40.0
@@ -63,7 +73,7 @@ resources:
   homepage: https://github.com/Perl-SDL3/SDL3.pm
   license: http://www.perlfoundation.org/artistic_license_2_0
   repository: git://github.com/Perl-SDL3/SDL3.pm.git
-version: v0.0.5
+version: v0.0.6
 x_help_wanted:
   - Tester
   - Documenter

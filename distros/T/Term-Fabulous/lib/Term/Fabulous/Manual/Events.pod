@@ -66,7 +66,7 @@ which events a key press or a click produces, and in which order:
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/example-event-monitor.svg" alt="The event monitor after Tab, typing Ada, Enter, F5, Tab and a click on the OK button: the log lists KeyPress, OnFocus, Change, Submit, OnBlur, Mouse, OnHoverStart, OnPress, Activate and OnRelease events with their targets"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.05/screenshots/example-event-monitor.svg" alt="The event monitor after Tab, typing Ada, Enter, F5, Tab and a click on the OK button: the log lists KeyPress, OnFocus, Change, Submit, OnBlur, Mouse, OnHoverStart, OnPress, Activate and OnRelease events with their targets"></p>
 
 =end html
 
@@ -181,11 +181,14 @@ the sections below it describe each event.
 	Submit           the text field or color picker    yes
 	Activate         the Button                        yes
 	Close            the Dialog, Toast or popup Menu   (no parent then)
-	Answer           the Prompt or FileDialog          (no parent then)
+	Answer           the Dialog (Prompt, FileDialog)   (no parent then)
 	Choose           the Menu                          yes, not popups
 	Select           Accordion, Tabs, DocumentTabs     yes
 	TabClose         the DocumentTabs                  yes
 	TabAdd           the DocumentTabs                  yes
+	TextClick        the Text                          yes
+	LinkActivate     the Text                          yes
+	ViewChange       the DocumentView                  yes
 	SeriesHover      the chart                         yes
 	OnFocus, OnBlur  the widget                        yes
 	OnPress          innermost pressable widget        yes
@@ -215,8 +218,9 @@ A mouse button was pressed or released, the mouse was dragged, or the
 wheel was turned. Fired on the topmost widget painted under the pointer
 (see L</MOUSE>). Fields: C<key> (which button or wheel direction),
 C<x>, C<y> (the cell), C<modifiers> (Shift, Alt, Ctrl and the motion
-flag of a drag), C<released_button> (which button a release released);
-methods C<use_wheel> and C<wheel_used> (see L</SCROLLING>).
+flag of a drag), C<released_button> (which button a release released),
+C<click_count> (2 for the second press of a double click); methods
+C<use_wheel> and C<wheel_used> (see L</SCROLLING>).
 
 =item C<MouseMove> (L<Term::Fabulous::Event::MouseMove>)
 
@@ -323,8 +327,8 @@ C<< $button->activate >>. Fired on the button. No fields.
 
 =item C<Close> (L<Term::Fabulous::Event::Close>)
 
-A L<Term::Fabulous::Widget::Dialog> was closed, by C<Escape> or from
-code, a L<Term::Fabulous::Widget::Toast> went away, by its timeout,
+A L<Term::Fabulous::Widget::Dialog> was closed, by an answer, by
+C<Escape> or from code, a L<Term::Fabulous::Widget::Toast> went away, by its timeout,
 its close mark or from code, or a L<Term::Fabulous::Widget::Menu> that
 was opened as a popup closed. Fired on the dialog, the toast or the
 menu, after it has left the screen, so only listeners on it see it. No
@@ -332,16 +336,18 @@ fields.
 
 =item C<Answer> (L<Term::Fabulous::Event::Answer>)
 
-A L<Term::Fabulous::Widget::Prompt> was answered: the user pressed one
-of its buttons or C<Escape>, or the program called C<answer> or
-C<close>. Or a L<Term::Fabulous::Widget::FileDialog> was answered: the
-user chose a file or a folder, or cancelled. Fired on the prompt or the
-file dialog after it closed and gave the focus back, so only listeners
-on it see it. Fields: C<button>, the id of the button (C<cancel> for
-Escape; for a file dialog C<open>, C<save>, C<choose> or C<cancel>),
-C<values>, the values of the prompt's fields (for a file dialog
-C<path>, the chosen path), and C<dismissed>, true when no button
-answered.
+A L<Term::Fabulous::Widget::Dialog> closed, right after its C<Close>:
+the user pressed one of its buttons or C<Escape>, or the program called
+C<answer> or C<close>. A L<Term::Fabulous::Widget::Prompt> answers this
+way, and so does a L<Term::Fabulous::Widget::FileDialog> when the user
+chose a file or a folder, or cancelled. Fired on the dialog after it
+closed and gave the focus back, so only listeners on it see it. Fields:
+C<button>, the id of the button (C<cancel> for Escape; for a file
+dialog C<open>, C<save>, C<choose> or C<cancel>), C<values>, the
+dialog's values, also when it was dismissed (a prompt's fields; a file
+dialog has none, and its choice adds C<path>, the chosen path), and
+C<dismissed>, true when no button answered (see
+L<Term::Fabulous::Widget::Dialog/Answers>).
 
 =item C<Choose> (L<Term::Fabulous::Event::Choose>)
 
@@ -382,18 +388,28 @@ fields.
 =item C<TextClick> (L<Term::Fabulous::Event::TextClick>)
 
 A mouse button was pressed on a character of a
-L<Term::Fabulous::Widget::Text> or L<Term::Fabulous::Widget::RichText>.
+L<Term::Fabulous::Widget::Text>.
 Fired on the text, after the C<Mouse> event of the press. Fields:
 C<button>, C<x>, C<y>, C<offset>, C<word>, C<word_start>, C<word_end>,
 C<spans>, C<link>, C<link_index>. See L</Clicks on text and links>.
 
 =item C<LinkActivate> (L<Term::Fabulous::Event::LinkActivate>)
 
-The user followed a link of a L<Term::Fabulous::Widget::RichText>:
-clicked it, or pressed C<Enter> while the RichText had the focus and
-the link was selected. Also fired by C<< $rich_text->activate_link >>.
-Fired on the RichText. Fields: C<link> (the link's target), C<index>,
+The user followed a link of a L<Term::Fabulous::Widget::Text>:
+clicked it, or pressed C<Enter> while the Text had the focus and
+the link was selected. Also fired by C<< $text->activate_link >>.
+Fired on the Text. Fields: C<link> (the link's target), C<index>,
 C<start>, C<end>.
+
+=item C<ViewChange> (L<Term::Fabulous::Event::ViewChange>)
+
+What a L<Term::Fabulous::Widget::DocumentView> shows changed: the user
+scrolled, selected another link or searched, or the program gave the
+view another document. Fired on the view after every frame that shows
+something new. Fields: C<top> and C<bottom> (the items at the edges of
+the view), C<section>, C<section_title>, C<percent>, C<link> (the target
+of the selected link), C<query>, C<match> and C<matches>. See
+L<Term::Fabulous::Cookbook::Documents/Search a document and show the reader's position (search, ViewChange)>.
 
 =item C<SeriesHover> (L<Term::Fabulous::Event::SeriesHover>)
 
@@ -743,7 +759,7 @@ skipped. The order wraps around at the end.
 when the user presses the left mouse button: the clicked widget, or its
 nearest ancestor that can take the focus, gets it. On text, the
 clicked widget is the Text itself, so a click on a
-L<Term::Fabulous::Widget::RichText> with links focuses it. Clicking where no
+L<Term::Fabulous::Widget::Text> with links focuses it. Clicking where no
 widget can take the focus clears the focus. Dragging and the other
 buttons do not move the focus.
 
@@ -782,7 +798,8 @@ To take a widget out of the focus order, pass C<can_focus =E<gt> 0> to
 C<new> (or C<can_focus #false> in a layout file), or call
 C<< $widget->can_focus(0) >> later; Tab skips it, a click does not focus
 it, and C<set_focused_widget> dies for it. A widget that has the focus
-when it stops being able to take it loses the focus at once (C<OnBlur>).
+when it stops being able to take it loses the focus at once (C<OnBlur>)
+to its heir (see L</When the focused widget goes away>).
 Disabled widgets (the inputs, the radio groups and the Buttons, through
 L<Clay::UI::Role::Interaction::Disableable>) cannot take the focus:
 while C<< $widget->disabled(1) >> is in force, C<can_focus> reads 0, and
@@ -819,6 +836,49 @@ dialog focuses the dialog's backdrop instead of a widget behind it, a
 focused widget that is disabled or removed hands the focus to the
 backdrop, and when the dialog closes the focus goes back to the widget
 that had it before.
+
+=head2 When the focused widget goes away
+
+When the focused widget is removed from the tree (or a widget around
+it is), is disabled or can no longer take the focus, the focus goes to
+its I<heir>, so the keys keep reaching the part of the screen the user
+was working in. Clay::UI walks up from the widget and stops at the first
+one that stays in the tree and can take the focus. A container on the
+way may name a widget of its own instead, with a C<focus_heir> method
+(see L<Clay::UI::Interaction/Focus heirs> and, for your own widgets,
+L<Term::Fabulous::Manual::CustomWidgets/A container widget>). The old
+widget gets C<OnBlur>, then the heir gets C<OnFocus>. Without an heir,
+nothing has the focus and the keys go to the root widget.
+
+The widgets of Term::Fabulous name these heirs:
+
+=over
+
+=item *
+
+a L<Term::Fabulous::Widget::Tabs> its active tab, when the page with
+the focus is no longer shown, so C<Ctrl+PageUp> and C<Ctrl+PageDown>
+keep working;
+
+=item *
+
+an L<Term::Fabulous::Widget::Accordion::Item> its header, when it closes
+over the focused widget;
+
+=item *
+
+the backdrop of a L<Term::Fabulous::Widget::Dialog> and a popup
+L<Term::Fabulous::Widget::Menu> the widget that had the focus before
+they opened, when they close.
+
+=back
+
+The other widgets need no name: a widget in an item of a
+L<Term::Fabulous::Widget::VirtualList> that scrolls out of the window
+hands the focus to the list, when the list can take it (a DocumentView
+can), else to the nearest widget above it that can; one in a cell of a
+L<Term::Fabulous::Widget::Table> that is built again, to the table; a
+widget inside an open dialog, to the dialog's backdrop.
 
 =head2 Custom focus order
 
@@ -924,6 +984,17 @@ For C<TB_KEY_MOUSE_RELEASE>: the button that was released
 (C<TB_KEY_MOUSE_LEFT>, C<TB_KEY_MOUSE_MIDDLE> or C<TB_KEY_MOUSE_RIGHT>),
 or C<undef> when the terminal did not say.
 
+=item C<click_count>
+
+For a button press: its place in a run of quick clicks, 1 for a single
+click, 2 for a double click, 3 for a triple click. A press continues
+the run when it is of the same button, in the same cell and at most
+C<double_click_seconds> (a parameter of L<Term::Fabulous/new>, default
+0.4) after the press before it, measured on the UI's clock
+(L<Term::Fabulous/now>), so a test with its own C<clock> can click
+quickly or slowly. Every other Mouse event (a release, a drag, the
+wheel) has 1.
+
 =back
 
 A report of the pointer moving with no button held becomes a
@@ -1000,9 +1071,8 @@ button; not a drag, a release or the wheel) fires C<TextClick> on the
 L<Term::Fabulous::Widget::Text> after the C<Mouse> event, which still
 goes to the widget behind the text. The event says which character was
 clicked (C<offset> in the text, also on a wrapped line), the word it
-belongs to, and for a L<Term::Fabulous::Widget::RichText> the spans and
-the link there. It bubbles, so a container can react to clicks on any
-text inside it:
+belongs to, and the spans and the link there. It bubbles, so a
+container can react to clicks on any text inside it:
 
 	$article->on(
 		TextClick => sub ($event) {
@@ -1011,11 +1081,11 @@ text inside it:
 		}
 	);
 
-A left click on a link of a RichText then selects the link and fires
-C<LinkActivate> on the RichText; the pointer over a link gives it its
-hovered look. See L<Term::Fabulous::Widget::RichText/LINKS> for links,
+A left click on a link of a Text then selects the link and fires
+C<LinkActivate> on the Text; the pointer over a link gives it its
+hovered look. See L<Term::Fabulous::Widget::Text/LINKS> for links,
 their looks and their keys. The recipes
-L<Term::Fabulous::Cookbook::KeyboardAndMouse/Follow links in a text (RichText links)>
+L<Term::Fabulous::Cookbook::KeyboardAndMouse/Follow links in a text (Text links)>
 and
 L<Term::Fabulous::Cookbook::KeyboardAndMouse/React to a click on a word (TextClick)>
 are complete programs.
@@ -1071,14 +1141,41 @@ The scroll box fires C<OnScroll> when its position changed.
 =item *
 
 Adding children does not move the view; it stays where the user scrolled
-to. To read or set the scroll position from code, ask the application
-object: C<< $ui->scroll_state($box) >> returns
-C<{ position, viewport, content }>, and
-C<< $ui->scroll_to( $box, { y => -10 } ) >> scrolls ten rows down from
-the top (see L<Term::Fabulous/bounding_box, scroll_state, scroll_to>).
+to, unless the box has C<< follow_end => 1 >> (see below). To read or
+set the scroll position, ask the application object:
+C<< $ui->scroll_state($box) >> returns C<{ position, viewport, content }>,
+and C<< $ui->scroll_to( $box, { y => -10 } ) >> scrolls ten rows down from
+the top (see L<Term::Fabulous/"bounding_box, content_box, scroll_state, scroll_to">).
 The recipe
 L<Scroll a ScrollBox from code|Term::Fabulous::Cookbook::LiveData/Scroll a ScrollBox from code (keep a log at the newest line)>
-uses them to keep a log at its newest line.
+keeps a log at its newest line with C<follow_end> and scrolls it with
+L<Term::Fabulous::Scrolling> and C<scroll_to>.
+
+=item *
+
+With C<< follow_end => 1 >>, the box stays at the end of its content
+while the content grows, as a log viewer does. Scrolling up stops
+following, and scrolling back to the last row resumes it (see
+L<Term::Fabulous::Widget::ScrollBox/follow_end>).
+
+=item *
+
+C<< $box->reveal($widget) >> scrolls a widget inside the box into view
+with the smallest move; C<< $box->reveal( $widget, align => 'top' ) >>
+puts its first row at the top of the box (see
+L<Term::Fabulous::Widget::ScrollBox/reveal>). A widget inside the box
+that gets the focus, with Tab, a click or from code, is scrolled into
+view the same way (see L<Term::Fabulous::Widget::ScrollBox/FOCUS>).
+
+=item *
+
+L<Term::Fabulous::Scrolling> scrolls any scroll container (a
+ScrollBox, a VirtualList, a document view) from code:
+C<scroll_by_rows>, C<scroll_by_pages>, C<scroll_to_start> and
+C<scroll_to_end> move it and return 1 when the content moved (for a
+VirtualList, C<scroll_to_start> and C<scroll_to_end> return 1 when it
+was asked to move); C<scroll_offset> reports the position as positive
+rows, 0 at the top (see L<Term::Fabulous::Scrolling/FUNCTIONS>).
 
 =item *
 
@@ -1103,8 +1200,10 @@ L<Term::Fabulous::Widget::ScrollBox>.
 
 =back
 
-There is no keyboard scrolling for ScrollBox. A
-L<Term::Fabulous::Widget::TextArea> scrolls its own text, with keys,
+A ScrollBox has no keys of its own; give it the keys of a pager with
+L<scroll_by_key|Term::Fabulous::Scrolling/scroll_by_key> (see
+L<Term::Fabulous::Cookbook::DocumentTechniques/Scroll any scroll box like a pager (Term::Fabulous::Scrolling)>).
+A L<Term::Fabulous::Widget::TextArea> scrolls its own text, with keys,
 wheel and a scrollbar; the scroll box around it scrolls only when the
 area is already at its end. A L<Term::Fabulous::Widget::Table> scrolls its rows
 with the keys, the wheel and its own scrollbar.
@@ -1116,6 +1215,8 @@ This page is part of L<Term::Fabulous::Manual>. Previous page: L<Term::Fabulous:
 L<Term::Fabulous::Cookbook::KeyboardAndMouse>,
 L<Term::Fabulous::Event::KeyPress>, L<Term::Fabulous::Event::Mouse>,
 L<Term::Fabulous::Widget::Button>, L<Term::Fabulous::Widget::Dialog>,
-L<Clay::UI::Events::Event>, L<Clay::UI::Interaction>.
+L<Term::Fabulous::Widget::ScrollBox>, L<Term::Fabulous::Scrolling>,
+L<Term::Fabulous::Widget::Text/LINKS>, L<Clay::UI::Events::Event>,
+L<Clay::UI::Interaction>.
 
 =cut

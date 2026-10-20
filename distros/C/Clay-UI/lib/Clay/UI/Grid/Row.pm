@@ -1,5 +1,5 @@
 package Clay::UI::Grid::Row;
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 use v5.22;
 use warnings;
 use feature 'signatures';

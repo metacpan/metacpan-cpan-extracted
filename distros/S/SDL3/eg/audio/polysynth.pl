@@ -1,4 +1,5 @@
 use v5.40;
+use blib;
 use SDL3 qw[:all];
 $|++;
 

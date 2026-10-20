@@ -57,7 +57,15 @@ tkb_dated_lower_bound(const tkb_dated *a, size_t n, int64_t day)
 static int
 tkb_week_is_plain(pTHX_ tkb_schedule *s, int64_t from, const char *what)
 {
+    if (s->join_hours)
+        return 0;
     tkb_ensure_span(aTHX_ s, from, from + 6, what);
+    if (s->hours.n_rules) {
+        tkb_rule_hours_ensure(aTHX_ &s->hours, from, what);
+        tkb_rule_hours_ensure(aTHX_ &s->hours, from + 6, what);
+        if (tkb_lower_bound(s->hours.rule_days, s->hours.n_rule_days, from + 7) != tkb_lower_bound(s->hours.rule_days, s->hours.n_rule_days, from))
+            return 0;
+    }
     if (tkb_lower_bound(s->closed, s->n_closed, from + 7) != tkb_lower_bound(s->closed, s->n_closed, from))
         return 0;
     if (tkb_lower_bound(s->open, s->n_open, from + 7) != tkb_lower_bound(s->open, s->n_open, from))
@@ -183,6 +191,36 @@ tkb_time_between(pTHX_ tkb_schedule *s, int64_t a_day, int64_t a_pos, int64_t b_
     return total;
 }
 
+/* A Duration of ns nanoseconds in hours and below, with a reference count
+ * of one: what Duration->new(nanoseconds => ns)->balance(largest =>
+ * 'hours') gives, made through the table where it is at version 3. */
+static SV *
+tkb_duration_hours(pTHX_ int64_t ns)
+{
+    SV *args[2], *dur, *bal[2];
+#if TKB_HAVE_V3
+    if (TKB_V3) {
+        time_keeper_parts p;
+        SV *out;
+        Zero(&p, 1, time_keeper_parts);
+        p.hours = ns / ((int64_t)3600 * TKB_NS_PER_SEC);
+        p.minutes = ns / ((int64_t)60 * TKB_NS_PER_SEC) % 60;
+        p.seconds = ns / TKB_NS_PER_SEC % 60;
+        p.nanoseconds = ns % TKB_NS_PER_SEC;
+        out = TKB(new_duration_sv)(aTHX_ &p);
+        if (out)
+            return out;
+    }
+#endif
+    args[0] = sv_2mortal(newSVpvs("nanoseconds"));
+    args[1] = sv_2mortal(tkb_i64_sv(aTHX_ ns));
+    dur = tkb_call(aTHX_ sv_2mortal(newSVpvs("Time::Keeper::Duration")), "new", args, 2);
+    bal[0] = sv_2mortal(newSVpvs("largest"));
+    bal[1] = sv_2mortal(newSVpvs("hours"));
+    dur = tkb_call(aTHX_ dur, "balance", bal, 2);
+    return SvREFCNT_inc_simple_NN(dur);
+}
+
 /* An amount of business time from key/value pairs or a Duration of clock
  * units: nanoseconds, with days and end_of_day for deadline. */
 static void
@@ -255,6 +293,259 @@ tkb_amount(pTHX_ SV **args, I32 n, int for_deadline, int64_t *amount, int64_t *d
     if (total > 9.0e18 || total < -9.0e18)
         croak("%s: the amount of business time is out of range", what);
     *amount = all_exact ? exact : (int64_t)total;
+}
+
+#endif
+
+#ifndef TKB_ELAPSED_H
+#define TKB_ELAPSED_H
+
+/* Elapsed reckoning: business time is the difference of instants. A day's
+ * spans become intervals of instants (an open the clocks skipped carried
+ * forward, a repeated time read the earlier way), and the walk sums and
+ * places on those. A plain week whose midnights, and the morning after,
+ * all have one offset is a wall-clock week and takes the weekly total at a
+ * stroke, as the wall-clock walk does. */
+
+typedef struct tkb_inst { int64_t sec; int32_t nsec; } tkb_inst;
+
+static int64_t
+tkb_inst_diff(const tkb_inst *a, const tkb_inst *b)
+{
+    return (b->sec - a->sec) * TKB_NS_PER_SEC + (b->nsec - a->nsec);
+}
+
+static int
+tkb_inst_cmp(const tkb_inst *a, const tkb_inst *b)
+{
+    if (a->sec != b->sec) return a->sec < b->sec ? -1 : 1;
+    return a->nsec < b->nsec ? -1 : a->nsec > b->nsec;
+}
+
+static void
+tkb_inst_add(tkb_inst *t, int64_t ns)
+{
+    int64_t total = (int64_t)t->nsec + ns % TKB_NS_PER_SEC;
+    t->sec += ns / TKB_NS_PER_SEC;
+    if (total >= TKB_NS_PER_SEC) { t->sec++; total -= TKB_NS_PER_SEC; }
+    else if (total < 0) { t->sec--; total += TKB_NS_PER_SEC; }
+    t->nsec = (int32_t)total;
+}
+
+/* A day's spans as instant intervals, seconds, into a buffer of pairs. */
+static size_t
+tkb_day_iv(pTHX_ tkb_schedule *s, int64_t day, SV *buf, const char *what)
+{
+    const tkb_day *h = tkb_hours_on(aTHX_ s, day, what);
+    int i;
+    SvCUR_set(buf, 0);
+    for (i = 0; i < h->n; i++) {
+        int64_t a = tkb_wall_instant(aTHX_ &s->hours.zone, day, h->spans[i].start, what);
+        int64_t b = tkb_wall_instant(aTHX_ &s->hours.zone, day, h->spans[i].end, what);
+        if (b <= a)
+            continue;
+        sv_catpvn(buf, (const char *)&a, sizeof a);
+        sv_catpvn(buf, (const char *)&b, sizeof b);
+    }
+    return SvCUR(buf) / (2 * sizeof(int64_t));
+}
+
+/* 1 when the zone keeps one offset from a through b, which comes before
+ * no change: there an instant and the wall clock differ by a constant, so
+ * elapsed reckoning is the wall clock's. Known only through the table's
+ * version 3 entry; -1 where the table cannot tell. */
+static int
+tkb_zone_steady(pTHX_ const time_keeper_zone *z, const tkb_inst *a, const tkb_inst *b)
+{
+#if TKB_HAVE_V3
+    if (TKB_V3) {
+        time_keeper_instant in, at;
+        int32_t before, after;
+        int rc;
+        in.sec = a->sec;
+        in.nsec = a->nsec;
+        for (;;) {
+            rc = TKB(next_change)(aTHX_ &in, z, &at, &before, &after);
+            if (rc == TIME_KEEPER_RANGE)
+                return 1;
+            if (rc != TIME_KEEPER_OK)
+                return -1;
+            if (at.sec > b->sec)
+                return 1;
+            if (before != after)
+                return 0;
+            in = at;
+        }
+    }
+#endif
+    PERL_UNUSED_ARG(z);
+    PERL_UNUSED_ARG(a);
+    PERL_UNUSED_ARG(b);
+    return -1;
+}
+
+static int
+tkb_week_steady(pTHX_ tkb_schedule *s, int64_t from, const char *what)
+{
+    int64_t base = tkb_wall_instant(aTHX_ &s->hours.zone, from, 0, what) - from * 86400, d;
+    {
+        tkb_inst a, b;
+        int st;
+        a.sec = base + from * 86400;
+        a.nsec = 0;
+        b.sec = a.sec + 8 * 86400;
+        b.nsec = 0;
+        st = tkb_zone_steady(aTHX_ &s->hours.zone, &a, &b);
+        if (st >= 0)
+            return st;
+    }
+    for (d = from + 1; d <= from + 8; d++)
+        if (tkb_wall_instant(aTHX_ &s->hours.zone, d, 0, what) - d * 86400 != base)
+            return 0;
+    return 1;
+}
+
+static void
+tkb_add_time_elapsed(pTHX_ tkb_schedule *s, int64_t day, int32_t secs, int32_t nsec, const tkb_inst *at, int64_t amount, tkb_inst *out, const char *what)
+{
+    SV *buf = sv_2mortal(newSVpvs(""));
+    int64_t weekly = (int64_t)s->hours.weekly_total * TKB_NS_PER_SEC;
+    const tkb_day *d;
+    tkb_inst t;
+    size_t n, k;
+    if (at)
+        t = *at;
+    else { t.sec = tkb_wall_instant(aTHX_ &s->hours.zone, day, secs, what); t.nsec = nsec; }
+    if (amount >= 0) {
+        if (tkb_span_at(tkb_hours_on(aTHX_ s, day, what), secs) < 0) {
+            tkb_next_open(aTHX_ s, &day, &secs, &nsec, what);
+            t.sec = tkb_wall_instant(aTHX_ &s->hours.zone, day, secs, what);
+            t.nsec = 0;
+        }
+        for (;;) {
+            const int64_t *iv;
+            int64_t rem = 0;
+            n = tkb_day_iv(aTHX_ s, day, buf, what);
+            iv = (const int64_t *)SvPVX(buf);
+            for (k = 0; k < n; k++) {
+                tkb_inst a = { iv[2 * k], 0 }, b = { iv[2 * k + 1], 0 };
+                tkb_inst lo = tkb_inst_cmp(&a, &t) > 0 ? a : t;
+                if (tkb_inst_cmp(&b, &lo) > 0)
+                    rem += tkb_inst_diff(&lo, &b);
+            }
+            if (amount <= rem) {
+                for (k = 0; k < n; k++) {
+                    tkb_inst a = { iv[2 * k], 0 }, b = { iv[2 * k + 1], 0 };
+                    tkb_inst lo = tkb_inst_cmp(&a, &t) > 0 ? a : t;
+                    int64_t avail = tkb_inst_cmp(&b, &lo) > 0 ? tkb_inst_diff(&lo, &b) : 0;
+                    if (avail <= 0)
+                        continue;
+                    if (amount <= avail) {
+                        tkb_inst_add(&lo, amount);
+                        *out = lo;
+                        return;
+                    }
+                    amount -= avail;
+                }
+            }
+            amount -= rem;
+            while (weekly > 0 && amount > weekly && tkb_week_is_plain(aTHX_ s, day + 1, what) && tkb_week_steady(aTHX_ s, day + 1, what)) {
+                day += 7;
+                amount -= weekly;
+            }
+            day = tkb_next_day_with_hours(aTHX_ s, day, 1, &d, what);
+            t.sec = tkb_wall_instant(aTHX_ &s->hours.zone, day, d->spans[0].start, what);
+            t.nsec = 0;
+        }
+    }
+    amount = -amount;
+    for (;;) {
+        const int64_t *iv;
+        int64_t el = 0;
+        n = tkb_day_iv(aTHX_ s, day, buf, what);
+        iv = (const int64_t *)SvPVX(buf);
+        for (k = 0; k < n; k++) {
+            tkb_inst a = { iv[2 * k], 0 }, b = { iv[2 * k + 1], 0 };
+            tkb_inst hi = tkb_inst_cmp(&b, &t) < 0 ? b : t;
+            if (tkb_inst_cmp(&hi, &a) > 0)
+                el += tkb_inst_diff(&a, &hi);
+        }
+        if (amount <= el) {
+            for (k = n; k-- > 0; ) {
+                tkb_inst a = { iv[2 * k], 0 }, b = { iv[2 * k + 1], 0 };
+                tkb_inst hi = tkb_inst_cmp(&b, &t) < 0 ? b : t;
+                int64_t avail = tkb_inst_cmp(&hi, &a) > 0 ? tkb_inst_diff(&a, &hi) : 0;
+                if (avail <= 0)
+                    continue;
+                if (amount <= avail) {
+                    tkb_inst_add(&hi, -amount);
+                    *out = hi;
+                    return;
+                }
+                amount -= avail;
+            }
+        }
+        amount -= el;
+        while (weekly > 0 && amount > weekly && tkb_week_is_plain(aTHX_ s, day - 7, what) && tkb_week_steady(aTHX_ s, day - 7, what)) {
+            day -= 7;
+            amount -= weekly;
+        }
+        day = tkb_next_day_with_hours(aTHX_ s, day, -1, &d, what);
+        t.sec = tkb_wall_instant(aTHX_ &s->hours.zone, day, d->spans[d->n - 1].end, what);
+        t.nsec = 0;
+    }
+}
+
+/* The intervals of one day clipped to [a, b), summed. */
+static int64_t
+tkb_day_clipped(pTHX_ tkb_schedule *s, int64_t day, const tkb_inst *a, const tkb_inst *b, SV *buf, const char *what)
+{
+    size_t n = tkb_day_iv(aTHX_ s, day, buf, what), k;
+    const int64_t *iv = (const int64_t *)SvPVX(buf);
+    int64_t total = 0;
+    for (k = 0; k < n; k++) {
+        tkb_inst x = { iv[2 * k], 0 }, y = { iv[2 * k + 1], 0 };
+        tkb_inst lo = tkb_inst_cmp(&x, a) > 0 ? x : *a;
+        tkb_inst hi = tkb_inst_cmp(&y, b) < 0 ? y : *b;
+        if (tkb_inst_cmp(&hi, &lo) > 0)
+            total += tkb_inst_diff(&lo, &hi);
+    }
+    return total;
+}
+
+static int64_t
+tkb_time_between_elapsed(pTHX_ tkb_schedule *s, int64_t a_day, const tkb_inst *a, int64_t b_day, const tkb_inst *b, const char *what)
+{
+    SV *buf = sv_2mortal(newSVpvs(""));
+    int64_t weekly = (int64_t)s->hours.weekly_total * TKB_NS_PER_SEC, total, d;
+    if (tkb_inst_cmp(a, b) > 0)
+        return -tkb_time_between_elapsed(aTHX_ s, b_day, b, a_day, a, what);
+    total = tkb_day_clipped(aTHX_ s, a_day, a, b, buf, what);
+    for (d = a_day + 1; d <= b_day; d++) {
+        if (weekly > 0 && b_day - d >= 7 && tkb_week_is_plain(aTHX_ s, d, what) && tkb_week_steady(aTHX_ s, d, what)) {
+            total += weekly;
+            d += 6;
+            continue;
+        }
+        total += tkb_day_clipped(aTHX_ s, d, a, b, buf, what);
+    }
+    return total;
+}
+
+/* An instant as a value in the caller's zone, locale, calendar and class. */
+static SV *
+tkb_inst_out(pTHX_ const tkb_inst *t, const tkb_val *caller, const char *what)
+{
+    time_keeper_instant i;
+    SV *out;
+    i.sec = t->sec;
+    i.nsec = t->nsec;
+    out = TKB(new_sv_cal)(aTHX_ &i, &caller->zone, caller->locale, caller->calendar);
+    if (!out)
+        croak("%s: the result could not be made", what);
+    if (SvSTASH(SvRV(caller->sv)) != SvSTASH(SvRV(out)))
+        sv_bless(out, SvSTASH(SvRV(caller->sv)));
+    return out;
 }
 
 #endif

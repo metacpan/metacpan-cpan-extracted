@@ -36,7 +36,7 @@
 <rect x="48" y="186" width="675" height="18" fill="#1a1f29"/>
 <rect x="48" y="222" width="675" height="18" fill="#1a1f29"/>
 <rect x="48" y="258" width="675" height="18" fill="#1a1f29"/>
-<rect x="48" y="294" width="675" height="36" fill="#1a1f29"/>
+<rect x="48" y="294" width="675" height="18" fill="#1a1f29"/>
 <rect x="48" y="330" width="27" height="18" fill="#2c313c"/>
 <rect x="84" y="330" width="27" height="18" fill="#2c313c"/>
 <rect x="228" y="330" width="27" height="18" fill="#2c313c"/>
@@ -57,14 +57,14 @@
 <text x="466.5" y="128" text-anchor="middle" fill="#787e8a">…</text>
 <text x="583.5" y="128" text-anchor="middle" fill="#787e8a">…</text>
 <text x="66" y="146" textLength="567" fill="#dcdfe4">[x]  Frances Allen      Platform  Engineer  12 Feb 2024  68,000</text>
-<text x="66" y="164" textLength="621" fill="#dcdfe4">[ ]  Ken Thompson       Core      Engineer  09 Jan 2023  70,000   yes</text>
-<text x="66" y="182" textLength="621" fill="#dcdfe4">[x]  Radia Perlman      Network   Engineer  29 Aug 2022  76,000   yes</text>
+<text x="66" y="164" textLength="630" fill="#dcdfe4">[ ]  Ken Thompson       Core      Engineer  09 Jan 2023  70,000    yes</text>
+<text x="66" y="182" textLength="630" fill="#dcdfe4">[x]  Radia Perlman      Network   Engineer  29 Aug 2022  76,000    yes</text>
 <text x="66" y="200" textLength="567" fill="#dcdfe4">[ ]  Grace Hopper       Web       Lead      15 Nov 2021  92,500</text>
-<text x="66" y="218" textLength="621" fill="#dcdfe4">[ ]  Katherine Johnson  Research  Engineer  08 Mar 2021  83,000   yes</text>
-<text x="66" y="236" textLength="621" fill="#dcdfe4">[ ]  Tim Berners-Lee    Web       Engineer  05 Oct 2020  74,500   yes</text>
+<text x="66" y="218" textLength="630" fill="#dcdfe4">[ ]  Katherine Johnson  Research  Engineer  08 Mar 2021  83,000    yes</text>
+<text x="66" y="236" textLength="630" fill="#dcdfe4">[ ]  Tim Berners-Lee    Web       Engineer  05 Oct 2020  74,500    yes</text>
 <text x="66" y="254" textLength="567" fill="#dcdfe4">[ ]  Dennis Ritchie     Core      Engineer  11 May 2020  78,000</text>
-<text x="66" y="272" textLength="621" fill="#dcdfe4">[ ]  Hedy Lamarr        Network   Lead      02 Dec 2019  88,000   yes</text>
-<text x="66" y="290" textLength="621" fill="#dcdfe4">[ ]  Ada Lovelace       Core      Engineer  04 Mar 2019  81,000   yes</text>
+<text x="66" y="272" textLength="630" fill="#dcdfe4">[ ]  Hedy Lamarr        Network   Lead      02 Dec 2019  88,000    yes</text>
+<text x="66" y="290" textLength="630" fill="#dcdfe4">[ ]  Ada Lovelace       Core      Engineer  04 Mar 2019  81,000    yes</text>
 <text x="66" y="308" textLength="567" fill="#dcdfe4">[ ]  Barbara Liskov     Platform  Lead      17 Sep 2018  95,500</text>
 <text x="57" y="344" textLength="9" fill="#8c929e">«</text>
 <text x="97.5" y="344" text-anchor="middle" fill="#8c929e">‹</text>

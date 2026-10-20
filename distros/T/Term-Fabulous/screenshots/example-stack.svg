@@ -18,71 +18,71 @@
 <text class="title" x="318" y="33" text-anchor="middle" dominant-baseline="central" fill="#9aa3b5">perl examples/stack.pl</text>
 <rect x="16.5" y="16.5" width="603" height="381" rx="10" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1"/>
 <g shape-rendering="crispEdges">
-<rect x="48" y="114" width="126" height="18" fill="#1e2332"/>
-<rect x="174" y="114" width="36" height="18" fill="#e06c75"/>
-<rect x="228" y="114" width="126" height="18" fill="#1e2332"/>
+<rect x="48" y="114" width="135" height="18" fill="#1e2332"/>
+<rect x="183" y="114" width="36" height="18" fill="#e06c75"/>
+<rect x="237" y="114" width="117" height="18" fill="#1e2332"/>
 <rect x="354" y="114" width="45" height="18" fill="#98c379"/>
 <rect x="417" y="114" width="144" height="18" fill="#1e2332"/>
 <rect x="561" y="114" width="27" height="18" fill="#e5c07b"/>
-<rect x="48" y="132" width="162" height="72" fill="#1e2332"/>
-<rect x="228" y="132" width="171" height="72" fill="#1e2332"/>
-<rect x="417" y="132" width="162" height="72" fill="#1e2332"/>
-<rect x="48" y="222" width="540" height="18" fill="#1e2332"/>
-<rect x="48" y="240" width="180" height="90" fill="#1e2332"/>
-<rect x="228" y="240" width="171" height="90" fill="#282e40"/>
-<rect x="399" y="240" width="189" height="90" fill="#1e2332"/>
-<rect x="48" y="330" width="540" height="36" fill="#1e2332"/>
-<rect x="57" y="122" width="117" height="1" fill="#78a0dc"/>
-<rect x="237" y="122" width="117" height="1" fill="#78a0dc"/>
+<rect x="48" y="132" width="171" height="72" fill="#1e2332"/>
+<rect x="237" y="132" width="162" height="72" fill="#1e2332"/>
+<rect x="417" y="132" width="171" height="72" fill="#1e2332"/>
+<rect x="48" y="222" width="540" height="36" fill="#1e2332"/>
+<rect x="48" y="258" width="189" height="90" fill="#1e2332"/>
+<rect x="237" y="258" width="171" height="90" fill="#282e40"/>
+<rect x="408" y="258" width="180" height="90" fill="#1e2332"/>
+<rect x="48" y="348" width="540" height="18" fill="#1e2332"/>
+<rect x="57" y="122" width="126" height="1" fill="#78a0dc"/>
+<rect x="246" y="122" width="108" height="1" fill="#78a0dc"/>
 <rect x="426" y="122" width="135" height="1" fill="#78a0dc"/>
 <rect x="52" y="132" width="1" height="54" fill="#78a0dc"/>
-<rect x="205" y="132" width="1" height="54" fill="#78a0dc"/>
-<rect x="232" y="132" width="1" height="54" fill="#78a0dc"/>
+<rect x="214" y="132" width="1" height="54" fill="#78a0dc"/>
+<rect x="241" y="132" width="1" height="54" fill="#78a0dc"/>
 <rect x="394" y="132" width="1" height="54" fill="#78a0dc"/>
 <rect x="421" y="132" width="1" height="54" fill="#78a0dc"/>
-<rect x="574" y="132" width="1" height="54" fill="#78a0dc"/>
-<rect x="57" y="194" width="144" height="1" fill="#78a0dc"/>
-<rect x="237" y="194" width="153" height="1" fill="#78a0dc"/>
-<rect x="426" y="194" width="144" height="1" fill="#78a0dc"/>
-<rect x="237" y="248" width="153" height="1" fill="#98c379"/>
-<rect x="232" y="258" width="1" height="54" fill="#98c379"/>
-<rect x="394" y="258" width="1" height="54" fill="#98c379"/>
-<rect x="237" y="320" width="153" height="1" fill="#98c379"/>
+<rect x="583" y="132" width="1" height="54" fill="#78a0dc"/>
+<rect x="57" y="194" width="153" height="1" fill="#78a0dc"/>
+<rect x="246" y="194" width="144" height="1" fill="#78a0dc"/>
+<rect x="426" y="194" width="153" height="1" fill="#78a0dc"/>
+<rect x="246" y="266" width="153" height="1" fill="#98c379"/>
+<rect x="241" y="276" width="1" height="54" fill="#98c379"/>
+<rect x="403" y="276" width="1" height="54" fill="#98c379"/>
+<rect x="246" y="338" width="153" height="1" fill="#98c379"/>
 </g>
 <polyline points="52.5 132 52.5 127 52.538 126.413 52.653 125.835 52.843 125.278 53.103 124.75 53.43 124.261 53.818 123.818 54.261 123.43 54.75 123.103 55.278 122.843 55.835 122.653 56.413 122.538 57 122.5 57 122.5" fill="none" stroke="#78a0dc" stroke-width="1" stroke-linejoin="round"/>
-<polyline points="232.5 132 232.5 127 232.538 126.413 232.653 125.835 232.843 125.278 233.103 124.75 233.43 124.261 233.818 123.818 234.261 123.43 234.75 123.103 235.278 122.843 235.835 122.653 236.413 122.538 237 122.5 237 122.5" fill="none" stroke="#78a0dc" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="241.5 132 241.5 127 241.538 126.413 241.653 125.835 241.843 125.278 242.103 124.75 242.43 124.261 242.818 123.818 243.261 123.43 243.75 123.103 244.278 122.843 244.835 122.653 245.413 122.538 246 122.5 246 122.5" fill="none" stroke="#78a0dc" stroke-width="1" stroke-linejoin="round"/>
 <polyline points="421.5 132 421.5 127 421.538 126.413 421.653 125.835 421.843 125.278 422.103 124.75 422.43 124.261 422.818 123.818 423.261 123.43 423.75 123.103 424.278 122.843 424.835 122.653 425.413 122.538 426 122.5 426 122.5" fill="none" stroke="#78a0dc" stroke-width="1" stroke-linejoin="round"/>
 <polyline points="52.5 186 52.5 190 52.538 190.587 52.653 191.165 52.843 191.722 53.103 192.25 53.43 192.739 53.818 193.182 54.261 193.57 54.75 193.897 55.278 194.157 55.835 194.347 56.413 194.462 57 194.5 57 194.5" fill="none" stroke="#78a0dc" stroke-width="1" stroke-linejoin="round"/>
-<polyline points="205.5 186 205.5 190 205.462 190.587 205.347 191.165 205.157 191.722 204.897 192.25 204.57 192.739 204.182 193.182 203.739 193.57 203.25 193.897 202.722 194.157 202.165 194.347 201.587 194.462 201 194.5 201 194.5" fill="none" stroke="#78a0dc" stroke-width="1" stroke-linejoin="round"/>
-<polyline points="232.5 186 232.5 190 232.538 190.587 232.653 191.165 232.843 191.722 233.103 192.25 233.43 192.739 233.818 193.182 234.261 193.57 234.75 193.897 235.278 194.157 235.835 194.347 236.413 194.462 237 194.5 237 194.5" fill="none" stroke="#78a0dc" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="214.5 186 214.5 190 214.462 190.587 214.347 191.165 214.157 191.722 213.897 192.25 213.57 192.739 213.182 193.182 212.739 193.57 212.25 193.897 211.722 194.157 211.165 194.347 210.587 194.462 210 194.5 210 194.5" fill="none" stroke="#78a0dc" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="241.5 186 241.5 190 241.538 190.587 241.653 191.165 241.843 191.722 242.103 192.25 242.43 192.739 242.818 193.182 243.261 193.57 243.75 193.897 244.278 194.157 244.835 194.347 245.413 194.462 246 194.5 246 194.5" fill="none" stroke="#78a0dc" stroke-width="1" stroke-linejoin="round"/>
 <polyline points="394.5 186 394.5 190 394.462 190.587 394.347 191.165 394.157 191.722 393.897 192.25 393.57 192.739 393.182 193.182 392.739 193.57 392.25 193.897 391.722 194.157 391.165 194.347 390.587 194.462 390 194.5 390 194.5" fill="none" stroke="#78a0dc" stroke-width="1" stroke-linejoin="round"/>
 <polyline points="421.5 186 421.5 190 421.538 190.587 421.653 191.165 421.843 191.722 422.103 192.25 422.43 192.739 422.818 193.182 423.261 193.57 423.75 193.897 424.278 194.157 424.835 194.347 425.413 194.462 426 194.5 426 194.5" fill="none" stroke="#78a0dc" stroke-width="1" stroke-linejoin="round"/>
-<polyline points="574.5 186 574.5 190 574.462 190.587 574.347 191.165 574.157 191.722 573.897 192.25 573.57 192.739 573.182 193.182 572.739 193.57 572.25 193.897 571.722 194.157 571.165 194.347 570.587 194.462 570 194.5 570 194.5" fill="none" stroke="#78a0dc" stroke-width="1" stroke-linejoin="round"/>
-<polyline points="232.5 258 232.5 253 232.538 252.413 232.653 251.835 232.843 251.278 233.103 250.75 233.43 250.261 233.818 249.818 234.261 249.43 234.75 249.103 235.278 248.843 235.835 248.653 236.413 248.538 237 248.5 237 248.5" fill="none" stroke="#98c379" stroke-width="1" stroke-linejoin="round"/>
-<polyline points="394.5 258 394.5 253 394.462 252.413 394.347 251.835 394.157 251.278 393.897 250.75 393.57 250.261 393.182 249.818 392.739 249.43 392.25 249.103 391.722 248.843 391.165 248.653 390.587 248.538 390 248.5 390 248.5" fill="none" stroke="#98c379" stroke-width="1" stroke-linejoin="round"/>
-<polyline points="232.5 312 232.5 316 232.538 316.587 232.653 317.165 232.843 317.722 233.103 318.25 233.43 318.739 233.818 319.182 234.261 319.57 234.75 319.897 235.278 320.157 235.835 320.347 236.413 320.462 237 320.5 237 320.5" fill="none" stroke="#98c379" stroke-width="1" stroke-linejoin="round"/>
-<polyline points="394.5 312 394.5 316 394.462 316.587 394.347 317.165 394.157 317.722 393.897 318.25 393.57 318.739 393.182 319.182 392.739 319.57 392.25 319.897 391.722 320.157 391.165 320.347 390.587 320.462 390 320.5 390 320.5" fill="none" stroke="#98c379" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="583.5 186 583.5 190 583.462 190.587 583.347 191.165 583.157 191.722 582.897 192.25 582.57 192.739 582.182 193.182 581.739 193.57 581.25 193.897 580.722 194.157 580.165 194.347 579.587 194.462 579 194.5 579 194.5" fill="none" stroke="#78a0dc" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="241.5 276 241.5 271 241.538 270.413 241.653 269.835 241.843 269.278 242.103 268.75 242.43 268.261 242.818 267.818 243.261 267.43 243.75 267.103 244.278 266.843 244.835 266.653 245.413 266.538 246 266.5 246 266.5" fill="none" stroke="#98c379" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="403.5 276 403.5 271 403.462 270.413 403.347 269.835 403.157 269.278 402.897 268.75 402.57 268.261 402.182 267.818 401.739 267.43 401.25 267.103 400.722 266.843 400.165 266.653 399.587 266.538 399 266.5 399 266.5" fill="none" stroke="#98c379" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="241.5 330 241.5 334 241.538 334.587 241.653 335.165 241.843 335.722 242.103 336.25 242.43 336.739 242.818 337.182 243.261 337.57 243.75 337.897 244.278 338.157 244.835 338.347 245.413 338.462 246 338.5 246 338.5" fill="none" stroke="#98c379" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="403.5 330 403.5 334 403.462 334.587 403.347 335.165 403.157 335.722 402.897 336.25 402.57 336.739 402.182 337.182 401.739 337.57 401.25 337.897 400.722 338.157 400.165 338.347 399.587 338.462 399 338.5 399 338.5" fill="none" stroke="#98c379" stroke-width="1" stroke-linejoin="round"/>
 <g class="terminal">
 <text x="48" y="92" textLength="432" fill="#dcdcdc">Stacked children share one box  (Ctrl+C to quit)</text>
-<text x="183" y="128" textLength="18" fill="#141923">12</text>
+<text x="192" y="128" textLength="18" fill="#141923">12</text>
 <text x="363" y="128" textLength="27" fill="#141923">new</text>
 <text x="570" y="128" textLength="9" fill="#141923">0</text>
 <text x="66" y="146" textLength="45" fill="#ffffff">Inbox</text>
-<text x="246" y="146" textLength="54" fill="#ffffff">Builds</text>
+<text x="255" y="146" textLength="54" fill="#ffffff">Builds</text>
 <text x="435" y="146" textLength="45" fill="#ffffff">Queue</text>
 <text x="66" y="164" textLength="81" fill="#aab4c8">12 unread</text>
-<text x="246" y="164" textLength="99" fill="#aab4c8">main: green</text>
+<text x="255" y="164" textLength="99" fill="#aab4c8">main: green</text>
 <text x="435" y="164" textLength="36" fill="#aab4c8">idle</text>
 <text x="66" y="182" textLength="81" fill="#aab4c8">3 flagged</text>
-<text x="246" y="182" textLength="72" fill="#aab4c8">dev: red</text>
+<text x="255" y="182" textLength="72" fill="#aab4c8">dev: red</text>
 <text x="57" y="236" textLength="315" fill="#6e788c">09:41:07  worker 2 finished job 401</text>
-<text x="57" y="254" textLength="162" fill="#6e788c">09:41:14  worker 3</text>
-<text x="57" y="272" textLength="162" fill="#6e788c">09:41:21  worker 1</text>
-<text x="57" y="290" textLength="162" fill="#6e788c">09:41:28  worker 2</text>
-<text x="255" y="290" textLength="117" fill="#ffffff">All jobs done</text>
-<text x="57" y="308" textLength="162" fill="#6e788c">09:41:35  worker 3</text>
-<text x="57" y="326" textLength="162" fill="#6e788c">09:41:42  worker 1</text>
-<text x="57" y="344" textLength="315" fill="#6e788c">09:41:49  worker 2 finished job 407</text>
+<text x="57" y="254" textLength="315" fill="#6e788c">09:41:14  worker 3 finished job 402</text>
+<text x="57" y="272" textLength="180" fill="#6e788c">09:41:21  worker 1 f</text>
+<text x="57" y="290" textLength="180" fill="#6e788c">09:41:28  worker 2 f</text>
+<text x="57" y="308" textLength="180" fill="#6e788c">09:41:35  worker 3 f</text>
+<text x="264" y="308" textLength="117" fill="#ffffff">All jobs done</text>
+<text x="57" y="326" textLength="180" fill="#6e788c">09:41:42  worker 1 f</text>
+<text x="57" y="344" textLength="180" fill="#6e788c">09:41:49  worker 2 f</text>
 <text x="57" y="362" textLength="315" fill="#6e788c">09:41:56  worker 3 finished job 408</text>
 </g>
 <g shape-rendering="crispEdges">

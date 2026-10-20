@@ -18,11 +18,11 @@
 <text class="title" x="246" y="33" text-anchor="middle" dominant-baseline="central" fill="#9aa3b5">perl examples/cookbook/table-lines.pl</text>
 <rect x="16.5" y="16.5" width="459" height="435" rx="10" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1"/>
 <g shape-rendering="crispEdges">
-<rect x="57" y="132" width="360" height="36" fill="#2c313c"/>
-<rect x="57" y="186" width="360" height="36" fill="#1c2029"/>
-<rect x="57" y="258" width="360" height="36" fill="#1c2029"/>
-<rect x="57" y="330" width="360" height="36" fill="#1c2029"/>
-<rect x="57" y="366" width="360" height="36" fill="#232a36"/>
+<rect x="57" y="132" width="360" height="18" fill="#2c313c"/>
+<rect x="57" y="204" width="360" height="18" fill="#1c2029"/>
+<rect x="57" y="276" width="360" height="18" fill="#1c2029"/>
+<rect x="57" y="348" width="360" height="18" fill="#1c2029"/>
+<rect x="57" y="384" width="360" height="18" fill="#232a36"/>
 <rect x="57" y="122" width="360" height="1" fill="#5c6370"/>
 <rect x="169" y="122" width="1" height="289" fill="#5c6370"/>
 <rect x="259" y="122" width="1" height="289" fill="#5c6370"/>

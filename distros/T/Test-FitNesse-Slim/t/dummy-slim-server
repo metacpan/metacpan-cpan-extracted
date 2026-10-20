@@ -1,0 +1,69 @@
+#! /usr/bin/env perl
+
+use strict;
+use warnings;
+
+BEGIN {
+  select STDERR; $| = 1;
+  select STDOUT; $| = 1;
+  require "sys/ioctl.ph";
+}
+
+use IO::Select;
+use IO::Socket::INET;
+use Socket;
+
+{ local $" = "][";
+  warn "$0: args = [@ARGV]\n"
+}
+
+warn "\@INC:\n",
+     map "  - $_\n", @INC;
+
+my($port) = @ARGV;
+die "$0: no port specified\n" unless defined $port;
+
+my $lsn = IO::Socket::INET->new(Listen => 1, LocalPort => $port)
+  or die "$0: create listen socket failed: $@\n";
+
+my $sel = new IO::Select( $lsn );
+
+while (my @ready = $sel->can_read) {
+  foreach my $fh (@ready) {
+    if ($fh == $lsn) {
+      warn "$0: new connection\n";
+      my $new = $lsn->accept;
+      syswrite $new, "Slim -- V0.2\x0A";
+      $sel->add($new);
+    }
+    else {
+      my $length = pack "L" => 0;
+      if (defined(ioctl $fh, FIONREAD, $length)) {
+        $length = unpack "L" => $length;
+        warn "$0: length = $length\n";
+
+        if (defined(my $n = sysread $fh, my $buf, $length) || !$!) {
+          warn "$0: short read: length=$length, n=$n\n"
+            unless $length == $n;
+
+          if (open my $od, "|-", "od", "-c") {
+            print $od $buf;
+            close $od;
+          }
+          else {
+            warn "$0: open od: $!\n";
+          }
+        }
+        else {
+          warn "$0: sysread: $!\n";
+        }
+      }
+      else {
+        warn "$0: ioctl FIONREAD failed: $!\n";
+      }
+
+      $sel->remove($fh);
+      $fh->close;
+    }
+  }
+}

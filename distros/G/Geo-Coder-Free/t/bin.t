@@ -26,6 +26,18 @@
 # is asserted each way: the first is refused with a 403 and the block page, and
 # the second is served the position, so the site's answer to a client it will not
 # serve, and its answer to one it will, are both checked rather than assumed.
+# The refusal is checked in full, because the page's own comment says the block
+# page is written rather than rendered so a blocked attacker learns nothing about
+# the site: its body is asserted to be the denial line and nothing else.  The
+# same refusal asked with HEAD is checked against RFC 7231 §4.3.2, which the
+# page cites: the headers a GET would get, and no body at all.  Two more of the
+# page's refusals are then asked for, each made to be only one layer's: an
+# address CGI::ACL cannot place in a country, and a country the site blocks,
+# which is refused although it comes from an address the site trusts.  The
+# query page's two remaining refusals follow: an address the page itself has
+# blacklisted, and a form submission whose CSRF token the site did not sign -
+# and, because a refusal is only half a rule, a submission carrying a token the
+# site did sign, which must still be answered.
 
 use strict;
 
@@ -44,7 +56,10 @@ use Test::Most;
 # which is where the TAP they belong with is already going.
 Test::More->builder->failure_output(\*STDOUT);
 
+use Cwd qw(abs_path);
 use DBI;
+use Digest::SHA qw(sha256_hex);
+use File::Path qw(make_path);
 use File::Spec;
 use File::Temp qw(tempdir);
 use Geo::Hash;
@@ -169,6 +184,14 @@ my $log_file = File::Spec->catfile($log_dir, 'vwf.log');
 # reads it as being in the US, and bin/testcgibin uses it for the same reasons.
 my $us_ip = '108.44.193.70';
 
+# The address the CGI::ACL test asks from: private, so no country can be looked
+# up for it and the ACL refuses the client.  bin/testcgibin asks test 10 from it.
+my $unplaceable_ip = '10.0.0.1';
+
+# The country the blocked-country tests arrive from, passed the way a web server
+# or CDN passes it to the page, and one of the countries the site blocks.
+my $blocked_country = 'RU';
+
 # The last log row matching a pattern, as the page wrote it, or undef when the
 # page wrote none.  The reason a row carries is what tells which layer of the
 # page's access control turned a client away; nothing written before these runs
@@ -183,6 +206,24 @@ sub _logged_row
 	close $log_fh;
 
 	return $rows[-1];
+}
+
+# A root directory of its own for one refusal test.  The page roots the file
+# caches it keeps - the country it remembers for a visitor, the answers it
+# remembers for a page - at root_dir, and looks for its templates there as well,
+# so a fresh root is given a link to the templates this distribution ships: a
+# test that is refused never needs it, and the one that is served an answer
+# cannot do without it.  Nothing written here outlives the run.
+sub private_root
+{
+	my ($name) = @_;
+
+	my $dir = File::Spec->catdir($stub, $name);
+	make_path($dir);
+	symlink(abs_path('templates'), File::Spec->catdir($dir, 'templates'))
+		or BAIL_OUT("Cannot link the templates into $dir: $!");
+
+	return $dir;
 }
 
 # The end of the log, for the diagnosis when a row that should be there is not.
@@ -240,12 +281,27 @@ local $ENV{'LOGDIR'} = $log_dir;
 # tests ask as the same client several times.
 local $ENV{'TMPDIR'} = $stub;
 
+# The page roots the file caches it keeps - the country it remembers for a
+# visitor, the answers it remembers for a page - at $ENV{'root_dir'}, which
+# bin/testcgibin sets to this distribution when nothing else has.  The tests
+# below give it a directory of the run's own, so everything a run caches is
+# inside the tree the run deletes: the checkout is not written to, and no country
+# resolved in one run can answer for the next.  The refusal tests that need a
+# cache of their own say so where they ask.
+
 Test::Script->import();
 
 script_compiles('bin/testcgibin');
 script_compiles('bin/address_lookup');
 
 if($ENV{'AUTHOR_TESTING'}) {
+	# Every page asked below is rooted in this run's own directory rather than in
+	# the checkout: what the page caches as it runs - the country it resolves for
+	# a visitor, the answer it remembers for a page - then belongs to the run that
+	# made it and is deleted with it, and a run leaves nothing behind for the
+	# manifest to trip over.
+	local $ENV{'root_dir'} = private_root('root');
+
 	# Test 1 looks a US postal address up in the stub.
 	script_runs(['bin/testcgibin', 1]);
 	script_stdout_like(qr/\-76\.84/, 'test 1: the Greenbelt address prints the stub longitude');
@@ -339,6 +395,17 @@ if($ENV{'AUTHOR_TESTING'}) {
 	script_stdout_like(qr/^Access Denied$/m, 'blocked: which says the client is denied');
 	script_stdout_unlike(qr/\-76\.84/, 'blocked: the answer is not given away');
 
+	# The block page is written by the page itself, not rendered from a template,
+	# and its comment says why: a blocked attacker must receive no information
+	# about the site's structure.  The whole answer is therefore pinned here to
+	# those three headers and the one denial line - nothing may be added to it -
+	# and the answer is then held to naming no page, link, markup or site title.
+	script_stdout_is("Status: 403 Forbidden\nContent-type: text/plain\nPragma: no-cache\n\nAccess Denied\n",
+		'blocked: the answer is the denial line and no more');
+	script_stdout_unlike(
+		qr{/cgi-bin/|page=|<html|<title|href=|\Q$site_title\E|\b(?:index|query|meta_data)\b},
+		'blocked: the block page names no page, link, markup or site title');
+
 	# The refusal is recorded, so an operator can see who was turned away and
 	# why.  The reason is one only this layer produces: a client refused by
 	# CGI::ACL, or for its country, or by the SQL-injection check, is logged with
@@ -351,12 +418,129 @@ if($ENV{'AUTHOR_TESTING'}) {
 		or diag("\n\t" . (defined($blocked) ? $blocked : 'no such row') . "\n");
 	like($blocked, qr/"\Q$us_ip\E"/, 'blocked: and the address that was refused');
 
+	# Test 9 is test 7's refusal asked with HEAD.  RFC 7231 §4.3.2, which the block
+	# page's own comment cites, says the answer is what the headers would be and
+	# no body: the status and content type must be sent, and nothing at all may
+	# follow the blank line that ends the headers - not merely without the denial
+	# line, but without a body of any kind.
+	script_runs(['bin/testcgibin', 9]);
+	script_stdout_is("Status: 403 Forbidden\nContent-type: text/plain\nPragma: no-cache\n\n",
+		'blocked HEAD: the headers are sent and the response ends there');
+	script_stdout_unlike(qr/Access Denied/,
+		'blocked HEAD: the denial line a GET would carry is not sent as a body');
+
 	# Test 8 is the same client allowed through: the position it asked for, and no
 	# block page.
 	script_runs(['bin/testcgibin', 8]);
 	script_stdout_like(qr/\-76\.84/, 'allowed: the client is served the answer');
 	script_stdout_unlike(qr/^Access Denied$/m, 'allowed: no block page is sent');
 	script_stdout_unlike(qr/^Status: 403/m, 'allowed: and no 403');
+
+	# Tests 10 and 11 are the page's other two refusals, and each is arranged to
+	# be one layer's alone.  Neither asserts on stderr, for the reason given
+	# above the blacklisted client: the page redirects the errors of any client
+	# that sends a user agent into a file of its own.  Both are asked with a cache
+	# of their own, so that what the page remembers for the client as it runs - the
+	# country it resolves for a visitor, the answer it renders for a page - cannot
+	# be what these tests then read: what is asserted below is the page's answer to
+	# the request, not to a request like it.
+	my $refusal_cache = File::Spec->catdir($stub, 'refusal-cache');
+	make_path($refusal_cache);
+	local $ENV{'root_dir'} = $refusal_cache;
+
+	# Test 10 is CGI::ACL refusing an address: it cannot be placed in a country,
+	# and the ACL denies what it cannot place.  Everything else about the request
+	# is test 3's - an ordinary browser, asking the question the stub answers - so
+	# the address is the only thing the client can be refused for.  The reason
+	# the log records is the one only this layer writes, and the country column
+	# beside it shows the address went unplaced, which is what it was refused for.
+	script_runs(['bin/testcgibin', 10]);
+	script_stdout_like(qr/^Status: 403 Forbidden$/m, 'ACL: the page refuses the client');
+	script_stdout_like(qr/^Access Denied$/m, 'ACL: with the block page');
+	script_stdout_unlike(qr/\-76\.84/, 'ACL: and the address is not answered');
+
+	my $acl_refusal = _logged_row(qr/Denied by CGI::ACL/);
+	ok(defined($acl_refusal), 'ACL: the refusal is recorded against the layer that made it')
+		or diag(_log_tail());
+	like($acl_refusal, qr/"\Q$unplaceable_ip\E"/, 'ACL: against the address it was made for');
+	like($acl_refusal, qr/,"unknown",/, 'ACL: and the address is recorded as one no country was found for');
+	like($acl_refusal, qr/,403,/, 'ACL: with the status the client was given');
+
+	# Test 11 is a blocked country.  It comes from the address the site trusts,
+	# so the ACL serves it and the refusal is the country list's - the reason
+	# recorded names that refusal and the country it read the client as being in,
+	# and is one no other layer writes.  The country arrives the way a web server
+	# or CDN passes it, which is the way CGI::Lingua reads a client's country.
+	script_runs(['bin/testcgibin', 11]);
+	script_stdout_like(qr/^Status: 403 Forbidden$/m, 'blocked country: the page refuses the client');
+	script_stdout_like(qr/^Access Denied$/m, 'blocked country: with the block page');
+	script_stdout_unlike(qr/\-76\.84/, 'blocked country: and the address it trusts is not answered either');
+
+	my $country_refusal = _logged_row(qr/blocked connexion from \Q$blocked_country\E/i);
+	ok(defined($country_refusal), 'blocked country: the refusal is recorded with its reason')
+		or diag(_log_tail());
+	like($country_refusal, qr/"\Q$us_ip\E"/, 'blocked country: against the address it came from');
+	like($country_refusal, qr/,"\L$blocked_country\E",/, 'blocked country: and the country the client was read as being in');
+	like($country_refusal, qr/,403,/, 'blocked country: with the status the client was given');
+
+	# Tests 12 to 14 are the query page's own two refusals, and the control for
+	# the second.  None asserts on stderr, for the reason given above the
+	# blacklisted client: the page redirects the errors of any client that sends
+	# a user agent into a file of its own.  Each is asked with a root of its own,
+	# so what is asserted is the page's answer to the request and not the
+	# country an earlier test remembered for the client.
+
+	# Test 12 is a client the page has blacklisted.  It asks test 3's question
+	# - from test 3's address, with the user agent test 8 is served with - but
+	# its wording reads like a SQL injection attempt, so the page adds the
+	# address to the blacklist it keeps in the process and refuses it.  The
+	# reason the log records is the one only that layer writes, and the 403 is
+	# the block page the user-agent refusal is given.
+	local $ENV{'root_dir'} = private_root('injection-cache');
+
+	script_runs(['bin/testcgibin', 12]);
+	script_stdout_like(qr/^Status: 403 Forbidden$/m, 'blacklisted IP: the page refuses the client');
+	script_stdout_like(qr/^Access Denied$/m, 'blacklisted IP: with the block page');
+	script_stdout_unlike(qr/\-76\.84/, 'blacklisted IP: and the address is not answered');
+
+	my $injection_refusal = _logged_row(qr/Blacklisted for attempting to break in/);
+	ok(defined($injection_refusal), 'blacklisted IP: the refusal is recorded against the layer that made it')
+		or diag(_log_tail());
+	like($injection_refusal, qr/"\Q$us_ip\E"/, 'blacklisted IP: against the address it was made for');
+	like($injection_refusal, qr/,403,/, 'blacklisted IP: with the status the client was given');
+
+	# The page reads the country it remembered for this address before it looks
+	# at a token, so these two tests ask from a root no other test has written
+	# to: what they are refused for is the token and not a country.
+	local $ENV{'root_dir'} = private_root('csrf-cache');
+
+	# Test 13 is a form submission whose CSRF token the site did not sign:
+	# everything else is test 3's, so the token is what it can be refused for.
+	# The token is long enough to be one and carries no signature the page could
+	# have made, which is what a guess at the token's shape looks like.
+	script_runs(['bin/testcgibin', 13]);
+	script_stdout_like(qr/^Status: 403 Forbidden$/m, 'CSRF: the page refuses an unsigned token');
+	script_stdout_like(qr/^Access Denied$/m, 'CSRF: with the block page');
+	script_stdout_unlike(qr/\-76\.84/, 'CSRF: and the answer is not given away');
+
+	my $csrf_refusal = _logged_row(qr/Rejected CSRF token/);
+	ok(defined($csrf_refusal), 'CSRF: the refusal is recorded against the layer that made it')
+		or diag(_log_tail());
+	like($csrf_refusal, qr/"\Q$us_ip\E"/, 'CSRF: against the address it was made for');
+	like($csrf_refusal, qr/,403,/, 'CSRF: with the status the client was given');
+
+	# Test 14 is the control test 13 needs: the same submission, carrying a
+	# token this site signed.  The token is built the way the page builds one -
+	# "timestamp:random:signature" with the signature taken over the first two
+	# fields and the secret the stub configuration gives the page - so a page
+	# that refused every token would fail here, and one that accepted every
+	# token would fail test 13.
+	my $token_data = '0:' . ('ab' x 32);
+	local $ENV{'CSRF_TOKEN'} = $token_data . ':' . sha256_hex("$token_data:" . ('a1' x 32));
+
+	script_runs(['bin/testcgibin', 14]);
+	script_stdout_like(qr/\-76\.84/, 'CSRF: a token the site signed is accepted');
+	script_stdout_unlike(qr/^Status: 403/m, 'CSRF: and no 403 is sent');
 } else {
 	diag('Author tests not required for installation');
 }

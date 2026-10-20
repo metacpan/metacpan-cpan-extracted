@@ -62,4 +62,5 @@ INCLUDE: xs/schedule.xs
 INCLUDE: xs/days.xs
 INCLUDE: xs/hours.xs
 INCLUDE: xs/rule.xs
+INCLUDE: xs/counts.xs
 INCLUDE: xs/test.xs

@@ -131,6 +131,11 @@ enum { PMD_URL = 0,      /* mount-relative, no trailing slash; "" is the root */
        PMD_MTIME,
        PMD_DOCID,        /* the Search::Trigram document id */
        PMD_PLAIN,        /* plain text, for snippets */
+       PMD_META,         /* RV to the front-matter HV, every key as written */
+       PMD_DATE,         /* front matter date:, as an epoch, else undef */
+       PMD_UPDATED,      /* updated:, else the date, else undef */
+       PMD_SECLABEL,     /* the section's sidebar label */
+       PMD_SECORDER,     /* the section's place among the sections */
        PMD__COUNT };
 
 enum { PMDC_DIR = 0,     /* the docs root, no trailing slash */
@@ -229,15 +234,40 @@ static void pmd_esc_sv(pTHX_ SV *out, SV *in) {
     pmd_esc(aTHX_ out, s, n);
 }
 
+/* How many of `n` bytes to keep so that at most `max` survive and a UTF-8
+ * sequence is not cut in half. Shared by the search snippets and the page
+ * summaries. */
+static STRLEN pmd_cut(const char *s, STRLEN n, STRLEN max) {
+    STRLEN take = n < max ? n : max;
+    while (take && take < n && ((unsigned char)s[take] & 0xC0) == 0x80) take--;
+    return take;
+}
+
+/* Runs of whitespace collapsed to one space, the leading run dropped, NOT
+ * escaped: for a summary handed to Perl, which escapes where it prints. */
+static void pmd_collapsed(pTHX_ SV *out, const char *s, STRLEN n) {
+    STRLEN i = 0;
+    int space = 0;
+    while (i < n && (s[i] == ' ' || s[i] == '\t' || s[i] == '\n' ||
+                     s[i] == '\r')) i++;
+    for (; i < n; i++) {
+        char c = s[i];
+        if (c == ' ' || c == '\t' || c == '\n' || c == '\r') { space = 1; continue; }
+        if (space) { sv_catpvs(out, " "); space = 0; }
+        sv_catpvn(out, &c, 1);
+    }
+}
+
 /* ---- front matter ---------------------------------------------------------
  * A restricted `---\n key: value \n---\n` block at byte 0. Scalar values
  * only, and the first line that is not `key: value` ends the block. This is
  * deliberately not YAML: running a YAML parser per page at boot to read two
  * scalars would put a dependency on the C path for no benefit. Unknown keys
  * are ignored rather than an error, so a document carrying front matter for
- * some other tool still renders.
+ * some other tool still renders, and every key, recognised or not, reaches
+ * the templates as `meta`.
  *
- * Returns the offset of the body, and fills `meta` with what it recognised. */
+ * Returns the offset of the body, and fills `meta` with every key it read. */
 static STRLEN pmd_front_matter(pTHX_ const char *s, STRLEN n, HV *meta) {
     STRLEN i = 0, line;
     if (n < 4 || memNE(s, "---\n", 4)) return 0;
@@ -268,6 +298,171 @@ static STRLEN pmd_front_matter(pTHX_ const char *s, STRLEN n, HV *meta) {
         i = line + 1;
     }
     return 0;                                    /* never closed: not ours */
+}
+
+/* ---- dates ----------------------------------------------------------------
+ * `date:` and `updated:` in front matter: YYYY-MM-DD (midnight UTC), or
+ * YYYY-MM-DDTHH:MM[:SS] followed by Z or a +HH:MM / -HH:MM offset. Parsed by
+ * hand rather than through strptime/timegm, which Windows lacks, with the
+ * days-from-civil arithmetic (proleptic Gregorian) doing the calendar. */
+
+static IV pmd_days_from_civil(IV y, IV m, IV d) {
+    IV era, yoe, doy, doe;
+    y -= m <= 2;
+    era = (y >= 0 ? y : y - 399) / 400;
+    yoe = y - era * 400;
+    doy = (153 * (m + (m > 2 ? -3 : 9)) + 2) / 5 + d - 1;
+    doe = yoe * 365 + yoe / 4 - yoe / 100 + doy;
+    return era * 146097 + doe - 719468;
+}
+
+static void pmd_civil_from_days(IV z, IV *y, IV *m, IV *d) {
+    IV era, doe, yoe, doy, mp;
+    z += 719468;
+    era = (z >= 0 ? z : z - 146096) / 146097;
+    doe = z - era * 146097;
+    yoe = (doe - doe / 1460 + doe / 36524 - doe / 146096) / 365;
+    doy = doe - (365 * yoe + yoe / 4 - yoe / 100);
+    mp  = (5 * doy + 2) / 153;
+    *d = doy - (153 * mp + 2) / 5 + 1;
+    *m = mp + (mp < 10 ? 3 : -9);
+    *y = yoe + era * 400 + (*m <= 2);
+}
+
+static int pmd_digits(const char *s, int n, IV *out) {
+    int i;
+    IV v = 0;
+    for (i = 0; i < n; i++) {
+        if (s[i] < '0' || s[i] > '9') return 0;
+        v = v * 10 + (s[i] - '0');
+    }
+    *out = v;
+    return 1;
+}
+
+/* Returns 1 and the epoch in *out, or 0 for anything that is not one of the
+ * forms above, including an impossible day (2026-02-30) and an epoch past
+ * what an IV holds on this perl. */
+static int pmd_parse_date(const char *s, STRLEN n, IV *out) {
+    IV y, mo, d, hh = 0, mi = 0, ss = 0, off = 0, days;
+    static const int mdays[] = { 31,28,31,30,31,30,31,31,30,31,30,31 };
+    NV secs;
+    if (n < 10 || s[4] != '-' || s[7] != '-') return 0;
+    if (!pmd_digits(s, 4, &y) || !pmd_digits(s + 5, 2, &mo)
+        || !pmd_digits(s + 8, 2, &d)) return 0;
+    if (mo < 1 || mo > 12 || d < 1) return 0;
+    if (d > mdays[mo - 1] + (mo == 2 && ((y % 4 == 0 && y % 100 != 0)
+                                         || y % 400 == 0)))
+        return 0;
+    if (n > 10) {
+        STRLEN i = 16;
+        if (n < 17 || (s[10] != 'T' && s[10] != ' ') || s[13] != ':')
+            return 0;
+        if (!pmd_digits(s + 11, 2, &hh) || !pmd_digits(s + 14, 2, &mi))
+            return 0;
+        if (n > 16 && s[16] == ':') {
+            if (n < 19 || !pmd_digits(s + 17, 2, &ss)) return 0;
+            i = 19;
+        }
+        if (hh > 23 || mi > 59 || ss > 59) return 0;
+        if (i == n) return 0;                   /* a time needs its zone */
+        if (s[i] == 'Z' && i + 1 == n) off = 0;
+        else if ((s[i] == '+' || s[i] == '-') && i + 6 == n
+                 && s[i + 3] == ':') {
+            IV oh, om;
+            if (!pmd_digits(s + i + 1, 2, &oh)
+                || !pmd_digits(s + i + 4, 2, &om)
+                || oh > 23 || om > 59) return 0;
+            off = (oh * 3600 + om * 60) * (s[i] == '-' ? -1 : 1);
+        }
+        else return 0;
+    }
+    days = pmd_days_from_civil(y, mo, d);
+    secs = (NV)days * 86400.0 + (NV)(hh * 3600 + mi * 60 + ss) - (NV)off;
+    if (secs > (NV)IV_MAX || secs < (NV)IV_MIN) return 0;
+    *out = (IV)secs;
+    return 1;
+}
+
+/* An epoch as YYYY-MM-DDTHH:MM:SSZ, for <time datetime> and article:*_time. */
+static SV *pmd_iso(pTHX_ IV t) {
+    IV days = t / 86400, rem = t % 86400, y, m, d;
+    if (rem < 0) { rem += 86400; days--; }
+    pmd_civil_from_days(days, &y, &m, &d);
+    return newSVpvf("%04" IVdf "-%02" IVdf "-%02" IVdf "T%02" IVdf ":%02"
+                    IVdf ":%02" IVdf "Z", y, m, d, rem / 3600,
+                    (rem % 3600) / 60, rem % 60);
+}
+
+/* An epoch as "19 October 2026", in UTC. English only: a site wanting
+ * another language has the epoch. */
+static SV *pmd_human(pTHX_ IV t) {
+    static const char *const names[] = { "January", "February", "March",
+        "April", "May", "June", "July", "August", "September", "October",
+        "November", "December" };
+    IV days = t / 86400, y, m, d;
+    if (t % 86400 < 0) days--;
+    pmd_civil_from_days(days, &y, &m, &d);
+    return newSVpvf("%" IVdf " %s %" IVdf, d, names[m - 1], y);
+}
+
+/* Read date: and updated: from a page's front matter into its slots. A value
+ * that does not parse croaks naming the file, at boot with the rest of the
+ * configuration; under `reload` the same croak reaches the developer as an
+ * error page on the request that read the bad edit. */
+static void pmd_page_dates(pTHX_ AV *page, HV *meta) {
+    SV *v, *file = *av_fetch(page, PMD_FILE, 0);
+    IV t;
+    int have = 0;
+    if ((v = pmd_opt(aTHX_ meta, "date")) && SvCUR(v)) {
+        STRLEN l;
+        const char *p = SvPV_const(v, l);
+        if (!pmd_parse_date(p, l, &t))
+            croak("Punk::Mount::Markdown: %s has date '%s', which is not "
+                  "YYYY-MM-DD or ISO-8601", SvPV_nolen(file), p);
+        av_store(page, PMD_DATE, newSViv(t));
+        have = 1;
+    }
+    else av_store(page, PMD_DATE, newSV(0));
+    if ((v = pmd_opt(aTHX_ meta, "updated")) && SvCUR(v)) {
+        STRLEN l;
+        const char *p = SvPV_const(v, l);
+        IV u;
+        if (!pmd_parse_date(p, l, &u))
+            croak("Punk::Mount::Markdown: %s has updated '%s', which is not "
+                  "YYYY-MM-DD or ISO-8601", SvPV_nolen(file), p);
+        av_store(page, PMD_UPDATED, newSViv(u));
+    }
+    else av_store(page, PMD_UPDATED, have ? newSViv(t) : newSV(0));
+}
+
+/* The `sort => 'date'` key: copied out of the page AVs so the comparator is
+ * plain C and needs no interpreter. */
+typedef struct {
+    int dated;
+    IV date;
+    const char *title, *url;
+    STRLEN tlen, ulen;
+    SV *sv;
+} pmd_sortkey;
+
+static int pmd_bytecmp(const char *a, STRLEN al, const char *b, STRLEN bl) {
+    int c = memcmp(a, b, al < bl ? al : bl);
+    if (c) return c;
+    return al < bl ? -1 : al > bl ? 1 : 0;
+}
+
+static int pmd_sortkey_cmp(const void *pa, const void *pb) {
+    const pmd_sortkey *a = (const pmd_sortkey *)pa;
+    const pmd_sortkey *b = (const pmd_sortkey *)pb;
+    int c;
+    if (a->dated != b->dated) return a->dated ? -1 : 1;
+    if (a->dated && a->date != b->date) return a->date > b->date ? -1 : 1;
+    if (a->dated) {
+        c = pmd_bytecmp(a->title, a->tlen, b->title, b->tlen);
+        if (c) return c;
+    }
+    return pmd_bytecmp(a->url, a->ulen, b->url, b->ulen);
 }
 
 /* The first `# H1`, as a title. Looks only at the top of the document, since
@@ -425,11 +620,9 @@ static SV *pmd_nav_html(pTHX_ AV *order, HV *pages, SV *prefix, SV *current) {
             if (open_section && SvCUR(open_section))
                 sv_catpvs(out, "</ul></details></li>\n");
             if (SvCUR(section)) {
-                SV *lbl = sv_2mortal(pmd_title_from_name(aTHX_
-                            SvPVX(section), SvCUR(section)));
                 sv_catpvs(out, "<li class=\"punk-md-section\">"
                                "<details open><summary>");
-                pmd_esc_sv(aTHX_ out, lbl);
+                pmd_esc_sv(aTHX_ out, *av_fetch(page, PMD_SECLABEL, 0));
                 sv_catpvs(out, "</summary><ul>\n");
             }
             if (open_section) SvREFCNT_dec(open_section);
@@ -511,13 +704,122 @@ static SV *pmd_chars(pTHX_ SV *sv) {
     return sv;
 }
 
+/* ---- SEO fields ----------------------------------------------------------
+ * What the shipped wrapper needs to write a page's meta tags, worked out here
+ * because a template cannot do path arithmetic:
+ *
+ *   host          the app's `host`, passed in at compile; "" without one
+ *   canonical     front-matter `canonical`, else host + prefix + url; "" with
+ *                 neither, and always "" off a page
+ *   image         front-matter `image` made absolute: an http(s) URL as is, a
+ *                 rooted path on the host, anything else beside the source
+ *                 file (host + prefix + its directory)
+ *   og_type       front-matter `og_type`, else `article` with a `date`, else
+ *                 `website`
+ *   twitter_card  `summary_large_image` with an image, else `summary`
+ *
+ * The origin is never the request's: the page is frozen at boot, before there
+ * is one, and a canonical taken from a Host header is how a cache is taught
+ * somebody else's hostname. */
+/* The names the mount itself puts in front of the templates; `vars` may not
+ * use them. */
+static const char *const pmd_reserved[] = {
+    "kind", "title", "site_title", "nav", "content", "toc", "url", "prefix",
+    "search", "search_path", "assets", "footer", "meta", "host", "canonical",
+    "image", "og_type", "twitter_card", "date", "updated", "date_iso",
+    "updated_iso", "date_human", "updated_human", NULL
+};
+
+static void pmd_seo(pTHX_ AV *cap, HV *data, AV *page, HV *meta, SV *url) {
+    HV *opts = (HV *)SvRV(*av_fetch(cap, PMDC_OPTS, 0));
+    SV *host = pmd_opt(aTHX_ opts, "host");
+    SV *prefix = *av_fetch(cap, PMDC_PREFIX, 0);
+    SV *canon = newSVpvs(""), *image = newSVpvs("");
+    SV *v, **dp, **up;
+    const char *ogt = "website";
+
+    if (page) {
+        if (meta && (v = pmd_opt(aTHX_ meta, "canonical")) && SvCUR(v))
+            sv_setsv(canon, v);
+        else if (host && SvCUR(host)) {
+            sv_setsv(canon, host);
+            sv_catsv(canon, prefix);
+            sv_catsv(canon, url);
+            if (!SvCUR(prefix) && !SvCUR(url)) sv_catpvs(canon, "/");
+        }
+
+        if (meta && (v = pmd_opt(aTHX_ meta, "image")) && SvCUR(v)) {
+            STRLEN il;
+            const char *ip = SvPV_const(v, il);
+            if ((il > 7 && memEQ(ip, "http://", 7)) ||
+                (il > 8 && memEQ(ip, "https://", 8)))
+                sv_setsv(image, v);
+            else {
+                if (host) sv_setsv(image, host);
+                if (ip[0] == '/') sv_catpvn(image, ip, il);
+                else {
+                    /* beside the source file: its directory under the root */
+                    SV *root = *av_fetch(cap, PMDC_DIR, 0);
+                    SV *file = *av_fetch(page, PMD_FILE, 0);
+                    STRLEN rl, fl, k, dend;
+                    const char *fp = SvPV_const(file, fl);
+                    (void)SvPV_const(root, rl);
+                    dend = rl;
+                    for (k = fl; k > rl; k--)
+                        if (fp[k - 1] == '/') { dend = k - 1; break; }
+                    sv_catsv(image, prefix);
+                    if (dend > rl) sv_catpvn(image, fp + rl, dend - rl);
+                    sv_catpvs(image, "/");
+                    sv_catpvn(image, ip, il);
+                }
+            }
+        }
+
+        if (meta && (v = pmd_opt(aTHX_ meta, "og_type")) && SvCUR(v))
+            ogt = NULL;
+        else if ((dp = av_fetch(page, PMD_DATE, 0)) && *dp && SvOK(*dp))
+            ogt = "article";
+
+        dp = av_fetch(page, PMD_DATE, 0);
+        up = av_fetch(page, PMD_UPDATED, 0);
+        if (dp && *dp && SvOK(*dp)) {
+            IV t = SvIV(*dp);
+            (void)hv_stores(data, "date", newSViv(t));
+            (void)hv_stores(data, "date_iso", pmd_iso(aTHX_ t));
+            (void)hv_stores(data, "date_human", pmd_human(aTHX_ t));
+        }
+        if (up && *up && SvOK(*up)) {
+            IV t = SvIV(*up);
+            (void)hv_stores(data, "updated", newSViv(t));
+            (void)hv_stores(data, "updated_iso", pmd_iso(aTHX_ t));
+            (void)hv_stores(data, "updated_human", pmd_human(aTHX_ t));
+        }
+    }
+
+    (void)hv_stores(data, "host",
+        pmd_chars(aTHX_ host ? newSVsv(host) : newSVpvs("")));
+    (void)hv_stores(data, "canonical", pmd_chars(aTHX_ canon));
+    (void)hv_stores(data, "image", pmd_chars(aTHX_ image));
+    (void)hv_stores(data, "og_type",
+        ogt ? newSVpv(ogt, 0)
+            : pmd_chars(aTHX_ newSVsv(pmd_opt(aTHX_ meta, "og_type"))));
+    (void)hv_stores(data, "twitter_card",
+        newSVpv(SvCUR(image) ? "summary_large_image" : "summary", 0));
+}
+
 /* `kind` tells the template which of the three things it is rendering:
  * "page" for a document, "search" for the results page, "notfound" for the
  * 404. All three go through the same template, so without it an overriding
  * template has no way to tell them apart and cannot, say, drop the table of
- * contents from a results page. */
+ * contents from a results page.
+ *
+ * `page` is the document being rendered, or NULL for the search page and the
+ * 404. Its front matter arrives as `meta` (an empty hash without a page, so
+ * `{% if meta.x %}` needs no kind check). The values are copied before
+ * decoding: the page keeps its own bytes, and a reload renders from them
+ * again. */
 static SV *pmd_shell(pTHX_ AV *cap, const char *kind, SV *title, SV *nav,
-                     SV *content, SV *toc, SV *url) {
+                     SV *content, SV *toc, SV *url, AV *page) {
     const st_abi *st = punk_st(aTHX);
     HV *opts = (HV *)SvRV(*av_fetch(cap, PMDC_OPTS, 0));
     SV *engine_sv = *av_fetch(cap, PMDC_STENCIL, 0);
@@ -527,6 +829,38 @@ static SV *pmd_shell(pTHX_ AV *cap, const char *kind, SV *title, SV *nav,
     SV *err = NULL, *out;
     SV *site = pmd_opt(aTHX_ opts, "title");
     SV *foot = pmd_opt(aTHX_ opts, "footer");
+    HV *mcopy = newHV();
+    HV *meta = NULL;
+
+    if (page) {
+        SV **mp = av_fetch(page, PMD_META, 0);
+        if (mp && *mp && SvROK(*mp)) meta = (HV *)SvRV(*mp);
+    }
+    if (meta) {
+        HE *he;
+        hv_iterinit(meta);
+        while ((he = hv_iternext(meta)))
+            (void)hv_store_ent(mcopy, hv_iterkeysv(he),
+                               pmd_chars(aTHX_ newSVsv(HeVAL(he))), 0);
+    }
+    (void)hv_stores(data, "meta", newRV_noinc((SV *)mcopy));
+    pmd_seo(aTHX_ cap, data, page, meta, url);
+
+    /* `vars`: the site's own values (its name, its links), the same on every
+     * page. The names the mount fills are refused at boot, so nothing here
+     * can shadow one; a value is a fresh copy so a template cannot reach the
+     * caller's data. */
+    {
+        SV *vars = pmd_opt(aTHX_ opts, "vars");
+        if (vars && SvROK(vars) && SvTYPE(SvRV(vars)) == SVt_PVHV) {
+            HV *vh = (HV *)SvRV(vars);
+            HE *he;
+            hv_iterinit(vh);
+            while ((he = hv_iternext(vh)))
+                (void)hv_store_ent(data, hv_iterkeysv(he),
+                                   newSVsv(HeVAL(he)), 0);
+        }
+    }
 
     if (!engine)
         croak("Punk::Mount::Markdown: the view engine is not a "
@@ -596,8 +930,10 @@ static void pmd_render_page(pTHX_ AV *cap, AV *page) {
     nav  = sv_2mortal(pmd_nav_html(aTHX_ order, pages,
                                    *av_fetch(cap, PMDC_PREFIX, 0),
                                    *av_fetch(page, PMD_URL, 0)));
+    av_store(page, PMD_META, newRV_inc((SV *)meta));
+    pmd_page_dates(aTHX_ page, meta);
     body = pmd_shell(aTHX_ cap, "page", *av_fetch(page, PMD_TITLE, 0), nav,
-                     html, toc_html, *av_fetch(page, PMD_URL, 0));
+                     html, toc_html, *av_fetch(page, PMD_URL, 0), page);
     av_store(page, PMD_BODY, body);
 }
 
@@ -730,10 +1066,7 @@ static SV *pmd_search_page(pTHX_ AV *cap, HV *env) {
                 if (SvOK(plain) && SvCUR(plain)) {
                     STRLEN pl;
                     const char *p = SvPV_const(plain, pl);
-                    STRLEN take = pl < 180 ? pl : 180;
-                    /* do not cut a UTF-8 sequence in half */
-                    while (take && take < pl &&
-                           ((unsigned char)p[take] & 0xC0) == 0x80) take--;
+                    STRLEN take = pmd_cut(p, pl, 180);
                     sv_catpvs(content, "<p class=\"punk-md-snippet\">");
                     pmd_esc_collapsed(aTHX_ content, p, take);
                     if (take < pl) sv_catpvs(content, "...");
@@ -756,7 +1089,96 @@ static SV *pmd_search_page(pTHX_ AV *cap, HV *env) {
                      sv_2mortal(newSVpv(
                          pmd_opt_str(aTHX_
                              (HV *)SvRV(*av_fetch(cap, PMDC_OPTS, 0)),
-                             "search_path", "/search"), 0)));
+                             "search_path", "/search"), 0)), NULL);
+}
+
+/* ---- the listing ----------------------------------------------------------
+ * $app->markdown_pages($prefix): the built pages, in the mount's order, as
+ * fresh Perl data, so a landing page, an index or a feed can be made from
+ * the same table the mount serves. Drafts are not in it, since the walk
+ * never kept them. Every value is a copy, decoded to characters: nothing a
+ * caller does to the list reaches a frozen page. */
+
+/* A page's summary: front-matter `description`, else its plain text with the
+ * leading title dropped, whitespace collapsed, cut to 200 bytes on a UTF-8
+ * boundary with "..." when anything was cut. */
+static SV *pmd_summary(pTHX_ AV *page, HV *meta) {
+    SV *v, *flat, *out;
+    SV **pp = av_fetch(page, PMD_PLAIN, 0);
+    SV *title = *av_fetch(page, PMD_TITLE, 0);
+    STRLEN fl, tl, take;
+    const char *f, *t;
+    if (meta && (v = pmd_opt(aTHX_ meta, "description")) && SvCUR(v))
+        return pmd_chars(aTHX_ newSVsv(v));
+    flat = sv_2mortal(newSVpvs(""));
+    if (pp && *pp && SvOK(*pp)) {
+        STRLEN pl;
+        const char *p = SvPV_const(*pp, pl);
+        pmd_collapsed(aTHX_ flat, p, pl);
+    }
+    f = SvPV_const(flat, fl);
+    t = SvPV_const(title, tl);
+    if (tl && fl >= tl && memEQ(f, t, tl) && (fl == tl || f[tl] == ' ')) {
+        f += tl; fl -= tl;
+        while (fl && *f == ' ') { f++; fl--; }
+    }
+    take = pmd_cut(f, fl, 200);
+    out = newSVpvn(f, take);
+    if (take < fl) sv_catpvs(out, "...");
+    return pmd_chars(aTHX_ out);
+}
+
+static AV *pmd_pages_av(pTHX_ AV *cap) {
+    HV *pages  = (HV *)SvRV(*av_fetch(cap, PMDC_PAGES, 0));
+    AV *order  = (AV *)SvRV(*av_fetch(cap, PMDC_ORDER, 0));
+    SV *prefix = *av_fetch(cap, PMDC_PREFIX, 0);
+    AV *out = newAV();
+    SSize_t i, n = av_len(order) + 1;
+    for (i = 0; i < n; i++) {
+        SV **u = av_fetch(order, i, 0);
+        HE *he;
+        AV *page;
+        HV *rec, *mcopy = newHV(), *meta = NULL;
+        SV **mp, **dp, **up, *url, *path;
+        if (!u || !*u) { SvREFCNT_dec((SV *)mcopy); continue; }
+        he = hv_fetch_ent(pages, *u, 0, 0);
+        if (!he || !HeVAL(he) || !SvROK(HeVAL(he))) {
+            SvREFCNT_dec((SV *)mcopy);
+            continue;
+        }
+        page = (AV *)SvRV(HeVAL(he));
+        rec = newHV();
+
+        mp = av_fetch(page, PMD_META, 0);
+        if (mp && *mp && SvROK(*mp)) {
+            HE *me;
+            meta = (HV *)SvRV(*mp);
+            hv_iterinit(meta);
+            while ((me = hv_iternext(meta)))
+                (void)hv_store_ent(mcopy, hv_iterkeysv(me),
+                                   pmd_chars(aTHX_ newSVsv(HeVAL(me))), 0);
+        }
+
+        url = newSVsv(prefix);
+        sv_catsv(url, *u);
+        if (!SvCUR(url)) sv_catpvs(url, "/");
+        path = SvCUR(*u) ? newSVsv(*u) : newSVpvs("/");
+
+        (void)hv_stores(rec, "url",   pmd_chars(aTHX_ url));
+        (void)hv_stores(rec, "path",  pmd_chars(aTHX_ path));
+        (void)hv_stores(rec, "title",
+            pmd_chars(aTHX_ newSVsv(*av_fetch(page, PMD_TITLE, 0))));
+        dp = av_fetch(page, PMD_DATE, 0);
+        up = av_fetch(page, PMD_UPDATED, 0);
+        (void)hv_stores(rec, "date",
+            (dp && *dp && SvOK(*dp)) ? newSViv(SvIV(*dp)) : newSV(0));
+        (void)hv_stores(rec, "updated",
+            (up && *up && SvOK(*up)) ? newSViv(SvIV(*up)) : newSV(0));
+        (void)hv_stores(rec, "summary", pmd_summary(aTHX_ page, meta));
+        (void)hv_stores(rec, "meta", newRV_noinc((SV *)mcopy));
+        av_push(out, newRV_noinc((SV *)rec));
+    }
+    return out;
 }
 
 /* ---- the app ---------------------------------------------------------------

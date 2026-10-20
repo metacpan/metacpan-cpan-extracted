@@ -17,7 +17,7 @@ use Data::Dumper qw(Dumper);
 # SHOW CREATE DATABASE oEdtk;
 
 use Exporter;
-our $VERSION     = 2.1126;
+our $VERSION     = 2.1129;
 our $VERSION_TXT = $VERSION =~ s/\./_/gr;
 our @ISA         = qw(Exporter);
 our @EXPORT_OK   = qw(

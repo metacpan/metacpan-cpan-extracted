@@ -37,7 +37,7 @@ my %NO_AUTH = (SkipAuthentication => 1);
 
 # Build a v=1 signed inbound message from a sender.
 sub signed_inbound {
-    my $raw = "From: Sender <sender\@origin.example>\r\n"
+    my $raw = "From: Sender <sender\@test1.dkim2.com>\r\n"
             . "To: user\@test1.dkim2.com\r\n"
             . "Subject: hello\r\n"
             . "\r\n"
@@ -241,6 +241,7 @@ sub forwarded_unchanged {
     my $bouncer = mk_signer(domain => 'test2.dkim2.com');
     my $out = Mail::DKIM2::DSN->generate(
         Message => $inbound, Signer => $bouncer, ReportingMTA => 'test2.dkim2.com',
+        PubkeyCallback => $CB, SkipTimestampCheck => 1,
     );
     ok($out->{raw}, 'generate returned a DSN');
     is($out->{send_to}, '<sender@origin.example>', 'DSN addressed to original sender');
@@ -262,18 +263,25 @@ sub forwarded_unchanged {
     is($v->result, 'pass', 'generated DSN verifies (pass)');
 }
 
-# === generate: works for UNSIGNED inbound too (bounce regardless) ===
+# === generate: never for a message that is not Provisionally Verified (-07 §16) ===
 {
     my $inbound = "From: nobody\@origin.example\r\nTo: user\@test1.dkim2.com\r\n"
                 . "Subject: unsigned\r\n\r\nhi\r\n";
     my $bouncer = mk_signer(domain => 'test2.dkim2.com');
-    my $out = Mail::DKIM2::DSN->generate(
+    my $out = eval { Mail::DKIM2::DSN->generate(
         Message => $inbound, Signer => $bouncer, To => 'nobody@origin.example',
-    );
-    is($out->{send_to}, 'nobody@origin.example', 'unsigned mail: bounced to envelope sender');
-    my $m = Email::MIME->new($out->{raw});
-    my @sig = $m->header_raw('DKIM2-Signature');
-    is(scalar(@sig), 1, 'unsigned-source DSN is DKIM2-signed');
+        PubkeyCallback => $CB, SkipTimestampCheck => 1,
+    ) };
+    ok(!$out, 'unsigned mail: no DSN');
+    like($@, qr/not sending a DSN: .*not Provisionally Verified/, '... and generate says why');
+    my ($ok, $why) = Mail::DKIM2::DSN->may_generate(Message => signed_inbound(), PubkeyCallback => $CB);
+    ok(!$ok, 'an expired top signature is not Provisionally Verified');
+    like($why, qr/signature expired/, '... saying so');
+    my @r = Mail::DKIM2::Reflector::generate_dsn(sender => 'nobody@origin.example',
+        message => $inbound, domain => 'test2.dkim2.com', selector => 'rsa1024',
+        key => DKIM2TestKeys::private_key('test2.dkim2.com', 'rsa1024'), pubkey_cb => $CB);
+    ok(!defined $r[0], 'reflector-dsn: nothing for unsigned mail');
+    like($r[1] // '', qr/no DKIM2-Signature/, '... and says why');
 }
 
 # === reflector-dsn: Reflector::generate_dsn end to end -> a fresh DKIM2 DSN
@@ -288,6 +296,7 @@ sub forwarded_unchanged {
         selector => 'rsa1024',
         key      => DKIM2TestKeys::private_key('test2.dkim2.com', 'rsa1024'),
         now      => $TS,
+        pubkey_cb => $CB, skip_timestamp_check => 1,
     );
     ok($out, 'generate_dsn produced a DSN');
     my $m = Email::MIME->new($out);
@@ -328,6 +337,7 @@ sub forwarded_unchanged {
         selector => 'rsa1024',
         key      => DKIM2TestKeys::private_key('test2.dkim2.com', 'rsa1024'),
         now      => $TS,
+        pubkey_cb => $CB, skip_timestamp_check => 1,
     );
     ok($out, 'generate_dsn produced a DSN');
     my $m = Email::MIME->new($out);
@@ -376,7 +386,8 @@ sub dsn_around {
                               body => $embedded);
     return Email::MIME->create(
         attributes => { content_type => 'multipart/report', encoding => '7bit' },
-        header_str => [ From => 'postmaster@test3.dkim2.com',
+        # From the domain that signs it (-07 section 11).
+        header_str => [ From => 'postmaster@' . ($o{domain} // 'test3.dkim2.com'),
                         To => 'user@test2.dkim2.com',
                         Subject => 'failure' ],
         parts => [
@@ -426,7 +437,7 @@ sub dsn_around {
             SkipTimestampCheck => 1,
         );
         ok(!$auth->{ok}, "a tampered returned message does not authenticate (headers_only=$headers_only)");
-        like($auth->{details} // '', qr/header hash mismatch/, '  ... because the header hash differs');
+        like($auth->{details} // '', qr/header hash sha256 mismatch/, '  ... because the header hash differs');
     }
 }
 

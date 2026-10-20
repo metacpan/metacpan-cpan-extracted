@@ -1,0 +1,15 @@
+<testResults>
+  <result>
+    <counts>
+      <right>3</right>
+      <wrong>1</wrong>
+      <ignores>2</ignores>
+      <exceptions>0</exceptions>
+    </counts>
+  </result>
+  <executionLog>
+    <testSystem>slim:fitnesse.slim.SlimService</testSystem>
+    <command>Connection to running SlimService: 127.0.0.1:8099</command>
+    <exitCode>0</exitCode>
+  </executionLog>
+</testResults>

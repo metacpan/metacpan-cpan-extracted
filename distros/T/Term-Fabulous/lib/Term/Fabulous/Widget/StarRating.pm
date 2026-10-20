@@ -10,7 +10,7 @@ use Object::Pad 0.825;
 use Term::Fabulous::Role::HasRange;
 use Term::Fabulous::Widget::Input;
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 class Term::Fabulous::Widget::StarRating
 	:isa(Term::Fabulous::Widget::Input)
@@ -19,7 +19,7 @@ class Term::Fabulous::Widget::StarRating
 {
 	use Clay::UI::Enum::Result;
 	use List::Util ();    # max is a method here
-	use Scalar::Util qw(refaddr weaken);
+	use Scalar::Util qw(refaddr);
 	use Term::Fabulous::Check qw(boolean non_negative_integer optional positive_integer);
 	use Term::Fabulous::Color;
 	use Term::Fabulous::Range;
@@ -66,10 +66,9 @@ class Term::Fabulous::Widget::StarRating
 			value          => $value,
 		);
 
-		weaken( my $weak_self = $self );
 		my $continue = Clay::UI::Enum::Result->CONTINUE;
-		$self->on( MouseMove      => sub ($event) { $weak_self->_hover_at( $weak_self->_star_at($event) ) if $weak_self;                            return $continue } );
-		$self->on( OnHoverStopped => sub ($event) { $weak_self->_hover_at(undef) if $weak_self && refaddr( $event->target ) == refaddr($weak_self); return $continue } );
+		$self->on( MouseMove      => sub ( $self, $event ) { $self->_hover_at( $self->_star_at($event) );                            return $continue }, owner => $self );
+		$self->on( OnHoverStopped => sub ( $self, $event ) { $self->_hover_at(undef) if refaddr( $event->target ) == refaddr($self); return $continue }, owner => $self );
 	}
 
 	method _checked_half_glyph ($value) {
@@ -319,7 +318,7 @@ Term::Fabulous::Widget::StarRating - Rate something with a row of stars
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-star-rating.svg" alt="Star ratings: a focused one with three of five stars, one with half stars and its value, a read-only one, one out of ten with a gap of zero, and a disabled one"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.05/screenshots/widget-star-rating.svg" alt="Star ratings: a focused one with three of five stars, one with half stars and its value, a read-only one, one out of ten with a gap of zero, and a disabled one"></p>
 
 =end html
 

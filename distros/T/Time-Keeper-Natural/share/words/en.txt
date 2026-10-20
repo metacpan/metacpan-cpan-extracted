@@ -1,0 +1,42 @@
+# Time::Keeper::Natural word table: en
+#
+# key<TAB>phrase|phrase. The words CLDR has none for. A phrase is matched after
+# the locale's CLDR words and must not be one of them; tools/wordcheck --locale en
+# refuses a collision. A key alone means "considered, and the language needs no
+# word" (English's list pattern already has "and").
+#
+# A "# test:" line is run by tools/wordcheck with the clock pinned to
+# 2026-10-15T09:00:00 Europe/London, in this file's locale (en, whose week
+# starts on Sunday): text => the value expected, or the start and the end
+# of an interval with " / " between them.
+start_of	start of|the start of|beginning of|the beginning of
+end_of	end of|the end of
+at	at|@
+on	on
+skip	the
+and
+of	of
+last	last
+range	from {0} to {1}|between {0} and {1}|{0} until {1}|{0} to {1}
+after	{0} after {1}|the day after {0}
+before	{0} before {1}|the day before {0}
+weekend	weekend
+# test: end of last month => 2026-09-30T23:59:59.999999999+01:00
+# test: start of next week => 2026-10-18T00:00:00+01:00
+# test: the end of the week => 2026-10-17T23:59:59.999999999+01:00
+# test: the end of the year => 2026-12-31T23:59:59.999999999+00:00
+# test: beginning of October 2026 => 2026-10-01T00:00:00+01:00
+# test: tomorrow at 3 pm => 2026-10-16T15:00:00+01:00
+# test: on Tuesday at 9 am => 2026-10-20T09:00:00+01:00
+# test: at 9 at night => 2026-10-15T21:00:00+01:00
+# test: the third Friday of next month => 2026-11-20T00:00:00+00:00
+# test: the last Friday of October => 2026-10-30T00:00:00+00:00
+# test: from Monday to Friday => 2026-10-19T00:00:00+01:00 / 2026-10-23T23:59:59.999999999+01:00
+# test: between 9 am and 5 pm => 2026-10-15T09:00:00+01:00 / 2026-10-15T17:00:00+01:00
+# test: tomorrow until the end of next week => 2026-10-16T00:00:00+01:00 / 2026-10-24T23:59:59.999999999+01:00
+# test: 10 am to noon => 2026-10-15T10:00:00+01:00 / 2026-10-15T12:00:00+01:00
+# test: 3 days after tomorrow => 2026-10-19T00:00:00+01:00
+# test: 2 weeks before October 20 => 2026-10-06T00:00:00+01:00
+# test: the day after next Tuesday => 2026-10-21T00:00:00+01:00
+# test: the day before October 15 => 2026-10-14T00:00:00+01:00
+# test: next weekend => 2026-10-24T00:00:00+01:00

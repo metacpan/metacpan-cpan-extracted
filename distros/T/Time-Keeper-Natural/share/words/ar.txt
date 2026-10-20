@@ -1,0 +1,19 @@
+# Time::Keeper::Natural word table: ar
+#
+# UNREVIEWED: written 18 Oct 2026 by a session, as the p2p site's catalogues were.
+# A native reader should review it before release. The format is en.txt's.
+#
+# Arabic joins "end" to a period by idafa with no word between, and CLDR's
+# words carry their article, so "نهاية الشهر الماضي" reads as it stands. An
+# ordinal weekday is not read.
+start_of	بداية|في بداية|مطلع|في مطلع
+end_of	نهاية|في نهاية
+at	الساعة|في الساعة
+on	يوم|في يوم
+skip
+and
+# test: نهاية الشهر الماضي => 2026-09-30T23:59:59.999999999+01:00
+# test: بداية الشهر القادم => 2026-11-01T00:00:00+00:00
+# test: نهاية الشهر => 2026-10-31T23:59:59.999999999+00:00
+# test: غدًا الساعة 3:30 م => 2026-10-16T15:30:00+01:00
+# test: يوم الثلاثاء => 2026-10-20T00:00:00+01:00

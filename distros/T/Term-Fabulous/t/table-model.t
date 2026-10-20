@@ -126,6 +126,34 @@ subtest 'trees' => sub {
 	like dies { model()->add_rows( [ { name => 'x' } ], parent => 1 ) }, qr/a parent row needs a table with children_key/, 'flat tables have no parents';
 };
 
+subtest 'a filtered tree can show its matches open' => sub {
+	my $model = model( row_id => 'name', children_key => 'kids', open_when_filtered => 1 );
+	$model->set_rows( [ { name => 'src', kids => [ { name => 'lib', kids => [ { name => 'x.pm' } ] }, { name => 'a.c' } ] }, { name => 'README' } ] );
+	$model->set_expanded( 'lib', 1 );
+	is view($model), 'src+ README', 'unfiltered, the rows are as open as their expansion says';
+	$model->search('x.pm');
+	is view($model),                                    'src- .lib- ..x.pm', 'searched, every passing row is open';
+	is [ map { $model->is_expanded($_) } qw(src lib) ], [ 0, 1 ],            'without changing the expansion';
+	$model->search('');
+	is view($model), 'src+ README', 'so the view is back as it was';
+	$model->open_when_filtered(0);
+	$model->search('x.pm');
+	is view($model),               'src+', 'without the option a search leaves the rows closed';
+	is $model->open_when_filtered, 0,      'the accessor reads it';
+};
+
+subtest 'only rows without children can match' => sub {
+	my $model = model( row_id => 'name', children_key => 'kids', expand_new => 1, only_leaves_match => 1 );
+	$model->set_rows( [ { name => 'lib', kids => [ { name => 'x.pm' }, { name => 'lib.c' } ] }, { name => 'docs', kids => [ { name => 'a.txt' } ] } ] );
+	$model->search('lib');
+	is view($model), 'lib- .lib.c', 'a parent passes only for a matching child';
+	$model->search('docs');
+	is view($model), '', 'a parent that matches by itself does not pass';
+	$model->only_leaves_match(0);
+	is view($model),              'docs', 'without the option it does (without its children, which do not)';
+	is $model->only_leaves_match, 0,      'the accessor reads it';
+};
+
 subtest 'columns' => sub {
 	my $calls = 0;
 	my $model = model(

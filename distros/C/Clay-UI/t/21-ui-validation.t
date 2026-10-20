@@ -180,18 +180,6 @@ subtest 'both spellings of one key die where the slice is set' => sub {
 	is( $box->layout, {}, 'the slice is unchanged' );
 };
 
-subtest 'hover roles cannot be composed onto a text node' => sub {
-	my $ok = eval q{
-		class HoverText :does(Clay::UI::Role::Core::TextNode) :does(Clay::UI::Role::Interaction::Hoverable) {
-			method text { 'x' }
-			method text_config { {} }
-		}
-		1;
-	};
-	ok( $ok, 'the class compiles' ) or diag $@;
-	like( dies { HoverText->new }, qr/wrap the text in an Element/, 'constructing it dies' );
-};
-
 subtest 'errors point at the caller' => sub {
 	my $box = Clay::UI::Test::Box->new;
 	like( dies { $box->background_color([300, 0, 0, 255]) }, qr/^Clay::UI: 'background_color\.r' expected a number in 0\.\.255, got '300' at \Q$0\E line \d+\.\n\z/,

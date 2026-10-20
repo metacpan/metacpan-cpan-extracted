@@ -196,9 +196,9 @@
 <polyline points="52.5 276 52.5 280 52.538 280.587 52.653 281.165 52.843 281.722 53.103 282.25 53.43 282.739 53.818 283.182 54.261 283.57 54.75 283.897 55.278 284.157 55.835 284.347 56.413 284.462 57 284.5 57 284.5" fill="none" stroke="#78a0dc" stroke-width="1" stroke-linejoin="round"/>
 <polyline points="484.5 276 484.5 280 484.462 280.587 484.347 281.165 484.157 281.722 483.897 282.25 483.57 282.739 483.182 283.182 482.739 283.57 482.25 283.897 481.722 284.157 481.165 284.347 480.587 284.462 480 284.5 480 284.5" fill="none" stroke="#78a0dc" stroke-width="1" stroke-linejoin="round"/>
 <g class="terminal">
-<text x="246" y="146" textLength="81" fill="#ffffff">Prism 2.4</text>
-<text x="246" y="182" textLength="216" fill="#96a0b4">Colors for your terminal</text>
-<text x="246" y="218" textLength="144" fill="#96a0b4">Press q to quit.</text>
+<text x="246" y="164" textLength="81" fill="#ffffff">Prism 2.4</text>
+<text x="246" y="200" textLength="216" fill="#96a0b4">Colors for your terminal</text>
+<text x="246" y="236" textLength="144" fill="#96a0b4">Press q to quit.</text>
 </g>
 <g shape-rendering="crispEdges">
 </g>

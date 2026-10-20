@@ -666,6 +666,78 @@ screenshot "cookbook-sixel-viewer" {
 	}
 }
 
+screenshot "cookbook-document-basics" {
+	script "examples/cookbook/document-basics.pl"
+	size 80 38
+}
+
+screenshot "cookbook-document-from-markup" {
+	script "examples/cookbook/document-from-markup.pl"
+}
+
+// The FAQ page, opened from the fifth link of the manual, with its
+// first link selected.
+screenshot "cookbook-document-links" {
+	script "examples/cookbook/document-links.pl"
+	size 80 20
+	steps {
+		key "l" "l" "l" "l" "l" "Enter"
+		key "l"
+	}
+}
+
+screenshot "cookbook-document-search" {
+	script "examples/cookbook/document-search.pl"
+	size 80 20
+	steps {
+		key "/"
+		type "disk"
+		key "Enter" "n" "n"
+	}
+}
+
+screenshot "cookbook-document-contents" {
+	script "examples/cookbook/document-contents.pl"
+	size 100 26
+	steps {
+		key "PageDown" "PageDown" "PageDown"
+	}
+}
+
+screenshot "cookbook-code-highlighting" {
+	script "examples/cookbook/code-highlighting.pl"
+	size 80 22
+}
+
+screenshot "cookbook-code-highlighting-scrolled" {
+	script "examples/cookbook/code-highlighting.pl"
+	size 80 22
+	steps {
+		key "Right" "Right"
+	}
+}
+
+screenshot "cookbook-document-styles" {
+	script "examples/cookbook/document-styles.pl"
+	size 80 16
+	steps {
+		key "F2"
+	}
+}
+
+screenshot "cookbook-pager-keys" {
+	script "examples/cookbook/pager-keys.pl"
+	size 80 20
+	steps {
+		key "n" "n" "n" "n" "n" "n"
+	}
+}
+
+screenshot "cookbook-document-widgets" {
+	script "examples/cookbook/document-widgets.pl"
+	args "5.10"
+}
+
 screenshot "cookbook-report-to-file" {
 	script "examples/cookbook/report-to-file.pl"
 	size 52 8
@@ -926,6 +998,18 @@ screenshot "widget-virtual-list" {
 		key "End"
 		wheel 40 10 direction="up" notches=4
 	}
+}
+
+screenshot "widget-document-view" {
+	script "examples/widgets/document-view.pl"
+	size 80 36
+	steps {
+		key "l"
+	}
+}
+
+screenshot "widget-code-block" {
+	script "examples/widgets/code-block.pl"
 }
 
 screenshot "widget-button" {

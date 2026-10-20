@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Punk ();
 
-our $VERSION = '0.61';
+our $VERSION = '0.62';
 
 1;
 
@@ -162,6 +162,16 @@ The paths, defaulting to C</healthz> and C</readyz>. An explicit C<undef>
 disables that endpoint, for a platform that only probes one of them.
 
 =head1 METHODS
+
+=head2 new
+
+The constructor L<Punk/plugin> calls. It takes nothing; the options go to
+L</register>.
+
+=head2 register($app, \%opts)
+
+Called once by C<plugin>: mounts the liveness and readiness routes with the
+L</OPTIONS>.
 
 =head2 Punk::Plugin::Health->paths($app)
 

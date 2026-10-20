@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Punk ();
 
-our $VERSION = '0.61';
+our $VERSION = '0.62';
 
 1;
 
@@ -111,6 +111,12 @@ A handler that dies does not take the worker down: the error event fires
 and the connection is closed with 1011.
 
 =head1 METHODS
+
+=head2 on($event, $code)
+
+Sets the handler for C<$event>, replacing any earlier one; see L</EVENTS>.
+Croaks on an unknown event or a C<$code> that is not a code reference.
+Chainable.
 
 =head2 send($text)
 

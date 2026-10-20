@@ -35,15 +35,17 @@ my @EVENTS = qw(SelectionChange CursorMove RowActivate SortChange PageChange Exp
 
 # A focused table on a memory terminal; returns the table and a harness
 # with the terminal, the UI and the names of the events fired since the
-# last look.
+# last look. A clock goes to the UI.
 sub table_ui (%args) {
 	my $size  = delete $args{size} // [ 40, 14 ];
+	my @clock = exists $args{clock} ? ( clock => delete $args{clock} ) : ();
 	my $table = Term::Fabulous::Widget::Table->new( id => 'people', row_id => 'id', columns => [@COLUMNS], rows => [@PEOPLE], %args );
 	my $root  = Term::Fabulous::Widget::Box->new( layout => { layout_direction => CLAY_TOP_TO_BOTTOM, sizing => { width => sizing_grow(), height => sizing_grow() } } );
 	$root->add_child($table);
 	my $terminal = Term::Fabulous::Terminal::Memory->new( width => $size->[0], height => $size->[1] );
-	my $ui       = Term::Fabulous->new( root => $root, width => $size->[0], height => $size->[1], terminal => $terminal );
+	my $ui       = Term::Fabulous->new( root => $root, width => $size->[0], height => $size->[1], terminal => $terminal, @clock );
 	my %h        = ( terminal => $terminal, ui => $ui, events => [] );
+
 	foreach my $name (@EVENTS) {
 		$table->on( $name => sub ($event) { push @{ $h{events} }, [ $name, $event ]; return } );
 	}
@@ -131,7 +133,7 @@ subtest 'drawing' => sub {
 	is static_lines($bare), [' Ann  Sales  34'], 'no header, no lines';
 
 	my $narrow = Term::Fabulous::Widget::Table->new( id => 'w', columns => [ { key => 'a' }, { key => 'b' } ], rows => [ { a => 'xx', b => 'yy' } ] );
-	is static_lines( $narrow, 11 ), [
+	is static_lines( $narrow, 10 ), [
 		"\x{256D}\x{2500}\x{2500}\x{2500}\x{2500}\x{252C}\x{2500}\x{2500}\x{2500}\x{2500}",
 		"\x{2502} a  \x{2502} b",
 		"\x{251C}\x{2500}\x{2500}\x{2500}\x{2500}\x{253C}\x{2500}\x{2500}\x{2500}\x{2500}",
@@ -210,7 +212,7 @@ subtest 'header keys' => sub {
 };
 
 subtest 'mouse' => sub {
-	my ( $table, $h ) = table_ui( selection => 'multiple' );
+	my ( $table, $h ) = table_ui( selection => 'multiple', clock => sub { 1000 } );    # every click is quick
 
 	# The selection column is 5 cells wide, the rows start on screen row 3.
 	click( $h, 8, 4 );
@@ -234,6 +236,51 @@ subtest 'mouse' => sub {
 	is [ map { $_->row_id } map { $_->[1] } grep { $_->[0] eq 'RowActivate' } @{ $h->{events} } ], [5], 'a double click activates';
 	mouse( $h, key => TB_KEY_MOUSE_RIGHT, x => 9, y => 1 );
 	ok $table->is_column_chooser_open, 'a right click on the header opens the column chooser';
+};
+
+subtest 'double clicks on the clock of the UI' => sub {
+	my $now = 1000;
+	my ( $table, $h ) = table_ui( clock => sub { $now } );
+	my $activated = sub {
+		[ map { $_->[1]->row_id } grep { $_->[0] eq 'RowActivate' } splice @{ $h->{events} } ]
+	};
+	click( $h, 9, 7 );
+	$now += 0.3;
+	click( $h, 9, 7 );
+	is $activated->(), [5], 'two clicks 0.3 seconds apart activate the row';
+	click( $h, 9, 7 );
+	is $activated->(), [], 'a third quick click is a single click';
+	click( $h, 9, 7 );
+	is $activated->(), [5], 'and a fourth a double click again';
+	$now += 1;
+	click( $h, 9, 6 );
+	$now += 0.5;
+	click( $h, 9, 6 );
+	is $activated->(), [], 'two clicks 0.5 seconds apart do not';
+	click( $h, 9, 5 );
+	click( $h, 9, 6 );
+	is $activated->(), [], 'nor two quick clicks on two lines';
+};
+
+subtest 'the column chooser stays on the screen' => sub {
+	my @columns = map { { key => "c$_", title => "Column $_" } } 1 .. 8;
+	my $table   = Term::Fabulous::Widget::Table->new(
+		id     => 'wide', row_id => 'id', columns => \@columns, rows => [ { id => 1 } ],
+		layout => { sizing => { width => sizing_grow(), height => sizing_fixed(5) } }
+	);
+	my $root = Term::Fabulous::Widget::Box->new( layout => { layout_direction => CLAY_TOP_TO_BOTTOM, sizing => { width => sizing_grow(), height => sizing_grow() } } );
+	$root->add_child( Term::Fabulous::Widget::Box->new( layout => { sizing => { width => sizing_grow(), height => sizing_fixed(15) } } ), $table );
+	my $ui = Term::Fabulous->new( root => $root, width => 40, height => 20, terminal => Term::Fabulous::Terminal::Memory->new( width => 40, height => 20 ) );
+	$ui->step;
+	is $ui->bounding_box($table)->{y}, 15, 'the table starts at row 15 of 20';
+	$table->open_column_chooser;
+	$ui->step;
+	my ($chooser) = grep { $_->isa('Term::Fabulous::Widget::Table::ColumnChooser') } @{ $table->children };
+	my $box = $ui->bounding_box($chooser);
+	is [ @{$box}{qw(y height)} ], [ 8, 12 ], 'the chooser of 12 rows moves up to end at the bottom of the screen';
+	is $box->{x} + $box->{width}, 40,        'at the right edge of the table';
+	my @lines = $ui->terminal->lines;
+	like $lines[18], qr/Esc closes/, 'its last line shows';
 };
 
 subtest 'mouse on trees and groups' => sub {
@@ -493,6 +540,77 @@ subtest 'scrolling' => sub {
 	ok !( grep { /\bn1\b/ } @{ screen($h) } ), 'the first rows scrolled away';
 	keys_to( $h, 'Ctrl+Home' );
 	ok( ( grep { /\bn1\b/ } @{ screen($h) } ), 'and come back' );
+
+	my $early = Term::Fabulous::Widget::Table->new( id => 'early', row_id => 'id', columns => [@COLUMNS], rows => [ map { { id => $_, name => "n$_", dept => 'd', age => $_ } } 1 .. 30 ] );
+	$early->cursor(25);
+	my $root = Term::Fabulous::Widget::Box->new( layout => { layout_direction => CLAY_TOP_TO_BOTTOM, sizing => { width => sizing_grow(), height => sizing_grow() } } );
+	$root->add_child($early);
+	my $terminal = Term::Fabulous::Terminal::Memory->new( width => 40, height => 10 );
+	my $ui       = Term::Fabulous->new( root => $root, width => 40, height => 10, terminal => $terminal );
+	$ui->step for 1 .. 2;
+	ok( ( grep { /\bn25\b/ } @{ screen( { terminal => $terminal } ) } ), 'a cursor set before the table was in a UI is scrolled into view after the first frame' );
+};
+
+subtest 'the frame stays while the rows scroll' => sub {
+	my ( $table, $h ) = table_ui( rows => [ map { { id => $_, name => "n$_", dept => 'd', age => $_ } } 1 .. 30 ], size => [ 40, 10 ], layout => { sizing => { height => sizing_grow() } } );
+	my $lines = screen($h);
+	like $lines->[0],   qr/\A\x{256D}\x{2500}+\x{252C}.*\x{2500}\x{256E}\z/, 'the top of the frame runs on over the scrollbar column';
+	like $lines->[9],   qr/\A\x{2570}\x{2500}+\x{2534}.*\x{2500}\x{256F}\z/, 'the bottom of the frame is the last line';
+	like $lines->[3],   qr/\bn1\b.*\x{2503}\x{2502}\z/,                      'the scrollbar is inside the frame, right of the last column';
+	unlike $lines->[1], qr/\x{2502}\s\x{2502}\z/,                            'the header has no line left of the scrollbar column';
+	keys_to( $h, 'Ctrl+End' );
+	$lines = screen($h);
+	ok( ( grep { /\bn30\b/ } @$lines ), 'the last row is in view' );
+	like $lines->[9], qr/\A\x{2570}.*\x{256F}\z/, 'and the bottom of the frame still is';
+
+	my ( $bare, $g )
+		= table_ui( rows => [ map { { id => $_, name => "n$_", dept => 'd', age => $_ } } 1 .. 30 ], header => 0, size => [ 40, 10 ], layout => { sizing => { height => sizing_grow() } } );
+	keys_to( $g, 'Ctrl+End' );
+	$lines = screen($g);
+	like $lines->[0], qr/\A\x{256D}\x{2500}+\x{252C}/, 'without column titles, the top of the frame stays too';
+	ok( ( grep { /\bn30\b/ } @$lines ), 'with the last row in view' );
+
+	my ( $fits, $f ) = table_ui( size => [ 40, 14 ] );
+	$lines = screen($f);
+	like $lines->[3], qr/\x{2502} Ann\s+\x{2502} Sales \x{2502}\s+34 \x{2502}\z/, 'rows that fit have no scrollbar column';
+};
+
+subtest 'a growing column wraps its text instead of scrolling sideways' => sub {
+	my $text = 'The quick brown fox jumps over the lazy dog and keeps on running far away';
+	my ( $table, $h ) = table_ui(
+		columns => [ { key => 'id', title => 'Id' }, { key => 'text', title => 'Text', width => 'grow' } ],
+		rows    => [ { id  => 1,    text  => $text } ],
+		layout  => { sizing => { width => sizing_grow() } },
+	);
+	my @rows = grep { /\x{2502}/ } @{ screen($h) };
+	ok !( grep { !/\x{2502}\z/ } @rows ), 'every row ends at the right side of the frame';
+	ok( ( grep { /\x{2502} running far away\s+\x{2502}/ } @rows ), 'the text wraps in the column' );
+	$table->update_column( text => width => 'fit' );
+	$h->{ui}->step;
+	ok( ( grep { /The quick brown fox jumps over th\z/ } @{ screen($h) } ), 'a fit column keeps its text on one line and scrolls sideways' );
+};
+
+subtest 'a growing column cuts off a word that is longer than its width' => sub {
+	my ( $table, $h ) = table_ui(
+		columns => [ { key => 'id', title => 'Id' }, { key => 'url', title => 'URL', width => 'grow', wrap => 'none' } ],
+		rows    => [ { id  => 1,    url   => 'https://example.com/a/very/long/path/without/any/spaces/in/it' } ],
+		layout  => { sizing => { width => sizing_grow() } },
+	);
+	my @rows = grep { /\x{2502}/ } @{ screen($h) };
+	ok !( grep { !/\x{2502}\z/ } @rows ), 'every row ends at the right side of the frame';
+	ok( ( grep { /\x{2502} https:\/\/example\.com\S*\s*\x{2502}\z/ } @rows ), 'the word is cut off inside the column' );
+};
+
+subtest 'a percent column keeps its share of the width with a long text' => sub {
+	my ( $table, $h ) = table_ui(
+		columns => [ { key => 'key', title => 'Key', width => 'percent(40)', wrap => 'none' }, { key => 'value', title => 'Value', width => 'grow', wrap => 'none' } ],
+		rows    => [ { id  => 1,     key   => 'extraKnownMarketplaces.claude-globals.source.path', value => 'directory' } ],
+		layout  => { sizing => { width => sizing_grow() } },
+	);
+	my @lines = @{ screen($h) };
+	my @rows  = grep { /\x{2502}/ } @lines;
+	ok !( grep { !/\x{2502}\z/ } @rows ), 'every row ends at the right side of the frame';
+	ok( index( $lines[0], "\x{252C}" ) <= 17, 'the key column is about 40% of the 40 columns wide' );
 };
 
 subtest 'hover and scrollbar' => sub {
@@ -504,7 +622,7 @@ subtest 'hover and scrollbar' => sub {
 
 	my ($bar_x) = grep { ( $h->{terminal}->cell( $_, 3 ) // [''] )->[0] eq "\x{2503}" } 0 .. 39;
 	ok defined $bar_x, 'a scrollbar shows the thumb';
-	mouse( $h, key => TB_KEY_MOUSE_LEFT, x => $bar_x, y => 9 );
+	mouse( $h, key => TB_KEY_MOUSE_LEFT, x => $bar_x, y => 8 );
 	ok( ( grep { /\bn30\b/ } @{ screen($h) } ), 'a click at the end of the scrollbar shows the end' );
 	mouse( $h, key => TB_KEY_MOUSE_LEFT, x => $bar_x, y => 3, mod => TB_MOD_MOTION );
 	ok( ( grep { /\bn1\b/ } @{ screen($h) } ), 'dragging to the top shows the start' );
@@ -547,6 +665,24 @@ subtest 'looks' => sub {
 	is $ui->cell( 2, 4 )->[2] & 0xFFFFFF, 0x102030, 'every other row is striped';
 };
 
+subtest 'a line between two colors takes the table background' => sub {
+	my $table = Term::Fabulous::Widget::Table->new( id => 'lines', row_id => 'id', row_lines => 'Solid', rows => [ @PEOPLE[ 0 .. 2 ] ], columns => [ @COLUMNS[ 0, 1 ] ] );
+	$table->set_row_style( 2, { background_color => '#400000' } );
+	my $root = Term::Fabulous::Widget::Box->new;
+	$root->add_child($table);
+	my $ui = Term::Fabulous::Static->new( root => $root, width => 30, height => 10 );
+	$ui->draw;
+	my @lines    = $ui->render_lines( colors => 0 );
+	my ($bob)    = grep { $lines[$_] =~ /Bob/ } 0 .. $#lines;
+	my $column_x = index( $lines[$bob], "\x{2502}", 1 );
+	my $bg_at    = sub ( $x, $y ) { $ui->cell( $x, $y )->[2] & 0xFFFFFF };
+	is $bg_at->( $column_x, $bob ),     0x400000, 'a column line inside a colored row keeps its color';
+	is $bg_at->( $column_x, $bob - 1 ), 0x16191F, 'the junction above the row does not';
+	is $bg_at->( 2,         $bob - 1 ), 0x16191F, 'nor the row line above it';
+	is $bg_at->( 2,         $bob + 1 ), 0x16191F, 'nor the one below it';
+	is $bg_at->( 2,         2 ),        0x16191F, 'the line under the titles takes neither color';
+};
+
 subtest 'columns' => sub {
 	my ( $table, $h ) = table_ui();
 	$table->hide_columns('dept');
@@ -582,6 +718,86 @@ KDL
 	like static_lines($table)->[0], qr/\x{2554}/, 'lines';
 	like dies { Term::Fabulous::Layout->new( string => "use Term::Fabulous::Widget::Table as Table\nuse Term::Fabulous::Widget::Text as Text\nTable \"t\" {\n\tText\n}" )->build },
 		qr/a table takes no child widgets/, 'child widgets die';
+};
+
+subtest 'a search reaches every page, and revealing a match turns to its page' => sub {
+	my ( $table, $h ) = table_ui( page_size => 2 );
+	ok $table->DOES('Term::Fabulous::Role::Searchable'), 'a table is searchable';
+	my %text_of = map { join( '/', @{ $_->[0] } ) => $_->[1] } $table->search_texts;
+	is $text_of{'5/name'}, 'Eve', 'a row on the last page is among the texts';
+	is $text_of{'3/age'},  '',    'an undefined value is an empty text';
+	is [ map { join '/', @{ $_->[0] } } $table->search_texts ], [
+		map {
+			my $id = $_;
+			map { "$id/$_" } qw(name dept age)
+		} 1 .. 5
+		],
+		'in row order, column by column';
+	my $revision = $table->search_revision( [ 5, 'name' ] );
+	$table->highlight_text( [ 5, 'name' ], [ [ 0, 2, 'on accent' ] ] );
+	like dies { $table->highlight_text( [ 5, 'name' ], [ [ 0, 99, 'on accent' ] ] ) }, qr/highlight end 99 lies past the text \(3 characters\)/,
+		'offsets past the text of a row that is not built die at the call';
+	is $table->reveal_text( [ 5, 'name' ], 0 ), [ undef, undef ], 'before the table was prepared again, the cell has no widget yet';
+	$h->{ui}->step;
+	is [ $table->page, $table->cursor ], [ 3, 5 ], 'the page turned and the cursor is on the row';
+	my ($text) = @{ $table->reveal_text( [ 5, 'name' ], 0 ) };
+	ref_is $text, $table->cell_widget( 5, 'name' ), 'now the cell text is there';
+	is $text->highlights->[0][1],                2,         'with the highlights the search set before it was built';
+	is $table->search_revision( [ 5, 'name' ] ), $revision, 'the revision stayed';
+	$table->update_row( 5, { name => 'Eva' } );
+	$h->{ui}->step;
+	isnt $table->search_revision( [ 5, 'name' ] ),   $revision, 'a changed row has another revision';
+	is $table->cell_widget( 5, 'name' )->highlights, [],        'and its highlights are gone';
+	is $table->search_revision( [ 9, 'name' ] ),     'gone',    'a row that does not exist is gone';
+	$table->clear_text_highlights;
+	like dies { $table->highlight_text( 'x', [] ) }, qr/highlight_text needs a key of \[ row id, column key \]/, 'keys are checked';
+};
+
+subtest 'revealing a match expands the rows and groups above it' => sub {
+	my ( $table, $h ) = table_ui(
+		children_key => 'children',
+		rows         => [
+			{ id => 1, name => 'Ann', dept => 'Sales', children => [ { id => 2, name => 'Bob', dept => 'Sales', children => [ { id => 3, name => 'Cid', dept => 'Sales' } ] } ] },
+			{ id => 4, name => 'Dan', dept => 'HR' }
+		],
+	);
+	my %text_of = map { join( '/', @{ $_->[0] } ) => $_->[1] } $table->search_texts;
+	is $text_of{'3/name'}, 'Cid', 'a row under collapsed rows is among the texts';
+	$table->reveal_text( [ 3, 'name' ], 0 );
+	$h->{ui}->step;
+	is [ $table->is_expanded(1), $table->is_expanded(2), $table->cursor ], [ 1, 1, 3 ], 'its ancestors are expanded and the cursor is on it';
+
+	$table->group_by('dept');
+	$table->collapse_group('HR');
+	$h->{ui}->step;
+	$table->reveal_text( [ 4, 'name' ], 0 );
+	$h->{ui}->step;
+	is [ $table->is_group_expanded('HR'), $table->cursor ], [ 1, 4 ], 'a collapsed group is opened for its row';
+};
+
+subtest 'the widgets of a custom cell are searched while the row is built' => sub {
+	my ( $table, $h ) = table_ui(
+		columns => [
+			{ key => 'name', title => 'Name' }, { key => 'age', title => 'Age', cell => sub ($cell) { return Term::Fabulous::Widget::Text->new( text => 'aged ' . ( $cell->{row}{age} // '?' ) ) } }
+		],
+		page_size => 2,
+	);
+	my %text_of = map {
+		join( '/', map { $_ // '-' } @{ $_->[0] } ) => $_->[1]
+	} $table->search_texts;
+	is $text_of{'1/age/0/-'}, 'aged 34', 'a text inside the cell widget of a built row';
+	ok !exists $text_of{'5/age/0/-'}, 'not of a row on another page';
+	$table->highlight_text( [ 1, 'age', 0, undef ], [ [ 0, 4, 'on accent' ] ] );
+	ref_is $table->reveal_text( [ 1, 'age', 0, undef ], 0 )->[0], $table->cell_widget( 1, 'age' ), 'reveal_text names the text in the cell';
+	is $table->cell_widget( 1, 'age' )->highlights->[0][1], 4, 'the highlight went onto it';
+	my $serial = $table->cell_widget( 1, 'age' )->search_serial;
+	like $table->search_revision( [ 1, 'age', 0, undef ] ), qr/\A[0-9]+:[0-9]+:$serial:[0-9]+\z/, 'the revision joins the row, the columns, the widget and its revision';
+	is $table->search_revision( [ 5, 'age', 0, undef ] ), 'gone', 'a cell that is not built is gone';
+	$table->page(3);
+	$h->{ui}->step;
+	$table->page(1);
+	$h->{ui}->step;
+	is $table->cell_widget( 1, 'age' )->highlights->[0][1], 4, 'a cell built again gets the highlight back';
 };
 
 done_testing;

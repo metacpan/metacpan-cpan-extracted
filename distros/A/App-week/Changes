@@ -1,5 +1,33 @@
 Revision history for Perl extension App-week
 
+1.0701 2026-10-19T16:36:06Z
+
+    - Export week() function to make it callable from Command::Run
+    - Initialize today's date on each run instead of at module load time
+
+1.07 2026-03-04T08:55:54Z
+
+    - Use NBSP for frame characters so that sl-2026 can detect them
+    - Bump minimum Perl version from 5.14 to 5.24
+    - Proofread English manual and update copyright year
+
+1.06 2025-07-10T05:45:57Z
+
+    - add --yankees to autoload list
+    - set HOME for test environment
+    - update i18n module to use LC_TIME environment variable
+      - Add env=LC_TIME parameter to i18n::setopt configuration
+      - Update documentation to reflect LC_TIME usage instead of LANG
+      - Changes affect --i18n and --i18n-v options behavior
+
+1.05 2024-10-26T06:27:56Z
+
+    - implement --yankees option with --strip option
+
+1.04 2024-09-29T06:02:05Z
+
+    - implement -Mmlb module and --dodgers option
+
 1.0303 2022-11-28T02:50:32Z
 
     - fix olympic theme color for -W option

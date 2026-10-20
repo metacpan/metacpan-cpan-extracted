@@ -11,7 +11,7 @@ my @modules = (
 	'Geo::Coder::Free::MaxMind',
 	'Geo::Coder::Free::OpenAddresses',
 	'Geo::Coder::Free::Provenance',
-	'Geo::Coder::Free::Validate',
+	'Geo::Location::Predicate',
 	'Geo::Coder::Free::DB::MaxMind::admin1',
 	'Geo::Coder::Free::DB::MaxMind::admin',
 	'Geo::Coder::Free::DB::MaxMind::cities',

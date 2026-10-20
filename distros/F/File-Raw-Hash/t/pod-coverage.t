@@ -21,4 +21,7 @@ eval "use Pod::Coverage $min_pc";
 plan skip_all => "Pod::Coverage $min_pc required for testing POD coverage"
     if $@;
 
-all_pod_coverage_ok();
+# Install::Files is written by ExtUtils::Depends at build time and installed
+# beside the module; it is not ours to document.
+pod_coverage_ok($_) for grep { !/::Install::Files\z/ } all_modules();
+done_testing;

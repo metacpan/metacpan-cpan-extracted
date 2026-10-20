@@ -17,6 +17,7 @@ define 白 L25
 
 define 虎黄 #FFE201
 option --tigers \
+	--stripe \
 	--cm *MONTH=*DAYS=黄/黒 \
 	--cm FRAME=*WEEK=赤/虎黄 \
 	--cm THISDAY=虎黄/黒,THISDAYS=虎黄/赤 \

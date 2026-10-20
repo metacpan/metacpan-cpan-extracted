@@ -90,7 +90,7 @@ row, a sort, a multiple selection and pages:
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-table.svg" alt="A table of staff with a filter row, sorted by the start date, two rows selected with check boxes and a pager below"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.05/screenshots/widget-table.svg" alt="A table of staff with a filter row, sorted by the start date, two rows selected with check boxes and a pager below"></p>
 
 =end html
 
@@ -321,7 +321,7 @@ is a complete program:
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-table-basics.svg" alt="A table of user accounts sorted by name, two rows selected with check boxes, and two status lines below: the selected logins and the account opened with Enter"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.05/screenshots/cookbook-table-basics.svg" alt="A table of user accounts sorted by name, two rows selected with check boxes, and two status lines below: the selected logins and the account opened with Enter"></p>
 
 =end html
 
@@ -529,7 +529,10 @@ C<grow> columns share the leftover width. A C<grow> column takes the
 width the other columns leave over, within its limits, and its text
 wraps in that width. When the columns need more width than the table
 has, the rows scroll sideways (see
-L<Term::Fabulous::Manual::TableStyles/SIZE AND SCROLLING>).
+L<Term::Fabulous::Manual::TableStyles/SIZE AND SCROLLING>), unless a
+column is C<grow> or C<percent>: then the table does not scroll
+sideways, and its C<fit> and C<grow> columns get narrower
+instead, down to their longest word, so that their text wraps.
 
 The recipe
 L<Size, align and wrap columns|Term::Fabulous::Cookbook::TableStyles/Size, align and wrap columns (widths, wrapping, widget titles)>
@@ -541,7 +544,7 @@ newlines of its text:
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-table-widths.svg" alt="An order table with a fixed number column, a growing Item column, a Notes column that takes a third of the width and wraps, an address column of two lines per row, a centered quantity, prices with a left-aligned title, and a Rating title with a star"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.05/screenshots/cookbook-table-widths.svg" alt="An order table with a fixed number column, a growing Item column, a Notes column that takes a third of the width and wraps, an address column of two lines per row, a centered quantity, prices with a left-aligned title, and a Rating title with a star"></p>
 
 =end html
 
@@ -564,15 +567,21 @@ grows: every row is as high as its tallest cell, and rows of different
 heights can follow each other. C<wrap> decides how text breaks:
 
 	wrap => 'words'       # at spaces, and at newlines (the default)
-	wrap => 'newlines'    # only at newlines in the text
+	wrap => 'newlines'    # only at newlines in the text; longer lines are cut off
 	wrap => 'none'        # never; text that does not fit is cut off
 
 Wrapping needs a limit on the column's width (C<'fit(0, 30)'>,
-C<'fixed(12)'>, C<'grow'>, C<'percent(25)'>); a plain C<fit> column is
-always as wide as its longest line. Text with newlines is several lines
-high in every mode but C<none>. A cell widget (see L</CELL WIDGETS>)
-can be any number of lines high, too. The column title wraps the same
-way as the column's cells.
+C<'fixed(12)'>, C<'grow'>, C<'percent(25)'>). A C<fit> column also
+wraps in a table that has a C<grow> or C<percent> column, because such
+a table squeezes its C<fit> columns; elsewhere a plain C<fit> column is
+as wide as its longest line. Text with newlines is several lines high
+in every mode but C<none>. Text that is not wrapped keeps its width as
+long as the other columns can get narrower, down to their longest word;
+after that it is cut off inside the cell padding, even a single long
+word such as a URL or a path, so a C<grow> or C<percent> column keeps
+to the table's width. A cell widget (see L</CELL WIDGETS>) can be any
+number of lines high, too. The column title wraps the same way as the
+column's cells.
 
 	{ key => 'description', title => 'Description', width => 'fit(0, 36)' }    # wraps at 36 cells
 	{ key => 'address',     title => 'Address',     wrap => 'newlines' }       # "Street 1\n12345 Town"
@@ -625,7 +634,8 @@ The user can choose the columns, too. A right click on a column title,
 or C<c> while the keyboard is in the header (press C<Up> on the first
 line; see L<Term::Fabulous::Widget::Table/KEYS>), opens the I<column
 chooser>: a small list with a check box per column over the table's top
-right corner. Checking or unchecking a box shows or hides the column at
+right corner (moved up when the table is too close to the bottom of the
+screen for all of it). Checking or unchecking a box shows or hides the column at
 once and fires C<ColumnsChange>. C<Escape> closes the list, and so does
 moving the focus out of it. Your program can open and close it with
 C<open_column_chooser> and C<close_column_chooser>, for example from a
@@ -646,7 +656,7 @@ is a complete program:
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-table-columns.svg" alt="A staff table with the column chooser open over its top right corner: City unchecked, E-mail checked, and the status line with the columns to save"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.05/screenshots/cookbook-table-columns.svg" alt="A staff table with the column chooser open over its top right corner: City unchecked, E-mail checked, and the status line with the columns to save"></p>
 
 =end html
 
@@ -672,7 +682,7 @@ column is a computed column (see L</Computed columns>):
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-table-format.svg" alt="A table of backup jobs with formatted times, durations, sizes, file counts, percentages, transfer rates and check marks, sorted by size, and a line that shows the raw value and the display text of one size"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.05/screenshots/cookbook-table-format.svg" alt="A table of backup jobs with formatted times, durations, sizes, file counts, percentages, transfer rates and check marks, sorted by size, and a line that shows the raw value and the display text of one size"></p>
 
 =end html
 
@@ -809,7 +819,7 @@ has a check box and a delete button in every row:
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-table-edit.svg" alt="A to-do table with check boxes, delete buttons and a note column, two tasks selected, a new task added and the status line below"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.05/screenshots/cookbook-table-edit.svg" alt="A to-do table with check boxes, delete buttons and a note column, two tasks selected, a new task added and the status line below"></p>
 
 =end html
 
@@ -1175,7 +1185,9 @@ L<Term::Fabulous::Widget::Table/KEYS>.
 
 =item Mouse
 
-L<Term::Fabulous::Widget::Table/MOUSE>: C<hover>, C<double_click_seconds>.
+L<Term::Fabulous::Widget::Table/MOUSE>: C<hover>; the double click
+interval is the UI's
+L<double_click_seconds|Term::Fabulous/double_click_seconds>.
 
 =item Events
 

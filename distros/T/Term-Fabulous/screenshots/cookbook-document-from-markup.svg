@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="780" height="525" viewBox="0 0 780 525" role="img" aria-label="perl examples/cookbook/document-from-markup.pl">
+<title>perl examples/cookbook/document-from-markup.pl</title>
+<style>
+.terminal text { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 15px; white-space: pre; }
+.terminal .b { font-weight: bold; }
+.terminal .i { font-style: italic; }
+.title { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 13px; }
+</style>
+<defs>
+<filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#000000" flood-opacity="0.3"/></filter>
+<clipPath id="window"><rect x="16" y="16" width="748" height="490" rx="10"/></clipPath>
+</defs>
+<rect x="16" y="16" width="748" height="490" rx="10" fill="#161622" filter="url(#shadow)"/>
+<rect x="16" y="16" width="748" height="34" fill="#1f2430" clip-path="url(#window)"/>
+<circle cx="36" cy="33" r="6" fill="#ff5f57"/>
+<circle cx="56" cy="33" r="6" fill="#febc2e"/>
+<circle cx="76" cy="33" r="6" fill="#28c840"/>
+<text class="title" x="390" y="33" text-anchor="middle" dominant-baseline="central" fill="#9aa3b5">perl examples/cookbook/document-from-markup.pl</text>
+<rect x="16.5" y="16.5" width="747" height="489" rx="10" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1"/>
+<g shape-rendering="crispEdges">
+<rect x="57" y="330" width="675" height="36" fill="#1e2128"/>
+<rect x="745" y="60" width="2" height="90" fill="#61afef"/>
+<rect x="39" y="86" width="693" height="1" fill="#5a606e"/>
+<rect x="745" y="150" width="1" height="342" fill="#464c5a"/>
+</g>
+<g class="terminal">
+<text x="39" y="74" textLength="72" class="b" fill="#61afef">snapback</text>
+<text x="57" y="128" textLength="72" class="b" fill="#dcdfe4">snapback</text>
+<text x="138" y="128" textLength="531" fill="#dcdfe4">copies the files of a directory to a backup disk. It copies</text>
+<text x="678" y="128" textLength="36" class="i" fill="#dcdfe4">only</text>
+<text x="57" y="146" textLength="630" fill="#dcdfe4">the files that changed since the last run, so the first backup takes a</text>
+<text x="57" y="164" textLength="360" fill="#dcdfe4">while and every later one takes seconds.</text>
+<text x="57" y="200" textLength="198" fill="#dcdfe4">This manual covers the</text>
+<text x="264" y="200" textLength="108" fill="#61afef">installation</text>
+<text x="372" y="200" textLength="54" fill="#dcdfe4">, your</text>
+<text x="435" y="200" textLength="108" fill="#61afef">first backup</text>
+<text x="543" y="200" textLength="45" fill="#dcdfe4">, the</text>
+<text x="597" y="200" textLength="72" fill="#61afef">settings</text>
+<text x="678" y="200" textLength="27" fill="#dcdfe4">and</text>
+<text x="57" y="218" textLength="45" fill="#61afef">hooks</text>
+<text x="102" y="218" textLength="360" fill="#dcdfe4">. Answers to common questions are in the</text>
+<text x="471" y="218" textLength="27" fill="#61afef">FAQ</text>
+<text x="498" y="218" textLength="9" fill="#dcdfe4">.</text>
+<text x="39" y="254" textLength="108" class="b" fill="#ebeef3">Installation</text>
+<text x="57" y="290" textLength="576" fill="#dcdfe4">snapback is a single Perl script. Copy it to a directory in your</text>
+<text x="642" y="290" textLength="36" fill="#e5c07b">PATH</text>
+<text x="687" y="290" textLength="27" fill="#dcdfe4">and</text>
+<text x="57" y="308" textLength="171" fill="#dcdfe4">make it executable:</text>
+<text x="66" y="344" textLength="162" fill="#dcdfe4">cp snapback ~/bin/</text>
+<text x="66" y="362" textLength="207" fill="#dcdfe4">chmod +x ~/bin/snapback</text>
+<text x="57" y="398" textLength="540" fill="#dcdfe4">It needs Perl 5.32 or later and no modules outside the core.</text>
+<text x="39" y="434" textLength="153" class="b" fill="#ebeef3">Your first backup</text>
+<text x="57" y="470" textLength="18" fill="#61afef">1.</text>
+<text x="93" y="470" textLength="585" fill="#dcdfe4">Connect the backup disk and note where it is mounted, for example</text>
+<text x="93" y="488" textLength="99" fill="#e5c07b">/mnt/backup</text>
+<text x="192" y="488" textLength="9" fill="#dcdfe4">.</text>
+</g>
+<g shape-rendering="crispEdges">
+<rect x="264" y="201" width="108" height="1" fill="#61afef"/>
+<rect x="435" y="201" width="108" height="1" fill="#61afef"/>
+<rect x="597" y="201" width="72" height="1" fill="#61afef"/>
+<rect x="57" y="219" width="45" height="1" fill="#61afef"/>
+<rect x="471" y="219" width="27" height="1" fill="#61afef"/>
+</g>
+</svg>

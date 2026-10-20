@@ -1,0 +1,20 @@
+# Time::Keeper::Natural word table: ja
+#
+# UNREVIEWED: written 18 Oct 2026 by a session, as the p2p site's catalogues were.
+# A native reader should review it before release. The format is en.txt's.
+#
+# Japanese puts "end" and "beginning" after the period. "週末" is the weekend,
+# and reads as the end of the week. An ordinal weekday ("来月の第3金曜日")
+# puts the month first and is not read.
+start_of	{0}初め|{0}の初め|{0}始め|{0}の始め|{0}初旬
+end_of	{0}末|{0}の末|{0}の終わり
+at	{0}に
+on	{0}に
+skip
+and
+# test: 先月末 => 2026-09-30T23:59:59.999999999+01:00
+# test: 来月の初め => 2026-11-01T00:00:00+00:00
+# test: 今年の終わり => 2026-12-31T23:59:59.999999999+00:00
+# test: 年末 => 2026-12-31T23:59:59.999999999+00:00
+# test: 明日15:30に => 2026-10-16T15:30:00+01:00
+# test: 火曜日に => 2026-10-20T00:00:00+01:00

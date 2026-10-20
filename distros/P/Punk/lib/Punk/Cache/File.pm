@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Punk ();
 
-our $VERSION = '0.61';
+our $VERSION = '0.62';
 
 # Every worker sees the same files, which is the whole point of this store
 # being the default - so it needs no cross-worker invalidation.
@@ -93,10 +93,36 @@ it, not a silent miss at three in the morning.
 
 =head1 METHODS
 
-The L<Punk::Cache> backend contract: C<get>, C<set>, C<delete>, C<clear>,
-C<stats>.
+The L<Punk::Cache> backend contract. See L<Punk::Cache> for the rules that
+go with it.
 
-C<stats> walks the cache to report C<bytes> and C<entries>, so it is an
+=head2 new(dir => $dir, max_bytes => $bytes, lock_wait => $secs)
+
+See L</Options>. C<max_bytes> is in bytes here; the C<cache> keyword
+converts a size such as C<'512M'> before it gets here. Croaks without a
+C<dir>, on a C<max_bytes> of C<0>, and on a negative or non-finite
+C<lock_wait>.
+
+=head2 get($key)
+
+The bytes stored under C<$key>, or undef when there are none or they have
+expired.
+
+=head2 set($key, $bytes, $ttl)
+
+Stores C<$bytes> for C<$ttl> seconds; C<0> means no expiry.
+
+=head2 delete($key)
+
+Removes C<$key>.
+
+=head2 clear
+
+Removes every entry.
+
+=head2 stats
+
+A list of pairs. It walks the cache to report C<bytes> and C<entries>, so it is an
 operator action rather than something to call per request.
 
 It also reports C<lock_errors>, which the in-memory store has no equivalent
@@ -105,6 +131,11 @@ because a path would not form. Every caller of such a lock is told to
 compute, so a non-zero count means the herd C<< Punk::Cache->compute >> and
 L<Punk::Plugin::Idempotency> rely on that lock to collapse has been running
 unprotected - duplicated work rather than wrong answers, but worth an alert.
+
+=head2 is_shared
+
+True: every worker sees the same files, so the store needs no invalidation
+across the pool. See L<Punk::Cache/is_shared>.
 
 =head1 SEE ALSO
 

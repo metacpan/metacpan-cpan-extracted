@@ -11,7 +11,7 @@ use Clay::UI::Role::Interaction::Focusable;
 use Clay::UI::Role::Interaction::HasFocusOrder;
 use Term::Fabulous::Widget::Box;
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 class Term::Fabulous::Widget::Dialog::Backdrop
 	:isa(Term::Fabulous::Widget::Box)
@@ -24,10 +24,13 @@ class Term::Fabulous::Widget::Dialog::Backdrop
 		CLAY_ATTACH_TO_ROOT CLAY_ATTACH_POINT_CENTER_CENTER
 		CLAY_ALIGN_X_CENTER CLAY_ALIGN_Y_CENTER sizing_grow
 	);
-	use Scalar::Util qw(weaken);
 
 	field $dialog :param :weak :reader;
 	field $z_index :param;
+
+	# The widget that had the focus when the dialog opened; it gets the
+	# focus back when the backdrop leaves (see focus_heir).
+	field $focus_before :param :weak = undef;
 
 	ADJUST {
 		$self->floating(
@@ -45,13 +48,13 @@ class Term::Fabulous::Widget::Dialog::Backdrop
 		);
 		$self->glyphs_show_through(1);
 
-		weaken( my $weak_self = $self );
-		$self->on( KeyPress => sub ($event) { return $weak_self->_handle_key($event) } );
+		$self->on( KeyPress => sub ( $self, $event ) { return $self->_handle_key($event) }, owner => $self );
 		$self->on(
-			OnBlur => sub ($event) {
-				$weak_self->_keep_focus if defined $weak_self;
+			OnBlur => sub ( $self, $event ) {
+				$self->_keep_focus;
 				return Clay::UI::Enum::Result->CONTINUE;
-			}
+			},
+			owner => $self
 		);
 	}
 
@@ -77,9 +80,10 @@ class Term::Fabulous::Widget::Dialog::Backdrop
 		return Clay::UI::Enum::Result->HANDLED;
 	}
 
-	# The focus does not leave an open dialog for nothing: when the focused
-	# widget inside it is disabled or removed, the backdrop takes it, so
-	# keys and Tab stay inside the dialog.
+	# Clearing the focus from code does not take it out of an open dialog:
+	# the backdrop takes it, so keys and Tab stay inside. A focused widget
+	# that is disabled or removed needs no help, the backdrop is its focus
+	# heir anyway.
 	method _keep_focus () {
 		return unless defined $dialog && $dialog->is_open;
 		my $ui          = $self->ui // return;
@@ -90,6 +94,12 @@ class Term::Fabulous::Widget::Dialog::Backdrop
 		return if defined $interaction->get_focused_widget || !$interaction->can_take_focus($self);
 		$interaction->set_focused_widget($self);
 		return;
+	}
+
+	# Who takes the focus when the backdrop leaves with the focus inside
+	# it, that is when the dialog closes: the widget that had it before.
+	method focus_heir () {
+		return $focus_before;
 	}
 
 	# Tab and Shift-Tab step through the focusable widgets inside the
@@ -103,6 +113,13 @@ class Term::Fabulous::Widget::Dialog::Backdrop
 	method get_previous_focus () {
 		return $self unless defined $dialog;
 		return $self->default_previous_focus( within => $dialog ) // $self;
+	}
+
+	# A widget inside the dialog that hands the focus on past its own
+	# subtree (Clay::UI::Interaction's focus_after) stays inside the
+	# dialog too, and never lands on the backdrop.
+	method focus_scope () {
+		return $dialog // $self;
 	}
 }
 
@@ -160,11 +177,18 @@ dialog on C<Escape>, when the dialog's C<close_on_escape> is set;
 =item *
 
 takes the focus itself when the focused widget inside the dialog loses
-it without another widget getting it (it is disabled or removed, or
-the program focuses nothing), so keys and Tab stay inside the dialog.
-It learns about that from the C<OnBlur> event bubbling up from the
-widget, so an C<OnBlur> listener inside the dialog must let it bubble
-(return C<Clay::UI::Enum::Result-E<gt>CONTINUE>).
+it, so keys and Tab stay inside the dialog. A widget that is disabled
+or removed hands the focus on to its nearest ancestor that can take it
+(see L<Clay::UI::Interaction/Focus heirs>), which is the Backdrop
+unless a widget inside the dialog is closer. When the program focuses
+nothing, the Backdrop learns about it from the C<OnBlur> event bubbling
+up from the widget, so an C<OnBlur> listener inside the dialog must let
+it bubble (return C<Clay::UI::Enum::Result-E<gt>CONTINUE>) for that;
+
+=item *
+
+gives the focus back to the widget that had it when the dialog opened
+when it leaves the screen with the dialog (see L</focus_heir>).
 
 =back
 
@@ -173,6 +197,13 @@ widget, so an C<OnBlur> listener inside the dialog must let it bubble
 =head2 dialog
 
 The L<Term::Fabulous::Widget::Dialog> this Backdrop belongs to.
+
+=head2 focus_heir
+
+The widget that had the focus when the dialog opened (held weakly, so
+C<undef> once it is gone). When the Backdrop leaves the tree with the
+focus inside it, the focus goes there if that widget can still take it
+(see L<Clay::UI::Interaction/Focus heirs>).
 
 =head2 get_next_focus, get_previous_focus
 
@@ -186,6 +217,13 @@ tracker's default order limited to the dialog
 L<Clay::UI::Interaction/default_next_focus>). From the Backdrop itself,
 Tab goes to the first widget and Shift+Tab to the last; with no
 focusable widget inside, both return the Backdrop.
+
+=head2 focus_scope
+
+The dialog: the subtree the order above covers. A widget inside the
+dialog that hands the focus on past its own subtree with
+L<Clay::UI::Interaction/focus_after> therefore stays inside the dialog
+and never lands on the Backdrop.
 
 =head1 SEE ALSO
 

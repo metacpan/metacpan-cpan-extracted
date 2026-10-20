@@ -82,6 +82,7 @@
          "recommends" : {
             "Algorithm::AhoCorasick::XS" : "0.04",
             "CHI" : "0.40",
+            "Module::Load" : "0.32",
             "Net::DNS" : "1.57",
             "Net::IP::LPM" : "1.12",
             "Ref::Util::XS" : "0",
@@ -94,6 +95,7 @@
             "File::ShareDir" : "0",
             "File::Slurper" : "0",
             "List::Util" : "1.33",
+            "Module::Load" : "0",
             "Moo" : "1",
             "Net::DNS::Resolver" : "0",
             "Net::IP" : "0",
@@ -121,7 +123,6 @@
             "File::Temp" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
-            "Module::Load" : "0",
             "Module::Metadata" : "0",
             "Net::DNS::Resolver::Mock" : "0",
             "Path::Tiny" : "0",
@@ -139,7 +140,7 @@
    "provides" : {
       "Robots::Validate" : {
          "file" : "lib/Robots/Validate.pm",
-         "version" : "v0.4.9"
+         "version" : "v0.4.11"
       }
    },
    "release_status" : "stable",
@@ -153,10 +154,10 @@
          "web" : "https://github.com/robrwo/Robots-Validate"
       }
    },
-   "version" : "v0.4.9",
+   "version" : "v0.4.11",
    "x_authority" : "cpan:RRWO",
    "x_generated_by_perl" : "v5.42.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.52",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.80",
    "x_spdx_expression" : "Artistic-2.0",
    "x_static_install" : 1
 }

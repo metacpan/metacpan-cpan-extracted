@@ -46,10 +46,12 @@
 %#
 %# END BPS TAGGED BLOCK }}}
 <div class="quick-calls">
-<&| /Widgets/TitleBox, title => loc('Quick Calls'), htmx_load => 1, htmx_get => RT->Config->Get('WebPath') . '/Views/Component/QuickCalls' &>
+<&| /Widgets/TitleBox, title => loc('Quick Calls'), htmx_load => 1, htmx_get => RT->Config->Get('WebPath') . '/Views/Component/QuickCalls', htmx_values => \%values &>
 </&>
 </div>
 
 <%INIT>
-
+# The htmx request that loads the portlet body can't tell which page
+# the portlet is on, so pass it along to pick the dashboard's config
+my %values = ( QuickCallsPath => $m->request_path );
 </%INIT>

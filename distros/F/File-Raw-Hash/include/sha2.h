@@ -40,6 +40,11 @@ void sha256_init  (sha256_ctx_t *ctx);
 void sha256_update(sha256_ctx_t *ctx, const void *data, size_t len);
 void sha256_final (sha256_ctx_t *ctx, unsigned char out[SHA256_DIGEST_SIZE]);
 
+/* Pick the CPU's SHA instructions when it has them (portable forces the C),
+ * and name the path in use: "armv8" or "portable". */
+void        sha256_select(int portable);
+const char *sha256_implementation(void);
+
 void sha512_init  (sha512_ctx_t *ctx);
 void sha512_update(sha512_ctx_t *ctx, const void *data, size_t len);
 void sha512_final (sha512_ctx_t *ctx, unsigned char out[SHA512_DIGEST_SIZE]);

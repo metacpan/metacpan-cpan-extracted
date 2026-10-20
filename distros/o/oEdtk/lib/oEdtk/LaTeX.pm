@@ -18,7 +18,7 @@ use Roman        qw( roman );
 use oEdtk::Utils qw( IDX_FORMAT );
 use charnames ':full';
 
-our $VERSION = 2.1126;
+our $VERSION = 2.1129;
 
 our @EXPORT_OK =
 	qw( tag tag_args ged_tag make_index demo demo_write demo_expected_write latex_escape_string translate_unit concat_string latex_boolean unfold_list

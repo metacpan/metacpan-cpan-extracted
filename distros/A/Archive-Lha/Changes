@@ -1,5 +1,10 @@
 Revision history for Archive-Lha
 
+0.23  2026-10-19 (Nicolas Mendoza)
+    - Fix POD coverage test failure on smokers that enable TEST_POD
+    - Fix DOS timestamps being converted as UTC instead of local time
+      when the XS functions are unavailable
+
 0.22  2026-05-14 (Nicolas Mendoza)
     - Remove Archive::Lha::Debug and heavyweight deps (Log::Dispatch, Data::Dump)
     - Add Test::UseAllModules to TEST_REQUIRES

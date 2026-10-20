@@ -12,7 +12,7 @@ use Term::Fabulous::Widget::Button;
 use Term::Fabulous::Widget::Text;
 use Term::Fabulous::Widget::Toast::Stack;
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 class Term::Fabulous::Widget::Toast
 	:isa(Term::Fabulous::Widget::Box)
@@ -87,14 +87,13 @@ class Term::Fabulous::Widget::Toast
 		$margin    = non_negative_integer( $self, margin => $margin );
 		$color     = optional( \&Term::Fabulous::Check::color, $self, color => $color );
 
-		weaken( my $weak_self = $self );
 		$_icon_text    = Term::Fabulous::Widget::Text->new( text => '' );
 		$_title_text   = Term::Fabulous::Widget::Text->new( text => '', bold      => 1 );
 		$_message_text = Term::Fabulous::Widget::Text->new( text => '', wrap_mode => CLAY_TEXT_WRAP_WORDS );
 		$_body         = Term::Fabulous::Widget::Box->new( layout => { layout_direction => CLAY_TOP_TO_BOTTOM, sizing => { width => sizing_grow() } } );
 		$_close_button = Term::Fabulous::Widget::Button->new( can_focus => 0, pressed_background_color => undef );
 		$_close_button->add_child( Term::Fabulous::Widget::Text->new( text => CLOSE_MARK ) );
-		$_close_button->on( Activate => sub ($event) { $weak_self->hide if $weak_self; return } );
+		$_close_button->on( Activate => sub ( $self, $event ) { $self->hide; return }, owner => $self );
 		$_panel_color = $self->background_color;
 		$self->SUPER::add_child( $_icon_text, $_body, $_close_button );
 		$_built = 1;
@@ -383,7 +382,7 @@ and goes away by itself
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-toast.svg" alt="Toasts stacked in the top right corner: an info, a success and a warning toast with titles, messages and close marks, a filled danger toast in the bottom right corner, and an alert box inside the form"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.05/screenshots/widget-toast.svg" alt="Toasts stacked in the top right corner: an info, a success and a warning toast with titles, messages and close marks, a filled danger toast in the bottom right corner, and an alert box inside the form"></p>
 
 =end html
 

@@ -1,16 +1,16 @@
 package Mail::DKIM2::Validate;
 use strict; use warnings; use 5.020;
 
-our $VERSION = '0.22';
+our $VERSION = '0.25';
 
 use Email::MIME;
 use List::Util qw(max);
-use Mail::DKIM2::Common qw(extract_mi_version extract_domain relaxed_domain_match parse_dkim_pubkey parse_mime);
+use Mail::DKIM2::Common qw(extract_mi_version domain_of to_alabel relaxed_domain_match parse_dkim_pubkey parse_mime);
 use Mail::DKIM2::MessageInstance;
 use Mail::DKIM2::Verifier;
 use Mail::DKIM2::Signature;
 
-# i= / m= of a field value; tag names are case insignificant (spec-06 §7, §8).
+# i= / m= of a field value; tag names are case insignificant (-07 §8).
 sub _i { my $h = shift // ''; $h =~ /(?:\A|;)\s*i\s*=\s*(\d+)/i ? 0 + $1 : 0 }
 sub _m { my $h = shift // ''; $h =~ /(?:\A|;)\s*m\s*=\s*(\d+)/i ? 0 + $1 : 0 }
 
@@ -73,7 +73,7 @@ sub _mi_tags {
     return [] unless $mi;
     my @t;
     push @t, { tag => 'm', label => 'instance', value => ($mi->get_tag('m') // '') };
-    # spec-06 §7.3: h= may carry a hash-set per algorithm -- show each one
+    # -07 §9.3: h= may carry a hash-set per algorithm -- show each one
     # under its own name rather than assuming sha256.
     my $hashes = $mi->get_tag('hashes') || {};
     for my $alg (sort keys %$hashes) {
@@ -125,7 +125,7 @@ sub _default_cb {
 #
 # Prior to spec-06, a receiving MTA's Received-SPF header (Fastmail adds one)
 # was covered by the Message-Instance header hash and could break
-# verification; this used to retry once with it stripped. spec-06 §4 excludes
+# verification; this used to retry once with it stripped. -07 §4 excludes
 # Received-SPF from the hash via the "received-" prefix rule (should_skip()),
 # so stripping it can no longer change h_digest()/b_digest() or any verdict —
 # the retry was provably a no-op. Removed rather than kept as a "safety net":
@@ -159,8 +159,8 @@ sub _report_once {
     my @sig_hdrs = $msg->header('DKIM2-Signature');
     my @mi_hdrs  = $msg->header('Message-Instance');
     $res{counts} = { signatures => scalar @sig_hdrs, instances => scalar @mi_hdrs };
-    # A Message-Instance with no signature anywhere is spec-06 §11's
-    # "PERMERROR Message-Instance m=<x> is not signed", not an absence of
+    # A Message-Instance with no signature anywhere is -07 §14's
+    # "PERMERROR: Message-Instance m=<x> is not signed", not an absence of
     # DKIM2. Reporting it as 'none' is exactly the answer someone pasting such
     # a message here does not need: it says "nothing to see" about a message
     # that a conforming receiver will reject.
@@ -170,13 +170,13 @@ sub _report_once {
                        map  { extract_mi_version($_) } @mi_hdrs;
         $top_mi //= '?';
         return { %res, overall => 'fail',
-                 summary => "PERMERROR Message-Instance m=$top_mi is not signed" };
+                 summary => "PERMERROR: Message-Instance m=$top_mi is not signed" };
     }
 
     return { %res, overall => 'none', summary => 'no DKIM2-Signature headers found' }
         unless @sig_hdrs;
 
-    # Overall verdict from the full verifier (includes the §10.7 deep MI walk).
+    # Overall verdict from the full verifier (includes the §14.7 deep MI walk).
     # Timestamp age is graded per-signature as a soft 'warn' below, so it must
     # not hard-fail the crypto verdict here.
     my $v = Mail::DKIM2::Verifier->new;
@@ -271,7 +271,7 @@ sub _mi_level {
 
     $lvl{tags} = _mi_tags($mi);
 
-    # spec-06 §3.4/§7.3: mirror MessageInstance::verify()'s semantics here --
+    # -07 §3.5/§9.3: mirror MessageInstance::verify()'s semantics here --
     # every implemented hash-set must match; an MI naming no implemented
     # algorithm displays as a mismatch (fail-closed), not silently as a
     # sha256-only "no hash".
@@ -352,7 +352,7 @@ sub _sig_level {
             my $ts = $sig->timestamp;
             if (defined $ts && $ts > 0) {
                 my $now = time();
-                if    ($ts > $now + 300)        { $lvl{timestamp} = { ok => 0, status => 'future', detail => 'timestamp in the future' }; }
+                if    ($ts > $now + 86400)      { $lvl{timestamp} = { ok => 0, status => 'future', detail => 'timestamp in the future' }; }
                 elsif ($now > $ts + 14*24*3600) { $lvl{timestamp} = { ok => 0, status => 'old',    detail => 'older than 14 days' }; }
             }
         }
@@ -360,39 +360,31 @@ sub _sig_level {
             my $prev = eval { Mail::DKIM2::Signature->parse($sig_by_i->{$num-1}) };
             die $@ if ref $@;
             if ($prev) {
+                # -07 section 7.1 item 1, as Verifier.pm checks it, so the
+                # report and the verdict cannot disagree.
+                my $p = $num - 1;
+                my $cur_d = $sig->domain // '';
                 my $prev_nd = $prev->next_domain;
+                my $cur_nd = $sig->next_domain;
+                my $mf = $sig->mail_from;
+                my @rts = map { [domain_of($_)] } @{ $prev->rcpt_to || [] };
                 if (defined $prev_nd && length $prev_nd) {
-                    # draft-06 §11.4: an nd= "imaginary hop" must name the domain
-                    # that signs the next signature; nd= MUST exactly match its d=.
-                    my $cur_d = $sig->domain // '';
-                    $lvl{custody} = (lc($prev_nd) eq lc($cur_d))
+                    # An nd= hop names the domain that signs the next signature.
+                    $lvl{custody} = ((to_alabel($prev_nd) =~ tr/A-Z/a-z/r) eq (to_alabel($cur_d) =~ tr/A-Z/a-z/r))
                         ? { ok => 1, detail => "nd=$prev_nd matches d= of i=$num" }
-                        # Canonical spec-06 wording (Task 3.1), verbatim "MAIL nd="
-                        # typo preserved, keyed on the *previous* hop's i=.
-                        : { ok => 0, detail => "DKIM2-Signature i=" . ($num - 1) . " MAIL nd= does not match" };
-                } else {
-                    my @rts = do { my $rt = $prev->rcpt_to; ref $rt eq 'ARRAY' ? @$rt : ($rt // ()) };
-                    my $cur_nd = $sig->next_domain;
-                    my $mf = $sig->mail_from;
-                    if (defined $cur_nd && length $cur_nd) {
-                        # draft-06 §9.3: a bridge after a real hop has no mf=, so
-                        # what must match the previous rt= is its d= — the key it
-                        # has to be made with. Mirrors Verifier.pm's check so the
-                        # report and the verdict cannot disagree.
-                        my $cur_d = $sig->domain // '';
-                        my $ok = grep { relaxed_domain_match($cur_d, extract_domain($_) // '') } @rts;
-                        $lvl{custody} = $ok
-                            ? { ok => 1, detail => "nd= hop d=$cur_d matches rt= of i=" . ($num - 1) }
-                            : { ok => 0, detail => "DKIM2-Signature i=$num nd= hop d=$cur_d did not match RCPT TO" };
-                    }
-                    elsif ($mf && $mf ne '<>') {
-                        my $mfd = extract_domain($mf);
-                        my $ok = grep { relaxed_domain_match($mfd // '', extract_domain($_) // '') } @rts;
-                        $lvl{custody} = $ok ? { ok => 1, detail => '' }
-                                            # Canonical spec-06 wording (Task 3.1), same
-                                            # form as Verifier.pm's Chain of Custody permerror.
-                                            : { ok => 0, detail => "DKIM2-Signature i=$num MAIL FROM $mf did not match" };
-                    }
+                        : { ok => 0, detail => "PERMERROR: DKIM2-Signature i=$p nd= does not match" };
+                } elsif ((defined $cur_nd && length $cur_nd) || (defined $mf && $mf =~ /\A<\s*>\z/)) {
+                    # An nd= hop, or a null mf=: its d= against the rt= domains.
+                    my $ok = grep { $_->[0] && !$_->[1] && relaxed_domain_match($_->[0], $cur_d) } @rts;
+                    $lvl{custody} = $ok
+                        ? { ok => 1, detail => ((defined $cur_nd && length $cur_nd) ? "nd= hop" : "mf=<> hop") . " d=$cur_d matches rt= of i=$p" }
+                        : { ok => 0, detail => "PERMERROR: DKIM2-Signature i=$num d= does not match the rt= of i=$p" };
+                } elsif (defined $mf) {
+                    my ($mfd, $lit) = domain_of($mf);
+                    my $ok = $mfd && !$lit
+                        && grep { $_->[0] && !$_->[1] && relaxed_domain_match($mfd, $_->[0]) } @rts;
+                    $lvl{custody} = $ok ? { ok => 1, detail => '' }
+                        : { ok => 0, detail => "PERMERROR: DKIM2-Signature i=$num mf= does not match the rt= of i=$p" };
                 }
             }
         }
@@ -421,7 +413,7 @@ sub _sig_level {
     $lvl{result} = 'warn' if $crypto eq 'pass' && !$lvl{timestamp}{ok};
     $_->{result} = $crypto for @{$lvl{items}};
 
-    # Local policy (spec-06 §"Check the Chain of Custody"): the
+    # Local policy (-07 section 14.4 allows a top nd= only by arrangement): the
     # highest-numbered DKIM2-Signature in the *whole* chain MUST NOT carry
     # nd= (mirrors the Verifier.pm permerror from Task 2.1). $sig_by_i is the
     # original, unmodified full signature set for every call in this walk,
