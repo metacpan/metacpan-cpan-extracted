@@ -41,6 +41,29 @@
     word-break: break-all;
   }
   .chart-source a { color: inherit; }
+  .map-legend {
+    margin: 0.5rem 0 0;
+    font-size: 0.88rem;
+    color: #444;
+  }
+  .map-legend strong { display: block; margin-bottom: 0.25rem; }
+  .map-legend ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem 1rem;
+  }
+  .legend-dot {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 1px solid rgba(0,0,0,0.15);
+    vertical-align: middle;
+    margin-right: 3px;
+  }
 </style>
 
 <p class="back-link"><a href="/">&larr; Home</a> &rsaquo; <a href="[% back_url | html %]">[% back_label || 'Back' | html %]</a>[%- IF back2_url -%] &rsaquo; <a href="[% back2_url | html %]">[% back2_label || 'Back' | html %]</a>[%- END -%]</p>
@@ -62,6 +85,17 @@
 [% IF map_body %]
 <div class="map-panel">
   [% map_body %]
+</div>
+[% END %]
+
+[% IF color_col.length %]
+<div class="map-legend">
+  <strong>Colour key: [% color_col | html %]</strong>
+  <ul>
+    [%- FOREACH entry IN color_legend -%]
+    <li><span class="legend-dot" style="background:[% entry.color | html %]"></span>[% entry.label | html %]</li>
+    [%- END -%]
+  </ul>
 </div>
 [% END %]
 

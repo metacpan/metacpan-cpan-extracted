@@ -43,15 +43,15 @@
 #define BUF_MAGIC       0x42554631U  /* "BUF1" */
 #define BUF_VERSION     3            /* v3: added occupancy bitmap region (layout change) */
 #define BUF_ERR_BUFLEN  (PATH_MAX + 256)
-#define BUF_READER_SLOTS 1024         /* per-process reader-counter mirror */
+#define BUF_READER_SLOTS 1024         /* per-handle reader slots */
 
-/* Occupancy bitmap: one bit per reader slot, set when a process claims a slot and
+/* Occupancy bitmap: one bit per reader slot, set when a handle claims a slot and
  * cleared on clean release.  A writer scans these BUF_OCC_WORDS words to visit
  * only OCCUPIED slots (O(words + live readers)) instead of all BUF_READER_SLOTS. */
 #define BUF_OCC_WORDS   (((BUF_READER_SLOTS) + 63) / 64)   /* 16 for 1024 slots */
 #define BUF_OCC_BYTES   ((uint64_t)BUF_OCC_WORDS * 8)      /* 128 bytes */
 
-/* ---- Per-process reader-slot table (in shared memory) ----
+/* ---- Reader-slot table (in shared memory) ----
  * In the reader-slots-only rwlock a reader's ENTIRE contribution to the shared
  * lock is `rdepth` in its OWN slot -- there is no separate shared reader counter
  * to fall out of sync with it -- so a dead reader's contribution is exactly this
@@ -62,7 +62,7 @@
  * already-released builds. */
 typedef struct {
     uint32_t pid;      /* owning PID, 0 = free */
-    uint32_t rdepth;   /* read-locks THIS process currently holds (recursion-safe) */
+    uint32_t rdepth;   /* read locks held by this handle (recursion-safe) */
     uint32_t _rsv1;    /* reserved (was waiters_parked); unused, kept for layout size */
     uint32_t _rsv2;    /* reserved (was writers_parked); unused, kept for layout size */
 } BufReaderSlot;
@@ -112,7 +112,7 @@ typedef struct {
     char      *path;         /* backing file path (strdup'd, NULL for anon) */
     int        fd;           /* kept open for memfd, -1 otherwise */
     int        efd;          /* eventfd for notifications, -1 if none */
-    uint32_t   my_slot_idx;  /* UINT32_MAX = unclaimed; per-process slot index */
+    uint32_t   my_slot_idx;  /* UINT32_MAX = unclaimed; this handle's slot */
     uint32_t   cached_pid;   /* getpid() at claim time */
     uint32_t   cached_fork_gen; /* fork-generation at claim time */
     uint8_t    wr_locked;    /* process-local: 1 if lock_wr is held */
@@ -120,9 +120,7 @@ typedef struct {
                                * because no reader slot was free. Decrements peel these
                                * off FIRST: a slot claimed mid-hold must not receive a
                                * decrement that was published to the slotless counter. */
-    uint32_t   rd_held;      /* read locks THIS handle holds (rdepth is per-process,
-                              * shared by every handle, so it cannot be used to tell
-                              * how much of it belongs to this handle at close time) */
+    uint32_t   rd_held;      /* read locks held by this handle */
     uint8_t    efd_owned;    /* 1 if we created the eventfd (close on destroy) */
 } BufHandle;
 
@@ -147,8 +145,8 @@ static inline void buf_spin_pause(void) {
 
 /* Futex-based write-preferring read-write lock (reader-slots-only) with
  * dead-process recovery.  The reader count is NOT stored in a shared counter; it
- * is DISTRIBUTED across per-process reader slots: each slot's `rdepth` is that
- * process's entire contribution.  A reader publishes its presence in its own slot
+ * is DISTRIBUTED across reader slots: each slot's `rdepth` is its handle's
+ * entire contribution.  A reader publishes its presence in its own slot
  * then re-checks the writer word; a writer publishes the writer word then scans
  * every slot until all live readers' rdepth reach 0.  Sequentially-consistent
  * store+load on each side (a Dekker handshake) gives mutual exclusion.  A crashed
@@ -182,10 +180,9 @@ static inline int buf_pid_alive(uint32_t pid) {
     return !buf_pid_is_zombie(pid); /* kill() also succeeds for a zombie -> treat as dead */
 }
 
-/* ---- Per-process slot lifecycle (dead-reader recovery) ----
- * Each process claims one BufReaderSlot lazily on first lock op so that
- * its contribution to the shared rwlock counter can be reclaimed by other
- * processes if it dies (SIGKILL'd worker no longer pins the counter). */
+/* ---- Slot lifecycle (dead-reader recovery) ----
+ * Each handle claims a slot lazily on its first lock operation; the owning PID
+ * lets writers reclaim the slot after a crash. */
 static uint32_t buf_fork_gen = 0;
 static pthread_once_t buf_atfork_once = PTHREAD_ONCE_INIT;
 static void buf_on_fork_child(void) {
@@ -193,6 +190,23 @@ static void buf_on_fork_child(void) {
 }
 static void buf_atfork_init(void) {
     pthread_atfork(NULL, NULL, buf_on_fork_child);
+}
+
+static inline void buf_reset_after_fork(BufHandle *h) {
+    uint32_t cur_gen = __atomic_load_n(&buf_fork_gen, __ATOMIC_RELAXED);
+    if (h->cached_fork_gen == cur_gen) return;
+    h->cached_fork_gen = cur_gen;
+    h->cached_pid = 0;
+    h->my_slot_idx = UINT32_MAX;
+    h->rd_held = 0;
+    h->slotless_held = 0;
+    h->wr_locked = 0;
+}
+
+/* An inherited write-lock flag belongs to the parent, not the child. */
+static inline int buf_write_locked(BufHandle *h) {
+    return h->wr_locked &&
+        h->cached_fork_gen == __atomic_load_n(&buf_fork_gen, __ATOMIC_RELAXED);
 }
 
 /* Occupancy bitmap: set a slot's bit when it is claimed, clear it on clean
@@ -209,12 +223,7 @@ static inline void buf_occ_clear(BufHandle *h, uint32_t s) {
 static inline void buf_claim_reader_slot(BufHandle *h) {
     if (!h->reader_slots) return;
     pthread_once(&buf_atfork_once, buf_atfork_init);
-    uint32_t cur_gen = __atomic_load_n(&buf_fork_gen, __ATOMIC_RELAXED);
-    if (h->cached_fork_gen != cur_gen) {
-        h->cached_fork_gen = cur_gen;
-        h->my_slot_idx = UINT32_MAX;
-        h->slotless_held = 0;   /* a forked child holds none of the parent's slotless reads */
-    }
+    buf_reset_after_fork(h);
     if (h->my_slot_idx != UINT32_MAX) return;
     uint32_t now_pid = (uint32_t)getpid();
     h->cached_pid = now_pid;
@@ -585,6 +594,15 @@ static int buf_reserve(int fd, uint64_t size) {
     return -1;
 }
 
+static int buf_header_geometry_valid(const BufHeader *hdr, uint64_t size) {
+    uint64_t data_off = sizeof(BufHeader) +
+        (uint64_t)BUF_READER_SLOTS * sizeof(BufReaderSlot) + BUF_OCC_BYTES;
+    return hdr->reader_slots_off == sizeof(BufHeader) &&
+        hdr->data_off == data_off && hdr->total_size == size &&
+        hdr->elem_size != 0 && size >= data_off &&
+        hdr->capacity <= (size - data_off) / hdr->elem_size;
+}
+
 static BufHandle *buf_create_map(const char *path, uint64_t capacity,
                                   uint32_t elem_size, uint32_t variant_id,
                                   mode_t file_mode, char *errbuf) {
@@ -774,13 +792,7 @@ static BufHandle *buf_create_map(const char *path, uint64_t capacity,
                      path, hdr->elem_size, elem_size);
             goto fail;
         }
-        if (hdr->elem_size == 0 ||
-            hdr->reader_slots_off < sizeof(BufHeader) ||
-            hdr->reader_slots_off > (uint64_t)st.st_size ||
-            hdr->reader_slots_off + reader_slots_size > (uint64_t)st.st_size ||
-            hdr->data_off < hdr->reader_slots_off + reader_slots_size ||
-            hdr->data_off > (uint64_t)st.st_size ||
-            hdr->capacity > ((uint64_t)st.st_size - hdr->data_off) / hdr->elem_size) {
+        if (!buf_header_geometry_valid(hdr, (uint64_t)st.st_size)) {
             snprintf(errbuf, BUF_ERR_BUFLEN, "%s: corrupt header (data doesn't fit in file)", path);
             goto fail;
         }
@@ -999,14 +1011,7 @@ static BufHandle *buf_open_fd(int fd, uint32_t elem_size, uint32_t variant_id,
         goto fail;
     }
     uint64_t reader_slots_size = (uint64_t)BUF_READER_SLOTS * sizeof(BufReaderSlot);
-    if (hdr->elem_size == 0 ||
-        hdr->reader_slots_off < sizeof(BufHeader) ||
-        hdr->reader_slots_off > (uint64_t)st.st_size ||
-        hdr->reader_slots_off + reader_slots_size > (uint64_t)st.st_size ||
-        hdr->data_off < hdr->reader_slots_off + reader_slots_size ||
-        hdr->data_off > (uint64_t)st.st_size ||
-        hdr->total_size != (uint64_t)st.st_size ||
-        hdr->capacity > ((uint64_t)st.st_size - hdr->data_off) / hdr->elem_size) {
+    if (!buf_header_geometry_valid(hdr, (uint64_t)st.st_size)) {
         snprintf(errbuf, BUF_ERR_BUFLEN, "fd=%d: corrupt header", fd);
         goto fail;
     }
@@ -1064,6 +1069,7 @@ static int buf_create_eventfd(BufHandle *h) {
 }
 
 static void buf_attach_eventfd(BufHandle *h, int efd) {
+    if (h->efd == efd) return;
     if (h->efd >= 0 && h->efd_owned) close(h->efd);
     h->efd = efd;
     h->efd_owned = 0;
@@ -1084,12 +1090,8 @@ static int64_t buf_wait_notify(BufHandle *h) {
 
 static void buf_close_map(BufHandle *h) {
     if (!h) return;
-    /* Release any lock this handle still holds BEFORE freeing it. Destroying a
-     * handle mid-lock (e.g. `$b->lock_rd; undef $b;`) otherwise pins the reader
-     * slot with a LIVE pid and rdepth > 0, or leaves wlock set to a live pid --
-     * and because that pid is alive, dead-owner recovery never fires, so every
-     * other process starves until this one exits. rdepth is per-process and
-     * shared by all handles, so we can only drop what THIS handle owes. */
+    /* Release this handle's locks before freeing the mapping, so a live process
+     * cannot strand its reader contribution or writer lock. */
     if (h->hdr) {
         /* Release only locks THIS process took.  A forked child inherits
          * rd_held/wr_locked verbatim, but those holds were published by the
@@ -1215,7 +1217,7 @@ static int BUF_FN(get_raw)(BufHandle *h, uint64_t byte_off, uint64_t nbytes, voi
     uint64_t data_size = h->capacity * (uint64_t)h->elem_size;
     if (nbytes > data_size || byte_off > data_size - nbytes) return 0;
     char *data = (char *)h->data;
-    if (h->wr_locked) {
+    if (buf_write_locked(h)) {
         memcpy(out, data + byte_off, (size_t)nbytes);
     } else {
         uint32_t seq_start;
@@ -1231,7 +1233,7 @@ static int BUF_FN(set_raw)(BufHandle *h, uint64_t byte_off, uint64_t nbytes, con
     uint64_t data_size = h->capacity * (uint64_t)h->elem_size;
     if (nbytes > data_size || byte_off > data_size - nbytes) return 0;
     char *data = (char *)h->data;
-    int nested = h->wr_locked;
+    int nested = buf_write_locked(h);
     if (!nested) { buf_rwlock_wrlock(h); buf_seqlock_write_begin(&h->hdr->seq); }
     memcpy(data + byte_off, in, (size_t)nbytes);
     if (!nested) { buf_seqlock_write_end(&h->hdr->seq); buf_rwlock_wrunlock(h); }
@@ -1242,7 +1244,7 @@ static int BUF_FN(set_raw)(BufHandle *h, uint64_t byte_off, uint64_t nbytes, con
 
 static void BUF_FN(clear)(BufHandle *h) {
     BufHeader *hdr = h->hdr;
-    int nested = h->wr_locked;
+    int nested = buf_write_locked(h);
     if (!nested) { buf_rwlock_wrlock(h); buf_seqlock_write_begin(&hdr->seq); }
     memset(h->data, 0, (size_t)((uint64_t)h->capacity * h->elem_size));
     if (!nested) { buf_seqlock_write_end(&hdr->seq); buf_rwlock_wrunlock(h); }
@@ -1257,7 +1259,7 @@ static int BUF_FN(get)(BufHandle *h, uint64_t idx, char *out, uint32_t *out_len)
     uint32_t esz = h->elem_size;
     if (idx >= h->capacity) return 0;
     char *data = (char *)h->data;
-    if (h->wr_locked) {
+    if (buf_write_locked(h)) {
         memcpy(out, data + idx * esz, esz);
     } else {
         uint32_t seq_start;
@@ -1277,7 +1279,7 @@ static int BUF_FN(set)(BufHandle *h, uint64_t idx, const char *val, uint32_t len
     uint32_t esz = h->elem_size;
     if (idx >= h->capacity) return 0;
     char *data = (char *)h->data;
-    int nested = h->wr_locked;
+    int nested = buf_write_locked(h);
     if (!nested) { buf_rwlock_wrlock(h); buf_seqlock_write_begin(&hdr->seq); }
     memset(data + idx * esz, 0, esz);
     uint32_t copy_len = len < esz ? len : esz;
@@ -1346,7 +1348,7 @@ static int BUF_FN(get_slice)(BufHandle *h, uint64_t from, uint64_t count,
     uint32_t esz = h->elem_size;
     if (count > h->capacity || from > h->capacity - count) return 0;
     char *data = (char *)h->data;
-    if (h->wr_locked) {
+    if (buf_write_locked(h)) {
         memcpy(out, data + from * esz, count * esz);
     } else {
         uint32_t seq_start;
@@ -1364,7 +1366,7 @@ static int BUF_FN(set_slice)(BufHandle *h, uint64_t from, uint64_t count,
     uint32_t esz = h->elem_size;
     if (count > h->capacity || from > h->capacity - count) return 0;
     char *data = (char *)h->data;
-    int nested = h->wr_locked;
+    int nested = buf_write_locked(h);
     if (!nested) { buf_rwlock_wrlock(h); buf_seqlock_write_begin(&hdr->seq); }
     memcpy(data + from * esz, in, count * esz);
     if (!nested) { buf_seqlock_write_end(&hdr->seq); buf_rwlock_wrunlock(h); }
@@ -1378,7 +1380,7 @@ static int BUF_FN(get_slice)(BufHandle *h, uint64_t from, uint64_t count,
     BufHeader *hdr = h->hdr;
     if (count > h->capacity || from > h->capacity - count) return 0;
     BUF_ELEM_TYPE *data = (BUF_ELEM_TYPE *)h->data;
-    if (h->wr_locked) {
+    if (buf_write_locked(h)) {
         memcpy(out, &data[from], count * sizeof(BUF_ELEM_TYPE));
     } else {
         uint32_t seq_start;
@@ -1395,7 +1397,7 @@ static int BUF_FN(set_slice)(BufHandle *h, uint64_t from, uint64_t count,
     BufHeader *hdr = h->hdr;
     if (count > h->capacity || from > h->capacity - count) return 0;
     BUF_ELEM_TYPE *data = (BUF_ELEM_TYPE *)h->data;
-    int nested = h->wr_locked;
+    int nested = buf_write_locked(h);
     if (!nested) { buf_rwlock_wrlock(h); buf_seqlock_write_begin(&hdr->seq); }
     memcpy(&data[from], in, count * sizeof(BUF_ELEM_TYPE));
     if (!nested) { buf_seqlock_write_end(&hdr->seq); buf_rwlock_wrunlock(h); }
@@ -1412,7 +1414,7 @@ static void BUF_FN(fill)(BufHandle *h, const char *val, uint32_t len) {
     BufHeader *hdr = h->hdr;
     uint32_t esz = h->elem_size;
     char *data = (char *)h->data;
-    int nested = h->wr_locked;
+    int nested = buf_write_locked(h);
     if (!nested) { buf_rwlock_wrlock(h); buf_seqlock_write_begin(&hdr->seq); }
     uint32_t copy_len = len < esz ? len : esz;
     memset(data, 0, (size_t)h->capacity * esz);
@@ -1426,7 +1428,7 @@ static void BUF_FN(fill)(BufHandle *h, const char *val, uint32_t len) {
 static void BUF_FN(fill)(BufHandle *h, BUF_ELEM_TYPE val) {
     BufHeader *hdr = h->hdr;
     BUF_ELEM_TYPE *data = (BUF_ELEM_TYPE *)h->data;
-    int nested = h->wr_locked;
+    int nested = buf_write_locked(h);
     if (!nested) { buf_rwlock_wrlock(h); buf_seqlock_write_begin(&hdr->seq); }
     for (uint64_t i = 0; i < h->capacity; i++)
         data[i] = val;
@@ -1537,6 +1539,8 @@ static inline void BUF_FN(lock_wr)(BufHandle *h) {
 }
 
 static inline void BUF_FN(unlock_wr)(BufHandle *h) {
+    buf_reset_after_fork(h);
+    if (!h->wr_locked) return;
     h->wr_locked = 0;
     buf_seqlock_write_end(&h->hdr->seq);
     buf_rwlock_wrunlock(h);
@@ -1547,6 +1551,7 @@ static inline void BUF_FN(lock_rd)(BufHandle *h) {
 }
 
 static inline void BUF_FN(unlock_rd)(BufHandle *h) {
+    buf_reset_after_fork(h);
     buf_rwlock_rdunlock(h);
 }
 

@@ -5,6 +5,7 @@ use warnings;
 use POSIX qw(strftime);
 use ForgeOps::Tracker::PiiScrubber qw(scrub scrub_string);
 use ForgeOps::Tracker::SqlStatement ();
+use ForgeOps::Tracker::StrictPrivacy ();
 
 my $MAX_FRAMES = 500;
 
@@ -42,6 +43,13 @@ sub new {
 # method plus the route pattern), and trace_id (the request's 32-character lowercase hex W3C trace
 # id, which is also what links this error to errors other services reported for the same trace).
 # Each is left out of the payload when undef, and all three are undef outside a request.
+#
+# With the configuration's strict_privacy on, the finished payload goes through
+# StrictPrivacy::event: the message is replaced by its message_fingerprint (computed from the
+# message as it would otherwise have been sent, so after scrub_pii, which is also what the server
+# fingerprints from a client without strict privacy, and keeps a message holding an email grouping
+# together), and breadcrumbs, endpoint, the SQL statement, source context, the user's
+# email/username and every context/tag key not in privacy_allowed_fields are left out.
 sub build {
     my ($self, $error, $context, $user, $breadcrumbs, $request) = @_;
     $context ||= {};
@@ -69,7 +77,9 @@ sub build {
     }
     $self->_attach_sql(\%payload, $error);
 
-    return $config->{scrub_pii} ? $self->_scrub_payload(\%payload) : \%payload;
+    my $payload = $config->{scrub_pii} ? $self->_scrub_payload(\%payload) : \%payload;
+    return $payload unless $config->{strict_privacy};
+    return ForgeOps::Tracker::StrictPrivacy::event($payload, $config->{privacy_allowed_fields});
 }
 
 # See SqlStatement for what's read off the error and how it's masked. The statement itself only
@@ -85,7 +95,7 @@ sub _attach_sql {
 
     my $objects = ForgeOps::Tracker::SqlStatement::objects($masked);
     $payload->{sql_objects} = $objects if $objects && $config->{capture_sql_objects};
-    $payload->{sql_statement} = $masked if $config->{capture_sql_statement};
+    $payload->{sql_statement} = $masked if $config->{capture_sql_statement} && !$config->{strict_privacy};
     return;
 }
 
@@ -169,9 +179,11 @@ sub _in_app {
 # flag, is the durable, protected way to turn it off). Best-effort: any file that can't be opened
 # (deleted, permission denied, a path that only ever existed inside a build step and isn't present
 # in this deployment) just means this one frame gets no source context, never a die of its own.
+# Never read at all under strict privacy, which never sends it.
 sub _attach_source_context {
     my ($self, $frame) = @_;
-    return $frame unless $self->{configuration}{capture_source_context} && $frame->{in_app};
+    my $config = $self->{configuration};
+    return $frame unless $config->{capture_source_context} && $frame->{in_app} && !$config->{strict_privacy};
 
     my $lines = $self->_read_source_lines($frame->{file});
     return $frame unless $lines;

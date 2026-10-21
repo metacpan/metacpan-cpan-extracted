@@ -1,7 +1,7 @@
 package Data::CuckooFilter::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 require XSLoader;
 XSLoader::load('Data::CuckooFilter::Shared', $VERSION);
 
@@ -316,10 +316,10 @@ ownership; if a holder dies, the next contender detects the dead owner and
 recovers. Each C<add> commits with a single fingerprint store (or, on the
 eviction path, an all-or-nothing sequence that rolls back on failure), so a
 crash leaves the filter consistent up to the last completed operation.
-B<Crash caveat>: dead-writer recovery repairs only the lock word, not the
-table. A writer killed in the middle of an eviction run never gets to roll it
-back and strands the fingerprint it was carrying, so a previously added item
-can afterward read as absent -- the "no false negatives" guarantee holds only
+B<Crash caveat>: dead-writer recovery repairs the lock and recounts live
+fingerprints, but cannot restore the table. A writer killed mid-eviction
+strands its carried fingerprint, so a previously added item can read as absent
+after recovery -- the "no false negatives" guarantee holds only
 when no writer has died mid-operation. Recreate the filter if that matters.
 B<Limitation>: PID reuse is not detected (very unlikely in practice).
 

@@ -1,7 +1,7 @@
 {
    "abstract" : "Perl extension for Generating 24 bit Images",
    "author" : [
-      "Tony Cook <tonyc@cpan.org>, Arnar M. Hrafnkelsson"
+      "Tony Cook <tony@develop-help.com>, Arnar M. Hrafnkelsson"
    ],
    "dynamic_config" : 0,
    "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
@@ -68,6 +68,6 @@
          "web" : "https://github.com/tonycoz/imager.git"
       }
    },
-   "version" : "1.039",
+   "version" : "1.040",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

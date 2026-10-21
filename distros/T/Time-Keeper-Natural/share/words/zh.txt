@@ -6,13 +6,27 @@
 # Chinese puts "end" and "beginning" after the period. "周末" is the weekend,
 # and reads as the end of the week. A time and a day take no word. An ordinal
 # weekday ("下个月的第三个星期五") is not read.
+#
+# 0.02's keys: Ranges, the day before or after a point and an ordinal weekday read. Chinese
+# puts the point before a duration, which after and before do not take. "下周末"
+# stays the end of next week, as 0.01 read it, so there is no weekend line.
 start_of	{0}初
 end_of	{0}底|{0}末
 at
 on
 skip
 and
+range	从{0}到{1}|{0}到{1}|{0}至{1}
+after	{0}的后一天
+before	{0}的前一天
+nth	{period}的第{n}个{weekday}|{period}第{n}个{weekday}|{period}的{n}个{weekday}
+last	最后一
 # test: 下个月底 => 2026-11-30T23:59:59.999999999+00:00
 # test: 上个月底 => 2026-09-30T23:59:59.999999999+01:00
 # test: 下个月初 => 2026-11-01T00:00:00+00:00
 # test: 年底 => 2026-12-31T23:59:59.999999999+00:00
+# test: 从星期一到星期五 => 2026-10-19T00:00:00+01:00 / 2026-10-23T23:59:59.999999999+01:00
+# test: 明天的后一天 => 2026-10-17T00:00:00+01:00
+# test: 明天的前一天 => 2026-10-15T00:00:00+01:00
+# test: 下个月的第三个星期五 => 2026-11-20T00:00:00+00:00
+# test: 十月的最后一个星期五 => 2026-10-30T00:00:00+00:00

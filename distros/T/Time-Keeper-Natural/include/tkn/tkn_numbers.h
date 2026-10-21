@@ -192,6 +192,8 @@ tkn_numbers_for(pTHX_ SV *klass, SV *locale)
             const char *t1, *t2, *w;
             HV *into;
             IV val;
+            if (le > p && le[-1] == '\r')
+                le--;
             if (*p == '#' || !(t1 = (const char *)memchr(p, '\t', (size_t)(le - p)))
                 || !(t2 = (const char *)memchr(t1 + 1, '\t', (size_t)(le - t1 - 1)))) {
                 p = nl ? nl + 1 : e;

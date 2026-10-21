@@ -6,14 +6,32 @@
 # Arabic joins "end" to a period by idafa with no word between, and CLDR's
 # words carry their article, so "نهاية الشهر الماضي" reads as it stands. An
 # ordinal weekday is not read.
+#
+# 0.02's keys: Ranges, a duration before or after a point, the weekend (CLDR's week words with
+# "عطلة نهاية الأسبوع") and an ordinal weekday after its weekday ("الجمعة الثالثة
+# من الشهر القادم") read. A duration is read in CLDR's forms ("3 أسابيع"), so the
+# oblique dual "أسبوعين" does not.
 start_of	بداية|في بداية|مطلع|في مطلع
 end_of	نهاية|في نهاية
 at	الساعة|في الساعة
 on	يوم|في يوم
 skip
 and
+range	من {0} إلى {1}|من {0} حتى {1}|بين {0} و{1}|{0} حتى {1}
+after	{0} بعد {1}
+before	{0} قبل {1}
+weekend	عطلة نهاية الأسبوع
+nth	{weekday} {n} من {period}|{weekday} {n} في {period}
+last	الأخيرة|الأخير
 # test: نهاية الشهر الماضي => 2026-09-30T23:59:59.999999999+01:00
 # test: بداية الشهر القادم => 2026-11-01T00:00:00+00:00
 # test: نهاية الشهر => 2026-10-31T23:59:59.999999999+00:00
 # test: غدًا الساعة 3:30 م => 2026-10-16T15:30:00+01:00
 # test: يوم الثلاثاء => 2026-10-20T00:00:00+01:00
+# test: من الاثنين إلى الجمعة => 2026-10-19T00:00:00+01:00 / 2026-10-23T23:59:59.999999999+01:00
+# test: بين 9 ص و5 م => 2026-10-15T09:00:00+01:00 / 2026-10-15T17:00:00+01:00
+# test: 3 أيام بعد غدًا => 2026-10-19T00:00:00+01:00
+# test: 3 أسابيع قبل 20 أكتوبر => 2026-09-29T00:00:00+01:00
+# test: عطلة نهاية الأسبوع القادم => 2026-10-23T00:00:00+01:00
+# test: الجمعة الثالثة من الشهر القادم => 2026-11-20T00:00:00+00:00
+# test: الجمعة الأخيرة من أكتوبر => 2026-10-30T00:00:00+00:00

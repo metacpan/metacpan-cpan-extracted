@@ -1,6 +1,7 @@
 #!/usr/bin/env perl
 # ex:ts=8 sw=4:
-# App::FuguWeb::Render: the probe, the lint, and the mandoc options.
+# App::FuguWeb::Render: the probe, the lint, the mandoc options, and the
+# Markdown render.
 #
 # The test builds its sources in a File::Temp directory. It never reads
 # the repository, so a change under man/ cannot break it.
@@ -171,6 +172,27 @@ MDOC
 		my $missing = $render->mdoc( 'one.1', "$dir/absent" );
 		is( $missing, undef,
 			'a staging directory that is absent fails' );
+	};
+}
+
+SKIP: {
+	skip 'lowdown not found', 1 unless have('lowdown');
+
+	subtest 'markdown keeps the HTML that the file holds' => sub {
+		my $dir = tempdir( CLEANUP => 1 );
+		open my $fh, '>', "$dir/page.md"
+		    or die "Cannot write the page: $!";
+		print {$fh} "One.\n\n<hr>\n\nTwo <kbd>x</kbd>.\n";
+		close $fh;
+
+		my $render = App::FuguWeb::Render->new(
+			config => config(),
+			log    => quiet(),
+		);
+		my $html = $render->markdown("$dir/page.md");
+		ok( defined $html, 'the page renders' );
+		like( $html, qr{<hr>}, 'an HTML block stays' );
+		like( $html, qr{<kbd>x</kbd>}, 'an HTML span stays' );
 	};
 }
 

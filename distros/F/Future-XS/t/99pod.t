@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use v5.14;
+use v5.24;
 use warnings;
 
 use Test2::V0;

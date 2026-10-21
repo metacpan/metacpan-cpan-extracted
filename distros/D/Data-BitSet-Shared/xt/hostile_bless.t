@@ -21,7 +21,7 @@ SKIP: {
     }
     waitpid $pid, 0;
     my $sig = $? & 0x7f;
-    ok $sig == 0 || $sig == 11, "non-derived bless handled (sig=$sig)";
+    is $sig, 0, "non-derived bless handled (sig=$sig)";
 }
 
 done_testing;

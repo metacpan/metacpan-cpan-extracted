@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.03';
+our $VERSION = '0.06';
 
 use Time::Keeper::Natural ();
 
@@ -18,7 +18,7 @@ Time::Keeper::Natural::Match - what a text named, and what was filled in
 
 =head1 VERSION
 
-Version 0.03
+Version 0.06
 
 =head1 SYNOPSIS
 
@@ -87,14 +87,14 @@ That list, the whole of it, in that order. A Match never carries another.
 
 =head2 text
 
-The text as given.
+The text as given (for C<find>, the whole text the mention is in).
 
 =head2 start
 
 =head2 end
 
 Where in the text what was read begins and ends, in characters: the text
-without its outer whitespace, since a text is read whole or not at all.
+without its outer whitespace, or for C<find> the mention.
 
 =head2 locale
 

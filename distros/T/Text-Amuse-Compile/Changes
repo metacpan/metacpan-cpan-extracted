@@ -1,5 +1,12 @@
 Revision history for perl module Text::Amuse::Compile
 
+1.92 2026-10-20
+
+ - Add github CI
+ - Add support for page numbers in local script
+ - Allow slides template customization
+ - Use smaller font size for code blocks in slides
+
 1.91 2026-02-20
 
  - Remove xeCJK usage. We already use babel and the options

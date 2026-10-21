@@ -183,4 +183,45 @@ SKIP: {
 }
 
 
+for my $headers ('Transfer-Encoding: gzip', 'Content-Length : 5') {
+    socketpair(my $client, my $srv, AF_UNIX, SOCK_STREAM, PF_UNSPEC) or die $!;
+    my $m = FakeMulti->new;
+    my $c = Proxy::Impersonate::Connection->new(fd => $srv, multi => $m,
+        make_handle => sub { bless {}, 'FakeHandle' });
+    $c->{rbuf} = "POST http://ex.com/ HTTP/1.1\r\n$headers\r\n\r\n"
+               . "GET http://ex.com/hidden HTTP/1.1\r\n\r\n";
+    $c->_process;
+    is(scalar @{$m->{calls}}, 0, 'unframeable input cannot become another request');
+    ok($c->{_dead}, 'unframeable input closes');
+}
+
+{
+    socketpair(my $client, my $srv, AF_UNIX, SOCK_STREAM, PF_UNSPEC) or die $!;
+    my $m = FakeMulti->new;
+    my $c = Proxy::Impersonate::Connection->new(fd => $srv, multi => $m,
+        make_handle => sub { bless {}, 'FakeHandle' });
+    $c->{rbuf} = "GET http://ex.com/ HTTP/1.1\r\nX-Large: " . ('x' x 65536) . "\r\n\r\n";
+    $c->_process;
+    ok($c->{_dead}, 'a complete oversized head is refused too');
+    is(scalar @{$m->{calls}}, 0, 'oversized head never goes upstream');
+}
+
+{
+    socketpair(my $client, my $srv, AF_UNIX, SOCK_STREAM, PF_UNSPEC) or die $!;
+    $client->blocking(0);
+    my $m = FakeMulti->new;
+    my $c = Proxy::Impersonate::Connection->new(fd => $srv, multi => $m,
+        make_handle => sub { bless {}, 'FakeHandle' });
+    $c->{rbuf} = "POST http://ex.com/ HTTP/1.1\r\nContent-Length: 5\r\nExpect: 100-continue\r\n\r\n";
+    $c->_process;
+    sysread($client, my $reply, 4096);
+    is($reply, "HTTP/1.1 100 Continue\r\n\r\n", 'Expect client is invited to send its buffered upload');
+    $c->_process;
+    ok(!sysread($client, my $again, 4096), '100 Continue is sent once');
+    $c->{rbuf} .= 'hello';
+    $c->_process;
+    is($m->{calls}[0]{req}{body}, 'hello', 'upload is forwarded after Continue');
+    $c->_close;
+}
+
 done_testing;

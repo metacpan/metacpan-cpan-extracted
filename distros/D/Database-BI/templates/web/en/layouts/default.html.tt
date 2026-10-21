@@ -16,12 +16,38 @@
 
     header {
       margin-bottom: 1.5rem;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 1rem;
     }
 
     header h1 {
       font-size: 1.75rem;
       font-weight: 600;
       color: #2c3e7a;
+    }
+
+    /* The tutorial is part of the application, so every page can reach it. */
+    .site-nav {
+      display: flex;
+      gap: 1rem;
+      margin-left: auto;
+      font-size: 0.9rem;
+    }
+
+    .site-nav a {
+      color: #2c3e7a;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .site-nav a:hover { text-decoration: underline; }
+
+    /* The chapter that helps with the page that is open. */
+    .site-nav-help {
+      border-left: 1px solid #cfd6e6;
+      padding-left: 1rem;
     }
 
     main {
@@ -372,6 +398,10 @@
       gap: 0.3rem;
     }
 
+    /* A flex display would otherwise beat the hidden attribute, leaving a
+       field the page has hidden on screen. */
+    .join-field[hidden] { display: none; }
+
     .join-field label {
       font-size: 0.8rem;
       font-weight: 600;
@@ -521,6 +551,27 @@
       box-shadow: none;
     }
 
+    .db-card--unavailable {
+      opacity: 0.5;
+      filter: grayscale(0.8);
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+    .db-card--unavailable:hover {
+      background: transparent;
+      box-shadow: none;
+    }
+    /* The delete button on an unavailable card must remain clickable even
+       though the card itself has pointer-events: none -- the button is a
+       sibling of the card inside the <li>, so it is unaffected. */
+    .db-unavail-badge {
+      display: block;
+      font-size: 0.72rem;
+      color: #b04000;
+      margin-top: 0.2rem;
+      font-weight: bold;
+    }
+
     .db-icon { font-size: 2rem; }
 
     .db-name {
@@ -589,6 +640,77 @@
       opacity: 1 !important;
       background: rgba(192, 57, 43, 0.12);
       color: #c0392b;
+    }
+
+    /* ---- canvas multi-select ---- */
+
+    /* selected card li */
+    li.cv-sel > a.db-card {
+      outline: 2px solid #3a6eca;
+      outline-offset: 2px;
+      background: rgba(58, 110, 202, 0.07);
+    }
+    /* card hovered during rubber-band drag */
+    li.cv-drag-over > a.db-card {
+      outline: 2px dashed #3a6eca;
+      outline-offset: 2px;
+      background: rgba(58, 110, 202, 0.04);
+    }
+
+    /* selection hint beside the "Saved canvases" heading */
+    .cv-sel-hint {
+      font-size: 0.7rem;
+      font-weight: normal;
+      text-transform: none;
+      letter-spacing: 0;
+      color: #aaa;
+    }
+
+    /* rubber-band selection rectangle */
+    .cv-rubber {
+      position: fixed;
+      border: 1.5px solid #3a6eca;
+      background: rgba(58, 110, 202, 0.08);
+      border-radius: 2px;
+      pointer-events: none;
+      z-index: 9000;
+    }
+
+    /* floating action bar shown when >= 1 canvas selected */
+    .cv-sel-bar {
+      position: fixed;
+      bottom: 1.2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 8000;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.55rem 1rem;
+      background: #2c3e7a;
+      color: #fff;
+      border-radius: 2rem;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.22);
+      font-size: 0.88rem;
+      white-space: nowrap;
+    }
+    .cv-sel-count { opacity: 0.85; }
+    .cv-sel-del, .cv-sel-clr {
+      background: none;
+      border: 1px solid rgba(255,255,255,0.4);
+      color: #fff;
+      border-radius: 1rem;
+      padding: 0.2rem 0.7rem;
+      cursor: pointer;
+      font-size: 0.82rem;
+      transition: background 0.12s;
+    }
+    .cv-sel-del:hover { background: rgba(192, 57, 43, 0.7); border-color: transparent; }
+    .cv-sel-clr:hover { background: rgba(255,255,255,0.15); }
+
+    @media (prefers-color-scheme: dark) {
+      li.cv-sel > a.db-card      { background: rgba(58, 110, 202, 0.18); }
+      li.cv-drag-over > a.db-card { background: rgba(58, 110, 202, 0.12); }
     }
 
     /* Export button in the toolbar */
@@ -667,6 +789,7 @@
     .btn-combo,
     .btn-treemap,
     .btn-histogram,
+    .btn-map,
     .btn-folder,
     .btn-pivot,
     .btn-stats,
@@ -697,6 +820,7 @@
     .btn-combo:hover,
     .btn-treemap:hover,
     .btn-histogram:hover,
+    .btn-map:hover,
     .btn-folder:hover,
     .btn-pivot:hover,
     .btn-stats:hover,
@@ -713,6 +837,7 @@
     .btn-combo:disabled,
     .btn-treemap:disabled,
     .btn-histogram:disabled,
+    .btn-map:disabled,
     .btn-calc:disabled,
     .btn-groups:disabled,
     .btn-dates:disabled,
@@ -1267,13 +1392,44 @@
 <body>
   <header>
     <h1>[% title | html %]</h1>
+    <nav class="site-nav" aria-label="Main">
+      <a href="/">Home</a>
+      <a id="site-nav-tutorial" href="/tutorial" target="_blank" rel="noopener"
+         title="Open the tutorial in a new tab (F1)">Tutorial</a>
+      [%- IF tutorial_chapter %]
+      <a id="site-nav-help" class="site-nav-help"
+         href="/tutorial#[% tutorial_chapter | html %]" target="_blank" rel="noopener"
+         title="Open this page's chapter in a new tab (F1)"
+         aria-label="Help for this page: [% tutorial_chapter_title | html %]">Help: [% tutorial_chapter_title | html %]</a>
+      [%- END %]
+    </nav>
   </header>
   <main>
     [% content %]
   </main>
   <footer><a href="https://github.com/nigelhorne/Database-BI" target="_blank">Database::BI</a></footer>
 
-  <!-- Full-window drop overlay: shown whenever files are dragged over the page -->
+    <!-- F1 is the standard Help key.  It follows the header's Help link, or
+       the tutorial top when this page has no chapter.  Both links carry
+       target="_blank", so the current table or chart view is not lost. -->
+  <script>
+  (function () {
+    document.addEventListener('keydown', function (e) {
+      if (e.key !== 'F1' || e.repeat) return;
+      if (e.ctrlKey || e.altKey || e.metaKey) return;
+
+      var help = document.getElementById('site-nav-help');
+      var top  = document.getElementById('site-nav-tutorial');
+      var link = help || top;
+      if (!link) return;
+
+      e.preventDefault();
+      link.click();
+    });
+  }());
+  </script>
+
+<!-- Full-window drop overlay: shown whenever files are dragged over the page -->
   <div id="drop-overlay" aria-live="polite">
     <div class="drop-overlay-box">
       <div class="drop-overlay-icon" aria-hidden="true">&#x1F4C2;</div>
@@ -1429,11 +1585,18 @@
   </script>
 [% IF chart %]
 <style>
-#add-to-canvas-btn {
+#canvas-actions {
   position: fixed;
   bottom: 1.25rem;
   right: 1.25rem;
   z-index: 900;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  max-width: calc(100vw - 2.5rem);
+}
+#canvas-actions button {
   background: #0d6efd;
   color: #fff;
   border: none;
@@ -1442,10 +1605,10 @@
   font-size: 0.9rem;
   cursor: pointer;
   box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-  display: none;
 }
-#add-to-canvas-btn:hover { background: #0b5ed7; }
-#add-to-canvas-panel {
+#canvas-actions button:hover { background: #0b5ed7; }
+#add-to-canvas-btn { display: none; }
+#add-to-canvas-panel, #new-canvas-panel {
   position: fixed;
   bottom: 4rem;
   right: 1.25rem;
@@ -1458,9 +1621,10 @@
   box-shadow: 0 4px 16px rgba(0,0,0,0.15);
   display: none;
 }
-#add-to-canvas-panel h4 { margin: 0 0 0.75rem; font-size: 0.95rem; }
-#atc-analysis-sel { width: 100%; margin-bottom: 0.6rem; }
-#atc-status { font-size: 0.8rem; color: #6c757d; margin-top: 0.4rem; min-height: 1.2em; }
+#add-to-canvas-panel h4, #new-canvas-panel h4 { margin: 0 0 0.75rem; font-size: 0.95rem; }
+#atc-analysis-sel, #new-canvas-name { width: 100%; margin-bottom: 0.6rem; }
+#atc-status, #new-canvas-status { font-size: 0.8rem; color: #6c757d; margin-top: 0.4rem; min-height: 1.2em; }
+#new-canvas-link { font-size: 0.85rem; margin-left: 0.5rem; }
 /* Resize handle for chart SVGs */
 .chart-svg-wrap {
   position: relative;
@@ -1509,7 +1673,21 @@
 .chart-resize-handle:focus-visible::after { opacity: 1; }
 .chart-svg-wrap:focus-within { outline: 2px solid #0d6efd; outline-offset: 4px; }
 </style>
-<button id="add-to-canvas-btn" title="Add this chart to an existing canvas">+ Add to Existing Canvas</button>
+<div id="canvas-actions">
+  <button id="new-canvas-btn" title="Create a new canvas starting with this chart">+ New Canvas</button>
+  <button id="add-to-canvas-btn" title="Add this chart to an existing canvas">+ Add to Existing Canvas</button>
+</div>
+<div id="new-canvas-panel" data-chart="[% chart_json | html %]">
+  <h4>New canvas</h4>
+  <input type="text" id="new-canvas-name" placeholder="Canvas name"
+         autocomplete="off" maxlength="120">
+  <div style="display:flex;gap:0.5rem;margin-top:0.25rem">
+    <button class="btn-primary" id="new-canvas-save" style="flex:1">Create</button>
+    <button class="btn-secondary" id="new-canvas-cancel">Cancel</button>
+    <a id="new-canvas-link" href="#" hidden>Open canvas</a>
+  </div>
+  <div id="new-canvas-status"></div>
+</div>
 <div id="add-to-canvas-panel">
   <h4>Add chart to existing canvas</h4>
   <select id="atc-analysis-sel"><option value="">Loading...</option></select>
@@ -1530,36 +1708,84 @@
   var status = document.getElementById('atc-status');
   var loaded = false;
 
+  var newBtn    = document.getElementById('new-canvas-btn');
+  var newPanel  = document.getElementById('new-canvas-panel');
+  var newName   = document.getElementById('new-canvas-name');
+  var newSave   = document.getElementById('new-canvas-save');
+  var newCancel = document.getElementById('new-canvas-cancel');
+  var newLink   = document.getElementById('new-canvas-link');
+  var newStatus = document.getElementById('new-canvas-status');
+
   /* Show the button only when at least one saved analysis exists. */
   fetch('/api/analyses').then(function (r) { return r.json(); }).then(function (data) {
     var list = (data && data.analyses) ? data.analyses : [];
     if (list.length) btn.style.display = '';
   }).catch(function () {});
 
+  /* The server rendered the exact chart spec for this page.  Using it keeps
+     options and encode keys (value rather than val, for example) correct; the
+     URL fallback is only for a page that somehow has no chart block. */
+  function chartFromServer() {
+    var el = document.getElementById('new-canvas-panel');
+    if (!el) return null;
+    try { return JSON.parse(el.getAttribute('data-chart') || 'null'); } catch (e) { return null; }
+  }
+
   function buildVisualSpec() {
     var p   = new URLSearchParams(window.location.search);
-    var url = window.location.href;
-    var kind = (function () {
-      var path = window.location.pathname;
-      if (/\/graph$|\/line$/.test(path)) return 'line';
-      if (/\/pie$/.test(path))           return 'pie';
-      if (/\/bar$/.test(path))           return 'bar';
-      if (/\/scatter$/.test(path))       return 'scatter';
-      if (/\/heatmap$/.test(path))       return 'heatmap';
-      if (/\/stacked$/.test(path))       return 'stacked';
-      if (/\/combo$/.test(path))         return 'combo';
-      if (/\/treemap$/.test(path))       return 'treemap';
-      if (/\/histogram$/.test(path))     return 'histogram';
-      return 'table';
-    }());
-    var encode = {};
-    ['x','y','cat','val','series','size','bar_val','line_val','group','col'].forEach(function (k) {
-      if (p.get(k)) encode[k] = p.get(k);
-    });
+    var spec = chartFromServer();
+    var vis;
+
+    if (spec && spec.kind) {
+      vis = { kind: spec.kind, encode: spec.encode || {}, title: spec.title || spec.kind };
+      if (spec.options) vis.options = spec.options;
+    } else {
+      var kind = (function () {
+        var path = window.location.pathname;
+        if (/\/graph$|\/line$/.test(path)) return 'line';
+        if (/\/pie$/.test(path))           return 'pie';
+        if (/\/bar$/.test(path))           return 'bar';
+        if (/\/scatter$/.test(path))       return 'scatter';
+        if (/\/heatmap$/.test(path))       return 'heatmap';
+        if (/\/stacked$/.test(path))       return 'stacked';
+        if (/\/combo$/.test(path))         return 'combo';        if (/\/treemap$/.test(path))     return 'treemap';
+        if (/\/histogram$/.test(path))   return 'histogram';
+        if (/\/map$/.test(path))         return 'map';
+        return 'table';
+      }());
+      var encode = {};
+      ['x','y','cat','val','series','size','bar_val','line_val','group','col','lat','lon','loc'].forEach(function (k) {
+        if (p.get(k)) encode[k] = p.get(k);
+      });
+      vis = { kind: kind, encode: encode, title: document.title || kind };
+    }
+
     var filters = p.getAll('f');
-    var vis = { kind: kind, encode: encode, title: document.title || kind };
     if (filters.length) vis.filters = filters;
     return vis;
+  }
+
+  /* A new canvas starts with this chart and the same datasets and joins as the
+     page it was made from. */
+  function buildNewAnalysis(name) {
+    var p = new URLSearchParams(window.location.search);
+    var l = p.get('l') || '';
+    if (!l) return null;
+
+    var datasets = [{ spec: l, alias: 'left', filters: p.getAll('f') }];
+    var joins = [];
+    p.getAll('j').forEach(function (jspec) {
+      var parts = jspec.split('|');
+      if (parts.length >= 3) {
+        datasets.push({ spec: parts[0], alias: 'right' + joins.length });
+        joins.push({
+          left: 'left', right: 'right' + joins.length,
+          left_key: parts[1], right_key: parts[2],
+        });
+      }
+    });
+
+    return { name: name, datasets: datasets, joins: joins, visuals: [buildVisualSpec()] };
   }
 
   function loadAnalyses() {
@@ -1584,8 +1810,64 @@
     });
   }
 
+  newBtn.addEventListener('click', function () {
+    var open = newPanel.style.display === 'block';
+    panel.style.display = 'none';
+    newPanel.style.display = open ? 'none' : 'block';
+    if (!open) {
+      newName.focus();
+      newLink.hidden = true;
+      newStatus.textContent = '';
+      newSave.disabled = !newName.value.trim();
+    }
+  });
+
+  newCancel.addEventListener('click', function () {
+    newPanel.style.display = 'none';
+  });
+
+  newSave.addEventListener('click', function () {
+    var name = newName.value.trim();
+    if (!name) { newStatus.textContent = 'Please type a canvas name.'; return; }
+
+    var spec = buildNewAnalysis(name);
+    if (!spec) {
+      newStatus.textContent = 'Cannot save: no data source in the current URL.';
+      return;
+    }
+
+    newSave.disabled = true;
+    newStatus.textContent = 'Saving...';
+    fetch('/api/analyses', {
+      method  : 'POST',
+      headers : { 'Content-Type': 'application/json' },
+      body    : JSON.stringify(spec),
+    })
+      .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
+      .then(function (res) {
+        if (res.ok && res.j.id) {
+          newLink.href    = '/a/' + res.j.id;
+          newLink.hidden  = false;
+          newStatus.textContent = 'Saved. ';
+          newStatus.appendChild(newLink);
+        } else {
+          newStatus.textContent = 'Error: ' + ((res.j && res.j.error) || 'unknown error');
+          newSave.disabled = false;
+        }
+      })
+      .catch(function () {
+        newStatus.textContent = 'Could not save the canvas -- check the server log.';
+        newSave.disabled = false;
+      });
+  });
+
+  newName.addEventListener('input', function () {
+    newSave.disabled = !newName.value.trim();
+  });
+
   btn.addEventListener('click', function () {
     var open = panel.style.display === 'block';
+    newPanel.style.display = 'none';
     panel.style.display = open ? 'none' : 'block';
     if (!open) { status.textContent = ''; loadAnalyses(); }
   });

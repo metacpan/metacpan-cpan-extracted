@@ -50,8 +50,10 @@ if ($pid == 0) {
         }
         # bulk write all points
         my $packed = pack("f<*", @data);
+        $cloud->lock_wr;
         $cloud->set_raw(0, $packed);
         $ctl->set(0, $npts);
+        $cloud->unlock_wr;
         $ctl->notify;
         sleep 0.05;  # 20 fps update
     }
@@ -69,6 +71,7 @@ while (!$ctl->get(1)) {
     my $n = $ctl->wait_notify;
     unless (defined $n) { sleep 0.001; next }
 
+    $cloud->lock_rd;
     my $npts = $ctl->get(0);
 
     # --- With OpenGL::Modern ---
@@ -82,6 +85,7 @@ while (!$ctl->get(1)) {
     # glVertexAttribPointer_c(0, 3, GL_FLOAT, GL_FALSE, 16, 0);
     # glVertexAttribPointer_c(1, 4, GL_UNSIGNED_BYTE, GL_TRUE, 16, 12);
     # glDrawArrays(GL_POINTS, 0, $npts);
+    $cloud->unlock_rd;
 
     $frames++;
 }

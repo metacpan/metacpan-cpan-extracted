@@ -11,11 +11,11 @@ Geo::Coder::Free::MissCache - process-level memory of lookups that found nothing
 
 =head1 VERSION
 
-Version 0.48
+Version 0.49
 
 =cut
 
-our $VERSION = '0.48';
+our $VERSION = '0.49';
 
 # How long a remembered miss lasts.  A miss is a statement about data on disk,
 # which does not change while a batch or a request runs; the lifetime only has
@@ -85,6 +85,17 @@ set is being read - two OpenAddresses directories hold different data, and a mis
 one says nothing about the other.  C<clear()> uses the same convention: giving
 it a backend name clears every data set that backend opened.
 
+=head3 API SPECIFICATION
+
+=head4 input
+
+    backend => { type => 'string' }            # Local, MaxMind or OpenAddresses
+    dataset => { type => 'string', optional => 1 }  # zero or more, which data set
+
+=head4 output
+
+    { type => 'string' }
+
 =cut
 
 sub scope_for {
@@ -100,6 +111,17 @@ sub scope_for {
 True if C<$key> was remembered as a miss in C<$scope> and has not expired.
 An expired entry is deleted as it is found.  A missing entry is false and is
 not an error.
+
+=head3 API SPECIFICATION
+
+=head4 input
+
+    scope => { type => 'string' }   # from scope_for()
+    key   => { type => 'string' }
+
+=head4 output
+
+    { type => 'boolean' }
 
 =cut
 
@@ -125,6 +147,18 @@ sub missed {
 
 Records that C<$key> found nothing in C<$scope>, for as long as
 L</expires_after> says.  Recording the same miss again refreshes it.
+Returns true.
+
+=head3 API SPECIFICATION
+
+=head4 input
+
+    scope => { type => 'string' }   # from scope_for()
+    key   => { type => 'string' }
+
+=head4 output
+
+    { type => 'boolean', value => 1 }
 
 =cut
 
@@ -142,9 +176,21 @@ sub remember {
     Geo::Coder::Free::MissCache->forget($scope, $key);
 
 Forgets one miss, leaving the rest of C<$scope> alone.  Returns true if there
-was an entry to forget.  A backend calls this when a lookup that had been
-remembered as a miss now succeeds, so a hit is never skipped on the strength
-of an older miss.
+was an entry to forget, and false if C<$scope> or C<$key> held none, so
+forgetting the same miss twice returns false the second time.  A backend calls
+this when a lookup that had been remembered as a miss now succeeds, so a hit is
+never skipped on the strength of an older miss.
+
+=head3 API SPECIFICATION
+
+=head4 input
+
+    scope => { type => 'string' }   # from scope_for()
+    key   => { type => 'string' }
+
+=head4 output
+
+    { type => 'boolean' }
 
 =cut
 
@@ -167,7 +213,18 @@ sub forget {
 
 With no argument, forgets every miss in every scope.  With a scope, forgets
 the misses in that scope and in every scope below it: C<clear('OpenAddresses')>
-empties every OpenAddresses data set this process has opened.  Returns true.
+empties every OpenAddresses data set this process has opened.  A scope that
+holds nothing, or names no backend, forgets nothing.  Returns true.
+
+=head3 API SPECIFICATION
+
+=head4 input
+
+    scope => { type => 'string', optional => 1 }   # a backend name or a scope_for() string
+
+=head4 output
+
+    { type => 'boolean', value => 1 }
 
 =cut
 
@@ -194,6 +251,16 @@ sub clear {
 
 How many misses are currently remembered, in all scopes or in one scope.
 Expired entries are discarded first, so this is the number of live entries.
+
+=head3 API SPECIFICATION
+
+=head4 input
+
+    scope => { type => 'string', optional => 1 }   # a backend name or a scope_for() string
+
+=head4 output
+
+    { type => 'integer', min => 0 }
 
 =cut
 
@@ -222,13 +289,28 @@ with the current setting, which is one hour.  Setting it to 0 makes every miss
 expire as soon as it is recorded, which turns the cache off.  It is a setting
 of the process, not of an object, like the cache itself.
 
+The lifetime is a whole number of seconds.  A negative number, a fraction or
+anything that is not a number croaks
+C<expires_after() expects a non-negative whole number of seconds>, and the
+setting is left as it was.  Returns the setting in force after the call.
+
+=head3 API SPECIFICATION
+
+=head4 input
+
+    seconds => { type => 'integer', min => 0, optional => 1 }
+
+=head4 output
+
+    { type => 'integer', min => 0 }
+
 =cut
 
 sub expires_after {
 	my ($class, $seconds) = @_;
 
 	if(defined($seconds)) {
-		Carp::croak('expires_after() expects a non-negative number of seconds')
+		Carp::croak('expires_after() expects a non-negative whole number of seconds')
 			unless $seconds =~ /^\d+$/;
 		$EXPIRES_AFTER = $seconds;
 	}
@@ -255,3 +337,23 @@ sub _sweep {
 }
 
 1;
+
+__END__
+
+=head1 AUTHOR
+
+Nigel Horne C<< <njh@nigelhorne.com> >>
+
+=head1 SEE ALSO
+
+L<Geo::Coder::Free>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2026 Nigel Horne.
+
+The program code is released under the following licence: GPL2 for personal use on a single computer.
+All other users (including Commercial, Charity, Educational, and Government)
+must apply in writing for a licence for use from Nigel Horne at C<< <njh at nigelhorne.com> >>.
+
+=cut

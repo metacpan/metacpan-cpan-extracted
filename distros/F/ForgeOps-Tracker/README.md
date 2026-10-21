@@ -245,6 +245,44 @@ To disable it:
 ForgeOps::Tracker::init(dsn => '...', scrub_pii => 0);
 ```
 
+## Strict privacy
+
+For apps that can't let personal or health data (PII, PHI) leave their own servers. With strict
+privacy on, the client sends only structured facts about an error (its class, its stack frames'
+file, line and sub, the release, environment, server, the request's `transaction_name` and trace
+id, and the database tables or procedures involved), never free text that could hold a name, an
+email or a diagnosis:
+
+- No error message. A `message_fingerprint` is sent instead: a one-way hash of the message with
+  its numbers, hex ids and UUIDs taken out, computed in your process, so errors still group
+  without the message ever leaving it.
+- No breadcrumbs (`add_breadcrumb` records nothing), no `endpoint`, no SQL statement even with
+  `capture_sql_statement` on, and no source context (the source file is never read).
+- The user is sent by `id` only, never `email` or `username`.
+- Context and tags only keep the top-level keys you list in `privacy_allowed_fields`, and only
+  when the value is a plain string or number (or a JSON boolean). Nothing else from them is sent.
+- Spans: an outbound call is named by method and host only (`GET api.example.com`), a request
+  named by its raw path (the PSGI integration's `GET /patients/jane-doe/12`) keeps only the first
+  segment (`GET /patients/:path`; a first segment with a digit becomes `:id`), and span data keeps
+  only the masked `db.statement` and `db.system`.
+- The same goes for the `transaction_name` in error events and performance samples. A route
+  pattern such as `/patients/:id` (Dancer2's) is kept as it is.
+
+```perl
+ForgeOps::Tracker::init(
+    dsn                    => '...',
+    strict_privacy         => 1,                         # default 0
+    privacy_allowed_fields => [qw(error_code feature)],  # default []
+);
+```
+
+Both can also come from the environment: `FORGE_OPS_STRICT_PRIVACY=true` and
+`FORGE_OPS_PRIVACY_ALLOWED_FIELDS=error_code,feature` (comma separated). A value passed to `init()`
+wins over the environment.
+
+ForgeOps applies the same rules again on arrival when the project's own Strict privacy setting is
+on, so an app with an older client, or one with this option off, still can't get that text stored.
+
 ## Performance monitoring
 
 Two more integrations, one per framework, time every request end to end and report it, bucketed

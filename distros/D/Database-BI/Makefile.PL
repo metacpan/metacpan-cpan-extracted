@@ -26,7 +26,7 @@ WriteMakefile(
 		'CGI::Info'	=> 0,
 		'CGI::Lingua'		=> '0.85',
 		'Database::Abstraction'	=> '0.51',	# 0.50 added redis_key + standalone-key support; 0.49 added aggregate(); 0.48 added limit/offset support in selectall_arrayref
-		'Database::Join' => '0.009.0',	# 0.009.0 added aggregate(), limit/offset/sort_by, dbi_source(); 0.004.0 added backend=>'auto' SQLite spill
+		'Database::Join' => '0.010.0',	# 0.009.0 added aggregate(), limit/offset/sort_by, dbi_source(); 0.004.0 added backend=>'auto' SQLite spill
 		'DBI'		=> 0,
 		'Net::SFTP::Foreign' => 0,
 		'File::Path'	=> '2.07',	# For remove_tree in Dashboard.pm at runtime
@@ -36,7 +36,7 @@ WriteMakefile(
 		'IPC::System::Simple' => 0,	# For autodie (:all) in DataSource.pm at runtime
 		'Mojo::Base' => 0,
 		'Mojo::JSON' => 0,
-		'HTML::D3' => '0.20',	# 0.20 added radius_range support for render_scatter_chart_snippet; 0.19 added scatter/stacked/combo/treemap/histogram snippets
+		'HTML::D3' => '0.23',	# 0.20 added radius_range support for render_scatter_chart_snippet; 0.19 added scatter/stacked/combo/treemap/histogram snippets
 		'HTML::TableExtract'	=> 0,
 		'LWP::UserAgent'		=> 0,		# Needed for Test::Mojo HTTP testing; LWP::UserAgent::Cached is used by D::A url fetch path
 		'LWP::UserAgent::Cached'	=> 0,		# Used by Database::Abstraction for URL-backed tables (import_url)
@@ -44,13 +44,16 @@ WriteMakefile(
 		'DB_File'			=> 0,		# Used in DataSource.pm for Berkeley DB magic-byte detection
 		'Mojolicious'	=> '9.49',
 		'Mojolicious::Plugin::TemplateToolkit' => 0,
-		'Params::Get'	=> 0,
-		'Params::Validate::Strict'	=> '0.39',
+		'Params::Get'	=> 0.17,
+		'Params::Validate::Strict'	=> '0.41',
+		'Digest::MD5'		=> 0,		# For Extract.pm fingerprinting (Phase 4.1)
+		'Digest::SHA'		=> 0,		# For HMAC-SHA256 share tokens in Dashboard.pm (Phase 4.6; core since Perl 5.10)
+		'MIME::Base64'		=> '3.11',	# For encode_base64url/decode_base64url in share tokens (Phase 4.6)
 		'Readonly'		=> 0,
 		'Socket'	=> '2.010',
 		'POSIX'			=> 0,		# For floor/ceil in Calc.pm (core module, listed for completeness)
 		'Spreadsheet::ParseXLSX'	=> 0,
-		'Sub::Protected'	=> 0,
+		'Sub::Protected' => 0.03,
 		'Excel::Writer::XLSX'	=> '1.07',
 	}, TEST_REQUIRES => {
 		'DBD::CSV' => 0,
@@ -58,12 +61,12 @@ WriteMakefile(
 		'JSON::MaybeXS' => 0,	# The browser tests speak Marionette and decode its frames
 		'Test::DescribeMe' => 0,	# Author tests (t/pod.t, t/manifest.t, t/version.t) declare themselves with this; the tools they need are optional and skipped without them
 		'Test::Memory::Cycle' => 0,
-		'Test::Mockingbird' => 0,
+		'Test::Mockingbird' => 0.14,
 		'Test::Most' => 0,
 		'Test::Mojo' => 0,
 		'Test::Needs' => 0,
-		'Test::Permissions' => 0,
-		'Test::Returns' => 0,
+		'Test::Permissions' => 0.001.2,
+		'Test::Returns' => 0.005,
 		'Test::Without::Module' => 0,
 		'Text::xSV::Slurp' => 0,
 		'XML::Simple' => 0,
@@ -87,13 +90,12 @@ WriteMakefile(
 					# valid_location() and 0.47 added geocode_many(), and the app
 					# installs, starts and tests without the module, hiding the
 					# location option and saying which version is needed.
-					'Geo::Coder::Free' => '0.47',
+					'Geo::Coder::Free' => '0.48',
 					# Rendering the map itself (Phase 6.1).  Also runtime-required: the
 					# rest of the application installs, starts and tests without it.
-					'HTML::OSM' => '0.10'
+					'HTML::OSM' => '0.11'
 				}
-			},
-			test => {
+			}, test => {
 				recommends => {
 					'Redis' => 0
 				}

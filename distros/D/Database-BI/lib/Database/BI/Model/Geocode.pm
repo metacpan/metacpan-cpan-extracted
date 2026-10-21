@@ -37,7 +37,7 @@ use Scalar::Util		qw(blessed);
 use Params::Get			();
 use Params::Validate::Strict	qw(validate_strict);
 
-our $VERSION = '0.014.0';
+our $VERSION = '0.015.0';
 
 # The version of Geo::Coder::Free this module asks for: 0.46 added valid_location()
 # and on_error => 'undef', 0.47 added geocode_many(), and this module asks for both
@@ -47,6 +47,13 @@ Readonly my $MIN_GEOCODER_VERSION => '0.47';
 # The default for map_geocode_max (section 6.2): new lookups allowed in one
 # request.  A crafted URL must not be able to turn one request into unbounded CPU.
 Readonly my $DEFAULT_MAX => 500;
+
+# The model store's shared place cache.  A place name means the same place
+# whichever file's column holds it, so one answer serves every dataset: the
+# second file that names Ramsgate plots it without asking the geocoder.  The
+# key cannot collide with a per-dataset entry, which always starts with a spec
+# scheme (path:, table:, url: or redis:).
+Readonly my $SHARED_CACHE_KEY => 'shared';
 
 # ---------------------------------------------------------------------------
 # I18N message dictionary.
@@ -1129,6 +1136,136 @@ sub models_with_cache {
 	my %updated = %{ (ref($models) eq 'HASH') ? $models : {} };
 
 	$updated{'geo'} = { %{ $updated{'geo'} // {} }, $spec_key => $spec };
+
+	return \%updated;
+}
+
+=head2 shared_cache_from_models
+
+    my $cache = Database::BI::Model::Geocode->shared_cache_from_models(\%models);
+
+Extract the place answers every dataset shares, as a B<copy> the caller may
+modify.  This is the cache a map request should pass to C<resolve_column>:
+a place geocoded for one file is then plotted for every other file that names
+it, without a second lookup.
+
+A model store written before the cache was shared has no shared entry; this
+returns C<{}> and the per-dataset caches remain readable with
+C<cache_from_models>.  A caller that reads both gets the old answers once and
+writes them back to the shared entry (see C<models_with_shared_cache>).
+
+This is a B<class method>; the invocant is ignored.
+
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+    \%models  => hashref, required;  the structure returned by _read_models()
+
+=head4 OUTPUT
+
+    { $place_name => [lat, lon] | 0, ... }
+
+Returns an empty hashref for a store with no shared cache, for a malformed
+entry, or for a C<\%models> argument that is not a hashref.  Never croaks.
+
+=head3 EXAMPLE
+
+    my $models = decode_json(Mojo::File->new($model_path)->slurp);
+    my $cache  = Database::BI::Model::Geocode->shared_cache_from_models($models);
+
+    # $cache is now { 'Ramsgate' => [51.336, 1.416], 'Paris' => 0, ... }
+
+=cut
+
+sub shared_cache_from_models {
+	my ($class, $models) = @_;
+
+	my $entry = (ref($models) eq 'HASH') ? $models->{'geo'}{$SHARED_CACHE_KEY} : undef;
+
+	return {} unless ref($entry) eq 'HASH' && (ref($entry->{'places'}) eq 'HASH');
+
+	return { %{ $entry->{'places'} } };
+}
+
+=head2 models_with_shared_cache
+
+    my $updated_models = Database::BI::Model::Geocode->models_with_shared_cache(
+        \%models, \%cache,
+        backend => 'OpenAddresses',
+        built   => '2026-10-18T12:00:00',
+    );
+
+Produce a new model store in which the shared place cache holds C<\%cache>.
+The cache is B<merged>, not replaced: a request writes back every place it
+saw, and another request may have answered a different place since this one
+read the store.  Other model keys, and every per-dataset C<geo> entry, are
+carried over unchanged.
+
+This module never writes the file, and does not add a per-dataset entry.  The
+caller passes the result to C<_write_models()> or its equivalent, where the
+writability and C<data_dir> guards live.
+
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+    \%models => hashref, required;  the existing model store (not modified)
+    \%cache  => hashref, required;  { place => [lat, lon] | 0 }
+    backend  => string, optional;   name of the geocoder backend that resolved
+    built    => string, optional;   ISO-8601 timestamp of the cache update
+
+=head4 OUTPUT
+
+Returns a new hashref.  The caller's C<\%models> is never modified.
+
+    {
+        ...all existing model keys...,
+        geo => {
+            ...all existing per-dataset entries...,
+            shared => {
+                places  => \%merged_cache,
+                backend => $backend,  # if supplied
+                built   => $built,    # if supplied
+            },
+        },
+    }
+
+=head3 EXAMPLE
+
+    my $updated = Database::BI::Model::Geocode->models_with_shared_cache(
+        $models,
+        $result->{'cache'},
+        backend => $result->{'backend'},
+        built   => '2026-10-18T09:15:42',
+    );
+
+    Mojo::File->new($model_path)->spew(encode_json($updated));
+
+=cut
+
+sub models_with_shared_cache {
+	my ($class, $models, $cache, %meta) = @_;
+
+	# Merge over what is already shared: the request may have read the store
+	# before another one resolved a place, and replacing the entry would lose
+	# that answer for every dataset rather than just this request.
+	my %places = (
+		%{ $class->shared_cache_from_models($models) },
+		%{ (ref($cache) eq 'HASH') ? $cache : {} },
+	);
+
+	my $spec = { %{ (ref($models) eq 'HASH') ? ($models->{'geo'}{$SHARED_CACHE_KEY} // {}) : {} } };
+
+	$spec->{'places'} = \%places;
+
+	for my $key (qw(backend built)) {
+		$spec->{$key} = $meta{$key} if defined($meta{$key});
+	}
+
+	my %updated = %{ (ref($models) eq 'HASH') ? $models : {} };
+
+	$updated{'geo'} = { %{ $updated{'geo'} // {} }, $SHARED_CACHE_KEY => $spec };
 
 	return \%updated;
 }

@@ -4,7 +4,7 @@
       "Robert Rothenberg <perl@rhizomnic.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150014",
+   "generated_by" : "Dist::Zilla version 6.040, CPAN::Meta::Converter version 2.150014",
    "keywords" : [
       "Aho-Corasick",
       "Boyer-Moore",
@@ -100,6 +100,7 @@
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
             "Module::Metadata" : "0",
+            "Object::Pad::MOP::Class" : "0",
             "Test2::Tools::Compare" : "0",
             "Test2::Tools::Exception" : "0",
             "Test2::V0" : "0",
@@ -112,7 +113,7 @@
    "provides" : {
       "Algorithm::UrataniTakeda" : {
          "file" : "lib/Algorithm/UrataniTakeda.pm",
-         "version" : "v0.1.6"
+         "version" : "v0.1.7"
       }
    },
    "release_status" : "stable",
@@ -126,10 +127,10 @@
          "web" : "https://github.com/robrwo/perl-Algorithm-UrataniTakeda"
       }
    },
-   "version" : "v0.1.6",
+   "version" : "v0.1.7",
    "x_authority" : "cpan:RRWO",
    "x_generated_by_perl" : "v5.42.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.42",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.80",
    "x_spdx_expression" : "Artistic-2.0",
    "x_static_install" : 1
 }

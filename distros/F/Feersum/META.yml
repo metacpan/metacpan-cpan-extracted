@@ -4,8 +4,12 @@ author:
   - 'Jeremy Stashewsky <stash@cpan.org>'
 build_requires:
   AnyEvent: '5.261'
+  JSON::XS: '2'
   Test::Fatal: '0.003'
+  Test::LeakTrace: '0.13'
   Test::More: '0.94'
+  Test::SharedFork: '0.25'
+  Test::TCP: '1.12'
 configure_requires:
   EV: '4'
   EV::MakeMaker: '0'
@@ -28,7 +32,7 @@ no_index:
 provides:
   Feersum:
     file: lib/Feersum.pm
-    version: '1.507'
+    version: '1.509'
   Feersum::Connection:
     file: lib/Feersum/Connection.pm
   Feersum::Connection::Handle:
@@ -44,17 +48,17 @@ provides:
 recommends:
   Alien::OpenSSL: '0'
   Alien::nghttp2: '0'
-  Plack: '0.995'
 requires:
   EV: '4'
   File::Spec: '0'
   Guard: '1.012'
   List::Util: '1.33'
+  Plack: '0.995'
   Scalar::Util: '1.19'
   perl: '5.014'
 resources:
   bugtracker: https://github.com/stash/Feersum/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/vividsnow/Feersum.git
-version: '1.507'
+version: '1.509'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

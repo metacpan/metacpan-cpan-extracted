@@ -29,17 +29,17 @@ use ClickHouse::Encoder;
                                    comment => "event kind" }],
         ],
         engine => 'MergeTree', order_by => '(id, ts)',
-        ttl    => 'ts + INTERVAL 30 DAY',
+        ttl    => 'ts + interval 30 day',
     );
     like($sql, qr/`ts` DateTime codec\(DoubleDelta, LZ4\)/,
          'per-column codec rendered');
     like($sql, qr/`kind` String default 'unknown' comment 'event kind'/,
          'default + comment rendered in order');
-    like($sql, qr/\nttl ts \+ INTERVAL 30 DAY/,
-         'table-level TTL clause rendered');
+    like($sql, qr/\nttl ts \+ interval 30 day/,
+         'table-level ttl clause rendered');
 }
 
-# MATERIALIZED and ALIAS each render with their keyword.
+# materialized and alias each render with their keyword.
 {
     my $sql = ClickHouse::Encoder->format_create_table(
         table   => 't',
@@ -53,16 +53,16 @@ use ClickHouse::Encoder;
     like($sql, qr/`c` Int32 alias a \+ 1/,        'alias column');
 }
 
-# A per-column TTL plus codec, both present.
+# A per-column ttl plus codec, both present.
 {
     my $sql = ClickHouse::Encoder->format_create_table(
         table   => 't',
         columns => [
             ['payload', 'String', { codec => 'ZSTD(3)',
-                                    ttl   => 'event_date + INTERVAL 7 DAY' }],
+                                    ttl   => 'event_date + interval 7 day' }],
         ],
     );
-    like($sql, qr/`payload` String codec\(ZSTD\(3\)\) ttl event_date \+ INTERVAL 7 DAY/,
+    like($sql, qr/`payload` String codec\(ZSTD\(3\)\) ttl event_date \+ interval 7 day/,
          'per-column codec then ttl');
 }
 
@@ -110,7 +110,7 @@ use ClickHouse::Encoder;
         primary_key  => 'id',
         order_by     => '(id, ts)',
         sample_by    => 'id',
-        ttl          => 'ts + INTERVAL 30 DAY',
+        ttl          => 'ts + interval 30 day',
         settings     => 'index_granularity = 8192',
     );
     like($sql, qr/sample by id/, 'format_create_table emits sample by');
@@ -120,7 +120,7 @@ use ClickHouse::Encoder;
     is($p->{primary_key},  'id',                       'roundtrip: primary_key');
     is($p->{order_by},     '(id, ts)',                 'roundtrip: order_by');
     is($p->{sample_by},    'id',                       'roundtrip: sample_by');
-    is($p->{ttl},          'ts + INTERVAL 30 DAY',     'roundtrip: ttl');
+    is($p->{ttl},          'ts + interval 30 day',     'roundtrip: ttl');
     is($p->{settings},     'index_granularity = 8192', 'roundtrip: settings');
 }
 

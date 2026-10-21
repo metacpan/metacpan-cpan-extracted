@@ -88,6 +88,21 @@ tkn_zone_words(pTHX_ tkn_lexicon *L, SV *anchor)
                 if (SvUTF8(key))
                     SvUTF8_on(first);
                 (void)hv_store_ent(set, first, &PL_sv_yes, 0);
+                /* and every word of it, marked "\2", for the words after the first */
+                {
+                    STRLEN a = 0, q;
+                    for (q = 0; q <= kl; q++)
+                        if (q == kl || kb[q] == ' ') {
+                            if (q > a) {
+                                SV *wd = sv_2mortal(newSVpvs("\2"));
+                                sv_catpvn(wd, kb + a, q - a);
+                                if (SvUTF8(key))
+                                    SvUTF8_on(wd);
+                                (void)hv_store_ent(set, wd, &PL_sv_yes, 0);
+                            }
+                            a = q + 1;
+                        }
+                }
             }
         }
     }
@@ -138,8 +153,24 @@ tkn_zone_may_be(pTHX_ tkn_lexicon *L, SV *anchor, SV *cand)
     first = sv_2mortal(newSVpvn(kb, sp ? (STRLEN)(sp - kb) : kl));
     if (SvUTF8(key))
         SvUTF8_on(first);
-    if (hv_exists_ent(set, first, 0))
+    if (hv_exists_ent(set, first, 0)) {
+        /* each word after the first is in some zone's name too ("at 3 pm"
+           is not, though "AT" is Atlantic Time) */
+        STRLEN a = sp ? (STRLEN)(sp - kb) + 1 : kl, q;
+        for (q = a; q <= kl; q++)
+            if (q == kl || kb[q] == ' ') {
+                if (q > a) {
+                    SV *wd = sv_2mortal(newSVpvs("\2"));
+                    sv_catpvn(wd, kb + a, q - a);
+                    if (SvUTF8(key))
+                        SvUTF8_on(wd);
+                    if (!hv_exists_ent(set, wd, 0))
+                        return 0;
+                }
+                a = q + 1;
+            }
         return 1;
+    }
     gmt = hv_fetchs(set, "\1", 0);
     if (gmt) {
         STRLEN gl;

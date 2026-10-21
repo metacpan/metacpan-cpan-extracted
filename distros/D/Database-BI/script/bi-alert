@@ -1,0 +1,277 @@
+#!/usr/bin/env perl
+# bi-alert -- Phase 4.3 digest and threshold CLI for Database::BI
+#
+# Evaluates one saved analysis's measures and optionally mails a digest
+# when a threshold condition is crossed.  Scheduling is handled by cron;
+# this script is deliberately stateless.
+#
+# Usage:
+#   bi-alert --analysis <id> [--threshold <alias>:<op>:<value>]
+#             [--model-dir <dir>] [--data-dir <dir>] [--dry-run]
+#
+# Exit codes:  0 = ok / threshold not crossed
+#              1 = threshold crossed (or no threshold; digest printed)
+#              2 = error (bad args, analysis not found, data unavailable)
+
+use strict;
+use warnings;
+
+use Getopt::Long qw(GetOptions :config no_ignore_case);
+use File::Spec;
+use Mojo::JSON qw(decode_json encode_json);
+use Mojo::File;
+use List::Util qw(sum);
+use Scalar::Util qw(looks_like_number);
+
+# ---------------------------------------------------------------------------
+# Parse arguments
+# ---------------------------------------------------------------------------
+
+my ($opt_id, $opt_threshold, $opt_model_dir, $opt_data_dir, $opt_dry_run, $opt_help);
+
+GetOptions(
+	'analysis|a=s'    => \$opt_id,
+	'threshold|t=s'   => \$opt_threshold,
+	'model-dir|m=s'   => \$opt_model_dir,
+	'data-dir|d=s'    => \$opt_data_dir,
+	'dry-run|n'       => \$opt_dry_run,
+	'help|h'          => \$opt_help,
+) or do { usage(); exit 2 };
+
+if ($opt_help) { usage(); exit 0 }
+
+unless (defined $opt_id && length $opt_id) {
+	warn "bi-alert: --analysis <id> is required\n";
+	exit 2;
+}
+
+my $model_dir = $opt_model_dir // '.bi';
+my $data_dir  = $opt_data_dir  // 'data';
+
+# ---------------------------------------------------------------------------
+# Load analysis
+# ---------------------------------------------------------------------------
+
+my $analyses_path = File::Spec->catfile($model_dir, 'analyses.json');
+unless (-f $analyses_path) {
+	warn "bi-alert: analyses file not found: $analyses_path\n";
+	exit 2;
+}
+
+my $analyses_json = eval { Mojo::File->new($analyses_path)->slurp };
+unless (defined $analyses_json) {
+	warn "bi-alert: cannot read $analyses_path: $!\n";
+	exit 2;
+}
+
+my $analyses = eval { decode_json($analyses_json) };
+if ($@ || !$analyses) {
+	warn "bi-alert: cannot parse $analyses_path: $@\n";
+	exit 2;
+}
+
+my $a = $analyses->{$opt_id};
+unless (defined $a) {
+	warn "bi-alert: analysis '$opt_id' not found\n";
+	exit 2;
+}
+
+# ---------------------------------------------------------------------------
+# Open the primary dataset
+# ---------------------------------------------------------------------------
+
+my @datasets = @{ $a->{datasets} // [] };
+unless (@datasets) {
+	warn "bi-alert: analysis '$opt_id' has no datasets\n";
+	exit 2;
+}
+
+my $spec = $datasets[0]{spec} // '';
+unless ($spec =~ /\A(?:table|path):/) {
+	warn "bi-alert: dataset spec '$spec' is not a local file spec\n";
+	exit 2;
+}
+
+my $file_path;
+if ($spec =~ /\Atable:(.+)\z/) {
+	my $table = $1;
+	for my $ext (qw(csv tsv psv xlsx xml sql sqlite sqlite3 db)) {
+		my $p = File::Spec->catfile($data_dir, "$table.$ext");
+		if (-f $p) { $file_path = $p; last }
+	}
+} elsif ($spec =~ /\Apath:(.+)\z/) {
+	$file_path = $1;
+}
+
+unless (defined $file_path && -f $file_path) {
+	warn "bi-alert: cannot locate data file for spec '$spec'\n";
+	exit 2;
+}
+
+# Load records via Database::Abstraction through DataSource if available,
+# otherwise fall back to a simple CSV parse for the most common case.
+my ($records, $columns);
+eval {
+	require Database::BI::Model::DataSource;
+	my $src = Database::BI::Model::DataSource->new(
+		file   => $file_path,
+		table  => do { (my $t = $file_path) =~ s/.*\///; $t =~ s/\.[^.]+\z//; $t },
+		directory => do { (my $d = $file_path) =~ s|/[^/]+\z||; $d },
+	);
+	$records = $src->fetch_all // [];
+	$columns = $src->columns // [sort keys %{ $records->[0] // {} }];
+};
+if ($@) {
+	# Minimal CSV fallback so the script works even without the full stack.
+	eval { require Text::CSV_XS } or do { require Text::CSV };
+	my $csv_class = $INC{'Text/CSV_XS.pm'} ? 'Text::CSV_XS' : 'Text::CSV';
+	eval {
+		my $csv = $csv_class->new({ binary => 1, auto_diag => 1 });
+		open(my $fh, '<:utf8', $file_path) or die $!;
+		$columns = $csv->getline($fh);
+		$records = [];
+		while (my $row = $csv->getline($fh)) {
+			my %h;
+			@h{@$columns} = @$row;
+			push @$records, \%h;
+		}
+		close $fh;
+	};
+	if ($@) {
+		warn "bi-alert: cannot read data file '$file_path': $@\n";
+		exit 2;
+	}
+}
+
+my $row_count = scalar @$records;
+
+# ---------------------------------------------------------------------------
+# Evaluate measures (Phase 2 vocabulary: sum avg min max count count_distinct)
+# ---------------------------------------------------------------------------
+
+# Build a simple measure result hashref keyed by alias.
+my @measures = @{ $a->{measures} // [] };
+
+# Pull measures from visuals if not at top level.
+unless (@measures) {
+	for my $vis (@{ $a->{visuals} // [] }) {
+		push @measures, @{ $vis->{measures} // [] };
+	}
+}
+
+my %results;
+for my $m (@measures) {
+	my $col   = $m->{col}  // $m->{column} // '';
+	my $fn    = $m->{fn}   // $m->{func}   // 'count';
+	my $alias = $m->{as}   // $m->{alias}  // "${col}_${fn}";
+	next unless length $alias;
+
+	my @vals = map { $_->{$col} } @$records;
+
+	if ($fn eq 'count') {
+		$results{$alias} = scalar @$records;
+	} elsif ($fn eq 'count_distinct') {
+		my %seen;
+		$results{$alias} = scalar grep { !$seen{$_}++ } @vals;
+	} else {
+		my @nums = grep { defined $_ && looks_like_number($_) } @vals;
+		if ($fn eq 'sum') {
+			$results{$alias} = @nums ? sum(@nums) : 0;
+		} elsif ($fn eq 'avg') {
+			$results{$alias} = @nums ? sum(@nums) / scalar(@nums) : 0;
+		} elsif ($fn eq 'min') {
+			if (@nums) {
+				my $v = $nums[0]; $v = $_ < $v ? $_ : $v for @nums;
+				$results{$alias} = $v;
+			}
+		} elsif ($fn eq 'max') {
+			if (@nums) {
+				my $v = $nums[0]; $v = $_ > $v ? $_ : $v for @nums;
+				$results{$alias} = $v;
+			}
+		}
+	}
+}
+
+# Also add a 'count' shortcut for the total rows.
+$results{count} //= $row_count;
+
+# ---------------------------------------------------------------------------
+# Print digest
+# ---------------------------------------------------------------------------
+
+print "Analysis: ${\$a->{name}}\n";
+print "Rows:     $row_count\n";
+if (%results) {
+	print "Measures:\n";
+	for my $k (sort keys %results) {
+		my $v = defined $results{$k} ? $results{$k} : '(null)';
+		print "  $k = $v\n";
+	}
+} else {
+	print "No measures configured.\n";
+}
+
+# ---------------------------------------------------------------------------
+# Evaluate threshold
+# ---------------------------------------------------------------------------
+
+my $threshold_crossed = 0;
+
+if (defined $opt_threshold && length $opt_threshold) {
+	unless ($opt_threshold =~ /\A([^:]+):([^:]+):(.+)\z/) {
+		warn "bi-alert: --threshold must be <measure>:<op>:<value> (e.g. count:gt:1000)\n";
+		exit 2;
+	}
+	my ($alias, $op, $tval) = ($1, $2, $3);
+	my $actual = $results{$alias};
+	unless (defined $actual) {
+		warn "bi-alert: measure alias '$alias' not found in results\n";
+		exit 2;
+	}
+	my %ops = (
+		gt => sub { $_[0] >  $_[1] },
+		ge => sub { $_[0] >= $_[1] },
+		lt => sub { $_[0] <  $_[1] },
+		le => sub { $_[0] <= $_[1] },
+		eq => sub { $_[0] == $_[1] },
+		ne => sub { $_[0] != $_[1] },
+	);
+	unless (exists $ops{$op}) {
+		warn "bi-alert: unsupported operator '$op'; allowed: gt ge lt le eq ne\n";
+		exit 2;
+	}
+	if ($ops{$op}->($actual, $tval)) {
+		$threshold_crossed = 1;
+		print "THRESHOLD CROSSED: $alias ($actual) $op $tval\n";
+		# TODO: send mail digest via configured mailer when --dry-run is not set.
+		if ($opt_dry_run) {
+			print "[dry-run] Would send digest mail here.\n";
+		}
+	} else {
+		print "Threshold not crossed: $alias ($actual) $op $tval\n";
+	}
+}
+
+my $exit_code = $threshold_crossed ? 1 : 0;
+exit $exit_code;
+
+# ---------------------------------------------------------------------------
+
+sub usage {
+	print <<'USAGE';
+Usage: bi-alert --analysis <id> [OPTIONS]
+
+  --analysis, -a <id>           Analysis id (required)
+  --threshold, -t <m>:<op>:<v>  Threshold: measure alias, operator (gt|ge|lt|le|eq|ne), value
+  --model-dir, -m <dir>         Model directory containing analyses.json (default: .bi)
+  --data-dir,  -d <dir>         Data directory (default: data)
+  --dry-run,   -n               Print digest without sending mail
+  --help,      -h               Show this help
+
+Exit codes:
+  0  OK; threshold not crossed (or no threshold specified)
+  1  Threshold crossed
+  2  Error
+USAGE
+}

@@ -2,7 +2,7 @@ package Mail::DKIM2::Verifier;
 use strict;
 use warnings;
 
-our $VERSION = '0.25';
+our $VERSION = '0.27';
 
 use base 'Mail::DKIM2::HeaderParser';
 use Crypt::Digest::SHA256 qw(sha256);
@@ -66,7 +66,8 @@ our $PREFETCH_MAX = 8;
 
 sub known_options {
     return qw(SkipTimestampCheck AllowUnsignedMI MidProcess HeadersOnly
-              PubkeyCallback Resolver IgnorePrefixes NextDomainOK StreamBody);
+              PubkeyCallback Resolver IgnorePrefixes NextDomainOK StreamBody
+              InstancesOnly);
 }
 
 sub init {
@@ -79,7 +80,8 @@ sub init {
     $self->{details}             = undef;
     $self->{diagnostic}          = undef;
     # Options the constructor was given stay; the rest get their defaults.
-    $self->{$_} //= 0 for qw(SkipTimestampCheck MidProcess AllowUnsignedMI HeadersOnly);
+    $self->{$_} //= 0 for qw(SkipTimestampCheck MidProcess AllowUnsignedMI HeadersOnly
+                             InstancesOnly);
     $self->{StreamBody} //= 1;
     check_ignore_prefixes($self->{IgnorePrefixes});
 }
@@ -141,6 +143,16 @@ sub headers_only {
     my ($self, $val) = @_;
     $self->{HeadersOnly} = $val if defined $val;
     return $self->{HeadersOnly};
+}
+
+# instances_only: check the Message-Instance chain and stop there, for a
+# caller that has had the signatures verified already (Gate's VerifyResult).
+# The result is 'pass' when the chain is intact. The signatures are not
+# checked, so an instance none of them covers is no fault here either.
+sub instances_only {
+    my ($self, $val) = @_;
+    $self->{InstancesOnly} = $val if defined $val;
+    return $self->{InstancesOnly};
 }
 
 # stream_body: hash every instance's body as the body arrives, and work out
@@ -225,19 +237,19 @@ sub finish_header {
         return;
     }
 
-    # With no signature the verdict is already known -- 'none' (a structure
-    # fault, such as the unsigned-instance PERMERROR, has stopped above) --
-    # and finish_body reaches it before it looks at the body, so do not keep
-    # one. Most mail carries no DKIM2 at
-    # all, and a verifier run on every message would otherwise hold a copy
-    # of each.
-    unless (%{$self->{_dk2_headers}}) {
+    # With no DKIM2 field at all the verdict is 'none' already, so the body
+    # is not kept: most mail carries no DKIM2, and a verifier run on every
+    # message would otherwise hold a copy of each. Instances with no
+    # signature (AllowUnsignedMI, MidProcess, InstancesOnly: anything else
+    # has stopped above) still have their chain walked.
+    unless (%{$self->{_dk2_headers}} || %{$self->{_mi_headers}}) {
         $self->finish_body;
         $self->stop;
         return;
     }
 
-    $self->_prefetch_keys;
+    $self->_prefetch_keys
+        if %{$self->{_dk2_headers}} && !$self->{InstancesOnly};
 
     $self->_start_plans if $self->{StreamBody} && !$self->{HeadersOnly};
 }
@@ -250,15 +262,17 @@ sub finish_header {
 sub _structure_error {
     my ($self) = @_;
     my $numbers = $self->{_numbers};
+    # InstancesOnly: the signatures are the caller's, so only their count.
+    my $sigs = !$self->{InstancesOnly};
     my %mi  = %{$self->{_mi_headers}};
-    my %dk2 = %{$self->{_dk2_headers}};
+    my %dk2 = $sigs ? %{$self->{_dk2_headers}} : ();
     my $error = chain_length_error($self->{_chain_counts})              # a
         // $self->{_mi_unusable}                                        # b
         // duplicate_number_error('Message-Instance', 'm',              # c
                @{$numbers->{'message-instance'} || []})
-        // $self->{_sig_unusable}                                       # d
-        // duplicate_number_error('DKIM2-Signature', 'i',               # e
-               @{$numbers->{'dkim2-signature'} || []});
+        // ($sigs ? $self->{_sig_unusable} : undef)                     # d
+        // ($sigs ? duplicate_number_error('DKIM2-Signature', 'i',      # e
+               @{$numbers->{'dkim2-signature'} || []}) : undef);
     return $error if $error;
 
     # f: every instance from m=1 up to the highest there is, or the highest
@@ -275,7 +289,8 @@ sub _structure_error {
     # g: an instance above every signature's m= is one nothing vouches for.
     # Not for an outbound signer (AllowUnsignedMI: it holds the instance it
     # is about to sign) or a partial chain view (MidProcess).
-    if (defined $max_v && !$self->{AllowUnsignedMI} && !$self->{MidProcess}) {
+    if (defined $max_v && !$self->{AllowUnsignedMI} && !$self->{MidProcess}
+        && !$self->{InstancesOnly}) {
         my ($top_signed) = sort { $b <=> $a } grep { defined }
                            map { $_->{sig}->version } values %dk2;
         return "PERMERROR: Message-Instance m=$max_v is not signed"
@@ -330,17 +345,15 @@ sub finish_body {
         return $self->_outcome($error);
     }
 
-    unless (keys %dk2_map) {
-        $self->{result} = 'none';
-        $self->{details} = 'no DKIM2-Signature headers found';
-        return;
-    }
-
+    # The Message-Instances first, then the signatures over them: a
+    # signature is worth checking, and its key worth fetching, only over
+    # instances that describe the message.
+    #
     # Section 14.2, content: every Message-Instance on its own, by ascending
-    # m= (contract C9) -- its tag list, then a duplicate hash algorithm, then
-    # its Recipe (MessageInstance->parse checks in that order), then the
-    # Recipe's copy ranges -- before any signature is worked out. Only the
-    # bound a message gives a range is left for the chain walk.
+    # m= -- its tag list, then a duplicate hash algorithm, then its Recipe
+    # (MessageInstance->parse checks in that order), then the Recipe's copy
+    # ranges. Only the bound a message gives a range is left for the chain
+    # walk.
     for my $v (sort { $a <=> $b } keys %mi_map) {
         (my $value = $mi_map{$v}) =~ s/\A[^:]*:[ \t]*//;
         my $obj = eval { Mail::DKIM2::MessageInstance->parse($value) };
@@ -350,6 +363,41 @@ sub finish_body {
             $self->{diagnostic} = $why;
             return $self->_error(permerror => "Message-Instance m=$v contains invalid JSON");
         }
+    }
+
+    # Section 14.7: walk the chain. Verify the top instance against the
+    # current content, then undo each instance and verify the reconstructed
+    # content against the next one down, until m=1; past an instance with a
+    # null body Recipe (previous body unrecoverable) the walk continues over
+    # the header history only. Top down, so the highest instance that fails
+    # is the one reported.
+    #
+    # MessageInstance::parse() dies (rather than returning an error) on a
+    # malformed r= payload -- e.g. the §14.2 invalid-JSON PERMERROR -- so
+    # this must run under eval or that die would propagate uncaught out of
+    # finish_body() and crash the caller instead of yielding a clean
+    # permerror result.
+    my $mi_chain_ok = eval {
+        $self->{HeadersOnly} ? $self->_verify_top_mi_headers() : $self->_verify_mi_chain()
+    };
+    if (my $err = $@) {
+        die $err if ref $err;
+        chomp $err;
+        return $self->_outcome($err);
+    }
+    return unless $mi_chain_ok;
+
+    if ($self->{InstancesOnly}) {
+        my $top = (sort { $b <=> $a } keys %mi_map)[0];
+        @{$self}{qw(result details)} = $top
+            ? ('pass', "Message-Instance m=1..$top intact")
+            : ('none', 'no Message-Instance headers found');
+        return;
+    }
+    unless (keys %dk2_map) {
+        $self->{result} = 'none';
+        $self->{details} = 'no DKIM2-Signature headers found';
+        return;
     }
 
     my $max_i = (sort { $b <=> $a } keys %dk2_map)[0];
@@ -406,28 +454,6 @@ sub finish_body {
     for my $i (1..$max_i) {
         return unless $self->_check_sig_crypto($i);
     }
-
-    # §13.7: the cryptographic chain proves the MI headers are authentic, but
-    # NOT that the current body/headers still match them. Walk the MI chain:
-    # verify the top instance against the current content, then undo each
-    # instance and verify the reconstructed content against the next one down,
-    # until m=1; past an instance with a null body Recipe (previous body
-    # unrecoverable) the walk continues over the header history only.
-    #
-    # MessageInstance::parse() dies (rather than returning an error) on a
-    # malformed r= payload -- e.g. the §14.2 invalid-JSON PERMERROR -- so
-    # this must run under eval or that die would propagate uncaught out of
-    # finish_body() and crash the caller instead of yielding a clean
-    # permerror result.
-    my $mi_chain_ok = eval {
-        $self->{HeadersOnly} ? $self->_verify_top_mi_headers() : $self->_verify_mi_chain()
-    };
-    if (my $err = $@) {
-        die $err if ref $err;
-        chomp $err;
-        return $self->_outcome($err);
-    }
-    return unless $mi_chain_ok;
 
     # -07 section 11, 14.8: every From the message has had must be
     # Authentic for the signature that answers for it.
@@ -1289,8 +1315,10 @@ body is gone) only the header history is checked. The outcome is a result and
 a reason, never an exception; see C<result> below.
 
 Extends L<Mail::DKIM2::HeaderParser>, which provides C<PRINT>, C<CLOSE>,
-C<load> and the tie interface. A message with no DKIM2-Signature is decided
-from its headers alone and its body is not kept.
+C<load> and the tie interface. The Message-Instances are checked first and
+the signatures over them second, so no key is needed to refuse a message
+whose instances do not describe it. A message with no DKIM2 field at all is
+decided from its headers alone and its body is not kept.
 
 This module implements draft-ietf-dkim-dkim2-spec-07; see L<Mail::DKIM2/STATUS>
 for what that means for the wire format and the API, and
@@ -1374,6 +1402,14 @@ signatures stripped (as the validator does walking the chain top-down), so
 the highest remaining signature is not the true top and the checks that
 apply only to the top are suppressed. Implies C<AllowUnsignedMI>.
 
+=item InstancesOnly
+
+Check the shape of the chain and the Message-Instances, and stop: for a
+caller that has had the signatures verified already. No key is fetched, an
+instance no signature covers is allowed, and the result is C<pass>
+(details C<"Message-Instance m=1..N intact">) when the instances match the
+message, C<none> when there are none.
+
 =item StreamBody
 
 On (the default): hash every Message-Instance's body as the body arrives,
@@ -1418,8 +1454,11 @@ Message-Instance does not match the content it describes.
 
 =item C<none>
 
-No DKIM2-Signature header fields (and no Message-Instance either: a
-Message-Instance with no signature is "is not signed", a C<permerror>).
+No DKIM2-Signature header fields. With no Message-Instance either; or,
+under C<AllowUnsignedMI> or C<MidProcess>, with Message-Instances that
+match the message (one that does not is the C<fail> or C<permerror> the
+walk found). Otherwise a Message-Instance with no signature is "is not
+signed", a C<permerror>.
 
 =item C<permerror>
 
@@ -1502,7 +1541,7 @@ strings in one RR are joined), C<has a syntax error> and C<has been
 revoked> (see L<Mail::DKIM2::Common/parse_dkim_key_record>), or
 C<algorithm mismatch> (a C<k=> that is not the signature algorithm's).
 
-=head2 resolver([$resolver]), set_pubkey_callback(\&cb), skip_timestamp_check([$bool]), allow_unsigned_mi([$bool]), next_domain_ok([$domain]), mid_process([$bool]), headers_only([$bool]), stream_body([$bool])
+=head2 resolver([$resolver]), set_pubkey_callback(\&cb), skip_timestamp_check([$bool]), allow_unsigned_mi([$bool]), next_domain_ok([$domain]), mid_process([$bool]), headers_only([$bool]), instances_only([$bool]), stream_body([$bool])
 
 Get or set the constructor options of the same names.
 
@@ -1529,6 +1568,17 @@ the highest instance, or the highest a signature covers.
 
 =item 3.
 
+B<Content.> Each Message-Instance's tags and Recipe, by ascending C<m=>.
+Then the top Message-Instance must match the message; its Recipe is applied
+and the next instance down checked against the result, back to C<m=1>;
+past an instance with a null body Recipe the walk continues over the
+header history only. All of this comes before any signature is looked at,
+so a message whose instances do not describe it is refused without a key
+being fetched, and a hash that does not match is the error reported
+whatever is wrong with the signatures.
+
+=item 4.
+
 B<Each signature.> Its tags (C<i=>, C<m=>, C<t=>, C<d=>, C<s=>, and either
 C<nd=> or both C<mf=> and C<rt=>), its timestamp (no more than 14 days
 before now, no more than a day after), then its signature: the signing input for C<i=K> is the canonicalized
@@ -1538,7 +1588,7 @@ headers below it, and itself with an empty C<s=> value, in that order
 whose key can be fetched is checked and must verify; an item whose key is absent is
 skipped if another item verifies.
 
-=item 4.
+=item 5.
 
 B<Chain of custody> (-07 section 7.1). After an C<nd=> hop, the next
 C<d=> must be the C<nd=> domain. Otherwise an C<nd=> hop, or one with a
@@ -1546,13 +1596,6 @@ null C<mf=>, must have its C<d=> the same as or above a C<rt=> domain of
 the hop before; any other hop its C<mf=> domain the same as or below one.
 Every non-null C<mf=> must be the same as or below its own C<d=>. Domains
 are compared as A-labels; a domain literal never matches.
-
-=item 5.
-
-B<Content.> The top Message-Instance must match the message; its Recipe
-is applied and the next instance down checked against the result, back to
-C<m=1>; past an instance with a null body Recipe the walk continues over the
-header history only.
 
 =item 6.
 

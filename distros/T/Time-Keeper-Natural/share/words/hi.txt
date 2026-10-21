@@ -5,15 +5,33 @@
 #
 # Hindi puts "end" after the period with a postposition, and the period goes
 # into the oblique case, which CLDR has only where its own word already is
-# ("इस माह"); "अगले माह का अंत" is not read. A time takes no word. An ordinal
-# weekday is not read.
+# ("इस माह"): the aliases put the others back ("अगले माह का अंत"). A time takes
+# no word. An ordinal weekday is not read.
+#
+# 0.02's keys: Ranges, the day before or after a point, the weekend (Sunday alone in India)
+# and an ordinal weekday with the month first read. Hindi puts the point before a
+# duration, which after and before do not take.
 start_of	{0} की शुरुआत|{0} के शुरू में|{0} की शुरुआत में
 end_of	{0} का अंत|{0} के अंत में|{0} के आखिर में
 at
 on	{0} को
 skip
 and
+alias	अगले माह=अगला माह|पिछले माह=पिछला माह|अगले वर्ष=अगला वर्ष|पिछले वर्ष=पिछला वर्ष|अगले सप्ताह=अगला सप्ताह|पिछले सप्ताह=पिछला सप्ताह
+range	{0} से {1} तक|{0} से {1}
+after	{0} के अगले दिन
+before	{0} से एक दिन पहले
+weekend	सप्ताहांत
+nth	{period} का {n} {weekday}|{period} के {n} {weekday}
+last	आखिरी|अंतिम
 # test: इस माह का अंत => 2026-10-31T23:59:59.999999999+00:00
 # test: अक्टूबर का अंत => 2026-10-31T23:59:59.999999999+00:00
 # test: 2027 की शुरुआत => 2027-01-01T00:00:00+00:00
 # test: मंगलवार को => 2026-10-20T00:00:00+01:00
+# test: अगले माह का अंत => 2026-11-30T23:59:59.999999999+00:00
+# test: सोमवार से शुक्रवार तक => 2026-10-19T00:00:00+01:00 / 2026-10-23T23:59:59.999999999+01:00
+# test: सोमवार के अगले दिन => 2026-10-20T00:00:00+01:00
+# test: सोमवार से एक दिन पहले => 2026-10-18T00:00:00+01:00
+# test: अगला सप्ताहांत => 2026-10-25T00:00:00+01:00
+# test: अगले माह का तीसरा शुक्रवार => 2026-11-20T00:00:00+00:00
+# test: अक्टूबर का आखिरी शुक्रवार => 2026-10-30T00:00:00+00:00

@@ -211,13 +211,12 @@ STATS
         "new_readonly", or the handle that called "freeze"), else 0.
 
 SHARING ACROSS PROCESSES
-    The filter lives in a shared mapping, shared the same three ways as the
-    rest of the family: a backing file (every process calls "new($path, ...)"
-    on the same path with a matching capacity), an anonymous mapping inherited
-    across "fork", or a memfd whose descriptor is passed to an unrelated
-    process (over a UNIX socket via "SCM_RIGHTS", or via "/proc/$pid/fd/$n")
-    and reopened with new_from_fd($fd). Because the mapping is shared, every
-    process adds into, tests against, and removes from the same table.
+    Processes in the same PID namespace share a mutable filter through a
+    backing file (every process calls "new($path, ...)" on the same path), an
+    anonymous mapping inherited across "fork", or a memfd whose descriptor is
+    passed to an unrelated process (over a UNIX socket via "SCM_RIGHTS", or
+    via "/proc/$pid/fd/$n") and reopened with new_from_fd($fd). Every process
+    adds into, tests against, and removes from the same table.
 
         # producer and consumer share one filter with no coordination
         my $cbf = Data::CountingBloomFilter::Shared->new(undef, 100_000);   # before fork
@@ -296,29 +295,28 @@ SECURITY
 CRASH SAFETY
     Mutation is guarded by a futex-based write-preferring rwlock with
     PID-encoded ownership; if a holder dies, the next contender detects the
-    dead owner and recovers. Each "add" and "remove" is a short sequence of
-    counter updates, so a crash leaves the filter consistent up to the last
-    completed operation. Limitation: PID reuse is not detected (very unlikely
-    in practice).
+    dead owner and recovers. Recovery does not roll back an interrupted
+    mutation: some of its counter updates may already be visible. Limitation:
+    PID reuse is not detected (very unlikely in practice).
 
     Reader-slot exhaustion (slotless readers): dead-process recovery
     attributes a crashed lock holder's contribution through its reader-slot.
-    The slot table holds 1024 entries (one per concurrent reader process). If
-    more than that many reader processes share one mapping at once, a reader
-    that cannot claim a slot proceeds "slotless" -- it still takes the read
-    lock but leaves no per-process record. If such a slotless reader is then
-    killed while holding the read lock, its share of the lock cannot be
-    attributed to a dead process, so writer recovery cannot reclaim it and
-    writers may block until the mapping is recreated. Reaching this needs more
-    than 1024 concurrent reader processes on one mapping plus a crash in the
-    brief read-lock window; the dead-process slot reclaim keeps the table from
-    filling with stale entries, so in practice it is very unlikely. Those
-    preconditions cover the live-process route only. The count lives in the
-    mapping and "new" validates the geometry, not this transient value, so a
-    backing file damaged at rest -- bit rot, a partial copy, or a process that
-    scribbled on the mapping -- can present a non-zero slotless count and
-    block every writer the same way, with none of the above. If writers hang
-    on a file no live reader is using, recreate it.
+    The slot table holds 1024 entries, claimed by handles that use the lock in
+    each process. If the table is full, a reader that cannot claim a slot
+    proceeds "slotless" -- it still takes the read lock but leaves no
+    per-process record. If such a slotless reader is then killed while holding
+    the read lock, its share of the lock cannot be attributed to a dead
+    process, so writer recovery cannot reclaim it and writers may block until
+    the mapping is recreated. Reaching this needs more than 1024 live handles
+    using one mapping plus a crash in the brief read-lock window; the
+    dead-process slot reclaim keeps the table from filling with stale entries,
+    so in practice it is very unlikely. Those preconditions cover the
+    live-process route only. The count lives in the mapping and "new"
+    validates the geometry, not this transient value, so a backing file
+    damaged at rest -- bit rot, a partial copy, or a process that scribbled on
+    the mapping -- can present a non-zero slotless count and block every
+    writer the same way, with none of the above. If writers hang on a file no
+    live reader is using, recreate it.
 
     An interrupted create is recovered too. A creator killed after the backing
     file is sized but before its header is committed leaves a full-size,

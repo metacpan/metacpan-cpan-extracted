@@ -4,11 +4,11 @@ author:
   - vividsnow
 build_requires:
   ExtUtils::MakeMaker: '0'
-  Test::More: '0'
+  Test::More: '0.88'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150014'
+generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150015'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,7 +21,7 @@ no_index:
 provides:
   Proxy::Impersonate:
     file: lib/Proxy/Impersonate.pm
-    version: '0.02'
+    version: '0.03'
   Proxy::Impersonate::Cert:
     file: lib/Proxy/Impersonate/Cert.pm
   Proxy::Impersonate::Connection:
@@ -29,12 +29,13 @@ provides:
   Proxy::Impersonate::HTTP:
     file: lib/Proxy/Impersonate/HTTP.pm
 requires:
-  Curl::Impersonate: '0.02'
+  Curl::Impersonate: '0.03'
   EV: '0'
+  File::Temp: '0.19'
   Net::SSLeay: '1.85'
   perl: '5.010'
 resources:
   bugtracker: https://github.com/vividsnow/perl5-proxy-impersonate/issues
   repository: https://github.com/vividsnow/perl5-proxy-impersonate.git
-version: '0.02'
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

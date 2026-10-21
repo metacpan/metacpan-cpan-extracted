@@ -1,5 +1,10 @@
 Revision history for Data::BitSet::Shared
 
+0.09  2026-10-16
+    - Recover safely when the backing filesystem is full.
+    - Improve set-bit enumeration and baseline CPU performance.
+    - Require writers to stop before freezing a segment.
+
 0.08  2026-09-26
     - Segments are reserved, so a full filesystem fails the constructor;
       DATA_BITSET_SHARED_SPARSE=1 skips the reservation.

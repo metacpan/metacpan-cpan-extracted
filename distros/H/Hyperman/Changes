@@ -1,5 +1,14 @@
 Revision history for Hyperman
 
+0.64	2026-10-21
+        - FIX: DATA sent in the same read as an Extended CONNECT's headers
+          was buffered as psgi.input and never reached the stream handle's
+          read half, so a WebSocket's first message over HTTP/2 was lost
+        - FIX: on io_uring with completion reads, the request after one
+          pipelined behind a streamed body was never read: the read armed
+          before the buffer was compacted landed at the old offset (t/27 on
+          every Linux smoker with liburing).
+
 0.63	2026-10-16
         - FIX: a build without nghttp2 or without OpenSSL did not compile:
           the HTTP/2 writer stub returned nothing and the QUIC context

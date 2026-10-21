@@ -35,7 +35,7 @@ entry has focus, then press Enter or Space to toggle it.</p>
 <p class="sr-only" id="stacked-live" role="status" aria-live="polite"></p>
 
 <div class="stacked-container">
-  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="[% d3_url | html %]"></script>
   [% chart_html %]
 </div>
 

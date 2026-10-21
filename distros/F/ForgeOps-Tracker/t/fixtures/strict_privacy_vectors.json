@@ -1,0 +1,267 @@
+{
+  "fingerprint": [
+    {
+      "message": "",
+      "normalized": "",
+      "fingerprint": "e3b0c44298fc1c149afbf4c8996fb924"
+    },
+    {
+      "message": "boom",
+      "normalized": "boom",
+      "fingerprint": "81f52337ebb4cb1669bb802c708807dd"
+    },
+    {
+      "message": "Couldn't find Invoice with id=8821",
+      "normalized": "Couldn't find Invoice with id=<n>",
+      "fingerprint": "b6959809369b97323c7852eaeb67d4ef"
+    },
+    {
+      "message": "Couldn't find Invoice with id=9004",
+      "normalized": "Couldn't find Invoice with id=<n>",
+      "fingerprint": "b6959809369b97323c7852eaeb67d4ef"
+    },
+    {
+      "message": "undefined method `email' for nil:NilClass",
+      "normalized": "undefined method `email' for nil:NilClass",
+      "fingerprint": "60b076de7cbd23bf4e9311af70d64049"
+    },
+    {
+      "message": "#<Order:0x00007f3a2c1b9e40> is invalid",
+      "normalized": "#<Order:0x> is invalid",
+      "fingerprint": "f9e9a066e3a72a7ef9af53dc4ecc2a9f"
+    },
+    {
+      "message": "user 123e4567-e89b-12d3-a456-426614174000 not found",
+      "normalized": "user <uuid> not found",
+      "fingerprint": "908d4ed1dc7e7232dd7a083a947ade4c"
+    },
+    {
+      "message": "USER 123E4567-E89B-12D3-A456-426614174000",
+      "normalized": "USER <uuid>",
+      "fingerprint": "338131b0ff726d27bf5e5ade3c3f45c8"
+    },
+    {
+      "message": "timeout after 5000ms",
+      "normalized": "timeout after 5000ms",
+      "fingerprint": "4e52cf5e91a3f018899278808dbad0ea"
+    },
+    {
+      "message": "v2.41.0 failed",
+      "normalized": "v2.<n>.<n> failed",
+      "fingerprint": "0ccab1c756871d215a8d790bda9d2c72"
+    },
+    {
+      "message": "abc123 _42 x9 42abc",
+      "normalized": "abc123 _42 x9 42abc",
+      "fingerprint": "9649bede7a441266a6f2b4b0434e9ac9"
+    },
+    {
+      "message": "port 5432; pid=17 (3 retries)",
+      "normalized": "port <n>; pid=<n> (<n> retries)",
+      "fingerprint": "6190a6cc730774b7f605bda426e92bfd"
+    },
+    {
+      "message": "-1 and +2 and 3.14",
+      "normalized": "-<n> and +<n> and <n>.<n>",
+      "fingerprint": "e4160b8d15ecc69009964e3b43ad6210"
+    },
+    {
+      "message": "0x12 is short, 0xABCDEF is not",
+      "normalized": "0x12 is short, 0x is not",
+      "fingerprint": "873efa2b33f5e58e320b3ef5eb787be6"
+    },
+    {
+      "message": "id_7 7_id 7",
+      "normalized": "id_7 7_id <n>",
+      "fingerprint": "fcd792500e209acded1f34d1ddda5bd8"
+    },
+    {
+      "message": "ünïcödé 42 日本 ٣ 99",
+      "normalized": "ünïcödé <n> 日本 ٣ <n>",
+      "fingerprint": "d25c872feec26e52f2ba88fcf0eb0493"
+    },
+    {
+      "message": "emoji 🎉 1 🎉",
+      "normalized": "emoji 🎉 <n> 🎉",
+      "fingerprint": "2de98db560df273c0d54cc35823876f6"
+    },
+    {
+      "message": "tab\t1\nnewline 2",
+      "normalized": "tab\t<n>\nnewline <n>",
+      "fingerprint": "9a9b376104b288aeedf8e1b64a967ea5"
+    },
+    {
+      "message": "uuid-like 123e4567-e89b-12d3-a456-42661417400 (too short)",
+      "normalized": "uuid-like 123e4567-e89b-12d3-a456-<n> (too short)",
+      "fingerprint": "542d1c18bb951191a8a3ed8b64e65f6a"
+    },
+    {
+      "message": "embedded123e4567-e89b-12d3-a456-426614174000",
+      "normalized": "embedded123e4567-e89b-12d3-a456-<n>",
+      "fingerprint": "ea90fe0f129741ce5f7c18522c9b458e"
+    },
+    {
+      "message": "deadbeef-dead-beef-dead-beefdeadbeef9",
+      "normalized": "deadbeef-dead-beef-dead-beefdeadbeef9",
+      "fingerprint": "7170eee52b8572cdf20868d8cdae3b1b"
+    }
+  ],
+  "span_name": [
+    {
+      "name": "GET https://api.example.com/patients/42?x=1",
+      "strict": "GET api.example.com"
+    },
+    {
+      "name": "POST api.stripe.com/v1/charges",
+      "strict": "POST api.stripe.com"
+    },
+    {
+      "name": "GET /patients/42/notes",
+      "strict": "GET /patients/:path"
+    },
+    {
+      "name": "DELETE http://10.0.0.5:8080/x/9",
+      "strict": "DELETE 10.0.0.5"
+    },
+    {
+      "name": "OrdersController#create",
+      "strict": "OrdersController#create"
+    },
+    {
+      "name": "SELECT orders",
+      "strict": "SELECT orders"
+    },
+    {
+      "name": "/patients/42",
+      "strict": "/patients/:path"
+    },
+    {
+      "name": "/patients/jane-doe-1961/chart?tab=2",
+      "strict": "/patients/:path"
+    },
+    {
+      "name": "GET https://api.example.com/pat<ients/jane",
+      "strict": "GET api.example.com"
+    },
+    {
+      "name": "GET user:pw@internal.example.com:8443/x",
+      "strict": "GET internal.example.com"
+    },
+    {
+      "name": "GET localhost:3000/a/1",
+      "strict": "GET localhost"
+    },
+    {
+      "name": "GET http://billing/charges/9",
+      "strict": "GET billing"
+    },
+    {
+      "name": "PUT /orders/17/items",
+      "strict": "PUT /orders/:path"
+    },
+    {
+      "name": "patients#show",
+      "strict": "patients#show"
+    },
+    {
+      "name": "GET https://user:p@ss@api.example.com/x",
+      "strict": "GET api.example.com"
+    }
+  ],
+  "path": [
+    {
+      "path": "/patients/42/notes?q=jane",
+      "strict": "/patients/:path"
+    },
+    {
+      "path": "/",
+      "strict": "/"
+    },
+    {
+      "path": "",
+      "strict": "/"
+    },
+    {
+      "path": "/checkout",
+      "strict": "/checkout"
+    },
+    {
+      "path": "/a/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/b",
+      "strict": "/a/:path"
+    },
+    {
+      "path": "/orders/abc-123#top",
+      "strict": "/orders/:path"
+    },
+    {
+      "path": "/patients/jane-doe/12",
+      "strict": "/patients/:path"
+    },
+    {
+      "path": "/patients/janedoe",
+      "strict": "/patients/:path"
+    },
+    {
+      "path": "/42/edit",
+      "strict": "/:id/:path"
+    },
+    {
+      "path": "/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "strict": "/:id"
+    },
+    {
+      "path": "//double//slash",
+      "strict": "/double/:path"
+    },
+    {
+      "path": "relative/path/x",
+      "strict": "relative/:path"
+    },
+    {
+      "path": "/patients/:id/notes",
+      "strict": "/patients/:id/notes"
+    },
+    {
+      "path": "/patients/{id}",
+      "strict": "/patients/{id}"
+    },
+    {
+      "path": "users/<int:id>/",
+      "strict": "users/<int:id>/"
+    },
+    {
+      "path": "/files/*path",
+      "strict": "/files/*path"
+    },
+    {
+      "path": "/posts/[slug]?x=1",
+      "strict": "/posts/[slug]"
+    },
+    {
+      "path": "/api/v1/orders/:id",
+      "strict": "/api/v1/orders/:id"
+    }
+  ],
+  "page_url": [
+    {
+      "url": "https://clinic.example.com/patients/jane-doe-1961/chart?tab=2",
+      "strict": "https://clinic.example.com/patients/:path"
+    },
+    {
+      "url": "http://user:pw@localhost:3000/a/b",
+      "strict": "http://localhost/a/:path"
+    },
+    {
+      "url": "https://shop.example.com/",
+      "strict": "https://shop.example.com/"
+    },
+    {
+      "url": "https://shop.example.com",
+      "strict": "https://shop.example.com/"
+    },
+    {
+      "url": "/relative/page/7",
+      "strict": "/relative/:path"
+    }
+  ]
+}

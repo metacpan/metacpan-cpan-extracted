@@ -52,6 +52,10 @@ last 8 bytes independently. So `550e8400-e29b-41d4-a716-446655440000` becomes
 
 ## Composite columns
 
+For a nonempty column, all nested serialization prefixes (LC version,
+Variant mode, JSON/Dynamic structure) precede its body. A zero-row column
+has neither prefixes nor data. The layouts below show prefixes inline.
+
 ### Array(T)
 
 ```

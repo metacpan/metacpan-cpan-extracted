@@ -111,7 +111,6 @@ find(self, x)
     /* find performs path compression -> it MUTATES -> take the write lock. */
     dsu_rwlock_wrlock(h);
     RETVAL = (UV)dsu_find(h, (uint32_t)x);
-    __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);
     dsu_rwlock_wrunlock(h);
   OUTPUT:
     RETVAL
@@ -132,7 +131,6 @@ union(self, a, b)
               b, h->n);
     dsu_rwlock_wrlock(h);
     RETVAL = (IV)dsu_union_locked(h, (uint32_t)a, (uint32_t)b);   /* 1 = newly merged, 0 = already together */
-    __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);
     dsu_rwlock_wrunlock(h);
   OUTPUT:
     RETVAL
@@ -154,7 +152,6 @@ connected(self, a, b)
     /* connected compresses paths via dsu_find -> it MUTATES -> write lock. */
     dsu_rwlock_wrlock(h);
     RETVAL = dsu_connected_locked(h, (uint32_t)a, (uint32_t)b);
-    __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);
     dsu_rwlock_wrunlock(h);
   OUTPUT:
     RETVAL
@@ -205,7 +202,6 @@ union_many(self, pairs)
         dsu_rwlock_wrlock(h);                            /* locked region: NO croak-capable calls */
         for (i = 0; i < npairs; i++)
             merged += (UV)dsu_union_locked(h, vals[2*i], vals[2*i + 1]);
-        __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);  /* a call always counts, even an empty batch */
         dsu_rwlock_wrunlock(h);
         RETVAL = merged;
     }
@@ -225,7 +221,6 @@ set_size(self, x)
     /* set_size compresses paths via dsu_find -> it MUTATES -> write lock. */
     dsu_rwlock_wrlock(h);
     RETVAL = (UV)dsu_set_size_locked(h, (uint32_t)x);
-    __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);
     dsu_rwlock_wrunlock(h);
   OUTPUT:
     RETVAL
@@ -260,7 +255,6 @@ reset(self)
   CODE:
     dsu_rwlock_wrlock(h);
     dsu_reset_locked(h);
-    __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);
     dsu_rwlock_wrunlock(h);
 
 SV *
@@ -277,7 +271,7 @@ stats(self)
         dsu_rwlock_rdlock(h);
         n        = h->hdr->n;
         num_sets = h->hdr->num_sets;
-        ops      = h->hdr->stat_ops;
+        ops      = __atomic_load_n(&h->hdr->stat_ops, __ATOMIC_RELAXED);
         dsu_rwlock_rdunlock(h);
 
         HV *hv = newHV();

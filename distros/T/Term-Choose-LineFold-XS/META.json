@@ -52,6 +52,6 @@
          "web" : "https://github.com/kuerbis/Term-Choose-LineFold-XS"
       }
    },
-   "version" : "0.005",
+   "version" : "0.006",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

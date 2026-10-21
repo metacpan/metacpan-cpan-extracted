@@ -1212,6 +1212,36 @@ subtest 'the workspace checks skip when the siblings are not there' => sub {
 		'and the skip says which checkout is missing') or diag($output);
 };
 
+# Before 0.04 a workspace producer was read whether or not its sibling was
+# there, so a declaration that named one failed check 1 on every install
+# outside a workspace while checks 2 and 3 skipped.
+subtest 'a workspace producer whose sibling is not there is skipped, not failed' => sub {
+	my ($status, $output) = _check(_fixture({}),
+		require_workspace   => ['No-Such-Distribution'],
+		workspace_producers => {
+			'Widget-Maker/lib/Widget/Maker.pm' => [qw(x y colour)],
+			'No-Such-Distribution/lib/Gone.pm' => [qw(x)],
+		});
+
+	is($status, 0, 'the contract passed') or diag($output);
+	is(scalar(_passed($output)), 1, 'the producer check ran and passed') or diag($output);
+	like($output, qr/^\s*ok \d+ # skip No-Such-Distribution\/lib\/Gone\.pm is not checked: No-Such-Distribution is not in the workspace$/m,
+		'the absent producer is skipped, naming the file and the sibling') or diag($output);
+	like($output, qr/^\s*ok \d+ - Widget-Maker\/lib\/Widget\/Maker\.pm sets 'colour'$/m,
+		'and a producer whose sibling is there is still checked') or diag($output);
+	unlike($output, qr/cannot read/, 'nothing was reported unreadable') or diag($output);
+};
+
+subtest 'a workspace producer missing from a sibling that is there still fails' => sub {
+	my ($status, $output) = _check(_fixture({}),
+		workspace_producers => { 'Widget-Maker/lib/Widget/Gone.pm' => [qw(x)] });
+
+	isnt($status, 0, 'the contract failed') or diag($output);
+	like($output, qr/cannot read Widget-Maker\/lib\/Widget\/Gone\.pm/,
+		'the file that moved is named') or diag($output);
+	_no_other_failures($output, $CHECKS[0]);
+};
+
 # ---------------------------------------------------------------------------
 # The two readers the scanner used to walk past: a program with no extension,
 # and a result taken out of a batch.

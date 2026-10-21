@@ -30,6 +30,9 @@ struct EnumEntry {
 typedef struct TypeInfo TypeInfo;
 struct TypeInfo {
     int code;
+    int has_prefix;
+    int split_prefix;
+    void *decode_state; /* temporary state, owned by the decoder scope */
     int param;             /* FixedString(N), DateTime64 precision, Decimal scale */
     TypeInfo *inner;       /* Array, Nullable */
     TypeInfo **tuple;      /* Tuple */

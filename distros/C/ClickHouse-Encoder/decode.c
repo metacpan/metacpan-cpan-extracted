@@ -33,7 +33,7 @@
     do {                                                                     \
         if ((UV)(needed) > (UV)(end - (*p)))                                 \
             croak("decode: buffer truncated (need %lu more bytes)",          \
-                  (unsigned long)(needed));                                  \
+                  (unsigned long)((UV)(needed) - (UV)(end - (*p))));          \
     } while (0)
 
 /* Read a little-endian multi-byte unsigned integer from a byte buffer.
@@ -62,11 +62,15 @@ static inline uint64_t dec_le64(const unsigned char *b) {
 }
 
 UV dec_varint(pTHX_ const unsigned char **p, const unsigned char *end) {
-    UV v = 0;
-    int shift = 0;
+    DEC_NEED(1);
+    unsigned char b = *(*p)++;
+    UV v = (UV)(b & 0x7f);
+    if (!(b & 0x80)) return v;
+    int shift = 7;
     while (1) {
         DEC_NEED(1);
-        unsigned char b = *(*p)++;
+        b = *(*p)++;
+        if (shift == 63 && (b & 0x7e)) croak("decode: varint exceeds 64 bits");
         v |= ((UV)(b & 0x7f)) << shift;
         if (!(b & 0x80)) break;
         shift += 7;
@@ -163,6 +167,9 @@ static void decode_dynamic_variant_slot(pTHX_ const unsigned char **p,
                                         AV *sub, int kind, SSize_t nv_rows,
                                         const char *ctx) {
     SSize_t k;
+    if (nv_rows && (kind == JV_BOOL || kind == JV_ARRAY_BOOL)
+        && !get_cv("JSON::PP::false", 0))
+        load_module(PERL_LOADMOD_NOIMPORT, newSVpvs("JSON::PP"), NULL);
     if (kind < 0 || kind == JV_STRING) {
         /* SharedVariant (-1) is a String column on the wire; same path. */
         for (k = 0; k < nv_rows; k++) {
@@ -177,7 +184,7 @@ static void decode_dynamic_variant_slot(pTHX_ const unsigned char **p,
          * attacker-controlled (variant disc bytes determine it). */
         if ((UV)nv_rows > (UV)(end - *p) / 8)
             croak("decode: buffer truncated (need %lu more bytes)",
-                  (unsigned long)((UV)nv_rows * 8));
+                  (unsigned long)((UV)nv_rows * 8 - (UV)(end - *p)));
         for (k = 0; k < nv_rows; k++) {
             uint64_t u = dec_le64(*p); *p += 8;
             int64_t v;  memcpy(&v, &u, 8);
@@ -188,7 +195,7 @@ static void decode_dynamic_variant_slot(pTHX_ const unsigned char **p,
     if (kind == JV_FLOAT64) {
         if ((UV)nv_rows > (UV)(end - *p) / 8)
             croak("decode: buffer truncated (need %lu more bytes)",
-                  (unsigned long)((UV)nv_rows * 8));
+                  (unsigned long)((UV)nv_rows * 8 - (UV)(end - *p)));
         for (k = 0; k < nv_rows; k++) {
             uint64_t u = dec_le64(*p); *p += 8;
             double v;  memcpy(&v, &u, 8);
@@ -199,7 +206,7 @@ static void decode_dynamic_variant_slot(pTHX_ const unsigned char **p,
     if (kind == JV_BOOL) {
         if ((UV)nv_rows > (UV)(end - *p))
             croak("decode: buffer truncated (need %lu more bytes)",
-                  (unsigned long)nv_rows);
+                  (unsigned long)((UV)nv_rows - (UV)(end - *p)));
         for (k = 0; k < nv_rows; k++) {
             unsigned char b = *(*p)++;
             av_store(sub, k, make_json_bool_sv(aTHX_ b));
@@ -213,7 +220,7 @@ static void decode_dynamic_variant_slot(pTHX_ const unsigned char **p,
         if (nv_rows == 0) return;
         if ((UV)nv_rows > (UV)(end - *p) / 8)
             croak("decode: buffer truncated (need %lu more bytes)",
-                  (unsigned long)((UV)nv_rows * 8));
+                  (unsigned long)((UV)nv_rows * 8 - (UV)(end - *p)));
         uint64_t *offs;
         Newx(offs, nv_rows, uint64_t);
         SAVEFREEPV(offs);
@@ -253,7 +260,7 @@ static void decode_dynamic_variant_slot(pTHX_ const unsigned char **p,
         if (kind != JV_ARRAY_STRING
             && total > (uint64_t)(end - *p) / per_elem)
             croak("decode: buffer truncated (need %lu more bytes)",
-                  (unsigned long)(per_elem * total));
+                  (unsigned long)(per_elem * total - (uint64_t)(end - *p)));
 
         uint64_t i;
         for (i = 0; i < total; i++) {
@@ -342,9 +349,228 @@ static void cleanup_dec_guard(pTHX_ void *pv) {
     if (g->av)    { SvREFCNT_dec((SV *)g->av);    g->av    = NULL; }
 }
 
-SV *decode_column(pTHX_ const unsigned char **p,
+typedef struct {
+    UV num_paths;
+    char **paths;
+    STRLEN *path_lens;
+    int **path_kind_list;
+    int *path_kind_count;
+    UV ntypes;
+    int *kinds_in_order;
+} DecodePrefix;
+
+static SV *decode_column_data(pTHX_ const unsigned char **p,
+                              const unsigned char *end,
+                              TypeInfo *t, SSize_t nrows);
+
+static void decode_prefix(pTHX_ const unsigned char **p,
+                           const unsigned char *end, TypeInfo *t) {
+    int i;
+    if (!t->has_prefix) return;
+    switch (t->code) {
+        case T_LOWCARDINALITY:
+            DEC_NEED(8);
+            if (dec_le64(*p) != 1) croak("decode: LowCardinality version != 1");
+            *p += 8;
+            return;
+        case T_VARIANT:
+            DEC_NEED(8);
+            if (dec_le64(*p) != 0) croak("decode: Variant mode != 0");
+            *p += 8;
+            for (i = 0; i < t->tuple_len; i++)
+                decode_prefix(aTHX_ p, end, t->tuple[t->variant_wire_to_decl[i]]);
+            return;
+        case T_JSON: {
+            DecodePrefix *state;
+            Newxz(state, 1, DecodePrefix);
+            SAVEFREEPV(state);
+            t->decode_state = state;
+
+            /* Object structure prefix. Versions: V1=0, V2=2, V3=4. */
+            DEC_NEED(8);
+            uint64_t obj_ver = dec_le64(*p); *p += 8;
+            if (obj_ver != 0 && obj_ver != 2 && obj_ver != 4)
+                croak("decode JSON: unsupported Object version %lu "
+                      "(known: 0, 2, 4); upgrade ClickHouse::Encoder",
+                      (unsigned long)obj_ver);
+            if (obj_ver == 0) {
+                /* V1: extra max_dynamic_paths varint before count. */
+                (void)dec_varint(aTHX_ p, end);
+            }
+            UV num_paths = dec_varint(aTHX_ p, end);
+            /* Defensive: each path takes at least 2 bytes (1-byte varint
+             * length prefix + 1-byte name). Reject obviously-impossible
+             * counts before allocating arrays sized by num_paths. */
+            if (num_paths > (UV)(end - *p))
+                croak("decode JSON: num_paths=%lu exceeds remaining buffer "
+                      "(%lu bytes)",
+                      (unsigned long)num_paths, (unsigned long)(end - *p));
+
+            char **paths = NULL;
+            STRLEN *path_lens = NULL;
+            if (num_paths > 0) {
+                Newx(paths, num_paths, char*);
+                SAVEFREEPV(paths);
+                Newx(path_lens, num_paths, STRLEN);
+                SAVEFREEPV(path_lens);
+            }
+            UV pi;
+            for (pi = 0; pi < num_paths; pi++) {
+                const char *ps;
+                STRLEN pl;
+                dec_lenpfx_string(aTHX_ p, end, &ps, &pl);
+                paths[pi]     = (char*)ps;  /* aliases input buffer */
+                path_lens[pi] = pl;
+            }
+            if (obj_ver == 4) {
+                /* V3 adds shared_data_serialization_version, and a
+                 * buckets count when that version is MAP_WITH_BUCKETS
+                 * (=1) or ADVANCED (=2). Native format with statistics
+                 * disabled (the default) skips the stats afterwards. */
+                UV shared_ver = dec_varint(aTHX_ p, end);
+                if (shared_ver == 1 || shared_ver == 2)
+                    (void)dec_varint(aTHX_ p, end);
+            }
+
+            /* Per-path Dynamic prefix: collect type-name lists. */
+            int **path_kind_list = NULL;  /* path_kind_list[p][i] = JsonValueKind */
+            int *path_kind_count = NULL;
+            if (num_paths > 0) {
+                Newxz(path_kind_list, num_paths, int*);
+                SAVEFREEPV(path_kind_list);
+                Newxz(path_kind_count, num_paths, int);
+                SAVEFREEPV(path_kind_count);
+            }
+            for (pi = 0; pi < num_paths; pi++) {
+                DEC_NEED(8);
+                uint64_t dyn_ver = dec_le64(*p); *p += 8;
+                if (dyn_ver != 1 && dyn_ver != 2 && dyn_ver != 4)
+                    croak("decode JSON: unsupported Dynamic version %lu "
+                          "(known: 1, 2, 4); upgrade ClickHouse::Encoder",
+                          (unsigned long)dyn_ver);
+                if (dyn_ver == 1)
+                    (void)dec_varint(aTHX_ p, end);
+                UV ntypes = dec_varint(aTHX_ p, end);
+                /* Each type name needs at least 2 bytes (length varint
+                 * + name byte). Reject implausibly large counts. */
+                if (ntypes > (UV)(end - *p))
+                    croak("decode JSON: ntypes=%lu exceeds remaining "
+                          "buffer (%lu bytes)",
+                          (unsigned long)ntypes, (unsigned long)(end - *p));
+
+                int *kinds_in_order = NULL;
+                if (ntypes > 0) {
+                    Newx(kinds_in_order, ntypes, int);
+                    SAVEFREEPV(kinds_in_order);
+                }
+                UV ti;
+                for (ti = 0; ti < ntypes; ti++) {
+                    const char *ts;
+                    STRLEN tl;
+                    dec_lenpfx_string(aTHX_ p, end, &ts, &tl);
+                    int k = json_kind_from_type_name(ts, tl);
+                    if (k < 0)
+                        croak("decode JSON: unsupported variant type '%.*s' "
+                              "for path '%.*s' (supported: Bool, Float64, "
+                              "Int64, String, Array(...) of those)",
+                              (int)tl, ts, (int)path_lens[pi], paths[pi]);
+                    kinds_in_order[ti] = k;
+                }
+                path_kind_list[pi]  = kinds_in_order;
+                path_kind_count[pi] = (int)ntypes;
+
+                /* Variant prefix: 8-byte mode. */
+                DEC_NEED(8);
+                uint64_t var_mode = dec_le64(*p); *p += 8;
+                if (var_mode != 0)
+                    croak("decode JSON: only BASIC variant mode supported "
+                          "(got %lu)", (unsigned long)var_mode);
+            }
+
+            state->num_paths = num_paths;
+            state->paths = paths;
+            state->path_lens = path_lens;
+            state->path_kind_list = path_kind_list;
+            state->path_kind_count = path_kind_count;
+            return;
+        }
+        case T_DYNAMIC: {
+            DecodePrefix *state;
+            Newxz(state, 1, DecodePrefix);
+            SAVEFREEPV(state);
+            t->decode_state = state;
+
+            /* Dynamic V1/V2/V3 prefix + Variant data, no Object wrapper. */
+            DEC_NEED(8);
+            uint64_t dyn_ver = dec_le64(*p); *p += 8;
+            if (dyn_ver != 1 && dyn_ver != 2 && dyn_ver != 4)
+                croak("decode Dynamic: unsupported version %lu "
+                      "(known: 1, 2, 4); upgrade ClickHouse::Encoder",
+                      (unsigned long)dyn_ver);
+            if (dyn_ver == 1)
+                (void)dec_varint(aTHX_ p, end);
+            UV ntypes = dec_varint(aTHX_ p, end);
+            /* Same bound as the JSON path's per-path Dynamic prefix:
+             * each type name takes at least 2 bytes on the wire. */
+            if (ntypes > (UV)(end - *p))
+                croak("decode Dynamic: ntypes=%lu exceeds remaining "
+                      "buffer (%lu bytes)",
+                      (unsigned long)ntypes, (unsigned long)(end - *p));
+
+            int *kinds_in_order = NULL;
+            if (ntypes > 0) {
+                Newx(kinds_in_order, ntypes, int);
+                SAVEFREEPV(kinds_in_order);
+            }
+            UV ti;
+            for (ti = 0; ti < ntypes; ti++) {
+                const char *ts; STRLEN tl;
+                dec_lenpfx_string(aTHX_ p, end, &ts, &tl);
+                int k = json_kind_from_type_name(ts, tl);
+                if (k < 0)
+                    croak("decode Dynamic: unsupported variant type '%.*s' "
+                          "(supported: Bool, Float64, Int64, String, "
+                          "Array(...) of those)",
+                          (int)tl, ts);
+                kinds_in_order[ti] = k;
+            }
+
+            DEC_NEED(8);
+            uint64_t var_mode = dec_le64(*p); *p += 8;
+            if (var_mode != 0)
+                croak("decode Dynamic: only BASIC variant mode supported "
+                      "(got %lu)", (unsigned long)var_mode);
+
+            state->ntypes = ntypes;
+            state->kinds_in_order = kinds_in_order;
+            return;
+        }
+        default:
+            if (t->inner) decode_prefix(aTHX_ p, end, t->inner);
+            for (i = 0; i < t->tuple_len; i++)
+                decode_prefix(aTHX_ p, end, t->tuple[i]);
+    }
+}
+
+SV *decode_column(pTHX_ const unsigned char **p, const unsigned char *end,
+                   TypeInfo *t, SSize_t nrows) {
+    if (!nrows) return newRV_noinc((SV *)newAV());
+    if (!t->has_prefix) return decode_column_data(aTHX_ p, end, t, nrows);
+    if (!t->split_prefix && (t->code == T_LOWCARDINALITY || t->code == T_VARIANT)) {
+        decode_prefix(aTHX_ p, end, t);
+        return decode_column_data(aTHX_ p, end, t, nrows);
+    }
+    ENTER;
+    decode_prefix(aTHX_ p, end, t);
+    SV *result = decode_column_data(aTHX_ p, end, t, nrows);
+    LEAVE;
+    return result;
+}
+
+static SV *decode_column_data(pTHX_ const unsigned char **p,
                          const unsigned char *end,
                          TypeInfo *t, SSize_t nrows) {
+    if (!nrows) return newRV_noinc((SV *)newAV());
     SV *result = NULL;
     DecGuard g;
     AV *av;
@@ -365,7 +591,12 @@ SV *decode_column(pTHX_ const unsigned char **p,
             DEC_SCALAR_LOOP(av, nrows, newSViv((IV)(int8_t)*(*p)++));
             break;
         }
-        case T_UINT8: case T_BOOL: case T_ENUM8: {
+        case T_ENUM8: {
+            DEC_NEED((STRLEN)nrows);
+            DEC_SCALAR_LOOP(av, nrows, newSViv((IV)(int8_t)*(*p)++));
+            break;
+        }
+        case T_UINT8: case T_BOOL: {
             DEC_NEED((STRLEN)nrows);
             DEC_SCALAR_LOOP(av, nrows, newSVuv((UV)*(*p)++));
             break;
@@ -385,7 +616,18 @@ SV *decode_column(pTHX_ const unsigned char **p,
             }
             break;
         }
-        case T_UINT16: case T_DATE: case T_ENUM16: {
+        case T_ENUM16: {
+            DEC_NEED((STRLEN)(2 * nrows));
+            for (r = 0; r < nrows; r++) {
+                uint16_t u = dec_le16(*p);
+                int16_t v; memcpy(&v, &u, 2);
+                av_store(av, r, newSViv((IV)v));
+                *p += 2;
+            }
+            break;
+        }
+        case T_UINT16: case T_DATE: {
+
             DEC_NEED((STRLEN)(2 * nrows));
             for (r = 0; r < nrows; r++) {
                 uint16_t v = dec_le16(*p);
@@ -494,7 +736,7 @@ SV *decode_column(pTHX_ const unsigned char **p,
             /* Division-form guard against `16 * nrows` overflow when
              * nrows is attacker-controlled. */
             if ((UV)nrows > (UV)(end - *p) / 16)
-                croak("decode: Decimal128 x %ld rows exceeds buffer",
+                croak("decode: Decimal128 x %ld rows exceeds remaining buffer",
                       (long)nrows);
             DEC_NEED((STRLEN)(16 * nrows));
             for (r = 0; r < nrows; r++) {
@@ -512,7 +754,7 @@ SV *decode_column(pTHX_ const unsigned char **p,
         }
         case T_DECIMAL256: {
             if ((UV)nrows > (UV)(end - *p) / 32)
-                croak("decode: Decimal256 x %ld rows exceeds buffer",
+                croak("decode: Decimal256 x %ld rows exceeds remaining buffer",
                       (long)nrows);
             DEC_NEED((STRLEN)(32 * nrows));
             for (r = 0; r < nrows; r++) {
@@ -532,7 +774,7 @@ SV *decode_column(pTHX_ const unsigned char **p,
             /* Wire: two LE UInt64 halves with bytes reversed within each
              * half. Reassemble to standard 8-4-4-4-12 hex form. */
             if ((UV)nrows > (UV)(end - *p) / 16)
-                croak("decode: UUID x %ld rows exceeds buffer",
+                croak("decode: UUID x %ld rows exceeds remaining buffer",
                       (long)nrows);
             DEC_NEED((STRLEN)(16 * nrows));
             for (r = 0; r < nrows; r++) {
@@ -571,7 +813,7 @@ SV *decode_column(pTHX_ const unsigned char **p,
         }
         case T_IPV6: {
             if ((UV)nrows > (UV)(end - *p) / 16)
-                croak("decode: IPv6 x %ld rows exceeds buffer",
+                croak("decode: IPv6 x %ld rows exceeds remaining buffer",
                       (long)nrows);
             DEC_NEED((STRLEN)(16 * nrows));
             for (r = 0; r < nrows; r++) {
@@ -584,7 +826,7 @@ SV *decode_column(pTHX_ const unsigned char **p,
             /* Read nrows UInt64 offsets, then decode flat inner array
              * of total = offsets[nrows-1] elements, then slice. */
             if ((UV)nrows > (UV)(end - *p) / 8)
-                croak("decode: Array offsets x %ld rows exceeds buffer",
+                croak("decode: Array offsets x %ld rows exceeds remaining buffer",
                       (long)nrows);
             DEC_NEED((STRLEN)(8 * nrows));
             SSize_t *offsets;
@@ -610,7 +852,7 @@ SV *decode_column(pTHX_ const unsigned char **p,
                 croak("decode: Array total=%ld exceeds remaining buffer "
                       "(%lu bytes)",
                       (long)total, (unsigned long)(end - *p));
-            SV *flat_rv = decode_column(aTHX_ p, end, t->inner, total);
+            SV *flat_rv = decode_column_data(aTHX_ p, end, t->inner, total);
             g.inner     = flat_rv;
             AV *flat    = (AV *)SvRV(flat_rv);
             for (r = 0; r < nrows; r++) {
@@ -630,6 +872,13 @@ SV *decode_column(pTHX_ const unsigned char **p,
             break;
         }
         case T_TUPLE: {
+            if (!t->tuple_len) {
+                DEC_NEED((STRLEN)nrows);
+                *p += nrows;
+                for (r = 0; r < nrows; r++)
+                    av_store(av, r, newRV_noinc((SV *)newAV()));
+                break;
+            }
             /* Decode each element type as a column of `nrows`, then
              * transpose into per-row tuples. */
             int i;
@@ -640,7 +889,7 @@ SV *decode_column(pTHX_ const unsigned char **p,
             g.vec   = cols;
             g.vec_n = 0;
             for (i = 0; i < t->tuple_len; i++) {
-                cols[i] = decode_column(aTHX_ p, end, t->tuple[i], nrows);
+                cols[i] = decode_column_data(aTHX_ p, end, t->tuple[i], nrows);
                 g.vec_n = i + 1;
             }
             for (r = 0; r < nrows; r++) {
@@ -664,7 +913,7 @@ SV *decode_column(pTHX_ const unsigned char **p,
             Newx(nulls, nrows, unsigned char);
             SAVEFREEPV(nulls);
             for (r = 0; r < nrows; r++) nulls[r] = *(*p)++;
-            SV *inner_rv = decode_column(aTHX_ p, end, t->inner, nrows);
+            SV *inner_rv = decode_column_data(aTHX_ p, end, t->inner, nrows);
             g.inner      = inner_rv;
             AV *inner    = (AV *)SvRV(inner_rv);
             for (r = 0; r < nrows; r++) {
@@ -690,19 +939,17 @@ SV *decode_column(pTHX_ const unsigned char **p,
             tuple_t.tuple_len = t->tuple_len;
             array_t.code      = T_ARRAY;
             array_t.inner     = &tuple_t;
-            SV *rv = decode_column(aTHX_ p, end, &array_t, nrows);
+            SV *rv = decode_column_data(aTHX_ p, end, &array_t, nrows);
             g.av = NULL;
             SvREFCNT_dec((SV *)av);
             result = rv;
             break;
         }
         case T_LOWCARDINALITY: {
-            DEC_NEED(24);
-            uint64_t version = dec_le64(*p);
-            uint64_t flags   = dec_le64(*p +  8);
-            uint64_t dict_n  = dec_le64(*p + 16);
-            *p += 24;
-            if (version != 1) croak("decode: LowCardinality version != 1 (got %lu)", (unsigned long)version);
+            DEC_NEED(16);
+            uint64_t flags   = dec_le64(*p);
+            uint64_t dict_n  = dec_le64(*p + 8);
+            *p += 16;
             /* Defensive: a corrupted dict_n must not allocate gigabytes. */
             if (dict_n > (uint64_t)(end - *p))
                 croak("decode: LowCardinality dict_n=%lu exceeds remaining "
@@ -717,9 +964,10 @@ SV *decode_column(pTHX_ const unsigned char **p,
             TypeInfo *inner = t->inner;
             int is_null    = (inner->code == T_NULLABLE);
             TypeInfo *leaf = is_null ? inner->inner : inner;
-            SV *dict_rv    = decode_column(aTHX_ p, end, leaf, (SSize_t)dict_n);
+            SV *dict_rv    = decode_column_data(aTHX_ p, end, leaf, (SSize_t)dict_n);
             g.inner        = dict_rv;
             AV *dict       = (AV *)SvRV(dict_rv);
+            SV **dict_values = AvARRAY(dict);
             DEC_NEED(8);
             uint64_t idx_n = dec_le64(*p);
             *p += 8;
@@ -748,8 +996,8 @@ SV *decode_column(pTHX_ const unsigned char **p,
                         croak("decode: LowCardinality index %lu out of range "
                               "(dict_n=%lu) at row %ld",
                               (unsigned long)i, (unsigned long)dict_n, (long)r);
-                    SV **elem = av_fetch(dict, (SSize_t)i, 0);
-                    av_store(av, r, elem ? SvREFCNT_inc(*elem) : newSV(0));
+                    SV *elem = dict_values[i];
+                    av_store(av, r, elem ? SvREFCNT_inc(elem) : newSV(0));
                 }
             }
             g.inner = NULL;
@@ -757,10 +1005,6 @@ SV *decode_column(pTHX_ const unsigned char **p,
             break;
         }
         case T_VARIANT: {
-            DEC_NEED(8);
-            uint64_t mode = dec_le64(*p);
-            *p += 8;
-            if (mode != 0) croak("decode: Variant mode != 0 (got %lu)", (unsigned long)mode);
             DEC_NEED((STRLEN)nrows);
             unsigned char *wire_disc;
             Newx(wire_disc, nrows, unsigned char);
@@ -786,7 +1030,7 @@ SV *decode_column(pTHX_ const unsigned char **p,
             int w;
             for (w = 0; w < nvar; w++) {
                 int decl = t->variant_wire_to_decl[w];
-                subcols[w] = decode_column(aTHX_ p, end, t->tuple[decl], counts[w]);
+                subcols[w] = decode_column_data(aTHX_ p, end, t->tuple[decl], counts[w]);
                 g.vec_n = w + 1;
             }
             SSize_t *cursors;
@@ -814,106 +1058,12 @@ SV *decode_column(pTHX_ const unsigned char **p,
         }
 
         case T_JSON: {
-            /* Object structure prefix. Versions: V1=0, V2=2, V3=4. */
-            DEC_NEED(8);
-            uint64_t obj_ver = dec_le64(*p); *p += 8;
-            if (obj_ver != 0 && obj_ver != 2 && obj_ver != 4)
-                croak("decode JSON: unsupported Object version %lu "
-                      "(known: 0, 2, 4); upgrade ClickHouse::Encoder",
-                      (unsigned long)obj_ver);
-            if (obj_ver == 0) {
-                /* V1: extra max_dynamic_paths varint before count. */
-                (void)dec_varint(aTHX_ p, end);
-            }
-            UV num_paths = dec_varint(aTHX_ p, end);
-            /* Defensive: each path takes at least 2 bytes (1-byte varint
-             * length prefix + 1-byte name). Reject obviously-impossible
-             * counts before allocating arrays sized by num_paths. */
-            if (num_paths > (UV)(end - *p))
-                croak("decode JSON: num_paths=%lu exceeds remaining buffer "
-                      "(%lu bytes)",
-                      (unsigned long)num_paths, (unsigned long)(end - *p));
-
-            char **paths = NULL;
-            STRLEN *path_lens = NULL;
-            if (num_paths > 0) {
-                Newx(paths, num_paths, char*);
-                SAVEFREEPV(paths);
-                Newx(path_lens, num_paths, STRLEN);
-                SAVEFREEPV(path_lens);
-            }
-            UV pi;
-            for (pi = 0; pi < num_paths; pi++) {
-                const char *ps;
-                STRLEN pl;
-                dec_lenpfx_string(aTHX_ p, end, &ps, &pl);
-                paths[pi]     = (char*)ps;  /* aliases input buffer */
-                path_lens[pi] = pl;
-            }
-            if (obj_ver == 4) {
-                /* V3 adds shared_data_serialization_version, and a
-                 * buckets count when that version is MAP_WITH_BUCKETS
-                 * (=1) or ADVANCED (=2). Native format with statistics
-                 * disabled (the default) skips the stats afterwards. */
-                UV shared_ver = dec_varint(aTHX_ p, end);
-                if (shared_ver == 1 || shared_ver == 2)
-                    (void)dec_varint(aTHX_ p, end);
-            }
-
-            /* Per-path Dynamic prefix: collect type-name lists. */
-            int **path_kind_list = NULL;  /* path_kind_list[p][i] = JsonValueKind */
-            int *path_kind_count = NULL;
-            if (num_paths > 0) {
-                Newxz(path_kind_list, num_paths, int*);
-                SAVEFREEPV(path_kind_list);
-                Newxz(path_kind_count, num_paths, int);
-                SAVEFREEPV(path_kind_count);
-            }
-            for (pi = 0; pi < num_paths; pi++) {
-                DEC_NEED(8);
-                uint64_t dyn_ver = dec_le64(*p); *p += 8;
-                if (dyn_ver != 1 && dyn_ver != 2 && dyn_ver != 4)
-                    croak("decode JSON: unsupported Dynamic version %lu "
-                          "(known: 1, 2, 4); upgrade ClickHouse::Encoder",
-                          (unsigned long)dyn_ver);
-                if (dyn_ver == 1)
-                    (void)dec_varint(aTHX_ p, end);
-                UV ntypes = dec_varint(aTHX_ p, end);
-                /* Each type name needs at least 2 bytes (length varint
-                 * + name byte). Reject implausibly large counts. */
-                if (ntypes > (UV)(end - *p))
-                    croak("decode JSON: ntypes=%lu exceeds remaining "
-                          "buffer (%lu bytes)",
-                          (unsigned long)ntypes, (unsigned long)(end - *p));
-
-                int *kinds_in_order = NULL;
-                if (ntypes > 0) {
-                    Newx(kinds_in_order, ntypes, int);
-                    SAVEFREEPV(kinds_in_order);
-                }
-                UV ti;
-                for (ti = 0; ti < ntypes; ti++) {
-                    const char *ts;
-                    STRLEN tl;
-                    dec_lenpfx_string(aTHX_ p, end, &ts, &tl);
-                    int k = json_kind_from_type_name(ts, tl);
-                    if (k < 0)
-                        croak("decode JSON: unsupported variant type '%.*s' "
-                              "for path '%.*s' (supported: Bool, Float64, "
-                              "Int64, String, Array(...) of those)",
-                              (int)tl, ts, (int)path_lens[pi], paths[pi]);
-                    kinds_in_order[ti] = k;
-                }
-                path_kind_list[pi]  = kinds_in_order;
-                path_kind_count[pi] = (int)ntypes;
-
-                /* Variant prefix: 8-byte mode. */
-                DEC_NEED(8);
-                uint64_t var_mode = dec_le64(*p); *p += 8;
-                if (var_mode != 0)
-                    croak("decode JSON: only BASIC variant mode supported "
-                          "(got %lu)", (unsigned long)var_mode);
-            }
+            DecodePrefix *state = (DecodePrefix *)t->decode_state;
+            UV num_paths = state->num_paths, pi;
+            char **paths = state->paths;
+            STRLEN *path_lens = state->path_lens;
+            int **path_kind_list = state->path_kind_list;
+            int *path_kind_count = state->path_kind_count;
 
             /* Build result: AV of HV refs, one per row. */
             for (r = 0; r < nrows; r++)
@@ -927,7 +1077,7 @@ SV *decode_column(pTHX_ const unsigned char **p,
             {
                 int tp;
                 for (tp = 0; tp < t->tuple_len; tp++) {
-                    SV *col_rv = decode_column(aTHX_ p, end, t->tuple[tp],
+                    SV *col_rv = decode_column_data(aTHX_ p, end, t->tuple[tp],
                                                nrows);
                     g.inner    = col_rv;
                     AV *col_av = (AV*)SvRV(col_rv);
@@ -1096,6 +1246,7 @@ SV *decode_column(pTHX_ const unsigned char **p,
                                 SV **leaf = hv_fetch(row_hv, kstr,
                                                      (I32)klen, 0);
                                 if (!leaf) { conflict = 1; break; }
+                                if (hv_exists(cur, seg, (I32)slen)) { conflict = 1; break; }
                                 SV *val = SvREFCNT_inc(*leaf);
                                 if (!hv_store(cur, seg, (I32)slen,
                                               val, 0)) {
@@ -1130,47 +1281,9 @@ SV *decode_column(pTHX_ const unsigned char **p,
         }
 
         case T_DYNAMIC: {
-            /* Dynamic V1/V2/V3 prefix + Variant data, no Object wrapper. */
-            DEC_NEED(8);
-            uint64_t dyn_ver = dec_le64(*p); *p += 8;
-            if (dyn_ver != 1 && dyn_ver != 2 && dyn_ver != 4)
-                croak("decode Dynamic: unsupported version %lu "
-                      "(known: 1, 2, 4); upgrade ClickHouse::Encoder",
-                      (unsigned long)dyn_ver);
-            if (dyn_ver == 1)
-                (void)dec_varint(aTHX_ p, end);
-            UV ntypes = dec_varint(aTHX_ p, end);
-            /* Same bound as the JSON path's per-path Dynamic prefix:
-             * each type name takes at least 2 bytes on the wire. */
-            if (ntypes > (UV)(end - *p))
-                croak("decode Dynamic: ntypes=%lu exceeds remaining "
-                      "buffer (%lu bytes)",
-                      (unsigned long)ntypes, (unsigned long)(end - *p));
-
-            int *kinds_in_order = NULL;
-            if (ntypes > 0) {
-                Newx(kinds_in_order, ntypes, int);
-                SAVEFREEPV(kinds_in_order);
-            }
-            UV ti;
-            for (ti = 0; ti < ntypes; ti++) {
-                const char *ts; STRLEN tl;
-                dec_lenpfx_string(aTHX_ p, end, &ts, &tl);
-                int k = json_kind_from_type_name(ts, tl);
-                if (k < 0)
-                    croak("decode Dynamic: unsupported variant type '%.*s' "
-                          "(supported: Bool, Float64, Int64, String, "
-                          "Array(...) of those)",
-                          (int)tl, ts);
-                kinds_in_order[ti] = k;
-            }
-
-            DEC_NEED(8);
-            uint64_t var_mode = dec_le64(*p); *p += 8;
-            if (var_mode != 0)
-                croak("decode Dynamic: only BASIC variant mode supported "
-                      "(got %lu)", (unsigned long)var_mode);
-
+            DecodePrefix *state = (DecodePrefix *)t->decode_state;
+            UV ntypes = state->ntypes;
+            int *kinds_in_order = state->kinds_in_order;
             int nv = (int)ntypes;
             unsigned mask = 0;
             int i;

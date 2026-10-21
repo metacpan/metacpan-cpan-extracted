@@ -116,4 +116,22 @@ is $w->score("zed"), 1, 'wrap() composes existing objects';
     is $z3->key_table->count, $before + 2, 'add_many: NaN-row key not interned (no ghost slot)';
 }
 
+{
+    my $snap = Data::SortedSet::Shared::Strings->new(max => 10);
+    $snap->add_many([ ['a', 1], ['b', 2], ['c', 3] ]);
+    my @seen;
+    $snap->each(sub {
+        push @seen, [ @_ ];
+        if (@seen == 1) { $snap->clear; $snap->add('replacement', 99) }
+    });
+    is_deeply \@seen, [ ['a', 1], ['b', 2], ['c', 3] ],
+        'each snapshots strings before a callback clears and reuses ids';
+    is_deeply [$snap->range_by_rank(0, -1)], ['replacement'], 'callback mutations remain visible';
+    eval { $snap->each(sub { die "callback failed\n" }) };
+    like $@, qr/callback failed/, 'each propagates callback exceptions';
+    $snap->clear;
+    eval { $snap->each(undef) };
+    like $@, qr/code ref/, 'each validates callbacks even when empty';
+}
+
 done_testing;

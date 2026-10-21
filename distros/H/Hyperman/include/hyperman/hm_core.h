@@ -152,6 +152,11 @@ struct hm_conn {
                                    * it at any moment, so it must not be
                                    * grown, freed or reused until the
                                    * completion lands            */
+    unsigned char recv_lent;      /* reading off a lent readiness watcher
+                                   * while requests wait unconsumed in
+                                   * rbuf (hm_recv_unsafe)        */
+    unsigned char again_queued;   /* hm_again_push has it for the top of
+                                   * the next turn (hm_run_again) */
     unsigned char detached;       /* app took the socket (see hm_detach) */
     unsigned char tunnel;         /* a 101 stream handle owns the bytes both
                                    * ways (hm_stream_open): what the peer
@@ -1154,9 +1159,32 @@ static int hm_arm_recv(hm_loop *loop, hm_conn *c) {
     return 1;
 }
 
+static int  hm_read_lend(hm_loop *loop, hm_conn *c);
+static void hm_read_unlend(hm_loop *loop, hm_conn *c);
+
+/* Requests are waiting in rbuf behind a park, a streamed body or a full write
+ * buffer, and whoever serves them will memmove the buffer down. A completion
+ * armed now holds rbuf + rlen, and after the move it lands past the new rlen
+ * while rlen counts it from the front: the parser re-reads the tail of the
+ * request it already served and waits for the rest of it until the idle
+ * sweep. (t/27 on every Linux smoker with liburing: the request after a
+ * pipelined one behind a sendfile body was never read.) */
+static int hm_recv_unsafe(hm_conn *c) {
+    return c->rlen > 0
+        && (c->again_queued || c->bsrc.kind || c->awaiting
+            || c->backlogged || c->stream_open);
+}
+
 /* Arm the next read however this connection reads: a completion if it can,
  * a readiness watcher otherwise. */
 static void hm_rearm_read(hm_loop *loop, hm_conn *c) {
+    /* A readiness read happens at rlen as it stands at the time, so it is
+     * safe across the move; given back once the buffer has been served. */
+    if (c->recv_lent) {
+        if (hm_recv_unsafe(c)) return;
+        hm_read_unlend(loop, c);
+        c->recv_lent = 0;
+    }
     /* Already reading off readiness: the watcher is persistent and
      * level-triggered, so re-adding it would be a syscall per response on
      * epoll for no effect at all. */
@@ -1166,6 +1194,10 @@ static void hm_rearm_read(hm_loop *loop, hm_conn *c) {
      * bytes into the same offset first. hm_arm_recv refuses for the same
      * reason, but its refusal is not a request to fall back. */
     if (c->recv_inflight) return;
+    if (loop->completion && hm_recv_unsafe(c)) {
+        if (hm_read_lend(loop, c)) c->recv_lent = 1;
+        return;
+    }
     if (hm_arm_recv(loop, c)) return;
     c->recv_fallback = 1;
     loop->be->add_io(loop->be, c->fd, HM_EV_READ, 0);
@@ -3344,6 +3376,7 @@ static void hm_again_push(hm_loop *loop, hm_conn *c) {
     loop->again[loop->again_n].fd = c->fd;
     loop->again[loop->again_n].id = c->id;
     loop->again_n++;
+    c->again_queued = 1;
 }
 
 /* Built-in https redirect: synthesize a 301 to the same host and target on
@@ -4329,6 +4362,7 @@ static void hm_run_again(pTHX_ hm_loop *loop) {
     loop->again_n = 0;
     for (i = 0; i < n; i++) {
         hm_conn *c = loop->conns[loop->again[i].fd];
+        if (c && c->id == loop->again[i].id) c->again_queued = 0;
         if (c && c->id == loop->again[i].id && !c->awaiting
             && (!c->in_app || hm_h2_reentrant(c)) && !c->bsrc.kind) {
             hm_process(aTHX_ c);

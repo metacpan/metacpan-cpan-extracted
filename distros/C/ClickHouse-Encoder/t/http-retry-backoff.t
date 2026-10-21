@@ -116,8 +116,8 @@ my $net = { success => 0, status => 599, content => 'timeout',
     local $@;
     eval { $bi->push_many([ [1], [2], [3], [4], [5] ]) };
     ok($@, 'push_many propagates the flush failure');
-    is($bi->buffered_count, 3,
-       'push_many: rows past the failed batch stay buffered for a retry');
+    is($bi->buffered_count, 5,
+       'push_many: failed and untried rows stay buffered for a retry');
     is($bi->{http}{calls}, 1, 'push_many: only the first batch was attempted');
 }
 

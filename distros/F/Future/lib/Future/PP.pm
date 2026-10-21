@@ -1,13 +1,16 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2011-2022 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2011-2026 -- leonerd@leonerd.org.uk
 
-package Future::PP 0.53;
+package Future::PP 0.54;
 
-use v5.14;
+use v5.20;
 use warnings;
 no warnings 'recursion'; # Disable the "deep recursion" warning
+
+use feature qw( postderef signatures );
+no warnings qw( experimental::postderef experimental::signatures );
 
 our @ISA = qw( Future::_base );
 
@@ -42,22 +45,20 @@ use constant {
 
 use constant CB_ALWAYS => CB_DONE|CB_FAIL|CB_CANCEL;
 
-sub _shortmess
+sub _shortmess ( $msg )
 {
-   my $at = Carp::shortmess( $_[0] );
+   my $at = Carp::shortmess( $msg );
    chomp $at; $at =~ s/\.$//;
    return $at;
 }
 
-sub _callable
+sub _callable ( $cb )
 {
-   my ( $cb ) = @_;
    defined $cb and ( reftype($cb) eq 'CODE' || overload::Method($cb, '&{}') );
 }
 
-sub new
+sub new ( $proto )
 {
-   my $proto = shift;
    return bless {
       ready     => 0,
       callbacks => [], # [] = [$type, ...]
@@ -72,9 +73,8 @@ sub new
    }, ( ref $proto || $proto );
 }
 
-sub __selfstr
+sub __selfstr ( $self )
 {
-   my $self = shift;
    my $str = "$self";
    $str .= " (\"$self->{label}\")" if defined $self->{label};
    $str .= " ($self->{constructed_at})" if defined $self->{constructed_at};
@@ -84,8 +84,7 @@ sub __selfstr
 my $GLOBAL_END;
 END { $GLOBAL_END = 1; }
 
-sub DESTROY_debug {
-   my $self = shift;
+sub DESTROY_debug ( $self ) {
    return if $GLOBAL_END;
    return if $self->{ready} and ( $self->{reported} or !$self->{failure} );
 
@@ -105,33 +104,28 @@ sub DESTROY_debug {
 }
 *DESTROY = \&DESTROY_debug if DEBUG;
 
-sub is_ready
+sub is_ready ( $self )
 {
-   my $self = shift;
    return $self->{ready};
 }
 
-sub is_done
+sub is_done ( $self )
 {
-   my $self = shift;
    return $self->{ready} && !$self->{failure} && !$self->{cancelled};
 }
 
-sub is_failed
+sub is_failed ( $self )
 {
-   my $self = shift;
    return $self->{ready} && !!$self->{failure}; # boolify
 }
 
-sub is_cancelled
+sub is_cancelled ( $self )
 {
-   my $self = shift;
    return $self->{cancelled};
 }
 
-sub state
+sub state ( $self )
 {
-   my $self = shift;
    return !$self->{ready}     ? "pending" :
            DEBUG              ? $self->{ready_at} :
            $self->{failure}   ? "failed" :
@@ -139,18 +133,17 @@ sub state
                                 "done";
 }
 
-sub _mark_ready
+sub _mark_ready ( $self, $reason )
 {
-   my $self = shift;
    $self->{ready} = 1;
-   $self->{ready_at} = _shortmess $_[0] if DEBUG;
+   $self->{ready_at} = _shortmess $reason if DEBUG;
 
    if( $Future::TIMES ) {
       $self->{rtime} = [ gettimeofday ];
    }
 
    delete $self->{on_cancel};
-   $_->[0] and $_->[0]->_revoke_on_cancel( $_->[1] ) for @{ $self->{revoke_when_ready} };
+   $_->[0] and $_->[0]->_revoke_on_cancel( $_->[1] ) for $self->{revoke_when_ready}->@*;
    delete $self->{revoke_when_ready};
 
    my $callbacks = delete $self->{callbacks} or return;
@@ -159,8 +152,8 @@ sub _mark_ready
    my $fail      = defined $self->{failure};
    my $done      = !$fail && !$cancelled;
 
-   my @result  = $done ? @{ $self->{result} } :
-                 $fail ? @{ $self->{failure} } :
+   my @result  = $done ? $self->{result}->@* :
+                 $fail ? $self->{failure}->@* :
                          ();
 
    foreach my $cb ( @$callbacks ) {
@@ -229,7 +222,7 @@ sub _mark_ready
             $f2->on_ready( $fseq ) if !$f2->{cancelled};
          }
          else {
-            push @{ $f2->{callbacks} }, [ CB_DONE|CB_FAIL, $fseq ];
+            push $f2->{callbacks}->@*, [ CB_DONE|CB_FAIL, $fseq ];
             weaken( $f2->{callbacks}[-1][1] );
          }
       }
@@ -242,22 +235,20 @@ sub _mark_ready
    }
 }
 
-sub done
+sub done ( $self, @result )
 {
-   my $self = shift;
-
    if( ref $self ) {
       $self->{cancelled} and return $self;
       $self->{ready} and Carp::croak "${\$self->__selfstr} is already ".$self->state." and cannot be ->done";
       $self->{subs} and Carp::croak "${\$self->__selfstr} is not a leaf Future, cannot be ->done";
-      $self->{result} = [ @_ ];
+      $self->{result} = [ @result ];
       $self->_mark_ready( "done" );
    }
    else {
       $self = $self->new;
       $self->{ready} = 1;
       $self->{ready_at} = _shortmess "done" if DEBUG;
-      $self->{result} = [ @_ ];
+      $self->{result} = [ @result ];
       if( $Future::TIMES ) {
          $self->{rtime} = [ gettimeofday ];
       }
@@ -266,11 +257,8 @@ sub done
    return $self;
 }
 
-sub fail
+sub fail ( $self, $exception, @more )
 {
-   my $self = shift;
-   my ( $exception, @more ) = @_;
-
    if( ref $exception eq "Future::Exception" ) {
       @more = ( $exception->category, $exception->details );
       $exception = $exception->message;
@@ -298,20 +286,17 @@ sub fail
    return $self;
 }
 
-sub on_cancel
+sub on_cancel ( $self, $code )
 {
-   my $self = shift;
-   my ( $code ) = @_;
-
    my $is_future = blessed( $code ) && $code->isa( "Future" );
    $is_future or _callable( $code ) or
       Carp::croak "Expected \$code to be callable or a Future in ->on_cancel";
 
    $self->{ready} and return $self;
 
-   push @{ $self->{on_cancel} }, $code;
+   push $self->{on_cancel}->@*, $code;
    if( $is_future ) {
-      push @{ $code->{revoke_when_ready} }, my $r = [ $self, \$self->{on_cancel}[-1] ];
+      push $code->{revoke_when_ready}->@*, my $r = [ $self, \$self->{on_cancel}[-1] ];
       weaken( $r->[0] );
       weaken( $r->[1] );
    }
@@ -320,30 +305,21 @@ sub on_cancel
 }
 
 # An optimised version for Awaitable role
-sub AWAIT_ON_CANCEL
+sub AWAIT_ON_CANCEL ( $self, $code )
 {
-   my $self = shift;
-   my ( $code ) = @_;
-
-   push @{ $self->{on_cancel} }, $code;
+   push $self->{on_cancel}->@*, $code;
 }
 
-sub AWAIT_CHAIN_CANCEL
+sub AWAIT_CHAIN_CANCEL ( $self, $f2 )
 {
-   my $self = shift;
-   my ( $f2 ) = @_;
-
-   push @{ $self->{on_cancel} }, $f2;
-   push @{ $f2->{revoke_when_ready} }, my $r = [ $self, \$self->{on_cancel}[-1] ];
+   push $self->{on_cancel}->@*, $f2;
+   push $f2->{revoke_when_ready}->@*, my $r = [ $self, \$self->{on_cancel}[-1] ];
    weaken( $r->[0] );
    weaken( $r->[1] );
 }
 
-sub _revoke_on_cancel
+sub _revoke_on_cancel ( $self, $ref )
 {
-   my $self = shift;
-   my ( $ref ) = @_;
-
    undef $$ref;
    $self->{empty_on_cancel_slots}++;
 
@@ -361,11 +337,8 @@ sub _revoke_on_cancel
    }
 }
 
-sub on_ready
+sub on_ready ( $self, $code )
 {
-   my $self = shift;
-   my ( $code ) = @_;
-
    my $is_future = blessed( $code ) && $code->isa( "Future" );
    $is_future or _callable( $code ) or
       Carp::croak "Expected \$code to be callable or a Future in ->on_ready";
@@ -376,29 +349,26 @@ sub on_ready
 
       $self->{reported} = 1 if $fail;
 
-      $is_future ? ( $done ? $code->done( @{ $self->{result} } ) :
-                     $fail ? $code->fail( @{ $self->{failure} } ) :
+      $is_future ? ( $done ? $code->done( $self->{result}->@* ) :
+                     $fail ? $code->fail( $self->{failure}->@* ) :
                              $code->cancel )
                  : $code->( $self );
    }
    else {
-      push @{ $self->{callbacks} }, [ CB_ALWAYS|CB_SELF, $self->wrap_cb( on_ready => $code ) ];
+      push $self->{callbacks}->@*, [ CB_ALWAYS|CB_SELF, $self->wrap_cb( on_ready => $code ) ];
    }
 
    return $self;
 }
 
 # An optimised version for Awaitable role
-sub AWAIT_ON_READY
+sub AWAIT_ON_READY ( $self, $code )
 {
-   my $self = shift;
-   my ( $code ) = @_;
-   push @{ $self->{callbacks} }, [ CB_ALWAYS|CB_SELF, $self->wrap_cb( on_ready => $code ) ];
+   push $self->{callbacks}->@*, [ CB_ALWAYS|CB_SELF, $self->wrap_cb( on_ready => $code ) ];
 }
 
-sub result
+sub result ( $self )
 {
-   my $self = shift;
    $self->{ready} or
       Carp::croak( "${\$self->__selfstr} is not yet ready" );
    if( my $failure = $self->{failure} ) {
@@ -409,28 +379,23 @@ sub result
    }
    $self->{cancelled} and Carp::croak "${\$self->__selfstr} was cancelled";
    return $self->{result}->[0] unless wantarray;
-   return @{ $self->{result} };
+   return $self->{result}->@*;
 }
 
-sub get
+sub get ( $self )
 {
-   my $self = shift;
    $self->await unless $self->{ready};
    return $self->result;
 }
 
-sub await
+sub await ( $self )
 {
-   my $self = shift;
    return $self if $self->{ready};
    Carp::croak "$self is not yet complete and does not provide ->await";
 }
 
-sub on_done
+sub on_done ( $self, $code )
 {
-   my $self = shift;
-   my ( $code ) = @_;
-
    my $is_future = blessed( $code ) && $code->isa( "Future" );
    $is_future or _callable( $code ) or
       Carp::croak "Expected \$code to be callable or a Future in ->on_done";
@@ -438,31 +403,27 @@ sub on_done
    if( $self->{ready} ) {
       return $self if $self->{failure} or $self->{cancelled};
 
-      $is_future ? $code->done( @{ $self->{result} } ) 
-                 : $code->( @{ $self->{result} } );
+      $is_future ? $code->done( $self->{result}->@* )
+                 : $code->( $self->{result}->@* );
    }
    else {
-      push @{ $self->{callbacks} }, [ CB_DONE|CB_RESULT, $self->wrap_cb( on_done => $code ) ];
+      push $self->{callbacks}->@*, [ CB_DONE|CB_RESULT, $self->wrap_cb( on_done => $code ) ];
    }
 
    return $self;
 }
 
-sub failure
+sub failure ( $self )
 {
-   my $self = shift;
    $self->await unless $self->{ready};
    return unless $self->{failure};
    $self->{reported} = 1;
    return $self->{failure}->[0] if !wantarray;
-   return @{ $self->{failure} };
+   return $self->{failure}->@*;
 }
 
-sub on_fail
+sub on_fail ( $self, $code )
 {
-   my $self = shift;
-   my ( $code ) = @_;
-
    my $is_future = blessed( $code ) && $code->isa( "Future" );
    $is_future or _callable( $code ) or
       Carp::croak "Expected \$code to be callable or a Future in ->on_fail";
@@ -471,20 +432,18 @@ sub on_fail
       return $self if not $self->{failure};
       $self->{reported} = 1;
 
-      $is_future ? $code->fail( @{ $self->{failure} } )
-                 : $code->( @{ $self->{failure} } );
+      $is_future ? $code->fail( $self->{failure}->@* )
+                 : $code->( $self->{failure}->@* );
    }
    else {
-      push @{ $self->{callbacks} }, [ CB_FAIL|CB_RESULT, $self->wrap_cb( on_fail => $code ) ];
+      push $self->{callbacks}->@*, [ CB_FAIL|CB_RESULT, $self->wrap_cb( on_fail => $code ) ];
    }
 
    return $self;
 }
 
-sub cancel
+sub cancel ( $self )
 {
-   my $self = shift;
-
    return $self if $self->{ready};
 
    $self->{cancelled}++;
@@ -500,9 +459,7 @@ sub cancel
    return $self;
 }
 
-my $make_donecatchfail_sub = sub {
-   my ( $with_f, $done_code, $fail_code, @catch_list ) = @_;
-
+my $make_donecatchfail_sub = sub ( $with_f, $done_code, $fail_code, @catch_list ) {
    my $func = (caller 1)[3];
    $func =~ s/^.*:://;
 
@@ -516,30 +473,26 @@ my $make_donecatchfail_sub = sub {
       Carp::croak "Expected catch handler for '$_' to be callable in ->$func"
       for keys %catch_handlers;
 
-   sub {
-      my $self = shift;
+   sub ( $self ) {
       my @maybe_self = $with_f ? ( $self ) : ();
 
       if( !$self->{failure} ) {
          return $self unless $done_code;
-         return $done_code->( @maybe_self, @{ $self->{result} } );
+         return $done_code->( @maybe_self, $self->{result}->@* );
       }
       else {
          my $name = $self->{failure}[1];
          if( defined $name and $catch_handlers{$name} ) {
-            return $catch_handlers{$name}->( @maybe_self, @{ $self->{failure} } );
+            return $catch_handlers{$name}->( @maybe_self, $self->{failure}->@* );
          }
          return $self unless $fail_code;
-         return $fail_code->( @maybe_self, @{ $self->{failure} } );
+         return $fail_code->( @maybe_self, $self->{failure}->@* );
       }
    };
 };
 
-sub _sequence
+sub _sequence ( $f1, $code, $flags )
 {
-   my $f1 = shift;
-   my ( $code, $flags ) = @_;
-
    $flags |= CB_SEQ_STRICT if STRICT;
 
    # For later, we might want to know where we were called from
@@ -569,8 +522,8 @@ sub _sequence
 
       my @args = (
          ( $flags & CB_SELF ? $f1 : () ),
-         ( $flags & CB_RESULT ? $f1->is_done   ? @{ $f1->{result} } :
-                                $f1->{failure} ? @{ $f1->{failure} } :
+         ( $flags & CB_RESULT ? $f1->is_done   ? $f1->{result}->@* :
+                                $f1->{failure} ? $f1->{failure}->@* :
                                                () : () ),
       );
 
@@ -597,18 +550,15 @@ sub _sequence
    # from $flags
    $code = $f1->wrap_cb( sequence => $code ) unless $flags & (CB_SEQ_IMDONE|CB_SEQ_IMFAIL);
 
-   push @{ $f1->{callbacks} }, [ CB_DONE|CB_FAIL|$flags, $code, $fseq ];
+   push $f1->{callbacks}->@*, [ CB_DONE|CB_FAIL|$flags, $code, $fseq ];
    weaken( $f1->{callbacks}[-1][2] );
 
    return $fseq;
 }
 
-sub then
+sub then ( $self, $done_code = undef, @catch_list )
 {
-   my $self = shift;
-   my $done_code = shift;
-   my $fail_code = ( @_ % 2 ) ? pop : undef;
-   my @catch_list = @_;
+   my $fail_code = ( @catch_list % 2 ) ? pop @catch_list : undef;
 
    if( $done_code and !@catch_list and !$fail_code ) {
       return $self->_sequence( $done_code, CB_SEQ_ONDONE|CB_RESULT );
@@ -620,59 +570,43 @@ sub then
    ), CB_SEQ_ONDONE|CB_SEQ_ONFAIL|CB_SELF );
 }
 
-sub then_done
+sub then_done ( $self, @result )
 {
-   my $self = shift;
-   my ( @result ) = @_;
    return $self->_sequence( \@result, CB_SEQ_ONDONE|CB_SEQ_IMDONE );
 }
 
-sub then_fail
+sub then_fail ( $self, @failure )
 {
-   my $self = shift;
-   my ( @failure ) = @_;
    return $self->_sequence( \@failure, CB_SEQ_ONDONE|CB_SEQ_IMFAIL );
 }
 
-sub else
+sub else ( $self, $fail_code )
 {
-   my $self = shift;
-   my ( $fail_code ) = @_;
-
    return $self->_sequence( $fail_code, CB_SEQ_ONFAIL|CB_RESULT );
 }
 
-sub else_done
+sub else_done ( $self, @result )
 {
-   my $self = shift;
-   my ( @result ) = @_;
    return $self->_sequence( \@result, CB_SEQ_ONFAIL|CB_SEQ_IMDONE );
 }
 
-sub else_fail
+sub else_fail ( $self, @failure )
 {
-   my $self = shift;
-   my ( @failure ) = @_;
    return $self->_sequence( \@failure, CB_SEQ_ONFAIL|CB_SEQ_IMFAIL );
 }
 
-sub catch
+sub catch ( $self, @catch_list )
 {
-   my $self = shift;
-   my $fail_code = ( @_ % 2 ) ? pop : undef;
-   my @catch_list = @_;
+   my $fail_code = ( @catch_list % 2 ) ? pop @catch_list : undef;
 
    return $self->_sequence( $make_donecatchfail_sub->(
       0, undef, $fail_code, @catch_list,
    ), CB_SEQ_ONDONE|CB_SEQ_ONFAIL|CB_SELF );
 }
 
-sub then_with_f
+sub then_with_f ( $self, $done_code, @catch_list )
 {
-   my $self = shift;
-   my $done_code = shift;
-   my $fail_code = ( @_ % 2 ) ? pop : undef;
-   my @catch_list = @_;
+   my $fail_code = ( @catch_list % 2 ) ? pop @catch_list : undef;
 
    if( $done_code and !@catch_list and !$fail_code ) {
       return $self->_sequence( $done_code, CB_SEQ_ONDONE|CB_SELF|CB_RESULT );
@@ -683,53 +617,43 @@ sub then_with_f
    ), CB_SEQ_ONDONE|CB_SEQ_ONFAIL|CB_SELF );
 }
 
-sub else_with_f
+sub else_with_f ( $self, $fail_code )
 {
-   my $self = shift;
-   my ( $fail_code ) = @_;
-
    return $self->_sequence( $fail_code, CB_SEQ_ONFAIL|CB_SELF|CB_RESULT );
 }
 
-sub catch_with_f
+sub catch_with_f ( $self, @catch_list )
 {
-   my $self = shift;
-   my $fail_code = ( @_ % 2 ) ? pop : undef;
-   my @catch_list = @_;
+   my $fail_code = ( @catch_list % 2 ) ? pop @catch_list : undef;
 
    return $self->_sequence( $make_donecatchfail_sub->(
       1, undef, $fail_code, @catch_list,
    ), CB_SEQ_ONDONE|CB_SEQ_ONFAIL|CB_SELF );
 }
 
-sub followed_by
+sub followed_by ( $self, $code )
 {
-   my $self = shift;
-   my ( $code ) = @_;
-
    return $self->_sequence( $code, CB_SEQ_ONDONE|CB_SEQ_ONFAIL|CB_SELF );
 }
 
-sub without_cancel
+sub without_cancel ( $self )
 {
-   my $self = shift;
    my $new = $self->new;
 
-   $self->on_ready( sub {
-      my $self = shift;
+   $self->on_ready( sub ( $self ) {
       if( $self->{cancelled} ) {
          $new->cancel;
       }
       elsif( $self->{failure} ) {
-         $new->fail( @{ $self->{failure} } );
+         $new->fail( $self->{failure}->@* );
       }
       else {
-         $new->done( @{ $self->{result} } );
+         $new->done( $self->{result}->@* );
       }
    });
 
    $new->{orig} = $self; # just to strongref it - RT122920
-   $new->on_ready( sub { undef $_[0]->{orig} } );
+   $new->on_ready( sub ( $self ) { undef $self->{orig} } );
 
    return $new;
 }
@@ -741,11 +665,8 @@ use constant {
    SUBFLAG_NO_CANCEL => (1<<0),
 };
 
-sub _new_convergent
+sub _new_convergent ( $, $subs )
 {
-   shift; # ignore this class
-   my ( $subs ) = @_;
-
    my @flaggedsubs;
 
    for ( my $i = 0; $i < @$subs; $i++ ) {
@@ -776,9 +697,8 @@ sub _new_convergent
 
 # This might be called by a DESTROY during global destruction so it should
 # be as defensive as possible (see RT88967)
-sub _cancel_subs
+sub _cancel_subs ( $self )
 {
-   my $self = shift;
    my $subs = $self->{subs} or return;
 
    foreach ( pairs @$subs ) {
@@ -787,11 +707,8 @@ sub _cancel_subs
    }
 }
 
-sub wait_all
+sub wait_all ( $class, @subs )
 {
-   my $class = shift;
-   my @subs = @_;
-
    unless( @subs ) {
       my $self = $class->done;
       $self->{subs} = [];
@@ -811,13 +728,13 @@ sub wait_all
    }
 
    weaken( my $weakself = $self );
-   my $sub_on_ready = sub {
+   my $sub_on_ready = sub ( $f ) {
       return unless my $self = $weakself;
 
       $pending--;
       $pending and return;
 
-      $self->{result} = [ pairkeys @{ $self->{subs} } ];
+      $self->{result} = [ pairkeys $self->{subs}->@* ];
       $self->_mark_ready( "wait_all" );
    };
 
@@ -828,11 +745,8 @@ sub wait_all
    return $self;
 }
 
-sub wait_any
+sub wait_any ( $class, @subs )
 {
-   my $class = shift;
-   my @subs = @_;
-
    unless( @subs ) {
       my $self = $class->fail( "Cannot ->wait_any with no subfutures" );
       $self->{subs} = [];
@@ -851,10 +765,10 @@ sub wait_any
       $self->_cancel_subs;
 
       if( $immediate_ready->{failure} ) {
-         $self->{failure} = [ @{ $immediate_ready->{failure} } ];
+         $self->{failure} = [ $immediate_ready->{failure}->@* ];
       }
       else {
-         $self->{result} = [ @{ $immediate_ready->{result} } ];
+         $self->{result} = [ $immediate_ready->{result}->@* ];
       }
       $self->_mark_ready( "wait_any" );
       return $self;
@@ -863,20 +777,20 @@ sub wait_any
    my $pending = 0;
 
    weaken( my $weakself = $self );
-   my $sub_on_ready = sub {
+   my $sub_on_ready = sub ( $f ) {
       return unless my $self = $weakself;
       return if $self->{result} or $self->{failure}; # don't recurse on child ->cancel
 
-      return if --$pending and $_[0]->{cancelled};
+      return if --$pending and $f->{cancelled};
 
-      if( $_[0]->{cancelled} ) {
+      if( $f->{cancelled} ) {
          $self->{failure} = [ "All component futures were cancelled" ];
       }
-      elsif( $_[0]->{failure} ) {
-         $self->{failure} = [ @{ $_[0]->{failure} } ];
+      elsif( $f->{failure} ) {
+         $self->{failure} = [ $f->{failure}->@* ];
       }
       else {
-         $self->{result}  = [ @{ $_[0]->{result} } ];
+         $self->{result}  = [ $f->{result}->@* ];
       }
 
       $self->_cancel_subs;
@@ -894,11 +808,8 @@ sub wait_any
    return $self;
 }
 
-sub needs_all
+sub needs_all ( $class, @subs )
 {
-   my $class = shift;
-   my @subs = @_;
-
    unless( @subs ) {
       my $self = $class->done;
       $self->{subs} = [];
@@ -927,23 +838,23 @@ sub needs_all
 
    # Look for immediate done
    if( !$pending ) {
-      $self->{result} = [ map { @{ $_->{result} } } @subs ];
+      $self->{result} = [ map { $_->{result}->@* } @subs ];
       $self->_mark_ready( "needs_all" );
       return $self;
    }
 
    weaken( my $weakself = $self );
-   my $sub_on_ready = sub {
+   my $sub_on_ready = sub ( $f ) {
       return unless my $self = $weakself;
       return if $self->{result} or $self->{failure}; # don't recurse on child ->cancel
 
-      if( $_[0]->{cancelled} ) {
+      if( $f->{cancelled} ) {
          $self->{failure} = [ "A component future was cancelled" ];
          $self->_cancel_subs;
          $self->_mark_ready( "needs_all" );
       }
-      elsif( $_[0]->{failure} ) {
-         $self->{failure} = [ @{ $_[0]->{failure} } ];
+      elsif( $f->{failure} ) {
+         $self->{failure} = [ $f->{failure}->@* ];
          $self->_cancel_subs;
          $self->_mark_ready( "needs_all" );
       }
@@ -951,7 +862,7 @@ sub needs_all
          $pending--;
          $pending and return;
 
-         $self->{result} = [ map { @{ $_->{result} } } pairkeys @{ $self->{subs} } ];
+         $self->{result} = [ map { $_->{result}->@* } pairkeys $self->{subs}->@* ];
          $self->_mark_ready( "needs_all" );
       }
    };
@@ -963,11 +874,8 @@ sub needs_all
    return $self;
 }
 
-sub needs_any
+sub needs_any ( $class, @subs )
 {
-   my $class = shift;
-   my @subs = @_;
-
    unless( @subs ) {
       my $self = $class->fail( "Cannot ->needs_any with no subfutures" );
       $self->{subs} = [];
@@ -989,7 +897,7 @@ sub needs_any
          $sub->{ready} ? $sub->{reported} = 1 : $sub->cancel;
       }
 
-      $self->{result} = [ @{ $immediate_done->{result} } ];
+      $self->{result} = [ $immediate_done->{result}->@* ];
       $self->_mark_ready( "needs_any" );
       return $self;
    }
@@ -1003,30 +911,30 @@ sub needs_any
    if( $immediate_fail ) {
       $_->{reported} = 1 for @subs;
       # For consistency we'll pick the last one for the failure
-      $self->{failure} = [ $subs[-1]->{failure} ];
+      $self->{failure} = [ $subs[-1]->{failure}->@* ];
       $self->_mark_ready( "needs_any" );
       return $self;
    }
 
    weaken( my $weakself = $self );
-   my $sub_on_ready = sub {
+   my $sub_on_ready = sub ( $f ) {
       return unless my $self = $weakself;
       return if $self->{result} or $self->{failure}; # don't recurse on child ->cancel
 
-      return if --$pending and $_[0]->{cancelled};
+      return if --$pending and $f->{cancelled};
 
-      if( $_[0]->{cancelled} ) {
+      if( $f->{cancelled} ) {
          $self->{failure} = [ "All component futures were cancelled" ];
          $self->_mark_ready( "needs_any" );
       }
-      elsif( $_[0]->{failure} ) {
+      elsif( $f->{failure} ) {
          $pending and return;
 
-         $self->{failure} = [ @{ $_[0]->{failure} } ];
+         $self->{failure} = [ $f->{failure}->@* ];
          $self->_mark_ready( "needs_any" );
       }
       else {
-         $self->{result} = [ @{ $_[0]->{result} } ];
+         $self->{result} = [ $f->{result}->@* ];
          $self->_cancel_subs;
          $self->_mark_ready( "needs_any" );
       }
@@ -1039,78 +947,65 @@ sub needs_any
    return $self;
 }
 
-sub pending_futures
+sub pending_futures ( $self )
 {
-   my $self = shift;
    $self->{subs} or Carp::croak "Cannot call ->pending_futures on a non-convergent Future";
-   return grep { not $_->{ready} } pairkeys @{ $self->{subs} };
+   return grep { not $_->{ready} } pairkeys $self->{subs}->@*;
 }
 
-sub ready_futures
+sub ready_futures ( $self )
 {
-   my $self = shift;
    $self->{subs} or Carp::croak "Cannot call ->ready_futures on a non-convergent Future";
-   return grep { $_->{ready} } pairkeys @{ $self->{subs} };
+   return grep { $_->{ready} } pairkeys $self->{subs}->@*;
 }
 
-sub done_futures
+sub done_futures ( $self )
 {
-   my $self = shift;
    $self->{subs} or Carp::croak "Cannot call ->done_futures on a non-convergent Future";
-   return grep { $_->{ready} and not $_->{failure} and not $_->{cancelled} } pairkeys @{ $self->{subs} };
+   return grep { $_->{ready} and not $_->{failure} and not $_->{cancelled} } pairkeys $self->{subs}->@*;
 }
 
-sub failed_futures
+sub failed_futures ( $self )
 {
-   my $self = shift;
    $self->{subs} or Carp::croak "Cannot call ->failed_futures on a non-convergent Future";
-   return grep { $_->{ready} and $_->{failure} } pairkeys @{ $self->{subs} };
+   return grep { $_->{ready} and $_->{failure} } pairkeys $self->{subs}->@*;
 }
 
-sub cancelled_futures
+sub cancelled_futures ( $self )
 {
-   my $self = shift;
    $self->{subs} or Carp::croak "Cannot call ->cancelled_futures on a non-convergent Future";
-   return grep { $_->{ready} and $_->{cancelled} } pairkeys @{ $self->{subs} };
+   return grep { $_->{ready} and $_->{cancelled} } pairkeys $self->{subs}->@*;
 }
 
-sub btime
+sub btime ( $self )
 {
-   my $self = shift;
    return $self->{btime};
 }
 
-sub rtime
+sub rtime ( $self )
 {
-   my $self = shift;
    return $self->{rtime};
 }
 
-sub set_label
+sub set_label ( $self, $label )
 {
-   my $self = shift;
-   ( $self->{label} ) = @_;
+   $self->{label} = $label;
    return $self;
 }
 
-sub label
+sub label ( $self )
 {
-   my $self = shift;
    return $self->{label};
 }
 
-sub set_udata
+sub set_udata ( $self, $name, $value )
 {
-   my $self = shift;
-   my ( $name, $value ) = @_;
    $self->{"u_$name"} = $value;
    return $self;
 }
 
-sub udata
+sub udata ( $self, $name )
 {
-   my $self = shift;
-   my ( $name ) = @_;
    return $self->{"u_$name"};
 }
 

@@ -142,7 +142,7 @@ add(self, value)
     dd_rwlock_wrlock(h);
     if (h->hdr->sealed) { dd_rwlock_wrunlock(h); croak("Data::DDSketch::Shared->add: sketch is frozen (read-only)"); }
     dd_insert_locked(h, value, 1);
-    __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);
+    h->hdr->stat_ops++;
     RETVAL = (UV)h->hdr->total_count;
     dd_rwlock_wrunlock(h);
   OUTPUT:
@@ -186,7 +186,7 @@ add_many(self, values)
         dd_rwlock_wrlock(h);                             /* locked region: NO croak-capable calls */
         if (h->hdr->sealed) { dd_rwlock_wrunlock(h); croak("Data::DDSketch::Shared->add_many: sketch is frozen (read-only)"); }
         for (i = 0; i < cnt; i++) { dd_insert_locked(h, vs[i], 1); added++; }
-        __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);
+        h->hdr->stat_ops++;
         dd_rwlock_wrunlock(h);
     }
     RETVAL = added;
@@ -389,7 +389,7 @@ merge(self, other)
     dd_rwlock_wrlock(h);
     if (h->hdr->sealed) { dd_rwlock_wrunlock(h); croak("Data::DDSketch::Shared->merge: sketch is frozen (read-only)"); }
     dd_merge_locked(h, tneg, tpos, nb, o_total, o_zero, o_sum, o_min, o_max);
-    __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);
+    h->hdr->stat_ops++;
     dd_rwlock_wrunlock(h);
 
 void
@@ -402,7 +402,7 @@ clear(self)
     dd_rwlock_wrlock(h);
     if (h->hdr->sealed) { dd_rwlock_wrunlock(h); croak("Data::DDSketch::Shared->clear: sketch is frozen (read-only)"); }
     dd_clear_locked(h);
-    __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);
+    h->hdr->stat_ops++;
     dd_rwlock_wrunlock(h);
 
 void
@@ -421,7 +421,7 @@ frozen(self)
   PREINIT:
     EXTRACT(self);
   CODE:
-    RETVAL = h->hdr->sealed ? 1 : 0;
+    RETVAL = __atomic_load_n(&h->hdr->sealed, __ATOMIC_ACQUIRE) ? 1 : 0;
   OUTPUT:
     RETVAL
 
@@ -474,6 +474,7 @@ stats(self)
     {
         uint64_t total, zero, ops;
         uint32_t nb;
+        uint8_t sealed;
         double alpha, gamma, sum, mn, mx;
         if (!h->readonly) dd_rwlock_rdlock(h);   /* frozen: immutable, no lock */
         total = h->hdr->total_count;
@@ -485,6 +486,7 @@ stats(self)
         sum   = h->hdr->sum;
         mn    = h->hdr->min_value;
         mx    = h->hdr->max_value;
+        sealed = __atomic_load_n(&h->hdr->sealed, __ATOMIC_ACQUIRE);
         if (!h->readonly) dd_rwlock_rdunlock(h);
 
         HV *hv = newHV();
@@ -499,7 +501,7 @@ stats(self)
         hv_stores(hv, "mean",        total ? newSVnv(sum / (double)total) : newSV(0));
         hv_stores(hv, "ops",         newSVuv((UV)ops));
         hv_stores(hv, "mmap_size",   newSVuv((UV)h->mmap_size));
-        hv_stores(hv, "frozen",      newSVuv(h->hdr->sealed ? 1 : 0));
+        hv_stores(hv, "frozen",      newSVuv(sealed ? 1 : 0));
         hv_stores(hv, "readonly",    newSVuv(h->readonly ? 1 : 0));
         RETVAL = newRV_noinc((SV *)hv);
     }

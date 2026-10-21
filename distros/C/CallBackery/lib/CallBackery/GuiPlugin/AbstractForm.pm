@@ -260,7 +260,7 @@ sub getAllFieldValues ($self, $parentForm, $currentForm, $args) {
             );
         }
         else {
-            $map{$key} = $self->getFieldValue($key);
+            $map{$key} = $value;
         }
     }
     if (@promises){

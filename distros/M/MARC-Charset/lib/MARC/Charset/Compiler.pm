@@ -12,8 +12,30 @@ MARC::Charset::Compiler - compile XML mapping rules from LoC
 =head1 DESCRIPTION
 
 MARC::Charset uses mapping rules from the Library of Congress for
-generating a MARC::Charset::Table for looking up utf8 values based on the 
+generating a MARC::Charset::Table for looking up utf8 values based on the
 source MARC-8 character set and the character.
+
+=head1 DATA SOURCE
+
+The XML mapping files this module compiles (F<etc/codetables.xml>,
+F<etc/additional-iii-characters.xml>, F<etc/cccii.xml> in this
+distribution) originate from the Library of Congress's own published
+character set tables:
+
+    https://www.loc.gov/marc/specifications/codetables.xml
+
+That file is not treated as a live dependency, and this module never
+fetches it at install or run time -- the copy in F<etc/> is vendored
+and versioned with the distribution. It's also known to differ from
+whatever the LC URL currently serves: LC has published more than one
+revision of this file over the years, and the copy here has picked up
+maintainer corrections for at least one known mistake in LC's data
+(see the G0/G1 workaround in C<end_element()> below, for
+characterSet codes 51, 34 and 45). Diffing against the live URL is
+useful context when investigating a specific character mapping, but
+copying it over F<etc/codetables.xml> wholesale is not safe without
+re-checking that those corrections are still needed against whatever
+LC is serving at the time.
 
 =head1 METHODS
 

@@ -33,6 +33,16 @@ use Time::Keeper::Natural;
 use Time::Keeper::Natural::Words;
 use Time::Keeper::Natural::Numbers;
 my ($out, $sorted, $only) = @ARGV;
+my %given;
+if ($ENV{TKN_ASKED}) {
+    open my $in, '<:encoding(UTF-8)', $ENV{TKN_ASKED} or die "$ENV{TKN_ASKED}: $!";
+    while (my $l = <$in>) {
+        chomp $l;
+        my ($loc, $t) = split /\t/, $l;
+        $t =~ s/\\n/\n/g;
+        push @{ $given{$loc} }, $t;
+    }
+}
 open my $fh, '>:encoding(UTF-8)', $out or die "$out: $!";
 SORTED
 my $L = 'Time::Keeper::Locale';
@@ -100,6 +110,7 @@ for my $loc (grep { $real{$_} } @tables, sort(keys %regional), @others) {
     }
     push @texts, map { $_->[0] } grep { $_->[1] !~ m{ / } && $_->[0] !~ /\b(?:after|before|weekend)\b/ } $w->tests;
     push @texts, map { uc } @texts[0 .. ($#texts < 40 ? $#texts : 40)];
+    @texts = @{ $given{$loc} || [] } if $ENV{TKN_ASKED};
     for my $t (grep { defined && length && !$seen{$_}++ } @texts) {
         my @got;
         for my $n (@parsers) {
@@ -134,7 +145,11 @@ sub run {
     chomp @l;
     return \@l;
 }
+# Ours answers the texts the oracle asked: 0.01's tables make them, and
+# a table that has grown since (an alias, an nth, a marked phrase) would
+# otherwise ask more.
 my $want = run('oracle', File::Spec->catdir($oracle, 'lib'));
+local $ENV{TKN_ASKED} = File::Spec->catfile($dir, 'oracle.txt');
 my $got = run('ours', @INC);
 # 0.02 refuses a phrase CLDR writes for two offsets unless prefer picks,
 # and assumes the direction when it does; 0.01 read the earlier offset.

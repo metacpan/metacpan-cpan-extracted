@@ -41,7 +41,18 @@ my $got = run('ours', map { "-I$_" } @INC);
 # and assumes the direction when it does; 0.01 read the earlier offset.
 my %tie = map { $_ => 1 } grep { defined $got->[$_] && $got->[$_] ne $want->[$_] && $got->[$_] =~ /pass prefer|\bdirection\b/ } 0 .. $#$want;
 note(scalar(keys %tie) . " answers differ by 0.02's rule for a phrase with two meanings");
-my @bad = grep { !$tie{$_} && (!defined $got->[$_] || $got->[$_] ne $want->[$_]) } 0 .. $#$want;
+# 0.02 reads texts 0.01 died on (a zone in the text, a day ordinal): an answer
+# may differ only there, the duration's answer the same.
+my %gain = map { $_ => 1 } grep {
+    my @w = split /\\t/, $want->[$_];
+    my @g = split /\\t/, $got->[$_] // '';
+    !$tie{$_} && @g >= 4 && $w[2] =~ /^died: / && $w[3] eq $g[3]
+        && ($g[2] !~ /^died: /
+            # or a table's nth frame (0.04) names why an ordinal weekday does not read
+            || ($w[2] =~ /no such word/ && $g[2] =~ /an ordinal weekday is counted in a month|no month has/))
+} 0 .. $#$want;
+note(scalar(keys %gain) . " texts 0.01 could not read now read");
+my @bad = grep { !$tie{$_} && !$gain{$_} && (!defined $got->[$_] || $got->[$_] ne $want->[$_]) } 0 .. $#$want;
 my $deaths = grep { /died: / } @$want;
 ok(@$want > 1000, scalar(@$want) . " texts (one in $every), $deaths with a death");
 is(scalar @$got, scalar @$want, 'as many answers');

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use 5.16.0;
 
-our $VERSION = '0.005';
+our $VERSION = '0.006';
 
 use Exporter 'import';
 our @EXPORT_OK = qw( print_columns );
@@ -30,7 +30,7 @@ Term::Choose::LineFold::XS - XS acceleration for Term-Choose-LineFold
 
 =head1 VERSION
 
-Version 0.005
+Version 0.006
 
 =cut
 

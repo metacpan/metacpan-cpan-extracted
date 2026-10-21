@@ -7,6 +7,13 @@ bench/06-duration.pl
 bench/07-date.pl
 bench/08-memory.pl
 bench/09-installed.pl
+bench/10-interval.pl
+bench/11-day-ordinal.pl
+bench/12-zone.pl
+bench/13-fraction.pl
+bench/14-after.pl
+bench/15-find.pl
+bench/16-first-use-zones.pl
 bench/common.pl
 bench/README
 bench/run.pl
@@ -15,6 +22,7 @@ include/tkn/tkn_absolute.h
 include/tkn/tkn_cxt.h
 include/tkn/tkn_days.h
 include/tkn/tkn_duration.h
+include/tkn/tkn_find.h
 include/tkn/tkn_fractions.h
 include/tkn/tkn_grammar.h
 include/tkn/tkn_interval.h
@@ -167,6 +175,7 @@ t/24-zones.t
 t/25-calendars.t
 t/26-fractions.t
 t/27-points.t
+t/28-order-and-case.t
 t/30-words-en.t
 t/31-coverage.t
 t/32-words-all.t
@@ -177,6 +186,7 @@ t/41-day-ordinals.t
 t/50-match.t
 t/51-errors.t
 t/52-match-edges.t
+t/53-find.t
 t/60-pod-examples.t
 t/manifest.t
 t/pod-coverage.t
@@ -187,6 +197,7 @@ tools/oracleread
 tools/wordcheck
 xs/absolute.xs
 xs/duration.xs
+xs/find.xs
 xs/grammar.xs
 xs/interval.xs
 xs/lexicon.xs
@@ -211,6 +222,7 @@ xt/12-oracle.t
 xt/13-leaks.t
 xt/14-zone-roundtrip-all.t
 xt/15-calendar-roundtrip-all.t
+xt/16-find-formats-all.t
 xt/boilerplate.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

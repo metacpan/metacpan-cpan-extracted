@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.09';
+our $VERSION = '0.11';
 
 our $CLOCK;
 
@@ -39,7 +39,7 @@ Time::Keeper - dates and times with time zones, leap seconds and locales
 
 =head1 VERSION
 
-Version 0.09
+Version 0.11
 
 =head1 SYNOPSIS
 

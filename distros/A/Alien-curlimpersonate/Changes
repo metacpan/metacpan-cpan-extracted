@@ -1,5 +1,9 @@
 Revision history for Alien-curlimpersonate
 
+0.04  2026-10-16
+    - Build curl-impersonate v2.3.0 with curl 8.23.0 and c-ares.
+    - Preserve upstream version information in mirrored builds.
+
 0.03  2026-09-01
         - build upstream curl-impersonate v2.2.2 instead of a fork of v2.1.1
         - impersonation target names are unchanged

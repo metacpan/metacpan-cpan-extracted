@@ -1,5 +1,5 @@
 package Crypt::Passphrase::MD5::Hex;
-$Crypt::Passphrase::MD5::Hex::VERSION = '0.023';
+$Crypt::Passphrase::MD5::Hex::VERSION = '0.024';
 use strict;
 use warnings;
 
@@ -14,7 +14,7 @@ sub new {
 
 sub accepts_hash {
 	my ($self, $hash) = @_;
-	return $hash =~ / ^ [a-f0-9]{32} $/xi;
+	return $hash =~ / ^ [a-f0-9]{32} \z /xi;
 }
 
 sub verify_password {
@@ -38,7 +38,7 @@ Crypt::Passphrase::MD5::Hex - Validate against hexed MD5 hashes with Crypt::Pass
 
 =head1 VERSION
 
-version 0.023
+version 0.024
 
 =head1 SYNOPSIS
 

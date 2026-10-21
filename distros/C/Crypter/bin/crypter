@@ -7,10 +7,8 @@ use Getopt::Long qw(GetOptions);
 use Crypter;
 use Pod::Usage qw(pod2usage);
 
-use FindBin qw($Bin);
-use lib "$Bin/../lib/";
 
-my %args = process_command_line(qw/i|input=s f|obfuscate=s g|pwdgen n|noise d o|output=s s|salt=s p|password=s h|help/);
+my %args = process_command_line(qw/i|input=s f|obfuscate=s g|pwdgen n|noise d o|output=s p|password=s h|help/);
 
 my $stdin = ($ARGV[-1] // '') eq '-';
 my $stdout;
@@ -30,8 +28,7 @@ if ($args{password}) {
 
 if ($args{pwdgen}) {
 	my $rand = new Strong::Random;
-	my $pwd = join'', map +(0..9,'a'..'z','A'..'Z')[$rand->rand(10+26*2)], 1..64;
-	say $pwd;
+	say join '', map +(0..9,'a'..'z','A'..'Z')[$rand->rand(10+26*2)], 1..64;
 	exit;
 } elsif ($args{noise}) {
 	my $rand = new Strong::Random;
@@ -40,100 +37,46 @@ if ($args{pwdgen}) {
 	}
 }
 
-
 my $uncrypt = $args{d};
-my $salt = $args{salt};
 my $obfuscate = $args{obfuscate};
 my $password = $args{password};
 
-unless ($salt) {
-	my $rand = new Strong::Random;
-	$salt = join'', map +(0..9,'a'..'z','A'..'Z')[$rand->rand(10+26*2)], 1..64;
-}
-
 usage() if !$stdout && !$output && !$uncrypt;
 
-if ($uncrypt) {
-	die "Not input file $file" if !-f $file && !$stdin;
-	die "No keyfile " . $file . '.key' if !$password && !-f $file . '.key';
-
-	my $input = '';
+die "Not input file $file" if !-f $file && !$stdin;
+die "No password" unless defined $password;
 	
-	my $key;
-	
-
-	unless ($password) {
-		my $fh;
-		open $fh, $file . '.key';
-		$key = join '', <$fh>;
-		close $fh;
-	}
-
-	my $fo;
-	if (!$stdout && $output) {
-		open $fo, '>', $output;
-	} else {
-		$fo = \*STDOUT;
-	}
-	binmode $fo;
-
-	my $fh;
-	if ($file) {
-		open $fh, $file;
-		binmode $fh;
-	} else {
-		$fh = \*STDIN;
-	}
-	
-	my $crypter = new Crypter(
-		password 	=> $password, 
-		obfuscate	=> $obfuscate,
-	);
-	
-	$crypter->uncrypt(input => $fh, output => $fo, keys => $key);
-
-
-	if (!$stdin) {
-		close $fo;
-	}
-
+my $fo;
+if (!$stdout && $output) {
+	open $fo, '>', $output;
 } else {
-	die "Not input file $file" if !$stdin && !-f $file;
+	$fo = \*STDOUT;
+}
+binmode $fo;
 
-
-	my $fo;
-	if (!$stdout) {
-		open $fo, '>', $output;
-	} else {
-		$fo = \*STDOUT;
-	}
-	binmode $fo;
-
-	my $fi;
-	if (!$stdin) {
-		open $fi, $file;
-	} else {
-		$fi = \*STDIN;
-	}
+my $fi;
+if ($file) {
+	open $fi, $file;
 	binmode $fi;
-	
-	my $crypter = new Crypter(
-		password 	=> $password, 
-		salt 		=> $salt, 
-		obfuscate 	=> $obfuscate,
-	);
-	my $keys = $crypter->crypt(input => $fi, output => $fo);
+} else {
+	$fi = \*STDIN;
+}
 
-	close $fi unless !$stdin;
-	close $fo;
+my $crypter = new Crypter(
+	password 	=> $password, 
+	obfuscate	=> $obfuscate,
+);
 
-	unless (defined $password) {
-		my $fh;
-		open $fh, '>', $output .'.key';
-		print $fh $keys;
-		close $fh;
+while (my $i = <$fi>) {
+	if ($uncrypt) {
+		print $fo $crypter->uncrypt($i);
+	} else {
+		print $fo $crypter->crypt($i);
 	}
 }
+
+close $fi if !$stdin;
+close $fo if !$stdout;
 
 sub usage {
 	my $file = @_ ? "$_[0]" : (caller)[1];
@@ -196,7 +139,7 @@ crypter - Console tool for crypting data
         -n, --noise         Noise Generator
         -h, --help          Help
 
-=AUTHOR
+=head1 AUTHOR
 
 Crypter developed by Ivan Trunaev, Russia, 2026
 

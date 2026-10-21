@@ -4,6 +4,10 @@
 # A native reader should review it before release. The format is en.txt's.
 #
 # pt-PT reads this file through its chain.
+#
+# 0.02's keys: Ranges, a duration before or after a point and the day after one read. The
+# weekend does not: "fim de semana" is masculine and CLDR's "próxima semana"
+# feminine.
 start_of	início de|início do|início da|começo de|começo do|começo da|no início de|no início do|no início da|no começo de|no começo do|no começo da
 end_of	fim de|fim do|fim da|final de|final do|final da|no fim de|no fim do|no fim da|no final de|no final do|no final da
 at	às|à
@@ -12,6 +16,9 @@ skip	o|a|os|as
 and
 of	de|do|da
 last	último|última
+range	de {0} a {1}|de {0} até {1}|entre {0} e {1}|{0} até {1}
+after	{0} depois de {1}|o dia depois de {0}
+before	{0} antes de {1}|o dia antes de {0}
 # test: fim do mês passado => 2026-09-30T23:59:59.999999999+01:00
 # test: início do próximo mês => 2026-11-01T00:00:00+00:00
 # test: fim do ano => 2026-12-31T23:59:59.999999999+00:00
@@ -20,3 +27,7 @@ last	último|última
 # test: na terça-feira => 2026-10-20T00:00:00+01:00
 # test: a terceira sexta-feira do próximo mês => 2026-11-20T00:00:00+00:00
 # test: a última sexta-feira de outubro => 2026-10-30T00:00:00+00:00
+# test: de segunda-feira a sexta-feira => 2026-10-19T00:00:00+01:00 / 2026-10-23T23:59:59.999999999+01:00
+# test: 3 dias depois de amanhã => 2026-10-19T00:00:00+01:00
+# test: 2 semanas antes de 20 de outubro => 2026-10-06T00:00:00+01:00
+# test: o dia depois de amanhã => 2026-10-17T00:00:00+01:00

@@ -57,7 +57,7 @@ my %tested;
 for my $t (glob('t/*.t'), glob('t/lib/*.pm')) {
     open my $fh, '<', $t or next;
     while (<$fh>) {
-        $tested{$1} = 1 while /->([A-Za-z_][A-Za-z0-9_]*)\b/g;
+        $tested{$1} = 1 while /(?:->|ClickHouse::Encoder(?:::TCP)?::)([A-Za-z_][A-Za-z0-9_]*)\b/g;
     }
 }
 

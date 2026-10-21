@@ -1,12 +1,15 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2016-2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2016-2026 -- leonerd@leonerd.org.uk
 
-package Future::Mutex 0.53;
+package Future::Mutex 0.54;
 
-use v5.14;
+use v5.20;
 use warnings;
+
+use feature qw( postderef signatures );
+no warnings qw( experimental::postderef experimental::signatures );
 
 use Future;
 
@@ -83,11 +86,8 @@ supplied.
 
 =cut
 
-sub new
+sub new ( $class, %params )
 {
-   my $class = shift;
-   my %params = @_;
-
    return bless {
       avail => $params{count} // 1,
       waitf => undef,
@@ -114,11 +114,8 @@ C<enter> returned.
 
 =cut
 
-sub enter
+sub enter ( $self, $code )
 {
-   my $self = shift;
-   my ( $code ) = @_;
-
    my $down_f;
    if( $self->{avail} ) {
       $self->{avail}--;
@@ -126,11 +123,11 @@ sub enter
    }
    else {
       die "ARGH Need to clone an existing future\n" unless defined $self->{waitf};
-      push @{ $self->{queue} }, $down_f = $self->{waitf}->new;
+      push $self->{queue}->@*, $down_f = $self->{waitf}->new;
    }
 
-   my $up = sub {
-      if( my $next_f = shift @{ $self->{queue} } ) {
+   my $up = sub ( $ ) {
+      if( my $next_f = shift $self->{queue}->@* ) {
          $next_f->done;
       }
       else {
@@ -152,9 +149,8 @@ Returns true if the mutex is currently unlocked, or false if it is locked.
 
 =cut
 
-sub available
+sub available ( $self )
 {
-   my $self = shift;
    return $self->{avail};
 }
 

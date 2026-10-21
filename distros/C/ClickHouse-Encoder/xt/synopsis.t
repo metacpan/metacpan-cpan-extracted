@@ -12,4 +12,4 @@ plan skip_all => 'set RELEASE_TESTING=1 to run synopsis tests'
 eval { require Test::Synopsis; Test::Synopsis->import };
 plan skip_all => 'Test::Synopsis not installed' if $@;
 
-Test::Synopsis::all_synopsis_ok('lib');
+Test::Synopsis::all_synopsis_ok();

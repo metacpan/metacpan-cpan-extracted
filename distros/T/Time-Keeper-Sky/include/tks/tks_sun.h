@@ -150,7 +150,7 @@ tks_place_of(pTHX_ SV *sv, const char *what)
 
 /* The sun seen from a place at an instant: everything position reports. */
 typedef struct tks_sunview {
-    tks_sunpos sun;
+    tks_sunpos pos;             /* not "sun": gcc on Solaris predefines sun as 1 */
     double alt, app_alt, az, H;
 } tks_sunview;
 
@@ -159,8 +159,8 @@ tks_sun_view(pTHX_ const tks_place *p, const time_keeper_instant *t, tks_sunview
 {
     double jd  = tks_jd_ut(t);
     double jde = tks_jde(aTHX_ t);
-    tks_sun_at(jde, &v->sun);
-    tks_altaz(jd, jde, p->lat, p->lon, v->sun.ra, v->sun.dec, &v->alt, &v->az, &v->H);
+    tks_sun_at(jde, &v->pos);
+    tks_altaz(jd, jde, p->lat, p->lon, v->pos.ra, v->pos.dec, &v->alt, &v->az, &v->H);
     v->app_alt = v->alt + tks_refraction(v->alt) / 60.0;
 }
 

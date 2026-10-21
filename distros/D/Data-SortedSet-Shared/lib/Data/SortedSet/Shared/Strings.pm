@@ -5,7 +5,7 @@ use Carp ();
 use Data::Intern::Shared ();
 use Data::SortedSet::Shared ();
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 # ---- construction ----
 
@@ -129,8 +129,7 @@ for my $m (qw(pop_min pop_max peek_min peek_max)) {
 
 sub each {
     my ($self, $cb) = @_;
-    my $k = $self->{keys};
-    $self->{set}->each(sub { $cb->($k->string($_[0]), $_[1]) });
+    $self->{set}->_each_strings($self->{keys}, $cb);
     return;
 }
 
@@ -230,7 +229,8 @@ those of L<Data::SortedSet::Shared>:
 C<remove> leaves the key interned (ids are stable); the key universe (C<max_keys>)
 must therefore accommodate every distinct key ever added, not just those currently
 present. C<clear> is the one exception -- it resets B<both> the set and the key
-table, so ids minted before a C<clear> no longer resolve. C<add> returns C<undef>
+table, so ids minted before a C<clear> no longer resolve; it requires exclusive
+access to both stores. C<add> returns C<undef>
 (and C<incr> croaks) if the key table or the member pool is full. C<add_many>
 interns each row's key in order, stopping only if the key table fills, then
 bulk-adds; it returns the number of members B<newly inserted> (fewer than the rows

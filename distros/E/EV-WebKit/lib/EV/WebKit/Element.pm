@@ -1,7 +1,7 @@
 package EV::WebKit::Element;
 use v5.10; use strict; use warnings;
 use Carp ();
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 # $frame is a web-process frame id when this element was found through a frame
 # the main-frame script cannot reach; undef is the ordinary main-frame case.
@@ -205,7 +205,8 @@ sub clear {
 sub submit {
     $_[0]->_call_js(
         'const el = window.__evwk.get(A.id, A.epoch); const f = el.form || el;'
-      . 'if (f instanceof HTMLFormElement) HTMLFormElement.prototype.submit.call(f);'
+      . 'const W = el.ownerDocument.defaultView;'
+      . 'if (f instanceof W.HTMLFormElement) W.HTMLFormElement.prototype.submit.call(f);'
       . 'return true;',
         {}, $_[1]);
 }
@@ -265,7 +266,7 @@ sub select_option {
     $value = "$value";
     $s->_call_js(
         'const el = window.__evwk.get(A.id, A.epoch);'
-      . 'if (!(el instanceof HTMLSelectElement)) throw new Error("element is not a <select>");'
+      . 'if (!(el instanceof HTMLSelectElement || el instanceof el.ownerDocument.defaultView.HTMLSelectElement)) throw new Error("element is not a <select>");'
       . 'const opts = [...el.options];'
       . 'let i = opts.findIndex(o => o.value === A.value);'
       . 'if (i < 0) i = opts.findIndex(o => (o.label || o.textContent || "").trim() === A.value);'
@@ -292,7 +293,7 @@ sub check {
     my $on  = @arg ? ($arg[0] ? 1 : 0) : 1;
     $s->_call_js(
         'const el = window.__evwk.get(A.id, A.epoch);'
-      . 'if (!(el instanceof HTMLInputElement) || !/^(checkbox|radio)$/.test(el.type))'
+      . 'if (!(el instanceof HTMLInputElement || el instanceof el.ownerDocument.defaultView.HTMLInputElement) || !/^(checkbox|radio)$/.test(el.type))'
       . '  throw new Error("element is not a checkbox or radio");'
       . 'if (el.checked === !!A.on) return !!A.on;'
       . 'el.checked = !!A.on;'

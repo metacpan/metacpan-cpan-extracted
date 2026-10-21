@@ -1,5 +1,12 @@
 Revision history for Test::Consumer::Contract
 
+0.04	Tue Oct 20 08:30:10 AM EDT 2026
+	- A workspace producer whose sibling distribution is not checked out is now
+	  skipped rather than failed.  Before, check 1 tried to read it anyway, so a
+	  declaration with workspace_producers failed on every CPAN install and
+	  single-repository CI job while the other workspace checks skipped.  A
+	  sibling that is present but no longer has the file still fails.
+
 0.03	Sat Oct 17 08:54:27 PM EDT 2026
 	- Rework the documentation and move the code more to my standards
 

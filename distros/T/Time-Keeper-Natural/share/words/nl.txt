@@ -3,6 +3,10 @@
 # UNREVIEWED: written 18 Oct 2026 by a session, as the p2p site's catalogues were.
 # A native reader should review it before release. The format is en.txt's.
 #
+#
+# 0.02's keys: Ranges, a duration before or after a point and the day after one read. The
+# weekend does not: CLDR's "volgende week" with "weekend" in it is not Dutch
+# (volgend weekend).
 start_of	begin|begin van|het begin van|aan het begin van
 end_of	eind|einde|eind van|einde van|het eind van|het einde van|aan het eind van|aan het einde van
 at	om
@@ -11,6 +15,9 @@ skip	de|het
 and
 of	van
 last	laatste
+range	van {0} tot {1}|tussen {0} en {1}|{0} tot {1}
+after	{0} na {1}|de dag na {0}
+before	{0} voor {1}|de dag voor {0}
 # test: eind volgende maand => 2026-11-30T23:59:59.999999999+00:00
 # test: begin volgende week => 2026-10-19T00:00:00+01:00
 # test: het einde van het jaar => 2026-12-31T23:59:59.999999999+00:00
@@ -19,3 +26,7 @@ last	laatste
 # test: op dinsdag => 2026-10-20T00:00:00+01:00
 # test: de derde vrijdag van volgende maand => 2026-11-20T00:00:00+00:00
 # test: de laatste vrijdag van oktober => 2026-10-30T00:00:00+00:00
+# test: van maandag tot vrijdag => 2026-10-19T00:00:00+01:00 / 2026-10-23T23:59:59.999999999+01:00
+# test: 3 dagen na morgen => 2026-10-19T00:00:00+01:00
+# test: 2 weken voor 20 oktober => 2026-10-06T00:00:00+01:00
+# test: de dag na morgen => 2026-10-17T00:00:00+01:00

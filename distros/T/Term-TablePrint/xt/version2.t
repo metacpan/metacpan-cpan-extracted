@@ -51,8 +51,8 @@ close $fh_ch;
 my $t = localtime;
 my $today = $t->ymd;
 
-is( $v,            $v_pod,         'Version in POD Term::TablePrint OK' );
-is( $v,            $v_pb,          'Version in Term::TablePrint::ProgressBar OK' );
-is( $v,            $v_pb_pod,      'Version in POD Term::TablePrint::ProgressBar OK' );
-is( $v,            $v_changes,     'Version in "Changes" OK' );
-is( $release_date, $today,         'Release date in Changes is date from today' );
+is( $v_pod,     $v, 'Version in POD Term::TablePrint OK' );
+is( $v_pb,      $v, 'Version in Term::TablePrint::ProgressBar OK' );
+is( $v_pb_pod,  $v, 'Version in POD Term::TablePrint::ProgressBar OK' );
+is( $v_changes, $v, 'Version in "Changes" OK' );
+is( $release_date, $today, 'Release date in Changes is date from today' );

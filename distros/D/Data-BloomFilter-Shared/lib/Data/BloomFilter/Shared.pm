@@ -1,7 +1,7 @@
 package Data::BloomFilter::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 require XSLoader;
 XSLoader::load('Data::BloomFilter::Shared', $VERSION);
 
@@ -96,9 +96,9 @@ defaults to B<0.01> (1%), and must be strictly between 0 and 1. C<new> and
 C<new_memfd> croak if C<$capacity> is less than 1 or C<$fp_rate> is out of range.
 
 From C<$capacity> and C<$fp_rate> the filter derives its geometry: C<k =
-round(-log2(fp_rate))> hashes (clamped to the range 1..32), and a bit array of
-C<m = next_power_of_two(ceil(capacity * k / ln 2))> bits (with a floor of 64
-bits). Rounding the bit count up to a power of two means the realised
+round(-log2(fp_rate))> hashes (clamped to the range 1..32), and a bit array
+large enough to meet the target at that capacity, rounded up to a power of two
+(with a floor of 64 bits). Rounding the bit count up means the realised
 false-positive rate at capacity is typically B<at or below> the configured
 target. When reopening an existing file or memfd, the stored geometry wins and
 the caller's C<$capacity>/C<$fp_rate> do not resize it -- but they are still

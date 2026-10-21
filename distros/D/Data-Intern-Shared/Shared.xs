@@ -221,7 +221,7 @@ frozen(self)
   PREINIT:
     EXTRACT(self);
   CODE:
-    RETVAL = h->hdr->sealed ? 1 : 0;
+    RETVAL = __atomic_load_n(&h->hdr->sealed, __ATOMIC_ACQUIRE) ? 1 : 0;
   OUTPUT:
     RETVAL
 
@@ -336,6 +336,7 @@ stats(self)
     {
         uint32_t count, max_strings, hash_slots, arena_used, arena_bytes;
         uint64_t ops;
+        uint8_t sealed;
         /* Snapshot the header fields under the lock; do all (croak-capable) Perl
            allocation after releasing it -- an OOM in newHV/newSVuv must never
            strand the read lock. */
@@ -347,6 +348,7 @@ stats(self)
         arena_used  = hd->arena_used;
         arena_bytes = hd->arena_bytes;
         ops         = hd->stat_ops;
+        sealed      = __atomic_load_n(&hd->sealed, __ATOMIC_ACQUIRE);
         if (!h->readonly) si_rwlock_rdunlock(h);
 
         HV *hv = newHV();
@@ -359,7 +361,7 @@ stats(self)
         hv_stores(hv, "arena_load",  newSVnv((double)arena_used / (double)arena_bytes));
         hv_stores(hv, "ops",         newSVuv(ops));
         hv_stores(hv, "mmap_size",   newSVuv((UV)h->mmap_size));
-        hv_stores(hv, "frozen",      newSVuv(h->hdr->sealed ? 1 : 0));
+        hv_stores(hv, "frozen",      newSVuv(sealed ? 1 : 0));
         hv_stores(hv, "readonly",    newSVuv(h->readonly ? 1 : 0));
         RETVAL = newRV_noinc((SV *)hv);
     }

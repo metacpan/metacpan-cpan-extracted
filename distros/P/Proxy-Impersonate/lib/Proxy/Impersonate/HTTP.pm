@@ -1,13 +1,14 @@
 package Proxy::Impersonate::HTTP;
 use v5.10; use strict; use warnings;
 use Exporter 'import';
-our @EXPORT_OK = qw(parse_request_head body_length coherent_headers response_head);
+our @EXPORT_OK = qw(parse_request_head body_length coherent_headers response_head strip_hop_headers);
 
 my %REASON = (
-    200=>'OK', 201=>'Created', 204=>'No Content',
+    200=>'OK', 201=>'Created', 204=>'No Content', 205=>'Reset Content',
     301=>'Moved Permanently', 302=>'Found', 303=>'See Other',
     304=>'Not Modified', 307=>'Temporary Redirect', 308=>'Permanent Redirect',
     400=>'Bad Request', 401=>'Unauthorized', 403=>'Forbidden', 404=>'Not Found',
+    411=>'Length Required', 417=>'Expectation Failed',
     500=>'Internal Server Error', 502=>'Bad Gateway', 503=>'Service Unavailable',
     504=>'Gateway Timeout',
 );
@@ -20,10 +21,24 @@ my %REASON = (
 # per-request Sec-Fetch-* + Accept, so forwarding them (they override the template
 # in place) fixes it. The User-Agent/Sec-CH-UA identity headers are supplied
 # separately via override_headers.
-my %FORWARD = map { $_ => 1 } qw(
-    cookie referer origin content-type authorization
-    sec-fetch-site sec-fetch-mode sec-fetch-dest
+my %HOP = map { $_ => 1 } qw(
+    connection keep-alive proxy-connection proxy-authenticate proxy-authorization
+    te trailer transfer-encoding upgrade
 );
+my %DROP = (%HOP, map { $_ => 1 } qw(
+    host content-length expect user-agent accept accept-language accept-encoding
+    upgrade-insecure-requests priority http2-settings
+));
+
+sub strip_hop_headers {
+    my ($h) = @_;
+    if (my $conn = $h->{connection}) {
+        delete @{$h}{map { split /\s*,\s*/, lc $_ }
+                         (ref $conn eq 'ARRAY' ? @$conn : $conn)};
+    }
+    delete @{$h}{keys %HOP};
+    return $h;
+}
 # Accept-Language is NOT forwarded: WebKit/libsoup may render the profile
 # languages in a non-Chrome format (comma-space, lower-cased region), a tell next
 # to a Chrome JA4. It is supplied as an identity header (override_headers) in the
@@ -60,11 +75,12 @@ sub parse_request_head {
     my $head = substr($buf, 0, $end);
     my ($line, @lines) = split /\r\n/, $head;
     return undef unless defined $line;
-    my ($method, $target, $version) = $line =~ m{^(\S+)\s+(\S+)\s+(HTTP/\d\.\d)$}
+    my ($method, $target, $version) = $line =~ m{\A([!#\x24%&'*+.^_`|~0-9A-Za-z-]+) +([^\x00-\x20\x7f]+) +(HTTP/1\.[01])\z}
         or return undef;
     my @pairs;
     for my $h (@lines) {
-        my ($k, $v) = $h =~ /^([^:]+):[ \t]*(.*?)[ \t]*$/ or next;
+        my ($k, $v) = $h =~ /\A([!#\x24%&'*+.^_`|~0-9A-Za-z-]+):[ \t]*([^\0\r\n]*[^ \t\0\r\n]|)[ \t]*\z/
+            or return undef;
         push @pairs, [$k, $v];
     }
     return {
@@ -85,7 +101,7 @@ sub _get {
 sub body_length {
     my ($pairs) = @_;
     my $te = _get($pairs, 'transfer-encoding');
-    return ('chunked') if $te && $te =~ /chunked/i;
+    return (length($te) ? 'chunked' : 'invalid') if defined $te;
     my @cl = map { $_->[1] } grep { lc($_->[0]) eq 'content-length' } @$pairs;
     if (@cl) {
         # RFC 7230 3.3.3: repeated (or comma-listed) values must all agree, and
@@ -93,7 +109,7 @@ sub body_length {
         # the body unframeable -- and taking a guess would leave the remainder
         # in the buffer to be re-parsed as a SECOND request, which is exactly
         # the request-smuggling primitive. Refuse instead.
-        my %v = map { $_ => 1 } map { split /\s*,\s*/, $_ } @cl;
+        my %v = map { $_ => 1 } map { split /\s*,\s*/, $_, -1 } @cl;
         my @vals = keys %v;
         return ('invalid') if @vals != 1 || $vals[0] !~ /^\d+$/;
         return ('length', $vals[0] + 0);
@@ -105,13 +121,15 @@ sub body_length {
 # "remove this header from the impersonate template".
 sub coherent_headers {
     my ($pairs, $chrome) = @_;
-    my (%out, %seen, $dest, $req_accept);
+    my (%out, %seen, $dest, $req_accept, @connection);
     for (@$pairs) {
         my $k = lc $_->[0];
         $dest       = $_->[1] if $k eq 'sec-fetch-dest';
         $req_accept = $_->[1] if $k eq 'accept';
-        if    ($FORWARD{$k})     { $out{$k} = $_->[1] }
-        elsif ($CONDITIONAL{$k}) { $out{$k} = $_->[1]; $seen{$k} = 1 }
+        push @connection, split /\s*,\s*/, lc $_->[1] if $k eq 'connection';
+        next if $DROP{$k} || index($k, 'sec-ch-') == 0;
+        $out{$k} = $_->[1];
+        $seen{$k} = 1 if $CONDITIONAL{$k};
     }
     $out{$_} = undef for grep { !$seen{$_} } keys %CONDITIONAL;
     # Upgrade-Insecure-Requests: real Chrome sends "1" on every navigation
@@ -141,6 +159,8 @@ sub coherent_headers {
         elsif (defined $req_accept) { $out{accept} = $req_accept }
         else                        { $out{accept} = '*/*' }   # symmetry: never leak curl's template Accept
     }
+    delete @out{@connection} if @connection;
+    $out{'accept-encoding'} = 'identity' if exists $out{range};
     return \%out;
 }
 

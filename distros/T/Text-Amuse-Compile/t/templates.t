@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 use utf8;
-use Test::More tests => 50;
+use Test::More tests => 55;
 use Text::Amuse::Compile::Templates;
 use File::Spec::Functions qw/catfile/;
 use Data::Dumper;
@@ -47,6 +47,7 @@ sub populate_dir {
     my $dir = File::Temp->newdir;
     my $dirname = $dir->dirname;
     foreach my $f (qw/html.tt latex.tt bare.html
+                      slides.tt
                       minimal.html bare-latex css/) {
         my $target = catfile($dirname, $f);
         diag "Creating $target";

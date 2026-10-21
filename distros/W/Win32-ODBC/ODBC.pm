@@ -1,6 +1,6 @@
 package Win32::ODBC;
 
-$VERSION = '0.036';
+$VERSION = '0.037';
 
 # Win32::ODBC.pm
 #       +==========================================================+
@@ -924,8 +924,7 @@ has been an error.
 
 You can now send SQL queries and retrieve info to your heart's
 content! See the description of the methods provided by this module
-below and also the file F<TEST.PL> as referred to in L<INSTALLATION
-NOTES> to see how it all works.
+below and also the script F<eg/sample.pl> to see how it all works.
 
 Finally, B<MAKE SURE> that you close your connection when you are
 finished:
@@ -941,8 +940,7 @@ implementation. I have recoded and restructured most of it including
 most of the F<ODBC.PM> package, but its very core is still based on
 Dan's code (thanks Dan!).
 
-The history of this extension is found in the file F<HISTORY.TXT> that
-comes with the original archive (see L<INSTALLATION NOTES> below).
+The history of this extension is in the file F<HISTORY.TXT>.
 
 =head2 Benefits
 
@@ -1444,24 +1442,11 @@ memory consumption.
 
 =back
 
-=head1 INSTALLATION NOTES
-
-If you wish to use this module with a build of Perl other than
-ActivePerl, you may wish to fetch the original source distribution for
-this module at:
-
-  ftp://ftp.roth.net:/pub/ntperl/ODBC/970208/Bin/Win32_ODBC_Build_CORE.zip
-
-or one of the other archives at that same location. See the included
-README for hints on installing this module manually, what to do if you
-get a I<parse exception>, and a pointer to a test script for this
-module.
-
 =head1 OTHER DOCUMENTATION
 
-Find a FAQ for Win32::ODBC at:
+The Internet Archive has a copy of the Win32::ODBC FAQ:
 
-  http://www.roth.net/odbc/odbcfaq.htm
+  https://web.archive.org/web/20081120061953/http://www.roth.net/odbc/odbcfaq.htm
 
 =head1 AUTHOR
 
@@ -1485,9 +1470,9 @@ Last Modified 1999.09.25.
 
 Copyright (c) 1996-1998 Dave Roth. All rights reserved.
 
-Courtesy of Roth Consulting:  http://www.roth.net/consult/
+Courtesy of Roth Consulting:  https://www.roth.net/
 
-Use under GNU General Public License. Details can be found at:
-http://www.gnu.org/copyleft/gpl.html
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
 
 =cut

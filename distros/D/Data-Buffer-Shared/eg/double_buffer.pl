@@ -3,7 +3,7 @@
 #
 # The producer writes to the back buffer while the consumer reads from
 # the front buffer. An atomic swap index selects which is which.
-# No tearing, no locking on the render path.
+# A read lock keeps the producer from reusing a frame during upload.
 use strict;
 use warnings;
 use POSIX qw(_exit);
@@ -43,7 +43,7 @@ if ($pid == 0) {
         $back->unlock_wr;
 
         # atomic swap: back becomes front
-        $ctl->set(0, $back_idx);
+        $ctl->cas(0, $front, $back_idx) or die 'front changed unexpectedly';
         $ctl->incr(1);
         $ctl->notify;
     }
@@ -52,7 +52,7 @@ if ($pid == 0) {
     _exit(0);
 }
 
-# === CONSUMER: always read from front buffer (no lock needed for GL upload) ===
+# === CONSUMER: hold the frame stable during upload ===
 my @bufs = ($buf0, $buf1);
 my @refs = ($buf0->as_scalar, $buf1->as_scalar);
 my $rendered = 0;
@@ -63,12 +63,13 @@ while (!$ctl->get(2)) {
     unless (defined $n) { sleep 0.001; next }
 
     my $front = $ctl->get(0);
+    next unless $ctl->cas(0, $front, $front);
     my $ref = $refs[$front];
+    $bufs[$front]->lock_rd;
 
     # --- With OpenGL::Modern ---
     # glBufferSubData_p(GL_ARRAY_BUFFER, 0, $$ref);
-    # # No lock needed! Producer writes to the OTHER buffer.
-    # # This read is always from a completed frame.
+    $bufs[$front]->unlock_rd;
 
     $rendered += $n;
 }

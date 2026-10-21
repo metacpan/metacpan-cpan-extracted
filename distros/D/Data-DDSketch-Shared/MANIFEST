@@ -9,6 +9,7 @@ MANIFEST.SKIP
 README
 Shared.xs
 t/01-basic.t
+t/02-concurrent.t
 t/03-frozen.t
 t/04-recover.t
 t/05-unlink-failure.t
@@ -21,6 +22,8 @@ xt/fork_dd.t
 xt/kill_repair.t
 xt/kwalitee.t
 xt/pod.t
+xt/rwlock.c
+xt/rwlock.t
 xt/tsan.t
 xt/valgrind.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

@@ -1,7 +1,7 @@
 
 #define	SYNTAX_ERROR	999
 #define CROAK(xxxx)													\
-				PUSHMARK(sp);										\
+				SP -= items;										\
 				XPUSHs(sv_2mortal(newSVnv((double)SYNTAX_ERROR)));	\
 				XPUSHs(sv_2mortal(newSVpv(xxxx, strlen(xxxx))));	\
 				PUTBACK;											\

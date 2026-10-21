@@ -59,6 +59,12 @@ if ($pid == 0) {
                          ["n=$n len=$len bytes=$bytes"] ];
             }
 
+            # the helper holds one handle; release it for the next stream
+            if ($env->{PATH_INFO} eq '/close') {
+                Hyperman::_abi_stream_close();
+                return [ 200, [ 'Content-Type' => 'text/plain' ], ['closed'] ];
+            }
+
             # An ordinary request must be unaffected by any of the above.
             return [ 200, [ 'Content-Type' => 'text/plain' ],
                      [ "plain:$env->{PATH_INFO}:"
@@ -198,6 +204,37 @@ is($rx{bytes}, 'ping-from-client',
 like(get_h1('/plain'), qr/^plain:\/plain:unset$/,
      'an ordinary request is untouched: no psgix.connect_protocol, and it '
    . 'still dispatches on end of stream');
+
+close $sock;
+
+# ---- DATA in the same read as the CONNECT headers --------------------------
+
+# A browser sends its first message right behind the CONNECT, and requests
+# are dispatched after nghttp2 has parsed the whole read. That DATA lands
+# before the stream has a handle, and has to reach the read half once the
+# handler has opened one rather than stay buffered as psgi.input.
+get_h1('/close');
+$sock = connect_h2();
+for (1 .. 10) {
+    my ($type, $flags) = read_frame($sock);
+    last unless defined $type;
+    last if $type == 0x4 && !($flags & 0x1);
+}
+syswrite $sock, frame(0x4, 0x1, 0, '')
+              . frame(0x1, 0x4, 1, $hb) . frame(0x0, 0, 1, 'early-bytes');
+($got_status, $got_data) = ();
+for (1 .. 20) {
+    my ($type, $flags, $sid, $pay) = read_frame($sock);
+    last unless defined $type;
+    $got_status = 1 if $type == 0x1 && $sid == 1;
+    if ($type == 0x0 && $sid == 1) { $got_data = $pay; last }
+}
+is($got_data, 'up:/chat;', 'a CONNECT sent with its first DATA is answered');
+Time::HiRes::sleep(0.2);
+%rx = get_h1('/rx') =~ /(\w+)=([^\s]*)/g;
+is($rx{bytes}, 'early-bytes',
+   '...and that DATA reaches the read half, though it was parsed before '
+ . 'the handle existed');
 
 close $sock;
 kill 'TERM', $pid;

@@ -314,7 +314,7 @@ frozen(self)
   PREINIT:
     EXTRACT(self);
   CODE:
-    RETVAL = h->hdr->sealed ? 1 : 0;
+    RETVAL = __atomic_load_n(&h->hdr->sealed, __ATOMIC_RELAXED) ? 1 : 0;
   OUTPUT:
     RETVAL
 
@@ -400,15 +400,13 @@ stats(self)
         hv_stores(hv, "depth",     newSVuv((UV)d));
         hv_stores(hv, "total",     newSVuv((UV)total));
         hv_stores(hv, "cells",     newSVuv((UV)cells));
-        hv_stores(hv, "epsilon",   newSVnv(M_E / (double)w));   /* achieved error factor */
-        /* Achieved failure probability.  A row's column is (h1 + r*h2) & (w-1),
-         * and w*h2 is a multiple of w, so rows r and r+w always probe the same
-         * column -- they are duplicates that add no independent estimate.  The
-         * effective depth is therefore min(d, w), which is what the bound uses. */
+        hv_stores(hv, "epsilon",   newSVnv(M_E / (double)w));   /* nominal error factor */
+        /* Nominal failure parameter: rows repeat every w; double-hashed rows
+         * are correlated, so this is not a strict probability guarantee. */
         hv_stores(hv, "delta",     newSVnv(exp(-(double)((uint64_t)d < w ? (uint64_t)d : w))));
         hv_stores(hv, "ops",       newSVuv((UV)ops));
         hv_stores(hv, "mmap_size", newSVuv((UV)h->mmap_size));
-        hv_stores(hv, "frozen",    newSVuv(h->hdr->sealed ? 1 : 0));
+        hv_stores(hv, "frozen",    newSVuv(__atomic_load_n(&h->hdr->sealed, __ATOMIC_RELAXED) ? 1 : 0));
         hv_stores(hv, "readonly",  newSVuv(h->readonly ? 1 : 0));
         RETVAL = newRV_noinc((SV *)hv);
     }

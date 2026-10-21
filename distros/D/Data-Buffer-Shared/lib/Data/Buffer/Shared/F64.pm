@@ -2,7 +2,7 @@ package Data::Buffer::Shared::F64;
 use strict;
 use warnings;
 use Data::Buffer::Shared;
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 sub import {
     $^H{"Data::Buffer::Shared::F64/buf_f64_get"} = 1;

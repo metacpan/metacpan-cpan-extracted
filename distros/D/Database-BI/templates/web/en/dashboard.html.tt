@@ -233,6 +233,8 @@
           title="Plot the current data as a treemap - choose a category column and an optional value column">&#x25A0; Treemap&hellip;</button>
   <button class="btn-histogram" id="btn-histogram" type="button"
           title="Plot the distribution of a numeric column as a histogram">&#x1F4CA; Histogram&hellip;</button>
+  <button class="btn-map" id="btn-map" type="button"
+          title="Plot the current rows on a map - use latitude and longitude columns, or geocode a place-name column">&#x1F5FA; Map&hellip;</button>
   <span class="toolbar-sep" role="separator" aria-hidden="true"></span>
   <button class="btn-folder" id="btn-folder" type="button"
           title="Browse records grouped by the letter prefix of a code column (e.g. Order # A10, B3, CT4)">&#x1F4C1; Folder view&hellip;</button>
@@ -321,7 +323,8 @@
 [%- END -%]
 
 [%- IF left_spec -%]
-<div class="save-analysis-panel panel-section" id="save-analysis-panel" hidden>
+<div class="save-analysis-panel panel-section" id="save-analysis-panel"
+     data-left-spec="[% left_spec | html %]" hidden>
   <h3 class="panel-title">&#x1F4BE; New canvas</h3>
   <div class="panel-row">
     <label for="save-analysis-name-inp">Canvas name</label>
@@ -358,7 +361,7 @@
         <select id="right-table-sel">
           <option value="">&mdash; select a table &mdash;</option>
           [%- FOREACH t IN available_tables -%]
-          <option value="table:[% t.name | html %]">[% t.name | html %]</option>
+          <option value="[% t.spec | html %]">[% t.name | html %]</option>
           [%- END -%]
         </select>
       </div>
@@ -452,7 +455,7 @@
         <select id="combine-table-sel">
           <option value="">&#x2014; select a table &#x2014;</option>
           [%- FOREACH t IN available_tables -%]
-          <option value="table:[% t.name | html %]">[% t.name | html %]</option>
+          <option value="[% t.spec | html %]">[% t.name | html %]</option>
           [%- END -%]
         </select>
       </div>
@@ -1025,6 +1028,93 @@
           <button type="button" id="btn-cancel-histogram" class="btn-secondary">Cancel</button>
         </div>
       </div>
+    </div>
+  </form>
+</div>
+
+<div class="graph-panel" id="map-panel" hidden>
+  <form id="map-form" method="get" action="/map"
+        data-parent-back="[% back_url | html %]" data-parent-back-label="[% back_label | html %]">
+    <input type="hidden" name="l" value="[% left_spec | html %]">
+    [%- FOREACH jspec IN current_joins -%]
+    <input type="hidden" name="j" value="[% jspec | html %]">
+    [%- END -%]
+    [%- FOREACH cspec IN combine_specs -%]
+    <input type="hidden" name="c" value="[% cspec | html %]">
+    [%- END -%]
+    [%- FOREACH fs IN filter_specs -%]
+    <input type="hidden" name="f" value="[% fs | html %]">
+    [%- END -%]
+    [%- IF dedup -%]
+    <input type="hidden" name="d" value="1">
+    [%- END -%]
+    <input type="hidden" name="back" id="map-back-inp" value="">
+    <input type="hidden" name="back2" id="map-back2-inp" value="">
+    <input type="hidden" name="back2_label" id="map-back2-label-inp" value="">
+
+    <h3 class="graph-panel-title">&#x1F5FA; Map</h3>
+    <p class="graph-panel-desc">Plot the current rows on a map. Use latitude and longitude columns, or let the app geocode a place-name column. Filters, joins and calculated fields carry over.</p>
+
+    <div class="graph-fields-row">
+      <div class="join-field">
+        <label for="map-mode-sel">Places are</label>
+        <select id="map-mode-sel">
+          <option value="coords">Coordinate columns</option>
+          <option value="loc">Place-name column</option>
+        </select>
+      </div>
+      <div class="join-field" id="map-lat-field">
+        <label for="map-lat-sel">Latitude</label>
+        <select id="map-lat-sel" name="lat" required>
+          <option value="">&#x2014; select column &#x2014;</option>
+          [%- FOREACH col IN columns -%]
+          <option value="[% col | html %]">[% col | html %]</option>
+          [%- END -%]
+        </select>
+      </div>
+      <div class="join-field" id="map-lon-field">
+        <label for="map-lon-sel">Longitude</label>
+        <select id="map-lon-sel" name="lon" required>
+          <option value="">&#x2014; select column &#x2014;</option>
+          [%- FOREACH col IN columns -%]
+          <option value="[% col | html %]">[% col | html %]</option>
+          [%- END -%]
+        </select>
+      </div>
+      <div class="join-field" id="map-loc-field" hidden>
+        <label for="map-loc-sel">Place column</label>
+        <select id="map-loc-sel" name="loc" disabled>
+          <option value="">&#x2014; select column &#x2014;</option>
+          [%- FOREACH col IN columns -%]
+          <option value="[% col | html %]">[% col | html %]</option>
+          [%- END -%]
+        </select>
+      </div>
+      <div class="graph-btn-col">
+        <span class="graph-btn-spacer"></span>
+        <div class="graph-btn-row">
+          <button type="submit" id="btn-do-map" class="btn-primary" disabled>Open map</button>
+          <button type="button" id="btn-cancel-map" class="btn-secondary">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="graph-fields-row" id="map-color-row">
+      <div class="join-field">
+        <label for="map-color-sel">Colour by column</label>
+        <select id="map-color-sel">
+          <option value="">&#x2014; none &#x2014;</option>
+        </select>
+      </div>
+      <div class="join-field" id="map-color-default-field" hidden>
+        <label for="map-color-default-inp">Default colour</label>
+        <input type="text" id="map-color-default-inp" placeholder="#3388ff" size="10">
+      </div>
+    </div>
+    <div id="map-color-rules" hidden>
+      <div class="filter-section-head" style="margin:0.4rem 0 0.2rem;font-size:0.85rem;font-weight:600;color:#555">Colour rules &mdash; first match wins</div>
+      <div id="map-rule-rows"></div>
+      <button type="button" id="btn-add-map-rule" class="btn-add-filter">&#x2b; Add rule</button>
     </div>
   </form>
 </div>
@@ -2278,7 +2368,7 @@ function parseAccounting(v) {
   var back2LabelInp = document.getElementById('graph-back2-label-inp');
   var graphForm     = document.getElementById('graph-form');
 
-  var otherPanels = ['join-panel', 'combine-panel', 'export-panel', 'pie-panel', 'heatmap-panel', 'bar-panel', 'stacked-panel', 'scatter-panel', 'combo-panel', 'treemap-panel', 'histogram-panel', 'folder-panel', 'pivot-panel', 'calc-panel', 'groups-panel', 'dates-panel', 'save-analysis-panel'].map(function (id) {
+  var otherPanels = ['join-panel', 'combine-panel', 'export-panel', 'pie-panel', 'heatmap-panel', 'bar-panel', 'stacked-panel', 'scatter-panel', 'combo-panel', 'treemap-panel', 'histogram-panel', 'folder-panel', 'pivot-panel', 'calc-panel', 'groups-panel', 'dates-panel', 'save-analysis-panel', 'map-panel'].map(function (id) {
     return document.getElementById(id);
   }).filter(Boolean);
 
@@ -2396,7 +2486,7 @@ function parseAccounting(v) {
   var back2LabelInp = document.getElementById('pie-back2-label-inp');
   var pieForm       = document.getElementById('pie-form');
 
-  var otherPanels = ['join-panel', 'combine-panel', 'export-panel', 'graph-panel', 'heatmap-panel', 'bar-panel', 'stacked-panel', 'scatter-panel', 'combo-panel', 'treemap-panel', 'histogram-panel', 'folder-panel', 'pivot-panel', 'calc-panel', 'groups-panel', 'dates-panel', 'save-analysis-panel'].map(function (id) {
+  var otherPanels = ['join-panel', 'combine-panel', 'export-panel', 'graph-panel', 'heatmap-panel', 'bar-panel', 'stacked-panel', 'scatter-panel', 'combo-panel', 'treemap-panel', 'histogram-panel', 'folder-panel', 'pivot-panel', 'calc-panel', 'groups-panel', 'dates-panel', 'save-analysis-panel', 'map-panel'].map(function (id) {
     return document.getElementById(id);
   }).filter(Boolean);
 
@@ -2481,7 +2571,7 @@ function parseAccounting(v) {
   var back2LabelInp = document.getElementById('heatmap-back2-label-inp');
   var heatmapForm   = document.getElementById('heatmap-form');
 
-  var otherPanels = ['join-panel', 'combine-panel', 'export-panel', 'graph-panel', 'pie-panel', 'bar-panel', 'stacked-panel', 'scatter-panel', 'combo-panel', 'treemap-panel', 'histogram-panel', 'folder-panel', 'pivot-panel', 'calc-panel', 'groups-panel', 'dates-panel', 'save-analysis-panel'].map(function (id) {
+  var otherPanels = ['join-panel', 'combine-panel', 'export-panel', 'graph-panel', 'pie-panel', 'bar-panel', 'stacked-panel', 'scatter-panel', 'combo-panel', 'treemap-panel', 'histogram-panel', 'folder-panel', 'pivot-panel', 'calc-panel', 'groups-panel', 'dates-panel', 'save-analysis-panel', 'map-panel'].map(function (id) {
     return document.getElementById(id);
   }).filter(Boolean);
 
@@ -2552,7 +2642,7 @@ function parseAccounting(v) {
   var back2LabelInp = document.getElementById('bar-back2-label-inp');
   var barForm       = document.getElementById('bar-form');
 
-  var otherPanels = ['join-panel', 'combine-panel', 'export-panel', 'graph-panel', 'pie-panel', 'heatmap-panel', 'stacked-panel', 'scatter-panel', 'combo-panel', 'treemap-panel', 'histogram-panel', 'folder-panel', 'pivot-panel', 'calc-panel', 'groups-panel', 'dates-panel', 'save-analysis-panel'].map(function (id) {
+  var otherPanels = ['join-panel', 'combine-panel', 'export-panel', 'graph-panel', 'pie-panel', 'heatmap-panel', 'stacked-panel', 'scatter-panel', 'combo-panel', 'treemap-panel', 'histogram-panel', 'folder-panel', 'pivot-panel', 'calc-panel', 'groups-panel', 'dates-panel', 'save-analysis-panel', 'map-panel'].map(function (id) {
     return document.getElementById(id);
   }).filter(Boolean);
 
@@ -2626,7 +2716,7 @@ function parseAccounting(v) {
   var back2LabelInp = document.getElementById('stacked-back2-label-inp');
   var stackedForm   = document.getElementById('stacked-form');
 
-  var otherPanels = ['join-panel', 'combine-panel', 'export-panel', 'graph-panel', 'pie-panel', 'heatmap-panel', 'bar-panel', 'scatter-panel', 'combo-panel', 'treemap-panel', 'histogram-panel', 'folder-panel', 'pivot-panel', 'calc-panel', 'groups-panel', 'dates-panel', 'save-analysis-panel'].map(function (id) {
+  var otherPanels = ['join-panel', 'combine-panel', 'export-panel', 'graph-panel', 'pie-panel', 'heatmap-panel', 'bar-panel', 'scatter-panel', 'combo-panel', 'treemap-panel', 'histogram-panel', 'folder-panel', 'pivot-panel', 'calc-panel', 'groups-panel', 'dates-panel', 'save-analysis-panel', 'map-panel'].map(function (id) {
     return document.getElementById(id);
   }).filter(Boolean);
 
@@ -2680,7 +2770,7 @@ function parseAccounting(v) {
   var back2LabelInp = document.getElementById('scatter-back2-label-inp');
   var scatterForm   = document.getElementById('scatter-form');
 
-  var otherPanels = ['join-panel', 'combine-panel', 'export-panel', 'graph-panel', 'pie-panel', 'heatmap-panel', 'bar-panel', 'stacked-panel', 'combo-panel', 'treemap-panel', 'histogram-panel', 'folder-panel', 'pivot-panel', 'calc-panel', 'groups-panel', 'dates-panel', 'save-analysis-panel'].map(function (id) {
+  var otherPanels = ['join-panel', 'combine-panel', 'export-panel', 'graph-panel', 'pie-panel', 'heatmap-panel', 'bar-panel', 'stacked-panel', 'combo-panel', 'treemap-panel', 'histogram-panel', 'folder-panel', 'pivot-panel', 'calc-panel', 'groups-panel', 'dates-panel', 'save-analysis-panel', 'map-panel'].map(function (id) {
     return document.getElementById(id);
   }).filter(Boolean);
 
@@ -2803,7 +2893,7 @@ function parseAccounting(v) {
   var back2LabelInp = document.getElementById('combo-back2-label-inp');
   var comboForm     = document.getElementById('combo-form');
 
-  var otherPanels = ['join-panel', 'combine-panel', 'export-panel', 'graph-panel', 'pie-panel', 'heatmap-panel', 'bar-panel', 'stacked-panel', 'scatter-panel', 'treemap-panel', 'histogram-panel', 'folder-panel', 'pivot-panel', 'calc-panel', 'groups-panel', 'dates-panel', 'save-analysis-panel'].map(function (id) {
+  var otherPanels = ['join-panel', 'combine-panel', 'export-panel', 'graph-panel', 'pie-panel', 'heatmap-panel', 'bar-panel', 'stacked-panel', 'scatter-panel', 'treemap-panel', 'histogram-panel', 'folder-panel', 'pivot-panel', 'calc-panel', 'groups-panel', 'dates-panel', 'save-analysis-panel', 'map-panel'].map(function (id) {
     return document.getElementById(id);
   }).filter(Boolean);
 
@@ -2882,7 +2972,7 @@ function parseAccounting(v) {
   var back2LabelInp = document.getElementById('treemap-back2-label-inp');
   var treemapForm   = document.getElementById('treemap-form');
 
-  var otherPanels = ['join-panel', 'combine-panel', 'export-panel', 'graph-panel', 'pie-panel', 'heatmap-panel', 'bar-panel', 'stacked-panel', 'scatter-panel', 'combo-panel', 'histogram-panel', 'folder-panel', 'pivot-panel', 'calc-panel', 'groups-panel', 'dates-panel', 'save-analysis-panel'].map(function (id) {
+  var otherPanels = ['join-panel', 'combine-panel', 'export-panel', 'graph-panel', 'pie-panel', 'heatmap-panel', 'bar-panel', 'stacked-panel', 'scatter-panel', 'combo-panel', 'histogram-panel', 'folder-panel', 'pivot-panel', 'calc-panel', 'groups-panel', 'dates-panel', 'save-analysis-panel', 'map-panel'].map(function (id) {
     return document.getElementById(id);
   }).filter(Boolean);
 
@@ -2927,7 +3017,7 @@ function parseAccounting(v) {
   var back2LabelInp = document.getElementById('histogram-back2-label-inp');
   var histogramForm = document.getElementById('histogram-form');
 
-  var otherPanels = ['join-panel', 'combine-panel', 'export-panel', 'graph-panel', 'pie-panel', 'heatmap-panel', 'bar-panel', 'stacked-panel', 'scatter-panel', 'combo-panel', 'treemap-panel', 'folder-panel', 'pivot-panel', 'calc-panel', 'groups-panel', 'dates-panel', 'save-analysis-panel'].map(function (id) {
+  var otherPanels = ['join-panel', 'combine-panel', 'export-panel', 'graph-panel', 'pie-panel', 'heatmap-panel', 'bar-panel', 'stacked-panel', 'scatter-panel', 'combo-panel', 'treemap-panel', 'folder-panel', 'pivot-panel', 'calc-panel', 'groups-panel', 'dates-panel', 'save-analysis-panel', 'map-panel'].map(function (id) {
     return document.getElementById(id);
   }).filter(Boolean);
 
@@ -2997,6 +3087,224 @@ function parseAccounting(v) {
 
 <script>
 // ---------------------------------------------------------------------------
+// Map panel
+// ---------------------------------------------------------------------------
+(function () {
+  var btnOpen   = document.getElementById('btn-map');
+  var panel     = document.getElementById('map-panel');
+  if (!btnOpen || !panel) return;
+
+  var btnCancel     = document.getElementById('btn-cancel-map');
+  var btnDo         = document.getElementById('btn-do-map');
+  var modeSel       = document.getElementById('map-mode-sel');
+  var latSel        = document.getElementById('map-lat-sel');
+  var lonSel        = document.getElementById('map-lon-sel');
+  var locSel        = document.getElementById('map-loc-sel');
+  var latField      = document.getElementById('map-lat-field');
+  var lonField      = document.getElementById('map-lon-field');
+  var locField      = document.getElementById('map-loc-field');
+  var backInp       = document.getElementById('map-back-inp');
+  var back2Inp      = document.getElementById('map-back2-inp');
+  var back2LabelInp = document.getElementById('map-back2-label-inp');
+  var mapForm       = document.getElementById('map-form');
+
+  var otherPanels = ['join-panel', 'combine-panel', 'export-panel', 'graph-panel', 'pie-panel', 'heatmap-panel', 'bar-panel', 'stacked-panel', 'scatter-panel', 'combo-panel', 'treemap-panel', 'histogram-panel', 'folder-panel', 'pivot-panel', 'calc-panel', 'groups-panel', 'dates-panel', 'save-analysis-panel'].map(function (id) {
+    return document.getElementById(id);
+  }).filter(Boolean);
+
+  function byLocation() {
+    return modeSel.value === 'loc';
+  }
+
+  function checkMap() {
+    if (byLocation()) {
+      btnDo.disabled = !locSel.value;
+    } else {
+      btnDo.disabled = !(latSel.value && lonSel.value && latSel.value !== lonSel.value);
+    }
+  }
+
+  // A disabled control is not submitted, so switching mode sends only the
+  // column that the chosen way of placing a row uses.
+  function syncMode() {
+    var loc = byLocation();
+    latField.hidden = loc;
+    lonField.hidden = loc;
+    locField.hidden = !loc;
+    latSel.disabled = loc;
+    lonSel.disabled = loc;
+    locSel.disabled = !loc;
+    latSel.required = !loc;
+    lonSel.required = !loc;
+    locSel.required = loc;
+    checkMap();
+  }
+
+  function guess(sel, patterns) {
+    var names = Array.from(sel.options).map(function (o) { return o.value; }).filter(Boolean);
+    for (var i = 0; i < patterns.length; i++) {
+      for (var j = 0; j < names.length; j++) {
+        if (patterns[i].test(names[j])) return names[j];
+      }
+    }
+    return '';
+  }
+
+  // Pick the obvious columns when the table has them, and leave the choice
+  // alone once the user has made it.
+  function guessColumns() {
+    if (!latSel.value) latSel.value = guess(latSel, [/^(lat|latitude)$/i, /lat/i]);
+    if (!lonSel.value) lonSel.value = guess(lonSel, [/^(lon|lng|long|longitude)$/i, /(lon|lng|longitude)/i]);
+    if (!locSel.value) locSel.value = guess(locSel, [/^(loc|location|place|city|town|address)$/i, /(place|location|city|address)/i]);
+    if (!latSel.value || !lonSel.value) {
+      if (locSel.value) modeSel.value = 'loc';
+    }
+  }
+
+  btnOpen.addEventListener('click', function () {
+    otherPanels.forEach(function (p) { p.hidden = true; });
+    backInp.value = window.location.href;
+    if (back2Inp && mapForm) {
+      var pb = mapForm.getAttribute('data-parent-back') || '';
+      back2Inp.value = pb;
+      if (back2LabelInp) back2LabelInp.value = pb ? (mapForm.getAttribute('data-parent-back-label') || '') : '';
+    }
+    guessColumns();
+    buildColorSelect();
+    panel.hidden = !panel.hidden;
+    syncMode();
+    if (!panel.hidden) modeSel.focus();
+  });
+
+  btnCancel && btnCancel.addEventListener('click', function () {
+    panel.hidden = true;
+  });
+
+  modeSel.addEventListener('change', syncMode);
+  latSel.addEventListener('change', checkMap);
+  lonSel.addEventListener('change', checkMap);
+  locSel.addEventListener('change', checkMap);
+
+  // --- Colour-coding controls ---
+  function isMapDateVal(v) {
+    return /^\d{4}-\d{2}-\d{2}$/.test(v) || /^\d{1,2}\/\d{1,2}\/\d{4}$/.test(v);
+  }
+
+  function buildColorSelect() {
+    if (!colorSel) return;
+    var tbl  = document.querySelector('table[data-table]') || document.querySelector('table');
+    if (!tbl || !tbl.tHead || !tbl.tBodies[0]) return;
+    var headers = Array.from(tbl.tHead.rows[0].cells);
+    var rows    = Array.from(tbl.tBodies[0].rows);
+    var prev    = colorSel.value;
+    while (colorSel.options.length > 1) colorSel.remove(1);
+    headers.forEach(function (th, idx) {
+      var name = th.textContent.trim();
+      if (!name) return;
+      var vals = rows.map(function (r) {
+        return r.cells[idx] ? r.cells[idx].textContent.trim() : '';
+      }).filter(function (v) { return v !== ''; });
+      if (vals.length === 0) return;
+      if (vals.every(isMapDateVal)) return;
+      if (!vals.every(function (v) { return !isNaN(parseAccounting(v)); })) return;
+      var opt = document.createElement('option');
+      opt.value = name; opt.textContent = name;
+      if (name === prev) opt.selected = true;
+      colorSel.appendChild(opt);
+    });
+    colorSel.style.width = 'auto';
+  }
+
+  var colorSel          = document.getElementById('map-color-sel');
+  var colorDefaultInp   = document.getElementById('map-color-default-inp');
+  var colorDefaultField = document.getElementById('map-color-default-field');
+  var colorRulesDiv     = document.getElementById('map-color-rules');
+  var colorRuleRows     = document.getElementById('map-rule-rows');
+  var btnAddRule        = document.getElementById('btn-add-map-rule');
+
+  var COLOR_OPS = [
+    ['gt', '> greater than'],
+    ['ge', '>= at least'],
+    ['lt', '< less than'],
+    ['le', '<= at most'],
+    ['eq', '= equals'],
+    ['ne', '!= not equals']
+  ];
+
+  function toggleColorSection() {
+    var active = colorSel.value !== '';
+    colorDefaultField.hidden = !active;
+    colorRulesDiv.hidden = !active;
+  }
+
+  function addColorRule() {
+    var row = document.createElement('div');
+    row.className = 'filter-row';
+
+    var opSel = document.createElement('select');
+    opSel.className = 'filter-op-sel';
+    COLOR_OPS.forEach(function (pair) {
+      var opt = document.createElement('option');
+      opt.value = pair[0]; opt.textContent = pair[1];
+      opSel.appendChild(opt);
+    });
+
+    var threshInp = document.createElement('input');
+    threshInp.type = 'text';
+    threshInp.className = 'filter-val-inp';
+    threshInp.placeholder = 'threshold';
+
+    var colorInp = document.createElement('input');
+    colorInp.type = 'text';
+    colorInp.className = 'filter-val-inp';
+    colorInp.placeholder = 'colour (e.g. red, #ff0000)';
+    colorInp.style.width = '12em';
+
+    var rmBtn = document.createElement('button');
+    rmBtn.type = 'button';
+    rmBtn.className = 'btn-remove-filter';
+    rmBtn.textContent = 'x';
+    rmBtn.addEventListener('click', function () { row.remove(); });
+
+    row.appendChild(opSel);
+    row.appendChild(threshInp);
+    row.appendChild(colorInp);
+    row.appendChild(rmBtn);
+    colorRuleRows.appendChild(row);
+  }
+
+  btnAddRule && btnAddRule.addEventListener('click', addColorRule);
+  colorSel && colorSel.addEventListener('change', toggleColorSection);
+
+  mapForm.addEventListener('submit', function () {
+    var col = colorSel ? colorSel.value : '';
+    if (!col) return;
+    function addHidden(nm, val) {
+      var inp = document.createElement('input');
+      inp.type = 'hidden'; inp.name = nm; inp.value = val;
+      mapForm.appendChild(inp);
+    }
+    addHidden('color', col);
+    var def = colorDefaultInp ? colorDefaultInp.value.trim() : '';
+    if (def) addHidden('color_default', def);
+    if (colorRuleRows) {
+      colorRuleRows.querySelectorAll('.filter-row').forEach(function (row) {
+        var sels = row.querySelectorAll('select');
+        var inps = row.querySelectorAll('input');
+        var op     = sels[0] ? sels[0].value : 'gt';
+        var thresh = inps[0] ? inps[0].value.trim() : '';
+        var clr    = inps[1] ? inps[1].value.trim() : '';
+        if (thresh && clr) addHidden('color_rule', op + ':' + thresh + ':' + clr);
+      });
+    }
+  });
+
+  syncMode();
+}());
+</script>
+
+<script>
+// ---------------------------------------------------------------------------
 // Folder view panel
 // ---------------------------------------------------------------------------
 (function () {
@@ -3009,7 +3317,7 @@ function parseAccounting(v) {
   var colSel    = document.getElementById('folder-col-sel');
   var backInp   = document.getElementById('folder-back-inp');
 
-  var otherPanels = ['join-panel', 'combine-panel', 'export-panel', 'graph-panel', 'pie-panel', 'heatmap-panel', 'bar-panel', 'stacked-panel', 'scatter-panel', 'combo-panel', 'treemap-panel', 'histogram-panel', 'pivot-panel', 'calc-panel', 'groups-panel', 'dates-panel', 'save-analysis-panel'].map(function (id) {
+  var otherPanels = ['join-panel', 'combine-panel', 'export-panel', 'graph-panel', 'pie-panel', 'heatmap-panel', 'bar-panel', 'stacked-panel', 'scatter-panel', 'combo-panel', 'treemap-panel', 'histogram-panel', 'pivot-panel', 'calc-panel', 'groups-panel', 'dates-panel', 'save-analysis-panel', 'map-panel'].map(function (id) {
     return document.getElementById(id);
   }).filter(Boolean);
 
@@ -3067,7 +3375,7 @@ function parseAccounting(v) {
   var measureList   = document.getElementById('pivot-measures');
   var chkTotals     = document.getElementById('pivot-totals');
 
-  var otherPanels = ['join-panel', 'combine-panel', 'export-panel', 'graph-panel', 'pie-panel', 'heatmap-panel', 'bar-panel', 'stacked-panel', 'scatter-panel', 'combo-panel', 'treemap-panel', 'histogram-panel', 'folder-panel', 'calc-panel', 'groups-panel', 'dates-panel', 'save-analysis-panel'].map(function (id) {
+  var otherPanels = ['join-panel', 'combine-panel', 'export-panel', 'graph-panel', 'pie-panel', 'heatmap-panel', 'bar-panel', 'stacked-panel', 'scatter-panel', 'combo-panel', 'treemap-panel', 'histogram-panel', 'folder-panel', 'calc-panel', 'groups-panel', 'dates-panel', 'save-analysis-panel', 'map-panel'].map(function (id) {
     return document.getElementById(id);
   }).filter(Boolean);
 
@@ -3266,7 +3574,7 @@ function parseAccounting(v) {
   var otherPanels = ['join-panel','combine-panel','export-panel','graph-panel',
     'pie-panel','heatmap-panel','bar-panel','stacked-panel','scatter-panel',
     'combo-panel','treemap-panel','histogram-panel','folder-panel','pivot-panel',
-    'groups-panel','dates-panel','save-analysis-panel'].map(function(id){
+    'groups-panel','dates-panel','save-analysis-panel','map-panel'].map(function(id){
       return document.getElementById(id);
     }).filter(Boolean);
 
@@ -3365,7 +3673,7 @@ function parseAccounting(v) {
   var otherPanels = ['join-panel','combine-panel','export-panel','graph-panel',
     'pie-panel','heatmap-panel','bar-panel','stacked-panel','scatter-panel',
     'combo-panel','treemap-panel','histogram-panel','folder-panel','pivot-panel',
-    'calc-panel','dates-panel','save-analysis-panel'].map(function(id){
+    'calc-panel','dates-panel','save-analysis-panel','map-panel'].map(function(id){
       return document.getElementById(id);
     }).filter(Boolean);
 
@@ -3495,7 +3803,7 @@ function parseAccounting(v) {
   var otherPanels = ['join-panel','combine-panel','export-panel','graph-panel',
     'pie-panel','heatmap-panel','bar-panel','stacked-panel','scatter-panel',
     'combo-panel','treemap-panel','histogram-panel','folder-panel','pivot-panel',
-    'calc-panel','groups-panel','save-analysis-panel'].map(function(id){
+    'calc-panel','groups-panel','save-analysis-panel','map-panel'].map(function(id){
       return document.getElementById(id);
     }).filter(Boolean);
 
@@ -3626,14 +3934,32 @@ function parseAccounting(v) {
   var otherPanels = ['join-panel','combine-panel','export-panel','graph-panel',
     'pie-panel','heatmap-panel','bar-panel','stacked-panel','scatter-panel',
     'combo-panel','treemap-panel','histogram-panel','folder-panel','pivot-panel',
-    'calc-panel','groups-panel','dates-panel'].map(function(id){
+    'calc-panel','groups-panel','dates-panel','map-panel'].map(function(id){
       return document.getElementById(id);
     }).filter(Boolean);
 
-  // Build a minimal analysis spec from the current page URL.
+  // The table on this page is the first card of the new canvas.  Read its
+  // headers so the card shows the columns the reader is looking at, not every
+  // column the source happens to contain.  A chart page has no table; there
+  // the empty column list means "all columns".
+  function currentTable() {
+    var table = document.querySelector('table[data-table]');
+    if (!table) return { columns: [], title: 'Table' };
+
+    var columns = Array.prototype.map.call(
+      table.querySelectorAll('thead th'),
+      function (th) { return (th.textContent || '').trim(); }
+    ).filter(Boolean);
+
+    var name = table.getAttribute('data-table') || 'Table';
+    var title = name.charAt(0).toUpperCase() + name.slice(1);
+    return { columns: columns, title: title };
+  }
+
+  // Build an analysis spec from the current page URL and table.
   function buildSpec(name) {
     var params = new URLSearchParams(location.search);
-    var l = params.get('l') || '';
+    var l = params.get('l') || panel.getAttribute('data-left-spec') || '';
     if (!l) return null;
     var datasets = [{ spec: l, alias: 'left', filters: params.getAll('f') }];
     var joins = [];
@@ -3644,7 +3970,12 @@ function parseAccounting(v) {
         joins.push({ left: 'left', right: 'right' + (joins.length), left_key: parts[1], right_key: parts[2] });
       }
     });
-    return { name: name, datasets: datasets, joins: joins };
+
+    var table = currentTable();
+    var encode = table.columns.length ? { columns: table.columns } : {};
+    var visuals = [{ kind: 'table', encode: encode, title: table.title }];
+
+    return { name: name, datasets: datasets, joins: joins, visuals: visuals };
   }
 
   nameInp.addEventListener('input', function() {

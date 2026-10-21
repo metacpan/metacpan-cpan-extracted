@@ -3,7 +3,7 @@ use 5.20.0;
 use strict;
 use warnings;
 
-our $VERSION = '0.25';
+our $VERSION = '0.27';
 
 use Carp ();
 use B ();
@@ -304,8 +304,8 @@ sub decode_tag_json {
     # null body Recipe to some verifiers and signers and a real one to others.
     # Keys are matched without regard to case (the -07 contract, decision 2),
     # so "Subject" and "subject" in one object are a duplicate too.
-    if (defined(my $k = _json_duplicate_key($text))) {
-        die "duplicate JSON object key\n";
+    if (defined(my $error = _json_lexical_error($text))) {
+        die $error;
     }
     return _json_octets($data);
 }
@@ -340,10 +340,13 @@ sub _is_utf8_octets {
     return $ok ? 1 : 0;
 }
 
-# The first key that appears twice in one JSON object of $text (already known
-# to be valid JSON), compared after unescaping and without regard to case,
-# or undef.
-sub _json_duplicate_key {
+# The first problem the decoded value cannot show in $text (already known to
+# be valid JSON), or undef: a key that appears twice in one object, compared
+# after unescaping and without regard to case, or a number with a fraction or
+# an exponent. Every number in a Recipe is an integer (-07 section 5), and
+# whether 1e0 decodes as an integer depends on the JSON backend -- JSON::XS
+# gives an NV, JSON::PP an IV -- so it is refused here, from the text.
+sub _json_lexical_error {
     my ($text) = @_;
     my $json = JSON->new->allow_nonref;
     my @stack;   # one entry per open container: undef for an array, a hash of keys for an object
@@ -359,12 +362,13 @@ sub _json_duplicate_key {
         if ($text =~ /\G("(?:[^"\\]|\\.)*")/gcs) {
             if ($want_key && ref $stack[-1]) {
                 my $k = lc $json->decode($1);
-                return $k if $stack[-1]{$k}++;
+                return "duplicate JSON object key\n" if $stack[-1]{$k}++;
                 $want_key = 0;
             }
             next;
         }
-        $text =~ /\G[^\s,:\[\]\{\}"]+/gc or last;   # number, true, false, null
+        $text =~ /\G([^\s,:\[\]\{\}"]+)/gc or last;   # number, true, false, null
+        return "JSON number is not an integer\n" if $1 =~ /^-?[0-9].*[.eE]/;
     }
     return;
 }

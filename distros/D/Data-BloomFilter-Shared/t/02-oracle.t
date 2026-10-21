@@ -50,6 +50,18 @@ my $FP  = 0.01;
     is $miss, 0, "merge of two disjoint $half-item sets contains all $CAP items";
 }
 
+for my $cfg ([11_000, 0.05], [7_500, 0.1], [5_500, 0.2]) {
+    my ($n, $target) = @$cfg;
+    my $bf = Data::BloomFilter::Shared->new(undef, $n, $target);
+    $bf->add_many([map { "in-$_" } 1 .. $n]);
+    my $predicted = (1 - exp(-$bf->hashes * $n / $bf->bits)) ** $bf->hashes;
+    cmp_ok $predicted, '<=', $target, "geometry meets target $target at capacity $n";
+    my $hits = 0;
+    $hits += $bf->contains("out-$_") for 1 .. 100_000;
+    cmp_ok $hits / 100_000, '<=', 1.1 * $target,
+        "observed false-positive rate meets target $target at capacity $n";
+}
+
 # (d) count estimate within 15% of the true 5000 distinct adds.
 {
     my $bf = Data::BloomFilter::Shared->new(undef, $CAP, $FP);

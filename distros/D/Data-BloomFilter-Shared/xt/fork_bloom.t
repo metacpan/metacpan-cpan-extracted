@@ -36,5 +36,6 @@ for my $k (0 .. $kids - 1) {
 is $miss, 0,
    sprintf('cross-process: all %d items added by %d children are contained (no false negatives)',
            $cap, $kids);
+is $bf->stats->{ops}, $cap, 'concurrent writers count every mutation';
 
 done_testing;

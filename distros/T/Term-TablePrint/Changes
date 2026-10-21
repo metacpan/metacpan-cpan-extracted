@@ -1,6 +1,9 @@
 Revision history for Term::TablePrint
 
 
+0.183   2026-10-21
+        Raised required minimum version for Term::Choose and Term::Choose::LineFold::XS (Unicode 18).
+
 0.182   2026-05-22
         - Bugfix header: restore option color.
         - Choose columns: add options color and mouse.

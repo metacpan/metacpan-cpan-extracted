@@ -222,6 +222,29 @@ tkn_has_all_punct(pTHX_ HV *p, const char *raw, STRLEN rl)
     return 1;
 }
 
+static IV tkn_piv(pTHX_ HV *p, const char *key);
+
+/* The lexicon's patterns, and beside them in C what the ladders test
+ * first, so a pattern that cannot fit costs no hash lookup. */
+static void
+tkn_patterns_of(pTHX_ tkn_lexicon *L)
+{
+    I32 i, n;
+    if (L->patterns)
+        return;
+    L->patterns = tkn_patterns_build(aTHX_ L);
+    n = av_len(L->patterns) + 1;
+    Newxz(L->pmeta, n ? n : 1, tkn_pmeta);
+    for (i = 0; i < n; i++) {
+        HV *p = (HV *)SvRV(*av_fetch(L->patterns, i, 0));
+        const char *kind = tkn_hstr(aTHX_ p, "kind");
+        L->pmeta[i].kind = kind && strEQ(kind, "date") ? 'd' : kind && strEQ(kind, "time") ? 't' : 'o';
+        L->pmeta[i].numeric = (I8)tkn_piv(aTHX_ p, "numeric");
+        L->pmeta[i].alpha = (I8)tkn_piv(aTHX_ p, "alpha");
+        L->pmeta[i].month_name = (I8)(tkn_piv(aTHX_ p, "month_name") ? 1 : 0);
+    }
+}
+
 static IV
 tkn_piv(pTHX_ HV *p, const char *key)
 {
@@ -524,13 +547,12 @@ tkn_time_of_day(pTHX_ SV *self, tkn_lexicon *L, SV *anchor, SV *raw, HV *info, t
     Newx(err, errlen, char);
     SAVEFREEPV(err);
     *shape = 0;
-    if (!L->patterns)
-        L->patterns = tkn_patterns_build(aTHX_ L);
+    tkn_patterns_of(aTHX_ L);
     for (i = 0; i <= av_len(L->patterns); i++) {
-        HV *p = (HV *)SvRV(*av_fetch(L->patterns, i, 0));
-        const char *kind = tkn_hstr(aTHX_ p, "kind");
-        if (!kind || strNE(kind, "time") || tkn_piv(aTHX_ p, "numeric") != runs || tkn_piv(aTHX_ p, "alpha") != alpha)
+        HV *p;
+        if (L->pmeta[i].kind != 't' || L->pmeta[i].numeric != runs || L->pmeta[i].alpha != alpha)
             continue;
+        p = (HV *)SvRV(*av_fetch(L->patterns, i, 0));
         if (!tkn_has_all_punct(aTHX_ p, rb, rl))
             continue;
         if (tkn_cldr(aTHX_ L, anchor, raw, tkn_hsv(aTHX_ p, "pattern"), TIME_KEEPER_KIND_TIME, NULL, tod, err, errlen)
@@ -609,6 +631,28 @@ tkn_time_of_day(pTHX_ SV *self, tkn_lexicon *L, SV *anchor, SV *raw, HV *info, t
 }
 
 /* _absolute: the text as a date and time (or a date only). */
+/* A text Time::Keeper->parse might read: every form it takes has four
+ * digits in a row (a year, a basic form, an epoch), a clock time
+ * ("15 Oct 26 09:00 GMT") or an @. */
+static int
+tkn_iso_shaped(const char *b, STRLEN n)
+{
+    STRLEN i, run = 0;
+    if (n && b[0] == '@')
+        return 1;
+    for (i = 0; i < n; i++) {
+        if (isDIGIT_A(b[i])) {
+            if (++run >= 4)
+                return 1;
+            continue;
+        }
+        run = 0;
+        if (b[i] == ':' && i > 0 && i + 1 < n && isDIGIT_A(b[i - 1]) && isDIGIT_A(b[i + 1]))
+            return 1;
+    }
+    return 0;
+}
+
 static SV *
 tkn_absolute(pTHX_ SV *self, tkn_lexicon *L, SV *text, HV *info, int dates_only)
 {
@@ -624,7 +668,7 @@ tkn_absolute(pTHX_ SV *self, tkn_lexicon *L, SV *text, HV *info, int dates_only)
         return NULL;
     /* in a calendar, a date with no time ("2026-09-06", the Chinese short
        date) is the calendar's to read, not ISO 8601's */
-    if (!dates_only && !(L->calendar && !memchr(rb, ':', rl) && !memchr(rb, 'T', rl) && rb[0] != '@')) {
+    if (!dates_only && !(L->calendar && !memchr(rb, ':', rl) && !memchr(rb, 'T', rl) && rb[0] != '@') && tkn_iso_shaped(rb, rl)) {
         SV *zone = tkn_method(aTHX_ anchor, "zone_name", NULL, 0), *args[3], *iso;
         args[0] = raw;
         args[1] = sv_2mortal(newSVpvs("zone"));
@@ -695,22 +739,21 @@ tkn_absolute(pTHX_ SV *self, tkn_lexicon *L, SV *text, HV *info, int dates_only)
     }
     runs = tkn_digit_runs(rb, rl);
     alpha = tkn_has_letter(aTHX_ raw);
-    if (!L->patterns)
-        L->patterns = tkn_patterns_build(aTHX_ L);
+    tkn_patterns_of(aTHX_ L);
     for (i = 0; i <= av_len(L->patterns); i++) {
-        HV *p = (HV *)SvRV(*av_fetch(L->patterns, i, 0));
-        const char *kind = tkn_hstr(aTHX_ p, "kind");
-        IV numeric = tkn_piv(aTHX_ p, "numeric");
+        HV *p;
+        IV numeric = L->pmeta[i].numeric;
         SV *v;
-        if (dates_only && (!kind || strNE(kind, "date")))
+        if (dates_only && L->pmeta[i].kind != 'd')
             continue;
         /* in a calendar, a number may be written in its numerals (ד׳, 初六),
            not digits, so the count of runs of digits says nothing */
         /* nor, there, does a month name always have letters (be writes the
            Chinese months "9") */
-        if (!L->calendar && (tkn_piv(aTHX_ p, "alpha") != alpha || numeric > runs
-                             || (!tkn_piv(aTHX_ p, "month_name") && numeric != runs)))
+        if (!L->calendar && (L->pmeta[i].alpha != alpha || numeric > runs
+                             || (!L->pmeta[i].month_name && numeric != runs)))
             continue;
+        p = (HV *)SvRV(*av_fetch(L->patterns, i, 0));
         v = tkn_by_pattern(aTHX_ self, L, anchor, raw, p, info);
         if (v)
             return v;

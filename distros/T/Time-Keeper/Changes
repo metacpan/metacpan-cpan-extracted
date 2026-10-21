@@ -1,5 +1,12 @@
 Revision history for Time-Keeper
 
+0.11    2026-10-21
+        - Tests run on perls before 5.14
+        - Tests pass on 32-bit perls (pointer and IV sizes).
+
+0.10    2026-10-20
+        - Builds on perl 5.10.0 (mPUSHs, mXPUSHs).
+
 0.09    2026-10-20
         - parse_cldr reads the numerals some calendars are written in: Hebrew numerals, the lunar days and Chinese numerals, and the first year of a Japanese era.
         - parse_cldr reads back every date it writes in every calendar and locale

@@ -16,6 +16,8 @@ use warnings;
 use Test::More;
 use File::Temp ();
 use File::Spec;
+use File::Copy qw(copy);
+use File::Path qw(make_path);
 use Cwd qw(getcwd abs_path);
 
 plan skip_all => 'set RELEASE_TESTING=1 to run ASAN tests'
@@ -41,10 +43,15 @@ my $root = getcwd();
 my $asan_dir = File::Temp->newdir('che-asan-XXXXXX', TMPDIR => 1);
 my $instrumented;
 {
-    my @sources = (glob('*.c'), glob('*.h'), glob('*.xs'), 'Makefile.PL');
+    open my $manifest, '<', 'MANIFEST' or die "MANIFEST: $!";
+    my @sources = map { /\A(\S+)/ ? $1 : () } <$manifest>;
+    close $manifest;
     my $ok = 1;
-    for my $f (@sources, 'lib', 't') {
-        $ok &&= (system('cp', '-r', $f, "$asan_dir/") == 0);
+    for my $f (@sources) {
+        my $dest = "$asan_dir/$f";
+        my ($volume, $dir) = File::Spec->splitpath($dest);
+        make_path($dir);
+        $ok &&= copy($f, $dest);
     }
     if ($ok) {
         my $flags = '-g -O0 -fsanitize=address -fno-omit-frame-pointer';
@@ -80,7 +87,7 @@ for my $t (@tests) {
             . "ASAN_OPTIONS='detect_leaks=0:abort_on_error=0:halt_on_error=1' "
             . "'$perl' -Mblib '$name' 2>&1";
     my $output = `$cmd`;
-    my $rc     = $? >> 8;
+    my $rc     = $?;
     if ($rc != 0) {
         diag("ASAN output for $name:\n$output");
     }

@@ -12,19 +12,11 @@ ok(test() => 'Crypter working!');
 sub test {
 	my $crypter = new Crypter(password => '123');
 	
-	my $encrypted = '';
+	my $encrypted = $crypter->crypt('Hello World!');
 	
-	$crypter->crypt(
-		input		=> 'Hello World!', 
-		output		=> \$encrypted
-	);
+	$crypter->reset();
 
-	my $decrypted = '';
-
-	$crypter->uncrypt(
-		input		=> $encrypted,
-		output		=> \$decrypted,
-	);
+	my $decrypted = $crypter->uncrypt($encrypted);
 	
 	return $decrypted eq 'Hello World!';
 }

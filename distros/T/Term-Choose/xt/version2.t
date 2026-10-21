@@ -58,7 +58,7 @@ for my $module ( @modules ) {
         }
     }
     close $fh;
-    is( $v, $v_module, 'Version in $module OK' );
+    is( $v_module, $v, "Version in $module OK" );
 }
 
 

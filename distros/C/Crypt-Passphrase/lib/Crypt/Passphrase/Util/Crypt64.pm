@@ -1,5 +1,5 @@
 package Crypt::Passphrase::Util::Crypt64;
-$Crypt::Passphrase::Util::Crypt64::VERSION = '0.023';
+$Crypt::Passphrase::Util::Crypt64::VERSION = '0.024';
 use strict;
 use warnings;
 
@@ -90,11 +90,11 @@ Crypt::Passphrase::Util::Crypt64 - An implementation of the crypt64 encoding
 
 =head1 VERSION
 
-version 0.023
+version 0.024
 
 =head1 SYNOPSIS
 
- use Crypt::Passphrase::Crypt64 ':all';
+ use Crypt::Passphrase::Util::Crypt64 ':all';
 
  my $encoded = encode_crypt64('abcd');
  my $decoded = decode_crypt64($encoded);

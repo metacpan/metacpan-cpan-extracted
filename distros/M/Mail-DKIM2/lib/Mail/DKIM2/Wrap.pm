@@ -3,7 +3,7 @@ use 5.20.0;
 use strict;
 use warnings;
 
-our $VERSION = '0.25';
+our $VERSION = '0.27';
 
 use Exporter 'import';
 use Crypt::PRNG qw(random_bytes);

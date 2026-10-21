@@ -26,6 +26,7 @@ t/eventfd_set.t
 t/pod_synopsis.t
 t/version_check.t
 t/08-foreign-invocant.t
+t/09-wait-signals.t
 xt/asan.t
 xt/capacity_boundary.t
 xt/cloexec_exec.t
@@ -46,10 +47,13 @@ xt/memfd_seal.t
 xt/mmap_leak.t
 xt/signal_during_wait.t
 xt/stress.t
+xt/slot_ownership.t
+xt/killed_waiter.t
 xt/timeout_validation.t
 xt/truncation.t
 xt/tsan.t
 xt/valgrind.t
 xt/valgrind_mp.t
+t/signal-destroy.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

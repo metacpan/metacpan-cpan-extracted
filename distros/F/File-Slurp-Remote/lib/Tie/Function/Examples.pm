@@ -1,17 +1,15 @@
 package Tie::Function::Examples;
 
-@ISA = qw(Tie::StdHash Exporter);
-@EXPORT_OK = qw(%thoucomma %nothoucomma %addcents %q_shell %q_perl %round %sprintf %line_numbers);
-
-require Tie::Hash;
-require Exporter;
-use Carp;
 use strict;
 use warnings;
+use Carp;
+require Tie::Hash;
+require Exporter;
 
-our $VERSION = 0.47;
+our @ISA = qw(Tie::StdHash Exporter);
+our @EXPORT_OK = qw(%thoucomma %nothoucomma %addcents %q_shell %q_perl %round %sprintf %line_numbers);
 
-use strict;
+our $VERSION = '0.48';
 
 tie our %q_perl, 'Tie::Function::Examples',
 	sub {

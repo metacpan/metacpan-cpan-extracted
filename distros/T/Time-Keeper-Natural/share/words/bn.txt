@@ -5,14 +5,22 @@
 #
 # Bengali joins the genitive to the period ("মাসের") and "end" after it, so the
 # frames carry the suffix. A time takes no word. An ordinal weekday is not read.
+#
+# 0.02's keys: Ranges and the weekend read. Bengali puts the point before a duration, which
+# after and before do not take, and CLDR has no Bengali ordinal words, so an
+# ordinal weekday is not read.
 start_of	{0}ের শুরু|{0}ের শুরুতে|{0}-এর শুরু
 end_of	{0}ের শেষ|{0}ের শেষে|{0}-এর শেষ
 at
 on	{0}ে|{0}-এ
 skip
 and
+range	{0} থেকে {1} পর্যন্ত|{0} থেকে {1}
+weekend	সপ্তাহান্ত
 # test: গত মাসের শেষ => 2026-09-30T23:59:59.999999999+01:00
 # test: এই মাসের শেষ => 2026-10-31T23:59:59.999999999+00:00
 # test: পরের মাসের শুরু => 2026-11-01T00:00:00+00:00
 # test: অক্টোবরের শেষ => 2026-10-31T23:59:59.999999999+00:00
 # test: মঙ্গলবারে => 2026-10-20T00:00:00+01:00
+# test: সোমবার থেকে শুক্রবার পর্যন্ত => 2026-10-19T00:00:00+01:00 / 2026-10-23T23:59:59.999999999+01:00
+# test: পরের সপ্তাহান্ত => 2026-10-24T00:00:00+01:00

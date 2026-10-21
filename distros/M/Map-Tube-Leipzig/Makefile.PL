@@ -21,6 +21,7 @@ WriteMakefile(
     },
     BUILD_REQUIRES   => {
         'Test::More' => 0,
+        'Path::Tiny' => 0.146,
     },
     PREREQ_PM => {
         'Moo'                  => '2.000000',
@@ -29,19 +30,34 @@ WriteMakefile(
         'Map::Tube'            => '4.09',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
+    test  => { TESTS => 't/*.t' },
     clean => { FILES => 'Map-Tube-Leipzig-*' },
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
         'meta-spec' => { version => 2 },
         provides    => {
-            'Map::Tube::Leipzig'           => { file => 'lib/Map/Tube/Leipzig.pm'        , version => '0.03' },
-            'Map::Tube::Leipzig::Line::S3' => { file => 'lib/Map/Tube/Leipzig/Line/S3.pm', version => '0.03' },
-            'Map::Tube::Leipzig::Line::S7' => { file => 'lib/Map/Tube/Leipzig/Line/S7.pm', version => '0.03' },
+            'Map::Tube::Leipzig' => {
+                file => 'lib/Map/Tube/Leipzig.pm',
+                version => MM->parse_version('lib/Map/Tube/Leipzig.pm')
+            },
+        },
+        prereqs => {
+            test => {
+                recommends => {
+                    'Test::CheckManifest' => 0,
+                    'Test::Map:::Tube'    => 4.09,
+                    'Test::Pod'           => 1.22,
+                    'Path::Tiny'          => 0.146,
+                },
+            },
         },
         resources => {
             repository => {
                 type => 'git',
                 url  => 'https://github.com/manwar/Map-Tube-Leipzig.git',
                 web  => 'https://github.com/manwar/Map-Tube-Leipzig',
+            },
+            bugtracker => {
+                web    => 'https://github.com/manwar/Map-Tube-Leipzig/issues'
             },
         }})
      : ()

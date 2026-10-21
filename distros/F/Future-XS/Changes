@@ -1,5 +1,11 @@
 Revision history for Future-XS
 
+0.16    2026-10-20
+        [BUGFIXES]
+         * `->without_cancel` needs to not weaken its stored sequence future
+           to match behaviour with `Future::PP` (thanks John Napiorkowski)
+           (RT181389)
+
 0.15    2026-01-13
         [BUGFIXES]
          * Fix a memory leak when `->result` or `->get` on a failed future

@@ -16,11 +16,11 @@ address-normalization helpers used by multiple backends.
 
 =head1 VERSION
 
-Version 0.48
+Version 0.49
 
 =cut
 
-our $VERSION = '0.48';
+our $VERSION = '0.49';
 
 use v5.20;
 use strict;
@@ -456,7 +456,7 @@ my $abbreviations;
 Normalise a street name to its abbreviated canonical form.  Uppercases the
 input, then abbreviates the second-to-last or last word (whichever is a
 recognised street type) using C<Geo::Coder::Abbreviations>.  Leading zeros
-are also stripped (C<"04th St"> → C<"4th St">).
+are also stripped (C<"04th St"> -> C<"4th St">).
 
 Exported so that C<Local.pm> and C<OpenAddresses.pm> can call it without
 importing C<Geo::Coder::Free>.
@@ -487,7 +487,7 @@ sub _normalize {
 
 =head2 _abbreviate
 
-Abbreviate a single street-type word (e.g. C<"Street"> → C<"ST">).  Returns
+Abbreviate a single street-type word (e.g. C<"Street"> -> C<"ST">).  Returns
 the original word uppercased if no abbreviation is found.
 
 Exported so that C<Local.pm> and C<OpenAddresses.pm> can call it without

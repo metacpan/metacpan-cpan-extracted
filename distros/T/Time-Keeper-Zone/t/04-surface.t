@@ -74,6 +74,7 @@ open $fh, '>', "$dir/clock" or die;
 print $fh "# comment\nUTC=true\nZONE=\"Africa/Lagos\"\n";
 close $fh;
 SKIP: {
+    skip 'the link of /etc/localtime is not read on Windows', 3 if $^O eq 'MSWin32';
     skip 'no symlinks here', 3 unless eval { symlink("/var/db/timezone/zoneinfo/Australia/Perth", "$dir/localtime") };
     is(local_from(undef, "$dir/localtime", "$dir/timezone", "$dir/clock", undef), 'Australia/Perth', 'the link of /etc/localtime first');
     is(local_from('EST5EDT', "$dir/localtime", undef, undef, undef), 'EST5EDT', 'but TZ before it');

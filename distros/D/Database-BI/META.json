@@ -32,8 +32,8 @@
       },
       "runtime" : {
          "recommends" : {
-            "Geo::Coder::Free" : "0.47",
-            "HTML::OSM" : "0.10"
+            "Geo::Coder::Free" : "0.48",
+            "HTML::OSM" : "0.11"
          },
          "requires" : {
             "CGI::Info" : "0",
@@ -44,30 +44,33 @@
             "DBI" : "0",
             "DB_File" : "0",
             "Database::Abstraction" : "0.51",
-            "Database::Join" : "v0.9.0",
+            "Database::Join" : "v0.10.0",
+            "Digest::MD5" : "0",
+            "Digest::SHA" : "0",
             "Excel::Writer::XLSX" : "1.07",
             "File::Path" : "2.07",
             "File::Spec" : "3.40",
             "File::Temp" : "0.22",
-            "HTML::D3" : "0.20",
+            "HTML::D3" : "0.23",
             "HTML::TableExtract" : "0",
             "IPC::System::Simple" : "0",
             "LWP::UserAgent" : "0",
             "LWP::UserAgent::Cached" : "0",
             "List::Util" : "1.40",
+            "MIME::Base64" : "3.11",
             "Mojo::Base" : "0",
             "Mojo::JSON" : "0",
             "Mojolicious" : "9.49",
             "Mojolicious::Plugin::TemplateToolkit" : "0",
             "Net::SFTP::Foreign" : "0",
             "POSIX" : "0",
-            "Params::Get" : "0",
-            "Params::Validate::Strict" : "0.39",
+            "Params::Get" : "0.17",
+            "Params::Validate::Strict" : "0.41",
             "Readonly" : "0",
             "Scalar::Util" : "0",
             "Socket" : "2.010",
             "Spreadsheet::ParseXLSX" : "0",
-            "Sub::Protected" : "0",
+            "Sub::Protected" : "0.03",
             "perl" : "5.020000"
          }
       },
@@ -81,12 +84,12 @@
             "JSON::MaybeXS" : "0",
             "Test::DescribeMe" : "0",
             "Test::Memory::Cycle" : "0",
-            "Test::Mockingbird" : "0",
+            "Test::Mockingbird" : "0.14",
             "Test::Mojo" : "0",
             "Test::Most" : "0",
             "Test::Needs" : "0",
-            "Test::Permissions" : "0",
-            "Test::Returns" : "0",
+            "Test::Permissions" : "v0.1.2",
+            "Test::Returns" : "0.005",
             "Test::Without::Module" : "0",
             "Text::xSV::Slurp" : "0",
             "XML::Simple" : "0"
@@ -104,6 +107,6 @@
          "web" : "https://github.com/nigelhorne/Database-BI"
       }
    },
-   "version" : "v0.014.0",
+   "version" : "v0.015.0",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

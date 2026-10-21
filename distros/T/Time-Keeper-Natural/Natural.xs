@@ -24,6 +24,7 @@
 #include "tkn/tkn_zones.h"
 #include "tkn/tkn_fractions.h"
 #include "tkn/tkn_points.h"
+#include "tkn/tkn_find.h"
 
 MODULE = Time::Keeper::Natural    PACKAGE = Time::Keeper::Natural
 
@@ -47,3 +48,4 @@ INCLUDE: xs/grammar.xs
 INCLUDE: xs/match.xs
 INCLUDE: xs/surface.xs
 INCLUDE: xs/interval.xs
+INCLUDE: xs/find.xs

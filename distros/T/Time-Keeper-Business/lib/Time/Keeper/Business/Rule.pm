@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use Time::Keeper::Business ();
 
@@ -21,7 +21,7 @@ Time::Keeper::Business::Rule - holidays by rule: fixed dates, nth weekdays, East
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =head1 SYNOPSIS
 

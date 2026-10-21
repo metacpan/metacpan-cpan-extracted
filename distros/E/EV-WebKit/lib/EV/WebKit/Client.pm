@@ -11,7 +11,7 @@ use MIME::Base64 ();
 use EV::WebKit::Protocol;
 use EV::WebKit::Client::Element;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 # How many undelivered broadcast events to keep when no on_event handler was
 # given. A page produces console output at its own pace and a caller may never

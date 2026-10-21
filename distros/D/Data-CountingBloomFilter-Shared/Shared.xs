@@ -151,7 +151,7 @@ add(self, item)
     cbf_rwlock_wrlock(h);
     if (h->hdr->sealed) { cbf_rwlock_wrunlock(h); croak("Data::CountingBloomFilter::Shared->add: filter is frozen (read-only)"); }
     RETVAL = cbf_add_locked(h, s, n);
-    __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);
+    h->hdr->stat_ops++;
     cbf_rwlock_wrunlock(h);
   OUTPUT:
     RETVAL
@@ -199,7 +199,7 @@ add_many(self, items)
         cbf_rwlock_wrlock(h);                             /* locked region: NO croak-capable calls */
         if (h->hdr->sealed) { cbf_rwlock_wrunlock(h); croak("Data::CountingBloomFilter::Shared->add_many: filter is frozen (read-only)"); }
         for (i = 0; i < cnt; i++) added += (UV)cbf_add_locked(h, ps[i], ls[i]);
-        __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);  /* a call always counts, even an empty batch */
+        h->hdr->stat_ops++;  /* a call always counts, even an empty batch */
         cbf_rwlock_wrunlock(h);
     }
     RETVAL = added;
@@ -263,7 +263,7 @@ remove(self, item)
     cbf_rwlock_wrlock(h);
     if (h->hdr->sealed) { cbf_rwlock_wrunlock(h); croak("Data::CountingBloomFilter::Shared->remove: filter is frozen (read-only)"); }
     RETVAL = cbf_remove_locked(h, s, n);
-    __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);
+    h->hdr->stat_ops++;
     cbf_rwlock_wrunlock(h);
   OUTPUT:
     RETVAL
@@ -318,7 +318,7 @@ merge(self, other)
     cbf_rwlock_wrlock(h);
     if (h->hdr->sealed) { cbf_rwlock_wrunlock(h); croak("Data::CountingBloomFilter::Shared->merge: filter is frozen (read-only)"); }
     cbf_merge_counters(h, tmp, bytes);
-    __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);
+    h->hdr->stat_ops++;
     cbf_rwlock_wrunlock(h);
 
 void
@@ -331,7 +331,7 @@ clear(self)
     cbf_rwlock_wrlock(h);
     if (h->hdr->sealed) { cbf_rwlock_wrunlock(h); croak("Data::CountingBloomFilter::Shared->clear: filter is frozen (read-only)"); }
     cbf_clear_locked(h);
-    __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);
+    h->hdr->stat_ops++;
     cbf_rwlock_wrunlock(h);
 
 void
@@ -350,7 +350,7 @@ frozen(self)
   PREINIT:
     EXTRACT(self);
   CODE:
-    RETVAL = h->hdr->sealed ? 1 : 0;
+    RETVAL = __atomic_load_n(&h->hdr->sealed, __ATOMIC_ACQUIRE) ? 1 : 0;
   OUTPUT:
     RETVAL
 
@@ -454,7 +454,7 @@ stats(self)
         hv_stores(hv, "fill_ratio", newSVnv((double)X / (double)m_ctr));
         hv_stores(hv, "ops",        newSVuv((UV)ops));
         hv_stores(hv, "mmap_size",  newSVuv((UV)h->mmap_size));
-        hv_stores(hv, "frozen",     newSVuv(h->hdr->sealed ? 1 : 0));
+        hv_stores(hv, "frozen",     newSVuv(__atomic_load_n(&h->hdr->sealed, __ATOMIC_ACQUIRE) ? 1 : 0));
         hv_stores(hv, "readonly",   newSVuv(h->readonly ? 1 : 0));
         RETVAL = newRV_noinc((SV *)hv);
     }

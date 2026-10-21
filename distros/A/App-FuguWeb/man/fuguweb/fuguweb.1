@@ -14,7 +14,7 @@
 .\" ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 .\" OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 .\"
-.Dd $Mdocdate: September 22 2026 $
+.Dd $Mdocdate: October 21 2026 $
 .Dt FUGUWEB 1
 .Os
 .Sh NAME
@@ -418,6 +418,8 @@ which defaults to the file name, and exactly one source:
 An HTML body fragment in the source directory.
 .It Ic markdown
 A Markdown file, relative to the project root.
+.Xr lowdown 1
+renders it, and the HTML that it holds stays as written.
 .It Ic index No = Cm yes
 The generated manual index.
 The page can also set a

@@ -138,7 +138,7 @@ use ClickHouse::Encoder;
         columns => [['id','Int32'], ['msg','String'], ['ts','DateTime']],
         order_by => '(id, ts)',
     );
-    like($sql, qr/create table `events`/, 'CREATE TABLE header');
+    like($sql, qr/create table `events`/, 'create table header');
     like($sql, qr/`id` Int32/,            'first column emitted');
     like($sql, qr/`msg` String/,          'middle column emitted');
     like($sql, qr/`ts` DateTime/,         'last column emitted');

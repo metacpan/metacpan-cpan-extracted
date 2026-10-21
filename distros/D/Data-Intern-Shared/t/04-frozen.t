@@ -2,6 +2,7 @@ use strict;
 use warnings;
 use Test::More;
 use File::Temp qw(tempdir);
+use POSIX qw(_exit);
 use Data::Intern::Shared;
 
 my $dir  = tempdir(CLEANUP => 1);
@@ -154,6 +155,42 @@ like exception(sub { Data::Intern::Shared->new_readonly(undef) }),
     is $anon->id_of("anon-str"), $id,        'anonymous frozen table still queryable (id_of)';
     ok $anon->exists("anon-str"),            'anonymous frozen table still queryable (exists)';
     like exception(sub { $anon->intern("more") }), qr/read-only/, 'mutating a frozen anonymous table croaks';
+}
+
+# A reader already polling the file must see all data when the seal appears.
+{
+    my $p = "$dir/publish.intern";
+    my $writer = Data::Intern::Shared->new($p, 2048, 65536);
+    pipe(my $ready, my $notify) or die "pipe: $!";
+    my $pid = fork // die "fork: $!";
+    if (!$pid) {
+        close $ready;
+        $SIG{ALRM} = 'DEFAULT';
+        alarm 10;
+        my $early = eval { Data::Intern::Shared->new_readonly($p) };
+        _exit(1) if $early || $@ !~ /not frozen/;
+        syswrite($notify, 'r') == 1 or _exit(2);
+        close $notify;
+        my $ro;
+        until ($ro) {
+            $ro = eval { Data::Intern::Shared->new_readonly($p) };
+            select undef, undef, undef, 0.001 unless $ro;
+        }
+        _exit(3) unless $ro->count == 2000;
+        for my $i (0 .. 1999) {
+            my $key = "publish-$i\0\xff";
+            my $id = $ro->id_of($key);
+            _exit(4) unless defined($id) && $id == $i && $ro->string($id) eq $key;
+        }
+        _exit(0);
+    }
+    close $notify;
+    is sysread($ready, my $byte, 1), 1, 'reader starts before the table is frozen';
+    close $ready;
+    $writer->intern("publish-$_\0\xff") for 0 .. 1999;
+    $writer->freeze;
+    waitpid($pid, 0) == $pid or die "waitpid: $!";
+    is $?, 0, 'concurrent read-only opener sees every published id and string';
 }
 
 done_testing;

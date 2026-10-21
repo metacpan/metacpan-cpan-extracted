@@ -29,9 +29,10 @@ ok defined($so), 'shared library present on disk' . (defined $so ? " ($so)" : ''
 
 # ... and exports the entry point. By full path, so the absent rpath cannot matter.
 SKIP: {
-    skip 'no shared library to load', 1 unless defined $so;
+    skip 'no shared library to load', 2 unless defined $so;
     my $lib = eval { DynaLoader::dl_load_file($so, 0) };
-    skip "dl_load_file unavailable: $@", 1 unless $lib;
+    ok $lib, 'shared library loads' or diag($@ || DynaLoader::dl_error());
+    skip 'shared library failed to load', 1 unless $lib;
     my $sym = DynaLoader::dl_find_symbol($lib, 'curl_easy_impersonate');
     ok $sym, 'libcurl-impersonate exports curl_easy_impersonate';
 }

@@ -12,12 +12,13 @@ my $n = $ARGV[0] || 1_000_000;
 my $cap = 10_000;
 
 sub bench {
-    my ($label, $code) = @_;
+    my ($label, $code, $ops) = @_;
+    $ops //= $n;
     my $t0 = time();
     $code->();
     my $elapsed = time() - $t0;
     printf "%-30s %8.0f ops/sec  (%.3fs for %d ops)\n",
-        $label, $n / $elapsed, $elapsed, $n;
+        $label, $ops / $elapsed, $elapsed, $ops;
 }
 
 print "=== I64 ($n ops, $cap elements) ===\n";
@@ -50,26 +51,26 @@ print "=== I64 ($n ops, $cap elements) ===\n";
     my $slice_n = int($n / 100);
     bench "i64 slice(100) read" => sub {
         for (1..$slice_n) { my @v = $buf->slice(0, 100) }
-    };
+    }, $slice_n;
     bench "i64 set_slice(100)" => sub {
         my @data = (42) x 100;
         for (1..$slice_n) { $buf->set_slice(0, @data) }
-    };
+    }, $slice_n;
 
     bench "i64 get_raw(800B)" => sub {
         for (1..$slice_n) { my $r = $buf->get_raw(0, 800) }
-    };
+    }, $slice_n;
     bench "i64 set_raw(800B)" => sub {
         my $data = pack("q<100", (42) x 100);
         for (1..$slice_n) { $buf->set_raw(0, $data) }
-    };
+    }, $slice_n;
 
     bench "i64 fill" => sub {
         for (1..1000) { $buf->fill(0) }
-    };
+    }, 1000;
     bench "i64 clear" => sub {
         for (1..1000) { $buf->clear }
-    };
+    }, 1000;
 }
 
 print "\n=== F64 ($n ops, $cap elements) ===\n";

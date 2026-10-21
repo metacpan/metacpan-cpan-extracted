@@ -194,6 +194,9 @@ ASYNCHRONOUS INTERFACE
     the end with an error string or "undef". Do not call "resume"/"remove"
     from inside these callbacks. Resume a paused transfer with "resume".
 
+    An exception in "on_headers" or "on_body" warns and aborts the transfer;
+    "on_done" receives an error.
+
     Pausing and the chunk contract: libcurl treats a pause as "this chunk
     was not consumed" and re-delivers it to "on_body" when you "resume". So
     decide whether to pause before consuming $chunk: if you return a pause

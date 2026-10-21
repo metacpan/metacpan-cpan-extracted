@@ -22,7 +22,7 @@ WriteMakefile($abmm->mm_args(
         'Alien::Build::MM'                        => '0.32',
         'Alien::Build::Plugin::Download::Git'     => '0',
     },
-    TEST_REQUIRES      => { 'Test::More' => '0', 'Test::Alien' => '0' },
+    TEST_REQUIRES      => { 'Test::More' => '0.88', 'Test::Alien' => '2.53' },
     PREREQ_PM          => { 'Alien::Base' => '0' },
     META_MERGE         => {
         'meta-spec' => { version => 2 },
@@ -51,7 +51,7 @@ readme : README
 README : lib/Alien/curlimpersonate.pm
 \t\$(PERLRUN) -MPod::Text -e "Pod::Text->new->parse_from_file(q{lib/Alien/curlimpersonate.pm}, q{README})"
 
-distdir : README
+create_distdir : README
 
 MAKE
 }

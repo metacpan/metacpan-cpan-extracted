@@ -58,6 +58,7 @@ my $t0 = time();
 while (!$ctl->get(1)) {
     my $n = $ctl->wait_notify;
     unless (defined $n) { sleep 0.001; next }
+    $pixels->lock_rd;
 
     # --- With OpenGL::Modern ---
     # glBindTexture(GL_TEXTURE_2D, $tex_id);
@@ -67,6 +68,7 @@ while (!$ctl->get(1)) {
     # Or via Perl string (copies once into GL driver):
     # glTexSubImage2D_s(GL_TEXTURE_2D, 0, 0, 0, $width, $height,
     #                   GL_RGBA, GL_UNSIGNED_BYTE, $$ref);
+    $pixels->unlock_rd;
 
     $frames += $n;
 }

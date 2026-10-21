@@ -1,0 +1,348 @@
+[%- WRAPPER 'web/en/layouts/default.html.tt' -%]
+<style>
+  .tutorial {
+    max-width: 62rem;
+    line-height: 1.65;
+  }
+
+  .tutorial-version {
+    font-size: 0.82rem;
+    color: #667;
+    margin-bottom: 1rem;
+  }
+
+  .tutorial-intro p {
+    margin: 0 0 0.9rem;
+  }
+
+  .tutorial-toc {
+    background: #f8f9fc;
+    border: 1px solid #dce3f0;
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+    margin: 1.5rem 0 2.5rem;
+  }
+
+  .tutorial-toc h2 {
+    font-size: 1rem;
+    color: #2c3e7a;
+    margin-bottom: 0.5rem;
+  }
+
+  .tutorial-toc ol {
+    margin: 0;
+    padding-left: 1.25rem;
+  }
+
+  .tutorial-toc li {
+    margin: 0.25rem 0;
+  }
+
+  .tutorial-toc a {
+    color: #2c3e7a;
+  }
+
+  .tutorial-part {
+    margin-top: 2.5rem;
+  }
+
+  .tutorial-part > h2 {
+    font-size: 1.35rem;
+    color: #2c3e7a;
+    border-bottom: 2px solid #dce3f0;
+    padding-bottom: 0.35rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .tutorial-chapter {
+    margin: 1.75rem 0;
+  }
+
+  .tutorial-chapter h3 {
+    font-size: 1.1rem;
+    color: #1a1a2e;
+    margin-bottom: 0.35rem;
+  }
+
+  /* A Help link lands on a chapter, so say which one was reached. */
+  .tutorial-chapter:target {
+    scroll-margin-top: 1rem;
+    background: #fffdf3;
+    border-left: 4px solid #c9a227;
+    padding-left: 1rem;
+    margin-left: -1rem;
+  }
+
+  .tutorial-lead {
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 0.6rem;
+  }
+
+  .tutorial-steps {
+    margin: 0.5rem 0 0 1.5rem;
+  }
+
+  .tutorial-steps li {
+    margin: 0.5rem 0;
+    padding-left: 0.25rem;
+  }
+
+  .tutorial-tip {
+    border-left: 4px solid #c9a227;
+    background: #fdf8e6;
+    color: #5c4a11;
+    padding: 0.6rem 0.85rem;
+    margin-top: 0.9rem;
+    font-size: 0.92rem;
+  }
+
+  .tutorial-try {
+    margin-top: 0.9rem;
+  }
+
+  /* A walk-through is a worked example: what to do, then what the screen
+     should show.  It is a separate box so a reader can find one quickly. */
+  .tutorial-walkthrough {
+    margin-top: 1rem;
+    padding: 0.8rem 1rem;
+    border: 1px solid #dce3f0;
+    border-radius: 6px;
+    background: #f7f9fe;
+  }
+
+  .tutorial-walkthrough h4 {
+    margin: 0 0 0.35rem;
+    font-size: 1rem;
+    color: #1a1a2e;
+  }
+
+  .tutorial-walkthrough-intro {
+    margin: 0 0 0.6rem;
+    font-size: 0.9rem;
+  }
+
+  .tutorial-walkthrough-steps {
+    margin: 0 0 0.6rem 1.25rem;
+  }
+
+  .tutorial-walkthrough-steps li {
+    margin: 0.55rem 0;
+  }
+
+  .tutorial-walkthrough .tutorial-do,
+  .tutorial-walkthrough .tutorial-see {
+    margin: 0;
+    font-size: 0.92rem;
+  }
+
+  .tutorial-walkthrough .tutorial-see {
+    color: #444;
+  }
+
+  .tutorial-walkthrough-result {
+    margin: 0;
+    padding-top: 0.55rem;
+    border-top: 1px solid #dce3f0;
+    font-size: 0.92rem;
+  }
+
+  .tutorial-toc-tag {
+    margin-left: 0.3rem;
+    padding: 0 0.3rem;
+    border: 1px solid #e7d9a8;
+    border-radius: 3px;
+    background: #fdf8e6;
+    color: #5c4a11;
+    font-size: 0.75rem;
+  }
+
+  .tutorial-table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 0.9rem 0;
+    font-size: 0.9rem;
+  }
+
+  .tutorial-table caption {
+    text-align: left;
+    font-weight: 600;
+    color: #333;
+    padding-bottom: 0.4rem;
+  }
+
+  .tutorial-table th,
+  .tutorial-table td {
+    border: 1px solid #dce3f0;
+    padding: 0.45rem 0.6rem;
+    text-align: left;
+    vertical-align: top;
+  }
+
+  .tutorial-table th {
+    background: #2c3e7a;
+    color: #fff;
+    font-weight: 600;
+  }
+
+  .tutorial-table tbody tr:nth-child(even) {
+    background: #f8f9fc;
+  }
+
+  .tutorial-faq,
+  .tutorial-glossary {
+    margin: 0;
+  }
+
+  .tutorial-faq dt,
+  .tutorial-glossary dt {
+    font-weight: 600;
+    margin-top: 1rem;
+  }
+
+  .tutorial-faq dd,
+  .tutorial-glossary dd {
+    margin: 0.2rem 0 0 0;
+  }
+
+  .tutorial-note {
+    margin-top: 2.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid #dce3f0;
+    font-size: 0.85rem;
+    color: #667;
+  }
+
+  .tutorial-top {
+    display: inline-block;
+    margin-top: 0.75rem;
+    font-size: 0.85rem;
+    color: #2c3e7a;
+  }
+</style>
+
+<p class="back-link"><a href="/">&larr; Home</a></p>
+
+<div class="tutorial">
+  <p class="tutorial-version">This page is for Database::BI version [% version | html %].</p>
+
+  <div class="tutorial-intro">
+    [%- FOREACH paragraph IN intro %]
+    <p>[% paragraph | html %]</p>
+    [%- END %]
+  </div>
+
+  <nav class="tutorial-toc" id="tutorial-contents" aria-label="Tutorial contents">
+    <h2>Contents</h2>
+    <ol>
+      [%- FOREACH part IN parts %]
+      <li>
+        <a href="#[% part.id | html %]">[% part.name | html %]</a>
+        <ol>
+          [%- FOREACH chapter IN part.chapters %]
+          <li><a href="#[% chapter.id | html %]">[% chapter.title | html %]</a>[% IF chapter.walkthrough %] <span class="tutorial-toc-tag">walk-through</span>[% END %]</li>
+          [%- END %]
+        </ol>
+      </li>
+      [%- END %]
+      <li><a href="#questions">Questions and answers</a></li>
+      <li><a href="#glossary">Words used in this tutorial</a></li>
+    </ol>
+  </nav>
+
+  [%- FOREACH part IN parts %]
+  <section class="tutorial-part" id="[% part.id | html %]">
+    <h2>[% part.name | html %]</h2>
+
+    [%- FOREACH chapter IN part.chapters %]
+    <section class="tutorial-chapter" id="[% chapter.id | html %]">
+      <h3>[% chapter.title | html %]</h3>
+      <p class="tutorial-lead">[% chapter.lead | html %]</p>
+
+      [%- IF chapter.steps.size %]
+      <ol class="tutorial-steps">
+        [%- FOREACH step IN chapter.steps %]
+        <li>[% step | html %]</li>
+        [%- END %]
+      </ol>
+      [%- END %]
+
+      [%- IF chapter.table %]
+      <table class="tutorial-table">
+        <caption>[% chapter.table.caption | html %]</caption>
+        <thead>
+          <tr>
+            [%- FOREACH heading IN chapter.table.head %]
+            <th scope="col">[% heading | html %]</th>
+            [%- END %]
+          </tr>
+        </thead>
+        <tbody>
+          [%- FOREACH row IN chapter.table.rows %]
+          <tr>
+            [%- FOREACH cell IN row %]
+            <td>[% cell | html %]</td>
+            [%- END %]
+          </tr>
+          [%- END %]
+        </tbody>
+      </table>
+      [%- END %]
+
+      [%- IF chapter.tip %]
+      <p class="tutorial-tip"><strong>Good to know:</strong> [% chapter.tip | html %]</p>
+      [%- END %]
+
+      [%- IF chapter.walkthrough %]
+      <div class="tutorial-walkthrough">
+        <h4>[% chapter.walkthrough.title | html %]</h4>
+        <p class="tutorial-walkthrough-intro">[% chapter.walkthrough.intro | html %]</p>
+        <ol class="tutorial-walkthrough-steps">
+          [%- FOREACH step IN chapter.walkthrough.steps -%]
+          <li>
+            <p class="tutorial-do"><strong>Do:</strong> [% step.do | html %]</p>
+            <p class="tutorial-see"><strong>You should see:</strong> [% step.see | html %]</p>
+          </li>
+          [%- END -%]
+        </ol>
+        <p class="tutorial-walkthrough-result"><strong>Result:</strong> [% chapter.walkthrough.result | html %]</p>
+      </div>
+      [%- END %]
+
+      [%- IF chapter.try %]
+      <p class="tutorial-try"><a class="btn-action" href="[% chapter.try.href | html %]">[% chapter.try.label | html %]</a></p>
+      [%- END %]
+
+      <a class="tutorial-top" href="#tutorial-contents">Back to contents</a>
+    </section>
+    [%- END %]
+  </section>
+  [%- END %]
+
+  <section class="tutorial-part" id="questions">
+    <h2>Questions and answers</h2>
+    <dl class="tutorial-faq">
+      [%- FOREACH item IN faq %]
+      <dt>[% item.question | html %]</dt>
+      <dd>[% item.answer | html %]</dd>
+      [%- END %]
+    </dl>
+  </section>
+
+  <section class="tutorial-part" id="glossary">
+    <h2>Words used in this tutorial</h2>
+    <dl class="tutorial-glossary">
+      [%- FOREACH item IN glossary %]
+      <dt>[% item.term | html %]</dt>
+      <dd>[% item.meaning | html %]</dd>
+      [%- END %]
+    </dl>
+  </section>
+
+  <p class="tutorial-note">
+    This page is part of the application. When a page is added, its chapter is
+    added to the same list that builds this page, and a test checks that no page
+    is missing.
+  </p>
+</div>
+[%- END -%]

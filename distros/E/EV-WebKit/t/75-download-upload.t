@@ -741,4 +741,23 @@ my $URL = "http://127.0.0.1:$port/served.bin";
     like($p // '', qr{^/}, '...with the callback reporting the absolute path');
 }
 
+{
+    my ($download, $ready, $err);
+    my $b = EV::WebKit->new(window => [200,150], timeout => 5);
+    $b->on_download(sub {
+        $download = $_[0];
+        $download->save_to("$dir/dropped.bin");
+        $download->on_finish(sub { $err = $_[1] });
+        $ready = EV::timer(0, 0, sub { undef $ready; EV::break });
+    });
+    $b->{view}->download_uri("http://127.0.0.1:$port/slow");
+    TWK::run_with_timeout(15);
+    ok($download, 'a download is still in flight before dropping the browser');
+    Scalar::Util::weaken(my $weak = $b);
+    undef $b;
+    ok(!defined $weak, 'holding an in-flight download does not keep its browser alive');
+    is($err, 'browser closed', 'dropping the browser resolves the active download');
+    $weak->quit if $weak;
+}
+
 done_testing;

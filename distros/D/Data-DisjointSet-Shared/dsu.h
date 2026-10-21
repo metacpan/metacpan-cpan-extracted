@@ -350,8 +350,8 @@ static inline void dsu_recover_stale_lock(DsuHandle *h, uint32_t observed_wlock)
         dsu_rwlock_drain(h);
         dsu_repair_locked(h);
     }
-    __atomic_store_n(&hdr->wlock, 0, __ATOMIC_RELEASE);
-    if (__atomic_load_n(&hdr->rwait, __ATOMIC_RELAXED) > 0)
+    __atomic_store_n(&hdr->wlock, 0, __ATOMIC_SEQ_CST);
+    if (__atomic_load_n(&hdr->rwait, __ATOMIC_SEQ_CST) > 0)
         syscall(SYS_futex, &hdr->wlock, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
 }
 
@@ -373,7 +373,7 @@ static inline void dsu_recover_after_timeout(DsuHandle *h) {
  * SIGKILLed while parked leaves rwait over-counted -> at most a spurious wake
  * (harmless); it can never under-count, so no wakeup is lost. */
 static inline void dsu_park(DsuHandle *h) {
-    __atomic_add_fetch(&h->hdr->rwait, 1, __ATOMIC_RELAXED);
+    __atomic_add_fetch(&h->hdr->rwait, 1, __ATOMIC_SEQ_CST);
 }
 static inline void dsu_unpark(DsuHandle *h) {
     __atomic_sub_fetch(&h->hdr->rwait, 1, __ATOMIC_RELAXED);
@@ -396,9 +396,9 @@ static inline void dsu_rdepth_inc(DsuHandle *h) {
 static inline void dsu_rdepth_dec(DsuHandle *h) {
     if (h->slotless_held > 0) {
         h->slotless_held--;
-        __atomic_sub_fetch(&h->hdr->slotless_rdepth, 1, __ATOMIC_RELEASE);
+        __atomic_sub_fetch(&h->hdr->slotless_rdepth, 1, __ATOMIC_SEQ_CST);
     } else if (h->my_slot_idx != UINT32_MAX) {
-        __atomic_sub_fetch(&h->reader_slots[h->my_slot_idx].rdepth, 1, __ATOMIC_RELEASE);
+        __atomic_sub_fetch(&h->reader_slots[h->my_slot_idx].rdepth, 1, __ATOMIC_SEQ_CST);
     }
 }
 
@@ -406,7 +406,7 @@ static inline void dsu_rdepth_dec(DsuHandle *h) {
  * after every rdepth decrement so a released read lock lets the writer re-scan
  * promptly instead of waiting out its timeout. */
 static inline void dsu_reader_wake_drain(DsuHandle *h) {
-    if (__atomic_load_n(&h->hdr->wlock, __ATOMIC_ACQUIRE) != 0) {
+    if (__atomic_load_n(&h->hdr->wlock, __ATOMIC_SEQ_CST) != 0) {
         __atomic_add_fetch(&h->hdr->drain_seq, 1, __ATOMIC_RELEASE);
         syscall(SYS_futex, &h->hdr->drain_seq, FUTEX_WAKE, 1, NULL, NULL, 0);
     }
@@ -444,7 +444,7 @@ static inline void dsu_rwlock_rdlock(DsuHandle *h) {
             continue;
         }
         dsu_park(h);
-        cur = __atomic_load_n(&hdr->wlock, __ATOMIC_RELAXED);
+        cur = __atomic_load_n(&hdr->wlock, __ATOMIC_SEQ_CST);
         if (cur != 0) {
             long rc = syscall(SYS_futex, &hdr->wlock, FUTEX_WAIT, cur,
                               &dsu_lock_timeout, NULL, 0);
@@ -489,7 +489,7 @@ static inline void dsu_rwlock_wrlock(DsuHandle *h) {
             continue;
         }
         dsu_park(h);
-        uint32_t cur = __atomic_load_n(&hdr->wlock, __ATOMIC_RELAXED);
+        uint32_t cur = __atomic_load_n(&hdr->wlock, __ATOMIC_SEQ_CST);
         if (cur != 0) {
             long rc = syscall(SYS_futex, &hdr->wlock, FUTEX_WAIT, cur,
                               &dsu_lock_timeout, NULL, 0);
@@ -510,7 +510,9 @@ static inline void dsu_rwlock_wrlock(DsuHandle *h) {
 static inline void dsu_rwlock_wrunlock(DsuHandle *h) {
     DsuHeader *hdr = h->hdr;
     __atomic_store_n(&hdr->wlock, 0, __ATOMIC_RELEASE);
-    if (__atomic_load_n(&hdr->rwait, __ATOMIC_RELAXED) > 0)
+    /* Count the operation and order unlock before checking the waiter hint. */
+    __atomic_fetch_add(&hdr->stat_ops, 1, __ATOMIC_SEQ_CST);
+    if (__atomic_load_n(&hdr->rwait, __ATOMIC_SEQ_CST) > 0)
         syscall(SYS_futex, &hdr->wlock, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
 }
 
@@ -613,10 +615,10 @@ static inline void dsu_reset_locked(DsuHandle *h) {
     uint32_t *sz = dsu_size(h);
     uint32_t n = h->n;                    /* cached at attach; hdr->n is peer-writable */
     h->hdr->op = DSU_OP_RESET;
-    __atomic_signal_fence(__ATOMIC_SEQ_CST);
+    __atomic_thread_fence(__ATOMIC_RELEASE);
     for (uint32_t i = 0; i < n; i++) { p[i] = i; sz[i] = 1; }
     h->hdr->num_sets = n;
-    __atomic_signal_fence(__ATOMIC_SEQ_CST);
+    __atomic_thread_fence(__ATOMIC_RELEASE);
     h->hdr->op = 0;
 }
 
@@ -735,7 +737,7 @@ static inline int dsu_validate_header(const DsuHeader *hdr, uint64_t file_size) 
 static int dsu_secure_open(const char *path, mode_t mode, char *errbuf) {
     for (int attempt = 0; attempt < 100; attempt++) {
         int fd = open(path, O_RDWR|O_CREAT|O_EXCL|O_NOFOLLOW|O_CLOEXEC, mode);
-        if (fd >= 0) { (void)fchmod(fd, mode); return fd; }   /* exact mode: umask narrowed the O_EXCL create */
+        if (fd >= 0) return fd;   /* apply the exact mode under flock, before initialization */
         if (errno != EEXIST) { DSU_ERR("create %s: %s", path, strerror(errno)); return -1; }
         fd = open(path, O_RDWR|O_NOFOLLOW|O_CLOEXEC);
         if (fd >= 0) return fd;

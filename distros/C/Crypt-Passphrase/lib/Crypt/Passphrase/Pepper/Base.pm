@@ -1,5 +1,5 @@
 package Crypt::Passphrase::Pepper::Base;
-$Crypt::Passphrase::Pepper::Base::VERSION = '0.023';
+$Crypt::Passphrase::Pepper::Base::VERSION = '0.024';
 use strict;
 use warnings;
 
@@ -92,7 +92,7 @@ Crypt::Passphrase::Pepper::Base - A base class for pre-hashing pepper implementa
 
 =head1 VERSION
 
-version 0.023
+version 0.024
 
 =head1 DESCRIPTION
 

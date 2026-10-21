@@ -21,5 +21,5 @@ requires:
   Test::More: '0.96'
   Unicode::GCString: '2013.10'
   perl: '5.016'
-version: '1.002'
+version: '1.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

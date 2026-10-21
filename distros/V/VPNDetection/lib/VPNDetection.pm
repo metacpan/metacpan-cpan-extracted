@@ -19,7 +19,7 @@ use VPNDetection::Error;
 use VPNDetection::Oauth;
 use VPNDetection::Result;
 
-our $VERSION = '3.9.0';
+our $VERSION = '3.10.0';
 our @EXPORT_OK = ('is_bogon');
 
 use constant DEFAULT_BASE_URL => 'https://api.vpndetection.io';
@@ -54,6 +54,10 @@ my $PUBPROXY_DETAIL = [fields => [
     [num_ports => ['integer']], [num_proxies => ['integer']], [last_seen => ['string']],
     [last_usable => ['string']],
 ]];
+# Where the address is and the AS announcing it carry every member whenever they
+# are present.
+my $LOCATION = [fields => [map { [$_ => ['string'], 1] } @VPNDetection::Result::LOCATION]];
+my $ASN = [fields => [[asn => ['integer'], 1], map { [$_ => ['string'], 1] } qw(name domain type prefix)]];
 our $LOOKUP = [fields => [
     [ip => ['string'], 1], [is_vpn => ['boolean'], 1],
     (map { [$_ => ['boolean']] } qw(is_hosting is_relay is_tor is_cdn is_resproxy is_dcproxy is_mobproxy is_pubproxy)),
@@ -61,6 +65,7 @@ our $LOOKUP = [fields => [
     (map { [$_ => $CLASS_DETAIL] } qw(hosting relay tor cdn)),
     (map { [$_ => $PROXY_DETAIL] } qw(resproxy dcproxy mobproxy)),
     [pubproxy => $PUBPROXY_DETAIL],
+    [location => $LOCATION], [asn => $ASN],
 ]];
 our $BATCH_ERROR = [fields => [[status => ['integer'], 1], [error => ['string'], 1]]];
 # Each entry is judged alone, by _lookup_chunk_p.
@@ -720,9 +725,10 @@ before writing an C<if>.
 
 =item api_key
 
-Your API key. Omit it for the free tier, which answers C<ip> and C<is_vpn> and
-allows 1000 requests per day per source address; an empty or blank key is the
-same, and sends no C<Authorization> header. The key is trimmed, so one read from
+Your API key. Without one a lookup answers C<ip> and C<is_vpn>, up to 1000 a day
+per source address; a free key adds Tor, relay, C<location> and C<asn>, and every
+paid plan answers every field. An empty or blank key is the same as none, and
+sends no C<Authorization> header. The key is trimmed, so one read from
 a file with its newline works; a key still holding a control character croaks
 here.
 

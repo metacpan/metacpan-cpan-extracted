@@ -2,7 +2,7 @@ package Map::Tube::Leipzig;
 
 use version;
 
-our $VERSION   = qv('v0.1.0');
+our $VERSION   = qv('v1.0.0');
 our $AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -11,7 +11,7 @@ Map::Tube::Leipzig - Interface to the Leipzig/Halle S-Bahn and Tram Map.
 
 =head1 VERSION
 
-Version v0.1.0
+Version v1.0.0
 
 =cut
 

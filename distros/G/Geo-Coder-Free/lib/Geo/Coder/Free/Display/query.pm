@@ -10,14 +10,17 @@ use Carp;
 
 =head1 VERSION
 
-Version 0.48
+Version 0.49
 
 =cut
 
-our $VERSION = '0.48';
+our $VERSION = '0.49';
 
 use parent 'Geo::Coder::Free::Display';
 use JSON::MaybeXS;
+# Imported functions are not methods: without this, $obj->croak() and the like
+# would resolve.
+use namespace::clean;
 
 sub html {
 	my $self = shift;

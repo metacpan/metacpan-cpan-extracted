@@ -4,27 +4,27 @@ use Test::More;
 use lib 'blib/lib', 'blib/arch', 't/lib';
 use ClickHouse::Encoder;
 
-# parse_create_table turns a SHOW CREATE TABLE string back into the
+# parse_create_table turns a show create table string back into the
 # structured shape schema_diff / format_create_table consume.
 
 # Full DDL with every trailing clause.
 {
     my $ddl = <<'DDL';
-CREATE TABLE analytics.events
+create table analytics.events
 (
     `id` UInt64,
-    `name` String DEFAULT 'anon',
-    `ts` DateTime CODEC(DoubleDelta, LZ4),
+    `name` String default 'anon',
+    `ts` DateTime codec(DoubleDelta, LZ4),
     `payload` Nullable(String),
     `tags` Array(LowCardinality(String))
 )
-ENGINE = MergeTree
-PARTITION BY toYYYYMM(ts)
-PRIMARY KEY id
-ORDER BY (id, ts)
-SAMPLE BY id
-TTL ts + INTERVAL 90 DAY
-SETTINGS index_granularity = 8192
+engine = MergeTree
+partition by toYYYYMM(ts)
+primary key id
+order by (id, ts)
+sample by id
+ttl ts + interval 90 day
+settings index_granularity = 8192
 DDL
     my $p = ClickHouse::Encoder->parse_create_table($ddl);
     is($p->{database}, 'analytics',          'database extracted');
@@ -34,7 +34,7 @@ DDL
     is($p->{primary_key},  'id',             'primary_key extracted');
     is($p->{order_by}, '(id, ts)',           'order_by extracted');
     is($p->{sample_by}, 'id',                'sample_by extracted');
-    is($p->{ttl}, 'ts + INTERVAL 90 DAY',    'ttl extracted');
+    is($p->{ttl}, 'ts + interval 90 day',    'ttl extracted');
     is($p->{settings}, 'index_granularity = 8192', 'settings extracted');
     is_deeply($p->{columns}, [
         ['id',      'UInt64'],
@@ -47,11 +47,11 @@ DDL
 
 # Types with internal commas (Decimal, named Tuple) must not be split.
 {
-    my $ddl = 'CREATE TABLE t ('
+    my $ddl = 'create table t ('
             . '`price` Decimal(18, 4), '
             . '`pair` Tuple(a Int32, b String), '
             . '`m` Map(String, Array(Int64))'
-            . ') ENGINE = Memory';
+            . ') engine = Memory';
     my $p = ClickHouse::Encoder->parse_create_table($ddl);
     is_deeply($p->{columns}, [
         ['price', 'Decimal(18, 4)'],
@@ -64,21 +64,21 @@ DDL
 # No database qualifier -> database is undef, table still set.
 {
     my $p = ClickHouse::Encoder->parse_create_table(
-        'CREATE TABLE bare (`x` Int32) ENGINE = Memory');
+        'create table bare (`x` Int32) engine = Memory');
     is($p->{database}, undef, 'unqualified name -> undef database');
     is($p->{table},    'bare', 'unqualified table name');
 }
 
-# IF NOT EXISTS and backtick-quoted qualified name.
+# if not exists and backtick-quoted qualified name.
 {
     my $p = ClickHouse::Encoder->parse_create_table(
-        'CREATE TABLE IF NOT EXISTS `my-db`.`my tbl` '
-      . '(`c` Int32) ENGINE = Memory');
+        'create table if not exists `my-db`.`my tbl` '
+      . '(`c` Int32) engine = Memory');
     is($p->{database}, 'my-db',  'backtick database with hyphen');
     is($p->{table},    'my tbl', 'backtick table with space');
 }
 
-# Identifiers containing a literal backtick: CH's SHOW CREATE TABLE (and
+# Identifiers containing a literal backtick: CH's show create table (and
 # format_create_table) backslash-escape it as \` inside the quotes, so
 # the parser must decode that escape rather than treat it as the end of
 # the quoted region.
@@ -96,26 +96,26 @@ DDL
 # The doubled-backtick escape form is also accepted on input.
 {
     my $p = ClickHouse::Encoder->parse_create_table(
-        'CREATE TABLE t (`a``b` Int32) ENGINE = Memory');
+        'create table t (`a``b` Int32) engine = Memory');
     is_deeply($p->{columns}, [['a`b', 'Int32']],
               'doubled-backtick escape decoded on input');
 }
 
-# CREATE OR REPLACE TABLE and CREATE TEMPORARY TABLE header variants.
+# create or replace table and create temporary table header variants.
 {
     my $p = ClickHouse::Encoder->parse_create_table(
-        'CREATE OR REPLACE TABLE t (`x` Int32) ENGINE = Memory');
-    is($p->{table}, 't', 'CREATE OR REPLACE TABLE header parsed');
+        'create or replace table t (`x` Int32) engine = Memory');
+    is($p->{table}, 't', 'create or replace table header parsed');
 
     my $q = ClickHouse::Encoder->parse_create_table(
-        'CREATE TEMPORARY TABLE tmp (`y` String) ENGINE = Memory');
-    is($q->{table}, 'tmp', 'CREATE TEMPORARY TABLE header parsed');
+        'create temporary table tmp (`y` String) engine = Memory');
+    is($q->{table}, 'tmp', 'create temporary table header parsed');
 }
 
-# Round-trip: parse -> schema_diff against a changed shape -> ALTERs.
+# Round-trip: parse -> schema_diff against a changed shape -> alters.
 {
     my $p = ClickHouse::Encoder->parse_create_table(
-        'CREATE TABLE t (`a` Int32, `b` String) ENGINE = Memory');
+        'create table t (`a` Int32, `b` String) engine = Memory');
     my $diff = ClickHouse::Encoder->schema_diff(
         $p->{columns}, [['a', 'Int64'], ['c', 'DateTime']]);
     my $sql = ClickHouse::Encoder->apply_schema_diff($diff, table => 't');
@@ -131,12 +131,12 @@ DDL
     local $@;
     eval { ClickHouse::Encoder->parse_create_table(undef) };
     like($@, qr/input required/, 'undef input croaks');
-    eval { ClickHouse::Encoder->parse_create_table('SELECT 1') };
+    eval { ClickHouse::Encoder->parse_create_table('select 1') };
     like($@, qr/no create table header/, 'non-DDL input croaks');
-    eval { ClickHouse::Encoder->parse_create_table('CREATE TABLE t') };
+    eval { ClickHouse::Encoder->parse_create_table('create table t') };
     like($@, qr/no column list/, 'missing column block croaks');
     eval { ClickHouse::Encoder->parse_create_table(
-        'CREATE TABLE t (`a` Int32') };
+        'create table t (`a` Int32') };
     like($@, qr/unbalanced column list/,
          'column block with no closing paren croaks');
 }
@@ -145,10 +145,10 @@ DDL
 # newlines come through as the two characters \ and n, which used to leave
 # the column block one unsplittable run and fail with "no columns parsed".
 {
-    # Captured verbatim from ClickHouse 26.7.1 via POST to /.
-    my $escaped = 'CREATE TABLE default.http_live\n(\n    `id` UInt32,'
+    # TabSeparated output shape from ClickHouse 26.7.1.
+    my $escaped = 'create table default.http_live\n(\n    `id` UInt32,'
                 . '\n    `name` String,\n    `ts` DateTime,'
-                . '\n    `val` Nullable(Float64)\n)\nENGINE = Memory' . "\n";
+                . '\n    `val` Nullable(Float64)\n)\nengine = Memory' . "\n";
     my $info = ClickHouse::Encoder->parse_create_table($escaped);
     is($info->{table}, 'http_live', 'escaped DDL: table name');
     is($info->{database}, 'default', 'escaped DDL: database');
@@ -169,14 +169,14 @@ DDL
 # merely on a backslash being present, so a caller's own SQL is never
 # rewritten - clause text included, which is returned verbatim.
 {
-    my $ddl = "CREATE TABLE t\n(\n  `a` String DEFAULT 'x\\ny',\n"
-            . "  `b` UInt32\n)\nENGINE = Memory";
+    my $ddl = "create table t\n(\n  `a` String default 'x\\ny',\n"
+            . "  `b` UInt32\n)\nengine = Memory";
     my $info = ClickHouse::Encoder->parse_create_table($ddl);
     is_deeply([map { $_->[0] } @{ $info->{columns} }], ['a','b'],
               'real-newline DDL containing a backslash escape is left alone');
 
-    my $one_line = q{CREATE TABLE t (`a` String) ENGINE = MergeTree }
-                 . q{ORDER BY a SETTINGS x = 'a\nb'};
+    my $one_line = q{create table t (`a` String) engine = MergeTree }
+                 . q{order by a settings x = 'a\nb'};
     my $flat = ClickHouse::Encoder->parse_create_table($one_line);
     is_deeply([map { $_->[0] } @{ $flat->{columns} }], ['a'],
               'single-line DDL with a backslash literal still parses');

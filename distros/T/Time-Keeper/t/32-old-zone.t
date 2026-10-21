@@ -15,10 +15,11 @@ our $copy;
 {
     my $ptr = Time::Keeper::Zone::_abi_ptr();
     my $psize = length pack('p', '');
-    $copy = unpack("P" . (16 * $psize), pack('J', $ptr));   # an int (padded) and fifteen pointers
+    my $pint  = length pack('J', 0) == $psize ? 'J' : 'L';
+    $copy = unpack("P" . (16 * $psize), pack($pint, $ptr));   # an int (padded) and fifteen pointers
     substr($copy, 0, length pack('i', 0)) = pack('i', 1);
     no warnings 'redefine', 'once';
-    *Time::Keeper::Zone::_abi_ptr = sub { unpack('J', pack('P', $copy)) };
+    *Time::Keeper::Zone::_abi_ptr = sub { unpack($pint, pack('P', $copy)) };
     $Time::Keeper::Zone::VERSION = '0.02';
 }
 

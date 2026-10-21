@@ -17,7 +17,7 @@ Requires Perl 5.22 or newer. [Mojolicious](https://metacpan.org/dist/Mojolicious
 
 ## Usage
 
-**No API key needed to start.** The free tier answers `ip` and `is_vpn`, and allows 1000 requests per day per source address.
+**No API key needed to start.** Without a key, a lookup answers `ip` and `is_vpn`, up to 1000 a day per source address.
 
 ```perl
 use VPNDetection;
@@ -30,16 +30,17 @@ print $result->is_vpn;   # 1
 
 ### With an API key
 
-An API key raises your quota, and raises your features on a paid plan. Create one in the [console](https://app.vpndetection.io), then pass it in:
+A free key adds Tor and relay detection, where the address is and the AS that announces it. Every paid plan answers every field, the same on each, and the plans differ only in how many lookups they include. Create a key in the [console](https://app.vpndetection.io), then pass it in:
 
 ```perl
 my $client = VPNDetection->new(api_key => $ENV{VPNDETECTION_API_KEY});
 
 my $result = $client->lookup('45.83.91.1');
 print $result->is_vpn;               # 1
-print $result->vpn->{provider};      # nordvpn
-print $result->is_hosting;           # 1
-print $result->hosting->{provider};
+print $result->location->{country};  # the ISO 3166 country code
+print $result->asn->{name};          # who runs the announcing network
+print $result->vpn->{provider};      # nordvpn, on a paid plan
+print $result->is_hosting;           # 1, on a paid plan
 ```
 
 ### Your own address
@@ -275,7 +276,7 @@ Each redirect URI must be https on a public host name, or http on a loopback add
 
 ### Absent is not false
 
-A field your plan does not include is absent, which never means "we checked and found nothing". Perl makes that easy to miss, since `undef` and `0` are both false.
+Without a key only `ip` and `is_vpn` come back, and a free key adds Tor, relay, `location` and `asn`. A field your plan does not include is absent, which never means "we checked and found nothing". Perl makes that easy to miss, since `undef` and `0` are both false.
 
 ```perl
 if ($result->is_hosting // 0) { ... }     # absent counts as false

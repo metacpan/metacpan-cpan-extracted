@@ -23,7 +23,9 @@ for my $k (0 .. $kids - 1) {
     }
     push @pids, $pid;
 }
-waitpid $_, 0 for @pids;
+my $failed = 0;
+for (@pids) { waitpid $_, 0; $failed++ if $?; }
+is $failed, 0, 'all adding children exited successfully';
 
 # every item every child added must be contained -- no false negatives across
 # processes, regardless of concurrent contention on the shared bit array.
@@ -36,6 +38,7 @@ for my $k (0 .. $kids - 1) {
 is $miss, 0,
    sprintf('cross-process: all %d items added by %d children are contained (no false negatives)',
            $cap, $kids);
+is $bf->stats->{ops}, $cap, 'concurrent writes retain every operation count';
 
 # Cross-process COUNTING and REMOVAL on a fresh shared filter: every child adds
 # the same key M times, so the 4-bit counters accumulate all children's
@@ -52,12 +55,16 @@ is $miss, 0,
         if (!$pid) { $cf->add($key) for 1 .. $M; _exit(0); }
         push @cp, $pid;
     }
-    waitpid $_, 0 for @cp;
+    $failed = 0;
+    for (@cp) { waitpid $_, 0; $failed++ if $?; }
+    is $failed, 0, 'all counting children exited successfully';
+    is $cf->stats->{ops}, $kids * $M, 'counted writes retain every operation count';
     is $cf->count_of($key), $kids * $M,
        "cross-process count_of == ${\ ($kids * $M) } (every child incremented the shared counters)";
     $cf->remove($key) for 1 .. $kids * $M;
     ok !$cf->contains($key),
        'cross-process: item absent after removing every counted contribution';
+    is $cf->stats->{ops}, 2 * $kids * $M, 'removals increment the operation count';
 }
 
 done_testing;

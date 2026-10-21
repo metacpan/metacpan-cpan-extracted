@@ -16,6 +16,7 @@
 #include "decode.h"
 #include "runtime.h"
 #include "cityhash.h"
+#include "scalar_kind.h"
 
 /* Read one varint from an SV's byte buffer starting at *off; advances
  * *off past the consumed bytes. Croaks with TCP-style messages on
@@ -30,6 +31,7 @@ static UV tcp_read_varint(pTHX_ const unsigned char *p, UV buf_len,
         if (*off >= buf_len)
             croak("varint: truncated at offset %lu", (unsigned long)*off);
         unsigned char b = p[(*off)++];
+        if (shift == 63 && (b & 0x7e)) croak("varint exceeds 64 bits");
         v |= ((UV)(b & 0x7f)) << shift;
         if (!(b & 0x80)) break;
         shift += 7;
@@ -39,6 +41,8 @@ static UV tcp_read_varint(pTHX_ const unsigned char *p, UV buf_len,
 }
 
 MODULE = ClickHouse::Encoder  PACKAGE = ClickHouse::Encoder
+
+PROTOTYPES: DISABLE
 
 SV*
 new(class, ...)
@@ -216,7 +220,7 @@ CODE:
     /* Validate: every declared column must be present and same length. */
     for (c = 0; c < enc->num_columns; c++) {
         Column *col = &enc->columns[c];
-        SV **slot = hv_fetch(cols, col->name, col->name_len, 0);
+        SV **slot = fetch_named_value(aTHX_ cols, col->name, col->name_len);
         if (!slot || !SvOK(*slot))
             croak("encode_columns: missing column '%.*s'",
                   (int)col->name_len, col->name);
@@ -240,7 +244,7 @@ CODE:
     SV **col_values = alloc_sv_array(aTHX_ num_rows);
     for (c = 0; c < enc->num_columns; c++) {
         Column *col = &enc->columns[c];
-        SV **slot = hv_fetch(cols, col->name, col->name_len, 0);
+        SV **slot = fetch_named_value(aTHX_ cols, col->name, col->name_len);
         AV *av = (AV *)SvRV(*slot);
         SSize_t r;
 
@@ -453,7 +457,7 @@ CODE:
      * columns whose name isn't in the set get a placeholder values
      * arrayref (one undef per row) and the wire bytes are still consumed
      * for that column's data, but no SVs are allocated for the values.
-     * Memory win on wide SELECT * when caller wants a few columns. */
+     * Memory win on wide select * when caller wants a few columns. */
     UV start_offset = 0;
     HV *keep_set = NULL;
     if (items >= 3) {
@@ -496,7 +500,7 @@ CODE:
         SAVEDESTRUCTOR_X(cleanup_typeinfo_ptr, &t);
 
         int keep = 1;
-        if (keep_set && !hv_exists(keep_set, name, name_len))
+        if (keep_set && !fetch_named_value(aTHX_ keep_set, name, name_len))
             keep = 0;
 
         SV *values;
@@ -799,8 +803,7 @@ CODE:
     if (!SvOK(s)) {
         p = ""; len = 0;
     } else {
-        /* SvPVutf8 returns the UTF-8 byte form */
-        p = SvPVutf8(s, len);
+        p = SvPV(s, len);
     }
     /* Build prefix + bytes. */
     char prefix[10];

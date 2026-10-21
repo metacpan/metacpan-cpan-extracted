@@ -43,8 +43,10 @@ for my $code (@codes) {
         my $used = grep {
             my $text = $_->[0];
             $key eq 'of' ? scalar(() = $w->split_on($text, 'of'))
-          : $key eq 'range' ? $_->[1] =~ m{ / } && scalar(grep { my ($m) = /\{0\}(.*)\{1\}/; $m =~ s/^\s+|\s+\z//g; length $m && index(lc $text, lc " $m ") >= 0 } @p)
-          : $key eq 'skip' || $key eq 'last' ? scalar(grep { $text =~ /(?:^|[\s'\x{2019}])\Q$_\E(?:\s|['\x{2019}]|\z)/i || index(lc $text, lc $_) == 0 } @p)
+          : $key eq 'range' ? $_->[1] =~ m{ / } && scalar(grep { my ($m) = /\{0\}(.*)\{1\}/; $m =~ s/^\s+|\s+\z//g; length $m && (index(lc $text, lc " $m ") >= 0 || (($w->{spaceless} || /\}\S|\S\{1\}/) && index(lc $text, lc $m) >= 0)) } @p)
+          : $key eq 'skip' || $key eq 'last' ? scalar(grep { $text =~ /(?:^|[\s'\x{2019}])\Q$_\E(?:\s|['\x{2019}]|\z)/i || index(lc $text, lc $_) == 0 || ($w->{spaceless} && index($text, $_) >= 0) } @p)
+          : $key eq 'alias' ? scalar(grep { my ($i) = split /=/; index(lc $text, lc $i) >= 0 } @p)
+          : $key eq 'nth' ? scalar(grep { my @l = grep { /\S/ } split /\{(?:period|n|weekday)\}/; !grep { index(lc $text, lc(s/^\s+|\s+\z//gr)) < 0 } @l } @p)
           : scalar(() = $w->frame($text, $key)) || scalar(grep { index(lc $text, lc($_ =~ s/\s*\{0\}\s*//r)) >= 0 } @p);
         } @tests;
         ok($used, "$code: some test line uses its $key");
@@ -58,6 +60,10 @@ for my $code (@codes) {
     my ($first) = grep { $_->[1] =~ /T23:59:59/ || $_->[1] =~ /T00:00:00/ } @tests;
     my $p = $N->new(zone => 'Europe/London', locale => 'en');
     ok(!defined $p->try_parse($first->[0]), "$code: '$first->[0]' does not read as English") if $first;
+    # and the other way: English's worded test lines do not read in the locale
+    my $here = $N->new(zone => 'Europe/London', locale => $code);
+    my @read = grep { defined $here->try_parse($_->[0]) || eval { $here->parse_interval($_->[0]); 1 } } grep { $_->[0] =~ /[a-z]{3}/ } $en->tests;
+    is_deeply([map { $_->[0] } @read], [], "$code: English's test lines do not read in it");
 }
 
 # A table never takes a CLDR word's meaning: in every locale with a table, each

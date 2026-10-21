@@ -601,11 +601,17 @@ sub blibdirs {
 
 
 #
-# remove targets in dynamic_lib section. we do them manually later.
+# remove and save targets in dynamic_lib section.
+# we use them later in postamble.
 #
+my $DYNAMIC_LIB_TARGETS = '';
 sub dynamic_lib {
     my $t = shift->SUPER::dynamic_lib(@_);
-    $t =~ s{\n\n.+$} {\n}ms;
+    my $i = index $t, "\n\n";
+    if ($i > -1) {
+        $DYNAMIC_LIB_TARGETS = substr $t, $i+2;
+        substr( $t, $i ) = "\n";
+    }
     $t;
 }
 
@@ -875,13 +881,8 @@ $(INST_DYNAMIC) : \
 EOP
     }
     else {
-        $pa .= <<'EOP';
-$(INST_DYNAMIC) : $(OBJECT) $(MYEXTLIB) $(INST_ARCHAUTODIR)$(DFSEP).exists \
-$(EXPORT_LIST) $(PERL_ARCHIVEDEP) $(PERL_ARCHIVE_AFTER) $(INST_DYNAMIC_DEP)
-	$(RM_F) $@
-	$(LD) $(LDDLFLAGS) $(LDFROM) $(OTHERLDFLAGS) -o $@ $(MYEXTLIB) $(PERL_ARCHIVE) $(LDLOADLIBS) $(PERL_ARCHIVE_AFTER) $(EXPORT_LIST) $(INST_DYNAMIC_FIX)
-	$(NOECHO) $(CHMOD) $(PERM_RWX) $@
-EOP
+        $DYNAMIC_LIB_TARGETS =~ s{CHMOD} {NOECHO) \$(CHMOD}s;
+        $pa .= $DYNAMIC_LIB_TARGETS;
     }
 
     return $pa;

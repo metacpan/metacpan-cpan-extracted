@@ -20,7 +20,9 @@ xt/destroy_during_call.t
 xt/eg_runs.t
 xt/enospc.t
 xt/fork_cbf.t
+xt/freeze_race.t
 xt/kwalitee.t
+xt/lock_wakeup.t
 xt/pod.t
 xt/slotless_reader_recovery.t
 xt/tsan.t

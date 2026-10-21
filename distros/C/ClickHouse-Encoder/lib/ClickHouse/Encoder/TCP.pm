@@ -2,7 +2,7 @@ package ClickHouse::Encoder::TCP;  ## no critic (Capitalization)
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 # Encoders/decoders for a useful subset of ClickHouse's native TCP
 # protocol packets. Built for insert pipelines: pack a Hello + Query,
@@ -14,12 +14,7 @@ our $VERSION = '0.02';
 # main encoder's buffer helpers); packet-level layout stays in Perl
 # for readability since it's not a hot path.
 #
-# Targets protocol revision 54429: predates flexible settings,
-# inter-server secret, OpenTelemetry, parallel-replica fields, and
-# the recent chunking negotiation extension. Modern CH servers
-# (protocol revision >= ~54475) handshake additional bytes past
-# Hello that this subset doesn't respond to - prefer HTTP for
-# integration with recent servers.
+# Targets negotiated revision 54429; newer fields require a full client.
 
 # XS loader handled by the parent module; ensure it's loaded so the
 # XSUBs under PACKAGE = ClickHouse::Encoder::TCP are available.
@@ -48,6 +43,7 @@ use constant SERVER_END_OF_STREAM  => 5;
 use constant SERVER_PROFILE_INFO   => 6;
 use constant SERVER_TOTALS         => 7;
 use constant SERVER_EXTREMES       => 8;
+use constant SERVER_LOG            => 10;
 use constant SERVER_TABLE_COLUMNS  => 11;
 use constant SERVER_PROFILE_EVENTS => 14;
 
@@ -93,19 +89,22 @@ sub pack_hello {
 #   varint  CLIENT_QUERY (=1)
 #   string  query_id (often empty so the server generates one)
 #   <ClientInfo>      (block - see _pack_client_info)
-#   string  settings  (\n-separated key=value pairs, empty for none)
+#   <Settings>        (see _pack_settings)
 #   varint  query_processing_stage (default Complete)
 #   varint  compression flag (default Disable)
 #   string  query SQL text
 sub pack_query {
     my (undef, %o) = @_;
+    my $rev = $o{revision} // DEFAULT_REVISION;
     return pack_varint(CLIENT_QUERY)
          . pack_string($o{query_id} // '')
-         . _pack_client_info(\%o)
+         . ($rev >= 54032 ? _pack_client_info(\%o) : '')
          . _pack_settings($o{settings})
-         . pack_varint($o{stage}       // STAGE_COMPLETE)
+         . pack_varint($o{stage} // STAGE_COMPLETE)
          . pack_varint($o{compression} // COMPRESSION_DISABLE)
-         . pack_string($o{query} // die "pack_query: 'query' is required\n");
+         . pack_string($o{query} // die "pack_query: 'query' is required\n")
+         . __PACKAGE__->pack_data_end(revision => $rev,
+             compress => $o{compression} ? ($o{compress} // 'lz4') : 'raw');
 }
 
 # ClientInfo subblock. At revision 54429 the fields after the
@@ -117,7 +116,10 @@ sub _pack_client_info {
     my $o = shift;
     my $rev = $o->{revision} // DEFAULT_REVISION;
     my $out = '';
-    $out .= chr($o->{query_kind} // 1);   # 1 = initial query
+    my $kind = $o->{query_kind} // 1;
+    return chr(0) if !$kind;
+    $out .= chr($kind);   # 1 = initial query
+
     $out .= pack_string($o->{initial_user}     // '');
     $out .= pack_string($o->{initial_query_id} // '');
     $out .= pack_string($o->{initial_address}  // '0.0.0.0:0');
@@ -169,33 +171,41 @@ sub _pack_settings {
 # must have been told to expect compressed data via the Query packet's
 # compression flag (see pack_query's `compression =E<gt>
 # COMPRESSION_ENABLE`).
+sub pack_block_info { return "\x01\x00\x02\xff\xff\xff\xff\x00" }
+
+sub unpack_block_info {
+    my ($bytes, $offset) = @_;
+    my %info;
+    while (1) {
+        (my $field, $offset) = unpack_varint($bytes, $offset);
+        last if !$field;
+        my $width = $field == 1 ? 1 : $field == 2 ? 4 : 0;
+        die "BlockInfo: unknown field $field\n" unless $width;
+        die "BlockInfo: truncated at offset $offset\n" if $offset + $width > length $bytes;
+        $info{$field == 1 ? 'is_overflows' : 'bucket_num'} = $field == 1
+            ? ord substr($bytes, $offset, 1)
+            : unpack('l<', substr($bytes, $offset, 4));
+        $offset += $width;
+    }
+    return (\%info, $offset);
+}
+
 sub pack_data {
     my (undef, $block_bytes, %o) = @_;
     die "pack_data: block bytes required\n" unless defined $block_bytes;
+    my $rev = $o{revision} // DEFAULT_REVISION;
+    $block_bytes = pack_block_info() . $block_bytes if $rev >= 51903;
     if (defined $o{compress} && $o{compress} ne 'none' && $o{compress} ne 'raw') {
-        $block_bytes = ClickHouse::Encoder->compress_native_block(
-            $block_bytes, mode => $o{compress});
+        $block_bytes = ClickHouse::Encoder->compress_native_block($block_bytes, mode => $o{compress});
     }
     return pack_varint(CLIENT_DATA)
-         . pack_string($o{table_name} // '')
+         . ($rev >= 50264 ? pack_string($o{table_name} // '') : '')
          . $block_bytes;
 }
 
-# Empty data packet: signals end of insert. Even with negotiated
-# compression, the end-of-insert empty block goes through the same
-# compressed-block framing so the server's CompressedReadBuffer parses
-# it the same way every other Data packet.
 sub pack_data_end {
-    my (undef, %o) = @_;
-    # A "data" packet with an empty Native block: ncols=0, nrows=0.
-    my $empty_block = pack_varint(0) . pack_varint(0);  # ncols + nrows
-    if (defined $o{compress} && $o{compress} ne 'none' && $o{compress} ne 'raw') {
-        $empty_block = ClickHouse::Encoder->compress_native_block(
-            $empty_block, mode => $o{compress});
-    }
-    return pack_varint(CLIENT_DATA)
-         . pack_string($o{table_name} // '')
-         . $empty_block;
+    my ($class, %o) = @_;
+    return $class->pack_data("\x00\x00", %o);
 }
 
 sub pack_ping {
@@ -213,10 +223,11 @@ sub pack_cancel {
 # payload fields depend on type. Croaks on truncation; caller can
 # pre-screen by ensuring at least 1 byte is available.
 sub unpack_packet {
-    my (undef, $bytes, $offset) = @_;
+    my (undef, $bytes, $offset, %opts) = @_;
     $offset //= 0;
     (my $type, $offset) = unpack_varint($bytes, $offset);
     my %pkt = (type => $type);
+    my $rev = $opts{revision} // DEFAULT_REVISION;
     if ($type == SERVER_HELLO) {
         ($pkt{name},     $offset) = unpack_string($bytes, $offset);
         ($pkt{major},    $offset) = unpack_varint($bytes, $offset);
@@ -228,15 +239,16 @@ sub unpack_packet {
         # 'truncated' so the reader fetches more, not silently drop a
         # field whose bytes simply have not arrived yet. Thresholds
         # match ClickHouse's DBMS_MIN_REVISION_WITH_* constants.
-        if ($pkt{revision} >= 54058) {
+        my $hello_rev = $pkt{revision} < $rev ? $pkt{revision} : $rev;
+        if ($hello_rev >= 54058) {
             ($pkt{timezone}, $offset)
                 = unpack_string($bytes, $offset);
         }
-        if ($pkt{revision} >= 54372) {
+        if ($hello_rev >= 54372) {
             ($pkt{display_name}, $offset)
                 = unpack_string($bytes, $offset);
         }
-        if ($pkt{revision} >= 54401) {
+        if ($hello_rev >= 54401) {
             ($pkt{version_patch}, $offset)
                 = unpack_varint($bytes, $offset);
         }
@@ -253,6 +265,12 @@ sub unpack_packet {
         die "unpack_packet: truncated at offset $offset"
             if $offset >= length $bytes;
         $pkt{has_nested} = ord substr($bytes, $offset++, 1);
+        if ($pkt{has_nested}) {
+            my ($nested, $next) = __PACKAGE__->unpack_packet(
+                pack_varint(SERVER_EXCEPTION) . substr($bytes, $offset));
+            $pkt{nested} = $nested;
+            $offset += $next - 1;
+        }
     }
     elsif ($type == SERVER_PROGRESS) {
         # At the targeted protocol revision (54429) a Progress packet
@@ -286,27 +304,18 @@ sub unpack_packet {
         $pkt{calculated_rows_before_limit}
             = ord substr($bytes, $offset++, 1);
     }
-    elsif ($type == SERVER_DATA || $type == SERVER_TOTALS
-        || $type == SERVER_EXTREMES) {
-        # Data packet: table_name then a Native block payload.
-        # We surface the table name and the byte range of the block;
-        # the caller passes those bytes to ClickHouse::Encoder->decode_block.
-        ($pkt{table_name}, $offset) = unpack_string($bytes, $offset);
+    elsif ($type == SERVER_DATA || $type == SERVER_TOTALS || $type == SERVER_EXTREMES
+        || $type == SERVER_LOG || $type == SERVER_PROFILE_EVENTS) {
+        ($pkt{table_name}, $offset) = unpack_string($bytes, $offset) if $rev >= 50264;
+        my $compressed = $opts{compressed} && $type != SERVER_LOG && $type != SERVER_PROFILE_EVENTS;
+        if (!$compressed && $rev >= 51903) {
+            ($pkt{block_info}, $offset) = unpack_block_info($bytes, $offset);
+        }
         $pkt{block_offset} = $offset;
-        # Caller decodes from here; advancing $offset requires parsing
-        # the inner block (ncols + nrows + per-column bytes). For the
-        # caller's convenience we don't attempt that here - they should
-        # use ClickHouse::Encoder->decode_block on the slice and add
-        # block_consumed = $decoded->{consumed} to advance.
     }
     elsif ($type == SERVER_TABLE_COLUMNS) {
         ($pkt{table_name},       $offset) = unpack_string($bytes, $offset);
         ($pkt{column_descriptor}, $offset) = unpack_string($bytes, $offset);
-    }
-    elsif ($type == SERVER_PROFILE_EVENTS) {
-        # Same shape as a Data packet.
-        ($pkt{table_name}, $offset) = unpack_string($bytes, $offset);
-        $pkt{block_offset} = $offset;
     }
     else {
         die "unpack_packet: unknown server packet type $type\n";
@@ -327,124 +336,97 @@ sub unpack_packet {
 # block-read N bytes when the server has only sent K < N.
 sub read_packet {
     my (undef, $fh, %opts) = @_;
-    # When `compressed => 1` is passed, the inner Native block of any
-    # Data-shaped packet is expected to be wrapped in CH's
-    # compressed-block framing (16-byte CityHash128 + 9-byte header +
-    # LZ4/ZSTD/raw payload). This must match what the caller negotiated
-    # in pack_query(... compression => COMPRESSION_ENABLE); reading
-    # without `compressed => 1` from a connection that DOES use
-    # compression will misparse the Native block and croak with a
-    # decode error rather than a clean diagnostic.
-    my $compressed = $opts{compressed};
-    # Optional caller-owned buffer: pass `buffer => \my $buf` and thread
-    # the same ref through every read_packet call on this filehandle.
-    # A fast server can pack several packets into one TCP segment;
-    # read_packet then leaves the bytes it over-read in that buffer for
-    # the next call. Without it, read_packet is a one-shot helper and
-    # over-read bytes are lost - unsafe to call in a loop.
-    my $bufref = $opts{buffer};
-    my $buf = $bufref ? $$bufref : '';
-    # Optional read deadline; without one a desynchronised handshake wedges
-    # the caller forever (see CAVEATS). Undef keeps the old behaviour.
+    my $bufref = $opts{buffer} // \my $local_buf;
+    $$bufref //= '';
     my $timeout = $opts{timeout};
+    my ($deadline, $fd);
+    if (defined $timeout) {
+        require Time::HiRes;
+        $deadline = Time::HiRes::time() + $timeout;
+        $fd = fileno $fh;
+    }
     my $read_some = sub {
-        my $fd = defined $timeout ? fileno($fh) : undef;
-        if (defined $timeout && defined $fd && $fd >= 0) {
-            require Time::HiRes;
-            my $deadline = Time::HiRes::time() + $timeout;
-            while (1) {
+        while (1) {
+            if (defined $fd && $fd >= 0) {
                 my $left = $deadline - Time::HiRes::time();
-                my $expired = "read_packet: timed out after ${timeout}s "
-                            . "waiting for the server (protocol desync, or "
-                            . "a server expecting a newer client "
-                            . "revision)\n";
+                my $expired = "read_packet: timed out after ${timeout}s waiting for the server\n";
                 die $expired if $left <= 0;
-                my $vec = '';
-                vec($vec, $fd, 1) = 1;
-                # select() rewrites its bit-vector argument, so hand it a
-                # copy. (Kept as a plain statement rather than an inline
-                # `my` inside the call, which CPANTS' quick prereq scanner
-                # cannot parse - it then reports the file as using nothing
-                # at all, including strict.)
-                my $ready = $vec;
+                my $ready = '';
+                vec($ready, $fd, 1) = 1;
                 my $n = select($ready, undef, undef, $left);
-                last if $n > 0;                 # readable
-                die $expired if $n == 0;        # deadline reached
-                # select returns -1 on EINTR, which is TRUE in Perl, so a
-                # bare `or die` would read a signal as readiness and fall
-                # into a blocking sysread. Retry against the deadline.
-                next if $! == Errno::EINTR();
-                die "read_packet: select failed: $!\n";
+                die $expired if $n == 0;
+                if ($n < 0) {
+                    next if $! == Errno::EINTR();
+                    die "read_packet: select failed: $!\n";
+                }
             }
+            my $got = sysread $fh, my $chunk, 4096;
+            next if !defined $got && $! == Errno::EINTR();
+            die "read_packet: read error: $!\n" unless defined $got;
+            die "read_packet: connection closed mid-packet\n" if !$got;
+            $$bufref .= $chunk;
+            return;
         }
-        my $got = sysread $fh, my $chunk, 4096;
-        die "read_packet: read error: $!\n" if !defined $got;
-        die "read_packet: connection closed mid-packet\n" if $got == 0;
-        $buf .= $chunk;
     };
-
-    my $pkt;
-    my $end;   # offset just past the consumed packet
+    my ($pkt, $end);
     while (1) {
-        my $ok = eval {
-            ($pkt, $end) = __PACKAGE__->unpack_packet($buf, 0);
-            1;
-        };
+        my $ok = eval { ($pkt, $end) = __PACKAGE__->unpack_packet($$bufref, 0, %opts); 1 };
         last if $ok;
         die $@ unless $@ =~ /truncated/;
         $read_some->();
     }
-
-    # For Data-shaped packets, also pull the inner Native block bytes.
-    # decode_block tells us how many bytes it consumed; if the block
-    # is still truncated, read more and retry.
     if (exists $pkt->{block_offset}) {
-        require ClickHouse::Encoder;
+        my $compressed = $opts{compressed}
+            && $pkt->{type} != SERVER_LOG && $pkt->{type} != SERVER_PROFILE_EVENTS;
         if ($compressed) {
-            # Step 1: pull the compressed-block frame (16 hash + 9 hdr
-            # + payload). Read more bytes until the frame is complete.
+            my $plain = '';
+            my $off = $pkt->{block_offset};
             while (1) {
+                my ($frame, $consumed);
+                while (1) {
+                    my $ok = eval {
+                        ($frame, $consumed) = ClickHouse::Encoder->decompress_native_block(
+                            $$bufref, offset => $off); 1;
+                    };
+                    last if $ok;
+                    die $@ unless $@ =~ /truncated header|extends past buffer/;
+                    $read_some->();
+                }
+                $off += $consumed;
+                $plain .= $frame;
                 my $ok = eval {
-                    my ($plain, $consumed) =
-                        ClickHouse::Encoder->decompress_native_block(
-                            $buf, offset => $pkt->{block_offset});
-                    # Decode the inner Native block out of $plain.
-                    my $b = ClickHouse::Encoder->decode_block($plain);
-                    $pkt->{block}       = $b;
-                    $pkt->{block_bytes} = $plain;   # decompressed bytes
-                    $pkt->{compressed_consumed} = $consumed;
+                    my $start = 0;
+                    if (($opts{revision} // DEFAULT_REVISION) >= 51903) {
+                        ($pkt->{block_info}, $start) = unpack_block_info($plain, 0);
+                    }
+                    my $b = ClickHouse::Encoder->decode_block($plain, $start);
+                    die "read_packet: trailing bytes in compressed Data packet\n"
+                        unless $start + $b->{consumed} == length $plain;
+                    $pkt->{block} = $b;
+                    $pkt->{block_bytes} = substr($plain, $start);
+                    $pkt->{compressed_consumed} = $off - $pkt->{block_offset};
                     1;
                 };
-                last if $ok;
-                # decompress_native_block raises "truncated header" /
-                # "block extends past buffer end" when more bytes are
-                # needed; also "buffer truncated" on the inner Native
-                # parse (shouldn't fire after decompress succeeds).
-                die $@ unless $@ =~ /truncated|extends past|need \d+ more/;
-                $read_some->();
+                if ($ok) { $end = $off; last }
+                die $@ unless $@ =~ /truncated|exceeds remaining buffer/;
             }
-            $end = $pkt->{block_offset} + $pkt->{compressed_consumed};
         } else {
+            my $need_at = 0;
             while (1) {
-                my $ok = eval {
-                    my $b = ClickHouse::Encoder->decode_block(
-                        substr($buf, $pkt->{block_offset}));
-                    $pkt->{block}       = $b;
-                    $pkt->{block_bytes} =
-                        substr($buf, $pkt->{block_offset}, $b->{consumed});
-                    1;
-                };
-                last if $ok;
-                die $@ unless $@ =~ /truncated/;
-                $read_some->();
+                $read_some->() while length($$bufref) < $need_at;
+                my $b = eval { ClickHouse::Encoder->decode_block($$bufref, $pkt->{block_offset}) };
+                if (!$@) {
+                    $pkt->{block} = $b;
+                    $pkt->{block_bytes} = substr($$bufref, $pkt->{block_offset}, $b->{consumed});
+                    $end = $pkt->{block_offset} + $b->{consumed};
+                    last;
+                }
+                die $@ unless $@ =~ /truncated|exceeds remaining buffer/;
+                $need_at = length($$bufref) + ($@ =~ /need (\d+) more/ ? $1 : 1);
             }
-            $end = $pkt->{block_offset} + length $pkt->{block_bytes};
         }
     }
-    # Hand any over-read bytes back to the caller's buffer so a looping
-    # caller does not lose packets the same sysread happened to pull in.
-    # Without a caller buffer those bytes are dropped (one-shot mode).
-    $$bufref = substr($buf, $end) if $bufref;
+    substr($$bufref, 0, $end, '');
     return $pkt;
 }
 
@@ -513,10 +495,7 @@ to drive an insert pipeline over the ClickHouse native TCP protocol
 C<Hello>, C<Data>, C<Exception>, C<Progress>, C<Pong>,
 C<EndOfStream>, C<ProfileInfo>, C<TableColumns>, C<ProfileEvents>.
 
-Targets protocol revision 54429 - the same revision ClickHouse
-clients have used since ~2020. Newer fields the server may include
-(timezone, display_name, version_patch) are read opportunistically
-when present.
+Targets protocol revision 54429 - newer fields are gated by the negotiated revision.
 
 Transport (socket / TLS / framing) is the caller's responsibility.
 L</read_packet> is provided as a convenience for blocking
@@ -570,6 +549,8 @@ L<ClickHouse::Encoder>'s C<decode_block> / C<decode_stream>.
 C<settings> may be a hashref (legacy string-value form) or a raw
 byte string already in the right shape.
 
+Query packets include the empty Data terminator for external tables.
+
 =head2 pack_data $block_bytes, %opts
 
     my $bytes = ClickHouse::Encoder::TCP->pack_data($block);
@@ -590,6 +571,12 @@ compressed data via the corresponding C<pack_query(... compression
 negotiating compression in the Query packet will be rejected as a
 parse error by C<CompressedReadBuffer>. C<compress> absent, or
 C<'none'> / C<'raw'>, emits the bare uncompressed block (the default).
+
+=head2 pack_block_info / unpack_block_info
+
+C<pack_block_info()> returns the default C<BlockInfo> bytes.
+C<unpack_block_info($bytes, $offset)> returns C<($info, $new_offset)>.
+TCP Data packets include this header before the Native block.
 
 =head2 pack_data_end %opts
 
@@ -714,21 +701,11 @@ reference them as C<ClickHouse::Encoder::TCP::SERVER_DATA> etc.
 
 =over 4
 
-=item * B<Modern server cutoff.> The default revision (54429) predates
-the client addendum (54458) and the chunked-packet negotiation (54470)
-that current servers expect after C<SERVER_HELLO>. B<The failure mode is
-a hang, not an error>: C<Hello> succeeds, then each side waits for the
-other and L</read_packet> blocks in C<sysread>. Verified against
-ClickHouse 26.7 (revision 54488). Pass C<<< timeout => $seconds >>> to
-turn that into a clean error, and prefer HTTP for recent servers.
+=item * B<Protocol revision.> Use the default revision 54429 with modern
+servers. Raising it requires additional handshake and packet fields.
 
-=item * B<String encoding.> Inputs to C<pack_string> (any string
-field: query, names, settings) are encoded as UTF-8 bytes; passing a
-byte-mode string with non-ASCII bytes will be reinterpreted as
-Latin-1 by Perl's UTF-8 upgrade rules. If you need raw bytes, encode
-to UTF-8 yourself first. C<unpack_string> conversely returns the
-raw byte string the server sent - it does not set the UTF-8 flag,
-so callers wanting characters should C<decode_utf8> the result.
+=item * B<String encoding.> C<pack_string> uses UTF-8 for character
+strings and preserves byte strings. C<unpack_string> returns bytes.
 
 =item * B<Settings values are strings.> Each setting is emitted with
 flags=0 (ordinary) and the value as a string. Numeric/typed-setting

@@ -170,5 +170,12 @@ xt/portability-files.t
 xt/prereq-used.t
 xt/spelling.t
 xt/synopsis.t
+t/native-prefixes.t
+t/production.t
+t/tcp-framing.t
+t/bulk-dedup-tokens.t
+t/decode-short-read-retry.t
+t/schema-redirect.t
+t/int-range.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

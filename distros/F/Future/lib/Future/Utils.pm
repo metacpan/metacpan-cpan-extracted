@@ -3,10 +3,14 @@
 #
 #  (C) Paul Evans, 2013-2024 -- leonerd@leonerd.org.uk
 
-package Future::Utils 0.53;
+package Future::Utils 0.54;
 
-use v5.14;
+use v5.20;
 use warnings;
+
+# Don't  use feature 'signatures'  in this module yet, because until perl 5.28
+# it's awkward to use both signatures and (&...)-style prototypes at the same
+# time.
 
 use Exporter 'import';
 # Can't import the one from Exporter as it relies on package inheritance

@@ -2,6 +2,6 @@
    "automated_actions" : "code_request",
    "automated_contributions" : "code_request",
    "code_generation" : "machine_generated",
-   "distribution" : "Algorithm-UrataniTakeda-v0.1.6",
+   "distribution" : "Algorithm-UrataniTakeda-v0.1.7",
    "version" : 1
 }

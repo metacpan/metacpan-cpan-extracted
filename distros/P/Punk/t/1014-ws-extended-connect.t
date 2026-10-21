@@ -186,6 +186,33 @@ is($payload, 'echo:hello',
  . 'HTTP/2 stream - the RFC 6455 codec is unchanged by the transport');
 
 close $sock;
+
+# The same, with the CONNECT and the first message in one write, as a
+# browser sends them. The server parses both before the route runs, so the
+# message is buffered before the websocket exists, and has to reach the
+# `message` handler once the route has wired it.
+$sock = IO::Socket::INET->new(PeerAddr => '127.0.0.1', PeerPort => $port,
+                              Proto => 'tcp');
+syswrite $sock, "PRI * HTTP/2.0\r\n\r\nSM\r\n\r\n" . frame(0x4, 0, 0, '');
+for (1 .. 6) {
+    my ($type, $flags) = read_frame($sock);
+    last unless defined $type;
+    last if $type == 0x4 && !($flags & 0x1);
+}
+syswrite $sock, frame(0x4, 0x1, 0, '') . frame(0x1, 0x4, 1, $hb)
+              . frame(0x0, 0, 1, ws_text('burst'));
+$ws_bytes = '';
+for (1 .. 30) {
+    my ($type, $flags, $sid, $pay) = read_frame($sock, 5);
+    last unless defined $type;
+    $ws_bytes .= $pay if $type == 0x0 && $sid == 1;
+    last if length $ws_bytes >= 2;
+}
+($op, $payload) = ws_decode($ws_bytes);
+is($payload, 'echo:burst',
+   'a message sent in the same write as the CONNECT is not lost');
+
+close $sock;
 kill 'TERM', $pid;
 waitpid $pid, 0;
 unlink "$dir/WSApp.pm";

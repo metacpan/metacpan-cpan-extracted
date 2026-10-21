@@ -27,15 +27,15 @@ or use cpanminus:
 
 DEVELOP CPAN RELEASE
 
-Install Carton ( https://metacpan.org/pod/Carton  ), then dependencies:
-	cpanm Carton
+Install cpm ( https://metacpan.org/pod/App::cpm  ), then dependencies:
+	cpanm App::cpm
 	perl dev/dev.pl
 Do something with code and test:
-	carton exec dzil test
+	perl dev/exec.pl dzil test
 	(don't forget to change: dist.ini copyright_year and release; .pm copyright year; Changes)
-	carton exec dzil build
+	perl dev/exec.pl dzil build
 	(git commit/push)
-	carton exec dzil release (sets the tag verstion in git)
+	perl dev/exec.pl dzil release (sets the tag verstion in git)
 Clean dependencies and build:
 	perl dev/clean-dev.pl
 
@@ -54,7 +54,7 @@ You can also look for information at:
 
 COPYRIGHT AND LICENCE
 
-Copyright © 2017-2024 Vladimir Varlamov <bes.internal@gmail.com>
+Copyright © 2017-2026 Vladimir Varlamov <bes.internal@gmail.com>
 This module is adapted copy of Date-Holidays-RU:
 Copyright © 2014 Alexander Nalobin <alexander@nalobin.ru>
 

@@ -29,6 +29,10 @@ use Digest::MD5;
 use Encode;
 use Params::Get;
 use Storable;
+# Imported functions are not methods: without this, $obj->croak() and the like
+# would resolve.  _valid_location is kept: t/edge_cases.t
+# checks that this package holds the rule itself.
+use namespace::clean -except => [qw(_valid_location)];
 
 # Some locations aren't found because of inconsistencies in the way things are stored - these are some values I know
 # FIXME: Should be in a configuration file
@@ -58,11 +62,11 @@ Provides a geocoding functionality to a local SQLite database containing geo-cod
 
 =head1 VERSION
 
-Version 0.48
+Version 0.49
 
 =cut
 
-our $VERSION = '0.48';
+our $VERSION = '0.49';
 
 =head1 SYNOPSIS
 
@@ -180,7 +184,7 @@ that either C<Leesburg, Loudoun County, Virginia, US> or C<Leesburg, Loudoun, Vi
 
 =head4 input
 
-    # Input schema (Params::Validate::Strict) — exactly one of location or scantext is required
+    # Input schema (Params::Validate::Strict) - exactly one of location or scantext is required
     location     => { type => 'scalar',   optional => 1 }  # address string (exclusive with scantext)
     scantext     => { type => 'scalar',   optional => 1 }  # free text to scan for place names
     region       => { type => 'scalar',   optional => 1 }  # ISO 3166-1 alpha-2 country code hint

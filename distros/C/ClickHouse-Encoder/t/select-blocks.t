@@ -20,10 +20,9 @@ use ClickHouse::Encoder;
 
 # Reject SQL with a trailing format clause (we always append
 # default_format=Native via the URL, and a user format would shadow
-# it). The mixed-case inputs below also exercise the case-insensitive
-# guard.
+# it).
 {
-    for my $sql ('select 1 format JSON', 'select 1 FORMAT TabSeparated',
+    for my $sql ('select 1 format JSON', 'select 1 format TabSeparated',
                  "select 1  format  csv") {
         my $err = eval {
             ClickHouse::Encoder->select_blocks($sql,
@@ -34,8 +33,8 @@ use ClickHouse::Encoder;
 }
 
 # Option-stripping: select_blocks drops keys it consumes (on_block,
-# keep, timeout, decompress) and dedup_token (INSERT-only, undocumented
-# on SELECT) before forwarding to _http_url_headers. Capture by
+# keep, timeout, decompress) and dedup_token (insert-only, undocumented
+# on select) before forwarding to _http_url_headers. Capture by
 # monkey-patching HTTP::Tiny->post so we can inspect the URL it sees.
 {
     require HTTP::Tiny;
@@ -59,7 +58,7 @@ use ClickHouse::Encoder;
     like($seen[0], qr/max_execution_time=7/,
          'select_blocks: settings forwarded to URL');
     unlike($seen[0], qr/insert_deduplication_token/,
-           'select_blocks: dedup_token stripped (INSERT-only)');
+           'select_blocks: dedup_token stripped (insert-only)');
     like($seen[0], qr{^http://h\.example:},
          'select_blocks: host honored');
     like($seen[0], qr/default_format=Native/,

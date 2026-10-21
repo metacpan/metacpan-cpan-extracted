@@ -8,6 +8,7 @@ use Time::HiRes ();
 use POSIX qw(strftime);
 use ForgeOps::Tracker::DeliveryStatus;
 use ForgeOps::Tracker::HistogramBucketer;
+use ForgeOps::Tracker::StrictPrivacy ();
 
 # Times requests in-process, bucketed by transaction name (see the PSGI/Dancer2 performance
 # integrations), and periodically flushes each distinct bucket as one small aggregate report,
@@ -64,6 +65,9 @@ sub record {
     my ($self, $transaction_name, $duration_ms) = @_;
     my $config = $self->{configuration};
     return unless $config->{track_performance} && $config->is_enabled;
+    # Under strict privacy a raw-path name (the PSGI integration's "GET /patients/42") loses its
+    # ids; a route is kept.
+    $transaction_name = ForgeOps::Tracker::StrictPrivacy::transaction_name($transaction_name) if $config->{strict_privacy};
 
     $self->_ensure_worker;
 

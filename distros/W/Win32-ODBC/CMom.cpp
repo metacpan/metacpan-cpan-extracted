@@ -107,7 +107,7 @@ CMom::~CMom(){
 
 	if (pList){
 		if (iType == MASTER){
-			char *szTemp;
+			const char *szTemp;
 			DWORD	dCount;
 			DEBUG_DUMP("CMom::~CMom: Entering Critical Section gCS")
 szTemp = "\n\n====================================\nCMom::~CMom: WE ARE DELETING CMom! OH MY GOD! NO!!! DON'T DO IT!!!\n\n\n";

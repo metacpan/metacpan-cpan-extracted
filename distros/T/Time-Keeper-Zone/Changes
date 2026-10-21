@@ -1,5 +1,9 @@
 Revision history for Time-Keeper-Zone
 
+0.05    2026-10-20
+        - Builds on perl 5.10.0 (mPUSHs, mXPUSHs).
+        - Fix: t/04-surface.t failed on Windows where symlink works.
+
 0.04    2026-10-18
         - Fix: t/04-surface.t failed on a Windows machine whose zone is not UTC.
 

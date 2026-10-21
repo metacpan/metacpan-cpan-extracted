@@ -3,7 +3,7 @@
 # and byte-diff against the original. Catches decode/re-encode
 # asymmetry that pure round-trip tests miss (encode-then-decode
 # cancels out symmetric bugs in both directions; decoding a fixture
-# captured FROM CH and then re-encoding to bytes the same fixture
+# captured from CH and then re-encoding to bytes the same fixture
 # is the only way to prove both sides agree with the server).
 use strict;
 use warnings;

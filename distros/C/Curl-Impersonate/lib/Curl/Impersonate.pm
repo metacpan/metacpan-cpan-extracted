@@ -1,7 +1,7 @@
 package Curl::Impersonate;
 use v5.10; use strict; use warnings;
 use Carp ();
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 require XSLoader;
 XSLoader::load('Curl::Impersonate', $VERSION);
 
@@ -249,6 +249,9 @@ your downstream consumer is full; return the value C<2> to abort the transfer
 bodyless response. C<on_done> fires once at the end with an error string or
 C<undef>. Do not call L</resume>/L</remove> from inside these callbacks. Resume a
 paused transfer with L</resume>.
+
+An exception in C<on_headers> or C<on_body> warns and aborts the transfer;
+C<on_done> receives an error.
 
 B<Pausing and the chunk contract:> libcurl treats a pause as "this chunk was not
 consumed" and re-delivers it to C<on_body> when you L</resume>. So decide whether

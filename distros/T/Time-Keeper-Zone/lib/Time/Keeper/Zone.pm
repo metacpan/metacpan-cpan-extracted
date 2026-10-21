@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 require XSLoader;
 XSLoader::load('Time::Keeper::Zone', $VERSION);
@@ -19,7 +19,7 @@ Time::Keeper::Zone - the time zones of the IANA database, compiled in
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =head1 SYNOPSIS
 

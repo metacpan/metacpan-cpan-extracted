@@ -22,6 +22,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
+            "Path::Tiny" : "0.146",
             "Test::More" : "0"
          }
       },
@@ -39,30 +40,32 @@
             "namespace::autoclean" : "0.28",
             "perl" : "5.014"
          }
+      },
+      "test" : {
+         "recommends" : {
+            "Path::Tiny" : "0.146",
+            "Test::CheckManifest" : "0",
+            "Test::Pod" : "1.22"
+         }
       }
    },
    "provides" : {
       "Map::Tube::Leipzig" : {
          "file" : "lib/Map/Tube/Leipzig.pm",
-         "version" : "0.03"
-      },
-      "Map::Tube::Leipzig::Line::S3" : {
-         "file" : "lib/Map/Tube/Leipzig/Line/S3.pm",
-         "version" : "0.03"
-      },
-      "Map::Tube::Leipzig::Line::S7" : {
-         "file" : "lib/Map/Tube/Leipzig/Line/S7.pm",
-         "version" : "0.03"
+         "version" : "v1.0.0"
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/manwar/Map-Tube-Leipzig/issues"
+      },
       "repository" : {
          "type" : "git",
          "url" : "https://github.com/manwar/Map-Tube-Leipzig.git",
          "web" : "https://github.com/manwar/Map-Tube-Leipzig"
       }
    },
-   "version" : "v0.1.0",
+   "version" : "v1.0.0",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

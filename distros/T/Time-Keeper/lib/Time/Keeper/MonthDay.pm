@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.09';
+our $VERSION = '0.11';
 
 use Time::Keeper;
 
@@ -27,7 +27,7 @@ Time::Keeper::MonthDay - a month and a day, in no year
 
 =head1 VERSION
 
-Version 0.09
+Version 0.11
 
 =head1 SYNOPSIS
 

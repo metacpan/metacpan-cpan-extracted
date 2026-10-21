@@ -1,5 +1,10 @@
 Revision history for Data-CuckooFilter-Shared
 
+0.07  2026-10-16
+    - Recover fingerprint counts after interrupted removals.
+    - Fix frozen-data publication and allocation failure cleanup.
+    - Link required threading and math libraries explicitly.
+
 0.06      2026-09-26
           - remove after an add killed mid-way no longer wraps the count and
             bricks the file.

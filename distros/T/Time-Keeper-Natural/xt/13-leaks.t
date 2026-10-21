@@ -11,13 +11,14 @@ use Time::Keeper::Natural;
 # A million calls of each kind (TKN_LEAK_N) must leave the process's
 # resident size where ten thousand left it: the readers, the deaths, the
 # Match and the try_ forms; 0.02's intervals, day ordinals and zones; 0.03's
-# calendars, fractions and points. A byte leaked a call is a megabyte here.
+# calendars, fractions and points; 0.04's find. A byte leaked a call is a megabyte here.
 my $N = $ENV{TKN_LEAK_N} || 1_000_000;
 my $rss = sub { my $k = `ps -o rss= -p $$`; $k =~ s/\s+//g; return $k };
 local $Time::Keeper::CLOCK = Time::Keeper->new(year => 2026, month => 10, day => 15, hour => 9, zone => 'Europe/London');
 my $n = Time::Keeper::Natural->new(locale => 'en-GB', zone => 'Europe/London');
 my $fr = Time::Keeper::Natural->new(locale => 'fr', zone => 'Europe/London');
 my $heb = Time::Keeper::Natural->new(locale => 'en', zone => 'Europe/London', calendar => 'hebrew');
+my $ja = Time::Keeper::Natural->new(locale => 'ja', zone => 'Europe/London');
 my @KINDS = (
     [ "parse('tomorrow')",            sub { $n->parse('tomorrow') } ],
     [ "parse('in 3 days')",           sub { $n->parse('in 3 days') } ],
@@ -41,6 +42,9 @@ my @KINDS = (
     [ 'after a point',                sub { $n->parse('3 days after tomorrow') } ],
     [ 'a day and its evening',        sub { $n->parse('tomorrow evening') } ],
     [ 'the weekend',                  sub { $n->parse('next weekend') } ],
+    [ 'find in a sentence',           sub { my @m = $n->find('Can we meet next Tuesday at 3 pm, or on the 20th? It takes 2 hours.') } ],
+    [ 'find with names, an interval',  sub { my @m = $n->find('closed Monday to Friday, from 9 am to 5 pm', names => 1) } ],
+    [ 'find in Japanese',             sub { my @m = $ja->find("\x{6765}\x{9031}\x{306e}\x{706b}\x{66dc}\x{65e5}\x{3001}\x{4e8c}\x{9031}\x{9593}\x{4e09}\x{65e5}\x{5f8c}") } ],
 );
 for my $k (@KINDS) {
     my ($what, $code) = @$k;

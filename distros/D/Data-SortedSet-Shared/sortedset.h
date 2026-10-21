@@ -403,7 +403,8 @@ static inline void ss_recover_stale_lock(SsHandle *h, uint32_t observed_wlock) {
         return;
     if (!ss_self_reading(h)) {
         ss_rwlock_drain(h);
-        ss_rebuild_locked(h);
+        if (!__atomic_load_n(&hdr->sealed, __ATOMIC_ACQUIRE))
+            ss_rebuild_locked(h);
     }
     __atomic_store_n(&hdr->wlock, 0, __ATOMIC_RELEASE);
     if (__atomic_load_n(&hdr->rwait, __ATOMIC_RELAXED) > 0)
@@ -659,7 +660,7 @@ static inline SsHandle *ss_setup(void *base, size_t map_size,
     return h;
 }
 
-/* Validate a mapped header (shared by ss_create reopen and ss_open_fd). */
+/* Validate immutable geometry before setting up a handle. */
 static inline int ss_validate_header(const SsHeader *hdr, uint64_t file_size) {
     if (hdr->magic != SS_MAGIC) return 0;
     if (hdr->version != SS_VERSION) return 0;
@@ -672,18 +673,33 @@ static inline int ss_validate_header(const SsHeader *hdr, uint64_t file_size) {
     if (hdr->reader_slots_off != L.reader_slots) return 0;
     if (hdr->index_off        != L.index)        return 0;
     if (hdr->nodes_off        != L.nodes)        return 0;
+    return 1;
+}
+
+/* Tree fields may disagree while a writer is running or awaiting recovery. */
+static inline int ss_validate_state(const SsHeader *hdr) {
     if (hdr->count > hdr->max_entries) return 0;
     if (hdr->root != SS_NONE && hdr->root >= hdr->node_capacity) return 0;
     if (hdr->root == SS_NONE && hdr->count != 0) return 0;
-    /* ...and the converse: a root that is a VALID index while the tree claims
-     * to be empty. The checks above accept that pair (the index is in range,
-     * and the "no root" rule only fires when root IS SS_NONE), but the node it
-     * names is still on the free list with uninitialised links -- the first
-     * insert descends from it and dereferences garbage. Height is the same
-     * story: a non-empty tree always has a height. */
     if (hdr->root != SS_NONE && (hdr->count == 0 || hdr->height == 0)) return 0;
     if (hdr->height != 0 && hdr->root == SS_NONE) return 0;
     return 1;
+}
+
+static void ss_destroy(SsHandle *h);
+
+static SsHandle *ss_attach(void *base, size_t map_size, const char *path, int fd, char *errbuf) {
+    SsHandle *h = ss_setup(base, map_size, path, fd);
+    if (!h) { SS_ERR("out of memory"); return NULL; }
+    ss_rwlock_rdlock(h);
+    int valid = ss_validate_state(h->hdr), sealed = h->hdr->sealed;
+    ss_rwlock_rdunlock(h);
+    if (!valid || sealed) {
+        SS_ERR("%s", sealed ? "this sorted set is frozen (read-only); open it with new_readonly" : "invalid sorted-set file");
+        ss_destroy(h);
+        return NULL;
+    }
+    return h;
 }
 
 
@@ -831,7 +847,7 @@ static SsHandle *ss_create(const char *path, uint32_t max_entries, mode_t mode, 
                 munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
             }
             flock(fd, LOCK_UN); close(fd);
-            return ss_setup(base, map_size, path, -1);
+            return ss_attach(base, map_size, path, -1, errbuf);
         }
     }
     ss_init_header(base, max_entries, index_slots, node_capacity, total);
@@ -882,7 +898,7 @@ static SsHandle *ss_open_fd(int fd, char *errbuf) {
     }
     int myfd = fcntl(fd, F_DUPFD_CLOEXEC, 0);
     if (myfd < 0) { SS_ERR("fcntl: %s", strerror(errno)); munmap(base, ms); return NULL; }
-    return ss_setup(base, ms, NULL, myfd);
+    return ss_attach(base, ms, NULL, myfd, errbuf);
 }
 
 static void ss_destroy(SsHandle *h) {
@@ -937,9 +953,12 @@ static SsHandle *ss_open_readonly(const char *path, char *errbuf) {
     if (!ss_validate_header((SsHeader *)base, (uint64_t)st.st_size)) {
         SS_ERR("%s: invalid sorted-set file", path); munmap(base, ms); return NULL;
     }
-    if (!((SsHeader *)base)->sealed) {
+    if (!__atomic_load_n(&((SsHeader *)base)->sealed, __ATOMIC_ACQUIRE)) {
         SS_ERR("%s is not frozen: call ->freeze on the producer before opening read-only", path);
         munmap(base, ms); return NULL;
+    }
+    if (!ss_validate_state((SsHeader *)base)) {
+        SS_ERR("%s: invalid sorted-set file", path); munmap(base, ms); return NULL;
     }
     SsHandle *h = ss_setup(base, ms, path, -1);   /* munmaps on OOM */
     if (!h) { SS_ERR("out of memory"); return NULL; }
@@ -956,7 +975,7 @@ static SsHandle *ss_open_readonly(const char *path, char *errbuf) {
  * read path.  Afterwards every mutator croaks and a read-write reopen is refused. */
 static int ss_freeze(SsHandle *h) {
     ss_rwlock_wrlock(h);
-    h->hdr->sealed = 1;
+    __atomic_store_n(&h->hdr->sealed, 1, __ATOMIC_RELEASE);
     ss_rwlock_wrunlock(h);
     if (h->path || h->backing_fd >= 0) return ss_msync(h);  /* durability for file/memfd-backed */
     return 0;   /* anonymous: the seal lives in shared memory (visible to forks); nothing to flush */

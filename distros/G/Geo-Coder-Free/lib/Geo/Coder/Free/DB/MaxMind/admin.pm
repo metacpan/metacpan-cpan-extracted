@@ -10,11 +10,11 @@ Geo::Coder::Free::DB::MaxMind::admin
 
 =head1 VERSION
 
-Version 0.48
+Version 0.49
 
 =cut
 
-our $VERSION = '0.48';
+our $VERSION = '0.49';
 
 # admin1.db is from http://download.geonames.org/export/dump/admin1CodesASCII.txt
 

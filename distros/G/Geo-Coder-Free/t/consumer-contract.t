@@ -49,6 +49,13 @@ use lib (do {
 });
 
 use Test::Most;
+use Test::Needs;
+
+# The oldest checker this declaration can be run with: before 0.04 a workspace
+# producer was read even when its sibling was not checked out, so outside a
+# workspace check 1 failed on Geo-Location-Point/lib/Geo/Location/Point.pm
+# while parts 2 and 3 skipped.
+my $CHECKER_VERSION = '0.04';
 
 # The declaration
 # ---------------------------------------------------------------------------
@@ -323,99 +330,96 @@ sub _slurp
 # ---------------------------------------------------------------------------
 
 # Called by its full name: the checker is loaded at run time, so that a
-# distribution installed outside this workspace skips this file instead of
-# failing to compile it.
-if(my $missing = _checker_missing()) {
-	plan skip_all => $missing;
-} else {
-	_require_workspace() if($ENV{'CONTRACT_STRICT'});
+# distribution installed outside this workspace, or with a checker older than
+# $CHECKER_VERSION, skips this file instead of failing to compile it.
+_need_checker();
+_require_workspace() if($ENV{'CONTRACT_STRICT'});
 
-	Test::Consumer::Contract::run_consumer_contract(_declaration());
+Test::Consumer::Contract::run_consumer_contract(_declaration());
 
-	# The two readers the scanner used to walk past, proved against the real
-	# files rather than the checker's fixtures: ged2map is a program with no
-	# extension, and Database::BI's reads start from a geocode_many() batch.
-	#
-	# What is asserted is that both read results at all, which is what makes
-	# their registration in _declaration() mean something: a registered consumer
-	# is read whether or not discovery found it, so a registration for a file the
-	# scanner cannot see would check nothing.  Which files the scanner walks is
-	# not asserted here: it is private to the checker (it was not until 0.03, and
-	# calling it from this distribution then only worked under a harness, where
-	# Sub::Private bypasses its own check), and the walk itself is proved by the
-	# checker's t/scanner.t.
-	subtest 'the two readers the scanner used to miss are read' => sub {
-		my $contract = Test::Consumer::Contract->new(_declaration());
+# The two readers the scanner used to walk past, proved against the real
+# files rather than the checker's fixtures: ged2map is a program with no
+# extension, and Database::BI's reads start from a geocode_many() batch.
+#
+# What is asserted is that both read results at all, which is what makes
+# their registration in _declaration() mean something: a registered consumer
+# is read whether or not discovery found it, so a registration for a file the
+# scanner cannot see would check nothing.  Which files the scanner walks is
+# not asserted here: it is private to the checker (it was not until 0.03, and
+# calling it from this distribution then only worked under a harness, where
+# Sub::Private bypasses its own check), and the walk itself is proved by the
+# checker's t/scanner.t.
+subtest 'the two readers the scanner used to miss are read' => sub {
+	my $contract = Test::Consumer::Contract->new(_declaration());
 
-		# The same checkouts parts 2 and 3 need: without them there is no file
-		# to look for, and this subtest must skip rather than fail.
-		plan skip_all => 'the sibling checkouts are not present'
-			unless $contract->workspace_present();
+	# The same checkouts parts 2 and 3 need: without them there is no file
+	# to look for, and this subtest must skip rather than fail.
+	plan skip_all => 'the sibling checkouts are not present'
+		unless $contract->workspace_present();
 
-		for my $rel (qw(HTML-Genealogy-Map/ged2map Database-BI/lib/Database/BI/Model/Geocode.pm)) {
-			my $raw = _slurp(_workspace_file($rel));
-			ok(defined($raw), "$rel is readable");
-
-			my @reads = $contract->reads_of_results($contract->strip($raw // ''));
-			cmp_ok(scalar(@reads), '>', 0, "$rel yields reads of results")
-				or diag(explain(\@reads));
-		}
-
-		# The mutation: the checker before 0.02 did not know geocode_many() was
-		# a producing method, so neither the batch nor the results taken out of
-		# it were followed.  With that behaviour back, the file has no reads to
-		# check - which is why its registration is only meaningful now.
-		my $batch_file = 'Database-BI/lib/Database/BI/Model/Geocode.pm';
-		my $raw = _slurp(_workspace_file($batch_file));
-		my $blind = Test::Consumer::Contract->new(_declaration(),
-			methods       => [qw(geocode reverse_geocode)],
-			batch_methods => ['nothing_matches_this'],
-		);
-		my @blind = $blind->reads_of_results($blind->strip($raw // ''));
-		is(scalar(@blind), 0, "$batch_file is invisible without batch support")
-			or diag(explain(\@blind));
-	};
-
-	# A consumer that discovery can never see, and why its registration matters:
-	# HTML::OSM takes a geocoder object and never names Geo::Coder::Free, so the
-	# walk in part 3 passes it by however the file is written.  The entry in
-	# 'consumers' is the only thing that gets its reads checked, so it is
-	# asserted here rather than left to be noticed if it is deleted.
-	subtest 'a consumer discovery cannot see is registered by hand' => sub {
-		my %declaration = _declaration();
-		my $rel = 'HTML-OSM/lib/HTML/OSM.pm';
-
-		my $contract = Test::Consumer::Contract->new(%declaration);
-		plan skip_all => 'the sibling checkouts are not present'
-			unless $contract->workspace_present();
-
-		ok($declaration{'consumers'}{$rel},
-			'HTML::OSM is registered, although the discovery check cannot find it')
-			or diag("\tWithout this entry nothing checks what HTML::OSM reads off a result.\n");
-
+	for my $rel (qw(HTML-Genealogy-Map/ged2map Database-BI/lib/Database/BI/Model/Geocode.pm)) {
 		my $raw = _slurp(_workspace_file($rel));
 		ok(defined($raw), "$rel is readable");
-		unlike($raw, qr/Geo::Coder::Free/,
-			'and it never names the distribution, which is why discovery misses it')
-			or diag("\tIt names Geo::Coder::Free now, so discovery would find it too.\n");
 
 		my @reads = $contract->reads_of_results($contract->strip($raw // ''));
-		ok(scalar(@reads), 'it does read results all the same') or diag(explain(\@reads));
-
-		my %read = map { $_->[0] => 1 } @reads;
-		ok($read{'lon'} && $read{'geometry'},
-			'including the two reads the declaration records a reason for')
+		cmp_ok(scalar(@reads), '>', 0, "$rel yields reads of results")
 			or diag(explain(\@reads));
-	};
+	}
 
-	done_testing();
-}
+	# The mutation: the checker before 0.02 did not know geocode_many() was
+	# a producing method, so neither the batch nor the results taken out of
+	# it were followed.  With that behaviour back, the file has no reads to
+	# check - which is why its registration is only meaningful now.
+	my $batch_file = 'Database-BI/lib/Database/BI/Model/Geocode.pm';
+	my $raw = _slurp(_workspace_file($batch_file));
+	my $blind = Test::Consumer::Contract->new(_declaration(),
+		methods       => [qw(geocode reverse_geocode)],
+		batch_methods => ['nothing_matches_this'],
+	);
+	my @blind = $blind->reads_of_results($blind->strip($raw // ''));
+	is(scalar(@blind), 0, "$batch_file is invisible without batch support")
+		or diag(explain(\@blind));
+};
 
-sub _checker_missing
+# A consumer that discovery can never see, and why its registration matters:
+# HTML::OSM takes a geocoder object and never names Geo::Coder::Free, so the
+# walk in part 3 passes it by however the file is written.  The entry in
+# 'consumers' is the only thing that gets its reads checked, so it is
+# asserted here rather than left to be noticed if it is deleted.
+subtest 'a consumer discovery cannot see is registered by hand' => sub {
+	my %declaration = _declaration();
+	my $rel = 'HTML-OSM/lib/HTML/OSM.pm';
+
+	my $contract = Test::Consumer::Contract->new(%declaration);
+	plan skip_all => 'the sibling checkouts are not present'
+		unless $contract->workspace_present();
+
+	ok($declaration{'consumers'}{$rel},
+		'HTML::OSM is registered, although the discovery check cannot find it')
+		or diag("\tWithout this entry nothing checks what HTML::OSM reads off a result.\n");
+
+	my $raw = _slurp(_workspace_file($rel));
+	ok(defined($raw), "$rel is readable");
+	unlike($raw, qr/Geo::Coder::Free/,
+		'and it never names the distribution, which is why discovery misses it')
+		or diag("\tIt names Geo::Coder::Free now, so discovery would find it too.\n");
+
+	my @reads = $contract->reads_of_results($contract->strip($raw // ''));
+	ok(scalar(@reads), 'it does read results all the same') or diag(explain(\@reads));
+
+	my %read = map { $_->[0] => 1 } @reads;
+	ok($read{'lon'} && $read{'geometry'},
+		'including the two reads the declaration records a reason for')
+		or diag(explain(\@reads));
+};
+
+done_testing();
+
+sub _need_checker
 {
 	my $error = do {
 		local $@;
-		eval { require Test::Consumer::Contract; 1 } ? undef : $@;
+		eval { require Test::Consumer::Contract; Test::Consumer::Contract->VERSION($CHECKER_VERSION); 1 } ? undef : $@;
 	};
 
 	return unless $error;
@@ -435,5 +439,9 @@ sub _checker_missing
 	BAIL_OUT("Test::Consumer::Contract is missing from a workspace that has "
 		. join(', ', @siblings) . ": $error") if(@siblings);
 
-	return 'Test::Consumer::Contract is not installed, so the reader/producer contract cannot be checked';
+	# Anywhere else a checker that is absent or too old skips the file; one that
+	# is installed but does not compile is an error, as Test::Needs has it.
+	test_needs({ 'Test::Consumer::Contract' => $CHECKER_VERSION });
+
+	return;
 }

@@ -386,7 +386,7 @@ subtest 'database responses are unwrapped at the right depth' => sub {
     my $family = {
         base => 'vpn_ip', name => 'VPN IP', summary => 'IP ranges observed as VPN infrastructure.',
         license_type => 'standard', starts => '2026-09-04T07:49:45.118Z', expires => undef,
-        in_term => Mojo::JSON::true, standing => 'licensed',
+        in_term => Mojo::JSON::true, standing => 'licensed', open => Mojo::JSON::false,
         versions => [{
             id => 'vpn_ip_v1', version => 1, summary => 'IP ranges observed as VPN infrastructure.',
             formats => [{ format => 'csvgz', bytes => 111013959 }],
@@ -395,7 +395,7 @@ subtest 'database responses are unwrapped at the right depth' => sub {
     };
     my $download = {
         dataset_id => 'vpn_ip_v1', format => 'csvgz', outcome => 'ok', sample => Mojo::JSON::false,
-        bytes => 10, http_status => 302, apikey_id => undef, client_ip => undef, user_agent => undef,
+        open => Mojo::JSON::false, bytes => 10, http_status => 302, apikey_id => undef, client_ip => undef, user_agent => undef,
         created => '2026-09-02T10:00:00Z',
     };
     my %bodies = (
@@ -722,7 +722,7 @@ subtest 'a member of the wrong type or a null is a retried server_error' => sub 
     my $family = {
         base => 'vpn_ip', name => 'VPN IP', summary => 's', license_type => undef, starts => undef,
         expires => undef, renews_at => undef, notice_due_at => undef, in_term => \1, standing => 'licensed',
-        versions => [{ id => 'vpn_ip_v1', version => 1, formats => [{ format => 'csvgz', bytes => undef }] }],
+        open => \0, versions => [{ id => 'vpn_ip_v1', version => 1, formats => [{ format => 'csvgz', bytes => undef }] }],
     };
     my $version = $family->{versions}[0];
     my $metadata = {
@@ -744,6 +744,8 @@ subtest 'a member of the wrong type or a null is a retried server_error' => sub 
         ['lookup, a detail of "x"', 'lookup', { %$lookup, vpn => 'x' }],
         ['lookup, a numeric string in a detail', 'lookup', { %$lookup, dcproxy => { hits => '3' } }],
         ['lookup, a null protocol', 'lookup', { %$lookup, pubproxy => { entry => \1, protocols => [undef] } }],
+        ['lookup, an AS number of "9009"', 'lookup', { %$lookup, asn => { asn => '9009', name => 'n', domain => 'd', type => 't', prefix => 'p' } }],
+        ['lookup, a location without its country', 'lookup', { %$lookup, location => { continent => 'EU' } }],
         ['my_ip, a flag of "yes"', 'my_ip', { %$lookup, is_relay => 'yes' }],
         ['my_entitlement, requests of "1"', 'my_entitlement', { %$entitlement, usage => { %{ $entitlement->{usage} }, requests => '1' } }],
         ['my_entitlement, a null CIDR', 'my_entitlement', { %$entitlement, apikey => { %{ $entitlement->{apikey} }, allowed_cidrs => [undef] } }],
@@ -751,6 +753,7 @@ subtest 'a member of the wrong type or a null is a retried server_error' => sub 
         ['list, a version of "3"', 'list', { databases => [{ %$family, versions => [{ %$version, version => '3' }] }] }],
         ['list, a version of "x"', 'list', { databases => [{ %$family, versions => [{ %$version, version => 'x' }] }] }],
         ['list, in_term of "yes"', 'list', { databases => [{ %$family, in_term => 'yes' }] }],
+        ['list, no open', 'list', { databases => [{ %$family, open => undef }] }],
         ['list, a null family', 'list', { databases => [$family, undef] }],
         ['list, versions of null', 'list', { databases => [{ %$family, versions => undef }] }],
         ['list, a null format', 'list', { databases => [{ %$family, versions => [{ %$version, formats => [undef] }] }] }],
@@ -763,7 +766,7 @@ subtest 'a member of the wrong type or a null is a retried server_error' => sub 
         ['checksums, a sha256 of 5', 'checksums', { id => 'i', format => 'csvgz', checksums => { md5 => 'a', sha1 => 'b', sha256 => 5, sha512 => 'd' } }],
         ['downloads, a null download', 'downloads', { downloads => [undef] }],
         ['downloads, bytes of "10"', 'downloads', { downloads => [{
-            dataset_id => 'vpn_ip_v1', format => 'csvgz', outcome => 'ok', sample => \0, bytes => '10',
+            dataset_id => 'vpn_ip_v1', format => 'csvgz', outcome => 'ok', sample => \0, open => \0, bytes => '10',
             created => '2026-09-02T10:00:00Z',
         }] }],
     );

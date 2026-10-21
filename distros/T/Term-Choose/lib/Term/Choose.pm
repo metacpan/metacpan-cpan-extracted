@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.10.1;
 
-our $VERSION = '1.782';
+our $VERSION = '1.783';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose );
 
@@ -827,13 +827,13 @@ sub __avail_screen_size {
     $self->{avail_width} = $self->{term_width};
     $self->{extra_w} = 0;
     if ( $self->{margin_right} || $self->{col_width} > $self->{avail_width} ) {
-        # When reducing the right margin, ensure that it does not go below 1 if it was originally
-        # set to 1 or greater, so that EXTRA_W does not have to be removed.
         $self->{extra_w} = EXTRA_W;
         $self->{avail_width} += $self->{extra_w};
         # + EXTRA_W: use also the last terminal column if there is only one item-column;
-        #            with only one item-column the output doesn't get messed up if an item
-        #            reaches the right edge of the terminal on a non-MSWin32-OS (EXTRA_W is 0 if OS is MSWin32)
+        # With only one item-column the output doesn't get messed up if an item reaches the right edge of the terminal
+        # on a non-MSWin32-OS (EXTRA_W is 0 if OS is MSWin32)
+        # If margin_right is 1 or greater adding EXTRA_W is also OK. When reducing the right margin, ensure that it does
+        # not go below 1 if it was originally set to 1 or greater, so that the EXTRA_W does not have to be removed.
     }
     my $reduce = $self->__check_horinzontal_margins();
     if ( defined $reduce ) {
@@ -913,9 +913,9 @@ sub __check_horinzontal_margins {
             if ( $self->{$tmp_tabs}[2] || $self->{$tmp_tabs}[3] ) {
                 my $avail_text_width = ( $self->{term_width} + EXTRA_W ) - ( $self->{$tmp_tabs}[2] + $self->{$tmp_tabs}[3] );
                 if ( $avail_text_width < $threshold ) {
-                    my $new_factor = $self->__reduce_horizontal_margin( $avail_text_width );
-                    if ( $new_factor < $reduce ) {
-                        $reduce = $new_factor;
+                    my $new_reduce = $self->__reduce_horizontal_margin( $avail_text_width );
+                    if ( $new_reduce < $reduce ) {
+                        $reduce = $new_reduce;
                     }
                 }
                 ++$self->{tabs_width_horizontal_margin};
@@ -944,10 +944,6 @@ sub __fold_text {
                     $l_margin = $self->{$tmp_tabs}[2];
                     $r_margin = $self->{$tmp_tabs}[3];
                 }
-                elsif ( $reduce == 0 ) {
-                    $l_margin = $self->{$tmp_tabs}[2] = 1 if $self->{$tmp_tabs}[2];
-                    $r_margin = $self->{$tmp_tabs}[3] = 1 if $self->{$tmp_tabs}[3];
-                }
                 else {
                     $l_margin = $self->{$tmp_tabs}[2] = int( $self->{$tmp_tabs}[2] * $reduce ) || 1 if $self->{$tmp_tabs}[2];
                     $r_margin = $self->{$tmp_tabs}[3] = int( $self->{$tmp_tabs}[3] * $reduce ) || 1 if $self->{$tmp_tabs}[3];
@@ -955,16 +951,6 @@ sub __fold_text {
                 if ( $self->{$tmp_tabs}[4] && $self->{$tmp_tabs}[4] < ( $self->{term_width} + EXTRA_W ) - ( $l_margin + $r_margin ) ) {
                     $max_width = $self->{$tmp_tabs}[4];
                 }
-                #if ( $self->{$tmp_tabs}[4] ) {
-                #    if ( $self->{$tmp_tabs}[4] < ( $self->{term_width} + EXTRA_W ) - ( $l_margin + $r_margin ) ) {
-                #        $max_width = $self->{$tmp_tabs}[4];
-                #    }
-                #    else {
-                #        $self->{$tmp_tabs}[4] = undef;
-                #        # It should be OK because subsequent calls to '__fold_text' (in '__avail_height_to_keep')
-                #        # do not reduce margins or call it once all max_width values have already been removed.
-                #    }
-                #}
             }
             else {
                 $l_margin = $self->{margin_left};
@@ -981,7 +967,7 @@ sub __fold_text {
             $init += $l_margin;
             $subseq += $l_margin;
             if ( $init > $width - 5 || $subseq > $width - 5 ) {
-                ( $init, $subseq ) = ( $l_margin, $l_margin );
+                ( $init, $subseq ) = ( 0, 0 );
             }
             my $fold_opt = {
                 width => $width, init_tab => $init, subseq_tab => $subseq, color => $self->{color}, join => 0, truncate_long_tabs => 0
@@ -1033,54 +1019,46 @@ sub __avail_height_to_keep {
     if ( $keep <= $self->{avail_height} ) {
         return;
     }
-    if ( $self->{max_width} || $self->{tabs_with_max_width} ) {
-        my $avail_width = {};
-        my $increase = { main => 0, info => 0, prompt => 0, bottom_text => 0 };
+    if ( $self->{max_width} || $self->{tabs_with_max_width} ) { ##
+        my $increase = {};
         my $steps = 10;
+        my $avail_width_main = ( $self->{term_width} + $self->{extra_w} ) - ( $self->{margin_left} + $self->{margin_right} );
         if ( $self->{max_width} ) {
-            $avail_width->{main} = ( $self->{term_width} + $self->{extra_w} ) - ( $self->{margin_left} + $self->{margin_right} );
-            $increase->{main} = ( $avail_width->{main} - $self->{max_width} ) / $steps;
+            $increase->{main} = int( ( $avail_width_main - $self->{max_width} ) / $steps );
         }
 
         for my $opt ( qw( info prompt bottom_text ) ) {
             my $tmp_tabs = 'tmp_tabs_' . $opt;
             if ( defined $self->{$tmp_tabs} && $self->{$tmp_tabs}[4] ) {
-                $avail_width->{$opt} = ( $self->{term_width} + EXTRA_W ) - ( $self->{$tmp_tabs}[2] + $self->{$tmp_tabs}[3] );
-                $increase->{$opt} = ( $avail_width->{$opt} - $self->{$tmp_tabs}[4] ) / $steps;
+                my $avail_width_text = ( $self->{term_width} + EXTRA_W ) - ( $self->{$tmp_tabs}[2] + $self->{$tmp_tabs}[3] );
+                $increase->{$opt} = int( ( $avail_width_text - $self->{$tmp_tabs}[4] ) / $steps );
             }
         }
 
         for my $s ( 1 .. $steps ) {
-            if ( $increase->{main} > 0 ) { # increase < 0 if max_width > avail_width
-                if ( $s == $steps ) {
-                    $self->{max_width} = $avail_width->{main};
-                }
-                else {
-                    $self->{max_width} += int $increase->{main};
-                }
-                $self->{avail_width} = $self->{max_width};
-
-            }
-            for my $opt ( qw( info prompt bottom_text ) ) {
-                if ( $increase->{$opt} > 0 ) {
-                    if ( $s == $steps ) {
-                        $self->{'tmp_tabs_' . $opt}[4] = $avail_width->{$opt};
+            for my $opt ( keys %$increase ) {
+                if ( $opt eq 'main' ) {
+                    if ( $increase->{main} > 0 && $s < $steps ) {
+                        $self->{max_width} += $increase->{main};
+                        $self->{avail_width} = $self->{max_width};
                     }
                     else {
-                        $self->{'tmp_tabs_' . $opt}[4] += int $increase->{$opt};
+                        $self->{max_width} = undef;
+                        $self->{avail_width} = $avail_width_main;
+                    }
+                }
+                else {
+                    if ( $increase->{$opt} > 0 && $s < $steps ) {
+                        $self->{'tmp_tabs_' . $opt}[4] += $increase->{$opt};
+                    }
+                    else {
+                        $self->{'tmp_tabs_' . $opt}[4] = undef;
                     }
                 }
             }
             $self->__fold_text();
             $keep = $self->__keep_to_row_count( $keep );
             last if $keep <= $self->{avail_height};
-        }
-        $self->{max_width} = undef;
-        for my $opt ( qw( info prompt bottom_text ) ) {
-            my $tmp_tabs = 'tmp_tabs_' . $opt;
-            if ( defined $self->{$tmp_tabs} && $self->{$tmp_tabs}[4] ) {
-                $self->{$tmp_tabs}[4] = undef; ##
-            }
         }
     }
     if ( $keep <= $self->{avail_height} ) {
@@ -1092,16 +1070,13 @@ sub __avail_height_to_keep {
         my $orig_avail_width  = $self->{avail_width};
 
         for my $reduce ( 0.80, 0.75, 0.6667, 0.5, 0 ) { # 4/5, 3/4, 2/3, 1/2, 0
-            if ( $reduce == 0 ) {
-                $self->{margin_right} = $self->{margin_right} ? 1 : 0;
-                $self->{margin_left}  = $self->{margin_left}  ? 1 : 0;
+            if ( $self->{margin_right} ) {
+                $self->{margin_right} = int( $self->{margin_right} * $reduce ) || 1;
             }
-            else {
-                $self->{margin_right} = int( $self->{margin_right} * $reduce ) || 1 if $self->{margin_right};
-                $self->{margin_left}  = int( $self->{margin_left}  * $reduce ) || 1 if $self->{margin_left};
+            if ( $self->{margin_left} ) {
+                $self->{margin_left}  = int( $self->{margin_left}  * $reduce ) || 1;
             }
-            $self->{avail_width} = $orig_avail_width + ( $orig_margin_right - $self->{margin_right} )
-                                                     + ( $orig_margin_left - $self->{margin_left} );
+            $self->{avail_width} = $orig_avail_width + ( $orig_margin_right - $self->{margin_right} ) + ( $orig_margin_left - $self->{margin_left} );
             $self->__fold_text( $reduce );
             $keep = $self->__keep_to_row_count( $keep );
             last if $keep <= $self->{avail_height}; ##
@@ -1668,7 +1643,7 @@ Term::Choose - Choose items from a list interactively.
 
 =head1 VERSION
 
-Version 1.782
+Version 1.783
 
 =cut
 
@@ -2195,7 +2170,8 @@ Expects a reference to an array with one to five elements:
 
 - The 1st element (initial tab) specifies the number of spaces inserted at the beginning of paragraphs.
 
-- The 2nd element (subsequent tab) specifies the number of spaces inserted at the beginning of wrapped lines (excluding paragraph starts).
+- The 2nd element (subsequent tab) specifies the number of spaces inserted at the beginning of wrapped lines (excluding
+paragraph starts).
 
 - The 3rd element specifies the number of spaces used as the left margin.
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
-# Shared append-only log: atomic write index + Str record buffer
+# Shared append-only log: committed write index + Str record buffer
 #
-# Multiple writers atomically claim a slot, write a fixed-size record.
+# Multiple writers serialize appends before publishing the committed index.
 # Reader tails the log by polling the write index.
 use strict;
 use warnings;
@@ -22,17 +22,19 @@ my $ctl = Data::Buffer::Shared::I64->new_anon(2);
 my $nwriters = 3;
 my $msgs_per = 20;
 
-# writers: claim slot via atomic incr, then write record
+# Writers publish the index only after the record is complete.
 my @pids;
 for my $w (1..$nwriters) {
     my $pid = fork();
     if ($pid == 0) {
         for my $m (1..$msgs_per) {
-            # atomic claim: incr returns new value, so slot = new - 1
-            my $slot = $ctl->incr(0) - 1;
+            $ctl->lock_wr;
+            my $slot = $ctl->get(0);
             my $idx = $slot % $max_entries;  # wrap around
             my $msg = sprintf("[w%d] msg %03d t=%.3f", $w, $m, time());
             $log->set($idx, $msg);
+            $ctl->set(0, $slot + 1);
+            $ctl->unlock_wr;
         }
         _exit(0);
     }
@@ -45,6 +47,7 @@ my $total_expected = $nwriters * $msgs_per;
 my @seen;
 
 while ($read_pos < $total_expected) {
+    $ctl->lock_rd;
     my $write_pos = $ctl->get(0);
     while ($read_pos < $write_pos && $read_pos < $total_expected) {
         my $idx = $read_pos % $max_entries;
@@ -52,6 +55,7 @@ while ($read_pos < $total_expected) {
         push @seen, $record if $record;
         $read_pos++;
     }
+    $ctl->unlock_rd;
     sleep 0.001 if $read_pos < $total_expected;
 }
 

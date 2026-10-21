@@ -1,5 +1,23 @@
 Revision history for Time-Keeper-Natural
 
+0.06    2026-10-20
+        - Builds on perls before 5.14 
+
+0.05    2026-10-20
+        - A word table with Windows line ends (CRLF) reads
+
+0.04    2026-10-20
+        - Ordinal weekdays in a language's own order, where its table has the frame: "来月の第3金曜日", "в третью пятницу октября".
+        - Inflected periods and weekdays put back to CLDR's phrase by a table's aliases: "Ende nächsten Monats", "конец следующего месяца", "अगले माह का अंत", "в среду".
+        - German "am Dienstag": a table may mark a phrase that is also a CLDR word, taken only with a day after it.
+        - Spaceless chains in number words: "二週間三日後", "两周三天后", parse_duration('一時間三十分').
+        - find: every time a text mentions, as Matches with their places, longest first and never overlapping.
+        - A text that does not read fails nearly three times sooner: day periods and zone names are looked up once a locale.
+        - "on the 20th" and "end of the 20th" read.
+        - The fifteen other word tables read ranges, a duration before or after a point, the day before or after one, the weekend and ordinal weekdays, as each language allows: its header says what it does not.
+        - Japanese "明日の15時": の joins a day to a time.
+        - A text read through CLDR's patterns is quicker: a pattern that cannot fit is passed over in C, and ISO 8601 is not asked about a text it cannot be.
+
 0.03    2026-10-20
         - A calendar option, or a -u-ca- extension: dates read in any of the seventeen calendars as Time::Keeper writes them, relative phrases count its months, values come back in it.
         - Fractions in durations and relative counts, in the locale's decimal sign: "1.5 hours", "1,5 Stunden", "in 2.5 days"; a month, quarter or year dies.

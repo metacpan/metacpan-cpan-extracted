@@ -16,6 +16,9 @@ my %param = (
 );
 $param{INC} = '-GX'                     if $Config{'cc'} =~ /^cl/i;
 $param{INC} = '-I$Config{incpath}\\mfc' if $Config{'cc'} =~ /^bcc32/i;
+# All sources are C++, and g++ warns about the C-only -std=c99 that some
+# perls put in ccflags.
+$param{CCFLAGS} = join ' ', grep { $_ ne '-std=c99' } split ' ', $Config{ccflags};
 $param{NO_META} = 1 if eval "$ExtUtils::MakeMaker::VERSION" >= 6.10_03;
 WriteMakefile(%param);
 

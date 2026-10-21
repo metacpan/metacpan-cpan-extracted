@@ -3,6 +3,13 @@
 #include "perl.h"
 #include "XSUB.h"
 
+#ifndef mPUSHs
+#  define mPUSHs(s) PUSHs(sv_2mortal(s))
+#endif
+#ifndef mXPUSHs
+#  define mXPUSHs(s) XPUSHs(sv_2mortal(s))
+#endif
+
 #include <stdint.h>
 
 #include "time_keeper_zone_abi.h"

@@ -1,8 +1,8 @@
 #!/usr/bin/perl
-# Mail::DKIM2::Gate: when the Gate runs the Verifier itself and it passes, the
-# Verifier has already walked the Message-Instance chain, so the Gate must not
-# walk it a second time; with no signatures or a caller-supplied VerifyResult
-# it still does.  A broken chain is still refused with the same reason.
+# Mail::DKIM2::Gate: the Message-Instance chain is walked once, by the
+# Verifier, whether or not there are signatures and whether or not the caller
+# supplied a VerifyResult; MessageInstance->chain_verifies is never called. A
+# broken chain is still refused with the same reason.
 use strict;
 use warnings;
 use Test::More;
@@ -49,10 +49,10 @@ ok($g->{ok}, 'valid signed chain passes');
 is("$w/$gw", '1/0', 'one chain walk (the Verifier), none by the Gate');
 
 ($g, $w, $gw) = counts($with_mi, %cb);
-is("$w/$gw", '0/1', 'no signatures: the Gate walks');
+is("$w/$gw", '1/0', 'no signatures: the Verifier walks');
 
 ($g, $w, $gw) = counts($signed, %cb, VerifyResult => 'pass');
-is("$w/$gw", '0/1', 'caller-supplied VerifyResult: the Gate walks');
+is("$w/$gw", '1/0', 'caller-supplied VerifyResult: the Verifier walks');
 
 # Content changed under the signed top MI: refused for the chain/upstream.
 (my $bad = $signed) =~ s/hello/tampered/;

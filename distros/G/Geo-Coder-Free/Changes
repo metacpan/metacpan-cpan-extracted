@@ -1,5 +1,27 @@
 Revision history for Geo-Coder-Free
 
+0.49	Tue Oct 20 08:03:03 PM EDT 2026
+	[ Enhancements ]
+	- Requires Perl 5.20, which Geo::Coder::Free::Utils has always needed
+	- Module::Runtime, Try::Tiny and namespace::clean are runtime prerequisites;
+	  Error, JSON::PP and Test::Exception are test prerequisites
+	- The modules the website needs are listed as the optional 'website' feature,
+	  and Geo::libpostal and Test::Consumer::Contract 0.04 are recommended
+	[ Bug Fixes ]
+	- Imported functions such as croak() can no longer be called as methods of
+	  Geo::Coder::Free, its backends or Geo::Coder::Free::Display::query
+	- Fixed a POD error in Geo::Coder::Free::OpenAddresses
+	- Geo::Coder::Free::MissCache->expires_after() now says it wants a whole
+	  number of seconds
+	[ Documentation ]
+	- Documented Geo::Coder::Free::MissCache in full, and added API specifications
+	  for clear_miss_cache() and provenance()
+	[ Tests ]
+	- t/consumer-contract.t needs Test::Consumer::Contract 0.04 and skips, rather
+	  than failing, with an older one, which failed the install outside a
+	  workspace of sibling checkouts by trying to read
+	  Geo-Location-Point/lib/Geo/Location/Point.pm
+
 0.48	Mon Oct 19 07:35:53 PM EDT 2026
 	[ Enhancements ]
 	- The location rule has moved to a distribution of its own, Geo-Location-Predicate
@@ -28,7 +50,7 @@ Revision history for Geo-Coder-Free
 
 0.47	Fri Oct 16 09:34:18 PM EDT 2026
 	[ Enhancements ]
-	- Added geocode_many(), the loop a batch caller writes around geocode() 
+	- Added geocode_many(), the loop a batch caller writes around geocode()
 	  It takes an arrayref of locations and answers with one entry
 	  per distinct value - the point it resolved to, or undef - plus lookups (how many values were
 	  looked up), resolved and unresolved (which add up to the number of distinct values) and

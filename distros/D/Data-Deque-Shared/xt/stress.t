@@ -16,8 +16,8 @@ for (1..$WORKERS) {
     my $pid = fork // die;
     if ($pid == 0) {
         for (1..$OPS) {
-            $dq->push_back_wait($$, 1.0);
-            $dq->pop_front_wait(1.0);
+            $dq->push_back_wait($$, 1.0) or _exit(1);
+            defined $dq->pop_front_wait(1.0) or _exit(2);
         }
         _exit(0);
     }

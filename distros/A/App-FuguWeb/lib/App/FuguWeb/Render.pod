@@ -62,7 +62,7 @@ badly.
     $render->markdown($path)
 
 Render one Markdown file into an HTML body fragment, with
-C<lowdown -Thtml>.
+C<lowdown -Thtml>. The HTML that the file holds stays as written.
 
 =head2 mdoc
 

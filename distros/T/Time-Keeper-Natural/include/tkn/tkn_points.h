@@ -135,57 +135,79 @@ tkn_period_start(pTHX_ tkn_lexicon *L, SV *name)
 {
     static const char *const ws[3] = { "wide", "abbreviated", "narrow" };
     static const char *const cs[2] = { "format", "stand-alone" };
-    SV *key = tkn_key_sv(aTHX_ L, name);
-    AV *rules;
-    HV *hit = (HV *)sv_2mortal((SV *)newHV());
-    int w, c, best = -1, best_len = -1;
-    I32 i;
-    for (w = 0; w < 3; w++)
-        for (c = 0; c < 2; c++) {
-            SV *args[3], *dp;
-            HE *he;
-            args[0] = L->code;
-            args[1] = sv_2mortal(newSVpv(ws[w], 0));
-            args[2] = sv_2mortal(newSVpv(cs[c], 0));
-            dp = tkn_call1(aTHX_ TKN_LOC, "day_periods", args, 3);
-            if (!dp || !SvROK(dp) || SvTYPE(SvRV(dp)) != SVt_PVHV)
-                continue;
-            hv_iterinit((HV *)SvRV(dp));
-            while ((he = hv_iternext((HV *)SvRV(dp)))) {
-                SV *pk = hv_iterkeysv(he);
-                if (strEQ(SvPV_nolen(pk), "am") || strEQ(SvPV_nolen(pk), "pm") || !SvOK(HeVAL(he)))
+    dMY_CXT;
+    SV *mk = sv_2mortal(newSVpvf("ps\1%" SVf, SVfARG(L->code))), *key = tkn_key_sv(aTHX_ L, name);
+    HE *he = hv_fetch_ent(MY_CXT.memo, mk, 0, 0);
+    HV *starts;
+    SV **got;
+    if (!he) {
+        /* each name's start, worked out once: the periods a name is CLDR's
+           for, and of those the longest */
+        HV *names = (HV *)sv_2mortal((SV *)newHV());
+        AV *rules;
+        HE *ne;
+        int w, c;
+        starts = newHV();
+        (void)hv_store_ent(MY_CXT.memo, mk, newRV_noinc((SV *)starts), 0);
+        for (w = 0; w < 3; w++)
+            for (c = 0; c < 2; c++) {
+                SV *args[3], *dp;
+                HE *pe;
+                args[0] = L->code;
+                args[1] = sv_2mortal(newSVpv(ws[w], 0));
+                args[2] = sv_2mortal(newSVpv(cs[c], 0));
+                dp = tkn_call1(aTHX_ TKN_LOC, "day_periods", args, 3);
+                if (!dp || !SvROK(dp) || SvTYPE(SvRV(dp)) != SVt_PVHV)
                     continue;
-                if (sv_eq(tkn_key_sv(aTHX_ L, HeVAL(he)), key))
-                    (void)hv_store_ent(hit, pk, &PL_sv_yes, 0);
+                hv_iterinit((HV *)SvRV(dp));
+                while ((pe = hv_iternext((HV *)SvRV(dp)))) {
+                    SV *pk = hv_iterkeysv(pe), *nk, **slot;
+                    if (strEQ(SvPV_nolen(pk), "am") || strEQ(SvPV_nolen(pk), "pm") || !SvOK(HeVAL(pe)))
+                        continue;
+                    nk = tkn_key_sv(aTHX_ L, HeVAL(pe));
+                    slot = hv_fetch(names, SvPVX(nk), SvUTF8(nk) ? -(I32)SvCUR(nk) : (I32)SvCUR(nk), 1);
+                    if (!SvROK(*slot))
+                        sv_setsv(*slot, sv_2mortal(newRV_noinc((SV *)newHV())));
+                    (void)hv_store_ent((HV *)SvRV(*slot), pk, &PL_sv_yes, 0);
+                }
             }
-        }
-    if (!HvUSEDKEYS(hit))
-        return -1;
-    rules = tkn_call(aTHX_ TKN_LOC, "day_period_rules", &L->code, 1);
-    for (i = 0; rules && i <= av_len(rules); i++) {
-        SV *r = *av_fetch(rules, i, 0), *pn = tkn_hget(aTHX_ r, "period"), *at = tkn_hget(aTHX_ r, "at"),
-           *from = tkn_hget(aTHX_ r, "from"), *before = tkn_hget(aTHX_ r, "before");
-        int start, len;
-        if (!pn || !hv_exists_ent(hit, pn, 0))
-            continue;
-        if (at && SvOK(at)) {
-            start = (int)SvIV(at);
-            len = 0;
-        }
-        else if (from && SvOK(from) && before && SvOK(before)) {
-            start = (int)SvIV(from);
-            len = ((int)SvIV(before) - start + 1440) % 1440;
-            if (!len)
-                len = 1440;
-        }
-        else
-            continue;
-        if (len > best_len) {
-            best = start;
-            best_len = len;
+        rules = tkn_call(aTHX_ TKN_LOC, "day_period_rules", &L->code, 1);
+        hv_iterinit(names);
+        while ((ne = hv_iternext(names))) {
+            HV *hit = (HV *)SvRV(HeVAL(ne));
+            int best = -1, best_len = -1;
+            I32 i;
+            for (i = 0; rules && i <= av_len(rules); i++) {
+                SV *r = *av_fetch(rules, i, 0), *pn = tkn_hget(aTHX_ r, "period"), *at = tkn_hget(aTHX_ r, "at"),
+                   *from = tkn_hget(aTHX_ r, "from"), *before = tkn_hget(aTHX_ r, "before");
+                int start, len;
+                if (!pn || !hv_exists_ent(hit, pn, 0))
+                    continue;
+                if (at && SvOK(at)) {
+                    start = (int)SvIV(at);
+                    len = 0;
+                }
+                else if (from && SvOK(from) && before && SvOK(before)) {
+                    start = (int)SvIV(from);
+                    len = ((int)SvIV(before) - start + 1440) % 1440;
+                    if (!len)
+                        len = 1440;
+                }
+                else
+                    continue;
+                if (len > best_len) {
+                    best = start;
+                    best_len = len;
+                }
+            }
+            if (best >= 0)
+                (void)hv_store_ent(starts, hv_iterkeysv(ne), newSViv(best), 0);
         }
     }
-    return best;
+    else
+        starts = (HV *)SvRV(HeVAL(he));
+    got = hv_fetch(starts, SvPVX(key), SvUTF8(key) ? -(I32)SvCUR(key) : (I32)SvCUR(key), 0);
+    return got ? (int)SvIV(*got) : -1;
 }
 
 static SV *
@@ -248,10 +270,24 @@ tkn_weekend(pTHX_ SV *self, tkn_lexicon *L, SV *words, SV *text, HV *info)
     list = tkn_phrases_of(aTHX_ words, sv_2mortal(newSVpvs("weekend")));
     if (!list || av_len(list) < 0)
         return NULL;
-    args[0] = L->code;
-    args[1] = sv_2mortal(newSVpvs("week"));
-    args[2] = sv_2mortal(newSVpvs("long"));
-    rel = tkn_call1(aTHX_ TKN_LOC, "relative_names", args, 3);
+    {
+        dMY_CXT;
+        SV *mk = sv_2mortal(newSVpvf("wk\1%" SVf, SVfARG(L->code)));
+        HE *he = hv_fetch_ent(MY_CXT.memo, mk, 0, 0);
+        if (he)
+            rel = HeVAL(he);
+        else {
+            args[0] = L->code;
+            args[1] = sv_2mortal(newSVpvs("week"));
+            args[2] = sv_2mortal(newSVpvs("long"));
+            rel = tkn_call1(aTHX_ TKN_LOC, "relative_names", args, 3);
+            (void)hv_store_ent(MY_CXT.memo, mk, rel ? newSVsv(rel) : newSV(0), 0);
+            if (!rel || !SvOK(rel))
+                rel = NULL;
+        }
+        if (rel && !SvOK(rel))
+            rel = NULL;
+    }
     at = rel ? tkn_hget(aTHX_ rel, "at") : NULL;
     disp = rel ? tkn_hget(aTHX_ rel, "display") : NULL;
     if (!at || !disp || !SvOK(disp))
@@ -273,10 +309,9 @@ tkn_weekend(pTHX_ SV *self, tkn_lexicon *L, SV *words, SV *text, HV *info)
                 }
             if (!q)
                 continue;
-            cand = sv_2mortal(newSVpvn(sb, (STRLEN)(q - sb)));
+            cand = sv_2mortal(newSVpvn_flags(sb, (STRLEN)(q - sb), SVf_UTF8));
             sv_catsv(cand, tkn_key_sv(aTHX_ L, noun));
             sv_catpvn(cand, q + dl, (STRLEN)(sb + sl - q - dl));
-            SvUTF8_on(cand);
             if (!sv_eq(tkn_key_sv(aTHX_ L, cand), key))
                 continue;
             {

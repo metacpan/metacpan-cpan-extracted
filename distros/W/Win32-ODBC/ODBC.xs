@@ -28,15 +28,16 @@
 #include <math.h>   // VC-5.0 brainmelt
 #include <windows.h>
 #include <stdio.h>
+#ifdef __CYGWIN__
+#   include <strings.h>
+#   define stricmp  strcasecmp
+#   define strnicmp strncasecmp
+#endif
     
     //  ODBC Stuff
-#ifdef __CYGWIN__
-#   include <iodbcinst.h>
-#else
-#   include <sql.h>
-#   include <sqlext.h>
-#   include <odbcinst.h>
-#endif
+#include <sql.h>
+#include <sqlext.h>
+#include <odbcinst.h>
     //  Win32 Perl Stuff
 #if defined(__cplusplus)
 extern "C" {
@@ -45,7 +46,10 @@ extern "C" {
 #include "perl.h"
 #include "XSub.h"
 
-#include "ppport.h"
+//  Perls older than 5.7.2 lack PERL_UNUSED_VAR.
+#ifndef PERL_UNUSED_VAR
+#define PERL_UNUSED_VAR(x) ((void)(x))
+#endif
 
 #if defined(__cplusplus)
 }   
@@ -63,7 +67,7 @@ extern "C" {
 
 extern  CMOM *cMom;
 
-RETCODE TableColList(pTHX_ int iType);
+RETCODE TableColList(pTHX_ I32 ax, I32 items, int iType);
 
 /*----------------------- P E R L   F U N C T I O N S -------------------*/
 
@@ -101,10 +105,7 @@ ODBC_TYPE *NewODBC(){
         DebugConnection("Creating a new ODBC object.", 0);
     }
 #endif
-    if (!(cmDaughter = (CMom *) ::cMom->operator[](GetCurrentThreadId()))){
-        cmDaughter = new CMom(GetCurrentThreadId());
-    }
-    if (cmDaughter){ 
+    if ((cmDaughter = ThreadDaughter())){
 
 #ifdef _DEBUG
         DEBUG_DUMP("NewODBC: Entering Critical Section gCS")
@@ -120,8 +121,8 @@ ODBC_TYPE *NewODBC(){
 #endif
 
         if (ghEnv){                            
-            if (h= new ODBC_TYPE){
-                if (h->Error = new ODBC_ERROR){
+            if ((h= new ODBC_TYPE)){
+                if ((h->Error = new ODBC_ERROR)){
                     if (cmDaughter->Add((void *)h)){
                         iResult = 1;                        
                         h->szDSN = 0;
@@ -356,12 +357,21 @@ RETCODE ResetStmt(ODBC_TYPE *h){
     return iReturnCode;
 }
     
+//  Record which function, and which step in it, raised the error, truncating
+//  each name to fit its field.
+void SetErrorSource(ODBC_ERROR *Error, const char *szFunction, const char *szFunctionLevel){
+    strncpy(Error->szFunction, szFunction, sizeof(Error->szFunction) - 1);
+    Error->szFunction[sizeof(Error->szFunction) - 1] = '\0';
+    strncpy(Error->szFunctionLevel, szFunctionLevel, sizeof(Error->szFunctionLevel) - 1);
+    Error->szFunctionLevel[sizeof(Error->szFunctionLevel) - 1] = '\0';
+}
+
     /*
         Process an ODBC structures error state from the ODBC API.
         This is called when an error is encountered via the ODBC API.
     */
 
-void _NT_ODBC_Error(ODBC_TYPE * h, char *szFunction, char *szFunctionLevel){
+void _NT_ODBC_Error(ODBC_TYPE * h, const char *szFunction, const char *szFunctionLevel){
     SDWORD cbErrorMsg;
 
     if(!h){
@@ -377,8 +387,7 @@ void _NT_ODBC_Error(ODBC_TYPE * h, char *szFunction, char *szFunctionLevel){
     if (!h->Error->ErrNum){
         h->Error->ErrNum = 911;
     }
-    strcpy(h->Error->szFunction, szFunction);
-    strcpy(h->Error->szFunctionLevel, szFunctionLevel);
+    SetErrorSource(h->Error, szFunction, szFunctionLevel);
 
 #ifdef _DEBUG
     if (giDebug){
@@ -394,15 +403,14 @@ void _NT_ODBC_Error(ODBC_TYPE * h, char *szFunction, char *szFunctionLevel){
         but from this body of code.
     */
 
-ODBC_TYPE *ODBCError(char *szString, ODBC_TYPE *h, char *szFunction, char * szFunctionLevel){
+ODBC_TYPE *ODBCError(const char *szString, ODBC_TYPE *h, const char *szFunction, const char * szFunctionLevel){
     if (!h){
         h = ODBCLIST;
     }
     if (h){
         h->Error->ErrNum = 911;
         strcpy(h->Error->szError, szString);
-        strcpy(h->Error->szFunction, szFunction);
-        strcpy(h->Error->szFunctionLevel, szFunctionLevel);
+        SetErrorSource(h->Error, szFunction, szFunctionLevel);
     }
 
 #ifdef _DEBUG
@@ -519,23 +527,38 @@ int ColNameToNum(ODBC_TYPE *h, char *szName){
     /*
         Check if the specified connection is valid and return the pointer
         to the ODBC structure.
-        Return a pointer to the master list (ODBCLIST) and genereate an error if
-        there is no valid connection.
+        For an ID with no connection, return the thread's default object
+        (ODBCLIST) and leave the error to NoSuchConn().
     */
 ODBC_TYPE * _NT_ODBC_Verify(int iODBC){
     CMom    *cmDaughter = 0;
     ODBC_TYPE *h = 0;
     
-    if(::cMom){
-//      EnterCriticalSection(&gCS);
-        if (cmDaughter = (CMom *) ::cMom->operator[](GetCurrentThreadId())){
-            if (!(h = (ODBC_TYPE *) cmDaughter->operator[]((DWORD)iODBC))){
-                h = (ODBC_TYPE *) cmDaughter->operator[]((DWORD)0);
-            }
+//  EnterCriticalSection(&gCS);
+    if ((cmDaughter = ThreadDaughter())){
+        if (!(h = (ODBC_TYPE *) cmDaughter->operator[]((DWORD)iODBC))){
+            h = (ODBC_TYPE *) cmDaughter->operator[]((DWORD)0);
         }
-//      LeaveCriticalSection(&gCS);
     }
+//  LeaveCriticalSection(&gCS);
     return (h);
+}
+
+//  Return this thread's daughter, creating it if ODBCShutDown() deleted it
+//  or this thread did not load the module.
+CMom *ThreadDaughter(){
+    CMom    *cmDaughter = 0;
+
+    if (::cMom){
+        cmDaughter = (CMom *) ::cMom->operator[](GetCurrentThreadId());
+    }
+    if (!cmDaughter){
+        InitExtension();
+        if (::cMom){
+            cmDaughter = (CMom *) ::cMom->operator[](GetCurrentThreadId());
+        }
+    }
+    return cmDaughter;
 }
 
     /*
@@ -546,10 +569,11 @@ int DeleteConn(int iODBC){
     ODBC_TYPE   *h = 0;
     int iResult = 0;
 
-    if(::cMom){
+//  ID 0 is the thread's default object, which error paths fall back to.
+    if(::cMom && iODBC){
         CMom    *cmDaughter = 0;
-        if (cmDaughter = (CMom *) ::cMom->operator[](GetCurrentThreadId())){
-            if (h = (ODBC_TYPE *) cmDaughter->operator[]((DWORD)iODBC)){
+        if ((cmDaughter = (CMom *) ::cMom->operator[](GetCurrentThreadId()))){
+            if ((h = (ODBC_TYPE *) cmDaughter->operator[]((DWORD)iODBC))){
                 if (FreeODBC(h)){
                     cmDaughter->Remove((DWORD)iODBC);
                     delete h;
@@ -561,6 +585,27 @@ int DeleteConn(int iODBC){
     return iResult;         
 }
 
+//  Delete a connection that failed to open, and return the thread's default
+//  object with the connection's error copied to it.
+ODBC_TYPE *DropFailedConn(ODBC_TYPE *h){
+    ODBC_TYPE *hDefault = ODBCLIST;
+
+    *hDefault->Error = *h->Error;
+    DeleteConn(h->conn);
+    return hDefault;
+}
+
+//  _NT_ODBC_Verify() returns the thread's default object, which has no HDBC,
+//  for an ID with no connection. If h is that object, set a "No such
+//  connection" error on it and return 1.
+int NoSuchConn(ODBC_TYPE *h, const char *szFunction){
+    if (h != ODBCLIST){
+        return 0;
+    }
+    CleanError(h->Error);
+    ODBCError("No such connection", h, szFunction, "0");
+    return 1;
+}
 
 
 
@@ -568,8 +613,8 @@ int DeleteConn(int iODBC){
         Map an Stmt close type string to the actual Stmt close type value.
     */
 
-char *MapCloseType(UWORD uCloseType){
-    char *szType;
+const char *MapCloseType(UWORD uCloseType){
+    const char *szType;
 
     switch(uCloseType){
         case SQL_DONT_CLOSE:
@@ -612,12 +657,10 @@ XS(XS_WIN32__ODBC_Connect) // ODBC_Connect(Connection string: input) returns con
     char      szDSN[DSN_LENGTH]; // string to hold datasource name
     ODBC_TYPE * h;
     char        *szIn = 0;
-    int         iTemp = 0;
 
     RETCODE retcode;           // Misc ODBC sh!t
     UCHAR   buff[ODBC_BUFF_SIZE];
     SDWORD  bufflenout;
-    int     lenn = 0;
     STRLEN  n_a;
 
     if(items < 1 || !(items & 1)){
@@ -638,28 +681,26 @@ XS(XS_WIN32__ODBC_Connect) // ODBC_Connect(Connection string: input) returns con
         strcat(szDSN, ";");
     }
 
-    PUSHMARK(sp);
+    SP -= items;
 
             //  Allocate new ODBC connection
     if (!(h = NewODBC())){
         h = ODBCError("Could not allocate memory of an ODBC connection\n", (ODBC_TYPE*)0, "ODBC_Connect", "1");
     }else{
         strcpy(h->szUserDSN, szIn);
-        if (h->hdbc = new ODBC_HDBC){
+        if ((h->hdbc = new ODBC_HDBC)){
             h->hdbc->hdbc = SQL_NULL_HDBC;
             h->hdbc->iConnected = 0;
             h->hdbc->iCount = 1;    //  Set the count to include this particular instance
         }else{
-            _NT_ODBC_Error(h, "ODBC_Connect could not allocate memory for an HDBC connection", "1a");
-            DeleteConn(h->conn);
+            ODBCError("Could not allocate memory for an HDBC connection", h, "ODBC_Connect", "1a");
         }
     
         if (!h->Error->ErrNum){
             retcode = SQLAllocConnect(h->henv, &h->hdbc->hdbc);
             if (retcode != SQL_SUCCESS)
             {
-                _NT_ODBC_Error((ODBC_TYPE*)0, "ODBC_Connect", "2");
-                DeleteConn(h->conn);
+                _NT_ODBC_Error(h, "ODBC_Connect", "2");
             }
         }
         if (!h->Error->ErrNum){
@@ -679,7 +720,7 @@ XS(XS_WIN32__ODBC_Connect) // ODBC_Connect(Connection string: input) returns con
                     }
                     retcode = SQLSetConnectOption(h->hdbc->hdbc, uType, udValue);
                     if (retcode != SQL_SUCCESS){
-                        sprintf(szError, "2a: Connect Item number %i", (iTemp/2));
+                        sprintf(szError, "2a:%i", (iTemp/2));
                         _NT_ODBC_Error(h, "ODBC_Connect", szError);
                         break;
                     }
@@ -691,20 +732,13 @@ XS(XS_WIN32__ODBC_Connect) // ODBC_Connect(Connection string: input) returns con
             retcode = SQLDriverConnect(h->hdbc->hdbc, (HWND) NULL, (unsigned char *)szDSN, strlen(szDSN), buff, ODBC_BUFF_SIZE, (short *)&bufflenout, SQL_DRIVER_NOPROMPT);
             if (retcode != SQL_SUCCESS && retcode != SQL_SUCCESS_WITH_INFO){
                 _NT_ODBC_Error(h, "ODBC_Connect", "4");
-                strcpy(ODBCLIST->Error->szError, h->Error->szError);
-                strcpy((char *)ODBCLIST->Error->szSqlState, (char *)h->Error->szSqlState);
-                strcpy(ODBCLIST->Error->szFunction, h->Error->szFunction);
-                strcpy(ODBCLIST->Error->szFunctionLevel, h->Error->szFunctionLevel);
                     //  If connection fails it does not genereate an error num. Hmmm...
                 if(! h->Error->ErrNum){
                     h->Error->ErrNum = 911;
                 }
-                ODBCLIST->Error->ErrNum = h->Error->ErrNum;
-                DeleteConn(h->conn);
-                h = ODBCLIST;
             }else{
                 h->hdbc->iConnected = 1;
-                if (h->szDSN = new char [strlen((const char *)buff) + 1]){
+                if ((h->szDSN = new char [strlen((const char *)buff) + 1])){
                     strcpy(h->szDSN, (char *) buff);
                 }
 
@@ -715,10 +749,10 @@ XS(XS_WIN32__ODBC_Connect) // ODBC_Connect(Connection string: input) returns con
             }
         }
         if (!h->Error->ErrNum){
-            retcode = ResetStmt(h);
-            if (retcode != SQL_SUCCESS){
-                DeleteConn(h->conn);
-            }
+            ResetStmt(h);
+        }
+        if (h->Error->ErrNum){
+            h = DropFailedConn(h);
         }
     }
     if (!h->Error->ErrNum){ // everything is happy
@@ -752,9 +786,9 @@ XS(XS_WIN32__ODBC_Execute) // ODBC_Execute($connection, $sql_text) returns (0,@f
     h = _NT_ODBC_Verify(SvIV(ST(0)));
     CleanError(h->Error);
     
-    PUSHMARK(sp);
+    SP -= items;
 
-    if (h != ODBCLIST){
+    if (! NoSuchConn(h, "ODBC_Execute")){
         szSQL = SvPV(ST(1), n_a);            // get SQL string
             //  Do we really want to resetsmtm now? 
         if (ResetStmt(h) == SQL_SUCCESS){
@@ -762,7 +796,7 @@ XS(XS_WIN32__ODBC_Execute) // ODBC_Execute($connection, $sql_text) returns (0,@f
                 delete [] h->szCommand;
                 h->szCommand = 0;
             }
-            if (h->szCommand = new char [strlen(szSQL) + 1]){
+            if ((h->szCommand = new char [strlen(szSQL) + 1])){
                 strcpy(h->szCommand, szSQL);
             } 
         }
@@ -827,9 +861,9 @@ XS(XS_WIN32__ODBC_Fetch) // ODBC_Fetch($connection) returns (0,@dataelements) or
         uType = (UWORD)SvIV(ST(2));
     }
                      
-    PUSHMARK(sp);
+    SP -= items;
 
-    if (h != ODBCLIST){
+    if (! NoSuchConn(h, "ODBC_Fetch")){
         SQLGetStmtOption(h->hstmt, SQL_ROWSET_SIZE, &dRowSetSize);
 //  SQLSetStmtOption(h->hstmt, SQL_ROWSET_SIZE, 1);
         if (!(rgfRowStatus = new UWORD [dRowSetSize])){
@@ -882,7 +916,7 @@ XS(XS_WIN32__ODBC_GetError)
 
     h = _NT_ODBC_Verify(SvIV(ST(0)));
 
-    PUSHMARK(sp);
+    SP -= items;
     XPUSHs(sv_2mortal(newSVnv((double)h->Error->ErrNum)));
     XPUSHs(sv_2mortal(newSVpv(h->Error->szError, strlen(h->Error->szError))));
     XPUSHs(sv_2mortal(newSVpv((char *)h->Error->szSqlState, strlen(( const char *) h->Error->szSqlState))));
@@ -895,7 +929,7 @@ XS(XS_WIN32__ODBC_GetError)
 }
           
 
-XS(XS_WIN32__ODBC_Disconnect) // usage: ODBC_Disconnect($conn) or ODBC_Disconnect() for all
+XS(XS_WIN32__ODBC_Disconnect) // usage: ODBC_Disconnect($conn)
 {
     dXSARGS;
     ODBC_TYPE *h;
@@ -907,7 +941,7 @@ XS(XS_WIN32__ODBC_Disconnect) // usage: ODBC_Disconnect($conn) or ODBC_Disconnec
     }else{
         conn = SvIV(ST(0));
     }
-    PUSHMARK(sp);
+    SP -= items;
     if (!(iResult = DeleteConn(conn))){
         h = ODBCError("No such connection", (ODBC_TYPE*) 0, "ODBC_Disconnect", "1");
     
@@ -935,29 +969,29 @@ XS(XS_WIN32__ODBC_Disconnect) // usage: ODBC_Disconnect($conn) or ODBC_Disconnec
 XS(XS_WIN32__ODBC_TableList) // ODBC_TableList($connection) returns (0,@TableNames) or ($err,$errtext)
 {
     dXSARGS;
-    RETCODE retcode;
 
     if(items != 5){
         CROAK("usage: ($Err,@ColumnNames) = ODBC_TableList($connection, $Qualifier, $Owner, $TableName, $TableType)\n");
     }
 
-    retcode = TableColList(aTHX_ 0);
+    TableColList(aTHX_ ax, items, 0);
 }
 
 XS(XS_WIN32__ODBC_ColumnList)
 {
     dXSARGS;    
-    RETCODE retcode;
 
     if(items != 5){
         CROAK("usage: ($Err,@ColumnNames) = ODBC_ColumnList($connection, $Qualifier, $Owner, $TableName, $ColumnName)\n");
     }
 
-    retcode = TableColList(aTHX_ 1);
+    TableColList(aTHX_ ax, items, 1);
 }
 
-RETCODE TableColList(pTHX_ int iType){
-    dXSARGS;
+RETCODE TableColList(pTHX_ I32 ax, I32 items, int iType){
+        //  The calling XSUB has already popped the mark, so take its ax and items
+        //  instead of popping another one with dXSARGS.
+    dSP;
     ODBC_TYPE * h;
     int    iTemp;
     UCHAR  buff2[ODBC_BUFF_SIZE];
@@ -965,41 +999,40 @@ RETCODE TableColList(pTHX_ int iType){
     UWORD  x;
     STRLEN n_a;
 
-    RETCODE retcode;
+    RETCODE retcode = 0;
     UCHAR   *szQualifier, *szOwner, *szName, *szType;
-    SWORD   sQLen, sOLen, sNLen, sTLen = 0;
-    UWORD   uTemp = 0;
+    SWORD   sQLen = 0, sOLen = 0, sNLen = 0, sTLen = 0;
 
     h = _NT_ODBC_Verify(SvIV(ST(0)));
     CleanError(h->Error);
     
-    if (szQualifier = (unsigned char *) SvPV(ST(1), n_a)){
+    if ((szQualifier = (unsigned char *) SvPV(ST(1), n_a))){
         if (!(sQLen = strlen((char *)szQualifier))){
             szQualifier = 0;
         }
     }
 
-    if (szOwner = (unsigned char *) SvPV(ST(2), n_a)){
+    if ((szOwner = (unsigned char *) SvPV(ST(2), n_a))){
         if (!(sOLen = strlen((char *)szOwner))){
             szOwner = 0;
         }
     }
 
-    if (szName = (unsigned char *) SvPV(ST(3), n_a)){
+    if ((szName = (unsigned char *) SvPV(ST(3), n_a))){
         if (!(sNLen = strlen((char *)szName))){
             szName = 0;
         }
     }
 
-    if (szType = (unsigned char *) SvPV(ST(4), n_a)){
+    if ((szType = (unsigned char *) SvPV(ST(4), n_a))){
         if (!(sTLen = strlen((char *)szType))){
             szType = 0;
         }
     }
     
-    PUSHMARK(sp);
+    SP -= items;
 
-    if (h != ODBCLIST){
+    if (! NoSuchConn(h, "ODBC_TableColList")){
         CleanError(h->Error);
         retcode = ResetStmt(h);
         if (h->szCommand){
@@ -1015,12 +1048,12 @@ RETCODE TableColList(pTHX_ int iType){
                     number of bytes for allocation (like 10).
                 */
                             
-        if (h->szCommand = new char [strlen((const char *) TABLE_COMMAND_STRING)
+        if ((h->szCommand = new char [strlen((const char *) TABLE_COMMAND_STRING)
                             + 12    //  for the name of the function
                             + (szQualifier ? strlen((const char *)szQualifier):10)
                             + (szOwner ? strlen((const char *)szOwner):10)
                             + (szName ? strlen((const char *)szName):10)
-                            + (szType ? strlen((const char *)szType):10) + 1]){
+                            + (szType ? strlen((const char *)szType):10) + 1])){
             sprintf(h->szCommand, TABLE_COMMAND_STRING, (iType)? "SQLColumns":"SQLTables", szQualifier, szOwner, szName, szType);
         }
         
@@ -1075,8 +1108,8 @@ XS(XS_WIN32__ODBC_MoreResults)  // usage: ODBC_MoreResults($conn)
  
     h = _NT_ODBC_Verify(SvIV(ST(0)));
     CleanError(h->Error);
-    PUSHMARK(sp);
-    if (h != ODBCLIST){
+    SP -= items;
+    if (! NoSuchConn(h, "ODBC_MoreResults")){
         retcode = SQLMoreResults(h->hstmt);
         if((retcode != SQL_SUCCESS) && (retcode != SQL_SUCCESS_WITH_INFO)){
             _NT_ODBC_Error(h, "ODBC_MoreResults", "1");
@@ -1108,9 +1141,9 @@ XS(XS_WIN32__ODBC_MaxBufSize)
 
     h = _NT_ODBC_Verify(SvIV(ST(0)));
     CleanError(h->Error);
-    PUSHMARK(sp);
+    SP -= items;
 
-    if (h != ODBCLIST){
+    if (! NoSuchConn(h, "ODBC_MaxBufSize")){
         if (items > 1){
             iSize = SvIV(ST(1));
             iSize = ((iSize <= 0)? 0:iSize);
@@ -1133,14 +1166,15 @@ XS(XS_WIN32__ODBC_GetConnections)
     dXSARGS;
     int iTemp;
     ODBC_TYPE   *h;
-    CMom    *cmDaughter = (CMom *) ::cMom->operator[](GetCurrentThreadId());
+    CMom    *cmDaughter;
 
     if(items){
         CROAK("usage: (@ConnectionList) = ODBC_GetConnections()\n");
     }
-    PUSHMARK(sp);
+    SP -= items;
 
-    for (iTemp = cmDaughter->TotalElements(); iTemp; iTemp--){
+    cmDaughter = ThreadDaughter();
+    for (iTemp = (cmDaughter)? cmDaughter->TotalElements():0; iTemp; iTemp--){
         h = (ODBC_TYPE *) cmDaughter->operator[]((DWORD)iTemp - 1);
         if (h){
             XPUSHs(sv_2mortal(newSVnv((double)h->conn)));
@@ -1187,10 +1221,12 @@ XS(XS_WIN32__ODBC_GetDSN)
         }
     }
 
-    PUSHMARK(sp);
+    SP -= items;
 
     szTemp = szDSN;
-    if (! (szDSN = new char [strlen(szTemp) + 1])){
+    if (! szTemp && NoSuchConn(h, "ODBC_GetDSN")){
+            //  ReturnError() below reports it.
+    }else if (! (szDSN = new char [strlen(szTemp) + 1])){
         szDSN = 0;
         ODBCError("Could not allocate memory for DSN comparison", h, "ODBC_GetDSN", "1");
     }else{
@@ -1200,11 +1236,11 @@ XS(XS_WIN32__ODBC_GetDSN)
         if (szTemp){
             *szTemp = '\0';
         }
-        if (szKeys = new char [dSize + 1]){ 
+        if ((szKeys = new char [dSize + 1])){ 
             SQLGetPrivateProfileString( szDSN, 0, "", szKeys, dSize, "ODBC.INI");
             if (strcmp(szKeys, "")){
                 szPointer = szKeys;
-                if (szValues = new char [dSize + 1]){   
+                if ((szValues = new char [dSize + 1])){   
                     XPUSHs(sv_2mortal(newSVnv((double)0)));
                     while(*szPointer){
                         SQLGetPrivateProfileString( szDSN, szPointer, "", szValues, dSize, "ODBC.INI");
@@ -1261,7 +1297,7 @@ XS(XS_WIN32__ODBC_DataSources)
         }
     }
 
-    PUSHMARK(sp);
+    SP -= items;
 
     *szDSN = *szDesc = '\0';
     retcode= SQLDataSources(h->henv, SQL_FETCH_FIRST, szDSN, SQL_MAX_DSN_LENGTH + 1, &pcbDSN, szDesc, DS_DESCRIPTION_LENGTH, &pcbDesc);
@@ -1301,7 +1337,7 @@ XS(XS_WIN32__ODBC_Drivers)
     }
     
     h = ODBCLIST;
-    PUSHMARK(sp);
+    SP -= items;
     
     *szDesc = *szAttr = '\0';
     retcode = SQLDrivers(h->henv, SQL_FETCH_FIRST, szDesc, DS_DESCRIPTION_LENGTH, &cbDesc, szAttr, DS_DESCRIPTION_LENGTH, &cbAttr);
@@ -1340,7 +1376,7 @@ XS(XS_WIN32__ODBC_RowCount)
     
     h = _NT_ODBC_Verify(SvIV(ST(0)));
     CleanError(h->Error);
-    PUSHMARK(sp);
+    SP -= items;
     
     retcode = SQLRowCount(h->hstmt, &sdRows);
     if(retcode == SQL_SUCCESS){
@@ -1363,7 +1399,7 @@ XS(XS_WIN32__ODBC_Info)
         CROAK("usage: ($ExtName, $Version, $Date, $Author, $CompileDate, $Credits, $Comments) = Info()\n");
     }
     
-    PUSHMARK(sp);
+    SP -= items;
     
     XPUSHs(sv_2mortal(newSVpv(VERNAME, strlen(VERNAME))));
     XPUSHs(sv_2mortal(newSVpv(VERSION, strlen(VERSION))));
@@ -1381,7 +1417,7 @@ XS(XS_WIN32__ODBC_GetStmtCloseType)
 {
     dXSARGS;
     ODBC_TYPE * h;
-    char    *szType;
+    const char    *szType;
 
     if(items != 1){
         CROAK("usage: ($Err, $Type) = ODBC_GetStmtCloseType($Connection)\n");
@@ -1389,7 +1425,7 @@ XS(XS_WIN32__ODBC_GetStmtCloseType)
 
     h = _NT_ODBC_Verify(SvIV(ST(0)));
     CleanError(h->Error);
-    PUSHMARK(sp);
+    SP -= items;
     
     if (!(szType = MapCloseType(h->uStmtCloseType))){
         ODBCError("Invalid Statment Close Type", h, "ODBC_GetStmtCloseType", "1");
@@ -1408,7 +1444,7 @@ XS(XS_WIN32__ODBC_SetStmtCloseType)
 {
     dXSARGS;
     ODBC_TYPE * h;
-    char    *szType;
+    const char    *szType = 0;
     UWORD   uType;      
     
     if(items != 2){
@@ -1418,7 +1454,7 @@ XS(XS_WIN32__ODBC_SetStmtCloseType)
     h = _NT_ODBC_Verify(SvIV(ST(0)));
     CleanError(h->Error);
     uType = (UWORD)SvIV(ST(1));
-    PUSHMARK(sp);
+    SP -= items;
 
     switch(uType){
         case SQL_DONT_CLOSE:
@@ -1463,13 +1499,14 @@ XS(XS_WIN32__ODBC_SetConnectOption)
 
     h = _NT_ODBC_Verify(SvIV(ST(0)));
     CleanError(h->Error);
+    NoSuchConn(h, "ODBC_SetConnectOption");
     uType = (UWORD)SvIV(ST(1));
     if (SvIOKp(ST(2)) || SvNOKp(ST(2))){
         udValue = SvIV(ST(2));
     }else{
         udValue = (ULONG_PTR) SvPV(ST(2), n_a);
     }
-    PUSHMARK(sp);
+    SP -= items;
 
     if(!h->Error->ErrNum){
         rResult = SQLSetConnectOption(h->hdbc->hdbc, uType, udValue);
@@ -1505,8 +1542,9 @@ XS(XS_WIN32__ODBC_GetConnectOption)
 
     h = _NT_ODBC_Verify(SvIV(ST(0)));
     CleanError(h->Error);
+    NoSuchConn(h, "ODBC_GetConnectOption");
     uOption = (UWORD)SvIV(ST(1));
-    PUSHMARK(sp);
+    SP -= items;
 
     if(!h->Error->ErrNum){
         memset(ucValue, 255, SQL_MAX_OPTION_STRING_LENGTH + 1);
@@ -1563,6 +1601,7 @@ XS(XS_WIN32__ODBC_StmtOption)
 
     h = _NT_ODBC_Verify(SvIV(ST(0)));
     CleanError(h->Error);
+    NoSuchConn(h, "ODBC_StmtOption");
     uOption = (UWORD)SvIV(ST(1));
     if (items > 2){
         if (SvIOKp(ST(2)) || SvNOKp(ST(2))){
@@ -1572,7 +1611,7 @@ XS(XS_WIN32__ODBC_StmtOption)
         }
     }
 
-    PUSHMARK(sp);
+    SP -= items;
 
     if(!h->Error->ErrNum){
         if(items < 3){
@@ -1638,7 +1677,7 @@ XS(XS_WIN32__ODBC_GetFunctions)
 
     h = _NT_ODBC_Verify(SvIV(ST(0)));
     CleanError(h->Error);
-    PUSHMARK(sp);
+    SP -= items;
 
     items--;
 
@@ -1651,6 +1690,9 @@ XS(XS_WIN32__ODBC_GetFunctions)
         uOption = (UWORD)SvIV(ST(1));
     }
 
+    if (NoSuchConn(h, "ODBC_GetFunctions")){
+        items = 0;
+    }
     while(items--){
         rResult = SQLGetFunctions(h->hdbc->hdbc, uOption, &uOutput[iTemp]);
         if (rResult != SQL_SUCCESS){
@@ -1700,8 +1742,9 @@ XS(XS_WIN32__ODBC_Transact)
 
     h = _NT_ODBC_Verify(SvIV(ST(0)));
     CleanError(h->Error);
+    NoSuchConn(h, "ODBC_Transact");
     uType = (UWORD)SvIV(ST(1));
-    PUSHMARK(sp);
+    SP -= items;
 
     if(!h->Error->ErrNum){
         if(uType == SQL_ROLLBACK || uType == SQL_COMMIT){
@@ -1744,6 +1787,8 @@ XS(XS_WIN32__ODBC_ConfigDSN)
         CROAK("usage: ($Err, $Type) = ODBC_ConfigDSN($Connection, $Function, $Driver, @Attributes)\n");
     }
 
+        //  The attribute loop below counts items down, so drop the arguments first.
+    SP -= items;
     h = _NT_ODBC_Verify(SvIV(ST(iStack)));
     CleanError(h->Error);
     iStack++;
@@ -1786,19 +1831,23 @@ XS(XS_WIN32__ODBC_ConfigDSN)
         }
     }
 
-    PUSHMARK(sp);
         /*  
             As of now szAttributes contains the entire DSN
         */
 
     if (! h->Error->ErrNum){
+        if (! szAttributes){
+                //  An empty attribute list is just the two NULs that end any list.
+            szAttributes = new char [2];
+            szAttributes[0] = szAttributes[1] = '\0';
+        }
         if(strcspn(szAttributes, "[]{}(),?*!@") < strlen(szAttributes)){
             ODBCError("Illegal use of reserved characters []{}(),?*!@", h, "ODBC_ConfigDSN", "3");
         }
 
                 //  Format Attribute list for the ConfigDataSource function...
                 //  attrib1=value1\0attrib2=value2\0attrib3=value3\0\0
-        for (;iSize > -1; iSize--){
+        for (iSize = strlen(szAttributes); iSize > -1; iSize--){
             if (szAttributes[iSize] == ';'){
                 szAttributes[iSize] = '\0';
             }
@@ -1841,12 +1890,13 @@ XS(XS_WIN32__ODBC_GetInfo)
 
     h = _NT_ODBC_Verify(SvIV(ST(0)));
     CleanError(h->Error);
+    NoSuchConn(h, "ODBC_GetInfo");
     uType = (UWORD)SvIV(ST(1));
-    PUSHMARK(sp);
+    SP -= items;
 
     if(!h->Error->ErrNum){
         while (!iFlag++){
-            if (ucValue = (UCHAR *) new char [iSize]){
+            if ((ucValue = (UCHAR *) new char [iSize])){
                     //  Set the memory set to $FF so we can tell if the return value
                     //  is a string. It will have a \0 at the end of it.
                 memset(ucValue, 0xff, iSize);   
@@ -1907,7 +1957,7 @@ XS(XS_WIN32__ODBC_CleanError)
 
     h = _NT_ODBC_Verify(SvIV(ST(0)));
     
-    PUSHMARK(sp);
+    SP -= items;
    
     CleanError(h->Error);
     XPUSHs(sv_2mortal(newSVnv((double)0)));
@@ -1937,11 +1987,11 @@ XS(XS_WIN32__ODBC_ColAttributes)
     szName = (unsigned char *) SvPV(ST(1), n_a);
     iType = (UWORD)SvIV(ST(2));
     
-    PUSHMARK(sp);
+    SP -= items;
    
     CleanError(h->Error);
     if (!h->Error->ErrNum){
-        if (iCol = ColNameToNum(h, (char *)szName)){
+        if ((iCol = ColNameToNum(h, (char *)szName))){
             memset(szBuff, '\0', ODBC_BUFF_SIZE);
             rResult = SQLColAttributes(h->hstmt, iCol, iType, szBuff, ODBC_BUFF_SIZE, (short *) &dBuffLen, (SQLLEN *) &dValue);
             if (rResult == SQL_SUCCESS || rResult == SQL_SUCCESS_WITH_INFO){
@@ -2010,7 +2060,7 @@ XS(XS_WIN32__ODBC_ColAttributes)
                 }
                 gszFile = 0;
             }else{
-                if (gszFile = new char [strlen(szFile) + 1]){
+                if ((gszFile = new char [strlen(szFile) + 1])){
                     strcpy(gszFile, szFile);
                 }
             }
@@ -2043,7 +2093,7 @@ XS(XS_WIN32__ODBC_ColAttributes)
         h->iDebug = (iDebug)? 1:0;
     }
     
-    PUSHMARK(sp);
+    SP -= items;
    
     if (!h->Error->ErrNum){
         XPUSHs(sv_2mortal(newSVnv((double)0)));
@@ -2071,6 +2121,7 @@ XS(XS_WIN32__ODBC_SetPos)
 
     h = _NT_ODBC_Verify(SvIV(ST(0)));
     CleanError(h->Error);
+    NoSuchConn(h, "ODBC_SetPos");
     uRow    = (UWORD)SvIV(ST(1));
     if (items > 2){
         uOption = (UWORD)SvIV(ST(2));
@@ -2078,7 +2129,7 @@ XS(XS_WIN32__ODBC_SetPos)
     if (items > 3){
         uLock   = (UWORD)SvIV(ST(3));
     }
-    PUSHMARK(sp);
+    SP -= items;
 
     if(!h->Error->ErrNum){
         rResult = SQLSetPos(h->hstmt, uRow, uOption, uLock);
@@ -2106,7 +2157,6 @@ XS(XS_WIN32__ODBC_GetData)
     dXSARGS;
     ODBC_TYPE * h;
     UCHAR   *szBuf = 0;
-    SDWORD  iBuf = DEFAULTCOLSIZE;
     int iTemp;
     
     if(items != 1){
@@ -2115,8 +2165,9 @@ XS(XS_WIN32__ODBC_GetData)
 
     h = _NT_ODBC_Verify(SvIV(ST(0)));
     CleanError(h->Error);
+    NoSuchConn(h, "ODBC_GetData");
     
-    PUSHMARK(sp);
+    SP -= items;
     
 /*  HERE WE must figure whether to use SQLGetData() beause we are using
     SQLFetch() or since we are using SQLExtendedFetch() we are to just
@@ -2181,7 +2232,6 @@ XS(XS_WIN32__ODBC_DropCursor)
     dXSARGS;
     ODBC_TYPE * h;
     UWORD       uCloseType, uCloseSpecified = 0;
-    RETCODE     retcode = 0;
     
     if(items < 1 || items > 2){
         CROAK("usage: ($Err, $Type) = ODBC_DropCursor($Connection [, $CloseType])\n");
@@ -2192,12 +2242,13 @@ XS(XS_WIN32__ODBC_DropCursor)
         uCloseSpecified = (UWORD)SvIV(ST(1));  
     }
     CleanError(h->Error);
-    PUSHMARK(sp);
+    NoSuchConn(h, "ODBC_DropCursor");
+    SP -= items;
 
     if(!h->Error->ErrNum){
         uCloseType = h->uStmtCloseType;
         h->uStmtCloseType = (items > 1)? uCloseSpecified:SQL_DROP;
-        retcode = ResetStmt(h);
+        ResetStmt(h);
         h->uStmtCloseType = uCloseType;
     }
     if (!h->Error->ErrNum){
@@ -2217,7 +2268,6 @@ XS(XS_WIN32__ODBC_CursorName)
     ODBC_TYPE * h;
     char    *szName;
     SWORD   sSize = 0;
-    RETCODE retcode = 0;
     STRLEN  n_a;
 
     if(items < 1 || items > 2){
@@ -2226,8 +2276,9 @@ XS(XS_WIN32__ODBC_CursorName)
 
     h = _NT_ODBC_Verify(SvIV(ST(0)));
     CleanError(h->Error);
+    NoSuchConn(h, "ODBC_CursorName");
 
-    PUSHMARK(sp);
+    SP -= items;
 
     if(!h->Error->ErrNum){
         if (items > 1){
@@ -2273,7 +2324,6 @@ XS(XS_WIN32__ODBC_Clone) // ODBC_Connect(Connection string: input) returns conne
 {
     dXSARGS;
     ODBC_TYPE   *h, *hOld = 0;
-    RETCODE retcode;           // Misc ODBC sh!t
 
     if(items != 1){
             //  We need at least 1 (DSN) entry. If more then we need them in pairs of
@@ -2283,10 +2333,12 @@ XS(XS_WIN32__ODBC_Clone) // ODBC_Connect(Connection string: input) returns conne
     }
     hOld = _NT_ODBC_Verify(SvIV(ST(0)));
 
-    PUSHMARK(sp);
+    SP -= items;
 
             //  Allocate new ODBC connection
-    if (!(h = NewODBC())){
+    if (NoSuchConn(hOld, "ODBC_Clone")){
+        h = hOld;
+    }else if (!(h = NewODBC())){
         h = ODBCError("Could not allocate memory of an ODBC connection\n", (ODBC_TYPE *)0, "ODBC_Clone", "1");
     }else{
             //  Copy info from the Cloned ODBC connection
@@ -2294,19 +2346,18 @@ XS(XS_WIN32__ODBC_Clone) // ODBC_Connect(Connection string: input) returns conne
         h->henv = hOld->henv;
         h->hdbc = hOld->hdbc;
         h->hdbc->iCount++;  
-        if (h->szDSN = new char [strlen((const char *)hOld->szDSN) + 1]){
+        if ((h->szDSN = new char [strlen((const char *)hOld->szDSN) + 1])){
             strcpy(h->szDSN, (char *) hOld->szDSN);
         }else{
             _NT_ODBC_Error(h, "ODBC_Clone", "2");
             h->Error->ErrNum = 0;
-            DeleteConn(h->conn);
         }
-    }
 
-    if (!h->Error->ErrNum){
-        retcode = ResetStmt(h);
-        if (retcode != SQL_SUCCESS){
-            DeleteConn(h->conn);
+        if (!h->Error->ErrNum){
+            ResetStmt(h);
+        }
+        if (h->Error->ErrNum){
+            h = DropFailedConn(h);
         }
     }
     if (!h->Error->ErrNum){ // everything is happy
@@ -2332,15 +2383,10 @@ XS(XS_WIN32__ODBC_GetSQLState)
 
     h = _NT_ODBC_Verify(SvIV(ST(0)));
 
-    PUSHMARK(sp);
+    SP -= items;
 
-    if (h->Error->szSqlState){
-        XPUSHs(sv_2mortal(newSVnv((double)0)));
-        XPUSHs(sv_2mortal(newSVpv((char *)h->Error->szSqlState, strlen((const char *) h->Error->szSqlState))));
-    }else{
-            //  Report the error
-        ReturnError(h);
-    }
+    XPUSHs(sv_2mortal(newSVnv((double)0)));
+    XPUSHs(sv_2mortal(newSVpv((char *)h->Error->szSqlState, strlen((const char *) h->Error->szSqlState))));
 
     PUTBACK;
 }
@@ -2351,7 +2397,7 @@ XS(XS_WIN32__ODBC_GetStats)
     ODBC_TYPE * h;
     int iTemp = 0;
     CMom    *cDaughter = 0;
-    char    *Keys[] = {  "TotalActiveThreads",          //  Total number of threads attached to this dll
+    const char    *Keys[] = {  "TotalActiveThreads",          //  Total number of threads attached to this dll
                          "TotalActiveODBCThreads",      //  Total num of threads with ODBC connections
                          "TotalActiveDebugConnections", //  Total number of active connections with active debugging
                          "TotalHistoryThreads",         //  Total history of threads that have connected to odbc connections
@@ -2371,7 +2417,7 @@ XS(XS_WIN32__ODBC_GetStats)
 
     h = _NT_ODBC_Verify( (items)? SvIV(ST(0)):0);
 
-    PUSHMARK(sp);
+    SP -= items;
 
     if (h && !(h->Error->ErrNum)){
         cDaughter = (CMom *) ::cMom->operator[](GetCurrentThreadId());
@@ -2442,7 +2488,7 @@ XS(XS_WIN32__ODBC_GetTypeInfo)
     ODBC_TYPE * h;
     SWORD   sType;
     RETCODE retcode= 0;
-    char    *szCommand = "GetTypeInfo()";
+    const char    *szCommand = "GetTypeInfo()";
     
     if(items != 2){
         CROAK("usage: ($Err, $NumValue, $Value) = ODBC_GetTypeInfo($Connection, $Type)\n");
@@ -2450,8 +2496,9 @@ XS(XS_WIN32__ODBC_GetTypeInfo)
 
     h = _NT_ODBC_Verify(SvIV(ST(0)));
     CleanError(h->Error);
+    NoSuchConn(h, "ODBC_GetTypeInfo");
     sType = (SWORD)SvIV(ST(1));
-    PUSHMARK(sp);
+    SP -= items;
 
     if(!h->Error->ErrNum){
         if (ResetStmt(h) == SQL_SUCCESS){
@@ -2459,7 +2506,7 @@ XS(XS_WIN32__ODBC_GetTypeInfo)
                 delete [] h->szCommand;
                 h->szCommand = 0;
             }
-            if (h->szCommand = new char [strlen(szCommand) + 1]){
+            if ((h->szCommand = new char [strlen(szCommand) + 1])){
                 strcpy(h->szCommand, szCommand);
             }
             retcode = SQLGetTypeInfo(h->hstmt, sType);
@@ -2494,8 +2541,10 @@ XS(XS_WIN32__ODBC_GetTypeInfo)
 
 XS(XS_WIN32__ODBC_ShutDown)
 {
-    //  dXSARGS;
+    dXSARGS;
+    SP -= items;
     TerminateThread();
+    PUTBACK;
 }
 
 void TerminateThread(){
@@ -2514,7 +2563,7 @@ void TerminateThread(){
 #endif
 
     if (::cMom){
-        if (cmDaughter = (CMom *) ::cMom->operator[](GetCurrentThreadId())){
+        if ((cmDaughter = (CMom *) ::cMom->operator[](GetCurrentThreadId()))){
         
 #ifdef _DEBUG
             DebugPrint("\t--> Thread daughter about to be deleted...\n");
@@ -2544,7 +2593,10 @@ void TerminateThread(){
 
 XS(XS_WIN32__ODBC_InitExtension)
 {
+    dXSARGS;
+    SP -= items;
     InitExtension();
+    PUTBACK;
 }
 
 int InitExtension(){
@@ -2553,9 +2605,14 @@ int InitExtension(){
     int iRetCode = 1;
 
 #if defined(__CYGWIN__) || defined(__MINGW32__)
-//  Otherwise, this is done in DllMain
-    InitializeCriticalSection(&gDCS);
-    InitializeCriticalSection(&gCS);
+//  Otherwise, this is done in DllMain. ODBCInit() runs this function again,
+//  and initializing a critical section twice is undefined behavior.
+    static BOOL bCriticalSectionsReady = FALSE;
+    if (!bCriticalSectionsReady){
+        InitializeCriticalSection(&gDCS);
+        InitializeCriticalSection(&gCS);
+        bCriticalSectionsReady = TRUE;
+    }
 #endif
 
     if (! ::cMom){
@@ -2564,10 +2621,17 @@ int InitExtension(){
     if (! ::cMom){
         iRetCode = FALSE;
     }else{
-        if (cmDaughter = (CMom *) ::cMom->operator[](GetCurrentThreadId())){
-            h = (ODBC_TYPE*) cmDaughter->operator[]((DWORD)0);
+        if (!(cmDaughter = (CMom *) ::cMom->operator[](GetCurrentThreadId()))){
+            new CMom(GetCurrentThreadId());    //  Registers itself in ::cMom
+            cmDaughter = (CMom *) ::cMom->operator[](GetCurrentThreadId());
         }
-        if(!h || !cmDaughter){
+        if (cmDaughter){
+            h = (ODBC_TYPE*) cmDaughter->operator[]((DWORD)0);
+        }else{
+//          Without a daughter, NewODBC() would call back into this function.
+            iRetCode = FALSE;
+        }
+        if(cmDaughter && !h){
             
 #ifdef _DEBUG
             DebugConnection("     =========> Creating Gratuitous ODBC structure...", 0);
@@ -2593,15 +2657,17 @@ extern "C"
 XS(boot_Win32__ODBC)
 {
     dXSARGS;
-    char* file = __FILE__;
+    const char* file = __FILE__;
     RETCODE iRetCode = 1;
+
+    PERL_UNUSED_VAR(items);
 
 #ifdef _DEBUG
     DebugConnection("==============\n\tRunning bootstrap code.", 0);
 #endif
         //  This will force the creation of a daughter Mom and populate it with a
         //  default ODBC object.                    
-    if (iRetCode = InitExtension()){    
+    if ((iRetCode = InitExtension())){    
         newXS("Win32::ODBC::constant",              XS_WIN32__ODBC_Constant, file);
         newXS("Win32::ODBC::ODBCConnect",           XS_WIN32__ODBC_Connect,  file);
         newXS("Win32::ODBC::ODBCExecute",           XS_WIN32__ODBC_Execute, file);

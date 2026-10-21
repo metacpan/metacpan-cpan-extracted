@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Hyperman ();
 
-our $VERSION = '0.63';
+our $VERSION = '0.64';
 
 sub new {
     my ($class, %args) = @_;

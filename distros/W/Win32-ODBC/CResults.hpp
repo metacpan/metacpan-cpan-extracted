@@ -15,7 +15,7 @@ class CResults{
 	public:
 		CResults(ODBC_Conn *hODBC);
 		~CResults();
-		char *operator[](int iElement);
+		const char *operator[](int iElement);
 		SDWORD  Size(int iElement);
 		SDWORD	ReturnSize(int iElement);
 		SWORD	NumOfCols();

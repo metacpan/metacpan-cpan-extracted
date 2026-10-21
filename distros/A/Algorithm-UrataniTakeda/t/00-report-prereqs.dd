@@ -68,6 +68,7 @@ do { my $x = {
                                    'IO::Handle' => '0',
                                    'IPC::Open3' => '0',
                                    'Module::Metadata' => '0',
+                                   'Object::Pad::MOP::Class' => '0',
                                    'Test2::Tools::Compare' => '0',
                                    'Test2::Tools::Exception' => '0',
                                    'Test2::V0' => '0',

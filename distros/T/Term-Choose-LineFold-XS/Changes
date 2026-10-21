@@ -1,6 +1,9 @@
 Revision history for Term::Choose::LineFold::XS
 
 
+0.006   2026-10-21
+    - Unicode 18.
+
 0.005   2026-02-01
     - Skip leading and trailing one-width-entries in char-width tables.
     - Update year copyright.

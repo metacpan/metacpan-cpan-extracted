@@ -14,7 +14,26 @@ use Term::Choose;
 # https://www.unicode.org/reports/tr11/
 # https://www.unicode.org/Public/UNIDATA/extracted/DerivedGeneralCategory.txt'
 
+
 $SIG{__WARN__} = sub { die @_ };
+
+
+sub unicode_version {
+    my $mech = WWW::Mechanize::Cached->new();
+    my $res = $mech->get( 'https://www.unicode.org/Public/UCD/latest/ReadMe.txt' );
+    if ( ! $res->is_success ) {
+        die $res->status_line;
+    }
+    my $page = $mech->content( format => 'text' );
+    my $latest_unicode_version = '0.0.0';
+    if ( $page =~ /\bversion\s+(\d+.\d+.\d+)\s+of\s+the\s+Unicode\s+Character\s+Database\b/) {
+        $latest_unicode_version = $1;
+    }
+    else {
+        die "Unicode version not found in ReadMe.txt";
+    }
+    return $latest_unicode_version;
+}
 
 
 sub unicode_data {
@@ -166,7 +185,7 @@ sub build_ranges {
 }
 
 
-
+my $latest_unicode_version = unicode_version();
 
 
 # # # # #   Perl PP   # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -203,6 +222,8 @@ our \@EXPORT_OK = qw( table_char_width );
 
 # Control characters, non-characters and surrogates are removed before using this table.
 
+# Unicode version $latest_unicode_version
+
 
 sub table_char_width { [
 PP_HEADER
@@ -238,6 +259,8 @@ for my $file_name ( "charwidth_default.h", "charwidth_ambiguous_is_wide.h" ) {
 #ifndef $macro_name
 #define $macro_name
 
+// Unicode version $latest_unicode_version
+
 typedef struct {
     unsigned int start;
     unsigned int end;
@@ -271,10 +294,10 @@ XS_FOOTER
 
 # # # # #   Rakudo    # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-for my $file_name ( "CharWidthAmbiguousWide.pm6", "CharWidthDefault.pm6" ) {
+for my $file_name ( "CharWidthAmbiguousWide.rakumod", "CharWidthDefault.rakumod" ) {
     my $ranges;
     my $amb;
-    if ( $file_name eq "CharWidthDefault.pm6" ) {
+    if ( $file_name eq "CharWidthDefault.rakumod" ) {
         $amb = 'narrow';
         $ranges = build_ranges( $width_normal );
     }
@@ -283,7 +306,7 @@ for my $file_name ( "CharWidthAmbiguousWide.pm6", "CharWidthDefault.pm6" ) {
         $ranges = build_ranges( $width_ambiguous );
     }
     open my $fh, '>', $file_name or die $!;
-    my $module = $file_name =~ s/\.pm6\z//r;
+    my $module = $file_name =~ s/\.rakumod\z//r;
 
     print $fh <<"RAKU_HEADER";
 use v6;
@@ -294,6 +317,8 @@ unit module Term::Choose::LineFold::$module;
 
 # Control characters, non-characters and surrogates are removed before using this table.
 # To have less ranges in table_char_width non-characters return 1.
+
+# Unicode version $latest_unicode_version
 
 
 sub table_char_width is export { [

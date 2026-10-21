@@ -909,11 +909,11 @@ sub vwflog
 
 	# Collect any warn/notice-level messages emitted during this request.
 	my $warnings;
-        if(my $messages = $info->messages()) {
-                $warnings = join('; ',
-                        grep defined, map { (($_->{'level'} eq 'warn') || ($_->{'level'} eq 'notice')) ? $_->{'message'} : undef } @{$messages}
-                        )
-        }
+	if(my $messages = $info->messages()) {
+		$warnings = join('; ',
+			grep defined, map { (($_->{'level'} eq 'warn') || ($_->{'level'} eq 'notice')) ? $_->{'message'} : undef } @{$messages}
+		);
+	}
 	$warnings ||= '';
 
 	my $country = $lingua->country() || 'unknown';

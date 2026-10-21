@@ -10,18 +10,12 @@ use Test::More;
 use lib 'blib/lib', 'blib/arch';
 use ClickHouse::Encoder;
 
-# Typed-path coercion: encoder applies Perl's SvIV/SvNV/SvPV coercion
-# rules per the declared type, so a "not-an-integer" string under a
-# JSON(a Int64) path silently becomes 0 (Perl numeric coercion). This
-# is documented behavior - same as what the corresponding non-JSON
-# Int64 column would do. Pin the round-trip so a future refactor that
-# adds strict-mode rejection here can detect it as a behavior change.
+# Typed integer paths use the same validation as standalone columns.
 {
     my $enc = ClickHouse::Encoder->new(columns =>
         [['j','JSON(a Int64)']]);
-    my $bytes = $enc->encode([[{ a => 'not-an-integer' }]]);
-    ok(defined $bytes && length $bytes > 0,
-       'typed Int64 path accepts coercible scalars (Perl SvIV rules)');
+    eval { $enc->encode([[{ a => 'not-an-integer' }]]) };
+    like($@, qr/Int64 out of range/, 'typed Int64 path rejects a nonnumeric value');
 }
 
 # Typed path with the right type works (sanity check round-trip).

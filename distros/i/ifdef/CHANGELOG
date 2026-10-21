@@ -1,3 +1,6 @@
+0.12    20 October 2026
+	sub import: don't attempt to add a filter when not compiling
+
 0.10	9 November 2019
 	Adoption.
 

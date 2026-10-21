@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>[% title | html %]</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; }
+body {
+	margin: 0;
+	padding: 0.5rem;
+	font-family: system-ui, sans-serif;
+	font-size: 14px;
+	background: #fff;
+	color: #212529;
+}
+.embed-title {
+	font-size: 1rem;
+	font-weight: 600;
+	margin: 0 0 0.5rem;
+}
+.embed-grid {
+	display: grid;
+	grid-template-columns: repeat(12, 1fr);
+	grid-auto-rows: minmax(15rem, auto);
+	gap: 0.75rem;
+}
+.visual-card {
+	background: #fff;
+	border: 1px solid #dee2e6;
+	border-radius: 4px;
+	overflow: hidden;
+	display: flex;
+	flex-direction: column;
+	grid-column: span 6;
+}
+.visual-card-title {
+	font-weight: 600;
+	font-size: 0.85rem;
+	padding: 0.3rem 0.5rem;
+	background: #f8f9fa;
+	border-bottom: 1px solid #dee2e6;
+}
+.visual-card-body {
+	flex: 1;
+	overflow: auto;
+	padding: 0.4rem;
+}
+.visual-card-body svg { max-width: 100%; height: auto; }
+.visual-error { color: #dc3545; padding: 0.5rem; font-size: 0.82rem; }
+</style>
+</head>
+<body>
+<p class="embed-title">[% canvas_name | html %]</p>
+[% IF visuals.size %]
+<div class="embed-grid" id="embed-grid">
+[% FOREACH v IN visuals %]
+	<div class="visual-card"
+	     id="visual-[% v.id %]"
+	     [% IF v.style.length %]style="[% v.style | html %]"[% END %]>
+		[% IF v.title.length %]
+		<div class="visual-card-title">[% v.title | html %]</div>
+		[% END %]
+		<div class="visual-card-body">
+			[% IF v.error.length %]
+			<p class="visual-error">[% v.error | html %]</p>
+			[% ELSIF v.html.length %]
+			[% v.html %]
+			[% END %]
+		</div>
+	</div>
+[% END %]
+</div>
+[% ELSE %]
+<p>No visuals to display.</p>
+[% END %]
+</body>
+</html>

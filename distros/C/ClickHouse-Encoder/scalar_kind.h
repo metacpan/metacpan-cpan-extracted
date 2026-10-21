@@ -6,6 +6,8 @@
  * paths without parsing the value twice. */
 
 int looks_stringy        (SV *val);
+SV **fetch_named_value(pTHX_ HV *hv, const char *name, STRLEN len);
+const char *hash_key_bytes(pTHX_ HE *he, STRLEN *len);
 int looks_like_int_str   (const char *s, STRLEN len);
 int looks_like_number_str(const char *s, STRLEN len);
 int looks_like_date      (const char *s, STRLEN len);

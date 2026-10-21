@@ -33,7 +33,7 @@ configure_requires:
   strict: '0'
   warnings: '0'
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -46,7 +46,7 @@ no_index:
 provides:
   UUID:
     file: lib/UUID.pm
-    version: '0.39'
+    version: '0.40'
 requires:
   Carp: '0'
   DynaLoader: '0'
@@ -57,5 +57,5 @@ requires:
   strict: '0'
   vars: '0'
   warnings: '0'
-version: '0.39'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+version: '0.40'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

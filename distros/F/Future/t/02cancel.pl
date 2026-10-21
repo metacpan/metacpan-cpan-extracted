@@ -1,5 +1,4 @@
-use v5.10;
-use strict;
+use v5.20;
 use warnings;
 
 use Test2::V0 0.000148; # is_refcount
@@ -131,6 +130,21 @@ use Future;
 
    $f1->cancel;
    ok( $f2->is_cancelled, '$f1 cancelled still cancels $f2' );
+}
+
+# without_cancel strongly holds its sequence (RT181389)
+SKIP: {
+   skip "This is buggy on Future::XS before 0.16", 1
+      if defined $Future::XS::VERSION and $Future::XS::VERSION < 0.16;
+
+   my $f1 = Future->new;
+
+   my $called;
+   $f1->without_cancel->on_done( sub { $called++ } );
+
+   $f1->done;
+
+   ok( $called, 'on_done callback of unreferenced ->without_cancel future invoked' );
 }
 
 # references are not retained in callbacks

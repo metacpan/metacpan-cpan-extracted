@@ -706,8 +706,9 @@ static void S_mark_ready(pTHX_ struct FutureXS *self, SV *selfsv, const char *st
   destroy_callbacks(self);
 }
 
-#define make_sequence(f1, cb)  S_make_sequence(aTHX_ f1, cb)
-static SV *S_make_sequence(pTHX_ SV *f1, struct FutureXSCallback *cb)
+#define make_sequence_weak(f1, cb)    S_make_sequence(aTHX_ f1, cb, true)
+#define make_sequence_strong(f1, cb)  S_make_sequence(aTHX_ f1, cb, false)
+static SV *S_make_sequence(pTHX_ SV *f1, struct FutureXSCallback *cb, bool weaken)
 {
   struct FutureXS *self = get_future(f1);
 
@@ -730,7 +731,9 @@ static SV *S_make_sequence(pTHX_ SV *f1, struct FutureXSCallback *cb)
     cb->seq.thencode = wrap_cb(f1, "sequence", sv_2mortal(cb->seq.thencode));
   if(cb->seq.elsecode)
     cb->seq.elsecode = wrap_cb(f1, "sequence", sv_2mortal(cb->seq.elsecode));
-  cb->seq.f = sv_rvweaken(newSVsv(fseq));
+  cb->seq.f = newSVsv(fseq);
+  if(weaken)
+    sv_rvweaken(cb->seq.f);
 
   push_callback(self, cb);
 
@@ -1182,7 +1185,7 @@ SV *Future_without_cancel(pTHX_ SV *f)
     /* no code */
   };
 
-  SV *ret = make_sequence(f, &cb);
+  SV *ret = make_sequence_strong(f, &cb);
   struct FutureXS *self = get_future(ret);
 
   self->precedent_f = newSVsv(f);
@@ -1200,7 +1203,7 @@ SV *Future_then(pTHX_ SV *f, U32 flags, SV *thencode, SV *elsecode)
   if(flags & FUTURE_THEN_WITH_F)
     cb.flags |= CB_SELF;
 
-  return make_sequence(f, &cb);
+  return make_sequence_weak(f, &cb);
 }
 
 SV *Future_followed_by(pTHX_ SV *f, SV *code)
@@ -1211,7 +1214,7 @@ SV *Future_followed_by(pTHX_ SV *f, SV *code)
     .seq.elsecode = SvREFCNT_inc(code),
   };
 
-  return make_sequence(f, &cb);
+  return make_sequence_weak(f, &cb);
 }
 
 SV *Future_thencatch(pTHX_ SV *f, U32 flags, SV *thencode, HV *catches, SV *elsecode)
@@ -1225,7 +1228,7 @@ SV *Future_thencatch(pTHX_ SV *f, U32 flags, SV *thencode, HV *catches, SV *else
   if(flags & FUTURE_THEN_WITH_F)
     cb.flags |= CB_SELF;
 
-  return make_sequence(f, &cb);
+  return make_sequence_weak(f, &cb);
 }
 
 #define future_new_subsv(cls, subs, n)  S_future_new_subsv(aTHX_ cls, subs, n)

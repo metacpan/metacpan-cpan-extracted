@@ -103,7 +103,7 @@ struct CbfHeader {
     uint32_t rwait;                   /* 76  parked-waiter hint (readers+writers blocked on wlock); over-count-safe */
     uint32_t drain_seq;               /* 80  futex bumped by a reader releasing under a draining writer (wakes it) */
     uint32_t slotless_rdepth;         /* readers holding with no reader-slot (documented residual) */
-    uint64_t stat_ops;                /* 88 */
+    uint64_t stat_ops;                /* 88  write-lock protected */
     uint8_t  sealed;                  /* 96  0 = mutable, 1 = frozen (read-only; lock-free reads) */
     uint8_t  _pad[159];               /* 97..255 */
 };
@@ -209,8 +209,8 @@ static inline void cbf_recover_stale_lock(CbfHandle *h, uint32_t observed_wlock)
         return;
     /* We now hold the write lock as mypid.  No additional shared state needs
      * repair here (this module has no seqlock); just release the lock. */
-    __atomic_store_n(&hdr->wlock, 0, __ATOMIC_RELEASE);
-    if (__atomic_load_n(&hdr->rwait, __ATOMIC_RELAXED) > 0)
+    __atomic_store_n(&hdr->wlock, 0, __ATOMIC_SEQ_CST);
+    if (__atomic_load_n(&hdr->rwait, __ATOMIC_SEQ_CST) > 0)
         syscall(SYS_futex, &hdr->wlock, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
 }
 
@@ -309,9 +309,10 @@ static inline void cbf_recover_after_timeout(CbfHandle *h) {
  * writers (blocked acquiring wlock) wait on the wlock futex and use this, so
  * wrunlock/recover know whether a FUTEX_WAKE is worth a syscall.  A waiter
  * SIGKILLed while parked leaves rwait over-counted -> at most a spurious wake
- * (harmless); it can never under-count, so no wakeup is lost. */
+ * (harmless). SEQ_CST publish/re-check pairs with unlock's store/hint check
+ * so a waiter and an unlocker cannot both miss each other. */
 static inline void cbf_park(CbfHandle *h) {
-    __atomic_add_fetch(&h->hdr->rwait, 1, __ATOMIC_RELAXED);
+    __atomic_add_fetch(&h->hdr->rwait, 1, __ATOMIC_SEQ_CST);
 }
 static inline void cbf_unpark(CbfHandle *h) {
     __atomic_sub_fetch(&h->hdr->rwait, 1, __ATOMIC_RELAXED);
@@ -334,9 +335,9 @@ static inline void cbf_rdepth_inc(CbfHandle *h) {
 static inline void cbf_rdepth_dec(CbfHandle *h) {
     if (h->slotless_held > 0) {
         h->slotless_held--;
-        __atomic_sub_fetch(&h->hdr->slotless_rdepth, 1, __ATOMIC_RELEASE);
+        __atomic_sub_fetch(&h->hdr->slotless_rdepth, 1, __ATOMIC_SEQ_CST);
     } else if (h->my_slot_idx != UINT32_MAX) {
-        __atomic_sub_fetch(&h->reader_slots[h->my_slot_idx].rdepth, 1, __ATOMIC_RELEASE);
+        __atomic_sub_fetch(&h->reader_slots[h->my_slot_idx].rdepth, 1, __ATOMIC_SEQ_CST);
     }
 }
 
@@ -344,7 +345,7 @@ static inline void cbf_rdepth_dec(CbfHandle *h) {
  * after every rdepth decrement so a released read lock lets the writer re-scan
  * promptly instead of waiting out its timeout. */
 static inline void cbf_reader_wake_drain(CbfHandle *h) {
-    if (__atomic_load_n(&h->hdr->wlock, __ATOMIC_ACQUIRE) != 0) {
+    if (__atomic_load_n(&h->hdr->wlock, __ATOMIC_SEQ_CST) != 0) {
         __atomic_add_fetch(&h->hdr->drain_seq, 1, __ATOMIC_RELEASE);
         syscall(SYS_futex, &h->hdr->drain_seq, FUTEX_WAKE, 1, NULL, NULL, 0);
     }
@@ -382,7 +383,7 @@ static inline void cbf_rwlock_rdlock(CbfHandle *h) {
             continue;
         }
         cbf_park(h);
-        cur = __atomic_load_n(&hdr->wlock, __ATOMIC_RELAXED);
+        cur = __atomic_load_n(&hdr->wlock, __ATOMIC_SEQ_CST);
         if (cur != 0) {
             long rc = syscall(SYS_futex, &hdr->wlock, FUTEX_WAIT, cur,
                               &cbf_lock_timeout, NULL, 0);
@@ -427,7 +428,7 @@ static inline void cbf_rwlock_wrlock(CbfHandle *h) {
             continue;
         }
         cbf_park(h);
-        uint32_t cur = __atomic_load_n(&hdr->wlock, __ATOMIC_RELAXED);
+        uint32_t cur = __atomic_load_n(&hdr->wlock, __ATOMIC_SEQ_CST);
         if (cur != 0) {
             long rc = syscall(SYS_futex, &hdr->wlock, FUTEX_WAIT, cur,
                               &cbf_lock_timeout, NULL, 0);
@@ -487,8 +488,8 @@ static inline void cbf_rwlock_wrlock(CbfHandle *h) {
 
 static inline void cbf_rwlock_wrunlock(CbfHandle *h) {
     CbfHeader *hdr = h->hdr;
-    __atomic_store_n(&hdr->wlock, 0, __ATOMIC_RELEASE);
-    if (__atomic_load_n(&hdr->rwait, __ATOMIC_RELAXED) > 0)
+    __atomic_store_n(&hdr->wlock, 0, __ATOMIC_SEQ_CST);
+    if (__atomic_load_n(&hdr->rwait, __ATOMIC_SEQ_CST) > 0)
         syscall(SYS_futex, &hdr->wlock, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
 }
 
@@ -595,7 +596,7 @@ static inline CbfHandle *cbf_setup(void *base, size_t map_size,
 
 /* Validate a mapped header (shared by cbf_create reopen and cbf_open_fd). */
 static inline int cbf_validate_header(const CbfHeader *hdr, uint64_t file_size) {
-    if (hdr->magic != CBF_MAGIC) return 0;
+    if (__atomic_load_n(&hdr->magic, __ATOMIC_ACQUIRE) != CBF_MAGIC) return 0;
     if (hdr->version != CBF_VERSION) return 0;
     if (hdr->k < CBF_MIN_K || hdr->k > CBF_MAX_K) return 0;
     if (hdr->m_ctr < CBF_MIN_CTR || hdr->m_ctr > CBF_MAX_CTR) return 0;
@@ -764,7 +765,7 @@ static CbfHandle *cbf_create(const char *path, uint64_t capacity, double fp_rate
                 }
                 CBF_ERR("invalid counting Bloom filter file"); munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
             }
-            if (((CbfHeader *)base)->sealed) {
+            if (__atomic_load_n(&((CbfHeader *)base)->sealed, __ATOMIC_ACQUIRE)) {
                 CBF_ERR("%s is frozen (read-only); open it with new_readonly", path);
                 munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
             }
@@ -815,7 +816,7 @@ static CbfHandle *cbf_open_fd(int fd, char *errbuf) {
     if (!cbf_validate_header((CbfHeader *)base, (uint64_t)st.st_size)) {
         CBF_ERR("invalid counting Bloom filter table"); munmap(base, ms); return NULL;
     }
-    if (((CbfHeader *)base)->sealed) {
+    if (__atomic_load_n(&((CbfHeader *)base)->sealed, __ATOMIC_ACQUIRE)) {
         CBF_ERR("this counting Bloom filter is frozen (read-only); open it with new_readonly");
         munmap(base, ms); return NULL;
     }
@@ -875,7 +876,7 @@ static CbfHandle *cbf_open_readonly(const char *path, char *errbuf) {
     if (!cbf_validate_header((CbfHeader *)base, (uint64_t)st.st_size)) {
         CBF_ERR("%s: invalid counting Bloom filter file", path); munmap(base, ms); return NULL;
     }
-    if (!((CbfHeader *)base)->sealed) {
+    if (!__atomic_load_n(&((CbfHeader *)base)->sealed, __ATOMIC_ACQUIRE)) {
         CBF_ERR("%s is not frozen: call ->freeze on the producer before opening read-only", path);
         munmap(base, ms); return NULL;
     }
@@ -891,7 +892,7 @@ static CbfHandle *cbf_open_readonly(const char *path, char *errbuf) {
  * and a read-write reopen is refused. */
 static int cbf_freeze(CbfHandle *h) {
     cbf_rwlock_wrlock(h);
-    h->hdr->sealed = 1;
+    __atomic_store_n(&h->hdr->sealed, 1, __ATOMIC_RELEASE);
     cbf_rwlock_wrunlock(h);
     if (h->path || h->backing_fd >= 0) return cbf_msync(h);  /* durability for file/memfd-backed */
     return 0;   /* anonymous: the seal lives in shared memory (visible to forks); nothing to flush */

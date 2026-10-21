@@ -3,6 +3,7 @@ Changes
 lib/Mozilla/CA.pm
 lib/Mozilla/CA/cacert.pem
 maint/cacert-diff
+maint/denylist.pl
 maint/get-tarball-name
 maint/make-tarball
 maint/mk-ca-bundle.pl

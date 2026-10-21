@@ -5,11 +5,11 @@ use EV;
 use Socket;
 use Scalar::Util ();
 use File::Temp ();
-use Curl::Impersonate;
+use Curl::Impersonate 0.03;
 use Proxy::Impersonate::Cert;
 use Proxy::Impersonate::Connection;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 sub new {
     my ($class, %o) = @_;
@@ -21,7 +21,8 @@ sub new {
     my $target = $o{impersonate} or Carp::croak('new: impersonate target required');
     my ($host, $port) = ($o{listen} // '127.0.0.1:0') =~ /^(.+):(\d+)$/
         or Carp::croak('new: listen must be host:port');
-    my $cert_dir = $o{cert_dir} // File::Temp::tempdir(CLEANUP => 1);
+    my $temp_dir = defined $o{cert_dir} ? undef : File::Temp->newdir;
+    my $cert_dir = $o{cert_dir} // "$temp_dir";
 
     socket(my $srv, PF_INET, SOCK_STREAM, 0) or Carp::croak("socket: $!");
     setsockopt($srv, SOL_SOCKET, SO_REUSEADDR, 1);
@@ -35,6 +36,7 @@ sub new {
         port    => $bound,
         cert    => Proxy::Impersonate::Cert->new(cert_dir => $cert_dir),
         cert_dir=> $cert_dir,
+        temp_dir=> $temp_dir,
         target  => $target,
         # Is the impersonate target a Chromium family? Decides whether the per-
         # request Accept is synthesized to Chrome's value or WebKit's own (Safari-
@@ -51,6 +53,7 @@ sub new {
         high_entropy => $o{high_entropy_headers} // {}, # added per-host after Accept-CH
         hints    => {},                           # host -> { hint-name => 1 } (Accept-CH seen)
         multi   => Curl::Impersonate->multi,
+        multi_state => {},
         conns   => {},
         cio     => {},   # curl fd => EV::io watcher
     }, $class;
@@ -76,11 +79,12 @@ sub cert_dir { $_[0]{cert_dir} }
 sub _wire_multi {
     my ($self) = @_;
     my $m = $self->{multi};
+    my $state = $self->{multi_state};
     Scalar::Util::weaken(my $wself = $self);
     Scalar::Util::weaken(my $wm    = $m);
     $m->set_socket_callback(sub {
         my ($fd, $what) = @_;
-        return unless $wself && $wm;
+        return unless $wself && $wm && !$wself->{_shutdown};
         if ($what == 4) { delete $wself->{cio}{$fd}; return }  # CURL_POLL_REMOVE
         my $events = 0;
         $events |= EV::READ  if $what & 1;                     # POLL_IN
@@ -92,24 +96,30 @@ sub _wire_multi {
             $ev |= 1 if $revents & EV::READ;
             $ev |= 2 if $revents & EV::WRITE;
             $ev = 3 unless $ev;                                # fallback: try both
+            local $state->{busy} = 1;
             $wm->socket_action($fd, $ev);
         });
     });
     $m->set_timer_callback(sub {
         my ($ms) = @_;
-        return unless $wself && $wm;
+        return unless $wself && $wm && !$wself->{_shutdown};
         if ($ms < 0) { undef $wself->{ctimer}; return }
-        $wself->{ctimer} = EV::timer($ms / 1000, 0, sub { $wm->socket_action(-1, 0) if $wm });
+        $wself->{ctimer} = EV::timer($ms / 1000, 0, sub {
+            local $state->{busy} = 1;
+            $wm->socket_action(-1, 0) if $wm;
+        });
     });
 }
 
 sub _accept {
     my ($self) = @_;
+    Scalar::Util::weaken(my $wself = $self);
     while (accept(my $cli, $self->{srv})) {
         my $conn = Proxy::Impersonate::Connection->new(
             fd    => $cli,
             cert  => $self->{cert},
             multi => $self->{multi},
+            multi_state => $self->{multi_state},
             override => $self->{override},
             on_request => $self->{on_request},
             on_response => $self->{on_response},
@@ -118,14 +128,14 @@ sub _accept {
             hints => $self->{hints},
             make_handle => sub {
                 Curl::Impersonate->new(
-                    impersonate => $self->{target},
-                    verify      => $self->{verify},
-                    timeout     => $self->{timeout},
+                    impersonate => $wself->{target},
+                    verify      => $wself->{verify},
+                    timeout     => $wself->{timeout},
                     decode      => 1,
-                    ($self->{follow} ? (follow_redirects => 1) : ()),
+                    ($wself->{follow} ? (follow_redirects => 1) : ()),
                 );
             },
-            on_close => sub { delete $self->{conns}{ $_[0] } },
+            on_close => sub { delete $wself->{conns}{ $_[0] } if $wself },
         );
         $self->{conns}{$conn} = $conn;
         $conn->start;
@@ -133,22 +143,32 @@ sub _accept {
 }
 
 sub run  { EV::run }
-sub stop { my ($self) = @_; undef $self->{aw}; EV::break(EV::BREAK_ALL) }
+sub stop {
+    my ($self) = @_;
+    undef $self->{aw};
+    close delete $self->{srv} if $self->{srv};
+    EV::break(EV::BREAK_ALL);
+}
 
 # In-process teardown: stop accepting, close active connections, release the
 # curl_multi wiring. Unlike stop(), does NOT EV::break -- the caller's shared
 # loop keeps running (e.g. EV::WebKit's browser loop).
 sub shutdown {
     my ($self) = @_;
+    $self->{_shutdown} = 1;
     undef $self->{aw};
+    close delete $self->{srv} if $self->{srv};
     my @conns = values %{ $self->{conns} || {} };   # snapshot: _close mutates {conns} via on_close
     $self->{conns} = {};
     for my $c (@conns) { eval { $c->_close } }
     $self->{cio} = {};
     undef $self->{ctimer};
     undef $self->{multi};
+    delete @{$self}{qw(on_request on_response)};
     return $self;
 }
+
+sub DESTROY { $_[0]->shutdown }
 
 1;
 
@@ -255,8 +275,8 @@ goes upstream -- so it sees B<every> request the client makes (navigations,
 subresources, XHR, fetch), and can rewrite, answer or refuse each one.
 
 C<$req> is a hashref with C<method>, C<url>, C<headers> (a lowercase-keyed
-hashref), C<body> and C<host> (the bare hostname). Modify any of them in place
-to rewrite the request:
+hashref), C<body> and C<host> (the bare hostname). Modify C<method>, C<url>,
+C<headers> or C<body> in place to rewrite the request:
 
     on_request => sub {
         my ($req) = @_;
@@ -387,8 +407,8 @@ bytes in the read buffer to be re-parsed as a second request:
 
 =item * A request head over 64KB is closed, which also caps a slow-drip head.
 
-=item * A chunked request body gets C<411>: there is no chunked decoder, since
-streaming uploads are out of scope.
+=item * A transfer-encoded request body gets C<411>: streaming uploads are out
+of scope.
 
 =item * A C<Content-Length> that is repeated with disagreeing values, or is not
 a plain non-negative integer, gets C<400>. An identical repeat is legal and is
@@ -408,7 +428,7 @@ worth knowing before binding it anywhere else.
 
 =head1 REQUIREMENTS
 
-L<Curl::Impersonate> 0.01 or later, L<Net::SSLeay>, L<EV>.
+L<Curl::Impersonate> 0.03 or later, L<Net::SSLeay>, L<EV>.
 
 =head1 SEE ALSO
 

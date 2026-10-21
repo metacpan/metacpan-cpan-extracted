@@ -1902,12 +1902,11 @@ subtest '/map loc= path: geocoder called, markers + counts correct' => sub {
 	my $json = Mojo::File->new($models_path)->slurp;
 	my $data = eval { decode_json($json) };
 	ok !$@, 'models.json is valid JSON';
-	my $spec_key = "$PLACE_SPEC|loc=city";
-	ok exists($data->{geo}{$spec_key}), 'spec key written into geo section';
+	ok exists($data->{geo}{shared}), 'shared place cache written into geo section';
 
 	# '42' is refused by valid_location() (pure-digit string) -> skipped, NOT cached.
 	# Empty string is also skipped.  Only the two successfully resolved places appear.
-	is_deeply [sort keys %{ $data->{geo}{$spec_key}{places} }],
+	is_deeply [sort keys %{ $data->{geo}{shared}{places} }],
 		[qw(Margate Ramsgate)],
 		'only resolved places in cache (42 and empty are skipped, never cached)';
 
@@ -1974,7 +1973,7 @@ subtest '/map loc= count invariants: skipped+cached+attempted+not_attempted==dis
 	# Read the written models and count places to verify attempted == resolved.
 	my $json = Mojo::File->new("$model_dir/models.json")->slurp;
 	my $data = decode_json($json);
-	my $places = $data->{geo}{"$PLACE_SPEC|loc=city"}{places};
+	my $places = $data->{geo}{shared}{places};
 
 	# '42' is refused by valid_location() (pure-digit string): it goes into @skipped,
 	# never into @pending, and is therefore never stored in the cache at all.
@@ -2031,8 +2030,8 @@ subtest '/map loc= concurrent model dirs are isolated' => sub {
 	my $data_a = decode_json(Mojo::File->new("$dir_a/models.json")->slurp);
 	my $data_b = decode_json(Mojo::File->new("$dir_b/models.json")->slurp);
 
-	my $places_a = $data_a->{geo}{"path:$csv_a|loc=city"}{places} // {};
-	my $places_b = $data_b->{geo}{"path:$csv_b|loc=city"}{places} // {};
+	my $places_a = $data_a->{geo}{shared}{places} // {};
+	my $places_b = $data_b->{geo}{shared}{places} // {};
 
 	ok !exists($places_a->{Broadstairs}), 'dir_a cache has no Broadstairs';
 	ok !exists($places_b->{Ramsgate}),    'dir_b cache has no Ramsgate';

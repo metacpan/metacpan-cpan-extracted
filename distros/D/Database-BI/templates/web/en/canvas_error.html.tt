@@ -1,0 +1,71 @@
+[%- WRAPPER 'web/en/layouts/default.html.tt' -%]
+
+<p class="back-link"><a href="/">&larr; Home</a></p>
+
+<div class="canvas-error-box">
+	<h1 class="canvas-error-title">&#x26A0; Canvas unavailable</h1>
+	<p class="canvas-error-name">[% canvas_name | html %]</p>
+	<p class="canvas-error-msg">[% error_msg | html %]</p>
+[%- IF error_specs.size -%]
+	<ul class="canvas-error-specs">
+[%- FOREACH s IN error_specs -%]
+		<li><code>[% s | html %]</code></li>
+[%- END -%]
+	</ul>
+[%- END -%]
+	<p class="canvas-error-hint">
+		The data file may have been moved, renamed, or deleted.
+		You can delete this canvas below if it is no longer needed.
+	</p>
+	<div class="canvas-error-actions">
+		<a href="/" class="btn">Go to Home</a>
+		<button type="button" class="btn btn-danger" id="canvas-error-delete"
+			data-id="[% canvas_id | html %]"
+			data-name="[% canvas_name | html %]">
+			&#x1F5D1; Delete this canvas
+		</button>
+	</div>
+</div>
+
+<style>
+.canvas-error-box {
+	max-width: 36rem;
+	margin: 3rem auto;
+	padding: 2rem;
+	border: 1px solid var(--color-border, #d0d0d0);
+	border-radius: 0.5rem;
+	background: var(--color-surface, #fff);
+}
+.canvas-error-title { font-size: 1.3rem; margin: 0 0 0.75rem; }
+.canvas-error-name  { font-weight: bold; margin: 0 0 0.5rem; }
+.canvas-error-msg   { color: var(--color-danger, #c0392b); margin: 0 0 0.75rem; }
+.canvas-error-specs { margin: 0 0 0.75rem; padding-left: 1.25rem; }
+.canvas-error-specs li { font-size: 0.85rem; word-break: break-all; }
+.canvas-error-hint  { color: var(--color-muted, #666); font-size: 0.9rem; margin: 0 0 1.25rem; }
+.canvas-error-actions { display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center; }
+.btn-danger { background: var(--color-danger, #c0392b); color: #fff; border: none; border-radius: 0.3rem; padding: 0.4rem 0.9rem; cursor: pointer; font-size: 0.95rem; }
+.btn-danger:hover { filter: brightness(1.1); }
+</style>
+
+<script>
+(function () {
+	var btn = document.getElementById('canvas-error-delete');
+	if (!btn) return;
+	btn.addEventListener('click', function () {
+		var id   = btn.getAttribute('data-id');
+		var name = btn.getAttribute('data-name');
+		if (!confirm('Delete canvas "' + name + '"?\n\nThis cannot be undone.')) return;
+		fetch('/api/analyses/' + encodeURIComponent(id), { method: 'DELETE' })
+			.then(function (r) {
+				if (r.ok) {
+					window.location.href = '/';
+				} else {
+					alert('Could not delete the canvas (server error).');
+				}
+			})
+			.catch(function () { alert('Could not delete the canvas (network error).'); });
+	});
+}());
+</script>
+
+[%- END -%]

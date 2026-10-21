@@ -142,8 +142,8 @@ tks_sun_view_precise(pTHX_ const tks_place *p, const time_keeper_instant *t, tks
 {
     double jd  = tks_jd_ut(t);
     double jde = tks_jde(aTHX_ t);
-    tks_sun_precise(jde, &v->sun);
-    tks_altaz(jd, jde, p->lat, p->lon, v->sun.ra, v->sun.dec, &v->alt, &v->az, &v->H);
+    tks_sun_precise(jde, &v->pos);
+    tks_altaz(jd, jde, p->lat, p->lon, v->pos.ra, v->pos.dec, &v->alt, &v->az, &v->H);
     v->app_alt = v->alt + tks_refraction(v->alt) / 60.0;
 }
 

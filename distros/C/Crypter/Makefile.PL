@@ -9,7 +9,7 @@ WriteMakefile(
     AUTHOR			=> 'Ivan Trunaev',
     VERSION_FROM	=> "lib/Crypter.pm",
     EXE_FILES		=> [ './bin/crypter' ],
-    PREREQ_PM		=> {'Strong::Random' => 0.9},
+    PREREQ_PM		=> {'Strong::Random' => 0.92},
 );
 
 1;

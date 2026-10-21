@@ -70,9 +70,11 @@ while (!$ctl->get(1)) {
         next;
     }
 
+    $pos->lock_rd;
     # In real GL: glBufferSubData(GL_ARRAY_BUFFER, 0, length($$ref), $$ref)
     # The $$ref dereference gives the live mmap data — zero copy to GL driver.
     my $data_size = length($$ref);
+    $pos->unlock_rd;
     $frames_rendered += $n;  # eventfd accumulates multiple notifies
 }
 

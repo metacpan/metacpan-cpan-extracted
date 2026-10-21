@@ -2,7 +2,7 @@ package ClickHouse::Encoder;
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 require XSLoader;
 XSLoader::load('ClickHouse::Encoder', $VERSION);
@@ -30,7 +30,7 @@ sub _http_url_headers {
     my ($sql, %opts) = @_;
     require Encode;
     my $esc = sub {
-        my $s = Encode::encode('UTF-8', $_[0], 0);
+        my $s = utf8::is_utf8($_[0]) ? Encode::encode('UTF-8', $_[0], 0) : $_[0];
         $s =~ s/([^A-Za-z0-9\-_.~])/sprintf('%%%02X', ord($1))/ge;
         $s;
     };
@@ -89,10 +89,10 @@ sub _check_endpoint {
 sub _http_tiny {
     my (%opts) = @_;
     require HTTP::Tiny;
-    my @args = (timeout => $opts{timeout} // 60);
+    my @args = (timeout => $opts{timeout} // 60, max_redirect => 0,
+                verify_SSL => $opts{verify_SSL} // 1);
     push @args, keep_alive => 1 if $opts{keep_alive};
     push @args, SSL_options => $opts{ssl_options} if $opts{ssl_options};
-    push @args, verify_SSL  => $opts{verify_SSL}  if exists $opts{verify_SSL};
     return HTTP::Tiny->new(@args);
 }
 
@@ -187,6 +187,7 @@ sub _for_describe {
 
         open my $fh, '-|', @cmd
             or die "Failed to run clickhouse-client: $!";
+        local $/ = "\n";
         @lines = <$fh>;
         close $fh;
         die "clickhouse-client failed: exit code " . ($? >> 8) if $?;
@@ -213,7 +214,8 @@ sub _for_describe {
     for my $line (@lines) {
         chomp $line;
         next if $line eq '';
-        my ($name, $type) = split /\t/, $line;
+        my ($name, $type, $kind) = split /\t/, $line;
+        next if defined $kind && $kind =~ /\A(?:materialized|alias|ephemeral)\z/i;
         push @columns, [$unesc->($name), $unesc->($type)];
     }
 
@@ -438,14 +440,20 @@ sub _split_paren_list {
     my ($start, $depth, $len) = (0, 0, length $body);
     for (my $i = 0; $i <= $len; $i++) {
         my $c = $i < $len ? substr($body, $i, 1) : ',';
-        if    ($c eq '(') { $depth++ }
-        elsif ($c eq ')') { $depth-- }
-        elsif ($c eq ',' && $depth == 0) {
-            (my $p = substr($body, $start, $i - $start)) =~ s/\A\s+|\s+\z//g;
+        if ($c eq "'" || $c eq '`' || $c eq '"') {
+            $i = _skip_sql_quoted($body, $i) - 1;
+            next;
+        }
+        if ($c eq '(') { $depth++ }
+        elsif ($c eq ')') { die "unbalanced ')'\n" if --$depth < 0 }
+        elsif ($c eq ',' && !$depth) {
+            my $p = substr($body, $start, $i - $start);
+            $p =~ s/\A\s+//; $p =~ s/\s+\z//;
             push @parts, $p if length $p;
             $start = $i + 1;
         }
     }
+    die "unbalanced '('\n" if $depth;
     return @parts;
 }
 
@@ -638,72 +646,52 @@ sub ping {
 sub parse_wkt {
     my ($class, $wkt) = @_;
     die "parse_wkt: input required\n" unless defined $wkt;
-    $wkt =~ s/\A\s+//;
-    $wkt =~ s/\s+\z//;
+    $wkt =~ s/\A\s+//; $wkt =~ s/\s+\z//;
     my ($kind, $rest) = $wkt =~ /\A([A-Za-z]+)\s*(.*)\z/s
         or die "parse_wkt: not a WKT geometry: $wkt\n";
     $kind = uc $kind;
-    # Strip the outermost parens (which every geometry has) once for
-    # uniform downstream parsing. EMPTY is rejected because CH Geo
-    # columns have no null/empty representation other than zero-length.
-    $rest =~ s/\A\(\s*//
-        or die "parse_wkt: $kind missing '(': $wkt\n";
-    $rest =~ s/\s*\)\z//
-        or die "parse_wkt: $kind unmatched parens: $wkt\n";
-    if ($kind eq 'POINT') {
-        return _wkt_point($rest);
-    }
-    if ($kind eq 'LINESTRING') {
-        return [ _wkt_points($rest) ];
-    }
-    if ($kind eq 'MULTILINESTRING' || $kind eq 'POLYGON') {
-        # Same shape on the wire (CH Polygon = ring + holes; outer ring
-        # comes first; MultiLineString is parallel parts). Parse as a
-        # list of paren-wrapped point-lists.
-        my @parts;
-        while ($rest =~ /\G\s*,?\s*\(\s*([^()]+?)\s*\)/gc) {
-            push @parts, [ _wkt_points($1) ];
-        }
-        die "parse_wkt: $kind: no parts parsed in $wkt\n" unless @parts;
-        return \@parts;
+    die "parse_wkt: $kind missing '('\n" unless $rest =~ /\A\s*\(/;
+    die "parse_wkt: $kind unmatched parens\n" unless $rest =~ /\)\s*\z/;
+    $rest = _wkt_group($rest);
+    die "parse_wkt: no parts parsed\n" if $kind =~ /\A(?:POLYGON|MULTILINESTRING)\z/ && $rest !~ /\S/;
+    die "parse_wkt: no polygons parsed\n" if $kind eq 'MULTIPOLYGON' && $rest !~ /\S/;
+
+    return _wkt_point($rest) if $kind eq 'POINT';
+    return [_wkt_points($rest)] if $kind eq 'LINESTRING';
+    if ($kind eq 'POLYGON' || $kind eq 'MULTILINESTRING') {
+        return [map { [_wkt_points(_wkt_group($_))] } _split_paren_list($rest)];
     }
     if ($kind eq 'MULTIPOLYGON') {
-        my @polys;
-        # MULTIPOLYGON(((...),(...)), ((...))): the outer level is
-        # polygons, each polygon is a list of rings.
-        while ($rest =~ /\G\s*,?\s*\(\s*(.*?)\s*\)\s*(?=,|\z)/gcs) {
-            my $poly_body = $1;
-            my @rings;
-            while ($poly_body =~ /\G\s*,?\s*\(\s*([^()]+?)\s*\)/gc) {
-                push @rings, [ _wkt_points($1) ];
-            }
-            die "parse_wkt: MULTIPOLYGON ring parse failed in $wkt\n"
-                unless @rings;
-            push @polys, \@rings;
-        }
-        die "parse_wkt: MULTIPOLYGON: no polygons parsed in $wkt\n"
-            unless @polys;
-        return \@polys;
+        return [map {
+            [map { [_wkt_points(_wkt_group($_))] }
+                 _split_paren_list(_wkt_group($_))]
+        } _split_paren_list($rest)];
     }
     die "parse_wkt: unsupported geometry '$kind'\n";
 }
 
+sub _wkt_group {
+    my $s = shift;
+    $s =~ /\A\s*\((.*)\)\s*\z/s or die "parse_wkt: unmatched parens\n";
+    return $1;
+}
+
 sub _wkt_point {
-    my ($s) = @_;
+    my $s = shift;
+    $s =~ s/\A\s+//; $s =~ s/\s+\z//;
     my @c = split /\s+/, $s;
-    die "parse_wkt: POINT needs 2 coords, got '$s'\n" unless @c == 2;
-    return [ map { $_ + 0 } @c ];
+    die "parse_wkt: POINT needs 2 coords (numeric), got '$s'\n"
+        unless @c == 2 && !grep { !/\A[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?\z/ } @c;
+    return [map { $_ + 0 } @c];
 }
 
 sub _wkt_points {
     my ($s) = @_;
-    my @pts;
-    for my $pair (split /\s*,\s*/, $s) {
-        my @c = split /\s+/, $pair;
-        die "parse_wkt: point needs 2 coords, got '$pair'\n" unless @c == 2;
-        push @pts, [ map { $_ + 0 } @c ];
-    }
-    return @pts;
+    return map {
+        my $point = eval { _wkt_point($_) };
+        die "parse_wkt: point needs 2 coords (numeric)\n" if $@;
+        $point;
+    } split /,/, $s;
 }
 
 # Return the list of supported ClickHouse type names (parametric types
@@ -812,7 +800,7 @@ sub format_create_table {
 
     my $body = join ",\n    ", map { _format_column($_) } @$columns;
 
-    my $sql = "create table " . _quote_ident($table) . " (\n    $body\n)";
+    my $sql = "create table " . join(".", map { _quote_ident($_) } split /\./, $table) . " (\n    $body\n)";
     $sql .= "\nengine = $engine";
     $sql .= "\npartition by $opts{partition_by}" if defined $opts{partition_by};
     $sql .= "\nprimary key $opts{primary_key}"   if defined $opts{primary_key};
@@ -863,28 +851,20 @@ sub _unquote_ident {
     return $s;
 }
 
-# Given the index of an opening backtick in $str, return the index just
-# past the matching closing backtick. Honors both escape conventions: a
-# backslash escapes the next char, and a doubled `` is a literal
-# backtick. Returns length($str) if the quote is never closed. The
-# CREATE-TABLE scanners below use this so an escaped backtick inside an
-# identifier cannot be mistaken for the end of the quoted region.
-sub _skip_backtick_quoted {
+# Scan a quoted SQL value, honoring doubled quotes and backslash escapes.
+sub _skip_sql_quoted {
     my ($str, $i) = @_;
+    my $quote = substr($str, $i++, 1);
     my $len = length $str;
-    $i++;                                   # past the opening backtick
     while ($i < $len) {
-        my $c = substr($str, $i, 1);
-        if ($c eq '\\') { $i += 2; next }
-        if ($c eq '`') {
-            return $i + 1
-                unless $i + 1 < $len && substr($str, $i + 1, 1) eq '`';
-            $i += 2;                        # doubled-backtick escape
-            next;
+        my $c = substr($str, $i++, 1);
+        if ($c eq '\\') { $i++; next }
+        if ($c eq $quote) {
+            return $i if $i >= $len || substr($str, $i, 1) ne $quote;
+            $i++;
         }
-        $i++;
     }
-    return $len;
+    die "unterminated quoted SQL value\n";
 }
 
 # Split a (possibly backtick-quoted, possibly database-qualified) table
@@ -897,7 +877,7 @@ sub _split_qname {
     my $dot = -1;
     for (my $i = 0; $i < $len; $i++) {
         my $c = substr($qname, $i, 1);
-        if ($c eq '`') { $i = _skip_backtick_quoted($qname, $i) - 1; next }
+        if ($c eq '`' || $c eq "'") { $i = _skip_sql_quoted($qname, $i) - 1; next }
         if ($c eq '.') { $dot = $i; last }
     }
     return (undef, _unquote_ident($qname)) if $dot < 0;
@@ -905,60 +885,18 @@ sub _split_qname {
             _unquote_ident(substr($qname, $dot + 1)));
 }
 
-# Split a create table column block on top-level commas, respecting both
-# parentheses (nested type args) and backtick-quoted identifiers (which
-# may legally contain commas or parens). _split_paren_list alone is not
-# backtick-aware, hence this dedicated splitter.
+# Split column definitions using the shared quote-aware list scanner.
 sub _split_column_defs {
-    my $body = shift;
-    my @parts;
-    my ($start, $depth, $len) = (0, 0, length $body);
-    for (my $i = 0; $i <= $len; $i++) {
-        my $c = $i < $len ? substr($body, $i, 1) : ',';
-        if ($c eq '`') { $i = _skip_backtick_quoted($body, $i) - 1; next }
-        if    ($c eq '(') { $depth++ }
-        elsif ($c eq ')') { $depth-- }
-        elsif ($c eq ',' && $depth == 0) {
-            (my $p = substr($body, $start, $i - $start))
-                =~ s/\A\s+|\s+\z//g;
-            push @parts, $p if length $p;
-            $start = $i + 1;
-        }
-    }
-    return @parts;
+    my ($body) = @_;
+    return _split_paren_list($body);
 }
 
-# Parse the output of `show create table` (or any create table DDL) into
-# a structured hashref: { database, table, columns => [[name,type],...],
-# engine, order_by, partition_by, primary_key, sample_by, ttl, settings }.
-# Clause values are returned verbatim (trimmed); columns is in the same
-# [name,type] shape schema_diff and format_create_table consume, so a
-# round-trip CH -> parse -> diff -> ALTER is one call each. Per-column
-# DEFAULT/CODEC/TTL modifiers are dropped from the type (they are not
-# part of the type proper); the bare type is what CH's own `describe`
-# would report. Croaks if no create table header or column block is found.
-# Undo TabSeparated escaping outside single-quoted SQL literals. Escapes
-# inside a literal are left alone: the caller's own DDL may carry a regex
-# or a Windows path, and clause values are returned verbatim, so rewriting
-# them is worse than leaving one escaped newline the parser ignores.
+# Undo the TabSeparated escaping layer around show create output.
 sub _tsv_unescape_ddl {
-    my ($s) = @_;
-    my %map = ('n' => "\n", 't' => "\t", 'r' => "\r", '0' => "\0",
-               '\\' => "\\");
-    my ($out, $in_lit, $len) = ('', 0, length $s);
-    for (my $i = 0; $i < $len; $i++) {
-        my $c = substr $s, $i, 1;
-        if ($c eq "'") { $in_lit = !$in_lit; $out .= $c; next }
-        if ($c eq "\\" && $i + 1 < $len) {
-            my $n = substr $s, $i + 1, 1;
-            # Inside a literal, copy the pair through untouched so an
-            # embedded \' still shields its quote from the toggle above.
-            if ($in_lit)          { $out .= $c . $n; $i++; next }
-            if (exists $map{$n})  { $out .= $map{$n}; $i++; next }
-        }
-        $out .= $c;
-    }
-    return $out;
+    my $s = shift;
+    $s =~ s{\\(.)}{ $1 eq 'n' ? "\n" : $1 eq 't' ? "\t"
+                   : $1 eq 'r' ? "\r" : $1 eq '0' ? "\0" : $1 }ge;
+    return $s;
 }
 
 sub parse_create_table {
@@ -981,8 +919,8 @@ sub parse_create_table {
     # database-qualified with a second. Inside backticks both escape
     # forms are accepted: \X (backslash) and `` (doubled).
     my $part = qr/(?:`(?:[^`\\]|\\.|``)+`|[^\s.(]+)/;
-    $ddl =~ /\bCREATE\s+(?:OR\s+REPLACE\s+)?(?:TEMPORARY\s+)?TABLE\s+
-             (?:IF\s+NOT\s+EXISTS\s+)?
+    $ddl =~ /\bcreate\s+(?:or\s+replace\s+)?(?:temporary\s+)?table\s+
+             (?:if\s+not\s+exists\s+)?
              ($part (?:\.$part)?)/xgci
         or die "parse_create_table: no create table header found\n";
     my $qname = $1;
@@ -996,7 +934,7 @@ sub parse_create_table {
     my ($depth, $close, $len) = (0, -1, length $ddl);
     for (my $i = $open; $i < $len; $i++) {
         my $c = substr($ddl, $i, 1);
-        if ($c eq '`') { $i = _skip_backtick_quoted($ddl, $i) - 1; next }
+        if ($c eq '`' || $c eq "'") { $i = _skip_sql_quoted($ddl, $i) - 1; next }
         if    ($c eq '(') { $depth++ }
         elsif ($c eq ')') { $depth--; if ($depth == 0) { $close = $i; last } }
     }
@@ -1005,9 +943,9 @@ sub parse_create_table {
 
     my @columns;
     for my $def (_split_column_defs($block)) {
-        # Skip table-level INDEX / CONSTRAINT / PROJECTION / primary key
+        # Skip table-level index / constraint / projection / primary key
         # entries that share the column block.
-        next if $def =~ /\A(?:INDEX|CONSTRAINT|PROJECTION|PRIMARY\s+KEY)\b/i;
+        next if $def =~ /\A(?:index|constraint|projection|primary\s+key)\b/i;
         my ($cname, $rest);
         if ($def =~ /\A(`(?:[^`\\]|\\.|``)+`)\s+(.*)\z/s) {
             ($cname, $rest) = (_unquote_ident($1), $2);
@@ -1017,7 +955,7 @@ sub parse_create_table {
             next;
         }
         # The type is the leading identifier plus its balanced (...) args;
-        # DEFAULT / CODEC / TTL / COMMENT modifiers come after and are
+        # default / codec / ttl / comment modifiers come after and are
         # not part of the type.
         my $type = _take_type(\$rest);
         push @columns, [$cname, $type] if length $type;
@@ -1030,29 +968,32 @@ sub parse_create_table {
         table    => $table,
         columns  => \@columns,
     );
-    # Trailing clauses. ENGINE has no terminating keyword of its own;
-    # each clause runs until the next clause keyword or end of string.
-    my $stop = qr/\bENGINE\b|\bPARTITION\s+BY\b|\bPRIMARY\s+KEY\b|
-                  \bORDER\s+BY\b|\bSAMPLE\s+BY\b|\bTTL\b|\bSETTINGS\b|\z/xi;
-    my %clause = (
-        engine       => qr/\bENGINE\s*=\s*/i,
-        partition_by => qr/\bPARTITION\s+BY\s+/i,
-        primary_key  => qr/\bPRIMARY\s+KEY\s+/i,
-        order_by     => qr/\bORDER\s+BY\s+/i,
-        sample_by    => qr/\bSAMPLE\s+BY\s+/i,
-        ttl          => qr/\bTTL\s+/i,
-        settings     => qr/\bSETTINGS\s+/i,
-    );
-    for my $k (keys %clause) {
-        # No /g: each clause is searched from the start of $tail
-        # independently. With /g the shared pos() on $tail would make a
-        # clause that sorts earlier in the string than a previously
-        # matched one unfindable. $+[0] is the end offset of the match.
-        next unless $tail =~ $clause{$k};
-        my $val = substr $tail, $+[0];
-        $val =~ s/$stop.*\z//s;
-        $val =~ s/\A\s+|\s+\z//g;
-        $out{$k} = $val if length $val;
+    my %keys = ('engine' => 'engine', 'partition by' => 'partition_by',
+                'primary key' => 'primary_key', 'order by' => 'order_by',
+                'sample by' => 'sample_by', 'ttl' => 'ttl',
+                'settings' => 'settings', 'comment' => 'comment');
+    my @clauses;
+    my $level = 0;
+    for (my $i = 0; $i < length $tail; $i++) {
+        my $c = substr($tail, $i, 1);
+        if ($c eq "'" || $c eq '`' || $c eq '"') {
+            $i = _skip_sql_quoted($tail, $i) - 1; next;
+        }
+        if ($c eq '(') { $level++; next }
+        if ($c eq ')') { $level--; next }
+        next if $level || ($i && substr($tail, $i - 1, 1) =~ /\w/);
+        pos($tail) = $i;
+        if ($tail =~ /\G(engine\s*=|partition\s+by\b|primary\s+key\b|order\s+by\b|sample\s+by\b|ttl\b|settings\b|comment\b)\s*/gci) {
+            my $key = lc $1; $key =~ s/\s*=\z//; $key =~ s/\s+/ /g;
+            push @clauses, [$i, pos($tail), $keys{$key}];
+            $i = pos($tail) - 1;
+        }
+    }
+    for my $i (0 .. $#clauses) {
+        my $end = $i < $#clauses ? $clauses[$i + 1][0] : length $tail;
+        my $value = substr($tail, $clauses[$i][1], $end - $clauses[$i][1]);
+        $value =~ s/\A\s+//; $value =~ s/[\s;]+\z//;
+        $out{$clauses[$i][2]} = $value if length $value;
     }
     return \%out;
 }
@@ -1060,7 +1001,7 @@ sub parse_create_table {
 # Consume one CH type expression from the front of $$rest (an identifier
 # optionally followed by a balanced parenthesised argument list), advance
 # $$rest past it, and return the type string. Used by parse_create_table
-# to separate the type from trailing DEFAULT/CODEC/... modifiers.
+# to separate the type from trailing default/codec/... modifiers.
 sub _take_type {
     my ($rest) = @_;
     $$rest =~ s/\A\s+//;
@@ -1071,7 +1012,7 @@ sub _take_type {
         my ($depth, $len) = (0, length $$rest);
         for (my $i = $pos; $i < $len; $i++) {
             my $c = substr($$rest, $i, 1);
-            if ($c eq '`') { $i = _skip_backtick_quoted($$rest, $i) - 1; next }
+            if ($c eq '`' || $c eq "'") { $i = _skip_sql_quoted($$rest, $i) - 1; next }
             if    ($c eq '(') { $depth++ }
             elsif ($c eq ')') { $depth--; if (!$depth) { $pos = $i + 1; last } }
         }
@@ -1235,7 +1176,7 @@ sub _rb_value_len {
         my ($len, $after) = _rb_unpack_varint($$bufref, $pos);
         return ($after - $pos) + $len;
     }
-    if ($type =~ /\AFixedString\((\d+)\)\z/) {
+    if ($type =~ /\AFixedString\(\s*(\d+)\s*\)\z/) {
         return $1;
     }
     (my $base = $type) =~ s/\(.*//s;
@@ -1245,6 +1186,7 @@ sub _rb_value_len {
         return $p <= 9  ? 4  : $p <= 18 ? 8
              : $p <= 38 ? 16 : 32;
     }
+    return 8 if $base eq 'DateTime' && $type =~ /\(\s*(\d+)/ && $1 > 0;
     my $w = $RB_FIXED_WIDTH{$base};
     die "decode_row_binary: cannot size unsupported type '$type'\n"
         unless defined $w;
@@ -1258,8 +1200,11 @@ sub _rb_decode_value {
         my $inner = $1;
         my ($n, $after) = _rb_unpack_varint($$bufref, $$posref);
         $$posref = $after;
-        return [ map { _rb_decode_value($inner, $bufref, $posref, $cache) }
-                 1 .. $n ];
+        my @values;
+        for (my $i = 0; $i < $n; $i++) {
+            push @values, _rb_decode_value($inner, $bufref, $posref, $cache);
+        }
+        return \@values;
     }
     if ($type =~ /\ALowCardinality\((.+)\)\z/s) {
         return _rb_decode_value($1, $bufref, $posref, $cache);
@@ -1344,8 +1289,10 @@ sub coerce_datetimes {
         # Strip Nullable() wrapping so the inner type matches below.
         # Nullable values come through as undef in the values array;
         # the loops already skip undef.
-        $type = $1 if $type =~ /^Nullable\((.*)\)\z/;
+        $type = $1 while $type =~ /\A(?:Nullable|LowCardinality)\((.*)\)\z/s;
 
+        $type =~ s/\ADateTime\(/DateTime64(/
+            if $type =~ /\ADateTime\(\s*(\d+)/ && $1 > 0;
         if ($type eq 'Date' || $type eq 'Date32') {
             for my $v (@$vals) {
                 next unless defined $v;
@@ -1358,7 +1305,7 @@ sub coerce_datetimes {
                 $v = _epoch_to_string($v, 0, $as, 'iso');
             }
         }
-        elsif ($type =~ /^DateTime64\((\d+)/) {
+        elsif ($type =~ /^DateTime(?:64)?\(\s*(\d+)/) {
             my $precision = $1;
             my $scale     = 10 ** $precision;
             for my $v (@$vals) {
@@ -1435,6 +1382,7 @@ sub _type_byte_estimate {
     # Strip outer parens/args for parametric prefix match.
     my $base = $type;
     $base =~ s/\(.*\z//s;
+    return 8 if $base eq 'DateTime' && $type =~ /\(\s*(\d+)/ && $1 > 0;
     return $FIXED_TYPE_BYTES{$base} if exists $FIXED_TYPE_BYTES{$base};
 
     if ($base eq 'String') {
@@ -1455,7 +1403,7 @@ sub _type_byte_estimate {
     }
     if ($base eq 'Tuple') {
         my ($body) = $type =~ /^Tuple\((.+)\)$/;
-        return 0 unless defined $body;
+        return 1 unless defined $body;
         my @parts = _split_paren_list($body);
         my $sum = 0;
         for my $p (@parts) {
@@ -1485,7 +1433,7 @@ sub _type_byte_estimate {
 # row count (an integer) or arrayref (counted). Uses per-type byte
 # budgets; variable-length types use a 16-byte average per value
 # (override via $avg_str). For batch-size decisions ("is this 1 MiB
-# or 100 MiB before I compress?"). NOT byte-exact: a String row with
+# or 100 MiB before I compress?"). not byte-exact: a String row with
 # a 10 KiB blob will be undercounted. Run encode() for the real size.
 sub estimate_size {
     my ($self, $rows_or_n, %opts) = @_;
@@ -1574,15 +1522,38 @@ sub insert_http {
 # feed the response chunks into a sliding buffer, decode complete blocks
 # as they arrive, and pass each one to $opts{on_block}. Memory stays
 # bounded by chunk_size + one block, so this is the right entry point
-# for selects that won't fit in memory. The user's $sql must NOT include
+# for selects that won't fit in memory. The user's $sql must not include
 # a format clause - this helper always requests format Native.
+sub _sql_without_literals {
+    my $s = shift;
+    my $out = '';
+    for (my $i = 0; $i < length $s; $i++) {
+        my $c = substr($s, $i, 1);
+        if ($c eq "'" || $c eq '`' || $c eq '"') {
+            $i = _skip_sql_quoted($s, $i) - 1; $out .= ' '; next;
+        }
+        if (substr($s, $i, 2) eq '--') {
+            my $end = index($s, "\n", $i + 2);
+            last if $end < 0;
+            $i = $end; $out .= ' '; next;
+        }
+        if (substr($s, $i, 2) eq '/*') {
+            my $end = index($s, '*/', $i + 2);
+            die "unterminated SQL comment\n" if $end < 0;
+            $i = $end + 1; $out .= ' '; next;
+        }
+        $out .= $c;
+    }
+    return $out;
+}
+
 sub select_blocks {
     my ($class, $sql, %opts) = @_;
     my $cb   = $opts{on_block}
         or die "select_blocks: 'on_block' coderef required\n";
     die "select_blocks: \$sql should not include a format clause "
       . "(select_blocks always requests format Native)\n"
-        if $sql =~ /\bformat\s+\w+\s*\z/i;
+        if _sql_without_literals($sql) =~ /\bformat\s+\w+\s*;?\s*\z/i;
     my $keep        = $opts{keep};
     my $decompress  = $opts{decompress};
 
@@ -1644,7 +1615,7 @@ sub select_blocks {
             substr($inner_buf, 0, $block->{consumed}, '');
             $need_at = 0;
         }
-        # When not decompressing, inner_buf IS buf; carry the residual
+    # When not decompressing, inner_buf IS buf; carry the residual
         # back so the next data_callback append sees the unconsumed tail.
         if (!$decompress) {
             $buf = $inner_buf;
@@ -1653,7 +1624,7 @@ sub select_blocks {
 
     my $resp = _http_tiny(%opts, timeout => $opts{timeout} // 60)->post(
         $url,
-        { content => $sql,
+        { content => utf8::is_utf8($sql) ? Encode::encode('UTF-8', $sql, 0) : $sql,
           headers => { %$hdr, 'Content-Type' => 'text/plain' },
           data_callback => sub { $buf .= $_[0]; $drain->() },
         });
@@ -1673,10 +1644,8 @@ sub select_blocks {
 
 # Returns a bulk-inserter object: ->push($row), ->push_many(\@rows),
 # ->flush (idempotent), ->finish. Holds a single HTTP::Tiny instance
-# across batches (so keepalive applies) and auto-flushes when the
-# accumulated row count crosses batch_size. Transient HTTP failures
-# (5xx, network errors) are retried up to retries times with linear
-# backoff; 4xx errors die immediately.
+# across batches and flushes at batch_size. HTTP 429, 5xx and network
+# failures are retried with exponential backoff; other errors die.
 sub bulk_inserter {
     my ($class_or_self, %args) = @_;
     return ClickHouse::Encoder::BulkInserter->new(%args,
@@ -1707,16 +1676,26 @@ sub new {
     my $table      = $args{table} or die "bulk_inserter needs table";
     my $compress   = $args{compress} // 'raw';
     my $timeout    = $args{timeout}  // 60;
+    my $batch_size = $args{batch_size} // 10_000;
+    die "bulk_inserter: batch_size must be a positive integer\n"
+        unless $batch_size =~ /\A[1-9][0-9]*\z/;
 
     my ($url, $hdr) = ClickHouse::Encoder::_build_insert_endpoint(
         $table, $compress, %args);
 
+    my $token = $args{dedup_token};
+    if (!defined $token && defined $args{settings}{insert_deduplication_token}) {
+        $token = $args{settings}{insert_deduplication_token};
+    }
+    $url =~ s/&insert_deduplication_token=[^&]*//g if defined $token;
+
     return bless {
         enc        => $enc,
         url        => $url,
+        dedup_token => $token,
         hdr        => $hdr,
         rows       => [],
-        batch_size => $args{batch_size} // 10_000,
+        batch_size => $batch_size,
         retries    => $args{retries}    // 3,
         retry_wait => $args{retry_wait} // 0.5,
         retry_max_wait => $args{retry_max_wait} // 30,
@@ -1741,15 +1720,15 @@ sub push :method {  ## no critic (ProhibitBuiltinHomonyms)
 sub push_many {
     my ($self, $rows) = @_;
     CORE::push @{ $self->{rows} }, @{$rows};
-    # Slice exactly batch_size rows per flush so we never POST one
-    # oversized body when push_many is called with N >> batch_size.
-    # `local` restores $self->{rows} to the remainder arrayref even
-    # when `flush` croaks mid-batch (so caller's eval{} sees the
-    # untried rows still buffered for a retry).
+    # Restore the failed batch ahead of the untried rows on error.
     while (@{ $self->{rows} } > $self->{batch_size}) {
         my @batch = splice @{ $self->{rows} }, 0, $self->{batch_size};
-        local $self->{rows} = \@batch;
-        $self->flush;
+        my $ok;
+        { local $self->{rows} = \@batch; $ok = eval { $self->flush; 1 }; }
+        unless ($ok) {
+            unshift @{ $self->{rows} }, @batch;
+            die $@;
+        }
     }
     $self->flush if @{ $self->{rows} } >= $self->{batch_size};
     return $self;
@@ -1761,17 +1740,24 @@ sub flush {
     return $self if !@{$rows};
     my $body = ClickHouse::Encoder::_apply_compression(
         $self->{origin}, $self->{compress}, $self->{enc}->encode($rows));
+    my $url = $self->{url};
+    if (defined $self->{dedup_token}) {
+        my $token = "$self->{dedup_token}-$self->{sent_batches}";
+        require Encode;
+        $token = Encode::encode('UTF-8', $token, 0) if utf8::is_utf8($token);
+        $token =~ s/([^A-Za-z0-9\-_.~])/sprintf('%%%02X', ord($1))/ge;
+        $url .= "&insert_deduplication_token=$token";
+    }
     my $resp;
     my $last_err;
     for my $attempt (0 .. $self->{retries}) {
-        $resp = $self->{http}->post($self->{url},
+        $resp = $self->{http}->post($url,
             { headers => $self->{hdr}, content => $body });
         last if $resp->{success};
-        # 4xx errors are not retryable - the request is malformed.
         die "bulk_inserter: HTTP $resp->{status}: $resp->{content}\n"
-            if $resp->{status} >= 400 && $resp->{status} < 500;
+            if $resp->{status} < 500 && $resp->{status} != 429;
         $last_err = "HTTP $resp->{status}: $resp->{content}";
-        # 5xx and network failures (599) are retryable. Exponential
+        # 429, 5xx and network failures (599) are retryable. Exponential
         # backoff (retry_wait * 2^attempt, capped at retry_max_wait)
         # with equal jitter: sleep half the window deterministically
         # then a random half, so concurrent inserters retrying the
@@ -1781,7 +1767,7 @@ sub flush {
             my $window = $self->{retry_wait} * (2 ** $attempt);
             $window = $self->{retry_max_wait}
                 if $window > $self->{retry_max_wait};
-            Time::HiRes::sleep($window / 2 + rand($window / 2));
+            Time::HiRes::sleep($window / 2 + rand($window / 2)) if $window > 0;
         }
     }
     die "bulk_inserter: gave up after $self->{retries} retries; "
@@ -1876,6 +1862,7 @@ sub encode_to_command {
     ## no critic (InputOutput::RequireBriefOpen) -- $fh is closed below
     defined(my $pid = open my $fh, '|-') or die "fork: $!";
     if ($pid == 0) {
+        local $SIG{PIPE} = 'DEFAULT';
         # exec only returns on failure. Fold the failure path onto the
         # same statement (via `or do {...}`) so Perl doesn't flag the
         # post-exec code as unreachable at compile time. POSIX::_exit
@@ -2128,7 +2115,8 @@ C<<< via => 'client' >>>). Default: whatever C<exec> finds on C<$PATH>.
 
 For C<<< via => 'http' >>>: the URL scheme (default C<http>; pass
 C<https> for TLS), request timeout in seconds (default 10),
-optional SSL options / verify_SSL passthrough to L<HTTP::Tiny>,
+optional SSL options / verify_SSL passthrough to L<HTTP::Tiny>
+(certificate verification defaults to on; redirects are disabled),
 and a hashref of per-query CH settings. Ignored under
 C<<< via => 'client' >>> (the C<clickhouse-client> binary handles
 its own connection).
@@ -2491,7 +2479,7 @@ replication pipelines.
         partition_by => 'toYYYYMM(ts)',        # optional
         primary_key  => '(id)',                # optional
         sample_by    => 'id',                  # optional
-        ttl          => 'event_date + INTERVAL 90 DAY',  # optional
+        ttl          => 'event_date + interval 90 day',  # optional
         settings     => 'index_granularity=8192', # optional
     );
 
@@ -2522,7 +2510,7 @@ inserted verbatim.
                                    comment => 'event kind' }],
         ],
         engine => 'MergeTree', order_by => '(id, ts)',
-        ttl    => 'ts + INTERVAL 30 DAY',
+        ttl    => 'ts + interval 30 day',
     );
 
 Pair with L</schema_diff> + L</apply_schema_diff> for end-to-end
@@ -2536,7 +2524,7 @@ schema migration tooling.
     #   columns  => [['id','UInt64'], ['name','String'], ...],
     #   engine   => 'MergeTree', order_by => '(id, ts)',
     #   partition_by => 'toYYYYMM(ts)', primary_key => 'id',
-    #   sample_by => 'id', ttl => 'ts + INTERVAL 90 DAY',
+    #   sample_by => 'id', ttl => 'ts + interval 90 day',
     #   settings => 'index_granularity = 8192',
     # }
     # Clause keys are present only when the DDL has that clause.
@@ -2545,20 +2533,16 @@ Parses the output of C<show create table> (or any C<create table>
 DDL) into a structured hashref. C<columns> is in the same
 C<[name, type]> shape L</schema_diff> and L</format_create_table>
 consume, so a round trip - fetch DDL, parse, diff against a desired
-shape, emit C<ALTER>s - is one call each. Per-column
-C<DEFAULT> / C<CODEC> / C<TTL> / C<COMMENT> modifiers are stripped
+shape, emit C<alter>s - is one call each. Per-column
+C<default> / C<codec> / C<ttl> / C<comment> modifiers are stripped
 from the reported type (the bare type is what C<describe> reports).
 Nested-comma types (C<Decimal(18, 4)>, named C<Tuple>, C<Map>) and
 backtick-quoted identifiers are handled. C<database> is C<undef>
 when the name is not schema-qualified. Croaks if no C<create table>
 header or column block is found.
 
-Trailing clauses (C<ENGINE>, C<partition by>, C<TTL>, ...) are
-delimited by the next clause keyword: a clause expression that
-itself embeds a standalone clause keyword (rare - e.g. a C<TTL>
-expression containing the bare word C<SETTINGS>) would be truncated
-there. The column list is parsed precisely; clause values are
-best-effort.
+Trailing clauses are split at top-level keywords; quoted values and
+parenthesized expressions stay intact.
 
 =head2 apply_schema_diff
 
@@ -2692,9 +2676,9 @@ stays bounded by one HTTP::Tiny chunk plus one block; this is the
 right entry point for selects that return more than fits in
 process memory.
 
-C<$sql> must NOT end with a C<format ...> clause - C<select_blocks>
+C<$sql> must not end with a C<format ...> clause - C<select_blocks>
 appends C<format Native> at the URL level and croaks when the SQL
-trails with a different format pin. A C<FORMAT> token inside the
+trails with a different format pin. A C<format> token inside the
 query body (for example a column literal) is fine.
 
 The optional C<keep =E<gt> \%names> hashref forwards a column
@@ -2730,8 +2714,8 @@ only on insert and is ignored if passed here.
 
 Holds an L<HTTP::Tiny> instance with keep-alive across batches,
 accumulates rows, auto-flushes at C<batch_size>, retries transient
-HTTP failures (5xx and 599 network errors) with exponential backoff
-and jitter. 4xx errors die immediately. Options:
+HTTP failures (429, 5xx and 599 network errors) with exponential backoff
+and jitter. Other 4xx errors die immediately. Options:
 
 =over 4
 
@@ -2786,9 +2770,9 @@ C<max_memory_usage>, ...) appended to every flush as URL params.
 
 =item C<dedup_token>
 
-Stamps every POST with C<insert_deduplication_token>. Identical
-retries are rejected server-side, making the inserter
-transactionally idempotent.
+Each batch uses C<insert_deduplication_token> as C<base-0>, C<base-1>,
+and so on. Retries reuse the batch token and body; use a unique base
+for each independent stream.
 
 =back
 
@@ -3169,8 +3153,9 @@ returns the flat columns.
 
 =item *
 
-Numeric types go through C<SvIV> / C<SvUV> / C<SvNV>. Negative inputs to
-unsigned types are bit-cast (standard Perl behaviour).
+Integer inputs must be numeric and fit the column's signed or unsigned
+range. Nonnumeric values, negative unsigned values and overflow croak.
+Floating-point inputs truncate toward zero after range validation.
 
 =item *
 

@@ -9,8 +9,8 @@ build_requires:
   Alien::git: '0'
   Config: '0'
   Sort::Versions: '0'
-  Test::Alien: '0'
-  Test::More: '0'
+  Test::Alien: '2.53'
+  Test::More: '0.88'
 configure_requires:
   Alien::Build::MM: '0.32'
   Alien::Build::Plugin::Build::CMake: '0.99'
@@ -19,7 +19,7 @@ configure_requires:
   Alien::Build::Plugin::Fetch::Git: '0.01'
   Alien::Build::Plugin::Prefer::SortVersions: '0.65'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150014'
+generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150015'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -32,7 +32,7 @@ no_index:
 provides:
   Alien::curlimpersonate:
     file: lib/Alien/curlimpersonate.pm
-    version: '0.03'
+    version: '0.04'
 requires:
   Alien::Base: '0'
   Alien::Build: '0.25'
@@ -40,7 +40,7 @@ requires:
 resources:
   bugtracker: https://github.com/vividsnow/perl5-alien-curlimpersonate/issues
   repository: https://github.com/vividsnow/perl5-alien-curlimpersonate.git
-version: '0.03'
+version: '0.04'
 x_alienfile:
   generated_by: 'Alien::Build::MM version 2.84'
   requires:

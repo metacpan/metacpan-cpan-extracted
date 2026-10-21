@@ -167,7 +167,7 @@ XS(XS_WIN32__Pipe_Create)
 	szName = (UCHAR *)SvPV(ST(0), n_a);
 	dWait = (DWORD)SvIV(ST(1));
 
-	PUSHMARK(sp);
+	SP -= items;
 
 	if (strlen((const char *)szName) > 255){
 		Error(ERROR_NAME_TOO_LONG);
@@ -205,7 +205,7 @@ XS(XS_WIN32__Pipe_Close)
 	}
 	Pipe = INT2PTR(class CPipe *, SvIV(ST(0)));
 
-	PUSHMARK(sp);
+	SP -= items;
 	
 	if (Pipe){
 		delete Pipe;
@@ -229,7 +229,7 @@ XS(XS_WIN32__Pipe_Write)
 	Pipe = INT2PTR(class CPipe *, SvIV(ST(0)));
 	vpData = (void *)SvPV(ST(1), dDataLen);
 
-	PUSHMARK(sp);
+	SP -= items;
 	
 	if (Pipe){
 		iResult = Pipe->Write((void *)vpData, (DWORD)dDataLen);
@@ -252,7 +252,7 @@ XS(XS_WIN32__Pipe_Read)
 	}
 	Pipe = INT2PTR(class CPipe *, SvIV(ST(0)));
 
-	PUSHMARK(sp);
+	SP -= items;
 	
 	if (Pipe){
 		while(iFlag){
@@ -269,7 +269,7 @@ XS(XS_WIN32__Pipe_Read)
 			if(dLen){
 				XPUSHs(sv_2mortal(newSVpv((char *)vpData, dLen)));
 			}else{
-				sv_setsv(ST(0), (SV*) &PL_sv_undef);
+				XPUSHs(&PL_sv_undef);
 			}
 		}
 	}
@@ -287,7 +287,7 @@ XS(XS_WIN32__Pipe_Connect)
 	}
 	Pipe = INT2PTR(class CPipe *, SvIV(ST(0)));
 
-	PUSHMARK(sp);
+	SP -= items;
 	
 	if (Pipe){
 		iResult = Pipe->Connect();
@@ -304,7 +304,7 @@ XS(XS_WIN32__Pipe_Disconnect)
 	int		iResult = 0;
 	int		iPurge = 0;
 
-	if(items > 0 && items < 3){
+	if(items < 1 || items > 2){
 		CROAK("usage: Disconnect($PipeHandle [, $iPurge]);\n");
 	}
 	Pipe = INT2PTR(class CPipe *, SvIV(ST(0)));
@@ -312,7 +312,7 @@ XS(XS_WIN32__Pipe_Disconnect)
 		iPurge = (int) SvIV(ST(1));
 	}
 
-	PUSHMARK(sp);
+	SP -= items;
 	
 	if (Pipe){
 		iResult = Pipe->Disconnect(iPurge);
@@ -335,7 +335,7 @@ XS(XS_WIN32__Pipe_ResizeBuffer)
 	Pipe = INT2PTR(class CPipe *, SvIV(ST(0)));
 	dSize = (DWORD)SvIV(ST(1));
 
-	PUSHMARK(sp);
+	SP -= items;
 	
 	if (Pipe){
 		dResult = Pipe->ResizeBuffer(dSize);
@@ -356,7 +356,7 @@ XS(XS_WIN32__Pipe_BufferSize)
 	}
 	Pipe = INT2PTR(class CPipe *, SvIV(ST(0)));
 
-	PUSHMARK(sp);
+	SP -= items;
 	
 	if (Pipe){
 		dResult = Pipe->BufferSize();
@@ -382,7 +382,7 @@ XS(XS_WIN32__Pipe_Error)
 		Pipe = INT2PTR(class CPipe *, SvIV(ST(0)));
 	}
 
-	PUSHMARK(sp);
+	SP -= items;
 	
 	if (Pipe){
 		iError = Pipe->iError;
@@ -406,7 +406,7 @@ XS(XS_WIN32__Pipe_Info)
 		CROAK("usage: ($ExtName, $Version, $Date, $Author, $CompileDate, $Credits) = Info()\n");
 	}
 	
-	PUSHMARK(sp);
+	SP -= items;
 	
 	XPUSHs(sv_2mortal(newSVpv(VERNAME, strlen(VERNAME))));
 	XPUSHs(sv_2mortal(newSVpv(VERSION, strlen(VERSION))));

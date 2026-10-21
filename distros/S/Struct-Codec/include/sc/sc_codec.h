@@ -301,6 +301,9 @@ typedef struct {
 /* struct_encode(..., strip_pointers => 1): a pointer object is written as
  * undef instead of refused. See sc_is_pointer_obj. */
 #define SC_STRIP_POINTERS 1u
+/* struct_encode(..., canonical => 1): every hash's keys in order, so equal
+ * data is equal bytes whatever order the hashes happen to hold them in. */
+#define SC_CANONICAL      2u
 
 typedef struct {
     char    *buf;
@@ -308,7 +311,7 @@ typedef struct {
     STRLEN   cap;
     SV      *bufsv;    /* the SV `buf` points into, NULL for a fixed buffer  */
     int      fixed;    /* encode_to: never grow, keep counting past cap      */
-    U32      flags;    /* SC_STRIP_POINTERS                                  */
+    U32      flags;    /* SC_STRIP_POINTERS | SC_CANONICAL                   */
     sc_seen *seen;     /* open addressing keyed on the SV's address          */
     STRLEN   nseen;
     STRLEN   seen_cap; /* a power of two, 0 until the first shared SV        */
@@ -359,6 +362,59 @@ static void sc_enc_varint(pTHX_ sc_enc *e, UV v) {
 }
 
 /* A key or a class name: one varint of (len << 1 | utf8), then the bytes. */
+/* ---- canonical order ---------------------------------------------------------
+ *
+ * A key is held as Latin-1 bytes or as UTF-8, and perl keeps one that fits in
+ * Latin-1 that way, so the same character can be either. Keys are ordered by
+ * character, as perl's sort orders them: two keys held alike compare as bytes
+ * (UTF-8's byte order is its character order), and a pair held differently is
+ * walked a character at a time. The decoder reads perl's own extended UTF-8,
+ * which a key from perl always is; a byte that does not start a sequence is
+ * taken as itself rather than read past the end. */
+typedef struct {
+    const char *k;
+    STRLEN      kl;
+    int         utf8;
+    HE         *he;
+} sc_hkey;
+
+static UV sc_utf8_next(const U8 **p, const U8 *end) {
+    const U8 *s = *p;
+    UV        c = *s;
+    int       more, i;
+    if      (c < 0x80) more = 0;
+    else if ((c & 0xE0) == 0xC0) { more = 1; c &= 0x1F; }
+    else if ((c & 0xF0) == 0xE0) { more = 2; c &= 0x0F; }
+    else if ((c & 0xF8) == 0xF0) { more = 3; c &= 0x07; }
+    else if ((c & 0xFC) == 0xF8) { more = 4; c &= 0x03; }
+    else if ((c & 0xFE) == 0xFC) { more = 5; c &= 0x01; }
+    else                         { more = 0; }
+    if (more && s + more >= end) more = (int)(end - s - 1);   /* never past the key */
+    for (i = 1; i <= more; i++) c = (c << 6) | (s[i] & 0x3F);
+    *p = s + 1 + more;
+    return c;
+}
+
+static int sc_hkey_cmp(const void *a, const void *b) {
+    const sc_hkey *x = (const sc_hkey *)a, *y = (const sc_hkey *)b;
+    if (x->utf8 == y->utf8) {
+        STRLEN n = x->kl < y->kl ? x->kl : y->kl;
+        int    r = n ? memcmp(x->k, y->k, n) : 0;
+        if (r) return r;
+        return x->kl < y->kl ? -1 : x->kl > y->kl ? 1 : 0;
+    }
+    {
+        const U8 *p = (const U8 *)x->k, *pe = p + x->kl;
+        const U8 *q = (const U8 *)y->k, *qe = q + y->kl;
+        while (p < pe && q < qe) {
+            UV c = x->utf8 ? sc_utf8_next(&p, pe) : *p++;
+            UV d = y->utf8 ? sc_utf8_next(&q, qe) : *q++;
+            if (c != d) return c < d ? -1 : 1;
+        }
+        return p < pe ? 1 : q < qe ? -1 : 0;
+    }
+}
+
 static void sc_enc_key(pTHX_ sc_enc *e, const char *p, STRLEN n, int utf8) {
     sc_enc_varint(aTHX_ e, ((UV)n << 1) | (utf8 ? 1u : 0u));
     sc_enc_bytes(aTHX_ e, p, n);
@@ -735,6 +791,26 @@ static void sc_enc_referent(pTHX_ sc_enc *e, SV *rv) {
         SC_PUT(e, SC_T_HASH);
         hv_iterinit(hv);
         sc_enc_varint(aTHX_ e, (UV)HvUSEDKEYS(hv));
+        if ((e->flags & SC_CANONICAL) && HvUSEDKEYS(hv) > 1) {
+            /* The keys gathered and ordered first, in a mortal so a croak
+             * while writing the values frees them. The format is unchanged:
+             * only the order of the pairs. */
+            STRLEN   want = (STRLEN)HvUSEDKEYS(hv), got = 0, j;
+            SV      *hold = sv_2mortal(newSV(want * sizeof(sc_hkey) + 1));
+            sc_hkey *ks = (sc_hkey *)SvPVX(hold);
+            while ((he = hv_iternext(hv)) && got < want) {
+                ks[got].k    = HePV(he, ks[got].kl);
+                ks[got].utf8 = HeUTF8(he) ? 1 : 0;
+                ks[got].he   = he;
+                got++;
+            }
+            qsort(ks, got, sizeof *ks, sc_hkey_cmp);
+            for (j = 0; j < got; j++) {
+                sc_enc_key(aTHX_ e, ks[j].k, ks[j].kl, ks[j].utf8);
+                sc_enc_value(aTHX_ e, HeVAL(ks[j].he));
+            }
+            return;
+        }
         while ((he = hv_iternext(hv))) {
             STRLEN kl;
             const char *k = HePV(he, kl);

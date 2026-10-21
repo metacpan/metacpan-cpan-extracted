@@ -3,7 +3,7 @@ use 5.20.0;
 use strict;
 use warnings;
 
-our $VERSION = '0.25';
+our $VERSION = '0.27';
 
 use Mail::DKIM2::Common ();
 use Mail::DKIM2::MessageInstance;
@@ -95,6 +95,11 @@ Notifications (-07 section 16).
 The verify-before-sign decision shared by C<bin/dkim2sign> and
 C<bin/dkim2-milter>: whether the upstream chain is worth extending, and
 whether a top C<nd=> names the domain about to sign.
+
+=item L<Mail::DKIM2::BodyHasher>
+
+The body hash of a message streamed from a file, for a host that computes a
+Message-Instance from the header block alone.
 
 =item L<Mail::DKIM2::Common>
 

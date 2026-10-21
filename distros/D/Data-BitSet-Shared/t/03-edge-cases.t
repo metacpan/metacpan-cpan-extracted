@@ -19,7 +19,7 @@ use Data::BitSet::Shared;
     my $b = Data::BitSet::Shared->new_memfd("e2", 64);
     $b->set($_) for 0..63;
     is $b->count, 64, "fully-set 64-bit word";
-    ok !$b->test(63) == 0, "last bit set";
+    ok $b->test(63), "last bit set";
 }
 
 # Capacity 65 (spans words)

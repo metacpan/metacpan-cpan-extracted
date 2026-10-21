@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.03';
+our $VERSION = '0.06';
 
 use XSLoader;
 XSLoader::load('Time::Keeper::Natural', $VERSION);
@@ -27,7 +27,7 @@ Time::Keeper::Natural - the words people use for a time, read in every locale
 
 =head1 VERSION
 
-Version 0.03
+Version 0.06
 
 =head1 SYNOPSIS
 
@@ -50,13 +50,18 @@ Version 0.03
     my $m = $n->match('15 October');
     $m->assumed;                                    # ('time', 'year', 'zone')
 
+    for my $m ($n->find('Can we meet next Tuesday at 3 pm, or on the 20th?')) {
+        say $m->start, '-', $m->end, ' ', $m->value;  # 12-32 2026-10-20T15:00:00+01:00
+    }                                               # 37-48 2026-10-20T00:00:00+01:00
+
     Time::Keeper::Natural->parse('tomorrow', zone => 'Asia/Tokyo');
 
 It reads relative phrases (L</RELATIVE TIME>), durations (L</DURATIONS>),
 dates and times in the locale's own formats, alone or on a day (L</ABSOLUTE
 DATES AND TIMES>), intervals (L</INTERVALS>), and, where a locale has a word table, "end of", "start
 of", "at" and "on" (L</WORDS>). A method that cannot read a text dies saying
-what it could not read.
+what it could not read. C<find> reads the times inside a longer text
+(L</FINDING TIMES IN TEXT>).
 
 =head1 DESCRIPTION
 
@@ -90,11 +95,6 @@ without, which reads everything in the first tier and none of this.
 
 =over
 
-=item Free text.
-
-A text is read whole or not at all: "let's meet next Tuesday" dies. Finding
-a date somewhere inside a sentence is another job, with its own guesses.
-
 =item Recurrence and vague words.
 
 "every Tuesday", "sometime next week", "soon".
@@ -111,8 +111,9 @@ spelling the locale's rules do not write ("twentyone").
 =item What a language's grammar keeps out of reach.
 
 Where "end of" wants a case CLDR does not have (German, Greek and Russian
-genitives, Hindi's oblique case), the edges read with month names, years and
-dates only; each table says what it cannot do in its own header.
+genitives, Hindi's oblique case), a table's aliases put back the forms it
+lists, and no others (L</WORD ORDER AND CASE>). Each table says what it
+cannot do in its own header.
 
 =back
 
@@ -261,6 +262,18 @@ As C<parse_interval>, with an empty list for a death.
 
 As C<match> for what C<parse_interval> reads: the kind C<interval>, the
 start as C<value> and the end as C<to>.
+
+=head2 find
+
+    my @m = $n->find('Can we meet next Tuesday at 3 pm, or on the 20th?');
+    my @m = $n->find($text, names => 1, kinds => [qw(point interval)]);
+
+Every time the text mentions, as Matches in text order (L</FINDING TIMES IN
+TEXT>), or their count in scalar context. C<names =E<gt> 1> lets a month or a
+weekday name alone be a mention. C<kinds> is a list of C<point>, C<date>,
+C<duration> and C<interval>, by default C<point>, C<duration> and
+C<interval>. The parser's options go to C<new>, or to C<find> called on the
+class.
 
 =head2 coverage
 
@@ -522,6 +535,33 @@ locale's weekend days (Saturday and Sunday in en-GB, Friday and Saturday in
 en-IL, Sunday alone in en-IN), whatever day its week starts on; the next and
 the last are a week either side. The value is its first day's first moment.
 
+=head1 WORD ORDER AND CASE
+
+    $n->in_locale('ja')->parse('来月の第3金曜日');                # 2026-11-20T00:00:00+00:00
+    $n->in_locale('ru')->parse('в третью пятницу октября');       # 2026-10-16T00:00:00+01:00
+    $n->in_locale('de')->parse('Ende nächsten Monats');           # 2026-11-30T23:59:59.999999999+00:00
+    $n->in_locale('ru')->parse('конец следующего месяца');        # 2026-11-30T23:59:59.999999999+00:00
+    $n->in_locale('de')->parse('am Dienstag');                    # 2026-10-20T00:00:00+01:00
+
+Three things a word table can say, for languages whose order or case CLDR's
+words do not cover. Each is read only where nothing else reads the text.
+
+An ordinal weekday in any order: a table's C<nth> phrase names three parts,
+C<{period}>, C<{n}> and C<{weekday}> ("{period}の第{n}{weekday}", "в {n}
+{weekday} {period}"). The number is digits, a number word, an ordinal word or
+one of the table's C<last> words, and the period must be a month, as with
+"the third Friday of next month".
+
+An inflected form put back to CLDR's phrase: a table's C<alias> lines
+("nächsten Monats=nächsten Monat", "следующего месяца=в следующем месяце",
+"пятницу=пятница") turn a genitive, an oblique or an accusative into the
+phrase CLDR writes, and the text is read again. An alias is a whole word in a
+language with spaces, and its phrase must be one of the locale's CLDR words.
+
+A phrase that is also a CLDR word, marked: German's "am" before a day is
+CLDR's AM. A table marks it (C<am!> under C<on>), and it is taken only with a day
+after it. Alone, "am" is read as it always was.
+
 =head1 WORDS
 
     $n->parse('end of last month');          # 2026-09-30T23:59:59.999999999+01:00
@@ -549,13 +589,13 @@ prove and says what its grammar keeps out of reach. A language that puts
 "end" after the period ("来月末", "다음 달 말", "অক্টোবরের শেষ") is written as a
 frame, and an article a contraction swallowed ("fin du mois dernier") is put
 back before giving up. A language whose "end of" wants a case CLDR does not
-have (German's genitive, Russian's) reads its edges with month names, years
-and dates only. The table's keys, the whole of them: C<start_of>, C<end_of>,
+have (German's genitive, Russian's) puts it back with aliases (L</WORD ORDER
+AND CASE>). The table's keys, the whole of them: C<start_of>, C<end_of>,
 C<at>, C<on>, C<skip> (words dropped where a part begins), C<and> (a chain
 joiner, where the locale's list pattern has none), C<of> and C<last> (for
 "the last Friday of October"), C<range> (two points as an interval, see
-L</INTERVALS>), and C<after>, C<before> and C<weekend> (L</RELATIVE TO A
-POINT>).
+L</INTERVALS>), C<after>, C<before> and C<weekend> (L</RELATIVE TO A
+POINT>), and C<nth> and C<alias> (L</WORD ORDER AND CASE>).
 
 "start of" and "end of" take any period the parser reads: a period word
 ("last month", "next week", "today"), a weekday ("next Tuesday"), a date ("15
@@ -579,6 +619,8 @@ message means the coming Tuesday; C<match> reports it as assumed.
     $n->parse_duration('two hours and thirty minutes');
     $n->parse('the third Friday of next month');     # 2026-11-20T00:00:00+00:00
     $n->parse('the last Friday of October');         # 2026-10-30T00:00:00+00:00
+    $n->in_locale('ja')->parse('二週間三日後');        # 2026-11-01T09:00:00+00:00
+    $n->in_locale('zh')->parse_duration('两周三天');  # P17D
 
 Where a count is read as digits it is also read as a word, 0 to 99, in the
 locales whose CLDR data has spellout rules, about ninety of them
@@ -587,6 +629,12 @@ with hyphens or spaces, and no other. English's "a" and "an" are one. The
 day ordinals in digits come the same way, from the locales'
 C<%digits-ordinal> rules, English's "st", "nd", "rd" and "th" chosen by CLDR's
 ordinal plural rules when the distribution is built.
+
+In a language written without spaces, a chain of counts is cut where each
+number starts, a word ("二週間三日後", "两周三天后") as well as digits. Where
+more than one cut reads, the longest piece that reads comes first, so
+"三十分" is thirty minutes and "兩個星期三日後" is two weeks and three days,
+not a Wednesday. A text whose pieces do not all read dies as before.
 
 "the third Friday of next month" counts a weekday in a month: an ordinal word,
 1 to 5, or the word table's "last", then a weekday name, the table's "of", and
@@ -684,6 +732,43 @@ C<parse> gives a value and leaves the caller unable to tell what the text
 said from what was filled in. C<match> gives both; see
 L<Time::Keeper::Natural::Match> for the list of what can be assumed, which is
 fixed.
+
+=head1 FINDING TIMES IN TEXT
+
+    my $n = Time::Keeper::Natural->new(zone => 'Europe/London', locale => 'en');
+    $n->find('Remind me in 2 hours');               # 'in 2 hours', a point
+    $n->find('It takes about 2 hours');             # '2 hours', a duration
+    $n->find('open from 9 am to 5 pm on weekdays'); # an interval
+    $n->find('I bought 3 apples yesterday.');       # 'yesterday' alone
+    $n->find('See you in May.');                    # nothing
+    $n->find('See you in May.', names => 1);        # 'May'
+
+C<find> reads a text the way C<parse> does, a span at a time. A mention is
+made only of the locale's own words: its CLDR words, its number words, its
+word table's phrases, the words its formats write and its zones' names, with
+digits and the punctuation dates are written with. From the leftmost start,
+the longest span that reads is the mention (at most twelve words, or
+forty-eight characters in a language written without spaces), and the next
+starts after it. Mentions never overlap, and "next Tuesday at 3 pm" is one,
+not three.
+
+A mention must hold a number, a number word, or one of CLDR's relative words
+("tomorrow", "next week"): "3 apples" does not read, and a month or a
+weekday name alone is a mention only with C<names>. So "Monday to Friday" is
+found with C<names> and not without it. A bare hour in a twelve-hour locale
+is one only where C<bare_hour> says which.
+
+Quotes and brackets round a mention and a sentence's full stop are not part
+of it, and a bracket it opens takes its closer ("15:05 (GMT)"). Each Match's
+C<text> is the whole text and its C<start> and C<end> the mention's place in
+it, in characters of the text as given. A span is read as a point first,
+then as an interval where it holds a separator the locale writes between
+two ends ("to", "–", "～"), then as a duration.
+
+Over every locale, what C<format_date> and C<format_datetime> write in their
+long width is found whole inside other words, as C<parse> reads it, but for
+three: Basque nests brackets, Khmer writes its zone's name with a zero-width
+space, and Toki Pona's date is longer than twelve words.
 
 =head1 ERRORS
 

@@ -2,7 +2,7 @@ package Mail::DKIM2::DSN;
 use strict;
 use warnings;
 
-our $VERSION = '0.25';
+our $VERSION = '0.27';
 
 use Email::MIME;
 use Carp;

@@ -390,7 +390,9 @@ my $HOP1_TEXT = add_sig(add_mi(message()), %HOP1);
     is($s->result, 'signed', 'signer: forwarding without a From change needs no From match');
 }
 
-# --- C9: the primary error is the first in -07 section 14 order ------------------------
+# --- C9: the primary error: structure (14.2), the Message-Instances (14.2
+# content, then 14.7), then the signatures (14.2 fields, 14.3 to 14.6), then
+# From (14.8) ------------------------------------------------------------------
 {
     # DKIM2-Signature i=$i's signature value with one base64 character
     # changed mid-value: still well-formed, no longer valid.
@@ -412,9 +414,26 @@ my $HOP1_TEXT = add_sig(add_mi(message()), %HOP1);
     is_error($corrupt->(add_sig(add_mi(message()), %HOP1, mf => '<a@example.net>'), 1),
         'permerror', 'PERMERROR: DKIM2-Signature i=1 MAIL FROM and d= do not match',
         'C9: custody and a bad signature (14.4 before 14.6)');
-    (my $subj = $corrupt->($HOP1_TEXT, 1)) =~ s/^Subject: .*$/Subject: tampered/m or die;
-    is_error($subj, 'fail', 'FAIL: DKIM2-Signature i=1 selector sel1 incorrect signature',
-        'C9: a bad signature and a header hash (14.6 before 14.7)');
+
+    # The Message-Instances before the signatures: a header or body hash that
+    # does not match is the primary error over any signature's, and no key
+    # is fetched for it.
+    my $tamper = sub { (my $t = $_[0]) =~ s/^Subject: .*$/Subject: tampered/m or die; $t };
+    is_error($tamper->($corrupt->($HOP1_TEXT, 1)),
+        'fail', 'FAIL: Message-Instance m=1 header hash sha256 mismatch',
+        'C9: a header hash and a bad signature (14.7 before 14.6)');
+    is_error($tamper->(add_sig(add_mi(message()), %HOP1, t => time - 15 * 86400)),
+        'fail', 'FAIL: Message-Instance m=1 header hash sha256 mismatch',
+        'C9: a header hash and an expired signature (14.7 before 14.3)');
+    is_error($tamper->(add_sig(add_mi(message()), %HOP1, mf => '<a@example.net>')),
+        'fail', 'FAIL: Message-Instance m=1 header hash sha256 mismatch',
+        'C9: a header hash and custody (14.7 before 14.4)');
+    (my $body = $HOP1_TEXT) =~ s/^body\r\n\z/changed\r\n/m or die;
+    my $fetched = 0;
+    is_error($body, 'fail', 'FAIL: Message-Instance m=1 body hash sha256 mismatch',
+        'C9: a body hash and no key (14.7 before 14.5)',
+        PubkeyCallback => sub { $fetched++; die "TEMPERROR: no DNS\n" });
+    is($fetched, 0, 'C9: no key is fetched for instances that do not match');
 }
 
 done_testing;

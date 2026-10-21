@@ -26,8 +26,12 @@
       "build" : {
          "requires" : {
             "AnyEvent" : "5.261",
+            "JSON::XS" : "2",
             "Test::Fatal" : "0.003",
-            "Test::More" : "0.94"
+            "Test::LeakTrace" : "0.13",
+            "Test::More" : "0.94",
+            "Test::SharedFork" : "0.25",
+            "Test::TCP" : "1.12"
          }
       },
       "configure" : {
@@ -52,14 +56,14 @@
       "runtime" : {
          "recommends" : {
             "Alien::OpenSSL" : "0",
-            "Alien::nghttp2" : "0",
-            "Plack" : "0.995"
+            "Alien::nghttp2" : "0"
          },
          "requires" : {
             "EV" : "4",
             "File::Spec" : "0",
             "Guard" : "1.012",
             "List::Util" : "1.33",
+            "Plack" : "0.995",
             "Scalar::Util" : "1.19",
             "perl" : "5.014"
          }
@@ -67,18 +71,14 @@
       "test" : {
          "recommends" : {
             "IO::Socket::SSL" : "0",
-            "JSON::XS" : "2",
-            "Net::SSLeay" : "0",
-            "Test::LeakTrace" : "0.13",
-            "Test::SharedFork" : "0.25",
-            "Test::TCP" : "1.12"
+            "Net::SSLeay" : "0"
          }
       }
    },
    "provides" : {
       "Feersum" : {
          "file" : "lib/Feersum.pm",
-         "version" : "1.507"
+         "version" : "1.509"
       },
       "Feersum::Connection" : {
          "file" : "lib/Feersum/Connection.pm"
@@ -113,6 +113,6 @@
          "web" : "https://github.com/vividsnow/Feersum"
       }
    },
-   "version" : "1.507",
+   "version" : "1.509",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

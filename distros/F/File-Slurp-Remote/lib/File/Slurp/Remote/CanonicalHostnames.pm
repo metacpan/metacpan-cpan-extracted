@@ -1,9 +1,10 @@
-
 package File::Slurp::Remote::CanonicalHostnames;
 
 use strict;
 use warnings;
 use File::Slurp::Remote::BrokenDNS qw($myfqdn %fqdnify);
+
+our $VERSION = '0.48';
 
 sub new
 {
@@ -23,17 +24,19 @@ sub canonicalize
 	return $fqdnify{$name};
 }
 
+1;
+
 __END__
 
 =head1 NAME
 
-package File::Slurp::Remote::CanonicalHostnames - a hostname canonicalizer example
+File::Slurp::Remote::CanonicalHostnames - a hostname canonicalizer example
 
 =head1 SYNOPSIS
 
  use File::Slurp::Remote::CanonicalHostnames;
 
- my $canonicalizer = File::Slurp::Remote:CanonicalHostnames->new();
+ my $canonicalizer = File::Slurp::Remote::CanonicalHostnames->new();
 
  my $my_hostname = $canonicalizer->myname;
 
@@ -52,16 +55,14 @@ questions.  L<Proc::JobQueue> will use this package by default, but you can
 override this behavior when you create L<Proc::JobQueue> objects and use
 a different package that provides the same interface.
 
-File::Slurp::Remote::CannonicalHostnames uses L<File::Slurp::Remote::BrokenDNS>
+File::Slurp::Remote::CanonicalHostnames uses L<File::Slurp::Remote::BrokenDNS>
 to do its work.  
 
 =head1 INTERFACE
 
-There following methods are required:
+The following methods are required:
 
-=head1
-
-=over 18
+=over 4
 
 =item new()
 

@@ -20,7 +20,7 @@ SKIP: {
     my ($fh, $path) = tempfile(UNLINK => 1, SUFFIX => '.shm');
     my $bad = ~0;  # all-ones 64-bit
     print $fh pack('V V V V Q< Q< Q< Q<',
-        0x44455132, 2, 8, 0, 16, 1024, $bad, $bad);
+        0x44455133, 3, 8, 0, 16, 1024, $bad, $bad);
     print $fh "\0" x (1024 - tell($fh));
     close $fh;
     open(my $rfh, '+<', $path) or die "open: $!";

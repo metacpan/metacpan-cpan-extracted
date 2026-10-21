@@ -85,7 +85,10 @@ tkn_w_frame(pTHX_ SV *words, SV *text, const char *key, SV **rest, SV **raw)
     tkn_fold_text(aTHX_ text, &F);
     for (i = 0; i < n; i++) {
         AV *ph = (AV *)SvRV(*av_fetch(list, i, 0));
-        SV *got = tkn_frame_match(aTHX_ &F, *av_fetch(ph, 2, 0), SvIV(*av_fetch(ph, 3, 0)), *av_fetch(ph, 4, 0));
+        IV flags = SvIV(*av_fetch(ph, 3, 0));
+        SV *got = tkn_frame_match(aTHX_ &F, *av_fetch(ph, 2, 0), flags, *av_fetch(ph, 4, 0));
+        if (got && (flags & TKN_F_MARK) && !SvCUR(got))
+            continue;
         if (got) {
             *rest = got;
             *raw = *av_fetch(ph, 1, 0);
@@ -242,6 +245,7 @@ tkn_fixed_with(pTHX_ tkn_lexicon *L, SV *s, const char *field)
 }
 
 static SV *tkn_phrase(pTHX_ SV *self, tkn_lexicon *L, SV *words, SV *text, SV *k, HV *info);
+static SV *tkn_day_phrase(pTHX_ SV *self, tkn_lexicon *L, SV *words, SV *text, HV *info);
 
 /* _weekday_name: a bare weekday, the coming one (or the past one). */
 static SV *
@@ -279,7 +283,7 @@ tkn_whole(pTHX_ tkn_lexicon *L, SV *k)
 static SV *
 tkn_day(pTHX_ SV *self, tkn_lexicon *L, SV *words, SV *text, SV *k, HV *info)
 {
-    SV *ct[2], *ck[2];
+    SV *ct[3], *ck[3];
     int nc = 1, c;
     ct[0] = text;
     ck[0] = k;
@@ -296,6 +300,10 @@ tkn_day(pTHX_ SV *self, tkn_lexicon *L, SV *words, SV *text, SV *k, HV *info)
             ct[1] = st;
             ck[1] = sk;
             nc = 2;
+        }
+        if (ct[0] != text) {
+            ct[nc] = text;
+            ck[nc++] = k;
         }
     }
     for (c = 0; c < nc; c++) {
@@ -362,6 +370,15 @@ tkn_edge(pTHX_ SV *self, tkn_lexicon *L, SV *words, SV *text, SV *k, int end, SV
             failed = ci;
     }
     if (!v) {
+        /* a day ordinal ("end of the 20th") */
+        HV *oi = tkn_info_new(aTHX);
+        if ((v = tkn_day_phrase(aTHX_ self, L, words, text, oi))) {
+            SV *pr = tkn_hsv(aTHX_ oi, "precision");
+            p = pr ? SvPV_nolen(sv_2mortal(newSVsv(pr))) : "day";
+            tkn_info_set(aTHX_ info, oi);
+        }
+    }
+    if (!v) {
         if (failed)
             tkn_info_set(aTHX_ info, failed);
         return NULL;
@@ -398,6 +415,66 @@ tkn_edge(pTHX_ SV *self, tkn_lexicon *L, SV *words, SV *text, SV *k, int end, SV
     }
 }
 
+/* An ordinal weekday in the period a text names: the nth (-1 the last)
+ * weekday dow of its month. nword and wdword name them in a reason, token
+ * the word a reason about the period points at. */
+static SV *
+tkn_nth_in(pTHX_ SV *self, tkn_lexicon *L, SV *words, IV n, SV *nword, int dow, SV *wdword, SV *right, SV *token, HV *info)
+{
+    SV *period = NULL, *nsv;
+    HV *pi = NULL;
+    AV *cands = tkn_w_articled(aTHX_ words, right);
+    I32 j;
+    for (j = 0; j <= av_len(cands); j++) {
+        SV *cand = *av_fetch(cands, j, 0);
+        pi = tkn_info_new(aTHX);
+        period = tkn_day(aTHX_ self, L, words, cand, tkn_key_sv(aTHX_ L, cand), pi);
+        if (period || tkn_has_reason(aTHX_ pi))
+            break;
+    }
+    if (!period) {
+        if (pi && tkn_has_reason(aTHX_ pi))
+            tkn_merge(aTHX_ info, pi);
+        return NULL;
+    }
+    {
+        SV *pp = tkn_hsv(aTHX_ pi, "precision");
+        const char *p = pp && SvTRUE(pp) ? SvPV_nolen(pp) : "day";
+        time_keeper_point in, mo, out;
+        SV *month;
+        if (strNE(p, "month")) {
+            (void)hv_stores(info, "reason", newSVpvf("an ordinal weekday is counted in a month, not a %s", p));
+            (void)hv_stores(info, "token", newSVsv(token));
+            return NULL;
+        }
+        if (n > 5) {
+            (void)hv_stores(info, "reason", newSVpvf("no month has a %" SVf " %" SVf, SVfARG(nword), SVfARG(wdword)));
+            (void)hv_stores(info, "token", newSVsv(nword));
+            return NULL;
+        }
+        month = tkn_truncate(aTHX_ period, TIME_KEEPER_UNIT_MONTH);
+        tkn_pt(aTHX_ month, &mo);
+        in = mo;
+        if (n == 0 || (TKN_TK->nth_in_month)(aTHX_ &in, dow, n < 0 ? -1 : (int)n, TIME_KEEPER_GAP_FAIL,
+                                             TIME_KEEPER_OVERLAP_EARLIER, &out, NULL, 0) != TIME_KEEPER_OK) {
+            time_keeper_civil mc;
+            tkn_civil_of(aTHX_ month, &mc);
+            (void)hv_stores(info, "reason", newSVpvf("%04d-%02d has no %" SVf " %" SVf, (int)mc.year, mc.month,
+                                                     SVfARG(nword), SVfARG(wdword)));
+            (void)hv_stores(info, "token", newSVsv(nword));
+            return NULL;
+        }
+        (void)hv_stores(info, "precision", newSVpvs("day"));
+        {
+            AV *a = tkn_assumed(aTHX_ info);
+            tkn_assumed_drop(aTHX_ tkn_assumed(aTHX_ pi), a, 1);
+            av_push(a, newSVpvs("time"));
+        }
+        nsv = tkn_pt_sv(aTHX_ &out);
+        return tkn_truncate(aTHX_ nsv, TIME_KEEPER_UNIT_DAY);
+    }
+}
+
 /* _nth: "the third Friday of next month", "the last Friday of October". */
 static SV *
 tkn_nth(pTHX_ SV *self, tkn_lexicon *L, SV *words, SV *text, HV *info)
@@ -425,11 +502,10 @@ tkn_nth(pTHX_ SV *self, tkn_lexicon *L, SV *words, SV *text, HV *info)
     }
     nt = av_len(tok) + 1;
     for (cut = 1; cut < nt; cut++) {
-        SV *first = sv_2mortal(newSVpvs("")), *rest = sv_2mortal(newSVpvs("")), *nsv, *period = NULL;
-        HV *wd, *pi = NULL;
+        SV *first = sv_2mortal(newSVpvs("")), *rest = sv_2mortal(newSVpvs(""));
+        HV *wd;
         IV n;
         I32 j;
-        AV *cands;
         SvUTF8_on(first);
         SvUTF8_on(rest);
         for (j = 0; j < cut; j++) {
@@ -457,57 +533,149 @@ tkn_nth(pTHX_ SV *self, tkn_lexicon *L, SV *words, SV *text, HV *info)
         }
         if (!(wd = tkn_fixed_with(aTHX_ L, rest, "weekday")))
             continue;
-        cands = tkn_w_articled(aTHX_ words, right);
-        for (j = 0; j <= av_len(cands); j++) {
-            SV *cand = *av_fetch(cands, j, 0);
-            pi = tkn_info_new(aTHX);
-            period = tkn_day(aTHX_ self, L, words, cand, tkn_key_sv(aTHX_ L, cand), pi);
-            if (period || tkn_has_reason(aTHX_ pi))
-                break;
-        }
-        if (!period) {
-            if (pi && tkn_has_reason(aTHX_ pi))
-                tkn_merge(aTHX_ info, pi);
-            return NULL;
-        }
-        {
-            SV *pp = tkn_hsv(aTHX_ pi, "precision");
-            const char *p = pp && SvTRUE(pp) ? SvPV_nolen(pp) : "day";
-            time_keeper_point in, mo, out;
-            int dow = (int)SvIV(tkn_hsv(aTHX_ wd, "weekday"));
-            SV *month;
-            if (strNE(p, "month")) {
-                (void)hv_stores(info, "reason", newSVpvf("an ordinal weekday is counted in a month, not a %s", p));
-                (void)hv_stores(info, "token", newSVsv(of));
-                return NULL;
-            }
-            if (n > 5) {
-                (void)hv_stores(info, "reason", newSVpvf("no month has a %" SVf " %" SVf, SVfARG(first), SVfARG(*av_fetch(tok, cut, 0))));
-                (void)hv_stores(info, "token", newSVsv(first));
-                return NULL;
-            }
-            month = tkn_truncate(aTHX_ period, TIME_KEEPER_UNIT_MONTH);
-            tkn_pt(aTHX_ month, &mo);
-            in = mo;
-            if (n == 0 || (TKN_TK->nth_in_month)(aTHX_ &in, dow, n < 0 ? -1 : (int)n, TIME_KEEPER_GAP_FAIL,
-                                                 TIME_KEEPER_OVERLAP_EARLIER, &out, NULL, 0) != TIME_KEEPER_OK) {
-                time_keeper_civil mc;
-                tkn_civil_of(aTHX_ month, &mc);
-                (void)hv_stores(info, "reason", newSVpvf("%04d-%02d has no %" SVf " %" SVf, (int)mc.year, mc.month,
-                                                         SVfARG(first), SVfARG(*av_fetch(tok, cut, 0))));
-                (void)hv_stores(info, "token", newSVsv(first));
-                return NULL;
-            }
-            (void)hv_stores(info, "precision", newSVpvs("day"));
-            {
-                AV *a = tkn_assumed(aTHX_ info);
-                tkn_assumed_drop(aTHX_ tkn_assumed(aTHX_ pi), a, 1);
-                av_push(a, newSVpvs("time"));
-            }
-            nsv = tkn_pt_sv(aTHX_ &out);
-            return tkn_truncate(aTHX_ nsv, TIME_KEEPER_UNIT_DAY);
-        }
+        return tkn_nth_in(aTHX_ self, L, words, n, first, (int)SvIV(tkn_hsv(aTHX_ wd, "weekday")), *av_fetch(tok, cut, 0), right, of, info);
     }
+    return NULL;
+}
+
+/* An nth frame's three slots as a text fills them. */
+typedef struct {
+    const tkn_fold *F;
+    AV *lits;
+    const char *order;
+    STRLEN a[3], b[3];
+    SV *self, *words, *v;
+    tkn_lexicon *L;
+    HV *info, *failed;
+    IV n;
+    int dow;
+} tkn_nth_fill;
+
+static SV *
+tkn_nth_slot(pTHX_ tkn_nth_fill *N, int i)
+{
+    STRLEN a = tkn_fskip_ws(N->F, N->a[i]), b = tkn_ftrim_end(N->F, a, N->b[i]);
+    return b > a ? tkn_fsub(aTHX_ N->F, a, b) : NULL;
+}
+
+/* {n}: digits, a number word, an ordinal word or a last word (-1). */
+static int
+tkn_nth_number(pTHX_ tkn_nth_fill *N, SV *t, IV *n)
+{
+    SV *d = tkn_trim(aTHX_ tkn_ascii_digits(aTHX_ t, N->L->has_digits ? N->L->digits : NULL)), *k, *v;
+    STRLEN dl, i;
+    const char *db = SvPV_const(d, dl);
+    for (i = 0; i < dl && isDIGIT_A(db[i]); i++)
+        ;
+    if (dl && dl <= 2 && i == dl) {
+        *n = (IV)atoi(db);
+        return 1;
+    }
+    k = tkn_key_sv(aTHX_ N->L, t);
+    if (tkn_w_is(aTHX_ N->words, k, "last")) {
+        *n = -1;
+        return 1;
+    }
+    if (!N->L->ordinals_read) {
+        N->L->ordinals_read = 1;
+        tkn_number_words(aTHX_ N->L, TKN_T_ORDINALS, "ordinals");
+    }
+    if ((v = tkn_value_of(aTHX_ N->L, TKN_T_ORDINALS, k)) || (v = tkn_value_of(aTHX_ N->L, TKN_T_NUMBERS, k))) {
+        *n = SvIV(v);
+        return 1;
+    }
+    return 0;
+}
+
+/* Fill slot i from pos on: each end where the next literal matches, the
+ * number and the weekday checked as they are filled, the period read once
+ * all three are. 1 when a value is found. */
+static int
+tkn_nth_walk(pTHX_ tkn_nth_fill *N, int i, STRLEN pos)
+{
+    const tkn_fold *F = N->F;
+    SV *next;
+    STRLEN e = pos;
+    if (i == 3) {
+        int s, pi = 0, ni = 0, wi = 0;
+        SV *pt, *nt, *wt;
+        HV *ri;
+        for (s = 0; s < 3; s++) {
+            if (N->order[s] == TKN_SLOT_PERIOD) pi = s;
+            if (N->order[s] == TKN_SLOT_N) ni = s;
+            if (N->order[s] == TKN_SLOT_WEEKDAY) wi = s;
+        }
+        pt = tkn_nth_slot(aTHX_ N, pi);
+        nt = tkn_nth_slot(aTHX_ N, ni);
+        wt = tkn_nth_slot(aTHX_ N, wi);
+        ri = tkn_info_new(aTHX);
+        N->v = tkn_nth_in(aTHX_ N->self, N->L, N->words, N->n, nt, N->dow, wt, pt, pt, ri);
+        if (N->v) {
+            tkn_info_set(aTHX_ N->info, ri);
+            return 1;
+        }
+        if (!N->failed && tkn_has_reason(aTHX_ ri))
+            N->failed = ri;
+        return 0;
+    }
+    next = *av_fetch(N->lits, i + 1, 0);
+    while (e < F->flen) {
+        IV m;
+        e = tkn_fnext(F, e);
+        if (F->f[e - 1] == '\n')
+            return 0;
+        m = tkn_match_toks(F, next, e);
+        if (m < 0 || (i == 2 && tkn_fskip_ws(F, (STRLEN)m) != F->flen))
+            continue;
+        N->a[i] = pos;
+        N->b[i] = e;
+        {
+            SV *t = tkn_nth_slot(aTHX_ N, i);
+            HV *wd;
+            if (!t)
+                continue;
+            if (N->order[i] == TKN_SLOT_N && !tkn_nth_number(aTHX_ N, t, &N->n))
+                continue;
+            if (N->order[i] == TKN_SLOT_WEEKDAY) {
+                if (!(wd = tkn_fixed_with(aTHX_ N->L, tkn_key_sv(aTHX_ N->L, t), "weekday")))
+                    continue;
+                N->dow = (int)SvIV(tkn_hsv(aTHX_ wd, "weekday"));
+            }
+        }
+        if (tkn_nth_walk(aTHX_ N, i + 1, (STRLEN)m))
+            return 1;
+    }
+    return 0;
+}
+
+/* An nth frame of the table: "来月の第3金曜日", "в третью пятницу октября". */
+static SV *
+tkn_nth_frame(pTHX_ SV *self, tkn_lexicon *L, SV *words, SV *text, HV *info)
+{
+    AV *list = tkn_phrases_of(aTHX_ words, sv_2mortal(newSVpvs("nth")));
+    I32 i, n = list ? av_len(list) + 1 : 0;
+    tkn_fold F;
+    tkn_nth_fill N;
+    if (!n)
+        return NULL;
+    tkn_fold_text(aTHX_ text, &F);
+    Zero(&N, 1, tkn_nth_fill);
+    N.F = &F;
+    N.self = self;
+    N.words = words;
+    N.L = L;
+    N.info = info;
+    for (i = 0; i < n; i++) {
+        AV *ph = (AV *)SvRV(*av_fetch(list, i, 0));
+        IV m;
+        N.lits = (AV *)SvRV(*av_fetch(ph, 2, 0));
+        N.order = SvPVX(*av_fetch(ph, 5, 0));
+        m = tkn_match_toks(&F, *av_fetch(N.lits, 0, 0), tkn_fskip_ws(&F, 0));
+        if (m >= 0 && tkn_nth_walk(aTHX_ &N, 0, (STRLEN)m))
+            return N.v;
+    }
+    if (N.failed)
+        tkn_info_set(aTHX_ info, N.failed);
     return NULL;
 }
 
@@ -581,6 +749,12 @@ tkn_worded(pTHX_ SV *self, tkn_lexicon *L, SV *words, SV *text, SV *k, HV *info)
         v = tkn_day(aTHX_ self, L, words, t, kk, di);
         if (!v && !tkn_has_reason(aTHX_ di))
             v = tkn_combined(aTHX_ self, L, NULL, words, t, di);
+        if (!v && !tkn_has_reason(aTHX_ di)) {
+            /* a day ordinal ("on the 20th") */
+            HV *oi = tkn_info_new(aTHX);
+            if ((v = tkn_day_phrase(aTHX_ self, L, words, t, oi)))
+                di = oi;
+        }
         if (v || tkn_has_reason(aTHX_ di)) {
             tkn_info_set(aTHX_ info, di);
             return v;
@@ -628,6 +802,14 @@ tkn_worded(pTHX_ SV *self, tkn_lexicon *L, SV *words, SV *text, SV *k, HV *info)
             return v;
         }
     }
+    if (tkn_w_count(aTHX_ words, "nth")) {
+        HV *ni = tkn_info_new(aTHX);
+        v = tkn_nth_frame(aTHX_ self, L, words, text, ni);
+        if (v || tkn_has_reason(aTHX_ ni)) {
+            tkn_info_set(aTHX_ info, ni);
+            return v;
+        }
+    }
     return NULL;
 }
 
@@ -663,10 +845,69 @@ static SV *tkn_zone_phrase(pTHX_ SV *self, tkn_lexicon *L, SV *words, SV *text, 
 static SV *tkn_frac_phrase(pTHX_ SV *self, tkn_lexicon *L, SV *text, HV *info);
 static SV *tkn_point_phrase(pTHX_ SV *self, tkn_lexicon *L, SV *words, SV *text, HV *info);
 
+/* The text with the table's aliases put back to the CLDR phrases they
+ * inflect ("Ende nächsten Monats" -> "Ende nächsten Monat"), longest first,
+ * leftmost, whole words in a spaced locale; NULL when none is in it. */
+static int
+tkn_alias_edge(const tkn_fold *F, STRLEN p, int before)
+{
+    STRLEN cl;
+    const char *q;
+    if (before ? p == 0 : p >= F->flen)
+        return 1;
+    if (!before)
+        return tkn_is_space_cp(tkn_utf8_cp((const U8 *)F->f + p, (const U8 *)F->f + F->flen, &cl)) || (F->f[p] > 0 && isPUNCT_A(F->f[p]));
+    q = F->f + p - 1;
+    while (q > F->f && ((U8)*q & 0xC0) == 0x80)
+        q--;
+    return tkn_is_space_cp(tkn_utf8_cp((const U8 *)q, (const U8 *)F->f + F->flen, &cl)) || (*q > 0 && isPUNCT_A(*q));
+}
+
+static SV *
+tkn_alias_text(pTHX_ tkn_lexicon *L, SV *words, SV *text)
+{
+    AV *list = tkn_phrases_of(aTHX_ words, sv_2mortal(newSVpvs("alias")));
+    I32 i, n = list ? av_len(list) + 1 : 0;
+    tkn_fold F;
+    SV *out;
+    STRLEN p = 0, last = 0;
+    int hits = 0;
+    if (!n)
+        return NULL;
+    tkn_fold_text(aTHX_ text, &F);
+    out = sv_2mortal(newSVpvs(""));
+    SvUTF8_on(out);
+    while (p < F.flen) {
+        IV m = -1;
+        AV *hit = NULL;
+        if (L->spaceless || tkn_alias_edge(&F, p, 1))
+            for (i = 0; i < n; i++) {
+                AV *ph = (AV *)SvRV(*av_fetch(list, i, 0));
+                m = tkn_match_toks(&F, *av_fetch(ph, 2, 0), p);
+                if (m > (IV)p && (L->spaceless || tkn_alias_edge(&F, (STRLEN)m, 0))) {
+                    hit = ph;
+                    break;
+                }
+            }
+        if (!hit) {
+            p = tkn_fnext(&F, p);
+            continue;
+        }
+        sv_catpvn(out, F.t + F.off[last], F.off[p] - F.off[last]);
+        sv_catsv(out, *av_fetch(hit, 4, 0));
+        last = p = (STRLEN)m;
+        hits++;
+    }
+    if (!hits)
+        return NULL;
+    sv_catpvn(out, F.t + F.off[last], F.tlen - F.off[last]);
+    return out;
+}
+
 /* _phrase without a zone: and where 0.01's reading fails, with a day
  * ordinal ("the 15th") read. */
 static SV *
-tkn_phrase_dated(pTHX_ SV *self, tkn_lexicon *L, SV *words, SV *text, SV *k, HV *info)
+tkn_phrase_dated0(pTHX_ SV *self, tkn_lexicon *L, SV *words, SV *text, SV *k, HV *info)
 {
     SV *v = tkn_phrase0(aTHX_ self, L, words, text, k, info);
     HV *di;
@@ -688,6 +929,22 @@ tkn_phrase_dated(pTHX_ SV *self, tkn_lexicon *L, SV *words, SV *text, SV *k, HV 
     v = tkn_point_phrase(aTHX_ self, L, words, text, di);
     if (v)
         tkn_info_set(aTHX_ info, di);
+    return v;
+}
+
+/* And where that fails, the text read again with the table's aliases
+ * put back. */
+static SV *
+tkn_phrase_dated(pTHX_ SV *self, tkn_lexicon *L, SV *words, SV *text, SV *k, HV *info)
+{
+    SV *v = tkn_phrase_dated0(aTHX_ self, L, words, text, k, info), *t2;
+    HV *ai;
+    if (v || !tkn_words_ok(words) || !(t2 = tkn_alias_text(aTHX_ L, words, text)))
+        return v;
+    ai = tkn_info_new(aTHX);
+    v = tkn_phrase_dated0(aTHX_ self, L, words, t2, tkn_key_sv(aTHX_ L, t2), ai);
+    if (v)
+        tkn_info_set(aTHX_ info, ai);
     return v;
 }
 

@@ -1310,10 +1310,12 @@ subtest 'Transaction 19: Line graph lifecycle' => sub {
 	SKIP: {
 		eval { require HTML::D3 } or skip 'HTML::D3 not available', 13;
 
+		my $d3_url = $t->app->config('d3_url');
+
 		# Phase 3: valid params render a D3.js chart page.
 		$t->get_ok('/graph?l=table:sales&x=product&y=amount')
 			->status_is(200, 'Phase 3: /graph with valid params returns 200')
-			->content_like(qr/d3\.js|d3\.v7/, 'Phase 3: D3.js included in output')
+			->content_like(qr/\Q$d3_url\E/, 'Phase 3: D3.js included in output')
 			->content_like(qr/Back to table/, 'Phase 3: back link present')
 			->content_like(qr/Export SVG/,    'Phase 3: SVG export button present')
 			->content_like(qr/Export PNG/,    'Phase 3: PNG export button present')
@@ -1358,6 +1360,8 @@ subtest 'Transaction 20: Graph UI polish, date-sort JS, and numeric Y-axis filte
 	SKIP: {
 		eval { require HTML::D3 } or skip 'HTML::D3 not available', 9;
 
+		my $d3_url = $t->app->config('d3_url');
+
 		# Phase 2: /graph renders via the TT layout with the snippet embedded.
 		$t->get_ok('/graph?l=table:sales&x=product&y=amount')
 			->status_is(200, 'Phase 2: /graph with valid params returns 200')
@@ -1369,8 +1373,8 @@ subtest 'Transaction 20: Graph UI polish, date-sort JS, and numeric Y-axis filte
 				'Phase 2: graph-container div present')
 			->content_like(qr/chart-resize-handle/,
 				'Phase 2: resize handle JS injected for chart pages')
-			->content_like(qr/d3\.v7/,
-				'Phase 2: D3.js v7 loaded via CDN script tag')
+			->content_like(qr/\Q$d3_url\E/,
+				'Phase 2: D3.js loaded from the configured URL')
 			->content_like(qr/biExportSVG|Export SVG/,
 				'Phase 2: SVG export button present')
 			# Phase 2a: animated initial draw (HTML::D3 >= 0.13 animated => 1).

@@ -1,4 +1,8 @@
 Revision history for Time-Keeper-Sky
 
+0.02    2026-10-20
+	- Fix: build failed on Solaris
+	- Builds on perl 5.10.0 (mPUSHs, newSVpvn_flags).
+
 0.01    2026-10-19
 	- First version

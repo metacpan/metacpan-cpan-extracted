@@ -51,7 +51,7 @@ PROTOTYPES: DISABLE
 # a caller who writes Struct::Codec::encode in full. Only the long names are
 # ever exported, so neither collides with Encode's in a caller's namespace.
 #
-# Options follow the value as pairs. The only one is strip_pointers, and an
+# Options follow the value as pairs, strip_pointers and canonical, and an
 # unknown name is an error rather than a silently ignored typo.
 SV *
 struct_encode(value, ...)
@@ -70,6 +70,10 @@ struct_encode(value, ...)
             if (n == 14 && memEQ(k, "strip_pointers", 14)) {
                 if (SvTRUE(ST(i + 1))) flags |= SC_STRIP_POINTERS;
                 else                   flags &= ~SC_STRIP_POINTERS;
+            }
+            else if (n == 9 && memEQ(k, "canonical", 9)) {
+                if (SvTRUE(ST(i + 1))) flags |= SC_CANONICAL;
+                else                   flags &= ~SC_CANONICAL;
             }
             else {
                 croak("Struct::Codec: unknown option '%" SVf "'", SVfARG(ST(i)));

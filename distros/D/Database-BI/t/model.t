@@ -299,6 +299,291 @@ subtest '/a/:id returns 404 for unknown id' => sub {
 	  ->status_is(404);
 };
 
+subtest 'POST /api/analyses/:id/visuals appends a rendered table or chart' => sub {
+	my $sales_path = $t->app->home->child('data/sales.csv')->to_string;
+	plan skip_all => 'data/sales.csv not found' unless -f $sales_path;
+
+	my $spec = {
+		name     => 'Append visuals',
+		datasets => [ { spec => "path:$sales_path", alias => 'left' } ],
+		visuals  => [ { kind => 'table', encode => {}, title => 'All rows' } ],
+		layout   => [ { visual => 0, x => 1, y => 1, w => 6, h => 3 } ],
+		params   => { factor => { type => 'number', default => 1 } },
+	};
+	my $cid = $t->post_ok('/api/analyses',
+		{ 'Content-Type' => 'application/json' },
+		encode_json($spec)
+	)->status_is(201)->tx->res->json->{id};
+
+	$t->post_ok("/api/analyses/$cid/visuals",
+		{ 'Content-Type' => 'application/json' },
+		encode_json({
+			kind   => 'table',
+			encode => { columns => ['region', 'amount'] },
+			title  => 'Regions',
+		})
+	)->status_is(201)
+	 ->json_is('/id'     => $cid)
+	 ->json_is('/visual' => 1)
+	 ->json_is('/title'  => 'Regions');
+
+	my $table_html = $t->tx->res->json->{html};
+	like $table_html, qr/<table/, 'the response carries the rendered table';
+	like $table_html, qr/North/,  'the new table renders the canvas rows';
+
+	$t->get_ok("/api/analyses/$cid")->status_is(200);
+	my $stored = $t->tx->res->json;
+	is scalar @{ $stored->{visuals} }, 2, 'the table was appended to the saved visuals';
+	is $stored->{visuals}[1]{kind}, 'table', 'the appended visual keeps its kind';
+	is_deeply $stored->{visuals}[1]{encode}{columns}, [qw(region amount)],
+		'the appended table keeps its chosen columns';
+	is scalar @{ $stored->{layout} }, 1,
+		'the new card is auto-placed, leaving the saved layout alone';
+
+	$t->post_ok("/api/analyses/$cid/visuals",
+		{ 'Content-Type' => 'application/json' },
+		encode_json({
+			kind   => 'bar',
+			encode => { cat => 'region', value => 'amount' },
+			title  => 'Amount by region',
+		})
+	)->status_is(201)
+	 ->json_is('/visual' => 2)
+	 ->json_is('/title'  => 'Amount by region')
+	 ->json_is('/kind'   => 'bar')
+	 ->json_is('/cf_col' => 'region');
+	like $t->tx->res->json->{html}, qr/<svg/, 'the response carries a rendered chart';
+	like $t->tx->res->json->{html}, qr/id="vis-2"/,
+		'and the chart has an element id of its own, not a shared #bar_chart';
+
+	# A card added in place is drawn against the canvas's own URL state, which
+	# the page sends with the request: without that it would show every region
+	# on a canvas the reader has filtered to one.
+	$t->post_ok("/api/analyses/$cid/visuals",
+		{ 'Content-Type' => 'application/json' },
+		encode_json({
+			kind   => 'bar',
+			encode => { cat => 'region', value => 'amount' },
+			title  => 'North only',
+			query  => '?cf=region:eq:North',
+		})
+	)->status_is(201)->json_is('/visual' => 3);
+
+	my $filtered = $t->tx->res->json->{html};
+	like $filtered, qr/id="vis-3"/, 'the filtered chart has an element id of its own';
+	like $filtered, qr/North/, 'the selected value is drawn';
+	unlike $filtered, qr/South/, 'and the cross-filter the page was showing applied';
+
+	# The same query can carry calculated columns and the parameter values they
+	# reference, so a card using a column the canvas already shows is accepted.
+	require Mojo::Util;
+	my $calc_qs = '?c=' . Mojo::Util::url_escape('scaled:amount * factor') . '&p.factor=2';
+	$t->post_ok("/api/analyses/$cid/visuals",
+		{ 'Content-Type' => 'application/json' },
+		encode_json({
+			kind   => 'table',
+			encode => { columns => ['scaled'] },
+			title  => 'Scaled',
+			query  => $calc_qs,
+		})
+	)->status_is(201)->json_is('/visual' => 4);
+	like $t->tx->res->json->{html}, qr/<th>scaled<\/th>/,
+		'the calculated column named in the query is on the card';
+	like $t->tx->res->json->{html}, qr/>2500</,
+		'and the parameter value in the query was bound';
+
+	$t->get_ok("/api/analyses/$cid")->status_is(200);
+	my $after = $t->tx->res->json;
+	is scalar @{ $after->{visuals} }, 5, 'the chart and the two filtered cards were appended too';
+	is $after->{visuals}[2]{kind}, 'bar', 'the chart kind is stored';
+	is_deeply $after->{visuals}[2]{encode}, { cat => 'region', value => 'amount' },
+		'the chart encoding is stored';
+
+	$t->get_ok("/a/$cid")->status_is(200);
+	my $page = $t->tx->res->body;
+	like $page, qr/id="btn-add-current"/, 'the canvas offers Add current view';
+	like $page, qr/id="ac-panel"/,        'the add panel is on the canvas page';
+	like $page, qr/var canvasColumns = \[/, 'the panel can list the canvas columns';
+	like $page, qr/Amount by region/,      'the appended chart renders on the canvas';
+	like $page, qr/id="vis-2"/, 'the first chart card keeps its element id';
+	like $page, qr/id="vis-3"/, 'the appended chart card has a different one';
+	like $page, qr/d3\.select\("#vis-3"\)/, 'so each card draws into its own element';
+	like $page, qr/finished drawing/, 'and the page can say when the card has finished drawing';
+	like $page, qr/function drawnIn/, 'which it knows from what the script drew, not from the script running';
+	like $page, qr/name: 'D3', what: 'the chart library'/, 'D3 is the library named for a chart';
+	like $page, qr/name: 'Leaflet', what: 'the map library'/, 'and Leaflet for a map';
+	like $page, qr/announceLibMissing\(lib, json\.kind, title\)/, 'and a card whose library is missing is announced by name';
+	like $page, qr/finished redrawing/, 'an edited map says when it has finished redrawing';
+	like $page, qr/could not be redrawn:/, 'and names Leaflet when it cannot be redrawn';
+};
+
+subtest 'A canvas loads D3 from the configured URL' => sub {
+	# The canvas script tag follows d3_url like the chart pages do, so a
+	# self-hosted copy is used for cards appended in place as well.
+	plan skip_all => 'data/sales.csv not found'
+		unless -f $t->app->home->child('data/sales.csv');
+	local $t->app->config->{d3_url} = '/static/d3/d3.min.js';
+
+	my $cid = $t->post_ok('/api/analyses',
+		{ 'Content-Type' => 'application/json' },
+		encode_json({
+			%BASE_SPEC,
+			name    => 'Self-hosted D3 canvas',
+			visuals => [
+				{ kind => 'table', encode => { columns => ['region'] }, title => 'Rows' },
+			],
+		})
+	)->status_is(201)->tx->res->json->{id};
+
+	$t->get_ok("/a/$cid")->status_is(200);
+	my $page = $t->tx->res->body;
+	like $page, qr{<script src="/static/d3/d3\.min\.js"></script>},
+		'the canvas loads D3 from the configured URL';
+	unlike $page, qr{cdnjs\.cloudflare\.com|d3js\.org},
+		'and asks no CDN for D3';
+};
+
+subtest 'A canvas seeded from a chart page keeps the chart options' => sub {
+	my $sales_path = $t->app->home->child('data/sales.csv')->to_string;
+	plan skip_all => 'data/sales.csv not found' unless -f $sales_path;
+	plan skip_all => 'HTML::D3 not available' unless eval { require HTML::D3; 1 };
+	require Mojo::Util;
+
+	# Each case takes the spec the chart page offers New Canvas, saves it as a
+	# canvas and reads the rendered card.  The marker is a line of the drawn
+	# chart, so it is the card that has to keep the option, not just the spec.
+	my @cases = (
+		{
+			label       => 'a horizontal bar',
+			url         => '/bar?l=table:sales&cat=region&val=amount&orient=h',
+			orientation => 'h',
+			marker      => qr/var yScale = d3\.scaleBand\(\)/,
+			what        => 'a seeded canvas draws it horizontally',
+		},
+		{
+			label       => 'a capped bar',
+			url         => '/bar?l=table:sales&cat=region&val=amount&max=1',
+			orientation => 'vertical',
+			max_items   => 1,
+			marker      => qr/"label":"Other"/,
+			what        => 'the top-N cap is kept, with its Other bar',
+		},
+		{
+			label       => 'a horizontal stacked bar',
+			url         => '/stacked?l=table:sales&cat=region&seg=product&val=amount&orient=h',
+			orientation => 'h',
+			marker      => qr/var yScale = d3\.scaleBand\(\)/,
+			what        => 'a seeded canvas draws it horizontally',
+		},
+		{
+			label       => 'a heatmap with values shown',
+			url         => '/heatmap?l=table:sales&x=region&y=product&val=amount&show_val=1',
+			show_values => 1,
+			marker      => qr/var showVals\d* = 1;/,
+			what        => 'a seeded canvas shows the cell values',
+		},
+	);
+
+	for my $case (@cases) {
+		$t->get_ok($case->{url})->status_is(200, "$case->{label}: the chart page renders");
+
+		my ($attr) = $t->tx->res->body =~ /id="new-canvas-panel" data-chart="([^"]*)"/;
+		ok defined $attr, "$case->{label}: the page offers a chart spec" or next;
+		my $spec = decode_json(Mojo::Util::html_unescape($attr));
+
+		if (defined $case->{orientation}) {
+			is $spec->{options}{orientation}, $case->{orientation},
+				"$case->{label}: the spec carries the orientation";
+		}
+		if (defined $case->{max_items}) {
+			is $spec->{options}{max_items}, $case->{max_items},
+				"$case->{label}: the spec carries the bar cap";
+		}
+		if (defined $case->{show_values}) {
+			is $spec->{options}{show_values}, $case->{show_values},
+				"$case->{label}: the spec carries show_values";
+		}
+
+		my $cid = $t->post_ok('/api/analyses',
+			{ 'Content-Type' => 'application/json' },
+			encode_json({
+				name     => 'Seeded: ' . $case->{label},
+				datasets => [ { spec => "path:$sales_path", alias => 'left' } ],
+				visuals  => [ $spec ],
+			})
+		)->status_is(201)->tx->res->json->{id};
+
+		$t->get_ok("/a/$cid")->status_is(200);
+		like $t->tx->res->body, $case->{marker}, $case->{what};
+	}
+};
+
+subtest 'A treemap card renders when the canvas is opened' => sub {
+	my $sales_path = $t->app->home->child('data/sales.csv')->to_string;
+	plan skip_all => 'data/sales.csv not found' unless -f $sales_path;
+	plan skip_all => 'HTML::D3 not available' unless eval { require HTML::D3; 1 };
+
+	# The treemap snippet takes { path, value } rows, not [label, value]
+	# pairs; giving it pairs made the whole canvas 500, which the browser seed
+	# test found.  This is the non-browser guard for it.
+	my $cid = $t->post_ok('/api/analyses',
+		{ 'Content-Type' => 'application/json' },
+		encode_json({
+			name     => 'Treemap canvas',
+			datasets => [ { spec => "path:$sales_path", alias => 'left' } ],
+			visuals  => [ {
+				kind   => 'treemap',
+				encode => { cat => 'product', value => 'amount' },
+				title  => 'Treemap',
+			} ],
+		})
+	)->status_is(201)->tx->res->json->{id};
+
+	$t->get_ok("/a/$cid")
+		->status_is(200, 'the canvas opens')
+		->content_like(qr/id="vis-0"/, 'the card has the treemap element')
+		->content_like(qr/Treemap/, 'and the card is titled');
+};
+
+subtest 'POST /api/analyses/:id/visuals rejects a visual it cannot draw' => sub {
+	my $sales_path = $t->app->home->child('data/sales.csv')->to_string;
+	plan skip_all => 'data/sales.csv not found' unless -f $sales_path;
+
+	my $cid = $t->post_ok('/api/analyses',
+		{ 'Content-Type' => 'application/json' },
+		encode_json({
+			name     => 'Reject visuals',
+			datasets => [ { spec => "path:$sales_path", alias => 'left' } ],
+			visuals  => [ { kind => 'table', encode => {}, title => 'All rows' } ],
+		})
+	)->status_is(201)->tx->res->json->{id};
+
+	$t->post_ok("/api/analyses/$cid/visuals",
+		{ 'Content-Type' => 'application/json' },
+		encode_json({ kind => 'bar', encode => { cat => 'no_such_column', value => 'amount' } })
+	)->status_is(400);
+	like $t->tx->res->json->{error}, qr/Column not found/,
+		'the error names the missing column';
+
+	$t->post_ok("/api/analyses/$cid/visuals",
+		{ 'Content-Type' => 'application/json' },
+		encode_json({ kind => 'sankey', encode => {} })
+	)->status_is(400);
+	like $t->tx->res->json->{error}, qr/Unsupported visual kind/,
+		'the error names the unsupported kind';
+
+	$t->get_ok("/api/analyses/$cid")->status_is(200);
+	is scalar @{ $t->tx->res->json->{visuals} }, 1,
+		'a rejected visual is not stored';
+};
+
+subtest 'POST /api/analyses/:id/visuals returns 404 for unknown canvas' => sub {
+	$t->post_ok('/api/analyses/nosuchcanvas/visuals',
+		{ 'Content-Type' => 'application/json' },
+		encode_json({ kind => 'table', encode => {} })
+	)->status_is(404);
+};
+
 # ---------------------------------------------------------------------------
 # Atomic write: verify no partial JSON on disk
 # ---------------------------------------------------------------------------

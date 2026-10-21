@@ -309,7 +309,6 @@ my $build_requires = {
 	'LWP::UserAgent::Throttled' => 0,
 	'LWP::Protocol::https' => 0,
 	'Scalar::Util' => 0,
-	'Try::Tiny' => 0
 };
 
 if(($^O ne 'solaris') && ($^O ne 'haiku') && ($^O ne 'MSWin32')) {
@@ -336,10 +335,13 @@ my $test_requires = {
 	'CGI::Lingua' => 0,
 	'CHI::Driver::Null' => 0,
 	'Data::Throttler' => 0,
+	'Error' => 0,	# t/utils.t
 	'File::Temp' => 0,
+	'JSON::PP' => 0,	# t/location-predicates.t
 	'Test::Carp' => 0,
 	'Test::Deep' => 0,
 	'Test::DescribeMe' => 0,
+	'Test::Exception' => 0,
 	'Test::Log::Abstraction' => 0,
 	'Test::Memory::Cycle' => 0,
 	'Test::Mockingbird' => 0,
@@ -415,6 +417,8 @@ WriteMakefile(
 		'Locale::SubCountry' => 0,
 		'Locale::US' => 0,
 		'Module::Info' => 0,
+		'Module::Runtime' => 0,	# Geo::Coder::Free::Utils
+		'namespace::clean' => 0,
 		'File::Spec' => 0,
 		'CHI' => 0,
 		'Object::Configure' => 0,
@@ -424,6 +428,7 @@ WriteMakefile(
 		'Storable' => 0,
 		'Text::CSV' => 0,
 		'Text::xSV::Slurp' => 0,
+		'Try::Tiny' => 0,	# Geo::Coder::Free::Utils
 	}, dist => $dist,
 	clean		=> { FILES => 'Geo-Coder-Free-*' },
 	EXE_FILES => [ 'bin/address_lookup' ],
@@ -469,6 +474,42 @@ WriteMakefile(
 			runtime => {
 				recommends => {
 					'Geo::Address::Parser' => 0,
+					'Geo::libpostal' => 0,
+				},
+			},
+			test => {
+				recommends => {
+					# t/consumer-contract.t skips without it, or with an older one
+					'Test::Consumer::Contract' => '0.04',
+				},
+			},
+		},
+		# The website (cgi-bin/page.fcgi and Geo::Coder::Free::Display,
+		# ::Allow and ::Config) needs these; the geocoder does not load them.
+		optional_features => {
+			website => {
+				description => 'Run the geocoding website in cgi-bin/page.fcgi',
+				prereqs => {
+					runtime => {
+						requires => {
+							'CGI::IDS' => 0,
+							'CGI::Info' => 0,
+							'Config::Abstraction' => 0,
+							'Crypt::URandom' => 0,
+							'Data::Throttler' => 0,
+							'DateTime' => 0,
+							'Error' => 0,
+							'HTML::SocialMedia' => 0,
+							'JSON::MaybeXS' => 0,
+							'LWP::Simple::WithCache' => 0,
+							'Template' => 0,
+							'Template::Filters' => 0,
+							'Template::Plugin::EnvHash' => 0,
+							'Template::Plugin::JSON' => 0,
+							'Template::Plugin::Math' => 0,
+							'XML::LibXML' => 0,
+						},
+					},
 				},
 			},
 		},
@@ -476,5 +517,5 @@ WriteMakefile(
 	# PL_FILES => (defined($ENV{'AUTOMATED_TESTING'}) ? {} : {'bin/create_db.PL' => 'bin/create_db'}),
 	# PPM_INSTALL_EXEC	=> 'bash',
 	# PPM_INSTALL_SCRIPT	=> 'bin/create_sqlite',
-	MIN_PERL_VERSION	=> '5.6.2'	# Probably would work, but never tested on earlier versions than this
+	MIN_PERL_VERSION	=> '5.020'	# Geo::Coder::Free::Utils has 'use v5.20'
 );

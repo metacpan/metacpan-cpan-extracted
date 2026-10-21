@@ -6,6 +6,8 @@ use POSIX qw(_exit);
 plan skip_all => 'set VALGRIND=1 to run' unless $ENV{VALGRIND};
 plan skip_all => 'valgrind not found' unless `which valgrind 2>/dev/null`;
 
+local $ENV{PERL_DESTRUCT_LEVEL} = 2;
+
 use File::Temp qw(tmpnam);
 my $path = tmpnam() . ".$$";
 

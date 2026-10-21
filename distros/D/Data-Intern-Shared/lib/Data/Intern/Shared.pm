@@ -1,7 +1,7 @@
 package Data::Intern::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 require XSLoader;
 XSLoader::load('Data::Intern::Shared', $VERSION);
 
@@ -218,8 +218,8 @@ its contents while other processes are using it.
 
 Mutation is guarded by a futex-based write-preferring rwlock with PID-encoded
 ownership; if a holder dies, the next contender detects the dead owner and
-recovers. The arena and tables are append-only and never rewritten in place, so a
-crash leaves the table consistent up to the last completed C<intern>.
+recovers. Interning is append-only, so a crash preserves completed interns;
+recovery finishes an interrupted C<clear>.
 B<Limitation>: PID reuse is not detected (very unlikely in practice).
 
 Reader-slot exhaustion (slotless readers): dead-process recovery attributes a

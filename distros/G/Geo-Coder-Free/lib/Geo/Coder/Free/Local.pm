@@ -17,6 +17,9 @@ use Object::Configure;
 use Params::Get;
 use Readonly;
 use Text::xSV::Slurp;
+# Imported functions are not methods: without this, $obj->croak() and the like
+# would resolve.
+use namespace::clean;
 
 =encoding utf-8
 
@@ -26,11 +29,11 @@ Geo::Coder::Free::Local - Geocode using user-curated local data
 
 =head1 VERSION
 
-Version 0.48
+Version 0.49
 
 =cut
 
-our $VERSION = '0.48';
+our $VERSION = '0.49';
 
 =head1 SYNOPSIS
 
@@ -660,7 +663,7 @@ sub geocode {
 
 =head4 input
 
-    # Input schema (Params::Validate::Strict) — latlng or lat+lon required
+    # Input schema (Params::Validate::Strict) - latlng or lat+lon required
     latlng => { type => 'scalar', optional => 1 }  # "$lat,$long" comma-separated decimal degrees
     lat    => { type => 'scalar', optional => 1 }  # latitude  (alternative to latlng)
     lon    => { type => 'scalar', optional => 1 }  # longitude (alternative to latlng)
@@ -734,7 +737,7 @@ sub reverse_geocode {
 
 =head2 ua
 
-Does nothing — present for drop-in compatibility with other Geo::Coder::* modules.
+Does nothing - present for drop-in compatibility with other Geo::Coder::* modules.
 
 =cut
 

@@ -76,7 +76,7 @@ set_slice(SV* self_sv, UV from, ...)
     CODE:
         EXTRACT_BUF("Data::Buffer::Shared::Str", self_sv);
         UV count = items - 2;
-        if (count == 0) XSRETURN(1);
+        if (count == 0) XSRETURN_YES;
         uint32_t esz = h->elem_size;
         char *tmp;
         Newxz(tmp, count * esz, char);
@@ -217,7 +217,7 @@ get_raw(SV* self_sv, UV byte_off, UV nbytes)
         RETVAL = newSV(nbytes ? nbytes : 1);
         SvPOK_on(RETVAL);
         SvCUR_set(RETVAL, nbytes);
-        if (nbytes) SvPVX(RETVAL)[nbytes] = '\0';  /* NUL-terminate; newSV reserved nbytes+1 */
+        SvPVX(RETVAL)[nbytes] = '\0';  /* NUL-terminate; newSV reserved nbytes+1 */
         if (!buf_str_get_raw(h, (uint64_t)byte_off, (uint64_t)nbytes, SvPVX(RETVAL))) {
             SvREFCNT_dec(RETVAL);
             croak("Data::Buffer::Shared::Str: get_raw out of bounds");

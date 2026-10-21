@@ -10,6 +10,8 @@ use Cwd qw(abs_path);
 use File::Basename qw(dirname);
 my $root = dirname(dirname(abs_path(__FILE__)));
 chdir $root or die "chdir $root: $!";
+plan skip_all => 'requires a git checkout'
+    unless qx(git rev-parse --is-inside-work-tree 2>/dev/null) =~ /^true/;
 
 # Collect: git-tracked files not covered by MANIFEST.SKIP
 my %git = map { chomp; $_ => 1 } qx(git ls-files);

@@ -1,7 +1,7 @@
 use ExtUtils::MakeMaker;
 use Config;
 unless ($^O eq 'linux') { print "OS unsupported: requires Linux\n"; exit 0 }
-if ($Config{ivsize} < 8) { print "OS unsupported: requires 64-bit\n"; exit 0 }
+if ($Config{ivsize} < 8 || $Config{ptrsize} < 8) { print "OS unsupported: requires 64-bit\n"; exit 0 }
 use Devel::PPPort; Devel::PPPort::WriteFile();
 WriteMakefile(
     NAME              => 'Data::Deque::Shared',

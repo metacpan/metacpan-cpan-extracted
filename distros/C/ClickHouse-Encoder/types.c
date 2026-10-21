@@ -28,7 +28,7 @@ static TypeInfo* parse_type_at(pTHX_ const char *type, STRLEN len, int depth);
  * rather than anything tighter: FixedString(N) is legal up to CH's
  * MAX_FIXED_STRING_SIZE and this parser also runs on wire type strings.
  * Overflow is checked before the multiply, so `long`'s width is moot. */
-static int parse_int_param(const char *s, STRLEN maxlen) {
+static int parse_int_param(const char *s, STRLEN maxlen, int allow_comma) {
     STRLEN i = 0;
     long v = 0;
     while (i < maxlen && (s[i] == ' ' || s[i] == '\t'
@@ -39,7 +39,37 @@ static int parse_int_param(const char *s, STRLEN maxlen) {
         if (v > (INT_MAX - digit) / 10) return -1;
         v = v * 10 + digit;
     }
+    while (i < maxlen && isSPACE(s[i])) i++;
+    if (i == maxlen || (s[i] != ')' && !(allow_comma && s[i] == ','))) return -1;
+    if (s[i] == ')' && i + 1 != maxlen) return -1;
     return (int)v;
+}
+
+static STRLEN skip_type_quote(pTHX_ const char *s, STRLEN len, STRLEN pos) {
+    char quote = s[pos++];
+    while (pos < len) {
+        if (s[pos] == '\\') { pos += 2; continue; }
+        if (s[pos++] == quote) {
+            if (pos < len && s[pos] == quote) { pos++; continue; }
+            return pos;
+        }
+    }
+    croak("Unterminated quote in type expression");
+    return len;
+}
+
+static char *copy_type_name(pTHX_ const char *s, STRLEN len) {
+    char *out;
+    Newx(out, len + 1, char);
+    STRLEN i = 0, n = 0;
+    if (len && s[0] == '`') { i = 1; len--; }
+    for (; i < len; i++) {
+        if (s[i] == '\\' && i + 1 < len) i++;
+        else if (s[i] == '`' && i + 1 < len && s[i+1] == '`') i++;
+        out[n++] = s[i];
+    }
+    out[n] = 0;
+    return out;
 }
 
 void free_typeinfo(pTHX_ TypeInfo *t) {
@@ -201,21 +231,29 @@ typedef struct {
     STRLEN len;         /* length of the trimmed type expression */
     STRLEN name_start;  /* offset of the field-name prefix (or 0 if absent) */
     STRLEN name_len;    /* length of the field-name prefix (0 = no name) */
+    char *name;         /* unquoted JSON path name */
 } TypeBound;
 
 /* Split a comma-separated type list at depth-0 commas, trim outer
  * whitespace, strip any leading "name<ws>" field-name prefix (Tuple
  * named-element form). When a field-name is found, name_start/name_len
  * record it so callers (e.g. T_TUPLE) can keep the names; when absent,
- * name_len is 0. bounds must have at least len+1 slots. Returns the
- * count of non-empty entries. */
-static int split_type_list(const char *s, STRLEN len, TypeBound *bounds) {
+ * name_len is 0. bounds holds type_list_capacity(s, len) slots. */
+static STRLEN type_list_capacity(const char *s, STRLEN len) {
+    STRLEN n = 1;
+    const char *end = s + len, *comma;
+    while ((comma = memchr(s, ',', end - s))) { n++; s = comma + 1; }
+    return n;
+}
+
+static int split_type_list(pTHX_ const char *s, STRLEN len, TypeBound *bounds) {
     int count = 0;
     int depth = 0;
     STRLEN start = 0, i;
     #define IS_WS(c) ((c)==' '||(c)=='\t'||(c)=='\n'||(c)=='\r')
     for (i = 0; i <= len; i++) {
         char c = (i < len) ? s[i] : ',';
+        if (c == '\'' || c == '`') { i = skip_type_quote(aTHX_ s, len, i) - 1; continue; }
         if (c == '(') depth++;
         else if (c == ')') depth--;
         else if ((c == ',' && depth == 0) || i == len) {
@@ -225,7 +263,15 @@ static int split_type_list(const char *s, STRLEN len, TypeBound *bounds) {
             while (tend > tstart && IS_WS(s[tend-1])) tend--;
             if (tend > tstart) {
                 STRLEN id_end = tstart;
-                if (id_end < tend
+                if (id_end < tend && s[id_end] == '`') {
+                    id_end = skip_type_quote(aTHX_ s, tend, id_end);
+                    if (id_end < tend && IS_WS(s[id_end])) {
+                        nstart = tstart;
+                        nlen = id_end - tstart;
+                        while (id_end < tend && IS_WS(s[id_end])) id_end++;
+                        tstart = id_end;
+                    }
+                } else if (id_end < tend
                     && ((s[id_end] >= 'A' && s[id_end] <= 'Z')
                      || (s[id_end] >= 'a' && s[id_end] <= 'z')
                      ||  s[id_end] == '_')) {
@@ -284,10 +330,64 @@ static TypeInfo** parse_tuple_types_with_bounds(pTHX_ const char *s,
 static TypeInfo** parse_tuple_types(pTHX_ const char *s, STRLEN len, int *count,
                                     int depth) {
     TypeBound *bounds;
-    Newx(bounds, len + 1, TypeBound);
+    Newx(bounds, type_list_capacity(s, len), TypeBound);
     SAVEFREEPV(bounds);
-    *count = split_type_list(s, len, bounds);
+    *count = split_type_list(aTHX_ s, len, bounds);
     return parse_tuple_types_with_bounds(aTHX_ s, bounds, *count, depth);
+}
+
+static SV *canonical_variant_type(pTHX_ const char *s, STRLEN len, TypeInfo *t) {
+    while (len && isSPACE(*s)) { s++; len--; }
+    while (len && isSPACE(s[len-1])) len--;
+    const char *open = memchr(s, '(', len);
+    STRLEN base_len = open ? (STRLEN)(open - s) : len;
+    if (base_len == 7 && memcmp(s, "Boolean", 7) == 0)
+        return sv_2mortal(newSVpvs("Bool"));
+    if (base_len >= 7 && base_len <= 10 && memcmp(s, "Decimal", 7) == 0) {
+        int precision = t->code == T_DECIMAL32 ? 9 : t->code == T_DECIMAL64 ? 18
+                      : t->code == T_DECIMAL128 ? 38 : 76;
+        if (base_len == 7) precision = parse_int_param(open + 1, len - base_len - 1, 1);
+        return sv_2mortal(newSVpvf("Decimal(%d, %d)", precision, t->param));
+    }
+    SV *out = sv_2mortal(newSVpvn(s, base_len));
+    if (!open) return out;
+    if (base_len == 8 && memcmp(s, "DateTime", 8) == 0 && t->code == T_DATETIME64)
+        sv_setpvs(out, "DateTime64");
+    sv_catpvs(out, "(");
+    const char *body = open + 1;
+    STRLEN body_len = len - base_len - 2;
+    if (t->inner && (t->code == T_ARRAY || t->code == T_NULLABLE || t->code == T_LOWCARDINALITY)) {
+        sv_catsv(out, canonical_variant_type(aTHX_ body, body_len, t->inner));
+    } else if (t->code == T_TUPLE || t->code == T_MAP) {
+        /* Geo aliases have no '(' and retain their public name. */
+        TypeBound *bounds;
+        Newx(bounds, type_list_capacity(body, body_len), TypeBound);
+        SAVEFREEPV(bounds);
+        int n = split_type_list(aTHX_ body, body_len, bounds), i;
+        for (i = 0; i < n; i++) {
+            if (i) sv_catpvs(out, ", ");
+            if (bounds[i].name_len) {
+                sv_catpvn(out, body + bounds[i].name_start, bounds[i].name_len);
+                sv_catpvs(out, " ");
+            }
+            sv_catsv(out, canonical_variant_type(aTHX_ body + bounds[i].start,
+                                                bounds[i].len, t->tuple[i]));
+        }
+    } else {
+        STRLEN i;
+        for (i = 0; i < body_len; i++) {
+            char c = body[i];
+            if (c == '\'' || c == '`') {
+                STRLEN end = skip_type_quote(aTHX_ body, body_len, i);
+                sv_catpvn(out, body + i, end - i); i = end - 1;
+            } else if (!isSPACE(c)) {
+                sv_catpvn(out, &c, 1);
+                if (c == ',') sv_catpvs(out, " ");
+            }
+        }
+    }
+    sv_catpvs(out, ")");
+    return out;
 }
 
 /* Return 1 if this type can be used as a JSON typed path. CH writes
@@ -327,7 +427,7 @@ static void parse_json_typed_paths(pTHX_ TypeInfo *t,
                                    const char *body, STRLEN body_len,
                                    int depth) {
     TypeBound *bounds;
-    Newxz(bounds, body_len + 1, TypeBound);
+    Newxz(bounds, type_list_capacity(body, body_len), TypeBound);
     SAVEFREEPV(bounds);
 
     int idx = 0;
@@ -335,6 +435,7 @@ static void parse_json_typed_paths(pTHX_ TypeInfo *t,
     STRLEN start = 0, i;
     for (i = 0; i <= body_len; i++) {
         char c = (i < body_len) ? body[i] : ',';
+        if (c == '\'' || c == '`') { i = skip_type_quote(aTHX_ body, body_len, i) - 1; continue; }
         if      (c == '(') paren_depth++;
         else if (c == ')') paren_depth--;
         else if ((c == ',' && paren_depth == 0) || i == body_len) {
@@ -344,7 +445,9 @@ static void parse_json_typed_paths(pTHX_ TypeInfo *t,
             while (te > ts && J_WS(body[te-1])) te--;
             if (te > ts) {
                 STRLEN id = ts;
-                if (body[id] == '_'
+                if (body[id] == '`') {
+                    id = skip_type_quote(aTHX_ body, te, id);
+                } else if (body[id] == '_'
                     || (body[id] >= 'A' && body[id] <= 'Z')
                     || (body[id] >= 'a' && body[id] <= 'z')) {
                     id++;
@@ -389,43 +492,28 @@ static void parse_json_typed_paths(pTHX_ TypeInfo *t,
         }
     }
     if (idx == 0) return;
-    int n = idx;
-
-    int j, ii;
+    int n = idx, ii, j;
+    for (ii = 0; ii < n; ii++) {
+        bounds[ii].name = copy_type_name(aTHX_ body + bounds[ii].name_start,
+                                         bounds[ii].name_len);
+        SAVEFREEPV(bounds[ii].name);
+    }
     for (ii = 1; ii < n; ii++) {
         TypeBound key = bounds[ii];
         j = ii - 1;
-        while (j >= 0) {
-            STRLEN m = bounds[j].name_len < key.name_len
-                     ? bounds[j].name_len : key.name_len;
-            int cmp = memcmp(body + bounds[j].name_start,
-                             body + key.name_start, m);
-            if (cmp == 0)
-                cmp = (int)bounds[j].name_len - (int)key.name_len;
-            if (cmp <= 0) break;
+        while (j >= 0 && strcmp(bounds[j].name, key.name) > 0) {
             bounds[j+1] = bounds[j];
             j--;
         }
         bounds[j+1] = key;
     }
-
     for (ii = 1; ii < n; ii++) {
-        if (bounds[ii].name_len == bounds[ii-1].name_len
-            && memcmp(body + bounds[ii].name_start,
-                      body + bounds[ii-1].name_start,
-                      bounds[ii].name_len) == 0)
-            croak("JSON(...): duplicate typed path name '%.*s'",
-                  (int)bounds[ii].name_len, body + bounds[ii].name_start);
+        if (strcmp(bounds[ii].name, bounds[ii-1].name) == 0)
+            croak("JSON(...): duplicate typed path name '%s'", bounds[ii].name);
     }
-
     t->tuple_len = n;
     Newxz(t->tuple_names, n, char*);
-    for (ii = 0; ii < n; ii++) {
-        Newx(t->tuple_names[ii], bounds[ii].name_len + 1, char);
-        memcpy(t->tuple_names[ii], body + bounds[ii].name_start,
-               bounds[ii].name_len);
-        t->tuple_names[ii][bounds[ii].name_len] = '\0';
-    }
+    for (ii = 0; ii < n; ii++) t->tuple_names[ii] = savepv(bounds[ii].name);
     t->tuple = parse_tuple_types_with_bounds(aTHX_ body, bounds, n, depth);
 
     for (ii = 0; ii < n; ii++) {
@@ -450,6 +538,10 @@ static TypeInfo* parse_type_at(pTHX_ const char *type, STRLEN len, int depth) {
         croak("Type nesting too deep (limit %d): %.*s",
               CHE_MAX_TYPE_DEPTH, (int)(len > 60 ? 60 : len), type);
 
+    while (len && isSPACE(type[0])) { type++; len--; }
+    while (len && isSPACE(type[len-1])) len--;
+    if (memchr(type, '(', len) && (!len || type[len-1] != ')'))
+        croak("Unbalanced type expression: %.*s", (int)len, type);
     Newx(slot, 1, TypeInfo*);
     *slot = NULL;
     SAVEDESTRUCTOR_X(cleanup_typeinfo_slot, slot);
@@ -482,7 +574,7 @@ static TypeInfo* parse_type_at(pTHX_ const char *type, STRLEN len, int depth) {
         t->code = T_STRING;
     } else if (len > 12 && strncmp(type, "FixedString(", 12) == 0) {
         t->code = T_FIXEDSTRING;
-        t->param = parse_int_param(type + 12, len - 12);
+        t->param = parse_int_param(type + 12, len - 12, 0);
         if (t->param <= 0) croak("FixedString needs positive length");
         /* ClickHouse's MAX_FIXED_STRING_SIZE; beyond it the server itself
          * refuses the type, so no real schema reaches here. */
@@ -497,9 +589,9 @@ static TypeInfo* parse_type_at(pTHX_ const char *type, STRLEN len, int depth) {
         const char *body = type + 6;
         STRLEN body_len = len - 7;
         TypeBound *bounds;
-        Newx(bounds, body_len + 1, TypeBound);
+        Newx(bounds, type_list_capacity(body, body_len), TypeBound);
         SAVEFREEPV(bounds);
-        t->tuple_len = split_type_list(body, body_len, bounds);
+        t->tuple_len = split_type_list(aTHX_ body, body_len, bounds);
         t->tuple = parse_tuple_types_with_bounds(aTHX_ body, bounds,
                                                  t->tuple_len, depth);
         /* If at least one element carries a field-name, capture all of
@@ -515,10 +607,7 @@ static TypeInfo* parse_type_at(pTHX_ const char *type, STRLEN len, int depth) {
             Newxz(t->tuple_names, t->tuple_len, char *);
             for (j = 0; j < t->tuple_len; j++) {
                 if (bounds[j].name_len > 0) {
-                    Newx(t->tuple_names[j], bounds[j].name_len + 1, char);
-                    memcpy(t->tuple_names[j],
-                           body + bounds[j].name_start, bounds[j].name_len);
-                    t->tuple_names[j][bounds[j].name_len] = '\0';
+                    t->tuple_names[j] = copy_type_name(aTHX_ body + bounds[j].name_start, bounds[j].name_len);
                 }
                 /* else: leave NULL -- mixed named/unnamed not really
                  * supported; encode will croak if hashref is used. */
@@ -537,37 +626,38 @@ static TypeInfo* parse_type_at(pTHX_ const char *type, STRLEN len, int depth) {
         parse_enum_entries(aTHX_ t, type + 7, len - 8, T_ENUM16);
     } else if (len > 10 && strncmp(type, "Decimal32(", 10) == 0) {
         t->code = T_DECIMAL32;
-        t->param = parse_int_param(type + 10, len - 10);
+        t->param = parse_int_param(type + 10, len - 10, 0);
         if (t->param < 0 || t->param > 9)
             croak("Decimal32 scale must be 0..9, got %d", t->param);
     } else if (len > 10 && strncmp(type, "Decimal64(", 10) == 0) {
         t->code = T_DECIMAL64;
-        t->param = parse_int_param(type + 10, len - 10);
+        t->param = parse_int_param(type + 10, len - 10, 0);
         if (t->param < 0 || t->param > 18)
             croak("Decimal64 scale must be 0..18, got %d", t->param);
     } else if (len > 11 && strncmp(type, "Decimal128(", 11) == 0) {
         t->code = T_DECIMAL128;
-        t->param = parse_int_param(type + 11, len - 11);
+        t->param = parse_int_param(type + 11, len - 11, 0);
         if (t->param < 0 || t->param > 38)
             croak("Decimal128 scale must be 0..38, got %d", t->param);
     } else if (len > 11 && strncmp(type, "Decimal256(", 11) == 0) {
         t->code = T_DECIMAL256;
-        t->param = parse_int_param(type + 11, len - 11);
+        t->param = parse_int_param(type + 11, len - 11, 0);
         if (t->param < 0 || t->param > 76)
             croak("Decimal256 scale must be 0..76, got %d", t->param);
     } else if (len > 8 && strncmp(type, "Decimal(", 8) == 0) {
-        int precision = parse_int_param(type + 8, len - 8);
+        int precision = parse_int_param(type + 8, len - 8, 1);
         const char *comma = memchr(type + 8, ',', len - 8);
         if (!comma) croak("Decimal(P, S) requires precision and scale");
-        int scale = parse_int_param(comma + 1, len - (STRLEN)(comma + 1 - type));
-        if (precision < 1 || precision > 38)
-            croak("Decimal(P, S) precision must be 1..38, got %d (use Decimal256(S) explicitly for P > 38)", precision);
+        int scale = parse_int_param(comma + 1, len - (STRLEN)(comma + 1 - type), 0);
+        if (precision < 1 || precision > 76)
+            croak("Decimal(P, S) precision must be 1..76, got %d", precision);
         if (scale < 0 || scale > precision)
             croak("Decimal scale must be 0..precision, got %d", scale);
         t->param = scale;
         if (precision <= 9) t->code = T_DECIMAL32;
         else if (precision <= 18) t->code = T_DECIMAL64;
-        else t->code = T_DECIMAL128;
+        else if (precision <= 38) t->code = T_DECIMAL128;
+        else t->code = T_DECIMAL256;
     } else if (len == 4 && strncmp(type, "Date", 4) == 0) {
         t->code = T_DATE;
     } else if (len == 6 && strncmp(type, "Date32", 6) == 0) {
@@ -575,10 +665,17 @@ static TypeInfo* parse_type_at(pTHX_ const char *type, STRLEN len, int depth) {
     } else if (len == 8 && strncmp(type, "DateTime", 8) == 0) {
         t->code = T_DATETIME;
     } else if (len > 9 && strncmp(type, "DateTime(", 9) == 0) {
-        t->code = T_DATETIME;
+        const char *arg = type + 9;
+        STRLEN arg_len = len - 9;
+        while (arg_len && isSPACE(*arg)) { arg++; arg_len--; }
+        if (arg_len && *arg >= '0' && *arg <= '9') {
+            t->param = parse_int_param(arg, arg_len, 1);
+            if (t->param < 0 || t->param > 9) croak("DateTime precision must be 0..9");
+            t->code = t->param ? T_DATETIME64 : T_DATETIME;
+        } else t->code = T_DATETIME;
     } else if (len > 11 && strncmp(type, "DateTime64(", 11) == 0) {
         t->code = T_DATETIME64;
-        t->param = parse_int_param(type + 11, len - 11);
+        t->param = parse_int_param(type + 11, len - 11, 1);
         if (t->param < 0 || t->param > 9)
             croak("DateTime64 precision must be 0..9, got %d", t->param);
     } else if (len == 4 && strncmp(type, "Bool", 4) == 0) {
@@ -623,15 +720,23 @@ static TypeInfo* parse_type_at(pTHX_ const char *type, STRLEN len, int depth) {
          * (the alphabetical sort and the parsed TypeInfo entries reference
          * the same ranges). */
         TypeBound *bounds;
-        Newx(bounds, body_len + 1, TypeBound);
+        Newx(bounds, type_list_capacity(body, body_len), TypeBound);
         SAVEFREEPV(bounds);
-        t->tuple_len = split_type_list(body, body_len, bounds);
+        t->tuple_len = split_type_list(aTHX_ body, body_len, bounds);
         if (t->tuple_len < 1)
             croak("Variant requires at least one type argument");
         if (t->tuple_len > 254)
             croak("Variant supports at most 254 types (got %d)", t->tuple_len);
         t->tuple = parse_tuple_types_with_bounds(aTHX_ body, bounds,
                                                  t->tuple_len, depth);
+
+        SV **canonical;
+        Newx(canonical, t->tuple_len, SV *);
+        SAVEFREEPV(canonical);
+        int vi;
+        for (vi = 0; vi < t->tuple_len; vi++)
+            canonical[vi] = canonical_variant_type(aTHX_ body + bounds[vi].start,
+                                                  bounds[vi].len, t->tuple[vi]);
 
         /* Sort declaration indices alphabetically by their type bytes.
          * Selection sort -- nvar is at most 254. */
@@ -644,10 +749,10 @@ static TypeInfo* parse_type_at(pTHX_ const char *type, STRLEN len, int depth) {
             for (k = j + 1; k < t->tuple_len; k++) {
                 int a = t->variant_wire_to_decl[min_idx];
                 int b = t->variant_wire_to_decl[k];
-                STRLEN la = bounds[a].len, lb = bounds[b].len;
+                STRLEN la, lb;
+                const char *sa = SvPV(canonical[a], la), *sb = SvPV(canonical[b], lb);
                 STRLEN cmp_len = la < lb ? la : lb;
-                int cmp = memcmp(body + bounds[a].start,
-                                 body + bounds[b].start, cmp_len);
+                int cmp = memcmp(sa, sb, cmp_len);
                 if (cmp > 0 || (cmp == 0 && la > lb)) min_idx = k;
             }
             if (min_idx != j) {
@@ -733,6 +838,14 @@ static TypeInfo* parse_type_at(pTHX_ const char *type, STRLEN len, int depth) {
     } else {
         croak("Unknown type: %.*s", (int)len, type);
     }
+
+    t->has_prefix = t->code == T_LOWCARDINALITY || t->code == T_VARIANT
+                 || t->code == T_JSON || t->code == T_DYNAMIC;
+    if (t->inner && t->inner->has_prefix) t->split_prefix = 1;
+    int pi;
+    for (pi = 0; pi < t->tuple_len; pi++)
+        if (t->tuple[pi]->has_prefix) t->split_prefix = 1;
+    t->has_prefix |= t->split_prefix;
 
     /* Disarm the slot: caller now owns t. */
     *slot = NULL;

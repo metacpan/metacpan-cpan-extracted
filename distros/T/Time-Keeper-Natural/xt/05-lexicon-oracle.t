@@ -49,7 +49,9 @@ sub sections {
     $out{joiners} = join "\n", map { "$_->{word}|$_->{raw}" } @{ $t->{joiners} };
     $out{scalars} = join ',', map { "$_=" . ($t->{$_} ? $t->{$_} : 0) } qw(num_max spaceless);
     $out{digit_map} = join ',', map { "$_=$t->{digit_map}{$_}" } sort keys %{ $t->{digit_map} || {} };
-    $out{patterns} = join "\n", map { cm($_) } $lex->patterns;
+    # 0.03 gave each pattern two facts for the calendars (cyclic_name, era):
+    # the rest is compared
+    $out{patterns} = join "\n", map { my %h = %$_; delete @h{qw(cyclic_name era)}; cm(\%h) } $lex->patterns;
     my $ties = $lex->ties;
     $out{ties} = join "\n", map { "$_\t" . join(';', sort map { cm($_) } @{ $ties->{$_} }) } sort keys %$ties;
     $out{api} = join "\n", map { join '|', @$_ } [ $lex->markers('future') ], [ $lex->markers('past') ],

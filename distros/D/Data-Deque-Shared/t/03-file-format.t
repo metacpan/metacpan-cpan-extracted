@@ -5,7 +5,7 @@ use Test::More;
 use File::Temp qw(tempdir);
 use Data::Deque::Shared;
 
-# v2 files created by this release must reject v1 magic ("DEQ1") on reopen,
+# v3 files created by this release must reject older formats on reopen,
 # preventing silent data corruption if an older on-disk deque is encountered.
 
 my $dir = tempdir(CLEANUP => 1);
@@ -47,8 +47,8 @@ my $dir = tempdir(CLEANUP => 1);
     my $total = $ctl_off + $cap * 8;
 
     open my $fh, '>', $path or die "open: $!";
-    my $header = "\x32\x51\x45\x44"          # magic = "DEQ2"
-               . pack('V', 2)                # version = 2
+    my $header = "\x33\x51\x45\x44"          # magic = "DEQ3"
+               . pack('V', 3)                # version = 3
                . pack('V', $bad_elem_size)   # elem_size (illegal for Str)
                . pack('V', 1)                # variant_id = DEQ_VAR_STR
                . pack('Q<', $cap)            # capacity
@@ -77,8 +77,8 @@ my $dir = tempdir(CLEANUP => 1);
     my $total = $ctl_off + $cap * 8;
 
     open my $fh, '>', $path or die "open: $!";
-    my $header = "\x32\x51\x45\x44"          # magic = "DEQ2"
-               . pack('V', 2)                # version = 2
+    my $header = "\x33\x51\x45\x44"          # magic = "DEQ3"
+               . pack('V', 3)                # version = 3
                . pack('V', $bad_elem_size)   # elem_size (illegal for Int)
                . pack('V', 0)                # variant_id = DEQ_VAR_INT
                . pack('Q<', $cap)
@@ -94,6 +94,24 @@ my $dir = tempdir(CLEANUP => 1);
     my $err = $@;
     ok !$dq, 'Int file with elem_size != 8 rejected';
     like $err, qr/invalid deque/i, 'rejection croaks with validation message';
+}
+
+{
+    my $path = "$dir/v2.deq";
+    { my $d = Data::Deque::Shared::Int->new($path, 2); $d->push_back(42) }
+    open my $fh, '+<:raw', $path or die $!;
+    my $v2 = pack('V V', 0x44455132, 2);
+    syswrite($fh, $v2) == 8 or die $!;
+    my $d = eval { Data::Deque::Shared::Int->new($path, 2) };
+    ok !$d, 'v2 file rejected on path attachment';
+    like $@, qr/invalid deque/, 'v2 path rejection reports invalid format';
+    $d = eval { Data::Deque::Shared::Int->new_from_fd(fileno($fh)) };
+    ok !$d, 'v2 file rejected on fd attachment';
+    like $@, qr/invalid deque/, 'v2 fd rejection reports invalid format';
+    sysseek($fh, 0, 0) // die $!;
+    sysread($fh, my $got, 8) == 8 or die $!;
+    is $got, $v2, 'rejection preserves the old header';
+    close $fh;
 }
 
 done_testing;

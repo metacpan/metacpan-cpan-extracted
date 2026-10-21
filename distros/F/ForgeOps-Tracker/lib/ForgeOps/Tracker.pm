@@ -14,6 +14,7 @@ use ForgeOps::Tracker::PerformanceFlusher;
 use ForgeOps::Tracker::Reporter;
 use ForgeOps::Tracker::SpanBuffer;
 use ForgeOps::Tracker::SpanDelivery;
+use ForgeOps::Tracker::StrictPrivacy ();
 use ForgeOps::Tracker::TraceParent;
 use Scalar::Util ();
 use Time::HiRes ();
@@ -24,7 +25,7 @@ use Time::HiRes ();
 # directly: retrying the identical 0.2.0 tarball came back 409 Conflict, not the original success
 # response repeated). No functional change from 0.2.0; this bump exists solely to get a fresh,
 # uploadable version number.
-our $VERSION = '0.13.0';
+our $VERSION = '0.15.0';
 
 my $configuration;
 my $reporter;
@@ -357,13 +358,13 @@ sub set_user {
 # events, attached to whatever report() sends next so an issue's detail page can show what led up
 # to it. Options: category (default 'custom'), level (default 'info'), data (a hashref of extra
 # detail, default {}). Only the max_breadcrumbs most recent are kept; does nothing when
-# track_breadcrumbs is off, e.g.:
+# track_breadcrumbs is off, or strict_privacy is on (it never sends breadcrumbs), e.g.:
 #
 #   ForgeOps::Tracker::add_breadcrumb('charging card', category => 'payment', data => { order_id => 42 });
 sub add_breadcrumb {
     my ($message, %options) = @_;
     my $config = _configuration();
-    return unless $config->{track_breadcrumbs};
+    return unless $config->{track_breadcrumbs} && !$config->{strict_privacy};
 
     push @current_breadcrumbs, {
         category  => defined $options{category} ? $options{category} : 'custom',
@@ -439,6 +440,13 @@ sub finish_trace {
     return unless $trace;
 
     my $payload = $trace->finish_trace($name, $started_at, $duration_ms, $errored);
+    # Under strict privacy every span goes through StrictPrivacy::span: an outbound call named by
+    # its method and host only, a root span named by its raw path (the PSGI integration's "GET
+    # /patients/42") cut down to its first segment, and no span data but the masked statement and
+    # db.system.
+    if ($payload && _configuration()->{strict_privacy}) {
+        $payload->{spans} = [ map { ForgeOps::Tracker::StrictPrivacy::span($_) } @{ $payload->{spans} } ];
+    }
     _span_queue()->push($payload) if $payload;
     return;
 }

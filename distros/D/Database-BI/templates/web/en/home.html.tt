@@ -163,6 +163,14 @@
   </div>
 
   <div class="action-card">
+    <span class="action-card-icon" aria-hidden="true">&#128218;</span>
+    <h2 class="action-card-title">New here? Read the tutorial</h2>
+    <p class="action-card-desc">A short guide in plain English, from opening a file to saving a chart.</p>
+    <a href="/tutorial" class="btn-action" target="_blank" rel="noopener"
+       title="Open the tutorial in a new tab (F1)">Open the tutorial</a>
+  </div>
+
+  <div class="action-card">
     <span class="action-card-icon" aria-hidden="true">&#127760;</span>
     <h2 class="action-card-title">Import from a web page</h2>
     <p class="action-card-desc">Paste the address of any web page that contains a data table and we&rsquo;ll pull it in.</p>
@@ -180,6 +188,13 @@
         <button type="submit" class="btn-action">Import</button>
       </div>
     </form>
+  </div>
+
+  <div class="action-card">
+    <span class="action-card-icon" aria-hidden="true">&#x1F4CB;</span>
+    <h2 class="action-card-title">Dataset catalog</h2>
+    <p class="action-card-desc">Browse all data files in the data directory with file type, size, last-modified date, and row count.</p>
+    <a href="/catalog" class="btn-action">View catalog</a>
   </div>
 
   <div class="action-card">
@@ -377,11 +392,22 @@
 
 <script>
 /* Saved canvases section -- fetches /api/analyses and renders db-card tiles.
- * Only shown when at least one saved analysis exists. */
+ * Supports Ctrl/Cmd+click or drag to multi-select, then Delete to bulk-remove. */
 (function () {
   var container = document.getElementById('bi-canvases');
   if (!container) return;
 
+  /* ---- selection state ---- */
+  var selected  = {};     /* id -> { li, name } */
+  var selBar    = null;   /* floating action bar (lazily created) */
+  var ul, section;
+
+  /* ---- rubber-band drag state ---- */
+  var drag       = null;  /* { x0, y0, moved } while mouse is down */
+  var rubber     = null;  /* the rubber-band <div> */
+  var dragEnded  = 0;     /* timestamp: suppress nav click briefly after drag */
+
+  /* ---- helpers ---- */
   function fmtDate(iso) {
     try {
       return new Date(iso).toLocaleString(undefined, {
@@ -397,23 +423,149 @@
     return d.innerHTML;
   }
 
+  function rectOverlap(a, b) {
+    return a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top;
+  }
+
+  /* ---- selection bar ---- */
+  function syncBar() {
+    var count = Object.keys(selected).length;
+    if (!count) { if (selBar) selBar.style.display = 'none'; return; }
+    if (!selBar) {
+      selBar = document.createElement('div');
+      selBar.className = 'cv-sel-bar';
+      selBar.innerHTML =
+        '<span class="cv-sel-count"></span>' +
+        '<button type="button" class="cv-sel-del">&#x1F5D1; Delete selected</button>' +
+        '<button type="button" class="cv-sel-clr">\u00d7 Clear</button>';
+      selBar.querySelector('.cv-sel-del').addEventListener('click', deleteSel);
+      selBar.querySelector('.cv-sel-clr').addEventListener('click', clearSel);
+      document.body.appendChild(selBar);
+    }
+    selBar.style.display = '';
+    var n = count;
+    selBar.querySelector('.cv-sel-count').textContent =
+      n + ' canvas' + (n !== 1 ? 'es' : '') + ' selected \u2014 ';
+  }
+
+  function setSel(li, id, name, on) {
+    if (on) { selected[id] = { li: li, name: name }; li.classList.add('cv-sel'); }
+    else    { delete selected[id]; li.classList.remove('cv-sel'); }
+    syncBar();
+  }
+
+  function clearSel() {
+    Object.keys(selected).forEach(function (id) { selected[id].li.classList.remove('cv-sel'); });
+    selected = {};
+    syncBar();
+  }
+
+  function deleteSel() {
+    var ids   = Object.keys(selected);
+    var names = ids.map(function (id) { return '"' + selected[id].name + '"'; });
+    if (!confirm(
+      'Delete ' + ids.length + ' canvas' + (ids.length !== 1 ? 'es' : '') + '?\n\n' +
+      names.join('\n') + '\n\nThis cannot be undone.'
+    )) return;
+    Promise.all(ids.map(function (id) {
+      return fetch('/api/analyses/' + encodeURIComponent(id), { method: 'DELETE' })
+        .then(function (r) { return { id: id, ok: r.ok }; })
+        .catch(function ()  { return { id: id, ok: false }; });
+    })).then(function (results) {
+      var failed = [];
+      results.forEach(function (r) {
+        if (r.ok) { if (selected[r.id]) { selected[r.id].li.remove(); delete selected[r.id]; } }
+        else failed.push(r.id);
+      });
+      syncBar();
+      if (ul && !ul.querySelector('li')) section.remove();
+      if (failed.length) alert('Could not delete ' + failed.length + ' canvas(es).');
+    });
+  }
+
+  /* ---- keyboard ---- */
+  document.addEventListener('keydown', function (e) {
+    if (e.key !== 'Delete') return;
+    var el = document.activeElement, tag = el && el.tagName;
+    if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+    if (!Object.keys(selected).length) return;
+    e.preventDefault();
+    deleteSel();
+  });
+
+  /* ---- rubber-band drag (document-level so mouse can leave the ul) ---- */
+  document.addEventListener('mousemove', function (e) {
+    if (!drag) return;
+    var dx = e.clientX - drag.x0, dy = e.clientY - drag.y0;
+    if (!drag.moved && dx * dx + dy * dy < 25) return;  /* < 5 px */
+    drag.moved = true;
+    if (!rubber) {
+      rubber = document.createElement('div');
+      rubber.className = 'cv-rubber';
+      document.body.appendChild(rubber);
+    }
+    var x = Math.min(e.clientX, drag.x0), y = Math.min(e.clientY, drag.y0);
+    var w = Math.abs(dx),                  h = Math.abs(dy);
+    rubber.style.cssText =
+      'position:fixed;left:' + x + 'px;top:' + y + 'px;width:' + w + 'px;height:' + h + 'px';
+    if (ul) {
+      var band = { left: x, top: y, right: x + w, bottom: y + h };
+      ul.querySelectorAll('li').forEach(function (li) {
+        li.classList.toggle('cv-drag-over', rectOverlap(li.getBoundingClientRect(), band));
+      });
+    }
+  });
+
+  document.addEventListener('mouseup', function () {
+    if (!drag) return;
+    if (drag.moved && ul) {
+      dragEnded = Date.now();
+      ul.querySelectorAll('li.cv-drag-over').forEach(function (li) {
+        li.classList.remove('cv-drag-over');
+        var id   = li.getAttribute('data-cv-id');
+        var name = li.getAttribute('data-cv-name');
+        if (id) setSel(li, id, name, true);
+      });
+    }
+    if (rubber) { rubber.remove(); rubber = null; }
+    drag = null;
+  });
+
+  /* ---- fetch and render ---- */
   fetch('/api/analyses')
     .then(function (r) { return r.json(); })
     .then(function (data) {
       var list = (data && data.analyses) ? data.analyses : [];
       if (!list.length) return;
-      var section = document.createElement('section');
+
+      section = document.createElement('section');
       section.className = 'recent-section';
+
       var h2 = document.createElement('h2');
       h2.className = 'section-heading';
       h2.textContent = 'Saved canvases';
+      var hint = document.createElement('span');
+      hint.className   = 'cv-sel-hint';
+      hint.textContent = '\u00a0\u2014 Ctrl+click or drag to select multiple';
+      h2.appendChild(hint);
       section.appendChild(h2);
-      var ul = document.createElement('ul');
+
+      ul = document.createElement('ul');
       ul.className = 'db-list';
+
+      /* start rubber-band from anywhere on the list (card clicks handled below) */
+      ul.addEventListener('mousedown', function (e) {
+        if (e.button !== 0) return;
+        drag = { x0: e.clientX, y0: e.clientY, moved: false };
+      });
+
       list.forEach(function (a, i) {
         var li = document.createElement('li');
         li.style.position = 'relative';
+        li.setAttribute('data-cv-id',   a.id);
+        li.setAttribute('data-cv-name', a.name || a.id);
 
+        /* ---- card link ---- */
         var card = document.createElement('a');
         card.href      = '/a/' + encodeURIComponent(a.id);
         card.className = 'db-card';
@@ -423,11 +575,47 @@
         card.innerHTML = '<span class="db-icon" aria-hidden="true">&#x1F5BC;</span>'
                        + '<span class="db-name">' + txt(a.name || a.id) + '</span>'
                        + '<span class="db-file">' + txt(fileLine) + '</span>';
+
+        card.addEventListener('click', function (e) {
+          /* Ctrl/Cmd+click toggles selection without navigating */
+          if (e.ctrlKey || e.metaKey) { e.preventDefault(); setSel(li, a.id, a.name || a.id, !selected[a.id]); return; }
+          /* Suppress nav immediately after a drag ended */
+          if (Date.now() - dragEnded < 300) { e.preventDefault(); return; }
+        });
+
         li.appendChild(card);
 
-        /* details tooltip, shown for the same reason on hover and on focus */
+        /* ---- availability probe ---- */
+        var pathSpecs = (a.datasets || [])
+          .map(function (d) { return d.spec || ''; })
+          .filter(function (s) { return /^path:/.test(s); })
+          .map(function (s) { return s.slice(5); });
+
+        if (pathSpecs.length) {
+          Promise.all(pathSpecs.map(function (p) {
+            return fetch('/api/stat?path=' + encodeURIComponent(p))
+              .then(function (r) { return r.ok ? r.json() : { exists: false }; })
+              .catch(function () { return { exists: false }; });
+          })).then(function (stats) {
+            var missing = pathSpecs.filter(function (_, idx) { return !stats[idx].exists; });
+            if (missing.length) {
+              card.classList.add('db-card--unavailable');
+              card.removeAttribute('href');
+              card.setAttribute('role', 'img');
+              card.setAttribute('aria-label', txt(a.name || a.id) + ' (data unavailable)');
+              card.title = 'Data source unavailable:\n' + missing.join('\n');
+              var warn = document.createElement('span');
+              warn.className   = 'db-unavail-badge';
+              warn.textContent = '\u26a0 Unavailable';
+              warn.title       = 'Data source unavailable:\n' + missing.join('\n');
+              card.appendChild(warn);
+            }
+          });
+        }
+
+        /* ---- details tooltip ---- */
         var tip = document.createElement('div');
-        tip.className    = 'file-tooltip tip-below';
+        tip.className     = 'file-tooltip tip-below';
         tip.id            = 'bi-canvases-tip-' + i;
         tip.setAttribute('role', 'tooltip');
         tip.style.display = 'none';
@@ -435,9 +623,7 @@
         var updLine = a.updated ? '&#x1F4C5; Updated: ' + txt(fmtDate(new Date(a.updated * 1000).toISOString())) : '';
         var crtLine = a.created ? '&#x1F551; Created: ' + txt(fmtDate(new Date(a.created * 1000).toISOString())) : '';
         var idLine  = '<div class="tip-muted">ID: ' + txt(a.id) + '</div>';
-        var dsLine  = nDatasets
-          ? '<div>' + txt(nDatasets + ' dataset' + (nDatasets !== 1 ? 's' : '')) + '</div>'
-          : '';
+        var dsLine  = nDatasets ? '<div>' + txt(nDatasets + ' dataset' + (nDatasets !== 1 ? 's' : '')) + '</div>' : '';
         tip.innerHTML = '<div class="tip-name">' + txt(a.name || a.id) + '</div>'
           + dsLine
           + (updLine ? '<div>' + updLine + '</div>' : '')
@@ -449,41 +635,38 @@
 
         function showTip() {
           tip.style.display = 'block';
-          /* flip above when near the bottom of the viewport */
-          var rect = tip.getBoundingClientRect();
-          if (rect.bottom > window.innerHeight) {
-            tip.classList.remove('tip-below');
-          } else {
-            tip.classList.add('tip-below');
-          }
+          var r = tip.getBoundingClientRect();
+          if (r.bottom > window.innerHeight) tip.classList.remove('tip-below');
+          else tip.classList.add('tip-below');
         }
-
         function hideTip() { tip.style.display = 'none'; }
-
         card.addEventListener('mouseenter', showTip);
         card.addEventListener('focus',      showTip);
         card.addEventListener('mouseleave', hideTip);
         card.addEventListener('blur',       hideTip);
 
-        /* trash-can delete button -- hidden until card is hovered (CSS .recent-remove) */
+        /* ---- trash button ---- */
         var delBtn = document.createElement('button');
         delBtn.type      = 'button';
         delBtn.className = 'recent-remove';
-        delBtn.title     = 'Delete this canvas';
+        delBtn.title     = selected[a.id] ? 'Delete selected canvases' : 'Delete this canvas';
         delBtn.setAttribute('aria-label', 'Delete canvas ' + txt(a.name || a.id));
         delBtn.innerHTML = '&#x1F5D1;';
         delBtn.addEventListener('click', function (e) {
           e.stopPropagation();
           e.preventDefault();
+          /* if this card is part of a multi-selection, bulk-delete the whole selection */
+          if (selected[a.id] && Object.keys(selected).length > 1) { deleteSel(); return; }
+          /* otherwise single-delete */
           if (!confirm('Delete canvas "' + (a.name || a.id) + '"?\n\nThis cannot be undone.')) return;
           fetch('/api/analyses/' + encodeURIComponent(a.id), { method: 'DELETE' })
             .then(function (r) {
               if (r.ok) {
+                delete selected[a.id];
                 li.remove();
+                syncBar();
                 if (!ul.querySelector('li')) section.remove();
-              } else {
-                alert('Could not delete canvas (server error).');
-              }
+              } else { alert('Could not delete canvas (server error).'); }
             })
             .catch(function () { alert('Could not delete canvas (network error).'); });
         });

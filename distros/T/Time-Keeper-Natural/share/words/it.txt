@@ -3,6 +3,10 @@
 # UNREVIEWED: written 18 Oct 2026 by a session, as the p2p site's catalogues were.
 # A native reader should review it before release. The format is en.txt's.
 #
+#
+# 0.02's keys: Ranges, a duration before or after a point ("prima del" too) and the day
+# after one read. The weekend does not: "fine settimana" is masculine and CLDR's
+# "settimana prossima" feminine.
 start_of	inizio|inizio di|inizio del|inizio della|inizio dello|inizio dell'|l'inizio di|l'inizio del|l'inizio della|l'inizio dell'|all'inizio di|all'inizio del|all'inizio della|all'inizio dell'
 end_of	fine|fine di|fine del|fine della|fine dello|fine dell'|la fine di|la fine del|la fine della|la fine dell'|alla fine di|alla fine del|alla fine della|alla fine dell'
 at	alle|all'|a
@@ -11,6 +15,9 @@ skip	il|lo|la|l'|i|gli|le
 and
 of	di|del|della|dell'
 last	ultimo|ultima
+range	dal {0} al {1}|da {0} a {1}|tra {0} e {1}|{0} fino a {1}
+after	{0} dopo {1}|il giorno dopo {0}
+before	{0} prima di {1}|il giorno prima di {0}|{0} prima del {1}
 # test: fine del mese scorso => 2026-09-30T23:59:59.999999999+01:00
 # test: inizio della settimana prossima => 2026-10-19T00:00:00+01:00
 # test: fine dell'anno => 2026-12-31T23:59:59.999999999+00:00
@@ -18,3 +25,8 @@ last	ultimo|ultima
 # test: domani alle 15:30 => 2026-10-16T15:30:00+01:00
 # test: il terzo venerdì del mese prossimo => 2026-11-20T00:00:00+00:00
 # test: l'ultimo venerdì di ottobre => 2026-10-30T00:00:00+00:00
+# test: dal lunedì al venerdì => 2026-10-19T00:00:00+01:00 / 2026-10-23T23:59:59.999999999+01:00
+# test: tra le 9 e le 17 => 2026-10-15T09:00:00+01:00 / 2026-10-15T17:00:00+01:00
+# test: 3 giorni dopo domani => 2026-10-19T00:00:00+01:00
+# test: 2 settimane prima del 20 ottobre => 2026-10-06T00:00:00+01:00
+# test: il giorno dopo domani => 2026-10-17T00:00:00+01:00

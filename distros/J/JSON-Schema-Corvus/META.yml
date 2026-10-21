@@ -1,0 +1,39 @@
+---
+abstract: 'Fast JSON Schema validation (draft 4 to 2020-12) in pure Perl'
+author:
+  - endjin
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0.98'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: JSON-Schema-Corvus
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  B: '0'
+  Encode: '0'
+  Hash::Util::FieldHash: '0'
+  JSON::PP: '2.27'
+  List::Util: '1.33'
+  MIME::Base64: '0'
+  Math::BigInt: '1.999'
+  POSIX: '0'
+  Scalar::Util: '1.18'
+  Symbol: '0'
+  Time::HiRes: '0'
+  perl: '5.026'
+resources:
+  bugtracker: https://github.com/corvus-dotnet/Corvus.JsonSchema/issues
+  homepage: https://corvus-oss.org/Corvus.JsonSchema/
+  repository: https://github.com/corvus-dotnet/Corvus.JsonSchema.git
+version: v0.1.0
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

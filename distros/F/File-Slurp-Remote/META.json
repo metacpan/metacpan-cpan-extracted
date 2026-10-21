@@ -1,12 +1,14 @@
 {
    "abstract" : "Easy read/write of remote files",
    "author" : [
-      "David Muir Sharnoff <muir@idiom.org>"
+      "David Muir Sharnoff <muir@idiom.org>",
+      "Nigel Horne <nhorne@nigelhorne.com>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150015",
    "license" : [
-      "unknown"
+      "gpl_2",
+      "gpl_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -32,14 +34,39 @@
       },
       "runtime" : {
          "requires" : {
+            "Carp" : "0",
+            "Exporter" : "0",
             "File::Slurp" : "0",
-            "File::Temp" : "0",
+            "POSIX" : "0",
+            "Socket" : "0",
             "Sys::Hostname::FQDN" : "0",
-            "Tie::Hash" : "0"
+            "Tie::Hash" : "0",
+            "perl" : "5.008"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Temp" : "0",
+            "FindBin" : "0",
+            "Test::More" : "0.88"
          }
       }
    },
    "release_status" : "stable",
-   "version" : 0.47,
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/nigelhorne/File-Slurp-Remote/issues"
+      },
+      "license" : [
+         "https://www.perlfoundation.org/artistic-license-20.html",
+         "https://www.gnu.org/licenses/old-licenses/lgpl-2.1.html"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/nigelhorne/File-Slurp-Remote.git",
+         "web" : "https://github.com/nigelhorne/File-Slurp-Remote"
+      }
+   },
+   "version" : "0.48",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

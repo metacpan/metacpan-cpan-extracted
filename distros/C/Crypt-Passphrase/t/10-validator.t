@@ -30,6 +30,7 @@ for my $test (@tests) {
 	ok($object->accepts_hash($hash), "$short_name accepts hash $hash");
 	ok($object->verify_password('test', $hash), "$short_name verifies hash $hash");
 	ok($passphrase->verify_password('test', $hash), "$short_name verifies hash $hash throught C::P too");
+	ok(!$passphrase->verify_password('', undef), 'Undef doesn\'t match empty password');
 	ok($passphrase->needs_rehash($hash), "$hash needs rehash");
 }
 

@@ -11,7 +11,7 @@ my $window_size = 5;
 my $dq = Data::Deque::Shared::Int->new(undef, $window_size);
 
 for my $val (1..12) {
-    $dq->pop_front if $dq->is_full;  # evict oldest
+    $dq->pop_front if $dq->size >= $window_size;  # evict oldest
     $dq->push_back($val);
 
     # read window contents (drain and refill for display)

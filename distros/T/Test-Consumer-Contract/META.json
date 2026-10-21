@@ -81,6 +81,6 @@
          "x_repository" : "https://github.com/nigelhorne/Test-Consumer-Contract"
       }
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

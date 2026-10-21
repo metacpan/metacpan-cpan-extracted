@@ -17,7 +17,7 @@ use Scalar::Util qw(weaken);
 use constant MAX_CLIENT_BACKLOG => 64 * 1024 * 1024;
 use EV::WebKit::Protocol;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 # A control server for a RUNNING EV::WebKit instance: another process can drive
 # the browser this one opened.

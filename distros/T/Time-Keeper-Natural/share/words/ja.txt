@@ -4,17 +4,35 @@
 # A native reader should review it before release. The format is en.txt's.
 #
 # Japanese puts "end" and "beginning" after the period. "週末" is the weekend,
-# and reads as the end of the week. An ordinal weekday ("来月の第3金曜日")
-# puts the month first and is not read.
+# and reads as the end of the week. An ordinal weekday puts the month first
+# ("来月の第3金曜日"), the nth frame's order.
+#
+# 0.02's keys: Ranges and the day before or after a point read. Japanese puts the point
+# before a duration, which after and before do not take. "来週末" stays the end
+# of next week, as 0.01 read it, so there is no weekend line.
+# "の" joins a day to a time ("明日の15時"), at its first "の" only, so "来週の火曜日
+# の15時" does not read.
 start_of	{0}初め|{0}の初め|{0}始め|{0}の始め|{0}初旬
 end_of	{0}末|{0}の末|{0}の終わり
-at	{0}に
+at	{0}に|の
 on	{0}に
 skip
 and
+last	最後の|最終
+nth	{period}の第{n}{weekday}|{period}の{n}{weekday}
+range	{0}から{1}まで|{0}から{1}|{0}～{1}
+after	{0}の翌日
+before	{0}の前日
 # test: 先月末 => 2026-09-30T23:59:59.999999999+01:00
 # test: 来月の初め => 2026-11-01T00:00:00+00:00
 # test: 今年の終わり => 2026-12-31T23:59:59.999999999+00:00
 # test: 年末 => 2026-12-31T23:59:59.999999999+00:00
 # test: 明日15:30に => 2026-10-16T15:30:00+01:00
 # test: 火曜日に => 2026-10-20T00:00:00+01:00
+# test: 来月の第3金曜日 => 2026-11-20T00:00:00+00:00
+# test: 来月の最後の金曜日 => 2026-11-27T00:00:00+00:00
+# test: 月曜日から金曜日まで => 2026-10-19T00:00:00+01:00 / 2026-10-23T23:59:59.999999999+01:00
+# test: 9時から17時まで => 2026-10-15T09:00:00+01:00 / 2026-10-15T17:00:00+01:00
+# test: 明日の翌日 => 2026-10-17T00:00:00+01:00
+# test: 明日の前日 => 2026-10-15T00:00:00+01:00
+# test: 明日の15時 => 2026-10-16T15:00:00+01:00

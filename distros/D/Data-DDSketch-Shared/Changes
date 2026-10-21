@@ -1,5 +1,10 @@
 Revision history for Data-DDSketch-Shared
 
+0.05  2026-10-16
+    - Recover dead writers during concurrent reads.
+    - Fix shared-lock wakeups and frozen-data publication.
+    - Improve allocation failure cleanup and build portability.
+
 0.04      2026-09-26
           - The process recovering a dead writer's lock recounts count from
             the buckets; sum, min and max may become estimates.

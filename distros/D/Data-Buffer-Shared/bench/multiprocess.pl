@@ -12,7 +12,8 @@ my $cap = 10_000;
 my $nprocs = $ARGV[1] || 2;
 
 sub bench_fork {
-    my ($label, $code) = @_;
+    my ($label, $code, $ops) = @_;
+    $ops //= $n;
     my $buf = Data::Buffer::Shared::I64->new_anon($cap);
     $buf->fill(1);
 
@@ -28,7 +29,7 @@ sub bench_fork {
     }
     waitpid($_, 0) for @pids;
     my $elapsed = time() - $t0;
-    my $total = $n * $nprocs;
+    my $total = $ops * $nprocs;
     printf "%-35s %10.0f ops/sec  (%d procs, %.3fs)\n",
         $label, $total / $elapsed, $nprocs, $elapsed;
 }
@@ -65,10 +66,10 @@ bench_fork "slice(100) reads" => sub {
     my $buf = shift;
     my $m = int($n / 100);
     for (1..$m) { my @v = $buf->slice(0, 100) }
-};
+}, int($n / 100);
 
 bench_fork "get_raw(800B) reads" => sub {
     my $buf = shift;
     my $m = int($n / 100);
     for (1..$m) { my $r = $buf->get_raw(0, 800) }
-};
+}, int($n / 100);

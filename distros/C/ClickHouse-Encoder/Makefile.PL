@@ -18,10 +18,10 @@ WriteMakefile(
     LICENSE      => 'perl_5',
     PREREQ_PM    => {
         XSLoader => 0,
-        # All of these are core in any supported Perl; listed for
-        # honesty about what the lazy-require sites pull in.
+        # Runtime and lazy helper dependencies.
         'HTTP::Tiny'   => 0,  # for_table(via=>'http'), insert_http, etc.
         'Time::HiRes'  => 0,  # bulk_inserter retry backoff
+        'JSON::PP'     => 0,  # decoded JSON/Dynamic booleans
         'Math::BigInt' => 0,  # decimal128_str / decimal256_str
         'Encode'       => 0,  # URL escaping in _http_url_headers
         'POSIX'        => 0,  # coerce_datetimes, encode_to_command

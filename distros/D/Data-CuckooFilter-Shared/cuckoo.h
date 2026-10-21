@@ -196,14 +196,20 @@ static inline int cf_pid_alive(uint32_t pid) {
  * CAS to OUR pid to hold the lock while fixing shared state, then release.
  * Using our pid (not a bare WRITER_BIT sentinel) means a subsequent recovering
  * process can detect and re-recover if we crash mid-recovery. */
+static inline __attribute__((always_inline)) void cf_rwlock_drain_readers(CfHandle *h);
+static void cf_recount(CfHandle *h);
+
 static inline void cf_recover_stale_lock(CfHandle *h, uint32_t observed_wlock) {
     CfHeader *hdr = h->hdr;
     uint32_t mypid = CF_RWLOCK_WR((uint32_t)getpid());
     if (!__atomic_compare_exchange_n(&hdr->wlock, &observed_wlock,
-            mypid, 0, __ATOMIC_ACQUIRE, __ATOMIC_RELAXED))
+            mypid, 0, __ATOMIC_SEQ_CST, __ATOMIC_RELAXED))
         return;
-    /* We now hold the write lock as mypid.  No additional shared state needs
-     * repair here (this module has no seqlock); just release the lock. */
+    /* A dead writer may have stored a slot without updating count, or vice versa. */
+    if (!__atomic_load_n(&hdr->sealed, __ATOMIC_ACQUIRE)) {
+        cf_rwlock_drain_readers(h);
+        cf_recount(h);
+    }
     __atomic_store_n(&hdr->wlock, 0, __ATOMIC_RELEASE);
     if (__atomic_load_n(&hdr->rwait, __ATOMIC_RELAXED) > 0)
         syscall(SYS_futex, &hdr->wlock, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
@@ -398,48 +404,9 @@ static inline void cf_rwlock_rdunlock(CfHandle *h) {
     cf_reader_wake_drain(h);          /* if a writer is draining, wake it to re-scan */
 }
 
-static inline void cf_rwlock_wrlock(CfHandle *h) {
-    cf_claim_reader_slot(h);  /* refresh cached_pid across fork */
+/* Caller owns wlock via a SEQ_CST CAS; drain readers before touching the table. */
+static inline __attribute__((always_inline)) void cf_rwlock_drain_readers(CfHandle *h) {
     CfHeader *hdr = h->hdr;
-    /* Encode PID in the wlock word itself (0x80000000 | pid) to eliminate any
-     * crash window between acquiring the lock and storing the owner. */
-    uint32_t mypid = CF_RWLOCK_WR(h->cached_pid);
-    /* Phase 1: acquire the writer word (mutual exclusion among writers). */
-    for (int spin = 0; ; spin++) {
-        uint32_t expected = 0;
-        if (__atomic_compare_exchange_n(&hdr->wlock, &expected, mypid,
-                0, __ATOMIC_SEQ_CST, __ATOMIC_RELAXED))
-            break;
-        /* Contended: expected now holds the current wlock value. */
-        if (expected >= CF_RWLOCK_WRITER_BIT &&
-            !cf_pid_alive(expected & CF_RWLOCK_PID_MASK)) {
-            cf_recover_stale_lock(h, expected);
-            spin = 0;
-            continue;
-        }
-        if (__builtin_expect(spin < CF_RWLOCK_SPIN_LIMIT, 1)) {
-            cf_rwlock_spin_pause();
-            continue;
-        }
-        cf_park(h);
-        uint32_t cur = __atomic_load_n(&hdr->wlock, __ATOMIC_RELAXED);
-        if (cur != 0) {
-            long rc = syscall(SYS_futex, &hdr->wlock, FUTEX_WAIT, cur,
-                              &cf_lock_timeout, NULL, 0);
-            if (rc == -1 && errno == ETIMEDOUT) {
-                cf_unpark(h);
-                cf_recover_after_timeout(h);
-                spin = 0;
-                continue;
-            }
-        }
-        cf_unpark(h);
-        spin = 0;
-    }
-    /* Phase 2: we own wlock, so no NEW reader can join (they see wlock!=0 and
-     * yield).  Drain the readers that were already holding when we won the CAS.
-     * The SEQ_CST CAS above + the SEQ_CST rdepth loads below are the writer side
-     * of the Dekker handshake. */
     for (;;) {
         uint32_t v = __atomic_load_n(&hdr->drain_seq, __ATOMIC_ACQUIRE);  /* snapshot BEFORE scan */
         int busy = 0;
@@ -478,6 +445,47 @@ static inline void cf_rwlock_wrlock(CfHandle *h) {
          * (which reclaims any newly-dead slotted reader). */
         syscall(SYS_futex, &hdr->drain_seq, FUTEX_WAIT, v, &cf_lock_timeout, NULL, 0);
     }
+}
+
+static inline void cf_rwlock_wrlock(CfHandle *h) {
+    cf_claim_reader_slot(h);  /* refresh cached_pid across fork */
+    CfHeader *hdr = h->hdr;
+    /* Encode PID in the wlock word itself (0x80000000 | pid) to eliminate any
+     * crash window between acquiring the lock and storing the owner. */
+    uint32_t mypid = CF_RWLOCK_WR(h->cached_pid);
+    /* Phase 1: acquire the writer word (mutual exclusion among writers). */
+    for (int spin = 0; ; spin++) {
+        uint32_t expected = 0;
+        if (__atomic_compare_exchange_n(&hdr->wlock, &expected, mypid,
+                0, __ATOMIC_SEQ_CST, __ATOMIC_RELAXED))
+            break;
+        /* Contended: expected now holds the current wlock value. */
+        if (expected >= CF_RWLOCK_WRITER_BIT &&
+            !cf_pid_alive(expected & CF_RWLOCK_PID_MASK)) {
+            cf_recover_stale_lock(h, expected);
+            spin = 0;
+            continue;
+        }
+        if (__builtin_expect(spin < CF_RWLOCK_SPIN_LIMIT, 1)) {
+            cf_rwlock_spin_pause();
+            continue;
+        }
+        cf_park(h);
+        uint32_t cur = __atomic_load_n(&hdr->wlock, __ATOMIC_RELAXED);
+        if (cur != 0) {
+            long rc = syscall(SYS_futex, &hdr->wlock, FUTEX_WAIT, cur,
+                              &cf_lock_timeout, NULL, 0);
+            if (rc == -1 && errno == ETIMEDOUT) {
+                cf_unpark(h);
+                cf_recover_after_timeout(h);
+                spin = 0;
+                continue;
+            }
+        }
+        cf_unpark(h);
+        spin = 0;
+    }
+    cf_rwlock_drain_readers(h);
 }
 
 static inline void cf_rwlock_wrunlock(CfHandle *h) {
@@ -568,6 +576,12 @@ static inline CfHandle *cf_setup(void *base, size_t map_size,
     h->occ          = (uint64_t *)((uint8_t *)base + cf_layout().occ);        /* trusted layout offset */
     h->mmap_size    = map_size;
     h->path         = path ? strdup(path) : NULL;
+    if (path && !h->path) {
+        munmap(base, map_size);
+        if (backing_fd >= 0) close(backing_fd);
+        free(h);
+        return NULL;
+    }
     h->backing_fd   = backing_fd;
     h->my_slot_idx  = UINT32_MAX;
     return h;
@@ -731,7 +745,7 @@ static CfHandle *cf_create(const char *path, uint64_t capacity, mode_t mode, cha
                 }
                 CF_ERR("invalid Cuckoo filter file"); munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
             }
-            if (((CfHeader *)base)->sealed) {
+            if (__atomic_load_n(&((CfHeader *)base)->sealed, __ATOMIC_ACQUIRE)) {
                 CF_ERR("%s is frozen (read-only); open it with new_readonly", path);
                 munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
             }
@@ -781,7 +795,7 @@ static CfHandle *cf_open_fd(int fd, char *errbuf) {
     if (!cf_validate_header((CfHeader *)base, (uint64_t)st.st_size)) {
         CF_ERR("invalid Cuckoo filter table"); munmap(base, ms); return NULL;
     }
-    if (((CfHeader *)base)->sealed) {
+    if (__atomic_load_n(&((CfHeader *)base)->sealed, __ATOMIC_ACQUIRE)) {
         CF_ERR("this Cuckoo filter is frozen (read-only); open it with new_readonly");
         munmap(base, ms); return NULL;
     }
@@ -838,10 +852,11 @@ static CfHandle *cf_open_readonly(const char *path, char *errbuf) {
     void *base = mmap(NULL, ms, PROT_READ, MAP_SHARED, fd, 0);
     close(fd);   /* the mapping keeps the file; a read-only view needs no fd (no msync/ftruncate) */
     if (base == MAP_FAILED) { CF_ERR("mmap %s: %s", path, strerror(errno)); return NULL; }
+    uint8_t sealed = __atomic_load_n(&((CfHeader *)base)->sealed, __ATOMIC_ACQUIRE);
     if (!cf_validate_header((CfHeader *)base, (uint64_t)st.st_size)) {
         CF_ERR("%s: invalid Cuckoo filter file", path); munmap(base, ms); return NULL;
     }
-    if (!((CfHeader *)base)->sealed) {
+    if (!sealed) {
         CF_ERR("%s is not frozen: call ->freeze on the producer before opening read-only", path);
         munmap(base, ms); return NULL;
     }
@@ -857,7 +872,7 @@ static CfHandle *cf_open_readonly(const char *path, char *errbuf) {
  * and a read-write reopen is refused. */
 static int cf_freeze(CfHandle *h) {
     cf_rwlock_wrlock(h);
-    h->hdr->sealed = 1;
+    __atomic_store_n(&h->hdr->sealed, 1, __ATOMIC_RELEASE);
     cf_rwlock_wrunlock(h);
     if (h->path || h->backing_fd >= 0) return cf_msync(h);  /* durability for file/memfd-backed */
     return 0;   /* anonymous: the seal lives in shared memory (visible to forks); nothing to flush */
@@ -908,6 +923,14 @@ static inline uint64_t cf_phys_buckets(CfHandle *h) {
     uint64_t base_off = cf_layout().slots;
     if (h->mmap_size <= base_off) return 0;
     return (uint64_t)(h->mmap_size - base_off) / ((uint64_t)CF_SLOTS * sizeof(uint16_t));
+}
+
+/* Cold path: called only while recovering a dead writer, with readers drained. */
+static void cf_recount(CfHandle *h) {
+    uint16_t *slots = cf_slots(h);
+    uint64_t n = cf_phys_buckets(h) * CF_SLOTS, count = 0;
+    for (uint64_t i = 0; i < n; i++) count += slots[i] != 0;
+    h->hdr->count = count;
 }
 
 /* pointer to bucket i's CF_SLOTS fingerprint slots.

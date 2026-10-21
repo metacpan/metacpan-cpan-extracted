@@ -18,3 +18,4 @@ t/00-load.t
 t/01-create.t
 t/02-roundtrip-client.pl
 t/02-roundtrip.t
+t/03-xsub-stack.t

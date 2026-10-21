@@ -7,8 +7,8 @@ WriteMakefile(
     AUTHOR           => 'vividsnow',
     LICENSE          => 'perl_5',
     MIN_PERL_VERSION => '5.010',
-    PREREQ_PM        => { 'EV' => 0, 'Net::SSLeay' => '1.85', 'Curl::Impersonate' => '0.02' },
-    TEST_REQUIRES    => { 'Test::More' => 0 },
+    PREREQ_PM        => { 'EV' => 0, 'Net::SSLeay' => '1.85', 'Curl::Impersonate' => '0.03', 'File::Temp' => '0.19' },
+    TEST_REQUIRES    => { 'Test::More' => '0.88' },
     META_MERGE       => {
         'meta-spec' => { version => 2 },
         resources   => {

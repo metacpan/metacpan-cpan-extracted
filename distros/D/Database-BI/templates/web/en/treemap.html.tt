@@ -35,7 +35,7 @@
 then press Enter or Space to open the matching rows in the table.</p>
 
 <div class="treemap-container">
-  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="[% d3_url | html %]"></script>
   [% chart_html %]
 </div>
 

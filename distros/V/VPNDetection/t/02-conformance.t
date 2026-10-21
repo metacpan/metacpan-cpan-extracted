@@ -67,7 +67,7 @@ sub serve {
     $origin->reset;
 }
 
-subtest 'a bogon is answered locally in the full max shape' => sub {
+subtest 'a bogon is answered locally in the widest shape' => sub {
     serve();
     my $result = client()->lookup('10.0.0.1');
 
@@ -80,6 +80,10 @@ subtest 'a bogon is answered locally in the full max shape' => sub {
     for my $object (@{ $corpus->{bogonResponse}{emptyObjects} }) {
         ok($result->has($object), "$object is present");
         is_deeply($result->$object, {}, "$object is empty");
+    }
+    for my $object (qw(location asn)) {
+        ok($result->has($object), "$object is present");
+        is_deeply($result->$object, $corpus->{bogonResponse}{$object}, "$object carries every key, empty");
     }
     is($origin->count, 0, 'a bogon must not reach the network');
 };
@@ -107,7 +111,7 @@ subtest 'lookup preserves absent-versus-false across every plan shape' => sub {
             ok($result->has($field), "$case->{name}: $field was served");
             is_deeply($result->$field, {}, "$case->{name}: $field is present and empty");
         }
-        for my $object (qw(vpn hosting dcproxy pubproxy)) {
+        for my $object (qw(vpn hosting dcproxy pubproxy location asn)) {
             next unless $expect->{$object};
             is_deeply($result->$object, $expect->{$object}, "$case->{name}: $object");
         }

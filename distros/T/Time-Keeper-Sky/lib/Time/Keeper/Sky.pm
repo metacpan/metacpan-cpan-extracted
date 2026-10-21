@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use XSLoader;
 XSLoader::load('Time::Keeper::Sky', $VERSION);
@@ -23,7 +23,7 @@ Time::Keeper::Sky - the sky from a place: the sun and the moon, where they are a
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 SYNOPSIS
 
@@ -58,14 +58,7 @@ A Time::Keeper::Sky is an observer: a place on the earth, with the time zone its
 are counted in and the locale its values print in. Everything the dist computes is
 seen from one.
 
-This dist was Time::Keeper::Sun, and still contains it: L<Time::Keeper::Sun> is a
-Time::Keeper::Sky, and every program written for Time::Keeper::Sun 0.01 or 0.02 runs
-unchanged, its objects still Time::Keeper::Suns. Anything that takes a place (C<<
-place => >> on the moon's methods) takes either. New code should start here.
-
-The methods below are the sun's, as Time::Keeper::Sun documented them; they are
-described in full in L<Time::Keeper::Sun>, with what a day is, the horizon, the range
-and the accuracy. The rest of the sky has a module each:
+L<https://lnation.org/sky>
 
 =over 4
 

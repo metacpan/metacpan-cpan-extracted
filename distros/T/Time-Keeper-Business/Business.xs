@@ -3,6 +3,16 @@
 #include "perl.h"
 #include "XSUB.h"
 
+#ifndef G_LIST
+#  define G_LIST G_ARRAY
+#endif
+#ifndef mPUSHs
+#  define mPUSHs(s) PUSHs(sv_2mortal(s))
+#endif
+#ifndef mXPUSHs
+#  define mXPUSHs(s) XPUSHs(sv_2mortal(s))
+#endif
+
 #include <stdint.h>
 
 #include "time_keeper_abi.h"

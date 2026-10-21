@@ -5,14 +5,29 @@
 #
 # Korean puts "end" and "beginning" after the period, and "에" after a time or
 # a day. An ordinal weekday is not read.
+#
+# 0.02's keys: Ranges, the day before or after a point and an ordinal weekday with the
+# month first read. Korean puts the point before a duration, which after and
+# before do not take. "다음 주말" stays the end of next week, as 0.01 read it, so
+# there is no weekend line.
 start_of	{0} 초|{0}초
 end_of	{0} 말|{0}말
 at	{0}에
 on	{0}에
 skip
 and
+range	{0}부터 {1}까지|{0}에서 {1}까지
+after	{0} 다음 날
+before	{0} 전날
+nth	{period} {n} {weekday}
+last	마지막
 # test: 다음 달 말 => 2026-11-30T23:59:59.999999999+00:00
 # test: 지난달 말 => 2026-09-30T23:59:59.999999999+01:00
 # test: 다음 달 초 => 2026-11-01T00:00:00+00:00
 # test: 내일 오후 3:30에 => 2026-10-16T15:30:00+01:00
 # test: 화요일에 => 2026-10-20T00:00:00+01:00
+# test: 월요일부터 금요일까지 => 2026-10-19T00:00:00+01:00 / 2026-10-23T23:59:59.999999999+01:00
+# test: 내일 다음 날 => 2026-10-17T00:00:00+01:00
+# test: 내일 전날 => 2026-10-15T00:00:00+01:00
+# test: 다음 달 셋째 금요일 => 2026-11-20T00:00:00+00:00
+# test: 10월 마지막 금요일 => 2026-10-30T00:00:00+00:00

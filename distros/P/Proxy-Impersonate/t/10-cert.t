@@ -28,6 +28,7 @@ is($mode & 077, 0, 'key file is not group/other readable');
 # applies to a server CTX without error
 my $ctx = Net::SSLeay::CTX_new();
 ok(eval { $c->apply_to_ctx($ctx); 1 }, 'apply_to_ctx succeeds') or diag($@);
+Net::SSLeay::CTX_free($ctx);
 
 # --- refuse to ADOPT an unsafe pre-existing key ---------------------------
 #
@@ -58,6 +59,30 @@ ok(eval { $c->apply_to_ctx($ctx); 1 }, 'apply_to_ctx succeeds') or diag($@);
     $err = '';
     eval { Proxy::Impersonate::Cert->new(cert_dir => $d2); 1 } or $err = $@;
     like($err, qr/is a symlink/, 'refuses a symlinked key');
+}
+
+{
+    my $bad = tempdir(CLEANUP => 1);
+    open my $f, '>', "$bad/cert.pem" or die $!;
+    print $f 'broken'; close $f;
+    eval { Proxy::Impersonate::Cert->new(cert_dir => $bad) };
+    like($@, qr/incomplete/, 'partial pair fails at startup');
+    open $f, '>', "$bad/key.pem" or die $!;
+    print $f 'broken'; close $f; chmod 0600, "$bad/key.pem";
+    eval { Proxy::Impersonate::Cert->new(cert_dir => $bad) };
+    like($@, qr/invalid certificate/, 'corrupt PEM fails at startup');
+}
+
+{
+    my $other = Proxy::Impersonate::Cert->new(cert_dir => tempdir(CLEANUP => 1));
+    my $pem = Net::SSLeay::PEM_get_string_PrivateKey($other->key);
+    open my $f, '>', $c->key_path or die $!;
+    print $f $pem; close $f;
+    eval { Proxy::Impersonate::Cert->new(cert_dir => $dir) };
+    like($@, qr/mismatched/, 'mismatched pair fails at startup');
+    my $ctx = Net::SSLeay::CTX_new();
+    ok(eval { $c->apply_to_ctx($ctx); 1 }, 'existing object uses its validated pair after files change');
+    Net::SSLeay::CTX_free($ctx);
 }
 
 done_testing;

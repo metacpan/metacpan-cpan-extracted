@@ -7,6 +7,7 @@
 use strict;
 use warnings;
 use Test::More;
+use File::Temp qw(tempfile);
 use lib 'blib/lib', 'blib/arch', 't/lib';
 use TestCH qw(split_paren_list);
 *_split_paren_list = \&split_paren_list;
@@ -126,8 +127,7 @@ for my $iter (1..$iters) {
 
     # List form so $port (an env var) isn't shell-interpreted; redirect
     # stderr in Perl rather than via the shell.
-    my $err_fh;
-    open $err_fh, '>', '/tmp/fuzz.err' or die "open /tmp/fuzz.err: $!";
+    my ($err_fh, $err_path) = tempfile('che-fuzz-XXXXXX', TMPDIR => 1, UNLINK => 1);
     defined(my $pid = open my $fh, '|-') or die "fork: $!";
     if ($pid == 0) {
         open STDERR, '>&', $err_fh or die "redirect: $!";
@@ -149,7 +149,9 @@ for my $iter (1..$iters) {
     chomp $count;
 
     if (!$insert_ok || $count != $nrows) {
-        my $err = do { local (@ARGV, $/) = '/tmp/fuzz.err'; <> };
+        open my $err_in, '<', $err_path or die "open $err_path: $!";
+        my $err = do { local $/; <$err_in> };
+        close $err_in;
         fail("iter $iter: CH rejected our buffer (got $count rows, expected $nrows)");
         diag("schema: $col_defs");
         diag("error:  $err") if $err;

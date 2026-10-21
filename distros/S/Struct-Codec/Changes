@@ -1,5 +1,9 @@
 Revision history for Struct::Codec
 
+0.10	2026-10-21
+        - canonical => 1 on struct_encode: every hash's keys in order, so
+          equal data is equal bytes in any process.
+
 0.09	2026-10-11
         - Builds on 5.10.0: HeUTF8 is defined where perl lacks it.
 

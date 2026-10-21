@@ -12,8 +12,7 @@
  * The slot's ctl word encodes (generation << 2) | state_bits, and
  * transitions are made via CAS. Head/tail still serialize the POSITION
  * handout; the per-slot state machine serializes the VALUE handoff.
- * A consumer that wins the head/tail CAS always waits for the matching
- * publisher's transition to FILLED before reading.
+ * Readers take the publication gate before advancing head/tail.
  *
  * Futex blocking when empty or full.
  */
@@ -39,13 +38,15 @@
 #include <linux/futex.h>
 #include <sys/eventfd.h>
 
-#define DEQ_MAGIC       0x44455132U  /* "DEQ2" -- v2 layout (per-slot ctl) */
-#define DEQ_VERSION     2
+#define DEQ_MAGIC       0x44455133U  /* "DEQ3" -- generation-qualified wake hints */
+#define DEQ_VERSION     3
 #define DEQ_ERR_BUFLEN  (PATH_MAX + 256)
 
-/* Drain-time recovery: how long to wait for a slot stuck in WRITING before
- * declaring its pusher dead and force-skipping. Matches the slot-stuck
- * recovery timeout used in sister Data-*-Shared modules (e.g. Stack). */
+#ifndef DEQ_WAIT_INTERRUPTED
+#define DEQ_WAIT_INTERRUPTED() 0
+#endif
+
+/* A slot must stay stuck this long before recovery. */
 #define DEQ_DRAIN_RECOVERY_SEC  2
 
 #define DEQ_VAR_INT   0
@@ -75,7 +76,9 @@ typedef struct {
     uint64_t total_size;
     uint64_t data_off;
     uint64_t ctl_off;          /* offset to per-slot ctl array */
-    uint8_t  _pad0[16];
+    uint32_t push_wait_hint;   /* registration generation + active bit */
+    uint32_t pop_wait_hint;
+    uint8_t  _pad0[8];
 
     uint64_t cursor;           /* 64: (head<<32)|tail */
     uint32_t waiters_push;     /* 72 */
@@ -84,8 +87,8 @@ typedef struct {
     uint64_t stat_pops;        /* 88 */
     uint64_t stat_waits;       /* 96 */
     uint64_t stat_timeouts;    /* 104 */
-    uint32_t push_wake_seq;    /* 112: bumped by every pop, futex word for pushers */
-    uint32_t pop_wake_seq;     /* 116: bumped by every push, futex word for poppers */
+    uint32_t push_wake_seq;    /* 112: futex word for pushers */
+    uint32_t pop_wake_seq;     /* 116: futex word for poppers */
     uint64_t stat_recoveries;  /* 120: recovery of abandoned/stuck slots (WRITING, READING, or EMPTY) */
 } DeqHeader;
 
@@ -129,8 +132,13 @@ static inline int deq_remaining(const struct timespec *dl, struct timespec *rem)
     return rem->tv_sec >= 0;
 }
 
-static inline uint8_t *deq_slot(DeqHandle *h, uint32_t idx) {
-    return h->data + (size_t)(idx % h->capacity) * h->elem_size;
+static inline uint64_t *deq_ctl_at(DeqHandle *h, uint32_t idx) {
+    return &h->ctl[idx];
+}
+
+static inline void deq_copy(void *dst, const void *src, uint32_t size) {
+    if (size == sizeof(uint64_t)) memcpy(dst, src, sizeof(uint64_t));
+    else memcpy(dst, src, size);
 }
 
 static inline uint32_t deq_size(DeqHandle *h) {
@@ -146,44 +154,63 @@ static inline void deq_spin_pause(void) {
 #endif
 }
 
-/* --- per-slot state machine helpers ---
- * Claim a slot for writing: spin CAS until we observe EMPTY and can mark
- * WRITING. Returns the generation that was observed, for the matching
- * publish.  Caller holds the position CAS so at most one pusher targets
- * this slot, but a pending popper from the previous cycle may still be
- * finishing; the spin is bounded by that popper's READING -> EMPTY store.
- */
-/* Bounded wait for `want`, with abandoned-slot recovery.
- *
- * A peer that died between claiming a slot and publishing/releasing it leaves
- * it stuck in WRITING (crashed pusher) or READING (crashed popper); a drain
- * that force-recovered a slot can likewise orphan a later publish. An unbounded
- * spin here wedges EVERY process using the deque, forever, at 100% CPU.
- * deq_drain already bounds its own wait for exactly this reason; the push/pop
- * fast paths must do the same or one SIGKILL is a permanent cluster-wide DoS.
- *
- * Returns 1 with *out_gen set when the slot was claimed in state `want`;
- * 0 when the slot was abandoned and force-reclaimed to EMPTY@(gen+1).
- *
- * Same false-positive caveat as deq_drain: ctl encodes no PID, so a live peer
- * stalled past the deadline is indistinguishable from a dead one; its later
- * publish is a CAS against the old generation, so it no-ops rather than
- * resurrecting a phantom slot. The claim->publish gap is a sub-microsecond
- * memcpy, many orders of magnitude below the deadline. */
-static inline int deq_slot_wait_state(uint64_t *ctl_word, uint32_t want,
-                                      uint64_t *out_gen) {
+static inline void deq_after_rmw_fence(void) {
+#if defined(__x86_64__) || defined(__i386__)
+    /* The preceding locked RMW already supplies the CPU fence. */
+    __asm__ volatile("" ::: "memory");
+#else
+    __atomic_thread_fence(__ATOMIC_SEQ_CST);
+#endif
+}
+
+static inline void deq_waiter_enter(uint32_t *count, uint32_t *hint) {
+    __atomic_add_fetch(count, 1, __ATOMIC_RELEASE);
+    uint32_t c = __atomic_load_n(hint, __ATOMIC_RELAXED);
+    while (!__atomic_compare_exchange_n(hint, &c, (c + 2u) | 1u,
+            1, __ATOMIC_RELEASE, __ATOMIC_RELAXED)) {}
+}
+
+static inline void deq_waiter_leave(uint32_t *count, uint32_t *hint) {
+    uint32_t c = __atomic_load_n(hint, __ATOMIC_RELAXED);
+    if (__atomic_sub_fetch(count, 1, __ATOMIC_RELAXED) == 0)
+        __atomic_compare_exchange_n(hint, &c, c & ~1u,
+                0, __ATOMIC_RELEASE, __ATOMIC_RELAXED);
+}
+
+static void deq_wake_slow(DeqHeader *hdr, int push, int n, uint32_t c) {
+    uint32_t *hint = push ? &hdr->push_wait_hint : &hdr->pop_wait_hint;
+    uint32_t *seq = push ? &hdr->push_wake_seq : &hdr->pop_wake_seq;
+    __atomic_add_fetch(seq, 1, __ATOMIC_RELEASE);
+    /* Forget dead waiters only if nobody registered during the wake. */
+    if (syscall(SYS_futex, seq, FUTEX_WAKE, n, NULL, NULL, 0) == 0)
+        __atomic_compare_exchange_n(hint, &c, c & ~1u,
+                0, __ATOMIC_RELEASE, __ATOMIC_RELAXED);
+}
+
+static inline void deq_wake(DeqHeader *hdr, int push, int n) {
+    uint32_t c = __atomic_load_n(push ? &hdr->push_wait_hint : &hdr->pop_wait_hint,
+                                  __ATOMIC_RELAXED);
+    if (c & 1u) deq_wake_slow(hdr, push, n, c);
+}
+
+/* Readers reserve BEFORE moving the cursor, so the position cannot be reused
+ * while an earlier reader is descheduled. Writers claim after the cursor CAS. */
+static uint64_t deq_slot_reserve_slow(DeqHandle *__restrict h, uint64_t *ctl_word, uint64_t cursor,
+                                      uint32_t want) {
     struct timespec dl;
     int dl_set = 0;
     uint32_t spins = 0;
+    uint64_t waiting_ctl = UINT64_MAX;
     for (;;) {
+        if (want == DEQ_SLOT_FILLED
+            && __atomic_load_n(&h->hdr->cursor, __ATOMIC_ACQUIRE) != cursor) return 0;
         uint64_t c = __atomic_load_n(ctl_word, __ATOMIC_ACQUIRE);
+        if (c != waiting_ctl) { waiting_ctl = c; dl_set = 0; }
         if (DEQ_SLOT_STATE(c) == want) {
-            uint32_t next = (want == DEQ_SLOT_EMPTY) ? DEQ_SLOT_WRITING : DEQ_SLOT_READING;
-            uint64_t nc = (DEQ_SLOT_GEN(c) << 2) | next;
+            uint64_t nc = c | 1u;
             if (__atomic_compare_exchange_n(ctl_word, &c, nc,
                     0, __ATOMIC_ACQUIRE, __ATOMIC_RELAXED)) {
-                *out_gen = DEQ_SLOT_GEN(c);
-                return 1;
+                return c;
             }
             continue;
         }
@@ -192,48 +219,66 @@ static inline int deq_slot_wait_state(uint64_t *ctl_word, uint32_t want,
             if (!dl_set) { deq_make_deadline((double)DEQ_DRAIN_RECOVERY_SEC, &dl); dl_set = 1; }
             struct timespec rem;
             if (!deq_remaining(&dl, &rem)) {
-                uint64_t nc = ((DEQ_SLOT_GEN(c) + 1) << 2) | DEQ_SLOT_EMPTY;
+                uint64_t nc = ((DEQ_SLOT_GEN(c) + 1) << 2) | (want | 1u);
                 if (__atomic_compare_exchange_n(ctl_word, &c, nc,
-                        0, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED))
-                    return 0;
-                continue;   /* CAS lost: state advanced concurrently -- re-observe */
+                        0, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED)) {
+                    __atomic_add_fetch(&h->hdr->stat_recoveries, 1, __ATOMIC_RELAXED);
+                    return nc;
+                }
             }
-            struct timespec ts = { 0, 100000L }; /* 100us */
+            struct timespec ts = { 0, 100000L };
             nanosleep(&ts, NULL);
         }
     }
 }
 
-static inline uint64_t deq_slot_claim_write(DeqHandle *h, uint64_t *ctl_word) {
-    uint64_t gen;
-    /* On recovery the slot is EMPTY at the bumped gen: retry and take it. */
-    while (!deq_slot_wait_state(ctl_word, DEQ_SLOT_EMPTY, &gen)) {
-        __atomic_add_fetch(&h->hdr->stat_recoveries, 1, __ATOMIC_RELAXED);
+/* Reads return FILLED@gen, READING@gen on recovery, or 0 to retry. */
+static inline uint64_t deq_slot_reserve(DeqHandle *__restrict h, uint64_t *ctl_word, uint64_t cursor,
+                                        uint32_t want) {
+    for (uint32_t spins = 0; spins < 8; spins++) {
+        uint64_t c = __atomic_load_n(ctl_word, __ATOMIC_ACQUIRE);
+        if (DEQ_SLOT_STATE(c) == want) {
+            uint64_t nc = c | 1u;
+            if (__atomic_compare_exchange_n(ctl_word, &c, nc,
+                    0, __ATOMIC_ACQUIRE, __ATOMIC_RELAXED)) {
+                return c;
+            }
+        }
+        if (want == DEQ_SLOT_FILLED
+            && __atomic_load_n(&h->hdr->cursor, __ATOMIC_ACQUIRE) != cursor) return 0;
     }
-    return gen;
+    return deq_slot_reserve_slow(h, ctl_word, cursor, want);
 }
 
-/* Publish written value: WRITING@gen -> FILLED@gen. Implemented as CAS
- * (not a plain store) so that if deq_drain force-recovered the slot mid-
- * write -- bumping it to EMPTY@(gen+1) -- this publish is a no-op rather
- * than clobbering the recovered state back to FILLED@gen. That would
- * leave a phantom FILLED at a stale gen which the next pusher's
- * deq_slot_claim_write (waits on EMPTY) could never advance past,
- * deadlocking that slot forever. The caller's cursor CAS was already
- * committed, so on lost-race the value is silently dropped -- matching
- * the documented drain-recovery semantics. */
+static inline void deq_slot_cancel(uint64_t *ctl_word, uint64_t reserved) {
+    uint64_t expected = reserved | DEQ_SLOT_READING;
+    uint64_t restored = DEQ_SLOT_STATE(reserved) == DEQ_SLOT_FILLED
+        ? reserved : reserved & ~(uint64_t)DEQ_SLOT_STATE_MASK;
+    __atomic_compare_exchange_n(ctl_word, &expected, restored,
+            0, __ATOMIC_RELEASE, __ATOMIC_RELAXED);
+}
+
+/* Keep the reservation when only the opposite boundary moved. */
+static inline int deq_cursor_commit(DeqHandle *__restrict h, uint64_t c, int front) {
+    uint32_t boundary = front ? DEQ_CURSOR_HEAD(c) : DEQ_CURSOR_TAIL(c);
+    c = __atomic_load_n(&h->hdr->cursor, __ATOMIC_ACQUIRE);
+    while ((front ? DEQ_CURSOR_HEAD(c) : DEQ_CURSOR_TAIL(c)) == boundary
+           && DEQ_CURSOR_SIZE(c) != 0) {
+        uint64_t nc = front
+            ? DEQ_CURSOR(boundary + 1u, DEQ_CURSOR_TAIL(c))
+            : DEQ_CURSOR(DEQ_CURSOR_HEAD(c), boundary - 1u);
+        if (__atomic_compare_exchange_n(&h->hdr->cursor, &c, nc,
+                0, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED)) return 1;
+    }
+    return 0;
+}
+
+/* A late publish cannot resurrect a generation replaced by recovery. */
 static inline void deq_slot_publish(uint64_t *ctl_word, uint64_t gen) {
     uint64_t expected = (gen << 2) | DEQ_SLOT_WRITING;
     uint64_t desired  = (gen << 2) | DEQ_SLOT_FILLED;
     (void)__atomic_compare_exchange_n(ctl_word, &expected, desired,
             0, __ATOMIC_RELEASE, __ATOMIC_RELAXED);
-}
-
-/* Claim a slot for reading: spin CAS until we observe FILLED and mark READING. */
-/* Returns 1 and sets *out_gen on success; 0 if the slot was abandoned by a
- * crashed pusher and has been force-reclaimed (no value to read). */
-static inline int deq_slot_claim_read(uint64_t *ctl_word, uint64_t *out_gen) {
-    return deq_slot_wait_state(ctl_word, DEQ_SLOT_FILLED, out_gen);
 }
 
 /* Release slot after read: READING@gen -> EMPTY@gen+1, via CAS not a blind
@@ -249,7 +294,7 @@ static inline void deq_slot_release(uint64_t *ctl_word, uint64_t gen) {
  * Push back (tail++)
  * ================================================================ */
 
-static inline int deq_try_push_back(DeqHandle *h, const void *val, uint32_t vlen) {
+static inline int deq_try_push_back(DeqHandle *__restrict h, const void *val, uint32_t vlen) {
     DeqHeader *hdr = h->hdr;
     uint32_t cap = h->capacity;   /* cached-at-attach geometry, not live hdr */
     for (;;) {
@@ -261,18 +306,16 @@ static inline int deq_try_push_back(DeqHandle *h, const void *val, uint32_t vlen
                 1, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED)) {
             uint32_t sz = h->elem_size;
             uint32_t cp = vlen < sz ? vlen : sz;
-            uint32_t idx = t % cap;
-            uint64_t gen = deq_slot_claim_write(h, &h->ctl[idx]);
-            memcpy(deq_slot(h, t), val, cp);
-            if (cp < sz) memset(deq_slot(h, t) + cp, 0, sz - cp);
-            deq_slot_publish(&h->ctl[idx], gen);
+            uint32_t idx = t & (cap - 1);
+            uint64_t *ctl_word = deq_ctl_at(h, idx);
+            uint64_t gen = DEQ_SLOT_GEN(deq_slot_reserve(h, ctl_word, 0, DEQ_SLOT_EMPTY));
+            deq_copy((h->data + (size_t)idx * sz), val, cp);
+            if (cp < sz) memset((h->data + (size_t)idx * sz) + cp, 0, sz - cp);
+            deq_slot_publish(ctl_word, gen);
             __atomic_add_fetch(&hdr->stat_pushes, 1, __ATOMIC_RELAXED);
             /* StoreLoad: publish our slot/cursor change before reading waiters. */
-            __atomic_thread_fence(__ATOMIC_SEQ_CST);
-            if (__atomic_load_n(&hdr->waiters_pop, __ATOMIC_RELAXED) > 0) {
-                __atomic_add_fetch(&hdr->pop_wake_seq, 1, __ATOMIC_RELEASE);
-                syscall(SYS_futex, &hdr->pop_wake_seq, FUTEX_WAKE, 1, NULL, NULL, 0);
-            }
+            deq_after_rmw_fence();
+            deq_wake(hdr, 0, 1);
             return 1;
         }
     }
@@ -282,7 +325,7 @@ static inline int deq_try_push_back(DeqHandle *h, const void *val, uint32_t vlen
  * Push front (head--)
  * ================================================================ */
 
-static inline int deq_try_push_front(DeqHandle *h, const void *val, uint32_t vlen) {
+static inline int deq_try_push_front(DeqHandle *__restrict h, const void *val, uint32_t vlen) {
     DeqHeader *hdr = h->hdr;
     uint32_t cap = h->capacity;   /* cached-at-attach geometry, not live hdr */
     for (;;) {
@@ -295,18 +338,16 @@ static inline int deq_try_push_front(DeqHandle *h, const void *val, uint32_t vle
                 1, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED)) {
             uint32_t sz = h->elem_size;
             uint32_t cp = vlen < sz ? vlen : sz;
-            uint32_t idx = new_hd % cap;
-            uint64_t gen = deq_slot_claim_write(h, &h->ctl[idx]);
-            memcpy(deq_slot(h, new_hd), val, cp);
-            if (cp < sz) memset(deq_slot(h, new_hd) + cp, 0, sz - cp);
-            deq_slot_publish(&h->ctl[idx], gen);
+            uint32_t idx = new_hd & (cap - 1);
+            uint64_t *ctl_word = deq_ctl_at(h, idx);
+            uint64_t gen = DEQ_SLOT_GEN(deq_slot_reserve(h, ctl_word, 0, DEQ_SLOT_EMPTY));
+            deq_copy((h->data + (size_t)idx * sz), val, cp);
+            if (cp < sz) memset((h->data + (size_t)idx * sz) + cp, 0, sz - cp);
+            deq_slot_publish(ctl_word, gen);
             __atomic_add_fetch(&hdr->stat_pushes, 1, __ATOMIC_RELAXED);
             /* StoreLoad: publish our slot/cursor change before reading waiters. */
-            __atomic_thread_fence(__ATOMIC_SEQ_CST);
-            if (__atomic_load_n(&hdr->waiters_pop, __ATOMIC_RELAXED) > 0) {
-                __atomic_add_fetch(&hdr->pop_wake_seq, 1, __ATOMIC_RELEASE);
-                syscall(SYS_futex, &hdr->pop_wake_seq, FUTEX_WAKE, 1, NULL, NULL, 0);
-            }
+            deq_after_rmw_fence();
+            deq_wake(hdr, 0, 1);
             return 1;
         }
     }
@@ -316,41 +357,36 @@ static inline int deq_try_push_front(DeqHandle *h, const void *val, uint32_t vle
  * Pop front (head++)
  * ================================================================ */
 
-static inline int deq_try_pop_front(DeqHandle *h, void *out) {
+static inline int deq_try_pop_front(DeqHandle *__restrict h, void *out) {
     DeqHeader *hdr = h->hdr;
+    uint32_t sz = h->elem_size;
     uint32_t cap = h->capacity;   /* cached-at-attach geometry, not live hdr */
     for (;;) {
         uint64_t c = __atomic_load_n(&hdr->cursor, __ATOMIC_ACQUIRE);
         uint32_t hd = DEQ_CURSOR_HEAD(c), t = DEQ_CURSOR_TAIL(c);
         if ((uint32_t)(t - hd) == 0) return 0;
-        uint64_t nc = DEQ_CURSOR(hd + 1, t);
-        if (__atomic_compare_exchange_n(&hdr->cursor, &c, nc,
-                1, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED)) {
-            uint32_t idx = hd % cap;
-            uint64_t gen;
-            if (!deq_slot_claim_read(&h->ctl[idx], &gen)) {
-                /* Slot was abandoned by a crashed pusher and reclaimed: that
-                 * value never existed. The cursor already advanced, freeing
-                 * space, so wake waiting pushers and count recovery. */
-                __atomic_add_fetch(&hdr->stat_recoveries, 1, __ATOMIC_RELAXED);
-                __atomic_thread_fence(__ATOMIC_SEQ_CST);
-                if (__atomic_load_n(&hdr->waiters_push, __ATOMIC_RELAXED) > 0) {
-                    __atomic_add_fetch(&hdr->push_wake_seq, 1, __ATOMIC_RELEASE);
-                    syscall(SYS_futex, &hdr->push_wake_seq, FUTEX_WAKE, 1, NULL, NULL, 0);
-                }
+        uint32_t idx = hd & (cap - 1);
+        uint64_t *ctl_word = deq_ctl_at(h, idx);
+        uint64_t reserved = deq_slot_reserve(h, ctl_word, c, DEQ_SLOT_FILLED);
+        if (!reserved) continue;
+        if (deq_cursor_commit(h, c, 1)) {
+            uint64_t gen = DEQ_SLOT_GEN(reserved);
+            if (DEQ_SLOT_STATE(reserved) == DEQ_SLOT_READING) {
+                deq_slot_release(ctl_word, gen);
+                /* Recovery advanced the cursor and freed space. */
+                deq_after_rmw_fence();
+                deq_wake(hdr, 1, 1);
                 continue;
             }
-            memcpy(out, deq_slot(h, hd), h->elem_size);
-            deq_slot_release(&h->ctl[idx], gen);
+            deq_copy(out, (h->data + (size_t)idx * sz), sz);
+            deq_slot_release(ctl_word, gen);
             __atomic_add_fetch(&hdr->stat_pops, 1, __ATOMIC_RELAXED);
             /* StoreLoad: publish our slot/cursor change before reading waiters. */
-            __atomic_thread_fence(__ATOMIC_SEQ_CST);
-            if (__atomic_load_n(&hdr->waiters_push, __ATOMIC_RELAXED) > 0) {
-                __atomic_add_fetch(&hdr->push_wake_seq, 1, __ATOMIC_RELEASE);
-                syscall(SYS_futex, &hdr->push_wake_seq, FUTEX_WAKE, 1, NULL, NULL, 0);
-            }
+            deq_after_rmw_fence();
+            deq_wake(hdr, 1, 1);
             return 1;
         }
+        deq_slot_cancel(ctl_word, reserved);
     }
 }
 
@@ -358,39 +394,36 @@ static inline int deq_try_pop_front(DeqHandle *h, void *out) {
  * Pop back (tail--)
  * ================================================================ */
 
-static inline int deq_try_pop_back(DeqHandle *h, void *out) {
+static inline int deq_try_pop_back(DeqHandle *__restrict h, void *out) {
     DeqHeader *hdr = h->hdr;
+    uint32_t sz = h->elem_size;
     uint32_t cap = h->capacity;   /* cached-at-attach geometry, not live hdr */
     for (;;) {
         uint64_t c = __atomic_load_n(&hdr->cursor, __ATOMIC_ACQUIRE);
         uint32_t hd = DEQ_CURSOR_HEAD(c), t = DEQ_CURSOR_TAIL(c);
         if ((uint32_t)(t - hd) == 0) return 0;
-        uint64_t nc = DEQ_CURSOR(hd, t - 1);
-        if (__atomic_compare_exchange_n(&hdr->cursor, &c, nc,
-                1, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED)) {
-            uint32_t idx = (t - 1) % cap;
-            uint64_t gen;
-            if (!deq_slot_claim_read(&h->ctl[idx], &gen)) {
+        uint32_t idx = (t - 1) & (cap - 1);
+        uint64_t *ctl_word = deq_ctl_at(h, idx);
+        uint64_t reserved = deq_slot_reserve(h, ctl_word, c, DEQ_SLOT_FILLED);
+        if (!reserved) continue;
+        if (deq_cursor_commit(h, c, 0)) {
+            uint64_t gen = DEQ_SLOT_GEN(reserved);
+            if (DEQ_SLOT_STATE(reserved) == DEQ_SLOT_READING) {
+                deq_slot_release(ctl_word, gen);
                 /* Abandoned slot reclaimed (see deq_try_pop_front). */
-                __atomic_add_fetch(&hdr->stat_recoveries, 1, __ATOMIC_RELAXED);
-                __atomic_thread_fence(__ATOMIC_SEQ_CST);
-                if (__atomic_load_n(&hdr->waiters_push, __ATOMIC_RELAXED) > 0) {
-                    __atomic_add_fetch(&hdr->push_wake_seq, 1, __ATOMIC_RELEASE);
-                    syscall(SYS_futex, &hdr->push_wake_seq, FUTEX_WAKE, 1, NULL, NULL, 0);
-                }
+                deq_after_rmw_fence();
+                deq_wake(hdr, 1, 1);
                 continue;
             }
-            memcpy(out, deq_slot(h, t - 1), h->elem_size);
-            deq_slot_release(&h->ctl[idx], gen);
+            deq_copy(out, (h->data + (size_t)idx * sz), sz);
+            deq_slot_release(ctl_word, gen);
             __atomic_add_fetch(&hdr->stat_pops, 1, __ATOMIC_RELAXED);
             /* StoreLoad: publish our slot/cursor change before reading waiters. */
-            __atomic_thread_fence(__ATOMIC_SEQ_CST);
-            if (__atomic_load_n(&hdr->waiters_push, __ATOMIC_RELAXED) > 0) {
-                __atomic_add_fetch(&hdr->push_wake_seq, 1, __ATOMIC_RELEASE);
-                syscall(SYS_futex, &hdr->push_wake_seq, FUTEX_WAKE, 1, NULL, NULL, 0);
-            }
+            deq_after_rmw_fence();
+            deq_wake(hdr, 1, 1);
             return 1;
         }
+        deq_slot_cancel(ctl_word, reserved);
     }
 }
 
@@ -398,13 +431,10 @@ static inline int deq_try_pop_back(DeqHandle *h, void *out) {
  * Blocking push/pop
  * ================================================================ */
 
-static inline int deq_push_wait(DeqHandle *h, const void *val, uint32_t vlen,
-                                 int front, double timeout) {
+static int deq_push_wait_slow(DeqHandle *h, const void *val, uint32_t vlen,
+                              int front, double timeout) {
     int (*try_fn)(DeqHandle*, const void*, uint32_t) =
         front ? deq_try_push_front : deq_try_push_back;
-    if (try_fn(h, val, vlen)) return 1;
-    if (timeout == 0) return 0;
-
     DeqHeader *hdr = h->hdr;
     struct timespec dl, rem;
     int has_dl = (timeout > 0);
@@ -413,8 +443,13 @@ static inline int deq_push_wait(DeqHandle *h, const void *val, uint32_t vlen,
 
     uint32_t cap = h->capacity;   /* cached-at-attach geometry, not live hdr */
     for (;;) {
+        if (DEQ_WAIT_INTERRUPTED()) {
+            deq_wake(hdr, 1, 1);
+            errno = EINTR;
+            return -1;
+        }
         uint32_t wseq = __atomic_load_n(&hdr->push_wake_seq, __ATOMIC_ACQUIRE);
-        __atomic_add_fetch(&hdr->waiters_push, 1, __ATOMIC_RELEASE);
+        deq_waiter_enter(&hdr->waiters_push, &hdr->push_wait_hint);
         /* StoreLoad: publish waiters++ before re-reading the cursor, so a
          * concurrent waker can't read waiters==0 while we read a stale cursor. */
         __atomic_thread_fence(__ATOMIC_SEQ_CST);
@@ -423,15 +458,24 @@ static inline int deq_push_wait(DeqHandle *h, const void *val, uint32_t vlen,
             struct timespec *pts = NULL;
             if (has_dl) {
                 if (!deq_remaining(&dl, &rem)) {
-                    __atomic_sub_fetch(&hdr->waiters_push, 1, __ATOMIC_RELAXED);
+                    deq_waiter_leave(&hdr->waiters_push, &hdr->push_wait_hint);
                     __atomic_add_fetch(&hdr->stat_timeouts, 1, __ATOMIC_RELAXED);
                     return 0;
                 }
                 pts = &rem;
             }
+#ifdef DEQ_WAIT_POLL_NS
+            struct timespec tick = { 0, DEQ_WAIT_POLL_NS };
+            if (!pts || pts->tv_sec > 0 || pts->tv_nsec > DEQ_WAIT_POLL_NS) pts = &tick;
+#endif
             syscall(SYS_futex, &hdr->push_wake_seq, FUTEX_WAIT, wseq, pts, NULL, 0);
         }
-        __atomic_sub_fetch(&hdr->waiters_push, 1, __ATOMIC_RELAXED);
+        deq_waiter_leave(&hdr->waiters_push, &hdr->push_wait_hint);
+        if (DEQ_WAIT_INTERRUPTED()) {
+            deq_wake(hdr, 1, 1);
+            errno = EINTR;
+            return -1;
+        }
         if (try_fn(h, val, vlen)) return 1;
         if (has_dl && !deq_remaining(&dl, &rem)) {
             __atomic_add_fetch(&hdr->stat_timeouts, 1, __ATOMIC_RELAXED);
@@ -440,12 +484,9 @@ static inline int deq_push_wait(DeqHandle *h, const void *val, uint32_t vlen,
     }
 }
 
-static inline int deq_pop_wait(DeqHandle *h, void *out, int back, double timeout) {
+static int deq_pop_wait_slow(DeqHandle *h, void *out, int back, double timeout) {
     int (*try_fn)(DeqHandle*, void*) =
         back ? deq_try_pop_back : deq_try_pop_front;
-    if (try_fn(h, out)) return 1;
-    if (timeout == 0) return 0;
-
     DeqHeader *hdr = h->hdr;
     struct timespec dl, rem;
     int has_dl = (timeout > 0);
@@ -453,8 +494,13 @@ static inline int deq_pop_wait(DeqHandle *h, void *out, int back, double timeout
     __atomic_add_fetch(&hdr->stat_waits, 1, __ATOMIC_RELAXED);
 
     for (;;) {
+        if (DEQ_WAIT_INTERRUPTED()) {
+            deq_wake(hdr, 0, 1);
+            errno = EINTR;
+            return -1;
+        }
         uint32_t wseq = __atomic_load_n(&hdr->pop_wake_seq, __ATOMIC_ACQUIRE);
-        __atomic_add_fetch(&hdr->waiters_pop, 1, __ATOMIC_RELEASE);
+        deq_waiter_enter(&hdr->waiters_pop, &hdr->pop_wait_hint);
         /* StoreLoad: publish waiters++ before re-reading the cursor, so a
          * concurrent waker can't read waiters==0 while we read a stale cursor. */
         __atomic_thread_fence(__ATOMIC_SEQ_CST);
@@ -463,21 +509,43 @@ static inline int deq_pop_wait(DeqHandle *h, void *out, int back, double timeout
             struct timespec *pts = NULL;
             if (has_dl) {
                 if (!deq_remaining(&dl, &rem)) {
-                    __atomic_sub_fetch(&hdr->waiters_pop, 1, __ATOMIC_RELAXED);
+                    deq_waiter_leave(&hdr->waiters_pop, &hdr->pop_wait_hint);
                     __atomic_add_fetch(&hdr->stat_timeouts, 1, __ATOMIC_RELAXED);
                     return 0;
                 }
                 pts = &rem;
             }
+#ifdef DEQ_WAIT_POLL_NS
+            struct timespec tick = { 0, DEQ_WAIT_POLL_NS };
+            if (!pts || pts->tv_sec > 0 || pts->tv_nsec > DEQ_WAIT_POLL_NS) pts = &tick;
+#endif
             syscall(SYS_futex, &hdr->pop_wake_seq, FUTEX_WAIT, wseq, pts, NULL, 0);
         }
-        __atomic_sub_fetch(&hdr->waiters_pop, 1, __ATOMIC_RELAXED);
+        deq_waiter_leave(&hdr->waiters_pop, &hdr->pop_wait_hint);
+        if (DEQ_WAIT_INTERRUPTED()) {
+            deq_wake(hdr, 0, 1);
+            errno = EINTR;
+            return -1;
+        }
         if (try_fn(h, out)) return 1;
         if (has_dl && !deq_remaining(&dl, &rem)) {
             __atomic_add_fetch(&hdr->stat_timeouts, 1, __ATOMIC_RELAXED);
             return 0;
         }
     }
+}
+
+static inline int deq_push_wait(DeqHandle *h, const void *val, uint32_t vlen,
+                                 int front, double timeout) {
+    if (front ? deq_try_push_front(h, val, vlen) : deq_try_push_back(h, val, vlen)) return 1;
+    if (timeout == 0) return 0;
+    return deq_push_wait_slow(h, val, vlen, front, timeout);
+}
+
+static inline int deq_pop_wait(DeqHandle *h, void *out, int back, double timeout) {
+    if (back ? deq_try_pop_back(h, out) : deq_try_pop_front(h, out)) return 1;
+    if (timeout == 0) return 0;
+    return deq_pop_wait_slow(h, out, back, timeout);
 }
 
 /* ================================================================
@@ -801,74 +869,40 @@ static void deq_clear(DeqHandle *h) {
      * can re-evaluate state, not just one. */
     /* StoreLoad: publish our slot/cursor change before reading waiters. */
     __atomic_thread_fence(__ATOMIC_SEQ_CST);
-    if (__atomic_load_n(&h->hdr->waiters_push, __ATOMIC_RELAXED) > 0) {
-        __atomic_add_fetch(&h->hdr->push_wake_seq, 1, __ATOMIC_RELEASE);
-        syscall(SYS_futex, &h->hdr->push_wake_seq, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
-    }
+    deq_wake(h->hdr, 1, INT_MAX);
     /* StoreLoad: publish our slot/cursor change before reading waiters. */
     __atomic_thread_fence(__ATOMIC_SEQ_CST);
-    if (__atomic_load_n(&h->hdr->waiters_pop, __ATOMIC_RELAXED) > 0) {
-        __atomic_add_fetch(&h->hdr->pop_wake_seq, 1, __ATOMIC_RELEASE);
-        syscall(SYS_futex, &h->hdr->pop_wake_seq, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
-    }
+    deq_wake(h->hdr, 0, INT_MAX);
 }
 
-/* Concurrency-safe drain: CAS cursor to advance head to tail, then release
- * each drained slot through the state machine so future pushes can reuse.
- *
- * Crash-recovery: a pusher that won the cursor CAS but died (SIGKILL/crash)
- * before completing its write leaves its slot stuck in a non-FILLED state.
- * Two distinct stall windows:
- *   1. cursor CAS done, claim_write not yet succeeded -- slot is still in
- *      EMPTY@gen (or briefly READING@gen if a prior popper is finishing).
- *   2. claim_write done, publish not yet done -- slot is WRITING@gen.
- * In either case plain deq_slot_claim_read would spin forever. We bound the
- * per-slot wait to ~2s; on timeout we CAS the current state -> EMPTY@(gen+1)
- * so the slot is reclaimed. The lock-free design doesn't track per-slot
- * owner PID so we cannot distinguish "dead writer" from "live but extremely
- * slow writer"; a 2s threshold is far longer than any legitimate slot fill.
- * A falsely-recovered live writer's late deq_slot_publish is a CAS keyed on
- * the original gen, so it observes the bump and silently no-ops rather than
- * resurrecting a phantom FILLED slot. */
+/* Drain at most the entry size, reserving each slot before advancing head.
+ * Abandoned slots use the same bounded recovery as push/pop. */
 static inline uint32_t deq_drain(DeqHandle *h) {
     DeqHeader *hdr = h->hdr;
     uint32_t cap = h->capacity;   /* cached-at-attach geometry, not live hdr */
-    /* Snapshot how many items are present at entry.  We drain at most this many:
-     * concurrent pops may take some, and pushes that arrive after entry are left
-     * for the next call. */
+    /* Bound the work even if producers keep adding items. */
     uint64_t c0 = __atomic_load_n(&hdr->cursor, __ATOMIC_ACQUIRE);
     uint32_t target = (uint32_t)(DEQ_CURSOR_TAIL(c0) - DEQ_CURSOR_HEAD(c0));
     uint32_t drained = 0;
-    /* Reclaim ONE head slot per iteration (not bulk-advance-then-walk): never
-     * expose a freed slot for a wrapping push to reuse before we reclaim it --
-     * that raced drain/pop/push on a reused slot (gen-agnostic claim_read). */
     while (drained < target) {
         uint64_t c = __atomic_load_n(&hdr->cursor, __ATOMIC_ACQUIRE);
         uint32_t hd = DEQ_CURSOR_HEAD(c), t = DEQ_CURSOR_TAIL(c);
         if ((uint32_t)(t - hd) == 0) break;     /* emptied by a concurrent consumer */
-        uint64_t nc = DEQ_CURSOR(hd + 1, t);
-        if (!__atomic_compare_exchange_n(&hdr->cursor, &c, nc,
-                1, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED))
-            continue;                            /* lost the CAS -- re-read + retry */
-        /* We now exclusively own item hd's slot. Reclaim it, with the same
-         * bounded recovery used by the pop fast paths. */
-        uint32_t idx = hd % cap;
-        uint64_t gen;
-        if (deq_slot_claim_read(&h->ctl[idx], &gen)) {
-            deq_slot_release(&h->ctl[idx], gen);
-        } else {
-            __atomic_add_fetch(&hdr->stat_recoveries, 1, __ATOMIC_RELAXED);
+        uint32_t idx = hd & (cap - 1);
+        uint64_t *ctl_word = deq_ctl_at(h, idx);
+        uint64_t reserved = deq_slot_reserve(h, ctl_word, c, DEQ_SLOT_FILLED);
+        if (!reserved) continue;
+        if (!deq_cursor_commit(h, c, 1)) {
+            deq_slot_cancel(ctl_word, reserved);
+            continue;
         }
+        deq_slot_release(ctl_word, DEQ_SLOT_GEN(reserved));
         drained++;
     }
     if (drained > 0) {
         /* StoreLoad: publish our slot/cursor changes before reading waiters. */
         __atomic_thread_fence(__ATOMIC_SEQ_CST);
-        if (__atomic_load_n(&hdr->waiters_push, __ATOMIC_RELAXED) > 0) {
-            __atomic_add_fetch(&hdr->push_wake_seq, 1, __ATOMIC_RELEASE);
-            syscall(SYS_futex, &hdr->push_wake_seq, FUTEX_WAKE,
-                    drained < INT_MAX ? (int)drained : INT_MAX, NULL, NULL, 0);
-        }
+        deq_wake(hdr, 1, drained < INT_MAX ? (int)drained : INT_MAX);
     }
     return drained;
 }

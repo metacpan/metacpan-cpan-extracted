@@ -1,5 +1,6 @@
 use strict; use warnings; use Test::More;
 use File::Temp qw(tempdir);
+use Data::SortedSet::Shared;
 
 # A writer killed between the B+tree update and the member-index update (or
 # mid count propagation, or mid clear) leaves the two disagreeing.  Stop it at
@@ -44,11 +45,20 @@ use strict; use warnings; use Data::SortedSet::Shared;
 my ($path, $op) = @ARGV;
 my $z = Data::SortedSet::Shared->new($path, 200);
 if ($op eq 'recover') { $z->count; $z->_validate; exit 0 }
+if ($op eq 'first_add') { $z->add(5, 7.5); exit 0 }
+if ($op =~ /^last_/) {
+    $z->add(5, 7.5);
+    if    ($op eq 'last_remove')  { $z->remove(5) }
+    elsif ($op eq 'last_rescore') { $z->add(5, 500) }
+    else                        { $z->pop_min }
+    exit 0;
+}
 $z->add($_, $_ * 1.5) for 0 .. 99;
 if    ($op eq 'add')    { $z->add(1000 + $_, $_ + 0.25) for 0 .. 4 }
 elsif ($op eq 'remove') { $z->remove($_ * 7) for 0 .. 4 }
 elsif ($op eq 'rescore'){ $z->add(5, 500) }
 elsif ($op eq 'clear')  { $z->clear }
+elsif ($op eq 'freeze') { $z->remove(7); $z->freeze }
 EOF
 close $v;
 
@@ -101,6 +111,14 @@ my %rm2  = %base; delete @rm2{0, 7};
 my %rm3  = %rm2;  delete $rm3{14};
 my %rm1  = %base; delete $rm1{0};
 my @cases = (
+    [ 'first add: root published, count not yet', 'first_add', 'ss_tree_add', 'hdr->count++;', 0, undef,
+      {}, { 5 => 7.5 } ],
+    [ 'last remove: root dropped, count not yet', 'last_remove', 'ss_tree_del', 'hdr->count--;', 0, undef,
+      { 5 => 7.5 }, {} ],
+    [ 'last rescore: tree temporarily empty', 'last_rescore', undef, 'ss_tree_add', 1, undef,
+      { 5 => 7.5 }, { 5 => 500 } ],
+    [ 'last pop: root dropped, count not yet', 'last_pop', 'ss_tree_del', 'hdr->count--;', 0, undef,
+      { 5 => 7.5 }, {} ],
     [ 'add: in the tree, not the index',   'add',     'ss_put_locked',    'int ok = ss_idx_set(h, member, score);', $N, undef,
       \%base, { %base, 1000 => 0.25 } ],
     [ 'add: mid count propagation',        'add',     'ss_insert_rec',    'if (!cr.split) { nd->counts[c]++; return r; }', 0, 'member == 1002',
@@ -109,6 +127,8 @@ my @cases = (
     [ 'rescore: deleted, not re-added',    'rescore', undef,              'ss_tree_add', 1, 'member == 5',
       \%base, { %base, 5 => 500 } ],
     [ 'clear: tree dropped, index intact', 'clear',   'ss_clear_locked',  'memset(h->index, 0,', 0, undef, \%base, {} ],
+    [ 'clear: count dropped, root not yet', 'clear', 'ss_clear_tree', 'hdr->root      = SS_NONE;', 0, undef,
+      \%base, {} ],
 );
 
 my $k = 0;
@@ -137,6 +157,25 @@ for my $case (@cases) {
     ok $l2 && run_gdb($path, 'recover', "sortedset.h:$l2", 0), "$name: recovering process killed mid-rebuild";
     my $st = check($path);
     ok consistent($st, \%base, \%rm1), "$name: third process sees the set from before or after" or diag $st;
+}
+
+{
+    my $path = "$dir/frozen.ss";
+    my $peer = Data::SortedSet::Shared->new($path, $MAX);
+    ok run_gdb($path, 'freeze', 'ss_rwlock_wrunlock if h->hdr->sealed', 0),
+        'freeze: writer killed after sealing, before unlocking';
+    my $payload = sub {
+        open my $f, '<', $path or die $!;
+        seek $f, 40, 0 or die $!;
+        read($f, my $buf, 8) == 8 or die 'short header';
+        seek $f, unpack('Q<', $buf), 0 or die $!;
+        local $/; return <$f>;
+    };
+    my $before = $payload->();
+    my $ro = Data::SortedSet::Shared->new_readonly($path);
+    is $ro->count, $N - 1, 'sealed file can already be read without recovery';
+    is $peer->count, $N - 1, 'existing peer recovers the dead freeze lock';
+    ok $before eq $payload->(), 'recovering a freeze lock leaves the sealed tree and index untouched';
 }
 
 done_testing;

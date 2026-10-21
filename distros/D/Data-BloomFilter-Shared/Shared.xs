@@ -150,7 +150,7 @@ add(self, item)
     bf_rwlock_wrlock(h);
     if (h->hdr->sealed) { bf_rwlock_wrunlock(h); croak("Data::BloomFilter::Shared->add: filter is frozen (read-only)"); }
     RETVAL = bf_add_locked(h, s, n);
-    __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);
+    h->hdr->stat_ops++;
     bf_rwlock_wrunlock(h);
   OUTPUT:
     RETVAL
@@ -195,7 +195,7 @@ add_many(self, items)
         bf_rwlock_wrlock(h);                             /* locked region: NO croak-capable calls */
         if (h->hdr->sealed) { bf_rwlock_wrunlock(h); croak("Data::BloomFilter::Shared->add_many: filter is frozen (read-only)"); }
         for (i = 0; i < cnt; i++) added += (UV)bf_add_locked(h, ps[i], ls[i]);
-        __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);  /* a call always counts, even an empty batch */
+        h->hdr->stat_ops++;  /* a call always counts, even an empty batch */
         bf_rwlock_wrunlock(h);
     }
     RETVAL = added;
@@ -270,7 +270,7 @@ merge(self, other)
     bf_rwlock_wrlock(h);
     if (h->hdr->sealed) { bf_rwlock_wrunlock(h); croak("Data::BloomFilter::Shared->merge: filter is frozen (read-only)"); }
     bf_merge_words(h, tmp, words);
-    __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);
+    h->hdr->stat_ops++;
     bf_rwlock_wrunlock(h);
 
 void
@@ -283,7 +283,7 @@ clear(self)
     bf_rwlock_wrlock(h);
     if (h->hdr->sealed) { bf_rwlock_wrunlock(h); croak("Data::BloomFilter::Shared->clear: filter is frozen (read-only)"); }
     bf_clear_locked(h);
-    __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);
+    h->hdr->stat_ops++;
     bf_rwlock_wrunlock(h);
 
 void
@@ -302,7 +302,7 @@ frozen(self)
   PREINIT:
     EXTRACT(self);
   CODE:
-    RETVAL = h->hdr->sealed ? 1 : 0;
+    RETVAL = __atomic_load_n(&h->hdr->sealed, __ATOMIC_ACQUIRE) ? 1 : 0;
   OUTPUT:
     RETVAL
 
@@ -383,6 +383,7 @@ stats(self)
     {
         uint64_t X, m_bits, capacity, ops, n_est;
         uint32_t k;
+        uint8_t sealed;
         double   fp_rate;
         /* Snapshot under the lock; do all (croak-capable) Perl allocation after
            releasing it -- so an OOM in newHV/newSVuv can never strand the lock. */
@@ -394,6 +395,7 @@ stats(self)
         capacity = h->hdr->capacity;
         fp_rate  = h->hdr->fp_rate;
         ops      = h->hdr->stat_ops;
+        sealed   = __atomic_load_n(&h->hdr->sealed, __ATOMIC_RELAXED);
         if (!h->readonly) bf_rwlock_rdunlock(h);
 
         HV *hv = newHV();
@@ -406,7 +408,7 @@ stats(self)
         hv_stores(hv, "fill_ratio", newSVnv((double)X / (double)m_bits));
         hv_stores(hv, "ops",        newSVuv((UV)ops));
         hv_stores(hv, "mmap_size",  newSVuv((UV)h->mmap_size));
-        hv_stores(hv, "frozen",     newSVuv(h->hdr->sealed ? 1 : 0));
+        hv_stores(hv, "frozen",     newSVuv(sealed ? 1 : 0));
         hv_stores(hv, "readonly",   newSVuv(h->readonly ? 1 : 0));
         RETVAL = newRV_noinc((SV *)hv);
     }

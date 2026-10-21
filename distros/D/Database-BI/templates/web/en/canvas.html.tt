@@ -43,6 +43,21 @@
 	overflow: hidden;
 	text-overflow: ellipsis;
 }
+/* The edit control on a map card: changes the columns it plots without
+ * deleting the card and adding it again. */
+.visual-edit-btn {
+	font-size: 0.72rem;
+	padding: 0.08rem 0.4rem;
+	margin-left: 0.4rem;
+	border: 1px solid var(--border, #dee2e6);
+	border-radius: 4px;
+	background: var(--card-bg, #fff);
+	color: inherit;
+	white-space: nowrap;
+	cursor: pointer;
+}
+.visual-edit-btn:hover { background: #f0f0f0; }
+.map-edit-panel { width: 330px; }
 .visual-card-body {
 	flex: 1;
 	overflow: auto;
@@ -52,6 +67,34 @@
 	max-width: 100%;
 	height: auto;
 }
+/* A map card owns its Leaflet element's size; HTML::OSM's generated CSS for
+ * #map is removed for canvas cards so several maps can share a page. */
+.canvas-map-wrap { width: 100%; }
+.canvas-map-wrap .canvas-map { width: 100%; height: 320px; min-height: 220px; }
+.canvas-map-wrap input[type="text"] {
+	margin: 0.35rem;
+	padding: 0.3rem 0.5rem;
+	border: 1px solid var(--border, #dee2e6);
+	border-radius: 4px;
+}
+.canvas-map-wrap button {
+	margin: 0.35rem;
+	padding: 0.25rem 0.5rem;
+	border: 1px solid var(--border, #dee2e6);
+	border-radius: 4px;
+	background: var(--header-bg, #f8f9fa);
+	cursor: pointer;
+}
+.visual-card-body .map-summary { margin: 0.35rem 0 0; font-size: 0.8rem; color: var(--muted, #6c757d); }
+.visual-card-body .map-notes {
+	margin: 0.4rem 0 0;
+	padding: 0.4rem 0.6rem;
+	border-left: 3px solid #c9a227;
+	background: #fdf8e6;
+	font-size: 0.8rem;
+	color: #5c4a11;
+}
+.visual-card-body .map-notes ul { margin: 0; padding-left: 1rem; }
 /* A cross-filter mark is a control: it filters the canvas by its value from
  * the keyboard too, so a focused one is stroked.  A fill cannot say which
  * mark has focus, because the fill is the value it encodes. */
@@ -234,6 +277,59 @@
 }
 .bm-item a:hover { text-decoration: underline; }
 .bm-empty { font-size: 0.82rem; color: var(--muted, #6c757d); padding: 0.25rem 0; margin: 0; }
+/* Add current view panel: adds a table or chart without leaving the canvas */
+.ac-wrap { position: relative; }
+.ac-panel {
+	/* Fixed, not absolute: the page column scrolls its overflow, and a panel
+	 * that hangs off the side of the button is clipped by that column. */
+	position: fixed;
+	top: 0;
+	right: auto;
+	z-index: 300;
+	overflow-y: auto;
+	background: var(--card-bg, #fff);
+	border: 1px solid var(--border, #dee2e6);
+	border-radius: 6px;
+	padding: 0.65rem 0.75rem;
+	width: 360px;
+	max-width: calc(100vw - 2rem);
+	box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+}
+.ac-panel h3 { margin: 0 0 0.15rem; font-size: 0.95rem; }
+.ac-help { margin: 0 0 0.5rem; font-size: 0.8rem; color: var(--muted, #6c757d); }
+.ac-field {
+	display: flex;
+	flex-direction: column;
+	gap: 0.15rem;
+	margin-bottom: 0.45rem;
+	font-size: 0.8rem;
+	font-weight: 600;
+}
+.ac-field[hidden] { display: none; }
+.ac-field select, .ac-field input {
+	font-size: 0.82rem;
+	font-weight: 400;
+	padding: 0.22rem 0.4rem;
+	border: 1px solid var(--border, #dee2e6);
+	border-radius: 4px;
+	background: var(--card-bg, #fff);
+	color: inherit;
+}
+.ac-field select[multiple] { padding: 0.15rem; }
+.ac-note { font-size: 0.72rem; font-weight: 400; color: var(--muted, #6c757d); }
+.ac-actions { display: flex; gap: 0.4rem; margin-top: 0.6rem; }
+.ac-actions button {
+	font-size: 0.8rem;
+	padding: 0.28rem 0.7rem;
+	border: 1px solid var(--border, #dee2e6);
+	border-radius: 4px;
+	background: var(--header-bg, #f8f9fa);
+	cursor: pointer;
+}
+.ac-actions .ac-submit { background: var(--link, #0d6efd); border-color: var(--link, #0d6efd); color: #fff; }
+.ac-actions button:disabled { opacity: 0.55; cursor: wait; }
+.ac-error { margin: 0.35rem 0 0; font-size: 0.78rem; color: var(--danger-fg, #c0392b); }
+.ac-error[hidden] { display: none; }
 /* Canvas toolbar buttons: same look as virtual table page toolbar buttons */
 .canvas-toolbar > button,
 .canvas-toolbar > .bm-wrap > button,
@@ -494,6 +590,14 @@
 
 [%- IF back_url.length -%]
 <p class="back-link"><a href="[% back_url | html %]">&larr; [% back_label | html %]</a> &rsaquo; <span>[% canvas_name | html %]</span></p>
+[%- ELSE -%]
+<p class="back-link"><a href="/">&larr; Home</a> &rsaquo; <span>[% canvas_name | html %]</span></p>
+[%- END -%]
+[%- IF freshness_stale -%]
+<div class="freshness-banner" role="alert" style="background:#fff3cd;border:1px solid #ffc107;border-radius:4px;padding:0.4rem 0.75rem;margin-bottom:0.5rem;font-size:0.85rem;color:#664d03;">
+	&#9888; [% freshness_msg | html %]
+	[% IF freshness_source_mtime.length %](source last modified: [% freshness_source_mtime | html %])[% END %]
+</div>
 [%- END -%]
 <div class="canvas-toolbar">
 	<h2 style="margin:0;flex:1">[% title | html %]</h2>
@@ -541,6 +645,107 @@
 			[% END %]
 		</div>
 	</div>
+	[% IF canvas_id.length %]
+	<div class="ac-wrap">
+		<button id="btn-add-current" class="btn-add-visual" type="button"
+		        aria-haspopup="dialog" aria-expanded="false" aria-controls="ac-panel"
+		        title="Add another table or chart to this canvas">&#x2295; Add current view</button>
+		<div class="ac-panel" id="ac-panel" role="dialog" aria-labelledby="ac-title" hidden>
+			<h3 id="ac-title">Add current view</h3>
+			<p class="ac-help">Add another table or chart from this canvas's columns. It is added to the end of the canvas.</p>
+			<form id="ac-form">
+				<label class="ac-field">View
+					<select id="ac-kind">
+						<option value="table">Table</option>
+						<option value="bar">Bar chart</option>
+						<option value="pie">Pie chart</option>
+						<option value="line">Line chart</option>
+						<option value="scatter">Scatter chart</option>
+						<option value="heatmap">Heatmap</option>
+						<option value="stacked">Stacked bar chart</option>
+						<option value="combo">Combo chart</option>
+						<option value="treemap">Treemap</option>
+						<option value="histogram">Histogram</option>
+						<option value="map">Map</option>
+					</select>
+				</label>
+				<label class="ac-field" data-for="table">Columns
+					<select id="ac-table-cols" multiple size="4"></select>
+					<span class="ac-note">None selected shows every column.</span>
+				</label>
+				<label class="ac-field" data-for="bar pie stacked treemap" data-label="Category">Category
+					<select id="ac-cat"></select>
+				</label>
+				<label class="ac-field" data-for="stacked" data-label="Series">Series
+					<select id="ac-series"></select>
+				</label>
+				<label class="ac-field" data-for="bar pie stacked treemap heatmap" data-label="Value">Value
+					<select id="ac-value"></select>
+				</label>
+				<label class="ac-field" data-for="line scatter heatmap combo" data-label="X column">X column
+					<select id="ac-x"></select>
+				</label>
+				<label class="ac-field" data-for="line scatter heatmap" data-label="Y column">Y column
+					<select id="ac-y"></select>
+				</label>
+				<label class="ac-field" data-for="combo" data-label="Bar value">Bar value
+					<select id="ac-bar-value"></select>
+				</label>
+				<label class="ac-field" data-for="combo" data-label="Line value">Line value
+					<select id="ac-line-value"></select>
+				</label>
+				<label class="ac-field" data-for="histogram" data-label="Column">Column
+					<select id="ac-hist-col"></select>
+				</label>
+				<label class="ac-field" data-for="histogram" data-label="Bins">Bins
+					<input id="ac-bins" type="number" min="1" max="200" value="10">
+				</label>
+				<label class="ac-field" data-for="map" data-label="Place column (optional)">Place column (optional)
+					<select id="ac-map-loc"></select>
+					<span class="ac-note">Or choose latitude and longitude below.</span>
+				</label>
+				<label class="ac-field" data-for="map" data-label="Latitude">Latitude
+					<select id="ac-map-lat"></select>
+				</label>
+				<label class="ac-field" data-for="map" data-label="Longitude">Longitude
+					<select id="ac-map-lon"></select>
+				</label>
+				<label class="ac-field" data-for="table bar pie line scatter heatmap stacked combo treemap histogram map" data-label="Title (optional)">Title (optional)
+					<input id="ac-title-inp" type="text" maxlength="200" autocomplete="off">
+				</label>
+				<p class="ac-error" id="ac-error" role="alert" hidden></p>
+				<div class="ac-actions">
+					<button type="submit" class="ac-submit" id="ac-add-btn">Add to canvas</button>
+					<button type="button" id="ac-cancel">Cancel</button>
+				</div>
+			</form>
+		</div>
+	</div>
+	<!-- Editing a map in place: the card at the index the form was opened from
+	     keeps its place, size and title, and only its encoding changes. -->
+	<div class="ac-panel map-edit-panel" id="me-panel" role="dialog"
+	     aria-labelledby="me-heading" hidden>
+		<h3 id="me-heading">Map columns</h3>
+		<p class="ac-help">Change what this map plots. Its place on the canvas and its other settings are kept, and the card is redrawn where it is.</p>
+		<form id="me-form">
+			<label class="ac-field">Place column (optional)
+				<select id="me-loc"></select>
+				<span class="ac-note">A place column is used when chosen; otherwise the coordinates below are.</span>
+			</label>
+			<label class="ac-field">Latitude
+				<select id="me-lat"></select>
+			</label>
+			<label class="ac-field">Longitude
+				<select id="me-lon"></select>
+			</label>
+			<p class="ac-error" id="me-error" role="alert" hidden></p>
+			<div class="ac-actions">
+				<button type="submit" class="ac-submit" id="me-save">Save columns</button>
+				<button type="button" id="me-cancel">Cancel</button>
+			</div>
+		</form>
+	</div>
+	[% END %]
 	[% IF canvas_data_url.length %]
 	<a href="[% canvas_data_url | html %]" class="btn-add-visual" id="btn-add-visual"
 	   title="Go to the data source to add another chart to this canvas">&#x2295; Add visual&hellip;</a>
@@ -590,6 +795,10 @@
 </div>
 [% END %]
 
+<!-- D3 before the cards: each card's chart snippet is an inline script that
+     runs while the card is parsed, so D3 has to be loaded by then.  Appending a
+     card in place re-runs the same snippet after the page is up. -->
+<script src="[% d3_url | html %]"></script>
 <div class="canvas-grid" id="canvas-grid" data-canvas-id="[% canvas_id | html %]"
 [% IF drill_name.length %]     data-drill-name="[% drill_name | html %]" data-drill-level="[% drill_level %]" data-drill-max="[% drill_max %]" data-drill-col="[% drill_col | html %]"[% END %]>
 [% FOREACH v IN visuals %]
@@ -611,6 +820,13 @@
 			<span class="drag-handle" aria-hidden="true">::</span>
 			[% END %]
 			<span class="visual-card-title" id="visual-title-[% v.id %]">[% v.title | html %]</span>
+			[% IF canvas_id.length && v.kind == 'map' %]
+			<button type="button" class="visual-edit-btn"
+			        data-edit-visual="[% v.id %]"
+			        aria-haspopup="dialog" aria-expanded="false" aria-controls="me-panel"
+			        aria-label="Edit columns of [% v.title | html %]"
+			        title="Change the place or latitude/longitude columns">Edit columns</button>
+			[% END %]
 			<span style="font-size:0.75rem;opacity:0.5;margin-left:0.5rem">[% v.kind | html %]</span>
 			[% IF canvas_id.length %]
 			<!-- A card's size is part of its canvas layout, and this is the same
@@ -696,7 +912,6 @@ the width and height it was left at, and the same size is written on the card it
 menu, so it reads without the menu being opened.</p>
 [% END %]
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
 <script>
 (function () {
 	'use strict';
@@ -724,8 +939,9 @@ menu, so it reads without the menu being opened.</p>
 	 * scramble every saved position; the position is what a drag changes, and the
 	 * move is announced for anyone not reading the screen.
 	 */
-	var grid       = document.getElementById('canvas-grid');
-	var anaId      = grid ? grid.getAttribute('data-canvas-id') : '';
+	var grid         = document.getElementById('canvas-grid');
+	var anaId        = grid ? grid.getAttribute('data-canvas-id') : '';
+	var canvasColumns = [% canvas_columns_json || '[]' %];
 	var drillName  = grid ? (grid.getAttribute('data-drill-name')  || '') : '';
 	var drillLevel = grid ? parseInt(grid.getAttribute('data-drill-level') || '0', 10) : 0;
 	var drillMax   = grid ? parseInt(grid.getAttribute('data-drill-max')   || '0', 10) : 0;
@@ -735,6 +951,16 @@ menu, so it reads without the menu being opened.</p>
 	function titleOf(card) {
 		var el = card.querySelector('.visual-card-title');
 		return el ? el.textContent.trim() : 'Visual';
+	}
+
+	/* The cards an initialiser should visit: the whole page by default, or the
+	 * one card an in-place append has just made.  A card passed as the root is
+	 * returned itself, because querySelectorAll on an element does not match the
+	 * element. */
+	function cardsIn(root) {
+		if (!root) return Array.prototype.slice.call(document.querySelectorAll('.visual-card'));
+		if (root.matches && root.matches('.visual-card')) return [root];
+		return Array.prototype.slice.call(root.querySelectorAll('.visual-card'));
 	}
 
 	function overlaps(a, b) {
@@ -899,12 +1125,13 @@ menu, so it reads without the menu being opened.</p>
 		return bottom;
 	}
 
-	function initMoveHandles() {
+	function initMoveHandles(root) {
 		if (!grid || !anaId) return;
-		grid.querySelectorAll('.visual-card-header').forEach(function (header) {
+		var scope = root || grid;
+		scope.querySelectorAll('.visual-card-header').forEach(function (header) {
 			header.addEventListener('pointerdown', onMoveStart);
 		});
-		grid.querySelectorAll('.drag-handle').forEach(function (handle) {
+		scope.querySelectorAll('.drag-handle').forEach(function (handle) {
 			handle.addEventListener('keydown', onMoveKey);
 			handle.addEventListener('blur',    flushSave);
 		});
@@ -1318,9 +1545,9 @@ menu, so it reads without the menu being opened.</p>
 		document.addEventListener('pointerup',   onResizeEnd);
 	}
 
-	function initResizeHandles() {
+	function initResizeHandles(root) {
 		if (!grid || !anaId) return;
-		grid.querySelectorAll('.visual-resize-handle').forEach(function (handle) {
+		(root || grid).querySelectorAll('.visual-resize-handle').forEach(function (handle) {
 			handle.addEventListener('pointerdown', onResizeStart);
 			handle.addEventListener('keydown',     onResizeKey);
 			handle.addEventListener('blur',        flushSave);
@@ -1343,9 +1570,9 @@ menu, so it reads without the menu being opened.</p>
 	 * stays selected, so the arrow keys walk the entries one after another
 	 * instead of being pulled back to the top after every one.
 	 */
-	function initSizeMenus() {
+	function initSizeMenus(root) {
 		if (!grid || !anaId) return;
-		grid.querySelectorAll('.visual-size-select').forEach(function (sel) {
+		(root || grid).querySelectorAll('.visual-size-select').forEach(function (sel) {
 			var card = sel.closest('.visual-card');
 			if (!card) return;
 
@@ -1416,9 +1643,11 @@ menu, so it reads without the menu being opened.</p>
 		return null;
 	}
 
-	function initCrossFilters() {
+	function initCrossFilters(root) {
 		if (typeof d3 === 'undefined') return;
-		var cards = document.querySelectorAll('.visual-card[data-cf-col]');
+		var cards = cardsIn(root).filter(function (card) {
+			return card.hasAttribute('data-cf-col');
+		});
 		cards.forEach(function (card) {
 			var cfCol = card.getAttribute('data-cf-col');
 			var visId = card.getAttribute('data-visual');
@@ -1573,8 +1802,8 @@ menu, so it reads without the menu being opened.</p>
 	 * Run inside the same setTimeout as initCrossFilters so D3 has finished
 	 * drawing before we probe for SVG elements.
 	 */
-	function initDownloadButtons() {
-		var cards = document.querySelectorAll('.visual-card');
+	function initDownloadButtons(root) {
+		var cards = cardsIn(root);
 		cards.forEach(function (card) {
 			var svg = card.querySelector('svg');
 			var btn = card.querySelector('.visual-dl-btn');
@@ -1756,6 +1985,752 @@ menu, so it reads without the menu being opened.</p>
 				if (r.ok) { onSuccess(); }
 			}).catch(function () {});
 		}
+	}());
+
+	/* ---- add another table or chart without leaving the canvas ----
+	 *
+	 * The panel posts the same visual spec a saved canvas stores, and the
+	 * server renders it with the canvas's own pipeline before appending it.
+	 * A reload is what puts the new card on screen: the card markup, its size
+	 * menu and its drag/resize handlers all come from the normal render, so
+	 * there is one implementation of a card rather than a second one here.
+	 * The current URL is kept, so an active cross-filter or drill path applies
+	 * to the new visual as it does to the others.
+	 */
+	(function () {
+		var btn   = document.getElementById('btn-add-current');
+		var panel = document.getElementById('ac-panel');
+		var form  = document.getElementById('ac-form');
+		if (!btn || !panel || !form || !anaId) return;
+
+		var kindSel  = document.getElementById('ac-kind');
+		var tableSel = document.getElementById('ac-table-cols');
+		var catSel   = document.getElementById('ac-cat');
+		var seriesSel = document.getElementById('ac-series');
+		var valueSel = document.getElementById('ac-value');
+		var xSel     = document.getElementById('ac-x');
+		var ySel     = document.getElementById('ac-y');
+		var barSel   = document.getElementById('ac-bar-value');
+		var lineSel  = document.getElementById('ac-line-value');
+		var histSel  = document.getElementById('ac-hist-col');
+		var mapLocSel = document.getElementById('ac-map-loc');
+		var mapLatSel = document.getElementById('ac-map-lat');
+		var mapLonSel = document.getElementById('ac-map-lon');
+		var binsInp  = document.getElementById('ac-bins');
+		var titleInp = document.getElementById('ac-title-inp');
+		var errorEl  = document.getElementById('ac-error');
+		var addBtn   = document.getElementById('ac-add-btn');
+		var cancelBtn = document.getElementById('ac-cancel');
+
+		function option(sel, value, label) {
+			var opt = document.createElement('option');
+			opt.value = value;
+			opt.textContent = label;
+			sel.appendChild(opt);
+		}
+
+		function fill(sel, opts) {
+			if (!sel) return;
+			sel.innerHTML = '';
+			for (var i = 0; i < opts.length; i++) {
+				if (opts[i].value === '' || opts[i].value === '__count__') {
+					option(sel, opts[i].value, opts[i].label);
+				} else {
+					option(sel, opts[i].value, opts[i].value);
+				}
+			}
+		}
+
+		var allCols = canvasColumns.map(function (c) { return { value: c.name }; });
+		var numCols = canvasColumns.filter(function (c) { return c.numeric; })
+			.map(function (c) { return { value: c.name }; });
+		var choose   = [{ value: '', label: 'Choose a column…' }];
+		var countOpt = [{ value: '__count__', label: 'Count (no column needed)' }];
+
+		fill(tableSel, allCols);
+		fill(catSel, choose.concat(allCols));
+		fill(seriesSel, choose.concat(allCols));
+		fill(valueSel, choose.concat(countOpt, allCols));
+		fill(xSel, choose.concat(allCols));
+		fill(ySel, choose.concat(numCols));
+		fill(barSel, choose.concat(numCols));
+		fill(lineSel, choose.concat(numCols));
+		fill(histSel, choose.concat(numCols));
+		fill(mapLocSel, choose.concat(allCols));
+		fill(mapLatSel, choose.concat(numCols));
+		fill(mapLonSel, choose.concat(numCols));
+
+		function syncFields() {
+			var kind = kindSel.value;
+			Array.prototype.forEach.call(panel.querySelectorAll('.ac-field[data-for]'), function (field) {
+				field.hidden = field.getAttribute('data-for').split(/\s+/).indexOf(kind) < 0;
+			});
+		}
+
+		function setError(message) {
+			errorEl.textContent = message || '';
+			errorEl.hidden = !message;
+		}
+
+		/* Keep the panel inside the viewport.  Right-aligning it to the button
+		 * clips its left edge on a narrow screen, where the button is not far
+		 * enough right for a 360px panel to open leftwards. */
+		function positionPanel() {
+			var r    = btn.getBoundingClientRect();
+			var w    = panel.offsetWidth;
+			var left = Math.max(8, Math.min(r.right - w, window.innerWidth - w - 8));
+			panel.style.left = left + 'px';
+			panel.style.top = (r.bottom + 4) + 'px';
+			panel.style.right = 'auto';
+			panel.style.maxHeight = Math.max(160, window.innerHeight - r.bottom - 12) + 'px';
+		}
+
+		function openPanel() {
+			panel.hidden = false;
+			btn.setAttribute('aria-expanded', 'true');
+			syncFields();
+			setError('');
+			positionPanel();
+			kindSel.focus();
+		}
+
+		function closePanel(returnFocus) {
+			panel.hidden = true;
+			btn.setAttribute('aria-expanded', 'false');
+			if (returnFocus) btn.focus();
+		}
+
+		btn.addEventListener('click', function () {
+			if (panel.hidden) { openPanel(); } else { closePanel(1); }
+		});
+		window.addEventListener('resize', function () {
+			if (!panel.hidden) positionPanel();
+		});
+		window.addEventListener('scroll', function () {
+			if (!panel.hidden) positionPanel();
+		}, { passive: true });
+		kindSel.addEventListener('change', syncFields);
+		cancelBtn.addEventListener('click', function () { closePanel(1); });
+		panel.addEventListener('keydown', function (e) {
+			if (e.key === 'Escape') { e.preventDefault(); closePanel(1); }
+		});
+		document.addEventListener('mousedown', function (e) {
+			if (!panel.hidden && !panel.contains(e.target) && e.target !== btn) closePanel(0);
+		});
+
+		function picked(sel, label) {
+			var v = sel ? sel.value : '';
+			if (!v) { setError('Choose a ' + label + '.'); sel.focus(); return null; }
+			return v;
+		}
+
+		/* ---- adding a card in place ----
+		 *
+		 * The API renders the visual; the card around it is built here with the
+		 * same chrome the template writes, appended after the saved cards, given
+		 * the listeners the cards loaded with the page already have, and focused -
+		 * the reader asked for this card, so it is where they should end up.  The
+		 * count and the fact that it was added are announced through #canvas-live.
+		 *
+		 * Inserting the body as markup does not run the scripts that draw a chart
+		 * or a map, so they are re-created node by node.  A map's Leaflet assets
+		 * come in `head`, added once per page (a canvas may not have had a map
+		 * before) and awaited before the map's own script runs.
+		 */
+		var KIND_NAMES = {
+			table: 'Table', bar: 'Bar chart', pie: 'Pie chart', line: 'Line chart',
+			graph: 'Line chart', scatter: 'Scatter chart', heatmap: 'Heatmap',
+			stacked: 'Stacked bar chart', combo: 'Combo chart', treemap: 'Treemap',
+			histogram: 'Histogram', map: 'Map',
+		};
+
+		/* Which library draws a card, so a card whose CDN copy did not load can
+		 * say which one is missing rather than only that something failed.
+		 * A table needs neither. */
+		var CHART_KINDS = {
+			bar: 1, pie: 1, line: 1, graph: 1, scatter: 1, heatmap: 1,
+			stacked: 1, combo: 1, treemap: 1, histogram: 1,
+		};
+		var DRAW_LIBS = {
+			chart: { global: 'd3', name: 'D3', what: 'the chart library' },
+			map:   { global: 'L',  name: 'Leaflet', what: 'the map library' },
+		};
+
+		function drawLib(kind) {
+			if (kind === 'map') return DRAW_LIBS.map;
+			return CHART_KINDS[kind] ? DRAW_LIBS.chart : null;
+		}
+
+		function libLoaded(lib) {
+			return !!lib && !!window[lib.global];
+		}
+
+		/* A card that was added but cannot be drawn says so, and names the
+		 * library the reader would have to reach, not just "the library". */
+		function announceLibMissing(lib, kind, title, lead) {
+			announce((KIND_NAMES[kind] || 'Visual') + ' "' + title + '" '
+				+ (lead || 'was added, but') + ' '
+				+ lib.name + ', ' + lib.what + ', did not load, so nothing was drawn.');
+		}
+
+		/* Evidence that the card's own script drew something: a map's Leaflet
+		 * container, or a chart's SVG with a shape in it.  The page's own SVG
+		 * shell, which the server writes before any script runs, is not enough. */
+		function drawnIn(card, kind) {
+			if (kind === 'map') return !!card.querySelector('.leaflet-container');
+			var svg = card.querySelector('.visual-card-body svg');
+			return !!svg && !!svg.querySelector('rect, path, circle, line, polyline, polygon');
+		}
+
+		/* Charts draw synchronously; Leaflet sets up its panes synchronously too,
+		 * but a map's assets may still be arriving.  Poll for the evidence, and
+		 * wait a moment before the first report so the announcement that the card
+		 * was added is heard before this one replaces it. */
+		function whenDrawn(card, kind, done) {
+			var waited = 0, step = 50, min = 250, max = 5000;
+			function check() {
+				var ok = drawnIn(card, kind);
+				waited += step;
+				if (ok && waited >= min) return done(true);
+				if (waited >= max) return done(false);
+				setTimeout(check, step);
+			}
+			setTimeout(check, step);
+		}
+
+		function element(tag, attrs, text) {
+			var node = document.createElement(tag);
+			if (attrs) {
+				Object.keys(attrs).forEach(function (name) {
+					node.setAttribute(name, attrs[name]);
+				});
+			}
+			if (text !== undefined) node.textContent = text;
+			return node;
+		}
+
+		function buildCard(json) {
+			var idx   = json.visual;
+			var title = json.title || ('Visual ' + (idx + 1));
+			var tid   = 'visual-title-' + idx;
+
+			var card = element('div', {
+				'class': 'visual-card', id: 'visual-' + idx, 'data-visual': String(idx),
+				tabindex: '-1', role: 'group', 'aria-labelledby': tid,
+			});
+			if (json.cf_col) card.setAttribute('data-cf-col', json.cf_col);
+
+			var header = element('div', { 'class': 'visual-card-header' });
+			header.appendChild(element('span', {
+				'class': 'drag-handle', role: 'button', tabindex: '0',
+				'aria-label': 'Move ' + title, 'aria-describedby': 'move-help',
+				title: 'Drag, or focus and use the arrow keys, to move this visual',
+			}, '::'));
+			header.appendChild(element('span', { 'class': 'visual-card-title', id: tid }, title));
+			if (json.kind === 'map') {
+				header.appendChild(element('button', {
+					'class': 'visual-edit-btn', type: 'button',
+					'data-edit-visual': String(idx),
+					'aria-haspopup': 'dialog', 'aria-expanded': 'false',
+					'aria-controls': 'me-panel',
+					'aria-label': 'Edit columns of ' + title,
+					title: 'Change the place or latitude/longitude columns',
+				}, 'Edit columns'));
+			}
+
+			var kind = element('span', null, json.kind || '');
+			kind.style.fontSize = '0.75rem';
+			kind.style.opacity = '0.5';
+			kind.style.marginLeft = '0.5rem';
+			header.appendChild(kind);
+
+			var size = element('select', {
+				'class': 'visual-size-select', id: 'visual-size-' + idx,
+				'aria-label': 'Size of ' + title, 'aria-describedby': 'size-help',
+			});
+			size.innerHTML = '<option value="" data-current="1">Size</option>'
+				+ '<optgroup label="Width">'
+				+ '<option value="12">Full width</option><option value="6">Half width</option>'
+				+ '<option value="4">Third width</option><option value="3">Quarter width</option>'
+				+ '</optgroup><optgroup label="Height">'
+				+ '<option value="h1">1 row high</option><option value="h2">2 rows high</option>'
+				+ '<option value="h3">3 rows high</option><option value="h6">6 rows high</option>'
+				+ '</optgroup>';
+			header.appendChild(size);
+			header.appendChild(element('span', { 'class': 'visual-size-badge', 'data-size-badge': '1' }));
+
+			var download = element('button', {
+				'class': 'visual-dl-btn', 'data-title': title, title: 'Download as PNG',
+			});
+			download.hidden = true;
+			download.innerHTML = '&#x2B07; Save image';
+			header.appendChild(download);
+
+			var body = element('div', { 'class': 'visual-card-body' });
+			if (json.error) {
+				body.appendChild(element('div', { 'class': 'visual-error' }, json.error));
+			} else {
+				body.innerHTML = json.html || '';
+			}
+
+			card.appendChild(header);
+			card.appendChild(body);
+			card.appendChild(element('span', {
+				'class': 'visual-resize-handle', 'data-resize-handle': '1',
+				role: 'slider', tabindex: '0', 'aria-labelledby': tid,
+				'aria-describedby': 'resize-help', 'aria-orientation': 'horizontal',
+				'aria-valuemin': '1',
+				title: 'Drag, or focus and use the arrow keys, to resize this visual',
+			}));
+
+			return card;
+		}
+
+		function updateVisualCount() {
+			var el = document.querySelector('.visual-count');
+			if (!el) return;
+			var n = grid.querySelectorAll('.visual-card').length;
+			el.textContent = n + ' visual' + (n === 1 ? '' : 's');
+		}
+
+		/* A <script> inserted as markup is inert: re-create it so the browser runs
+		 * the chart or map init it carries, keeping the order the markup has. */
+		function runCardScripts(card) {
+			Array.prototype.slice.call(card.querySelectorAll('script')).forEach(function (old) {
+				var script = document.createElement('script');
+				Array.prototype.forEach.call(old.attributes, function (attr) {
+					script.setAttribute(attr.name, attr.value);
+				});
+				script.textContent = old.textContent;
+				old.parentNode.replaceChild(script, old);
+			});
+		}
+
+		function headHas(tag, attr, value) {
+			var nodes = document.head.querySelectorAll(tag);
+			for (var i = 0; i < nodes.length; i++) {
+				if (nodes[i].getAttribute(attr) === value) return true;
+			}
+			return false;
+		}
+
+		/* Add the stylesheet and script a map needs, once per page, and resolve
+		 * when Leaflet is ready - the map's init script runs after this and needs
+		 * it.  A card with no head resolves at once. */
+		function loadCardAssets(head) {
+			if (!head) return Promise.resolve(true);
+
+			var template = document.createElement('template');
+			template.innerHTML = head;
+			Array.prototype.slice.call(template.content.children).forEach(function (node) {
+				if (node.tagName === 'LINK' && node.getAttribute('href')) {
+					var href = node.getAttribute('href');
+					if (headHas('link', 'href', href)) return;
+					var link = document.createElement('link');
+					link.rel = 'stylesheet';
+					link.href = href;
+					document.head.appendChild(link);
+				} else if (node.tagName === 'SCRIPT' && node.getAttribute('src')) {
+					var src = node.getAttribute('src');
+					if (headHas('script', 'src', src)) return;
+					var script = document.createElement('script');
+					script.src = src;
+					document.head.appendChild(script);
+				} else if (node.tagName === 'STYLE') {
+					document.head.appendChild(node.cloneNode(true));
+				}
+			});
+
+			if (window.L) return Promise.resolve(true);
+			return new Promise(function (resolve) {
+				var waited = 0;
+				var timer = setInterval(function () {
+					waited += 50;
+					if (window.L || waited >= 5000) {
+						clearInterval(timer);
+						resolve(!!window.L);
+					}
+				}, 50);
+			});
+		}
+
+		function appendCard(json) {
+			var card = buildCard(json);
+			grid.appendChild(card);
+
+			initMoveHandles(card);
+			initResizeHandles(card);
+			initSizeMenus(card);
+			updateVisualCount();
+
+			var title = json.title || ('Visual ' + (json.visual + 1));
+			var count = grid.querySelectorAll('.visual-card').length;
+			card.focus();
+			announce((KIND_NAMES[json.kind] || 'Visual') + ' "' + title
+				+ '" added at the end of the canvas. ' + count + ' visual'
+				+ (count === 1 ? '' : 's') + ' on the canvas.');
+
+			var lib = drawLib(json.kind);
+			loadCardAssets(json.head).then(function (ready) {
+				if (lib && !libLoaded(lib)) {
+					announceLibMissing(lib, json.kind, title);
+					return;
+				}
+				if (!ready) {
+					announceLibMissing(lib || DRAW_LIBS.map, json.kind, title);
+					return;
+				}
+				runCardScripts(card);
+				setTimeout(function () {
+					initCrossFilters(card);
+					initDownloadButtons(card);
+				}, 50);
+
+				if (!lib) return;
+				whenDrawn(card, json.kind, function (drawn) {
+					if (drawn) {
+						announce((KIND_NAMES[json.kind] || 'Visual') + ' "' + title
+							+ '" finished drawing.');
+					} else {
+						announce((KIND_NAMES[json.kind] || 'Visual') + ' "' + title
+							+ '" was added, but it did not finish drawing.');
+					}
+				});
+			});
+		}
+
+		/* ---- changing a map card's columns in place ----
+		 *
+		 * A map card that plotted the wrong column should not have to be deleted
+		 * and added again.  The edit control on the card opens the card's own
+		 * encoding - a place column, or a latitude and longitude - and PATCHES
+		 * the visual at its index: the place in the layout, the size and the
+		 * title stay, and only the body is replaced.  The server draws the
+		 * replacement through the same pipeline and URL state as the card being
+		 * replaced; the map's script is re-run the way an appended card's is.
+		 */
+		var editPanel  = document.getElementById('me-panel');
+		var editForm   = document.getElementById('me-form');
+		var editLoc    = document.getElementById('me-loc');
+		var editLat    = document.getElementById('me-lat');
+		var editLon    = document.getElementById('me-lon');
+		var editSave   = document.getElementById('me-save');
+		var editCancel = document.getElementById('me-cancel');
+		var editError  = document.getElementById('me-error');
+
+		if (editPanel && editForm && editLoc && editLat && editLon && editSave && editError) {
+			var editTarget = null;   /* { card, btn, index } */
+			var editLoaded = false;
+
+			var editSetError = function (message) {
+				editError.textContent = message || '';
+				editError.hidden = !message;
+			};
+
+			/* The title is the card's own words, or the server's derived one
+			 * when the card never had a title of its own.  Every control that
+			 * names the card in its accessible name follows it. */
+			var editSetTitle = function (card, title) {
+				var titleEl = card.querySelector('.visual-card-title');
+				if (titleEl) titleEl.textContent = title;
+				var handle = card.querySelector('.drag-handle');
+				if (handle) handle.setAttribute('aria-label', 'Move ' + title);
+				var size = card.querySelector('.visual-size-select');
+				if (size) size.setAttribute('aria-label', 'Size of ' + title);
+				var dl = card.querySelector('.visual-dl-btn');
+				if (dl) dl.setAttribute('data-title', title);
+			};
+
+			var editFill = function (sel, columns, selected) {
+				sel.innerHTML = '';
+				var seen = {};
+				var add = function (value, label) {
+					if (seen[value]) return;
+					seen[value] = 1;
+					var opt = document.createElement('option');
+					opt.value = value;
+					opt.textContent = label;
+					sel.appendChild(opt);
+				};
+				add('', 'Choose a column…');
+				columns.forEach(function (name) { add(name, name); });
+				/* A saved column is offered even when the sampler did not call
+				 * it numeric: the server, not this list, decides what a
+				 * coordinate column is, and the card's own value must be
+				 * selectable. */
+				if (selected && !seen[selected]) add(selected, selected);
+				sel.value = selected || '';
+			};
+
+			var editPosition = function () {
+				if (!editTarget) return;
+				var r    = editTarget.btn.getBoundingClientRect();
+				var w    = editPanel.offsetWidth;
+				var left = Math.max(8, Math.min(r.right - w, window.innerWidth - w - 8));
+				editPanel.style.left = left + 'px';
+				editPanel.style.top = (r.bottom + 4) + 'px';
+				editPanel.style.right = 'auto';
+				editPanel.style.maxHeight = Math.max(160, window.innerHeight - r.bottom - 12) + 'px';
+			};
+
+			var editClose = function (returnFocus) {
+				var target = editTarget;
+				editPanel.hidden = true;
+				if (target) target.btn.setAttribute('aria-expanded', 'false');
+				editTarget = null;
+				editLoaded = false;
+				if (returnFocus && target) target.btn.focus();
+			};
+
+			var editOpen = function (card, btn) {
+				var index = parseInt(card.getAttribute('data-visual'), 10);
+				if (isNaN(index)) return;
+
+				/* A second press on the same control closes it, like the other
+				 * panel on this toolbar. */
+				if (!editPanel.hidden && editTarget && editTarget.card === card) {
+					editClose(1);
+					return;
+				}
+				if (editTarget) editTarget.btn.setAttribute('aria-expanded', 'false');
+
+				editTarget = { card: card, btn: btn, index: index };
+				btn.setAttribute('aria-expanded', 'true');
+				editPanel.hidden = false;
+				editLoaded = false;
+				editSave.disabled = true;
+				editSave.textContent = 'Save columns';
+				editLoc.innerHTML = '<option value="">Loading…</option>';
+				editLat.innerHTML = '';
+				editLon.innerHTML = '';
+				editSetError('');
+				editPosition();
+				editLoc.focus();
+
+				fetch('/api/analyses/' + encodeURIComponent(anaId))
+					.then(function (r) { return r.json(); })
+					.then(function (analysis) {
+						if (!editTarget || editTarget.card !== card) return;
+						var vis = (analysis && analysis.visuals && analysis.visuals[index]) || null;
+						if (!vis || vis.kind !== 'map') {
+							editSetError('This card is no longer a map. Reload the canvas to see its current columns.');
+							return;
+						}
+						var enc     = vis.encode || {};
+						var numeric = canvasColumns.filter(function (c) { return c.numeric; })
+							.map(function (c) { return c.name; });
+						var all = canvasColumns.map(function (c) { return c.name; });
+						editFill(editLoc, all, enc.loc || '');
+						editFill(editLat, numeric, enc.lat || '');
+						editFill(editLon, numeric, enc.lon || '');
+						editLoaded = true;
+						editSave.disabled = false;
+					})
+					.catch(function () {
+						if (editTarget && editTarget.card === card) {
+							editSetError('Could not read the card’s columns. Check the connection and try again.');
+						}
+					});
+			};
+
+			/* Delegated: the cards appended in place carry the same button but
+			 * no listener of their own. */
+			grid.addEventListener('click', function (e) {
+				var btn = e.target.closest('.visual-edit-btn');
+				if (!btn) return;
+				var card = btn.closest('.visual-card');
+				if (card) editOpen(card, btn);
+			});
+
+			editCancel.addEventListener('click', function () { editClose(1); });
+			editPanel.addEventListener('keydown', function (e) {
+				if (e.key === 'Escape') { e.preventDefault(); editClose(1); }
+			});
+			window.addEventListener('resize', function () { if (!editPanel.hidden) editPosition(); });
+			window.addEventListener('scroll', function () { if (!editPanel.hidden) editPosition(); }, { passive: true });
+			document.addEventListener('mousedown', function (e) {
+				if (editPanel.hidden) return;
+				if (editPanel.contains(e.target)) return;
+				if (e.target.closest && e.target.closest('.visual-edit-btn')) return;
+				editClose(0);
+			});
+
+			editForm.addEventListener('submit', function (e) {
+				e.preventDefault();
+				if (!editTarget || !editLoaded) return;
+				editSetError('');
+
+				var encode = {};
+				if (editLoc.value) {
+					encode.loc = editLoc.value;
+				} else if (editLat.value && editLon.value) {
+					encode.lat = editLat.value;
+					encode.lon = editLon.value;
+				} else {
+					editSetError('Choose a place column, or both a latitude and a longitude column.');
+					(editLat.value ? editLon : editLat).focus();
+					return;
+				}
+
+				var target = editTarget;
+				editSave.disabled = true;
+				editSave.textContent = 'Saving…';
+
+				fetch('/api/analyses/' + encodeURIComponent(anaId) + '/visuals/' + target.index, {
+					method  : 'PATCH',
+					headers : { 'Content-Type': 'application/json' },
+					body    : JSON.stringify({ encode: encode, query: window.location.search || '' }),
+				}).then(function (r) {
+					return r.json().catch(function () { return {}; }).then(function (json) {
+						if (!r.ok) throw new Error(json.error || ('The canvas refused the change (' + r.status + ')'));
+						return json;
+					});
+				}).then(function (json) {
+					/* A response that does not name this card is not one this
+					 * code can place; a reload shows what the server stored. */
+					if (!json || json.visual !== target.index || typeof json.html !== 'string') {
+						window.location.reload();
+						return;
+					}
+
+					var card = target.card;
+					if (json.title) editSetTitle(card, json.title);
+					if (json.cf_col) card.setAttribute('data-cf-col', json.cf_col);
+					else card.removeAttribute('data-cf-col');
+
+					var body = card.querySelector('.visual-card-body');
+					if (body) body.innerHTML = json.html;
+
+					editClose(1);
+					announce('Map columns updated: '
+						+ (encode.loc ? 'place column ' + encode.loc
+						              : 'latitude ' + encode.lat + ' and longitude ' + encode.lon) + '.');
+
+					var titleEl = card.querySelector('.visual-card-title');
+					var title   = json.title || (titleEl ? titleEl.textContent : 'Map');
+
+					loadCardAssets(json.head).then(function (ready) {
+						if (!ready || !libLoaded(DRAW_LIBS.map)) {
+							announceLibMissing(DRAW_LIBS.map, 'map', title, 'could not be redrawn:');
+							return;
+						}
+						runCardScripts(card);
+						setTimeout(function () {
+							initCrossFilters(card);
+							initDownloadButtons(card);
+						}, 50);
+
+						whenDrawn(card, 'map', function (drawn) {
+							announce(drawn
+								? 'Map "' + title + '" finished redrawing.'
+								: 'Map "' + title + '" did not finish redrawing.');
+						});
+					});
+				}).catch(function (err) {
+					editSetError(err.message || 'The columns could not be changed.');
+					editSave.disabled = false;
+					editSave.textContent = 'Save columns';
+				});
+			});
+		}
+
+		form.addEventListener('submit', function (e) {
+			e.preventDefault();
+			setError('');
+
+			var kind   = kindSel.value;
+			var encode = {};
+			var options = {};
+			var title  = titleInp.value.trim();
+
+			if (kind === 'table') {
+				var cols = Array.prototype.map.call(tableSel.selectedOptions, function (o) { return o.value; });
+				if (cols.length) encode.columns = cols;
+			} else if (kind === 'bar') {
+				encode.cat   = picked(catSel, 'category'); if (!encode.cat) return;
+				encode.value = valueSel.value || '__count__';
+			} else if (kind === 'pie') {
+				encode.cat   = picked(catSel, 'category'); if (!encode.cat) return;
+				encode.value = picked(valueSel, 'value'); if (!encode.value) return;
+			} else if (kind === 'line') {
+				encode.x = picked(xSel, 'X column'); if (!encode.x) return;
+				encode.y = picked(ySel, 'Y column'); if (!encode.y) return;
+			} else if (kind === 'scatter') {
+				encode.x = picked(xSel, 'X column'); if (!encode.x) return;
+				encode.y = picked(ySel, 'Y column'); if (!encode.y) return;
+			} else if (kind === 'heatmap') {
+				encode.x = picked(xSel, 'X column'); if (!encode.x) return;
+				encode.y = picked(ySel, 'Y column'); if (!encode.y) return;
+				if (valueSel.value) encode.value = valueSel.value;
+			} else if (kind === 'stacked') {
+				encode.cat    = picked(catSel, 'category'); if (!encode.cat) return;
+				encode.series = picked(seriesSel, 'series'); if (!encode.series) return;
+				encode.value  = valueSel.value || '__count__';
+			} else if (kind === 'combo') {
+				encode.cat      = picked(xSel, 'X column'); if (!encode.cat) return;
+				encode.bar_val  = picked(barSel, 'bar value'); if (!encode.bar_val) return;
+				encode.line_val = picked(lineSel, 'line value'); if (!encode.line_val) return;
+			} else if (kind === 'treemap') {
+				encode.group = picked(catSel, 'category'); if (!encode.group) return;
+				encode.value = valueSel.value || '__count__';
+			} else if (kind === 'histogram') {
+				encode.value = picked(histSel, 'column'); if (!encode.value) return;
+				options.bins = parseInt(binsInp.value, 10) || 10;
+			} else if (kind === 'map') {
+				if (mapLocSel.value) {
+					encode.loc = mapLocSel.value;
+				} else {
+					encode.lat = picked(mapLatSel, 'latitude column'); if (!encode.lat) return;
+					encode.lon = picked(mapLonSel, 'longitude column'); if (!encode.lon) return;
+				}
+			}
+
+			var payload = {
+				kind: kind, encode: encode, options: options,
+				/* The canvas's own URL state, so a card added while a chart is
+				 * cross-filtering, or with a what-if parameter set, is drawn like
+				 * the cards beside it. */
+				query: window.location.search || '',
+			};
+			if (title) payload.title = title;
+
+			addBtn.disabled = true;
+			btn.disabled = true;
+			addBtn.textContent = 'Adding…';
+
+			fetch('/api/analyses/' + encodeURIComponent(anaId) + '/visuals', {
+				method  : 'POST',
+				headers : { 'Content-Type': 'application/json' },
+				body    : JSON.stringify(payload),
+			}).then(function (r) {
+				return r.json().catch(function () { return {}; }).then(function (json) {
+					if (!r.ok) throw new Error(json.error || ('The canvas refused the visual (' + r.status + ')'));
+					return json;
+				});
+			}).then(function (json) {
+				/* Without an index there is no card to build: reloading is the
+				 * way back to a page that shows what the server stored, and it
+				 * only happens if the response was not the one expected. */
+				if (!json || typeof json.visual !== 'number') {
+					window.location.reload();
+					return;
+				}
+
+				appendCard(json);
+				form.reset();
+				addBtn.disabled = false;
+				btn.disabled = false;
+				addBtn.textContent = 'Add to canvas';
+				/* Focus has moved to the card; returning it to the button would
+				 * take the reader away from what they just added. */
+				closePanel(0);
+			}).catch(function (err) {
+				setError(err.message || 'The visual could not be added.');
+				addBtn.disabled = false;
+				btn.disabled = false;
+				addBtn.textContent = 'Add to canvas';
+			});
+		});
 	}());
 
 	/* ---- the first-visit tip (3.2) ----

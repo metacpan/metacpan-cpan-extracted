@@ -6,13 +6,19 @@
  * Time::Keeper's shared object), and the per-interpreter caches, which a
  * new thread starts without (CLONE) since they hold its own Perl values. */
 
-/* What perls before 5.14 (isSPACE_A, isDIGIT_A) and 5.10.0 (newSVpvn_flags,
+/* What perls before 5.14 (isSPACE_A, isDIGIT_A, isALPHA_A) and 5.10.0 (newSVpvn_flags,
  * 5.10.1's) lack; the dist's floor is 5.10.0. */
 #ifndef isSPACE_A
 #  define isSPACE_A(c) ((c) == ' ' || (c) == '\t' || (c) == '\n' || (c) == '\r' || (c) == '\f')
 #endif
 #ifndef isDIGIT_A
 #  define isDIGIT_A(c) ((c) >= '0' && (c) <= '9')
+#endif
+#ifndef isALPHA_A
+#  define isALPHA_A(c) (((c) >= 'a' && (c) <= 'z') || ((c) >= 'A' && (c) <= 'Z'))
+#endif
+#ifndef isPUNCT_A
+#  define isPUNCT_A(c) ((c) >= 0x21 && (c) <= 0x7E && !isALNUM(c))
 #endif
 /* perl 5.42's UTF8_MAXBYTES_CASE calls MAX, which perl.h defines only for the core and
  * where the system headers do (not MinGW). */
@@ -42,6 +48,9 @@ typedef struct tkn_cache {
     SV *reasons;        /* the sixteen reasons' patterns, on first use (Phase 10) */
     HV *zone_abbrs;     /* every zone's tzdata abbreviations, on first use (0.02) */
     HV *zone_words;     /* a locale's zone names' first words, by code, on first use (0.02) */
+    HV *known;          /* the words find takes as part of a mention, by code, on first use (0.04) */
+    HV *memo;           /* CLDR facts a reader asks for on every read, by code (0.04) */
+    int quiet;          /* find is reading: a reader that cannot read returns, not dies (0.04) */
 } my_cxt_t;
 
 START_MY_CXT
@@ -81,6 +90,9 @@ tkn_cxt_init(pTHX_ my_cxt_t *cxt)
     cxt->reasons = NULL;
     cxt->zone_abbrs = NULL;
     cxt->zone_words = newHV();
+    cxt->known = newHV();
+    cxt->quiet = 0;
+    cxt->memo = newHV();
 }
 
 #endif

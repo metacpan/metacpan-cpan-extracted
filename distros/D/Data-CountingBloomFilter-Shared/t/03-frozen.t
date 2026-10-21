@@ -11,6 +11,7 @@ my @in   = qw(apple banana cherry date elderberry fig grape);
 # ---- producer: build, populate, freeze ----
 {
     my $cbf = Data::CountingBloomFilter::Shared->new($path, 1000, 0.01);
+    my $peer = Data::CountingBloomFilter::Shared->new($path, 1000, 0.01);
     ok !$cbf->frozen,   'freshly created filter is not frozen';
     ok !$cbf->readonly, 'read-write handle is not read-only';
     $cbf->add($_) for @in[0..3];
@@ -22,6 +23,13 @@ my @in   = qw(apple banana cherry date elderberry fig grape);
     ok $cbf->frozen,   'frozen after ->freeze';
     ok $cbf->readonly, 'freezing handle becomes read-only';
     is $cbf->count, $c, 'count unchanged by freeze';
+    ok $peer->contains('apple'), 'an existing mutable peer can still query after freeze';
+    like exception(sub { $peer->add('x') }), qr/frozen|read-only/, 'freeze blocks writes through an existing peer';
+    like exception(sub { $peer->remove('apple') }), qr/frozen|read-only/, 'freeze blocks removals through an existing peer';
+    like exception(sub { $peer->add_many(['x']) }), qr/frozen|read-only/, 'freeze blocks batches through an existing peer';
+    like exception(sub { $peer->clear }), qr/frozen|read-only/, 'freeze blocks clearing through an existing peer';
+    like exception(sub { $peer->merge($cbf) }), qr/frozen|read-only/, 'freeze blocks merges through an existing peer';
+    is $peer->count, $c, 'rejected mutations leave the sealed counters intact';
 
     like exception(sub { $cbf->add("x") }),        qr/frozen|read-only/, 'add on frozen handle croaks';
     like exception(sub { $cbf->add_many(["x"]) }), qr/frozen|read-only/, 'add_many on frozen handle croaks';

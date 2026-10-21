@@ -1,7 +1,7 @@
 
 #define	SYNTAX_ERROR	999
 #define CROAK(xxxx)                                  \
-  PUSHMARK(sp);                                      \
+  SP -= items;                                       \
   XPUSHs(sv_2mortal(newSVnv((double)SYNTAX_ERROR))); \
   XPUSHs(sv_2mortal(newSVpv(xxxx, strlen(xxxx))));   \
   PUTBACK;                                           \
@@ -37,11 +37,12 @@
 #define	DEFAULT_STMT_CLOSE_TYPE		SQL_DROP
 
 //	Define ODBCList as a Macro for backward compatiblility.
-#define	THREAD_MOM	( (CMom *) ::cMom->operator[](GetCurrentThreadId()))
+#define	THREAD_MOM	(ThreadDaughter())
 #define	ODBCLIST	( (ODBC_TYPE *) (THREAD_MOM)->operator[]((DWORD)0))
 
 
 class CResults;
+class CMom;
 
 struct	ODBC_hdbc{
 	HDBC	hdbc;				//	Handle to the ODBC connection
@@ -81,7 +82,7 @@ struct	ODBC_Conn{
 
 	#define	ReturnError(xx)																\
 		{ 																					\
-			char *szError = "No connections exist";											\
+			const char *szError = "No connections exist";											\
 			if (h){																			\
 				szError = h->Error->szError;												\
 			}																				\
@@ -137,12 +138,16 @@ struct	ODBC_Conn{
 ODBC_TYPE *NewODBC();
 ODBC_TYPE *CleanODBC(ODBC_TYPE *h);
 ODBC_TYPE * _NT_ODBC_Verify(int iODBC);
-ODBC_TYPE *ODBCError(char *szString, ODBC_TYPE *h, char *szFunction, char *szFunctionLevel);
+CMom *ThreadDaughter();
+ODBC_TYPE *ODBCError(const char *szString, ODBC_TYPE *h, const char *szFunction, const char *szFunctionLevel);
 int DeleteConn(int iODBC);
-void _NT_ODBC_Error(ODBC_Conn * h, char *szFunction, char *szFunctionLevel);
+ODBC_TYPE *DropFailedConn(ODBC_TYPE *h);
+int NoSuchConn(ODBC_TYPE *h, const char *szFunction);
+void SetErrorSource(ODBC_ERROR *Error, const char *szFunction, const char *szFunctionLevel);
+void _NT_ODBC_Error(ODBC_Conn * h, const char *szFunction, const char *szFunctionLevel);
 int FreeODBC(ODBC_TYPE *h);
 RETCODE ResetStmt(ODBC_TYPE *h);
-char *MapCloseType(UWORD uCloseType);
+const char *MapCloseType(UWORD uCloseType);
 void CleanError(ODBC_ERROR *h);
 int	ColNameToNum(ODBC_TYPE *h, char *szName);
 // void ReturnError(ODBC_TYPE *h);

@@ -87,6 +87,9 @@ tkn_reason_known(pTHX_ SV *reason)
 static void
 tkn_cannot(pTHX_ SV *method, SV *text, SV *token, SV *reason)
 {
+    dMY_CXT;
+    if (MY_CXT.quiet)
+        return;
     if (!SvOK(reason) || !tkn_reason_known(aTHX_ reason))
         tkn_carp(aTHX_ "Carp::confess", sv_2mortal(newSVpvf("Time::Keeper::Natural: '%" SVf "' is not one of the reasons",
                                                             SVfARG(SvOK(reason) ? reason : &PL_sv_no))));
@@ -174,8 +177,10 @@ tkn_point(pTHX_ SV *self, SV *method, SV *text, HV **info_out)
     tkn_lex_words(aTHX_ self, &lexsv, &words);
     L = tkn_lex(aTHX_ lexsv);
     k = tkn_key_sv(aTHX_ L, text);
-    if (!SvCUR(k))
+    if (!SvCUR(k)) {
         tkn_cannot(aTHX_ method, text, sv_2mortal(newSVpvs("")), sv_2mortal(newSVpvs("the text is empty")));
+        return NULL;
+    }
     info = tkn_info_new(aTHX);
     v = tkn_phrase(aTHX_ self, L, words, text, k, info);
     /* in a calendar, a date written in the Gregorian still reads, and is
@@ -196,6 +201,11 @@ tkn_point(pTHX_ SV *self, SV *method, SV *text, HV **info_out)
             tkn_info_assume(aTHX_ info, "zone");
         *info_out = info;
         return tkn_in_cal(aTHX_ self, v);
+    }
+    {
+        dMY_CXT;
+        if (MY_CXT.quiet)
+            return NULL;
     }
     {
         HV *scratch = (HV *)sv_2mortal((SV *)newHV());
@@ -365,8 +375,10 @@ tkn_match_new(pTHX_ SV *klass, HV *a)
         (void)hv_stores(self, "precision", newSVsv(precision));
         (void)hv_stores(self, "assumed", newRV_inc((SV *)assumed));
         (void)hv_stores(self, "text", newSVsv(text));
-        (void)hv_stores(self, "start", newSViv((IV)lead));
-        (void)hv_stores(self, "end", newSViv((IV)(lead == chars ? 0 : chars - trail)));
+        /* find gives where a mention is in a longer text */
+        SV *gs = tkn_hsv(aTHX_ a, "start"), *ge = tkn_hsv(aTHX_ a, "end");
+        (void)hv_stores(self, "start", gs ? newSViv(SvIV(gs)) : newSViv((IV)lead));
+        (void)hv_stores(self, "end", ge ? newSViv(SvIV(ge)) : newSViv((IV)(lead == chars ? 0 : chars - trail)));
         (void)hv_stores(self, "locale", loc ? newSVsv(loc) : newSV(0));
         (void)hv_stores(self, "anchor", anc ? newSVsv(anc) : newSV(0));
         if (strEQ(ks, "interval")) {

@@ -1,5 +1,6 @@
 use strict; use warnings; use Test::More;
 use File::Temp qw(tempdir);
+use Data::DisjointSet::Shared;
 
 # reset rewrites every element's parent and size in one pass under the write
 # lock; a writer killed part-way used to leave sizes and num_sets disagreeing
@@ -45,7 +46,8 @@ open my $v, '>', $victim or die $!;
 print $v <<'VEOF';
 use strict; use warnings; use Data::DisjointSet::Shared;
 my ($path, $op) = @ARGV;
-my $d = Data::DisjointSet::Shared->new($path, 64);
+my $d = Data::DisjointSet::Shared->new($path, 64, $op eq 'create-race' ? 0666 : 0600);
+if ($op eq 'create-race') { $d->union(0, 1); exit 0 }
 if ($op eq 'recover') { $d->num_sets; $d->find(0); exit 0 }
 $d->union($_, $_ + 32) for 0 .. 31;
 $d->union($_, $_ + 1) for 40 .. 50;
@@ -129,6 +131,25 @@ for my $case (['union: linked, size not updated', 'sz[ra] += sz[rb];'],
     ok $l2 && run_gdb($path, 'recover', $l2, 0), "$name: recovering process killed mid-recount";
     my $st = check($path);
     ok partition($st), "$name: third process sees sizes and num_sets agreeing with the links" or diag $st;
+}
+
+{
+    my $path = "$dir/create-race.dsu";
+    my $line = line_in('dsu_secure_open', 'if (fd >= 0)');
+    my $cmds = "$dir/create-race.cmds";
+    open my $c, '>', $cmds or die $!;
+    print $c "set pagination off\nset confirm off\nset breakpoint pending on\n",
+        "set debuginfod enabled off\nbreak dsu.h:$line\nrun\n",
+        "shell $^X @inc -MData::DisjointSet::Shared -e 'my \$d = Data::DisjointSet::Shared->new(q{$path}, 16, 0600); \$d->union(2, 3)'\n",
+        "continue\nquit\n";
+    close $c;
+    my $log = `ulimit -v 1500000; timeout 60 $gdb -nx -batch -x $cmds --args $^X @inc $victim $path create-race 2>&1`;
+    ok $log =~ /Breakpoint 1[,.]/ && $log =~ /exited normally/,
+        'creator paused after exclusive open while a peer initialized the file' or diag $log;
+    is((stat $path)[2] & 0777, 0600, 'delayed creator preserves the initialized file permissions');
+    my $d = Data::DisjointSet::Shared->new($path, 64);
+    is $d->capacity, 16, 'delayed creator uses the peer capacity';
+    ok $d->connected(0, 1) && $d->connected(2, 3), 'both creators contributed to the same partition';
 }
 
 done_testing;

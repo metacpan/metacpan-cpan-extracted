@@ -5,15 +5,23 @@ use warnings;
 
 use Carp ();
 
-our $VERSION = '3.9.0';
+our $VERSION = '3.10.0';
 
 our @FLAGS = qw(
     is_vpn is_hosting is_relay is_tor is_cdn is_resproxy is_dcproxy is_mobproxy
     is_pubproxy
 );
 our @DETAILS = qw(vpn hosting relay tor cdn resproxy dcproxy mobproxy pubproxy);
+# Where the address is and the AS announcing it, on every keyed answer, each
+# with every member present: an empty string, or AS 0, where nothing is known.
+our @OBJECTS = qw(location asn);
+our @LOCATION = qw(
+    continent continent_name country country_name timezone currency_code currency_name
+    currency_symbol flag_emoji flag_unicode
+);
+our @ASN = qw(asn name domain type prefix);
 
-my %KNOWN = map { $_ => 1 } 'ip', 'is_bogon', @FLAGS, @DETAILS;
+my %KNOWN = map { $_ => 1 } 'ip', 'is_bogon', @FLAGS, @DETAILS, @OBJECTS;
 
 # The one place a wire body becomes a result. Every field is copied on key
 # PRESENCE and never on truthiness: a plan that includes `is_hosting` and
@@ -26,7 +34,7 @@ sub from_wire {
     for my $flag (@FLAGS) {
         $answer{$flag} = $body->{$flag} ? 1 : 0 if exists $body->{$flag};
     }
-    for my $detail (@DETAILS) {
+    for my $detail (@DETAILS, @OBJECTS) {
         $answer{$detail} = $body->{$detail} if exists $body->{$detail};
     }
     return $class->_new(\%answer, $body);
@@ -45,7 +53,7 @@ sub has {
 # a key is entitled to without reading the plan table.
 sub fields {
     my ($self) = @_;
-    return grep { exists $self->{$_} } @FLAGS, @DETAILS;
+    return grep { exists $self->{$_} } @FLAGS, @DETAILS, @OBJECTS;
 }
 
 # The response exactly as it came off the wire, with its original names and its
@@ -62,7 +70,7 @@ sub _new {
 
 # One reader per field rather than AUTOLOAD, so a typo is a compile-adjacent
 # "Can't locate object method" rather than a silent undef.
-for my $field ('ip', 'is_bogon', @FLAGS, @DETAILS) {
+for my $field ('ip', 'is_bogon', @FLAGS, @DETAILS, @OBJECTS) {
     no strict 'refs';
     *{__PACKAGE__ . "::$field"} = sub { $_[0]->{$field} };
 }
@@ -82,6 +90,8 @@ VPNDetection::Result - what a lookup answers
     $result->ip;                    # '45.83.91.1'
     $result->is_vpn;                # 1
     $result->vpn->{provider};       # 'mullvad'
+    $result->location->{country};   # the ISO 3166 country code
+    $result->asn->{name};           # who runs the announcing network
 
     $result->is_hosting;            # 1, 0, or undef when your plan omits it
     $result->is_hosting // 0;       # read an absent field as false
@@ -118,17 +128,29 @@ than served.
 =head2 is_hosting, is_relay, is_tor, is_cdn, is_resproxy, is_dcproxy, is_mobproxy, is_pubproxy
 
 The tier-gated flags: C<1>, C<0>, or C<undef> when your plan omits the field.
-C<is_pubproxy> is whether a public proxy, one anyone can connect through,
-listens on the address or sends its traffic out from it.
+Without a key only C<is_vpn> comes back; a free key adds C<is_tor> and
+C<is_relay>, and every paid plan answers every flag. C<is_pubproxy> is whether a
+public proxy, one anyone can connect through, listens on the address or sends
+its traffic out from it.
 
 =head2 vpn, hosting, relay, tor, cdn, resproxy, dcproxy, mobproxy, pubproxy
 
 The detail objects, as plain hash references, or C<undef> when your plan omits
-them. C<pubproxy> carries C<entry>, C<exit>, C<protocols> (an array
+them. C<vpn> carries C<provider>, C<last_seen> and C<confidence>; its C<method>
+is deprecated, since no plan is answered with it from 2026-10-20. C<pubproxy> carries C<entry>, C<exit>, C<protocols> (an array
 reference), C<num_ports>, C<num_proxies>, C<last_seen> and C<last_usable>.
 C<num_ports> is 0 when the address is only an exit and C<num_proxies> 0 when it
 is only an entry; C<last_usable> is an empty string when no request through a
 proxy on the address was answered.
+
+=head2 location, asn
+
+Where the address is and the AS announcing it, as plain hash references, on every
+keyed answer and C<undef> without a key. C<location> carries C<continent>,
+C<continent_name>, C<country>, C<country_name>, C<timezone>, C<currency_code>,
+C<currency_name>, C<currency_symbol>, C<flag_emoji> and C<flag_unicode>; C<asn>
+carries C<asn>, C<name>, C<domain>, C<type> and C<prefix>. Every key is present
+whenever the object is: an empty string, and C<asn> 0, where nothing is known.
 
 =head2 has($field)
 

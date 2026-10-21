@@ -87,12 +87,15 @@ frame(self, text, key)
         SV *got = NULL, *raw = NULL;
     PPCODE:
         list = tkn_phrases_of(aTHX_ self, key);
-        n = list ? av_len(list) + 1 : 0;
+        n = list && !tkn_key_is(key, "nth") && !tkn_key_is(key, "alias") ? av_len(list) + 1 : 0;
         if (n)
             tkn_fold_text(aTHX_ text, &F);
         for (i = 0; i < n && !got; i++) {
             AV *ph = (AV *)SvRV(*av_fetch(list, i, 0));
-            got = tkn_frame_match(aTHX_ &F, *av_fetch(ph, 2, 0), SvIV(*av_fetch(ph, 3, 0)), *av_fetch(ph, 4, 0));
+            IV flags = SvIV(*av_fetch(ph, 3, 0));
+            got = tkn_frame_match(aTHX_ &F, *av_fetch(ph, 2, 0), flags, *av_fetch(ph, 4, 0));
+            if (got && (flags & TKN_F_MARK) && !SvCUR(got))
+                got = NULL;
             if (got)
                 raw = *av_fetch(ph, 1, 0);
         }
@@ -119,7 +122,7 @@ split_on(self, text, key)
         SV *left = NULL, *right = NULL, *raw = NULL;
     PPCODE:
         list = tkn_phrases_of(aTHX_ self, key);
-        n = list ? av_len(list) + 1 : 0;
+        n = list && !tkn_key_is(key, "nth") && !tkn_key_is(key, "alias") ? av_len(list) + 1 : 0;
         if (n)
             tkn_fold_text(aTHX_ text, &F);
         for (i = 0; i < n; i++) {

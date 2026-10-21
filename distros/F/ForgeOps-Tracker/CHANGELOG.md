@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.15.0 (2026-10-20)
+
+- Strict privacy: a raw request path now keeps only its first segment, and the rest is sent as `:path` (`/patients/jane-doe/12` becomes `/patients/:path`; a first segment with a digit or over 40 characters becomes `:id`). Before, only segments holding a digit were replaced, so a path like `/patients/janedoe` went out whole. A route template (`/patients/:id/notes`, `{id}`, `<int:id>`, `[slug]`, `*path`) is kept as it is. This applies everywhere strict privacy names a request or a call by its path: span names and transaction names.
+
+## 0.14.0 (2026-10-20)
+
+- New `strict_privacy` option (off by default, or `FORGE_OPS_STRICT_PRIVACY=true`) for apps that can't let personal or health data leave their servers. With it on, an error event carries no message (a `message_fingerprint` computed in your process is sent instead, so errors still group), no breadcrumbs, no `endpoint`, no SQL statement and no source context, and the user only by `id`. Outbound HTTP spans are named by method and host only, a request named by its raw path has its ids taken out, and span data keeps only `db.statement` and `db.system`. A raw-path `transaction_name` has its ids taken out in error events and performance samples too.
+- New `privacy_allowed_fields` option (or `FORGE_OPS_PRIVACY_ALLOWED_FIELDS=error_code,feature`): the context and tag keys strict privacy still sends, when their value is a plain string or number. Empty by default.
+
 ## 0.13.0 (2026-10-13)
 
 - Fixed: a batch the server refused was re-sent at every flush for as long as the process lived, with everything recorded since added to it. Performance samples and custom and infrastructure metrics are now dropped when the server answers with a 4xx other than 408 or 429 (a 400, 401, 403, 413 or 422, for example), since sending the same batch again can only fail the same way. Once a metric buffer had filled up behind such a batch, every new metric was dropped too; that no longer happens.

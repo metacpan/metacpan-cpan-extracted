@@ -43,7 +43,7 @@ croak_like(sub { ClickHouse::Encoder->new(columns => [['v', 'Decimal32(10)']]) }
            qr/Decimal32 scale must be 0\.\.9/, 'Decimal32 scale > 9');
 
 croak_like(sub { ClickHouse::Encoder->new(columns => [['v', 'Decimal(0, 0)']]) },
-           qr/precision must be 1\.\.38/, 'Decimal(P,S) P=0');
+           qr/precision must be 1\.\.76/, 'Decimal(P,S) P=0');
 
 croak_like(sub { ClickHouse::Encoder->new(columns => [['v', 'Variant()']]) },
            qr/Variant requires at least one type/, 'Variant() empty');

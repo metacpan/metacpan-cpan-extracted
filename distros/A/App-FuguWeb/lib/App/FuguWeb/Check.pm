@@ -18,7 +18,7 @@
 use v5.36;
 
 package App::FuguWeb::Check;
-our $VERSION = '0.10.0';
+our $VERSION = '0.10.1';
 
 use App::FuguWeb;
 use App::FuguWeb::Keys;

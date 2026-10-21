@@ -1,5 +1,10 @@
 Revision history for Data-Buffer-Shared
 
+0.10  2026-10-16
+    - Fix inherited locks and validate attached segment layouts.
+    - Preserve eventfd ownership and handle empty bulk operations.
+    - Correct shared-buffer publication in the examples.
+
 0.09      2026-09-26
           - DATA_BUFFER_SHARED_SPARSE=0 reserves segments up front, so a full
             filesystem fails the constructor, not a later write.

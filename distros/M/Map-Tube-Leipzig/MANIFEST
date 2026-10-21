@@ -7,9 +7,13 @@ MANIFEST
 MANIFEST.SKIP
 README
 t/00-load.t
-t/map-tube-leipzig.t
+t/01-map-data.t
+t/02-map.t
+t/03-nodes.t
+t/04-lines.t
 xt/manifest.t
 xt/pod.t
+xt/provides.t
 xt/version.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

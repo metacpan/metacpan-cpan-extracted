@@ -13,3 +13,7 @@
 
 0.005 2026-10-15
     - Add README.md generation via Makefile.PL
+
+0.006 2026-10-20
+    - Identifier C1 was encoded as letter C and number 1
+      (0x28,0x1D,0x7E,0x81,0x00,0x00,0x00,0x00).

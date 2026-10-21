@@ -14,7 +14,7 @@ use Data::CountMinSketch::Shared;
 # Word-frequency estimation over a stream with a Count-Min sketch. We count
 # every word into a tiny fixed-size sketch (no per-word hash entry), then ask
 # it for the estimated frequency of each distinct word and print the top few.
-# The estimate never undercounts and overcounts only by a small bounded amount.
+# The estimate never undercounts; collisions determine the overestimate.
 
 my $text = <<'END';
 the quick brown fox jumps over the lazy dog
@@ -42,5 +42,5 @@ for my $w (@ranked[0 .. ($#ranked < 6 ? $#ranked : 6)]) {
 my $st = $cms->stats;
 printf "\nsketch: width %d, depth %d, %d cells, total %d, memory %d bytes\n",
     @{$st}{qw(width depth cells total mmap_size)};
-printf "guarantee: overestimate <= %.4g * total ~ %.2f, with prob >= %.4g\n",
+printf "nominal bound: overestimate <= %.4g * total ~ %.2f, probability >= %.4g\n",
     $st->{epsilon}, $st->{epsilon} * $st->{total}, 1 - $st->{delta};

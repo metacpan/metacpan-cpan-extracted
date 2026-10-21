@@ -1,0 +1,96 @@
+county,population,lat,lon,region
+Accomack,33157,37.77,-75.72,Eastern Shore
+Albemarle,113264,38.03,-78.56,Central Virginia
+Alleghany,15313,37.78,-79.91,Central Virginia
+Amelia,13159,37.34,-77.97,Southside
+Amherst,31882,37.59,-79.11,Central Virginia
+Appomattox,15911,37.37,-78.82,Central Virginia
+Arlington,238643,38.88,-77.09,Northern Virginia
+Augusta,76168,38.16,-79.12,Shenandoah Valley
+Bath,4393,38.06,-79.74,Shenandoah Valley
+Bedford,82018,37.32,-79.56,Central Virginia
+Bland,6280,37.12,-81.13,Southwest Virginia
+Botetourt,33222,37.55,-79.80,Central Virginia
+Brunswick,16186,36.77,-77.85,Southside
+Buchanan,20891,37.27,-82.04,Southwest Virginia
+Buckingham,17570,37.57,-78.56,Central Virginia
+Campbell,55789,37.20,-79.09,Central Virginia
+Caroline,30725,38.03,-77.35,Central Virginia
+Carroll,27270,36.73,-80.73,Southwest Virginia
+Charles City,6963,37.36,-77.08,Richmond Metro
+Charlotte,12112,37.01,-78.65,Southside
+Chesterfield,364478,37.38,-77.59,Richmond Metro
+Clarke,14389,39.12,-77.98,Northern Virginia
+Craig,5206,37.48,-80.24,Central Virginia
+Culpeper,55139,38.47,-78.00,Central Virginia
+Cumberland,10052,37.51,-78.26,Central Virginia
+Dickenson,14260,37.13,-82.35,Southwest Virginia
+Dinwiddie,29081,37.08,-77.63,Southside
+Essex,10953,37.94,-76.95,Northern Neck
+Fairfax,1150309,38.85,-77.31,Northern Virginia
+Fauquier,73874,38.75,-77.84,Northern Virginia
+Floyd,15858,36.92,-80.38,Southwest Virginia
+Fluvanna,28285,37.84,-78.28,Central Virginia
+Franklin,56987,37.04,-79.84,Southside
+Frederick,90288,39.20,-78.31,Shenandoah Valley
+Giles,16286,37.33,-80.69,Southwest Virginia
+Gloucester,40474,37.41,-76.52,Hampton Roads
+Goochland,24727,37.68,-77.88,Richmond Metro
+Grayson,14837,36.64,-81.22,Southwest Virginia
+Greene,20237,38.30,-78.48,Central Virginia
+Greensville,11378,36.68,-77.57,Southside
+Halifax,34431,36.77,-78.93,Southside
+Hanover,107766,37.75,-77.35,Richmond Metro
+Henrico,330818,37.44,-77.35,Richmond Metro
+Henry,51049,36.69,-80.00,Southside
+Highland,2214,38.36,-79.57,Shenandoah Valley
+Isle of Wight,37109,36.90,-76.73,Hampton Roads
+James City,76523,37.32,-76.77,Hampton Roads
+King and Queen,7052,37.71,-76.88,Northern Neck
+King George,27550,38.27,-77.13,Northern Virginia
+King William,17117,37.70,-77.09,Richmond Metro
+Lancaster,11391,37.72,-76.42,Northern Neck
+Lee,22740,36.70,-83.13,Southwest Virginia
+Loudoun,420959,39.08,-77.64,Northern Virginia
+Louisa,36244,37.97,-78.00,Central Virginia
+Lunenburg,11690,36.95,-78.24,Southside
+Madison,13987,38.38,-78.27,Central Virginia
+Mathews,8906,37.43,-76.32,Hampton Roads
+Mecklenburg,29553,36.69,-78.35,Southside
+Middlesex,10823,37.61,-76.55,Northern Neck
+Montgomery,98535,37.20,-80.41,Central Virginia
+Nelson,14807,37.79,-78.87,Central Virginia
+New Kent,23091,37.52,-77.06,Richmond Metro
+Northampton,11599,37.34,-75.95,Eastern Shore
+Northumberland,12095,37.86,-76.41,Northern Neck
+Nottoway,15853,37.13,-78.05,Southside
+Orange,36591,38.25,-78.11,Central Virginia
+Page,24376,38.62,-78.47,Shenandoah Valley
+Patrick,17608,36.67,-80.26,Southside
+Pittsylvania,61880,36.83,-79.39,Southside
+Powhatan,29652,37.57,-77.92,Richmond Metro
+Prince Edward,22565,37.22,-78.44,Southside
+Prince George,40875,37.19,-77.21,Southside
+Prince William,470335,38.70,-77.48,Northern Virginia
+Pulaski,33805,37.07,-80.77,Southwest Virginia
+Rappahannock,7919,38.68,-78.16,Northern Virginia
+Richmond County,9001,37.94,-76.72,Northern Neck
+Roanoke,94186,37.27,-80.02,Central Virginia
+Rockbridge,22572,37.80,-79.45,Shenandoah Valley
+Rockingham,81959,38.53,-78.87,Shenandoah Valley
+Russell,26214,37.02,-82.09,Southwest Virginia
+Scott,21073,36.71,-82.60,Southwest Virginia
+Shenandoah,45373,38.86,-78.64,Shenandoah Valley
+Smyth,29552,36.85,-81.56,Southwest Virginia
+Southampton,19351,36.73,-77.11,Southside
+Spotsylvania,142789,38.19,-77.66,Northern Virginia
+Stafford,156416,38.42,-77.44,Northern Virginia
+Surry,6630,37.12,-76.87,Southside
+Sussex,10754,36.93,-77.27,Southside
+Tazewell,40595,37.13,-81.56,Southwest Virginia
+Warren,43052,38.92,-78.21,Shenandoah Valley
+Washington,54406,36.73,-82.04,Southwest Virginia
+Westmoreland,17189,38.00,-76.81,Northern Neck
+Wise,36029,36.97,-82.62,Southwest Virginia
+Wythe,28684,36.93,-81.09,Southwest Virginia
+York,68280,37.22,-76.51,Hampton Roads

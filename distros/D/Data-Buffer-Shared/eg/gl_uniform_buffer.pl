@@ -51,7 +51,7 @@ printf "UBO size: %d bytes (std140 aligned)\n", length($$ref);
 # --- Multiprocess pattern ---
 # Process A (camera/physics):
 #   my $ubo = Data::Buffer::Shared::F32->new('/tmp/scene.shm', 24);
-#   $ubo->create_eventfd;
+#   my $efd = $ubo->create_eventfd;  # pass to B via SCM_RIGHTS
 #   while (1) {
 #       $ubo->lock_wr;
 #       $ubo->set_slice(0, @updated_vp_matrix);
@@ -62,10 +62,13 @@ printf "UBO size: %d bytes (std140 aligned)\n", length($$ref);
 #
 # Process B (renderer):
 #   my $ubo = Data::Buffer::Shared::F32->new('/tmp/scene.shm', 24);
+#   $ubo->attach_eventfd($received_eventfd);
 #   my $ref = $ubo->as_scalar;
 #   while (1) {
 #       if (defined $ubo->wait_notify) {
+#           $ubo->lock_rd;
 #           glBufferSubData_p(GL_UNIFORM_BUFFER, 0, $$ref);
+#           $ubo->unlock_rd;
 #       }
 #       draw_scene();
 #   }

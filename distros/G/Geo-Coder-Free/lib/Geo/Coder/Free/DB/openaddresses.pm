@@ -10,11 +10,11 @@ Geo::Coder::Free::DB::openaddresses - interface to data from http://results.open
 
 =head1 VERSION
 
-Version 0.48
+Version 0.49
 
 =cut
 
-our $VERSION = '0.48';
+our $VERSION = '0.49';
 
 use parent 'Database::Abstraction';
 

@@ -80,6 +80,34 @@ subtest "small strings" => sub {
 
 };
 
+subtest "duplicate keywords" => sub {
+
+    my $m = Algorithm::UrataniTakeda->new( patterns => [ "foo", "bar", "foo" ] );
+
+    is match_details( $m, "dogfood" ), as_bag(
+        [ 3, "foo" ],
+    );
+
+
+    is match_details( $m, "dogfood is food" ), as_bag(
+        [ 3, "foo" ],
+        [ 11, "foo" ],
+    );
+
+
+};
+
+subtest "zero" => sub {
+
+    my $m = Algorithm::UrataniTakeda->new( patterns => [ "0" ] );
+
+    is match_details( $m, "d0g" ), as_bag(
+        [ 1, "0" ],
+    );
+
+};
+
+
 sub as_bag(@list) {
 
     my $arr = Test2::Compare::Bag->new;

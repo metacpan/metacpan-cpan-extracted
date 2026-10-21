@@ -30,6 +30,10 @@ use Locale::US;
 use CHI;
 use Locale::Country;
 use Scalar::Util;
+# Imported functions are not methods: without this, $obj->croak() and the like
+# would resolve.  _valid_location is kept: t/edge_cases.t
+# checks that this package holds the rule itself.
+use namespace::clean -except => [qw(_valid_location)];
 
 our %admin1cache;
 our %admin2cache;     # name → region code (e.g. 'Kent' → 'P5')
@@ -59,11 +63,11 @@ Geo::Coder::Free::MaxMind - Provides a geocoding functionality using the MaxMind
 
 =head1 VERSION
 
-Version 0.48
+Version 0.49
 
 =cut
 
-our $VERSION = '0.48';
+our $VERSION = '0.49';
 
 =head1 SYNOPSIS
 

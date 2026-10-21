@@ -4,12 +4,12 @@ Database::BI - Web-based Business Intelligence viewer for data files
 
 ## Version
 
-0.014.0
+0.015.0
 
 ## Description
 
 `Database::BI` is a self-contained [Mojolicious](https://metacpan.org/pod/Mojolicious) web application that reads
-and views arbitrary flat data (CSV, PSV, TSV, SQLite, XML, XLSX, etc.)
+and views arbitrary data (CSV, PSV, TSV, SQLite, JSON, XML, XLSX, etc.)
 and presents them as styled, sortable, reorderable
 HTML tables.
 It has no persistent database of its own,
@@ -20,6 +20,9 @@ on disc, drag-and-drop files to upload, join multiple tables in memory, apply
 server-side filters, and export results as CSV, SQLite, JSON, or XLSX.  Nine
 D3.js v7 chart types, a pivot/crosstab table, per-column statistics, and
 multi-visual saved canvases are available from the toolbar.
+
+A tutorial in plain English is built into the application at `/tutorial`.
+It is written for people who do not know Perl, and it is the place to start.
 
 Key features:
 
@@ -59,7 +62,8 @@ as it changes.  All chart pages include Copy-link and Export SVG/PNG buttons.
 - **Maps** -- `GET /map` plots the filtered view on an OpenStreetMap map, either
 from latitude and longitude columns or from a place column geocoded locally
 with [Geo::Coder::Free](https://metacpan.org/pod/Geo%3A%3ACoder%3A%3AFree) (one lookup per distinct place, remembered in the
-dataset's model store).  Rows sharing a position become one marker.
+model store and shared by every dataset that names it).  Rows sharing a
+position become one marker.
 - **Pivot table** -- the "Pivot table" panel builds a crosstab from any
 combination of row dimensions, column dimensions, and measures
 (`sum|avg|min|max|count|count_distinct`).  Supports subtotals, HAVING
@@ -84,7 +88,11 @@ that menu, so a width the corner grip left it at reads without the menu being
 opened.  Each move is announced -- the column and row the
 card landed in, and any card the move pushed down -- and saved as you go.  The whole position and size is
 saved with the canvas, so a card put in row 4 stays in row 4 rather than
-being packed up the page.  Canvases support
+being packed up the page.  **Add current view** in the toolbar appends another
+table, chart or map without leaving the canvas, and a status region announces
+the card and the new visual count; when the card's script has drawn it, the
+region says the chart or map has finished drawing, and if D3 or Leaflet could
+not be loaded it names the missing library instead.  Canvases support
 cross-filtering, drill-through hierarchies, parameterisation, bookmarks
 with undo/redo, per-visual PNG download, and print to PDF/paper.
 - **Drag-and-drop upload** -- any supported data file can be dropped directly
@@ -169,6 +177,11 @@ perl Makefile.PL
 
     Scans `data_dir`, renders a card grid of available tables.
 
+- `GET /tutorial`
+
+    Renders the tutorial that is part of the application.  The chapters are data
+    in [Database::BI::Tutorial](https://metacpan.org/pod/Database%3A%3ABI%3A%3ATutorial), not in this POD.
+
 - `GET /view/:table`
 
     Opens the named table from `data_dir`.  Accepts `?f=col:op:val`
@@ -200,6 +213,7 @@ perl Makefile.PL
 
     ```
     table:name                         named table from data_dir
+    table:file/table                   a table inside a multi-table SQLite file
     path:/abs/path/to/file.csv         absolute local path
     /../hostname/dir/file.csv          remote file via SFTP
     redis:tablename|redis://host:port  Redis hash store (requires Redis module)
@@ -207,7 +221,8 @@ perl Makefile.PL
 
 - `GET /api/columns`
 
-    Returns `{ "columns": [...] }` for a table (`?table=name`) or file
+    Returns `{ "columns": [...] }` for a table (`?table=name` or
+    `?table=file/table` for a table inside a multi-table SQLite file) or file
     (`?path=/abs/path`).  Used by the join UI to populate the right-key
     dropdown without a page reload.
 
@@ -468,8 +483,11 @@ perl Makefile.PL
 
     OpenStreetMap map of the filtered view, drawn with HTML::OSM.  A row's position
     comes from a location column that is geocoded (`loc=`, one lookup per distinct
-    value, remembered in the dataset's model store) or from coordinate columns
-    (`lat=` and `lon=`).  Rows sharing a position become one marker.  Parameters:
+    value, remembered once in the model store and shared with every dataset that
+    names it) or from coordinate columns (`lat=` and `lon=`).  Rows sharing a
+    position become one marker.  Markers are clustered with
+    Leaflet.markercluster, so a dense map draws a count at low zoom and splits it
+    as it is zoomed in.  Parameters:
 
     ```
     l=<spec>      left table (required)
@@ -522,6 +540,38 @@ perl Makefile.PL
     stored as given - a gap is a gap - but two visuals may not share a cell, so
     an overlapping set is rejected with `400` and the stored layout is left
     alone.
+
+- `POST /api/analyses/:id/visuals`
+
+    Appends one visual to a saved canvas.  Body: `{ kind, encode, options,
+    title, query }`, with `kind` one of `table`, `bar`, `pie`, `line`,
+    `graph`, `scatter`, `heatmap`, `stacked`, `combo`, `treemap`,
+    `histogram` or `map`.  A map's `encode` names either `loc` (a place column
+    to geocode) or `lat` and `lon`.  The optional `query` is the canvas page's
+    query string: `cf` (cross-filter), `c` (calculated columns) and
+    `p.<name>` (bound parameter values) are read from it, so a card added
+    while the canvas is filtered or parameterised is drawn through the same state
+    as the cards already on screen.  The visual is rendered against the canvas's
+    datasets, joins and calculated fields before it is stored, so an unknown
+    column or an undrawable visual is rejected with `400` and nothing is appended.
+    Returns `201 { id, visual, kind, title, html, head, cf_col }`, where
+    `visual` is the new visual's index, `head` is any stylesheet and script the
+    page must add once to draw the card (Leaflet, for a map), and `cf_col` is the
+    column the card's marks cross-filter by.  The card is left unplaced in
+    `layout`; it is auto-placed after the saved cards until the reader moves or
+    resizes it.
+
+- `PATCH /api/analyses/:id/visuals/:visual`
+
+    Changes the columns of one stored visual without removing it.  Body:
+    `{ encode, query }`; `encode` replaces the visual's encoding in place (for
+    a map, `{ loc }` or `{ lat, lon }`), and the optional `query` is the
+    canvas page's query string, read for `cf`, `c` and `p.<name>` so
+    the redrawn card matches the page it is on.  The visual keeps its index, so
+    its layout position, size and title are unchanged.  The replacement is
+    rendered before it is stored, so an unknown column or an undrawable map is a
+    `400` and the saved visual is left alone.  Returns
+    `{ id, visual, kind, title, html, head, cf_col }`.
 
 - `DELETE /api/analyses/:id`
 
@@ -592,8 +642,46 @@ defaults:
     data_dir => 'data',   # directory scanned for data files on the home page
     platform => 'web',    # VWF template dimension
     language => 'en',     # VWF template dimension
+
+    # Browser-side libraries.  d3_url overrides the chart and canvas
+    # script; the leaflet_* keys override the map assets, and tile_url
+    # overrides the tile server.  See "Self-hosting D3 and Leaflet"
+    # below.
+    d3_url => 'https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js',
 }
 ```
+
+### Self-Hosting D3 and Leaflet
+
+The chart pages load D3 from a public CDN by default, and the map pages load
+Leaflet and leaflet.markercluster from unpkg.  A deployment with no outbound
+network access, or one that prefers to serve its own assets, sets the URLs in
+`database_bi.conf`:
+
+```perl
+{
+    d3_url                          => '/static/d3/d3.min.js',
+    leaflet_js_url                  => '/static/leaflet/leaflet.js',
+    leaflet_css_url                 => '/static/leaflet/leaflet.css',
+    leaflet_cluster_js_url          => '/static/leaflet/leaflet.markercluster.js',
+    leaflet_cluster_css_url         => '/static/leaflet/MarkerCluster.css',
+    leaflet_cluster_default_css_url => '/static/leaflet/MarkerCluster.Default.css',
+    tile_url                        => 'https://tiles.internal/{z}/{x}/{y}.png',
+}
+```
+
+An absolute path is served like any other static file: put the library under
+the application's `public/` directory, so `/static/d3/d3.min.js` is
+`public/static/d3/d3.min.js`.  The five Leaflet keys may be set on their own;
+any left out keeps [HTML::OSM](https://metacpan.org/pod/HTML%3A%3AOSM)'s pinned CDN URL.  Use a path beginning with
+`/`, or a full URL; a path without the leading slash is relative to the page.  The versions to copy are the
+ones the defaults name: D3 7.9.0, Leaflet 1.9.4, and leaflet.markercluster 1.5.3.
+`tile_url` points the map layer at a self-hosted tile server instead of
+OpenStreetMap.  It keeps Leaflet's `{z}`, `{x}` and `{y}` placeholders, and
+`{s}` too if the server uses subdomains.  Set it and every request needed to
+draw a map can stay on the local network.  The OpenStreetMap attribution stays
+on the map, since it is the usual credit for OSM-derived tiles.  The in-page
+place search still calls Nominatim if a reader uses it.
 
 ## Common Pitfalls
 

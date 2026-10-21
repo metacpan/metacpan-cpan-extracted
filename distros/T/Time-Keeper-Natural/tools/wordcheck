@@ -97,6 +97,8 @@ if ($w) {
             print "  prefix: '$p' begins the CLDR word(s) ", join(', ', map { "'$_'" } @pre), "\n" if @pre && !$opt{quiet};
         }
     }
+    my @marked = map { my $k = $_; map { "$k $_" } grep { /!\z/ } $w->phrases($k) } $w->keys;
+    print "marked: ", (@marked ? join(' | ', @marked) : 'none'), "\n";
     my $anchor = Time::Keeper->new(year => 2026, month => 10, day => 15, hour => 9, zone => 'Europe/London', locale => $w->code);
     local $Time::Keeper::CLOCK = $anchor;
     my $n = Time::Keeper::Natural->new(zone => 'Europe/London', locale => $w->code);

@@ -38,6 +38,9 @@ BEGIN {
     @AnyDBM_File::ISA = qw(GDBM_File DB_File NDBM_File ODBM_File SDBM_File);
     # SDBM_File is last on the list because it produces the largest database
     # on disk.
+
+    $Storable::canonical = 1;
+    # try to keep the generated database reproducible
 }
 use AnyDBM_File;
 use MARC::Charset::Code;

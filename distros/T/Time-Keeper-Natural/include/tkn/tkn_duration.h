@@ -536,6 +536,7 @@ tkn_duration(pTHX_ SV *self, SV *method, SV *text, HV **info_out)
     k = tkn_key_sv(aTHX_ L, text);
     if (!SvCUR(k)) {
         tkn_cannot(aTHX_ method, text, sv_2mortal(newSVpvs("")), sv_2mortal(newSVpvs("the text is empty")));
+        return NULL;
     }
     info = (HV *)sv_2mortal((SV *)newHV());
     (void)hv_stores(info, "precision", newSVpvs("none"));
@@ -571,6 +572,11 @@ tkn_duration(pTHX_ SV *self, SV *method, SV *text, HV **info_out)
             (void)hv_stores(info, "reason", newSVsv(tkn_hsv(aTHX_ fi, "reason")));
             (void)hv_stores(info, "token", newSVsv(tkn_hsv(aTHX_ fi, "token")));
         }
+    }
+    {
+        dMY_CXT;
+        if (MY_CXT.quiet)
+            return NULL;
     }
     if (!tkn_hsv(aTHX_ info, "reason")) {
         HV *scratch = (HV *)sv_2mortal((SV *)newHV());

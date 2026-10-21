@@ -161,4 +161,35 @@ is(response_head(502, {}), "HTTP/1.1 502 Bad Gateway\r\n\r\n", '502 with no head
 }
 
 
+for my $line ('Content-Length : 5', ' Content-Length: 5', 'broken',
+              "X-Test: a\0b", "X-Test: a\nb") {
+    ok(!parse_request_head("POST / HTTP/1.1\r\n$line\r\n\r\n"),
+       'malformed header is refused');
+}
+{
+    my $r = parse_request_head("GET / HTTP/1.1\r\nX-A: \t value \t\r\nX-B:\t \r\nX-C: x\r\n\r\n");
+    is_deeply($r->{headers}, [['X-A', 'value'], ['X-B', ''], ['X-C', 'x']],
+        'field parsing trims optional whitespace and retains empty and single-byte values');
+}
+is((body_length([['Transfer-Encoding', 'gzip']]))[0], 'chunked',
+   'all transfer codings require a decoder');
+is((body_length([['Content-Length', '5,']]))[0], 'invalid',
+   'empty length in a comma list is refused');
+
+{
+    my $h = coherent_headers([
+        ['X-CSRF-Token', 'token'], ['Range', 'bytes=100-'], ['If-None-Match', '"tag"'],
+        ['Cache-Control', 'no-cache'], ['Connection', 'x-private'], ['X-Private', 'secret'],
+        ['Proxy-Authorization', 'secret'], ['Sec-CH-UA-Arch', 'wrong'],
+    ], 1);
+    is($h->{'x-csrf-token'}, 'token', 'application headers survive');
+    is($h->{range}, 'bytes=100-', 'range survives');
+    is($h->{'accept-encoding'}, 'identity', 'range offsets refer to uncompressed bytes');
+    is($h->{'if-none-match'}, '"tag"', 'cache validator survives');
+    is($h->{'cache-control'}, 'no-cache', 'cache policy survives');
+    ok(!exists $h->{'x-private'} && !exists $h->{'proxy-authorization'},
+       'hop headers and proxy credentials stay local');
+    ok(!exists $h->{'sec-ch-ua-arch'}, 'client hints come from the configured identity');
+}
+
 done_testing;

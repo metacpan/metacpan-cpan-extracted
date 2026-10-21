@@ -83,5 +83,13 @@
       "desc" : "CMU Typewriter Text",
       "name" : "CMU Typewriter Text",
       "type" : "mono"
+   },
+   {
+      "name": "Annapurna SIL",
+      "desc" : "Annapurna SIL",
+      "type" : "serif",
+      "languages": [
+         "ne"
+      ]
    }
 ]

@@ -1,5 +1,10 @@
 Revision history for ClickHouse-Encoder
 
+0.03  2026-10-16
+    - Fix Native framing, schema parsing and decoded values.
+    - Preserve failed bulk batches and improve transport retries.
+    - Validate integer inputs; verify HTTPS certificates and disable redirects.
+
 0.02    2026-07-31
         - Fix the bundled CityHash128 for inputs of 128 bytes or more, so
           compressed blocks of a realistic size checksum correctly. All

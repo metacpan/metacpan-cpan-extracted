@@ -4,7 +4,7 @@
       "vividsnow"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150014",
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150015",
    "license" : [
       "perl_5"
    ],
@@ -32,22 +32,23 @@
       },
       "runtime" : {
          "requires" : {
-            "Curl::Impersonate" : "0.02",
+            "Curl::Impersonate" : "0.03",
             "EV" : "0",
+            "File::Temp" : "0.19",
             "Net::SSLeay" : "1.85",
             "perl" : "5.010"
          }
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0"
+            "Test::More" : "0.88"
          }
       }
    },
    "provides" : {
       "Proxy::Impersonate" : {
          "file" : "lib/Proxy/Impersonate.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       },
       "Proxy::Impersonate::Cert" : {
          "file" : "lib/Proxy/Impersonate/Cert.pm"
@@ -70,6 +71,6 @@
          "web" : "https://github.com/vividsnow/perl5-proxy-impersonate"
       }
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

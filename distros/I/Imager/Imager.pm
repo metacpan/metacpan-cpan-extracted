@@ -149,7 +149,7 @@ BEGIN {
   if ($ex_version < 5.57) {
     our @ISA = qw(Exporter);
   }
-  $VERSION = '1.039';
+  $VERSION = '1.040';
   require XSLoader;
   XSLoader::load(Imager => $VERSION);
 }
@@ -5495,7 +5495,7 @@ attachment mechanism.
 
 =head1 AUTHOR
 
-Tony Cook <tonyc@cpan.org> is the current maintainer for Imager.
+Tony Cook <tony@develop-help.com> is the current maintainer for Imager.
 
 Arnar M. Hrafnkelsson is the original author of Imager.
 

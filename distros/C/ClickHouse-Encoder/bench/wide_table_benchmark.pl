@@ -118,7 +118,7 @@ printf "Native data is %.0f%% smaller\n", (1 - length($native_data) / length($cs
 
 # Create test table
 print "\n", "=" x 70, "\n";
-print "INSERT Benchmark\n";
+print "insert Benchmark\n";
 print "=" x 70, "\n\n";
 
 print "Setting up test table...\n";
@@ -188,7 +188,7 @@ printf "  Bandwidth:  %.1f MB/sec\n", length($csv_data) / $csv_avg / 1024 / 1024
 
 my $speedup = $csv_avg / $native_avg;
 print "\n", "=" x 70, "\n";
-printf "Native INSERT is %.2fx faster than TabSeparated\n", $speedup;
+printf "Native insert is %.2fx faster than TabSeparated\n", $speedup;
 print "=" x 70, "\n";
 
 # Cleanup

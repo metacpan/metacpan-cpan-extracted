@@ -20,14 +20,17 @@ for my $cap (16, 64, 256) {
         my $pid = fork // die;
         if ($pid == 0) {
             for (1..$OPS) {
-                $dq->push_back_wait($$, 1.0);
-                $dq->pop_front_wait(1.0);
+                $dq->push_back_wait($$, 1.0) or _exit(1);
+                defined $dq->pop_front_wait(1.0) or _exit(2);
             }
             _exit(0);
         }
         push @pids, $pid;
     }
-    waitpid($_, 0) for @pids;
+    for my $pid (@pids) {
+        waitpid($pid, 0);
+        die "worker $pid failed: $?\n" if $?;
+    }
     my $dt = time - $t0;
     my $s = $dq->stats;
     printf "  cap=%-6d %10.0f ops/s  (%.3fs)  waits=%d\n",

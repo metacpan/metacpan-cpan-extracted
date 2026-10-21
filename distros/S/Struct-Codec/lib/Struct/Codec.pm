@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 our $Eval = 1;
 
@@ -241,6 +241,7 @@ exported on request, and are the same two functions.
 
     my $bytes = struct_encode($value);
     my $bytes = struct_encode($value, strip_pointers => 1);
+    my $bytes = struct_encode($value, canonical => 1);
 
 A byte string. Croaks, naming the type, on a value it cannot carry. Options
 follow the value as pairs, and an unknown one is an error:
@@ -252,6 +253,18 @@ follow the value as pairs, and an unknown one is an error:
 True writes a pointer object (see L</What is refused>) as C<undef> where it
 sits, and the rest of the structure as it is. False, the default, refuses the
 whole value.
+
+=item canonical
+
+True writes every hash's keys in order, so equal data is equal bytes: a hash
+holds its keys in an order perl chooses, which differs between two hashes
+built differently and from one process to the next, and without this option
+the bytes follow it. Keys are ordered by character, as perl's C<sort> orders
+them, whether a key is held as Latin-1 or as UTF-8. The stream is the same
+format, so C<struct_decode> reads it as any other. It costs a sort per hash: a
+five-key hash takes about half as long again to encode. False, the default,
+writes each hash in its own order. A tied hash is written as its tie, and the
+tie object's own hashes are ordered with the rest.
 
 =back
 

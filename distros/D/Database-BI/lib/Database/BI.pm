@@ -11,8 +11,9 @@ use File::Spec ();
 use Readonly;
 
 use Database::BI::Model::DataSource;
+use Database::BI::Tutorial;
 
-our $VERSION = '0.014.0';
+our $VERSION = '0.015.0';
 
 # Default config values used by the Config plugin and referenced explicitly
 # in startup() so callers always get a resolved value.
@@ -20,6 +21,12 @@ Readonly my $DEFAULT_DATA_DIR     => 'data';
 Readonly my $DEFAULT_PLATFORM     => 'web';
 Readonly my $DEFAULT_LANGUAGE     => 'en';
 Readonly my $DEFAULT_CACHE_TTL_URL => '15 min';
+
+# The browser-side chart library is fetched from a CDN unless the deployment
+# self-hosts it.  This is the pinned version the pages were tested with; the
+# URL is a config seam (d3_url), and the Leaflet assets have their own keys
+# (leaflet_*_url), so an offline installation can point them at its own copies.
+Readonly my $DEFAULT_D3_URL => 'https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js';
 
 # Transport-layer upload size cap (bytes).  Mojolicious enforces this before
 # the request body is read into memory, so an oversized upload never reaches
@@ -33,12 +40,12 @@ Database::BI - Web-based Business Intelligence viewer for data files
 
 =head1 VERSION
 
-0.014.0
+0.015.0
 
 =head1 DESCRIPTION
 
 C<Database::BI> is a self-contained L<Mojolicious> web application that reads
-and views arbitrary flat data (CSV, PSV, TSV, SQLite, XML, XLSX, etc.)
+and views arbitrary data (CSV, PSV, TSV, SQLite, JSON, XML, XLSX, etc.)
 and presents them as styled, sortable, reorderable
 HTML tables.
 It has no persistent database of its own,
@@ -49,6 +56,9 @@ on disc, drag-and-drop files to upload, join multiple tables in memory, apply
 server-side filters, and export results as CSV, SQLite, JSON, or XLSX.  Nine
 D3.js v7 chart types, a pivot/crosstab table, per-column statistics, and
 multi-visual saved canvases are available from the toolbar.
+
+A tutorial in plain English is built into the application at C</tutorial>.
+It is written for people who do not know Perl, and it is the place to start.
 
 Key features:
 
@@ -113,7 +123,8 @@ as it changes.  All chart pages include Copy-link and Export SVG/PNG buttons.
 B<Maps> -- C<GET /map> plots the filtered view on an OpenStreetMap map, either
 from latitude and longitude columns or from a place column geocoded locally
 with L<Geo::Coder::Free> (one lookup per distinct place, remembered in the
-dataset's model store).  Rows sharing a position become one marker.
+model store and shared by every dataset that names it).  Rows sharing a
+position become one marker.
 
 =item *
 
@@ -150,7 +161,11 @@ that menu, so a width the corner grip left it at reads without the menu being
 opened.  Each move is announced -- the column and row the
 card landed in, and any card the move pushed down -- and saved as you go.  The whole position and size is
 saved with the canvas, so a card put in row 4 stays in row 4 rather than
-being packed up the page.  Canvases support
+being packed up the page.  B<Add current view> in the toolbar appends another
+table, chart or map without leaving the canvas, and a status region announces
+the card and the new visual count; when the card's script has drawn it, the
+region says the chart or map has finished drawing, and if D3 or Leaflet could
+not be loaded it names the missing library instead.  Canvases support
 cross-filtering, drill-through hierarchies, parameterisation, bookmarks
 with undo/redo, per-visual PNG download, and print to PDF/paper.
 
@@ -239,6 +254,11 @@ B<Generate the Makefile for the first time or after editing Makefile.PL:>
 
 Scans C<data_dir>, renders a card grid of available tables.
 
+=item C<GET /tutorial>
+
+Renders the tutorial that is part of the application.  The chapters are data
+in L<Database::BI::Tutorial>, not in this POD.
+
 =item C<GET /view/:table>
 
 Opens the named table from C<data_dir>.  Accepts C<?f=col:op:val>
@@ -267,13 +287,15 @@ Performs one or more left joins and renders the merged table.  Parameters:
 Spec formats:
 
   table:name                         named table from data_dir
+  table:file/table                   a table inside a multi-table SQLite file
   path:/abs/path/to/file.csv         absolute local path
   /../hostname/dir/file.csv          remote file via SFTP
   redis:tablename|redis://host:port  Redis hash store (requires Redis module)
 
 =item C<GET /api/columns>
 
-Returns C<{ "columns": [...] }> for a table (C<?table=name>) or file
+Returns C<{ "columns": [...] }> for a table (C<?table=name> or
+C<?table=file/table> for a table inside a multi-table SQLite file) or file
 (C<?path=/abs/path>).  Used by the join UI to populate the right-key
 dropdown without a page reload.
 
@@ -508,8 +530,11 @@ D3.js v7 histogram with server-side binning.  Parameters:
 
 OpenStreetMap map of the filtered view, drawn with HTML::OSM.  A row's position
 comes from a location column that is geocoded (C<loc=>, one lookup per distinct
-value, remembered in the dataset's model store) or from coordinate columns
-(C<lat=> and C<lon=>).  Rows sharing a position become one marker.  Parameters:
+value, remembered once in the model store and shared with every dataset that
+names it) or from coordinate columns (C<lat=> and C<lon=>).  Rows sharing a
+position become one marker.  Markers are clustered with
+Leaflet.markercluster, so a dense map draws a count at low zoom and splits it
+as it is zoomed in.  Parameters:
 
   l=<spec>      left table (required)
   loc=<col>     column of places to geocode (required unless lat= and lon= are)
@@ -560,6 +585,38 @@ span at most 6 rows).  Positions are
 stored as given - a gap is a gap - but two visuals may not share a cell, so
 an overlapping set is rejected with C<400> and the stored layout is left
 alone.
+
+=item C<POST /api/analyses/:id/visuals>
+
+Appends one visual to a saved canvas.  Body: C<{ kind, encode, options,
+title, query }>, with C<kind> one of C<table>, C<bar>, C<pie>, C<line>,
+C<graph>, C<scatter>, C<heatmap>, C<stacked>, C<combo>, C<treemap>,
+C<histogram> or C<map>.  A map's C<encode> names either C<loc> (a place column
+to geocode) or C<lat> and C<lon>.  The optional C<query> is the canvas page's
+query string: C<cf> (cross-filter), C<c> (calculated columns) and
+C<p.E<lt>nameE<gt>> (bound parameter values) are read from it, so a card added
+while the canvas is filtered or parameterised is drawn through the same state
+as the cards already on screen.  The visual is rendered against the canvas's
+datasets, joins and calculated fields before it is stored, so an unknown
+column or an undrawable visual is rejected with C<400> and nothing is appended.
+Returns C<201 { id, visual, kind, title, html, head, cf_col }>, where
+C<visual> is the new visual's index, C<head> is any stylesheet and script the
+page must add once to draw the card (Leaflet, for a map), and C<cf_col> is the
+column the card's marks cross-filter by.  The card is left unplaced in
+C<layout>; it is auto-placed after the saved cards until the reader moves or
+resizes it.
+
+=item C<PATCH /api/analyses/:id/visuals/:visual>
+
+Changes the columns of one stored visual without removing it.  Body:
+C<{ encode, query }>; C<encode> replaces the visual's encoding in place (for
+a map, C<{ loc }> or C<{ lat, lon }>), and the optional C<query> is the
+canvas page's query string, read for C<cf>, C<c> and C<p.E<lt>nameE<gt>> so
+the redrawn card matches the page it is on.  The visual keeps its index, so
+its layout position, size and title are unchanged.  The replacement is
+rendered before it is stored, so an unknown column or an undrawable map is a
+C<400> and the saved visual is left alone.  Returns
+C<{ id, visual, kind, title, html, head, cf_col }>.
 
 =item C<DELETE /api/analyses/:id>
 
@@ -631,7 +688,43 @@ defaults:
         data_dir => 'data',   # directory scanned for data files on the home page
         platform => 'web',    # VWF template dimension
         language => 'en',     # VWF template dimension
+
+        # Browser-side libraries.  d3_url overrides the chart and canvas
+        # script; the leaflet_* keys override the map assets, and tile_url
+        # overrides the tile server.  See "Self-hosting D3 and Leaflet"
+        # below.
+        d3_url => 'https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js',
     }
+
+=head2 Self-hosting D3 and Leaflet
+
+The chart pages load D3 from a public CDN by default, and the map pages load
+Leaflet and leaflet.markercluster from unpkg.  A deployment with no outbound
+network access, or one that prefers to serve its own assets, sets the URLs in
+C<database_bi.conf>:
+
+    {
+        d3_url                          => '/static/d3/d3.min.js',
+        leaflet_js_url                  => '/static/leaflet/leaflet.js',
+        leaflet_css_url                 => '/static/leaflet/leaflet.css',
+        leaflet_cluster_js_url          => '/static/leaflet/leaflet.markercluster.js',
+        leaflet_cluster_css_url         => '/static/leaflet/MarkerCluster.css',
+        leaflet_cluster_default_css_url => '/static/leaflet/MarkerCluster.Default.css',
+        tile_url                        => 'https://tiles.internal/{z}/{x}/{y}.png',
+    }
+
+An absolute path is served like any other static file: put the library under
+the application's C<public/> directory, so C</static/d3/d3.min.js> is
+C<public/static/d3/d3.min.js>.  The five Leaflet keys may be set on their own;
+any left out keeps L<HTML::OSM>'s pinned CDN URL.  Use a path beginning with
+C</>, or a full URL; a path without the leading slash is relative to the page.  The versions to copy are the
+ones the defaults name: D3 7.9.0, Leaflet 1.9.4, and leaflet.markercluster 1.5.3.
+C<tile_url> points the map layer at a self-hosted tile server instead of
+OpenStreetMap.  It keeps Leaflet's C<{z}>, C<{x}> and C<{y}> placeholders, and
+C<{s}> too if the server uses subdomains.  Set it and every request needed to
+draw a map can stay on the local network.  The OpenStreetMap attribution stays
+on the map, since it is the usual credit for OSM-derived tiles.  The in-page
+place search still calls Nominatim if a reader uses it.
 
 =head1 COMMON PITFALLS
 
@@ -880,6 +973,7 @@ sub startup ($self) {
 			data_dir => $DEFAULT_DATA_DIR,
 			platform => $DEFAULT_PLATFORM,
 			language => $DEFAULT_LANGUAGE,
+			d3_url   => $DEFAULT_D3_URL,
 		}
 	});
 
@@ -907,6 +1001,33 @@ sub startup ($self) {
 			POST_CHOMP => 1,
 			TRIM       => 1,
 		},
+	});
+
+	# Every page names the tutorial chapter that helps with it.  The layout
+	# turns this into a "Help: ..." link beside the main Tutorial link, so a
+	# reader on the pie chart screen lands on the pie chart chapter.  It lives
+	# here rather than in every action: a new action is one entry in the action
+	# map in Database::BI::Tutorial, and t/tutorial.t checks it is there.
+	$self->hook(before_render => sub {
+		my $c = shift;
+
+		# The chart pages and canvases read this from the stash.  Resolving it
+		# per request rather than once at startup means a deployment (and a
+		# test) can point D3 at a local copy by changing the config.
+		my $d3_url = $c->app->config('d3_url');
+		$c->stash(d3_url =>
+			(defined $d3_url && !ref $d3_url && length $d3_url)
+				? $d3_url : $DEFAULT_D3_URL);
+
+		return if defined $c->stash('tutorial_chapter');
+
+		my $chapter = Database::BI::Tutorial->chapter_for_action($c->stash('action'));
+		return unless $chapter;
+
+		$c->stash(
+			tutorial_chapter       => $chapter->{id},
+			tutorial_chapter_title => $chapter->{title},
+		);
 	});
 
 	# Factory helper: opens any named table from the configured data directory.
@@ -966,6 +1087,7 @@ sub startup ($self) {
 
 	my $r = $self->routes();
 	$r->get('/')->to('Dashboard#index');
+	$r->get('/tutorial')->to('Dashboard#tutorial');
 	$r->get('/view/:table')->to('Dashboard#view');
 	$r->get('/browse')->to('Dashboard#browse');
 	$r->get('/open')->to('Dashboard#open_file');
@@ -1013,9 +1135,17 @@ sub startup ($self) {
 	$r->post('/api/analyses/import')    ->to('Dashboard#analyses_import');
 	$r->get('/api/analyses/:id')        ->to('Dashboard#analyses_get');
 	$r->put('/api/analyses/:id')        ->to('Dashboard#analyses_update');
-	$r->patch('/api/analyses/:id')      ->to('Dashboard#analyses_patch');
-	$r->delete('/api/analyses/:id')     ->to('Dashboard#analyses_delete');
+	$r->patch('/api/analyses/:id')      ->to('Dashboard#analyses_patch');	$r->delete('/api/analyses/:id')      ->to('Dashboard#analyses_delete');
+	$r->post('/api/analyses/:id/visuals')->to('Dashboard#analyses_add_visual');
+	$r->patch('/api/analyses/:id/visuals/:visual')->to('Dashboard#analyses_update_visual');
 	$r->get('/api/analyses/:id/export') ->to('Dashboard#analyses_export');
+
+	# Phase 4 -- extracts, catalog, sharing, embedding, per-visual downloads
+	$r->get('/catalog')                       ->to('Dashboard#catalog_view');
+	$r->get('/share/:id')                     ->to('Dashboard#share_view');
+	$r->get('/embed/:id')                     ->to('Dashboard#embed_view');
+	$r->get('/a/:id/visual/:n/:fmt')          ->to('Dashboard#visual_download');
+	$r->post('/api/analyses/:id/share')       ->to('Dashboard#analyses_share');
 
 	# Evict stale upload subdirectories on every startup so the cache cannot
 	# grow unboundedly across server restarts.  Only entries whose mtime is

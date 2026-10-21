@@ -7,7 +7,7 @@ use Carp ();
 
 use VPNDetection::Error;
 
-our $VERSION = '3.9.0';
+our $VERSION = '3.10.0';
 
 # The formats a dataset is published in. Anything else is refused before it
 # reaches the API, whose 400 would cost a round trip and name nothing to act on.
@@ -220,7 +220,7 @@ my $DATABASE_SHAPE = [fields => [
     [base => ['string'], 1], [name => ['string'], 1], [summary => ['string'], 1],
     [license_type => ['string']], [starts => ['string']], [expires => ['string']],
     [renews_at => ['string']], [notice_due_at => ['string']], [in_term => ['boolean'], 1],
-    [standing => ['string'], 1], [versions => [list => $VERSION_SHAPE], 1],
+    [standing => ['string'], 1], [open => ['boolean'], 1], [versions => [list => $VERSION_SHAPE], 1],
 ]];
 my $COLUMN_SHAPE = [fields => [[name => ['string'], 1], [type => ['string'], 1], [description => ['string']]]];
 my $METADATA_SHAPE = [fields => [
@@ -235,7 +235,7 @@ my $CHECKSUMS_SHAPE = [fields => [
 ]];
 my $DOWNLOAD_SHAPE = [fields => [
     [dataset_id => ['string'], 1], [format => ['string'], 1], [outcome => ['string'], 1],
-    [sample => ['boolean'], 1], [bytes => ['integer']], [http_status => ['integer']],
+    [sample => ['boolean'], 1], [open => ['boolean'], 1], [bytes => ['integer']], [http_status => ['integer']],
     [apikey_id => ['string']], [client_ip => ['string']], [user_agent => ['string']],
     [created => ['string'], 1],
 ]];

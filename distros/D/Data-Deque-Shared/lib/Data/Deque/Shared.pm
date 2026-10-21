@@ -1,7 +1,7 @@
 package Data::Deque::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 require XSLoader;
 XSLoader::load('Data::Deque::Shared', $VERSION);
 
@@ -52,7 +52,7 @@ push/pop at both ends. Futex blocking when empty or full.
 B<Linux-only>. Requires 64-bit Perl. Capacity must be E<lt>= 2^31.
 
 Used only as a FIFO (C<push_back> + C<pop_front>), it's effectively a
-fixed-slot lock-free string queue: 1.3x-4.7x faster than
+fixed-slot string queue: 1.3x-4.7x faster than
 L<Data::Queue::Shared::Str> under multi-producer contention, at the cost
 of per-slot fixed memory (C<capacity x max_len>).
 
@@ -63,9 +63,8 @@ Each slot carries a 64-bit control word (state + generation) that acts
 as a publication gate: a pusher atomically transitions the slot through
 C<empty -> writing -> filled>, and a popper transitions it through
 C<filled -> reading -> empty> with the generation bumped on completion.
-A consumer that claims position C<n> via the head/tail CAS therefore
-always observes the publication transition of the corresponding push
-before reading the value.
+Readers reserve the published slot before advancing head/tail, so another
+operation cannot steal its value while the reader is descheduled.
 
 C<drain> is safe under concurrent C<push>/C<pop>: it spin-waits on any
 slot whose pusher is mid-publish, then releases each slot through the
@@ -78,11 +77,10 @@ late publish rather than resurrect the slot as FILLED.
 
 =head2 Compatibility
 
-File format bumped to v2 in this release (per-slot control array added
-for MPMC safety). Opening a v1 file (magic C<DEQ1>) created by
-Data::Deque::Shared C<E<lt>= 0.02> will croak on header validation.
-Re-create the deque with the new version; anonymous and memfd-backed
-usage is unaffected.
+File format v3 (magic C<DEQ3>) uses generation-qualified waiter hints.
+Files in v1 or v2 format, created by Data::Deque::Shared C<E<lt>= 0.11>,
+are rejected. Stop all attached processes and re-create their queues when
+upgrading.
 
 =head1 METHODS
 
@@ -108,7 +106,8 @@ or a filesystem path for a file-backed mapping shared across processes.
 C<$capacity> is the number of slots (must be E<gt> 0 and E<lt>= 2^31); it is
 rounded up to the next power of two, and C<capacity>/C<stats> report that
 rounded value. For the Str variant, C<$max_len> is the maximum stored byte
-length per entry (must be E<gt> 0 and E<lt> 2 GiB); longer values are truncated.
+length per entry (must be E<gt> 0 and E<lt> 2 GiB); longer values are truncated
+at a character boundary for UTF-8 strings, or a byte boundary for byte strings.
 C<$mode> is an optional octal file permission mode applied only when a
 backing file is created (default C<0600>); see L</SECURITY>.
 

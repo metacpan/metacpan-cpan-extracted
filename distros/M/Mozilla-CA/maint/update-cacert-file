@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use File::Spec::Functions qw(updir catfile abs2rel canonpath);
+use File::Spec::Functions qw(updir catfile abs2rel canonpath rel2abs);
 use File::Basename qw(dirname);
 use Cwd qw(abs_path);
 use POSIX qw(strftime);
@@ -11,10 +11,39 @@ my $dir = dirname(__FILE__);
 my $root = abs2rel(abs_path(catfile($dir, updir)));
 
 my $CACERT_PEM_FILE = canonpath("$root/lib/Mozilla/CA/cacert.pem");
+my $DENYLIST_FILE = rel2abs("$dir/denylist.pl");
+
+binmode STDOUT, ':utf8';
+binmode STDERR, ':utf8';
+
+my $denylist = do $DENYLIST_FILE or die $@;
 
 system($^X, "$dir/mk-ca-bundle.pl", '-u', $CACERT_PEM_FILE) == 0
     or exit $?;
 
+remove_denylisted($CACERT_PEM_FILE, @$denylist) if @$denylist;
+
 if (system(qw( git diff --exit-code --quiet ), $CACERT_PEM_FILE) == 0) {
     print "No changes to certificate bundle.\n";
+}
+
+sub remove_denylisted {
+    my ($pem_file, @labels) = @_;
+
+    open my $fh, '<:encoding(UTF-8)', $pem_file or die "Can't read $pem_file: $!";
+    my $pem = do { local $/; <$fh> };
+    close $fh;
+
+    for my $label (@labels) {
+        if ($pem =~ s/^\Q$label\E\n=+\n.*?-----END CERTIFICATE-----\n\n?//ms) {
+            print "Removed denylisted certificate: $label\n";
+        }
+        else {
+            warn "Denylisted certificate not found in bundle: $label\n";
+        }
+    }
+
+    open $fh, '>:encoding(UTF-8)', $pem_file or die "Can't write $pem_file: $!";
+    print $fh $pem;
+    close $fh or die "Can't write $pem_file: $!";
 }

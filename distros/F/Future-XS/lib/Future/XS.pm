@@ -3,9 +3,9 @@
 #
 #  (C) Paul Evans, 2022-2024 -- leonerd@leonerd.org.uk
 
-package Future::XS 0.15;
+package Future::XS 0.16;
 
-use v5.14;
+use v5.24;
 use warnings;
 
 use Carp;

@@ -9,7 +9,7 @@ use Test::More;
 # taken wherever a place is, and new makes the class it was called on.
 
 use_ok('Time::Keeper::Sky') or BAIL_OUT('Time::Keeper::Sky does not load');
-is($Time::Keeper::Sky::VERSION, '0.01', 'Time::Keeper::Sky is 0.01');
+is($Time::Keeper::Sky::VERSION, '0.02', 'Time::Keeper::Sky is 0.02');
 is($Time::Keeper::Sun::VERSION, '0.03', 'and loads Time::Keeper::Sun, at 0.03, above the 0.02 on CPAN');
 ok($INC{'Time/Keeper/Sun/Day.pm'}, 'with its Day');
 ok(!$INC{'Time/Keeper.pm'}, 'and not Time::Keeper, until a method needs it');

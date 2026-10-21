@@ -1,6 +1,7 @@
 .editorconfig
 Build.PL
 Changes
+distrolint.ini
 lib/Future.pm
 lib/Future/Exception.pm
 lib/Future/Mutex.pm

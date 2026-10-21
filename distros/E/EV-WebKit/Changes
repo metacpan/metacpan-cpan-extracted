@@ -1,5 +1,10 @@
 Revision history for EV-WebKit
 
+0.05  2026-10-16
+    - Snapshot cookies after navigation and redirects.
+    - Fix form controls in same-origin frames.
+    - Release browsers and cookie snapshots during downloads and teardown.
+
 0.04  2026-09-15
         - Control listen replaces a dangling socket symlink instead of croaking
         - a dying on_* handler no longer blocks Control's broadcast

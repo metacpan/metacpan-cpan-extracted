@@ -86,8 +86,9 @@ close $fh;
 SCRIPT
 
 my $dir = File::Temp->newdir;
-# 0.01 knows no range, after, before or weekend key, nor their test lines:
-# both sides read the tables without them.
+# 0.01 knows no range, after, before, weekend, alias or nth key, nor their
+# test lines, nor a marked phrase ("am!"): both sides read the tables
+# without them.
 {
     my $copy = File::Spec->catdir($dir, 'words');
     mkdir $copy or die "$copy: $!";
@@ -95,7 +96,8 @@ my $dir = File::Temp->newdir;
     for my $f (grep { /\.txt\z/ } readdir $dh) {
         open my $in, '<:raw', "$share/$f" or die "$f: $!";
         open my $out, '>:raw', "$copy/$f" or die "$copy/$f: $!";
-        print $out grep { !/^(?:range|after|before|weekend)(?:\t|\n)/ && !m{^# test: .* => \S+ / \S+$} && !/^# test: .*\b(?:after|before|weekend)\b/ } <$in>;
+        print $out map { /^#/ ? $_ : s/(?<=[\t|])[^\t|\n]*!(?:\||(?=\n))//gr =~ s/\|(?=\n)//r }
+            grep { !/^(?:range|after|before|weekend|alias|nth)(?:\t|\n)/ && !m{^# test: .* => \S+ / \S+$} && !/^# test: .*\b(?:after|before|weekend)\b/ } <$in>;
     }
     $share = $copy;
 }

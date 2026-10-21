@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.03';
+our $VERSION = '0.06';
 
 use Time::Keeper::Locale;
 use Time::Keeper::Natural ();
@@ -22,7 +22,7 @@ Time::Keeper::Natural::Words - the words CLDR has none for, one small table a lo
 
 =head1 VERSION
 
-Version 0.03
+Version 0.06
 
 =head1 SYNOPSIS
 
@@ -60,6 +60,10 @@ C<data> for it. The keys, the whole list:
                on, "the day after {0}"
     before     the same, before it
     weekend    the noun, put where CLDR's "this week" has its word for week
+    nth        an ordinal weekday in the language's order, with {period}, {n}
+               and {weekday}: "{period}の第{n}{weekday}"
+    alias      an inflected form and the CLDR phrase it reads as:
+               "nächsten Monats=nächsten Monat"
 
 A key alone means the language needs no word for it. A phrase is matched after
 the locale's CLDR words and may not be one: a table that takes one dies when
@@ -68,6 +72,15 @@ is run by C<tools/wordcheck>; a value of two moments with C< / > between
 them is an interval, read by L<Time::Keeper::Natural/parse_interval>. A
 C<range> phrase holds C<{0}> and then C<{1}>, and none of its three parts may
 be a CLDR word.
+
+An C<alias> is the other way round: its phrase must be one of the locale's
+CLDR words, and its inflected form must not be. A locale that reads another's
+file (C<hi-Latn> reads C<hi.txt>) leaves out an alias whose phrase it lacks.
+An C<nth> phrase names each of its three parts once, and its other words may
+not be CLDR's. A phrase of C<at>, C<on>, C<of>, C<start_of> or C<end_of> that
+ends in C<!> is marked: it may be a CLDR word (German's "am", CLDR's AM), and
+it frames only a text that has something after it. C<phrases> gives it with
+its mark, and C<tools/wordcheck> lists the marked ones.
 
 =head1 METHODS
 

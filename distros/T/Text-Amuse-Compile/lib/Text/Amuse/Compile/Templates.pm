@@ -136,6 +136,7 @@ sub new {
                                         ([a-zA-Z][a-zA-Z0-9_]+-)?
                                         (((bare|minimal)[_.-])?html|
                                             (bare[_.-])?latex     |
+                                            slides                |
                                             css)
                                         (\.tt2?)?/x
                                } readdir($dh);
@@ -180,6 +181,7 @@ sub format_id {
 sub names {
     return (qw/html minimal_html bare_html
                css latex bare_latex
+               slides
               /);
 }
 
@@ -1257,6 +1259,10 @@ sub slides {
 
 % remove the numbering
 \setcounter{secnumdepth}{-2}
+
+% User smaller fonts in every alltt environment
+\BeforeBeginEnvironment{alltt}{\begin{scriptsize}}
+\AfterEndEnvironment{alltt}{\end{scriptsize}}
 
 \title{[% doc.header_as_latex.title %]}
 \date{[% doc.header_as_latex.date %]}

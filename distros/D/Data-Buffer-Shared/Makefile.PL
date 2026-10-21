@@ -48,7 +48,7 @@ WriteMakefile(
         },
     },
     MIN_PERL_VERSION  => '5.022',
-    LIBS              => [''],
+    LIBS              => ['-lpthread'],
     DEFINE            => '-D_GNU_SOURCE',
     INC               => '-I. ' . join(' ', @xpk_flags),
     XS                => { 'Shared.xs' => 'Shared.c' },

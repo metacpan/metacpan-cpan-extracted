@@ -52,6 +52,7 @@ t/60-settings.t
 t/60-webprocess.t
 t/61-cookies.t
 t/62-cookiejar.t
+t/62-cookie-navigation.t
 t/63-proxy.t
 t/64-nav.t
 t/65-nav-overlap.t
@@ -60,6 +61,7 @@ t/71-dialog.t
 t/72-policy.t
 t/73-mock.t
 t/74-element-controls.t
+t/74-frame-controls.t
 t/75-download-upload.t
 t/76-on-request.t
 t/77-pdf-plugins.t

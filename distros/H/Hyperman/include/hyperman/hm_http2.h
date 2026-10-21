@@ -45,6 +45,11 @@ typedef struct hm_h2_stream {
     unsigned char ready;     /* the request is complete and waiting to
                               * be handed to the application, once
                               * nghttp2 is off the stack (hm_h2_input) */
+    unsigned char tunnel;    /* an Extended CONNECT stream: what body
+                              * arrived before the read half was
+                              * registered is the tunnel's, and goes to
+                              * it (hm_stream_on_data)                 */
+    unsigned char in_app;    /* its handler is on the stack            */
     struct hm_h2_stream *next;
 } hm_h2_stream;
 
@@ -671,6 +676,7 @@ static void hm_h2_dispatch(pTHX_ hm_h2_sess *s, hm_h2_stream *st) {
     env_rv = newRV_noinc((SV *)env);
     {
         int32_t sid = st->id;
+        st->in_app = 1;
         resp = hm_call_app(aTHX_ loop, env_rv);
         hm_count_request(loop);
         /* An application that waited (a ->get, a drain) pumped this loop,
@@ -686,6 +692,7 @@ static void hm_h2_dispatch(pTHX_ hm_h2_sess *s, hm_h2_stream *st) {
             SvREFCNT_dec(env_rv);
             return;
         }
+        st->in_app = 0;
     }
 
     if (resp && hm_is_awaitable(aTHX_ resp)) {
@@ -709,6 +716,22 @@ static void hm_h2_dispatch(pTHX_ hm_h2_sess *s, hm_h2_stream *st) {
     if (st->producing) {
         if (resp) SvREFCNT_dec(resp);
         SvREFCNT_dec(env_rv);
+        /* An Extended CONNECT stream whose first DATA came in the same read
+         * as its headers: nghttp2 parsed it before this dispatch, with no
+         * handle to take it, so it was buffered as the body. Handed over
+         * now that the handler has returned and has had the chance to wire
+         * its events, as hm_process does for an HTTP/1.1 tunnel opened
+         * inside the handler. */
+        if (st->tunnel && st->body && SvCUR(st->body)) {
+            SV *b = st->body;
+            st->body = NULL;
+            if (!hm_stream_deliver(aTHX_ c->fd, c->id, (int64_t)st->id,
+                                   SvPVX(b), SvCUR(b), 0)) {
+                st->body = b;           /* no read half yet: kept for it */
+                b = NULL;
+            }
+            if (b) SvREFCNT_dec(b);
+        }
         return;
     }
     hm_h2_respond(aTHX_ s, st, resp);
@@ -868,7 +891,7 @@ static int hm_h2_cb_frame_recv(nghttp2_session *ses,
         if (frame->hd.type == NGHTTP2_HEADERS
             && (frame->hd.flags & NGHTTP2_FLAG_END_HEADERS)
             && hm_h2_is_connect(aTHX_ st->env))
-            st->ready = 1;
+            st->ready = st->tunnel = 1;
     }
     return 0;
 }

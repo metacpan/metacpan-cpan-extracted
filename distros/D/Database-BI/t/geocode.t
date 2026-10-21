@@ -482,6 +482,60 @@ subtest 'the model store keeps the answers, and this module never writes it' => 
 		$result->{'cache'}, 'and reading it back gives what the next request needs');
 };
 
+subtest 'one place answer serves every dataset' => sub {
+	my $geocoder = stub();
+	my $geocode  = Database::BI::Model::Geocode->new(geocoder => $geocoder);
+
+	my $models = {
+		'fields' => { 'keep' => 'me' },
+		'geo'    => { 'table:old|loc=town' => { 'places' => { 'Elsewhere' => [ 1, 2 ] } } },
+	};
+
+	is_deeply(Database::BI::Model::Geocode->shared_cache_from_models($models), {},
+		'a store written before sharing has no shared cache');
+	is_deeply(Database::BI::Model::Geocode->shared_cache_from_models(undef), {},
+		'and an absent store is not an error');
+
+	my $result = $geocode->resolve_column(
+		[ { 'place' => 'Ramsgate, Kent' }, { 'place' => 'Nowhere' } ], 'place',
+		cache => Database::BI::Model::Geocode->cache_from_models($models, 'table:old|loc=town'),
+	);
+
+	my $updated = Database::BI::Model::Geocode->models_with_shared_cache(
+		$models, $result->{'cache'},
+		backend => $result->{'backend'}, built => '2026-10-17T09:00:00Z',
+	);
+
+	is_deeply($updated->{'fields'}, { 'keep' => 'me' }, 'the other keys of the store are left alone');
+	is_deeply($updated->{'geo'}{'table:old|loc=town'}, { 'places' => { 'Elsewhere' => [ 1, 2 ] } },
+		'the older per-dataset entry is left alone');
+	is_deeply($updated->{'geo'}{'shared'}{'places'}, {
+		'Elsewhere'      => [ 1, 2 ],
+		'Ramsgate, Kent' => [ 51.33333, 1.43333 ],
+		'Nowhere'        => 0,
+	}, 'the shared entry holds the old and the new answers, misses included');
+	is($updated->{'geo'}{'shared'}{'backend'}, $result->{'backend'}, 'with the backend that answered');
+	is($updated->{'geo'}{'shared'}{'built'}, '2026-10-17T09:00:00Z', 'and when');
+	is_deeply($models->{'geo'}{'shared'}, undef, 'the store the caller passed was not modified');
+
+	my $more = Database::BI::Model::Geocode->models_with_shared_cache(
+		$updated, { 'Paris' => [ 48.85, 2.35 ] },
+	);
+	is_deeply($more->{'geo'}{'shared'}{'places'}{'Paris'}, [ 48.85, 2.35 ],
+		'a later write adds a place');
+	is_deeply($more->{'geo'}{'shared'}{'places'}{'Ramsgate, Kent'}, [ 51.33333, 1.43333 ],
+		'without dropping a place another request answered');
+	is_deeply($updated->{'geo'}{'shared'}{'places'}{'Paris'}, undef,
+		'and the store passed in is not modified');
+
+	my $copy = Database::BI::Model::Geocode->shared_cache_from_models($more);
+	is_deeply($copy, $more->{'geo'}{'shared'}{'places'},
+		'reading the shared cache gives what the next request needs');
+	$copy->{'New'} = [ 0, 0 ];
+	ok(!exists $more->{'geo'}{'shared'}{'places'}{'New'},
+		'and the copy is the caller\'s to modify');
+};
+
 subtest 'without the module there is a sentence, not an exception' => sub {
 	# Test::Without::Module cannot un-load a module already in %INC (see CLAUDE.md).
 	# If an earlier subtest loaded Geo::Coder::Free, we cannot simulate its absence.

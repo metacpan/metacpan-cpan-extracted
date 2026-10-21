@@ -11,7 +11,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013'
+generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150015'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -28,6 +28,7 @@ recommends:
 requires:
   Encode: '0'
   HTTP::Tiny: '0'
+  JSON::PP: '0'
   Math::BigInt: '0'
   POSIX: '0'
   Time::HiRes: '0'
@@ -36,5 +37,5 @@ requires:
 resources:
   bugtracker: https://github.com/vividsnow/perl5-clickhouse-encoder/issues
   repository: https://github.com/vividsnow/perl5-clickhouse-encoder.git
-version: '0.02'
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

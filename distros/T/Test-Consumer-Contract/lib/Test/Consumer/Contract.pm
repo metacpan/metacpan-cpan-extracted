@@ -31,7 +31,7 @@ use lib ();
 
 our @EXPORT_OK = qw(run_consumer_contract);
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 =head1 NAME
 
@@ -39,7 +39,7 @@ Test::Consumer::Contract - check that code reading a result only reads the field
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =head1 SYNOPSIS
 
@@ -180,7 +180,9 @@ C<run()> runs these checks.  Each one is a subtest in the TAP output.
 
 Each file in C<producers> and C<workspace_producers> must still contain an
 assignment to each key listed for it.  POD and comments do not count: a key
-shown in an example is not a key being set.
+shown in an example is not a key being set.  A workspace producer whose sibling
+distribution is not checked out is skipped, not failed; one whose sibling is
+there but whose file is not still fails.
 
 =item 2. the value object still derives what it promises
 
@@ -470,6 +472,7 @@ Readonly::Hash my %MESSAGES => (
 	'consumer.stale_advice' => 'Remove the stale entry, so the registry keeps describing the code.',
 	'why.unpromised'        => 'no producer in this workspace ever sets it',
 	'skip.siblings'         => 'sibling checkouts are not present ({missing})',
+	'skip.producer'         => '{file} is not checked: {sibling} is not in the workspace',
 	'accessor.documented'   => '{accessor} is a documented accessor of {class}',
 	'accessor.accounted'    => '{class} documents no accessor the contract accounts for nowhere',
 	'accessor.drift'        => {
@@ -622,7 +625,10 @@ C<dist_root>, or absolute.
 =item C<workspace_producers> (hashref)
 
 Like C<producers>, but paths are relative to the workspace: producers in a
-sibling distribution that this distribution's value object comes from.
+sibling distribution that this distribution's value object comes from.  The
+first component of the path names that sibling; when it is not in the
+workspace, the file's checks are skipped (C<skip.producer>), so a declaration
+that names one still passes on a CPAN install.
 
 =item C<consumers> (hashref)
 
@@ -1509,11 +1515,16 @@ sub _producer_evidence :Private
 			: File::Spec->catfile($self->{'dist_root'}, split(m{/}, $file));
 		push @evidence, { path => $path, label => $file, keys => $self->{'producers'}{$file} };
 	}
+	# A workspace producer also carries the sibling it lives in - the first
+	# component of its path - so that a missing checkout can be told apart from
+	# a missing file.
 	foreach my $file (keys %{$self->{'workspace_producers'}}) {
+		my @parts = split(m{/}, $file);
 		push @evidence, {
-			path  => File::Spec->catfile($self->{'workspace'}, split(m{/}, $file)),
-			label => $file,
-			keys  => $self->{'workspace_producers'}{$file},
+			path    => File::Spec->catfile($self->{'workspace'}, @parts),
+			label   => $file,
+			keys    => $self->{'workspace_producers'}{$file},
+			sibling => $parts[0],
 		};
 	}
 
@@ -1534,6 +1545,21 @@ sub _check_producers :Protected
 	if(@{$evidence}) {
 		subtest $self->i18n('check.producers') => sub {
 			foreach my $producer (@{$evidence}) {
+				# A producer in a sibling that is not checked out is skipped, as
+				# the workspace checks are: outside a workspace (a CPAN install,
+				# a single-repository CI job) there is nothing to read, and that
+				# is not a broken contract.  A sibling that is there but no longer
+				# has the file still fails below, since the file has moved.
+				if(defined(my $sibling = $producer->{'sibling'})) {
+					if(!-d File::Spec->catdir($self->{'workspace'}, $sibling)) {
+						SKIP: {
+							skip($self->i18n('skip.producer', { file => $producer->{'label'}, sibling => $sibling }),
+								1 + scalar(@{$producer->{'keys'}}));
+						}
+						next;
+					}
+				}
+
 				my $raw = $self->_readable($producer->{'path'}, $producer->{'label'});
 				next unless(defined($raw));
 
@@ -2881,6 +2907,7 @@ summarised below.  Diagnostics after a failed assertion are indented a tab.
                          reading it, or register it in may_rely_on with why.
     consumer.stale       A may_rely_on entry is no longer read.  Remove it.
     skip.siblings        (skip) A require_workspace distribution is absent.
+    skip.producer        (skip) A workspace producer's sibling is absent.
     accessor.documented  (test name) A name in accessors/not_accessors is not
                          documented or defined by the value object.
     accessor.drift       The value object documents a name the contract does not
@@ -3133,6 +3160,7 @@ arrows are triggers, and the lines under each arrow are what happens.
          v
     [CHECKING PRODUCERS] ---- no producers declared ----------+
          |  subtest 1: one ok() per file read and per key     |
+         |    a producer's sibling missing -> its tests skip  |
          v                                                    v
     [CHECKING DERIVATION] --- no 'derives' ------------------+
          |  loads the value object class (cached)             |

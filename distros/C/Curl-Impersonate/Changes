@@ -1,5 +1,10 @@
 Revision history for Curl-Impersonate
 
+0.03  2026-10-16
+    - Handle HEAD responses correctly when reusing connections.
+    - Preserve upload methods and bodies across redirects.
+    - Propagate streaming callback failures.
+
 0.02  2026-09-02
         - new decode option: decompress the response body
 

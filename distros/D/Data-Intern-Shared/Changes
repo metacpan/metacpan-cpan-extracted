@@ -1,5 +1,9 @@
 Revision history for Data-Intern-Shared
 
+0.07  2026-10-16
+    - Finish an interrupted clear before admitting readers or writers.
+    - Publish frozen tables safely to read-only attachments.
+
 0.06      2026-09-26
           - DATA_INTERN_SHARED_SPARSE=0 reserves segments up front, so a full
             filesystem fails the constructor, not a later write.

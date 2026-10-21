@@ -1,5 +1,17 @@
 Revision history for Future
 
+0.54    2026-10-20
+        [CHANGES]
+         * Update all Perl to `use v5.20`, using new perl features of
+           signatures and postfix deref
+
+        [BUGFIXES]
+         * Ensure that `Future->needs_any` immediate failure message actually
+           copies the message from its final failed component, rather than
+           referring to an array containing it
+         * Add unit tests for `->without_cancel` not weakening its sequence
+           future, as fixed by `Future::XS` version 0.16 (RT181389)
+
 0.53    2026-09-30
         [CHANGES]
          * Add documentation to point at the `Future::XS` distribution

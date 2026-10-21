@@ -1,0 +1,62 @@
+{
+   "abstract" : "Fast JSON Schema validation (draft 4 to 2020-12), on the corvus-json-schema C library",
+   "author" : [
+      "endjin"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "apache_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "JSON-Schema-Corvus-XS",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Alien::Base::Wrapper" : "2.38",
+            "Alien::CorvusJsonSchema" : "v0.1.0",
+            "ExtUtils::MakeMaker" : "6.64"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Alien::CorvusJsonSchema" : "v0.1.0",
+            "JSON::PP" : "2.27",
+            "perl" : "5.026"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/corvus-dotnet/Corvus.JsonSchema/issues"
+      },
+      "homepage" : "https://corvus-oss.org/Corvus.JsonSchema/",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/corvus-dotnet/Corvus.JsonSchema.git",
+         "web" : "https://github.com/corvus-dotnet/Corvus.JsonSchema/tree/main/src-perl/JSON-Schema-Corvus-XS"
+      }
+   },
+   "version" : "v0.1.0",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

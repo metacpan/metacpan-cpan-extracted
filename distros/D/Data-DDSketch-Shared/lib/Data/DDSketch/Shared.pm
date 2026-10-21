@@ -1,7 +1,7 @@
 package Data::DDSketch::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 require XSLoader;
 XSLoader::load('Data::DDSketch::Shared', $VERSION);
 
@@ -192,12 +192,8 @@ C<freeze> takes the write lock, marks the sketch B<permanently immutable>
 to disk. A frozen sketch rejects every mutator (C<add>, C<add_many>, C<merge>,
 C<clear>) with a croak, and a read-write reopen (C<< new($path, ...) >>) of a
 sealed file is B<refused> -- so a shipped artifact can never be silently
-mutated out from under its readers. That protection is enforced by the reader:
-the seal is a header flag that C<0.01> and earlier do not know about, and the
-on-disk format version is deliberately unchanged so those releases can still
-open files written here. A pre-C<0.02> build therefore opens a sealed file
-read-write and can modify it, so keep producers and consumers on C<0.02> or
-later if you rely on the seal. C<freeze> itself is not idempotent: the handle
+mutated out from under its readers. The current on-disk format is version 2;
+version 1 files must be rebuilt. C<freeze> itself is not idempotent: the handle
 that seals the file becomes a read-only view of it, so calling C<freeze> on
 that handle again croaks.
 
@@ -243,23 +239,12 @@ after its count but before its sum, min and max updates leaves those three
 missing that one value, or estimated as above if the sketch was empty.
 B<Limitation>: PID reuse is not detected (very unlikely in practice).
 
-Reader-slot exhaustion (slotless readers): dead-process recovery attributes a
-crashed lock holder's contribution through its reader-slot. The slot table
-holds 1024 entries (one per concurrent reader process). If more than that many
-reader processes share one mapping at once, a reader that cannot claim a slot
-proceeds "slotless" -- it still takes the read lock but leaves no per-process
-record. If such a slotless reader is then killed while holding the read lock,
-its share of the lock cannot be attributed to a dead process, so writer
-recovery cannot reclaim it and writers may block until the mapping is
-recreated. Reaching this needs more than 1024 concurrent reader processes on
-one mapping plus a crash in the brief read-lock window; the dead-process slot
-reclaim keeps the table from filling with stale entries, so in practice it is
-very unlikely. Those preconditions cover the live-process route only. The
-count lives in the mapping and C<new> validates the geometry, not this
-transient value, so a backing file damaged at rest -- bit rot, a partial copy,
-or a process that scribbled on the mapping -- can present a non-zero slotless
-count and block every writer the same way, with none of the above. If writers
-hang on a file no live reader is using, recreate it.
+Each mutable handle claims a reader slot at its first locked operation; the
+mapping has 1024 slots. Dead slots are reclaimed, but when all slots belong to
+live processes, an extra handle reads without a slot. Killing that process
+during a read can strand its reader count and block writers. A damaged backing
+file can strand the slotless count too; if writers hang with no live readers,
+recreate the mapping.
 
 An interrupted create is recovered too. A creator killed after the backing
 file is sized but before its header is committed leaves a full-size, all-zero

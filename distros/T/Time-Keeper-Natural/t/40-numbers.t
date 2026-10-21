@@ -78,6 +78,9 @@ my $n = $N->new(zone => 'Europe/London', locale => 'en-GB');
     is(str(sub { $n->in_locale('ja')->parse('三日後') }), '2026-10-18T09:00:00+01:00', 'ja');
     is(str(sub { $n->parse_duration('two hours and thirty minutes') }), 'PT2H30M', 'a duration');
     is(str(sub { $n->in_locale('de')->parse_duration('zwei Stunden') }), 'PT2H', 'de duration');
+    is(str(sub { $n->in_locale('ja')->parse_duration('二週間三日') }), 'P17D', 'ja duration, a spaceless chain in words');
+    is(str(sub { $n->in_locale('ja')->parse_duration('一時間三十分') }), 'PT1H30M', 'ja, thirty read whole');
+    is(str(sub { $n->in_locale('zh')->parse_duration('两周三天') }), 'P17D', 'zh duration');
     is(str(sub { $n->in_locale('xh')->parse('in 2 days') }), 'died: ' . (eval { $n->in_locale('xh')->parse('in 2 days') } // $@), 'a locale with no rules reads what it reads') if 0;
 }
 
@@ -103,7 +106,7 @@ my $n = $N->new(zone => 'Europe/London', locale => 'en-GB');
     dies_like(sub { $n->parse('the second Tuesday of next week') }, qr/an ordinal weekday is counted in a month, not a week/, 'a week');
     dies_like(sub { $n->parse('the second Tuesday of 2027') }, qr/an ordinal weekday is counted in a month, not a year/, 'a year');
     is(str(sub { $n->in_locale('fr')->parse('le troisième vendredi du mois prochain') }), '2026-11-20T00:00:00+00:00', 'French, through its table');
-    dies_like(sub { $n->in_locale('ru')->parse('в третью пятницу октября') }, qr/no such word in ru/, 'Russian, whose table has no of, does not');
+    is(str(sub { $n->in_locale('ru')->parse('в третью пятницу октября') }), '2026-10-16T00:00:00+01:00', 'Russian, through its nth frame');
 }
 
 done_testing;

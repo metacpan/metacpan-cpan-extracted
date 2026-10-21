@@ -1,9 +1,11 @@
 package MARC::Charset;
 
+use v5.8.8;
+
 use strict;
 use warnings;
 
-our $VERSION = '1.35';
+our $VERSION = '1.36';
 
 use base qw(Exporter);
 our @EXPORT_OK = qw(marc8_to_utf8 utf8_to_marc8);
@@ -305,9 +307,11 @@ sub marc8_to_utf8
 
         if (!$found)
         {
-            warn(sprintf("no mapping found for [0x\%X] at position $index in $marc8 ".
+            warn(sprintf("no mapping found for [0x\%X] at position $index ",
+                          unpack('C',substr($marc8,$index,1))) .
+                " in $marc8 " .
                 "g0=".MARC::Charset::Constants::charset_name($G0) . " " .
-                "g1=".MARC::Charset::Constants::charset_name($G1), unpack('C',substr($marc8,$index,1))));
+                "g1=".MARC::Charset::Constants::charset_name($G1));
             if (!$ignore_errors)
             {
                 reset_charsets();
@@ -382,7 +386,13 @@ sub utf8_to_marc8
         if (! $code)
         {
             warn("no mapping found at position $i in $utf8"); 
-            reset_charsets() and return unless $ignore_errors;
+            if (!$ignore_errors)
+            {
+                reset_charsets();
+                return;
+            }
+            # drop the character we can't map and carry on
+            next;
         }
 
         # if it's a combining character move it around

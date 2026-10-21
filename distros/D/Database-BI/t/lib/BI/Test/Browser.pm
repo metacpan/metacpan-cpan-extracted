@@ -20,6 +20,11 @@ package BI::Test::Browser;
 # point at a closed port, so a page's CDN script fails at once instead of
 # waiting on a network the test does not need.
 #
+# A test that needs its own config values, or fixture files served on the app's
+# origin, passes app_config => {...} and static_paths => [...].  The latter are
+# extra static roots, so a test can serve the libraries a deployment would
+# self-host without putting them in the application's public directory.
+#
 #   my $browser = BI::Test::Browser->new(record_patches => 1);
 #   $browser->navigate('/view/sales');
 #   $browser->focus('#btn-bar');
@@ -135,6 +140,8 @@ sub new {
 		platform        => $arg{platform} || 'web',
 		language        => $arg{language} || 'en',
 		record_patches  => $arg{record_patches} ? 1 : 0,
+		app_config      => $arg{app_config} || {},
+		static_paths    => $arg{static_paths} || [],
 		stopped         => 0,
 	}, $class;
 
@@ -178,6 +185,17 @@ sub _start_server {
 			platform  => $self->{platform},
 			language  => $self->{language},
 		);
+
+		# Constructor arguments are app attributes, not config values; the
+		# Config plugin builds config in startup(), so apply test overrides
+		# after the app exists.
+		$app->config->{$_} = $self->{app_config}{$_}
+			for sort keys %{ $self->{app_config} };
+
+		# A test can serve fixture assets, such as the libraries a deployment
+		# self-hosts, from its own temporary directory on the app's origin.
+		push @{ $app->static->paths }, @{ $self->{static_paths} }
+			if @{ $self->{static_paths} };
 
 		# Every layout PATCH, body and all, recorded before the controller can
 		# reject or store it.  This is the test's only view of what the page

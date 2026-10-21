@@ -1,5 +1,11 @@
 Revision history for Mozilla-CA
 
+20261020
+  - Update from Mozilla repository to 2026-10-20
+  - Denylisted certificates:
+    - emSign ECC Root CA - G3
+      sha256: 86a1ecba089c4a8d3bbe2734c612ba341d813e043cf9e8a862cd5c57a36bbe6b
+
 20260813
   - Update from Mozilla repository to 2026-08-13
   - Added certificates:

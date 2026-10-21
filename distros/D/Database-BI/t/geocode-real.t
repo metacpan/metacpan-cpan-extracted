@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 
-# The real Geo::Coder::Free behind Phase 6.2 of BI-Phase6.md, rather than the
+# The real Geo::Coder::Free behind Database::BI, rather than the
 # stub t/geocode.t drives it with: a dirty column is handed to
 # resolve_column() with no injected geocoder, so the module's own loading path,
 # the module's own valid_location() and a real batch are what is under test.
@@ -19,12 +19,14 @@ use strict;
 use warnings;
 
 use Test::Most;
-use Test::Needs { 'Geo::Coder::Free' => '0.47' };	# skips the file, as BI-Phase6.md section 11 asks
+use Test::Needs { 'Geo::Coder::Free' => '0.48' };
 use Database::BI::Model::Geocode;
 
 # Geo::Coder::Free is a recommends, not a prerequisite: 0.46 added
-# valid_location() and 0.47 added geocode_many(), and the app installs, starts
-# and tests without either.  Test::Needs above skips a machine without 0.47+;
+# valid_location(), 0.47 added geocode_many(), and 0.48 added per-lookup cache
+# counts (the lookups key reports reads, not attempts).  The app installs,
+# starts and tests without any of these.  Test::Needs above skips a machine
+# without 0.48+;
 # this catches the other case, a module that claims the version and does not
 # answer the two questions this module asks of one.
 for my $method (qw(valid_location geocode_many)) {

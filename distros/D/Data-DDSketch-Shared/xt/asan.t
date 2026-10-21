@@ -12,7 +12,7 @@ plan skip_all => 'set ASAN=1 to run' unless $ENV{ASAN};
 
 # Rebuild with ASAN flags in-place
 my $build = `make clean 2>/dev/null; perl Makefile.PL OPTIMIZE='-O0 -g -fsanitize=address -fno-omit-frame-pointer' 2>&1 && make 2>&1`;
-like $build, qr/Shared\.o/, 'ASAN build succeeded'
+is $?, 0, 'ASAN build succeeded'
     or BAIL_OUT("ASAN build failed:\n$build");
 
 my @tests = sort glob("t/*.t");
@@ -24,6 +24,7 @@ for my $t (@tests) {
 }
 
 diag "rebuilding without ASAN...";
-`make clean 2>/dev/null; perl Makefile.PL 2>&1 && make 2>&1`;
+my $restore = `make clean 2>/dev/null; perl Makefile.PL 2>&1 && make 2>&1`;
+is $?, 0, 'restored normal build' or diag $restore;
 
 done_testing;

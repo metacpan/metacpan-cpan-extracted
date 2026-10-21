@@ -2,6 +2,8 @@ use strict;
 use warnings;
 use Test::More;
 use File::Temp qw(tempdir);
+use POSIX qw(_exit);
+use Time::HiRes qw(time sleep);
 use Data::DDSketch::Shared;
 
 my $dir  = tempdir(CLEANUP => 1);
@@ -85,6 +87,47 @@ my ($c, $q50, $mn, $mx, $mean, $sum, $zc);
 # ---- refuse a read-write reopen of a sealed file ----
 like exception(sub { Data::DDSketch::Shared->new($path, 0.01, 1024) }),
      qr/frozen|read-only/, 'read-write reopen of a sealed file is refused';
+
+{
+    my $live = "$dir/live.dd";
+    my $producer = Data::DDSketch::Shared->new($live);
+    my $peer = Data::DDSketch::Shared->new($live);
+    my $pid = fork // die "fork: $!";
+    if (!$pid) {
+        $producer->add_many([ (2) x 10_000 ]);
+        $producer->freeze;
+        _exit(0);
+    }
+    my ($ro, $err);
+    my $consistent = 1;
+    my $until = time + 30;
+    while (time < $until) {
+        my $st = $peer->stats;
+        $consistent &&= !$st->{frozen} || ($st->{count} == 10_000 && $st->{sum} == 20_000);
+        $ro = eval { Data::DDSketch::Shared->new_readonly($live) };
+        $err = $@;
+        last if $ro;
+        last unless $err =~ /not frozen/;
+        sleep 0.001;
+    }
+    kill 'KILL', $pid unless $ro;
+    waitpid $pid, 0;
+    is $?, 0, 'concurrent producer exits successfully';
+    ok $consistent, 'stats reports the seal with the same distribution snapshot';
+    ok $ro, 'read-only attach observes the published seal' or diag $err;
+    if ($ro) {
+        is $ro->count, 10_000, 'published snapshot includes all values';
+        is $ro->sum, 20_000, 'published snapshot includes the sum';
+        cmp_ok abs($ro->quantile(0.5) - 2) / 2, '<=', 0.011, 'published buckets are visible';
+        for my $op (
+            sub { $peer->add(1) }, sub { $peer->add_many([1, 2]) },
+            sub { $peer->clear }, sub { $peer->merge($producer) },
+        ) {
+            like exception($op), qr/frozen/, 'a pre-existing peer rejects mutation after freeze';
+        }
+        is $peer->count, $ro->count, 'peer still reads the sealed distribution';
+    }
+}
 
 # ---- new_readonly rejects a non-frozen file ----
 {

@@ -1,5 +1,5 @@
 package Crypt::Passphrase::Pepper::Simple;
-$Crypt::Passphrase::Pepper::Simple::VERSION = '0.023';
+$Crypt::Passphrase::Pepper::Simple::VERSION = '0.024';
 use strict;
 use warnings;
 
@@ -54,7 +54,7 @@ Crypt::Passphrase::Pepper::Simple - A pepper-wrapper for Crypt::Passphrase
 
 =head1 VERSION
 
-version 0.023
+version 0.024
 
 =head1 SYNOPSIS
 

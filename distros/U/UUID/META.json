@@ -4,7 +4,7 @@
       "Rick Myers <jrm@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -83,10 +83,10 @@
    "provides" : {
       "UUID" : {
          "file" : "lib/UUID.pm",
-         "version" : "0.39"
+         "version" : "0.40"
       }
    },
    "release_status" : "stable",
-   "version" : "0.39",
+   "version" : "0.40",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

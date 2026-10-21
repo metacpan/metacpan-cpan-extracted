@@ -21,43 +21,43 @@ no_index:
 provides:
   EV::WebKit:
     file: lib/EV/WebKit.pm
-    version: '0.04'
+    version: '0.05'
   EV::WebKit::Auth:
     file: lib/EV/WebKit.pm
-    version: '0.04'
+    version: '0.05'
   EV::WebKit::Client:
     file: lib/EV/WebKit/Client.pm
-    version: '0.04'
+    version: '0.05'
   EV::WebKit::Client::Element:
     file: lib/EV/WebKit/Client/Element.pm
-    version: '0.04'
+    version: '0.05'
   EV::WebKit::Control:
     file: lib/EV/WebKit/Control.pm
-    version: '0.04'
+    version: '0.05'
   EV::WebKit::Dialog:
     file: lib/EV/WebKit.pm
-    version: '0.04'
+    version: '0.05'
   EV::WebKit::Download:
     file: lib/EV/WebKit.pm
-    version: '0.04'
+    version: '0.05'
   EV::WebKit::Element:
     file: lib/EV/WebKit/Element.pm
-    version: '0.04'
+    version: '0.05'
   EV::WebKit::FileChooser:
     file: lib/EV/WebKit.pm
-    version: '0.04'
+    version: '0.05'
   EV::WebKit::Fingerprint:
     file: lib/EV/WebKit/Fingerprint.pm
-    version: '0.04'
+    version: '0.05'
   EV::WebKit::Policy:
     file: lib/EV/WebKit.pm
-    version: '0.04'
+    version: '0.05'
   EV::WebKit::Protocol:
     file: lib/EV/WebKit/Protocol.pm
-    version: '0.04'
+    version: '0.05'
   EV::WebKit::UserContent:
     file: lib/EV/WebKit.pm
-    version: '0.04'
+    version: '0.05'
 recommends:
   Proxy::Impersonate: '0.01'
 requires:
@@ -72,5 +72,5 @@ requires:
 resources:
   bugtracker: https://github.com/vividsnow/perl5-ev-webkit/issues
   repository: https://github.com/vividsnow/perl5-ev-webkit.git
-version: '0.04'
+version: '0.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

@@ -74,6 +74,12 @@ static int ss_rank_window(uint32_t cnt, IV start, IV stop, IV *a, IV *b) {
     return cnt > 0 && *a <= *b;
 }
 
+static void ss_free_snapshot(pTHX_ void *ptr) {
+    ss_rcollect_t *col = (ss_rcollect_t *)ptr;
+    free(col->members); free(col->scores);
+    Safefree(col);
+}
+
 MODULE = Data::SortedSet::Shared  PACKAGE = Data::SortedSet::Shared
 
 PROTOTYPES: DISABLE
@@ -571,6 +577,59 @@ each(self, cb)
             if (SvTRUE(ERRSV)) { free(col.members); free(col.scores); croak_sv(ERRSV); }
         }
         free(col.members); free(col.scores);
+    }
+
+void
+_each_strings(self, keys, cb)
+    SV *self
+    SV *keys
+    SV *cb
+  PREINIT:
+    EXTRACT(self);
+  CODE:
+    {
+        ENTER; SAVETMPS;
+        SV *key_table = sv_2mortal(newSVsv(keys));
+        SV *callback = sv_2mortal(newSVsv(cb));
+        if (!SvROK(callback) || SvTYPE(SvRV(callback)) != SVt_PVCV)
+            croak("each: callback must be a code ref");
+        if (!sv_isobject(key_table)) croak("each: expected a key table");
+        GV *method = gv_fetchmethod(SvSTASH(SvRV(key_table)), "string");
+        if (!method || !GvCV(method)) croak("each: key table has no string method");
+        SV *decode = sv_2mortal(SvREFCNT_inc((SV *)GvCV(method)));
+        REEXTRACT(self);
+        ss_rcollect_t *col;
+        Newxz(col, 1, ss_rcollect_t);
+        SAVEDESTRUCTOR_X(ss_free_snapshot, col);
+        if (!h->readonly) ss_rwlock_rdlock(h);
+        int ok = ss_collect_range(h, 0, h->hdr->count, 0, col);
+        if (!h->readonly) ss_rwlock_rdunlock(h);
+        if (!ok) croak("each: out of memory");
+        SV **strings;
+        Newx(strings, col->n, SV *);
+        SAVEFREEPV(strings);
+        for (size_t i = 0; i < col->n; i++) {
+            dSP; ENTER; SAVETMPS; PUSHMARK(SP);
+            XPUSHs(key_table);
+            XPUSHs(sv_2mortal(newSViv((IV)col->members[i])));
+            PUTBACK;
+            call_sv(decode, G_SCALAR);
+            SPAGAIN;
+            SV *str = POPs;
+            SvREFCNT_inc(str);
+            PUTBACK;
+            FREETMPS; LEAVE;
+            strings[i] = sv_2mortal(str);
+        }
+        for (size_t i = 0; i < col->n; i++) {
+            dSP; ENTER; SAVETMPS; PUSHMARK(SP);
+            XPUSHs(strings[i]);
+            XPUSHs(sv_2mortal(newSVnv(col->scores[i])));
+            PUTBACK;
+            call_sv(callback, G_VOID|G_DISCARD);
+            FREETMPS; LEAVE;
+        }
+        FREETMPS; LEAVE;
     }
 
 SV *

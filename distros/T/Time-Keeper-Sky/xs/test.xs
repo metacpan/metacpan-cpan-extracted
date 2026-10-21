@@ -387,15 +387,15 @@ void
 _sun_precise_jde(jde)
         NV jde
     PREINIT:
-        tks_sunpos sun;
+        tks_sunpos pos;
     PPCODE:
-        tks_sun_precise((double)jde, &sun);
+        tks_sun_precise((double)jde, &pos);
         EXTEND(SP, 5);
-        mPUSHn(sun.lon);
-        mPUSHn(sun.ra);
-        mPUSHn(sun.dec);
-        mPUSHn(sun.R);
-        mPUSHn(sun.eot);
+        mPUSHn(pos.lon);
+        mPUSHn(pos.ra);
+        mPUSHn(pos.dec);
+        mPUSHn(pos.R);
+        mPUSHn(pos.eot);
 
 void
 _pluto_j2000(jde)

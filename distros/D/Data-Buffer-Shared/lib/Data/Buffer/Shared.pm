@@ -1,7 +1,7 @@
 package Data::Buffer::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 require XSLoader;
 XSLoader::load('Data::Buffer::Shared', $VERSION);
@@ -152,7 +152,7 @@ disturb the handle.
 =head2 Lifecycle
 
     my $p  = $buf->path;    # backing file path, or undef for anon/memfd
-    my $fd = $buf->fd;      # memfd fd, or undef for anon/file-backed
+    my $fd = $buf->fd;      # owned fd for memfd/fd-backed, undef otherwise
     my $fd = $buf->memfd;   # alias of fd()
     $buf->clear;            # zero all elements (write-locked)
     $buf->sync;             # msync(MS_SYNC) mmap to backing store
@@ -163,9 +163,8 @@ C<unlink> also works as a class method: C<< Data::Buffer::Shared::I64->unlink($p
 It croaks if the removal fails -- except when the file is already gone, which is
 what you asked for, so a cleanup path may safely run twice.
 
-C<memfd> is an alias of C<fd> (present on every variant): both return the backing
-file descriptor for a memfd-backed buffer (created with C<new_memfd>), or C<undef>
-for anonymous and file-backed buffers.
+C<memfd> is an alias of C<fd>: both return the descriptor held by C<new_memfd>
+and C<new_from_fd> handles, or C<undef> for C<new> and C<new_anon> handles.
 
 =head2 API
 
@@ -204,22 +203,21 @@ Raw / bulk:
 
 C<get_raw> and C<set_raw> address the data area in B<bytes>, not element
 indices -- unlike every other accessor here. On an C<I64> buffer
-C<< $buf->get_raw(4, 4) >> returns bytes 4..7, which is the upper half of
-element 0 and the lower half of element 1, not elements 4..7. Multiply by the
-element size to address elements. Both are bounds-checked against the data area
-and croak rather than run past it.
+C<< $buf->get_raw(4, 4) >> returns bytes 4..7 of element 0. Multiply by the
+element size to address elements. Out-of-bounds C<get_raw> croaks;
+C<set_raw> returns false.
 
 Zero-copy:
 
     my $sv = $buf->as_scalar;   # mmap-aliased read-only scalar ref
 
-The returned scalar aliases the mapped bytes directly (no copy) and holds a
-reference to the buffer so the mapping stays alive while it is in use.
+The scalar aliases mapped bytes and keeps the buffer alive. For a coherent
+view, hold a read lock and have peers write under the write lock.
 
 Cross-process notification (all variants):
 
     my $efd = $buf->create_eventfd;   # create + attach an eventfd, returns the fd
-    $buf->attach_eventfd($fd);        # attach an already-open eventfd
+    $buf->attach_eventfd($fd);        # borrow a non-blocking eventfd
     my $efd = $buf->eventfd;          # current eventfd, or undef if none
     $buf->notify;                     # signal (eventfd write)
     my $n = $buf->wait_notify;        # drain the counter, non-blocking (undef if 0)
@@ -250,11 +248,10 @@ Explicit locking (for batch operations):
     buf_xx_lock_rd $buf;    # read lock
     buf_xx_unlock_rd $buf;  # read unlock
 
-The explicit locks are B<non-recursive> and B<non-upgradable>: calling
+Write locks are B<non-recursive> and B<non-upgradable>: calling
 C<lock_wr> while holding C<lock_rd> on the same handle, or calling C<lock_wr>
-twice without an intervening C<unlock_wr>, self-deadlocks. Dropping the last
-reference to a handle while holding one of its locks leaks that handle's
-reader slot (and any held lock contribution) until the process exits.
+twice without an intervening C<unlock_wr>, self-deadlocks. Closing a handle
+releases the locks it acquired in the current process.
 
 =head1 CONCURRENCY AND CRASH SAFETY
 
@@ -262,8 +259,9 @@ Single-element numeric get/set and the atomic counter operations
 (C<incr>/C<decr>/C<add>/C<cas>/C<cmpxchg>/C<atomic_and>/C<atomic_or>/C<atomic_xor>)
 are lock-free and safe to call concurrently from any number of processes. Bulk
 reads (C<slice>, C<get_raw>) are guarded by a seqlock and retry if a writer
-intervenes. Bulk writes (C<set_slice>, C<fill>, C<clear>, C<set_raw>) and the
-explicit C<lock_wr>/C<unlock_wr> region take a write lock.
+holding the write lock intervenes. Bulk writes (C<set_slice>, C<fill>, C<clear>,
+C<set_raw>) and the explicit C<lock_wr>/C<unlock_wr> region take a write lock.
+Lock-free numeric operations bypass these locks and the seqlock.
 
 The write/read lock is a write-preferring futex read-write lock with
 dead-process recovery: if a process crashes while holding the lock, another
@@ -347,13 +345,13 @@ its contents while other processes are using it.
 
 Reader-slot exhaustion (slotless readers): dead-process recovery attributes a
 crashed lock holder's contribution through its reader-slot. The slot table
-holds 1024 entries (one per concurrent reader process). If more than that many
-reader processes share one mapping at once, a reader that cannot claim a slot
+holds 1024 entries (one per handle that has acquired a lock). If more than that
+many handles share one mapping at once, a reader that cannot claim a slot
 proceeds "slotless" -- it still takes the read lock but leaves no per-process
 record. If such a slotless reader is then killed while holding the read lock,
 its share of the lock cannot be attributed to a dead process, so writer
 recovery cannot reclaim it and writers may block until the mapping is
-recreated. Reaching this needs more than 1024 concurrent reader processes on
+recreated. Reaching this needs more than 1024 concurrent handles on
 one mapping plus a crash in the brief read-lock window; the dead-process slot
 reclaim keeps the table from filling with stale entries, so in practice it is
 very unlikely. Those preconditions cover the live-process route only. The

@@ -75,6 +75,28 @@ like exception(sub { Data::BloomFilter::Shared->new_readonly("$dir/does-not-exis
 like exception(sub { Data::BloomFilter::Shared->new_readonly(undef) }),
      qr/required/, 'new_readonly requires a path';
 
+for my $kind (qw(file memfd)) {
+    my $producer = $kind eq 'file'
+        ? Data::BloomFilter::Shared->new("$dir/peer.bf", 1000, 0.01)
+        : Data::BloomFilter::Shared->new_memfd('frozen-peer', 1000, 0.01);
+    my $peer = $kind eq 'file'
+        ? Data::BloomFilter::Shared->new($producer->path, 1000, 0.01)
+        : Data::BloomFilter::Shared->new_from_fd($producer->memfd);
+    $producer->add('before-seal');
+    $producer->freeze;
+    ok $peer->frozen, "$kind: existing peer sees the seal";
+    ok $peer->contains('before-seal'), "$kind: existing peer reads frozen data";
+    is $peer->stats->{frozen}, 1, "$kind: peer stats report frozen";
+    like exception(sub { $peer->add('x') }), qr/frozen/, "$kind: peer add refused";
+    like exception(sub { $peer->add_many(['x']) }), qr/frozen/, "$kind: peer batch refused";
+    like exception(sub { $peer->clear }), qr/frozen/, "$kind: peer clear refused";
+    like exception(sub { $peer->merge($producer) }), qr/frozen/, "$kind: peer merge refused";
+    if ($kind eq 'memfd') {
+        like exception(sub { Data::BloomFilter::Shared->new_from_fd($producer->memfd) }),
+            qr/frozen/, 'a frozen memfd cannot be reopened writable';
+    }
+}
+
 # ---- merge FROM a frozen (read-only) other into a mutable filter (lock-free o read) ----
 {
     my $m   = "$dir/other.bf";

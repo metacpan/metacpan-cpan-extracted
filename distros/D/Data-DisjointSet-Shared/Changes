@@ -1,5 +1,10 @@
 Revision history for Data-DisjointSet-Shared
 
+0.07  2026-10-16
+    - Fix shared-lock wakeups and interrupted reset publication.
+    - Preserve permissions when another process finishes initialization.
+    - Link threading dependencies explicitly.
+
 0.06      2026-09-26
           - Recovery re-derives set sizes and num_sets after a writer killed
             mid-union, and reruns an interrupted reset.

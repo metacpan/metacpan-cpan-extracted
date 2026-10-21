@@ -3,10 +3,33 @@
 #include "perl.h"
 #include "XSUB.h"
 #include "ppport.h"
+static int deq_wait_interrupted(void) { dTHX; return PL_sig_pending != 0; }
+#define DEQ_WAIT_INTERRUPTED() deq_wait_interrupted()
+#define DEQ_WAIT_POLL_NS 500000000L
 #include "deque.h"
 
+static inline uint32_t deq_str_length(const char *s, STRLEN len,
+                                      uint32_t max_len, int is_utf8) {
+    if (len > max_len) {
+        len = max_len;
+        /* The first omitted byte must start a character. */
+        if (is_utf8) while (len && ((unsigned char)s[len] & 0xc0) == 0x80) len--;
+    }
+    return (uint32_t)len;
+}
+
+static inline int deq_is_object(pTHX_ SV *sv) {
+    if (!sv_isobject(sv)) return 0;
+    HV *stash = SvSTASH(SvRV(sv));
+    const char *name = HvNAME_get(stash);
+    return (name && HvNAMELEN_get(stash) == 24
+        && memEQ(name, "Data::Deque::Shared::", 21)
+        && (memEQ(name + 21, "Int", 3) || memEQ(name + 21, "Str", 3)))
+        || sv_derived_from(sv, "Data::Deque::Shared");
+}
+
 #define EXTRACT_DEQ(sv) \
-    if (!sv_isobject(sv) || !sv_derived_from(sv, "Data::Deque::Shared")) \
+    if (!deq_is_object(aTHX_ sv)) \
         croak("Expected a Data::Deque::Shared object"); \
     DeqHandle *h = INT2PTR(DeqHandle*, SvIV(SvRV(sv))); \
     if (!h) croak("Attempted to use a destroyed Data::Deque::Shared object"); \
@@ -30,6 +53,40 @@
     SV *ref = newRV_noinc(obj); \
     sv_bless(ref, gv_stashpv(class, GV_ADD)); \
     RETVAL = ref
+
+static int deq_perl_push_wait(pTHX_ SV *self, DeqHandle *h, const void *val, uint32_t len, int front, double timeout) {
+    DeqHandle *h0 = h;
+    struct timespec deadline, remaining;
+    if (timeout > 0) deq_make_deadline(timeout, &deadline);
+    double seconds = timeout;
+    for (;;) {
+        int result = deq_push_wait(h, val, len, front, seconds);
+        if (result >= 0) return result;
+        PERL_ASYNC_CHECK();
+        REEXTRACT_DEQ(self);
+        if (timeout > 0) {
+            if (!deq_remaining(&deadline, &remaining)) return 0;
+            seconds = (double)remaining.tv_sec + (double)remaining.tv_nsec / 1e9;
+        }
+    }
+}
+
+static int deq_perl_pop_wait(pTHX_ SV *self, DeqHandle *h, void *out, int back, double timeout) {
+    DeqHandle *h0 = h;
+    struct timespec deadline, remaining;
+    if (timeout > 0) deq_make_deadline(timeout, &deadline);
+    double seconds = timeout;
+    for (;;) {
+        int result = deq_pop_wait(h, out, back, seconds);
+        if (result >= 0) return result;
+        PERL_ASYNC_CHECK();
+        REEXTRACT_DEQ(self);
+        if (timeout > 0) {
+            if (!deq_remaining(&deadline, &remaining)) return 0;
+            seconds = (double)remaining.tv_sec + (double)remaining.tv_nsec / 1e9;
+        }
+    }
+}
 
 MODULE = Data::Deque::Shared  PACKAGE = Data::Deque::Shared
 
@@ -302,7 +359,7 @@ push_back_wait(self, val, ...)
     if (items > 2 && (SvGETMAGIC(ST(2)), SvOK(ST(2)))) timeout = SvNV(ST(2));
     int64_t v = (int64_t)val;
     REEXTRACT_DEQ(self);
-    RETVAL = deq_push_wait(h, &v, sizeof(v), 0, timeout);
+    RETVAL = deq_perl_push_wait(aTHX_ self, h, &v, sizeof(v), 0, timeout);
   OUTPUT:
     RETVAL
 
@@ -317,7 +374,7 @@ push_front_wait(self, val, ...)
     if (items > 2 && (SvGETMAGIC(ST(2)), SvOK(ST(2)))) timeout = SvNV(ST(2));
     int64_t v = (int64_t)val;
     REEXTRACT_DEQ(self);
-    RETVAL = deq_push_wait(h, &v, sizeof(v), 1, timeout);
+    RETVAL = deq_perl_push_wait(aTHX_ self, h, &v, sizeof(v), 1, timeout);
   OUTPUT:
     RETVAL
 
@@ -353,7 +410,7 @@ pop_front_wait(self, ...)
     if (items > 1 && (SvGETMAGIC(ST(1)), SvOK(ST(1)))) timeout = SvNV(ST(1));
     int64_t v;
     REEXTRACT_DEQ(self);
-    RETVAL = deq_pop_wait(h, &v, 0, timeout) ? newSViv((IV)v) : &PL_sv_undef;
+    RETVAL = deq_perl_pop_wait(aTHX_ self, h, &v, 0, timeout) ? newSViv((IV)v) : &PL_sv_undef;
   OUTPUT:
     RETVAL
 
@@ -367,7 +424,7 @@ pop_back_wait(self, ...)
     if (items > 1 && (SvGETMAGIC(ST(1)), SvOK(ST(1)))) timeout = SvNV(ST(1));
     int64_t v;
     REEXTRACT_DEQ(self);
-    RETVAL = deq_pop_wait(h, &v, 1, timeout) ? newSViv((IV)v) : &PL_sv_undef;
+    RETVAL = deq_perl_pop_wait(aTHX_ self, h, &v, 1, timeout) ? newSViv((IV)v) : &PL_sv_undef;
   OUTPUT:
     RETVAL
 
@@ -439,7 +496,7 @@ push_back(self, val)
     const char *s = SvPV(val, slen);
     REEXTRACT_DEQ(self);
     uint32_t max_len = h->elem_size - sizeof(uint32_t);
-    if (slen > max_len) slen = max_len;  /* fixed-size slot: truncate (documented + tested) */
+    slen = deq_str_length(s, slen, max_len, SvUTF8(val));
     uint8_t *buf;
     Newxz(buf, h->elem_size, uint8_t);
     uint32_t l32 = (uint32_t)slen | (SvUTF8(val) ? 0x80000000u : 0u);  /* bit 31 = SvUTF8 */
@@ -461,7 +518,7 @@ push_front(self, val)
     const char *s = SvPV(val, slen);
     REEXTRACT_DEQ(self);
     uint32_t max_len = h->elem_size - sizeof(uint32_t);
-    if (slen > max_len) slen = max_len;  /* fixed-size slot: truncate (documented + tested) */
+    slen = deq_str_length(s, slen, max_len, SvUTF8(val));
     uint8_t *buf;
     Newxz(buf, h->elem_size, uint8_t);
     uint32_t l32 = (uint32_t)slen | (SvUTF8(val) ? 0x80000000u : 0u);  /* bit 31 = SvUTF8 */
@@ -485,14 +542,19 @@ push_back_wait(self, val, ...)
     const char *s = SvPV(val, slen);
     REEXTRACT_DEQ(self);
     uint32_t max_len = h->elem_size - sizeof(uint32_t);
-    if (slen > max_len) slen = max_len;  /* fixed-size slot: truncate (documented + tested) */
+    slen = deq_str_length(s, slen, max_len, SvUTF8(val));
     uint8_t *buf;
     Newxz(buf, h->elem_size, uint8_t);
     uint32_t l32 = (uint32_t)slen | (SvUTF8(val) ? 0x80000000u : 0u);  /* bit 31 = SvUTF8 */
     memcpy(buf, &l32, sizeof(uint32_t));
     memcpy(buf + sizeof(uint32_t), s, slen);
-    RETVAL = deq_push_wait(h, buf, h->elem_size, 0, timeout);
-    Safefree(buf);
+    RETVAL = deq_try_push_back(h, buf, h->elem_size);
+    if (RETVAL || timeout == 0) {
+        Safefree(buf);
+    } else {
+        SAVEFREEPV(buf);
+        RETVAL = deq_perl_push_wait(aTHX_ self, h, buf, h->elem_size, 0, timeout);
+    }
   OUTPUT:
     RETVAL
 
@@ -509,14 +571,19 @@ push_front_wait(self, val, ...)
     const char *s = SvPV(val, slen);
     REEXTRACT_DEQ(self);
     uint32_t max_len = h->elem_size - sizeof(uint32_t);
-    if (slen > max_len) slen = max_len;  /* fixed-size slot: truncate (documented + tested) */
+    slen = deq_str_length(s, slen, max_len, SvUTF8(val));
     uint8_t *buf;
     Newxz(buf, h->elem_size, uint8_t);
     uint32_t l32 = (uint32_t)slen | (SvUTF8(val) ? 0x80000000u : 0u);  /* bit 31 = SvUTF8 */
     memcpy(buf, &l32, sizeof(uint32_t));
     memcpy(buf + sizeof(uint32_t), s, slen);
-    RETVAL = deq_push_wait(h, buf, h->elem_size, 1, timeout);
-    Safefree(buf);
+    RETVAL = deq_try_push_front(h, buf, h->elem_size);
+    if (RETVAL || timeout == 0) {
+        Safefree(buf);
+    } else {
+        SAVEFREEPV(buf);
+        RETVAL = deq_perl_push_wait(aTHX_ self, h, buf, h->elem_size, 1, timeout);
+    }
   OUTPUT:
     RETVAL
 
@@ -580,7 +647,7 @@ pop_front_wait(self, ...)
     REEXTRACT_DEQ(self);
     Newx(buf, h->elem_size, uint8_t);
     SAVEFREEPV(buf);
-    if (deq_pop_wait(h, buf, 0, timeout)) {
+    if (deq_perl_pop_wait(aTHX_ self, h, buf, 0, timeout)) {
         uint32_t l32;
         memcpy(&l32, buf, sizeof(uint32_t));
         int is_utf8 = (l32 & 0x80000000u) != 0;
@@ -607,7 +674,7 @@ pop_back_wait(self, ...)
     REEXTRACT_DEQ(self);
     Newx(buf, h->elem_size, uint8_t);
     SAVEFREEPV(buf);
-    if (deq_pop_wait(h, buf, 1, timeout)) {
+    if (deq_perl_pop_wait(aTHX_ self, h, buf, 1, timeout)) {
         uint32_t l32;
         memcpy(&l32, buf, sizeof(uint32_t));
         int is_utf8 = (l32 & 0x80000000u) != 0;

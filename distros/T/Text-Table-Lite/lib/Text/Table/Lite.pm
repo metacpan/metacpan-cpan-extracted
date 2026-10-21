@@ -9,7 +9,7 @@ use Exporter 'import';
 use Encode qw(encode decode find_encoding FB_CROAK);
 use Unicode::GCString ();
 
-our $VERSION   = '1.002';
+our $VERSION   = '1.03';
 our @EXPORT_OK = qw(generate_table);
 
 my %BORDERS = (
@@ -320,13 +320,19 @@ sub _truncate {
 
 __END__
 
+=pod
+
+=encoding utf8
+
 =head1 NAME
 
 Text::Table::Lite - Generate formatted tables from 2D arrays with multiline cells and multiple character encodings
 
+表格转换文本工具，支持多种编码格式的中文，支持多行单元格。
+
 =head1 VERSION
 
-Version 1.002
+Version 1.03
 
 =head1 SYNOPSIS
 

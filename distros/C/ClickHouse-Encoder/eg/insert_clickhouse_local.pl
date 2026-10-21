@@ -7,7 +7,7 @@
 #   perl eg/insert_clickhouse_local.pl out.orc Parquet ORC      (custom format)
 #
 # clickhouse-local reads our buffer as a typed table via --structure, then
-# the select INTO OUTFILE writes the chosen format.
+# the select into outfile writes the chosen format.
 
 use strict;
 use warnings;

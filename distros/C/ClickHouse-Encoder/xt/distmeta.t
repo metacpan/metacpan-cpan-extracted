@@ -22,12 +22,10 @@ plan skip_all => 'need Test::CPAN::Meta, Test::CPAN::Meta::JSON, or CPAN::Meta'
 
 subtest 'structural conformance' => sub {
     if ($have_yaml) {
-        Test::CPAN::Meta->import;
-        Test::CPAN::Meta::meta_yaml_ok();
+        Test::CPAN::Meta::meta_spec_ok('META.yml');
     }
     if ($have_json) {
-        Test::CPAN::Meta::JSON->import;
-        Test::CPAN::Meta::JSON::meta_json_ok();
+        Test::CPAN::Meta::JSON::meta_spec_ok('META.json');
     }
     pass 'no structural validator installed' unless $have_yaml || $have_json;
 };

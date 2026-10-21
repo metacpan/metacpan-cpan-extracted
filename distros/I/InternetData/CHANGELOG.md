@@ -2,6 +2,12 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 1.6.1 are described by their release commits.
 
+## 1.11.2 - 2026-10-21
+
+### Fixes
+
+- Re-pin the spec to 2026.10.21: a 403 for a refused address ([`8c136db`](https://github.com/internetdata/sdk-perl/commit/8c136db4aae781f2c8d7dd0ed8cf18442f8caba0))
+
 ## 1.11.1 - 2026-10-18
 
 ### Fixes

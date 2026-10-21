@@ -49,7 +49,7 @@
 #define DD_VERSION      2   /* 2: added the occupancy bitmap region (layout change) */
 #define DD_ERR_BUFLEN   (PATH_MAX + 256)
 #ifndef DD_READER_SLOTS
-#define DD_READER_SLOTS 1024         /* max concurrent reader processes for dead-process recovery */
+#define DD_READER_SLOTS 1024         /* mutable handles per mapping for dead-process recovery */
 #endif
 /* Occupancy bitmap: one bit per reader slot, set when a process claims a slot and
  * cleared on clean release.  A writer scans these DD_OCC_WORDS words to visit
@@ -67,7 +67,7 @@
  * Structs
  * ================================================================ */
 
-/* Per-process slot for dead-process recovery.  In the reader-slots-only rwlock a
+/* Per-handle slot for dead-process recovery.  In the reader-slots-only rwlock a
  * reader's ENTIRE contribution to the shared lock is `rdepth` in its OWN slot --
  * there is no separate shared reader counter to fall out of sync with it -- so a
  * dead reader's contribution is exactly this one word, which a draining writer
@@ -77,7 +77,7 @@
  * 16-byte slot size across the already-released builds. */
 typedef struct {
     uint32_t pid;      /* 0 = unclaimed */
-    uint32_t rdepth;   /* read-locks THIS process currently holds (recursion-safe) */
+    uint32_t rdepth;   /* read-locks THIS handle currently holds (recursion-safe) */
     uint32_t _rsv1;    /* reserved (was waiters_parked); unused, kept for layout size */
     uint32_t _rsv2;    /* reserved (was writers_parked); unused, kept for layout size */
 } DdReaderSlot;
@@ -138,7 +138,7 @@ typedef struct DdHandle {
  * with dead-process recovery
  *
  * The reader count is NOT stored in a shared counter.  It is DISTRIBUTED across
- * per-process reader slots: each slot's `rdepth` is that process's entire
+ * per-handle reader slots: each slot's `rdepth` is that handle's entire
  * contribution to the lock.  A reader publishes its presence in its own slot and
  * then re-checks the writer word; a writer publishes the writer word and then
  * scans every slot until all live readers' rdepth reach 0.  Sequentially-
@@ -324,17 +324,13 @@ static inline void dd_rwlock_drain(DdHandle *h) {
     }
 }
 
-/* 1 if this process holds a read lock on the segment (through any handle).  Such a
- * lock predates the current wlock holder, whose drain could then never have
- * finished: it died before mutating anything. */
+/* A read lock already held by this handle predates the dead writer's drain.
+ * Another thread's slot can instead be provisional, published after that drain,
+ * and must not suppress repair. */
 static int dd_self_reading(DdHandle *h) {
     if (h->slotless_held) return 1;
-    uint32_t me = (uint32_t)getpid();
-    for (uint32_t i = 0; i < DD_READER_SLOTS; i++)
-        if (__atomic_load_n(&h->reader_slots[i].pid, __ATOMIC_ACQUIRE) == me &&
-            __atomic_load_n(&h->reader_slots[i].rdepth, __ATOMIC_ACQUIRE) != 0)
-            return 1;
-    return 0;
+    return h->my_slot_idx != UINT32_MAX &&
+        __atomic_load_n(&h->reader_slots[h->my_slot_idx].rdepth, __ATOMIC_ACQUIRE) != 0;
 }
 
 static void dd_repair_locked(DdHandle *h);
@@ -353,8 +349,8 @@ static inline void dd_recover_stale_lock(DdHandle *h, uint32_t observed_wlock) {
         dd_rwlock_drain(h);
         dd_repair_locked(h);
     }
-    __atomic_store_n(&hdr->wlock, 0, __ATOMIC_RELEASE);
-    if (__atomic_load_n(&hdr->rwait, __ATOMIC_RELAXED) > 0)
+    __atomic_store_n(&hdr->wlock, 0, __ATOMIC_SEQ_CST);
+    if (__atomic_load_n(&hdr->rwait, __ATOMIC_SEQ_CST) > 0)
         syscall(SYS_futex, &hdr->wlock, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
 }
 
@@ -376,7 +372,7 @@ static inline void dd_recover_after_timeout(DdHandle *h) {
  * SIGKILLed while parked leaves rwait over-counted -> at most a spurious wake
  * (harmless); it can never under-count, so no wakeup is lost. */
 static inline void dd_park(DdHandle *h) {
-    __atomic_add_fetch(&h->hdr->rwait, 1, __ATOMIC_RELAXED);
+    __atomic_add_fetch(&h->hdr->rwait, 1, __ATOMIC_SEQ_CST);
 }
 static inline void dd_unpark(DdHandle *h) {
     __atomic_sub_fetch(&h->hdr->rwait, 1, __ATOMIC_RELAXED);
@@ -399,17 +395,18 @@ static inline void dd_rdepth_inc(DdHandle *h) {
 static inline void dd_rdepth_dec(DdHandle *h) {
     if (h->slotless_held > 0) {
         h->slotless_held--;
-        __atomic_sub_fetch(&h->hdr->slotless_rdepth, 1, __ATOMIC_RELEASE);
+        __atomic_sub_fetch(&h->hdr->slotless_rdepth, 1, __ATOMIC_SEQ_CST);
     } else if (h->my_slot_idx != UINT32_MAX) {
-        __atomic_sub_fetch(&h->reader_slots[h->my_slot_idx].rdepth, 1, __ATOMIC_RELEASE);
+        __atomic_sub_fetch(&h->reader_slots[h->my_slot_idx].rdepth, 1, __ATOMIC_SEQ_CST);
     }
 }
 
 /* Wake a writer that may be draining readers (it waits on drain_seq).  Called
  * after every rdepth decrement so a released read lock lets the writer re-scan
- * promptly instead of waiting out its timeout. */
+ * promptly instead of waiting out its timeout.  SEQ_CST pairs the decrement +
+ * gate check with the writer's gate CAS + reader scan. */
 static inline void dd_reader_wake_drain(DdHandle *h) {
-    if (__atomic_load_n(&h->hdr->wlock, __ATOMIC_ACQUIRE) != 0) {
+    if (__atomic_load_n(&h->hdr->wlock, __ATOMIC_SEQ_CST) != 0) {
         __atomic_add_fetch(&h->hdr->drain_seq, 1, __ATOMIC_RELEASE);
         syscall(SYS_futex, &h->hdr->drain_seq, FUTEX_WAKE, 1, NULL, NULL, 0);
     }
@@ -447,7 +444,7 @@ static inline void dd_rwlock_rdlock(DdHandle *h) {
             continue;
         }
         dd_park(h);
-        cur = __atomic_load_n(&hdr->wlock, __ATOMIC_RELAXED);
+        cur = __atomic_load_n(&hdr->wlock, __ATOMIC_SEQ_CST);
         if (cur != 0) {
             long rc = syscall(SYS_futex, &hdr->wlock, FUTEX_WAIT, cur,
                               &dd_lock_timeout, NULL, 0);
@@ -492,7 +489,7 @@ static inline void dd_rwlock_wrlock(DdHandle *h) {
             continue;
         }
         dd_park(h);
-        uint32_t cur = __atomic_load_n(&hdr->wlock, __ATOMIC_RELAXED);
+        uint32_t cur = __atomic_load_n(&hdr->wlock, __ATOMIC_SEQ_CST);
         if (cur != 0) {
             long rc = syscall(SYS_futex, &hdr->wlock, FUTEX_WAIT, cur,
                               &dd_lock_timeout, NULL, 0);
@@ -512,8 +509,9 @@ static inline void dd_rwlock_wrlock(DdHandle *h) {
 
 static inline void dd_rwlock_wrunlock(DdHandle *h) {
     DdHeader *hdr = h->hdr;
-    __atomic_store_n(&hdr->wlock, 0, __ATOMIC_RELEASE);
-    if (__atomic_load_n(&hdr->rwait, __ATOMIC_RELAXED) > 0)
+    /* Pair with park + gate recheck: neither side may miss the other's store. */
+    __atomic_store_n(&hdr->wlock, 0, __ATOMIC_SEQ_CST);
+    if (__atomic_load_n(&hdr->rwait, __ATOMIC_SEQ_CST) > 0)
         syscall(SYS_futex, &hdr->wlock, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
 }
 
@@ -626,6 +624,12 @@ static inline DdHandle *dd_setup(void *base, size_t map_size,
         if ((uint64_t)h->num_buckets > fit) h->num_buckets = (uint32_t)fit;
     }
     h->path         = path ? strdup(path) : NULL;
+    if (path && !h->path) {
+        munmap(base, map_size);
+        if (backing_fd >= 0) close(backing_fd);
+        free(h);
+        return NULL;
+    }
     h->backing_fd   = backing_fd;
     h->my_slot_idx  = UINT32_MAX;
     return h;
@@ -784,7 +788,7 @@ static DdHandle *dd_create(const char *path, double alpha, uint64_t num_buckets,
                 }
                 DD_ERR("invalid DDSketch file"); munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
             }
-            if (((DdHeader *)base)->sealed) {
+            if (__atomic_load_n(&((DdHeader *)base)->sealed, __ATOMIC_ACQUIRE)) {
                 DD_ERR("%s is frozen (read-only); open it with new_readonly", path);
                 munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
             }
@@ -833,7 +837,7 @@ static DdHandle *dd_open_fd(int fd, char *errbuf) {
     if (!dd_validate_header((DdHeader *)base, (uint64_t)st.st_size)) {
         DD_ERR("invalid DDSketch table"); munmap(base, ms); return NULL;
     }
-    if (((DdHeader *)base)->sealed) {
+    if (__atomic_load_n(&((DdHeader *)base)->sealed, __ATOMIC_ACQUIRE)) {
         DD_ERR("this DDSketch is frozen (read-only); open it with new_readonly");
         munmap(base, ms); return NULL;
     }
@@ -893,7 +897,7 @@ static DdHandle *dd_open_readonly(const char *path, char *errbuf) {
     if (!dd_validate_header((DdHeader *)base, (uint64_t)st.st_size)) {
         DD_ERR("%s: invalid DDSketch file", path); munmap(base, ms); return NULL;
     }
-    if (!((DdHeader *)base)->sealed) {
+    if (!__atomic_load_n(&((DdHeader *)base)->sealed, __ATOMIC_ACQUIRE)) {
         DD_ERR("%s is not frozen: call ->freeze on the producer before opening read-only", path);
         munmap(base, ms); return NULL;
     }
@@ -909,7 +913,7 @@ static DdHandle *dd_open_readonly(const char *path, char *errbuf) {
  * croaks and a read-write reopen is refused. */
 static int dd_freeze(DdHandle *h) {
     dd_rwlock_wrlock(h);
-    h->hdr->sealed = 1;
+    __atomic_store_n(&h->hdr->sealed, 1, __ATOMIC_RELEASE);
     dd_rwlock_wrunlock(h);
     if (h->path || h->backing_fd >= 0) return dd_msync(h);  /* durability for file/memfd-backed */
     return 0;   /* anonymous: the seal lives in shared memory (visible to forks); nothing to flush */

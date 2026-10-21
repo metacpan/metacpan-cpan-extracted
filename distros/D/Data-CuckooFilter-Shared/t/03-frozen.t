@@ -11,6 +11,7 @@ my @in   = qw(apple banana cherry date elderberry fig grape);
 # ---- producer: build, populate, freeze ----
 {
     my $cf = Data::CuckooFilter::Shared->new($path, 1000);
+    my $other = Data::CuckooFilter::Shared->new($path, 1);
     ok !$cf->frozen,   'freshly created filter is not frozen';
     ok !$cf->readonly, 'read-write handle is not read-only';
     $cf->add($_) for @in[0..3];
@@ -22,6 +23,14 @@ my @in   = qw(apple banana cherry date elderberry fig grape);
     ok $cf->frozen,   'frozen after ->freeze';
     ok $cf->readonly, 'freezing handle becomes read-only';
     is $cf->count, $c, 'count unchanged by freeze';
+    ok $other->frozen, 'an existing peer observes the seal';
+    ok !$other->readonly, 'the peer retains its read-write mapping';
+    ok $other->contains('apple'), 'the peer can still query';
+    like exception(sub { $other->add('x') }),        qr/frozen/, 'peer add is refused';
+    like exception(sub { $other->add_many(['x']) }), qr/frozen/, 'peer batch is refused';
+    like exception(sub { $other->remove('apple') }), qr/frozen/, 'peer remove is refused';
+    like exception(sub { $other->clear }),           qr/frozen/, 'peer clear is refused';
+    is $other->count, $c, 'refused peer writes preserve count';
 
     like exception(sub { $cf->add("x") }),        qr/frozen|read-only/, 'add on frozen handle croaks';
     like exception(sub { $cf->add_many(["x"]) }), qr/frozen|read-only/, 'add_many on frozen handle croaks';
@@ -76,6 +85,11 @@ my @in   = qw(apple banana cherry date elderberry fig grape);
 # ---- refuse a read-write reopen of a sealed file ----
 like exception(sub { Data::CuckooFilter::Shared->new($path, 1000) }),
      qr/frozen|read-only/, 'read-write reopen of a sealed file is refused';
+{
+    open my $fh, '+<', $path or die $!;
+    like exception(sub { Data::CuckooFilter::Shared->new_from_fd(fileno $fh) }),
+         qr/frozen|read-only/, 'fd reopen of a sealed file is refused';
+}
 
 # ---- new_readonly rejects a non-frozen file ----
 {

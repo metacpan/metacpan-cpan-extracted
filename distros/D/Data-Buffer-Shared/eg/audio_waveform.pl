@@ -37,6 +37,7 @@ if ($pid == 0) {
 
         # write into circular position
         my $wrap_pos = $pos % $buf_samples;
+        $audio->lock_wr;
         if ($wrap_pos + $chunk <= $buf_samples) {
             $audio->set_slice($wrap_pos, @samples);
         } else {
@@ -47,6 +48,7 @@ if ($pid == 0) {
         }
         $pos += $chunk;
         $ctl->set(0, $pos);
+        $audio->unlock_wr;
         $ctl->notify;
     }
     $ctl->set(1, 1);
@@ -62,6 +64,7 @@ my $t0 = time();
 while (!$ctl->get(1)) {
     my $n = $ctl->wait_notify;
     unless (defined $n) { sleep 0.001; next }
+    $audio->lock_rd;
 
     # --- With OpenGL::Modern ---
     # Upload waveform to a VBO for line strip rendering:
@@ -75,6 +78,7 @@ while (!$ctl->get(1)) {
 
     # Simulated: just read peak amplitude
     my @samples = unpack("f<$buf_samples", $$ref);
+    $audio->unlock_rd;
     my $peak = 0;
     for (@samples) { $peak = abs($_) if abs($_) > $peak }
     $frames++;

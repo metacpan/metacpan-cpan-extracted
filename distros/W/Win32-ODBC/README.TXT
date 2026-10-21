@@ -85,23 +85,23 @@ KNOWN PROBLEMS:
       consumption.
 
 TESTING:
-  To test out this extension, install it then run the TEST.PL included with
+  To test out this extension, install it then run the eg/sample.pl included with
   this archive...
   - This version of Win32::ODBC comes with a little database of trivial, non
     sensible data in MS Access 7.0 format. If you have the proper driver 
-	installed, the test.pl will create a temporary DSN that points to this
+	installed, the eg/sample.pl will create a temporary DSN that points to this
 	database and performs its tests on it. The temporary DSN is removed at the
 	end of the test cycle.
-  - If you want to run the test.pl against another DSN that you already have
+  - If you want to run the eg/sample.pl against another DSN that you already have
     created
-    then run the test.pl but specify your DSN (see syntax below).
+    then run the eg/sample.pl but specify your DSN (see syntax below).
   - You can limit the number of records that are retrieved during the test
     (assuming that the ODBC driver you use conforms to proper ODBC API
     standards). Specify after your DSN name the number of records to display.
     The default number of records is 15.
 
 	Syntax:
-        perl test.pl [[DSN Name] #OfRecords]
+        perl eg/sample.pl [[DSN Name] #OfRecords]
 
              DSN Name.......The DSN name of your choice (must have been pre
                             configured)
@@ -172,7 +172,7 @@ You should check to see if $Data is indeed defined otherwise there has been an
 error.
 
 You can now send SQL queries and retrieve info to your heart's content!
-See the description of functions below and also the test.pl to see how it
+See the description of functions below and also the eg/sample.pl to see how it
 all works.
 
 MAKE SURE that you close you connection when you are finished:
@@ -506,6 +506,6 @@ The ODBC.PM Package supports the following functions:
 
 
 ======================================
-	See the test.pl file for an example of Win32::ODBC's usage.
+	See the eg/sample.pl file for an example of Win32::ODBC's usage.
 
 Last Modified 96.10.16

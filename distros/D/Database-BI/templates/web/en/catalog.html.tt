@@ -1,0 +1,91 @@
+[%- WRAPPER 'web/en/layouts/default.html.tt'
+    page_title = title
+-%]
+<style>
+.catalog-table {
+	border-collapse: collapse;
+	width: 100%;
+	font-size: 0.9rem;
+}
+.catalog-table th,
+.catalog-table td {
+	border: 1px solid var(--border, #dee2e6);
+	padding: 0.4rem 0.6rem;
+	text-align: left;
+	vertical-align: top;
+}
+.catalog-table th {
+	background: var(--header-bg, #f8f9fa);
+	font-weight: 600;
+	white-space: nowrap;
+}
+.catalog-table tr:nth-child(even) td {
+	background: var(--row-alt, #f8f9fa);
+}
+.catalog-type {
+	color: var(--muted, #6c757d);
+	font-size: 0.8rem;
+}
+.catalog-analyses {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+.catalog-analyses li {
+	font-size: 0.82rem;
+	white-space: nowrap;
+}
+.catalog-empty {
+	color: var(--muted, #6c757d);
+	font-style: italic;
+	font-size: 0.82rem;
+}
+.catalog-heading {
+	margin: 0 0 1rem;
+}
+</style>
+
+<p class="back-link"><a href="/">&larr; Home</a></p>
+
+<h2 class="catalog-heading">Dataset catalog</h2>
+
+[% IF catalog_entries.size %]
+<table class="catalog-table">
+	<thead>
+		<tr>
+			<th>File</th>
+			<th>Type</th>
+			<th>Size</th>
+			<th>Last modified</th>
+			<th>Used by</th>
+		</tr>
+	</thead>
+	<tbody>
+	[% FOREACH e IN catalog_entries %]
+		<tr>
+			<td>
+				<a href="/open?path=[% e.path | uri %]">[% e.name | html %]</a>
+			</td>
+			<td class="catalog-type">[% e.type | html %]</td>
+			<td>[% e.size %]</td>
+			<td>[% e.mtime_str | html %]</td>
+			<td>
+				[% IF e.analyses.size %]
+				<ul class="catalog-analyses">
+					[% FOREACH a IN e.analyses %]
+					<li><a href="/a/[% a.id | html %]">[% a.name | html %]</a></li>
+					[% END %]
+				</ul>
+				[% ELSE %]
+				<span class="catalog-empty">Not used</span>
+				[% END %]
+			</td>
+		</tr>
+	[% END %]
+	</tbody>
+</table>
+[% ELSE %]
+<p>No data files found in the configured data directory.</p>
+[% END %]
+
+[%- END -%]

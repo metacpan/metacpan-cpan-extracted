@@ -3,14 +3,14 @@ package File::Slurp::Remote::BrokenDNS;
 
 use strict;
 use warnings;
-use Tie::Function::Examples;
+use Tie::Function::Examples qw(%q_shell);
 use Socket;
 use Sys::Hostname::FQDN qw(fqdn);
 require Exporter;
 
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw($myfqdn %fqdnify);
-our $VERSION = 0.47;
+our $VERSION = '0.48';
 
 our %cache;
 our $myfqdn;
@@ -23,7 +23,8 @@ if ($ENV{BROKEN_DNS_WORKAROUND}) {
 		sub {
 			my ($host) = @_;
 			return $cache{$host} if $cache{$host};
-			my $hn = `ssh -o StrictHostKeyChecking=no $host -n hostname`;
+			return $host if $host =~ /^-/;
+			my $hn = `ssh -o StrictHostKeyChecking=no -n $q_shell{$host} hostname`;
 			chomp($hn);
 			return $cache{$host} = $hn;
 		};
@@ -45,8 +46,6 @@ if ($ENV{BROKEN_DNS_WORKAROUND}) {
 1;
 
 __END__
-
-1;
 
 =head1 NAME
 

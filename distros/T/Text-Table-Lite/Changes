@@ -1,5 +1,10 @@
 Revision history for Text::Table::Lite
 
+1.03  2026-10-20
+    - 增加中文说明
+    - 修改pod中的显示bug
+	- 核心代码无改动
+
 1.002  2026-10-20
     - Rename distribution and module to Text::Table::Lite.
     - Replace input_encoding/output_encoding with one encoding option.

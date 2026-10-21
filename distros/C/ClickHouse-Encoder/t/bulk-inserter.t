@@ -94,7 +94,7 @@ use ClickHouse::Encoder;
     is($bi->sent_rows, 5, 'exact-batch: 5 rows accounted for');
 }
 
-# Live INSERT against 127.0.0.1:18123 if reachable
+# Live insert against 127.0.0.1:18123 if reachable
 SKIP: {
     require HTTP::Tiny;
     my $http = HTTP::Tiny->new(timeout => 1);

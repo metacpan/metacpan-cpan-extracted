@@ -311,6 +311,34 @@ first_clear(self)
   OUTPUT:
     RETVAL
 
+void
+_set_bits(self, ...)
+    SV *self
+  PREINIT:
+    EXTRACT_BS(self);
+  PPCODE:
+    I32 context = GIMME_V;
+    uint32_t nw = h->hdr->num_words;
+    uint32_t mw = bs_max_words(h);
+    if (nw > mw) nw = mw;
+    uint64_t cap = h->hdr->capacity;
+    UV count = 0;
+    for (uint32_t i = 0; i < nw; i++) {
+        uint64_t word = __atomic_load_n(&h->data[i], __ATOMIC_ACQUIRE);
+        if (i == nw - 1 && cap % 64)
+            word &= ((uint64_t)1 << (cap % 64)) - 1;
+        if (context == G_ARRAY) {
+            EXTEND(SP, bs_popcount(word));
+            while (word) {
+                mPUSHu((UV)i * 64 + __builtin_ctzll(word));
+                word &= word - 1;
+            }
+        } else {
+            count += (UV)bs_popcount(word);
+        }
+    }
+    if (context == G_SCALAR) mXPUSHu(count);
+
 SV *
 path(self)
     SV *self

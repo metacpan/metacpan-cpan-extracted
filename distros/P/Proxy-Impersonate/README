@@ -98,8 +98,8 @@ METHODS
         answer or refuse each one.
 
         $req is a hashref with "method", "url", "headers" (a lowercase-keyed
-        hashref), "body" and "host" (the bare hostname). Modify any of them
-        in place to rewrite the request:
+        hashref), "body" and "host" (the bare hostname). Modify "method",
+        "url", "headers" or "body" in place to rewrite the request:
 
             on_request => sub {
                 my ($req) = @_;
@@ -220,8 +220,8 @@ REQUEST HANDLING LIMITS
     *   A request head over 64KB is closed, which also caps a slow-drip
         head.
 
-    *   A chunked request body gets 411: there is no chunked decoder, since
-        streaming uploads are out of scope.
+    *   A transfer-encoded request body gets 411: streaming uploads are out
+        of scope.
 
     *   A "Content-Length" that is repeated with disagreeing values, or is
         not a plain non-negative integer, gets 400. An identical repeat is
@@ -238,7 +238,7 @@ REQUEST HANDLING LIMITS
     but it is worth knowing before binding it anywhere else.
 
 REQUIREMENTS
-    Curl::Impersonate 0.01 or later, Net::SSLeay, EV.
+    Curl::Impersonate 0.03 or later, Net::SSLeay, EV.
 
 SEE ALSO
     Curl::Impersonate, EV::WebKit

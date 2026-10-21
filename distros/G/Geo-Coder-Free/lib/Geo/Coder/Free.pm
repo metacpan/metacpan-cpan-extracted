@@ -16,6 +16,10 @@ use Object::Configure;
 use Params::Get;
 use Readonly;
 use Scalar::Util;
+# Imported functions are not methods: without this, $obj->croak() and the like
+# would resolve.  The three kept are reached as
+# Geo::Coder::Free::<name> by t/function.t, t/path.t and t/edge_cases.t.
+use namespace::clean -except => [qw(_valid_location _normalize _abbreviate)];
 
 =head1 NAME
 
@@ -23,11 +27,11 @@ Geo::Coder::Free - Geocoding using free, locally-hosted databases
 
 =head1 VERSION
 
-Version 0.48
+Version 0.49
 
 =cut
 
-our $VERSION = '0.48';
+our $VERSION = '0.49';
 
 =encoding utf-8
 
@@ -430,7 +434,7 @@ C<long> and C<lng> come from the value object itself.
 
 =head3 PSEUDOCODE
 
-    if self is not a blessed object → delegate to new()->geocode(@args)
+    if self is not a blessed object -> delegate to new()->geocode(@args)
     normalise @_ into %params
     validate: on_error is 'croak' or 'undef' (croak if not)
     validate: location is not purely numeric; scantext is not purely numeric
@@ -522,8 +526,6 @@ sub geocode {
 			} else {
 				$ignore_words = \%_COMMON_WORDS;
 			}
-
-			my @rc;
 
 			# 3-word window search
 			my @triplets = _find_word_ngrams($scantext, 3, $ignore_words);
@@ -729,7 +731,7 @@ the same handful of places thousands of times costs the handful of lookups.
 
 =head4 input
 
-    # Input schema (Params::Validate::Strict) — values required, options optional
+    # Input schema (Params::Validate::Strict) - values required, options optional
     values   => { type => 'arrayref' }                  # location strings, one per row
     region   => { type => 'scalar', optional => 1 }     # ISO 3166-1 alpha-2 country code hint
     on_error => { type => 'scalar', optional => 1 }     # 'croak' (the default) or 'undef'
@@ -920,7 +922,19 @@ a data set while the process is running.
 
 With a scope - C<OpenAddresses>, C<Local> or C<MaxMind> - only that backend's
 entries go; C<OpenAddresses> covers every OpenAddresses directory this process
-has opened.  Returns true.
+has opened.  A scope that names no backend, such as
+C<clear_miss_cache('Nonsense')>, forgets nothing and is not an error.  Returns
+true.
+
+=head3 API SPECIFICATION
+
+=head4 input
+
+    scope => { type => 'string', optional => 1 }  # OpenAddresses, Local or MaxMind
+
+=head4 output
+
+    { type => 'boolean', value => 1 }
 
 =cut
 
@@ -968,6 +982,28 @@ something that is not a result.  A key a result does not carry comes back
 C<undef> rather than being guessed at, because a plain hash from another
 geocoder has no provenance to report.
 
+=head3 API SPECIFICATION
+
+=head4 input
+
+    point => { type => 'hashref', optional => 1 }  # a result, usually a Geo::Location::Point
+
+=head4 output
+
+    # list context
+    { type => 'array', min => 0, max => 4 }   # dist, backend, confidence, accuracy; or ()
+
+    # scalar context
+    {
+        type   => 'hashref',
+        schema => {
+            dist       => { type => 'string', optional => 1 },
+            backend    => { type => 'string', optional => 1 },
+            confidence => { type => 'number', optional => 1, min => 0, max => 1 },
+            accuracy   => { type => 'string', optional => 1 },
+        },
+    }   # {} when handed something that is not a result
+
 =cut
 
 sub provenance {
@@ -1006,7 +1042,7 @@ OpenAddresses is attempted first when available.
 
 =head4 input
 
-    # Input schema (Params::Validate::Strict) — latlng required
+    # Input schema (Params::Validate::Strict) - latlng required
     latlng => { type => 'scalar' }  # "$lat,$long" comma-separated decimal degrees
     # NOTE: separate lat/lon/long keys are NOT supported at the Geo::Coder::Free
     # (facade) level.  When no OpenAddresses backend is configured, passing
@@ -1264,12 +1300,12 @@ L<http://results.openaddresses.io> into that directory; and
 optionally set C<WHOSONFIRST_HOME> to point to an empty directory and download the data using
 L<https://github.com/nigelhorne/NJH-Snippets/blob/master/bin/wof-clone>.
 The script C<bin/download_databases> (see below) will do those for you.
-You do not need to download the MaxMind data — that is downloaded automatically.
+You do not need to download the MaxMind data - that is downloaded automatically.
 
 You will need to create the database used by C<Geo::Coder::Free>.
 
 Install L<App::csv2sqlite> and L<https://github.com/nigelhorne/NJH-Snippets>.
-Run C<bin/create_sqlite> — this converts the MaxMind "cities" database from CSV to SQLite.
+Run C<bin/create_sqlite> - this converts the MaxMind "cities" database from CSV to SQLite.
 
 To use with MariaDB, set C<MARIADB_SERVER="$hostname;$port"> and
 C<MARIADB_USER="$user;$password"> (TODO: username/password should be asked for interactively).
@@ -1297,7 +1333,7 @@ to parse.
 
 =item 3
 
-Run C<bin/download_databases> — this downloads the Who's On First, OpenAddr, OpenStreetMap,
+Run C<bin/download_databases> - this downloads the Who's On First, OpenAddr, OpenStreetMap,
 and dr5hn databases.
 OpenStreetMap now uses PBF files, so you will need C<apt install osmium-tool> first.
 Check the values of C<OSM_HOME>, C<OPENADDR_HOME>, C<DR5HN_HOME> and C<WHOSONFIRST_HOME>
@@ -1306,7 +1342,7 @@ The C<Makefile.PL> file downloads the MaxMind database automatically, as it is n
 
 =item 4
 
-Run C<bin/create_db> — this creates the database used by C<Geo::Coder::Free> from the data you
+Run C<bin/create_db> - this creates the database used by C<Geo::Coder::Free> from the data you
 have just downloaded.
 The database is called C<openaddr.sql> for historical reasons (before Who's On First was added);
 it actually contains data from all sources above.
@@ -1323,7 +1359,7 @@ L<gedcom|https://github.com/nigelhorne/gedcom> and
 L<ged2site|https://github.com/nigelhorne/ged2site>.
 One of the things these do is check the validity of a family tree, including verifying place-names.
 Of course places do change names and spelling becomes more consistent over the years, but the vast
-majority remain the same — enough to make computerised verification worthwhile.
+majority remain the same - enough to make computerised verification worthwhile.
 
 =head1 BUGS
 

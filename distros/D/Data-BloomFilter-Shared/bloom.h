@@ -115,6 +115,7 @@ typedef struct BfHandle {
     uint64_t     *occ;           /* BF_OCC_WORDS-word slot-occupancy bitmap (trusted layout offset) */
     void         *base;          /* mmap base */
     uint64_t      bits_off;      /* validated bit-array offset, cached: never re-read from the peer-writable header */
+    uint64_t      bits_words;    /* cached bound from the immutable mapping size and bits_off */
     size_t        mmap_size;
     char         *path;          /* backing file path (strdup'd) */
     int           backing_fd;    /* memfd or reopened-fd to close on destroy, -1 for file/anon */
@@ -204,8 +205,8 @@ static inline void bf_recover_stale_lock(BfHandle *h, uint32_t observed_wlock) {
         return;
     /* We now hold the write lock as mypid.  No additional shared state needs
      * repair here (this module has no seqlock); just release the lock. */
-    __atomic_store_n(&hdr->wlock, 0, __ATOMIC_RELEASE);
-    if (__atomic_load_n(&hdr->rwait, __ATOMIC_RELAXED) > 0)
+    __atomic_store_n(&hdr->wlock, 0, __ATOMIC_SEQ_CST);
+    if (__atomic_load_n(&hdr->rwait, __ATOMIC_SEQ_CST) > 0)
         syscall(SYS_futex, &hdr->wlock, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
 }
 
@@ -306,7 +307,7 @@ static inline void bf_recover_after_timeout(BfHandle *h) {
  * SIGKILLed while parked leaves rwait over-counted -> at most a spurious wake
  * (harmless); it can never under-count, so no wakeup is lost. */
 static inline void bf_park(BfHandle *h) {
-    __atomic_add_fetch(&h->hdr->rwait, 1, __ATOMIC_RELAXED);
+    __atomic_add_fetch(&h->hdr->rwait, 1, __ATOMIC_SEQ_CST);
 }
 static inline void bf_unpark(BfHandle *h) {
     __atomic_sub_fetch(&h->hdr->rwait, 1, __ATOMIC_RELAXED);
@@ -329,17 +330,18 @@ static inline void bf_rdepth_inc(BfHandle *h) {
 static inline void bf_rdepth_dec(BfHandle *h) {
     if (h->slotless_held > 0) {
         h->slotless_held--;
-        __atomic_sub_fetch(&h->hdr->slotless_rdepth, 1, __ATOMIC_RELEASE);
+        __atomic_sub_fetch(&h->hdr->slotless_rdepth, 1, __ATOMIC_SEQ_CST);
     } else if (h->my_slot_idx != UINT32_MAX) {
-        __atomic_sub_fetch(&h->reader_slots[h->my_slot_idx].rdepth, 1, __ATOMIC_RELEASE);
+        __atomic_sub_fetch(&h->reader_slots[h->my_slot_idx].rdepth, 1, __ATOMIC_SEQ_CST);
     }
 }
 
 /* Wake a writer that may be draining readers (it waits on drain_seq).  Called
  * after every rdepth decrement so a released read lock lets the writer re-scan
- * promptly instead of waiting out its timeout. */
+ * promptly instead of waiting out its timeout.  SC decrement + gate check
+ * pairs with the writer's SC gate CAS + depth scan. */
 static inline void bf_reader_wake_drain(BfHandle *h) {
-    if (__atomic_load_n(&h->hdr->wlock, __ATOMIC_ACQUIRE) != 0) {
+    if (__atomic_load_n(&h->hdr->wlock, __ATOMIC_SEQ_CST) != 0) {
         __atomic_add_fetch(&h->hdr->drain_seq, 1, __ATOMIC_RELEASE);
         syscall(SYS_futex, &h->hdr->drain_seq, FUTEX_WAKE, 1, NULL, NULL, 0);
     }
@@ -377,7 +379,7 @@ static inline void bf_rwlock_rdlock(BfHandle *h) {
             continue;
         }
         bf_park(h);
-        cur = __atomic_load_n(&hdr->wlock, __ATOMIC_RELAXED);
+        cur = __atomic_load_n(&hdr->wlock, __ATOMIC_SEQ_CST);
         if (cur != 0) {
             long rc = syscall(SYS_futex, &hdr->wlock, FUTEX_WAIT, cur,
                               &bf_lock_timeout, NULL, 0);
@@ -394,7 +396,7 @@ static inline void bf_rwlock_rdlock(BfHandle *h) {
 }
 
 static inline void bf_rwlock_rdunlock(BfHandle *h) {
-    bf_rdepth_dec(h);                 /* RELEASE: drop our entire contribution */
+    bf_rdepth_dec(h);                 /* drop our entire contribution before checking the gate */
     bf_reader_wake_drain(h);          /* if a writer is draining, wake it to re-scan */
 }
 
@@ -422,7 +424,7 @@ static inline void bf_rwlock_wrlock(BfHandle *h) {
             continue;
         }
         bf_park(h);
-        uint32_t cur = __atomic_load_n(&hdr->wlock, __ATOMIC_RELAXED);
+        uint32_t cur = __atomic_load_n(&hdr->wlock, __ATOMIC_SEQ_CST);
         if (cur != 0) {
             long rc = syscall(SYS_futex, &hdr->wlock, FUTEX_WAIT, cur,
                               &bf_lock_timeout, NULL, 0);
@@ -482,8 +484,9 @@ static inline void bf_rwlock_wrlock(BfHandle *h) {
 
 static inline void bf_rwlock_wrunlock(BfHandle *h) {
     BfHeader *hdr = h->hdr;
-    __atomic_store_n(&hdr->wlock, 0, __ATOMIC_RELEASE);
-    if (__atomic_load_n(&hdr->rwait, __ATOMIC_RELAXED) > 0)
+    /* SC unlock + hint check pairs with a waiter's SC park + gate check. */
+    __atomic_store_n(&hdr->wlock, 0, __ATOMIC_SEQ_CST);
+    if (__atomic_load_n(&hdr->rwait, __ATOMIC_SEQ_CST) > 0)
         syscall(SYS_futex, &hdr->wlock, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
 }
 
@@ -545,18 +548,9 @@ static inline uint64_t *bf_bits(BfHandle *h) {
     return (uint64_t *)((char *)h->base + h->bits_off);
 }
 
-/* Layer B trusted bound: the number of 64-bit words in the bit array that are
- * guaranteed to lie within the real mapping.  Derived from the process-local
- * mmap_size (fixed at attach time, not writable by a peer) and the SAME
- * bits_off that bf_bits() uses, so bits[0 .. bf_bits_words_max()-1] can never
- * fall outside the mapping even if a peer sharing the backing file corrupts the
- * header (m_bits / m_mask / bits_off) after attach-time validation.  For a
- * valid filter this equals m_bits/64 exactly, so every clamp below it is a
- * never-taken branch in normal use. */
+/* Trusted mapping bound, cached at attach time rather than recomputed per item. */
 static inline uint64_t bf_bits_words_max(BfHandle *h) {
-    uint64_t off = h->bits_off;
-    if (off >= h->mmap_size) return 0;
-    return (h->mmap_size - off) / sizeof(uint64_t);
+    return h->bits_words;
 }
 
 static inline BfHandle *bf_setup(void *base, size_t map_size,
@@ -573,6 +567,7 @@ static inline BfHandle *bf_setup(void *base, size_t map_size,
     h->reader_slots = (BfReaderSlot *)((uint8_t *)base + sizeof(BfHeader));  /* trusted layout, not the peer-writable header offset */
     h->occ          = (uint64_t *)((uint8_t *)base + bf_layout().occ);       /* trusted layout offset */
     h->bits_off     = hdr->bits_off;   /* single validated read; bound and pointer stay consistent */
+    h->bits_words   = h->bits_off < map_size ? (map_size - h->bits_off) / sizeof(uint64_t) : 0;
     h->mmap_size    = map_size;
     h->path         = path ? strdup(path) : NULL;
     h->backing_fd   = backing_fd;
@@ -611,10 +606,11 @@ static int bf_validate_create_args(uint64_t capacity, double fp_rate,
     if (kl > BF_MAX_K) kl = BF_MAX_K;
     uint32_t k = (uint32_t)kl;
 
-    /* m_opt = ceil(capacity * k / ln2); reject if it would exceed the bit-array
-     * cap (otherwise the filter would be silently undersized -> fp_rate broken);
-     * m_bits = next_pow2(m_opt), floor BF_MIN_BITS. */
+    /* Keep the existing sizing floor, but meet the target when rounding k down. */
     double m_opt_d = ceil((double)capacity * (double)k / M_LN2);
+    double m_target = ceil(-((double)capacity * (double)k) /
+                           log1p(-pow(fp_rate, 1.0 / (double)k)));
+    if (m_target > m_opt_d) m_opt_d = m_target;
     if (m_opt_d > (double)BF_MAX_BITS) { BF_ERR("capacity too large for the bit-array cap"); return 0; }
     uint64_t m_bits = bf_next_pow2_u64((uint64_t)m_opt_d);
 
@@ -703,16 +699,45 @@ static BfHandle *bf_create(const char *path, uint64_t capacity, double fp_rate, 
             BF_ERR("%s: file too small (%lld)", path, (long long)st.st_size);
             flock(fd, LOCK_UN); close(fd); return NULL;
         }
-        if (is_new && (st.st_uid != geteuid() || fchmod(fd, mode) < 0)) {
+        int initialize = is_new;
+        if (!is_new) {
+            BfHeader disk_hdr;
+            ssize_t n;
+            do n = pread(fd, &disk_hdr, sizeof disk_hdr, 0); while (n < 0 && errno == EINTR);
+            if (n != (ssize_t)sizeof disk_hdr) {
+                BF_ERR("%s: cannot read Bloom filter header", path);
+                flock(fd, LOCK_UN); close(fd); return NULL;
+            }
+            if (!bf_validate_header(&disk_hdr, (uint64_t)st.st_size)) {
+                if (disk_hdr.magic == 0 && (uint64_t)st.st_size == total && st.st_uid == geteuid()) {
+                    if (!bf_file_is_zero(fd, (uint64_t)st.st_size)) {
+                        BF_ERR("%s: incomplete Bloom filter file left by an interrupted create; remove it and retry", path);
+                        flock(fd, LOCK_UN); close(fd); return NULL;
+                    }
+                    initialize = 1;
+                } else {
+                    BF_ERR("invalid Bloom filter file");
+                    flock(fd, LOCK_UN); close(fd); return NULL;
+                }
+            } else if (disk_hdr.sealed) {
+                BF_ERR("%s is frozen (read-only); open it with new_readonly", path);
+                flock(fd, LOCK_UN); close(fd); return NULL;
+            }
+        }
+        if (initialize && st.st_uid != geteuid()) {
             BF_ERR("%s: refusing to initialize file not owned by us", path);
+            flock(fd, LOCK_UN); close(fd); return NULL;
+        }
+        if (initialize && fchmod(fd, mode) < 0) {
+            BF_ERR("%s: fchmod: %s", path, strerror(errno));
             flock(fd, LOCK_UN); close(fd); return NULL;
         }
         if (is_new && ftruncate(fd, (off_t)total) < 0) {
             BF_ERR("ftruncate: %s", strerror(errno)); flock(fd, LOCK_UN); close(fd); return NULL;
         }
-        if (is_new && bf_reserve(fd, total) < 0) {
+        if (initialize && bf_reserve(fd, total) < 0) {
             BF_ERR("%s: cannot reserve %llu bytes: %s", path, (unsigned long long)total, strerror(errno));
-            if (ftruncate(fd, 0) < 0) { /* best effort */ }
+            if (is_new && ftruncate(fd, 0) < 0) { /* best effort */ }
             flock(fd, LOCK_UN); close(fd); return NULL;
         }
         map_size = is_new ? (size_t)total : (size_t)st.st_size;
@@ -722,39 +747,7 @@ static BfHandle *bf_create(const char *path, uint64_t capacity, double fp_rate, 
             if (is_new && ftruncate(fd, 0) < 0) { /* best effort */ }
             flock(fd, LOCK_UN); close(fd); return NULL;
         }
-        if (!is_new) {
-            if (!bf_validate_header((BfHeader *)base, (uint64_t)st.st_size)) {
-                /* Recover an abandoned mid-init file: a creator killed
-                 * between the ftruncate and the header init leaves a
-                 * full-size, all-zero (magic==0) file that would brick every
-                 * future open of this path.  Re-initialize ONLY when it is
-                 * exactly our size, still uninitialized, and owned by us;
-                 * anything else still errors. */
-                if (((BfHeader *)base)->magic == 0 && (uint64_t)st.st_size == total
-                    && st.st_uid == geteuid() && bf_file_is_zero(fd, map_size)) {
-                    if (fchmod(fd, mode) < 0) {
-                        BF_ERR("%s: fchmod: %s", path, strerror(errno));
-                        munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
-                    }
-                    if (bf_reserve(fd, total) < 0) {
-                        BF_ERR("%s: cannot reserve %llu bytes: %s", path, (unsigned long long)total, strerror(errno));
-                        munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
-                    }
-                    bf_init_header(base, k, m_bits, capacity, fp_rate, total);
-                    flock(fd, LOCK_UN); close(fd);
-                    return bf_setup(base, map_size, path, -1);
-                }
-                if (((BfHeader *)base)->magic == 0 && (uint64_t)st.st_size == total
-                    && st.st_uid == geteuid()) {
-                    BF_ERR("%s: incomplete Bloom filter file left by an interrupted create; remove it and retry", path);
-                    munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
-                }
-                BF_ERR("invalid Bloom filter file"); munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
-            }
-            if (((BfHeader *)base)->sealed) {
-                BF_ERR("%s is frozen (read-only); open it with new_readonly", path);
-                munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
-            }
+        if (!initialize) {
             flock(fd, LOCK_UN); close(fd);
             return bf_setup(base, map_size, path, -1);
         }
@@ -802,7 +795,7 @@ static BfHandle *bf_open_fd(int fd, char *errbuf) {
     if (!bf_validate_header((BfHeader *)base, (uint64_t)st.st_size)) {
         BF_ERR("invalid Bloom filter table"); munmap(base, ms); return NULL;
     }
-    if (((BfHeader *)base)->sealed) {
+    if (__atomic_load_n(&((BfHeader *)base)->sealed, __ATOMIC_ACQUIRE)) {
         BF_ERR("this Bloom filter is frozen (read-only); open it with new_readonly");
         munmap(base, ms); return NULL;
     }
@@ -835,7 +828,7 @@ static BfHandle *bf_open_readonly(const char *path, char *errbuf) {
     if (!bf_validate_header((BfHeader *)base, (uint64_t)st.st_size)) {
         BF_ERR("%s: invalid Bloom filter file", path); munmap(base, ms); return NULL;
     }
-    if (!((BfHeader *)base)->sealed) {
+    if (!__atomic_load_n(&((BfHeader *)base)->sealed, __ATOMIC_ACQUIRE)) {
         BF_ERR("%s is not frozen: call ->freeze on the producer before opening read-only", path);
         munmap(base, ms); return NULL;
     }
@@ -878,7 +871,7 @@ static inline int bf_msync(BfHandle *h) {
  * read-write reopen is refused. */
 static int bf_freeze(BfHandle *h) {
     bf_rwlock_wrlock(h);
-    h->hdr->sealed = 1;
+    __atomic_store_n(&h->hdr->sealed, 1, __ATOMIC_RELEASE);
     bf_rwlock_wrunlock(h);
     if (h->path || h->backing_fd >= 0) return bf_msync(h);  /* durability for file/memfd-backed */
     return 0;   /* anonymous: the seal lives in shared memory (visible to forks); nothing to flush */

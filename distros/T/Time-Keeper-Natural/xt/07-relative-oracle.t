@@ -118,7 +118,14 @@ my $got = run('ours', @INC);
 # and assumes the direction when it does; 0.01 read the earlier offset.
 my %tie = map { $_ => 1 } grep { defined $got->[$_] && $got->[$_] ne $want->[$_] && $got->[$_] =~ /pass prefer|\bdirection\b/ } 0 .. $#$want;
 note(scalar(keys %tie) . " answers differ by 0.02's rule for a phrase with two meanings");
-my @bad = grep { !$tie{$_} && (!defined $got->[$_] || $got->[$_] ne $want->[$_]) } 0 .. $#$want;
+# 0.02 reads chains 0.01 died on in a spaceless locale, where a piece starts
+# with its direction word ("ในอีก 2 ชั่วโมง และ 30 นาที") or a number word:
+# an answer may differ only that way.
+my %gain = map { $_ => 1 } grep {
+    !$tie{$_} && defined $got->[$_] && $got->[$_] ne $want->[$_] && $want->[$_] =~ /\tdied: / && $got->[$_] !~ /\tdied: /
+} 0 .. $#$want;
+note(scalar(keys %gain) . " texts 0.01 could not read now read");
+my @bad = grep { !$tie{$_} && !$gain{$_} && (!defined $got->[$_] || $got->[$_] ne $want->[$_]) } 0 .. $#$want;
 my %loc = map { (split /\t/)[0] => 1 } @$want;
 my $died = grep { /\tdied: / } @$want;
 ok(@$want > 100000, scalar(@$want) . " texts in " . scalar(keys %loc) . " locales, $died of them refused");

@@ -1,9 +1,11 @@
 use strict;
 use warnings;
 use Test::More;
+use File::Temp qw(tempdir);
 use Data::BitSet::Shared;
 
 plan skip_all => 'AUTHOR_TESTING not set' unless $ENV{AUTHOR_TESTING};
+my $dir = tempdir(CLEANUP => 1);
 
 # Boundary/invalid-argument tests. Each should croak cleanly, not crash.
 
@@ -28,7 +30,7 @@ sub run_child {
 }
 
 # --- path with embedded NUL (Perl may truncate; module may accept/reject) ---
-run_child('embedded NUL path',     sub { Data::BitSet::Shared->new("/tmp/a\x00b.shm", 16) });
+run_child('embedded NUL path',     sub { Data::BitSet::Shared->new("$dir/a\x00b.shm", 16) });
 
 # --- zero capacity ---
 run_child('cap=0',                 sub { Data::BitSet::Shared->new(undef, 0) });

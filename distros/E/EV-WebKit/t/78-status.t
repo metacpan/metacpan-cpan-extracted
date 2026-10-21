@@ -73,15 +73,12 @@ push @steps, sub {
     });
 };
 push @steps, sub {
-    # Port 1 is BLOCKED, not refused, and the two behave differently: the engine
-    # reports a blocked port as a completed load of its own error page (ok true,
-    # status undef), where a genuinely REFUSED connection resolves with an
-    # error. This step keeps the blocked case, because status must say "no
-    # response" for it; the refused case is the step below, and asserting the
-    # blocked behaviour of BOTH is what made the POD's claim look verified.
+    # WebKit versions differ on whether a blocked port fails or loads an error
+    # page. Neither produces an HTTP response.
     $b->go('http://127.0.0.1:1/blocked', sub {
         $g{'blocked.status'} = $b->status;
         $g{'blocked.ok'}     = $_[0];
+        $g{'blocked.err'}    = $_[1];
         $run->();
     });
 };
@@ -125,8 +122,8 @@ is($g{'301.title'}, 'FinalPage', '...and title from the final document');
 # and a caller comparing numerically would read it as falsy-but-defined.
 is($g{'html.status'}, undef, 'load_html has no HTTP status (undef, not 0)');
 is($g{'blocked.status'}, undef, 'a blocked port has no HTTP status');
-is($g{'blocked.ok'}, 1,
-   'a blocked port reports ok=1 -- the engine loads its own error page');
+ok($g{'blocked.ok'} || ($g{'blocked.err'} // '') =~ /^load failed:/,
+   'a blocked port completes with an error page or a load failure');
 
 SKIP: {
     skip 'could not obtain a free port to be refused on', 3 unless $g{'refused.port'};

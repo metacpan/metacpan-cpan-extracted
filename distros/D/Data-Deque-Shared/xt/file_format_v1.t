@@ -5,13 +5,13 @@ use File::Temp qw(tempfile);
 
 use Data::Deque::Shared;
 
-# Fabricate a v1 file — v2 code must reject cleanly.
+# Fabricate a v1 file — current code must reject cleanly.
 # Header layout starts with magic + version (first 8 bytes).
 
 my ($fh, $path) = tempfile(UNLINK => 1, SUFFIX => '.deque');
 # DEQ_MAGIC "DEQ1" = 0x44455131, version field follows.
 # Write bytes matching v1 magic + version=1 + plausible sizes.
-# The point is: v2 code must reject "version != 2" without crashing.
+# The old format must be rejected without crashing.
 my $v1 = pack('V V', 0x44455131, 1);  # magic + v1
 # pad to typical header size
 $v1 .= "\0" x 1024;

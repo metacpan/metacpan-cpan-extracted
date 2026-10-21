@@ -55,7 +55,7 @@ _abi_v3(op, ...)
         char err[256];
         int code = TIME_KEEPER_BAD, have_out = 0, i;
         SV *made = NULL;
-        IV iv[12];
+        int64_t iv[12];
     PPCODE:
         err[0] = '\0';
         if (strEQ(op, "parse_cldr")) {
@@ -92,8 +92,10 @@ _abi_v3(op, ...)
         }
         else if (strEQ(op, "duration")) {
             time_keeper_parts p;
-            p.years = SvIV(ST(1)); p.months = SvIV(ST(2)); p.weeks = SvIV(ST(3)); p.days = SvIV(ST(4));
-            p.hours = SvIV(ST(5)); p.minutes = SvIV(ST(6)); p.seconds = SvIV(ST(7)); p.nanoseconds = SvIV(ST(8));
+            p.years = tk_arg_i64(aTHX_ ST(1), "years"); p.months = tk_arg_i64(aTHX_ ST(2), "months");
+            p.weeks = tk_arg_i64(aTHX_ ST(3), "weeks"); p.days = tk_arg_i64(aTHX_ ST(4), "days");
+            p.hours = tk_arg_i64(aTHX_ ST(5), "hours"); p.minutes = tk_arg_i64(aTHX_ ST(6), "minutes");
+            p.seconds = tk_arg_i64(aTHX_ ST(7), "seconds"); p.nanoseconds = tk_arg_i64(aTHX_ ST(8), "nanoseconds");
             p.end_of_month = (int)SvIV(ST(9));
             made = (t->new_duration_sv)(aTHX_ &p);
             code = made ? TIME_KEEPER_OK : TIME_KEEPER_RANGE;
@@ -102,8 +104,10 @@ _abi_v3(op, ...)
             time_keeper_parts p;
             code = (t->duration_from_sv)(aTHX_ ST(1), &p);
             if (code == TIME_KEEPER_OK)
-                made = newSVpvf("%" IVdf " %" IVdf " %" IVdf " %" IVdf " %" IVdf " %d", (IV)p.months, (IV)p.days,
-                                (IV)p.minutes, (IV)p.seconds, (IV)p.nanoseconds, p.end_of_month);
+                made = newSVpvf("%" SVf " %" SVf " %" SVf " %" SVf " %" SVf " %d",
+                                SVfARG(sv_2mortal(tk_newSVi64(aTHX_ p.months))), SVfARG(sv_2mortal(tk_newSVi64(aTHX_ p.days))),
+                                SVfARG(sv_2mortal(tk_newSVi64(aTHX_ p.minutes))), SVfARG(sv_2mortal(tk_newSVi64(aTHX_ p.seconds))),
+                                SVfARG(sv_2mortal(tk_newSVi64(aTHX_ p.nanoseconds))), p.end_of_month);
         }
         else if (strEQ(op, "locale_code")) {
             const char *c = NULL;
@@ -118,14 +122,14 @@ _abi_v3(op, ...)
             if (code == TIME_KEEPER_OK) {
                 const char *lc = "?";
                 (t->locale_code)(lid, &lc);
-                made = newSVpvf("%d %" IVdf " %s", kind, (IV)days, lc);
+                made = newSVpvf("%d %" SVf " %s", kind, SVfARG(sv_2mortal(tk_newSVi64(aTHX_ days))), lc);
             }
         }
         else if (strEQ(op, "new_date_sv")) {
             HV *st = items > 4 && SvOK(ST(4)) ? gv_stashsv(ST(4), GV_ADD) : NULL;
             STRLEN ll;
             const char *ln = SvPV(ST(3), ll);
-            made = (t->new_date_sv)(aTHX_ (int)SvIV(ST(1)), (int64_t)SvIV(ST(2)), (t->locale_find)(ln, ll), st);
+            made = (t->new_date_sv)(aTHX_ (int)SvIV(ST(1)), tk_arg_i64(aTHX_ ST(2), "days"), (t->locale_find)(ln, ll), st);
             code = made ? TIME_KEEPER_OK : TIME_KEEPER_BAD;
         }
         else if (strEQ(op, "locale_weekend")) {
@@ -149,7 +153,7 @@ _abi_v3(op, ...)
         }
         else {
             for (i = 0; i < 12; i++)
-                iv[i] = items > i + 2 && SvOK(ST(i + 2)) ? SvIV(ST(i + 2)) : 0;
+                iv[i] = items > i + 2 && SvOK(ST(i + 2)) ? tk_arg_i64(aTHX_ ST(i + 2), "an argument") : 0;
             if ((t->from_sv_cal)(aTHX_ ST(1), &in.inst, &in.zone, &in.locale, &in.calendar) != TIME_KEEPER_OK)
                 croak("_abi_v3: not a Time::Keeper value");
             if (strEQ(op, "plus")) {

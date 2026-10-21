@@ -25,9 +25,14 @@
 #define TKN_F_PRE_WS 2
 #define TKN_F_SUF    4
 #define TKN_F_SUF_WS 8
+#define TKN_F_MARK   16
 
-static const char *const tkn_word_keys[] = { "after", "and", "at", "before", "end_of", "last", "of", "on", "range", "skip", "start_of", "weekend" };
-#define TKN_N_WORD_KEYS 12
+#define TKN_SLOT_PERIOD  'p'
+#define TKN_SLOT_N       'n'
+#define TKN_SLOT_WEEKDAY 'w'
+
+static const char *const tkn_word_keys[] = { "after", "alias", "and", "at", "before", "end_of", "last", "nth", "of", "on", "range", "skip", "start_of", "weekend" };
+#define TKN_N_WORD_KEYS 14
 
 /* One character's case fold, as /i compares it, appended to out. */
 static void
@@ -406,6 +411,139 @@ tkn_test_line(pTHX_ const char *s, const char *e, SV **text, SV **want)
     return 0;
 }
 
+static int
+tkn_key_is(SV *key, const char *name)
+{
+    STRLEN n = strlen(name);
+    return SvPOK(key) && SvCUR(key) == n && memEQ(SvPVX(key), name, n);
+}
+
+/* What a table part means in CLDR: a word (tkn_cldr_word) or a field's
+ * name ("Jahr"), or NULL. */
+static SV *
+tkn_cldr_meaning(pTHX_ tkn_lexicon *L, const char *s, const char *e)
+{
+    SV *what = tkn_cldr_word(aTHX_ L, s, e), *part;
+    AV *fr;
+    if (what)
+        return what;
+    part = sv_2mortal(newSVpvn_flags(s, (STRLEN)(e - s), SVf_UTF8));
+    fr = (AV *)sv_2mortal((SV *)newAV());
+    tkn_lookup_k(aTHX_ L, TKN_T_FIELD_NAMES, -1, tkn_key_sv(aTHX_ L, part), fr);
+    if (av_len(fr) >= 0) {
+        SV *fld = tkn_hget(aTHX_ *av_fetch(fr, 0, 0), "field");
+        return sv_2mortal(newSVpvf("the %" SVf " field", SVfARG(fld ? fld : &PL_sv_no)));
+    }
+    return NULL;
+}
+
+/* An alias, "inflected=CLDR phrase": the inflected form's tokens and the
+ * phrase it reads as. In the file's own locale the phrase must be one of
+ * its CLDR words and the inflected form must not be; a locale that borrows
+ * the file (hi-Latn) leaves out an alias that fails either: 0. */
+static int
+tkn_alias_rec(pTHX_ tkn_lexicon *L, SV *file, SV *raw, SV *norm, SV **rec, int own)
+{
+    STRLEN len;
+    const char *b = SvPV_const(raw, len), *eq = (const char *)memchr(b, '=', len);
+    const char *is = b, *ie = eq, *ts = eq ? eq + 1 : NULL, *te = b + len;
+    SV *what, *target;
+    PERL_UNUSED_ARG(norm);
+    if (eq) {
+        tkn_trim_ws(&is, &ie, 1, 1);
+        tkn_trim_ws(&ts, &te, 1, 1);
+    }
+    if (!eq || is >= ie || ts >= te)
+        tkn_carp(aTHX_ "Carp::croak", sv_2mortal(newSVpvf("Time::Keeper::Natural::Words: %" SVf ": the alias '%" SVf "' is not inflected=CLDR phrase",
+              SVfARG(file), SVfARG(raw))));
+    target = sv_2mortal(newSVpvn_flags(ts, (STRLEN)(te - ts), SVf_UTF8));
+    if (!own && (!tkn_cldr_meaning(aTHX_ L, ts, te) || tkn_cldr_meaning(aTHX_ L, is, ie)))
+        return 0;
+    if (!tkn_cldr_meaning(aTHX_ L, ts, te))
+        tkn_carp(aTHX_ "Carp::croak", sv_2mortal(newSVpvf("Time::Keeper::Natural::Words: %" SVf ": the alias '%" SVf "' points at '%" SVf "', which is not a CLDR word in %" SVf,
+              SVfARG(file), SVfARG(raw), SVfARG(target), SVfARG(L->code))));
+    if ((what = tkn_cldr_meaning(aTHX_ L, is, ie)))
+        tkn_carp(aTHX_ "Carp::croak", sv_2mortal(newSVpvf("Time::Keeper::Natural::Words: %" SVf ": the alias '%" SVf "' takes '%" SVf "', a CLDR word in %" SVf " (%" SVf ")",
+              SVfARG(file), SVfARG(raw), SVfARG(sv_2mortal(newSVpvn_flags(is, (STRLEN)(ie - is), SVf_UTF8))), SVfARG(L->code), SVfARG(what))));
+    rec[0] = newSVsv(tkn_normalise(aTHX_ sv_2mortal(newSVpvn_flags(is, (STRLEN)(ie - is), SVf_UTF8)), L->spaceless));
+    rec[1] = newSVsv(raw);
+    rec[2] = newSVsv(tkn_lit(aTHX_ (const U8 *)is, (const U8 *)ie, L->spaceless));
+    rec[3] = newSViv(0);
+    rec[4] = newSVsv(target);
+    rec[5] = newSV(0);
+    rec[6] = newSViv(0);
+    return 1;
+}
+
+/* An nth frame, "{period}の第{n}{weekday}": the literals around the three
+ * slots (four token strings, an empty one where two slots touch) and the
+ * slots' order. */
+static void
+tkn_nth_rec(pTHX_ tkn_lexicon *L, SV *file, SV *raw, SV *norm, SV **rec)
+{
+    static const char *const names[3] = { "{period}", "{n}", "{weekday}" };
+    static const char ids[3] = { TKN_SLOT_PERIOD, TKN_SLOT_N, TKN_SLOT_WEEKDAY };
+    STRLEN len;
+    const char *b = SvPV_const(raw, len), *e = b + len, *p = b, *from = b;
+    AV *lits = newAV();
+    char order[4];
+    int got = 0, seen[3] = { 0, 0, 0 };
+    while (p < e) {
+        int s, hit = -1;
+        for (s = 0; s < 3; s++)
+            if ((STRLEN)(e - p) >= strlen(names[s]) && memEQ(p, names[s], strlen(names[s]))) {
+                hit = s;
+                break;
+            }
+        if (hit < 0) {
+            p++;
+            continue;
+        }
+        if (seen[hit] || got == 3)
+            break;
+        {
+            const char *a = from, *z = p;
+            SV *what;
+            if (!got)
+                tkn_trim_ws(&a, &z, 1, 0);
+            if (tkn_has_nonspace(a, z) && (what = tkn_cldr_word(aTHX_ L, a, z))) {
+                SvREFCNT_dec((SV *)lits);
+                tkn_carp(aTHX_ "Carp::croak", sv_2mortal(newSVpvf("Time::Keeper::Natural::Words: %" SVf ": '%" SVf "' is a CLDR word in %" SVf " (%" SVf "); a table may not take one",
+                      SVfARG(file), SVfARG(raw), SVfARG(L->code), SVfARG(what))));
+            }
+            av_push(lits, newSVsv(tkn_lit(aTHX_ (const U8 *)a, (const U8 *)z, L->spaceless)));
+        }
+        seen[hit] = 1;
+        order[got++] = ids[hit];
+        p += strlen(names[hit]);
+        from = p;
+    }
+    if (got != 3 || p < e) {
+        SvREFCNT_dec((SV *)lits);
+        tkn_carp(aTHX_ "Carp::croak", sv_2mortal(newSVpvf("Time::Keeper::Natural::Words: %" SVf ": the nth '%" SVf "' needs {period}, {n} and {weekday}, each once",
+              SVfARG(file), SVfARG(raw))));
+    }
+    {
+        const char *a = from, *z = e;
+        SV *what;
+        tkn_trim_ws(&a, &z, 0, 1);
+        if (tkn_has_nonspace(a, z) && (what = tkn_cldr_word(aTHX_ L, a, z))) {
+            SvREFCNT_dec((SV *)lits);
+            tkn_carp(aTHX_ "Carp::croak", sv_2mortal(newSVpvf("Time::Keeper::Natural::Words: %" SVf ": '%" SVf "' is a CLDR word in %" SVf " (%" SVf "); a table may not take one",
+                  SVfARG(file), SVfARG(raw), SVfARG(L->code), SVfARG(what))));
+        }
+        av_push(lits, newSVsv(tkn_lit(aTHX_ (const U8 *)a, (const U8 *)z, L->spaceless)));
+    }
+    order[3] = '\0';
+    rec[0] = newSVsv(norm);
+    rec[1] = newSVsv(raw);
+    rec[2] = newRV_noinc((SV *)lits);
+    rec[3] = newSViv(0);
+    rec[4] = newSV(0);
+    rec[5] = newSVpvn(order, 3);
+    rec[6] = newSViv(0);
+}
+
 /* Words->from_file: a table read, checked and compiled. */
 static SV *
 tkn_words_from_file(pTHX_ SV *klass, SV *file, SV *code, SV *forl)
@@ -435,6 +573,9 @@ tkn_words_from_file(pTHX_ SV *klass, SV *file, SV *code, SV *forl)
         STRLEN i;
         p = nl ? nl + 1 : end;
         lineno++;
+        /* a file saved with Windows line ends */
+        if (le > ls && le[-1] == '\r')
+            le--;
         line = sv_2mortal(newSVpvn(ls, (STRLEN)(le - ls)));
         {
             char *f = SvPVX(line);
@@ -469,7 +610,7 @@ tkn_words_from_file(pTHX_ SV *klass, SV *file, SV *code, SV *forl)
                 if ((STRLEN)(ke - ks) == strlen(tkn_word_keys[k]) && memEQ(ks, tkn_word_keys[k], ke - ks))
                     ok = 1;
             if (!ok)
-                tkn_carp(aTHX_ "Carp::croak", sv_2mortal(newSVpvf("Time::Keeper::Natural::Words: %" SVf " line %" IVdf ": '%" SVf "' is not a key; the keys are after, and, at, before, end_of, last, of, on, range, skip, start_of, weekend",
+                tkn_carp(aTHX_ "Carp::croak", sv_2mortal(newSVpvf("Time::Keeper::Natural::Words: %" SVf " line %" IVdf ": '%" SVf "' is not a key; the keys are after, alias, and, at, before, end_of, last, nth, of, on, range, skip, start_of, weekend",
                       SVfARG(file), lineno, SVfARG(sv_2mortal(newSVpvn_flags(ks, (STRLEN)(ke - ks), SVf_UTF8))))));
         }
         key = sv_2mortal(newSVpvn(ks, (STRLEN)(ke - ks)));
@@ -487,13 +628,27 @@ tkn_words_from_file(pTHX_ SV *klass, SV *file, SV *code, SV *forl)
             while (r <= le) {
                 const char *bar = (const char *)memchr(r, '|', (size_t)(le - r)), *re = bar ? bar : le;
                 const char *rs = r, *rend = re, *z;
-                SV *raw, *norm, *sk, *rec[7];
+                SV *raw, *spelt, *norm, *sk, *rec[7];
+                int marked;
                 AV *ph;
                 int k;
                 r = bar ? bar + 1 : le + 1;
                 tkn_trim_ws(&rs, &rend, 1, 1);
                 if (rs >= rend)
                     continue;
+                spelt = sv_2mortal(newSVpvn_flags(rs, (STRLEN)(rend - rs), SVf_UTF8));
+                marked = 0;
+                if (rend[-1] == '!' && !tkn_key_is(key, "alias")) {
+                    if (!(tkn_key_is(key, "at") || tkn_key_is(key, "on") || tkn_key_is(key, "of") || tkn_key_is(key, "start_of")
+                          || tkn_key_is(key, "end_of")))
+                        tkn_carp(aTHX_ "Carp::croak", sv_2mortal(newSVpvf("Time::Keeper::Natural::Words: %" SVf ": '%" SVf "' is marked, and only at, on, of, start_of and end_of may be",
+                              SVfARG(file), SVfARG(spelt))));
+                    marked = 1;
+                    rend--;
+                    tkn_trim_ws(&rs, &rend, 0, 1);
+                    if (rs >= rend)
+                        continue;
+                }
                 raw = sv_2mortal(newSVpvn_flags(rs, (STRLEN)(rend - rs), SVf_UTF8));
                 norm = tkn_normalise(aTHX_ raw, L->spaceless);
                 sk = sv_2mortal(newSVsv(key));
@@ -505,7 +660,13 @@ tkn_words_from_file(pTHX_ SV *klass, SV *file, SV *code, SV *forl)
                 for (z = rs; z + 3 <= rend; z++)
                     if (memEQ(z, "{0}", 3))
                         break;
-                if ((SvCUR(key) == 5 && memEQ(SvPVX(key), "range", 5)) || (SvCUR(key) == 5 && memEQ(SvPVX(key), "after", 5))
+                if (tkn_key_is(key, "alias")) {
+                    if (!tkn_alias_rec(aTHX_ L, file, raw, norm, rec, sv_eq(L->code, code)))
+                        continue;
+                }
+                else if (tkn_key_is(key, "nth"))
+                    tkn_nth_rec(aTHX_ L, file, raw, norm, rec);
+                else if ((SvCUR(key) == 5 && memEQ(SvPVX(key), "range", 5)) || (SvCUR(key) == 5 && memEQ(SvPVX(key), "after", 5))
                     || (SvCUR(key) == 6 && memEQ(SvPVX(key), "before", 6))) {
                     /* A range, text before {0}, between {0} and {1}, after {1};
                        after and before the same, a duration in {0} and a point
@@ -561,7 +722,7 @@ tkn_words_from_file(pTHX_ SV *klass, SV *file, SV *code, SV *forl)
                         what = tkn_cldr_word(aTHX_ L, ps, pe);
                     if (!what && has0 && tkn_has_nonspace(ss, se))
                         what = tkn_cldr_word(aTHX_ L, ss, se);
-                    if (what)
+                    if (what && !marked)
                         tkn_carp(aTHX_ "Carp::croak", sv_2mortal(newSVpvf("Time::Keeper::Natural::Words: %" SVf ": '%" SVf "' is a CLDR word in %" SVf " (%" SVf "); a table may not take one",
                               SVfARG(file), SVfARG(raw), SVfARG(L->code), SVfARG(what))));
                     {
@@ -604,8 +765,12 @@ tkn_words_from_file(pTHX_ SV *klass, SV *file, SV *code, SV *forl)
                         rec[4] = newSVsv(suf_t);
                         rec[5] = newSVsv(split_t);
                         rec[6] = newSViv(sflags);
+                        if (marked)
+                            SvIV_set(rec[3], SvIV(rec[3]) | TKN_F_MARK);
                     }
                 }
+                if (marked)
+                    sv_setsv(rec[1], spelt);
                 ph = av_make(7, rec);
                 for (k = 0; k < 7; k++)
                     SvREFCNT_dec(rec[k]);

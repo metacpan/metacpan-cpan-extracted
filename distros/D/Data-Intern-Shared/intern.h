@@ -95,7 +95,7 @@ struct SiHeader {
     uint32_t arena_bytes;             /* 16  arena capacity */
     uint32_t count;                   /* 20  interned strings; also the next id to assign */
     uint32_t arena_used;              /* 24  bytes used in the arena */
-    uint32_t _pad0;                   /* 28 */
+    uint32_t clear_pending;           /* 28  finish an interrupted clear during recovery */
     uint64_t total_size;              /* 32 */
     uint64_t reader_slots_off;        /* 40 */
     uint64_t hash_off;                /* 48 */
@@ -226,14 +226,17 @@ static inline int si_pid_alive(uint32_t pid) {
  * CAS to OUR pid to hold the lock while fixing shared state, then release.
  * Using our pid (not a bare WRITER_BIT sentinel) means a subsequent recovering
  * process can detect and re-recover if we crash mid-recovery. */
+static inline void si_clear_locked(SiHandle *h);
+
 static inline void si_recover_stale_lock(SiHandle *h, uint32_t observed_wlock) {
     SiHeader *hdr = h->hdr;
     uint32_t mypid = SI_RWLOCK_WR((uint32_t)getpid());
     if (!__atomic_compare_exchange_n(&hdr->wlock, &observed_wlock,
             mypid, 0, __ATOMIC_ACQUIRE, __ATOMIC_RELAXED))
         return;
-    /* We now hold the write lock as mypid.  No additional shared state needs
-     * repair here (this module has no seqlock); just release the lock. */
+    /* clear_pending is set only after readers have drained. */
+    if (__atomic_load_n(&hdr->clear_pending, __ATOMIC_ACQUIRE))
+        si_clear_locked(h);
     __atomic_store_n(&hdr->wlock, 0, __ATOMIC_RELEASE);
     if (__atomic_load_n(&hdr->rwait, __ATOMIC_RELAXED) > 0)
         syscall(SYS_futex, &hdr->wlock, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
@@ -756,7 +759,7 @@ static SiHandle *si_create(const char *path, uint32_t max_strings, uint32_t aren
                 }
                 SI_ERR("invalid intern file"); munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
             }
-            if (((SiHeader *)base)->sealed) {
+            if (__atomic_load_n(&((SiHeader *)base)->sealed, __ATOMIC_ACQUIRE)) {
                 SI_ERR("%s is frozen (read-only); open it with new_readonly", path);
                 munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
             }
@@ -806,7 +809,7 @@ static SiHandle *si_open_fd(int fd, char *errbuf) {
     if (!si_validate_header((SiHeader *)base, (uint64_t)st.st_size)) {
         SI_ERR("invalid intern table"); munmap(base, ms); return NULL;
     }
-    if (((SiHeader *)base)->sealed) {
+    if (__atomic_load_n(&((SiHeader *)base)->sealed, __ATOMIC_ACQUIRE)) {
         SI_ERR("this intern table is frozen (read-only); open it with new_readonly");
         munmap(base, ms); return NULL;
     }
@@ -839,7 +842,7 @@ static SiHandle *si_open_readonly(const char *path, char *errbuf) {
     if (!si_validate_header((SiHeader *)base, (uint64_t)st.st_size)) {
         SI_ERR("%s: invalid intern file", path); munmap(base, ms); return NULL;
     }
-    if (!((SiHeader *)base)->sealed) {
+    if (!__atomic_load_n(&((SiHeader *)base)->sealed, __ATOMIC_ACQUIRE)) {
         SI_ERR("%s is not frozen: call ->freeze on the producer before opening read-only", path);
         munmap(base, ms); return NULL;
     }
@@ -882,7 +885,7 @@ static inline int si_msync(SiHandle *h) {
  * and a read-write reopen is refused. */
 static int si_freeze(SiHandle *h) {
     si_rwlock_wrlock(h);
-    h->hdr->sealed = 1;
+    __atomic_store_n(&h->hdr->sealed, 1, __ATOMIC_RELEASE);
     si_rwlock_wrunlock(h);
     if (h->path || h->backing_fd >= 0) return si_msync(h);  /* durability for file/memfd-backed */
     return 0;   /* anonymous: the seal lives in shared memory (visible to forks); nothing to flush */
@@ -895,10 +898,12 @@ static int si_freeze(SiHandle *h) {
 /* reset to empty (caller holds the write lock) */
 static inline void si_clear_locked(SiHandle *h) {
     SiHeader *hdr = h->hdr;
+    __atomic_store_n(&hdr->clear_pending, 1, __ATOMIC_RELAXED);
+    __atomic_thread_fence(__ATOMIC_RELEASE);
     hdr->count      = 0;
     hdr->arena_used = 0;
-    __atomic_signal_fence(__ATOMIC_SEQ_CST);
     memset(h->slots, 0, (size_t)h->hash_slots * sizeof(SiSlot));  /* cached geometry, not peer-writable hdr->hash_slots */
+    __atomic_store_n(&hdr->clear_pending, 0, __ATOMIC_RELEASE);
 }
 
 /* the string record at arena offset `off`: sets *len, returns a pointer to the

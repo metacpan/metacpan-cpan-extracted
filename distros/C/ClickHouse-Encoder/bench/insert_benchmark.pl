@@ -90,7 +90,7 @@ sub bench_insert {
 }
 
 print "\n", "=" x 60, "\n";
-print "INSERT Benchmark (into Null engine - measures parsing speed)\n";
+print "insert Benchmark (into Null engine - measures parsing speed)\n";
 print "=" x 60, "\n\n";
 
 # Warmup
@@ -138,7 +138,7 @@ printf "  throughput: %.0f rows/sec, %.2f MB/sec\n",
 
 my $speedup = $csv_avg / $native_avg;
 printf "\n", "=" x 60, "\n";
-printf "Native is %.2fx faster than CSV for ClickHouse INSERT\n", $speedup;
+printf "Native is %.2fx faster than CSV for ClickHouse insert\n", $speedup;
 print "=" x 60, "\n";
 
 # Now test with real table (MergeTree) to include write overhead

@@ -204,8 +204,7 @@ patterns(self)
         I32 i, n;
     PPCODE:
         L = tkn_lex(aTHX_ self);
-        if (!L->patterns)
-            L->patterns = tkn_patterns_build(aTHX_ L);
+        tkn_patterns_of(aTHX_ L);
         n = av_len(L->patterns) + 1;
         SP = PL_stack_base + ax - 1;
         if (GIMME_V == G_SCALAR) {

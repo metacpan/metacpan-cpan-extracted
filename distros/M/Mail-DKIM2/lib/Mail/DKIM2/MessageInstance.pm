@@ -2,7 +2,7 @@ package Mail::DKIM2::MessageInstance;
 use strict;
 use warnings;
 
-our $VERSION = '0.25';
+our $VERSION = '0.27';
 
 
 use Mail::DKIM2::Digest;
@@ -157,14 +157,30 @@ sub body_digest_raw {
     my $bref = defined $_[0] ? \$_[0] : \'';
     my $alg = lc($_[1] // 'sha256');
     my $d = Mail::DKIM2::Digest->new($alg);    # croaks on an unknown $alg
+    _body_digest_feed([$d], $bref, 1);
+    return encode_base64($d->digest, '');
+}
+
+# Add the body text in $$bref to each of @$digests, canonicalised as
+# body_digest_raw does. With $final it is the rest of the body: its trailing
+# line breaks are dropped and the closing CRLF added. Without, it stops
+# short of any CR and LF at the end, which may yet be the body's trailing
+# line breaks, and returns the length it took; the caller keeps the rest for
+# the next call. Mail::DKIM2::BodyHasher streams a body through this.
+sub _body_digest_feed {
+    my ($digests, $bref, $final) = @_;
     my $len = length $$bref;
 
     # $end: the body without its trailing line breaks, each a LF with an
     # optional CR before it, taken from the end.
     my $end = $len;
-    while ($end > 0 && substr($$bref, $end - 1, 1) eq "\n") {
-        $end--;
-        $end-- if $end > 0 && substr($$bref, $end - 1, 1) eq "\r";
+    if ($final) {
+        while ($end > 0 && substr($$bref, $end - 1, 1) eq "\n") {
+            $end--;
+            $end-- if $end > 0 && substr($$bref, $end - 1, 1) eq "\r";
+        }
+    } else {
+        $end-- while $end > 0 && substr($$bref, $end - 1, 1) =~ /[\r\n]/;
     }
 
     for (my $pos = 0; $pos < $end; ) {
@@ -178,11 +194,13 @@ sub body_digest_raw {
         my $piece = substr($$bref, $pos, $n);
         $piece =~ s/\r\n/\n/g if index($piece, "\r") >= 0;
         $piece =~ s/\n/\r\n/g;
-        $d->add($piece);
+        $_->add($piece) for @$digests;
         $pos += $n;
     }
-    $d->add("\r\n");
-    return encode_base64($d->digest, '');
+    if ($final) {
+        $_->add("\r\n") for @$digests;
+    }
+    return $end;
 }
 
 # Mark the body Recipe as null per -07 §5.2: the body changed but the

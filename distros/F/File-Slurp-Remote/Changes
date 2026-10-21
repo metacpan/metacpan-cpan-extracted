@@ -1,5 +1,23 @@
 Revision history for File-Slurp-Remote
 
+0.48	Tue Oct 20 08:58:36 PM EDT 2026
+	[ Enhancements ]
+	- Allow the remote user name to be given as user@host, as scp does
+	- Refuse hosts and user names beginning with '-' so they can't be taken as ssh options
+	- user@host is split at the last @, as ssh does, and the user is passed with ssh -l
+	- Paths may contain colons: the host ends at the first colon before any slash, as with scp
+	[ Bug Fixes ]
+	- Paths like ./a:b are now treated as local files
+	- Quote the host name in the BROKEN_DNS_WORKAROUND ssh call
+	- CanonicalHostnames: add $VERSION, fix POD errors
+	- Remove unused temporary directory created on load
+	- Document that $File::Slurp::Remote::scp is unused
+	[ Packaging ]
+	- Declare core, test and minimum perl dependencies; add LICENSE and repository metadata
+	[ Testing ]
+	- Add t/remote_user.t, which doesn't need ssh access to localhost
+	- Add POD and POD coverage author tests, run in CI
+
 0.47	Sat Oct 10 09:36:13 PM EDT 2026
 	[ Bug Fixes ]
 	- Add missing 'package File::Slurp::Remote' so PAUSE can index the distribution

@@ -29,4 +29,20 @@ START_MY_CXT
 #define SvNV_nomg(sv) (SvNOK(sv) ? SvNVX(sv) : sv_2nv(sv))
 #endif
 
+/* mPUSHs and newSVpvn_flags came in perl 5.10.1; the floor is 5.10.0. */
+#ifndef mPUSHs
+#define mPUSHs(s) PUSHs(sv_2mortal(s))
+#endif
+#ifndef newSVpvn_flags
+static SV *
+tks_newSVpvn_flags(pTHX_ const char *s, STRLEN len, U32 flags)
+{
+    SV *sv = newSVpvn(s, len);
+    if (flags & SVf_UTF8)
+        SvUTF8_on(sv);
+    return (flags & SVs_TEMP) ? sv_2mortal(sv) : sv;
+}
+#define newSVpvn_flags(s, len, flags) tks_newSVpvn_flags(aTHX_ (s), (len), (flags))
+#endif
+
 #endif

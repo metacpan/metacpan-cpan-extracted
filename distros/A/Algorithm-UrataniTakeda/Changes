@@ -1,5 +1,18 @@
 Revision history for Algorithm-UrataniTakeda:
 
+v0.1.7    2026-10-20 20:48:11+01:00 Europe/London
+  [Security]
+  - Limit the size of the failure shift table. (CVE-2026-113811)
+
+  [Enhancements]
+  - Improve the performance of the shift2 table builder.
+
+  [Bug Fixes]
+  - Find matches of "0".
+
+  [Tests]
+  - Added a test case to prove that duplicate keywords do not return duplicate results.
+
 v0.1.6    2026-08-31 11:56:31+01:00 Europe/London
   [Enhancements]
   - Allowed the constructor to simply contain an array reference of patterns.

@@ -5,6 +5,20 @@
 
 #include "scalar_kind.h"
 
+SV **fetch_named_value(pTHX_ HV *hv, const char *name, STRLEN len) {
+    SV **value = hv_fetch(hv, name, (I32)len, 0);
+    if (!value && len && is_utf8_string((const U8 *)name, len))
+        value = hv_fetch(hv, name, -(I32)len, 0);
+    return value;
+}
+
+const char *hash_key_bytes(pTHX_ HE *he, STRLEN *len) {
+    if (HeKLEN(he) == HEf_SVKEY) return SvPV(HeKEY_sv(he), *len);
+    if (HeKWASUTF8(he)) return SvPVutf8(hv_iterkeysv(he), *len);
+    *len = (STRLEN)HeKLEN(he);
+    return HeKEY(he);
+}
+
 int looks_stringy(SV *val) {
     return SvOK(val) && SvPOK(val) && !SvIOK(val) && !SvNOK(val);
 }

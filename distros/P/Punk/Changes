@@ -1,5 +1,9 @@
 Revision history for Punk
 
+0.63    2026-10-21
+        - Requires Hyperman 0.64: on 0.60 to 0.63 a WebSocket's first
+          message over HTTP/2 was lost (t/1014 on Linux smokers).
+
 0.62    2026-10-19
         - markdown: front matter reaches the templates as `meta`.
         - markdown: the shipped wrapper writes description, canonical,

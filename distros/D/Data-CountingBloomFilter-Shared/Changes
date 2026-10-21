@@ -1,5 +1,10 @@
 Revision history for Data-CountingBloomFilter-Shared
 
+0.05  2026-10-16
+    - Fix shared-lock wakeups and frozen-data publication.
+    - Improve portability of concurrent access.
+    - Clarify crash-recovery and process-sharing limits.
+
 0.04      2026-09-26
           - DATA_COUNTINGBLOOMFILTER_SHARED_SPARSE=0 reserves segments up
             front: a full filesystem fails the constructor.

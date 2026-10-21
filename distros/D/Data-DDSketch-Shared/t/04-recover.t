@@ -26,7 +26,7 @@ unlink $p;
     my $d = eval { Data::DDSketch::Shared->new($p, $alpha, $num_buckets) };
     ok($d, "new() recovers an abandoned mid-init file instead of bricking") or diag $@;
   SKIP: {
-        skip "no handle", 6 unless $d;
+        skip "no handle", 8 unless $d;
         is($d->count, 0, "recovered sketch starts empty (count==0, no stale data)");
         ok(!defined($d->quantile(0.5)), "recovered empty sketch has no quantile");
         ok(!defined($d->min), "recovered empty sketch has no min");

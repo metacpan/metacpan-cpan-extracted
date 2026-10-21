@@ -38,16 +38,16 @@ DESCRIPTION
     install and the library is compiled at install time. See "SYSTEM
     REQUIREMENTS", because that build is neither short nor dependency-free.
 
-    The pinned version is v2.2.2, built from
+    The pinned version is v2.3.0, built from
     <https://github.com/lexiforest/curl-impersonate> itself. It is an exact
     tag rather than the newest one: upstream 2.0.0 replaced autotools with a
     CMake superbuild, and the target names this library is asked for are
     load-bearing in whatever links it, so neither is left to float.
 
 SYSTEM REQUIREMENTS
-    curl-impersonate statically builds BoringSSL, zlib, zstd, brotli,
-    nghttp2 and ngtcp2 alongside curl itself. That needs, on top of a C and
-    C++ compiler:
+    curl-impersonate statically builds BoringSSL, c-ares, zlib, zstd,
+    brotli, nghttp2 and ngtcp2 alongside curl itself. That needs, on top of
+    a C and C++ compiler:
 
     *   "git" -- the source is fetched by cloning the upstream repository
 

@@ -1,9 +1,9 @@
 #!/usr/bin/env perl
 # Lock-free SPSC ring buffer (single producer, single consumer)
 #
-# Head/tail indices in I64 (atomic), payload in F32.
-# Producer: write at tail, atomic incr tail.
-# Consumer: read from head up to tail, atomic store head.
+# Head/tail indices in I64, payload in F32; successful CAS orders publication.
+# Producer: write at tail, release-publish tail.
+# Consumer: acquire tail, read payload, release-publish head.
 # No locks, no syscalls on the fast path.
 use strict;
 use warnings;
@@ -25,13 +25,18 @@ my $ctl = Data::Buffer::Shared::I64->new_anon(2);
 my $pid = fork();
 if ($pid == 0) {
     # === PRODUCER ===
+    my $tail = 0;
     for my $i (1..$total_items) {
-        # spin until there's space (tail - head < ring_size)
-        while ($ctl->get(1) - $ctl->get(0) >= $ring_size) {}
+        while (1) {
+            my $head = $ctl->get(0);
+            next if $tail - $head >= $ring_size;
+            last if $ctl->cas(0, $head, $head);
+        }
 
-        my $pos = $ctl->get(1) & $mask;
+        my $pos = $tail & $mask;
         $ring->set($pos, $i * 0.001);
-        $ctl->incr(1);  # atomic publish
+        $ctl->cas(1, $tail, $tail + 1) or die 'tail changed unexpectedly';
+        $tail++;
     }
     _exit(0);
 }
@@ -40,11 +45,13 @@ if ($pid == 0) {
 my $consumed = 0;
 my $sum = 0.0;
 my $t0 = time();
+my $head = 0;
+my $published_head = 0;
 
 while ($consumed < $total_items) {
-    my $head = $ctl->get(0);
     my $tail = $ctl->get(1);
     next if $head >= $tail;  # nothing to read
+    next unless $ctl->cas(1, $tail, $tail);
 
     # batch consume all available
     while ($head < $tail) {
@@ -53,7 +60,8 @@ while ($consumed < $total_items) {
         $head++;
         $consumed++;
     }
-    $ctl->set(0, $head);  # atomic advance head
+    $ctl->cas(0, $published_head, $head) or die 'head changed unexpectedly';
+    $published_head = $head;
 }
 waitpid($pid, 0);
 my $elapsed = time() - $t0;

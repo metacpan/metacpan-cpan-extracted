@@ -14,6 +14,8 @@ t/61-http-method.t
 t/62-multi-safety.t
 t/63-redirect.t
 t/64-proxy-url.t
+t/65-head.t
+t/66-stream-errors.t
 xt/20-fingerprint.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

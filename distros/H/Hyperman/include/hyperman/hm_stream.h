@@ -254,6 +254,24 @@ static int hm_stream_h2_reset(pTHX_ hm_conn *c, int64_t sid) {
     return 1;
 }
 
+/* What an Extended CONNECT stream was sent before its read half existed.
+ * Requests are dispatched after nghttp2_session_mem_recv returns, so a DATA
+ * frame read in the same burst as the CONNECT headers is parsed first, and
+ * with no handle to take it, it was buffered as the request body. Handed
+ * over, owned by the caller, and the stream forgets it. Not while the
+ * stream's handler is still running: it has not wired its events yet, and
+ * hm_h2_dispatch hands the bytes over when it returns. */
+static SV *hm_stream_h2_take_early(pTHX_ hm_conn *c, int64_t sid) {
+    hm_h2_stream *st = hm_stream_h2_st(c, sid);
+    SV *b;
+    PERL_UNUSED_CONTEXT;
+    if (!st || !st->tunnel || st->in_app
+        || !st->body || !SvCUR(st->body)) return NULL;
+    b = st->body;
+    st->body = NULL;
+    return b;
+}
+
 #else  /* !HM_HAVE_NGHTTP2: there is no h2 transport to branch to */
 
 static int hm_stream_h2_begin(pTHX_ hm_conn *c, int64_t sid, int status,
@@ -272,6 +290,11 @@ static int hm_stream_h2_reset(pTHX_ hm_conn *c, int64_t sid) {
     PERL_UNUSED_CONTEXT;
     (void)c; (void)sid;
     return 0;
+}
+static SV *hm_stream_h2_take_early(pTHX_ hm_conn *c, int64_t sid) {
+    PERL_UNUSED_CONTEXT;
+    (void)c; (void)sid;
+    return NULL;
 }
 static size_t hm_stream_h2_held(hm_conn *c, int64_t sid) {
     (void)c; (void)sid;
@@ -472,6 +495,18 @@ static int hm_stream_on_data(pTHX_ void *h, hm_abi_stream_data_cb cb, void *ud) 
             size_t n = c->rlen;
             c->rlen = 0;
             cb(aTHX_ (void *)s, c->rbuf, n, 0, ud);
+        }
+    }
+    /* The h2 counterpart of tunnel == 1: a handle opened after the handler
+     * returned (it parked on a Future) takes what the stream was sent
+     * before it. A handle opened inside the handler gets its bytes from
+     * hm_h2_dispatch once the handler has returned. */
+    else if (cb && s->kind == HM_STREAM_H2 && !s->dead) {
+        hm_conn *c = hm_stream_conn(s);
+        SV *b = c ? hm_stream_h2_take_early(aTHX_ c, s->sid) : NULL;
+        if (b) {
+            cb(aTHX_ (void *)s, SvPVX(b), SvCUR(b), 0, ud);
+            SvREFCNT_dec(b);
         }
     }
     return HM_ABI_STREAM_OK;

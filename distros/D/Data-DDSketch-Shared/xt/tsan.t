@@ -11,7 +11,7 @@ plan skip_all => 'libtsan not found' unless $tsan_lib && -f $tsan_lib;
 plan skip_all => 'set TSAN=1 to run' unless $ENV{TSAN};
 
 my $build = `make clean 2>/dev/null; perl Makefile.PL OPTIMIZE='-O1 -g -fsanitize=thread -fno-omit-frame-pointer' 2>&1 && make 2>&1`;
-like $build, qr/Shared\.o/, 'TSan build succeeded'
+is $?, 0, 'TSan build succeeded'
     or BAIL_OUT("TSan build failed:\n$build");
 
 my @tests = sort glob("t/*.t");
@@ -23,6 +23,7 @@ for my $t (@tests) {
 }
 
 diag "rebuilding without TSan...";
-`make clean 2>/dev/null; perl Makefile.PL 2>&1 && make 2>&1`;
+my $restore = `make clean 2>/dev/null; perl Makefile.PL 2>&1 && make 2>&1`;
+is $?, 0, 'restored normal build' or diag $restore;
 
 done_testing;

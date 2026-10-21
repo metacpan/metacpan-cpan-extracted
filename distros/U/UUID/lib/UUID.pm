@@ -10,7 +10,7 @@ require DynaLoader;
 use vars qw(@ISA %EXPORT_TAGS @EXPORT_OK $VERSION);
 @ISA = qw(DynaLoader);
 
-$VERSION = '0.39';
+$VERSION = '0.40';
 
 %EXPORT_TAGS = (
     'all' => [qw(
@@ -622,6 +622,8 @@ Petr Pisar
 Kurt Starsinic
 
 Matt Martini
+
+Chad Granum
 
 =head1 SEE ALSO
 

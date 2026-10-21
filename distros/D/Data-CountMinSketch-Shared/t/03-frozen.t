@@ -2,6 +2,7 @@ use strict;
 use warnings;
 use Test::More;
 use File::Temp qw(tempdir);
+use POSIX qw(_exit);
 use Data::CountMinSketch::Shared;
 
 my $dir  = tempdir(CLEANUP => 1);
@@ -76,6 +77,30 @@ my @in   = qw(apple banana cherry date elderberry fig grape);
 # ---- refuse a read-write reopen of a sealed file ----
 like exception(sub { Data::CountMinSketch::Shared->new($path, 0.01, 0.01) }),
      qr/frozen|read-only/, 'read-write reopen of a sealed file is refused';
+
+{
+    my $p = "$dir/peer.cms";
+    my $writer = Data::CountMinSketch::Shared->new($p, 0.01, 0.01);
+    my $peer = Data::CountMinSketch::Shared->new($p, 0.01, 0.01);
+    my $pid = fork // die "fork: $!";
+    if (!$pid) {
+        $writer->add_many([map { "peer-$_" } 1 .. 1000]);
+        $writer->freeze;
+        _exit(0);
+    }
+    waitpid $pid, 0;
+    is $?, 0, 'producer freezes successfully in another process';
+    my $ro = Data::CountMinSketch::Shared->new_readonly($p);
+    is $ro->total, 1000, 'read-only attach sees all updates published before the seal';
+    cmp_ok $ro->estimate('peer-500'), '>=', 1, 'published counters are visible read-only';
+    ok $peer->frozen, 'existing peer sees the seal';
+    ok !$peer->readonly, 'existing peer retains its read-write mapping';
+    like exception(sub { $peer->add('late') }), qr/frozen/, 'sealed peer rejects add';
+    like exception(sub { $peer->add_many(['late']) }), qr/frozen/, 'sealed peer rejects add_many';
+    like exception(sub { $peer->clear }), qr/frozen/, 'sealed peer rejects clear';
+    like exception(sub { $peer->merge($ro) }), qr/frozen/, 'sealed peer rejects merge';
+    is $peer->total, 1000, 'rejected peer mutations leave the total unchanged';
+}
 
 # ---- new_readonly rejects a non-frozen file ----
 {

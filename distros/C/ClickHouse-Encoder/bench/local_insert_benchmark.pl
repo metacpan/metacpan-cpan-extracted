@@ -24,7 +24,7 @@ unless (system("$CH --query 'select 1' >/dev/null 2>&1") == 0) {
 }
 
 print "=" x 70, "\n";
-print "clickhouse-local INSERT benchmark: Native vs TabSeparated\n";
+print "clickhouse-local insert benchmark: Native vs TabSeparated\n";
 print "Rows: $ROWS, runs: $RUNS\n";
 print "=" x 70, "\n\n";
 

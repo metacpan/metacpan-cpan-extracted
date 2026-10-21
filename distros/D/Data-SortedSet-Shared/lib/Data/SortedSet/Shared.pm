@@ -1,7 +1,7 @@
 package Data::SortedSet::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 require XSLoader;
 XSLoader::load('Data::SortedSet::Shared', $VERSION);
 
@@ -148,7 +148,7 @@ Rank indices are 0-based and may be negative (counting from the end, like Perl
 slices); C<range_by_*> bounds are B<inclusive>.  C<range_by_score> /
 C<rev_range_by_score> accept C<< limit => $n >> and C<< offset => $k >> (a
 negative C<offset> is treated as 0).  All
-range and rank methods return B<members>; pass C<< withscores => 1 >> for a flat
+range methods return B<members>; pass C<< withscores => 1 >> for a flat
 C<(member, score, ...)> list instead.
 
 =head2 Pop and peek

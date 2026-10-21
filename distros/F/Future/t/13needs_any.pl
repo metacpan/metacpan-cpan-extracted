@@ -1,5 +1,4 @@
-use v5.10;
-use strict;
+use v5.20;
 use warnings;
 
 use Test2::V0 0.000148; # is_refcount
@@ -134,7 +133,7 @@ use constant FUTURE_HAS_CONVERGENT_ALSO => ( !defined $Future::XS::VERSION or $F
    my $future = Future->needs_any( Future->fail("F1") );
 
    ok( $future->is_ready, '$future of already-failed sub already ready' );
-   $future->failure;
+   is( [ $future->failure ], [ "F1" ], 'failure of already-failed' );
 }
 
 # cancel propagation

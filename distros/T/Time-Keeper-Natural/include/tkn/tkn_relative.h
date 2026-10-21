@@ -589,6 +589,66 @@ tkn_group_rv(pTHX_ const char *s, STRLEN n, AV *m)
     return newRV_noinc((SV *)g);
 }
 
+/* A spaceless piece is a digit run's start or a number word's first
+ * character (num_char) at q, not at the piece's start. */
+static int
+tkn_num_cut(tkn_lexicon *L, const char *k, STRLEN a, STRLEN q)
+{
+    if (q <= a)
+        return 0;
+    if (k[q] >= '0' && k[q] <= '9')
+        return !(k[q - 1] >= '0' && k[q - 1] <= '9');
+    return tkn_tfind(L, &L->t[TKN_T_NUM_CHAR], k + q, UTF8SKIP((const U8 *)k + q)) >= 0;
+}
+
+/* A spaceless segment [a, e) cut where a number starts, digits or a word
+ * ("二週間三日"), the longest piece that reads first, each piece read;
+ * 1 when every piece reads. Reads are capped by *budget. */
+static int
+tkn_num_split(pTHX_ tkn_lexicon *L, tkn_reader *r, const char *k, STRLEN a, STRLEN e, AV *res, int *budget)
+{
+    STRLEN c = e;
+    if (a >= e)
+        return 1;
+    for (;;) {
+        if (c == e || tkn_num_cut(L, k, a, c)) {
+            AV *m;
+            if (--*budget < 0)
+                return 0;
+            m = tkn_read_piece(aTHX_ r, k + a, c - a);
+            if (av_len(m) >= 0) {
+                av_push(res, tkn_group_rv(aTHX_ k + a, c - a, m));
+                if (tkn_num_split(aTHX_ L, r, k, c, e, res, budget))
+                    return 1;
+                SvREFCNT_dec(av_pop(res));
+            }
+        }
+        if (c <= a + 1)
+            return 0;
+        do
+            c--;
+        while (c > a && ((U8)k[c] & 0xC0) == 0x80);
+        if (c == a)
+            return 0;
+    }
+}
+
+/* 0.01 cut a spaceless chain at digits only: where that fails, a number
+ * word starts a piece too, in each segment between joiners. NULL unless
+ * every piece reads and there are min_n of them. */
+static AV *
+tkn_num_groups(pTHX_ tkn_lexicon *L, tkn_reader *r, const char *k, STRLEN (*segs)[2], int nseg, int min_n)
+{
+    AV *res = (AV *)sv_2mortal((SV *)newAV());
+    int s, budget = 256;
+    if (nseg >= 64)
+        return NULL;
+    for (s = 0; s < nseg; s++)
+        if (!tkn_num_split(aTHX_ L, r, k, segs[s][0], segs[s][1], res, &budget))
+            return NULL;
+    return av_len(res) + 1 >= min_n ? res : NULL;
+}
+
 /* _groups: the fewest groups the key splits into, each read by the
  * reader, with the locale's joiners between them; NULL (and the token
  * where reading stopped) when there is no such split. */
@@ -603,6 +663,8 @@ tkn_groups(pTHX_ tkn_lexicon *L, SV *ksv, HV *info, tkn_reader *r, int min_n)
     if (L->spaceless) {
         STRLEN p = 0, start = 0;
         AV *pieces = (AV *)sv_2mortal((SV *)newAV());
+        STRLEN segs[64][2];
+        int nseg = 0;
         I32 i;
         while (p <= klen) {
             I32 hit = -1;
@@ -619,6 +681,10 @@ tkn_groups(pTHX_ tkn_lexicon *L, SV *ksv, HV *info, tkn_reader *r, int min_n)
                 }
             if (hit >= 0 || p == klen) {
                 STRLEN a = start, q;
+                if (nseg < 64) {
+                    segs[nseg][0] = start;
+                    segs[nseg++][1] = p;
+                }
                 for (q = start; q <= p; q++) {
                     if (q == p || (q > start && k[q] >= '0' && k[q] <= '9' && !(k[q - 1] >= '0' && k[q - 1] <= '9'))) {
                         if (q > a) {
@@ -638,12 +704,15 @@ tkn_groups(pTHX_ tkn_lexicon *L, SV *ksv, HV *info, tkn_reader *r, int min_n)
             p += UTF8SKIP((const U8 *)k + p);
         }
         if (av_len(pieces) + 1 < min_n)
-            return NULL;
+            return tkn_num_groups(aTHX_ L, r, k, segs, nseg, min_n);
         for (i = 0; i <= av_len(pieces); i++) {
             STRLEN pl;
             const char *pb = SvPV_const(*av_fetch(pieces, i, 0), pl);
             AV *m = tkn_read_piece(aTHX_ r, pb, pl);
             if (av_len(m) < 0) {
+                AV *res2 = tkn_num_groups(aTHX_ L, r, k, segs, nseg, min_n);
+                if (res2)
+                    return res2;
                 (void)hv_stores(info, "token", newSVsv(*av_fetch(pieces, i, 0)));
                 return NULL;
             }

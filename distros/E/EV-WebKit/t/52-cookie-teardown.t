@@ -70,4 +70,26 @@ for my $op (qw/cookies set_cookie save_cookies clear_cookies/) {
     pass('DESTROY mid-cookie-op did not crash during the following settle run');
 }
 
+{
+    require Scalar::Util;
+    my $b = EV::WebKit->new(window => [200,150], timeout => 5);
+    my ($weak, $fired, $err);
+    {
+        my $canary = bless {}, 'SnapshotCanary';
+        $weak = $canary;
+        Scalar::Util::weaken($weak);
+        $b->save_cookies($jar, ['http://one.test/', 'http://two.test/'], sub {
+            my $held = $canary;
+            $fired++;
+            $err = $_[1];
+        });
+    }
+    $b->quit;
+    undef $b;
+    { my $settle = EV::timer(1, 0, sub { EV::break }); EV::run }
+    is($fired, 1, 'snapshot callback resolved once after dropping its browser');
+    is($err, 'browser closed', 'snapshot resolves as closed');
+    ok(!defined $weak, 'snapshot releases callback captures after its browser is dropped');
+}
+
 done_testing;

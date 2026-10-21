@@ -1,5 +1,9 @@
 Revision history for Perl extension UUID.
 
+0.40 Tue Oct 20 18:37:03 EDT 2026
+  - Fix linking on Android/NetBSD/Interix when useshrplib=true.
+    - Thanks Chad Granum. [rt.cpan.org #182036]
+
 0.39 Sat Sep  5 11:48:16 EDT 2026
   - Fix deadlock on MacOS/OSX.
     - Thanks Kurt Starsinic, Matt Martini. [rt.cpan.org #178101]

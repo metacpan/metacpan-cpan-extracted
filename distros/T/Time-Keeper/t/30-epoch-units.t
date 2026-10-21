@@ -21,7 +21,7 @@ my $iv64 = $Config{ivsize} >= 8;
     my $t = t(year => 2026, month => 10, day => 15, hour => 9, minute => 41, second => 17, nanosecond => 123456789);
     my $e = $t->epoch;
     is($t->epoch_millis, "${e}123", 'milliseconds');
-    is($t->epoch_micros, "${e}123456", 'microseconds');
+    cmp_ok($t->epoch_micros, '==', "${e}123456", 'microseconds');
     is($t->epoch_nanos, "${e}123456789", 'nanoseconds');
     is($K->from_epoch_millis($t->epoch_millis) . '', '2026-10-15T09:41:17.123Z', 'and back from the milliseconds, to the millisecond');
     is($K->from_epoch_micros($t->epoch_micros) . '', '2026-10-15T09:41:17.123456Z', 'from the microseconds');

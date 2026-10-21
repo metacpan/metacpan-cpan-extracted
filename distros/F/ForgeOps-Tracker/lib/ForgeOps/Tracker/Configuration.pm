@@ -3,6 +3,7 @@ package ForgeOps::Tracker::Configuration;
 use strict;
 use warnings;
 use Cwd qw(getcwd);
+use ForgeOps::Tracker::StrictPrivacy ();
 
 # Holds a single ForgeOps DSN plus everything else the client needs to build and deliver events.
 # Mirrors gems/forge_ops_tracker/lib/forge_ops_tracker/configuration.rb: a single DSN string
@@ -95,6 +96,18 @@ sub new {
         # names (HOSTNAME, PATH, PORT, and so on; see ForgeOps::Tracker::Changes) are always left
         # out.
         track_env_var_names => 0,
+        # Off by default. On, nothing this client sends carries free text that could hold personal
+        # or health data: no error message (a message_fingerprint is sent instead, so errors still
+        # group), no breadcrumbs, no endpoint, no SQL statement, no source context, no user email or
+        # username, and outbound HTTP spans named by method and host only. See
+        # ForgeOps::Tracker::StrictPrivacy for every rule. FORGE_OPS_STRICT_PRIVACY=true turns it on
+        # from the environment; init() or setting it here wins over that.
+        strict_privacy => _env_flag($ENV{FORGE_OPS_STRICT_PRIVACY}),
+        # Context and tag keys strict privacy still sends (only plain values under exactly these
+        # top-level keys), an arrayref such as ['error_code', 'feature'] or one comma-separated
+        # string. Empty by default, so nothing from context or tags goes out.
+        # FORGE_OPS_PRIVACY_ALLOWED_FIELDS=error_code,feature sets it from the environment.
+        privacy_allowed_fields => [ ForgeOps::Tracker::StrictPrivacy::allowed_field_list($ENV{FORGE_OPS_PRIVACY_ALLOWED_FIELDS}) ],
     }, $class;
 }
 
@@ -227,6 +240,13 @@ sub is_enabled {
 sub log {
     my ($self, $message) = @_;
     $self->{logger}->($message) if $self->{logger};
+}
+
+# "true", "1", "yes" or "on" (any case) is on; anything else, or unset, is off.
+sub _env_flag {
+    my ($value) = @_;
+    return 0 unless defined $value;
+    return $value =~ /\A\s*(?:true|1|yes|on)\s*\z/i ? 1 : 0;
 }
 
 sub _safe_hostname {

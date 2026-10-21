@@ -1,0 +1,32 @@
+---
+abstract: 'Fast JSON Schema validation (draft 4 to 2020-12), on the corvus-json-schema C library'
+author:
+  - endjin
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0.98'
+configure_requires:
+  Alien::Base::Wrapper: '2.38'
+  Alien::CorvusJsonSchema: v0.1.0
+  ExtUtils::MakeMaker: '6.64'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: JSON-Schema-Corvus-XS
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Alien::CorvusJsonSchema: v0.1.0
+  JSON::PP: '2.27'
+  perl: '5.026'
+resources:
+  bugtracker: https://github.com/corvus-dotnet/Corvus.JsonSchema/issues
+  homepage: https://corvus-oss.org/Corvus.JsonSchema/
+  repository: https://github.com/corvus-dotnet/Corvus.JsonSchema.git
+version: v0.1.0
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

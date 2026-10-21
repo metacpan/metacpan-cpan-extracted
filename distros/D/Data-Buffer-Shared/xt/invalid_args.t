@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 use Test::More;
-use File::Temp qw(tmpnam);
+use File::Temp qw(tempdir);
 use Data::Buffer::Shared;
 
 plan skip_all => 'AUTHOR_TESTING not set' unless $ENV{AUTHOR_TESTING};
@@ -9,7 +9,8 @@ plan skip_all => 'AUTHOR_TESTING not set' unless $ENV{AUTHOR_TESTING};
 # Boundary/invalid-argument tests. Each should croak cleanly, not crash.
 
 # Happy-path baseline: constructor works with sane args.
-my $ok = eval { my $h = Data::Buffer::Shared::I64->new(scalar(tmpnam()), 64); 1 };
+my $dir = tempdir(CLEANUP => 1);
+my $ok = eval { my $h = Data::Buffer::Shared::I64->new("$dir/valid", 64); 1 };
 ok $ok, 'baseline: valid args succeed' or diag "unexpected failure: $@";
 
 # Each bad-arg case: the module either croaks cleanly or returns an object.
@@ -29,7 +30,7 @@ sub run_child {
 }
 
 # --- path with embedded NUL (Perl may truncate; module may accept/reject) ---
-run_child('embedded NUL path',     sub { Data::Buffer::Shared::I64->new("/tmp/a\x00b.shm", 16) });
+run_child('embedded NUL path',     sub { Data::Buffer::Shared::I64->new("$dir/a\x00b.shm", 16) });
 
 # --- zero capacity ---
 run_child('cap=0',                 sub { Data::Buffer::Shared::I64->new(undef, 0) });

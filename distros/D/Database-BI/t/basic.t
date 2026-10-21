@@ -29,6 +29,40 @@ subtest 'View table' => sub {
 };
 
 # ---------------------------------------------------------------------------
+subtest 'New canvas starts with the current table' => sub {
+	$t->get_ok('/view/sales')->status_is(200)
+		->content_like(qr{id="save-analysis-panel"[^>]*data-left-spec="table:sales"}s,
+			'the New canvas panel knows the current table even though the URL has no l=')
+		->content_like(qr/var visuals = \[\{ kind: 'table'/,
+			'saving a new canvas builds a table visual');
+
+	$t->get_ok('/pie?l=table:sales&cat=region&val=amount')->status_is(200)
+		->content_like(qr/id="new-canvas-btn"/, 'the chart page has a New canvas button')
+		->content_like(qr/id="new-canvas-panel" data-chart="[^"]*&quot;kind&quot;:&quot;pie&quot;/, 'the chart page exposes its chart spec')
+		->content_like(qr/&quot;value&quot;:&quot;amount&quot;/, 'the exposed spec keeps the value column');
+};
+
+# ---------------------------------------------------------------------------
+subtest 'Table toolbar has a Map panel' => sub {
+	$t->get_ok('/view/sales')->status_is(200)
+		->content_like(qr/id="btn-map"/, 'the Map button is in the toolbar')
+		->content_like(qr/&#x1F5FA; Map&hellip;/, 'the button names the map')
+		->content_like(qr/id="map-panel"/, 'the Map panel is present')
+		->content_like(qr/id="map-form"[^>]*action="\/map"/s, 'the panel submits to /map')
+		->content_like(qr/id="map-mode-sel"/, 'the panel offers both ways to place a row')
+		->content_like(qr/id="map-lat-sel"[^>]*name="lat"/s, 'there is a latitude column')
+		->content_like(qr/id="map-lon-sel"[^>]*name="lon"/s, 'there is a longitude column')
+		->content_like(qr/id="map-loc-sel"[^>]*name="loc"/s, 'there is a place-name column')
+		->content_like(qr/id="btn-do-map"/, 'the panel has its own submit button');
+
+	# Opening any of the other chart panels must close the Map panel, or two
+	# forms would be on screen at once.
+	my $body = $t->tx->res->body;
+	my $arrays = () = $body =~ /'map-panel'\]\.map\(function\s*\(id\)\s*\{/g;
+	cmp_ok($arrays, '>=', 15, 'every chart panel closes the Map panel');
+};
+
+# ---------------------------------------------------------------------------
 subtest 'Filesystem browser' => sub {
     my $tmpdir = File::Spec->tmpdir;
     $t->get_ok('/browse')->status_is(200)->content_like(qr/Browse Files/i);
@@ -592,6 +626,26 @@ subtest 'GET /bar' => sub {
 	  ->content_like(qr/id="bar_chart"/, 'bar chart SVG present');
 };
 
+subtest 'D3 can be served from the deployment itself' => sub {
+	# Charts load D3 from a CDN unless d3_url says otherwise.  A local URL
+	# is emitted as written, so a deployment can serve the library itself and
+	# draw charts with no outbound network access.
+	local $t->app->config->{d3_url} = '/static/d3/d3.min.js';
+
+	my $dir = File::Temp->newdir;
+	my $csv = File::Spec->catfile("$dir", 'd3smoke.csv');
+	Mojo::File->new($csv)->spurt("region,amount\nNorth,100\nSouth,200\n");
+
+	for my $path ('/bar', '/pie') {
+		$t->get_ok("$path?l=" . url_escape("path:$csv") . '&cat=region&val=amount')
+		  ->status_is(200)
+		  ->content_like(qr{<script src="/static/d3/d3\.min\.js"></script>},
+			"$path loads D3 from the configured URL")
+		  ->content_unlike(qr{cdnjs\.cloudflare\.com|d3js\.org},
+			"$path asks no CDN for D3");
+	}
+};
+
 # ---------------------------------------------------------------------------
 subtest 'GET /folder' => sub {
 	my $dir = File::Temp->newdir;
@@ -650,6 +704,28 @@ subtest 'GET /calc/list' => sub {
 	# Without l= param returns 400.
 	$t->get_ok('/calc/list')
 	  ->status_is(400);
+};
+
+# ---------------------------------------------------------------------------
+subtest 'A saved calculation appears in the table view' => sub {
+	my $model_dir = File::Temp->newdir;
+	my $calc      = Test::Mojo->new('Database::BI');
+	$calc->app->config->{model_dir} = "$model_dir";
+
+	$calc->post_ok('/calc/save', form => {
+		l    => 'table:sales',
+		name => 'tax_amount',
+		expr => 'amount * 1.2',
+	})->status_is(200)->json_is('/ok', 1, 'the calculation was saved');
+
+	$calc->get_ok('/view/sales')->status_is(200)
+		->content_like(qr/tax_amount/, 'the table view shows the saved column')
+		->content_like(qr/1500(?:\.00)?/, 'and the value it calculates for the first row');
+
+	$calc->post_ok('/calc/delete', form => {
+		l    => 'table:sales',
+		name => 'tax_amount',
+	})->status_is(200);
 };
 
 # ---------------------------------------------------------------------------

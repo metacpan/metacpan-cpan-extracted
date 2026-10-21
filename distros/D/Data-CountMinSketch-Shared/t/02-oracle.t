@@ -52,35 +52,37 @@ my $total = $N * ($N + 1) / 2;
         sprintf("max overestimate %d <= 5*epsilon*total (%.1f)", $max_over, $bound * 5);
 }
 
-# (c) merge: two sketches over disjoint key sets, merged estimate == sum of the
-#     two estimates for every key (cellwise-add soundness).
+# (c) Merge equals a combined stream, including when collisions change which
+#     row gives the minimum in each input.
 {
-    my $a = Data::CountMinSketch::Shared->new(undef, $EPS, $DELTA);
-    my $b = Data::CountMinSketch::Shared->new(undef, $EPS, $DELTA);
-    # a gets keys "a$i" added $i times; b gets keys "b$i" added (i*2) times
-    my $M = 500;
+    my $a = Data::CountMinSketch::Shared->new(undef, 0.1, $DELTA);
+    my $b = Data::CountMinSketch::Shared->new(undef, 0.1, $DELTA);
+    my $combined = Data::CountMinSketch::Shared->new(undef, 0.1, $DELTA);
+    my $M = 200;
     for my $i (1 .. $M) {
         $a->add("a$i", $i);
         $b->add("b$i", $i * 2);
+        $combined->add("a$i", $i);
+        $combined->add("b$i", $i * 2);
     }
-    # snapshot the pre-merge estimates for every key in both sets
-    my %ea = map { ("a$_" => $a->estimate("a$_")) } 1 .. $M;
-    my %eb_a = map { ("b$_" => $a->estimate("b$_")) } 1 .. $M;   # a's view of b's keys (collisions)
-    my %ea_b = map { ("a$_" => $b->estimate("a$_")) } 1 .. $M;   # b's view of a's keys (collisions)
-    my %eb = map { ("b$_" => $b->estimate("b$_")) } 1 .. $M;
+    my @keys = map { ("a$_", "b$_", "absent$_") } 1 .. $M;
+    my %sums = map { ($_ => $a->estimate($_) + $b->estimate($_)) } @keys;
 
     my $ta = $a->total;
     my $tb = $b->total;
 
     $a->merge($b);
 
-    my $bad = 0;
-    for my $i (1 .. $M) {
-        my $ka = "a$i"; my $kb = "b$i";
-        $bad++ unless $a->estimate($ka) == $ea{$ka} + $ea_b{$ka};
-        $bad++ unless $a->estimate($kb) == $eb_a{$kb} + $eb{$kb};
+    my ($bad, $below, $above) = (0, 0, 0);
+    for my $key (@keys) {
+        my $estimate = $a->estimate($key);
+        $bad++ if $estimate != $combined->estimate($key);
+        $below++ if $estimate < $sums{$key};
+        $above++ if $estimate > $sums{$key};
     }
-    is $bad, 0, "merge: estimate(k) == sum of the two pre-merge estimates for every key";
+    is $bad, 0, 'merge estimates match counting both streams into one sketch';
+    is $below, 0, 'merged minimum is at least the sum of the separate minima';
+    cmp_ok $above, '>', 0, 'collisions can make merged estimates exceed that sum';
     is $a->total, $ta + $tb, 'merge: total == sum of both input totals';
 }
 

@@ -1,5 +1,10 @@
 Revision history for Data::Deque::Shared
 
+0.12  2026-10-16
+    - New v3 file format: recreate existing backing files.
+    - Fix concurrent slot ownership and progress after a waiting peer dies.
+    - Handle signals safely during waits; truncate UTF-8 at character boundaries.
+
 0.11      2026-10-01
           - Fix a test that failed on busy machines.
 

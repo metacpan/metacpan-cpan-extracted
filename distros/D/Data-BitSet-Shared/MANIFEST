@@ -23,6 +23,7 @@ t/version_check.t
 t/04-frozen.t
 t/05-recover.t
 t/06-foreign-invocant.t
+t/07-set-bits.t
 xt/abi_skew.t
 xt/asan.t
 xt/class_pv_magic.t

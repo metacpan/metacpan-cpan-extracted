@@ -1,5 +1,10 @@
 Revision history for Data-SortedSet-Shared
 
+0.08  2026-10-16
+    - Wait for writes and repair interrupted headers before reopening.
+    - Keep sealed data immutable during dead-lock recovery.
+    - Snapshot string keys before invoking each callbacks.
+
 0.07      2026-09-26
           - A writer killed mid add, incr, remove or pop is repaired: the set
             is as before or after that write.

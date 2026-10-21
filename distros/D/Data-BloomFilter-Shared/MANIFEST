@@ -20,6 +20,7 @@ xt/eg_runs.t
 xt/enospc.t
 xt/fork_bloom.t
 xt/kwalitee.t
+xt/lock_lifecycle.t
 xt/pod.t
 xt/slotless_reader_recovery.t
 xt/tsan.t

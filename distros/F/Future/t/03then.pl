@@ -1,5 +1,4 @@
-use v5.10;
-use strict;
+use v5.20;
 use warnings;
 
 use Test2::V0 0.000148; # is_refcount

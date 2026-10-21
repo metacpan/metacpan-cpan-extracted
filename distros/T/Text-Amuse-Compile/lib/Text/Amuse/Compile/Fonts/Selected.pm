@@ -157,6 +157,12 @@ HYPERREF
         else {
             push @out, "\\usepackage[$babel_langs,provide*=*${bidi}]{babel}";
         }
+        my %babelprovides = (
+                             nepali => "mapdigits, maparabic",
+                            );
+        if (my $provide = $babelprovides{$main_lang}) {
+            push @out, "\\babelprovide[${provide}]{${main_lang}}"
+        }
         my %slots = (qw/main rm
                         mono tt
                         sans sf/);

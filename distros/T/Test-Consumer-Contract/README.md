@@ -4,7 +4,7 @@ Test::Consumer::Contract - check that code reading a result only reads the field
 
 ## Version
 
-Version 0.03
+Version 0.04
 
 ## Synopsis
 
@@ -159,7 +159,9 @@ workspace/
 
     Each file in `producers` and `workspace_producers` must still contain an
     assignment to each key listed for it.  POD and comments do not count: a key
-    shown in an example is not a key being set.
+    shown in an example is not a key being set.  A workspace producer whose sibling
+    distribution is not checked out is skipped, not failed; one whose sibling is
+    there but whose file is not still fails.
 
 - 2. the value object still derives what it promises
 
@@ -430,7 +432,10 @@ required; every other option has a default.  An optional option given as
 - `workspace_producers` (hashref)
 
     Like `producers`, but paths are relative to the workspace: producers in a
-    sibling distribution that this distribution's value object comes from.
+    sibling distribution that this distribution's value object comes from.  The
+    first component of the path names that sibling; when it is not in the
+    workspace, the file's checks are skipped (`skip.producer`), so a declaration
+    that names one still passes on a CPAN install.
 
 - `consumers` (hashref)
 
@@ -1237,6 +1242,7 @@ consumer.offender    A consumer reads a key not every producer sets.  Stop
                      reading it, or register it in may_rely_on with why.
 consumer.stale       A may_rely_on entry is no longer read.  Remove it.
 skip.siblings        (skip) A require_workspace distribution is absent.
+skip.producer        (skip) A workspace producer's sibling is absent.
 accessor.documented  (test name) A name in accessors/not_accessors is not
                      documented or defined by the value object.
 accessor.drift       The value object documents a name the contract does not
@@ -1496,6 +1502,7 @@ arrows are triggers, and the lines under each arrow are what happens.
      v
 [CHECKING PRODUCERS] ---- no producers declared ----------+
      |  subtest 1: one ok() per file read and per key     |
+     |    a producer's sibling missing -> its tests skip  |
      v                                                    v
 [CHECKING DERIVATION] --- no 'derives' ------------------+
      |  loads the value object class (cached)             |

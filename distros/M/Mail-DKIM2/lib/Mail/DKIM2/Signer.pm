@@ -2,7 +2,7 @@ package Mail::DKIM2::Signer;
 use strict;
 use warnings;
 
-our $VERSION = '0.25';
+our $VERSION = '0.27';
 
 use base 'Mail::DKIM2::HeaderParser';
 use Crypt::Digest::SHA256 qw(sha256);
@@ -137,6 +137,9 @@ sub finish_header {
     $self->{_dk2_headers} = \@dk2_headers;
     $self->{_next_i} = $next_i;
     $self->{_signature} = $self->_new_signature($self->{RcptTo});
+    # Section 12.8 signs the Message-Instance and DKIM2-Signature fields
+    # alone, so the body is not kept.
+    $self->{_body_sink} = sub {};
 }
 
 # The signature object for this hop with rt= set to $rcpt (an arrayref, or
@@ -373,6 +376,10 @@ Signer reads the existing
 Message-Instance and DKIM2-Signature headers, chooses the next C<i=>, builds
 the signing input of -07 section 10.5, and signs it. It does not alter
 the message: the caller prepends the header C<as_string> returns.
+
+Nothing it signs is in the body (section 12.8), so the body is discarded as
+it arrives, and a caller holding the message in a file may feed it the
+header block alone.
 
 Extends L<Mail::DKIM2::HeaderParser>, which provides C<PRINT>, C<CLOSE>,
 C<load> and the tie interface.

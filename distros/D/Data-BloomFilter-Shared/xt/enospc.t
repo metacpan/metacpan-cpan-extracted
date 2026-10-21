@@ -17,10 +17,23 @@ my $bin  = tempdir(CLEANUP => 1);
 open my $fh, '>', "$bin/child.pl" or die $!;
 print {$fh} <<'P';
 use strict; use warnings;
+use Errno qw(ENOSPC);
+use Fcntl qw(O_CREAT O_RDWR);
 use Data::BloomFilter::Shared;
-my ($mnt, @args) = @ARGV;
+my ($mnt, $scenario, @args) = @ARGV;
+if ($scenario ne 'create') {
+    my $ref = Data::BloomFilter::Shared->new(undef, @args);
+    open my $empty, '>', "$mnt/x.shm" or die $!;
+    truncate $empty, $ref->stats->{mmap_size} + ($scenario eq 'invalid' ? 8 : 0) or die $!;
+    close $empty or die $!;
+    sysopen my $fill, "$mnt/fill", O_CREAT|O_RDWR, 0600 or die $!;
+    my $page = 'x' x 4096;
+    1 while defined syswrite($fill, $page);
+    die "fill: $!" unless $! == ENOSPC;
+}
 my $h = eval { Data::BloomFilter::Shared->new("$mnt/x.shm", @args) };
 print $h ? "created\n" : "refused: $@";
+print "size=", -s "$mnt/x.shm", " blocks=", (stat "$mnt/x.shm")[12], "\n";
 P
 close $fh;
 
@@ -31,22 +44,31 @@ sub on_small_tmpfs {
     return ($code > 128 ? $code - 128 : $? & 127, $out);   # the shell reports a child killed by signal n as 128+n
 }
 
-my ($sig, $out) = on_small_tmpfs('', 1000, 0.01);
+my ($sig, $out) = on_small_tmpfs('', 'create', 1000, 0.01);
 is $sig, 0, 'a segment that fits: no signal';
 like $out, qr/^created/, '  and it is created';
 
-($sig, $out) = on_small_tmpfs('DATA_BLOOMFILTER_SHARED_SPARSE=0', 1000, 0.01);
+($sig, $out) = on_small_tmpfs('DATA_BLOOMFILTER_SHARED_SPARSE=0', 'create', 1000, 0.01);
 is $sig, 0, 'DATA_BLOOMFILTER_SHARED_SPARSE=0: a segment that fits: no signal';
 like $out, qr/^created/, '  and it is created';
 
 my @big = (10_000_000, 0.01);   # a 16 MiB bit array
-($sig, $out) = on_small_tmpfs('DATA_BLOOMFILTER_SHARED_SPARSE=0', @big);
+($sig, $out) = on_small_tmpfs('DATA_BLOOMFILTER_SHARED_SPARSE=0', 'create', @big);
 is $sig, 0, 'DATA_BLOOMFILTER_SHARED_SPARSE=0: a segment the filesystem cannot hold does not kill the process';
 like $out, qr/^refused: .*No space left on device/, '  it is refused with the reason';
 diag $out unless $out =~ /^refused/;
+like $out, qr/size=0 blocks=0/, 'failed creation leaves an empty file';
 
-($sig, $out) = on_small_tmpfs('', @big);
+($sig, $out) = on_small_tmpfs('', 'create', @big);
 is $sig, 0, 'by default: no signal';
 like $out, qr/^created/, '  it creates the sparse file';
+
+for my $scenario (qw(recover invalid)) {
+    ($sig, $out) = on_small_tmpfs('DATA_BLOOMFILTER_SHARED_SPARSE=0', $scenario, 1_000_000, 0.01);
+    is $sig, 0, "$scenario on a full filesystem: no signal";
+    like $out, $scenario eq 'recover' ? qr/refused: .*No space left on device/ : qr/refused: .*invalid/,
+        "$scenario on a full filesystem: constructor reports the error";
+    like $out, qr/blocks=0/, "$scenario checking does not allocate sparse pages";
+}
 
 done_testing;

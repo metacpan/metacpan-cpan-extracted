@@ -33,7 +33,10 @@ sub acquire {
 
 sub release {
     my ($sem) = @_;
-    $sem->incr(0);
+    while (1) {
+        my $cur = $sem->get(0);
+        return if $sem->cas(0, $cur, $cur + 1);
+    }
 }
 
 my @pids;

@@ -81,9 +81,9 @@ METHODS
 
     From $capacity and $fp_rate the filter derives its geometry: "k =
     round(-log2(fp_rate))" hashes (clamped to the range 1..32), and a bit
-    array of "m = next_power_of_two(ceil(capacity * k / ln 2))" bits (with a
-    floor of 64 bits). Rounding the bit count up to a power of two means the
-    realised false-positive rate at capacity is typically at or below the
+    array large enough to meet the target at that capacity, rounded up to a
+    power of two (with a floor of 64 bits). Rounding the bit count up means
+    the realised false-positive rate at capacity is typically at or below the
     configured target. When reopening an existing file or memfd, the stored
     geometry wins and the caller's $capacity/$fp_rate do not resize it -- but
     they are still range-checked, so an out-of-range value croaks. "new_memfd"

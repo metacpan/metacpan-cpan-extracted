@@ -1,16 +1,20 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2011-2024 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2011-2026 -- leonerd@leonerd.org.uk
 
-package Future 0.53;
+package Future 0.54;
 
-use v5.14;
+use v5.20;
 use warnings;
 no warnings 'recursion'; # Disable the "deep recursion" warning
 
 # we are not overloaded, but we want to check if other objects are
 require overload;
+require attributes;
+
+use feature qw( signatures );
+no warnings qw( experimental::signatures );
 
 require Future::Exception;
 
@@ -244,12 +248,11 @@ interfaces.
 
 =cut
 
-*AWAIT_CLONE = sub { shift->new };
+*AWAIT_CLONE = sub ( $self ) { $self->new };
 
 # Useful for identifying CODE references
-sub CvNAME_FILE_LINE
+sub CvNAME_FILE_LINE ( $code )
 {
-   my ( $code ) = @_;
    my $cv = svref_2object( $code );
 
    my $name = join "::", $cv->STASH->NAME, $cv->GV->NAME;
@@ -294,11 +297,8 @@ libraries driven by C<Future>.
 
 =cut
 
-sub wrap
+sub wrap ( $class, @values )
 {
-   my $class = shift;
-   my @values = @_;
-
    if( @values == 1 and blessed $values[0] and $values[0]->isa( __PACKAGE__ ) ) {
       return $values[0];
    }
@@ -325,11 +325,8 @@ fact.
 
 =cut
 
-sub call
+sub call ( $class, $code, @args )
 {
-   my $class = shift;
-   my ( $code, @args ) = @_;
-
    my $f;
    eval { $f = $code->( @args ); 1 } or $f = $class->fail( $@ );
    blessed $f and $f->isa( "Future" ) or $f = $class->fail( "Expected " . CvNAME_FILE_LINE($code) . " to return a Future" );
@@ -364,7 +361,7 @@ depending on its component futures.
 
 =cut
 
-*AWAIT_IS_READY = sub { shift->is_ready };
+*AWAIT_IS_READY = sub ( $self ) { $self->is_ready };
 
 =head2 is_done
 
@@ -394,7 +391,7 @@ Returns true if the future has been cancelled by C<cancel>.
 
 =cut
 
-*AWAIT_IS_CANCELLED = sub { shift->is_cancelled };
+*AWAIT_IS_CANCELLED = sub ( $self ) { $self->is_cancelled };
 
 =head2 state
 
@@ -431,11 +428,11 @@ C<resolve>.
 
 =cut
 
-*resolve = sub { shift->done( @_ ) };
+*resolve = sub ( $self, @result ) { $self->done( @result ) };
 
 # TODO: For efficiency we can implement better versions of these as individual
 #  methods know which case is being invoked
-*AWAIT_NEW_DONE = *AWAIT_DONE = sub { shift->done( @_ ) };
+*AWAIT_NEW_DONE = *AWAIT_DONE = sub ( $self, @result ) { $self->done( @result ) };
 
 =head2 fail
 
@@ -464,11 +461,11 @@ I<Since version 0.45:> this method is also available under the name C<reject>.
 
 =cut
 
-*reject = sub { shift->fail( @_ ) };
+*reject = sub ( $self, @failure ) { $self->fail( @failure ) };
 
 # TODO: For efficiency we can implement better versions of these as individual
 #  methods know which case is being invoked
-*AWAIT_NEW_FAIL = *AWAIT_FAIL = sub { shift->fail( @_ ) };
+*AWAIT_NEW_FAIL = *AWAIT_FAIL = sub ( $self, @failure ) { $self->fail( @failure ) };
 
 =head2 die
 
@@ -484,17 +481,16 @@ Returns the C<$future>.
 
 =cut
 
-sub die :method
+sub die ( $self, $exception, @more )
 {
-   my $self = shift;
-   my ( $exception, @more ) = @_;
-
    if( !ref $exception and $exception !~ m/\n$/ ) {
       $exception .= sprintf " at %s line %d\n", (caller)[1,2];
    }
 
    $self->fail( $exception, @more );
 }
+# :method with signatures is difficult before Perl 5.28
+attributes::->import( __PACKAGE__, \&die, 'method' );
 
 =head2 on_cancel
 
@@ -517,7 +513,7 @@ originating future's cancellation list.
 
 =cut
 
-*AWAIT_ON_CANCEL = *AWAIT_CHAIN_CANCEL = sub { shift->on_cancel( @_ ) };
+*AWAIT_ON_CANCEL = *AWAIT_CHAIN_CANCEL = sub ( $self, $cb ) { $self->on_cancel( $cb ) };
 
 =head1 USER METHODS
 
@@ -546,7 +542,7 @@ Returns the C<$future>.
 
 =cut
 
-*AWAIT_ON_READY = sub { shift->on_ready( @_ ) };
+*AWAIT_ON_READY = sub ( $self, $cb ) { $self->on_ready( $cb ) };
 
 =head2 result
 
@@ -570,7 +566,7 @@ If the future was cancelled or is not yet ready an exception is thrown.
 
 =cut
 
-*AWAIT_RESULT = *AWAIT_GET = sub { shift->result };
+*AWAIT_RESULT = *AWAIT_GET = sub ( $self ) { $self->result };
 
 =head2 get
 
@@ -586,7 +582,7 @@ the result returned as above.
 
 =cut
 
-*AWAIT_WAIT = sub { shift->get };
+*AWAIT_WAIT = sub ( $self ) { $self->get };
 
 =head2 await
 
@@ -623,9 +619,8 @@ Now a synonym for L</await>. New code should invoke C<await> directly.
 
 =cut
 
-sub block_until_ready
+sub block_until_ready ( $self )
 {
-   my $self = shift;
    return $self->await;
 }
 
@@ -647,11 +642,8 @@ libraries that return C<Future> instances.
 
 =cut
 
-sub unwrap
+sub unwrap ( $class, @values )
 {
-   shift; # $class
-   my @values = @_;
-
    if( @values == 1 and blessed $values[0] and $values[0]->isa( __PACKAGE__ ) ) {
       return $values[0]->get;
    }
@@ -913,22 +905,17 @@ whatever it returns is passed to the C<fail> method of C<$future>.
 
 =cut
 
-sub transform
+sub transform ( $self, %args )
 {
-   my $self = shift;
-   my %args = @_;
-
    my $xfrm_done = $args{done};
    my $xfrm_fail = $args{fail};
 
    return $self->then_with_f(
-      sub {
-         my ( $f, @result ) = @_;
+      sub ( $f, @result ) {
          return $f unless $xfrm_done;
          return $f->new->done( $xfrm_done->( @result ) );
       },
-      sub {
-         my ( $f, @failure ) = @_;
+      sub ( $f, @failure ) {
          return $f unless $xfrm_fail;
          return $f->new->fail( $xfrm_fail->( @failure ) );
       }
@@ -969,18 +956,14 @@ when the result is already known.
 
 =cut
 
-sub then_done
+sub then_done ( $self, @result )
 {
-   my $self = shift;
-   my ( @result ) = @_;
-   return $self->then_with_f( sub { return $_[0]->new->done( @result ) } );
+   return $self->then_with_f( sub ( $f, @ ) { return $f->new->done( @result ) } );
 }
 
-sub then_fail
+sub then_fail ( $self, @failure )
 {
-   my $self = shift;
-   my ( @failure ) = @_;
-   return $self->then_with_f( sub { return $_[0]->new->fail( @failure ) } );
+   return $self->then_with_f( sub ( $f, @ ) { return $f->new->fail( @failure ) } );
 }
 
 =head2 else_with_f
@@ -1016,18 +999,14 @@ when the result is already known.
 
 =cut
 
-sub else_done
+sub else_done ( $self, @result )
 {
-   my $self = shift;
-   my ( @result ) = @_;
-   return $self->else_with_f( sub { return $_[0]->new->done( @result ) } );
+   return $self->else_with_f( sub ( $f, @ ) { return $f->new->done( @result ) } );
 }
 
-sub else_fail
+sub else_fail ( $self, @failure )
 {
-   my $self = shift;
-   my ( @failure ) = @_;
-   return $self->else_with_f( sub { return $_[0]->new->fail( @failure ) } );
+   return $self->else_with_f( sub ( $f, @ ) { return $f->new->fail( @failure ) } );
 }
 
 =head2 catch_with_f
@@ -1104,10 +1083,9 @@ reference which ensures it persists until it completes. For example:
 
 =cut
 
-sub retain
+sub retain ( $self )
 {
-   my $self = shift;
-   return $self->on_ready( sub { undef $self } );
+   return $self->on_ready( sub ( $ ) { undef $self } );
 }
 
 =head1 CONVERGENT FUTURES
@@ -1362,9 +1340,8 @@ C<undef>.
 
 =cut
 
-sub elapsed
+sub elapsed ( $self )
 {
-   my $self = shift;
    return undef unless defined( my $btime = $self->btime ) and
                        defined( my $rtime = $self->rtime );
    return tv_interval( $self->btime, $self->rtime );
@@ -1429,10 +1406,8 @@ others (see the C<< $orig->( @_ ) >> part).
 =cut
 
 # Callers expect to find this in the real Future:: package
-sub Future::wrap_cb
+sub Future::wrap_cb ( $self, $op, $cb )
 {
-   my $self = shift;
-   my ( $op, $cb ) = @_;
    return $cb;
 }
 

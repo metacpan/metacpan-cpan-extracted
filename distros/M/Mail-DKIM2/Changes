@@ -1,5 +1,51 @@
 Revision history for Mail::DKIM2
 
+0.27    2026-10-21
+        Fix a test failure on hosts without JSON::XS.
+
+        - A Recipe number with an exponent ({"c":[1e0,3]}) is refused
+          whichever JSON backend JSON.pm picks. JSON::PP decodes 1e0 as
+          an integer where JSON::XS gives a float, so with JSON::PP 0.25
+          and 0.26 accepted it and failed t/recipe-order.t on install.
+          decode_tag_json now refuses any number with a fraction or an
+          exponent from the JSON text itself.
+        - New t/json-backend.t runs the check under JSON::PP.
+
+0.26    2026-10-20
+        The Message-Instances are verified before the signatures, and a
+        message in a file can be signed and gated without reading it into
+        memory. No change to anything on the wire; which error is primary
+        changes for messages with more than one fault.
+
+        - New Mail::DKIM2::BodyHasher: the body hash body_digest_raw
+          gives, from a message fed through PRINT/CLOSE or load() in
+          pieces, holding at most a megabyte of the body. Its
+          body_hashes are what calculate's BodyHash and verify's
+          BodyHashes take, so a Message-Instance can be computed or
+          checked from the header block alone.
+        - Verifier order: the Message-Instances are checked first (each
+          one's content, then the walk, section 14.7), the signatures
+          second (sections 14.2 to 14.6), From last. No key is needed to
+          refuse a message whose instances do not describe it, and with
+          several faults a hash mismatch is now the primary error over a
+          timestamp, custody, key or signature error.
+        - Under AllowUnsignedMI or MidProcess, Message-Instances with no
+          DKIM2-Signature are walked: 'none' if they match the message,
+          the walk's fail or permerror if not (it was 'none' unread).
+        - New Verifier option InstancesOnly (instances_only): the chain's
+          shape and the Message-Instances, then stop, with no key fetched;
+          'pass' ("Message-Instance m=1..N intact") when they match.
+        - Gate->check takes a filehandle (or any object with getline) as
+          well as a string, and streams its body into the Verifier. The
+          chain is walked once, always by the Verifier (InstancesOnly with
+          no signature or with VerifyResult); it no longer calls
+          MessageInstance->chain_verifies.
+        - The Signer discards the body as it arrives (section 12.8 signs
+          none of it), and may be fed the header block alone.
+        - load() reads a filehandle a piece at a time, and stops reading
+          once the parser has stopped (a Verifier with no signature to
+          check, after the header fields), instead of reading it whole.
+
 0.25    2026-10-20
         Which error is reported when a message has more than one fault
         (the interop contract's C9, so every implementation names the

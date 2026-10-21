@@ -1,6 +1,6 @@
 package EV::WebKit;
 use v5.10; use strict; use warnings;
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use Glib::Object::Introspection;
 use Glib::IO;   # Gio bindings: Cancellable, MemoryInputStream
@@ -825,9 +825,10 @@ sub new {
     $view->signal_connect('notify::uri' => sub {
         my $self = $wself or return;
         return if $self->{_dead} || !$self->{view};
+        my $u = $self->{view}->get_uri;
+        $self->{_seen_uris}{$u} = 1 if defined $u && length $u;
         my $p = $self->{pending} or return;
         return unless defined $p->[5];
-        my $u = $self->{view}->get_uri;
         $p->[5] = $u if defined $u && length $u;
     });
 
@@ -3821,7 +3822,8 @@ sub save_cookies {
     # Expiry stays session-only here: get_expires dies (GDateTime not registered with
     # gperl in this GI binding), so it is deliberately never called.
     $cb = $self->_op_track($cb);   # quit() mid-flight resolves this instead of dropping it
-    my (%dedup, @rows, $err);
+    my (%dedup, $err);
+    my $rows = [];
     my $pending = scalar @$uris;
     my @hold = $self->_native_hold;   # keep natives alive until ALL per-URI get_cookies native sides finish (UAF on teardown otherwise -- see _native_hold); released once on the last completion
     # one shared weak $self, captured by every per-URI closure below (same GI
@@ -3845,35 +3847,37 @@ sub save_cookies {
                 for my $c (@$list) {
                     my $key = join("\x1e", $c->get_name, $c->get_domain, $c->get_path);
                     next if $dedup{$key}++;
-                    push @rows, {
+                    push @$rows, {
                         name      => $c->get_name,           value     => $c->get_value,
                         domain    => $c->get_domain,          path      => $c->get_path,
                         secure    => $c->get_secure ? 1 : 0,  http_only => $c->get_http_only ? 1 : 0,
                     };
                 }
             }
+            undef $cancel;
             my $last = (--$pending <= 0);            # decrement regardless of $self liveness so the keep-alive is always released
             $timer->stop if $last;                   # all per-URI ops done -- disarm the watchdog
             _release_natives_later(\@hold) if $last; # last per-URI native op done -- drop the keep-alive on a clean tick
-            my $self = $wself or return;
             return if !$last;            # more URIs still in flight
             # Release the captures on the LAST completion -- GI never lets go of
             # these closures, so what they still hold is held for the life of
             # the process. Only the last one may do it: the others are still
             # using @cancels via the shared watchdog. See _call_js.
-            my $lcb = $cb;
-            undef $cb; undef $timer; @cancels = ();
+            my ($lcb, $lrows) = ($cb, $rows);
+            undef $cb; undef $rows; undef $timer; @cancels = (); %dedup = ();
+            my $self = $wself or return;
+            return if $self->{_dead};
             return $self->_defer($lcb, undef, $err) if $err;
             my $ok = eval {
                 # :utf8 -- _enc (character-mode codec) can hand back a wide
                 # Perl string; encode it properly instead of a raw byte dump.
                 open my $fh, '>:utf8', $file or die "open $file: $!\n";
-                print $fh _enc(\@rows);
+                print $fh _enc($lrows);
                 close $fh or die "close $file: $!\n";
                 1;
             };
             return $self->_defer($lcb, undef, _clean($@)) unless $ok;
-            $self->_defer($lcb, scalar(@rows), undef);
+            $self->_defer($lcb, scalar(@$lrows), undef);
         });
     }
     return $self;
@@ -4091,7 +4095,7 @@ sub DESTROY { my $self = shift; $self->{_destroying} = 1; eval { $self->quit } }
 
 {
     package EV::WebKit::UserContent;
-    our $VERSION = '0.04';
+    our $VERSION = '0.05';
     # Handle for one injected user script or stylesheet. Holds a WEAK ref to the
     # browser (so a dangling handle never keeps the instance alive) plus the id
     # of its native in the browser's per-kind registry. remove() is idempotent:
@@ -4118,7 +4122,7 @@ sub DESTROY { my $self = shift; $self->{_destroying} = 1; eval { $self->quit } }
 
 {
     package EV::WebKit::Dialog;
-    our $VERSION = '0.04';
+    our $VERSION = '0.05';
     # lightweight wrapper around a WebKitScriptDialog, valid only for the
     # duration of the script-dialog signal handler that receives it.
     sub _new    { bless { d => $_[1] }, $_[0] }
@@ -4149,7 +4153,7 @@ sub DESTROY { my $self = shift; $self->{_destroying} = 1; eval { $self->quit } }
 
 {
     package EV::WebKit::FileChooser;
-    our $VERSION = '0.04';
+    our $VERSION = '0.05';
     # lightweight wrapper around a WebKitFileChooserRequest, valid only for the
     # duration of the run-file-chooser handler that receives it.
     sub _new { bless { r => $_[1] }, $_[0] }
@@ -4183,7 +4187,7 @@ sub DESTROY { my $self = shift; $self->{_destroying} = 1; eval { $self->quit } }
 
 {
     package EV::WebKit::Auth;
-    our $VERSION = '0.04';
+    our $VERSION = '0.05';
     # A WebKitAuthenticationRequest, valid only for the duration of the
     # on_authenticate handler that receives it.
     sub _new { bless { r => $_[1] }, $_[0] }
@@ -4225,19 +4229,20 @@ sub DESTROY { my $self = shift; $self->{_destroying} = 1; eval { $self->quit } }
 
 {
     package EV::WebKit::Download;
-    our $VERSION = '0.04';
+    our $VERSION = '0.05';
     # A download in progress. Unlike Dialog/FileChooser this OUTLIVES the signal
     # that created it: WebKit reports progress and completion later, so the
     # object is retained by the browser until it finishes or fails.
     my $SEQ = 0;
     sub _new {
         my ($class, $browser, $dl) = @_;
-        Scalar::Util::weaken(my $b = $browser);   # the browser owns us; do not own it back
         # `native` is the browser's {_dl_native}/{_dl_want} key -- the identity
         # of the WebKitDownload, which is what download() matches on (its uri
         # is not stable enough; see download()).
-        return bless { b => $b, dl => $dl, native => Scalar::Util::refaddr($dl),
-                       seq => ++$SEQ, overwrite => 0 }, $class;
+        my $self = bless { b => $browser, dl => $dl, native => Scalar::Util::refaddr($dl),
+                           seq => ++$SEQ, overwrite => 0 }, $class;
+        Scalar::Util::weaken($self->{b});
+        return $self;
     }
 
     sub uri       { eval { $_[0]{dl}->get_request->get_uri } }
@@ -4394,7 +4399,7 @@ sub DESTROY { my $self = shift; $self->{_destroying} = 1; eval { $self->quit } }
 
 {
     package EV::WebKit::Policy;
-    our $VERSION = '0.04';
+    our $VERSION = '0.05';
     # lightweight wrapper around a WebKit(Navigation|Response)PolicyDecision,
     # valid only for the duration of the decide-policy signal handler that
     # receives it.
@@ -5087,9 +5092,8 @@ connection the engine reports as reaching an error page rather than failing.
 A refused connection and a DNS failure do B<not> land here: they resolve the
 navigation with C<$ok> C<undef> and C<$err> set to a C<load failed: ...>
 string, so check C<$err> first and only then C<status>. (One exception is worth
-knowing because it looks like a counter-example: a connection to a port the
-host blocks outright, rather than refusing, can be reported by the engine as a
-completed load of its own error page -- C<$ok> true with C<undef> status.)
+knowing: a port blocked by the engine may instead complete with its own error
+page -- C<$ok> true with C<undef> status -- depending on the WebKit version.)
 
 =head3 html
 
@@ -5965,7 +5969,7 @@ domain/URI). Returns C<$b>.
 
 Writes this instance's cookies to C<$file> as a JSON snapshot, enumerated
 per-URI (via the same path as C<cookies>) over C<\@uris>, or, if omitted,
-every URI this instance has C<go>ne to. C<$count> is the number of
+every URI this instance has visited or requested. C<$count> is the number of
 (deduplicated) cookies written. C<$file> is written as UTF-8 text, so
 cookie values containing non-ASCII characters round-trip correctly. This
 is an explicit, opt-in mechanism, distinct from C<cookie_jar>'s native

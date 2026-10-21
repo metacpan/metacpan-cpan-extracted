@@ -43,7 +43,7 @@ static SV *make_null_placeholder(pTHX_ TypeInfo *t) {
     }
     if (t->code == T_LOWCARDINALITY)
         return make_null_placeholder(aTHX_ t->inner);
-    if (t->code == T_VARIANT)
+    if (t->code == T_VARIANT || t->code == T_JSON || t->code == T_DYNAMIC)
         /* Variant's encoder treats undef as the NULL discriminator. */
         return &PL_sv_undef;
     if (t->code == T_STRING || t->code == T_FIXEDSTRING)
@@ -63,16 +63,64 @@ static int enum_lookup_name(pTHX_ TypeInfo *t, const char *s, STRLEN slen, int16
     return 1;
 }
 
+static uint64_t checked_integer(pTHX_ SV *val, const char *type,
+                                unsigned bits, int is_unsigned) {
+    uint64_t magnitude;
+    int negative = 0;
+    SvGETMAGIC(val);
+    if (!SvOK(val)) return 0;
+    if (SvIOK(val)) {
+        if (SvIsUV(val)) magnitude = (uint64_t)SvUVX(val);
+        else {
+            IV iv = SvIVX(val);
+            negative = iv < 0;
+            magnitude = negative ? (uint64_t)0 - (uint64_t)iv : (uint64_t)iv;
+        }
+    } else if (SvPOK(val)) {
+        UV uv;
+        int flags = grok_number(SvPVX_const(val), SvCUR(val), &uv);
+        if (flags & (IS_NUMBER_INFINITY | IS_NUMBER_NAN))
+            croak("%s out of range", type);
+        if (flags & IS_NUMBER_NOT_INT) goto numeric;
+        if (!(flags & IS_NUMBER_IN_UV)) {
+            croak("%s out of range", type);
+        }
+        magnitude = (uint64_t)uv;
+        negative = (flags & IS_NUMBER_NEG) != 0;
+    } else {
+      numeric: ;
+        NV nv = SvNV_nomg(val);
+        NV upper = is_unsigned ? (bits == 64 ? (NV)18446744073709551616.0
+                                             : (NV)((uint64_t)1 << bits))
+                               : (NV)((uint64_t)1 << (bits - 1));
+        NV lower = is_unsigned ? (NV)0 : -upper;
+        if (!isfinite(nv) || nv < lower || nv >= upper)
+            croak("%s out of range", type);
+        return is_unsigned ? (uint64_t)nv : (uint64_t)(int64_t)nv;
+    }
+    if (is_unsigned) {
+        uint64_t max = bits == 64 ? UINT64_MAX : ((uint64_t)1 << bits) - 1;
+        if ((negative && magnitude) || magnitude > max)
+            croak("%s out of range", type);
+        return magnitude;
+    } else {
+        uint64_t limit = (uint64_t)1 << (bits - 1);
+        if (magnitude > limit || (!negative && magnitude == limit))
+            croak("%s out of range", type);
+        return negative ? (uint64_t)0 - magnitude : magnitude;
+    }
+}
+
 static void encode_scalar(pTHX_ Buffer *b, SV *val, TypeInfo *t) {
     switch (t->code) {
-        case T_INT8:   buf_byte(aTHX_ b,(uint8_t)(int8_t)SvIV(val)); break;
-        case T_INT16:  buf_le16(aTHX_ b,(uint16_t)(int16_t)SvIV(val)); break;
-        case T_INT32:  buf_le32(aTHX_ b,(uint32_t)(int32_t)SvIV(val)); break;
-        case T_INT64:  buf_le64(aTHX_ b,(uint64_t)(int64_t)SvIV(val)); break;
-        case T_UINT8:  buf_byte(aTHX_ b,(uint8_t)SvUV(val)); break;
-        case T_UINT16: buf_le16(aTHX_ b,(uint16_t)SvUV(val)); break;
-        case T_UINT32: buf_le32(aTHX_ b,(uint32_t)SvUV(val)); break;
-        case T_UINT64: buf_le64(aTHX_ b,(uint64_t)SvUV(val)); break;
+        case T_INT8:   buf_byte(aTHX_ b, (uint8_t)checked_integer(aTHX_ val, "Int8", 8, 0)); break;
+        case T_INT16:  buf_le16(aTHX_ b, (uint16_t)checked_integer(aTHX_ val, "Int16", 16, 0)); break;
+        case T_INT32:  buf_le32(aTHX_ b, (uint32_t)checked_integer(aTHX_ val, "Int32", 32, 0)); break;
+        case T_INT64:  buf_le64(aTHX_ b, checked_integer(aTHX_ val, "Int64", 64, 0)); break;
+        case T_UINT8:  buf_byte(aTHX_ b, (uint8_t)checked_integer(aTHX_ val, "UInt8", 8, 1)); break;
+        case T_UINT16: buf_le16(aTHX_ b, (uint16_t)checked_integer(aTHX_ val, "UInt16", 16, 1)); break;
+        case T_UINT32: buf_le32(aTHX_ b, (uint32_t)checked_integer(aTHX_ val, "UInt32", 32, 1)); break;
+        case T_UINT64: buf_le64(aTHX_ b, checked_integer(aTHX_ val, "UInt64", 64, 1)); break;
         case T_FLOAT32: buf_lefloat(aTHX_ b,(float)SvNV(val)); break;
         case T_FLOAT64: buf_ledouble(aTHX_ b,SvNV(val)); break;
         case T_BFLOAT16: {
@@ -384,12 +432,13 @@ static void encode_scalar(pTHX_ Buffer *b, SV *val, TypeInfo *t) {
         case T_IPV4: {
             uint32_t v;
             if (!SvOK(val)) v = 0;
-            else if (SvIOK(val) || SvNOK(val)) v = (uint32_t)SvUV(val);
+            else if (SvIOK(val) || SvNOK(val))
+                v = (uint32_t)checked_integer(aTHX_ val, "IPv4 integer", 32, 1);
             else {
                 STRLEN slen;
                 const char *s = SvPV(val, slen);
                 if (looks_like_int_str(s, slen)) {
-                    v = (uint32_t)SvUV(val);
+                    v = (uint32_t)checked_integer(aTHX_ val, "IPv4 integer", 32, 1);
                 } else {
                     char tmp[INET_ADDRSTRLEN];
                     if (slen >= sizeof(tmp))
@@ -416,7 +465,7 @@ static void encode_scalar(pTHX_ Buffer *b, SV *val, TypeInfo *t) {
             } else {
                 STRLEN slen;
                 const char *s = SvPV(val, slen);
-                if (slen == 16) {
+                if (slen == 16 && !memchr(s, ':', slen)) {
                     memcpy(out, s, 16);
                 } else {
                     char tmp[INET6_ADDRSTRLEN];
@@ -424,8 +473,10 @@ static void encode_scalar(pTHX_ Buffer *b, SV *val, TypeInfo *t) {
                         croak("IPv6 string too long: %.*s", (int)slen, s);
                     memcpy(tmp, s, slen);
                     tmp[slen] = 0;
-                    if (inet_pton(AF_INET6, tmp, out) != 1)
-                        croak("Invalid IPv6 address: %s", tmp);
+                    if (inet_pton(AF_INET6, tmp, out) != 1) {
+                        if (slen == 16) memcpy(out, s, 16);
+                        else croak("Invalid IPv6 address: %s", tmp);
+                    }
                 }
             }
             buf_append(aTHX_ b, (const char *)out, 16);
@@ -513,11 +564,12 @@ static int json_classify_array(pTHX_ AV *av) {
         if (SvIsBOOL(*e)) leaf = JV_BOOL;
         else
 #endif
-        if (SvIOK(*e) && !SvNOK(*e)) leaf = JV_INT64;
+        if (SvIOK(*e) && !SvNOK(*e))
+            leaf = SvIsUV(*e) && SvUV(*e) > (UV)INT64_MAX ? JV_FLOAT64 : JV_INT64;
         else if (SvNOK(*e)) {
             NV nv = SvNV(*e);
-            leaf = (nv == (NV)(int64_t)nv
-                    && nv >= (NV)INT64_MIN && nv <= (NV)INT64_MAX)
+            leaf = (nv >= (NV)INT64_MIN && nv < (NV)9223372036854775808.0L
+                    && nv == (NV)(int64_t)nv)
                  ? JV_INT64 : JV_FLOAT64;
         } else {
             leaf = JV_STRING;
@@ -563,7 +615,8 @@ static JsonValueKind json_classify_leaf(pTHX_ SV *val) {
 #ifdef SvIsBOOL
     if (SvIsBOOL(val)) return JV_BOOL;
 #endif
-    if (SvIOK(val) && !SvNOK(val)) return JV_INT64;
+    if (SvIOK(val) && !SvNOK(val))
+        return SvIsUV(val) && SvUV(val) > (UV)INT64_MAX ? JV_FLOAT64 : JV_INT64;
     if (SvNOK(val)) {
         NV n = SvNV(val);
         /* NV holding an exact integer value (e.g. `1.0`) collapses to
@@ -572,8 +625,8 @@ static JsonValueKind json_classify_leaf(pTHX_ SV *val) {
          * value through a float-typed Variant or an explicit Float64
          * column. NaN/Inf fall through to Float64 because the integer
          * round-trip equality check fails for them. */
-        if (n == (NV)(int64_t)n
-            && n >= (NV)INT64_MIN && n <= (NV)INT64_MAX)
+        if (n >= (NV)INT64_MIN && n < (NV)9223372036854775808.0L
+            && n == (NV)(int64_t)n)
             return JV_INT64;
         return JV_FLOAT64;
     }
@@ -670,15 +723,15 @@ static void flatten_json_hash(pTHX_ HV *src,
     hv_iterinit(src);
     HE *he;
     while ((he = hv_iternext(src))) {
-        I32 klen;
-        char *kstr = hv_iterkey(he, &klen);
+        STRLEN klen;
+        const char *kstr = hash_key_bytes(aTHX_ he, &klen);
         SV *vsv = hv_iterval(src, he);
 
-        STRLEN new_len = prefix_len + (prefix_len ? 1 : 0) + klen;
-        SV *path_sv = sv_2mortal(newSV(new_len));
+        STRLEN new_len = prefix_len + (prefix ? 1 : 0) + klen;
+        SV *path_sv = sv_2mortal(newSV(new_len + 1));
         SvPOK_only(path_sv);
         char *pbuf = SvPVX(path_sv);
-        if (prefix_len) {
+        if (prefix) {
             memcpy(pbuf, prefix, prefix_len);
             pbuf[prefix_len] = '.';
             memcpy(pbuf + prefix_len + 1, kstr, klen);
@@ -705,8 +758,11 @@ static void flatten_json_hash(pTHX_ HV *src,
                               SvPVX(path_sv), new_len, out_flat,
                               stop_paths, depth);
         } else {
+            UV count = HvUSEDKEYS(out_flat);
             hv_store(out_flat, SvPVX(path_sv), new_len,
                      SvREFCNT_inc_simple_NN(vsv), 0);
+            if (HvUSEDKEYS(out_flat) == count)
+                croak("JSON column: duplicate path '%.*s' in one object", (int)new_len, SvPVX(path_sv));
         }
     }
 }
@@ -728,7 +784,24 @@ static int cmp_path_entry(const void *a, const void *b) {
     return 0;
 }
 
+static void encode_column_data(pTHX_ Buffer *b, Buffer *prefix,
+                               SV **values, SSize_t num_rows, TypeInfo *t);
+
 void encode_column(pTHX_ Buffer *b, SV **values, SSize_t num_rows, TypeInfo *t) {
+    if (!num_rows) return;
+    if (t->split_prefix) {
+        Buffer data;
+        buf_init(aTHX_ &data);
+        encode_column_data(aTHX_ &data, b, values, num_rows, t);
+        buf_append(aTHX_ b, data.ptr, data.len);
+    } else {
+        encode_column_data(aTHX_ b, b, values, num_rows, t);
+    }
+}
+
+/* Native writes every state prefix before any container or value data. */
+static void encode_column_data(pTHX_ Buffer *b, Buffer *prefix,
+                               SV **values, SSize_t num_rows, TypeInfo *t) {
     SSize_t r;
 
     switch (t->code) {
@@ -758,7 +831,7 @@ void encode_column(pTHX_ Buffer *b, SV **values, SSize_t num_rows, TypeInfo *t) 
                 buf_le64(aTHX_ b,offset);
             }
 
-            if (total_elems > 0) {
+            if (total_elems > 0 || t->inner->has_prefix) {
                 SV **all_elems = alloc_sv_array(aTHX_ total_elems);
                 SSize_t idx = 0;
                 for (r = 0; r < num_rows; r++) {
@@ -770,12 +843,18 @@ void encode_column(pTHX_ Buffer *b, SV **values, SSize_t num_rows, TypeInfo *t) 
                         all_elems[idx++] = elem ? *elem : &PL_sv_undef;
                     }
                 }
-                encode_column(aTHX_ b, all_elems, total_elems, t->inner);
+                encode_column_data(aTHX_ b, prefix, all_elems, total_elems, t->inner);
             }
             break;
         }
 
         case T_TUPLE: {
+            if (!t->tuple_len) {
+                buf_grow(aTHX_ b, num_rows);
+                memset(b->ptr + b->len, 0x30, num_rows);
+                b->len += num_rows;
+                break;
+            }
             int i;
             SV **elem_values = alloc_sv_array(aTHX_ num_rows);
 
@@ -791,8 +870,8 @@ void encode_column(pTHX_ Buffer *b, SV **values, SSize_t num_rows, TypeInfo *t) 
                     } else if (SvTYPE(rv) == SVt_PVHV
                                && t->tuple_names && t->tuple_names[i]) {
                         /* Named-tuple input as hashref: look up by name. */
-                        SV **elem = hv_fetch((HV*)rv, t->tuple_names[i],
-                                             strlen(t->tuple_names[i]), 0);
+                        SV **elem = fetch_named_value(aTHX_ (HV*)rv, t->tuple_names[i],
+                                                     strlen(t->tuple_names[i]));
                         elem_values[r] = elem ? *elem : &PL_sv_undef;
                     } else if (SvTYPE(rv) == SVt_PVHV) {
                         croak("Tuple given as hashref but type is unnamed; "
@@ -801,7 +880,7 @@ void encode_column(pTHX_ Buffer *b, SV **values, SSize_t num_rows, TypeInfo *t) 
                         croak("Expected arrayref or hashref for Tuple type");
                     }
                 }
-                encode_column(aTHX_ b, elem_values, num_rows, t->tuple[i]);
+                encode_column_data(aTHX_ b, prefix, elem_values, num_rows, t->tuple[i]);
             }
             break;
         }
@@ -824,7 +903,7 @@ void encode_column(pTHX_ Buffer *b, SV **values, SSize_t num_rows, TypeInfo *t) 
                     else
                         inner_values[r] = values[r];
                 }
-                encode_column(aTHX_ b, inner_values, num_rows, t->inner);
+                encode_column_data(aTHX_ b, prefix, inner_values, num_rows, t->inner);
             }
             break;
         }
@@ -847,10 +926,10 @@ void encode_column(pTHX_ Buffer *b, SV **values, SSize_t num_rows, TypeInfo *t) 
                     hv_iterinit(hv);
                     HE *he;
                     while ((he = hv_iternext(hv))) {
-                        I32 klen;
-                        char *kstr = hv_iterkey(he, &klen);
                         SV *vsv = hv_iterval(hv, he);
                         AV *pair = newAV();
+                        STRLEN klen;
+                        const char *kstr = hash_key_bytes(aTHX_ he, &klen);
                         av_push(pair, newSVpvn(kstr, klen));
                         av_push(pair, SvREFCNT_inc(vsv));
                         av_push(pairs, newRV_noinc((SV *)pair));
@@ -871,7 +950,7 @@ void encode_column(pTHX_ Buffer *b, SV **values, SSize_t num_rows, TypeInfo *t) 
                 total += n;
                 buf_le64(aTHX_ b, offset);
             }
-            if (total > 0) {
+            if (total > 0 || t->split_prefix) {
                 SV **all = alloc_sv_array(aTHX_ total);
                 SSize_t idx = 0;
                 for (r = 0; r < num_rows; r++) {
@@ -895,7 +974,7 @@ void encode_column(pTHX_ Buffer *b, SV **values, SSize_t num_rows, TypeInfo *t) 
                         SV **e = av_fetch(pair, j, 0);
                         col[k] = e ? *e : &PL_sv_undef;
                     }
-                    encode_column(aTHX_ b, col, total, t->tuple[j]);
+                    encode_column_data(aTHX_ b, prefix, col, total, t->tuple[j]);
                 }
             }
             break;
@@ -916,7 +995,7 @@ void encode_column(pTHX_ Buffer *b, SV **values, SSize_t num_rows, TypeInfo *t) 
             int nvar = t->tuple_len;
             #define VARIANT_NULL 255
 
-            buf_le64(aTHX_ b, 0);
+            buf_le64(aTHX_ prefix, 0);
 
             int *counts;  /* indexed by declaration idx */
             Newxz(counts, nvar, int);
@@ -952,7 +1031,7 @@ void encode_column(pTHX_ Buffer *b, SV **values, SSize_t num_rows, TypeInfo *t) 
             /* Emit sub-columns in wire (alphabetical) order. */
             for (v = 0; v < nvar; v++) {
                 int d = t->variant_wire_to_decl[v];
-                encode_column(aTHX_ b, per_var[d], counts[d], t->tuple[d]);
+                encode_column_data(aTHX_ b, prefix, per_var[d], counts[d], t->tuple[d]);
             }
             #undef VARIANT_NULL
             break;
@@ -972,6 +1051,8 @@ void encode_column(pTHX_ Buffer *b, SV **values, SSize_t num_rows, TypeInfo *t) 
              * (which always carries the "default" value) and the wire format
              * for the actual non-NULL dict starts at index 1.
              */
+            buf_le64(aTHX_ prefix, 1);
+            if (!num_rows) break;
             TypeInfo *inner = t->inner;
             int is_null = (inner->code == T_NULLABLE);
             TypeInfo *leaf = is_null ? inner->inner : inner;
@@ -1061,7 +1142,6 @@ void encode_column(pTHX_ Buffer *b, SV **values, SSize_t num_rows, TypeInfo *t) 
 
             uint64_t flags = (uint64_t)idx_type | (1ULL << 9);  /* HasAdditionalKeys */
 
-            buf_le64(aTHX_ b, 1);              /* version */
             buf_le64(aTHX_ b, flags);
             buf_le64(aTHX_ b, (uint64_t)dict_count);
 
@@ -1072,7 +1152,7 @@ void encode_column(pTHX_ Buffer *b, SV **values, SSize_t num_rows, TypeInfo *t) 
                 SV **e = av_fetch(dict_av, di, 0);
                 dict_vals[di] = e ? *e : &PL_sv_undef;
             }
-            encode_column(aTHX_ b, dict_vals, (SSize_t)dict_count, leaf);
+            encode_column_data(aTHX_ b, prefix, dict_vals, (SSize_t)dict_count, leaf);
 
             buf_le64(aTHX_ b, (uint64_t)num_rows);
 
@@ -1107,7 +1187,7 @@ void encode_column(pTHX_ Buffer *b, SV **values, SSize_t num_rows, TypeInfo *t) 
 
             /* Step 1: flatten each row's hashref to dotted-path leaves.
              * Typed paths whose declared inner type is itself a hash
-             * shape (Map / Tuple) must NOT be recursed into during
+             * shape (Map / Tuple) must not be recursed into during
              * flatten - the user's nested hash for those is the leaf
              * value, not a sub-object. Build a stop-set of those names
              * and pass it to flatten so it stops recursing at them. */
@@ -1276,12 +1356,12 @@ void encode_column(pTHX_ Buffer *b, SV **values, SSize_t num_rows, TypeInfo *t) 
             }
 
             /* Step 4: emit Object structure prefix (V1). */
-            buf_le64(aTHX_ b, 0);                     /* Object V1 */
-            buf_varint(aTHX_ b, (UV)num_paths);       /* max_dynamic_paths */
-            buf_varint(aTHX_ b, (UV)num_paths);       /* actual count */
+            buf_le64(aTHX_ prefix, 0);                     /* Object V1 */
+            buf_varint(aTHX_ prefix, (UV)num_paths);       /* max_dynamic_paths */
+            buf_varint(aTHX_ prefix, (UV)num_paths);       /* actual count */
             int p;
             for (p = 0; p < num_paths; p++)
-                buf_string(aTHX_ b, paths[p], path_lens[p]);
+                buf_string(aTHX_ prefix, paths[p], path_lens[p]);
 
             /* Per-path wire-slot tables. path_slots[p*5+s] is the lex-ordered
              * slot at index s (kind index or -1 for SharedVariant);
@@ -1304,9 +1384,9 @@ void encode_column(pTHX_ Buffer *b, SV **values, SSize_t num_rows, TypeInfo *t) 
                 int wire_slots = wire_slot_counts[p];
                 int kc = wire_slots - 1;  /* minus SharedVariant */
 
-                buf_le64(aTHX_ b, 1);                   /* Dynamic V1 */
-                buf_varint(aTHX_ b, (UV)kc);            /* max_dynamic_types */
-                buf_varint(aTHX_ b, (UV)kc);            /* actual count */
+                buf_le64(aTHX_ prefix, 1);                   /* Dynamic V1 */
+                buf_varint(aTHX_ prefix, (UV)kc);            /* max_dynamic_types */
+                buf_varint(aTHX_ prefix, (UV)kc);            /* actual count */
 
                 /* User variant type names in lex order (skip SharedVariant). */
                 int *slots = path_slots + p*JSON_LEX_SLOTS;
@@ -1315,9 +1395,9 @@ void encode_column(pTHX_ Buffer *b, SV **values, SSize_t num_rows, TypeInfo *t) 
                     int k = slots[s];
                     if (k < 0) continue;
                     const char *nm = json_kind_type_name[k];
-                    buf_string(aTHX_ b, nm, strlen(nm));
+                    buf_string(aTHX_ prefix, nm, strlen(nm));
                 }
-                buf_le64(aTHX_ b, 0);                   /* Variant BASIC */
+                buf_le64(aTHX_ prefix, 0);                   /* Variant BASIC */
             }
 
             /* Step 5b: emit typed-path column data (sorted by name).
@@ -1329,7 +1409,7 @@ void encode_column(pTHX_ Buffer *b, SV **values, SSize_t num_rows, TypeInfo *t) 
             if (n_typed > 0 && num_rows > 0) {
                 int tp;
                 for (tp = 0; tp < n_typed; tp++)
-                    encode_column(aTHX_ b, typed_vals[tp], num_rows,
+                    encode_column_data(aTHX_ b, prefix, typed_vals[tp], num_rows,
                                   t->tuple[tp]);
             }
 
@@ -1447,17 +1527,17 @@ void encode_column(pTHX_ Buffer *b, SV **values, SSize_t num_rows, TypeInfo *t) 
             int wire_slots = json_build_lex_table(mask, slots);
             int kc = wire_slots - 1;
 
-            buf_le64(aTHX_ b, 1);              /* Dynamic V1 */
-            buf_varint(aTHX_ b, (UV)kc);       /* max_dynamic_types */
-            buf_varint(aTHX_ b, (UV)kc);       /* actual count */
+            buf_le64(aTHX_ prefix, 1);              /* Dynamic V1 */
+            buf_varint(aTHX_ prefix, (UV)kc);       /* max_dynamic_types */
+            buf_varint(aTHX_ prefix, (UV)kc);       /* actual count */
             int s;
             for (s = 0; s < wire_slots; s++) {
                 int k = slots[s];
                 if (k < 0) continue;
                 const char *nm = json_kind_type_name[k];
-                buf_string(aTHX_ b, nm, strlen(nm));
+                buf_string(aTHX_ prefix, nm, strlen(nm));
             }
-            buf_le64(aTHX_ b, 0);              /* Variant BASIC */
+            buf_le64(aTHX_ prefix, 0);              /* Variant BASIC */
 
             /* Discriminator byte per row. */
             for (r = 0; r < num_rows; r++) {

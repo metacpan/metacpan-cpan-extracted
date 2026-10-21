@@ -1,6 +1,10 @@
 Revision history for Term::Choose
 
 
+1.783   2026-10-21
+    - Unicode 18.
+    - Code refactoring.
+
 1.782   2026-04-09
     - Updates and bugfixes available height and available width.
     - Bugfix option mark: wrong mapping.

@@ -34,6 +34,37 @@ ok($conn->{ctx}, '_begin_tls created a per-connection SSL CTX');
 ok(Net::SSLeay::CTX_get_mode($conn->{ctx}) & 0x2,
    '_begin_tls sets SSL_MODE_ACCEPT_MOVING_WRITE_BUFFER (guards HTTPS truncation on the backpressure write path)');
 
+$peer_fd->blocking(0);
+setsockopt($srv_fd, SOL_SOCKET, SO_SNDBUF, 4096) or die $!;
+my $peer_ctx = Net::SSLeay::CTX_new();
+my $peer_ssl = Net::SSLeay::new($peer_ctx);
+Net::SSLeay::set_fd($peer_ssl, fileno($peer_fd));
+my $connected;
+for (1..1000) {
+    $connected = Net::SSLeay::connect($peer_ssl) > 0 unless $connected;
+    $conn->_do_handshake unless $conn->{state} eq 'tls';
+    last if $connected && $conn->{state} eq 'tls';
+}
+ok($connected && $conn->{state} eq 'tls', 'nonblocking TLS handshake completed');
+
+my $first = 'first-' x 32768;
+my $second = 'second-' x 32768;
+$conn->_write_client($first);
+ok(length($conn->{wbuf}), 'small socket forces a pending TLS write');
+$conn->_write_client($second);
+my $got = '';
+for (1..10000) {
+    last if $conn->{_dead};
+    $conn->_flush;
+    my ($data, $rc) = Net::SSLeay::read($peer_ssl, 32768);
+    $got .= $data if defined $rc && $rc > 0;
+    last if length($got) == length($first) + length($second) && !length($conn->{wbuf});
+}
+ok(!$conn->{_dead}, 'growing a queued TLS write does not kill the connection');
+is($got, $first . $second, 'TLS retry delivers appended data exactly once');
+
 $conn->_close;
+Net::SSLeay::free($peer_ssl);
+Net::SSLeay::CTX_free($peer_ctx);
 close $peer_fd;
 done_testing;

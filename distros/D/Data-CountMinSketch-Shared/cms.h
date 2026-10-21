@@ -5,8 +5,8 @@
  * hashed once (XXH3-128); the two 64-bit halves drive one column per row
  * (d-row double hashing) into a d x w counter matrix (w a power of two). add
  * increments the d cells; estimate returns the minimum of the d cells, which
- * never underestimates the true count and overestimates by at most epsilon*total
- * with probability >= 1-delta. The matrix lives in a shared mapping so several
+ * never underestimates the true count; double hashing makes the usual CMS
+ * probability bound approximate. The matrix lives in a shared mapping so several
  * processes share one sketch; a write-preferring futex rwlock with reader-slot
  * dead-process recovery guards mutation. Two sketches of equal geometry can be
  * merged (cellwise add -> sum of streams).
@@ -673,6 +673,7 @@ static CmsHandle *cms_create(const char *path, double epsilon, double delta, mod
     uint64_t total = cms_total_size(w, d);
     int anonymous = (path == NULL);
     int fd = -1;
+    int initialize = anonymous;
     size_t map_size;
     void *base;
 
@@ -691,16 +692,47 @@ static CmsHandle *cms_create(const char *path, double epsilon, double delta, mod
             CMS_ERR("%s: file too small (%lld)", path, (long long)st.st_size);
             flock(fd, LOCK_UN); close(fd); return NULL;
         }
-        if (is_new && (st.st_uid != geteuid() || fchmod(fd, mode) < 0)) {
+        initialize = is_new;
+        if (!is_new) {
+            /* A mapped read of a tmpfs hole can allocate a page; validate before mapping. */
+            CmsHeader hdr;
+            ssize_t n;
+            do n = pread(fd, &hdr, sizeof hdr, 0); while (n < 0 && errno == EINTR);
+            if (n != (ssize_t)sizeof hdr) {
+                CMS_ERR("%s: cannot read Count-Min sketch header: %s", path, n < 0 ? strerror(errno) : "short read");
+                flock(fd, LOCK_UN); close(fd); return NULL;
+            }
+            if (!cms_validate_header(&hdr, (uint64_t)st.st_size)) {
+                if (hdr.magic == 0 && (uint64_t)st.st_size == total && st.st_uid == geteuid()) {
+                    if (!cms_file_is_zero(fd, total)) {
+                        CMS_ERR("%s: incomplete Count-Min sketch file left by an interrupted create; remove it and retry", path);
+                        flock(fd, LOCK_UN); close(fd); return NULL;
+                    }
+                    initialize = 1;
+                } else {
+                    CMS_ERR("invalid Count-Min sketch file");
+                    flock(fd, LOCK_UN); close(fd); return NULL;
+                }
+            }
+            if (!initialize && hdr.sealed) {
+                CMS_ERR("%s is frozen (read-only); open it with new_readonly", path);
+                flock(fd, LOCK_UN); close(fd); return NULL;
+            }
+        }
+        if (initialize && st.st_uid != geteuid()) {
             CMS_ERR("%s: refusing to initialize file not owned by us", path);
+            flock(fd, LOCK_UN); close(fd); return NULL;
+        }
+        if (initialize && fchmod(fd, mode) < 0) {
+            CMS_ERR("%s: fchmod: %s", path, strerror(errno));
             flock(fd, LOCK_UN); close(fd); return NULL;
         }
         if (is_new && ftruncate(fd, (off_t)total) < 0) {
             CMS_ERR("ftruncate: %s", strerror(errno)); flock(fd, LOCK_UN); close(fd); return NULL;
         }
-        if (is_new && cms_reserve(fd, total) < 0) {
+        if (initialize && cms_reserve(fd, total) < 0) {
             CMS_ERR("%s: cannot reserve %llu bytes: %s", path, (unsigned long long)total, strerror(errno));
-            if (ftruncate(fd, 0) < 0) { /* best effort */ }
+            if (is_new && ftruncate(fd, 0) < 0) { /* best effort */ }
             flock(fd, LOCK_UN); close(fd); return NULL;
         }
         map_size = is_new ? (size_t)total : (size_t)st.st_size;
@@ -710,44 +742,8 @@ static CmsHandle *cms_create(const char *path, double epsilon, double delta, mod
             if (is_new && ftruncate(fd, 0) < 0) { /* best effort */ }
             flock(fd, LOCK_UN); close(fd); return NULL;
         }
-        if (!is_new) {
-            if (!cms_validate_header((CmsHeader *)base, (uint64_t)st.st_size)) {
-                /* Recover an abandoned mid-init file: a creator killed
-                 * between the ftruncate and the header init leaves a
-                 * full-size, all-zero (magic==0) file that would brick every
-                 * future open of this path.  Re-initialize ONLY when it is
-                 * exactly our size, still uninitialized, and owned by us;
-                 * anything else still errors. */
-                if (((CmsHeader *)base)->magic == 0 && (uint64_t)st.st_size == total
-                    && st.st_uid == geteuid() && cms_file_is_zero(fd, map_size)) {
-                    if (fchmod(fd, mode) < 0) {
-                        CMS_ERR("%s: fchmod: %s", path, strerror(errno));
-                        munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
-                    }
-                    if (cms_reserve(fd, total) < 0) {
-                        CMS_ERR("%s: cannot reserve %llu bytes: %s", path, (unsigned long long)total, strerror(errno));
-                        munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
-                    }
-                    cms_init_header(base, w, d, total);
-                    flock(fd, LOCK_UN); close(fd);
-                    return cms_setup(base, map_size, path, -1);
-                }
-                if (((CmsHeader *)base)->magic == 0 && (uint64_t)st.st_size == total
-                    && st.st_uid == geteuid()) {
-                    CMS_ERR("%s: incomplete Count-Min sketch file left by an interrupted create; remove it and retry", path);
-                    munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
-                }
-                CMS_ERR("invalid Count-Min sketch file"); munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
-            }
-            if (((CmsHeader *)base)->sealed) {
-                CMS_ERR("%s is frozen (read-only); open it with new_readonly", path);
-                munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
-            }
-            flock(fd, LOCK_UN); close(fd);
-            return cms_setup(base, map_size, path, -1);
-        }
     }
-    cms_init_header(base, w, d, total);
+    if (initialize) cms_init_header(base, w, d, total);
     if (fd >= 0) { flock(fd, LOCK_UN); close(fd); }
     return cms_setup(base, map_size, path, -1);
 }
@@ -823,7 +819,7 @@ static CmsHandle *cms_open_readonly(const char *path, char *errbuf) {
     if (!cms_validate_header((CmsHeader *)base, (uint64_t)st.st_size)) {
         CMS_ERR("%s: invalid Count-Min sketch file", path); munmap(base, ms); return NULL;
     }
-    if (!((CmsHeader *)base)->sealed) {
+    if (!__atomic_load_n(&((CmsHeader *)base)->sealed, __ATOMIC_ACQUIRE)) {
         CMS_ERR("%s is not frozen: call ->freeze on the producer before opening read-only", path);
         munmap(base, ms); return NULL;
     }
@@ -866,7 +862,7 @@ static inline int cms_msync(CmsHandle *h) {
  * read-write reopen is refused. */
 static int cms_freeze(CmsHandle *h) {
     cms_rwlock_wrlock(h);
-    h->hdr->sealed = 1;
+    __atomic_store_n(&h->hdr->sealed, 1, __ATOMIC_RELEASE);
     cms_rwlock_wrunlock(h);
     if (h->path || h->backing_fd >= 0) return cms_msync(h);  /* durability for file/memfd-backed */
     return 0;   /* anonymous: the seal lives in shared memory (visible to forks); nothing to flush */

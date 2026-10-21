@@ -2,13 +2,14 @@ package Mail::DKIM2::HeaderParser;
 use strict;
 use warnings;
 
-our $VERSION = '0.25';
+our $VERSION = '0.27';
 
 # Thin base class for streaming message parsing.
 # Replaces the deep Mail::DKIM::Common → Mail::DKIM::MessageParser
 # inheritance chain with just what DKIM2 Signer/Verifier need.
 
 use Carp;
+use Scalar::Util qw(blessed);
 
 # The constructor options a subclass accepts, as a list of CamelCase names.
 # new() refuses anything else, so a misspelt option is an error at the call
@@ -38,7 +39,8 @@ sub TIEHANDLE {
 # a reference to one, a filehandle, or an Email::MIME. Line endings are
 # normalised to CRLF, which is what every DKIM2 hash is defined over; PRINT
 # itself never alters what it is given, since a streaming host has already
-# got CRLF and may split a line ending across chunks.
+# got CRLF and may split a line ending across chunks. A filehandle is read
+# a piece at a time, never whole.
 sub load {
     my ($self, $input) = @_;
     # can() is probed in an eval (an unblessed reference has none), and like
@@ -61,8 +63,9 @@ sub load {
         $tref = \$input->as_string;
     }
     elsif (ref $input eq 'GLOB' || ref \$input eq 'GLOB' || $can->('getline')) {
-        local $/;
-        $tref = \readline($input);
+        _read_handle($input, sub { $self->PRINT($_[0]); !$self->{_stopped} });
+        $self->CLOSE;
+        return $self;
     }
     elsif (ref $input) {
         croak "load: cannot read a message from a " . ref($input) . " reference";
@@ -78,6 +81,46 @@ sub load {
     $self->PRINT($$tref);
     $self->CLOSE;
     return $self;
+}
+
+use constant READ_PIECE => 1 << 16;
+
+# _read_handle($fh, $sink, $header_only): read $fh to its end, or with
+# $header_only through the blank line that ends the header fields, with
+# every line ending made CRLF, handing it to $sink in pieces of about
+# READ_PIECE bytes, until $sink returns false. A CR that ends a block waits
+# for the next, so a CRLF is never split between pieces. An object other
+# than a filehandle is read through its getline.
+sub _read_handle {
+    my ($fh, $sink, $header_only) = @_;
+    local $/ = "\n";
+    my $lines = $header_only || (blessed($fh) && !$fh->isa('IO::Handle')
+                                 && $fh->can('getline'));
+    if ($lines) {
+        my $next = blessed($fh) && $fh->can('getline')
+            ? sub { $fh->getline } : sub { readline($fh) };
+        my $piece = '';
+        while (defined(my $line = $next->())) {
+            $line =~ s/\r?\n\z/\r\n/;
+            $piece .= $line;
+            last if $header_only && $line eq "\r\n";
+            next if length $piece < READ_PIECE;
+            return unless $sink->($piece);
+            $piece = '';
+        }
+        $sink->($piece) if length $piece;
+        return;
+    }
+    my $carry = '';
+    while (read($fh, my $piece, READ_PIECE)) {
+        $piece = $carry . $piece;
+        $carry = substr($piece, -1) eq "\r" ? chop($piece) : '';
+        # s/\r?\n/\r\n/g, as body_digest_raw does it.
+        $piece =~ s/\r\n/\n/g if index($piece, "\r") >= 0;
+        $piece =~ s/\n/\r\n/g;
+        return unless $sink->($piece);
+    }
+    $sink->($carry) if length $carry;
 }
 
 sub init {
@@ -279,7 +322,8 @@ C<finish_body> unless C<stop> was called.
 =head2 load($input)
 
 C<PRINT> and C<CLOSE> in one call. C<$input> is the message as a string,
-a reference to one, a filehandle (read to the end), or an L<Email::MIME>;
+a reference to one, a filehandle (read a piece at a time, to the end or until
+the parser has stopped), or an L<Email::MIME>;
 any other reference croaks. Bare LF line endings are normalised to CRLF
 first, since every DKIM2 hash is defined over CRLF. Returns the object.
 

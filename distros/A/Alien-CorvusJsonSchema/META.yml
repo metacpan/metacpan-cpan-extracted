@@ -1,0 +1,55 @@
+---
+abstract: 'The corvus-json-schema C library, for JSON Schema validation'
+author:
+  - endjin
+build_requires:
+  Alien::Build: '2.38'
+  Alien::Build::MM: '0.25'
+  Archive::Tar: '0'
+  HTTP::Tiny: '0.044'
+  IO::Socket::SSL: '1.56'
+  IO::Zlib: '0'
+  Mozilla::CA: '0'
+  Net::SSLeay: '1.49'
+  Test2::V0: '0.000060'
+  Test::Alien: '0'
+  URI: '0'
+configure_requires:
+  Alien::Build: '2.57'
+  Alien::Build::MM: '0.32'
+  Alien::Build::Plugin::Digest::Negotiate: '0'
+  Alien::Build::Plugin::Digest::SHA: '0'
+  ExtUtils::MakeMaker: '6.64'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alien-CorvusJsonSchema
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Alien::Base: '2.38'
+  Alien::Build: '0.25'
+  perl: '5.026'
+resources:
+  bugtracker: https://github.com/corvus-dotnet/Corvus.JsonSchema/issues
+  homepage: https://corvus-oss.org/Corvus.JsonSchema/
+  repository: https://github.com/corvus-dotnet/Corvus.JsonSchema.git
+version: v0.1.0
+x_alienfile:
+  generated_by: 'Alien::Build::MM version 2.88'
+  requires:
+    share:
+      Archive::Tar: '0'
+      HTTP::Tiny: '0.044'
+      IO::Socket::SSL: '1.56'
+      IO::Zlib: '0'
+      Mozilla::CA: '0'
+      Net::SSLeay: '1.49'
+      URI: '0'
+    system: {}
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

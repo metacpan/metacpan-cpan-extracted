@@ -5,6 +5,10 @@
 #
 # Spanish contracts "de el" to "del": "fin del mes pasado" is read by putting
 # the swallowed "el" back, since CLDR's own words carry it ("el mes pasado").
+#
+# 0.02's keys: Ranges, a duration before or after a point ("antes del" too) and the day
+# after one read. The weekend does not: "fin de semana" is masculine and CLDR's
+# "la próxima semana" feminine.
 start_of	principio de|principio del|principios de|principios del|inicio de|inicio del|comienzo de|comienzo del|a principios de|a principios del|al principio de|al principio del|al inicio de|al inicio del
 end_of	fin de|fin del|final de|final del|finales de|finales del|a fin de|a fin del|a finales de|a finales del|al final de|al final del
 at	a las|a la
@@ -13,6 +17,9 @@ skip	el|la|los|las
 and
 of	de|del
 last	último|última
+range	de {0} a {1}|desde {0} hasta {1}|entre {0} y {1}|{0} hasta {1}
+after	{0} después de {1}|el día después de {0}|{0} después del {1}
+before	{0} antes de {1}|el día antes de {0}|{0} antes del {1}
 # test: fin del mes pasado => 2026-09-30T23:59:59.999999999+01:00
 # test: principio de la próxima semana => 2026-10-19T00:00:00+01:00
 # test: final del año => 2026-12-31T23:59:59.999999999+00:00
@@ -20,3 +27,7 @@ last	último|última
 # test: mañana a las 15:30 => 2026-10-16T15:30:00+01:00
 # test: el tercer viernes del próximo mes => 2026-11-20T00:00:00+00:00
 # test: el último viernes de octubre => 2026-10-30T00:00:00+00:00
+# test: de lunes a viernes => 2026-10-19T00:00:00+01:00 / 2026-10-23T23:59:59.999999999+01:00
+# test: 3 días después de mañana => 2026-10-19T00:00:00+01:00
+# test: 2 semanas antes del 20 de octubre => 2026-10-06T00:00:00+01:00
+# test: el día después de mañana => 2026-10-17T00:00:00+01:00

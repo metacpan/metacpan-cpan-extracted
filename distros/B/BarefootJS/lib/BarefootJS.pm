@@ -1,5 +1,5 @@
 package BarefootJS;
-our $VERSION = "0.39.7";
+our $VERSION = "0.39.8";
 use strict;
 use warnings;
 use utf8;
@@ -753,6 +753,15 @@ sub multiply ($self, $l, $r) {
 sub divide ($self, $l, $r) {
     no warnings qw(numeric uninitialized);
     return BarefootJS::Evaluator::_divide(_as_double($l), _as_double($r));
+}
+
+# JS `%` (#3474): the truncated remainder, which takes the dividend's sign
+# (`-7 % 2` is -1) and keeps a fraction. Perl's native `%` floors (`-7 % 2`
+# is 1) and converts both operands to integers (`NaN % 2` is 0). A nil
+# operand reads as 0, as with the native operator.
+sub mod ($self, $l, $r) {
+    no warnings qw(numeric);
+    return BarefootJS::Evaluator::_remainder(_as_double($l // 0), _as_double($r // 0));
 }
 
 # NaN is the only float for which `$x != $x` holds. Used as the
@@ -2194,7 +2203,7 @@ package BarefootJS::Date;
 # compartment where `$BarefootJS::VERSION` is not visible and collapses to
 # 0. scripts/sync-perl-versions.ts bumps every `our $VERSION` line in the
 # file, so this stays in lockstep with the package version above.
-our $VERSION = "0.39.7";
+our $VERSION = "0.39.8";
 
 sub new {
     my ($class, $epoch_ms) = @_;

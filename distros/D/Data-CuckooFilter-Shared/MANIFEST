@@ -13,6 +13,8 @@ t/02-oracle.t
 t/03-frozen.t
 t/04-recover.t
 t/05-unlink-failure.t
+t/06-dead-writer.t
+t/07-freeze-race.t
 xt/asan.t
 xt/class_pv_magic.t
 xt/crash_recovery.t
@@ -21,6 +23,7 @@ xt/eg_runs.t
 xt/enospc.t
 xt/fork_cuckoo.t
 xt/kwalitee.t
+xt/native.t
 xt/pod.t
 xt/tsan.t
 xt/valgrind.t

@@ -1,5 +1,9 @@
 Revision history for Time-Keeper-Business
 
+0.03    2026-10-20
+        - Builds on perls before 5.36 (G_LIST).
+        - Builds on perl 5.10.0 (mPUSHs, mXPUSHs).
+
 0.02    2026-10-19
         - A holiday source with arguments: { source => $obj, regions => [...] }, passed to its holidays method after the year.
         - Rules in other calendars: fixed and nth take calendar, month_code and leap_month; a lunar holiday can fall twice in a year.

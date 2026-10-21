@@ -3,7 +3,7 @@ package ZX81::Tokenize;
 use Modern::Perl;
 use POSIX qw(frexp);
 
-our $VERSION = '0.005';
+our $VERSION = '0.006';
 
 use Exporter qw(import);
 
@@ -117,6 +117,12 @@ sub tokenize_line {
                 my $num_chars = encode_chars($num);
                 my $num_bin   = encode_float($num);
                 $bin .= $num_chars . pack( "C", 0x7E ) . $num_bin;
+            }
+            elsif ( $line =~ s/^(\w+)//i ) {
+
+                # identifier
+                my $ident = $1;
+                $bin .= encode_chars($ident);
             }
             elsif ( $line =~ s/^\"//i ) {
 

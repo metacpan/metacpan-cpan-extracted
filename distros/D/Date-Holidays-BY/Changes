@@ -1,3 +1,17 @@
+3.2027.0	2026-10-21
+	+ exact dates for 1992-2012
+	+ exact dates for 2027
+	+ short_business_days(): shortened business days are calculated by the Labor Code art. 116, the table SHORT_BUSINESS_DAYS is removed
+	+ croak on invalid dates in is_holiday, is_business_day, is_short_business_day
+	* postponed days and working days on weekends are not repeated after the last year with data
+	* locale priority: LC_ALL, LC_MESSAGES, LANG
+	* Radonitsa is removed from the table of postponed days (it is calculated)
+	- dependencies: Date::Easter (Radonitsa is calculated), Time::Piece (weekday is calculated), Test::Exception
+	- deprecated variables $HOLIDAYS_VALID_SINCE, $INACCURATE_TIMES_SINCE (use $ref->{HOLIDAYS_VALID_SINCE}, $ref->{INACCURATE_TIMES_BEFORE}, $ref->{INACCURATE_TIMES_SINCE})
+	- 2038 problem on x86 with perl < 5.12
+	develop: carton is replaced by cpm (dev/exec.pl instead of carton exec)
+	* pod typos
+
 2.2026.0	2025-07-24
 	+ exact dates for 2026
 

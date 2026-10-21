@@ -77,6 +77,23 @@ my $n = $N->new(zone => 'Europe/London', locale => 'en-GB');
     is(str(sub { $N->new(now => $spring)->parse('in 1 week and 0 days') }), '2027-04-03T01:30:00+01:00', 'a week on');
 }
 
+# Spaceless chains cut where a number word starts as well as digits, the
+# longest piece that reads first, every piece read.
+{
+    my $p = sub { my ($loc, $t) = @_; str(sub { $N->new(zone => 'Europe/London', locale => $loc)->parse($t) }) };
+    is($p->('ja', '二週間三日後'), '2026-11-01T09:00:00+00:00', 'ja: two weeks three days, in words');
+    is($p->('ja', '二週間三日後'), $p->('ja', '2週間3日後'), 'as in digits');
+    is($p->('ja', '2週間三日後'), '2026-11-01T09:00:00+00:00', 'digits and words mixed');
+    is($p->('ja', '一時間三十分後'), '2026-10-15T10:30:00+01:00', 'thirty is one word, not three and ten');
+    is($p->('zh', '两周三天后'), '2026-11-01T09:00:00+00:00', 'zh');
+    is($p->('zh', '两天三小时前'), '2026-10-13T06:00:00+01:00', 'zh, the past');
+    is($p->('yue', '兩個星期三日後'), '2026-11-01T09:00:00+00:00', 'yue: 星期三 (Wednesday) inside the chain is not one');
+    is($p->('ja', '一昨日'), '2026-10-13T00:00:00+01:00', 'a fixed phrase that begins with a number character reads whole');
+    is($p->('th', 'ในอีก 2 ชั่วโมง และ 30 นาที'), '2026-10-15T11:30:00+01:00', 'th: a piece that begins with its direction word');
+    like($p->('ja', '一二三四五六七八九十一二三四五六七八九十'), qr/no such word in ja/, 'number words alone are no chain');
+    like($p->('zh', '一个星期三天后'), qr/no such word in zh/, 'a piece CLDR does not write (个星期) still dies');
+}
+
 # Deaths.
 {
     dies_like(sub { $n->parse('in 2 weeks and 3 days ago') }, qr/one direction a phrase/, 'both directions');

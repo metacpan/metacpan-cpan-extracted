@@ -1,5 +1,10 @@
 Revision history for Proxy-Impersonate
 
+0.03  2026-10-16
+    - Fix HTTP framing, bodyless responses and streaming teardown.
+    - Preserve forwarded headers and handle hook and certificate failures.
+    - Require Curl::Impersonate 0.03 for upstream HEAD handling.
+
 0.02  2026-09-02
         - upstream responses are decompressed before being forwarded, so a page
           served with an encoding the client cannot decode (zstd) now renders

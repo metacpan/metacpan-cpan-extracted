@@ -118,7 +118,7 @@ METHODS
     Rank indices are 0-based and may be negative (counting from the end, like
     Perl slices); "range_by_*" bounds are inclusive. "range_by_score" /
     "rev_range_by_score" accept "limit => $n" and "offset => $k" (a negative
-    "offset" is treated as 0). All range and rank methods return members; pass
+    "offset" is treated as 0). All range methods return members; pass
     "withscores => 1" for a flat "(member, score, ...)" list instead.
 
   Pop and peek

@@ -68,6 +68,12 @@ typedef struct {
     I32 m, next;
 } tkn_node;
 
+/* What the pattern ladders test of a pattern before they read it (0.04). */
+typedef struct {
+    char kind;          /* 'd' date, 't' time, 'o' other */
+    I8 numeric, alpha, month_name;
+} tkn_pmeta;
+
 typedef struct {
     SV *code;
     int spaceless, has_digits, num_max, ordinals_read;
@@ -98,6 +104,7 @@ typedef struct {
     int cal_id;         /* Time::Keeper's index of it, 0 for the Gregorian */
     SV *decimal;        /* the locale's decimal sign, on first use (0.03) */
     SV *group;          /* and its group separator */
+    tkn_pmeta *pmeta;   /* the patterns' facts, beside L->patterns (0.04) */
 } tkn_lexicon;
 
 static U32
@@ -1135,6 +1142,7 @@ tkn_lexicon_free(pTHX_ tkn_lexicon *L)
     SvREFCNT_dec(L->digital);
     SvREFCNT_dec(L->lists);
     SvREFCNT_dec((SV *)L->patterns);
+    Safefree(L->pmeta);
     SvREFCNT_dec((SV *)L->periods);
     Safefree(L->jword_w);
     SvREFCNT_dec((SV *)L->jwords);

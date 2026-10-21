@@ -25,5 +25,17 @@ perltidy:
 readme:
 \tperl -MPod::Markdown -e "Pod::Markdown->new->filter(qw(lib/ZX81/Tokenize.pm))" > README.md
 
+# --- test ---
+mytest:
+\t$(MAKE) perltidy
+\t$(MAKE) all
+\t$(MAKE) readme
+\t$(MAKE) test
+
+# --- clean ---
+myclean:
+\t$(MAKE) clean
+\tfind . -name '*.bak' -exec rm -f {} \;
+
 END
 }

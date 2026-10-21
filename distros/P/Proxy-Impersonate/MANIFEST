@@ -13,11 +13,13 @@ t/21-target-family.t
 t/30-connection.t
 t/31-on-request.t
 t/32-on-response.t
+t/33-framing.t
 t/40-integration.t
 t/41-verify.t
 t/42-hints.t
 t/43-ssl-moving-buffer.t
 t/44-backpressure.t
+t/45-streaming.t
 t/50-shutdown.t
 xt/50-fingerprint.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

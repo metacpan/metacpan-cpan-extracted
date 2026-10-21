@@ -31,7 +31,22 @@ my $msg1 = parse_mime($data);
 
 my $dns = decode_json(path($dns_json)->slurp);
 
-# Header-level PERMERRORs first, as the Verifier reports them. The walk below
+# The whole message through the Verifier first, so a message with several
+# faults reports the primary error in the library's order (contract C9),
+# not the order the walk below happens to meet them.
+{
+  my $verifier = Mail::DKIM2::Verifier->new();
+  $verifier->skip_timestamp_check(1) if $ignore_ts;
+  $verifier->set_pubkey_callback(sub { find_key(@_) });
+  $verifier->PRINT($msg1->as_string());
+  $verifier->CLOSE;
+  unless ($verifier->result =~ /\A(?:pass|none)\z/) {
+    say STDERR $verifier->details if $verifier->details;
+    die "DKIM2: " . $verifier->result_detail() . "\n";
+  }
+}
+
+# Header-level PERMERRORs, as the Verifier reports them. The walk below
 # is driven by the i= and m= values it can read, so without this a junk
 # DKIM2-Signature with no usable i= -- even the only one -- would simply never
 # be visited, and an i= or m= above MAX_CHAIN_LENGTH would be a loop bound.

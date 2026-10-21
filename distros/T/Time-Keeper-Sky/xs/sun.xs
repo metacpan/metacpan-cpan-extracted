@@ -191,10 +191,10 @@ position(self, ...)
             (void)hv_stores(hv, "apparent_altitude", newSVnv(v.app_alt));
             (void)hv_stores(hv, "azimuth",           newSVnv(v.az));
             (void)hv_stores(hv, "hour_angle",        newSVnv(v.H));
-            (void)hv_stores(hv, "declination",       newSVnv(v.sun.dec));
-            (void)hv_stores(hv, "right_ascension",   newSVnv(v.sun.ra));
-            (void)hv_stores(hv, "equation_of_time",  newSVnv(v.sun.eot));
-            (void)hv_stores(hv, "distance",          newSVnv(v.sun.R));
+            (void)hv_stores(hv, "declination",       newSVnv(v.pos.dec));
+            (void)hv_stores(hv, "right_ascension",   newSVnv(v.pos.ra));
+            (void)hv_stores(hv, "equation_of_time",  newSVnv(v.pos.eot));
+            (void)hv_stores(hv, "distance",          newSVnv(v.pos.R));
             RETVAL = newRV_noinc((SV *)hv);
         }
     OUTPUT:

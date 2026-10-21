@@ -12,7 +12,9 @@ my @files = (
     't/00-report-prereqs.t',
     't/01-search.t',
     't/02-errors.t',
-    't/03-defects.t'
+    't/03-defects.t',
+    't/04-memo-bounded.t',
+    't/05-build-cost.t'
 );
 
 eol_unix_ok($_, { trailing_whitespace => 1 }) foreach @files;

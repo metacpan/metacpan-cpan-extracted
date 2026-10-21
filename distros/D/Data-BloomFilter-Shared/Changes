@@ -1,5 +1,10 @@
 Revision history for Data-BloomFilter-Shared
 
+0.08  2026-10-16
+    - Meet requested false-positive targets for new filters.
+    - Recover abandoned segments safely on full filesystems.
+    - Fix shared-lock wakeups and frozen-data publication.
+
 0.07      2026-09-26
           - DATA_BLOOMFILTER_SHARED_SPARSE=0 reserves segments up front, so a
             full filesystem fails the constructor, not a later write.

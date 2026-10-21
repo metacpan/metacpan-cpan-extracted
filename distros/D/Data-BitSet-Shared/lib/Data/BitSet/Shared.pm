@@ -1,7 +1,7 @@
 package Data::BitSet::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 require XSLoader;
 XSLoader::load('Data::BitSet::Shared', $VERSION);
 
@@ -13,6 +13,9 @@ use overload
     fallback => 1;
 
 sub set_bits {
+    # Not goto &_set_bits: that reuses the context frame, so the XSUB's GIMME_V
+    # reads G_VOID on perls before 5.38 and it pushes nothing at all.
+    return _set_bits(@_) if ref($_[0]) eq __PACKAGE__;
     my ($self) = @_;
     grep { $self->test($_) } 0 .. $self->capacity - 1;
 }
@@ -77,7 +80,7 @@ B<Linux-only>. Requires 64-bit Perl.
     my $ro = Data::BitSet::Shared->new_readonly($path);      # frozen file, read-only
 
 C<new_readonly> opens a B<frozen> file read-only for lock-free querying (see
-L</"FROZEN (READ-ONLY) MODE">). The descriptor you pass is duplicated
+L</"FROZEN (READ-ONLY) MODE">). C<new_from_fd> duplicates the descriptor
 (C<F_DUPFD_CLOEXEC>), so it stays yours to close and closing it does not
 disturb the handle.
 
@@ -164,8 +167,8 @@ only guarantees the mapping is never mutated again).
     my $ro = Data::BitSet::Shared->new_readonly("/tmp/seen.bitset");
     $ro->test($_) for @queries;
 
-C<freeze> marks the bitset B<permanently immutable> (there is no unfreeze --
-rebuild the file to change it) and flushes the seal to disk. A frozen bitset
+C<freeze> requires all writers to have stopped. It marks the bitset
+B<permanently immutable> and flushes the seal to disk. A frozen bitset
 rejects every mutator (C<set>, C<clear>, C<toggle>, C<fill>, C<zero>) with a
 croak, and a read-write reopen (C<< new($path, ...) >> or C<new_from_fd>) of a
 sealed file is B<refused> -- so a shipped artifact can never be silently

@@ -3,7 +3,7 @@ package Database::BI::Controller::Dashboard;
 use strict;
 use warnings;
 
-our $VERSION = '0.014.0';
+our $VERSION = '0.015.0';
 
 use Mojo::Base 'Mojolicious::Controller', -strict, -signatures;
 
@@ -12,8 +12,10 @@ use Cwd			qw(realpath);
 use List::Util		qw(min max sum);
 use CGI::Info;
 use CGI::Lingua;
+use Database::BI::Tutorial;
 use Mojo::File;
 use Mojo::JSON		qw(encode_json decode_json);
+use Mojo::Parameters;
 use Mojo::Util		qw(url_escape encode xml_escape);
 use File::Path		qw(remove_tree);
 use File::Spec;
@@ -21,6 +23,7 @@ use File::Temp		qw(tempfile tempdir);
 use Readonly;
 use Socket		qw(inet_aton);
 use Sub::Protected;
+use version ();
 
 # ---------------------------------------------------------------------------
 # Constants
@@ -60,6 +63,11 @@ Readonly my $REDIS_URL_RE  => qr{\Aredis://[^\s|]+\z}si;
 # Accepts 'hostname', 'user@hostname', and IPv4 addresses (IPv6 is excluded
 # because the [...] notation would be ambiguous in the path syntax).
 Readonly my $REMOTE_HOST_RE => qr/\A(?:[a-zA-Z0-9][a-zA-Z0-9._-]*\@)?[a-zA-Z0-9][a-zA-Z0-9._-]*\z/;
+
+# The tile layer HTML::OSM 0.10 hardcodes.  Older releases have no tile_url
+# constructor argument, so the app substitutes its configured URL in the
+# rendered body; 0.11 and later take the argument directly.
+Readonly my $DEFAULT_TILE_URL => 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
 
 # ---------------------------------------------------------------------------
 # I18N message dictionary for all user-visible strings in this controller.
@@ -116,6 +124,11 @@ Readonly my %MESSAGES => (
 	warn_map_coordinate_rows    => 'Plotted %d of %d rows; %d hold no usable coordinate',
 	warn_map_markers_capped     => 'Showing the first %d of %d markers; add f= filters to see the rest',
 	warn_map_cache_unwritten    => 'The resolved places could not be remembered in the model store, so the next request will look them up again',
+	# Phase 4
+	error_token_invalid         => 'Share token is invalid or has expired',
+	error_token_missing         => 'A share token is required to view this analysis',
+	error_extract_unwritable    => 'Extract store is not writable; using direct read',
+	freshness_stale_msg         => 'Source data has changed since this analysis was last saved',
 );
 
 # Maximum accepted upload body size.  Enforced both here (application layer)
@@ -126,6 +139,11 @@ Readonly my $MAX_UPLOAD_BYTES    => $MAX_UPLOAD_MIB * 1_048_576;
 Readonly my $DEFAULT_JOIN_MAX_ROWS => 10_000;
 Readonly my $DEFAULT_MAP_GEOCODE_MAX => 500;   # new lookups per request (map_geocode_max)
 Readonly my $DEFAULT_MAP_MAX_MARKERS => 2_000; # markers drawn per request (map_max_markers)
+Readonly my $DEFAULT_MARKER_COLOR  => '#3388ff'; # Leaflet default blue
+Readonly my %NAMED_COLORS          => map { $_ => 1 } qw(
+    red orange yellow green teal cyan blue navy purple
+    magenta pink brown maroon olive silver gray grey gold lime white black
+);
 Readonly my $MAX_PREFIX_LEN        => 20;
 Readonly my $DEFAULT_PER_PAGE      => 200;
 Readonly my $MAX_PER_PAGE          => 2_000;
@@ -141,6 +159,9 @@ Readonly my %MEASURE_FN_OK => map { $_ => 1 } @MEASURE_FNS;
 # Allowed strptime-style date format patterns for the /dates/save endpoint.
 Readonly my %ALLOWED_DATE_PATTERNS => map { $_ => 1 }
 	qw(%m/%d/%Y %d/%m/%Y %d-%b-%Y);
+
+# Default share token lifetime: 30 days in seconds.
+Readonly my $SHARE_TOKEN_TTL => 30 * 86_400;
 
 # ---------------------------------------------------------------------------
 # Protected helpers
@@ -340,8 +361,8 @@ sub _resolve_language :Protected ($self, $platform, $default) {
 # _scan_data_dir($self) -> \@table_list
 #
 # Purpose: Return an arrayref of { name, file } hashrefs for every supported
-#          data file in the configured data_dir.  Used by the index action and
-#          by the join panel "available tables" dropdown.
+#          data file in the configured data_dir.  Used by the index action; the
+#          join panel uses _scan_join_tables, which also lists internal tables.
 # Entry:   None.
 # Exit:    Returns [] when data_dir does not exist or contains no supported files.
 # Side Effects: Filesystem directory read.
@@ -361,10 +382,51 @@ sub _scan_data_dir :Protected ($self) {
 	})->to_array;
 }
 
+# _scan_join_tables($self) -> \@table_list
+#
+# Purpose: Like _scan_data_dir, but each multi-table SQLite file contributes
+#          one entry per internal table as well as the file entry.  The join
+#          and combine panels need this: "table:store/customer" names a table
+#          inside store.db, which a plain file name cannot do.
+# Entry:   None.
+# Exit:    Returns [] when data_dir does not exist or has no supported files.
+#          Every entry has a spec suitable for the panel's option value.
+# Side Effects: Reads data_dir and opens each SQLite file to list its tables.
+sub _scan_join_tables :Protected ($self) {
+	my $dir    = $self->app->home->child($self->app->config->{data_dir} // 'data');
+	my $tables = $self->_scan_data_dir;
+	my @all;
+
+	for my $table (@$tables) {
+		push @all, { %$table, spec => "table:$table->{name}" };
+		next unless $table->{file} =~ /\.(?:db|sql|sqlite|sqlite3)\z/i;
+
+		my $source = eval { $self->open_table($table->{name}, directory => $dir->to_string) };
+		next unless $source;
+
+		my $internal_tables = eval { $source->sqlite_tables };
+		next unless $internal_tables && @$internal_tables > 1;
+
+		my @internal = @$internal_tables;
+
+		for my $name (@internal) {
+			next unless $name =~ $TABLE_NAME_RE;
+			push @all, {
+				%$table,
+				name     => "$table->{name} / $name",
+				internal => $name,
+				spec     => "table:$table->{name}/$name",
+			};
+		}
+	}
+
+	return \@all;
+}
+
 # _open_spec($self, $spec) -> ($DataSource, $label) or ()
 #
-# Purpose: Parse a "table:name" or "path:/abs/path" spec, verify the underlying
-#          file exists (Database::Abstraction creates empty objects silently for
+# Purpose: Parse a "table:name", "table:file/table" or "path:/abs/path" spec,
+#          verify the underlying file exists (Database::Abstraction creates empty objects silently for
 #          missing files, so we must check ourselves), and return a live
 #          DataSource object and a display label.
 # Entry:   $spec is a non-empty string.
@@ -372,12 +434,16 @@ sub _scan_data_dir :Protected ($self) {
 #          (invalid spec format, file missing, DataSource init error).
 # Side Effects: Filesystem stat; DataSource construction (reads file header).
 sub _open_spec :Protected ($self, $spec) {
-	if ($spec =~ /\Atable:([A-Za-z0-9_]+)\z/) {
-		my $table    = lc $1;
+	if ($spec =~ m{\Atable:([A-Za-z0-9_]+)(?:/([A-Za-z0-9_]+))?\z}) {
+		my ($table, $internal) = ($1, $2);
+		$table = lc $table;
 		my $data_dir = $self->app->home->child($self->app->config->{data_dir} // 'data');
 		return () unless grep { -f $data_dir->child("$table.$_") } @SUPPORTED_EXT;
-		my $src = eval { $self->open_table($table, directory => $data_dir->to_string) };
-		return ($src, $table) if $src && !$@;
+		my $src = eval {
+			$self->open_table($table, directory => $data_dir->to_string,
+				defined $internal ? (internal_table => $internal) : ())
+		};
+		return ($src, defined $internal ? $internal : $table) if $src && !$@;
 	} elsif ($spec =~ /\Apath:(.+)\z/) {
 		my $path_arg = $1;
 		# Remote path: /../hostname/dir/file -- delegate to DataSource with host param.
@@ -417,10 +483,21 @@ sub _open_spec :Protected ($self, $spec) {
 #
 # Purpose: Convert a table/path spec back to a browseable URL (used for the
 #          back-link on join and export views).
-# Entry:   $spec is a "table:name" or "path:/abs" string.
+# Entry:   $spec is a "table:name", "table:file/table" or "path:/abs" string.
 # Exit:    Returns a URL string beginning with '/'.
 sub _spec_to_url :Protected ($self, $spec) {
-	return "/view/$1" if $spec =~ /\Atable:([A-Za-z0-9_]+)\z/;
+	if ($spec =~ m{\Atable:([A-Za-z0-9_]+)(?:/([A-Za-z0-9_]+))?\z}) {
+		my ($table, $internal) = ($1, $2);
+		return "/view/$table" unless defined $internal;
+
+		my $data_dir = $self->app->home->child($self->app->config->{data_dir} // 'data');
+		for my $ext (@SUPPORTED_EXT) {
+			my $file = $data_dir->child("$table.$ext");
+			next unless -f $file;
+			return '/open?path=' . url_escape($file->to_string) . '&it=' . url_escape($internal);
+		}
+		return "/view/$table";
+	}
 	return '/open?path=' . url_escape($1) if $spec =~ /\Apath:(.+)\z/;
 	return '/import?url=' . url_escape($1) if $spec =~ $URL_SPEC_RE;
 	return '/' if $spec =~ $REDIS_SPEC_RE;
@@ -699,6 +776,24 @@ sub _numeric_cell {
 	$n = "-$n" if $is_acct_neg && $n =~ /\A\d/;
 	return undef unless $n =~ /\A-?\d+(?:\.\d+)?\z/;
 	return $n + 0;
+}
+
+# _column_is_numeric($records, $col) -> bool
+#
+# Says whether a column can be used as a chart measure.  It samples the first
+# non-empty cells rather than the whole table: the canvas needs a quick answer
+# for the column picker, and a column with a non-numeric value in its first 20
+# rows is not a safe measure anyway.
+sub _column_is_numeric {
+	my ($records, $col) = @_;
+	my $seen = 0;
+	for my $row (@{ $records // [] }) {
+		my $v = $row->{$col};
+		next unless defined $v && length $v;
+		return 0 unless defined _numeric_cell($v);
+		last if ++$seen >= 20;
+	}
+	return $seen ? 1 : 0;
 }
 
 # _measure_pushable($source, $fn, $col, \@records) -> bool
@@ -1311,9 +1406,13 @@ sub _apply_date_normalization :Protected ($self, $records, $columns, $spec_key) 
 #                          passed to Calc->new so expressions may reference them.
 #   spec_key => $str    -- override the l= spec key used to look up stored calc
 #                          fields (canvas context where ?l= is absent).
+#   calc     => \@specs -- additional ?c=-style specs, for a canvas whose query
+#                          string arrived with the request rather than as the
+#                          request's own parameters.
 sub _apply_calc_fields :Protected ($self, $records, $columns, $extra = undef) {
 	my $bound_params     = ($extra // {})->{params}   // {};
 	my $spec_key_override = ($extra // {})->{spec_key};
+	my $extra_calc        = ($extra // {})->{calc}    // [];
 
 	# Normalise date columns before evaluating expressions so that date
 	# functions (YEAR, MONTH, etc.) see ISO-8601 values even when the source
@@ -1337,7 +1436,7 @@ sub _apply_calc_fields :Protected ($self, $records, $columns, $extra = undef) {
 			}
 		}
 	}
-	for my $spec (@{ $self->every_param('c') // [] }) {
+	for my $spec (@{ $self->every_param('c') // [] }, @$extra_calc) {
 		# Skip source specs handled by _run_pipeline_source.
 		next if $spec =~ /\A(?:path:|table:|url:|redis:)/i;
 		my ($name, $expr) = ($spec =~ /\A([A-Za-z_][A-Za-z0-9_]*):(.+)\z/s);
@@ -1892,6 +1991,174 @@ sub analyses_delete ($self) {
 	$self->render(json => { deleted => 1 });
 }
 
+# POST /api/analyses/:id/visuals  (append one table or chart)
+#
+# Adds a visual to a saved canvas without sending the reader back to the table
+# or chart page it came from.  The request is { kind, encode, options, title }
+# and the visual is rendered here, with the same pipeline and renderer the
+# canvas itself uses, before it is stored: a column that does not exist is a
+# 400 rather than a broken card the reader only discovers after a reload.
+#
+# The new card is deliberately left out of the saved layout.  An auto-placed
+# card is ordered after the saved ones and stays there without pinning a
+# position that the next drag would have to fight; the canvas writes a layout
+# entry once the reader moves or resizes it.
+sub analyses_add_visual ($self) {
+	my $id = $self->stash('id') // '';
+	return $self->render(json => { error => $MESSAGES{error_analysis_id_invalid} }, status => 400)
+		unless $id =~ /\A[A-Za-z0-9]+\z/;
+
+	my $analyses = $self->_read_analyses;
+	return $self->render(json => { error => sprintf($MESSAGES{error_analysis_not_found}, $id) }, status => 404)
+		unless exists $analyses->{$id};
+	my $a = $analyses->{$id};
+
+	my $body = eval { decode_json($self->req->body) };
+	return $self->render(json => { error => sprintf($MESSAGES{error_analysis_json}, $@) }, status => 400)
+		unless ref $body eq 'HASH';
+
+	my $kind = $body->{kind} // '';
+	my %supported = map { $_ => 1 }
+		qw( table bar pie line graph scatter heatmap stacked combo treemap histogram map );
+	return $self->render(json => { error => 'Unsupported visual kind' }, status => 400)
+		unless $supported{$kind};
+
+	for my $key (qw( encode options )) {
+		return $self->render(json => { error => "$key must be an object" }, status => 400)
+			if defined $body->{$key} && ref $body->{$key} ne 'HASH';
+	}
+
+	my $vis = {
+		kind    => $kind,
+		encode  => ($body->{encode}  // {}),
+		options => ($body->{options} // {}),
+	};
+	$vis->{title} = $body->{title}
+		if defined $body->{title} && !ref $body->{title} && length $body->{title};
+
+	# The card is added without a page reload, so the canvas's own URL state has
+	# to come with the request: a reader who adds a card while a chart is
+	# cross-filtering the canvas, with calculated columns on the URL, or with a
+	# what-if parameter set, gets a card drawn like the ones beside it rather
+	# than against the unfiltered table.
+	my $ctx = $self->_canvas_render_context($a, $body->{query});
+	return $self->render(json => { error => $ctx->{error} }, status => $ctx->{status})
+		if $ctx->{error};
+
+	# The new card is never the cross-filter source: it did not exist when the
+	# filter was made, so every cf applies to it, as it does to every card but
+	# the source.
+	my $records = $ctx->{records};
+	for my $spec (@{ $ctx->{cf_specs} }) {
+		$records = _apply_filter_spec($records, $spec);
+	}
+
+	# The index is known before the render, so the card's SVG and Leaflet ids
+	# match the ones a later page load will give it.
+	my $index = scalar @{ $a->{visuals} // [] };
+
+	my $rendered = $self->_render_visual_html(
+		$vis, $records, $ctx->{columns}, $ctx->{src}, $index, $ctx->{spec_key},
+		(@{ $ctx->{cf_specs} } ? 1 : 0),
+	);
+	return $self->render(json => { error => $rendered->{error} }, status => 400)
+		if $rendered->{error};
+
+	push @{ $a->{visuals} //= [] }, $vis;
+	$a->{updated} = time();
+	$self->_write_analyses($analyses);
+
+	return $self->render(
+		json   => {
+			id     => $id,
+			visual => $index,
+			kind   => $kind,
+			title  => ($vis->{title} // $rendered->{title} // 'Visual ' . ($index + 1)),
+			html   => $rendered->{html},
+			head   => ($rendered->{head} // ''),
+			# The column a chart's marks filter by, so the card appended in
+			# place is a cross-filter control like the cards around it.
+			cf_col => (_vis_cf_col($vis) // ''),
+		},
+		status => 201,
+	);
+}
+
+# PATCH /api/analyses/:id/visuals/:visual  (change a saved visual's columns)
+#
+# A map card that plotted the wrong column should not have to be deleted and
+# added again: the visual keeps its index - and with it its place in the
+# layout, its size, its title and the Leaflet ids a re-render reuses - while
+# its C<encode> is replaced.  Like the append above, the replacement is drawn
+# before it is stored, so an unknown column is a 400 and the saved visual is
+# left alone.  The optional C<query> is the canvas page's URL state, so a card
+# edited while the canvas is cross-filtered is redrawn with the others.
+sub analyses_update_visual ($self) {
+	my $id = $self->stash('id') // '';
+	return $self->render(json => { error => $MESSAGES{error_analysis_id_invalid} }, status => 400)
+		unless $id =~ /\A[A-Za-z0-9]+\z/;
+
+	my $analyses = $self->_read_analyses;
+	return $self->render(json => { error => sprintf($MESSAGES{error_analysis_not_found}, $id) }, status => 404)
+		unless exists $analyses->{$id};
+	my $a = $analyses->{$id};
+
+	my $index = $self->stash('visual') // '';
+	return $self->render(json => { error => 'Visual index must be a number' }, status => 400)
+		unless $index =~ /\A\d+\z/;
+	$index += 0;
+	return $self->render(json => { error => "No visual at index $index" }, status => 404)
+		unless $index < scalar @{ $a->{visuals} // [] };
+
+	my $body = eval { decode_json($self->req->body) };
+	return $self->render(json => { error => sprintf($MESSAGES{error_analysis_json}, $@) }, status => 400)
+		unless ref $body eq 'HASH';
+
+	return $self->render(json => { error => 'encode must be an object' }, status => 400)
+		unless ref $body->{encode} eq 'HASH';
+
+	my $vis = { %{ $a->{visuals}[$index] } };
+	$vis->{encode} = { %{ $body->{encode} } };
+
+	my $ctx = $self->_canvas_render_context($a, $body->{query});
+	return $self->render(json => { error => $ctx->{error} }, status => $ctx->{status})
+		if $ctx->{error};
+
+	# The card is drawn as it is on this page: a cross-filter applies to every
+	# card but the one that made it, and this card may be that one.
+	my $records      = $ctx->{records};
+	my $prefiltered  = 0;
+	if (@{ $ctx->{cf_specs} } && $ctx->{cf_source} != $index) {
+		for my $spec (@{ $ctx->{cf_specs} }) {
+			$records = _apply_filter_spec($records, $spec);
+		}
+		$prefiltered = 1;
+	}
+
+	my $rendered = $self->_render_visual_html(
+		$vis, $records, $ctx->{columns}, $ctx->{src}, $index, $ctx->{spec_key},
+		$prefiltered,
+	);
+	return $self->render(json => { error => $rendered->{error} }, status => 400)
+		if $rendered->{error};
+
+	$a->{visuals}[$index] = $vis;
+	$a->{updated} = time();
+	$self->_write_analyses($analyses);
+
+	return $self->render(
+		json => {
+			id     => $id,
+			visual => $index,
+			kind   => ($vis->{kind} // ''),
+			title  => ($vis->{title} // $rendered->{title} // 'Visual ' . ($index + 1)),
+			html   => $rendered->{html},
+			head   => ($rendered->{head} // ''),
+			cf_col => (_vis_cf_col($vis) // ''),
+		},
+	);
+}
+
 # GET /api/analyses/:id/export
 sub analyses_export ($self) {
 	my $id = $self->stash('id') // '';
@@ -1955,6 +2222,64 @@ sub analyses_import ($self) {
 # Opens the first dataset from a saved analysis and chains any declared joins.
 # Returns the base pipeline triple for _render_visual_html.
 # Returns an empty list on any error so canvas_render can respond 422.
+# _canvas_render_context($self, \%analysis, $query) -> \%ctx | { error, status }
+#
+# The state a card is drawn through when it is rendered outside canvas_render:
+# the base pipeline, calculated columns, bound parameters and the cross-filters
+# named by a canvas page's query string.  C<cf_specs> are returned unapplied so
+# the caller can decide which card, if any, is their source; C<cf_source> is
+# the C<cv> index, or -1 when the page names none.  Only C<cf>, C<c> and
+# C<p.<name>> are read from C<$query> - the same keys canvas_render reads from
+# its own URL - so a page's state is not a way to reach anything else.
+sub _canvas_render_context :Protected ($self, $a, $query) {
+	my $params;
+	if (defined $query) {
+		return { error => 'query must be a string', status => 400 }
+			if ref $query || length($query) > 4096;
+		(my $qs = $query) =~ s/\A\?//;
+		$params = Mojo::Parameters->new($qs);
+	}
+
+	my ($src, $records, $columns) = $self->_build_canvas_pipeline($a);
+	return { error => 'Cannot open data source for this canvas', status => 422 }
+		unless defined $records;
+
+	my ($bound_ref, $p_errors) = $self->_bound_canvas_params(
+		$a, sub { $params ? $params->param($_[0]) : undef },
+	);
+	return { error => join('; ', @$p_errors), status => 400 }
+		if @$p_errors;
+	my %param_values = %$bound_ref;
+
+	eval {
+		($records, $columns) = $self->_apply_calc_fields(
+			$records, $columns,
+			{
+				params   => \%param_values,
+				spec_key => ($a->{datasets}[0]{spec} // ''),
+				calc     => [ $params ? @{ $params->every_param('c') // [] } : () ],
+			}
+		);
+	};
+	if ($@) {
+		(my $e = $@) =~ s/ at \S+ line \d+\.?\n?$//;
+		return { error => $e, status => 400 };
+	}
+
+	my @cf_specs  = $params ? grep { /\S/ } @{ $params->every_param('cf') // [] } : ();
+	my $cf_source = (defined $params && defined $params->param('cv'))
+		? int($params->param('cv')) : -1;
+
+	return {
+		src       => $src,
+		records   => $records,
+		columns   => $columns,
+		spec_key  => ($a->{datasets}[0]{spec} // ''),
+		cf_specs  => \@cf_specs,
+		cf_source => $cf_source,
+	};
+}
+
 sub _build_canvas_pipeline :Protected ($self, $analysis) {
 	my @datasets = @{ $analysis->{datasets} // [] };
 	return () unless @datasets;
@@ -2000,18 +2325,52 @@ sub _build_canvas_pipeline :Protected ($self, $analysis) {
 	return ($src, $records, \@columns);
 }
 
-# _render_visual_html($self, \%vis, $records, \@columns, $src)
-#     -> { html => Str, title => Str } | { error => Str }
+# _chart_json($self, \%chart_spec) -> $json_for_a_data_attribute
+#
+# The chart templates put this in the New canvas panel's data-chart attribute
+# so the canvas buttons can save the chart exactly as it is drawn, including
+# options the URL does not carry.  Escape '<' as well, so the value is inert
+# even if a title or column name contains markup.
+sub _chart_json :Protected ($self, $chart) {
+	my $json = encode_json($chart);
+	$json =~ s{<}{\\u003c}g;
+	return $json;
+}
+
+# _chart_orientation(\%options) -> 'horizontal' | 'vertical'
+#
+# The chart pages store a bar's direction as options.orientation, the spelling
+# their URL uses, while the canvas used to read options.orient; both are read
+# here.  The values the pages emit are v/h and vertical/horizontal.
+sub _chart_orientation {
+	my ($options) = @_;
+
+	my $orient = $options->{orientation} // $options->{orient} // '';
+	return ($orient =~ /\A(?:h|horizontal)\z/i) ? 'horizontal' : 'vertical';
+}
+
+# _render_visual_html($self, \%vis, $records, \@columns, $src, $vis_id, $spec_key)
+#     -> { html => Str, title => Str, head => Str } | { error => Str }
 #
 # Renders one canvas visual spec to an HTML snippet without touching
 # $self->render().  Applies any per-visual filters, then dispatches by
-# kind to the appropriate HTML::D3 renderer.
-sub _render_visual_html :Protected ($self, $vis, $records, $columns, $src) {
+# kind to the appropriate renderer.  $vis_id gives a map's Leaflet element
+# ids a page-unique suffix; $spec_key is the dataset whose older per-dataset
+# geocode entry may still be read while the shared cache is migrated.
+sub _render_visual_html :Protected ($self, $vis, $records, $columns, $src, $vis_id, $spec_key, $prefiltered) {
 	my $kind    = $vis->{kind}    // '';
 	my $encode  = $vis->{encode}  // {};
 	my $options = $vis->{options} // {};
 	my $filters = $vis->{filters} // [];
 	my $title   = $vis->{title}   // '';
+
+	# Every chart on a canvas needs an element id of its own: HTML::D3 names the
+	# SVG after the chart kind by default, so two bar cards both write #bar_chart
+	# and the second card's script draws into the first.  The id carries the
+	# visual's index, which is stable across renders, so a saved canvas and a
+	# card appended in place agree; the chart pages render one chart and keep
+	# HTML::D3's default.
+	my $svg_id = 'vis-' . (defined($vis_id) ? $vis_id : 'chart');
 
 	# Apply per-visual filters on top of the base pipeline records.
 	my $vis_recs = $records;
@@ -2020,6 +2379,13 @@ sub _render_visual_html :Protected ($self, $vis, $records, $columns, $src) {
 	}
 
 	my %col_set = map { $_ => 1 } @$columns;
+
+	# A chart aggregates the rows it is given.  The SQL push path in
+	# _grouped_totals re-reads the source, which has none of the filters the
+	# caller already applied (a cross-filter, or this visual's own filters), so
+	# those rows have to be folded in Perl.  Passing no source is how the
+	# pipeline says so.
+	my $agg_src = (@$filters || $prefiltered) ? undef : $src;
 
 	require HTML::D3;
 
@@ -2034,7 +2400,7 @@ sub _render_visual_html :Protected ($self, $vis, $records, $columns, $src) {
 			unless $count_mode || $col_set{$val_col};
 
 		my $agg = $self->_grouped_totals(
-			{ source => $src, records => $vis_recs },
+			{ source => $agg_src, records => $vis_recs },
 			{ by => [$cat_col], fn => $count_mode ? 'count' : 'sum',
 			  val => $count_mode ? undef : $val_col, as => 'value' },
 		);
@@ -2042,11 +2408,17 @@ sub _render_visual_html :Protected ($self, $vis, $records, $columns, $src) {
 
 		$title ||= $count_mode ? "Count by $cat_col" : "$val_col by $cat_col";
 		my @bars   = map { [_decode_cell($_->{$cat_col}), $_->{value}] } @$agg;
-		my $orient = (($options->{orient} // '') eq 'h') ? 'horizontal' : 'vertical';
+		my $orient = _chart_orientation($options);
+		# The bar page caps its bars as max_bars and stores the cap as
+		# max_items; the seed has to carry it or a seeded canvas draws every
+		# category where the page drew the top few and Other.
+		my $max_bars = int($options->{max_items} // $options->{max_bars} // 0);
 		my $sn = HTML::D3->new(title => $title, width => 480, height => 320, responsive => 1)
 			->render_bar_chart_snippet(\@bars, {
 				orientation => $orient,
 				x_label     => $cat_col,
+				id          => $svg_id,
+				($max_bars > 0 ? (max_bars => $max_bars) : ()),
 			});
 		my $html = $sn->{html};
 		utf8::decode($html) unless utf8::is_utf8($html);
@@ -2065,7 +2437,7 @@ sub _render_visual_html :Protected ($self, $vis, $records, $columns, $src) {
 			unless $count_mode || $col_set{$val_col};
 
 		my $agg = $self->_grouped_totals(
-			{ source => $src, records => $vis_recs },
+			{ source => $agg_src, records => $vis_recs },
 			{ by => [$cat_col], fn => $count_mode ? 'count' : 'sum',
 			  val => $count_mode ? undef : $val_col, as => 'value' },
 		);
@@ -2079,6 +2451,7 @@ sub _render_visual_html :Protected ($self, $vis, $records, $columns, $src) {
 				donut        => $options->{donut} ? 1 : 0,
 				legend       => 1,
 				color_scheme => $scheme,
+				id           => $svg_id,
 			});
 		my $html = $sn->{html};
 		utf8::decode($html) unless utf8::is_utf8($html);
@@ -2104,7 +2477,7 @@ sub _render_visual_html :Protected ($self, $vis, $records, $columns, $src) {
 
 		$title ||= "$y_col vs $x_col";
 		my $sn = HTML::D3->new(title => $title, width => 480, height => 320, responsive => 1)
-			->render_zoomable_line_chart_snippet(\@pairs, {});
+			->render_zoomable_line_chart_snippet(\@pairs, { id => $svg_id });
 		my $html = $sn->{html};
 		utf8::decode($html) unless utf8::is_utf8($html);
 		return { html => $html, title => $title };
@@ -2132,6 +2505,7 @@ sub _render_visual_html :Protected ($self, $vis, $records, $columns, $src) {
 			->render_scatter_chart_snippet(\@points, {
 				x_label => $x_col,
 				y_label => $y_col,
+				id      => $svg_id,
 			});
 		my $html = $sn->{html};
 		utf8::decode($html) unless utf8::is_utf8($html);
@@ -2158,7 +2532,7 @@ sub _render_visual_html :Protected ($self, $vis, $records, $columns, $src) {
 			push @y_order, $yv unless $seen_y{$yv}++;
 		}
 		my $agg = $self->_grouped_totals(
-			{ source => $src, records => $vis_recs },
+			{ source => $agg_src, records => $vis_recs },
 			{ by  => [$x_col, $y_col],
 			  fn  => length($val_col) ? 'sum' : 'count',
 			  val => length($val_col) ? $val_col : undef,
@@ -2183,6 +2557,8 @@ sub _render_visual_html :Protected ($self, $vis, $records, $columns, $src) {
 				y_label      => $y_col,
 				val_label    => (length($val_col) ? $val_col : 'Count'),
 				color_scheme => $scheme,
+				show_values  => ($options->{show_values} ? 1 : 0),
+				id           => $svg_id,
 			});
 		my $html = $sn->{html};
 		utf8::decode($html) unless utf8::is_utf8($html);
@@ -2203,7 +2579,7 @@ sub _render_visual_html :Protected ($self, $vis, $records, $columns, $src) {
 			unless $count_mode || $col_set{$val_col};
 
 		my $agg = $self->_grouped_totals(
-			{ source => $src, records => $vis_recs },
+			{ source => $agg_src, records => $vis_recs },
 			{ by  => [$cat_col, $seg_col],
 			  fn  => $count_mode ? 'count' : 'sum',
 			  val => $count_mode ? undef   : $val_col,
@@ -2220,10 +2596,13 @@ sub _render_visual_html :Protected ($self, $vis, $records, $columns, $src) {
 		$title ||= $count_mode ? "Count by $cat_col and $seg_col"
 		                       : "$val_col by $cat_col and $seg_col";
 		my $scheme = $options->{scheme} // 'tableau10';
+		my $orient = (_chart_orientation($options) eq 'horizontal') ? 'h' : 'v';
 		my $sn = HTML::D3->new(title => $title, width => 480, height => 320, responsive => 1)
 			->render_stacked_bar_snippet(\@data, {
 				scheme  => $scheme,
 				x_label => $cat_col,
+				orient  => $orient,
+				id      => $svg_id,
 			});
 		my $html = $sn->{html};
 		utf8::decode($html) unless utf8::is_utf8($html);
@@ -2242,11 +2621,11 @@ sub _render_visual_html :Protected ($self, $vis, $records, $columns, $src) {
 		return { error => "Column not found: $line_col" } unless $col_set{$line_col};
 
 		my $bar_rows = $self->_grouped_totals(
-			{ source => $src, records => $vis_recs },
+			{ source => $agg_src, records => $vis_recs },
 			{ by => [$x_col], fn => 'sum', val => $bar_col,  as => 'bar_val' },
 		);
 		my $line_rows = $self->_grouped_totals(
-			{ source => $src, records => $vis_recs },
+			{ source => $agg_src, records => $vis_recs },
 			{ by => [$x_col], fn => 'sum', val => $line_col, as => 'line_val' },
 		);
 		my (%bar_map, %line_map, @x_order, %x_seen);
@@ -2269,6 +2648,7 @@ sub _render_visual_html :Protected ($self, $vis, $records, $columns, $src) {
 			->render_combo_snippet(\@data, {
 				bar_label  => $bar_col,
 				line_label => $line_col,
+				id         => $svg_id,
 			});
 		my $html = $sn->{html};
 		utf8::decode($html) unless utf8::is_utf8($html);
@@ -2286,7 +2666,7 @@ sub _render_visual_html :Protected ($self, $vis, $records, $columns, $src) {
 			unless $count_mode || $col_set{$val_col};
 
 		my $agg = $self->_grouped_totals(
-			{ source => $src, records => $vis_recs },
+			{ source => $agg_src, records => $vis_recs },
 			{ by  => [$cat_col],
 			  fn  => $count_mode ? 'count' : 'sum',
 			  val => $count_mode ? undef   : $val_col,
@@ -2296,9 +2676,13 @@ sub _render_visual_html :Protected ($self, $vis, $records, $columns, $src) {
 
 		$title ||= $count_mode ? "Count by $cat_col" : "$val_col by $cat_col";
 		my $scheme = $options->{scheme} // 'tableau10';
-		my @tiles  = map { [_decode_cell($_->{$cat_col}), $_->{value}] } @$agg;
+		# The snippet takes one row per tile as { path, value }, the shape the
+		# treemap page builds; a [label, value] pair is not a path and croaks.
+		my @tiles = map {
+			{ path => 'Root/' . _decode_cell($_->{$cat_col}), value => $_->{value} }
+		} @$agg;
 		my $sn = HTML::D3->new(title => $title, width => 480, height => 320, responsive => 1)
-			->render_treemap_snippet(\@tiles, { scheme => $scheme });
+			->render_treemap_snippet(\@tiles, { scheme => $scheme, id => $svg_id });
 		my $html = $sn->{html};
 		utf8::decode($html) unless utf8::is_utf8($html);
 		return { html => $html, title => $title };
@@ -2357,10 +2741,43 @@ sub _render_visual_html :Protected ($self, $vis, $records, $columns, $src) {
 
 		$title ||= "Distribution of $col";
 		my $sn = HTML::D3->new(title => $title, width => 480, height => 320, responsive => 1)
-			->render_histogram_snippet(\@bin_data, { binned => 1, x_label => $col });
+			->render_histogram_snippet(\@bin_data, { binned => 1, x_label => $col, id => $svg_id });
 		my $html = $sn->{html};
 		utf8::decode($html) unless utf8::is_utf8($html);
 		return { html => $html, title => $title };
+	}
+
+	# ------------------------------------------------------------------- map --
+	if ($kind eq 'map') {
+		my $map = $self->_map_data(
+			$vis_recs, $columns, $encode, $options, $spec_key, $vis_id,
+		);
+		return { error => $map->{error} } if $map->{error};
+
+		my $html = '';
+		if ($map->{map_body}) {
+			$html .= '<div class="canvas-map-wrap">' . $map->{map_body} . '</div>';
+		}
+		if ($map->{marker_count}) {
+			$html .= '<p class="map-summary">Plotting '
+				. $map->{marker_count} . ' marker' . ($map->{marker_count} == 1 ? '' : 's')
+				. ' for ' . $map->{row_count} . ' of ' . $map->{source_rows}
+				. ' row' . ($map->{source_rows} == 1 ? '' : 's') . '.</p>';
+		}
+		if (@{ $map->{messages} }) {
+			$html .= '<div class="map-notes" role="status"><ul>'
+				. join('', map {
+					'<li class="map-note" data-key="' . xml_escape($_->{key} // '') . '">'
+					. xml_escape($_->{text} // '') . '</li>'
+				} @{ $map->{messages} })
+				. '</ul></div>';
+		}
+
+		return {
+			html  => $html,
+			title => $title || $map->{title},
+			head  => ($map->{map_head} // ''),
+		};
 	}
 
 	# ----------------------------------------------------------------- table --
@@ -2420,6 +2837,49 @@ sub _vis_cf_col {
 # Phase 3.1 bridge: redirects to the reconstructed data-view URL when the
 # canvas has no visuals array.
 # Phase 3.2: renders N visuals in a CSS grid when visuals are present.
+# _bound_canvas_params($self, $a, $lookup) -> (\%bound, \@errors)
+#
+# Resolve the canvas's declared parameters against URL values.  $lookup takes a
+# parameter name ("p.<name>") and returns the raw string from the request or
+# undef; the default is used when it returns undef.  Numbers are coerced and
+# range-checked, and an error is reported rather than a value bound, so the
+# canvas page and a card appended to it draw the same parameter values.
+sub _bound_canvas_params :Protected ($self, $a, $lookup) {
+	my %param_defs = %{ $a->{params} // {} };
+	my (%bound_params, @errors);
+
+	for my $pname (sort keys %param_defs) {
+		my $def     = $param_defs{$pname};
+		my $type    = $def->{type}    // 'string';
+		my $default = $def->{default} // '';
+		my $raw     = $lookup->("p.$pname");
+		my $val     = defined $raw ? $raw : $default;
+
+		if ($type eq 'number') {
+			require Scalar::Util;
+			unless (Scalar::Util::looks_like_number($val)) {
+				push @errors, sprintf($MESSAGES{error_param_type}, $pname);
+				next;
+			}
+			$val = $val + 0;
+			my ($lo, $hi) = ($def->{min}, $def->{max});
+			if (defined $lo && $val < $lo) {
+				push @errors, sprintf($MESSAGES{error_param_range},
+					$pname, $lo, defined $hi ? $hi : '+inf');
+				next;
+			}
+			if (defined $hi && $val > $hi) {
+				push @errors, sprintf($MESSAGES{error_param_range},
+					$pname, defined $lo ? $lo : '-inf', $hi);
+				next;
+			}
+		}
+		$bound_params{$pname} = $val;
+	}
+
+	return (\%bound_params, \@errors);
+}
+
 sub canvas_render ($self) {
 	my $id = $self->stash('id') // '';
 	return $self->render(text => $MESSAGES{error_analysis_id_invalid}, status => 400)
@@ -2430,6 +2890,34 @@ sub canvas_render ($self) {
 		unless exists $analyses->{$id};
 	my $a = $analyses->{$id};
 
+	# Phase 4.2 -- freshness: compare each dataset's current mtime against
+	# the analysis's saved updated timestamp.  Flag stale when any source
+	# is newer.  Non-fatal: the canvas renders with a stale banner.
+	my ($freshness_stale, $freshness_msg, $freshness_source_mtime) = (0, '', '');
+	{
+		my $analysis_updated = $a->{updated} // 0;
+		# Parse ISO-8601 to epoch for comparison if needed.
+		if ($analysis_updated && $analysis_updated =~ /\A(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})Z?\z/) {
+			require POSIX;
+			$analysis_updated = POSIX::mktime($6, $5, $4, $3, $2 - 1, $1 - 1900);
+		}
+		my $newest_src_mtime = 0;
+		for my $ds (@{ $a->{datasets} // [] }) {
+			my $spec = $ds->{spec} // '';
+			next unless $spec =~ /\A(?:table|path):/;
+			my ($src) = eval { $self->_open_spec($spec) };
+			next unless $src && $src->can('updated');
+			my $mt = eval { $src->updated } // 0;
+			$newest_src_mtime = $mt if $mt > $newest_src_mtime;
+		}
+		if ($newest_src_mtime && $analysis_updated && $newest_src_mtime > $analysis_updated) {
+			$freshness_stale = 1;
+			$freshness_msg   = $MESSAGES{freshness_stale_msg};
+			require POSIX;
+			$freshness_source_mtime = POSIX::strftime('%Y-%m-%d %H:%M UTC', gmtime($newest_src_mtime));
+		}
+	}
+
 	# Phase 3.2 / 3.3: if visuals array is non-empty, render the canvas.
 	my @visuals = @{ $a->{visuals} // [] };
 	if (@visuals) {
@@ -2437,48 +2925,19 @@ sub canvas_render ($self) {
 		# Phase 3.5 -- bound parameters from URL ?p.<name>=<value>.
 		# Parameter definitions live in the analysis: params => { name => { type, default, min, max } }.
 		# URL values are type-coerced and range-checked; out-of-range returns 400.
-		my %param_defs   = %{ $a->{params} // {} };
-		my %bound_params;
-		{
-			my @p_errors;
-			for my $pname (sort keys %param_defs) {
-				my $def     = $param_defs{$pname};
-				my $type    = $def->{type}    // 'string';
-				my $default = $def->{default} // '';
-				my $raw     = $self->param("p.$pname");
-				my $val     = defined $raw ? $raw : $default;
-
-				if ($type eq 'number') {
-					require Scalar::Util;
-					unless (Scalar::Util::looks_like_number($val)) {
-						push @p_errors,
-							sprintf($MESSAGES{error_param_type}, $pname);
-						next;
-					}
-					$val = $val + 0;
-					my ($lo, $hi) = ($def->{min}, $def->{max});
-					if (defined $lo && $val < $lo) {
-						push @p_errors, sprintf($MESSAGES{error_param_range},
-							$pname, $lo, defined $hi ? $hi : '+inf');
-						next;
-					}
-					if (defined $hi && $val > $hi) {
-						push @p_errors, sprintf($MESSAGES{error_param_range},
-							$pname, defined $lo ? $lo : '-inf', $hi);
-						next;
-					}
-				}
-				$bound_params{$pname} = $val;
-			}
-			if (@p_errors) {
-				return $self->render(
-					text   => join('; ', @p_errors),
-					status => 400,
-				);
-			}
+		my ($bound_ref, $p_errors) = $self->_bound_canvas_params(
+			$a, sub { $self->param($_[0]) },
+		);
+		my %bound_params = %$bound_ref;
+		if (@$p_errors) {
+			return $self->render(
+				text   => join('; ', @$p_errors),
+				status => 400,
+			);
 		}
 
 		# Build stash list for parameter bar: sorted by name.
+		my %param_defs = %{ $a->{params} // {} };
 		my @canvas_params = map {
 			my $def = $param_defs{$_};
 			{
@@ -2492,10 +2951,21 @@ sub canvas_render ($self) {
 		} sort keys %param_defs;
 
 		my ($src, $records, $columns) = $self->_build_canvas_pipeline($a);
-		return $self->render(
-			text   => 'Cannot open data source for this canvas',
-			status => 422,
-		) unless defined $records;
+		unless (defined $records) {
+			my ($platform, $language) = $self->_resolve_template;
+			my @specs = map { $_->{spec} // '' } @{ $a->{datasets} // [] };
+			return $self->render(
+				handler     => 'tt',
+				template    => "$platform/$language/canvas_error",
+				format      => 'html',
+				status      => 422,
+				title       => 'Canvas unavailable',
+				canvas_id   => $id,
+				canvas_name => ($a->{name} // $id),
+				error_msg   => 'The data source for this canvas could not be opened.',
+				error_specs => \@specs,
+			);
+		}
 
 		# Apply calc fields with bound params so expressions may reference them.
 		my $canvas_spec_key = ($a->{datasets}[0]{spec} // '');
@@ -2648,6 +3118,7 @@ sub canvas_render ($self) {
 		}
 
 		my @rendered;
+		my $canvas_map_head = '';
 		for my $i (0 .. $#visuals) {
 			my $vis = $visuals[$i];
 
@@ -2659,7 +3130,11 @@ sub canvas_render ($self) {
 				}
 			}
 
-			my $result = $self->_render_visual_html($vis, $vis_recs, $columns, $src);
+			my $result = $self->_render_visual_html(
+				$vis, $vis_recs, $columns, $src, $i, $canvas_spec_key,
+				($cf_active && $i != $cf_source ? 1 : 0),
+			);
+			$canvas_map_head ||= $result->{head} // '';
 			push @rendered, {
 				id        => $i,
 				title     => ($vis->{title} // $result->{title} // ('Visual ' . ($i + 1))),
@@ -2682,6 +3157,14 @@ sub canvas_render ($self) {
 		# Escape </ so the array literal cannot prematurely close a <script> tag.
 		(my $bm_json = encode_json(\@canvas_bookmarks)) =~ s{</}{<\\/}g;
 
+		my $canvas_columns_json = encode_json([
+			map { { name => $_, numeric => _column_is_numeric($records, $_) ? 1 : 0 } }
+				@$columns
+		]);
+		# The JSON is written into a <script> block.  Escape '<' so a column
+		# name containing markup cannot close the tag, as the chart spec is.
+		$canvas_columns_json =~ s{<}{\\u003c}g;
+
 		my ($platform, $language) = $self->_resolve_template;
 		return $self->render(
 			handler      => 'tt',
@@ -2691,6 +3174,7 @@ sub canvas_render ($self) {
 			canvas_id    => $id,
 			canvas_name  => $a->{name},
 			canvas_data_url  => ($self->_analysis_to_url($a) // ''),
+			canvas_columns_json => $canvas_columns_json,
 			visuals      => \@rendered,
 			canvas_params    => \@canvas_params,
 			canvas_bookmarks => \@canvas_bookmarks,
@@ -2705,8 +3189,12 @@ sub canvas_render ($self) {
 			drill_col        => $drill_col,
 			drill_crumb      => \@drill_crumb,
 			drill_max        => $drill_max,
+			extra_head       => $canvas_map_head,
 			back_url         => '/',
 			back_label       => 'Home',
+			freshness_stale  => $freshness_stale,
+			freshness_msg    => $freshness_msg,
+			freshness_source_mtime => $freshness_source_mtime,
 		);
 	}
 
@@ -2904,6 +3392,33 @@ sub index ($self) {
 	);
 }
 
+=head2 tutorial
+
+C<GET /tutorial> -- Render the tutorial that is part of the application.
+
+The chapters, questions and glossary are data in L<Database::BI::Tutorial>.
+They are not in this module's POD, so adding a feature means adding a chapter
+there and no change to this action or to the template.
+
+=cut
+
+sub tutorial ($self) {
+	my ($platform, $language) = $self->_resolve_template;
+
+	$self->render(
+		template => "$platform/$language/tutorial",
+		handler  => 'tt',
+		format   => 'html',
+		title    => 'Tutorial',
+		language => $language,
+		intro    => Database::BI::Tutorial->intro,
+		parts    => Database::BI::Tutorial->parts,
+		faq      => Database::BI::Tutorial->faq,
+		glossary => Database::BI::Tutorial->glossary,
+		version  => $self->app->VERSION,
+	);
+}
+
 =head2 view
 
 C<GET /view/:table> -- Open and display the chosen table from C<data_dir>.
@@ -3014,6 +3529,20 @@ sub view ($self) {
 	# correctly builds filter_specs (for export URLs) and filters_json (for UI).
 	my (undef, $filter_specs, $filters_json) = $self->_apply_filters($records);
 
+	# Calculated fields belong to the table, not only to its charts.  The table
+	# action is addressed by :table rather than l=, so name the spec explicitly
+	# when looking up the fields saved for it; otherwise a saved column would
+	# appear in every chart and not in the table it was made from.
+	my ($calc_records, $calc_columns) = eval {
+		$self->_apply_calc_fields($records, \@columns, { spec_key => "table:$table" })
+	};
+	if ($@) {
+		(my $e = $@) =~ s/ at \S+ line \d+\.?\n?$//;
+		return $self->render(text => $e, status => 400);
+	}
+	$records = $calc_records;
+	@columns = @$calc_columns;
+
 	my $page_url = $self->req->url->clone;
 	$page_url->query->remove('page')->remove('per_page');
 	my $page_base_url = $page_url->to_string;
@@ -3029,7 +3558,7 @@ sub view ($self) {
 		left_spec        => "table:$table",
 		combine_specs    => [],
 		current_joins    => [],
-		available_tables => $self->_scan_data_dir,
+		available_tables => $self->_scan_join_tables,
 		join_summaries   => [],
 		filter_specs     => $filter_specs,
 		filters_json     => $filters_json,
@@ -3265,7 +3794,7 @@ sub open_file ($self) {
 			left_spec        => $lspec,
 			combine_specs    => [],
 			current_joins    => [],
-			available_tables => $self->_scan_data_dir,
+			available_tables => $self->_scan_join_tables,
 			join_summaries   => [],
 			filter_specs     => $filter_specs,
 			filters_json     => $filters_json,
@@ -3325,7 +3854,7 @@ sub open_file ($self) {
 			left_spec        => $lspec,
 			combine_specs    => [],
 			current_joins    => [],
-			available_tables => $self->_scan_data_dir,
+			available_tables => $self->_scan_join_tables,
 			join_summaries   => [],
 			filter_specs     => $filter_specs,
 			filters_json     => $filters_json,
@@ -3349,6 +3878,15 @@ sub open_file ($self) {
 	my $lspec    = 'path:' . $file->to_string;
 
 	my $it = $self->param('it');	# optional: select a specific internal table
+
+	# A table opened from the schema browser belongs to a file in data_dir.  Name
+	# it as table:store/sales so the join, filter and export panels keep the
+	# chosen internal table instead of dropping back to the file's first table.
+	if (defined $it && $it =~ $TABLE_NAME_RE) {
+		my $data_dir = eval { $self->app->home->child($self->app->config->{data_dir} // 'data')->realpath };
+		my $file_dir = eval { $file->dirname->realpath };
+		$lspec = "table:$table/$it" if $data_dir && $file_dir && "$file_dir" eq "$data_dir";
+	}
 
 	# Allow the tables view to override the default "Back to browser" link.
 	my $back_override = _safe_back_url($self->param('back'));
@@ -3422,7 +3960,7 @@ sub open_file ($self) {
 		left_spec        => $lspec,
 		combine_specs    => [],
 		current_joins    => [],
-		available_tables => $self->_scan_data_dir,
+		available_tables => $self->_scan_join_tables,
 		join_summaries   => [],
 		filter_specs     => $filter_specs,
 		filters_json     => $filters_json,
@@ -3528,7 +4066,7 @@ sub import_url ($self) {
 		left_spec        => $lspec,
 		combine_specs    => [],
 		current_joins    => [],
-		available_tables => $self->_scan_data_dir,
+		available_tables => $self->_scan_join_tables,
 		join_summaries   => [],
 		filter_specs     => $filter_specs,
 		filters_json     => $filters_json,
@@ -3547,9 +4085,11 @@ Used by the join UI to populate the right-key dropdown without a page reload.
 
 =head4 INPUT
 
-  ?table=  string   Table name from C<data_dir>.
+  ?table=  string   Table name from C<data_dir>, or C<file/table> for a table
+                    inside a multi-table SQLite file.
   ?path=   string   Absolute path to a data file.
-  ?spec=   string   Unified spec: C<"table:name"> or C<"path:/abs/path">.
+  ?spec=   string   Unified spec: C<"table:name">, C<"table:file/table"> or
+                    C<"path:/abs/path">.
                     Parsed only when C<table> and C<path> are both absent.
 
 One of C<table>, C<path>, or C<spec> must be present; C<table> takes
@@ -3574,6 +4114,7 @@ None produced by this action directly; internal errors yield a 404.
 =head3 EXAMPLE
 
   GET /api/columns?table=sales            -> {"columns":["product","region","amount"]}
+  GET /api/columns?table=store/customer   -> {"columns":["id","name","email"]}
   GET /api/columns?spec=table:sales       -> {"columns":["product","region","amount"]}
   GET /api/columns?spec=path:/data/f.csv  -> {"columns":[...]}
   GET /api/columns?table=noexist          -> 404
@@ -3588,7 +4129,7 @@ sub columns_api ($self) {
 	# "table:name" or "path:/abs/path" -- mirrors _open_spec's parsing.
 	if (!defined($table_name) && !defined($path)) {
 		my $spec = $self->param('spec') // '';
-		if ($spec =~ /\Atable:([A-Za-z_][A-Za-z0-9_]*)\z/) {
+		if ($spec =~ m{\Atable:([A-Za-z_][A-Za-z0-9_]*(?:/[A-Za-z_][A-Za-z0-9_]*)?)\z}) {
 			$table_name = $1;
 		} elsif ($spec =~ /\Apath:(.+)\z/s) {
 			$path = $1;
@@ -3596,11 +4137,15 @@ sub columns_api ($self) {
 	}
 
 	my $source;
-	if (defined $table_name && $table_name =~ $TABLE_NAME_RE) {
+	if (defined $table_name && $table_name =~ m{\A([A-Za-z_][A-Za-z0-9_]*)(?:/([A-Za-z_][A-Za-z0-9_]*))?\z}) {
+		my ($table, $internal) = ($1, $2);
 		my $data_dir = $self->app->home->child($self->app->config->{data_dir} // 'data');
 		return $self->render(json => { error => 'not found' }, status => 404)
-			unless grep { -f $data_dir->child(lc($table_name) . ".$_") } @SUPPORTED_EXT;
-		$source = eval { $self->open_table(lc $table_name, directory => $data_dir->to_string) };
+			unless grep { -f $data_dir->child(lc($table) . ".$_") } @SUPPORTED_EXT;
+		$source = eval {
+			$self->open_table(lc $table, directory => $data_dir->to_string,
+				defined $internal ? (internal_table => $internal) : ())
+		};
 	}
 	elsif (defined $path) {
 		if ($path =~ m{\A/\.\./([^/]+)((?:/.+)?)/([^/]+)\z}) {
@@ -3638,8 +4183,8 @@ C<GET /join> -- Perform one or more left joins and render the merged table.
 
 =head4 INPUT
 
-  ?l=    string   Required. Left table spec: "table:name" or "path:/abs/path".
-                  Returns 404 if unresolvable.
+  ?l=    string   Required. Left table spec: "table:name", "table:file/table"
+                  or "path:/abs/path".  Returns 404 if unresolvable.
   ?j=    string   (repeatable) Join step: "<right-spec>|<left-key>|<right-key>".
                   Invalid or non-existent steps are silently skipped.
   ?f=    string   (repeatable) Result filter: "col:op:val".
@@ -3781,7 +4326,7 @@ sub join_tables ($self) {
 		left_spec        => $left_spec,
 		combine_specs    => [],
 		current_joins    => \@join_specs,
-		available_tables => $self->_scan_data_dir,
+		available_tables => $self->_scan_join_tables,
 		join_summaries   => \@summaries,
 		filter_specs     => $filter_specs,
 		filters_json     => $filters_json,
@@ -3937,7 +4482,7 @@ sub combine_tables ($self) {
 		left_spec        => $left_spec,
 		combine_specs    => \@combine_specs,
 		current_joins    => [],
-		available_tables => $self->_scan_data_dir,
+		available_tables => $self->_scan_join_tables,
 		join_summaries   => \@summaries,
 		filter_specs     => $filter_specs,
 		filters_json     => $filters_json,
@@ -4548,6 +5093,7 @@ sub graph_view ($self) {
 			title           => $title,
 			chart_html      => $chart_html,
 			chart           => \%chart_spec,
+			chart_json      => $self->_chart_json(\%chart_spec),
 			back_url        => ($back2 // $back),
 			back_label      => ($back2 ? ($back2_lbl || 'Back') : 'Back to table'),
 			($back2 ? (back2_url => $back, back2_label => 'Back to table') : ()),
@@ -4632,6 +5178,7 @@ sub graph_view ($self) {
 		title            => $title,
 		chart_html       => $chart_html,
 		chart            => \%chart_spec,
+		chart_json       => $self->_chart_json(\%chart_spec),
 		back_url         => ($back2 // $back),
 		back_label       => ($back2 ? ($back2_lbl || 'Back') : 'Back to table'),
 		($back2 ? (back2_url => $back, back2_label => 'Back to table') : ()),
@@ -4762,6 +5309,7 @@ sub pie_view ($self) {
 		title            => $title,
 		chart_html       => $chart_html,
 		chart            => \%chart_spec,
+		chart_json       => $self->_chart_json(\%chart_spec),
 		back_url         => ($back2 // $back),
 		back_label       => ($back2 ? ($back2_lbl || 'Back') : 'Back to table'),
 		($back2 ? (back2_url => $back, back2_label => 'Back to table') : ()),
@@ -4933,6 +5481,7 @@ sub heatmap_view ($self) {
 		title            => $title,
 		chart_html       => $chart_html,
 		chart            => \%chart_spec,
+		chart_json       => $self->_chart_json(\%chart_spec),
 		cell_count       => scalar @triples,
 		back_url         => ($back2 // $back),
 		back_label       => ($back2 ? ($back2_lbl || 'Back') : 'Back to table'),
@@ -5106,6 +5655,7 @@ sub bar_view ($self) {
 		title           => $title,
 		chart_html      => $chart_html,
 		chart           => \%chart_spec,
+		chart_json      => $self->_chart_json(\%chart_spec),
 		bar_count       => scalar @bars,
 		cat_col         => $cat_col,
 		back_url        => ($back2 // $back),
@@ -6246,6 +6796,7 @@ sub scatter_view ($self) {
 		title           => $title,
 		chart_html      => $chart_html,
 		chart           => \%chart_spec,
+		chart_json      => $self->_chart_json(\%chart_spec),
 		point_count     => scalar @points,
 		x_col           => $x_col,
 		y_col           => $y_col,
@@ -6350,6 +6901,7 @@ sub stacked_view ($self) {
 		title           => $title,
 		chart_html      => $chart_html,
 		chart           => \%chart_spec,
+		chart_json      => $self->_chart_json(\%chart_spec),
 		bar_count       => scalar(grep { defined $_->{cat} } @data),
 		back_url        => ($back2 // $back),
 		back_label      => ($back2 ? ($back2_lbl || 'Back') : 'Back to table'),
@@ -6461,6 +7013,7 @@ sub combo_view ($self) {
 		title           => $title,
 		chart_html      => $chart_html,
 		chart           => \%chart_spec,
+		chart_json      => $self->_chart_json(\%chart_spec),
 		point_count     => scalar @data,
 		back_url        => ($back2 // $back),
 		back_label      => ($back2 ? ($back2_lbl || 'Back') : 'Back to table'),
@@ -6572,6 +7125,7 @@ sub treemap_view ($self) {
 		title           => $title,
 		chart_html      => $chart_html,
 		chart           => \%chart_spec,
+		chart_json      => $self->_chart_json(\%chart_spec),
 		tile_count      => scalar @data,
 		cat_col         => $cat_col,
 		drill_back_url  => $back,
@@ -6695,6 +7249,7 @@ sub histogram_view ($self) {
 		title            => $title,
 		chart_html       => $chart_html,
 		chart            => \%chart_spec,
+		chart_json       => $self->_chart_json(\%chart_spec),
 		value_count      => scalar @values,
 		bins             => $bins,
 		back_url         => ($back2 // $back),
@@ -6711,11 +7266,384 @@ sub histogram_view ($self) {
 # Phase 6.1/6.2: one route, one template, two ways for a row to get a
 # position.  With lat= and lon= the columns already hold coordinates; with
 # loc=<column> every distinct value of that column is geocoded once, by
-# Database::BI::Model::Geocode, and the resolved places are remembered in the
-# model store so a second visit asks nothing.  Everything before that - the
-# pipeline, calculated fields and f= filters - is the same as every other
-# visual, so a map shows the filtered, calculated view and not the raw table.
+# Database::BI::Model::Geocode.  Answers are remembered in one shared cache in
+# the model store, keyed by the place rather than by the file or column that
+# named it, so a second visit asks nothing and a second dataset naming the same
+# place asks nothing either.  Everything before that - the pipeline, calculated
+# fields and f= filters - is the same as every other visual, so a map shows the
+# filtered, calculated view and not the raw table.
 # ---------------------------------------------------------------------------
+
+# _map_data($self, \@records, \@columns, \%encode, \%options, $spec_key, $id_suffix)
+#     -> \%result
+#
+# Resolve a map's markers and draw its HTML.  The map page and a map card on a
+# canvas both come through here: a map spec names either loc=<column> (places
+# to geocode) or lat=/lon= (coordinates already in the data), and everything
+# else - the marker cap, popups, the geocode cache and HTML::OSM - is the same
+# in both places.  %result has { map_body, map_head, title, messages, ... } on success
+# or { error, status } when the spec cannot be drawn.  $id_suffix makes the
+# Leaflet element ids unique when several maps share one page; undef leaves the
+# map page's own ids alone.
+sub _map_data :Protected ($self, $records, $columns, $encode, $options, $spec_key, $id_suffix) {
+	$encode  //= {};
+	$options //= {};
+
+	my $loc_col = $encode->{loc} // '';
+	my $lat_col = $encode->{lat} // '';
+	my $lon_col = $encode->{lon} // '';
+	my $by_location = length $loc_col;
+
+	return { error => $self->_i18n('error_map_source'), status => 400 }
+		unless $by_location || (length($lat_col) && length($lon_col));
+	return { error => $self->_i18n('error_map_coordinates'), status => 400 }
+		if !$by_location && (!length($lat_col) || !length($lon_col));
+
+	my %col_set = map { $_ => 1 } @$columns;
+	my $cfg     = $self->app->config;
+
+	my @popup = grep {
+		defined($_) && !ref($_) && length($_) && $_ ne $loc_col && $col_set{$_}
+	} @{ ref($options->{popup}) eq 'ARRAY' ? $options->{popup} : [] };
+
+	# Default: when no popup columns are requested, show every column that is
+	# not a coordinate column so the marker tooltip is informative out of the box.
+	unless (@popup) {
+		my %coord_set = map { $_ => 1 }
+			grep { defined($_) && length($_) } ($loc_col, $lat_col, $lon_col);
+		@popup = grep { !$coord_set{$_} } @$columns;
+	}
+
+	my ($backend, $plotted_rows) = (undef, 0);
+	my (@markers, @messages);
+
+	if ($by_location) {
+		return { error => $self->_i18n('error_map_loc_column', $loc_col), status => 400 }
+			unless $col_set{$loc_col};
+
+		require Database::BI::Model::Geocode;
+
+		# The geocoder is a config seam first and a recommended dependency
+		# second: a deployment may hand in an object, and a test does exactly
+		# that.  With neither, the model reports the module as unavailable and
+		# the map is still the map.
+		my $injected = $cfg->{geocoder};
+		my $geocode  = Database::BI::Model::Geocode->new(
+			(defined($injected) && ref($injected) && $injected->can('geocode_many')
+				? (geocoder => $injected) : ()),
+			(defined($cfg->{openaddr}) && length($cfg->{openaddr})
+				? (openaddr => $cfg->{openaddr}) : ()),
+		);
+
+		# A place name means the same place whichever file's column holds it, so
+		# the answers live in one shared cache: the second dataset that names a
+		# place plots it without asking the geocoder.  A per-dataset entry from an
+		# older model store is folded in as well; the shared answer wins if both
+		# have the name, and places only the old entry knows about are moved into
+		# the shared cache below, so the next dataset benefits from them too.
+		my $cache_spec = ($spec_key // '') . '|loc=' . $loc_col;
+		my $models     = $self->_read_models;
+		my $legacy     = Database::BI::Model::Geocode->cache_from_models($models, $cache_spec);
+		my $shared     = Database::BI::Model::Geocode->shared_cache_from_models($models);
+		my %cache      = (%$legacy, %$shared);
+		my $to_share   = grep { !exists $shared->{$_} } keys %$legacy;
+		my $region     = $cfg->{map_region};
+
+		my $result = $geocode->resolve_column(
+			$records, $loc_col,
+			cache => \%cache,
+			((defined($region) && $region =~ /\A[A-Za-z]{2}\z/) ? (region => $region) : ()),
+			max   => _map_limit($cfg->{map_geocode_max}, $DEFAULT_MAP_GEOCODE_MAX),
+		);
+
+		push @messages, @{ $result->{messages} };
+		$backend      = $result->{backend};
+		$plotted_rows = $result->{counts}{plotted};
+
+		# Only a request that asked something new, or found old answers to move
+		# into the shared cache, has something new to remember: rewriting the
+		# store for a page answered entirely from the shared cache would be a
+		# write per view.  $to_share empties after the migration, so an old store
+		# is written once per dataset rather than on every view.
+		if ($result->{counts}{attempted} || $to_share) {
+			my $updated = Database::BI::Model::Geocode->models_with_shared_cache(
+				$models, $result->{cache},
+				(defined($backend) ? (backend => $backend) : ()),
+				built => _iso8601_utc(),
+			);
+			my $written = $self->_write_models($updated);
+
+			# A failed migration is not worth a page message: the answers are
+			# still in the old entry, so this dataset is unaffected.  A failed
+			# new lookup is, because the next visit pays for it again.
+			if (!$written && $result->{counts}{attempted}) {
+				push @messages, {
+					key  => 'warn_map_cache_unwritten',
+					text => $self->_i18n('warn_map_cache_unwritten'),
+				};
+			}
+		}
+
+		for my $marker (@{ $result->{markers} }) {
+			my $row = ($marker->{first_row} <= $#$records)
+				? $records->[ $marker->{first_row} ] : {};
+			push @markers, {
+				%{ $marker },
+				'label' => _map_popup(
+					$marker->{value}, $marker->{rows},
+					[ map { [ $_, $row->{$_} ] } @popup ],
+				),
+			};
+		}
+
+	} else {
+		return { error => "Column not found: $lat_col", status => 400 }
+			unless $col_set{$lat_col};
+		return { error => "Column not found: $lon_col", status => 400 }
+			unless $col_set{$lon_col};
+
+		my (%by_key, $out_of_lat, $out_of_lon, $unusable);
+
+		for my $index (0 .. $#$records) {
+			my $row = $records->[$index];
+			my $lat = _numeric_cell($row->{$lat_col} // '');
+			my $lon = _numeric_cell($row->{$lon_col} // '');
+
+			# A row is never plotted at (0,0): a fake point in the Gulf of
+			# Guinea is worse than a missing one.  A whole column outside its
+			# range is named instead, because a transposed pair is the error a
+			# user makes here.
+			if (defined($lat) && ($lat < -90 || $lat > 90)) { $out_of_lat++; next }
+			if (defined($lon) && ($lon < -180 || $lon > 180)) { $out_of_lon++; next }
+			unless (defined($lat) && defined($lon)) { $unusable++; next }
+
+			# Rows at one coordinate are one marker: that is what makes a large
+			# file renderable, and "how many are here?" is the question a map
+			# answers.
+			my $key   = sprintf('%.6f,%.6f', $lat, $lon);
+			my $point = $by_key{$key};
+			if ($point) { $point->{rows}++; next }
+
+			$point = $by_key{$key} = {
+				'lat' => $lat, 'lon' => $lon, 'rows' => 1, 'first_row' => $index,
+			};
+			push @markers, $point;
+		}
+
+		return { error => $self->_i18n('error_map_coordinate_range', $lat_col, 'latitude'),
+			status => 400 } if !@markers && $out_of_lat;
+		return { error => $self->_i18n('error_map_coordinate_range', $lon_col, 'longitude'),
+			status => 400 } if !@markers && $out_of_lon;
+		return { error => $self->_i18n('error_map_coordinate_numeric', $lat_col, $lon_col),
+			status => 400 } if !@markers && @$records;
+
+		$plotted_rows += $_->{rows} for @markers;
+
+		push @messages, {
+			key  => 'warn_map_coordinate_rows',
+			text => $self->_i18n('warn_map_coordinate_rows', $plotted_rows,
+				scalar(@$records), scalar(@$records) - $plotted_rows),
+		} if $plotted_rows < scalar @$records;
+
+		for my $marker (@markers) {
+			my $row = $records->[ $marker->{first_row} ];
+			$marker->{label} = _map_popup(
+				sprintf('%.6f, %.6f', $marker->{lat}, $marker->{lon}),
+				$marker->{rows},
+				[ map { [ $_, $row->{$_} ] } @popup ],
+			);
+		}
+	}
+
+	my $title = $by_location ? "Map of $loc_col" : "$lat_col and $lon_col";
+	my $cap   = _map_limit($options->{max},
+		_map_limit($cfg->{map_max_markers}, $DEFAULT_MAP_MAX_MARKERS));
+
+	if (@markers > $cap) {
+		push @messages, {
+			key  => 'warn_map_markers_capped',
+			text => $self->_i18n('warn_map_markers_capped', $cap, scalar @markers),
+		};
+		@markers = @markers[0 .. $cap - 1];
+	}
+
+	push @messages, {
+		key  => 'error_map_no_markers',
+		text => $self->_i18n('error_map_no_markers'),
+	} unless @markers;
+
+	# Leaflet's CSS and JS belong in the head, which the layout owns; the rest of
+	# the map - the search box, the buttons, the div and its script - goes in the
+	# body where the map should appear.
+	my ($map_head, $map_body);
+	if (@markers) {
+		# HTML::OSM is a recommended dependency, so its absence is a state the
+		# page reports and survives: the markers are still counted, nothing is
+		# drawn, and the rest of the application is untouched.
+		if (eval { require HTML::OSM; 1 }) {
+			# Markers go in a cluster group rather than straight onto the map.
+			# A card may plot up to map_max_markers (2000 by default), and at a
+			# low zoom that many pins overlap into noise; markercluster draws a
+			# count instead and splits it as the reader zooms in.  A sparse map
+			# looks the same - the plugin leaves markers that are far apart on
+			# their own - but the plugin is only fetched once the map itself is.
+			# The Leaflet assets are a config seam too.  A deployment with no
+			# outbound network access serves them from its own origin; any key
+			# the operator leaves out keeps HTML::OSM's pinned CDN URL.  The tile
+			# layer has its own key, since a local tile server removes the last
+			# outbound request the page makes.
+			my %leaflet_assets;
+			for my $asset (
+				[ 'leaflet_js_url',                  'js_url' ],
+				[ 'leaflet_css_url',                 'css_url' ],
+				[ 'leaflet_cluster_js_url',          'cluster_js_url' ],
+				[ 'leaflet_cluster_css_url',         'cluster_css_url' ],
+				[ 'leaflet_cluster_default_css_url', 'cluster_default_css_url' ],
+			) {
+				my ($key, $param) = @$asset;
+				my $url = $cfg->{$key};
+				$leaflet_assets{$param} = $url
+					if defined $url && !ref $url && length $url;
+			}
+
+			my $tile_url = $cfg->{tile_url};
+			$tile_url = undef
+				unless defined($tile_url) && !ref($tile_url) && length($tile_url);
+
+			# HTML::OSM 0.11 added tile_url.  An older release would reject it
+			# as an unknown constructor argument, so substitute the URL in the
+			# rendered body instead and keep the config working either way.
+			my $native_tile_url = eval {
+				version->parse($HTML::OSM::VERSION) >= version->parse('0.11')
+			};
+
+			my $map = HTML::OSM->new(
+				height  => '560px',
+				width   => '100%',
+				cluster => 1,
+				($tile_url && $native_tile_url ? (tile_url => $tile_url) : ()),
+				%leaflet_assets,
+			);
+			my $color_col     = $options->{color_col} // '';
+			my $color_rules   = $options->{color_rules}   // [];
+			my $color_default = $options->{color_default} // $DEFAULT_MARKER_COLOR;
+			for my $marker (@markers) {
+				my @icon_arg;
+				if (length $color_col) {
+					my $row   = $records->[ $marker->{first_row} ];
+					my $cval  = (defined($row) ? $row->{$color_col} : undef) // '';
+					my $color = _apply_color_rule($cval, $color_rules, $color_default);
+					@icon_arg = (icon => _marker_icon($color));
+				}
+				$map->add_marker([ $marker->{lat}, $marker->{lon} ],
+					html => $marker->{label}, @icon_arg);
+			}
+			($map_head, $map_body) = $map->onload_render();
+			$map_body = _replace_map_tile_url($map_body, $tile_url)
+				if $tile_url && !$native_tile_url;
+			($map_head, $map_body) = _canvas_map_html($map_head, $map_body, $id_suffix)
+				if defined($id_suffix) && length($id_suffix);
+		} else {
+			push @messages, {
+				key  => 'error_map_renderer_missing',
+				text => $self->_i18n('error_map_renderer_missing'),
+			};
+		}
+	}
+
+	my %chart_spec = (
+		kind   => 'map',
+		title  => $title,
+		encode => ($by_location ? { loc => $loc_col }
+		                        : { lat => $lat_col, lon => $lon_col }),
+	);
+	$chart_spec{options}{popup} = \@popup if @popup;
+	$chart_spec{options}{max}   = $options->{max}
+		if defined($options->{max}) && $options->{max} =~ /\A\d+\z/ && $options->{max} > 0;
+	if (defined($options->{color_col}) && length($options->{color_col})) {
+		$chart_spec{encode}{color}         = $options->{color_col};
+		$chart_spec{options}{color_rules}  = $options->{color_rules}
+			if defined($options->{color_rules}) && @{ $options->{color_rules} };
+		$chart_spec{options}{color_default} = $options->{color_default}
+			if defined($options->{color_default});
+	}
+
+	return {
+		title        => $title,
+		map_head     => $map_head,
+		map_body     => $map_body,
+		messages     => \@messages,
+		marker_count => scalar @markers,
+		row_count    => $plotted_rows,
+		source_rows  => scalar @$records,
+		loc_col      => ($by_location ? $loc_col : undef),
+		lat_col      => ($by_location ? undef    : $lat_col),
+		lon_col      => ($by_location ? undef    : $lon_col),
+		backend      => $backend,
+		chart        => \%chart_spec,
+	};
+}
+
+# _replace_map_tile_url($body, $url) -> $body
+#
+# Replace the tile layer URL in a body rendered by HTML::OSM releases that
+# predate tile_url.  The URL is escaped for the single-quoted JavaScript
+# literal the renderer emits, so a quote, backslash or newline in the config
+# cannot end the string or the enclosing <script>.
+sub _replace_map_tile_url {
+	my ($body, $url) = @_;
+	return $body unless defined($body) && defined($url) && length($url);
+
+	my $escaped = $url;
+	$escaped =~ s/\\/\\\\/g;
+	$escaped =~ s/'/\\'/g;
+	$escaped =~ s/\r?\n/\\n/g;
+	$escaped =~ s|</|<\\/|g;
+
+	$body =~ s{\Q$DEFAULT_TILE_URL\E}{$escaped}g;
+	return $body;
+}
+
+# _canvas_map_html($head, $body, $id_suffix) -> ($head, $body)
+#
+# HTML::OSM names the map element "map" and its controls "search-box",
+# "reset-button" and "clear-search-button".  Those names are fine for one map
+# on a page and collide as soon as a canvas has two, so a card suffixes them and
+# wraps the generated script in a function: the script's map and searchMarkers
+# variables become local to that card instead of overwriting the previous
+# map's.  The head is the same Leaflet stylesheet and script for every map, so
+# only the first head is passed to the layout.
+sub _canvas_map_html {
+	my ($head, $body, $id_suffix) = @_;
+
+	my $suffix = $id_suffix // 'map';
+	$suffix =~ s/[^A-Za-z0-9_-]//g;
+	$suffix = 'map' unless length $suffix;
+
+	my %ids = (
+		'map'                 => "map-$suffix",
+		'search-box'          => "search-box-$suffix",
+		'reset-button'        => "reset-button-$suffix",
+		'clear-search-button' => "clear-search-button-$suffix",
+	);
+	for my $old (sort keys %ids) {
+		my $new = $ids{$old};
+		$body =~ s/id="\Q$old\E"/id="$new"/g;
+		$body =~ s{getElementById\('\Q$old\E'\)}{getElementById('$new')}g;
+		$body =~ s{L\.map\('\Q$old\E'\)}{L.map('$new')}g;
+	}
+	$body =~ s{<div id="$ids{map}"></div>}{<div id="$ids{map}" class="canvas-map"></div>};
+
+	# The card owns the map's size, so the page-wide #map rule is noise here.
+	$head =~ s{<style>.*?</style>}{}s;
+
+	# One map per card, one local scope per map.  The replacement uses !
+	# as its delimiter because the wrapper itself contains braces.
+	$body =~ s!<script>\s*!<script>\n(function () {\n!;
+	$body =~ s!</script>!})();\n</script>!;
+
+	return ($head, $body);
+}
 
 sub map_view ($self) {
 	my $loc_col   = $self->param('loc') // '';
@@ -6747,180 +7675,54 @@ sub map_view ($self) {
 	}
 
 	my %col_set = map { $_ => 1 } @{ $columns };
-	my $cfg     = $self->app->config;
-
-	# popup= names the columns shown in a marker's popup; without it a marker
-	# says what it is and how many rows it stands for, which is the whole of what
-	# an aggregated point knows.
 	my @popup = grep { length($_) && $_ ne $loc_col && $col_set{$_} }
 		@{ $self->every_param('popup') };
 
-	my ($backend, $plotted_rows) = (undef, 0);
-	my (@markers, @messages);
+	# Marker colour params
+	my $color_col     = $self->param('color') // '';
+	my $color_def_raw = $self->param('color_default') // '';
+	my ($color_rules, $color_default) =
+		_parse_color_rules($self->every_param('color_rule'), $color_def_raw);
 
-	if ($by_location) {
-		return $self->render(text => $self->_i18n('error_map_loc_column', $loc_col), status => 400)
-			unless $col_set{$loc_col};
+	if (length($color_col) && !$col_set{$color_col}) {
+		return $self->render(text => "Column not found: $color_col", status => 400);
+	}
 
-		require Database::BI::Model::Geocode;
+	my %options;
+	$options{popup}         = \@popup       if @popup;
+	$options{color_col}     = $color_col    if length $color_col;
+	$options{color_rules}   = $color_rules  if @$color_rules;
+	$options{color_default} = $color_default;
+	my $max = $self->param('max');
+	$options{max} = $max if defined($max) && $max =~ /\A\d+\z/ && $max > 0;
 
-		# The geocoder is a config seam first and a recommended dependency
-		# second: a deployment may hand in an object, and a test does exactly
-		# that.  With neither, the model reports the module as unavailable and
-		# the map is still the map.
-		my $injected = $cfg->{geocoder};
-		my $geocode  = Database::BI::Model::Geocode->new(
-			(defined($injected) && ref($injected) && $injected->can('geocode_many')
-				? (geocoder => $injected) : ()),
-			(defined($cfg->{openaddr}) && length($cfg->{openaddr})
-				? (openaddr => $cfg->{openaddr}) : ()),
+	# Build colour legend for the template
+	my @color_legend;
+	if (length $color_col) {
+		my %op_label = (
+			gt => '>', ge => '>=', lt => '<', le => '<=', eq => '=', ne => '!=',
 		);
-
-		my $spec   = join('|', $self->param('l') // '', 'loc=' . $loc_col);
-		my $models = $self->_read_models;
-		my $region = $cfg->{map_region};
-
-		my $result = $geocode->resolve_column(
-			$records, $loc_col,
-			cache => Database::BI::Model::Geocode->cache_from_models($models, $spec),
-			((defined($region) && $region =~ /\A[A-Za-z]{2}\z/) ? (region => $region) : ()),
-			max   => _map_limit($cfg->{map_geocode_max}, $DEFAULT_MAP_GEOCODE_MAX),
-		);
-
-		push @messages, @{ $result->{messages} };
-		$backend      = $result->{backend};
-		$plotted_rows = $result->{counts}{plotted};
-
-		# Only a request that asked something new has something new to remember:
-		# rewriting the store for a page answered entirely from the cache would be
-		# a write per view.
-		if ($result->{counts}{attempted}) {
-			my $updated = Database::BI::Model::Geocode->models_with_cache(
-				$models, $spec, $result->{cache},
-				(defined($backend) ? (backend => $backend) : ()),
-				built => _iso8601_utc(),
-			);
-			push @messages, {
-				key  => 'warn_map_cache_unwritten',
-				text => $self->_i18n('warn_map_cache_unwritten'),
-			} unless $self->_write_models($updated);
-		}
-
-		for my $marker (@{ $result->{markers} }) {
-			my $row = ($marker->{first_row} <= $#$records)
-				? $records->[ $marker->{first_row} ] : {};
-			push @markers, {
-				%{ $marker },
-				'label' => _map_popup(
-					$marker->{value}, $marker->{rows},
-					[ map { [ $_, $row->{$_} ] } @popup ],
-				),
+		for my $rule (@$color_rules) {
+			push @color_legend, {
+				color => $rule->{color},
+				label => $color_col . ' ' . ($op_label{ $rule->{op} } // $rule->{op})
+					. ' ' . $rule->{val},
 			};
 		}
-
-	} else {
-		return $self->render(text => "Column not found: $lat_col", status => 400)
-			unless $col_set{$lat_col};
-		return $self->render(text => "Column not found: $lon_col", status => 400)
-			unless $col_set{$lon_col};
-
-		my (%by_key, $out_of_lat, $out_of_lon, $unusable);
-
-		for my $index (0 .. $#$records) {
-			my $row = $records->[$index];
-			my $lat = _numeric_cell($row->{$lat_col} // '');
-			my $lon = _numeric_cell($row->{$lon_col} // '');
-
-			# A row is never plotted at (0,0): a fake point in the Gulf of
-			# Guinea is worse than a missing one.  A whole column outside its
-			# range is named instead, because a transposed pair is the error a
-			# user makes here.
-			if (defined($lat) && ($lat < -90 || $lat > 90)) { $out_of_lat++; next }
-			if (defined($lon) && ($lon < -180 || $lon > 180)) { $out_of_lon++; next }
-			unless (defined($lat) && defined($lon)) { $unusable++; next }
-
-			# Rows at one coordinate are one marker: that is what makes a large
-			# file renderable, and "how many are here?" is the question a map
-			# answers.
-			my $key   = sprintf('%.6f,%.6f', $lat, $lon);
-			my $point = $by_key{$key};
-			if ($point) { $point->{rows}++; next }
-
-			$point = $by_key{$key} = {
-				'lat' => $lat, 'lon' => $lon, 'rows' => 1, 'first_row' => $index,
-			};
-			push @markers, $point;
-		}
-
-		return $self->render(
-			text   => $self->_i18n('error_map_coordinate_range', $lat_col, 'latitude'),
-			status => 400,
-		) if !@markers && $out_of_lat;
-		return $self->render(
-			text   => $self->_i18n('error_map_coordinate_range', $lon_col, 'longitude'),
-			status => 400,
-		) if !@markers && $out_of_lon;
-		return $self->render(
-			text   => $self->_i18n('error_map_coordinate_numeric', $lat_col, $lon_col),
-			status => 400,
-		) if !@markers && @{ $records };
-
-		$plotted_rows += $_->{rows} for @markers;
-
-		push @messages, {
-			key  => 'warn_map_coordinate_rows',
-			text => $self->_i18n('warn_map_coordinate_rows', $plotted_rows,
-				scalar(@{ $records }), scalar(@{ $records }) - $plotted_rows),
-		} if $plotted_rows < scalar @{ $records };
-
-		for my $marker (@markers) {
-			my $row = $records->[ $marker->{first_row} ];
-			$marker->{label} = _map_popup(
-				sprintf('%.6f, %.6f', $marker->{lat}, $marker->{lon}),
-				$marker->{rows},
-				[ map { [ $_, $row->{$_} ] } @popup ],
-			);
-		}
+		push @color_legend, { color => $color_default, label => 'Other' }
+			if @color_legend;
 	}
 
-	my $title = $by_location ? "Map of $loc_col" : "$lat_col and $lon_col";
-	my $cap   = _map_limit($self->param('max'),
-		_map_limit($cfg->{map_max_markers}, $DEFAULT_MAP_MAX_MARKERS));
+	my $result = $self->_map_data(
+		$records, $columns,
+		($by_location ? { loc => $loc_col } : { lat => $lat_col, lon => $lon_col }),
+		\%options,
+		$self->param('l') // '',
+		undef,
+	);
 
-	if (@markers > $cap) {
-		push @messages, {
-			key  => 'warn_map_markers_capped',
-			text => $self->_i18n('warn_map_markers_capped', $cap, scalar @markers),
-		};
-		@markers = @markers[0 .. $cap - 1];
-	}
-
-	push @messages, {
-		key  => 'error_map_no_markers',
-		text => $self->_i18n('error_map_no_markers'),
-	} unless @markers;
-
-	# Leaflet's CSS and JS belong in the head, which the layout owns; the rest of
-	# the map - the search box, the buttons, the div and its script - goes in the
-	# body where the map should appear.
-	my ($map_head, $map_body);
-	if (@markers) {
-		# HTML::OSM is a recommended dependency, so its absence is a state the
-		# page reports and survives: the markers are still counted, nothing is
-		# drawn, and the rest of the application is untouched.
-		if (eval { require HTML::OSM; 1 }) {
-			my $map = HTML::OSM->new(height => '560px', width => '100%');
-			for my $marker (@markers) {
-				$map->add_marker([ $marker->{lat}, $marker->{lon} ], html => $marker->{label});
-			}
-			($map_head, $map_body) = $map->onload_render();
-		} else {
-			push @messages, {
-				key  => 'error_map_renderer_missing',
-				text => $self->_i18n('error_map_renderer_missing'),
-			};
-		}
-	}
+	return $self->render(text => $result->{error}, status => $result->{status})
+		if $result->{error};
 
 	my ($source_url, $source_accessed) = $self->_url_attribution;
 	my ($platform, $language) = $self->_resolve_template;
@@ -6929,17 +7731,21 @@ sub map_view ($self) {
 		handler         => 'tt',
 		template        => "$platform/$language/map",
 		format          => 'html',
-		title           => $title,
-		extra_head      => $map_head,
-		map_body        => $map_body,
-		messages        => \@messages,
-		marker_count    => scalar @markers,
-		row_count       => $plotted_rows,
-		source_rows     => scalar @{ $records },
-		loc_col         => ($by_location ? $loc_col : undef),
-		lat_col         => ($by_location ? undef    : $lat_col),
-		lon_col         => ($by_location ? undef    : $lon_col),
-		backend         => $backend,
+		title           => $result->{title},
+		extra_head      => $result->{map_head},
+		map_body        => $result->{map_body},
+		messages        => $result->{messages},
+		marker_count    => $result->{marker_count},
+		row_count       => $result->{row_count},
+		source_rows     => $result->{source_rows},
+		loc_col         => $result->{loc_col},
+		lat_col         => $result->{lat_col},
+		lon_col         => $result->{lon_col},
+		backend         => $result->{backend},
+		chart           => $result->{chart},
+		chart_json      => $self->_chart_json($result->{chart}),
+		color_col       => $color_col,
+		color_legend    => \@color_legend,
 		back_url        => ($back2 // $back),
 		back_label      => ($back2 ? ($back2_lbl || 'Back') : 'Back to table'),
 		($back2 ? (back2_url => $back, back2_label => 'Back to table') : ()),
@@ -6957,7 +7763,7 @@ sub _map_popup {
 	my ($heading, $rows, $extras) = @_;
 
 	my @lines = '<strong>' . xml_escape($heading // '') . '</strong>';
-	push @lines, $rows . ($rows == 1 ? ' row' : ' rows');
+	push @lines, $rows . ' rows' if $rows != 1;
 	push @lines, map { xml_escape($_->[0]) . ': ' . xml_escape($_->[1]) }
 		grep { defined($_->[1]) && length($_->[1]) } @{ $extras // [] };
 
@@ -6977,6 +7783,100 @@ sub _map_limit {
 	return $value + 0;
 }
 
+# _parse_color($str) -> $color_or_undef
+#
+# Accepts a lowercase CSS named color from a fixed whitelist, or a hex color
+# string in #rgb or #rrggbb form.  Returns the normalised lowercase string or
+# undef when the input is invalid.
+sub _parse_color {
+	my ($c) = @_;
+	return undef unless defined($c) && length($c);
+	$c = lc $c;
+	return $c if $NAMED_COLORS{$c};
+	return $c if $c =~ /\A#[0-9a-f]{3}\z/;
+	return $c if $c =~ /\A#[0-9a-f]{6}\z/;
+	return undef;
+}
+
+# _parse_color_rules(\@raw_rules, $default_raw) -> (\@rules, $default_color)
+#
+# Parses the ?color_rule=op:threshold:color repeatable param list and the
+# optional ?color_default=color param into a structured rules array and a
+# fallback colour.  Invalid rule entries are silently dropped.
+sub _parse_color_rules {
+	my ($raw_rules, $default_raw) = @_;
+	my $default_color = _parse_color($default_raw // '') // $DEFAULT_MARKER_COLOR;
+	my @rules;
+	for my $raw (@{ $raw_rules // [] }) {
+		my ($op, $val, $color_str) = split /:/, $raw, 3;
+		next unless defined($op) && defined($val) && defined($color_str);
+		$op = lc $op;
+		next unless $op =~ /\A(?:gt|ge|lt|le|eq|ne)\z/;
+		my $color = _parse_color($color_str);
+		next unless defined $color;
+		push @rules, { op => $op, val => $val, color => $color };
+	}
+	return (\@rules, $default_color);
+}
+
+# _apply_color_rule($value, \@rules, $default_color) -> $color
+#
+# Returns the first colour whose rule matches $value, or $default_color.
+# Numeric comparisons are used when both sides look like plain numbers.
+sub _apply_color_rule {
+	my ($value, $rules, $default) = @_;
+	$value //= '';
+	for my $rule (@$rules) {
+		my ($op, $threshold, $color) = @{$rule}{qw(op val color)};
+		my ($num_val, $num_thr);
+		if (	$value     =~ /\A-?\d+(?:\.\d+)?\z/ &&
+			$threshold =~ /\A-?\d+(?:\.\d+)?\z/) {
+			$num_val = $value     + 0;
+			$num_thr = $threshold + 0;
+		}
+		my $match;
+		if (defined $num_val) {
+			$match = ($op eq 'gt' && $num_val >  $num_thr)
+			      || ($op eq 'ge' && $num_val >= $num_thr)
+			      || ($op eq 'lt' && $num_val <  $num_thr)
+			      || ($op eq 'le' && $num_val <= $num_thr)
+			      || ($op eq 'eq' && $num_val == $num_thr)
+			      || ($op eq 'ne' && $num_val != $num_thr);
+		} else {
+			$match = ($op eq 'eq' && lc($value) eq lc($threshold))
+			      || ($op eq 'ne' && lc($value) ne lc($threshold));
+		}
+		return $color if $match;
+	}
+	return $default;
+}
+
+# _marker_icon($color) -> $data_uri
+#
+# Returns a data:image/svg+xml URI for a 32x32 teardrop pin icon whose fill is
+# $color.  The icon anchor is [16,32] (HTML::OSM's hardcoded default), so the
+# path tip lands at the bottom centre of the bounding box.
+sub _marker_icon {
+	my ($color) = @_;
+	$color //= $DEFAULT_MARKER_COLOR;
+
+	# Commas in path data avoid spaces that would need percent-encoding.
+	my $svg =
+		"<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'>" .
+		"<path d='M16,0C10,0,5,5,5,12C5,21,16,32,16,32C16,32,27,21,27,12C27,5,22,0,16,0Z'" .
+		" fill='$color' stroke='#444' stroke-width='1.5'/>" .
+		"<circle cx='16' cy='12' r='5' fill='white' opacity='0.65'/>" .
+		"</svg>";
+
+	# Minimal percent-encoding for a data: URI (RFC 2397).
+	$svg =~ s/#/%23/g;
+	$svg =~ s/</%3C/g;
+	$svg =~ s/>/%3E/g;
+	$svg =~ s/ /%20/g;
+
+	return "data:image/svg+xml,$svg";
+}
+
 # _iso8601_utc() -> $string
 #
 # When a geocode cache was built, in the form the model store records.
@@ -6984,6 +7884,329 @@ sub _iso8601_utc {
 	require POSIX;
 
 	return POSIX::strftime('%Y-%m-%dT%H:%M:%SZ', gmtime());
+}
+
+# ---------------------------------------------------------------------------
+# Phase 4.1 -- Extract helper
+# ---------------------------------------------------------------------------
+
+# _get_or_build_extract($self, $src, $records, $columns, $spec) -> $path | undef
+#
+# Returns a path to a cached SQLite extract for the current source fingerprint,
+# building one if the cache is cold.  Returns undef when:
+#   - model_dir is not configured or not writable
+#   - the source has no mtime (URL-backed, headerless cache, etc.)
+#   - writing the extract would fail
+# The caller continues with direct reads in all undef cases.
+sub _get_or_build_extract :Protected ($self, $src, $records, $columns, $spec) {
+	my $app    = $self->app;
+	my $mdcfg  = $app->config('model_dir') // '.bi';
+	my $mdir   = Mojo::File->new($app->home->child($mdcfg))->to_string;
+	return undef unless -d $mdir || eval { Mojo::File->new($mdir)->make_path; 1 };
+
+	my $mtime = eval { $src->can('updated') ? $src->updated : undef } // undef;
+	return undef unless defined $mtime;
+
+	my $fsize = 0;
+	if ($src->can('_file_path') && defined $src->{_file_path} && -f $src->{_file_path}) {
+		$fsize = -s $src->{_file_path};
+	}
+
+	require Database::BI::Extract;
+	my $cache = Database::BI::Extract->new(model_dir => $mdir);
+
+	my $path = $cache->get($spec, $mtime, $fsize);
+	return $path if $path;
+
+	# Build a new extract.
+	my $bytes = eval { $self->_write_sqlite_db($records, $columns) };
+	if ($@) {
+		carp $MESSAGES{error_extract_unwritable} . ": $@";
+		return undef;
+	}
+
+	$path = eval { $cache->put($spec, $mtime, $fsize, $bytes) };
+	if ($@) {
+		carp $MESSAGES{error_extract_unwritable} . ": $@";
+		return undef;
+	}
+
+	return $path;
+}
+
+# ---------------------------------------------------------------------------
+# Phase 4.3 shared pipeline helper (used by catalog_view and bi-alert)
+# ---------------------------------------------------------------------------
+
+# _catalog_entry($self, $mf, $analyses) -> \%entry
+#
+# Build one catalog entry for a Mojo::File data file.
+sub _catalog_entry :Protected ($self, $mf, $analyses) {
+	my $path  = $mf->to_string;
+	my $name  = $mf->basename;
+	my $size  = -s $path // 0;
+	my $mtime = (stat($path))[9] // 0;
+
+	require POSIX;
+	my $mtime_str = $mtime ? POSIX::strftime('%Y-%m-%d %H:%M UTC', gmtime($mtime)) : '';
+
+	# Find which analyses reference this file.
+	# Normalize path separators so that Windows paths stored with backslashes
+	# match Mojo::File paths that may use forward slashes, and vice versa.
+	# Case-fold only the path portion on case-insensitive filesystems.
+	my $use_ci = File::Spec->case_tolerant;
+	(my $norm_path = $path) =~ s{\\}{/}g;
+	$norm_path = lc $norm_path if $use_ci;
+
+	my @refs;
+	for my $aid (sort keys %$analyses) {
+		my $a = $analyses->{$aid};
+		for my $ds (@{ $a->{datasets} // [] }) {
+			my $spec = $ds->{spec} // '';
+			my $table_stem = $mf->basename; $table_stem =~ s/\.[^.]+\z//;
+			(my $norm_spec = $spec) =~ s{\\}{/}g;
+			$norm_spec = lc $norm_spec if $use_ci;
+			if (CORE::index($norm_spec, $norm_path) >= 0 || CORE::index($spec, "table:$table_stem") == 0) {
+				push @refs, { id => $aid, name => $a->{name} };
+				last;
+			}
+		}
+	}
+
+	# Derive a human-readable type from the extension.
+	my ($ext) = ($name =~ /\.([^.]+)\z/);
+	$ext = lc($ext // '');
+	my %type_map = (
+		csv => 'CSV file', tsv => 'TSV file', psv => 'PSV file',
+		xml => 'XML file', xlsx => 'XLSX spreadsheet',
+		sql => 'SQLite database', sqlite => 'SQLite database',
+		sqlite3 => 'SQLite database', db => 'Berkeley DB / SQLite',
+	);
+	my $type = $type_map{$ext} // 'Data file';
+
+	return {
+		name           => $name,
+		path           => $path,
+		type           => $type,
+		size           => $size,
+		mtime_str      => $mtime_str,
+		analysis_count => scalar @refs,
+		analyses       => \@refs,
+	};
+}
+
+# ---------------------------------------------------------------------------
+# Phase 4.7 -- Catalog
+# ---------------------------------------------------------------------------
+
+# GET /catalog
+sub catalog_view ($self) {
+	my $data_dir  = $self->app->config('data_dir') // 'data';
+	my $dir       = Mojo::File->new($self->app->home->child($data_dir));
+	my $analyses  = $self->_read_analyses;
+
+	my @entries;
+	if (-d $dir) {
+		my $ext_re = $EXT_RE;
+		for my $mf ($dir->list->each) {
+			next unless $mf->to_string =~ $ext_re;
+			push @entries, $self->_catalog_entry($mf, $analyses);
+		}
+	}
+
+	my ($platform, $language) = $self->_resolve_template;
+	$self->render(
+		handler        => 'tt',
+		template       => "$platform/$language/catalog",
+		format         => 'html',
+		title          => 'Dataset catalog',
+		catalog_entries => \@entries,
+	);
+}
+
+# ---------------------------------------------------------------------------
+# Phase 4.6 -- Sharing and embedding
+# ---------------------------------------------------------------------------
+
+# _share_secret($self) -> $secret_string
+sub _share_secret :Protected ($self) {
+	my $s = $self->app->config('share_secret') // '';
+	unless (length $s) {
+		carp 'share_secret not configured; using insecure default';
+		$s = 'BI_DEFAULT_INSECURE_SECRET';
+	}
+	return $s;
+}
+
+# _make_share_token($self, $id, $expires) -> $token_string
+#
+# Signs with HMAC-SHA256 using Digest::SHA (Perl core since 5.10).
+sub _make_share_token :Protected ($self, $id, $expires) {
+	require Digest::SHA;
+	require MIME::Base64;
+	my $secret  = $self->_share_secret;
+	my $payload = "$id|$expires";
+	my $hmac    = Digest::SHA::hmac_sha256_hex($payload, $secret);
+	return MIME::Base64::encode_base64url("$payload|$hmac");
+}
+
+# _verify_share_token($self, $id, $token) -> 1 | undef
+sub _verify_share_token :Protected ($self, $id, $token) {
+	return undef unless defined $token && length $token;
+	require MIME::Base64;
+	my $decoded = eval { MIME::Base64::decode_base64url($token) };
+	return undef unless defined $decoded;
+	my ($tid, $expires, $hmac) = split /\|/, $decoded, 3;
+	return undef unless defined $tid && defined $expires && defined $hmac;
+	return undef unless $tid eq $id;
+	return undef unless $expires =~ /\A\d+\z/ && $expires > time();
+	require Digest::SHA;
+	my $secret   = $self->_share_secret;
+	my $expected = Digest::SHA::hmac_sha256_hex("$id|$expires", $secret);
+	return undef unless $hmac eq $expected;
+	return 1;
+}
+
+# POST /api/analyses/:id/share
+sub analyses_share ($self) {
+	my $id = $self->stash('id') // '';
+	return $self->render(json => { error => $MESSAGES{error_analysis_id_invalid} }, status => 400)
+		unless $id =~ /\A[A-Za-z0-9]+\z/;
+
+	my $analyses = $self->_read_analyses;
+	return $self->render(json => { error => sprintf($MESSAGES{error_analysis_not_found}, $id) }, status => 404)
+		unless exists $analyses->{$id};
+
+	my $expires = time() + $SHARE_TOKEN_TTL;
+	my $token   = $self->_make_share_token($id, $expires);
+	my $url     = $self->req->url->base->to_string . "/share/$id?token=" . url_escape($token);
+
+	$self->render(json => { token => $token, url => $url, expires => $expires });
+}
+
+# GET /share/:id?token=...
+sub share_view ($self) {
+	my $id    = $self->stash('id') // '';
+	my $token = $self->param('token') // '';
+	return $self->render(text => $MESSAGES{error_analysis_id_invalid}, status => 400)
+		unless $id =~ /\A[A-Za-z0-9]+\z/;
+	return $self->render(text => $MESSAGES{error_token_missing}, status => 401)
+		unless length $token;
+	unless ($self->_verify_share_token($id, $token)) {
+		return $self->render(text => $MESSAGES{error_token_invalid}, status => 403);
+	}
+
+	my $analyses = $self->_read_analyses;
+	return $self->render(text => sprintf($MESSAGES{error_analysis_not_found}, $id), status => 404)
+		unless exists $analyses->{$id};
+	my $a = $analyses->{$id};
+
+	my @visuals = @{ $a->{visuals} // [] };
+	unless (@visuals) {
+		return $self->render(text => 'This shared analysis has no visuals', status => 404);
+	}
+
+	# Reuse canvas_render logic by temporarily setting id in stash and
+	# forwarding; set sharing_mode so the template hides admin controls.
+	$self->stash(sharing_mode => 1);
+	# Delegate to canvas_render which reads stash('id').
+	return $self->canvas_render;
+}
+
+# GET /embed/:id?token=...
+sub embed_view ($self) {
+	my $id    = $self->stash('id') // '';
+	my $token = $self->param('token') // '';
+	return $self->render(text => $MESSAGES{error_analysis_id_invalid}, status => 400)
+		unless $id =~ /\A[A-Za-z0-9]+\z/;
+	return $self->render(text => $MESSAGES{error_token_missing}, status => 401)
+		unless length $token;
+	unless ($self->_verify_share_token($id, $token)) {
+		return $self->render(text => $MESSAGES{error_token_invalid}, status => 403);
+	}
+
+	my $analyses = $self->_read_analyses;
+	return $self->render(text => sprintf($MESSAGES{error_analysis_not_found}, $id), status => 404)
+		unless exists $analyses->{$id};
+	my $a = $analyses->{$id};
+
+	# X-Frame-Options: embed is opt-in.
+	$self->res->headers->header('X-Frame-Options' => 'SAMEORIGIN');
+
+	my @visuals = @{ $a->{visuals} // [] };
+	unless (@visuals) {
+		return $self->render(text => 'This shared analysis has no visuals', status => 404);
+	}
+
+	# Build a minimal context for the embed template.
+	# Reuse the canvas pipeline helper to render visuals.
+	my ($src, $records, $columns) = $self->_build_canvas_pipeline($a);
+	return $self->render(text => 'Cannot open data source', status => 422)
+		unless defined $records;
+
+	my @rendered;
+	for my $i (0 .. $#visuals) {
+		my $vis = $visuals[$i];
+		my $ctx = eval { $self->_canvas_render_context($a, $self->req->url->query->to_string) };
+		next unless $ctx && ref $ctx eq 'HASH' && !$ctx->{error};
+		push @rendered, $ctx;
+	}
+
+	# Simpler: delegate to canvas_render and let it handle the heavy lifting.
+	# Just set a flag so the embed template is selected.
+	$self->stash(embed_mode => 1, sharing_mode => 1);
+	my ($platform, $language) = $self->_resolve_template;
+	$self->render(
+		handler     => 'tt',
+		template    => "$platform/$language/embed",
+		format      => 'html',
+		title       => $a->{name},
+		canvas_id   => $id,
+		canvas_name => $a->{name},
+		visuals     => \@rendered,
+	);
+}
+
+# GET /a/:id/visual/:n/:format
+sub visual_download ($self) {
+	my $id     = $self->stash('id')     // '';
+	my $n      = $self->stash('n')      // 0;
+	my $format = $self->stash('fmt') // '';
+
+	return $self->render(text => $MESSAGES{error_analysis_id_invalid}, status => 400)
+		unless $id =~ /\A[A-Za-z0-9]+\z/;
+	return $self->render(text => 'Format must be csv or png', status => 400)
+		unless $format =~ /\A(?:csv|png)\z/;
+	return $self->render(text => 'Visual index must be a non-negative integer', status => 400)
+		unless $n =~ /\A\d+\z/;
+
+	my $analyses = $self->_read_analyses;
+	return $self->render(text => sprintf($MESSAGES{error_analysis_not_found}, $id), status => 404)
+		unless exists $analyses->{$id};
+	my $a = $analyses->{$id};
+
+	my @visuals = @{ $a->{visuals} // [] };
+	return $self->render(text => "Visual $n not found", status => 404)
+		unless $n < scalar @visuals;
+
+	if ($format eq 'csv') {
+		# Run the pipeline and return CSV for this visual's data.
+		my (undef, $records, $columns) = $self->_run_pipeline_source;
+		return $self->render(text => 'Cannot open data source', status => 422)
+			unless defined $records;
+		my $csv = $self->_serialize_csv($records, $columns);
+		$self->res->headers->content_disposition(
+			"attachment; filename=\"visual-$n.csv\""
+		);
+		return $self->render(data => encode('UTF-8', $csv), format => 'txt');
+	}
+
+	# PNG: not implemented in the server (canvas/SVG rendering is client-side).
+	# Return 501 with a descriptive message.
+	return $self->render(
+		text   => 'PNG download requires the browser SVG renderer; use the in-page Save Image button',
+		status => 501,
+	);
 }
 
 1;
@@ -7530,10 +8753,14 @@ C<GET /map> -- Render an OpenStreetMap map of the view.
 A row gets a position one of two ways.  With C<loc=E<lt>columnE<gt>> the column
 holds places, and each distinct value is geocoded once by
 L<Database::BI::Model::Geocode> (one lookup per value however often the column
-repeats it); the answers are remembered in the dataset's model store, so a
-second visit asks nothing.  With C<lat=> and C<lon=> the columns already hold
+repeats it); the answers are remembered in the model store and shared by every
+dataset, so a second visit - or another file naming the same place - asks
+nothing.  With C<lat=> and C<lon=> the columns already hold
 coordinates.  Rows sharing a position become one marker whose popup says how
-many rows it stands for.
+many rows it stands for.  Markers are clustered with Leaflet.markercluster, so
+a dense map draws a count at low zoom and splits it into individual pins as it
+is zoomed in; a sparse map looks the same, because markers far enough apart are
+left on their own.
 
 Accepts the same C<l=>, C<j=>, C<c=> and C<f=> pipeline params as every other
 visual, so the map shows the filtered, calculated view.
@@ -7541,7 +8768,7 @@ visual, so the map shows the filtered, calculated view.
   loc=<col>      Location column to geocode (required unless lat= and lon= are given)
   lat=<col>      Latitude column (numeric, -90..90)
   lon=<col>      Longitude column (numeric, -180..180)
-  popup=<col>    Column shown in the marker popup (repeatable; default: none)
+  popup=<col>    Column shown in the marker popup (repeatable; default: all non-coordinate columns)
   max=N          Markers to draw (default: map_max_markers, 2000)
   back=<url>     URL for the "Back to table" breadcrumb link
 
@@ -7558,7 +8785,7 @@ use instead of loading L<Geo::Coder::Free>; the seam the tests use).
   loc      string  Optional.  Column of places to geocode.
   lat      string  Optional.  Numeric latitude column.
   lon      string  Optional.  Numeric longitude column.
-  popup    string  Optional, repeatable.  Columns shown in the popup.
+  popup    string  Optional, repeatable.  Columns shown in the popup.  Default: all non-coordinate columns.
   max      int     Optional.  Positive marker cap for this request.
   back     url     Optional.  Safe back-link URL (sanitised by _safe_back_url).
 
@@ -7818,6 +9045,19 @@ the sum of all source tables.
 =item *
 
 C<_resolve_language> extracts only the primary language subtag from the first
+C<Accept-Language> tag (e.g. C<de> from C<de-DE,de;q=0.9,en;q=0.8>).
+Quality weights and multiple alternatives are not ranked.
+
+=item *
+
+No GeoIP-based language resolution is implemented.  The language is resolved
+from the HTTP C<Accept-Language> header only.
+
+=item *
+
+C<Sub::Protected> enforcement requires the CHECK compilation phase; when modules
+are loaded dynamically at test time the "Too late to run CHECK block" warning
+is emitted and the restrilanguage> extracts only the primary language subtag from the first
 C<Accept-Language> tag (e.g. C<de> from C<de-DE,de;q=0.9,en;q=0.8>).
 Quality weights and multiple alternatives are not ranked.
 

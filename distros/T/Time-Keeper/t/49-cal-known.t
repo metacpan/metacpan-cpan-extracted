@@ -52,7 +52,7 @@ is($bad, 0, "$rows ICU answers across " . scalar(keys %seen) . " calendars agree
 
 # A few anchors by hand, from the literature.
 my $K = 'Time::Keeper';
-is($K->parse('0622-07-19T00:00:00Z', calendar => 'islamic-civil')->iso8601 =~ s/T.*//r, '0622-07-19', 'the civil Hijri epoch');
+is((split /T/, $K->parse('0622-07-19T00:00:00Z', calendar => 'islamic-civil')->iso8601)[0], '0622-07-19', 'the civil Hijri epoch');
 is($K->new(year => 1, month => 1, day => 1, calendar => 'islamic-civil')->iso8601, '0622-07-19T00:00:00Z', '1 Muharram 1 AH is 19 July 622');
 is($K->new(year => 1, month => 1, day => 1, calendar => 'islamic-tbla')->iso8601, '0622-07-18T00:00:00Z', 'a day earlier in the astronomical reckoning');
 is($K->new(year => 1, month => 1, day => 1, calendar => 'hebrew')->iso8601, '-003760-09-07T00:00:00Z', '1 Tishri AM 1');

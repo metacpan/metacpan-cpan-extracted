@@ -98,6 +98,8 @@ GIF/testimg/screen2.gif
 GIF/testimg/screen3.gif
 GIF/testimg/trimgdesc.gif
 GIF/testimg/trmiddesc.gif
+GIF/testimg/v4hp-5h6w-9897-i.gif
+GIF/testimg/v4hp-5h6w-9897.gif
 GIF/testimg/zerocomm.gif	Image with a zero-length comment extension
 hlines.c			Manage sets of horizontal line segments
 ICO/ICO.pm			Windows Icon file support
@@ -399,7 +401,7 @@ t/950-kwalitee/070-mymeta.t
 t/950-kwalitee/080-nousevars.t	Check various standards
 t/data/exif32overcnt.bin	EXIF with count beyond block size
 t/data/exif32oversz.bin		EXIF with size beyond block size
-t/data/exif580atend.bin         EXIF with data right at EOF (correctly)
+t/data/exif580atend.bin		EXIF with data right at EOF (correctly)
 t/data/exifattack.bin		EXIF with zero length ASCII field (POC)
 t/data/exifbad0ascii.bin	EXIF with zero length ASCII field
 t/data/exifbadascoff.bin	EXIF block with bad ASCII field offset

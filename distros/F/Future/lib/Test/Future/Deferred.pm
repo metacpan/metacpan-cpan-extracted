@@ -1,13 +1,16 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2018 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2018-2026 -- leonerd@leonerd.org.uk
 
-package Test::Future::Deferred 0.53;
+package Test::Future::Deferred 0.54;
 
-use v5.14;
+use v5.20;
 use warnings;
 use base qw( Future );
+
+use feature qw( signatures );
+no warnings qw( experimental::signatures );
 
 use Carp;
 
@@ -48,7 +51,7 @@ or similar.
 
 =head2 flush
 
-   Test::Future::Deferred->flush
+   Test::Future::Deferred->flush;
 
 I<Since version 0.52.>
 
@@ -59,7 +62,7 @@ activities to take place.
 
 my @deferrals;
 
-sub flush
+sub flush ( $ = undef )
 {
    while( my $d = shift @deferrals ) {
       my ( $f, $method, @args ) = @$d;
@@ -67,12 +70,12 @@ sub flush
    }
 }
 
-sub await
+sub await ( $self )
 {
    Test::Future::Deferred->flush;
 
-   $_[0]->is_ready or
-      croak "$_[0] ran out of things to do and is still not ready";
+   $self->is_ready or
+      croak "$self ran out of things to do and is still not ready";
 }
 
 =head2 done_later
@@ -85,10 +88,10 @@ the given result, but only when C<get> is called.
 
 =cut
 
-sub done_later
+sub done_later ( $self, @result )
 {
-   my $self = ref $_[0] ? shift : shift->new;
-   push @deferrals, [ $self, done => @_ ];
+   ref $self or $self = $self->new;
+   push @deferrals, [ $self, done => @result ];
    return $self;
 }
 
@@ -104,10 +107,10 @@ message given here also.
 
 =cut
 
-sub fail_later
+sub fail_later ( $self, @failure )
 {
-   my $self = ref $_[0] ? shift : shift->new;
-   push @deferrals, [ $self, fail => @_ ];
+   ref $self or $self = $self->new;
+   push @deferrals, [ $self, fail => @failure ];
    return $self;
 }
 

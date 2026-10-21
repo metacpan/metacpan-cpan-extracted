@@ -62,13 +62,21 @@ sub dies_like {
     open $fh, '>:encoding(UTF-8)', $bad or die $!;
     print $fh "colour\tred\n";
     close $fh;
-    dies_like(sub { $W->from_file($bad, 'en') }, qr/'colour' is not a key; the keys are after, and, at, before, end_of, last, of, on, range, skip, start_of, weekend/, 'a key that is not one');
+    dies_like(sub { $W->from_file($bad, 'en') }, qr/'colour' is not a key; the keys are after, alias, and, at, before, end_of, last, nth, of, on, range, skip, start_of, weekend/, 'a key that is not one');
     open $fh, '>:encoding(UTF-8)', $bad or die $!;
     print $fh "# a comment\nend_of\tclose of\n\nskip\n# test: close of last month => x\n";
     close $fh;
     my $w = $W->from_file($bad, 'en');
     is_deeply([$w->phrases('end_of')], ['close of'], 'a good file reads');
     is_deeply([$w->tests], [['close of last month', 'x']], 'with its test line');
+    # the same file with Windows line ends, as a text-mode write leaves it there
+    open $fh, '>:raw:encoding(UTF-8)', $bad or die $!;
+    print $fh "# a comment\r\nend_of\tclose of\r\n\r\nskip\r\n# test: close of last month => x\r\n";
+    close $fh;
+    $w = $W->from_file($bad, 'en');
+    is_deeply([$w->phrases('end_of')], ['close of'], 'a file with CRLF line ends reads');
+    is_deeply([$w->tests], [['close of last month', 'x']], 'with its test line');
+    is_deeply([$w->phrases('skip')], [], 'and a key alone');
 }
 
 done_testing;

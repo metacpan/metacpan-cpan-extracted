@@ -47,7 +47,7 @@ METHODS
         my $ro = Data::BitSet::Shared->new_readonly($path);      # frozen file, read-only
 
     "new_readonly" opens a frozen file read-only for lock-free querying (see
-    "FROZEN (READ-ONLY) MODE"). The descriptor you pass is duplicated
+    "FROZEN (READ-ONLY) MODE"). "new_from_fd" duplicates the descriptor
     ("F_DUPFD_CLOEXEC"), so it stays yours to close and closing it does not
     disturb the handle.
 
@@ -126,9 +126,9 @@ FROZEN (READ-ONLY) MODE
         my $ro = Data::BitSet::Shared->new_readonly("/tmp/seen.bitset");
         $ro->test($_) for @queries;
 
-    "freeze" marks the bitset permanently immutable (there is no unfreeze --
-    rebuild the file to change it) and flushes the seal to disk. A frozen
-    bitset rejects every mutator ("set", "clear", "toggle", "fill", "zero")
+    "freeze" requires all writers to have stopped. It marks the bitset
+    permanently immutable and flushes the seal to disk. A frozen bitset
+    rejects every mutator ("set", "clear", "toggle", "fill", "zero")
     with a croak, and a read-write reopen ("new($path, ...)" or "new_from_fd")
     of a sealed file is refused -- so a shipped artifact can never be silently
     mutated out from under its readers.

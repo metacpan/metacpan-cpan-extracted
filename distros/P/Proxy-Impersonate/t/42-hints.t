@@ -39,7 +39,7 @@ sub fetch {
         socket(my $s, PF_INET, SOCK_STREAM, 0);
         setsockopt($s, SOL_SOCKET, SO_RCVTIMEO, pack('l!l!', 15, 0));
         connect($s, sockaddr_in($proxy->port, inet_aton('127.0.0.1')));
-        syswrite($s, "GET http://127.0.0.1:$oport/ HTTP/1.1\r\nHost: 127.0.0.1:$oport\r\nAccept: */*\r\n\r\n");
+        syswrite($s, "GET http://127.0.0.1:$oport/ HTTP/1.1\r\nHost: 127.0.0.1:$oport\r\nAccept: */*\r\nConnection: close\r\n\r\n");
         my $buf = ''; while (1) { my $n = sysread($s, my $b, 8192); last if !$n; $buf .= $b } _save($result, $buf); exit 0;
     }
     my $cw = EV::child($pid, 0, sub { EV::break() });

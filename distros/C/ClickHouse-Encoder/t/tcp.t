@@ -5,6 +5,7 @@ use Test::More;
 use lib 'blib/lib', 'blib/arch';
 use ClickHouse::Encoder;
 use ClickHouse::Encoder::TCP;
+my $BI = ClickHouse::Encoder::TCP::pack_block_info();
 
 # Round-trip a Hello: pack, then unpack, verify fields.
 {
@@ -140,14 +141,14 @@ use ClickHouse::Encoder::TCP;
     # Empty table name (1 varint byte == 0)
     is(ord(substr($pkt, 1, 1)), 0, 'empty table name varint');
     # The remaining bytes ARE the Native block
-    is(substr($pkt, 2), $block, 'wrapped block bytes intact');
+    is(substr($pkt, 2), $BI . $block, 'wrapped block bytes intact');
 }
 
 # pack_data_end: empty block signal
 {
     my $end = ClickHouse::Encoder::TCP->pack_data_end();
     # \x02 (CLIENT_DATA) + \x00 (empty table) + \x00 (ncols=0) + \x00 (nrows=0)
-    is($end, "\x02\x00\x00\x00", 'end-of-insert canonical bytes');
+    is($end, "\x02\x00" . $BI . "\x00\x00", 'end-of-insert canonical bytes');
 }
 
 # Ping / Cancel
@@ -281,11 +282,11 @@ use ClickHouse::Encoder::TCP;
 # from there.
 {
     for my $type (7, 8) {
-        my $bytes = chr($type) . _len_str('');  # empty table name
+        my $bytes = chr($type) . _len_str('') . $BI;  # empty table name
         my ($pkt, $off) = ClickHouse::Encoder::TCP->unpack_packet($bytes, 0);
         is($pkt->{type},         $type, "type $type unpacks");
         is($pkt->{table_name},   '',    "type $type table_name empty");
-        is($pkt->{block_offset}, 2,     "type $type block_offset past 1-byte type+empty name");
+        is($pkt->{block_offset}, 10,     "type $type block_offset past 1-byte type+empty name");
     }
 }
 
@@ -293,11 +294,11 @@ use ClickHouse::Encoder::TCP;
 # table_name string followed by a block; block_offset points past
 # the name so the caller can decode_block from there.
 {
-    my $bytes = "\x0e" . _len_str('');  # type 14, empty table name
+    my $bytes = "\x0e" . _len_str('') . $BI;  # type 14, empty table name
     my ($pkt) = ClickHouse::Encoder::TCP->unpack_packet($bytes, 0);
     is($pkt->{type},         14, 'ProfileEvents type');
     is($pkt->{table_name},   '', 'ProfileEvents table_name empty');
-    is($pkt->{block_offset}, 2,  'ProfileEvents block_offset past type+name');
+    is($pkt->{block_offset}, 10,  'ProfileEvents block_offset past type+name');
 }
 
 # ProfileInfo: rows + blocks + rows_bytes (varints), applied_limit
@@ -359,7 +360,7 @@ SKIP: {
        'framed payload uses LZ4 method tag 0x82');
 
     my $plain = ClickHouse::Encoder->decompress_native_block($framed);
-    is($plain, $block, 'compressed Data packet round-trips through decompress');
+    is($plain, $BI . $block, 'compressed Data packet round-trips through decompress');
 }
 
 # pack_data_end with compression: the empty Native block must also
@@ -377,7 +378,7 @@ SKIP: {
     # empty-Native-block bytes (ncols=0, nrows=0).
     my $framed = substr($end, 2);
     my $plain  = ClickHouse::Encoder->decompress_native_block($framed);
-    is($plain, "\x00\x00",
+    is($plain, $BI . "\x00\x00",
        'compressed pack_data_end framing wraps the 2-byte empty block');
 }
 
@@ -396,12 +397,12 @@ SKIP: {
     my $framed = substr($pkt, 2);
     is(ord(substr($framed, 16, 1)), 0x90,
        'zstd pack_data uses ZSTD method tag 0x90');
-    is(ClickHouse::Encoder->decompress_native_block($framed), $block,
+    is(ClickHouse::Encoder->decompress_native_block($framed), $BI . $block,
        'zstd-compressed Data packet round-trips through decompress');
 
     my $end = ClickHouse::Encoder::TCP->pack_data_end(compress => 'zstd');
     is(ClickHouse::Encoder->decompress_native_block(substr($end, 2)),
-       "\x00\x00",
+       $BI . "\x00\x00",
        'zstd pack_data_end framing wraps the empty block');
 }
 
@@ -417,7 +418,7 @@ SKIP: {
     my $enc = ClickHouse::Encoder->new(columns => [['x','Int32']]);
     my $block = $enc->encode([[42], [43], [44]]);
     my $framed = ClickHouse::Encoder->compress_native_block(
-        $block, mode => 'lz4');
+        $BI . $block, mode => 'lz4');
     my $server_pkt =
         "\x01"          # SERVER_DATA type
       . "\x00"          # empty table_name varint
@@ -482,18 +483,10 @@ SKIP: {
     close $r;
 }
 
-# Live INSERT end-to-end. Opt-in: this requires a ClickHouse server
-# at protocol revision <= 54474 (older than the chunking-negotiation
-# extension introduced around CH 24.10). Modern servers (rev >=
-# 54475) advertise a chunking offer right after Hello that this
-# subset does not respond to, so the connection ends with a fast
-# protocol-mismatch error rather than a real handshake. The unit
-# tests above fully cover the wire-format encoding correctness.
+# Live insert over the negotiated default revision.
 SKIP: {
     skip "set TEST_CLICKHOUSE_TCP=1 (default port 9000) to enable "
-       . "live TCP tests; requires a server at protocol revision "
-       . "<= 54474 - newer servers add chunking negotiation past "
-       . "this subset's scope", 4
+       . "live TCP tests", 4
         unless $ENV{TEST_CLICKHOUSE_TCP};
     my $tcp_port = $ENV{TEST_CLICKHOUSE_TCP_PORT} // 9000;
     require IO::Socket::INET;
@@ -503,19 +496,20 @@ SKIP: {
     );
     skip "ClickHouse TCP not reachable on :$tcp_port", 4 unless $sock;
     binmode $sock;
+    my $rbuf = '';
 
     print $sock ClickHouse::Encoder::TCP->pack_hello(
         user => 'default', password => '', database => 'default');
-    my $hello = ClickHouse::Encoder::TCP->read_packet($sock);
+    my $hello = ClickHouse::Encoder::TCP->read_packet($sock, buffer => \$rbuf, timeout => 5);
     is($hello->{type}, 0, 'server hello received');
     cmp_ok($hello->{revision}, '>', 54000, 'server revision sane');
 
-    # Create + INSERT
+    # Create + insert
     print $sock ClickHouse::Encoder::TCP->pack_query(
         query => 'drop table if exists ch_tcp_t');
     # Consume to EndOfStream
     while (1) {
-        my $p = ClickHouse::Encoder::TCP->read_packet($sock);
+        my $p = ClickHouse::Encoder::TCP->read_packet($sock, buffer => \$rbuf, timeout => 5);
         last if $p->{type} == 5;  # EOS
         next if $p->{type} == 3;  # progress
         die "drop: unexpected $p->{type}" if $p->{type} == 2;
@@ -523,19 +517,19 @@ SKIP: {
     print $sock ClickHouse::Encoder::TCP->pack_query(
         query => 'create table ch_tcp_t (x Int32, s String) engine=Memory');
     while (1) {
-        my $p = ClickHouse::Encoder::TCP->read_packet($sock);
+        my $p = ClickHouse::Encoder::TCP->read_packet($sock, buffer => \$rbuf, timeout => 5);
         last if $p->{type} == 5;
         next if $p->{type} == 3;
         die "create: unexpected $p->{type}" if $p->{type} == 2;
     }
 
-    # INSERT
+    # insert
     print $sock ClickHouse::Encoder::TCP->pack_query(
         query => 'insert into ch_tcp_t format native');
     # Server replies with TableColumns + empty Data sample block.
     # Drain until first non-progress non-table-columns packet.
     while (1) {
-        my $p = ClickHouse::Encoder::TCP->read_packet($sock);
+        my $p = ClickHouse::Encoder::TCP->read_packet($sock, buffer => \$rbuf, timeout => 5);
         last if $p->{type} == 1;       # SERVER_DATA (sample)
         next if $p->{type} == 11;      # TableColumns
         next if $p->{type} == 3;       # Progress
@@ -550,7 +544,7 @@ SKIP: {
 
     # Read until EOS
     while (1) {
-        my $p = ClickHouse::Encoder::TCP->read_packet($sock);
+        my $p = ClickHouse::Encoder::TCP->read_packet($sock, buffer => \$rbuf, timeout => 5);
         last if $p->{type} == 5;
         next if $p->{type} == 3;
         next if $p->{type} == 6;       # ProfileInfo
@@ -558,14 +552,14 @@ SKIP: {
         die "insert flush: type $p->{type} $p->{message}\n"
             if $p->{type} == 2;
     }
-    ok(1, 'INSERT via TCP completed without exception');
+    ok(1, 'insert via TCP completed without exception');
 
-    # SELECT count() via the same connection
+    # select count() via the same connection
     print $sock ClickHouse::Encoder::TCP->pack_query(
         query => 'select count() from ch_tcp_t');
     my $got_count;
     while (1) {
-        my $p = ClickHouse::Encoder::TCP->read_packet($sock);
+        my $p = ClickHouse::Encoder::TCP->read_packet($sock, buffer => \$rbuf, timeout => 5);
         last if $p->{type} == 5;
         next if $p->{type} == 3 || $p->{type} == 6 || $p->{type} == 14
              || $p->{type} == 11;
@@ -575,15 +569,12 @@ SKIP: {
                 if $p->{block}{nrows};
         }
     }
-    is($got_count, 3, 'SELECT count via TCP returned 3');
+    is($got_count, 3, 'select count via TCP returned 3');
 
     close $sock;
 }
 
-# read_packet's timeout. Without one the call blocks in sysread forever,
-# which is what a handshake against a too-new server does: both sides
-# wait and neither gives up. Verified against ClickHouse 26.7 (rev 54488),
-# where the Hello succeeds and the very next read hangs.
+# read_packet's timeout against a socket that accepts but never speaks.
 SKIP: {
     my $ok = eval { require IO::Socket::INET; 1 };
     skip 'IO::Socket::INET not available', 3 unless $ok;

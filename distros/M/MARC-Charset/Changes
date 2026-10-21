@@ -1,5 +1,68 @@
 Revision history for MARC::Charset
 
+1.36 Tue Oct 20 12:57:01 PM EDT 2026
+    - Fix utf8_to_marc8() dying when ignore_errors is on
+
+    When utf8_to_marc8() meets a character with no MARC-8 mapping, it warns
+    and, unless errors are being ignored, returns. However, in ignore_errors mode
+    (either the global setting or the second argument) it died with:
+
+        Can't call method "is_combining" on an undefined value
+
+    It now skips the unmappable character in that case, which is what
+    marc8_to_utf8() already does for unmappable MARC-8 characters.
+    (Martin Renvoize)
+
+    - Add table for converting CCCII characters
+
+    At least one Japanese Z39.50 server in the wild that advertises
+    supplying MARC-8 returns records that include the CCCII representation of
+    the halfwidth katakana middle dot character, which appears to
+    have no EACC equivalent.  This patch adds a new conversion table
+    for such characters as they get discovered.
+
+    Credit to Zac Craven for reporting the issue. (Galen Charlton)
+
+    - Fix crashes and warnings that can occur if the MARC-8 data contains '%'
+
+    Since (e.g,.) EACC strings can contain the % sign, the MARC-8
+    string was removed from the sprintf used by the warning
+    message displayed if the codepoint cannot be found. This
+    eliminates the following warnings and crashes:
+
+      Missing argument in sprintf...
+      Modification of a read-only value attempted...
+
+    (Galen Charlton)
+
+    - Store the generated character mapping database in a reproducible way
+
+    The $Storable::canonical setting makes Storable sort hashes by their
+    key when storing them. This makes the generated table reproducible
+    between builds. (Niko Tyni)
+
+    - Document etc/codetables.xml's source and add an opt-in freshness check
+
+    The optional author check xt/release/codetables-source.t retrieves
+    the codetables XML from the Library of Congress and complains if
+    there's a difference. Currently there is, but the differences
+    amount to a few intentional enhancements. (Martin Renvoize)
+
+    - Assert 5.8.8 as the minimum Perl version
+
+    Perl 5.8.8 includes a variety of UTF-8 fixes over 5.8.2 and
+    is more easily maintained as the oldest version of Perl still
+    supported by the MARC/Perl modules. (Galen Charlton and
+    Martin Renvoize)
+
+    - Many improvements and updates to project metadata
+
+    Includes declaring a license file; pointing at GitHub as the
+    current repository, issue tracker and home page; converting
+    the README to POD format and updating it; adding contribution
+    and security issue reporting guidelines as part of MARC/Perl
+    overall. (Martin Renvoize)
+
 1.35 Tue Aug 13 19:50:55 PDT 2013
     - improve conversion of certain composed characters to MARC8
     

@@ -22,4 +22,5 @@ t/GuidGen.t
 t/HttpGetFile.t
 t/Names.t
 t/Privileges.t
+t/SetChildShowWindow.t
 t/Unicode.t

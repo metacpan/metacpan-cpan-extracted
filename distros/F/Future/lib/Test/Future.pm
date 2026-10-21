@@ -3,11 +3,15 @@
 #
 #  (C) Paul Evans, 2014-2015 -- leonerd@leonerd.org.uk
 
-package Test::Future 0.53;
+package Test::Future 0.54;
 
-use v5.14;
+use v5.20;
 use warnings;
 use base qw( Test::Builder::Module );
+
+# Don't  use feature 'signatures'  in this module yet, because until perl 5.28
+# it's awkward to use both signatures and (&...)-style prototypes at the same
+# time.
 
 our @EXPORT = qw(
    no_pending_futures

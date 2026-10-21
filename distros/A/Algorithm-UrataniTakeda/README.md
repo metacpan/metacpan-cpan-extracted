@@ -42,13 +42,16 @@ It combines the Aho-Corasick algorithm with the Boyer-Moore algorithm, and is si
 
 # RECENT CHANGES
 
-Changes for version v0.1.6 (2026-08-31)
+Changes for version v0.1.7 (2026-10-20)
 
+- Security
+    - Limit the size of the failure shift table. (CVE-2026-113811)
 - Enhancements
-    - Allowed the constructor to simply contain an array reference of patterns.
-    - Changed internal methods to lexical methods so that they are effectively private.
+    - Improve the performance of the shift2 table builder.
 - Bug Fixes
-    - Enable warnings for Object::Pad versions after 0.800.
+    - Find matches of "0".
+- Tests
+    - Added a test case to prove that duplicate keywords do not return duplicate results.
 
 See the `Changes` file for more details.
 

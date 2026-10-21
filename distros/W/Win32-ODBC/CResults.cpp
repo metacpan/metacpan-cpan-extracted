@@ -64,17 +64,17 @@ CResults::CResults(ODBC_TYPE *h){
 
 	if (SQLNumResultCols(h->hstmt, (SWORD *)&sNumOfCols) == SQL_SUCCESS){
 		
-		if (szColumn = new char* [sNumOfCols + 1]){		//	Alloc array of strings
+		if ((szColumn = new char* [sNumOfCols + 1])){		//	Alloc array of strings
 			memset(szColumn, 0x00, sizeof(char*) * (sNumOfCols + 1));
 		}
 	
 //	TESTING: multiply alloced data by dRowSetSize
-		if (dSize = new SQLLEN [(sNumOfCols + 1) * dRowSetSize]){		//	Alloc array of sizes
+		if ((dSize = new SQLLEN [(sNumOfCols + 1) * dRowSetSize])){		//	Alloc array of sizes
 		    memset(dSize, 0x00, (sizeof(SQLLEN) * (sNumOfCols + 1) * dRowSetSize));
 		}
 	
 //	TESTING: multiply alloced data by dRowSetSize
-		if (dReturnSize = new SQLLEN [(sNumOfCols + 1) * dRowSetSize]){	//	Alloc array of return sizes
+		if ((dReturnSize = new SQLLEN [(sNumOfCols + 1) * dRowSetSize])){	//	Alloc array of return sizes
 		    memset(dReturnSize, 0x00, (sizeof(SQLLEN) * (sNumOfCols + 1) * dRowSetSize));
 		}
 
@@ -96,7 +96,7 @@ CResults::CResults(ODBC_TYPE *h){
 
 //	 Here is dRowSetSize again.
 					if (!(szColumn[iTemp] = (char *) new UCHAR [(++dSize[iTemp]) * dRowSetSize])){
-						sprintf((char *)szBuff, "Could not allocate enough memory (%d bytes) for column %d.\n", (dSize[iTemp] * dRowSetSize), iTemp);
+						sprintf((char *)szBuff, "Could not allocate enough memory (%.0f bytes) for column %d.\n", (double)(dSize[iTemp] * dRowSetSize), iTemp);
 						::ODBCError((char *)szBuff, h, "CResults()", "1");
 						break;
 					}
@@ -191,8 +191,8 @@ SWORD CResults::NumOfCols(){
 	return sNumOfCols;
 }
 
-char *CResults::operator[](int iElement){;
-	char	*szReturn = 0;
+const char *CResults::operator[](int iElement){;
+	const char	*szReturn = 0;
 	
 	if (iElement >= 0 && iElement <= sNumOfCols){
 		switch(dReturnSize[iElement]){
@@ -213,7 +213,7 @@ void CResults::RemoveBuffers(){
 	int	iTemp;
 	ODBC_Conn	*h;
 
-	if (h = ::_NT_ODBC_Verify(iODBC)){
+	if ((h = ::_NT_ODBC_Verify(iODBC))){
 		if (h->hstmt){
 			SQLFreeStmt(h->hstmt, SQL_UNBIND);
 		}

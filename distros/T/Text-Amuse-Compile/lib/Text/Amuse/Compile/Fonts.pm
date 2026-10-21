@@ -451,6 +451,12 @@ sub default_font_list {
              "name" =>  "FandolHei",
              "type" =>  "serif"
             },
+            {
+             "languages" => ["ne" ],
+             "name" => "Annapurna SIL",
+             "desc" => "Annapurna SIL",
+             "type" => "serif",
+            },
            ];
 }
 

@@ -1,12 +1,15 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2019 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2019-2026 -- leonerd@leonerd.org.uk
 
-package Future::Exception 0.53;
+package Future::Exception 0.54;
 
-use v5.14;
+use v5.20;
 use warnings;
+
+use feature qw( signatures );
+no warnings qw( experimental::signatures );
 
 =head1 NAME
 
@@ -47,7 +50,7 @@ SYNOPSIS example.
 =cut
 
 use overload
-   '""'     => "message",
+   '""'     => sub ( $self, $, $ ) { $self->message },
    fallback => 1;
 
 =head1 CONSTRUCTOR
@@ -60,14 +63,12 @@ Constructs a new C<Future::Exception> wrapping the given failed future.
 
 =cut
 
-sub from_future
+sub from_future ( $class, $f )
 {
-   my $class = shift;
-   my ( $f ) = @_;
    return $class->new( $f->failure );
 }
 
-sub new { my $class = shift; bless [ @_ ], $class; }
+sub new ( $class, @args ) { bless [ @args ], $class; }
 
 =head1 ACCESSORS
 
@@ -80,9 +81,9 @@ common use-case of printing, regexp testing, or other behaviours.
 
 =cut
 
-sub message  { shift->[0] }
-sub category { shift->[1] }
-sub details  { my $self = shift; @{$self}[2..$#$self] }
+sub message  ( $self ) { $self->[0] }
+sub category ( $self ) { $self->[1] }
+sub details  ( $self ) { @{$self}[2..$#$self] }
 
 =head1 METHODS
 
@@ -102,10 +103,8 @@ number are appended to it, in the same way C<die()> does.
 
 =cut
 
-sub throw
+sub throw ( $class, $message, $category, @details )
 {
-   my $class = shift;
-   my ( $message, $category, @details ) = @_;
    $message =~ m/\n$/ or
       $message .= sprintf " at %s line %d.\n", ( caller )[1,2];
    die $class->new( $message, $category, @details );
@@ -122,9 +121,8 @@ Returns a new C<Future> object in a failed state matching the exception.
 
 =cut
 
-sub as_future
+sub as_future ( $self )
 {
-   my $self = shift;
    return Future->fail( $self->message, $self->category, $self->details );
 }
 

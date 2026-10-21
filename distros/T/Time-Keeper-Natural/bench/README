@@ -19,5 +19,12 @@ repetition does not flatter it.
     TKN_BENCH_RUNS      runs, the best kept (5)
     TKN_BENCH_LOADS     fresh processes for the load time (41)
 
-Measured 19 October 2026 on an Apple M5, perl 5.42, Time::Keeper 0.07:
-see the numbers in plan_port_natural_xs/13-benchmarks-and-the-gate.md.
+Benchmarks 10 to 16 hold the marks of plan_time_keeper_natural_2/13 (0.02 and
+later), also set before any measurement: intervals, day ordinals, a zone in
+the text, fractions, a duration after a point, find, and the first use of a
+locale with its zones.
+
+Measured 19 October 2026 (Time::Keeper 0.07) and 20 October 2026 (0.04 on
+Time::Keeper 0.09) on an Apple M5, perl 5.42: see the numbers in
+plan_port_natural_xs/13-benchmarks-and-the-gate.md and
+plan_time_keeper_natural_2/13-benchmarks-and-the-gate.md.

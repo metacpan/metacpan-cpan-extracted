@@ -2,9 +2,11 @@ package Mail::DKIM2::Gate;
 use strict;
 use warnings;
 
-our $VERSION = '0.25';
+our $VERSION = '0.27';
 
 use Email::MIME;
+use Scalar::Util qw(blessed);
+use Mail::DKIM2::HeaderParser;
 use Mail::DKIM2::Common qw(extract_mi_version parse_mime valid_sequence chain_number_error);
 use Mail::DKIM2::MessageInstance;
 use Mail::DKIM2::Signature;
@@ -36,7 +38,10 @@ module decides.
 =head2 check
 
 C<< Mail::DKIM2::Gate->check($message, %opts) >> takes the whole message as a
-string (CRLF line endings) and returns a hashref. Options:
+string (CRLF line endings) or a filehandle (or an object with C<getline>),
+and returns a hashref. A filehandle is read a piece at a time, its body
+going straight into the Verifier, so the message is never held whole.
+Options:
 C<PubkeyCallback>, C<Resolver> and C<SkipTimestampCheck> are passed to the
 Verifier, C<IgnorePrefixes> to both the Verifier and the Message-Instance
 chain check (the caller's own header fields, hashed by neither end),
@@ -47,7 +52,7 @@ upstream signature carries C<nd=> the gate passes only if it equals that
 domain (case-insensitive) and refuses otherwise ("top signature nd=X names
 another domain"); without it a top C<nd=> is refused as before.
 C<VerifyResult> supplies an already-computed verifier result so the upstream
-signatures are not verified again.
+signatures are not verified again; the Message-Instance chain still is.
 
 The upstream DKIM2-Signatures are verified with a Verifier that allows an
 unsigned Message-Instance above the top signature (the one the caller is about
@@ -90,6 +95,16 @@ the null must check out.
 
 =cut
 
+# True for a filehandle, as HeaderParser::load tells one from a string.
+sub _is_handle {
+    my ($input) = @_;
+    return 1 if ref $input eq 'GLOB' || ref \$input eq 'GLOB';
+    return 0 unless blessed $input;
+    my $can = eval { $input->can('getline') };
+    die $@ if ref $@;
+    return $can ? 1 : 0;
+}
+
 # True when the highest-i= DKIM2-Signature among @$sigs carries nd=. Uses the
 # parsed signature, so FWS around "=" (allowed by the tag-list syntax) is seen.
 sub _top_has_nd {
@@ -114,6 +129,14 @@ sub check {
         qw(SigningDomain AllowNullBodyRecipe SkipTimestampCheck IgnorePrefixes
            PubkeyCallback Resolver VerifyResult));
 
+    # A filehandle is read a piece at a time: the header fields here, the body
+    # straight into the Verifier below, so the message is never held whole.
+    my $fh = _is_handle($message) ? $message : undef;
+    if ($fh) {
+        my $head = '';
+        Mail::DKIM2::HeaderParser::_read_handle($fh, sub { $head .= $_[0]; 1 }, 1);
+        $message = $head;
+    }
     my $msg = parse_mime($message);
     my @sigs = $msg->header_raw('DKIM2-Signature');
     my @mis  = $msg->header_raw('Message-Instance');
@@ -126,43 +149,35 @@ sub check {
     my $verify_result = $o{VerifyResult};
     $verify_result = undef
         if defined $sd && length $sd && $has_dk2 && _top_has_nd(\@sigs);
-    my $own_walk = 0;
-    if (!defined $verify_result) {
-        if ($has_dk2) {
-            my $v = Mail::DKIM2::Verifier->new(
-                SkipTimestampCheck => $o{SkipTimestampCheck} ? 1 : 0,
-                ($o{PubkeyCallback} ? (PubkeyCallback => $o{PubkeyCallback}) : ()),
-                ($o{Resolver} ? (Resolver => $o{Resolver}) : ()),
-                ($o{IgnorePrefixes} ? (IgnorePrefixes => $o{IgnorePrefixes}) : ()));
-            $v->allow_unsigned_mi(1);
-            $v->next_domain_ok($sd) if defined $sd && length $sd;
-            $v->PRINT($message);
-            $v->CLOSE();
-            $verify_result = $v->result_detail();
-            $own_walk = 1;
+    # One Verifier, the body streamed through it. It walks the
+    # Message-Instance chain before it looks at a signature, so with no
+    # signature, or with the signatures verified already (VerifyResult), it
+    # is run for the walk alone; with neither signature nor instance there is
+    # nothing to walk. A walk that fails under the signatures is an
+    # upstream-chain refusal below; on its own it is broken-mi-chain.
+    my ($chain_ok, $chain_why) = (1, undef);
+    my $instances_only = defined $verify_result || !$has_dk2;
+    if ($has_dk2 || @mis) {
+        my $v = Mail::DKIM2::Verifier->new(
+            SkipTimestampCheck => $o{SkipTimestampCheck} ? 1 : 0,
+            InstancesOnly      => $instances_only ? 1 : 0,
+            ($o{PubkeyCallback} ? (PubkeyCallback => $o{PubkeyCallback}) : ()),
+            ($o{Resolver} ? (Resolver => $o{Resolver}) : ()),
+            ($o{IgnorePrefixes} ? (IgnorePrefixes => $o{IgnorePrefixes}) : ()));
+        $v->allow_unsigned_mi(1);
+        $v->next_domain_ok($sd) if defined $sd && length $sd;
+        $v->PRINT($message);
+        Mail::DKIM2::HeaderParser::_read_handle($fh,
+            sub { $v->PRINT($_[0]); !$v->stopped }) if $fh;
+        $v->CLOSE();
+        if ($instances_only) {
+            ($chain_ok, $chain_why) = (0, $v->details)
+                unless $v->result =~ /\A(?:pass|none)\z/;
         } else {
-            $verify_result = 'none';
+            $verify_result = $v->result_detail();
         }
     }
-
-    # Our own Verifier run that ended in 'pass' has already walked the whole
-    # Message-Instance chain (Verifier::_verify_mi_chain, run in finish_body
-    # only on that path; we never set HeadersOnly or mid_process).  That walk
-    # is the same one chain_verifies does: same verify() per instance with
-    # the same IgnorePrefixes, the same undo(), the same switch to a
-    # header-only walk below a null-body Recipe, and the same up-front
-    # _chain_error check (verify() makes it on the first iteration).
-    # allow_unsigned_mi only suppresses the "MI m= not signed" PERMERROR
-    # among the structure checks at the end of the header fields; it does
-    # not change the walk.  So a 'pass'
-    # means chain_verifies would succeed, and walking again is wasted work.
-    # Without signatures, with a caller-supplied VerifyResult, or on any
-    # non-pass result the walk was not (fully) done, so run it here.
-    my ($chain_ok, $chain_why) = (1, undef);
-    unless ($own_walk && $verify_result =~ /^pass/) {
-        ($chain_ok, $chain_why) = Mail::DKIM2::MessageInstance->chain_verifies($message,
-            ($o{IgnorePrefixes} ? (IgnorePrefixes => $o{IgnorePrefixes}) : ()));
-    }
+    $verify_result //= 'none';
 
     my %by_v;
     for my $val (@mis) {

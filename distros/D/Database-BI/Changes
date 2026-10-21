@@ -1,5 +1,62 @@
 Revision history for Database-BI
 
+0.015.0 Tue Oct 20 08:10:43 PM EDT 2026
+	[ New Features ]
+	- GET /tutorial: in-application tutorial with a chapter for every page
+	  feature (Database::BI::Tutorial).  Each chapter has numbered steps, a
+	  tip, and a Try it link.  Chapters for joins, pivot, calc fields, canvas,
+	  and five chart types include a worked walk-through.  F1 opens the chapter
+	  for the current page; a "Help:" link in the header does the same.
+	  t/tutorial.t enforces that every GET page has a chapter and no sentence
+	  exceeds 25 words.
+	- Dataset catalog (GET /catalog): lists all files in data_dir with type,
+	  size, last-modified date, and which saved analyses reference each file.
+	- Sharing and embedding: POST /api/analyses/:id/share issues a signed
+	  HMAC token.  GET /share/:id?token= renders a read-only canvas;
+	  GET /embed/:id?token= renders a chrome-less embed page.
+	  GET /a/:id/visual/:n/csv downloads one visual's data as CSV.
+	- Extract cache (Database::BI::Extract): query results are materialised as
+	  SQLite files under model_dir/extracts/ keyed by source fingerprint.
+	  Deleting the extracts/ directory leaves the app fully functional.
+	- bi-alert CLI (script/bi-alert): evaluates a saved analysis against a
+	  threshold (--threshold alias:op:value).  Exit 0 = ok, 1 = crossed,
+	  2 = error.  Schedule via cron.
+	[ Enhancements ]
+	- Map markers cluster with Leaflet.markercluster: overlapping pins show a
+	  count at low zoom and split into individual markers as you zoom in.
+	- Geocode answers are now shared across all datasets in the model store.
+	  A place is resolved once and any other dataset that names it plots it
+	  immediately without another lookup.
+	- D3, Leaflet, and tile-server URLs are all configurable, so a deployment
+	  with no outbound network access can serve every asset itself.
+	- Map is a canvas visual kind.  New Canvas and Add to Existing Canvas both
+	  start from the map's lat/lon or geocoded column spec.  Canvas map cards
+	  support in-place column editing without a page reload.
+	- Add visual panel on canvas: append a table, chart, or map card to an
+	  open canvas without leaving the page.
+	- New Canvas seeds itself from the current table or chart, including its
+	  kind, columns, and options, so a pie chart stays a pie on the canvas.
+	- Multi-table SQLite files support a nested spec (table:store/customer).
+	  The join and combine panels list each internal table separately.
+	- Map marker popups now show all non-coordinate columns by default.
+	  Pass ?popup=col to restrict the popup to specific columns.
+	- data/virginia_counties.csv added: all 95 Virginia counties with 2020
+	  census populations, lat/lon centroids, and region labels.  Tutorial
+	  walk-throughs for map, pie, bar, scatter, and stats use this file.
+	- Canvas home-page cards support Ctrl+click and rubber-band drag for
+	  multi-select; a floating action bar offers bulk delete.
+	- Canvas freshness banner warns when a source file has changed since the
+	  analysis was last saved.
+	[ Bug Fixes ]
+	- Canvas treemap cards no longer return 500.
+	- Chart options (orientation, max_items, show_values) are now preserved
+	  when seeding a canvas from a chart page.
+	- D3 is now loaded before chart cards, so inline chart scripts run
+	  correctly on first render.
+	- Cross-filtered canvas charts now aggregate the filtered rows, not the
+	  full source.
+	- Stored calc fields now appear in /view/:table (not only in chart views).
+
 0.014.0	Mon Oct 19 09:49:36 AM EDT 2026
 	[ New Features ]
 	- GET /map renders the filtered dataset on an OpenStreetMap map via

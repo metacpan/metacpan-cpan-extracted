@@ -20,6 +20,7 @@ lib/ForgeOps/Tracker/Reporter.pm
 lib/ForgeOps/Tracker/SpanBuffer.pm
 lib/ForgeOps/Tracker/SqlStatement.pm
 lib/ForgeOps/Tracker/SpanDelivery.pm
+lib/ForgeOps/Tracker/StrictPrivacy.pm
 lib/ForgeOps/Tracker/TraceParent.pm
 LICENSE.txt
 Makefile.PL
@@ -32,6 +33,7 @@ t/database_span.t
 t/delivery_queue.t
 t/environment_warning.t
 t/event_builder.t
+t/fixtures/strict_privacy_vectors.json
 t/histogram_bucketer.t
 t/https_warning.t
 t/integrations_dancer2.t
@@ -44,6 +46,7 @@ t/performance_flusher.t
 t/pii_scrubber.t
 t/reporter.t
 t/sql_statement.t
+t/strict_privacy.t
 t/trace_context.t
 t/tracing.t
 t/tracker.t

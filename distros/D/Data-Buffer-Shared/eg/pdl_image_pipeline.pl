@@ -43,8 +43,10 @@ if ($cap_pid == 0) {
                     255;                         # A
             }
         }
+        $raw_buf->lock_wr;
         $raw_buf->set_raw(0, pack("C*", @frame));
         $ctl->incr(0);
+        $raw_buf->unlock_wr;
         $ctl->notify;
 
         # throttle to ~120 fps
@@ -60,11 +62,13 @@ if ($proc_pid == 0) {
     while ($processed < $nframes) {
         # Wakeups coalesce and both stages drain the one eventfd: the counters say what is ready.
         $ctl->wait_notify;
+        $raw_buf->lock_rd;
         my $ready = $ctl->get(0);
-        if ($ready <= $processed) { sleep 0.001; next }
+        if ($ready <= $processed) { $raw_buf->unlock_rd; sleep 0.001; next }
 
         # read raw frame
         my $raw = $raw_buf->get_raw(0, $npx);
+        $raw_buf->unlock_rd;
 
         # --- With PDL ---
         # use PDL;
@@ -87,9 +91,10 @@ if ($proc_pid == 0) {
             next if ($i % 4) == 3;  # skip alpha
             $px[$i] = $px[$i] + 30 > 255 ? 255 : $px[$i] + 30;
         }
+        $proc_buf->lock_wr;
         $proc_buf->set_raw(0, pack("C*", @px));
-
         $ctl->set(1, $ready);
+        $proc_buf->unlock_wr;
         $ctl->notify;
         $processed = $ready;
     }
@@ -103,14 +108,16 @@ my $t0 = time();
 
 while ($rendered < $nframes) {
     $ctl->wait_notify;
+    $proc_buf->lock_rd;
     my $ready = $ctl->get(1);
-    if ($ready <= $rendered) { sleep 0.001; next }
+    if ($ready <= $rendered) { $proc_buf->unlock_rd; sleep 0.001; next }
 
     # --- With OpenGL::Modern ---
     # glTexSubImage2D_s(GL_TEXTURE_2D, 0, 0, 0, $w, $h,
     #                   GL_RGBA, GL_UNSIGNED_BYTE, $$ref);
     # render_fullscreen_quad();
     # glutSwapBuffers();
+    $proc_buf->unlock_rd;
 
     $rendered = $ready;
 }

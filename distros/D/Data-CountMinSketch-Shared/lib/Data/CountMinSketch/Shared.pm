@@ -1,7 +1,7 @@
 package Data::CountMinSketch::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 require XSLoader;
 XSLoader::load('Data::CountMinSketch::Shared', $VERSION);
 
@@ -49,12 +49,13 @@ added. Memory is proportional to the configured error parameters, not to the
 number of distinct items or the size of the items; the sketch never stores the
 items themselves, only a small matrix of counters.
 
-The estimate has a one-sided guarantee: it B<never underestimates> the true
-count, and overestimates by at most C<epsilon * total> with probability at least
-C<1 - delta>, where C<total> is the sum of all increments. (An item never added
-estimates as 0 unless hash collisions with other items inflate every one of its
-cells.) This makes the sketch ideal for finding heavy hitters and approximate
-counts in a stream that is too large to count exactly. One caveat: C<add> does
+The estimate B<never underestimates> the true count. The standard Count-Min
+bound is an overestimate of at most C<epsilon * total> with probability at least
+C<1 - delta>, where C<total> is the sum of all increments. That bound assumes
+independent row hashes; this module uses double hashing, so its error parameters
+are B<nominal>, not strict probability guarantees. An item never added estimates
+as 0 unless collisions inflate every one of its cells. This makes the sketch
+useful for heavy hitters and approximate counts in large streams. C<add> does
 not saturate, so a single key's counter and the grand total wrap at 2^64 if a
 true count ever reaches that (C<merge> saturates instead); the
 never-underestimate guarantee holds for all realistic counts.
@@ -74,9 +75,9 @@ mapping across C<fork>, or reopens a passed memfd, sees the others' additions
 and contributes its own. A write-preferring futex rwlock with dead-process
 recovery guards mutation, so many processes may C<add> and C<estimate>
 concurrently. Two sketches of identical geometry can be combined with C<merge>
-(cellwise add), which yields a sketch whose counts are the B<sum> of the two
-input streams -- the merged estimate of any item equals the sum of its estimates
-in the two inputs.
+(cellwise add), which is equivalent to counting both input streams into one
+sketch. Its estimates can exceed the sum of the two separate estimates when
+collisions differ.
 
 Items are added and queried by their B<byte> content; wide-character strings
 (any codepoint above 255) cause a "Wide character" croak -- encode such strings
@@ -113,9 +114,9 @@ mode (see L</CRASH SAFETY>).
 From C<$epsilon> and C<$delta> the sketch derives its geometry: a width of C<w
 = next_power_of_two(ceil(e / epsilon))> columns (with a floor of 2 columns)
 and a depth of C<d = ceil(ln(1 / delta))> rows (clamped to the range 1..32).
-Rounding the width up to a power of two means the realised error factor at any
-given total is typically B<at or below> the configured target. When reopening
-an existing file or memfd, the stored geometry wins and the caller's
+Rounding the width up to a power of two puts the nominal error factor B<at or
+below> the configured target. When reopening an existing file or memfd, the
+stored geometry wins and the caller's
 C<$epsilon>/C<$delta> do not resize it -- but they are still range-checked, so
 an out-of-range value croaks. C<new_memfd> creates a Linux memfd (transferable
 via its C<memfd> descriptor); C<new_from_fd> reopens one in another process.
@@ -145,20 +146,20 @@ once under a single write lock, returning the number of elements added (the
 array's length).
 
 C<estimate> returns the estimated number of times C<$item> has been added: the
-minimum of its C<d> cells. This value B<never underestimates> the true count,
-and exceeds it by at most C<epsilon * total> with probability at least
-C<1 - delta>. An item that was never added estimates as 0 unless every one of
-its cells happens to collide with other items.
+minimum of its C<d> cells. This value B<never underestimates> the true count
+for completed updates. The probability bound is nominal under double hashing
+(see L</DESCRIPTION>). An item that was never added estimates as 0 unless every
+one of its cells happens to collide with other items.
 
 =head2 Merging
 
     $cms->merge($other);
 
-Folds C<$other>'s counter matrix into C<$cms> by cellwise addition, so C<$cms>
-then estimates, for every item, the B<sum> of that item's counts in the two
-sketches; C<$cms>'s C<total> likewise becomes the sum of the two totals. Both
-sketches must have identical geometry -- the same width and depth, which follows
-from constructing both with the same C<$epsilon> and C<$delta> (C<merge> croaks
+Folds C<$other>'s counter matrix into C<$cms> by cellwise addition, equivalent
+to counting both streams into one sketch. The resulting estimate can exceed
+the sum of the input estimates; C<$cms>'s C<total> becomes the sum of the two
+totals. Both sketches must have identical geometry -- the same width and depth,
+which follows from constructing both with the same C<$epsilon> and C<$delta> (C<merge> croaks
 on a mismatch). C<$other> is read under its own lock into a private snapshot
 first, so merging is deadlock-free even if two processes merge each other
 concurrently; C<$other> is not modified. Cells that would overflow a 64-bit
@@ -195,19 +196,13 @@ C<stats()> returns a hashref describing the sketch:
 
 =item * C<cells> -- C<width * depth>, the number of 64-bit counters.
 
-=item * C<epsilon> -- the achieved error factor, C<e / width>. The
-per-item overestimate is bounded by C<epsilon * total> (with probability
-C<1 - delta>); a smaller value is a tighter bound.
+=item * C<epsilon> -- the nominal error factor, C<e / width>, used in the
+reference bound C<epsilon * total>.
 
-=item * C<delta> -- the achieved failure probability,
-C<< exp(-min(depth, width)) >>. This is the chance that the overestimate
-exceeds the C<epsilon * total> bound for a given item; a smaller value is a
-stronger guarantee. Row I<r> and row I<r+width> always probe the same column,
-so rows past C<width> repeat an earlier row and add no independent estimate --
-the effective depth is C<< min(depth, width) >>. A very loose C<epsilon>
-combined with a very tight C<delta> therefore cannot reach the requested
-C<delta>; tighten C<epsilon> (a smaller epsilon raises C<width>) to get
-there.
+=item * C<delta> -- the nominal failure parameter,
+C<< exp(-min(depth, width)) >>. Rows repeat every C<width>, so the nominal
+depth is capped at C<width>. Even distinct rows are correlated under double
+hashing: this value is B<not a rigorous failure probability>.
 
 =item * C<ops> -- running count of mutating operations (C<add>, C<add_many>,
 C<merge>, C<clear>).
@@ -243,7 +238,8 @@ they are first written, and once the filesystem is full, a write to a page not
 yet allocated dies with SIGBUS. Set C<DATA_COUNTMINSKETCH_SHARED_SPARSE=0> to
 reserve the whole segment at creation, so a full filesystem makes them croak
 instead; on tmpfs and memfd that commits the segment's memory at once, and a
-memory cgroup too small for it gets an OOM kill rather than a croak.
+memory cgroup too small for it gets an OOM kill rather than a croak. Filesystems
+without allocation support retain sparse behavior.
 
 =head1 FROZEN (READ-ONLY) MODE
 
@@ -306,8 +302,9 @@ its contents while other processes are using it.
 
 Mutation is guarded by a futex-based write-preferring rwlock with PID-encoded
 ownership; if a holder dies, the next contender detects the dead owner and
-recovers. Each cell increment is a single word store, so a crash leaves the
-sketch consistent up to the last completed C<add>.
+recovers. Recovery restores progress, not transactions: a process killed during
+C<add>, C<add_many>, C<merge>, or C<clear> can leave a partial update. Rebuild
+the sketch if you require exact recovery of completed operations.
 B<Limitation>: PID reuse is not detected (very unlikely in practice).
 
 Reader-slot exhaustion (slotless readers): dead-process recovery attributes a

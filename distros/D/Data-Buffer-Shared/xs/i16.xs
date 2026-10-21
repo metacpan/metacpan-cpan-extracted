@@ -63,7 +63,7 @@ set_slice(SV* self_sv, UV from, ...)
     CODE:
         EXTRACT_BUF("Data::Buffer::Shared::I16", self_sv);
         UV count = items - 2;
-        if (count == 0) XSRETURN(1);
+        if (count == 0) XSRETURN_YES;
         int16_t *tmp;
         Newx(tmp, count, int16_t);
         SAVEFREEPV(tmp);
@@ -230,7 +230,7 @@ get_raw(SV* self_sv, UV byte_off, UV nbytes)
         RETVAL = newSV(nbytes ? nbytes : 1);
         SvPOK_on(RETVAL);
         SvCUR_set(RETVAL, nbytes);
-        if (nbytes) SvPVX(RETVAL)[nbytes] = '\0';  /* NUL-terminate; newSV reserved nbytes+1 */
+        SvPVX(RETVAL)[nbytes] = '\0';  /* NUL-terminate; newSV reserved nbytes+1 */
         if (!buf_i16_get_raw(h, (uint64_t)byte_off, (uint64_t)nbytes, SvPVX(RETVAL))) {
             SvREFCNT_dec(RETVAL);
             croak("Data::Buffer::Shared::I16: get_raw out of bounds");
@@ -341,7 +341,7 @@ add_slice(SV* self_sv, UV from, ...)
     CODE:
         EXTRACT_BUF("Data::Buffer::Shared::I16", self_sv);
         UV count = items - 2;
-        if (count == 0) XSRETURN(1);
+        if (count == 0) XSRETURN_YES;
         int16_t *tmp;
         Newx(tmp, count, int16_t);
         SAVEFREEPV(tmp);

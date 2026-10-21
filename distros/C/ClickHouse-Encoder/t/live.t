@@ -433,7 +433,7 @@ sub ch_insert_native {
 # Test 13: LowCardinality(FixedString) and Geo aliases — live roundtrip.
 {
     ch_query("drop table if exists test_geo");
-    ch_query(q{SET allow_experimental_geo_types=1});
+    ch_query(q{set allow_experimental_geo_types=1});
     ch_query(q{create table test_geo (
         code   LowCardinality(FixedString(2)),
         loc    Point,
@@ -476,7 +476,7 @@ SKIP: {
     ch_query("drop table if exists test_json");
     # JSON type needs an experimental-feature gate in CH 24.x/25.x and
     # an explicit enable in 26.x. Each clickhouse-client call is a new
-    # session, so the flag must be set on the same call as the CREATE.
+    # session, so the flag must be set on the same call as the create.
     # `--allow_experimental_json_type=1 --enable_json_type=1` covers
     # both: unknown flags are silently ignored by clickhouse-client.
     my @json_flags = ('--allow_experimental_json_type=1',
@@ -496,7 +496,7 @@ SKIP: {
         [{user => {name => "carol", age => 40}}],
     ];
     my $data = $enc->encode($rows);
-    ok(ch_insert_native('test_json', $data), 'INSERT format native (JSON)');
+    ok(ch_insert_native('test_json', $data), 'insert format native (JSON)');
 
     my $n = ch_query_result("select count() from test_json");
     is($n, '6', '6 rows in JSON table');
@@ -538,7 +538,7 @@ SKIP: {
         [{name => 'bob',   age => 25, extra => 'more'}],
     ]);
     ok(ch_insert_native('test_json_typed', $td),
-       'typed JSON paths INSERT accepted');
+       'typed JSON paths insert accepted');
     my $cnt = ch_query_result("select count() from test_json_typed");
     is($cnt, '2', 'typed JSON paths: 2 rows');
     my $name = ch_query_result(
@@ -546,7 +546,7 @@ SKIP: {
     is($name, 'alice', 'typed path subcolumn query');
 }
 
-# Test: compressed Native INSERT over HTTP. End-to-end wire-compat
+# Test: compressed Native insert over HTTP. End-to-end wire-compat
 # check for the bundled CityHash128 v1.0.2 port - if our hash diverges
 # from cityhash102 in any detail the server rejects with "Checksum
 # doesn't match in compressed block" before storing any rows.
@@ -579,7 +579,7 @@ SKIP: {
 
     # Wrap in CH's compressed-block framing - this calls our bundled
     # CityHash128 v1.0.2 implementation. If the hash bytes diverge
-    # from CH's cityhash102 the server will refuse the INSERT.
+    # from CH's cityhash102 the server will refuse the insert.
     my $framed = ClickHouse::Encoder->compress_native_block(
         $native, mode => 'lz4');
 
@@ -590,15 +590,15 @@ SKIP: {
         { content => $framed,
           headers => { 'Content-Type' => 'application/octet-stream' } });
     ok($resp->{success},
-       'compressed Native INSERT accepted (CityHash128 validates against CH)')
+       'compressed Native insert accepted (CityHash128 validates against CH)')
         or diag("status=$resp->{status} body=$resp->{content}");
 
     my $cnt = ch_query_result("select count() from test_compressed");
-    is($cnt, '3', 'compressed INSERT delivered 3 rows');
+    is($cnt, '3', 'compressed insert delivered 3 rows');
 
     my $sum = ch_query_result(
         "select sum(id) from test_compressed");
-    is($sum, '6', 'compressed INSERT row values intact (sum=6)');
+    is($sum, '6', 'compressed insert row values intact (sum=6)');
 
     # The 3-row block above stays on CityHash128's short path. Only a
     # realistically-sized block reaches the >=128-byte loop, which is what
@@ -618,20 +618,20 @@ SKIP: {
             { content => $bframed,
               headers => { 'Content-Type' => 'application/octet-stream' } });
         ok($bresp->{success},
-           'compressed INSERT of a realistically-sized block accepted')
+           'compressed insert of a realistically-sized block accepted')
             or diag("status=$bresp->{status} body="
                   . substr($bresp->{content} // '', 0, 120));
         is(ch_query_result("select count() from test_compressed_big"),
-           '500', 'large compressed INSERT delivered all 500 rows');
+           '500', 'large compressed insert delivered all 500 rows');
     }
 
-    # Round-trip the other way: SELECT the data back uncompressed and
+    # Round-trip the other way: select the data back uncompressed and
     # confirm the values match (additional pin on the whole pipeline).
     my $first_msg = ch_query_result(
         "select msg from test_compressed where id = 2");
     is($first_msg, 'beta', 'compressed-then-stored row decodes correctly');
 
-    # Round-trip the other direction: SELECT with ?compress=1 and read
+    # Round-trip the other direction: select with ?compress=1 and read
     # the response through select_blocks(decompress => 1). End-to-end
     # validation of CityHash128 in the response direction too.
     my @ids;

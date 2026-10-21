@@ -32,6 +32,7 @@ sub run_under_valgrind {
     # "definitely lost: N bytes" line these assertions match appears - so
     # with -q every check in this file passed unconditionally.
     my $cmd = "$vg --leak-check=full --error-exitcode=99 $perl -Mblib '$name' 2>&1";
+    local $ENV{PERL_DESTRUCT_LEVEL} = 2;
     my $output = `$cmd`;
     return $output;
 }

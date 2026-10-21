@@ -1,7 +1,7 @@
 package Proxy::Impersonate::Cert;
 use v5.10; use strict; use warnings;
 use Carp ();
-use Fcntl qw(O_CREAT O_WRONLY O_TRUNC);
+use Fcntl qw(O_CREAT O_WRONLY O_EXCL);
 use Net::SSLeay ();
 
 BEGIN { Net::SSLeay::initialize() }
@@ -17,6 +17,11 @@ sub new {
     -d $dir or mkdir $dir, 0700 or Carp::croak("Cert: mkdir $dir: $!");
     my $self = bless { dir => $dir }, $class;
     $self->_load_or_generate;
+    my $ctx = Net::SSLeay::CTX_new() or Carp::croak('Cert: CTX_new failed');
+    my $ok = eval { $self->apply_to_ctx($ctx); 1 };
+    my $err = $@;
+    Net::SSLeay::CTX_free($ctx);
+    Carp::croak($err) unless $ok;
     return $self;
 }
 
@@ -55,7 +60,8 @@ sub _mk_self_signed {
 sub _load_or_generate {
     my ($self) = @_;
     my ($cf, $kf) = ($self->cert_path, $self->key_path);
-    if (-r $cf && -r $kf) {
+    if (-e $cf || -l $cf || -e $kf || -l $kf) {
+        Carp::croak('Cert: incomplete certificate/key pair') unless -r $cf && -r $kf;
         # Adopting a key we did not write is the interesting case: cert_dir is a
         # 0700 File::Temp dir by default, but the option exists precisely so a
         # caller can persist the cert somewhere of their choosing -- and a
@@ -70,18 +76,21 @@ sub _load_or_generate {
             my ($mode, $uid) = @st[2, 4];
             Carp::croak("Cert: refusing to use $kf -- it is a symlink")
                 if -l _;
+            Carp::croak("Cert: refusing to use $kf -- not a regular file") unless -f _;
             Carp::croak(sprintf 'Cert: refusing to use %s -- mode %04o is accessible '
                               . 'beyond its owner (want 0600)', $kf, $mode & 07777)
                 if $mode & 077;
             Carp::croak("Cert: refusing to use $kf -- it is owned by uid $uid, not $<")
                 if $uid != $<;
         }
-        my $bc = Net::SSLeay::BIO_new_file($cf, 'r');
+        my $bc = Net::SSLeay::BIO_new_file($cf, 'r') or Carp::croak("Cert: read $cf failed");
         $self->{cert} = Net::SSLeay::PEM_read_bio_X509($bc);
         Net::SSLeay::BIO_free($bc);
-        my $bk = Net::SSLeay::BIO_new_file($kf, 'r');
+        Carp::croak("Cert: invalid certificate in $cf") unless $self->{cert};
+        my $bk = Net::SSLeay::BIO_new_file($kf, 'r') or Carp::croak("Cert: read $kf failed");
         $self->{key} = Net::SSLeay::PEM_read_bio_PrivateKey($bk);
         Net::SSLeay::BIO_free($bk);
+        Carp::croak("Cert: invalid private key in $kf") unless $self->{key};
         return;
     }
     my $key  = _gen_key();
@@ -91,12 +100,13 @@ sub _load_or_generate {
     _spew($kf, Net::SSLeay::PEM_get_string_PrivateKey($key), 0600);
 }
 
-# Install the cert+key on a Net::SSLeay server SSL_CTX. Uses the persisted
-# files via set_cert_and_key (proven in the Task-1 spike).
+# Use the validated in-memory pair for every handshake.
 sub apply_to_ctx {
     my ($self, $ctx) = @_;
-    Net::SSLeay::set_cert_and_key($ctx, $self->cert_path, $self->key_path)
-        or Carp::croak('Cert: set_cert_and_key failed');
+    Net::SSLeay::CTX_use_certificate($ctx, $self->{cert})
+        && Net::SSLeay::CTX_use_PrivateKey($ctx, $self->{key})
+        && Net::SSLeay::CTX_check_private_key($ctx)
+        or Carp::croak('Cert: invalid or mismatched certificate/key pair');
 }
 
 sub _spew {
@@ -104,10 +114,15 @@ sub _spew {
     $mode //= 0644;
     # create at the target mode so the private key never exists world-readable
     # in an open->chmod window
-    sysopen(my $fh, $path, O_CREAT | O_WRONLY | O_TRUNC, $mode)
+    sysopen(my $fh, $path, O_CREAT | O_WRONLY | O_EXCL, $mode)
         or Carp::croak("Cert: write $path: $!");
-    print $fh $data; close $fh;
-    chmod $mode, $path;   # exact perms even if the file pre-existed
+    my $ok = print $fh $data;
+    $ok = close($fh) && $ok;
+    if (!$ok) {
+        my $err = $!;
+        unlink $path;
+        Carp::croak("Cert: write $path: $err");
+    }
 }
 
 sub DESTROY {

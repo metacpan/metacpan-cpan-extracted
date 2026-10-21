@@ -10,6 +10,8 @@ last month", read into Time::Keeper values, relative to a moment called the anch
     my ($from, $to) = $n->parse_interval('15–17 Oct 2026');
     $n->parse('3 pm EST');
     $n->parse('the 15th');
+    $n->parse('3 days after tomorrow');
+    my @found = $n->find('Can we meet next Tuesday at 3 pm, or on the 20th?');
 
 WHAT IT READS
 
@@ -21,15 +23,24 @@ back. A zone after a time ("3 pm EST", "15:30 Europe/Paris") and a day written a
 an ordinal ("the 15th", "le 1er octobre", in about forty locales) are read too, and
 with a calendar option the dates of any of CLDR's seventeen calendars ("4 Heshvan
 5787", "令和8年10月15日"), relative phrases counting that calendar's months.
+Durations take fractions in the locale's decimal sign ("1.5 hours", "1,5
+Stunden"), a day takes a part of it ("tomorrow morning", "demain soir"), and
+chains of counts in a language written without spaces may be in words
+("二週間三日後").
 
-Where a locale has a word table, also "end of", "start of", "at", "on", and
-"from ... to ..." between two times. Tables
-ship for ar bn de el en es fr hi it ja ko nl pt ru th zh; all but English are
-first drafts awaiting a native reader.
+Where a locale has a word table, also "end of", "start of", "at", "on", "from
+... to ...", a duration before or after a point ("3 days after tomorrow"), the
+weekend, and ordinal weekdays in the language's own order ("来月の第3金曜日").
+A table can also put an inflected form back to CLDR's phrase ("Ende nächsten
+Monats"). Tables ship for ar bn de el en es fr hi it ja ko nl pt ru th zh. All but
+English are first drafts awaiting a native reader, and each says in its header
+what its language does not read.
+
+find returns every time a text mentions, each with its place in the text.
 
 WHAT IT DOES NOT READ
 
-Free text, recurrence, vague words ("soon"), idioms CLDR does not have
+Recurrence, vague words ("soon"), idioms CLDR does not have
 ("a fortnight"), holidays and business days.
 
 INSTALLATION

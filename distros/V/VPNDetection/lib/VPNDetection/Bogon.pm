@@ -8,7 +8,7 @@ use Socket qw(AF_INET AF_INET6 inet_pton);
 use VPNDetection::Bogons;
 use VPNDetection::Result;
 
-our $VERSION = '3.9.0';
+our $VERSION = '3.10.0';
 
 # Whether an address is private, loopback, link-local, documentation, multicast
 # or otherwise not routable on the public internet, including the IPv6
@@ -45,12 +45,15 @@ sub unmapped {
 }
 
 # The answer a bogon gets, in the full shape the API serves at its widest plan:
-# every flag present and false, every detail object present and empty.
+# every flag present and false, every detail object present and empty, and a
+# location and AS of empty strings and AS 0.
 sub bogon_result {
     my ($ip) = @_;
     my %answer = (ip => $ip, is_bogon => 1);
     $answer{$_} = 0 for @VPNDetection::Result::FLAGS;
     $answer{$_} = {} for @VPNDetection::Result::DETAILS;
+    $answer{location} = { map { $_ => '' } @VPNDetection::Result::LOCATION };
+    $answer{asn} = { map { $_ => $_ eq 'asn' ? 0 : '' } @VPNDetection::Result::ASN };
     return VPNDetection::Result->_new(\%answer, {});
 }
 

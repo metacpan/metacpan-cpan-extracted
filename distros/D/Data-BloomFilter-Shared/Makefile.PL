@@ -13,7 +13,7 @@ WriteMakefile(
     AUTHOR             => 'vividsnow',
     LICENSE            => 'perl_5',
     MIN_PERL_VERSION   => '5.022',
-    LIBS               => [''],
+    LIBS               => ['-lm -lpthread'],
     DEFINE             => '-D_GNU_SOURCE',
     INC                => '-I.',
     XS                 => { 'Shared.xs' => 'Shared.c' },

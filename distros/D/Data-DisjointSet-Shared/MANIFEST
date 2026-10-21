@@ -11,6 +11,7 @@ Shared.xs
 t/01-basic.t
 t/02-oracle.t
 t/03-recover.t
+t/04-sharing.t
 xt/asan.t
 xt/crash_recovery.t
 xt/destroy_during_call.t

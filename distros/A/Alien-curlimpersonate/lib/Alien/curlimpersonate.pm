@@ -1,7 +1,7 @@
 package Alien::curlimpersonate;
 use v5.10; use strict; use warnings;
 use parent 'Alien::Base';
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 1;
 
 __END__
@@ -48,7 +48,7 @@ libcurl-impersonate to find, so the probe always selects a C<share> install
 and the library is compiled at install time. See L</"SYSTEM REQUIREMENTS">,
 because that build is neither short nor dependency-free.
 
-The pinned version is B<v2.2.2>, built from
+The pinned version is B<v2.3.0>, built from
 L<https://github.com/lexiforest/curl-impersonate> itself. It is an exact tag
 rather than the newest one: upstream 2.0.0 replaced autotools with a CMake
 superbuild, and the target names this library is asked for are load-bearing in
@@ -56,7 +56,7 @@ whatever links it, so neither is left to float.
 
 =head1 SYSTEM REQUIREMENTS
 
-curl-impersonate statically builds BoringSSL, zlib, zstd, brotli, nghttp2 and
+curl-impersonate statically builds BoringSSL, c-ares, zlib, zstd, brotli, nghttp2 and
 ngtcp2 alongside curl itself. That needs, on top of a C and C++ compiler:
 
 =over 4

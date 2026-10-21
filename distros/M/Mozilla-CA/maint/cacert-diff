@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use File::Spec::Functions qw(updir catfile abs2rel canonpath);
+use File::Spec::Functions qw(updir catfile abs2rel canonpath rel2abs);
 use File::Basename qw(dirname);
 use Cwd qw(abs_path);
 use POSIX qw(strftime);
@@ -13,6 +13,7 @@ my $dir = dirname(__FILE__);
 my $root = abs2rel(abs_path(catfile($dir, updir)));
 
 my $CACERT_PEM_FILE = canonpath("$root/lib/Mozilla/CA/cacert.pem");
+my $DENYLIST_FILE = rel2abs("$dir/denylist.pl");
 
 binmode STDOUT, ':utf8';
 
@@ -107,10 +108,18 @@ my %updated =
     grep exists $content[1]->{$_} && $content[0]->{$_} ne $content[1]->{$_},
     keys %{ $content[0] };
 
+my $denylist = do $DENYLIST_FILE or die $@;
+
+my %denylisted =
+    map +($_ => delete $removed{$_}),
+    grep exists $removed{$_},
+    @$denylist;
+
 for my $change (
     [ 'Added', \%added ],
     [ 'Updated', \%updated ],
     [ 'Removed', \%removed ],
+    [ 'Denylisted', \%denylisted ],
 ) {
     my ($label, $certs) = @$change;
     next

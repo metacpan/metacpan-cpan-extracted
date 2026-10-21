@@ -677,10 +677,9 @@ METHODS
     A refused connection and a DNS failure do not land here: they resolve
     the navigation with $ok "undef" and $err set to a "load failed: ..."
     string, so check $err first and only then "status". (One exception is
-    worth knowing because it looks like a counter-example: a connection to a
-    port the host blocks outright, rather than refusing, can be reported by
-    the engine as a completed load of its own error page -- $ok true with
-    "undef" status.)
+    worth knowing: a port blocked by the engine may instead complete with
+    its own error page -- $ok true with "undef" status -- depending on the
+    WebKit version.)
 
    html
         $b->html(sub { my ($html, $err) = @_; ... });
@@ -1479,8 +1478,8 @@ METHODS
 
     Writes this instance's cookies to $file as a JSON snapshot, enumerated
     per-URI (via the same path as "cookies") over "\@uris", or, if omitted,
-    every URI this instance has "go"ne to. $count is the number of
-    (deduplicated) cookies written. $file is written as UTF-8 text, so
+    every URI this instance has visited or requested. $count is the number
+    of (deduplicated) cookies written. $file is written as UTF-8 text, so
     cookie values containing non-ASCII characters round-trip correctly. This
     is an explicit, opt-in mechanism, distinct from "cookie_jar"'s native
     persistence (see "new") -- it is the only way to capture SESSION

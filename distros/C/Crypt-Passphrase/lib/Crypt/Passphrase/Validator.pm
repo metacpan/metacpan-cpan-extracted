@@ -1,5 +1,5 @@
 package Crypt::Passphrase::Validator;
-$Crypt::Passphrase::Validator::VERSION = '0.023';
+$Crypt::Passphrase::Validator::VERSION = '0.024';
 use strict;
 use warnings;
 
@@ -30,7 +30,7 @@ Crypt::Passphrase::Validator - Base class for Crypt::Passphrase validators
 
 =head1 VERSION
 
-version 0.023
+version 0.024
 
 =head1 DESCRIPTION
 

@@ -25,6 +25,8 @@ my $n = $N->new(zone => 'Europe/London', locale => 'en-GB');
     is(str(sub { $n->parse('2026-10-20T15:00:00Z') }), '2026-10-20T16:00:00+01:00', 'ISO with a zone, converted');
     is(str(sub { $n->parse('2026-10-20T15:00:00') }), '2026-10-20T15:00:00+01:00', 'ISO with none, in the parser\'s');
     is(str(sub { $n->parse('2026-10-20') }), '2026-10-20T00:00:00+01:00', 'an ISO date');
+    is(str(sub { $n->parse('15 Oct 26 09:00 GMT') }), '2026-10-15T10:00:00+01:00', 'RFC 2822 with a two-digit year, which only its clock time shows');
+    is(str(sub { $n->parse('Thursday, 15-Oct-26 09:00:00 GMT') }), '2026-10-15T10:00:00+01:00', 'RFC 850, as HTTP takes it');
     is(str(sub { $n->parse('@1760000000') }), '' . Time::Keeper->from_epoch(1760000000, zone => 'Europe/London'), 'an epoch');
     is($n->parse('2026-10-20T15:00:00Z')->locale, 'en-GB', 'and the parser\'s locale');
 }

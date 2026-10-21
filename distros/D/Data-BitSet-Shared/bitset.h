@@ -121,6 +121,19 @@ static inline int bs_toggle(BsHandle *h, uint64_t bit) {
     return (old & mask) ? 0 : 1;
 }
 
+static inline int bs_popcount(uint64_t word) {
+#if defined(__x86_64__) && !defined(__POPCNT__)
+    /* Keep the software fallback inline on baseline x86-64 builds. */
+    word -= (word >> 1) & UINT64_C(0x5555555555555555);
+    word = (word & UINT64_C(0x3333333333333333))
+         + ((word >> 2) & UINT64_C(0x3333333333333333));
+    word = (word + (word >> 4)) & UINT64_C(0x0f0f0f0f0f0f0f0f);
+    return (int)((word * UINT64_C(0x0101010101010101)) >> 56);
+#else
+    return __builtin_popcountll(word);
+#endif
+}
+
 /* Population count -- total set bits. */
 static inline uint64_t bs_count(BsHandle *h) {
     uint64_t total = 0;
@@ -131,7 +144,7 @@ static inline uint64_t bs_count(BsHandle *h) {
         uint64_t word = __atomic_load_n(&h->data[i], __ATOMIC_RELAXED);
         if (i == nw - 1 && (cap % 64))
             word &= ((uint64_t)1 << (cap % 64)) - 1;
-        total += (uint64_t)__builtin_popcountll(word);
+        total += (uint64_t)bs_popcount(word);
     }
     return total;
 }
@@ -277,6 +290,7 @@ static int bs_file_is_zero(int fd, uint64_t size) {
     char buf[16384];
     for (uint64_t off = 0; off < size; ) {
         ssize_t n = pread(fd, buf, size - off < sizeof buf ? (size_t)(size - off) : sizeof buf, (off_t)off);
+        if (n < 0 && errno == EINTR) continue;
         if (n <= 0) return 0;
         for (ssize_t i = 0; i < n; i++) if (buf[i]) return 0;
         off += (uint64_t)n;
@@ -328,52 +342,50 @@ static BsHandle *bs_create(const char *path, uint64_t capacity, mode_t mode, cha
             BS_ERR("%s: file too small (%lld)", path, (long long)st.st_size);
             flock(fd, LOCK_UN); close(fd); return NULL;
         }
-        if (is_new && (st.st_uid != geteuid() || fchmod(fd, mode) < 0)) {
+        int recover = 0;
+        if (!is_new) {
+            uint32_t magic;
+            ssize_t n;
+            do n = pread(fd, &magic, sizeof magic, 0); while (n < 0 && errno == EINTR);
+            if (n != (ssize_t)sizeof magic) {
+                BS_ERR("invalid bitset file"); flock(fd, LOCK_UN); close(fd); return NULL;
+            }
+            /* Check abandoned files before mmap: even a read fault on a full tmpfs can SIGBUS. */
+            if (magic == 0 && (uint64_t)st.st_size == total && st.st_uid == geteuid()) {
+                if (!bs_file_is_zero(fd, total)) {
+                    BS_ERR("%s: incomplete bitset file left by an interrupted create; remove it and retry", path);
+                    flock(fd, LOCK_UN); close(fd); return NULL;
+                }
+                recover = 1;
+            } else if (magic != BS_MAGIC) {
+                BS_ERR("invalid bitset file"); flock(fd, LOCK_UN); close(fd); return NULL;
+            }
+        }
+        if (is_new && st.st_uid != geteuid()) {
             BS_ERR("%s: refusing to initialize file not owned by us", path);
+            flock(fd, LOCK_UN); close(fd); return NULL;
+        }
+        if ((is_new || recover) && fchmod(fd, mode) < 0) {
+            BS_ERR("%s: fchmod: %s", path, strerror(errno));
             flock(fd, LOCK_UN); close(fd); return NULL;
         }
         if (is_new && ftruncate(fd, (off_t)total) < 0) {
             BS_ERR("ftruncate: %s", strerror(errno)); flock(fd, LOCK_UN); close(fd); return NULL;
         }
-        if (is_new && bs_reserve(fd, total) < 0) {
+        if ((is_new || recover) && bs_reserve(fd, total) < 0) {
             BS_ERR("%s: cannot reserve %llu bytes: %s", path, (unsigned long long)total, strerror(errno));
-            if (ftruncate(fd, 0) < 0) { /* best effort */ }
+            if (is_new && ftruncate(fd, 0) < 0) { /* best effort */ }
             flock(fd, LOCK_UN); close(fd); return NULL;
         }
-        map_size =is_new ? (size_t)total : (size_t)st.st_size;
+        map_size = is_new ? (size_t)total : (size_t)st.st_size;
         base = mmap(NULL, map_size, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
         if (base == MAP_FAILED) {
             BS_ERR("mmap: %s", strerror(errno));
             if (is_new && ftruncate(fd, 0) < 0) { /* best effort */ }
             flock(fd, LOCK_UN); close(fd); return NULL;
         }
-        if (!is_new) {
+        if (!is_new && !recover) {
             if (!bs_validate_header((BsHeader *)base, (uint64_t)st.st_size)) {
-                /* Recover an abandoned mid-init file: a creator killed
-                 * between the ftruncate and the header init leaves a
-                 * full-size, all-zero (magic==0) file that would brick every
-                 * future open of this path.  Re-initialize ONLY when it is
-                 * exactly our size, still uninitialized, and owned by us;
-                 * anything else still errors. */
-                if (((BsHeader *)base)->magic == 0 && (uint64_t)st.st_size == total
-                    && st.st_uid == geteuid() && bs_file_is_zero(fd, map_size)) {
-                    if (fchmod(fd, mode) < 0) {
-                        BS_ERR("%s: fchmod: %s", path, strerror(errno));
-                        munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
-                    }
-                    if (bs_reserve(fd, total) < 0) {
-                        BS_ERR("%s: cannot reserve %llu bytes: %s", path, (unsigned long long)total, strerror(errno));
-                        munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
-                    }
-                    bs_init_header(base, total, capacity, nw);
-                    flock(fd, LOCK_UN); close(fd);
-                    return bs_setup(base, map_size, path, -1);
-                }
-                if (((BsHeader *)base)->magic == 0 && (uint64_t)st.st_size == total
-                    && st.st_uid == geteuid()) {
-                    BS_ERR("%s: incomplete bitset file left by an interrupted create; remove it and retry", path);
-                    munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
-                }
                 BS_ERR("invalid bitset file"); munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
             }
             if (((BsHeader *)base)->sealed) {
@@ -478,11 +490,7 @@ static BsHandle *bs_open_readonly(const char *path, char *errbuf) {
     return h;
 }
 
-/* Seal a bitset: make it permanently immutable so it can be shipped and
- * opened read-only. BitSet has no rwlock -- its per-bit ops are already
- * lock-free CAS/atomics -- so there is no writer lock to take here; publish
- * the seal with a release store, then flush it (file/memfd-backed).
- * Afterwards every mutator croaks and a read-write reopen is refused. */
+/* Writers must be quiescent before publishing and flushing the seal. */
 static int bs_freeze(BsHandle *h) {
     __atomic_store_n(&h->hdr->sealed, 1, __ATOMIC_RELEASE);
     if (h->path || h->backing_fd >= 0) return bs_msync(h);  /* durability for file/memfd-backed */

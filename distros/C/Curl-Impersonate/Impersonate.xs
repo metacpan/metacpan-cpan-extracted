@@ -138,6 +138,8 @@ static struct curl_slist *apply_request(CURL *easy, const char *method,
     dTHX;
     struct curl_slist *hlist = NULL;
     STRLEN blen = 0;
+    int post = strcmp(method, "POST") == 0;
+    int body_method = post || strcmp(method, "PUT") == 0 || strcmp(method, "PATCH") == 0;
     curl_easy_setopt(easy, CURLOPT_URL, url);
     curl_easy_setopt(easy, CURLOPT_CUSTOMREQUEST, method);
     if (SvOK(body_sv)) { const char *bp = SvPV(body_sv, blen);
@@ -151,12 +153,20 @@ static struct curl_slist *apply_request(CURL *easy, const char *method,
            (as Chrome does for an empty POST/PUT). Other methods reset to GET --
            NOT POSTFIELDS=NULL, which leaves method=POST and emits a bogus
            Content-Type/Length on a bodyless GET. CUSTOMREQUEST sets the verb. */
-        if (strcmp(method, "POST") == 0 || strcmp(method, "PUT") == 0 || strcmp(method, "PATCH") == 0) {
+        if (body_method) {
             curl_easy_setopt(easy, CURLOPT_POSTFIELDSIZE, (long) 0);
             curl_easy_setopt(easy, CURLOPT_COPYPOSTFIELDS, "");
         } else {
             curl_easy_setopt(easy, CURLOPT_HTTPGET, 1L);
         }
+    }
+    if (strcmp(method, "HEAD") == 0)
+        curl_easy_setopt(easy, CURLOPT_NOBODY, 1L);
+    else if (blen || body_method) {
+        curl_easy_setopt(easy, CURLOPT_NOBODY, 0L);
+        /* COPYPOSTFIELDS also backs PUT/PATCH; preserve those uploads on 301/302. */
+        curl_easy_setopt(easy, CURLOPT_POSTREDIR, post
+            ? 0L : (long) (CURL_REDIR_POST_301 | CURL_REDIR_POST_302));
     }
     if (SvROK(headers_hv) && SvTYPE(SvRV(headers_hv)) == SVt_PVHV) {
         HV *hv = (HV *) SvRV(headers_hv); I32 nk = hv_iterinit(hv);
@@ -215,7 +225,11 @@ static size_t body_cb_stream(char *p, size_t s, size_t n, void *u){
                 PUTBACK;
                 call_sv(r->on_headers, G_VOID|G_DISCARD|G_EVAL);
                 SPAGAIN;
-                if (SvTRUE(ERRSV)) warn("Curl::Impersonate on_headers died: %s", SvPV_nolen(ERRSV));
+                if (SvTRUE(ERRSV)) {
+                    warn("Curl::Impersonate on_headers died: %s", SvPV_nolen(ERRSV));
+                    FREETMPS; LEAVE;
+                    return 0;
+                }
                 FREETMPS; LEAVE;
             }
         }
@@ -228,7 +242,10 @@ static size_t body_cb_stream(char *p, size_t s, size_t n, void *u){
         SPAGAIN;
         if (cnt) {                            /* G_SCALAR always returns one item; pop it */
             SV *rv = POPs;
-            if (SvTRUE(ERRSV)) warn("Curl::Impersonate on_body died: %s", SvPV_nolen(ERRSV));
+            if (SvTRUE(ERRSV)) {
+                warn("Curl::Impersonate on_body died: %s", SvPV_nolen(ERRSV));
+                act = 2;
+            }
             else act = SvTRUE(rv) ? (SvIV(rv) == 2 ? 2 : 1) : 0;   /* true=pause, 2=abort */
         }
         PUTBACK;
@@ -252,8 +269,7 @@ static void dispatch_done(ci_req *r, CURLcode result) {
        the inner loop exits. free_ci_req's unlink then becomes a no-op. */
     unlink_req(r);
     ENTER; SAVETMPS;
-    SV *err_sv = (result != CURLE_OK)
-        ? sv_2mortal(newSVpv(curl_easy_strerror(result), 0)) : &PL_sv_undef;
+    SV *err_sv;
     if (r->streaming && result == CURLE_OK && !r->headers_sent && SvROK(r->on_headers)) {
         /* bodyless response (204/304/HEAD/Content-Length:0): on_body never fired,
            so deliver on_headers here before on_done, else the consumer gets nothing */
@@ -265,9 +281,14 @@ static void dispatch_done(ci_req *r, CURLcode result) {
         PUTBACK;
         call_sv(r->on_headers, G_VOID|G_DISCARD|G_EVAL);
         SPAGAIN;
-        if (SvTRUE(ERRSV)) warn("Curl::Impersonate on_headers died: %s", SvPV_nolen(ERRSV));
+        if (SvTRUE(ERRSV)) {
+            warn("Curl::Impersonate on_headers died: %s", SvPV_nolen(ERRSV));
+            result = CURLE_ABORTED_BY_CALLBACK;
+        }
         r->headers_sent = 1;
     }
+    err_sv = (result != CURLE_OK)
+        ? sv_2mortal(newSVpv(curl_easy_strerror(result), 0)) : &PL_sv_undef;
     if (SvROK(r->cb)) {                    /* a missing on_done is allowed -> just no completion call */
         PUSHMARK(SP);
         if (r->streaming) {
@@ -430,7 +451,7 @@ _setopt_defaults(self_sv, opt_hv)
         curl_easy_setopt(self->easy, CURLOPT_SSL_VERIFYHOST, on ? 2L : 0L);
     }
     if ((sv = hv_fetchs(o, "follow_redirects", 0)) && SvTRUE(*sv))
-        curl_easy_setopt(self->easy, CURLOPT_FOLLOWLOCATION, 1L);
+        curl_easy_setopt(self->easy, CURLOPT_FOLLOWLOCATION, CURLFOLLOW_OBEYCODE);
     if ((sv = hv_fetchs(o, "proxy", 0)) && SvOK(*sv))
         curl_easy_setopt(self->easy, CURLOPT_PROXY, SvPV_nolen(*sv));
     /* "" enables every built-in decoder without pinning a list. The header the

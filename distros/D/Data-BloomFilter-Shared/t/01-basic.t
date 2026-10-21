@@ -1,7 +1,10 @@
 use strict;
 use warnings;
 use Test::More;
+use File::Temp qw(tempdir);
 use Data::BloomFilter::Shared;
+
+my $dir = tempdir(CLEANUP => 1);
 
 # constructors: capacity + default fp_rate, and explicit fp_rate
 my $bf = Data::BloomFilter::Shared->new(undef, 1000);
@@ -159,7 +162,7 @@ like $@, qr/fp_rate|rate/, 'new_memfd fp_rate 1.5 croak mentions rate';
 }
 
 # file-backed reopen: add, sync, reopen, still contains
-my $path = "/tmp/bloom-basic-$$.bin";
+my $path = "$dir/basic.bin";
 unlink $path;
 {
     my $w = Data::BloomFilter::Shared->new($path, 5000, 0.01);
@@ -184,7 +187,7 @@ unlink $path;
 
 # new_from_fd error path: a valid fd over a non-Bloom file is rejected
 {
-    my $jp = "/tmp/bloom-junkfd-$$.bin";
+    my $jp = "$dir/junkfd.bin";
     unlink $jp;
     open my $fh, '+>', $jp or die $!;   # real filehandle -> fileno is valid
     print $fh "not a bloom table";
@@ -212,7 +215,7 @@ unlink $path;
 }
 
 # class-method unlink
-my $cu = "/tmp/bloom-cu-$$.bin";
+my $cu = "$dir/class-unlink.bin";
 unlink $cu;
 { my $w = Data::BloomFilter::Shared->new($cu, 100, 0.01); $w->sync; }
 ok -e $cu, 'backing file exists';
@@ -220,7 +223,7 @@ Data::BloomFilter::Shared->unlink($cu);
 ok !-e $cu, 'class-method unlink removed the file';
 
 # instance-method unlink
-my $iu = "/tmp/bloom-iu-$$.bin";
+my $iu = "$dir/instance-unlink.bin";
 unlink $iu;
 {
     my $w = Data::BloomFilter::Shared->new($iu, 100, 0.01);

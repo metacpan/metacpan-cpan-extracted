@@ -746,7 +746,9 @@ tkn_interval_try(pTHX_ SV *self, tkn_lexicon *L, SV *words, SV *text, SV *k, HV 
         if (got <= 0) {
             HV *pi = tkn_info_new(aTHX);
             int g2;
-            *single = tkn_phrase(aTHX_ self, L, words, text, k, tkn_info_new(aTHX)) ? 1 : 0;
+            dMY_CXT;
+            /* find has read the text as a point already, and it did not */
+            *single = MY_CXT.quiet == 2 ? 0 : tkn_phrase(aTHX_ self, L, words, text, k, tkn_info_new(aTHX)) ? 1 : 0;
             g2 = tkn_interval_pairs(aTHX_ self, L, words, text, !*single, pi, s_out, e_out);
             if (g2 > 0) {
                 tkn_info_set(aTHX_ info, pi);
@@ -774,8 +776,11 @@ tkn_interval(pTHX_ SV *self, SV *method, SV *text, SV **s_out, SV **e_out, HV **
     tkn_lex_words(aTHX_ self, &lexsv, &words);
     L = tkn_lex(aTHX_ lexsv);
     k = tkn_key_sv(aTHX_ L, text);
-    if (!SvCUR(k))
+    *s_out = *e_out = NULL;
+    if (!SvCUR(k)) {
         tkn_cannot(aTHX_ method, text, sv_2mortal(newSVpvs("")), sv_2mortal(newSVpvs("the text is empty")));
+        return;
+    }
     info = tkn_info_new(aTHX);
     got = tkn_interval_try(aTHX_ self, L, words, text, k, info, s_out, e_out, &single);
     /* a zone named at the end is both ends' ("9 am - 5 pm EST") */
@@ -796,6 +801,13 @@ tkn_interval(pTHX_ SV *self, SV *method, SV *text, SV **s_out, SV **e_out, HV **
         *s_out = tkn_in_cal(aTHX_ self, *s_out);
         *e_out = tkn_in_cal(aTHX_ self, *e_out);
         return;
+    }
+    {
+        dMY_CXT;
+        if (MY_CXT.quiet) {
+            *s_out = *e_out = NULL;
+            return;
+        }
     }
     if (got < 0)
         tkn_cannot(aTHX_ method, text, tkn_first_token(aTHX_ text), sv_2mortal(newSVpvs("the interval ends before it starts")));
