@@ -364,6 +364,8 @@ sub synth_value {
     return [ '100m', '1Gi' ]                          if $info->{is_array_of_quantity};
     return [ '2024-01-01T00:00:00Z' ]                 if $info->{is_array_of_time};
     return { 'sample-key' => 'sample-value' } if $info->{is_hash_of_str} || $info->{is_hash_opaque};
+    # map[string][]string (k194)
+    return { 'sample-key' => [ 'sample-a', 'sample-b' ] } if $info->{is_hash_of_str_arrays};
     # Typed value maps -- the { TypeName => 1 } DSL form (k63). Each value
     # must satisfy the scalar constraint the map carries.
     return { 'sample-key' => '100m' }                 if $info->{is_hash_of_quantity};
@@ -379,6 +381,10 @@ sub synth_value {
     if ($info->{is_hash_of_objects}) {
         my $child = object_field_value($info->{class}, $mode, $depth, $info->{required});
         return defined $child ? { 'sample-key' => $child } : undef;
+    }
+    if ($info->{is_hash_of_object_arrays}) {    # map[string][]Object (k194)
+        my $child = object_field_value($info->{class}, $mode, $depth, $info->{required});
+        return defined $child ? { 'sample-key' => [$child] } : undef;
     }
     if ($info->{is_array_of_objects}) {
         my $child = object_field_value($info->{class}, $mode, $depth, $info->{required});
@@ -481,6 +487,13 @@ for my $class (@classes) {
                     my @encoded = map { $json_iso->encode($_) } @{ $out1->{$key} };
                     ok((@encoded && !grep { !/^-?\d+\z/ } @encoded),
                         "$class ($mode) .$key elements serialize as unquoted numbers")
+                        or diag("encoded: @encoded");
+                }
+                elsif ($info->{is_hash_of_str_arrays}) {
+                    # map[string][]string: every element must hit the wire as a JSON string
+                    my @encoded = map { $json_iso->encode($_) } map { @$_ } values %{ $out1->{$key} };
+                    ok((@encoded && !grep { !/^"/ } @encoded),
+                        "$class ($mode) .$key elements serialize as JSON strings")
                         or diag("encoded: @encoded");
                 }
                 elsif ($info->{is_hash_of_str}) {

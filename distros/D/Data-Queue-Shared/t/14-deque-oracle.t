@@ -10,18 +10,18 @@ use Data::Queue::Shared;
 # corrupted live elements. Any arena mismatch surfaces as a wrong pop value.
 
 my $CAP   = 16;     # element-count capacity
-my $ARENA = 256;    # deliberately small -> many wraps
+my $ARENA = 4096;   # minimum arena; payloads below force wraps
 
 my $q = Data::Queue::Shared::Str->new(undef, $CAP, $ARENA);
 my @oracle;         # front == $oracle[0], back == $oracle[-1]
 
 # Deterministic LCG so a failure is reproducible.
 my $seed = 0x1234abcd;
-sub rnd { $seed = ($seed * 1103515245 + 12345) & 0x7fffffff; $seed }
+sub rnd { $seed = ($seed * 1103515245 + 12345) & 0x7fffffff; $seed >> 16 }
 
 my $counter = 0;
 sub gen {
-    my $pad = rnd() % 34;                       # 0..33 -> alloc spans several sizes
+    my $pad = rnd() % 1024;
     sprintf("%d:", $counter++) . ("x" x $pad);
 }
 

@@ -1,7 +1,7 @@
 package Data::SpatialHash::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 require XSLoader;
 XSLoader::load('Data::SpatialHash::Shared', $VERSION);
 
@@ -263,12 +263,13 @@ query radius so each query touches only a handful of cells.
 As a safety net, any region query that would scan more than approximately
 67 million cells (2**26) -- a C<query_radius>, C<query_aabb>,
 C<each_in_radius>, or a C<query_radius_many> sub-query whose region spans that
-many cells, a C<query_knn> that must walk that many cells across its expanding
-shells, or a C<each_pair_within> / C<each_colliding_pair> whose per-entry
+many cells, or a C<each_pair_within> / C<each_colliding_pair> whose per-entry
 neighbourhood spans that many cells -- croaks with
 a message containing the word "cells" rather than scanning unbounded.  If
 your use case genuinely requires regions that large, increase C<cell_size>
 so the same physical region maps to fewer cells.
+
+C<query_knn> falls back to scanning live entries when shell expansion is costly.
 
 =head2 Spherical worlds
 
@@ -296,8 +297,8 @@ in S<-pi/2 .. pi/2>, C<lon> in S<-pi .. pi>); C<alt> is height above the sphere
 of radius C<$R>, so an entity lies at distance C<$R + $alt> from the centre.
 Each geo method converts to Cartesian and delegates to the ordinary 3D engine,
 so C<$dist> in C<query_geo_radius> is a true straight-line distance and must be
-finite and non-negative.  At a pole, longitude is undefined and C<position_geo> reports it
-as 0.  Calling a geo method on a map created without C<sphere> croaks.
+finite and non-negative. At a pole, longitude is undefined.
+Calling a geo method on a map created without C<sphere> croaks.
 C<insert_geo> returns a handle or C<undef> if the pool is exhausted (test with
 C<defined> -- handle 0 is valid but false); C<move_geo> returns true, or false
 for a freed/invalid handle; C<position_geo> croaks on a freed or invalid handle.

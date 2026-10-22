@@ -1,7 +1,7 @@
 package WWW::Hetzner::CLI::Cmd::StorageBox::Cmd::RollbackSnapshot;
 # ABSTRACT: Roll a Storage Box back to a snapshot
 
-our $VERSION = '0.101';
+our $VERSION = '0.102';
 
 use Moo;
 use MooX::Cmd;
@@ -38,7 +38,7 @@ WWW::Hetzner::CLI::Cmd::StorageBox::Cmd::RollbackSnapshot - Roll a Storage Box b
 
 =head1 VERSION
 
-version 0.101
+version 0.102
 
 =head1 SYNOPSIS
 

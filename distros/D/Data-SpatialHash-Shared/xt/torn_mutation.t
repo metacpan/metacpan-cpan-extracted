@@ -3,10 +3,7 @@ plan skip_all => 'author test' unless $ENV{AUTHOR_TESTING};
 
 use Data::SpatialHash::Shared;
 
-# Mutations are not crash-atomic: a SIGKILL mid-move (between bucket unlink and
-# relink) can orphan at most the one entry being moved. The structure must stay
-# operable afterwards -- the lock recovers, queries/stats terminate (no chain
-# cycle), and at most one entry is unreachable.
+# A SIGKILL mid-move must recover every live entry and leave the map usable.
 
 my $s = Data::SpatialHash::Shared->new(undef, 200_000, 0, 1.0);
 my @h = map { $s->insert(rand()*1000, rand()*1000, $_) } 1 .. 50_000;
@@ -27,7 +24,7 @@ my $ok = eval {
     alarm 0;
     my $delta = $st->{count} - scalar(@all);
     note "count=$st->{count} reachable=" . scalar(@all) . " max_chain=$st->{max_chain} delta=$delta";
-    ok $delta >= 0 && $delta <= 1, "at most one orphaned entry after mid-move SIGKILL (delta=$delta)";
+    is $delta, 0, 'every live entry reachable after mid-move SIGKILL';
     ok defined($s->insert(1, 1, -1)), 'map still usable after the SIGKILL (lock recovered)';
     1;
 };

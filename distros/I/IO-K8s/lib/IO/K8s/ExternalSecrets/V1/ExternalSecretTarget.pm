@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1::ExternalSecretTarget;
 # ABSTRACT: ExternalSecretTarget defines the Kubernetes Secret to be created, there can be only one target per ExternalSecret.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s creationPolicy => Str, { enum => [qw(Owner Orphan Merge None CreateOrMerge)], default => 'Owner' };
@@ -30,7 +30,7 @@ IO::K8s::ExternalSecrets::V1::ExternalSecretTarget - ExternalSecretTarget define
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 creationPolicy
 

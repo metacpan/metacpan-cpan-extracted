@@ -1,17 +1,17 @@
 package IO::K8s::Api::Core::V1::Secret;
 # ABSTRACT: Secret holds secret data of a certain type. The total bytes of the values in the Data field must be less than MaxSecretSize bytes.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::APIObject;
 with 'IO::K8s::Role::Namespaced';
 
 
-k8s data => { Str => 1 };
+k8s data => HashRef[Str];
 
 
 k8s immutable => Bool;
 
 
-k8s stringData => { Str => 1 };
+k8s stringData => HashRef[Str];
 
 
 k8s type => Str;
@@ -30,7 +30,7 @@ IO::K8s::Api::Core::V1::Secret - Secret holds secret data of a certain type. The
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head1 DESCRIPTION
 

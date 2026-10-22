@@ -1,5 +1,46 @@
 Revision history for WWW-Hetzner
 
+0.102     2026-10-21 18:48:51Z
+    - The distribution declares LWP::Protocol::https, without it every
+      https target fails
+    - Fix: transport failures (connection refused, DNS, TLS, timeout) now
+      croak with LWP's reason instead of a bare "Hetzner API error: 500";
+      non-JSON error bodies (e.g. a proxy's HTML 502) contribute their status
+      and text to the error message
+    - Fix: the debug log no longer prints password, private_key and
+      user_data values of request bodies
+    - New: WWW::Hetzner::Cloud::Costs, $cloud->costs(label_selector => ...,
+      price => 'gross'|'net') sums the hourly and monthly cost per resource
+      and in total for servers (plus the server backup surcharge when
+      backup_window is set), volumes, primary IPs, floating IPs and load
+      balancers, priced per location from /pricing. Gross by default; the
+      result carries price and vat_rate. Where /pricing has no hourly price
+      (volumes, floating IPs) hourly is derived as monthly/624 and flagged
+      hourly_derived. Resources without a price warn and stay out of the
+      totals
+    - CLI: hcloud.pl costs [--label|-l SELECTOR] [--net] [--json]
+    - Fix: Server and PrimaryIP read the location object current API responses
+      carry instead of the dropped datacenter (datacenter kept as fallback);
+      Server gains the backup_window attribute
+    - Fix: Servers->create sent start_after_create, automount, enable_ipv4 and
+      enable_ipv6 (also inside public_net) as JSON numbers, which the API
+      rejected as invalid_input; they are now JSON booleans, as is
+      change_type's upgrade_disk. The caller's public_net hash is no longer
+      modified
+    - Docs: WWW::Hetzner::Cloud::API::Datacenters is deprecated, Hetzner
+      removed GET /v1/datacenters (410 deprecated_api_endpoint); use
+      Locations. The hcloud.pl datacenter command and the datacenter parameter
+      of Servers->create and PrimaryIPs->create are deprecated as well
+    - Fix: Volumes->create and Volumes->attach send automount as a JSON
+      boolean; a Perl 0 went out as the JSON number 0, which the API rejected
+      as invalid_input, and attach turned every value into true
+    - CLI: hcloud.pl server list and hcloud.pl primary-ip list show the column
+      LOCATION instead of DATACENTER, the API no longer sends the datacenter
+      field
+    - New: the server type carries its locations, one entry per location with
+      the name, the availability the datacenter used to deliver and the
+      deprecation flag
+
 0.101     2026-09-22 05:53:00Z
     - New: WWW::Hetzner::Storage, a third API host (api.hetzner.com) for
       Storage Boxes

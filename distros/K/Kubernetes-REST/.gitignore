@@ -27,6 +27,9 @@
 .claude/todos/
 .claude/projects/
 
+# Claude Code worktrees (isolated agents) -- never commit
+/.claude/worktrees/
+
 # Build artifacts
 Kubernetes-REST-*/
 Kubernetes-REST-*.tar.gz

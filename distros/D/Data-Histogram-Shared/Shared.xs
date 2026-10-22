@@ -437,7 +437,7 @@ frozen(self)
   PREINIT:
     EXTRACT(self);
   CODE:
-    RETVAL = h->hdr->sealed ? 1 : 0;
+    RETVAL = __atomic_load_n(&h->hdr->sealed, __ATOMIC_ACQUIRE) ? 1 : 0;
   OUTPUT:
     RETVAL
 
@@ -531,7 +531,7 @@ stats(self)
         hv_stores(hv, "sub_bucket_count", newSViv((IV)sub_bucket_count));
         hv_stores(hv, "ops",              newSVuv((UV)ops));
         hv_stores(hv, "mmap_size",        newSVuv((UV)h->mmap_size));
-        hv_stores(hv, "frozen",           newSVuv(h->hdr->sealed ? 1 : 0));
+        hv_stores(hv, "frozen",           newSVuv(__atomic_load_n(&h->hdr->sealed, __ATOMIC_ACQUIRE) ? 1 : 0));
         hv_stores(hv, "readonly",         newSVuv(h->readonly ? 1 : 0));
         RETVAL = newRV_noinc((SV *)hv);
     }

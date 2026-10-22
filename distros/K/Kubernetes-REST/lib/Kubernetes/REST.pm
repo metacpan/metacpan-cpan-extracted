@@ -1,5 +1,5 @@
 package Kubernetes::REST;
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 # ABSTRACT: A Perl REST Client for the Kubernetes API
 use Moo;
 use Carp qw(croak carp);
@@ -1258,7 +1258,15 @@ sub _inflate_list {
             . " INCOMPLETE (often IO::K8s version drift against the cluster):\n  %s",
             scalar @dropped, scalar @$items, $class, join("\n  ", @dropped);
     }
-    return IO::K8s::List->new(items => \@objects, item_class => $class);
+    my $meta = $struct->{metadata};
+    my $metadata = ref $meta eq 'HASH'
+        ? $self->k8s->struct_to_object(
+            'IO::K8s::Apimachinery::Pkg::Apis::Meta::V1::ListMeta', $meta)
+        : undef;
+    return IO::K8s::List->new(
+        items => \@objects, item_class => $class,
+        (defined $metadata ? (metadata => $metadata) : ()),
+    );
 }
 
 sub _process_watch_chunk {
@@ -1395,7 +1403,7 @@ sub list {
     # A misspelt option is not ignored (karr k58): label_selector listed
     # unfiltered, namespce across the cluster. name and subresource are out
     # too: they made the request a GET of one object, read as an empty list.
-    $self->_croak_unknown_args('list', \%args, qw(namespace labelSelector fieldSelector));
+    $self->_croak_unknown_args('list', \%args, qw(namespace labelSelector fieldSelector limit continue resourceVersion));
     my ($class, $response) = $self->_list_request($short_class, %args);
     $self->_check_response($response, "list $short_class");
 
@@ -1412,6 +1420,7 @@ sub _list_request {
     # Extract query parameters before building path
     my $label_selector = delete $args{labelSelector};
     my $field_selector = delete $args{fieldSelector};
+    my %paging = map { $_ => delete $args{$_} } qw(limit continue resourceVersion);
 
     my $class = $self->_expand_class_or_croak($short_class);
     my $path = $self->_build_path($class, %args,
@@ -1420,6 +1429,7 @@ sub _list_request {
     my %params;
     $params{labelSelector} = $label_selector if defined $label_selector;
     $params{fieldSelector} = $field_selector if defined $field_selector;
+    defined $paging{$_} and $params{$_} = $paging{$_} for sort keys %paging;
 
     my $response = %params
         ? $self->_request('GET', $path, undef, parameters => \%params)
@@ -2069,6 +2079,8 @@ sub watch {
     my %params = (
         watch          => 'true',
         timeoutSeconds => $timeout,
+        # BOOKMARK events carry the server's current resourceVersion (k69).
+        allowWatchBookmarks => 'true',
     );
     $params{resourceVersion} = $resource_version if defined $resource_version;
     $params{labelSelector}   = $label_selector   if defined $label_selector;
@@ -2078,19 +2090,31 @@ sub watch {
 
     my $buffer = '';
     my $last_rv = $resource_version;
+    # Without a start resourceVersion the server first replays the existing
+    # objects as ADDED events, each with its own older version: no resume
+    # point until the first BOOKMARK (k69).
+    my $trusted = defined $resource_version ? 1 : 0;
     my $got_410 = 0;
 
     my $data_callback = sub {
         my ($chunk) = @_;
         for my $result ($self->_process_watch_chunk($class, \$buffer, $chunk)) {
-            $last_rv = $result->{resourceVersion} if $result->{resourceVersion};
+            my $is_bookmark = $result->{event}->type eq 'BOOKMARK';
+            $trusted = 1 if $is_bookmark;
+            $last_rv = $result->{resourceVersion}
+                if $result->{resourceVersion} && $trusted;
             $got_410 = 1 if $result->{error_code} == 410;
+            next if $is_bookmark;
             $on_event->($result->{event});
         }
     };
 
     my $response = $self->io->call_streaming($req, $data_callback);
 
+    # 410 on the request itself is the same expired resourceVersion as the
+    # ERROR event; without a resourceVersion it stays an APIError (k69).
+    croak "Watch expired (410 Gone): resourceVersion too old, re-list to get a fresh resourceVersion"
+        if $response->status == 410 && defined $resource_version;
     $self->_check_response($response, "watch $short_class");
 
     croak "Watch expired (410 Gone): resourceVersion too old, re-list to get a fresh resourceVersion"
@@ -2398,7 +2422,7 @@ Kubernetes::REST - A Perl REST Client for the Kubernetes API
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head1 SYNOPSIS
 
@@ -2882,7 +2906,10 @@ Validate an HTTP response. Returns the response on success. On a status code
 C<details> of a Kubernetes C<Status> body, the decoded C<body>, the
 C<context> and the C<response>. It stringifies to the message this method
 croaked with as a plain string before, C<Kubernetes API error (get Pod): 404
-...>, naming the line that called C<check_response>. See L</ERROR HANDLING>.
+...>, naming the line that called C<check_response>. A status of C<599> is not an
+answer of the API server but a transport failure, with the error message in
+the C<body> (see "Error contract" in L<Kubernetes::REST::Role::IO>). See
+L</ERROR HANDLING>.
 
 =head2 inflate_object
 
@@ -2936,6 +2963,56 @@ List resources. Returns an L<IO::K8s::List> object.
 Accepts short class names (C<Pod>) or full class paths. For namespaced resources, pass C<namespace> parameter. Omit C<namespace> to list cluster-scoped resources.
 
 Supports C<labelSelector> and C<fieldSelector> query parameters for server-side filtering.
+
+Three more options are sent as query parameters when given:
+
+=over 4
+
+=item limit
+
+Server-side chunking: at most this many items per response. If more match,
+the list carries a continue token in C<< $list->metadata->continue >>.
+
+=item continue
+
+The token from the previous page's C<< $list->metadata->continue >>. Repeat
+the same selectors and C<limit> on every page.
+
+=item resourceVersion
+
+Read at this version instead of the server's current state.
+
+=back
+
+C<< $list->metadata >> is the L<IO::K8s::List> C<ListMeta>, with
+C<resourceVersion>, C<continue> and C<remainingItemCount>; it is C<undef> when
+the response carries no list metadata. An empty or undefined
+C<continue> marks the last page.
+
+    # Page through a large collection
+    my ($continue, @pods);
+    do {
+        my $page = $api->list('Pod',
+            namespace => 'default',
+            limit     => 500,
+            (defined $continue ? (continue => $continue) : ()),
+        );
+        push @pods, $page->items->@*;
+        $continue = $page->metadata ? $page->metadata->continue : undef;
+    } while (defined $continue && length $continue);
+
+    # List, then watch from exactly that state
+    my $list = $api->list('Pod', namespace => 'default');
+    handle_pod($_) for $list->items->@*;
+    $api->watch('Pod',
+        namespace       => 'default',
+        resourceVersion => $list->metadata->resourceVersion,
+        on_event        => sub { handle_event($_[0]) },
+    );
+
+When paging, the server holds the C<resourceVersion> constant across all pages
+of one list, so the one from the last page is the point to start a
+C<watch> from.
 
 Any other argument croaks before a request is sent, naming it: a misspelt
 option is not ignored. That includes C<name>: the list endpoint selects one
@@ -3350,7 +3427,8 @@ connection after this many seconds.
 =item resourceVersion
 
 Resume watching from a specific resource version - pass the return value of a
-previous C<watch()> call to avoid missing events.
+previous C<watch()> call to avoid missing events. Without one, the server
+starts with synthetic C<ADDED> events for everything that exists.
 
 =item labelSelector
 
@@ -3370,9 +3448,20 @@ Any other argument croaks before a request is sent, naming it: a misspelt
 option is not ignored. That includes C<name>: to watch one object, pass
 C<< fieldSelector => 'metadata.name=NAME' >>.
 
-Returns the last C<resourceVersion> seen. Croaks on 410 Gone once the given
-C<resourceVersion> has expired - re-list to get a fresh one and resume from
-there:
+Every watch requests C<allowWatchBookmarks=true>. C<BOOKMARK> events are never
+passed to C<on_event>; their C<resourceVersion> only advances the resume
+point, so a quiet watch can still be resumed without a C<410>.
+
+Returns the resume point, the C<resourceVersion> to pass to the next call. With
+a start C<resourceVersion> that is the version of the last event or bookmark,
+or the start version if none arrived. Without one it is the version of the
+first C<BOOKMARK> (or of later events); the synthetic initial C<ADDED> events
+do not count, as they are older than the server state and resuming from one
+would replay history. If the server sent no bookmark (older servers) the
+return value is C<undef>: start again without a version, or re-list.
+
+Croaks on 410 Gone once the given C<resourceVersion> has expired - re-list to
+get a fresh one and resume from there:
 
     my $rv;
     while (1) {
@@ -3384,17 +3473,22 @@ there:
             );
         };
         if ($@ && $@ =~ /410 Gone/) {
-            # resourceVersion expired, re-list to get fresh version
+            # resourceVersion expired: re-list, process the items, and
+            # resume from the version the fresh list was read at
             my $list = $api->list('Pod', namespace => 'default');
-            $rv = undef;  # start fresh
+            handle_pod($_) for $list->items->@*;
+            $rv = $list->metadata->resourceVersion;
         }
     }
 
-That croak is a plain string, not a L<Kubernetes::REST::APIError>: the watch
-request itself was answered with C<200>, and the C<410> arrived inside the
-stream as an C<ERROR> event, which C<on_event> has already been given. It
-calls for a re-list, not error handling. An HTTP error status on the watch
-request itself dies with an L<Kubernetes::REST::APIError> as usual.
+That croak is a plain string, not a L<Kubernetes::REST::APIError>. It is raised
+when the stream carries a C<410> as an C<ERROR> event (the request itself was
+answered with C<200>; C<on_event> has already been given that event), and also
+when the watch request itself is answered with HTTP C<410> and a
+C<resourceVersion> was given. Either way it calls for a re-list, not error
+handling. Any other HTTP error status on the watch request, and a C<410> when
+no C<resourceVersion> was given, dies with an L<Kubernetes::REST::APIError>
+as usual.
 
 =head2 log
 
@@ -3541,6 +3635,11 @@ it carries the status for code that has to tell cases apart:
 Besides C<code>, C<is_not_found> and C<is_conflict> it has the C<reason>,
 C<message> and C<details> of the Kubernetes C<Status> body, the decoded
 C<body>, the C<context> and the C<response>.
+
+A C<code> of C<599> is not an answer of the API server but a transport
+failure (unreachable, TLS, timeout, a body that broke off, a missing
+L<LWP::Protocol::https>), and its C<body> holds the error message - see the
+"Error contract" in L<Kubernetes::REST::Role::IO>.
 
 That includes the C</openapi/v2> fetch behind C<schema_for> and
 C<compare_schema>, and the discovery documents (C<GET /api>, C<GET /apis>,

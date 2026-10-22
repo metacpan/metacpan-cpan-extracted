@@ -8,7 +8,7 @@ use WWW::Hetzner::Storage;
 use WWW::Hetzner::Robot;
 use namespace::clean;
 
-our $VERSION = '0.101';
+our $VERSION = '0.102';
 
 
 has cloud => (
@@ -44,7 +44,7 @@ WWW::Hetzner - Perl client for Hetzner APIs (Cloud, Storage, Robot)
 
 =head1 VERSION
 
-version 0.101
+version 0.102
 
 =head1 SYNOPSIS
 
@@ -207,6 +207,8 @@ Returns a L<WWW::Hetzner::Storage> instance for the Storage Box API.
 =item * L<WWW::Hetzner::Cloud::Datacenter> - Datacenter object
 
 =item * L<WWW::Hetzner::Cloud::Pricing> - Price list object
+
+=item * L<WWW::Hetzner::Cloud::Costs> - Current running cost of a project
 
 =back
 

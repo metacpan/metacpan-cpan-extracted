@@ -1,7 +1,7 @@
 package WWW::Hetzner::Cloud::API::RRSets;
 # ABSTRACT: Hetzner Cloud DNS RRSets (Records) API
 
-our $VERSION = '0.101';
+our $VERSION = '0.102';
 
 use Moo;
 with 'WWW::Hetzner::Role::Pagination';
@@ -201,7 +201,7 @@ WWW::Hetzner::Cloud::API::RRSets - Hetzner Cloud DNS RRSets (Records) API
 
 =head1 VERSION
 
-version 0.101
+version 0.102
 
 =head1 SYNOPSIS
 

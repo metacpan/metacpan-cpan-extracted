@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1alpha1::GeneratorStateStatus;
 # ABSTRACT: GeneratorStateStatus defines the observed state of a generator state resource.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s conditions => ['+IO::K8s::ExternalSecrets::V1alpha1::GeneratorStateStatusCondition'];
@@ -20,7 +20,7 @@ IO::K8s::ExternalSecrets::V1alpha1::GeneratorStateStatus - GeneratorStateStatus 
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 conditions
 

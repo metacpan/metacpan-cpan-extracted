@@ -1,7 +1,7 @@
 # ABSTRACT: Rex filesystem operations via exec channels (no SFTP)
 
 package Rex::Interface::Fs::LibSSH;
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 use strict;
 use warnings;
 
@@ -104,9 +104,55 @@ sub glob {
         if defined $pattern
         && $pattern =~ /[\0';|&<>`$()\n\r\\]/;
 
-    my $out = $self->_run("echo $pattern");
-    chomp $out;
-    return split /\s+/, $out;
+    # Like perl's glob (stock Rex::Interface::Fs::SSH): braces expand
+    # locally and every alternative is returned; only an alternative with
+    # a wildcard (or a ~) goes to the remote shell, where unmatched ones
+    # yield nothing. A plain path is returned as given, existing or not.
+    my @result;
+    for my $alt ( _brace_expand($pattern) ) {
+        if ( $alt !~ /[*?\[~]/ ) {
+            push @result, $alt;
+            next;
+        }
+
+        # Blanks stay part of one word (backslash itself was rejected
+        # above, so this cannot unescape anything). The shell leaves
+        # unmatched wildcards verbatim, hence the -e/-L test; names are
+        # NUL-separated so whitespace in file names survives.
+        ( my $word = $alt ) =~ s/([ \t])/\\$1/g;
+        my $out = $self->_run(
+            qq{for f in $word; do if [ -e "\$f" ] || [ -L "\$f" ]; then printf '%s\\0' "\$f"; fi; done}
+        );
+        push @result, grep { length } split /\0/, $out
+            if defined $out && length $out;
+    }
+    return @result;
+}
+
+# Expand the first {a,b,...} group (nested groups recurse); an unbalanced
+# or comma-less group is literal, as in perl's glob.
+sub _brace_expand {
+    my ($str) = @_;
+    my $start = index $str, '{';
+    return $str if $start < 0;
+
+    my ( $depth, @comma, $end ) = (0);
+    for my $i ( $start .. length($str) - 1 ) {
+        my $c = substr $str, $i, 1;
+        if    ( $c eq '{' ) { $depth++ }
+        elsif ( $c eq '}' ) { if ( --$depth == 0 ) { $end = $i; last } }
+        elsif ( $c eq ',' && $depth == 1 ) { push @comma, $i }
+    }
+    return $str if !defined $end || !@comma;
+
+    my ( $pre, $post ) = ( substr( $str, 0, $start ), substr( $str, $end + 1 ) );
+    my @alts;
+    my $from = $start + 1;
+    for my $to ( @comma, $end ) {
+        push @alts, substr $str, $from, $to - $from;
+        $from = $to + 1;
+    }
+    return map { _brace_expand( $pre . $_ . $post ) } @alts;
 }
 
 sub mkdir {
@@ -204,7 +250,7 @@ Rex::Interface::Fs::LibSSH - Rex filesystem operations via exec channels (no SFT
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 DESCRIPTION
 

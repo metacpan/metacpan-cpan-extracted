@@ -42,6 +42,21 @@ static SV *ph_mkobj(pTHX_ void *p, const char *cls) {
  * SvPVbyte, dying tied element, OOM) can't longjmp past the free and leak the builder. */
 static void ph_builder_free_x(pTHX_ void *p) { ph_builder_free((PhBuilder*)p); }
 
+static const char *ph_path(pTHX_ SV *sv, int copy_path, uint8_t *utf8) {
+    STRLEN len;
+    const char *p;
+    if (utf8 && SvROK(sv)) {
+        sv = sv_2mortal(newSVsv(sv));
+        p = SvPV_force(sv, len);
+    } else p = SvPV(sv, len);
+    if (memchr(p, '\0', len)) croak("path contains NUL");
+    if (utf8) *utf8 = SvUTF8(sv) ? 1 : 0;
+    if (!copy_path) return p;
+    char *copy = savepvn(p, len);
+    SAVEFREEPV(copy);
+    return copy;
+}
+
 MODULE = Data::PerfectHash::Shared  PACKAGE = Data::PerfectHash::Shared
 PROTOTYPES: DISABLE
 
@@ -130,14 +145,12 @@ DESTROY(self)
 void
 build(self, path, ...)
     SV *self
-    const char *path
+    SV *path
   PREINIT:
     BEXTRACT(self);
     mode_t mode = 0600; char err[256];
   CODE:
-    /* F2: copy `path` before the option loop's magic (SvPV_nolen/SvUV) can
-     * reassign the caller's variable and invalidate the pointer. */
-    char *psafe = savepvn(path, strlen(path)); SAVEFREEPV(psafe);
+    const char *psafe = ph_path(aTHX_ path, 1, NULL);
     if ((items - 2) % 2) croak("build: odd number of options");
     for (int i=2;i+1<items;i+=2) {
         const char *key = SvPV_nolen(ST(i));
@@ -154,13 +167,13 @@ MODULE = Data::PerfectHash::Shared  PACKAGE = Data::PerfectHash::Shared
 SV *
 build_int(class, path, ids)
     const char *class
-    const char *path
+    SV *path
     SV *ids
   PREINIT:
     char err[256];
   CODE:
-    /* F2: stable copy of path before element magic (SvIV) can invalidate it. */
-    char *psafe = savepvn(path, strlen(path)); SAVEFREEPV(psafe);
+    const char *psafe = ph_path(aTHX_ path, 1, NULL);
+    SvGETMAGIC(ids);
     if (!SvROK(ids)||SvTYPE(SvRV(ids))!=SVt_PVAV) croak("build_int: expected an arrayref");
     { AV *av=(AV*)SvRV(ids); sv_2mortal(SvREFCNT_inc((SV*)av));   /* pin: element magic cannot free it mid-loop */
       PhBuilder *b=ph_builder_new(PH_TYPE_INT);
@@ -175,13 +188,13 @@ build_int(class, path, ids)
 SV *
 build_str(class, path, strs)
     const char *class
-    const char *path
+    SV *path
     SV *strs
   PREINIT:
     char err[256];
   CODE:
-    /* F2: stable copy of path before element magic (SvPVbyte) can invalidate it. */
-    char *psafe = savepvn(path, strlen(path)); SAVEFREEPV(psafe);
+    const char *psafe = ph_path(aTHX_ path, 1, NULL);
+    SvGETMAGIC(strs);
     if (!SvROK(strs)||SvTYPE(SvRV(strs))!=SVt_PVAV) croak("build_str: expected an arrayref");
     { AV *av=(AV*)SvRV(strs); sv_2mortal(SvREFCNT_inc((SV*)av));   /* pin: element magic cannot free it mid-loop */
       PhBuilder *b=ph_builder_new(PH_TYPE_STR);
@@ -196,12 +209,14 @@ build_str(class, path, strs)
 SV *
 load(class, path)
     const char *class
-    const char *path
+    SV *path
   PREINIT:
-    char err[256]; PhSet *s;
+    char err[256]; PhSet *s; uint8_t utf8;
   CODE:
-    s = ph_open(path, err, sizeof err);
-    if (!s) croak("Data::PerfectHash::Shared->load(%s): %s", path, err);
+    const char *psafe = ph_path(aTHX_ path, 0, &utf8);
+    s = ph_open(psafe, err, sizeof err);
+    if (!s) croak("Data::PerfectHash::Shared->load(%s): %s", psafe, err);
+    s->path_utf8 = utf8;
     RETVAL = ph_mkobj(aTHX_ s, "Data::PerfectHash::Shared");
   OUTPUT:
     RETVAL
@@ -261,13 +276,14 @@ each_key(self, cb)
         SREEXTRACT(self);   /* the callback ran arbitrary Perl */
     }
 
-const char *
+SV *
 path(self)
     SV *self
   PREINIT:
     SEXTRACT(self);
   CODE:
-    RETVAL = s->path;
+    RETVAL = newSVpv(s->path, 0);
+    if (s->path_utf8) SvUTF8_on(RETVAL);
   OUTPUT:
     RETVAL
 

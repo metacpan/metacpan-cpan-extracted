@@ -63,7 +63,7 @@ WriteMakefile(
         'Carp'           => 0,
         'File::Basename' => 0,
         'File::Spec'     => 0,
-        'Net::QUIC'      => '0.04',
+        'Net::QUIC'      => '0.05',
         'Scalar::Util'    => 0,
         'Time::HiRes'     => 0,
         'Uniform::HTTP'    => '0.06',

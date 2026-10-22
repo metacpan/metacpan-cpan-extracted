@@ -10,6 +10,7 @@
 .claude/skills/io-k8s-core/SKILL.md
 .claude/skills/perl-io-k8s-kubernetes-classes/SKILL.md
 .gitignore
+.worktreeinclude
 CLAUDE.md
 Changes
 LICENSE
@@ -1990,6 +1991,7 @@ misc/agent-context/.claude/skilletor.lock.json
 misc/agent-context/.claude/skills/getty-git-commit-style/SKILL.md
 misc/agent-context/.claude/skills/getty-git-usage/SKILL.md
 misc/agent-context/.claude/skills/getty-perl-core/SKILL.md
+misc/agent-context/.claude/skills/getty-perl-core/references/dbic.md
 misc/agent-context/.claude/skills/getty-perl-moo/SKILL.md
 misc/agent-context/.claude/skills/getty-perl-pod/SKILL.md
 misc/agent-context/.claude/skills/getty-perl-release-author-getty/SKILL.md
@@ -2070,7 +2072,14 @@ t/150_k188_yaml_string_quoting.t
 t/151_k191_typed_maps.t
 t/152_k191_no_legacy_ref_warning.t
 t/153_k196_number_wire_type.t
+t/154_k198_yaml11_load.t
+t/155_k199_save_utf8.t
+t/156_k200_keyword_property_names.t
+t/157_k195_crd_value_options.t
+t/158_k192_audit_descends_object_maps.t
+t/159_k193_no_legacy_map_declarations.t
 t/15_role_specbuilder.t
+t/160_k194_hashref_arrayref.t
 t/16_role_netpol.t
 t/17_role_routable.t
 t/18_role_certmanaged.t

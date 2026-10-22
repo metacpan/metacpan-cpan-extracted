@@ -1,6 +1,6 @@
 package IO::K8s::CertManager::V1::IssuerCondition;
 # ABSTRACT: IssuerCondition contains condition information for an Issuer.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s lastTransitionTime => Time;
@@ -30,7 +30,7 @@ IO::K8s::CertManager::V1::IssuerCondition - IssuerCondition contains condition i
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 lastTransitionTime
 

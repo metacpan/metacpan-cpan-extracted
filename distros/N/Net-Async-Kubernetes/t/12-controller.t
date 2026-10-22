@@ -67,7 +67,7 @@ subtest 'controller deduplicates queued events and reconciles latest state' => s
 
     is(scalar @reconciled, 1, 'duplicate queued key reconciled once');
     is($reconciled[0]{resource}, 'Pod', 'resource passed to reconcile');
-    is($reconciled[0]{key}, 'default/pod-1', 'default key derived from namespace/name');
+    is($reconciled[0]{key}, 'Pod:default/pod-1', 'default key derived from namespace/name');
     is($reconciled[0]{event_type}, 'MODIFIED', 'latest event wins for queued key');
 };
 
@@ -139,7 +139,7 @@ subtest 'reconcile context does not keep the client alive' => sub {
         $loop->run;
         $loop->unwatch_time($guard);
 
-        is_deeply(\@keys, ['default/pod-ctx'], 'reconcile ran once');
+        is_deeply(\@keys, ['Pod:default/pod-ctx'], 'reconcile ran once');
 
         # the ctx stays behind in the controller entries after the reconcile
         is(scalar keys %{ $controller->{entries} }, 1,
@@ -247,7 +247,7 @@ subtest 'watch ERROR events reach the controller hook' => sub {
     is($errors[0][0]{code}, 403, 'raw status hashref passed to the hook');
     is($errors[0][1]{resource}, 'Pod', 'error context names the watched resource');
     is($errors[0][1]{controller}, $controller, 'error context carries the controller');
-    is_deeply(\@reconciled, ['default/pod-err'], 'ERROR event stays out of the workqueue');
+    is_deeply(\@reconciled, ['Pod:default/pod-err'], 'ERROR event stays out of the workqueue');
 };
 
 subtest 'per watch on_error keeps precedence over the controller hook' => sub {
@@ -283,7 +283,7 @@ subtest 'per watch on_error keeps precedence over the controller hook' => sub {
     is(scalar @spec_errors, 1, 'watch level on_error received the ERROR event');
     is($spec_errors[0]{code}, 403, 'watch level on_error gets the raw status hashref');
     is(scalar @hook_errors, 0, 'controller hook not called when the watch handles errors');
-    is_deeply(\@reconciled, ['default/pod-err'], 'reconcile still runs for the object event');
+    is_deeply(\@reconciled, ['Pod:default/pod-err'], 'reconcile still runs for the object event');
 };
 
 subtest 'controller patches status subresource' => sub {
@@ -311,6 +311,68 @@ subtest 'controller patches status subresource' => sub {
     is($req->{method}, 'PATCH', 'used PATCH for status update');
     like($req->{path}, qr{/api/v1/namespaces/default/pods/pod-1/status$}, 'patched status subresource path');
     like($req->{content}, qr/"status"/, 'request contains status payload');
+};
+
+subtest 'same namespace/name across resources: own key each, shared only via key_for' => sub {
+    # The default key carries the resource (k80): ConfigMap default/web and
+    # Service default/web are two keys, two reconciles, each with its own
+    # object. key_for without the resource coalesces them on purpose.
+    my $run = sub {
+        my (%key_for) = @_;
+        my $kube = make_kube();
+        MockTransport::mock_watch_events('/api/v1/namespaces/default/configmaps', []);
+        MockTransport::mock_watch_events('/api/v1/namespaces/default/services', []);
+
+        my @reconciled;
+        my $controller;
+        $controller = Net::Async::Kubernetes::Controller->new(
+            kube => $kube,
+            on_reconcile => sub {
+                my ($ctx) = @_;
+                push @reconciled, {
+                    resource   => $ctx->{resource},
+                    event_type => $ctx->{event_type},
+                    kind       => $ctx->{object}->kind,
+                    key        => $ctx->{key},
+                };
+                return;
+            },
+        );
+        $controller->watch_resource($_, namespace => 'default', %key_for)
+            for qw(ConfigMap Service);
+        $loop->add($controller);
+
+        my ($cm_spec, $svc_spec) = @{ $controller->{watch_specs} };
+        my $meta = { name => 'web', namespace => 'default' };
+        $controller->_enqueue_event($cm_spec, 'ADDED',
+            $kube->new_object(ConfigMap => { metadata => $meta }));
+        $controller->_enqueue_event($svc_spec, 'MODIFIED',
+            $kube->new_object(Service => { metadata => $meta }));
+
+        $loop->watch_time(after => 0.5, code => sub { $loop->stop });
+        $loop->run;
+        $controller->stop;
+        $loop->remove($controller);
+        return \@reconciled;
+    };
+
+    my $split = $run->();
+    is(scalar @$split, 2, 'default key: one reconcile per resource');
+    is_deeply(
+        [ sort map { $_->{key}.'|'.$_->{kind}.'|'.$_->{event_type} } @$split ],
+        [ 'ConfigMap:default/web|ConfigMap|ADDED', 'Service:default/web|Service|MODIFIED' ],
+        'default key: Resource:namespace/name, each reconcile with its own object',
+    );
+
+    my $merged = $run->(key_for => sub {
+        my ($object, $spec) = @_;
+        return $object->metadata->namespace.'/'.$object->metadata->name;
+    });
+    is(scalar @$merged, 1, 'key_for without the resource: one reconcile for both');
+    is_deeply($merged->[0], {
+        resource => 'Service', event_type => 'MODIFIED',
+        kind => 'Service', key => 'default/web',
+    }, 'key_for without the resource: ctx carries only the last event');
 };
 
 done_testing;

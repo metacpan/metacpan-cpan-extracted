@@ -26,6 +26,7 @@
 #include <errno.h>
 #include <time.h>
 #include <limits.h>
+#include <float.h>
 #include <signal.h>
 #include <stdio.h>
 #include <math.h>
@@ -827,7 +828,7 @@ static HistHandle *hist_create(const char *path, int64_t lowest, int64_t highest
                 }
                 HIST_ERR("invalid histogram file"); munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
             }
-            if (((HistHeader *)base)->sealed) {
+            if (__atomic_load_n(&((HistHeader *)base)->sealed, __ATOMIC_ACQUIRE)) {
                 HIST_ERR("%s is frozen (read-only); open it with new_readonly", path);
                 munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
             }
@@ -878,7 +879,7 @@ static HistHandle *hist_open_fd(int fd, char *errbuf) {
     if (!hist_validate_header((HistHeader *)base, (uint64_t)st.st_size)) {
         HIST_ERR("invalid histogram table"); munmap(base, ms); return NULL;
     }
-    if (((HistHeader *)base)->sealed) {
+    if (__atomic_load_n(&((HistHeader *)base)->sealed, __ATOMIC_ACQUIRE)) {
         HIST_ERR("this histogram is frozen (read-only); open it with new_readonly");
         munmap(base, ms); return NULL;
     }
@@ -938,7 +939,7 @@ static HistHandle *hist_open_readonly(const char *path, char *errbuf) {
     if (!hist_validate_header((HistHeader *)base, (uint64_t)st.st_size)) {
         HIST_ERR("%s: invalid histogram file", path); munmap(base, ms); return NULL;
     }
-    if (!((HistHeader *)base)->sealed) {
+    if (!__atomic_load_n(&((HistHeader *)base)->sealed, __ATOMIC_ACQUIRE)) {
         HIST_ERR("%s is not frozen: call ->freeze on the producer before opening read-only", path);
         munmap(base, ms); return NULL;
     }
@@ -955,7 +956,7 @@ static HistHandle *hist_open_readonly(const char *path, char *errbuf) {
  * refused. */
 static int hist_freeze(HistHandle *h) {
     hist_rwlock_wrlock(h);
-    h->hdr->sealed = 1;
+    __atomic_store_n(&h->hdr->sealed, 1, __ATOMIC_RELEASE);
     hist_rwlock_wrunlock(h);
     if (h->path || h->backing_fd >= 0) return hist_msync(h);  /* durability for file/memfd-backed */
     return 0;   /* anonymous: the seal lives in shared memory (visible to forks); nothing to flush */
@@ -1056,7 +1057,9 @@ static void hist_record_locked(HistHandle *h, int64_t value, int64_t count) {
 static int64_t hist_value_at_percentile_locked(HistHandle *h, double p) {
     int64_t total = h->hdr->total_count;
     if (total == 0) return 0;
-    int64_t want = (int64_t)ceil((p / 100.0) * (double)total);
+    /* Allow for floating-point roundoff at integral ranks. */
+    double rank = p * (double)total / 100.0;
+    int64_t want = p >= 100.0 ? total : (int64_t)ceil(rank * (1.0 - DBL_EPSILON));
     if (want < 1) want = 1;
     if (want > total) want = total;
     int64_t *counts = hist_counts(h);

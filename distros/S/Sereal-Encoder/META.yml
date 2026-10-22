@@ -1,14 +1,14 @@
 ---
 abstract: 'Fast, compact, powerful binary serialization'
 author:
-  - 'Steffen Mueller <smueller@cpan.org>, Yves Orton <yves@cpan.org>'
+  - 'Steffen Mueller <cpan@steffen-mueller.net>, Yves Orton <yves@cpan.org>'
 build_requires:
   Data::Dumper: '0'
   ExtUtils::ParseXS: '2.21'
   File::Spec: '0'
   Hash::Util: '0'
   Scalar::Util: '0'
-  Sereal::Decoder: '5.01'
+  Sereal::Decoder: '5.011'
   Test::Deep: '0'
   Test::Differences: '0'
   Test::LongString: '0'
@@ -29,11 +29,11 @@ no_index:
     - t
     - inc
 requires:
-  Sereal::Decoder: '5.01'
+  Sereal::Decoder: '5.011'
   XSLoader: '0'
-  perl: '5.008'
+  perl: '5.014'
 resources:
   bugtracker: https://github.com/Sereal/Sereal/issues
   repository: git://github.com/Sereal/Sereal.git
-version: '5.010'
+version: '5.011'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

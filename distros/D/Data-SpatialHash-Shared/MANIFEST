@@ -71,6 +71,7 @@ xt/mpmc_fuzz.t
 xt/perf.t
 xt/pod.t
 xt/pool_exhaustion.t
+xt/query_many_leak.t
 xt/reader_starvation_guard.t
 xt/slotless_reader_recovery.t
 xt/stress.t

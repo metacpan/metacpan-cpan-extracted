@@ -396,7 +396,6 @@ WriteMakefile(
 	PREREQ_PM => {
 		'Carp' => 0,
 		# 'BerkeleyDB' => 0,
-		'Config::Auto' => 0,
 		'Cwd' => 0,
 		'Data::Validate::URI' => 0,
 		'DB_File' => 0,
@@ -406,6 +405,7 @@ WriteMakefile(
 		'DBD::CSV' => 0,
 		'DBD::SQLite' => 0,
 		'Encode' => 0,
+		'Error' => 0,	# Geo::Coder::Free::Utils and Config use Error::Simple
 		'Geo::Coder::Abbreviations' => 0.03,
 		'Geo::Location::Predicate' => 0.01,	# the location rule, a distribution of its own since 0.48
 		'Geo::Hash' => 0,

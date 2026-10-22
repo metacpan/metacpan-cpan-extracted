@@ -3,6 +3,7 @@ requires 'Moo';
 requires 'MooX::Cmd';
 requires 'MooX::Options';
 requires 'LWP::UserAgent';
+requires 'LWP::Protocol::https';
 requires 'JSON::MaybeXS';
 requires 'URI';
 requires 'HTTP::Request';

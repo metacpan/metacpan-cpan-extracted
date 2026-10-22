@@ -110,6 +110,26 @@ Cloud resource), `t/robot_*.t` (each Robot area), `t/io.t` (HTTPRequest / HTTPRe
 Role::IO / LWPIO / MockIO), `t/logging.t` (Log::Any), `t/integration_cloud.t`. Run the
 whole suite with `prove -lr t/` (recursive — `t/lib/` holds the harness, not tests).
 
+## Hazards — the seams that break silently
+
+**The IO seam is load-bearing and shared.** `Role::IO`'s `call($req)` is the single
+chokepoint every request passes through; both `Net::Async::Hetzner` and the test mock
+plug into it. Code that reaches past it to LWP directly passes its own tests and
+silently breaks the async client and the mock harness at once — the wrong thing looks
+right. Always go through `_build_request` → `io->call` → `_parse_response`.
+
+**Tests must never hit the network.** The mock harness (`Test::WWW::Hetzner::MockIO` in
+`t/lib/`) exists so no test needs a real token. A "quick live check" against a real
+Hetzner account can create or destroy real infrastructure — extend a fixture instead.
+
+**Read the sibling resource before writing a new one.** `Servers` is the reference
+implementation of the API-controller / entity / CLI-command trio; "looks orthogonal" is
+dangerous — copy the shape of the resource that already does the same thing.
+
+**Changing the request/response contract is a paired change.** `_build_request` and
+`_parse_response` are reused by `Net::Async::Hetzner`; a change to their shape is a
+ticket on that repo's board, never a silent cross-repo edit.
+
 ## Related
 
 - `p5-net-async-hetzner` — `Net::Async::Hetzner`, the async client that reuses this

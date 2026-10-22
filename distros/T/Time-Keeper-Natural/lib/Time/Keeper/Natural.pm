@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 use XSLoader;
 XSLoader::load('Time::Keeper::Natural', $VERSION);
@@ -27,7 +27,7 @@ Time::Keeper::Natural - the words people use for a time, read in every locale
 
 =head1 VERSION
 
-Version 0.06
+Version 0.07
 
 =head1 SYNOPSIS
 

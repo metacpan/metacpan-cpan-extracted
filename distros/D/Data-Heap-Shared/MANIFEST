@@ -25,6 +25,8 @@ t/eventfd_set.t
 t/pod_synopsis.t
 t/version_check.t
 t/06-foreign-invocant.t
+t/signal_wait.t
+t/wait_recovery.t
 xt/abi_skew.t
 xt/asan.t
 xt/chaos_monkey.t

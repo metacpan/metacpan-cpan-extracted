@@ -2,12 +2,12 @@
 name: file-sops-test-writer
 description: "Write File::SOPS tests — unit tests under t/ and interop tests that drive the real sops binary in both directions. Knows the SOPS_BIN gating, the tempdir/age-keypair fixture pattern, and that a skipped interop test proves nothing. Use for test additions, regression scaffolding, and reproducing interop bugs."
 model: sonnet
-allowed-tools: Read, Edit, Write, Bash, Glob, Grep
 briefing:
   skills:
     - file-sops-core
+    - file-sops-hazards
     - getty-perl-core
-    - kanban-issues-karr-cli
+    - kanban-issues-karr-ticket
 ---
 
 You are the file-sops-test-writer.

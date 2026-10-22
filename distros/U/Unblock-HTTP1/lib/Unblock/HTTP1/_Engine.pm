@@ -8,6 +8,21 @@ use Scalar::Util qw(weaken);
 
 sub _init_engine {
     my ($self, %option) = @_;
+    $self->{receive_body} = exists $option{receive_body}
+        ? delete $option{receive_body} : 'stream';
+    croak 'new(): receive_body must be buffered or stream'
+        unless defined($self->{receive_body}) && !ref($self->{receive_body})
+            && $self->{receive_body} =~ /\A(?:buffered|stream)\z/;
+    $self->{max_buffered_body_bytes} = exists $option{max_buffered_body_bytes}
+        ? delete $option{max_buffered_body_bytes} : 64 * 1024 * 1024;
+    croak 'new(): max_buffered_body_bytes must be a positive integer'
+        unless defined($self->{max_buffered_body_bytes})
+            && !ref($self->{max_buffered_body_bytes})
+            && $self->{max_buffered_body_bytes} =~ /\A[0-9]+\z/
+            && $self->{max_buffered_body_bytes} > 0
+            && $self->{max_buffered_body_bytes} <= (~0);
+    croak 'new(): buffered reception cannot be combined with on_body'
+        if $self->{receive_body} eq 'buffered' && $self->{callbacks}{on_body};
     my $transport = delete $option{transport};
     if (defined $transport) {
         croak 'new(): transport must be an object' unless ref $transport;
@@ -314,8 +329,9 @@ sub _transport_abort {
     $self->{transport_aborted} = 1;
     $self->{output} = '';
     $self->{closed} = 1;
-    $self->{switch_notice} = undef;
+    my $notice = delete $self->{switch_notice};
     $self->_fail_all($reason);
+    $notice->[0]->_notify_finish if $notice;
     if (my $host = $self->{transport}) {
         eval { $host->unblock_abort($reason) };
     }

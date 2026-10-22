@@ -1,5 +1,5 @@
 package Kubernetes::REST::Networking;
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 # ABSTRACT: Compatibility helper for deprecated v0 Networking calls
 use Moo;
 extends 'Kubernetes::REST::V0Group';
@@ -20,7 +20,7 @@ Kubernetes::REST::Networking - Compatibility helper for deprecated v0 Networking
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head1 SYNOPSIS
 

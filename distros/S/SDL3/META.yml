@@ -5,7 +5,7 @@ author:
   - 'Sanko Robinson'
 build_requires:
   Affix: v1.2.7
-  Alien::SDL3: '0'
+  Alien::SDL3: v3.4.22
   IPC::Cmd: '0'
   TAP::Harness::Env: '0'
   Test2::Plugin::UTF8: '0'
@@ -26,7 +26,7 @@ configure_requires:
   Module::Build::Tiny: '0'
   Path::Tiny: '0.144'
 dynamic_config: 0
-generated_by: 'App::mii v1.0.0, CPAN::Meta::Converter version 2.150013'
+generated_by: 'App::mii v1.0.0, CPAN::Meta::Converter version 2.150015'
 keywords:
   - ffi
   - library
@@ -52,19 +52,19 @@ optional_features:
 provides:
   SDL3:
     file: lib/SDL3.pm
-    version: v0.0.6
+    version: v0.0.7
   SDL3::Image:
     file: lib/SDL3/Image.pm
-    version: v0.0.6
+    version: v0.0.7
   SDL3::Mixer:
     file: lib/SDL3/Mixer.pm
-    version: v0.0.6
+    version: v0.0.7
   SDL3::TTF:
     file: lib/SDL3/TTF.pm
-    version: v0.0.6
+    version: v0.0.7
 requires:
   Affix: v1.2.7
-  Alien::SDL3: '0'
+  Alien::SDL3: v3.4.22
   Carp: '0'
   Data::Dump: '0'
   perl: v5.40.0
@@ -73,7 +73,7 @@ resources:
   homepage: https://github.com/Perl-SDL3/SDL3.pm
   license: http://www.perlfoundation.org/artistic_license_2_0
   repository: git://github.com/Perl-SDL3/SDL3.pm.git
-version: v0.0.6
+version: v0.0.7
 x_help_wanted:
   - Tester
   - Documenter

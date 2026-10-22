@@ -20,7 +20,8 @@ sub _request_from_validated_head {
         | Uniform::HTTP::FastPath::FLAG_TARGET_EXACT();
 
     if ($head->{body_mode} eq 'none') {
-        $flags |= Uniform::HTTP::FastPath::FLAG_COMPLETE();
+        $flags |= Uniform::HTTP::FastPath::FLAG_COMPLETE()
+            | Uniform::HTTP::FastPath::FLAG_HAS_BUFFERED_BODY();
     } else {
         $flags |=
             Uniform::HTTP::FastPath::FLAG_MUTABLE()
@@ -42,7 +43,7 @@ sub _request_from_validated_head {
         undef,
         $head->{headers},
         [],
-        undef,
+        $head->{body_mode} eq 'none' ? '' : undef,
     ]);
 }
 

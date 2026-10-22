@@ -15,26 +15,28 @@ Devel::PPPort::WriteFile();
 
 my (@xpk_flags, $xpk_define);
 eval {
+    require XS::Parse::Keyword;
+    XS::Parse::Keyword->VERSION('0.50');
     require XS::Parse::Keyword::Builder;
     @xpk_flags = XS::Parse::Keyword::Builder->extra_compiler_flags;
     $xpk_define = '-DHAVE_XS_PARSE_KEYWORD';
 };
 if ($@) {
-    warn "XS::Parse::Keyword not found; keyword API will not be available\n";
+    warn "XS::Parse::Keyword 0.50 or newer not available; keyword API will not be available\n";
     $xpk_define = '';
 }
 
 WriteMakefile(
     NAME              => 'Data::Queue::Shared',
     VERSION_FROM      => 'lib/Data/Queue/Shared.pm',
-    PREREQ_PM         => { 'XS::Parse::Keyword' => '0.40' },
+    PREREQ_PM         => { 'XS::Parse::Keyword' => '0.50' },
     TEST_REQUIRES     => {
         'Test::More' => 0,
     },
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => 0,
         'Devel::PPPort' => 0,
-        'XS::Parse::Keyword' => '0.40',
+        'XS::Parse::Keyword' => '0.50',
     },
     ABSTRACT_FROM     => 'lib/Data/Queue/Shared.pm',
     AUTHOR            => 'vividsnow',

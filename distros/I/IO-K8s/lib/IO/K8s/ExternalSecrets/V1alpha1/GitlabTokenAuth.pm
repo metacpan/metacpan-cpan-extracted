@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1alpha1::GitlabTokenAuth;
 # ABSTRACT: Auth configures how ESO authenticates with the GitLab API.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s token => '+IO::K8s::ExternalSecrets::V1alpha1::GitlabDeployTokenSecretRef', { required => 'schema' };
@@ -20,7 +20,7 @@ IO::K8s::ExternalSecrets::V1alpha1::GitlabTokenAuth - Auth configures how ESO au
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 token
 

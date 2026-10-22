@@ -100,9 +100,10 @@ sub helper { 'helped' }
 sub greet  { 'hi from ' . $_[0]{n} }
 my $obj = bless { n => 'obj' }, __PACKAGE__;
 
-ConfigMap {
-    name        => 'with-code',
-    annotations => {
+ControllerRevision {
+    name     => 'with-code',
+    revision => 1,
+    data     => {
         cb    => sub { helper() . '-' . (++$count) },
         named => \&helper,
         obj   => $obj,
@@ -111,7 +112,7 @@ ConfigMap {
 PK8S
     my ($cm) = @{ $k8s->load($file) };
     is_deeply([ loader_packages() ], [], 'package removed');
-    my $ann = $cm->metadata->annotations;
+    my $ann = $cm->data;
     is($ann->{cb}->(),    'helped-42', 'closure calls the manifest sub and its package variable');
     is($ann->{cb}->(),    'helped-43', 'and keeps its state');
     is($ann->{named}->(), 'helped',    'a reference to a manifest sub still runs');

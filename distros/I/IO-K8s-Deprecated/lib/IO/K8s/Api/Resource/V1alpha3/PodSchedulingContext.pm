@@ -4,7 +4,7 @@ package IO::K8s::Api::Resource::V1alpha3::PodSchedulingContext;
 use strict;
 use warnings;
 
-our $VERSION = '1.105';
+our $VERSION = '1.111';
 
 die __PACKAGE__ . " has been removed. It was part of Kubernetes' \"classic\""
   . " Dynamic Resource Allocation (DRA) control-plane-controller allocation"
@@ -33,7 +33,7 @@ IO::K8s::Api::Resource::V1alpha3::PodSchedulingContext - REMOVED -- classic DRA 
 
 =head1 VERSION
 
-version 1.105
+version 1.111
 
 =head1 DESCRIPTION
 

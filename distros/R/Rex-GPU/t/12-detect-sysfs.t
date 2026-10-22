@@ -33,9 +33,9 @@ use lib "$Bin/lib";
 #     hiding a real card, and an all-virtual host logs the same "skipping"
 #     line as an all-virtual lspci host, empty arrays;
 #   * other devices: PCI domains other than 0000: are reported, sorted after
-#     it; an AMD GPU decodes with compute 0; a device of class 0380 and an
-#     ASPEED [1a03] VGA are silently ignored -- today's behaviour (0380 is
-#     card k75; not judged here);
+#     it; an AMD GPU decodes with compute 0; an AMD device at class 0380 is
+#     listed too, an NVIDIA one there and an ASPEED [1a03] VGA are silently
+#     ignored (card k75);
 #   * dies before anything is installed or changed -- never "no GPU found" --
 #     when the read exits non-zero, when a line has fewer than six fields,
 #     and when ANY device's class or vendor (a NIC included) is unreadable or
@@ -105,6 +105,7 @@ my %DEV = (
   virtio           => '0000:0b:00.0 0x030000 0x1af4 0x1050 0x1af4 0x1100',
   amd              => '0000:0c:00.0 0x030000 0x1002 0x744c 0x0000 0x0000',
   class_0380       => '0000:0d:00.0 0x038000 0x10de 0x2204 0x1043 0x87b5',
+  amd_instinct     => '0000:0f:00.0 0x038000 0x1002 0x74a1 0x1002 0x74a1',
   aspeed           => '0000:0e:00.0 0x030000 0x1a03 0x2000 0x0000 0x0000',
   domain1          => '0001:00:00.0 0x030000 0x10de 0x2205 0x0000 0x0000',
   domain2          => '10000:00:00.0 0x030000 0x10de 0x2206 0x0000 0x0000'
@@ -281,12 +282,17 @@ subtest 'other devices: domains, AMD, class 0380 and ASPEED ignored (today\'s be
     name => 'AMD GPU [1002:744c]', vendor => 'amd', pci_class => '0300', compute => 0
   }, 'AMD device decodes with compute 0');
 
-  # class 0380 is not a display class this code recognises at all (0300/0302
-  # only) -- an NVIDIA-vendor device there is dropped just like anything
-  # else outside those two classes. Not a judgement on whether it should be
-  # (card k75); pinning today's behaviour only.
+  # class 0380 counts for vendor 1002 only (karr k75): an NVIDIA-vendor
+  # device there is still dropped, an AMD Instinct is listed, compute 0.
   my ( $c0380 ) = sysfs_detect($DEV{class_0380});
   is_deeply($c0380->{nvidia}, [], 'class 0380 NVIDIA-vendor device => ignored, not reported');
+  is_deeply($c0380->{amd}, [], '... and not as amd either');
+
+  my ( $mi ) = sysfs_detect($DEV{amd_instinct});
+  is_deeply($mi->{amd}, [ {
+    name => 'AMD GPU [1002:74a1]', vendor => 'amd', pci_class => '0380', compute => 0
+  } ], 'AMD Instinct at class 0380 => listed under amd, compute 0');
+  is_deeply($mi->{nvidia}, [], '... no nvidia');
 
   my ( $aspeed ) = sysfs_detect($DEV{aspeed});
   is_deeply($aspeed->{nvidia}, [], 'ASPEED [1a03] at class 0300 => no nvidia');

@@ -87,7 +87,7 @@
    "provides" : {
       "Perl::Critic::Distribution" : {
          "file" : "lib/Perl/Critic/Distribution.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       }
    },
    "release_status" : "stable",
@@ -102,7 +102,7 @@
          "web" : "https://github.com/teodesian/perl-critic-distribution"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_generated_by_perl" : "v5.44.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.43",
    "x_spdx_expression" : "MIT"

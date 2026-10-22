@@ -1,7 +1,7 @@
 package WWW::Hetzner::CLI::Cmd::StorageBox::Cmd::Subaccount::Cmd::List;
 # ABSTRACT: List subaccounts of a Storage Box
 
-our $VERSION = '0.101';
+our $VERSION = '0.102';
 
 use Moo;
 use MooX::Cmd;
@@ -55,7 +55,7 @@ WWW::Hetzner::CLI::Cmd::StorageBox::Cmd::Subaccount::Cmd::List - List subaccount
 
 =head1 VERSION
 
-version 0.101
+version 0.102
 
 =head1 SYNOPSIS
 

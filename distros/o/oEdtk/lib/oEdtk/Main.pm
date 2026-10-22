@@ -6,7 +6,7 @@ use warnings;
 use feature 'state';
 
 use Exporter;
-our $VERSION = 2.1129;
+our $VERSION = 2.1131;
 
 our @ISA    = qw(Exporter);
 our @EXPORT = qw(

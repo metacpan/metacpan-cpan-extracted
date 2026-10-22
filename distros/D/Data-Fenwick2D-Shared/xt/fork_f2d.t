@@ -56,4 +56,34 @@ is $bad, 0, 'each child row-block sums to exactly its update count';
     is $g->point(7, 8), $kids * 1000, 'cross-process shared-cell accumulation (7,8)';
 }
 
+{
+    my $g = Data::Fenwick2D::Shared->new(undef, 48, 48);
+    my @cp;
+    for my $role (0 .. 5) {
+        my $pid = fork // die "fork: $!";
+        if (!$pid) {
+            my $ok = eval {
+                for (1 .. 2000) {
+                    if ($role < 3) {
+                        $g->update(17, 17, 1);
+                    } else {
+                        die 'torn rectangle' if $g->rect(18, 18, 48, 48) != 0;
+                        my $st = $g->stats;
+                        die 'torn stats' if $st->{total} != $st->{ops};
+                    }
+                }
+                1;
+            };
+            warn $@ unless $ok;
+            _exit($ok ? 0 : 1);
+        }
+        push @cp, $pid;
+    }
+    for my $pid (@cp) {
+        waitpid $pid, 0;
+        is $?, 0, 'mixed reader/writer child completed';
+    }
+    is $g->total, 6000, 'mixed readers and writers lose no updates';
+}
+
 done_testing;

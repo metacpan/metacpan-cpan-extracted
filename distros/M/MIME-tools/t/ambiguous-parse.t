@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 use Test::Deep;
-use Test::More tests => 53;
+use Test::More tests => 60;
 
 use MIME::Entity;
 use MIME::Parser;
@@ -122,3 +122,21 @@ $ans = $entity->head->mime_attr('content-type.@duplicate_parameters');
 ok(defined($ans), 'No duplicate parameters');
 cmp_deeply($ans, ['boundary'], 'Duplicate "boundary" parameter was detected in bad message');
 ok($parser->ambiguous_content(), 'Ambiguous content was detected in message with duplicate boundary parameters, one of them with comment');
+
+# A quoted boundary with trailing whitespace: multipart_boundary() strips it
+# (RFC 2046), but parsers keeping the quoted value verbatim see a different
+# boundary, so it must be marked ambiguous
+$entity = $parser->parse_open('testmsgs/trailing-space-boundary.msg');
+$ans = $entity->head->mime_attr('content-type.@boundary_ambiguous');
+ok(defined($ans), 'Trailing whitespace in quoted boundary marked ambiguous');
+ok($parser->ambiguous_content(), 'Ambiguous content was detected in message with trailing whitespace in boundary parameter');
+ok($entity->ambiguous_content(), 'Entity method matches parser method');
+is($entity->head->multipart_boundary, 'FOO', 'Boundary parameter was stripped');
+@parts = $entity->parts;
+is(scalar(@parts), 1, 'Smuggled block is not a MIME part');
+like(join('', @{ $entity->epilogue || [] }), qr/evil\.exe/,
+     'Smuggled attachment is in epilogue');
+# mimic a sanitizer: strip epilogue and write back the stripped boundary
+$entity->epilogue([]);
+$entity->head->mime_attr('Content-Type.boundary', $entity->head->multipart_boundary);
+ok(!$entity->ambiguous_content(), 'Sanitized message is no longer ambiguous');

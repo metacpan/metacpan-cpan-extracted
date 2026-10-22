@@ -1,10 +1,10 @@
 package IO::K8s::PrometheusOperator::V1::PersistentVolumeClaimStatus;
 # ABSTRACT: status is deprecated: this field is never set.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s accessModes                      => [Str];
-k8s allocatedResourceStatuses        => { Str => 1 };
+k8s allocatedResourceStatuses        => HashRef[Str];
 k8s allocatedResources               => HashRef[Quantity];
 k8s capacity                         => HashRef[Quantity];
 k8s conditions                       => ['Core::V1::PersistentVolumeClaimCondition'];
@@ -34,7 +34,7 @@ IO::K8s::PrometheusOperator::V1::PersistentVolumeClaimStatus - status is depreca
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 accessModes
 

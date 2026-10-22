@@ -5,7 +5,7 @@ package Geo::Coder::Free::Display;
 
 =head1 VERSION
 
-Version 0.49
+Version 0.51
 
 =cut
 
@@ -93,7 +93,7 @@ server-side form handling and do not need CSRF tokens at all:
 
 # -----------------------------------------------------------------------
 
-our $VERSION = '0.49';
+our $VERSION = '0.51';
 
 use v5.20;
 use strict;
@@ -165,12 +165,12 @@ sub new
 		# FIXME: this only works when no arguments are given
 		$class = __PACKAGE__;
 	} elsif(Scalar::Util::blessed($class)) {
-		# $class is already an object — return a shallow clone with the new
+		# $class is already an object - return a shallow clone with the new
 		# params merged in (used to re-bless into a subclass).
 		return bless { %{$class}, %{$params} }, ref($class);
 	}
 
-	# SECURITY — Shellshock / invalid-referer defence:
+	# SECURITY - Shellshock / invalid-referer defence:
 	#   The HTTP_REFERER header is attacker-controlled.  Validate it as a URI
 	#   before letting it propagate further into the request; returning undef
 	#   causes the caller to treat this as a blocked request.
@@ -395,7 +395,7 @@ sub as_string {
 	# 'cart' is an example
 	unless($args && $args->{cart}) {
 		if(my $purchases = $self->{_info}->get_cookie(cookie_name => 'cart')) {
-			# SECURITY — malformed cookie defence:
+			# SECURITY - malformed cookie defence:
 			#   The cart cookie is colon-delimited key:qty pairs (e.g. "sku1:2:sku2:1").
 			#   An attacker-controlled cookie with an odd number of colons would cause
 			#   "Odd number of elements in hash assignment" and corrupt the cart hash.
@@ -473,7 +473,7 @@ sub get_template_path
 		return $self->{_filename};
 	}
 
-	# FIXME: reread the config file since something is cloberring it 
+	# FIXME: reread the config file since something is cloberring it
 	if(my $config = Config::Abstraction->new(config_dirs => [$self->{config_dir}], config_files => ['default', $self->{info}->domain_name()], logger => $self->{logger})) {
 		$config = $config->all();
 		$self->{config} = $self->{_config} = $config;
@@ -713,7 +713,7 @@ sub add_preload
 	croak "Unknown preload type '$as'; must be one of: " . join(', ', sort keys %valid_types)
 		unless $valid_types{$as};
 
-	# SECURITY — header injection defence:
+	# SECURITY - header injection defence:
 	#   $href is interpolated into the Link header value.  Reject anything that
 	#   is not a root-relative path; in particular, CRLF characters in $href
 	#   would let a caller inject arbitrary HTTP headers.
@@ -738,7 +738,7 @@ Returns the HTTP header section, terminated by an empty line
 =cut
 
 # Generate and return the HTTP response headers (without the blank-line
-# terminator — FCGI::Buffer appends that).  Also emits Set-Cookie lines
+# terminator - FCGI::Buffer appends that).  Also emits Set-Cookie lines
 # for session cookies and the CSRF token, plus Link: rel=preload headers
 # for any assets registered via add_preload().
 sub http
@@ -801,7 +801,7 @@ sub http
 		$rc = $params->{'Retry-After'} . "\n";
 	}
 
-	# ── Defensive security headers ─────────────────────────────────────────
+	# -- Defensive security headers -----------------------------------------
 	# X-Frame-Options: prevents clickjacking by disallowing iframe embedding
 	#   from cross-origin pages.  (OWASP Clickjacking Defence Cheat Sheet)
 	# X-Content-Type-Options: stops browsers from MIME-sniffing the response
@@ -1019,7 +1019,7 @@ sub csrf_token_valid
 sub _generate_csrf_token($self) {
 	my $secret = $self->csrf_secret($self->{config});
 
-	# SECURITY — use a cryptographically secure RNG, not rand().
+	# SECURITY - use a cryptographically secure RNG, not rand().
 	#   Perl's built-in rand() is a predictable PRNG; if an attacker knows the
 	#   approximate server time they can enumerate the 32-bit output space in
 	#   seconds.  Crypt::URandom reads from /dev/urandom (or the OS equivalent),

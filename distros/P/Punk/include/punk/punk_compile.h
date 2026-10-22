@@ -140,6 +140,7 @@ static SV *pc_resolve_target(pTHX_ SV *self, SV *target, SV *whatsv) {
     {
         SV *methsv = sv_2mortal(newSVpvn(method, metl));
         const char *methname = SvPV_nolen(methsv);
+        SV *loaderr = NULL;
         cvp = pc_class_can(aTHX_ classname, cl2, methname);
         if (!cvp) {
             SV *req = pk_require_src(aTHX_ classname);
@@ -149,9 +150,32 @@ static SV *pc_resolve_target(pTHX_ SV *self, SV *target, SV *whatsv) {
                 if (!(st2 && HvUSEDKEYS(st2)))
                     croak("Punk: %s names '%s' but %s does not load: %s",
                           what, ts, classname, SvPV_nolen(ERRSV));
+                {
+                    SV *nofile = sv_2mortal(newSVpvs("Can't locate "));
+                    const char *p = classname, *e = classname + cl2;
+                    STRLEN nl;
+                    const char *nf, *es;
+                    while (p < e) {
+                        if (p + 1 < e && p[0] == ':' && p[1] == ':') {
+                            sv_catpvs(nofile, "/");
+                            p += 2;
+                        } else {
+                            sv_catpvn(nofile, p, 1);
+                            p++;
+                        }
+                    }
+                    sv_catpvs(nofile, ".pm ");
+                    nf = SvPV_const(nofile, nl);
+                    es = SvPV_nolen(ERRSV);
+                    if (strncmp(es, nf, nl) != 0)
+                        loaderr = sv_2mortal(newSVsv(ERRSV));
+                }
             }
             cvp = pc_class_can(aTHX_ classname, cl2, methname);
         }
+        if (!cvp && loaderr)
+            croak("Punk: %s names '%s' but %s does not load: %s",
+                  what, ts, classname, SvPV_nolen(loaderr));
         if (!cvp)
             croak("Punk: %s names '%s' but %s has no method '%s'",
                   what, ts, classname, methname);

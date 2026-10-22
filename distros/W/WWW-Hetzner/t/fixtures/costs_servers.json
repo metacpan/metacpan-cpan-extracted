@@ -1,0 +1,26 @@
+{
+  "servers": [
+    {
+      "id": 101, "name": "web-1", "status": "running",
+      "server_type": { "id": 114, "name": "cx23" },
+      "location": { "id": 1, "name": "fsn1" },
+      "backup_window": "22-02",
+      "labels": { "citiai-env": "live" },
+      "public_net": { "ipv4": { "ip": "203.0.113.10" } }
+    },
+    {
+      "id": 102, "name": "db-1", "status": "off",
+      "server_type": { "id": 110, "name": "cpx32" },
+      "location": { "id": 5, "name": "sin" },
+      "backup_window": null,
+      "labels": { "citiai-env": "live" }
+    },
+    {
+      "id": 103, "name": "old-1", "status": "running",
+      "server_type": { "id": 110, "name": "cpx32" },
+      "datacenter": { "id": 4, "name": "fsn1-dc14", "location": { "id": 1, "name": "fsn1" } },
+      "labels": { "citiai-env": "live" }
+    }
+  ],
+  "meta": { "pagination": { "page": 1, "per_page": 25, "next_page": null, "total_entries": 3 } }
+}

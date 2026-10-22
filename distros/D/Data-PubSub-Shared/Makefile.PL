@@ -14,6 +14,7 @@ use Devel::PPPort;
 Devel::PPPort::WriteFile();
 
 require XS::Parse::Keyword::Builder;
+XS::Parse::Keyword::Builder->write_XSParseKeyword_h;
 my @xpk_flags = XS::Parse::Keyword::Builder->extra_compiler_flags;
 
 # The 16-byte Int slot commits (value, sequence) with a lock-free 16-byte CAS
@@ -55,6 +56,7 @@ WriteMakefile(
     INC               => '-I. ' . join(' ', @xpk_flags),
     XS                => { 'Shared.xs' => 'Shared.c' },
     OBJECT            => 'Shared$(OBJ_EXT)',
+    depend            => { 'Shared$(OBJ_EXT)' => 'pubsub.h' },
     META_MERGE        => {
         'meta-spec' => { version => 2 },
         resources => {
@@ -64,5 +66,5 @@ WriteMakefile(
             bugtracker => { web => 'https://github.com/vividsnow/perl5-data-pubsub-shared/issues' },
         },
     },
-    clean             => { FILES => "*.bs *.o ppport.h Shared.c" },
+    clean             => { FILES => "*.bs *.o ppport.h XSParseKeyword.h Shared.c" },
 );

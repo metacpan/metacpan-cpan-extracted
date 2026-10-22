@@ -1,0 +1,585 @@
+#!/opt/bin/perl
+
+=head1 NAME
+
+anyevent-mcp-askpermission - graphical or terminal permission helper
+
+=head1 DESCRIPTION
+
+C<anyevent-mcp-askpermission> asks you whether an MCP tool may perform an
+operation, such as reading a file or running a command. It shows the
+requested operation and privileges, and lets you allow or deny it once,
+or choose a rule for future requests.
+
+Servers using L<AnyEvent::MCP::Server::Permissions> normally start this
+helper automatically when a permission check needs your decision. The
+helper displays a local graphical dialog or asks in a terminal, then
+returns your choice to the server. You do not normally run it yourself.
+To change saved rules later, use C<anyevent-mcp manage-rules NAME> or
+C<anyevent-mcp edit-rules NAME>.
+
+=head1 PERMISSION PROMPTS
+
+The helper tries YAD first, leaving display backend selection to GTK.
+If YAD cannot start, it asks on C</dev/tty>. Closing a working dialog,
+terminal EOF, or having neither interface available means deny once.
+
+Server, tool, action, workdir, subject and reason are shown as read-only
+GTK labels when present, including the multibroker alias when available.
+The requested sandbox grants appear together on one line. The initial YAD
+form also has a C<Denial reason (optional)> field above four choices:
+C<Deny once>, C<Deny always...>, C<Allow always...>, C<Allow once>.
+The persistent rule editor can match the selected workdir (default) or any
+configured workdir, including future ones. This changes rule matching,
+not per-call sandbox grants.
+One-time decisions are on the outside; C<Deny once>
+uses YAD's default OK response. Closing the dialog also denies once.
+The persistent choices open a separate rule editor for grant and scope
+settings, including exact requested-file scope on deny rules. Rules can last
+indefinitely (the default), 900 seconds or 16 hours. Expired rules disappear
+when the rules are read and are removed from disk on the next ordinary save.
+The reason
+is included in a denial result but is ignored on an allowance.
+
+Optional display-only request C<details> maps plain labels to Unicode text,
+for example C<< { "View patch" => $diff } >>. Each entry appears as a size
+summary and a button. YAD adds an ellipsis to the label and opens a separate,
+read-only, resizable, monospace text window without dismissing the approval dialog.
+Content is written to a private temporary UTF-8 file, never interpolated
+into a command; control characters are escaped. The helper limits each
+preview to 65536 Unicode characters and identifies incomplete previews.
+Terminal and native MCP prompts include the same bounded text inline.
+Display-only details never constrain or become part of persistent permission rules; an
+C<allow-always> rule for C<perl -> permits future, different stdin scripts.
+
+YAD uses GTK, so you can select a dark theme externally by setting
+C<GTK_THEME=Adwaita:dark> in the server's environment before starting it.
+The permission helper inherits that setting and passes it to YAD; the
+theme is not changed for unrelated applications.
+
+In a terminal, the four decisions are single-letter shortcuts and C<m>
+edits the optional denial reason. Closing the dialog, cancelling or an unavailable
+terminal denies once. Rule management remains separate:
+C<anyevent-mcp manage-rules NAME> or C<anyevent-mcp edit-rules NAME>.
+
+
+=head1 HELPER PROTOCOL
+
+The helper reads one permission request on stdin and writes one JSON
+decision on stdout. Servers invoke it through
+L<AnyEvent::MCP::Permissions::Ask>, which describes the helper interface
+and how to select a replacement helper. YAD's stderr is suppressed;
+startup failure is detected from its exit status.
+
+=head1 OPTIONS
+
+=over
+
+=item --manage-rules $file
+
+Opens a YAD list of rules in evaluation order. Select a rule to delete or move
+up/down. Under the file lock, changes are rejected if the list has changed.
+
+=item --edit-rules $file
+
+Edits the actual permission file with C<$VISUAL>, C<$EDITOR>,
+C<sensible-editor> or C<vi>. The editor handles external changes itself;
+this command does not validate or overwrite its saved contents.
+
+=back
+
+=head1 PROMPT INTERFACE
+
+C<--tty> uses only C</dev/tty>; C<--yad> uses only YAD. These options are
+mutually exclusive and apply only to permission prompts. Neither explicit
+mode falls back to another interface. Unavailable prompting denies access.
+Without either option the helper tries YAD, then a terminal if YAD cannot
+start. Closing or declining a working dialog never triggers fallback.
+
+=cut
+
+use common::sense;
+
+use Getopt::Long ();
+use Text::ParseWords ();
+use AnyEvent::MCP ();
+use JSON::XS ();
+use File::Temp ();
+use AnyEvent::MCP::Permissions::Ask ();
+use AnyEvent::MCP::Server::Permissions ();
+
+Getopt::Long::GetOptions (
+   "manage-rules=s" => \my $rules_file, "edit-rules=s" => \my $edit_file,
+   "tty" => \my $tty_only, "yad" => \my $yad_only, "help" => \my $help,
+)
+   or exit 2;
+die "Unexpected arguments\n" if @ARGV || defined $rules_file && defined $edit_file;
+die "--tty and --yad are mutually exclusive\n" if $tty_only && $yad_only;
+die "--tty/--yad select permission prompts, not rule management\n"
+   if ($tty_only || $yad_only) && (defined $rules_file || defined $edit_file);
+if ($help) {
+   print "usage: $0 [--tty | --yad | --manage-rules FILE | --edit-rules FILE]\n";
+   exit;
+}
+
+binmode STDIN;
+binmode STDOUT;
+
+my $json = JSON::XS->new->canonical;
+my $yad_pid;
+$SIG{TERM} = $SIG{INT} = sub {
+   if ($yad_pid) {
+      kill TERM => $yad_pid;
+      waitpid $yad_pid, 0;
+   }
+   exit 1;
+};
+
+sub yad {
+   my $pid = open my $fh, "-|";
+   return unless defined $pid;
+   if (!$pid) {
+      open STDERR, ">", "/dev/null" or exit 127;
+      exec "yad", "--no-markup", map AnyEvent::MCP::utf8enc $_, @_;
+      exit 127;
+   }
+   $yad_pid = $pid;
+   local $/;
+   my $output = <$fh>;
+   close $fh;
+   my $status = $?;
+   undef $yad_pid;
+
+   # our buttons never use 1: GTK display failure is not user cancellation.
+   return if $status == 1 << 8 || $status == 127 << 8 || $status & 127;
+   ($status >> 8, AnyEvent::MCP::utf8dec $output)
+}
+
+sub manage_rules {
+   my ($file) = @_;
+
+   my $permissions = AnyEvent::MCP::Server::Permissions->new;
+   $permissions->{file} = $file;
+
+   while (1) {
+      my $rules = $permissions->rules;
+      my ($status, $output) = yad (
+         "--list", "--title=MCP permission rules", "--width=900", "--height=450",
+         "--text=$file\nRules are evaluated from top to bottom; the first match wins.",
+         "--column=Order:NUM", "--column=Decision", "--column=Action",
+         "--column=Workdir", "--column=Subject", "--column=Sandbox grants", "--column=Expires",
+         "--no-click", "--print-column=1", "--separator=\x1f",
+         "--button=Close:0", "--button=Move up:4",
+         "--button=Move down:6", "--button=Delete selected:2",
+         map {
+            my $rule = $rules->[$_];
+            $_ + 1, $rule->{decision} || "ask",
+            (map { exists $rule->{$_} ? $json->encode ($rule->{$_}) : "(any)" } qw(action workdir subject sandbox-grants)),
+            (exists $rule->{expires} ? scalar localtime $rule->{expires} : "Indefinite")
+         } 0 .. $#$rules,
+      );
+      die "YAD rule editor unavailable\n" unless defined $status;
+      return unless grep $_ == $status, 2, 4, 6;
+      my ($index) = $output =~ /\A([1-9][0-9]*)\x1f?\s*\z/;
+      next unless $index && $index <= @$rules;
+      next if $status == 4 && $index == 1;
+      next if $status == 6 && $index == @$rules;
+      my $expected = $json->encode ($rules);
+
+      my $ok = eval {
+         my $lock = $permissions->_lock;
+         my $current = $permissions->rules;
+         die "Permission rules changed since selection\n"
+            unless $json->encode ($current) eq $expected;
+         if ($status == 2) {
+            splice @$current, $index - 1, 1;
+         } else {
+            my $other = $status == 4 ? $index - 2 : $index;
+            @$current[$index - 1, $other] = @$current[$other, $index - 1];
+         }
+
+         # deletion does not need the application's capability implications.
+         $permissions->{sandbox_grants} = {
+            map { map { $_ => [] } split /,/, $_->{"sandbox-grants"} } @$current
+         };
+         $permissions->_write ($current);
+         1
+      };
+      unless ($ok) {
+         my $error = $@;
+         print STDERR $error;
+         yad "--title=MCP permission rules", "--text=$error", "--button=Close:0";
+      }
+   }
+}
+
+sub edit_rules {
+   my ($file) = @_;
+
+   my $permissions = AnyEvent::MCP::Server::Permissions->new;
+   $permissions->{file} = $file;
+   my $lock = $permissions->_lock; # Ensure the file exists and is private.
+   close $lock or die "Cannot unlock permission rules: $!\n";
+
+   for my $choice (grep { defined && /\S/ } @ENV{qw(VISUAL EDITOR)}, "sensible-editor", "vi") {
+      my @editor = Text::ParseWords::shellwords ($choice);
+      next unless @editor;
+
+      my $status = system { $editor[0] } @editor, AnyEvent::MCP::utf8enc ($file);
+      next if $status == -1;
+
+      $status == 0
+         or die "Editor failed or was interrupted (status $status)\n";
+
+      return
+   }
+
+   die "No editor found (VISUAL, EDITOR, sensible-editor, vi)\n"
+}
+if (defined $rules_file) {
+   eval { manage_rules AnyEvent::MCP::utf8dec $rules_file; 1 } or do {
+      print STDERR $@;
+      exit 1;
+   };
+   exit;
+}
+
+if (defined $edit_file) {
+   eval { edit_rules AnyEvent::MCP::utf8dec $edit_file; 1 } or do {
+      print STDERR $@;
+      exit 1;
+   };
+   exit;
+}
+
+my $request = do { local $/; JSON::XS::decode_json (scalar <STDIN>) };
+die "Invalid permission request\n" unless $request->{version} == 1;
+my $subjects = $request->{subjects} || [];
+my %decisions = (d => "deny-once", n => "deny-always", o => "allow-once", a => "allow-always");
+my $persistent = !defined $request->{subject} || @$subjects;
+my @deny_paths = grep defined && !ref, @{$request->{paths} || []};
+my $unsandboxed = ($request->{sandbox_implementation} || "") =~ /\ANONE/;
+
+sub rule_dialog {
+   my ($choice, $message) = @_;
+
+   my $allow = $choice eq "allow-always";
+   my %selected = map { $_ => 1 } @{$request->{sandbox_grants}};
+   my ($status, $output) = yad (
+      "--form", "--title=Create MCP permission rule",
+      "--width=650", "--separator=\x1f", "--item-separator=\x1f",
+      "--num-output", "--always-print-result", "--buttons-layout=edge",
+      "--text=Configure which future requests this rule covers."
+         . (!$allow ? "\nDenial reason: " . (length $message ? $message : "(none)") : ""),
+      "--button=Back:10", "--button=Save rule:8",
+      ($allow ? (map {
+         my $grant = $_;
+         my $description = $request->{sandbox_grant_descriptions}{$grant};
+         my $label = $grant . (defined $description && length $description ? " - $description" : "");
+         $label =~ s/\\/\\\\/g;
+         ("--field=$label:CHK", $selected{$grant} ? "TRUE" : "FALSE")
+      } @{$request->{sandbox_grant_choices}}) : ()),
+      (defined $request->{workdir} ? ("--field=Workdir scope:CB",
+         "^1: This workdir\x1f2: Any configured workdir, including future ones") : ()),
+      (@$subjects ? ("--field=Rule scope:CB", join "\x1f",
+         map { ($_ == 0 ? "^" : "") . ($_ + 1) . ": " . $json->encode ($subjects->[$_]{label}) }
+            0 .. $#$subjects) : ()),
+      (!$allow && @deny_paths ? ("--field=Deny file scope:CB", join "\x1f",
+         (map { ($_ == 0 ? "^" : "") . ($_ + 1) . ": Exact file " . $json->encode ($deny_paths[$_]) }
+            0 .. $#deny_paths),
+         scalar (@deny_paths + 1) . ": All paths") : ()),
+      "--field=Rule lifetime:CB", "^Indefinite\x1f900 seconds\x1f16 hours",
+   );
+   return { decision => "back" } if $status == 10;
+   return { decision => "deny-once" } unless $status == 8;
+   my @values = split /\x1f/, $output, -1;
+   my %answer = (decision => $choice, (!$allow && length $message ? (message => $message) : ()));
+   if ($allow) {
+      my @grants;
+      for (@{$request->{sandbox_grant_choices}}) {
+         my $value = shift @values;
+         die "Invalid YAD sandbox grant selection\n" unless defined $value && $value =~ /\A(?:TRUE|FALSE)\z/i;
+         push @grants, $_ if lc $value eq "true";
+      }
+      $answer{sandbox_grants} = \@grants;
+   }
+   if (defined $request->{workdir}) {
+      my $index = shift @values;
+      die "Invalid YAD workdir scope\n" unless defined $index && $index =~ /\A[12]\z/;
+      $answer{workdir_scope} = "all" if $index == 2;
+   }
+   if (@$subjects) {
+      my $index = shift @values;
+      die "Invalid YAD rule scope\n" unless defined $index && $index =~ /\A[1-9][0-9]*\z/
+         && $index <= @$subjects;
+      $answer{subject} = $subjects->[$index - 1]{subject};
+   }
+   if (!$allow && @deny_paths) {
+      my $index = shift @values;
+      die "Invalid YAD denial file scope\n" unless defined $index && $index =~ /\A[1-9][0-9]*\z/
+         && $index <= @deny_paths + 1;
+      $answer{path} = $deny_paths[$index - 1] if $index <= @deny_paths;
+   }
+   my $lifetime = shift @values;
+   defined $lifetime && $lifetime =~ /\A[123]\z/
+      or die "Invalid YAD rule lifetime\n";
+   $answer{lifetime} = ("indefinite", "900", "57600")[$lifetime - 1];
+
+   \%answer
+}
+
+# display-only details are passed by filename, never through shell source text.
+sub shell_quote {
+   my $arg = shift;
+
+   $arg =~ s/'/'\\''/g;
+   "'$arg'"
+}
+
+sub display_text {
+   my $text = shift;
+
+   # render control and bidi characters explicitly, preserving tabs and newlines.
+   $text =~ s/([\x00-\x08\x0b-\x1f\x7f-\x9f\x{202a}-\x{202e}\x{2066}-\x{2069}])/sprintf "\\u{%X}", ord $1/ge;
+   $text
+}
+
+sub detail_fields {
+   my @fields;
+
+   for my $label (sort keys %{$request->{details} || {}}) {
+      my $text = $request->{details}{$label};
+      defined $text && !ref $text
+         or die "Invalid permission detail\n";
+
+      my $preview = AnyEvent::MCP::Permissions::Ask::detail_text $label, $text;
+      my $chars = length $text;
+      my $bytes = length AnyEvent::MCP::utf8enc $text;
+
+      my ($fh, $filename) = File::Temp::tempfile (
+         "mcp-permission-XXXXXXXX", TMPDIR => 1, UNLINK => 1);
+      binmode $fh;
+      print {$fh} AnyEvent::MCP::utf8enc ($preview)
+         or die "Cannot write permission detail: $!\n";
+      close $fh or die "Cannot close permission detail: $!\n";
+
+      $label = display_text $label;
+      $label =~ s/[:\t\n]/sprintf "\\u{%X}", ord $&/ge;
+      my $info = "$label: $chars characters, $bytes UTF-8 bytes"
+         . ($chars > 65536 ? " (incomplete preview)" : "");
+      $info =~ s/\\/\\\\/g;
+      my $button = $label;
+      $button =~ s/\\/\\\\/g;
+
+      push @fields,
+         "--field=$info:LBL", "",
+         "--field=$button...:FBTN",
+         join " ", map shell_quote ($_),
+            ("yad", "--no-markup", "--text-info",
+             "--title=MCP permission: $label", "--width=900", "--height=650",
+             "--fontname=Monospace 11", "--filename=$filename",
+             "--button=Close:0");
+   }
+
+   @fields
+}
+
+sub graphical {
+   if (($request->{_permission_stage} || "") eq "rule") {
+      my $previous = $request->{_permission_selection};
+      return rule_dialog ($previous->{decision}, $previous->{message} // "");
+   }
+
+   my @details = map {
+      my $value = $request->{$_};
+      $value = $_ eq "reason" ? display_text ($value)
+         : ref $value || $value =~ /[\x00-\x1f\x7f]/ ? $json->encode ($value) : $value;
+      $value =~ s/\\/\\\\/g;
+      ({
+         name                   => "Server",
+         multibroker_alias      => "Multibroker alias",
+         tool                   => "Tool",
+         action                 => "Action",
+         action_description     => "Action description",
+         sandbox_implementation => "Sandbox",
+         subject                => "Subject",
+         workdir                => "Workdir",
+         paths                  => "Paths",
+         reason                 => "Reason",
+      }->{$_} || ucfirst $_) . ": $value"
+   } grep defined $request->{$_}, qw(name multibroker_alias tool action action_description sandbox_implementation workdir subject paths reason);
+
+   my @view_fields = detail_fields;
+   my $message = $request->{_permission_selection}{message} // "";
+   while (1) {
+      my ($status, $output) = yad (
+         "--form", ($unsandboxed ? "--title=UNSANDBOXED MCP permission required"
+                                  : "--title=MCP permission required"),
+         "--width=650", "--height=400", "--scroll",
+         "--text=" . ($unsandboxed
+            ? "WARNING: NO SANDBOX. Workers run with all privileges of the host user.\n"
+            : "")
+            . "Required grants: " . join (" ", @{$request->{sandbox_grants}}),
+         "--separator=\x1f", "--item-separator=\x1f", "--num-output", "--always-print-result",
+         "--focus-field=" . (@details + @view_fields / 2 + 1),
+         "--buttons-layout=edge",
+         "--button=Deny once:0",
+         ($persistent ? ("--button=Deny always...:6") : ()),
+         ($persistent ? ("--button=Allow always...:8") : ()),
+         "--button=Allow once:4",
+         (map { ("--field=$_:LBL", "") } @details),
+         @view_fields,
+         "--field=Denial reason (optional)", $message,
+      );
+      return unless defined $status;
+      return { decision => "deny-once" } unless grep $_ == $status, 0, 4, 6, 8;
+      $message = (split /\x1f/, $output, -1)[@details + @view_fields / 2];
+      die "Missing permission message field\n" unless defined $message;
+      $message =~ s/\r?\n\z//;
+
+      my $choice = {
+         0 => "deny-once",
+         4 => "allow-once",
+         6 => "deny-always",
+         8 => "allow-always",
+      }->{$status};
+      if ($choice =~ /-always\z/) {
+         return { decision => $choice,
+            ($choice eq "deny-always" && length $message ? (message => $message) : ()),
+         } if ($request->{_permission_stage} || "") eq "choice";
+
+         my $answer = rule_dialog ($choice, $message);
+         next if $answer->{decision} eq "back";
+         return $answer;
+      }
+      return {
+         decision => $choice,
+         ($status == 0 && length $message ? (message => $message) : ()),
+         ($status == 4 ? (sandbox_grants => [@{$request->{sandbox_grants}}]) : ()),
+      };
+   }
+}
+
+sub terminal {
+   open my $tty, "+<", "/dev/tty" or return { decision => "deny-once" };
+   binmode $tty, ":encoding(UTF-8)";
+   select ((select ($tty), $| = 1)[0]);
+
+   my $ask = sub {
+      print {$tty} $_[0] or die "Permission terminal: $!\n";
+      my $answer = <$tty>;
+      $answer =~ s/\s+\z// if defined $answer;
+      $answer
+   };
+
+   my $message = $request->{_permission_selection}{message} // "";
+   my $rule = sub {
+      my ($choice) = @_;
+
+      print {$tty} "Denial reason: ", (length $message ? $message : "(none)"), "\n"
+         if $choice eq "deny-always";
+      return { decision => "back" } if (($ask->("Configure future rule [Enter=continue, b=back]: ") // "b") eq "b");
+      my %answer = (decision => $choice,
+         ($choice eq "deny-always" && length $message ? (message => $message) : ()));
+      if ($choice eq "allow-always") {
+         print {$tty} "Available grants: ", join (", ", @{$request->{sandbox_grant_choices}}), "\n";
+         my $caps = $ask->("Allowed grants [" . join (",", @{$request->{sandbox_grants}}) . "]: ");
+         return { decision => "deny-once" } unless defined $caps;
+         $answer{sandbox_grants} = [length $caps
+            ? ($caps eq "-" ? () : split /\s*,\s*/, $caps, -1)
+            : @{$request->{sandbox_grants}}];
+      }
+      if (defined $request->{workdir}) {
+         print {$tty} "Workdir rule scope:\n",
+            "1: This workdir\n",
+            "2: Any configured workdir, including future ones\n";
+         my $index = $ask->("Workdir scope [1]: ");
+         return { decision => "deny-once" } unless defined $index;
+         $index = 1 unless length $index;
+         $index =~ /\A[12]\z/ or die "Invalid workdir scope\n";
+         $answer{workdir_scope} = "all" if $index == 2;
+      }
+      if (@$subjects) {
+         print {$tty} map { ($_ + 1) . ": " . $json->encode ($subjects->[$_]{label}) . "\n" }
+            0 .. $#$subjects;
+         my $index = $ask->("Persistent scope [1]: ");
+         return { decision => "deny-once" } unless defined $index;
+         $index = 1 unless length $index;
+         die "Invalid persistent scope\n" unless $index =~ /\A[1-9][0-9]*\z/ && $index <= @$subjects;
+         $answer{subject} = $subjects->[$index - 1]{subject};
+      }
+      if ($choice eq "deny-always" && @deny_paths) {
+         print {$tty} map { ($_ + 1) . ": " . $json->encode ($deny_paths[$_]) . "\n" }
+            0 .. $#deny_paths;
+         print {$tty} (@deny_paths + 1) . ": All paths\n";
+         my $index = $ask->("Deny file scope [1]: ");
+         return { decision => "deny-once" } unless defined $index;
+         $index = 1 unless length $index;
+         die "Invalid deny file scope\n" unless $index =~ /\A[1-9][0-9]*\z/
+            && $index <= @deny_paths + 1;
+         $answer{path} = $deny_paths[$index - 1] if $index <= @deny_paths;
+      }
+      my $lifetime = $ask->("Rule lifetime [1=indefinite, 2=900 seconds, 3=16 hours; default 1]: ");
+      return { decision => "deny-once" } unless defined $lifetime;
+      $lifetime = 1 unless length $lifetime;
+      $lifetime =~ /\A[123]\z/ or die "Invalid rule lifetime\n";
+      $answer{lifetime} = ("indefinite", "900", "57600")[$lifetime - 1];
+
+      \%answer
+   };
+
+   if (($request->{_permission_stage} || "") eq "rule") {
+      return $rule->($request->{_permission_selection}{decision});
+   }
+
+   print {$tty} "\n\n******** MCP PERMISSION REQUIRED ********\n\n",
+      AnyEvent::MCP::Permissions::Ask::message ($request),
+      "\n\nThis is an approval prompt. No decision has been made.\n";
+
+   while (1) {
+      print {$tty} "\nDenial reason: ", (length $message ? $message : "(none)"), "\n",
+         "  m  edit denial reason\n",
+         "  o  allow once       d  deny once (default)\n",
+         ($persistent ? "  a  allow always...  n  deny always...\n" : "");
+      my $choice = $ask->("Choice [d]: ");
+      return { decision => "deny-once" } unless defined $choice;
+      $choice = "d" unless length $choice;
+
+      if ($choice eq "m") {
+         my $text = $ask->("Denial reason (Enter clears): ");
+         return { decision => "deny-once" } unless defined $text;
+         $message = $text;
+         next;
+      }
+
+      next unless exists $decisions{$choice};
+      next if !$persistent && $choice =~ /[na]/;
+      my $decision = $decisions{$choice};
+      if ($decision =~ /-always\z/) {
+         return { decision => $decision,
+            ($decision eq "deny-always" && length $message ? (message => $message) : ()),
+         } if ($request->{_permission_stage} || "") eq "choice";
+
+         my $answer = $rule->($decision);
+         next if $answer->{decision} eq "back";
+         return $answer;
+      }
+      return {
+         decision => $decision,
+         ($choice eq "d" && length $message ? (message => $message) : ()),
+         ($choice eq "o" ? (sandbox_grants => [@{$request->{sandbox_grants}}]) : ()),
+      };
+   }
+}
+
+my $decision = eval {
+   my $answer = $tty_only ? terminal : graphical;
+   $answer = $yad_only ? { decision => "deny-once" } : terminal unless $answer;
+   AnyEvent::MCP::Permissions::Ask::build ($request, $answer,
+      $request->{_permission_stage}, $request->{_permission_selection})
+};
+if ($@) {
+   print STDERR "Permission prompt failed; denied: $@";
+   $decision = { decision => "deny-once" };
+}
+print JSON::XS::encode_json ($decision), "\n";

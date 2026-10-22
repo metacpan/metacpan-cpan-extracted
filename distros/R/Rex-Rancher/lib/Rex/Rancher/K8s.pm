@@ -1,7 +1,7 @@
 # ABSTRACT: Kubernetes API operations for Rex::Rancher (device plugin, readiness)
 
 package Rex::Rancher::K8s;
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 use v5.14.4;
 use warnings;
 
@@ -244,7 +244,7 @@ Rex::Rancher::K8s - Kubernetes API operations for Rex::Rancher (device plugin, r
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 

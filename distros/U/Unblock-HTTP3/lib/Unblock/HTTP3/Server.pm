@@ -5,7 +5,7 @@ use warnings;
 
 use parent 'Unblock::HTTP3::Connection';
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 sub new {
     my ($class, %option) = @_;
@@ -47,6 +47,23 @@ stream handling.
 
 The application sees canonical Uniform::HTTP::Request objects. It does not
 need to build Uniform response objects manually for common replies.
+
+=head1 RECEIVE BODY OPTIONS
+
+C<receive_body> accepts C<buffered> or C<stream>. Buffering remains the default.
+C<max_buffered_body_bytes> is a positive byte limit, defaulting to 64 MiB.
+Zero does not mean unlimited. Buffered reception installs the body on the
+same Uniform message before freezing it and invoking the body-completion
+callback. Empty completed bodies have an empty string representation.
+The engine releases retained chunks on failure or cancellation.
+
+Select streaming per transaction with C<$tx-E<gt>on_data(...)> during the
+header callback. Legacy C<on_body> still selects streaming automatically.
+Do not combine C<on_data> and C<on_body>. See
+L<Unblock::HTTP3::Transaction/RECEIVE AND FINISH CALLBACKS>.
+
+A buffer limit failure resets only the affected stream.
+It does not call successful body completion.
 
 =head1 CONSTRUCTOR
 
@@ -148,6 +165,12 @@ Starts HTTP/3 processing and installs the QUIC stream callbacks. For ordinary
 =head2 next_transaction
 
 Returns the next newly received request Transaction for pull-style users.
+Pull-only requests remain strongly queued until retrieved. When C<on_request>
+also delivers the Transaction, its queue notification is weak. A mixed
+callback/pull consumer may retrieve the live Transaction, but should keep
+the callback's Transaction reference if it needs it after the request
+becomes terminal and the native stream closes. Callback-only servers do
+not retain all completed request bodies through this optional pull queue.
 
 =head2 quic
 

@@ -83,10 +83,9 @@ DESCRIPTION
     Data::Pool::Shared::Str - fixed-length strings
 
   Allocation
-    Allocation uses a CAS-based bitmap scan (lock-free). Each 64-slot group is
-    managed by one atomic uint64_t word. On contention, CAS retries
-    automatically. When the pool is full, "alloc" blocks on a futex until a
-    slot is freed.
+    Allocation scans an atomic bitmap and claims a slot through its owner word
+    with CAS (lock-free). Each 64-slot group has one bitmap word. When the
+    pool is full, "alloc" blocks on a futex until a slot is freed.
 
   Crash Safety
     Each slot records the PID of its allocator. "recover_stale" scans for
@@ -147,7 +146,8 @@ METHODS
         my $idx = $pool->alloc(0);          # non-blocking
         my $idx = $pool->try_alloc;         # non-blocking (same as alloc(0))
 
-    Returns slot index on success, "undef" on failure/timeout.
+    Returns slot index on success, "undef" on failure/timeout. Perl signal
+    handlers run while "alloc" and "alloc_n" wait.
 
         $pool->free($idx);                  # release slot (returns true/false)
 
@@ -249,6 +249,9 @@ METHODS
         my $idx = $pool->alloc_set($val, $timeout); # with timeout
         my $idx = $pool->try_alloc_set($val);       # non-blocking
 
+    If "set" throws, the newly allocated slot is freed before the exception
+    propagates.
+
         $pool->each_allocated(sub { my $idx = shift; ... });
 
   Common Methods
@@ -297,8 +300,8 @@ PERFORMANCE
     *   Allocation scans a bitmap of ceil(capacity/64) words. O(capacity/64)
         worst case, O(1) amortized with scan_hint.
 
-    *   Each allocation is a single CAS on one bitmap word. Under contention,
-        CAS retries on the same word are ~10ns each.
+    *   Each allocation claims an owner word with CAS, then sets its bitmap
+        bit.
 
     *   When pool is full, "alloc" blocks on a futex (zero CPU). Woken by a
         single "FUTEX_WAKE" syscall on "free".

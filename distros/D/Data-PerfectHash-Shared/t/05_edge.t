@@ -13,4 +13,16 @@ my $dir=tempdir(CLEANUP=>1);
   my $s=Data::PerfectHash::Shared->load($p); is $s->count,1,'str single count'; ok $s->has("hello"),'str single hit'; ok !$s->has("world"),'str single miss'; }
 { my $p="$dir/sdup.phs"; Data::PerfectHash::Shared->build_str($p,["a","a","b"]);
   my $s=Data::PerfectHash::Shared->load($p); is $s->count,2,'str dedup'; ok $s->has("a")&&$s->has("b"),'str dedup hits'; }
+for my $keys ([""], ["", ""], ["", "a", "a", "b", ""]) {
+    my $p = "$dir/empty-key.phs";
+    Data::PerfectHash::Shared->build_str($p, $keys);
+    my $s = Data::PerfectHash::Shared->load($p);
+    my %expected = map { $_ => 1 } @$keys;
+    is $s->count, scalar(keys %expected), 'empty string deduplicates';
+    ok $s->has(''), 'empty string is present';
+    ok !$s->has("\0"), 'NUL differs from empty string';
+    my @seen;
+    $s->each_key(sub { push @seen, $_[0] });
+    is_deeply [sort @seen], [sort keys %expected], 'empty string round-trips';
+}
 done_testing;

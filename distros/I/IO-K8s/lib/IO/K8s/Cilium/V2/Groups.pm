@@ -1,6 +1,6 @@
 package IO::K8s::Cilium::V2::Groups;
 # ABSTRACT: Groups allows referencing CIDRs that are resolved from an external integration.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s aws => '+IO::K8s::Cilium::V2::AWSGroup';
@@ -20,7 +20,7 @@ IO::K8s::Cilium::V2::Groups - Groups allows referencing CIDRs that are resolved 
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 aws
 

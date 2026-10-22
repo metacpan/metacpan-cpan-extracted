@@ -98,11 +98,11 @@ subtest 'script method: installer lines unchanged' => sub {
     'k3s agent: the script does not start it (bounded start follows)' );
   my $kp = dist('k3s');
   is( $kp->script_install_cmd( undef, undef ),
-    'curl -sfL https://get.k3s.io | INSTALL_K3S_SKIP_START=true sh -s - server --write-kubeconfig-mode=644',
+    'curl -sfL https://get.k3s.io | INSTALL_K3S_SKIP_START=true sh -s - server',
     'k3s server: the script does not start it (bounded start follows)' );
   is( $kp->script_install_cmd( 'https://cp1:6443', 'v1.30.4+k3s1' ),
     'curl -sfL https://get.k3s.io | K3S_URL=https://cp1:6443 INSTALL_K3S_VERSION=v1.30.4+k3s1'
-      . ' INSTALL_K3S_SKIP_START=true sh -s - server --write-kubeconfig-mode=644',
+      . ' INSTALL_K3S_SKIP_START=true sh -s - server',
     'k3s server HA join: same' );
 };
 
@@ -247,7 +247,7 @@ subtest 'artifact install commands' => sub {
   is_deeply( [ dist('k3s')->artifact_install_cmds( $ks, undef, 'v1.30.4+k3s1' ) ], [
     $place,
     'INSTALL_K3S_SKIP_DOWNLOAD=binary INSTALL_K3S_BIN_DIR=/usr/local/bin INSTALL_K3S_VERSION=v1.30.4+k3s1'
-      . ' INSTALL_K3S_SKIP_START=true sh /tmp/k3s-artifacts/install.sh server --write-kubeconfig-mode=644',
+      . ' INSTALL_K3S_SKIP_START=true sh /tmp/k3s-artifacts/install.sh server',
     ], 'k3s server: binary placed atomically as /usr/local/bin/k3s, then the script, which does not start it' );
   is_deeply( [ agent('k3s')->artifact_install_cmds( $ks, 'https://cp1:6443', 'v1.30.4+k3s1' ) ], [
     $place,

@@ -1,7 +1,7 @@
 package WWW::Hetzner::Cloud::API::Datacenters;
 # ABSTRACT: Hetzner Cloud Datacenters API
 
-our $VERSION = '0.101';
+our $VERSION = '0.102';
 
 use Moo;
 with 'WWW::Hetzner::Role::Pagination';
@@ -81,7 +81,7 @@ WWW::Hetzner::Cloud::API::Datacenters - Hetzner Cloud Datacenters API
 
 =head1 VERSION
 
-version 0.101
+version 0.102
 
 =head1 SYNOPSIS
 
@@ -101,6 +101,16 @@ version 0.101
 This module provides access to Hetzner Cloud datacenters. Datacenters are
 virtual subdivisions of locations with specific server type availability.
 All methods return L<WWW::Hetzner::Cloud::Datacenter> objects.
+
+=head1 DEPRECATION
+
+B<The Datacenters endpoint has been removed by Hetzner.> Since the
+L<2026-06-02 changelog entry|https://docs.hetzner.cloud/changelog#2026-06-02-datacenters-deprecated>,
+C<GET /v1/datacenters> answers C<410 Gone> with error code
+C<deprecated_api_endpoint> ("API functionality was removed"), so every
+method of this controller now dies with that API error. The module is kept
+for backward compatibility only; use L<WWW::Hetzner::Cloud::API::Locations>
+instead.
 
 =head2 list
 

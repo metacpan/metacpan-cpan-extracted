@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib 'lib';
 
-our $VERSION = '0.101';
+our $VERSION = '0.102';
 
 use WWW::Hetzner::Robot::CLI;
 
@@ -24,7 +24,7 @@ hrobot.pl - Hetzner Robot CLI (Perl implementation)
 
 =head1 VERSION
 
-version 0.101
+version 0.102
 
 =head1 SYNOPSIS
 

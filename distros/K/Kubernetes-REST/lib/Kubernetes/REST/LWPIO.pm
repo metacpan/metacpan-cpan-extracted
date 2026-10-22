@@ -1,5 +1,5 @@
 package Kubernetes::REST::LWPIO;
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 # ABSTRACT: HTTP client using LWP::UserAgent
 use Moo;
 use LWP::UserAgent;
@@ -82,7 +82,7 @@ sub call {
 
     my $res = $self->ua->request($http_req);
 
-    return $self->_response($res);
+    return $self->_response($res, $req->method);
   }
 
 sub call_streaming {
@@ -95,12 +95,24 @@ sub call_streaming {
       [ %{$req->headers} ],
     );
 
+    # LWP catches a die in the content callback, aborts the transfer and only
+    # notes it in X-Died / Client-Aborted. Keep the exception, die on to stop
+    # the transfer, and rethrow it untouched once the request is over.
+    my ( $failed, $error );
+    my $received = 0;
     my $res = $self->ua->request($http_req, sub {
       my ($chunk) = @_;
-      $data_callback->($chunk);
+      return if $failed;
+      $received += length $chunk;
+      unless ( eval { $data_callback->($chunk); 1 } ) {
+        ( $failed, $error ) = ( 1, $@ );
+        die $error;
+      }
     });
 
-    return $self->_response($res);
+    die $error if $failed;
+
+    return $self->_response($res, $req->method, $received);
   }
 
 # charset => 'none' undoes Content-Encoding (gzip et al) but leaves the charset
@@ -108,7 +120,46 @@ sub call_streaming {
 # expect, and what HTTPTinyIO hands back. Plain decoded_content() would decode
 # UTF-8 here and IO::K8s would then decode the characters a second time.
 sub _response {
-    my ($self, $res) = @_;
+    my ($self, $res, $method, $received) = @_;
+
+    # LWP reports its own failures (cannot connect, TLS module missing,
+    # unsupported scheme) as ordinary-looking responses; a transfer cut off
+    # mid-body is a 200 with Client-Aborted/X-Died. Neither is an answer from
+    # the API server: map both to 599 with the message as content, as
+    # HTTPTinyIO does.
+    # (A response object without ->header, such as a test double, has no
+    # LWP markers.)
+    my $has_headers = $res->can('header');
+    my $internal = $has_headers && ( $res->header('Client-Warning') // '' ) eq 'Internal response';
+    my $aborted  = $has_headers && ( defined $res->header('Client-Aborted') || defined $res->header('X-Died') );
+
+    # LWP does not flag a body shorter than its Content-Length; compare the
+    # bytes received on the wire (before Content-Encoding is undone).
+    my $truncated;
+    # (LWP keeps an error body in the response instead of feeding the callback.)
+    if ($has_headers) {
+      my $kept = length( $res->content // '' );
+      $received = $kept if !defined $received || $kept > $received;
+    }
+    if ( $has_headers && !$internal && !$aborted && ( $method // '' ) ne 'HEAD'
+         && defined $received && !$res->header('Transfer-Encoding') ) {
+      my $expected = $res->header('Content-Length');
+      $truncated = 1 if defined $expected && $expected =~ /\A\d+\z/ && $received < $expected;
+    }
+
+    if ( $internal || $aborted || $truncated ) {
+      my $message = $internal
+        ? $res->decoded_content(charset => 'none')
+        : $truncated ? 'connection closed before the whole response body was received'
+        : $res->header('X-Died');
+      $message = $res->header('Client-Aborted') // 'transport error'
+        unless defined $message && length $message;
+      chomp $message;
+      return Kubernetes::REST::HTTPResponse->new(
+        status  => 599,
+        content => $message,
+      );
+    }
 
     my $content = $res->decoded_content(charset => 'none');
 
@@ -132,7 +183,7 @@ Kubernetes::REST::LWPIO - HTTP client using LWP::UserAgent
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head1 SYNOPSIS
 
@@ -201,6 +252,8 @@ The underlying L<LWP::UserAgent> instance. Access this to attach middleware such
 
 Execute an HTTP request. Receives a fully prepared L<Kubernetes::REST::HTTPRequest> (URL, headers, content all set). Returns a L<Kubernetes::REST::HTTPResponse>.
 
+A failure of L<LWP::UserAgent> itself (cannot connect, TLS error, timeout, unsupported scheme, C<LWP::Protocol::https> not installed) is returned as status C<599> with the message as content; any other status is the API server's. See L<Kubernetes::REST::Role::IO/Error contract>.
+
 =head2 call_streaming
 
     my $response = $io->call_streaming($req, sub { my ($chunk) = @_; ... });
@@ -208,6 +261,8 @@ Execute an HTTP request. Receives a fully prepared L<Kubernetes::REST::HTTPReque
 Execute an HTTP request with streaming response. The C<$data_callback> is called with each chunk of data as it arrives.
 
 Used internally by L<Kubernetes::REST/watch> and L<Kubernetes::REST/log> for the Watch and Pod Log APIs.
+
+Transport failures, a transfer cut off in the middle of the body included, come back as status C<599>. If the callback dies, the transfer is aborted and the same exception is rethrown unchanged, with no response. See L<Kubernetes::REST::Role::IO/Error contract>.
 
 =head1 SEE ALSO
 

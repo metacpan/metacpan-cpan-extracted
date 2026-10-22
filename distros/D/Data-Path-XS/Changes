@@ -1,5 +1,10 @@
 Revision history for Data-Path-XS
 
+0.04  2026-10-16
+    - Fix setter ownership and self-referential paths, including tainted paths.
+    - Preserve tied reads and keyword result lifetimes.
+    - Keep compiled paths local to their creating thread.
+
 0.03  2026-04-28
     - Fix keyword API parent-type dispatch (numeric-looking hash keys)
     - Fix UTF-8 hash key support across all APIs

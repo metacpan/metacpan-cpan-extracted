@@ -43,7 +43,7 @@ package M;
 sub ops {
     my ($seed, $nops, $n) = @_;
     srand $seed;
-    my @ops;
+    my @ops = (['range_assign', 0, $n - 1, 4], ['set', int($n / 2), -3]);
     for (1 .. $nops) {
         my $r = rand;
         my ($l, $h) = sort { $a <=> $b } int rand $n, int rand $n;
@@ -141,6 +141,7 @@ my @steps = (0, 2, 5, 9, 14, 20, 30, 45);
 my @anchors = grep { defined $_->[1] } (
     [ 'push add',      anchor($PUSH, qr/st_apply_add\(&nodes\[2\*v\],/),    [0, 7, 40, 150], \@steps ],
     [ 'push assign',   anchor($PUSH, qr/st_apply_assign\(&nodes\[2\*v\],/), [0, 7, 40],      \@steps ],
+    [ 'drop assign',   anchor($PUSH, qr/nd->flags &= ~ST_F_HAS_ASSIGN;/),  [0, 7, 40],      [0, 2, 5] ],
     [ 'range add',     'st_range_add_rec',    [3, 300, 1500],  [1, 30, 90, 200, 400] ],
     [ 'range assign',  'st_range_assign_rec', [3, 300, 1500],  [1, 30, 90, 200, 400] ],
 );
@@ -152,6 +153,7 @@ sub intact {
 }
 
 my ($runs, $hits) = (0, 0);
+my %hit_at;
 for my $a (@anchors) {
     for my $skip (@{ $a->[2] }) {
         for my $steps (@{ $a->[3] }) {
@@ -159,6 +161,7 @@ for my $a (@anchors) {
             my ($path, $log) = ("$dir/$tag.st", "$dir/$tag.log");
             my $hit = gdb_run($tag, $a->[1], $skip, $steps, "$dir/victim.pl", "$dir/model.pl", $path, $log, @args);
             $hits += $hit;
+            $hit_at{$a->[0]} += $hit;
             intact(state_of($path, $log), "$a->[0], call " . ($skip + 1) . " + $steps instructions"
                                           . ($hit ? '' : ', not reached'));
         }
@@ -182,5 +185,6 @@ for my $r (grep { defined $_->[0] } [$replay, 0], [$pull, 0], [$pull, 40]) {
 }
 
 ok $hits, "gdb hit $hits of $runs breakpoints" or diag 'no breakpoint was reached: these runs proved nothing';
+ok $hit_at{'drop assign'}, 'reached assignment retirement crash checks';
 note 'killed in: ' . join ', ', map { "$_=$where{$_}" } sort { $where{$b} <=> $where{$a} } keys %where;
 done_testing;

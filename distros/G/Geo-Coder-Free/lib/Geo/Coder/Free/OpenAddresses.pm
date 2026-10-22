@@ -62,11 +62,11 @@ Provides a geocoding functionality to a local SQLite database containing geo-cod
 
 =head1 VERSION
 
-Version 0.49
+Version 0.51
 
 =cut
 
-our $VERSION = '0.49';
+our $VERSION = '0.51';
 
 =head1 SYNOPSIS
 
@@ -98,6 +98,25 @@ To install,
 run the createdatabases.PL script which imports the data into an SQLite database.
 This process will take some time.
 
+=head2 Optional modules
+
+Two modules are used to parse an address when they are installed, and the
+lookup goes on without them when they are not:
+
+=over 4
+
+=item * L<Geo::Address::Parser> splits a US address into its fields before the
+database is searched for them.
+
+=item * L<Geo::libpostal> is tried last, for US and Canadian addresses the
+other steps could not parse.  The first call to it in a process loads
+libpostal's model, which is several gigabytes, so that call can take several
+seconds and the process then holds that memory.  Pass C<< libpostal => 0 >> to
+C<new()> to leave it unused, for example in a short-lived or memory-constrained
+process, or in a test with a time limit.
+
+=back
+
 =head1 METHODS
 
 =head2 new
@@ -109,13 +128,18 @@ openaddresses.sql.
 
 Takes an optional parameter cache, which points to an object that understands get() and set() messages to store data in
 
+Takes an optional parameter libpostal.  When it is false, L<Geo::libpostal> is
+never loaded or called, even if it is installed; see L</Optional modules>.
+It defaults to true.
+
 =head3 API SPECIFICATION
 
 =head4 input
 
     # Input schema (Params::Validate::Strict)
-    openaddr => { type => 'scalar' }                                          # path to the directory containing openaddresses.sql
-    cache    => { type => 'object', optional => 1, can => ['get', 'set'] }   # CHI-compatible cache object
+    openaddr  => { type => 'scalar' }                                          # path to the directory containing openaddresses.sql
+    cache     => { type => 'object', optional => 1, can => ['get', 'set'] }   # CHI-compatible cache object
+    libpostal => { type => 'boolean', optional => 1, default => 1 }           # false: never use Geo::libpostal
 
 =head4 output
 
@@ -134,7 +158,11 @@ sub new {
 	if(my $openaddr = $param{'openaddr'}) {
 		Carp::croak(__PACKAGE__, ": Can't find the directory $openaddr")
 			if((!-d $openaddr) || (!-r $openaddr));
-		return bless { openaddr => $openaddr, cache => $param{'cache'} }, $class;
+		return bless {
+			openaddr => $openaddr,
+			cache => $param{'cache'},
+			libpostal => $param{'libpostal'} // 1,
+		}, $class;
 	}
 	Carp::croak(__PACKAGE__, ": Usage: new(openaddr => '/path/to/openaddresses')");
 }
@@ -147,6 +175,18 @@ How many times this backend has read its database since the object was created.
 A lookup answered from the result cache or from the shared miss cache does not
 increase it, so C<geocode_many()> can take the count before and after a value to
 tell a lookup that cost a read from one that was answered from a cache.
+
+=head3 API SPECIFICATION
+
+=head4 input
+
+    # Input schema (Params::Validate::Strict)
+    # none
+
+=head4 output
+
+    # Output schema (Return::Set)
+    { type => 'integer', min => 0 }   # 0 for a new object
 
 =cut
 
@@ -911,9 +951,12 @@ sub geocode
 	}
 
 	if($country) {
-		require Geo::Address::Parser && Geo::Address::Parser->import() unless Geo::Address::Parser->can('parse');
+		# Geo::Address::Parser is optional; skip this step if it isn't installed
+		unless(Geo::Address::Parser->can('parse')) {
+			eval { require Geo::Address::Parser; Geo::Address::Parser->import() };
+		}
 
-		if($country eq 'US') {
+		if(($country eq 'US') && Geo::Address::Parser->can('parse')) {
 			my $addr_parser = Geo::Address::Parser->new(country => 'US');
 			if(my $fields = $addr_parser->parse($location)) {
 				for my $key (keys %{$fields}) {
@@ -928,7 +971,8 @@ sub geocode
 
 	# Finally try libpostal,
 	# which is good but uses a lot of memory
-	if($libpostal_is_installed == LIBPOSTAL_UNKNOWN) {
+	my $use_libpostal = $self->{'libpostal'} // 1;
+	if($use_libpostal && ($libpostal_is_installed == LIBPOSTAL_UNKNOWN)) {
 		if(eval { require Geo::libpostal; } ) {
 			Geo::libpostal->import();
 			$libpostal_is_installed = LIBPOSTAL_INSTALLED;
@@ -939,7 +983,7 @@ sub geocode
 
 	# print(__PACKAGE__, ': ', __LINE__, ": libpostal_is_installed = $libpostal_is_installed ($location)\n");
 
-	if(($libpostal_is_installed == LIBPOSTAL_INSTALLED) && (my %addr = Geo::libpostal::parse_address($location))) {
+	if($use_libpostal && ($libpostal_is_installed == LIBPOSTAL_INSTALLED) && (my %addr = Geo::libpostal::parse_address($location))) {
 		if($addr{'country'} && $addr{'state'} && ($addr{'country'} =~ /^(Canada|United States|USA|US)$/i)) {
 			if($street = $addr{'road'}) {
 				$street = _normalize($street);
@@ -1082,7 +1126,21 @@ sub _get {
 
     $location = $geocoder->reverse_geocode(latlng => '37.778907,-122.39732');
 
-To be done.
+To be done.  The database holds a hash of each address rather than the address
+itself, so a coordinate cannot be turned back into one.  It always croaks
+C<Reverse lookup is not yet supported>, whatever it is given.
+
+=head3 API SPECIFICATION
+
+=head4 input
+
+    # Input schema (Params::Validate::Strict)
+    # any arguments are accepted and ignored
+
+=head4 output
+
+    # Output schema (Return::Set)
+    # none: always croaks
 
 =cut
 
@@ -1094,6 +1152,18 @@ sub reverse_geocode {
 =head2	ua
 
 Does nothing, here for compatibility with other geocoders
+
+=head3 API SPECIFICATION
+
+=head4 input
+
+    # Input schema (Params::Validate::Strict)
+    # any arguments are accepted and ignored
+
+=head4 output
+
+    # Output schema (Return::Set)
+    # nothing: an empty list, or undef in scalar context
 
 =cut
 

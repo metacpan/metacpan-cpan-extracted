@@ -1,6 +1,6 @@
 package File::SOPS::Backend::Age;
 # ABSTRACT: age encryption backend for SOPS
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 use Moo;
 use Carp qw(croak);
 use Crypt::Age;
@@ -191,7 +191,7 @@ File::SOPS::Backend::Age - age encryption backend for SOPS
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 

@@ -25,19 +25,33 @@ sub attributes_for {
   return [ @{ "${class}::_k8s_attributes" } ];
 }
 
-sub assert_rejected_declaration {
-  my ($class, $field, $label) = @_;
-  my $k8s = $class->can('k8s');
+# k200: a field whose accessor name is taken (by a role helper, by another
+# JSON key that sanitizes to the same name) is no longer refused: it gets a
+# renamed accessor and keeps its JSON key. What k144 protected still holds
+# and is asserted here: the existing method / attribute is untouched, the
+# registry only grows by the one new entry, and the new field is a distinct
+# wire field.
+sub assert_renamed_declaration {
+  my ($class, $field, $accessor, $label) = @_;
   my $before_registry = registry_for($class);
-  my $before_attributes = attributes_for($class);
+  my $before_method = $class->can($field);
+  ok(!$class->can($accessor), $label.': the renamed accessor '.$accessor.' is free before')
+    or return;
 
-  throws_ok { $k8s->($field, 'Str') }
-    qr/\Q$field\E/,
-    $label.' is rejected naming its JSON field';
-  is_deeply(registry_for($class), $before_registry,
-    $label.' leaves the registry unchanged after rejection');
-  is_deeply(attributes_for($class), $before_attributes,
-    $label.' leaves the attribute list unchanged after rejection');
+  lives_ok { IO::K8s::Resource->_k8s($class, $field, 'Str') }
+    $label.' is accepted';
+  my $after = registry_for($class);
+  is($after->{$accessor}{json_key}, $field,
+    $label.' is registered under accessor '.$accessor.' with its JSON key '.$field);
+  is_deeply([ sort grep { !exists $before_registry->{$_} } keys %$after ], [ $accessor ],
+    $label.' adds exactly the one registry entry');
+  is_deeply({ map { $_ => $after->{$_} } keys %$before_registry }, $before_registry,
+    $label.' leaves every existing registry entry unchanged');
+  ok(scalar(grep { $_ eq $accessor } @{ attributes_for($class) }),
+    $label.' appends the accessor to the attribute list');
+  is($class->can($field), $before_method,
+    $label.' leaves the method of the original name untouched');
+  ok($class->can($accessor), $label.' installs the renamed accessor');
 }
 
 # Shared body for the recomposition regression below: constructs, reads,
@@ -134,8 +148,8 @@ sub assert_recomposed_conditions_setter_not_shadowed {
 # unrelated ones below -- got to run.
 my $custom_conditions_error;
 eval {
-  TestK144::Conditions::Custom->can('k8s')->(
-    conditions => ['Core::V1::ComponentCondition']
+  IO::K8s::Resource->_k8s(
+    'TestK144::Conditions::Custom', conditions => ['Core::V1::ComponentCondition']
   );
   1;
 } or $custom_conditions_error = $@;
@@ -212,17 +226,25 @@ eval {
 # -- proof that `conditions` is a legitimate wire field name, not merely an
 # accessor IO::K8s::Role::APIObject happens to define. Every other
 # non-yielding helper keeps the strict rejection this subtest checks.
-subtest 'a field colliding with a non-yielding APIObject helper is rejected atomically' => sub {
-  assert_rejected_declaration(
+#
+# k200: the claim is kept, the mechanism replaced -- the helper stays the
+# helper and the registry only gains the new field, but instead of failing
+# the class the field gets a renamed accessor (_is_ready), JSON key unchanged.
+subtest 'a field colliding with a non-yielding APIObject helper gets a renamed accessor' => sub {
+  assert_renamed_declaration(
     'TestK144::MethodCollision::IsReady',
-    'is_ready',
+    'is_ready', '_is_ready',
     'is_ready colliding with the APIObject helper'
   );
-  assert_rejected_declaration(
+  assert_renamed_declaration(
     'TestK144::MethodCollision::SetOwner',
-    'set_owner',
+    'set_owner', '_set_owner',
     'set_owner colliding with the APIObject helper'
   );
+
+  my $obj = TestK144::MethodCollision::IsReady->new(is_ready => 'yes');
+  is($obj->TO_JSON->{is_ready}, 'yes', 'the field is on the wire under its JSON key');
+  is($obj->_is_ready, 'yes', 'and readable through the renamed accessor');
 };
 
 # Claim: a class that declares its own `conditions` wire field gets that
@@ -363,34 +385,38 @@ subtest 'a Pod without a top-level conditions field still reads status.condition
 
 # Claim: distinct JSON keys that sanitize to one accessor must be rejected in
 # either declaration order, including when the first declaration is inherited.
-subtest 'sanitized accessor collisions are rejected atomically in every order' => sub {
+subtest 'sanitized accessor collisions keep both keys, in every order' => sub {
   # Claim: x-value followed by x_value is two distinct wire fields, not an override.
-  assert_rejected_declaration(
+  assert_renamed_declaration(
     'TestK144::Sanitized::DashThenUnder',
-    'x_value',
+    'x_value', '_x_value',
     'x-value then x_value'
   );
 
-  # Claim: the reverse spelling order has the identical rejection contract.
-  assert_rejected_declaration(
+  # Claim: the reverse spelling order has the identical contract.
+  assert_renamed_declaration(
     'TestK144::Sanitized::UnderThenDash',
-    'x-value',
+    'x-value', '_x_value',
     'x_value then x-value'
   );
 
   # Claim: a child cannot claim a parent accessor through a different wire key.
-  assert_rejected_declaration(
+  assert_renamed_declaration(
     'TestK144::Sanitized::InheritedDashChild',
-    'x_value',
+    'x_value', '_x_value',
     'inherited x-value then child x_value'
   );
 
   # Claim: inherited collision detection is independent of the first spelling.
-  assert_rejected_declaration(
+  assert_renamed_declaration(
     'TestK144::Sanitized::InheritedUnderChild',
-    'x-value',
+    'x-value', '_x_value',
     'inherited x_value then child x-value'
   );
+
+  my $both = TestK144::Sanitized::DashThenUnder->new('x-value' => 'dash', x_value => 'under');
+  is_deeply($both->TO_JSON, { 'x-value' => 'dash', x_value => 'under' },
+    'both keys reach the wire with their own values');
 };
 
 # Claim: metadata is the intentional role-owned exception, not a declaration

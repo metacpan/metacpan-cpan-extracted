@@ -1,5 +1,10 @@
 Revision history for Data-PubSub-Shared
 
+0.12  2026-10-16
+    - Fix concurrent subscriber cursors, overflow counts and reset ordering.
+    - Handle signals safely during blocking polls and string publication.
+    - Preserve eventfd ownership, Unicode values and reader notifications.
+
 0.11      2026-09-26
           - A clear killed part-way no longer makes later int publishes
             vanish.

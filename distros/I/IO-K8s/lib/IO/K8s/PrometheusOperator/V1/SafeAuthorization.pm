@@ -1,6 +1,6 @@
 package IO::K8s::PrometheusOperator::V1::SafeAuthorization;
 # ABSTRACT: authorization configures the Authorization header credentials used by the client.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s credentials => 'Core::V1::ConfigMapKeySelector';
@@ -22,7 +22,7 @@ IO::K8s::PrometheusOperator::V1::SafeAuthorization - authorization configures th
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 credentials
 

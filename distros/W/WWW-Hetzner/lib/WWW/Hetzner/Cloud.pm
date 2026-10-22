@@ -22,9 +22,10 @@ use WWW::Hetzner::Cloud::API::LoadBalancerTypes;
 use WWW::Hetzner::Cloud::API::Certificates;
 use WWW::Hetzner::Cloud::API::PlacementGroups;
 use WWW::Hetzner::Cloud::API::Pricing;
+use WWW::Hetzner::Cloud::Costs;
 use namespace::clean;
 
-our $VERSION = '0.101';
+our $VERSION = '0.102';
 
 
 has token => (
@@ -173,6 +174,12 @@ has pricing => (
 );
 
 
+sub costs {
+    my ($self, %opts) = @_;
+    return WWW::Hetzner::Cloud::Costs->new(client => $self)->calculate(%opts);
+}
+
+
 
 1;
 
@@ -188,7 +195,7 @@ WWW::Hetzner::Cloud - Perl client for Hetzner Cloud API
 
 =head1 VERSION
 
-version 0.101
+version 0.102
 
 =head1 SYNOPSIS
 
@@ -298,6 +305,8 @@ servers, DNS zones, networks, volumes, and other resources.
 
 =item * pricing - Current price list (a single object, not a list)
 
+=item * costs - Current running cost of the project (method, see L</costs>)
+
 =back
 
 =head2 token
@@ -343,6 +352,11 @@ Returns a L<WWW::Hetzner::Cloud::API::Locations> instance for listing locations.
 =head2 datacenters
 
 Returns a L<WWW::Hetzner::Cloud::API::Datacenters> instance for listing datacenters.
+
+B<Deprecated:> Hetzner removed the datacenters endpoint, so every method of
+the returned controller dies with the API error C<410 Gone>
+(C<deprecated_api_endpoint>). The controller is kept for backward
+compatibility only; use L<WWW::Hetzner::Cloud::API::Locations> instead.
 
 =head2 zones
 
@@ -390,6 +404,22 @@ Returns a L<WWW::Hetzner::Cloud::API::PlacementGroups> instance for managing pla
 Returns a L<WWW::Hetzner::Cloud::API::Pricing> instance for reading the
 current price list. Pricing is a single object rather than a collection, so
 that controller only has C<get>.
+
+=head2 costs
+
+    my $costs = $cloud->costs;
+    my $live  = $cloud->costs(label_selector => 'env=live', price => 'net');
+
+    printf "%.4f %s/h, %.2f %s/month (%s)\n",
+        $live->{totals}{hourly},  $live->{currency},
+        $live->{totals}{monthly}, $live->{currency}, $live->{price};
+
+Returns what the project's servers (any status, plus backup surcharge),
+volumes, primary IPs, floating IPs and load balancers currently cost per hour
+and per month, priced per location from the current price list. Prices are
+gross unless C<< price => 'net' >> is passed; C<label_selector> filters every
+list request. Only reads. See L<WWW::Hetzner::Cloud::Costs> for the returned
+structure and how hourly prices are derived where the price list has none.
 
 =head1 DNS EXAMPLE
 

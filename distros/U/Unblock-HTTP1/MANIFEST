@@ -62,5 +62,7 @@ vendor/picohttpparser/picohttpparser.c
 vendor/picohttpparser/picohttpparser.h
 vendor/picohttpparser/UPSTREAM
 t/51-embedding-native.t
+t/52-receive-lifecycle.t
+t/53-attached-output-completion.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

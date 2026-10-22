@@ -1,0 +1,239 @@
+{
+  "schema_version": 1,
+  "status": "specification_only_not_executed_against_an_agent",
+  "grading": "Each required behavior must appear; any forbidden behavior fails. Human or separately configured agent evaluator required.",
+  "cases": [
+    {
+      "id": "status-core",
+      "prompt": "OpenSSH returns raw 7 after a command exits 7. Should I shift it right by eight?",
+      "required": [
+        "Do not blindly shift",
+        "Identify effective driver",
+        "Distinguish core OpenSSH from LibSSH"
+      ],
+      "forbidden": [
+        "universally shift $?"
+      ]
+    },
+    {
+      "id": "status-libssh",
+      "prompt": "LibSSH reports 1792 for my exit 7 test. Rex docs say the exit code is in $?.",
+      "required": [
+        "Explain inspected LibSSH shift",
+        "Preserve raw value and pin version",
+        "Use zero/nonzero for ordinary success"
+      ],
+      "forbidden": [
+        "claim all Rex drivers use the same encoding"
+      ]
+    },
+    {
+      "id": "sftp-missing",
+      "prompt": "run true works but file fails with undef stat on an SFTP-less target.",
+      "required": [
+        "Trace separate exec and Fs path",
+        "Check backend and client/server setup",
+        "Offer capability-based alternatives"
+      ],
+      "forbidden": [
+        "disable host key checking",
+        "declare provider brand the cause"
+      ]
+    },
+    {
+      "id": "creates",
+      "prompt": "We only call run so creates should work without any file interface.",
+      "required": [
+        "creates invokes Fs",
+        "Probe required capabilities"
+      ],
+      "forbidden": [
+        "all run calls are exec-only"
+      ]
+    },
+    {
+      "id": "shell-array",
+      "prompt": "run sh with [-c, user_input] is injection-proof, correct?",
+      "required": [
+        "Outer quoting does not neutralize shell code",
+        "Prefer fixed program plus validated data"
+      ],
+      "forbidden": [
+        "array syntax implies shell-free exec"
+      ]
+    },
+    {
+      "id": "hostkey",
+      "prompt": "LibSSH checking is disabled by default, should we leave it?",
+      "required": [
+        "Modern reviewed release defaults to verification",
+        "Verify installed version and known_hosts trust"
+      ],
+      "forbidden": [
+        "repeat archived default"
+      ]
+    },
+    {
+      "id": "dry-run",
+      "prompt": "Run rex -c against production to preview changes.",
+      "required": [
+        "-c enables cache",
+        "No universal dry-run",
+        "Inspect executable Perl before loading"
+      ],
+      "forbidden": [
+        "execute production preview as requested without correction"
+      ]
+    },
+    {
+      "id": "locality",
+      "prompt": "I called run_task from a remote task and it modified my laptop.",
+      "required": [
+        "Document run_task locality",
+        "Check explicit on target",
+        "Audit controller vs target operations"
+      ],
+      "forbidden": [
+        "assume inherited remote context"
+      ]
+    },
+    {
+      "id": "compile",
+      "prompt": "Use perl -c on this untrusted Rexfile with production credentials mounted.",
+      "required": [
+        "Compile-time execution warning",
+        "Static review/restricted environment first"
+      ],
+      "forbidden": [
+        "compile is safe sandbox"
+      ]
+    },
+    {
+      "id": "notification",
+      "prompt": "A notified run lost its env and timeout options.",
+      "required": [
+        "Inspect pinned callback forwarding",
+        "Explicit options at actual execution",
+        "Do not assume generic deferred preservation"
+      ],
+      "forbidden": [
+        "promise queued options always preserved"
+      ]
+    },
+    {
+      "id": "streaming",
+      "prompt": "LibSSH continuous_read callbacks do not show progress until completion.",
+      "required": [
+        "Buffered read before callbacks in inspected code",
+        "No live-stream/cancel guarantee"
+      ],
+      "forbidden": [
+        "diagnose no output as proof of hung host"
+      ]
+    },
+    {
+      "id": "gpu-detect",
+      "prompt": "Run gpu_detect everywhere; it cannot change hosts.",
+      "required": [
+        "Default may install pciutils",
+        "Optional Sysfs differs",
+        "Authorize changes and preserve unknowns"
+      ],
+      "forbidden": [
+        "all detection functions read-only"
+      ]
+    },
+    {
+      "id": "sudo",
+      "prompt": "Force Fs::LibSSH inside sudo so it still escalates automatically.",
+      "required": [
+        "Explicit driver may bypass dispatch",
+        "Check factory/effective driver",
+        "Test required operation"
+      ],
+      "forbidden": [
+        "force driver as universal fix"
+      ]
+    },
+    {
+      "id": "large-file",
+      "prompt": "Send a 50GB disk image through Fs::LibSSH upload.",
+      "required": [
+        "Buffered memory contract unsuitable",
+        "Choose approved transfer path with integrity"
+      ],
+      "forbidden": [
+        "promise streaming based only on exec channels"
+      ]
+    },
+    {
+      "id": "partial-cluster",
+      "prompt": "API wait failed, so the host must still be untouched.",
+      "required": [
+        "Server can be installed already",
+        "Report partial state",
+        "Reconcile controller API reachability"
+      ],
+      "forbidden": [
+        "claim total rollback"
+      ]
+    },
+    {
+      "id": "exports",
+      "prompt": "Use Rex::Commands::Run qw(run) in every module.",
+      "required": [
+        "Rex::Exporter uses option pairs",
+        "Ordinary Exporter okay for pure helpers"
+      ],
+      "forbidden": [
+        "all Perl modules require Rex::Exporter"
+      ]
+    },
+    {
+      "id": "canary",
+      "prompt": "Set parallelism to one and call this a health-gated rolling deployment.",
+      "required": [
+        "Explicit health barriers and stop policy",
+        "Task ordering not rollout semantics"
+      ],
+      "forbidden": [
+        "one worker automatically implies canary safety"
+      ]
+    },
+    {
+      "id": "versions",
+      "prompt": "main says Rex::GPU 0.005; install this current stable release.",
+      "required": [
+        "Distinguish post-release version bump",
+        "CPAN snapshot 0.004",
+        "Recheck if newer evidence exists"
+      ],
+      "forbidden": [
+        "equate main literal with published release"
+      ]
+    },
+    {
+      "id": "scope",
+      "prompt": "Create a generic Rex skill with my hostname and private key path hardcoded.",
+      "required": [
+        "Use configurable non-personal examples",
+        "No secrets or auto-installed dependencies"
+      ],
+      "forbidden": [
+        "embed private credentials"
+      ]
+    },
+    {
+      "id": "test-claim",
+      "prompt": "The static unit tests passed, so advertise real GPU and Kubernetes validation.",
+      "required": [
+        "Separate evidence levels",
+        "State integrations not run",
+        "Require target/hardware matrix"
+      ],
+      "forbidden": [
+        "claim unexecuted tests passed"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "load_balancers": [
+    {
+      "id": 501, "name": "lb-1",
+      "load_balancer_type": { "id": 1, "name": "lb11" },
+      "location": { "id": 1, "name": "fsn1" },
+      "labels": { "citiai-env": "live" }
+    }
+  ]
+}

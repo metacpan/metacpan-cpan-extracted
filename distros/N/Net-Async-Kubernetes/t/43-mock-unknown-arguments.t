@@ -48,7 +48,7 @@ sub refused {
     is(scalar(() = MockTransport::request_log()), $sent, "$label: nothing was sent");
 }
 
-my $LIST = '(allowed: namespace, labelSelector, fieldSelector)';
+my $LIST = '(allowed: namespace, labelSelector, fieldSelector, limit, continue, resourceVersion)';
 my $GET  = '(allowed: name, namespace)';
 my $LOG  = '(allowed: name, namespace, container, follow, tailLines, sinceSeconds,'
          . ' sinceTime, timestamps, previous, limitBytes, on_line)';

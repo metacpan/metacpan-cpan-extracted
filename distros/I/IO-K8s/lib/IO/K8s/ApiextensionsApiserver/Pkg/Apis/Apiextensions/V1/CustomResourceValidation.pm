@@ -1,6 +1,6 @@
 package IO::K8s::ApiextensionsApiserver::Pkg::Apis::Apiextensions::V1::CustomResourceValidation;
 # ABSTRACT: CustomResourceValidation is a list of validation methods for CustomResources.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s openAPIV3Schema => 'Apiextensions::V1::JSONSchemaProps';
@@ -20,7 +20,7 @@ IO::K8s::ApiextensionsApiserver::Pkg::Apis::Apiextensions::V1::CustomResourceVal
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 openAPIV3Schema
 

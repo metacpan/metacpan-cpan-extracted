@@ -21,8 +21,8 @@ if (!$producer) {
     my $end = time + $DURATION;
     my $ops = 0;
     while (time < $end) {
-        my $s = $p2->alloc;
-        $p2->set($s, 1);
+        my $s = $p2->alloc(0.05);
+        next unless defined $s;
         $ops++;
     }
     _exit(0);
@@ -43,7 +43,9 @@ if (!$consumer) {
 }
 
 waitpid $producer, 0;
+is $?, 0, 'producer exited successfully';
 waitpid $consumer, 0;
+is $?, 0, 'consumer exited successfully';
 
 my $st = $p->stats;
 my $allocs = $st->{allocs} // 0;

@@ -1,6 +1,6 @@
 package IO::K8s::Api::Resource::V1alpha3::DeviceClaim;
 # ABSTRACT: DeviceClaim defines how to request devices with a ResourceClaim.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s config => ['Resource::V1alpha3::DeviceClaimConfiguration'];
@@ -26,7 +26,7 @@ IO::K8s::Api::Resource::V1alpha3::DeviceClaim - DeviceClaim defines how to reque
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 config
 

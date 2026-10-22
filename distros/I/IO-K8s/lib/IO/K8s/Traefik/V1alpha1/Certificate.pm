@@ -1,6 +1,6 @@
 package IO::K8s::Traefik::V1alpha1::Certificate;
 # ABSTRACT: DefaultCertificate defines the default certificate configuration.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s secretName => Str, { required => 'schema' };
@@ -20,7 +20,7 @@ IO::K8s::Traefik::V1alpha1::Certificate - DefaultCertificate defines the default
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 secretName
 

@@ -14,6 +14,7 @@ my $c;   # producer's count, captured before freeze; the read-only view must mat
     my $hll = Data::HyperLogLog::Shared->new($path, 14);
     ok !$hll->frozen,   'freshly created estimator is not frozen';
     ok !$hll->readonly, 'read-write handle is not read-only';
+    my $peer = Data::HyperLogLog::Shared->new($path);
     $hll->add($_) for @in[0..49];
     $hll->add_many([ @in[50..499] ]);
     $c = $hll->count;
@@ -23,10 +24,19 @@ my $c;   # producer's count, captured before freeze; the read-only view must mat
     ok $hll->frozen,   'frozen after ->freeze';
     ok $hll->readonly, 'freezing handle becomes read-only';
     is $hll->count, $c, 'count unchanged by freeze';
+    is $peer->count, $c, 'an existing mutable handle reads the frozen data';
+    ok $peer->frozen, 'an existing handle observes the seal';
+    my $ops = $peer->stats->{ops};
+    for my $call (sub { $peer->add("x") }, sub { $peer->add_many([]) },
+                  sub { $peer->clear }, sub { $peer->merge($hll) }) {
+        like exception($call), qr/frozen|read-only/, 'existing handle refuses mutation after freeze';
+    }
+    is $peer->stats->{ops}, $ops, 'rejected mutations do not change operation count';
 
     like exception(sub { $hll->add("x") }),        qr/frozen|read-only/, 'add on frozen handle croaks';
     like exception(sub { $hll->add_many(["x"]) }), qr/frozen|read-only/, 'add_many on frozen handle croaks';
     like exception(sub { $hll->clear }),           qr/frozen|read-only/, 'clear on frozen handle croaks';
+    like exception(sub { $hll->merge($peer) }),     qr/frozen|read-only/, 'merge on frozen handle croaks';
     like exception(sub { $hll->freeze }),          qr/read-only/,        'freeze on a read-only handle croaks';
 }
 
@@ -93,6 +103,17 @@ like exception(sub { Data::HyperLogLog::Shared->new_readonly(undef) }),
     $A->add("local");
     $A->merge($Bro);   # must read Bro's registers without locking its PROT_READ map
     ok $A->count >= 1, 'merge target reflects its own + frozen-other items';
+}
+
+# A descriptor reopen must honor the same seal as a path reopen.
+{
+    my $h = Data::HyperLogLog::Shared->new_memfd('frozen');
+    $h->add_many(\@in);
+    my $peer = Data::HyperLogLog::Shared->new_from_fd($h->memfd);
+    $h->freeze;
+    is $peer->count, $h->count, 'memfd peer reads data after freeze';
+    like exception(sub { Data::HyperLogLog::Shared->new_from_fd($h->memfd) }),
+         qr/frozen|read-only/, 'descriptor reopen refuses a frozen estimator';
 }
 
 done_testing;

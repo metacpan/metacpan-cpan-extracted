@@ -1,9 +1,9 @@
 package IO::K8s::PrometheusOperator::V1::ProbeTargetStaticConfig;
 # ABSTRACT: staticConfig defines the static list of targets to probe and the relabeling configuration.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
-k8s labels            => { Str => 1 };
+k8s labels            => HashRef[Str];
 k8s relabelingConfigs => ['+IO::K8s::PrometheusOperator::V1::RelabelConfig'];
 k8s static            => [Str];
 
@@ -24,7 +24,7 @@ IO::K8s::PrometheusOperator::V1::ProbeTargetStaticConfig - staticConfig defines 
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 labels
 

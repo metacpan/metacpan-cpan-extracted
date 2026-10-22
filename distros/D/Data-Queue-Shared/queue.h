@@ -75,14 +75,20 @@ typedef struct {
     /* ---- Cache line 3 (192-255): mutex + arena state + stats ---- */
     uint32_t mutex;          /* 192: futex-based mutex (0 or PID|0x80000000) */
     uint32_t mutex_waiters;  /* 196 */
-    uint32_t arena_wpos;     /* 200: str mode: next write position in arena */
-    uint32_t arena_used;     /* 204: str mode: total arena bytes consumed */
+    union {
+        struct {
+            uint32_t arena_wpos; /* 200 */
+            uint32_t arena_used; /* 204 */
+        };
+        uint64_t arena_state;
+    };
     uint64_t stat_push_ok;   /* 208 */
     uint64_t stat_pop_ok;    /* 216 */
     uint64_t stat_push_full; /* 224 */
     uint64_t stat_pop_empty; /* 232 */
     uint64_t stat_recoveries;/* 240 */
-    uint8_t  _pad3[8];       /* 248-255 */
+    uint32_t str_arena_wait; /* 248: a producer has run out of arena bytes */
+    uint8_t  _pad3[4];       /* 252-255 */
 } QueueHeader;
 
 #if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
@@ -173,6 +179,14 @@ static inline int queue_ensure_copy_buf(QueueHandle *h, uint32_t needed) {
     h->copy_buf = nb;
     h->copy_buf_cap = ns;
     return 1;
+}
+
+/* Keep the arena front consistent if a process dies between metadata writes. */
+static inline void queue_set_arena(QueueHeader *hdr, uint32_t wpos, uint32_t used) {
+    union { uint32_t parts[2]; uint64_t word; } state;
+    state.parts[0] = wpos;
+    state.parts[1] = used;
+    __atomic_store_n(&hdr->arena_state, state.word, __ATOMIC_RELEASE);
 }
 
 /* ================================================================
@@ -774,7 +788,8 @@ static inline int queue_##PFX##_try_push(QueueHandle *h, VTYPE value) {       \
                 slot->value = value;                                          \
                 __atomic_store_n(&slot->sequence, (STYPE)(pos + 1),           \
                                  __ATOMIC_RELEASE);                           \
-                __atomic_add_fetch(&hdr->stat_push_ok, 1, __ATOMIC_RELAXED); \
+                /* Order publication before the waiter-count read. */       \
+                __atomic_add_fetch(&hdr->stat_push_ok, 1, __ATOMIC_SEQ_CST); \
                 queue_wake_consumers(hdr);                                    \
                 return 1;                                                     \
             }                                                                 \
@@ -811,7 +826,7 @@ static inline int queue_##PFX##_try_pop(QueueHandle *h, VTYPE *value) {       \
                 *value = slot->value;                                         \
                 __atomic_store_n(&slot->sequence,                             \
                     (STYPE)(pos + h->capacity), __ATOMIC_RELEASE);            \
-                __atomic_add_fetch(&hdr->stat_pop_ok, 1, __ATOMIC_RELAXED);  \
+                __atomic_add_fetch(&hdr->stat_pop_ok, 1, __ATOMIC_SEQ_CST);  \
                 queue_wake_producers(hdr);                                    \
                 return 1;                                                     \
             }                                                                 \
@@ -832,6 +847,20 @@ static inline int queue_##PFX##_try_pop(QueueHandle *h, VTYPE *value) {       \
     }                                                                         \
 }                                                                             \
                                                                                \
+/* Pass a wake onward when reservations completed out of order. */           \
+static inline void queue_##PFX##_handoff(QueueHandle *h, bool producer) {     \
+    QueueHeader *hdr = h->hdr;                                                \
+    uint32_t *waiters = producer ? &hdr->push_waiters : &hdr->pop_waiters;     \
+    if (!__atomic_load_n(waiters, __ATOMIC_RELAXED)) return;                 \
+    uint64_t pos = __atomic_load_n(producer ? &hdr->tail : &hdr->head,        \
+                                   __ATOMIC_RELAXED);                        \
+    SLOT *slot = &((SLOT *)h->slots)[pos & h->cap_mask];                       \
+    STYPE seq = __atomic_load_n(&slot->sequence, __ATOMIC_ACQUIRE);           \
+    if ((DTYPE)(seq - (STYPE)(pos + (producer ? 0 : 1))) < 0) return;         \
+    if (producer) queue_wake_producers(hdr);                                  \
+    else queue_wake_consumers(hdr);                                           \
+}                                                                             \
+                                                                               \
 static int queue_##PFX##_push_wait(QueueHandle *h, VTYPE value,               \
                                     double timeout) {                          \
     if (queue_##PFX##_try_push(h, value)) return 1;                           \
@@ -847,25 +876,29 @@ static int queue_##PFX##_push_wait(QueueHandle *h, VTYPE value,               \
          * push_waiters==0, skips the push_futex bump, and our subsequent  \
          * FUTEX_WAIT then sleeps on an unchanged seq with no future       \
          * waker to wake it. */                                             \
-        __atomic_add_fetch(&hdr->push_waiters, 1, __ATOMIC_RELEASE);          \
+        __atomic_add_fetch(&hdr->push_waiters, 1, __ATOMIC_SEQ_CST);          \
         uint32_t fseq = __atomic_load_n(&hdr->push_futex, __ATOMIC_ACQUIRE); \
         if (queue_##PFX##_try_push(h, value)) {                               \
             __atomic_sub_fetch(&hdr->push_waiters, 1, __ATOMIC_RELEASE);      \
+            queue_##PFX##_handoff(h, true);                                   \
             return 1;                                                         \
         }                                                                     \
-        struct timespec *pts = NULL;                                          \
+        const struct timespec *pts = &queue_lock_timeout;                                          \
         if (has_deadline) {                                                    \
             if (!queue_remaining_time(&deadline, &remaining)) {               \
                 __atomic_sub_fetch(&hdr->push_waiters, 1, __ATOMIC_RELEASE); \
                 return 0;                                                     \
             }                                                                 \
-            pts = &remaining;                                                 \
+            if (remaining.tv_sec < QUEUE_LOCK_TIMEOUT_SEC) pts = &remaining;                                                 \
         }                                                                     \
         long rc = syscall(SYS_futex, &hdr->push_futex, FUTEX_WAIT,           \
                           fseq, pts, NULL, 0);                                \
         __atomic_sub_fetch(&hdr->push_waiters, 1, __ATOMIC_RELEASE);          \
-        if (queue_##PFX##_try_push(h, value)) return 1;                       \
-        if (rc == -1 && errno == ETIMEDOUT) return 0;                         \
+        if (queue_##PFX##_try_push(h, value)) {                               \
+            queue_##PFX##_handoff(h, true);                                   \
+            return 1;                                                         \
+        }                                                                     \
+        if (has_deadline && rc == -1 && errno == ETIMEDOUT && !queue_remaining_time(&deadline, &remaining)) return 0;                         \
     }                                                                         \
 }                                                                             \
                                                                                \
@@ -881,25 +914,29 @@ static int queue_##PFX##_pop_wait(QueueHandle *h, VTYPE *value,               \
         /* Announce BEFORE sampling fseq / checking condition; see        \
          * queue_##PFX##_push_wait for the missed-wakeup race this        \
          * ordering closes. */                                             \
-        __atomic_add_fetch(&hdr->pop_waiters, 1, __ATOMIC_RELEASE);           \
+        __atomic_add_fetch(&hdr->pop_waiters, 1, __ATOMIC_SEQ_CST);           \
         uint32_t fseq = __atomic_load_n(&hdr->pop_futex, __ATOMIC_ACQUIRE);  \
         if (queue_##PFX##_try_pop(h, value)) {                                \
             __atomic_sub_fetch(&hdr->pop_waiters, 1, __ATOMIC_RELEASE);       \
+            queue_##PFX##_handoff(h, false);                                  \
             return 1;                                                         \
         }                                                                     \
-        struct timespec *pts = NULL;                                          \
+        const struct timespec *pts = &queue_lock_timeout;                                          \
         if (has_deadline) {                                                    \
             if (!queue_remaining_time(&deadline, &remaining)) {               \
                 __atomic_sub_fetch(&hdr->pop_waiters, 1, __ATOMIC_RELEASE);  \
                 return 0;                                                     \
             }                                                                 \
-            pts = &remaining;                                                 \
+            if (remaining.tv_sec < QUEUE_LOCK_TIMEOUT_SEC) pts = &remaining;                                                 \
         }                                                                     \
         long rc = syscall(SYS_futex, &hdr->pop_futex, FUTEX_WAIT,            \
                           fseq, pts, NULL, 0);                                \
         __atomic_sub_fetch(&hdr->pop_waiters, 1, __ATOMIC_RELEASE);           \
-        if (queue_##PFX##_try_pop(h, value)) return 1;                        \
-        if (rc == -1 && errno == ETIMEDOUT) return 0;                         \
+        if (queue_##PFX##_try_pop(h, value)) {                                \
+            queue_##PFX##_handoff(h, false);                                  \
+            return 1;                                                         \
+        }                                                                     \
+        if (has_deadline && rc == -1 && errno == ETIMEDOUT && !queue_remaining_time(&deadline, &remaining)) return 0;                         \
     }                                                                         \
 }                                                                             \
                                                                                \
@@ -941,6 +978,23 @@ DEFINE_INT_QUEUE(int16, QueueInt16Slot, int16_t, uint32_t, int32_t)
  * Str queue: mutex-protected with circular arena
  * ================================================================ */
 
+/* Under the mutex: a woken large value may not fit while a smaller one does.
+ * Wake its peers once per removal, without changing the space futex sequence. */
+static inline void queue_str_arena_blocked(QueueHandle *h) {
+    QueueHeader *hdr = h->hdr;
+    if (hdr->str_arena_wait) return;
+    hdr->str_arena_wait = 1;
+    if (h->arena_cap - hdr->arena_used >= 8
+        && __atomic_load_n(&hdr->push_waiters, __ATOMIC_RELAXED))
+        syscall(SYS_futex, &hdr->push_futex, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
+}
+
+static inline uint32_t queue_str_producer_wake_count(QueueHeader *hdr, uint32_t n) {
+    if (!hdr->str_arena_wait) return n;
+    hdr->str_arena_wait = 0;
+    return INT_MAX;
+}
+
 /* Push one item while mutex is already held. Returns 1=ok, 0=full, -2=too long. */
 static inline int queue_str_push_locked(QueueHandle *h, const char *str,
                                          uint32_t len, bool utf8) {
@@ -967,12 +1021,11 @@ static inline int queue_str_push_locked(QueueHandle *h, const char *str,
 
     if ((uint64_t)hdr->arena_used + skip > h->arena_cap) {
         if (hdr->tail == hdr->head) {
-            hdr->arena_wpos = 0;
-            hdr->arena_used = 0;
             saved_wpos = 0;
             pos = 0;
             skip = alloc;
         } else {
+            queue_str_arena_blocked(h);
             __atomic_add_fetch(&hdr->stat_push_full, 1, __ATOMIC_RELAXED);
             return 0;
         }
@@ -987,12 +1040,10 @@ static inline int queue_str_push_locked(QueueHandle *h, const char *str,
     slot->arena_skip = (uint32_t)skip;
     slot->prev_wpos = saved_wpos;
 
-    hdr->arena_wpos = pos + alloc;
-    hdr->arena_used += (uint32_t)skip;
-    /* The tail is the commit point, and plain stores reorder: a pusher killed before it must
-     * leave nothing published, not a message whose arena the next push writes over. */
-    __atomic_signal_fence(__ATOMIC_SEQ_CST);
-    hdr->tail++;
+    queue_set_arena(hdr, pos + alloc,
+        hdr->tail == hdr->head ? (uint32_t)skip : hdr->arena_used + (uint32_t)skip);
+    /* Publish after the payload and arena state, including on weakly ordered CPUs. */
+    __atomic_store_n(&hdr->tail, hdr->tail + 1, __ATOMIC_RELEASE);
     __atomic_add_fetch(&hdr->stat_push_ok, 1, __ATOMIC_RELAXED);
     return 1;
 }
@@ -1039,16 +1090,14 @@ static inline int queue_str_pop_locked(QueueHandle *h, const char **out_str,
     uint32_t skip = slot->arena_skip;
     /* Consume before crediting the bytes back: a crash between the two then
      * leaves a self-healing over-count, not a message the next push overwrites. */
-    hdr->head++;
-    __atomic_signal_fence(__ATOMIC_SEQ_CST);
+    __atomic_store_n(&hdr->head, hdr->head + 1, __ATOMIC_RELAXED);
 
     if (last) {
-        hdr->arena_used = 0;
-        hdr->arena_wpos = 0;
+        queue_set_arena(hdr, 0, 0);
     } else if (hdr->arena_used <= skip) {
-        hdr->arena_used = 0;
+        __atomic_store_n(&hdr->arena_used, 0, __ATOMIC_RELEASE);
     } else {
-        hdr->arena_used -= skip;
+        __atomic_store_n(&hdr->arena_used, hdr->arena_used - skip, __ATOMIC_RELEASE);
     }
 
     __atomic_add_fetch(&hdr->stat_pop_ok, 1, __ATOMIC_RELAXED);
@@ -1059,8 +1108,9 @@ static inline int queue_str_try_pop(QueueHandle *h, const char **out_str,
                                      uint32_t *out_len, bool *out_utf8) {
     queue_mutex_lock(h->hdr);
     int r = queue_str_pop_locked(h, out_str, out_len, out_utf8);
+    uint32_t wake = r == 1 ? queue_str_producer_wake_count(h->hdr, 1) : 0;
     queue_mutex_unlock(h->hdr);
-    if (r == 1) queue_wake_producers(h->hdr);
+    if (wake) queue_wake_producers_n(h->hdr, wake);
     return r;
 }
 
@@ -1088,20 +1138,22 @@ static int queue_str_push_wait(QueueHandle *h, const char *str,
             return r;
         }
 
-        struct timespec *pts = NULL;
+        /* Periodic retries also recover a peer killed before its wakeup. */
+        const struct timespec *pts = &queue_lock_timeout;
         if (has_deadline) {
             if (!queue_remaining_time(&deadline, &remaining)) {
                 __atomic_sub_fetch(&hdr->push_waiters, 1, __ATOMIC_RELEASE);
                 return 0;
             }
-            pts = &remaining;
+            if (remaining.tv_sec < QUEUE_LOCK_TIMEOUT_SEC) pts = &remaining;
         }
         long rc = syscall(SYS_futex, &hdr->push_futex, FUTEX_WAIT, seq, pts, NULL, 0);
         __atomic_sub_fetch(&hdr->push_waiters, 1, __ATOMIC_RELEASE);
 
         r = queue_str_try_push(h, str, len, utf8);
         if (r != 0) return r;
-        if (rc == -1 && errno == ETIMEDOUT) return 0;
+        if (has_deadline && rc == -1 && errno == ETIMEDOUT
+            && !queue_remaining_time(&deadline, &remaining)) return 0;
     }
 }
 
@@ -1126,20 +1178,21 @@ static int queue_str_pop_wait(QueueHandle *h, const char **out_str,
             return r;
         }
 
-        struct timespec *pts = NULL;
+        const struct timespec *pts = &queue_lock_timeout;
         if (has_deadline) {
             if (!queue_remaining_time(&deadline, &remaining)) {
                 __atomic_sub_fetch(&hdr->pop_waiters, 1, __ATOMIC_RELEASE);
                 return 0;
             }
-            pts = &remaining;
+            if (remaining.tv_sec < QUEUE_LOCK_TIMEOUT_SEC) pts = &remaining;
         }
         long rc = syscall(SYS_futex, &hdr->pop_futex, FUTEX_WAIT, seq, pts, NULL, 0);
         __atomic_sub_fetch(&hdr->pop_waiters, 1, __ATOMIC_RELEASE);
 
         r = queue_str_try_pop(h, out_str, out_len, out_utf8);
         if (r != 0) return r;
-        if (rc == -1 && errno == ETIMEDOUT) return 0;
+        if (has_deadline && rc == -1 && errno == ETIMEDOUT
+            && !queue_remaining_time(&deadline, &remaining)) return 0;
     }
 }
 
@@ -1156,10 +1209,8 @@ static void queue_str_clear(QueueHandle *h) {
     QueueHeader *hdr = h->hdr;
     queue_mutex_lock(hdr);
     /* One store empties it: zeroing head and tail apart would leave tail-head garbage. */
-    hdr->head = hdr->tail;
-    __atomic_signal_fence(__ATOMIC_SEQ_CST);
-    hdr->arena_wpos = 0;
-    hdr->arena_used = 0;
+    __atomic_store_n(&hdr->head, hdr->tail, __ATOMIC_RELAXED);
+    queue_set_arena(hdr, 0, 0);
     queue_mutex_unlock(hdr);
     /* clear is a bulk transition -- wake every blocked producer and
      * consumer so they re-evaluate state, not just one of each. */
@@ -1245,8 +1296,7 @@ static inline int queue_str_push_front(QueueHandle *h, const char *str,
          * start, resetting the ring (also defragments a drained arena). */
         pos  = 0;
         skip = alloc;
-        hdr->arena_used = alloc;
-        hdr->arena_wpos = alloc;
+        queue_set_arena(hdr, alloc, alloc);
     } else {
         uint32_t rpos = (uint32_t)(((uint64_t)hdr->arena_wpos
                           + cap - (hdr->arena_used % cap)) % cap);
@@ -1258,6 +1308,7 @@ static inline int queue_str_push_front(QueueHandle *h, const char *str,
             skip = alloc + rpos;   /* wasting the [0, rpos) bytes below it  */
         }
         if ((uint64_t)hdr->arena_used + skip > cap) {
+            queue_str_arena_blocked(h);
             __atomic_add_fetch(&hdr->stat_push_full, 1, __ATOMIC_RELAXED);
             queue_mutex_unlock(hdr);
             return 0;
@@ -1273,9 +1324,7 @@ static inline int queue_str_push_front(QueueHandle *h, const char *str,
     slot->packed_len = len | (utf8 ? QUEUE_STR_UTF8_FLAG : 0);
     slot->arena_skip = skip;
     slot->prev_wpos  = hdr->arena_wpos;   /* retained for layout stability */
-    /* The slot before the head that publishes it. */
-    __atomic_signal_fence(__ATOMIC_SEQ_CST);
-    hdr->head--;
+    __atomic_store_n(&hdr->head, hdr->head - 1, __ATOMIC_RELEASE);
 
     __atomic_add_fetch(&hdr->stat_push_ok, 1, __ATOMIC_RELAXED);
     queue_mutex_unlock(hdr);
@@ -1304,20 +1353,21 @@ static int queue_str_push_front_wait(QueueHandle *h, const char *str,
             return r;
         }
 
-        struct timespec *pts = NULL;
+        const struct timespec *pts = &queue_lock_timeout;
         if (has_deadline) {
             if (!queue_remaining_time(&deadline, &remaining)) {
                 __atomic_sub_fetch(&hdr->push_waiters, 1, __ATOMIC_RELEASE);
                 return 0;
             }
-            pts = &remaining;
+            if (remaining.tv_sec < QUEUE_LOCK_TIMEOUT_SEC) pts = &remaining;
         }
         long rc = syscall(SYS_futex, &hdr->push_futex, FUTEX_WAIT, seq, pts, NULL, 0);
         __atomic_sub_fetch(&hdr->push_waiters, 1, __ATOMIC_RELEASE);
 
         r = queue_str_push_front(h, str, len, utf8);
         if (r != 0) return r;
-        if (rc == -1 && errno == ETIMEDOUT) return 0;
+        if (has_deadline && rc == -1 && errno == ETIMEDOUT
+            && !queue_remaining_time(&deadline, &remaining)) return 0;
     }
 }
 
@@ -1333,9 +1383,8 @@ static inline int queue_str_pop_back(QueueHandle *h, const char **out_str,
         return 0;
     }
 
-    hdr->tail--;
-    /* Unpublish before crediting the bytes back, as in pop. */
-    __atomic_signal_fence(__ATOMIC_SEQ_CST);
+    /* Unpublish before the release store that credits the arena bytes back. */
+    __atomic_store_n(&hdr->tail, hdr->tail - 1, __ATOMIC_RELAXED);
     uint32_t idx = (uint32_t)(hdr->tail & h->cap_mask);
     QueueStrSlot *slot = &((QueueStrSlot *)h->slots)[idx];
 
@@ -1345,7 +1394,7 @@ static inline int queue_str_pop_back(QueueHandle *h, const char **out_str,
     *out_utf8 = (slot->packed_len & QUEUE_STR_UTF8_FLAG) != 0;
 
     if (!queue_ensure_copy_buf(h, len + 1)) {
-        hdr->tail++;  /* rollback */
+        __atomic_store_n(&hdr->tail, hdr->tail + 1, __ATOMIC_RELAXED); /* rollback */
         queue_mutex_unlock(hdr);
         return -1;
     }
@@ -1362,19 +1411,19 @@ static inline int queue_str_pop_back(QueueHandle *h, const char **out_str,
      * holds whether the element was appended (push) or prepended
      * (push_front). */
     if (hdr->tail == hdr->head) {
-        hdr->arena_used = 0;
-        hdr->arena_wpos = 0;
+        queue_set_arena(hdr, 0, 0);
     } else if (hdr->arena_used <= slot->arena_skip || h->arena_cap == 0) {
-        hdr->arena_used = 0;
+        __atomic_store_n(&hdr->arena_used, 0, __ATOMIC_RELEASE);
     } else {
-        hdr->arena_used -= slot->arena_skip;
-        hdr->arena_wpos = (uint32_t)(((uint64_t)hdr->arena_wpos
-                          + h->arena_cap - (slot->arena_skip % h->arena_cap)) % h->arena_cap);
+        queue_set_arena(hdr, (uint32_t)(((uint64_t)hdr->arena_wpos
+                          + h->arena_cap - (slot->arena_skip % h->arena_cap)) % h->arena_cap),
+                          hdr->arena_used - slot->arena_skip);
     }
 
     __atomic_add_fetch(&hdr->stat_pop_ok, 1, __ATOMIC_RELAXED);
+    uint32_t wake = queue_str_producer_wake_count(hdr, 1);
     queue_mutex_unlock(hdr);
-    queue_wake_producers(hdr);
+    if (wake) queue_wake_producers_n(hdr, wake);
     return 1;
 }
 
@@ -1399,24 +1448,25 @@ static int queue_str_pop_back_wait(QueueHandle *h, const char **out_str,
             return r;
         }
 
-        struct timespec *pts = NULL;
+        const struct timespec *pts = &queue_lock_timeout;
         if (has_deadline) {
             if (!queue_remaining_time(&deadline, &remaining)) {
                 __atomic_sub_fetch(&hdr->pop_waiters, 1, __ATOMIC_RELEASE);
                 return 0;
             }
-            pts = &remaining;
+            if (remaining.tv_sec < QUEUE_LOCK_TIMEOUT_SEC) pts = &remaining;
         }
         long rc = syscall(SYS_futex, &hdr->pop_futex, FUTEX_WAIT, seq, pts, NULL, 0);
         __atomic_sub_fetch(&hdr->pop_waiters, 1, __ATOMIC_RELEASE);
 
         r = queue_str_pop_back(h, out_str, out_len, out_utf8);
         if (r != 0) return r;
-        if (rc == -1 && errno == ETIMEDOUT) return 0;
+        if (has_deadline && rc == -1 && errno == ETIMEDOUT
+            && !queue_remaining_time(&deadline, &remaining)) return 0;
     }
 }
 
-/* msync -- flush mmap to disk for crash durability */
+/* msync -- flush mapped pages to disk */
 static inline int queue_sync(QueueHandle *h) {
     return msync(h->hdr, h->mmap_size, MS_SYNC);
 }
@@ -1436,6 +1486,7 @@ static inline int queue_eventfd_create(QueueHandle *h) {
  * it ourselves via queue_eventfd_create -- caller-supplied fds remain
  * the caller's property. */
 static inline void queue_eventfd_set(QueueHandle *h, int fd) {
+    if (h->notify_fd == fd) return;
     if (h->notify_fd >= 0 && h->notify_fd != fd && h->notify_fd_owned)
         close(h->notify_fd);
     h->notify_fd = fd;

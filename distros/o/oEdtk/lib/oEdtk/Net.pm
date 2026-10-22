@@ -25,7 +25,7 @@ our @EXPORT_OK = qw( ua_ssl_opts make_ua );
 use IO::Socket::SSL qw( SSL_VERIFY_PEER SSL_VERIFY_NONE );
 use LWP::UserAgent;
 
-our $VERSION = 2.1129;
+our $VERSION = 2.1131;
 
 use constant DEFAULT_VERIFY => 1;
 

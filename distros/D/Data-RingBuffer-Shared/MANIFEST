@@ -29,6 +29,9 @@ t/eventfd_set.t
 t/pod_synopsis.t
 t/version_check.t
 t/06-foreign-invocant.t
+t/07-wait-signals.t
+t/08-list.t
+t/09-wait-race.t
 xt/abi_skew.t
 xt/asan.t
 xt/cloexec.t
@@ -55,6 +58,7 @@ xt/multiwriter_seq.t
 xt/persistence_roundtrip.t
 xt/reader_livelock.t
 xt/seq_wraparound.t
+xt/slot_sequence.t
 xt/stress.t
 xt/timeout_validation.t
 xt/truncation.t

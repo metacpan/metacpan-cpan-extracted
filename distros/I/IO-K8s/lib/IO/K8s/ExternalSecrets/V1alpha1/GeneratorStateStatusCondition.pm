@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1alpha1::GeneratorStateStatusCondition;
 # ABSTRACT: GeneratorStateStatusCondition represents the observed condition of a generator state.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s lastTransitionTime => Time;
@@ -28,7 +28,7 @@ IO::K8s::ExternalSecrets::V1alpha1::GeneratorStateStatusCondition - GeneratorSta
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 lastTransitionTime
 

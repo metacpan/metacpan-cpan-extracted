@@ -1,6 +1,6 @@
 package IO::K8s::PrometheusOperator::V1alpha1::KubernetesSDConfig;
 # ABSTRACT: KubernetesSDConfig allows retrieving scrape targets from Kubernetes' REST API.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s apiServer            => Str;
@@ -12,7 +12,7 @@ k8s followRedirects      => Bool;
 k8s namespaces           => '+IO::K8s::PrometheusOperator::V1alpha1::NamespaceDiscovery';
 k8s noProxy              => Str;
 k8s oauth2               => '+IO::K8s::PrometheusOperator::V1alpha1::OAuth2';
-k8s proxyConnectHeader   => Opaque;
+k8s proxyConnectHeader   => HashRef[ArrayRef[InstanceOf['IO::K8s::Api::Core::V1::SecretKeySelector']]];
 k8s proxyFromEnvironment => Bool;
 k8s proxyUrl             => Str, { pattern => qr/^(http|https|socks5):\/\/.+$/ };
 k8s role                 => Str, { required => 'schema', enum => [qw(Pod Endpoints Ingress Service Node EndpointSlice)] };
@@ -48,7 +48,7 @@ IO::K8s::PrometheusOperator::V1alpha1::KubernetesSDConfig - KubernetesSDConfig a
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 apiServer
 

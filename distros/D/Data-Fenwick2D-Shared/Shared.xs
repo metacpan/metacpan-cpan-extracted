@@ -156,9 +156,9 @@ update(self, x, y, delta)
     if (h->readonly) croak("Data::Fenwick2D::Shared->update: structure is frozen (read-only)");
     CHECK_XY(x, y);
     f2d_rwlock_wrlock(h);
-    if (h->hdr->sealed) { f2d_rwlock_wrunlock(h); croak("Data::Fenwick2D::Shared->update: structure is frozen (read-only)"); }
+    if (__atomic_load_n(&h->hdr->sealed, __ATOMIC_RELAXED)) { f2d_rwlock_wrunlock(h); croak("Data::Fenwick2D::Shared->update: structure is frozen (read-only)"); }
     f2d_update_locked(h, (uint64_t)x, (uint64_t)y, (int64_t)delta);
-    __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);
+    h->hdr->stat_ops++;
     f2d_rwlock_wrunlock(h);
 
 IV
@@ -174,10 +174,10 @@ set(self, x, y, value)
     if (h->readonly) croak("Data::Fenwick2D::Shared->set: structure is frozen (read-only)");
     CHECK_XY(x, y);
     f2d_rwlock_wrlock(h);
-    if (h->hdr->sealed) { f2d_rwlock_wrunlock(h); croak("Data::Fenwick2D::Shared->set: structure is frozen (read-only)"); }
+    if (__atomic_load_n(&h->hdr->sealed, __ATOMIC_RELAXED)) { f2d_rwlock_wrunlock(h); croak("Data::Fenwick2D::Shared->set: structure is frozen (read-only)"); }
     cur = f2d_point_locked(h, (uint64_t)x, (uint64_t)y);           /* current value at (x,y) */
-    f2d_update_locked(h, (uint64_t)x, (uint64_t)y, (int64_t)value - cur);
-    __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);
+    f2d_update_locked(h, (uint64_t)x, (uint64_t)y, (int64_t)((uint64_t)value - (uint64_t)cur));
+    h->hdr->stat_ops++;
     f2d_rwlock_wrunlock(h);
     RETVAL = (IV)cur;                                              /* previous value */
   OUTPUT:
@@ -191,9 +191,9 @@ clear(self)
   CODE:
     if (h->readonly) croak("Data::Fenwick2D::Shared->clear: structure is frozen (read-only)");
     f2d_rwlock_wrlock(h);
-    if (h->hdr->sealed) { f2d_rwlock_wrunlock(h); croak("Data::Fenwick2D::Shared->clear: structure is frozen (read-only)"); }
+    if (__atomic_load_n(&h->hdr->sealed, __ATOMIC_RELAXED)) { f2d_rwlock_wrunlock(h); croak("Data::Fenwick2D::Shared->clear: structure is frozen (read-only)"); }
     f2d_clear_locked(h);
-    __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);
+    h->hdr->stat_ops++;
     f2d_rwlock_wrunlock(h);
 
 void
@@ -212,7 +212,7 @@ frozen(self)
   PREINIT:
     EXTRACT(self);
   CODE:
-    RETVAL = h->hdr->sealed ? 1 : 0;
+    RETVAL = __atomic_load_n(&h->hdr->sealed, __ATOMIC_ACQUIRE) ? 1 : 0;
   OUTPUT:
     RETVAL
 
@@ -359,7 +359,7 @@ stats(self)
         hv_stores(hv, "total",     newSViv((IV)tot));
         hv_stores(hv, "ops",       newSVuv((UV)ops));
         hv_stores(hv, "mmap_size", newSVuv((UV)mmap_size));
-        hv_stores(hv, "frozen",    newSVuv(h->hdr->sealed ? 1 : 0));
+        hv_stores(hv, "frozen",    newSVuv(__atomic_load_n(&h->hdr->sealed, __ATOMIC_ACQUIRE) ? 1 : 0));
         hv_stores(hv, "readonly",  newSVuv(h->readonly ? 1 : 0));
         RETVAL = newRV_noinc((SV *)hv);
     }

@@ -25,6 +25,9 @@
 .claude/todos/
 .claude/projects/
 
+# Claude Code worktrees (isolated agents) -- never commit
+/.claude/worktrees/
+
 # Perl / Dist::Zilla distribution
 
 # Build artifacts
@@ -85,3 +88,7 @@ AGENTS.md
 # karr materialized task view -- never commit
 tasks/
 config.yml
+
+# skilletor: committe Config + Ignore-Block
+!.claude/skilletor.json
+!.claude/.gitignore

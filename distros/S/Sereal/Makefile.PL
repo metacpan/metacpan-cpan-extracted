@@ -4,7 +4,7 @@ use warnings;
 
 use ExtUtils::MakeMaker;
 use Cwd;
-our $VERSION = '5.010';
+our $VERSION = '5.011';
 $VERSION = eval $VERSION or die "WTF: $VERSION: $@";    # deal with underbars
 
 my $shared_dir        = "../shared";
@@ -28,7 +28,7 @@ inc::Sereal::BuildTools::link_files( $shared_dir, "tests_only" ) if $in_source_r
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
 WriteMakefile1(
-    MIN_PERL_VERSION => '5.008',
+    MIN_PERL_VERSION => '5.014',
     META_MERGE       => {
         resources => {
             repository => {
@@ -60,7 +60,7 @@ WriteMakefile1(
     },                                  # e.g., Module::Name => 1.1
     LICENSE       => 'perl',
     ABSTRACT_FROM => 'lib/Sereal.pm',
-    AUTHOR        => 'Steffen Mueller <smueller@cpan.org>, Yves Orton <yves@cpan.org>',
+    AUTHOR        => 'Steffen Mueller <cpan@steffen-mueller.net>, Yves Orton <yves@cpan.org>',
     test          => {
         TESTS => "t/*.t t/*/*/*.t",
     },

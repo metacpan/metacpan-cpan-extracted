@@ -255,7 +255,7 @@ tkn_day_phrase(pTHX_ SV *self, tkn_lexicon *L, SV *words, SV *text, HV *info)
             int want = pass ? (day == 1 ? 2 : 1) : day;
             SV *sub = *av_fetch(tok, at, 0), *t2, *got;
             HV *pi = pass ? tkn_info_new(aTHX) : si;
-            AV *t = (AV *)sv_2mortal((SV *)av_make(n, AvARRAY(tok)));
+            AV *t = (AV *)sv_2mortal((SV *)tkn_av_copy(n, AvARRAY(tok)));
             time_keeper_civil c;
             STRLEN sl;
             const char *sb = SvPV_const(sub, sl);

@@ -141,13 +141,13 @@ SUMMARY
             my $search_content = $search->Content;
             my $xlsx;
 
-            if ( ( $search_content->{SearchType} // '' ) eq 'Chart' ) {
+            if ( $search->Type =~ /Chart$/ ) {
                 $xlsx = RunComponent(
                     '/Search/Chart.xlsx',
                     'Query'         => $search_content->{'Query'}         || '',
                     'GroupBy'       => $search_content->{'GroupBy'}       || '',
                     'ChartFunction' => $search_content->{'ChartFunction'} || '',
-                    'Class'         => $search_content->{'Class'}         || 'RT::Tickets',
+                    'Class'         => $search->Class                     || 'RT::Tickets',
                 );
             }
             else {
@@ -157,7 +157,7 @@ SUMMARY
                     'Order'      => $search_content->{'Order'}   || '',
                     'OrderBy'    => $search_content->{'OrderBy'} || '',
                     'Format'     => $search_content->{'Format'}  || '',
-                    'Class'      => 'RT::' . ( $search_content->{'SearchType'} || 'Ticket' ) . 's',
+                    'Class'      => $search->Class               || 'RT::Tickets',
                     'ObjectType' => $search_content->{'ObjectType'} || '',
                 );
             }

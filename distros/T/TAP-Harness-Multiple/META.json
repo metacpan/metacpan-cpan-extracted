@@ -1,0 +1,61 @@
+{
+   "abstract" : "Run and archive multiple test harnesses in a single harness",
+   "author" : [
+      "James E Keenan (jkeenan@pobox.com)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "TAP-Harness-Multiple",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Path" : "2.07",
+            "TAP::Harness::Archive" : "0.14",
+            "Test::Harness" : "3.23"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "IO::CaptureOutput" : "0",
+            "Test::Simple" : "0.44"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/jkeenan/TAP-Harness-Multiple/issues"
+      },
+      "homepage" : "http://thenceforward.net/perl/modules/TAP-Harness-Multiple/",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/jkeenan/TAP-Harness-Multiple.git",
+         "web" : "https://github.com/jkeenan/TAP-Harness-Multiple"
+      }
+   },
+   "version" : "0.08",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

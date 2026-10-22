@@ -25,35 +25,48 @@ plan skip_all => 'libasan.so / libubsan.so not located'
     unless -f $asan_lib && -f $ubsan_lib;
 
 my $cwd = getcwd;
+END { chdir $cwd if defined $cwd }
 my $tmp = tempdir(CLEANUP => 1);
+system('cp', '-r', "$cwd/lib", "$cwd/XS.xs", "$cwd/Makefile.PL", "$tmp/") == 0
+    or die "cp failed ($?)";
 chdir $tmp or die "chdir $tmp: $!";
 
-my $perl = $Config{perlpath} || 'perl';
-my $opts = q{OPTIMIZE=-O0 -g -fsanitize=address,undefined -fno-omit-frame-pointer};
+sub capture {
+    my $pid = open my $pipe, '-|';
+    die "fork: $!" unless defined $pid;
+    if (!$pid) {
+        open STDERR, '>&', STDOUT or die "redirect stderr: $!";
+        exec @_;
+        die "exec: $!";
+    }
+    my $out = do { local $/; <$pipe> };
+    close $pipe;
+    return ($?, $out);
+}
 
-# Build out-of-tree, pointing back to the source.
-local $ENV{PERL_MM_OPT} = $opts;
-local $ENV{LD} = "cc -fsanitize=address,undefined";
+my $perl = $^X;
+my @opts = ('OPTIMIZE=-O0 -g -fsanitize=address,undefined -fno-omit-frame-pointer',
+            "LDDLFLAGS=$Config{lddlflags} -fsanitize=address,undefined");
 my $rc;
+my $out;
 
-$rc = system("$perl $cwd/Makefile.PL >/dev/null 2>&1");
-ok($rc == 0, "Makefile.PL configured under sanitizer flags") or do { chdir $cwd; done_testing; exit };
+($rc, $out) = capture($perl, 'Makefile.PL', @opts);
+ok($rc == 0, "Makefile.PL configured under sanitizer flags") or do { diag($out); done_testing; exit };
 
-$rc = system("make CCFLAGS_AS_NEEDED= LD='cc -fsanitize=address,undefined' >/dev/null 2>&1");
-ok($rc == 0, "build under sanitizer flags") or do { chdir $cwd; done_testing; exit };
+($rc, $out) = capture('make');
+ok($rc == 0, "build under sanitizer flags") or do { diag($out); done_testing; exit };
 
 local $ENV{LD_PRELOAD}    = "$asan_lib $ubsan_lib";
-local $ENV{ASAN_OPTIONS}  = 'detect_leaks=1:abort_on_error=0:halt_on_error=0';
-local $ENV{UBSAN_OPTIONS} = 'print_stacktrace=1:halt_on_error=0';
+local $ENV{ASAN_OPTIONS}  = 'detect_leaks=1:halt_on_error=1';
+local $ENV{UBSAN_OPTIONS} = 'print_stacktrace=1:halt_on_error=1';
 
-my $out = `prove -b $cwd/t/ 2>&1`;
-$rc = $? >> 8;
+($rc, $out) = capture($perl, '-S', 'prove', '-b', "$cwd/t/");
 my $pass = $rc == 0;
 
-ok($pass, "all tests pass under ASan/UBSan");
-unlike($out, qr/AddressSanitizer:.*\bDataPath/i,  'no ASan reports rooted in Data::Path::XS')
+ok($pass, "all tests pass under ASan/UBSan") or diag($out);
+unlike($out, qr/(?:ERROR|SUMMARY): (?:AddressSanitizer|LeakSanitizer)|AddressSanitizer:DEADLYSIGNAL/, 'no ASan reports')
     or diag($out);
-unlike($out, qr/runtime error:.*\bXS\.xs/,         'no UBSan reports rooted in XS.xs')
+unlike($out, qr/runtime error:/, 'no UBSan reports')
     or diag($out);
 
 chdir $cwd;

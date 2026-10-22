@@ -29,7 +29,7 @@ use Time::Piece;
 use oEdtk::Config qw(config_read);
 use oEdtk::Net    qw(make_ua);
 
-our $VERSION = 2.1129;
+our $VERSION = 2.1131;
 
 # The wire contract, unchanged from the fork.
 use constant USER_AGENT      => 'oEUser';

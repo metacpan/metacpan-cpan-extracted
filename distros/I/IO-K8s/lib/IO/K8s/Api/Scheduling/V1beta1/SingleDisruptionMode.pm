@@ -1,6 +1,6 @@
 package IO::K8s::Api::Scheduling::V1beta1::SingleDisruptionMode;
 # ABSTRACT: SingleDisruptionMode specifies that children can be disrupted independently.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 1;
@@ -17,7 +17,7 @@ IO::K8s::Api::Scheduling::V1beta1::SingleDisruptionMode - SingleDisruptionMode s
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head1 SUPPORT
 

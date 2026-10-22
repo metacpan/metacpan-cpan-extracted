@@ -1,0 +1,36 @@
+use strict;
+use warnings;
+use Rex -feature => ['1.4'];
+use JSON::PP;
+
+# The environment selects a reviewed backend name, not an arbitrary Perl module.
+my $backend = $ENV{REX_BACKEND} // 'OpenSSH';
+die "REX_BACKEND must be OpenSSH, SSH, or LibSSH\n"
+    unless $backend =~ /\A(?:OpenSSH|SSH|LibSSH)\z/;
+require Rex::LibSSH if $backend eq 'LibSSH';
+set connection => $backend;
+
+desc 'Observe raw status for a fixed non-mutating POSIX-shell probe';
+task 'inspect_status_contract', sub {
+    die "Remote context required\n" if Rex::is_local();
+    my $driver = ref Rex::Interface::Exec->create();
+    my ($stdout, $stderr);
+    my $returned = run q{printf '%s\n' 'probe-out'; printf '%s\n' 'probe-err' >&2; exit 7},
+        sub {
+            ($stdout, $stderr) = @_;
+            return $stdout;
+        }, auto_die => 0;
+    my $raw_status = $?; # Capture before JSON encoding or other work.
+    print JSON::PP->new->canonical->pretty->encode({
+        configured_backend => $backend,
+        effective_exec_driver => $driver,
+        raw_status => $raw_status,
+        success => $raw_status == 0 ? JSON::PP::true : JSON::PP::false,
+        stdout => $stdout,
+        stderr => $stderr,
+        returned => $returned,
+        expected_program_exit => 7,
+        decoded_exit => undef, # No unverified universal status normalization.
+    });
+};
+1;

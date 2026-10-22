@@ -1,5 +1,18 @@
 Revision history for Net-QUIC
 
+0.06  2026-10-21
+    - Wake existing bounded-send Stream producers when a peer connection-wide
+      MAX_DATA update restores transmission credit, including Streams with
+      no outstanding bytes and therefore no individual ACK to wake them.
+    - Reuse the existing on_stream_activity / next_active_stream_id wakeup
+      contract; do not introduce an HTTP dependency or public API break.
+    - Keep transmit-credit snapshots conditional on registered blocked
+      producers to avoid overhead for ordinary send paths.
+    - Add standalone regression t/38-max-data-wakeup.t and preserve
+      Net::QUIC's loop-neutral, independently usable Client/Server APIs.
+    - Verify the unreleased source on the existing full Linux/Windows/macOS
+      Perl CI matrix before final GitHub/CPAN release.
+
 0.05  2026-10-18
     - Add optional Stream->send_some($bytes, limit_to_credit => 1) for
       advanced multiplexed senders. Keep the default send_some behavior

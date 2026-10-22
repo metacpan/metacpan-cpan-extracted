@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1::VolcengineAuthSecretRef;
 # ABSTRACT: SecretRef defines the static credentials to use for authentication.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s accessKeyID     => '+IO::K8s::ExternalSecrets::V1::SecretKeySelector', { required => 'schema' };
@@ -24,7 +24,7 @@ IO::K8s::ExternalSecrets::V1::VolcengineAuthSecretRef - SecretRef defines the st
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 accessKeyID
 

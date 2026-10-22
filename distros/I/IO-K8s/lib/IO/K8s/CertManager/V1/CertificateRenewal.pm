@@ -1,6 +1,6 @@
 package IO::K8s::CertManager::V1::CertificateRenewal;
 # ABSTRACT: `renewal` allows configuration of how your certificate is renewed.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s policy  => Str, { enum => [qw(RenewBefore Disabled)] };
@@ -22,7 +22,7 @@ IO::K8s::CertManager::V1::CertificateRenewal - `renewal` allows configuration of
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 policy
 

@@ -1,6 +1,6 @@
 package Net::Async::Kubernetes::Watcher;
 # ABSTRACT: Auto-reconnecting Kubernetes watch as IO::Async::Notifier
-our $VERSION = '0.009';
+our $VERSION = '0.011';
 use strict;
 use warnings;
 use parent 'IO::Async::Notifier';
@@ -170,6 +170,13 @@ sub _start_watch {
     my %params = (
         watch          => 'true',
         timeoutSeconds => $self->timeout,
+        # Without it the only resourceVersion a quiet watch ever holds is
+        # that of the last initial ADDED event, older than the state the
+        # server started the watch from, and the reconnect replays history
+        # from there (k73). With it the server sends BOOKMARK events (one
+        # after the initial events, then periodically) carrying the current
+        # one.
+        allowWatchBookmarks => 'true',
     );
     $params{resourceVersion} = $self->{_resource_version}
         if defined $self->{_resource_version};
@@ -206,6 +213,16 @@ sub _start_watch {
             my $event = $result->{event};
             $weak_self->{_stream_events}++;
 
+            # A BOOKMARK only carries the resourceVersion (taken above). It
+            # is an event for the attempt (a stream that got one ran its
+            # course) but not one for the consumer: not dispatched, to
+            # on_event neither, and no name filter or event_types decides.
+            if ($event->type eq 'BOOKMARK') {
+                $weak_self->{_failures} = 0;
+                $weak_self->{_stream_error} = undef;
+                next;
+            }
+
             if ($result->{is_error}) {
                 if ($result->{error_code} == 410) {
                     $weak_self->{_resource_version} = undef;
@@ -235,6 +252,17 @@ sub _start_watch {
         # A rejected request (401, 403, 5xx) resolves like any response. It
         # is a failed attempt, not a watch cycle that ran its course.
         if ($response->status >= 400) {
+            # 410 Gone on the request itself (aggregated API servers,
+            # proxies) is the same expired resourceVersion as the ERROR
+            # event: forget it and start over at once, silently (k78). Only
+            # when there was a version to forget: a 410 to a request without
+            # one is a failed attempt like any other and meets the backoff
+            # instead of a tight loop. The failure count is kept - this
+            # restart is no success.
+            if ($response->status == 410 && defined $weak_self->{_resource_version}) {
+                $weak_self->{_resource_version} = undef;
+                return $weak_self->_start_watch;
+            }
             my $cause = eval {
                 $rest->check_response($response, 'watch ' . $weak_self->resource);
                 1;
@@ -432,7 +460,7 @@ Net::Async::Kubernetes::Watcher - Auto-reconnecting Kubernetes watch as IO::Asyn
 
 =head1 VERSION
 
-version 0.009
+version 0.011
 
 =head1 SYNOPSIS
 
@@ -475,9 +503,18 @@ The watcher automatically:
 
 =item * Reconnects when the server-side timeout expires
 
-=item * Resumes from the last C<resourceVersion> to avoid missing events
+=item * Resumes from the last C<resourceVersion> to avoid missing events. It
+asks the server for C<BOOKMARK> events (C<allowWatchBookmarks>) and takes only
+their C<resourceVersion>: they are never passed to a callback, C<on_event>
+included. That keeps a reconnect of a quiet watch started without a
+C<resourceVersion> from resuming at the version of the last initial C<ADDED>
+event, which would replay history. A server that sends no bookmark after the
+initial events (older ones) still leaves that window open.
 
-=item * Handles 410 Gone by clearing the C<resourceVersion> and restarting
+=item * Handles 410 Gone, as an C<ERROR> event on the stream or as the HTTP
+status of the watch request, by clearing the C<resourceVersion> and restarting
+at once. A request answered 410 although it carried no C<resourceVersion> is
+a failed attempt like any other, with backoff.
 
 =item * Retries a failed watch attempt -- a transport error, a rejection
 such as C<401> or C<403>, or a stream that closes at once without an event

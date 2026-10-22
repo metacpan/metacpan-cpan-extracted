@@ -205,10 +205,9 @@ SECURITY
 
 CRASH SAFETY
     Mutation is guarded by a futex-based write-preferring rwlock with
-    PID-encoded ownership and dead-owner recovery. Each "add" is a short
-    bounded update, so a crash leaves the sketch consistent up to the last
-    completed operation. Limitation: PID reuse is not detected (very unlikely
-    in practice).
+    PID-encoded ownership and dead-owner recovery. A crash can leave the current
+    mutation partially applied. Limitation: PID reuse is not detected (very
+    unlikely in practice).
 
     Reader-slot exhaustion (slotless readers): dead-process recovery
     attributes a crashed lock holder's contribution through its reader-slot.

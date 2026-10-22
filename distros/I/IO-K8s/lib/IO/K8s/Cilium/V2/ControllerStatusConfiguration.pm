@@ -1,6 +1,6 @@
 package IO::K8s::Cilium::V2::ControllerStatusConfiguration;
 # ABSTRACT: Configuration is the controller configuration
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s 'error-retry'      => Bool;
@@ -24,7 +24,7 @@ IO::K8s::Cilium::V2::ControllerStatusConfiguration - Configuration is the contro
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 error-retry
 

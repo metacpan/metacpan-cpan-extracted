@@ -335,18 +335,71 @@ subtest 'TX8: alternatives retry — input matched by alternatives table trigger
 	cmp_ok(scalar @ramsgate_calls, '>=', 1,
 		'phase 2: canonical "Ramsgate" was queried via alternatives mapping');
 
-	# Phase 4 — ITERATOR STATE NOTE: the alternatives loop uses `each %{$alt}`, which
-	# retains its internal iterator position across calls.  After an early return inside
-	# the loop, the next invocation continues from the next hash entry rather than
-	# restarting.  The second geocode may or may not find the same alternative depending
-	# on what remains after the matched key in the iteration order.  We only assert that
-	# the call completes without error.
+	# Phase 4 — IDEMPOTENCY: the alternatives loop walks a snapshot of the keys,
+	# not each(), so no iterator state is carried between calls and the same
+	# input finds the same alternative again.
 	@oa_locations_seen = ();
 	my $r2;
 	lives_ok { $r2 = $geo->geocode(location => ALT_INPUT) }
-		'phase 4: second geocode with same input completes without error (each iterator state)';
-	ok(!defined($r2) || ref($r2) eq 'Geo::Location::Point',
-		'phase 4: result is undef (iterator skipped) or GLP (iterator wrapped) — both valid');
+		'phase 4: second geocode with same input completes without error';
+	isa_ok($r2, 'Geo::Location::Point',
+		'phase 4: second geocode finds the same alternative');
+
+	restore_all();
+	_remock_maxmind();
+};
+
+subtest 'TX8a: alternatives miss — an alternative that finds nothing does not loop forever' => sub {
+	# Regression: 'Tyne and Wear = Borough of North Tyneside' is tried with and
+	# without commas.  Both re-geocode calls walked the alternatives hash with
+	# each(), resetting the shared iterator, so the outer loop restarted at the
+	# top, matched 'Tyne and Wear' again and never finished.
+	my $oa_calls = 0;
+	my $geo = _setup_geo_with_oa(sub { $oa_calls++; return undef });
+
+	my $r;
+	eval {
+		local $SIG{ALRM} = sub { die "TIMEOUT\n" };
+		alarm(10);
+		$r = $geo->geocode(location => 'Chirton, Tyne and Wear, England');
+		alarm(0);
+	};
+	alarm(0);
+	is($@, q{}, 'geocode returns rather than looping');
+	ok(!defined($r) || ref($r) eq 'Geo::Location::Point', 'result is undef or a GLP');
+	cmp_ok($oa_calls, '<', 20, "OA consulted a bounded number of times ($oa_calls)");
+
+	# The table is read as written, not split into words.
+	is($geo->{'alternatives'}{'Tyne and Wear'}, 'Borough of North Tyneside',
+		'__DATA__ value kept as one string');
+
+	restore_all();
+	_remock_maxmind();
+};
+
+subtest 'TX8b: alternatives guard — a replacement that still matches its key is tried once' => sub {
+	# 'Kent' => 'Kent, England' matches its own output, so without the guard
+	# each retry would match again and recurse until Perl ran out of stack.
+	my @seen;
+	my $geo = _setup_geo_with_oa(sub {
+		my (undef, $params) = @_;
+		push @seen, ref($params) eq 'HASH' ? ($params->{'location'} // '?') : ($params // '?');
+		return undef;
+	});
+	local $geo->{'alternatives'} = { 'Kent' => 'Kent, England' };
+
+	my $r;
+	eval {
+		local $SIG{ALRM} = sub { die "TIMEOUT\n" };
+		alarm(10);
+		$r = $geo->geocode(location => 'Ramsgate, Kent');
+		alarm(0);
+	};
+	alarm(0);
+	is($@, q{}, 'geocode returns rather than recursing');
+	is($r, undef, 'nothing found');
+	ok((grep { $_ eq 'Ramsgate, Kent, England' } @seen), 'the alternative was tried');
+	ok(!(grep { /England, England/ } @seen), 'it was not applied to its own output');
 
 	restore_all();
 	_remock_maxmind();

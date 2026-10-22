@@ -33,6 +33,8 @@ lib/Geo/Coder/Free/Local.pm
 lib/Geo/Coder/Free/MaxMind.pm
 lib/Geo/Coder/Free/MissCache.pm
 lib/Geo/Coder/Free/OpenAddresses.pm
+lib/Geo/Coder/Free/OpenAddresses/databases/counties.txt
+lib/Geo/Coder/Free/OpenAddresses/databases/states.txt
 lib/Geo/Coder/Free/Provenance.pm
 lib/Geo/Coder/Free/Utils.pm
 LICENSE
@@ -85,6 +87,7 @@ t/no404s.t
 t/noopentickets.t
 t/noplan.t
 t/openaddr.t
+t/optional-modules.t
 t/osm.t
 t/path.t
 t/pod-cm.t

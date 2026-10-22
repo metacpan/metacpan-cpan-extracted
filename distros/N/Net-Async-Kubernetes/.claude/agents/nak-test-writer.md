@@ -5,6 +5,8 @@ model: sonnet
 briefing:
   skills:
     - nak-core
+    - nak-hazards
+    - nak-testing
     - getty-perl-core
     - perl-io-async-future
     - kanban-issues-karr-ticket

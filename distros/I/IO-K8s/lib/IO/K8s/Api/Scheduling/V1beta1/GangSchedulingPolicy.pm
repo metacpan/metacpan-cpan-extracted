@@ -1,6 +1,6 @@
 package IO::K8s::Api::Scheduling::V1beta1::GangSchedulingPolicy;
 # ABSTRACT: GangSchedulingPolicy defines the parameters for gang scheduling.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s minCount => Int, 'required';
@@ -20,7 +20,7 @@ IO::K8s::Api::Scheduling::V1beta1::GangSchedulingPolicy - GangSchedulingPolicy d
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 minCount
 

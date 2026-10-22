@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use base 'XML::XPath';
-our $VERSION = 2.1129;
+our $VERSION = 2.1131;
 
 sub findTextValue {
 	my ( $self, $path, $context ) = @_;

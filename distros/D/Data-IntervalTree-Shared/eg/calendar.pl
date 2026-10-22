@@ -11,7 +11,7 @@ BEGIN {
 }
 use Data::IntervalTree::Shared;
 
-# A booking calendar: each reservation is a half-open time interval keyed by a
+# A booking calendar: each reservation is a closed time interval keyed by a
 # booking id.  An interval tree answers "what's booked at time T?" (stab) and
 # "does a proposed slot clash with anything?" (overlaps) in O(log n + matches),
 # instead of scanning every booking.

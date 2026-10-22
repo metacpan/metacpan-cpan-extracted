@@ -1,5 +1,60 @@
 Revision history for Net-Async-Kubernetes
 
+0.011     2026-10-21 20:17:11Z
+
+ - Forgotten requirements bumping: cpanfile now requires Kubernetes::REST 1.110
+   and IO::K8s 1.111, the versions released just before 0.010 (0.010 still
+   declared 1.109 for both).
+
+0.010     2026-10-21 18:31:25Z
+ - list takes limit, continue and resourceVersion (sent as query parameters,
+   as Kubernetes::REST's list does since its k74), and the IO::K8s::List it
+   resolves to carries the collection metadata (resourceVersion, continue,
+   remainingItemCount) through Kubernetes::REST's inflate_list. POD shows a
+   paging loop. Before, all three failed the Future as unknown arguments.
+   (Kubernetes::REST k74)
+ - port_forward understands the Kubelet's channel layout (k77): data on
+   channel 2*i and errors on 2*i+1 per requested port, each opened by a frame
+   holding the port number (2 bytes little-endian). New callbacks
+   `on_data($session, $port, $bytes)` and `on_port_error($session, $port,
+   $message)` get the payload with the preamble stripped and checked; a wrong
+   or data-carrying preamble and a frame on an unexpected channel go to
+   `on_error`. `on_frame` stays raw. The session gains `write_port($port,
+   $bytes)`, `ports` and `is_port_forward`; `write_stdin` and `resize` croak on
+   a port-forward session. POD for both layouts rewritten.
+ - New `port_forward_listen`, like `kubectl port-forward`: listens on local TCP
+   ports (`ports => { local => remote }`, local 0 picks a free one), one
+   port-forward session per accepted connection, and resolves to a
+   Net::Async::Kubernetes::PortForwardListener (`port_for`, `stop`). The
+   live example now sends a real HTTP request through the forward (k77).
+ - Fix Watcher replaying history on reconnect: a watch started without a
+   resourceVersion kept the one of its last initial ADDED event, so a quiet
+   namespace's reconnect replayed everything since. The watch now sends
+   `allowWatchBookmarks=true` and takes the resourceVersion of BOOKMARK
+   events, which are not passed to any callback (k73).
+ - Fix Watcher against an HTTP 410 on the watch request itself: it kept the
+   expired resourceVersion and retried it forever. It now drops it and
+   restarts like for the 410 ERROR event (k78).
+ - Fix Controller retries: `$ctx->{attempt}` now counts up (1, 2, 3, ...) when
+   a failed reconcile is retried without a new event, instead of staying at 1,
+   and `stop` now cancels pending retry timers as documented, so a quick
+   stop/start no longer reconciles a stale object (k79).
+ - The Controller's default reconcile key now carries the resource:
+   `Resource:namespace/name` (`Resource:name` cluster-scoped), e.g.
+   `Pod:default/web`. Same-named objects of different watched resources
+   (ConfigMap default/web, Service default/web) used to fall onto one key and
+   coalesce into one reconcile carrying only the last event, so the earlier
+   object was never reconciled. To coalesce on purpose, return a shared key
+   from `key_for` (k80).
+ - Fix one-shot `log` returning decoded characters for a `text/plain` log
+   instead of the raw bytes Kubernetes::REST specifies and the streaming
+   mode delivers; every response body is now left undecoded by charset, a
+   `Content-Encoding` is still resolved (k75).
+ - Fix cp_to_pod / cp_from_pod reporting success when the connection closed
+   without a status frame, which left a truncated file as "done". Success now
+   needs the `Success` status on channel 3, a missing status fails the Future,
+   and cp_from_pod also fails on a failing print/close of the local file (k76).
+
 0.009     2026-10-01 03:40:55Z
  - Require IO::K8s 1.109: string-map fields (labels, annotations, ConfigMap
    data, ...) now serialize numeric values as JSON strings, which the API

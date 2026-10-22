@@ -13,12 +13,11 @@
     LogHandle *h0 = h; PERL_UNUSED_VAR(h0); \
     sv_2mortal(SvREFCNT_inc(SvRV(sv)))
 
-/* Re-read the handle after a call that can run Perl code (tied/overloaded
- * argument magic, tied-array fetches).  That code may call $obj->DESTROY
+/* Re-read the handle after a call that can run Perl code (argument magic
+ * or a signal handler). That code may call $obj->DESTROY
  * explicitly, which frees the handle and zeroes the IV; EXTRACT_LOG's mortal
  * pins the referent only against refcount-driven destruction, not an
- * explicit DESTROY, so the local `h` would dangle.  Used only where magic
- * can actually intervene between EXTRACT_LOG and the first use of h. */
+ * explicit DESTROY, so the local `h` would dangle. */
 #define REEXTRACT_LOG(sv) \
     if (!SvROK(sv)) \
         croak("Data::Log::Shared object was replaced during the call"); \
@@ -30,6 +29,13 @@
     SV *ref = newRV_noinc(obj); \
     sv_bless(ref, gv_stashpv(class, GV_ADD)); \
     RETVAL = ref
+
+static void __attribute__((cold, noinline))
+log_check_signals(pTHX_ SV *self, LogHandle *h0) {
+    LogHandle *h;
+    PERL_ASYNC_CHECK();
+    REEXTRACT_LOG(self);
+}
 
 MODULE = Data::Log::Shared  PACKAGE = Data::Log::Shared
 
@@ -197,7 +203,20 @@ wait_for(self, expected_count, ...)
   CODE:
     if (items > 2 && (SvGETMAGIC(ST(2)), SvOK(ST(2)))) timeout = SvNV(ST(2));
     REEXTRACT_LOG(self);
-    RETVAL = log_wait(h, expected_count, timeout);
+    if (log_entry_count(h) != expected_count) RETVAL = 1;
+    else if (timeout == 0) RETVAL = 0;
+    else {
+        struct timespec dl;
+        if (timeout > 0) log_make_deadline(timeout, &dl);
+        __atomic_add_fetch(&h->hdr->stat_waits, 1, __ATOMIC_RELAXED);
+        int rc;
+        for (;;) {
+            rc = log_wait_until(h, expected_count, timeout > 0 ? &dl : NULL);
+            if (rc >= 0) break;
+            log_check_signals(aTHX_ self, h0);
+        }
+        RETVAL = rc;
+    }
   OUTPUT:
     RETVAL
 

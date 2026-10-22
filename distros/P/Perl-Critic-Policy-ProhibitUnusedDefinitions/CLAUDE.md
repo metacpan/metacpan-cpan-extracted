@@ -38,7 +38,7 @@ job is the defect, whichever is better.
 | `.perlcriticrc` | the policies, which are the house style made enforceable |
 | `Changes` | what changed and when, per release |
 | `dist.ini` | the build, and what has to be installed to run it |
-| `prereqs.yaml` | what it needs at runtime and to test, read by `[PrereqsFile]` |
+| `prereqs.yml` | what it needs at runtime and to test, read by `[PrereqsFile]` |
 
 This policy's own `.perlcriticrc` does not enable it.  Perl::Critic calls
 `violates`, `applies_to` and the rest from outside, so every one would be

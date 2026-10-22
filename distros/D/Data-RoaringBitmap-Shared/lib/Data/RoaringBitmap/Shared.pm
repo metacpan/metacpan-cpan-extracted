@@ -1,7 +1,7 @@
 package Data::RoaringBitmap::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 require XSLoader;
 XSLoader::load('Data::RoaringBitmap::Shared', $VERSION);
 
@@ -253,6 +253,7 @@ container, array or bitmap).
 
 =item * C<ops> -- running count of mutating operations
 (C<add>, C<add_many>, C<remove>, C<union>, C<intersect>, C<clear>).
+Self/alias set operations are not counted.
 
 =item * C<mmap_size> -- bytes of the shared mapping.
 
@@ -352,8 +353,8 @@ or new, and a C<union> of a bitmap with an array container sets bits one at a
 time, so a kill leaves part of the array's values added. When no slot is
 spare, the rewrite happens in place, and a kill during it can tear that
 container. A call that touches several buckets
-(C<add_many>, C<union>, C<intersect>, C<clear>) is not atomic as a whole: a kill
-leaves it partly applied.
+(C<add_many>, C<union>, C<intersect>) is not atomic as a whole: a kill
+leaves it partly applied. An interrupted C<clear> is completed by recovery.
 
 Reader-slot exhaustion (slotless readers): dead-process recovery attributes a
 crashed lock holder's contribution through its reader-slot. The slot table holds

@@ -1,6 +1,6 @@
 package IO::K8s::Api::Lifecycle::V1alpha1::EvictionTarget;
 # ABSTRACT: EvictionTarget contains a reference to an object that should be evicted.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s pod => 'Lifecycle::V1alpha1::EvictionPodReference';
@@ -20,7 +20,7 @@ IO::K8s::Api::Lifecycle::V1alpha1::EvictionTarget - EvictionTarget contains a re
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 pod
 

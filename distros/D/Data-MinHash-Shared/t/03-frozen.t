@@ -20,11 +20,20 @@ my (@producer_regs, $producer_filled);
     $producer_filled = $mh->filled;
     @producer_regs   = $mh->registers;
 
+    my $live = Data::MinHash::Shared->new($path, $k);
     $mh->freeze;
     ok $mh->frozen,   'frozen after ->freeze';
     ok $mh->readonly, 'freezing handle becomes read-only';
     is $mh->filled, $producer_filled, 'filled unchanged by freeze';
     is_deeply [ $mh->registers ], \@producer_regs, 'registers unchanged by freeze';
+    ok $live->frozen, 'an existing mutable handle sees the seal';
+    for my $mutate (
+        sub { $live->add('x') }, sub { $live->add_many(['x']) },
+        sub { $live->clear }, sub { $live->merge($mh) },
+    ) {
+        like exception($mutate), qr/frozen|read-only/, 'seal rejects mutation through an existing handle';
+    }
+    is_deeply [$live->registers], \@producer_regs, 'rejected mutations preserve the frozen registers';
 
     like exception(sub { $mh->add("x") }),        qr/frozen|read-only/, 'add on frozen handle croaks';
     like exception(sub { $mh->add_many(["x"]) }), qr/frozen|read-only/, 'add_many on frozen handle croaks';

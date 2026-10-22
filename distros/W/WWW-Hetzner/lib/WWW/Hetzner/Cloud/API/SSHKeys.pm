@@ -1,7 +1,7 @@
 package WWW::Hetzner::Cloud::API::SSHKeys;
 # ABSTRACT: Hetzner Cloud SSH Keys API
 
-our $VERSION = '0.101';
+our $VERSION = '0.102';
 
 use Moo;
 with 'WWW::Hetzner::Role::Pagination';
@@ -144,7 +144,7 @@ WWW::Hetzner::Cloud::API::SSHKeys - Hetzner Cloud SSH Keys API
 
 =head1 VERSION
 
-version 0.101
+version 0.102
 
 =head1 SYNOPSIS
 

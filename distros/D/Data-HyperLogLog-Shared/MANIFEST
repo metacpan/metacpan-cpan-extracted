@@ -19,6 +19,8 @@ xt/eg_runs.t
 xt/fork_hll.t
 xt/kwalitee.t
 xt/pod.t
+xt/shared_core.c
+xt/shared_core.t
 xt/tsan.t
 xt/valgrind.t
 xxhash.h

@@ -42,7 +42,7 @@ name: Algorithm-UrataniTakeda
 provides:
   Algorithm::UrataniTakeda:
     file: lib/Algorithm/UrataniTakeda.pm
-    version: v0.1.7
+    version: v0.1.8
 requires:
   Carp: '0'
   List::Util: '0'
@@ -53,7 +53,7 @@ requires:
 resources:
   bugtracker: https://github.com/robrwo/perl-Algorithm-UrataniTakeda/issues
   repository: git://github.com/robrwo/perl-Algorithm-UrataniTakeda.git
-version: v0.1.7
+version: v0.1.8
 x_authority: cpan:RRWO
 x_generated_by_perl: v5.42.1
 x_serialization_backend: 'YAML::Tiny version 1.76'

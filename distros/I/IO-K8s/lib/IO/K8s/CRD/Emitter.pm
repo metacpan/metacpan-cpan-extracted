@@ -1,6 +1,6 @@
 package IO::K8s::CRD::Emitter;
 # ABSTRACT: Render generated IO::K8s classes as house-style Perl source
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use v5.10;
 use Moo;
 use Carp qw( croak );
@@ -168,6 +168,13 @@ sub _is_external_ref {
     return index($self->package_for($class), $self->base . '::') != 0;
 }
 
+# The full package name of a registry class, for the one DSL form that takes
+# it unexpanded: HashRef[ArrayRef[InstanceOf['...']]] (k194).
+sub _full_class {
+    my ($self, $class) = @_;
+    return $self->_is_generated($class) ? $self->package_for($class) : $class;
+}
+
 sub _class_ref {
     my ($self, $class) = @_;
 
@@ -248,6 +255,9 @@ sub _type_source {
     return ($self->_class_ref($info->{class}), $nested)                if $info->{is_object};
     return ('[' . $self->_class_ref($info->{class}) . ']', $nested)    if $info->{is_array_of_objects};
     return ('{ ' . $self->_class_ref($info->{class}) . ' => 1 }', $nested) if $info->{is_hash_of_objects};
+    return ('HashRef[ArrayRef[Str]]') if $info->{is_hash_of_str_arrays};
+    return ("HashRef[ArrayRef[InstanceOf['" . $self->_full_class($info->{class}) . "']]]", $nested)
+        if $info->{is_hash_of_object_arrays};
     return ('[Str]')      if $info->{is_array_of_str};
     return ('[Int]')      if $info->{is_array_of_int};
     return ('[Bool]')     if $info->{is_array_of_bool};
@@ -261,15 +271,15 @@ sub _type_source {
     # lenient legacy form only where the registry says lenient, a strict
     # one -- AutoGen's additionalProperties {type: string} -- as
     # HashRef[Str]. The free map is Opaque.
-    return ('{ Str => 1 }')      if $info->{is_hash_of_str} && $info->{is_hash_of_str_lenient};
-    return ('HashRef[Str]')      if $info->{is_hash_of_str};
-    return ('Opaque')            if $info->{is_hash_opaque};
-    return ('{ Int => 1 }')      if $info->{is_hash_of_int};
-    return ('{ Num => 1 }')      if $info->{is_hash_of_num};
-    return ('{ Bool => 1 }')     if $info->{is_hash_of_bool};
-    return ('{ Quantity => 1 }') if $info->{is_hash_of_quantity};
-    return ('{ Time => 1 }')     if $info->{is_hash_of_time};
-    return ('{ IntOrStr => 1 }') if $info->{is_hash_of_int_or_string};
+    return ('{ Str => 1 }')          if $info->{is_hash_of_str} && $info->{is_hash_of_str_lenient};
+    return ('HashRef[Str]')          if $info->{is_hash_of_str};
+    return ('Opaque')                if $info->{is_hash_opaque};
+    return ('HashRef[Int]')          if $info->{is_hash_of_int};
+    return ('HashRef[Num]')          if $info->{is_hash_of_num};
+    return ('HashRef[Bool]')         if $info->{is_hash_of_bool};
+    return ('HashRef[Quantity]')     if $info->{is_hash_of_quantity};
+    return ('HashRef[Time]')         if $info->{is_hash_of_time};
+    return ('HashRef[IntOrStr]')     if $info->{is_hash_of_int_or_string};
     return ('Str')      if $info->{is_str};
     return ('Int')      if $info->{is_int};
     return ('Num')      if $info->{is_num};
@@ -738,7 +748,7 @@ IO::K8s::CRD::Emitter - Render generated IO::K8s classes as house-style Perl sou
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head1 SYNOPSIS
 

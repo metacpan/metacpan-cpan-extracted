@@ -12,10 +12,9 @@ use Net::QUIC::Driver;
 use Unblock::HTTP3::Client;
 use Unblock::HTTP3::Connection;
 
-is(
-    $Net::QUIC::VERSION,
-    '0.04',
-    'client protocol error tests use released Net::QUIC 0.04',
+ok(
+    $Net::QUIC::VERSION >= 0.05,
+    'client protocol error tests support Net::QUIC 0.05 or newer',
 );
 
 my $cert_file = "$FindBin::Bin/fixtures/localhost-cert.pem";

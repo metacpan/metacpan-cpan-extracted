@@ -34,7 +34,7 @@ use constant {
 use constant RE_UUID => qr/^[0-9a-fA-F]{8}-(?:[0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}\z/;
 use constant RE_UINT => qr/^[1-9][0-9]*\z/;
 
-our $VERSION = v0.25;
+our $VERSION = v0.26;
 
 use parent 'Data::URIID::Base';
 
@@ -451,6 +451,15 @@ my %url_parser = (
             source => 'wikimedia-commons',
             type => 'wikimedia-commons-identifier',
             id => \1,
+        },
+        {
+            host => 'abstract.wikipedia.org',
+            path => qr#^/(?:wiki|view/[a-z]+)/([Q][1-9][0-9]*)\z#,
+            source => 'wikipedia',
+            type => 'wikidata-identifier',
+            id => \1,
+            ise_order => ISEORDER_RUO,
+            action => 'render',
         },
         {
             host => 'www.fellig.org',
@@ -974,6 +983,8 @@ sub new {
 
     $self = bless \%opts, $pkg;
 
+    $self->{requests} = $opts{extractor}->record_requests ? [] : undef; # This avoids any future calls to record_requests as we can just check if the array is defined.
+
     $self->_lookup;
     $self->_lookup_with_mode(mode => 'offline');
     $self->_lookup_with_mode(mode => 'online');
@@ -1122,7 +1133,7 @@ sub _lookup_with_mode {
             foreach my $service (@{$lookup_services{$id_type}}) {
                 next if $done{$service};
                 $done{$service} = 1;
-                $self->_lookup_one($service, %opts);
+                $self->_lookup_one($service, %opts, pass => $pass);
             }
         }
         foreach my $digest (keys %lookup_services_digest) {
@@ -1130,7 +1141,7 @@ sub _lookup_with_mode {
             foreach my $service (@{$lookup_services_digest{$digest}}) {
                 next if $done{$service};
                 $done{$service} = 1;
-                $self->_lookup_one($service, %opts);
+                $self->_lookup_one($service, %opts, pass => $pass);
             }
         }
     }
@@ -1202,7 +1213,7 @@ sub _lookup__https {
                         prop        => 'pageprops',
                         ppprop      => 'wikibase_item',
                         titles      => $page,
-                    });
+                    }, result => $self);
                 if (defined $json) {
                     my $wikidata_identifier = eval {$json->{query}{pages}{(keys %{$json->{query}{pages}})[0]}{pageprops}{wikibase_item}};
                     if (defined $wikidata_identifier) {
@@ -1813,6 +1824,32 @@ sub url {
     croak 'Identifier does not generate a URL for the selected service';
 }
 
+
+sub get_requests {
+    my ($self, %opts) = @_;
+    my $requests = $self->{requests};
+    my @list;
+
+    unless (defined $requests) {
+        if (exists $opts{default}) {
+            return @{$opts{default}} if $opts{list};
+            return $opts{default};
+        }
+
+        croak 'No requests recorded';
+    }
+
+    @list = @{$requests};
+
+    if ($opts{list}) {
+        return @list;
+    } elsif (scalar(@list) == 1) {
+        return $list[0];
+    } else {
+        croak 'Zero or multiple records, need to call with list => 1';
+    }
+}
+
 sub _register_service__type {
     my ($self, $uri, $rule, $res, $ud) = @_;
     return $self->extractor->ise_to_name(type => $ud->{id}->type->uuid);
@@ -1977,7 +2014,7 @@ Data::URIID::Result - Extractor for identifiers from URIs
 
 =head1 VERSION
 
-version v0.25
+version v0.26
 
 =head1 SYNOPSIS
 
@@ -2229,7 +2266,7 @@ On any error this method will C<die>.
     my URI $url = $result->url( $service );
     my URI $url = $result->url( service => $service ); # the same
     # or:
-    my URI $url = $result->url( %options );
+    my URI $url = $result->url( %opts );
 
 Returns a URL for the resource on a given service.
 If no service is given the value returned by C<$result-E<gt>attribute('service')> is used.
@@ -2262,6 +2299,17 @@ Overrides the default language tags from the C<$result-E<gt>extractor> object.
 May be an arrayref with a list of exact matches or a string that is parsed as a list (and supers being added).
 
 =back
+
+=head2 get_requests
+
+    my @requests = $result->get_requests(list => 1);
+
+(experimental since v0.26)
+
+Gets the list of requests done for this lookup.
+This method will C<die> if request recording was turned off.
+
+Each element of the list will be a L<Data::URIID::Request>.
 
 =head1 AUTHOR
 

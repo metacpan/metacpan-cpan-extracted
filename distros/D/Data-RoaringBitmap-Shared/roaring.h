@@ -77,6 +77,7 @@
 #define RB_TYPE_NONE   0u
 #define RB_TYPE_ARRAY  1u
 #define RB_TYPE_BITMAP 2u
+#define RB_PUB_CLEAR   (RB_NUM_BUCKETS + 1u)
 
 #define RB_ERR(fmt, ...) do { if (errbuf) snprintf(errbuf, RB_ERR_BUFLEN, fmt, ##__VA_ARGS__); } while (0)
 
@@ -132,7 +133,7 @@ struct RbHeader {
     uint64_t stat_ops;                /* 88 */
     uint8_t  sealed;                  /* 96  0 = mutable, 1 = frozen (read-only; lock-free reads) */
     uint8_t  _pad0[3];                /* 97..99 */
-    uint32_t pub_hi;                  /* 100 1 + bucket of an in-flight container switch, 0 = none */
+    uint32_t pub_hi;                  /* 100 1 + bucket of a switch, RB_PUB_CLEAR, or 0 = none */
     RbBucket pub;                     /* 104 that switch's new bucket value, replayed by recovery */
     uint8_t  _pad1[136];              /* 120..255 */
 };
@@ -276,10 +277,6 @@ static inline void rb_occ_clear(RbHandle *h, uint32_t s) {
     __atomic_fetch_and(&h->occ[s >> 6], ~((uint64_t)1 << (s & 63)), __ATOMIC_SEQ_CST);
 }
 
-/* Ensure this process owns a reader slot.  Called from the lock helpers so
- * that fork()'d children pick up their own slot lazily instead of sharing
- * the parent's.  Hot-path is a single relaxed load + compare; only on a
- * fork-generation mismatch do we touch getpid() and scan slots. */
 /* Ensure this process owns a reader slot.  Called from the lock helpers so that
  * fork()'d children pick up their own slot lazily instead of sharing the
  * parent's.  Hot-path is a single relaxed load + compare; only on a
@@ -903,12 +900,15 @@ static inline int rb_remove_locked(RbHandle *h, uint32_t x) {
 static inline void rb_clear_locked(RbHandle *h) {
     RbHeader *hdr = h->hdr;
     RbBucket *bt = rb_buckets(h);
+    __atomic_store_n(&hdr->pub_hi, RB_PUB_CLEAR, __ATOMIC_RELAXED);
+    __atomic_thread_fence(__ATOMIC_RELEASE);  /* publish before erasing any bucket bytes */
     memset(bt, 0, (size_t)RB_NUM_BUCKETS * sizeof(RbBucket));
     hdr->free_count = 0;
     __atomic_signal_fence(__ATOMIC_SEQ_CST);
     hdr->container_used = 1;   /* slot 0 reserved */
     hdr->free_head = 0;
     hdr->cardinality = 0;
+    __atomic_store_n(&hdr->pub_hi, 0, __ATOMIC_RELEASE);
 }
 
 /* Smallest set element.  Returns 1 and sets *out, else 0 (empty set). */
@@ -1177,7 +1177,8 @@ static void rb_repair_locked(RbHandle *h) {
     RbHeader *hdr = h->hdr;
     RbBucket *bt = rb_buckets(h);
     if (hdr->sealed) return;
-    uint32_t p = __atomic_load_n(&hdr->pub_hi, __ATOMIC_RELAXED);
+    uint32_t p = __atomic_load_n(&hdr->pub_hi, __ATOMIC_ACQUIRE);
+    if (p == RB_PUB_CLEAR) { rb_clear_locked(h); return; }
     if (p) {
         if (p <= RB_NUM_BUCKETS) {
             bt[p - 1].container_off = hdr->pub.container_off;
@@ -1196,7 +1197,11 @@ static void rb_repair_locked(RbHandle *h) {
         RbBucket *b = &bt[hi];
         if (b->type == RB_TYPE_NONE) continue;
         uint32_t off = b->container_off;
-        if (off == 0 || off >= used) continue;
+        if (off == 0 || off >= used) {
+            /* clear may have zeroed the offset before reaching the type. */
+            memset(b, 0, sizeof(*b));
+            continue;
+        }
         if (b->type != RB_TYPE_ARRAY)
             b->cardinality = (uint32_t)rb_popcount_bitmap(rb_bitmap(h, off));
         if (b->cardinality == 0) {
@@ -1454,7 +1459,7 @@ static RbHandle *rb_create(const char *path, uint64_t container_cap_in, mode_t f
                 }
                 RB_ERR("invalid roaring-bitmap file"); munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
             }
-            if (((RbHeader *)base)->sealed) {
+            if (__atomic_load_n(&((RbHeader *)base)->sealed, __ATOMIC_ACQUIRE)) {
                 RB_ERR("%s is frozen (read-only); open it with new_readonly", path);
                 munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
             }
@@ -1504,7 +1509,7 @@ static RbHandle *rb_open_fd(int fd, char *errbuf) {
     if (!rb_validate_header((RbHeader *)base, (uint64_t)st.st_size)) {
         RB_ERR("invalid roaring-bitmap file"); munmap(base, ms); return NULL;
     }
-    if (((RbHeader *)base)->sealed) {
+    if (__atomic_load_n(&((RbHeader *)base)->sealed, __ATOMIC_ACQUIRE)) {
         RB_ERR("this roaring bitmap is frozen (read-only); open it with new_readonly");
         munmap(base, ms); return NULL;
     }
@@ -1564,7 +1569,7 @@ static RbHandle *rb_open_readonly(const char *path, char *errbuf) {
     if (!rb_validate_header((RbHeader *)base, (uint64_t)st.st_size)) {
         RB_ERR("%s: invalid roaring-bitmap file", path); munmap(base, ms); return NULL;
     }
-    if (!((RbHeader *)base)->sealed) {
+    if (!__atomic_load_n(&((RbHeader *)base)->sealed, __ATOMIC_ACQUIRE)) {
         RB_ERR("%s is not frozen: call ->freeze on the producer before opening read-only", path);
         munmap(base, ms); return NULL;
     }
@@ -1580,7 +1585,7 @@ static RbHandle *rb_open_readonly(const char *path, char *errbuf) {
  * and a read-write reopen is refused. */
 static int rb_freeze(RbHandle *h) {
     rb_rwlock_wrlock(h);
-    h->hdr->sealed = 1;
+    __atomic_store_n(&h->hdr->sealed, 1, __ATOMIC_RELEASE);
     rb_rwlock_wrunlock(h);
     if (h->path || h->backing_fd >= 0) return rb_msync(h);  /* durability for file/memfd-backed */
     return 0;   /* anonymous: the seal lives in shared memory (visible to forks); nothing to flush */

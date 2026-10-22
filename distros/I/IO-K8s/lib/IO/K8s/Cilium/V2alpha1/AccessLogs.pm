@@ -1,10 +1,10 @@
 package IO::K8s::Cilium::V2alpha1::AccessLogs;
 # ABSTRACT: AccessLogs defines an Envoy access log configuration, including its output format and the generated proxy components that should emit it.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s format  => Str, { required => 'schema', enum => [qw(JSON Text)] };
-k8s json    => { Str => 1 }, { default => {'authority' => '%REQUEST_HEADER(:AUTHORITY)%','bytes_received' => '%BYTES_RECEIVED%','bytes_sent' => '%BYTES_SENT%','duration' => '%DURATION%','method' => '%REQUEST_HEADER(:METHOD)%','path' => '%REQUEST_HEADER(X-ENVOY-ORIGINAL-PATH?:PATH)%','protocol' => '%PROTOCOL%','request_id' => '%REQUEST_HEADER(X-REQUEST-ID)%','response_code' => '%RESPONSE_CODE%','response_flags' => '%RESPONSE_FLAGS%','start_time' => '%START_TIME%','upstream_host' => '%UPSTREAM_HOST%','upstream_service_time' => '%RESPONSE_HEADER(X-ENVOY-UPSTREAM-SERVICE-TIME)%','user_agent' => '%REQUEST_HEADER(USER-AGENT)%','x_forwarded_for' => '%REQUEST_HEADER(X-FORWARDED-FOR)%'} };
+k8s json    => HashRef[Str], { default => {'authority' => '%REQUEST_HEADER(:AUTHORITY)%','bytes_received' => '%BYTES_RECEIVED%','bytes_sent' => '%BYTES_SENT%','duration' => '%DURATION%','method' => '%REQUEST_HEADER(:METHOD)%','path' => '%REQUEST_HEADER(X-ENVOY-ORIGINAL-PATH?:PATH)%','protocol' => '%PROTOCOL%','request_id' => '%REQUEST_HEADER(X-REQUEST-ID)%','response_code' => '%RESPONSE_CODE%','response_flags' => '%RESPONSE_FLAGS%','start_time' => '%START_TIME%','upstream_host' => '%UPSTREAM_HOST%','upstream_service_time' => '%RESPONSE_HEADER(X-ENVOY-UPSTREAM-SERVICE-TIME)%','user_agent' => '%REQUEST_HEADER(USER-AGENT)%','x_forwarded_for' => '%REQUEST_HEADER(X-FORWARDED-FOR)%'} };
 k8s targets => [Str], { enum => [qw(HTTP TCP)], default => [qw(HTTP)] };
 k8s text    => Str, { default => '[%START_TIME%] "%REQUEST_HEADER(:METHOD)% %REQUEST_HEADER(X-ENVOY-ORIGINAL-PATH?:PATH)% %PROTOCOL%" %RESPONSE_CODE% %RESPONSE_FLAGS% %BYTES_RECEIVED% %BYTES_SENT% %DURATION% %RESPONSE_HEADER(X-ENVOY-UPSTREAM-SERVICE-TIME)% "%REQUEST_HEADER(X-FORWARDED-FOR)%" "%REQUEST_HEADER(USER-AGENT)%" "%REQUEST_HEADER(X-REQUEST-ID)%" "%REQUEST_HEADER(:AUTHORITY)%" "%UPSTREAM_HOST%"' };
 
@@ -26,7 +26,7 @@ IO::K8s::Cilium::V2alpha1::AccessLogs - AccessLogs defines an Envoy access log c
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 format
 

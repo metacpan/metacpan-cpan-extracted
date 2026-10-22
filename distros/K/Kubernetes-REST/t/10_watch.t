@@ -140,8 +140,9 @@ subtest 'last resourceVersion returned' => sub {
     ]);
 
     my $last_rv = $api->watch('Pod',
-        namespace => 'kube-system',
-        on_event  => sub {},
+        namespace       => 'kube-system',
+        resourceVersion => '400',
+        on_event        => sub {},
     );
 
     is($last_rv, '505', 'returns last resourceVersion');
@@ -291,6 +292,36 @@ subtest 'watch with selectors' => sub {
 
     is(scalar @events, 1, 'received event with selectors');
     is($last_rv, '400', 'resourceVersion correct with selectors');
+};
+
+# === An exception in on_event reaches the caller of watch() (k71) ===
+subtest 'exception in on_event propagates out of watch' => sub {
+    $mock_io->add_watch_events('/api/v1/namespaces/default/pods', [
+        {
+            type   => 'ADDED',
+            object => {
+                apiVersion => 'v1', kind => 'Pod',
+                metadata   => { name => 'p1', namespace => 'default', resourceVersion => '7' },
+                spec       => { containers => [$container] },
+            },
+        },
+    ]);
+
+    my $seen = 0;
+    my $rv = eval {
+        $api->watch('Pod',
+            namespace => 'default',
+            on_event  => sub { $seen++; die "handler bug\n" },
+        );
+    };
+    is $@, "handler bug\n", 'string exception reaches the caller';
+    is $seen, 1, 'handler ran once';
+    ok !defined $rv, 'no resourceVersion returned';
+
+    my $obj = bless { why => 'leave watch' }, 'Test::LeaveWatch';
+    eval { $api->watch('Pod', namespace => 'default', on_event => sub { die $obj }) };
+    is ref $@, 'Test::LeaveWatch', 'object exception survives watch';
+    is $@->{why}, 'leave watch', 'payload intact';
 };
 
 done_testing;

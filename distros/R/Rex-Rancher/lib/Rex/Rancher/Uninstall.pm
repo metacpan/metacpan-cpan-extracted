@@ -1,7 +1,7 @@
 # ABSTRACT: Take RKE2/K3s and Cilium's datapath off a host, and refuse to install over what Cilium left
 
 package Rex::Rancher::Uninstall;
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 use v5.14.4;
 use warnings;
 
@@ -110,6 +110,14 @@ sub uninstall_cmd {
       . ' || ip rule add from all lookup local priority 0 2>/dev/null || true',
     'ip rule list 2>/dev/null | grep -qE "^0:[[:space:]].*lookup local"'
       . ' && ip rule del from all lookup local priority 100 2>/dev/null || true',
+    # The same for IPv6, after the IPv4 lines. Same tolerance: a host without
+    # IPv6 (no kernel support, ipv6.disable=1) fails every `ip -6` quietly.
+    'for t in ' . join(' ', $self->_cilium_ip_tables)
+      . '; do while ip -6 rule del lookup $t 2>/dev/null; do :; done; done',
+    'ip -6 rule list 2>/dev/null | grep -qE "^0:[[:space:]].*lookup local"'
+      . ' || ip -6 rule add from all lookup local priority 0 2>/dev/null || true',
+    'ip -6 rule list 2>/dev/null | grep -qE "^0:[[:space:]].*lookup local"'
+      . ' && ip -6 rule del from all lookup local priority 100 2>/dev/null || true',
     # Every step above is guarded, so without this the line exited 0
     # whatever happened -- a missing or failing uninstaller left rke2 in
     # place and read as a clean uninstall (kubernetes-ocp k175).
@@ -217,7 +225,22 @@ sub _env_files_cmd {
 # /opt/cni/bin, on both distributions) and the runtime dir RKE2 and K3s share.
 # A stale cilium binary is not cosmetic: install_cilium keeps a CLI whose
 # version happens to match instead of installing the one asked for.
-sub _leftover_paths { qw( /usr/local/bin/cilium /opt/cni /run/k3s ) }
+#
+# And the NVIDIA GPU Operator's: its toolkit directory /usr/local/nvidia and
+# the two CDI specs it writes under /var/run/cdi. A re-join otherwise has
+# rke2 pick the operator's runtime from the leftover toolkit config at start
+# (kubernetes-ocp #228: every GPU sandbox failed on an old crun). Exactly
+# these files, not /var/run/cdi (other specs live there), not /etc/cdi
+# (Rex::GPU writes its own specs there with gpu.toolkit false), no host
+# driver, no /usr/bin/nvidia-*. Distribution-independent.
+sub _leftover_paths {
+  qw(
+    /usr/local/bin/cilium /opt/cni /run/k3s
+    /usr/local/nvidia
+    /var/run/cdi/k8s.device-plugin.nvidia.com-gpu.json
+    /var/run/cdi/management.nvidia.com-gpu.yaml
+  )
+}
 
 # A warning is one line on stderr, starting with the marker, so that
 # uninstall_warnings finds it among whatever else the channel carries. The
@@ -313,7 +336,7 @@ Rex::Rancher::Uninstall - Take RKE2/K3s and Cilium's datapath off a host, and re
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 
@@ -444,6 +467,14 @@ removed with C<--one-file-system>: a mount the uninstaller left below them
 (containerd's task mounts live in C</run/k3s>) is skipped, never recursed
 into;
 
+=item * what the NVIDIA GPU Operator leaves: C</usr/local/nvidia> (its
+toolkit) and its two CDI specs
+C</var/run/cdi/k8s.device-plugin.nvidia.com-gpu.json> and
+C</var/run/cdi/management.nvidia.com-gpu.yaml>, in the same C<rm -rf>. Without
+them a re-join has rke2 take the operator's runtime from the leftover toolkit
+configuration at start. Not removed: C</etc/cdi> (Rex::GPU's own specs), the
+rest of C</var/run/cdi>, the host driver, C</usr/bin/nvidia-*>;
+
 =item * Cilium's datapath: the C<clsact> qdisc of every device carrying a
 Cilium tc program (with C<tc> installed, see below); the pins in
 C</sys/fs/bpf/cilium> and
@@ -460,6 +491,12 @@ C</run/cilium> with C<--one-file-system>;
 then the C<local> table lookup Cilium moved from priority C<0> to C<100>:
 put back at C<0> first, and the one at C<100> deleted only once a
 priority C<0> one is there, so the host never lacks a C<local> lookup.
+The same again for IPv6 (C<ip -6 rule>, same tables, same order, after the
+IPv4 rules). Rex::Rancher's own Cilium is IPv4-only; the IPv6 rules are
+there for what a dual-stack Cilium left, and are removed defensively. A host
+without IPv6 fails every C<ip -6> call quietly and is not affected. Only the
+rules go, not the routes in the tables, as for IPv4; L</cilium_residue> does
+not report IPv6 rules.
 
 =back
 

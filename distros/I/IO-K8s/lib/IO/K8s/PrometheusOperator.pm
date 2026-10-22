@@ -1,6 +1,6 @@
 package IO::K8s::PrometheusOperator;
 # ABSTRACT: Prometheus Operator CRD resource map provider for IO::K8s
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use Moo;
 with 'IO::K8s::Role::ResourceMap';
 
@@ -55,7 +55,7 @@ IO::K8s::PrometheusOperator - Prometheus Operator CRD resource map provider for 
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head1 SYNOPSIS
 

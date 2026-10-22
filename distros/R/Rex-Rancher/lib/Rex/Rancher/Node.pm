@@ -1,7 +1,7 @@
 # ABSTRACT: Linux node preparation for Rancher Kubernetes distributions (RKE2/K3s)
 
 package Rex::Rancher::Node;
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 use v5.14.4;
 use warnings;
 
@@ -272,7 +272,7 @@ Rex::Rancher::Node - Linux node preparation for Rancher Kubernetes distributions
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 

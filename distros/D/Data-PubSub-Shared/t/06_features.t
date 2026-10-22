@@ -82,6 +82,18 @@ use Data::PubSub::Shared;
     is_deeply \@got, [1, 2, 3], 'int drain_notify(3) correct values';
 }
 
+for my $variant (qw(Int Int32 Int16 Str)) {
+    my $ps = "Data::PubSub::Shared::$variant"->new(undef, 32);
+    $ps->eventfd;
+    my $sub = $ps->subscribe;
+    $ps->publish_multi(1..5);
+    $ps->notify;
+    is_deeply [$sub->drain_notify(2)], [1, 2], "$variant: bounded notification drain";
+    is $ps->eventfd_consume, 1, "$variant: remaining messages stay notified";
+    is_deeply [$sub->drain_notify(10)], [3, 4, 5], "$variant: remaining messages drain";
+    is $ps->eventfd_consume, undef, "$variant: empty ring is not renotified";
+}
+
 # --- Sub: eventfd_set / fileno ---
 {
     my $ps = Data::PubSub::Shared::Int->new(undef, 64);
@@ -104,6 +116,30 @@ use Data::PubSub::Shared;
     my $fd = $ps->eventfd;
     my $sub = $ps->subscribe;
     is $sub->fileno, $fd, 'str sub inherits eventfd';
+}
+
+for my $variant (qw(Int Int32 Int16 Str)) {
+    my $class = "Data::PubSub::Shared::$variant";
+    my $ps = $class->new_memfd('notify-owner', 32);
+    my $fd = $ps->eventfd;
+    {
+        my $peer = $class->new_from_fd($ps->memfd);
+        $peer->eventfd_set($fd);
+        isnt $peer->fileno, $fd, "$variant: handle owns a duplicate eventfd";
+        $peer->publish_notify(7);
+        is $ps->eventfd_consume, 1, "$variant: duplicate notifies the shared eventfd";
+        my $owned = $peer->fileno;
+        $peer->eventfd_set($owned);
+        is $peer->fileno, $owned, "$variant: setting the current eventfd is idempotent";
+        eval { $peer->eventfd_set(1_000_000) };
+        like $@, qr/eventfd_set:/, "$variant: invalid eventfd reports failure";
+        is $peer->fileno, $owned, "$variant: failed replacement preserves the eventfd";
+        $peer->eventfd_set(-1);
+        is $peer->fileno, -1, "$variant: eventfd can be detached";
+        $peer->eventfd_set($fd);
+    }
+    $ps->notify;
+    is $ps->eventfd_consume, 1, "$variant: eventfd survives peer destruction";
 }
 
 # --- Str: publish_multi batch (single mutex hold) ---

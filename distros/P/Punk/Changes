@@ -1,5 +1,9 @@
 Revision history for Punk
 
+0.64    2026-10-21
+        - A controller that dies while loading names its error, not
+          "has no method".
+
 0.63    2026-10-21
         - Requires Hyperman 0.64: on 0.60 to 0.63 a WebSocket's first
           message over HTTP/2 was lost (t/1014 on Linux smokers).

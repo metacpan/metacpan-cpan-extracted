@@ -2,7 +2,7 @@ package Data::Path::XS;
 use strict;
 use warnings;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use parent 'Exporter';
 our @EXPORT_OK = qw(path_get path_set path_delete path_exists
@@ -81,7 +81,7 @@ Data::Path::XS - Fast path-based access to nested data structures
     my $cp    = path_compile('/foo/bar/1');
     my $other = { foo => { bar => [4, 5, 6] } };
     pathc_get($data,  $cp);                   # 42
-    pathc_get($other, $cp);                   # 5 — reuse across data
+    pathc_get($other, $cp);                   # 5 -- reuse across data
 
     # Keyword syntax (compile-time optimized)
     use Data::Path::XS ':keywords';
@@ -161,7 +161,7 @@ empty string cannot be expressed in a string path. Use the array API
 
 UTF-8 keys are propagated correctly. The path SV's C<SvUTF8> flag (or,
 in the array API, each key SV's flag) is forwarded to C<hv_fetch>/
-C<hv_store> so C<"/café"> matches hash keys stored under C<use utf8>.
+C<hv_store> so C<"/caf\x{e9}"> matches hash keys stored under C<use utf8>.
 
 =back
 
@@ -393,8 +393,8 @@ Read operations (C<path_get>, C<path_exists>, C<path_delete>, and their
 array/compiled/keyword counterparts) work on tied hashes and arrays via
 the standard fetch/exists/delete magic.
 
-Write operations (C<path_set>, C<patha_set>, C<pathc_set>, and the
-C<pathset> keyword) currently croak with a message of the form
+Write operations (C<path_set>, C<patha_set>, C<pathc_set>, and dynamic
+C<pathset>) currently croak with a message of the form
 C<"Cannot ... on tied/magical hash"> or C<"... on tied/magical array">,
 rather than invoking the tied STORE method. For tied write targets,
 assign through native Perl syntax. This limitation may be relaxed in a
@@ -406,8 +406,8 @@ The module uses no global state and is safe in threaded programs as
 long as each thread operates on its own data. No locking is performed
 on shared structures.
 
-Compiled-path objects own internal buffers and should not be shared
-across threads; create one per thread.
+Compiled-path objects are skipped when threads are cloned; create one
+per thread.
 
 =head1 PERFORMANCE
 

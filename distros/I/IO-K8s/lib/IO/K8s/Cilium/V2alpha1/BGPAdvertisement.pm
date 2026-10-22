@@ -1,6 +1,6 @@
 package IO::K8s::Cilium::V2alpha1::BGPAdvertisement;
 # ABSTRACT: BGPAdvertisement defines which routes Cilium should advertise to BGP peers.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s advertisementType => Str, { required => 'schema', enum => [qw(PodCIDR CiliumPodIPPool Service)] };
@@ -26,7 +26,7 @@ IO::K8s::Cilium::V2alpha1::BGPAdvertisement - BGPAdvertisement defines which rou
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 advertisementType
 

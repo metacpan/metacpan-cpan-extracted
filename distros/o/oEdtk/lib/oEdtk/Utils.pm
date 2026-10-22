@@ -27,7 +27,7 @@ our @EXPORT_OK = qw(
 	parse_yyyymmdd scalar_dump track track_begin track_end trim_list
 );
 
-our $VERSION = 2.1129;
+our $VERSION = 2.1131;
 
 use Carp         qw(carp croak);
 use Cwd          qw(abs_path);

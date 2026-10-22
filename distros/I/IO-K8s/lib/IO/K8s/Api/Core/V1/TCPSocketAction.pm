@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::TCPSocketAction;
 # ABSTRACT: TCPSocketAction describes an action based on opening a socket
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s host => Str;
@@ -23,7 +23,7 @@ IO::K8s::Api::Core::V1::TCPSocketAction - TCPSocketAction describes an action ba
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 host
 

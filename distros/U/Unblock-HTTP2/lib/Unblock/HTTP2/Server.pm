@@ -9,7 +9,7 @@ use parent 'Unblock::HTTP2::_Connection';
 use Unblock::HTTP2::_Headers;
 use Unblock::HTTP2::Transaction;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 use constant {
     H2_DATA              => 0,
@@ -27,6 +27,7 @@ my $BODY_LOW_WATER  = 32_768;
 sub new {
     my ($class, %option) = @_;
     my $transport = delete $option{transport};
+    my %receive = $class->_receive_options(\%option);
 
     my %callbacks;
     for my $name (qw(
@@ -123,6 +124,7 @@ sub new {
 
     $self->_initialize_connection(
         $session,
+        %receive,
         role      => 'server',
         callbacks => \%callbacks,
         transport => $transport,
@@ -276,9 +278,7 @@ sub _on_data_chunk_recv {
 
     $transaction->_receive_body_bytes(length $data);
 
-    my $result = $self->_invoke_callback(
-        'on_body', $transaction, $transaction->request, $data,
-    );
+    my $result = $transaction->_receive_data($transaction->request, $data);
 
     if ($result ne '1') {
         $self->_stream_failure($stream_id, "$result");
@@ -295,6 +295,8 @@ sub _request_end {
     return if $state->{request_end_called}++;
 
     my $transaction = $self->transaction_for_stream_id($stream_id) or return;
+    return if $transaction->is_terminal;
+    $transaction->_finish_receive($transaction->request);
     $transaction->request->mark_complete->freeze;
 
     my $result = $self->_invoke_callback(
@@ -308,12 +310,19 @@ sub _invoke_callback {
     my ($self, $name, @args) = @_;
     my $callback = $self->{callbacks}{$name} or return 1;
 
+    my $tx = $args[0];
+    $tx->{callback_depth}++ if $tx;
     my $ok = eval {
         $callback->(@args);
         1;
     };
 
-    return $ok ? 1 : $@;
+    my $error = "$@";
+    if ($tx) {
+        $tx->{callback_depth}--;
+        $tx->_notify_finish if $tx->{finish_pending};
+    }
+    return $ok ? 1 : $error;
 }
 
 sub _on_invalid_frame {
@@ -600,7 +609,7 @@ sub _stream_failure {
         $transaction->_fail($error, $code, 0);
         $self->_invoke_stream_error($transaction, $error, $code);
     }
-    elsif (my $callback = $self->{callbacks}{on_error}) {
+    elsif (!$transaction && (my $callback = $self->{callbacks}{on_error})) {
         eval { $callback->(undef, $error, $code) };
     }
 
@@ -615,11 +624,13 @@ sub _invoke_stream_error {
     if ($result ne '1') {
         my $callback = $self->{callbacks}{on_error};
         eval { $callback->($transaction, "$result", $error_code) } if $callback;
+        $transaction->_notify_finish;
         return;
     }
 
     my $callback = $self->{callbacks}{on_error};
     eval { $callback->($transaction, $error, $error_code) } if $callback;
+    $transaction->_notify_finish;
     return;
 }
 
@@ -638,9 +649,11 @@ sub _on_stream_close {
         }
         else {
             if (!$transaction->request->is_complete) {
+                $transaction->_finish_receive($transaction->request);
                 $transaction->request->mark_complete->freeze;
             }
             $transaction->_mark_complete;
+            $transaction->_notify_finish;
         }
     }
 
@@ -699,6 +712,23 @@ run an event loop.
 An optional attached framework host receives wire output automatically.
 Without one, drain C<output()> while C<want_write()> is true. See
 L<Unblock::HTTP2::Integration>.
+
+=head1 RECEIVE BODY OPTIONS
+
+C<receive_body> accepts C<buffered> or C<stream>. Streaming remains the default.
+C<max_buffered_body_bytes> is a positive byte limit, defaulting to 64 MiB.
+Zero does not mean unlimited. Buffered reception installs the body on the
+same Uniform message before freezing it and invoking the body-completion
+callback. Empty completed bodies have an empty string representation.
+The engine releases retained chunks on failure or cancellation.
+
+Select streaming per transaction with C<$tx-E<gt>on_data(...)> during the
+header callback. Do not combine buffered mode with legacy C<on_body>.
+Do not combine C<on_data> and C<on_body>. See
+L<Unblock::HTTP2::Transaction/RECEIVE AND FINISH CALLBACKS>.
+
+A buffer limit failure resets only the affected stream.
+It does not call successful body completion.
 
 =head1 CONSTRUCTOR
 

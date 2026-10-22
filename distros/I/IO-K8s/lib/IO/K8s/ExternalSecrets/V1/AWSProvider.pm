@@ -1,11 +1,11 @@
 package IO::K8s::ExternalSecrets::V1::AWSProvider;
 # ABSTRACT: AWS configures this store to sync secrets using AWS Secret Manager provider
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s additionalRoles   => [Str];
 k8s auth              => '+IO::K8s::ExternalSecrets::V1::AWSAuth';
-k8s customSessionTags => { Str => 1 };
+k8s customSessionTags => HashRef[Str];
 k8s externalID        => Str;
 k8s prefix            => Str;
 k8s region            => Str, { required => 'schema' };
@@ -42,7 +42,7 @@ IO::K8s::ExternalSecrets::V1::AWSProvider - AWS configures this store to sync se
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 additionalRoles
 

@@ -1,7 +1,7 @@
 package Data::RadixTree::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 require XSLoader;
 XSLoader::load('Data::RadixTree::Shared', $VERSION);
 
@@ -92,8 +92,8 @@ space at once.
 B<Capacity is fixed at creation.> The node pool holds C<node_capacity> nodes and
 the label arena holds C<arena_capacity> bytes; C<insert> croaks (after releasing
 the lock) when either would overflow. A single insert consumes at most two nodes
-and at most C<length(key)> arena bytes, so size both with headroom for your key
-set. B<Linux-only.> Requires 64-bit Perl.
+(three temporarily during an edge split) and at most C<length(key)> arena bytes,
+so size both with headroom for your key set. B<Linux-only.> Requires 64-bit Perl.
 
 =head1 METHODS
 
@@ -305,20 +305,20 @@ its contents while other processes are using it.
 
 Mutation is guarded by a futex-based write-preferring rwlock with PID-encoded
 ownership; if a holder dies, the next contender detects the dead owner and
-recovers. Because an C<insert> performs all of its node/arena allocations under
-the lock after a capacity pre-check, a crash leaves the tree consistent up to
-the last completed C<insert> or C<delete>. B<Limitation>: PID reuse is not
-detected (very unlikely in practice).
+recovers. Interrupted inserts and deletes leave committed keys and their count
+consistent; recovery finishes an interrupted C<clear>. A crash before an insert
+commits can leak node or arena space until C<clear>. B<Limitation>: PID reuse is
+not detected (very unlikely in practice).
 
 Reader-slot exhaustion (slotless readers): dead-process recovery attributes a
 crashed lock holder's contribution through its reader-slot. The slot table holds
-1024 entries (one per concurrent reader process). If more than that many reader
-processes share one mapping at once, a reader that cannot claim a slot proceeds
+1024 entries (one per active read-write handle per process). If more than that
+many handles share one mapping at once, a reader that cannot claim a slot proceeds
 "slotless" -- it still takes the read lock but leaves no per-process record. If
 such a slotless reader is then killed while holding the read lock, its share of
 the lock cannot be attributed to a dead process, so writer recovery cannot
 reclaim it and writers may block until the mapping is recreated. Reaching this
-needs more than 1024 concurrent reader processes on one mapping plus a crash in
+needs more than 1024 active handles on one mapping plus a crash in
 the brief read-lock window; the dead-process slot reclaim keeps the table from
 filling with stale entries, so in practice it is very unlikely.
 

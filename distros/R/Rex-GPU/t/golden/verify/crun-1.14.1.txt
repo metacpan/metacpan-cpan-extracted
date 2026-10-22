@@ -1,0 +1,8 @@
+# golden: verify/crun-1.14.1
+# Host interactions Rex::GPU emits, in order. Regenerate with
+# REX_GPU_GOLDEN_UPDATE=1 prove -l t/ -- and read the diff.
+run: lsmod | grep '^nvidia '
+run: nvidia-smi -L 2>&1
+can_run: nvidia-ctk
+can_run: crun
+run: crun --version 2>&1

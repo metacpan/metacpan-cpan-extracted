@@ -17,7 +17,7 @@ Mojolicious, native transport code, or another event framework.
 
     cpanm Unblock::HTTP1
 
-Version 0.11 requires Perl 5.16 and Uniform::HTTP 0.06 or newer.
+Requires Perl 5.16 and Uniform::HTTP 0.06 or newer.
 Linux::Event, IO::Async and AnyEvent are optional host frameworks.
 
 ## Start here
@@ -107,6 +107,24 @@ For complete instructions, read:
     perldoc Unblock::HTTP1::Integration
 
 The repository also includes docs/INTEGRATION.md and docs/COOKBOOK.md.
+
+## Receive bodies and transaction completion
+
+By default, incoming body data is streamed through callbacks. To retain the
+decoded body in the canonical Uniform::HTTP message, construct a Client or
+Server with `receive_body => 'buffered'`. Buffered reception is limited by
+`max_buffered_body_bytes` (64 MiB by default).
+
+For per-transaction streaming, register `$tx->on_data(sub { ... })` in the
+incoming-headers callback, or supply `on_data` to Client->request(). That
+callback receives decoded body fragments without collecting the full body.
+Do not combine `on_data` and `on_body` on one Transaction.
+
+`$tx->on_finish(sub { ... })` runs exactly once after the Transaction reaches
+complete, cancelled, or error state. On an attached server, successful
+completion is not reported until the host has accepted the corresponding
+outgoing bytes. See the Client, Server, and Transaction POD for the callback
+ordering and receive modes.
 
 ## Connection and message behavior
 

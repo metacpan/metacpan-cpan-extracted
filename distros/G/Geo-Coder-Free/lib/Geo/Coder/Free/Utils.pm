@@ -16,11 +16,11 @@ address-normalization helpers used by multiple backends.
 
 =head1 VERSION
 
-Version 0.49
+Version 0.51
 
 =cut
 
-our $VERSION = '0.49';
+our $VERSION = '0.51';
 
 use v5.20;
 use strict;
@@ -33,7 +33,6 @@ our @EXPORT = qw(create_disc_cache create_memory_cache distance _abbreviate _nor
 our @EXPORT_OK = qw(_abbreviate _normalize);
 
 use CHI;
-use Data::Dumper;
 use Geo::Coder::Abbreviations;
 use DBI;
 use Error::Simple;
@@ -245,7 +244,7 @@ sub _is_driver_available($driver) {
 	if($driver_modules{$driver}->can('new')) {
 		return 1;
 	}
-	# SECURITY — string-eval elimination:
+	# SECURITY - string-eval elimination:
 	#   eval "require $module_name" is a string eval; if $driver ever escaped
 	#   the hash-key whitelist (e.g. through a future regression in the caller),
 	#   it could execute arbitrary code.  A block eval with require_module() is

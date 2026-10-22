@@ -1,6 +1,6 @@
 package IO::K8s::PrometheusOperator::V1::RemoteWriteSpec;
 # ABSTRACT: RemoteWriteSpec defines the configuration to write samples from Prometheus to a remote endpoint.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s authorization        => '+IO::K8s::PrometheusOperator::V1::Authorization';
@@ -10,13 +10,13 @@ k8s bearerToken          => Str;
 k8s bearerTokenFile      => Str;
 k8s enableHTTP2          => Bool;
 k8s followRedirects      => Bool;
-k8s headers              => { Str => 1 };
+k8s headers              => HashRef[Str];
 k8s messageVersion       => Str, { enum => [qw(V1.0 V2.0)] };
 k8s metadataConfig       => '+IO::K8s::PrometheusOperator::V1::MetadataConfig';
 k8s name                 => Str;
 k8s noProxy              => Str;
 k8s oauth2               => '+IO::K8s::PrometheusOperator::V1::OAuth2';
-k8s proxyConnectHeader   => Opaque;
+k8s proxyConnectHeader   => HashRef[ArrayRef[InstanceOf['IO::K8s::Api::Core::V1::SecretKeySelector']]];
 k8s proxyFromEnvironment => Bool;
 k8s proxyUrl             => Str, { pattern => qr/^(http|https|socks5):\/\/.+$/ };
 k8s queueConfig          => '+IO::K8s::PrometheusOperator::V1::QueueConfig';
@@ -68,7 +68,7 @@ IO::K8s::PrometheusOperator::V1::RemoteWriteSpec - RemoteWriteSpec defines the c
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 authorization
 

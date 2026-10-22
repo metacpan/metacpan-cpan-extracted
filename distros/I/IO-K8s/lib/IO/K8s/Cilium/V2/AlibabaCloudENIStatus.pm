@@ -1,6 +1,6 @@
 package IO::K8s::Cilium::V2::AlibabaCloudENIStatus;
 # ABSTRACT: AlibabaCloud is the AlibabaCloud specific status of the node.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s enis => { '+IO::K8s::Cilium::V2::AlibabaCloudENI' => 1 };
@@ -20,7 +20,7 @@ IO::K8s::Cilium::V2::AlibabaCloudENIStatus - AlibabaCloud is the AlibabaCloud sp
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 enis
 

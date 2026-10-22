@@ -8,7 +8,7 @@ use Hash::Util::FieldHash qw(fieldhash);
 use Net::QUIC ();
 use Net::QUIC::Stream ();
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 fieldhash my %OUTPUT_CALLBACK;
 fieldhash my %STREAM_AVAILABLE_CALLBACK;
@@ -708,6 +708,9 @@ as received data, FIN, acknowledgement progress, RESET_STREAM, STOP_SENDING,
 stream close, peer send-credit increases, or a newly peer-created Stream.
 A Stream waiting for connection-wide bounded transmit capacity can also be
 woken when a different Stream's ACK or reset releases retained transmit data.
+A peer MAX_DATA increase also wakes only short-accepted Streams waiting for
+connection-level send credit. This does not wake unrelated Streams or require
+a timer, and applies only when activity tracking was enabled.
 
 The callback does not receive one event object per transport event. Activity is
 coalesced by Stream.

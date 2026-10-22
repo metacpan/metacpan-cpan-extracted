@@ -1,7 +1,7 @@
 package WWW::Hetzner::CLI::Cmd::PlacementGroup::Cmd::Describe;
 # ABSTRACT: Describe a placement group
 
-our $VERSION = '0.101';
+our $VERSION = '0.102';
 
 use Moo;
 use MooX::Cmd;
@@ -49,7 +49,7 @@ WWW::Hetzner::CLI::Cmd::PlacementGroup::Cmd::Describe - Describe a placement gro
 
 =head1 VERSION
 
-version 0.101
+version 0.102
 
 =head1 SUPPORT
 

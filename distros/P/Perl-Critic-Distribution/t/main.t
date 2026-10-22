@@ -20,6 +20,7 @@ use Cpanel::JSON::XS();
 use IO::Compress::Gzip();
 use IO::Uncompress::Gunzip();
 use Scalar::Util();
+use PPI();
 
 use Perl::Critic::Distribution;
 
@@ -304,6 +305,70 @@ subtest 'the cache of a root that is gone is removed' => sub {
     ok( !-e $gone_cache,       'the next write removes it' );
     ok( -e "$cache/notes.txt", 'and leaves alone a file that is not a cache' );
     is( scalar( () = glob("$cache/*.json.gz") ), 1, 'and keeps the one whose root is there' );
+};
+
+subtest 'for_file, with the parameters of a policy' => sub {
+    local %Perl::Critic::Distribution::FOR;
+    local $ENV{XDG_CACHE_HOME} = tempdir( CLEANUP => 1 );
+    my $file = dist() . '/lib/Some.pm';
+    my $dir  = tempdir( CLEANUP => 1 );
+
+    is( $D->for_file( $file, cache => 0, cache_dir => $dir ), $D->for_file( $file, cache_dir => undef ), 'cache off keeps no cache, whatever cache_dir says' );
+    is( $D->for_file( $file, cache => 1, cache_dir => q{} ),  $D->for_file($file),                       'an empty cache_dir is the default' );
+    is( $D->for_file( $file, cache => 1, cache_dir => $dir ), $D->for_file( $file, cache_dir => $dir ),  'and any other is that directory' );
+    isnt( $D->for_file( $file, cache_dir => q{} ), $D->for_file($file), 'without cache, cache_dir is taken as it is' );
+
+    my %param = map { $_->{name} => $_ } $D->policy_parameters();
+    is_deeply( [ sort keys %param ], [qw{cache cache_dir}], 'a policy gets the two parameters' );
+    is( $param{cache}{default_string},     '1', 'with the cache on' );
+    is( $param{cache_dir}{default_string}, q{}, 'in the default directory' );
+};
+
+subtest 'called_by_perl' => sub {
+    my %name = map { $_ => 1 } $D->called_by_perl();
+    ok( $name{$_},   "$_ is called by perl" ) for qw{BEGIN DESTROY import AUTOLOAD BUILD FETCH};
+    ok( !$name{new}, 'and new is not, because code calls it' );
+};
+
+subtest 'walk' => sub {
+    my $source = <<'END';
+package Outer;
+sub one { inner() }
+sub Other::two { other() }
+sub fwd;
+after_fwd();
+package Block { sub three { blocked() } }
+back();
+sub ::top { topped() }
+END
+    my @seen;
+    $D->walk(
+        PPI::Document->new( \$source ),
+        sub {
+            my ( $elem, $package, $sub ) = @_;
+            push @seen, [ $elem->content(), $package, $sub ] if $elem->isa('PPI::Token::Word') && $elem->snext_sibling() && $elem->snext_sibling()->isa('PPI::Structure::List');
+        },
+    );
+    is_deeply(
+        \@seen,
+        [
+            [qw{inner Outer Outer::one}],
+            [qw{other Outer Other::two}],
+            [ 'after_fwd', 'Outer', undef ],
+            [qw{blocked Block Block::three}],
+            [ 'back', 'Outer', undef ],
+            [qw{topped Outer main::top}],
+        ],
+        'each call is seen in source order, with its package and its sub'
+    );
+
+    my %packages;
+    $D->walk( PPI::Document->new( \$source ), sub { $packages{ $_[0]->content() } = 1 if $_[0]->isa('PPI::Statement::Package') } );
+    is( scalar keys %packages, 2, 'each package statement is seen' );
+
+    my @in;
+    $D->walk( PPI::Document->new( \'called()' ), sub { push @in, [ @_[ 1, 2 ] ] if $_[0]->isa('PPI::Token::Word') }, package => 'Some', sub => 'Some::it' );
+    is_deeply( \@in, [ [qw{Some Some::it}] ], 'and the context of a fragment can be given' );
 };
 
 done_testing();

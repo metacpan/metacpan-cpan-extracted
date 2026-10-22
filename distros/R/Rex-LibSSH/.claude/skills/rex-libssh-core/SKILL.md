@@ -1,6 +1,6 @@
 ---
 name: rex-libssh-core
-description: Load before editing Rex::LibSSH — the four Rex interfaces on Net::LibSSH exec channels, the exec() signature Rex actually calls, the channel traps, why sudo bypasses this backend.
+description: Load before editing Rex::LibSSH — the four Rex interfaces on Net::LibSSH exec channels, the exec() signature Rex actually calls, the module contracts, why sudo bypasses this backend.
 ---
 
 # Rex::LibSSH — core
@@ -17,6 +17,9 @@ SFTP, the distribution has failed at the one thing it exists for.
 
 Consumers: `Rex::GPU` and `Rex::Rancher` (both `recommends 'Rex::LibSSH'` in their
 cpanfiles) for Hetzner dedicated servers, which ship without an SFTP subsystem.
+
+Die Net::LibSSH-Kanal-API und ihre vier Fallen: `rex-libssh-channel`. Wie sich das
+Backend prüfen lässt und was die Testsuite trägt: `rex-libssh-testing`.
 
 ## How Rex reaches this code
 
@@ -85,41 +88,6 @@ our own `Fs::LibSSH::_run` both call `$exec->exec($cmd)` — so `$path` and `$op
 arrive undef on every `is_file`, `stat`, `ls`, `mkdir` call. Any code added to `exec`
 must survive that; guard with `$option &&`/`defined $path` rather than dereferencing.
 
-## Net::LibSSH — the surface this backend uses
-
-`Net::LibSSH` 0.002, XS over libssh (not libssh2 — that is `Net::SSH2`).
-
-```perl
-my $ssh = Net::LibSSH->new;
-$ssh->option( host => $h, port => $p, user => $u, timeout => $t );
-$ssh->option( strict_hostkeycheck => 0 );
-$ssh->connect       or die $ssh->error;   # 1 / 0
-$ssh->auth_publickey($privkey) || $ssh->auth_agent || $ssh->auth_password($pw);
-
-my $ch = $ssh->channel;          # one channel = one command, for its whole lifetime
-$ch->exec($cmd);                 # exactly once per channel
-my $out = $ch->read;             # slurp stdout to EOF
-my $err = $ch->read( -1, 1 );    # slurp stderr
-$ch->write($data); $ch->send_eof;  # stdin, for `cat > file`
-my $rc = $ch->exit_status;       # AFTER reading; -1 until the remote process exits
-$ch->close;
-```
-
-Four traps in that API:
-
-1. **`read(undef)` reads nothing.** undef numifies to 0 and the call returns an empty
-   string. Pass `-1` or no argument to slurp. A `$len` threaded through from a caller
-   that may be undef silently yields empty files.
-2. **`exit_status` before EOF returns `-1`.** Read all output first, then ask. `-1`
-   shifted into `$?` looks like a wildly wrong exit code rather than "not finished".
-3. **stdout then stderr, sequentially, is safe** — libssh pumps all protocol messages
-   (including stderr window adjustments) while blocking in the stdout read, so this does
-   not deadlock the way a naive select loop over two pipes would. Don't "fix" it into
-   interleaved reads.
-4. **Not thread-safe, no fork support — one connection per process.** Rex's
-   `parallelism` forks per host. Each child must build its own session; a session
-   inherited across a fork is a use-after-free in C, not a Perl error.
-
 ## Invariants of the four modules
 
 **`Connection::LibSSH`** — the timeout is set twice on purpose:
@@ -181,29 +149,6 @@ That asymmetry is the security-relevant line in this distribution.
 - **No `chown`/`chmod`/`ln`/`rmdir` of our own** — those come from `Fs::Base`, which
   builds shell commands and calls `Fs::Base::_exec` (the resolving form). They work
   because `Exec::LibSSH` tolerates the one-argument call.
-
-## Verification
-
-```bash
-prove -lr t/            # -r matters: t/lib/ holds the harness, plain -l t/ is not recursive
-prove -lv t/01-rex-integration.t
-```
-
-`t/00-load.t` only checks that four modules compile. The proof is
-`t/01-rex-integration.t`, which starts a **real sshd** on a free port via
-`t/lib/TestSSHD.pm` — ed25519 host and client keys in a tempdir, `StrictModes no`,
-`AllowUsers $current_user`, killed via `SIGTERM` in `DESTROY` — and drives `run`,
-`is_file`, `is_dir`, `mkdir`, `file`, `stat`, `upload` and `download` against it.
-
-Two things about that harness:
-
-- It **`plan skip_all`s** when `sshd` or `ssh-keygen` is missing, and the suite then
-  reports success having connected to nothing. Always say whether it ran.
-- `TestSSHD` adds `Subsystem sftp` when it finds an sftp-server binary, so the test host
-  usually *has* SFTP. The suite therefore cannot prove the SFTP-free claim by itself —
-  it proves the exec paths work. To test the actual target environment, drop the
-  `Subsystem` line (`has_sftp` is exposed for exactly this) or point at a real host
-  without one.
 
 ## Conventions in this distribution
 

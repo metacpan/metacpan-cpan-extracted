@@ -328,4 +328,69 @@ for my $class (sort keys %EXPECTED) {
     }
 }
 
+# ---------------------------------------------------------------------------
+# 2e. k200: the compile-time sugar (Moo keywords, the k8s DSL function, the
+# type names) must be gone from a class once its declarations are done, so
+# those names are free as JSON property names. Checked on a shipped class,
+# on an inline-struct class and on AutoGen-built classes.
+# ---------------------------------------------------------------------------
+
+{
+    my @SUGAR = qw( has with extends before after around k8s
+                    Str Int Bool Num IntOrStr Quantity Time );
+
+    my @classes = (
+        'IO::K8s::Api::Core::V1::PodSpec',
+        'IO::K8s::Api::Core::V1::Container',
+    );
+
+    {
+        package Test::K200::Inline;
+        use IO::K8s::Resource;
+        k8s outer => { inner => Str };
+    }
+    my $inline = eval { Test::K200::Inline->_k8s_attr_info->{outer}{class} };
+    ok($inline, 'inline struct got its own class') or diag($@);
+    push @classes, $inline if $inline;
+
+    my $k8s = IO::K8s->new;
+    my $reg = eval { $k8s->add_crd({
+        apiVersion => 'apiextensions.k8s.io/v1',
+        kind       => 'CustomResourceDefinition',
+        metadata   => { name => 'sugars.k200.example.com' },
+        spec       => {
+            group    => 'k200.example.com',
+            names    => { kind => 'Sugar', plural => 'sugars' },
+            scope    => 'Namespaced',
+            versions => [{
+                name => 'v1', served => \1, storage => \1,
+                schema => { openAPIV3Schema => { type => 'object', properties => {
+                    spec => { type => 'object', properties => {
+                        nested => { type => 'object', properties => { x => { type => 'string' } } },
+                    } },
+                } } },
+            }],
+        },
+    }) };
+    if ($reg) {
+        my $top = $reg->{Sugar}{ $reg->{Sugar}{storage} };
+        push @classes, $top;
+        my $spec = $top->_k8s_attr_info->{spec}{class};
+        push @classes, $spec if $spec;
+        my $nested = $spec && $spec->_k8s_attr_info->{nested}{class};
+        push @classes, $nested if $nested;
+    }
+    else {
+        fail('AutoGen CRD for the sugar sweep builds');
+        diag($@);
+    }
+
+    for my $class (@classes) {
+        my @left = grep { $class->can($_) } @SUGAR;
+        is_deeply(\@left, [], "$class carries no compile-time sugar")
+            or diag('still callable: '.join(', ', @left));
+        ok($class->can('TO_JSON'), "$class kept TO_JSON");
+    }
+}
+
 done_testing;

@@ -50,7 +50,7 @@ use oEdtk::DBAdmin qw(
 sub usage {
 	print STDERR "usage: $0 <mode> --dsn <dsn> [--user U] [--pass P]\n"
 		. "  modes: --check-only | --dry-run | --historize [--force] | --revert --stamp S"
-		. " | --additive [--with-constraints | --dry-run]\n";
+		. " | --additive [--with-constraints] [--dry-run]\n";
 	exit 1;
 }
 
@@ -82,6 +82,10 @@ my @modes = grep { $_ } ( $check, $dry, $historize, $revert, $additive );
 # two-mode combination allowed.
 my $additive_preview = ( $additive && $dry && @modes == 2 ) ? 1 : 0;
 usage() unless @modes == 1 || $additive_preview;
+if ( $with_constraints && !$additive ) {
+	print STDERR "db_migrate: --with-constraints requires --additive\n";
+	usage();
+}
 usage() unless defined $dsn;
 
 my $dbh = DBI->connect( $dsn, $user, $pass, { RaiseError => 1, PrintError => 0, AutoCommit => 1 } )
@@ -92,7 +96,8 @@ if ($additive_preview) {
 		schema_AdditivePlan( $dbh, ( $with_constraints ? ( with_constraints => 1 ) : () ) );
 	print join( "\n", @{ $plan->{report} } ), "\n";
 	print "\n-- in-place DDL (illustrative; nothing is written) --\n";
-	print "  $_;\n" for @{ $plan->{add_sql} }, @{ $plan->{widen_sql} };
+	print "  $_;\n"
+		for @{ $plan->{add_sql} }, @{ $plan->{widen_sql} }, @{ $plan->{key_sql} };
 	$dbh->disconnect;
 	exit 0;
 }

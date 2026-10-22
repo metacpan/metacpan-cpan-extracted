@@ -3,7 +3,7 @@ use warnings FATAL => 'all';
 
 use Test::More qw(no_plan);
 
-require_ok 'examples/bloggery/bloggery.cgi';
+require_ok './examples/bloggery/bloggery.cgi';
 
 __END__
 #use Test::More (

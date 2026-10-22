@@ -1,7 +1,7 @@
 # ABSTRACT: What RKE2 and K3s differ in, and the host steps they share
 
 package Rex::Rancher::Distribution;
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 use v5.14.4;
 use Moo;
 use Module::Runtime qw( use_module );
@@ -717,15 +717,24 @@ sub _stale_containerd_restart {
   }
 
   Rex::Commands::Run::run("systemctl is-active --quiet $service", auto_die => 0);
-  # Not running: the start renders a fresh config.toml anyway.
-  return 0 unless $? == 0;
-  Rex::Logger::info( $has_tmpl
+  my $prefix = '';
+  unless ($? == 0) {
+    # containerd 2.x exits on that bare config.toml, so the service never gets
+    # to active: it hangs in activating (its Restart= loop) or ends failed
+    # (k91). Either one wants to run and is restarted once. Stopped on purpose
+    # (inactive): its next start renders a fresh config.toml anyway.
+    my $state = Rex::Commands::Run::run("systemctl is-active $service 2>/dev/null", auto_die => 0) // '';
+    $state =~ s/\s+//g;
+    return 0 unless $state eq 'activating' || $state eq 'failed';
+    $prefix = "$service is $state (containerd exits on its bare config); ";
+  }
+  Rex::Logger::info( $prefix . ( $has_tmpl
     ? "$dir/config.toml was rendered from Rex::GPU 0.001's bare config.toml.tmpl, "
       . "which another template has replaced since; restarting $service so it "
       . "renders that one"
     : "$dir/config.toml was rendered from a config.toml.tmpl that is gone "
       . "(Rex::GPU 0.001's); restarting $service so it regenerates its "
-      . "containerd config", 'warn');
+      . "containerd config" ), 'warn');
   return 1;
 }
 
@@ -757,9 +766,33 @@ sub remove_bare_containerd_template {
   my $out = Rex::Commands::Run::run("rm -f $tmpl 2>&1", auto_die => 0);
   die "Could not remove $tmpl, the bare containerd template that replaces "
     . "${label}'s own containerd config: " . ( ( $out // '' ) =~ s/\s+\z//r ) . "\n"
-    . "$service was not (re)started.\n"
     unless $? == 0;
   return 1;
+}
+
+# remove_bare_containerd_template right before a (re)start of the service
+# (install_server, install_agent, update_registries): a failure there also
+# means that start did not happen, which the error says. Outside a start
+# (heal_bare_containerd_template) the sentence would mislead (k83).
+sub _remove_bare_template_before_start {
+  my ( $self ) = @_;
+  my $removed = eval { $self->remove_bare_containerd_template };
+  die $@ . $self->service . " was not (re)started.\n" unless defined $removed;
+  return $removed;
+}
+
+
+sub heal_bare_containerd_template {
+  my ( $self ) = @_;
+  my $removed = $self->remove_bare_containerd_template;
+  return { removed => $removed, restarted => 0 } unless $self->_stale_containerd_restart;
+
+  my $service = $self->service;
+  my $out = Rex::Commands::Run::run("systemctl restart $service 2>&1", auto_die => 0);
+  die "Could not restart $service after removing the bare containerd template: "
+    . ( ( $out // '' ) =~ s/\s+\z//r ) . "\n"
+    unless $? == 0;
+  return { removed => $removed, restarted => 1 };
 }
 
 
@@ -1000,7 +1033,7 @@ Rex::Rancher::Distribution - What RKE2 and K3s differ in, and the host steps the
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 
@@ -1575,6 +1608,25 @@ with C<rm -f> (no SFTP); dies when the removal fails. Restarts nothing
 itself: L</start_verb> then restarts a running service whose C<config.toml>
 is still that template's output. C<1> when it removed the template, else
 C<0>.
+
+=head2 heal_bare_containerd_template
+
+  my $r = $dist->heal_bare_containerd_template;
+  # { removed => 1, restarted => 1 }
+
+For a node outside an install -- a drift remedy on a running cluster:
+L</remove_bare_containerd_template>, then, when a running L</service>'s
+C<config.toml> is still that template's output (the same check
+L</start_verb> makes), one C<systemctl restart> so it renders its own
+containerd config again. A service that hangs in C<activating> or ended
+C<failed> is restarted the same way: containerd 2.x exits on that bare
+config, so such a node never gets to C<active> (k91). A service stopped on
+purpose (C<inactive>) is not started: its next start renders a fresh one. Returns a hash with C<removed> and
+C<restarted> (each C<1> or C<0>); dies when the removal or the restart fails.
+
+Inside L<Rex::Rancher::Server/install_server> and
+L<Rex::Rancher::Agent/install_agent> this is not needed: they remove the
+template, and their start already restarts.
 
 =head2 restart_watch
 

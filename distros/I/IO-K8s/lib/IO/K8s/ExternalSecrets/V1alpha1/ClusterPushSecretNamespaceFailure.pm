@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1alpha1::ClusterPushSecretNamespaceFailure;
 # ABSTRACT: ClusterPushSecretNamespaceFailure represents a failed namespace deployment and it's reason.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s namespace => Str, { required => 'schema' };
@@ -22,7 +22,7 @@ IO::K8s::ExternalSecrets::V1alpha1::ClusterPushSecretNamespaceFailure - ClusterP
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 namespace
 

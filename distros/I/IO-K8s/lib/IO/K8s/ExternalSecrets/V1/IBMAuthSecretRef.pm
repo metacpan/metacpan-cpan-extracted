@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1::IBMAuthSecretRef;
 # ABSTRACT: IBMAuthSecretRef contains the secret reference for IBM Cloud API key authentication.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s iamEndpoint           => Str;
@@ -22,7 +22,7 @@ IO::K8s::ExternalSecrets::V1::IBMAuthSecretRef - IBMAuthSecretRef contains the s
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 iamEndpoint
 

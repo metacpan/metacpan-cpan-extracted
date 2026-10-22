@@ -49,6 +49,20 @@ is $s->poll, "", 'empty string preserved';
     ok utf8::is_utf8($got), 'UTF-8 flag preserved';
 }
 
+# Overloaded Unicode
+{
+    package UnicodeMessage;
+    use overload '""' => sub { "\x{263A}" }, fallback => 1;
+    sub new { bless {}, shift }
+}
+for my $method (qw(publish publish_notify publish_multi)) {
+    my $ps2 = Data::PubSub::Shared::Str->new(undef, 32);
+    $ps2->$method(UnicodeMessage->new);
+    my $got = $ps2->subscribe_all->poll;
+    is $got, "\x{263A}", "$method preserves overloaded Unicode";
+    ok utf8::is_utf8($got), "$method preserves its UTF-8 flag";
+}
+
 # publish_multi
 {
     my $ps2 = Data::PubSub::Shared::Str->new(undef, 32);

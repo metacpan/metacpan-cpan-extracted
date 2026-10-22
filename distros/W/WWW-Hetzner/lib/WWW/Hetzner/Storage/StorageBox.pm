@@ -1,7 +1,7 @@
 package WWW::Hetzner::Storage::StorageBox;
 # ABSTRACT: Hetzner Storage Box object
 
-our $VERSION = '0.101';
+our $VERSION = '0.102';
 
 use Moo;
 with 'WWW::Hetzner::Role::HasAction';
@@ -197,7 +197,7 @@ WWW::Hetzner::Storage::StorageBox - Hetzner Storage Box object
 
 =head1 VERSION
 
-version 0.101
+version 0.102
 
 =head1 SYNOPSIS
 

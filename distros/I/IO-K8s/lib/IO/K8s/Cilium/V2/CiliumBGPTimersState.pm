@@ -1,6 +1,6 @@
 package IO::K8s::Cilium::V2::CiliumBGPTimersState;
 # ABSTRACT: Timers is the state of the negotiated BGP timers for this peer.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s appliedHoldTimeSeconds  => Int;
@@ -22,7 +22,7 @@ IO::K8s::Cilium::V2::CiliumBGPTimersState - Timers is the state of the negotiate
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 appliedHoldTimeSeconds
 

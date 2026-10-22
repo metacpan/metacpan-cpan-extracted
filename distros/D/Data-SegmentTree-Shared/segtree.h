@@ -135,6 +135,7 @@ typedef struct StHandle {
     uint64_t      size;          /* cached next_pow2(n) */
     size_t        mmap_size;
     char         *path;          /* backing file path (strdup'd) */
+    char         *unlink_path;   /* absolute path for relative backing files */
     int           backing_fd;    /* memfd or reopened-fd to close on destroy, -1 for file/anon */
     uint32_t      my_slot_idx;   /* UINT32_MAX if all slots taken (no recovery for this handle) */
     uint32_t      cached_pid;    /* getpid() cached at last slot claim */
@@ -233,6 +234,8 @@ static inline void st_occ_clear(StHandle *h, uint32_t s) {
     __atomic_fetch_and(&h->occ[s >> 6], ~((uint64_t)1 << (s & 63)), __ATOMIC_SEQ_CST);
 }
 
+static inline void st_reader_wake_drain(StHandle *h);
+
 /* Ensure this process owns a reader slot.  Called from the lock helpers so that
  * fork()'d children pick up their own slot lazily instead of sharing the
  * parent's.  Hot-path is a single relaxed load + compare; only on a
@@ -266,23 +269,27 @@ static inline void st_claim_reader_slot(StHandle *h) {
             return;
         }
     }
-    /* Pass 2: no free slot -- reclaim one whose owner is dead.  Safe even if its
-     * rdepth>0: clearing pid drops the dead reader's entire contribution (a
-     * writer scan ignores rdepth when pid==0), and we reset rdepth to 0 as we
-     * claim it.  No orphaned shared counter exists, so dead slots need not be
-     * skipped even if they still show a read count. */
+    /* Pass 2: claim one slot and clear other dead slots so exited workers
+     * do not leave the occupancy bitmap permanently full. */
     for (uint32_t i = 0; i < ST_READER_SLOTS; i++) {
         uint32_t dpid = __atomic_load_n(&h->reader_slots[i].pid, __ATOMIC_ACQUIRE);
-        if (dpid == 0 || dpid == now_pid || st_pid_alive(dpid)) continue;
+        if (dpid == now_pid || (dpid && st_pid_alive(dpid))) continue;
+        if (dpid == 0 && h->my_slot_idx != UINT32_MAX) continue;
         uint32_t expected = dpid;
         if (__atomic_compare_exchange_n(&h->reader_slots[i].pid, &expected, now_pid, 0,
                 __ATOMIC_ACQUIRE, __ATOMIC_RELAXED)) {
-            __atomic_store_n(&h->reader_slots[i].rdepth, 0, __ATOMIC_RELAXED);
-            st_occ_set(h, i);
-            h->my_slot_idx = i;
-            return;
+            if (__atomic_exchange_n(&h->reader_slots[i].rdepth, 0, __ATOMIC_RELEASE))
+                st_reader_wake_drain(h);
+            if (h->my_slot_idx == UINT32_MAX) {
+                st_occ_set(h, i);
+                h->my_slot_idx = i;
+            } else {
+                st_occ_clear(h, i);
+                __atomic_store_n(&h->reader_slots[i].pid, 0, __ATOMIC_RELEASE);
+            }
         }
     }
+    if (h->my_slot_idx != UINT32_MAX) return;
     /* Table full -- leave my_slot_idx = UINT32_MAX so this handle takes the
      * slotless path (lock still works; recovery of THIS reader's death is the
      * documented slotless limitation). */
@@ -625,6 +632,24 @@ static inline StHandle *st_setup(void *base, size_t map_size,
         }
     }
     h->path         = path ? strdup(path) : NULL;
+    if (path && h->path && path[0] != '/') {
+        char *cwd = getcwd(NULL, 0);
+        if (cwd) {
+            size_t len = strlen(cwd) + strlen(path) + 2;
+            h->unlink_path = (char *)malloc(len);
+            if (h->unlink_path) snprintf(h->unlink_path, len, "%s/%s", cwd, path);
+            free(cwd);
+        }
+    }
+    if (path && (!h->path || (path[0] != '/' && !h->unlink_path))) {
+        ST_ERR("backing path: %s", strerror(errno));
+        free(h->unlink_path);
+        free(h->path);
+        free(h);
+        munmap(base, map_size);
+        if (backing_fd >= 0) close(backing_fd);
+        return NULL;
+    }
     h->backing_fd   = backing_fd;
     h->my_slot_idx  = UINT32_MAX;
     return h;
@@ -861,6 +886,7 @@ static void st_destroy(StHandle *h) {
     }
     if (h->backing_fd >= 0) close(h->backing_fd);
     if (h->base) munmap(h->base, h->mmap_size);
+    free(h->unlink_path);
     free(h->path);
     free(h);
 }
@@ -957,7 +983,6 @@ static inline void st_pushdown(StHeader *hdr, StNode *nodes, uint64_t v, uint64_
         st_apply_assign(&nodes[2*v],     nd->assign, lcnt);
         st_apply_assign(&nodes[2*v + 1], nd->assign, rcnt);
         nd->flags &= ~ST_F_HAS_ASSIGN;
-        nd->assign = 0;
     } else if (nd->lazy) {
         int64_t d = nd->lazy;
         hdr->pd_delta  = d;

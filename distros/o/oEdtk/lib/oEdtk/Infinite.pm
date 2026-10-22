@@ -3,7 +3,7 @@ package oEdtk::Infinite;
 use strict;
 use warnings;
 
-our $VERSION = 2.1129;
+our $VERSION = 2.1131;
 
 our @ISA       = qw(Exporter);
 our @EXPORT_OK = qw( import_cobol_X import_cobol_S9V9

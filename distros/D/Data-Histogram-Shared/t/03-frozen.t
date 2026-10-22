@@ -23,10 +23,17 @@ my ($c, $mn, $mx, $mean, $p50, $cv400);
     $p50   = $h->value_at_percentile(50);
     $cv400 = $h->count_at_value(400);
 
+    my $peer = Data::Histogram::Shared->new($path);
     $h->freeze;
     ok $h->frozen,   'frozen after ->freeze';
     ok $h->readonly, 'freezing handle becomes read-only';
     is $h->total_count, $c, 'total_count unchanged by freeze';
+    ok $peer->frozen, 'an existing handle sees the seal';
+    is $peer->percentile(50), $p50, 'an existing handle can still query after freeze';
+    like exception(sub { $peer->record(1) }),      qr/frozen|read-only/, 'existing handle rejects record after freeze';
+    like exception(sub { $peer->record_many([1]) }), qr/frozen|read-only/, 'existing handle rejects record_many after freeze';
+    like exception(sub { $peer->reset }),        qr/frozen|read-only/, 'existing handle rejects reset after freeze';
+    is $peer->total_count, $c, 'rejected writes leave frozen data intact';
 
     like exception(sub { $h->record(1) }),         qr/frozen|read-only/, 'record on frozen handle croaks';
     like exception(sub { $h->record_many([1]) }),  qr/frozen|read-only/, 'record_many on frozen handle croaks';

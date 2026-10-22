@@ -1,6 +1,6 @@
 package IO::K8s::Traefik::V1alpha1::Chain;
 # ABSTRACT: Chain holds the configuration of the chain middleware.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s middlewares => ['Core::V1::SecretReference'];
@@ -20,7 +20,7 @@ IO::K8s::Traefik::V1alpha1::Chain - Chain holds the configuration of the chain m
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 middlewares
 

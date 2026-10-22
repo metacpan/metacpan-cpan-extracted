@@ -145,6 +145,24 @@ my @absent   = (5001, $B5 | 2, $B10 | 500, 900000, 4294967295);
 like exception(sub { Data::RoaringBitmap::Shared->new($path, 256) }),
      qr/frozen|read-only/, 'read-write reopen of a sealed file is refused';
 
+# An already-open receiver must also reject self/alias set ops after a peer freezes it.
+{
+    my $producer = Data::RoaringBitmap::Shared->new("$dir/peer.rb", 8);
+    my $peer = Data::RoaringBitmap::Shared->new("$dir/peer.rb", 8);
+    $producer->add(42);
+    $producer->freeze;
+    my $ro = Data::RoaringBitmap::Shared->new_readonly("$dir/peer.rb");
+    my $ops = $ro->stats->{ops};
+    for my $method (qw(union intersect)) {
+        for my $other ($peer, $producer, $ro) {
+            like exception(sub { $peer->$method($other) }), qr/frozen|read-only/,
+                "$method on a peer-frozen receiver rejects the same bitmap";
+        }
+    }
+    is $ro->stats->{ops}, $ops, 'rejected set ops leave frozen stats unchanged';
+    is_deeply $ro->to_array, [42], 'peer-frozen contents stay unchanged';
+}
+
 # ---- new_readonly rejects a non-frozen file ----
 {
     my $u = "$dir/unsealed.rb";

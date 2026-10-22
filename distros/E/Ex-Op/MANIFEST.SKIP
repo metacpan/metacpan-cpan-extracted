@@ -1,0 +1,14 @@
+\.o$
+\.bs$
+^blib/
+^Makefile$
+^Makefile\.old$
+^MYMETA\.
+^pm_to_blib$
+^Op\.c$
+^Ex-Op-
+^ignore\.txt$
+^\.git/
+~$
+\.swp$
+\.bak$

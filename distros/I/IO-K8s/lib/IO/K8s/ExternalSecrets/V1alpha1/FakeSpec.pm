@@ -1,10 +1,10 @@
 package IO::K8s::ExternalSecrets::V1alpha1::FakeSpec;
 # ABSTRACT: FakeSpec contains the static data.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s controller => Str;
-k8s data       => { Str => 1 };
+k8s data       => HashRef[Str];
 
 
 
@@ -22,7 +22,7 @@ IO::K8s::ExternalSecrets::V1alpha1::FakeSpec - FakeSpec contains the static data
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 controller
 

@@ -1,5 +1,5 @@
 package Kubernetes::REST::CLI::Cmd::Raw;
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 # ABSTRACT: The raw command of kube_client
 use Moo;
 use MooX::Cmd;
@@ -47,7 +47,7 @@ Kubernetes::REST::CLI::Cmd::Raw - The raw command of kube_client
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head1 SYNOPSIS
 

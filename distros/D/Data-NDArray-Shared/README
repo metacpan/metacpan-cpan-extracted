@@ -292,7 +292,8 @@ PDL INTEROP
         A new shared array copied from $piddle (made physical and contiguous
         first); the dtype and shape follow the piddle's type and "reverse" of
         its dims. $path is the backing file ("undef" or omitted for an
-        anonymous mapping).
+        anonymous mapping). An existing file must have the same dtype and
+        shape.
 
     *   "$array->update_from_pdl($piddle)"
 
@@ -320,13 +321,9 @@ PDL INTEROP
         the mapping; use "to_pdl"/"from_pdl" when you want an independent,
         resizable copy.
 
-        On a frozen array (see "FROZEN (READ-ONLY) MODE") the mapping itself
-        is "PROT_READ", and PDL has no write path that is reliably safe
-        against that (its own read-only flag stops ".=" and in-place ops, but
-        not "$piddle->set(...)", which pokes the buffer directly). So
-        "as_pdl_alias" refuses to alias a frozen array and "croak"s instead of
-        handing back a piddle that could still crash the process; use "to_pdl"
-        for a safe copy.
+        "as_pdl_alias" refuses frozen arrays; use "to_pdl" for a safe copy.
+        Discard aliases before "freeze", since they bypass the seal as well as
+        the lock.
 
     *   "$bytes = $array->buffer"
 

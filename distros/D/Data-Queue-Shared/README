@@ -106,7 +106,8 @@ DESCRIPTION
     Creates or opens a shared queue backed by file $path. $capacity is rounded
     up to the next power of 2. When opening an existing file, parameters are
     read from the stored header. Multiple processes can open the same file
-    simultaneously.
+    simultaneously. All processes sharing a queue must run the same module
+    version.
 
     Pass "undef" for $path to create an anonymous queue using
     "MAP_SHARED|MAP_ANONYMOUS". Anonymous queues are shared with child
@@ -200,7 +201,7 @@ DESCRIPTION
 
    Management
         $q->clear;                  # remove all elements
-        $q->sync;                   # msync -- flush to disk for crash durability
+        $q->sync;                   # msync -- flush mapped pages to disk
         $q->unlink;                 # remove backing file
         Class->unlink($path);       # class method form
         my $p = $q->path;           # backing file path
@@ -245,9 +246,11 @@ DESCRIPTION
 
   Crash Safety
     If a process dies while holding the Str queue mutex, other processes
-    detect the stale lock within 2 seconds via PID tracking and automatically
-    recover. The Int queue is lock-free and requires no crash recovery for
-    normal push/pop operations.
+    detect the stale lock on acquisition via PID tracking and automatically
+    recover after a 2-second lock timeout. Integer queues cannot recover a
+    worker killed after reserving a slot; recreate the queue after such a
+    crash. "sync" flushes pages; it does not make operations transactional
+    across a system crash.
 
   Keyword API
     When XS::Parse::Keyword is installed at build time, keyword forms are

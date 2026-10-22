@@ -1,7 +1,7 @@
 package Data::Fenwick::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 require XSLoader;
 XSLoader::load('Data::Fenwick::Shared', $VERSION);
 
@@ -263,19 +263,19 @@ others are using it.
 
 Mutation is guarded by a futex-based write-preferring rwlock with PID-encoded
 ownership; if a holder dies, the next contender detects the dead owner and
-recovers. Each C<update> is a short O(log n) sequence of int64 stores, so a crash
-leaves the tree consistent up to the last completed operation. B<Limitation>: PID
-reuse is not detected (very unlikely in practice).
+recovers. A process killed during a mutation can leave a partially applied
+operation and inconsistent sums; lock recovery does not repair the data.
+Rebuild from your source data after a writer crash. PID reuse is not detected.
 
 Reader-slot exhaustion (slotless readers): dead-process recovery attributes a
 crashed lock holder's contribution through its reader-slot. The slot table holds
-1024 entries (one per concurrent reader process). If more than that many reader
-processes share one mapping at once, a reader that cannot claim a slot proceeds
-"slotless" -- it still takes the read lock but leaves no per-process record. If
+1024 entries (one per active handle in each process). When these are all taken,
+a reader that cannot claim a slot proceeds "slotless" -- it still takes the read
+lock but leaves no per-process record. If
 such a slotless reader is then killed while holding the read lock, its share of
 the lock cannot be attributed to a dead process, so writer recovery cannot
 reclaim it and writers may block until the mapping is recreated. Reaching this
-needs more than 1024 concurrent reader processes on one mapping plus a crash in
+needs more than 1024 active handles on one mapping plus a crash in
 the brief read-lock window; the dead-process slot reclaim keeps the table from
 filling with stale entries, so in practice it is very unlikely.
 

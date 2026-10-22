@@ -99,16 +99,16 @@ subtest 'rke2 installer command' => sub {
 subtest 'k3s installer command' => sub {
   my $p = dist('k3s');
   is($p->script_install_cmd(undef, undef),
-    'curl -sfL https://get.k3s.io | INSTALL_K3S_SKIP_START=true sh -s - server --write-kubeconfig-mode=644',
+    'curl -sfL https://get.k3s.io | INSTALL_K3S_SKIP_START=true sh -s - server',
     'unpinned, first server');
   is($p->script_install_cmd(undef, 'v1.30.4+k3s1'),
-    'curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION=v1.30.4+k3s1 INSTALL_K3S_SKIP_START=true sh -s - server'
-      . ' --write-kubeconfig-mode=644',
+    'curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION=v1.30.4+k3s1 INSTALL_K3S_SKIP_START=true sh -s - server',
     'pinned: INSTALL_K3S_VERSION');
   my $ha = $p->script_install_cmd('https://cp1:6443', 'v1.30.4+k3s1');
   like($ha, qr/\| K3S_URL=https:\/\/cp1:6443 INSTALL_K3S_VERSION=v1\.30\.4\+k3s1 INSTALL_K3S_SKIP_START=true sh -s - server/,
     'HA join: URL and version');
   unlike($ha, qr/--disable/, 'disable lives in config.yaml, not on the command line');
+  unlike($ha, qr/kubeconfig-mode/, 'no kubeconfig mode: k3s.yaml stays 0600 (t/kubeconfig-mode.t)');
 };
 
 done_testing;

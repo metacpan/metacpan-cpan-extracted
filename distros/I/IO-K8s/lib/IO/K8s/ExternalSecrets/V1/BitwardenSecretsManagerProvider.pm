@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1::BitwardenSecretsManagerProvider;
 # ABSTRACT: BitwardenSecretsManager configures this store to sync secrets using BitwardenSecretsManager provider
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s apiURL                => Str;
@@ -34,7 +34,7 @@ IO::K8s::ExternalSecrets::V1::BitwardenSecretsManagerProvider - BitwardenSecrets
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 apiURL
 

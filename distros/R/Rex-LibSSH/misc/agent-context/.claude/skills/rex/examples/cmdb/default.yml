@@ -1,0 +1,5 @@
+application:
+  name: example
+  enabled: true
+  port: 8080
+# Non-secret desired state only. No credentials are stored here.

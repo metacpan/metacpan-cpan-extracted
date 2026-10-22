@@ -2,115 +2,69 @@ use strict;
 use warnings;
 use Test::More;
 use Time::HiRes qw(time sleep);
-use POSIX '_exit';
-use IO::Pipe;
-
+use POSIX qw(_exit WUNTRACED);
 use Data::PubSub::Shared;
 
-# ============================================================
-# Str: publisher crashes while holding mutex
-#
-# Strategy: child builds a large batch, signals ready, then calls
-# publish_multi (holds mutex for entire batch). Parent kills child
-# mid-batch. With enough items, the window is wide enough.
-#
-# This test is inherently timing-dependent. If the child completes
-# before the kill, recoveries=0 and we note it. If caught mid-publish,
-# recoveries>=1 and recovery takes ~2s (LOCK_TIMEOUT_SEC).
-# ============================================================
-
 sub kill_mid_publish {
-    my ($ps, $msg, $count) = @_;
-    my $pipe = IO::Pipe->new;
+    my ($ps, $msg) = @_;
+    pipe my $reader, my $ready or die "pipe: $!";
     my $pid = fork // die "fork: $!";
-    if ($pid == 0) {
-        $pipe->writer;
-        my @batch = ($msg) x $count;
-        # Signal parent: batch is ready, about to enter publish_multi
-        print $pipe "go\n";
-        $pipe->close;
-        $ps->publish_multi(@batch);
+    if (!$pid) {
+        close $reader;
+        my @batch = ($msg) x 8192;
+        print {$ready} "go\n";
+        close $ready;
+        $ps->publish_multi(@batch) while 1;
         _exit(0);
     }
-    $pipe->reader;
-    <$pipe>;
-    $pipe->close;
-    sleep(0.05);
-    kill 9, $pid;
+    close $ready;
+    <$reader>;
+    close $reader;
+    open my $fd, '+<&', $ps->memfd or die "dup: $!";
+    my $held = 0;
+    for (1..100) {
+        kill 'STOP', $pid;
+        waitpid($pid, WUNTRACED);
+        sysseek($fd, 72, 0) // die "seek: $!";
+        sysread($fd, my $word, 4) == 4 or die "read: $!";
+        $held = unpack('L', $word) == ($pid | 0x80000000);
+        last if $held;
+        kill 'CONT', $pid;
+        sleep 0.002;
+    }
+    close $fd;
+    kill 'KILL', $pid;
     waitpid($pid, 0);
-    return $pid;
+    return $held;
 }
 
-# Test 1: single crash + recovery
-{
-    my $msg_size = 1024;
-    my $ps = Data::PubSub::Shared::Str->new(undef, 65536, $msg_size);
-    $ps->publish("before");
-
-    my $msg = "x" x ($msg_size - 1);
-    my $pid = kill_mid_publish($ps, $msg, 500000);
-    diag "child $pid killed";
-
-    my $t0 = time;
-    $ps->publish("after");
-    my $dt = time - $t0;
-
-    my $stats = $ps->stats;
-    diag sprintf "dt=%.2fs recoveries=%d publish_ok=%d",
-        $dt, $stats->{recoveries}, $stats->{publish_ok};
-
-    if ($stats->{recoveries} > 0) {
-        ok $dt >= 1.5 && $dt < 5, sprintf('stale mutex recovery in %.2fs', $dt);
-    } else {
-        pass 'child completed before kill (timing-dependent)';
+for my $size (512, 1024) {
+    my $ps = Data::PubSub::Shared::Str->new_memfd('crash-recovery', 32768, $size);
+    for my $round (1..2) {
+        ok kill_mid_publish($ps, 'x' x $size), "size $size round $round: killed the lock owner";
+        my $start = time;
+        $ps->publish("after-$round");
+        cmp_ok time - $start, '<', 8, 'stale lock recovery is bounded';
+        is $ps->stats->{recoveries}, $round, 'each abandoned lock was recovered';
+        my @got = $ps->subscribe_all->drain;
+        is $got[-1], "after-$round", 'post-crash message is readable';
     }
-
-    ok $stats->{publish_ok} >= 2, 'both pre and post-crash published';
-
-    my $sub = $ps->subscribe_all;
-    my @got = $sub->drain;
-    my $found = grep { $_ eq 'after' } @got;
-    ok $found, 'post-crash message readable';
 }
 
-# Test 2: multiple crash cycles
-{
-    my $msg_size = 512;
-    my $ps = Data::PubSub::Shared::Str->new(undef, 65536, $msg_size);
-    my $msg = "y" x ($msg_size - 1);
-
-    for my $round (1..3) {
-        kill_mid_publish($ps, $msg, 500000);
-        my $t0 = time;
-        $ps->publish("round-$round");
-        my $dt = time - $t0;
-        ok $dt < 5, sprintf("round %d: publish in %.2fs", $round, $dt);
-    }
-
-    my $stats = $ps->stats;
-    ok $stats->{publish_ok} >= 3, "multi-crash: parent messages published";
-    diag sprintf "total recoveries: %d", $stats->{recoveries};
-}
-
-# Test 3: Int — no mutex, no recovery needed
 {
     my $ps = Data::PubSub::Shared::Int->new(undef, 256);
-
     my $pid = fork // die "fork: $!";
-    if ($pid == 0) {
+    if (!$pid) {
         $ps->publish($_) for 1..1000;
         _exit(0);
     }
-    sleep(0.01);
-    kill 9, $pid;
+    sleep 0.01;
+    kill 'KILL', $pid;
     waitpid($pid, 0);
-
-    my $t0 = time;
     $ps->publish(42);
-    my $dt = time - $t0;
-
-    ok $dt < 0.01, sprintf('int: no recovery delay (%.4fs)', $dt);
-    ok $ps->write_pos > 0, 'int: functional after child crash';
+    my $sub = $ps->subscribe;
+    $sub->cursor($ps->write_pos - 1);
+    is $sub->poll, 42, 'integer publish remains readable after a publisher exits';
 }
 
 done_testing;

@@ -1,7 +1,7 @@
 package Data::SegmentTree::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 require XSLoader;
 XSLoader::load('Data::SegmentTree::Shared', $VERSION);
 
@@ -79,11 +79,9 @@ Point updates via C<set> use assign internally, so they keep the monoids valid.
 C<product> additionally croaks if the product of the queried range overflows a
 signed 64-bit integer.
 
-B<On-disk format>: the on-disk layout changes between releases (0.02 widened the
-node to carry the assign tag and the gcd/product aggregates; 0.03 added the
-reader-slots lock's occupancy bitmap), so a B<file written by an older release is
-rejected on attach> -- rebuild it. These trees are normally ephemeral compute
-structures, so this only matters if you persisted one.
+B<On-disk format>: files written by 0.01/0.02 are rejected on attach -- rebuild
+them. These trees are normally ephemeral compute structures, so this only
+matters if you persisted one.
 
 =head1 METHODS
 
@@ -119,7 +117,7 @@ C<set> assigns a single position; C<add> adds a delta to a single position and
 returns its new value; C<range_add> adds a delta to every position in the
 inclusive range C<[$l, $r]>, and C<range_assign> sets every position in the range
 to a constant -- each in O(log n) via lazy propagation. All indices are 0-based
-and croak if out of range; the range forms croak if C<$l > $r>.
+and croak if out of range; the range forms croak if C<< $l > $r >>.
 C<range_add>/C<add> gate off the gcd/product monoids (see below); C<set>/
 C<range_assign> do not.
 
@@ -141,7 +139,7 @@ mutually consistent. C<gcd> returns the greatest common divisor of C<|values|>
 over the range (0 for an all-zero range), and C<product> returns their product;
 both require an B<assign/set-only> tree and croak once any C<range_add>/C<add> has run
 (see L</"Range assign and the gcd/product monoids">), and C<product> also croaks
-on 64-bit overflow. Ranges croak if an index is out of range or C<$l > $r>.
+on 64-bit overflow. Ranges croak if an index is out of range or C<< $l > $r >>.
 
 =head2 Introspection and lifecycle
 
@@ -199,23 +197,14 @@ agrees with the individual C<get> values, and the interrupted C<range_add>,
 C<range_assign>, C<add> or C<set> shows as applied to some of its positions
 and not others, each holding its value from either before or after it; an
 interrupted C<clear> reads as done or not done. The repair takes time
-proportional to C<n>. A writer running a version of this
-module before 0.06, killed while pushing a pending C<range_add> down the tree,
-can leave that add applied twice to positions an earlier, completed
-C<range_add> covered. B<Limitation>: PID reuse is not detected (very
-unlikely in practice).
+proportional to C<n>. A writer running a version before 0.07, killed during a
+push-down, can corrupt an earlier completed update. B<Limitation>: PID reuse is
+not detected (very unlikely in practice).
 
-Reader-slot exhaustion (slotless readers): dead-process recovery attributes a
-crashed lock holder's contribution through its reader-slot. The slot table holds
-1024 entries (one per concurrent reader process). If more than that many reader
-processes share one mapping at once, a reader that cannot claim a slot proceeds
-"slotless" -- it still takes the read lock but leaves no per-process record. If
-such a slotless reader is then killed while holding the read lock, its share of
-the lock cannot be attributed to a dead process, so writer recovery cannot
-reclaim it and writers may block until the mapping is recreated. Reaching this
-needs more than 1024 concurrent reader processes on one mapping plus a crash in
-the brief read-lock window; the dead-process slot reclaim keeps the table from
-filling with stale entries, so in practice it is very unlikely.
+The lock has 1024 reader slots, one per handle in each process. A reader that
+cannot claim a slot takes a read lock without a per-process record. If killed
+while holding it, writer recovery cannot reclaim its contribution and writers
+may block until the mapping is recreated.
 
 An interrupted create is recovered too. A creator killed after the backing
 file is sized but before its header is committed leaves a full-size, all-zero

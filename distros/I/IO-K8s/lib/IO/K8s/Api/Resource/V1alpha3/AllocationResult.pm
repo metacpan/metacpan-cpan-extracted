@@ -1,6 +1,6 @@
 package IO::K8s::Api::Resource::V1alpha3::AllocationResult;
 # ABSTRACT: AllocationResult contains attributes of an allocated resource.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s controller => Str;
@@ -26,7 +26,7 @@ IO::K8s::Api::Resource::V1alpha3::AllocationResult - AllocationResult contains a
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 controller
 

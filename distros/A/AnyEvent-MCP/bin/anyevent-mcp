@@ -1,0 +1,142 @@
+#!/opt/bin/perl
+
+=head1 NAME
+
+anyevent-mcp - initialize MCP configuration and manage permission rules
+
+=head1 SYNOPSIS
+
+   anyevent-mcp init
+   anyevent-mcp manage-rules fs-default
+   anyevent-mcp edit-rules-file /path/to/rules.ini
+
+=head1 DESCRIPTION
+
+C<anyevent-mcp> sets up the shared AnyEvent::MCP configuration and manages
+permission rules saved by its servers. Use it to review permissions you have
+allowed or denied permanently, remove a rule, or change the order in which
+rules are checked.
+
+C<manage-rules> opens a graphical rule manager; C<edit-rules> opens the
+rule file in your text editor. Both take a rule profile name. For example,
+C<anyevent-mcp manage-rules fs-default> manages the default filesystem
+server's rules. The corresponding C<*-file> commands accept a pathname
+when an application stores its rules elsewhere.
+
+C<init> creates the private global configuration and its master secret,
+from which servers can derive their connection credentials. You normally
+do not need to run it: a server creates a missing secret when it loads its
+configuration. Use C<init> when you want to create the configuration
+explicitly; it refuses to overwrite an existing file.
+
+See L<AnyEvent::MCP::Intro> for setting up and connecting to the servers,
+L<AnyEvent::MCP/GLOBAL CONFIGURATION> for the configuration file format,
+and L<AnyEvent::MCP::Server::Permissions/RULE FILES> for permission rules.
+
+=head1 COMMANDS
+
+=over
+
+=item init
+
+Create the private global configuration and master secret. Unlike ordinary
+configuration loading, this fails rather than overwriting an existing file.
+C<--config FILE> selects a different configuration file for this command.
+
+=item manage-rules NAME
+
+Open the YAD rule deletion and reordering interface for the named profile.
+For a filesystem server started with C<--name code>, use profile C<fs-code>.
+
+=item edit-rules NAME
+
+Open the named profile's rule file in a text editor.
+
+=item manage-rules-file $file
+
+Open the rule manager for the explicit pathname C<$file>.
+
+=item edit-rules-file $file
+
+Open C<$file> in a text editor. Use these explicit-file commands for
+applications whose rule files do not use the named-profile convention.
+
+=back
+
+Named profiles use
+C<anyevent-mcp/rules/NAME.ini> in the user configuration directory.
+Editing uses C<$VISUAL>, C<$EDITOR>, C<sensible-editor> or C<vi>.
+For the server's effective URL, use that server's C<--print-url> option.
+
+
+=cut
+
+use common::sense;
+
+use Getopt::Long ();
+use AnyEvent::MCP ();
+use AnyEvent::MCP::Config ();
+
+sub usage {
+   print <<'EOF';
+Usage: anyevent-mcp [--config FILE] COMMAND [ARGUMENTS]
+
+   manage-rules NAME       delete/reorder rules in YAD
+   edit-rules NAME         edit rules with VISUAL, EDITOR, sensible-editor, vi
+   manage-rules-file FILE  manage an explicit rules file
+   edit-rules-file FILE    edit an explicit rules file
+   init                    create a private configuration and master secret
+
+Rule profiles are stored under $XDG_CONFIG_HOME/anyevent-mcp, falling back
+to ~/.config/anyevent-mcp/rules (e.g. manage-rules fs-default).
+
+Configuration defaults to ~/.config/anyevent-mcp/global.ini, or the
+corresponding location under XDG_CONFIG_HOME. Use --help for this text.
+
+A missing master secret is generated and saved automatically when a server
+loads its configuration. Configuration format: see AnyEvent::MCP.
+EOF
+}
+
+Getopt::Long::Configure ("no_auto_abbrev", "no_ignore_case", "require_order");
+Getopt::Long::GetOptions ("config=s" => \my $file, "help" => \my $help)
+   or exit 2;
+
+if ($help) {
+   usage;
+   exit 0;
+}
+
+my $command = shift @ARGV;
+unless (defined $command) {
+   usage;
+   exit 2;
+}
+
+@ARGV = map AnyEvent::MCP::utf8dec $_, @ARGV;
+
+eval {
+   if ($command =~ /\A(?:manage-rules|edit-rules)(?:-file)?\z/ && @ARGV == 1) {
+      my $path = $ARGV[0];
+      if ($command !~ /-file\z/) {
+         $path =~ /\A[A-Za-z0-9][A-Za-z0-9_.-]*\z/
+            or die "Invalid permission rule profile name\n";
+         my $config_home = $ENV{XDG_CONFIG_HOME} || ($ENV{HOME} || die "HOME is not set\n") . "/.config";
+         $config_home =~ m{\A/} or die "XDG_CONFIG_HOME must be an absolute path\n";
+         $path = "$config_home/anyevent-mcp/rules/$path.ini";
+      }
+      my $action = $command =~ /\Amanage-/ ? "--manage-rules" : "--edit-rules";
+      exec "anyevent-mcp-askpermission", $action, AnyEvent::MCP::utf8enc $path;
+      die "Cannot start permission rule tool: $!\n";
+   } elsif ($command eq "init" && !@ARGV) {
+      my $config = AnyEvent::MCP::Config->init (defined $file ? (file => $file) : ());
+      print "Created $config->{file}\n";
+   } else {
+      die "Invalid command or arguments; use --help\n";
+   }
+   1
+} or do {
+   print STDERR $@;
+   exit 1;
+};
+

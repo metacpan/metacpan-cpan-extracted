@@ -1,3 +1,7 @@
+v0.26  2026-10-21Z
+    - Added support for Data::URIID::Request
+    - Added parsing for abstract wikipedia
+
 v0.25  2026-10-04Z
     - Added support for urn:-URIs as a service for easier usage
     - Added support for unicode-code-point (type)

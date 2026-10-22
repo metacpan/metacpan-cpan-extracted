@@ -1,14 +1,14 @@
 ---
 abstract: 'Extend functionality of IO::Capture'
 author:
-  - 'James E Keenan (jkeenan@cpan.org)'
+  - 'James E Keenan (jkeenan@pobox.com)'
 build_requires:
   ExtUtils::MakeMaker: '0'
   Test::Simple: '0.44'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.02, CPAN::Meta::Converter version 2.142690'
+generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,8 +20,10 @@ no_index:
     - inc
 requires:
   IO::Capture: '0.05'
+  perl: '5.006000'
 resources:
-  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=IO-Capture-Extended
+  bugtracker: https://github.com/jkeenan/io-captured-extended/issues
   homepage: http://thenceforward.net/perl/modules/IO-Capture-Extended/
   repository: https://github.com/jkeenan/io-capture-extended.git
-version: 0.13
+version: 0.14
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

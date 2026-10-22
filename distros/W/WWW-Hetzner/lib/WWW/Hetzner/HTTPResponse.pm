@@ -4,7 +4,7 @@ package WWW::Hetzner::HTTPResponse;
 
 use Moo;
 
-our $VERSION = '0.101';
+our $VERSION = '0.102';
 
 
 has status => (is => 'ro', required => 1);
@@ -28,7 +28,7 @@ WWW::Hetzner::HTTPResponse - HTTP response object for Hetzner API
 
 =head1 VERSION
 
-version 0.101
+version 0.102
 
 =head1 SYNOPSIS
 

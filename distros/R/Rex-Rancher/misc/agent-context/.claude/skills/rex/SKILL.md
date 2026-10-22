@@ -1,196 +1,93 @@
 ---
 name: rex
-description: Use when writing or debugging a Rexfile or Rex task — connection types, Rex::Commands, which commands need SFTP, or the LibSSH backend.
-user-invocable: false
-allowed-tools: Read, Grep, Glob
-model: sonnet
+description: Author, review, debug, and safely operate Perl Rex automation, Rexfiles, tasks, inventory, CMDB, resources, SSH/OpenSSH/LibSSH transports, sudo, modules, and optional Rex::GPU or Rex::Rancher integrations. Use for Rex execution semantics, filesystem/SFTP failures, idempotency, deployment, testing, and backend-level source investigation.
 ---
 
-## Rex Basics
+# Rex automation
 
-Rex is a Perl automation framework. Entry point is a `Rexfile` (or any `.pm`/`.pl` via `-f`).
+## Working contract
+
+Use this skill for the Perl automation framework, not unrelated products named Rex.
+Identify the installed release, enabled feature flags, active connection, effective
+Exec/Fs/File drivers, target OS, privilege context, and intended change scope first.
+The researched baseline is Rex 1.16.1; repository observations are separately pinned
+in [SOURCE_LOCK.json](SOURCE_LOCK.json). A development checkout is not a CPAN release.
+
+Read only the relevant route below. Consult [the reference index](references/INDEX.md)
+for narrower questions. Do not load the entire reference tree or the archived skill.
+
+## Mandatory safeguards
+
+1. A Rexfile is executable Perl. Inspect it before task listing, compilation, or execution;
+   all can load code. Keep managed-host actions inside tasks, not at file load time.
+2. Prove locality. No host can mean local execution; `run_task` has its own locality rules.
+   Stop a remote-only task when `Rex::is_local()` is true. Confirm the resolved host set.
+3. Keep host-key verification enabled. Obtain trusted fingerprints independently;
+   `ssh-keyscan` alone does not establish server identity. Never "fix" failures by
+   silently disabling verification, changing the transport, or forcing a lock.
+4. Classify operations, not command names: exec, metadata, file handles, transfer,
+   sudo, external tools. A successful `run 'true'` does not validate filesystem access.
+5. Use `auto_die => 1` for required command success, or capture `$?` immediately after
+   `auto_die => 0`. Zero/nonzero is portable across inspected backends; numeric decoding
+   is not. Do not unconditionally shift `$?`; preserve raw status and driver identity.
+6. Argument arrays are shell-quoted arguments, not shell-free `execve`. Keep the
+   executable trusted; avoid interpolated shell programs and validate option operands.
+7. Build repeatability explicitly. A marker file is not proof of a valid deployment;
+   notifications are not a dependency scheduler; a running service is not application health.
+8. Keep secrets out of code, command lines, debug output, reports, diffs, and fixtures.
+   Authorize destructive actions separately. Define recovery before first mutation.
+9. Do not claim a universal dry-run. `rex -c` enables caching; it is not check mode.
+10. Distinguish documented behavior, pinned implementation observations, recommendations,
+    and actual test results. Never turn an untested example into a compatibility claim.
+
+## Read by task
+
+| Task | Read first | Then, only as needed |
+|---|---|---|
+| New Rexfile or existing-project entry | [Execution model](references/foundations/execution-model.md) | [Installation and features](references/foundations/installation-features.md), [CLI](references/foundations/cli.md) |
+| Groups, environments, task composition | [Tasks and inventory](references/foundations/tasks-inventory.md) | [CMDB](references/foundations/configuration-cmdb.md), [Rollouts](references/operations/rollouts.md) |
+| Backend selection or SFTP failure | [Capability matrix](references/transports/selection-matrix.md) | [OpenSSH/SSH](references/transports/ssh-openssh.md), [SFTP-less procedure](references/transports/sftp-less.md) |
+| Rex::LibSSH behavior | [LibSSH](references/transports/libssh.md) | [Source audit](references/research/claim-audit.md), [Sudo/local](references/transports/sudo-local.md) |
+| Commands, status, injection, timeout | [Run and status](references/execution/run-and-status.md) | [Quoting](references/execution/quoting.md), [Errors/timeouts](references/execution/errors-timeouts.md) |
+| Convergent configuration | [Idempotency](references/execution/idempotency-notifications.md) | [Files](references/resources/files-templates.md), [Packages](references/resources/packages.md), [Services](references/resources/services.md) |
+| Platform-dependent administration | [Facts/platforms](references/resources/facts-platforms.md) | [Users/cron](references/resources/users-cron.md), [Resource routing](references/resources/catalog.md) |
+| Diagnosis, testing, performance | [Debugging](references/operations/debugging-performance.md) | [Testing](references/operations/testing.md), [Security](references/operations/security.md) |
+| Reusable modules or new backends | [Module authoring](references/extensions/module-authoring.md) | [Backend internals](references/extensions/backend-internals.md) |
+| GPU or RKE2/K3s automation | [GPU integration](references/extensions/gpu.md) or [Rancher integration](references/extensions/rancher.md) | [Optional ecosystem](references/extensions/ecosystem.md) |
+
+## Default procedure
+
+Inspect → establish versions and context → classify capabilities → read the relevant
+reference → define preconditions and recovery → implement the smallest change → test
+on a disposable target → verify a second run → canary → approve wider execution.
+For diagnosis, stop after the read-only evidence stage unless mutation was authorized.
+
+## Minimal remote-only example
 
 ```perl
-use Rex -feature => ['1.4'];   # ALWAYS include feature flag
-use Rex::Commands::Run;        # explicit imports
-use Rex::Commands::File;
+use strict;
+use warnings;
+use Rex -feature => ['1.4'];
 
-desc "Short description shown in rex --tasks";
-task "taskname", sub {
-  run "uname -r";
+# Explicitly select the backend only after checking the target's capabilities.
+set connection => 'OpenSSH';
+desc 'Read the kernel name on an explicitly selected remote host';
+task 'inspect_kernel', sub {
+    die "Remote host required\n" if Rex::is_local();
+    my $output = run 'uname', ['-s'], auto_die => 1;
+    print "$output\n";
 };
 ```
 
-Run with: `rex -f Rexfile -H host taskname`
+Use `rex -f Rexfile -H approved-host inspect_kernel` only after inspecting the file,
+verifying host identity, and resolving credentials. The feature bundle imports the
+common DSL; normal `Exporter` selective-import syntax is not Rex::Exporter's API.
 
-## Connection Types
+## Supporting assets
 
-```perl
-# Default (Net::SSH2 / libssh2) — supports SFTP
-set connection => 'SSH';
-
-# System OpenSSH binary (ControlMaster) — NO SFTP unless server has subsystem
-set connection => 'OpenSSH';
-
-# LibSSH (Net::LibSSH / libssh) — no SFTP required
-set connection => 'LibSSH';   # use this for Hetzner dedicated and SFTP-less hosts
-
-# Local — no SSH at all
-set connection => 'Local';
-```
-
-**Critical:** `set connection => 'OpenSSH'` causes `Rex::Interface::Fs::OpenSSH` to call
-`Rex::get_sftp()` for EVERY file operation. If the server has no SFTP subsystem,
-`get_sftp()` returns undef and `$sftp->stat(...)` crashes:
-```
-Can't call method "stat" on an undefined value at Rex/Interface/Fs/OpenSSH.pm line 82
-```
-**Solution:** use `set connection => 'LibSSH'` (from the `Rex-LibSSH` distribution).
-
-## Rex::Commands — What Needs SFTP
-
-| Command | SFTP required? |
-|---------|---------------|
-| `run "cmd"` | No — exec channel |
-| `file "/path", content => "..."` | SSH/OpenSSH only — LibSSH works without SFTP |
-| `file "/dir", ensure => 'directory'` | SSH/OpenSSH only — LibSSH works without SFTP |
-| `delete_lines_matching "/file", matching => qr/x/` | SSH/OpenSSH only |
-| `host_entry ...` | SSH/OpenSSH only |
-| `pkg ["curl"], ensure => "present"` | No |
-| `can_run("cmd")` | No |
-| `operating_system()` | No |
-| `is_debian()`, `is_redhat()`, `is_suse()` | No |
-
-## Rex::Commands::Run
-
-```perl
-use Rex::Commands::Run;
-
-my $out = run "uname -r";               # returns stdout
-my $out = run "cmd", auto_die => 1;     # croaks on non-zero exit
-my $out = run "cmd", auto_die => 0;     # never croaks
-# Check exit code:
-run "cmd", auto_die => 0;
-if ($? != 0) { ... }
-
-# Array form (no shell injection):
-run 'sh', ['-c', 'echo hi'], auto_die => 0;
-
-can_run("nvidia-smi");   # returns path if found, undef if not
-```
-
-## Rex::Commands::Gather
-
-```perl
-use Rex::Commands::Gather;
-
-my $os      = operating_system();         # 'Debian', 'Ubuntu', 'CentOS', ...
-my $version = operating_system_version(); # '12', '22.04', '8', ...
-is_debian();    # true for Debian + Ubuntu
-is_redhat();    # true for RHEL/Rocky/Alma/CentOS
-is_suse();      # true for openSUSE/SLES
-```
-
-## Rex::Interface Architecture
-
-```
-Rex::Interface::Connection::LibSSH  — wraps Net::LibSSH (libssh) — no SFTP needed
-Rex::Interface::Connection::OpenSSH — wraps system ssh binary (ControlMaster)
-Rex::Interface::Connection::SSH     — wraps Net::SSH2 / libssh2
-Rex::Interface::Fs::LibSSH          — file ops via exec channels — no SFTP
-Rex::Interface::Fs::OpenSSH         — file ops via get_sftp() → CRASHES if undef
-Rex::Interface::Fs::SSH             — same problem as OpenSSH
-```
-
-## LibSSH Backend (Rex::LibSSH)
-
-From the `Rex-LibSSH` distribution. Use for any host without SFTP subsystem.
-
-```perl
-use Rex -feature => ['1.4'];
-use Rex::LibSSH;
-
-set connection => 'LibSSH';
-
-# All Rex file operations now work without SFTP:
-file '/etc/hostname', content => "myhost\n";
-delete_lines_matching '/etc/fstab', matching => qr/\sswap\s/;
-host_entry 'myhost.internal', ip => '127.0.1.1', aliases => ['myhost'];
-```
-
-Authentication:
-```perl
-Rex::Config->set_private_key('/root/.ssh/id_ed25519');
-Rex::Config->set_public_key('/root/.ssh/id_ed25519.pub');
-```
-
-Host key checking is disabled by default (`strict_hostkeycheck => 0`).
-
-## Getty's Rex distributions (CPAN)
-
-### Rex::GPU (`Rex-GPU`)
-
-```perl
-use Rex::GPU;
-
-my $gpus = gpu_detect();
-# { nvidia => [{name => "RTX 4090", compute => 1}], amd => [...] }
-
-gpu_setup(containerd_config => 'rke2');  # detect + install + configure
-# containerd_config: 'rke2', 'k3s', 'containerd', 'none'
-```
-
-Sub-modules:
-- `Rex::GPU::Detect` — PCI class code based detection
-- `Rex::GPU::NVIDIA` — driver install (Debian/Ubuntu/RHEL/SUSE), container toolkit, containerd config
-
-Requires `Rex::LibSSH` connection for SFTP-less hosts. Dies with a helpful message if
-neither LibSSH nor a working SFTP connection is present.
-
-### Rex::Rancher (`Rex-Rancher`)
-
-```perl
-use Rex::Rancher::Node;
-prepare_node(hostname => 'h', domain => 'd', timezone => 'UTC');
-
-use Rex::Rancher::Server;
-install_server(distribution => 'rke2', token => '...', tls_san => ['ip']);
-
-use Rex::Rancher::Cilium;
-install_cilium(distribution => 'rke2');
-```
-
-## Common Gotchas
-
-1. **SFTP-less hosts** — use `set connection => 'LibSSH'` (from `Rex-LibSSH`).
-   Never use `set connection => 'OpenSSH'` for hosts without SFTP.
-
-2. **`<> line N` in error messages** is Perl's `$.` tracker from `<ARGV>`, not a
-   source line number. Misleading — the actual crash is in the C stack.
-
-3. **`$?` after `run`** — Rex sets `$?` to the remote exit code (shifted left 8).
-   Check with `$? != 0` or use `auto_die => 1`.
-
-4. **`use Rex -feature => ['1.4']`** — without this, many modern Rex behaviors
-   are disabled. Always include it.
-
-5. **`Rex::Exporter` not `Exporter`** — Rex modules use `require Rex::Exporter;
-   use base qw(Rex::Exporter); use vars qw(@EXPORT);` pattern, not standard
-   `Exporter`.
-
-6. **OpenSSH ControlMaster** — `set connection => 'OpenSSH'` uses SSH
-   multiplexing. The master process stays alive between task calls. Clean up
-   with `ssh -O exit` if connection gets stuck.
-
-7. **`operating_system_version()`** returns a string like `'22.04'` or `'12'`.
-   Use `int(operating_system_version())` for major version integer.
-
-8. **`pkg \@array, ensure => "present"`** — pass arrayref, not list.
-   `pkg ["curl", "wget"], ensure => "present"` is correct.
-
-9. **`auto_die => 0` is not the default** — `run "cmd"` without `auto_die`
-   uses Rex's global `set_fail_flag` setting. Always be explicit in library
-   code.
-
-10. **Rex task names must not clash with imported functions** — `task 'foo'`
-    overwrites imported `foo()` in the namespace. Use distinct task names.
+[Examples](examples/README.md) distinguish runnable lab assets from design skeletons.
+[Static review](scripts/audit_rexfile.py) is a heuristic, not a Perl parser or security proof.
+[Offline inventory](scripts/inspect_rex.pl) reads installed module text without loading Rex.
+[Validation](VALIDATION.md) states what ran and what did not.
+Use the [change brief](templates/change-brief.md) for operational handoff and the
+[reproduction template](templates/bug-report.md) for backend issues.

@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1alpha1::GCRWorkloadIdentity;
 # ABSTRACT: Specify a service account with Workload Identity
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s clusterLocation   => Str, { required => 'schema' };
@@ -26,7 +26,7 @@ IO::K8s::ExternalSecrets::V1alpha1::GCRWorkloadIdentity - Specify a service acco
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 clusterLocation
 

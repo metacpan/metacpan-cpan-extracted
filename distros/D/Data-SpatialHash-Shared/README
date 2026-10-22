@@ -240,12 +240,14 @@ METHODS
     As a safety net, any region query that would scan more than approximately
     67 million cells (2**26) -- a "query_radius", "query_aabb",
     "each_in_radius", or a "query_radius_many" sub-query whose region spans
-    that many cells, a "query_knn" that must walk that many cells across its
-    expanding shells, or a "each_pair_within" / "each_colliding_pair" whose
+    that many cells, or a "each_pair_within" / "each_colliding_pair" whose
     per-entry neighbourhood spans that many cells -- croaks with a message
     containing the word "cells" rather than scanning unbounded. If your use
     case genuinely requires regions that large, increase "cell_size" so the
     same physical region maps to fewer cells.
+
+    "query_knn" falls back to scanning live entries when shell expansion is
+    costly.
 
   Spherical worlds
     For points on or above a sphere (planets, globes), construct with a body
@@ -273,11 +275,11 @@ METHODS
     $alt" from the centre. Each geo method converts to Cartesian and delegates
     to the ordinary 3D engine, so $dist in "query_geo_radius" is a true
     straight-line distance and must be finite and non-negative. At a pole,
-    longitude is undefined and "position_geo" reports it as 0. Calling a geo
-    method on a map created without "sphere" croaks. "insert_geo" returns a
-    handle or "undef" if the pool is exhausted (test with "defined" -- handle
-    0 is valid but false); "move_geo" returns true, or false for a
-    freed/invalid handle; "position_geo" croaks on a freed or invalid handle.
+    longitude is undefined. Calling a geo method on a map created without
+    "sphere" croaks. "insert_geo" returns a handle or "undef" if the pool is
+    exhausted (test with "defined" -- handle 0 is valid but false); "move_geo"
+    returns true, or false for a freed/invalid handle; "position_geo" croaks
+    on a freed or invalid handle.
 
    Cube-sphere cells
     A direction (or lat/lon) maps to a hierarchical cell id on a cube-sphere:

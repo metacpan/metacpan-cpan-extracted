@@ -27,7 +27,7 @@ no_index:
 provides:
   Perl::Critic::Distribution:
     file: lib/Perl/Critic/Distribution.pm
-    version: '0.001'
+    version: '0.002'
 requires:
   Cpanel::JSON::XS: '0'
   Cwd: '0'
@@ -53,7 +53,7 @@ resources:
   bugtracker: https://github.com/teodesian/perl-critic-distribution/issues
   homepage: https://github.com/teodesian/perl-critic-distribution
   repository: https://github.com/teodesian/perl-critic-distribution.git
-version: '0.001'
+version: '0.002'
 x_generated_by_perl: v5.44.0
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: MIT

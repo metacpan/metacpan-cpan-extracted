@@ -12,7 +12,8 @@ my $root = dirname(dirname(abs_path(__FILE__)));
 chdir $root or die "chdir $root: $!";
 
 # Collect: git-tracked files not covered by MANIFEST.SKIP
-my %git = map { chomp; $_ => 1 } qx(git ls-files);
+my %git = map { chomp; $_ => 1 } qx(git ls-files 2>/dev/null);
+plan skip_all => 'requires a git checkout' if $?;
 delete $git{'.gitignore'};
 delete $git{$_} for grep /^\.github\//, keys %git;   # CI files optional
 delete $git{$_} for grep /^MANIFEST(\.SKIP)?$/, keys %git;  # MANIFEST self-excluded

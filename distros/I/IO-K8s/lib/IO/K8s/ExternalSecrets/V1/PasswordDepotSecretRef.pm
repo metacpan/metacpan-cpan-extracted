@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1::PasswordDepotSecretRef;
 # ABSTRACT: PasswordDepotSecretRef contains the secret reference for Password Depot authentication.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s credentials => '+IO::K8s::ExternalSecrets::V1::SecretKeySelector';
@@ -20,7 +20,7 @@ IO::K8s::ExternalSecrets::V1::PasswordDepotSecretRef - PasswordDepotSecretRef co
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 credentials
 

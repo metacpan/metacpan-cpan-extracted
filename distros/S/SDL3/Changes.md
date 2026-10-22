@@ -5,6 +5,12 @@ All notable changes to SDL.pm will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v0.0.7] - 2026-10-21
+
+### Added
+
+- Document prerequisites based on what I needed to do for the CI.
+
 ## [v0.0.6] - 2026-10-20
 
 Finally getting around to SDL3::Mixer, SDL3::Image, and SDL3::TTF.
@@ -103,7 +109,8 @@ I'm going to bundle all the demos I had hidden away on github to the main SDL3 d
 
   - It exists!
 
-[Unreleased]: https://github.com/Perl-SDL3/SDL3.pm/compare/v0.0.6...HEAD
+[Unreleased]: https://github.com/Perl-SDL3/SDL3.pm/compare/v0.0.7...HEAD
+[v0.0.7]: https://github.com/Perl-SDL3/SDL3.pm/compare/v0.0.6...v0.0.7
 [v0.0.6]: https://github.com/Perl-SDL3/SDL3.pm/compare/v0.0.5...v0.0.6
 [v0.0.5]: https://github.com/Perl-SDL3/SDL3.pm/compare/v0.0.4...v0.0.5
 [v0.0.4]: https://github.com/Perl-SDL3/SDL3.pm/compare/v0.0.3...v0.0.4

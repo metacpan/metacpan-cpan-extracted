@@ -10,6 +10,7 @@ Shared.xs
 t/01-basic.t
 t/02-frozen.t
 t/03-recover.t
+t/04-integers.t
 xt/asan.t
 xt/class_pv_magic.t
 xt/crash_recovery.t
@@ -19,6 +20,7 @@ xt/enospc.t
 xt/fork_f2d.t
 xt/kwalitee.t
 xt/pod.t
+xt/reserve.t
 xt/tsan.t
 xt/valgrind.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

@@ -5,44 +5,24 @@ use File::Temp qw(tempfile);
 
 use Data::ReqRep::Shared;
 
-my $MAGIC   = 0x52525331;   # RRS1
-my $VERSION = 1;
-my $MODE_STR = 0;
-
-# ReqRepHeader line 0: magic version mode req_cap total_size(u64) req_slots_off req_arena_off
-# req_arena_cap resp_slots resp_data_max resp_off resp_stride, then 12 bytes padding.
-my $HDR0_PACK = 'V V V V Q< V V V V V V V x[12]';
-
 SKIP: {
-    open(my $fh, '<', '/dev/null') or skip "no /dev/null", 1;
+    open(my $fh, '<', '/dev/null') or skip "no /dev/null", 2;
     my $r = eval { Data::ReqRep::Shared->new_from_fd(fileno($fh)) };
     ok !defined($r), '/dev/null rejected';
     like $@, qr/(too small|invalid|fstat)/i, 'meaningful error';
 }
 
-# Everything fits within total_size, but resp_off overlaps the arena.
 {
     my ($fh, $path) = tempfile(UNLINK => 1, SUFFIX => '.shm');
-    my $size = 8192;
-    my $req_cap = 4;
-    my $req_slots_off = 256;
-    my $req_arena_off = 512;
-    my $req_arena_cap = 4096;
-    my $resp_off      = 1024;
-    my $resp_stride   = 256;
-    my $resp_slots    = 4;
-    my $resp_data_max = 128;
-    print $fh pack($HDR0_PACK,
-        $MAGIC, $VERSION, $MODE_STR, $req_cap,
-        $size,
-        $req_slots_off, $req_arena_off, $req_arena_cap,
-        $resp_slots, $resp_data_max, $resp_off, $resp_stride);
-    print $fh "\0" x ($size - tell($fh));
-    close $fh;
-    open(my $rfh, '+<', $path) or die "open: $!";
-    my $r = eval { Data::ReqRep::Shared->new_from_fd(fileno($rfh)) };
+    my $srv = Data::ReqRep::Shared->new($path, 4, 4, 128, 4096);
+    ok eval { Data::ReqRep::Shared->new_from_fd(fileno($fh)) }, 'file descriptor with a valid current header accepted';
+    sysseek($fh, 28, 0) == 28 or die $!;
+    sysread($fh, my $arena_off, 4) == 4 or die $!;
+    sysseek($fh, 44, 0) == 44 or die $!;
+    syswrite($fh, pack('L', unpack('L', $arena_off) + 64)) == 4 or die $!;
+    my $r = eval { Data::ReqRep::Shared->new_from_fd(fileno($fh)) };
     ok !defined($r), 'resp_off inside arena rejected (v0.04 regression)';
-    close $rfh;
+    like $@, qr/invalid or incompatible/, 'rejected for the layout, not the format version';
 }
 
 {

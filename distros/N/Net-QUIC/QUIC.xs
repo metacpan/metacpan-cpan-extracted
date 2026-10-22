@@ -2337,6 +2337,8 @@ _receive_datagram(self, data_sv, local_sv, peer_sv, ecn_uv = 0)
         ngtcp2_path path;
         ngtcp2_pkt_info pi;
         ngtcp2_tstamp now;
+        uint64_t send_credit_before;
+        int watch_credit;
         int rv;
     CODE:
         ep = net_quic_connection_from_sv(self);
@@ -2365,6 +2367,14 @@ _receive_datagram(self, data_sv, local_sv, peer_sv, ecn_uv = 0)
         memset(&pi, 0, sizeof(pi));
         pi.ecn = (uint8_t)ecn_uv;
 
+        /* Snapshot available connection-wide send credit before input.
+         * ngtcp2 exposes per-stream MAX_STREAM_DATA callbacks, but not a
+         * corresponding callback for peer MAX_DATA increases.
+         */
+        watch_credit = ep->stream_activity_enabled &&
+                       ep->stream_tx_capacity_waiters != 0;
+        send_credit_before = watch_credit
+            ? ngtcp2_conn_get_max_data_left2(ep->conn) : 0;
         now = net_quic_now();
         rv = ngtcp2_conn_read_pkt(
             ep->conn,
@@ -2381,6 +2391,17 @@ _receive_datagram(self, data_sv, local_sv, peer_sv, ecn_uv = 0)
          * transmit buffers only after the read call has returned.
          */
         net_quic_stream_apply_deferred_discards(aTHX_ ep);
+
+        /* A peer MAX_DATA update may release send credit for Streams which
+         * previously short-accepted bytes but have no data in flight to
+         * generate their own ACK. Reuse the generic capacity-waiter queue;
+         * do not wake every Stream or introduce a protocol-specific hook.
+         * Only notify after ngtcp2_conn_read_pkt has returned.
+         */
+        if (rv == 0 && watch_credit && ep->stream_tx_capacity_waiters != 0 &&
+            ngtcp2_conn_get_max_data_left2(ep->conn) > send_credit_before) {
+            net_quic_stream_wake_capacity_waiters(ep);
+        }
 
         if (rv == NGTCP2_ERR_DRAINING || rv == NGTCP2_ERR_CLOSING) {
             net_quic_capture_peer_close(ep);

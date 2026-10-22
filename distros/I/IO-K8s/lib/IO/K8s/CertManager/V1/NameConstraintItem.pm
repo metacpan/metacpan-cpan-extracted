@@ -1,6 +1,6 @@
 package IO::K8s::CertManager::V1::NameConstraintItem;
 # ABSTRACT: Permitted contains the constraints in which the names must be located.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s dnsDomains     => [Str];
@@ -26,7 +26,7 @@ IO::K8s::CertManager::V1::NameConstraintItem - Permitted contains the constraint
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 dnsDomains
 

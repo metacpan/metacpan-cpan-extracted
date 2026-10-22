@@ -1,13 +1,13 @@
 package IO::K8s::ExternalSecrets::V1alpha1::WebhookSpec;
 # ABSTRACT: WebhookSpec controls the behavior of the external generator. Any body parameters should be passed to the server through the parameters field.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s auth       => '+IO::K8s::ExternalSecrets::V1::AuthorizationProtocol';
 k8s body       => Str;
 k8s caBundle   => Str;
 k8s caProvider => '+IO::K8s::ExternalSecrets::V1::WebhookCAProvider';
-k8s headers    => { Str => 1 };
+k8s headers    => HashRef[Str];
 k8s method     => Str;
 k8s result     => '+IO::K8s::ExternalSecrets::V1::WebhookResult', { required => 'schema' };
 k8s secrets    => ['+IO::K8s::ExternalSecrets::V1alpha1::WebhookSecret'];
@@ -38,7 +38,7 @@ IO::K8s::ExternalSecrets::V1alpha1::WebhookSpec - WebhookSpec controls the behav
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 auth
 

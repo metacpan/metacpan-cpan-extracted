@@ -1,7 +1,7 @@
 # ABSTRACT: SHA-256 checks of downloaded release artifacts
 
 package Rex::Rancher::Checksum;
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 use v5.14.4;
 use warnings;
 
@@ -47,7 +47,7 @@ Rex::Rancher::Checksum - SHA-256 checks of downloaded release artifacts
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 

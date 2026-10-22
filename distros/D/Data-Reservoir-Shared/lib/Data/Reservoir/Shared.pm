@@ -1,7 +1,7 @@
 package Data::Reservoir::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 require XSLoader;
 XSLoader::load('Data::Reservoir::Shared', $VERSION);
 
@@ -67,7 +67,7 @@ Perl.
 A reservoir created with C<new_weighted> keeps a B<weighted> random sample: each
 item carries a positive weight and is retained with probability proportional to
 its weight rather than uniformly. This is the B<Efraimidis-Spirakis A-Res>
-algorithm -- each observed item is assigned a key C<u ** (1/weight)> (with C<u>
+algorithm -- each observed item is assigned a key C<log(u) / weight> (with C<u>
 uniform in C<(0,1]>) and the C<k> items with the largest keys are kept, tracked
 in a shared min-heap so a heavier arrival can evict the current lightest member.
 With a single slot the probability of keeping item C<i> is exactly
@@ -75,7 +75,8 @@ C<< w_i / sum(w) >>. Feed weighted items with C<< $rsv->add($item, $weight) >> (
 weight must be a finite number greater than zero); everything else -- C<sample>,
 C<count>, C<get>, C<clear>, and cross-process sharing -- works identically. A
 weighted reservoir stores an extra C<k * 16> bytes for the heap and records its
-mode in the header, so a reopened segment stays weighted.
+mode in the header, so a reopened segment stays weighted. Weighted files from
+earlier releases must be recreated for the logarithmic key format.
 
 =head1 METHODS
 
@@ -102,7 +103,8 @@ cross-user sharing; it defaults to C<0600> (owner-only).
 The constructors create a new segment sparse: pages are allocated as they are
 first written, and once the filesystem is full, a write to a page not yet
 allocated dies with SIGBUS. Set C<DATA_RESERVOIR_SHARED_SPARSE=0> to reserve
-the whole segment at creation, so a full filesystem makes them croak instead;
+the whole segment at creation, so a full filesystem or unsupported reservation
+makes them croak instead;
 on tmpfs and memfd that commits the segment's memory at once, and a memory
 cgroup too small for it gets an OOM kill rather than a croak.
 

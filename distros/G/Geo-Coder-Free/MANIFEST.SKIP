@@ -83,6 +83,7 @@ CLAUDE.md
 downloads/
 lib/Geo/Coder/Free/GeoNames/
 lib/Geo/Coder/Free/MaxMind/
-lib/Geo/Coder/Free/OpenAddresses/databases/
+# Read by createdatabase.PL; codes.txt is not used
+^lib/Geo/Coder/Free/OpenAddresses/databases/codes\.txt$
 save_to/
 page/

@@ -1,5 +1,55 @@
 Revision history for Geo-Coder-Free
 
+0.51	Wed Oct 21 09:05:22 PM EDT 2026
+	[ Bug Fixes ]
+	- geocode() no longer hangs when OpenAddresses is configured and a location
+	  that matches the built-in alternatives table isn't found, such as
+	  "Chirton, Tyne and Wear, England".  The hang came in with 0.50
+	- An alternative is not tried again while it is already being tried, so an
+	  entry whose replacement still matches it cannot recurse forever
+	- The alternatives table is read as written: "Borough of North Tyneside" is
+	  no longer looked up as "Borough, of, North, Tyneside" first
+	- Error is now a runtime prerequisite; Geo::Coder::Free::Utils, which every
+	  user loads, has always needed it
+	[ Enhancements ]
+	- Config::Auto is no longer needed
+	- The US states and counties lists that createdatabase.PL imports are now
+	  in the distribution; before, a build from CPAN silently skipped them
+	[ Documentation ]
+	- LIMITATIONS no longer describes the alternatives loop missing a match on
+	  a repeated call; it walks a sorted list of keys and always finds it
+	[ Tests ]
+	- t/transaction.t checks that an alternative which finds nothing returns,
+	  and that the same input finds the same alternative every time
+
+0.50	Wed Oct 21 11:01:07 AM EDT 2026
+	[ Enhancements ]
+	- Geo::Coder::Free->new() and Geo::Coder::Free::OpenAddresses->new() take
+	  libpostal => 0, which keeps Geo::libpostal from being loaded or used even
+	  when it is installed
+	[ Bug Fixes ]
+	- Geo::Coder::Free::OpenAddresses no longer dies with "Can't locate
+	  Geo/Address/Parser.pm" on a US address when the optional
+	  Geo::Address::Parser isn't installed; it skips that step instead
+	[ Documentation ]
+	- Geo::Coder::Free::OpenAddresses documents the optional modules it uses, and
+	  that libpostal's first call loads a model of several gigabytes
+	- LIMITATIONS now says that, without OpenAddresses data, a two-part
+	  "City, Country" location is often answered with the wrong place, flagged
+	  accuracy 'region', and that accented names must be spelled as in the data
+	  and passed as character strings
+	- Fixed the geocode_many() example, which printed the array reference
+	  instead of the unresolved values
+	- API specifications for every public method of Geo::Coder::Free::MaxMind,
+	  and for the rest of OpenAddresses, Local and Geo::Coder::Free (reads,
+	  reverse_geocode, ua, run); the formal specification covers libpostal
+	[ Tests ]
+	- The OpenAddresses ReDoS test in t/edge_cases.t no longer times out when
+	  Geo::libpostal is installed.  Loading libpostal's model on its first call
+	  could take longer than the 5 second limit, which failed the 0.49 install
+	- The ReDoS tests in t/edge_cases.t fail on any error, not only a timeout
+	- New t/optional-modules.t runs OpenAddresses without Geo::Address::Parser
+
 0.49	Tue Oct 20 08:03:03 PM EDT 2026
 	[ Enhancements ]
 	- Requires Perl 5.20, which Geo::Coder::Free::Utils has always needed

@@ -405,11 +405,11 @@ ExtUtils::ModuleMaker.
 
 =head1 AUTHOR
 
-James E Keenan.  CPAN ID: JKEENAN.  jkeenan [at] cpan [dot] org.
+James E Keenan.  CPAN ID: JKEENAN.  jkeenan [at] pobox [dot] com.
 
 =head1 COPYRIGHT
 
-Copyright 2005-15 James E Keenan.
+Copyright 2005-26 James E Keenan.
 
 This program is free software; you can redistribute
 it and/or modify it under the same terms as Perl itself.

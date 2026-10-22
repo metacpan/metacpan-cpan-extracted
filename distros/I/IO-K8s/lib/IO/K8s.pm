@@ -12,7 +12,7 @@ use IO::K8s::Resource ();
 use IO::K8s::Unstructured ();
 use namespace::clean;
 
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 
 # Track which classes we've auto-generated
 my %_autogen_cache;
@@ -1268,6 +1268,18 @@ sub _inflate_struct {
                 $_ => $self->_struct_to_object_expanded($inner_class, $value->{$_},
                     $class.' field '.$attr." at key '".$_."'")
             } keys %$value };
+        } elsif ($info->{is_hash_of_object_arrays}) {
+            my $inner_class = $info->{class};
+            $args{$attr} = { map {
+                my $key  = $_;
+                my $list = $value->{$key};
+                $key => (ref $list eq 'ARRAY'
+                    ? [ map {
+                        $self->_struct_to_object_expanded($inner_class, $list->[$_],
+                            $class.' field '.$attr." at key '".$key."' element ".$_)
+                    } 0 .. $#$list ]
+                    : $list)
+            } keys %$value };
         } elsif ($info->{is_object}) {
             $args{$attr} = $self->_struct_to_object_expanded($info->{class}, $value,
                 $class.' field '.$attr);
@@ -1369,11 +1381,9 @@ sub load {
 sub load_yaml {
     my ($self, $file_or_string, %opts) = @_;
 
-    require YAML::PP;
-
     # A file or YAML text, multi-document, by the rule IO::K8s::CRD->load
-    # shares (k159, k162). YAML::PP->new is what YAML::PP::Load used here.
-    my ($refused, @docs) = $self->_yaml_documents($file_or_string, YAML::PP->new);
+    # shares (k159, k162), with plain scalars resolved the kubectl way (k198).
+    my ($refused, @docs) = $self->_yaml_documents($file_or_string, $self->_yaml_parser);
     croak "load_yaml: '".$file_or_string."' ".$refused if defined $refused;
 
     my $collect_errors = $opts{collect_errors};
@@ -1403,6 +1413,74 @@ sub load_yaml {
     }
 
     return \@objects;
+}
+
+# The YAML::PP both loaders parse with (k198). kubectl reads manifests as
+# YAML 1.1, so 'privileged: no' is false and 'defaultMode: 0644' is 420;
+# the YAML 1.2 core schema YAML::PP defaults to reads them as the string
+# 'no' (a true Bool) and 644. The 1.1 forms are registered ahead of the 1.2
+# core schema, which stays underneath for everything else, so what loaded
+# before still loads the same (0o644, 0x1A4, 1e3, true/false). The 1.1
+# schema YAML::PP ships is not used as is: it also reads 22:22 or 10:30 as a
+# sexagesimal number, which kubectl does not, and a string field would
+# silently turn into 1342. Only the booleans (y n yes no on off in every
+# spelling YAML 1.1 knows) and the leading-zero octal integers are added.
+# Takes YAML::PP's 'boolean' setting, so each caller keeps its own.
+sub _yaml_parser {
+    my ($self, $boolean) = @_;
+    require YAML::PP;
+    require YAML::PP::Schema;
+
+    my $schema = YAML::PP::Schema->new(
+        yaml_version => '1.2',
+        defined $boolean ? ( boolean => $boolean ) : (),
+    );
+    # A mapping key stays the text as written: 'y:', 'on:' or 'no:' is the
+    # key "y", "on", "no", not a boolean (which YAML::PP would turn into a
+    # "Duplicate key" croak for two of them, or a mangled key). That is a
+    # deliberate difference from kubectl, which reads them as "true"/"false"
+    # and so breaks CRD properties named 'on' or 'y'. A scalar is a key when
+    # the innermost open mapping holds an even number of nodes so far.
+    my ( $true, $false ) = ( $schema->true, $schema->false );    # not $schema itself: no cycle
+    my $in_key = sub {
+        my ($constructor) = @_;
+        my $top = $constructor->stack->[-1];
+        return $top && $top->{type} eq 'mapping' && !( @{ $top->{ref} } % 2 );
+    };
+    for my $word ( qw( y Y yes Yes YES on On ON true True TRUE ) ) {
+        $schema->add_resolver(
+            tag   => 'tag:yaml.org,2002:bool',
+            match => [ equals => $word => sub {
+                my ( $constructor, $event ) = @_;
+                return $in_key->($constructor) ? $event->{value} : $true->(@_);
+            } ],
+        );
+    }
+    for my $word ( qw( n N no No NO off Off OFF false False FALSE ) ) {
+        $schema->add_resolver(
+            tag   => 'tag:yaml.org,2002:bool',
+            match => [ equals => $word => sub {
+                my ( $constructor, $event ) = @_;
+                return $in_key->($constructor) ? $event->{value} : $false->(@_);
+            } ],
+        );
+    }
+    $schema->add_resolver(
+        tag   => 'tag:yaml.org,2002:int',
+        match => [ regex => qr{^([+-]?)0([0-7][0-7_]*)$} => sub {
+            my ( $constructor, $event, $matches ) = @_;
+            return $event->{value} if $in_key->($constructor);
+            my ( $sign, $digits ) = @$matches;
+            $digits =~ tr/_//d;
+            return ( $sign eq '-' ? -1 : 1 ) * oct $digits;
+        } ],
+    );
+    $schema->load_subschemas('Core');
+
+    return YAML::PP->new(
+        schema => $schema,
+        defined $boolean ? ( boolean => $boolean ) : (),
+    );
 }
 
 # The YAML documents in a load_yaml or IO::K8s::CRD->load argument: one
@@ -1458,7 +1536,7 @@ IO::K8s - Objects representing things found in the Kubernetes API
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head1 SYNOPSIS
 
@@ -1601,7 +1679,7 @@ The C<k8s> DSL supports these type specifications:
   k8s ready    => 'Bool';                  # boolean attribute
   k8s spec     => 'Core::V1::PodSpec';     # nested IO::K8s object
   k8s ports    => ['Core::V1::ServicePort']; # array of objects
-  k8s labels   => { Str => 1 };            # map of strings
+  k8s labels   => HashRef[Str];           # map of strings
   k8s data     => HashRef[Str];            # map of strings (strict)
   k8s raw      => Opaque;                  # free map, values untyped
   k8s items    => ['+Full::Class::Name'];  # array with full class (+ prefix)
@@ -2047,6 +2125,19 @@ With CRDs (requires openapi_spec):
 Load a YAML manifest file (or YAML string) and return an ArrayRef of IO::K8s
 objects. Supports multi-document YAML (separated by C<--->).
 
+Plain scalars are resolved the way C<kubectl> resolves them, as YAML 1.1:
+C<yes>, C<no>, C<on>, C<off>, C<y> and C<n> in every spelling YAML 1.1
+knows (C<No>, C<OFF>, ...) are booleans, so C<privileged: no> is false, and
+a leading-zero integer is octal, so C<defaultMode: 0644> is 420. Quote a
+value (C<'no'>) to keep it a string. Mapping keys are the exception: C<y:>,
+C<on:> or C<no:> stays the key C<"y">, C<"on">, C<"no"> (and C<0644:> the key
+C<"0644">), unlike C<kubectl>, which turns them into C<"true"> or C<"false">.
+That would break names such as a CRD property C<on>. Everything the YAML 1.2 core schema
+reads stays as it was, including C<0o644> and C<0x1A4>. Sexagesimal numbers
+(C<10:30>) and the YAML 1.1 timestamp type are not applied, as in
+C<kubectl>. The same applies to L<IO::K8s::CRD/load>. Writing is unchanged:
+C<to_yaml> already quotes every string a YAML 1.1 reader would misread.
+
 An argument without a newline that names an existing file is read from
 that file, as UTF-8. Anything else is taken as YAML text, which is expected
 as decoded characters (not UTF-8 bytes) and is parsed as given. A one-line
@@ -2471,7 +2562,7 @@ replaced with the unified L<IO::K8s::List> class. The old class names emitted
 deprecation warnings for a while; as of this release they have been dropped
 from this distribution entirely. If you need the old name to fail loudly
 instead of silently resolving to a stale prior release, install
-L<IO::K8s::Deprecated>, which ships CPAN redirect stubs for all 76 of them.
+L<IO::K8s::Deprecated>, which ships CPAN redirect stubs for all 74 of them.
 
 =item * B<Updated to Kubernetes v1.37 API>
 

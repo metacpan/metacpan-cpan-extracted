@@ -1,0 +1,228 @@
+{
+  "schema_version": 1,
+  "verified_on": "2026-10-09",
+  "kind": "research-source-lock-not-dependency-lock",
+  "repositories": {
+    "core": {
+      "repository": "RexOps/Rex",
+      "commit": "e2d7836bb9040429b96cf79c213adc9385274c88",
+      "url": "https://github.com/RexOps/Rex",
+      "indexed_cpan_release": "1.16.1",
+      "release_date": "2025-07-05",
+      "repository_version_literal": "9999.99.99_99",
+      "files": [
+        {
+          "path": "lib/Rex.pm",
+          "coverage": "lines 1–720",
+          "focus": "Module loading, connection stack/local fallback, imports and feature-bundle implementation; later code not fully reviewed",
+          "url": "https://github.com/RexOps/Rex/blob/e2d7836bb9040429b96cf79c213adc9385274c88/lib/Rex.pm"
+        },
+        {
+          "path": "lib/Rex/Commands.pm",
+          "coverage": "lines 500–670",
+          "focus": "Task/group auth implementation and documentation; task composition additionally read in release POD",
+          "url": "https://github.com/RexOps/Rex/blob/e2d7836bb9040429b96cf79c213adc9385274c88/lib/Rex/Commands.pm"
+        },
+        {
+          "path": "lib/Rex/Commands/Run.pm",
+          "coverage": "run implementation and run/can_run/sudo POD; sudo tail partial",
+          "focus": "Quoting, status policy, guards, timeout, callbacks, notifications and report semantics",
+          "url": "https://github.com/RexOps/Rex/blob/e2d7836bb9040429b96cf79c213adc9385274c88/lib/Rex/Commands/Run.pm"
+        },
+        {
+          "path": "lib/Rex/Exporter.pm",
+          "coverage": "complete",
+          "focus": "Import option contract and symbol export behavior",
+          "url": "https://github.com/RexOps/Rex/blob/e2d7836bb9040429b96cf79c213adc9385274c88/lib/Rex/Exporter.pm"
+        },
+        {
+          "path": "lib/Rex/Commands/Service.pm",
+          "coverage": "lines 200–470",
+          "focus": "Ensure and legacy action paths, return values and change reporting",
+          "url": "https://github.com/RexOps/Rex/blob/e2d7836bb9040429b96cf79c213adc9385274c88/lib/Rex/Commands/Service.pm"
+        },
+        {
+          "path": "lib/Rex/Interface/Fs.pm",
+          "coverage": "complete",
+          "focus": "Factory dispatch",
+          "url": "https://github.com/RexOps/Rex/blob/e2d7836bb9040429b96cf79c213adc9385274c88/lib/Rex/Interface/Fs.pm"
+        },
+        {
+          "path": "lib/Rex/Interface/Fs/SSH.pm",
+          "coverage": "complete",
+          "focus": "SFTP metadata, Perl/exec helpers and SCP transfer branches",
+          "url": "https://github.com/RexOps/Rex/blob/e2d7836bb9040429b96cf79c213adc9385274c88/lib/Rex/Interface/Fs/SSH.pm"
+        },
+        {
+          "path": "lib/Rex/Interface/Fs/OpenSSH.pm",
+          "coverage": "complete",
+          "focus": "Metadata and SFTP transfer paths",
+          "url": "https://github.com/RexOps/Rex/blob/e2d7836bb9040429b96cf79c213adc9385274c88/lib/Rex/Interface/Fs/OpenSSH.pm"
+        },
+        {
+          "path": "lib/Rex/Interface/Connection/OpenSSH.pm",
+          "coverage": "complete",
+          "focus": "Options/authentication, independent SFTP initialization, lifecycle and Sudo type",
+          "url": "https://github.com/RexOps/Rex/blob/e2d7836bb9040429b96cf79c213adc9385274c88/lib/Rex/Interface/Connection/OpenSSH.pm"
+        },
+        {
+          "path": "lib/Rex/Interface/Exec/SSH.pm",
+          "coverage": "complete",
+          "focus": "Shell/path/env wrapper and SSH2 helper delegation; delegated helper not audited",
+          "url": "https://github.com/RexOps/Rex/blob/e2d7836bb9040429b96cf79c213adc9385274c88/lib/Rex/Interface/Exec/SSH.pm"
+        },
+        {
+          "path": "lib/Rex/Interface/Exec/OpenSSH.pm",
+          "coverage": "complete",
+          "focus": "open3/waitpid and direct status normalization",
+          "url": "https://github.com/RexOps/Rex/blob/e2d7836bb9040429b96cf79c213adc9385274c88/lib/Rex/Interface/Exec/OpenSSH.pm"
+        }
+      ]
+    },
+    "libssh": {
+      "repository": "Getty/rex-libssh",
+      "commit": "32a5db0e8fe49e0caf91793aeb214ca2ded9c0ab",
+      "url": "https://github.com/Getty/rex-libssh",
+      "indexed_cpan_release": "0.004",
+      "release_date": "2026-09-20",
+      "repository_version_literal": "0.005",
+      "files": [
+        {
+          "path": "lib/Rex/Interface/Connection/LibSSH.pm",
+          "coverage": "complete",
+          "focus": "Host-key defaults/precedence, authentication, timeout reset and driver type",
+          "url": "https://github.com/Getty/rex-libssh/blob/32a5db0e8fe49e0caf91793aeb214ca2ded9c0ab/lib/Rex/Interface/Connection/LibSSH.pm"
+        },
+        {
+          "path": "lib/Rex/Interface/Exec/LibSSH.pm",
+          "coverage": "complete",
+          "focus": "Three-argument wrapper, buffered output, callbacks, shifted status",
+          "url": "https://github.com/Getty/rex-libssh/blob/32a5db0e8fe49e0caf91793aeb214ca2ded9c0ab/lib/Rex/Interface/Exec/LibSSH.pm"
+        },
+        {
+          "path": "lib/Rex/Interface/Fs/LibSSH.pm",
+          "coverage": "complete",
+          "focus": "Exec file operations, quoting, GNU stat, glob/list limits, buffering and forced driver",
+          "url": "https://github.com/Getty/rex-libssh/blob/32a5db0e8fe49e0caf91793aeb214ca2ded9c0ab/lib/Rex/Interface/Fs/LibSSH.pm"
+        },
+        {
+          "path": "lib/Rex/Interface/File/LibSSH.pm",
+          "coverage": "complete",
+          "focus": "Read buffer, write channel, path quoting, limited explicit status checks",
+          "url": "https://github.com/Getty/rex-libssh/blob/32a5db0e8fe49e0caf91793aeb214ca2ded9c0ab/lib/Rex/Interface/File/LibSSH.pm"
+        }
+      ]
+    },
+    "gpu": {
+      "repository": "Getty/rex-gpu",
+      "commit": "bded1977b558c2fb6a46ae09ad2379acc5287775",
+      "url": "https://github.com/Getty/rex-gpu",
+      "indexed_cpan_release": "0.004",
+      "release_date": "2026-10-01",
+      "repository_version_literal": "0.005",
+      "files": [
+        {
+          "path": "lib/Rex/GPU.pm",
+          "coverage": "lines 1–310; tail truncated near start of gpu_setup",
+          "focus": "Public API/POD, exports, detector dispatch, connection precheck; full driver implementation not reviewed",
+          "url": "https://github.com/Getty/rex-gpu/blob/bded1977b558c2fb6a46ae09ad2379acc5287775/lib/Rex/GPU.pm"
+        }
+      ]
+    },
+    "rancher": {
+      "repository": "Getty/rex-rancher",
+      "commit": "cb4df5cbaf6f62ff1de943cd54f0ed5c8ddc652e",
+      "url": "https://github.com/Getty/rex-rancher",
+      "indexed_cpan_release": "0.003",
+      "release_date": "2026-10-01",
+      "repository_version_literal": "0.004",
+      "files": [
+        {
+          "path": "lib/Rex/Rancher.pm",
+          "coverage": "lines 1–220 and 360–560",
+          "focus": "Public API/POD, connection/distribution checks, server orchestration and agent POD; other helper implementations not exhaustively reviewed",
+          "url": "https://github.com/Getty/rex-rancher/blob/cb4df5cbaf6f62ff1de943cd54f0ed5c8ddc652e/lib/Rex/Rancher.pm"
+        }
+      ]
+    }
+  },
+  "documentation": [
+    {
+      "module": "Rex",
+      "url": "https://metacpan.org/pod/Rex",
+      "evidence": "release documentation; not a local runtime test"
+    },
+    {
+      "module": "Rex::Commands",
+      "url": "https://metacpan.org/pod/Rex::Commands",
+      "evidence": "release documentation; not a local runtime test"
+    },
+    {
+      "module": "Rex::Commands::Run",
+      "url": "https://metacpan.org/pod/Rex::Commands::Run",
+      "evidence": "release documentation; not a local runtime test"
+    },
+    {
+      "module": "Rex::Commands::File",
+      "url": "https://metacpan.org/pod/Rex::Commands::File",
+      "evidence": "release documentation; not a local runtime test"
+    },
+    {
+      "module": "Rex::Commands::Pkg",
+      "url": "https://metacpan.org/pod/Rex::Commands::Pkg",
+      "evidence": "release documentation; not a local runtime test"
+    },
+    {
+      "module": "Rex::Commands::Service",
+      "url": "https://metacpan.org/pod/Rex::Commands::Service",
+      "evidence": "release documentation; not a local runtime test"
+    },
+    {
+      "module": "Rex::Commands::Gather",
+      "url": "https://metacpan.org/pod/Rex::Commands::Gather",
+      "evidence": "release documentation; not a local runtime test"
+    },
+    {
+      "module": "Rex::Commands::Notify",
+      "url": "https://metacpan.org/pod/Rex::Commands::Notify",
+      "evidence": "release documentation; not a local runtime test"
+    },
+    {
+      "module": "Rex::CMDB",
+      "url": "https://metacpan.org/pod/Rex::CMDB",
+      "evidence": "release documentation; not a local runtime test"
+    },
+    {
+      "module": "Rex::Test::Base",
+      "url": "https://metacpan.org/pod/Rex::Test::Base",
+      "evidence": "release documentation; not a local runtime test"
+    },
+    {
+      "module": "Rex::LibSSH",
+      "url": "https://metacpan.org/pod/Rex::LibSSH",
+      "evidence": "release documentation; not a local runtime test"
+    },
+    {
+      "module": "Rex::GPU",
+      "url": "https://metacpan.org/pod/Rex::GPU",
+      "evidence": "release documentation; not a local runtime test"
+    },
+    {
+      "module": "Rex::Rancher",
+      "url": "https://metacpan.org/pod/Rex::Rancher",
+      "evidence": "release documentation; not a local runtime test"
+    },
+    {
+      "module": "distribution/Rex/bin/rex",
+      "url": "https://metacpan.org/pod/distribution/Rex/bin/rex",
+      "evidence": "release documentation; not a local runtime test"
+    }
+  ],
+  "boundaries": [
+    "Source read through the GitHub connector, not a successful local clone.",
+    "No full release-tarball/master equivalence check.",
+    "No exhaustive provider audit or security certification.",
+    "No SSH, sudo, GPU hardware, or Kubernetes integration run.",
+    "User/Cron and other catalog modules are routing targets; no full implementation audit."
+  ]
+}

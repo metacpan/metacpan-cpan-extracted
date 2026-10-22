@@ -1,6 +1,6 @@
 package IO::K8s::PrometheusOperator::V1alpha1::DNSSDConfig;
 # ABSTRACT: DNSSDConfig allows specifying a set of DNS domain names which are periodically queried to discover a list of targets.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s names           => [Str], { required => 'schema' };
@@ -26,7 +26,7 @@ IO::K8s::PrometheusOperator::V1alpha1::DNSSDConfig - DNSSDConfig allows specifyi
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 names
 

@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::PodCertificateProjection;
 # ABSTRACT: PodCertificateProjection provides a private key and X.509 certificate in the pod filesystem.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s certificateChainPath => Str;
@@ -24,7 +24,7 @@ k8s signerName => Str, 'required';
 k8s user => Int;
 
 
-k8s userAnnotations => { Str => 1 };
+k8s userAnnotations => HashRef[Str];
 
 
 1;
@@ -41,7 +41,7 @@ IO::K8s::Api::Core::V1::PodCertificateProjection - PodCertificateProjection prov
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 certificateChainPath
 

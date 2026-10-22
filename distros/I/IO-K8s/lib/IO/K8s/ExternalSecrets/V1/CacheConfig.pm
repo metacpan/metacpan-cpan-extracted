@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1::CacheConfig;
 # ABSTRACT: Cache configures client-side caching for read operations (GetSecret, GetSecretMap).
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s maxSize => Int, { minimum => 1, default => 100 };
@@ -22,7 +22,7 @@ IO::K8s::ExternalSecrets::V1::CacheConfig - Cache configures client-side caching
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 maxSize
 

@@ -49,6 +49,7 @@ if    ($op eq 'move')   { $s->move($h[$_], 100.5 + $_, 50.5) for 0 .. 9 }
 elsif ($op eq 'remove') { $s->remove($h[$_]) for 0 .. 9 }
 elsif ($op eq 'insert') { $s->insert(200.5 + $_, 0.5, 1000 + $_) for 0 .. 9 }
 elsif ($op eq 'clear')  { $s->clear }
+elsif ($op eq 'freeze') { $s->freeze }
 EOF
 close $v;
 
@@ -115,6 +116,28 @@ for my $case (@cases) {
     ok $l2 && run_gdb($path, 'recover', $l2, 0), "$name: recovering process killed mid-rebuild";
     my $st = check($path);
     ok consistent($st), "$name: third process sees a consistent map" or diag $st;
+}
+
+{
+    require Data::SpatialHash::Shared;
+    my $path = "$dir/frozen.sph";
+    my $peer = Data::SpatialHash::Shared->new($path, $MAX, 0, 1.0);
+    my $line = line_in('sph_freeze', 'sph_rwlock_wrunlock(h);');
+    ok $line && run_gdb($path, 'freeze', $line, 0),
+        'freezer killed after sealing, before unlocking';
+    my $ro = Data::SpatialHash::Shared->new_readonly($path);
+    my $read_data = sub {
+        open my $f, '<:raw', $path or die $!;
+        local $/;
+        my $image = <$f>;
+        return substr($image, unpack('Q<', substr($image, 48, 8)));
+    };
+    my $before = $read_data->();
+    my @all = $peer->query_aabb(-1, -1, 41, 1);
+    is scalar(@all), $LIVE, 'existing peer recovers the interrupted freeze';
+    ok $read_data->() eq $before, 'recovery preserves the frozen data image';
+    is scalar(() = $ro->query_aabb(-1, -1, 41, 1)), $LIVE,
+        'lock-free reader still sees all frozen entries';
 }
 
 done_testing;

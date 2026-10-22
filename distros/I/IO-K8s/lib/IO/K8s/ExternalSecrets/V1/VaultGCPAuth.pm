@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1::VaultGCPAuth;
 # ABSTRACT: Gcp authenticates with Vault using Google Cloud Platform authentication method GCP authentication method
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s location          => Str;
@@ -32,7 +32,7 @@ IO::K8s::ExternalSecrets::V1::VaultGCPAuth - Gcp authenticates with Vault using 
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 location
 

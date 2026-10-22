@@ -1,7 +1,7 @@
 package WWW::Hetzner::Storage::API::StorageBoxTypes;
 # ABSTRACT: Hetzner Storage Box Types API
 
-our $VERSION = '0.101';
+our $VERSION = '0.102';
 
 use Moo;
 use Carp qw(croak);
@@ -81,7 +81,7 @@ WWW::Hetzner::Storage::API::StorageBoxTypes - Hetzner Storage Box Types API
 
 =head1 VERSION
 
-version 0.101
+version 0.102
 
 =head1 SYNOPSIS
 

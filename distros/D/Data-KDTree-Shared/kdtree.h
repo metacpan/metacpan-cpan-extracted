@@ -212,8 +212,10 @@ static inline void kd_recover_stale_lock(KdHandle *h, uint32_t observed_wlock) {
     if (!__atomic_compare_exchange_n(&hdr->wlock, &observed_wlock,
             mypid, 0, __ATOMIC_ACQUIRE, __ATOMIC_RELAXED))
         return;
-    /* We now hold the write lock as mypid.  No additional shared state needs
-     * repair here (this module has no seqlock); just release the lock. */
+    /* Rebuild after an interrupted mutable write; a published seal already
+     * guarantees complete links, and its readers must remain lock-free. */
+    if (!__atomic_load_n(&hdr->sealed, __ATOMIC_ACQUIRE))
+        __atomic_store_n(&hdr->dirty, 1, __ATOMIC_RELEASE);
     __atomic_store_n(&hdr->wlock, 0, __ATOMIC_RELEASE);
     if (__atomic_load_n(&hdr->rwait, __ATOMIC_RELAXED) > 0)
         syscall(SYS_futex, &hdr->wlock, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
@@ -577,6 +579,13 @@ static inline KdHandle *kd_setup(void *base, size_t map_size,
         if (backing_fd >= 0) close(backing_fd);
         return NULL;
     }
+    h->path = path ? strdup(path) : NULL;
+    if (path && !h->path) {
+        munmap(base, map_size);
+        if (backing_fd >= 0) close(backing_fd);
+        free(h);
+        return NULL;
+    }
     h->hdr          = hdr;
     h->base         = base;
     h->reader_slots = (KdReaderSlot *)((uint8_t *)base + sizeof(KdHeader));  /* trusted layout, not the peer-writable header offset */
@@ -584,7 +593,6 @@ static inline KdHandle *kd_setup(void *base, size_t map_size,
      * dims/capacity, so compute it from trusted constants, not the peer header. */
     h->occ          = (uint64_t *)((uint8_t *)base + sizeof(KdHeader)
                                    + (uint64_t)KD_READER_SLOTS * sizeof(KdReaderSlot));
-    h->nodes_off    = hdr->nodes_off;   /* single validated read of each geometry field */
     h->nodes_off    = hdr->nodes_off;   /* single validated read of each geometry field */
     h->idx_off      = hdr->idx_off;
     h->node_stride  = hdr->node_stride;
@@ -596,7 +604,6 @@ static inline KdHandle *kd_setup(void *base, size_t map_size,
         uint64_t fit = kd_nodes_max(h);
         if ((uint64_t)h->capacity > fit) h->capacity = (uint32_t)fit;
     }
-    h->path         = path ? strdup(path) : NULL;
     h->backing_fd   = backing_fd;
     h->my_slot_idx  = UINT32_MAX;
     return h;
@@ -832,10 +839,11 @@ static KdHandle *kd_open_readonly(const char *path, char *errbuf) {
     void *base = mmap(NULL, ms, PROT_READ, MAP_SHARED, fd, 0);
     close(fd);   /* the mapping keeps the file; a read-only view needs no fd (no msync/ftruncate) */
     if (base == MAP_FAILED) { KD_ERR("mmap %s: %s", path, strerror(errno)); return NULL; }
+    uint8_t sealed = __atomic_load_n(&((KdHeader *)base)->sealed, __ATOMIC_ACQUIRE);
     if (!kd_validate_header((KdHeader *)base, (uint64_t)st.st_size)) {
         KD_ERR("%s: invalid k-d tree file", path); munmap(base, ms); return NULL;
     }
-    if (!((KdHeader *)base)->sealed) {
+    if (!sealed) {
         KD_ERR("%s is not frozen: call ->freeze on the producer before opening read-only", path);
         munmap(base, ms); return NULL;
     }
@@ -887,8 +895,7 @@ static void kd_build_locked(KdHandle *h);
 static int kd_freeze(KdHandle *h) {
     kd_rwlock_wrlock(h);
     if (h->hdr->dirty) kd_build_locked(h);
-    __atomic_signal_fence(__ATOMIC_SEQ_CST);
-    h->hdr->sealed = 1;
+    __atomic_store_n(&h->hdr->sealed, 1, __ATOMIC_RELEASE);
     kd_rwlock_wrunlock(h);
     if (h->path || h->backing_fd >= 0) return kd_msync(h);
     return 0;   /* anonymous: the seal lives in shared memory (visible to forks); nothing to flush */
@@ -924,8 +931,7 @@ static int64_t kd_add_locked(KdHandle *h, const double *coords, uint64_t payload
     *kd_right(h, slot)   = KD_NIL;
     /* Dirty before the count: a kill between costs a rebuild, never a counted point outside the tree. */
     h->hdr->dirty = 1;
-    __atomic_signal_fence(__ATOMIC_SEQ_CST);
-    h->hdr->count = slot + 1;
+    __atomic_store_n(&h->hdr->count, slot + 1, __ATOMIC_RELEASE);
     return (int64_t)slot;
 }
 
@@ -955,14 +961,13 @@ static uint32_t kd_build_rec(KdHandle *h, uint32_t *idx, int64_t lo, int64_t hi,
 
 /* (re)build a balanced tree over all inserted points (caller holds wrlock) */
 static void kd_build_locked(KdHandle *h) {
-    uint64_t n = h->hdr->count;
+    uint64_t n = __atomic_load_n(&h->hdr->count, __ATOMIC_ACQUIRE);
     if (n > h->capacity) n = h->capacity;                 /* Layer B */
-    if (n == 0) { h->hdr->root = KD_NIL; __atomic_signal_fence(__ATOMIC_SEQ_CST); h->hdr->dirty = 0; return; }
+    if (n == 0) { h->hdr->root = KD_NIL; __atomic_store_n(&h->hdr->dirty, 0, __ATOMIC_RELEASE); return; }
     uint32_t *idx = kd_idx(h);                             /* scratch region inside the mapping */
     for (uint64_t i = 0; i < n; i++) idx[i] = (uint32_t)i;
     h->hdr->root = kd_build_rec(h, idx, 0, (int64_t)n - 1, 0);
-    __atomic_signal_fence(__ATOMIC_SEQ_CST);
-    h->hdr->dirty = 0;
+    __atomic_store_n(&h->hdr->dirty, 0, __ATOMIC_RELEASE);
 }
 
 /* ---- k-nearest search via a bounded max-heap of the m best (farthest at 0) ---- */
@@ -1031,22 +1036,25 @@ static uint64_t kd_range_locked(KdHandle *h, const double *lo, const double *hi,
 }
 
 /* ---- radius (ball) search ---- */
-static void kd_radius_rec(KdHandle *h, uint32_t node, const double *q, double r, double r2,
+static void kd_radius_rec(KdHandle *h, uint32_t node, const double *q, double r2,
                           uint32_t depth, KdRes *out, uint64_t *cnt, uint64_t cap, uint64_t *budget) {
     if (!KD_NODE_OK(h, node) || depth > KD_MAX_DEPTH) return;   /* Layer B: bound recursion depth */
     if (*budget == 0) return; (*budget)--;   /* runaway guard: bound total work, not just depth */
     double d2 = kd_dist2_to(h, node, q);
     if (d2 <= r2 && *cnt < cap) { out[*cnt].id = *kd_payload(h, node); out[*cnt].dist2 = d2; (*cnt)++; }
     uint32_t axis = depth % h->dims;
-    double c = kd_coords(h, node)[axis];
-    if (q[axis] - r <= c) kd_radius_rec(h, *kd_left(h, node),  q, r, r2, depth + 1, out, cnt, cap, budget);
-    if (q[axis] + r >= c) kd_radius_rec(h, *kd_right(h, node), q, r, r2, depth + 1, out, cnt, cap, budget);
+    double diff = q[axis] - kd_coords(h, node)[axis];
+    uint32_t near = (diff < 0) ? *kd_left(h, node) : *kd_right(h, node);
+    uint32_t far  = (diff < 0) ? *kd_right(h, node) : *kd_left(h, node);
+    kd_radius_rec(h, near, q, r2, depth + 1, out, cnt, cap, budget);
+    if (diff * diff <= r2)
+        kd_radius_rec(h, far, q, r2, depth + 1, out, cnt, cap, budget);
 }
 
 static uint64_t kd_radius_locked(KdHandle *h, const double *q, double r,
                                  KdRes *out, uint64_t cap) {
     uint64_t cnt = 0, budget = 2 * (uint64_t)h->capacity + 1;   /* a valid tree visits each node once */
-    kd_radius_rec(h, h->hdr->root, q, r, r * r, 0, out, &cnt, cap, &budget);
+    kd_radius_rec(h, h->hdr->root, q, r * r, 0, out, &cnt, cap, &budget);
     return cnt;
 }
 
@@ -1054,11 +1062,9 @@ static uint64_t kd_radius_locked(KdHandle *h, const double *q, double r,
 static inline void kd_clear_locked(KdHandle *h) {
     /* Dirty first: a kill at any point then reads as not cleared (rebuilt) or cleared. */
     h->hdr->dirty = 1;
-    __atomic_signal_fence(__ATOMIC_SEQ_CST);
-    h->hdr->count = 0;
+    __atomic_store_n(&h->hdr->count, 0, __ATOMIC_RELEASE);
     h->hdr->root  = KD_NIL;
-    __atomic_signal_fence(__ATOMIC_SEQ_CST);
-    h->hdr->dirty = 0;
+    __atomic_store_n(&h->hdr->dirty, 0, __ATOMIC_RELEASE);
 }
 
 #endif /* KD_H */

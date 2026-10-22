@@ -58,6 +58,7 @@ use_ok('WWW::Hetzner::Cloud::Certificate');
 use_ok('WWW::Hetzner::Cloud::PlacementGroup');
 use_ok('WWW::Hetzner::Cloud::LoadBalancerType');
 use_ok('WWW::Hetzner::Cloud::Pricing');
+use_ok('WWW::Hetzner::Cloud::Costs');
 
 # Robot API
 use_ok('WWW::Hetzner::Robot');

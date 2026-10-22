@@ -9,7 +9,7 @@ use warnings;
 use Carp qw(carp croak);
 
 use Exporter;
-our $VERSION   = 2.1129;
+our $VERSION   = 2.1131;
 our @ISA       = qw(Exporter);
 our @EXPORT_OK = qw(
 	EDMS_edidx_build

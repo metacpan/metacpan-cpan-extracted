@@ -294,4 +294,36 @@ subtest 'MockIO supports HTTPResponse from route' => sub {
     like($@, qr/Forbidden/, 'HTTPResponse route triggers error handling');
 };
 
+subtest 'LWPIO names the reason for LWP internal failures' => sub {
+    {
+        package Test::StubUA;
+        sub new { bless {}, shift }
+        sub request {
+            my $r = HTTP::Response->new(500, "Can't connect", [
+                'Client-Warning' => 'Internal response',
+                'Content-Type'   => 'text/plain',
+            ], "Can't connect to 127.0.0.1:9 (Connection refused)\n");
+            return $r;
+        }
+    }
+    require HTTP::Response;
+    my $cloud = WWW::Hetzner::Cloud->new(
+        token => 't',
+        io    => WWW::Hetzner::LWPIO->new(ua => Test::StubUA->new),
+    );
+    eval { $cloud->get('/servers') };
+    like($@, qr/Hetzner API error: Can't connect to 127\.0\.0\.1:9/, 'transport reason in error');
+};
+
+subtest 'non-JSON error body contributes status and text' => sub {
+    my $cloud = WWW::Hetzner::Cloud->new(token => 't');
+    my $res = WWW::Hetzner::HTTPResponse->new(
+        status => 502, content => "<html><body><h1>Bad Gateway</h1></body></html>");
+    eval { $cloud->_parse_response($res, 'GET', '/servers') };
+    like($@, qr/Hetzner API error: 502 Bad Gateway/, 'status and stripped text');
+    $res = WWW::Hetzner::HTTPResponse->new(status => 503);
+    eval { $cloud->_parse_response($res, 'GET', '/servers') };
+    like($@, qr/Hetzner API error: 503 at/, 'bare status when no body');
+};
+
 done_testing;

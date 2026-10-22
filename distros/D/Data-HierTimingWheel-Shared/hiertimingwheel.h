@@ -953,7 +953,7 @@ static int64_t hw_add_locked(HwHandle *h, uint64_t delay, uint64_t payload) {
     HwTimer *tm = hw_timer(h, t);
     tm->payload = payload;
     tm->expiry  = E;
-    uint32_t gen = (tm->state >> 1) + 1;                   /* bump generation for this reuse */
+    uint32_t gen = (tm->state + 2u) >> 1;                  /* bump within the 31-bit generation */
     /* Recovery re-bins every active timer by its expiry. */
     __atomic_signal_fence(__ATOMIC_SEQ_CST);
     tm->state   = (gen << 1) | 1u;                         /* low bit = active, upper bits = generation */

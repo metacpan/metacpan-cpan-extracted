@@ -9,9 +9,12 @@
 #include <pdlcore.h>
 static Core *PDL;   /* PDL core C functions; bootstrapped lazily on first as_pdl_alias */
 
-/* deletedata magic for our external (mmap-aliased) data: never free it -- the
-   NDArray handle owns the mapping (kept alive via the piddle's header). */
-static void nda_pdl_nofree(pdl *p, Size_t param) { (void)param; p->data = 0; }
+/* Keep the mapping alive until PDL releases the external data. */
+static void nda_pdl_nofree(pdl *p, Size_t param) {
+    dTHX;
+    p->data = 0;
+    SvREFCNT_dec(INT2PTR(SV *, param));
+}
 
 /* Load PDL::Core and grab its Core struct on first use, so plain use of the module
    without as_pdl_alias does not pull in PDL. */
@@ -22,10 +25,11 @@ static void nda_boot_pdl(pTHX) {
     if (SvTRUE(ERRSV)) croak("%s", SvPV_nolen(ERRSV));
     coresv = get_sv("PDL::SHARE", 0);
     if (!coresv) croak("Data::NDArray::Shared: PDL::Core not loadable (needed for as_pdl_alias)");
-    PDL = INT2PTR(Core *, SvIV(coresv));
-    if (!PDL) croak("Data::NDArray::Shared: got a NULL PDL Core pointer");
-    if (PDL->Version != PDL_CORE_VERSION)
+    Core *core = INT2PTR(Core *, SvIV(coresv));
+    if (!core) croak("Data::NDArray::Shared: got a NULL PDL Core pointer");
+    if (core->Version != PDL_CORE_VERSION)
         croak("Data::NDArray::Shared: please rebuild against the installed PDL (Core version mismatch)");
+    PDL = core;
 }
 #endif
 
@@ -136,7 +140,16 @@ static void nda_fill_bytes(NdaHandle *h, const char *enc, uint32_t nb) {
     uint64_t size = h->size, e;   /* cached immutable count, not peer hdr->size */
     char *base = nda_data(h);
     if (nb == 1) { memset(base, (unsigned char)enc[0], (size_t)size); return; }
-    for (e = 0; e < size; e++) memcpy(base + e * nb, enc, nb);
+#define NDA_FILL_WIDTH(CT) do { \
+    CT v; memcpy(&v, enc, sizeof v); \
+    for (e = 0; e < size; e++) memcpy(base + e * sizeof v, &v, sizeof v); \
+} while (0)
+    switch (nb) {
+        case 2: NDA_FILL_WIDTH(uint16_t); break;
+        case 4: NDA_FILL_WIDTH(uint32_t); break;
+        case 8: NDA_FILL_WIDTH(uint64_t); break;
+    }
+#undef NDA_FILL_WIDTH
 }
 
 /* ----------------------------------------------------------------
@@ -248,12 +261,19 @@ static void nda_elementwise_op_locked(NdaHandle *a, NdaHandle *b, int op) {
  * safe -- only `a` (never readonly; the caller already refused that) takes a
  * lock.  `a` is always the caller's own (mutable) handle, so array_id ordering
  * is only needed -- and only meaningful -- when both sides actually lock. */
+static int nda_array_before(const NdaHandle *a, const NdaHandle *b) {
+    if (a->hdr->array_id != b->hdr->array_id)
+        return a->hdr->array_id < b->hdr->array_id;
+    if (a->device != b->device) return a->device < b->device;
+    return a->inode < b->inode;   /* copied files retain array_id */
+}
+
 static void nda_lock_pair(NdaHandle *a, NdaHandle *b) {
     if (b->readonly) {
         nda_rwlock_wrlock(a);
         return;
     }
-    if (a->hdr->array_id < b->hdr->array_id) {
+    if (nda_array_before(a, b)) {
         nda_rwlock_wrlock(a);
         nda_rwlock_rdlock(b);
     } else {
@@ -266,7 +286,7 @@ static void nda_unlock_pair(NdaHandle *a, NdaHandle *b) {
         nda_rwlock_wrunlock(a);
         return;
     }
-    if (a->hdr->array_id < b->hdr->array_id) {
+    if (nda_array_before(a, b)) {
         nda_rwlock_rdunlock(b);
         nda_rwlock_wrunlock(a);
     } else {
@@ -275,8 +295,23 @@ static void nda_unlock_pair(NdaHandle *a, NdaHandle *b) {
     }
 }
 
+static int nda_same_array(pTHX_ NdaHandle *a, NdaHandle *b) {
+    if (a->hdr->array_id != b->hdr->array_id) return 0;
+    NdaHandle *pair[2] = { a, b };
+    for (int i = 0; i < 2; i++) {
+        NdaHandle *h = pair[i];
+        if (!h->inode && h->backing_fd >= 0) {
+            struct stat st;
+            if (fstat(h->backing_fd, &st) < 0) croak("Data::NDArray::Shared: fstat: %s", strerror(errno));
+            h->device = st.st_dev;
+            h->inode = st.st_ino;
+        }
+    }
+    return a->inode && a->inode == b->inode && a->device == b->device;
+}
+
 /* Shared body of add/subtract/multiply: validate `other`, take the locks in a
- * deadlock-free id order (or a single wrlock for self/same-id), apply the
+ * deadlock-free id order (or a single wrlock for the same mapping), apply the
  * element-wise op, bump stat_ops, and unlock.  `op` is '+', '-' or '*'; `who`
  * is the fully-qualified method name used in croak messages. */
 static void nda_do_elementwise(pTHX_ SV *self_sv, NdaHandle *h, SV *other, int op, const char *who) {
@@ -296,7 +331,7 @@ static void nda_do_elementwise(pTHX_ SV *self_sv, NdaHandle *h, SV *other, int o
     if (o->size != h->size)   /* cached immutable counts, not peer hdr->size */
         croak("%s: size mismatch (%" UVuf " vs %" UVuf ")",
               who, (UV)h->size, (UV)o->size);
-    if (o == h || o->hdr->array_id == h->hdr->array_id) {
+    if (o == h || nda_same_array(aTHX_ h, o)) {
         nda_rwlock_wrlock(h);
         if (h->hdr->sealed) { nda_rwlock_wrunlock(h); croak("%s: array is frozen (read-only)", who); }
         nda_elementwise_op_locked(h, h, op);   /* self: +=->double, -=->zero, *=->square */
@@ -1019,20 +1054,10 @@ _alias_pdl_create(self, datatype, dims_av)
   CODE:
 #ifdef HAVE_PDL
     {
-        /* Frozen: the mapping is PROT_READ.  PDL_READONLY (PDL's own "throw
-         * error if given as output to xform" flag) blocks ordinary in-place
-         * writes (.=, +=, ->inplace->...) with a clean croak, but NOT every PDL
-         * write path -- $piddle->set(...) pokes the buffer directly and does
-         * NOT check it, so a PDL_READONLY-flagged alias can still SIGSEGV
-         * (confirmed empirically).  There is no PDL mechanism that reliably
-         * blocks every write path, so refuse the zero-copy alias outright on a
-         * frozen handle rather than hand out a piddle with a real, if narrower,
-         * crash hazard; to_pdl gives a safe (copied) piddle instead. */
-        if (h->readonly)
+        /* PDL's readonly flag does not cover every write path. */
+        if (h->readonly || h->hdr->sealed)
             croak("Data::NDArray::Shared->as_pdl_alias: array is frozen (read-only); "
-                  "a zero-copy alias would risk writing into the read-only mapping "
-                  "(not all PDL write paths are read-only-safe) -- use to_pdl for a "
-                  "safe copy instead");
+                  "use to_pdl for a safe copy instead");
         IV nd = av_len(dims_av) + 1, i;
         PDL_Indx dims[NDA_MAX_DIMS];
         pdl_error err;
@@ -1050,12 +1075,20 @@ _alias_pdl_create(self, datatype, dims_av)
         err = PDL->setdims(p, dims, (PDL_Indx)nd);
         if (err.error) { PDL->destroy(p); croak("Data::NDArray::Shared: PDL->setdims failed"); }
         REEXTRACT(self);
-        if (h->readonly)   /* REEXTRACT re-reads h; re-check in case magic mid-call froze it */
+        if (h->readonly || h->hdr->sealed) {
+            PDL->destroy(p);
             croak("Data::NDArray::Shared->as_pdl_alias: array is frozen (read-only); "
                   "use to_pdl for a safe copy instead");
+        }
         p->data = nda_data(h);                    /* alias the shared mmap */
         p->state |= PDL_DONTTOUCHDATA | PDL_ALLOCATED;
-        PDL->add_deletedata_magic(p, nda_pdl_nofree, 0);
+        SV *owner = newSVsv(self);
+        err = PDL->add_deletedata_magic(p, nda_pdl_nofree, (Size_t)PTR2UV(owner));
+        if (err.error) {
+            SvREFCNT_dec(owner);
+            PDL->destroy(p);
+            croak("Data::NDArray::Shared: PDL->add_deletedata_magic failed");
+        }
         RETVAL = newSV(0);
         PDL->SetSV_PDL(RETVAL, p);                /* wrap the pdl as its Perl object */
     }

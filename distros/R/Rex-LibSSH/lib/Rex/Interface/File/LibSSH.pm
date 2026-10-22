@@ -1,7 +1,7 @@
 # ABSTRACT: Rex remote file handle via Net::LibSSH exec channels
 
 package Rex::Interface::File::LibSSH;
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 use strict;
 use warnings;
 
@@ -33,16 +33,33 @@ sub open {
     if ( $mode eq '>' || $mode eq '>>' ) {
         my $cmd = $mode eq '>' ? "cat > $qpath" : "cat >> $qpath";
         my $ch  = $ssh->channel or die "LibSSH File: failed to open channel";
-        $ch->exec($cmd);
+        unless ( $ch->exec($cmd) ) {
+            $ch->close;
+            Rex::Logger::debug("LibSSH File::open: exec failed for $path");
+            return 0;
+        }
         $self->{ch}  = $ch;
         $self->{buf} = '';
     }
     elsif ( $mode eq '<' ) {
         my $ch = $ssh->channel or die "LibSSH File: failed to open channel";
-        $ch->exec("cat $qpath");
-        $self->{buf} = $ch->read;
-        $self->{pos} = 0;
+        unless ( $ch->exec("cat $qpath") ) {
+            $ch->close;
+            Rex::Logger::debug("LibSSH File::open: exec failed for $path");
+            return 0;
+        }
+        my $buf  = $ch->read;
+        my $exit = $ch->exit_status;
         $ch->close;
+
+        # A missing or unreadable file must not read as an empty one: stock
+        # Rex::Interface::File::SSH::open returns false there and callers test it.
+        if ( $exit != 0 ) {
+            Rex::Logger::debug("LibSSH File::open: cat $path exited $exit");
+            return 0;
+        }
+        $self->{buf} = $buf;
+        $self->{pos} = 0;
     }
     else {
         die "LibSSH File: unsupported mode '$mode'";
@@ -66,7 +83,13 @@ sub write {
     utf8::encode($buf)
         if Rex::Config->get_write_utf8_files && utf8::is_utf8($buf);
 
-    $self->{ch}->write($buf);
+    my $ch = $self->{ch}
+        or die "LibSSH File: write on a handle that is not open for writing\n";
+
+    my $n = $ch->write($buf);
+    die "LibSSH File: write to $self->{path} failed\n"
+        if !defined $n || $n < 0;
+    return $n;
 }
 
 sub seek {
@@ -76,12 +99,18 @@ sub seek {
 
 sub close {
     my ($self) = @_;
-    if ( $self->{ch} ) {
-        $self->{ch}->send_eof;
-        $self->{ch}->read;    # drain
-        $self->{ch}->close;
-        undef $self->{ch};
-    }
+    my $ch = delete $self->{ch} or return 1;
+
+    $ch->send_eof;
+    $ch->read;    # drain
+    my $exit = $ch->exit_status;
+    $ch->close;
+
+    # cat exits non-zero on a full disk, a read-only filesystem or a missing
+    # parent directory; Rex then renames the truncated temp file into place.
+    die "LibSSH File: writing $self->{path} failed (exit $exit)\n"
+        if $exit != 0;
+    return 1;
 }
 
 # Shell-quote a single path component.
@@ -111,7 +140,7 @@ Rex::Interface::File::LibSSH - Rex remote file handle via Net::LibSSH exec chann
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 DESCRIPTION
 
@@ -121,6 +150,12 @@ interface using L<Net::LibSSH> exec channels.
 Write modes (C<E<gt>> and C<E<gt>E<gt>>) open a channel running C<cat
 E<gt>> or C<cat E<gt>E<gt>> on the remote. Writes are streamed directly
 over the SSH connection and committed when C<close()> is called.
+
+Failures are reported: C<open> returns false when the exec request fails or,
+in read mode, when C<cat> exits non-zero (missing or unreadable file);
+C<write> dies on a failed write; C<close> dies when the remote C<cat> exited
+non-zero, which is where a write into a missing directory or onto a full
+disk shows up.
 
 Read mode (C<E<lt>>) slurps the entire file via C<cat> and buffers it
 locally; C<read()> and C<seek()> operate on the local buffer.

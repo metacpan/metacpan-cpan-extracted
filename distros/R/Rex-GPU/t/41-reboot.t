@@ -66,6 +66,19 @@ sub reboot_on {
 
 my $SHUTDOWN = q{run: nohup sh -c 'sleep 2 && shutdown -r now' >/dev/null 2>&1 &};
 my @PROBE_OK = ( [ 'echo ok' => 'ok', 0 ] );
+my $BOOT_CMD = 'run: cat /proc/sys/kernel/random/boot_id 2>/dev/null';
+my $ID_OLD   = '11111111-2222-3333-4444-555555555555';
+my $ID_NEW   = 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee';
+
+# `cat .../boot_id` answers the given ids in order, the last one repeating.
+sub boot_ids {
+  my ( @ids ) = @_;
+  my $n = 0;
+  return [ 'cat /proc/sys/kernel/random/boot_id 2>/dev/null' => sub {
+    my $id = $ids[ $n < $#ids ? $n++ : $#ids ];
+    return ( $id, length $id ? 0 : 1 );
+  } ];
+}
 
 #### install_driver(reboot => 1)
 
@@ -81,7 +94,8 @@ subtest 'install_driver(reboot => 1): one shutdown -r, no modprobe' => sub {
   my ( $at ) = grep { $lines[$_] eq $SHUTDOWN } 0 .. $#lines;
   is_deeply([ grep { /modprobe/ } @lines[$at .. $#lines] ], [], 'no modprobe after it');
   is_deeply([ grep { /modprobe nvidia/ } @lines ], [], 'no modprobe nvidia at all');
-  is($lines[$at - 1], 'run: update-initramfs -u 2>/dev/null', 'reboot comes right after the initramfs rebuild');
+  is($lines[$at - 1], $BOOT_CMD, 'the boot_id is read right before the reboot (karr #78)');
+  is($lines[$at - 2], 'run: update-initramfs -u 2>/dev/null', '... after the initramfs rebuild');
   is($lines[$at + 1], 'run: echo ok', 'then the reconnect probe');
   is_deeply($slept, [ 20 ], 'slept 20 s, reconnected on the first try');
   is($conn->{reconnects}, 1, 'one reconnect');
@@ -92,9 +106,9 @@ subtest 'install_driver(reboot => 1): one shutdown -r, no modprobe' => sub {
     host => host_profile('debian-12'),
     code => sub { Rex::GPU::NVIDIA::install_driver(gpu => gpu_fixture('ada')) }
   );
-  my @before = @lines[0 .. $at - 1];
-  is_deeply(\@before, [ @{ $plain->{lines} }[0 .. $at - 1] ], 'same commands as without reboot up to the reboot');
-  is($plain->{lines}[$at], 'run: modprobe nvidia', '... where the no-reboot install runs modprobe instead');
+  my @before = @lines[0 .. $at - 2];
+  is_deeply(\@before, [ @{ $plain->{lines} }[0 .. $at - 2] ], 'same commands as without reboot up to the reboot (boot_id read aside)');
+  is($plain->{lines}[$at - 1], 'run: modprobe nvidia', '... where the no-reboot install runs modprobe instead');
 };
 
 subtest 'install_driver(reboot => 1) with a working driver: no reboot' => sub {
@@ -117,7 +131,7 @@ subtest 'reconnect fails 3 times, then comes back' => sub {
     code       => sub { Rex::GPU::NVIDIA::_reboot_and_wait() }
   );
   is($rec->{error}, undef, 'no die');
-  is_deeply($rec->{lines}, [ $SHUTDOWN, 'run: echo ok' ],
+  is_deeply($rec->{lines}, [ $BOOT_CMD, $SHUTDOWN, 'run: echo ok' ],
     'the reboot command, then the probe only once the reconnect succeeded');
   is($conn->{reconnects}, 4, 'four reconnects');
   is($conn->{disconnects}, 4, 'each after a disconnect');
@@ -134,7 +148,7 @@ subtest 'never comes back: dies after 60 tries' => sub {
     code       => sub { Rex::GPU::NVIDIA::_reboot_and_wait() }
   );
   like($rec->{error}, qr/^Host did not come back after reboot$/, 'dies with "did not come back"');
-  is_deeply($rec->{lines}, [ $SHUTDOWN ], 'the reboot command only -- the probe never ran');
+  is_deeply($rec->{lines}, [ $BOOT_CMD, $SHUTDOWN ], 'the boot_id read and the reboot command only -- the probe never ran');
   is($conn->{reconnects}, 60, '60 reconnects');
   is_deeply($slept, [ 20, (5) x 60 ], '20 s, then 60 x 5 s');
 };
@@ -183,6 +197,60 @@ subtest 'probe output that only contains ok is not ok' => sub {
     code => sub { Rex::GPU::NVIDIA::_reboot_and_wait() }
   );
   like($rec->{error}, qr/did not come back/, 'an error message is not the probe answering');
+};
+
+#### The boot's identity counts, not that something answers (karr #78)
+
+subtest 'new boot_id after the reconnect: back, same order and timings' => sub {
+  my ( $rec, $conn, $slept ) = reboot_on(
+    host => host_profile('debian-12', responses => [ @PROBE_OK, boot_ids($ID_OLD, $ID_NEW) ]),
+    code => sub { Rex::GPU::NVIDIA::_reboot_and_wait() }
+  );
+  is($rec->{error}, undef, 'no die');
+  is_deeply($rec->{lines}, [ $BOOT_CMD, $SHUTDOWN, 'run: echo ok', $BOOT_CMD ],
+    'boot_id, reboot, probe, boot_id again');
+  is_deeply($slept, [ 20 ], 'slept 20 s, back on the first try');
+  ok((grep { $_->[1] =~ /Host is back online \(after ~25s\)/ } @{ $rec->{logs} }), 'back online after ~25s');
+};
+
+subtest 'same boot_id: the old host still shutting down, keeps waiting' => sub {
+  my ( $rec, $conn, $slept ) = reboot_on(
+    host => host_profile('debian-12', responses => [ @PROBE_OK, boot_ids($ID_OLD) ]),
+    code => sub { Rex::GPU::NVIDIA::_reboot_and_wait() }
+  );
+  like($rec->{error}, qr/^Host did not come back after reboot$/, 'dies with "did not come back"');
+  is($conn->{reconnects}, 60, '60 reconnects');
+  ok(!(grep { $_->[1] =~ /back online/ } @{ $rec->{logs} }), 'never reported back online');
+};
+
+subtest 'same boot_id twice, then a new one: back on the third try' => sub {
+  my ( $rec, $conn, $slept ) = reboot_on(
+    host => host_profile('debian-12', responses => [ @PROBE_OK, boot_ids($ID_OLD, $ID_OLD, $ID_OLD, $ID_NEW) ]),
+    code => sub { Rex::GPU::NVIDIA::_reboot_and_wait() }
+  );
+  is($rec->{error}, undef, 'no die');
+  is($conn->{reconnects}, 3, 'three reconnects');
+  is_deeply($slept, [ 20, 5, 5 ], 'waited after the two stale answers');
+};
+
+subtest 'boot_id unreadable afterwards: not proven, keeps waiting' => sub {
+  my ( $rec ) = reboot_on(
+    host => host_profile('debian-12', responses => [ @PROBE_OK, boot_ids($ID_OLD, '') ]),
+    code => sub { Rex::GPU::NVIDIA::_reboot_and_wait() }
+  );
+  like($rec->{error}, qr/did not come back/, 'an empty read is not a new boot');
+};
+
+subtest 'boot_id unreadable before: reboot still happens, answer-only as before' => sub {
+  my ( $rec, $conn, $slept ) = reboot_on(
+    host => host_profile('debian-12', responses => [ @PROBE_OK, boot_ids('') ]),
+    code => sub { Rex::GPU::NVIDIA::_reboot_and_wait() }
+  );
+  is($rec->{error}, undef, 'no die');
+  is_deeply($rec->{lines}, [ $BOOT_CMD, $SHUTDOWN, 'run: echo ok' ],
+    'shutdown still sent, no second boot_id read');
+  ok((grep { $_->[1] =~ /boot_id not readable/ } @{ $rec->{logs} }), 'logged');
+  is_deeply($slept, [ 20 ], 'timings unchanged');
 };
 
 done_testing;

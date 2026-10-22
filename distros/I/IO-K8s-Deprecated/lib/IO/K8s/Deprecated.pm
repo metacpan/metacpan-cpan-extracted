@@ -1,5 +1,5 @@
 package IO::K8s::Deprecated;
-our $VERSION = '1.105';
+our $VERSION = '1.111';
 # ABSTRACT: Registry of CPAN redirect stubs for renamed/retired IO::K8s modules
 
 use strict;
@@ -20,7 +20,7 @@ IO::K8s::Deprecated - Registry of CPAN redirect stubs for renamed/retired IO::K8
 
 =head1 VERSION
 
-version 1.105
+version 1.111
 
 =head1 DESCRIPTION
 
@@ -81,11 +81,16 @@ normally and uniformly with the rest of the distribution
 C<version_finder> restriction in C<dist.ini>). There is no per-tombstone
 hand-frozen C<$VERSION>. The starting version, C<1.105>, was chosen for one
 reason: it is safely past C<IO-K8s 1.100>, the last CPAN release that
-shipped any of these module names. IO-K8s will never ship these names
-again (they are permanently removed, not merely between releases), and
-this distribution's own version only ever increases from here, so
-C<1.105> stays ahead of that target for good without further
-special-casing.
+shipped any of these module names, and this distribution's own version
+only ever increases from here, so it stays ahead of that target for good
+without further special-casing.
+
+That rests on IO-K8s not shipping these names again -- which is an
+assumption about another distribution, not something a version number can
+enforce. It has failed once (see L</NO LONGER TOMBSTONED>), so it is
+checked: C<t/02-name-guard.t> fails as soon as a package shipped here is
+also shipped by the current IO-K8s. A name that comes back in IO-K8s
+loses its tombstone here; it does not get a higher version.
 
 If a future tombstone is ever added for a name whose last-shipped version
 is higher than whatever version this dist has reached by then, confirm
@@ -101,15 +106,16 @@ the sharedir at build time).
 
 =head1 CURRENT TOMBSTONES
 
-=head2 Consolidated into the generic IO::K8s::List (76 classes)
+=head2 Consolidated into the generic IO::K8s::List (74 classes)
 
 IO-K8s replaced every per-resource C<*List> class with a single generic
 L<IO::K8s::List> back in its C<1.00> Moose-to-Moo rewrite. Each of the
 classes below was never a real class in the C<1.x> series -- it only
 emitted a deprecation warning on load. C<IO-K8s> C<1.100> was the last CPAN
-release to ship even that warning stub; all 76 were dropped from the
-distribution outright afterwards. Every one of them redirects to the same
-successor:
+release to ship even that warning stub; all 76 such stubs were dropped from
+the distribution outright afterwards. 74 of them stayed gone and are
+tombstoned here (for the other two see L</NO LONGER TOMBSTONED>). Every one
+of them redirects to the same successor:
 
   IO::K8s::Api::Admissionregistration::V1alpha1::InitializerConfigurationList
   IO::K8s::Api::Admissionregistration::V1beta1::MutatingWebhookConfigurationList
@@ -160,8 +166,6 @@ successor:
   IO::K8s::Api::Extensions::V1beta1::NetworkPolicyList
   IO::K8s::Api::Extensions::V1beta1::PodSecurityPolicyList
   IO::K8s::Api::Extensions::V1beta1::ReplicaSetList
-  IO::K8s::Apimachinery::Pkg::Apis::Meta::V1::APIGroupList
-  IO::K8s::Apimachinery::Pkg::Apis::Meta::V1::APIResourceList
   IO::K8s::Api::Networking::V1::NetworkPolicyList
   IO::K8s::Api::Policy::V1beta1::PodDisruptionBudgetList
   IO::K8s::Api::Policy::V1beta1::PodSecurityPolicyList
@@ -188,7 +192,7 @@ successor:
   IO::K8s::KubeAggregator::Pkg::Apis::Apiregistration::V1::APIServiceList
   IO::K8s::KubeAggregator::Pkg::Apis::Apiregistration::V1beta1::APIServiceList
 
-All 76 redirect to: L<IO::K8s::List>.
+All 74 redirect to: L<IO::K8s::List>.
 
 =head2 Removed -- classic DRA control-plane-controller allocation (4 classes)
 
@@ -213,6 +217,32 @@ lingering old-cluster backward-compatibility rationale to keep them around
 in IO-K8s: DRA itself was alpha-only when these shipped, never GA, so
 there was no "still-supported older cluster" depending on this API the way
 there is for a long-GA API's deprecated beta track.
+
+=head1 NO LONGER TOMBSTONED
+
+Release C<1.105> of this distribution shipped tombstones for two more names,
+swept up with the C<*List> classes above because IO-K8s had carried them as
+the same kind of warning stub up to C<1.100>:
+
+  IO::K8s::Apimachinery::Pkg::Apis::Meta::V1::APIGroupList
+  IO::K8s::Apimachinery::Pkg::Apis::Meta::V1::APIResourceList
+
+They are not lists of resources, though, but the C<meta.v1> Kinds the API
+server answers discovery requests with -- they carry C<groups> and
+C<resources>, not C<items>, so L<IO::K8s::List> was never a replacement for
+them. C<IO-K8s> C<1.106> ships both again as real classes. A name IO-K8s
+ships is not an orphan, and a tombstone for it does harm: both
+distributions install the same file, so whichever is installed last wins,
+and installing this distribution after IO-K8s replaced the working classes
+with stubs that die on load. Both tombstones were therefore removed.
+
+If C<IO-K8s-Deprecated> C<1.105> was installed on top of C<IO-K8s> C<1.106>
+or later, upgrading this distribution does not bring the two classes back
+-- an installer does not delete files a newer release no longer ships.
+Reinstall IO-K8s (C<cpanm --reinstall IO::K8s>) to restore them.
+
+The rule this left behind -- no package shipped here may be shipped by the
+current IO-K8s -- is held by C<t/02-name-guard.t>.
 
 =head1 CONSIDERED BUT NOT TOMBSTONED
 

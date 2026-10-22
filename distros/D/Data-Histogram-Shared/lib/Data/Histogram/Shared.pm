@@ -1,7 +1,7 @@
 package Data::Histogram::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 require XSLoader;
 XSLoader::load('Data::Histogram::Shared', $VERSION);
 
@@ -52,24 +52,20 @@ Data::Histogram::Shared - shared-memory HdrHistogram for Linux
 
 =head1 DESCRIPTION
 
-A High Dynamic Range histogram (HdrHistogram) in shared memory: a compact,
-fixed-size structure that records B<integer> values across a very wide range and
-answers percentile, minimum, maximum and mean queries within a fixed,
-configurable relative error. It is the standard tool for latency and response-
-time measurement, where the values of interest span many orders of magnitude
-(microseconds to seconds) yet a constant number of significant figures must be
-preserved across the whole range.
+A High Dynamic Range histogram (HdrHistogram) in shared memory: a fixed-size
+structure for recording B<integer> values over a wide range and querying
+percentiles, minimum, maximum and mean. It is suited to latency measurements
+that span many orders of magnitude (microseconds to seconds).
 
 You construct the histogram with the C<lowest> and C<highest> values it must
 track and the number of C<sig_figs> (significant figures) of precision you
 require. Values are bucketed logarithmically -- one bucket per power of two of
-magnitude -- and linearly within each bucket, so that any two values that agree
-to C<sig_figs> significant figures fall into the same sub-bucket and are treated
-as B<equivalent>. A percentile query is therefore accurate to within
-C<1 / 10**sig_figs> relative error: with the default 3 significant figures, a
-reported percentile is within 0.1% of the true value. Memory is proportional to
-the dynamic range and the precision, B<not> to the number of values recorded:
-you can record billions of samples into a few kilobytes of counters.
+magnitude -- and linearly within each bucket. Values in the same sub-bucket are
+B<equivalent>. Bucket widths are at most C<1 / 10**sig_figs> of the value,
+except where the minimum width C<2**floor(log2($lowest))> dominates.
+Memory is proportional to the dynamic range and the precision, B<not> to the
+number of values recorded:
+you can record billions of samples into a fixed array of counters.
 
 The histogram stores B<integer> values only. To record floating-point
 quantities, scale them to integers yourself before recording -- for example,
@@ -97,7 +93,7 @@ the two input streams. B<Linux-only>. Requires 64-bit Perl.
     my $ro = Data::Histogram::Shared->new_readonly($path);   # frozen file, read-only
 
 C<$path> is the backing file (C<undef> or omitted for an anonymous mapping).
-C<$lowest> is the lowest value that can be distinguished from 0 and must be
+C<$lowest> sets the minimum resolution and must be
 C<E<gt>= 1> (default 1). C<$highest> is the highest value that can be tracked and
 must be C<E<gt>= 2 * $lowest> (default C<3_600_000_000>, i.e. one hour in
 microseconds). C<$sig_figs> is the number of significant figures of precision
@@ -148,7 +144,7 @@ C<record> adds C<$n> (default 1) occurrences of the integer C<$value> to the
 histogram and returns the new C<total_count>. C<$value> must be in the range
 C<0 .. $highest>: a negative value croaks, and a value above C<$highest> croaks
 (C<"value ... exceeds highest_trackable_value">). Values strictly below
-C<$lowest> are recorded but collapse into the lowest sub-bucket. C<$n> is an
+C<$lowest> are recorded at the minimum bucket width. C<$n> is an
 unsigned integer.
 
 C<record_many> takes an array reference and records each element once under a
@@ -156,12 +152,9 @@ single write lock, returning the number recorded. Every element is range-checked
 B<before> the lock is taken, so an out-of-range element croaks without recording
 any of the batch (and without holding the lock).
 
-The B<precision contract>: any two values that agree to C<sig_figs> significant
-figures are B<equivalent> -- they fall into the same sub-bucket and are
-indistinguishable once recorded. A value read back out of the histogram (for
-example via a percentile query) is the B<highest> value equivalent to the bucket
-it landed in, so it is always C<E<gt>= > the recorded value and within
-C<1 / 10**sig_figs> relative error of it.
+Percentiles return the B<highest equivalent value> of the selected bucket.
+They can exceed the largest recorded value or the configured C<$highest>
+when either lies inside a bucket.
 
 =head2 Querying
 
@@ -256,6 +249,9 @@ or the handle that called C<freeze>), else 0.
 
 =head1 SHARING ACROSS PROCESSES
 
+Processes sharing a B<mutable> histogram must be in the same PID namespace;
+lock recovery uses local process IDs.
+
 The histogram lives in a shared mapping, shared the same three ways as the rest
 of the family: a B<backing file> (every process calls C<< new($path, ...) >> on
 the same path with matching geometry), an B<anonymous mapping inherited across
@@ -326,21 +322,20 @@ its contents while other processes are using it.
 
 Mutation is guarded by a futex-based write-preferring rwlock with PID-encoded
 ownership; if a holder dies, the next contender detects the dead owner and
-recovers. Each count increment is a single word store, so a crash leaves the
-histogram consistent up to the last completed C<record>. A C<merge> killed
-part-way is left partly applied, and a C<reset> killed part-way leaves some old
-counts behind, which skew percentiles and the mean until the next C<reset>.
+recovers. Recovery releases locks; it does not roll back an interrupted
+mutation. A killed C<record>, C<merge> or C<reset> can leave partially applied
+counts or extrema, skewing percentiles and the mean until the next C<reset>.
 B<Limitation>: PID reuse is not detected (very unlikely in practice).
 
 Reader-slot exhaustion (slotless readers): dead-process recovery attributes a
 crashed lock holder's contribution through its reader-slot. The slot table holds
-1024 entries (one per concurrent reader process). If more than that many reader
-processes share one mapping at once, a reader that cannot claim a slot proceeds
+1024 entries (one per handle that takes a lock). If more than that many handles
+share one mapping at once, a reader that cannot claim a slot proceeds
 "slotless" -- it still takes the read lock but leaves no per-process record. If
 such a slotless reader is then killed while holding the read lock, its share of
 the lock cannot be attributed to a dead process, so writer recovery cannot
 reclaim it and writers may block until the mapping is recreated. Reaching this
-needs more than 1024 concurrent reader processes on one mapping plus a crash in
+needs more than 1024 handles on one mapping plus a crash in
 the brief read-lock window; the dead-process slot reclaim keeps the table from
 filling with stale entries, so in practice it is very unlikely.
 

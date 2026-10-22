@@ -1,5 +1,8 @@
 Revision history for Perl extension IO-Capture-Extended
 
+0.14 Wed Oct 21 08:44:19 PM EDT 2026
+    - No change in functionality; update Makefile.PL
+
 0.13 Wed Mar 11 19:06:32 EDT 2015
     - Add metadata to Makefile.PL.
 

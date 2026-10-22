@@ -737,8 +737,6 @@ query_radius_many(self, queries)
     AV *qav = (AV *)SvRV(queries);
     sv_2mortal(SvREFCNT_inc((SV *)qav));   /* pin the arrayref: element magic below cannot free it mid-loop */
     SSize_t nq = av_len(qav) + 1;
-    AV *out = newAV();
-    if (nq > 0) av_extend(out, nq - 1);
     int err = 0;                                  /* 0 ok, 1 OOM, 2 TOOBIG */
     struct qr_row { double c[3]; double r; int dims; } *Q = NULL;
     if (nq > 0) { Newxz(Q, nq, struct qr_row); SAVEFREEPV(Q); }
@@ -787,11 +785,12 @@ query_radius_many(self, queries)
     if (!h->readonly) sph_rwlock_rdunlock(h);
     if (err) {
         for (SSize_t i = 0; i < nq; i++) free(R[i].vals);   /* free what Phase 2 collected */
-        SvREFCNT_dec((SV *)out);
         if (err == 1) croak("query_radius_many: out of memory");
         croak(SPH_TOOBIG_MSG, (unsigned)SPH_MAX_QUERY_CELLS);
     }
     /* Phase 3: build the Perl result tree with NO lock held. */
+    AV *out = newAV();
+    if (nq > 0) av_extend(out, nq - 1);
     for (SSize_t i = 0; i < nq; i++) {
         AV *res = newAV();
         if (R[i].n) {

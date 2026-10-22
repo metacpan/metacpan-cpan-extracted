@@ -1,5 +1,5 @@
 package Perl::Critic::Policy::ProhibitUnusedDefinitions;
-$Perl::Critic::Policy::ProhibitUnusedDefinitions::VERSION = '0.005';
+$Perl::Critic::Policy::ProhibitUnusedDefinitions::VERSION = '0.006';
 # ABSTRACT: A sub nobody calls, or a global nobody reads, is code nobody needs.
 
 use 5.014;
@@ -28,13 +28,7 @@ Readonly::Hash my %DESC_FOR => (
     global   => q{Global %s is never used in bin/, lib/, t/ or xt/},
 );
 
-Readonly::Scalar my $DEFAULT_ALLOW_SUBS => join ' ', qw{
-  BEGIN END INIT CHECK UNITCHECK AUTOLOAD DESTROY import unimport CLONE CLONE_SKIP
-  BUILD BUILDARGS DEMOLISH FOREIGNBUILDARGS
-  TIESCALAR TIEARRAY TIEHASH TIEHANDLE FETCH STORE FETCHSIZE STORESIZE EXTEND
-  EXISTS DELETE CLEAR PUSH POP SHIFT UNSHIFT SPLICE FIRSTKEY NEXTKEY SCALAR UNTIE
-  PRINT PRINTF WRITE READ READLINE GETC CLOSE OPEN BINMODE EOF FILENO SEEK TELL
-};
+Readonly::Scalar my $DEFAULT_ALLOW_SUBS => join ' ', Perl::Critic::Distribution->called_by_perl();
 
 Readonly::Scalar my $DEFAULT_ALLOW_GLOBALS => join ' ', qw{
   $VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS $AUTOLOAD
@@ -93,18 +87,7 @@ sub supported_parameters {
             default_string => $DEFAULT_ALLOW_GLOBALS,
             behavior       => 'string list',
         },
-        {
-            name           => 'cache',
-            description    => 'Keep the index of each distribution on disk between runs.',
-            default_string => '1',
-            behavior       => 'boolean',
-        },
-        {
-            name           => 'cache_dir',
-            description    => 'Where the index is kept.  Empty means the default of Perl::Critic::Distribution.',
-            default_string => q{},
-            behavior       => 'string',
-        },
+        Perl::Critic::Distribution->policy_parameters(),
     );
 }
 
@@ -156,7 +139,7 @@ sub _definitions_in {
     # Only a file in bin/ or lib/ is checked.
     my $definitions;
     my ( undef, $area ) = Perl::Critic::Distribution->root_of( $doc->filename() );
-    if ( $area && $AREA_OF{$area} eq 'code' && ( my $dist = $self->_distribution( $doc->filename() ) ) ) {
+    if ( $area && $AREA_OF{$area} eq 'code' && ( my $dist = Perl::Critic::Distribution->for_file( $doc->filename(), cache => $self->{_cache}, cache_dir => $self->{_cache_dir} ) ) ) {
         my %by_elem;
         foreach my $def ( @{ _walk_document( $doc->ppi_document() )->{defs} } ) {
             my ( $elem, @kind_and_key ) = @$def;
@@ -186,16 +169,6 @@ sub _is_needed {
         }
     }
     return 0;
-}
-
-# The distribution of a file, with the cache that this policy is configured
-# with: none when cache is off, the default when cache_dir is empty.
-sub _distribution {
-    my ( $self, $file ) = @_;
-
-    return Perl::Critic::Distribution->for_file( $file, cache_dir => undef )               if !$self->{_cache};
-    return Perl::Critic::Distribution->for_file( $file, cache_dir => $self->{_cache_dir} ) if $self->{_cache_dir};
-    return Perl::Critic::Distribution->for_file($file);
 }
 
 # Every definition, export and use in the distribution.  A file's uses are
@@ -295,40 +268,25 @@ sub _walk_document {
     return \%found;
 }
 
-# In source order, so each token is seen with the package and sub it is in.
-# $pkg changes among siblings and is passed down, never back up, which is how
-# a package statement ends with its enclosing block.
+# Each definition and use under $node, which is in $pkg and in the sub $in_sub.
 sub _walk {
     my ( $node, $pkg, $in_sub, $found ) = @_;
 
-    foreach my $child ( $node->children() ) {
-        if ( $child->isa('PPI::Statement::Package') ) {
-            my ($block) = grep { $_->isa('PPI::Structure::Block') } $child->schildren();
-            if ($block) {
-                _walk( $block, $child->namespace(), $in_sub, $found );
+    Perl::Critic::Distribution->walk(
+        $node,
+        sub {
+            my ( $child, $package, $sub ) = @_;
+            if ( $child->isa('PPI::Statement::Sub') && !$child->forward() ) {
+                push @{ $found->{defs} }, [ $child, 'sub', _qualify( $package, $child->name() ) ];
             }
-            else {
-                $pkg = $child->namespace();
+            elsif ( $child->isa('PPI::Statement') ) {
+                _definitions( $child, $package, $found );
             }
-            next;
-        }
-
-        if ( $child->isa('PPI::Statement::Sub') && !$child->forward() ) {
-            my $key = _qualify( $pkg, $child->name() );
-            push @{ $found->{defs} }, [ $child, 'sub', $key ];
-            _walk( $child, $pkg, $key, $found );
-            next;
-        }
-
-        _definitions( $child, $pkg, $found ) if $child->isa('PPI::Statement');
-
-        if ( $child->isa('PPI::Node') ) {
-            _walk( $child, $pkg, $in_sub, $found );
-        }
-        else {
-            _token( $child, $pkg, $in_sub, $found );
-        }
-    }
+            _token( $child, $package, $sub, $found ) if !$child->isa('PPI::Node');
+        },
+        package => $pkg,
+        sub     => $in_sub,
+    );
     return;
 }
 
@@ -493,7 +451,7 @@ Perl::Critic::Policy::ProhibitUnusedDefinitions - A sub nobody calls, or a globa
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 Perl::Critic::Policy::ProhibitUnusedDefinitions
 

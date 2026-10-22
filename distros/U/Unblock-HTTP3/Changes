@@ -1,5 +1,23 @@
 Revision history for Unblock-HTTP3
 
+0.13  2026-10-18
+    - Add bounded buffered HTTP/3 receive lifecycle and per-transaction
+      on_data/on_finish callbacks for the unified Unblock::HTTP layer.
+    - Keep the same native transaction and canonical Uniform message identity;
+      isolate body-limit failures per HTTP/3 stream.
+    - Require the published standalone Net::QUIC 0.05 distribution and use
+      optional credit-limited Stream->send_some in the HTTP/3 output bridge.
+    - Rely on Net::QUIC 0.05 targeted shared-capacity waiter notifications,
+      preserving fair progress under multiple slow streaming producers.
+    - Avoid unbounded retention of completed callback-delivered HTTP/3
+      Transactions and body buffers in optional pull-notification queues.
+      Retain strong pull-only semantics; mixed callback/pull access works
+      while the Transaction is live.
+    - Add sustained 2048-request real-QUIC memory and notification-queue
+      regression coverage through the unified integration.
+    - Remove temporary development Net::QUIC source pins from GitHub Actions.
+    - Retain native consumer ABI version 1 and the existing public HTTP/3 API.
+
 0.12  2026-10-11
     - Give NativeABI an explicit, statically parsable version so PAUSE can
       index it correctly instead of detecting an apparent downgrade.

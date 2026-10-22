@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::VolumeDevice;
 # ABSTRACT: volumeDevice describes a mapping of a raw block device within a container.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s devicePath => Str, 'required';
@@ -23,7 +23,7 @@ IO::K8s::Api::Core::V1::VolumeDevice - volumeDevice describes a mapping of a raw
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 devicePath
 

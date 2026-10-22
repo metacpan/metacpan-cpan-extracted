@@ -1,0 +1,7 @@
+{
+  "schema_version": 1,
+  "tool": "rex-static-review",
+  "limitations": "Text patterns only; not a Perl parser or safety certificate. No Rex code executed.",
+  "findings": [],
+  "input_errors": []
+}

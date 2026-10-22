@@ -1,7 +1,7 @@
 package WWW::Hetzner::Role::Pagination;
 # ABSTRACT: Controller helper for collecting paginated API lists
 
-our $VERSION = '0.101';
+our $VERSION = '0.102';
 
 use Moo::Role;
 use Carp qw(croak);
@@ -63,7 +63,7 @@ WWW::Hetzner::Role::Pagination - Controller helper for collecting paginated API 
 
 =head1 VERSION
 
-version 0.101
+version 0.102
 
 =head1 SYNOPSIS
 

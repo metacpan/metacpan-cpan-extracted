@@ -1,5 +1,10 @@
 Revision history for Data::Heap::Shared
 
+0.11  2026-10-16
+    - Recover missed wakes after a producer dies.
+    - Dispatch signal handlers safely during blocking waits.
+    - Keep the original timeout across interrupted waits.
+
 0.10      2026-09-26
           - A process killed mid push or pop no longer loses, duplicates or
             misorders an element: the next lock holder finishes it.

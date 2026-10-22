@@ -1,0 +1,3073 @@
+#!/opt/bin/perl
+
+=head1 NAME
+
+mcp-fs - filesystem and command tools with optional sandboxing
+
+=head1 SYNOPSIS
+
+   mcp-fs --stdio /path/to/workdir
+   mcp-fs --name project --bind 127.0.0.1:31741 /path/to/workdir
+
+=head1 DESCRIPTION
+
+C<mcp-fs> gives an MCP client tools to read, search and change files, and
+run commands. An assistant can use these tools to work on your projects
+without you writing a Perl server.
+
+Start it with one or more project directories, called workdirs. The client
+connects to the server, lists its tools and makes requests. A request can
+select one of these workdirs; with only one, the selection can be omitted.
+Tools operate on files on disk. To work with unsaved Vim buffers, use
+L<mcp-vim>.
+
+Before starting an operation, the server checks permission rules and, when
+needed, asks you for approval. Operations normally run in a bubblewrap
+sandbox with the approved access. Workdirs provide the default filesystem
+scope; operations needing access elsewhere require the corresponding
+sandbox grants.
+
+You can connect an MCP client directly over HTTP or stdin/stdout, or run
+the server through C<mcp-multibroker>. See L<AnyEvent::MCP::Intro> for a
+walkthrough from installation to a first filesystem request.
+
+=head1 FIRST USE
+
+Configure your MCP client to launch the server with an existing project:
+
+   mcp-fs --stdio --name project /home/alice/src/project
+
+The client starts the process and speaks MCP over stdin/stdout. Do not run
+another copy in a terminal. For HTTP clients, run without C<--stdio> and
+use C<--print-url> with the same C<--name> and C<--bind> settings; see
+L<AnyEvent::MCP::Intro/YOUR FIRST FILESYSTEM SERVER>.
+
+To inspect the tools available with your installed utilities without
+starting a listener, run C<mcp-fs --tool-help /home/alice/src/project>.
+
+Once connected, ask the assistant:
+
+   Show the configured workdirs and list my project's top-level files.
+   Read its README if present. Do not change files or run commands.
+
+C<workdirs> shows the available paths without a worker. Listing requests
+C<inspect> permission, and reading a file requests C<read>. Allow each once
+to try them. Approval is specific to the requested action and sandbox grants.
+If no dialog appears, inspect the tool error and server stderr: the helper
+needs a YAD display or usable terminal. See L</PERMISSIONS>.
+
+For a separate sandbox check without MCP, change to your project directory
+and run:
+
+   mcp-fs --exec-cmd workdir-read -- ls
+
+This uses the current directory as the workdir. It tests the sandbox,
+not client connectivity or permission prompting.
+
+=head1 TOOLS
+
+C<workdirs> reports configured workdirs and available sandbox grants.
+C<list> and C<find> enumerate directory entries; C<stat> returns lstat
+metadata without following symlinks. C<file-read> reads byte ranges and
+returns Base64 data; C<read-lines> reads LF-delimited lines with selectable
+UTF-8, Latin-1 or Base64 representation. C<grep> searches files using a
+literal pattern or PCRE. C<file-write> writes Base64 bytes at an offset
+without implicit truncation; C<path-op> performs pathname mutations;
+C<file-patch> applies a unified diff to a single file.
+
+C<exec> runs an argv array, not a shell command string. To use shell
+syntax, explicitly invoke a shell in that array. C<stdin_encoding> selects
+C<utf-8> (default), C<latin1> or C<base64>. The 4 MiB limit applies to
+the resulting stdin bytes. Stdout and stderr are decoded as
+UTF-8, with a raw capture limit of 1 MiB per stream; use the byte-range tools
+for binary file contents. Its optional
+C<sandbox_grants> B<replaces> the default C<workdir-read> grant rather than
+adding to it. Explicitly passing an empty array therefore asks for no
+grants. Command exit codes are normal tool results, not transport errors.
+On timeout, output collection stops and C<truncated> is true; C<exit> and
+C<signal> still describe the reaped child.
+Perl is required for normal server operation; missing optional GNU utilities
+can cause their tools to be omitted.
+The command requested by C<exec> is resolved when the worker runs; it need
+not be present when the server starts. Inspect C<tools/list> rather than
+assuming every tool is present.
+
+=head2 Command output
+
+C<exec>, C<vcs-diff> and C<vcs-status> share three presentation options:
+
+=over
+
+=item grep => $pattern
+
+Optional PCRE line filter for stdout. It runs in a separate timed GNU grep
+worker after command output has been captured. It is not passed to the
+original command or a shell. Stderr remains unfiltered.
+
+=item max_lines => $integer
+
+Maximum returned stdout lines after filtering, default 2000, maximum 100000.
+
+=item max_bytes => $integer
+
+Maximum returned UTF-8 bytes per stream, default 65536, maximum 1048576.
+Clipping does not leave an incomplete UTF-8 character. Stderr has its own
+budget, so a large stdout does not hide diagnostics.
+
+=back
+
+The command runs once and is drained to completion, subject to its timeout.
+Raw capture is bounded to 1 MiB per stream, independently of the returned
+output limits. C<capture_truncated> means bytes were omitted before filtering
+or collection ended on timeout: matches in that omitted output are unknown.
+C<stdout_truncated>, C<stderr_truncated> and the combined C<truncated> flag
+also account for returned-output limits.
+
+Changing presentation options does not change the command's permission
+subject. C<exit>, C<signal> and C<timed_out> always describe the original
+command, including a diff exit code indicating differences. A filter error
+makes the tool result an error and adds C<filter_error>, while retaining that
+command status. The command may already have completed; do not rerun it
+merely because its output filter failed.
+
+=head2 Version control
+
+C<vcs-diff> and C<vcs-status> take a required C<backend>: C<git>, C<svn>,
+C<cvs> or C<hg>, a workdir, an optional C<cwd> (default C<.>), and an optional
+C<files> array. C<cwd> selects a directory within the workdir; it does not
+change the granted mount boundary. Files are relative to C<cwd> and must
+stay within the selected workdir. The worker checks its resolved directory
+after chdir and before starting the client, rejecting symlink escapes.
+Backend selection is explicit. With no files, the command examines the
+working copy at C<cwd>. Files must be inside the selected workdir;
+they are passed as literal filenames, not options, revisions or shell code.
+Git diff shows unstaged changes; SVN, CVS and Mercurial diff compare the
+working copy with its base. No commit, update, fetch or push is performed.
+
+These tools have separate C<vcs-diff> and C<vcs-status> permission actions.
+They request C<workdir-read> for the selected working copy. CVS additionally
+requests C<ssh-agent>, which includes network access. Git, SVN and Mercurial
+perform these local operations without network or home access.
+A saved approval can cover the fixed operation regardless of filenames or
+output filters, for that workdir and backend, or all supported backends.
+Configured VCS clients and their configuration are trusted, including any
+helpers they invoke; these tools do not sandbox the client's own semantics.
+The ordinary sandbox grants still bound its host access. In unsandboxed
+mode, the normal full-authority approval requirement applies.
+
+Clients are resolved at startup. C<executable.git>, C<executable.svn>,
+C<executable.cvs> and C<executable.hg> in trusted program/instance settings
+can override them. A missing client produces a tool error for that backend.
+
+=head1 REQUIREMENTS
+
+Bubblewrap is required by default, but can be disabled explicitly.
+Perl 5.8.4 or later must run in the worker environment at startup (except
+for C<--exec-cmd>). GNU find, grep, patch and sed are optional; tools
+requiring an unavailable utility are omitted. Use C<tools/list> to see
+which tools are available.
+
+=head1 CONNECTIONS
+
+HTTP is the default and does not print its URL on startup. C<--print-url>
+prints the credential-bearing URL; the same token works in a bearer header.
+C<--stdio> or
+C<PERL_ANYEVENT_MCP_MULTIBROKER_PROTOCOL=stdio> selects stdin/stdout.
+See L<AnyEvent::MCP/GLOBAL CONFIGURATION> for named HTTP settings.
+
+=head1 OPTIONS
+
+Common options, including C<--name>, C<--bind>, C<--token>,
+C<--stdio>, C<--connect>, C<--print-url>, C<--auto-allow> and
+C<--auto-deny>, are documented in
+L<AnyEvent::MCP::Server::Simple/mcp_getoptions>.
+The default service-instance name is C<default>; C<--name> also selects
+the filesystem permission-rule file described below.
+Unlike ordinary startup, C<--print-url> does not require a workdir.
+C<--tool-help> prints the tools available with the selected configuration
+and installed utilities, including argument types and descriptions, then
+exits without starting the MCP listener. Supply the usual WORKDIR arguments.
+
+For example, C<--auto-allow '*,inspect,workdir-read'> together with
+C<--auto-allow '*,read,workdir-read'> approves only those action classes
+within workdir-read authority. C<--auto-allow '*,*,workdir-write'> approves
+any action needing at most workdir-write authority (including read and no grants).
+
+=over
+
+=item --exec-cmd SANDBOX-GRANT,...
+
+Run a command with the named sandbox grants. No MCP server or permission rules
+are used; the current directory is the workdir. With C<--sandbox=none> the
+command runs directly with normal host-user privileges.
+Defaults to C<$SHELL> or C</bin/sh> if no command is supplied.
+The C<--> separator before the command is optional.
+
+=item --ask $method
+
+Selects permission prompting: C<helper> (default), C<tty>, C<yad>, C<mcp>, or C<auto>.
+C<tty> and C<yad> force the corresponding built-in interface without fallback.
+Overrides C<PERL_ANYEVENT_MCP_PERMISSION_ASK>, which can configure the
+default for all servers using C<AnyEvent::MCP::Server::Permissions>.
+The default keeps approval local. C<mcp> delegates to client form elicitation;
+C<auto> uses elicitation when advertised and otherwise the local helper.
+
+=item --sandbox MODE
+
+Select C<bwrap> (default), C<auto>, or C<none>. C<bwrap> requires a usable
+bubblewrap executable. C<auto> uses bubblewrap if found, otherwise runs
+unsandboxed; it does not fall back if an existing executable fails.
+C<none> deliberately runs workers with full host-user privileges.
+
+In unsandboxed mode every MCP worker (including read-only tools) requires
+approval for the actual maximum execution authority: world-write, network,
+shared-tmp and host-proc. Narrower approvals do not authorize execution;
+the server does not pretend that workdir mounts restrict direct processes.
+Startup warns prominently when there is no sandbox.
+
+=item --bwrap PATH
+
+Selects the bubblewrap executable. Defaults to C<bwrap> in C<PATH>.
+
+=back
+
+Rules reside in C<$XDG_CONFIG_HOME/anyevent-mcp/rules/fs-NAME.ini>,
+or the corresponding C<$HOME/.config> path. The rules filename shares the
+service-instance name but has an C<fs> namespace. The default instance uses
+C<rules/fs-default.ini>. The rules path is printed on stderr when starting
+HTTP; normal startup leaves stdout untouched.
+
+=head1 TRUSTED CONFIGURATION
+
+In C<~/.config/anyevent-mcp/global.ini> (or the corresponding
+C<XDG_CONFIG_HOME> location), C<[program NAME]> supplies defaults based
+on the executable basename, while C<[instance NAME]> overrides them for
+C<--name NAME>. A symlinked executable therefore has its own program defaults.
+
+   [program mcp-fs]
+   mount.opt = ro:/opt
+   prepend-path = /opt/bin:/opt/sbin
+   mount.shared = rw:/srv/shared
+   env.cvs = CVS_RSH=/my/cvs/rsh
+   executable.perl = /opt/bin/perl
+
+   [instance myproject]
+   mount.opt =
+   prepend-path =
+   mount.extra = ro:/srv/project-tools
+
+Automatic permission rules can also be configured:
+
+   [program mcp-fs]
+   auto-rule.10 = allow *,read,workdir-read
+   auto-rule.20 = allow *,write,workdir-write
+   auto-rule.30 = deny *,exec,*
+
+These apply to every named mcp-fs instance; CLI auto-rules are evaluated first.
+
+C<mount.SUFFIX> entries are applied in alphabetical key order after
+the private sandbox mounts. The suffix is an arbitrary stable name;
+an empty instance value suppresses an inherited entry. Paths must be
+absolute and exist. A colon after C<ro:> or C<rw:> starts the literal
+pathname; no separate quoting or escaping syntax is used.
+
+C<env.SUFFIX> entries contain C<NAME=value> to set a literal value, or
+C<NAME> to inherit that variable from the server environment if present.
+Values may contain spaces and equals signs; there is no shell expansion.
+Entries are applied in alphabetical key order after the default environment.
+An empty instance entry suppresses the corresponding program entry.
+C<SSH_AUTH_SOCK> is managed exclusively by the C<ssh-agent> grant, even
+when listed in these settings. Environment settings do not expose paths;
+custom executables outside the runtime/workdir mounts need configured mounts.
+
+C<prepend-path> adds colon-separated directories before the bubblewrapped
+worker's fixed C<PATH> of
+C</bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin>.
+Trailing colons are ignored, so both C</opt/bin> and C</opt/bin:> work.
+The server's C<PATH> is not inherited. An empty instance value restores the
+fixed default rather than the program value. C<--sandbox=none> continues to
+use the host environment. Directories outside the normal runtime mounts
+still need a configured mount to be accessible.
+
+Configured mounts grant baseline access to every sandbox invocation,
+independently of tool permission grants. With C<world-read>, only C<rw:>
+exceptions are applied over the read-only host filesystem. With
+C<world-write>, these configured mounts are ignored. Baseline execution
+paths include C</usr>, C</bin>, system libraries and selected system
+configuration, but not C</opt>. Shared host temporary directories require
+C<shared-tmp>, a configured mount, or a C<world-*> grant.
+
+C<executable.find>, C<executable.grep>, C<executable.patch>,
+C<executable.perl>, C<executable.sed>, and C<executable.bwrap>
+override automatic executable discovery. Explicit choices must resolve to
+executable files and are trusted instead of version-probed, except for
+C<executable.perl>, which must satisfy the Perl minimum version.
+C<executable.perl> defaults to C<perl> in the worker's C<PATH>;
+the other worker executables are discovered there too. C<--bwrap>
+overrides C<executable.bwrap> and is located on the host.
+
+Defaults also include alternatives, font configuration, local timezone,
+TLS certificate stores, NSS configuration and DNS configuration where
+present. Unless C<world-read> or C<world-write> is granted, a synthetic
+passwd entry is supplied without exposing the host passwd or group
+databases. With either world grant, the host databases remain visible.
+
+The C<workdirs> result includes C<workdir_vcs>, a mapping from configured
+workdir identities to arrays of backends with metadata markers directly
+in that directory. Detection checks C<CVS>, C<.git>, C<.hg> and C<.svn>;
+a Git metadata file is supported as well as a directory. Symlink markers
+are reported without following them. This is a hint, not validation of a
+repository. There is no recursive scan or parent search, multiple markers
+are retained, and an empty array means no marker was found. Detection is
+independent of the available clients in C<vcs_backends> and does not choose
+the backend for a VCS command.
+
+=head1 SANDBOX GRANTS
+
+C<workdir-read> and C<workdir-write> expose only the selected workdir;
+write implies read. C<all-workdirs-read> and C<all-workdirs-write>
+expose every configured workdir. C<all-workdirs-read> combined with
+C<workdir-write> mounts all workdirs read-only except the selected one,
+which is writable. C<all-workdirs-write> makes all writable.
+Configured workdirs are mounted using resolved absolute paths, but their
+permission-rule identities are verbatim command-line arguments.
+Persistent permission rules default to the selected workdir, with an explicit
+option to match any configured workdir, including future additions. This
+controls reuse of the rule, not the workdirs accessible in one operation.
+The multibroker alias is shown in permission prompts, without changing the rule file.
+Tools accept C<workdir> as a persistent positive integer ID, a numeric
+string containing that ID, or an exact configured or resolved workdir path.
+C<workdirs> returns C<workdirs> and C<resolved_workdirs> objects keyed by ID,
+not arrays indexed by argument position. IDs are shared across server
+instances in C<$XDG_CONFIG_HOME/anyevent-mcp/fs-workdir-ids.json>, or under
+C<$HOME/.config> when XDG_CONFIG_HOME is unset. Resolved absolute paths
+determine IDs; permission-rule identities remain the verbatim arguments.
+
+The registry stores C<ID =E<gt> [workdir, last_use]> pairs, with C<last_use>
+as a Unix timestamp. Starting
+a server resolves its IDs once and reserves any new allocations under the
+file lock. An AnyEvent timer runs immediately and every 5.25 days, rereading
+the registry and overwriting those fixed assignments with fresh timestamps.
+Other entries expire after seven days without refresh;
+their IDs can be reused. Restart servers after manually changing the registry.
+Numeric IDs therefore survive restarts and argument reordering while retained,
+but are not permanent references to paths that have expired.
+
+Non-numeric strings are matched only against configured workdirs, never
+interpreted as arbitrary filesystem paths. Unknown or ambiguous selectors
+fail. With only one workdir, the field may be omitted.
+Overlapping workdirs have unspecified mount order and access effects;
+do not rely on overlapping workdir boundaries for isolation.
+C<homedir-read> and C<homedir-write> similarly control HOME.
+C<world-read> and C<world-write> expose the host filesystem, with write
+implying read. C<network> and C<shared-tmp> independently enable networking
+and the host's C</tmp> and C</var/tmp>. C<long-running> permits exec timeouts
+over 300 seconds. C<host-proc> is unavailable with bubblewrap; direct execution has host-process access.
+
+C<ssh-agent> implies C<network>. It exposes the server's C<SSH_AUTH_SOCK>
+at C</run/anyevent-mcp/ssh-agent> and sets the child's variable to that path.
+It also exposes C<~/.ssh/known_hosts> read-only if present, without mounting
+the rest of HOME. Private key files and SSH user configuration are not exposed.
+An unset or empty C<SSH_AUTH_SOCK> exposes no socket, allowing rsh-based CVS;
+a configured socket must be an absolute path naming an existing socket node.
+Socket replacement requires a new invocation; an existing bind mount keeps
+the old node. Agent access permits authentication, not retrieval of private keys.
+
+=head1 LIMITATIONS
+
+With bubblewrap, regardless of granted sandbox grants, the sandbox mounts procfs at
+C</proc>. Its process entries are restricted by the PID namespace, but
+kernel-wide and hardware information (including C</proc/irq> and
+C</proc/bus>) remains visible. This is a limitation of bubblewrap's
+C<--proc> option, which does not support C<subset=pid>.
+
+=head1 PERMISSIONS
+
+L<AnyEvent::MCP::Server::Permissions> applies ordered allow, deny and ask
+decisions to server-defined action classes. C<inspect> groups stat/list/find;
+C<read> groups file-read/read-lines/grep; C<write> groups file-write/file-patch;
+C<manage> covers path-op, and C<exec> covers command execution. C<file-write>
+may create files despite being in the write class; manage refers specifically
+to pathname operations rather than an exclusive right to create files.
+Filesystem operations have no path-based persistent subjects: their rules
+match C<action>, C<sandbox-grants>, and C<workdir> when selected-workdir
+authority is required. All-workdirs-only requests have no workdir identity.
+Rules without C<workdir> can apply to any selected workdir if their sandbox
+grants cover the request; dialog-generated selected-workdir rules are exact.
+Requested paths are shown in the approval dialog for information only.
+Exec additionally offers persistent
+command/argv subjects. When stdin is provided, exec attaches display-only
+details to the permission request: Unicode text for UTF-8 input, or a
+bounded escaped-byte preview for Latin-1/Base64 input. The YAD helper offers
+a separate C<View stdin...> window; the preview shows input size and
+truncation. This does not change authorization: persistent exec rules match
+argv, not stdin, and later runs may supply different scripts or bytes.
+Conversion takes place before approval and the worker receives the exact
+resulting bytes.
+C<file-patch> supplies C<View patch> details with the target and supplied diff.
+Base64 patches are decoded for display: valid UTF-8 is shown as Unicode,
+otherwise non-printable bytes and backslashes are escaped in a byte view.
+The UI chooses whether to show a separate viewer or an inline preview.
+Each tool checks permissions before starting its worker. Approval
+defaults to the local helper selected by C<PERL_ANYEVENT_MCP_PERMISSION_HELPER>,
+which tries YAD, then a terminal, then denies once. Client elicitation is
+selected with C<--ask mcp>, C<--ask auto>, or the corresponding
+C<PERL_ANYEVENT_MCP_PERMISSION_ASK> value.
+
+You can edit the rule file at any time. It is reread on permission checks,
+so changes apply without restarting the server. Keep it owned by your user
+and private (mode 0600). See L<AnyEvent::MCP::Server::Permissions> for the
+rule syntax and ordering.
+
+Permission retries retain earlier one-time approvals within the same call.
+For one worker accessing several paths, the required sandbox-grant set combines
+the authority needed for all paths and is approved once. An insufficient reduction fails before
+the worker starts.
+Multi-path C<stat> requires all paths inside its selected workdir.
+C<path-op> can attempt cross-workdir renames after approving the sandbox
+grants required for both paths. The sandboxed C<rename(2)> may fail with
+C<EXDEV> across mounts; no copy/delete fallback is attempted.
+C<mkpath> requires a path inside the selected workdir.
+C<path-op> performs requested operations in this fixed order:
+C<unlink>, C<rmdir>, C<mkpath>, C<mkdir>, C<symlink>, C<truncate>,
+C<chmod>, C<rename>. C<mkpath> includes each missing component in the
+combined permission check before starting the worker.
+The first failure stops subsequent operations; successful earlier mutations
+remain in place. There is no rollback or all-or-nothing transaction.
+
+Exec defaults to a 30-second timeout and permits up to 300 seconds without
+additional timeout authority. A larger explicit C<timeout>, up to 21600
+seconds (six hours), also requires C<long-running>. This capability is added
+to the requested permissions automatically. Cancellation still terminates
+the worker, regardless of its allowed timeout.
+
+The C<host-proc> grant is unavailable with bubblewrap. Runtime mounts
+provide sandbox machinery. Symlinks resolve within granted mounts.
+Without bubblewrap, workers operate in the host mount and process namespaces.
+
+=head1 PATCHES
+
+C<file-patch> uses L<AnyEvent::MCP/PATCH UTILITIES> for normalization and
+validation. GNU patch runs inside the granted sandbox with fuzz zero.
+Successful output replaces the original by rename after checking its
+identity, size, timestamps, metadata and link count. These stat checks
+do not detect every concurrent edit; they are not a filesystem transaction.
+
+=cut
+
+use common::sense;
+
+use MIME::Base64 ();
+use Getopt::Long ();
+use Cwd ();
+use File::Basename ();
+use File::Spec::Unix ();
+use POSIX ();
+use Fcntl qw(F_SETFD);
+use Scalar::Util qw(weaken);
+
+use JSON::XS ();
+use AnyEvent ();
+use AnyEvent::MCP ();
+use AnyEvent::MCP::Config ();
+use AnyEvent::MCP::Workdirs ();
+use AnyEvent::MCP::Server::Permissions ();
+use AnyEvent::Handle ();
+use AnyEvent::Log ();
+use AnyEvent::Util ();
+
+use AnyEvent::MCP::Server::Simple;
+
+# resolve an executable name or path to an absolute executable file.
+sub find_executable {
+   my ($name) = @_;
+
+   !ref $name and length $name and $name !~ /\0/
+      or return;
+
+   my @path = $name =~ m{/}
+      ? ($name)
+      : map { (length $_ ? $_ : ".") . "/$name" } split /:/, $ENV{PATH};
+   my $cwd = Cwd::getcwd;
+
+   for my $path (@path) {
+      next unless -f $path and -x _;
+      return $path =~ m{\A/} ? $path : "$cwd/$path";
+   }
+
+   undef
+}
+
+Getopt::Long::Configure qw(bundling no_ignore_case require_order);
+
+my $sandbox_mode = "bwrap";
+my $usage = "Usage: $0 [OPTION]... WORKDIR [WORKDIR]...\n"
+   . "       $0 --exec-cmd GRANT,... [--] [COMMAND [ARG]...]\n";
+
+my %server_options = mcp_getoptions ({
+   usage => $usage,
+   description => "Expose filesystem tools and command execution over MCP.\n"
+      . "Operations require permission and normally run inside bubblewrap.",
+   option_heading => "Filesystem options:",
+   options => [
+      ["--ask MODE", "Ask for permission via helper (default), tty, yad, mcp, or auto"],
+      ["--sandbox MODE", "Use bwrap (default), auto, or none (unsandboxed)"],
+      ["--bwrap PATH", "Path to the bubblewrap executable"],
+      ["--exec-cmd GRANT,...", "Run a command directly with the named grants"],
+   ],
+   examples => "  $0 --stdio /home/alice/src/project\n"
+      . "  $0 --name project --print-url\n"
+      . "  $0 --sandbox bwrap /home/alice/src/project\n"
+      . "  $0 --auto-allow '*,inspect,workdir-read' --auto-allow '*,read,workdir-read' /project\n"
+      . "  $0 --auto-allow '*,*,workdir-write' /project",
+},
+   "sandbox=s"       => \$sandbox_mode,
+   "ask=s"           => \my $ask,
+   "exec-cmd=s"      => \my $exec_cmd,
+   "bwrap=s"         => \my $bwrap,
+);
+
+my $name = $server_options{name};
+my $stdio = delete $server_options{stdio};
+
+die "--ask must be helper, tty, yad, mcp, or auto\n"
+   if defined $ask && $ask !~ /\A(?:helper|tty|yad|mcp|auto)\z/;
+
+(defined $exec_cmd or @ARGV)
+   or die $usage;
+
+$sandbox_mode =~ /\A(?:bwrap|auto|none)\z/
+   or die "--sandbox must be bwrap, auto, or none\n";
+
+my $program_name = AnyEvent::MCP::Config::program_name ();
+my $config_file = AnyEvent::MCP::Config::_file ();
+my $config = -e $config_file ? AnyEvent::MCP::Config->global : undef;
+my %settings = $config ? (
+   %{ $config->{section}{"program $program_name"} },
+   %{ $config->{section}{"instance $name"} },
+) : ();
+
+my $sandbox_path = "/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin";
+(my $prepend = $settings{"prepend-path"} // "") =~ s/:+\z//;
+$sandbox_path = "$prepend:$sandbox_path" if length $prepend;
+
+my @mount;
+for my $key (sort grep /\Amount\./, keys %settings) {
+   my $value = $settings{$key};
+   next unless length $value;
+   my ($mode, $path) = $value =~ /\A(ro|rw):(\/.*)\z/
+      or die "invalid $key mount '$value'\n";
+   -e $path or die "invalid $key mount path '$path'\n";
+   push @mount, [$key, $mode, $path];
+}
+
+my @environment;
+for my $key (sort grep /\Aenv\./, keys %settings) {
+   my $value = $settings{$key};
+   next unless length $value;
+   my ($name, $text) = $value =~ /\A([A-Za-z_][A-Za-z_0-9]*)(?:=(.*))?\z/s
+      or die "invalid $key environment entry '$value'\n";
+   push @environment, [$name, $text];
+}
+
+my ($find, $grep, $patch, $perl, $sed);
+my %vcs_program;
+
+$bwrap //= $settings{"executable.bwrap"} || "bwrap";
+
+if ($sandbox_mode ne "none") {
+   my $name = $bwrap;
+   $bwrap = find_executable $name;
+   die "bubblewrap executable not found: $name\n"
+      if !$bwrap && $sandbox_mode eq "bwrap";
+} else {
+   undef $bwrap;
+}
+
+my @runtime_path = grep -e, qw(
+   /usr
+   /bin
+   /sbin
+   /lib
+   /lib64
+   /etc/ld.so.cache
+   /etc/alternatives
+   /etc/fonts
+   /etc/localtime
+   /etc/ssl/openssl.cnf
+   /etc/ssl/certs
+   /etc/pki/tls/openssl.cnf
+   /etc/pki/tls/certs
+   /etc/pki/ca-trust
+   /etc/nsswitch.conf
+   /etc/hosts
+   /etc/resolv.conf
+);
+
+my (@workdir, @workdir_identity);
+if (defined $exec_cmd) {
+   @workdir = Cwd::abs_path ".";
+   @workdir or die "cannot resolve current directory\n";
+   utf8::decode $workdir[0] or die "workdir is not UTF-8\n";
+   @workdir_identity = @workdir;
+} else {
+   for my $path (@ARGV) {
+      my $workdir = Cwd::abs_path $path;
+      -d $workdir or die "invalid workdir '$path'\n";
+      utf8::decode $workdir or die "workdir is not UTF-8\n";
+      my $identity = $path;
+      utf8::decode $identity or die "workdir identity is not UTF-8\n";
+      push @workdir, $workdir;
+      push @workdir_identity, $identity;
+   }
+}
+
+my $home = $ENV{HOME};
+$home =~ m{\A/} and -d $home
+   or die "HOME must name an absolute existing directory\n";
+$home = Cwd::abs_path $home
+   // die "cannot resolve HOME\n";
+utf8::decode $home
+   or die "HOME is not a valid UTF-8 path\n";
+
+my $config_home;
+unless (defined $exec_cmd) {
+   $config_home = $ENV{XDG_CONFIG_HOME};
+   if (length $config_home) {
+      $config_home =~ m{\A/}
+         or die "permission config directory must be absolute\n";
+      utf8::decode $config_home
+         or die "permission config directory is not UTF-8\n";
+   } else {
+      $config_home = "$home/.config";
+   }
+}
+
+my ($workdir_ids, $workdir_refresh);
+
+unless (defined $exec_cmd) {
+   $workdir_ids = AnyEvent::MCP::Workdirs->new (
+      file => "$config_home/anyevent-mcp/fs-workdir-ids.json",
+      paths => \@workdir,
+   );
+
+   my $interval = .75 * $workdir_ids->{expiry};
+   $workdir_refresh = AE::timer 0, $interval, sub {
+      $workdir_ids->refresh;
+   };
+}
+
+my %sandbox_grant = (
+   "workdir-read"  => [],
+   "workdir-write" => ["workdir-read"],
+   "all-workdirs-read" => ["workdir-read"],
+   "all-workdirs-write" => [qw(all-workdirs-read workdir-write)],
+   "homedir-read"     => [],
+   "homedir-write"    => ["homedir-read"],
+   "world-read"    => [qw(all-workdirs-read homedir-read)],
+   "world-write"   => [qw(world-read all-workdirs-write homedir-write)],
+   "network"       => [],
+   "ssh-agent"     => ["network"],
+   "long-running"  => [],
+   "shared-tmp"    => [],
+   "host-proc"     => [],
+);
+
+my %sandbox_grant_description = (
+   "workdir-read"  => "Read files in the selected workdir",
+   "workdir-write" => "Change files in the selected workdir",
+   "all-workdirs-read" => "Read files in all configured workdirs",
+   "all-workdirs-write" => "Change files in all configured workdirs",
+   "homedir-read"     => "Read files in your home directory",
+   "homedir-write"    => "Change files in your home directory",
+   "world-read"    => "Read the host filesystem",
+   "world-write"   => "Change the host filesystem",
+   "network"       => "Use network connections",
+   "ssh-agent"     => "Use your SSH agent to authenticate, read known_hosts and use network connections",
+   "long-running"  => "Run commands longer than five minutes",
+   "shared-tmp"    => "Access host temporary directories",
+   "host-proc"     => $bwrap ? "Host process access (unavailable with bubblewrap)"
+                             : "Full access to host processes",
+);
+
+my @exec_default_sandbox_grants = ("workdir-read");
+
+my $umask = umask;
+
+my $permissions;
+$permissions = AnyEvent::MCP::Server::Permissions->new (
+   sandbox_grants             => \%sandbox_grant,
+   sandbox_grant_descriptions => sub {
+      my ($request) = @_;
+
+      my %description = %sandbox_grant_description;
+      if (defined $request->{selected_workdir}) {
+         my $name = JSON::XS->new->utf8 (0)->allow_nonref
+            ->encode ($request->{selected_workdir});
+         $description{"workdir-read"} = "Read files in selected workdir $name";
+         $description{"workdir-write"} = "Change files in selected workdir $name";
+      }
+      \%description
+   },
+   (defined $ask ? (ask => $ask) : ()),
+   auto_rules => [@{$server_options{auto_rules} || []},
+      ($config ? $config->auto_rules ($name) : ())],
+   sandbox_implementation => $bwrap ? "bubblewrap" : "NONE - UNSANDBOXED (full host-user privileges)",
+   actions => {
+      inspect => "Inspect resource metadata and enumerate names",
+      read    => "Read resource contents",
+      write   => "Modify resource contents",
+      manage  => "Rename, remove, and manage filesystem paths",
+      exec    => "Run arbitrary commands",
+      "vcs-diff"   => "Read working-copy differences using a VCS client",
+      "vcs-status" => "Read working-copy status using a VCS client",
+   },
+   name         => $name,
+   file         => "$config_home/anyevent-mcp/rules/fs-$name.ini",
+) unless defined $exec_cmd;
+
+# permissions group tools by their kind of access, not by MCP tool name.
+my %tool_action = (
+   stat => "inspect", list => "inspect", find => "inspect",
+   "file-read" => "read", "read-lines" => "read", grep => "read",
+   "file-write" => "write", "file-patch" => "write",
+   "path-op" => "manage", exec => "exec",
+);
+
+# normalize an API pathname lexically against its selected workdir.
+sub fs_path {
+   my ($workdir, $path) = @_;
+
+   !ref $path and length $path and $path !~ /\0/
+      or die "path must be a nonempty string without NUL\n";
+   $path = "$workdir/$path" unless $path =~ m{\A/};
+
+   my @part;
+
+   for (split m{/+}, $path) {
+      next if !length or $_ eq ".";
+      if ($_ eq "..") {
+         pop @part;
+      } else {
+         push @part, $_;
+      }
+   }
+
+   "/" . join "/", @part
+}
+
+# test pathname containment without resolving symlinks.
+sub fs_inside {
+   my ($path, $directory) = @_;
+
+   $directory eq "/" or $path eq $directory or (index $path, "$directory/") == 0
+}
+
+# classify relative to the selected workdir, not any configured workdir.
+sub fs_path_capability {
+   my ($workdir, $path, $mode) = @_;
+
+   return "workdir-$mode"
+      if fs_inside $path, $workdir;
+   return "all-workdirs-$mode"
+      if grep { fs_inside $path, $_ } @workdir;
+   return "homedir-$mode" if fs_inside $path, $home;
+   return "shared-tmp" if (fs_inside $path, "/tmp") or (fs_inside $path, "/var/tmp");
+
+   "world-$mode"
+}
+
+# persist selected-workdir identities only where the requested authority
+# actually depends on that selection. Broad all-workdirs grants are unscoped.
+sub fs_grant_workdir {
+   my ($identity, $grants) = @_;
+
+   my $have = $permissions->closure ($grants);
+   return $identity if $have->{"workdir-write"} && !$have->{"all-workdirs-write"};
+   return $identity if $have->{"workdir-read"} && !$have->{"all-workdirs-read"};
+   undef
+}
+
+# permission prompts display the selected, verbatim configured workdir next
+# to workdir-specific grant choices. This is information, not a rule scope.
+sub fs_require_permission {
+   my ($req, $identity, $request) = @_;
+
+   $request->{selected_workdir} = $identity;
+   $req->require_permission ($request)
+}
+
+# direct execution has no filesystem, network or process isolation. Request
+# every grant the process effectively receives, regardless of client wishes.
+my @unsandboxed_grants = qw(world-write network shared-tmp host-proc);
+sub fs_effective_grants {
+   return @_ if $bwrap;
+   (@unsandboxed_grants, grep $_ eq "long-running", @_)
+}
+
+# one worker needs the combined sandbox authority for every path it will access.
+sub fs_require_paths {
+   my ($req, $workdir, $identity, $paths, $mode, $reason, $details) = @_;
+
+   my %seen;
+   $paths = [grep !$seen{$_}++, @$paths];
+   my %need = map { (fs_path_capability $workdir, $_, $mode) => 1 } @$paths;
+   %need = map { $_ => 1 } fs_effective_grants (keys %need);
+   my @grants = sort keys %need;
+   my $grant = fs_require_permission ($req, $identity, {
+      tool           => $req->{tool},
+      action         => $tool_action{$req->{tool}},
+      workdir        => fs_grant_workdir ($identity, \@grants),
+      paths          => $paths,
+      sandbox_grants => \@grants,
+      reason         => $reason // "$req->{tool} " . join (", ", @$paths),
+      (defined $details ? (details => $details) : ()),
+   });
+
+   my $have = $permissions->closure ($grant);
+   for my $capability (sort keys %need) {
+      $have->{$capability}
+         or die "permission reduced below $capability for $req->{tool}\n";
+   }
+
+   [sort keys %$have]
+}
+
+# test whether the granted capability set makes this pathname writable.
+sub fs_writable {
+   my ($workdir, $path, $have) = @_;
+
+   $have->{"world-write"}
+      or ($have->{"all-workdirs-write"} and (grep { fs_inside $path, $_ } @workdir))
+      or ($have->{"workdir-write"} and fs_inside $path, $workdir)
+      or ($have->{"homedir-write"} and (fs_inside $path, $home))
+      or ($have->{"shared-tmp"} and ((fs_inside $path, "/tmp") or (fs_inside $path, "/var/tmp")))
+}
+
+# build the bubblewrap argv implementing the granted sandbox authority.
+sub fs_sandbox {
+   my ($workdir, $sandbox_grants) = @_;
+
+   my $have = {};
+   my @todo = @$sandbox_grants;
+   while (@todo) {
+      my $capability = pop @todo;
+      exists $sandbox_grant{$capability} or die "Unknown permission capability '$capability'\n";
+      next if $have->{$capability}++;
+      push @todo, @{$sandbox_grant{$capability}};
+   }
+
+   unless ($bwrap) {
+      unless (defined $exec_cmd) {
+         $have->{$_} or die "unsandboxed execution needs $_ grant\n"
+            for @unsandboxed_grants;
+      }
+      return ();
+   }
+
+   die "host-proc sandbox authority is unresolved and unavailable in v1\n"
+      if $have->{"host-proc"};
+
+   my @command = ($bwrap, qw(
+      --die-with-parent
+      --unshare-user --unshare-pid --unshare-ipc --unshare-uts
+      --unshare-cgroup-try --disable-userns --cap-drop ALL
+   ));
+   push @command, "--new-session" unless defined $exec_cmd;
+
+   push @command, "--unshare-net" unless $have->{network};
+
+   push @command, $have->{"world-write"} ? "--bind-try" : "--ro-bind-try", "/", "/"
+      if $have->{"world-read"};
+
+   my @scope_mount;
+
+   unless ($have->{"world-read"}) {
+      for my $path (@runtime_path) {
+         my $mount = (fs_writable $workdir, $path, $have) ? "--bind-try" : "--ro-bind-try";
+         push @scope_mount, $mount, $path, $path;
+      }
+   }
+
+   if ($have->{"homedir-read"}
+       and (!$have->{"world-read"} or ($have->{"homedir-write"} and !$have->{"world-write"}))) {
+      my $mount = (fs_writable $workdir, $home, $have) ? "--bind-try" : "--ro-bind-try";
+      push @scope_mount, $mount, $home, $home;
+   }
+
+   if ($have->{"all-workdirs-read"}) {
+      for my $path (@workdir) {
+         my $mount = ($have->{"all-workdirs-write"}
+            or ($path eq $workdir && $have->{"workdir-write"}))
+               ? "--bind" : "--ro-bind";
+         push @scope_mount, $mount, $path, $path;
+      }
+   } elsif ($have->{"workdir-read"}) {
+      my $mount = $have->{"workdir-write"} ? "--bind" : "--ro-bind";
+      push @scope_mount, $mount, $workdir, $workdir;
+   }
+
+   # replace special host mounts even when broad filesystem authority was asked.
+   push @command, qw(--tmpfs /sys --tmpfs /run --dev /dev);
+   push @command, "--proc", "/proc";
+
+   for my $tmp (qw(/tmp /var/tmp)) {
+      if ($have->{"shared-tmp"} && !$have->{"world-write"}) {
+         push @command, "--bind-try", $tmp, $tmp;
+      } elsif (!$have->{"world-read"}
+         && !(grep $_->[2] eq $tmp, @mount)) {
+         push @command, "--tmpfs", $tmp;
+      }
+   }
+
+   # explicit mounts override the private baseline where bwrap/kernel permit it.
+   push @command, @scope_mount;
+   for my $path (qw(/etc/resolv.conf /etc/hosts)) {
+      my $mount = (fs_writable $workdir, $path, $have) ? "--bind-try" : "--ro-bind-try";
+      push @command, $mount, $path, $path;
+   }
+
+   # configured exceptions come after workdir/home mounts. Do not let an
+   # administrator's ro exception narrow explicitly granted write authority.
+   unless ($have->{"world-write"}) {
+      for my $entry (@mount) {
+         my ($key, $mode, $path) = @$entry;
+         next if $mode eq "ro" && ($have->{"world-read"} || fs_writable $workdir, $path, $have);
+         push @command, ($mode eq "rw" ? "--bind" : "--ro-bind"), $path, $path;
+      }
+   }
+
+   push @command, "--file", 3, "/etc/passwd"
+      unless $have->{"world-read"};
+
+   my $agent_socket;
+   if ($have->{"ssh-agent"}) {
+      if (length $ENV{SSH_AUTH_SOCK}) {
+         $ENV{SSH_AUTH_SOCK} =~ m{\A/} && -S $ENV{SSH_AUTH_SOCK}
+            or die "SSH_AUTH_SOCK must name an absolute existing socket\n";
+         my $source = $ENV{SSH_AUTH_SOCK};
+         utf8::decode $source or die "SSH_AUTH_SOCK is not UTF-8\n";
+         $agent_socket = "/run/anyevent-mcp/ssh-agent";
+         push @command, "--ro-bind", $source, $agent_socket;
+      }
+      push @command, "--ro-bind-try", "$home/.ssh/known_hosts", "$home/.ssh/known_hosts"
+         unless $have->{"homedir-read"} || $have->{"world-read"};
+   }
+
+   push @command, "--remount-ro", "/"
+      unless $have->{"world-write"};
+
+   push @command,
+      "--clearenv",
+      "--setenv", "PATH", $sandbox_path,
+      "--setenv", "LC_ALL", "C.UTF-8",
+      "--setenv", "HOME", $home;
+
+   for my $name (qw(TERM COLORTERM TERMINFO TERMINFO_DIRS NO_COLOR CLICOLOR CLICOLOR_FORCE LINES COLUMNS)) {
+      push @command, "--setenv", $name, $ENV{$name} if defined $ENV{$name};
+   }
+
+   for my $entry (@environment) {
+      my ($name, $value) = @$entry;
+      next if $name eq "SSH_AUTH_SOCK";
+      $value = $ENV{$name} unless defined $value;
+      push @command, "--setenv", $name, $value if defined $value;
+   }
+   push @command, "--setenv", "SSH_AUTH_SOCK", $agent_socket if defined $agent_socket;
+
+   push @command,
+      "--chdir", defined $exec_cmd ? $workdir : $have->{"workdir-read"} ? $workdir : "/tmp",
+      "--";
+
+   @command
+}
+
+# pass a private synthetic user entry to bubblewrap without a host passwd mount.
+sub fs_passwd_fd {
+   my ($read, $write) = AnyEvent::Util::portable_pipe
+      or die "passwd pipe: $!\n";
+   print {$write} "sandbox:x:$<:" . POSIX::getgid () . ":Sandbox:$home:/bin/sh\n"
+      or die "passwd pipe: $!\n";
+   close $write or die "passwd pipe: $!\n";
+
+   if (fileno ($read) != 3) {
+      POSIX::dup2 (fileno ($read), 3) == 3 or die "passwd dup2: $!\n";
+      close $read;
+      open $read, "<&=3" or die "passwd fd: $!\n";
+   }
+
+   defined fcntl ($read, F_SETFD, 0) or die "passwd fcntl: $!\n";
+   $read
+}
+
+if (defined $exec_cmd) {
+   my @sandbox_grants = length $exec_cmd ? split /,/, $exec_cmd, -1 : ();
+   my @command = ((fs_sandbox $workdir[0], \@sandbox_grants),
+      (@ARGV ? @ARGV : ($ENV{SHELL} || "/bin/sh")));
+   my $passwd_fd = fs_passwd_fd () if $bwrap;
+
+   exec {$command[0]} @command;
+   die "exec $command[0]: $!\n";
+}
+
+# Perl is required in the worker namespace; discover the other tools there too.
+my $probe = q{#perl
+   use 5.008004;
+   use Cwd ();
+
+   my %test = (
+      find => [[qw(--version)], qr/^find \(GNU findutils\)/m],
+      grep => [[qw(--version)], qr/^grep \(GNU grep\)/m],
+      patch => [[qw(--version)], qr/^GNU patch /m],
+      sed => [["-n", "1p", "/dev/null"], qr/\A\z/],
+   );
+
+   sub find_executable {
+      my ($name) = @_;
+
+      return unless length $name && $name !~ /\0/;
+      my @path = $name =~ m{/} ? ($name)
+         : map { (length $_ ? $_ : ".") . "/$name" } split /:/, $ENV{PATH}, -1;
+      for (@path) {
+         next unless -f $_ && -x _;
+         return m{\A/} ? $_ : Cwd::getcwd () . "/$_";
+      }
+      undef
+   }
+
+   while (@ARGV) {
+      my ($name, $wanted, $explicit) = splice @ARGV, 0, 3;
+      my $path = find_executable $wanted;
+      if ($path && !$explicit && $test{$name}) {
+         my ($args, $match) = @{$test{$name}};
+         my $ok = open my $fh, "-|", $path, @$args;
+         if ($ok) {
+            my $output = do { local $/; <$fh> };
+            $ok = close $fh && $output =~ $match;
+         }
+         undef $path unless $ok;
+      }
+      $path ||= "";
+      print "$path\0";
+   }
+};
+
+my @names = qw(perl find grep patch sed git svn cvs hg);
+my $perl_name = $settings{"executable.perl"} || "perl";
+my @command = ($bwrap ? (fs_sandbox $workdir[0], []) : (),
+   $perl_name, "-e", $probe,
+   map { ($_, $settings{"executable.$_"} || $_, length $settings{"executable.$_"} ? 1 : 0) } @names);
+my $pid = open my $fh, "-|";
+defined $pid or die "Perl probe fork: $!\n";
+
+unless ($pid) {
+   my $passwd_fd = fs_passwd_fd () if $bwrap;
+   exec {$command[0]} @command;
+   warn "exec $command[0]: $!\n";
+   POSIX::_exit 126;
+}
+
+my $output = do { local $/; <$fh> };
+close $fh or die "Perl '$perl_name' cannot run in the worker environment\n";
+my @paths = split /\0/, $output, -1;
+@paths == @names + 1 && pop @paths eq ""
+   or die "invalid Perl executable probe response\n";
+my %program;
+@program{@names} = @paths;
+$program{perl} or die "Perl interpreter not found inside the sandbox\n";
+($find, $grep, $patch, $perl, $sed) = @program{qw(find grep patch perl sed)};
+warn "$_: not detected or wrong version\n"
+   for grep !$program{$_}, qw(find grep patch sed);
+%vcs_program = map { ($_ => $program{$_}) } qw(git svn cvs hg);
+
+warn "mcp-fs: SANDBOX NONE - workers run with full host-user privileges\n"
+   unless $bwrap;
+
+AnyEvent::detect; # proc_spawn creates child watchers after they might have died
+
+# spawn stdin/stdout and stderr handles; proc_destroy closes them and terminates the child.
+# the independent child watcher remains alive until the child is reaped.
+sub proc_spawn {
+   my ($program, @argv) = @_;
+
+   my ($parent, $child) = AnyEvent::Util::portable_socketpair
+      or die "socketpair: $!\n";
+   my ($error, $child_error) = AnyEvent::Util::portable_pipe
+      or die "pipe: $!\n";
+
+   my $pid = fork;
+   defined $pid or die "fork: $!\n";
+
+   unless ($pid) {
+      open STDIN,  "<&", $child       or POSIX::_exit 126;
+      open STDOUT, ">&", $child       or POSIX::_exit 126;
+      open STDERR, ">&", $child_error or POSIX::_exit 126;
+
+      close $parent;
+      close $error;
+      close $child;
+      close $child_error;
+
+      my $passwd_fd = fs_passwd_fd () if $bwrap;
+      AnyEvent::Util::close_all_fds_except (0, 1, 2, ($bwrap ? 3 : ()));
+
+      exec {$program} $program, @argv;
+      print STDERR "exec $program: $!\n";
+      POSIX::_exit 126;
+   }
+
+   close $child;
+   close $child_error;
+
+   my $io  = AnyEvent::Handle->new (fh => $parent);
+   my $err = AnyEvent::Handle->new (fh => $error);
+   my $proc = { pid => $pid };
+
+   # keep the watcher alive independently so a fatal I/O error still reaps.
+   $proc->{child} = AE::child $pid, sub {
+      $proc->{status} = $_[1];
+      delete $proc->{pid};
+      delete $proc->{child};
+      (delete $proc->{done})->($proc->{status}) if $proc->{done};
+   };
+
+   $io->{proc}     = $proc;
+   $io->{proc_err} = $err;
+
+   $io
+}
+
+# signal a spawned process while its pid is still owned by us.
+sub proc_kill {
+   my ($proc, $signal) = @_;
+
+   my $pid = $proc->{pid} or return;
+
+   $signal //= "KILL";
+   kill $signal => $pid
+}
+
+# abandon a process and release its streams; repeated cleanup is harmless.
+sub proc_destroy {
+   my ($io) = @_;
+
+   proc_kill (delete $io->{proc}) if $io->{proc};
+   (delete $io->{proc_err})->destroy if $io->{proc_err};
+   $io->destroy;
+}
+
+# register the process's exit callback, or call it immediately if reaped.
+sub proc_on_exit {
+   my ($proc, $done) = @_;
+
+   return $done->($proc->{status})
+      if defined $proc->{status};
+
+   $proc->{done} = $done;
+}
+
+# Run a one-shot subprocess, leaving output interpretation to the caller.
+# The stream callbacks consume rbuf and may return true to terminate the child.
+sub proc_run {
+   my ($req, $command, $input, $timeout, $on_stdout, $on_stderr, $done) = @_;
+
+   my $io = proc_spawn @$command;
+   my $err = $io->{proc_err};
+   my $proc = $io->{proc};
+   my ($open, $timed_out, $failure, $timer) = (2);
+
+   my $complete = sub {
+      return if $open || !defined $proc->{status};
+      my $cb = $done or return;
+      undef $done;
+      undef $timer;
+      proc_destroy $io;
+      return if $req->{finished};
+      delete $req->{on_cancel};
+      $cb->($proc->{status}, $timed_out, $failure);
+   };
+
+   my $stop = sub {
+      undef $timer;
+      delete $req->{on_cancel};
+      $open = 0;
+      proc_destroy $io;
+      $complete->();
+   };
+   $req->{on_cancel} = $stop;
+
+   for my $stream ([$io, $on_stdout], [$err, $on_stderr]) {
+      my ($handle, $consume) = @$stream;
+      my $closed;
+      my $finish = sub {
+         return if $closed++;
+         --$open;
+         $complete->();
+      };
+      my $read = sub {
+         my ($handle, $eof) = @_;
+         my $stop = eval { $consume->($handle, $eof) };
+         if ($@) {
+            $failure ||= $@;
+            $stop = 1;
+         }
+         proc_kill $proc if $stop;
+      };
+      $handle->on_read (sub { $read->($_[0], 0) });
+      $handle->on_eof (sub {
+         $read->($_[0], 1);
+         $finish->();
+      });
+      $handle->on_error (sub {
+         return unless $_[1];
+         $read->($_[0], 0);
+         $failure ||= "subprocess I/O: $_[2]\n" unless $timed_out;
+         proc_kill $proc;
+         $finish->();
+      });
+   }
+
+   my $ok = eval {
+      $io->push_write ($input) if length $input;
+      $io->push_shutdown;
+      1
+   };
+   unless ($ok) {
+      my $error = $@;
+      proc_destroy $io;
+      die $error;
+   }
+
+   $timer = AE::timer $timeout, 0, sub {
+      $timed_out = 1;
+      $stop->();
+   };
+
+   proc_on_exit $proc, $complete;
+}
+
+# Run a subprocess and collect bounded output.
+sub fs_run {
+   my ($req, $command, $input, $timeout, $byte_limit, $line_limit, $done) = @_;
+
+   my ($truncated, $line_truncated);
+   my ($stdout, $stderr) = ("", "");
+
+   my $capture = sub {
+      my ($target, $data, $lines) = @_;
+
+      return if $lines and $line_truncated;
+      return unless length $data;
+      my $remaining = $byte_limit - (length $stdout) - (length $stderr);
+      $truncated = 1 if length $data > $remaining;
+      $$target .= substr $data, 0, $remaining
+         if $remaining > 0;
+
+      if ($lines and $line_limit and ($$target =~ tr/\n//) > $line_limit) {
+         my $end = -1;
+         $end = index $$target, "\n", $end + 1
+            for 1 .. $line_limit;
+         substr $$target, $end + 1, length $$target, "";
+         $truncated = $line_truncated = 1;
+         return 1
+      }
+
+      0
+   };
+
+   proc_run $req, $command, $input, $timeout,
+      sub {
+         my ($handle) = @_;
+         my $stop = $capture->(\$stdout, $handle->{rbuf}, 1);
+         $handle->{rbuf} = "";
+         $stop
+      },
+      sub {
+         my ($handle) = @_;
+         $capture->(\$stderr, $handle->{rbuf}, 0);
+         $handle->{rbuf} = "";
+         0
+      },
+      sub {
+         my ($status, $timed_out, $failure) = @_;
+         return $done->(0, $failure) if $failure;
+         $done->(1, +{
+            stdout    => $stdout,
+            stderr    => $stderr,
+            exit      => $status >> 8,
+            signal    => $status & 127,
+            timed_out => $timed_out ? JSON::XS::true : JSON::XS::false,
+            truncated => $truncated || $timed_out ? JSON::XS::true : JSON::XS::false,
+         });
+      };
+}
+
+my $perl_slave = q{#perl
+   binmode STDIN;
+   binmode STDOUT;
+   $SIG{PIPE} = "IGNORE";
+   $| = 1;
+
+   for (;;) {
+      4 == read STDIN, my $buf, 4
+         or last;
+      my $len = unpack "N", $buf;
+      $len == read STDIN, $buf, $len
+         or die "short perl frame\n";
+
+      my @result = do {
+         (my $source, local @ARGV) = unpack "(w/a*)*", $buf;
+         ("+", eval $source)
+      };
+
+      @result = ("-", $@)
+         if $@;
+
+      print pack "N/a*", pack "(w/a*)*", @result
+         or die "stdout: $!\n"
+   }
+};
+
+sub perl_frame {
+   pack "N/a*", pack "(w/a*)*", @_
+}
+
+my $perl_worker;
+
+sub perl_eval {
+   my ($req, $workdir, $sandbox_grants, $source, $args, $timeout, $done) = @_;
+
+   my @command = ((fs_sandbox $workdir, $sandbox_grants), $perl, "-e", $perl_slave);
+   my $key = pack "(w/a*)*", @command;
+   my $io = $perl_worker;
+   undef $perl_worker;
+
+   if ($io && ($io->{perl_key} ne $key || !$io->{proc}{pid})) {
+      proc_destroy $io;
+      undef $io;
+   }
+
+   unless ($io) {
+      $io = proc_spawn @command;
+      $io->{rbuf_max} = (1 << 20) + 4096;
+      $io->{perl_key} = $key;
+      weaken (my $this = $io);
+
+      my $idle_destroy = sub {
+         my $io = $this or return;
+
+         undef $perl_worker if $perl_worker && $perl_worker == $io;
+         proc_destroy $io;
+      };
+      my $idle_stderr = sub { $_[0]{rbuf} = "" };
+
+      $io->{perl_idle} = sub {
+         my ($io) = @_;
+         my $err = $io->{proc_err};
+
+         $io ->on_eof   ($idle_destroy);
+         $io ->on_error ($idle_destroy);
+         $err->on_eof   ($idle_destroy);
+         $err->on_error ($idle_destroy);
+         $err->on_read  ($idle_stderr );
+         $io ->on_read  ($idle_destroy);
+      };
+
+      proc_on_exit $io->{proc}, sub {
+         my $io = $this or return;
+
+         $io->{perl_on_exit}->($_[0]) if $io->{perl_on_exit};
+         $idle_destroy->() if $perl_worker && $perl_worker == $io;
+      };
+   }
+
+   my $err = $io->{proc_err};
+   my $timer;
+   my $stderr = "";
+
+   my $finish = sub {
+      my ($failure, $payload) = @_;
+      my $cb = $done or return;
+      undef $done;
+      undef $timer;
+      delete $req->{on_cancel};
+      delete $io->{perl_on_exit};
+
+      if ($failure || defined $io->{proc}{status}) {
+         my $status = $io->{proc}{status};
+         my $reason = $failure || "exited (exit " . ($status >> 8)
+            . ", signal " . ($status & 127) . ")";
+         AE::log warn => "sandbox perl worker: $reason"
+            unless $failure && $failure =~ /\Asandbox perl (?:cancelled|timed out)\n\z/;
+         proc_destroy $io;
+         return $cb->(0, $failure || "sandbox perl exited\n")
+            unless $req->{finished};
+         return;
+      }
+
+      my (@response, $error);
+      my $ok = eval {
+         @response = unpack "(w/a*)*", $payload;
+         my $status = shift @response;
+         defined $status or die "missing perl response status\n";
+         if ($status eq "-") {
+            $error = AnyEvent::MCP::utf8dec $response[0];
+         } elsif ($status ne "+") {
+            die "invalid perl response status\n";
+         }
+         1
+      };
+
+      unless ($ok) {
+         my $error = $@;
+         AE::log warn => "sandbox perl worker: $error";
+         proc_destroy $io;
+         return $cb->(0, $error) unless $req->{finished};
+         return;
+      }
+
+      # the response completes the request; the interpreter remains idle.
+      proc_destroy $perl_worker if $perl_worker;
+      $perl_worker = $io;
+      $io->{perl_idle}->($io);
+      return if $req->{finished};
+      return $cb->(0, $error) if defined $error;
+      $cb->(1, \@response);
+   };
+
+   $io->{perl_on_exit} = sub {
+      my ($status) = @_;
+      $finish->("sandbox perl failed (exit " . ($status >> 8)
+         . ", signal " . ($status & 127) . "): $stderr\n");
+   };
+
+   $req->{on_cancel} = sub { $finish->("sandbox perl cancelled\n") };
+   $io->on_eof (sub { $finish->("short perl response\n") });
+   $io->on_error (sub { $finish->("sandbox perl stdout: $_[2]\n") if $_[1] });
+   $err->on_read (sub {
+      $stderr .= substr $_[0]{rbuf}, 0, 65536 - length $stderr
+         if length $stderr < 65536;
+      $_[0]{rbuf} = "";
+   });
+   $err->on_eof (sub { $finish->("sandbox perl stderr closed\n") });
+   $err->on_error (sub { $finish->("sandbox perl stderr: $_[2]\n") if $_[1] });
+
+   $timer = AE::timer $timeout, 0, sub { $finish->("sandbox perl timed out\n") };
+   my $ok = eval {
+      $io->push_read (packstring => "N", sub {
+         my ($io, $payload) = @_;
+
+         return $finish->("unexpected sandbox perl output\n")
+            if length $io->{rbuf};
+         $finish->(undef, $payload);
+      });
+      $io->push_write (perl_frame $source, @$args);
+      1
+   };
+   $finish->($@) unless $ok;
+}
+
+# resolve a configured workdir by persistent ID or exact path.
+sub fs_workdir {
+   my ($id) = @_;
+
+   $id = $workdir_ids->{ids}[0] if !defined $id and @workdir == 1;
+
+   defined $id && !ref $id
+      or die "select a configured workdir by ID or exact path\n";
+
+   my $i;
+   if ($id =~ /\A[0-9]+\z/) {
+      ($i) = grep $workdir_ids->{ids}[$_] == $id, 0 .. $#workdir;
+      defined $i or die "Unknown workdir ID '$id'\n";
+   } else {
+      my @match = grep { $id eq $workdir_identity[$_] || $id eq $workdir[$_] } 0 .. $#workdir;
+      @match == 1 or die @match
+         ? "Ambiguous configured workdir '$id'\n"
+         : "Unknown configured workdir '$id'\n";
+      $i = $match[0];
+   }
+
+   wantarray ? ($workdir[$i], $workdir_identity[$i]) : $workdir[$i]
+}
+
+my $workdir_schema = {
+   description => "Configured workdir: persistent positive integer ID (or numeric string), or exact path from workdirs/resolved_workdirs. IDs are object keys in those listings, not argument positions. Required when multiple workdirs are configured.",
+   anyOf => [
+      { type => "integer", minimum => 1 },
+      { type => "string", minLength => 1 },
+   ],
+};
+
+sub fs_result;
+
+# command output options affect presentation, never argv or permission scope.
+my %output_schema = (
+   grep => { type => "string", description => "Optional PCRE line filter for stdout only. Runs after bounded capture, without a shell." },
+   max_lines => { type => "integer", minimum => 1, maximum => 100000, default => 2000,
+      description => "Maximum returned stdout lines after filtering." },
+   max_bytes => { type => "integer", minimum => 1, maximum => 1048576, default => 65536,
+      description => "Maximum returned UTF-8 bytes per stream; stderr is never filtered." },
+);
+
+sub fs_output_options {
+   my ($args) = @_;
+
+   my %options = (max_lines => $args->{max_lines} // 2000, max_bytes => $args->{max_bytes} // 65536);
+   for my $name (qw(max_lines max_bytes)) {
+      $options{$name} =~ /\A[0-9]+\z/ && $options{$name} >= 1
+         && $options{$name} <= $output_schema{$name}{maximum}
+         or die "invalid $name\n";
+   }
+
+   if (exists $args->{grep}) {
+      defined $args->{grep} && !ref $args->{grep} && $args->{grep} !~ /\0/
+         && length $args->{grep} <= 65536
+         or die "grep must be a string without NUL, at most 65536 characters\n";
+      $grep or die "output filtering needs GNU grep\n";
+      $options{grep} = AnyEvent::MCP::utf8enc $args->{grep};
+   }
+
+   \%options
+}
+
+# clipping a UTF-8 stream may leave at most three bytes of an incomplete character.
+sub fs_output_text {
+   my ($bytes, $cut) = @_;
+
+   for (0 .. ($cut ? 3 : 0)) {
+      my $text = $bytes;
+      return $text if utf8::decode $text;
+      chop $bytes;
+   }
+
+   die "command output is not UTF-8\n";
+}
+
+# preserve child status while bounding capture and, separately, returned output.
+sub fs_command {
+   my ($req, $workdir, $grants, $argv, $input, $timeout, $options, $cwd) = @_;
+
+   # check the actual directory inside the worker, after resolving symlinks.
+   $argv = [$perl, "-MCwd", "-e", q{
+      my $workdir = shift;
+      chdir shift or die "VCS chdir: $!\n";
+      my $cwd = Cwd::getcwd ();
+      defined $cwd && ($workdir eq "/" || $cwd eq $workdir || (index $cwd, "$workdir/") == 0)
+         or die "VCS cwd must resolve within the selected workdir\n";
+      exec {$ARGV[0]} @ARGV;
+      die "VCS exec: $!\n";
+   }, $workdir, $cwd, @$argv] if defined $cwd;
+
+   my @command = ((fs_sandbox $workdir, $grants),
+      $bwrap ? @$argv
+         : ($^X, "-e", 'chdir shift or die "chdir: $!"; exec @ARGV; die "exec: $!";', $workdir, @$argv));
+   my ($stdout, $stderr) = ("", "");
+   my ($stdout_cut, $stderr_cut);
+
+   my $capture = sub {
+      my ($handle, $out, $cut) = @_;
+      my $remaining = 1048576 - length $$out;
+      $$cut = 1 if length $handle->{rbuf} > $remaining;
+      $$out .= substr $handle->{rbuf}, 0, $remaining if $remaining > 0;
+      $handle->{rbuf} = "";
+      0
+   };
+
+   proc_run $req, \@command, $input, $timeout,
+      sub { $capture->($_[0], \$stdout, \$stdout_cut) },
+      sub { $capture->($_[0], \$stderr, \$stderr_cut) },
+      sub {
+         my ($status, $timed_out, $failure) = @_;
+         return $req->error ($failure) if $failure;
+
+         my $result = {
+            exit => $status >> 8, signal => $status & 127,
+            timed_out => $timed_out ? JSON::XS::true : JSON::XS::false,
+            capture_truncated => $stdout_cut || $stderr_cut || $timed_out ? JSON::XS::true : JSON::XS::false,
+         };
+
+         my $finish = sub {
+            my $ok = eval {
+               $stdout_cut = 1 if length $stdout > $options->{max_bytes};
+               $stderr_cut = 1 if length $stderr > $options->{max_bytes};
+               my $out = fs_output_text (substr ($stdout, 0, $options->{max_bytes}), $stdout_cut);
+               my $err = fs_output_text (substr ($stderr, 0, $options->{max_bytes}), $stderr_cut);
+               my @lines = split /(?<=\n)/, $out;
+               if (@lines > $options->{max_lines}) {
+                  splice @lines, $options->{max_lines};
+                  $out = join "", @lines;
+                  $stdout_cut = 1;
+               }
+               @$result{qw(stdout stderr)} = ($out, $err);
+               $result->{stdout_truncated} = $stdout_cut || $timed_out ? JSON::XS::true : JSON::XS::false;
+               $result->{stderr_truncated} = $stderr_cut || $timed_out ? JSON::XS::true : JSON::XS::false;
+               $result->{truncated} = $stdout_cut || $stderr_cut || $timed_out ? JSON::XS::true : JSON::XS::false;
+               1
+            };
+            return $req->error ($@) unless $ok;
+            $req->reply (fs_result $result, exists $result->{filter_error});
+         };
+
+         return $finish->() unless exists $options->{grep};
+
+         {
+            my $ok = eval { $stdout = AnyEvent::MCP::utf8enc (fs_output_text $stdout, $stdout_cut); 1 };
+            return $req->error ($@) unless $ok;
+         }
+
+         # regex execution stays in a timed worker, outside the broker's event loop.
+         my @filter = ((fs_sandbox $workdir, $grants), $grep, "-aP", "--", $options->{grep});
+         fs_run $req, \@filter, $stdout, 5, 1048576, 0, sub {
+            my ($success, $filtered) = @_;
+            if (!$success || $filtered->{exit} > 1 || $filtered->{signal} || $filtered->{timed_out}) {
+               my $error = $success ? $filtered->{stderr} : $filtered;
+               $error = eval { fs_output_text (substr ($error, 0, 4096), 1) } || "no diagnostic";
+               $result->{filter_error} = "stdout filter failed: $error";
+               $stdout = "";
+               $stdout_cut = 1;
+            } else {
+               $stdout = $filtered->{stdout};
+               $stdout_cut ||= $filtered->{truncated};
+            }
+            $finish->();
+         };
+      };
+}
+
+# wrap raw text as an MCP text result.
+sub fs_text_result {
+   my ($text, $failed) = @_;
+
+   my $response = {
+      content => [{
+         type => "text",
+         text => $text,
+      }],
+   };
+
+   $response->{isError} = JSON::XS::true if $failed;
+
+   $response
+}
+
+# wrap a Perl value as an MCP text result.
+sub fs_result {
+   my ($result, $failed) = @_;
+
+   my $response = fs_text_result (JSON::XS->new->encode ($result), $failed);
+   $response->{structuredContent} = $result;
+
+   $response
+}
+
+mcp_tool workdirs =>
+   "List configured workdirs, VCS metadata markers at each workdir (without recursion or parent search), available VCS clients, sandbox grants, trusted mounts and runtime paths.",
+   {
+      type                 => "object",
+      properties           => {},
+      additionalProperties => JSON::XS::false,
+   },
+   sub {
+      my ($req, $args) = @_;
+
+      AE::log debug => "fs workdirs";
+
+      # report local metadata markers, not an inferred repository for the tree.
+      my %marker = (cvs => "CVS", git => ".git", hg => ".hg", svn => ".svn");
+      my %workdir_vcs = map {
+         my $i = $_;
+         ($workdir_identity[$i] => [grep {
+            lstat "$workdir[$i]/$marker{$_}" && (-d _ || -l _ || ($_ eq "git" && -f _))
+         } sort keys %marker])
+      } 0 .. $#workdir;
+
+      $req->reply (fs_result +{
+         workdirs                   => { map { $workdir_ids->{ids}[$_] => $workdir_identity[$_] } reverse 0 .. $#workdir },
+         resolved_workdirs          => { map { $workdir_ids->{ids}[$_] => $workdir[$_] } 0 .. $#workdir },
+         workdir_vcs                => \%workdir_vcs,
+         vcs_backends               => [sort grep defined $vcs_program{$_}, keys %vcs_program],
+         umask                      => (sprintf "%04o", $umask),
+         runtime_paths              => \@runtime_path,
+         mounts                     => \@mount,
+         sandbox_grants             => \%sandbox_grant,
+         exec_default_sandbox_grants => \@exec_default_sandbox_grants,
+         unavailable_sandbox_grants  => ["host-proc"],
+      });
+   }
+;
+
+# escape a pathname for compact line-oriented text output.
+sub escape_path {
+   my ($text) = @_;
+
+   $text =~ s/\\/\\\\/g;
+   $text =~ s/\n/\\n/g;
+   $text
+}
+
+sub format_iec_number {
+   my ($number) = @_;
+
+   for my $suffix ("", qw(k M G T P)) {
+      return "$number$suffix" if $number < 1024 or $suffix eq "P";
+      $number = int (($number + 512) / 1024);
+   }
+}
+
+sub fs_find_relative {
+   my ($base, $path) = @_;
+
+   return "" if $path eq $base;
+   substr $path, length ($base) + ($base eq "/" ? 0 : 1)
+}
+
+sub format_path_listing {
+   my ($base, $record, $truncated) = @_;
+
+   my (@line, $directory);
+
+   for my $record (sort { $a->[2] cmp $b->[2] } @$record) {
+      my ($type, $size, $full_path) = @$record;
+      my $relative = fs_find_relative $base, $full_path;
+
+      if ($type eq "d") {
+         push @line, "/" . (escape_path $relative);
+         $directory = $relative;
+         next;
+      }
+
+      my ($dir, $name);
+
+      if (!length $relative) {
+         ($name) = $full_path =~ m{([^/]*)\z};
+      } else {
+         ($dir, $name) = $relative =~ m{\A(?:(.*)/)?([^/]*)\z};
+         $dir //= "";
+
+         if (!defined $directory or $directory ne $dir) {
+            push @line, "/" . (escape_path $dir);
+            $directory = $dir;
+         }
+      }
+
+      $name = escape_path $name;
+      push @line, $type eq "f"
+         ? (join "\t", $type, (format_iec_number $size), $name)
+         : (join "\t", $type, $name);
+   }
+
+   push @line, "!truncated" if $truncated;
+
+   join "", map "$_\n", @line
+}
+
+sub fs_list_find {
+   my ($req, $args, $recurse) = @_;
+
+   my $tool = $recurse ? "find" : "list";
+
+   my ($workdir, $identity) = fs_workdir $args->{workdir};
+   my $path = fs_path $workdir, $args->{path} // ".";
+   my $limit = $args->{limit} // 200;
+   $limit <= 1000
+      or die "invalid limit\n";
+
+   my $granted = fs_require_paths ($req, $workdir, $identity, [$path], "read",
+      $args->{reason} // "$tool $path");
+
+   if ($recurse) {
+      AE::log debug => join " ", "fs", $tool, $path, (substr $args->{name}, 0, 40);
+   } else {
+      AE::log debug => "fs $tool $path";
+   }
+
+   my $find_path = AnyEvent::MCP::utf8enc $path;
+   my @command = ((fs_sandbox $workdir, $granted), $find, $find_path);
+
+   if ($recurse) {
+      my $needle = AnyEvent::MCP::utf8enc $args->{name};
+      $needle =~ s/([\\*?\[])/\\$1/g;
+      push @command, "!", "-type", "d", "-name", "*$needle*";
+   } else {
+      push @command, "-maxdepth", "1";
+   }
+
+   push @command, "-printf", q{%y\0%s\0%p\0};
+
+   my (@record, $seen, $truncated, $failure);
+   my $stderr = "";
+
+   proc_run $req, \@command, "", 30,
+      sub {
+         my ($handle, $eof) = @_;
+
+         while (!$failure and !$truncated
+                and $handle->{rbuf} =~ s/\A([^\0]*)\0([^\0]*)\0([^\0]*)\0//s) {
+            my ($type, $size, $raw_path) = ($1, $2, $3);
+            my $full_path = eval { AnyEvent::MCP::utf8dec $raw_path };
+
+            if ($@) {
+               $failure = "$tool returned a non-UTF-8 pathname\n";
+               last;
+            }
+
+            if (++$seen > $limit) {
+               $truncated = 1;
+               last;
+            }
+
+            push @record, [$type, $size, $full_path];
+         }
+
+         $failure ||= "incomplete $tool output\n"
+            if $eof && length $handle->{rbuf} && !$truncated;
+         $handle->{rbuf} = "" if $failure or $truncated;
+         $failure || $truncated
+      },
+      sub {
+         my ($handle) = @_;
+         my $remaining = 65536 - length $stderr;
+         $stderr .= substr $handle->{rbuf}, 0, $remaining if $remaining > 0;
+         $handle->{rbuf} = "";
+         0
+      },
+      sub {
+         my ($status, $timed_out, $io_failure) = @_;
+         return if $req->{finished};
+
+         my $result;
+         my $ok = eval {
+            die "$tool timed out\n" if $timed_out;
+            die $failure || $io_failure if $failure || $io_failure;
+
+            if (($status >> 8 or $status & 127) and !$truncated) {
+               my $error = eval { AnyEvent::MCP::utf8dec $stderr };
+               $error = "non-UTF-8 error output" if $@;
+               die "$tool failed (exit " . ($status >> 8) . ", signal " . ($status & 127) . "): $error\n";
+            }
+
+            $result = fs_text_result (format_path_listing $path, \@record, $truncated);
+            1
+         };
+
+         if ($ok) {
+            $req->reply ($result);
+         } else {
+            $req->error ($@);
+         }
+      };
+}
+
+$find && mcp_tool list =>
+   "List immediate filesystem entries without following symlinks. "
+   . "Compact text output uses /relative-directory headers for directories, f<TAB>approx-size<TAB>name "
+   . "for regular files, TYPE<TAB>name for l/p/s/b/c/? nodes, "
+   . "with compact size suffixes k/M/G/T/P using IEC powers of 1024, "
+   . "and !truncated when the result limit was exceeded. Backslash and newline are escaped in names.",
+   {
+      type                 => "object",
+      properties           => {
+         path   => {
+            type        => "string",
+            description => "Directory to list; defaults to the selected workdir.",
+         },
+         limit  => {
+            type    => "integer",
+            minimum => 1,
+            maximum => 1000,
+            default => 200,
+         },
+         workdir => $workdir_schema,
+         reason => {
+            type        => "string",
+            description => "Reason for requesting permission.",
+         },
+      },
+      additionalProperties => JSON::XS::false,
+   },
+   sub {
+      fs_list_find $_[0], $_[1], 0
+   }
+;
+
+$find && mcp_tool find =>
+   "Find non-directory filesystem entries recursively by literal basename substring without following symlinks. Same output format as list.",
+   {
+      type                 => "object",
+      properties           => {
+         path   => {
+            type        => "string",
+            description => "Path to search recursively; defaults to the selected workdir.",
+         },
+         name   => {
+            type        => "string",
+            minLength   => 1,
+            description => "Literal substring of the basename to find.",
+         },
+         limit  => {
+            type    => "integer",
+            minimum => 1,
+            maximum => 1000,
+            default => 200,
+         },
+         workdir => $workdir_schema,
+         reason => {
+            type        => "string",
+            description => "Reason for requesting permission.",
+         },
+      },
+      required             => ["name"],
+      additionalProperties => JSON::XS::false,
+   },
+   sub {
+      fs_list_find $_[0], $_[1], 1
+   }
+;
+
+my $file_read = q{#perl
+   my ($path, $offset, $length) = @ARGV;
+
+   open my $fh, "<:raw", $path     or return 0, "open: $!";
+   defined sysseek $fh, $offset, 0 or return 0, "seek: $!";
+   my $n = sysread $fh, my $data, $length;
+   defined $n                      or return 0, "read: $!";
+
+   (1, $data)
+};
+
+$perl && mcp_tool file_read =>
+   "Read up to 1 MiB by byte offset; returns structured {data: BASE64} on success or {error: STRING} on filesystem failure.",
+   {
+      type                 => "object",
+      properties           => {
+         path     => {
+            type => "string",
+         },
+         offset   => {
+            type    => "integer",
+            minimum => 0,
+            default => 0,
+         },
+         length   => {
+            type    => "integer",
+            minimum => 1,
+            maximum => 1<<20,
+            default => 1<<16,
+         },
+         workdir => $workdir_schema,
+         reason   => {
+            type        => "string",
+            description => "Reason for requesting permission.",
+         },
+      },
+      required             => ["path"],
+      additionalProperties => JSON::XS::false,
+   },
+   sub {
+      my ($req, $args) = @_;
+
+      my ($workdir, $identity) = fs_workdir $args->{workdir};
+      my $offset = $args->{offset} // 0;
+      my $length = $args->{length} // 65536;
+      $length <= 1<<20
+         or die "invalid read range\n";
+      my $path = fs_path $workdir, $args->{path};
+
+      my $granted = fs_require_paths ($req, $workdir, $identity, [$path], "read",
+         $args->{reason} // "read $path");
+
+      AE::log debug => join " ", "fs file-read", $path, $offset, $length;
+
+      perl_eval $req, $workdir, $granted, $file_read,
+         [AnyEvent::MCP::utf8enc $path, $offset, $length], 30, sub {
+         my ($success, $result) = @_;
+
+         return $req->error ($result)
+            unless $success;
+
+         @$result == 2
+            or return $req->error ("invalid file-read response\n");
+         my ($ok, $value) = @$result;
+         if ($ok eq "1") {
+            $req->reply (fs_result {
+               data => MIME::Base64::encode_base64 ($value, ""),
+            });
+         } elsif ($ok eq "0") {
+            $req->reply (fs_result {
+               error => AnyEvent::MCP::utf8dec $value,
+            });
+         } else {
+            $req->error ("invalid file-read status\n");
+         }
+      };
+   }
+;
+
+$sed && mcp_tool read_lines =>
+   "Read byte-LF-delimited (0x0A) lines by positive line-number ranges. "
+   . "encoding: utf-8 (strict, default), latin1 (raw bytes as Latin-1 text), or base64 (each range's exact sed output bytes). "
+   . "linenums=true prefixes each line with its absolute line number and a colon (before base64 encoding, if selected). "
+   . "Each requested range returns two MCP text items: [range=N,M] metadata (truncated=1 only if output was truncated), then the selected text without added line endings. Order, overlaps and duplicates are preserved; raw-byte output is limited to 1 MiB.",
+   {
+      type                 => "object",
+      properties           => {
+         path   => {
+            type => "string",
+         },
+         ranges => {
+            type     => "array",
+            description => "Inclusive line ranges, each N or N,M.",
+            items    => {
+               type    => "string",
+               pattern => q{^[1-9][0-9]*(?:,[1-9][0-9]*)?$},
+            },
+            minItems => 1,
+            maxItems => 20,
+         },
+         encoding => {
+            type        => "string",
+            description => "How each selected byte range is represented: utf-8 (strict, default), latin1, or base64. Line numbers always count LF (0x0A) bytes.",
+            enum        => ["utf-8", "latin1", "base64"],
+            default     => "utf-8",
+         },
+         linenums => {
+            type        => "boolean",
+            description => "Prefix each line, including blanks, with absolute line number and colon.",
+            default     => JSON::XS::false,
+         },
+         workdir => $workdir_schema,
+         reason => {
+            type        => "string",
+            description => "Reason for requesting permission.",
+         },
+      },
+      required             => ["path", "ranges"],
+      additionalProperties => JSON::XS::false,
+   },
+   sub {
+      my ($req, $args) = @_;
+
+      my $encoding = $args->{encoding} // "utf-8";
+      $encoding =~ /\A(?:utf-8|latin1|base64)\z/ or die "invalid read-lines encoding\n";
+
+      my ($workdir, $identity) = fs_workdir $args->{workdir};
+      my $path = fs_path $workdir, $args->{path};
+      my @range = map {
+         my ($start, $end) = /\A([1-9]\d*)(?:,([1-9]\d*))?\z/
+            or die "invalid line range\n";
+         $end //= $start;
+         $start <= $end
+            or die "invalid line range\n";
+         [$_, $start, $end]
+      } @{$args->{ranges}};
+
+      my $granted = fs_require_paths ($req, $workdir, $identity, [$path], "read",
+         $args->{reason} // "read lines $path");
+
+      AE::log debug => join " ", "fs read-lines", $path, map $_->[0], @range;
+
+      my (@result, $truncated);
+      my $remaining = 1 << 20;
+      my $next;
+      $next = sub {
+         unless (@range) {
+            undef $next;
+            my @content;
+            for my $i (0 .. $#result) {
+               my ($range, $body) = @{$result[$i]};
+               my $header = "[range=$range";
+               $header .= " truncated=1" if $truncated && $i == $#result;
+               push @content,
+                  { type => "text", text => "$header]" },
+                  { type => "text", text => $body };
+            }
+            push @content, { type => "text", text => "[truncated=1]" }
+               if $truncated && !@content;
+            return $req->reply ({ content => \@content });
+         }
+
+         my ($range, $start, $end) = @{shift @range};
+         my @command = (
+            (fs_sandbox $workdir, $granted),
+            $sed, "-n",
+            "-e", ($start == $end ? "${start}p" : "${start},${end}p"),
+            "-e", "${end}Q", # Preserve unterminated final line (GNU sed).
+            AnyEvent::MCP::utf8enc $path,
+         );
+
+         fs_run $req, \@command, "", 30, $remaining, 0, sub {
+            my ($success, $value) = @_;
+
+            return $req->error ($value)
+               unless $success;
+
+            my $body;
+            my $ok = eval {
+               die "read-lines timed out\n" if $value->{timed_out};
+               if ($value->{exit} or $value->{signal}) {
+                  my $stderr = AnyEvent::MCP::utf8dec $value->{stderr};
+                  die "read-lines failed (exit $value->{exit}, signal $value->{signal}): $stderr\n";
+               }
+               if ($args->{linenums} && length $value->{stdout}) {
+                  my $line = $start;
+                  $value->{stdout} =~ s/^/$line++ . ":"/gme;
+                  if (length $value->{stdout} > $remaining) {
+                     substr ($value->{stdout}, $remaining) = "";
+                     $value->{truncated} = 1;
+                  }
+               }
+               $body = $encoding eq "utf-8" ? AnyEvent::MCP::utf8dec $value->{stdout}
+                     : $encoding eq "base64" ? MIME::Base64::encode_base64 ($value->{stdout}, "")
+                     : $value->{stdout}; # Unflagged byte strings are Latin-1 to Perl/JSON::XS.
+               1
+            };
+            return $req->error ($@)
+               unless $ok;
+
+            push @result, [$range, $body];
+            $remaining -= length $value->{stdout};
+            if ($value->{truncated} or ($remaining <= 0 and @range)) {
+               $truncated = 1;
+               @range = ();
+            }
+            $next->();
+         };
+      };
+
+      $next->();
+   }
+;
+
+my $file_write = q{#perl
+   my ($path, $offset, $data) = @ARGV;
+
+   use Fcntl qw(O_WRONLY O_CREAT);
+   sysopen my $fh, $path, O_WRONLY | O_CREAT, 0666 or return 0, "open: $!";
+
+   binmode $fh;
+   defined sysseek $fh, $offset, 0 or return 0, "seek: $!";
+   my $n = syswrite $fh, $data;
+   defined $n or return 0, "write: $!";
+
+   (1, "$n")
+};
+
+$perl && mcp_tool file_write =>
+   "Write up to 1 MiB of base64 data at a byte offset without truncating; returns structured {bytes: INTEGER} on success or {error: STRING} on filesystem failure.",
+   {
+      type                 => "object",
+      properties           => {
+         path    => {
+            type => "string",
+         },
+         offset  => {
+            type    => "integer",
+            minimum => 0,
+            default => 0,
+         },
+         data    => {
+            type => "string",
+         },
+         workdir => $workdir_schema,
+         reason  => {
+            type        => "string",
+            description => "Reason for requesting permission.",
+         },
+      },
+      required             => ["path", "data"],
+      additionalProperties => JSON::XS::false,
+   },
+   sub {
+      my ($req, $args) = @_;
+
+      my ($workdir, $identity) = fs_workdir $args->{workdir};
+      my $offset = $args->{offset} // 0;
+      my $data = MIME::Base64::decode_base64 $args->{data};
+      MIME::Base64::encode_base64 ($data, "") eq $args->{data}
+         or die "invalid base64 data\n";
+      length $data <= 1048576
+         or die "write data exceeds 1 MiB\n";
+      my $path = fs_path $workdir, $args->{path};
+
+      my $granted = fs_require_paths ($req, $workdir, $identity, [$path], "write",
+         $args->{reason} // "write $path");
+
+      AE::log debug => join " ", "fs file-write", $path, $offset, length ($data);
+
+      perl_eval $req, $workdir, $granted, $file_write,
+         [AnyEvent::MCP::utf8enc $path, $offset, $data], 30, sub {
+         my ($success, $result) = @_;
+
+         return $req->error ($result)
+            unless $success;
+
+         @$result == 2
+            or return $req->error ("invalid file-write response\n");
+         my ($ok, $value) = @$result;
+         if ($ok eq "1") {
+            $value =~ /\A[0-9]+\z/
+               or return $req->error ("invalid file-write byte count\n");
+            $req->reply (fs_result {
+               bytes => 0 + $value,
+            });
+         } elsif ($ok eq "0") {
+            $req->reply (fs_result {
+               error => AnyEvent::MCP::utf8dec $value,
+            });
+         } else {
+            $req->error ("invalid file-write status\n");
+         }
+      };
+   }
+;
+
+my $path_op = q{#perl
+   while (@ARGV) {
+      my $op = shift;
+
+      if ($op eq "unlink") {
+         my $path = shift;
+
+         unlink $path
+            or die "unlink $path: $!\n";
+      } elsif ($op eq "rmdir") {
+         my $path = shift;
+
+         rmdir $path
+            or die "rmdir $path: $!\n";
+      } elsif ($op eq "mkdir") {
+         my ($path, $mode) = splice @ARGV, 0, 2;
+         $mode = oct $mode;
+         mkdir $path, $mode
+            or die "mkdir $path: $!\n";
+         chmod $mode, $path
+            or die "chmod $path: $!\n";
+      } elsif ($op eq "mkpath") {
+         my ($path, $mode) = splice @ARGV, 0, 2;
+         $mode = oct $mode;
+         my $prefix = "";
+
+         for (split m{/}, $path) {
+            next unless length;
+            $prefix .= "/$_";
+            next if -d $prefix;
+            mkdir $prefix, $mode
+               or die "mkdir $prefix: $!\n";
+            chmod $mode, $prefix
+               or die "chmod $prefix: $!\n";
+         }
+      } elsif ($op eq "symlink") {
+         my ($target, $path) = splice @ARGV, 0, 2;
+         symlink $target, $path
+            or die "symlink $path: $!\n";
+      } elsif ($op eq "truncate") {
+         my ($path, $size) = splice @ARGV, 0, 2;
+         truncate $path, $size
+            or die "truncate $path: $!\n";
+      } elsif ($op eq "chmod") {
+         my ($path, $mode) = splice @ARGV, 0, 2;
+         $mode = oct $mode;
+         chmod $mode, $path
+            or die "chmod $path: $!\n";
+      } elsif ($op eq "rename") {
+         my ($path, $to) = splice @ARGV, 0, 2;
+         rename $path, $to
+            or die "rename $path -> $to: $!\n";
+      } else {
+         die "invalid path operation '$op'\n";
+      }
+   }
+
+   1
+};
+
+$perl && mcp_tool path_op =>
+   "Perform pathname mutations in fixed order: unlink, rmdir, mkpath, mkdir, symlink, truncate, chmod, rename. "
+   . "Operations stop at the first failure; earlier changes remain and are not rolled back. "
+   . "mkpath creates missing components in the worker; symlink targets are link contents, not authority.",
+   {
+      type                 => "object",
+      properties           => {
+         path     => {
+            type => "string",
+         },
+         unlink   => {
+            type => "boolean",
+         },
+         rmdir    => {
+            type => "boolean",
+         },
+         mkdir    => {
+            description => "Create path as a directory with this final mode, overriding umask.",
+            anyOf       => [
+               { type => "string", pattern => q{^[0-7]+$} },
+               { type => "integer", minimum => 0 },
+            ],
+         },
+         mkpath   => {
+            description => "Create missing path components with this final mode, overriding umask.",
+            anyOf       => [
+               { type => "string", pattern => q{^[0-7]+$} },
+               { type => "integer", minimum => 0 },
+            ],
+         },
+         symlink  => {
+            type        => "string",
+            minLength   => 1,
+            description => "Create path as a symlink containing this target.",
+         },
+         truncate => {
+            type    => "integer",
+            minimum => 0,
+         },
+         chmod     => {
+            anyOf => [
+               { type => "string", pattern => q{^[0-7]+$} },
+               { type => "integer", minimum => 0 },
+            ],
+         },
+         rename    => {
+            type        => "string",
+            minLength   => 1,
+            description => "Rename path to this destination.",
+         },
+         workdir => $workdir_schema,
+         reason    => {
+            type        => "string",
+            description => "Reason for requesting permission.",
+         },
+      },
+      required             => ["path"],
+      additionalProperties => JSON::XS::false,
+   },
+   sub {
+      my ($req, $args) = @_;
+
+      ($args->{unlink} or $args->{rmdir}
+       or grep { exists $args->{$_} } qw(mkdir mkpath symlink truncate chmod rename))
+         or die "no path operation requested\n";
+
+      my ($workdir, $identity) = fs_workdir $args->{workdir};
+      my $path = fs_path $workdir, $args->{path};
+      my $rename = exists $args->{rename}
+         ? fs_path $workdir, $args->{rename}
+         : undef;
+      die "mkpath requires a path in the selected workdir\n"
+         if exists $args->{mkpath} && !fs_inside ($path, $workdir);
+
+      my $json = JSON::XS->new;
+      my @log = map {
+         ($_ eq "unlink" or $_ eq "rmdir")
+            ? ($args->{$_} ? $_ : ())
+            : (exists $args->{$_}
+               ? "$_: " . $json->encode ($_ eq "rename" ? $rename : $args->{$_}) : ())
+      } qw(unlink rmdir mkpath mkdir symlink truncate chmod rename);
+      my $reason = join "\n",
+         (defined $args->{reason} ? $args->{reason} : ()),
+         "Path: " . $json->encode ($path), "Operations (in order):", map "  $_", @log;
+
+      my $granted = fs_require_paths $req, $workdir, $identity,
+         [$path, (defined $rename ? $rename : ())], "write", $reason;
+
+      AE::log debug => join " ", "fs path-op", $path, @log;
+
+      my @operation;
+      my $raw_path = AnyEvent::MCP::utf8enc $path;
+
+      push @operation, unlink => $raw_path
+         if $args->{unlink};
+      push @operation, rmdir => $raw_path
+         if $args->{rmdir};
+      push @operation, mkpath => $raw_path, $args->{mkpath}
+         if exists $args->{mkpath};
+      push @operation, mkdir => $raw_path, $args->{mkdir}
+         if exists $args->{mkdir};
+      push @operation, symlink => (AnyEvent::MCP::utf8enc $args->{symlink}), $raw_path
+         if exists $args->{symlink};
+      push @operation, truncate => $raw_path, $args->{truncate}
+         if exists $args->{truncate};
+      push @operation, chmod => $raw_path, $args->{chmod}
+         if exists $args->{chmod};
+      push @operation, rename => $raw_path, (AnyEvent::MCP::utf8enc $rename)
+         if defined $rename;
+
+      perl_eval $req, $workdir, $granted, $path_op,
+         \@operation, 30, sub {
+         my ($success, $result) = @_;
+
+         return $req->error ($result)
+            unless $success;
+
+         @$result == 1 and $result->[0] eq "1"
+            or return $req->error ("invalid path-op response\n");
+         $req->reply (fs_text_result "ok\n");
+      };
+   }
+;
+
+my $file_patch = q{#perl
+   use Fcntl qw(O_RDWR O_CREAT O_EXCL);
+   use Errno qw(EEXIST ENAMETOOLONG);
+
+   my ($patch, $path, $diff, @max_offset) = @ARGV;
+
+   my $create_tempfile = sub {
+      my ($name) = @_;
+      utf8::decode $name
+         or return undef, "invalid UTF-8 tempfile name";
+
+      my $slash = rindex $name, "/";
+      my $dir = $slash < 0 ? "" : substr $name, 0, $slash + 1;
+      my $file = substr $name, $slash + 1;
+
+      for (;;) {
+         my $pathname = "$dir$file";
+         utf8::encode $pathname;
+
+         if (sysopen my $fh, $pathname, O_RDWR | O_CREAT | O_EXCL, 0600) {
+            binmode $fh;
+            return $fh, $pathname
+         }
+
+         if ($! == EEXIST) {
+            $file .= "~";
+         } elsif ($! == ENAMETOOLONG) {
+            substr $file, (length $file) * .75, 2, "~";
+         } else {
+            return undef, "open tempfile: $!"
+         }
+      }
+   };
+
+   # Deliberately self-contained: patch validation must not load host modules.
+   my $check_patch_output = sub {
+      my ($status, $output, @max_offset) = @_;
+      my (@hunks, @unparsed);
+
+      for (split /\n/, $output) {
+         if (/^Hunk #(\d+) (succeeded|FAILED|ignored) at (-?\d+)(?: with fuzz (\d+))?(?: \(offset (-?\d+) lines?\))?\.\z/) {
+            push @hunks, [0 + $1, $2 eq "succeeded", 0 + $4, 0 + $5];
+         } elsif (!length
+            || /^Hmm\.\.\. +Looks like a unified diff to me\.\.\.\z/
+            || /^The text leading up to this was:\z/
+            || /^-+\z/ || /^\|/
+            || /^patching file / || /^checking file /
+            || /^Using Plan [AB]\.\.\.\z/ || /^done\z/) {
+            # GNU patch --verbose framing.
+         } else {
+            push @unparsed, $_;
+         }
+      }
+
+      $status == 0
+         or die "patch failed (wait status $status):\n$output";
+      @unparsed == 0
+         or die "patch: unrecognized output:\n" . (join "\n", @unparsed) . "\n";
+      @hunks == @max_offset && @hunks
+         or die "patch: expected " . @max_offset . " hunks, got " . @hunks . "\n";
+
+      for my $i (0 .. $#hunks) {
+         my ($number, $success, $fuzz, $offset) = @{$hunks[$i]};
+
+         $number == $i + 1
+            or die "patch: unexpected hunk number $number\n";
+         $success
+            or die "patch: hunk $number failed\n";
+         !$fuzz
+            or die "patch: hunk $number used fuzz $fuzz\n";
+         abs ($offset) <= $max_offset[$i]
+            or die "patch: hunk $number offset $offset exceeds $max_offset[$i]\n";
+      }
+   };
+
+   my $run_patch = sub {
+      my ($newname, $path, $diff) = @_;
+
+      my ($errfh, $errname) = $create_tempfile->("/tmp/mcp-fs~~patch~~");
+      $errfh
+         or return undef, $errname;
+
+      local $ENV{LC_ALL} = "C";
+      open my $write, "|-", "sh", "-c",
+         q{exec "$4" --unified --verbose --binary --batch --forward --get=0 --fuzz=0 --reject-file=- --no-backup-if-mismatch -o "$2" "$1" >"$3" 2>&1},
+         "--", $path, $newname, $errname, $patch
+         or return undef, "open patch pipe: $!";
+
+      my $write_error;
+      {
+         print $write $diff
+            or $write_error = "write patch: $!";
+         close $write;
+      }
+
+      my $status = $?;
+
+      unlink $errname
+         or return undef, "unlink patch stderr: $!";
+      defined sysseek $errfh, 0, 0
+         or return undef, "seek patch stderr: $!";
+      my $output = do { local $/; <$errfh> };
+      $output = "" unless defined $output;
+      $output =~ s/\s+\z//;
+
+      return undef, $write_error
+         if $write_error and !$status;
+
+      $status, $output
+   };
+
+   my $replace_file = sub {
+      my ($path, $before, $newfh, $newname) = @_;
+
+      chown $before->[4], $before->[5], $newfh;
+      chmod $before->[2], $newfh;
+
+      my @after = lstat $path;
+      @after
+         or return undef, "lstat: $!";
+      join ("\0", @$before[0, 1, 2, 3, 4, 5, 7, 9, 10]) eq join ("\0", @after[0, 1, 2, 3, 4, 5, 7, 9, 10])
+         or return undef, "file changed while applying patch";
+      my @new = stat $newfh;
+      $after[3] == 1
+         or return undef, "refusing to replace multiply-linked file";
+      join ("\0", @after[2, 4, 5]) eq join ("\0", @new[2, 4, 5])
+         or return undef, "cannot preserve file metadata";
+
+      rename $newname, $path
+         or return undef, "rename: $!";
+
+      $new[7], undef
+   };
+
+   my @before = lstat $path;
+   @before
+      or return 0, "lstat: $!";
+   -f _
+      or return 0, "not a regular file";
+
+   my ($newfh, $newname) = $create_tempfile->("$path~~new~~");
+   $newfh
+      or return 0, $newname;
+
+   my ($status, $output) = $run_patch->($newname, $path, $diff);
+   unless (defined $status) {
+      unlink $newname;
+      return 0, $output
+   }
+
+   unless (eval { $check_patch_output->($status, $output, @max_offset); 1 }) {
+      my $error = $@;
+      unlink $newname;
+      return 0, $error
+   }
+
+   my ($bytes, $error) = $replace_file->($path, \@before, $newfh, $newname);
+   unlink $newname unless defined $bytes;
+   defined $bytes
+      ? (1, "$bytes")
+      : (0, $error)
+};
+
+$perl && $patch && mcp_tool file_patch =>
+   "Apply a unified diff to one regular file. Hunk counts are recomputed, fuzz is disabled, "
+   . "whole-hunk relocation is limited per hunk by distinct old-side lines. "
+   . "Pure insertion is allowed only at the beginning; elsewhere include old-side context. "
+   . "The diff argument is Unicode text (converted to UTF-8 bytes for patch), "
+   . "or base64 of raw patch bytes (autodetected: text has @ hunk markers; "
+   . "base64 cannot contain @).",
+   {
+      type                 => "object",
+      properties           => {
+         path    => { type => "string" },
+         diff    => { type => "string", minLength => 1 },
+         workdir => $workdir_schema,
+         reason  => {
+            type        => "string",
+            description => "Reason for requesting permission.",
+         },
+      },
+      required             => ["path", "diff"],
+      additionalProperties => JSON::XS::false,
+   },
+   sub {
+      my ($req, $args) = @_;
+
+      my ($workdir, $identity) = fs_workdir $args->{workdir};
+      my $path = fs_path $workdir, $args->{path};
+      my $diff = $args->{diff};
+      my $detail = $diff;
+
+      if (index ($diff, "@") >= 0) {
+         $diff = AnyEvent::MCP::utf8enc $diff;
+      } else {
+         my $bytes = MIME::Base64::decode_base64 $diff;
+         MIME::Base64::encode_base64 ($bytes, "") eq $diff
+            or die "invalid base64 diff\n";
+         $diff = $bytes;
+         $detail = eval { AnyEvent::MCP::utf8dec $bytes };
+
+         unless (defined $detail) {
+            $detail = $bytes;
+            $detail =~ s/([^\x09\x0a\x20-\x5b\x5d-\x7e])/sprintf "\\x{%02X}", ord $1/ge;
+            $detail = "Raw patch: " . length ($bytes) . " bytes (escaped byte view)\n\n" . $detail;
+         }
+      }
+
+      my $max_offset;
+      ($diff, $max_offset) = AnyEvent::MCP::normalize_udiff $diff;
+      length $diff <= 4<<20
+         or die "patch exceeds 4 MiB\n";
+
+      my $granted = fs_require_paths ($req, $workdir, $identity, [$path], "write",
+         $args->{reason} // "patch $path", { "View patch" => "File: $path\n\n$detail" });
+
+      AE::log debug => join " ", "fs file-patch", $path, scalar (@$max_offset), "hunks", length ($diff), "bytes";
+
+      perl_eval $req, $workdir, $granted, $file_patch,
+         [$patch, AnyEvent::MCP::utf8enc $path, $diff, @$max_offset], 30, sub {
+         my ($success, $result) = @_;
+
+         return $req->error ($result)
+            unless $success;
+
+         @$result == 2
+            or return $req->error ("invalid file-patch response\n");
+         my ($ok, $value) = @$result;
+
+         if ($ok eq "1") {
+            $value =~ /\A[0-9]+\z/
+               or return $req->error ("invalid file-patch byte count\n");
+            $req->reply (fs_result {
+               bytes => 0 + $value,
+            });
+         } elsif ($ok eq "0") {
+            $req->reply (fs_result {
+               error => AnyEvent::MCP::utf8dec $value,
+            });
+         } else {
+            $req->error ("invalid file-patch status\n");
+         }
+      };
+   }
+;
+
+$find && $grep && mcp_tool grep =>
+   "Search regular files of at most 1 MiB recursively without following symlinks or descending .git. "
+   . "Fixed-string matching by default; mode=pcre uses GNU grep -P. "
+   . "Stops after the result limit; reports truncation and timeout separately.",
+   {
+      type                 => "object",
+      properties           => {
+         path    => {
+            type        => "string",
+            description => "Path to search; defaults to the selected workdir.",
+         },
+         pattern => {
+            type      => "string",
+            minLength => 1,
+         },
+         mode    => {
+            type    => "string",
+            enum    => ["fixed", "pcre"],
+            default => "fixed",
+         },
+         limit   => {
+            type        => "integer",
+            minimum     => 1,
+            maximum     => 1000,
+            default     => 200,
+            description => "Maximum number of matching lines to return.",
+         },
+         workdir => $workdir_schema,
+         reason  => {
+            type        => "string",
+            description => "Reason for requesting permission.",
+         },
+      },
+      required             => ["pattern"],
+      additionalProperties => JSON::XS::false,
+   },
+   sub {
+      my ($req, $args) = @_;
+
+      my ($workdir, $identity) = fs_workdir $args->{workdir};
+      my $path = fs_path $workdir, $args->{path} // ".";
+      my $mode = $args->{mode} // "fixed";
+      $mode eq "fixed" or $mode eq "pcre"
+         or die "invalid grep mode\n";
+      my $limit = $args->{limit} // 200;
+      $limit <= 1000
+         or die "invalid limit\n";
+      my $granted = fs_require_paths ($req, $workdir, $identity, [$path], "read",
+         $args->{reason} // "grep $path");
+
+      AE::log debug => join " ", "fs grep", $path, $mode, (substr $args->{pattern}, 0, 40);
+
+      my $find_path = AnyEvent::MCP::utf8enc $path;
+      my $pattern = AnyEvent::MCP::utf8enc $args->{pattern};
+      my @command = (
+         (fs_sandbox $workdir, $granted),
+         $find, $find_path,
+         "-name", ".git", "-prune", "-o",
+         "-type", "f",
+         "-size", "-1048577c",
+         "-exec",
+         # GNU find treats any nonzero -exec ... + batch as failure.
+         # grep uses 1 for no matches, which is a successful empty search;
+         # preserve all other errors (including find traversal failures).
+         "/bin/sh", "-c", q{"$@" || [ "$?" -eq 1 ]}, "sh",
+         $grep, ($mode eq "pcre" ? "-P" : "-F"),
+         "-I", "-H", "-n", "--color=never", "-e", $pattern,
+         "{}", "+",
+      );
+
+      fs_run $req, \@command, "", 30, 1024 * 1024, $limit, sub {
+         my ($success, $result) = @_;
+
+         return $req->error ($result)
+            unless $success;
+
+         my $response;
+         my $ok = eval {
+            my $stdout = AnyEvent::MCP::utf8dec $result->{stdout};
+            my $stderr = AnyEvent::MCP::utf8dec $result->{stderr};
+
+            if (($result->{exit} or $result->{signal})
+                and !$result->{truncated} and !$result->{timed_out}) {
+               die "grep failed (exit $result->{exit}, signal $result->{signal}): $stderr\n";
+            }
+
+            $response = {
+               stdout    => $stdout,
+               stderr    => $stderr,
+               timed_out => $result->{timed_out},
+               truncated => $result->{truncated},
+            };
+            1
+         };
+         return $req->error ($@)
+            unless $ok;
+
+         $req->reply (fs_result $response);
+      };
+   }
+;
+
+my $stat = q{#perl
+   map {
+      my @s = lstat $_;
+
+      pack "(w/a*)*", (@s
+         ? (1, (-l _ ? "link" : -d _ ? "directory" : -f _ ? "file" : "other"), @s)
+         : (0, "lstat: $!"))
+   } @ARGV
+};
+
+$perl && mcp_tool stat =>
+   "Get lstat metadata for up to 100 paths; symlinks are not followed.",
+   {
+      type                 => "object",
+      properties           => {
+         paths  => {
+            type     => "array",
+            items    => {
+               type => "string",
+            },
+            minItems => 1,
+            maxItems => 100,
+         },
+         workdir => $workdir_schema,
+         reason => {
+            type        => "string",
+            description => "Reason for requesting permission.",
+         },
+      },
+      required             => ["paths"],
+      additionalProperties => JSON::XS::false,
+   },
+   sub {
+      my ($req, $args) = @_;
+
+      my ($workdir, $identity) = fs_workdir $args->{workdir};
+      ARRAY:: eq ref $args->{paths} and @{$args->{paths}} and @{$args->{paths}} <= 100
+         or die "stat needs 1..100 paths\n";
+      my @paths = map { fs_path $workdir, $_ } @{$args->{paths}};
+      die "stat paths must be inside the selected workdir\n"
+         if grep { !fs_inside ($_, $workdir) } @paths;
+
+      my $granted = fs_require_paths $req, $workdir, $identity, \@paths, "read", $args->{reason};
+
+      my @log = @paths;
+      splice @log, 3, @log - 3, "..." if @log > 3;
+      AE::log debug => join " ", "fs stat", @log;
+
+      perl_eval $req, $workdir, $granted, $stat, [map { AnyEvent::MCP::utf8enc $_ } @paths],
+         30, sub {
+         my ($success, $result) = @_;
+
+         return $req->error ($result)
+            unless $success;
+
+         @$result == @paths
+            or return $req->error ("invalid stat response\n");
+
+         my @result;
+         for my $i (0 .. $#paths) {
+            my ($ok, @s) = unpack "(w/a*)*", $result->[$i];
+
+            if ($ok) {
+               my $type = shift @s;
+               push @result, +{
+                  path  => $paths[$i],
+                  type  => $type,
+                  size  => 0 + $s[7],
+                  mode  => (sprintf "%04o", $s[2] & 07777),
+                  uid   => 0 + $s[4],
+                  gid   => 0 + $s[5],
+                  mtime => 0 + $s[9],
+               };
+            } else {
+               push @result, +{
+                  path  => $paths[$i],
+                  error => AnyEvent::MCP::utf8dec $s[0],
+               };
+            }
+         }
+
+         $req->reply (fs_result { result => \@result });
+      };
+   }
+;
+
+mcp_tool exec =>
+   "Run arbitrary argv " . ($bwrap ? "in bubblewrap" : "UNSANDBOXED with full host-user privileges") . "; stdin_encoding: utf-8 (default), latin1 or base64; 4 MiB limit after decoding. "
+   . "stdout/stderr are UTF-8, captured to 1 MiB each and returned with max_lines/max_bytes limits. Optional grep is a PCRE stdout postfilter; stderr is unfiltered. Capture truncation is explicit. Sandbox grants are optional; "
+   . "explicit grants replace the workdir-read default. A command's exit status, signal or timeout is returned as a normal result, not a tool error. There is no command-prefix safety classification. Timeouts above 300 seconds require "
+   . "long-running permission; the maximum is six hours.",
+   {
+      type       => "object",
+      properties => {
+         %output_schema,
+         workdir => $workdir_schema,
+         argv => {
+            type     => "array",
+            items    => { type => "string" },
+            minItems => 1,
+         },
+         sandbox_grants => {
+            type        => "array",
+            description => "If omitted, defaults to workdir-read under bubblewrap. If supplied (including []), replaces this default entirely rather than extending it. Without bubblewrap effective grants are always maximum host authority. host-proc is unavailable with bubblewrap.",
+            items       => {
+               type => "string",
+               enum => [sort keys %sandbox_grant],
+            },
+         },
+         reason => {
+            type        => "string",
+            description => "Useful reason for requesting arbitrary command authority.",
+         },
+         stdin  => { type => "string" },
+         stdin_encoding => {
+            type => "string",
+            default => "utf-8",
+            enum => [qw(utf-8 latin1 base64)],
+            description => "Convert stdin text to bytes as UTF-8 (default), Latin-1 code points U+0000..U+00FF, or canonical Base64; 4 MiB byte limit.",
+         },
+         timeout => {
+            type    => "integer",
+            minimum => 1,
+            maximum => 21600,
+            default => 30,
+            description => "Seconds; values above 300 also request long-running permission.",
+         },
+      },
+      required             => [qw(argv reason)],
+      additionalProperties => JSON::XS::false,
+   },
+   sub {
+      my ($req, $args) = @_;
+
+      my $output = fs_output_options $args;
+
+      ARRAY:: eq ref $args->{argv} and @{$args->{argv}}
+         or die "exec needs argv strings without NUL\n";
+      for my $arg (@{$args->{argv}}) {
+         defined $arg and !ref $arg and $arg !~ /\0/
+            or die "exec needs argv strings without NUL\n";
+      }
+      length $args->{argv}[0] or die "exec needs an executable\n";
+
+      my ($workdir, $identity) = fs_workdir $args->{workdir};
+      my $timeout = $args->{timeout} // 30;
+      $timeout >= 1 && $timeout <= 21600 && $timeout == int $timeout
+         or die "invalid timeout\n";
+
+      my $sandbox_grants = [exists $args->{sandbox_grants} ? @{$args->{sandbox_grants}} : @exec_default_sandbox_grants];
+      push @$sandbox_grants, "long-running" if $timeout > 300;
+      $sandbox_grants = [fs_effective_grants @$sandbox_grants];
+      my $requested = $permissions->closure ($sandbox_grants);
+      die "host-proc sandbox authority is unresolved and unavailable in v1\n"
+         if $bwrap && $requested->{"host-proc"};
+
+      my $stdin_text = $args->{stdin} // "";
+      my $stdin_encoding = $args->{stdin_encoding} // "utf-8";
+      $stdin_encoding =~ /\A(?:utf-8|latin1|base64)\z/
+         or die "invalid stdin_encoding\n";
+      my $input;
+      if ($stdin_encoding eq "utf-8") {
+         $input = AnyEvent::MCP::utf8enc $stdin_text;
+      } elsif ($stdin_encoding eq "latin1") {
+         $stdin_text !~ /[^\x00-\xff]/
+            or die "latin1 stdin contains code points above U+00FF\n";
+         $input = pack "C*", unpack "U*", $stdin_text;
+      } else {
+         $input = MIME::Base64::decode_base64 $stdin_text;
+         MIME::Base64::encode_base64 ($input, "") eq $stdin_text
+            or die "invalid base64 stdin\n";
+      }
+      length $input <= 4 * 1024 * 1024 or die "stdin exceeds 4 MiB\n";
+      my $stdin_detail = $stdin_text;
+      if (length $input && $stdin_encoding ne "utf-8") {
+         my $preview = substr ($input, 0, 4096);
+         $preview =~ s/([^\x20-\x5b\x5d-\x7e])/sprintf "\\x{%02X}", ord $1/ge;
+         $stdin_detail = "$stdin_encoding stdin: " . length ($input) . " bytes (escaped preview)\n\n" . $preview;
+         $stdin_detail .= "\n... (preview limited to 4096 bytes)"
+            if length $input > 4096;
+      }
+
+      my $coder = JSON::XS->new->canonical;
+      my $subject = $coder->encode ($args->{argv});
+      my $executable = $coder->encode ($args->{argv}[0]);
+      my $granted = fs_require_permission ($req, $identity, {
+         tool           => "exec",
+         action         => "exec",
+         workdir        => fs_grant_workdir ($identity, $sandbox_grants),
+         subject        => $subject,
+         reason         => $args->{reason},
+         sandbox_grants => $sandbox_grants,
+         (length $input ? (details => { "View stdin" => $stdin_detail }) : ()),
+         subjects => [
+            {
+               label   => "exact executable and argv",
+               subject => $subject,
+            },
+            {
+               label   => "this executable, arbitrary argv",
+               subject => "^\\[\Q$executable\E(?:,.*)?\\]\\z",
+            },
+            {
+               label   => "any command",
+               subject => "^",
+            },
+         ],
+      });
+
+      $timeout <= 300 || $permissions->closure ($granted)->{"long-running"}
+         or die "permission reduced below long-running for exec\n";
+
+      AE::log debug => "fs exec "
+         . (substr $subject, 0, 200)
+         . (length $subject > 200 ? "..." : "")
+         . (length $input ? " stdin=" . length ($input) : "");
+
+      fs_command $req, $workdir, $granted, $args->{argv}, $input, $timeout, $output;
+   }
+;
+
+# fixed operations accept filenames, never caller-supplied VCS options or shell code.
+for my $operation (qw(diff status)) {
+   mcp_tool "vcs-$operation" =>
+      "Run $operation for Git, SVN, CVS or Mercurial in a configured workdir. "
+      . "backend is explicit; cwd selects a directory within the workdir (default .). "
+      . "files are relative to cwd and stay within the selected workdir, not options. "
+      . "Uses a dedicated permission action and workdir-read; CVS also requests ssh-agent (including network). "
+      . "Returns the normal command exit/signal, bounded stdout/stderr and truncation flags. "
+      . "grep filters stdout using PCRE after the 1 MiB capture cap; max_lines/max_bytes limit returned output. "
+      . "Clients and their local configuration are trusted; the sandbox enforces the approved filesystem/network grants.",
+      {
+         type => "object",
+         properties => {
+            workdir => $workdir_schema,
+            cwd => { type => "string", default => ".", minLength => 1,
+               description => "Command directory relative to the selected workdir; must resolve inside it. Does not change the mount boundary." },
+            backend => { type => "string", enum => [qw(git svn cvs hg)] },
+            files => { type => "array", items => { type => "string" }, default => [] },
+            %output_schema,
+         },
+         required => ["backend"],
+         additionalProperties => JSON::XS::false,
+      },
+      sub {
+         my ($req, $args) = @_;
+
+         my $backend = $args->{backend};
+         defined $backend && !ref $backend && $backend =~ /\A(?:git|svn|cvs|hg)\z/
+            or die "backend must be git, svn, cvs or hg\n";
+         my $program = $vcs_program{$backend}
+            or die "$backend executable is unavailable\n";
+         my $output = fs_output_options $args;
+         my ($workdir, $identity) = fs_workdir $args->{workdir};
+         my $cwd = fs_path $workdir, $args->{cwd} // ".";
+         fs_inside $cwd, $workdir or die "VCS cwd must stay within the selected workdir\n";
+         my $files = $args->{files} // [];
+         ref $files eq "ARRAY" or die "files must be an array of filenames\n";
+         my @files;
+         my @paths = ($cwd);
+         for my $file (@$files) {
+            my $path = fs_path $cwd, $file;
+            fs_inside $path, $workdir or die "VCS files must stay within the selected workdir\n";
+            push @paths, $path;
+            my $relative = File::Spec::Unix->abs2rel ($path, $cwd);
+            push @files, "./$relative";
+         }
+
+         my @argv = $backend eq "git"
+            ? ($program, "--no-pager", "--no-optional-locks", "--literal-pathspecs", "-c", "core.fsmonitor=false",
+               $operation, ($operation eq "diff" ? qw(--no-ext-diff --no-textconv --no-color --ignore-submodules)
+                                                : qw(--short --untracked-files=normal --ignore-submodules)),
+               "--", @files)
+            : $backend eq "svn"
+            ? ($program, "--non-interactive", "--no-auth-cache", $operation,
+               ($operation eq "diff" ? ("--internal-diff") : ()), "--", map "$_\@", @files)
+            : $backend eq "cvs"
+            ? ($program, "-f", $operation, ($operation eq "diff" ? ("-u") : ()), "--", @files)
+            : ($program, "--noninteractive", "--config", "ui.paginate=never", $operation, "--", @files);
+
+         my @need = fs_effective_grants ("workdir-read", ($backend eq "cvs" ? ("ssh-agent") : ()));
+         my $granted = fs_require_permission ($req, $identity, {
+            tool => $req->{tool}, action => "vcs-$operation",
+            workdir => fs_grant_workdir ($identity, \@need),
+            subject => $backend, subjects => [
+               { label => "$backend working copies", subject => $backend },
+               { label => "all supported VCS clients", subject => "^" },
+            ],
+            sandbox_grants => \@need, paths => \@paths,
+            reason => "$backend $operation in $cwd (workdir $identity)"
+               . (@files ? ": " . join (", ", @files) : " (entire working copy)"),
+         });
+         my $have = $permissions->closure ($granted);
+         $have->{$_} or die "permission reduced below $_ for $req->{tool}\n" for @need;
+
+         AE::log debug => join " ", "fs vcs-$operation", $backend, $cwd, @files;
+
+         fs_command $req, $workdir, $granted, \@argv, "", 30, $output, $cwd;
+      };
+}
+
+mcp_config
+   name        => $name,
+   idle_exit   => 300,
+   max_size    => 8 * 1024 * 1024, # 4 MiB binary stdin expands to ~5.6 MiB of Base64 JSON.
+   server_info => { name => "mcp-fs", version => "0" },
+   permissions => $permissions,
+   on_error    => sub { AE::log info => "mcp-tool $_[1]{tool}: $_[2]" },
+   on_start    => sub {
+      print STDERR "Permission rules: $permissions->{file}\n"
+         if $_[0]->isa ("AnyEvent::MCP::Server::HTTP");
+   },
+   short_instructions => "Filesystem access: read/edit files, run sandboxed commands, inspect VCS in configured workdirs. Discover tools when working with files.",
+   instructions => "Use workdirs to inspect configured workdirs, mounts and sandbox_grants. Select workdir by persistent positive integer ID (or numeric string) from the listing object keys, or exact configured/resolved path; IDs are not argument positions. Inactive mappings expire after seven days and IDs may then be reused. Stale paths fail. Paths are relative to the selected workdir; workdir-read/write expose only that workdir. all-workdirs-read/write expose every configured workdir; all-workdirs-read plus workdir-write allows writing only the selected workdir. Absolute paths in another configured workdir require all-workdirs authority; other absolute paths request home/world authority or shared-tmp for host tmp. Multi-path stat must stay within the selected workdir; rename may target another path but requires the combined sandbox grants and can fail with EXDEV at a mount boundary. Symlinks resolve inside the granted sandbox mounts; overlapping workdirs have unspecified access behavior. Trusted mount entries add baseline authority independent of requested grants; world-read retains writable exceptions, world-write ignores them. Exec supports explicit sandbox_grants and requires a useful reason. Prefer vcs-diff/vcs-status with an explicit backend for working-copy inspection; these use fixed argv and automatically request needed grants. Exec and VCS tools share grep/max_lines/max_bytes output options; stderr is unfiltered and capture_truncated means matches beyond the capture cap are unknown.\n";
+
+mcp_start %server_options, (stdio => $stdio);
+

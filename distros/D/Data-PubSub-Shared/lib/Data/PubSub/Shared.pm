@@ -1,7 +1,7 @@
 package Data::PubSub::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 require XSLoader;
 XSLoader::load('Data::PubSub::Shared', $VERSION);
@@ -70,7 +70,7 @@ Data::PubSub::Shared - High-performance shared-memory pub/sub for Linux
     $sub->poll_cb(sub { process($_[0]) });
 
     # String variant
-    my $sps = Data::PubSub::Shared::Str->new('/tmp/ps.shm', 1024);
+    my $sps = Data::PubSub::Shared::Str->new('/tmp/ps-str.shm', 1024);
     $sps->publish("hello world");
 
     # Compact variants (half the memory, same API)
@@ -78,10 +78,9 @@ Data::PubSub::Shared - High-performance shared-memory pub/sub for Linux
     my $ps16 = Data::PubSub::Shared::Int16->new(undef, 65536);
 
     # Multiprocess
+    my $child_sub = $ps->subscribe;
     if (fork() == 0) {
-        my $child = Data::PubSub::Shared::Int->new('/tmp/ps.shm', 1024);
-        my $sub = $child->subscribe;
-        while (defined(my $v = $sub->poll_wait(1))) {
+        while (defined(my $v = $child_sub->poll_wait(1))) {
             print "got: $v\n";
         }
         exit;
@@ -129,8 +128,8 @@ B<Linux-only>. Requires 64-bit Perl.
 
 =item L<Data::PubSub::Shared::Int> -- int64, 16 bytes/slot
 
-Lock-free MPMC publish via atomic fetch-and-add. Seqlock-protected
-subscribers. Best for counters, timestamps, event IDs.
+Lock-free MPMC publish where a 16-byte CAS is available; otherwise
+publishers use the header mutex. Subscribers stay lock-free.
 
 =item L<Data::PubSub::Shared::Int32> -- int32, 8 bytes/slot
 
@@ -150,8 +149,8 @@ flag preserved. Best for log lines, JSON, serialized payloads.
 
 =head2 Int vs Str
 
-B<Int> (including Int32/Int16): lock-free, zero contention between
-publishers. Use when the payload fits in an integer.
+B<Int> (including Int32/Int16): lock-free publish where a slot-wide CAS
+is available, with a mutex fallback. Use for integer payloads.
 
 B<Str>: mutex serializes publishers, but subscribers are still
 lock-free. Use for arbitrary byte strings.
@@ -245,8 +244,11 @@ to Perl between messages. Returns count processed.
     };
 
 Subscribers inherit the handle's eventfd at creation time.
+Cross-process notifications require that same eventfd, inherited through
+C<fork()> or passed via C<SCM_RIGHTS>; opening the same file does not share it.
 Use C<< $sub->eventfd_set($fd) >> to set manually after creation
 (both handles and subscribers support C<eventfd_set>).
+Handles duplicate supplied fds; subscribers borrow them.
 C<< $ps->fileno >> and C<< $sub->fileno >> return the current
 notification fd (the handle's or the subscriber's), or -1 if none is
 set -- useful for registering with an event loop.
@@ -299,9 +301,9 @@ Keywords are lexically scoped.
 
 =head2 Crash Safety
 
-Str mode: futex mutex with PID tracking. If a publisher dies holding
-the mutex, other publishers recover within 2 seconds. Int modes are
-lock-free and need no recovery.
+Mutex-protected publishers recover dead owners within 2 seconds. An integer
+publisher killed after reserving slots can leave a gap: subscribers at
+that gap wait until the ring wraps, or can C<reset> to skip it.
 
 =head1 BENCHMARKS
 

@@ -11,7 +11,7 @@ use Unblock::HTTP1::_Native ();
 use Unblock::HTTP1::_Wire ();
 use Unblock::HTTP1::Transaction;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 sub new {
     my ($class, %option) = @_;
@@ -145,10 +145,7 @@ sub _drive {
             return if $self->{switched} || $self->{closed};
 
             if ($bodyless) {
-                $tx->_mark_remote_done;
-                my $end_cb = $self->_invoke_server('on_request_end', $tx, $request);
-                return $self->_application_error($end_cb) unless $end_cb eq '1';
-                $self->_retire_if_done;
+                $self->_complete_request($tx, $request);
                 next;
             }
 
@@ -156,9 +153,7 @@ sub _drive {
                 my $length = $head->{content_length};
                 if ($length) {
                     my $bytes = $self->_input_take($length);
-                    my $body_cb = $self->_invoke_server(
-                        'on_body', $tx, $request, $bytes,
-                    );
+                    my $body_cb = $tx->_receive_data($request, $bytes);
                     return $self->_application_error($body_cb)
                         unless $body_cb eq '1';
                     return if $self->{switched} || $self->{closed};
@@ -179,8 +174,9 @@ sub _drive {
                 ? $available : $rx->{remaining};
             my $bytes = $self->_input_take($take);
             $rx->{remaining} -= $take;
-            my $cb = $self->_invoke_server('on_body', $tx, $rx->{request}, $bytes);
+            my $cb = $tx->_receive_data($rx->{request}, $bytes);
             return $self->_application_error($cb) unless $cb eq '1';
+            return if $tx->is_terminal;
             if ($rx->{remaining} == 0) {
                 $self->_finish_request;
                 next;
@@ -204,9 +200,10 @@ sub _drive {
             }
             $self->_input_discard($available - length($leftover));
             if (defined($decoded) && length($decoded)) {
-                my $cb = $self->_invoke_server('on_body', $tx, $rx->{request}, $decoded);
+                my $cb = $tx->_receive_data($rx->{request}, $decoded);
                 return $self->_application_error($cb) unless $cb eq '1';
             }
+            return if $tx->is_terminal;
             return unless $done;
             $rx->{mode} = 'trailers';
             delete $rx->{decoder};
@@ -260,9 +257,15 @@ sub _finish_request {
 
 sub _complete_request {
     my ($self, $tx, $request) = @_;
+    return if $tx->is_terminal;
+    $tx->_finish_receive($request);
     $request->mark_complete->freeze;
     $tx->_mark_remote_done;
-    my $cb = $self->_invoke_server('on_request_end', $tx, $request);
+    my $cb;
+    {
+        local $self->{completing_request} = 1;
+        $cb = $self->_invoke_server('on_request_end', $tx, $request);
+    }
     return $self->_application_error($cb) unless $cb eq '1';
     $self->_retire_if_done;
     return;
@@ -365,9 +368,25 @@ sub _transaction_write {
     return $ok;
 }
 
+# Keep HTTP/1 pipelined response construction batched while preserving
+# exactly-once terminal callbacks. A local response is not successfully
+# complete until its complete output was accepted by the attached host.
+sub _transport_sync {
+    my ($self) = @_;
+    $self->SUPER::_transport_sync;
+    return if $self->{transport_aborted} || length($self->{output});
+    my $pending = delete $self->{pending_host_finishes} or return;
+    for my $tx (@$pending) {
+        $tx->_mark_complete unless $tx->is_terminal;
+        $tx->_notify_finish;
+    }
+    return;
+}
+
 sub _retire_if_done {
     my ($self) = @_;
     my $tx = $self->{active} or return;
+    return if $self->{completing_request};
     return unless $tx->{local_done} && $tx->{remote_done};
     if ($tx->{switch_pending}) {
         $tx->_mark_complete unless $tx->is_terminal;
@@ -381,10 +400,19 @@ sub _retire_if_done {
         }
         return $self->_deliver_switch_notice($tx, $response);
     }
-    $tx->_mark_complete unless $tx->is_terminal;
+    # The HTTP/1 parser can finish several pipelined requests during one
+    # input call. Retire them from parsing now, but hold their terminal
+    # observers until the whole coalesced output is accepted by the host.
+    my $await_host = $self->{transport_attached} && length($self->{output});
+    if ($await_host) {
+        push @{ $self->{pending_host_finishes} //= [] }, $tx;
+    } else {
+        $tx->_mark_complete unless $tx->is_terminal;
+    }
     my $keep = $tx->{keep_alive};
     $keep = $tx->{request_keep_alive} unless defined $keep;
     $self->{active} = undef;
+    $tx->_notify_finish unless $await_host;
     if (!$keep || $self->{eof}) {
         $self->{closed} = 1;
         $self->_transport_sync if $self->{transport_attached};
@@ -399,6 +427,7 @@ sub _retire_if_done {
 sub _deliver_switch_notice {
     my ($self, $tx, $response) = @_;
     my $cb = $self->_invoke_server('on_switch', $tx, $response);
+    $tx->_notify_finish;
     if ($cb ne '1') {
         if ($self->{transport_attached}) {
             $self->_transport_abort($cb);
@@ -416,8 +445,13 @@ sub _transaction_cancel {
     $self->{active} = undef if $self->{active} && $self->{active} == $tx;
     $self->{rx} = undef;
     $self->{closed} = 1;
-    $self->_transport_abort('HTTP/1 transaction cancelled')
-        if $self->{transport_attached};
+    $self->_input_clear;
+    {
+        local $self->{cancelling} = 1;
+        $self->_transport_abort('HTTP/1 transaction cancelled')
+            if $self->{transport_attached};
+    }
+    $tx->_notify_finish;
     return;
 }
 
@@ -434,8 +468,15 @@ sub _maybe_drain {
 sub _invoke_server {
     my ($self, $name, @args) = @_;
     my $cb = $self->{callbacks}{$name} or return 1;
+    my $tx = $args[0];
+    $tx->{callback_depth}++ if $tx;
     my $ok = eval { $cb->(@args); 1 };
-    return $ok ? 1 : "$@";
+    my $error = "$@";
+    if ($tx) {
+        $tx->{callback_depth}--;
+        $tx->_notify_finish if $tx->{finish_pending};
+    }
+    return $ok ? 1 : $error;
 }
 
 sub _application_error {
@@ -443,6 +484,7 @@ sub _application_error {
     $error = 'HTTP/1 server callback failed' unless defined($error) && length($error);
     my $tx = $self->{active};
     if ($tx && !$tx->response && !$self->{switched}) {
+        local $self->{completing_request} = 1;
         eval {
             my $response = Uniform::HTTP::Response->new(status => 500, body => '');
             $self->_transaction_respond($tx, $response);
@@ -451,9 +493,11 @@ sub _application_error {
     }
     $self->{closed} = 1;
     $tx->_fail($error) if $tx && !$tx->is_terminal;
-    if (my $cb = $self->{callbacks}{on_error}) {
-        eval { $cb->($tx, $error) };
-    }
+    $self->_invoke_server('on_error', $tx, $error);
+    $self->{active} = undef;
+    $self->{rx} = undef;
+    $self->_input_clear;
+    $tx->_notify_finish if $tx;
     return;
 }
 
@@ -473,9 +517,11 @@ sub _protocol_error {
     if (my $tx = $self->{active}) {
         $tx->_fail($detail || $reason) unless $tx->is_terminal;
     }
-    if (my $cb = $self->{callbacks}{on_error}) {
-        eval { $cb->($self->{active}, $detail || $reason) };
-    }
+    $self->_invoke_server('on_error', $self->{active}, $detail || $reason);
+    my $tx = delete $self->{active};
+    $self->{rx} = undef;
+    $self->_input_clear;
+    $tx->_notify_finish if $tx;
     return;
 }
 
@@ -511,13 +557,15 @@ sub _on_eof {
 
 sub _fail_all {
     my ($self, $error) = @_;
-    if (my $tx = delete $self->{active}) {
-        $tx->_fail($error) unless $tx->is_terminal;
-    }
+    my $tx = delete $self->{active};
+    $tx->_fail($error) if $tx && !$tx->is_terminal;
     $self->{rx} = undef;
-    if (my $cb = $self->{callbacks}{on_error}) {
-        eval { $cb->(undef, $error) };
-    }
+    $self->_input_clear;
+    my $pending = delete $self->{pending_host_finishes} || [];
+    $_->_fail($error) for grep { !$_->is_terminal } @$pending;
+    $self->_invoke_server('on_error', $tx, $error) unless $self->{cancelling};
+    $tx->_notify_finish if $tx;
+    $_->_notify_finish for @$pending;
     return;
 }
 
@@ -574,6 +622,23 @@ C<output()>.
 The Server supports persistent HTTP/1 connections and safely handles
 pipelined request bytes. Only one transaction is active at a time; bytes for a
 later request remain buffered until the prior transaction retires.
+
+=head1 RECEIVE BODY OPTIONS
+
+C<receive_body> accepts C<buffered> or C<stream>. Streaming remains the default.
+C<max_buffered_body_bytes> is a positive byte limit, defaulting to 64 MiB.
+Zero does not mean unlimited. Buffered reception installs the body on the
+same Uniform message before freezing it and invoking the body-completion
+callback. Empty completed bodies have an empty string representation.
+The engine releases retained chunks on failure or cancellation.
+
+Select streaming per transaction with C<$tx-E<gt>on_data(...)> during the
+header callback. Do not combine buffered mode with legacy C<on_body>.
+Do not combine C<on_data> and C<on_body>. See
+L<Unblock::HTTP1::Transaction/RECEIVE AND FINISH CALLBACKS>.
+
+A buffer limit failure closes the HTTP/1 connection.
+It does not call successful body completion.
 
 =head1 CONSTRUCTOR
 
@@ -844,6 +909,19 @@ Called by an attached host after C<unblock_send()> returned a defined false
 value (meaning complete acceptance followed by congestion). The host must
 call this again when it can accept more output. It can trigger a streaming
 Transaction's C<on_drain> callback.
+
+A fatal host write error is B<not> ordinary congestion. A transport such
+as Linux::Event may close itself on an output hard-limit violation.
+The host adapter must report the error to the engine (or throw from
+C<unblock_send()>); it must not return false as though the rejected bytes
+were accepted, nor call C<resume_output()> for that rejected output.
+
+With an attached host, normal server transaction C<on_finish> success waits
+until all its outgoing HTTP bytes have been accepted by the host, including
+batched pipelined responses. If the host rejects that queued output, the
+pending Transactions finish with error instead. Acceptance means ownership
+transfer to the host, not that the remote peer has received the bytes.
+Manual C<output()> use retains its original local-completion timing.
 
 An output-queueing host that always returns undef does not need it.
 

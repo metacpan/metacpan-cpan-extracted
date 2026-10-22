@@ -1,4 +1,4 @@
-package Perl::Critic::Distribution 0.001;
+package Perl::Critic::Distribution 0.002;
 
 # ABSTRACT: Parse a distribution once, for every policy that needs all of it.
 
@@ -46,6 +46,14 @@ Readonly::Array my @DIST_MARKERS => qw{ dist.ini Makefile.PL Build.PL META.json 
 Readonly::Scalar my $CACHE_FORMAT => 1;
 
 Readonly::Scalar my $CACHE_NAME => 'perl-critic-distribution';
+
+Readonly::Array my @CALLED_BY_PERL => qw{
+  BEGIN END INIT CHECK UNITCHECK AUTOLOAD DESTROY import unimport CLONE CLONE_SKIP
+  BUILD BUILDARGS DEMOLISH FOREIGNBUILDARGS
+  TIESCALAR TIEARRAY TIEHASH TIEHANDLE FETCH STORE FETCHSIZE STORESIZE EXTEND
+  EXISTS DELETE CLEAR PUSH POP SHIFT UNSHIFT SPLICE FIRSTKEY NEXTKEY SCALAR UNTIE
+  PRINT PRINTF WRITE READ READLINE GETC CLOSE OPEN BINMODE EOF FILENO SEEK TELL
+};
 
 # What the files in the cache directory are named.
 Readonly::Scalar my $CACHE_FILE_RX => qr/\A [[:xdigit:]]{40} [.]json[.]gz \z/xs;
@@ -232,7 +240,13 @@ sub for_file {
     my ( $class, $file, %opts ) = @_;
 
     my ($root) = $class->root_of($file) or return;
-    my $cache_dir = exists $opts{cache_dir} ? $opts{cache_dir} : $class->default_cache_dir();
+    my $cache_dir = $class->default_cache_dir();
+    if ( exists $opts{cache} ) {
+        $cache_dir = !$opts{cache} ? undef : ( $opts{cache_dir} // q{} ) eq q{} ? $cache_dir : $opts{cache_dir};
+    }
+    elsif ( exists $opts{cache_dir} ) {
+        $cache_dir = $opts{cache_dir};
+    }
 
     return $FOR{ join "\0", $root, $cache_dir // q{} } //= bless { root => $root, cache_dir => $cache_dir }, $class;
 }
@@ -295,6 +309,69 @@ sub keep {
     return $self->$write_cache();
 }
 
+
+sub policy_parameters {
+    return (
+        {
+            name           => 'cache',
+            description    => 'Keep what was read of each distribution on disk between runs.',
+            default_string => '1',
+            behavior       => 'boolean',
+        },
+        {
+            name           => 'cache_dir',
+            description    => 'Where it is kept.  Empty means the default of Perl::Critic::Distribution.',
+            default_string => q{},
+            behavior       => 'string',
+        },
+    );
+}
+
+
+sub called_by_perl {
+    return @CALLED_BY_PERL;
+}
+
+
+sub walk {
+    my ( $class, $node, $visit, %context ) = @_;
+
+    # Each frame is the children of a node, how far through them the walk is,
+    # and the package and the sub there.  A loop and not recursion, because a deep
+    # document would otherwise warn of deep recursion, which is fatal here.
+    my @frames = ( [ [ $node->children() ], 0, $context{package} // 'main', $context{sub} ] );
+    while (@frames) {
+        my $frame = $frames[-1];
+        my ( $children, $at, $package, $sub ) = @$frame;
+        my $child = $children->[$at];
+        if ( !defined $child ) {
+            pop @frames;
+            next;
+        }
+        $frame->[1]++;
+
+        $visit->( $child, $package, $sub );
+
+        if ( $child->isa('PPI::Statement::Package') ) {
+            my ($block) = grep { $_->isa('PPI::Structure::Block') } $child->schildren();
+            if ($block) {
+                push @frames, [ [ $block->children() ], 0, $child->namespace(), $sub ];
+            }
+            else {
+                $frame->[2] = $child->namespace();
+            }
+        }
+        elsif ( $child->isa('PPI::Statement::Sub') && !$child->forward() ) {
+            ( my $name = $child->name() ) =~ s/\A::/main::/xs;
+            push @frames, [ [ $child->children() ], 0, $package, index( $name, '::' ) >= 0 ? $name : "${package}::$name" ];
+        }
+        elsif ( $child->isa('PPI::Node') ) {
+            push @frames, [ [ $child->children() ], 0, $package, $sub ];
+        }
+    }
+    return;
+}
+
 1;
 
 __END__
@@ -309,7 +386,7 @@ Perl::Critic::Distribution - Parse a distribution once, for every policy that ne
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -458,6 +535,7 @@ when neither that nor C<HOME> is set.
 =head3 for_file
 
     my $dist = Perl::Critic::Distribution->for_file( $file, cache_dir => $dir );
+    my $dist = Perl::Critic::Distribution->for_file( $file, cache => $on, cache_dir => $dir );
 
 The distribution that C<$file> belongs to, as C<root_of> finds it, or undef
 for a file in none.  Source with no file name, such as a string handed to
@@ -466,6 +544,10 @@ C<critique>, belongs to none.
 C<cache_dir> is where the cache is kept.  Without it, C<default_cache_dir>.
 Undef keeps no cache.  The same root and cache directory return the same
 object for the life of the process.
+
+C<cache> is for a policy that takes the parameters of C<policy_parameters>,
+and passes on what it got.  With C<cache>, a false value keeps no cache, and
+an empty C<cache_dir> means C<default_cache_dir>.
 
 =head3 root
 
@@ -511,6 +593,57 @@ every file, and that costs time to work out again.
 
 Keeps C<$data> as the stash of C<$name>, and writes the cache.  Returns true if
 the cache was written, which is never when there is no cache directory.
+
+=head2 FOR POLICIES
+
+What a policy that reads the whole distribution usually needs as well.
+
+=head3 policy_parameters
+
+    sub supported_parameters {
+        return ( { name => 'my_own', ... }, Perl::Critic::Distribution->policy_parameters() );
+    }
+
+The parameters C<cache> and C<cache_dir>, for C<supported_parameters> of a
+policy.  C<cache> is on by default, and an empty C<cache_dir> means
+C<default_cache_dir>.  Perl::Critic puts them in C<< $policy->{_cache} >> and
+C<< $policy->{_cache_dir} >>, which C<for_file> takes as they are:
+
+    Perl::Critic::Distribution->for_file( $file, cache => $self->{_cache}, cache_dir => $self->{_cache_dir} );
+
+Give every policy that reads the distribution the same C<cache_dir>, or none,
+so that they share a parse.
+
+=head3 called_by_perl
+
+    my @names = Perl::Critic::Distribution->called_by_perl();
+
+The subs that Perl or a framework calls by name, so that no code in the
+distribution calls them: the blocks such as C<BEGIN>, C<AUTOLOAD>,
+C<DESTROY>, C<import> and C<unimport>, C<CLONE>, the hooks of Moose and Moo
+such as C<BUILD>, and the methods of the tie interface.  A policy that judges
+a sub by who calls it leaves these alone.
+
+=head3 walk
+
+    Perl::Critic::Distribution->walk( $ppi, $visit );
+    Perl::Critic::Distribution->walk( $node, $visit, package => $package, sub => $sub );
+
+Calls C<< $visit->( $element, $package, $sub ) >> for each element below
+C<$node>, in source order.  C<$package> is the package that the element is
+in.  C<$sub> is the qualified name of the sub that the element is in, such as
+C<Some::Thing::helper>, or undef outside every sub.
+
+A package statement changes the package of the statements after it in the
+same block, and a package block changes the package inside its block.  The
+visit sees the package statement, and then what is in its block, but not the
+name in the statement.  A sub statement is seen with the sub around it, and
+what is in it with the sub that it defines.  A forward declaration defines no
+sub.
+
+C<package> and C<sub> give the context of C<$node>, for code that is not a
+whole file, such as a document parsed from inside a string.  Without them,
+C<$node> is in C<main> and in no sub.
 
 =head1 BUGS
 

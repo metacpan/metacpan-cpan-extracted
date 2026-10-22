@@ -1,7 +1,7 @@
 package Data::Graph::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 require XSLoader;
 XSLoader::load('Data::Graph::Shared', $VERSION);
 
@@ -58,8 +58,8 @@ bitmap pool, edges stored as adjacency lists in a separate edge pool.
 Mutex-protected mutations with PID-based stale recovery.
 
 B<Note>: C<remove_node> removes the node and its outgoing edges only.
-Incoming edges from other nodes are NOT automatically removed (this is
-an O(1) design choice) -- their C<dst> is left dangling until the slot's
+Incoming edges from other nodes are NOT automatically removed (incoming
+lists are not scanned) -- their C<dst> is left dangling until the slot's
 bit is reused. Use C<remove_node_full> when this matters; it additionally
 splices incoming edges in O(N+E).
 
@@ -94,7 +94,7 @@ rather than a croak.
     my $id = $g->add_node($data);            # returns node index or undef
     $g->add_edge($src, $dst);                # weight defaults to 1
     $g->add_edge($src, $dst, $weight);
-    $g->remove_node($id);                    # O(1) -- outgoing edges only
+    $g->remove_node($id);                    # O(out-degree) -- outgoing edges only
     $g->remove_node_full($id);               # O(N+E) -- also splices incoming
     $g->has_node($id);
     $g->node_data($id);
@@ -140,7 +140,7 @@ serialized by a single process-shared exclusive mutex stored in the mapping
 header; it is implemented directly on a Linux futex, so it works across
 unrelated processes without any pthread setup.
 
-The mutex records the PID of its current owner. If a process dies while
+Recovery requires all peers to share a PID namespace. If a process dies while
 holding the lock, a waiter that times out detects the dead (or zombie) owner
 via C<kill(pid, 0)> plus a F</proc> liveness check, reclaims the lock, and
 proceeds. This keeps a crash from wedging the whole graph, but it cannot

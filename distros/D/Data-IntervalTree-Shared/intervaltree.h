@@ -220,8 +220,8 @@ static inline void it_recover_stale_lock(ItHandle *h, uint32_t observed_wlock) {
         return;
     /* We now hold the write lock as mypid.  No additional shared state needs
      * repair here (this module has no seqlock); just release the lock. */
-    __atomic_store_n(&hdr->wlock, 0, __ATOMIC_RELEASE);
-    if (__atomic_load_n(&hdr->rwait, __ATOMIC_RELAXED) > 0)
+    __atomic_store_n(&hdr->wlock, 0, __ATOMIC_SEQ_CST);
+    if (__atomic_load_n(&hdr->rwait, __ATOMIC_SEQ_CST) > 0)
         syscall(SYS_futex, &hdr->wlock, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
 }
 
@@ -254,6 +254,15 @@ static inline void it_occ_clear(ItHandle *h, uint32_t s) {
     __atomic_fetch_and(&h->occ[s >> 6], ~((uint64_t)1 << (s & 63)), __ATOMIC_SEQ_CST);
 }
 
+static inline void it_reader_wake_drain(ItHandle *h);
+static inline void it_reset_reader_slot(ItHandle *h, uint32_t s) {
+    uint32_t stale = __atomic_exchange_n(&h->reader_slots[s].rdepth, 0, __ATOMIC_SEQ_CST);
+    it_occ_set(h, s);
+    h->my_slot_idx = s;
+    /* A draining writer may have seen the predecessor's depth with our new pid. */
+    if (stale) it_reader_wake_drain(h);
+}
+
 static inline void it_claim_reader_slot(ItHandle *h) {
     uint32_t cur_gen = __atomic_load_n(&it_fork_gen, __ATOMIC_RELAXED);
     if (__builtin_expect(cur_gen == h->cached_fork_gen && h->my_slot_idx != UINT32_MAX, 1))
@@ -277,9 +286,7 @@ static inline void it_claim_reader_slot(ItHandle *h) {
                 __ATOMIC_ACQUIRE, __ATOMIC_RELAXED)) {
             /* Fresh owner holds no read locks yet; clear any stale rdepth left by
              * a dead predecessor (its contribution is dropped as we take over). */
-            __atomic_store_n(&h->reader_slots[s].rdepth, 0, __ATOMIC_RELAXED);
-            it_occ_set(h, s);   /* mark occupied BEFORE any rdlock can bump rdepth */
-            h->my_slot_idx = s;
+            it_reset_reader_slot(h, s);
             return;
         }
     }
@@ -293,9 +300,7 @@ static inline void it_claim_reader_slot(ItHandle *h) {
         uint32_t expected = dpid;
         if (__atomic_compare_exchange_n(&h->reader_slots[i].pid, &expected, now_pid, 0,
                 __ATOMIC_ACQUIRE, __ATOMIC_RELAXED)) {
-            __atomic_store_n(&h->reader_slots[i].rdepth, 0, __ATOMIC_RELAXED);
-            it_occ_set(h, i);
-            h->my_slot_idx = i;
+            it_reset_reader_slot(h, i);
             return;
         }
     }
@@ -322,7 +327,7 @@ static inline void it_recover_after_timeout(ItHandle *h) {
  * SIGKILLed while parked leaves rwait over-counted -> at most a spurious wake
  * (harmless); it can never under-count, so no wakeup is lost. */
 static inline void it_park(ItHandle *h) {
-    __atomic_add_fetch(&h->hdr->rwait, 1, __ATOMIC_RELAXED);
+    __atomic_add_fetch(&h->hdr->rwait, 1, __ATOMIC_SEQ_CST);
 }
 static inline void it_unpark(ItHandle *h) {
     __atomic_sub_fetch(&h->hdr->rwait, 1, __ATOMIC_RELAXED);
@@ -345,9 +350,9 @@ static inline void it_rdepth_inc(ItHandle *h) {
 static inline void it_rdepth_dec(ItHandle *h) {
     if (h->slotless_held > 0) {
         h->slotless_held--;
-        __atomic_sub_fetch(&h->hdr->slotless_rdepth, 1, __ATOMIC_RELEASE);
+        __atomic_sub_fetch(&h->hdr->slotless_rdepth, 1, __ATOMIC_SEQ_CST);
     } else if (h->my_slot_idx != UINT32_MAX) {
-        __atomic_sub_fetch(&h->reader_slots[h->my_slot_idx].rdepth, 1, __ATOMIC_RELEASE);
+        __atomic_sub_fetch(&h->reader_slots[h->my_slot_idx].rdepth, 1, __ATOMIC_SEQ_CST);
     }
 }
 
@@ -355,7 +360,8 @@ static inline void it_rdepth_dec(ItHandle *h) {
  * after every rdepth decrement so a released read lock lets the writer re-scan
  * promptly instead of waiting out its timeout. */
 static inline void it_reader_wake_drain(ItHandle *h) {
-    if (__atomic_load_n(&h->hdr->wlock, __ATOMIC_ACQUIRE) != 0) {
+    /* Pair the SC decrement/check with the writer's SC gate/scan. */
+    if (__atomic_load_n(&h->hdr->wlock, __ATOMIC_SEQ_CST) != 0) {
         __atomic_add_fetch(&h->hdr->drain_seq, 1, __ATOMIC_RELEASE);
         syscall(SYS_futex, &h->hdr->drain_seq, FUTEX_WAKE, 1, NULL, NULL, 0);
     }
@@ -393,7 +399,7 @@ static inline void it_rwlock_rdlock(ItHandle *h) {
             continue;
         }
         it_park(h);
-        cur = __atomic_load_n(&hdr->wlock, __ATOMIC_RELAXED);
+        cur = __atomic_load_n(&hdr->wlock, __ATOMIC_SEQ_CST);
         if (cur != 0) {
             long rc = syscall(SYS_futex, &hdr->wlock, FUTEX_WAIT, cur,
                               &it_lock_timeout, NULL, 0);
@@ -438,7 +444,7 @@ static inline void it_rwlock_wrlock(ItHandle *h) {
             continue;
         }
         it_park(h);
-        uint32_t cur = __atomic_load_n(&hdr->wlock, __ATOMIC_RELAXED);
+        uint32_t cur = __atomic_load_n(&hdr->wlock, __ATOMIC_SEQ_CST);
         if (cur != 0) {
             long rc = syscall(SYS_futex, &hdr->wlock, FUTEX_WAIT, cur,
                               &it_lock_timeout, NULL, 0);
@@ -498,8 +504,9 @@ static inline void it_rwlock_wrlock(ItHandle *h) {
 
 static inline void it_rwlock_wrunlock(ItHandle *h) {
     ItHeader *hdr = h->hdr;
-    __atomic_store_n(&hdr->wlock, 0, __ATOMIC_RELEASE);
-    if (__atomic_load_n(&hdr->rwait, __ATOMIC_RELAXED) > 0)
+    /* Pair with the waiter's SC hint increment and gate re-check. */
+    __atomic_store_n(&hdr->wlock, 0, __ATOMIC_SEQ_CST);
+    if (__atomic_load_n(&hdr->rwait, __ATOMIC_SEQ_CST) > 0)
         syscall(SYS_futex, &hdr->wlock, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
 }
 
@@ -609,7 +616,7 @@ static inline ItHandle *it_setup(void *base, size_t map_size,
 
 /* Validate a mapped header (shared by it_create reopen and it_open_fd). */
 static inline int it_validate_header(const ItHeader *hdr, uint64_t file_size) {
-    if (hdr->magic != IT_MAGIC) return 0;
+    if (__atomic_load_n(&hdr->magic, __ATOMIC_ACQUIRE) != IT_MAGIC) return 0;
     if (hdr->version != IT_VERSION) return 0;
     if (hdr->capacity < IT_MIN_CAP || hdr->capacity > IT_MAX_CAP) return 0;
     if (hdr->count > hdr->capacity) return 0;
@@ -755,7 +762,7 @@ static ItHandle *it_create(const char *path, uint64_t capacity, mode_t mode, cha
                 }
                 IT_ERR("invalid interval tree file"); munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
             }
-            if (((ItHeader *)base)->sealed) {
+            if (__atomic_load_n(&((ItHeader *)base)->sealed, __ATOMIC_ACQUIRE)) {
                 IT_ERR("%s is frozen (read-only); open it with new_readonly", path);
                 munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
             }
@@ -804,7 +811,7 @@ static ItHandle *it_open_fd(int fd, char *errbuf) {
     if (!it_validate_header((ItHeader *)base, (uint64_t)st.st_size)) {
         IT_ERR("invalid interval tree table"); munmap(base, ms); return NULL;
     }
-    if (((ItHeader *)base)->sealed) {
+    if (__atomic_load_n(&((ItHeader *)base)->sealed, __ATOMIC_ACQUIRE)) {
         IT_ERR("this interval tree is frozen (read-only); open it with new_readonly");
         munmap(base, ms); return NULL;
     }
@@ -837,7 +844,7 @@ static ItHandle *it_open_readonly(const char *path, char *errbuf) {
     if (!it_validate_header((ItHeader *)base, (uint64_t)st.st_size)) {
         IT_ERR("%s: invalid interval tree file", path); munmap(base, ms); return NULL;
     }
-    if (!((ItHeader *)base)->sealed) {
+    if (!__atomic_load_n(&((ItHeader *)base)->sealed, __ATOMIC_ACQUIRE)) {
         IT_ERR("%s is not frozen: call ->freeze on the producer before opening read-only", path);
         munmap(base, ms); return NULL;
     }
@@ -889,8 +896,7 @@ static void it_build_locked(ItHandle *h);
 static int it_freeze(ItHandle *h) {
     it_rwlock_wrlock(h);
     if (h->hdr->dirty) it_build_locked(h);
-    __atomic_signal_fence(__ATOMIC_SEQ_CST);
-    h->hdr->sealed = 1;
+    __atomic_store_n(&h->hdr->sealed, 1, __ATOMIC_RELEASE);
     it_rwlock_wrunlock(h);
     if (h->path || h->backing_fd >= 0) return it_msync(h);
     return 0;   /* anonymous: the seal lives in shared memory (visible to forks); nothing to flush */
@@ -920,7 +926,7 @@ static int64_t it_add_locked(ItHandle *h, int64_t lo, int64_t hi, uint64_t paylo
     nd->left = IT_NIL; nd->right = IT_NIL;
     /* Dirty before the count: a kill between costs a rebuild, never a counted node outside the tree. */
     h->hdr->dirty = 1;
-    __atomic_signal_fence(__ATOMIC_SEQ_CST);
+    __atomic_thread_fence(__ATOMIC_RELEASE);
     h->hdr->count = slot + 1;
     return (int64_t)slot;
 }
@@ -956,12 +962,12 @@ static uint32_t it_build_rec(ItHandle *h, uint32_t *idx, int64_t lo, int64_t hi)
 static void it_build_locked(ItHandle *h) {
     uint64_t n = h->hdr->count;
     if (n > h->capacity) n = h->capacity;                 /* Layer B */
-    if (n == 0) { h->hdr->root = IT_NIL; __atomic_signal_fence(__ATOMIC_SEQ_CST); h->hdr->dirty = 0; return; }
+    if (n == 0) { h->hdr->root = IT_NIL; __atomic_thread_fence(__ATOMIC_RELEASE); h->hdr->dirty = 0; return; }
     uint32_t *idx = it_idx(h);                             /* scratch region inside the mapping */
     for (uint64_t i = 0; i < n; i++) idx[i] = (uint32_t)i;
     qsort_r(idx, (size_t)n, sizeof(uint32_t), it_cmp_lo, h);   /* sort by lo once (subranges stay sorted) */
     h->hdr->root = it_build_rec(h, idx, 0, (int64_t)n - 1);
-    __atomic_signal_fence(__ATOMIC_SEQ_CST);
+    __atomic_thread_fence(__ATOMIC_RELEASE);
     h->hdr->dirty = 0;
 }
 
@@ -996,10 +1002,10 @@ static uint64_t it_overlaps_locked(ItHandle *h, int64_t ql, int64_t qh, ItRes *o
 static inline void it_clear_locked(ItHandle *h) {
     /* Dirty first: a kill at any point then reads as not cleared (rebuilt) or cleared. */
     h->hdr->dirty = 1;
-    __atomic_signal_fence(__ATOMIC_SEQ_CST);
+    __atomic_thread_fence(__ATOMIC_RELEASE);
     h->hdr->count = 0;
     h->hdr->root  = IT_NIL;
-    __atomic_signal_fence(__ATOMIC_SEQ_CST);
+    __atomic_thread_fence(__ATOMIC_RELEASE);
     h->hdr->dirty = 0;
 }
 

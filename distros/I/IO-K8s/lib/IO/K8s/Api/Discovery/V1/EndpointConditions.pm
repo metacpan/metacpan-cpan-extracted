@@ -1,6 +1,6 @@
 package IO::K8s::Api::Discovery::V1::EndpointConditions;
 # ABSTRACT: EndpointConditions represents the current condition of an endpoint.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s ready => Bool;
@@ -26,7 +26,7 @@ IO::K8s::Api::Discovery::V1::EndpointConditions - EndpointConditions represents 
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 ready
 

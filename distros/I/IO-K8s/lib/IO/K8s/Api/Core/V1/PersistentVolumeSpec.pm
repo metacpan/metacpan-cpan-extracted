@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::PersistentVolumeSpec;
 # ABSTRACT: PersistentVolumeSpec is the specification of a persistent volume.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s accessModes => [Str];
@@ -15,7 +15,7 @@ k8s azureDisk => 'Core::V1::AzureDiskVolumeSource';
 k8s azureFile => 'Core::V1::AzureFilePersistentVolumeSource';
 
 
-k8s capacity => { Quantity => 1 };
+k8s capacity => HashRef[Quantity];
 
 
 k8s cephfs => 'Core::V1::CephFSPersistentVolumeSource';
@@ -110,7 +110,7 @@ IO::K8s::Api::Core::V1::PersistentVolumeSpec - PersistentVolumeSpec is the speci
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 accessModes
 

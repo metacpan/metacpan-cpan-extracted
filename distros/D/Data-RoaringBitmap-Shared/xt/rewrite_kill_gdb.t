@@ -4,7 +4,7 @@ use Test::More;
 use File::Temp qw(tempdir);
 
 # SIGKILL a writer (under gdb, at an instruction boundary) at points spread over
-# a container rewrite, and check that the next process sees the bitmap exactly
+# a container rewrite or clear, and check that the next process sees the bitmap exactly
 # as it was before the call or after it, with its cardinality right and no
 # container slot lost.
 
@@ -34,6 +34,8 @@ my %op = (
                  call => '$a->add(5000)',     post => [0 .. 4095, 5000] },
     remove  => { xs => 'remove',    a => \@evens,       b => [],
                  call => '$a->remove(0)',     post => [@evens[1 .. $#evens]] },
+    clear   => { xs => 'clear', cap => 260, a => [map { ($_ << 16) | 7 } 0 .. 256],
+                 b => [], call => '$a->clear', post => [] },
 );
 
 my $lib = "$dir/rb_kill.pl";
@@ -54,6 +56,7 @@ if ($mode eq 'victim') {
     my ($base) = map { /^([0-9a-f]+)-/ ? $1 : () } grep { m{ \Q$dir\E/a\.rb$} } <$m>;
     open my $g, '>', $gdbvars or die $!;
     print $g "set \$wl = (unsigned int *) (0x$base + 72)\n";
+    print $g "set \$bt = (unsigned int *) (0x$base + *(unsigned long long *)(0x$base + 56))\n";
     close $g;
     eval $call; die $@ if $@;
     exit 0;
@@ -90,8 +93,29 @@ sub fresh {
     close $s;
 }
 
+sub recovery_result {
+    my ($o) = @_;
+    my $r = `$^X -Iblib/lib -Iblib/arch $lib check $dir $CAP '$o->{call}' 2>&1`;
+    my ($res) = $r =~ /RESULT (.*)/;
+    return $res // "no result: $r";
+}
+
 for my $name (sort keys %op) {
     my $o = $op{$name};
+    $CAP = $o->{cap} // 8;
+    if ($name eq 'clear') {
+        for my $hi (0, 128, 256) {
+            fresh($o);
+            my $k = gdb_run($o->{xs}, $o->{call}, "source $dir/vars.gdb",
+                "watch -location \$bt[$hi * 4]", 'continue');
+            my $res = recovery_result($o);
+            ok($k =~ /Old value = \d+\s+New value = 0/
+                && $res =~ /^held=1 post card_ok=1 free=(\d+) want=\1$/,
+                "clear: killed while erasing bucket $hi, recovery completed without losing slots")
+                or diag "$res\n$k";
+        }
+        next;
+    }
     fresh($o);
     my $log = gdb_run($o->{xs}, $o->{call}, "source $dir/vars.gdb", 'set $n = 0',
         'while *$wl == 0', 'stepi', 'set $n = $n + 1', 'end', 'set $lk = $n',
@@ -108,9 +132,7 @@ for my $name (sort keys %op) {
     for my $n (sort { $a <=> $b } keys %n) {
         fresh($o);
         my $k = gdb_run($o->{xs}, $o->{call}, "stepi $n");
-        my $r = `$^X -Iblib/lib -Iblib/arch $lib check $dir $CAP '$o->{call}' 2>&1`;
-        my ($res) = $r =~ /RESULT (.*)/;
-        $res //= "no result: $r";
+        my $res = recovery_result($o);
         $seen{$1}++ if $res =~ /\b(pre|post|torn)\b/;
         push @bad, "stepi $n: $res" unless $k =~ /Breakpoint 1[,.]/
             && $res =~ /^held=1 (?:pre|post) card_ok=1 free=(\d+) want=\1$/;

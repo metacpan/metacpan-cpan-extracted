@@ -1,5 +1,10 @@
 Revision history for Data-MinHash-Shared
 
+0.06  2026-10-16
+    - Fix missed shared-lock wakeups and frozen-data publication.
+    - Recover sparse files safely on full filesystems.
+    - Improve build portability and clarify interrupted-write limits.
+
 0.05      2026-09-26
           - Segments are reserved, so a full filesystem fails the constructor;
             DATA_MINHASH_SHARED_SPARSE=1 skips the reservation.

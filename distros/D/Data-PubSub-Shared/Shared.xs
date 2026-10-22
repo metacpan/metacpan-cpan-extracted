@@ -4,6 +4,9 @@
 #include "XSUB.h"
 
 #include "ppport.h"
+
+static int pubsub_wait_interrupted(void) { dTHX; return PL_sig_pending != 0; }
+#define PUBSUB_WAIT_INTERRUPTED() pubsub_wait_interrupted()
 #include "pubsub.h"
 
 #include "XSParseKeyword.h"
@@ -127,6 +130,115 @@ DEFINE_PS_KW(str, "Str", lag,     1, build_kw_1arg)
         croak("%s object was replaced during the call", classname); \
     sub = INT2PTR(PubSubSub*, SvIV(SvRV(sv))); \
     if (sub != sub0) croak("%s object replaced or destroyed during the call", classname)
+
+static void pubsub_perl_mutex_lock(pTHX_ SV *self, PubSubHandle *h) {
+    PubSubHandle *h0 = h;
+    struct timespec deadline;
+    pubsub_make_deadline(PUBSUB_LOCK_TIMEOUT_SEC, &deadline);
+    while (pubsub_mutex_lock_until(h->hdr, &deadline, 1) < 0) {
+        PERL_ASYNC_CHECK();
+        REEXTRACT_HANDLE("Data::PubSub::Shared", self);
+    }
+}
+
+static int pubsub_perl_str_publish(pTHX_ SV *self, PubSubHandle *h,
+                                  const char *str, uint32_t len, bool utf8) {
+    if (len > h->msg_size) return -1;
+    SV *copy = sv_2mortal(newSVpvn(str, len));
+    pubsub_perl_mutex_lock(aTHX_ self, h);
+    int result = pubsub_str_publish_locked(h, SvPVX_const(copy), len, utf8);
+    pubsub_mutex_unlock(h->hdr);
+    if (result == 1) pubsub_wake_subscribers_fenced(h->hdr);
+    return result;
+}
+
+static int pubsub_perl_int_poll_wait(pTHX_ SV *self, PubSubSub *sub,
+                                      int64_t *value, double timeout) {
+    PubSubSub *sub0 = sub;
+    SV *owner = (SV *)sub->userdata;
+    PubSubHandle *h = INT2PTR(PubSubHandle *, SvIV(SvRV(owner)));
+    PubSubHandle *h0 = h;
+    struct timespec deadline, remaining;
+    if (timeout > 0) pubsub_make_deadline(timeout, &deadline);
+    double seconds = timeout;
+    for (;;) {
+        int result = pubsub_int_poll_wait(sub, value, seconds);
+        if (result >= 0) return result;
+        PERL_ASYNC_CHECK();
+        REEXTRACT_SUB("Data::PubSub::Shared::Int::Sub", self);
+        REEXTRACT_HANDLE("Data::PubSub::Shared::Int", owner);
+        if (timeout > 0) {
+            if (!pubsub_remaining_time(&deadline, &remaining)) return 0;
+            seconds = (double)remaining.tv_sec + (double)remaining.tv_nsec / 1e9;
+        }
+    }
+}
+
+static int pubsub_perl_int32_poll_wait(pTHX_ SV *self, PubSubSub *sub,
+                                      int32_t *value, double timeout) {
+    PubSubSub *sub0 = sub;
+    SV *owner = (SV *)sub->userdata;
+    PubSubHandle *h = INT2PTR(PubSubHandle *, SvIV(SvRV(owner)));
+    PubSubHandle *h0 = h;
+    struct timespec deadline, remaining;
+    if (timeout > 0) pubsub_make_deadline(timeout, &deadline);
+    double seconds = timeout;
+    for (;;) {
+        int result = pubsub_int32_poll_wait(sub, value, seconds);
+        if (result >= 0) return result;
+        PERL_ASYNC_CHECK();
+        REEXTRACT_SUB("Data::PubSub::Shared::Int32::Sub", self);
+        REEXTRACT_HANDLE("Data::PubSub::Shared::Int32", owner);
+        if (timeout > 0) {
+            if (!pubsub_remaining_time(&deadline, &remaining)) return 0;
+            seconds = (double)remaining.tv_sec + (double)remaining.tv_nsec / 1e9;
+        }
+    }
+}
+
+static int pubsub_perl_int16_poll_wait(pTHX_ SV *self, PubSubSub *sub,
+                                      int16_t *value, double timeout) {
+    PubSubSub *sub0 = sub;
+    SV *owner = (SV *)sub->userdata;
+    PubSubHandle *h = INT2PTR(PubSubHandle *, SvIV(SvRV(owner)));
+    PubSubHandle *h0 = h;
+    struct timespec deadline, remaining;
+    if (timeout > 0) pubsub_make_deadline(timeout, &deadline);
+    double seconds = timeout;
+    for (;;) {
+        int result = pubsub_int16_poll_wait(sub, value, seconds);
+        if (result >= 0) return result;
+        PERL_ASYNC_CHECK();
+        REEXTRACT_SUB("Data::PubSub::Shared::Int16::Sub", self);
+        REEXTRACT_HANDLE("Data::PubSub::Shared::Int16", owner);
+        if (timeout > 0) {
+            if (!pubsub_remaining_time(&deadline, &remaining)) return 0;
+            seconds = (double)remaining.tv_sec + (double)remaining.tv_nsec / 1e9;
+        }
+    }
+}
+
+static int pubsub_perl_str_poll_wait(pTHX_ SV *self, PubSubSub *sub,
+                                      const char **str, uint32_t *len, bool *utf8, double timeout) {
+    PubSubSub *sub0 = sub;
+    SV *owner = (SV *)sub->userdata;
+    PubSubHandle *h = INT2PTR(PubSubHandle *, SvIV(SvRV(owner)));
+    PubSubHandle *h0 = h;
+    struct timespec deadline, remaining;
+    if (timeout > 0) pubsub_make_deadline(timeout, &deadline);
+    double seconds = timeout;
+    for (;;) {
+        int result = pubsub_str_poll_wait(sub, str, len, utf8, seconds);
+        if (result >= 0) return result;
+        PERL_ASYNC_CHECK();
+        REEXTRACT_SUB("Data::PubSub::Shared::Str::Sub", self);
+        REEXTRACT_HANDLE("Data::PubSub::Shared::Str", owner);
+        if (timeout > 0) {
+            if (!pubsub_remaining_time(&deadline, &remaining)) return 0;
+            seconds = (double)remaining.tv_sec + (double)remaining.tv_nsec / 1e9;
+        }
+    }
+}
 
 MODULE = Data::PubSub::Shared  PACKAGE = Data::PubSub::Shared::Int
 
@@ -411,7 +523,8 @@ eventfd_set(self, fd)
   PREINIT:
     EXTRACT_HANDLE("Data::PubSub::Shared::Int", self);
   CODE:
-    pubsub_eventfd_set(h, fd);
+    if (pubsub_eventfd_set(h, fd) < 0)
+        croak("eventfd_set: %s", strerror(errno));
 
 IV
 fileno(self)
@@ -494,7 +607,7 @@ poll_wait(self, ...)
   CODE:
     if (items > 1 && (SvGETMAGIC(ST(1)), SvOK(ST(1)))) timeout = SvNV(ST(1));
     REEXTRACT_SUB("Data::PubSub::Shared::Int::Sub", self);
-    int r = pubsub_int_poll_wait(sub, &value, timeout);
+    int r = pubsub_perl_int_poll_wait(aTHX_ self, sub, &value, timeout);
     if (r == 1)
         RETVAL = newSViv((IV)value);
     else
@@ -527,7 +640,7 @@ poll_wait_multi(self, count, ...)
     if (count == 0) XSRETURN(0);
     if (items > 2 && (SvGETMAGIC(ST(2)), SvOK(ST(2)))) timeout = SvNV(ST(2));
     REEXTRACT_SUB("Data::PubSub::Shared::Int::Sub", self);
-    if (!pubsub_int_poll_wait(sub, &value, timeout)) XSRETURN(0);
+    if (!pubsub_perl_int_poll_wait(aTHX_ self, sub, &value, timeout)) XSRETURN(0);
     mXPUSHi((IV)value);
     for (UV i = 1; i < count; i++) {
         if (!pubsub_int_poll(sub, &value)) break;
@@ -650,8 +763,12 @@ drain_notify(self, ...)
     pubsub_sub_eventfd_consume(sub);
     max_count = (items > 1 && (SvGETMAGIC(ST(1)), SvOK(ST(1)))) ? (uint32_t)SvUV(ST(1)) : UINT32_MAX;
     REEXTRACT_SUB("Data::PubSub::Shared::Int::Sub", self);
-    while (max_count-- > 0 && pubsub_int_poll(sub, &value))
+    while (max_count > 0 && pubsub_int_poll(sub, &value)) {
+        max_count--;
         mXPUSHi((IV)value);
+    }
+    if (max_count == 0 && pubsub_lag(sub) > 0)
+        pubsub_notify_fd(sub->notify_fd);
 
 void
 eventfd_set(self, fd)
@@ -752,10 +869,10 @@ publish(self, value)
   CODE:
     STRLEN len;
     SvGETMAGIC(value);   /* run get-magic/overload before reading the UTF8 flag */
-    bool utf8 = SvUTF8(value) ? true : false;
     const char *str = SvPV_nomg(value, len);
+    bool utf8 = SvUTF8(value) ? true : false;
     REEXTRACT_HANDLE("Data::PubSub::Shared::Str", self);
-    int r = pubsub_str_publish(h, str, LEN32(len), utf8);
+    int r = pubsub_perl_str_publish(aTHX_ self, h, str, LEN32(len), utf8);
     if (r == -1) croak("publish: message too long (%u > %u)", (unsigned)len, h->msg_size);
     RETVAL = &PL_sv_yes;
   OUTPUT:
@@ -794,17 +911,18 @@ publish_multi(self, ...)
             args[i].len = len;
         }
         REEXTRACT_HANDLE("Data::PubSub::Shared::Str", self);
-        pubsub_mutex_lock(h->hdr);
+        pubsub_perl_mutex_lock(aTHX_ self, h);
         for (uint32_t i = 0; i < count; i++) {
             int r = pubsub_str_publish_locked(h, args[i].str, LEN32(args[i].len), args[i].utf8);
             if (r == -1) {
                 pubsub_mutex_unlock(h->hdr);
+                if (RETVAL) pubsub_wake_subscribers_fenced(h->hdr);
                 croak("publish_multi: message too long (%u > %u)", (unsigned)args[i].len, h->msg_size);
             }
             RETVAL++;
         }
         pubsub_mutex_unlock(h->hdr);
-        pubsub_wake_subscribers(h->hdr);
+        pubsub_wake_subscribers_fenced(h->hdr);
     }
   OUTPUT:
     RETVAL
@@ -818,10 +936,10 @@ publish_notify(self, value)
   CODE:
     STRLEN len;
     SvGETMAGIC(value);   /* run get-magic/overload before reading the UTF8 flag */
-    bool utf8 = SvUTF8(value) ? true : false;
     const char *str = SvPV_nomg(value, len);
+    bool utf8 = SvUTF8(value) ? true : false;
     REEXTRACT_HANDLE("Data::PubSub::Shared::Str", self);
-    int r = pubsub_str_publish(h, str, LEN32(len), utf8);
+    int r = pubsub_perl_str_publish(aTHX_ self, h, str, LEN32(len), utf8);
     if (r == -1) croak("publish_notify: message too long (%u > %u)", (unsigned)len, h->msg_size);
     pubsub_notify(h);
 
@@ -921,7 +1039,9 @@ clear(self)
   PREINIT:
     EXTRACT_HANDLE("Data::PubSub::Shared::Str", self);
   CODE:
-    pubsub_clear(h);
+    pubsub_perl_mutex_lock(aTHX_ self, h);
+    pubsub_clear_locked(h);
+    pubsub_mutex_unlock(h->hdr);
 
 void
 sync(self)
@@ -967,7 +1087,8 @@ eventfd_set(self, fd)
   PREINIT:
     EXTRACT_HANDLE("Data::PubSub::Shared::Str", self);
   CODE:
-    pubsub_eventfd_set(h, fd);
+    if (pubsub_eventfd_set(h, fd) < 0)
+        croak("eventfd_set: %s", strerror(errno));
 
 IV
 fileno(self)
@@ -1060,7 +1181,7 @@ poll_wait(self, ...)
   CODE:
     if (items > 1 && (SvGETMAGIC(ST(1)), SvOK(ST(1)))) timeout = SvNV(ST(1));
     REEXTRACT_SUB("Data::PubSub::Shared::Str::Sub", self);
-    int r = pubsub_str_poll_wait(sub, &str, &len, &utf8, timeout);
+    int r = pubsub_perl_str_poll_wait(aTHX_ self, sub, &str, &len, &utf8, timeout);
     if (r == 1) {
         RETVAL = newSVpvn(str, len);
         if (utf8) SvUTF8_on(RETVAL);
@@ -1102,7 +1223,7 @@ poll_wait_multi(self, count, ...)
     if (count == 0) XSRETURN(0);
     if (items > 2 && (SvGETMAGIC(ST(2)), SvOK(ST(2)))) timeout = SvNV(ST(2));
     REEXTRACT_SUB("Data::PubSub::Shared::Str::Sub", self);
-    if (pubsub_str_poll_wait(sub, &str, &len, &utf8, timeout) != 1) XSRETURN(0);
+    if (pubsub_perl_str_poll_wait(aTHX_ self, sub, &str, &len, &utf8, timeout) != 1) XSRETURN(0);
     {
         SV *sv = newSVpvn(str, len);
         if (utf8) SvUTF8_on(sv);
@@ -1237,11 +1358,14 @@ drain_notify(self, ...)
     pubsub_sub_eventfd_consume(sub);
     max_count = (items > 1 && (SvGETMAGIC(ST(1)), SvOK(ST(1)))) ? (uint32_t)SvUV(ST(1)) : UINT32_MAX;
     REEXTRACT_SUB("Data::PubSub::Shared::Str::Sub", self);
-    while (max_count-- > 0 && pubsub_str_poll(sub, &str, &len, &utf8) == 1) {
+    while (max_count > 0 && pubsub_str_poll(sub, &str, &len, &utf8) == 1) {
+        max_count--;
         SV *sv = newSVpvn(str, len);
         if (utf8) SvUTF8_on(sv);
         mXPUSHs(sv);
     }
+    if (max_count == 0 && pubsub_lag(sub) > 0)
+        pubsub_notify_fd(sub->notify_fd);
 
 void
 eventfd_set(self, fd)
@@ -1524,7 +1648,8 @@ eventfd_set(self, fd)
   PREINIT:
     EXTRACT_HANDLE("Data::PubSub::Shared::Int32", self);
   CODE:
-    pubsub_eventfd_set(h, fd);
+    if (pubsub_eventfd_set(h, fd) < 0)
+        croak("eventfd_set: %s", strerror(errno));
 
 IV
 fileno(self)
@@ -1607,7 +1732,7 @@ poll_wait(self, ...)
   CODE:
     if (items > 1 && (SvGETMAGIC(ST(1)), SvOK(ST(1)))) timeout = SvNV(ST(1));
     REEXTRACT_SUB("Data::PubSub::Shared::Int32::Sub", self);
-    int r = pubsub_int32_poll_wait(sub, &value, timeout);
+    int r = pubsub_perl_int32_poll_wait(aTHX_ self, sub, &value, timeout);
     if (r == 1)
         RETVAL = newSViv((IV)value);
     else
@@ -1640,7 +1765,7 @@ poll_wait_multi(self, count, ...)
     if (count == 0) XSRETURN(0);
     if (items > 2 && (SvGETMAGIC(ST(2)), SvOK(ST(2)))) timeout = SvNV(ST(2));
     REEXTRACT_SUB("Data::PubSub::Shared::Int32::Sub", self);
-    if (!pubsub_int32_poll_wait(sub, &value, timeout)) XSRETURN(0);
+    if (!pubsub_perl_int32_poll_wait(aTHX_ self, sub, &value, timeout)) XSRETURN(0);
     mXPUSHi((IV)value);
     for (UV i = 1; i < count; i++) {
         if (!pubsub_int32_poll(sub, &value)) break;
@@ -1763,8 +1888,12 @@ drain_notify(self, ...)
     pubsub_sub_eventfd_consume(sub);
     max_count = (items > 1 && (SvGETMAGIC(ST(1)), SvOK(ST(1)))) ? (uint32_t)SvUV(ST(1)) : UINT32_MAX;
     REEXTRACT_SUB("Data::PubSub::Shared::Int32::Sub", self);
-    while (max_count-- > 0 && pubsub_int32_poll(sub, &value))
+    while (max_count > 0 && pubsub_int32_poll(sub, &value)) {
+        max_count--;
         mXPUSHi((IV)value);
+    }
+    if (max_count == 0 && pubsub_lag(sub) > 0)
+        pubsub_notify_fd(sub->notify_fd);
 
 void
 eventfd_set(self, fd)
@@ -2047,7 +2176,8 @@ eventfd_set(self, fd)
   PREINIT:
     EXTRACT_HANDLE("Data::PubSub::Shared::Int16", self);
   CODE:
-    pubsub_eventfd_set(h, fd);
+    if (pubsub_eventfd_set(h, fd) < 0)
+        croak("eventfd_set: %s", strerror(errno));
 
 IV
 fileno(self)
@@ -2130,7 +2260,7 @@ poll_wait(self, ...)
   CODE:
     if (items > 1 && (SvGETMAGIC(ST(1)), SvOK(ST(1)))) timeout = SvNV(ST(1));
     REEXTRACT_SUB("Data::PubSub::Shared::Int16::Sub", self);
-    int r = pubsub_int16_poll_wait(sub, &value, timeout);
+    int r = pubsub_perl_int16_poll_wait(aTHX_ self, sub, &value, timeout);
     if (r == 1)
         RETVAL = newSViv((IV)value);
     else
@@ -2163,7 +2293,7 @@ poll_wait_multi(self, count, ...)
     if (count == 0) XSRETURN(0);
     if (items > 2 && (SvGETMAGIC(ST(2)), SvOK(ST(2)))) timeout = SvNV(ST(2));
     REEXTRACT_SUB("Data::PubSub::Shared::Int16::Sub", self);
-    if (!pubsub_int16_poll_wait(sub, &value, timeout)) XSRETURN(0);
+    if (!pubsub_perl_int16_poll_wait(aTHX_ self, sub, &value, timeout)) XSRETURN(0);
     mXPUSHi((IV)value);
     for (UV i = 1; i < count; i++) {
         if (!pubsub_int16_poll(sub, &value)) break;
@@ -2286,8 +2416,12 @@ drain_notify(self, ...)
     pubsub_sub_eventfd_consume(sub);
     max_count = (items > 1 && (SvGETMAGIC(ST(1)), SvOK(ST(1)))) ? (uint32_t)SvUV(ST(1)) : UINT32_MAX;
     REEXTRACT_SUB("Data::PubSub::Shared::Int16::Sub", self);
-    while (max_count-- > 0 && pubsub_int16_poll(sub, &value))
+    while (max_count > 0 && pubsub_int16_poll(sub, &value)) {
+        max_count--;
         mXPUSHi((IV)value);
+    }
+    if (max_count == 0 && pubsub_lag(sub) > 0)
+        pubsub_notify_fd(sub->notify_fd);
 
 void
 eventfd_set(self, fd)

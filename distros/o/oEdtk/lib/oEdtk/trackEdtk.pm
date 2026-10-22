@@ -13,7 +13,7 @@ BEGIN {
 	use Exporter;
 	use vars qw($VERSION @ISA  @EXPORT_OK);    # @EXPORT %EXPORT_TAGS);
 
-	$VERSION = 2.1129;         # eventually this library should be taken over by oEdtk::Tracking
+	$VERSION = 2.1131;         # eventually this library should be taken over by oEdtk::Tracking
 	@ISA     = qw(Exporter);
 
 	#		@EXPORT		= qw(

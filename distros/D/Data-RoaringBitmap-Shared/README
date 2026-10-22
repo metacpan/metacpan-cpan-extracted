@@ -214,7 +214,8 @@ STATS
         container, array or bitmap).
 
     *   "ops" -- running count of mutating operations ("add", "add_many",
-        "remove", "union", "intersect", "clear").
+        "remove", "union", "intersect", "clear"). Self/alias set operations
+        are not counted.
 
     *   "mmap_size" -- bytes of the shared mapping.
 
@@ -312,8 +313,9 @@ CRASH SAFETY
     "union" of a bitmap with an array container sets bits one at a time, so a
     kill leaves part of the array's values added. When no slot is spare, the
     rewrite happens in place, and a kill during it can tear that container. A
-    call that touches several buckets ("add_many", "union", "intersect",
-    "clear") is not atomic as a whole: a kill leaves it partly applied.
+    call that touches several buckets ("add_many", "union", "intersect") is
+    not atomic as a whole: a kill leaves it partly applied. An interrupted
+    "clear" is completed by recovery.
 
     Reader-slot exhaustion (slotless readers): dead-process recovery
     attributes a crashed lock holder's contribution through its reader-slot.

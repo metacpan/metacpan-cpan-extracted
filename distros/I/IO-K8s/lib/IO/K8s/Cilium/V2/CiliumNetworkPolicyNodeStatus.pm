@@ -1,9 +1,9 @@
 package IO::K8s::Cilium::V2::CiliumNetworkPolicyNodeStatus;
 # ABSTRACT: CiliumNetworkPolicyNodeStatus is the status of a Cilium policy rule for a specific node.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
-k8s annotations         => { Str => 1 };
+k8s annotations         => HashRef[Str];
 k8s enforcing           => Bool;
 k8s error               => Str;
 k8s lastUpdated         => Time;
@@ -30,7 +30,7 @@ IO::K8s::Cilium::V2::CiliumNetworkPolicyNodeStatus - CiliumNetworkPolicyNodeStat
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 annotations
 

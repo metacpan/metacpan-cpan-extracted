@@ -1,5 +1,17 @@
 Revision history for Unblock-HTTP1
 
+0.12  2026-10-21
+    - Add coordinated buffered/streamed receive selection while retaining
+      the canonical Uniform::HTTP message and native engine Transaction.
+    - Expose on_data and on_finish with exactly-once terminal notification,
+      bounded receive buffers, and bodyless response correctness.
+    - Defer attached-transport success retirement until the host accepts
+      all corresponding output bytes, preserving error and congestion rules.
+    - Retain ordered HTTP/1.1 pipelining, Upgrade handoff and borrowed-input
+      suffix accounting without changing the public NativeABI layout.
+    - Expand receive/lifecycle, fatal output-limit and native/portable
+      regression tests. Continue standalone use without an event loop.
+
 0.11  2026-10-10
     - Add an optional framework-hosted Client and Server mode using
       transport => $stream. HTTP output is delivered automatically through

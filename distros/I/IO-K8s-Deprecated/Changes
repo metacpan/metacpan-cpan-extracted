@@ -1,5 +1,29 @@
 Revision history for IO-K8s-Deprecated
 
+1.111     2026-10-21 18:26:25Z
+
+    * Removed the tombstones for
+      IO::K8s::Apimachinery::Pkg::Apis::Meta::V1::APIGroupList and
+      IO::K8s::Apimachinery::Pkg::Apis::Meta::V1::APIResourceList. They
+      were swept up with the *List classes in 1.105, but they are the
+      meta.v1 discovery Kinds, not lists of resources, and IO-K8s ships
+      both again as real classes since 1.106. Both distributions install
+      the same file, so installing IO-K8s-Deprecated 1.105 after IO-K8s
+      1.106 or later overwrote the working classes with stubs that die on
+      load. This distribution now holds 78 tombstones: 74 consolidated
+      *List classes and the 4 classic DRA classes.
+
+    * If you installed IO-K8s-Deprecated 1.105 on top of IO-K8s 1.106 or
+      later: upgrading this distribution does not bring the two classes
+      back, an installer does not delete files a newer release no longer
+      ships. Reinstall IO-K8s (cpanm --reinstall IO::K8s).
+
+    * New test t/02-name-guard.t holds the rule behind it: no package
+      shipped here may be shipped by the current IO-K8s. It compares
+      against an io-k8s-p5 checkout next to this one, an installed IO::K8s
+      at least as new as this distribution, or the lib directory named in
+      IO_K8S_LIB, and skips when none of them is available.
+
 1.105     2026-08-08 03:21:30Z
 
     First release. Permanent home for CPAN redirect ("tombstone") stub

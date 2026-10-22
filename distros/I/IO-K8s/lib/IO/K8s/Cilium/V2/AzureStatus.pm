@@ -1,6 +1,6 @@
 package IO::K8s::Cilium::V2::AzureStatus;
 # ABSTRACT: Azure is the Azure specific status of the node.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s interfaces => ['+IO::K8s::Cilium::V2::AzureInterface'];
@@ -20,7 +20,7 @@ IO::K8s::Cilium::V2::AzureStatus - Azure is the Azure specific status of the nod
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 interfaces
 

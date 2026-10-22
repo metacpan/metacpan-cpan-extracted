@@ -1,6 +1,6 @@
 package IO::K8s::Api::Storage::V1::CSIDriverSpec;
 # ABSTRACT: CSIDriverSpec is the specification of a CSIDriver.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s attachRequired => Bool;
@@ -50,7 +50,7 @@ IO::K8s::Api::Storage::V1::CSIDriverSpec - CSIDriverSpec is the specification of
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 attachRequired
 

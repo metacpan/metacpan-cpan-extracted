@@ -38,10 +38,10 @@
  * if holding the write lock, 0 if holding the read lock. */
 static int kd_query_lock(KdHandle *h) {
     kd_rwlock_rdlock(h);
-    if (!h->hdr->dirty) return 0;
+    if (!__atomic_load_n(&h->hdr->dirty, __ATOMIC_ACQUIRE)) return 0;
     kd_rwlock_rdunlock(h);
     kd_rwlock_wrlock(h);
-    if (h->hdr->dirty) kd_build_locked(h);
+    if (__atomic_load_n(&h->hdr->dirty, __ATOMIC_ACQUIRE)) kd_build_locked(h);
     return 1;
 }
 static void kd_query_unlock(KdHandle *h, int wr) {
@@ -66,7 +66,13 @@ static void kd_read_point(pTHX_ KdHandle *h, SV *aref, double *buf, const char *
         croak("Data::KDTree::Shared->%s: expected %u coordinates, got %ld", what, (unsigned)dims, (long)(av_len(av) + 1));
     for (uint32_t d = 0; d < dims; d++) {
         SV **el = av_fetch(av, (SSize_t)d, 0);
-        double v = (el && *el) ? SvNV(*el) : 0.0;
+        if (!el || !*el)
+            croak("Data::KDTree::Shared->%s: coordinate %u is missing", what, (unsigned)d);
+        SV *coord = *el;
+        SvGETMAGIC(coord);
+        if (!SvOK(coord))
+            croak("Data::KDTree::Shared->%s: coordinate %u is missing", what, (unsigned)d);
+        double v = SvNV_nomg(coord);
         if (!isfinite(v)) croak("Data::KDTree::Shared->%s: coordinate %u is not finite", what, (unsigned)d);
         buf[d] = v;
     }
@@ -363,7 +369,7 @@ frozen(self)
   PREINIT:
     EXTRACT(self);
   CODE:
-    RETVAL = h->hdr->sealed ? 1 : 0;
+    RETVAL = __atomic_load_n(&h->hdr->sealed, __ATOMIC_ACQUIRE) ? 1 : 0;
   OUTPUT:
     RETVAL
 

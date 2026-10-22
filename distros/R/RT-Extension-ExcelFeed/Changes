@@ -1,3 +1,9 @@
+1.05 2026-10-21
+ - Export chart values as plain text
+
+1.04 2026-09-17
+ - Fix emailed dashboard exports of transaction, asset and chart searches
+
 1.03 2026-07-02
  - Add config for number of rows per page
  - Default to 1000 rows per page instead of 100

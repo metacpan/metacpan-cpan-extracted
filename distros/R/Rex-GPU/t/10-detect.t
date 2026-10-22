@@ -536,6 +536,30 @@ subtest 'detect — AMD only' => sub {
   is($r->{amd}[0]{name}, 'Navi 31 [Radeon RX 7900 XTX]', 'element name (karr #5)');
 };
 
+subtest 'detect — class 0380: AMD Instinct listed, NVIDIA there is not (karr k75)' => sub {
+  my $r = detect_with(
+    '0f:00.0 Display controller [0380]: Advanced Micro Devices, Inc. [AMD/ATI] Aldebaran/MI200 [Instinct MI250X] [1002:740c] (rev 02)'
+  );
+  is(scalar @{$r->{amd}}, 1, 'one amd device');
+  is($r->{amd}[0]{pci_class}, '0380', 'pci_class 0380');
+  is($r->{amd}[0]{compute}, 0, 'compute 0');
+  is($r->{amd}[0]{name}, 'Aldebaran/MI200 [Instinct MI250X]', 'name');
+  is(scalar @{$r->{nvidia}}, 0, 'no nvidia');
+
+  my $n = detect_with(
+    '0d:00.0 Display controller [0380]: NVIDIA Corporation GA102 [GeForce RTX 3090] [10de:2204] (rev a1)'
+  );
+  is(scalar @{$n->{nvidia}}, 0, 'NVIDIA at 0380 => still not listed');
+  is(scalar @{$n->{amd}},    0, '... nor amd');
+
+  my $both = detect_with(
+      "0d:00.0 Display controller [0380]: NVIDIA Corporation GA102 [GeForce RTX 3090] [10de:2204] (rev a1)\n"
+    . '0f:00.0 Display controller [0380]: Advanced Micro Devices, Inc. [AMD/ATI] Aldebaran/MI200 [Instinct MI250X] [1002:740c] (rev 02)'
+  );
+  is(scalar @{$both->{nvidia}}, 0, 'mixed: nvidia 0380 dropped');
+  is(scalar @{$both->{amd}},    1, 'mixed: amd 0380 listed');
+};
+
 subtest 'detect — virtual-only output => empty (unchanged)' => sub {
   # virtio [1af4] alone
   my $r = detect_with(

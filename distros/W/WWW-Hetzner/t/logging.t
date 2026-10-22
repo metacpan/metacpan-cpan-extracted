@@ -89,4 +89,18 @@ subtest 'error logging on API error' => sub {
     like($errors[0]->{message}, qr/Invalid token/, 'error contains API message');
 };
 
+subtest 'debug body log masks secrets' => sub {
+    my $log_ = Log::Any->get_logger(category => 'WWW::Hetzner::Role::HTTP');
+    $log_->clear;
+    my $cloud = mock_cloud('POST /servers' => { server => {} });
+    my $req = $cloud->_build_request('POST', '/servers', body => {
+        name => 'web', user_data => 'secret-ud', password => 'hunter2', private_key => 'KEY',
+    });
+    my ($body) = grep { $_->{message} =~ /^Body:/ } @{ $log_->msgs };
+    ok($body, 'body logged');
+    unlike($body->{message}, qr/secret-ud|hunter2|KEY/, 'secrets masked in log');
+    like($body->{message}, qr/web/, 'other fields kept');
+    like($req->content, qr/hunter2/, 'request itself unchanged');
+};
+
 done_testing;

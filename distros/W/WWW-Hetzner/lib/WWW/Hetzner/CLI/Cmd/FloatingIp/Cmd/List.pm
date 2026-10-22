@@ -1,7 +1,7 @@
 package WWW::Hetzner::CLI::Cmd::FloatingIp::Cmd::List;
 # ABSTRACT: List floating IPs
 
-our $VERSION = '0.101';
+our $VERSION = '0.102';
 
 use Moo;
 use MooX::Cmd;
@@ -54,7 +54,7 @@ WWW::Hetzner::CLI::Cmd::FloatingIp::Cmd::List - List floating IPs
 
 =head1 VERSION
 
-version 0.101
+version 0.102
 
 =head1 SUPPORT
 

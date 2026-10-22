@@ -1,5 +1,10 @@
 Revision history for Data-SegmentTree-Shared
 
+0.07  2026-10-16
+    - Repair interrupted assignment propagation in optimized builds.
+    - Reclaim idle reader slots after worker churn.
+    - Remove relative backing paths correctly after chdir.
+
 0.06      2026-09-26
           - A writer killed mid-update is repaired: each position reads as
             before or after it, and ranges agree with points.

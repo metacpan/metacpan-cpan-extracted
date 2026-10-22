@@ -1,6 +1,6 @@
 package IO::K8s::Cilium::V2::ENIStatus;
 # ABSTRACT: ENI is the AWS ENI specific status of the node.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s enis => { '+IO::K8s::Cilium::V2::ENI' => 1 };
@@ -20,7 +20,7 @@ IO::K8s::Cilium::V2::ENIStatus - ENI is the AWS ENI specific status of the node.
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 enis
 

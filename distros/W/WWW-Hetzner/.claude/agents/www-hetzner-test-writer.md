@@ -2,12 +2,11 @@
 name: www-hetzner-test-writer
 description: "Write and extend WWW::Hetzner tests using the mock-IO fixture harness. Tests NEVER hit the real Hetzner API — always inject Test::WWW::Hetzner::MockIO with fixture routes. Use for test additions, regression scaffolding, and debugging via captured request bodies."
 model: sonnet
-allowed-tools: Read, Edit, Write, Bash, Glob, Grep
 briefing:
   skills:
     - www-hetzner-core
     - getty-perl-moo
-    - kanban-issues-karr-cli
+    - kanban-issues-karr-ticket
 ---
 
 You are the www-hetzner-test-writer for **WWW::Hetzner**.

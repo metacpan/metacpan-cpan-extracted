@@ -1,6 +1,6 @@
 package IO::K8s::PrometheusOperator::V1::Condition;
 # ABSTRACT: Condition represents the state of the resources associated with the Prometheus, Alertmanager or ThanosRuler resource.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s lastTransitionTime => Time, { required => 'schema' };
@@ -30,7 +30,7 @@ IO::K8s::PrometheusOperator::V1::Condition - Condition represents the state of t
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 lastTransitionTime
 

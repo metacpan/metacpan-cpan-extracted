@@ -1,7 +1,7 @@
 package WWW::Hetzner::Cloud::API::ServerTypes;
 # ABSTRACT: Hetzner Cloud Server Types API
 
-our $VERSION = '0.101';
+our $VERSION = '0.102';
 
 use Moo;
 with 'WWW::Hetzner::Role::Pagination';
@@ -81,7 +81,7 @@ WWW::Hetzner::Cloud::API::ServerTypes - Hetzner Cloud Server Types API
 
 =head1 VERSION
 
-version 0.101
+version 0.102
 
 =head1 SYNOPSIS
 

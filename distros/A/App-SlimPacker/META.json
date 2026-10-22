@@ -33,7 +33,7 @@
       "runtime" : {
          "requires" : {
             "App::FatPacker" : "0",
-            "Module::CoreList" : "0",
+            "Module::CoreList" : "3.07",
             "PPI" : "0",
             "perl" : "5.010"
          }
@@ -53,6 +53,6 @@
          "url" : "https://github.com/nicomen/App-SlimPacker"
       }
    },
-   "version" : "0.07",
+   "version" : "0.08",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

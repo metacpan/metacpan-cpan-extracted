@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1::VaultKubernetesAuth;
 # ABSTRACT: Kubernetes authenticates with Vault by passing the ServiceAccount token stored in the named Secret resource to the Vault server.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s mountPath         => Str, { required => 'schema', default => 'kubernetes' };
@@ -26,7 +26,7 @@ IO::K8s::ExternalSecrets::V1::VaultKubernetesAuth - Kubernetes authenticates wit
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 mountPath
 

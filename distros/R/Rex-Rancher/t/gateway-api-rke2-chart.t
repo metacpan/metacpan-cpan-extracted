@@ -67,6 +67,10 @@ subtest 'rancher_deploy_server hands it to install_server' => sub {
   local *Rex::Rancher::_save_kubeconfig_locally = sub { $_[1] };
   local *Rex::Rancher::wait_for_api             = sub { 1 };
   local *Rex::Rancher::install_cilium           = sub {};
+  # preflight_server reads the host, offline this machine: a fresh host.
+  local *Rex::Rancher::Uninstall::check_cilium_residue              = sub { 1 };
+  local *Rex::Rancher::Distribution::check_version_skew             = sub { return };
+  local *Rex::Rancher::Distribution::check_established_cluster_cidr = sub { return };
   Rex::Rancher::rancher_deploy_server( %gw, kubeconfig_file => '/nonexistent/kc.yaml' );
   is_deeply( $got{disable}, [ @DEFAULT, $CHART ], 'gateway_api: chart in the disable list' );
   Rex::Rancher::rancher_deploy_server( kubeconfig_file => '/nonexistent/kc.yaml' );

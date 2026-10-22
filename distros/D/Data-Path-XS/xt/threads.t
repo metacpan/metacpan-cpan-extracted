@@ -24,10 +24,14 @@ use Data::Path::XS qw(path_get path_set path_compile pathc_get pathc_set);
 
 my $N = 8;
 my $ITERS = 2000;
+my $parent_path = path_compile('/value');
 
 my @threads = map {
     threads->create(sub {
         my $tid = $_;
+        eval { pathc_get({ value => 42 }, $parent_path) };
+        return [$tid, 0, 'inherited compiled path accepted']
+            unless $@ =~ /Not a compiled path/;
         my $data = {};
         my $cp_set = path_compile('/users/0/name');
         my $cp_get = path_compile('/users/0/name');
@@ -44,6 +48,8 @@ my @threads = map {
 for my $t (@threads) {
     my $r = $t->join;
     is($r->[2], 'ok', "thread $r->[0] completed $ITERS iterations");
+    is(pathc_get({ value => 42 }, $parent_path), 42,
+       'parent compiled path survives thread destruction');
 }
 
 done_testing;

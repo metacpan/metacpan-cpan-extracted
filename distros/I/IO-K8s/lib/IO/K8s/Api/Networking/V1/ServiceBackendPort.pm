@@ -1,6 +1,6 @@
 package IO::K8s::Api::Networking::V1::ServiceBackendPort;
 # ABSTRACT: ServiceBackendPort is the service port being referenced.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s name => Str;
@@ -23,7 +23,7 @@ IO::K8s::Api::Networking::V1::ServiceBackendPort - ServiceBackendPort is the ser
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 name
 

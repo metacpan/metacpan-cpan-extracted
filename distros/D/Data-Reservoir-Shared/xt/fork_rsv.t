@@ -27,6 +27,7 @@ waitpid $_, 0 for @pids;
 
 is $r->count, $k, "reservoir full: count == k ($k) after $kids*$per adds";
 is $r->seen, $kids * $per, "seen == grand total (no lost observations)";
+is $r->stats->{ops}, $kids * $per, 'ops counts every add under concurrent writers';
 my $bad = grep { !/^c[0-3]-\d+$/ } $r->sample;
 is $bad, 0, 'every sampled item was fed by some child (no corruption)';
 

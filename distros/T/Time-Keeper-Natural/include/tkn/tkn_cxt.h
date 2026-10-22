@@ -37,6 +37,17 @@ tkn_newSVpvn_flags(pTHX_ const char *s, STRLEN len, U32 flags)
 #  define newSVpvn_flags(s, len, flags) tkn_newSVpvn_flags(aTHX_ (s), (len), (flags))
 #endif
 
+/* av_make of n SVs; an empty array's AvARRAY is NULL, which a DEBUGGING perl's
+ * av_make asserts against even when n is 0. */
+#define tkn_av_copy(n, from) ((n) > 0 ? av_make((n), (from)) : newAV())
+
+/* A character class through Perl's engine, with \p{Cn} added: a script newer
+ * than the running perl's Unicode (Adlam before 5.26) is unassigned there,
+ * and its letters are letters still. */
+#define TKN_RX_LETTER "qr/[\\p{L}\\p{Cn}]/"
+#define TKN_RX_WORD   "qr/[\\w\\p{Cn}]/"
+#define TKN_RX_LNS    "qr/[\\p{L}\\p{N}\\p{Cn}\\s]/"
+
 #define MY_CXT_KEY "Time::Keeper::Natural::_guts" XS_VERSION
 
 typedef struct tkn_cache {

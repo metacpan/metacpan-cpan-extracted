@@ -20,11 +20,11 @@ no_index:
     - inc
 requires:
   App::FatPacker: '0'
-  Module::CoreList: '0'
+  Module::CoreList: '3.07'
   PPI: '0'
   perl: '5.010'
 resources:
   bugtracker: https://github.com/nicomen/App-SlimPacker/issues
   repository: https://github.com/nicomen/App-SlimPacker
-version: '0.07'
+version: '0.08'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

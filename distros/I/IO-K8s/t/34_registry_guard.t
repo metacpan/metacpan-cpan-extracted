@@ -56,13 +56,14 @@ my $registry = \%IO::K8s::Resource::_attr_registry;
 
 # Inline-generated structs (Resource.pm `_generate_inline_struct`) are not
 # shipped as .pm files — they materialise as packages when the parent class
-# is loaded. We accept any target that has a `k8s` function in its symbol
-# table, regardless of whether there's a .pm on disk for it.
+# is loaded. We accept any target that is a materialised resource class
+# (it can TO_JSON, from the composed role), regardless of whether there's a
+# .pm on disk for it.
 sub is_inline_struct_available {
     my ($target) = @_;
     return 1 if $loadable{$target};
     no strict 'refs';
-    return defined &{"${target}::k8s"};
+    return $target->can("TO_JSON") ? 1 : 0;
 }
 
 my @missing;

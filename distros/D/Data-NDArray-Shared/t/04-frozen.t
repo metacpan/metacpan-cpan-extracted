@@ -75,6 +75,11 @@ $expected[6] = 99.5;   # flat index 6 == multi-index (1,2) in a (3,4) row-major 
     ok !eval { $A->set(0, 0, 1); 1 },
         'A is still refused: the post-wrlock seal re-check catches it';
     like $@, qr/frozen|read-only/, 'post-wrlock seal re-check message';
+  SKIP: {
+        skip 'PDL not installed', 2 unless eval { require PDL; 1 };
+        ok !eval { $A->as_pdl_alias; 1 }, 'alias through a previously attached handle refuses the seal';
+        like $@, qr/frozen|read-only/, 'alias reports the shared seal';
+    }
 }
 
 # ---- consumer: read-only attach (the shipped artifact) ----

@@ -1,6 +1,6 @@
 package IO::K8s::Api::Scheduling::V1beta1::CompositeDisruptionMode;
 # ABSTRACT: CompositeDisruptionMode defines how individual entities within a composite pod group can be disrupted. Exactly one mode must be set.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s all => 'Scheduling::V1beta1::AllCompositeDisruptionMode';
@@ -23,7 +23,7 @@ IO::K8s::Api::Scheduling::V1beta1::CompositeDisruptionMode - CompositeDisruption
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 all
 

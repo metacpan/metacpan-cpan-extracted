@@ -1,6 +1,6 @@
 package IO::K8s::Cilium::V2::AlibabaCloudENI;
 # ABSTRACT: ENI represents an AlibabaCloud Elastic Network Interface
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s 'instance-id'          => Str;
@@ -9,7 +9,7 @@ k8s 'network-interface-id' => Str;
 k8s 'primary-ip-address'   => Str;
 k8s 'private-ipsets'       => ['+IO::K8s::Cilium::V2::PrivateIPSet'];
 k8s 'security-groupids'    => [Str];
-k8s tags                   => { Str => 1 };
+k8s tags                   => HashRef[Str];
 k8s type                   => Str;
 k8s vpc                    => '+IO::K8s::Cilium::V2::VPC';
 k8s vswitch                => '+IO::K8s::Cilium::V2::VSwitch';
@@ -40,7 +40,7 @@ IO::K8s::Cilium::V2::AlibabaCloudENI - ENI represents an AlibabaCloud Elastic Ne
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 instance-id
 

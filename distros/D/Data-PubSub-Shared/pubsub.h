@@ -55,6 +55,10 @@
 #define PUBSUB_STR_LEN_MASK      0x7FFFFFFFU
 #define PUBSUB_POLL_RETRIES      8
 
+#ifndef PUBSUB_WAIT_INTERRUPTED
+#define PUBSUB_WAIT_INTERRUPTED() 0
+#endif
+
 /* ================================================================
  * Header (256 bytes = 4 cache lines)
  * ================================================================ */
@@ -227,67 +231,87 @@ static inline int pubsub_pid_alive(uint32_t pid) {
     return !pubsub_pid_is_zombie(pid); /* kill() also succeeds for a zombie -> treat as dead */
 }
 
-static const struct timespec pubsub_lock_timeout = { PUBSUB_LOCK_TIMEOUT_SEC, 0 };
+static inline int pubsub_remaining_time(const struct timespec *deadline,
+                                         struct timespec *remaining);
+static inline void pubsub_make_deadline(double timeout, struct timespec *deadline);
 
 static inline void pubsub_recover_stale_mutex(PubSubHeader *hdr, uint32_t observed) {
     if (!__atomic_compare_exchange_n(&hdr->mutex, &observed, 0,
             0, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED))
         return;
     __atomic_add_fetch(&hdr->stat_recoveries, 1, __ATOMIC_RELAXED);
+    __atomic_thread_fence(__ATOMIC_SEQ_CST);
     if (__atomic_load_n(&hdr->mutex_waiters, __ATOMIC_RELAXED) > 0)
         syscall(SYS_futex, &hdr->mutex, FUTEX_WAKE, 1, NULL, NULL, 0);
 }
 
-static inline void pubsub_mutex_lock(PubSubHeader *hdr) {
+static inline int pubsub_mutex_lock_until(PubSubHeader *hdr,
+                                           struct timespec *deadline, int interruptible) {
     uint32_t mypid = PUBSUB_MUTEX_VAL((uint32_t)getpid());
+    struct timespec remaining;
     for (int spin = 0; ; spin++) {
         uint32_t expected = 0;
         if (__atomic_compare_exchange_n(&hdr->mutex, &expected, mypid,
                 1, __ATOMIC_ACQUIRE, __ATOMIC_RELAXED))
-            return;
+            return 0;
         if (__builtin_expect(spin < PUBSUB_SPIN_LIMIT, 1)) {
             pubsub_spin_pause();
             continue;
         }
-        __atomic_add_fetch(&hdr->mutex_waiters, 1, __ATOMIC_RELAXED);
+        __atomic_add_fetch(&hdr->mutex_waiters, 1, __ATOMIC_SEQ_CST);
         uint32_t cur = __atomic_load_n(&hdr->mutex, __ATOMIC_RELAXED);
+        int timed_out = 0;
         if (cur != 0) {
-            long rc = syscall(SYS_futex, &hdr->mutex, FUTEX_WAIT, cur,
-                              &pubsub_lock_timeout, NULL, 0);
-            if (rc == -1 && errno == ETIMEDOUT) {
-                __atomic_sub_fetch(&hdr->mutex_waiters, 1, __ATOMIC_RELAXED);
-                uint32_t val = __atomic_load_n(&hdr->mutex, __ATOMIC_RELAXED);
-                if (val >= PUBSUB_MUTEX_WRITER_BIT) {
-                    uint32_t pid = val & PUBSUB_MUTEX_PID_MASK;
-                    if (!pubsub_pid_alive(pid))
-                        pubsub_recover_stale_mutex(hdr, val);
-                }
-                spin = 0;
-                continue;
+            if (!pubsub_remaining_time(deadline, &remaining)) {
+                timed_out = 1;
+            } else {
+                long rc = syscall(SYS_futex, &hdr->mutex, FUTEX_WAIT, cur,
+                                  &remaining, NULL, 0);
+                timed_out = rc == -1 && errno == ETIMEDOUT;
             }
         }
         __atomic_sub_fetch(&hdr->mutex_waiters, 1, __ATOMIC_RELAXED);
+        if (timed_out) {
+            uint32_t val = __atomic_load_n(&hdr->mutex, __ATOMIC_RELAXED);
+            if (val >= PUBSUB_MUTEX_WRITER_BIT) {
+                uint32_t pid = val & PUBSUB_MUTEX_PID_MASK;
+                if (!pubsub_pid_alive(pid))
+                    pubsub_recover_stale_mutex(hdr, val);
+            }
+            pubsub_make_deadline(PUBSUB_LOCK_TIMEOUT_SEC, deadline);
+        }
+        if (interruptible && PUBSUB_WAIT_INTERRUPTED()) {
+            errno = EINTR;
+            return -1;
+        }
         spin = 0;
     }
 }
 
+static inline void pubsub_mutex_lock(PubSubHeader *hdr) {
+    struct timespec deadline;
+    pubsub_make_deadline(PUBSUB_LOCK_TIMEOUT_SEC, &deadline);
+    (void)pubsub_mutex_lock_until(hdr, &deadline, 0);
+}
+
 static inline void pubsub_mutex_unlock(PubSubHeader *hdr) {
     __atomic_store_n(&hdr->mutex, 0, __ATOMIC_RELEASE);
+    __atomic_thread_fence(__ATOMIC_SEQ_CST);
     if (__atomic_load_n(&hdr->mutex_waiters, __ATOMIC_RELAXED) > 0)
         syscall(SYS_futex, &hdr->mutex, FUTEX_WAKE, 1, NULL, NULL, 0);
 }
 
-static inline void pubsub_wake_subscribers(PubSubHeader *hdr) {
-    /* SEQ_CST fence pairs with consumer's SEQ_CST waiters increment in
-     * poll_wait. Without it, the RELAXED load below may be reordered
-     * before the prior RELEASE store of the slot sequence on weak-memory
-     * architectures, letting us observe waiters == 0 even when a consumer
-     * has already incremented it after publishing the data. */
-    __atomic_thread_fence(__ATOMIC_SEQ_CST);
+static inline void pubsub_wake_subscribers_fenced(PubSubHeader *hdr) {
     if (__atomic_load_n(&hdr->sub_waiters, __ATOMIC_RELAXED) > 0) {
         __atomic_add_fetch(&hdr->sub_futex, 1, __ATOMIC_RELEASE);
         syscall(SYS_futex, &hdr->sub_futex, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
     }
+}
+
+static inline void pubsub_wake_subscribers(PubSubHeader *hdr) {
+    /* Pair with the reader's waiters increment before testing for sleepers. */
+    __atomic_thread_fence(__ATOMIC_SEQ_CST);
+    pubsub_wake_subscribers_fenced(hdr);
 }
 
 static inline int pubsub_remaining_time(const struct timespec *deadline,
@@ -323,7 +347,7 @@ static inline int pubsub_validate_header(PubSubHeader *hdr, uint32_t mode,
     if (hdr->magic != PUBSUB_MAGIC ||
         hdr->version != PUBSUB_VERSION ||
         hdr->mode != mode ||
-        hdr->capacity == 0 ||
+        hdr->capacity < 2 ||
         (hdr->capacity & (hdr->capacity - 1)) != 0 ||
         hdr->total_size != file_size ||
         hdr->slots_off != sizeof(PubSubHeader))
@@ -336,7 +360,9 @@ static inline int pubsub_validate_header(PubSubHeader *hdr, uint32_t mode,
     if (hdr->capacity > (hdr->total_size - hdr->slots_off) / slot_size)
         return 0;
     if (mode == PUBSUB_MODE_STR) {
-        if (hdr->data_off == 0 || hdr->msg_size == 0 || hdr->arena_cap == 0)
+        if (hdr->data_off == 0 || hdr->msg_size == 0 ||
+            hdr->msg_size > PUBSUB_STR_LEN_MASK || hdr->arena_cap > UINT32_MAX ||
+            hdr->arena_cap != (uint64_t)hdr->capacity * ((uint64_t)hdr->msg_size + 8))
             return 0;
         uint64_t slots_end = hdr->slots_off + (uint64_t)hdr->capacity * slot_size;
         if (hdr->data_off < slots_end ||
@@ -369,6 +395,7 @@ static PubSubHandle *pubsub_init_handle(void *base, size_t map_size,
     h->mode       = mode;
     h->arena_cap  = hdr->arena_cap;
     h->path       = path ? strdup(path) : NULL;
+    if (path && !h->path) { free(h); return NULL; }
     h->notify_fd  = -1;
     h->backing_fd = -1;
 
@@ -480,7 +507,7 @@ static int pubsub_reserve(int fd, uint64_t size) {
     int e;
     do e = posix_fallocate(fd, 0, (off_t)size); while (e == EINTR);
     sigprocmask(SIG_SETMASK, &old, NULL);
-    if (e == 0 || e == EOPNOTSUPP || e == EINVAL) return 0;
+    if (e == 0) return 0;
     errno = e;
     return -1;
 }
@@ -597,7 +624,9 @@ static PubSubHandle *pubsub_create(const char *path, uint32_t capacity,
             }
             flock(fd, LOCK_UN);
             close(fd);
-            return pubsub_init_handle(base, map_size, mode, path);
+            PubSubHandle *h = pubsub_init_handle(base, map_size, mode, path);
+            if (!h) munmap(base, map_size);
+            return h;
         }
 
         pubsub_init_header(base, mode, cap, total_size, slots_off, data_off,
@@ -832,7 +861,10 @@ static inline uint64_t pubsub_lag(PubSubSub *sub) {
         pubsub_mutex_lock(HDR);                                                \
         SLOTT *_s = (SLOTP);                                                   \
         if (!PUBSUB_LAP_SUPERSEDED(STYPE, DTYPE, NEWSEQ, _s->sequence)) {      \
-            _s->value = (VAL);                                                 \
+            /* A busy sequence cannot match this slot's readable positions. */ \
+            __atomic_store_n(&_s->sequence, (STYPE)((NEWSEQ) - 1), __ATOMIC_RELAXED); \
+            __atomic_thread_fence(__ATOMIC_RELEASE);                          \
+            __atomic_store_n(&_s->value, (VAL), __ATOMIC_RELAXED);              \
             __atomic_store_n(&_s->sequence, (NEWSEQ), __ATOMIC_RELEASE);       \
         }                                                                      \
         pubsub_mutex_unlock(HDR);                                              \
@@ -926,17 +958,21 @@ static inline int pubsub_##PFX##_poll(PubSubSub *sub, VTYPE *value) {          \
          * same idiom as PUBSUB_LAP_SUPERSEDED); the signed subtraction of \
          * two DTYPEs here would be UB on displacement > 2^31 without -fwrapv. */ \
         DTYPE diff = (DTYPE)((STYPE)seq1 - (STYPE)(cursor + 1));             \
-        if (diff != 0) {                                                       \
+        if (__builtin_expect(diff != 0, 0)) {                                 \
             if (diff > 0) {                                                    \
+                wp = __atomic_load_n(&hdr->write_pos, __ATOMIC_ACQUIRE);       \
                 uint64_t nc = wp > sub->capacity ? wp - sub->capacity : 0;     \
-                if (nc > cursor) sub->overflow_count += nc - cursor;           \
-                sub->cursor = nc;                                              \
+                if (nc > cursor) {                                            \
+                    sub->overflow_count += nc - cursor;                       \
+                    sub->cursor = nc;                                         \
+                }                                                              \
                 continue;                                                      \
             }                                                                  \
             return 0;                                                          \
         }                                                                      \
-        VTYPE v = slot->value;                                                 \
-        STYPE seq2 = __atomic_load_n(&slot->sequence, __ATOMIC_ACQUIRE);       \
+        VTYPE v = __atomic_load_n(&slot->value, __ATOMIC_RELAXED);              \
+        __atomic_thread_fence(__ATOMIC_ACQUIRE);                               \
+        STYPE seq2 = __atomic_load_n(&slot->sequence, __ATOMIC_RELAXED);       \
         if (seq2 != seq1) continue;                                            \
         *value = v;                                                            \
         sub->cursor = cursor + 1;                                              \
@@ -978,10 +1014,12 @@ static int pubsub_##PFX##_poll_wait(PubSubSub *sub, VTYPE *value,              \
         }                                                                      \
         long rc = syscall(SYS_futex, &hdr->sub_futex, FUTEX_WAIT,             \
                           fseq, pts, NULL, 0);                                 \
+        int wait_errno = errno;                                                \
         __atomic_sub_fetch(&hdr->sub_waiters, 1, __ATOMIC_SEQ_CST);           \
+        if (PUBSUB_WAIT_INTERRUPTED()) { errno = EINTR; return -1; }                                                  \
         r = pubsub_##PFX##_poll(sub, value);                                   \
         if (r != 0) return r;                                                  \
-        if (rc == -1 && errno == ETIMEDOUT) return 0;                          \
+        if (rc == -1 && wait_errno == ETIMEDOUT) return 0;                     \
     }                                                                          \
 }
 
@@ -1059,7 +1097,7 @@ static inline int pubsub_str_publish(PubSubHandle *h, const char *str,
     pubsub_mutex_lock(h->hdr);
     int r = pubsub_str_publish_locked(h, str, len, utf8);
     pubsub_mutex_unlock(h->hdr);
-    if (r == 1) pubsub_wake_subscribers(h->hdr);
+    if (r == 1) pubsub_wake_subscribers_fenced(h->hdr);
     return r;
 }
 
@@ -1085,12 +1123,14 @@ static inline int pubsub_str_poll(PubSubSub *sub, const char **out_str,
         PubSubStrSlot *slot = &slots[idx];
 
         uint64_t seq1 = __atomic_load_n(&slot->sequence, __ATOMIC_ACQUIRE);
-        if (seq1 != cursor + 1) {
+        if (__builtin_expect(seq1 != cursor + 1, 0)) {
             if (seq1 > cursor + 1) {
+                wp = __atomic_load_n(&hdr->write_pos, __ATOMIC_ACQUIRE);
                 uint64_t new_cursor = wp > sub->capacity ? wp - sub->capacity : 0;
-                if (new_cursor > cursor)
+                if (new_cursor > cursor) {
                     sub->overflow_count += new_cursor - cursor;
-                sub->cursor = new_cursor;
+                    sub->cursor = new_cursor;
+                }
                 continue;
             }
             return 0;
@@ -1116,7 +1156,8 @@ static inline int pubsub_str_poll(PubSubSub *sub, const char **out_str,
             memcpy(sub->copy_buf, sub->data + aoff, len);
         sub->copy_buf[len] = '\0';
 
-        uint64_t seq2 = __atomic_load_n(&slot->sequence, __ATOMIC_ACQUIRE);
+        __atomic_thread_fence(__ATOMIC_ACQUIRE);
+        uint64_t seq2 = __atomic_load_n(&slot->sequence, __ATOMIC_RELAXED);
         if (seq2 != seq1) continue;
 
         *out_str = sub->copy_buf;
@@ -1160,11 +1201,13 @@ static int pubsub_str_poll_wait(PubSubSub *sub, const char **out_str,
         }
         long rc = syscall(SYS_futex, &hdr->sub_futex, FUTEX_WAIT,
                           fseq, pts, NULL, 0);
+        int wait_errno = errno;
         __atomic_sub_fetch(&hdr->sub_waiters, 1, __ATOMIC_SEQ_CST);
+        if (PUBSUB_WAIT_INTERRUPTED()) { errno = EINTR; return -1; }
 
         r = pubsub_str_poll(sub, out_str, out_len, out_utf8);
         if (r != 0) return r;
-        if (rc == -1 && errno == ETIMEDOUT) return 0;
+        if (rc == -1 && wait_errno == ETIMEDOUT) return 0;
     }
 }
 
@@ -1172,18 +1215,8 @@ static int pubsub_str_poll_wait(PubSubSub *sub, const char **out_str,
  * Common operations
  * ================================================================ */
 
-static void pubsub_clear(PubSubHandle *h) {
+static void pubsub_clear_locked(PubSubHandle *h) {
     PubSubHeader *hdr = h->hdr;
-    /* Str-only mutex is intentional, not an omission: the int/int32/int16
-     * publish path is lock-free and never acquires hdr->mutex, so locking it
-     * here would serialize nothing. Callers must invoke clear() only while
-     * publishers are quiescent -- see the clear() contract in
-     * Data::PubSub::Shared POD ("Call clear only when publishers are
-     * quiescent"). Str publish takes the ring mutex, so only that mode can
-     * (and does) exclude an in-flight publish here. */
-    if (h->mode == PUBSUB_MODE_STR)
-        pubsub_mutex_lock(hdr);
-
     /* Zero all slot sequences */
     uint32_t cap = h->capacity;
     if (h->mode == PUBSUB_MODE_INT) {
@@ -1206,16 +1239,21 @@ static void pubsub_clear(PubSubHandle *h) {
 
     /* Rewind only once no slot holds a later lap: stale sequences past a rewound
      * write_pos make every new int publish into them a silent drop. */
-    __atomic_signal_fence(__ATOMIC_SEQ_CST);
+    __atomic_thread_fence(__ATOMIC_RELEASE);
     __atomic_store_n(&hdr->write_pos, 0, __ATOMIC_RELAXED);
     __atomic_store_n(&hdr->stat_publish_ok, 0, __ATOMIC_RELAXED);
     if (h->mode == PUBSUB_MODE_STR)
         __atomic_store_n(&hdr->arena_wpos, 0, __ATOMIC_RELAXED);
 
-    if (h->mode == PUBSUB_MODE_STR)
-        pubsub_mutex_unlock(hdr);
     pubsub_wake_subscribers(hdr);
 }
+
+static void pubsub_clear(PubSubHandle *h) {
+    if (h->mode == PUBSUB_MODE_STR) pubsub_mutex_lock(h->hdr);
+    pubsub_clear_locked(h);
+    if (h->mode == PUBSUB_MODE_STR) pubsub_mutex_unlock(h->hdr);
+}
+
 
 static inline int pubsub_sync(PubSubHandle *h) {
     return msync(h->hdr, h->mmap_size, MS_SYNC);
@@ -1227,17 +1265,24 @@ static inline int pubsub_eventfd_create(PubSubHandle *h) {
     return h->notify_fd;
 }
 
-static inline void pubsub_eventfd_set(PubSubHandle *h, int fd) {
-    if (h->notify_fd >= 0 && h->notify_fd != fd)
-        close(h->notify_fd);
-    h->notify_fd = fd;
+static inline int pubsub_eventfd_set(PubSubHandle *h, int fd) {
+    if (h->notify_fd == fd) return 0;
+    int myfd = fd < 0 ? -1 : fcntl(fd, F_DUPFD_CLOEXEC, 0);
+    if (fd >= 0 && myfd < 0) return -1;
+    if (h->notify_fd >= 0) close(h->notify_fd);
+    h->notify_fd = myfd;
+    return 0;
+}
+
+static inline void pubsub_notify_fd(int fd) {
+    if (fd >= 0) {
+        uint64_t one = 1;
+        ssize_t __attribute__((unused)) rc = write(fd, &one, sizeof(one));
+    }
 }
 
 static inline void pubsub_notify(PubSubHandle *h) {
-    if (h->notify_fd >= 0) {
-        uint64_t one = 1;
-        ssize_t __attribute__((unused)) rc = write(h->notify_fd, &one, sizeof(one));
-    }
+    pubsub_notify_fd(h->notify_fd);
 }
 
 static inline int64_t pubsub_eventfd_consume(PubSubHandle *h) {

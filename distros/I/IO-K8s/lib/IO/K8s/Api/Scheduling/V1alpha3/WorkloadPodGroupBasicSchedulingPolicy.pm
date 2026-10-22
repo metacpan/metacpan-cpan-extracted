@@ -1,6 +1,6 @@
 package IO::K8s::Api::Scheduling::V1alpha3::WorkloadPodGroupBasicSchedulingPolicy;
 # ABSTRACT: WorkloadPodGroupBasicSchedulingPolicy indicates standard Kubernetes scheduling behavior.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 1;
@@ -17,7 +17,7 @@ IO::K8s::Api::Scheduling::V1alpha3::WorkloadPodGroupBasicSchedulingPolicy - Work
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head1 SUPPORT
 

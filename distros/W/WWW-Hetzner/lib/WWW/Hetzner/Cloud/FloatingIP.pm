@@ -1,7 +1,7 @@
 package WWW::Hetzner::Cloud::FloatingIP;
 # ABSTRACT: Hetzner Cloud Floating IP object
 
-our $VERSION = '0.101';
+our $VERSION = '0.102';
 
 use Moo;
 with 'WWW::Hetzner::Role::HasAction';
@@ -158,7 +158,7 @@ WWW::Hetzner::Cloud::FloatingIP - Hetzner Cloud Floating IP object
 
 =head1 VERSION
 
-version 0.101
+version 0.102
 
 =head1 SYNOPSIS
 

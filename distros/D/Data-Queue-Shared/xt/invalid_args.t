@@ -2,6 +2,7 @@ use strict;
 use warnings;
 use Test::More;
 use Data::Queue::Shared;
+use File::Temp qw(tempdir);
 
 plan skip_all => 'AUTHOR_TESTING not set' unless $ENV{AUTHOR_TESTING};
 
@@ -28,7 +29,8 @@ sub run_child {
 }
 
 # --- path with embedded NUL (Perl may truncate; module may accept/reject) ---
-run_child('embedded NUL path',     sub { Data::Queue::Shared::Int->new("/tmp/a\x00b.shm", 16) });
+my $dir = tempdir(CLEANUP => 1);
+run_child('embedded NUL path',     sub { Data::Queue::Shared::Int->new("$dir/a\x00b.shm", 16) });
 
 # --- zero capacity ---
 run_child('cap=0',                 sub { Data::Queue::Shared::Int->new(undef, 0) });

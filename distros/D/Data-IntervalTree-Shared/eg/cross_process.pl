@@ -39,5 +39,5 @@ waitpid $_, 0 for @pids;
 printf "parent: after %d children added %d intervals each, count=%d\n\n", $kids, $per, $it->count;
 
 my $p = 500_000;
-printf "intervals containing point %d: %d\n", $p, scalar $it->stab($p);
+printf "intervals containing point %d: %d\n", $p, scalar(my @at = $it->stab($p));
 printf "intervals overlapping [%d, %d]: %d\n", 499_000, 501_000, scalar(my @o = $it->overlaps(499_000, 501_000));

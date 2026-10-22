@@ -16,40 +16,40 @@ name: File-SOPS
 provides:
   File::SOPS:
     file: lib/File/SOPS.pm
-    version: '0.004'
+    version: '0.005'
   File::SOPS::Backend::Age:
     file: lib/File/SOPS/Backend/Age.pm
-    version: '0.004'
+    version: '0.005'
   File::SOPS::Comment:
     file: lib/File/SOPS/Comment.pm
-    version: '0.004'
+    version: '0.005'
   File::SOPS::Encrypted:
     file: lib/File/SOPS/Encrypted.pm
-    version: '0.004'
+    version: '0.005'
   File::SOPS::Format::ENV:
     file: lib/File/SOPS/Format/ENV.pm
-    version: '0.004'
+    version: '0.005'
   File::SOPS::Format::ENV::Ordered:
     file: lib/File/SOPS/Format/ENV/Ordered.pm
-    version: '0.004'
+    version: '0.005'
   File::SOPS::Format::INI:
     file: lib/File/SOPS/Format/INI.pm
-    version: '0.004'
+    version: '0.005'
   File::SOPS::Format::JSON:
     file: lib/File/SOPS/Format/JSON.pm
-    version: '0.004'
+    version: '0.005'
   File::SOPS::Format::YAML:
     file: lib/File/SOPS/Format/YAML.pm
-    version: '0.004'
+    version: '0.005'
   File::SOPS::Metadata:
     file: lib/File/SOPS/Metadata.pm
-    version: '0.004'
+    version: '0.005'
   File::SOPS::Metadata::Flat:
     file: lib/File/SOPS/Metadata/Flat.pm
-    version: '0.004'
+    version: '0.005'
 requires:
   Cpanel::JSON::XS: '4.38'
-  Crypt::Age: '0.004'
+  Crypt::Age: '0.005'
   CryptX: '0'
   JSON::MaybeXS: '0'
   Moo: '0'
@@ -61,7 +61,7 @@ resources:
   bugtracker: https://github.com/Getty/p5-file-sops/issues
   homepage: https://github.com/Getty/p5-file-sops
   repository: https://github.com/Getty/p5-file-sops.git
-version: '0.004'
+version: '0.005'
 x_Dist_Zilla:
   perl:
     version: '5.040001'
@@ -83,6 +83,10 @@ x_Dist_Zilla:
           include_untracked: 0
       name: '@Author::GETTY/Git::GatherDir'
       version: '2.052'
+    -
+      class: Dist::Zilla::Plugin::GatherAgentContext
+      name: '@Author::GETTY/GatherAgentContext'
+      version: '0.001'
     -
       class: Dist::Zilla::Plugin::ManifestSkip
       name: '@Author::GETTY/@Filter/ManifestSkip'
@@ -292,8 +296,8 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::RewriteVersion:
           add_tarball_name: 0
           finders:
-            - ':ExecFiles'
             - ':InstallModules'
+            - ':PerlExecFiles'
           global: 0
           skip_version_provider: 0
         Dist::Zilla::Plugin::RewriteVersion::Transitional: {}
@@ -338,7 +342,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.004'
+          tag: '0.005'
           tag_format: '%v'
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
@@ -353,8 +357,8 @@ x_Dist_Zilla:
       config:
         Dist::Zilla::Plugin::BumpVersionAfterRelease:
           finders:
-            - ':ExecFiles'
             - ':InstallModules'
+            - ':PerlExecFiles'
           global: 0
           munge_makefile_pl: 1
         Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional: {}

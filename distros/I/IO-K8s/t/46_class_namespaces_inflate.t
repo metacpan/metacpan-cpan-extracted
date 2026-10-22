@@ -230,7 +230,7 @@ subtest 'cache invalidated by late k8s registration' => sub {
     my $attrs1 = $class->_k8s_attributes;
     is_deeply($attrs1, ['early_attr'], 'first attribute list');
 
-    $class->can('k8s')->(late_attr => 'Str');
+    IO::K8s::Resource->_k8s($class, late_attr => 'Str');
 
     my $info2 = $class->_k8s_attr_info;
     ok(exists $info2->{late_attr}, 'cache invalidated: late attr visible on next lookup');

@@ -1,6 +1,6 @@
 package IO::K8s::Cilium::V2::VPC;
 # ABSTRACT: VPC is the vpc to which the ENI belongs
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s cidr              => Str;
@@ -26,7 +26,7 @@ IO::K8s::Cilium::V2::VPC - VPC is the vpc to which the ENI belongs
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 cidr
 

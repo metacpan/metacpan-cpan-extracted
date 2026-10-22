@@ -2,7 +2,7 @@ package Data::NDArray::Shared;
 use strict;
 use warnings;
 use Carp ();
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 require XSLoader;
 XSLoader::load('Data::NDArray::Shared', $VERSION);
 
@@ -26,10 +26,8 @@ my %PDL_TYPE = (   # dtype => PDL type-constructor name
 my %DTYPE_OF = reverse %PDL_TYPE;   # PDL type name => dtype
 
 sub _require_pdl {
-    # require PDL alone does NOT define the type-constructor subs (&PDL::double,
-    # &PDL::long, ...) nor new_from_specification -- those live in PDL::Core, which
-    # `use PDL` loads but `require PDL` does not.  Load it explicitly so to_pdl works.
-    eval { require PDL; require PDL::Core; 1 }
+    # Load core, copying and arithmetic methods without importing into this package.
+    eval { require PDL::Lite; 1 }
         or Carp::croak("Data::NDArray::Shared: PDL interop needs PDL installed (cpanm PDL)");
 }
 sub _pdl_ctor {
@@ -57,8 +55,13 @@ sub from_pdl {
     my $tname = "" . $p->type;
     my $dt = $DTYPE_OF{$tname}
         or Carp::croak("Data::NDArray::Shared->from_pdl: unsupported PDL type '$tname'");
-    $p = $p->copy;                          # force a contiguous, physical piddle
+    $p = $p->copy;
     my $self = $class->new($path, $dt, reverse $p->dims);
+    if (defined $path) {
+        $self->dtype eq $dt or Carp::croak("from_pdl: dtype mismatch");
+        my @shape = $self->shape;
+        "@shape" eq join(' ', reverse $p->dims) or Carp::croak("from_pdl: shape mismatch");
+    }
     $self->update_from_bytes(${ $p->get_dataref });
     return $self;
 }
@@ -92,7 +95,6 @@ sub as_pdl_alias {
     my $typenum = _pdl_ctor($self->dtype)->()->enum;        # PDL type number for our dtype
     # _alias_pdl_create croaks if the module was built without PDL (no C path).
     my $p = $self->_alias_pdl_create($typenum, [ reverse $self->shape ]);   # dims in PDL order
-    $p->hdr->{_nda_shared} = $self;   # keep the mapping alive while the piddle lives
     return $p;
 }
 
@@ -427,6 +429,7 @@ snapshot.
 A B<new> shared array B<copied> from C<$piddle> (made physical and contiguous
 first); the dtype and shape follow the piddle's type and C<reverse> of its dims.
 C<$path> is the backing file (C<undef> or omitted for an anonymous mapping).
+An existing file must have the same dtype and shape.
 
 =item * C<< $array->update_from_pdl($piddle) >>
 
@@ -453,12 +456,8 @@ shared-memory view. Do not B<resize or retype> the alias (a reshape that grows
 it, a type conversion) -- it is a fixed window onto the mapping; use
 C<to_pdl>/C<from_pdl> when you want an independent, resizable copy.
 
-On a B<frozen> array (see L</"FROZEN (READ-ONLY) MODE">) the mapping itself is
-C<PROT_READ>, and PDL has no write path that is reliably safe against that (its
-own read-only flag stops C<< .= >> and in-place ops, but not
-C<< $piddle->set(...) >>, which pokes the buffer directly). So C<as_pdl_alias>
-B<refuses to alias a frozen array> and C<croak>s instead of handing back a
-piddle that could still crash the process; use C<to_pdl> for a safe copy.
+C<as_pdl_alias> refuses frozen arrays; use C<to_pdl> for a safe copy.
+Discard aliases before C<freeze>, since they bypass the seal as well as the lock.
 
 =item * C<< $bytes = $array->buffer >>
 

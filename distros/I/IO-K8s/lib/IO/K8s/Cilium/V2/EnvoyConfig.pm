@@ -1,6 +1,6 @@
 package IO::K8s::Cilium::V2::EnvoyConfig;
 # ABSTRACT: EnvoyConfig is a reference to the CEC or CCEC resource in which the listener is defined.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s kind => Str, { enum => [qw(CiliumEnvoyConfig CiliumClusterwideEnvoyConfig)] };
@@ -22,7 +22,7 @@ IO::K8s::Cilium::V2::EnvoyConfig - EnvoyConfig is a reference to the CEC or CCEC
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 kind
 

@@ -1,6 +1,6 @@
 package IO::K8s::Cilium::V2::AddressPair;
 # ABSTRACT: IngressAddressing is the addressing information for Ingress listener.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s ipv4 => Str;
@@ -22,7 +22,7 @@ IO::K8s::Cilium::V2::AddressPair - IngressAddressing is the addressing informati
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 ipv4
 

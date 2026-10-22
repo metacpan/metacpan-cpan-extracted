@@ -1,12 +1,12 @@
 package IO::K8s::Api::Resource::V1alpha3::BasicDevice;
 # ABSTRACT: BasicDevice defines one device instance.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s attributes => { 'Resource::V1alpha3::DeviceAttribute' => 1 };
 
 
-k8s capacity => { Quantity => 1 };
+k8s capacity => HashRef[Quantity];
 
 
 1;
@@ -23,7 +23,7 @@ IO::K8s::Api::Resource::V1alpha3::BasicDevice - BasicDevice defines one device i
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 attributes
 

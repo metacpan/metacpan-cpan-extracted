@@ -261,29 +261,37 @@ sub registry_for { +{ %{ $IO::K8s::Resource::_attr_registry{ $_[0] } // {} } } }
 
 subtest 'the declaration preflight checks the predicate and clearer names' => sub {
   my $before = registry_for('Test158::HasMethod');
-  throws_ok { Test158::HasMethod::k8s(extra => 'Str', { nullable => 1 }) }
+  throws_ok { IO::K8s::Resource->_k8s('Test158::HasMethod', extra => 'Str', { nullable => 1 }) }
     qr/field 'extra' of Test158::HasMethod.*'has_extra'/,
     'a method named like the predicate is refused, naming field and method';
   is_deeply(registry_for('Test158::HasMethod'), $before, 'and leaves the registry alone');
   is(Test158::HasMethod->has_extra, 'mine', 'the method is untouched');
 
-  throws_ok { Test158::ClearMethod::k8s(extra => 'Str', { nullable => 1 }) }
+  throws_ok { IO::K8s::Resource->_k8s('Test158::ClearMethod', extra => 'Str', { nullable => 1 }) }
     qr/field 'extra' of Test158::ClearMethod.*'clear_extra'/,
     'a method named like the clearer is refused as well';
 
-  throws_ok { Test158::FieldFirst::k8s(bar => 'Str', { nullable => 1 }) }
+  throws_ok { IO::K8s::Resource->_k8s('Test158::FieldFirst', bar => 'Str', { nullable => 1 }) }
     qr/field 'bar' of Test158::FieldFirst.*'has_bar'/,
     'a field whose accessor is the predicate name is refused';
 
-  throws_ok { Test158::NullableFirst::k8s(has_foo => 'Str') }
-    qr/field 'has_foo' of Test158::NullableFirst collides with the method 'has_foo'/,
-    'a later field taking the predicate name is refused by the method check';
+# k200: a later field whose name is the predicate's is no longer refused by
+# the method check; it gets a renamed accessor, the predicate stays, and the
+# JSON key is unchanged.
+  my $predicate = Test158::NullableFirst->can('has_foo');
+  lives_ok { IO::K8s::Resource->_k8s('Test158::NullableFirst', has_foo => 'Str') }
+    'a later field taking the predicate name is accepted';
+  is(registry_for('Test158::NullableFirst')->{_has_foo}{json_key}, 'has_foo',
+    'under a renamed accessor, with its JSON key unchanged');
+  is(Test158::NullableFirst->can('has_foo'), $predicate, 'and the predicate is untouched');
+  is(Test158::NullableFirst->new(has_foo => 'v')->TO_JSON->{has_foo}, 'v',
+    'the field reaches the wire under its JSON key');
 
-  lives_ok { Test158::PlainWithMethod::k8s(baz => 'Str') }
+  lives_ok { IO::K8s::Resource->_k8s('Test158::PlainWithMethod', baz => 'Str') }
     'a non-nullable field has no predicate and does not collide';
   is(Test158::PlainWithMethod->has_baz, 'mine', 'and the method stays');
 
-  lives_ok { Test158::NullableFirst::k8s(foo => 'Str', { nullable => 1 }) }
+  lives_ok { IO::K8s::Resource->_k8s('Test158::NullableFirst', foo => 'Str', { nullable => 1 }) }
     'an identical redeclaration in the same class is still a no-op';
 };
 

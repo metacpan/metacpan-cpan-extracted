@@ -38,14 +38,6 @@ lib/oEdtk/lang/fr
 lib/oEdtk/LaTeX.pm
 lib/oEdtk/lib/acq_Check.pl
 lib/oEdtk/lib/acq_Load.pl
-lib/oEdtk/lib/backup_compo_lmndv.sh
-lib/oEdtk/lib/backup_editique.sh
-lib/oEdtk/lib/cgi-bin/edtk.cgi
-lib/oEdtk/lib/cgi-bin/edtk_ged.cgi
-lib/oEdtk/lib/cgi-bin/edtk_ged.html
-lib/oEdtk/lib/cgi-bin/edtk_inged.cgi
-lib/oEdtk/lib/cgi-bin/edtk_para.cgi
-lib/oEdtk/lib/cgi-bin/index.html
 lib/oEdtk/lib/check_oEdtk_ini.pl
 lib/oEdtk/lib/cob2pm.pl
 lib/oEdtk/lib/db_copy.pl
@@ -60,10 +52,6 @@ lib/oEdtk/lib/db_move.pl
 lib/oEdtk/lib/db_Schema_init.pl
 lib/oEdtk/lib/edms_process.pl
 lib/oEdtk/lib/edms_runner.pl
-lib/oEdtk/lib/ged_process.pl
-lib/oEdtk/lib/html/edtk_ged.html
-lib/oEdtk/lib/html/edtk_inged.html
-lib/oEdtk/lib/html/index.html
 lib/oEdtk/lib/index_Block_refs.pl
 lib/oEdtk/lib/index_Check_omgr.pl
 lib/oEdtk/lib/index_Check_tracked_docs.pl
@@ -72,11 +60,8 @@ lib/oEdtk/lib/index_Purge_DCLIB.pl
 lib/oEdtk/lib/index_Remise_en_poste.pl
 lib/oEdtk/lib/index_Run_lot.pl
 lib/oEdtk/lib/index_Statistics.pl
-lib/oEdtk/lib/mep_compo.sh
-lib/oEdtk/lib/mep_editique.sh
 lib/oEdtk/lib/params_Export.pl
 lib/oEdtk/lib/params_Import.pl
-lib/oEdtk/lib/short_test.sh
 lib/oEdtk/lib/template/00-MODELES/doc/exemple-excel.csv
 lib/oEdtk/lib/template/00-MODELES/doc/exemple-excel.csv.idx
 lib/oEdtk/lib/template/00-MODELES/sample-excel-3.pl

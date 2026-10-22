@@ -1,6 +1,6 @@
 ---
 name: kubernetes-cilium-concepts
-description: "Use on a Cilium cluster — eBPF networking, kube-proxy replacement, CiliumNetworkPolicy, Gateway API, LB-IPAM, Hubble, or misbehaving service routing and LoadBalancer IPs."
+description: "Use on a Cilium cluster — kube-proxy replacement, CiliumNetworkPolicy, Gateway API, LB-IPAM, Hubble, or broken service routing."
 user-invocable: true
 ---
 

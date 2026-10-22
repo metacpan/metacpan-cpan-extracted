@@ -1,13 +1,18 @@
+use strict;
+use warnings;
 use ExtUtils::MakeMaker;
-require 5.006;
 
 my $mm_ver = ExtUtils::MakeMaker->VERSION;
 
-WriteMakefile(
+my %WriteMakefileArgs = (
     NAME            => 'IO::Capture::Extended',
     VERSION_FROM    => 'lib/IO/Capture/Extended.pm',
     ABSTRACT_FROM   => 'lib/IO/Capture/Extended.pm',
-    AUTHOR          => 'James E Keenan (jkeenan@cpan.org)',
+    AUTHOR          => 'James E Keenan (jkeenan@pobox.com)',
+    MIN_PERL_VERSION    => '5.6.0',
+    CONFIGURE_REQUIRES => {
+        'ExtUtils::MakeMaker' => 0,
+    },
     PREREQ_PM    => {
                      'IO::Capture'  => 0.05,
                     },
@@ -26,8 +31,10 @@ WriteMakefile(
                 type => 'git',
             },
             bugtracker => {
-                web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=IO-Capture-Extended',
+                web         => 'https://github.com/jkeenan/io-captured-extended/issues',
             },
         },
     })),
 );
+
+WriteMakefile(%WriteMakefileArgs);

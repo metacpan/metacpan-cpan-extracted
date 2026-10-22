@@ -16,7 +16,7 @@ use warnings;
 use Exporter 'import';
 our @EXPORT_OK = qw( scan_schema driver_of size_from_type );
 
-our $VERSION = 2.1129;
+our $VERSION = 2.1131;
 
 # The driver name from a DSN, in the tool's vocabulary (undef when unsupported).
 sub driver_of {

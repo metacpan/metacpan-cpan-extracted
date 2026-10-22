@@ -25,6 +25,7 @@ my %WriteMakefileArgs = (
     "IO::K8s" => "1.109",
     "IO::Socket::SSL" => 0,
     "JSON::MaybeXS" => 0,
+    "LWP::Protocol::https" => 0,
     "LWP::UserAgent" => 0,
     "Module::Runtime" => 0,
     "Moo" => 0,
@@ -39,7 +40,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Test::Exception" => 0
   },
-  "VERSION" => "1.109",
+  "VERSION" => "1.110",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -50,6 +51,7 @@ my %FallbackPrereqs = (
   "IO::K8s" => "1.109",
   "IO::Socket::SSL" => 0,
   "JSON::MaybeXS" => 0,
+  "LWP::Protocol::https" => 0,
   "LWP::UserAgent" => 0,
   "Module::Runtime" => 0,
   "Moo" => 0,

@@ -819,7 +819,7 @@ subtest 'Security — _normalize() does not backtrack catastrophically' => sub {
 	eval { $result = Geo::Coder::Free::_normalize($long_street) };
 	alarm(0);
 
-	isnt($@, "TIMEOUT\n", "_normalize() with 200-word input completes within @{[REDOS_TIMEOUT]}s");
+	is($@, q{}, "_normalize() with 200-word input completes within @{[REDOS_TIMEOUT]}s without error");
 	like($result, qr/\S/, '_normalize() returns a non-empty string');
 
 	diag("_normalize result length: " . length($result)) if $ENV{TEST_VERBOSE};
@@ -841,7 +841,7 @@ subtest 'Security — _find_gb_addresses() does not backtrack on comma-free inpu
 	eval { @matches = Geo::Coder::Free::_find_gb_addresses($no_commas) };
 	alarm(0);
 
-	isnt($@, "TIMEOUT\n", "_find_gb_addresses() on 5000-char comma-free input finishes within @{[REDOS_TIMEOUT]}s");
+	is($@, q{}, "_find_gb_addresses() on 5000-char comma-free input finishes within @{[REDOS_TIMEOUT]}s without error");
 	is(scalar @matches, 0, 'no addresses extracted from comma-free text');
 };
 
@@ -853,7 +853,10 @@ subtest 'Security — _find_gb_addresses() does not backtrack on comma-free inpu
 # string that would have triggered the backtracking.
 # -----------------------------------------------------------------------
 subtest 'Security — OA city-name regex does not backtrack' => sub {
-	my $oa = Geo::Coder::Free::OpenAddresses->new(openaddr => $TMPDIR);
+	# Keep libpostal out of the timed call: its first parse_address() loads
+	# a model of several gigabytes, which can take longer than the timeout
+	# on its own and has nothing to do with the regex being tested.
+	my $oa = Geo::Coder::Free::OpenAddresses->new(openaddr => $TMPDIR, libpostal => 0);
 
 	# A long space-only string wrapped in city-like context, which used
 	# to cause exponential backtracking in the nested quantifier.
@@ -864,7 +867,7 @@ subtest 'Security — OA city-name regex does not backtrack' => sub {
 	my $r = eval { $oa->geocode(location => $hostile) };
 	alarm(0);
 
-	isnt($@, "TIMEOUT\n", "OA geocode with hostile city padding completes within @{[REDOS_TIMEOUT]}s");
+	is($@, q{}, "OA geocode with hostile city padding completes within @{[REDOS_TIMEOUT]}s without error");
 	is($r, undef, 'hostile city-padding string returns undef (not found in empty DB)');
 };
 

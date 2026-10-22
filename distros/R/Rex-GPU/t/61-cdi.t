@@ -201,6 +201,26 @@ subtest '`cdi list` fails (CLI without it) => static nvidia.yaml as before, no m
   ok((grep { /cdi list/ } warns($rec)), 'warns that resolvability could not be checked');
 };
 
+subtest 'k77: failing `cdi generate` => warning for each device, no [ok], no die' => sub {
+  my $rec = cdi_on(@UNMANAGED, list_says([ '', 0 ]),
+    [ $GEN_GPU  => 'driver not loaded', 1 ],
+    [ $GEN_MGMT => 'level=error msg="NVML not reachable"', 1 ]);
+  is($rec->{error}, undef, 'no die');
+  my @w = warns($rec);
+  ok((grep { /could not generate/ && /nvidia\.com\/gpu=all/ && !/management/ && /driver not loaded/ } @w),
+    'gpu=all failure warned with the output') or diag explain \@w;
+  ok((grep { /could not generate/ && /management\.nvidia\.com\/gpu=all/ && /NVML/ } @w),
+    'management failure warned') or diag explain \@w;
+  ok(!(grep { /\[ok\] CDI specs written/ } map { $_->[1] } @{ $rec->{logs} }), 'no false [ok]');
+};
+
+subtest 'k77: `cdi list` fails and `cdi generate` fails => warning, no [ok]' => sub {
+  my $rec = cdi_on(@UNMANAGED, [ $LIST => 'Incorrect Usage', 1 ], [ $GEN_GPU => '', 1 ]);
+  is($rec->{error}, undef, 'no die');
+  ok((grep { /could not generate/ && /failed/ } warns($rec)), 'generate failure warned');
+  ok(!(grep { /\[ok\]/ } map { $_->[1] } @{ $rec->{logs} }), 'no [ok]');
+};
+
 subtest '`cdi list` fails on a managed host => start only, warning' => sub {
   my $rec = cdi_on(@MANAGED, [ $LIST => '', 1 ]);
   is($rec->{error}, undef, 'no die');

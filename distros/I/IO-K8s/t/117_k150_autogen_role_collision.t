@@ -54,45 +54,70 @@ sub generate {
         api_version => 'k150.example.com/v1', kind => $kind, resource_plural => lc($kind).'s');
 }
 
-subtest 'a property named like a role method is refused, naming class, property and method' => sub {
+# k200 changed the outcome of the collision from "refused" to "renamed":
+# the claim k150 protects -- a property must never silently replace a role
+# method -- is kept, but the property now gets an underscore-prefixed
+# accessor with its JSON key unchanged instead of failing the generation.
+subtest 'a property named like a role method keeps the method and gets a renamed accessor' => sub {
     for my $case (
-        [ label         => { type => 'string' } ],     # Role::APIObject helper
-        [ save          => { type => 'string' } ],
-        [ is_ready      => { type => 'boolean' } ],
-        [ owner_refs    => { type => 'array', items => { type => 'string' } } ],
-        [ spec_get      => { type => 'string' } ],     # SpecBuilder, composed by the role
-        [ to_crd        => { type => 'object' } ],
-        [ api_version   => { type => 'string' } ],     # identity methods
-        [ resource_plural => { type => 'string' } ],
+        [ label         => { type => 'string' },  'v' ],     # Role::APIObject helper
+        [ save          => { type => 'string' },  'v' ],
+        [ is_ready      => { type => 'boolean' }, JSON::MaybeXS::true ],
+        [ owner_refs    => { type => 'array', items => { type => 'string' } }, ['o'] ],
+        [ spec_get      => { type => 'string' },  'v' ],     # SpecBuilder, composed by the role
+        [ to_crd        => { type => 'object', properties => { a => { type => 'string' } } }, { a => 'v' } ],
+        [ api_version   => { type => 'string' },  'v' ],     # identity methods
+        [ resource_plural => { type => 'string' }, 'v' ],
     ) {
-        my ($prop, $schema) = @$case;
+        my ($prop, $schema, $value) = @$case;
         (my $kind = "Clash_$prop") =~ s/_(\w)/\u$1/g;
-        my $class = IO::K8s::AutoGen::def_to_class("com.example.k150.v1.$kind", "IO::K8s::_AUTOGEN_k150_$prop");
-        throws_ok { generate($kind, $prop, $prop => $schema) }
-            qr/field '\Q$prop\E' of \Q$class\E collides with the method '\Q$prop\E'/,
-            "$prop is refused, naming the class, the property and the method";
+        my $role_method = do {
+            # the method as the role (or identity) gives it, before the property exists
+            my $probe = IO::K8s::AutoGen::get_or_generate(
+                "com.example.k150.v1.${kind}Probe", gvk_def("${kind}Probe"), {},
+                "IO::K8s::_AUTOGEN_k150_probe_$prop",
+                api_version => 'k150.example.com/v1', kind => "${kind}Probe", resource_plural => lc($kind).'probes');
+            $probe->can($prop);
+        };
+        my $class;
+        lives_ok { $class = generate($kind, $prop, $prop => $schema) }
+            "$prop is accepted";
+        next unless $class;
+        ok($class->can("_$prop"), "$prop gets the renamed accessor _$prop");
+        my $obj = $class->new($prop => $value);
+        is_deeply($obj->TO_JSON->{$prop}, $value, "$prop keeps its JSON key and value on the wire");
+        ok($role_method, "$prop is a method of a class without the property");
+        # the method of that name is not the property's accessor: it is
+        # not the one the renamed attribute reads
+        isnt($class->can($prop), $class->can("_$prop"), "$prop is still a method, distinct from the accessor");
     }
 };
 
-subtest 'the refusal is a failed generation run (k149)' => sub {
+subtest 'a colliding property no longer fails the generation run (k149 remembered failures stay in t/110)' => sub {
     my $class = IO::K8s::AutoGen::def_to_class('com.example.k150.v1.Remembered', 'IO::K8s::_AUTOGEN_k150_run');
-    throws_ok { generate('Remembered', 'run', add_label => { type => 'string' }) }
-        qr/field 'add_label' of \Q$class\E collides with the method 'add_label'/,
-        'first request dies on the collision';
-    throws_ok { generate('Remembered', 'run', add_label => { type => 'string' }) }
-        qr/\Q$class\E failed to generate earlier in this namespace.*collides with the method 'add_label'/s,
-        'second request rethrows the remembered original error';
-    ok(!(grep { $_ eq $class } IO::K8s::AutoGen::generated_classes()),
-        'the class is never listed as generated');
+    my $first;
+    lives_ok { $first = generate('Remembered', 'run', add_label => { type => 'string' }) }
+        'first request generates the class';
+    is(eval { generate('Remembered', 'run', add_label => { type => 'string' }) }, $first,
+        'second request returns the same class');
+    ok((grep { $_ eq $class } IO::K8s::AutoGen::generated_classes()),
+        'the class is listed as generated');
+    ok($first->can('_add_label'), 'add_label property got the renamed accessor');
+    is($first->new(add_label => 'x')->TO_JSON->{add_label}, 'x', 'and keeps its JSON key');
+    my $o = $first->new(metadata => { name => 'x' });
+    $o->add_label(tier => 'web');
+    ok($o->has_label('tier'), 'the role helper add_label is still the role helper');
 };
 
-subtest 'the openapi_spec and add_crd routes refuse it as well' => sub {
+subtest 'the openapi_spec and add_crd routes rename it as well' => sub {
     my $k8s = IO::K8s->new(openapi_spec => { definitions => {
         'com.example.k150.v1.Dial' => gvk_def('Dial', match_labels => { type => 'string' }),
     } });
-    throws_ok { $k8s->inflate({ apiVersion => 'k150.example.com/v1', kind => 'Dial', match_labels => 'x' }) }
-        qr/field 'match_labels' of \S+::Dial collides with the method 'match_labels'/,
+    my $dial;
+    lives_ok { $dial = $k8s->inflate({ apiVersion => 'k150.example.com/v1', kind => 'Dial', match_labels => 'x' }) }
         'inflate through an openapi_spec';
+    is($dial && $dial->TO_JSON->{match_labels}, 'x', 'match_labels keeps its JSON key on the wire') if $dial;
+    ok($dial && $dial->can('_match_labels'), 'and gets the renamed accessor') if $dial;
 
     my $crd = {
         apiVersion => 'apiextensions.k8s.io/v1',
@@ -111,9 +136,11 @@ subtest 'the openapi_spec and add_crd routes refuse it as well' => sub {
             }],
         },
     };
-    throws_ok { IO::K8s->new->add_crd($crd) }
-        qr/field 'annotation' of \S+::Knob collides with the method 'annotation'/,
-        'add_crd';
+    my $k = IO::K8s->new;
+    lives_ok { $k->add_crd($crd) } 'add_crd';
+    my $knob = eval { $k->new_object('Knob', metadata => { name => 'k' }, annotation => 'a') };
+    is($knob && $knob->TO_JSON->{annotation}, 'a', 'annotation keeps its JSON key on the wire');
+    ok($knob && $knob->can('_annotation'), 'and gets the renamed accessor');
 };
 
 subtest 'conditions, metadata, apiVersion and kind keep their k144 treatment on the wire' => sub {

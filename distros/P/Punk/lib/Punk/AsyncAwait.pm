@@ -7,7 +7,7 @@ use 5.016;
 use strict;
 use warnings;
 
-our $VERSION = '0.63';
+our $VERSION = '0.64';
 
 use Punk::Future ();        # the AWAIT_* methods live in Punk's XS, and a
                             # controller may never have loaded Punk itself

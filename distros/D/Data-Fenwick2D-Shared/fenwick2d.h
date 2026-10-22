@@ -198,8 +198,8 @@ static inline void f2d_recover_stale_lock(F2dHandle *h, uint32_t observed_wlock)
         return;
     /* We now hold the write lock as mypid.  No additional shared state needs
      * repair here (this module has no seqlock); just release the lock. */
-    __atomic_store_n(&hdr->wlock, 0, __ATOMIC_RELEASE);
-    if (__atomic_load_n(&hdr->rwait, __ATOMIC_RELAXED) > 0)
+    __atomic_store_n(&hdr->wlock, 0, __ATOMIC_SEQ_CST);
+    if (__atomic_load_n(&hdr->rwait, __ATOMIC_SEQ_CST) > 0)
         syscall(SYS_futex, &hdr->wlock, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
 }
 
@@ -228,6 +228,8 @@ static inline void f2d_occ_clear(F2dHandle *h, uint32_t s) {
     __atomic_fetch_and(&h->occ[s >> 6], ~((uint64_t)1 << (s & 63)), __ATOMIC_SEQ_CST);
 }
 
+static inline void f2d_reader_wake_drain(F2dHandle *h);
+
 /* Ensure this process owns a reader slot.  Called from the lock helpers so that
  * fork()'d children pick up their own slot lazily instead of sharing the
  * parent's.  Hot-path is a single relaxed load + compare; only on a
@@ -255,8 +257,9 @@ static inline void f2d_claim_reader_slot(F2dHandle *h) {
                 __ATOMIC_ACQUIRE, __ATOMIC_RELAXED)) {
             /* Fresh owner holds no read locks yet; clear any stale rdepth left by
              * a dead predecessor (its contribution is dropped as we take over). */
-            __atomic_store_n(&h->reader_slots[s].rdepth, 0, __ATOMIC_RELAXED);
+            uint32_t stale = __atomic_exchange_n(&h->reader_slots[s].rdepth, 0, __ATOMIC_SEQ_CST);
             f2d_occ_set(h, s);   /* mark occupied BEFORE any rdlock can bump rdepth */
+            if (stale) f2d_reader_wake_drain(h);
             h->my_slot_idx = s;
             return;
         }
@@ -271,8 +274,9 @@ static inline void f2d_claim_reader_slot(F2dHandle *h) {
         uint32_t expected = dpid;
         if (__atomic_compare_exchange_n(&h->reader_slots[i].pid, &expected, now_pid, 0,
                 __ATOMIC_ACQUIRE, __ATOMIC_RELAXED)) {
-            __atomic_store_n(&h->reader_slots[i].rdepth, 0, __ATOMIC_RELAXED);
+            uint32_t stale = __atomic_exchange_n(&h->reader_slots[i].rdepth, 0, __ATOMIC_SEQ_CST);
             f2d_occ_set(h, i);
+            if (stale) f2d_reader_wake_drain(h);
             h->my_slot_idx = i;
             return;
         }
@@ -298,9 +302,9 @@ static inline void f2d_recover_after_timeout(F2dHandle *h) {
  * writers (blocked acquiring wlock) wait on the wlock futex and use this, so
  * wrunlock/recover know whether a FUTEX_WAKE is worth a syscall.  A waiter
  * SIGKILLed while parked leaves rwait over-counted -> at most a spurious wake
- * (harmless); it can never under-count, so no wakeup is lost. */
+ * (harmless). SEQ_CST pairs publication + gate check with unlock + hint check. */
 static inline void f2d_park(F2dHandle *h) {
-    __atomic_add_fetch(&h->hdr->rwait, 1, __ATOMIC_RELAXED);
+    __atomic_add_fetch(&h->hdr->rwait, 1, __ATOMIC_SEQ_CST);
 }
 static inline void f2d_unpark(F2dHandle *h) {
     __atomic_sub_fetch(&h->hdr->rwait, 1, __ATOMIC_RELAXED);
@@ -323,9 +327,9 @@ static inline void f2d_rdepth_inc(F2dHandle *h) {
 static inline void f2d_rdepth_dec(F2dHandle *h) {
     if (h->slotless_held > 0) {
         h->slotless_held--;
-        __atomic_sub_fetch(&h->hdr->slotless_rdepth, 1, __ATOMIC_RELEASE);
+        __atomic_sub_fetch(&h->hdr->slotless_rdepth, 1, __ATOMIC_SEQ_CST);
     } else if (h->my_slot_idx != UINT32_MAX) {
-        __atomic_sub_fetch(&h->reader_slots[h->my_slot_idx].rdepth, 1, __ATOMIC_RELEASE);
+        __atomic_sub_fetch(&h->reader_slots[h->my_slot_idx].rdepth, 1, __ATOMIC_SEQ_CST);
     }
 }
 
@@ -333,7 +337,7 @@ static inline void f2d_rdepth_dec(F2dHandle *h) {
  * after every rdepth decrement so a released read lock lets the writer re-scan
  * promptly instead of waiting out its timeout. */
 static inline void f2d_reader_wake_drain(F2dHandle *h) {
-    if (__atomic_load_n(&h->hdr->wlock, __ATOMIC_ACQUIRE) != 0) {
+    if (__atomic_load_n(&h->hdr->wlock, __ATOMIC_SEQ_CST) != 0) {
         __atomic_add_fetch(&h->hdr->drain_seq, 1, __ATOMIC_RELEASE);
         syscall(SYS_futex, &h->hdr->drain_seq, FUTEX_WAKE, 1, NULL, NULL, 0);
     }
@@ -371,7 +375,7 @@ static inline void f2d_rwlock_rdlock(F2dHandle *h) {
             continue;
         }
         f2d_park(h);
-        cur = __atomic_load_n(&hdr->wlock, __ATOMIC_RELAXED);
+        cur = __atomic_load_n(&hdr->wlock, __ATOMIC_SEQ_CST);
         if (cur != 0) {
             long rc = syscall(SYS_futex, &hdr->wlock, FUTEX_WAIT, cur,
                               &f2d_lock_timeout, NULL, 0);
@@ -388,7 +392,7 @@ static inline void f2d_rwlock_rdlock(F2dHandle *h) {
 }
 
 static inline void f2d_rwlock_rdunlock(F2dHandle *h) {
-    f2d_rdepth_dec(h);                 /* RELEASE: drop our entire contribution */
+    f2d_rdepth_dec(h);                 /* SEQ_CST: drop presence before checking the writer */
     f2d_reader_wake_drain(h);          /* if a writer is draining, wake it to re-scan */
 }
 
@@ -416,7 +420,7 @@ static inline void f2d_rwlock_wrlock(F2dHandle *h) {
             continue;
         }
         f2d_park(h);
-        uint32_t cur = __atomic_load_n(&hdr->wlock, __ATOMIC_RELAXED);
+        uint32_t cur = __atomic_load_n(&hdr->wlock, __ATOMIC_SEQ_CST);
         if (cur != 0) {
             long rc = syscall(SYS_futex, &hdr->wlock, FUTEX_WAIT, cur,
                               &f2d_lock_timeout, NULL, 0);
@@ -476,15 +480,15 @@ static inline void f2d_rwlock_wrlock(F2dHandle *h) {
 
 static inline void f2d_rwlock_wrunlock(F2dHandle *h) {
     F2dHeader *hdr = h->hdr;
-    __atomic_store_n(&hdr->wlock, 0, __ATOMIC_RELEASE);
-    if (__atomic_load_n(&hdr->rwait, __ATOMIC_RELAXED) > 0)
+    __atomic_store_n(&hdr->wlock, 0, __ATOMIC_SEQ_CST);
+    if (__atomic_load_n(&hdr->rwait, __ATOMIC_SEQ_CST) > 0)
         syscall(SYS_futex, &hdr->wlock, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
 }
 
 /* ================================================================
  * Layout math + create / open / destroy
  *
- * Layout: Header -> reader_slots[1024] -> grid[(rows+1)*(cols+1) int64]
+ * Layout: Header -> reader_slots[1024] -> occ bitmap -> grid[(rows+1)*(cols+1) int64]
  * ================================================================ */
 
 /* Single source of truth for the mmap region layout offsets:
@@ -566,7 +570,7 @@ static inline F2dHandle *f2d_setup(void *base, size_t map_size,
 
 /* Validate a mapped header (shared by f2d_create reopen and f2d_open_fd). */
 static inline int f2d_validate_header(const F2dHeader *hdr, uint64_t file_size) {
-    if (hdr->magic != F2D_MAGIC) return 0;
+    if (__atomic_load_n(&hdr->magic, __ATOMIC_ACQUIRE) != F2D_MAGIC) return 0;
     if (hdr->version != F2D_VERSION) return 0;
     if (hdr->rows < F2D_MIN_DIM || hdr->rows > F2D_MAX_DIM) return 0;
     if (hdr->cols < F2D_MIN_DIM || hdr->cols > F2D_MAX_DIM) return 0;
@@ -587,13 +591,10 @@ static int f2d_validate_args(uint64_t rows, uint64_t cols, char *errbuf) {
     return 1;
 }
 
-/* Securely obtain a fd for a path-backed segment: create it exclusively
- * (O_CREAT|O_EXCL|O_NOFOLLOW at `mode`, default 0600 = owner-only), or, if it
- * already exists, attach to it (O_RDWR|O_NOFOLLOW, no O_CREAT). O_EXCL blocks a
- * pre-seeded or hard-linked file and O_NOFOLLOW a symlink swap, so a local
- * attacker can no longer redirect or poison the backing store through the path.
- * Cross-user sharing is opt-in via a wider `mode` (e.g. 0660); the caller still
- * validates the file's contents via f2d_validate_header. */
+/* Exclusively create a path-backed segment at `mode` (default 0600), or
+ * attach to an existing file; neither open follows a final symlink.
+ * A wider mode (e.g. 0660) opts into cross-user sharing. The caller validates
+ * the header on attach; an existing valid file is trusted. */
 static int f2d_secure_open(const char *path, mode_t mode, char *errbuf) {
     for (int attempt = 0; attempt < 100; attempt++) {
         int fd = open(path, O_RDWR|O_CREAT|O_EXCL|O_NOFOLLOW|O_CLOEXEC, mode);
@@ -636,7 +637,7 @@ static int f2d_reserve(int fd, uint64_t size) {
     int e;
     do e = posix_fallocate(fd, 0, (off_t)size); while (e == EINTR);
     sigprocmask(SIG_SETMASK, &old, NULL);
-    if (e == 0 || e == EOPNOTSUPP || e == EINVAL) return 0;
+    if (e == 0) return 0;
     errno = e;
     return -1;
 }
@@ -664,6 +665,21 @@ static F2dHandle *f2d_create(const char *path, uint64_t rows, uint64_t cols, mod
         if (!is_new && (uint64_t)st.st_size < sizeof(F2dHeader)) {
             F2D_ERR("%s: file too small (%lld)", path, (long long)st.st_size);
             flock(fd, LOCK_UN); close(fd); return NULL;
+        }
+        /* Reading a mapped tmpfs hole allocates a page, even during validation. */
+        if (!is_new && st.st_blocks == 0) {
+            uint32_t magic;
+            if (pread(fd, &magic, sizeof magic, 0) != (ssize_t)sizeof magic) {
+                F2D_ERR("%s: cannot read Fenwick2D tree header", path);
+                flock(fd, LOCK_UN); close(fd); return NULL;
+            }
+            if (magic == 0) {
+                if ((uint64_t)st.st_size != total || st.st_uid != geteuid() || !f2d_file_is_zero(fd, total)) {
+                    F2D_ERR("invalid Fenwick2D tree file");
+                    flock(fd, LOCK_UN); close(fd); return NULL;
+                }
+                is_new = 1;
+            }
         }
         if (is_new && (st.st_uid != geteuid() || fchmod(fd, mode) < 0)) {
             F2D_ERR("%s: refusing to initialize file not owned by us", path);
@@ -713,7 +729,7 @@ static F2dHandle *f2d_create(const char *path, uint64_t rows, uint64_t cols, mod
                 }
                 F2D_ERR("invalid Fenwick2D tree file"); munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
             }
-            if (((F2dHeader *)base)->sealed) {
+            if (__atomic_load_n(&((F2dHeader *)base)->sealed, __ATOMIC_ACQUIRE)) {
                 F2D_ERR("%s is frozen (read-only); open it with new_readonly", path);
                 munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
             }
@@ -762,7 +778,7 @@ static F2dHandle *f2d_open_fd(int fd, char *errbuf) {
     if (!f2d_validate_header((F2dHeader *)base, (uint64_t)st.st_size)) {
         F2D_ERR("invalid Fenwick2D tree table"); munmap(base, ms); return NULL;
     }
-    if (((F2dHeader *)base)->sealed) {
+    if (__atomic_load_n(&((F2dHeader *)base)->sealed, __ATOMIC_ACQUIRE)) {
         F2D_ERR("this Fenwick2D tree is frozen (read-only); open it with new_readonly");
         munmap(base, ms); return NULL;
     }
@@ -795,7 +811,7 @@ static F2dHandle *f2d_open_readonly(const char *path, char *errbuf) {
     if (!f2d_validate_header((F2dHeader *)base, (uint64_t)st.st_size)) {
         F2D_ERR("%s: invalid Fenwick2D tree file", path); munmap(base, ms); return NULL;
     }
-    if (!((F2dHeader *)base)->sealed) {
+    if (!__atomic_load_n(&((F2dHeader *)base)->sealed, __ATOMIC_ACQUIRE)) {
         F2D_ERR("%s is not frozen: call ->freeze on the producer before opening read-only", path);
         munmap(base, ms); return NULL;
     }
@@ -838,7 +854,7 @@ static inline int f2d_msync(F2dHandle *h) {
  * and a read-write reopen is refused. */
 static int f2d_freeze(F2dHandle *h) {
     f2d_rwlock_wrlock(h);
-    h->hdr->sealed = 1;
+    __atomic_store_n(&h->hdr->sealed, 1, __ATOMIC_RELEASE);
     f2d_rwlock_wrunlock(h);
     if (h->path || h->backing_fd >= 0) return f2d_msync(h);  /* durability for file/memfd-backed */
     return 0;   /* anonymous: the seal lives in shared memory (visible to forks); nothing to flush */
@@ -876,7 +892,7 @@ static void f2d_update_locked(F2dHandle *h, uint64_t x, uint64_t y, int64_t delt
     for (uint64_t i = x; i >= 1 && i <= rmax; i += f2d_lowbit(i))
         for (uint64_t j = y; j >= 1 && j <= cmax; j += f2d_lowbit(j)) {
             uint64_t f = f2d_idx(i, j, cmax);
-            if (f < smax) tree[f] += delta;          /* Layer B: bulletproof flat bound */
+            if (f < smax) tree[f] = (int64_t)((uint64_t)tree[f] + (uint64_t)delta);
         }
 }
 
@@ -887,21 +903,21 @@ static int64_t f2d_prefix_locked(F2dHandle *h, uint64_t x, uint64_t y) {
     uint64_t smax = f2d_tree_slots_max(h);
     if (x > rmax) x = rmax;
     if (y > cmax) y = cmax;
-    int64_t s = 0;
+    uint64_t s = 0;
     for (uint64_t i = x; i > 0; i -= f2d_lowbit(i))
         for (uint64_t j = y; j > 0; j -= f2d_lowbit(j)) {
             uint64_t f = f2d_idx(i, j, cmax);
-            if (f < smax) s += tree[f];
+            if (f < smax) s += (uint64_t)tree[f];
         }
-    return s;
+    return (int64_t)s;
 }
 
 /* sum over the inclusive rectangle [x1..x2] x [y1..y2] (1-based) via inclusion-exclusion */
 static int64_t f2d_rect_locked(F2dHandle *h, uint64_t x1, uint64_t y1, uint64_t x2, uint64_t y2) {
-    return f2d_prefix_locked(h, x2,     y2)
-         - f2d_prefix_locked(h, x1 - 1, y2)
-         - f2d_prefix_locked(h, x2,     y1 - 1)
-         + f2d_prefix_locked(h, x1 - 1, y1 - 1);
+    return (int64_t)((uint64_t)f2d_prefix_locked(h, x2,     y2)
+                  - (uint64_t)f2d_prefix_locked(h, x1 - 1, y2)
+                  - (uint64_t)f2d_prefix_locked(h, x2,     y1 - 1)
+                  + (uint64_t)f2d_prefix_locked(h, x1 - 1, y1 - 1));
 }
 
 /* value at cell (x,y) == the 1x1 rectangle sum */

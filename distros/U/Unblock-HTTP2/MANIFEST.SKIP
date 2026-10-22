@@ -13,3 +13,5 @@
 ^nghttp2\.c$
 ^nghttp2\.(?:o|obj)$
 ^HTTP2\.bs$
+
+^Handoff\.md$

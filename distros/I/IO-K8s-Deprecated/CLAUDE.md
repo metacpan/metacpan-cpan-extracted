@@ -1,6 +1,6 @@
 # CLAUDE.md — IO::K8s::Deprecated
 
-**MANDATORY: load the `perl-core` skill via the Skill tool before editing any
+**MANDATORY: load the `getty-perl-core` skill via the Skill tool before editing any
 Perl code in this repo.** It encodes Getty's house rules; the
 `io-k8s-deprecated` skill (`.claude/skills/io-k8s-deprecated/SKILL.md`)
 layers the tombstone-specific procedure on top and is auto-loaded into the
@@ -20,8 +20,9 @@ removal orphans a name in-distribution: PAUSE does not know or care that the
 dist is still actively released, so the old name orphans the same way a
 cross-distribution rename would.
 
-**Not every internally-deprecated class needs a tombstone here.** Two false
-starts worth knowing about, both discovered while building this dist:
+**Not every internally-deprecated class needs a tombstone here.** Three
+false starts worth knowing about -- the first two discovered while building
+this dist, the third after its first release:
 
 1. IO::K8s shipped ~76 `*List` classes (`PodList`, `ServiceList`, ...) as
    soft-deprecated warning stubs (`warn`, not `die`) since its very first
@@ -40,26 +41,37 @@ starts worth knowing about, both discovered while building this dist:
    `IO-K8s` to match that convention instead of being tombstoned — always
    check whether "renamed/removed" should instead be "restored for
    backward compat" before drafting a tombstone.
+3. Release `1.105` tombstoned `Apimachinery::Pkg::Apis::Meta::V1::APIGroupList`
+   and `::APIResourceList` along with the `*List` sweep. They are the
+   `meta.v1` discovery Kinds, not lists of resources, and `IO-K8s` `1.106`
+   shipped both again as real classes. Both dists install the same file, so
+   installing this one after `IO-K8s` overwrote the working classes with
+   die-stubs. Both tombstones were removed. A name `IO-K8s` ships — still
+   or again — is never a tombstone here; `t/02-name-guard.t` fails when one
+   is. A tombstone can go wrong *after* it was right: check the guard
+   against a current `io-k8s-p5` checkout before every release.
 
 Each *genuinely* orphaned class gets a stub package here under the OLD
 name, versioned above the last `IO-K8s` release that shipped that name,
 taking the PAUSE index entry over. The stub `die`s immediately on load,
 naming the replacement. Full mechanism and the step-by-step "add a new
 tombstone" procedure (including the audit method, and how to distinguish a
-genuine orphan from the two false-start patterns above) are in the
+genuine orphan from the false-start patterns above) are in the
 `io-k8s-deprecated` skill, not duplicated here.
 
 ## Version policy — normal dzil versioning, no per-file overrides
 
 `dist.ini` has **no** `version_finder` restriction. Every file -- the main
-module and all 80 tombstones alike -- versions normally and uniformly with
+module and all 78 tombstones alike -- versions normally and uniformly with
 the rest of the distribution (`RewriteVersion::Transitional` /
 `BumpVersionAfterRelease`), same as `IO-K8s` itself. The starting version,
 `1.105`, was chosen for one reason: it's safely past `IO-K8s 1.100`, the
-last CPAN release that shipped any of these module names. Since `IO-K8s`
-will never ship these names again (they're permanently gone, not just
-between releases) and this dist's version only ever increases, `1.105`
-stays ahead of that target for good. Full reasoning:
+last CPAN release that shipped any of these module names. This dist's
+version only ever increases, so it stays ahead of that target for good.
+That rests on `IO-K8s` not shipping these names again — an assumption that
+has failed once (false start #3 above) and is therefore checked by
+`t/02-name-guard.t`; a name that comes back in `IO-K8s` loses its
+tombstone here, it does not get a higher version. Full reasoning:
 `lib/IO/K8s/Deprecated.pm`'s "VERSION POLICY" section.
 
 If a future tombstone needs a name whose last-shipped version exceeds
@@ -69,12 +81,13 @@ per-file version overrides.
 
 ## Current tombstones
 
-80 modules total, two shapes, all versioned `$VERSION = '1.105'` (safely
+78 modules total, two shapes, all versioned `$VERSION = '1.105'` (safely
 past `IO-K8s` `1.100`, the last release that shipped every one of these
 names):
 
-- **76 "consolidated" tombstones** — the old per-resource `*List` classes
-  IO-K8s consolidated into the generic `IO::K8s::List`. Full list:
+- **74 "consolidated" tombstones** — the old per-resource `*List` classes
+  IO-K8s consolidated into the generic `IO::K8s::List` (76 were dropped
+  there; two are back, see false start #3 above). Full list:
   `lib/IO/K8s/Deprecated.pm`'s POD, or `t/01-tombstones.t`'s
   `@old_list_classes` array.
 - **4 "removed, no successor" tombstones** — the classic
@@ -96,7 +109,8 @@ TOMBSTONED" section for both.
 Do not improvise this — follow the procedure in the `io-k8s-deprecated`
 skill (`.claude/skills/io-k8s-deprecated/SKILL.md`): find the old module's
 last released version, confirm it's a genuine orphan (not soft-deprecated
-in place, not restored for backward compat), create the stub, add it to
+in place, not restored for backward compat, not shipped by `IO-K8s`
+again), create the stub, add it to
 `t/01-tombstones.t`, update this dist's main-module POD table and this
 file's summary above, add a `Changes` entry.
 
@@ -115,6 +129,11 @@ prove -lr t/
 
 `t/00-load.t` loads the real main module (`IO::K8s::Deprecated`) and must
 load cleanly. `t/01-tombstones.t` asserts every tombstone dies on load —
-the 76 List-consolidation ones with a message pointing at `IO::K8s::List`,
+the 74 List-consolidation ones with a message pointing at `IO::K8s::List`,
 the 4 classic-DRA ones with a "removed, no successor" message pointing at
-the current `resource.k8s.io/v1` API.
+the current `resource.k8s.io/v1` API. `t/02-name-guard.t` asserts that no
+package shipped here is shipped by the current `IO-K8s`: it reads the
+`io-k8s-p5` checkout next to this one (found from a dzil build directory
+too), else an installed `IO::K8s` at least as new as this dist, or the lib
+directory in `IO_K8S_LIB`. Without any of them it **skips** — a skip is not
+a pass, make sure the checkout is there and current before a release.

@@ -8,7 +8,11 @@
 .claude/settings.json
 .claude/skilletor.json
 .claude/skills/nak-core/SKILL.md
+.claude/skills/nak-hazards/SKILL.md
+.claude/skills/nak-runtime/SKILL.md
+.claude/skills/nak-testing/SKILL.md
 .gitignore
+.worktreeinclude
 CLAUDE.md
 Changes
 LICENSE
@@ -24,6 +28,7 @@ eg/live_features.pl
 eg/watch_pods.pl
 lib/Net/Async/Kubernetes.pm
 lib/Net/Async/Kubernetes/Controller.pm
+lib/Net/Async/Kubernetes/PortForwardListener.pm
 lib/Net/Async/Kubernetes/PortForwardSession.pm
 lib/Net/Async/Kubernetes/Watcher.pm
 maint/prove-pinned.sh
@@ -37,6 +42,7 @@ misc/agent-context/.claude/skilletor.lock.json
 misc/agent-context/.claude/skills/getty-git-commit-style/SKILL.md
 misc/agent-context/.claude/skills/getty-git-usage/SKILL.md
 misc/agent-context/.claude/skills/getty-perl-core/SKILL.md
+misc/agent-context/.claude/skills/getty-perl-core/references/dbic.md
 misc/agent-context/.claude/skills/getty-perl-pod/SKILL.md
 misc/agent-context/.claude/skills/getty-perl-release-author-getty/SKILL.md
 misc/agent-context/.claude/skills/kanban-issues-karr-coordination/SKILL.md
@@ -49,6 +55,9 @@ misc/agent-context/.claude/skills/kanban-issues-karr-coordination/references/set
 misc/agent-context/.claude/skills/kanban-issues-karr-coordination/references/storage.md
 misc/agent-context/.claude/skills/kanban-issues-karr-ticket/SKILL.md
 misc/agent-context/.claude/skills/nak-core/SKILL.md
+misc/agent-context/.claude/skills/nak-hazards/SKILL.md
+misc/agent-context/.claude/skills/nak-runtime/SKILL.md
+misc/agent-context/.claude/skills/nak-testing/SKILL.md
 misc/agent-context/.claude/skills/perl-io-async-future/SKILL.md
 misc/agent-context/.claude/skills/perl-io-k8s-kubernetes-classes/SKILL.md
 misc/agent-context/.claude/skills/perl-kubernetes-rest/SKILL.md
@@ -102,7 +111,14 @@ t/43-mock-unknown-arguments.t
 t/44-mock-unknown-arguments-duplex.t
 t/45-mock-named-arguments.t
 t/46-mock-odd-arguments.t
+t/47-mock-watcher-bookmarks.t
+t/48-mock-watcher-http-410.t
+t/49-log-bytes.t
+t/50-port-forward-data.t
+t/51-port-forward-listen.t
+t/52-list-paging.t
 t/author-pod-syntax.t
+t/lib/FakeWebSocketClient.pm
 t/lib/Gizmo.pm
 t/lib/MockTransport.pm
 t/lib/My/GatewayApi/Gateway.pm

@@ -29,6 +29,7 @@ for my $w (1..$WORKERS) {
             next unless defined $s;
             $p->set($s, $$);
             my $v = $p->get($s);
+            _exit(2) unless $v == $$;
             $p->free($s);
         }
         _exit(0);
@@ -100,8 +101,10 @@ for my $w (1..$WORKERS) {
         for my $i (1..$OPS) {
             my $s = $p->alloc(1.0);
             next unless defined $s;
-            $p->set($s, "worker=$w op=$i pid=$$");
+            my $expected = "worker=$w op=$i pid=$$";
+            $p->set($s, $expected);
             my $v = $p->get($s);
+            _exit(2) unless $v eq $expected;
             $p->free($s);
         }
         _exit(0);

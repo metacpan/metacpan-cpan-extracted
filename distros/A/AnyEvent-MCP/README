@@ -1,0 +1,1120 @@
+NAME
+    AnyEvent::MCP::Intro - using MCP servers, clients and permissions
+
+DESCRIPTION
+    You can use the servers in this distribution without writing any Perl.
+    This walkthrough starts with one filesystem server, connects it to an
+    MCP client, and makes a useful request. Once that works, it explains
+    persistent configuration, permissions and combining several servers.
+
+    If you want to write a small server yourself, continue with "TUTORIAL"
+    in AnyEvent::MCP::Server::Simple. Applications needing their own
+    connection management or dispatch can use the modules described in
+    "MODULES" in AnyEvent::MCP.
+
+    The examples use "/home/alice/src/project" as an existing project
+    directory. Replace it with your own absolute path. Commands shown here
+    are commands for you to run; requests addressed to the LLM are shown
+    separately.
+
+INSTALLATION
+    Install the Perl distribution and the external programs used by the
+    servers. Installing one does not install the other.
+
+    For mcp-fs, install Linux bubblewrap and the filesystem utilities. On
+    Debian or Ubuntu, for example:
+
+       sudo apt install bubblewrap findutils grep patch sed perl yad
+
+    "yad" is optional: it supplies graphical permission dialogs. Without a
+    usable YAD dialog, the helper tries "/dev/tty"; if neither is available,
+    it denies the request. Bubblewrap's executable is "bwrap". The machine
+    must allow the unprivileged user namespaces it needs.
+
+    mcp-fs detects its utilities at startup and omits tools whose utilities
+    are unavailable or unsuitable. It requires bubblewrap by default. See
+    "TRUSTED CONFIGURATION" in mcp-fs for explicit utility paths and
+    "LIMITATIONS" in mcp-fs for the sandbox's limits.
+
+    If you have an unpacked distribution or source checkout, run these
+    commands in its top-level directory:
+
+       perl Makefile.PL
+       make
+       make test
+       make install
+
+    "perl Makefile.PL" reports missing Perl dependencies. Install those with
+    your usual package manager or CPAN client before continuing. For
+    example, the main non-core dependencies can be installed with:
+
+       cpan AnyEvent AnyEvent::HTTP AnyEvent::WebSocket::Server \
+          AnyEvent::WebSocket::Message common::sense JSON::XS
+
+    Use the same Perl installation for dependency installation, building and
+    running the servers. A module installed for the system Perl might not be
+    available to a Perl installed under "/opt". "make install" needs write
+    access to the selected Perl's installation directories; use an
+    appropriate local Perl installation or run that final step with the
+    required privileges.
+
+    Installation puts "mcp-fs", "mcp-multibroker", "mcp-vim",
+    "mcp-webbrowser", "mcp-ask-user", "anyevent-mcp" and
+    "anyevent-mcp-askpermission" in the selected executable directory. Make
+    that directory available in the environment of your MCP client, or
+    configure absolute executable paths. A desktop application need not have
+    the same "PATH" as your shell.
+
+    To try an uninstalled source tree after installing its dependencies, you
+    can run a program with the source library path:
+
+       perl -Ilib bin/mcp-fs --stdio --name code /home/alice/src/project
+
+    Do this from the distribution directory. When configuring a client to
+    start such a command, account for the client's working directory or use
+    absolute paths to Perl, "lib" and the script. An installed executable
+    avoids that extra setup.
+
+PICK A SERVER
+    For a local MCP client, configure it to launch the server that provides
+    the tools you want:
+
+       mcp-fs --stdio /home/alice/src/project
+       mcp-vim --stdio
+       mcp-webbrowser --stdio
+       mcp-ask-user --stdio
+
+    "--stdio" means the MCP client launches the process. Do not start a
+    separate copy in a terminal. For HTTP clients, use a running server and
+    its "--print-url" instead, as explained below.
+
+    "mcp-fs" reads, searches and changes files and runs commands in a
+    sandbox. The first walkthrough below uses this server.
+
+    "mcp-vim" reads and edits live Vim buffers. Install the companion Vim
+    plugin and connect the editor to its listener; see "Add a live Vim
+    editor" and "VIM PLUGIN INSTALLATION" in mcp-vim.
+
+    "mcp-webbrowser" works with explicitly approved browser tabs. Install
+    its companion userscript and connect each tab you want to expose; see
+    "CONNECTED BROWSER PAGES".
+
+    "mcp-ask-user" lets the assistant ask you questions through a local YAD
+    or terminal dialog, or through the client's native form UI; see "Ask the
+    client's human a question".
+
+    To offer several servers over one MCP connection, use "mcp-multibroker".
+    It combines these servers with each other or with third-party MCP
+    servers, whether started locally over stdio or reached over HTTP. Their
+    tools appear under separate name prefixes; see "COMBINING SERVERS" and
+    mcp-multibroker for the full command syntax.
+
+YOUR FIRST FILESYSTEM SERVER
+    Start with one project and one connection. You do not need a
+    multibroker, a hand-written configuration file or saved permission rules
+    yet.
+
+  Choose stdio or HTTP
+    Use stdio when your MCP client runs on the same machine and can launch a
+    server process. Configure the client to start the following command:
+
+       mcp-fs --stdio --name code /home/alice/src/project
+
+    The client starts this process and uses its stdin/stdout for MCP. You do
+    not start a second copy in a terminal, and there is no listener URL or
+    HTTP token to configure. Diagnostics go to stderr.
+
+    Clients that take a command and an argument array need these values:
+
+       command: mcp-fs
+       arguments: --stdio, --name, code, /home/alice/src/project
+
+    These describe separate arguments, not one shell command string. Use an
+    absolute executable path if the client cannot find "mcp-fs". See "CLIENT
+    EXAMPLES" for examples of particular clients.
+
+    Use HTTP when the client connects to an already-running server, or when
+    it cannot launch a local process. Start this in a terminal on the server
+    machine and leave it running:
+
+       mcp-fs --name code --bind :31741 /home/alice/src/project
+
+    In another terminal, obtain the matching connection URL:
+
+       mcp-fs --name code --bind :31741 --print-url
+
+    The second command prints a credential-bearing URL and exits without
+    opening a listener. Configure that URL in the client. The default
+    address is IPv4 loopback, so this example is reachable from the same
+    machine only. A hosted client needs a suitable tunnel or reachable
+    endpoint; its own "localhost" is not your computer.
+
+    Repeat the same name and listener overrides when printing the URL. Both
+    commands must use the same user and configuration directory. Port zero
+    chooses an ephemeral port, which "--print-url" cannot predict; use an
+    explicit port for this walkthrough.
+
+    The HTTP server generates and saves its private master secret when
+    needed. You can initialize it explicitly with "anyevent-mcp init", but
+    that command is unnecessary when configuration already exists and will
+    refuse to replace it. Keep the printed URL private: possession of its
+    token authenticates a client.
+
+  Make a useful request
+    Once your client reports that the server is connected, ask the LLM:
+
+       Show me the configured workdirs. List the top-level files in the
+       project, then read its README if it has one. Do not modify files
+       or run commands.
+
+    "workdirs" returns the configured paths, sandbox grants, trusted mounts
+    and runtime paths. Listing names requests "inspect" permission; reading
+    contents requests "read" permission. Expect a permission prompt when
+    there is no saved rule allowing the operation.
+
+    Choose "Allow once" for the first operation. The worker then runs with
+    the requested sandbox grants. A denial is a tool failure that the LLM
+    should report, rather than an empty file or a disconnected server.
+
+    For a slightly larger task, ask:
+
+       Find TODO comments in this project and explain the three that look
+       most useful to address next. Do not modify files or run commands.
+
+    This can use "find", "grep" and "read-lines". You need not write MCP
+    requests yourself. If a client offers its own tool-approval prompt, that
+    is an additional client policy; it does not replace mcp-fs's
+    permissions.
+
+  Give the server a purpose
+    To explain why an instance exists, provide a short purpose:
+
+       mcp-fs --stdio --name memory \
+          --custom-instructions 'Use this server to retrieve and store persistent memory.' \
+          /home/alice/memory
+
+    For persistent configuration, use "custom_instructions" in the global
+    configuration's "[program mcp-fs]" or "[instance memory]" section.
+    Instance settings override program settings; the command line overrides
+    both. This purpose appears first in the advertised MCP instructions so a
+    model can decide whether to discover the server's tools.
+
+    Servers using "AnyEvent::MCP::Server::Simple" also expose the instance
+    purpose and complete operating instructions as a "meta-instructions"
+    tool description. Calling that tool returns the complete text when a
+    client truncates descriptions. Clients that understand MCP server
+    instructions still receive a short purpose or routing hint at discovery
+    time, followed by an automatic pointer to the full instructions in the
+    tool description.
+
+  Understand the workdir
+    The directory passed at startup tells mcp-fs which workdir to expose. It
+    does not grant permission for every operation in that directory. Each
+    operation still requests its action and sandbox grants.
+
+    With one workdir, tools can omit the "workdir" argument. With several:
+
+       mcp-fs --stdio --name code /home/alice/src/project /home/alice/notes
+
+    tools select one using a persistent positive integer ID, a numeric
+    string or an exact configured/resolved path returned by "workdirs". The
+    "workdirs" and "resolved_workdirs" objects use these IDs as keys.
+    Relative tool paths are relative to that selection. Permission rules
+    continue to use the configured path, not its numeric ID.
+
+    IDs are shared across filesystem servers in
+    "$XDG_CONFIG_HOME/anyevent-mcp/fs-workdir-ids.json", or under
+    "$HOME/.config" by default. They identify resolved absolute paths and
+    survive restarts and argument reordering. Startup resolves IDs once and
+    reserves new allocations under the lock. A timer runs immediately and
+    every 5.25 days to reread the registry and refresh the server's fixed
+    assignments. Other entries expire after seven days and their IDs may be
+    reused. Restart servers after manually changing the registry.
+
+    "workdir-read" exposes the selected workdir read-only. "workdir-write"
+    makes it writable and implies read access. A path in another configured
+    workdir requires all-workdirs authority; a path elsewhere requires
+    suitable home/world or shared-tmp authority. A symlink cannot make an
+    unmounted target appear inside the sandbox.
+
+    Prefer separate, non-overlapping workdirs. Overlapping mounts have
+    unspecified access effects. See "SANDBOX GRANTS" in mcp-fs before
+    granting access beyond the selected workdir.
+
+  Inspect version-control changes
+    For a Git, SVN, CVS or Mercurial working copy, ask the LLM to use
+    "vcs-diff" and "vcs-status", with "backend" set to "git", "svn", "cvs"
+    or "hg". "workdirs" reports the available clients. These tools accept
+    filenames and construct the command themselves; no shell pipeline or
+    arbitrary VCS options need to be approved.
+
+    For example:
+
+       Show the CVS diff for this project, limited to 200 lines.
+       Then show its status, keeping stdout lines matching "File:|Status:".
+
+    These operations have their own permission actions. They request read
+    access to the selected workdir. CVS additionally requests the
+    "ssh-agent" grant, which includes network access, the agent socket and
+    "known_hosts", but not general home-directory access. Read permission
+    for ordinary file tools does not automatically authorize a VCS
+    operation.
+
+    For arbitrary "exec" commands, the same output options are available:
+    "grep" filters stdout using PCRE, "max_lines" limits matching stdout
+    lines, and "max_bytes" bounds returned bytes per stream. Prefer these
+    options to a shell wrapper that mixes execution and output processing.
+    Stderr is unfiltered, and exit status still describes the original
+    command.
+
+    Defaults return at most 2000 stdout lines and 64 KiB per stream. Raw
+    capture has a separate 1 MiB limit per stream. A true
+    "capture_truncated" means output was omitted before filtering or
+    collection ended on timeout, so absent matches do not prove the omitted
+    output had none. See "Command output" in mcp-fs for all result flags and
+    limits.
+
+CONFIGURING YOUR SETUP
+    There are three different things to configure: how the client connects,
+    how the server runs, and which operations the user allows. Changing one
+    does not necessarily change the other two.
+
+  Where each setting belongs
+    Directories to expose
+        Pass workdirs on the mcp-fs startup command. For a stdio server,
+        that command belongs in the client's server configuration. For an
+        HTTP server, it belongs in the command used to run the service.
+
+    Connection transport
+        The client launches a command for stdio or connects to a URL for
+        HTTP. "--stdio" selects the former for mcp-fs and the multibroker.
+
+    Listener address, port and tokens
+        Use "[instance NAME]" in the global configuration or command-line
+        "--bind" and "--token" overrides.
+
+    Trusted mounts and utility paths
+        For mcp-fs, use "[program NAME]" defaults and "[instance NAME]"
+        overrides in the global configuration.
+
+    Allowed operations and sandbox grants
+        Use the permission rules file, normally created through approval
+        dialogs. This file is separate from the global configuration.
+
+    Location of permission prompts
+        Use "--ask helper", "--ask tty", "--ask yad", "--ask auto" or "--ask
+        mcp", or set "PERL_ANYEVENT_MCP_PERMISSION_ASK" in the server's
+        environment.
+
+    Combined server connections
+        Put prefix/server pairs on the multibroker startup command. HTTP
+        child credentials can also use "[client PREFIX]" in the global
+        configuration.
+
+  One complete named configuration
+    The global file is "$XDG_CONFIG_HOME/anyevent-mcp/global.ini", falling
+    back to "$HOME/.config/anyevent-mcp/global.ini". Settings are UTF-8 "key
+    = value" lines; values are unquoted. Whole-line "#" and ";" comments are
+    allowed. See "GLOBAL CONFIGURATION" in AnyEvent::MCP for the complete
+    format.
+
+    Start with the existing file, preserving its "[global]" secret. If you
+    have no file yet, "anyevent-mcp init" creates it privately. Add this
+    section:
+
+       [instance code]
+       bind = 127.0.0.1:31741
+
+    Now start:
+
+       mcp-fs --name code /home/alice/src/project
+
+    and retrieve its URL with:
+
+       mcp-fs --name code --print-url
+
+    Both use "[instance code]". No explicit token is needed: the server
+    derives one from its name and the existing master secret.
+
+    For this setup:
+
+       instance settings: [instance code]
+       selected workdir: /home/alice/src/project
+       permission file: ~/.config/anyevent-mcp/rules/fs-code.ini
+       rule-manager profile: fs-code
+
+    The permission pathname above assumes the default configuration
+    directory. "anyevent-mcp manage-rules fs-code" opens the graphical rule
+    manager; "anyevent-mcp edit-rules fs-code" opens the file in your
+    editor.
+
+    Settings shared by all mcp-fs instances go in "[program mcp-fs]".
+    Instance settings override program settings.
+
+    File ownership and permissions are under the user's control. The global
+    configuration contains a master authentication secret, so take care when
+    sharing it. "--config FILE" on "anyevent-mcp init" selects that
+    command's output file; it does not make the servers use an arbitrary
+    alternate file. Use the same "HOME"/"XDG_CONFIG_HOME" environment when
+    running the server and its management commands.
+
+  Names, prefixes and profiles
+    "--name code" selects instance settings, derived HTTP credentials and
+    mcp-fs's "rules/fs-code.ini". Without "--name", mcp-fs uses "default",
+    giving profile "fs-default". Two processes with the same program, name
+    and configuration share credentials and rules, even if their workdirs
+    differ.
+
+    A multibroker prefix, such as "files", only routes tools: "grep" becomes
+    "files.grep". It does not rename the child server or select its rules.
+    For example:
+
+       mcp-multibroker files \
+          'stdio:mcp-fs --name code /home/alice/src/project'
+
+    The tools are "files.*", but the child still uses instance "code" and
+    rule-manager profile "fs-code". The multibroker's own "--name" selects
+    its upstream listener settings.
+
+  Configuration changes and restarts
+    Command-line listener options override the named global settings. For
+    mcp-fs trusted settings, an instance entry overrides the corresponding
+    program entry; an empty instance mount value suppresses the inherited
+    mount.
+
+    Workdirs, mounts, utility paths, listener settings and tokens are read
+    at startup. Change the file or startup command, then restart the
+    affected server. The multibroker also needs restarting to change its
+    prefix/server pairs; refreshing discovery does not change those pairs.
+
+    Permission rules are reread on permission checks, so editing them does
+    not require a restart. A client's displayed tool list can still be
+    cached. After restarting a child, refresh tool discovery or reconnect
+    the client as described in "COMBINING SERVERS".
+
+PERMISSIONS IN PRACTICE
+    HTTP authentication establishes that the client may connect. Permission
+    checks decide whether a tool may perform an operation. A correct token
+    therefore does not prevent permission prompts.
+
+  What the prompt means
+    The prompt describes an action, paths or command, a reason and sandbox
+    grants. For filesystem tools, the actions are:
+
+       inspect     stat, list, find
+       read        file-read, read-lines, grep
+       write       file-write, file-patch
+       manage      path-op
+       exec        arbitrary command execution
+       vcs-diff    working-copy differences
+       vcs-status  working-copy status
+
+    The action and grants are independent. Allowing "read" does not allow
+    "write", even if a worker grant permits both kinds of filesystem access.
+    "exec" runs arbitrary commands; it is not a classification of supposedly
+    safe command prefixes.
+
+    Choose allow/deny once, or always. Closing the dialog denies once. An
+    optional denial reason is returned with the error; it is not added to
+    successful tool results. An always choice opens a rule editor. Choose an
+    indefinite lifetime (the default), 900 seconds or 16 hours. Finite
+    lifetimes are stored as "expires" Unix timestamps. Expired rules
+    disappear on every read; the next ordinary save removes them from disk.
+    Expiry affects future permission checks, not operations already
+    authorized. Filesystem allow rules can select grants and the selected
+    workdir when the authority depends on it. Deny rules can also select an
+    exact affected path. Exec offers persistent command/argv subjects.
+
+    For exec, "View stdin..." lets you inspect supplied input without
+    closing the approval dialog. Filesystem and Vim patch tools similarly
+    offer "View patch...", including the target file or editor and buffer.
+    Longer text is shown as an explicitly incomplete preview. These are YAD
+    button labels; other interfaces can show the details inline. That input
+    is display-only: an exec allow rule does not constrain future stdin.
+    Allowing an interpreter command can therefore allow a different script
+    on its next invocation.
+
+    A worker accessing several paths requests their combined sandbox
+    authority once. If the chosen grants are insufficient, it fails before
+    starting.
+
+  Save a useful read-only policy
+    After trying individual operations, you might want the LLM to inspect
+    and read the project without asking each time, while keeping changes
+    subject to approval. Put these rules in "rules/fs-code.ini", or create
+    equivalent allow rules through the prompt:
+
+       [rule]
+       decision=allow
+       action=inspect
+       workdir=/home/alice/src/project
+       sandbox-grants=workdir-read
+
+       [rule]
+       decision=allow
+       action=read
+       workdir=/home/alice/src/project
+       sandbox-grants=workdir-read
+
+       [rule]
+       decision=deny
+       action=exec
+
+    Use the exact workdir spelling passed at server startup. Absolute
+    startup paths make this easier. Rule-file permissions follow the usual
+    Unix filesystem rules; any user who can edit the file can change the
+    server's approval policy.
+
+    Without matching rules, write and manage operations still ask. The final
+    rule denies command execution outright; omit it if you want execution to
+    ask instead.
+
+    Rules run in order, stopping at the first match. An allow rule matches
+    only when its grants cover the request, including implications.
+    "workdir-write" implies "workdir-read"; "network" remains independent.
+    Action and subject match exactly unless beginning with "^", which
+    selects a Perl regular expression. Workdir matching is always exact. An
+    explicit "ask" rule can override later allow rules.
+
+    These allow rules authorize sandbox access to the selected workdir. They
+    cannot confine authority to one file or a subtree inside it. Filesystem
+    operations do not offer persistent path subjects. An exact "path"
+    matcher is available for deny rules only. Trusted runtime and configured
+    mounts remain baseline access independently of these grants. See
+    "TRUSTED CONFIGURATION" in mcp-fs.
+
+  Change or remove saved rules
+    Use:
+
+       anyevent-mcp manage-rules fs-code
+       anyevent-mcp edit-rules fs-code
+
+    The first command lets you delete and reorder rules in YAD. The second
+    uses $VISUAL, $EDITOR, "sensible-editor" or "vi". An earlier deny or ask
+    rule can explain why adding a later allow rule does not change the
+    result.
+
+    For a custom application with another rule pathname, use:
+
+       anyevent-mcp manage-rules-file /path/to/rules.ini
+       anyevent-mcp edit-rules-file /path/to/rules.ini
+
+    A failed attempt to save a permanent rule is an error, not a successful
+    permanent approval. The file mode is preserved when saved through these
+    commands. For full syntax and programming interfaces, see
+    AnyEvent::MCP::Server::Permissions.
+
+  Choose where to ask
+    The default "helper" mode runs "anyevent-mcp-askpermission" on the
+    server machine. It tries YAD, then "/dev/tty", then denies if neither
+    can be used. The helper inherits the server's display environment.
+    "--ask tty" and "--ask yad" instead force the built-in terminal or YAD
+    interface. They ignore custom helper settings and never try another
+    interface. These modes work for permission prompts and ordinary forms,
+    including forms handled by a multibroker.
+    "PERL_ANYEVENT_MCP_PERMISSION_HELPER" selects a different executable.
+
+    For a modern client supporting MCP form elicitation, you can instead
+    use:
+
+       mcp-fs --stdio --name code --ask auto /home/alice/src/project
+
+    "auto" uses the client's form support when advertised for that request,
+    otherwise the local helper. "mcp" requires that support and fails when
+    unavailable. It does not silently fall back. Use client-side permission
+    approval only when that client is a trusted authority to grant access.
+
+    To set the default for servers using the shared permission engine:
+
+       PERL_ANYEVENT_MCP_PERMISSION_ASK=auto \
+          mcp-fs --stdio --name code /home/alice/src/project
+
+    An explicit application "ask" setting or "--ask" overrides the
+    environment. For spawned stdio children, "mcp-multibroker --ask auto"
+    passes this default to them. It cannot change the environment of an
+    independently running HTTP server.
+
+    The multibroker can handle form elicitation locally for both stdio and
+    HTTP children. "--ask helper" selects local dialogs even if the upstream
+    client advertises native forms; "--ask mcp" forwards forms upstream, and
+    "auto" uses native forms when advertised. If a client claims support but
+    silently declines questions, use "helper". A decline never causes a
+    fallback prompt.
+
+    Standalone "mcp-ask-user" also supports these modes and defaults to the
+    local helper. A question is different from an approval: answering it
+    does not grant a filesystem worker any authority.
+
+COMBINING SERVERS
+    Once the first connection works, "mcp-multibroker" lets you give the
+    client one connection for several MCP servers. It works with the servers
+    in this distribution and with third-party MCP servers, including ones
+    written in other languages. Each downstream server can be a local
+    subprocess communicating over stdio or an existing HTTP endpoint; you
+    can mix both in one broker. The broker discovers their tools and
+    forwards calls to the appropriate server without changing how that
+    server implements its tools.
+
+    For example, combine two filesystem instances:
+
+       mcp-multibroker --name tools --bind :31740 \
+          code 'stdio:mcp-fs --name code /home/alice/src/project' \
+          notes 'stdio:mcp-fs --name notes /home/alice/notes'
+
+    Quote each "stdio:" shell command as one argument. The broker supplies
+    the child's stdio environment and starts ordinary children lazily, on
+    first use. The explicit child names give them separate permission
+    profiles "fs-code" and "fs-notes".
+
+    Obtain the upstream HTTP URL with:
+
+       mcp-multibroker --name tools --bind :31740 --print-url
+
+    Configure this URL in place of the client's old direct connection. The
+    client can now see "code.grep", "code.read-lines", "notes.find" and
+    other prefixed tools. It does not need a separate connection to each
+    child.
+
+    For a client launching the multibroker locally, configure:
+
+       mcp-multibroker --stdio --name tools \
+          code 'stdio:mcp-fs --name code /home/alice/src/project' \
+          notes 'stdio:mcp-fs --name notes /home/alice/notes'
+
+    "--stdio" selects the upstream connection. The child commands still use
+    "stdio:"; that selects each downstream connection independently. No
+    upstream HTTP URL is needed in this case.
+
+    The same setup can include Vim, browser pages, a third-party stdio
+    server or a remote HTTP service. See "Add an HTTP child" for an example
+    mixing local and remote servers, and "DOWNSTREAM SERVERS" in
+    mcp-multibroker for the complete syntax, including direct argv
+    execution, credentials and per-child options.
+
+  Discover and refresh tools
+    Ask the LLM:
+
+       Call discover-brokers and list-tools, then show me which servers
+       are available and what each is for.
+
+    "discover-brokers" returns advertised instructions (which may be short),
+    no instructions, or an error for each configured server. "list-tools"
+    requests current tool definitions, including any prefixed
+    "meta-instructions" tools and their full instruction descriptions;
+    unreachable servers are omitted. A reachable server can still fail
+    later.
+
+    If the client still has an old direct tool list, "call-tool" can invoke
+    an exact prefixed name found by "list-tools". Refresh the client's MCP
+    connection if it continues to hide newly available tools.
+
+    Discovery queries configured servers and currently registered reverse
+    connections. Changing the static downstream command still requires a
+    restart.
+
+  Let a server connect to the multibroker
+    To add independently started servers without editing the multibroker
+    command, keep its HTTP/extension listener active alongside stdio:
+
+       mcp-multibroker --stdio --listen --bind 127.0.0.1:31740
+       mcp-multibroker --bind 127.0.0.1:31740 --print-url
+
+    Append an alias to the returned credential-bearing URL:
+
+       mcp-fs --connect http://127.0.0.1:31740/TOKEN/files /home/alice/project
+
+    The filesystem server initiates the TCP connection but remains the MCP
+    server. The multibroker authenticates the same token used for HTTP,
+    registers the alias and discovers the tools. A configured or connected
+    alias cannot be replaced. After disconnecting, the server retries once
+    per second for sixty attempts. Pending calls fail and are never
+    replayed. Remote registration does not grant the multibroker
+    spawned-child shutdown authority.
+
+    The hello is a raw JSON line, followed by ordinary MCP JSONL on the same
+    socket; the HTTP-shaped URL is an address and credential, not an HTTP
+    request. The bundled connector supports plain "http://" endpoints. An
+    HTTP listener is already active by default when the upstream connection
+    is HTTP.
+
+  Add an HTTP child
+    A broker can mix spawned stdio servers and existing HTTP endpoints,
+    including independently implemented third-party servers:
+
+       mcp-multibroker --stdio \
+          code 'stdio:mcp-fs --name code /home/alice/src/project' \
+          remote https://example.org/mcp/ --bearer TOKEN
+
+    "--bearer" immediately after the HTTP pair belongs to that child.
+    "--token" before all pairs configures the multibroker's own HTTP
+    listener. They authenticate different connections.
+
+    To avoid putting a child's bearer token in the startup command, add:
+
+       [client remote]
+       bearer = TOKEN
+       timeout = 300
+
+    to the private global configuration, and omit "--bearer" from the
+    command. The prefix "remote" selects these client defaults. The
+    command-line URL still chooses the endpoint. Use the actual credential
+    accepted by that server, not the literal placeholder "TOKEN".
+
+    A token already present in a child's URL needs no separate bearer
+    option. The bundled servers use static URL-safe tokens; they do not
+    validate OAuth access tokens or implement HTTP Basic authentication. Use
+    TLS or an appropriate tunnel when credentials cross untrusted networks.
+
+    The multibroker does not put every child inside the mcp-fs sandbox. Each
+    process or remote service has its own authority and enforcement.
+
+  Add a live Vim editor
+    Install the Vim plugin using "VIM PLUGIN INSTALLATION" in mcp-vim. It is
+    included in the source distribution but is not installed by Perl's "make
+    install".
+
+    Without a multibroker, configure the MCP client to launch:
+
+       mcp-vim --stdio --name editor
+
+    Even in stdio mode, mcp-vim listens separately for editor connections.
+    If using a multibroker, start its child eagerly so Vim can connect
+    before the first MCP tool call:
+
+       mcp-multibroker --stdio \
+          code 'stdio:mcp-fs --name code /home/alice/src/project' \
+          vim 'stdio:mcp-vim --name editor' --eager
+
+    In another terminal, obtain the editor broker's URL prefix:
+
+       mcp-vim --name editor --print-url
+
+    Append the desired target name in Vim:
+
+       :Mcp http://HOST:PORT/TOKEN/my-editor
+
+    Use the actual printed prefix in place of "http://HOST:PORT/TOKEN/". Ask
+    the LLM to call "targets", then "state" before reading or editing
+    buffers ("vim.targets" and "vim.state" through the multibroker). These
+    tools see live, possibly unsaved buffers. Edits require a current
+    changedtick and do not save files to disk.
+
+    To pass arguments directly, use "PREFIX --- PROGRAM ARG... ---":
+
+       mcp-multibroker --stdio \
+          vim --- mcp-vim --name editor --bind :: --- --eager \
+          code --- mcp-fs --name code '/home/alice/project with spaces' ---
+
+    Only the invoking shell processes quoting. The broker passes all
+    arguments between the delimiters unchanged, including empty arguments
+    and child options. Use "stdio:COMMAND" for shell syntax or a literal
+    "---" child argument. An empty command or missing closing delimiter is
+    an error.
+
+    "--eager" belongs immediately after its stdio URL or closing "---". An
+    eager connection failure is logged; the broker does not continuously
+    restart the child. Later tool use can try connecting again.
+
+  Ask the client's human a question
+    To let the assistant ask you questions, configure its MCP client to
+    launch:
+
+       mcp-ask-user --stdio
+
+    Or add the question server to a multibroker:
+
+       mcp-multibroker --stdio \
+          code 'stdio:mcp-fs --name code /home/alice/src/project' \
+          questions 'stdio:mcp-ask-user'
+
+    The LLM can call "ask-user" ("questions.ask-user" through the
+    multibroker) with a question, up to three suggested answers and room for
+    free text. For example, tell it to use that tool if choosing among
+    several possible tasks needs your input. For several fields or other
+    value types, "ask-form" ("questions.ask-form" through the multibroker)
+    accepts "message" and "requestedSchema" directly and returns the
+    standard elicitation response. Both tools use the same configured
+    presentation mode. Decline and cancel are distinct results; neither
+    supplies an answer.
+
+    By default the multibroker displays questions locally, using YAD or a
+    terminal. Add "--ask mcp" before the broker entries to use the client's
+    native forms, or "--ask auto" to select by advertised capability. This
+    also works with "mcp-ask-user" started separately: give that server
+    "--ask mcp" so it delegates presentation to its connecting multibroker.
+
+    "anyevent-mcp-form-elicitation" is the standalone form renderer. It
+    reads standard MCP form parameters as UTF-8 JSON on stdin and writes an
+    accept/decline/cancel response as JSON on stdout.
+    "PERL_ANYEVENT_MCP_ELICITATION_HELPER" selects a replacement executable.
+    See anyevent-mcp-form-elicitation for supported fields and mcp-ask-user
+    for question arguments and result fields.
+
+CONNECTED BROWSER PAGES
+    "mcp-webbrowser" is the browser-page counterpart to "mcp-vim". It
+    exposes only tabs explicitly allowed by the browser user. Configure your
+    MCP client to launch:
+
+       mcp-webbrowser --stdio
+
+    The broker keeps its own HTTP/WebSocket listener active even in stdio
+    mode; the userscript connects to that listener, not to MCP's stdio
+    stream. In a separate terminal, obtain its URL:
+
+       mcp-webbrowser --print-url
+
+    Use the same instance name and configuration as the broker. Keep this
+    credential-bearing URL private. Install the companion userscript from
+    "webbrowser/mcp-webbrowser.user.js" in the source distribution or from
+    <https://dist.schmorp.de/mcp-webbrowser/1/mcp-webbrowser.user.js>.
+    Chromium with ScriptCat has been tested. On a tab you want to expose,
+    choose Allow MCP access to this tab from the userscript menu and enter
+    the printed URL when prompted. Other tabs remain unexposed.
+
+    The broker supplies "tabs", "execute" and "add-element" tools,
+    permission prompts, cancellation and execution timeouts. See "USERSCRIPT
+    INSTALLATION AND USE" in mcp-webbrowser for setup, compatibility and the
+    current ScriptCat discarded-tab limitation.
+
+    If the multibroker launches the browser broker, keep that child running
+    from startup so browser tabs can connect:
+
+       mcp-multibroker --stdio browser --- mcp-webbrowser --- --eager
+
+HTTP TOKENS AND SERVER IDENTITY
+    For the ordinary bundled HTTP endpoints, a client can present an
+    accepted token in either of these ways:
+
+       POST /TOKEN/
+       POST /                 Authorization: Bearer TOKEN
+
+    URL tokens are path components, not browser cookies. For another
+    configured endpoint, "/TOKEN" prefixes that endpoint path. All accepted
+    tokens authenticate the same operations; they are not separate users or
+    permission levels. Permissions still govern the tool operation.
+
+    By default, the master secret and server name determine one stable token
+    and a port in 16384..32767. Changing a server's name changes its derived
+    credentials and default port. Changing or losing the master secret
+    changes all derived credentials. Keep an existing "[global]" secret when
+    editing other configuration.
+
+    To configure explicit tokens:
+
+       [instance code]
+       tokens = first-secret,second-secret
+
+    Replace those placeholders with actual unguessable URL-safe tokens.
+    Repeated "--token" options replace the whole configured list and the
+    derived default. The first token appears in "--print-url"; all are
+    accepted. mcp-vim also accepts its token set for Vim and browser
+    WebSocket connections.
+
+    If "--print-url" disagrees with the client's URL, compare the name,
+    command-line overrides, user and configuration environment with the
+    running process. The command resolves configuration; it does not ask the
+    running server which URL it uses. A changed file needs a server restart.
+
+    An Origin allowlist restricts browser origins; it does not authenticate
+    clients. A CORS preflight can succeed without a token, while the MCP
+    POST still requires one. See "AUTHENTICATION" in
+    AnyEvent::MCP::Server::HTTP for the low-level server interface.
+
+CLIENT EXAMPLES
+    Client settings and command syntax evolve independently of this
+    distribution. These examples show the connection choices; consult the
+    linked client documentation if its interface differs. Replace
+    illustrative paths and credentials with your own.
+
+  OpenAI Codex CLI
+    For the first direct filesystem connection:
+
+       codex mcp add code -- \
+          mcp-fs --stdio --name code /home/alice/src/project
+       codex mcp list
+
+    For a multibroker connection:
+
+       codex mcp add mytools -- \
+          mcp-multibroker --stdio \
+          code 'stdio:mcp-fs --name code /home/alice/src/project'
+
+    Use "/mcp" within Codex to inspect connections. See Codex MCP
+    documentation <https://learn.chatgpt.com/docs/extend/mcp>.
+
+  Anthropic Claude Code
+    For the direct connection:
+
+       claude mcp add --transport stdio --scope user code -- \
+          mcp-fs --stdio --name code /home/alice/src/project
+       claude mcp list
+
+    Replace the launched command with the multibroker command above when you
+    want several servers. Use "/mcp" for connection status. See Claude Code
+    MCP documentation <https://code.claude.com/docs/en/mcp>.
+
+  Google Gemini CLI
+    Merge a direct server entry into "~/.gemini/settings.json":
+
+       {
+         "mcpServers": {
+           "code": {
+             "command": "mcp-fs",
+             "args": [
+               "--stdio", "--name", "code", "/home/alice/src/project"
+             ]
+           }
+         }
+       }
+
+    For a combined connection, use "mcp-multibroker" as the command and its
+    "--stdio" and prefix/server pairs as the argument array. Use "/mcp" to
+    inspect the connection. See Gemini CLI MCP documentation
+    <https://geminicli.com/docs/tools/mcp-server/>.
+
+  Hosted clients, including ChatGPT web
+    A hosted client cannot spawn your local stdio command or reach your
+    machine's loopback address directly. A Secure MCP Tunnel runs locally,
+    connects out to OpenAI, and forwards MCP requests to a local stdio
+    command or HTTP URL. No public listener or inbound firewall port is
+    needed.
+
+    First create a tunnel in OpenAI Platform tunnel settings and obtain its
+    "tunnel_..." ID and a runtime API key. Arrange for
+    "CONTROL_PLANE_API_KEY" to be set securely in the tunnel client's
+    environment; do not put a real key in a script, command line or example.
+    Associate the tunnel with the ChatGPT workspace where you want to use
+    it.
+
+    For stdio, put the server startup command in a small executable wrapper,
+    for example "/home/alice/bin/my-mcp":
+
+       #!/bin/sh
+       exec mcp-multibroker --stdio \
+          code --- mcp-fs --name code /home/alice/src/project --- \
+          questions --- mcp-ask-user ---
+
+    With a tunnel installation providing "tunnel-client-runtime", run:
+
+       tunnel-client-runtime run \
+          --log.format=struct-text \
+          --log.level=warn \
+          --control-plane.tunnel-id=tunnel_... \
+          --mcp.connection-max-ttl=120s \
+          --mcp.command=/home/alice/bin/my-mcp
+
+    The tunnel starts the wrapper as its stdio MCP server. Do not start a
+    separate copy yourself. Make the wrapper executable and ensure its
+    programs and Perl modules are on the tunnel process's "PATH".
+
+    For HTTP, instead start the server or multibroker separately:
+
+       mcp-multibroker --name tools --bind 127.0.0.1:16586 \
+          code 'stdio:mcp-fs --name code /home/alice/src/project'
+
+    Obtain the matching credential-bearing URL:
+
+       mcp-multibroker --name tools --bind 127.0.0.1:16586 --print-url
+
+    Then point the tunnel runtime at that URL, rather than a command:
+
+       tunnel-client-runtime run \
+          --log.format=struct-text \
+          --log.level=warn \
+          --control-plane.tunnel-id=tunnel_... \
+          --mcp.connection-max-ttl=120s \
+          --mcp.server-url=http://127.0.0.1:16586/TOKEN/
+
+    Replace "TOKEN" with the actual URL path printed above, and keep it
+    private. In this mode, the multibroker must remain running separately;
+    the tunnel only connects to it. Both modes require the tunnel runtime to
+    remain active while the hosted client uses the server. Use one of
+    "--mcp.command" and "--mcp.server-url", not both.
+
+    In ChatGPT, add a custom MCP server using a Tunnel connection and select
+    the tunnel ID. Creation and visibility depend on the Platform and
+    ChatGPT workspace permissions. The tunnel client's CLI and supported
+    configuration forms can vary between releases; the examples above use
+    the direct runtime CLI rather than its optional profile setup. See
+    Secure MCP Tunnel
+    <https://developers.openai.com/api/docs/guides/secure-mcp-tunnels> for
+    obtaining a tunnel, runtime, credentials and connecting it to ChatGPT.
+
+TROUBLESHOOTING
+  The server does not start
+    Read stderr or the client's server log. Missing Perl modules, a missing
+    workdir, unsuitable utilities or an unavailable bubblewrap executable
+    can fail startup. Confirm that the client launches the same executable
+    and arguments you intended, with the expected "PATH" and Perl
+    installation.
+
+    For a local sandbox check, run from the project directory:
+
+       mcp-fs --exec-cmd workdir-read -- ls
+
+    This runs "ls" with the named grants and trusted baseline mounts,
+    without MCP or saved permission rules. A failure here can identify a
+    bubblewrap or runtime problem. It does not test the client connection or
+    approval UI. "--sandbox none" disables isolation and changes worker
+    authority; it is not a fix that preserves the same permission boundary.
+
+  The client cannot connect
+    For stdio, configure a command the client launches, rather than a URL. A
+    separately running stdio process is not the client's connection. Do not
+    put banners or diagnostics on stdout.
+
+    For HTTP, leave the server running and check its address and port.
+    "--print-url" exits without starting it. Loopback binds accept local
+    connections only; hosted or remote clients need the appropriate route or
+    tunnel. An occupied port causes a listener error, so check the server
+    log.
+
+  Authentication fails
+    Obtain the URL with the same name, bind/token overrides and
+    configuration environment as the running process. Use the complete path,
+    including any required trailing slash. A clean URL needs an accepted
+    bearer token.
+
+    A multibroker child credential is not necessarily the upstream
+    listener's credential. "--bearer" after a child pair and "--token"
+    before the pairs configure different sides of the connection.
+
+    If the server warns that it cannot save the master secret, another
+    process may derive a different token. Check write access to the global
+    configuration. Do not replace an existing secret simply to add a
+    setting.
+
+  Connected, but there are no tools
+    Inspect the server's stderr for omitted utilities. mcp-fs's "workdirs"
+    tool reports configuration even when a utility-dependent tool is absent.
+    For a multibroker, call "discover-brokers" to see individual connection
+    errors, then "list-tools" to refresh definitions.
+
+    A third-party child might require initialization or features this client
+    implementation does not support. See AnyEvent::MCP::Client and its
+    transport documentation for limitations.
+
+  There is no approval dialog
+    First check whether the tool was denied by a saved rule or is waiting
+    for the client's own approval. An allowed operation needs no server
+    prompt.
+
+    The default helper runs on the server machine. A background service may
+    have neither a usable display nor "/dev/tty", even though your
+    interactive shell has both. Supply the appropriate display environment,
+    a usable helper, or "--ask auto" with a modern client supporting form
+    elicitation. "--ask mcp" reports an error if that support is absent.
+
+    Setting an asking mode cannot make an unsupported client display a form.
+    Check stderr and the tool error instead of assuming a missing dialog is
+    an approval.
+
+  It asks again after I chose allow
+    Allow-once covers one tool invocation, including its permission retries.
+    The next invocation asks again. Use allow-always to save a rule.
+
+    Inspect the saved rule's action, workdir and grants. Listing names and
+    reading contents are different actions. A rule for one exact workdir
+    spelling will not match a differently spelled startup argument. A
+    request for extra authority, such as networking, does not match a
+    workdir-read-only allow rule. Earlier ask or deny rules take precedence.
+
+    Confirm that the prompt's permanent rule was successfully saved and that
+    you are editing the rules for the actual child name, not merely its
+    multibroker prefix.
+
+  The worker cannot see a directory or executable
+    The worker sees granted mounts and trusted baseline mounts, not
+    everything the server process can see. Check "workdirs" for the selected
+    path, mounts and runtime paths. A symlink target outside those mounts is
+    unavailable.
+
+    The ordinary sandbox runtime includes "/usr", "/bin" and system
+    libraries, but not "/opt". For tools or libraries under "/opt", add this
+    to "[program mcp-fs]" in the private global configuration:
+
+       mount.opt = ro:/opt
+
+    This assumes "/opt" exists. Restart mcp-fs after changing trusted
+    mounts. If your worker Perl is "/opt/bin/perl", you can also set
+    "executable.perl = /opt/bin/perl" in that program section. Supply the
+    actual executable path: selecting it does not itself mount the
+    executable or its dependencies inside the worker.
+
+    A trusted mount supplies baseline access to every worker using it; a
+    writable mount likewise supplies baseline write authority.
+
+    An arbitrary command might also need its user's configuration or
+    repository credentials under HOME, or network access. Request the
+    corresponding grants when needed; do not assume "workdir-read" includes
+    them. For example, CVS over SSH can use "workdir-read" and "ssh-agent".
+    The latter includes network access, the agent socket and
+    "~/.ssh/known_hosts", without exposing private key files or the rest of
+    HOME. The broker must inherit "SSH_AUTH_SOCK" from your environment.
+    User-configured helpers outside the runtime mounts need an explicit
+    trusted mount. An explicit exec grant array replaces the default rather
+    than adding to it.
+
+  My configuration change seems to be ignored
+    Check which file and section the process actually selects. Global
+    settings use the server user's "HOME"/"XDG_CONFIG_HOME". Instance names,
+    program basenames and multibroker prefixes serve different purposes.
+
+    Restart after changing startup settings, mounts or utilities. Permission
+    rules need no restart, but their order still matters. Refresh discovery
+    after a child restart; reconnect a client that retains an old tool list.
+    "--print-url" reads the current configuration, which can differ from an
+    older running process.
+
+  The command failed, but the MCP request succeeded
+    "exec" reports exit status, signal or timeout as a normal tool result. A
+    successful MCP exchange is not a successful Unix command. Conversely, a
+    transport failure does not prove a command did nothing: it may have
+    completed before the connection was lost. Calls are not automatically
+    replayed after a transport failure.
+
+TESTING
+    The default test level is 0. It checks protocol behaviour, permissions,
+    validation and ordinary process operation, including worker cancellation
+    and reaping. Watchdogs allow slow machines time to finish; they do not
+    make successful tests wait for the whole timeout.
+
+       prove -Ilib t
+
+    Set "PERL_ANYEVENT_MCP_TESTS" to 1 to include the extended tests:
+
+       PERL_ANYEVENT_MCP_TESTS=1 prove -Ilib t
+
+    Level 1 adds GNU find/grep/sed/patch operations, real Vim scripting,
+    browser transfer integration, short idle-lifetime tests, a helper
+    descendant holding a pipe open, and tests which deliberately wait for a
+    command timeout or cancel a form helper across several processes. Run
+    this level before releases. Values greater than 1 currently select the
+    same tests as level 1.
+
+    Missing GNU utilities or required Vim functions cause explicit skips
+    even at level 1. The permission and form UI tests use a YAD stand-in:
+    neither level requires YAD, X11 or an interactive display. The
+    filesystem tests use a bubblewrap stand-in and check arguments and
+    worker behaviour; they do not test kernel isolation. The browser tests
+    use simulated peers.
+
+WHERE TO GO NEXT
+    For available tools and server-specific options:
+
+       perldoc mcp-fs
+       perldoc mcp-multibroker
+       perldoc mcp-vim
+       perldoc mcp-ask-user
+       perldoc anyevent-mcp
+
+    For a complete first Perl server, options, replies, permission checks
+    and asynchronous work, see "TUTORIAL" in AnyEvent::MCP::Server::Simple.
+    For the module map and shared configuration reference, see
+    AnyEvent::MCP. For permission rule details, see
+    AnyEvent::MCP::Server::Permissions.
+
+SEE ALSO
+    AnyEvent::MCP, AnyEvent::MCP::Server::Simple, mcp-fs, mcp-multibroker,
+    mcp-vim, mcp-ask-user, AnyEvent::MCP::Server::Permissions
+

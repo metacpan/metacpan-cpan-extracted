@@ -19,6 +19,13 @@ our %cilium_opts;
 local *Rex::Rancher::wait_for_api                = sub { push @ran, 'wait_for_api'; $api_up };
 local *Rex::Rancher::install_cilium              = sub { push @ran, 'install_cilium'; %cilium_opts = @_ };
 local *Rex::Rancher::deploy_nvidia_device_plugin = sub { push @ran, 'device_plugin' };
+# preflight_server/preflight_agent read the host, and offline that host is this
+# machine (Rex's local exec): its host reads are faked to a fresh host with
+# nothing installed. The preflight's pure checks still run; it records nothing
+# in @ran (its place in the pipeline: t/deploy-preflight.t).
+local *Rex::Rancher::Uninstall::check_cilium_residue              = sub { 1 };
+local *Rex::Rancher::Distribution::check_version_skew             = sub { return };
+local *Rex::Rancher::Distribution::check_established_cluster_cidr = sub { return };
 use warnings 'redefine';
 
 my %server = ( kubeconfig_file => '/nonexistent/kc.yaml' );

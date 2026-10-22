@@ -1,6 +1,6 @@
 package IO::K8s::Cilium::V2::RedirectBackend;
 # ABSTRACT: RedirectBackend specifies backend configuration to redirect traffic to.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s localEndpointSelector => 'Meta::V1::LabelSelector', { required => 'schema' };
@@ -22,7 +22,7 @@ IO::K8s::Cilium::V2::RedirectBackend - RedirectBackend specifies backend configu
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 localEndpointSelector
 

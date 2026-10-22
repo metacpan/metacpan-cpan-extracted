@@ -5,7 +5,7 @@ use warnings;
 use Carp qw(croak);
 use Uniform::HTTP::Request 0.06 ();
 use Uniform::HTTP::Response 0.06 ();
-use Scalar::Util qw(blessed weaken);
+use Scalar::Util qw(blessed isweak weaken);
 use Time::HiRes ();
 
 use Unblock::HTTP3 ();
@@ -13,7 +13,7 @@ use Unblock::HTTP3::_Native ();
 use Unblock::HTTP3::Transaction ();
 use Net::QUIC::Connection ();
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 my $H3_DATAGRAM_ERROR = 0x33;
 my $H3_CLOSED_CRITICAL_STREAM = 0x0104;
@@ -967,6 +967,7 @@ sub _new {
         )
         : undef;
     my $on_extension_settings = delete $args{on_extension_settings};
+    my $on_request_available = delete $args{on_request_available};
     my %callbacks;
     for my $name (qw(on_request on_body on_request_end on_error)) {
         next unless exists $args{$name};
@@ -992,6 +993,11 @@ sub _new {
     croak 'on_extension_settings must be a code reference'
         if defined($on_extension_settings)
             && ref($on_extension_settings) ne 'CODE';
+    croak 'on_request_available must be a code reference'
+        if defined($on_request_available)
+            && ref($on_request_available) ne 'CODE';
+    croak 'on_request_available is only valid for a client connection'
+        if $role ne 'client' && defined($on_request_available);
 
     croak 'enable_extended_connect must be 0 or 1'
         if !defined($enable_extended_connect)
@@ -1050,7 +1056,7 @@ sub _new {
             unless defined($limit->[1])
                 && !ref($limit->[1])
                 && $limit->[1] =~ /\A[0-9]+\z/
-                && $limit->[1] > 0;
+                && $limit->[1] > 0 && $limit->[1] <= (~0);
     }
 
     for my $setting (
@@ -1172,6 +1178,8 @@ sub _new {
         peer_settings_initialized  => defined($remembered_peer_settings) ? 1 : 0,
         peer_settings_parser       => {},
         on_extension_settings      => $on_extension_settings,
+        on_request_available       => $on_request_available,
+        request_credit_blocked     => 0,
         callbacks                  => \%callbacks,
         control_settings_rewritten => 0,
         control_settings_delta     => 0,
@@ -1204,6 +1212,7 @@ sub _new {
         pending_early_datagrams    => {},
         ready_informational => [],
         output_finished   => {},
+        blocked_output    => {},
         response_sent     => {},
     }, $class;
 }
@@ -1516,12 +1525,15 @@ sub _fail_connection {
     $self->{error_code} = 0 + $code;
     $self->{error} = "$message";
 
+    my $callback_error = '';
     for my $transaction (values %{ $self->{transactions} }) {
         next if $transaction->is_terminal;
-        $transaction->_mark_error($message, $code);
+        eval { $transaction->_mark_error($message, $code); 1 }
+            or $callback_error ||= "$@";
     }
 
     $self->{quic}->close($code);
+    die $callback_error if length $callback_error;
     return;
 }
 
@@ -1537,7 +1549,7 @@ sub request {
 
     my %callbacks;
     for my $name (qw(
-        on_informational on_response on_body on_complete on_error on_drain
+        on_informational on_response on_body on_data on_finish on_complete on_error on_drain
     )) {
         next unless exists $option{$name};
         my $callback = delete $option{$name};
@@ -1667,6 +1679,10 @@ sub request {
             unless $self->{peer_settings_initialized};
     }
 
+    croak 'request(): on_data cannot be combined with on_body or receive_body on_data'
+        if $callbacks{on_data} && ($callbacks{on_body} || $receive_options->{on_data});
+    my $on_data = delete $callbacks{on_data};
+
     my $stream_id = $self->_submit_request(
         $request,
         $request_streaming,
@@ -1710,6 +1726,7 @@ sub request {
         $receive_options,
     );
 
+    $transaction->on_data($on_data) if $on_data;
     $self->{transactions}{$stream_id} = $transaction;
 
     if ($stream_body && defined $callbacks{on_drain}) {
@@ -1727,12 +1744,55 @@ sub request {
     return $transaction;
 }
 
+# Callback consumers already own their transaction. Weak queue slots
+# preserve prompt mixed callback/pull reads without pinning every completed
+# request and response for the life of a multiplexed connection. Pure pull
+# entries remain strong, so an application may retrieve them later.
+sub _enqueue_delivery {
+    my ($self, $queue_name, $transaction, $callback_owned) = @_;
+
+    my $queue = $self->{$queue_name};
+    shift @$queue while @$queue && !defined $queue->[0];
+    push @$queue, $transaction;
+    if ($callback_owned) {
+        weaken($queue->[-1]);
+        # A live old entry can keep the head from advancing while expired
+        # weak notifications accumulate behind it. Periodic compaction
+        # bounds that stale tail without scanning on every request. Strong
+        # pull-only entries must remain queued until explicitly retrieved.
+        if (++$self->{weak_delivery_insertions}{$queue_name} >= 64) {
+            # Copying an SV with grep/map turns a weak reference strong.
+            # Compact in place and restore the weakness of moved entries.
+            my $write = 0;
+            for my $read (0 .. $#$queue) {
+                next unless defined $queue->[$read];
+                if ($write != $read) {
+                    my $was_weak = isweak($queue->[$read]);
+                    $queue->[$write] = $queue->[$read];
+                    weaken($queue->[$write]) if $was_weak;
+                }
+                ++$write;
+            }
+            splice @$queue, $write;
+            $self->{weak_delivery_insertions}{$queue_name} = 0;
+        }
+    }
+    return;
+}
+
+sub _next_delivery {
+    my ($self, $queue_name) = @_;
+    my $queue = $self->{$queue_name};
+    shift @$queue while @$queue && !defined $queue->[0];
+    return shift @$queue;
+}
+
 sub next_transaction {
     my ($self, @args) = @_;
 
     croak 'next_transaction() does not accept arguments' if @args;
     $self->_service if $self->{started} && !$self->{failed};
-    return shift @{ $self->{ready_transactions} };
+    return $self->_next_delivery('ready_transactions');
 }
 
 sub next_informational {
@@ -1740,7 +1800,7 @@ sub next_informational {
 
     croak 'next_informational() does not accept arguments' if @args;
     $self->_service if $self->{started} && !$self->{failed};
-    return shift @{ $self->{ready_informational} };
+    return $self->_next_delivery('ready_informational');
 }
 
 sub _request_contract {
@@ -2353,21 +2413,32 @@ sub _write_transaction_body {
     $self->_drain_output;
     $self->_maybe_complete_transaction($id);
 
-    return $self->{native}->streaming_retained_bytes
-        < $self->{send_buffer_limit}
-        ? 1
-        : 0;
+    # Each active streaming producer gets a share of the native retained
+    # body budget. A QUIC-credit-blocked stream must not withhold every
+    # other producer's on_drain merely because its own data remains queued.
+    # A complete write is accepted before this advisory return; one write
+    # can exceed its share, so this is NOT a hard memory or packet limit.
+    return $self->{native}->streaming_retained_bytes_for_stream($id)
+        < $self->_streaming_share_limit ? 1 : 0;
+}
+
+sub _streaming_share_limit {
+    my ($self) = @_;
+    my $count = $self->{native}->active_streaming_body_count;
+    return $self->{send_buffer_limit} if $count < 2;
+    my $share = int($self->{send_buffer_limit} / $count);
+    return $share || 1;
 }
 
 sub _drain_body_producers {
     my ($self) = @_;
 
-    return
-        if $self->{native}->streaming_retained_bytes
-            >= $self->{send_buffer_limit};
-
+    my $share = $self->_streaming_share_limit;
     for my $transaction (values %{ $self->{transactions} }) {
         next if $transaction->is_terminal;
+        my $id = $transaction->stream_id;
+        next if $self->{native}->streaming_retained_bytes_for_stream($id)
+            >= $share;
 
         if (my $body = $transaction->_request_body_object) {
             $body->_drain;
@@ -2407,6 +2478,11 @@ sub _consume_received_body {
     my $stream = $self->{streams}{ $transaction->stream_id }
         or croak 'received body stream is no longer available';
 
+    # STOP_SENDING already discards and credits delivered, unconsumed bytes
+    # in Net::QUIC. Terminal Reader cleanup must not credit them a second time.
+    return if $transaction->is_terminal
+        && defined($stream->local_stop_sending_code);
+
     $stream->consume(0 + $amount);
     return;
 }
@@ -2422,24 +2498,11 @@ sub _cancel_transaction {
 
     return $transaction if $transaction->is_terminal;
 
-    my $id = $transaction->stream_id;
-    my $stream = $self->{streams}{$id};
-
-    if (defined $stream) {
-        if ($stream->can_receive && !$stream->remote_finished) {
-            $self->{native}->shutdown_stream_read($id);
-            $stream->stop_sending($H3_REQUEST_CANCELLED);
-            $transaction->_mark_local_stop_sending($H3_REQUEST_CANCELLED);
-        }
-
-        if ($stream->can_send && !defined($stream->local_reset_code)) {
-            $self->{native}->shutdown_stream_write($id);
-            $stream->reset($H3_REQUEST_CANCELLED);
-            $transaction->_mark_local_reset($H3_REQUEST_CANCELLED);
-        }
-    }
-
-    $self->{native}->discard_body($id);
+    $self->_reject_message_stream(
+        $transaction->stream_id,
+        'HTTP/3 transaction cancelled',
+        $H3_REQUEST_CANCELLED,
+    );
 
     $transaction->_mark_cancelled;
     return $transaction;
@@ -2759,8 +2822,18 @@ sub _capsule_protocol_error {
     return;
 }
 
+sub _receive_body_failure {
+    my ($self, $transaction, $reason, $discarded_bytes) = @_;
+    my $stream = $self->{streams}{ $transaction->stream_id };
+    $stream->consume($discarded_bytes) if $stream && $discarded_bytes;
+    $self->_reject_message_stream($transaction->stream_id, $reason, $H3_EXCESSIVE_LOAD);
+    $transaction->_mark_error($reason, $H3_EXCESSIVE_LOAD);
+    return;
+}
+
 sub _reject_message_stream {
-    my ($self, $id, $reason) = @_;
+    my ($self, $id, $reason, $code) = @_;
+    $code = $H3_MESSAGE_ERROR unless defined $code;
 
     $self->{rejected_streams}{$id} = "$reason";
 
@@ -2770,15 +2843,15 @@ sub _reject_message_stream {
     if (defined $stream) {
         if ($stream->can_receive && !$stream->remote_finished) {
             $self->{native}->shutdown_stream_read($id);
-            $stream->stop_sending($H3_MESSAGE_ERROR);
-            $transaction->_mark_local_stop_sending($H3_MESSAGE_ERROR)
+            $stream->stop_sending($code);
+            $transaction->_mark_local_stop_sending($code)
                 if defined $transaction;
         }
 
         if ($stream->can_send && !defined($stream->local_reset_code)) {
             $self->{native}->shutdown_stream_write($id);
-            $stream->reset($H3_MESSAGE_ERROR);
-            $transaction->_mark_local_reset($H3_MESSAGE_ERROR)
+            $stream->reset($code);
+            $transaction->_mark_local_reset($code)
                 if defined $transaction;
         }
     }
@@ -2824,6 +2897,7 @@ sub _cleanup_stream_if_done {
     delete $self->{stream_lifecycle}{$id};
     delete $self->{trailer_field_section_size}{$id};
     delete $self->{output_finished}{$id};
+    delete $self->{blocked_output}{$id};
     delete $self->{response_sent}{$id};
     delete $self->{body_bytes_sent}{$id};
     delete $self->{rejected_streams}{$id};
@@ -2841,7 +2915,7 @@ sub _maybe_complete_transaction {
 
     my $transaction = $self->{transactions}{$id};
     return unless defined $transaction;
-    return if $transaction->is_terminal;
+    return if $transaction->is_terminal || $transaction->{callback_depth};
 
     if ($self->{role} eq 'client') {
         my $response = $transaction->response;
@@ -2863,6 +2937,7 @@ sub _maybe_complete_transaction {
 
     my $request = $transaction->request;
     return unless $request->is_complete;
+    return unless $transaction->{request_end_callback_called};
 
     my $reader = $transaction->_incoming_body_reader('request');
     return if defined($reader) && !$reader->is_complete;
@@ -3019,7 +3094,9 @@ sub start {
 
     $self->{quic}->on_stream_available(sub {
         return unless defined $weak;
+        my ($quic, $kind) = @_;
         $weak->_service;
+        $weak->_request_stream_available($kind);
     });
 
     if ($self->{quic}->can_receive_datagram) {
@@ -3033,6 +3110,25 @@ sub start {
     $self->_service;
 
     return $self;
+}
+
+sub _request_stream_available {
+    my ($self, $kind) = @_;
+    return unless $self->{role} eq 'client'
+        && $self->{request_credit_blocked}
+        && defined($kind) && $kind eq 'bidi'
+        && !$self->{failed}
+        && !defined($self->{remote_shutdown_id})
+        && !$self->{shutdown_started};
+
+    # This is a one-shot wakeup, not a claim that any stream slot remains.
+    # Consumers must try request() again and wait for another notification
+    # if another user of this QUIC connection has consumed the credit.
+    $self->{request_credit_blocked} = 0;
+    my $callback = $self->{on_request_available} or return;
+    my $ok = eval { $callback->($self); 1 };
+    warn "on_request_available callback failed: $@" unless $ok;
+    return;
 }
 
 sub _reset_peer_settings_to_defaults {
@@ -3171,7 +3267,11 @@ sub _promote_accepted_early_transactions {
             }
         }
 
-        push @{ $self->{ready_transactions} }, $transaction;
+        $self->_enqueue_delivery(
+            'ready_transactions',
+            $transaction,
+            defined($self->{callbacks}{on_request}) ? 1 : 0,
+        );
 
         if (defined $self->{callbacks}{on_request}) {
             my $result = $transaction->_invoke(
@@ -3566,35 +3666,19 @@ sub _service_stream {
         return if $self->{failed};
     }
 
-    if ($self->{rejected_streams}{$id}) {
-        if ($stream->can_receive) {
-            while (my $chunk = $stream->next_data_chunk) {
-                my ($bytes) = @$chunk;
-                $stream->consume(length($bytes))
-                    if length($bytes);
-            }
-        }
-
-        if ($stream->closed) {
-            $self->_release_peer_bidi_stream_credit(
-                $id,
-                $stream,
-            );
-            $self->{native}->discard_body($id);
-            delete $self->{streams}{$id};
-            delete $self->{stream_lifecycle}{$id};
-                    delete $self->{rejected_streams}{$id};
-        }
-
-        return;
-    }
-
     if ($stream->can_receive) {
         while (1) {
             my $chunk = $stream->next_data_chunk;
             last unless defined $chunk;
 
             my ($bytes, $fin) = @$chunk;
+
+            # Rejected streams still need QUIC reset/close bookkeeping below.
+            # Discard payload without allowing queued HTTP callbacks to escape.
+            if ($self->{rejected_streams}{$id}) {
+                $stream->consume(length($bytes)) if length($bytes);
+                next;
+            }
 
             $self->_inspect_peer_settings_bytes($id, $bytes);
             return if $self->{failed};
@@ -3623,7 +3707,13 @@ sub _service_stream {
         }
     }
 
-    if ($stream->can_send) {
+    if ($stream->can_send && !$self->{rejected_streams}{$id}) {
+        # Activity may indicate ACKs or new QUIC send credit. Allow nghttp3
+        # to retry this stream, but re-block it if QUIC still accepts only
+        # a partial write. Other streams must remain eligible meanwhile.
+        if (delete $self->{blocked_output}{$id}) {
+            $self->{native}->unblock_stream($id);
+        }
         my $acked_offset = $stream->acked_offset;
 
         if (
@@ -3761,11 +3851,13 @@ sub _drain_events {
             if ($type eq 'data') {
                 my $stream = $self->{streams}{$id};
                 $stream->consume(length($args[0]))
-                    if defined($stream) && length($args[0]);
+                    if defined($stream) && length($args[0])
+                        && !defined($stream->local_stop_sending_code);
             } elsif ($type eq 'deferred_consume') {
                 my $stream = $self->{streams}{$id};
                 $stream->consume($args[0])
-                    if defined($stream) && $args[0];
+                    if defined($stream) && $args[0]
+                        && !defined($stream->local_stop_sending_code);
             }
             next;
         }
@@ -3800,6 +3892,12 @@ sub _drain_events {
 
             my $transaction = $self->{transactions}{$id}
                 or croak "received HTTP/3 DATA for unknown Transaction";
+            if ($transaction->is_terminal) {
+                my $stream = $self->{streams}{$id};
+                $stream->consume(length($bytes)) if $stream && length($bytes);
+                next;
+            }
+            $transaction->{receive_started} = 1;
             my $kind = $self->{role} eq 'server'
                 ? 'request'
                 : 'response';
@@ -3810,10 +3908,8 @@ sub _drain_events {
                     $reader->pending_bytes + length($bytes)
                     > $self->{max_streaming_body_bytes}
                 ) {
-                    $self->_fail_connection(
-                        $H3_EXCESSIVE_LOAD,
-                        'HTTP/3 streaming body queue exceeds configured limit',
-                    );
+                    $self->_receive_body_failure($transaction,
+                        'HTTP/3 streaming body queue exceeds configured limit', length($bytes));
                     next;
                 }
 
@@ -3827,10 +3923,8 @@ sub _drain_events {
                 $current + length($bytes)
                 > $self->{max_buffered_body_bytes}
             ) {
-                $self->_fail_connection(
-                    $H3_EXCESSIVE_LOAD,
-                    'HTTP/3 buffered body exceeds configured limit',
-                );
+                $self->_receive_body_failure($transaction,
+                    'HTTP/3 buffered body exceeds configured limit', length($bytes));
                 next;
             }
 
@@ -3846,27 +3940,27 @@ sub _drain_events {
         if ($type eq 'deferred_consume') {
             my $stream = $self->{streams}{$id};
             $stream->consume($args[0])
-                if defined($stream) && $args[0];
+                if defined($stream) && $args[0]
+                        && !defined($stream->local_stop_sending_code);
             next;
         }
 
         if ($type eq 'end_stream') {
             my $transaction = $self->{transactions}{$id};
-            if (defined $transaction) {
+            if (defined $transaction && !$transaction->is_terminal) {
                 my $kind = $self->{role} eq 'server'
                     ? 'request'
                     : 'response';
                 my $reader = $transaction->_incoming_body_reader($kind);
 
                 if (defined $reader) {
-                    $reader->_mark_end;
-
                     my $message = $self->{messages}{$id};
                     if (defined $message) {
                         $message->freeze_trailers;
                         $message->freeze;
                         $message->mark_complete;
                     }
+                    $reader->_mark_end;
                 } else {
                     $transaction->_finish_received_message($kind);
                 }
@@ -4132,7 +4226,11 @@ sub _finish_headers {
             }
 
             $transaction->_enable_datagrams if $datagrams;
-            push @{ $self->{ready_transactions} }, $transaction;
+            $self->_enqueue_delivery(
+                'ready_transactions',
+                $transaction,
+                defined($self->{callbacks}{on_request}) ? 1 : 0,
+            );
 
             if (defined $self->{callbacks}{on_request}) {
                 my $result = $transaction->_invoke(
@@ -4178,7 +4276,11 @@ sub _finish_headers {
                 if $fin;
 
             $transaction->_push_informational($message);
-            push @{ $self->{ready_informational} }, $transaction;
+            $self->_enqueue_delivery(
+                'ready_informational',
+                $transaction,
+                defined($transaction->{callbacks}{on_informational}) ? 1 : 0,
+            );
             my $result = $transaction->_invoke(
                 'on_informational',
                 $message,
@@ -4193,6 +4295,7 @@ sub _finish_headers {
             $message,
         );
         die $response_result unless $response_result eq '1';
+        return if $transaction->is_terminal;
 
         $transaction->_ensure_receive_reader('response');
 
@@ -4205,7 +4308,14 @@ sub _finish_headers {
                 if defined($writer) && !$writer->is_complete;
         }
 
-        push @{ $self->{ready_transactions} }, $transaction;
+        my $callback = $transaction->{callbacks};
+        $self->_enqueue_delivery(
+            'ready_transactions',
+            $transaction,
+            ($callback->{on_response} || $callback->{on_complete}
+                || $callback->{on_body} || $callback->{on_data}
+                || $callback->{on_finish}) ? 1 : 0,
+        );
     }
 
     my $lifecycle = $self->{stream_lifecycle}{$id};
@@ -4397,7 +4507,13 @@ sub _submit_request {
     }
 
     my $stream = $self->{quic}->open_bidi_stream;
-    return unless defined $stream;
+    if (!defined $stream) {
+        # No local bidirectional QUIC stream was opened, so no HTTP request
+        # has been submitted. Notify the caller when credit may return.
+        $self->{request_credit_blocked} = 1;
+        return;
+    }
+    $self->{request_credit_blocked} = 0;
 
     my $id = $stream->id;
     $self->{streams}{$id} = $stream;
@@ -4526,7 +4642,7 @@ sub _drain_output {
             );
             my $length = length($remaining);
             my $accepted = $length
-                ? $stream->send_some($remaining)
+                ? $stream->send_some($remaining, limit_to_credit => 1)
                 : 0;
 
             $pending->{offset} += $accepted;
@@ -4584,7 +4700,7 @@ sub _drain_output {
         my $accepted = 0;
 
         if ($length) {
-            $accepted = $stream->send_some($bytes);
+            $accepted = $stream->send_some($bytes, limit_to_credit => 1);
         }
 
         $self->{native}->add_write_offset($id, $accepted);
@@ -4595,7 +4711,13 @@ sub _drain_output {
             $self->_maybe_complete_transaction($id);
         }
 
-        last if $accepted < $length;
+        if ($accepted < $length) {
+            # nghttp3 otherwise repeatedly chooses a flow-control-blocked
+            # stream and prevents other H3 streams from making progress.
+            $self->{native}->block_stream($id);
+            $self->{blocked_output}{$id} = 1;
+            next;
+        }
         last if !$length && !$fin;
     }
 
@@ -4653,6 +4775,16 @@ Server-specific options include:
     on_error
 
 Client-specific options include C<remembered_peer_settings>.
+
+C<send_buffer_limit> is an advisory limit for native streamed outgoing body
+bytes retained until acknowledgment, not a hard process or QUIC packet memory
+limit. The engine divides this budget among unfinished streaming producers,
+and a producer that returns false from C<write()> resumes through its own
+C<on_drain> after its retained bytes fall below its current share. This
+prevents another credit-blocked HTTP/3 stream from occupying all producer
+wakeups. A write is accepted in full before returning false, so individual
+large writes can exceed a stream's share or the configured soft budget.
+Buffering performed by Net::QUIC and the operating system is separate.
 
 =head1 COMMON METHODS
 

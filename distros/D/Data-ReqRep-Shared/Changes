@@ -1,5 +1,9 @@
 Revision history for Data-ReqRep-Shared
 
+0.10  2026-10-16
+    - Protect replacement channel files from older handles' unlink calls.
+    - Reject malformed layouts consistently.
+
 0.09      2026-09-25
           - Incompatible on-disk format: recreate existing files.
           - Survive processes that die, stop, exec or reuse PIDs mid-request.
@@ -9,34 +13,17 @@ Revision history for Data-ReqRep-Shared
 
 0.08      2026-09-15
           - Incompatible on-disk format: recreate existing files.
-          - Refuse attaching across PID namespaces or boots (see CONTAINERS).
-          - Refuse a world-writable file owned by another user.
-          - Fix slot leaks and lost or misdelivered replies when a cancel,
-            timeout, clear or crash recovery raced a reply.
-          - Fix crash recovery losing a slot when the recoverer is killed.
-          - Fix lost wakeups in send_wait and get_wait.
-          - Fix recv_multi, recv_wait_multi and drain losing requests on OOM.
-          - Fix recv_wait_multi(0) taking a request.
-          - Fix a worker killed mid-receive corrupting the next request.
+          - Refuse attaching across PID namespaces or boots, or to a foreign
+            world-writable file; new croaks after 10s on a held file lock.
           - reply returns false for a corrupt id instead of croaking.
-          - new croaks after 10s instead of hanging on a held file lock.
-          - Recover a lock left ownerless by a corrupt file instead of hanging.
-          - eventfd setters keep their own duplicate of the descriptor.
+          - Fix lost wakeups, and lost or misdelivered requests and replies.
 
 0.07      2026-08-12
-          - Fix a client receiving another client's reply. A reply copied its
-            payload into the response slot before claiming it, so a cancel and
-            re-acquire completing in that window let the copy overwrite the new
-            owner's already-published reply; the new owner then read it as its
-            own, with no error reported anywhere. A reply now takes the slot
-            before writing to it.
-          - Recover a file left behind by an interrupted create instead of
-            leaving the path unopenable.
-          - Hardening: re-entrancy with tied and overloaded arguments, and
-            DESTROY on an invocant that is not one of ours.
-          - Documentation and test-harness corrections.
-          - unlink() reports a removal that failed; one already gone is not an
-            error.
+          - Fix a client receiving another client's reply when a cancel and
+            re-acquire raced the reply.
+          - A file left by an interrupted create is recovered, not refused.
+          - Hardening against tied and overloaded arguments.
+          - unlink() reports a failed removal; a missing file is no error.
 
 0.06      2026-07-21
           - Bound a shared slot's response length before copying it.
@@ -47,38 +34,25 @@ Revision history for Data-ReqRep-Shared
       0600 (pass a file-mode argument to new() for cross-user sharing).
 
 0.04  2026-05-27
-    - slot_acquire: owner_pid CAS gates the state CAS, ACQUIRE on loads
-      (fixes recovery ABA where a fresh free+acquire could clobber a live owner)
-    - reply: re-check generation before publishing CAS and recover post-CAS
-      via gen bump (fixes TOCTOU where cancel+re-acquire could let a reply
-      land on the wrong owner's slot)
-    - slot_release: two-step CAS (owner_pid mypid->0, then state from->FREE)
-      prevents blind state-store from clobbering a freshly-acquired slot
-    - compute_layout: resp_stride in uint64 (was wrapping for resp_data_max
-      near UINT32_MAX -> replies overflowing into next slot)
-    - validate_header: reject files with resp_stride too small for slot data
-    - size(): read head before tail and clamp tail<head to 0
-    - plug mmap/fd leak in create_int / create_int_memfd on calloc OOM
+    - Fix a recovery ABA and a reply race that could clobber a live slot or
+      deliver to the wrong owner.
+    - Slot release no longer clobbers a freshly acquired slot.
+    - resp_stride is 64-bit and validated; size() clamps.
+    - create_int no longer leaks on calloc failure.
 
 
 0.03  2026-04-26
-    - arena underflow guard; init under flock
-    - strict fd validation; harden DESTROY
-    - hoist SV construction out of recv multi/drain mutex
-    - class prefix on client croaks
-    - eventfd consume returns count; MAKE OBJ macro fix
-    - idempotent eventfd; aarch64 CI matrix
+    - Arena underflow guard; init under flock; strict fd validation.
+    - Hardened DESTROY; client croaks carry the class prefix.
+    - eventfd consume returns the count; eventfd setup is idempotent.
 
 
 0.02  2026-04-12
     - Add SEE ALSO cross-links to family modules
 
 0.01  2026-04-10
-    - Initial release
-    - Str variant: mutex-protected request queue with circular arena
-    - Int variant: lock-free Vyukov MPMC request queue
-    - Per-slot futex for targeted response delivery
-    - Generation counter for ABA-safe cancel/recycle
-    - PID-based stale lock and slot recovery
-    - Dual eventfd for async EV integration
-    - File-backed, anonymous, and memfd shared memory
+    - Initial release: Str (mutex, circular arena) and Int (lock-free MPMC)
+      request queues.
+    - Per-slot futex reply delivery, generation counters, PID-based stale
+      recovery.
+    - Dual eventfd; file-backed, anonymous or memfd.

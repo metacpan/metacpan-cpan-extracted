@@ -1,6 +1,6 @@
 package IO::K8s::AgentSandbox::V1beta1::PodReadinessGate;
 # ABSTRACT: PodReadinessGate
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s conditionType => Str, { required => 'schema' };
@@ -20,7 +20,7 @@ IO::K8s::AgentSandbox::V1beta1::PodReadinessGate - PodReadinessGate
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 conditionType
 

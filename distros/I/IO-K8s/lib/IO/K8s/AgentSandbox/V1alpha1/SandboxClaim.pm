@@ -1,6 +1,6 @@
 package IO::K8s::AgentSandbox::V1alpha1::SandboxClaim;
 # ABSTRACT: Request for sandbox allocation
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::APIObject
     api_version     => 'extensions.agents.x-k8s.io/v1alpha1',
     resource_plural => 'sandboxclaims';
@@ -12,8 +12,8 @@ k8s spec => {
     },
     warmpool => Str,
     additionalPodMetadata => {
-        annotations => { Str => 1 },
-        labels      => { Str => 1 },
+        annotations => HashRef[Str],
+        labels      => HashRef[Str],
     },
     env => ['+IO::K8s::AgentSandbox::V1beta1::EnvVar'],
     lifecycle => {
@@ -44,7 +44,7 @@ IO::K8s::AgentSandbox::V1alpha1::SandboxClaim - Request for sandbox allocation
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head1 DESCRIPTION
 

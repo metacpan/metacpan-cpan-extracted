@@ -58,8 +58,18 @@ use Data::HierTimingWheel::Shared;
 # delay < 1 is treated as 1
 {
     my $tw = Data::HierTimingWheel::Shared->new(undef, 8, 2, 10);
-    $tw->add(0, 42);
-    is_deeply [$tw->advance(1)], [42], 'delay 0 fires on the next tick';
+    for my $delay (0, -1, '-2', -3.5) {
+        $tw->add($delay, 42);
+        is_deeply [$tw->advance(1)], [42], "delay $delay fires on the next tick";
+    }
+}
+
+{
+    my $tw = Data::HierTimingWheel::Shared->new(undef, 65535, 4, 1);
+    my $delay = 9223372036854775808;
+    my $id = $tw->add($delay, 42);
+    is_deeply [$tw->advance(1)], [], 'unsigned delay above IV_MAX is not clamped';
+    ok $tw->cancel($id), 'the distant timer is still pending';
 }
 
 # advance by many ticks returns everything due, in tick order
@@ -108,12 +118,36 @@ use Data::HierTimingWheel::Shared;
     is $tw->cancel($id), 0, 'cannot cancel an already-fired timer';
 }
 
+# Start a long-lived pool slot just before its generation wraps.
+{
+    my $tw = Data::HierTimingWheel::Shared->new_memfd('generation', 8, 2, 1);
+    open my $fh, '+<&', $tw->memfd or die $!;
+    binmode $fh;
+    sysseek($fh, 48, 0) == 48 or die $!;
+    sysread($fh, my $offset, 8) == 8 or die $!;
+    my $state = unpack('Q<', $offset) + 28;
+    sysseek($fh, $state, 0) == $state or die $!;
+    syswrite($fh, pack('V', 0xfffffffc)) == 4 or die $!;
+    close $fh or die $!;
+    my $old = $tw->add(1, 11);
+    ok $tw->cancel($old), 'last generation before wrap is cancellable';
+    my $id = $tw->add(1, 22);
+    is $id, 0, 'generation wrap returns a valid id';
+    is $tw->cancel($old), 0, 'pre-wrap id cannot cancel the wrapped timer';
+    is_deeply [$tw->advance], [22], 'wrapped timer fires normally';
+    my $next = $tw->add(1, 33);
+    is $tw->cancel($id), 0, 'wrapped id is stale after slot reuse';
+    ok $tw->cancel($next), 'slot remains cancellable after wrap';
+}
+
 # full pool + delay-out-of-range croak; slots reusable after firing
 {
     my $tw = Data::HierTimingWheel::Shared->new(undef, 4, 2, 3);   # max delay 4**2 - 1 = 15
     $tw->add(2, $_) for 1 .. 3;
     ok !eval { $tw->add(2, 99); 1 }, 'scheduling beyond capacity croaks';
     like $@, qr/full/, 'full-pool croak';
+    ok !eval { $tw->add(-1, 99); 1 }, 'negative delay still rejects a full pool';
+    like $@, qr/full/, 'negative delay reports the full pool';
     $tw->advance(2);                  # fire all three -> pool empties
     my $id = eval { $tw->add(1, 99) };
     ok defined($id) && !$@, 'a freed slot is reusable after firing';

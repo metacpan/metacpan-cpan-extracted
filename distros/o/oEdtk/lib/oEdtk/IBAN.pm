@@ -2,7 +2,7 @@ package oEdtk::IBAN;
 use warnings;
 use strict;
 
-our $VERSION = '2.1129';
+our $VERSION = '2.1131';
 use bigint;
 use experimental 'switch';
 use Carp    qw( carp croak );

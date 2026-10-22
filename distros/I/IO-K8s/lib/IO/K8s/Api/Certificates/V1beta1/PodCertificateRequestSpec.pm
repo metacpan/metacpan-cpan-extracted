@@ -1,6 +1,6 @@
 package IO::K8s::Api::Certificates::V1beta1::PodCertificateRequestSpec;
 # ABSTRACT: PodCertificateRequestSpec describes the certificate request. All fields are immutable after creation.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s maxExpirationSeconds => Int;
@@ -36,7 +36,7 @@ k8s signerName => Str, 'required';
 k8s stubPKCS10Request => Str;
 
 
-k8s unverifiedUserAnnotations => { Str => 1 };
+k8s unverifiedUserAnnotations => HashRef[Str];
 
 
 1;
@@ -53,7 +53,7 @@ IO::K8s::Api::Certificates::V1beta1::PodCertificateRequestSpec - PodCertificateR
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 maxExpirationSeconds
 

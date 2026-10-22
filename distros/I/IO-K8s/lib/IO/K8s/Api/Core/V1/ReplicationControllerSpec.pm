@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::ReplicationControllerSpec;
 # ABSTRACT: ReplicationControllerSpec is the specification of a replication controller.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s minReadySeconds => Int;
@@ -9,7 +9,7 @@ k8s minReadySeconds => Int;
 k8s replicas => Int;
 
 
-k8s selector => { Str => 1 };
+k8s selector => HashRef[Str];
 
 
 k8s template => 'Core::V1::PodTemplateSpec';
@@ -29,7 +29,7 @@ IO::K8s::Api::Core::V1::ReplicationControllerSpec - ReplicationControllerSpec is
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 minReadySeconds
 

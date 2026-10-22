@@ -58,6 +58,16 @@
 # Local recette / development runner scripts (not part of the distribution).
 ^run_.*\.sh$
 \.log$
+# Repository-only operational helpers, kept in git but not shipped.
+^lib/oEdtk/lib/backup_compo_lmndv\.sh$
+^lib/oEdtk/lib/backup_editique\.sh$
+^lib/oEdtk/lib/mep_compo\.sh$
+^lib/oEdtk/lib/mep_editique\.sh$
+^lib/oEdtk/lib/short_test\.sh$
+^lib/oEdtk/lib/ged_process\.pl$
+# Repository-only web front-ends and their static pages.
+^lib/oEdtk/lib/cgi-bin/
+^lib/oEdtk/lib/html/
 # Root planning documents (the shipped README.md is kept).
 ^(?!README\.md$).*\.md$
 # Runtime logs written under lib/ (also covered by .gitignore).

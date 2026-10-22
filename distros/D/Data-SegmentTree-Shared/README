@@ -65,12 +65,9 @@ DESCRIPTION
     monoids valid. "product" additionally croaks if the product of the queried
     range overflows a signed 64-bit integer.
 
-    On-disk format: the on-disk layout changes between releases (0.02 widened
-    the node to carry the assign tag and the gcd/product aggregates; 0.03
-    added the reader-slots lock's occupancy bitmap), so a file written by an
-    older release is rejected on attach -- rebuild it. These trees are
-    normally ephemeral compute structures, so this only matters if you
-    persisted one.
+    On-disk format: files written by 0.01/0.02 are rejected on attach --
+    rebuild them. These trees are normally ephemeral compute structures, so
+    this only matters if you persisted one.
 
 METHODS
   Constructors
@@ -104,8 +101,8 @@ METHODS
     and returns its new value; "range_add" adds a delta to every position in
     the inclusive range "[$l, $r]", and "range_assign" sets every position in
     the range to a constant -- each in O(log n) via lazy propagation. All
-    indices are 0-based and croak if out of range; the range forms croak if $l
-    $r>. "range_add"/"add" gate off the gcd/product monoids (see below);
+    indices are 0-based and croak if out of range; the range forms croak if
+    "$l > $r". "range_add"/"add" gate off the gcd/product monoids (see below);
     "set"/ "range_assign" do not.
 
   Queries
@@ -126,7 +123,7 @@ METHODS
     their product; both require an assign/set-only tree and croak once any
     "range_add"/"add" has run (see "Range assign and the gcd/product
     monoids"), and "product" also croaks on 64-bit overflow. Ranges croak if
-    an index is out of range or $l $r>.
+    an index is out of range or "$l > $r".
 
   Introspection and lifecycle
         $st->size;          # n, the number of positions
@@ -184,23 +181,14 @@ CRASH SAFETY
     shows as applied to some of its positions and not others, each holding its
     value from either before or after it; an interrupted "clear" reads as done
     or not done. The repair takes time proportional to "n". A writer running a
-    version of this module before 0.06, killed while pushing a pending
-    "range_add" down the tree, can leave that add applied twice to positions
-    an earlier, completed "range_add" covered. Limitation: PID reuse is not
-    detected (very unlikely in practice).
+    version before 0.07, killed during a push-down, can corrupt an earlier
+    completed update. Limitation: PID reuse is not detected (very unlikely in
+    practice).
 
-    Reader-slot exhaustion (slotless readers): dead-process recovery
-    attributes a crashed lock holder's contribution through its reader-slot.
-    The slot table holds 1024 entries (one per concurrent reader process). If
-    more than that many reader processes share one mapping at once, a reader
-    that cannot claim a slot proceeds "slotless" -- it still takes the read
-    lock but leaves no per-process record. If such a slotless reader is then
-    killed while holding the read lock, its share of the lock cannot be
-    attributed to a dead process, so writer recovery cannot reclaim it and
-    writers may block until the mapping is recreated. Reaching this needs more
-    than 1024 concurrent reader processes on one mapping plus a crash in the
-    brief read-lock window; the dead-process slot reclaim keeps the table from
-    filling with stale entries, so in practice it is very unlikely.
+    The lock has 1024 reader slots, one per handle in each process. A reader
+    that cannot claim a slot takes a read lock without a per-process record.
+    If killed while holding it, writer recovery cannot reclaim its
+    contribution and writers may block until the mapping is recreated.
 
     An interrupted create is recovered too. A creator killed after the backing
     file is sized but before its header is committed leaves a full-size,

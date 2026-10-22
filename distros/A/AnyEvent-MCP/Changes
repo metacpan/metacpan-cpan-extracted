@@ -1,0 +1,15 @@
+Revision history for AnyEvent::MCP
+
+0.61  Thu 22 Oct 2026 08:57:42 CEST
+	- resolve bind hostnames via AnyEvent::Socket instead of Socket::getaddrinfo.
+	- honor user-selected file permissions and preserve them across replacements.
+	- fix permission test fixture grants.
+	- fix activity log timestamp formatting on older perl versions.
+	- correct multibroker test tool count (including meta-instructions).
+	- fix perl 5.12 syntax errors in mcp-fs and mcp-vim.
+
+0.6  Wed 21 Oct 2026 20:43:20 CEST
+	- 34k LOC of pure llm madness. but seems to work. yay.
+
+0.0  Sat 03 Oct 2026 07:29:39 CEST
+	- original version, an AnyEvent::HTTP clone.

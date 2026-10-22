@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1::FortanixProvider;
 # ABSTRACT: Fortanix configures this store to sync secrets using the Fortanix provider
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s apiKey => '+IO::K8s::ExternalSecrets::V1::FortanixProviderSecretRef';
@@ -22,7 +22,7 @@ IO::K8s::ExternalSecrets::V1::FortanixProvider - Fortanix configures this store 
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 apiKey
 

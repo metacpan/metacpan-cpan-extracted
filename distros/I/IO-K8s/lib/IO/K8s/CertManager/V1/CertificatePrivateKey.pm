@@ -1,6 +1,6 @@
 package IO::K8s::CertManager::V1::CertificatePrivateKey;
 # ABSTRACT: Private key options.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s algorithm      => Str, { enum => [qw(RSA ECDSA Ed25519)] };
@@ -26,7 +26,7 @@ IO::K8s::CertManager::V1::CertificatePrivateKey - Private key options.
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 algorithm
 

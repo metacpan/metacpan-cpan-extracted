@@ -3,7 +3,7 @@ use strictures 1;
 use warnings::illegalproto ();
 use Moo::Role ();
 
-our $VERSION = '0.033';
+our $VERSION = '0.034';
 
 sub import {
   my ($class, $app_package) = @_;

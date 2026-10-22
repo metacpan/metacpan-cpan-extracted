@@ -1,6 +1,6 @@
 package IO::K8s::Cilium::V2::IPAMPoolDemand;
 # ABSTRACT: Needed indicates how many IPs out of the above Pool this node requests from the operator.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s 'ipv4-addrs' => Int;
@@ -22,7 +22,7 @@ IO::K8s::Cilium::V2::IPAMPoolDemand - Needed indicates how many IPs out of the a
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 ipv4-addrs
 

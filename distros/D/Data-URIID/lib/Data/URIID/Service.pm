@@ -21,8 +21,9 @@ use Data::Identifier::Generate v0.25;
 
 use Data::URIID::Result;
 use Data::URIID::Colour;
+use Data::URIID::Request;
 
-our $VERSION = v0.25;
+our $VERSION = v0.26;
 
 use parent 'Data::URIID::Base';
 
@@ -767,23 +768,31 @@ sub _is_online {
 sub _online_lookup {
     my ($self, $result, %opts) = @_;
     my $func;
+    my $res;
 
     return undef unless $self->_is_online;
     $func = $self->can(sprintf('_online_lookup__%s', $self->name =~ tr/\.:\-/_/r));
     return undef unless $func;
 
-    return $self->$func($result, %opts);
+    $res = $self->$func($result, %opts);
+    Data::URIID::Request->_construct(result => $result, service => $self, online => 1, pass => $opts{pass}, structured => $res);
+
+    return $res;
 }
 
 # Private method:
 sub _offline_lookup {
     my ($self, $result, %opts) = @_;
     my $func;
+    my $res;
 
     $func = $self->can(sprintf('_offline_lookup__%s', $self->name =~ tr/\.:\-/_/r));
     return undef unless $func;
 
-    return $self->$func($result, %opts);
+    $res = $self->$func($result, %opts);
+    Data::URIID::Request->_construct(result => $result, service => $self, online => 0, pass => $opts{pass}, structured => $res);
+
+    return $res;
 }
 
 
@@ -894,6 +903,7 @@ sub _get_html {
             my $r = HTML::TreeBuilder::XPath->new;
             $r->parse(decode($msg->content_charset, $$val));
             $r->eof;
+            Data::URIID::Request->_construct(result => $opts{result}, service => $self, online => 1, pass => $opts{pass}, request_url => $url, actual_url => $url, response => $msg, raw_data => $val, decoded_data => $r);
             $r;
         };
     } else {
@@ -920,7 +930,7 @@ sub _get_json {
                 $path =~ s/%s/uri_escape_utf8(shift(@args))/ge;
                 $path = $local_override_dir.'/'.$path;
 
-                $data = $self->_get_json_file($path);
+                $data = $self->_get_json_file($path, %opts, request_url => (defined $opts{query} ? undef : $url));
                 return $data if defined $data;
             }
         }
@@ -936,20 +946,28 @@ sub _get_json {
         my $msg = $extractor->_ua->get($url, 'Accept' => 'application/json');
         return undef unless $msg->is_success;
         my $val = $msg->decoded_content(ref => 1, charset => 'none');
-        from_json(decode($msg->content_charset, $$val));
+        my $json = eval { from_json(decode($msg->content_charset, $$val)) };
+        Data::URIID::Request->_construct(result => $opts{result}, service => $self, online => 1, pass => $opts{pass}, request_url => $url, actual_url => $url, response => $msg, raw_data => $val, decoded_data => $json);
+        $json
     };
 }
 
 # Private helper:
 sub _get_json_file {
-    my ($self, $filename) = @_;
-    my $fh = eval { open(my $fh, '<', $filename) or die $!; $fh; } // eval { open(my $fh, '<:gzip', $filename.'.gz') or die $!; $fh; };
+    my ($self, $filename, %opts) = @_;
+    my $fh = eval { open(my $fh, '<', $filename) or die $!; $fh; } // eval { open(my $fh, '<:gzip', $filename.'.gz') or die $!; $filename .= '.gz'; $fh; };
 
     return undef unless $fh;
 
     return eval {
-        local $/ = undef;
-        from_json(scalar <$fh>);
+        my $val = do {
+            local $/ = undef;
+            scalar <$fh>;
+        };
+        my $json = from_json($val);
+        require URI::file;
+        Data::URIID::Request->_construct(result => $opts{result}, service => $self, online => $opts{online}, pass => $opts{pass}, request_url => $opts{request_url}, actual_url => URI::file->new_abs($filename), raw_data => $val, decoded_data => $json);
+        return $json;
     };
 }
 
@@ -1099,32 +1117,32 @@ sub _offline_lookup__Data__Identifier {
 }
 
 sub _online_lookup__wikidata {
-    my ($self, $result) = @_;
-    return _online_lookup__wikibase($self, $result, $config_wikidata);
+    my ($self, $result, %opts) = @_;
+    return _online_lookup__wikibase($self, $result, $config_wikidata, %opts);
 }
 
 sub _online_lookup__factgrid {
-    my ($self, $result) = @_;
-    return _online_lookup__wikibase($self, $result, $config_factgrid);
+    my ($self, $result, %opts) = @_;
+    return _online_lookup__wikibase($self, $result, $config_factgrid, %opts);
 }
 
 sub _online_lookup__wikibase {
-    my ($self, $result, $config) = @_;
+    my ($self, $result, $config, %opts) = @_;
     my $id = eval {$result->id($config->{type})};
 
     unless (defined $id) {
-        $id = $self->_online_lookup__wikibase__stage_0($result, $config);
+        $id = $self->_online_lookup__wikibase__stage_0($result, $config, %opts);
     }
 
     if (defined $id) {
-        return $self->_online_lookup__wikibase__stage_1($result, $id, $config);
+        return $self->_online_lookup__wikibase__stage_1($result, $id, $config, %opts);
     }
 
     return undef;
 }
 
 sub _online_lookup__wikibase__stage_0 {
-    my ($self, $result, $config) = @_;
+    my ($self, $result, $config, %opts) = @_;
     my @ids;
 
     foreach my $property (keys %{$config->{idmap}}) {
@@ -1157,7 +1175,7 @@ sub _online_lookup__wikibase__stage_0 {
 
     {
         my $q = sprintf('SELECT * WHERE { { %s } } LIMIT 1', join('} UNION {', @ids));
-        my $res = $self->_get_json($config->{endpoint}{sparql}, query => {format => 'json', query => $q});
+        my $res = $self->_get_json($config->{endpoint}{sparql}, query => {format => 'json', query => $q}, result => $result, %opts);
         my $item = eval {$res->{results}{bindings}[0]{item}};
         return undef unless $item;
         return undef unless ($item->{type} // '') eq 'uri';
@@ -1170,11 +1188,11 @@ sub _online_lookup__wikibase__stage_0 {
 }
 
 sub _online_lookup__wikibase__stage_1 {
-    my ($self, $result, $id, $config) = @_;
+    my ($self, $result, $id, $config, %opts) = @_;
     my %ids = ($config->{type} => $id);
     my %attr;
     my %res = (id => \%ids, attributes => \%attr);
-    my $data = $self->_get_json(sprintf($config->{endpoint}{entitydata}, $id), local_override => ['%s.json', $id]);
+    my $data = $self->_get_json(sprintf($config->{endpoint}{entitydata}, $id), local_override => ['%s.json', $id], result => $result, %opts);
 
     $data = $data->{entities}{$id};
 
@@ -1262,7 +1280,7 @@ sub _online_lookup__wikibase__from_service__coordinate {
 }
 
 sub _online_lookup__wikimedia_commons {
-    my ($self, $result) = @_;
+    my ($self, $result, %opts) = @_;
     my $res = {
         'attributes' => {},
     };
@@ -1275,7 +1293,7 @@ sub _online_lookup__wikimedia_commons {
             iiprop      => 'url|mime|size|sha1|canonicaltitle',
             iiurlwidth  => 240, # get thumbnail
             format      => 'json'
-        });
+        }, result => $result, %opts);
 
     foreach my $page_id ( keys(%{ $json->{query}->{pages} }) ) { # only one item
         my $page = $json->{query}->{pages}->{$page_id};
@@ -1292,12 +1310,12 @@ sub _online_lookup__wikimedia_commons {
 }
 
 sub _online_lookup__fellig {
-    my ($self, $result) = @_;
+    my ($self, $result, %opts) = @_;
     my Data::URIID $extractor = $self->extractor;
 
     foreach my $type (@fellig_types) {
         my $id = eval {$result->id($type, _no_convert => 1)} // next;
-        my $json = $self->_get_json(sprintf('https://api.fellig.org/v0/overview/%s/%s', $type, uri_escape($id)), local_override => ['overview/%s/%s.json', $type, $id]) // next;
+        my $json = $self->_get_json(sprintf('https://api.fellig.org/v0/overview/%s/%s', $type, uri_escape($id)), local_override => ['overview/%s/%s.json', $type, $id], result => $result, %opts) // next;
 
         foreach my $idx (@{$json->{main_result}}) {
             my $tag = $json->{tags}[$idx];
@@ -1339,11 +1357,11 @@ sub _online_lookup__fellig {
 }
 
 sub _online_lookup__noembed_com {
-    my ($self, $result) = @_;
+    my ($self, $result, %opts) = @_;
 
     foreach my $service (qw(youtube)) {
         my $url = eval {$result->url(service => $service, action => 'render')} // eval {$result->url($service, action => 'embed')} // next;
-        my $json = $self->_get_json('https://noembed.com/embed', query => {url => $url}) // next;
+        my $json = $self->_get_json('https://noembed.com/embed', query => {url => $url}, result => $result, %opts) // next;
         my %attr;
         my %res = (attributes => \%attr);
 
@@ -1389,11 +1407,11 @@ sub _online_lookup__osm__handle {
 }
 
 sub _online_lookup__osm {
-    my ($self, $result) = @_;
+    my ($self, $result, %opts) = @_;
 
     foreach my $type (qw(node way relation)) {
         my $id = eval {$result->id('osm-'.$type)} // next;
-        my $json = $self->_get_json(sprintf('https://api.openstreetmap.org/api/0.6/%s/%s.json', $type, $id), local_override => ['%s/%s.json', $type, $id]) // next;
+        my $json = $self->_get_json(sprintf('https://api.openstreetmap.org/api/0.6/%s/%s.json', $type, $id), local_override => ['%s/%s.json', $type, $id], result => $result, %opts) // next;
         my $element = eval {$json->{elements}[0]} // return undef;
         return $self->_online_lookup__osm__handle($element);
     }
@@ -1402,13 +1420,13 @@ sub _online_lookup__osm {
 }
 
 sub _online_lookup__overpass {
-    my ($self, $result) = @_;
+    my ($self, $result, %opts) = @_;
     my $id = $result->id('wikidata-identifier');
     my $json = $self->_get_json('https://overpass-api.de/api/interpreter', query => {
             data => sprintf("[out:json][timeout:25];\n(node[\"wikidata\"=\"%s\"];\nway[\"wikidata\"=\"%s\"];\nrelation[\"wikidata\"=\"%s\"];\n);\nout;",
                 $id, $id, $id,
             ),
-        }) // return undef;
+        }, result => $result, %opts) // return undef;
     my $element = eval {$json->{elements}[0]} // return undef;
     my $res = $self->_online_lookup__osm__handle($element);
     my $type = $element->{type} // '';
@@ -1426,7 +1444,7 @@ sub _online_lookup__overpass {
 sub _online_lookup__xkcd {
     my ($self, $result, %opts) = @_;
     my $id = eval {$result->id('xkcd-num')};
-    my $json = $self->_get_json($opts{metadata_url} // $result->url(service => 'xkcd', action => 'metadata'), local_override => ['%s.json', $id]) // return undef;
+    my $json = $self->_get_json($opts{metadata_url} // $result->url(service => 'xkcd', action => 'metadata'), local_override => ['%s.json', $id], result => $result, %opts) // return undef;
     my %ids;
     my %attr;
     my %res = (id => \%ids, attributes => \%attr);
@@ -1498,7 +1516,7 @@ sub _online_lookup__e621 {
 sub _online_lookup__danbooru2chanjp {
     my ($self, $result, %opts) = @_;
     my $url = $result->url(service => 'danbooru2chanjp', action => 'info');
-    my $html = $self->_get_html($url) // return undef;
+    my $html = $self->_get_html($url, result => $result, %opts) // return undef;
     my $json = from_json(((($html->findnodes('//script[@id="metadata" and @type="application/json"]'))[0] // return undef)->content_list)[0]);
     my %attr;
     my %digest;
@@ -1535,7 +1553,7 @@ sub _online_lookup__danbooru2chanjp {
 
 sub _online_lookup__furaffinity {
     my ($self, $result, %opts) = @_;
-    my $html = $self->_get_html($result->url(service => 'furaffinity', action => 'info')) // return undef;
+    my $html = $self->_get_html($result->url(service => 'furaffinity', action => 'info'), result => $result, %opts) // return undef;
     my %attr;
     my %res = (attributes => \%attr);
     my %raw = map {$_->attr('property') => $_->attr('content')} $html->findnodes('/html/head/meta[@property]');
@@ -1559,7 +1577,7 @@ sub _online_lookup__furaffinity {
 
 sub _online_lookup__imgur {
     my ($self, $result, %opts) = @_;
-    my $html = $self->_get_html($result->url(service => 'imgur', action => 'info')) // return undef;
+    my $html = $self->_get_html($result->url(service => 'imgur', action => 'info'), result => $result, %opts) // return undef;
     my %attr;
     my %res = (attributes => \%attr);
     my %raw = map {$_->attr('name') => $_->attr('content')} $html->findnodes('/html/head/meta[@name]');
@@ -1577,7 +1595,7 @@ sub _online_lookup__imgur {
 
 sub _online_lookup__notalwaysright {
     my ($self, $result, %opts) = @_;
-    my $html = $self->_get_html($result->url(service => 'notalwaysright', action => 'info')) // return undef;
+    my $html = $self->_get_html($result->url(service => 'notalwaysright', action => 'info'), result => $result, %opts) // return undef;
     my %attr;
     my %res = (attributes => \%attr);
     my %raw = map {$_->attr('property') => $_->attr('content')} $html->findnodes('/html/head/meta[@property]');
@@ -1598,7 +1616,7 @@ sub _online_lookup__notalwaysright {
 
 sub _online_lookup__ruthede {
     my ($self, $result, %opts) = @_;
-    my $html = $self->_get_html($result->url(service => 'ruthede', action => 'info')) // return undef;
+    my $html = $self->_get_html($result->url(service => 'ruthede', action => 'info'), result => $result, %opts) // return undef;
     my %attr;
     my %res = (attributes => \%attr);
 
@@ -1618,7 +1636,7 @@ sub _online_lookup__ruthede {
 
 sub _online_lookup__denkxweb_hessen {
     my ($self, $result, %opts) = @_;
-    my $html = $self->_get_html($result->url(service => 'denkxweb-hessen', action => 'info')) // return undef;
+    my $html = $self->_get_html($result->url(service => 'denkxweb-hessen', action => 'info'), result => $result, %opts) // return undef;
     my %attr;
     my %res = (attributes => \%attr);
     my %attr_map = (
@@ -1640,7 +1658,7 @@ sub _online_lookup__denkxweb_hessen {
 
 sub _online_lookup__ibbco {
     my ($self, $result, %opts) = @_;
-    my $html = $self->_get_html($result->url(service => 'ibbco', action => 'info')) // return undef;
+    my $html = $self->_get_html($result->url(service => 'ibbco', action => 'info'), result => $result, %opts) // return undef;
     my %attr;
     my %res = (attributes => \%attr);
 
@@ -1676,7 +1694,7 @@ Data::URIID::Service - Extractor for identifiers from URIs
 
 =head1 VERSION
 
-version v0.25
+version v0.26
 
 =head1 SYNOPSIS
 

@@ -1,6 +1,6 @@
 package IO::K8s::Traefik::V1alpha1::RouterObservabilityConfig;
 # ABSTRACT: Observability defines the observability configuration for a router.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s accessLogs     => Bool;
@@ -26,7 +26,7 @@ IO::K8s::Traefik::V1alpha1::RouterObservabilityConfig - Observability defines th
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 accessLogs
 

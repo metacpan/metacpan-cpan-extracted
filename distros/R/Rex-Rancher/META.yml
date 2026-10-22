@@ -16,49 +16,49 @@ name: Rex-Rancher
 provides:
   Rex::Rancher:
     file: lib/Rex/Rancher.pm
-    version: '0.003'
+    version: '0.004'
   Rex::Rancher::Agent:
     file: lib/Rex/Rancher/Agent.pm
-    version: '0.003'
+    version: '0.004'
   Rex::Rancher::Checksum:
     file: lib/Rex/Rancher/Checksum.pm
-    version: '0.003'
+    version: '0.004'
   Rex::Rancher::Cilium:
     file: lib/Rex/Rancher/Cilium.pm
-    version: '0.003'
+    version: '0.004'
   Rex::Rancher::Distribution:
     file: lib/Rex/Rancher/Distribution.pm
-    version: '0.003'
+    version: '0.004'
   Rex::Rancher::Distribution::K3s:
     file: lib/Rex/Rancher/Distribution/K3s.pm
-    version: '0.003'
+    version: '0.004'
   Rex::Rancher::Distribution::RKE2:
     file: lib/Rex/Rancher/Distribution/RKE2.pm
-    version: '0.003'
+    version: '0.004'
   Rex::Rancher::K8s:
     file: lib/Rex/Rancher/K8s.pm
-    version: '0.003'
+    version: '0.004'
   Rex::Rancher::Node:
     file: lib/Rex/Rancher/Node.pm
-    version: '0.003'
+    version: '0.004'
   Rex::Rancher::Options:
     file: lib/Rex/Rancher/Options.pm
-    version: '0.003'
+    version: '0.004'
   Rex::Rancher::Server:
     file: lib/Rex/Rancher/Server.pm
-    version: '0.003'
+    version: '0.004'
   Rex::Rancher::Uninstall:
     file: lib/Rex/Rancher/Uninstall.pm
-    version: '0.003'
+    version: '0.004'
 recommends:
-  Rex::GPU: '0.002'
-  Rex::LibSSH: '0.004'
+  Rex::GPU: '0.004'
+  Rex::LibSSH: '0.005'
 requires:
   HTTP::Tiny: '0'
-  IO::K8s: '1.109'
+  IO::K8s: '1.111'
   IO::Socket::SSL: '0'
   JSON::MaybeXS: '0'
-  Kubernetes::REST: '1.109'
+  Kubernetes::REST: '1.110'
   Module::Runtime: '0'
   Moo: '0'
   Rex: v1.14.0
@@ -69,7 +69,7 @@ resources:
   bugtracker: https://github.com/Getty/rex-rancher/issues
   homepage: https://github.com/Getty/rex-rancher
   repository: https://github.com/Getty/rex-rancher.git
-version: '0.003'
+version: '0.004'
 x_Dist_Zilla:
   perl:
     version: '5.040001'
@@ -349,7 +349,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.003'
+          tag: '0.004'
           tag_format: '%v'
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:

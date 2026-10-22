@@ -38,36 +38,51 @@ use Data::Reservoir::Shared;
 # A(w=1) vs B(w=3) -> P(B) = 3/4.  One seeded stream, cleared between trials
 # (advancing the RNG genuinely decorrelates trials -- per-trial reseeding with a
 # weak multiplier does NOT).  Tight bound (~6 sigma at N=8000).
-{
+for my $scale (1, 0.0001) {
     my $z = Data::Reservoir::Shared->new_weighted(undef, 1, 8);
     $z->seed(2654435761);
     my ($b, $N) = (0, 8000);
     for (1 .. $N) {
         $z->clear;
-        $z->add("A", 1);
-        $z->add("B", 3);
+        $z->add("A", $scale);
+        $z->add("B", 3 * $scale);
         my @s = $z->sample;
         $b++ if @s == 1 && $s[0] eq "B";
     }
     my $p = $b / $N;
-    cmp_ok $p, '>=', 0.72, "k=1: P(B|w=3) >= 0.72 (got $p)";
-    cmp_ok $p, '<=', 0.78, "k=1: P(B|w=3) <= 0.78 (got $p)";
+    cmp_ok $p, '>=', 0.72, "k=1 scale $scale: P(B|w=3) >= 0.72 (got $p)";
+    cmp_ok $p, '<=', 0.78, "k=1 scale $scale: P(B|w=3) <= 0.78 (got $p)";
 }
 
 # equal weights degrade to uniform: P(B) = 1/2
-{
+for my $weight (2.5, 0.0001) {
     my $z = Data::Reservoir::Shared->new_weighted(undef, 1, 8);
     $z->seed(1013904223);
     my ($b, $N) = (0, 8000);
     for (1 .. $N) {
         $z->clear;
-        $z->add("A", 2.5);
-        $z->add("B", 2.5);
+        $z->add("A", $weight);
+        $z->add("B", $weight);
         my @s = $z->sample;
         $b++ if @s == 1 && $s[0] eq "B";
     }
     my $p = $b / $N;
-    cmp_ok abs($p - 0.5), '<', 0.04, "k=1 equal weights ~ uniform (got $p)";
+    cmp_ok abs($p - 0.5), '<', 0.04, "k=1 equal weights $weight ~ uniform (got $p)";
+}
+
+# A common weight scale must not change the sample, including normalized weights.
+for my $method (qw(add add_many)) {
+    my @samples;
+    for my $scale (1, 0.0001, 1_000_000) {
+        my $r = Data::Reservoir::Shared->new_weighted(undef, 64, 16);
+        $r->seed(12345);
+        my @pairs = map { ["s$_", (1 + $_ % 17) * $scale] } 1 .. 500;
+        if ($method eq 'add_many') { $r->add_many(\@pairs) }
+        else { $r->add(@$_) for @pairs }
+        push @samples, [sort $r->sample];
+    }
+    is_deeply $samples[1], $samples[0], "$method: normalized weights preserve the sample";
+    is_deeply $samples[2], $samples[0], "$method: enlarged weights preserve the sample";
 }
 
 # heavy items dominate: aggregate keep-frequency of heavy >> light
@@ -101,19 +116,19 @@ use Data::Reservoir::Shared;
 # add_many actually plumbs each pair's weight (not silently treating them as 1):
 # same A(w=1) vs B(w=3) -> P(B) ~ 3/4 oracle as the k=1 add() test, but fed through
 # add_many.  If weights were misread as 1, P(B) would collapse to ~1/2 and fail.
-{
+for my $scale (1, 0.0001) {
     my $z = Data::Reservoir::Shared->new_weighted(undef, 1, 8);
     $z->seed(2654435761);
     my ($b, $N) = (0, 8000);
     for (1 .. $N) {
         $z->clear;
-        $z->add_many([ ["A", 1], ["B", 3] ]);
+        $z->add_many([ ["A", $scale], ["B", 3 * $scale] ]);
         my @s = $z->sample;
         $b++ if @s == 1 && $s[0] eq "B";
     }
     my $p = $b / $N;
-    cmp_ok $p, '>=', 0.72, "add_many k=1: P(B|w=3) >= 0.72 (got $p)";
-    cmp_ok $p, '<=', 0.78, "add_many k=1: P(B|w=3) <= 0.78 (got $p)";
+    cmp_ok $p, '>=', 0.72, "add_many k=1 scale $scale: P(B|w=3) >= 0.72 (got $p)";
+    cmp_ok $p, '<=', 0.78, "add_many k=1 scale $scale: P(B|w=3) <= 0.78 (got $p)";
 }
 
 # error handling (all croak BEFORE taking the lock)
@@ -160,6 +175,30 @@ use Data::Reservoir::Shared;
         my $r2 = Data::Reservoir::Shared->new_from_fd($fd);
         ok $r2->is_weighted, 'new_from_fd sees the weighted mode';
     }
+}
+
+# Earlier weighted keys cannot be mixed with logarithmic keys.
+{
+    my $dir = File::Temp::tempdir(CLEANUP => 1);
+    my $path = "$dir/legacy.rsv";
+    { my $r = Data::Reservoir::Shared->new_weighted($path, 3, 16); $r->add("saved", 1) }
+    open my $fh, '+<:raw', $path or die $!;
+    seek $fh, 4, 0 or die $!;
+    read $fh, my $version, 4;
+    is unpack('V', $version), 3, 'weighted files use the logarithmic key version';
+    seek $fh, 4, 0 or die $!;
+    print {$fh} pack('V', 2);
+    $fh->flush or die $!;
+    seek $fh, 0, 0 or die $!;
+    my $before = do { local $/; <$fh> };
+    eval { Data::Reservoir::Shared->new_weighted($path, 3, 16) };
+    like $@, qr/invalid reservoir/, 'legacy weighted file rejected';
+    eval { Data::Reservoir::Shared->new_from_fd(fileno $fh) };
+    like $@, qr/invalid reservoir/, 'legacy weighted descriptor rejected';
+    eval { Data::Reservoir::Shared->new($path, 3, 16) };
+    like $@, qr/invalid reservoir/, 'uniform constructor also rejects legacy weighted keys';
+    seek $fh, 0, 0 or die $!;
+    is do { local $/; <$fh> }, $before, 'rejected legacy file remains unchanged';
 }
 
 # clear empties a weighted reservoir

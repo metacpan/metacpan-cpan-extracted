@@ -396,7 +396,7 @@ static inline GraphHandle *graph_setup(void *base, size_t map_size,
     }
     h->hdr          = hdr;
     /* Snapshot the geometry ONCE and re-verify it against the mapping before
-     * caching anything: a write-peer can flip max_nodes/max_edges/*_off in the
+     * caching anything: a write-peer can flip capacities/offsets in the
      * window between graph_validate_header and here (graph_open_fd holds no
      * lock at all), so the earlier validation does not pin what we cache.
      * Offsets are then RECOMPUTED from the trusted layout rather than read from
@@ -534,7 +534,9 @@ static GraphHandle *graph_create(const char *path, uint32_t max_nodes, uint32_t 
     } else {
         fd = graph_secure_open(path, mode, errbuf);
         if (fd < 0) return NULL;
-        if (flock(fd, LOCK_EX) < 0) { GRAPH_ERR("flock: %s", strerror(errno)); close(fd); return NULL; }
+        int lock_rc;
+        do lock_rc = flock(fd, LOCK_EX); while (lock_rc < 0 && errno == EINTR);
+        if (lock_rc < 0) { GRAPH_ERR("flock: %s", strerror(errno)); close(fd); return NULL; }
         struct stat st;
         if (fstat(fd, &st) < 0) { GRAPH_ERR("fstat: %s", strerror(errno)); flock(fd, LOCK_UN); close(fd); return NULL; }
         int is_new = (st.st_size == 0);

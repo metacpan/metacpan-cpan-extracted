@@ -38,6 +38,7 @@ for my $c (0 .. $kids - 1) {
 waitpid $_, 0 for @pids;
 
 is $it->count, $cap, "count == grand total ($cap): no lost appends across children";
+is $it->stats->{ops}, $cap, 'operation count has no lost updates across writers';
 
 # exactly the $kids probe-spanning intervals contain $PROBE
 my @at = $it->stab($PROBE);

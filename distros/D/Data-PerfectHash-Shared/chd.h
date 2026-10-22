@@ -52,9 +52,9 @@ static void ph_builder_add_int(PhBuilder *b, int64_t k) {
     b->ints[b->nint++] = k;
 }
 static void ph_builder_add_str(PhBuilder *b, const void *k, size_t len) {
-    if (b->arena_len + len > b->arena_cap) {
-        size_t newcap = b->arena_cap;
-        while (newcap < b->arena_len + len) newcap = newcap ? newcap*2 : 4096;
+    if (!b->arena || b->arena_len + len > b->arena_cap) {
+        size_t newcap = b->arena_cap ? b->arena_cap : 4096;
+        while (newcap < b->arena_len + len) newcap *= 2;
         uint8_t *p = (uint8_t*)realloc(b->arena, newcap);
         if (!p) croak("out of memory");
         b->arena = p; b->arena_cap = newcap;
@@ -266,8 +266,16 @@ static int ph_build(PhBuilder *b, const char *path, mode_t mode, char *err, size
     if (fd < 0) { snprintf(err,el,"mkstemp %s: %s", tmp, strerror(errno)); free(tmp); PHB_FREEALL(); return -1; }
     int rc = 0;
     if (fchmod(fd, mode) != 0) { snprintf(err,el,"fchmod: %s", strerror(errno)); rc=-1; }
-    else { size_t off=0; while(off<file_size){ ssize_t w=write(fd,img+off,file_size-off); if(w<=0){snprintf(err,el,"write: %s",strerror(errno)); rc=-1; break;} off+=w; } }
-    close(fd);
+    else {
+        size_t off = 0;
+        while (off < file_size) {
+            ssize_t w = write(fd, img + off, file_size - off);
+            if (w < 0 && errno == EINTR) continue;
+            if (w <= 0) { snprintf(err,el,"write: %s",strerror(w == 0 ? EIO : errno)); rc=-1; break; }
+            off += w;
+        }
+    }
+    if (close(fd) != 0 && rc == 0) { snprintf(err,el,"close: %s",strerror(errno)); rc=-1; }
     if (rc==0 && rename(tmp, path) != 0) { snprintf(err,el,"rename %s: %s", path, strerror(errno)); rc=-1; }
     if (rc!=0) unlink(tmp);            /* leave no partial temp on failure */
     free(tmp);

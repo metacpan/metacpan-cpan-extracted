@@ -1,7 +1,7 @@
 package Data::MinHash::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 require XSLoader;
 XSLoader::load('Data::MinHash::Shared', $VERSION);
 
@@ -228,8 +228,8 @@ the mapping.
 =head1 CRASH SAFETY
 
 Mutation is guarded by a futex-based write-preferring rwlock with PID-encoded
-ownership and dead-owner recovery. Each C<add> is a short bounded update, so a
-crash leaves the sketch consistent up to the last completed operation.
+ownership and dead-owner recovery. A crash can leave the current mutation
+partially applied.
 B<Limitation>: PID reuse is not detected (very unlikely in practice).
 
 Reader-slot exhaustion (slotless readers): dead-process recovery attributes a

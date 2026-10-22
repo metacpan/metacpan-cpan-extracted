@@ -18,8 +18,10 @@ xt/enospc.t
 xt/fork_rsv.t
 xt/kwalitee.t
 xt/pod.t
+xt/reserve.t
 xt/sift_kill.t
 xt/tsan.t
 xt/valgrind.t
+t/unlink-chdir.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

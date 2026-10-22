@@ -1,0 +1,3 @@
+application:
+  port: 8081
+# Exercise the provider's configured merge policy; do not assume whole-map replacement.

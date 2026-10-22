@@ -1,6 +1,6 @@
 package IO::K8s::Traefik::V1alpha1::TraefikServiceSpec;
 # ABSTRACT: TraefikServiceSpec defines the desired state of a TraefikService.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s failover            => '+IO::K8s::Traefik::V1alpha1::Failover';
@@ -26,7 +26,7 @@ IO::K8s::Traefik::V1alpha1::TraefikServiceSpec - TraefikServiceSpec defines the 
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 failover
 

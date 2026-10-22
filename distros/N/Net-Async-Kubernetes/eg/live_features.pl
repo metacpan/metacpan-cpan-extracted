@@ -6,6 +6,7 @@ use v5.20;
 use Getopt::Long qw(GetOptions);
 use File::Temp qw(tempfile);
 use IO::Async::Loop;
+use Net::Async::HTTP;
 use Net::Async::Kubernetes;
 
 my %opt = (
@@ -142,33 +143,33 @@ run_step('attach()', sub {
     die "attach did not open" unless $opened;
 });
 
-run_step('port_forward()', sub {
-    my $done = $loop->new_future;
-    my $opened = 0;
-    my $status = '';
-
-    $kube->port_forward('Pod', $pod_name,
+# port_forward_listen() on local port 0 (the system picks a free one), then a
+# real HTTP request through the forward. The pod must have an HTTP server
+# listening on --port (default 80), e.g. nginx; a pod without one makes the
+# step fail with the Kubelet's connection error from the error channel.
+run_step('port_forward_listen() + HTTP GET through the forward', sub {
+    my @errors;
+    my $listener = $kube->port_forward_listen('Pod', $pod_name,
         namespace => $opt{namespace},
-        ports     => [$opt{port}],
-        on_open   => sub {
-            my ($session) = @_;
-            $opened = 1;
-            $session->close(code => 1000);
-        },
-        on_frame  => sub {
-            my ($ch, $payload) = @_;
-            $status .= $payload if $ch == 3;
-        },
-        on_close  => sub { $done->done unless $done->is_ready; },
-        on_error  => sub {
-            my ($err) = @_;
-            $done->fail($err) unless $done->is_ready;
-        },
+        ports     => { 0 => $opt{port} },
+        on_error  => sub { push @errors, $_[0] },
     )->get;
 
-    $done->get;
-    die "port_forward did not open" unless $opened;
-    say "port_forward status: $status" if length $status;
+    my $local = $listener->port_for($opt{port});
+    say "forwarding 127.0.0.1:$local -> pod port $opt{port}";
+
+    my $http = Net::Async::HTTP->new;
+    $loop->add($http);
+    my $response = eval {
+        $http->GET("http://127.0.0.1:$local/")->get;
+    };
+    my $err = $@;
+    $listener->stop;
+    $loop->remove($http);
+
+    die "request through the forward failed: $err" if $err;
+    die "forward reported: " . join('; ', @errors) if @errors;
+    say "HTTP status line: " . $response->code . " " . ($response->message // '');
 });
 
 run_step('cp_to_pod()/cp_from_pod()', sub {

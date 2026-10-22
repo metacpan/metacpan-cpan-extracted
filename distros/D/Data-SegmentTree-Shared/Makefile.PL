@@ -13,7 +13,7 @@ WriteMakefile(
     AUTHOR             => 'vividsnow',
     LICENSE            => 'perl_5',
     MIN_PERL_VERSION   => '5.022',
-    LIBS               => [''],
+    LIBS               => ['-lpthread'],
     DEFINE             => '-D_GNU_SOURCE',
     # -fwrapv: sum/min/max do intentional two's-complement wraparound on signed
     # int64 (documented in the POD); make it defined behaviour, not UB.  Preserve

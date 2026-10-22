@@ -1,10 +1,10 @@
 package IO::K8s::CertManager::V1::CertificateRequestSpec;
 # ABSTRACT: Specification of the desired state of the CertificateRequest resource.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s duration  => Str;
-k8s extra     => Opaque;
+k8s extra     => HashRef[ArrayRef[Str]];
 k8s groups    => [Str];
 k8s isCA      => Bool;
 k8s issuerRef => '+IO::K8s::CertManager::V1::IssuerReference', { required => 'schema' };
@@ -36,7 +36,7 @@ IO::K8s::CertManager::V1::CertificateRequestSpec - Specification of the desired 
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 duration
 

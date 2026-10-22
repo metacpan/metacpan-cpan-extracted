@@ -244,7 +244,7 @@ subtest 'list and watch send the selectors exactly' => sub {
         { fieldSelector => [$selector], labelSelector => ['app=web'] },
         'list: both selectors arrive exactly');
     is_deeply(eval { server_query($io->urls->[1]) } // $@,
-        { fieldSelector => [$selector], labelSelector => ['app=web'],
+        { allowWatchBookmarks => ['true'], fieldSelector => [$selector], labelSelector => ['app=web'],
           timeoutSeconds => ['5'], watch => ['true'] },
         'watch: the selectors arrive exactly, and so does everything after them');
 };

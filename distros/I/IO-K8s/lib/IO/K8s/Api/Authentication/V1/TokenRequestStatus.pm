@@ -1,6 +1,6 @@
 package IO::K8s::Api::Authentication::V1::TokenRequestStatus;
 # ABSTRACT: TokenRequestStatus is the result of a token request.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s expirationTimestamp => Time, 'required';
@@ -23,7 +23,7 @@ IO::K8s::Api::Authentication::V1::TokenRequestStatus - TokenRequestStatus is the
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 expirationTimestamp
 

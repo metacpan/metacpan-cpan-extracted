@@ -408,12 +408,10 @@ union(self, other)
          * tied `other` can have destroyed self before h is used below. `o` was
          * read after that magic and needs no re-read. */
         REEXTRACT(self);
-        /* Same underlying bitmap (same handle, or two handles to one mapping
-         * sharing a bitmap_id) -> a |= a is a no-op.  Must short-circuit before
-         * locking: taking the write lock and the read lock on the SAME rwlock
-         * would self-deadlock. */
+        /* Same bitmap: a pure no-op, including stats, so freeze cannot race a write. */
         if (o == h || o->hdr->bitmap_id == h->hdr->bitmap_id) {
-            __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);
+            if (__atomic_load_n(&h->hdr->sealed, __ATOMIC_ACQUIRE))
+                croak("Data::RoaringBitmap::Shared->union: bitmap is frozen (read-only)");
             SvREFCNT_inc(self);
             RETVAL = self;
         } else if (o->readonly) {
@@ -474,11 +472,10 @@ intersect(self, other)
          * tied `other` can have destroyed self before h is used below. `o` was
          * read after that magic and needs no re-read. */
         REEXTRACT(self);
-        /* Same underlying bitmap (same handle, or two handles to one mapping
-         * sharing a bitmap_id) -> a &= a is a no-op.  Short-circuit before
-         * locking to avoid self-deadlocking on the one shared rwlock. */
+        /* Same bitmap: a pure no-op, including stats, so freeze cannot race a write. */
         if (o == h || o->hdr->bitmap_id == h->hdr->bitmap_id) {
-            __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);
+            if (__atomic_load_n(&h->hdr->sealed, __ATOMIC_ACQUIRE))
+                croak("Data::RoaringBitmap::Shared->intersect: bitmap is frozen (read-only)");
             SvREFCNT_inc(self);
             RETVAL = self;
         } else if (o->readonly) {
@@ -534,7 +531,7 @@ frozen(self)
   PREINIT:
     EXTRACT(self);
   CODE:
-    RETVAL = h->hdr->sealed ? 1 : 0;
+    RETVAL = __atomic_load_n(&h->hdr->sealed, __ATOMIC_ACQUIRE) ? 1 : 0;
   OUTPUT:
     RETVAL
 

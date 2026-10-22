@@ -47,3 +47,6 @@ spec/
 # karr materialized task view -- never commit
 tasks/
 config.yml
+
+# git worktrees of this repo -- local only, never commit
+/.claude/worktrees/

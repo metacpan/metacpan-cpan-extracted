@@ -13,6 +13,7 @@
 ^MYMETA\.(json|yml)$
 ^Shared\.c$
 ^ppport\.h$
+^XSParseKeyword\.h$
 \.tar\.gz$
 ^MANIFEST\.bak$
 

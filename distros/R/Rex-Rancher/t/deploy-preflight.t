@@ -202,9 +202,10 @@ for my $dist (qw( rke2 k3s )) {
 subtest 'preflight_server / preflight_agent' => sub {
   reset_host( pid => 42, running => 'v1.30.4+rke2r1', installed => 'v1.30.4+rke2r1' );
   is_deeply( Rex::Rancher::Server::preflight_server( hold_running => 1, version => 'v1.31.0+rke2r1',
-      cluster_cidr => '10.42.0.0/16' ),
-    { version => 'v1.30.4+rke2r1', install_method => 'script', cluster_cidr => '10.42.0.0/16' },
-    'server: the version, install method and cluster-cidr this run uses' );
+      cluster_cidr => '10.42.0.0/16', kubeconfig_mode => '0640' ),
+    { version => 'v1.30.4+rke2r1', install_method => 'script', cluster_cidr => '10.42.0.0/16',
+      kubeconfig_mode => '0640' },
+    'server: the version, install method, cluster-cidr and kubeconfig mode this run uses' );
 
   local @nodes = ( cp_node('v1.31.2+k3s1') );
   reset_host( pid => 0, installed => 'v1.30.4+k3s1' );

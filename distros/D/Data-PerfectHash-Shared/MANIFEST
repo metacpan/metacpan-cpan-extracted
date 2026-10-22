@@ -23,11 +23,15 @@ t/06_cross_bless.t
 t/07_atomic_rebuild.t
 t/08_builder_errors.t
 t/09_threads.t
+t/10_inputs.t
+t/11_roundtrip.t
 xt/asan.t
+xt/build_io.t
 xt/concurrent_readers.t
 xt/destroy_during_call.t
 xt/eg_runs.t
 xt/kwalitee.t
+xt/lib/Instrumented.pm
 xt/large_500k.t
 xt/pod.t
 xt/tsan.t

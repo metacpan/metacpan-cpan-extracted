@@ -47,7 +47,12 @@ while (time < $end) {
 }
 diag "stats reads=$reads regressions=$regress final=" . join(',', map "$_=$prev_stats->{$_}", sort keys %$prev_stats);
 
-waitpid $_, 0 for @pids;
+my $fails = 0;
+for my $pid (@pids) {
+    waitpid $pid, 0;
+    $fails++ if $?;
+}
+is $fails, 0, 'all stats writers exited successfully';
 
 cmp_ok $reads, '>', 100, "read stats repeatedly under load (reads=$reads)";
 is $regress, 0, "stat counters monotonic non-decreasing under concurrent ops";

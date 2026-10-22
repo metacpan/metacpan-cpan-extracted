@@ -241,6 +241,22 @@ is(
 
 $retained_body = 'mutated-after-append';
 
+is(
+    $retained_client->active_streaming_body_count,
+    1,
+    'native tracks one unfinished streaming producer',
+);
+is(
+    $retained_client->streaming_retained_bytes_for_stream(0),
+    length('original-retained-body'),
+    'native tracks retained bytes on the owning request stream',
+);
+is(
+    $retained_client->streaming_retained_bytes_for_stream(4),
+    0,
+    'native reports zero bytes for an unknown stream',
+);
+
 $transfer_retained->();
 
 $retained_client->update_ack_offset(
@@ -252,6 +268,11 @@ is(
     $retained_client->streaming_retained_bytes,
     0,
     'ACK releases retained Perl body storage',
+);
+is(
+    $retained_client->streaming_retained_bytes_for_stream(0),
+    0,
+    'ACK also releases the owning stream retained-byte count',
 );
 
 my $retained_received = '';
@@ -270,6 +291,64 @@ is(
 
 $retained_client->append_body(0, '', 1);
 $transfer_retained->();
+
 $retained_client->close_stream(0);
+
+# An unfinished producer can gain a sibling. Cancelling one returns only its
+# storage, and EOF removes the producer from fair-share accounting without
+# pretending the unacknowledged bytes have been released.
+my $joining = Unblock::HTTP3::_Native->client;
+$joining->bind_streams(2, 6, 10);
+my $submit_joining = sub {
+    my ($id) = @_;
+    $joining->submit_request(
+        $id,
+        [
+            [ ':method', 'POST' ],
+            [ ':scheme', 'https' ],
+            [ ':authority', 'example.test' ],
+            [ ':path', "/joined-$id" ],
+        ],
+        undef,
+        1,
+    );
+};
+$submit_joining->(0);
+is($joining->active_streaming_body_count, 1,
+    'first unfinished producer participates in send budget');
+$joining->append_body(0, 'a' x 4096, 0);
+is($joining->streaming_retained_bytes_for_stream(0), 4096,
+    'first producer retains unacknowledged bytes');
+
+$submit_joining->(4);
+is($joining->active_streaming_body_count, 2,
+    'new stream joins while first producer retains bytes');
+$joining->append_body(4, 'b' x 2048, 0);
+is($joining->streaming_retained_bytes, 6144,
+    'connection aggregate includes both producers');
+is($joining->streaming_retained_bytes_for_stream(4), 2048,
+    'joined producer retains its own bytes');
+
+$joining->discard_body(0);
+is($joining->streaming_retained_bytes_for_stream(0), 0,
+    'cancelled producer discards its retained storage');
+is($joining->streaming_retained_bytes, 2048,
+    'cancelled producer releases only its aggregate share');
+is($joining->active_streaming_body_count, 1,
+    'cancelled producer relinquishes active fair-share slot');
+
+$joining->append_body(4, 'c' x 1024, 1);
+is($joining->active_streaming_body_count, 0,
+    'EOF removes last producer from dynamic share count');
+is($joining->streaming_retained_bytes_for_stream(4), 3072,
+    'EOF retains unacknowledged storage until discard');
+$joining->discard_body(4);
+is($joining->streaming_retained_bytes, 0,
+    'discard releases remaining retained storage');
+is($joining->streaming_retained_bytes_for_stream(4), 0,
+    'discard zeros individual stream counter');
+$joining->discard_body(4);
+is($joining->streaming_retained_bytes, 0,
+    'repeated discard does not underflow accounting');
 
 done_testing;

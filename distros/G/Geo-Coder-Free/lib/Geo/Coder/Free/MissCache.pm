@@ -11,11 +11,11 @@ Geo::Coder::Free::MissCache - process-level memory of lookups that found nothing
 
 =head1 VERSION
 
-Version 0.49
+Version 0.51
 
 =cut
 
-our $VERSION = '0.49';
+our $VERSION = '0.51';
 
 # How long a remembered miss lasts.  A miss is a statement about data on disk,
 # which does not change while a batch or a request runs; the lifetime only has

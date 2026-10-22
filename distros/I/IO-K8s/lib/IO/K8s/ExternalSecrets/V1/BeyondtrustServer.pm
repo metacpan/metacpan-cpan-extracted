@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1::BeyondtrustServer;
 # ABSTRACT: Auth configures how API server works.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s apiUrl               => Str, { required => 'schema' };
@@ -32,7 +32,7 @@ IO::K8s::ExternalSecrets::V1::BeyondtrustServer - Auth configures how API server
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 apiUrl
 

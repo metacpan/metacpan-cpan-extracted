@@ -1,6 +1,6 @@
 package IO::K8s::Api::Scheduling::V1alpha3::CompositePodGroupSpec;
 # ABSTRACT: CompositePodGroupSpec defines the desired state of CompositePodGroup.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s disruptionMode => 'Scheduling::V1alpha3::CompositeDisruptionMode';
@@ -41,7 +41,7 @@ IO::K8s::Api::Scheduling::V1alpha3::CompositePodGroupSpec - CompositePodGroupSpe
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 disruptionMode
 

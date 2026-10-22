@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::PodSpec;
 # ABSTRACT: PodSpec is a description of a pod.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s activeDeadlineSeconds => Int;
@@ -60,7 +60,7 @@ k8s initContainers => ['Core::V1::Container'];
 k8s nodeName => Str;
 
 
-k8s nodeSelector => { Str => 1 };
+k8s nodeSelector => HashRef[Str];
 
 
 k8s os => 'Core::V1::PodOS';
@@ -146,7 +146,7 @@ IO::K8s::Api::Core::V1::PodSpec - PodSpec is a description of a pod.
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 activeDeadlineSeconds
 

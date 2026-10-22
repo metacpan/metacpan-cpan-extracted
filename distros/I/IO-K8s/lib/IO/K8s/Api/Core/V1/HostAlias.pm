@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::HostAlias;
 # ABSTRACT: HostAlias holds the mapping between IP and hostnames that will be injected as an entry in the pod's hosts file.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s hostnames => [Str];
@@ -23,7 +23,7 @@ IO::K8s::Api::Core::V1::HostAlias - HostAlias holds the mapping between IP and h
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 hostnames
 

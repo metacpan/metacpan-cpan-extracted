@@ -1,6 +1,6 @@
 package IO::K8s::Role::SpecBuilder;
 # ABSTRACT: Role for deep-path spec manipulation on CRD objects
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use Scalar::Util qw(blessed);
 use Carp qw(croak);
 use Module::Runtime qw(use_module);
@@ -320,6 +320,7 @@ sub _sb_fresh {
                 is_hash_of_str is_hash_of_objects is_hash_of_int is_hash_of_num
                 is_hash_of_bool is_hash_of_quantity is_hash_of_time
                 is_hash_of_int_or_string is_hash_opaque
+                is_hash_of_str_arrays is_hash_of_object_arrays
             );
             croak "spec path '$path': cannot descend through scalar field '$seg'";
         }
@@ -534,7 +535,7 @@ IO::K8s::Role::SpecBuilder - Role for deep-path spec manipulation on CRD objects
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head1 SYNOPSIS
 

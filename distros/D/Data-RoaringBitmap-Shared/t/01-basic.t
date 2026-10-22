@@ -350,6 +350,7 @@ like $@, qr/container_capacity/i, 'oversized capacity croak mentions container_c
     $h1->add_many([1, 2, 3, 70000]);
     my $h2 = Data::RoaringBitmap::Shared->new($sp, 256);   # second handle, same file
     ok $h2->contains(70000), 'second handle sees the first handle writes (same mapping)';
+    my $ops = $h1->stats->{ops};
 
     my $ok = eval {
         local $SIG{ALRM} = sub { die "hung\n" };
@@ -375,6 +376,7 @@ like $@, qr/container_capacity/i, 'oversized capacity croak mentions container_c
     };
     ok $self_ok, 'self union/intersect did not hang';
     is_deeply $h1->to_array, [1, 2, 3, 70000], 'self set ops are a no-op';
+    is $h1->stats->{ops}, $ops, 'self/alias set ops leave stats unchanged';
 
     undef $h1; undef $h2;
     unlink $sp;

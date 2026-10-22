@@ -1,10 +1,10 @@
 package IO::K8s::PrometheusOperator::V1::RuleGroup;
 # ABSTRACT: RuleGroup is a list of sequentially evaluated recording and alerting rules.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s interval                  => Str, { pattern => qr/^(0|(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?)$/ };
-k8s labels                    => { Str => 1 };
+k8s labels                    => HashRef[Str];
 k8s limit                     => Int;
 k8s name                      => Str, { required => 'schema' };
 # Upstream's own text, kept as the plain string it is: the inline modifier
@@ -36,7 +36,7 @@ IO::K8s::PrometheusOperator::V1::RuleGroup - RuleGroup is a list of sequentially
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 interval
 

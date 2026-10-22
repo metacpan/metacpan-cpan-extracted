@@ -1,5 +1,9 @@
 Revision history for Data-HyperLogLog-Shared
 
+0.07  2026-10-16
+    - Publish frozen data safely to read-only attachments.
+    - Release mappings when backing-path allocation fails.
+
 0.06      2026-09-26
           - A create that fails at mmap no longer leaves a full-size file
             behind.

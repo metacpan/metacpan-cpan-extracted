@@ -13,7 +13,7 @@ WriteMakefile(
     PREREQ_PM        => {
         'PPI'              => 0,
         'App::FatPacker'   => 0,
-        'Module::CoreList' => 0,
+        'Module::CoreList' => '3.07',    # first release with is_core()
     },
     TEST_REQUIRES    => {
         'Test::More' => '0.88',

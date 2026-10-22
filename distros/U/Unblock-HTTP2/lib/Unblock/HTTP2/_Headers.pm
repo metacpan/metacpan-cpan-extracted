@@ -9,7 +9,7 @@ use Uniform::HTTP::FastPath 0.06 ();
 use Uniform::HTTP::Request 0.06;
 use Uniform::HTTP::Response 0.06;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 my %FORBIDDEN = map { $_ => 1 } qw(
     connection
@@ -38,7 +38,8 @@ sub _received_flags {
         if $kind == Uniform::HTTP::FastPath::KIND_REQUEST();
 
     if ($end_stream) {
-        $flags |= Uniform::HTTP::FastPath::FLAG_COMPLETE();
+        $flags |= Uniform::HTTP::FastPath::FLAG_COMPLETE()
+            | Uniform::HTTP::FastPath::FLAG_HAS_BUFFERED_BODY();
     }
     else {
         $flags |= Uniform::HTTP::FastPath::FLAG_MUTABLE()
@@ -252,7 +253,7 @@ sub request_from_headers {
         undef,
         $normal,
         [],
-        undef,
+        $end_stream ? '' : undef,
     ];
 
     return Uniform::HTTP::FastPath::request_from_validated($view);
@@ -298,7 +299,7 @@ sub response_from_headers {
         undef,
         $normal,
         [],
-        undef,
+        $end_stream ? '' : undef,
     ];
 
     return Uniform::HTTP::FastPath::response_from_validated($view);

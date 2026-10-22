@@ -1,7 +1,7 @@
 package WWW::Hetzner::Cloud::Volume;
 # ABSTRACT: Hetzner Cloud Volume object
 
-our $VERSION = '0.101';
+our $VERSION = '0.102';
 
 use Moo;
 with 'WWW::Hetzner::Role::HasAction';
@@ -152,7 +152,7 @@ WWW::Hetzner::Cloud::Volume - Hetzner Cloud Volume object
 
 =head1 VERSION
 
-version 0.101
+version 0.102
 
 =head1 SYNOPSIS
 

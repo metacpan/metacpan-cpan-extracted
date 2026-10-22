@@ -47,7 +47,7 @@
 #define FEN_VERSION      2   /* 2: added the occupancy bitmap region (layout change) */
 #define FEN_ERR_BUFLEN   (PATH_MAX + 256)
 #ifndef FEN_READER_SLOTS
-#define FEN_READER_SLOTS 1024         /* max concurrent reader processes for dead-process recovery */
+#define FEN_READER_SLOTS 1024         /* reader handles per mapping for dead-process recovery */
 #endif
 /* Occupancy bitmap: one bit per reader slot, set when a process claims a slot and
  * cleared on clean release.  A writer scans these FEN_OCC_WORDS words to visit
@@ -191,6 +191,13 @@ static inline int fen_pid_alive(uint32_t pid) {
     return !fen_pid_is_zombie(pid); /* kill() also succeeds for a zombie -> treat as dead */
 }
 
+static inline void fen_release_writer(FenHeader *hdr) {
+    /* Pair with the waiter's publish + gate re-check: neither may miss the other. */
+    __atomic_store_n(&hdr->wlock, 0, __ATOMIC_SEQ_CST);
+    if (__atomic_load_n(&hdr->rwait, __ATOMIC_SEQ_CST) > 0)
+        syscall(SYS_futex, &hdr->wlock, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
+}
+
 /* Force-recover a stale WRITE lock left by a dead writer (held or mid-drain).
  * CAS to OUR pid to hold the lock while fixing shared state, then release.
  * Using our pid (not a bare WRITER_BIT sentinel) means a subsequent recovering
@@ -203,9 +210,7 @@ static inline void fen_recover_stale_lock(FenHandle *h, uint32_t observed_wlock)
         return;
     /* We now hold the write lock as mypid.  No additional shared state needs
      * repair here (this module has no seqlock); just release the lock. */
-    __atomic_store_n(&hdr->wlock, 0, __ATOMIC_RELEASE);
-    if (__atomic_load_n(&hdr->rwait, __ATOMIC_RELAXED) > 0)
-        syscall(SYS_futex, &hdr->wlock, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
+    fen_release_writer(hdr);
 }
 
 static const struct timespec fen_lock_timeout = { FEN_LOCK_TIMEOUT_SEC, 0 };
@@ -305,7 +310,7 @@ static inline void fen_recover_after_timeout(FenHandle *h) {
  * SIGKILLed while parked leaves rwait over-counted -> at most a spurious wake
  * (harmless); it can never under-count, so no wakeup is lost. */
 static inline void fen_park(FenHandle *h) {
-    __atomic_add_fetch(&h->hdr->rwait, 1, __ATOMIC_RELAXED);
+    __atomic_add_fetch(&h->hdr->rwait, 1, __ATOMIC_SEQ_CST);
 }
 static inline void fen_unpark(FenHandle *h) {
     __atomic_sub_fetch(&h->hdr->rwait, 1, __ATOMIC_RELAXED);
@@ -315,7 +320,8 @@ static inline void fen_unpark(FenHandle *h) {
  * contribution to the lock.  A slotted reader uses its slot's rdepth; a reader
  * that could not claim a slot uses the global slotless_rdepth.  inc() is SEQ_CST
  * so the wlock re-check that follows it in rdlock forms a Dekker handshake with
- * the writer's SEQ_CST wlock-store + rdepth-scan.  leave() peels slotless first
+ * the writer's SEQ_CST wlock-store + rdepth-scan.  dec() is SEQ_CST so its gate
+ * check cannot miss a draining writer.  leave() peels slotless first
  * so a slot claimed mid-hold cannot misattribute the decrement. */
 static inline void fen_rdepth_inc(FenHandle *h) {
     if (h->my_slot_idx != UINT32_MAX) {
@@ -328,9 +334,9 @@ static inline void fen_rdepth_inc(FenHandle *h) {
 static inline void fen_rdepth_dec(FenHandle *h) {
     if (h->slotless_held > 0) {
         h->slotless_held--;
-        __atomic_sub_fetch(&h->hdr->slotless_rdepth, 1, __ATOMIC_RELEASE);
+        __atomic_sub_fetch(&h->hdr->slotless_rdepth, 1, __ATOMIC_SEQ_CST);
     } else if (h->my_slot_idx != UINT32_MAX) {
-        __atomic_sub_fetch(&h->reader_slots[h->my_slot_idx].rdepth, 1, __ATOMIC_RELEASE);
+        __atomic_sub_fetch(&h->reader_slots[h->my_slot_idx].rdepth, 1, __ATOMIC_SEQ_CST);
     }
 }
 
@@ -338,7 +344,7 @@ static inline void fen_rdepth_dec(FenHandle *h) {
  * after every rdepth decrement so a released read lock lets the writer re-scan
  * promptly instead of waiting out its timeout. */
 static inline void fen_reader_wake_drain(FenHandle *h) {
-    if (__atomic_load_n(&h->hdr->wlock, __ATOMIC_ACQUIRE) != 0) {
+    if (__atomic_load_n(&h->hdr->wlock, __ATOMIC_SEQ_CST) != 0) {
         __atomic_add_fetch(&h->hdr->drain_seq, 1, __ATOMIC_RELEASE);
         syscall(SYS_futex, &h->hdr->drain_seq, FUTEX_WAKE, 1, NULL, NULL, 0);
     }
@@ -376,7 +382,7 @@ static inline void fen_rwlock_rdlock(FenHandle *h) {
             continue;
         }
         fen_park(h);
-        cur = __atomic_load_n(&hdr->wlock, __ATOMIC_RELAXED);
+        cur = __atomic_load_n(&hdr->wlock, __ATOMIC_SEQ_CST);
         if (cur != 0) {
             long rc = syscall(SYS_futex, &hdr->wlock, FUTEX_WAIT, cur,
                               &fen_lock_timeout, NULL, 0);
@@ -393,7 +399,7 @@ static inline void fen_rwlock_rdlock(FenHandle *h) {
 }
 
 static inline void fen_rwlock_rdunlock(FenHandle *h) {
-    fen_rdepth_dec(h);                 /* RELEASE: drop our entire contribution */
+    fen_rdepth_dec(h);                 /* drop our entire contribution */
     fen_reader_wake_drain(h);          /* if a writer is draining, wake it to re-scan */
 }
 
@@ -421,7 +427,7 @@ static inline void fen_rwlock_wrlock(FenHandle *h) {
             continue;
         }
         fen_park(h);
-        uint32_t cur = __atomic_load_n(&hdr->wlock, __ATOMIC_RELAXED);
+        uint32_t cur = __atomic_load_n(&hdr->wlock, __ATOMIC_SEQ_CST);
         if (cur != 0) {
             long rc = syscall(SYS_futex, &hdr->wlock, FUTEX_WAIT, cur,
                               &fen_lock_timeout, NULL, 0);
@@ -480,10 +486,7 @@ static inline void fen_rwlock_wrlock(FenHandle *h) {
 }
 
 static inline void fen_rwlock_wrunlock(FenHandle *h) {
-    FenHeader *hdr = h->hdr;
-    __atomic_store_n(&hdr->wlock, 0, __ATOMIC_RELEASE);
-    if (__atomic_load_n(&hdr->rwait, __ATOMIC_RELAXED) > 0)
-        syscall(SYS_futex, &hdr->wlock, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
+    fen_release_writer(h->hdr);
 }
 
 /* ================================================================
@@ -558,7 +561,9 @@ static inline FenHandle *fen_setup(void *base, size_t map_size,
                                  const char *path, int backing_fd) {
     FenHeader *hdr = (FenHeader *)base;
     FenHandle *h = (FenHandle *)calloc(1, sizeof(FenHandle));
-    if (!h) {
+    if (h && path) h->path = strdup(path);
+    if (!h || (path && !h->path)) {
+        free(h);
         munmap(base, map_size);
         if (backing_fd >= 0) close(backing_fd);
         return NULL;
@@ -571,7 +576,6 @@ static inline FenHandle *fen_setup(void *base, size_t map_size,
     h->tree2_off    = hdr->tree2_off;
     h->mode         = hdr->mode;
     h->mmap_size    = map_size;
-    h->path         = path ? strdup(path) : NULL;
     h->backing_fd   = backing_fd;
     h->my_slot_idx  = UINT32_MAX;
     return h;
@@ -579,7 +583,7 @@ static inline FenHandle *fen_setup(void *base, size_t map_size,
 
 /* Validate a mapped header (shared by fen_create reopen and fen_open_fd). */
 static inline int fen_validate_header(const FenHeader *hdr, uint64_t file_size) {
-    if (hdr->magic != FEN_MAGIC) return 0;
+    if (__atomic_load_n(&hdr->magic, __ATOMIC_ACQUIRE) != FEN_MAGIC) return 0;
     if (hdr->version != FEN_VERSION) return 0;
     if (hdr->mode != FEN_MODE_POINT && hdr->mode != FEN_MODE_RANGE) return 0;
     if (hdr->n < FEN_MIN_N || hdr->n > FEN_MAX_N) return 0;
@@ -650,7 +654,7 @@ static int fen_reserve(int fd, uint64_t size) {
     int e;
     do e = posix_fallocate(fd, 0, (off_t)size); while (e == EINTR);
     sigprocmask(SIG_SETMASK, &old, NULL);
-    if (e == 0 || e == EOPNOTSUPP || e == EINVAL) return 0;
+    if (e == 0) return 0;
     errno = e;
     return -1;
 }
@@ -727,7 +731,7 @@ static FenHandle *fen_create(const char *path, uint64_t n, uint32_t fmode, mode_
                 }
                 FEN_ERR("invalid Fenwick tree file"); munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
             }
-            if (((FenHeader *)base)->sealed) {
+            if (__atomic_load_n(&((FenHeader *)base)->sealed, __ATOMIC_RELAXED)) {
                 FEN_ERR("%s is frozen (read-only); open it with new_readonly", path);
                 munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
             }
@@ -776,7 +780,7 @@ static FenHandle *fen_open_fd(int fd, char *errbuf) {
     if (!fen_validate_header((FenHeader *)base, (uint64_t)st.st_size)) {
         FEN_ERR("invalid Fenwick tree table"); munmap(base, ms); return NULL;
     }
-    if (((FenHeader *)base)->sealed) {
+    if (__atomic_load_n(&((FenHeader *)base)->sealed, __ATOMIC_RELAXED)) {
         FEN_ERR("this Fenwick tree is frozen (read-only); open it with new_readonly");
         munmap(base, ms); return NULL;
     }
@@ -809,7 +813,7 @@ static FenHandle *fen_open_readonly(const char *path, char *errbuf) {
     if (!fen_validate_header((FenHeader *)base, (uint64_t)st.st_size)) {
         FEN_ERR("%s: invalid Fenwick tree file", path); munmap(base, ms); return NULL;
     }
-    if (!((FenHeader *)base)->sealed) {
+    if (!__atomic_load_n(&((FenHeader *)base)->sealed, __ATOMIC_ACQUIRE)) {
         FEN_ERR("%s is not frozen: call ->freeze on the producer before opening read-only", path);
         munmap(base, ms); return NULL;
     }
@@ -852,7 +856,7 @@ static inline int fen_msync(FenHandle *h) {
  * and a read-write reopen is refused. */
 static int fen_freeze(FenHandle *h) {
     fen_rwlock_wrlock(h);
-    h->hdr->sealed = 1;
+    __atomic_store_n(&h->hdr->sealed, 1, __ATOMIC_RELEASE);
     fen_rwlock_wrunlock(h);
     if (h->path || h->backing_fd >= 0) return fen_msync(h);  /* durability for file/memfd-backed */
     return 0;   /* anonymous: the seal lives in shared memory (visible to forks); nothing to flush */
@@ -879,7 +883,7 @@ static void fen_update_locked(FenHandle *h, uint64_t i, int64_t delta) {
     int64_t *tree = fen_tree(h);
     uint64_t nmax = fen_nmax(h);
     for (uint64_t x = i; x >= 1 && x <= nmax; x += fen_lowbit(x))
-        tree[x] += delta;
+        tree[x] = (int64_t)((uint64_t)tree[x] + (uint64_t)delta);
 }
 
 /* prefix sum over positions 1..i (1-based); caller guarantees 0 <= i <= n */
@@ -887,15 +891,16 @@ static int64_t fen_prefix_locked(FenHandle *h, uint64_t i) {
     const int64_t *tree = fen_tree(h);
     uint64_t nmax = fen_nmax(h);
     if (i > nmax) i = nmax;                          /* Layer B: never read past the mapping */
-    int64_t s = 0;
+    uint64_t s = 0;
     for (uint64_t x = i; x > 0; x -= fen_lowbit(x))
-        s += tree[x];
-    return s;
+        s += (uint64_t)tree[x];
+    return (int64_t)s;
 }
 
 /* sum over positions l..r inclusive (1-based); caller guarantees 1 <= l <= r <= n */
 static int64_t fen_range_locked(FenHandle *h, uint64_t l, uint64_t r) {
-    return fen_prefix_locked(h, r) - fen_prefix_locked(h, l - 1);
+    return (int64_t)((uint64_t)fen_prefix_locked(h, r)
+                   - (uint64_t)fen_prefix_locked(h, l - 1));
 }
 
 /* smallest position i with prefix(i) >= target, or n+1 if none.  Binary lifting;
@@ -908,7 +913,10 @@ static uint64_t fen_lower_bound_locked(FenHandle *h, int64_t target) {
     while ((step << 1) && (step << 1) <= nmax) step <<= 1;   /* largest power of two <= nmax */
     for (; step > 0; step >>= 1) {
         uint64_t nxt = pos + step;
-        if (nxt <= nmax && acc + tree[nxt] < target) { pos = nxt; acc += tree[nxt]; }
+        if (nxt <= nmax) {
+            int64_t sum = (int64_t)((uint64_t)acc + (uint64_t)tree[nxt]);
+            if (sum < target) { pos = nxt; acc = sum; }
+        }
     }
     return pos + 1;
 }
@@ -922,7 +930,7 @@ static void fen_merge_locked(FenHandle *dst, const int64_t *src, uint64_t src_sl
     if (slots > slots_max) slots = slots_max;
     if (slots > src_slots) slots = src_slots;        /* ...and reads to the src buffer */
     for (uint64_t x = 1; x < slots; x++)             /* slot 0 unused */
-        tree[x] += src[x];
+        tree[x] = (int64_t)((uint64_t)tree[x] + (uint64_t)src[x]);
 }
 
 /* reset all positions to 0 (caller holds the write lock) */
@@ -960,13 +968,14 @@ static inline uint64_t fen_range_nmax(FenHandle *h) {
 }
 /* BIT primitives on an explicit tree array, bounded by nmax (1-based) */
 static inline void fen_bit_add(int64_t *tree, uint64_t i, int64_t delta, uint64_t nmax) {
-    for (uint64_t x = i; x >= 1 && x <= nmax; x += fen_lowbit(x)) tree[x] += delta;
+    for (uint64_t x = i; x >= 1 && x <= nmax; x += fen_lowbit(x))
+        tree[x] = (int64_t)((uint64_t)tree[x] + (uint64_t)delta);
 }
 static inline int64_t fen_bit_prefix(const int64_t *tree, uint64_t i, uint64_t nmax) {
     if (i > nmax) i = nmax;
-    int64_t s = 0;
-    for (uint64_t x = i; x > 0; x -= fen_lowbit(x)) s += tree[x];
-    return s;
+    uint64_t s = 0;
+    for (uint64_t x = i; x > 0; x -= fen_lowbit(x)) s += (uint64_t)tree[x];
+    return (int64_t)s;
 }
 /* add delta to every position in [l,r] (1-based); caller holds the write lock */
 static void fen_range_add_locked(FenHandle *h, uint64_t l, uint64_t r, int64_t delta) {
@@ -976,10 +985,11 @@ static void fen_range_add_locked(FenHandle *h, uint64_t l, uint64_t r, int64_t d
     if (r > nmax) r = nmax;
     if (l > r) return;
     fen_bit_add(b1, l, delta, nmax);
-    fen_bit_add(b2, l, delta * (int64_t)(l - 1), nmax);
+    fen_bit_add(b2, l, (int64_t)((uint64_t)delta * (l - 1)), nmax);
     if (r + 1 <= nmax) {                              /* drop the r+1==n+1 sentinel: never queried */
-        fen_bit_add(b1, r + 1, -delta, nmax);
-        fen_bit_add(b2, r + 1, -delta * (int64_t)r, nmax);
+        uint64_t neg = (uint64_t)0 - (uint64_t)delta;
+        fen_bit_add(b1, r + 1, (int64_t)neg, nmax);
+        fen_bit_add(b2, r + 1, (int64_t)(neg * r), nmax);
     }
 }
 /* prefix sum over 1..i (range mode); caller holds a lock */
@@ -988,12 +998,13 @@ static int64_t fen_range_prefix_locked(FenHandle *h, uint64_t i) {
     if (i > nmax) i = nmax;
     int64_t p1 = fen_bit_prefix(fen_tree(h),  i, nmax);
     int64_t p2 = fen_bit_prefix(fen_tree2(h), i, nmax);
-    return p1 * (int64_t)i - p2;
+    return (int64_t)((uint64_t)p1 * i - (uint64_t)p2);
 }
 /* sum over l..r inclusive (range mode); caller holds a lock */
 static int64_t fen_range_range_locked(FenHandle *h, uint64_t l, uint64_t r) {
     if (l < 1) l = 1;
-    return fen_range_prefix_locked(h, r) - fen_range_prefix_locked(h, l - 1);
+    return (int64_t)((uint64_t)fen_range_prefix_locked(h, r)
+                   - (uint64_t)fen_range_prefix_locked(h, l - 1));
 }
 
 /* ---- mode-dispatching wrappers used by the XS (point vs range) ---- */

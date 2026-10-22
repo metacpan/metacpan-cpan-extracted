@@ -1,7 +1,7 @@
 package WWW::Hetzner::Cloud::API::Pricing;
 # ABSTRACT: Hetzner Cloud Pricing API
 
-our $VERSION = '0.101';
+our $VERSION = '0.102';
 
 use Moo;
 use WWW::Hetzner::Cloud::Pricing;
@@ -40,7 +40,7 @@ WWW::Hetzner::Cloud::API::Pricing - Hetzner Cloud Pricing API
 
 =head1 VERSION
 
-version 0.101
+version 0.102
 
 =head1 SYNOPSIS
 

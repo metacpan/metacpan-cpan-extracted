@@ -58,6 +58,24 @@ for my $c (@cases) {
     cmp_ok length($A->bbit_signature(1)), '<', $k * 8 / 8, 'b=1 signature is far smaller than the full sketch';
 }
 
+# ---- odd register counts and every bit width ----
+{
+    for my $odd_k (7, 17) {
+        my $A = Data::MinHash::Shared->new(undef, $odd_k);
+        my $B = Data::MinHash::Shared->new(undef, $odd_k);
+        $A->add_many([1 .. 30]);
+        $B->add_many([15 .. 45]);
+        my @regs = $A->registers;
+        for my $b (1 .. 64) {
+            my $bits = join '', map { substr(unpack('b*', pack('Q<', $_)), 0, $b) } @regs;
+            my $sig = $A->bbit_signature($b);
+            is $sig, pack('b*', $bits), "k=$odd_k b=$b: low bits packed with zero padding";
+            is(Data::MinHash::Shared->bbit_similarity_of($sig, $B->bbit_signature($b), $odd_k, $b),
+               $A->bbit_similarity($B, $b), "k=$odd_k b=$b: snapshot estimate matches live estimate");
+        }
+    }
+}
+
 # ---- error handling ----
 {
     my $A = sketch(1 .. 10);

@@ -39,3 +39,7 @@ spec/
 *~
 *.swp
 *.bak
+
+# skilletor: committe Config + Ignore-Block
+!.claude/skilletor.json
+!.claude/.gitignore

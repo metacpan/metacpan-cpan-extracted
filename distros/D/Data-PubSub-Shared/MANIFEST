@@ -32,11 +32,13 @@ t/12_recover.t
 t/pod_synopsis.t
 t/version_check.t
 t/13-foreign-invocant.t
+t/14_wait_signals.t
 typemap
 xt/asan.t
 xt/binary_data.t
 xt/cloexec_exec.t
 xt/concurrent_open.t
+xt/concurrent_integrity.t
 xt/crash_recovery.t
 xt/destroy_during_call.t
 xt/detached_sub.t
@@ -62,5 +64,6 @@ xt/truncation.t
 xt/tsan.t
 xt/valgrind.t
 xt/zero_subscribers.t
+t/signal-destroy.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

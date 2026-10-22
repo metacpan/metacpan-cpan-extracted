@@ -5,7 +5,7 @@ package Rex::Rancher;
 use v5.14.4;
 use warnings;
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 
 use Rex::Rancher::Node;
 use Rex::Rancher::Server;
@@ -130,10 +130,11 @@ sub rancher_deploy_server {
   # misleading error. The server itself is installed; a re-run picks up.
   if ($local_kc && !$api_up) {
     my $addr = _kubeconfig_server_addr(%opts) // '127.0.0.1';
+    my $reach = $addr =~ /^\[.*\]:\d+$/ || $addr =~ /^[^:]+:\d+$/ ? $addr : "$addr:6443";
     die "Kubernetes API at $addr did not answer through $local_kc within "
       . "wait_for_api's timeout; $distribution server is installed, Cilium "
       . "and later steps did not run. Check that this machine reaches "
-      . "$addr:6443 (firewall, tls_san, kubeconfig_server), or omit "
+      . "$reach (firewall, tls_san, kubeconfig_server), or omit "
       . "kubeconfig_file to install Cilium through the remote host only\n";
   }
 
@@ -383,7 +384,8 @@ sub _save_kubeconfig_locally {
           . "the cluster from this machine; pass tls_san or kubeconfig_server",
         "warn");
     }
-    elsif ($loopback{lc $server_addr}) {
+    elsif ($loopback{ lc( $server_addr =~ s/^\[([^\]]*)\](?::\d+)?$/$1/r
+                                    =~ s/^([^:]+):\d+$/$1/r ) }) {
       # A loopback address patches 127.0.0.1 to itself (or another loopback):
       # still unreachable from the operator's machine.
       Rex::Logger::info(
@@ -432,7 +434,7 @@ Rex::Rancher - Rancher Kubernetes (RKE2/K3s) deployment automation for Rex
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 
@@ -838,7 +840,9 @@ re-run picks up from there.
 Explicit server address to use when patching the kubeconfig. Overrides the
 C<tls_san>-based default, so the kubeconfig can point at an address that is
 not the first C<tls_san> entry (e.g. the node's advertised host while
-C<tls_san> lists every control-plane address). Only the kubeconfig is
+C<tls_san> lists every control-plane address). May carry a port
+(C<cp.example.com:7443>, C<[2001:db8::10]:7443>) for an API reached through a
+different one; without it the kubeconfig keeps its 6443. Only the kubeconfig is
 affected; the address must still be a name in the API server certificate
 (the node's own IPs and hostname, or a C<tls_san> entry).
 
@@ -909,6 +913,15 @@ it, with a warning naming both.
 =item C<node_labels>
 
 Node labels to apply, as an arrayref of C<key=value> strings.
+
+=item C<kubeconfig_mode>
+
+File mode of the kubeconfig the server writes on the node (C<rke2.yaml> /
+C<k3s.yaml>), as a string such as C<'0640'>, written as
+C<write-kubeconfig-mode> to C<config.yaml> on RKE2 and K3s alike; anything
+else dies before the node is prepared. Default: the distribution's own
+C<0600 root:root>, which keeps the cluster admin's key in that file from the
+node's other accounts. See L<Rex::Rancher::Server/install_server>.
 
 =item C<registries>
 
@@ -1040,7 +1053,7 @@ changed. These only read; C<install_agent> asks them again after node
 preparation and GPU setup.
 
 The server-only options have no effect on an agent and are ignored:
-C<tls_san>, C<disable>, C<cluster_cidr>, C<kubeconfig_server>, C<cilium>, C<cilium_version>, C<cilium_cli_version>,
+C<tls_san>, C<disable>, C<cluster_cidr>, C<kubeconfig_mode>, C<kubeconfig_server>, C<cilium>, C<cilium_version>, C<cilium_cli_version>,
 C<cilium_helm_values>, C<gateway_api>, C<gateway_api_version>,
 C<gateway_api_channel>, C<k8s_service_host>, C<ipam_mode> and C<gpu_device_plugin>. Whether
 a K3s agent runs Flannel and kube-proxy or leaves both to Cilium follows the

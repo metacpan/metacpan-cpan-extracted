@@ -1,10 +1,10 @@
 package Sereal;
-use 5.008;
+use 5.014;
 use strict;
 use warnings;
-our $VERSION    = '5.010';
+our $VERSION    = '5.011';
 our $XS_VERSION = $VERSION; $VERSION = eval $VERSION;
-use Sereal::Encoder 5.010 qw(
+use Sereal::Encoder 5.011 qw(
     encode_sereal
     sereal_encode_with_object
     SRL_UNCOMPRESSED
@@ -12,7 +12,7 @@ use Sereal::Encoder 5.010 qw(
     SRL_ZLIB
     SRL_ZSTD
 );
-use Sereal::Decoder 5.010 qw(
+use Sereal::Decoder 5.011 qw(
     decode_sereal
     looks_like_sereal
     decode_sereal_with_header_data
@@ -163,6 +163,8 @@ version of C<Sereal> and you'll get the most recent released versions
 of C<Sereal::Encoder> and C<Sereal::Decoder> whose version is smaller than
 or equal to the version of C<Sereal> you depend on.
 
+This distribution requires Perl 5.14 or newer.
+
 The protocol specification and many other bits of documentation
 can be found in the github repository. Right now, the specification is at
 L<https://github.com/Sereal/Sereal/blob/master/sereal_spec.pod>,
@@ -236,7 +238,7 @@ L<https://groups.google.com/forum/?fromgroups#!forum/sereal-dev>
 
 =head1 AUTHOR
 
-Steffen Mueller E<lt>smueller@cpan.orgE<gt>
+Steffen Mueller E<lt>cpan@steffen-mueller.netE<gt>
 
 =head1 ACKNOWLEDGMENT
 

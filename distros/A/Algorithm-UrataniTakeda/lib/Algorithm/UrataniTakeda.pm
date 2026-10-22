@@ -10,7 +10,7 @@ use Object::Pad 0.59;
 
 package Algorithm::UrataniTakeda;
 
-our $VERSION = 'v0.1.7';
+our $VERSION = 'v0.1.8';
 
 use Carp ();
 use List::Util ();
@@ -36,7 +36,7 @@ class Algorithm::UrataniTakeda {
         my @string = unpack( "U*", $pattern );
         my $i = $#string;
 
-        $alpha->{$_} //= 1 for @string;
+        $alpha->{$_} = \1 for @string;
 
         $min = $i if $min < 0 || $min > $i;
 
@@ -58,7 +58,7 @@ class Algorithm::UrataniTakeda {
         }
 
         $states->[$n] //= {};
-        $ends->[$n] = $pattern;
+        $ends->[$n] = \$pattern;
         push $left->@*, $n;
     }
 
@@ -169,8 +169,8 @@ class Algorithm::UrataniTakeda {
             my $z = 0;
             while ( $q >= 0 && $states->[$z]{ $c = $string[$q] } ) {
                 $z = $states->[$z]{$c};
-                if ( defined $ends->[$z] ) {
-                    $callback->( $q, $ends->[$z] ) or last TEXT;
+                if ( $ends->[$z] ) {
+                    $callback->( $q, $ends->[$z]->$* ) or last TEXT;
                 }
                 $q--;
             }
@@ -180,7 +180,7 @@ class Algorithm::UrataniTakeda {
             # memo grows by one entry per (state, distinct character) ever seen in searched text and is never released.
 
             my $f = (
-                $fails->[$z]{ $alpha->{$c} ? $c : -1 } //= do {
+                $fails->[$z]{ exists $alpha->{$c} ? $c : -1 } //= do {
                     my $a = $shift1->[$z]{$c};
                     my $b = $shift2->[$z];
                     ( $a && $a < $b ) ? $a : $b;
@@ -275,7 +275,7 @@ Algorithm::UrataniTakeda - an implementation of the Uratani-Takeda string search
 
 =head1 VERSION
 
-version v0.1.7
+version v0.1.8
 
 =head1 SYNOPSIS
 

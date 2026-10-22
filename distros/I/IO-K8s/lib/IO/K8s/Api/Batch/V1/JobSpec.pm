@@ -1,6 +1,6 @@
 package IO::K8s::Api::Batch::V1::JobSpec;
 # ABSTRACT: JobSpec describes how the job execution will look like.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s activeDeadlineSeconds => Int;
@@ -68,7 +68,7 @@ IO::K8s::Api::Batch::V1::JobSpec - JobSpec describes how the job execution will 
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 activeDeadlineSeconds
 

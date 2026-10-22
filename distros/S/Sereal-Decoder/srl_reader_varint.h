@@ -157,21 +157,12 @@ srl_read_varint_u64_nocheck(pTHX_ srl_reader_buffer_t *buf)
 SRL_STATIC_INLINE UV
 srl_read_varint_uv(pTHX_ srl_reader_buffer_t *buf)
 {
-    /* TODO check expect_true log */
-    /* So. This is a bit of a funky piece of logic. Essentially,
-     * we can use the unrolled-loop version of varint decoding
-     * IFF there's certainly enough space in the input buffer
-     * even for the longest possible varint (11 chars, but see
-     * definition of SRL_MAX_VARINT_LENGTH) OR if we know that the
-     * unrolled logic will terminate with an error in case it
-     * reaches the end of the buffer. The latter condition
-     * is true if the varint continuation bit (high bit of the byte)
-     * is not set on the last byte in the buffer (because then the
-     * unrolled logic is guaranteed to terminate before over-reading
-     * past the end of the buffer. */
-    if (expect_true( buf->end - buf->pos >= SRL_MAX_VARINT_LENGTH )
-                     || !(*(buf->end - 1) & 0x80))
-    {
+    /* We can use the unrolled-loop version of varint decoding
+     * IFF there is certainly enough space in the input buffer
+     * even for the longest possible varint (11 bytes, see
+     * SRL_MAX_VARINT_LENGTH). Otherwise, use the safe byte-by-byte
+     * reader which bounds-checks each byte against buf->end. */
+    if (expect_true( buf->end - buf->pos >= SRL_MAX_VARINT_LENGTH )) {
         if (sizeof(UV) == sizeof(U32)) {
             return srl_read_varint_u32_nocheck(aTHX_ buf);
         } else {
@@ -187,9 +178,10 @@ srl_read_varint_uv_offset(pTHX_ srl_reader_buffer_t *buf, const char * const err
 {
     const UV offset= srl_read_varint_uv(aTHX_ buf);
     /* A "copy" reference can only refer to things that precede it
-     * in the same body. This check asserts that it at least does not
-     * refer to anything that is yet to be decoded. */
-    if (expect_false( buf->body_pos + offset >= buf->pos )) {
+     * in the same body. Compare the offset to the number of bytes already
+     * decoded instead of adding an uncontrolled UV to body_pos as
+     * that pointer addition can wrap below body_pos for a large offset. */
+    if (expect_false( offset >= (UV)(buf->pos - buf->body_pos) )) {
         SRL_RDR_ERRORf4(buf, "Corrupted packet%s. Offset %"UVuf" points past current position %"UVuf" in packet with length of %"UVuf" bytes long",
                          errstr, offset, (UV)SRL_RDR_POS_OFS(buf), (UV)SRL_RDR_SIZE(buf));
     }

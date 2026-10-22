@@ -26,6 +26,13 @@ local *Rex::Rancher::_gpu_setup_if_requested = sub { push @ran, 'gpu_setup' };
 # Rex::GPU is not needed here: its check has t/gpu-module-version.t.
 local *Rex::Rancher::_check_gpu_module       = sub { };
 local *Rex::Rancher::install_agent           = sub { push @ran, 'install_agent'; %agent_opts = @_ };
+# preflight_server/preflight_agent read the host, and offline that host is this
+# machine (Rex's local exec): its host reads are faked to a fresh host with
+# nothing installed. The preflight's pure checks still run; it records nothing
+# in @ran (its place in the pipeline: t/deploy-preflight.t).
+local *Rex::Rancher::Uninstall::check_cilium_residue              = sub { 1 };
+local *Rex::Rancher::Distribution::check_version_skew             = sub { return };
+local *Rex::Rancher::Distribution::check_established_cluster_cidr = sub { return };
 use warnings 'redefine';
 
 for my $dist (qw( rke2 k3s )) {

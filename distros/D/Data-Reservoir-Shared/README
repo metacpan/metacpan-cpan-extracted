@@ -52,7 +52,7 @@ DESCRIPTION
     each item carries a positive weight and is retained with probability
     proportional to its weight rather than uniformly. This is the
     Efraimidis-Spirakis A-Res algorithm -- each observed item is assigned a
-    key "u ** (1/weight)" (with "u" uniform in "(0,1]") and the "k" items with
+    key "log(u) / weight" (with "u" uniform in "(0,1]") and the "k" items with
     the largest keys are kept, tracked in a shared min-heap so a heavier
     arrival can evict the current lightest member. With a single slot the
     probability of keeping item "i" is exactly "w_i / sum(w)". Feed weighted
@@ -60,7 +60,8 @@ DESCRIPTION
     greater than zero); everything else -- "sample", "count", "get", "clear",
     and cross-process sharing -- works identically. A weighted reservoir
     stores an extra "k * 16" bytes for the heap and records its mode in the
-    header, so a reopened segment stays weighted.
+    header, so a reopened segment stays weighted. Weighted files from earlier
+    releases must be recreated for the logarithmic key format.
 
 METHODS
   Constructors
@@ -85,10 +86,10 @@ METHODS
     The constructors create a new segment sparse: pages are allocated as they
     are first written, and once the filesystem is full, a write to a page not
     yet allocated dies with SIGBUS. Set "DATA_RESERVOIR_SHARED_SPARSE=0" to
-    reserve the whole segment at creation, so a full filesystem makes them
-    croak instead; on tmpfs and memfd that commits the segment's memory at
-    once, and a memory cgroup too small for it gets an OOM kill rather than a
-    croak.
+    reserve the whole segment at creation, so a full filesystem or unsupported
+    reservation makes them croak instead; on tmpfs and memfd that commits the
+    segment's memory at once, and a memory cgroup too small for it gets an OOM
+    kill rather than a croak.
 
   Sampling
         my $kept  = $rsv->add($item);            # uniform: 1 if now stored, 0 if discarded

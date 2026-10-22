@@ -13,7 +13,7 @@
 ^Net-QUIC-[^/]+(?:/|\.tar(?:\.gz)?$)
 ^cover_db(?:/|$)
 ^\.prove$
-^handoff\.md$
+^[Hh]andoff\.md$
 ^missing_features\.md$
 ^protocol_engine_plan\.md$
 ~$

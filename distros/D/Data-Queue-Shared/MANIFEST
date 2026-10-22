@@ -46,6 +46,7 @@ t/pod_synopsis.t
 t/version_check.t
 typemap
 xt/asan.t
+xt/arena_crash.t
 xt/binary_data.t
 xt/clock_monotonic.t
 xt/clock_skew.t
@@ -66,6 +67,7 @@ xt/fork_bomb.t
 xt/futex_fairness.t
 xt/fuzz_ops.t
 xt/invalid_args.t
+xt/int_reservations.t
 xt/kwalitee.t
 xt/manifest_vs_git.t
 xt/max_length.t
@@ -89,5 +91,7 @@ xt/zero_consumers.t
 t/15-recover.t
 t/16-foreign-invocant.t
 t/17-adversarial-hardening.t
+t/18-str-wakeups.t
+t/19-int-missed-wake.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

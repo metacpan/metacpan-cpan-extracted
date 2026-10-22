@@ -1059,7 +1059,7 @@ static uint32_t reqrep_next_tag(void) {
 }
 
 static ReqRepHandle *reqrep_setup_handle(void *base, size_t map_size,
-                                          const char *path, int backing_fd) {
+                                          const char *path, int backing_fd, const struct stat *file_st) {
     ReqRepHeader *hdr = (ReqRepHeader *)base;
     ReqRepHandle *h = (ReqRepHandle *)calloc(1, sizeof(ReqRepHandle));
     if (!h) return NULL;
@@ -1078,10 +1078,10 @@ static ReqRepHandle *reqrep_setup_handle(void *base, size_t map_size,
     h->procs         = (ReqRepProc *)((char *)base + hdr->proc_off);
     h->lost          = (uint32_t *)(h->procs + REQREP_PROC_SLOTS);
     h->path          = path ? strdup(path) : NULL;
-    struct stat st;
-    if (path && lstat(path, &st) == 0) {
-        h->file_dev = st.st_dev;
-        h->file_ino = st.st_ino;
+    if (path && !h->path) { free(h); return NULL; }
+    if (file_st) {
+        h->file_dev = file_st->st_dev;
+        h->file_ino = file_st->st_ino;
     }
     h->notify_fd     = -1;
     h->reply_fd      = -1;
@@ -1379,6 +1379,7 @@ static ReqRepHandle *reqrep_create(const char *path, uint32_t req_cap,
     int anonymous = (path == NULL);
     size_t map_size;
     void *base;
+    struct stat st;
 
     if (anonymous) {
         map_size = (size_t)total_size;
@@ -1400,7 +1401,6 @@ static ReqRepHandle *reqrep_create(const char *path, uint32_t req_cap,
             close(fd); return NULL;
         }
 
-        struct stat st;
         if (fstat(fd, &st) < 0) {
             REQREP_ERR("fstat(%s): %s", path, strerror(errno));
             flock(fd, LOCK_UN); close(fd); return NULL;
@@ -1454,7 +1454,7 @@ static ReqRepHandle *reqrep_create(const char *path, uint32_t req_cap,
                                         req_slots_off, req_arena_off, req_arena_cap,
                                         resp_off, resp_stride, &prov);
                     flock(fd, LOCK_UN); close(fd);
-                    ReqRepHandle *h = reqrep_setup_handle(base, map_size, path, -1);
+                    ReqRepHandle *h = reqrep_setup_handle(base, map_size, path, -1, &st);
                     if (!h) { munmap(base, map_size); return NULL; }
                     return h;
                 }
@@ -1470,7 +1470,7 @@ static ReqRepHandle *reqrep_create(const char *path, uint32_t req_cap,
             }
             flock(fd, LOCK_UN);
             close(fd);
-            ReqRepHandle *h = reqrep_setup_handle(base, map_size, path, -1);
+            ReqRepHandle *h = reqrep_setup_handle(base, map_size, path, -1, &st);
             if (!h) { munmap(base, map_size); return NULL; }
             return h;
         }
@@ -1482,7 +1482,7 @@ static ReqRepHandle *reqrep_create(const char *path, uint32_t req_cap,
         close(fd);
     }
 
-    ReqRepHandle *h = reqrep_setup_handle(base, map_size, path, -1);
+    ReqRepHandle *h = reqrep_setup_handle(base, map_size, path, -1, anonymous ? NULL : &st);
     if (!h) { munmap(base, map_size); return NULL; }
     return h;
 }
@@ -1530,7 +1530,7 @@ static ReqRepHandle *reqrep_open(const char *path, uint32_t mode, char *errbuf) 
     flock(fd, LOCK_UN);
     close(fd);
 
-    ReqRepHandle *h = reqrep_setup_handle(base, map_size, path, -1);
+    ReqRepHandle *h = reqrep_setup_handle(base, map_size, path, -1, &st);
     if (!h) { munmap(base, map_size); return NULL; }
     return h;
 }
@@ -1580,7 +1580,7 @@ static ReqRepHandle *reqrep_create_memfd(const char *name, uint32_t req_cap,
                         req_slots_off, req_arena_off, req_arena_cap,
                         resp_off, resp_stride, &prov);
 
-    ReqRepHandle *h = reqrep_setup_handle(base, (size_t)total_size, NULL, fd);
+    ReqRepHandle *h = reqrep_setup_handle(base, (size_t)total_size, NULL, fd, NULL);
     if (!h) { munmap(base, (size_t)total_size); close(fd); return NULL; }
     return h;
 }
@@ -1624,7 +1624,7 @@ static ReqRepHandle *reqrep_open_fd(int fd, uint32_t mode, char *errbuf) {
         return NULL;
     }
 
-    ReqRepHandle *h = reqrep_setup_handle(base, map_size, NULL, myfd);
+    ReqRepHandle *h = reqrep_setup_handle(base, map_size, NULL, myfd, NULL);
     if (!h) { munmap(base, map_size); close(myfd); return NULL; }
     return h;
 }
@@ -2571,7 +2571,7 @@ static ReqRepHandle *reqrep_create_int(const char *path, uint32_t req_cap,
                     reqrep_int_init_header(base, req_cap, resp_slots_n, total_size,
                                             req_slots_off, resp_off, resp_stride, &prov);
                     flock(fd, LOCK_UN); close(fd);
-                    ReqRepHandle *h = reqrep_setup_handle(base, map_size, path, -1);
+                    ReqRepHandle *h = reqrep_setup_handle(base, map_size, path, -1, &st);
                     if (!h) { munmap(base, map_size); return NULL; }
                     return h;
                 }
@@ -2586,21 +2586,21 @@ static ReqRepHandle *reqrep_create_int(const char *path, uint32_t req_cap,
                 munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
             }
             flock(fd, LOCK_UN); close(fd);
-            ReqRepHandle *h = reqrep_setup_handle(base, map_size, path, -1);
+            ReqRepHandle *h = reqrep_setup_handle(base, map_size, path, -1, &st);
             if (!h) { munmap(base, map_size); return NULL; }
             return h;
         }
         reqrep_int_init_header(base, req_cap, resp_slots_n, total_size,
                                 req_slots_off, resp_off, resp_stride, &prov);
         flock(fd, LOCK_UN); close(fd);
-        ReqRepHandle *h = reqrep_setup_handle(base, map_size, path, -1);
+        ReqRepHandle *h = reqrep_setup_handle(base, map_size, path, -1, &st);
         if (!h) { munmap(base, map_size); return NULL; }
         return h;
     }
 
     reqrep_int_init_header(base, req_cap, resp_slots_n, total_size,
                             req_slots_off, resp_off, resp_stride, &prov);
-    ReqRepHandle *h = reqrep_setup_handle(base, map_size, path, -1);
+    ReqRepHandle *h = reqrep_setup_handle(base, map_size, path, -1, NULL);
     if (!h) { munmap(base, map_size); return NULL; }
     return h;
 }
@@ -2637,7 +2637,7 @@ static ReqRepHandle *reqrep_create_int_memfd(const char *name, uint32_t req_cap,
 
     reqrep_int_init_header(base, req_cap, resp_slots_n, total_size,
                             req_slots_off, resp_off, resp_stride, &prov);
-    ReqRepHandle *h = reqrep_setup_handle(base, (size_t)total_size, NULL, fd);
+    ReqRepHandle *h = reqrep_setup_handle(base, (size_t)total_size, NULL, fd, NULL);
     if (!h) { munmap(base, (size_t)total_size); close(fd); return NULL; }
     return h;
 }

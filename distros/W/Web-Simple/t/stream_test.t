@@ -1,12 +1,8 @@
 use strict;
 use warnings FATAL => 'all';
 
-use Test::More (
-  eval { require HTTP::Request::AsCGI }
-    ? 'no_plan'
-    : (skip_all => 'No HTTP::Request::AsCGI')
-);
-
+use Test::More;
+use Test::Needs 'HTTP::Request::AsCGI';
 use HTTP::Request::Common qw(GET POST);
 
 my $app = StreamTest->new;
@@ -42,3 +38,5 @@ sub run_request {
         },;
     }
 }
+
+done_testing;

@@ -5,6 +5,7 @@ model: inherit
 briefing:
   skills:
     - rex-rancher-core
+    - rex-rancher-traps
     - rex
     - getty-perl-core
     - kubernetes-rke2

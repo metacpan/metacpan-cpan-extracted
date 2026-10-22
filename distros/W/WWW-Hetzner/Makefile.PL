@@ -23,6 +23,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "HTTP::Request" => 0,
     "JSON::MaybeXS" => 0,
+    "LWP::Protocol::https" => 0,
     "LWP::UserAgent" => 0,
     "Log::Any" => 0,
     "Moo" => 0,
@@ -36,7 +37,7 @@ my %WriteMakefileArgs = (
     "Log::Any::Test" => 0,
     "Test::More" => "0.94"
   },
-  "VERSION" => "0.101",
+  "VERSION" => "0.102",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -46,6 +47,7 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "HTTP::Request" => 0,
   "JSON::MaybeXS" => 0,
+  "LWP::Protocol::https" => 0,
   "LWP::UserAgent" => 0,
   "Log::Any" => 0,
   "Log::Any::Test" => 0,

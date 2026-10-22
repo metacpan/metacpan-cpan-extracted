@@ -29,12 +29,12 @@
          "requires" : {
             "Devel::PPPort" : "0",
             "ExtUtils::MakeMaker" : "0",
-            "XS::Parse::Keyword" : "0.40"
+            "XS::Parse::Keyword" : "0.50"
          }
       },
       "runtime" : {
          "requires" : {
-            "XS::Parse::Keyword" : "0.40",
+            "XS::Parse::Keyword" : "0.50",
             "perl" : "5.022"
          }
       },
@@ -55,6 +55,6 @@
          "web" : "https://github.com/vividsnow/perl5-data-queue-shared"
       }
    },
-   "version" : "0.10",
+   "version" : "0.11",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

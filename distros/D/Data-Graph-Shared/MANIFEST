@@ -24,6 +24,7 @@ t/version_check.t
 t/04-frozen.t
 t/05-recover.t
 t/06-foreign-invocant.t
+t/07-paths.t
 xt/asan.t
 xt/cloexec_exec.t
 xt/concurrent_open.t
@@ -33,7 +34,9 @@ xt/eg_runs.t
 xt/enospc.t
 xt/fd_leak.t
 xt/fd_validation.t
+xt/graph_model.t
 xt/invalid_args.t
+xt/interrupted_open.t
 xt/kwalitee.t
 xt/manifest_vs_git.t
 xt/memfd_seal.t

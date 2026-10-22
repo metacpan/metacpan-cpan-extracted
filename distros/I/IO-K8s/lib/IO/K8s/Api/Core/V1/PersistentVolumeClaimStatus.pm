@@ -1,18 +1,18 @@
 package IO::K8s::Api::Core::V1::PersistentVolumeClaimStatus;
 # ABSTRACT: PersistentVolumeClaimStatus is the current status of a persistent volume claim.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s accessModes => [Str];
 
 
-k8s allocatedResourceStatuses => { Str => 1 };
+k8s allocatedResourceStatuses => HashRef[Str];
 
 
-k8s allocatedResources => { Quantity => 1 };
+k8s allocatedResources => HashRef[Quantity];
 
 
-k8s capacity => { Quantity => 1 };
+k8s capacity => HashRef[Quantity];
 
 
 k8s conditions => ['Core::V1::PersistentVolumeClaimCondition'];
@@ -44,7 +44,7 @@ IO::K8s::Api::Core::V1::PersistentVolumeClaimStatus - PersistentVolumeClaimStatu
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 accessModes
 

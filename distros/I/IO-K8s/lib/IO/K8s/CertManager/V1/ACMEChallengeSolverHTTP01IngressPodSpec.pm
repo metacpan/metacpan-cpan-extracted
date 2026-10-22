@@ -1,11 +1,11 @@
 package IO::K8s::CertManager::V1::ACMEChallengeSolverHTTP01IngressPodSpec;
 # ABSTRACT: PodSpec defines overrides for the HTTP01 challenge solver pod.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s affinity           => 'Core::V1::Affinity';
 k8s imagePullSecrets   => ['+IO::K8s::CertManager::V1::LocalObjectReference'];
-k8s nodeSelector       => { Str => 1 };
+k8s nodeSelector       => HashRef[Str];
 k8s priorityClassName  => Str;
 k8s resources          => 'Core::V1::VolumeResourceRequirements';
 k8s securityContext    => '+IO::K8s::CertManager::V1::ACMEChallengeSolverHTTP01IngressPodSecurityContext';
@@ -34,7 +34,7 @@ IO::K8s::CertManager::V1::ACMEChallengeSolverHTTP01IngressPodSpec - PodSpec defi
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 affinity
 

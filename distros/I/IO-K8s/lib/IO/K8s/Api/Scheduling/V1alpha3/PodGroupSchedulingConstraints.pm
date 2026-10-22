@@ -1,6 +1,6 @@
 package IO::K8s::Api::Scheduling::V1alpha3::PodGroupSchedulingConstraints;
 # ABSTRACT: PodGroupSchedulingConstraints defines scheduling constraints (e.g. topology) for a PodGroup.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s topology => ['Scheduling::V1alpha3::TopologyConstraint'];
@@ -20,7 +20,7 @@ IO::K8s::Api::Scheduling::V1alpha3::PodGroupSchedulingConstraints - PodGroupSche
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 topology
 

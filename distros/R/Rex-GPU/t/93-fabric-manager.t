@@ -52,7 +52,7 @@ my @NVSWITCH_LINES = map {
 } 5 .. 8;
 
 my $LSPCI_PROBE   = 'command -v lspci >/dev/null 2>&1';
-my $DISPLAY_READ  = q{lspci -nn 2>&1 | grep -E '\[03(00|02)\]'};
+my $DISPLAY_READ  = q{lspci -nn 2>&1 | grep -E '\[03(00|02)\]|\[0380\].*\[1002:'};
 my $NVSWITCH_READ = q{lspci -nn -d 10de: 2>/dev/null | grep -F '[0680]'};
 
 # detect() with run() answering per command; records the commands. lspci is

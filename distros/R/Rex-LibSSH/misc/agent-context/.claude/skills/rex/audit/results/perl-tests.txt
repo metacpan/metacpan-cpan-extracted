@@ -1,0 +1,20 @@
+ok 1 - valid plan retained
+ok 2 - returns independent hash
+ok 3 - input is unchanged
+ok 4 - rejects invalid path: relative
+ok 5 - rejects invalid path: /etc/config
+ok 6 - rejects invalid path: /srv/example-other/config
+ok 7 - rejects invalid path: /srv/example/../secret
+ok 8 - rejects invalid path: /srv/example/./secret
+ok 9 - rejects invalid path: /srv/example//secret
+ok 10 - rejects invalid path: /srv/example/
+ok 11 - rejects invalid path: NUL case
+ok 12 - rejects invalid plan data
+ok 13 - rejects invalid plan data
+ok 14 - rejects invalid plan data
+ok 15 - rejects invalid plan data
+ok 16 - rejects invalid plan data
+ok 17 - rejects non-hash input
+ok 18 - rejects filesystem root as approval boundary
+ok 19 - empty content is legitimate
+1..19

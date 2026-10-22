@@ -4,7 +4,29 @@
 #include "XSUB.h"
 
 #include "ppport.h"
+
+static int pool_wait_interrupted(void) { dTHX; return PL_sig_pending != 0; }
+#define POOL_WAIT_INTERRUPTED() pool_wait_interrupted()
 #include "pool.h"
+
+static XS(XS_Data__Pool__Shared_alloc);
+static XS(XS_Data__Pool__Shared_try_alloc);
+static XS(XS_Data__Pool__Shared_set);
+static XS(XS_Data__Pool__Shared__I64_set);
+static XS(XS_Data__Pool__Shared__I32_set);
+static XS(XS_Data__Pool__Shared__F64_set);
+static XS(XS_Data__Pool__Shared__Str_set);
+
+static int pool_native_set(CV *cv) {
+    if (!cv || !CvISXSUB(cv)) return -1;
+    XSUBADDR_t fn = CvXSUB(cv);
+    if (fn == XS_Data__Pool__Shared_set)      return POOL_VAR_RAW;
+    if (fn == XS_Data__Pool__Shared__I64_set) return POOL_VAR_I64;
+    if (fn == XS_Data__Pool__Shared__I32_set) return POOL_VAR_I32;
+    if (fn == XS_Data__Pool__Shared__F64_set) return POOL_VAR_F64;
+    if (fn == XS_Data__Pool__Shared__Str_set) return POOL_VAR_STR;
+    return -1;
+}
 
 /* slot_sv lifetime magic: returned scalar pins the pool object alive by
  * holding an incremented refcount, released when the scalar is freed. */
@@ -17,6 +39,32 @@ static int pool_scalar_magic_free(pTHX_ SV *sv, MAGIC *mg) {
 static const MGVTBL pool_scalar_magic_vtbl = {
     NULL, NULL, NULL, NULL, pool_scalar_magic_free, NULL, NULL, NULL
 };
+
+typedef struct {
+    SV *object;
+    SV *slot;
+    int committed;
+} PoolAllocation;
+
+static void pool_allocation_cleanup(pTHX_ void *offset) {
+    PoolAllocation *allocation = SSPTRt(PTR2IV(offset), PoolAllocation);
+    SV *object = allocation->object, *slot = allocation->slot;
+    if (!allocation->committed) {
+        dSP;
+        ENTER;
+        SAVETMPS;
+        save_scalar(PL_errgv);
+        PUSHMARK(SP);
+        XPUSHs(object);
+        XPUSHs(slot);
+        PUTBACK;
+        call_method("free", G_DISCARD | G_EVAL);
+        FREETMPS;
+        LEAVE;
+    }
+    SvREFCNT_dec(slot);
+    SvREFCNT_dec(object);
+}
 
 #define EXTRACT_POOL(sv) \
     if (!sv_isobject(sv) || !sv_derived_from(sv, "Data::Pool::Shared")) \
@@ -56,6 +104,40 @@ static const MGVTBL pool_scalar_magic_vtbl = {
     if (!pool_is_allocated(h, slot)) \
         croak("slot %" UVuf " is not allocated", (UV)(slot))
 
+
+static int64_t pool_perl_alloc(pTHX_ SV *self, PoolHandle *h, double timeout) {
+    PoolHandle *h0 = h;
+    struct timespec deadline, remaining;
+    if (timeout > 0) pool_make_deadline(timeout, &deadline);
+    double seconds = timeout;
+    for (;;) {
+        int64_t result = pool_alloc(h, seconds);
+        if (result != -2) return result;
+        PERL_ASYNC_CHECK();
+        REEXTRACT_POOL(self);
+        if (timeout > 0) {
+            if (!pool_remaining_time(&deadline, &remaining)) return -1;
+            seconds = (double)remaining.tv_sec + (double)remaining.tv_nsec / 1e9;
+        }
+    }
+}
+
+static int pool_perl_alloc_n(pTHX_ SV *self, PoolHandle *h, uint64_t *out, uint32_t count, double timeout) {
+    PoolHandle *h0 = h;
+    struct timespec deadline, remaining;
+    if (timeout > 0) pool_make_deadline(timeout, &deadline);
+    double seconds = timeout;
+    for (;;) {
+        int result = pool_alloc_n(h, out, count, seconds);
+        if (result >= 0) return result;
+        PERL_ASYNC_CHECK();
+        REEXTRACT_POOL(self);
+        if (timeout > 0) {
+            if (!pool_remaining_time(&deadline, &remaining)) return 0;
+            seconds = (double)remaining.tv_sec + (double)remaining.tv_nsec / 1e9;
+        }
+    }
+}
 
 MODULE = Data::Pool::Shared  PACKAGE = Data::Pool::Shared
 
@@ -125,7 +207,7 @@ alloc(self, ...)
   CODE:
     if (items > 1 && (SvGETMAGIC(ST(1)), SvOK(ST(1)))) timeout = SvNV(ST(1));
     REEXTRACT_POOL(self);
-    int64_t slot = pool_alloc(h, timeout);
+    int64_t slot = pool_perl_alloc(aTHX_ self, h, timeout);
     RETVAL = (slot >= 0) ? newSViv((IV)slot) : &PL_sv_undef;
   OUTPUT:
     RETVAL
@@ -138,6 +220,98 @@ try_alloc(self)
   CODE:
     int64_t slot = pool_try_alloc(h);
     RETVAL = (slot >= 0) ? newSViv((IV)slot) : &PL_sv_undef;
+  OUTPUT:
+    RETVAL
+
+SV *
+alloc_set(self, value, ...)
+    SV *self
+    SV *value
+  ALIAS:
+    try_alloc_set = 1
+  CODE:
+    ENTER;
+    SAVETMPS;
+    SV *object = sv_2mortal(newSVsv(self));
+    SV *val = sv_2mortal(newSVsv(value));
+    SV *timeout = NULL;
+    if (!ix) {
+        timeout = sv_2mortal(items > 2 ? newSVsv(ST(2)) : newSViv(-1));
+        if (!SvOK(timeout)) sv_setiv(timeout, -1);
+    }
+    EXTRACT_POOL(object);
+    GV *alloc_gv = gv_fetchmethod_autoload(SvSTASH(SvRV(object)), ix ? "try_alloc" : "alloc", 0);
+    GV *set_gv = gv_fetchmethod_autoload(SvSTASH(SvRV(object)), "set", 0);
+    CV *alloc_cv = alloc_gv ? GvCV(alloc_gv) : NULL;
+    int variant = set_gv ? pool_native_set(GvCV(set_gv)) : -1;
+    int native = variant >= 0 && alloc_cv && CvISXSUB(alloc_cv)
+        && CvXSUB(alloc_cv) == (ix ? XS_Data__Pool__Shared_try_alloc : XS_Data__Pool__Shared_alloc);
+    dSP;
+    SV *slot;
+    if (native) {
+        double seconds = ix ? 0 : SvNV(timeout);
+        REEXTRACT_POOL(object);
+        int64_t index = ix ? pool_try_alloc(h) : pool_perl_alloc(aTHX_ object, h, seconds);
+        SPAGAIN;
+        slot = index >= 0 ? sv_2mortal(newSViv((IV)index)) : &PL_sv_undef;
+    } else {
+        PUSHMARK(SP);
+        XPUSHs(object);
+        if (!ix) XPUSHs(timeout);
+        PUTBACK;
+        call_method(ix ? "try_alloc" : "alloc", G_SCALAR);
+        SPAGAIN;
+        slot = POPs;
+    }
+    if (SvOK(slot)) {
+        SSize_t offset = SSNEWt(1, PoolAllocation);
+        PoolAllocation *allocation = SSPTRt(offset, PoolAllocation);
+        allocation->object = SvREFCNT_inc(object);
+        allocation->slot = SvREFCNT_inc(slot);
+        allocation->committed = 0;
+        SAVEDESTRUCTOR_X(pool_allocation_cleanup, INT2PTR(void *, offset));
+        if (native) {
+            UV index = SvUV(slot);
+            IV integer = 0;
+            NV number = 0;
+            STRLEN len = 0;
+            const char *bytes = NULL;
+            if (variant == POOL_VAR_I64 || variant == POOL_VAR_I32) integer = SvIV(val);
+            else if (variant == POOL_VAR_F64) number = SvNV(val);
+            else bytes = SvPV(val, len);
+            SPAGAIN;
+            REEXTRACT_POOL(object);
+            CHECK_SLOT(h, index);
+            CHECK_ALLOCATED(h, index);
+            switch (variant) {
+                case POOL_VAR_I64: pool_set_i64(h, index, (int64_t)integer); break;
+                case POOL_VAR_I32: pool_set_i32(h, index, (int32_t)integer); break;
+                case POOL_VAR_F64: pool_set_f64(h, index, (double)number); break;
+                case POOL_VAR_STR: pool_set_str(h, index, bytes, (uint32_t)len); break;
+                default:
+                    if (len > h->elem_size) len = h->elem_size;
+                    memcpy(pool_slot_ptr(h, index), bytes, len);
+                    if (len < h->elem_size)
+                        memset(pool_slot_ptr(h, index) + len, 0, h->elem_size - len);
+            }
+        } else {
+            PUSHMARK(SP);
+            XPUSHs(object);
+            XPUSHs(slot);
+            XPUSHs(val);
+            PUTBACK;
+            call_method("set", G_DISCARD);
+            SPAGAIN;
+        }
+        RETVAL = newSVsv(slot);
+        SSPTRt(offset, PoolAllocation)->committed = 1;
+    } else {
+        RETVAL = &PL_sv_undef;
+    }
+    PUTBACK;
+    FREETMPS;
+    LEAVE;
+    if (!SvOK(RETVAL) && GIMME_V == G_ARRAY) XSRETURN_EMPTY;
   OUTPUT:
     RETVAL
 
@@ -421,7 +595,7 @@ alloc_n(self, count, ...)
         Newx(buf, count, uint64_t);
         SAVEFREEPV(buf);  /* freed on scope exit, incl. a croak from newSViv/av_push */
         REEXTRACT_POOL(self);
-        if (pool_alloc_n(h, buf, (uint32_t)count, timeout)) {
+        if (pool_perl_alloc_n(aTHX_ self, h, buf, (uint32_t)count, timeout)) {
             AV *av = newAV();
             av_extend(av, count - 1);
             for (UV i = 0; i < count; i++)

@@ -35,7 +35,7 @@ my @CB = qw( subprotocol on_open on_frame on_close on_error );
 my %ALLOWED = (
     log          => [qw( name namespace container follow tailLines sinceSeconds sinceTime
                          timestamps previous limitBytes on_line )],
-    port_forward => [qw( name namespace ports ), @CB],
+    port_forward => [qw( name namespace ports subprotocol on_open on_frame on_data on_port_error on_close on_error )],
     exec         => [qw( name namespace command container stdin stdout stderr tty ), @CB],
     attach       => [qw( name namespace container stdin stdout stderr tty ), @CB],
     cp_to_pod    => [qw( name namespace container local remote chunk_size )],

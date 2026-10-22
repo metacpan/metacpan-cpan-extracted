@@ -6,6 +6,7 @@ disallowedTools: Write, NotebookEdit, Bash
 briefing:
   skills:
     - nak-core
+    - nak-runtime
     - getty-perl-pod
 ---
 

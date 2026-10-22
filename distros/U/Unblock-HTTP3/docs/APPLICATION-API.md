@@ -44,6 +44,46 @@ Request and response objects from Uniform::HTTP are still accepted, and the
 engine returns those canonical objects to callbacks. The named forms avoid
 manual construction for common applications.
 
+## Incoming body lifecycle
+
+Buffered incoming bodies are the standalone engine default. Each Client or
+Server accepts `receive_body => 'buffered'` and a positive
+`max_buffered_body_bytes` limit (64 MiB by default). When body reception
+successfully completes, the same canonical Uniform message receives its final
+body before it is frozen and before the body-completion callback. Empty bodies
+remain empty strings, not undefined. A buffered-body overflow fails only its
+HTTP/3 stream and discards that stream's retained bytes.
+
+For streaming reception, register `on_data` while handling the incoming
+headers, before any body bytes arrive:
+
+```perl
+my $server = Unblock::HTTP3::Server->new(
+    quic => $quic,
+    on_request => sub {
+        my ($tx, $request) = @_;
+        $tx->on_data(sub {
+            my ($tx, $bytes) = @_;
+            process_request_chunk($bytes);
+        });
+        $tx->on_finish(sub {
+            my ($tx) = @_;
+            record_terminal_state($tx->state, $tx->error);
+        });
+    },
+);
+```
+
+The client can pass `on_data => sub { ... }` and `on_finish => sub { ... }`
+directly in `request()`, or register them during `on_response`. `on_data`
+receives decoded HTTP body payload octets; it does not decode content
+encodings. It disables whole-body accumulation for that transaction. The old
+`on_body` remains available, but must not be combined with `on_data`.
+An `on_finish` callback fires once after complete, cancelled, or error
+terminal state and after applicable completion/error callbacks. Terminal
+notification is distinct from incoming body completion and does not alter
+the native Transaction's identity.
+
 ## Transport integration
 
 The host framework owns its UDP socket and timers. Net::QUIC handles QUIC and

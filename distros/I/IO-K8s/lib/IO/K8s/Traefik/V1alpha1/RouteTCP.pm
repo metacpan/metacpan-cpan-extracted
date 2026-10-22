@@ -1,6 +1,6 @@
 package IO::K8s::Traefik::V1alpha1::RouteTCP;
 # ABSTRACT: RouteTCP holds the TCP route configuration.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s match       => Str, { required => 'schema' };
@@ -28,7 +28,7 @@ IO::K8s::Traefik::V1alpha1::RouteTCP - RouteTCP holds the TCP route configuratio
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 match
 

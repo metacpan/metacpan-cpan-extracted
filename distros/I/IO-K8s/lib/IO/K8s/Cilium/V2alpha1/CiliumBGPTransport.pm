@@ -1,6 +1,6 @@
 package IO::K8s::Cilium::V2alpha1::CiliumBGPTransport;
 # ABSTRACT: Transport defines the BGP transport parameters for the peer.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s localPort => Int, { minimum => 1, maximum => 65535 };
@@ -22,7 +22,7 @@ IO::K8s::Cilium::V2alpha1::CiliumBGPTransport - Transport defines the BGP transp
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 localPort
 

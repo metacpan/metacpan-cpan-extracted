@@ -1,6 +1,6 @@
 package Net::Async::Kubernetes;
 # ABSTRACT: Async Kubernetes client for IO::Async
-our $VERSION = '0.009';
+our $VERSION = '0.011';
 use strict;
 use warnings;
 use parent 'IO::Async::Notifier';
@@ -20,6 +20,7 @@ use Kubernetes::REST::HTTPResponse;
 use Kubernetes::REST::WatchEvent;
 use Kubernetes::REST::LogEvent;
 use Net::Async::Kubernetes::PortForwardSession;
+use Net::Async::Kubernetes::PortForwardListener;
 use Net::Async::Kubernetes::Watcher;
 use Net::Async::Kubernetes::Controller;
 
@@ -444,17 +445,18 @@ sub _list_request {
     return Future->fail("Invalid arguments to list()") if @args % 2;
     my %args = @args;
     my $unknown = $self->_unknown_argument_error('list', \%args,
-        qw( namespace labelSelector fieldSelector ));
+        qw( namespace labelSelector fieldSelector limit continue resourceVersion ));
     return Future->fail($unknown) if defined $unknown;
 
     my $rest = $self->_rest;
     my ($class, $error) = $self->_resolve_class($short_class);
     return Future->fail($error) unless defined $class;
 
-    # Selectors are query parameters; build_path only knows path segments and
-    # would drop them silently, turning a filtered list into a full one.
+    # Selectors and paging are query parameters; build_path only knows path
+    # segments and would drop them silently, turning a filtered list into a
+    # full one.
     my %params;
-    for my $selector (qw(labelSelector fieldSelector)) {
+    for my $selector (qw(labelSelector fieldSelector limit continue resourceVersion)) {
         my $value = delete $args{$selector};
         $params{$selector} = $value if defined $value;
     }
@@ -1212,7 +1214,8 @@ sub port_forward {
 
     # Support: port_forward('Pod', 'name', ...) and port_forward('Pod', name => 'name', ...)
     my ($arg_error, %args) = $self->_named_args('port_forward', \@rest_args,
-        qw( name namespace ports subprotocol on_open on_frame on_close on_error ));
+        qw( name namespace ports subprotocol on_open on_frame on_data on_port_error
+            on_close on_error ));
     return Future->fail($arg_error) if defined $arg_error;
 
     return Future->fail("name required for port_forward") unless $args{name};
@@ -1229,6 +1232,8 @@ sub port_forward {
     my $subprotocol = delete $args{subprotocol} // 'v4.channel.k8s.io';
     my $on_open  = delete $args{on_open};
     my $on_frame = delete $args{on_frame};
+    my $on_data  = delete $args{on_data};
+    my $on_port_error = delete $args{on_port_error};
     my $on_close = delete $args{on_close};
     my $on_error = delete $args{on_error};
 
@@ -1253,12 +1258,61 @@ sub port_forward {
     );
 
     return $self->_do_duplex_request($req,
-        caller   => 'port_forward',
-        on_open  => $on_open,
-        on_frame => $on_frame,
-        on_close => $on_close,
-        on_error => $on_error,
+        caller        => 'port_forward',
+        ports         => $ports,
+        on_open       => $on_open,
+        on_frame      => $on_frame,
+        on_data       => $on_data,
+        on_port_error => $on_port_error,
+        on_close      => $on_close,
+        on_error      => $on_error,
     );
+}
+
+
+sub port_forward_listen {
+    my ($self, $short_class, @rest_args) = @_;
+
+    my ($arg_error, %args) = $self->_named_args('port_forward_listen', \@rest_args,
+        qw( name namespace ports host subprotocol on_error ));
+    return Future->fail($arg_error) if defined $arg_error;
+
+    return Future->fail("name required for port_forward_listen") unless $args{name};
+
+    my $ports = delete $args{ports};
+    return Future->fail("ports required for port_forward_listen")
+        unless ref($ports) eq 'HASH' && %$ports;
+    my %seen_remote;
+    for my $local (sort keys %$ports) {
+        my $remote = $ports->{$local};
+        return Future->fail("invalid local port '$local' for port_forward_listen")
+            unless $local =~ /^\d+$/ && $local <= 65535;
+        return Future->fail("invalid remote port '" . ($remote // 'undef') . "' for port_forward_listen")
+            unless defined($remote) && $remote =~ /^\d+$/ && $remote > 0 && $remote <= 65535;
+        return Future->fail("remote port '$remote' listed twice for port_forward_listen")
+            if $seen_remote{$remote}++;
+    }
+
+    my $loop = eval { $self->loop };
+    return Future->fail("port_forward_listen requires Net::Async::Kubernetes to be added to an IO::Async::Loop")
+        unless $loop;
+
+    my ($class, $error) = $self->_resolve_class($short_class);
+    return Future->fail($error) unless defined $class;
+
+    my $listener = Net::Async::Kubernetes::PortForwardListener->new(
+        kube         => $self,
+        host         => $args{host} // '127.0.0.1',
+        mappings     => { %$ports },
+        on_error     => $args{on_error},
+        forward_args => [
+            $short_class,
+            name => $args{name},
+            (defined $args{namespace} ? (namespace => $args{namespace}) : ()),
+            (defined $args{subprotocol} ? (subprotocol => $args{subprotocol}) : ()),
+        ],
+    );
+    return $listener->start;
 }
 
 
@@ -1441,6 +1495,9 @@ sub cp_to_pod {
             return if $done->is_ready;
             if ($status_payload =~ /"status"\s*:\s*"Failure"/i) {
                 $done->fail("cp_to_pod failed: $status_payload");
+            } elsif ($status_payload !~ /"status"\s*:\s*"Success"/i) {
+                $done->fail("cp_to_pod failed: connection closed without a Success status, "
+                    . "the transfer may be incomplete");
             } else {
                 $done->done({
                     local   => $local,
@@ -1507,14 +1564,27 @@ sub cp_from_pod {
                 $done->fail("cp_from_pod failed: $status_payload");
                 return;
             }
+            if ($status_payload !~ /"status"\s*:\s*"Success"/i) {
+                $done->fail("cp_from_pod failed: connection closed without a Success status, "
+                    . "the transfer may be incomplete");
+                return;
+            }
 
             open my $fh, '>:raw', $local
                 or do {
                     $done->fail("cannot write local file '$local' for cp_from_pod: $!");
                     return;
                 };
-            print {$fh} $stdout;
-            close $fh;
+            unless (print {$fh} $stdout) {
+                my $err = $!;
+                close $fh;
+                $done->fail("cannot write local file '$local' for cp_from_pod: $err");
+                return;
+            }
+            unless (close $fh) {
+                $done->fail("cannot write local file '$local' for cp_from_pod: $!");
+                return;
+            }
 
             $done->done({
                 local   => $local,
@@ -1605,7 +1675,7 @@ sub _do_request {
         my ($response) = @_;
         return Future->done(Kubernetes::REST::HTTPResponse->new(
             status  => $response->code,
-            content => $response->decoded_content // $response->content // '',
+            content => $response->decoded_content(charset => 'none') // $response->content // '',
         ));
     });
 }
@@ -1660,8 +1730,11 @@ sub _do_duplex_request {
 
     my $on_open  = $callbacks{on_open};
     my $on_frame = $callbacks{on_frame};
+    my $on_data  = $callbacks{on_data};
+    my $on_port_error = $callbacks{on_port_error};
     my $on_close = $callbacks{on_close};
     my $on_error = $callbacks{on_error};
+    my $ports    = $callbacks{ports};
 
     my $ws_url = $self->_build_websocket_url($req->url);
     my $ws_req = $self->_build_websocket_request($req);
@@ -1696,14 +1769,29 @@ sub _do_duplex_request {
 
     my $dispatch_frame = sub {
         my ($bytes) = @_;
-        return unless ref($on_frame) eq 'CODE';
         return unless defined $bytes;
         return unless length $bytes;
 
         my $channel = ord(substr($bytes, 0, 1));
         my $payload = substr($bytes, 1);
-        my $ok = eval { $on_frame->($channel, $payload); 1 };
-        $notify_error->($@) unless $ok;
+        if (ref($on_frame) eq 'CODE') {
+            my $ok = eval { $on_frame->($channel, $payload); 1 };
+            $notify_error->($@) unless $ok;
+        }
+
+        # port-forward: strip and check the preamble, route data and errors
+        return unless $session && $session->is_port_forward;
+        for my $event ($session->_port_events($channel, $payload)) {
+            my ($kind, @rest) = @$event;
+            my $cb = $kind eq 'data' ? $on_data
+                : $kind eq 'port_error' ? $on_port_error : undef;
+            if ($kind eq 'error') {
+                $notify_error->($rest[0]);
+            } elsif (ref($cb) eq 'CODE') {
+                my $ok = eval { $cb->($session, @rest); 1 };
+                $notify_error->($@) unless $ok;
+            }
+        }
     };
 
     $client = $self->_make_websocket_client(
@@ -1737,6 +1825,11 @@ sub _do_duplex_request {
         },
     );
 
+    $session = Net::Async::Kubernetes::PortForwardSession->new(
+        ws_client => $client,
+        ($ports ? (ports => $ports) : ()),
+    );
+
     $self->add_child($client);
 
     return $client->connect(
@@ -1744,9 +1837,6 @@ sub _do_duplex_request {
         req => $ws_req,
         $self->_ssl_options,
     )->then(sub {
-        $session = Net::Async::Kubernetes::PortForwardSession->new(
-            ws_client => $client,
-        );
 
         if (ref($on_open) eq 'CODE') {
             my $ok = eval { $on_open->($session); 1 };
@@ -1820,7 +1910,7 @@ Net::Async::Kubernetes - Async Kubernetes client for IO::Async
 
 =head1 VERSION
 
-version 0.009
+version 0.011
 
 =head1 SYNOPSIS
 
@@ -2165,6 +2255,20 @@ IO::K8s objects.
 
 C<labelSelector> and C<fieldSelector> are sent as query parameters, so
 filtering happens server-side rather than on the list that comes back.
+C<limit>, C<continue> and C<resourceVersion> are sent as query parameters too,
+as in L<Kubernetes::REST/list>. The list carries the collection's metadata
+(C<resourceVersion>, C<continue>, C<remainingItemCount>) in
+C<< $list->metadata >>, so a large collection can be paged and a watch can
+start from the version the list was read at:
+
+    my ($continue, @pods);
+    do {
+        my $page = $kube->list('Pod', namespace => 'default', limit => 500,
+            defined $continue ? (continue => $continue) : ())->get;
+        push @pods, @{ $page->items };
+        $continue = $page->metadata->continue;
+    } while (defined $continue && length $continue);
+
 Any other option -- a misspelt C<labelselector> would otherwise list every
 object -- fails the L<Future> before a request is sent, naming the options
 C<list> takes. So does an odd list of options, as C<Invalid arguments to
@@ -2179,7 +2283,7 @@ qualified C<'group/version/Kind'> name to pin a specific API version -- see
 L</expand_class>
 
 =item C<%args> - Optional parameters: C<namespace>, C<labelSelector>,
-C<fieldSelector>
+C<fieldSelector>, C<limit>, C<continue>, C<resourceVersion>
 
 =back
 
@@ -2601,6 +2705,10 @@ With C<on_line>, opens a streaming request and invokes the callback once per
 line with L<Kubernetes::REST::LogEvent> objects. The returned L<Future>
 resolves when the stream ends.
 
+The log is returned as raw bytes in both modes, as L<Kubernetes::REST> does;
+decode it yourself (C<Encode::decode('UTF-8', $text)>) when you need
+characters.
+
 Besides C<name>, C<namespace> and C<on_line> it takes the options
 C<container>, C<follow>, C<tailLines>, C<sinceSeconds>, C<sinceTime>,
 C<timestamps>, C<previous> and C<limitBytes>, sent as query parameters. Any
@@ -2609,33 +2717,123 @@ L<Future> before a request is sent.
 
 =head2 port_forward
 
-    my $f = $kube->port_forward('Pod', 'my-pod',
-        namespace => 'default',
-        ports     => [8080, 8443],
-        on_frame  => sub { my ($channel, $payload) = @_; ... },
-    );
-    my $session = $f->get;
+    my $session = $kube->port_forward('Pod', 'my-pod',
+        namespace     => 'default',
+        ports         => [8080, 8443],
+        on_data       => sub { my ($session, $port, $bytes) = @_; ... },
+        on_port_error => sub { my ($session, $port, $message) = @_; ... },
+        on_error      => sub { my ($error) = @_; ... },
+    )->get;
+
+    $session->write_port(8080, "GET / HTTP/1.0\r\n\r\n");
 
 Create an async pod port-forward session request.
 
 Returns a L<Future> that resolves to the duplex session object returned by the
 transport backend. The default transport returns a
-L<Net::Async::Kubernetes::PortForwardSession> object.
+L<Net::Async::Kubernetes::PortForwardSession> in port-forward mode: it has
+C<write_port>, C<write_channel> and C<close>; C<write_stdin> and C<resize>
+belong to exec/attach and croak here (see L</Channels>).
 
-The session helper supports C<write_channel>, C<write_stdin>, C<resize>, and
-C<close>.
+To forward a local TCP port instead of driving the connection by hand, see
+L</port_forward_listen>.
+
+=head3 Callbacks
 
 C<on_open> receives the created session object.
 
+C<on_data> is called as C<< $on_data->($session, $port, $bytes) >> with the
+bytes the pod side of the forwarded connection of remote C<$port> sent, port
+preamble stripped.
+
+C<on_port_error> is called as C<< $on_port_error->($session, $port, $message) >>
+with what the Kubelet wrote on the error channel of C<$port>: the reason it
+could not reach the port in the pod, as text.
+
+C<on_error> is called as C<< $on_error->($error) >> for transport problems and
+for frames that break the protocol: a first frame on a channel that is not
+exactly the two-byte port number of that channel's port (wrong number, or
+payload in the same frame), and a frame on a channel beyond the C<2 * N>
+channels of the C<N> requested ports. Such a frame is not passed on as data;
+after a bad preamble the channel delivers nothing further.
+
 C<on_frame> receives C<($channel, $payload)> where the first byte of each
-binary websocket frame is decoded as Kubernetes channel id.
+binary websocket frame is decoded as Kubernetes channel id. It is raw: the
+preamble frames are included. It is called in addition to C<on_data> and
+C<on_port_error>, for every frame, before them.
+
+C<on_close> is called once when the connection ends.
+
+All callbacks run inside the event loop and must not C<< ->get >> a Future.
+
+=head3 Channels
+
+A port-forward session does not use the exec/attach channel layout of
+L</exec>. For each requested port, counted from 0 in the order of C<ports>,
+the Kubelet opens two channels: the I<data> channel C<2 * $i> and the
+I<error> channel C<2 * $i + 1>. With C<< ports =E<gt> [8080, 8443] >>:
+
+    channel 0   data    of port 8080
+    channel 1   error   of port 8080
+    channel 2   data    of port 8443
+    channel 3   error   of port 8443
+
+Channel 3 is therefore the error channel of the second port, not a status
+stream. Bytes for the forwarded TCP connection are sent with
+C<< $session->write_port($port, $bytes) >> (or
+C<< write_channel(2 * $i, $bytes) >>).
+
+The first frame the server sends on every channel, data and error alike, is
+not payload: it is the port number as two bytes, little-endian
+(C<unpack('v', $payload)>), in a frame of its own. The library strips it and
+checks it against the port the channel belongs to before C<on_data> and
+C<on_port_error> see anything; only C<on_frame> sees it raw.
+
+=head3 Options
 
 It takes C<name>, C<namespace>, C<ports> (one port or an arrayref of them,
 required), C<subprotocol> (default C<v4.channel.k8s.io>) and the callbacks
-C<on_open>, C<on_frame>, C<on_close> and C<on_error>. Any other option -- a
-misspelt C<onFrame> would otherwise be dropped, a C<subresource> would even
-land in the request path -- fails the L<Future> before a request is sent,
-naming the options C<port_forward> takes.
+C<on_open>, C<on_frame>, C<on_data>, C<on_port_error>, C<on_close> and
+C<on_error>. Any other option -- a misspelt C<onFrame> would otherwise be
+dropped, a C<subresource> would even land in the request path -- fails the
+L<Future> before a request is sent, naming the options C<port_forward> takes.
+
+=head2 port_forward_listen
+
+    my $listener = $kube->port_forward_listen('Pod', 'my-pod',
+        namespace => 'default',
+        ports     => { 0 => 8080, 18443 => 8443 },    # local => remote
+        host      => '127.0.0.1',
+        on_error  => sub { my ($message) = @_; warn $message },
+    )->get;
+
+    my $local = $listener->port_for(8080);   # the ephemeral port picked for local 0
+    # ... connect to 127.0.0.1:$local, as with kubectl port-forward ...
+    $listener->stop;
+
+Like C<kubectl port-forward>: listens on local TCP ports and forwards every
+accepted connection to a remote port of the pod. C<ports> is a hashref
+C<< local =E<gt> remote >>; a local port of C<0> lets the system pick one,
+which L<Net::Async::Kubernetes::PortForwardListener/port_for> reports. Remote
+ports must be unique. C<host> is the local address to bind, default
+C<127.0.0.1>. C<name>, C<namespace> and C<subprotocol> are as for
+L</port_forward>, and the call takes the same positional or keyed C<name>.
+
+Returns a L<Future> that resolves to a L<Net::Async::Kubernetes::PortForwardListener>
+once all local ports listen. Every incoming connection gets a port-forward
+session of its own for exactly its remote port, so two connections are two
+websocket sessions. Data that arrives before that session is open is held
+and sent when it is. When either side ends (connection closed, websocket
+closed, error on the pod's error channel, protocol error) the other is
+closed too; the reason is reported to C<on_error> (C<$message>) if given.
+The websocket has no half-close: a client that shuts down its sending side
+ends the whole forward.
+
+It fails the L<Future> without a request for an unknown option, a missing
+name, C<ports> that is not a non-empty hashref, a local port outside
+0 to 65535, a remote one outside 1 to 65535, and a client that is not in a
+loop. Failing to bind a local port fails it too, and closes those already
+bound.
 
 =head2 exec
 
@@ -2721,6 +2919,11 @@ for very large files.
 Returns a L<Future> resolving to a hashref containing C<local>, C<remote>,
 C<bytes>, C<stderr>, and C<status>.
 
+The copy only counts as done when the pod reported a C<Success> status on the
+status channel (3), which the C<v4.channel.k8s.io> protocol always sends at the
+end. A C<Failure> status, or a connection that closes without any status
+(dropped connection, restarted API server), fails the L<Future>.
+
 It takes C<name>, C<namespace>, C<container>, C<local>, C<remote> and
 C<chunk_size> (bytes per stdin write, default 65536). Any other option fails
 the L<Future> before a request is sent, naming the options C<cp_to_pod>
@@ -2746,6 +2949,13 @@ for very large files.
 
 Returns a L<Future> resolving to a hashref containing C<local>, C<remote>,
 C<bytes>, C<stderr>, and C<status>.
+
+The copy only counts as done when the pod reported a C<Success> status on the
+status channel (3), which the C<v4.channel.k8s.io> protocol always sends at the
+end. A C<Failure> status, or a connection that closes without any status
+(dropped connection, restarted API server), fails the L<Future> and the local
+file is not written. A failing write of the local file (C<open>, C<print> or
+C<close>, e.g. a full disk) fails it as well.
 
 It takes C<name>, C<namespace>, C<container>, C<remote> and C<local>. Any
 other option -- C<chunk_size> belongs to L</cp_to_pod> only -- fails the

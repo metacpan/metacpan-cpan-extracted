@@ -53,6 +53,24 @@ is($server_line->(patch_kubeconfig_server($kc, '[2001:db8::10]')),
 is($server_line->(patch_kubeconfig_server($kc, '::ffff:192.0.2.1')),
   'https://[::ffff:192.0.2.1]:6443', 'IPv4-mapped IPv6 address: in brackets');
 
+# host:port: the port replaces the kubeconfig's.
+my %with_port = (
+  'cp:7443'              => 'https://cp:7443',
+  'cp.example.com:6443'  => 'https://cp.example.com:6443',
+  '203.0.113.10:7443'    => 'https://203.0.113.10:7443',
+  '[2001:db8::10]:7443'  => 'https://[2001:db8::10]:7443',
+  '[::1]:7443'           => 'https://[::1]:7443',
+);
+is($server_line->(patch_kubeconfig_server($kc, $_)), $with_port{$_}, 'with port: '.$_)
+  for sort keys %with_port;
+is($server_line->(patch_kubeconfig_server($kc =~ s/:6443/:6444/r, '[fd00::1]')),
+  'https://[fd00::1]:6444', 'bracketed IPv6 without port: the kubeconfig port is kept');
+for my $bad ('cp:0', 'cp:65536', 'cp:abc', 'cp:', '[2001:db8::10]:x', '[2001:db8::10]:',
+             'a:b:c', '[nothex]:7443', '[cp]') {
+  ok(!eval { patch_kubeconfig_server($kc, $bad); 1 }, 'invalid dies: '.$bad);
+  like($@, qr/^patch_kubeconfig_server: /, 'invalid says so: '.$bad);
+}
+
 # k3s/rke2 write [::1] when the (first) service CIDR is IPv6.
 my $kc6 = $kc =~ s{127\.0\.0\.1}{[::1]}r;
 is($server_line->(patch_kubeconfig_server($kc6, 'cp.example.com')),

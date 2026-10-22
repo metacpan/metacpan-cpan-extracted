@@ -42,16 +42,11 @@ It combines the Aho-Corasick algorithm with the Boyer-Moore algorithm, and is si
 
 # RECENT CHANGES
 
-Changes for version v0.1.7 (2026-10-20)
+Changes for version v0.1.8 (2026-10-21)
 
-- Security
-    - Limit the size of the failure shift table. (CVE-2026-113811)
 - Enhancements
-    - Improve the performance of the shift2 table builder.
-- Bug Fixes
-    - Find matches of "0".
-- Tests
-    - Added a test case to prove that duplicate keywords do not return duplicate results.
+    - Improved the performance for setting up the fail shift cache.
+    - Improved the performance when checking for complete matches.
 
 See the `Changes` file for more details.
 

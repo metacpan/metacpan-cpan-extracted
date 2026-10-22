@@ -339,15 +339,10 @@ static inline uint64_t log_available(LogHandle *h) {
     return h->hdr->data_size - __atomic_load_n(&h->hdr->tail, __ATOMIC_RELAXED);
 }
 
-static inline int log_wait(LogHandle *h, uint64_t expected_count, double timeout) {
-    if (log_entry_count(h) != expected_count) return 1;
-    if (timeout == 0) return 0;
-
-    struct timespec dl, rem;
-    int has_dl = (timeout > 0);
-    if (has_dl) log_make_deadline(timeout, &dl);
-    __atomic_add_fetch(&h->hdr->stat_waits, 1, __ATOMIC_RELAXED);
-
+/* Returns -1 on EINTR, after unregistering the waiter. */
+static inline int log_wait_until(LogHandle *h, uint64_t expected_count,
+                                  const struct timespec *dl) {
+    struct timespec rem;
     for (;;) {
         __atomic_add_fetch(&h->hdr->waiters, 1, __ATOMIC_RELEASE);
         /* StoreLoad: publish waiters++ before reading wake_seq/count, so a
@@ -355,25 +350,40 @@ static inline int log_wait(LogHandle *h, uint64_t expected_count, double timeout
         __atomic_thread_fence(__ATOMIC_SEQ_CST);
         uint32_t seq = __atomic_load_n(&h->hdr->wake_seq, __ATOMIC_ACQUIRE);
         uint64_t cur = __atomic_load_n(&h->hdr->count, __ATOMIC_ACQUIRE);
+        int interrupted = 0;
         if (cur == expected_count) {
             struct timespec *pts = NULL;
-            if (has_dl) {
-                if (!log_remaining(&dl, &rem)) {
+            if (dl) {
+                if (!log_remaining(dl, &rem)) {
                     __atomic_sub_fetch(&h->hdr->waiters, 1, __ATOMIC_RELAXED);
                     __atomic_add_fetch(&h->hdr->stat_timeouts, 1, __ATOMIC_RELAXED);
                     return 0;
                 }
                 pts = &rem;
             }
-            syscall(SYS_futex, &h->hdr->wake_seq, FUTEX_WAIT, seq, pts, NULL, 0);
+            interrupted = syscall(SYS_futex, &h->hdr->wake_seq, FUTEX_WAIT,
+                                  seq, pts, NULL, 0) < 0 && errno == EINTR;
         }
         __atomic_sub_fetch(&h->hdr->waiters, 1, __ATOMIC_RELAXED);
+        if (interrupted) return -1;
         if (log_entry_count(h) != expected_count) return 1;
-        if (has_dl && !log_remaining(&dl, &rem)) {
+        if (dl && !log_remaining(dl, &rem)) {
             __atomic_add_fetch(&h->hdr->stat_timeouts, 1, __ATOMIC_RELAXED);
             return 0;
         }
     }
+}
+
+static inline int log_wait(LogHandle *h, uint64_t expected_count, double timeout) {
+    if (log_entry_count(h) != expected_count) return 1;
+    if (timeout == 0) return 0;
+    struct timespec dl;
+    if (timeout > 0) log_make_deadline(timeout, &dl);
+    __atomic_add_fetch(&h->hdr->stat_waits, 1, __ATOMIC_RELAXED);
+    int rc;
+    do rc = log_wait_until(h, expected_count, timeout > 0 ? &dl : NULL);
+    while (rc < 0);
+    return rc;
 }
 
 /* ================================================================

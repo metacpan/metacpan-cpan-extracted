@@ -1,7 +1,7 @@
 package WWW::Hetzner::Cloud::API::Certificates;
 # ABSTRACT: Hetzner Cloud Certificates API
 
-our $VERSION = '0.101';
+our $VERSION = '0.102';
 
 use Moo;
 with 'WWW::Hetzner::Role::Pagination';
@@ -132,7 +132,7 @@ WWW::Hetzner::Cloud::API::Certificates - Hetzner Cloud Certificates API
 
 =head1 VERSION
 
-version 0.101
+version 0.102
 
 =head1 SYNOPSIS
 

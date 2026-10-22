@@ -1,0 +1,47 @@
+test_cli_bad_utf8 (test_tools.AuditTests.test_cli_bad_utf8) ... ok
+test_cli_json_threshold (test_tools.AuditTests.test_cli_json_threshold) ... ok
+test_cli_never_threshold (test_tools.AuditTests.test_cli_never_threshold) ... ok
+test_cli_oversized (test_tools.AuditTests.test_cli_oversized) ... ok
+test_creates (test_tools.AuditTests.test_creates) ... ok
+test_data_array (test_tools.AuditTests.test_data_array) ... ok
+test_descriptive_task (test_tools.AuditTests.test_descriptive_task) ... ok
+test_empty (test_tools.AuditTests.test_empty) ... ok
+test_forced_fs (test_tools.AuditTests.test_forced_fs) ... ok
+test_full_line_comment (test_tools.AuditTests.test_full_line_comment) ... ok
+test_hostkey_feature (test_tools.AuditTests.test_hostkey_feature) ... ok
+test_hostkey_on (test_tools.AuditTests.test_hostkey_on) ... ok
+test_hostkey_openssh (test_tools.AuditTests.test_hostkey_openssh) ... ok
+test_hostkey_zero (test_tools.AuditTests.test_hostkey_zero) ... ok
+test_latest (test_tools.AuditTests.test_latest) ... ok
+test_literal_secret (test_tools.AuditTests.test_literal_secret) ... ok
+test_pod_skipped_preserves_lines (test_tools.AuditTests.test_pod_skipped_preserves_lines) ... ok
+test_raw_capture (test_tools.AuditTests.test_raw_capture) ... ok
+test_regular_helper_export (test_tools.AuditTests.test_regular_helper_export) ... ok
+test_secret_variable (test_tools.AuditTests.test_secret_variable) ... ok
+test_selective_import (test_tools.AuditTests.test_selective_import) ... ok
+test_shell_program (test_tools.AuditTests.test_shell_program) ... ok
+test_shift_left_assignment (test_tools.AuditTests.test_shift_left_assignment) ... ok
+test_shift_right (test_tools.AuditTests.test_shift_right) ... ok
+test_task_collision (test_tools.AuditTests.test_task_collision) ... ok
+test_cases_are_unique_and_complete (test_tools.EvaluationSchemaTests.test_cases_are_unique_and_complete) ... ok
+test_inventory_json (test_tools.InspectorTests.test_inventory_json) ... ok
+test_never_executes_module (test_tools.InspectorTests.test_never_executes_module) ... ok
+test_bad_frontmatter (test_tools.ValidatorTests.test_bad_frontmatter) ... ok
+test_duplicate_frontmatter_key (test_tools.ValidatorTests.test_duplicate_frontmatter_key) ... ok
+test_extra_file (test_tools.ValidatorTests.test_extra_file) ... ok
+test_hash_tamper (test_tools.ValidatorTests.test_hash_tamper) ... ok
+test_invalid_json (test_tools.ValidatorTests.test_invalid_json) ... ok
+test_link_escape (test_tools.ValidatorTests.test_link_escape) ... ok
+test_manifest_unsafe_path (test_tools.ValidatorTests.test_manifest_unsafe_path) ... ok
+test_missing_file (test_tools.ValidatorTests.test_missing_file) ... ok
+test_missing_link (test_tools.ValidatorTests.test_missing_link) ... ok
+test_remote_links_not_fetched (test_tools.ValidatorTests.test_remote_links_not_fetched) ... ok
+test_safe_relative (test_tools.ValidatorTests.test_safe_relative) ... ok
+test_symlink_rejected (test_tools.ValidatorTests.test_symlink_rejected) ... ok
+test_valid_fixture (test_tools.ValidatorTests.test_valid_fixture) ... ok
+test_valid_local_link (test_tools.ValidatorTests.test_valid_local_link) ... ok
+
+----------------------------------------------------------------------
+Ran 42 tests in 5.281s
+
+OK

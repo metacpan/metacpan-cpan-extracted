@@ -320,43 +320,40 @@ static inline int heap_pop(HeapHandle *h, int64_t *out_priority, int64_t *out_va
     return 1;
 }
 
-static inline int heap_pop_wait(HeapHandle *h, int64_t *out_p, int64_t *out_v, double timeout) {
+typedef struct {
+    struct timespec deadline;
+    int started;
+} HeapWait;
+
+/* -1 asks the XS caller to dispatch signals and retry, preserving the deadline. */
+static inline int heap_pop_wait(HeapHandle *h, int64_t *out_p, int64_t *out_v, double timeout, HeapWait *wait) {
     if (heap_pop(h, out_p, out_v)) return 1;
     if (timeout == 0) return 0;
 
     HeapHeader *hdr = h->hdr;
-    struct timespec dl, rem;
+    struct timespec rem;
     int has_dl = (timeout > 0);
-    if (has_dl) heap_make_deadline(timeout, &dl);
-    __atomic_add_fetch(&hdr->stat_waits, 1, __ATOMIC_RELAXED);
-
-    for (;;) {
-        __atomic_add_fetch(&hdr->waiters_pop, 1, __ATOMIC_SEQ_CST);
-        __atomic_thread_fence(__ATOMIC_SEQ_CST);   /* StoreLoad: publish waiters_pop before reading size */
-        uint32_t cur = __atomic_load_n(&hdr->size, __ATOMIC_SEQ_CST);
-        if (cur > h->capacity) {   /* corrupt size: heap_pop can never succeed, so do not busy-spin */
-            __atomic_sub_fetch(&hdr->waiters_pop, 1, __ATOMIC_RELAXED);
-            return 0;
-        }
-        if (cur == 0) {
-            struct timespec *pts = NULL;
-            if (has_dl) {
-                if (!heap_remaining(&dl, &rem)) {
-                    __atomic_sub_fetch(&hdr->waiters_pop, 1, __ATOMIC_RELAXED);
-                    __atomic_add_fetch(&hdr->stat_timeouts, 1, __ATOMIC_RELAXED);
-                    return 0;
-                }
-                pts = &rem;
-            }
-            syscall(SYS_futex, &hdr->size, FUTEX_WAIT, 0, pts, NULL, 0);
-        }
-        __atomic_sub_fetch(&hdr->waiters_pop, 1, __ATOMIC_RELAXED);
-        if (heap_pop(h, out_p, out_v)) return 1;
-        if (has_dl && !heap_remaining(&dl, &rem)) {
+    if (!wait->started) {
+        wait->started = 1;
+        if (has_dl) heap_make_deadline(timeout, &wait->deadline);
+        __atomic_add_fetch(&hdr->stat_waits, 1, __ATOMIC_RELAXED);
+    }
+    const struct timespec *pts = &heap_lock_timeout;
+    if (has_dl) {
+        if (!heap_remaining(&wait->deadline, &rem)) {
             __atomic_add_fetch(&hdr->stat_timeouts, 1, __ATOMIC_RELAXED);
             return 0;
         }
+        if (rem.tv_sec < heap_lock_timeout.tv_sec) pts = &rem;
     }
+    __atomic_add_fetch(&hdr->waiters_pop, 1, __ATOMIC_SEQ_CST);
+    __atomic_thread_fence(__ATOMIC_SEQ_CST);   /* StoreLoad: publish waiters_pop before reading size */
+    uint32_t cur = __atomic_load_n(&hdr->size, __ATOMIC_SEQ_CST);
+    if (cur == 0)
+        /* Recheck periodically: a producer can die after publishing size but before waking us. */
+        syscall(SYS_futex, &hdr->size, FUTEX_WAIT, 0, pts, NULL, 0);
+    __atomic_sub_fetch(&hdr->waiters_pop, 1, __ATOMIC_RELAXED);
+    return cur > h->capacity ? 0 : -1;
 }
 
 static inline int heap_peek(HeapHandle *h, int64_t *out_p, int64_t *out_v) {

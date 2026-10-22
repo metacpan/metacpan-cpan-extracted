@@ -502,5 +502,6 @@ xs/wsroom.xs
 xt/0550-model-rows-oracle.t
 xt/boilerplate.t
 xt/lib/RowsOracle.pm
+t/lib/RSc/Controller/HalfLoaded.pm
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

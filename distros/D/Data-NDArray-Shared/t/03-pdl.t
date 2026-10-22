@@ -6,6 +6,8 @@ BEGIN {
         unless eval { require PDL; PDL->import; 1 };
 }
 use Data::NDArray::Shared;
+use File::Temp qw(tempdir);
+use Scalar::Util qw(weaken);
 
 # ---- buffer: raw contiguous bytes ----
 {
@@ -82,6 +84,25 @@ use Data::NDArray::Shared;
     like $@, qr/shape mismatch/, 'shape-mismatch message';
 }
 
+# Existing files must match even when the byte counts are identical.
+{
+    my $dir = tempdir(CLEANUP => 1);
+    my $p = sequence(double(), 2, 2) + 1;
+    for my $case ([ 'i64', 2, 2 ], [ 'f64', 4 ]) {
+        my ($dt, @dims) = @$case;
+        my $path = "$dir/$dt.nda";
+        my $a = Data::NDArray::Shared->new($path, $dt, @dims)->fill(9);
+        ok !eval { Data::NDArray::Shared->from_pdl($p, $path); 1 },
+            "from_pdl refuses an incompatible existing $dt file";
+        like $@, qr/(?:dtype|shape) mismatch/, 'reports the incompatible geometry';
+        is_deeply $a->to_list, [ (9) x 4 ], 'refused conversion preserves existing data';
+    }
+    my $path = "$dir/matching.nda";
+    my $a = Data::NDArray::Shared->new($path, 'f64', 2, 2);
+    Data::NDArray::Shared->from_pdl($p, $path);
+    is_deeply $a->to_list, [ 1, 2, 3, 4 ], 'from_pdl updates a matching existing file';
+}
+
 # ---- as_pdl_alias: zero-copy, bidirectional ----
 {
     my $z = Data::NDArray::Shared->new(undef, "f64", 5);
@@ -137,6 +158,26 @@ use Data::NDArray::Shared;
     my $a = Data::NDArray::Shared->new(undef, "u8", 4);
     ok !eval { $a->update_from_bytes("xy"); 1 }, 'update_from_bytes wrong length croaks';
     like $@, qr/expected/, 'length-mismatch message';
+}
+
+# Header replacement and derived views must retain the mapping independently.
+for my $slice (0, 1) {
+    my $a = Data::NDArray::Shared->new(undef, 'i32', 3)->fill(7);
+    my $weak = $a;
+    weaken $weak;
+    my $al = $a->as_pdl_alias;
+    undef $a;
+    $al->sethdr({});
+    $al = $al->slice('1:2') if $slice;
+    ok defined($weak), "alias retains its owner after header replacement (slice=$slice)";
+  SKIP: {
+        skip 'mapping was released', 1 unless defined $weak;
+        $al .= 8;
+        is_deeply [ $al->list ], [ (8) x ($slice ? 2 : 3) ],
+            'alias still reads and writes its retained mapping';
+    }
+    undef $al;
+    ok !defined($weak), 'mapping owner is released with the last PDL view';
 }
 
 done_testing;

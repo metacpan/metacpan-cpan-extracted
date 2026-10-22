@@ -212,12 +212,10 @@ subtest 'legitimate glob still works after hardening' => sub {
     my @hosts = Rex::Interface::Fs::LibSSH->new->glob('/etc/hos*');
     ok scalar(@hosts) >= 1, 'glob /etc/hos* returns matches (legitimate *)';
 
-    # An unmatched glob is passed through literally by the default
-    # shell (no nullglob/failglob set), so echo emits the pattern
-    # itself -- one element, the literal pattern. This documents the
-    # observable behaviour rather than asserting empty.
+    # An unmatched wildcard must yield an empty list, not the pattern
+    # itself (karr #10; the shell echoes unmatched globs verbatim).
     my @none = Rex::Interface::Fs::LibSSH->new->glob('/etc/nonexistent.glob.*.xyz');
-    is scalar(@none), 1, 'glob with no matches echoes the literal pattern';
+    is scalar(@none), 0, 'glob with no matches returns an empty list';
 };
 
 subtest 'hostile glob pattern does not execute anything beyond globbing' => sub {

@@ -1,5 +1,62 @@
 Revision history for Kubernetes-REST
 
+1.110     2026-10-21 18:27:11Z
+
+ - Kubeconfig exec credentials are a Kubernetes::REST::AuthExec (k73): the
+   plugin is run again when status.expirationTimestamp is within
+   expiry_margin seconds (default 60), so a long-running client no longer
+   gets 401 once an EKS/GKE/AKS token expires. Without an
+   expirationTimestamp the plugin runs once, as before. A failed re-run
+   warns and keeps the last token; there is no re-fetch after a 401. A
+   plugin that returns clientCertificateData/clientKeyData instead of a
+   token now dies with "only token plugins are supported ... client
+   certificate".
+
+ - list() accepts limit, continue and resourceVersion, sent as query
+   parameters (k74), and inflate_list hands the response's metadata
+   (resourceVersion, continue, remainingItemCount) to the IO::K8s::List, so
+   paging and list-then-watch work on the public API. The POD shows both.
+
+ - watch() no longer returns a resourceVersion that replays history (k69).
+   It sends allowWatchBookmarks=true, takes the resourceVersion of BOOKMARK
+   events as resume point and never passes a BOOKMARK to on_event. Started
+   without a resourceVersion, the versions of the initial ADDED events are
+   not a resume point: the return value is that of the first bookmark or of
+   later events, and undef if the server sent no bookmark. An HTTP 410 on
+   the watch request itself, with a resourceVersion given, croaks with the
+   same "Watch expired (410 Gone)" as the ERROR event form.
+
+ - call_streaming of both IO backends rethrows an exception from the data
+   callback unchanged (k71): a die in on_event or on_line now reaches the
+   caller of watch() and log() instead of ending the stream silently under
+   LWPIO (and instead of becoming a 599 under HTTPTinyIO). LWPIO reports
+   transport failures - connect errors, a missing LWP::Protocol::https
+   (k72), a body cut short - as status 599 with the message as content, as
+   HTTPTinyIO always did, instead of an LWP-internal 500/501 or a 200. The
+   contract is documented in Kubernetes::REST::Role::IO. A truncated body
+   that LWPIO used to hand back as 200 is now an APIError with code 599.
+
+ - The in-cluster endpoint wraps an IPv6 KUBERNETES_SERVICE_HOST in
+   brackets (k76): fd00:10:96::1 gives https://[fd00:10:96::1]:443 instead
+   of an unparsable URL.
+
+ - Require LWP::Protocol::https (k72): it is a separate distribution since
+   libwww-perl 6, and without it the default LWPIO backend answered every
+   request to an https:// API server with LWP's internal 501.
+
+ - HTTPTinyIO passes verify_SSL and an explicit SSL_verify_mode (k75):
+   ssl_verify_server => 1 now also checks the host name on HTTP::Tiny
+   older than 0.083, and ssl_verify_server => 0 (kubeconfig
+   insecure-skip-tls-verify) is honoured on HTTP::Tiny 0.083 and newer.
+   HTTP::Tiny 0.054 or newer is recommended.
+
+ - Kubeconfig exec credential plugins are started without a shell (k70):
+   every configured arg reaches the plugin as exactly one argument, so args
+   with spaces, quotes, "$" or ";" no longer get split or interpreted. The
+   plugin's stderr stays visible, and a failure croaks with "exec credential
+   command CMD exited with status N" (or "could not be started"). Shell
+   expansion in command or args no longer happens.
+
 1.109     2026-10-01 03:32:13Z
 
  - Require IO::K8s 1.109: string-map fields (labels, annotations, ConfigMap

@@ -1,10 +1,10 @@
 package IO::K8s::K3s::V1::ETCDSnapshotSpec;
 # ABSTRACT: ETCDSnapshotSpec desribes an etcd snapshot file
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s location     => Str, { required => 'schema' };
-k8s metadata     => { Str => 1 };
+k8s metadata     => HashRef[Str];
 k8s nodeName     => Str, { required => 'schema' };
 k8s s3           => '+IO::K8s::K3s::V1::ETCDSnapshotS3';
 k8s snapshotName => Str, { required => 'schema' };
@@ -28,7 +28,7 @@ IO::K8s::K3s::V1::ETCDSnapshotSpec - ETCDSnapshotSpec desribes an etcd snapshot 
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 location
 

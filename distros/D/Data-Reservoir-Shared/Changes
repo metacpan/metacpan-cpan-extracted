@@ -1,5 +1,10 @@
 Revision history for Data-Reservoir-Shared
 
+0.06  2026-10-16
+    - Use logarithmic weighted sampling keys; recreate older weighted files (v3).
+    - Keep uniform backing files compatible and reject unsupported reservation.
+    - Remove relative backing paths after chdir; link threading dependencies.
+
 0.05      2026-09-26
           - A writer killed mid add no longer loses, duplicates or misorders
             an item: the next lock holder finishes it.

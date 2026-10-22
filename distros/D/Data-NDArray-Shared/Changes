@@ -1,5 +1,10 @@
 Revision history for Data-NDArray-Shared
 
+0.07  2026-10-16
+    - Distinguish copied files from aliases during arithmetic.
+    - Keep PDL aliases alive and reject incompatible or frozen backing files.
+    - Load required PDL operations automatically and improve bulk fills.
+
 0.06      2026-09-26
           - A reshape killed part-way is repaired to the 1-D view instead of
             leaving the file unopenable.

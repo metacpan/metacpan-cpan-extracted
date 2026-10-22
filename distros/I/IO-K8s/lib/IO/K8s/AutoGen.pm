@@ -1,6 +1,6 @@
 package IO::K8s::AutoGen;
 # ABSTRACT: Dynamically generate IO::K8s classes from OpenAPI schema
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use v5.10;
 use strict;
 use warnings;
@@ -9,7 +9,7 @@ use Digest::SHA qw( sha1_hex );
 use Module::Runtime qw( use_module );
 use Package::Stash;
 use Scalar::Util qw(blessed reftype refaddr looks_like_number);
-use Types::Standard qw( Bool HashRef Int Num Str );
+use Types::Standard qw( ArrayRef Bool HashRef InstanceOf Int Num Str );
 # Type::Tiny object for the [IntOrStr] array items (k167); see the array
 # branch of _schema_to_type_spec for why a bareword does not do. [Time]
 # items go through $GENERATED_TIME instead (k178), so Time is not imported.
@@ -327,9 +327,12 @@ sub _generate_class {
     require IO::K8s::Resource;
     IO::K8s::Resource->_setup_class($class);
 
-    # Get the k8s function for this class
-    my $k8s = $class->can('k8s')
-        or croak "Failed to set up k8s DSL for $class";
+    # Fields are declared through IO::K8s::Resource->_k8s directly, so the
+    # compile-time sugar (has, with, after, k8s, Str, ...) the setup just
+    # gave the class is swept at once: a property may be called any of
+    # those names (k200).
+    IO::K8s::Resource->_sweep_sugar($class);
+    my $k8s = sub { IO::K8s::Resource->_k8s($class, @_) };
 
     # A top-level class -- one with a GVK -- gets its identity methods and
     # IO::K8s::Role::APIObject (and with it IO::K8s::Role::SpecBuilder)
@@ -337,13 +340,11 @@ sub _generate_class {
     # gives a hand-written class (k150). The other way round, Role::Tiny's
     # "class wins" let a property whose accessor has the name of a role
     # method (label, save, is_ready, spec_get, ...) silently replace that
-    # method. Now the k144 declaration preflight in IO::K8s::Resource sees
-    # the role method and refuses the property, naming the class, the
-    # property and the method, which fails the whole generation run (k149).
-    # There is no renaming: the property would have to change its accessor
-    # name, and with it what the class looks like, to get past a clash its
-    # schema cannot know about. conditions keeps its k144 exception -- the
-    # role helper yields to a declared field of that name.
+    # method. Now IO::K8s::Resource sees the role method when it picks the
+    # property's accessor and gives the property another one (_label, k200),
+    # keeping the JSON key as the field's json_key; the role method stays
+    # what it is. conditions keeps its k144 exception -- the role helper
+    # yields to a declared field of that name.
     #
     # The identity methods still go in before the role, so the role sees
     # them and does not install its own class-name-derived api_version, kind
@@ -891,6 +892,22 @@ sub _schema_type_kind {
     return 'string';  # 'string', '', and anything unmodeled alike (k42's own Str fallback)
 }
 
+# What the items of a map of lists (additionalProperties of type array, k194)
+# are, as the generator and the reuse check read them: 'Str' for plain
+# strings, 'ref' for a $ref to an object definition or an apiextensions
+# union, 'props' for an inline object with properties, 'other' for anything
+# the DSL has no map-of-lists form for (the map is then the free Opaque).
+sub _array_map_item_kind {
+    my ($items) = @_;
+    if (defined(my $ref = $items->{'$ref'})) {
+        $ref =~ s{^#/definitions/}{};
+        return (_scalar_ref_type($ref) || $OPAQUE_TYPES{$ref}) ? 'other' : 'ref';
+    }
+    return 'props' if _has_properties($items);
+    my $kind = ($items->{type} // '') eq 'string' ? _map_value_kind($items) : '';
+    return $kind eq 'Str' ? 'Str' : 'other';
+}
+
 # The value type of a map whose additionalProperties is a scalar schema
 # (k191) -- the DSL kind name Str, Int, Num, Bool, IntOrStr or Time -- or
 # undef when the generator types the map as the free Opaque instead: an
@@ -1106,6 +1123,24 @@ sub _object_compatible {
     }
     return $entry->{is_hash_of_objects} && _class_compatible($entry->{class}, $addl, $ctx)
         if _has_properties($addl);
+    # a map of lists (k194): what the generator makes of it
+    if (($addl->{type} // '') eq 'array' && ref($addl->{items} // {}) eq 'HASH') {
+        my $items = $addl->{items} // {};
+        my $item_kind = _array_map_item_kind($items);
+        return !!$entry->{is_hash_of_str_arrays} if $item_kind eq 'Str';
+        if ($item_kind eq 'ref') {
+            return 0 unless $entry->{is_hash_of_object_arrays};
+            (my $ref = $items->{'$ref'}) =~ s{^#/definitions/}{};
+            if (my $union = _union_class($ref)) {
+                return ($entry->{class} // '') eq $union;
+            }
+            my $def = _ref_definition($ref, $ctx) or return 0;
+            return _class_compatible($entry->{class}, $def, $ctx);
+        }
+        return $entry->{is_hash_of_object_arrays} && _class_compatible($entry->{class}, $items, $ctx)
+            if $item_kind eq 'props';
+        return !!$entry->{is_hash_opaque};
+    }
     # a scalar value schema is the string or typed map the generator makes
     # of it, by the scalar rules; anything else it types as the opaque map
     return !!$entry->{is_hash_opaque} unless _map_value_kind($addl);
@@ -1565,6 +1600,32 @@ sub _schema_to_type_spec {
             if (_has_properties($addl)) {
                 return { '+' . _nested_class($class, $field_name, 'Value', $addl, $all_defs, $namespace, $reuse_core, $reuse_core_except) => 1 };
             }
+            # A map of lists (k194): additionalProperties an array of
+            # strings -- HashRef[ArrayRef[Str]] -- or of objects, a $ref'd
+            # definition or an items schema with properties --
+            # HashRef[ArrayRef[InstanceOf[Class]]]. Any other array value
+            # stays the free map.
+            if (($addl->{type} // '') eq 'array' && ref($addl->{items} // {}) eq 'HASH') {
+                my $items = $addl->{items} // {};
+                my $item_kind = _array_map_item_kind($items);
+                return HashRef[ ArrayRef[Str] ] if $item_kind eq 'Str';
+                if ($item_kind eq 'ref') {
+                    (my $ref = $items->{'$ref'}) =~ s{^#/definitions/}{};
+                    if (my $union = _union_class($ref)) {
+                        return HashRef[ ArrayRef[ InstanceOf[$union] ] ];
+                    }
+                    if ($all_defs && $all_defs->{$ref}) {
+                        my $ref_class = get_or_generate($ref, $all_defs->{$ref}, $all_defs, $namespace);
+                        return HashRef[ ArrayRef[ InstanceOf[$ref_class] ] ];
+                    }
+                    _croak_unresolved_ref($ref, "the items of the additionalProperties of $where");
+                }
+                if ($item_kind eq 'props') {
+                    my $core = $may_reuse->('Item') ? _core_class_for($items, $all_defs) : undef;
+                    my $item_class = $core // _nested_class($class, $field_name, 'Item', $items, $all_defs, $namespace, $reuse_core, $reuse_core_except);
+                    return HashRef[ ArrayRef[ InstanceOf[$item_class] ] ];
+                }
+            }
             # A scalar value schema is the string map HashRef[Str] or the
             # typed map of its kind; anything else -- object or array
             # values, a value schema without a type -- the free map (k191).
@@ -1883,7 +1944,7 @@ IO::K8s::AutoGen - Dynamically generate IO::K8s classes from OpenAPI schema
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head1 SYNOPSIS
 
@@ -2007,6 +2068,12 @@ object> (or one with C<x-kubernetes-preserve-unknown-fields>) becomes
 C<Opaque>, and an C<additionalProperties>-only map (no C<properties> of
 their own) a C<HashRef[X]>, with nothing underneath to attach options to. Scalar properties carry their options at every level
 regardless.
+
+An C<additionalProperties> whose value is an array of strings becomes
+C<HashRef[ArrayRef[Str]]>, one whose items are objects (a C<$ref>, or an
+inline schema with C<properties>)
+C<HashRef[ArrayRef[InstanceOf[Class]]]> (k194); an array of anything else
+stays C<Opaque>.
 
 A path-derived nested class name that would run past Perl's 251-character
 limit on a fully qualified identifier (cert-manager's CRDs inline a full
@@ -2153,26 +2220,29 @@ the schema's C<x-kubernetes-group-version-kind> metadata is ambiguous for
 the requested C<api_version>, or names no entry matching it -- the GVK
 selection fails closed rather than pick a version.
 
-=item *
-
-a top-level class -- one with an C<api_version> and a C<kind> -- has a
-property whose accessor would take the name of a method of
-L<IO::K8s::Role::APIObject> (C<label>, C<save>, C<is_ready>, ..., and the
-C<spec_*> methods of L<IO::K8s::Role::SpecBuilder>, which it composes) or of
-the identity methods C<api_version> and C<resource_plural>. The
-identity methods and the role are in place before the first property is
-declared, the order C<use IO::K8s::APIObject> gives a hand-written class,
-so the declaration check of L<IO::K8s::Resource/k8s> refuses the property
-with C<< k8s: field 'label' of <class> collides with the method 'label' of
-<class>, which is not an attribute >>. Before, such a property silently
-replaced the role method on the generated class. The exceptions are that
-check's own: a C<conditions> property takes over the role's condition
-helper, and C<apiVersion>, C<kind> and C<metadata> are not declared from
-the schema at all, since the class already supplies them. A nested class
-composes no role, so these names are ordinary fields there. Nothing is
-renamed.
-
 =back
+
+A property name never fails a run. A property may be called anything, including
+a Moo keyword or a type name (C<after>, C<before>, C<with>, C<extends>,
+C<has>, C<Str>, C<Int>, ...): a generated class has the compile-time sugar swept
+before its first property is declared, so those names are ordinary fields, on
+a nested class as on a top-level one. A property whose name is a real method
+of the class -- C<new>, C<meta>, C<does>, C<can>, C<isa>, C<import>,
+C<TO_JSON>, and on a top-level class every method of
+L<IO::K8s::Role::APIObject> (C<label>, C<save>, C<is_ready>, ..., and the
+C<spec_*> methods of L<IO::K8s::Role::SpecBuilder>) and the identity methods
+C<api_version> and C<resource_plural> -- gets an accessor with a leading
+underscore (C<_label>, C<__label> if that is taken as well), as does the
+second of two keys that sanitize to the same name (C<a-b> and C<a_b>: the
+first in sorted order keeps C<a_b>, the other becomes C<_a_b>). The JSON key
+is kept as the field's C<json_key> and constructor argument, so the wire
+format, C<< ->new(label => ...) >>, C<FROM_HASH> and C<to_crd> still use the
+property's own name; only the Perl method differs. Before, such a property
+failed the whole run with C<< k8s: field 'label' of <class> collides with the
+method 'label' of <class> >>, and a class replaced the role method silently
+(k150). The exceptions are unchanged: a C<conditions> property takes over the
+role's condition helper, and C<apiVersion>, C<kind> and C<metadata> are not
+declared from the schema at all, since the class already supplies them.
 
 A failure anywhere in this process is a failure of the whole generation run,
 not just of the one class being built: the root class, every

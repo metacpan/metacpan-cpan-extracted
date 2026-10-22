@@ -1,6 +1,6 @@
 package IO::K8s::Api::Resource::V1beta1::DeviceDerivedAttribute;
 # ABSTRACT: DeviceDerivedAttribute defines a derived attribute computed via CEL.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s expression => Str, 'required';
@@ -23,7 +23,7 @@ IO::K8s::Api::Resource::V1beta1::DeviceDerivedAttribute - DeviceDerivedAttribute
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 expression
 

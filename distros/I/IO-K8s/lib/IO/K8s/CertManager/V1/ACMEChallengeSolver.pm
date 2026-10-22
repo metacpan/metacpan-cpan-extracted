@@ -1,6 +1,6 @@
 package IO::K8s::CertManager::V1::ACMEChallengeSolver;
 # ABSTRACT: An ACMEChallengeSolver describes how to solve ACME challenges for the issuer it is part of.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s dns01                  => '+IO::K8s::CertManager::V1::ACMEChallengeSolverDNS01';
@@ -26,7 +26,7 @@ IO::K8s::CertManager::V1::ACMEChallengeSolver - An ACMEChallengeSolver describes
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 dns01
 

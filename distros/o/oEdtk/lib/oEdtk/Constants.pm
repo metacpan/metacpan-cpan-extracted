@@ -3,7 +3,7 @@ package oEdtk::Constants;
 use strict;
 use warnings;
 
-our $VERSION   = 2.1129;
+our $VERSION   = 2.1131;
 our @ISA       = qw(Exporter);
 our @EXPORT_OK = qw(check_typdoc init populate trim_array trim_scalar);
 

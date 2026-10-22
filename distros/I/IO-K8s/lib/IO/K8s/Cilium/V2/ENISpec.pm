@@ -1,19 +1,19 @@
 package IO::K8s::Cilium::V2::ENISpec;
 # ABSTRACT: ENI is the AWS ENI specific configuration.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s 'availability-zone'         => Str;
 k8s 'delete-on-termination'     => Bool;
 k8s 'disable-prefix-delegation' => Bool;
-k8s 'exclude-interface-tags'    => { Str => 1 };
+k8s 'exclude-interface-tags'    => HashRef[Str];
 k8s 'first-interface-index'     => Int, { minimum => 0 };
 k8s 'instance-type'             => Str;
 k8s 'node-subnet-id'            => Str;
-k8s 'security-group-tags'       => { Str => 1 };
+k8s 'security-group-tags'       => HashRef[Str];
 k8s 'security-groups'           => [Str];
 k8s 'subnet-ids'                => [Str];
-k8s 'subnet-tags'               => { Str => 1 };
+k8s 'subnet-tags'               => HashRef[Str];
 k8s 'use-primary-address'       => Bool;
 k8s 'vpc-id'                    => Str;
 
@@ -44,7 +44,7 @@ IO::K8s::Cilium::V2::ENISpec - ENI is the AWS ENI specific configuration.
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 availability-zone
 

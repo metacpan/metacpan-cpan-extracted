@@ -1,6 +1,6 @@
 package IO::K8s::Role::CertManaged;
 # ABSTRACT: Role for cert-manager certificate and issuer management
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use Carp qw(croak);
 # Imports above `use Moo::Role` on purpose: Role::Tiny treats subs already in
 # the package as not-methods, so their names stay off every consumer. A `use`
@@ -141,7 +141,7 @@ IO::K8s::Role::CertManaged - Role for cert-manager certificate and issuer manage
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head1 SYNOPSIS
 

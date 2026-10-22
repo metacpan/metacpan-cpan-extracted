@@ -1,6 +1,6 @@
 package IO::K8s::Role::Routable;
 # ABSTRACT: Role for building HTTP/gRPC routing rules
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use Carp qw( croak );
 use Scalar::Util qw( looks_like_number );
 # Imports above `use Moo::Role` on purpose: Role::Tiny treats subs already in
@@ -212,13 +212,13 @@ IO::K8s::Role::Routable - Role for building HTTP/gRPC routing rules
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head1 SYNOPSIS
 
     package My::Route;
     use IO::K8s::APIObject api_version => 'gateway.networking.k8s.io/v1';
-    k8s spec => { Str => 1 };
+    k8s spec => HashRef[Str];
     with 'IO::K8s::Role::Routable';
 
     sub _route_format { 'gateway' }   # or 'traefik', 'ingress'

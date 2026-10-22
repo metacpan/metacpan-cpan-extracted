@@ -51,6 +51,8 @@
 #
 # For development (both repos checked out):
 #   PERL5LIB=lib:../rex-gpu/lib:$PERL5LIB rex -f eg/lan.Rexfile -H <IP> deploy
+#
+# The checklist for the live run of this rig stands in eg/lan.RUNBOOK.md.
 
 use Rex -feature => ['1.4'];
 use Rex::LibSSH;

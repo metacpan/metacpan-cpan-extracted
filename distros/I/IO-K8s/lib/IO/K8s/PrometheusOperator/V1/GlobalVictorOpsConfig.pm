@@ -1,6 +1,6 @@
 package IO::K8s::PrometheusOperator::V1::GlobalVictorOpsConfig;
 # ABSTRACT: victorops defines the default configuration for VictorOps.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s apiKey => 'Core::V1::ConfigMapKeySelector';
@@ -22,7 +22,7 @@ IO::K8s::PrometheusOperator::V1::GlobalVictorOpsConfig - victorops defines the d
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 apiKey
 

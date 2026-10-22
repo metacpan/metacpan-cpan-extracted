@@ -1,0 +1,421 @@
+#!/opt/bin/perl
+
+=head1 NAME
+
+anyevent-mcp-form-elicitation - display an MCP elicitation form using YAD or a terminal
+
+=head1 SYNOPSIS
+
+   anyevent-mcp-form-elicitation <request.json >response.json
+
+=head1 DESCRIPTION
+
+Reads one UTF-8 JSON object containing MCP form elicitation parameters:
+C<mode> (optional, C<form>), C<message> and C<requestedSchema>. It displays
+the form using YAD, or uses C</dev/tty> if YAD cannot start. It writes one
+ordinary MCP response to stdout:
+
+   {"action":"accept","content":{"answer":"Some text"}}
+   {"action":"decline"}
+   {"action":"cancel"}
+
+Exit status zero means a valid response, including decline or cancel.
+Nonzero means invalid input or a helper failure; diagnostics go to stderr.
+Closing a working dialog cancels the question and does not open another
+prompt. Without YAD or a terminal the helper fails rather than inventing
+an answer.
+
+Forms contain at most 32 fields. Supported field types are strings,
+single-select string enums (C<enum> or titled C<oneOf> values), booleans,
+numbers and integers. Titles, descriptions, defaults, required fields,
+string length limits and numeric bounds are supported. Unsupported schema
+features, including string formats, nested objects, multi-select arrays and
+URL elicitation, produce an error.
+
+Text fields accept multiline answers. Optional unselected choices,
+booleans and blank numbers are omitted; empty text is returned as an empty
+string. In a terminal, enter C<<< << >>> to start multiline text, ending
+with a line containing only C<.>. C<:cancel> and C<:decline> leave the form;
+C<:omit> omits an optional field. Prefix a literal colon command with another
+colon. A final confirmation lets you submit or edit the entered answers.
+
+The helper does not speak an MCP transport or maintain continuation tokens.
+It can be used directly from shell scripts or replaced by another executable
+with the same stdin/stdout contract. MCP callers use
+C<PERL_ANYEVENT_MCP_ELICITATION_HELPER> to select an alternative.
+
+=head1 OPTIONS
+
+=over
+
+=item --tty
+
+Use the terminal directly, without trying YAD.
+
+=item --yad
+
+Use only YAD. If it cannot start, fail without trying a terminal.
+Mutually exclusive with C<--tty>.
+
+=item --help
+
+Print a short usage message.
+
+=back
+
+=cut
+
+use common::sense;
+use Getopt::Long ();
+use AnyEvent::MCP ();
+use JSON::XS ();
+use Scalar::Util qw(looks_like_number);
+use Text::ParseWords ();
+
+Getopt::Long::GetOptions ("tty" => \my $tty_only, "yad" => \my $yad_only, "help" => \my $help) or exit 2;
+die "Unexpected arguments\n" if @ARGV;
+die "--tty and --yad are mutually exclusive\n" if $tty_only && $yad_only;
+if ($help) {
+   print "usage: $0 [--tty | --yad] <request.json >response.json\n";
+   exit;
+}
+
+binmode STDIN;
+binmode STDOUT;
+my $json = JSON::XS->new->canonical;
+my $input = "";
+while (read STDIN, my $chunk, 8192) {
+   $input .= $chunk;
+   length $input <= 1 << 20 or die "Form request exceeds 1 MiB\n";
+}
+my $params = JSON::XS::decode_json $input;
+
+sub value {
+   my ($field, $value) = @_;
+
+   my $name = $field->{name};
+   if ($field->{type} eq "boolean") {
+      JSON::XS::is_bool ($value) or die "$name: expected a boolean\n";
+   } elsif ($field->{type} eq "string") {
+      defined $value && !ref $value or die "$name: expected text\n";
+      length $value >= ($field->{minLength} || 0) or die "$name: text is too short\n";
+      !defined $field->{maxLength} || length $value <= $field->{maxLength} or die "$name: text is too long\n";
+      !exists $field->{choices} || grep $_->{value} eq $value, @{$field->{choices}}
+         or die "$name: unknown choice\n";
+   } else {
+      defined $value && !ref $value && looks_like_number $value
+         && $value !~ /nan|inf/i or die "$name: expected a number\n";
+      $value = 0 + $value;
+      "$value" !~ /nan|inf/i or die "$name: expected a finite number\n";
+      $field->{type} ne "integer" || $value == int $value or die "$name: expected an integer\n";
+      !defined $field->{minimum} || $value >= $field->{minimum} or die "$name: below minimum\n";
+      !defined $field->{maximum} || $value <= $field->{maximum} or die "$name: above maximum\n";
+
+      return 0 + $value;
+   }
+   $value
+}
+
+sub fields {
+   my ($params) = @_;
+
+   ref $params eq "HASH" && (!defined $params->{mode} || $params->{mode} eq "form")
+      or die "Only form elicitation is supported\n";
+   defined $params->{message} && !ref $params->{message}
+      or die "Elicitation needs a message\n";
+   my $schema = $params->{requestedSchema};
+   ref $schema eq "HASH" && $schema->{type} eq "object" && ref $schema->{properties} eq "HASH"
+      or die "Elicitation needs a flat object schema\n";
+   !grep !/\A(?:type|properties|required|\$schema)\z/, keys %$schema
+      or die "Unsupported form schema keyword\n";
+   keys %{$schema->{properties}} <= 32 or die "Too many form fields\n";
+   !exists $schema->{required} || ref $schema->{required} eq "ARRAY"
+      or die "Invalid required fields\n";
+   my %required;
+   for (@{$schema->{required} || []}) {
+      defined && !ref && exists $schema->{properties}{$_} or die "Unknown required field\n";
+      $required{$_} = 1;
+   }
+
+   my @fields;
+   for my $name (sort keys %{$schema->{properties}}) {
+      my $field = $schema->{properties}{$name};
+      ref $field eq "HASH" && $field->{type} =~ /\A(?:string|number|integer|boolean)\z/
+         or die "Unsupported field type for $name\n";
+      my %allowed = map { $_ => 1 } qw(type title description default);
+      $allowed{$_} = 1 for $field->{type} eq "string" ? qw(minLength maxLength enum oneOf) :
+         $field->{type} eq "boolean" ? () : qw(minimum maximum);
+      !grep !$allowed{$_}, keys %$field or die "Unsupported schema keyword for $name\n";
+      for (qw(title description)) {
+         !exists $field->{$_} || defined $field->{$_} && !ref $field->{$_}
+            or die "Invalid $_ for $name\n";
+      }
+      my $copy = { %$field, name => $name, required => $required{$name} };
+      if (exists $field->{enum} || exists $field->{oneOf}) {
+         !(exists $field->{enum} && exists $field->{oneOf}) or die "Conflicting enums for $name\n";
+         my $items = $field->{enum} || $field->{oneOf};
+         ref $items eq "ARRAY" && @$items && @$items <= 256 or die "Invalid enum for $name\n";
+         my %seen;
+         $copy->{choices} = [map {
+            my ($v, $label);
+            if (exists $field->{oneOf}) {
+               ref $_ eq "HASH" && !grep !/\A(?:const|title)\z/, keys %$_
+                  or die "Invalid titled enum for $name\n";
+               ($v, $label) = ($_->{const}, $_->{title} // $_->{const});
+            } else {
+               ($v, $label) = ($_, $_);
+            }
+            defined $v && !ref $v && defined $label && !ref $label && !$seen{$v}++
+               or die "Invalid enum value for $name\n";
+            +{ value => $v, label => $label }
+         } @$items];
+      }
+      for (qw(minLength maxLength)) {
+         !exists $field->{$_} || defined $field->{$_} && !ref $field->{$_}
+            && $field->{$_} =~ /\A[0-9]+\z/ or die "Invalid $_ for $name\n";
+      }
+      for (qw(minimum maximum)) {
+         !exists $field->{$_} || defined $field->{$_} && !ref $field->{$_}
+            && looks_like_number $field->{$_} && $field->{$_} !~ /nan|inf/i
+               or die "Invalid $_ for $name\n";
+      }
+      !defined $field->{minLength} || !defined $field->{maxLength}
+         || $field->{minLength} <= $field->{maxLength} or die "Invalid length bounds for $name\n";
+      !defined $field->{minimum} || !defined $field->{maximum}
+         || $field->{minimum} <= $field->{maximum} or die "Invalid numeric bounds for $name\n";
+      value ($copy, $field->{default}) if exists $field->{default};
+      push @fields, $copy;
+   }
+   \@fields
+}
+
+sub response {
+   my ($params, $response) = @_;
+
+   my $fields = fields $params;
+   ref $response eq "HASH" or die "Invalid elicitation response\n";
+   my $action = $response->{action};
+   return { action => $action } if defined $action && ($action eq "decline" || $action eq "cancel");
+   defined $action && $action eq "accept" && ref $response->{content} eq "HASH"
+      or die "Invalid elicitation response action\n";
+   my %known = map { $_->{name} => 1 } @$fields;
+   !grep !$known{$_}, keys %{$response->{content}} or die "Unknown response field\n";
+   my %content;
+   for my $field (@$fields) {
+      my $name = $field->{name};
+      if (exists $response->{content}{$name}) {
+         $content{$name} = value ($field, $response->{content}{$name});
+      } else {
+         !$field->{required} or die "$name: required field is missing\n";
+      }
+   }
+   { action => "accept", content => \%content }
+}
+
+
+# escape terminal controls without interpreting markup or form field syntax.
+sub visible {
+   my $text = shift;
+
+   $text =~ s/([\x00-\x08\x0b-\x1f\x7f-\x9f\x{202a}-\x{202e}\x{2066}-\x{2069}])/sprintf "\\u{%X}", ord $1/ge;
+   $text
+}
+
+sub label {
+   my $text = visible shift;
+
+   $text =~ s/([:!\t\n])/sprintf "\\u{%X}", ord $1/ge;
+   $text
+}
+
+sub yad_text {
+   my $text = shift;
+
+   $text =~ s/\\/\\\\/g;
+   $text
+}
+
+my $yad_pid;
+$SIG{TERM} = $SIG{INT} = sub {
+   if ($yad_pid) {
+      kill TERM => $yad_pid;
+      waitpid $yad_pid, 0;
+   }
+   exit 1;
+};
+
+sub yad {
+   my $pid = open my $fh, "-|";
+   return unless defined $pid;
+   if (!$pid) {
+      open STDERR, ">", "/dev/null" or exit 127;
+      exec "yad", "--no-markup", map AnyEvent::MCP::utf8enc $_, @_;
+      exit 127;
+   }
+   $yad_pid = $pid;
+   local $/;
+   my $output = <$fh>;
+   close $fh;
+   my $status = $?;
+   undef $yad_pid;
+   return if $status == 1 << 8 || $status == 127 << 8 || $status & 127;
+   ($status >> 8, AnyEvent::MCP::utf8dec $output)
+}
+
+my $fields = fields $params;
+for my $field (@$fields) {
+   $field->{choices} = [
+      { label => "No", value => JSON::XS::false },
+      { label => "Yes", value => JSON::XS::true },
+   ] if $field->{type} eq "boolean";
+}
+
+sub initial {
+   my ($field) = @_;
+
+   return $field->{choices} ? 1 : "" unless exists $field->{default};
+   if ($field->{choices}) {
+      my $default = $json->encode ($field->{default});
+      for (0 .. $#{$field->{choices}}) {
+         return $_ + 2 if $json->encode ($field->{choices}[$_]{value}) eq $default;
+      }
+   }
+   $field->{default}
+}
+
+sub contents {
+   my ($raw) = @_;
+
+   my %content;
+   for my $i (0 .. $#$fields) {
+      my $field = $fields->[$i];
+      my $value = $raw->[$i];
+      if ($field->{choices}) {
+         defined $value && $value =~ /\A[0-9]+\z/ && $value <= @{$field->{choices}} + 1
+            or die "$field->{name}: invalid selection\n";
+         next if $value < 2;
+         $value = $field->{choices}[$value - 2]{value};
+      } elsif ($field->{type} ne "string") {
+         next if !defined $value || $value eq "";
+      }
+      $content{$field->{name}} = $value;
+   }
+   response ($params, { action => "accept", content => \%content })
+}
+
+sub graphical {
+   my @raw = map initial ($_), @$fields;
+   my $error = "";
+   while (1) {
+      my (@options, @values);
+      for my $i (0 .. $#$fields) {
+         my $field = $fields->[$i];
+         my $title = label ($field->{title} // $field->{name});
+         $title .= " *" if $field->{required};
+         my $value = $raw[$i];
+         if ($field->{choices}) {
+            my @items = ("(no selection)", map label ($_->{label}), @{$field->{choices}});
+            my $selected = length $value ? $value - 1 : 0;
+            $items[$selected] = "^$items[$selected]";
+            $value = join "\x1f", @items;
+            push @options, "--field=" . yad_text ($title) . ":CB";
+         } else {
+            $value !~ /\0/ && $value ne "\@disabled\@"
+               or die "$field->{name}: default cannot be represented by YAD\n";
+            push @options, "--field=" . yad_text ($title) . ($field->{type} eq "string" ? ":TXT" : "");
+         }
+         push @values, yad_text $value;
+      }
+      my $message = join "\n\n", (length $error ? $error : ()), visible ($params->{message}),
+         map { label ($_->{title} // $_->{name}) . ": " . visible ($_->{description}) }
+            grep length $_->{description}, @$fields;
+      my ($status, $output) = yad (
+         "--form", "--title=MCP form", "--width=650", "--height=450", "--scroll",
+         "--text=" . yad_text ($message), "--quoted-output", "--separator= ",
+         "--item-separator=\x1f", "--num-output", "--always-print-result",
+         "--button=Submit:2", "--button=Decline:4", "--button=Cancel:6",
+         @options, "--", @values,
+      );
+      return unless defined $status;
+      return { action => "decline" } if $status == 4;
+      return { action => "cancel" } unless $status == 2;
+      @raw = Text::ParseWords::shellwords $output;
+      @raw == @$fields or die "Invalid YAD form output\n";
+
+      # YAD TXT output escapes backslashes, tabs and newlines inside the shell quoting.
+      for my $i (0 .. $#$fields) {
+         next unless $fields->[$i]{type} eq "string" && !$fields->[$i]{choices};
+         $raw[$i] =~ s/\\([\\nt])/$1 eq "n" ? "\n" : $1 eq "t" ? "\t" : "\\"/ge;
+      }
+
+      my $response = eval { contents \@raw };
+      return $response unless $@;
+      $error = $@;
+   }
+}
+
+sub terminal {
+   open my $tty, "+<", "/dev/tty" or die "Neither YAD nor a terminal is available\n";
+   binmode $tty, ":encoding(UTF-8)";
+   my $old = select $tty; $| = 1; select $old;
+   my @raw = map initial ($_), @$fields;
+   print {$tty} visible ($params->{message}), "\n";
+   print {$tty} "Enter keeps the displayed default; :omit skips an optional field.\n",
+      ":decline refuses, :cancel cancels, << starts multiline text (end with .).\n";
+
+   my $read = sub {
+      my $line = <$tty>;
+      return unless defined $line;
+      $line =~ s/\r?\n\z//;
+      $line
+   };
+   while (1) {
+      for my $i (0 .. $#$fields) {
+         my $field = $fields->[$i];
+         print {$tty} "\n", visible ($field->{title} // $field->{name}),
+            ($field->{required} ? " (required)" : ""), "\n";
+         print {$tty} visible ($field->{description}), "\n" if length $field->{description};
+         if ($field->{choices}) {
+            print {$tty} "  1: (no selection)\n";
+            print {$tty} "  ", $_ + 2, ": ", visible ($field->{choices}[$_]{label}), "\n"
+               for 0 .. $#{$field->{choices}};
+         }
+         print {$tty} "[", visible ($raw[$i]), "] > ";
+         my $line = $read->();
+         return { action => "cancel" } if !defined $line || $line eq ":cancel";
+         return { action => "decline" } if $line eq ":decline";
+         if ($line eq ":omit") {
+            $raw[$i] = $field->{choices} ? "1" : "";
+         } elsif ($line eq "<<" && $field->{type} eq "string" && !$field->{choices}) {
+            my @lines;
+            while (1) {
+               my $line = $read->();
+               return { action => "cancel" } unless defined $line;
+               last if $line eq ".";
+               push @lines, $line;
+            }
+            $raw[$i] = join "\n", @lines;
+         } elsif (length $line) {
+            $line =~ s/\A::/:/;
+            $raw[$i] = $line;
+         }
+      }
+      my $response = eval { contents \@raw };
+      if ($@) {
+         print {$tty} "\n", visible ($@);
+         next;
+      }
+      print {$tty} "\n", $json->pretty->encode ($response->{content}), "\n",
+         "Submit [Enter], edit [e], decline [d], cancel [c]: ";
+      my $line = $read->();
+      return { action => "cancel" } unless defined $line;
+      return $response if $line eq "";
+      return { action => "decline" } if $line eq "d";
+      return { action => "cancel" } if $line eq "c";
+   }
+}
+
+my $response = $tty_only ? terminal : graphical;
+$response = terminal unless $response || $yad_only;
+defined $response or die "YAD is unavailable\n";
+print JSON::XS::encode_json ($response), "\n";

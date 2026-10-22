@@ -7,7 +7,7 @@ BEGIN {
 	use vars     qw($VERSION @ISA @EXPORT @EXPORT_OK $LOGGERLEVEL $WARN2LOGGER)
 		;    #backward compatibility for Perls under 5.6
 
-	$VERSION   = 2.1129;
+	$VERSION   = 2.1131;
 	@ISA       = qw(Exporter);
 	@EXPORT    = qw(logger);
 	@EXPORT_OK = qw($LOGGERLEVEL $WARN2LOGGER);

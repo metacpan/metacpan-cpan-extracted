@@ -1,6 +1,6 @@
 package File::SOPS::Metadata::Flat;
 # ABSTRACT: the flat sops_age__list_0__map_enc metadata encoding of the ENV and INI formats
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 use Moo;
 use Carp qw(croak);
 use Scalar::Util qw(blessed);
@@ -244,7 +244,7 @@ File::SOPS::Metadata::Flat - the flat sops_age__list_0__map_enc metadata encodin
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 

@@ -15,7 +15,9 @@ use App::SlimPacker qw(perl_switches plugin_search_paths inline_plugins module_d
     is perl_switches([], ['Foo=5.010'], [], []), "use Foo 5.010;\n", '-M Foo=5.010 → use Foo 5.010;';
     is perl_switches([], ['5.010'], [], []), "use 5.010;\n", '-M 5.010 → use 5.010;';
     is perl_switches([], [], ['print 1;'], []), "print 1;\n", '-e CODE → code';
-    is perl_switches([], [], [], ['say q(hi);']), "use feature qw(:all);\nsay q(hi);\n", '-E CODE → feature on + code';
+    is perl_switches([], [], [], ['say q(hi);']),
+        qq{BEGIN{require feature;eval{feature->import(':all');1}or feature->import(':5.10')}\nsay q(hi);\n},
+        '-E CODE → feature on + code';
     is perl_switches([], ['List::Util=sum'], ['print sum(1,2);'], []),
        "use List::Util qw(sum);\nprint sum(1,2);\n", '-m/-M before -e code';
 }

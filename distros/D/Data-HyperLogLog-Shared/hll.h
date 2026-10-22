@@ -553,7 +553,8 @@ static inline HllHandle *hll_setup(void *base, size_t map_size,
                                    const char *path, int backing_fd) {
     HllHeader *hdr = (HllHeader *)base;
     HllHandle *h = (HllHandle *)calloc(1, sizeof(HllHandle));
-    if (!h) {
+    if (!h || (path && !(h->path = strdup(path)))) {
+        free(h);
         munmap(base, map_size);
         if (backing_fd >= 0) close(backing_fd);
         return NULL;
@@ -563,7 +564,6 @@ static inline HllHandle *hll_setup(void *base, size_t map_size,
     h->reader_slots = (HllReaderSlot *)((uint8_t *)base + sizeof(HllHeader));  /* trusted layout, not the peer-writable header offset */
     h->occ          = (uint64_t *)((uint8_t *)base + hll_layout().occ);        /* trusted layout offset */
     h->mmap_size    = map_size;
-    h->path         = path ? strdup(path) : NULL;
     h->backing_fd   = backing_fd;
     h->my_slot_idx  = UINT32_MAX;
     return h;
@@ -571,7 +571,7 @@ static inline HllHandle *hll_setup(void *base, size_t map_size,
 
 /* Validate a mapped header (shared by hll_create reopen and hll_open_fd). */
 static inline int hll_validate_header(const HllHeader *hdr, uint64_t file_size) {
-    if (hdr->magic != HLL_MAGIC) return 0;
+    if (__atomic_load_n(&hdr->magic, __ATOMIC_ACQUIRE) != HLL_MAGIC) return 0;
     if (hdr->version != HLL_VERSION) return 0;
     if (hdr->precision < HLL_MIN_PRECISION || hdr->precision > HLL_MAX_PRECISION) return 0;
     if (hdr->m != (1u << hdr->precision)) return 0;
@@ -690,7 +690,7 @@ static HllHandle *hll_create(const char *path, uint32_t precision, mode_t mode, 
                 }
                 HLL_ERR("invalid HyperLogLog file"); munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
             }
-            if (((HllHeader *)base)->sealed) {
+            if (__atomic_load_n(&((HllHeader *)base)->sealed, __ATOMIC_ACQUIRE)) {
                 HLL_ERR("%s is frozen (read-only); open it with new_readonly", path);
                 munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
             }
@@ -736,7 +736,7 @@ static HllHandle *hll_open_fd(int fd, char *errbuf) {
     if (!hll_validate_header((HllHeader *)base, (uint64_t)st.st_size)) {
         HLL_ERR("invalid HyperLogLog table"); munmap(base, ms); return NULL;
     }
-    if (((HllHeader *)base)->sealed) {
+    if (__atomic_load_n(&((HllHeader *)base)->sealed, __ATOMIC_ACQUIRE)) {
         HLL_ERR("this HyperLogLog estimator is frozen (read-only); open it with new_readonly");
         munmap(base, ms); return NULL;
     }
@@ -796,7 +796,7 @@ static HllHandle *hll_open_readonly(const char *path, char *errbuf) {
     if (!hll_validate_header((HllHeader *)base, (uint64_t)st.st_size)) {
         HLL_ERR("%s: invalid HyperLogLog file", path); munmap(base, ms); return NULL;
     }
-    if (!((HllHeader *)base)->sealed) {
+    if (!__atomic_load_n(&((HllHeader *)base)->sealed, __ATOMIC_ACQUIRE)) {
         HLL_ERR("%s is not frozen: call ->freeze on the producer before opening read-only", path);
         munmap(base, ms); return NULL;
     }
@@ -812,7 +812,7 @@ static HllHandle *hll_open_readonly(const char *path, char *errbuf) {
  * croaks and a read-write reopen is refused. */
 static int hll_freeze(HllHandle *h) {
     hll_rwlock_wrlock(h);
-    h->hdr->sealed = 1;
+    __atomic_store_n(&h->hdr->sealed, 1, __ATOMIC_RELEASE);
     hll_rwlock_wrunlock(h);
     if (h->path || h->backing_fd >= 0) return hll_msync(h);  /* durability for file/memfd-backed */
     return 0;   /* anonymous: the seal lives in shared memory (visible to forks); nothing to flush */

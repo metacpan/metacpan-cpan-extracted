@@ -120,11 +120,14 @@ subtest 'duplex websocket transport returns active session' => sub {
     $session->write_channel(2, 'abc')->get;
     is($last_ws->sent_binary->[0], chr(2) . 'abc', 'write_channel encodes first byte as channel');
 
-    $session->write_stdin("pwd\n")->get;
-    is($last_ws->sent_binary->[1], chr(0) . "pwd\n", 'write_stdin uses channel 0');
+    # a port-forward session (k77): stdin and resize are exec/attach only
+    $session->write_port(8080, "pwd\n")->get;
+    is($last_ws->sent_binary->[1], chr(0) . "pwd\n", 'write_port uses the data channel of the port');
 
-    $session->resize(width => 120, height => 40)->get;
-    is($last_ws->sent_binary->[2], chr(4) . '{"Width":120,"Height":40}', 'resize uses channel 4 json payload');
+    eval { $session->write_stdin("pwd\n") };
+    like($@, qr/not available on a port-forward session/, 'write_stdin refused on port-forward');
+    eval { $session->resize(width => 120, height => 40) };
+    like($@, qr/not available on a port-forward session/, 'resize refused on port-forward');
 
     $session->close(code => 1000, payload => 'bye')->get;
     is($last_ws->sent_close->[0], pack('n', 1000) . 'bye', 'close sends websocket close payload');

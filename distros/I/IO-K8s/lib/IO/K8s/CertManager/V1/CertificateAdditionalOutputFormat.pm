@@ -1,6 +1,6 @@
 package IO::K8s::CertManager::V1::CertificateAdditionalOutputFormat;
 # ABSTRACT: CertificateAdditionalOutputFormat defines an additional output format of a Certificate resource.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s type => Str, { required => 'schema', enum => [qw(DER CombinedPEM)] };
@@ -20,7 +20,7 @@ IO::K8s::CertManager::V1::CertificateAdditionalOutputFormat - CertificateAdditio
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 type
 

@@ -29,11 +29,11 @@ Geo::Coder::Free::Local - Geocode using user-curated local data
 
 =head1 VERSION
 
-Version 0.49
+Version 0.51
 
 =cut
 
-our $VERSION = '0.49';
+our $VERSION = '0.51';
 
 =head1 SYNOPSIS
 
@@ -84,12 +84,12 @@ an address that omits the name falls through to the slower O(n) C<_search> path.
 
 =cut
 
-# Libpostal detection states — avoid magic numbers
+# Libpostal detection states - avoid magic numbers
 use constant LIBPOSTAL_UNKNOWN       => 0;
 use constant LIBPOSTAL_INSTALLED     => 1;
 use constant LIBPOSTAL_NOT_INSTALLED => -1;
 
-# Module-level singleton flags — see LIMITATIONS re: thread safety.
+# Module-level singleton flags - see LIMITATIONS re: thread safety.
 our $libpostal_is_installed = LIBPOSTAL_UNKNOWN;
 
 # Lazily initialised Locale singletons to avoid repeated object construction
@@ -204,7 +204,7 @@ sub new {
 	# grep before _search when no rows for the requested state/country exist.
 	# Major: every (state|country) pair in the dataset is represented here.
 	# Minor: if geocode's target pair is absent, _search can never match.
-	# Conclusion: early return is safe — eliminates the O(n) grep per call.
+	# Conclusion: early return is safe - eliminates the O(n) grep per call.
 	for my $row (@{$self->{'data'}}) {
 		my $rk = uc($row->{'state'} // '') . '|' . uc($row->{'country'} // '');
 		$self->{'region_index'}{$rk} = 1;
@@ -242,6 +242,18 @@ created.  A lookup answered from the index, from the result cache or from the
 shared miss cache does not increase it, so C<geocode_many()> can take the count
 before and after a value to tell a lookup that cost a search from one that was
 answered from a cache.
+
+=head3 API SPECIFICATION
+
+=head4 input
+
+    # Input schema (Params::Validate::Strict)
+    # none
+
+=head4 output
+
+    # Output schema (Return::Set)
+    { type => 'integer', min => 0 }   # 0 for a new object
 
 =cut
 
@@ -342,7 +354,7 @@ sub geocode {
 	my $location = $params{'location'}
 		or Carp::croak('Usage: geocode(location => $location)');
 
-	# Normalise the lookup key — "USA" is treated the same as "US"
+	# Normalise the lookup key - "USA" is treated the same as "US"
 	my $lc = lc($location);
 	$lc =~ s/,\s*usa$/, us/i;
 
@@ -421,13 +433,13 @@ sub geocode {
 				}
 			}
 
-			# Abort early if no data at all matches this state/country —
+			# Abort early if no data at all matches this state/country -
 			# saves traversing the full dataset for every remaining strategy.
 			if (!defined($addr{'country'})) {
 				$addr{'country'} = $l =~ /(United States|USA|US)$/i ? 'US'
 					: Carp::croak("TODO: extract country from $l");
 			}
-			# O(1) region check via index built in new() — replaces the former
+			# O(1) region check via index built in new() - replaces the former
 			# O(n) grep across all rows.
 			# Major: region_index maps every (state|country) pair in the dataset.
 			# Minor: if target pair is absent, no _search call can match.
@@ -442,7 +454,7 @@ sub geocode {
 		$l =~ tr/,/ /;
 		$l =~ s/\s{2,}/ /g;
 
-		# Geo::StreetAddress::US is buggy (RT#122617) — skip county-style addresses
+		# Geo::StreetAddress::US is buggy (RT#122617) - skip county-style addresses
 		if ($location !~ /\sCounty,/i) {
 			my $href = Geo::StreetAddress::US->parse_location($l)
 			        // Geo::StreetAddress::US->parse_address($l);
@@ -521,12 +533,12 @@ sub geocode {
 		}
 	}
 
-	# Simple "Town, County, England" — no further sub-parsers will help
+	# Simple "Town, County, England" - no further sub-parsers will help
 	if (($location =~ /[^,]+,[^,]+,.*England$/) && ($location !~ /[^,]+,[^,]+,[^,]+,.*England$/)) {
 		return $self->_remember_miss($lc);
 	}
 
-	# Geo::Address::Parser — optional; load lazily, skip if not installed
+	# Geo::Address::Parser - optional; load lazily, skip if not installed
 	unless (Geo::Address::Parser->can('parse')) {
 		eval { require Geo::Address::Parser; Geo::Address::Parser->import() };
 	}
@@ -542,7 +554,7 @@ sub geocode {
 		}
 	}
 
-	# Geo::libpostal — accurate but uses enormous RAM; initialise at most once
+	# Geo::libpostal - accurate but uses enormous RAM; initialise at most once
 	if ($libpostal_is_installed == LIBPOSTAL_UNKNOWN) {
 		if (eval { require Geo::libpostal; 1 }) {
 			Geo::libpostal->import();
@@ -564,7 +576,7 @@ sub geocode {
 				$addr{'road'} = _normalize($street);
 			}
 
-			# libpostal returns "england" as a state — map to country code
+			# libpostal returns "england" as a state - map to country code
 			if (defined($addr{'state'}) && !defined($addr{'country'})
 			    && $addr{'state'} eq 'england') {
 				delete $addr{'state'};
@@ -631,7 +643,7 @@ sub geocode {
 		}
 	}
 
-	# Try the alternatives table — curated mappings for inconsistent names
+	# Try the alternatives table - curated mappings for inconsistent names
 	$location = uc($location);
 	for my $left (keys %alternatives) {
 		next unless $location =~ $left;
@@ -717,12 +729,15 @@ sub reverse_geocode {
 		         && _equal($row->{'longitude'}, $longitude, 4);
 
 		# Rows in $self->{'data'} are blessed as Geo::Location::Point by
-		# the index-building loop in new() — calling as_string() is safe here.
+		# the index-building loop in new() - calling as_string() is safe here.
 		my $location = uc($row->as_string());
 		if (wantarray) {
 			push @rc, $location;
 			# Add any reverse-alternative mappings for this location
-			while (my ($left, $right) = each %alternatives) {
+			# keys, not each(): %alternatives is package-wide, and an each()
+			# iterator left part-way would make the next pass skip entries
+			foreach my $left (sort keys %alternatives) {
+				my $right = $alternatives{$left};
 				if ($location =~ $right) {
 					(my $l = $location) =~ s/$right/$left/;
 					push @rc, $l;
@@ -739,6 +754,18 @@ sub reverse_geocode {
 
 Does nothing - present for drop-in compatibility with other Geo::Coder::* modules.
 
+=head3 API SPECIFICATION
+
+=head4 input
+
+    # Input schema (Params::Validate::Strict)
+    # any arguments are accepted and ignored
+
+=head4 output
+
+    # Output schema (Return::Set)
+    # nothing: an empty list, or undef in scalar context
+
 =cut
 
 sub ua { }
@@ -749,10 +776,10 @@ sub ua { }
 
 # Purpose:  Normalise the four calling conventions used by geocode/reverse_geocode:
 #           hashref, even-length key-val list, single bare string.
-# Entry:    $error_msg  — croak message if an unsupported ref type is passed.
-#           $bare_key   — hash key to use when a single bare string is given
+# Entry:    $error_msg  - croak message if an unsupported ref type is passed.
+#           $bare_key   - hash key to use when a single bare string is given
 #                         ('location' for geocode, 'latlng' for reverse_geocode).
-#           @args       — raw @_ after $self has been shifted.
+#           @args       - raw @_ after $self has been shifted.
 # Exit:     Flat %params hash.
 # Side Effects: None; croaks on non-hash reference arguments.
 sub _normalize_args {
@@ -784,7 +811,7 @@ sub _cache_and_return {
 #           no mapping is found or the input is already two characters.
 #           Locale::US and Locale::CA objects are cached as module-level
 #           singletons to avoid repeated construction overhead.
-# Entry:    $country — country name or ISO code; $state — state/province name.
+# Entry:    $country - country name or ISO code; $state - state/province name.
 # Exit:     Two-letter code or $state unchanged.
 # Side Effects: May initialise $_locale_us or $_locale_ca singletons.
 sub _to_two_letter_state {
@@ -804,8 +831,8 @@ sub _to_two_letter_state {
 # Purpose:  Match parsed address components against all data rows.
 #           Each named column must match (case-insensitively) the corresponding
 #           data field; a minimum of 3 columns must match for a result.
-# Entry:    $self, $data — hashref of address components,
-#           @columns — ordered list of keys to compare.
+# Entry:    $self, $data - hashref of address components,
+#           @columns - ordered list of keys to compare.
 # Exit:     Geo::Location::Point on match; undef otherwise.
 # Side Effects: May delete undef entries from $data (for undefined optional fields).
 sub _search {
@@ -814,7 +841,7 @@ sub _search {
 	$self->{'reads'}++;
 
 	# M5 (boolean reduction): the $failed flag was set-and-break in the inner loop
-	# then tested in the outer loop — eliminated by using a labeled 'next ROW'
+	# then tested in the outer loop - eliminated by using a labeled 'next ROW'
 	# that short-circuits directly, removing one boolean gate per iteration.
 	ROW: for my $row (@{$self->{'data'}}) {
 		my $matched = 0;
@@ -886,7 +913,7 @@ sub _result_for {
 # Purpose:  Calculate the geographic centres (centroids) of all city/state/country
 #           clusters in the parsed dataset that contain three or more data points.
 #           Clusters with fewer than 3 entries are too sparse to be meaningful.
-# Entry:    $rows — arrayref of hashrefs with latitude/longitude/city/state/country.
+# Entry:    $rows - arrayref of hashrefs with latitude/longitude/city/state/country.
 # Exit:     Arrayref of hashrefs (one per qualifying cluster), or undef if none.
 # Side Effects: None.
 sub _find_geographic_centres {
@@ -931,7 +958,7 @@ sub _find_geographic_centres {
 # Purpose:  Compute the arithmetic mean of latitude and longitude for a group
 #           of locations.  Accurate for small geographic areas; for large areas
 #           or locations crossing the antimeridian, a vector-mean is needed.
-# Entry:    $locs — arrayref of hashrefs each with 'latitude' and 'longitude'.
+# Entry:    $locs - arrayref of hashrefs each with 'latitude' and 'longitude'.
 # Exit:     ($centre_lat, $centre_lon) as decimal degree strings to 6dp.
 # Side Effects: None.
 sub _calculate_centre {
@@ -943,7 +970,7 @@ sub _calculate_centre {
 }
 
 # https://www.oreilly.com/library/view/perl-cookbook/1565922433/ch02s03.html
-# Equal within $dp decimal places — avoids floating-point equality pitfalls.
+# Equal within $dp decimal places - avoids floating-point equality pitfalls.
 sub _equal {
 	my ($A, $B, $dp) = @_;
 	return sprintf("%.${dp}g", $A) eq sprintf("%.${dp}g", $B);

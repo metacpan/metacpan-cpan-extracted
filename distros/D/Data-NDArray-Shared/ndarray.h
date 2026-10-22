@@ -159,6 +159,8 @@ typedef struct NdaHandle {
     uint32_t       cached_fork_gen; /* nda_fork_gen value at last slot claim */
     uint32_t       slotless_held; /* read-locks this process holds with no reader-slot */
     int            readonly;      /* 1 = frozen O_RDONLY/PROT_READ view: lock-free reads, mutation croaks */
+    dev_t          device;
+    ino_t          inode;         /* backing identity; a copied file has its own lock */
 } NdaHandle;
 
 /* ================================================================
@@ -749,7 +751,7 @@ static inline void nda_init_header(void *base, int dtype, const uint64_t *shape,
 }
 
 static inline NdaHandle *nda_setup(void *base, size_t map_size,
-                                   const char *path, int backing_fd) {
+                                   const char *path, int backing_fd, const struct stat *st) {
     NdaHeader *hdr = (NdaHeader *)base;
     NdaHandle *h = (NdaHandle *)calloc(1, sizeof(NdaHandle));
     if (!h) {
@@ -775,6 +777,7 @@ static inline NdaHandle *nda_setup(void *base, size_t map_size,
     h->path         = path ? strdup(path) : NULL;
     h->backing_fd   = backing_fd;
     h->my_slot_idx  = UINT32_MAX;
+    if (st) { h->device = st->st_dev; h->inode = st->st_ino; }
     return h;
 }
 
@@ -803,8 +806,9 @@ static inline int nda_validate_header(const NdaHeader *hdr, uint64_t file_size) 
 
 /* Read-write attach: a shape torn by a killed reshape is repaired under the
  * write lock (which also recovers the dead writer) instead of refusing the file. */
-static NdaHandle *nda_setup_rw(void *base, size_t map_size, const char *path, int backing_fd) {
-    NdaHandle *h = nda_setup(base, map_size, path, backing_fd);
+static NdaHandle *nda_setup_rw(void *base, size_t map_size, const char *path, int backing_fd,
+                               const struct stat *st) {
+    NdaHandle *h = nda_setup(base, map_size, path, backing_fd, st);
     if (h && !nda_shape_ok(h->hdr, h->size)) {
         nda_rwlock_wrlock(h);
         nda_repair_shape_locked(h);
@@ -873,6 +877,7 @@ static NdaHandle *nda_create(const char *path, int dtype,
     int fd = -1;
     size_t map_size;
     void *base;
+    struct stat stt;
 
     if (anonymous) {
         map_size = (size_t)total;
@@ -882,7 +887,6 @@ static NdaHandle *nda_create(const char *path, int dtype,
         fd = nda_secure_open(path, mode, errbuf);
         if (fd < 0) return NULL;
         if (flock(fd, LOCK_EX) < 0) { NDA_ERR("flock: %s", strerror(errno)); close(fd); return NULL; }
-        struct stat stt;
         if (fstat(fd, &stt) < 0) { NDA_ERR("fstat: %s", strerror(errno)); flock(fd, LOCK_UN); close(fd); return NULL; }
         int is_new = (stt.st_size == 0);
         if (!is_new && (uint64_t)stt.st_size < sizeof(struct NdaHeader)) {
@@ -928,7 +932,7 @@ static NdaHandle *nda_create(const char *path, int dtype,
                     }
                     nda_init_header(base, dtype, shape, ndim, size, strides, total);
                     flock(fd, LOCK_UN); close(fd);
-                    return nda_setup(base, map_size, path, -1);
+                    return nda_setup(base, map_size, path, -1, &stt);
                 }
                 if (((NdaHeader *)base)->magic == 0 && (uint64_t)stt.st_size == total
                     && stt.st_uid == geteuid()) {
@@ -942,12 +946,12 @@ static NdaHandle *nda_create(const char *path, int dtype,
                 munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
             }
             flock(fd, LOCK_UN); close(fd);
-            return nda_setup_rw(base, map_size, path, -1);
+            return nda_setup_rw(base, map_size, path, -1, &stt);
         }
     }
     nda_init_header(base, dtype, shape, ndim, size, strides, total);
     if (fd >= 0) { flock(fd, LOCK_UN); close(fd); }
-    return nda_setup(base, map_size, path, -1);
+    return nda_setup(base, map_size, path, -1, anonymous ? NULL : &stt);
 }
 
 static NdaHandle *nda_create_memfd(const char *name, int dtype,
@@ -970,7 +974,7 @@ static NdaHandle *nda_create_memfd(const char *name, int dtype,
     void *base = mmap(NULL, (size_t)total, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
     if (base == MAP_FAILED) { NDA_ERR("mmap: %s", strerror(errno)); close(fd); return NULL; }
     nda_init_header(base, dtype, shape, ndim, size, strides, total);
-    return nda_setup(base, (size_t)total, NULL, fd);
+    return nda_setup(base, (size_t)total, NULL, fd, NULL);
 }
 
 static NdaHandle *nda_open_fd(int fd, char *errbuf) {
@@ -995,7 +999,7 @@ static NdaHandle *nda_open_fd(int fd, char *errbuf) {
     }
     int myfd = fcntl(fd, F_DUPFD_CLOEXEC, 0);
     if (myfd < 0) { NDA_ERR("fcntl: %s", strerror(errno)); munmap(base, ms); return NULL; }
-    return nda_setup_rw(base, ms, NULL, myfd);
+    return nda_setup_rw(base, ms, NULL, myfd, &stt);
 }
 
 static void nda_destroy(NdaHandle *h) {
@@ -1053,7 +1057,7 @@ static NdaHandle *nda_open_readonly(const char *path, char *errbuf) {
         NDA_ERR("%s is not frozen: call ->freeze on the producer before opening read-only", path);
         munmap(base, ms); return NULL;
     }
-    NdaHandle *h = nda_setup(base, ms, path, -1);   /* munmaps on OOM */
+    NdaHandle *h = nda_setup(base, ms, path, -1, &st);   /* munmaps on OOM */
     if (!h) { NDA_ERR("out of memory"); return NULL; }
     h->readonly = 1;
     return h;

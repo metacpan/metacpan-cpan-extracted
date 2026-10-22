@@ -1,7 +1,7 @@
 package Data::Queue::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 require XSLoader;
 XSLoader::load('Data::Queue::Shared', $VERSION);
@@ -169,6 +169,7 @@ Creates or opens a shared queue backed by file C<$path>.
 C<$capacity> is rounded up to the next power of 2.
 When opening an existing file, parameters are read from the stored header.
 Multiple processes can open the same file simultaneously.
+All processes sharing a queue must run the same module version.
 
 Pass C<undef> for C<$path> to create an anonymous queue using
 C<MAP_SHARED|MAP_ANONYMOUS>. Anonymous queues are shared with child
@@ -268,7 +269,7 @@ whole call: once it has run out, each remaining value gets one try.
 =head3 Management
 
     $q->clear;                  # remove all elements
-    $q->sync;                   # msync -- flush to disk for crash durability
+    $q->sync;                   # msync -- flush mapped pages to disk
     $q->unlink;                 # remove backing file
     Class->unlink($path);       # class method form
     my $p = $q->path;           # backing file path
@@ -315,9 +316,11 @@ all event-loop watchers.
 =head2 Crash Safety
 
 If a process dies while holding the Str queue mutex, other processes
-detect the stale lock within 2 seconds via PID tracking and automatically
-recover. The Int queue is lock-free and requires no crash recovery for
-normal push/pop operations.
+detect the stale lock on acquisition via PID tracking and automatically
+recover after a 2-second lock timeout. Integer queues cannot recover a worker
+killed after reserving a slot; recreate the queue after such a crash.
+C<sync> flushes pages; it does not make operations transactional across a
+system crash.
 
 =head2 Keyword API
 

@@ -75,6 +75,38 @@ for my $dist (qw( rke2 k3s )) {
     is( resolve($dist), 'G' x 48, 'whitespace-only file falls back to generation' );
   };
 
+  # The server rewrites server/token as K10<ca-hash>::server:<secret>; the
+  # first deploy wrote the bare secret into config.yaml. A re-run that swapped
+  # it for the long form would change config.yaml and restart a server with
+  # nothing to change (live on crag, 2026-10-21, karr k92).
+  my $config = "/etc/rancher/$dist/config.yaml";
+
+  subtest "$dist: config.yaml with the bare secret of server/token is kept" => sub {
+    %files = ( $path => $TOKEN."\n", $config => "cni: none\ntoken: s3cr3t-token-value-0123456789\n" );
+    is( resolve($dist), 's3cr3t-token-value-0123456789', 'config.yaml value returned unchanged' );
+    ok( !grep( m{urandom}, @cmds ), 'no new token generated' );
+    is( $cmds[0], "cat $path 2>/dev/null", 'server/token is read first' );
+  };
+
+  subtest "$dist: config.yaml with the long form is kept" => sub {
+    %files = ( $path => $TOKEN."\n", $config => "token: $TOKEN\n" );
+    is( resolve($dist), $TOKEN, 'long form returned' );
+  };
+
+  subtest "$dist: config.yaml with another secret yields to server/token" => sub {
+    %files = ( $path => $TOKEN."\n", $config => "token: something-else\n" );
+    is( resolve($dist), $TOKEN, 'the token the datastore is sealed with wins' );
+  };
+
+  subtest "$dist: config.yaml without a usable token yields to server/token" => sub {
+    for my $content ( "cni: none\n", "token: [a, b]\n", ": : not yaml {\n", "- a\n- b\n" ) {
+      %files = ( $path => $TOKEN."\n", $config => $content );
+      is( resolve($dist), $TOKEN, 'server/token for: '.( $content =~ s/\n/\\n/gr ) );
+    }
+    %files = ( $path => $TOKEN."\n" );
+    is( resolve($dist), $TOKEN, 'server/token when config.yaml is missing' );
+  };
+
   subtest "$dist: passed token wins" => sub {
     %files = ( $path => $TOKEN );
     is( resolve( $dist, 'given-token' ), 'given-token', 'caller token used' );

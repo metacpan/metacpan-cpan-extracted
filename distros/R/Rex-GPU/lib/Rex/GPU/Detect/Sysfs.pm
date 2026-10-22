@@ -1,7 +1,7 @@
 # ABSTRACT: GPU detection from sysfs, without lspci or pciutils
 
 package Rex::GPU::Detect::Sysfs;
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 use v5.14.4;
 use warnings;
 
@@ -35,7 +35,9 @@ sub detect {
   my %virtual = map { lc($_) => 1 } $class->virtual_display_vendor_ids;
   my $virtual = 0;
   for my $dev (@$devices) {
-    next unless $dev->{class} eq '0300' || $dev->{class} eq '0302';
+    # Class 0380 (AMD Instinct, karr #75) counts for vendor 1002 only.
+    next unless $dev->{class} eq '0300' || $dev->{class} eq '0302'
+      || ( $dev->{class} eq '0380' && $dev->{vendor} eq '1002' );
     if ($dev->{vendor} eq '10de') {
       push @{$result->{nvidia}}, $class->_nvidia_gpu_from_sysfs($dev);
     }
@@ -193,7 +195,7 @@ Rex::GPU::Detect::Sysfs - GPU detection from sysfs, without lspci or pciutils
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -324,7 +326,8 @@ GPU was found.
 =item * B<Virtual displays> (L<Rex::GPU::Detect/virtual_display_vendor_ids>)
 are skipped per device, never hiding a real card next to them, as with
 C<lspci>. Only class C<0300> and C<0302> devices are display devices here
-too.
+too, plus class C<0380> for vendor C<1002> (AMD Instinct); an NVIDIA device
+at C<0380> is not listed.
 
 =item * B<Order.> Devices are reported in the order of their PCI address.
 

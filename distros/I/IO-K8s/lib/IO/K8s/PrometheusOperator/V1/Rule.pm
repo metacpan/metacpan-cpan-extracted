@@ -1,14 +1,14 @@
 package IO::K8s::PrometheusOperator::V1::Rule;
 # ABSTRACT: Rule describes an alerting or recording rule See Prometheus documentation: [alerting](https://www.prometheus.io/docs/prometheus/latest/configuration/alerting_rules/) or [recording](https://www.prometheus.io/docs/prometheus/latest/configuration/recording_rules/#recording-rules) rule
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s alert           => Str;
-k8s annotations     => { Str => 1 };
+k8s annotations     => HashRef[Str];
 k8s expr            => IntOrStr, { required => 'schema' };
 k8s for             => Str, { pattern => qr/^(0|(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?)$/ };
 k8s keep_firing_for => Str, { pattern => qr/^(0|(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?)$/ };
-k8s labels          => { Str => 1 };
+k8s labels          => HashRef[Str];
 k8s record          => Str;
 
 
@@ -32,7 +32,7 @@ IO::K8s::PrometheusOperator::V1::Rule - Rule describes an alerting or recording 
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 alert
 

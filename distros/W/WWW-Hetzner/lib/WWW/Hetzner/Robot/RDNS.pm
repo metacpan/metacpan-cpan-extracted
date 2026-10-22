@@ -1,7 +1,7 @@
 package WWW::Hetzner::Robot::RDNS;
 # ABSTRACT: Hetzner Robot reverse DNS entry entity
 
-our $VERSION = '0.101';
+our $VERSION = '0.102';
 
 use Moo;
 use namespace::clean;
@@ -46,7 +46,7 @@ WWW::Hetzner::Robot::RDNS - Hetzner Robot reverse DNS entry entity
 
 =head1 VERSION
 
-version 0.101
+version 0.102
 
 =head2 ip
 

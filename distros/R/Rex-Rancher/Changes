@@ -1,5 +1,60 @@
 Revision history for Rex-Rancher
 
+0.004     2026-10-21 22:35:28Z
+  - Requires IO::K8s 1.111 and Kubernetes::REST 1.110; recommends Rex::GPU
+    0.004 and Rex::LibSSH 0.005.
+  - A re-run of install_server without a token no longer restarts a server
+    on its first re-run: the first deploy writes the generated secret bare
+    into config.yaml, the server keeps it as K10<ca-hash>::server:<secret> in
+    server/token, and the re-run wrote that long form into config.yaml --
+    the same token, but a changed file, so start_verb restarted the service.
+    When config.yaml already holds the same secret, its value is kept. Seen
+    live on crag with RKE2 v1.36.5. (k92)
+  - The LAN example rig (eg/lan.Rexfile) gets offline test coverage and a
+    runbook with the live-run checklist: t/eg-lan-rexfile.t covers the tasks,
+    the environment contract and the control points, eg/lan.RUNBOOK.md the
+    machine prep and the runs. (k53)
+  - heal_bare_containerd_template and start_verb also restart a service that
+    hangs in activating or ended failed when its config.toml is still Rex::GPU
+    0.001's bare template output: containerd 2.x exits on that config, so the
+    service never reaches active and was left alone (seen live on RKE2 v1.36.4,
+    where only the unit's own Restart= healed it). A service stopped on purpose
+    (inactive) is still not started. (k91)
+  - New Rex::Rancher::Distribution->heal_bare_containerd_template for a
+    running node outside an install: removes Rex::GPU 0.001's bare
+    config.toml.tmpl and restarts a running service once when its
+    config.toml is still that template's output; returns
+    { removed, restarted }. remove_bare_containerd_template no longer says
+    "<service> was not (re)started" on its own -- install_server,
+    install_agent and update_registries still add it, where a start follows.
+  - uninstall_node also removes the NVIDIA GPU Operator's leftovers
+    (/usr/local/nvidia and its two CDI specs under /var/run/cdi); /etc/cdi
+    and the host driver stay. Before, a re-join took the operator runtime
+    from the leftover toolkit config.
+  - uninstall_node also removes Cilium's IPv6 ip rules (tables 2004/2005, the
+    local lookup moved to priority 100), after the IPv4 ones and with the same
+    tolerance: a host without IPv6 is unaffected. cilium_residue does not
+    report them.
+  - fetch_kubeconfig, patch_kubeconfig_server and kubeconfig_server take
+    host:port as the server address (cp:7443, [2001:db8::10]:7443); the port
+    replaces the kubeconfig's. Before, cp:7443 produced a broken URL. Without
+    a port nothing changes (the kubeconfig's 6443 is kept); an invalid port
+    dies.
+  - The Cilium CLI install checks the release's .sha256sum before the binary
+    lands in /usr/local/bin, and aborts on a missing or wrong sum. Download
+    and unpacking run in a mktemp -d directory (removed afterwards, also on
+    failure) instead of fixed names in /tmp.
+  - K3s servers are installed without --write-kubeconfig-mode=644:
+    /etc/rancher/k3s/k3s.yaml, which holds the cluster admin's client
+    certificate and key, gets K3s' own 0600 root:root, as rke2.yaml does.
+    Anything on the node that reads k3s.yaml as another user than root needs
+    kubeconfig_mode; Rex::Rancher itself reads it as root.
+  - New kubeconfig_mode option ('0640', '0644', ...) for install_server and
+    rancher_deploy_server, RKE2 and K3s alike: written as
+    write-kubeconfig-mode to config.yaml, for whoever needs the node's
+    kubeconfig readable beyond root. A string of a zero and three octal
+    digits; anything else dies before the host is touched.
+
 0.003     2026-10-01 04:03:18Z
   - install_cilium with a kubeconfig no longer prints "Use of uninitialized
     value" on a cluster without a Cilium Helm release (every fresh

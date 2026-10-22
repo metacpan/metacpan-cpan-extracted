@@ -1,5 +1,10 @@
 Revision history for Data-Queue-Shared
 
+0.11  2026-10-16
+    - Keep integer waiters progressing after out-of-order reservations.
+    - Recover missed wakes after a peer dies; fix string-space notifications.
+    - Preserve eventfd ownership and notification counts across queue variants.
+
 0.10      2026-09-26
           - A killed push, pop or clear no longer corrupts a Str queue.
           - Int, Int32 and Int16 queues reserve their segment, so a full

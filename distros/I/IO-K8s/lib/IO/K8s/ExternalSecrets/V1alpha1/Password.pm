@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1alpha1::Password;
 # ABSTRACT: Password generates a random password based on the configuration parameters in spec.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::APIObject
     api_version     => 'generators.external-secrets.io/v1alpha1',
     resource_plural => 'passwords',
@@ -24,7 +24,7 @@ IO::K8s::ExternalSecrets::V1alpha1::Password - Password generates a random passw
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 spec
 

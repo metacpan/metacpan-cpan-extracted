@@ -1,14 +1,14 @@
 package IO::K8s::Cilium::V2::IPAMStatus;
 # ABSTRACT: IPAM is the IPAM status of the node.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s 'assigned-static-ip' => Str;
 k8s 'ipv6-used'          => { '+IO::K8s::Cilium::V2::AllocationIP' => 1 };
 k8s 'operator-status'    => '+IO::K8s::Cilium::V2::OperatorStatus';
 k8s 'pod-cidrs'          => { '+IO::K8s::Cilium::V2::PodCIDRMapEntry' => 1 };
-k8s 'release-ips'        => { Str => 1 };
-k8s 'release-ipv6s'      => { Str => 1 };
+k8s 'release-ips'        => HashRef[Str];
+k8s 'release-ipv6s'      => HashRef[Str];
 k8s used                 => { '+IO::K8s::Cilium::V2::AllocationIP' => 1 };
 
 
@@ -32,7 +32,7 @@ IO::K8s::Cilium::V2::IPAMStatus - IPAM is the IPAM status of the node.
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 assigned-static-ip
 

@@ -1,6 +1,6 @@
 package IO::K8s::Api::Flowcontrol::V1beta3::FlowDistinguisherMethod;
 # ABSTRACT: FlowDistinguisherMethod specifies the method of a flow distinguisher.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s type => Str, 'required';
@@ -20,7 +20,7 @@ IO::K8s::Api::Flowcontrol::V1beta3::FlowDistinguisherMethod - FlowDistinguisherM
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 type
 

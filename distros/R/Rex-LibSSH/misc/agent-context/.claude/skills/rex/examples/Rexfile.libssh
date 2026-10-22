@@ -1,0 +1,20 @@
+use strict;
+use warnings;
+use Rex -feature => ['1.4'];
+use Rex::LibSSH;
+
+# Optional backend example; requires separately installed approved dependencies.
+# Leave host-key verification on and provision verified known_hosts externally.
+set connection => 'LibSSH';
+
+desc 'Separately probe exec and metadata on an approved LibSSH target';
+task 'inspect_libssh_capabilities', sub {
+    die "Remote context required\n" if Rex::is_local();
+    run 'true', auto_die => 1;
+    print "exec: succeeded\n";
+    my $exists = is_file('/etc/os-release');
+    print "metadata result: ", ($exists ? 'file observed' : 'not observed'), "\n";
+    # A false result does not distinguish every missing/denied/backend failure.
+    # This does not test writes, transfer fidelity, sudo, or cancellation.
+};
+1;

@@ -1,5 +1,19 @@
 Revision history for Rex-LibSSH
 
+0.005     2026-10-21 19:27:03Z
+  - A failed connect adds the "host key checking is on: add the host to
+    known_hosts ... or opt out" hint only when the error is a host key
+    refusal; a refused or unreachable port (a host still rebooting) carries
+    no host key hint.
+  - Rex::Interface::File::LibSSH reports failure. open returns false when
+    the exec request fails or, reading, when cat exits non-zero, so a
+    missing file does not read as an empty one; write dies on a failed
+    write; close dies when the remote cat exited non-zero, so a write into
+    a missing directory or onto a full disk is not reported as changed.
+  - Rex::Interface::Fs::LibSSH::glob returns an empty list when a pattern
+    matches nothing; file names are not split at whitespace and a blank in
+    the pattern stays part of one word.
+
 0.004     2026-09-20 18:54:48Z
   - SECURITY: the server host key is now verified against known_hosts by
     default (CWE-322, reported privately via CPANSec). Previously
@@ -27,9 +41,10 @@ Revision history for Rex-LibSSH
   - Add t/04-no-sftp.t and t/lib/TestSSHDNoSFTP.pm to prove every
     Fs/File operation works against an sshd without a Subsystem sftp
     line — the environment this distribution was built for.
-  - Document that Fs::LibSSH never routes through Rex::Interface::Fs::Sudo
-    (known limitation, not a bug) and that upload/download/read-mode open
-    hold the whole file in memory on both ends.
+  - Document that Rex::Interface::Fs::LibSSH never routes through
+    Rex::Interface::Fs::Sudo (known limitation, not a bug) and that
+    upload/download/read-mode open hold the whole file in memory on both
+    ends.
 
 0.002     2026-03-29 04:09:31Z
   - Reset session timeout to 0 after connect to allow long-running commands

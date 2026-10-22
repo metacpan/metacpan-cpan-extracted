@@ -1,7 +1,7 @@
 package WWW::Hetzner::CLI::Cmd::Server::Cmd::Reboot;
 # ABSTRACT: Reboot a server (soft)
 
-our $VERSION = '0.101';
+our $VERSION = '0.102';
 
 use Moo;
 use MooX::Cmd;
@@ -35,7 +35,7 @@ WWW::Hetzner::CLI::Cmd::Server::Cmd::Reboot - Reboot a server (soft)
 
 =head1 VERSION
 
-version 0.101
+version 0.102
 
 =head1 SUPPORT
 

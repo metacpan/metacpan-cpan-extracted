@@ -1,6 +1,6 @@
 package IO::K8s::CRD;
 # ABSTRACT: Turn CustomResourceDefinition manifests into IO::K8s classes
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use v5.10;
 use strict;
 use warnings;
@@ -58,8 +58,7 @@ sub load {
         # UTF-8, a directory is refused, and a one-line argument that is no
         # file and only parses to plain scalars -- a mistyped path -- dies
         # instead of giving [] and an add_crd that registers nothing.
-        require YAML::PP;
-        my ($refused, @found) = IO::K8s->_yaml_documents($input, YAML::PP->new(boolean => 'JSON::PP'));
+        my ($refused, @found) = IO::K8s->_yaml_documents($input, IO::K8s->_yaml_parser('JSON::PP'));
         croak "IO::K8s::CRD->load: '".$input."' ".$refused if defined $refused;
         @docs = grep { ref $_ eq 'HASH' } @found;
     }
@@ -320,7 +319,22 @@ sub _ensure_class_loaded {
 sub _property_schema {
     my ($entry, $seen, $where) = @_;
     my $schema = _type_schema($entry, $seen);
-    _apply_options($schema, $entry->{options}, $where, $entry->{is_bool}) if $entry->{options};
+    return $schema unless $entry->{options};
+
+    # Value constraints (enum/minimum/maximum/pattern) of an [X] array or a
+    # typed map constrain each element / each value, so they belong on
+    # items / additionalProperties (k195), as IO::K8s::AutoGen reads them
+    # back. Everything else (description, default, nullable,
+    # preserve_unknown) describes the container itself and stays on it.
+    my %opts  = %{ $entry->{options} };
+    my $inner = ref $schema->{items} eq 'HASH'                ? $schema->{items}
+              : ref $schema->{additionalProperties} eq 'HASH' ? $schema->{additionalProperties}
+              :                                                  undef;
+    if ($inner) {
+        my %value = map { $_ => delete $opts{$_} } grep { exists $opts{$_} } qw(enum minimum maximum pattern);
+        _apply_options($inner, \%value, $where, 0) if %value;
+    }
+    _apply_options($schema, \%opts, $where, $entry->{is_bool});
     return $schema;
 }
 
@@ -384,6 +398,11 @@ sub _type_schema {
     # The string map (k191) -- HashRef[Str] and { Str => 1 } alike, a
     # map[string]string upstream -- and the free map, Opaque / HashRef,
     # which is what { Str => 1 } used to stand for here.
+    return { type => 'object', additionalProperties => { type => 'array', items => { type => 'string' } } }
+        if $entry->{is_hash_of_str_arrays};
+    return { type => 'object',
+             additionalProperties => { type => 'array', items => _schema_for_class($entry->{class}, $seen) } }
+        if $entry->{is_hash_of_object_arrays};
     return { type => 'object', additionalProperties => { type => 'string' } } if $entry->{is_hash_of_str};
     return _opaque_object() if $entry->{is_hash_opaque};
     return { type => 'object', additionalProperties => { type => 'integer' } } if $entry->{is_hash_of_int};
@@ -685,7 +704,7 @@ IO::K8s::CRD - Turn CustomResourceDefinition manifests into IO::K8s classes
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head1 SYNOPSIS
 
@@ -729,6 +748,12 @@ YAML or JSON text (multi-document YAML yields several), a path to such a
 file, or an arrayref of any of those. Dies on a document that is not a
 C<CustomResourceDefinition> or lacks C<spec.group>, C<spec.names.kind> or
 C<spec.versions>.
+
+YAML text is read as YAML 1.1 for plain scalars, like C<kubectl> and
+L<IO::K8s/load_yaml>: C<yes>/C<no>/C<on>/C<off>/C<y>/C<n> are booleans and
+C<0644> is octal. Quote a value to keep it a string. Mapping keys are not
+converted: a property named C<y> or C<on> under C<properties> stays that
+name (C<kubectl> would make it C<"true">).
 
 A string is read by the same rule as L<IO::K8s/load_yaml>: without
 a newline and naming an existing file, it is read from that file, as UTF-8;
@@ -885,6 +910,14 @@ The C<openAPIV3Schema> for one version of C<$class> (D9): walks
 C<< $class->_k8s_attr_info >> and mirrors L<IO::K8s::AutoGen>'s
 schema-to-DSL mapping (C<_schema_to_type_spec>) field by field, in
 reverse, keyed by each field's C<json_key>.
+
+Field options are emitted onto the property's schema, with one split for an
+C<[X]> array and a typed map (C<HashRef[X]>, C<< { X => 1 } >>): the value
+constraints C<enum>, C<minimum>, C<maximum> and C<pattern> constrain each
+element or value, so they land on C<items> or C<additionalProperties> (the
+place L<IO::K8s::AutoGen> reads them back from). The options that describe
+the container itself -- C<description>, C<default>, C<nullable>,
+C<preserve_unknown> -- stay on the array or object schema.
 
 For a top-level Kind (C<< $class->can('_is_resource') >>) the registry's
 own C<metadata> entry is skipped and C<apiVersion>/C<kind>/C<metadata>

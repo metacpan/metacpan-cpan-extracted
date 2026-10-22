@@ -18,7 +18,7 @@ my %WriteMakefileArgs = (
   "NAME" => "File::SOPS",
   "PREREQ_PM" => {
     "Cpanel::JSON::XS" => "4.38",
-    "Crypt::Age" => "0.004",
+    "Crypt::Age" => "0.005",
     "CryptX" => 0,
     "JSON::MaybeXS" => 0,
     "Moo" => 0,
@@ -29,7 +29,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "File::Slurper" => 0
   },
-  "VERSION" => "0.004",
+  "VERSION" => "0.005",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -38,7 +38,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Cpanel::JSON::XS" => "4.38",
-  "Crypt::Age" => "0.004",
+  "Crypt::Age" => "0.005",
   "CryptX" => 0,
   "File::Slurper" => 0,
   "JSON::MaybeXS" => 0,

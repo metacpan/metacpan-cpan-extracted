@@ -21,7 +21,7 @@ use Data::URIID::Service;
 
 use parent 'Data::Identifier::Interface::Known';
 
-our $VERSION = v0.25;
+our $VERSION = v0.26;
 
 my %names = (
     service => {
@@ -398,6 +398,17 @@ sub earth {
     return $self->{earth} //= Data::Identifier->new(wd => 'Q2');
 }
 
+
+sub record_requests {
+    my ($self, $new_value) = @_;
+
+    if (scalar(@_) == 2) {
+        $self->{record_requests} = !!$new_value;
+    }
+
+    return $self->{record_requests};
+}
+
 # Private method:
 sub _get_language_tags {
     my ($self, %opts) = @_;
@@ -565,7 +576,7 @@ Data::URIID - Extractor for identifiers from URIs
 
 =head1 VERSION
 
-version v0.25
+version v0.26
 
 =head1 SYNOPSIS
 
@@ -764,6 +775,16 @@ If the value is not be a valid L<Data::Identifier>, it is parsed as per C<from> 
 The identifier will also be registered as per L<Data::Identifier/register>.
 
 The value must be set before any calls to L</lookup> to take effect for them.
+
+=head2 record_requests
+
+    my $record = $extractor->record_requests( [ $new_value ] );
+
+(experimental since v0.26)
+
+Gets or sets the whether or not to record requests.
+This value is only used for future lookups via L</lookup>.
+Therefore, it should be most often been used before performing any lookups.
 
 =head1 UTILITY METHODS
 

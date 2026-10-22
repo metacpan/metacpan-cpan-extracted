@@ -1,0 +1,36 @@
+---
+abstract: unknown
+author:
+  - unknown
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Pod::Checker: '0'
+  Protocol::WebSocket::Frame: '0'
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: AnyEvent-MCP
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  AnyEvent: '5.33'
+  AnyEvent::HTTP: '0'
+  AnyEvent::WebSocket::Message: '0'
+  AnyEvent::WebSocket::Server: '0'
+  Digest::SHA: '0'
+  Encode: '0'
+  JSON::XS: '3'
+  MIME::Base64: '0'
+  Scalar::Util: '0'
+  common::sense: '3.3'
+  parent: '0'
+version: 0.61
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

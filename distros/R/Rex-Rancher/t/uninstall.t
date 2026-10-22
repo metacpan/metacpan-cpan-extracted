@@ -132,8 +132,10 @@ subtest 'the line: every step, in order' => sub {
       'command -v rke2 >/dev/null 2>&1 || for f in /etc/default/rke2-server /etc/default/rke2-agent;'
       . ' do if [ -f $f ] && [ "$(cat $f 2>/dev/null)" = "' . $PATH_LINE . '" ];'
       . ' then rm -f $f 2>/dev/null || true; fi; done' ],
-    [ 'the Cilium CLI, the CNI dir, the shared runtime dir, never into a mount below them' =>
-      'rm -rf --one-file-system /usr/local/bin/cilium /opt/cni /run/k3s 2>/dev/null || true' ],
+    [ 'the Cilium CLI, the CNI dir, the shared runtime dir, the GPU Operator toolkit and its two CDI specs, never into a mount below them' =>
+      'rm -rf --one-file-system /usr/local/bin/cilium /opt/cni /run/k3s /usr/local/nvidia'
+      . ' /var/run/cdi/k8s.device-plugin.nvidia.com-gpu.json'
+      . ' /var/run/cdi/management.nvidia.com-gpu.yaml 2>/dev/null || true' ],
     [ 'legacy tc, with tc there: clsact off every device with a Cilium program' =>
       'if command -v tc >/dev/null 2>&1; then for d in /sys/class/net/*; do d=${d##*/};' ],
     [ 'without tc: a warning on stderr that cannot fail the line' =>
@@ -161,6 +163,14 @@ subtest 'the line: every step, in order' => sub {
     [ 'then the one at 100 removed, only with one at 0 there' =>
       'ip rule list 2>/dev/null | grep -qE "^0:[[:space:]].*lookup local"'
       . ' && ip rule del from all lookup local priority 100 2>/dev/null || true' ],
+    [ 'IPv6: the same tables drained, after the IPv4 lines' =>
+      'for t in 2004 2005; do while ip -6 rule del lookup $t 2>/dev/null; do :; done; done' ],
+    [ 'IPv6: the local lookup put back at priority 0 first' =>
+      'ip -6 rule list 2>/dev/null | grep -qE "^0:[[:space:]].*lookup local"'
+      . ' || ip -6 rule add from all lookup local priority 0 2>/dev/null || true' ],
+    [ 'IPv6: then the one at 100 removed, only with one at 0 there' =>
+      'ip -6 rule list 2>/dev/null | grep -qE "^0:[[:space:]].*lookup local"'
+      . ' && ip -6 rule del from all lookup local priority 100 2>/dev/null || true' ],
     [ 'outcome: a distribution binary still on PATH' =>
       'for b in rke2 k3s; do p=$(command -v $b 2>/dev/null) && still="$still $p"; done' ],
     [ '... fails the line' =>
@@ -320,8 +330,10 @@ SKIP: {
         ip => "case \"\$1 \$2\" in \"link del\") exit 0;; esac\nexit 1\n",
       );
       my $log = $r->{log};
-      like( $log, qr{^rm -rf --one-file-system /usr/local/bin/cilium /opt/cni /run/k3s$}m,
+      like( $log, qr{^rm -rf --one-file-system /usr/local/bin/cilium /opt/cni /run/k3s /usr/local/nvidia /var/run/cdi/k8s\.device-plugin\.nvidia\.com-gpu\.json /var/run/cdi/management\.nvidia\.com-gpu\.yaml$}m,
         'the leftover paths go, never recursing into a mount below them' );
+      unlike( $log, qr{^rm -rf [^\n]*(?:/etc/cdi|/var/run/cdi(?:\s|$)|/usr/bin/nvidia)}m,
+        'not /etc/cdi, not /var/run/cdi whole, not the host nvidia binaries' );
       like( $log, qr{^rm -rf /sys/fs/bpf/cilium /sys/fs/bpf/tc/globals/cilium_\*}m,
         'the pinned links and maps go -- unpinning a link Cilium no longer holds detaches its program' );
       for my $l (qw( cilium_host cilium_net cilium_vxlan cilium_geneve cilium_wg0 )) {

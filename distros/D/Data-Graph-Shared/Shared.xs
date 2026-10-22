@@ -67,6 +67,7 @@ new(class, path, max_nodes, max_edges, ...)
     UV max_edges
   PREINIT:
     char errbuf[GRAPH_ERR_BUFLEN];
+    STRLEN path_len;
   CODE:
     /* Resolve the optional mode arg FIRST: its get-magic runs arbitrary Perl that
      * can realloc/free the path PV, so capture the path LAST, immediately before
@@ -74,8 +75,8 @@ new(class, path, max_nodes, max_edges, ...)
     mode_t mode = (items > 4 && (SvGETMAGIC(ST(4)), SvOK(ST(4)))) ? (mode_t)SvUV(ST(4)) : 0600;
     if (max_nodes > UINT32_MAX || max_edges > UINT32_MAX)
         croak("Data::Graph::Shared->new: max_nodes/max_edges exceed 2^32");
-    const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
-    if (p && strlen(p) != (size_t)SvCUR(path))
+    const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV(path, path_len) : NULL;
+    if (p && strlen(p) != (size_t)path_len)
         croak("Data::Graph::Shared->new: path contains an embedded NUL");
     GraphHandle *h = graph_create(p, (uint32_t)max_nodes, (uint32_t)max_edges, mode, errbuf);
     if (!h) croak("Data::Graph::Shared->new: %s", errbuf[0] ? errbuf : "out of memory");
@@ -119,14 +120,17 @@ new_readonly(class, path)
     SV *path
   PREINIT:
     char errbuf[GRAPH_ERR_BUFLEN];
+    STRLEN path_len;
   CODE:
     /* Open a FROZEN (sealed) file read-only: O_RDONLY + PROT_READ, no lock
        ever.  A sealed file is immutable and no read path writes the mapping,
        so queries take no reader-slot / rwlock traffic and any number of
        processes can share one PROT_READ mapping (same architecture; the
        magic rejects a wrong-endian file). */
-    const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
+    const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV(path, path_len) : NULL;
     if (!p) croak("Data::Graph::Shared->new_readonly: path is required");
+    if (strlen(p) != (size_t)path_len)
+        croak("Data::Graph::Shared->new_readonly: path contains an embedded NUL");
     GraphHandle *h = graph_open_readonly(p, errbuf);
     if (!h) croak("Data::Graph::Shared->new_readonly: %s", errbuf);
     class = SvPV_nolen(ST(0));   /* re-read: SvGETMAGIC above may have run Perl that reallocs/frees ST(0)'s PV */
@@ -163,7 +167,10 @@ unlink(self_or_class, ...)
         p = h->path;
     } else {
         if (items < 2) croak("Usage: ...->unlink($path)");
-        p = SvPV_nolen(ST(1));
+        STRLEN path_len;
+        p = SvPV(ST(1), path_len);
+        if (strlen(p) != (size_t)path_len)
+            croak("Data::Graph::Shared->unlink: path contains an embedded NUL");
     }
     if (!p) croak("cannot unlink anonymous or memfd object");
     if (unlink(p) != 0 && errno != ENOENT) croak("unlink(%s): %s", p, strerror(errno));

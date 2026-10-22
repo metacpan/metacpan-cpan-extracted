@@ -45,7 +45,7 @@ my %expect = (
             'systemctl show -p MainPID rke2-server 2>/dev/null',
             'systemctl start --no-block rke2-server',
             'systemctl is-active rke2-server' ],
-  k3s  => [ 'curl -sfL https://get.k3s.io | K3S_URL=https://cp1:6443 INSTALL_K3S_SKIP_START=true sh -s - server --write-kubeconfig-mode=644',
+  k3s  => [ 'curl -sfL https://get.k3s.io | K3S_URL=https://cp1:6443 INSTALL_K3S_SKIP_START=true sh -s - server',
             'systemctl enable k3s',
             'systemctl show -p MainPID k3s 2>/dev/null',
             'systemctl restart --no-block k3s',

@@ -21,6 +21,8 @@ xt/enospc.t
 xt/fork_mnh.t
 xt/kwalitee.t
 xt/pod.t
+xt/rwlock.c
+xt/rwlock.t
 xt/tsan.t
 xt/valgrind.t
 xxhash.h

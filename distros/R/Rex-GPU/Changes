@@ -1,5 +1,24 @@
 Revision history for Rex-GPU
 
+0.005     2026-10-21 20:21:08Z
+  - detect (lspci and sysfs) now lists AMD Instinct accelerators, which
+    enumerate as PCI class 0380, under "amd" (compute 0, still no driver
+    install); gpu_setup logs its "AMD GPU detected" warning for them.
+    Class 0380 is accepted for vendor 1002 only; NVIDIA detection is
+    unchanged. The lspci read command string changed to match.
+  - generate_cdi_specs no longer logs "[ok] CDI specs written" when
+    nvidia-ctk cdi generate for nvidia.com/gpu=all fails; it warns and
+    carries on, like the management spec.
+  - _reboot_and_wait now compares /proc/sys/kernel/random/boot_id before
+    and after the reboot and reports the host back only on a different
+    boot; a host that cannot read it falls back to the old answer-only
+    check.
+  - verify_nvidia (the last gpu_setup step) warns when `crun --version`
+    reports a crun older than 1.15 (1.14.1 is known broken: with the GPU
+    Operator's NVIDIA toolkit making crun the first runtime, sandboxes fail
+    with "unknown version specified"). Warning only, nothing is changed; a
+    host without crun is silent. It adds one `can_run: crun` probe.
+
 0.004     2026-10-01 16:14:46Z
   - Not run on GPU hardware yet; checked against the commands sent to the
     host.

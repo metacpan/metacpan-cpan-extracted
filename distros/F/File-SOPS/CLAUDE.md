@@ -40,7 +40,7 @@ principle and lane are in `.claude/rules/file-sops-rules.md`.
 | Public API, guards, error behaviour, rule policy | `file-sops-api` | `SOPS.pm`, `Metadata.pm` |
 | Parsers, emitters, quoting, the order-preserving reparse | `file-sops-format` | `Format/*.pm` |
 | Write/extend tests, reproduce interop bugs | `file-sops-test-writer` | `t/` |
-| Pre-release audit (Changes, cpanfile, dist.ini, interop proof) | `file-sops-release-checker` | reports only |
+| Commits, `Changes`, card → done, pre-release audit | `file-sops-release-manager` | reports only |
 
 The first three replaced a single `file-sops-worker`. Splitting them let each briefing
 carry its own traps instead of one agent holding all of them: the wire lane needs the
@@ -56,7 +56,7 @@ an argument is its own, but what that argument makes the document look like is n
 The agents carry their knowledge via `briefing.skills` (see `.claude/agents/`); the main
 agent delegates rather than loading them. Skill sources live under `.claude/skills/` —
 `file-sops-core` is project-owned, the `getty-perl-*`, `perl-release-dist-ini` and
-`kanban-issues-karr-cli` ones are hardlinked from their shared sources.
+`kanban-issues-karr-coordination` ones are hardlinked from their shared sources.
 
 Work coordination runs on the local `karr` board (`karr board`).
 

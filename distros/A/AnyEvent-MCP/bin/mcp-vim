@@ -1,0 +1,1726 @@
+#!/opt/bin/perl
+
+=head1 NAME
+
+mcp-vim - MCP server for live Vim editors
+
+=head1 SYNOPSIS
+
+   mcp-vim [--name NAME] [--bind ADDRESS[:PORT]] [--stdio] [--print-url]
+
+=head1 DESCRIPTION
+
+C<mcp-vim> lets MCP clients read and edit buffers in running Vim editors,
+including changes that have not been saved to disk. An assistant can work
+with the same text you are editing, and its changes appear in Vim for you
+to review and save.
+
+It runs as a broker daemon. Each Vim editor needs the supplied Vim plugin,
+which connects the editor to the broker. Your MCP client connects to the
+same broker, which forwards requests to the editor and returns its replies.
+The client can use MCP over HTTP or stdin/stdout; Vim always connects over
+TCP using the plugin's private protocol.
+
+One broker can serve several Vim editors. Each editor connects with a
+target name, allowing the client to list the connected editors and choose
+which one to work with. Buffer IDs belong to the selected editor.
+
+See L</VIM PLUGIN INSTALLATION> for installing and connecting the Vim
+plugin, and L<AnyEvent::MCP::Intro> for configuring an MCP client.
+
+=head1 FIRST USE
+
+Install the companion Vim plugin described below. Configure the MCP
+client to launch:
+
+   mcp-vim --stdio --name editor
+
+In another terminal, under the same user and configuration directory,
+retrieve the listener's credential-bearing URL:
+
+   mcp-vim --name editor --print-url
+
+Append a target name and enter the resulting command in Vim:
+
+   :Mcp http://HOST:PORT/TOKEN/my-editor
+
+Then ask the assistant to call C<targets>, C<state>, and C<read-lines>
+for a buffer in C<my-editor>. C<targets> shows whether Vim connected;
+C<state> supplies buffer IDs and changedticks. Reads include unsaved text.
+
+Through a multibroker, tools have a prefix such as C<vim.targets>.
+Start its mcp-vim child with C<--eager> so the listener exists before
+the first tool call. Starting the broker alone does not connect Vim:
+each editor must run C<:Mcp>. If connecting fails, check the broker's
+C<--name>, bind address, token and configuration environment.
+Edits require a current C<expected_changedtick>; they do not save files
+until the separate C<save> tool or a writing Ex command is used.
+
+=head1 TOOLS
+
+C<targets> lists connected Vim sessions, and C<state> reports their buffers
+and current cursor. C<read-lines> and C<grep> operate on live Vim buffers,
+B<not> saved disk files. C<apply-diff> and C<substitute> edit buffers;
+C<set-cursor> deliberately changes the visible editor position.
+Use C<targets> first, then C<state> to obtain buffer IDs and changedticks.
+A target identifies one connected editor; a buffer ID is local to that editor.
+
+Editing operations require the buffer's C<expected_changedtick> from a
+recent state or read. A changed tick rejects stale edits instead of silently
+applying them to a buffer that has moved on. Diff context must also match.
+Explicitly addressed unloaded buffers can be loaded on demand, so reads
+and edits are not necessarily free of editor side effects. A buffer edit
+does not save the file to disk; the user remains in control of that step.
+
+=head2 Patch text and buffer lines
+
+C<apply-diff> accepts Unicode text. The private JSON protocol decodes it
+into a Vim String; the plugin writes buffer lines in Vim's internal
+C<&encoding> and sends the patch String to GNU patch. C<&fileencoding>
+and C<&fileformat> govern saving the buffer, not these temporary files.
+The UTF-8 path has been checked with non-ASCII text.
+
+Patching operates on complete logical lines, with a final newline,
+independently of C<&endofline>. Nonempty output without that final newline
+is rejected. Vim represents an embedded NUL in a buffer line as NL inside
+the corresponding String; C<writefile>/C<readfile> preserve such bytes in
+untouched lines.
+
+NUL-containing diffs are rejected by the broker before permission prompting
+or forwarding: Vim's C<json_decode> would drop C<\u0000> from Strings.
+There is no raw-byte diff transport for Vim yet. This differs from the
+byte-oriented shared helper and the filesystem tool's raw-byte base64 form.
+
+=head2 Undo and redo
+
+C<undo> and C<redo> each move one step through the selected buffer's normal
+Vim undo tree. Both require C<target>, C<buffer> and C<expected_changedtick>,
+and use the C<write> permission. The tick is checked after loading and
+entering that buffer. A stale tick or an unmodifiable buffer rejects the
+operation. Neither tool saves the buffer.
+
+The result includes C<buffer>, the new C<changedtick>, C<changed>,
+C<seq_cur> (the reached undo sequence), C<seq_last> (the latest allocated
+sequence) and C<modified>. At the oldest/newest reachable state, the operation
+succeeds with C<changed> false. Redo follows Vim's selected branch; it does
+not switch to another branch or select an arbitrary historical sequence.
+
+When another buffer is selected, the caller's original buffer and view are
+restored. In the current buffer, Vim's normal undo/redo cursor adjustment
+is retained. Undo acts on ordinary buffer history, including human edits;
+it does not identify or group changes made by an assistant.
+
+=head2 Open a file
+
+C<open> accepts C<target> and a nonempty C<path> without NUL. It adds the
+pathname to Vim's buffer list and loads it without selecting it. Relative
+paths use Vim's current effective directory at execution time. The pathname
+is passed to C<bufadd>, not an Ex command or shell; wildcard and command
+characters are literal. A missing file becomes an empty named buffer.
+
+An existing buffer is reused. Loaded contents, including unsaved edits,
+are not reread from disk. The result reports C<buffer>, C<filename>,
+C<changedtick>, C<line_count> and C<modified>, ready for subsequent tools.
+No file is saved. Use C<set-cursor> separately to display the buffer.
+
+This requires the separate C<open> action. Loading can run normal Vim
+autocommands and modelines, which can change editor state or fail after
+side effects. An error does not undo buffer creation or those effects.
+Permission scopes still cover an editor, not an individual pathname.
+
+=head2 Save modified buffers
+
+C<save> accepts C<target>, C<buffer> and C<expected_changedtick>. It runs
+Vim's C<:update> in that buffer: an unmodified buffer needs no write; a
+modified buffer is saved to its current filename. There is no filename
+argument, save-as or force option. A stale tick rejects the operation.
+
+Saving requires the separate C<save> permission. A C<write> grant for
+editing does not authorize saving. The result reports C<buffer>,
+C<changedtick>, C<modified> and C<filename> after the command. Inspect
+C<modified>: write autocommands can leave or make the buffer modified.
+
+Normal Vim write checks and autocommands apply. They can change text,
+rename or remove buffers, write other files, or fail after side effects.
+The tick guard checks the buffer before the command; it does not constrain
+autocommands or detect external changes to the disk file. A removed or
+unloaded target after the command produces an error even if a write occurred.
+The caller's original buffer and view are restored when possible.
+
+=head2 Unrestricted Ex commands
+
+C<ex> accepts C<target> and C<command>. Without C<buffer>, it executes the
+command text in that editor's current buffer, window and directory.
+An optional C<buffer> makes that buffer current first and leaves it current
+unless the command changes it. C<expected_changedtick> requires C<buffer>
+and is checked in Vim immediately before executing the command, after
+entering the buffer. A stale tick prevents execution. Buffer loading and
+entering can still have their normal Vim side effects.
+
+For example, C<command =E<gt> "update"> with a buffer id and its latest
+changedtick saves that buffer only if its contents have not changed since
+you inspected it. The tick does not describe the disk file or prevent
+autocommands from running.
+
+The command can change the buffer, window and directory,
+access files, invoke shell commands or configured functions, and exit Vim.
+It is not restricted to the current buffer. Prefer the dedicated tools
+when they express the requested operation.
+
+The permission prompt includes the command text. Persistent choices cover
+this exact command in this editor, any Ex command in this editor, or any
+Ex command in all current and future editors. Exact means the complete
+command string, including whitespace and newlines. Such a rule applies to
+all buffers in that editor: approving C<update> is not approval for only
+the buffer used in the original request. Commands can invoke mappings,
+functions and autocommands whose behaviour changes independently of the
+command text.
+
+The result is C<{output: STRING}>, containing captured Vim messages.
+An error is returned as a tool error; effects before that error remain.
+Use noninteractive commands. Message capture suppresses ordinary message
+display, but does not prevent commands from prompting or blocking Vim.
+Request cancellation stops waiting for the reply, not a command already
+running in Vim. If a command exits Vim, the connection can close before
+a reply is delivered.
+
+=head1 VIM PLUGIN INSTALLATION
+
+The Vim plugin is included in the AnyEvent::MCP source distribution as
+C<vim/plugin/mcp-vim.vim>. Installing the Perl distribution does not install
+the Vim plugin. From the source distribution, install it yourself:
+
+   mkdir -p ~/.vim/plugin
+   cp vim/plugin/mcp-vim.vim ~/.vim/plugin/mcp-vim.vim
+
+Alternatively, download the published plugin:
+
+   mkdir -p ~/.vim/plugin
+   wget -O ~/.vim/plugin/mcp-vim.vim \
+      https://dist.schmorp.de/mcp-vim/1/mcp-vim.vim
+
+The C</1/> is the major version of the private Vim/broker protocol, not
+the MCP protocol or the Perl distribution. Restart Vim after installing
+or updating the plugin.
+
+Connect a Vim instance with C<:Mcp URL>, appending the desired target name
+to the broker URL (which C<mcp-vim --print-url> can show):
+
+   :Mcp http://HOST:PORT/TOKEN/TARGET
+
+To avoid typing the URL prefix repeatedly, configure
+C<g:mcp_broker_url> in your vimrc:
+
+   let g:mcp_broker_url = 'http://HOST:PORT/TOKEN/'
+
+Then use C<:Mcp TARGET>, with the target name alone.
+
+Distinct Vim instances requesting the same target name receive suffixes
+such as C< #2>. Reconnecting the same instance replaces its connection and
+keeps its assigned name. Use C<targets> to obtain the actual names.
+
+The Vim plugin uses a private protocol, not MCP. Its initial raw JSON line is
+C<["mcp-vim", cookie, major, minor, target, instance_id]>; subsequent messages
+use Vim's ordinary JSON channel envelope. The broker accepts clients with the
+same major version and a minor version no newer than its own. Keep the broker
+and plugin versions compatible when updating them.
+
+The broker itself can connect to a multibroker using
+C<--connect http://host:port/token/alias>. Its own TCP listener remains active
+for Vim and browser connections. The multibroker URL and the Vim broker's own
+listener URL have independent credentials.
+
+=head1 CONNECTIONS AND AUTHENTICATION
+
+By default, the broker derives a stable port in the 16384..32767 range
+from its service-instance name, defaulting to C<default>. By default
+its token is derived from the private global AnyEvent::MCP master
+secret. Configured C<tokens> or repeated C<--token> options replace that
+default. Every accepted token authenticates MCP HTTP, browser WebSocket
+connections and the private Vim/broker protocol. Keep these tokens
+private.
+
+By default the TCP listener binds IPv4 loopback on the name-derived port.
+C<bind> in C<[instance NAME]> or C<--bind> overrides the address and port.
+
+C<--stdio>, or C<PERL_ANYEVENT_MCP_MULTIBROKER_PROTOCOL=stdio>, additionally
+serves MCP over stdin/stdout. The TCP listener remains active. In this mode
+the process exits after stdio closes and pending responses have drained.
+
+C<--print-url> prints the URL prefix (without a Vim target name) and
+exits, without opening the listener. Normal startup does not print
+the credential. Use the same C<HOME> and C<XDG_CONFIG_HOME> as the
+running broker, for example when checking the URL of a systemd service
+account. Changing the global master secret changes derived tokens and
+invalidates URLs using those tokens. Explicitly configured tokens are
+independent of the master secret.
+
+=head1 PERMISSIONS
+
+MCP tool calls require permission independently of connection authentication.
+C<read> covers C<targets>, C<state>, C<read-lines> and C<grep>.
+C<write> covers C<apply-diff>, C<substitute>, C<undo>, C<redo> and C<set-cursor>, including
+changes to the visible editor position. C<save> authorizes the C<save> tool and is
+independent of C<read> and C<write>. C<open> independently authorizes loading
+files by pathname. C<exec> authorizes the unrestricted
+C<ex> tool. Neither C<read> nor C<write> implies C<exec>, or each other.
+Explicit all-action rules also match C<exec>. Dedicated
+editing tools leave buffers unsaved; C<save> saves explicitly, and Ex
+commands can save files or perform other arbitrary work.
+
+Permission prompts offer the selected editor (all its buffers), or all
+editors including future connections. Listing target names has its own
+scope. Rules identify editors by their assigned target names, not connection
+IDs; a saved rule also applies to a later editor using that name.
+Buffer filenames do not restrict these grants.
+
+C<apply-diff> attaches display-only C<View patch> details containing the
+editor name, buffer number and supplied diff. YAD offers a separate viewer;
+terminal and native MCP prompts show a bounded preview inline. These details
+do not narrow a saved editor-wide write grant.
+
+Rules are stored in
+C<$XDG_CONFIG_HOME/anyevent-mcp/rules/vim-NAME.ini>, or the corresponding
+C<$HOME/.config> path. C<NAME> is the service-instance name. For example,
+C<mcp-vim> uses C<rules/vim-default.ini>. Subjects are C<target:TARGET>
+for read/write access to an editor and C<targets> for discovery. Ex subjects
+are C<ex:JSON_TARGET:JSON_COMMAND>, where both JSON values are strings.
+The helper offers exact and editor-wide matchers; there is no need to
+write their quoting by hand. An omitted subject still matches all subjects.
+An allow rule needs an empty C<sandbox-grants> value:
+
+   [rule]
+   decision=allow
+   action=read
+   subject=target:my-editor
+   sandbox-grants=
+
+By default, questions go to the local permission helper. C<--ask tty> and
+C<--ask yad> force the built-in terminal or YAD interface without fallback.
+Use C<--ask mcp>
+to ask through a client with form elicitation, or C<--ask auto> to use
+elicitation when advertised and the helper otherwise. A declined elicitation
+does not fall back to the helper. The environment variable
+C<PERL_ANYEVENT_MCP_PERMISSION_ASK> supplies the default when C<--ask> is
+omitted. See L<AnyEvent::MCP::Server::Permissions> for rule and prompt details.
+
+These checks apply to MCP tools over both HTTP and stdio. They do not change
+the authenticated private Vim connection or the browser session protocol.
+Reads can still load explicitly addressed buffers and trigger Vim's usual
+loading behaviour; these permissions do not sandbox Vim.
+
+=head1 OPTIONS
+
+Common options, including C<--name>, C<--bind>, C<--token>,
+C<--stdio>, C<--connect>, C<--print-url>, C<--auto-allow> and
+C<--auto-deny>, are documented in
+L<AnyEvent::MCP::Server::Simple/mcp_getoptions>.
+For this server, C<--bind> also controls the Vim and WebSocket listener;
+all configured tokens authenticate those connections as well as MCP.
+C<--stdio> adds an MCP JSONL connection while keeping the TCP listener
+active, and C<--print-url> reports its credential-bearing URL prefix.
+C<--tool-help> prints registered tools and arguments without starting a
+listener. For example, C<--auto-allow '*,write'> approves buffer-editing
+actions but not C<save>, C<open> or unrestricted C<exec>.
+
+=over
+
+=item --ask MODE
+
+Select permission prompting: C<helper>, C<tty>, C<yad>, C<mcp> or C<auto>.
+See L</PERMISSIONS>.
+
+=back
+
+=head1 SYSTEMD
+
+A service can run C</path/to/mcp-vim> directly. Set its C<HOME> and, if
+needed, C<XDG_CONFIG_HOME> so it uses the intended global secret.
+Run C<mcp-vim --print-url> as the service user to obtain the connection URL;
+there is no separate install-time cookie generation step.
+
+=cut
+
+use common::sense;
+
+use Getopt::Long ();
+use AnyEvent::MCP::Config ();
+
+use MIME::Base64 ();
+
+use Socket ();
+
+use JSON::XS ();
+
+use AnyEvent ();
+use AnyEvent::Socket ();
+use AnyEvent::MCP ();
+use AnyEvent::MCP::Extension ();
+use AnyEvent::MCP::Server::HTTP ();
+use AnyEvent::MCP::Server::Toolset ();
+use AnyEvent::MCP::Server::Permissions ();
+use AnyEvent::MCP::Server::Simple qw(mcp_getoptions mcp_tool_help mcp_log mcp_log_request);
+
+use AnyEvent::WebSocket::Server ();
+use AnyEvent::WebSocket::Message ();
+
+our $PORT;
+our $NICK;
+
+my $usage = "Usage: mcp-vim [OPTION]...\n";
+my %server_options = mcp_getoptions ({
+   usage => $usage,
+   path => "/",
+   description => "Bridge live Vim buffers to MCP and browser WebSocket clients.\n"
+      . "With --stdio, the broker also serves MCP on stdin/stdout; TCP stays active.",
+   options => [["--ask MODE", "Ask for permission via helper (default), tty, yad, mcp, or auto"]],
+   examples => "  mcp-vim --name editor --bind 127.0.0.1:20792\n"
+      . "  mcp-vim --name editor --print-url\n"
+      . "  mcp-vim --auto-allow '*,write'",
+}, "ask=s" => \my $ask);
+@ARGV and die $usage;
+
+my $name = $server_options{name};
+my $bind = $server_options{bind};
+my @tokens = @{$server_options{tokens} || []};
+my $connect = $server_options{connect};
+my $stdio = $server_options{stdio} || !defined $connect && $ENV{PERL_ANYEVENT_MCP_MULTIBROKER_PROTOCOL} eq "stdio";
+!($stdio && defined $connect) or die "Cannot combine --stdio and --connect\n";
+
+# private Vim/broker wire protocol (separate from the browser protocol)
+my $vim_prot_major = 1;
+my $vim_prot_minor = 0;
+
+my $config = AnyEvent::MCP::Config->global;
+my %http = $config->http_settings ($name, $bind);
+my $host = $http{host};
+$PORT = $http{port};
+
+# A URL credential must survive service restarts and --print-url.
+my $stored = AnyEvent::MCP::Config->new (file => $config->{file});
+$stored->{section}{global}{secret} eq $config->{section}{global}{secret}
+   or die "mcp-vim: MCP master secret is not persistently stored in $config->{file}\n";
+
+$http{tokens} = \@tokens if @tokens;
+my @accepted_tokens = @{$http{tokens}};
+/\A[A-Za-z0-9_.~-]+\z/ or die "Invalid mcp-vim token\n" for @accepted_tokens;
+my %accepted_token = map { $_ => 1 } @accepted_tokens;
+
+chomp (my $hostname = qx<hostname -f>);
+length $hostname or die "cannot determine mcp-vim hostname\n";
+$NICK //= $hostname;
+
+
+our $JSON_CODER = JSON::XS->new->utf8;
+
+#############################################################################
+
+my %xpcse;
+my %vim;
+my %target;
+
+sub targets_changed {
+   $_->send_json ([targets => keys %target]) for values %xpcse;
+}
+
+#############################################################################
+
+sub base::emit {
+   my ($self, $type, @args) = @_;
+
+   eval {
+      $type =~ y/-/_/;
+      $type = "_on_$type";
+
+      $self->$type (@args);
+   };
+   if ($@) {
+      warn "error executing $type callback: $@";
+   }
+}
+
+#############################################################################
+# vim
+
+@vim::ISA = base::;
+
+sub vim::new {
+   my ($class, $hdl, $hello) = @_;
+
+   my ($requested, $instance_id) = @$hello[4, 5];
+
+   (my $old) = grep
+      defined $instance_id
+      && defined $_->{instance_id}
+      && $_->{requested} eq $requested
+      && $_->{instance_id} eq $instance_id,
+      values %vim;
+
+   my $name = $old ? $old->{target} : $requested;
+   $old->destroy if $old;
+
+   unless ($old) {
+      my $n = 2;
+      $name = "$requested #" . $n++
+         while exists $target{$name};
+   }
+
+   my $self = bless {
+      ah          => $hdl,
+      target      => $name,
+      requested   => $requested,
+      instance_id => $instance_id,
+   }, $class;
+
+   $vim{$self+0} = $self;
+
+   AE::log debug => "new vim connection\n";
+
+   # the line-based hello reader leaves subsequent bytes in the handle.
+   $hdl->{json} = AnyEvent::MCP::json_class ()->new->utf8->max_depth (512);
+   $hdl->rtimeout (0);
+
+   {
+      Scalar::Util::weaken (my $self = $self);
+
+      $hdl->on_error (sub {
+         $_[0]->destroy;
+         $self->destroy;
+      });
+   }
+
+   mcp_log "vim <$self->{target}> connected";
+   $target{$self->{target}} = $self;
+   targets_changed;
+
+   $self->read_json;
+   $self
+}
+
+sub vim::read_json {
+   my ($self) = @_;
+
+   Scalar::Util::weaken (my $weak_self = $self);
+
+   $self->{ah}->push_read (json => sub {
+      my (undef, $packet) = @_;
+
+      my $self = $weak_self or return;
+
+      $self->emit (@{ $packet->[1] });
+      $self->read_json;
+   });
+}
+
+sub vim::destroy {
+   my ($self) = @_;
+
+   delete $vim{$self+0}
+      or return;
+
+   $self->{ah}->destroy;
+
+   if (my $save = delete $self->{save}) {
+      $save->{xpcse}->cancel_save ($save);
+   }
+
+   delete $target{$self->{target}};
+   targets_changed;
+
+   $_->(0, "vim disconnected")
+      for values %{ delete $self->{rpccb} || {} };
+
+   mcp_log "vim <$self->{target}> disconnected";
+}
+
+sub vim::send_msg {
+   my ($self, $msg) = @_;
+
+   $self->{ah}->push_write (json => [0, $msg]);
+
+   AE::log trace => "$self->{target} < @$msg";#d#
+}
+
+sub vim::rpc_ {
+   my $cb = pop;
+   my ($self, $cmd, @args) = @_;
+
+   my $id = ++$self->{rpcid};
+   $self->{rpccb}{$id} = $cb;
+
+   $self->send_msg ([call => $id, $cmd, @args]);
+}
+
+sub vim::_on_reply {
+   my ($self, $id, $success, $result) = @_; # also backtrace, but we completelky ignore that
+
+   my $cb = delete $self->{rpccb}{$id}
+      or die "reply for id $id has no callback\n";
+
+   $cb->($success, $result);
+}
+
+# startup session info
+sub vim::_on_session {
+   my ($self, $id, $state) = @_;
+
+   $self->{session}{$id} = $state;
+}
+
+sub vim::_on_ack {
+   my ($self, $bytes) = @_;
+}
+
+# end of session list
+sub vim::_on_sessions_done {
+   my ($self) = @_;
+
+   $self->send_msg ([echo => "connected as '$self->{target}'"]);
+}
+
+sub vim::_on_save {
+   my ($self, $id) = @_;
+
+   # a save's input belongs to Vim until eof; the browser queue owns the upload.
+   if (my $old = delete $self->{save}) {
+      $old->{xpcse}->cancel_save ($old);
+   }
+
+   my $hdrs = $self->{session}{$id}
+      or return $self->send_msg ([echo => "$id: session not found"]);
+
+   my ($xpcse) = grep $_->{origin} eq $hdrs->{origin}, values %xpcse;
+
+   $xpcse
+      or return $self->send_msg ([echo => "$id: no origin found, connect a tab for $hdrs->{origin}"]);
+
+   AE::log info => "save $id $hdrs->{origin}";
+   $self->send_msg ([echo => "requesting save to $hdrs->{origin}..."]);
+
+   $self->{save} = $xpcse->save ($self, $id, $hdrs);
+}
+
+sub vim::_on_data {
+   my ($self, $encoded) = @_;
+
+   my $data = MIME::Base64::decode_base64 $encoded;
+
+   if (my $save = $self->{save}) {
+      push @{$save->{data}}, $data;
+      $save->{xpcse}->send_data;
+   } else {
+      # discard a rejected save's input without holding up its sender.
+      $self->send_msg ([ack => length $data]);
+   }
+}
+
+sub vim::_on_eof {
+   my ($self, $success) = @_;
+
+   my $save = delete $self->{save}
+      or return;
+
+   if ($success) {
+      $save->{eof} = 1;
+      $save->{xpcse}->send_data;
+   } else {
+      $save->{xpcse}->cancel_save ($save);
+   }
+}
+
+sub vim::_on_close {
+   my ($self, $id) = @_;
+
+   my $hdrs = $self->{session}{$id}
+      or return $self->send_msg ([echo => "$id: session not found"]);
+
+   AE::log debug => "vim session close $id";
+
+   unlink $hdrs->{path};
+   delete $self->{session}{$id};
+}
+
+sub vim::session_open {
+   my ($self, $hdrs) = @_;
+
+   my $id = "s" . substr rand, 2;
+   $self->{session}{$id} = $hdrs;
+
+   AE::log debug => "vim session open: $id $hdrs->{path}";
+
+   my $filename = $hdrs->{filename};
+
+   $filename =~ s/->/➔/g;
+   $filename =~ s/::/∷/g;
+   $filename =~ s/\//∕/g;
+   $filename =~ s/[\/<>:"\\|\?\*\x00-\x1f]/_/g;
+
+   $self->send_msg ([open => "$id", $filename // "unknown", $hdrs->{extension}, $hdrs]);
+}
+
+sub vim::_on_quit {
+   my ($self) = @_;
+
+   $self->destroy;
+}
+
+#############################################################################
+
+@xpcse::ISA = base::;
+
+sub xpcse::new {
+   my ($class, $self) = @_;
+
+   bless $self, $class;
+
+   {
+      Scalar::Util::weaken (my $self = $self);
+
+      $self->{conn}->on (finish => sub {
+         #AE::log trace => "on finish";#d#
+         $self->finish;
+      });
+
+      $self->{conn}->on (each_message => sub {
+         eval {
+            my $opcode = $_[1]->opcode;
+
+            if ($opcode == 1) {
+               AE::log trace => "websocket recv: " . $_[1]->body;
+
+               $self->emit (@{ $JSON_CODER->decode ($_[1]->body) });
+
+            } else {
+               my $data = $_[1]->body;
+               $self->{ondata_cb}($self, $data);
+               $self->send_json ([ack => length $data]);
+            }
+         };
+         if ($@) { # AnyEvent::WebScoket simply eats errors and silently disconnects
+            warn $@;
+            exit 1;
+         }
+      });
+
+      $self->{pinger} = AE::timer 5, 10 * 60, sub {
+         # send regular pong frames, to satisfy nginx and to probe the connection
+         $self->{conn}->send (AnyEvent::WebSocket::Message->new (opcode => 10, body => ""));
+      };
+   }
+
+   $xpcse{$self+0} = $self; # keep alive
+
+   $self->send_json ([nick => $NICK]);
+
+   targets_changed;
+
+   $self
+}
+
+sub xpcse::_on_xpcse_client {
+   my ($self, $version) = @_;
+
+   if ($version != 1) {
+      AE::log warn => "ws xpcse client version mismatch (me 1, them $version)";
+      $self->destroy;
+      return;
+   }
+}
+
+sub xpcse::_on_open {
+   my ($self, $target, $hdrs) = @_;
+
+   if (my $vim = $target{$target}) {
+      $self->{upload_vim} = $vim;
+
+      $vim->session_open ($hdrs);
+
+      $self->{ondata_cb} = sub {
+         $vim->send_msg ([data => MIME::Base64::encode_base64 $_[1], ""]) if $vim{$vim+0};
+      };
+   } else {
+      $self->{ondata_cb} = sub { };
+   }
+}
+
+sub xpcse::_on_eof {
+   my ($self, $success) = @_;
+
+   if (my $vim = delete $self->{upload_vim}) {
+      $vim->send_msg ([eof => $success*1]) if $vim{$vim+0};
+   }
+
+   delete $self->{ondata_cb};
+}
+
+sub xpcse::send_json {
+   $_[0]{conn}->send (AnyEvent::WebSocket::Message->new (opcode => 1, body => $JSON_CODER->encode ($_[1])));
+}
+
+sub xpcse::send_bin {
+   $_[0]{conn}->send (AnyEvent::WebSocket::Message->new (opcode => 2, body => $_[1]));
+}
+
+sub xpcse::destroy {
+   my ($self, $code) = @_;
+
+   delete $xpcse{$self+0}
+      or return;
+
+   $code ||= 1002;
+
+   delete $self->{pinger};
+
+   $self->_on_eof (0);
+   for my $save (@{delete $self->{saves} || []}) {
+      if (my $vim = $save->{vim}) {
+         delete $vim->{save}
+            if $vim->{save} && $vim->{save} == $save;
+         $vim->send_msg ([echo => "$save->{session}: browser disconnected"]) if $vim{$vim+0};
+      }
+   }
+
+   my $conn = delete $self->{conn};
+
+   $conn->close ($code) if $conn;
+
+   AE::log debug => "websocket connection destroy $code";
+}
+
+sub xpcse::finish {
+   shift->destroy (@_);
+}
+
+sub xpcse::save {
+   my ($self, $vim, $session, $hdrs) = @_;
+
+   my $save = {
+      xpcse   => $self,
+      vim     => $vim,
+      session => $session,
+      hdrs    => $hdrs,
+      data    => [],
+   };
+
+   # the queue and Vim input own the save; neither endpoint is kept alive by it.
+   Scalar::Util::weaken ($save->{xpcse});
+   Scalar::Util::weaken ($save->{vim});
+   push @{$self->{saves}}, $save;
+   $self->send_data;
+   $save
+}
+
+sub xpcse::send_data {
+   my ($self) = @_;
+
+   my $save = $self->{saves}[0]
+      or return;
+
+   unless (exists $save->{credit}) {
+      $save->{credit} = 10e6;
+      $self->send_json ([upload => $save->{hdrs}]);
+   }
+
+   # a positive credit admits one whole chunk, even if it exceeds the window.
+   while (@{$save->{data}} && $save->{credit} > 0) {
+      my $data = shift @{$save->{data}};
+      $save->{credit} -= length $data;
+      $self->send_bin ($data);
+   }
+
+   # eof is 1 when Vim has finished, 2 once the browser has been told.
+   if ($save->{eof} == 1 && !@{$save->{data}}) {
+      $save->{eof} = 2;
+      $self->send_json (["upload-done"]);
+   }
+}
+
+sub xpcse::_on_ack {
+   my ($self, $bytes) = @_;
+
+   my $save = $self->{saves}[0]
+      or return;
+
+   $bytes =~ /\A[0-9]+\z/ && $bytes <= 10e6 - $save->{credit}
+      or return $self->destroy;
+
+   $save->{credit} += $bytes;
+
+   # ack means receipt by the browser, independently of the final save result.
+   my $vim = $save->{vim};
+   $vim->send_msg ([ack => $bytes]) if $vim && $vim{$vim+0};
+
+   $self->send_data;
+}
+
+sub xpcse::_on_upload_done {
+   my ($self, $status, $msg) = @_;
+
+   my $save = $self->{saves}[0]
+      or return;
+
+   $save->{eof} == 2
+      or return $self->destroy;
+
+   shift @{$self->{saves}};
+
+   my $vim = $save->{vim};
+   if ($vim && $vim{$vim+0}) {
+      if ($msg =~ /\n/) {
+         $msg =~ s/^upload ok, but.*:\n+//;
+         $msg =~ s/\n\n+/\n/g;
+         $msg =~ s/\n\z//;
+         $vim->send_msg ([error => "error: $msg"]);
+
+         if ($msg =~ / line ([0-9]+), /) {
+            $vim->send_msg ([goto => $save->{session}, $1, 1]);
+         }
+
+         AE::log warn => "upload error: $status $msg";
+      } else {
+         $vim->send_msg ([echo => "$status $msg"]);
+      }
+   }
+
+   # the browser's reply, rather than sending eof, releases the next upload.
+   $self->send_data;
+}
+
+sub xpcse::cancel_save {
+   my ($self, $save) = @_;
+
+   if ($self->{saves}[0] == $save) {
+      # there is no upload-abort message; closing prevents a partial POST.
+      $self->destroy (1011);
+   } else {
+      @{$self->{saves}} = grep $_ != $save, @{$self->{saves}};
+   }
+}
+
+#############################################################################
+
+my $permissions = AnyEvent::MCP::Server::Permissions->new (
+   name    => "vim-$name",
+   actions => {
+      read  => "Read Vim target names, editor state and buffer contents",
+      open  => "Load a file into a Vim buffer; autocommands and modelines may run",
+      write => "Change Vim buffer contents or the editor position",
+      save  => "Save a Vim buffer to its current filename if modified",
+      exec  => "Execute arbitrary Vim commands with full host-user privileges",
+   },
+   (defined $ask ? (ask => $ask) : ()),
+   auto_rules => [@{$server_options{auto_rules} || []},
+      $config->auto_rules ($name)],
+);
+
+sub vim_permission {
+   my ($req, $action, $name, $command, $details, $reason) = @_;
+
+   my $subject = defined $name ? "target:$name" : "targets";
+   my $label = defined $name ? "editor '$name' (all buffers)" : "the list of connected editors";
+   my @subjects = (
+      { label => $label, subject => $subject },
+      { label => "all Vim editors, including future connections", subject => "^" },
+   );
+
+   if (defined $command) {
+      my $json = JSON::XS->new->allow_nonref;
+      my $editor = "ex:" . $json->encode ($name) . ":";
+      $subject = $editor . $json->encode ($command);
+      @subjects = (
+         { label => "this exact command in editor '$name' (all buffers)", subject => $subject },
+         { label => "any Ex command in editor '$name' (all buffers)", subject => "^" . (quotemeta $editor) },
+         { label => "any Ex command in any Vim editor, including future connections", subject => "^" },
+      );
+   }
+
+   $req->require_permission ({
+      tool           => $req->{tool},
+      action         => $action,
+      subject        => $subject,
+      subjects       => \@subjects,
+      sandbox_grants => [],
+      reason         => $reason // ("$req->{tool}: " . (defined $name ? "Vim editor '$name'" : "list connected Vim editors")
+         . (defined $command ? "\n\n$command" : "")),
+      (defined $details ? (details => $details) : ()),
+   });
+}
+
+my $toolset = AnyEvent::MCP::Server::Toolset->new;
+my $json = JSON::XS->new;
+
+sub rpc_reply {
+   my ($req, $format) = @_;
+
+   sub {
+      my ($success, $result) = @_;
+
+      return if $req->{finished};
+
+      eval {
+         $success or die "$result\n";
+
+         $req->reply ($format ? $format->($result) : {
+            content => [{
+               type => "text",
+               text => $json->encode ($result),
+            }],
+         });
+         1
+      } or do {
+         my $error = $@;
+
+         return if $req->{cancelled};
+         die $error if $req->{finished};
+
+         AE::log info => "mcp-tool $req->{tool}: $error";
+         $req->error ($error);
+      };
+   }
+}
+
+$toolset->tool (targets =>
+   "List Vim targets. Target is human-readable editor/session id. Use before other tools if target is unknown.",
+   {
+      type       => "object",
+      properties => {},
+   },
+   sub {
+      my ($req, $args) = @_;
+
+      vim_permission $req, read => undef;
+
+      AE::log debug => "vim targets";
+
+      $req->reply ({
+         content => [{
+            type => "text",
+            text => $json->encode ([sort keys %target]),
+         }],
+      });
+   }
+);
+
+$toolset->tool (state =>
+   "Get Vim state. Optional target restricts to one editor; omitted means all targets. "
+      . "Returns target => state mapping. State has cwd, current buffer/cursor, and buffer metadata. "
+      . "Unloaded buffers have null changedtick/line_count; read or search them before guarded edits. "
+      . "Explicit buffer access loads buffers on demand. "
+      . "Call state before operating on Vim if current editor/buffer state is not known for this user turn. "
+      . "Vim buffers are live editor state, not disk-file snapshots.",
+   {
+      type       => "object",
+      properties => {
+         target => {
+            type        => "string",
+            description => "Optional Vim target id from targets. Omit for all targets.",
+         },
+      },
+      required => [],
+   },
+   sub {
+      my ($req, $args) = @_;
+
+      my @log = length $args->{target} ? $args->{target} : ();
+
+      # keep log values copied: stringifying request scalars can change JSON::XS number/string encoding.
+      AE::log debug => join " ", "vim state", @log;
+
+      my @targets = length $args->{target}
+         ? $args->{target}
+         : keys %target;
+
+      # permission retries must happen before any of the parallel RPCs start.
+      vim_permission $req, read => $_ for @targets;
+      vim_permission $req, read => undef unless @targets;
+
+      my %state;
+      my $pending = @targets;
+      my $reply = rpc_reply $req;
+
+      return $reply->(1, \%state) unless $pending;
+
+      for my $name (@targets) {
+         my $vim = $target{$name}
+            or die "target does not exist: $name\n";
+
+         $vim->rpc_ (state => sub {
+            my ($success, $result) = @_;
+
+            return $reply->(0, $result) unless $success;
+
+            $state{$name} = $result;
+            $reply->(1, \%state) unless --$pending;
+         });
+      }
+   }
+);
+
+$toolset->tool (read_lines =>
+   "With linenums=true, prefix lines with their absolute line number and a colon. " .
+   "Read live Vim buffer ranges, loading the explicitly named buffer on demand. Returns JSON changedtick/range metadata first, then two MCP text entries per range: [range=start,end] and newline-terminated buffer lines, separately.",
+   {
+      type       => "object",
+      properties => {
+         target => {
+            type        => "string",
+            description => "Vim target id.",
+         },
+         buffer => {
+            type        => "integer",
+            description => "Buffer id from state.",
+         },
+         ranges => {
+            type        => "array",
+            description => "One or more restricted Vim Ex ranges: %, ., $, positive line numbers, +/- offsets, /regex/, ?regex?, and optional , or ; between two addresses.",
+            minItems    => 1,
+            items       => { type => "string" },
+         },
+         linenums => {
+            type        => "boolean",
+            default     => JSON::XS::false,
+            description => "Prefix each line with its absolute line number and a colon.",
+         },
+      },
+      required => ["target", "buffer", "ranges"],
+   },
+   sub {
+      my ($req, $args) = @_;
+
+      vim_permission $req, read => $args->{target};
+
+      my @log = ($args->{target}, $args->{buffer}, @{$args->{ranges}});
+
+      # keep log values copied: stringifying request scalars can change JSON::XS number/string encoding.
+      AE::log debug => join " ", "vim read-lines", @log;
+
+      $target{$args->{target}}->rpc_ (
+         read_lines => $args->{buffer}, $args->{ranges}, rpc_reply ($req, sub {
+            my ($result) = @_;
+
+            my @ranges = @{$result->{ranges}};
+            my $metadata = {
+               changedtick => $result->{changedtick},
+               ranges      => [map {
+                  +{
+                     range => $_->{range},
+                     start => $_->{start},
+                     end   => $_->{end},
+                  }
+               } @ranges],
+            };
+
+            +{
+               content => [
+                  {
+                     type => "text",
+                     text => $json->encode ($metadata),
+                  },
+                  map {{
+                     type => "text",
+                     text => "[range=$_->{start},$_->{end}]",
+                  }, {
+                     type => "text",
+                     text => do {
+                        my $line = $_->{start};
+                        join "", map { ($args->{linenums} ? $line++ . ":" : "") . "$_\n" } @{$_->{lines}};
+                     },
+                  }} @ranges,
+               ],
+            }
+         })
+      );
+   }
+);
+
+$toolset->tool (grep =>
+   "Search Vim buffers. Explicit buffer ids are loaded on demand; empty buffers means all currently loaded buffers. "
+      . "mode=regex uses native Vim regex syntax; mode=word matches literal whole word. "
+      . "Returns buffer/tick/line/column/text matches and truncated flag.",
+   {
+      type       => "object",
+      properties => {
+         target => {
+            type        => "string",
+            description => "Vim target id.",
+         },
+         buffers => {
+            type        => "array",
+            description => "Buffer ids. Explicit ids load on demand; empty array = all currently loaded buffers.",
+            items       => { type => "integer" },
+         },
+         pattern => {
+            type        => "string",
+            description => "Search pattern. Native Vim regex for mode=regex; literal word for mode=word.",
+         },
+         mode => {
+            type        => "string",
+            enum        => ["regex", "word"],
+            description => "Search syntax.",
+         },
+         max_results => {
+            type        => "integer",
+            minimum     => 1,
+            description => "Stop after this many matches.",
+         },
+      },
+      required => ["target", "buffers", "pattern", "mode", "max_results"],
+   },
+   sub {
+      my ($req, $args) = @_;
+
+      vim_permission $req, read => $args->{target};
+
+      my @buffers = map 0 + $_, @{$args->{buffers}};
+      my $log_buffers = @buffers ? (join ",", map 0 + $_, @buffers) : "*";
+      my @log = (
+         $args->{target},
+         $log_buffers,
+         $args->{mode},
+         (substr $args->{pattern}, 0, 20),
+      );
+
+      # keep log values copied: stringifying request scalars can change JSON::XS number/string encoding.
+      AE::log debug => join " ", "vim grep", @log;
+
+      $target{$args->{target}}->rpc_ (
+         grep => \@buffers, $args->{pattern}, $args->{mode}, $args->{max_results}, rpc_reply ($req)
+      );
+   }
+);
+
+sub normalize_udiff {
+   my $diff = shift;
+   my @line = split /\n/, $diff, -1;
+   my $delta = 0;
+   my $hunks = 0;
+   my @max_offset;
+
+   pop @line while @line and !length $line[-1];
+
+   for (my $i = 0; $i < @line; ++$i) {
+      next unless $line[$i] =~ /^@@ /;
+
+      $line[$i] =~ /^@@ -(\d+)(?:,\d+)?(?: \+\d+(?:,\d+)?)? @@(.*)$/
+         or die "normalize_udiff: bad hunk header '$line[$i]'\n";
+
+      my ($old_start, $suffix) = ($1, $2);
+      my ($old_count, $new_count) = (0, 0);
+      my %old_line;
+      my $j = $i + 1;
+
+      # GNU patch mishandles hunks with more prefix than suffix context.
+      # Make the first context line an identity change without losing it.
+      # see https://unix.stackexchange.com/questions/414542/does-patch-work-with-asymmetric-context
+      splice @line, $i + 1, 1, "-$1", "+$1"
+         if $line[$i + 1] =~ /^ (.*)\z/;
+
+      for (; $j < @line; ++$j) {
+         last if $line[$j] =~ /^@@ /;
+
+         my $tag = substr $line[$j], 0, 1;
+
+         if ($tag eq " ") {
+            ++$old_count;
+            ++$new_count;
+            $old_line{substr $line[$j], 1} = 1;
+         } elsif ($tag eq "-") {
+            ++$old_count;
+            $old_line{substr $line[$j], 1} = 1;
+         } elsif ($tag eq "+") {
+            ++$new_count;
+         } elsif ($line[$j] eq "\\ No newline at end of file") {
+            # Marker belongs to the preceding body line and counts neither side.
+         } else {
+            die "normalize_udiff: bad hunk line '$line[$j]'\n";
+         }
+      }
+
+      $old_count or $new_count
+         or die "normalize_udiff: empty hunk at old line $old_start\n";
+
+      $old_count or !$old_start
+         or die "normalize_udiff: hunk " . ($hunks + 1)
+              . " needs old-side context for insertion after old line $old_start\n";
+
+      my $new_start = $old_start + $delta;
+      ++$new_start unless $old_count;
+      --$new_start unless $new_count;
+
+      $new_start >= 0
+         or die "normalize_udiff: invalid new line $new_start\n";
+
+      $line[$i] = sprintf "@@ -%d,%d +%d,%d @@%s",
+         $old_start, $old_count, $new_start, $new_count, $suffix;
+
+      $delta += $new_count - $old_count;
+      ++$hunks;
+      my $max_offset = keys %old_line;
+      --$max_offset
+         if $max_offset;
+      push @max_offset, $max_offset;
+      $i = $j - 1;
+   }
+
+   $hunks
+      or die "normalize_udiff: no hunks\n";
+
+   (join ("\n", @line, ""), \@max_offset)
+}
+
+$toolset->tool (open =>
+   "Load a pathname into a listed Vim buffer without selecting it. Reuses an existing buffer without rereading it. "
+      . "Requires the separate open permission. Relative paths use Vim's current effective directory. "
+      . "No shell, wildcard or Ex-command parsing. Missing files become empty named buffers; nothing is saved. "
+      . "Normal load autocommands and modelines run and may change editor state or fail after side effects. "
+      . "Returns buffer, filename, changedtick, line_count and modified.",
+   {
+      type       => "object",
+      properties => {
+         target => { type => "string", description => "Vim target id." },
+         path   => { type => "string", minLength => 1, description => "File pathname, without NUL." },
+      },
+      required             => ["target", "path"],
+      additionalProperties => JSON::XS::false,
+   },
+   sub {
+      my ($req, $args) = @_;
+
+      defined $args->{path} && !ref $args->{path} && length $args->{path} && $args->{path} !~ /\0/
+         or die "path must be a nonempty string without NUL\n";
+      my $vim = $target{$args->{target}}
+         or die "target does not exist: $args->{target}\n";
+
+      vim_permission $req, open => $args->{target}, undef, undef,
+         "Open file in Vim editor '$args->{target}'\nPath: " . JSON::XS->new->allow_nonref->encode ($args->{path});
+
+      AE::log debug => "vim open $args->{target} " . $json->encode (substr ($args->{path}, 0, 80));
+
+      $vim->rpc_ (open => $args->{path}, rpc_reply ($req));
+   }
+);
+
+$toolset->tool (apply_diff =>
+   "Apply relaxed unified diff to a live Vim buffer. NUL-containing diffs are rejected before forwarding. In @@ headers only old start (-N) matters; -N is the old-file line of the first hunk body line, including context; "
+      . "all other numbers are ignored/recomputed and may be 0; '\@\@ -N \@\@' is valid. "
+      . "Guarded by expected_changedtick; context must match exactly (fuzz=0), with per-hunk relocation limited by distinct old-side lines. Pure insertion is allowed only at the beginning; elsewhere include old-side context.",
+   {
+      type       => "object",
+      properties => {
+         target => {
+            type        => "string",
+            description => "Vim target id.",
+         },
+         buffer => {
+            type        => "integer",
+            description => "Buffer id from current Vim state.",
+         },
+         diff => {
+            type        => "string",
+            minLength   => 1,
+            description => "Unified diff; only \@\@ old start (-N) matters; -N is the old-file line of the first hunk body line, including context. Other numbers are ignored and may be 0; \@\@ -N \@\@ is valid. Pure insertion is allowed only at the beginning; elsewhere include old-side context. Whole-hunk relocation tolerance is derived per hunk from distinct old-side lines.",
+         },
+         expected_changedtick => {
+            type        => "integer",
+            description => "changedtick from latest state/read of this buffer.",
+         },
+      },
+      required => ["target", "buffer", "diff", "expected_changedtick"],
+   },
+   sub {
+      my ($req, $args) = @_;
+
+      defined $args->{diff} && !ref $args->{diff} && $args->{diff} !~ /\0/
+         or die "diff must be text without NUL\n";
+
+      my $buffer = $args->{buffer};
+      vim_permission $req, write => $args->{target}, undef, {
+         "View patch" => "Editor: $args->{target}\nBuffer: $buffer\n\n$args->{diff}",
+      };
+
+      my ($hunk, $body);
+
+      for (split /\n/, $args->{diff}) {
+         if (/^@@ /) {
+            ++$hunk;
+         } elsif ($hunk) {
+            ++$body;
+         }
+      }
+
+      my @log = ($args->{target}, $args->{buffer}, $body);
+
+      # keep log values copied: stringifying request scalars can change JSON::XS number/string encoding.
+      AE::log debug => join " ", "vim apply-diff", @log;
+
+      $target{$args->{target}}->rpc_ (
+         apply_patch =>
+            $args->{buffer},
+            (normalize_udiff $args->{diff}),
+            $args->{expected_changedtick}, rpc_reply ($req)
+      );
+   }
+);
+
+$toolset->tool (substitute =>
+   "Run guarded Vim :substitute on live buffer range for simple mechanical regex replacements. "
+      . "Prefer apply-diff for structural or multiline edits. Pattern uses native Vim regex syntax. "
+      . "Replacement uses native Vim :substitute replacement syntax. Flags are Vim substitute flags. "
+      . q{To clear the whole buffer, use range %, pattern \%^\_.*\%$, replacement empty, flags empty; Vim leaves one empty line. }
+      . "expected_changedtick must match or operation fails stale.",
+   {
+      type       => "object",
+      properties => {
+         target => {
+            type        => "string",
+            description => "Vim target id.",
+         },
+         buffer => {
+            type        => "integer",
+            description => "Buffer id.",
+         },
+         range => {
+            type        => "string",
+            description => "Restricted Vim Ex range: %, ., $, positive line numbers, +/- offsets, /regex/, ?regex?, and optional , or ; between two addresses.",
+         },
+         pattern => {
+            type        => "string",
+            description => "Native Vim regex.",
+         },
+         replacement => {
+            type        => "string",
+            description => "Native Vim :substitute replacement.",
+         },
+         flags => {
+            type        => "string",
+            description => "Vim substitute flags; allowed: egiInp#lr.",
+            pattern     => "^[egiInp#lr]*\$",
+         },
+         expected_changedtick => {
+            type        => "integer",
+            description => "changedtick from latest read/state.",
+         },
+      },
+      required => [
+         "target", "buffer", "range", "pattern", "replacement", "flags", "expected_changedtick"
+      ],
+   },
+   sub {
+      my ($req, $args) = @_;
+
+      vim_permission $req, write => $args->{target};
+
+      my @log = (
+         $args->{target}, $args->{buffer}, $args->{range},
+         (substr $args->{pattern}, 0, 20),
+         "=>",
+         (substr $args->{replacement}, 0, 20),
+         $args->{flags},
+      );
+
+      # keep log values copied: stringifying request scalars can change JSON::XS number/string encoding.
+      AE::log debug => join " ", "vim substitute", @log;
+
+      $target{$args->{target}}->rpc_ (
+         substitute => $args->{buffer}, $args->{range}, $args->{pattern},
+                       $args->{replacement}, $args->{flags}, $args->{expected_changedtick}, rpc_reply ($req)
+      );
+   }
+);
+
+for my $operation (qw(undo redo update)) {
+   $toolset->tool (($operation eq "update" ? "save" : $operation) =>
+      $operation eq "update"
+         ? "Run Vim :update in the selected buffer: save to its current filename only if modified. "
+            . "Requires separate save permission and a current expected_changedtick. No filename or force option. "
+            . "Normal write autocommands run and may have side effects; a failure does not roll them back. "
+            . "Returns buffer, changedtick, modified and filename after the command. "
+            . "Preserves the caller's current buffer/view when possible."
+         : ucfirst ($operation) . " one change in the selected Vim buffer using its normal undo tree. "
+         . "Requires write permission and expected_changedtick from the latest read/state. "
+         . "Leaves buffers unsaved and preserves the caller's current buffer when operating on another buffer. "
+         . "At the history boundary returns changed=false. "
+         . "Returns buffer, changedtick, changed, seq_cur (reached undo sequence), seq_last and modified.",
+      {
+         type       => "object",
+         properties => {
+            target => { type => "string", description => "Vim target id." },
+            buffer => { type => "integer", minimum => 1, description => "Buffer id from current Vim state." },
+            expected_changedtick => {
+               type => "integer", minimum => 0,
+               description => "changedtick from latest read/state of this buffer.",
+            },
+         },
+         required             => ["target", "buffer", "expected_changedtick"],
+         additionalProperties => JSON::XS::false,
+      },
+      sub {
+         my ($req, $args) = @_;
+
+         defined $args->{buffer} && !ref $args->{buffer} && $args->{buffer} =~ /\A[1-9][0-9]*\z/
+            or die "buffer must be a positive integer\n";
+         defined $args->{expected_changedtick} && !ref $args->{expected_changedtick}
+            && $args->{expected_changedtick} =~ /\A[0-9]+\z/
+            or die "expected_changedtick must be a nonnegative integer\n";
+
+         my $vim = $target{$args->{target}}
+            or die "target does not exist: $args->{target}\n";
+
+         vim_permission $req, ($operation eq "update" ? "save" : "write") => $args->{target};
+
+         AE::log debug => join " ", "vim", ($operation eq "update" ? "save" : $operation),
+            $args->{target}, $args->{buffer};
+         $vim->rpc_ ($operation => 0 + $args->{buffer}, 0 + $args->{expected_changedtick}, rpc_reply ($req));
+      }
+   );
+}
+
+$toolset->tool (set_cursor =>
+   "Make buffer current/visible as needed and set Vim cursor. Unlike read/edit helpers this intentionally changes user's "
+      . "editor position. Optional expected_changedtick guards against stale buffer. "
+      . "After making an edit in the user's current buffer, normally move the cursor to the edited region so the user can immediately see the change. "
+      . "Do not move the cursor for purely investigative reads/searches unless useful.",
+   {
+      type       => "object",
+      properties => {
+         target => {
+            type        => "string",
+            description => "Vim target id.",
+         },
+         buffer => {
+            type        => "integer",
+            description => "Buffer id.",
+         },
+         line => {
+            type        => "integer",
+            minimum     => 1,
+            description => "1-based line.",
+         },
+         column => {
+            type        => "integer",
+            minimum     => 1,
+            description => "1-based byte column as used by Vim col().",
+         },
+         expected_changedtick => {
+            type        => "integer",
+            description => "Optional buffer changedtick guard.",
+         },
+      },
+      required => ["target", "buffer", "line", "column"],
+   },
+   sub {
+      my ($req, $args) = @_;
+
+      vim_permission $req, write => $args->{target};
+
+      my @log = ($args->{target}, $args->{buffer}, $args->{line}, $args->{column});
+
+      # keep log values copied: stringifying request scalars can change JSON::XS number/string encoding.
+      AE::log debug => join " ", "vim set-cursor", @log;
+
+      $target{$args->{target}}->rpc_ (
+         set_cursor => @{$args}{qw(buffer line column)},
+            (exists $args->{expected_changedtick} ? $args->{expected_changedtick} : ()), rpc_reply ($req)
+      );
+   }
+);
+
+$toolset->tool (ex =>
+   "Execute unrestricted Ex commands in a Vim editor's current context. Requires the separate exec permission. "
+      . "Can run shell commands, read/write files, invoke configured code or exit Vim with the user's full privileges. "
+      . "Prefer the dedicated read/edit/navigation tools when sufficient. "
+      . "command is Ex text, allowing command separators and newlines; keep it simple and directly reviewable. "
+      . "Optional buffer makes that buffer current; expected_changedtick requires buffer and is checked immediately before execution. "
+      . "Persistent permission can cover the exact command in this editor, any command here, or all editors. "
+      . "Returns {output: captured Vim messages}, or a Vim error. Errors do not roll back earlier effects. "
+      . "Use noninteractive commands: prompts or long-running commands can block Vim, and cancellation cannot undo execution.",
+   {
+      type       => "object",
+      properties => {
+         target  => { type => "string", description => "Vim target id." },
+         command => { type => "string", minLength => 1, description => "Unrestricted Ex command text, without NUL." },
+         buffer  => { type => "integer", minimum => 1, description => "Optional buffer to make current before execution." },
+         expected_changedtick => {
+            type => "integer", minimum => 0,
+            description => "Optional changedtick guard for buffer; requires buffer. A stale tick prevents execution.",
+         },
+      },
+      required => ["target", "command"],
+   },
+   sub {
+      my ($req, $args) = @_;
+
+      my $command = $args->{command};
+      defined $command && !ref $command && length $command && $command !~ /\0/
+         or die "command must be a nonempty string without NUL\n";
+
+      !exists $args->{expected_changedtick} || exists $args->{buffer}
+         or die "expected_changedtick requires buffer\n";
+
+      my $vim = $target{$args->{target}}
+         or die "target does not exist: $args->{target}\n";
+
+      vim_permission $req, exec => $args->{target}, $command;
+
+      $vim->rpc_ (ex => $command, @{$args}{qw(buffer expected_changedtick)}, rpc_reply ($req));
+   }
+);
+
+mcp_tool_help ($server_options{tool_help}, $toolset);
+
+my $instructions = <<'EOF';
+   This server operates on live Vim editors and buffers, not filesystem snapshots.
+   Use targets to discover connected editors, then state to find buffer IDs and changedticks.
+   Use read-lines or grep to inspect buffers; explicit access may load an unloaded buffer.
+   open loads a pathname into a listed buffer without selecting it and requires separate open permission.
+   apply-diff, substitute, undo and redo modify live buffers and require a current expected_changedtick.
+   Editing tools leave buffers unsaved. save writes the current file only if modified and explicitly authorized; it requires save permission and a current expected_changedtick.
+   set-cursor deliberately changes the visible editor position; use it to navigate or show edits.
+   ex executes arbitrary Ex commands with full Vim privileges and separate exec permission; prefer narrower tools and simple commands.
+EOF
+
+my $custom_instructions = $server_options{custom_instructions}
+   // $config->{section}{"instance $name"}{custom_instructions}
+   // $config->{section}{"program " . AnyEvent::MCP::Config::program_name ()}{custom_instructions};
+my %guidance = (
+   instructions       => $instructions,
+   short_instructions => "Live Vim editing: inspect buffers, make guarded unsaved edits, navigate editors. Discover tools.",
+   auto_instructions  => 1,
+   on_request         => \&mcp_log_request,
+   (defined $custom_instructions ? (custom_instructions => $custom_instructions) : ()),
+);
+
+my $mcp = AnyEvent::MCP::Server::HTTP->new (
+   server_info      => { name => "mcp-vim", version => "0" },
+   %guidance,
+   toolsets         => [$toolset],
+   permissions      => $permissions,
+   path             => "/",
+   tokens           => \@accepted_tokens,
+   max_size         => 100e6,
+   origins          => ["*"],
+   connection_close => 1,
+);
+
+my $done = AE::cv;
+my $stdio_mcp;
+
+if (defined $connect) {
+   require AnyEvent::MCP::Server::Connect;
+   $stdio_mcp = AnyEvent::MCP::Server::Connect->new (
+      server_info  => $mcp->{server_info},
+      %guidance,
+      toolsets     => [$toolset],
+      permissions  => $permissions,
+      max_size     => 100e6,
+      connect      => $connect,
+      on_close     => sub { $done->send },
+   );
+   $stdio_mcp->start;
+} elsif ($stdio) {
+   require AnyEvent::MCP::Server::JSONL;
+
+   binmode STDIN;
+   binmode STDOUT;
+
+   $stdio_mcp = AnyEvent::MCP::Server::JSONL->new (
+      server_info         => $mcp->{server_info},
+      %guidance,
+      toolsets            => [$toolset],
+      permissions         => $permissions,
+      max_size            => 100e6,
+      on_connection_close => sub { $done->send },
+   );
+
+   $stdio_mcp->accept (\*STDIN, \*STDOUT);
+}
+
+#############################################################################
+
+sub accept_json {
+   my ($fh) = @_;
+
+   my $hdl = AnyEvent::Handle->new (
+      fh       => $fh,
+      on_error => sub { $_[0]->destroy },
+      on_eof   => sub { $_[0]->destroy },
+   );
+
+   AnyEvent::MCP::Extension::accept ($hdl, \@accepted_tokens, sub {
+      my ($hdl, $hello) = @_;
+
+      @$hello == 6 && $hello->[0] eq "mcp-vim"
+         && defined $hello->[2] && !ref $hello->[2] && $hello->[2] =~ /\A[0-9]+\z/
+         && defined $hello->[3] && !ref $hello->[3] && $hello->[3] =~ /\A[0-9]+\z/
+         && $hello->[2] == $vim_prot_major && $hello->[3] <= $vim_prot_minor
+         && defined $hello->[4] && !ref $hello->[4]
+         && defined $hello->[5] && !ref $hello->[5]
+         or die "Invalid private Vim hello\n";
+
+      vim->new ($hdl, $hello);
+   });
+}
+
+#############################################################################
+
+sub accept_ws {
+   my ($fh, $peer_host, $peer_port) = @_;
+
+   # tcp_server has already formatted the numeric address for us.
+   my $peer = AnyEvent::Socket::format_hostport $peer_host, $peer_port;
+
+   my $origin;
+
+   my $ws_server = new AnyEvent::WebSocket::Server
+      max_payload_size => 1000e6,
+      handshake => sub {
+         my ($req, $res) = @_;
+
+         if ($req->{resource_name} !~ m%^/([^/]+)/+(.+)\z%s || !$accepted_token{$1}) {
+            AE::log notice => "illegal websocket connect from $peer";
+            return;
+         }
+
+         $origin = $2;
+
+         AE::log info => "websocket connect for $origin";
+         #$res->subprotocol ($prot);
+
+         #$res->{subprotocol}
+         #   or return AE::log info => "no matching subprotocol";
+
+         $res
+      },
+   ;
+
+   $ws_server->establish ($fh)->cb (sub {
+      if (my $conn = eval { $_[0]->recv }) {
+         xpcse->new ({ conn => $conn, origin => $origin });
+      }
+   });
+}
+
+#############################################################################
+
+AnyEvent::Socket::tcp_server $host, $PORT, sub {
+   my ($fh, $peer_host, $peer_port) = @_
+      or return;
+
+   my $watcher; $watcher = AE::io $fh, 0, sub {
+      undef $watcher;
+
+      defined recv $fh, my $magic, 1, Socket::MSG_PEEK
+         or return;
+
+      if ($magic eq "[") { # json
+         accept_json $fh;
+      } elsif ($magic eq "P" or $magic eq "O") { # HTTP POST/OPTIONS / MCP JSON-RPC 2.0
+         $mcp->accept ($fh);
+      } elsif ($magic eq "G") {
+         accept_ws $fh, $peer_host, $peer_port;
+      }
+   };
+};
+
+$done->recv;
+

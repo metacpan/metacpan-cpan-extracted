@@ -1,6 +1,6 @@
 requires 'perl', '5.014';
 
-requires 'Crypt::Age', '0.004';
+requires 'Crypt::Age', '0.005';
 requires 'CryptX';
 requires 'YAML::XS';
 # Only used to recover document key order for MAC verification; YAML::XS stays

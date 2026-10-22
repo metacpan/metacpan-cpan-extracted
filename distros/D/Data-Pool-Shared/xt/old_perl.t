@@ -2,6 +2,9 @@ use strict;
 use warnings;
 use Test::More;
 use File::Temp qw(tempdir);
+use File::Basename qw(dirname);
+use Cwd qw(abs_path getcwd);
+use ExtUtils::Manifest qw(maniread manicopy);
 
 # Build and test under an older Perl (e.g. 5.24, 5.28) via plenv. Catches
 # ppport.h changes, SvPV_nolen semantics, and XS ABI shifts. Select which
@@ -13,15 +16,17 @@ my $perl = "$ENV{HOME}/.plenv/versions/$plenv/bin/perl";
 plan skip_all => "$perl not installed (use: plenv install $plenv)" unless -x $perl;
 
 diag "testing with $perl";
-my $src = '/home/yk/dev/perl-modules/Data-Pool-Shared';
+my $src = dirname(dirname(abs_path(__FILE__)));
 my $tmp = tempdir(CLEANUP => 1);
+my $cwd = getcwd();
+chdir $src or die $!;
+manicopy(maniread(), $tmp, 'cp');
+chdir $tmp or die $!;
 
-my $rc = system(
-    "cd $tmp && cp -r $src/* . && " .
-    "$perl Makefile.PL >/dev/null 2>&1 && " .
-    "make >/dev/null 2>&1 && " .
-    "make test >&2"
-);
+my $rc = system($perl, 'Makefile.PL');
+$rc ||= system('make', '-s');
+$rc ||= system('make', 'test');
 is $rc, 0, "build+test pass with Perl $plenv";
+chdir $cwd or die $!;
 
 done_testing;

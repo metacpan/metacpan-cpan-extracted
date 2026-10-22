@@ -20,11 +20,13 @@ xt/enospc.t
 xt/fork_radix.t
 xt/insert_split_capacity.t
 xt/kwalitee.t
+xt/mutation_crash_consistency.t
 xt/node_pool_exhaustion.t
 xt/pod.t
 xt/slotless_reader_recovery.t
 xt/split_crash_consistency.t
 xt/tsan.t
 xt/valgrind.t
+t/unlink-chdir.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

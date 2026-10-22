@@ -1,6 +1,6 @@
 package IO::K8s::GatewayAPI::V1::FrontendTLSValidation;
 # ABSTRACT: Validation holds configuration information for validating the frontend (client).
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s caCertificateRefs => ['+IO::K8s::GatewayAPI::V1::ObjectReference'], { required => 'schema' };
@@ -22,7 +22,7 @@ IO::K8s::GatewayAPI::V1::FrontendTLSValidation - Validation holds configuration 
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 caCertificateRefs
 

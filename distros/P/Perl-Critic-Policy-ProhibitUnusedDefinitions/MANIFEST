@@ -10,7 +10,7 @@ Makefile.PL
 README
 dist.ini
 lib/Perl/Critic/Policy/ProhibitUnusedDefinitions.pm
-prereqs.yaml
+prereqs.yml
 t/00-compile.t
 t/Perl-Critic-Policy-ProhibitUnusedDefinitions.t
 t/author-critic.t

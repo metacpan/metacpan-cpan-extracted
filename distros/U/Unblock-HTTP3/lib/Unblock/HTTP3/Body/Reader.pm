@@ -9,7 +9,7 @@ use Scalar::Util qw(blessed weaken);
 use Unblock::HTTP3 ();
 use Unblock::HTTP3::_Bytes ();
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 sub _new {
     my ($class, $transaction, $kind, %option) = @_;
@@ -234,11 +234,31 @@ sub _maybe_finish {
     $self->{complete} = 1;
 
     my $transaction = $self->{transaction};
-    $transaction->_received_body_complete($self->{kind})
-        if defined $transaction;
-
-    my $callback = $self->{on_end};
-    $callback->($self) if $callback;
+    $transaction->{callback_depth}++ if $transaction;
+    my $ok = eval {
+        $transaction->_received_body_complete($self->{kind})
+            if $transaction;
+        my $callback = $self->{on_end};
+        $callback->($self) if $callback;
+        1;
+    };
+    my $error = "$@";
+    if ($transaction) {
+        $transaction->{callback_depth}--;
+        if (!$ok && !$transaction->is_terminal) {
+            my $connection = $transaction->{connection};
+            $connection->_reject_message_stream($transaction->stream_id, $error)
+                if $connection;
+            eval { $transaction->_mark_error($error) };
+        }
+        $transaction->_notify_finish if $transaction->{finish_pending};
+        if ($ok) {
+            my $connection = $transaction->{connection};
+            $connection->_maybe_complete_transaction($transaction->stream_id)
+                if $connection;
+        }
+    }
+    die $error unless $ok;
 
     return;
 }
@@ -249,8 +269,12 @@ sub _cancel {
     return if $self->{complete} || $self->{cancelled};
 
     $self->{cancelled} = 1;
+    my $pending = $self->{pending};
     $self->{queue} = [];
     $self->{pending} = 0;
+    my $transaction = $self->{transaction};
+    $transaction->_consume_received_body($self->{kind}, $pending)
+        if $transaction && $pending;
 
     my $callback = $self->{on_cancel};
     $callback->($self) if $callback;

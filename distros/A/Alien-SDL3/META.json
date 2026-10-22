@@ -71,7 +71,7 @@
    "provides" : {
       "Alien::SDL3" : {
          "file" : "lib/Alien/SDL3.pm",
-         "version" : "v3.4.21"
+         "version" : "v3.4.22"
       }
    },
    "release_status" : "stable",
@@ -89,7 +89,7 @@
          "web" : "https://github.com/Perl-SDL3/Alien-SDL3.pm"
       }
    },
-   "version" : "v3.4.21",
+   "version" : "v3.4.22",
    "x_authority" : "cpan:SANKO",
    "x_ignore" : [
       ".tidyallrc",

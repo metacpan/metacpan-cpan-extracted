@@ -11,7 +11,7 @@ use URI::Escape ();
 use Carp qw(croak);
 use Log::Any qw($log);
 
-our $VERSION = '0.101';
+our $VERSION = '0.102';
 
 
 requires 'token';
@@ -102,12 +102,24 @@ sub _build_request {
 
     if ($opts{body}) {
         $req_args{content} = $self->_encode_body($opts{body});
-        $log->debugf("Body: %s", $req_args{content});
+        $log->debugf("Body: %s", $self->_encode_body($self->_mask_body($opts{body})));
     }
 
     return WWW::Hetzner::HTTPRequest->new(%req_args);
 }
 
+
+my @SECRET_KEYS = qw(password private_key user_data);
+
+sub _mask_body {
+    my ($self, $body) = @_;
+    return $body unless ref $body eq 'HASH';
+    my %copy = %$body;
+    for my $key (@SECRET_KEYS) {
+        $copy{$key} = '********' if defined $copy{$key};
+    }
+    return \%copy;
+}
 
 sub _parse_response {
     my ($self, $response, $method, $path) = @_;
@@ -120,7 +132,17 @@ sub _parse_response {
     }
 
     unless ($response->status >= 200 && $response->status < 300) {
-        my $error = $data->{error}{message} // $response->status;
+        my $error = (ref $data eq 'HASH' && ref $data->{error} eq 'HASH'
+                ? $data->{error}{message} : undef);
+        unless (defined $error) {
+            $error = $response->status;
+            my $text = $response->content // '';
+            $text =~ s/<[^>]*>/ /g;
+            $text =~ s/\s+/ /g;
+            $text =~ s/^ //; $text =~ s/ $//;
+            $text = substr($text, 0, 200) . '...' if length $text > 200;
+            $error .= " $text" if length $text;
+        }
         $log->errorf("API error: %s", $error);
         croak "Hetzner API error: $error";
     }
@@ -155,7 +177,7 @@ WWW::Hetzner::Role::HTTP - HTTP client role for Hetzner API clients
 
 =head1 VERSION
 
-version 0.101
+version 0.102
 
 =head1 SYNOPSIS
 
@@ -182,7 +204,13 @@ HTTP transport is delegated to a pluggable L<WWW::Hetzner::Role::IO> backend
 (default: L<WWW::Hetzner::LWPIO>), making it possible to use async HTTP
 clients.
 
-Uses L<Log::Any> for logging HTTP requests and responses.
+Uses L<Log::Any> for logging HTTP requests and responses. The debug log of a
+request body masks the top-level keys C<password>, C<private_key> and
+C<user_data>; the request itself is sent unchanged.
+
+Non-2xx responses croak with C<Hetzner API error: ...>: the API's error
+message if the body carries one, otherwise the status code followed by the
+(tag-stripped, truncated) body text.
 
 =head1 REQUIRED ATTRIBUTES
 

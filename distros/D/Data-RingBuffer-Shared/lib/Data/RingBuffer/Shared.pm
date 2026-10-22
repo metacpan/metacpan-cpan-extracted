@@ -1,7 +1,7 @@
 package Data::RingBuffer::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 require XSLoader;
 XSLoader::load('Data::RingBuffer::Shared', $VERSION);
 
@@ -11,9 +11,11 @@ sub CLONE_SKIP { 1 }  # blessed C-pointer handle: never clone into ithreads (dou
 
 sub to_list {
     my ($self) = @_;
-    my $sz = $self->size;
-    return () unless $sz;
-    grep { defined } map { $self->latest($sz - 1 - $_) } 0 .. $sz - 1;
+    my $head = $self->head;
+    return () unless $head;
+    my $cap = $self->capacity;
+    my $oldest = $head > $cap ? $head - $cap : 0;
+    grep { defined } map { $self->read_seq($_) } $oldest .. $head - 1;
 }
 
 1;
@@ -36,7 +38,7 @@ Data::RingBuffer::Shared - Shared-memory fixed-size ring buffer for Linux
     say $ring->latest(1);     # 42 (previous)
     say $ring->size;          # 2
 
-    # overwrites oldest when full -- never blocks
+    # overwrites oldest when full
     $ring->write($_) for 1..200;
     say $ring->size;          # 100 (capacity)
     say $ring->latest;        # 200
@@ -59,7 +61,7 @@ Data::RingBuffer::Shared - Shared-memory fixed-size ring buffer for Linux
 =head1 DESCRIPTION
 
 Fixed-size circular buffer in shared memory. Writes overwrite the
-oldest entry when the buffer is full -- writes never block or fail.
+oldest entry when the buffer is full.
 Readers access data by relative position (0=latest) or absolute
 sequence number.
 
@@ -104,7 +106,7 @@ gets an OOM kill rather than a croak.
 
     my $seq = $ring->write($value);  # returns sequence number
 
-Always succeeds. Overwrites oldest when full.
+Returns a sequence number. Overwrites oldest when full.
 
 =head2 Read
 
@@ -112,7 +114,7 @@ Always succeeds. Overwrites oldest when full.
     my $val = $ring->latest($n);   # nth most recent (0=latest)
     my $val = $ring->read_seq($s); # by sequence (undef if overwritten)
 
-    my @all = $ring->to_list;      # entire ring, oldest first
+    my @all = $ring->to_list;      # starting window, oldest first
 
 =head2 Status
 
@@ -126,7 +128,8 @@ Always succeeds. Overwrites oldest when full.
     my $ok = $ring->wait_for($expected_count);          # block until count changes
     my $ok = $ring->wait_for($expected_count, $timeout);
 
-Returns 1 if new data arrived (count != expected), 0 on timeout.
+Returns 1 if new data arrived (count != expected), 0 on timeout. An omitted
+or negative timeout waits indefinitely; Perl signal handlers run during waits.
 
 =head2 Lifecycle
 
@@ -145,7 +148,7 @@ Single-process (1M ops, x86_64 Linux, Perl 5.40, cap=1000):
 
     Int write       11.7M/s
     Int latest      11.1M/s
-    Int read_seq    10.4M/s
+    Int read_seq(stale) 10.4M/s
     F64 write        8.8M/s
     F64 latest      12.0M/s
 
@@ -156,11 +159,10 @@ C<writes>, C<overwrites>, C<mmap_size>.
 
 =head1 CONCURRENCY AND CRASH SAFETY
 
-The ring is B<lock-free>: there are no mutexes or rwlocks. A writer claims a
-unique, monotonically increasing position with a single atomic increment of the
-head counter, so multiple writer and reader processes may share one buffer
-concurrently. Writes always succeed and never block; when the buffer is full the
-oldest slot is overwritten.
+Writers claim unique positions with an atomic increment of the head counter,
+so multiple writer and reader processes may share one buffer concurrently.
+Writers serialize on each slot using atomics; a stalled writer can delay another
+writer until the recovery timeout. A full buffer overwrites the oldest slot.
 
 Each slot carries a publication sequence used as a seqlock. A reader loads the
 sequence, copies the value, then re-checks the sequence; if a write was in
@@ -170,13 +172,12 @@ reader therefore never observes a torn or half-written value.
 
 If a writer crashes mid-write, its slot is left marked in-progress. Readers skip
 that slot (returning C<undef>) rather than block, and after a short recovery
-timeout a later writer reclaims the slot and overwrites the partial data. Because
-there are no locks, a crash can never orphan one and wedge other processes; the
+timeout a later writer reclaims the slot and overwrites the partial data. The
 buffer as a whole stays usable. C<wait_for> blocks on a futex over an internal
 wake counter, so a crashed waiter cannot stall writers either.
 
 C<clear> is B<not> concurrency-safe: call it only when no other process is
-writing to the buffer.
+using the buffer.
 
 An interrupted create is recovered too. A creator killed after the backing
 file is sized but before its header is committed leaves a full-size, all-zero

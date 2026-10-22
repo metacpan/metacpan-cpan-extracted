@@ -1,6 +1,6 @@
 package Kubernetes::REST::Example;
 # ABSTRACT: Working examples for Kubernetes::REST with Minikube, K3s, and other clusters
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 1;
 
 __END__
@@ -15,7 +15,7 @@ Kubernetes::REST::Example - Working examples for Kubernetes::REST with Minikube,
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head1 DESCRIPTION
 
@@ -733,16 +733,25 @@ This is the foundation for building Kubernetes controllers.
             );
         };
         if ($@ && $@ =~ /410 Gone/) {
-            # resourceVersion too old, re-list to get fresh state
+            # resourceVersion too old: re-list, then resume from the
+            # version the fresh list was read at
             warn "Watch expired, re-listing...\n";
-            $api->list('Pod', namespace => 'default');
-            $rv = undef;
+            my $list = $api->list('Pod', namespace => 'default');
+            say "Now: " . $_->metadata->name for @{ $list->items };
+            $rv = $list->metadata->resourceVersion;
         } elsif ($@) {
             warn "Watch error: $@\n";
             sleep 5;
         }
         # Normal timeout, just restart the watch
     }
+
+The server sends C<BOOKMARK> events, which C<watch()> keeps away from
+C<on_event>; it resumes from their C<resourceVersion>. C<watch()> returns
+C<undef> when it has no safe resume point, which happens on a watch started
+without a C<resourceVersion> against a server that sent no bookmark. The
+loop above then starts over without a version, so the server replays the
+current state as C<ADDED> events. See L<Kubernetes::REST/watch> for the details.
 
 =head2 Watch with selectors
 

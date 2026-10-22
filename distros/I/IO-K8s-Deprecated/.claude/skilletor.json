@@ -1,0 +1,18 @@
+{
+  "sources": {
+    "getty": {
+      "git": "https://github.com/Getty/skills.git",
+      "ref": "main"
+    }
+  },
+  "install": {
+    "skills": [
+      "getty-git-commit-style@getty",
+      "getty-git-usage@getty"
+    ]
+  },
+  "targets": [
+    "claude"
+  ],
+  "gitignore": true
+}

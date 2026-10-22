@@ -1,6 +1,6 @@
 package IO::K8s::Role::APIObject;
 # ABSTRACT: Role for top-level Kubernetes API objects
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use Types::Standard qw( InstanceOf Maybe );
 use IO::K8s::Resource ();
 use Scalar::Util qw(blessed);
@@ -567,9 +567,12 @@ sub to_yaml {
 
 sub save {
     my ($self, $file) = @_;
-    open my $fh, '>', $file or die "Cannot write to $file: $!";
-    print $fh $self->to_yaml;
-    close $fh;
+    open my $fh, '>:encoding(UTF-8)', $file
+        or croak 'Cannot write to '.$file.': '.$!;
+    print $fh $self->to_yaml
+        or croak 'Cannot write to '.$file.': '.$!;
+    close $fh
+        or croak 'Cannot write to '.$file.': '.$!;
     return $self;
 }
 
@@ -908,7 +911,7 @@ IO::K8s::Role::APIObject - Role for top-level Kubernetes API objects
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 metadata
 
@@ -1025,7 +1028,8 @@ Serialize the object to YAML format suitable for C<kubectl apply -f>.
 
     $pod->save('pod.yaml');
 
-Save the object to a YAML file. Returns the object for chaining.
+Save the object to a YAML file, encoded as UTF-8. Croaks if the file cannot
+be written or closed. Returns the object for chaining.
 
 =head2 add_label
 

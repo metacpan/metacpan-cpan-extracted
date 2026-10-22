@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib 'lib';
 
-our $VERSION = '0.101';
+our $VERSION = '0.102';
 
 # Map hyphenated commands to MooX::Cmd package names
 # (Perl packages can't have hyphens, so we translate)
@@ -121,7 +121,7 @@ hcloud.pl - Hetzner Cloud CLI (Perl implementation)
 
 =head1 VERSION
 
-version 0.101
+version 0.102
 
 =head1 SYNOPSIS
 

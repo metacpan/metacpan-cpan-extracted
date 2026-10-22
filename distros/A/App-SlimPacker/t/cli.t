@@ -84,9 +84,11 @@ my ($td, $out, $rc);
     #    the loaded file's @INC path back to the .packlist(s) that list it. Use
     #    fixture modules we control so nothing depends on how a tester's perl is
     #    laid out (a core module like Carp can carry a site_perl .packlist).
+    # mkpath before abs_path: abs_path of a nonexistent path is undef on
+    # some platforms (e.g. Cygwin)
+    mkpath("$td/inc/Fake");
+    mkpath("$td/inc/auto/Fake/Mod");
     my $fixture = Cwd::abs_path("$td/inc");
-    mkpath("$fixture/Fake");
-    mkpath("$fixture/auto/Fake/Mod");
     write_fixture("$fixture/Fake/Mod.pm", "package Fake::Mod;\nsub ok { 1 }\n1;\n");
     write_fixture("$fixture/auto/Fake/Mod/.packlist", "$fixture/Fake/Mod.pm\n");
     write_fixture("$fixture/Fake/None.pm", "package Fake::None;\n1;\n");

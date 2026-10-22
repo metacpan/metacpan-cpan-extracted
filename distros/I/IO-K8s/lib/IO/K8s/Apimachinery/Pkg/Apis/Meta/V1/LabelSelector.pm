@@ -1,12 +1,12 @@
 package IO::K8s::Apimachinery::Pkg::Apis::Meta::V1::LabelSelector;
 # ABSTRACT: A label selector is a label query over a set of resources. The result of matchLabels and matchExpressions are ANDed. An empty label selector matches all objects. A null label selector matches no objects.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s matchExpressions => ['Meta::V1::LabelSelectorRequirement'];
 
 
-k8s matchLabels => { Str => 1 };
+k8s matchLabels => HashRef[Str];
 
 
 1;
@@ -23,7 +23,7 @@ IO::K8s::Apimachinery::Pkg::Apis::Meta::V1::LabelSelector - A label selector is 
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 matchExpressions
 

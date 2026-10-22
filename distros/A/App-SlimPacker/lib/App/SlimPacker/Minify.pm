@@ -4,7 +4,7 @@ use warnings;
 use PPI;
 use Scalar::Util 'refaddr';
 use Exporter 'import';
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 our @EXPORT_OK = qw(
     process process_deps minify_file name_gen needs_space
     module_deps collect_bundle_globals
@@ -30,6 +30,15 @@ sub needs_space {
     # (e.g. `use Foo 5.57(qw/x/)`) is a Perl syntax error. The paren arrives as
     # a Structure whose content starts with '('.
     return 1 if $lr =~ /Number/ && $rc =~ /^\(/;
+    # Perl <= 5.18 mis-tokenizes `&&WORD` (also `&`, `||`, `//`) when a method
+    # call follows (`$x&&Foo::Bar->baz`): "Operator or semicolon missing
+    # before &Foo::Bar". Keep the space after the operator.
+    return 1 if ($lc eq '&&' || $lc eq '||' || $lc eq '//' || $lc eq '&')
+              && $rc =~ /^[A-Za-z_]/;
+    # `-WORD` is a filetest (`-e $x`) or, on perl <= 5.20, an ambiguous
+    # bareword negation ("Ambiguous use of -WORD resolved as -&WORD()").
+    # Keep the space after a minus that preceded a word.
+    return 1 if $lc eq '-' && $rc =~ /^[A-Za-z_]/;
     return 0;
 }
 
@@ -532,8 +541,29 @@ sub _regex_exempt_names_doc {
          || $r eq 'PPI::Token::Regexp::Substitute'
          || $r eq 'PPI::Token::QuoteLike::Regexp') {
             _regex_exempt_names($in_string, $in_string_word, $r, $tok->content);
+        } elsif ($r eq 'PPI::Token::Quote::Single'
+              || $r eq 'PPI::Token::Quote::Literal') {
+            _string_exempt_names($in_string, $in_string_word, $tok->content);
+        } elsif ($r eq 'PPI::Token::HereDoc'
+              && ($tok->{_mode} || '') !~ /^(?:interpolate|command)$/) {
+            _string_exempt_names($in_string, $in_string_word,
+                                 join '', $tok->heredoc);
         }
         $tok = $tok->next_token;
+    }
+}
+
+# Names referenced with a sigil inside a NON-interpolating string are frozen
+# like regex code regions: such strings can be eval'd as code at runtime
+# (Sub::Defer builds its deferred subs in a q[...] template that closes over
+# the file lexicals $undeferred / $deferred_info), and a renamed lexical
+# referenced there would break.  Interpolating strings are fine: their
+# references are rewritten to match the renames.
+sub _string_exempt_names {
+    my ($in_string, $in_string_word, $text) = @_;
+    while ($text =~ /[\$\@\%]\{?([A-Za-z_]\w*)/g) {
+        $in_string->{$1} = 1;
+        $in_string_word->{$1} = 1 if $in_string_word;
     }
 }
 
@@ -1546,13 +1576,14 @@ sub collect_bundle_globals {
     if (ref $args[-1] eq 'HASH') { %opts = %{ pop @args } }
     my @sources = @args;
     my (%globals, %lexicals, %in_string, %in_string_word, %subs, %words, %pkgs,
-        %data_globs, %xs_pkgs);
+        %data_globs, %xs_pkgs, %mod_in_string);
     for my $src (@sources) {
         next unless defined $src;
         my $doc = PPI::Document->new(\$src) or next;
         _collect_bundle_globals_doc($doc, \%globals, \%lexicals, \%in_string,
                                     \%in_string_word, \%subs, \%words, \%pkgs,
-                                    \%data_globs, $opts{rename_exports});
+                                    \%data_globs, $opts{rename_exports},
+                                    \%mod_in_string);
         $xs_pkgs{$_} = 1 for _xs_packages($doc);
     }
     # An XS module finds its compiled code by package name, so it and every
@@ -1601,6 +1632,11 @@ sub collect_bundle_globals {
         my @pc = split /::/, $p;
         for (@pc) {
             next if defined $modmap{$_};
+            # A component of a qualified name mentioned inside a string stays:
+            # the string may be eval'd as code (Sub::Defer's q[...] template
+            # says `package Sub::Defer;`), and strings are never rewritten to
+            # follow module renames.
+            next if $mod_in_string{$_};
             my $short;
             do { $short = name_gen($mcounter++) }
                 while $KEEP{$short} || $PERL_WORDS{$short} || $modreserved{$short};
@@ -1634,7 +1670,7 @@ sub collect_bundle_globals {
 # anything that survives.
 sub _collect_bundle_globals_doc {
     my ($doc, $globals, $lexicals, $in_string, $in_string_word, $subs, $words,
-        $pkgs, $data_globs, $rexport) = @_;
+        $pkgs, $data_globs, $rexport, $mod_in_string) = @_;
     my $cur_pkg = 'main';
     my %seen_stmt;
     my $tok = $doc->first_token;
@@ -1715,9 +1751,23 @@ sub _collect_bundle_globals_doc {
                     while ($pr->{repl} =~ /\b([A-Za-z_]\w*)\b/g) { $in_string_word->{$1} = 1 }
                 }
             }
-        } elsif ($r =~ /^PPI::Token::(?:Quote::(?:Interpolate|Double|Single)|QuoteLike::(?:Readline|Backtick|Command|Words)|HereDoc)$/) {
+        } elsif ($r =~ /^PPI::Token::(?:Quote::(?:Interpolate|Double|Single|Literal)|QuoteLike::(?:Readline|Backtick|Command|Words)|HereDoc)$/) {
             my $str = $tok->content;
             $str .= join('', $tok->heredoc) if $r eq 'PPI::Token::HereDoc' && $tok->can('heredoc');
+            # A qualified name in a NON-interpolating string freezes its
+            # components in the module map: the string may be eval'd as code
+            # (Sub::Defer's q[...] template says `package Sub::Defer;`), and
+            # unlike interpolating text these strings are never rewritten to
+            # follow module renames.
+            if ($mod_in_string
+                && ($r eq 'PPI::Token::Quote::Single'
+                 || $r eq 'PPI::Token::Quote::Literal'
+                 || ($r eq 'PPI::Token::HereDoc'
+                     && ($tok->{_mode} || '') !~ /^(?:interpolate|command)$/))) {
+                while ($str =~ /\b((?:[A-Za-z_]\w*::)+[A-Za-z_]\w*)\b/g) {
+                    $mod_in_string->{$_} = 1 for split /::/, $1;
+                }
+            }
             # With rename_exports, protocol words AND $-exported variables (use
             # import lists, @EXPORT_OK qw lists, can('x') strings) are renamed
             # in step with the sub/variable they name, so they do not freeze it.

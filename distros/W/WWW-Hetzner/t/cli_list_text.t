@@ -6,6 +6,8 @@ use lib 't/lib';
 use Test::WWW::Hetzner::Mock;
 
 use WWW::Hetzner::CLI::Cmd::Server;
+use WWW::Hetzner::CLI::Cmd::Server::Cmd::List;
+use WWW::Hetzner::CLI::Cmd::PrimaryIp::Cmd::List;
 use WWW::Hetzner::CLI::Cmd::Image;
 use WWW::Hetzner::CLI::Cmd::Datacenter;
 use WWW::Hetzner::CLI::Cmd::Sshkey;
@@ -45,7 +47,42 @@ my @cases = (
         matches => [
             qr/203\.0\.113\.10/, 'public IPv4 is shown',
             qr/cx23/,              'server type is shown',
-            qr/fsn1-dc14/,         'datacenter is shown',
+            qr/LOCATION/,          'the location column is headed LOCATION',
+            qr/fsn1/,              'the location of a server with a datacenter is shown',
+        ],
+        not_matches => [
+            qr/fsn1-dc14/, 'the datacenter name is no longer shown',
+        ],
+    },
+    {
+        name    => 'server list',
+        class   => 'WWW::Hetzner::CLI::Cmd::Server::Cmd::List',
+        routes  => [ 'GET /servers' => load_fixture('servers_list_current') ],
+        matches => [
+            qr/203\.0\.113\.10/, 'public IPv4 is shown',
+            qr/LOCATION/,          'the location column is headed LOCATION',
+            qr/fsn1/,              'the location of a current response is shown',
+        ],
+    },
+    {
+        name    => 'primary-ip list',
+        class   => 'WWW::Hetzner::CLI::Cmd::PrimaryIp::Cmd::List',
+        routes  => [ 'GET /primary_ips' => load_fixture('primary_ips_list_current') ],
+        matches => [
+            qr/203\.0\.113\.70/, 'the IP address is shown',
+            qr/LOCATION/,          'the location column is headed LOCATION',
+            qr/fsn1/,              'the location of a current response is shown',
+        ],
+    },
+    {
+        name    => 'primary-ip list with a datacenter response',
+        class   => 'WWW::Hetzner::CLI::Cmd::PrimaryIp::Cmd::List',
+        routes  => [ 'GET /primary_ips' => load_fixture('primary_ips_list') ],
+        matches => [
+            qr/LOCATION/, 'the location column is headed LOCATION',
+        ],
+        not_matches => [
+            qr/fsn1-dc14/, 'the datacenter name is no longer shown',
         ],
     },
     {
@@ -109,6 +146,12 @@ for my $case (@cases) {
         while (@matches) {
             my ($pattern, $name) = splice @matches, 0, 2;
             like($out, $pattern, $name);
+        }
+
+        my @not_matches = @{ $case->{not_matches} // [] };
+        while (@not_matches) {
+            my ($pattern, $name) = splice @not_matches, 0, 2;
+            unlike($out, $pattern, $name);
         }
     };
 }

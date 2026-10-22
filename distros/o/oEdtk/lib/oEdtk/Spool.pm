@@ -5,7 +5,7 @@ use warnings;
 
 use oEdtk::Main 0.42;
 
-our $VERSION = 2.1129;
+our $VERSION = 2.1131;
 
 # The maximum number of characters we emit before inserting
 # a newline.

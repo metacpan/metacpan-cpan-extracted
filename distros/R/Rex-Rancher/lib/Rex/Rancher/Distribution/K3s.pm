@@ -1,7 +1,7 @@
 # ABSTRACT: K3s: paths, services and installer
 
 package Rex::Rancher::Distribution::K3s;
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 use v5.14.4;
 use Moo;
 use JSON::MaybeXS;
@@ -109,6 +109,9 @@ sub cilium_helm_defaults {
 # that cannot reach its server; the caller starts it --no-block and waits
 # bounded. No K3S_TOKEN: the token is in config.yaml, and anything on this
 # line shows up in ps. traefik/servicelb are disabled in config.yaml too.
+# No --write-kubeconfig-mode either: k3s.yaml holds the cluster admin's key
+# and stays at k3s' own 0600, as rke2.yaml does; another mode is the server's
+# kubeconfig_mode, written to config.yaml on both distributions.
 sub script_install_cmd {
   my ( $self, $server, $version ) = @_;
   my @env;
@@ -116,8 +119,7 @@ sub script_install_cmd {
   push @env, "INSTALL_K3S_VERSION=$version" if $version;
   push @env, 'INSTALL_K3S_SKIP_START=true';
   my $env_str = join('', map { "$_ " } @env);
-  return "curl -sfL " . $self->install_url . " | ${env_str}sh -s - " . $self->role
-    . ( $self->is_agent ? '' : ' --write-kubeconfig-mode=644' );
+  return "curl -sfL " . $self->install_url . " | ${env_str}sh -s - " . $self->role;
 }
 
 # Put the verified binary where the K3s install script looks for it: next to
@@ -134,9 +136,7 @@ sub artifact_install_cmds {
   push @env, 'INSTALL_K3S_SKIP_DOWNLOAD=binary', 'INSTALL_K3S_BIN_DIR=/usr/local/bin',
     "INSTALL_K3S_VERSION=$version";
   push @env, 'INSTALL_K3S_SKIP_START=true';
-  my $cmd = join(' ', @env) . " sh $spec->{script} $role";
-  $cmd .= ' --write-kubeconfig-mode=644' if $role eq 'server';
-  return ( $place, $cmd );
+  return ( $place, join(' ', @env) . " sh $spec->{script} $role" );
 }
 
 sub run_server_install_script {
@@ -158,7 +158,7 @@ Rex::Rancher::Distribution::K3s - K3s: paths, services and installer
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 
@@ -173,7 +173,10 @@ The K3s side of L<Rex::Rancher::Distribution>. Configuration in
 C</etc/rancher/k3s>, units C<k3s> and C<k3s-agent.service>, installer from
 L<https://get.k3s.io> with C<INSTALL_K3S_SKIP_START> (the unit is restarted
 C<--no-block> and waited on instead) and C<K3S_URL> for a join, release
-binaries C<k3s> / C<k3s-ARCH>. The service is restarted on every run: the
+binaries C<k3s> / C<k3s-ARCH>. The installer line carries no
+C<--write-kubeconfig-mode>: C<k3s.yaml> keeps K3s' own C<0600>, and another
+mode is L<Rex::Rancher::Server/install_server>'s C<kubeconfig_mode>, in
+C<config.yaml> as on RKE2. The service is restarted on every run: the
 install script rewrites its unit and C<k3s.service.env> each time, so it is
 not narrowed to L<Rex::Rancher::Distribution/restart_reasons> as on RKE2.
 With C<hold_running> it is: restarted for L<Rex::Rancher::Distribution/restart_reasons>

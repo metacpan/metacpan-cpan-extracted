@@ -4,7 +4,7 @@ package IO::K8s::Api::Apps::V1beta1::ControllerRevisionList;
 use strict;
 use warnings;
 
-our $VERSION = '1.105';
+our $VERSION = '1.111';
 
 die __PACKAGE__ . " has been removed. IO-K8s replaced all per-resource"
   . " *List classes with the single generic IO::K8s::List back in its 1.00"
@@ -29,7 +29,7 @@ IO::K8s::Api::Apps::V1beta1::ControllerRevisionList - REMOVED -- superseded by t
 
 =head1 VERSION
 
-version 1.105
+version 1.111
 
 =head1 DESCRIPTION
 

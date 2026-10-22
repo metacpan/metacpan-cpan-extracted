@@ -1,5 +1,10 @@
 Revision history for Data-KDTree-Shared
 
+0.05  2026-10-16
+    - Include decimal-coordinate points on radius boundaries.
+    - Reject missing and undefined coordinates.
+    - Fix interrupted-write and frozen-tree publication.
+
 0.04      2026-09-26
           - A writer killed mid add or clear no longer leaves a counted point
             the tree lacks.

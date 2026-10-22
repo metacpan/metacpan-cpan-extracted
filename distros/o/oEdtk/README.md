@@ -1,58 +1,49 @@
 # oEdtk
 
-**oEdtk** is a Perl 5 toolkit for **industrial printing processing**. It provides the
-generic building blocks needed to write applications that parse fixed-record data
-streams (COBOL copybooks, XML or plain text) and turn them into composed documents
-(LaTeX/PDF, CSV, Excel) and database content: letters, mailings, invoices, banking
-statements, and similar high-volume productions.
+**oEdtk** is a stable Perl 5 toolkit for industrial document processing. It parses
+fixed-record, XML, or plain-text input; applies application-specific rules; and
+produces LaTeX/PDF documents, CSV or Excel files, database records, indexes, and
+production tracking data.
 
-- **Purpose**: parse a data stream, extract records, and drive document composition
-  and tracking at production scale.
-- **Problem it solves**: it factors out the repetitive plumbing of industrial
-  document workflows (record unpacking, template-driven output, LaTeX composition,
-  database loading, index/output management, tracking) so that each application only
-  implements its own business rules.
-- **Intended users**: developers and integrators building editorial-production
-  applications, and maintainers operating those applications in production.
-- **Main benefits**: one consistent parsing/composition model, a documented
-  configuration layer, support for several database engines, and a large
-  non-regression suite.
-- **Maturity**: a stable, CPAN-style release (`2.1129`). No module carries an
-  explicit "experimental" label; the runtime environment defaults to `Dev`
-  (`EDTK_TYPE_ENV=Dev` in the shipped template). Some modules are legacy and kept
-  only for compatibility - see [Limits and constraints](#limits-and-constraints).
+> **Release:** `2.1131`  
+> **Minimum Perl:** `5.28`  
+> **Default database:** SQLite  
+> **PDF generation:** requires a separately installed LaTeX toolchain
 
-Main features at a glance:
+Use oEdtk when an editorial-production application needs a consistent processing
+model without reimplementing record unpacking, document composition, database
+loading, output management, or tracking. The intended audience is developers,
+integrators, and production maintainers.
 
-- Fixed-record parsing driven by per-record "motifs" and output templates.
-- LaTeX composition (`pdflatex`) with an output manager for lots and batches.
-- Database administration: schema create/detect/upgrade/historise, bulk CSV load,
-  backup buffering (PostgreSQL, MySQL/MariaDB, SQLite, Oracle).
-- Document tracking and statistics.
-- XML reading against DTD/XSD, and Cameleon-style readers.
-- Optional network services: e-mailing, ECM injection, Keycloak, dissemination plan.
-- A plug-in mechanism to attach corporate code without a registry.
+## Main capabilities
+
+- Parse fixed-record streams using per-record motifs and output templates.
+- Compose LaTeX/PDF documents and manage lots and batches.
+- Create, detect, migrate, historise, and load PostgreSQL, MySQL/MariaDB, SQLite,
+  and Oracle databases.
+- Produce document tracking and statistics.
+- Read XML against DTD or XSD schemas.
+- Integrate optional emailing, ECM, Keycloak, and dissemination-plan services.
+- Attach corporate code through an optional extension mechanism.
 
 ## Table of contents
 
-- [Presentation](#presentation)
+- [Project model](#project-model)
 - [Quick start](#quick-start)
 - [Requirements](#requirements)
 - [Installation](#installation)
+- [How processing works](#how-processing-works)
 - [Configuration](#configuration)
-- [Usage](#usage)
-- [Use cases](#use-cases)
-- [Features](#features)
-- [Tests and validation](#tests-and-validation)
-- [Architecture](#architecture)
-- [Modules](#modules)
+- [Common operations](#common-operations)
+- [Architecture and repository reference](#architecture-and-repository-reference)
+- [Module reference](#module-reference)
 - [Public interfaces](#public-interfaces)
+- [Tests and validation](#tests-and-validation)
 - [Limits and constraints](#limits-and-constraints)
 - [Troubleshooting](#troubleshooting)
 - [Development and contribution](#development-and-contribution)
 - [License, security and support](#license-security-and-support)
-
-## Presentation
+## Project model
 
 oEdtk is not a single program: it is a **library plus a set of shipped helper
 scripts**. The core (`lib/oEdtk.pm` and the modules under `lib/oEdtk/`) is generic and
@@ -66,11 +57,13 @@ applications need (user-side address helpers, generated record descriptors,
 editor-specific XML readers, and the document-injection client). It is a **separate
 distribution** and is **not a prerequisite** of oEdtk: the thin `oEdtk::*` delegates
 resolve the corresponding `oEUser::*` modules on demand, and fail with an explicit
-message when the companion is absent. See [`oEUser/README`](oEUser/README).
+message when the companion is absent.
 
 This document covers the repository **and** the shipped Perl package (`README.md` is
 included in the distribution tarball).
-
+The core distribution is stable and CPAN-style. No module is explicitly marked
+experimental. The shipped configuration template defaults to `Dev`; production
+behaviour depends on the selected configuration and installed optional services.
 ## Quick start
 
 The shortest path to a first run:
@@ -96,10 +89,10 @@ The shortest path to a first run:
    perl -MoEdtk -e 'print oEdtk_release()'
    ```
 
-   Expected output: a banner line `(c) 2005-2026 oedtk@free.fr - oEdtk v2.1129`.
+   Expected output: a banner line `(c) 2005-2026 oedtk@free.fr - oEdtk v2.1131`.
 
 4. **Write a minimal application** (`myapp.pl`) using the fixed-record model
-   (see [`lib/oEdtk.pm`](lib/oEdtk.pm) SYNOPSIS):
+   (see [Application skeletons](#complete-application-example)):
 
    ```perl
    use strict;
@@ -127,7 +120,6 @@ The shortest path to a first run:
    LaTeX toolchain and a populated configuration (see
    [Configuration](#configuration)); without them, the composition back-end cannot
    run.
-
 ## Requirements
 
 ### Operating systems
@@ -167,8 +159,9 @@ Plus, among others: `Archive::Zip`, `Date::Calc`, `Email::Sender::Simple` and
 `IPC::Run3`, `LWP::UserAgent` and the `HTTP::*` modules, `IO::Socket::SSL`,
 `Log::Log4perl`, `PDF::Create`, `PDF::Tk`, `Readonly`, `Regexp::Common`,
 `Term::ReadKey`, `Text::CSV_XS`, `Time::HiRes`, `Try::Tiny`, `YAML::Tiny`, and
-`CGI` + `CGI::FormBuilder` (the CGI front-ends load these at the top level, so they
-are hard requirements). A full install pulls all of them.
+`CGI` + `CGI::FormBuilder` (loaded at the top level by the repository's CGI
+front-ends, so they stay declared as hard requirements). A full install pulls all of
+them.
 
 ### Database drivers
 
@@ -179,8 +172,9 @@ are hard requirements). A full install pulls all of them.
   for PostgreSQL and MySQL/MariaDB.
 - **`DBD::Oracle`** - optional; not installed by default (it needs the Oracle client
   to build).
-- **`DBD::Excel`**, **`DBD::MariaDB`** - optional (MariaDB is reached through
+- **`DBD::MariaDB`** - optional (MariaDB is reached through
   `DBD::mysql`).
+- **`DBD::Excel`** - optional.
 
 Installing the package never requires a database driver beyond `DBD::SQLite`: the
 PostgreSQL and MySQL drivers are recommends, not test requirements, so a plain
@@ -209,7 +203,6 @@ when the driver is absent.
 `Test::More >= 1.302`, `IPC::Run3` (declared in `TEST_REQUIRES`). The PostgreSQL and
 MySQL integration facets additionally need `DBD::Pg` / `DBD::mysql`; they are
 optional and the facets skip when the driver is absent.
-
 ## Installation
 
 Methods are listed from the simplest to the most advanced.
@@ -223,7 +216,7 @@ cpan oEdtk        # or: cpanm oEdtk
 Pulls the dependencies and installs the modules. **Verify**:
 `perl -MoEdtk -e 'print oEdtk_release()'`.
 
-### From source (a checkout of this repository)
+### From source
 
 ```sh
 perl Makefile.PL
@@ -248,10 +241,95 @@ instead of `make`.
 
 ### Optional companion distribution
 
-`oEUser` is a **separate** distribution (see [`oEUser/README`](oEUser/README)); it
-requires oEdtk **2.1120** or later. Install it with the same
+`oEUser` is a **separate** distribution; it requires oEdtk **2.1120** or later. Install it with the same
 `perl Makefile.PL && make && make install` sequence from the `oEUser/` directory.
+## How processing works
 
+### Processing lifecycle
+
+An oEdtk application is a small script with a fixed shape (see the
+[Quick start](#quick-start) and [Application skeletons](#complete-application-example)):
+
+1. `oe_new_job($infile, $outfile)` - read the configuration, open the `IN`/`OUT`
+   handles, start the composition back-end.
+2. Declare each record once: `oe_rec_motif($key, $template)` (mandatory),
+   `oe_rec_output($key, $sprintf_template)` and, optionally,
+   `oe_rec_pre_process` / `oe_rec_process` / `recEdtk_post_process` to hook user subs.
+3. Read the stream line by line and call `oe_process_ref_rec($offset, $keylen, $line)`
+   for each - it recognises the record by key, unpacks it into the global `@DATATAB`,
+   runs the hooks and builds the output.
+4. `oe_compo_link($infile, $outfile)` - close the handles and finalise (emit the LaTeX
+   trailer, wait for the composer, optionally import the result).
+
+`oe_new_job` also parses run-time options, among them `--index`, `--massmail`,
+`--edms`, `--cgi`, `--noinputfiles` and `--input_code=<code>`.
+### Inputs and outputs
+
+- **Input**: a fixed-record data stream (or XML for the XML readers). Records are
+  identified by a key at a fixed offset/length.
+- **Output**: a composed document (LaTeX source -> PDF/DVI), CSV, Excel, and/or rows
+  written to a database. Diagnostics go to **stderr**; data and reports go to
+  **stdout** (see [`docs/integration/LOGGER.md`](docs/integration/LOGGER.md)).
+
+
+### Complete application example
+
+```perl
+use oEdtk::Main;
+use strict;
+
+sub main() {
+    # File input and output opening
+    oe_new_job( $ARGV[0], $ARGV[1] );
+
+    # Application initialisation (user defined)
+    &initApp();
+
+    # Reading the input line by line
+    while ( my $ligne = <IN> ) {
+        chomp($ligne);
+
+        # Testing if $ligne matches pre-declared records
+        if ( oe_process_ref_rec( 0, 3, $ligne ) ) {
+        } else {
+            # If not, record is ignored
+            warn "INFO IGNORE REC. line $.\n";
+        }
+    }
+
+    # Closing input and output file
+    oe_compo_link( $ARGV[0], $ARGV[1] );
+    return 1;
+}
+
+sub initApp() {
+    # EXAMPLE : DECLARATION OF RECORD KEYED '016'
+    # Process '&initDoc' done when record '016' is found,
+    # before proceeding with the record
+    # (mandatory only if no oe_rec_motif declared)
+    oe_rec_pre_process( "016", \&initDoc );
+
+    # Structure of record '016' for splitting/extraction
+    # (could be delayed in 'pre_process' procedure)
+    oe_rec_motif( "016", "A67 A20 A*" );
+
+    # Process '&format_date' after the record is read
+    # (only if necessary)
+    oe_rec_process( "016", \&format_date );
+
+    # LaTeX output declaration (only if necessary)
+    oe_rec_output( "016", "<SK>%s<#DATE=%s><SK>%s" );
+
+    # Process after building the output
+    # (only if necessary)
+    recEdtk_post_process( "016", \&vars_prepared_for_next_Rec );
+    return 1;
+}
+```
+
+
+The pre-process, process, and post-process hooks in this example are optional. Remove
+them when the application only needs motif-based unpacking and direct output.
 ## Configuration
 
 ### Where the configuration comes from
@@ -354,7 +432,7 @@ relative to `EDTK_DIR_BASE` (default `$EDTK_PRGPATH`, the running script's direc
 | `EDTK_DB_PK_IDJOB` | Keeps `ed_idjob` in the INDEX primary key. | `yes` (mainline) / any other value (fork schema). |
 | `EDTK_DB_IDJOB_DEFAULT` | Value written to `ed_idjob` when the key is kept. | empty until the S51 gate. |
 | `EDTK_DB_FetchHashKeyName` | Case-folding of fetched column names (`FetchHashKeyName`). | `NAME_uc` (default). |
-| `EDTK_DB_COPY_ENCODING` | Source encoding of the CSV bulk-load path. | `UTF8` = file already UTF-8; empty = legacy (Latin-1). |
+| `EDTK_DB_COPY_ENCODING` | Source encoding of the CSV bulk-load path; an explicit value is also required to enable the ELT path. | `UTF8` = file already UTF-8; `LATIN1` = Latin-1; empty = legacy parsed-COPY heuristic only (no ELT). |
 | `EDTK_DB_DEFER_INDEX_RATIO`, `_MIN_ROWS` | Index-deferral policy of the PostgreSQL bulk load (opt-in). | empty = off; when set, defaults `0.1` / `10000`. |
 | `EDTK_DB_BURST_MO` | ELT staging threshold, in MiB, on PostgreSQL. | `50` (default); `0` disables; empty/invalid falls back to 50. |
 
@@ -435,20 +513,6 @@ A few keys the code reads are not shipped in the template and stay optional: `ED
 (XML catalogs, read from `[MAIL]`), `EDTK_DB_STORAGE_ENGINE` (MySQL storage engine, default
 `MyISAM`), `EDTK_ENTIRE_YEARS_KEPT` and `EDTK_STATS_DAYS_FROM` (retention / history windows).
 
-### The runtime directory model
-
-`[ENVDESC]` defines every path relative to `EDTK_DIR_BASE` (which is set to the script
-directory at runtime) and to `EDTK_PRGNAME` (the running program name). The main ones:
-
-- `EDTK_DIR_APP` / `EDTK_DIR_SCRIPT` - application root and the per-application script
-  directory;
-- `EDTK_DIR_CONFIG` - configuration and dictionaries;
-- `EDTK_DIR_DATA_IN` (`EDTK_FDATAIN`, `EDTK_FDATWORK`) - input/work files;
-- `EDTK_DIR_APPTMP` - temporary work area;
-- `EDTK_DIR_OUTMNGR` / `EDTK_DIR_EDOCMNGR` / `EDTK_DIR_DOCLIB` - output, EDMS transit
-  and document library;
-- `EDTK_DIR_LOG` - logs.
-
 ### Environment variables read by the code
 
 Besides the keys above (which are exported into the process environment at runtime),
@@ -481,35 +545,9 @@ EDTK_DBI_DSN      = DBI:SQLite:dbname=$EDTK_DIR_SCRIPT/oEdtk_db.tmp
 EDTK_DBI_DSN_USER = oedtk
 EDTK_DBI_DSN_PASS = change-me
 ```
+## Common operations
 
-### Security
-
-`edtk.ini` can carry database and service passwords. Keep it out of version control,
-restrict its permissions, and never commit real credentials. The shipped template uses
-placeholder values only.
-
-## Usage
-
-### The application model
-
-An oEdtk application is a small script with a fixed shape (see the
-[Quick start](#quick-start) and [`lib/oEdtk.pm`](lib/oEdtk.pm) SYNOPSIS):
-
-1. `oe_new_job($infile, $outfile)` - read the configuration, open the `IN`/`OUT`
-   handles, start the composition back-end.
-2. Declare each record once: `oe_rec_motif($key, $template)` (mandatory),
-   `oe_rec_output($key, $sprintf_template)` and, optionally,
-   `oe_rec_pre_process` / `oe_rec_process` / `recEdtk_post_process` to hook user subs.
-3. Read the stream line by line and call `oe_process_ref_rec($offset, $keylen, $line)`
-   for each - it recognises the record by key, unpacks it into the global `@DATATAB`,
-   runs the hooks and builds the output.
-4. `oe_compo_link($infile, $outfile)` - close the handles and finalise (emit the LaTeX
-   trailer, wait for the composer, optionally import the result).
-
-`oe_new_job` also parses run-time options, among them `--index`, `--massmail`,
-`--edms`, `--cgi`, `--noinputfiles` and `--input_code=<code>`.
-
-### The migration CLI
+### Database schema migration
 
 `lib/db_migrate.pl` is a standalone command line over `oEdtk::DBAdmin` that updates a
 database schema. Exactly one mode is required:
@@ -533,52 +571,7 @@ perl lib/db_migrate.pl --additive   --dsn <dsn> [--with-constraints]
 Options: `--dsn`, `--user`, `--pass`, `--stamp`, `--force`, `--with-constraints`. Exit
 code `0` on success, `1` on a controlled abort (reason on stderr); `--check-only` and
 `--dry-run` are strictly read-only. The password is never printed.
-
-### CGI front-ends
-
-The shipped scripts under `lib/oEdtk/lib/cgi-bin/` provide web front-ends:
-`edtk.cgi` (inline composition of an uploaded XML), `edtk_inged.cgi` (push a document
-into EDMS), `edtk_ged.cgi` (redirect to the document lookup) and `edtk_para.cgi`
-(end-user editor of inline parts). Each is gated by a configuration key named after the
-script basename, in the `[EDOCMNGR]` section.
-
-### Helper scripts
-
-`lib/oEdtk/lib/` ships operational scripts, all run as `perl <script> [args]` with
-arguments read positionally or from the configuration: database maintenance
-(`db_*.pl`), index/output management (`index_*.pl`), tracking statistics
-(`tracking_Statistics.pl`), acquittal (`acq_*.pl`), parameters import/export
-(`params_*.pl`), and configuration/dev helpers (`check_oEdtk_ini.pl`, `cob2pm.pl`,
-`edms_*.pl`, `ged_process.pl`). Shell helpers (`*.sh`) cover backup and go-live steps.
-
-### Inputs and outputs
-
-- **Input**: a fixed-record data stream (or XML for the XML readers). Records are
-  identified by a key at a fixed offset/length.
-- **Output**: a composed document (LaTeX source -> PDF/DVI), CSV, Excel, and/or rows
-  written to a database. Diagnostics go to **stderr**; data and reports go to
-  **stdout** (see [`docs/integration/LOGGER.md`](docs/integration/LOGGER.md)).
-
-## Use cases
-
-### 1. Discovery - turn a fixed-record file into a document
-
-*Need*: convert a small file into a readable document.
-*Steps*: install oEdtk, copy a minimal `edtk.ini`, write a script that declares the
-record motifs and outputs (see [Quick start](#quick-start)), run
-`perl myapp.pl input.txt output.tex`.
-*Result*: `output.tex` holding one composed block per recognised record.
-*Limits*: PDF output needs a LaTeX toolchain and a populated `[COMPO]` section.
-
-### 2. Common - composition with output management
-
-*Need*: produce a batch of documents and register them.
-*Steps*: enable `--index` in `oe_new_job`, configure `[EDTK_DB]` / `[COMPO]`, then run
-the application; `oe_compo_link` calls `oe_after_compo`, which can import the result
-through `oEdtk::Outmngr` and, when configured, EDMS.
-*Result*: composed documents plus index rows in the output-manager database.
-
-### 3. Advanced - bulk database load
+### Bulk database loading
 
 *Need*: load a large CSV into a table efficiently.
 *Steps*: use `oEdtk::DBAdmin::csv_import` with a PostgreSQL DSN to go through the
@@ -587,69 +580,187 @@ through `oEdtk::Outmngr` and, when configured, EDMS.
 (`--forceCopy` in the packaged tracker) to bypass the staging path and force the
 parsed COPY path regardless of volume. See
 [`docs/dbadmin/D80-report.md`](docs/dbadmin/D80-report.md).
+
+The ELT path also requires an **explicit source encoding**: it declares the
+file's encoding to the server (`COPY ... ENCODING`), while the parsed path keeps
+a per-field heuristic that no single declaration reproduces. When the log
+reports:
+
+```
+_load_csv_pg_copy: ELT unavailable (ELT needs an explicit source encoding), using COPY
+```
+
+declare the encoding that matches the bytes on disk, then rerun the load:
+
+- library call: pass `pg_copy_encoding => 'UTF8'` (or `'LATIN1'`, etc.) in the
+  `csv_import` parameter hash;
+- packaged tracker: set `EDTK_DB_COPY_ENCODING = UTF8` (or the file's real
+  encoding) in `[EDTK_DB]` of `edtk.ini`; it has no command-line flag for this.
+
+An empty value is not a neutral default here: `LATIN1` is only the parsed path's
+historical fallback, so even a Latin-1 file must be declared explicitly to use
+the ELT. A wrong value silently corrupts accented characters. The ELT is then
+taken when the file reaches `EDTK_DB_BURST_MO` (or when `pg_copy_staging => 1`
+forces it); until the encoding is declared, the load safely falls back to the
+parsed COPY path.
+
 *Result*: the table is loaded; reported row counts match the source.
+### CGI front-ends
 
-### 4. Automation - scripted database maintenance and statistics
+The repository keeps the CGI front-ends and their static pages under
+`lib/oEdtk/lib/cgi-bin/` and `lib/oEdtk/lib/html/`: `edtk.cgi` (inline composition of an
+uploaded XML), `edtk_inged.cgi` (push a document into EDMS), `edtk_ged.cgi` (redirect to
+the document lookup) and `edtk_para.cgi` (end-user editor of inline parts). Each is
+gated by a configuration key named after the script basename, in the `[EDOCMNGR]`
+section. They stay in git but are excluded from the distribution.
+### Helper scripts
 
-*Need*: version a schema change or report statistics.
-*Steps*: run `lib/db_migrate.pl --dry-run --dsn <dsn>` to preview, then
-`--historize` to apply; use `index_Statistics.pl` / `tracking_Statistics.pl` for
-reports.
-*Result*: a schema update with a reversible history, or a statistics report on stdout.
+`lib/oEdtk/lib/` ships operational scripts, all run as `perl <script> [args]` with
+arguments read positionally or from the configuration: database maintenance
+(`db_*.pl`), index/output management (`index_*.pl`), tracking statistics
+(`tracking_Statistics.pl`), acquittal (`acq_*.pl`), parameters import/export
+(`params_*.pl`), and configuration/dev helpers (`check_oEdtk_ini.pl`, `cob2pm.pl`,
+`edms_*.pl`). The repository also keeps the local backup and go-live helpers
+(`backup_compo_lmndv.sh`, `backup_editique.sh`, `mep_compo.sh`, `mep_editique.sh`,
+`short_test.sh`) and `ged_process.pl`; they stay in git but are excluded from the
+distribution.
+## Architecture and repository reference
 
-## Features
+### Core components
 
-### Record parsing and output building
+- `oEdtk::Main`: job setup, options, record processing, and finalisation.
+- `oEdtk::Config`: `edtk.ini` lookup, merge, expansion, and runtime injection.
+- `oEdtk::Record` / `oEdtk::RecordParser`: record model and streaming parser.
+- `oEdtk::Run`, `oEdtk::Doc`, `oEdtk::TexDoc`, `oEdtk::LaTeX`: composition pipeline.
+- `oEdtk::DBAdmin`: database access, schema lifecycle, and bulk loading.
+- `oEdtk::Outmngr`: output indexes, lots, filieres, depot, purge, and statistics.
+- `oEdtk::Tracking`: document-level events and reporting.
+- `oEdtk::XML::*`: XML readers and validation.
+- `oEdtk::Ext`: optional corporate extensions.
 
-Declare a record with `oe_rec_motif($key, $template)` (an `unpack`-style template; end
-it with `A*` to drop trailing data) and an output with
-`oe_rec_output($key, $sprintf_template)`. Optional hooks (`oe_rec_pre_process`,
-`oe_rec_process`, `recEdtk_post_process`) run user subs around unpacking and output;
-`recEdtk_erase` / `recEdtk_redefine` let you ignore or redefine a record mid-stream.
-Unpacked values live in the global `@DATATAB`.
+### Execution flow
 
-### LaTeX composition
+```mermaid
+flowchart TD
+    App["Application script (.pl)"] --> Main["oEdtk::Main - oe_new_job"]
+    Config["oEdtk::Config - edtk.ini"] --> Main
+    Main --> Parser["Record loop - oe_process_ref_rec"]
+    Parser --> Run["oEdtk::Run - oe_compo_run (LaTeX)"]
+    Main --> Link["oe_compo_link"]
+    Run --> After["oe_after_compo"]
+    After --> Omgr["oEdtk::Outmngr"]
+    After --> Edms["EDMS / EDOCMNGR"]
+    Parser --> Track["oEdtk::Tracking"]
+    Omgr --> DB["oEdtk::DBAdmin"]
+    Track --> DB
+```
+### Entry points and extension
 
-`oEdtk::Run` builds and executes the configured LaTeX command (synchronously or through
-an asynchronous FIFO), and `oEdtk::Doc` / `oEdtk::TexDoc` build the LaTeX body (tags,
-tables, includes, QR codes, escaping).
+The per-application entry point is the application `.pl` (a template ships as
+[`lib/oEdtk/lib/template/runEdtk.pl`](lib/oEdtk/lib/template/runEdtk.pl)). The library
+entry point is `oEdtk::Main`. The standalone CLI entry point is
+[`lib/db_migrate.pl`](lib/db_migrate.pl). Corporate extensions attach through
+`oEdtk::Ext` and the configuration, not through a compile-time registry.
+### Repository layout
 
-### Output management
+```
+Makefile.PL  MANIFEST  MANIFEST.SKIP  README.md  Changes   # packaging
+lib/oEdtk.pm                                               # main module
+lib/oEdtk/                                                 # core modules
+lib/oEdtk/iniEdtk/                                         # config templates, dictionaries
+lib/oEdtk/lang/                                            # message catalogues (en, es, fr)
+lib/oEdtk/lib/                                             # helper scripts + templates (CGIs: repo-only)
+lib/db_migrate.pl                                          # schema-migration CLI
+t/                                                         # test suite
+oEUser/                                                    # optional companion distribution
+docs/                                                      # working documentation (not shipped)
+tools/                                                     # maintainer tooling (not shipped)
+```
+## Module reference
 
-`oEdtk::Outmngr` inserts index lines, assigns lots and filieres, and handles depot,
-purge and statistics of document batches.
+Grouped by role (path, responsibility, and the main internal dependencies). This is a
+curated map, not an exhaustive listing.
 
-### Tracking and statistics
+### Core
 
-`oEdtk::Tracking` records document-level events into the tracking database;
-`stats_week`, `stats_iddest` and `stats_month` produce reports.
+| Module | Responsibility | Uses |
+|---|---|---|
+| `lib/oEdtk.pm` | Documentation-only top module; `oEdtk_release`. | - |
+| `lib/oEdtk/Main.pm` | Job setup, record loop, output tags, corporation/ID, date helpers. | `Config`, `Run`, `DisseminationPlan` |
+| `lib/oEdtk/Config.pm` | Reads `edtk.ini` (`config_read`, `get_ini_path`). | `Config::IniFiles`, `Sys::Hostname` |
+| `lib/oEdtk/DBAdmin.pm` | DB connect, schema create/detect/upgrade/historise, bulk CSV load, backup buffer. | `DBI`, `Config` |
+| `lib/oEdtk/Outmngr.pm` | Output-manager index, lots, filieres, depot/purge/stats. | `DBAdmin` |
+| `lib/oEdtk/Tracking.pm` | Document-level tracking and statistics. | `Main`, `DBAdmin`, `Dict` |
+| `lib/oEdtk/Run.pm` | Composition runner and post-composition import. | `Config`, `Outmngr`, `EDMS` |
 
-### Database administration
+### Parsing and document primitives
 
-`oEdtk::DBAdmin` connects (with a retry loop and a store-and-forward backup buffer),
-creates and detects schemas, historises/reverts/additively upgrades them, and loads CSV
-in bulk. PostgreSQL, MySQL/MariaDB, SQLite and Oracle are supported, with per-engine
-SQL differences (e.g. `LOAD DATA INFILE` on MySQL, `COPY` on PostgreSQL).
+| Module | Responsibility |
+|---|---|
+| `lib/oEdtk/Record.pm` | An in-memory record: an ordered field list. |
+| `lib/oEdtk/RecordParser.pm` | Streaming record parser (motifs, denormalisation). |
+| `lib/oEdtk/Doc.pm` | LaTeX document builder (tags, tables, includes, escaping). |
+| `lib/oEdtk/TexDoc.pm` | `Doc` plus QR codes / hhline / TexTag handling. |
+| `lib/oEdtk/LaTeX.pm` | Latin-9 escaping and small TeX constructors. |
+
+### Data and validation helpers
+
+| Module | Responsibility |
+|---|---|
+| `lib/oEdtk/Restitution.pm` | Read a value out of nested data by key path. |
+| `lib/oEdtk/IBAN.pm` | Validate IBAN/BIC. |
+| `lib/oEdtk/FixIdx.pm` | Pad each document to an even page count. |
+| `lib/oEdtk/Utils.pm` | Text cleanup, index format, date/price parsing, tracking helpers (corporate part delegates to `oEUser::Utils`). |
+| `lib/oEdtk/Ext.pm` | Load and call optional corporate code by name. |
 
 ### XML
 
-`oEdtk::XML::DTD` (parse/validate against a DTD), `oEdtk::XML::XSD` (against an XSD),
-`oEdtk::XML::Default` (Cameleon reader) and `oEdtk::XML::Generic` (generic reader plus
-schema verification).
+| Module | Responsibility |
+|---|---|
+| `lib/oEdtk/XML/DTD.pm` | Parse and validate XML against a DTD. |
+| `lib/oEdtk/XML/XSD.pm` | Validate XML against an XSD. |
+| `lib/oEdtk/XML/Default.pm` | Default XML reader. |
+| `lib/oEdtk/XML/Generic.pm` | Generic XML reader plus schema verification. |
+| `lib/oEdtk/XML/DTD/Utils.pm` | Delegate to `oEdtk::XML::DTD`. |
 
-### Network services (optional)
+### Network and services
 
-`oEdtk::Emailing` (mailing service), `oEdtk::ECM` (ECM document injection),
-`oEdtk::Keycloak` (token endpoint), `oEdtk::DisseminationPlan`, and the shared TLS
-transport `oEdtk::Net`. All are inactive until configured under `[SERVICES]`.
+| Module | Responsibility |
+|---|---|
+| `lib/oEdtk/Net.pm` | Shared HTTP/TLS transport settings. |
+| `lib/oEdtk/ECM.pm` | ECM document injection and mailed-date stamping. |
+| `lib/oEdtk/Emailing.pm` | Delegate to `oEUser::Emailing`. |
+| `lib/oEdtk/Keycloak.pm` | Delegate to `oEUser::Keycloak`. |
+| `lib/oEdtk/DisseminationPlan.pm` | Delegate to `oEUser::DisseminationPlan`. |
 
-### Extensions
+### Other shipped modules
 
-`oEdtk::Ext` plugs corporate code in without a registry: `require_optional` loads a
-companion module by its fixed name (absence is a documented no-op), and
-`load_named_callable` / `call_named_callable` resolve a `Module::function` named in the
-configuration after validating its name.
+`AddrField`, `DateField`, `Dict`, `EDMS`, `FatalsToEmail`, `Field`, `FPField`,
+`Messenger`, `OmgrIdxDoc`, `SchemaScan`, `SignedField`, `Spool`, `TexTag`, `Util`,
+`XPath`, `dataEdtk`, `libDev`, `libXls`, `logger`, `trackEdtk`, `tuiEdtk`. Two modules
+are **legacy**: `Tracking2` (superseded by `Tracking`) and `logger2` (a deprecated dead
+duplicate - use `logger`).
+## Public interfaces
 
+The functions an application or an operator is most likely to use. Signatures follow
+the shipped POD.
+
+| Function | Module | Signature / purpose |
+|---|---|---|
+| `oe_new_job` | `oEdtk::Main` | `oe_new_job($infile, $outfile [, $single_job_id])` - open `IN`/`OUT`, start composition. |
+| `oe_process_ref_rec` | `oEdtk::Main` | `oe_process_ref_rec($offset, $key_len, $line [, $rec_offset, $rec_len])` - recognise and process one record; returns 1/0. |
+| `oe_compo_link` | `oEdtk::Main` | `oe_compo_link($infile, $outfile)` - close handles, finalise. |
+| `oe_rec_motif` | `oEdtk::Main` | `oe_rec_motif($key, $template)` - declare a record's unpack template. |
+| `oe_rec_output` | `oEdtk::Main` | `oe_rec_output($key, $sprintf_template)` - declare a record's output. |
+| `oe_rec_process` / `recEdtk_post_process` | `oEdtk::Main` | `( $key, \&sub )` - hook a sub after unpacking / after output. |
+| `config_read` / `get_ini_path` | `oEdtk::Config` | `config_read(@sections, $opt)` -> `%cfg`; `get_ini_path()` -> resolved ini path. |
+| `db_connect` | `oEdtk::DBAdmin` | `db_connect($cfg, $dsn_key)` -> `$dbh` (with fallback to the backup buffer). |
+| `csv_import` | `oEdtk::DBAdmin` | Bulk-load a CSV into a table (per-engine fast path). |
+| `schema_MigrationPlan` / `schema_Historize` / `schema_Revert` / `schema_Additive` | `oEdtk::DBAdmin` | Plan, apply, revert or additively update a schema (drives `db_migrate.pl`). |
+| `oe_compo_run` / `oe_cmd_run` | `oEdtk::Run` | Build and run the LaTeX command (sync/async). |
+| `Tracking->new` / `->track` / `->end` | `oEdtk::Tracking` | Open a tracking session, record an event, close it. |
+| `omgr_*` | `oEdtk::Outmngr` | Index insert, lot/filiere assignment, depot, purge and statistics. |
+| `logger` | `oEdtk::logger` | `logger($level, $msg)` - emit a diagnostic on **stderr**. |
 ## Tests and validation
 
 ### Layout
@@ -730,156 +841,6 @@ prove -Ilib -It/lib t/int/05_encoding.t   # UTF-8/ASCII + LF everywhere
 A green run reports `Files=..., Tests=..., PASS`. Ratchet tests fail in **both**
 directions - when a guarded item appears, and when a recorded item is already fixed -
 so a failure means the frozen list and the tree disagree; fix one or the other.
-
-## Architecture
-
-### Components
-
-- **Application script** - yours; declares records and drives the loop.
-- **`oEdtk::Main`** - job setup, option parsing, the record loop, output-tag building,
-  and the final link.
-- **`oEdtk::Record` / `oEdtk::RecordParser`** - the in-memory record and the streaming
-  parser.
-- **`oEdtk::Run`** - the composition runner (LaTeX command, `oe_after_compo`).
-- **`oEdtk::Doc` / `oEdtk::TexDoc` / `oEdtk::LaTeX`** - LaTeX body building.
-- **`oEdtk::Config`** - configuration loading.
-- **`oEdtk::DBAdmin`** - database access, schema management, bulk load.
-- **`oEdtk::Outmngr`** - output-manager index and batches.
-- **`oEdtk::Tracking`** - document tracking and statistics.
-- **`oEdtk::XML::*`** - XML readers.
-- **`oEdtk::Ext`** - extension hook.
-- **Thin delegates** (`oEdtk::Emailing`, `oEdtk::Keycloak`,
-  `oEdtk::DisseminationPlan`, `oEdtk::Constants`, `oEdtk::Utils`,
-  `oEdtk::XML::DTD::Utils`, `oEdtk::Infinite`) - forward to `oEUser::*`.
-
-### Execution flow
-
-```mermaid
-flowchart TD
-    App["Application script (.pl)"] --> Main["oEdtk::Main - oe_new_job"]
-    Config["oEdtk::Config - edtk.ini"] --> Main
-    Main --> Parser["Record loop - oe_process_ref_rec"]
-    Parser --> Run["oEdtk::Run - oe_compo_run (LaTeX)"]
-    Main --> Link["oe_compo_link"]
-    Run --> After["oe_after_compo"]
-    After --> Omgr["oEdtk::Outmngr"]
-    After --> Edms["EDMS / EDOCMNGR"]
-    Parser --> Track["oEdtk::Tracking"]
-    Omgr --> DB["oEdtk::DBAdmin"]
-    Track --> DB
-```
-
-### Entry points and extension
-
-The per-application entry point is the application `.pl` (a template ships as
-[`lib/oEdtk/lib/template/runEdtk.pl`](lib/oEdtk/lib/template/runEdtk.pl)). The library
-entry point is `oEdtk::Main`. The standalone CLI entry point is
-[`lib/db_migrate.pl`](lib/db_migrate.pl). Corporate extensions attach through
-`oEdtk::Ext` and the configuration, not through a compile-time registry.
-
-### Repository layout
-
-```
-Makefile.PL  MANIFEST  MANIFEST.SKIP  README.md  Changes   # packaging
-lib/oEdtk.pm                                               # main module
-lib/oEdtk/                                                 # core modules
-lib/oEdtk/iniEdtk/                                         # config templates, dictionaries
-lib/oEdtk/lang/                                            # message catalogues (en, es, fr)
-lib/oEdtk/lib/                                             # shipped helper scripts + CGIs + templates
-lib/db_migrate.pl                                          # schema-migration CLI
-t/                                                         # test suite
-oEUser/                                                    # optional companion distribution
-docs/                                                      # working documentation (not shipped)
-tools/                                                     # maintainer tooling (not shipped)
-```
-
-## Modules
-
-Grouped by role (path, responsibility, and the main internal dependencies). This is a
-curated map, not an exhaustive listing.
-
-### Core
-
-| Module | Responsibility | Uses |
-|---|---|---|
-| `lib/oEdtk.pm` | Documentation-only top module; `oEdtk_release`. | - |
-| `lib/oEdtk/Main.pm` | Job setup, record loop, output tags, corporation/ID, date helpers. | `Config`, `Run`, `DisseminationPlan` |
-| `lib/oEdtk/Config.pm` | Reads `edtk.ini` (`config_read`, `get_ini_path`). | `Config::IniFiles`, `Sys::Hostname` |
-| `lib/oEdtk/DBAdmin.pm` | DB connect, schema create/detect/upgrade/historise, bulk CSV load, backup buffer. | `DBI`, `Config` |
-| `lib/oEdtk/Outmngr.pm` | Output-manager index, lots, filieres, depot/purge/stats. | `DBAdmin` |
-| `lib/oEdtk/Tracking.pm` | Document-level tracking and statistics. | `Main`, `DBAdmin`, `Dict` |
-| `lib/oEdtk/Run.pm` | Composition runner and post-composition import. | `Config`, `Outmngr`, `EDMS` |
-
-### Parsing and document primitives
-
-| Module | Responsibility |
-|---|---|
-| `lib/oEdtk/Record.pm` | An in-memory record: an ordered field list. |
-| `lib/oEdtk/RecordParser.pm` | Streaming record parser (motifs, denormalisation). |
-| `lib/oEdtk/Doc.pm` | LaTeX document builder (tags, tables, includes, escaping). |
-| `lib/oEdtk/TexDoc.pm` | `Doc` plus QR codes / hhline / TexTag handling. |
-| `lib/oEdtk/LaTeX.pm` | Latin-9 escaping and small TeX constructors. |
-
-### Data and validation helpers
-
-| Module | Responsibility |
-|---|---|
-| `lib/oEdtk/Restitution.pm` | Read a value out of nested data by key path. |
-| `lib/oEdtk/IBAN.pm` | Validate IBAN/BIC. |
-| `lib/oEdtk/FixIdx.pm` | Pad each document to an even page count. |
-| `lib/oEdtk/Utils.pm` | Text cleanup, index format, date/price parsing, tracking helpers (corporate part delegates to `oEUser::Utils`). |
-| `lib/oEdtk/Ext.pm` | Load and call optional corporate code by name. |
-
-### XML
-
-| Module | Responsibility |
-|---|---|
-| `lib/oEdtk/XML/DTD.pm` | Parse and validate XML against a DTD. |
-| `lib/oEdtk/XML/XSD.pm` | Validate XML against an XSD. |
-| `lib/oEdtk/XML/Default.pm` | Default (Cameleon) XML reader. |
-| `lib/oEdtk/XML/Generic.pm` | Generic XML reader plus schema verification. |
-| `lib/oEdtk/XML/DTD/Utils.pm` | Delegate to `oEdtk::XML::DTD`. |
-
-### Network and services
-
-| Module | Responsibility |
-|---|---|
-| `lib/oEdtk/Net.pm` | Shared HTTP/TLS transport settings. |
-| `lib/oEdtk/ECM.pm` | ECM document injection and mailed-date stamping. |
-| `lib/oEdtk/Emailing.pm` | Delegate to `oEUser::Emailing`. |
-| `lib/oEdtk/Keycloak.pm` | Delegate to `oEUser::Keycloak`. |
-| `lib/oEdtk/DisseminationPlan.pm` | Delegate to `oEUser::DisseminationPlan`. |
-
-### Other shipped modules
-
-`AddrField`, `DateField`, `Dict`, `EDMS`, `FatalsToEmail`, `Field`, `FPField`,
-`Messenger`, `OmgrIdxDoc`, `SchemaScan`, `SignedField`, `Spool`, `TexTag`, `Util`,
-`XPath`, `dataEdtk`, `libDev`, `libXls`, `logger`, `trackEdtk`, `tuiEdtk`. Two modules
-are **legacy**: `Tracking2` (superseded by `Tracking`) and `logger2` (a deprecated dead
-duplicate - use `logger`).
-
-## Public interfaces
-
-The functions an application or an operator is most likely to use. Signatures follow
-the shipped POD.
-
-| Function | Module | Signature / purpose |
-|---|---|---|
-| `oe_new_job` | `oEdtk::Main` | `oe_new_job($infile, $outfile [, $single_job_id])` - open `IN`/`OUT`, start composition. |
-| `oe_process_ref_rec` | `oEdtk::Main` | `oe_process_ref_rec($offset, $key_len, $line [, $rec_offset, $rec_len])` - recognise and process one record; returns 1/0. |
-| `oe_compo_link` | `oEdtk::Main` | `oe_compo_link($infile, $outfile)` - close handles, finalise. |
-| `oe_rec_motif` | `oEdtk::Main` | `oe_rec_motif($key, $template)` - declare a record's unpack template. |
-| `oe_rec_output` | `oEdtk::Main` | `oe_rec_output($key, $sprintf_template)` - declare a record's output. |
-| `oe_rec_process` / `recEdtk_post_process` | `oEdtk::Main` | `( $key, \&sub )` - hook a sub after unpacking / after output. |
-| `config_read` / `get_ini_path` | `oEdtk::Config` | `config_read(@sections, $opt)` -> `%cfg`; `get_ini_path()` -> resolved ini path. |
-| `db_connect` | `oEdtk::DBAdmin` | `db_connect($cfg, $dsn_key)` -> `$dbh` (with fallback to the backup buffer). |
-| `csv_import` | `oEdtk::DBAdmin` | Bulk-load a CSV into a table (per-engine fast path). |
-| `schema_MigrationPlan` / `schema_Historize` / `schema_Revert` / `schema_Additive` | `oEdtk::DBAdmin` | Plan, apply, revert or additively update a schema (drives `db_migrate.pl`). |
-| `oe_compo_run` / `oe_cmd_run` | `oEdtk::Run` | Build and run the LaTeX command (sync/async). |
-| `Tracking->new` / `->track` / `->end` | `oEdtk::Tracking` | Open a tracking session, record an event, close it. |
-| `omgr_*` | `oEdtk::Outmngr` | Index insert, lot/filiere assignment, depot, purge and statistics. |
-| `logger` | `oEdtk::logger` | `logger($level, $msg)` - emit a diagnostic on **stderr**. |
-
 ## Limits and constraints
 
 - **No single all-purpose CLI**: the tool runs through an application script (or
@@ -900,7 +861,6 @@ the shipped POD.
   with an explicit message.
 - **Warranty**: oEdtk ships without warranty of any kind (see
   [License, security and support](#license-security-and-support)).
-
 ## Troubleshooting
 
 | Symptom | Possible cause | Remedy |
@@ -912,7 +872,6 @@ the shipped POD.
 | PostgreSQL prints `relation ... already exists, skipping` | A `CREATE ... IF NOT EXISTS` on an existing object. | Expected; the shipped `DBAdmin` pre-checks and logs it at Information level. |
 | `prove t` runs only a few files | `prove` does not recurse without `-r`. | Use `prove -Ilib -It/lib -r t` or `tools/run-tnr.sh`. |
 | A ratchet test fails | The frozen list and the tree disagree. | Update the tree, or the corresponding `t/data/*.txt` baseline, in the intended direction. |
-
 ## Development and contribution
 
 ### Environment
@@ -947,7 +906,7 @@ Never weaken a test or a ratchet baseline.
 
 Integration work happens on the `integration/2.1120` branch; post-release steps do not
 bump the version -- a release does, and every module of the package then carries the
-package version (currently **2.1129**). The progress ledger is
+package version (currently **2.1131**). The progress ledger is
 [`docs/integration/STATE.md`](docs/integration/STATE.md).
 
 ### API snapshots
@@ -967,19 +926,24 @@ perl tools/api_snapshot.pl oEUser-M/lib --extra-inc oEdtk-fork-M \
 The `--extra-inc` and `--home-ini` options compensate for the read-only sources'
 dependencies; `--exclude '::Descriptor::'` skips the generated descriptor modules.
 `snap/` is not part of the distribution.
-
 ## License, security and support
+
+### Authors
+
+oEdtk by D Aunay, G Chaillou, A Chambon, M Henrion, G Ballin.
+Perl by Larry Wall and the `perl5-porters`.
 
 ### License
 
-oEdtk is released under the **Artistic License 2.0**, a GPL-compatible free-software
-license. The full text ships as [`lib/oEdtk/COPYING`](lib/oEdtk/COPYING); see also the
-`LICENCE` and `COPYRIGHT` sections of [`lib/oEdtk.pm`](lib/oEdtk.pm). It is distributed
-**without any warranty**.
+oEdtk is Copyright (C) 2005-2026 G Chaillou, D Aunay, A Chambon, M Henrion, G Ballin.
+All rights reserved. It is released under the **Artistic License 2.0**, a
+GPL-compatible free-software license. The full text ships as
+[`lib/oEdtk/COPYING`](lib/oEdtk/COPYING). It is distributed **without any
+warranty**.
 
 ### Security
 
-- Keep `edtk.ini` and the `.env` file out of version control and restrict their
+- Keep `edtk.ini` or `.env` file out of version control and restrict their
   permissions; they can carry database and service credentials.
 - The test databases are for development only (loopback-exposed Docker containers);
   never point them at production data.

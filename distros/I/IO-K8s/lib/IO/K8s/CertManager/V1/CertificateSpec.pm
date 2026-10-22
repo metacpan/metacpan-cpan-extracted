@@ -1,6 +1,6 @@
 package IO::K8s::CertManager::V1::CertificateSpec;
 # ABSTRACT: Specification of the desired state of the Certificate resource.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s additionalOutputFormats => ['+IO::K8s::CertManager::V1::CertificateAdditionalOutputFormat'];
@@ -66,7 +66,7 @@ IO::K8s::CertManager::V1::CertificateSpec - Specification of the desired state o
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 additionalOutputFormats
 

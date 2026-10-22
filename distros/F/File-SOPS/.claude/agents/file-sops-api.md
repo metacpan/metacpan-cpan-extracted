@@ -2,14 +2,14 @@
 name: file-sops-api
 description: "File::SOPS public API worker — encrypt/decrypt/rotate/extract and the file variants, the encryption-rule policy in Metadata.pm, argument shapes, guards, error behaviour and the POD that documents them. Owns what a caller may do and what happens when they do it wrong. Use for API changes, guards against silent data loss, and compatibility decisions."
 model: inherit
-allowed-tools: Read, Edit, Write, Bash, Glob, Grep
 briefing:
   skills:
     - getty-perl-core
     - getty-perl-moo
-    - getty-perl-release-author-getty
     - file-sops-core
-    - kanban-issues-karr-cli
+    - file-sops-hazards
+    - kanban-issues-karr-ticket
+    - getty-perl-pod
 ---
 
 You are the file-sops-api worker for **File::SOPS**. You own the surface a caller

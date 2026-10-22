@@ -5,7 +5,7 @@ use warnings;
 
 use Carp qw(croak);
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 sub byte_string {
     my ($name, $value) = @_;

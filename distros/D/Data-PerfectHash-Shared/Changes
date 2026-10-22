@@ -1,5 +1,10 @@
 Revision history for Data::PerfectHash::Shared
 
+0.05  2026-10-16
+    - Handle empty keys and tied arrayrefs safely.
+    - Preserve Unicode paths and reject embedded NULs.
+    - Retry interrupted writes and report output failures.
+
 0.04  2026-10-01
     - Perls without 64-bit integers are refused at build time: int keys are
       64-bit.

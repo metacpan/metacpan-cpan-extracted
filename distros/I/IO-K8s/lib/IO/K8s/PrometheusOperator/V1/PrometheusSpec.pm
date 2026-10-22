@@ -1,6 +1,6 @@
 package IO::K8s::PrometheusOperator::V1::PrometheusSpec;
 # ABSTRACT: spec defines the specification of the desired behavior of the Prometheus cluster.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use utf8;
 use IO::K8s::Resource;
 
@@ -38,7 +38,7 @@ k8s enforcedTargetLimit                  => Int, { minimum => 0 };
 k8s evaluationInterval                   => Str, { pattern => qr/^(0|(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?)$/, default => '30s' };
 k8s excludedFromEnforcement              => ['+IO::K8s::PrometheusOperator::V1::ObjectReference'];
 k8s exemplars                            => '+IO::K8s::PrometheusOperator::V1::Exemplars';
-k8s externalLabels                       => { Str => 1 };
+k8s externalLabels                       => HashRef[Str];
 k8s externalUrl                          => Str;
 k8s hostAliases                          => ['Core::V1::HostAlias'];
 k8s hostNetwork                          => Bool;
@@ -59,7 +59,7 @@ k8s maximumStartupDurationSeconds        => Int, { minimum => 60 };
 k8s minReadySeconds                      => Int, { minimum => 0 };
 k8s nameEscapingScheme                   => Str, { enum => [qw(AllowUTF8 Underscores Dots Values)] };
 k8s nameValidationScheme                 => Str, { enum => [qw(UTF8 Legacy)] };
-k8s nodeSelector                         => { Str => 1 };
+k8s nodeSelector                         => HashRef[Str];
 k8s otlp                                 => '+IO::K8s::PrometheusOperator::V1::OTLPConfig';
 k8s overrideHonorLabels                  => Bool;
 k8s overrideHonorTimestamps              => Bool;
@@ -272,7 +272,7 @@ IO::K8s::PrometheusOperator::V1::PrometheusSpec - spec defines the specification
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 additionalAlertManagerConfigs
 

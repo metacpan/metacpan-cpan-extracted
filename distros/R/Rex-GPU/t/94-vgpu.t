@@ -117,7 +117,7 @@ subtest '_parse_lspci_vmm' => sub {
 
 #### detect()
 
-my $LSPCI_READ = q{lspci -nn 2>&1 | grep -E '\[03(00|02)\]'};
+my $LSPCI_READ = q{lspci -nn 2>&1 | grep -E '\[03(00|02)\]|\[0380\].*\[1002:'};
 my $VMM_READ   = 'lspci -vmmnn -d 10de: 2>/dev/null';
 
 sub detect_on {

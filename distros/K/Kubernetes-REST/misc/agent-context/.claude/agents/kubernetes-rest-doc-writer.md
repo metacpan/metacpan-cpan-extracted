@@ -6,6 +6,7 @@ disallowedTools: Write, NotebookEdit, Bash
 briefing:
   skills:
     - kubernetes-rest-core
+    - kubernetes-rest-hazards
     - perl-kubernetes-rest
     - getty-perl-pod
 ---

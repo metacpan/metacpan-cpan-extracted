@@ -1,7 +1,7 @@
 # ABSTRACT: Rancher Kubernetes server (control plane) installation
 
 package Rex::Rancher::Server;
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 use v5.14.4;
 use warnings;
 
@@ -48,6 +48,7 @@ sub install_server {
   my $method       = $checked->{install_method};
   my $cluster_cidr = $checked->{cluster_cidr};
   my $version      = $checked->{version};
+  my $kubeconfig_mode = $checked->{kubeconfig_mode};
   my $hold         = $opts{hold_running};
   my $cilium       = exists $opts{cilium} ? $opts{cilium} : 1;
   my $token        = _resolve_token($dist, $opts{token});
@@ -65,7 +66,7 @@ sub install_server {
 
   # Write config.yaml
   _write_config($dist, $token, $server, $tls_san, $node_labels, $cilium,
-    $node_name, $disable, $cluster_cidr);
+    $node_name, $disable, $cluster_cidr, $kubeconfig_mode);
 
   # Write registries.yaml if configured
   if ($registries) {
@@ -94,6 +95,7 @@ sub preflight_server {
   my %checked = (
     install_method => scalar Rex::Rancher::Options->resolve_install_method($opts{install_method}, $opts{version}),
     cluster_cidr   => scalar Rex::Rancher::Options->check_cluster_cidr($opts{cluster_cidr}),
+    kubeconfig_mode => scalar Rex::Rancher::Options->check_kubeconfig_mode($opts{kubeconfig_mode}),
   );
   # The first read of the host: Cilium state an earlier cluster left on a host
   # without RKE2/K3s would hang every image pull of this install (k71).
@@ -125,7 +127,7 @@ sub update_registries {
 
   # Before the restart: it would render Rex::GPU 0.001's bare containerd
   # template again, which carries no registry mirrors. Dies if it cannot.
-  $dist->remove_bare_containerd_template;
+  $dist->_remove_bare_template_before_start;
 
   # Restart containerd to pick up new config: whichever unit this node runs.
   run $dist->restart_services_cmd, auto_die => 0;
@@ -187,9 +189,43 @@ sub patch_kubeconfig_server {
     unless defined $server && length $server;
 
   $server = '' . $server;    # a Rex server object names its host when stringified
-  $server = '[' . $server . ']' if defined inet_pton(AF_INET6, $server);
-  $content =~ s{https://(?:127\.0\.0\.1|\[::1\]):(\d+)}{https://$server:$1}g;
+  my ( $host, $port ) = split_server_address($server);
+  if ( defined $port ) {
+    $content =~ s{https://(?:127\.0\.0\.1|\[::1\]):\d+}{https://$host:$port}g;
+  }
+  else {
+    $content =~ s{https://(?:127\.0\.0\.1|\[::1\]):(\d+)}{https://$host:$1}g;
+  }
   return $content;
+}
+
+# "host", "host:port", "[v6]", "[v6]:port" or a bare v6 address into the host
+# as it goes into a URL (a v6 address bracketed) and the port, undef when
+# none was given. A malformed port or address dies.
+sub split_server_address {
+  my ($server) = @_;
+  my ( $host, $port );
+  if ( $server =~ /^\[([^\]]*)\](?::(.*))?$/s ) {
+    ( $host, $port ) = ( $1, $2 );
+    die "patch_kubeconfig_server: '$server' is not a valid server address\n"
+      unless defined inet_pton( AF_INET6, $host );
+    $host = '[' . $host . ']';
+  }
+  elsif ( defined inet_pton( AF_INET6, $server ) ) {
+    $host = '[' . $server . ']';
+  }
+  elsif ( $server =~ /^([^:\[\]]+)(?::(.*))?$/s ) {
+    ( $host, $port ) = ( $1, $2 );
+  }
+  else {
+    die "patch_kubeconfig_server: '$server' is not a valid server address\n";
+  }
+  if ( defined $port ) {
+    die "patch_kubeconfig_server: invalid port '$port' in server address '$server'\n"
+      unless $port =~ /^[0-9]{1,5}$/ && $port >= 1 && $port <= 65535;
+    $port += 0;
+  }
+  return ( $host, $port );
 }
 
 # The admin client certificate and key are in there: created 0600, and an
@@ -229,10 +265,42 @@ sub _resolve_token {
   return $given if defined $given;
   my $existing = _existing_server_token($dist);
   if (defined $existing) {
+    # The server keeps the token as K10<ca-hash>::server:<secret>, the first
+    # deploy wrote the bare secret into config.yaml. Same secret: keep what
+    # config.yaml has, or the re-run changes the file and restarts the server.
+    my $configured = _configured_token($dist);
+    if (defined $configured && _token_secret($configured) eq _token_secret($existing)) {
+      Rex::Logger::info("Reusing the cluster token in " . $dist->config_file
+        . " (same secret as " . $dist->server_token . ")");
+      return $configured;
+    }
     Rex::Logger::info("Reusing existing cluster token from " . $dist->server_token);
     return $existing;
   }
   return _generate_token();
+}
+
+# The secret part of a token: what follows "::<user>:" in the K10 form, the
+# token itself otherwise.
+sub _token_secret {
+  my ($token) = @_;
+  return $token =~ /\AK10[0-9a-f]+::[^:]+:(.+)\z/s ? $1 : $token;
+}
+
+# The token in config.yaml, if it holds one as a plain string. Anything else
+# -- no file, unreadable, not YAML, no or no string token -- is undef: the
+# caller then takes server/token, as before. Never the parser's message, it
+# may quote the token.
+sub _configured_token {
+  my ($dist) = @_;
+  my $out = run "cat " . $dist->config_file . " 2>/dev/null", auto_die => 0;
+  return unless $? == 0 && defined $out && length $out;
+  my $config = eval { YAML::PP->new->load_string($out) };
+  return unless ref $config eq 'HASH';
+  my $token = $config->{token};
+  return unless defined $token && !ref $token;
+  $token =~ s/\s+\z//;
+  return length $token ? $token : undef;
 }
 
 # Read over the exec channel (no SFTP). A missing or unreadable file means
@@ -260,7 +328,7 @@ sub _generate_token {
 
 sub _build_server_config {
   my ($dist, $token, $server, $tls_san, $node_labels, $cilium,
-    $node_name, $disable, $cluster_cidr) = @_;
+    $node_name, $disable, $cluster_cidr, $kubeconfig_mode) = @_;
 
   my %config = (
     'token' => $token,
@@ -288,6 +356,12 @@ sub _build_server_config {
   $config{server} = $server if $server;
   $config{'node-name'} = $node_name if $node_name;
 
+  # Only when asked for: unwritten, rke2.yaml / k3s.yaml get the
+  # distribution's own 0600, which the cluster admin's key in them wants. A
+  # string, so that YAML::PP quotes it: an unquoted 0644 is the number 420 to
+  # the distributions' YAML reader.
+  $config{'write-kubeconfig-mode'} = "$kubeconfig_mode" if defined $kubeconfig_mode;
+
   if ($tls_san) {
     my @sans = ref $tls_san eq 'ARRAY' ? @{$tls_san} : split(/,/, $tls_san);
     $config{'tls-san'} = \@sans;
@@ -303,11 +377,11 @@ sub _build_server_config {
 
 sub _write_config {
   my ($dist, $token, $server, $tls_san, $node_labels, $cilium,
-    $node_name, $disable, $cluster_cidr) = @_;
+    $node_name, $disable, $cluster_cidr, $kubeconfig_mode) = @_;
 
   my $config =
     _build_server_config($dist, $token, $server, $tls_san, $node_labels, $cilium,
-      $node_name, $disable, $cluster_cidr);
+      $node_name, $disable, $cluster_cidr, $kubeconfig_mode);
 
   my $config_file = $dist->config_file;
   Rex::Logger::info("Writing config to $config_file");
@@ -336,7 +410,7 @@ sub _install {
   # Before the start decision: this start would render Rex::GPU 0.001's bare
   # containerd template again (start_verb restarts a running service whose
   # config.toml is still its output).
-  $dist->remove_bare_containerd_template;
+  $dist->_remove_bare_template_before_start;
 
   # Enable and start the service. --no-block: return immediately; RKE2 first
   # start pulls many images and exceeds systemctl's default 90s activation
@@ -395,7 +469,7 @@ Rex::Rancher::Server - Rancher Kubernetes server (control plane) installation
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 
@@ -593,7 +667,11 @@ what the k3s runs covered is listed in L<Rex::Rancher::Distribution::K3s>.
 Shared secret used for node joining. If omitted, the token the server is
 already sealed with (C</var/lib/rancher/rke2/server/token>, K3s:
 C</var/lib/rancher/k3s/server/token>) is reused, so re-running
-C<install_server> on a live control plane never rotates its token. Only on a
+C<install_server> on a live control plane never rotates its token. The server
+keeps it there in the long form C<K10E<lt>ca-hashE<gt>::server:E<lt>secretE<gt>>;
+when C<config.yaml> already holds the same secret (bare or long), that value
+is kept as it is, so a re-run leaves C<config.yaml> unchanged and does not
+restart the server. Only on a
 fresh server (no such file) is a new one generated (up to 48 random
 alphanumeric characters, never fewer than 32).
 A passed C<token> always wins.
@@ -747,6 +825,21 @@ parsed dies too, with its name. A server not set up yet is not checked.
 
 Node labels applied at join time, as an arrayref of C<key=value> strings.
 
+=item C<kubeconfig_mode>
+
+File mode of the kubeconfig the server writes on the node
+(C</etc/rancher/rke2/rke2.yaml>, K3s: C</etc/rancher/k3s/k3s.yaml>), as a
+string of a zero and three octal digits such as C<'0640'>, written as
+C<write-kubeconfig-mode> to C<config.yaml> on RKE2 and K3s alike. Anything
+else dies before the host is touched, a number included: the Perl literal
+C<0640> is the number 416. Default: nothing written, so the distribution's
+own C<0600 root:root> applies.
+
+That file holds the cluster admin's client certificate and key: with a mode
+others can read (C<'0644'>), every local account on the server node is
+cluster admin. Nothing in Rex::Rancher needs more than the default;
+L</get_kubeconfig> and the Cilium CLI read the file as root.
+
 =item C<registries>
 
 Private registry mirror configuration. Written to C<registries.yaml> in the
@@ -822,7 +915,8 @@ turns it on for C<gpu =E<gt> 1, gpu_setup =E<gt> 0>.
 =head2 preflight_server(%opts)
 
   my $checked = Rex::Rancher::Server::preflight_server(%opts);
-  # { version => ..., install_method => 'script', cluster_cidr => ... }
+  # { version => ..., install_method => 'script', cluster_cidr => ...,
+  #   kubeconfig_mode => ... }
 
 Everything L</install_server> checks before it writes or installs, with the
 same options and in the same order, and nothing else: it only reads the
@@ -834,7 +928,7 @@ exported.
 =over
 
 =item 1. the pure option checks: C<distribution>, C<install_method> (with
-C<version>), C<cluster_cidr>;
+C<version>), C<cluster_cidr>, C<kubeconfig_mode>;
 
 =item 2. Cilium datapath state an earlier cluster left on a host without
 RKE2 or K3s (L<Rex::Rancher::Uninstall/check_cilium_residue>), the first
@@ -854,7 +948,8 @@ under C<hold_running>, else C<version>;
 
 Dies as L</install_server> would. Returns a hashref: the C<version> this run
 installs (held, pinned, or C<undef> for the stable channel), the
-C<install_method> and the C<cluster_cidr> (C<undef> when not given).
+C<install_method>, the C<cluster_cidr> and the C<kubeconfig_mode> (each
+C<undef> when not given).
 
 =head2 update_registries(%opts)
 
@@ -946,8 +1041,9 @@ C<rke2> (default) or C<k3s>. Anything else dies before the host is read.
 =item C<server>
 
 The address the kubeconfig will reach the Kubernetes API at: a host name or
-an IPv4/IPv6 address, without scheme or port. It must be a name the API
-server certificate is made for (the node's own IPs and host name, or a
+an IPv4/IPv6 address, without scheme, optionally with a port (C<cp:7443>,
+C<[2001:db8::10]:7443>; the kubeconfig's own port, 6443, is kept without one).
+It must be a name the API server certificate is made for (the node's own IPs and host name, or a
 C<tls_san>), since the CA stays. Omitted, the kubeconfig keeps the loopback
 address the node wrote, which works only on the node itself (a C<Local>
 connection) or through a tunnel to its port 6443.
@@ -1010,10 +1106,13 @@ C<https://SERVER:PORT>, the port kept. Nothing else changes: the CA
 C<$server> must be a name the API server certificate is made for. A server
 URL that is not loopback (a configured C<bind-address>) is left alone.
 
-C<$server> is a host name or an IPv4/IPv6 address, without scheme or port;
-an IPv6 address is put in brackets (C<https://[2001:db8::10]:6443>), one
-already in brackets is taken as it is. Dies without C<$content> or
-C<$server>.
+C<$server> is a host name or an IPv4/IPv6 address, without scheme, with an
+optional port: C<cp>, C<cp:7443>, C<[2001:db8::10]:7443>. A port given
+replaces the one in the kubeconfig; without one the kubeconfig's is kept. An
+IPv6 address is put in brackets (C<https://[2001:db8::10]:6443>), one already
+in brackets is taken as it is; a port after an IPv6 address needs the
+brackets. Dies without C<$content> or C<$server>, or on an invalid port
+(not 1 to 65535) or address.
 
 =head2 get_token($distribution)
 

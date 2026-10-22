@@ -20,7 +20,8 @@ use Data::Path::XS qw(patha_get);
 # un-escaped: ~1 -> /, ~0 -> ~  (in that order to handle "~01" => "~1").
 sub json_pointer_to_array {
     my ($pointer) = @_;
-    return [] if $pointer eq '' || $pointer eq '/';
+    return [] if $pointer eq '';
+    return [''] if $pointer eq '/';
     die "JSON Pointer must start with '/' or be empty\n"
         unless $pointer =~ s{^/}{};
     return [ map {

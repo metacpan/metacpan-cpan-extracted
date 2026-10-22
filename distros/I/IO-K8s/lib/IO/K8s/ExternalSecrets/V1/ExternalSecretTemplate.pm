@@ -1,9 +1,9 @@
 package IO::K8s::ExternalSecrets::V1::ExternalSecretTemplate;
 # ABSTRACT: Template defines a blueprint for the created Secret resource.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
-k8s data          => { Str => 1 };
+k8s data          => HashRef[Str];
 k8s engineVersion => Str, { enum => [qw(v2)], default => 'v2' };
 k8s mergePolicy   => Str, { enum => [qw(Replace Merge)], default => 'Replace' };
 k8s metadata      => '+IO::K8s::ExternalSecrets::V1::ExternalSecretTemplateMetadata';
@@ -30,7 +30,7 @@ IO::K8s::ExternalSecrets::V1::ExternalSecretTemplate - Template defines a bluepr
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 data
 

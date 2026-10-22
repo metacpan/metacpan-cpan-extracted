@@ -1,6 +1,6 @@
 package IO::K8s::Traefik::V1alpha1::ServersTransport;
 # ABSTRACT: ServersTransport is the CRD implementation of a ServersTransport.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::APIObject
     api_version     => 'traefik.io/v1alpha1',
     resource_plural => 'serverstransports';
@@ -23,7 +23,7 @@ IO::K8s::Traefik::V1alpha1::ServersTransport - ServersTransport is the CRD imple
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 spec
 

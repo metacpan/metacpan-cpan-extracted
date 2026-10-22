@@ -1,0 +1,39 @@
+Ex-Op
+
+A drop-in replacement for Exporter with custom ops.
+
+Ex::Op is a replacement for Exporter that reads the same @EXPORT,
+@EXPORT_OK and %EXPORT_TAGS, and gives the module that uses it an `op`
+keyword. An op is a named sub whose calls, once compiled, skip the work of
+an ordinary sub call.
+
+    package My::Util;
+    use Ex::Op;
+    our @EXPORT_OK = qw(add);
+    op add ($x, $y) { $x + $y }
+
+REQUIREMENTS
+
+perl 5.10 or newer and a C compiler. No non-core dependencies.
+
+INSTALLATION
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Ex::Op
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2026 by LNATION <email@lnation.org>.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)

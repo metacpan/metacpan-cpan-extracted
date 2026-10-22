@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1::PulumiOIDCAuth;
 # ABSTRACT: OIDCConfig authenticates using Kubernetes ServiceAccount tokens via OIDC.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s expirationSeconds => Int, { minimum => 600, default => 600 };
@@ -24,7 +24,7 @@ IO::K8s::ExternalSecrets::V1::PulumiOIDCAuth - OIDCConfig authenticates using Ku
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 expirationSeconds
 

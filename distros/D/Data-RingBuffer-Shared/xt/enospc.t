@@ -19,8 +19,17 @@ open my $fh, '>', "$bin/child.pl" or die $!;
 print {$fh} <<'P';
 use strict; use warnings;
 use Data::RingBuffer::Shared;
-my ($mnt, $class, @args) = @ARGV;
-my $h = eval { "Data::RingBuffer::Shared::$class"->new("$mnt/x.shm", @args) };
+my ($mnt, $class, $capacity, $recover) = @ARGV;
+if ($recover) {
+    open my $hole, '>', "$mnt/x.shm" or die $!;
+    truncate $hole, 128 + 16 * $capacity or die $!;
+    close $hole;
+    open my $full, '>', "$mnt/full" or die $!;
+    my $page = 'x' x 4096;
+    1 while (syswrite($full, $page) // 0) > 0;
+    close $full;
+}
+my $h = eval { "Data::RingBuffer::Shared::$class"->new("$mnt/x.shm", $capacity) };
 print $h ? "created\n" : "refused: $@";
 P
 close $fh;
@@ -41,6 +50,10 @@ for my $class (qw(Int F64)) {
     is $sig, 0, "$class: a segment the filesystem cannot hold does not kill the process";
     like $out, qr/^refused: .*No space left on device/, '  it is refused with the reason';
     diag $out unless $out =~ /^refused/;
+
+    ($sig, $out) = on_small_tmpfs('', $class, 1000, 'recover');
+    is $sig, 0, "$class: recovering an abandoned file on a full filesystem does not kill the process";
+    like $out, qr/^refused: .*No space left on device/, '  recovery reports the reservation failure';
 
     ($sig, $out) = on_small_tmpfs('DATA_RINGBUFFER_SHARED_SPARSE=1', $class, 1 << 20);
     is $sig, POSIX::SIGBUS(), "$class: DATA_RINGBUFFER_SHARED_SPARSE=1 skips the reservation: initializing the segment faults";

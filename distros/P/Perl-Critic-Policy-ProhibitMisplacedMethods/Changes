@@ -1,0 +1,5 @@
+Revision history for Perl-Critic-Policy-ProhibitMisplacedMethods
+
+0.001 2026-10-22 TEODESIAN
+    - Initial release.  Reports a sub that only one subclass uses, and a sub
+      that two subclasses define where the class above them defines none.

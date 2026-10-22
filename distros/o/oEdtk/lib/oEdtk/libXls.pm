@@ -11,7 +11,7 @@ use oEdtk::Config qw(config_read);
 
 use Exporter;
 
-our $VERSION = 2.1129;
+our $VERSION = 2.1131;
 our @ISA     = qw(Exporter);
 our @EXPORT  = qw(prod_Xls_Init
 	prod_Xls_New		prod_Xls_Insert_Val

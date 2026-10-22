@@ -1,7 +1,7 @@
 package WWW::Hetzner::CLI::Cmd::Zone::Cmd::Delete;
 # ABSTRACT: Delete a DNS zone
 
-our $VERSION = '0.101';
+our $VERSION = '0.102';
 
 use Moo;
 use MooX::Cmd;
@@ -36,7 +36,7 @@ WWW::Hetzner::CLI::Cmd::Zone::Cmd::Delete - Delete a DNS zone
 
 =head1 VERSION
 
-version 0.101
+version 0.102
 
 =head1 SUPPORT
 

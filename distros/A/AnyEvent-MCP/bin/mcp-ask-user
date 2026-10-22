@@ -1,0 +1,427 @@
+#!/opt/bin/perl
+
+=head1 NAME
+
+mcp-ask-user - ask the human questions through MCP
+
+=head1 SYNOPSIS
+
+   mcp-ask-user --stdio
+   mcp-ask-user --name questions --print-url
+
+=head1 DESCRIPTION
+
+C<mcp-ask-user> lets an assistant ask you a question when it needs
+clarification or a choice before continuing. C<ask-user> asks one question;
+C<ask-form> accepts a generic MCP form schema. By default, a local helper
+displays the form using YAD or a terminal and returns your answer to the
+caller. C<--ask mcp> uses your MCP
+client's form interface instead.
+
+Each C<ask-user> call asks one question, with up to three suggested answers
+and a free-text answer field. You can also decline or cancel the question;
+these are returned as distinct results.
+
+Run it as an MCP server connected to your client, or include it among the
+servers configured in C<mcp-multibroker>. A spawned instance delegates
+presentation to that broker unless you explicitly give it C<--ask>.
+The broker's ask mode then selects local prompting or upstream elicitation.
+See L<AnyEvent::MCP::Intro> for configuring server connections.
+
+=head1 FIRST USE
+
+Configure your MCP client to launch C<mcp-ask-user --stdio>. Then ask
+the assistant to call C<ask-user> with these arguments:
+
+   {
+     "question": "Which part of the project should we inspect first?",
+     "options": [
+       {"label": "Tests"},
+       {"label": "Documentation"}
+     ]
+   }
+
+The helper displays a question and returns the chosen or typed answer.
+By default its dialog appears B<on the server machine>, not necessarily
+where you are using the MCP client. It needs YAD or a usable C</dev/tty>.
+For a remote or headless server, C<--ask mcp> works only if the MCP
+client supports form elicitation; otherwise configure a local helper.
+
+With a multibroker prefix C<questions>, call C<questions.ask-user>.
+A spawned child normally delegates presentation to the broker, whose
+C<--ask> mode selects local or client-side forms. Independently run
+servers use their own mode. Decline and cancel are distinct results,
+not permission grants, and do not cause a fallback prompt.
+
+=head1 ASK-USER TOOL
+
+In C<mcp> mode, the connected client must support the modern input-challenge
+protocol and advertise form elicitation. Local prompting also works for
+legacy callers and clients without form support.
+
+=over
+
+=item question => $text
+
+Required nonempty question, up to 4096 characters.
+
+=item id => $id
+
+Question identifier, defaulting to C<question>. Starts with an ASCII
+letter or underscore, followed by letters, digits, underscores or hyphens,
+with a total length of at most 64 characters.
+
+=item header => $text
+
+Optional form heading, up to 64 characters.
+
+=item options => [{ label => $label, description => $description }...]
+
+Up to three suggested answers. Labels must be nonempty, distinct and no
+longer than 100 characters. Descriptions are optional, up to 512 characters.
+Free text remains available whether or not options are supplied.
+
+=back
+
+An accepted response returns C<{ id, status, answer, source }>, with
+C<status> equal to C<answered> and C<source> equal to C<choice> or
+C<free_text>. Nonblank free text takes precedence over a selected option;
+it is limited to 4096 characters. Decline and cancel return C<{ id, status }>
+with C<status> equal to C<declined> or C<cancelled>, without an answer.
+An accepted form containing neither an answer nor a selected option is
+a tool error.
+
+Input continuations expire after 30 minutes, are bound to the original call
+and are consumed once. These results use C<structuredContent> and matching
+JSON text; see L<AnyEvent::MCP::Server::Request/result>.
+
+=head1 ASK-FORM TOOL
+
+C<ask-form> exposes the form interface directly when you need several fields
+or types other than a single text answer. For example:
+
+   {
+      "message": "Choose the download settings.",
+      "requestedSchema": {
+         "type": "object",
+         "required": ["directory", "overwrite"],
+         "properties": {
+            "directory": {"type": "string", "title": "Destination directory"},
+            "overwrite": {"type": "boolean", "title": "Overwrite existing files"}
+         }
+      }
+   }
+
+=over
+
+=item message => $text
+
+Required text explaining what the form asks and why.
+
+=item requestedSchema => { type => "object", properties => { ... }, ... }
+
+Required MCP form schema. Field names identify the returned values.
+The tool forwards the schema unchanged, with C<mode> set to C<form>.
+The selected renderer determines supported schema features and validates
+the entered values. The default local helper supports its documented flat
+form subset; unsupported features fail explicitly. Native mode forwards
+the schema to the MCP client without imposing the local helper's limits.
+
+=back
+
+The result is the ordinary elicitation response, in C<structuredContent>
+and matching JSON text:
+
+   {"action":"accept","content":{"directory":"/tmp/maps","overwrite":false}}
+   {"action":"decline"}
+   {"action":"cancel"}
+
+The tool checks the response action and requires object content on acceptance;
+it does not interpret field names or revalidate content against the schema.
+Boolean and numeric values retain their JSON types. Decline and cancel
+carry no content and never trigger a fallback prompt. Native continuations
+have the same 30-minute lifetime and one-use, original-call binding as
+C<ask-user>.
+
+=head1 OPTIONS
+
+C<--ask helper> runs C<anyevent-mcp-form-elicitation>, or the executable named by
+C<PERL_ANYEVENT_MCP_ELICITATION_HELPER>. C<--ask mcp> delegates to the client.
+C<--ask auto> uses native forms when advertised and the helper otherwise.
+C<--ask tty> and C<--ask yad> force the built-in form renderer's terminal
+or YAD interface, ignoring the custom helper variable. They never fall back
+to another interface.
+A decline never causes another prompt through a different interface.
+Clients that advertise forms but silently decline them require explicit
+C<helper> mode.
+
+An explicit C<--ask> wins. Otherwise spawned multibroker instances delegate
+to the broker; standalone instances use C<PERL_ANYEVENT_MCP_PERMISSION_ASK>
+or default to C<helper>. The helper receives standard elicitation parameters
+and returns a standard response; see L<anyevent-mcp-form-elicitation>.
+
+C<--name>, C<--bind>, C<--token>, C<--stdio>, C<--connect>,
+C<--print-url> and other common server options are described in
+L<AnyEvent::MCP::Server::Simple/mcp_getoptions>. HTTP is the default;
+C<--print-url> prints the authenticated URL without starting a listener.
+
+=cut
+
+use common::sense;
+use AnyEvent::MCP::Server::Simple;
+use AnyEvent ();
+use AnyEvent::MCP ();
+use JSON::XS ();
+use AnyEvent::MCP::Helper ();
+
+my %options = mcp_getoptions ({
+   usage       => "Usage: $0 [OPTION]...\n",
+   description => "Ask a human question or display an MCP form, locally or through native elicitation.",
+   options     => [["--ask MODE", "Ask via helper (default), tty, yad, mcp, or auto"]],
+   examples    => "  $0 --stdio\n  $0 --ask mcp --name questions --print-url",
+}, "ask=s" => \my $ask_mode);
+$ask_mode //= $ENV{PERL_ANYEVENT_MCP_MULTIBROKER_PROTOCOL} eq "stdio"
+   ? "mcp" : $ENV{PERL_ANYEVENT_MCP_PERMISSION_ASK} || "helper";
+$ask_mode =~ /\A(?:helper|tty|yad|auto|mcp)\z/ or die "--ask must be helper, tty, yad, auto, or mcp\n";
+
+my %pending;
+
+sub _call {
+   my ($req) = @_;
+
+   my %params = %{$req->{params}};
+   delete @params{qw(inputResponses requestState _meta)};
+   # _meta is per-request context, not stable operation identity: retries can
+   # carry different client capabilities, progress tokens and clientInfo.
+   # bind the one-use token to the protocol version and semantic parameters.
+   JSON::XS->new->canonical->encode ([$req->{protocol_version}, $req->{method}, \%params])
+}
+
+sub answer_question {
+   my ($req, $id, $labels, $response) = @_;
+
+   ref $response eq "HASH"
+      or return $req->error ("Invalid question response");
+
+   my $action = $response->{action};
+   return $req->result ({ id => $id, status => "declined" }) if $action eq "decline";
+   return $req->result ({ id => $id, status => "cancelled" }) if $action eq "cancel";
+   $action eq "accept" && ref $response->{content} eq "HASH"
+      or return $req->error ("Invalid question response action");
+
+   my $content = $response->{content};
+   my $text = $content->{free_text};
+   my $choice = $content->{choice};
+   return $req->error ("Invalid free-text answer")
+      if defined $text && (ref $text || length $text > 4096);
+   return $req->error ("Invalid selected answer")
+      if defined $choice && (ref $choice || !$labels->{$choice});
+
+   my $source = $text =~ /\S/ ? "free_text"
+              : defined $choice ? "choice"
+              : return $req->error ("No answer supplied");
+
+   return $req->result ({
+      id     => $id,
+      status => "answered",
+      answer => $content->{$source},
+      source => $source,
+   });
+}
+
+sub elicit_form {
+   my ($req, $form, $key, $done) = @_;
+
+   my $state = $req->{params}{requestState};
+   if (defined $state || exists $req->{params}{inputResponses}) {
+      my $entry = delete $pending{$state}
+         if defined $state && !ref $state;
+      $entry && $entry->{call} eq _call ($req)
+         or return $req->error ("Invalid or expired $key continuation");
+
+      return $done->($req, $req->{params}{inputResponses}{$key});
+   }
+
+   my $caps = $req->{params}{_meta}{"io.modelcontextprotocol/clientCapabilities"};
+   my $native = $req->{protocol_version} ge "2026"
+      && ref $caps eq "HASH" && ref $caps->{elicitation} eq "HASH"
+      && (!keys %{$caps->{elicitation}} || ref $caps->{elicitation}{form} eq "HASH");
+
+   if ($ask_mode =~ /\A(?:helper|tty|yad)\z/ || $ask_mode eq "auto" && !$native) {
+      my $job = AnyEvent::MCP::Helper->new (
+         helper => $ask_mode eq "tty" || $ask_mode eq "yad"
+            ? ["anyevent-mcp-form-elicitation", "--$ask_mode"]
+            : $ENV{PERL_ANYEVENT_MCP_ELICITATION_HELPER} || "anyevent-mcp-form-elicitation",
+         timeout => 1800,
+      );
+      my $old_cancel = $req->{on_cancel};
+      $req->{on_cancel} = sub { $job->cancel; $old_cancel->(@_) if $old_cancel };
+      $job->ask ($form, sub {
+         my ($success, $response) = @_;
+
+         return if $req->{finished};
+         return $req->error ($response) unless $success;
+         $done->($req, $response);
+      });
+      return;
+   }
+   $native or return $req->error ("MCP form elicitation is unavailable for this client");
+
+   my $token = "ae-mcp-$key:" . unpack "H*", AnyEvent::MCP::random_bytes 32;
+   my $entry = $pending{$token} = { call => _call ($req) };
+   $entry->{timer} = AnyEvent->timer (after => 1800, cb => sub {
+      delete $pending{$token};
+   });
+
+   $req->reply ({
+      resultType    => "input_required",
+      requestState  => $token,
+      inputRequests => {
+         $key => {
+            method => "elicitation/create",
+            params => $form,
+         },
+      },
+   });
+}
+
+sub ask_user {
+   my ($req, $args) = @_;
+
+   my $id = $args->{id} // "question";
+   my $question = $args->{question};
+   my $options = $args->{options} // [];
+
+   !ref $id && $id =~ /\A[A-Za-z_][A-Za-z_0-9-]{0,63}\z/
+      or return $req->error ("Invalid question id");
+   defined $question && !ref $question && $question =~ /\S/ && length $question <= 4096
+      or return $req->error ("Question must be a nonempty string");
+   return $req->error ("Invalid question header")
+      if defined $args->{header} && (ref $args->{header} || length $args->{header} > 64);
+   ref $options eq "ARRAY" && @$options <= 3
+      or return $req->error ("Invalid answer options");
+
+   my %labels;
+   for my $option (@$options) {
+      ref $option eq "HASH" && defined $option->{label}
+         && !ref $option->{label} && $option->{label} =~ /\S/
+         && length $option->{label} <= 100
+         && (!defined $option->{description}
+            || !ref $option->{description} && length $option->{description} <= 512)
+         && !$labels{$option->{label}}++
+         or return $req->error ("Invalid answer option");
+   }
+
+   my $schema = {
+      type       => "object",
+      properties => {
+         (@$options ? (choice => {
+            type  => "string",
+            title => "Select an answer (or use free text)",
+            enum  => [map $_->{label}, @$options],
+         }) : ()),
+         free_text => {
+            type      => "string",
+            title     => @$options ? "Alternative answer (optional)" : "Your answer",
+            maxLength => 4096,
+         },
+      },
+      (@$options ? () : (required => ["free_text"])),
+   };
+   my $message = join "\n",
+      (length $args->{header} ? $args->{header} : ()),
+      $question,
+      map { $_->{label} . (length $_->{description} ? " - $_->{description}" : "") } @$options;
+
+   my $form = { mode => "form", message => $message, requestedSchema => $schema };
+   AE::log debug => "ask-user ask-user $id"
+      unless defined $req->{params}{requestState};
+   elicit_form ($req, $form, question => sub {
+      answer_question ($_[0], $id, \%labels, $_[1]);
+   });
+}
+
+sub answer_form {
+   my ($req, $response) = @_;
+
+   ref $response eq "HASH" && defined $response->{action} && !ref $response->{action}
+      or return $req->error ("Invalid form response");
+
+   my $action = $response->{action};
+   return $req->result ({ action => $action }) if $action eq "decline" || $action eq "cancel";
+   $action eq "accept" && ref $response->{content} eq "HASH"
+      or return $req->error ("Invalid form response action");
+
+   $req->result ({ action => $action, content => $response->{content} });
+}
+
+sub ask_form {
+   my ($req, $args) = @_;
+
+   defined $args->{message} && !ref $args->{message}
+      or return $req->error ("Form needs a message");
+
+   my $schema = $args->{requestedSchema};
+   ref $schema eq "HASH" && $schema->{type} eq "object" && ref $schema->{properties} eq "HASH"
+      or return $req->error ("Form needs an object schema with properties");
+
+   AE::log debug => "ask-user ask-form"
+      unless defined $req->{params}{requestState};
+   elicit_form ($req, {
+      mode            => "form",
+      message         => $args->{message},
+      requestedSchema => $schema,
+   }, form => \&answer_form);
+}
+
+mcp_tool ask_user =>
+   "Ask the human a question, wait for the response, and return the answer or a distinct decline/cancel status. The configured ask mode selects a local form helper or native MCP elicitation.",
+   {
+      type       => "object",
+      required   => ["question"],
+      properties => {
+         id       => { type => "string", description => "Stable question identifier (default: question)" },
+         header   => { type => "string", description => "Optional short form heading" },
+         question => { type => "string", description => "Question to display to the human" },
+         options => {
+            type        => "array",
+            maxItems    => 3,
+            description => "Optional suggested answers (up to three). Free text is always available.",
+            items       => {
+               type       => "object",
+               required   => ["label"],
+               properties => {
+                  label       => { type => "string" },
+                  description => { type => "string" },
+               },
+            },
+         },
+      },
+   },
+   \&ask_user;
+
+mcp_tool ask_form =>
+   "Ask the human to fill an MCP elicitation form. Accepts message and requestedSchema and returns the standard accept/content, decline or cancel response. The configured ask mode selects a local form helper or native MCP elicitation; local helpers support their documented schema subset.",
+   {
+      type                 => "object",
+      required             => ["message", "requestedSchema"],
+      additionalProperties => JSON::XS::false,
+      properties           => {
+         message => {
+            type        => "string",
+            description => "Text explaining what the form asks and why",
+         },
+         requestedSchema => {
+            type        => "object",
+            description => "MCP form schema: an object with named properties",
+         },
+      },
+   },
+   \&ask_form;
+
+mcp_config
+   server_info => { name => "mcp-ask-user", version => $AnyEvent::MCP::VERSION },
+   short_instructions => "Ask the human when input is needed: ask-user for a question, ask-form for structured fields. Decline and cancel are not answers.",
+   instructions => "Use ask-user or ask-form only when human input is needed. ask-user offers one question with choices and free text; ask-form accepts an MCP form schema. A declined or cancelled request is not an answer.";
+
+mcp_start %options;

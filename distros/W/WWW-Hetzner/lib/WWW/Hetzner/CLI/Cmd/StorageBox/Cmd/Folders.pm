@@ -1,7 +1,7 @@
 package WWW::Hetzner::CLI::Cmd::StorageBox::Cmd::Folders;
 # ABSTRACT: List Storage Box folders
 
-our $VERSION = '0.101';
+our $VERSION = '0.102';
 
 use Moo;
 use MooX::Cmd;
@@ -56,7 +56,7 @@ WWW::Hetzner::CLI::Cmd::StorageBox::Cmd::Folders - List Storage Box folders
 
 =head1 VERSION
 
-version 0.101
+version 0.102
 
 =head1 SYNOPSIS
 

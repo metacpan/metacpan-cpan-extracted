@@ -2,6 +2,8 @@
 use strict;
 use warnings;
 use Test::More;
+use IO::Socket::SSL qw( SSL_VERIFY_PEER SSL_VERIFY_NONE );
+use HTTP::Tiny;
 use FindBin;
 use lib "$FindBin::Bin/../lib", "$FindBin::Bin/lib";
 
@@ -197,6 +199,39 @@ subtest 'HTTPTinyIO - ua is HTTP::Tiny' => sub {
     isa_ok $ua, 'HTTP::Tiny';
 };
 
+# What HTTP::Tiny really hands to IO::Socket::SSL for a connection, built the
+# same way HTTP::Tiny::_open_handle builds its handle from the ua.
+sub tiny_ssl_args {
+    my ($ua, $host) = @_;
+    my $handle = HTTP::Tiny::Handle->new(
+        SSL_options => $ua->{SSL_options},
+        verify_SSL  => $ua->{verify_SSL},
+    );
+    return $handle->_ssl_args($host);
+}
+
+subtest 'HTTPTinyIO - ssl_verify_server => 1 verifies cert and hostname' => sub {
+    my $io = Kubernetes::REST::HTTPTinyIO->new(
+        ssl_verify_server => 1,
+        ssl_ca_file       => $INC{'Kubernetes/REST/HTTPTinyIO.pm'},
+    );
+    my $ua = $io->ua;
+    is $ua->verify_SSL, 1, 'ua verify_SSL is 1';
+    my $args = tiny_ssl_args($ua, 'k8s.example.com');
+    is $args->{SSL_verifycn_scheme}, 'http', 'hostname verification on';
+    is $args->{SSL_verifycn_name}, 'k8s.example.com', 'verified against the connect host';
+    is $args->{SSL_verify_mode}, SSL_VERIFY_PEER, 'SSL_VERIFY_PEER';
+};
+
+subtest 'HTTPTinyIO - ssl_verify_server => 0 disables verification' => sub {
+    my $io = Kubernetes::REST::HTTPTinyIO->new(ssl_verify_server => 0);
+    my $ua = $io->ua;
+    is $ua->verify_SSL, 0, 'ua verify_SSL is 0 (not left at the HTTP::Tiny default)';
+    my $args = tiny_ssl_args($ua, 'k8s.example.com');
+    is $args->{SSL_verifycn_scheme}, 'none', 'hostname verification off';
+    is $args->{SSL_verify_mode}, SSL_VERIFY_NONE, 'SSL_VERIFY_NONE';
+};
+
 subtest 'HTTPTinyIO - implements Role::IO' => sub {
     my $io = Kubernetes::REST::HTTPTinyIO->new;
     ok $io->does('Kubernetes::REST::Role::IO'), 'HTTPTinyIO does Role::IO';
@@ -328,6 +363,151 @@ subtest 'REST allows HTTPTinyIO override' => sub {
         io => Kubernetes::REST::HTTPTinyIO->new,
     );
     isa_ok $api->io, 'Kubernetes::REST::HTTPTinyIO', 'can override with HTTPTinyIO';
+};
+
+# ============================================================================
+# Real sockets: callback exceptions and transport failures (k71)
+# ============================================================================
+
+use IO::Socket::INET;
+use POSIX ();
+
+# Forked one-shot-per-connection server on 127.0.0.1. $handler gets the
+# connected socket after the request head was read and writes the raw response.
+sub spawn_server {
+    my ($handler) = @_;
+    my $listen = IO::Socket::INET->new(
+        Listen => 5, LocalAddr => '127.0.0.1', LocalPort => 0, ReuseAddr => 1,
+    ) or die "listen: $!";
+    my $port = $listen->sockport;
+    my $pid = fork;
+    die "fork: $!" unless defined $pid;
+    if (!$pid) {
+        local $SIG{TERM} = sub { POSIX::_exit(0) };
+        while (my $c = $listen->accept) {
+            while (my $line = <$c>) { last if $line =~ /^\r?\n$/ }
+            $handler->($c);
+            close $c;
+        }
+        POSIX::_exit(0);
+    }
+    close $listen;
+    return ($port, $pid);
+}
+
+sub stop_server { my ($pid) = @_; kill 'TERM', $pid; waitpid $pid, 0 }
+
+sub closed_port {
+    my $l = IO::Socket::INET->new(Listen => 1, LocalAddr => '127.0.0.1', LocalPort => 0)
+        or die "listen: $!";
+    my $port = $l->sockport;
+    close $l;
+    return $port;
+}
+
+sub get_req {
+    my ($port) = @_;
+    return Kubernetes::REST::HTTPRequest->new(
+        method => 'GET', url => "http://127.0.0.1:$port/x", headers => {},
+    );
+}
+
+my %backend = (
+    LWPIO      => sub { Kubernetes::REST::LWPIO->new(timeout => 10) },
+    HTTPTinyIO => sub { Kubernetes::REST::HTTPTinyIO->new(timeout => 10) },
+);
+
+package Test::CallbackError {
+    sub new { bless { msg => $_[1] }, $_[0] }
+    sub msg { $_[0]{msg} }
+}
+
+for my $name (sort keys %backend) {
+    my $io = $backend{$name}->();
+
+    subtest "$name - call_streaming rethrows a string exception from the callback" => sub {
+        my ($port, $pid) = spawn_server(sub {
+            my ($c) = @_;
+            print $c "HTTP/1.1 200 OK\r\nContent-Length: 6\r\nConnection: close\r\n\r\nabc\ndef";
+        });
+        my $res = eval { $io->call_streaming(get_req($port), sub { die "boom in on_event\n" }) };
+        my $err = $@;
+        stop_server($pid);
+        is $err, "boom in on_event\n", 'exception reaches the caller unchanged';
+        ok !$res, 'no response returned';
+    };
+
+    subtest "$name - call_streaming rethrows an object exception from the callback" => sub {
+        my ($port, $pid) = spawn_server(sub {
+            my ($c) = @_;
+            print $c "HTTP/1.1 200 OK\r\nContent-Length: 6\r\nConnection: close\r\n\r\nabc\ndef";
+        });
+        my $obj = Test::CallbackError->new('structured');
+        eval { $io->call_streaming(get_req($port), sub { die $obj }) };
+        my $err = $@;
+        stop_server($pid);
+        isa_ok $err, 'Test::CallbackError', 'object exception';
+        is eval { $err->msg }, 'structured', 'payload intact';
+    };
+
+    subtest "$name - call_streaming with a well-behaved callback" => sub {
+        my ($port, $pid) = spawn_server(sub {
+            my ($c) = @_;
+            print $c "HTTP/1.1 200 OK\r\nContent-Length: 7\r\nConnection: close\r\n\r\nabc\ndef";
+        });
+        my $got = '';
+        my $res = $io->call_streaming(get_req($port), sub { $got .= $_[0] });
+        stop_server($pid);
+        is $res->status, 200, 'status 200';
+        is $got, "abc\ndef", 'all bytes delivered to the callback';
+    };
+
+    subtest "$name - connect failure is a 599 with the message" => sub {
+        my $port = closed_port();
+        for my $mode (qw( call call_streaming )) {
+            my $res = $mode eq 'call'
+                ? $io->call(get_req($port))
+                : $io->call_streaming(get_req($port), sub {});
+            is $res->status, 599, "$mode: transport failure is 599";
+            ok length($res->content // ''), "$mode: content carries the error message";
+        }
+    };
+
+    subtest "$name - a real server 500 stays 500" => sub {
+        my $body = '{"kind":"Status","code":500}';
+        my ($port, $pid) = spawn_server(sub {
+            my ($c) = @_;
+            print $c "HTTP/1.1 500 Internal Server Error\r\nContent-Length: ".length($body)."\r\nConnection: close\r\n\r\n".$body;
+        });
+        my $res  = $io->call(get_req($port));
+        my $res2 = $io->call_streaming(get_req($port), sub {});
+        stop_server($pid);
+        is $res->status,  500, 'call: 500 kept';
+        is $res2->status, 500, 'call_streaming: 500 kept';
+        is $res->content, $body, 'call: server body kept';
+    };
+
+    subtest "$name - connection dropped mid-body is a 599" => sub {
+        my ($port, $pid) = spawn_server(sub {
+            my ($c) = @_;
+            print $c "HTTP/1.1 200 OK\r\nContent-Length: 100\r\nConnection: close\r\n\r\nshort";
+        });
+        my $res  = $io->call(get_req($port));
+        my $got  = '';
+        my $res2 = $io->call_streaming(get_req($port), sub { $got .= $_[0] });
+        stop_server($pid);
+        is $res->status,  599, 'call: truncated body is 599';
+        is $res2->status, 599, 'call_streaming: truncated body is 599';
+    };
+}
+
+subtest 'LWPIO - unsupported scheme (LWP internal 501) is a 599 with the message' => sub {
+    my $io = Kubernetes::REST::LWPIO->new;
+    my $res = $io->call(Kubernetes::REST::HTTPRequest->new(
+        method => 'GET', url => 'nosuchscheme://localhost/x', headers => {},
+    ));
+    is $res->status, 599, 'internal 501 mapped to 599';
+    like $res->content, qr/nosuchscheme/, 'message in content';
 };
 
 done_testing;

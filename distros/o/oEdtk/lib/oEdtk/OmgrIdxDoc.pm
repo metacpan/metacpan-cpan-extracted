@@ -2,7 +2,7 @@ package oEdtk::OmgrIdxDoc;
 use strict;
 use warnings;
 
-our $VERSION = 2.1129;
+our $VERSION = 2.1131;
 
 use base 'oEdtk::Doc';
 use oEdtk::Config  qw(config_read);

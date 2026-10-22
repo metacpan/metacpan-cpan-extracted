@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1::BitwardenSecretsManagerSecretRef;
 # ABSTRACT: BitwardenSecretsManagerSecretRef contains the credential ref to the bitwarden instance.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s credentials => '+IO::K8s::ExternalSecrets::V1::SecretKeySelector', { required => 'schema' };
@@ -20,7 +20,7 @@ IO::K8s::ExternalSecrets::V1::BitwardenSecretsManagerSecretRef - BitwardenSecret
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 credentials
 

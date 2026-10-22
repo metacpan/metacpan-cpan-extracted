@@ -1,0 +1,29 @@
+{
+  "server_types": [
+    {
+      "id": 22,
+      "name": "cx23",
+      "description": "CX23",
+      "cores": 2,
+      "memory": 4,
+      "disk": 40,
+      "deprecated": false,
+      "prices": [],
+      "storage_type": "local",
+      "cpu_type": "shared",
+      "architecture": "x86",
+      "locations": [
+        {
+          "name": "fsn1",
+          "available": true,
+          "deprecated": false
+        },
+        {
+          "name": "nbg1",
+          "available": false,
+          "deprecated": false
+        }
+      ]
+    }
+  ]
+}

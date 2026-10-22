@@ -1,5 +1,10 @@
 Revision history for Data::Graph::Shared
 
+0.09  2026-10-16
+    - Accept overloaded paths and reject embedded NULs consistently.
+    - Retry file locks interrupted by signals.
+    - Clarify operation costs and process-sharing limits.
+
 0.08      2026-09-26
           - A writer killed mid add_node, add_edge or remove_node no longer
             leaves a half-published node or freed edges linked.

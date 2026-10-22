@@ -1,7 +1,7 @@
 package WWW::Hetzner::CLI::Cmd::PrimaryIp::Cmd::List;
 # ABSTRACT: List primary IPs
 
-our $VERSION = '0.101';
+our $VERSION = '0.102';
 
 use Moo;
 use MooX::Cmd;
@@ -26,7 +26,7 @@ sub execute {
         return;
     }
 
-    printf "%-8s %-20s %-6s %-18s %-12s %-10s\n", 'ID', 'NAME', 'TYPE', 'IP', 'DATACENTER', 'ASSIGNEE';
+    printf "%-8s %-20s %-6s %-18s %-12s %-10s\n", 'ID', 'NAME', 'TYPE', 'IP', 'LOCATION', 'ASSIGNEE';
     printf "%-8s %-20s %-6s %-18s %-12s %-10s\n", '-' x 8, '-' x 20, '-' x 6, '-' x 18, '-' x 12, '-' x 10;
 
     for my $pip (@$pips) {
@@ -35,7 +35,7 @@ sub execute {
             $pip->name // '-',
             $pip->type // '-',
             $pip->ip // '-',
-            $pip->datacenter_name // '-',
+            $pip->location // '-',
             $pip->assignee_id // '-';
     }
 }
@@ -54,7 +54,7 @@ WWW::Hetzner::CLI::Cmd::PrimaryIp::Cmd::List - List primary IPs
 
 =head1 VERSION
 
-version 0.101
+version 0.102
 
 =head1 SUPPORT
 

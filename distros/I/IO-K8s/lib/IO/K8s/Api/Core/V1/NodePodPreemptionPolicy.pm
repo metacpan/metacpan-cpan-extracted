@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::NodePodPreemptionPolicy;
 # ABSTRACT: NodePodPreemptionPolicy defines the node-level policies governing preemption for pods on this node.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s disableResizePreemption => [Str];
@@ -20,7 +20,7 @@ IO::K8s::Api::Core::V1::NodePodPreemptionPolicy - NodePodPreemptionPolicy define
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 disableResizePreemption
 

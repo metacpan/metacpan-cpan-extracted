@@ -19,7 +19,7 @@ configure_requires:
   Path::Tiny: '0'
   perl: v5.40.0
 dynamic_config: 0
-generated_by: 'App::mii v1.0.0, CPAN::Meta::Converter version 2.150013'
+generated_by: 'App::mii v1.0.0, CPAN::Meta::Converter version 2.150015'
 keywords: []
 license: artistic_2
 meta-spec:
@@ -38,7 +38,7 @@ no_index:
 provides:
   Alien::SDL3:
     file: lib/Alien/SDL3.pm
-    version: v3.4.21
+    version: v3.4.22
 recommends:
   Affix: '0'
 requires:
@@ -52,7 +52,7 @@ resources:
   homepage: https://github.com/Perl-SDL3/Alien-SDL3.pm
   license: http://www.perlfoundation.org/artistic_license_2_0
   repository: https://github.com/Perl-SDL3/Alien-SDL3.pm.git
-version: v3.4.21
+version: v3.4.22
 x_authority: cpan:SANKO
 x_ignore:
   - .tidyallrc

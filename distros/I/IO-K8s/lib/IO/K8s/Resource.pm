@@ -1,6 +1,6 @@
 package IO::K8s::Resource;
 # ABSTRACT: Base class for all Kubernetes resources
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use v5.10;
 use strict;
 use warnings;
@@ -221,22 +221,43 @@ sub import {
     my $caller = caller;
     $class->_setup_class($caller);
     $class->_import_map_types($caller);
+    $class->_sweep_sugar($caller, 'scope');
 }
 
-# HashRef and Opaque for map declarations (k191): `k8s data => HashRef[Str]`,
-# `k8s raw => Opaque`. Only here, where a class is compiled from source --
+# HashRef, ArrayRef, InstanceOf and Opaque for map declarations (k191, k194):
+# `k8s data => HashRef[Str]`, `k8s extra => HashRef[ArrayRef[Str]]`,
+# `k8s m => HashRef[ArrayRef[InstanceOf['Some::Class']]]`, `k8s raw => Opaque`.
+# Only here, where a class is compiled from source --
 # _setup_class also serves inline structs and IO::K8s::AutoGen, which build
-# their fields at runtime and never name a type in code. Both names are
+# their fields at runtime and never name a type in code. All four names are
 # swept from the package again once the scope that said `use` has finished
 # compiling (namespace::clean, the explicit-list form): the declarations
 # compiled against them keep working, but neither becomes a method of every
 # shipped class, which is what k118 took HashRef off (t/27_no_import_leak.t).
 sub _import_map_types {
     my ($class, $target) = @_;
-    Types::Standard->import::into($target, qw( HashRef ));
+    Types::Standard->import::into($target, qw( ArrayRef HashRef InstanceOf ));
     IO::K8s::Types->import::into($target, qw( Opaque ));
-    namespace::clean->import(-cleanee => $target, qw( HashRef Opaque ));
+    namespace::clean->import(-cleanee => $target, qw( ArrayRef HashRef InstanceOf Opaque ));
 }
+
+# The compile-time sugar _setup_class gives a class: the Moo keywords, the
+# `k8s` declaration function and the type names a `k8s` line is written
+# with. It exists so the declarations of a class can be written; once they
+# are done it has no business being a method (k200). Left in place, every
+# class `can` has / with / extends / before / after / around / k8s / Str /
+# Int / ..., and a schema property of one of those names (Kong's
+# ordering.after, ordering.before) had its accessor refused as a collision.
+my @SUGAR = qw(
+    extends has with before after around k8s
+    Str Int Bool Num IntOrStr Quantity Time
+);
+
+# The `has` Moo installed for each class, kept so _declare_field can still
+# declare an attribute after the keyword itself has been swept away. It is
+# the closure Moo made for that very package, so it behaves exactly as the
+# imported one did.
+my %_has;
 
 sub _setup_class {
     my ($class, $target) = @_;
@@ -246,6 +267,24 @@ sub _setup_class {
     Moo::Role->apply_roles_to_package($target, 'IO::K8s::Role::Resource');
     my $stash = Package::Stash->new($target);
     $stash->add_symbol('&k8s', sub { $class->_k8s($target, @_) });
+    $_has{$target} = $target->can('has');
+}
+
+# Remove the sugar again. A class compiled from source (`use
+# IO::K8s::Resource`) keeps it until the scope that said `use` has finished
+# compiling -- namespace::clean, the same mechanism as the HashRef/Opaque
+# sweep above -- so the file's own `k8s`, `with` and `has` lines, compiled
+# against it, keep working. A class built at runtime (inline struct,
+# IO::K8s::AutoGen) has no source to compile: its fields are declared by
+# calling IO::K8s::Resource->_k8s directly, so the sugar goes at once.
+sub _sweep_sugar {
+    my ($class, $target, $when) = @_;
+    if ($when && $when eq 'scope') {
+        namespace::clean->import(-cleanee => $target, @SUGAR);
+    } else {
+        my $stash = Package::Stash->new($target);
+        $stash->remove_symbol('&'.$_) for grep { $stash->has_symbol('&'.$_) } @SUGAR;
+    }
 }
 
 sub _expand_class {
@@ -429,6 +468,10 @@ sub _takes_any_value {
 # and a lenient Str-based Time (IO::K8s::AutoGen's) stays lenient.
 sub _typed_map {
     my ($info, $value_type, $opts, $where) = @_;
+    # HashRef[ArrayRef[X]]: the map of lists (k194)
+    return _array_map($info, $value_type->type_parameter, $opts, $where)
+        if $value_type->is_parameterized
+        && $value_type->parameterized_from->name eq 'ArrayRef';
     my $kind = $value_type->name;
     if ($kind eq 'Str') {
         $info->{is_hash_of_str} = 1;
@@ -444,6 +487,26 @@ sub _typed_map {
         . $value_type->display_name . '] (a scalar type, or InstanceOf[Class])';
 }
 
+# The map of lists (k194), map[string][]X upstream: HashRef[ArrayRef[Str]]
+# (every element a JSON string, the strict form) and
+# HashRef[ArrayRef[InstanceOf[Class]]] (every element an object). Other
+# element types are not modelled; a field of that shape stays Opaque.
+sub _array_map {
+    my ($info, $elem_type, $opts, $where) = @_;
+    if ($elem_type->name eq 'Str') {
+        $info->{is_hash_of_str_arrays} = 1;
+        return HashRef[ ArrayRef[ _constrain($elem_type, 'Str', $opts, $where) ] ];
+    }
+    if ($elem_type->isa('Type::Tiny::Class')) {
+        $info->{is_hash_of_object_arrays} = 1;
+        $info->{class} = $elem_type->class;
+        _reject_value_options($opts, $where);
+        return HashRef[ ArrayRef[ InstanceOf[ $elem_type->class ] ] ];
+    }
+    croak "k8s: cannot interpret the element type of $where: HashRef[ArrayRef["
+        . $elem_type->display_name . ']] (Str, or InstanceOf[Class])';
+}
+
 # The map of objects: { Class => 1 } and HashRef[InstanceOf[Class]].
 sub _object_map {
     my ($info, $full_class, $opts, $where) = @_;
@@ -456,7 +519,8 @@ sub _object_map {
 sub _generate_inline_struct {
     my ($class_name, $fields) = @_;
     __PACKAGE__->_setup_class($class_name);
-    for my $field_name (keys %$fields) {
+    __PACKAGE__->_sweep_sugar($class_name);
+    for my $field_name (sort keys %$fields) {
         __PACKAGE__->_k8s($class_name, $field_name, $fields->{$field_name});
     }
 }
@@ -521,11 +585,54 @@ sub _k8s_adopt {
     return $class->_declare_field($caller, $name, $type_spec, $marker, 1);
 }
 
+# The Perl accessor a JSON key gets in $caller (k200). The key sanitized
+# to a valid identifier (_sanitize_attr_name) is the name wanted; it is
+# taken unless
+#   * another JSON key already holds it -- in this class or, nearest wins,
+#     in an ancestor: sanitizing is not injective (x-value and x_value both
+#     become x_value), or
+#   * it is a real method of the class that is no attribute: new, meta,
+#     does, can, isa, import, DOES, BUILD, TO_JSON, a role's helpers (label,
+#     save, is_ready, spec_get, ...) -- a wire field must not replace them.
+# In either case the accessor gets a leading underscore -- the mark
+# _sanitize_attr_name already puts on `$ref` (_ref) -- and another one for
+# each further clash (new -> _new -> __new). The JSON key is untouched: the
+# field keeps it as its json_key and constructor argument, which is what
+# TO_JSON, FROM_HASH, the CRD emitter and compare_to_schema read. The
+# first of two clashing keys in declaration order keeps the plain name
+# (AutoGen and inline structs declare in sorted key order, so it is
+# deterministic). A key that already has an accessor in $caller -- declared
+# before, or by an ancestor -- gets that one back, so a redeclaration and
+# an override of the same key land on the same attribute. An adopted field
+# (metadata) is never renamed.
+#
+# Left alone are the attributes a class defines outside the DSL (a role's
+# own `has`) and the role helpers that yield to a wire field
+# (_yielding_role_helper): the declaration preflight in _declare_field
+# decides about those.
+sub _accessor_name {
+    my ($caller, $json_key, $adopt) = @_;
+    my $candidate = _sanitize_attr_name($json_key);
+    return $candidate if $adopt;
+    while (1) {
+        my ($declarer, $registered) = _nearest_registration($caller, $candidate);
+        if ($registered) {
+            return $candidate if ($registered->{json_key} // $candidate) eq $json_key;
+        } elsif (!$caller->can($candidate)) {
+            return $candidate;
+        } elsif (IO::K8s::Role::Resource::_effective_attribute_specs($caller)->{$candidate}
+                || _yielding_role_helper($caller, $candidate)) {
+            return $candidate;
+        }
+        $candidate = '_'.$candidate;
+    }
+}
+
 sub _declare_field {
     my ($class, $caller, $name, $type_spec, $marker, $adopt) = @_;
 
     my $json_key  = $name;
-    my $attr_name = _sanitize_attr_name($name);
+    my $attr_name = _accessor_name($caller, $name, $adopt);
     my $where     = "field '$name' of $caller";
 
     # Declaration preflight (k144). Every conflict is refused here, before
@@ -533,30 +640,26 @@ sub _declare_field {
     # the registry, the attribute list or the merged-view cache -- a
     # rejected declaration leaves the class exactly as it was.
     #
-    # Two JSON keys, one accessor: _sanitize_attr_name is not injective
-    # (x-value and x_value both become x_value), so a second key reaching
-    # an attribute name another key already holds -- in this class or,
-    # nearest wins, in an ancestor -- would silently retarget that field.
+    # Two JSON keys wanting one accessor (x-value and x_value) and a key
+    # wanting the name of a real method (new, meta, ...) are no conflicts
+    # to refuse: _accessor_name has already given the field a free
+    # accessor (k200), so what is looked at below is that accessor.
     my ($declarer, $registered) = _nearest_registration($caller, $attr_name);
-    if ($registered) {
-        my $other_key = $registered->{json_key} // $attr_name;
-        croak "k8s: $where collides with field '$other_key' of $declarer: "
-            . "both map to the Perl attribute '$attr_name'"
-            if $other_key ne $json_key;
-    }
     # The same JSON key declared a second time in this very class (k151).
     # Moo keeps the first attribute, so a second declaration is only ever
     # compared with the first one, below, once its type is interpreted --
     # identical is a no-op, anything else is refused.
     my $redeclared = $registered && $declarer eq $caller;
     # A method that is not a Moo attribute -- an IO::K8s::Role::APIObject
-    # helper such as get_condition, a Moo keyword -- used to make the old
+    # helper such as get_condition -- used to make the old
     # `return if $caller->can($attr_name)` register the field and skip
     # has(), leaving the wire field served by that method. What counts is
     # the effective Moo spec; a registry entry proves nothing. The one way
     # past this is a role helper its role declares as yielding to a wire
     # field of the same name (see _yielding_role_helper): the field is then
-    # installed over it.
+    # installed over it. Any other real method does not get here under the
+    # field's own name -- _accessor_name moved the accessor (k200); only an
+    # adopted field, which is never renamed, can still meet one.
     my ($spec, $local, $yielding);
     if ($caller->can($attr_name)) {
         $spec = IO::K8s::Role::Resource::_effective_attribute_specs($caller)->{$attr_name};
@@ -856,7 +959,8 @@ sub _declare_field {
     return _register_field($caller, $attr_name, \%info) unless $install;
 
     # Call Moo's has — use init_arg to map JSON key to Perl-safe attribute name
-    my $has = $caller->can('has');
+    my $has = $_has{$caller} // $caller->can('has')
+        or croak "k8s: $caller has no 'has' to declare $where with";
     my @coerce;
     # Bool attributes: coerce \0/\1 refs, JSON booleans and 'true'/'false'
     # strings to plain 0/1
@@ -991,6 +1095,52 @@ sub _declare_field {
                 } else {
                     $out{$key} = $in->{$key};
                 }
+            }
+            return \%out;
+        });
+    }
+    # Map of lists of objects (k194): each list built element-wise, the
+    # failure naming the key and the index. Same scan-first shortcut and
+    # element rule as the array and hash forms above.
+    elsif ($info{is_hash_of_object_arrays}) {
+        my $oc = $info{class};
+        my $builds = _object_builds($oc);
+        @coerce = (coerce => sub {
+            return $_[0] unless ref $_[0] eq 'HASH';
+            my $in = $_[0];
+            my $needed = 0;
+            KEY: for my $key (keys %$in) {
+                next unless ref $in->{$key} eq 'ARRAY';
+                for my $elem (@{ $in->{$key} }) {
+                    next unless $builds->($elem);
+                    $needed = 1;
+                    last KEY;
+                }
+            }
+            return $in unless $needed;
+            my %out;
+            for my $key (sort keys %$in) {
+                my $list = $in->{$key};
+                unless (ref $list eq 'ARRAY') {
+                    $out{$key} = $list;
+                    next;
+                }
+                my @built;
+                for my $i (0 .. $#$list) {
+                    if ($builds->($list->[$i])) {
+                        push @built, eval {
+                            IO::K8s::Role::Resource::_default_k8s()
+                                ->_struct_to_object_expanded($oc, $list->[$i])
+                        };
+                        if (my $err = $@) {
+                            $err =~ s/\n\z//;
+                            die "$err at key '$key' element $i\n";
+                        }
+                    } else {
+                        push @built, $list->[$i];
+                    }
+                }
+                $out{$key} = \@built;
             }
             return \%out;
         });
@@ -1130,7 +1280,7 @@ IO::K8s::Resource - Base class for all Kubernetes resources
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head1 SYNOPSIS
 
@@ -1166,14 +1316,16 @@ IO::K8s::Resource - Base class for Kubernetes resources
     k8s labels => { Str => 1 };                # String map (lenient legacy spelling)
     k8s data => HashRef[Str];                  # String map, strict
     k8s raw => Opaque;                         # Free map, values untyped (also bare HashRef)
-    k8s limits => { Quantity => 1 };           # Typed value map (also Int/Num/Bool/Time/IntOrStr)
+    k8s limits => HashRef[Quantity];           # Typed value map (also Int/Num/Bool/Time/IntOrStr)
     k8s ports => HashRef[Int];                 # The same, as HashRef[X]
+    k8s extra => HashRef[ArrayRef[Str]];       # Map of string lists (map[string][]string)
+    k8s headers => HashRef[ArrayRef[InstanceOf['IO::K8s::Api::Core::V1::SecretKeySelector']]];  # Map of object lists
     k8s rows => [ {} ];                         # Array of opaque hashes
     k8s matrix => [ [] ];                       # Array of opaque arrays
     k8s spec => {                              # Inline struct
         replicas => Int,
         selector => Str,
-        template => { Str => 1 },
+        template => HashRef[Str],
     };
 
 C<< { Str => 1 } >> and C<HashRef[Str]> declare a B<string map> -- labels,
@@ -1196,6 +1348,18 @@ map upstream declares as C<map[X]Quantity> rejects a bad value at
 construction rather than at the API server; C<HashRef[Quantity]> and the
 other C<HashRef[X]>, including C<HashRef[InstanceOf['Some::Class']]> for a
 map of objects, are the same declarations spelled the other way.
+
+C<HashRef[ArrayRef[Str]]> declares a map of string lists, C<map[string][]string>
+upstream (C<UserInfo.extra>, C<TokenRequestSpec.attestations>), and
+C<HashRef[ArrayRef[InstanceOf['Some::Class']]]> a map of object lists,
+C<map[string][]Object> (PrometheusOperator C<proxyConnectHeader>); the class
+is named in full, since C<InstanceOf> takes no short name. Both are strict:
+a value that is not an array, or an element of the wrong kind, is refused at
+construction. Elements of a string list go out as JSON strings, objects in
+the lists are built from hashes on construction and inflate, and C<to_crd>
+emits C<additionalProperties: {type: array, items: ...}>. Other element
+types (C<HashRef[ArrayRef[Int]]>) are not modelled; declare such a field
+C<Opaque>.
 
 Inline structs auto-generate an inner class (e.g. C<MyClass::_Spec>) with
 the declared fields. Hashrefs are auto-coerced to the inner class on
@@ -1250,6 +1414,32 @@ original keys.
 
     k8s '$ref' => Str;                          # Moo attr: _ref
     k8s 'x-kubernetes-list-type' => Str;        # Moo attr: x_kubernetes_list_type
+
+=head3 Accessor names
+
+The compile-time sugar this module imports -- the Moo keywords C<has>,
+C<with>, C<extends>, C<before>, C<after>, C<around>, the C<k8s> function
+and the type names C<Str>, C<Int>, C<Bool>, C<Num>, C<IntOrStr>,
+C<Quantity>, C<Time> (and C<HashRef>, C<Opaque>) -- is removed from the
+class again once the scope that said C<use> has finished compiling, and at
+once for a class built at runtime (inline structs, L<IO::K8s::AutoGen>).
+None of these names is a method of a finished class, so a field may be
+called C<after>, C<before>, C<with>, C<has> or C<Str>, and gets an
+accessor of that name.
+
+A field whose name is a real method of the class -- C<new>, C<meta>,
+C<does>, C<can>, C<isa>, C<import>, C<DOES>, C<BUILD>, C<TO_JSON>, a role
+helper such as C<label> or C<is_ready> -- or whose sanitized name another
+JSON key already holds (C<a-b> and C<a_b>, in this class or an ancestor)
+gets an accessor with a leading underscore, one more for every further
+clash: C<new> becomes C<_new>, then C<__new>. This is the mark C<$ref>
+-> C<_ref> already carries. The JSON key is untouched -- it is kept as the
+field's C<json_key> and constructor argument -- so C<TO_JSON>, C<FROM_HASH>,
+C<< ->new(new => ...) >> and C<to_crd> use the original name, and
+C<_k8s_attr_info> is keyed by the accessor. Of two clashing keys the one
+declared first keeps the plain name (AutoGen and inline structs declare in
+sorted key order). The one role helper that yields to a field of its name
+(C<conditions>) is still taken over, not renamed.
 
 =head3 Field options
 
@@ -1360,18 +1550,12 @@ on a declaration that collides with something already in place:
 
 =over 4
 
-=item * Two different JSON keys that sanitize to the same Perl attribute
-name (C<x-value> and C<x_value> both become C<x_value>), in this class or,
-nearest wins, in an ancestor: C<< k8s: field '<name>' of <class> collides
-with field '<other key>' of <declaring class>: both map to the Perl
-attribute '<attr>' >>.
-
-=item * A field name that is already a method on the class but not a Moo
-attribute -- a role helper such as L<IO::K8s::Role::APIObject/is_ready> --
-unless the role that provides it has declared the helper as yielding to a
-wire field of the same name, which today only C<conditions> is:
-C<< k8s: field '<name>' of <class> collides with the method '<attr>' of
-<class>, which is not an attribute >>.
+=item * An adopted field (C<metadata>, declared by
+L<IO::K8s::Role::APIObject> itself) whose name is a method on the class
+but not a Moo attribute: C<< k8s: field '<name>' of <class> collides with
+the method '<attr>' of <class>, which is not an attribute >>. Every other
+field name that is a method, or that another JSON key already holds, gets
+a renamed accessor instead of failing; see L</Accessor names>.
 
 =item * A field that would take over an attribute the class defines
 itself outside the C<k8s> DSL (a plain C<has>): C<< k8s: field '<name>' of

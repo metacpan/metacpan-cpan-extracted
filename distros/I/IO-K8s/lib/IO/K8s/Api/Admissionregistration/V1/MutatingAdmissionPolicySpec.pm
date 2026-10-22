@@ -1,6 +1,6 @@
 package IO::K8s::Api::Admissionregistration::V1::MutatingAdmissionPolicySpec;
 # ABSTRACT: MutatingAdmissionPolicySpec is the specification of the desired behavior of the admission policy.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s failurePolicy => Str;
@@ -38,7 +38,7 @@ IO::K8s::Api::Admissionregistration::V1::MutatingAdmissionPolicySpec - MutatingA
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 failurePolicy
 

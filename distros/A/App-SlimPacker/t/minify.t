@@ -217,6 +217,26 @@ sub nt { my ($c, $s) = @_; my $cl = "PPI::Token::$c"; no strict 'refs'; return $
     is needs_space(nt('Symbol','$fh'), nt('Cast','$')), 1, 'sym+cast($) → space (prevents $$merge)';
     is needs_space(nt('Symbol','$fh'), nt('Cast','@')), 1, 'sym+cast(@) → space (prevents @$merge)';
     is needs_space(nt('Cast','$'), nt('Symbol','$src')), 0, 'cast+sym → no double-space (cast-sym stays glued)';
+    # &&/||/// before a word: perl <= 5.18 mis-tokenizes `$x&&Foo::Bar->baz`
+    # ("Operator or semicolon missing before &Foo::Bar")
+    is needs_space(nt('Operator','&&'), nt('Word','Foo')), 1, '&& + word → space (old-perl tokenizer)';
+    is needs_space(nt('Operator','||'), nt('Word','Foo')), 1, '|| + word → space (old-perl tokenizer)';
+    is needs_space(nt('Operator','&&'), nt('Symbol','$x')), 0, '&& + $x → none';
+    # - before a word: `-e` et al. are filetests, others warn on old perls
+    is needs_space(nt('Operator','-'), nt('Word','e')), 1, '- + word → space (filetest/ambiguity)';
+    is needs_space(nt('Operator','-'), nt('Number','5')), 0, '- + number → none';
+}
+
+# ── lexicals referenced inside non-interpolating strings are not renamed ──
+# Such strings can be eval'd as code (Sub::Defer builds its deferred subs in
+# a q[...] template closing over file lexicals); renaming the declaration
+# would orphan the reference inside the string.
+{
+    my $out = process(q{my $undeferred; my $tpl = q[ $undeferred ||= 1 ]; eval $tpl; my $other_var = 2; print $other_var;});
+    like   $out, qr/my\$undeferred;/,  'lexical named in q[...] string kept';
+    unlike $out, qr/\$other_var/,      'unrelated lexical still renamed';
+    my $hd = process(qq{my \$frozen_by_hd;\nmy \$x = <<'EOT';\n \$frozen_by_hd\nEOT\nprint \$x;});
+    like   $hd, qr/my\$frozen_by_hd;/, 'lexical named in single-quoted heredoc kept';
 }
 
 # ── pack_string: shortest exact Perl literal for arbitrary bytes ───────────

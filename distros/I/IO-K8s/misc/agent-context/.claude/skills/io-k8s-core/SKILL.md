@@ -124,6 +124,10 @@ a new *core* kind is not reachable by short name until it is listed there.
 
 1. Create the `.pm` under the right namespace; `# ABSTRACT:` line and `our $VERSION` matching
    every other module (see the release skill — every module carries the same version, by design).
+   **Do not "clean up" the version to the main module only** — this dist ships to CPAN, the
+   `[@Author::GETTY]` bundle narrows `version_finder` to `:MainModule` only for `no_cpan` dists,
+   and every package needs its own version for PAUSE indexing. The usual house rule says the
+   opposite, and a grep "confirms" it.
 2. Choose `IO::K8s::Resource` (embedded) or `IO::K8s::APIObject` (top-level).
 3. Declare every wire field with `k8s`, matching the upstream OpenAPI schema — types and
    required-ness verbatim, no invented fields, no guessed casing.
@@ -162,3 +166,14 @@ Kubernetes rejects wrong JSON types. `Int` must serialize unquoted, `Bool` as `t
 canonical-ordered. `t/26_build_verify.t` builds manifests in Perl and compares against the
 kubectl-canonical structure; `t/25_real_world.t` goes the other direction, parsing real YAML.
 Any change to `TO_JSON`/`FROM_HASH` must keep both green.
+
+## Testing this distribution
+
+`prove -l t/` is **not recursive** and silently skips the subdirectory tests, exiting 0 — use
+`dzil test` or `prove -lr t/` (about 16 s for the full suite), and reserve a non-`-r` run for a
+single named file.
+
+A mass edit across `lib/` touches ~850 files at once. Upstream API syncs legitimately work that
+way, but one wrong pattern lands everywhere and `t/02_compile_all.t` only proves the files
+still load. Always follow a sweep with the full suite plus `t/26_build_verify.t` and
+`t/25_real_world.t` — they check both serialization directions.

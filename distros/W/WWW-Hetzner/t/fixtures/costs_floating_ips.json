@@ -1,0 +1,10 @@
+{
+  "floating_ips": [
+    {
+      "id": 401, "name": "vip", "ip": "198.51.100.4", "type": "ipv4",
+      "server": 101,
+      "home_location": { "id": 1, "name": "fsn1" },
+      "labels": { "citiai-env": "live" }
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 package IO::K8s::Cilium::V2::ServiceListener;
 # ABSTRACT: ServiceListener
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s listener  => Str;
@@ -26,7 +26,7 @@ IO::K8s::Cilium::V2::ServiceListener - ServiceListener
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 listener
 

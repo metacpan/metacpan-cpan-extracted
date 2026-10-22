@@ -445,7 +445,7 @@ static inline void sph_recover_stale_lock(SpatialHandle *h, uint32_t observed_wl
         return;
     if (!sph_self_reading(h)) {
         sph_rwlock_drain(h);
-        sph_rebuild_locked(h);
+        if (!hdr->sealed) sph_rebuild_locked(h);
     }
     __atomic_store_n(&hdr->wlock, 0, __ATOMIC_RELEASE);
     if (__atomic_load_n(&hdr->rwait, __ATOMIC_RELAXED) > 0)
@@ -727,7 +727,7 @@ static inline SpatialHandle *sph_setup(void *base, size_t map_size,
 
 /* Validate a mapped header (shared by sph_create reopen and sph_open_fd). */
 static inline int sph_validate_header(const SphHeader *hdr, uint64_t file_size) {
-    if (hdr->magic != SPH_MAGIC) return 0;
+    if (__atomic_load_n(&hdr->magic, __ATOMIC_ACQUIRE) != SPH_MAGIC) return 0;
     if (hdr->version != SPH_VERSION) return 0;
     if (hdr->max_entries == 0 || hdr->num_buckets == 0) return 0;
     if (hdr->max_entries > SPH_MAX_CAPACITY || hdr->num_buckets > SPH_MAX_CAPACITY) return 0;
@@ -1165,7 +1165,7 @@ static SpatialHandle *sph_open_readonly(const char *path, char *errbuf) {
     if (!sph_validate_header((SphHeader *)base, (uint64_t)st.st_size)) {
         SPH_ERR("%s: invalid spatial hash file", path); munmap(base, ms); return NULL;
     }
-    if (!((SphHeader *)base)->sealed) {
+    if (!__atomic_load_n(&((SphHeader *)base)->sealed, __ATOMIC_ACQUIRE)) {
         SPH_ERR("%s is not frozen: call ->freeze on the producer before opening read-only", path);
         munmap(base, ms); return NULL;
     }
@@ -1181,7 +1181,7 @@ static SpatialHandle *sph_open_readonly(const char *path, char *errbuf) {
  * croaks and a read-write reopen is refused. */
 static int sph_freeze(SpatialHandle *h) {
     sph_rwlock_wrlock(h);
-    h->hdr->sealed = 1;
+    __atomic_store_n(&h->hdr->sealed, 1, __ATOMIC_RELEASE);
     sph_rwlock_wrunlock(h);
     if (h->path || h->backing_fd >= 0) return sph_msync(h);  /* durability for file/memfd-backed */
     return 0;   /* anonymous: the seal lives in shared memory (visible to forks); nothing to flush */
@@ -1491,6 +1491,40 @@ static uint32_t sph_knn_walk(SpatialHandle *h, const int64_t C[3], const double 
     }
     return walked;
 }
+
+static void sph_knn_scan(SpatialHandle *h, const double c[3], int dims,
+                         sph_cand_t *heap, uint32_t *n, uint32_t k) {
+    double cs = h->hdr->cell_size;
+    if (h->hdr->count > h->max_entries / 4) {
+        for (uint32_t idx = 0; idx < h->max_entries; idx++) {
+            if (!sph_is_live(h, idx)) continue;
+            const double *pos = h->entries[idx].pos;
+            double d2 = sph_dist2(h, pos, c, dims);
+            if (*n >= k && !(d2 < heap[0].d2)) continue;
+            if (dims == 2 && pos[2] != 0.0 &&
+                sph_wrap_cell(sph_floor_cell(pos[2], cs), h->wrap_cells[2]) != 0)
+                continue;
+            sph_heap_offer(heap, n, k, d2, h->entries[idx].value);
+        }
+        return;
+    }
+    for (uint32_t w = 0; w < h->bitmap_words; w++) {
+        uint64_t word = h->bitmap[w];
+        while (word) {
+            uint32_t idx = (w << 6) + (uint32_t)__builtin_ctzll(word);
+            word &= word - 1;
+            if (idx >= h->max_entries) break;
+            const double *pos = h->entries[idx].pos;
+            double d2 = sph_dist2(h, pos, c, dims);
+            if (*n >= k && !(d2 < heap[0].d2)) continue;
+            if (dims == 2 && pos[2] != 0.0 &&
+                sph_wrap_cell(sph_floor_cell(pos[2], cs), h->wrap_cells[2]) != 0)
+                continue;
+            sph_heap_offer(heap, n, k, d2, h->entries[idx].value);
+        }
+    }
+}
+
 static int sph_query_knn(SpatialHandle *h, const double c[3], uint32_t k, int dims, sph_collect_t *out) {
     double cc[3] = { c[0], c[1], dims==3 ? c[2] : 0 };
     uint32_t total = h->hdr->count;
@@ -1500,34 +1534,23 @@ static int sph_query_knn(SpatialHandle *h, const double c[3], uint32_t k, int di
     if (!heap) return 0;
     uint32_t n = 0;                    /* candidates currently in the heap */
 
-    if (h->wrap) {
-        /* Toroidal: expanding shells would re-visit wrapped cells and double-offer
-           the same entry to the heap.  The world is bounded, so scan every live
-           entry once with the min-image distance -- O(max_entries), fine for a torus. */
-        uint32_t me = h->max_entries;
-        for (uint32_t idx = 0; idx < me; idx++)
-            if (sph_is_live(h, idx))
-                sph_heap_offer(heap, &n, k, sph_dist2(h, h->entries[idx].pos, cc, dims),
-                               h->entries[idx].value);
-    } else {
+    if (h->wrap) goto scan_live;  /* wrapped shells would revisit entries */
+    {
     int64_t center[3]; sph_cell_of(h, cc, center);
     double cs = h->hdr->cell_size;
-    /* Termination is by how many live entries we have EXAMINED, not by a cell
-       count: cell distance is unbounded (continuous coords), so a far point can
-       sit arbitrarily many shells out. Snapshot the population; once seen==total
-       every live entry has been visited and nothing remains to find. */
     uint32_t seen = 0;                 /* live, cell-matched entries examined */
-    uint64_t cells_visited = 0;
-    /* g < INT32_MAX is only a corruption guard against a bogus count; the real
-       terminators below (have-k bound, or seen>=total) end the loop normally. */
+    uint64_t scan_budget = (uint64_t)h->bitmap_words + total;
+    if (scan_budget < 4096) scan_budget = 4096;
+    if (scan_budget > SPH_MAX_QUERY_CELLS) scan_budget = SPH_MAX_QUERY_CELLS;
     for (int64_t g = 0; g < INT32_MAX; g++) {
+        uint64_t width = (uint64_t)(2 * g + 1);
+        uint64_t cells = width * width;
+        if (dims == 3) cells *= width;
+        if (cells > scan_budget) goto scan_live;
         /* Enumerate the Chebyshev shell at distance g -- its SURFACE only, not
            the full (2g+1)^d box, so per-shell work is O(g) in 2D / O(g^2) in 3D.
-           cells_visited counts every cell walked, so the cap bounds real work. */
+           Fall back to the live bitmap when empty-cell work exceeds a scan. */
 #define SPH_KNN_PROCESS(CX, CY, CZ) do {                                  \
-            if (++cells_visited > (uint64_t)SPH_MAX_QUERY_CELLS) {        \
-                free(heap); return SPH_Q_TOOBIG;                          \
-            }                                                             \
             int64_t C_[3] = { (CX), (CY), (CZ) };                         \
             seen += sph_knn_walk(h, C_, cc, dims, heap, &n, k);           \
         } while (0)
@@ -1567,7 +1590,12 @@ static int sph_query_knn(SpatialHandle *h, const double c[3], uint32_t k, int di
         /* stop once every live entry has been examined: nothing left to find. */
         if (seen >= total) break;
     }
-    }   /* end !wrap */
+    }
+    goto emit_result;
+scan_live:
+    n = 0;   /* discard shell candidates so each live entry is offered once */
+    sph_knn_scan(h, cc, dims, heap, &n, k);
+emit_result:
     qsort(heap, n, sizeof(sph_cand_t), sph_cmp_d2);    /* nearest-first */
     for (uint32_t i = 0; i < n; i++)
         if (!sph_collect_push(out, heap[i].val)) { free(heap); return 0; }

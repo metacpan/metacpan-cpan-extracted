@@ -1,7 +1,7 @@
 package Data::Fenwick2D::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 require XSLoader;
 XSLoader::load('Data::Fenwick2D::Shared', $VERSION);
 
@@ -139,9 +139,9 @@ new_from_fd($fd) >>. The descriptor you pass is duplicated
 disturb the handle. Every process's updates land in the one shared grid, and
 queries take only the read lock so many readers proceed concurrently.
 
-C<new> and C<new_memfd> create a new segment sparse: pages are allocated as
-they are first written, and once the filesystem is full, a write to a page not
-yet allocated dies with SIGBUS. Set C<DATA_FENWICK2D_SHARED_SPARSE=0> to
+File-backed C<new> and C<new_memfd> create sparse segments: pages are allocated
+as they are first accessed. Once the filesystem is full, accessing an
+unallocated page can cause SIGBUS. Set C<DATA_FENWICK2D_SHARED_SPARSE=0> to
 reserve the whole segment at creation, so a full filesystem makes them croak
 instead; on tmpfs and memfd that commits the segment's memory at once, and a
 memory cgroup too small for it gets an OOM kill rather than a croak.
@@ -194,22 +194,14 @@ the mapping.
 =head1 CRASH SAFETY
 
 Mutation is guarded by a futex-based write-preferring rwlock with PID-encoded
-ownership and dead-owner recovery. Each update is a short bounded
-C<O(log rows * log cols)> walk, so a crash leaves the grid consistent up to the
-last completed operation. B<Limitation>: PID reuse is not detected (very unlikely
-in practice).
+ownership and dead-owner recovery. Recovery releases abandoned locks; it
+cannot repair an interrupted C<update>, C<set>, or C<clear>. Rebuild the grid
+after a process dies during mutation. PID reuse is not detected.
 
-Reader-slot exhaustion (slotless readers): dead-process recovery attributes a
-crashed lock holder's contribution through its reader-slot. The slot table holds
-1024 entries (one per concurrent reader process). If more than that many reader
-processes share one mapping at once, a reader that cannot claim a slot proceeds
-"slotless" -- it still takes the read lock but leaves no per-process record. If
-such a slotless reader is then killed while holding the read lock, its share of
-the lock cannot be attributed to a dead process, so writer recovery cannot
-reclaim it and writers may block until the mapping is recreated. Reaching this
-needs more than 1024 concurrent reader processes on one mapping plus a crash in
-the brief read-lock window; the dead-process slot reclaim keeps the table from
-filling with stale entries, so in practice it is very unlikely.
+The reader-slot table has 1024 entries, one per handle per process that has
+used a lock. Dead processes' slots are reclaimed lazily. If the table is full,
+a reader proceeds without a slot; if killed while holding the read lock, it
+may leave writers blocked until the mapping is recreated.
 
 An interrupted create is recovered too. A creator killed after the backing
 file is sized but before its header is committed leaves a full-size, all-zero

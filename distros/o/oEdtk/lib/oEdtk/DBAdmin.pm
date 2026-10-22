@@ -17,7 +17,7 @@ use Data::Dumper qw(Dumper);
 # SHOW CREATE DATABASE oEdtk;
 
 use Exporter;
-our $VERSION     = 2.1129;
+our $VERSION     = 2.1131;
 our $VERSION_TXT = $VERSION =~ s/\./_/gr;
 our @ISA         = qw(Exporter);
 our @EXPORT_OK   = qw(
@@ -3786,10 +3786,24 @@ sub _schema_level_defs {
 	);
 }
 
+# Find a table in a SchemaScan result, ignoring identifier case. PostgreSQL
+# folds unquoted names to lower case while the shipped configuration keeps the
+# historical upper-case names (EDTK_INDEX), so an exact hash lookup misses it.
+sub _schema_scan_table {
+	my ( $scan, $table ) = @_;
+	my $tables = $scan->{tables} // {};
+	return $tables->{$table} if exists $tables->{$table};
+	my $want = lc $table;
+	for my $name ( keys %$tables ) {
+		return $tables->{$name} if lc($name) eq $want;
+	}
+	return;
+}
+
 # The discriminators of one table, read off a SchemaScan result.
 sub _schema_features {
 	my ( $scan, $table ) = @_;
-	my $t = $scan->{tables}{$table};
+	my $t = _schema_scan_table( $scan, $table );
 	return unless $t;
 
 	my @cols = @{ $t->{columns} // [] };
@@ -3811,7 +3825,7 @@ sub _schema_features {
 sub _schema_col_diff {
 	my ( $scan, $table, $cols ) = @_;
 	my ( @missing, @shrink );
-	my $t    = $table ? $scan->{tables}{$table}                                 : undef;
+	my $t    = $table ? _schema_scan_table( $scan, $table )                     : undef;
 	my %live = $t     ? map { lc( $_->{name} ) => $_ } @{ $t->{columns} // [] } : ();
 	for my $c (@$cols) {
 		my ( $name, $type ) = @$c;
@@ -3859,7 +3873,8 @@ sub _schema_classify {
 sub _schema_report_lines {
 	my (%p) = @_;
 	my @lines;
-	push @lines, "schema level: $p{level}";
+
+	#push @lines, "schema level: $p{level}";
 	push @lines, "driver: $p{driver}";
 	push @lines, "index table: $p{table}";
 	if ( my $f = $p{features} ) {
@@ -4161,7 +4176,7 @@ sub _schema_index_specs {
 	my ( $dbh, $table ) = @_;
 	require oEdtk::SchemaScan;
 	my $scan = eval { oEdtk::SchemaScan::scan_schema($dbh) } or return [];
-	my $t    = $scan->{tables}{$table}                       or return [];
+	my $t    = _schema_scan_table( $scan, $table )           or return [];
 	return [
 		map  { { name => $_->{name}, unique => $_->{unique}, columns => $_->{columns} } }
 		grep { $_->{name} !~ /^sqlite_autoindex_/ } @{ $t->{indexes} // [] }
@@ -4211,7 +4226,7 @@ sub _schema_key_columns {
 	my ( $dbh, $table ) = @_;
 	require oEdtk::SchemaScan;
 	my $scan = eval { oEdtk::SchemaScan::scan_schema($dbh) } or return ();
-	my $t    = $scan->{tables}{$table}                       or return ();
+	my $t    = _schema_scan_table( $scan, $table )           or return ();
 	return map { lc $_->{name} }
 		sort { $a->{pk} <=> $b->{pk} } grep { $_->{pk} } @{ $t->{columns} // [] };
 }
@@ -4337,7 +4352,8 @@ sub schema_MigrationPlan {
 	}
 
 	my @report;
-	push @report, "schema level: $detect->{level}";
+
+	#push @report, "schema level: $detect->{level}";
 	push @report, "driver: $detect->{driver}";
 	push @report, "target level: T";
 	push @report, "history stamp: $stamp";
@@ -4646,32 +4662,62 @@ sub _schema_pk_constraint_name {
 	return;
 }
 
+# The DDL that swaps a table's primary key for $cols, per driver, as a list of
+# statements. Returns ($statements, $error): $statements is an arrayref and
+# $error is undef on success. SQLite and NC cannot change a key in place.
+# PostgreSQL and Oracle build a separate unique index and attach it, so the
+# constraint and the index never compete for the same name.
+sub _schema_change_key_sql {
+	my ( $driver, $table, $cols, $pkname ) = @_;
+	my $list = join( ', ', @$cols );
+	return ( [], "changing the key in place is not supported on $driver" )
+		if $driver eq 'SQLite' || $driver eq 'NC';
+
+	if ( $driver eq 'mysql' ) {
+		return (
+			[
+				"alter table $table drop primary key",
+				"alter table $table add primary key ( $list )"
+			],
+			undef
+		);
+	}
+
+	return ( [], "cannot find the primary-key constraint of $table" )
+		unless defined $pkname;
+
+	my $ix  = "ux_" . $table;
+	my @sql = (
+		"alter table $table drop constraint $pkname",
+		"create unique index if not exists $ix on $table ( $list )",
+	);
+	push @sql,
+		( $driver eq 'PostgreSQL' )
+		? "alter table $table add constraint pk_$table primary key using index $ix"
+		: "alter table $table add constraint pk_$table primary key ( $list ) using index $ix";
+	return ( \@sql, undef );
+}
+
 # Swap a table's primary key for a duplicate-free column set, per driver. On
 # SQLite a key cannot be changed without rebuilding the table, which is out of
 # scope for an additive delta. Returns an (ok, error) pair.
 sub _schema_change_key {
 	my ( $dbh, $table, $cols ) = @_;
 	my $driver = _db_check_driver_name($dbh);
-	my $list   = join( ', ', @$cols );
-	return ( 0, "changing the key in place is not supported on $driver" )
-		if $driver eq 'SQLite' || $driver eq 'NC';
+	my $pkname =
+		( $driver eq 'PostgreSQL' || $driver eq 'Oracle' )
+		? _schema_pk_constraint_name( $dbh, $table )
+		: undef;
+	my ( $statements, $err ) = _schema_change_key_sql( $driver, $table, $cols, $pkname );
+	return ( 0, $err ) if defined $err;
 
-	if ( $driver eq 'mysql' ) {
-		return ( 0, "alter table $table drop primary key" )
-			unless eval { _db_do_ddl( $dbh, "alter table $table drop primary key" ) };
-		return ( 0, "alter table $table add primary key ( $list )" )
-			unless eval { _db_do_ddl( $dbh, "alter table $table add primary key ( $list )" ) };
-		return ( 1, undef );
+	for my $sql (@$statements) {
+		my $ok = eval { _db_do_ddl( $dbh, $sql ) };
+		unless ( defined $ok ) {
+			my $why = $@ || 'the driver refused the statement';
+			return ( 0, "$sql: $why" );
+		}
 	}
-
-	# PostgreSQL / Oracle: drop the existing key, attach the new one.
-	my $pkname = _schema_pk_constraint_name( $dbh, $table );
-	_db_do_ddl( $dbh, "alter table $table drop constraint $pkname" ) if defined $pkname;
-	my $ix = "pk_" . $table;
-	_db_do_ddl( $dbh, "create unique index if not exists $ix on $table ( $list )" );
-	return ( 0, "alter table $table add constraint $ix primary key" )
-		unless
-		eval { _db_do_ddl( $dbh, "alter table $table add constraint $ix primary key ( $list )" ) };
 	return ( 1, undef );
 }
 
@@ -4680,7 +4726,9 @@ sub _schema_change_key {
 # a SELECT / PRAGMA). Options: manifest, with_constraints (0|1). Returns a plan
 # hash: ok, level, driver, detect, create (list), add (table => [cols]), widen
 # (table => [ {col,from,to} ]), key (list), add_sql (list), widen_sql (list),
-# violations (list) and report (list of lines).
+# key_sql (list), violations (list) and report (list of lines). A key change
+# requested on a driver that cannot perform it in place is a violation, so the
+# preview never promises more than schema_Additive can deliver.
 sub schema_AdditivePlan {
 	my ( $dbh, %opt ) = @_;
 	my $cfg      = eval { config_read('EDTK_DB') } || {};
@@ -4700,12 +4748,13 @@ sub schema_AdditivePlan {
 	my @violations;
 	my @add_sql;
 	my @widen_sql;
+	my @key_sql;
 
 	for my $t (@$manifest) {
 		my $tbl = $target->{$t} or next;
 
 		# A table absent from the base is created, not altered.
-		my $live = $scan->{tables}{$t};
+		my $live = _schema_scan_table( $scan, $t );
 		if ( !$live ) {
 			push @create, $t;
 			next;
@@ -4751,17 +4800,29 @@ sub schema_AdditivePlan {
 		my @tpk = _schema_pk_of($tbl);
 		if ( @tpk && join( ',', @spk ) ne join( ',', @tpk ) ) {
 			push @key, { table => $t, from => join( ',', @spk ), to => join( ',', @tpk ) };
-			push @violations,
-				  "$t: key differs ( "
-				. join( ',', @spk ) . " -> "
-				. join( ',', @tpk )
-				. " ); use --with-constraints"
-				unless $opt{with_constraints};
+			if ( !$opt{with_constraints} ) {
+				push @violations,
+					  "$t: key differs ( "
+					. join( ',', @spk ) . " -> "
+					. join( ',', @tpk )
+					. " ); use --with-constraints";
+			}
+			else {
+				my $pkname = _schema_pk_constraint_name( $dbh, $t );
+				my ( $sql, $err ) = _schema_change_key_sql( $driver, $t, \@tpk, $pkname );
+				if ( defined $err ) {
+					push @violations, "$t: $err";
+				}
+				else {
+					push @key_sql, @$sql;
+				}
+			}
 		}
 	}
 
 	my @report;
-	push @report, "schema level: $detect->{level}";
+
+	#push @report, "schema level: $detect->{level}";
 	push @report, "driver: $driver";
 	push @report, "target level: T";
 	push @report, "mode: additive (in place, read-only preview)";
@@ -4798,6 +4859,7 @@ sub schema_AdditivePlan {
 		key        => \@key,
 		add_sql    => \@add_sql,
 		widen_sql  => \@widen_sql,
+		key_sql    => \@key_sql,
 		violations => \@violations,
 		report     => \@report,
 	};
@@ -4834,8 +4896,8 @@ sub schema_Additive {
 		# 1. add the missing columns, widen the narrower ones and, when asked,
 		# change the key -- on the tables that already exist.
 		for my $t (@$manifest) {
-			my $tbl     = $target->{$t}       or next;
-			my $live    = $scan->{tables}{$t} or next;
+			my $tbl     = $target->{$t}                   or next;
+			my $live    = _schema_scan_table( $scan, $t ) or next;
 			my %sc      = map { lc( $_->{name} ) => $_ } @{ $live->{columns} // [] };
 			my ($nrows) = $dbh->selectrow_array("select count(*) from $t");
 			$nrows += 0;
@@ -4894,7 +4956,7 @@ sub schema_Additive {
 		# 2. create the still-missing tables last, once the existing ones carry
 		# every column their indexes reference (schema_Create is "IF NOT EXISTS").
 		for my $t (@$manifest) {
-			push @created, $t unless $scan->{tables}{$t};
+			push @created, $t unless _schema_scan_table( $scan, $t );
 		}
 		if (@created) {
 			schema_Create($dbh);
@@ -5696,7 +5758,9 @@ Read-only preview of the in-place additive update: what C<schema_Additive> would
 add, widen, create or change. Option C<with_constraints> (0|1). Writes nothing
 (every statement is a SELECT / PRAGMA). Returns a plan hash: C<ok>, C<level>,
 C<driver>, C<detect>, C<create>, C<add>, C<widen>, C<key>, C<add_sql>, C<widen_sql>,
-C<violations> and C<report>.
+C<key_sql>, C<violations> and C<report>. When C<with_constraints> asks for a key
+change on a driver that cannot perform it in place (SQLite, NC), the plan reports
+it as a violation instead of rendering DDL that the update would refuse.
 
 =head2 schema_Additive( $dbh, %opt )
 
@@ -5760,11 +5824,20 @@ C<pg_copy_staging> (0 or 1) forces either path regardless of size, and
 C<force_copy> (true) forces the parsed COPY path ahead of every other setting
 (the packaged tracker exposes it as C<--forceCopy>).
 
+The ELT path additionally requires an explicit source encoding
+(C<pg_copy_encoding> or C<EDTK_DB_COPY_ENCODING>). Without it the load logs
+C<_load_csv_pg_copy: ELT unavailable (ELT needs an explicit source encoding)>
+and falls back to the parsed COPY path.
+
 =head2 EDTK_DB_COPY_ENCODING
 
-Source encoding declared to the PostgreSQL COPY. When unset, the historical
-LATIN1 is used; an unknown value is rejected with a message instead of being
-passed silently. The caller parameter C<pg_copy_encoding> takes precedence.
+Source encoding of the CSV bytes, declared to the PostgreSQL COPY. It is
+required to enable the ELT path: an explicit value (the caller parameter
+C<pg_copy_encoding>, else this key) makes the ELT declare C<ENCODING '<name>'>.
+When unset, the parsed COPY path keeps its historical per-field heuristic and
+the ELT is unavailable (it falls back to parsed COPY as described above). The
+name must match the file's real encoding; an unknown value is rejected with a
+message instead of being passed silently.
 
 =head2 EDTK_DB_DEFER_INDEX_RATIO, EDTK_DB_DEFER_INDEX_MIN_ROWS
 

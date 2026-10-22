@@ -201,4 +201,98 @@ is_deeply( \%h, { AA => 1, BB => 2 }, '_uc_hash_keys upper-cases every key in pl
 	is( $d, 5, '_elapsed_seconds truncates the fractional part' );
 }
 
+# --- oEdtk::DBAdmin::_schema_change_key_sql : portable key-change DDL ---------
+# PostgreSQL and Oracle build a separate unique index and attach it; reusing the
+# constraint name for the index made the ADD CONSTRAINT fail on PostgreSQL.
+{
+	my @cols = qw( ed_idldoc ed_seqdoc ed_idseqpg ed_idjob );
+
+	my ( $sql, $err ) = oEdtk::DBAdmin::_schema_change_key_sql( 'PostgreSQL', 'EDTK_INDEX', \@cols,
+		'edtk_index_pkey' );
+	is( $err, undef, 'PostgreSQL key change has no error' );
+	is_deeply(
+		$sql,
+		[
+			'alter table EDTK_INDEX drop constraint edtk_index_pkey',
+			'create unique index if not exists ux_EDTK_INDEX on EDTK_INDEX ( '
+				. join( ', ', @cols ) . ' )',
+'alter table EDTK_INDEX add constraint pk_EDTK_INDEX primary key using index ux_EDTK_INDEX',
+		],
+		'PostgreSQL attaches the pre-built unique index'
+	);
+
+	( $sql, $err ) =
+		oEdtk::DBAdmin::_schema_change_key_sql( 'Oracle', 'EDTK_INDEX', \@cols, 'EDTK_INDEX_PK' );
+	is( $err, undef, 'Oracle key change has no error' );
+	is_deeply(
+		$sql,
+		[
+			'alter table EDTK_INDEX drop constraint EDTK_INDEX_PK',
+			'create unique index if not exists ux_EDTK_INDEX on EDTK_INDEX ( '
+				. join( ', ', @cols ) . ' )',
+			'alter table EDTK_INDEX add constraint pk_EDTK_INDEX primary key ( '
+				. join( ', ', @cols )
+				. ' ) using index ux_EDTK_INDEX',
+		],
+		'Oracle attaches the pre-built unique index with its column list'
+	);
+
+	( $sql, $err ) = oEdtk::DBAdmin::_schema_change_key_sql( 'mysql', 'EDTK_INDEX', \@cols, undef );
+	is( $err, undef, 'MySQL key change has no error' );
+	is_deeply(
+		$sql,
+		[
+			'alter table EDTK_INDEX drop primary key',
+			'alter table EDTK_INDEX add primary key ( ' . join( ', ', @cols ) . ' )',
+		],
+		'MySQL swaps the primary key in place'
+	);
+
+	( $sql, $err ) =
+		oEdtk::DBAdmin::_schema_change_key_sql( 'SQLite', 'EDTK_INDEX', \@cols, undef );
+	is_deeply( $sql, [], 'SQLite renders no key-change DDL' );
+	is(
+		$err,
+		'changing the key in place is not supported on SQLite',
+		'SQLite reports that the key cannot be changed in place'
+	);
+
+	( $sql, $err ) =
+		oEdtk::DBAdmin::_schema_change_key_sql( 'PostgreSQL', 'EDTK_INDEX', \@cols, undef );
+	is_deeply( $sql, [], 'a missing constraint name renders no DDL' );
+	like( $err, qr/cannot find the primary-key constraint/, 'the missing constraint is reported' );
+}
+
+# --- oEdtk::DBAdmin::_schema_scan_table : case-insensitive table lookup ------
+# PostgreSQL stores the unquoted EDTK_INDEX as edtk_index while the shipped
+# configuration keeps the historical upper-case name.
+{
+	my $scan = {
+		tables => {
+			edtk_index => {
+				columns => [
+					{ name => 'ed_idldoc', size => 36,    pk => 1 },
+					{ name => 'ed_seqdoc', size => undef, pk => 2 },
+				],
+			},
+		},
+	};
+	is(
+		oEdtk::DBAdmin::_schema_scan_table( $scan, 'EDTK_INDEX' ),
+		$scan->{tables}{edtk_index},
+		'an upper-case config name finds the lower-case table'
+	);
+	is(
+		oEdtk::DBAdmin::_schema_scan_table( $scan, 'edtk_index' ),
+		$scan->{tables}{edtk_index},
+		'an exact name still finds the table'
+	);
+	is( oEdtk::DBAdmin::_schema_scan_table( $scan, 'EDTK_MISSING' ),
+		undef, 'an absent table is undefined' );
+
+	my $f = oEdtk::DBAdmin::_schema_features( $scan, 'EDTK_INDEX' );
+	is( $f->{idldoc_size}, 36, '_schema_features resolves the table case-insensitively' );
+	is_deeply( $f->{key}, [ 'ed_idldoc', 'ed_seqdoc' ], 'the key is read off the resolved table' );
+}
+
 done_testing();

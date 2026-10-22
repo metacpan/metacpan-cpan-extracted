@@ -1,4 +1,10 @@
 Revision history for Perl-Critic-Distribution
 
+0.002 2026-10-22 TEODESIAN
+    - for_file takes cache, and policy_parameters gives a policy the cache
+      and cache_dir parameters that it passes on.
+    - called_by_perl lists the subs that perl or a framework calls by name.
+    - walk visits a document with the package and the sub of each element.
+
 0.001 2026-10-08 TEODESIAN
     - Initial Release

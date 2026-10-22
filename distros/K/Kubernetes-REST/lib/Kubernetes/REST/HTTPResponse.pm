@@ -1,5 +1,5 @@
 package Kubernetes::REST::HTTPResponse;
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 # ABSTRACT: HTTP response object
 use Moo;
 use Types::Standard qw/Str Int/;
@@ -25,7 +25,7 @@ Kubernetes::REST::HTTPResponse - HTTP response object
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head1 SYNOPSIS
 
@@ -48,7 +48,10 @@ it itself. See L<Kubernetes::REST::Role::IO/Encoding contract>.
 
 =head2 status
 
-The HTTP status code (e.g., 200, 404, 500).
+The HTTP status code (e.g., 200, 404, 500). C<599> is the exception: it is
+not a status of the API server but how an IO backend reports a transport
+failure, with the error message as C<content>. See
+L<Kubernetes::REST::Role::IO/Error contract>.
 
 =head1 SEE ALSO
 

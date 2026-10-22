@@ -204,8 +204,8 @@ static inline void mnh_recover_stale_lock(MnhHandle *h, uint32_t observed_wlock)
         return;
     /* We now hold the write lock as mypid.  No additional shared state needs
      * repair here (this module has no seqlock); just release the lock. */
-    __atomic_store_n(&hdr->wlock, 0, __ATOMIC_RELEASE);
-    if (__atomic_load_n(&hdr->rwait, __ATOMIC_RELAXED) > 0)
+    __atomic_store_n(&hdr->wlock, 0, __ATOMIC_SEQ_CST);
+    if (__atomic_load_n(&hdr->rwait, __ATOMIC_SEQ_CST) > 0)
         syscall(SYS_futex, &hdr->wlock, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
 }
 
@@ -306,7 +306,7 @@ static inline void mnh_recover_after_timeout(MnhHandle *h) {
  * SIGKILLed while parked leaves rwait over-counted -> at most a spurious wake
  * (harmless); it can never under-count, so no wakeup is lost. */
 static inline void mnh_park(MnhHandle *h) {
-    __atomic_add_fetch(&h->hdr->rwait, 1, __ATOMIC_RELAXED);
+    __atomic_add_fetch(&h->hdr->rwait, 1, __ATOMIC_SEQ_CST);
 }
 static inline void mnh_unpark(MnhHandle *h) {
     __atomic_sub_fetch(&h->hdr->rwait, 1, __ATOMIC_RELAXED);
@@ -329,9 +329,9 @@ static inline void mnh_rdepth_inc(MnhHandle *h) {
 static inline void mnh_rdepth_dec(MnhHandle *h) {
     if (h->slotless_held > 0) {
         h->slotless_held--;
-        __atomic_sub_fetch(&h->hdr->slotless_rdepth, 1, __ATOMIC_RELEASE);
+        __atomic_sub_fetch(&h->hdr->slotless_rdepth, 1, __ATOMIC_SEQ_CST);
     } else if (h->my_slot_idx != UINT32_MAX) {
-        __atomic_sub_fetch(&h->reader_slots[h->my_slot_idx].rdepth, 1, __ATOMIC_RELEASE);
+        __atomic_sub_fetch(&h->reader_slots[h->my_slot_idx].rdepth, 1, __ATOMIC_SEQ_CST);
     }
 }
 
@@ -339,7 +339,7 @@ static inline void mnh_rdepth_dec(MnhHandle *h) {
  * after every rdepth decrement so a released read lock lets the writer re-scan
  * promptly instead of waiting out its timeout. */
 static inline void mnh_reader_wake_drain(MnhHandle *h) {
-    if (__atomic_load_n(&h->hdr->wlock, __ATOMIC_ACQUIRE) != 0) {
+    if (__atomic_load_n(&h->hdr->wlock, __ATOMIC_SEQ_CST) != 0) {
         __atomic_add_fetch(&h->hdr->drain_seq, 1, __ATOMIC_RELEASE);
         syscall(SYS_futex, &h->hdr->drain_seq, FUTEX_WAKE, 1, NULL, NULL, 0);
     }
@@ -377,7 +377,7 @@ static inline void mnh_rwlock_rdlock(MnhHandle *h) {
             continue;
         }
         mnh_park(h);
-        cur = __atomic_load_n(&hdr->wlock, __ATOMIC_RELAXED);
+        cur = __atomic_load_n(&hdr->wlock, __ATOMIC_SEQ_CST);
         if (cur != 0) {
             long rc = syscall(SYS_futex, &hdr->wlock, FUTEX_WAIT, cur,
                               &mnh_lock_timeout, NULL, 0);
@@ -422,7 +422,7 @@ static inline void mnh_rwlock_wrlock(MnhHandle *h) {
             continue;
         }
         mnh_park(h);
-        uint32_t cur = __atomic_load_n(&hdr->wlock, __ATOMIC_RELAXED);
+        uint32_t cur = __atomic_load_n(&hdr->wlock, __ATOMIC_SEQ_CST);
         if (cur != 0) {
             long rc = syscall(SYS_futex, &hdr->wlock, FUTEX_WAIT, cur,
                               &mnh_lock_timeout, NULL, 0);
@@ -482,8 +482,9 @@ static inline void mnh_rwlock_wrlock(MnhHandle *h) {
 
 static inline void mnh_rwlock_wrunlock(MnhHandle *h) {
     MnhHeader *hdr = h->hdr;
-    __atomic_store_n(&hdr->wlock, 0, __ATOMIC_RELEASE);
-    if (__atomic_load_n(&hdr->rwait, __ATOMIC_RELAXED) > 0)
+    /* Pair with park + gate re-check so neither side can miss the other. */
+    __atomic_store_n(&hdr->wlock, 0, __ATOMIC_SEQ_CST);
+    if (__atomic_load_n(&hdr->rwait, __ATOMIC_SEQ_CST) > 0)
         syscall(SYS_futex, &hdr->wlock, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
 }
 
@@ -570,7 +571,7 @@ static inline MnhHandle *mnh_setup(void *base, size_t map_size,
 
 /* Validate a mapped header (shared by mnh_create reopen and mnh_open_fd). */
 static inline int mnh_validate_header(const MnhHeader *hdr, uint64_t file_size) {
-    if (hdr->magic != MNH_MAGIC) return 0;
+    if (__atomic_load_n(&hdr->magic, __ATOMIC_ACQUIRE) != MNH_MAGIC) return 0;
     if (hdr->version != MNH_VERSION) return 0;
     if (hdr->k < MNH_MIN_K || hdr->k > MNH_MAX_K) return 0;
     if (hdr->capacity != hdr->k) return 0;
@@ -667,6 +668,30 @@ static MnhHandle *mnh_create(const char *path, uint64_t k, mode_t mode, char *er
             MNH_ERR("%s: file too small (%lld)", path, (long long)st.st_size);
             flock(fd, LOCK_UN); close(fd); return NULL;
         }
+        if (!is_new) {
+            MnhHeader disk_hdr;
+            if (pread(fd, &disk_hdr, sizeof disk_hdr, 0) != (ssize_t)sizeof disk_hdr) {
+                MNH_ERR("invalid MinHash sketch file");
+                flock(fd, LOCK_UN); close(fd); return NULL;
+            }
+            if (!mnh_validate_header(&disk_hdr, (uint64_t)st.st_size)) {
+                /* Inspect holes with pread: mmap faults can SIGBUS on a full tmpfs. */
+                if (disk_hdr.magic == 0 && (uint64_t)st.st_size == total
+                    && st.st_uid == geteuid()) {
+                    if (mnh_file_is_zero(fd, (uint64_t)st.st_size)) is_new = 1;
+                    else {
+                        MNH_ERR("%s: incomplete MinHash sketch file left by an interrupted create; remove it and retry", path);
+                        flock(fd, LOCK_UN); close(fd); return NULL;
+                    }
+                } else {
+                    MNH_ERR("invalid MinHash sketch file");
+                    flock(fd, LOCK_UN); close(fd); return NULL;
+                }
+            } else if (disk_hdr.sealed) {
+                MNH_ERR("%s is frozen (read-only); open it with new_readonly", path);
+                flock(fd, LOCK_UN); close(fd); return NULL;
+            }
+        }
         if (is_new && (st.st_uid != geteuid() || fchmod(fd, mode) < 0)) {
             MNH_ERR("%s: refusing to initialize file not owned by us", path);
             flock(fd, LOCK_UN); close(fd); return NULL;
@@ -687,38 +712,6 @@ static MnhHandle *mnh_create(const char *path, uint64_t k, mode_t mode, char *er
             flock(fd, LOCK_UN); close(fd); return NULL;
         }
         if (!is_new) {
-            if (!mnh_validate_header((MnhHeader *)base, (uint64_t)st.st_size)) {
-                /* Recover an abandoned mid-init file: a creator killed
-                 * between the ftruncate and the header init leaves a
-                 * full-size, all-zero (magic==0) file that would brick every
-                 * future open of this path.  Re-initialize ONLY when it is
-                 * exactly our size, still uninitialized, and owned by us;
-                 * anything else still errors. */
-                if (((MnhHeader *)base)->magic == 0 && (uint64_t)st.st_size == total
-                    && st.st_uid == geteuid() && mnh_file_is_zero(fd, map_size)) {
-                    if (fchmod(fd, mode) < 0) {
-                        MNH_ERR("%s: fchmod: %s", path, strerror(errno));
-                        munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
-                    }
-                    if (mnh_reserve(fd, total) < 0) {
-                        MNH_ERR("%s: cannot reserve %llu bytes: %s", path, (unsigned long long)total, strerror(errno));
-                        munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
-                    }
-                    mnh_init_header(base, k, total);
-                    flock(fd, LOCK_UN); close(fd);
-                    return mnh_setup(base, map_size, path, -1);
-                }
-                if (((MnhHeader *)base)->magic == 0 && (uint64_t)st.st_size == total
-                    && st.st_uid == geteuid()) {
-                    MNH_ERR("%s: incomplete MinHash sketch file left by an interrupted create; remove it and retry", path);
-                    munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
-                }
-                MNH_ERR("invalid MinHash sketch file"); munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
-            }
-            if (((MnhHeader *)base)->sealed) {
-                MNH_ERR("%s is frozen (read-only); open it with new_readonly", path);
-                munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
-            }
             flock(fd, LOCK_UN); close(fd);
             return mnh_setup(base, map_size, path, -1);
         }
@@ -797,7 +790,7 @@ static MnhHandle *mnh_open_readonly(const char *path, char *errbuf) {
     if (!mnh_validate_header((MnhHeader *)base, (uint64_t)st.st_size)) {
         MNH_ERR("%s: invalid MinHash sketch file", path); munmap(base, ms); return NULL;
     }
-    if (!((MnhHeader *)base)->sealed) {
+    if (!__atomic_load_n(&((MnhHeader *)base)->sealed, __ATOMIC_ACQUIRE)) {
         MNH_ERR("%s is not frozen: call ->freeze on the producer before opening read-only", path);
         munmap(base, ms); return NULL;
     }
@@ -840,7 +833,7 @@ static inline int mnh_msync(MnhHandle *h) {
  * mutator croaks and a read-write reopen is refused. */
 static int mnh_freeze(MnhHandle *h) {
     mnh_rwlock_wrlock(h);
-    h->hdr->sealed = 1;
+    __atomic_store_n(&h->hdr->sealed, 1, __ATOMIC_RELEASE);
     mnh_rwlock_wrunlock(h);
     if (h->path || h->backing_fd >= 0) return mnh_msync(h);  /* durability for file/memfd-backed */
     return 0;   /* anonymous: the seal lives in shared memory (visible to forks); nothing to flush */

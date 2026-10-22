@@ -1,5 +1,9 @@
 Revision history for Data::Pool::Shared
 
+0.11  2026-10-16
+    - Dispatch signal handlers safely during blocking allocations.
+    - Release slots when alloc_set or try_alloc_set fails.
+
 0.10      2026-09-26
           - recover_stale frees slots of processes killed mid alloc or free.
           - New file format: recreate files from 0.09 or earlier.

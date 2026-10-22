@@ -1,0 +1,10 @@
+{
+  "volumes": [
+    {
+      "id": 201, "name": "data-1", "status": "available", "size": 10,
+      "server": 101,
+      "location": { "id": 1, "name": "fsn1" },
+      "labels": { "citiai-env": "live" }
+    }
+  ]
+}

@@ -1,3 +1,24 @@
+5.520	  2026-10-21  Dianne Skoll <dianne@skoll.ca>
+
+	* VERSION 5.520 RELEASED
+
+	* MIME::Parser used O(N^2) CPU time and memory parsing a MIME
+	  message nested N levels deep.  A smallish specially-crafted
+	  message could DOS the computer by making it consume enormous
+	  amounts of memory and CPU time.  The parser was modified to use
+	  O(N) time and memory in this case.  Additionally, a new
+	  MIME::Parser::max_depth() function was added to limit the nesting
+	  depth before declaring a parse failure.  Problem was reported to
+	  me by Zhaoyang Li and Xiang Li from AOSP Lab at Nankai University.
+
+	* MIME::Parser would ignore multiple blank lines in a message
+	  when parsing it; this could break DKIM.  Problem pointed out
+	  and fix suggested by Tim Henderson.
+
+	* If a MIME boundary includes trailing whitespace, we mark the
+	  parse as ambiguous.  Problem noted and patch submitted by
+	  Christian Herdtweck
+
 5.519	  2026-09-22  Dianne Skoll <dianne@skoll.ca>
 
 	* VERSION 5.519 RELEASED

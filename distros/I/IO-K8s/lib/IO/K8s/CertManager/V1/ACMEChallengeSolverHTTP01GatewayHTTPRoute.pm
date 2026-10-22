@@ -1,9 +1,9 @@
 package IO::K8s::CertManager::V1::ACMEChallengeSolverHTTP01GatewayHTTPRoute;
 # ABSTRACT: The Gateway API is a sig-network community API that models service networking in Kubernetes (https://gateway-api.sigs.k8s.io/).
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
-k8s labels      => { Str => 1 };
+k8s labels      => HashRef[Str];
 k8s parentRefs  => ['+IO::K8s::CertManager::V1::ParentReference'];
 k8s podTemplate => '+IO::K8s::CertManager::V1::ACMEChallengeSolverHTTP01IngressPodTemplate';
 k8s serviceType => Str;
@@ -26,7 +26,7 @@ IO::K8s::CertManager::V1::ACMEChallengeSolverHTTP01GatewayHTTPRoute - The Gatewa
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 labels
 

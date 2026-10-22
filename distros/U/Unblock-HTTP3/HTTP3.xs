@@ -31,6 +31,7 @@ typedef struct unblock_http3_body {
     int streaming;
     int eof;
     uint64_t discarded_unacked;
+    size_t retained_bytes;
     unblock_http3_body_chunk *head;
     unblock_http3_body_chunk *tail;
     struct unblock_http3_body *next;
@@ -527,7 +528,7 @@ unblock_http3_received_uniform_flags(
     }
 
     if (fin) {
-        flags |= UHTTP_COMPLETE;
+        flags |= UHTTP_COMPLETE | UHTTP_HAS_BUFFERED_BODY;
     } else {
         flags |=
             UHTTP_MUTABLE
@@ -572,6 +573,10 @@ unblock_http3_header_block_uniform_request(
         UHTTP_KIND_REQUEST,
         fin
     );
+    if (fin) {
+        input.body.data = "";
+        input.body.len = 0;
+    }
     input.version.data = "3";
     input.version.len = 1;
     input.method =
@@ -632,6 +637,10 @@ unblock_http3_header_block_uniform_response(
         UHTTP_KIND_RESPONSE,
         fin
     );
+    if (fin) {
+        input.body.data = "";
+        input.body.len = 0;
+    }
     input.version.data = "3";
     input.version.len = 1;
     input.status = status;
@@ -751,6 +760,7 @@ unblock_http3_body_append(
     body->tail = chunk;
 
     if (body->streaming) {
+        body->retained_bytes += (size_t)len;
         native->streaming_retained_bytes += (size_t)len;
     }
 
@@ -784,6 +794,10 @@ unblock_http3_body_discard(
                     croak("HTTP/3 streaming retained-byte accounting underflow");
                 }
 
+                if (body->retained_bytes < retained) {
+                    croak("HTTP/3 per-stream retained-byte accounting underflow");
+                }
+                body->retained_bytes -= retained;
                 native->streaming_retained_bytes -= retained;
             }
         }
@@ -827,6 +841,10 @@ unblock_http3_body_remove(
                         croak("HTTP/3 streaming retained-byte accounting underflow");
                     }
 
+                    if (body->retained_bytes < retained) {
+                        croak("HTTP/3 per-stream retained-byte accounting underflow");
+                    }
+                    body->retained_bytes -= retained;
                     native->streaming_retained_bytes -= retained;
                 }
 
@@ -986,6 +1004,10 @@ unblock_http3_acked_stream_data_cb(
             if (native->streaming_retained_bytes < take) {
                 return NGHTTP3_ERR_CALLBACK_FAILURE;
             }
+            if (body->retained_bytes < take) {
+                return NGHTTP3_ERR_CALLBACK_FAILURE;
+            }
+            body->retained_bytes -= take;
             native->streaming_retained_bytes -= take;
         }
 
@@ -3841,6 +3863,39 @@ add_write_offset(self, stream_id, amount)
         }
 
 void
+block_stream(self, stream_id)
+    SV *self
+    IV stream_id
+    PREINIT:
+        unblock_http3_native_conn *native;
+    CODE:
+        native = unblock_http3_conn_from_sv(self);
+
+        nghttp3_conn_block_stream(
+            native->conn,
+            (int64_t)stream_id
+        );
+
+void
+unblock_stream(self, stream_id)
+    SV *self
+    IV stream_id
+    PREINIT:
+        unblock_http3_native_conn *native;
+        int rv;
+    CODE:
+        native = unblock_http3_conn_from_sv(self);
+
+        rv = nghttp3_conn_unblock_stream(
+            native->conn,
+            (int64_t)stream_id
+        );
+
+        if (rv != 0) {
+            unblock_http3_fail("could not unblock HTTP/3 stream", rv);
+        }
+
+void
 update_ack_offset(self, stream_id, offset)
     SV *self
     IV stream_id
@@ -4544,6 +4599,40 @@ streaming_retained_bytes(self)
     CODE:
         native = unblock_http3_conn_from_sv(self);
         RETVAL = (UV)native->streaming_retained_bytes;
+    OUTPUT:
+        RETVAL
+
+UV
+streaming_retained_bytes_for_stream(self, stream_id)
+    SV *self
+    IV stream_id
+    PREINIT:
+        unblock_http3_native_conn *native;
+        unblock_http3_body *body;
+    CODE:
+        native = unblock_http3_conn_from_sv(self);
+        body = unblock_http3_body_find(native, (int64_t)stream_id);
+        RETVAL = body != NULL && body->streaming
+            ? (UV)body->retained_bytes : 0;
+    OUTPUT:
+        RETVAL
+
+UV
+active_streaming_body_count(self)
+    SV *self
+    PREINIT:
+        unblock_http3_native_conn *native;
+        unblock_http3_body *body;
+        UV count;
+    CODE:
+        native = unblock_http3_conn_from_sv(self);
+        count = 0;
+        for (body = native->bodies; body != NULL; body = body->next) {
+            if (body->streaming && !body->eof) {
+                ++count;
+            }
+        }
+        RETVAL = count;
     OUTPUT:
         RETVAL
 

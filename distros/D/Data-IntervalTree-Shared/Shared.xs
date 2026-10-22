@@ -185,7 +185,7 @@ add(self, lo, hi, id = &PL_sv_undef)
     if (h->hdr->sealed) { it_rwlock_wrunlock(h); croak("Data::IntervalTree::Shared->add: tree is frozen (read-only)"); }
     payload = have_id ? id_val : h->hdr->count;   /* default id = insertion index */
     slot = it_add_locked(h, (int64_t)lo, (int64_t)hi, payload);
-    __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);
+    h->hdr->stat_ops++;   /* protected by the write lock */
     it_rwlock_wrunlock(h);
     if (slot < 0) croak("Data::IntervalTree::Shared->add: tree is full (capacity %u)", (unsigned)h->capacity);
     RETVAL = (UV)slot;
@@ -258,7 +258,7 @@ clear(self)
     it_rwlock_wrlock(h);
     if (h->hdr->sealed) { it_rwlock_wrunlock(h); croak("Data::IntervalTree::Shared->clear: tree is frozen (read-only)"); }
     it_clear_locked(h);
-    __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);
+    h->hdr->stat_ops++;
     it_rwlock_wrunlock(h);
 
 void
@@ -277,7 +277,7 @@ frozen(self)
   PREINIT:
     EXTRACT(self);
   CODE:
-    RETVAL = h->hdr->sealed ? 1 : 0;
+    RETVAL = __atomic_load_n(&h->hdr->sealed, __ATOMIC_ACQUIRE) ? 1 : 0;
   OUTPUT:
     RETVAL
 
@@ -328,6 +328,7 @@ stats(self)
     {
         uint64_t count, ops;
         uint32_t cap, dirty;
+        uint8_t sealed;
         /* Snapshot under the lock; do all (croak-capable) Perl allocation after
            releasing it -- so an OOM in newHV/newSVuv can never strand the lock. */
         if (!h->readonly) it_rwlock_rdlock(h);   /* frozen: immutable, no lock */
@@ -335,6 +336,7 @@ stats(self)
         cap   = h->hdr->capacity;
         dirty = h->hdr->dirty;
         ops   = h->hdr->stat_ops;
+        sealed = __atomic_load_n(&h->hdr->sealed, __ATOMIC_ACQUIRE);
         if (!h->readonly) it_rwlock_rdunlock(h);
         HV *hv = newHV();
         hv_stores(hv, "count",     newSVuv((UV)count));
@@ -342,7 +344,7 @@ stats(self)
         hv_stores(hv, "dirty",     newSVuv((UV)dirty));
         hv_stores(hv, "ops",       newSVuv((UV)ops));
         hv_stores(hv, "mmap_size", newSVuv((UV)h->mmap_size));
-        hv_stores(hv, "frozen",    newSVuv(h->hdr->sealed ? 1 : 0));
+        hv_stores(hv, "frozen",    newSVuv(sealed ? 1 : 0));
         hv_stores(hv, "readonly",  newSVuv(h->readonly ? 1 : 0));
         RETVAL = newRV_noinc((SV *)hv);
     }

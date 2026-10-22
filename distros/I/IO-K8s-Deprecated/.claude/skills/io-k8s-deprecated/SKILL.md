@@ -1,6 +1,6 @@
 ---
 name: io-k8s-deprecated
-description: "IO::K8s::Deprecated -- permanent home for CPAN redirect (tombstone) stub modules covering IO::K8s classes genuinely removed from the IO-K8s distribution's own release history. Covers the PAUSE-takeover mechanism, how to tell a genuine orphan from a soft-deprecated-in-place or restored-for-backcompat class, the audit method, and the procedure for adding a new tombstone."
+description: Use when an IO::K8s class was removed and needs a CPAN tombstone, or when auditing IO-K8s for orphaned module names.
 user-invocable: false
 allowed-tools: Read, Grep, Glob
 model: sonnet
@@ -34,10 +34,10 @@ way a cross-distribution rename would orphan it. Releasing
 than the last `IO-K8s` release that shipped that name takes over the PAUSE
 index entry for it.
 
-## Before drafting a tombstone: rule out the two false starts
+## Before drafting a tombstone: rule out the three false starts
 
-Both of these happened while building this dist -- check for them **before**
-writing a tombstone, not after:
+All of these happened to this dist -- check for them **before** writing a
+tombstone, not after:
 
 1. **Soft-deprecated in place, still shipping.** IO::K8s carried ~76
    `*List` classes (`PodList`, `ServiceList`, ...) as `warn`-on-load stubs
@@ -63,6 +63,21 @@ writing a tombstone, not after:
    CRD", check whether `io-k8s-p5` already has a precedent of keeping the
    old version around, and prefer proposing a restore there over drafting
    a tombstone here.**
+3. **Shipped by `IO-K8s` again.** Release `1.105` tombstoned
+   `Apimachinery::Pkg::Apis::Meta::V1::APIGroupList` and
+   `::APIResourceList` together with the `*List` sweep, because `IO-K8s`
+   had carried them as the same kind of warning stub. They are the
+   `meta.v1` discovery Kinds, not lists of resources, and `IO-K8s` `1.106`
+   shipped both again as real classes. Both dists install the same file
+   path, so installing this one after `IO-K8s` overwrote the working
+   classes with die-stubs. Both tombstones were removed. **A name `IO-K8s`
+   ships -- still or again -- never gets a tombstone, and a tombstone
+   whose name comes back is deleted, not re-versioned.** This one differs
+   from the other two: the tombstone was defensible when drafted and went
+   wrong later, through a release of the other dist. So it is not a
+   one-time check -- `t/02-name-guard.t` compares every package shipped
+   here against the current `IO-K8s` and must run (not skip) before every
+   release.
 
 ## Auditing IO-K8s for orphaned module names
 
@@ -88,7 +103,7 @@ to see whether git detected the change as a rename (confirms the successor
 class) or a straight deletion (confirms no replacement) -- do not guess the
 successor from the file path alone; read the commit message and diff the
 old and new file's `k8s spec => ...` / `api_version` to confirm behavior
-didn't also change silently. Then apply the two false-start checks above
+didn't also change silently. Then apply the false-start checks above
 before concluding a tombstone is actually warranted.
 
 ## Tombstone shapes
@@ -102,7 +117,7 @@ the Cilium case above).
 ### 2. Consolidated -- die pointing at one shared generic replacement
 
 For a batch of old classes replaced by a single generic class. Model:
-the 76 `*List` tombstones, all pointing at `IO::K8s::List`. Because every
+the 74 `*List` tombstones, all pointing at `IO::K8s::List`. Because every
 member of the batch shares the same successor and the same die-message
 shape, generate the tombstone files and the `t/01-tombstones.t` entries
 from a flat list of old names rather than hand-writing each one -- see
@@ -129,11 +144,18 @@ Consequences shared by all three shapes:
   the old name** -- currently `1.100`, hence this dist starting at `1.105`
   -- found via `cpanm --info IO::K8s` or IO-K8s's release git tags (`git
   tag -l --sort=v:refname`; `git ls-tree` the tag to confirm the name was
-  actually there). Since `IO-K8s` will never ship these names again,
+  actually there). A tombstoned name is one `IO-K8s` no longer ships, so
   there's no need to round up generously the way a genuinely
-  contested/still-shipping name would require. If a *future* tombstone
+  contested/still-shipping name would require -- and should `IO-K8s` ship
+  it again, the answer is to delete the tombstone (false start #3), not to
+  out-version it. If a *future* tombstone
   batch targets a name IO-K8s shipped past whatever version this dist has
   reached by then, check that before releasing and bump first if needed.
+- **The `die` is unconditional, at the top level, and starts its line with
+  `die __PACKAGE__`.** `t/02-name-guard.t` recognises an installed copy of
+  a tombstone by exactly that line when it has to tell this dist's stubs
+  apart from `IO-K8s`'s classes in a shared install tree, and it fails for
+  a stub written any other way.
 - **The module does nothing else.** No POD-only doc stub, no re-export, no
   `use base` of the replacement, and critically **no `use
   IO::K8s::APIObject`** -- a tombstone must not register itself as a live
@@ -144,7 +166,7 @@ Model files: `lib/IO/K8s/Api/Core/V1/PodList.pm` (consolidated shape).
 ## Adding a new tombstone (procedure)
 
 1. **Find the old module's last released `$VERSION`** and confirm it's a
-   genuine orphan via the audit method and the two false-start checks
+   genuine orphan via the audit method and the false-start checks
    above.
 2. **Create the stub(s)** at `lib/<Old/Namespace>.pm` (path matches the OLD
    module name). Pick the shape above and model it on the matching
@@ -157,7 +179,9 @@ Model files: `lib/IO/K8s/Api/Core/V1/PodList.pm` (consolidated shape).
    "CURRENT TOMBSTONES", grouped under the right shape heading.
 5. **Update `README.md`'s tombstone summary** to match.
 6. **Add a `Changes` entry** under `{{$NEXT}}`.
-7. **Verify**: `prove -lr t/` green, `dzil build` clean, and confirm the
+7. **Verify**: `prove -lr t/` green with `t/02-name-guard.t` actually run
+   against a current `io-k8s-p5` checkout next to this one (a skip there
+   is not a pass), `dzil build` clean, and confirm the
    dist's current version already exceeds the new tombstone's target
    version (bump before release if not -- normal versioning applies here,
    nothing special to check per-file). Do not `dzil release` without the

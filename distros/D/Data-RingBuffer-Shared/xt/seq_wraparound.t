@@ -15,7 +15,7 @@ plan skip_all => 'AUTHOR_TESTING not set' unless $ENV{AUTHOR_TESTING};
 my $cap = 4;
 my $r = Data::RingBuffer::Shared::Int->new(undef, $cap);
 
-# Write 1M times; head will be 1M, well past the 32-bit boundary
+# Write 1M times to exercise repeated slot reuse.
 for my $i (1..1_000_000) { $r->write($i) }
 
 is $r->count, 1_000_000, 'count tracks 1M writes';
@@ -30,6 +30,21 @@ ok !defined $r->read_seq($r->head + 1), 'read_seq(future) returns undef';
 # latest(0..cap-1) = last cap values written
 for my $n (0..$cap-1) {
     is $r->latest($n), 1_000_000 - $n, "latest($n) = " . (1_000_000 - $n);
+}
+
+{
+    my $r = Data::RingBuffer::Shared::Int->new_memfd('boundary', 4);
+    my $base = 2 ** 32 - 2;
+    open my $fh, '+<&', $r->memfd or die $!;
+    sysseek($fh, 64, 0) // die $!;
+    syswrite($fh, pack('QQ', $base, $base)) == 16 or die $!;
+    close $fh;
+    for my $offset (0..3) {
+        is $r->write(101 + $offset), $base + $offset, 'write sequence crosses the 32-bit boundary';
+    }
+    is_deeply [$r->to_list], [101..104], 'values survive the 32-bit boundary';
+    is $r->count, $base + 4, 'count remains 64-bit';
+    ok !defined $r->read_seq($base - 1), 'older sequence remains out of range';
 }
 
 done_testing;

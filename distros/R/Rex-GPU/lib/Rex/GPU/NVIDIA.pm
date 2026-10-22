@@ -1,7 +1,7 @@
 # ABSTRACT: NVIDIA GPU driver and container toolkit management
 
 package Rex::GPU::NVIDIA;
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 use v5.14.4;
 use warnings;
 
@@ -356,6 +356,9 @@ sub verify_nvidia {
     $ok = 0;
   }
 
+  # Warns only, never changes $ok (karr #79).
+  $class->_warn_old_crun;
+
   unless ($ok) {
     Rex::Logger::info("GPU verification incomplete — some features may not work until reboot", "warn");
   }
@@ -386,6 +389,33 @@ sub verify_nvidia_driver {
   }
 
   return $ok;
+}
+
+# karr #79: a crun older than 1.15 (1.14.1 seen broken live) rejects the OCI
+# spec once the GPU Operator's toolkit makes the crun runtime first ("unknown
+# version specified"): no GPU sandbox starts. Warning only, nothing is changed;
+# no crun on the host => silent. The bound is conservative, only 1.14.1 is
+# known broken. Compared per numeric component (1.9 < 1.15), not as strings.
+sub _warn_old_crun {
+  my ( $class ) = @_;
+  return unless can_run("crun");
+  my $out = run "crun --version 2>&1", auto_die => 0;
+  return unless defined $out && $out =~ /\bcrun version (\d+(?:\.\d+)*)/;
+  my $version = $1;
+  my @have    = split /\./, $version;
+  my @min     = ( 1, 15 );
+  my $older   = 0;
+  for my $i ( 0 .. $#min ) {
+    my $h = $have[$i] // 0;
+    last if $h > $min[$i];
+    if ($h < $min[$i]) { $older = 1; last }
+  }
+  return unless $older;
+  Rex::Logger::info("crun $version found: older than 1.15 (known broken: 1.14.1). "
+    ."With the GPU Operator's NVIDIA toolkit making the crun runtime first, "
+    ."GPU sandboxes fail with 'OCI runtime create failed: unknown version specified'. "
+    ."Update or remove crun, or keep runc as the first runtime. Nothing was changed.", "warn");
+  return;
 }
 
 # The kernel module and nvidia-smi checks both verify_* share; warns per
@@ -950,7 +980,17 @@ sub _write_cdi_spec {
   my ( $class, $device, %opt ) = @_;
   run "mkdir -p /etc/cdi", auto_die => 0 if $opt{mkdir} // 1;
   if ($device eq 'nvidia.com/gpu=all') {
-    run "nvidia-ctk cdi generate --output=/etc/cdi/nvidia.yaml 2>/dev/null", auto_die => 0;
+    my $out = run "nvidia-ctk cdi generate --output=/etc/cdi/nvidia.yaml 2>/dev/null", auto_die => 0;
+    if ($? != 0) {
+      # stderr stays discarded (the emitted command is unchanged): only stdout
+      # and the exit code can be reported.
+      my $code = $? >> 8;
+      $out //= '';
+      $out =~ s/\s+\z//;
+      Rex::Logger::info("  could not generate the CDI spec for $device (nvidia-ctk cdi generate: "
+        . ($out eq '' ? 'failed, exit ' . $code : $out) . ")", "warn");
+      return 0;
+    }
     Rex::Logger::info("  [ok] CDI specs written to /etc/cdi/nvidia.yaml");
     return 1;
   }
@@ -1026,6 +1066,13 @@ sub _reboot_and_wait {
   my ( $class ) = @_;
   Rex::Logger::info("Rebooting host to activate NVIDIA driver (replacing nouveau)...");
 
+  # The identity of the boot we are leaving (karr #78): an answer to `echo ok`
+  # alone can come from the old system still shutting down. Reading it must
+  # never stop the reboot: unreadable -> the old, answer-only behaviour.
+  my $boot_id = _read_boot_id();
+  Rex::Logger::info("  boot_id not readable before reboot, checking only that the host answers")
+    unless length $boot_id;
+
   # Schedule reboot 2 s from now so the run() call can return cleanly
   run "nohup sh -c 'sleep 2 && shutdown -r now' >/dev/null 2>&1 &", auto_die => 0;
 
@@ -1042,7 +1089,9 @@ sub _reboot_and_wait {
       # Verify we can actually run a command: its output, not just that run
       # returned (karr #65); a PTY session answers "ok\r"
       my $test = eval { run "echo ok", auto_die => 0 };
-      if (defined $test && $test =~ /^ok\r?$/m) {
+      # same boot_id = still the old system going down: keep waiting
+      if (defined $test && $test =~ /^ok\r?$/m
+          && ( !length $boot_id || _new_boot_id( $boot_id ) )) {
         Rex::Logger::info("  Host is back online (after ~" . ($i * 5 + 20) . "s)");
         $back = 1;
         last;
@@ -1053,6 +1102,22 @@ sub _reboot_and_wait {
   }
 
   die "Host did not come back after reboot\n" unless $back;
+}
+
+# True only for a readable boot_id that differs from the old one; an
+# unreadable one proves nothing, so the caller keeps waiting.
+sub _new_boot_id {
+  my ( $old ) = @_;
+  my $now = _read_boot_id();
+  return length $now && $now ne $old ? 1 : 0;
+}
+
+# The kernel's per-boot UUID, or '' when it cannot be read (never dies).
+# A plain function: _reboot_and_wait is called as function and as method.
+sub _read_boot_id {
+  my $out = eval { run "cat /proc/sys/kernel/random/boot_id 2>/dev/null", auto_die => 0 };
+  return '' unless defined $out;
+  return $out =~ /^\s*([0-9a-fA-F-]{32,36})\s*$/m ? lc $1 : '';
 }
 
 1;
@@ -1069,7 +1134,7 @@ Rex::GPU::NVIDIA - NVIDIA GPU driver and container toolkit management
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -1839,6 +1904,12 @@ Returns C<1> if all checks pass, C<0> if any check fails. A warning is
 logged for each failure; the function does not die. A partial installation
 (e.g. driver installed but host not yet rebooted) emits a summary warning
 noting that features may not work until reboot.
+
+Also, if C<crun> is on the host and C<crun --version> reports a version
+older than 1.15 (1.14.1 is known broken: GPU sandboxes fail with "unknown
+version specified" once the GPU Operator's toolkit makes crun the first
+runtime), a warning says so. It is advice only: it does not change the
+return value, and nothing is changed on the host. No crun, no output.
 
 =head2 verify_nvidia_driver
 

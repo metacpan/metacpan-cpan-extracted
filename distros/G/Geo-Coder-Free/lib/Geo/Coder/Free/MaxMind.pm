@@ -36,10 +36,10 @@ use Scalar::Util;
 use namespace::clean -except => [qw(_valid_location)];
 
 our %admin1cache;
-our %admin2cache;     # name → region code (e.g. 'Kent' → 'P5')
-our %admin2cache_rev; # region code → name (inverse; avoids O(N) scan in _prepare)
+our %admin2cache;     # name -> region code (e.g. 'Kent' -> 'P5')
+our %admin2cache_rev; # region code -> name (inverse; avoids O(N) scan in _prepare)
 
-# Lazily-initialised Locale singletons — constructing Locale::US / Locale::CA
+# Lazily-initialised Locale singletons - constructing Locale::US / Locale::CA
 # on every geocode call for US/Canadian addresses was the top object-churn
 # hotspot.  These are module-level my-variables (not exported) so they survive
 # across object instances and avoid the construction cost after the first call.
@@ -63,11 +63,11 @@ Geo::Coder::Free::MaxMind - Provides a geocoding functionality using the MaxMind
 
 =head1 VERSION
 
-Version 0.49
+Version 0.51
 
 =cut
 
-our $VERSION = '0.49';
+our $VERSION = '0.51';
 
 =head1 SYNOPSIS
 
@@ -119,6 +119,23 @@ Here's the method to find the location of Sittingbourne, Kent, England:
      gb,sittingbourne,Sittingbourne,G5,41148,51.333333,.75
 
 The admin2.db is far from comprehensive, see Makefile.PL for some entries that are added manually.
+
+Called on an object, it returns a shallow copy with the arguments merged in.
+It croaks if the directory doesn't exist.  Other arguments are passed to
+L<Database::Abstraction>.
+
+=head3 API SPECIFICATION
+
+=head4 input
+
+    # Input schema (Params::Validate::Strict)
+    directory => { type => 'string', optional => 1 }                           # holds databases/; defaults to beside this module
+    cache     => { type => 'object', optional => 1, can => ['get', 'set'] }   # CHI-compatible; defaults to a global memory cache
+
+=head4 output
+
+    # Output schema (Return::Set)
+    { type => 'object', isa => 'Geo::Coder::Free::MaxMind' }
 
 =cut
 
@@ -175,6 +192,18 @@ C<%known_locations> entry - does not increase it.  C<geocode_many()> takes the
 count before and after a value to tell a lookup that cost a read from one that
 was answered from a cache.
 
+=head3 API SPECIFICATION
+
+=head4 input
+
+    # Input schema (Params::Validate::Strict)
+    # none
+
+=head4 output
+
+    # Output schema (Return::Set)
+    { type => 'integer', min => 0 }   # 0 for a new object
+
 =cut
 
 sub reads {
@@ -215,6 +244,24 @@ city name, C<region> when the lookup named only a region or a country - the row
 is then the first match in that region, not a city the caller asked for - and
 C<locality> for a hand-curated C<%known_locations> entry, whose coordinate is a
 town's.
+
+=head3 API SPECIFICATION
+
+=head4 input
+
+    # Input schema (Params::Validate::Strict) - also accepts a hashref or a bare location string
+    location => { type => 'string' }                 # must contain a comma unless region is given
+    region   => { type => 'string', optional => 1 }  # ISO 3166-1 alpha-2 country code hint
+
+=head4 output
+
+    # Output schema (Return::Set)
+    { type => 'object', isa => 'Geo::Location::Point', optional => 1 }   # at most one, in any context
+
+Returns nothing when the location has no comma and no region is given, when it
+is not found, or when it was already remembered as a miss.  It croaks on a
+missing location, on a reference other than a hashref, and on a location that
+fails L<Geo::Location::Predicate>'s rule, such as one made only of digits.
 
 =cut
 
@@ -678,6 +725,26 @@ sub geocode {
     $location = $geocoder->reverse_geocode(latlng => '37.778907,-122.39732');
 
 Returns a string, or undef if it can't be found.
+The nearest place within 0.01 degrees is chosen; in list context every place
+within that distance is returned.  Separate C<lat> and C<lon> (or C<long>) are
+accepted instead of C<latlng>.  It croaks if a coordinate is missing or is not
+a decimal number.
+
+=head3 API SPECIFICATION
+
+=head4 input
+
+    # Input schema (Params::Validate::Strict) - also accepts a hashref or a bare "lat,long" string
+    latlng => { type => 'string', optional => 1 }   # "lat,long"
+    lat    => { type => 'number', optional => 1 }   # with lon or long, when latlng isn't given
+    lon    => { type => 'number', optional => 1 }
+    long   => { type => 'number', optional => 1 }
+
+=head4 output
+
+    # Output schema (Return::Set)
+    # scalar context: { type => 'string', optional => 1 }
+    # list context:   { type => 'arrayref', of => 'string' }
 
 =cut
 
@@ -734,7 +801,7 @@ sub reverse_geocode
 		);
 	}
 
-	# Validate coordinates before interpolating into SQL — prevents injection
+	# Validate coordinates before interpolating into SQL - prevents injection
 	# if a caller passes a non-numeric latlng string.
 	for my $c ($latitude, $longitude) {
 		Carp::croak('Invalid coordinate value for reverse_geocode')
@@ -751,8 +818,8 @@ sub reverse_geocode
 	}
 
 	# Performance: the former code issued 5 sequential SQL queries with ever-
-	# widening radii (0.000001 → 0.01).  Replace with a single query that
-	# orders by Manhattan distance and caps at the maximum radius (0.01°).
+	# widening radii (0.000001 -> 0.01).  Replace with a single query that
+	# orders by Manhattan distance and caps at the maximum radius (0.01 degrees).
 	# This eliminates 4 round-trips to SQLite on the common miss-until-last case.
 	$self->_read();
 	my $rc = $self->{'cities'}->execute(
@@ -773,9 +840,9 @@ sub _prepare {
 	my ($self, $loc) = @_;
 
 	if(my $region = $loc->{'Region'}) {
-		# O(1) reverse lookup — the former O(N) `while each %admin2cache` scan
+		# O(1) reverse lookup - the former O(N) `while each %admin2cache` scan
 		# walked the entire cache comparing values.  %admin2cache_rev is kept in
-		# sync at every write site, giving a constant-time code→name translation.
+		# sync at every write site, giving a constant-time code->name translation.
 		my $county = $admin2cache_rev{$region};
 		if($county) {
 			$loc->{'Region'} = $county;
@@ -806,6 +873,18 @@ sub _prepare {
 =head2	ua
 
 Does nothing, here for compatibility with other geocoders
+
+=head3 API SPECIFICATION
+
+=head4 input
+
+    # Input schema (Params::Validate::Strict)
+    # any arguments are accepted and ignored
+
+=head4 output
+
+    # Output schema (Return::Set)
+    # nothing: an empty list, or undef in scalar context
 
 =cut
 

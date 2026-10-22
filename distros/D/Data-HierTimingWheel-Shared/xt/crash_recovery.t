@@ -9,6 +9,9 @@ use Data::HierTimingWheel::Shared;
 # take the write lock and schedule -- the futex rwlock's dead-owner recovery.
 # The anonymous MAP_SHARED mapping is inherited across fork, so parent and child
 # contend on the one wheel.
+# The child cancels every timer it adds, so occupancy stays flat: keeping half
+# of them left 74k of the 100k pool live here and overflowed it on a faster
+# machine, and the parent's add below then croaked instead of testing recovery.
 my $h = Data::HierTimingWheel::Shared->new(undef, 64, 4, 100_000);
 my $pid = fork // die $!;
 if (!$pid) {
@@ -16,7 +19,7 @@ if (!$pid) {
     for (1 .. 2_000_000) {
         $s = ($s * 1103515245 + 12345) & 0x7fffffff;
         my $id = $h->add(1 + $s % 200000, $s);   # delays spanning several levels
-        $h->cancel($id) if $s % 2;
+        $h->cancel($id);
     }
     exit 0;
 }

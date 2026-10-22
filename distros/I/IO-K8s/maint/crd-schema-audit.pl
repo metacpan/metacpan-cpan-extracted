@@ -316,7 +316,8 @@ sub audit_provider {
 
             my $target = $i->{class} or next;
             my $child = (($p->{type} // '') eq 'array') ? $p->{items}
-                      : $i->{is_hash}                   ? $p->{additionalProperties}
+                      : $i->{is_hash_of_objects}        ?$p->{additionalProperties}
+                      : $i->{is_hash_of_object_arrays}  ? ($p->{additionalProperties} // {})->{items}
                       :                                   $p;
             $walk->($child, $target, "$where.$key");
         }

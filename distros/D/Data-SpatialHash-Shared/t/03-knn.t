@@ -68,4 +68,40 @@ sub d3 { my ($p,$cx,$cy,$cz) = @_; ($p->[0]-$cx)**2 + ($p->[1]-$cy)**2 + ($p->[2
     }
 }
 
+for my $capacity (4, 16) {
+    for my $wrap ([], [10, 10], [10, 10, 10]) {
+        my $mixed = Data::SpatialHash::Shared->new(undef, $capacity, 0, 1.0,
+            @$wrap ? (wrap => $wrap) : ());
+        my $label = 'capacity=' . $capacity . ', wrap=[' . join(',', @$wrap) . ']';
+        $mixed->insert(0.5, 0.5, 1);
+        $mixed->insert(1.5, 0.5, 0.25, 2);
+        $mixed->insert(0.5, 0.5, 1, 3);
+        $mixed->insert(0.5, 0.5, @$wrap == 3 ? 9.75 : -0.25, 4);
+        is_deeply [$mixed->query_knn(0.5, 0.5, 8)], [1, 2],
+            "2D knn returns only the z=0 cell layer ($label)";
+        my @all_layers = $mixed->query_knn(0.5, 0.5, 0, 8);
+        is scalar(@all_layers), 4, "3D knn still includes every layer ($label)";
+        $mixed->remove(0); $mixed->remove(1);
+        is_deeply [$mixed->query_knn(0.5, 0.5, 8)], [],
+            "2D knn returns empty when the z=0 layer is empty ($label)";
+    }
+}
+
+for my $dims (3) {
+    my $sparse = Data::SpatialHash::Shared->new(undef, 64, 0, 1.0);
+    for my $x (0.5, 1000.5, 2000.5) {
+        $sparse->insert($x, 0.5, $dims == 3 ? (0.5, int($x)) : int($x));
+    }
+    is_deeply [$sparse->query_knn(0.5, 0.5, $dims == 3 ? (0.5, 8) : 8)],
+        [0, 1000, 2000], "$dims-D sparse knn finds distant points without exhausting the cell cap";
+}
+
+{
+    my $churn = Data::SpatialHash::Shared->new(undef, 65, 0, 1.0);
+    my @h = map { $churn->insert(1000 + $_, 0, 42) } 0 .. 64;
+    $churn->remove($h[$_]) for 0 .. 63;
+    is_deeply [$churn->query_knn(0, 0, 10)], [42],
+        'knn finds the last entry after most of the pool is removed';
+}
+
 done_testing;

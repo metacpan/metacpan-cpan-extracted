@@ -80,7 +80,7 @@ use MIME::Tools qw(:config :msgs);
 #------------------------------
 
 # The package version, both in 1.23 style *and* usable by MakeMaker:
-$VERSION = "5.519";
+$VERSION = "5.520";
 
 
 #------------------------------
@@ -296,6 +296,11 @@ sub parse_params {
         # Mark parse ambiguous if boundary parameter is encoded
         if ($param eq 'boundary') {
                 if (defined($val) && $val =~ /^=\?.*\?[A-Z]\?.*\?=$/i) {
+                        $params{'@boundary_ambiguous'} = 1;
+                }
+                # multipart_boundary() strips trailing whitespace per RFC 2046,
+                # so a verbatim parser sees a different boundary: mark ambiguous
+                if (defined($val) && $val =~ /\s+\z/) {
                         $params{'@boundary_ambiguous'} = 1;
                 }
         }

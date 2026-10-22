@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 use Time::Keeper;
 use Time::Keeper::Locale;
@@ -23,7 +23,7 @@ Time::Keeper::Natural::Lexicon - a locale's words for a time, compiled to be rea
 
 =head1 VERSION
 
-Version 0.06
+Version 0.07
 
 =head1 SYNOPSIS
 

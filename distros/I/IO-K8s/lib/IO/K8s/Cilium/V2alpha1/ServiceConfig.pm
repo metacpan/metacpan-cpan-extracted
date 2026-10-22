@@ -1,6 +1,6 @@
 package IO::K8s::Cilium::V2alpha1::ServiceConfig;
 # ABSTRACT: Service specifies the configuration for the generated Service.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s allocateLoadBalancerNodePorts  => Bool;
@@ -36,7 +36,7 @@ IO::K8s::Cilium::V2alpha1::ServiceConfig - Service specifies the configuration f
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 allocateLoadBalancerNodePorts
 

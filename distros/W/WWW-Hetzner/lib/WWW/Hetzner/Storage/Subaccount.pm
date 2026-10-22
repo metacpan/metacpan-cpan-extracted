@@ -1,7 +1,7 @@
 package WWW::Hetzner::Storage::Subaccount;
 # ABSTRACT: Hetzner Storage Box Subaccount object
 
-our $VERSION = '0.101';
+our $VERSION = '0.102';
 
 use Moo;
 with 'WWW::Hetzner::Role::HasAction';
@@ -130,7 +130,7 @@ WWW::Hetzner::Storage::Subaccount - Hetzner Storage Box Subaccount object
 
 =head1 VERSION
 
-version 0.101
+version 0.102
 
 =head1 SYNOPSIS
 

@@ -1,6 +1,6 @@
 package IO::K8s::Api::Scheduling::V1alpha3::PodGroupResourceClaimStatus;
 # ABSTRACT: PodGroupResourceClaimStatus is stored in the PodGroupStatus for each PodGroupResourceClaim which references a ResourceClaimTemplate. It stores the generated name for the corresponding ResourceClaim.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s name => Str, 'required';
@@ -23,7 +23,7 @@ IO::K8s::Api::Scheduling::V1alpha3::PodGroupResourceClaimStatus - PodGroupResour
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 name
 

@@ -95,7 +95,21 @@ wait_for(self, expected_count, ...)
   CODE:
     if (items > 2 && (SvGETMAGIC(ST(2)), SvOK(ST(2)))) timeout = SvNV(ST(2));
     REEXTRACT(self);
-    RETVAL = ring_wait(h, expected_count, timeout);
+    if (__atomic_load_n(&h->hdr->count, __ATOMIC_ACQUIRE) != expected_count) {
+        RETVAL = 1;
+    } else if (timeout == 0) {
+        RETVAL = 0;
+    } else {
+        struct timespec dl;
+        if (timeout > 0) ring_make_deadline(timeout, &dl);
+        int result;
+        while ((result = ring_wait_until(h, expected_count, timeout > 0 ? &dl : NULL)) < 0) {
+            if (errno != EINTR) croak("futex wait: %s", strerror(errno));
+            PERL_ASYNC_CHECK();
+            REEXTRACT(self);
+        }
+        RETVAL = result;
+    }
   OUTPUT:
     RETVAL
 

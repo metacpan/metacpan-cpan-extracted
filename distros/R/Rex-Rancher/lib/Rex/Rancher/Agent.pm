@@ -1,7 +1,7 @@
 # ABSTRACT: Rancher Kubernetes agent (worker node) installation
 
 package Rex::Rancher::Agent;
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 use v5.14.4;
 use warnings;
 
@@ -163,7 +163,7 @@ sub _enable_service {
   my $service = $dist->service;
   # Before the start decision, as on the server: this start would render
   # Rex::GPU 0.001's bare containerd template again.
-  $dist->remove_bare_containerd_template;
+  $dist->_remove_bare_template_before_start;
   # k3s: restart, as the install script did before INSTALL_K3S_SKIP_START,
   # so a re-run still picks up a new binary and config.yaml. rke2's
   # installer never started the agent: start, or restart for a stale
@@ -199,7 +199,7 @@ Rex::Rancher::Agent - Rancher Kubernetes agent (worker node) installation
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 

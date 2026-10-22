@@ -1,5 +1,10 @@
 Revision history for Perl module TAP::Harness::Multiple
 
+0.08 Wed Oct 21 09:06:26 AM EDT 2026
+    - No change in functionality
+    - Modernize Makefile.PL and metadata handling
+    - Add GitHub Actions configuration file
+
 0.07 Mon Nov 21 21:35:00 2011
     - Update LICENSE per recommendation of Gerd Pokorra
 

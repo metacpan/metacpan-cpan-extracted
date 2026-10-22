@@ -1,0 +1,43 @@
+{
+   "architecture" : "x86_64-linux-gnu-thread-multi",
+   "controller_os" : "linux",
+   "ignored_inc_hooks" : 0,
+   "mode" : "text-only; no Rex code loaded; literal version scan, not runtime verification",
+   "modules" : [
+      {
+         "found" : false,
+         "module" : "Rex"
+      },
+      {
+         "found" : false,
+         "module" : "Rex::LibSSH"
+      },
+      {
+         "found" : false,
+         "module" : "Net::LibSSH"
+      },
+      {
+         "found" : false,
+         "module" : "Net::SSH2"
+      },
+      {
+         "found" : false,
+         "module" : "Net::OpenSSH"
+      },
+      {
+         "found" : false,
+         "module" : "Net::SFTP::Foreign"
+      },
+      {
+         "found" : false,
+         "module" : "Rex::GPU"
+      },
+      {
+         "found" : false,
+         "module" : "Rex::Rancher"
+      }
+   ],
+   "perl_executable" : "/usr/bin/perl",
+   "perl_version" : "v5.40.1",
+   "schema_version" : 1
+}

@@ -1,9 +1,9 @@
 package IO::K8s::Apimachinery::Pkg::Apis::Meta::V1::ObjectMeta;
 # ABSTRACT: ObjectMeta is metadata that all persisted resources must have, which includes all objects users must create.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
-k8s annotations => { Str => 1 };
+k8s annotations => HashRef[Str];
 
 
 k8s creationTimestamp => Time;
@@ -24,7 +24,7 @@ k8s generateName => Str;
 k8s generation => Int;
 
 
-k8s labels => { Str => 1 };
+k8s labels => HashRef[Str];
 
 
 k8s managedFields => ['Meta::V1::ManagedFieldsEntry'];
@@ -62,7 +62,7 @@ IO::K8s::Apimachinery::Pkg::Apis::Meta::V1::ObjectMeta - ObjectMeta is metadata 
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 annotations
 

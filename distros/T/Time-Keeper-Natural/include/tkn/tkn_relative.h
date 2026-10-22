@@ -429,7 +429,7 @@ tkn_joiner_info(pTHX_ tkn_lexicon *L)
     HV *seen;
     if (L->jinfo)
         return;
-    wre = sv_2mortal(newSVsv(eval_pv("qr/\\w/", TRUE)));
+    wre = sv_2mortal(newSVsv(eval_pv(TKN_RX_WORD, TRUE)));
     scratch = sv_2mortal(newSVpvs(""));
     seen = (HV *)sv_2mortal((SV *)newHV());
     Newxz(L->jword_w, n ? n : 1, char);
@@ -859,7 +859,7 @@ tkn_groups(pTHX_ tkn_lexicon *L, SV *ksv, HV *info, tkn_reader *r, int min_n)
                 if (av_len(m) < 0)
                     continue;
                 if (!best[i] || av_len(best[jj]) + 1 < av_len(best[i])) {
-                    AV *cand = (AV *)sv_2mortal((SV *)av_make(av_len(best[jj]) + 1, AvARRAY(best[jj])));
+                    AV *cand = (AV *)sv_2mortal((SV *)tkn_av_copy(av_len(best[jj]) + 1, AvARRAY(best[jj])));
                     av_push(cand, tkn_group_rv(aTHX_ SvPVX(gs), SvCUR(gs), m));
                     best[i] = cand;
                 }

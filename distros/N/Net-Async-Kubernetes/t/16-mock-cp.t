@@ -51,7 +51,10 @@ subtest 'cp_to_pod streams local bytes via exec stdin' => sub {
         my ($self, $short, $name, %args) = @_;
         $captured = { short => $short, name => $name, %args };
         $session = Test::CP::Session->new;
-        $self->loop->later(sub { $args{on_close}->() if $args{on_close} });
+        $self->loop->later(sub {
+            $args{on_frame}->(3, '{"status":"Success"}');
+            $args{on_close}->() if $args{on_close};
+        });
         return Future->done($session);
     };
 
@@ -115,6 +118,7 @@ subtest 'cp_from_pod collects stdout and writes local file' => sub {
             $args{on_frame}->(1, "abc");
             $args{on_frame}->(1, "def");
             $args{on_frame}->(2, "warn");
+            $args{on_frame}->(3, '{"status":"Success"}');
             $args{on_close}->();
         });
         return Future->done(Test::CP::Session->new);
@@ -137,6 +141,83 @@ subtest 'cp_from_pod collects stdout and writes local file' => sub {
     my $content = <$fh>;
     close $fh;
     is($content, 'abcdef', 'local file content matches stdout stream');
+};
+
+subtest 'cp_to_pod fails when the connection closes without a status' => sub {
+    my $loop = IO::Async::Loop->new;
+    my $kube = make_kube($loop);
+    my $tmp = tempdir(CLEANUP => 1);
+    my $local = File::Spec->catfile($tmp, 'in.txt');
+    open my $fh, '>:raw', $local or die $!;
+    print {$fh} "x";
+    close $fh;
+
+    no warnings 'redefine';
+    local *Net::Async::Kubernetes::exec = sub {
+        my ($self, $short, $name, %args) = @_;
+        $self->loop->later(sub { $args{on_close}->() });
+        return Future->done(Test::CP::Session->new);
+    };
+
+    my $f = $kube->cp_to_pod('Pod', 'nginx', local => $local, remote => '/tmp/out');
+    my $ok = eval { $f->get; 1 };
+    ok(!$ok, 'future failed');
+    like($@, qr/cp_to_pod failed: connection closed without a Success status/, 'clear message');
+};
+
+subtest 'cp_from_pod fails when the connection closes without a status' => sub {
+    my $loop = IO::Async::Loop->new;
+    my $kube = make_kube($loop);
+    my $tmp = tempdir(CLEANUP => 1);
+    my $local = File::Spec->catfile($tmp, 'download.txt');
+
+    no warnings 'redefine';
+    local *Net::Async::Kubernetes::exec = sub {
+        my ($self, $short, $name, %args) = @_;
+        $self->loop->later(sub {
+            $args{on_frame}->(1, "partial");
+            $args{on_close}->();
+        });
+        return Future->done(Test::CP::Session->new);
+    };
+
+    my $f = $kube->cp_from_pod('Pod', 'nginx', remote => '/tmp/src', local => $local);
+    my $ok = eval { $f->get; 1 };
+    ok(!$ok, 'future failed');
+    like($@, qr/cp_from_pod failed: connection closed without a Success status/, 'clear message');
+    ok(!-e $local, 'truncated data not written to the local file');
+};
+
+subtest 'cp_from_pod fails when the local write fails' => sub {
+    my $loop = IO::Async::Loop->new;
+    my $kube = make_kube($loop);
+    my $tmp = tempdir(CLEANUP => 1);
+
+    no warnings 'redefine';
+    local *Net::Async::Kubernetes::exec = sub {
+        my ($self, $short, $name, %args) = @_;
+        $self->loop->later(sub {
+            $args{on_frame}->(1, "abc");
+            $args{on_frame}->(3, '{"status":"Success"}');
+            $args{on_close}->();
+        });
+        return Future->done(Test::CP::Session->new);
+    };
+
+    my $missing = File::Spec->catfile($tmp, 'no-such-dir', 'out.txt');
+    my $f = $kube->cp_from_pod('Pod', 'nginx', remote => '/tmp/src', local => $missing);
+    my $ok = eval { $f->get; 1 };
+    ok(!$ok, 'future failed for a path in a missing directory');
+    like($@, qr/cannot write local file '\Q$missing\E' for cp_from_pod/, 'open error reported');
+
+  SKIP: {
+        skip '/dev/full not available', 2 unless -w '/dev/full';
+        my $f2 = $kube->cp_from_pod('Pod', 'nginx', remote => '/tmp/src', local => '/dev/full');
+        my $ok2 = eval { $f2->get; 1 };
+        ok(!$ok2, 'future failed for a full device');
+        like($@, qr{cannot write local file '/dev/full' for cp_from_pod: .*space}i,
+            'print/close error reported');
+    }
 };
 
 subtest 'cp_from_pod validation' => sub {

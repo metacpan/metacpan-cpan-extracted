@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::NodeAllocatableResourceClaimStatus;
 # ABSTRACT: NodeAllocatableResourceClaimStatus tracks the status of node-allocatable resources allocated to a ResourceClaim for a Pod.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s containers => [Str], 'required';
@@ -32,7 +32,7 @@ IO::K8s::Api::Core::V1::NodeAllocatableResourceClaimStatus - NodeAllocatableReso
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 containers
 

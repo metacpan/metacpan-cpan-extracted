@@ -410,8 +410,11 @@ unlink(self, ...)
   CODE:
     if (sv_isobject(self) && sv_derived_from(self, "Data::SegmentTree::Shared")) {
         StHandle *h = INT2PTR(StHandle*, SvIV(SvRV(self)));
-        if (h && h->path && unlink(h->path) != 0 && errno != ENOENT)
-            croak("Data::SegmentTree::Shared->unlink(%s): %s", h->path, strerror(errno));
+        if (h && h->path) {
+            const char *up = h->unlink_path ? h->unlink_path : h->path;
+            if (unlink(up) != 0 && errno != ENOENT)
+                croak("Data::SegmentTree::Shared->unlink(%s): %s", h->path, strerror(errno));
+        }
     } else if (items >= 2 && (SvGETMAGIC(ST(1)), SvOK(ST(1)))) {
         {
             const char *up = SvPV_nolen(ST(1));

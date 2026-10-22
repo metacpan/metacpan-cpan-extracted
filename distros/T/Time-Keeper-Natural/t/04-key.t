@@ -17,6 +17,8 @@ use Time::Keeper::Natural::Lexicon;
 # spaces, with invisible marks, with curly apostrophes) in twelve locales,
 # or in all of them under AUTHOR_TESTING or RELEASE_TESTING (1.9 million
 # strings, 15 seconds).
+# U+180E MONGOLIAN VOWEL SEPARATOR is no space since Unicode 6.3, though
+# [\s\p{Zs}] on perls before 5.18 still takes it; the C keeps it in the word.
 # What 0.01 kept in the lexicon's hash, rebuilt from the locale's data.
 my %STATE;
 sub state_of {
@@ -38,7 +40,7 @@ sub ref_normalise {
         $s = Unicode::Normalize::NFC($s);
         $s =~ tr/\x{2018}\x{2019}\x{02bc}/'''/;
         $s =~ s/[\x{200b}-\x{200f}\x{feff}\x{061c}]//g;
-        $s =~ s/[\s\p{Zs}]+/ /g;
+        $s =~ s/(?:(?!\x{180e})[\s\p{Zs}])+/ /g;
     }
     else {
         $s =~ s/\s+/ /g;

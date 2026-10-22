@@ -1,6 +1,6 @@
 package IO::K8s::PrometheusOperator::V1::AlertmanagerEndpoints;
 # ABSTRACT: AlertmanagerEndpoints defines a selection of a single Endpoints object containing Alertmanager IPs to fire alerts against.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s alertRelabelings     => ['+IO::K8s::PrometheusOperator::V1::RelabelConfig'];
@@ -14,7 +14,7 @@ k8s namespace            => Str;
 k8s noProxy              => Str;
 k8s pathPrefix           => Str;
 k8s port                 => IntOrStr, { required => 'schema' };
-k8s proxyConnectHeader   => Opaque;
+k8s proxyConnectHeader   => HashRef[ArrayRef[InstanceOf['IO::K8s::Api::Core::V1::SecretKeySelector']]];
 k8s proxyFromEnvironment => Bool;
 k8s proxyUrl             => Str, { pattern => qr/^(http|https|socks5):\/\/.+$/ };
 k8s relabelings          => ['+IO::K8s::PrometheusOperator::V1::RelabelConfig'];
@@ -56,7 +56,7 @@ IO::K8s::PrometheusOperator::V1::AlertmanagerEndpoints - AlertmanagerEndpoints d
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 alertRelabelings
 

@@ -1,6 +1,6 @@
 package IO::K8s::Cilium::V2::ENI;
 # ABSTRACT: ENI represents an AWS Elastic Network Interface More details: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-eni.html
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s addresses           => [Str];
@@ -15,7 +15,7 @@ k8s prefixes            => [Str];
 k8s 'public-ip'         => Str;
 k8s 'security-groups'   => [Str];
 k8s subnet              => '+IO::K8s::Cilium::V2::AwsSubnet';
-k8s tags                => { Str => 1 };
+k8s tags                => HashRef[Str];
 k8s vpc                 => '+IO::K8s::Cilium::V2::AwsVPC';
 
 
@@ -46,7 +46,7 @@ IO::K8s::Cilium::V2::ENI - ENI represents an AWS Elastic Network Interface More 
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 addresses
 

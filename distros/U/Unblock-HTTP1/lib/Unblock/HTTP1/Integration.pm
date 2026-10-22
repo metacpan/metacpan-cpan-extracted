@@ -3,7 +3,7 @@ package Unblock::HTTP1::Integration;
 use strict;
 use warnings;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 1;
 
@@ -276,6 +276,26 @@ A false write()/end() return indicates congestion, not rejected bytes.
 Callbacks may defer their work. Errors thrown by HTTP callbacks are handled
 as connection/protocol failures; do not expect a callback's return value to
 mean that the framework socket sent bytes.
+
+=head1 INCOMING BODY MODES AND TERMINAL CALLBACKS
+
+Incoming bodies stream by default. An integration may configure a Client or
+Server with C<receive_body =E<gt> 'buffered'> to collect decoded incoming
+body bytes on the canonical Uniform::HTTP message. Buffered reception has a
+C<max_buffered_body_bytes> limit, defaulting to 64 MiB.
+
+For a particular Transaction, register C<$tx-E<gt>on_data(sub { ... })> during
+the incoming-header callback to receive decoded fragments without retaining
+the entire body. Client C<request()> may also take C<on_data> directly.
+Do not combine C<on_data> with C<on_body> on the same Transaction.
+
+C<$tx-E<gt>on_finish(sub { ... })> runs exactly once when the Transaction
+becomes complete, cancelled, or errored, after the corresponding normal
+completion/error callbacks. Client C<request()> also accepts C<on_finish>.
+For an attached server, successful completion waits until the framework
+has accepted the outgoing HTTP bytes, not until the network has delivered
+them. Consult L<Unblock::HTTP1::Transaction> for callback ordering and
+registration rules.
 
 =head1 UPGRADE AND CONNECT
 

@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1::OnboardbaseProvider;
 # ABSTRACT: Onboardbase configures this store to sync secrets using the Onboardbase provider
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s apiHost     => Str, { required => 'schema', default => 'https://public.onboardbase.com/api/v1/' };
@@ -26,7 +26,7 @@ IO::K8s::ExternalSecrets::V1::OnboardbaseProvider - Onboardbase configures this 
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 apiHost
 

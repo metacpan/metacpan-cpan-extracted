@@ -18,10 +18,23 @@ my $bin  = tempdir(CLEANUP => 1);
 open my $fh, '>', "$bin/child.pl" or die $!;
 print {$fh} <<'P';
 use strict; use warnings;
+use Errno qw(ENOSPC);
 use Data::MinHash::Shared;
 my ($mnt, @args) = @ARGV;
+if ($args[0] eq 'recover') {
+    shift @args;
+    my $size = Data::MinHash::Shared->new(undef, $args[0])->stats->{mmap_size};
+    open my $empty, '>', "$mnt/x.shm" or die $!;
+    truncate $empty, $size or die $!;
+    close $empty or die $!;
+    open my $fill, '>', "$mnt/fill" or die $!;
+    while (defined syswrite($fill, "\0" x 4096)) {}
+    die "filling tmpfs: $!" unless $! == ENOSPC;
+    close $fill;
+}
 my $h = eval { Data::MinHash::Shared->new("$mnt/x.shm", @args) };
 print $h ? "created\n" : "refused: $@";
+print "size: ", -s "$mnt/x.shm", "\n";
 P
 close $fh;
 
@@ -39,7 +52,13 @@ like $out, qr/^created/, '  and it is created';
 ($sig, $out) = on_small_tmpfs('', 1 << 20);
 is $sig, 0, 'a segment the filesystem cannot hold does not kill the process';
 like $out, qr/^refused: .*No space left on device/, '  it is refused with the reason';
+like $out, qr/^size: 0$/m, '  a failed reservation leaves an empty file';
 diag $out unless $out =~ /^refused/;
+
+($sig, $out) = on_small_tmpfs('', 'recover', 256);
+is $sig, 0, 'recovery on a completely full tmpfs does not kill the process';
+like $out, qr/^refused: .*No space left on device/, '  recovery fails with the reservation error';
+like $out, qr/^size: 0$/m, '  failed recovery can be retried after freeing space';
 
 # Creation writes every page, so without the reservation the full filesystem faults there.
 ($sig, $out) = on_small_tmpfs('DATA_MINHASH_SHARED_SPARSE=1', 1 << 20);

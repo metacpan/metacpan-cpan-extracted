@@ -1,0 +1,43 @@
+{
+  "servers": [
+    {
+      "id": 123456,
+      "name": "omnicorp-cop",
+      "status": "running",
+      "server_type": {
+        "id": 1,
+        "name": "cx23",
+        "description": "CX23"
+      },
+      "location": {
+        "id": 1,
+        "name": "fsn1",
+        "description": "Falkenstein DC Park 1",
+        "country": "DE",
+        "city": "Falkenstein",
+        "latitude": 50.47612,
+        "longitude": 12.370071,
+        "network_zone": "eu-central",
+        "deprecation": null
+      },
+      "image": {
+        "id": 1,
+        "name": "debian-13",
+        "description": "Debian 13"
+      },
+      "public_net": {
+        "ipv4": {
+          "ip": "203.0.113.10"
+        },
+        "ipv6": {
+          "ip": "2001:db8::1/64"
+        }
+      },
+      "labels": {
+        "ocp-cluster": "omnicorp",
+        "ocp-role": "control-plane"
+      },
+      "created": "2025-01-05T12:00:00+00:00"
+    }
+  ]
+}

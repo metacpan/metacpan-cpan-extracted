@@ -1,5 +1,11 @@
 Revision history for File-SOPS
 
+0.005     2026-10-21 18:35:30Z
+  - Crypt::Age is raised to 0.005, the release whose header parser no longer
+    overwrites the caller's $_; with 0.004 a decrypt inside for (@files)
+    rewrote the list. A test holds the guarantee for decrypt, decrypt_file and
+    extract. (k203)
+
 0.004     2026-09-20 15:52:56Z
   - SECURITY: fixes CVE-2026-85783, an unbounded age-header stanza count that
     let a single document force expensive work per decrypt attempt. Crypt::Age

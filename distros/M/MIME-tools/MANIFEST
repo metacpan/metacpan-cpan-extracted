@@ -54,10 +54,12 @@ t/02-pod.t
 t/99-prepare.t
 t/ambiguous-parse.t
 t/attachment-filename-encoding.t
+t/blank-lines-in-preamble.t
 t/Body.t
 t/BodyPrint.t
 t/concatenated-base64.t
 t/Decoder.t
+t/deeply-nested.t
 t/EmptyPart.t
 t/Entity.t
 t/Filer.t
@@ -152,6 +154,7 @@ testmsgs/bluedot-postcard.ref
 testmsgs/bluedot-simple.msg
 testmsgs/bluedot-simple.ref
 testmsgs/concatenated-base64.msg
+testmsgs/deeply-nested.msg
 testmsgs/double-boundary-with-comment.msg
 testmsgs/double-boundary.msg
 testmsgs/double-content-disposition-param.msg
@@ -208,6 +211,7 @@ testmsgs/russian.ref
 testmsgs/simple.msg
 testmsgs/simple.ref
 testmsgs/ticket-60931.msg
+testmsgs/trailing-space-boundary.msg
 testmsgs/triple-boundary-one-empty.msg
 testmsgs/unusual-space-in-boundary.msg
 testmsgs/utf8-bom-at-start.msg

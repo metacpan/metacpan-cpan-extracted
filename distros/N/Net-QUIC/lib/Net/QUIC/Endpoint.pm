@@ -9,7 +9,7 @@ use Net::QUIC ();
 use Net::QUIC::Connection ();
 use Net::QUIC::Datagram ();
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 sub _transport_config {
     my ($class, $value) = @_;
@@ -674,6 +674,16 @@ C<connection_window> is the starting receive allowance for the whole
 connection.
 
 C<stream_window> is the starting receive allowance for each Stream.
+
+If an application holds received bytes without consuming them on several
+Streams, size C<connection_window> for the total held data plus enough
+headroom for Streams that are still consuming. The QUIC library can
+coalesce MAX_DATA updates until a meaningful portion of the connection
+receive allowance has been returned. A window barely covering all held
+Streams can therefore prevent an otherwise active Stream from making
+progress. This is receiver-side flow control, not the transmit
+C<send_buffer_limit>, and Net::QUIC does not silently increase the
+application's selected receive allowance.
 
 C<max_bidi_streams> and C<max_uni_streams> are the initial numbers of
 peer-created streams that may exist at once.

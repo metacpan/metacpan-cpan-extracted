@@ -1,6 +1,6 @@
 package IO::K8s::Cilium::V2alpha1::HTTPOptions;
 # ABSTRACT: HTTPOptions specifies HTTP connection manager options.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s grpcWebTranslation => '+IO::K8s::Cilium::V2alpha1::GRPCWebTranslationConfig';
@@ -20,7 +20,7 @@ IO::K8s::Cilium::V2alpha1::HTTPOptions - HTTPOptions specifies HTTP connection m
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 grpcWebTranslation
 

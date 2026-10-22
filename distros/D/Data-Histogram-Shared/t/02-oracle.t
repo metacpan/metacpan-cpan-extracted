@@ -90,4 +90,20 @@ $h->record($_) for 1 .. $N;
         sprintf("mean %.2f ~ %.1f within 0.1%% (err %.4f%%)", $mean, $true, abs($mean - $true) / $true * 100);
 }
 
+for my $n (25, 100, 125, 250, 375, 1000) {
+    my $g = Data::Histogram::Shared->new(undef, 1, 1000, 3);
+    $g->record_many([1 .. $n]);
+    my $bad = 0;
+    for my $tenths (0 .. 1000) {
+        my $want = int(($tenths * $n + 999) / 1000);
+        $want = 1 if $want < 1;
+        my $got = $g->percentile($tenths / 10);
+        if ($got != $want) {
+            diag "n=$n p=" . ($tenths / 10) . ": got $got, expected $want" unless $bad;
+            $bad++;
+        }
+    }
+    is $bad, 0, "nearest ranks for integer and decimal percentiles (n=$n)";
+}
+
 done_testing;

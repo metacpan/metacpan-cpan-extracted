@@ -1,6 +1,6 @@
 package Net::Async::Kubernetes::Controller;
 # ABSTRACT: Minimal controller runtime for Net::Async::Kubernetes
-our $VERSION = '0.009';
+our $VERSION = '0.011';
 use strict;
 use warnings;
 use parent 'IO::Async::Notifier';
@@ -110,7 +110,12 @@ sub stop {
     # counts.
     $self->{queue} = [];
     for my $entry (values %{ $self->{entries} || {} }) {
-        delete $entry->{retry_future};
+        # Cancel, not just forget: a timer left running would re-queue the
+        # pre-stop ctx after a quick restart, reconciling an object that may
+        # be gone and for which no event arrived.
+        if (my $retry = delete $entry->{retry_future}) {
+            $retry->cancel;
+        }
         $entry->{queued} = 0;
         $entry->{dirty} = 0;
     }
@@ -283,6 +288,14 @@ sub _schedule_retry {
         return if $self->{stopped};
         delete $entry->{retry_future};
         return if $entry->{active} || $entry->{queued};
+        # The retry reuses the ctx of the failed run, so the attempt number
+        # has to move on here; only a fresh event rebuilds it otherwise.
+        if (my $old = $entry->{ctx}) {
+            my $ctx = { %$old, attempt => ($entry->{failures} // 0) + 1 };
+            weaken($ctx->{kube});
+            weaken($ctx->{controller});
+            $entry->{ctx} = $ctx;
+        }
         $entry->{queued} = 1;
         push @{ $self->{queue} }, $key;
         $self->_schedule_drain;
@@ -318,9 +331,10 @@ sub _key_for {
     my $name = $meta ? $meta->name : undef;
     my $namespace = $meta ? $meta->namespace : undef;
 
-    return defined($namespace) && length($namespace)
+    my $id = defined($namespace) && length($namespace)
         ? "$namespace/$name"
         : $name;
+    return "$spec->{resource}:$id";
 }
 
 sub get_object {
@@ -403,7 +417,7 @@ Net::Async::Kubernetes::Controller - Minimal controller runtime for Net::Async::
 
 =head1 VERSION
 
-version 0.009
+version 0.011
 
 =head1 SYNOPSIS
 
@@ -566,7 +580,30 @@ was retrying picks up at its next attempt number rather than at attempt 1.
 Registers a watched resource and returns the watcher instance once started.
 An odd list of parameters croaks, as C<Invalid arguments to
 watch_resource()>, before anything is registered. Repeated events for the
-same reconcile key are coalesced into a single queued entry. A key's entry is
+same reconcile key are coalesced into a single queued entry.
+
+The default reconcile key is C<Resource:namespace/name>
+(C<Resource:name> for a cluster-scoped object), with C<Resource> the name the
+resource was registered under, e.g. C<Pod:default/web>. Objects of different
+watched resources that share a namespace and name, such as
+C<ConfigMap default/web> and C<Service default/web>, are therefore reconciled
+on their own, each with its own event in the context.
+
+To coalesce them instead -- the controller-runtime pattern of mapping a
+secondary resource onto the key of its primary one, with a reconcile that
+re-reads the state it needs -- set C<key_for>, which is called as
+C<< $key_for->($object, $spec) >> with C<< $spec->{resource} >> naming the
+watched resource, and return the shared key:
+
+    key_for => sub {
+        my ($object, $spec) = @_;
+        return $object->metadata->namespace.'/'.$object->metadata->name;
+    },
+
+The context of a coalesced key carries only the last event (C<resource>,
+C<event_type> and C<object>).
+
+A key's entry is
 dropped once it reconciles cleanly, so the queue does not grow with the
 number of objects seen; a key that is still queued, dirty or retrying keeps
 its entry, and with it its C<attempt> count.

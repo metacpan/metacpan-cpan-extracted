@@ -1,5 +1,5 @@
 This archive contains the distribution Perl-Critic-Distribution,
-version 0.001:
+version 0.002:
 
   Parse a distribution once, for every policy that needs all of it.
 

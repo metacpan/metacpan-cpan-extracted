@@ -8,7 +8,7 @@ use MooX::Options;
 use WWW::Hetzner::Cloud;
 use WWW::Hetzner::Storage;
 
-our $VERSION = '0.101';
+our $VERSION = '0.102';
 
 
 option token => (
@@ -81,6 +81,7 @@ sub execute {
     print "  location         List locations\n";
     print "  datacenter       List datacenters\n";
     print "  pricing          Show the current price list\n";
+    print "  costs            Show the current running cost of the project\n";
     print "\nExamples:\n";
     print "  hcloud.pl server list\n";
     print "  hcloud.pl -t mytoken server list\n";
@@ -108,7 +109,7 @@ WWW::Hetzner::CLI - Hetzner Cloud CLI
 
 =head1 VERSION
 
-version 0.101
+version 0.102
 
 =head1 SYNOPSIS
 
@@ -199,6 +200,8 @@ options, and output should match the original tool as closely as possible.
 =item * L<datacenter|WWW::Hetzner::CLI::Cmd::Datacenter> - List datacenters
 
 =item * L<pricing|WWW::Hetzner::CLI::Cmd::Pricing> - Show the current price list
+
+=item * L<costs|WWW::Hetzner::CLI::Cmd::Costs> - Show the current running cost of the project
 
 =back
 

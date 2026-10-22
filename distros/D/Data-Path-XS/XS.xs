@@ -39,8 +39,9 @@ typedef struct {
     const char *str;
     STRLEN len;
     IV idx;             /* Pre-parsed array index (valid only if is_numeric) */
-    int is_numeric;     /* 1 if component is a valid array index, 0 for hash key */
-    int next_is_array;  /* 1 if next component is numeric (create array), 0 for hash */
+    U32 hash;
+    U8 is_numeric;      /* 1 if component is a valid array index, 0 for hash key */
+    U8 next_is_array;   /* 1 if next component is numeric (create array), 0 for hash */
 } PathComponent;
 
 /* Compiled path object - flexible array member for cache locality */
@@ -104,6 +105,79 @@ PERL_STATIC_INLINE I32 sv_to_klen(pTHX_ SV *sv, const char **kstr_out) {
     return SvUTF8(sv) ? -(I32)klen : (I32)klen;
 }
 
+/* Snapshot magical values once; plain values need no copy. */
+PERL_STATIC_INLINE SV *path_value(pTHX_ SV *sv) {
+    return UNLIKELY(SvGMAGICAL(sv)) ? sv_2mortal(newSVsv(sv)) : sv;
+}
+
+PERL_STATIC_INLINE SV *path_fetch(pTHX_ SV **svp) {
+    return svp && *svp ? path_value(aTHX_ *svp) : NULL;
+}
+
+PERL_STATIC_INLINE SV *path_fetch_retained(pTHX_ SV **svp, const char *path) {
+    if (svp && *svp && SvPOK(*svp) && SvPVX(*svp) == path)
+        sv_2mortal(SvREFCNT_inc(*svp));
+    return path_fetch(aTHX_ svp);
+}
+
+PERL_STATIC_INLINE SV *path_container(pTHX_ SV *sv) {
+    if (LIKELY((SvFLAGS(sv) & (SVf_ROK | SVs_GMG)) == SVf_ROK)) return sv;
+    sv = path_value(aTHX_ sv);
+    return SvROK(sv) ? sv : NULL;
+}
+
+PERL_STATIC_INLINE SV *compiled_fetch(pTHX_ HV *hv, const PathComponent *c, I32 utf8_flag) {
+    return path_fetch(aTHX_ (SV**)hv_common_key_len(hv, c->str,
+        (I32)c->len * utf8_flag, HV_FETCH_JUST_SV, NULL, c->hash));
+}
+
+PERL_STATIC_INLINE SV *path_source(pTHX_ SV *sv) {
+    sv = path_value(aTHX_ sv);
+    return sv_2mortal(SvWEAKREF(sv) ? newSVsv(sv) : SvREFCNT_inc(sv));
+}
+
+PERL_STATIC_INLINE SV *path_store_hash(pTHX_ HV *hv, const char *key, I32 len,
+                                     U32 hash, SV *value, const char *api) {
+    if (UNLIKELY(SvRMAGICAL((SV*)hv)))
+        croak("Cannot %s on tied/magical hash", api);
+    SV **slot = (SV**)hv_common_key_len(hv, key, len,
+        HV_FETCH_JUST_SV | HV_FETCH_LVALUE, NULL, hash);
+    if (UNLIKELY(!slot || !*slot)) croak("Failed to store value");
+    SV *target = *slot;
+    if (UNLIKELY(SvMAGICAL(target))) {
+        SV *copy = sv_2mortal(newSVsv(value));
+        if (!hv_store(hv, key, len, copy, hash)) croak("Failed to store value");
+        SvREFCNT_inc_simple_void_NN(copy);
+        return copy;
+    }
+    if (SvROK(target) && SvROK(value) && SvRV(target) == SvRV(value)
+        && !SvWEAKREF(target) && !SvREADONLY(target) && !SvMAGICAL(value))
+        return target;
+    sv_setsv_nomg(target, value);
+    return target;
+}
+
+PERL_STATIC_INLINE SV *path_store_array(pTHX_ AV *av, IV idx, SV *value, const char *api) {
+    if (UNLIKELY(SvRMAGICAL((SV*)av)))
+        croak("Cannot %s on tied/magical array", api);
+    if (UNLIKELY(SvREADONLY((SV*)av)))
+        croak("Modification of a read-only value attempted");
+    SV **slot = av_fetch(av, idx, 1);
+    if (UNLIKELY(!slot || !*slot)) croak("Failed to store value");
+    SV *target = *slot;
+    if (UNLIKELY(SvMAGICAL(target))) {
+        SV *copy = sv_2mortal(newSVsv(value));
+        if (!av_store(av, idx, copy)) croak("Failed to store value");
+        SvREFCNT_inc_simple_void_NN(copy);
+        return copy;
+    }
+    if (SvROK(target) && SvROK(value) && SvRV(target) == SvRV(value)
+        && !SvWEAKREF(target) && !SvREADONLY(target) && !SvMAGICAL(value))
+        return target;
+    sv_setsv_nomg(target, value);
+    return target;
+}
+
 /* True iff p..end (after slash-skipping) has no further non-empty components. */
 PERL_STATIC_INLINE int kw_at_last_component(const char *p, const char *end) {
     while (p < end && *p == '/') p++;
@@ -112,7 +186,8 @@ PERL_STATIC_INLINE int kw_at_last_component(const char *p, const char *end) {
 
 /* Fast SV to index - check IOK first, accept negative for Perl-style access */
 PERL_STATIC_INLINE int sv_to_index(pTHX_ SV *sv, IV *idx) {
-    if (SvIOK(sv)) {
+    sv = path_value(aTHX_ sv);
+    if (SvIOK(sv) && !SvPOK(sv)) {
         *idx = SvIVX(sv);
         return 1;
     }
@@ -128,7 +203,7 @@ PERL_STATIC_INLINE SV* navigate_to_parent(pTHX_ SV *data, const char *path, STRL
                               int create, I32 utf8_flag) {
     const char *p = path;
     const char *end = path + path_len;
-    SV *current = data;
+    SV *current = path_value(aTHX_ data);
 
     if (UNLIKELY(path_len == 0)) {
         *final_key_ptr = NULL;
@@ -172,8 +247,8 @@ PERL_STATIC_INLINE SV* navigate_to_parent(pTHX_ SV *data, const char *path, STRL
 
         if (LIKELY(t == SVt_PVHV)) {
             HV *hv = (HV*)inner;
-            SV **val = hv_fetch(hv, tok_start, (I32)tok_len * utf8_flag, 0);
-            if (UNLIKELY(!val || !*val || !SvROK(*val))) {
+            SV *val = path_fetch_retained(aTHX_ hv_fetch(hv, tok_start, (I32)tok_len * utf8_flag, 0), path);
+            if (UNLIKELY(!val || !SvROK(val))) {
                 if (create) {
                     /* Tied/magical containers can't autovivify — hv_store
                      * returns NULL without invoking STORE. Croak with a
@@ -185,21 +260,21 @@ PERL_STATIC_INLINE SV* navigate_to_parent(pTHX_ SV *data, const char *path, STRL
                     const char *next_end = check;
                     while (next_end < end && *next_end != '/') next_end++;
                     IV dummy;
-                    SV *new_ref = is_array_index(check, next_end - check, &dummy)
+                    SV *new_ref = sv_2mortal(is_array_index(check, next_end - check, &dummy)
                         ? newRV_noinc((SV*)newAV())
-                        : newRV_noinc((SV*)newHV());
+                        : newRV_noinc((SV*)newHV()));
                     if (UNLIKELY(!hv_store(hv, tok_start, (I32)tok_len * utf8_flag, new_ref, 0))) {
-                        SvREFCNT_dec(new_ref);
                         *final_key_ptr = NULL;
                         return NULL;
                     }
+                    SvREFCNT_inc_simple_void_NN(new_ref);
                     current = new_ref;
                 } else {
                     *final_key_ptr = NULL;
                     return NULL;
                 }
             } else {
-                current = *val;
+                current = val;
             }
         } else if (t == SVt_PVAV) {
             IV idx;
@@ -207,8 +282,8 @@ PERL_STATIC_INLINE SV* navigate_to_parent(pTHX_ SV *data, const char *path, STRL
                 *final_key_ptr = NULL;
                 return NULL;
             }
-            SV **val = av_fetch((AV*)inner, idx, 0);
-            if (UNLIKELY(!val || !*val || !SvROK(*val))) {
+            SV *val = path_fetch_retained(aTHX_ av_fetch((AV*)inner, idx, 0), path);
+            if (UNLIKELY(!val || !SvROK(val))) {
                 if (create) {
                     if (UNLIKELY(SvRMAGICAL((SV*)inner))) {
                         croak("Cannot path_set on tied/magical array");
@@ -216,21 +291,21 @@ PERL_STATIC_INLINE SV* navigate_to_parent(pTHX_ SV *data, const char *path, STRL
                     const char *next_end = check;
                     while (next_end < end && *next_end != '/') next_end++;
                     IV dummy;
-                    SV *new_ref = is_array_index(check, next_end - check, &dummy)
+                    SV *new_ref = sv_2mortal(is_array_index(check, next_end - check, &dummy)
                         ? newRV_noinc((SV*)newAV())
-                        : newRV_noinc((SV*)newHV());
+                        : newRV_noinc((SV*)newHV()));
                     if (UNLIKELY(!av_store((AV*)inner, idx, new_ref))) {
-                        SvREFCNT_dec(new_ref);
                         *final_key_ptr = NULL;
                         return NULL;
                     }
+                    SvREFCNT_inc_simple_void_NN(new_ref);
                     current = new_ref;
                 } else {
                     *final_key_ptr = NULL;
                     return NULL;
                 }
             } else {
-                current = *val;
+                current = val;
             }
         } else {
             *final_key_ptr = NULL;
@@ -302,6 +377,9 @@ static CompiledPath* compile_path(pTHX_ SV *path_sv) {
         if (tok_len > 0) {
             cp->components[i].str = tok_start;
             cp->components[i].len = tok_len;
+            cp->components[i].hash = 0;
+            if (cp->utf8_flag > 0)
+                PERL_HASH(cp->components[i].hash, tok_start, tok_len);
             cp->components[i].is_numeric = is_array_index(tok_start, tok_len, &cp->components[i].idx);
             cp->components[i].next_is_array = 0;  /* Will set below */
             i++;
@@ -333,11 +411,19 @@ static XOP xop_pathset;
 static XOP xop_pathdelete;
 static XOP xop_pathexists;
 
+#define KW_RETURN(value) STMT_START { \
+    SV *result = (value); \
+    SPAGAIN; \
+    PUSHs(result); \
+    RETURN; \
+} STMT_END
+
 static OP* pp_pathget_dynamic(pTHX)
 {
     dSP;
     SV *path_sv = POPs;
     SV *data_sv = POPs;
+    PUTBACK;
 
     STRLEN path_len;
     const char *path = SvPV(path_sv, path_len);
@@ -350,7 +436,7 @@ static OP* pp_pathget_dynamic(pTHX)
     /* Skip leading slashes */
     while (p < end && *p == '/') p++;
 
-    while (p < end && SvOK(current)) {
+    while (p < end) {
         const char *start = p;
         while (p < end && *p != '/') p++;
         STRLEN comp_len = p - start;
@@ -360,7 +446,7 @@ static OP* pp_pathget_dynamic(pTHX)
             continue;
         }
 
-        if (UNLIKELY(!SvROK(current))) {
+        if (UNLIKELY(!(current = path_container(aTHX_ current)))) {
             current = &PL_sv_undef;
             break;
         }
@@ -372,7 +458,7 @@ static OP* pp_pathget_dynamic(pTHX)
          * Hash keys that look numeric are still hash keys. */
         if (LIKELY(t == SVt_PVHV)) {
             SV **svp = hv_fetch((HV*)inner, start, (I32)comp_len * utf8_flag, 0);
-            current = svp ? *svp : &PL_sv_undef;
+            current = svp && *svp ? *svp : &PL_sv_undef;
         } else if (t == SVt_PVAV) {
             IV idx;
             if (UNLIKELY(!is_array_index(start, comp_len, &idx))) {
@@ -380,7 +466,7 @@ static OP* pp_pathget_dynamic(pTHX)
                 break;
             }
             SV **elem = av_fetch((AV*)inner, idx, 0);
-            current = elem ? *elem : &PL_sv_undef;
+            current = elem && *elem ? *elem : &PL_sv_undef;
         } else {
             current = &PL_sv_undef;
             break;
@@ -389,8 +475,8 @@ static OP* pp_pathget_dynamic(pTHX)
         if (p < end && *p == '/') p++;
     }
 
-    PUSHs(current);
-    RETURN;
+    current = path_value(aTHX_ current);
+    KW_RETURN(sv_2mortal(SvREFCNT_inc(current)));
 }
 
 /* Check if the next non-empty component (after p) parses as an array index. */
@@ -415,6 +501,9 @@ static OP* pp_pathset_dynamic(pTHX)
     SV *path_sv = *++MARK;
     SV *value_sv = *++MARK;
     SP = ORIGMARK;  /* Reset stack to before our args */
+    PUTBACK;
+    value_sv = path_source(aTHX_ value_sv);
+    SV *stored = NULL;
 
     STRLEN path_len;
     const char *path = SvPV(path_sv, path_len);
@@ -430,7 +519,7 @@ static OP* pp_pathset_dynamic(pTHX)
         croak("Cannot set root");
     }
 
-    SV *current = data_sv;
+    SV *current = path_value(aTHX_ data_sv);
 
     while (p < end) {
         const char *start = p;
@@ -456,33 +545,24 @@ static OP* pp_pathset_dynamic(pTHX)
             I32 klen = (I32)comp_len * utf8_flag;
 
             if (is_last) {
-                SV *copy = SvROK(value_sv) ? SvREFCNT_inc(value_sv) : newSVsv(value_sv);
-                if (UNLIKELY(!hv_store(hv, start, klen, copy, 0))) {
-                    SvREFCNT_dec(copy);
-                    croak(SvRMAGICAL((SV*)hv)
-                          ? "Cannot pathset on tied/magical hash"
-                          : "Failed to store value");
-                }
+                stored = path_store_hash(aTHX_ hv, start, klen, 0, value_sv, "pathset");
+                break;
             } else {
-                SV **elem = hv_fetch(hv, start, klen, 1);  /* lvalue/create */
-                if (UNLIKELY(!elem)) {
-                    croak(SvRMAGICAL((SV*)hv)
-                          ? "Cannot pathset on tied/magical hash"
-                          : "Cannot navigate to path");
-                }
-                if (!SvROK(*elem)) {
-                    /* sv_setsv on a magical slot won't propagate STORE;
-                     * fail loudly instead of silently dropping the write. */
+                SV *elem = path_fetch_retained(aTHX_ hv_fetch(hv, start, klen, 0), path);
+                if (!elem || !SvROK(elem)) {
                     if (UNLIKELY(SvRMAGICAL((SV*)hv))) {
                         croak("Cannot pathset on tied/magical hash");
                     }
-                    SV *new_ref = kw_next_component_is_numeric(p, end)
+                    SV *new_ref = sv_2mortal(kw_next_component_is_numeric(p, end)
                         ? newRV_noinc((SV*)newAV())
-                        : newRV_noinc((SV*)newHV());
-                    sv_setsv(*elem, new_ref);
-                    SvREFCNT_dec(new_ref);
+                        : newRV_noinc((SV*)newHV()));
+                    if (UNLIKELY(!hv_store(hv, start, klen, new_ref, 0)))
+                        croak("Cannot navigate to path");
+                    SvREFCNT_inc_simple_void_NN(new_ref);
+                    current = new_ref;
+                } else {
+                    current = elem;
                 }
-                current = *elem;
             }
         } else if (t == SVt_PVAV) {
             IV idx;
@@ -492,31 +572,24 @@ static OP* pp_pathset_dynamic(pTHX)
             AV *av = (AV*)inner;
 
             if (is_last) {
-                SV *copy = SvROK(value_sv) ? SvREFCNT_inc(value_sv) : newSVsv(value_sv);
-                if (UNLIKELY(!av_store(av, idx, copy))) {
-                    SvREFCNT_dec(copy);
-                    croak(SvRMAGICAL((SV*)av)
-                          ? "Cannot pathset on tied/magical array"
-                          : "Failed to store value");
-                }
+                stored = path_store_array(aTHX_ av, idx, value_sv, "pathset");
+                break;
             } else {
-                SV **elem = av_fetch(av, idx, 1);  /* lvalue/create */
-                if (UNLIKELY(!elem)) {
-                    croak(SvRMAGICAL((SV*)av)
-                          ? "Cannot pathset on tied/magical array"
-                          : "Cannot navigate to path");
-                }
-                if (!SvROK(*elem)) {
+                SV *elem = path_fetch_retained(aTHX_ av_fetch(av, idx, 0), path);
+                if (!elem || !SvROK(elem)) {
                     if (UNLIKELY(SvRMAGICAL((SV*)av))) {
                         croak("Cannot pathset on tied/magical array");
                     }
-                    SV *new_ref = kw_next_component_is_numeric(p, end)
+                    SV *new_ref = sv_2mortal(kw_next_component_is_numeric(p, end)
                         ? newRV_noinc((SV*)newAV())
-                        : newRV_noinc((SV*)newHV());
-                    sv_setsv(*elem, new_ref);
-                    SvREFCNT_dec(new_ref);
+                        : newRV_noinc((SV*)newHV()));
+                    if (UNLIKELY(!av_store(av, idx, new_ref)))
+                        croak("Cannot navigate to path");
+                    SvREFCNT_inc_simple_void_NN(new_ref);
+                    current = new_ref;
+                } else {
+                    current = elem;
                 }
-                current = *elem;
             }
         } else {
             croak("Cannot navigate to path");
@@ -525,8 +598,9 @@ static OP* pp_pathset_dynamic(pTHX)
         if (p < end && *p == '/') p++;
     }
 
+    SPAGAIN;
     if (GIMME_V != G_VOID)
-        PUSHs(value_sv);
+        PUSHs(sv_2mortal(SvREFCNT_inc(stored)));
     RETURN;
 }
 
@@ -537,6 +611,7 @@ static OP* pp_pathdelete_dynamic(pTHX)
     dSP;
     SV *path_sv = POPs;
     SV *data_sv = POPs;
+    PUTBACK;
 
     STRLEN path_len;
     const char *path = SvPV(path_sv, path_len);
@@ -552,7 +627,7 @@ static OP* pp_pathdelete_dynamic(pTHX)
         croak("Cannot delete root");
     }
 
-    SV *current = data_sv;
+    SV *current = path_value(aTHX_ data_sv);
     SV *parent = NULL;
     const char *last_key_start = NULL;
     STRLEN last_key_len = 0;
@@ -577,27 +652,24 @@ static OP* pp_pathdelete_dynamic(pTHX)
         }
 
         if (UNLIKELY(!SvROK(current))) {
-            PUSHs(&PL_sv_undef);
-            RETURN;
+            KW_RETURN(&PL_sv_undef);
         }
 
         SV *inner = SvRV(current);
         svtype t = SvTYPE(inner);
 
         if (LIKELY(t == SVt_PVHV)) {
-            SV **svp = hv_fetch((HV*)inner, start, (I32)comp_len * utf8_flag, 0);
-            current = svp ? *svp : &PL_sv_undef;
+            SV *svp = path_fetch(aTHX_ hv_fetch((HV*)inner, start, (I32)comp_len * utf8_flag, 0));
+            current = svp ? svp : &PL_sv_undef;
         } else if (t == SVt_PVAV) {
             IV idx;
             if (UNLIKELY(!is_array_index(start, comp_len, &idx))) {
-                PUSHs(&PL_sv_undef);
-                RETURN;
+                KW_RETURN(&PL_sv_undef);
             }
-            SV **elem = av_fetch((AV*)inner, idx, 0);
-            current = elem ? *elem : &PL_sv_undef;
+            SV *elem = path_fetch(aTHX_ av_fetch((AV*)inner, idx, 0));
+            current = elem ? elem : &PL_sv_undef;
         } else {
-            PUSHs(&PL_sv_undef);
-            RETURN;
+            KW_RETURN(&PL_sv_undef);
         }
 
         if (p < end && *p == '/') p++;
@@ -619,8 +691,7 @@ static OP* pp_pathdelete_dynamic(pTHX)
     }
 
     /* hv_delete/av_delete with flags=0 already mortalize the returned SV. */
-    PUSHs(deleted ? deleted : &PL_sv_undef);
-    RETURN;
+    KW_RETURN(deleted ? deleted : &PL_sv_undef);
 }
 
 /* Custom op for dynamic path exists check.
@@ -630,6 +701,7 @@ static OP* pp_pathexists_dynamic(pTHX)
     dSP;
     SV *path_sv = POPs;
     SV *data_sv = POPs;
+    PUTBACK;
 
     STRLEN path_len;
     const char *path = SvPV(path_sv, path_len);
@@ -642,8 +714,7 @@ static OP* pp_pathexists_dynamic(pTHX)
 
     if (p >= end) {
         /* Empty path - root always exists (consistent with path_exists) */
-        PUSHs(&PL_sv_yes);
-        RETURN;
+        KW_RETURN(&PL_sv_yes);
     }
 
     SV *current = data_sv;
@@ -660,9 +731,8 @@ static OP* pp_pathexists_dynamic(pTHX)
 
         int is_last = kw_at_last_component(p, end);
 
-        if (UNLIKELY(!SvROK(current))) {
-            PUSHs(&PL_sv_no);
-            RETURN;
+        if (UNLIKELY(!(current = path_container(aTHX_ current)))) {
+            KW_RETURN(&PL_sv_no);
         }
 
         SV *inner = SvRV(current);
@@ -672,43 +742,36 @@ static OP* pp_pathexists_dynamic(pTHX)
             HV *hv = (HV*)inner;
             I32 klen = (I32)comp_len * utf8_flag;
             if (is_last) {
-                PUSHs(hv_exists(hv, start, klen) ? &PL_sv_yes : &PL_sv_no);
-                RETURN;
+                KW_RETURN(hv_exists(hv, start, klen) ? &PL_sv_yes : &PL_sv_no);
             }
             SV **svp = hv_fetch(hv, start, klen, 0);
-            if (!svp || !SvOK(*svp)) {
-                PUSHs(&PL_sv_no);
-                RETURN;
+            if (!svp || !*svp) {
+                KW_RETURN(&PL_sv_no);
             }
             current = *svp;
         } else if (t == SVt_PVAV) {
             IV idx;
             if (UNLIKELY(!is_array_index(start, comp_len, &idx))) {
-                PUSHs(&PL_sv_no);
-                RETURN;
+                KW_RETURN(&PL_sv_no);
             }
             AV *av = (AV*)inner;
             if (is_last) {
-                PUSHs(av_exists(av, idx) ? &PL_sv_yes : &PL_sv_no);
-                RETURN;
+                KW_RETURN(av_exists(av, idx) ? &PL_sv_yes : &PL_sv_no);
             }
             SV **elem = av_fetch(av, idx, 0);
-            if (!elem || !SvOK(*elem)) {
-                PUSHs(&PL_sv_no);
-                RETURN;
+            if (!elem || !*elem) {
+                KW_RETURN(&PL_sv_no);
             }
             current = *elem;
         } else {
-            PUSHs(&PL_sv_no);
-            RETURN;
+            KW_RETURN(&PL_sv_no);
         }
 
         if (p < end && *p == '/') p++;
     }
 
     /* All components consumed (or path was all slashes) - root/value exists */
-    PUSHs(&PL_sv_yes);
-    RETURN;
+    KW_RETURN(&PL_sv_yes);
 }
 
 /* Wrap a (data, path) pair as a custom binop dispatched to ppaddr. */
@@ -784,9 +847,9 @@ static int build_kw_pathget(pTHX_ OP **out, XSParseKeywordPiece *args[],
 static const struct XSParseKeywordHooks hooks_pathget = {
     .permit_hintkey = "Data::Path::XS/pathget",
     .pieces = (const struct XSParseKeywordPieceType []) {
-        XPK_TERMEXPR,       /* data structure */
+        XPK_TERMEXPR_SCALARCTX,       /* data structure */
         XPK_COMMA,          /* , */
-        XPK_TERMEXPR,       /* path */
+        XPK_TERMEXPR_SCALARCTX,       /* path */
         {0}
     },
     .build = &build_kw_pathget,
@@ -867,11 +930,11 @@ static int build_kw_pathset(pTHX_ OP **out, XSParseKeywordPiece *args[],
 static const struct XSParseKeywordHooks hooks_pathset = {
     .permit_hintkey = "Data::Path::XS/pathset",
     .pieces = (const struct XSParseKeywordPieceType []) {
-        XPK_TERMEXPR,       /* data structure */
+        XPK_TERMEXPR_SCALARCTX,       /* data structure */
         XPK_COMMA,          /* , */
-        XPK_TERMEXPR,       /* path */
+        XPK_TERMEXPR_SCALARCTX,       /* path */
         XPK_COMMA,          /* , */
-        XPK_TERMEXPR,       /* value */
+        XPK_TERMEXPR_SCALARCTX,       /* value */
         {0}
     },
     .build = &build_kw_pathset,
@@ -896,9 +959,9 @@ static int build_kw_pathdelete(pTHX_ OP **out, XSParseKeywordPiece *args[],
 static const struct XSParseKeywordHooks hooks_pathdelete = {
     .permit_hintkey = "Data::Path::XS/pathdelete",
     .pieces = (const struct XSParseKeywordPieceType []) {
-        XPK_TERMEXPR,       /* data structure */
+        XPK_TERMEXPR_SCALARCTX,       /* data structure */
         XPK_COMMA,          /* , */
-        XPK_TERMEXPR,       /* path */
+        XPK_TERMEXPR_SCALARCTX,       /* path */
         {0}
     },
     .build = &build_kw_pathdelete,
@@ -923,9 +986,9 @@ static int build_kw_pathexists(pTHX_ OP **out, XSParseKeywordPiece *args[],
 static const struct XSParseKeywordHooks hooks_pathexists = {
     .permit_hintkey = "Data::Path::XS/pathexists",
     .pieces = (const struct XSParseKeywordPieceType []) {
-        XPK_TERMEXPR,       /* data structure */
+        XPK_TERMEXPR_SCALARCTX,       /* data structure */
         XPK_COMMA,          /* , */
-        XPK_TERMEXPR,       /* path */
+        XPK_TERMEXPR_SCALARCTX,       /* path */
         {0}
     },
     .build = &build_kw_pathexists,
@@ -963,13 +1026,13 @@ path_get(data, path)
             svtype t = SvTYPE(inner);
 
             if (t == SVt_PVHV) {
-                SV **val = hv_fetch((HV*)inner, final_key, (I32)final_key_len * utf8_flag, 0);
-                RETVAL = (val && *val) ? SvREFCNT_inc(*val) : &PL_sv_undef;
+                SV *val = path_fetch(aTHX_ hv_fetch((HV*)inner, final_key, (I32)final_key_len * utf8_flag, 0));
+                RETVAL = val ? SvREFCNT_inc(val) : &PL_sv_undef;
             } else if (t == SVt_PVAV) {
                 IV idx;
                 if (is_array_index(final_key, final_key_len, &idx)) {
-                    SV **val = av_fetch((AV*)inner, idx, 0);
-                    RETVAL = (val && *val) ? SvREFCNT_inc(*val) : &PL_sv_undef;
+                    SV *val = path_fetch(aTHX_ av_fetch((AV*)inner, idx, 0));
+                    RETVAL = val ? SvREFCNT_inc(val) : &PL_sv_undef;
                 } else {
                     RETVAL = &PL_sv_undef;
                 }
@@ -986,7 +1049,10 @@ path_set(data, path, value)
     SV *data
     SV *path
     SV *value
-  CODE:
+  PPCODE:
+    PUTBACK;
+    value = path_source(aTHX_ value);
+    SV *stored;
     STRLEN path_len;
     const char *path_str = SvPV(path, path_len);
     const char *final_key;
@@ -1010,38 +1076,20 @@ path_set(data, path, value)
 
     SV *inner = SvRV(parent);
     svtype t = SvTYPE(inner);
-    SV *copy = SvROK(value) ? SvREFCNT_inc(value) : newSVsv(value);  /* Refs shared, scalars copied */
 
     if (t == SVt_PVHV) {
-        if (UNLIKELY(!hv_store((HV*)inner, final_key, (I32)final_key_len * utf8_flag, copy, 0))) {
-            SvREFCNT_dec(copy);
-            croak(SvRMAGICAL(inner)
-                  ? "Cannot path_set on tied/magical hash"
-                  : "Failed to store value");
-        }
+        stored = path_store_hash(aTHX_ (HV*)inner, final_key, (I32)final_key_len * utf8_flag, 0, value, "path_set");
     } else if (t == SVt_PVAV) {
         IV idx;
-        if (!is_array_index(final_key, final_key_len, &idx)) {
-            SvREFCNT_dec(copy);
-            croak("Invalid array index");
-        }
-        if (UNLIKELY(!av_store((AV*)inner, idx, copy))) {
-            SvREFCNT_dec(copy);
-            croak(SvRMAGICAL(inner)
-                  ? "Cannot path_set on tied/magical array"
-                  : "Failed to store value");
-        }
+        if (!is_array_index(final_key, final_key_len, &idx)) croak("Invalid array index");
+        stored = path_store_array(aTHX_ (AV*)inner, idx, value, "path_set");
     } else {
-        SvREFCNT_dec(copy);
         croak("Parent is not a hash or array");
     }
 
-    if (GIMME_V == G_VOID) {
-        XSRETURN_EMPTY;
-    }
-    RETVAL = SvREFCNT_inc(value);
-  OUTPUT:
-    RETVAL
+    SPAGAIN;
+    if (GIMME_V != G_VOID)
+        XPUSHs(sv_2mortal(SvREFCNT_inc(stored)));
 
 SV*
 path_delete(data, path)
@@ -1138,7 +1186,7 @@ patha_get(data, path_av)
     AV *path_av
   CODE:
     SSize_t len = av_len(path_av) + 1;
-    SV *current = data;
+    SV *current = path_value(aTHX_ data);
 
     for (SSize_t i = 0; i < len; i++) {
         SV **key_ptr = av_fetch(path_av, i, 0);
@@ -1153,15 +1201,15 @@ patha_get(data, path_av)
         if (LIKELY(t == SVt_PVHV)) {
             const char *kstr;
             I32 sklen = sv_to_klen(aTHX_ *key_ptr, &kstr);
-            SV **val = hv_fetch((HV*)inner, kstr, sklen, 0);
-            if (UNLIKELY(!val || !*val)) { RETVAL = &PL_sv_undef; goto done; }
-            current = *val;
+            SV *val = path_fetch(aTHX_ hv_fetch((HV*)inner, kstr, sklen, 0));
+            if (UNLIKELY(!val)) { RETVAL = &PL_sv_undef; goto done; }
+            current = val;
         } else if (t == SVt_PVAV) {
             IV idx;
             if (UNLIKELY(!sv_to_index(aTHX_ *key_ptr, &idx))) { RETVAL = &PL_sv_undef; goto done; }
-            SV **val = av_fetch((AV*)inner, idx, 0);
-            if (UNLIKELY(!val || !*val)) { RETVAL = &PL_sv_undef; goto done; }
-            current = *val;
+            SV *val = path_fetch(aTHX_ av_fetch((AV*)inner, idx, 0));
+            if (UNLIKELY(!val)) { RETVAL = &PL_sv_undef; goto done; }
+            current = val;
         } else {
             RETVAL = &PL_sv_undef;
             goto done;
@@ -1177,9 +1225,12 @@ patha_set(data, path_av, value)
     SV *data
     AV *path_av
     SV *value
-  CODE:
+  PPCODE:
+    PUTBACK;
+    value = path_source(aTHX_ value);
+    SV *stored;
     SSize_t len = av_len(path_av) + 1;
-    SV *current = data;
+    SV *current = path_value(aTHX_ data);
 
     if (UNLIKELY(len == 0)) croak("Cannot set root");
 
@@ -1194,42 +1245,42 @@ patha_set(data, path_av, value)
         if (LIKELY(t == SVt_PVHV)) {
             const char *kstr;
             I32 sklen = sv_to_klen(aTHX_ *key_ptr, &kstr);
-            SV **val = hv_fetch((HV*)inner, kstr, sklen, 0);
-            if (UNLIKELY(!val || !*val || !SvROK(*val))) {
+            SV *val = path_fetch(aTHX_ hv_fetch((HV*)inner, kstr, sklen, 0));
+            if (UNLIKELY(!val || !SvROK(val))) {
                 SV **next_key = av_fetch(path_av, i + 1, 0);
                 IV dummy;
-                SV *new_ref = (next_key && *next_key && sv_to_index(aTHX_ *next_key, &dummy))
+                SV *new_ref = sv_2mortal((next_key && *next_key && sv_to_index(aTHX_ *next_key, &dummy))
                     ? newRV_noinc((SV*)newAV())
-                    : newRV_noinc((SV*)newHV());
+                    : newRV_noinc((SV*)newHV()));
                 if (UNLIKELY(!hv_store((HV*)inner, kstr, sklen, new_ref, 0))) {
-                    SvREFCNT_dec(new_ref);
                     croak(SvRMAGICAL(inner)
                           ? "Cannot patha_set on tied/magical hash"
                           : "Failed to store intermediate value");
                 }
+                SvREFCNT_inc_simple_void_NN(new_ref);
                 current = new_ref;
             } else {
-                current = *val;
+                current = val;
             }
         } else if (t == SVt_PVAV) {
             IV idx;
             if (UNLIKELY(!sv_to_index(aTHX_ *key_ptr, &idx))) croak("Invalid array index");
-            SV **val = av_fetch((AV*)inner, idx, 0);
-            if (UNLIKELY(!val || !*val || !SvROK(*val))) {
+            SV *val = path_fetch(aTHX_ av_fetch((AV*)inner, idx, 0));
+            if (UNLIKELY(!val || !SvROK(val))) {
                 SV **next_key = av_fetch(path_av, i + 1, 0);
                 IV dummy;
-                SV *new_ref = (next_key && *next_key && sv_to_index(aTHX_ *next_key, &dummy))
+                SV *new_ref = sv_2mortal((next_key && *next_key && sv_to_index(aTHX_ *next_key, &dummy))
                     ? newRV_noinc((SV*)newAV())
-                    : newRV_noinc((SV*)newHV());
+                    : newRV_noinc((SV*)newHV()));
                 if (UNLIKELY(!av_store((AV*)inner, idx, new_ref))) {
-                    SvREFCNT_dec(new_ref);
                     croak(SvRMAGICAL(inner)
                           ? "Cannot patha_set on tied/magical array"
                           : "Failed to store intermediate value");
                 }
+                SvREFCNT_inc_simple_void_NN(new_ref);
                 current = new_ref;
             } else {
-                current = *val;
+                current = val;
             }
         } else {
             croak("Cannot navigate to path");
@@ -1241,40 +1292,22 @@ patha_set(data, path_av, value)
     svtype t = SvTYPE(inner);
     SV **final_key_ptr = av_fetch(path_av, len - 1, 0);
     if (UNLIKELY(!final_key_ptr || !*final_key_ptr)) croak("Invalid final key");
-    SV *copy = SvROK(value) ? SvREFCNT_inc(value) : newSVsv(value);  /* Refs shared, scalars copied */
 
     if (LIKELY(t == SVt_PVHV)) {
         const char *kstr;
         I32 sklen = sv_to_klen(aTHX_ *final_key_ptr, &kstr);
-        if (UNLIKELY(!hv_store((HV*)inner, kstr, sklen, copy, 0))) {
-            SvREFCNT_dec(copy);
-            croak(SvRMAGICAL(inner)
-                  ? "Cannot patha_set on tied/magical hash"
-                  : "Failed to store value");
-        }
+        stored = path_store_hash(aTHX_ (HV*)inner, kstr, sklen, 0, value, "patha_set");
     } else if (t == SVt_PVAV) {
         IV idx;
-        if (UNLIKELY(!sv_to_index(aTHX_ *final_key_ptr, &idx))) {
-            SvREFCNT_dec(copy);
-            croak("Invalid array index");
-        }
-        if (UNLIKELY(!av_store((AV*)inner, idx, copy))) {
-            SvREFCNT_dec(copy);
-            croak(SvRMAGICAL(inner)
-                  ? "Cannot patha_set on tied/magical array"
-                  : "Failed to store value");
-        }
+        if (!sv_to_index(aTHX_ *final_key_ptr, &idx)) croak("Invalid array index");
+        stored = path_store_array(aTHX_ (AV*)inner, idx, value, "patha_set");
     } else {
-        SvREFCNT_dec(copy);
         croak("Parent is not a hash or array");
     }
 
-    if (GIMME_V == G_VOID) {
-        XSRETURN_EMPTY;
-    }
-    RETVAL = SvREFCNT_inc(value);
-  OUTPUT:
-    RETVAL
+    SPAGAIN;
+    if (GIMME_V != G_VOID)
+        XPUSHs(sv_2mortal(SvREFCNT_inc(stored)));
 
 int
 patha_exists(data, path_av)
@@ -1282,7 +1315,7 @@ patha_exists(data, path_av)
     AV *path_av
   CODE:
     SSize_t len = av_len(path_av) + 1;
-    SV *current = data;
+    SV *current = path_value(aTHX_ data);
 
     if (UNLIKELY(len == 0)) { RETVAL = 1; goto done; }
 
@@ -1296,15 +1329,15 @@ patha_exists(data, path_av)
         if (LIKELY(t == SVt_PVHV)) {
             const char *kstr;
             I32 sklen = sv_to_klen(aTHX_ *key_ptr, &kstr);
-            SV **val = hv_fetch((HV*)inner, kstr, sklen, 0);
-            if (UNLIKELY(!val || !*val)) { RETVAL = 0; goto done; }
-            current = *val;
+            SV *val = path_fetch(aTHX_ hv_fetch((HV*)inner, kstr, sklen, 0));
+            if (UNLIKELY(!val)) { RETVAL = 0; goto done; }
+            current = val;
         } else if (t == SVt_PVAV) {
             IV idx;
             if (UNLIKELY(!sv_to_index(aTHX_ *key_ptr, &idx))) { RETVAL = 0; goto done; }
-            SV **val = av_fetch((AV*)inner, idx, 0);
-            if (UNLIKELY(!val || !*val)) { RETVAL = 0; goto done; }
-            current = *val;
+            SV *val = path_fetch(aTHX_ av_fetch((AV*)inner, idx, 0));
+            if (UNLIKELY(!val)) { RETVAL = 0; goto done; }
+            current = val;
         } else {
             RETVAL = 0; goto done;
         }
@@ -1336,7 +1369,7 @@ patha_delete(data, path_av)
     AV *path_av
   CODE:
     SSize_t len = av_len(path_av) + 1;
-    SV *current = data;
+    SV *current = path_value(aTHX_ data);
 
     if (UNLIKELY(len == 0)) croak("Cannot delete root");
 
@@ -1350,15 +1383,15 @@ patha_delete(data, path_av)
         if (LIKELY(t == SVt_PVHV)) {
             const char *kstr;
             I32 sklen = sv_to_klen(aTHX_ *key_ptr, &kstr);
-            SV **val = hv_fetch((HV*)inner, kstr, sklen, 0);
-            if (UNLIKELY(!val || !*val)) { RETVAL = &PL_sv_undef; goto done; }
-            current = *val;
+            SV *val = path_fetch(aTHX_ hv_fetch((HV*)inner, kstr, sklen, 0));
+            if (UNLIKELY(!val)) { RETVAL = &PL_sv_undef; goto done; }
+            current = val;
         } else if (t == SVt_PVAV) {
             IV idx;
             if (UNLIKELY(!sv_to_index(aTHX_ *key_ptr, &idx))) { RETVAL = &PL_sv_undef; goto done; }
-            SV **val = av_fetch((AV*)inner, idx, 0);
-            if (UNLIKELY(!val || !*val)) { RETVAL = &PL_sv_undef; goto done; }
-            current = *val;
+            SV *val = path_fetch(aTHX_ av_fetch((AV*)inner, idx, 0));
+            if (UNLIKELY(!val)) { RETVAL = &PL_sv_undef; goto done; }
+            current = val;
         } else {
             RETVAL = &PL_sv_undef; goto done;
         }
@@ -1416,7 +1449,7 @@ pathc_get(data, compiled)
         RETVAL = SvREFCNT_inc(data);
     } else {
         /* Fully inlined navigation for maximum speed */
-        SV *current = data;
+        SV *current = path_value(aTHX_ data);
         PathComponent *c = cp->components;
         PathComponent *end = c + cp->count;
         const I32 utf8_flag = cp->utf8_flag;
@@ -1431,23 +1464,23 @@ pathc_get(data, compiled)
             svtype t = SvTYPE(inner);
 
             if (LIKELY(t == SVt_PVHV)) {
-                SV **val = hv_fetch((HV*)inner, c->str, (I32)c->len * utf8_flag, 0);
-                if (UNLIKELY(!val || !*val)) {
+                SV *val = compiled_fetch(aTHX_ (HV*)inner, c, utf8_flag);
+                if (UNLIKELY(!val)) {
                     RETVAL = &PL_sv_undef;
                     goto done;
                 }
-                current = *val;
+                current = val;
             } else if (t == SVt_PVAV) {
                 if (UNLIKELY(!c->is_numeric)) {
                     RETVAL = &PL_sv_undef;
                     goto done;
                 }
-                SV **val = av_fetch((AV*)inner, c->idx, 0);
-                if (UNLIKELY(!val || !*val)) {
+                SV *val = path_fetch(aTHX_ av_fetch((AV*)inner, c->idx, 0));
+                if (UNLIKELY(!val)) {
                     RETVAL = &PL_sv_undef;
                     goto done;
                 }
-                current = *val;
+                current = val;
             } else {
                 RETVAL = &PL_sv_undef;
                 goto done;
@@ -1465,14 +1498,17 @@ pathc_set(data, compiled, value)
     SV *data
     SV *compiled
     SV *value
-  CODE:
+  PPCODE:
+    PUTBACK;
+    value = path_source(aTHX_ value);
+    SV *stored;
     CompiledPath *cp;
     VALIDATE_COMPILED_PATH(compiled, cp);
 
     if (UNLIKELY(cp->count == 0)) croak("Cannot set root");
 
     /* Fully inlined navigation with creation for maximum speed */
-    SV *current = data;
+    SV *current = path_value(aTHX_ data);
     PathComponent *c = cp->components;
     PathComponent *last = c + cp->count - 1;
     const I32 utf8_flag = cp->utf8_flag;
@@ -1486,38 +1522,38 @@ pathc_set(data, compiled, value)
 
         if (LIKELY(t == SVt_PVHV)) {
             I32 klen = (I32)c->len * utf8_flag;
-            SV **val = hv_fetch((HV*)inner, c->str, klen, 0);
-            if (UNLIKELY(!val || !*val || !SvROK(*val))) {
+            SV *val = compiled_fetch(aTHX_ (HV*)inner, c, utf8_flag);
+            if (UNLIKELY(!val || !SvROK(val))) {
                 /* Create intermediate structure using pre-computed type */
-                SV *new_ref = c->next_is_array
+                SV *new_ref = sv_2mortal(c->next_is_array
                     ? newRV_noinc((SV*)newAV())
-                    : newRV_noinc((SV*)newHV());
-                if (UNLIKELY(!hv_store((HV*)inner, c->str, klen, new_ref, 0))) {
-                    SvREFCNT_dec(new_ref);
+                    : newRV_noinc((SV*)newHV()));
+                if (UNLIKELY(!hv_store((HV*)inner, c->str, klen, new_ref, c->hash))) {
                     croak(SvRMAGICAL(inner)
                           ? "Cannot pathc_set on tied/magical hash"
                           : "Failed to store intermediate value");
                 }
+                SvREFCNT_inc_simple_void_NN(new_ref);
                 current = new_ref;
             } else {
-                current = *val;
+                current = val;
             }
         } else if (t == SVt_PVAV) {
             if (UNLIKELY(!c->is_numeric)) croak("Invalid array index");
-            SV **val = av_fetch((AV*)inner, c->idx, 0);
-            if (UNLIKELY(!val || !*val || !SvROK(*val))) {
-                SV *new_ref = c->next_is_array
+            SV *val = path_fetch(aTHX_ av_fetch((AV*)inner, c->idx, 0));
+            if (UNLIKELY(!val || !SvROK(val))) {
+                SV *new_ref = sv_2mortal(c->next_is_array
                     ? newRV_noinc((SV*)newAV())
-                    : newRV_noinc((SV*)newHV());
+                    : newRV_noinc((SV*)newHV()));
                 if (UNLIKELY(!av_store((AV*)inner, c->idx, new_ref))) {
-                    SvREFCNT_dec(new_ref);
                     croak(SvRMAGICAL(inner)
                           ? "Cannot pathc_set on tied/magical array"
                           : "Failed to store intermediate value");
                 }
+                SvREFCNT_inc_simple_void_NN(new_ref);
                 current = new_ref;
             } else {
-                current = *val;
+                current = val;
             }
         } else {
             croak("Cannot navigate to path");
@@ -1529,35 +1565,19 @@ pathc_set(data, compiled, value)
     if (UNLIKELY(!SvROK(current))) croak("Cannot navigate to path");
     SV *inner = SvRV(current);
     svtype t = SvTYPE(inner);
-    SV *copy = SvROK(value) ? SvREFCNT_inc(value) : newSVsv(value);  /* Refs shared, scalars copied */
 
     if (LIKELY(t == SVt_PVHV)) {
-        if (UNLIKELY(!hv_store((HV*)inner, last->str, (I32)last->len * utf8_flag, copy, 0))) {
-            SvREFCNT_dec(copy);
-            croak(SvRMAGICAL(inner)
-                  ? "Cannot pathc_set on tied/magical hash"
-                  : "Failed to store value");
-        }
+        stored = path_store_hash(aTHX_ (HV*)inner, last->str, (I32)last->len * utf8_flag, last->hash, value, "pathc_set");
     } else if (t == SVt_PVAV) {
-        if (UNLIKELY(!last->is_numeric)) { SvREFCNT_dec(copy); croak("Invalid array index"); }
-        if (UNLIKELY(!av_store((AV*)inner, last->idx, copy))) {
-            SvREFCNT_dec(copy);
-            croak(SvRMAGICAL(inner)
-                  ? "Cannot pathc_set on tied/magical array"
-                  : "Failed to store value");
-        }
+        if (!last->is_numeric) croak("Invalid array index");
+        stored = path_store_array(aTHX_ (AV*)inner, last->idx, value, "pathc_set");
     } else {
-        SvREFCNT_dec(copy);
         croak("Parent is not a hash or array");
     }
 
-    /* Skip return value overhead in void context */
-    if (GIMME_V == G_VOID) {
-        XSRETURN_EMPTY;
-    }
-    RETVAL = SvREFCNT_inc(value);
-  OUTPUT:
-    RETVAL
+    SPAGAIN;
+    if (GIMME_V != G_VOID)
+        XPUSHs(sv_2mortal(SvREFCNT_inc(stored)));
 
 int
 pathc_exists(data, compiled)
@@ -1571,7 +1591,7 @@ pathc_exists(data, compiled)
         RETVAL = 1;
     } else {
         /* Inlined navigation to parent */
-        SV *current = data;
+        SV *current = path_value(aTHX_ data);
         PathComponent *c = cp->components;
         PathComponent *last = c + cp->count - 1;
         const I32 utf8_flag = cp->utf8_flag;
@@ -1585,14 +1605,14 @@ pathc_exists(data, compiled)
             svtype t = SvTYPE(inner);
 
             if (LIKELY(t == SVt_PVHV)) {
-                SV **val = hv_fetch((HV*)inner, c->str, (I32)c->len * utf8_flag, 0);
-                if (UNLIKELY(!val || !*val)) { RETVAL = 0; goto done; }
-                current = *val;
+                SV *val = compiled_fetch(aTHX_ (HV*)inner, c, utf8_flag);
+                if (UNLIKELY(!val)) { RETVAL = 0; goto done; }
+                current = val;
             } else if (t == SVt_PVAV) {
                 if (UNLIKELY(!c->is_numeric)) { RETVAL = 0; goto done; }
-                SV **val = av_fetch((AV*)inner, c->idx, 0);
-                if (UNLIKELY(!val || !*val)) { RETVAL = 0; goto done; }
-                current = *val;
+                SV *val = path_fetch(aTHX_ av_fetch((AV*)inner, c->idx, 0));
+                if (UNLIKELY(!val)) { RETVAL = 0; goto done; }
+                current = val;
             } else {
                 RETVAL = 0;
                 goto done;
@@ -1607,7 +1627,7 @@ pathc_exists(data, compiled)
             SV *inner = SvRV(current);
             svtype t = SvTYPE(inner);
             if (LIKELY(t == SVt_PVHV)) {
-                RETVAL = hv_exists((HV*)inner, last->str, (I32)last->len * utf8_flag);
+                RETVAL = cBOOL(hv_common_key_len((HV*)inner, last->str, (I32)last->len * utf8_flag, HV_FETCH_ISEXISTS, NULL, last->hash));
             } else if (t == SVt_PVAV) {
                 RETVAL = last->is_numeric ? av_exists((AV*)inner, last->idx) : 0;
             } else {
@@ -1630,7 +1650,7 @@ pathc_delete(data, compiled)
     if (UNLIKELY(cp->count == 0)) croak("Cannot delete root");
 
     /* Inlined navigation to parent */
-    SV *current = data;
+    SV *current = path_value(aTHX_ data);
     PathComponent *c = cp->components;
     PathComponent *last = c + cp->count - 1;
     const I32 utf8_flag = cp->utf8_flag;
@@ -1644,14 +1664,14 @@ pathc_delete(data, compiled)
         svtype t = SvTYPE(inner);
 
         if (LIKELY(t == SVt_PVHV)) {
-            SV **val = hv_fetch((HV*)inner, c->str, (I32)c->len * utf8_flag, 0);
-            if (UNLIKELY(!val || !*val)) { RETVAL = &PL_sv_undef; goto done; }
-            current = *val;
+            SV *val = compiled_fetch(aTHX_ (HV*)inner, c, utf8_flag);
+            if (UNLIKELY(!val)) { RETVAL = &PL_sv_undef; goto done; }
+            current = val;
         } else if (t == SVt_PVAV) {
             if (UNLIKELY(!c->is_numeric)) { RETVAL = &PL_sv_undef; goto done; }
-            SV **val = av_fetch((AV*)inner, c->idx, 0);
-            if (UNLIKELY(!val || !*val)) { RETVAL = &PL_sv_undef; goto done; }
-            current = *val;
+            SV *val = path_fetch(aTHX_ av_fetch((AV*)inner, c->idx, 0));
+            if (UNLIKELY(!val)) { RETVAL = &PL_sv_undef; goto done; }
+            current = val;
         } else {
             RETVAL = &PL_sv_undef;
             goto done;
@@ -1686,6 +1706,15 @@ pathc_delete(data, compiled)
     RETVAL
 
 MODULE = Data::Path::XS    PACKAGE = Data::Path::XS::Compiled
+
+int
+CLONE_SKIP(class)
+    SV *class
+  CODE:
+    PERL_UNUSED_VAR(class);
+    RETVAL = 1;
+  OUTPUT:
+    RETVAL
 
 void
 DESTROY(self)

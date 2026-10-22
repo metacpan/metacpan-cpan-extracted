@@ -1,6 +1,6 @@
 package IO::K8s::PrometheusOperator::V1::WebHTTPConfig;
 # ABSTRACT: httpConfig defines HTTP parameters for web server.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s headers => '+IO::K8s::PrometheusOperator::V1::WebHTTPHeaders';
@@ -22,7 +22,7 @@ IO::K8s::PrometheusOperator::V1::WebHTTPConfig - httpConfig defines HTTP paramet
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 headers
 

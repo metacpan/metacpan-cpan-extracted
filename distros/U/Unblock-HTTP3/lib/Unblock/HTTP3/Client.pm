@@ -7,7 +7,7 @@ use Uniform::HTTP::Request 0.06 ();
 
 use parent 'Unblock::HTTP3::Connection';
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 sub new {
     my ($class, %option) = @_;
@@ -27,7 +27,7 @@ sub request {
         my %field = @arg;
         for my $name (qw(
             stream_body receive_body datagrams early_data
-            on_informational on_response on_body on_complete on_error on_drain
+            on_informational on_response on_body on_data on_finish on_complete on_error on_drain
         )) {
             $option{$name} = delete $field{$name} if exists $field{$name};
         }
@@ -87,6 +87,23 @@ framework through Net::QUIC::Driver.
 
 HTTP/3 response messages are canonical Uniform::HTTP::Response objects.
 
+=head1 RECEIVE BODY OPTIONS
+
+C<receive_body> accepts C<buffered> or C<stream>. Buffering remains the default.
+C<max_buffered_body_bytes> is a positive byte limit, defaulting to 64 MiB.
+Zero does not mean unlimited. Buffered reception installs the body on the
+same Uniform message before freezing it and invoking the body-completion
+callback. Empty completed bodies have an empty string representation.
+The engine releases retained chunks on failure or cancellation.
+
+Select streaming per transaction with C<$tx-E<gt>on_data(...)> during the
+header callback. Legacy C<on_body> still selects streaming automatically.
+Do not combine C<on_data> and C<on_body>. See
+L<Unblock::HTTP3::Transaction/RECEIVE AND FINISH CALLBACKS>.
+
+A buffer limit failure resets only the affected stream.
+It does not call successful body completion.
+
 =head1 CONSTRUCTOR
 
 =head2 new
@@ -96,6 +113,14 @@ HTTP/3 response messages are canonical Uniform::HTTP::Response objects.
     );
 
 C<quic> is required and must be a L<Net::QUIC::Connection>.
+
+An optional C<on_request_available =E<gt> sub { ... }> callback receives
+this same Client after a prior C<request()> returned undef because QUIC
+could not open a bidirectional stream, and a later QUIC C<bidi> availability
+event occurs. The callback is a one-shot hint, not reserved stream credit;
+try the unsubmitted request again from a later event-loop turn. No
+notification occurs for unidirectional stream events or normal traffic.
+This callback is not an automatic retry mechanism.
 
 Useful optional constructor settings include C<receive_body>,
 C<send_buffer_limit>, C<max_field_section_size>,
@@ -118,7 +143,11 @@ operation call C<start()> only after C<$quic-E<gt>ready> is true.
         on_response => sub { ... },
     );
 
-Returns an L<Unblock::HTTP3::Transaction>. Request fields are used to
+Returns an L<Unblock::HTTP3::Transaction> when a request stream is
+admitted, or undef if QUIC has no local bidirectional stream credit.
+No request is submitted or frozen in the latter case, and an optional
+C<on_request_available> callback can signal when trying again may work.
+Request fields are used to
 construct a canonical Uniform::HTTP::Request. The existing object form is
 also accepted:
 
@@ -205,8 +234,14 @@ For ordinary requests, the Net::QUIC connection must be ready first.
 
 =head2 next_transaction
 
-Pulls the next Transaction available from the engine. The callback API does
-not require polling.
+Pulls the next Transaction available from the engine. Pull-only
+Transactions stay strongly queued until retrieved. When a response is also
+delivered through C<on_response>, C<on_complete>, C<on_body>, C<on_data>,
+or C<on_finish>, its pull notification is weak: keep the Transaction
+received from the callback if it must survive beyond its terminal
+lifecycle. Callback delivery does not accumulate completed Transactions
+and bodies in a second strong queue. The callback API does not require
+polling; mixed callers can still pull a live Transaction.
 
 =head2 next_informational
 

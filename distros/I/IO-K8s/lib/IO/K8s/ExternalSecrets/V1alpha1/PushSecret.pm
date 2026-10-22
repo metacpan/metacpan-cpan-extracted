@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1alpha1::PushSecret;
 # ABSTRACT: PushSecret is the Schema for the PushSecrets API that enables pushing Kubernetes secrets to external secret providers.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::APIObject
     api_version     => 'external-secrets.io/v1alpha1',
     resource_plural => 'pushsecrets',
@@ -26,7 +26,7 @@ IO::K8s::ExternalSecrets::V1alpha1::PushSecret - PushSecret is the Schema for th
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 spec
 

@@ -1,0 +1,30 @@
+use strict;
+use warnings;
+use Rex -feature => ['1.4'];
+use File::Temp qw(tempdir);
+
+set connection => 'Local';
+
+desc 'Opt-in local temporary-directory file convergence smoke test';
+task 'local_file_smoke', sub {
+    die "This test is local-only\n" unless Rex::is_local();
+    die "Set REX_LAB_WRITE=1 to authorize temporary local writes\n"
+        unless ($ENV{REX_LAB_WRITE} // '') eq '1';
+    my $dir = tempdir('rex-skill-XXXXXX', TMPDIR => 1, CLEANUP => 1);
+    my $path = "$dir/example.conf";
+    my $content = "name=example\nenabled=true\n";
+    my $changes = 0;
+    for (1 .. 2) {
+        file $path, content => $content, mode => 600,
+            on_change => sub { ++$changes };
+    }
+    die "Expected one changed apply across two runs, saw $changes\n" unless $changes == 1;
+    open my $fh, '<:raw', $path or die "Cannot read local test result: $!\n";
+    my $actual = do { local $/; <$fh> };
+    close $fh or die "Cannot close local test result: $!\n";
+    die "Byte-for-byte readback failed\n" unless defined($actual) && $actual eq $content;
+    my $mode = (stat($path))[2] & 0777; # Perl stat mode uses an octal bitmask.
+    die "Unexpected permission mode\n" unless $mode == 0600;
+    print "PASS: initial apply, unchanged apply, bytes, and local permissions\n";
+};
+1;

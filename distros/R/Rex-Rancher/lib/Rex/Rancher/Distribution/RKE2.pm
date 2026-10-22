@@ -1,7 +1,7 @@
 # ABSTRACT: RKE2: paths, services and installer of the default distribution
 
 package Rex::Rancher::Distribution::RKE2;
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 use v5.14.4;
 use Moo;
 use JSON::MaybeXS;
@@ -143,7 +143,7 @@ Rex::Rancher::Distribution::RKE2 - RKE2: paths, services and installer of the de
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 

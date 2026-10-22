@@ -19,8 +19,8 @@ sub get_rss {
 }
 
 # Warm up + observe baseline
-$p->alloc for 1..100;
-$p->free($_) for 0..99;
+my @warmup = map { $p->alloc } 1..100;
+$p->free_n(\@warmup);
 
 my $rss_start = get_rss();
 diag "RSS start: ${rss_start}KB";
@@ -41,14 +41,15 @@ for my $i (1..$N) {
 
     # Exercise stats/slot_sv occasionally (XS lifetime paths)
     $p->stats if $i % 1000 == 0;
-    if ($i % 5000 == 0 && @alloc) {
-        my $sv = $p->slot_sv($alloc[0]);
-        my $len = length $sv;
+    if ($i % 5000 == 1 && @alloc) {
+        my $view = \$p->slot_sv($alloc[0]);
+        my $len = length $$view;
     }
 }
 
 # Cleanup
 $p->free($_) for @alloc;
+is $p->used, 0, 'all endurance allocations released';
 
 my $rss_end = get_rss();
 my $growth = $rss_end - $rss_start;

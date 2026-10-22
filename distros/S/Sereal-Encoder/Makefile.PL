@@ -6,7 +6,7 @@ use warnings;
 use ExtUtils::MakeMaker;
 use Config;
 
-our $VERSION = '5.010';    # what version are we and what version of Decoder do we need.
+our $VERSION = '5.011';    # what version are we and what version of Decoder do we need.
 $VERSION = eval $VERSION or die "WTF: $VERSION: $@";    # deal with underbars
 
 my $shared_dir        = "../shared";
@@ -79,7 +79,7 @@ if ( $defines !~ /HAVE_CSNAPPY/ ) {
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
 inc::Sereal::BuildTools::WriteMakefile(
-    MIN_PERL_VERSION => '5.008',
+    MIN_PERL_VERSION => '5.014',
     META_MERGE       => {
         resources => {
             repository => {
@@ -118,7 +118,7 @@ inc::Sereal::BuildTools::WriteMakefile(
     },                                          # e.g., Module::Name => 1.1
     LICENSE       => 'perl',
     ABSTRACT_FROM => 'lib/Sereal/Encoder.pm',
-    AUTHOR        => 'Steffen Mueller <smueller@cpan.org>, Yves Orton <yves@cpan.org>',
+    AUTHOR        => 'Steffen Mueller <cpan@steffen-mueller.net>, Yves Orton <yves@cpan.org>',
     LIBS          => [$libs],                                                             # e.g., '-lm'
     DEFINE        => $defines,
     INC           => $inc,                                                                # e.g., '-I. -I/usr/local/include'

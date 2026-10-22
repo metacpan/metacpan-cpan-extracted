@@ -59,7 +59,8 @@ sub refused {
 
 my $CB = join(', ', qw( subprotocol on_open on_frame on_close on_error ));
 my %CB = map { $_ => sub {} } qw( on_open on_frame on_close on_error );
-my $PF     = "(allowed: name, namespace, ports, $CB)";
+# port_forward alone also takes on_data and on_port_error (k77)
+my $PF     = '(allowed: name, namespace, ports, subprotocol, on_open, on_frame, on_data, on_port_error, on_close, on_error)';
 my $EXEC   = "(allowed: name, namespace, command, container, stdin, stdout, stderr, tty, $CB)";
 my $ATTACH = "(allowed: name, namespace, container, stdin, stdout, stderr, tty, $CB)";
 my $CP_TO   = '(allowed: name, namespace, container, local, remote, chunk_size)';

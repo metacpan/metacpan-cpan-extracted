@@ -124,7 +124,18 @@ pop_wait(self, ...)
     if (items > 1 && (SvGETMAGIC(ST(1)), SvOK(ST(1)))) timeout = SvNV(ST(1));
     REEXTRACT_HEAP(self);   /* the timeout's get-magic may have destroyed self */
     int64_t p, v;
-    if (heap_pop_wait(h, &p, &v, timeout)) {
+    HeapWait wait;
+    wait.started = 0;
+    int got;
+    while ((got = heap_pop_wait(h, &p, &v, timeout, &wait)) < 0) {
+        if (UNLIKELY(PL_sig_pending)) {
+            PERL_ASYNC_CHECK();
+            REEXTRACT_HEAP(self);
+        }
+    }
+    SPAGAIN;
+    SP -= items;
+    if (got) {
         EXTEND(SP, 2);
         PUSHs(sv_2mortal(newSViv((IV)p)));
         PUSHs(sv_2mortal(newSViv((IV)v)));

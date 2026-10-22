@@ -1,9 +1,9 @@
 package IO::K8s::Api::Node::V1::Scheduling;
 # ABSTRACT: Scheduling specifies the scheduling constraints for nodes supporting a RuntimeClass.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
-k8s nodeSelector => { Str => 1 };
+k8s nodeSelector => HashRef[Str];
 
 
 k8s tolerations => ['Core::V1::Toleration'];
@@ -23,7 +23,7 @@ IO::K8s::Api::Node::V1::Scheduling - Scheduling specifies the scheduling constra
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 nodeSelector
 

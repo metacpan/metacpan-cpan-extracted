@@ -1,6 +1,6 @@
 package IO::K8s::PrometheusOperator::V1::GlobalRocketChatConfig;
 # ABSTRACT: rocketChat defines the default configuration for Rocket Chat.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s apiURL  => Str, { pattern => qr/^(http|https):\/\/.+$/ };
@@ -24,7 +24,7 @@ IO::K8s::PrometheusOperator::V1::GlobalRocketChatConfig - rocketChat defines the
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 apiURL
 

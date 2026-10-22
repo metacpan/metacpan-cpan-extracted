@@ -1,5 +1,5 @@
 package Kubernetes::REST::HTTPTinyIO;
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 # ABSTRACT: HTTP client using HTTP::Tiny
 use Moo;
 use HTTP::Tiny;
@@ -39,7 +39,7 @@ has ua => (is => 'ro', lazy => 1, default => sub {
     require IO::Socket::SSL::Utils;
 
     my %options;
-    $options{ SSL_verify_mode } = SSL_VERIFY_PEER if ($self->ssl_verify_server);
+    $options{ SSL_verify_mode } = $self->ssl_verify_server ? SSL_VERIFY_PEER : SSL_VERIFY_NONE;
 
     if (defined $self->ssl_cert_pem) {
         $options{ SSL_cert } = [ IO::Socket::SSL::Utils::PEM_string2cert($self->ssl_cert_pem) ];
@@ -62,6 +62,7 @@ has ua => (is => 'ro', lazy => 1, default => sub {
     return HTTP::Tiny->new(
       agent => 'Kubernetes::REST Perl Client ' . ($Kubernetes::REST::VERSION // 'dev'),
       timeout => $self->timeout,
+      verify_SSL => $self->ssl_verify_server ? 1 : 0,
       SSL_options => \%options,
     );
 });
@@ -90,14 +91,25 @@ sub call_streaming {
     my ($self, $req, $data_callback) = @_;
 
 
+    # HTTP::Tiny turns a die in data_callback into a 599; keep the original
+    # exception and rethrow it unchanged after the request.
+    my ( $failed, $error );
     my $res = $self->ua->request(
       $req->method,
       $req->url,
       {
         headers => $req->headers,
-        data_callback => $data_callback,
+        data_callback => sub {
+          return if $failed;
+          unless ( eval { $data_callback->(@_); 1 } ) {
+            ( $failed, $error ) = ( 1, $@ );
+            die $error;
+          }
+        },
       }
     );
+
+    die $error if $failed;
 
     return Kubernetes::REST::HTTPResponse->new(
        status => $res->{ status },
@@ -119,7 +131,7 @@ Kubernetes::REST::HTTPTinyIO - HTTP client using HTTP::Tiny
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head1 SYNOPSIS
 
@@ -143,6 +155,8 @@ it by design. Use L<Net::Async::Kubernetes> for those.
 =head2 ssl_verify_server
 
 Boolean. Whether to verify the server's SSL certificate. Defaults to true.
+
+The value drives both C<verify_SSL> of L<HTTP::Tiny> and the C<SSL_verify_mode> handed to L<IO::Socket::SSL> (C<SSL_VERIFY_PEER> or C<SSL_VERIFY_NONE>), so it covers the certificate chain and the hostname check together. Both are set explicitly; the backend does not rely on the L<HTTP::Tiny> default (on since 0.083). Use L<HTTP::Tiny> 0.054 or newer: from that version C<verify_SSL> controls the hostname check, and older releases do not honour the option reliably.
 
 =head2 ssl_cert_file
 
@@ -182,6 +196,8 @@ The underlying L<HTTP::Tiny> instance.
 
 Execute an HTTP request. Receives a fully prepared L<Kubernetes::REST::HTTPRequest> (URL, headers, content all set). Returns a L<Kubernetes::REST::HTTPResponse>.
 
+A transport failure is returned as status C<599> with the message as content, as L<HTTP::Tiny> reports it; any other status is the API server's. See L<Kubernetes::REST::Role::IO/Error contract>.
+
 =head2 call_streaming
 
     my $response = $io->call_streaming($req, sub { my ($chunk) = @_; ... });
@@ -189,6 +205,8 @@ Execute an HTTP request. Receives a fully prepared L<Kubernetes::REST::HTTPReque
 Execute an HTTP request with streaming response. The C<$data_callback> is called with each chunk of data as it arrives.
 
 Used internally by L<Kubernetes::REST/watch> and L<Kubernetes::REST/log> for the Watch and Pod Log APIs.
+
+Transport failures come back as status C<599>. If the callback dies, the transfer is aborted and the same exception is rethrown unchanged, with no response: it is not turned into the 599 L<HTTP::Tiny> would report for it. See L<Kubernetes::REST::Role::IO/Error contract>.
 
 =head1 SEE ALSO
 

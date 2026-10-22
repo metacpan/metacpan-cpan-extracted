@@ -1,6 +1,6 @@
 package IO::K8s::Traefik::V1alpha1::Headers;
 # ABSTRACT: Headers holds the headers middleware configuration.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s accessControlAllowCredentials     => Bool;
@@ -18,8 +18,8 @@ k8s contentSecurityPolicyReportOnly   => Str;
 k8s contentTypeNosniff                => Bool;
 k8s customBrowserXSSValue             => Str;
 k8s customFrameOptionsValue           => Str;
-k8s customRequestHeaders              => { Str => 1 };
-k8s customResponseHeaders             => { Str => 1 };
+k8s customRequestHeaders              => HashRef[Str];
+k8s customResponseHeaders             => HashRef[Str];
 k8s featurePolicy                     => Str;
 k8s forceSTSHeader                    => Bool;
 k8s frameDeny                         => Bool;
@@ -30,7 +30,7 @@ k8s publicKey                         => Str;
 k8s referrerPolicy                    => Str;
 k8s sslForceHost                      => Bool;
 k8s sslHost                           => Str;
-k8s sslProxyHeaders                   => { Str => 1 };
+k8s sslProxyHeaders                   => HashRef[Str];
 k8s sslRedirect                       => Bool;
 k8s sslTemporaryRedirect              => Bool;
 k8s stsIncludeSubdomains              => Bool;
@@ -84,7 +84,7 @@ IO::K8s::Traefik::V1alpha1::Headers - Headers holds the headers middleware confi
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 accessControlAllowCredentials
 

@@ -27,6 +27,25 @@ SKIP: {
     close $rfh;
 }
 
+# Stored geometry validation
+{
+    my ($fh, $path) = tempfile(UNLINK => 1, SUFFIX => '.shm');
+    my $ps = Data::PubSub::Shared::Str->new($path, 4, 16);
+    undef $ps;
+    sysseek($fh, 0, 0) // die "seek: $!";
+    sysread($fh, my $header, 256) == 256 or die "read: $!";
+    for my $case ([48, pack('Q', 32), 'overlapping arena regions'],
+                  [40, pack('L', 0x80000000), 'unrepresentable message size'],
+                  [12, pack('L', 1), 'one-slot ring']) {
+        my $bad = $header;
+        substr($bad, $case->[0], length($case->[1])) = $case->[1];
+        sysseek($fh, 0, 0) // die "seek: $!";
+        syswrite($fh, $bad) == length($bad) or die "write: $!";
+        eval { Data::PubSub::Shared::Str->new_from_fd(fileno($fh)) };
+        like $@, qr/invalid/, "rejects $case->[2] in stored geometry";
+    }
+}
+
 # Valid roundtrip
 {
     my $ps = Data::PubSub::Shared::Int->new_memfd("t", 16);

@@ -129,7 +129,7 @@ Applications do not need to match responses with raw QUIC stream IDs.
 
 ## QUIC boundary
 
-Unblock::HTTP3 uses the public protocol-engine API in Net::QUIC 0.04.
+Unblock::HTTP3 uses the public protocol-engine API in Net::QUIC 0.05.
 
 Receive data follows this path:
 
@@ -151,7 +151,7 @@ Send data follows this path:
     HTTP body producer
         -> libnghttp3 data reader
         -> nghttp3_conn_writev_stream
-        -> Net::QUIC::Stream->send_some
+        -> Net::QUIC::Stream->send_some(..., limit_to_credit => 1)
         -> nghttp3_conn_add_write_offset
 
 Acknowledgements follow this path:
@@ -161,12 +161,18 @@ Acknowledgements follow this path:
         -> nghttp3 acked_stream_data callback
         -> release retained body memory
 
+HTTP/3 requests credit-limited acceptance from Net::QUIC 0.05: accepted
+prefixes are constrained by the shared transmit buffer and available peer
+stream/connection credit. It never resends an accepted prefix. Net::QUIC
+tracks short-acceptance capacity waiters and wakes them when sibling ACKs
+free shared transmit space; HTTP/3 does not broadcast ACK wakeups.
+
 Stream activity is coalesced through:
 
     Net::QUIC::Connection->on_stream_activity
     Net::QUIC::Connection->next_active_stream_id
 
-HTTP Datagrams use the separate Net::QUIC 0.04 RFC 9221 boundary:
+HTTP Datagrams use the separate Net::QUIC 0.05 RFC 9221 boundary:
 
     Transaction->send_datagram
         -> Quarter Stream ID + payload
@@ -402,7 +408,7 @@ Unblock::HTTP3 uses libnghttp3's RFC 9218 priority machinery.
 
 libnghttp3 also needs the cumulative number of client bidirectional streams
 permitted by QUIC so it can validate PRIORITY_UPDATE element IDs. Net::QUIC
-0.04 defaults that transport value to 100 and replenishes MAX_STREAMS as
+0.05 defaults that transport value to 100 and replenishes MAX_STREAMS as
 peer-created streams close.
 
 Unblock::HTTP3 mirrors that default into libnghttp3 and advances the native
@@ -497,8 +503,11 @@ The default queued streaming receive-body limit is 4 MiB.
 These limits are configurable.
 
 The field-section limit is advertised in HTTP/3 SETTINGS and is also enforced
-locally. Resource-limit violations close the HTTP/3 connection with
-H3_EXCESSIVE_LOAD.
+locally. Field-section limit violations close the HTTP/3 connection with
+H3_EXCESSIVE_LOAD. Buffered or queued streaming body-limit violations reset
+only the affected request stream with H3_EXCESSIVE_LOAD. Other streams remain
+usable, retained body bytes are released, and discarded receive credit is
+returned. Transaction on_finish runs after its error callback.
 
 Unblock::HTTP3 also records the peer's SETTINGS_MAX_FIELD_SECTION_SIZE and checks
 every outgoing header and trailer section before submission. An oversized

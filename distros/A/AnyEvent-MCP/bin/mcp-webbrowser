@@ -1,0 +1,808 @@
+#!/opt/bin/perl
+
+=encoding utf8
+
+=head1 NAME
+
+mcp-webbrowser - expose opted-in browser tabs to MCP
+
+=head1 SYNOPSIS
+
+   mcp-webbrowser --stdio
+   mcp-webbrowser --print-url
+   mcp-webbrowser --stdio --bind 127.0.0.1:31741
+   mcp-webbrowser --connect http://host:port/TOKEN/browser
+
+=head1 DESCRIPTION
+
+The companion userscript lets you explicitly grant an MCP client access to
+individual browser tabs. Only opted-in tabs connect to this broker over
+WebSocket; MCP clients can then discover those tabs, execute JavaScript in
+their page context and add DOM elements. Code can inspect or change the
+page, including logged-in content and forms, and cause side effects. Treat
+allowing a tab as giving the MCP client access to that page, not merely its
+URL or title. The broker still applies its own MCP permission rules.
+
+This executable is the broker, not a browser extension. The userscript
+handles per-tab authorization and page execution. The broker cannot see
+unapproved tabs merely because the userscript is installed.
+
+The HTTP/WebSocket listener stays active alongside MCP stdio or an outgoing
+C<--connect>. Listener configuration, token derivation and URL discovery follow
+C<mcp-vim>. Tokens authenticate both MCP HTTP and browser WebSocket connections.
+Keep the broker URL private. The userscript accepts the C<http://> URL printed
+by C<mcp-webbrowser --print-url>, converts it to WebSocket internally and
+appends its own opaque per-tab target ID.
+
+=head1 USERSCRIPT INSTALLATION AND USE
+
+The self-contained userscript is C<webbrowser/mcp-webbrowser.user.js> in the
+AnyEvent::MCP source distribution. Installing the Perl distribution does
+not install it in a browser. Install a userscript manager first; see the
+L<ScriptCat installation guide|https://docs.scriptcat.org/en/docs/use/use/>.
+B<ScriptCat on Chromium and Firefox has been tested> (Firefox 153 on Linux,
+including page execution, DOM insertion and navigation). ScriptCat is available
+for Chrome, Edge and Firefox. Tampermonkey
+provides the required C<GM_getTab>/C<GM_saveTab> APIs and may work, but
+has not been tested with this userscript. Other managers are unverified.
+
+Install the source-distribution file through your userscript manager, or
+open the published userscript URL in the browser and install it there:
+
+   https://dist.schmorp.de/mcp-webbrowser/1/mcp-webbrowser.user.js
+
+The C</1/> is the major version of the private browser/broker protocol, not
+the MCP protocol or Perl distribution version. The published script declares
+that URL for installation and automatic updates; updates depend on the
+userscript manager. The source file contains the entire userscript and
+needs no external JavaScript import.
+
+Start the broker (directly or through your MCP client/multibroker) and obtain
+its listener URL with:
+
+   mcp-webbrowser --stdio
+   mcp-webbrowser --print-url
+
+The second command prints the URL and exits; run it with the same service
+name and configuration as the running broker. It does not launch a second
+listener. On a page you want to expose, select B<Allow MCP access to this
+tab> from the userscript menu. The first time, enter the full URL printed
+by C<--print-url> when prompted. Do not append a tab name or convert
+C<http> to C<ws> yourself. The URL is remembered across tabs; the grant is
+per tab, not per website. Pages remain unexposed until explicitly allowed,
+and the menu on an unapproved tab contains only the Allow command.
+
+When allowed, the menu offers B<Disconnect MCP access to this tab>, the
+broker URL configuration and independent toggles for a tab-title indicator
+and a notification in the page when switching to that tab. Both indicators
+are enabled by default. The title prefix is C<[○MCP]> while connecting,
+C<[●MCP]> when connected and C<[⊗MCP]> after prolonged failure. The toast
+shows the same status and disappears shortly after a successful connection.
+The indicator prefix is omitted from titles reported to the broker.
+The permission remains granted during temporary disconnections and normally
+survives navigation or reload until explicitly revoked.
+
+If a tab does not connect, check that the broker is running and its URL is
+correct. Depending on browser settings, you may also need to allow the page
+to access a local-loopback or local-network address; browser permission
+blocking can look like a WebSocket failure. The title and toast indicators
+report connectivity, not a trustworthy security boundary.
+
+B<Note:> ScriptCat currently loses the saved per-tab permission when
+Chromium replaces a discarded tab. After such a discard and restoration,
+you must choose Allow again. This is tracked in
+L<https://github.com/scriptscat/scriptcat/issues/1791>.
+
+=head1 FIRST TOOL CALL
+
+After allowing a tab, ask your assistant:
+
+   Call tabs and show the connected tabs. On one of them, execute
+   document.title and show its result.
+
+Use a C<target> returned by C<tabs> for the C<execute> call. Listing
+requires C<read> permission; even this simple JavaScript expression needs
+C<exec> permission, because execution has full page authority. The
+tool returns an object containing C<value>; there is no read-only mode.
+
+With a multibroker prefix C<browser>, the tools are C<browser.tabs>
+and C<browser.execute>. If no tab is listed, confirm that the userscript
+was allowed B<on that tab> and that its indicator shows a connection.
+Installing the userscript does not grant access to any tabs.
+An execution error or timeout does not prove that nothing happened;
+do not blindly retry JavaScript that changes page state.
+
+=head1 TOOLS
+
+=over
+
+=item tabs
+
+Return C<{tabs: [...]}> with each connected tab's C<target>, current document
+C<instance_id>, integer C<revision>, and client-reported C<url> and C<title>.
+The revision starts at 1 and advances on document replacement, not on an
+ordinary WebSocket reconnect or a same-document navigation. Disconnected tab
+identities are retained for up to 30 seconds. This is cached registration
+metadata, not a fresh DOM inspection. Requires C<read> permission.
+
+=item execute
+
+Run C<code> on C<target>. Optional C<instance_id> and C<revision> from C<tabs>
+reject a replaced document before dispatch. C<timeout> defaults to 30 seconds
+and can be 1..300 seconds. With C<navigate> false (the default), the browser
+awaits the evaluation result. Results are C<{value: JSON_VALUE}>; exceptions
+become tool errors.
+Replies default to a 16 KiB UTF-8 JSON limit; C<max_bytes> can raise the
+limit to 2 MiB (minimum 1024 bytes). The size includes the JSON envelope.
+Oversized results yield an error instead of truncating JSON or disconnecting
+the browser. Code has already executed when the size error is returned;
+do not blindly retry commands with side effects.
+
+With C<navigate> true, the broker sends the command, awaits the browser's
+C<ready> message, and sends C<proceed> before the browser evaluates it.
+The broker then waits for either a new document registering on the same tab
+or an observed same-document navigation. The result has C<navigation> equal
+to C<document> or C<same-document>, the resulting C<revision>, and reported
+URL/title. If neither completion is observed before the timeout, it returns
+C<navigation: "timeout"> with a reason, current revision and available metadata.
+Timeout does not imply that the command was not executed; no automatic retry
+is attempted. One navigation operation at a time is allowed per tab.
+
+The browser client injects C<code> as the body of C<async () =E<gt> code>
+in the page's JavaScript world. A single expression yields its value without
+C<return>; use a braced function body with explicit C<return> for multiple
+statements. Parenthesize object literals, e.g. C<({title: document.title})>.
+C<await> works inside either form. Declarations in the body do not persist
+between calls unless assigned to page globals. Results are awaited. This
+does not use C<eval> or C<Function>. Syntax errors can prevent the injected
+script from starting; a temporary page-world error listener tries to return
+the native syntax-error message, otherwise the client reports an injection
+failure. Source injection is serialized until each script acknowledges
+successful compilation or fails; asynchronous execution thereafter may
+overlap. Code has full page-context authority, with no read-only evaluation
+mode or sandbox claim.
+
+Cancellation and timeout send a best-effort cancel message. They cannot undo
+already executed code or guarantee that JavaScript stops. Disconnect fails
+ordinary pending calls without replaying them. A navigation request persists
+across disconnects and may complete on the next document's registration.
+Concurrent human navigation can satisfy a pending request; success reports
+observation, not proof that the submitted code caused the navigation.
+
+=item add-element
+
+Insert an element through the userscript's C<GM_addElement> in the content
+sandbox. This can bypass page CSP for stylesheets and scripts. Required
+C<target> and C<tag>; optional C<parent> is a document CSS selector
+(default: document root). C<attributes> contains HTML attribute strings,
+while C<properties> contains DOM property values, such as C<textContent>
+or C<innerHTML>. Properties are supplied during element creation; attributes
+are set explicitly as well. An unsuccessful selector or insertion is an error.
+The result is C<{value: {tag: TAG, id: ID_OR_NULL}}> and does not assert that
+the caller's C<id> is unique. No automatic ID or registry is maintained: give
+elements a distinctive C<id> or C<data-*> attribute when later page-context
+C<execute> calls need to modify or remove them. Uses C<exec> permission and
+supports the same optional C<instance_id> and C<revision> guards as C<execute>.
+
+=back
+
+=head1 PERMISSIONS
+
+The default rule file is C<~/.config/anyevent-mcp/rules/webbrowser-default.ini>,
+under C<$XDG_CONFIG_HOME> when set. C<--name NAME> replaces C<default>.
+C<read> covers tab discovery; C<exec> covers arbitrary JavaScript.
+
+Exec prompts offer this exact code in this target, any code in this target,
+or any code in all targets. Saved target grants also cover future tabs using
+the same target name. Client-reported URLs and titles are display information,
+not verified origin identities or saved permission scopes.
+C<--ask> selects the same helper, tty, yad, mcp or auto modes as other servers.
+
+=head1 OPTIONS
+
+Common options, including C<--name>, C<--bind>, C<--token>,
+C<--stdio>, C<--connect>, C<--print-url>, C<--auto-allow> and
+C<--auto-deny>, are documented in
+L<AnyEvent::MCP::Server::Simple/mcp_getoptions>. This broker retains its
+HTTP/WebSocket listener when serving MCP over stdio or C<--connect>.
+C<--tool-help> prints registered tools and arguments without listening.
+C<--auto-allow '*,*'> approves both discovery and JavaScript execution:
+only explicitly opted-in tabs are exposed, but code has full authority
+in those pages.
+
+=head1 BROWSER PROTOCOL
+
+WebSocket authentication happens at C</TOKEN/TARGET>. C<TARGET> is one
+percent-encoded path component. Before ordinary messages, send:
+
+   ["mcp-webbrowser", 1, 0, INSTANCE_ID, {"url": URL, "title": TITLE}]
+
+C<INSTANCE_ID> identifies one loaded document. Keep it across reconnects of that
+document and change it on navigation/reload. The private browser protocol is
+1.0, independent of MCP and the old xpcse browser-transfer protocol.
+The broker answers C<["welcome", TARGET, INSTANCE_ID, REVISION]>.
+The requested target represents a browser tab: a different document with the
+same target replaces its previous connection and increments the revision.
+Reconnecting the same document retains that revision. A disconnected tab's
+identity expires after 30 seconds with no pending navigation. No page is
+exposed before a valid hello.
+
+A tab session starts on first hello, remains active across temporary socket
+disconnects and document replacements, and finishes on an explicit C<quit>,
+after 30 seconds of inactivity, or when the broker stops. Session start
+and finish are logged at C<info>; ordinary socket connection and disconnection
+events are logged at C<trace>. Revision and request IDs are transmitted as
+JSON numbers, even when Perl string operations have touched those scalars.
+Approved JavaScript is logged at C<trace> when dispatched for ordinary evaluation,
+or when C<proceed> is sent for navigation (never during the permission prompt).
+
+Broker to browser:
+
+   ["call", ID, "execute", {"code": CODE, "max_bytes": BYTES}]
+   ["call", ID, "navigate", {"code": CODE, "max_bytes": BYTES}]
+   ["call", ID, "add_element", {"tag": TAG, "parent": SELECTOR, "attributes": ATTRS, "properties": PROPS}]
+   ["proceed", ID]
+   ["cancel", ID]
+
+Browser to broker:
+
+   ["reply", ID, true, JSON_VALUE]
+   ["reply", ID, false, ERROR_STRING]
+   ["ready", ID]
+   ["navigated", ID, {"url": URL, "title": TITLE}]
+   ["state", {"url": URL, "title": TITLE}]
+   ["quit"]
+
+The browser replies C<ready> to a C<navigate> call without evaluating it.
+Only C<proceed> starts evaluation. C<navigated> reports a completed
+same-document navigation; a different document's hello is the other
+completion path. C<reply> with C<false> can report an evaluation failure.
+Only JSON values cross the wire; undefined becomes null. Errors are strings.
+Late replies after cancellation are ignored. State updates replace cached
+metadata. Malformed messages close the connection with status 1002.
+The initial hello has a 15-second deadline; a silent connection is closed.
+
+The distributed userscript evaluates in the page's JavaScript world via an
+injected script and returns serialized results through DOM events. Its
+Navigation API listener is installed in that same world. The broker cannot
+authenticate page-reported values or infer application-rendering readiness
+from navigation success. The userscript retries disconnected WebSockets;
+it has no event subscriptions or separate SPA revision counter.
+
+=cut
+
+use common::sense;
+use AnyEvent ();
+use AnyEvent::Socket ();
+use AnyEvent::Handle ();
+use AnyEvent::MCP ();
+use AnyEvent::MCP::Config ();
+use AnyEvent::MCP::Server::HTTP ();
+use AnyEvent::MCP::Server::JSONL ();
+use AnyEvent::MCP::Server::Permissions ();
+use AnyEvent::MCP::Server::Toolset ();
+use AnyEvent::MCP::Server::Simple qw(mcp_getoptions mcp_tool_help mcp_log mcp_log_request);
+use AnyEvent::WebSocket::Server ();
+use AnyEvent::WebSocket::Message ();
+use JSON::XS ();
+use Socket ();
+use Scalar::Util qw(weaken);
+
+my %options = mcp_getoptions ({
+   usage => "Usage: mcp-webbrowser [OPTION]...\n",
+   path => "/",
+   description => "Expose connected browser tabs to MCP; HTTP/WebSocket stays active with stdio or --connect.",
+   options => [["--ask MODE", "Ask via helper (default), tty, yad, mcp, or auto"]],
+   examples => "  mcp-webbrowser --auto-allow '*,*' # all actions in opted-in tabs",
+}, "ask=s" => \my $ask);
+@ARGV and die "Unexpected arguments\n";
+my $name = $options{name};
+my $connect = $options{connect};
+my $stdio = $options{stdio} || !defined $connect && $ENV{PERL_ANYEVENT_MCP_MULTIBROKER_PROTOCOL} eq "stdio";
+!($stdio && defined $connect) or die "Cannot combine --stdio and --connect\n";
+
+my $config = AnyEvent::MCP::Config->global;
+my %http = $config->http_settings ($name, $options{bind});
+$http{tokens} = $options{tokens} if $options{tokens};
+my %token = map { $_ => 1 } @{$http{tokens}};
+my $json = JSON::XS->new->utf8->max_depth (64);
+my (%connections, %pages, %tabs);
+my $done = AE::cv;
+
+my $permissions = AnyEvent::MCP::Server::Permissions->new (
+   name => "webbrowser-$name",
+   actions => {
+      read => "List connected browser tabs and their reported metadata",
+      exec => "Execute arbitrary JavaScript in a connected browser page",
+   },
+   (defined $ask ? (ask => $ask) : ()),
+   auto_rules => [@{$options{auto_rules} || []},
+      $config->auto_rules ($name)],
+);
+
+sub page_label {
+   my ($state) = @_;
+
+   my ($title, $url) = @{$state}{qw(title url)};
+   s/[\x00-\x1f\x7f]/ /g for $title, $url;
+
+   (length $title ? substr ($title, 0, 80) . " - " : "")
+      . substr ($url, 0, 160)
+}
+
+sub code_preview {
+   my ($code, $limit) = @_;
+
+   $limit //= 160;
+   my $short = substr ($code, 0, $limit);
+   $short .= "..." if length $code > $limit;
+   $json->encode ($short)
+}
+
+sub url_preview {
+   my $url = shift;
+
+   $url =~ s/[?#].*//s;
+   $url =~ s{(://)[^/]*@}{$1};
+   $url =~ s/[\x00-\x1f\x7f]/ /g;
+   my $short = substr ($url, 0, 64);
+   $short .= "..." if length $url > 64;
+   $json->encode ($short)
+}
+
+sub permission {
+   my ($req, $action, $target, $code) = @_;
+
+   my $subject = "tabs";
+   my @subjects = ({ label => "the list of connected browser tabs", subject => $subject });
+
+   if (defined $target) {
+      my $label = $target;
+      if (my $page = $pages{$target}) {
+         $label = page_label ($page->{state}) . " (tab " . substr ($target, 0, 8) . ")";
+      }
+
+      my $coder = JSON::XS->new->allow_nonref;
+      my $prefix = "execute:" . $coder->encode ($target) . ":";
+      $subject = $prefix . $coder->encode ($code);
+      @subjects = (
+         { label => "this exact code in page '$label'", subject => $subject },
+         { label => "any JavaScript in page '$label'", subject => "^" . (quotemeta $prefix) },
+         { label => "any JavaScript in all browser tabs, including future connections", subject => "^" },
+      );
+      $target = $label;
+   }
+
+   $req->require_permission ({
+      tool => $req->{tool}, action => $action,
+      subject => $subject, subjects => \@subjects, sandbox_grants => [],
+      reason => defined $target ? "Execute JavaScript in '$target'\n\n$code" : "List connected browser tabs",
+   });
+}
+
+sub send_message {
+   my ($page, $message) = @_;
+
+   $page->{conn}->send (AnyEvent::WebSocket::Message->new (opcode => 1, body => $json->encode ($message)));
+}
+
+sub finish_call {
+   my ($page, $id, $success, $value) = @_;
+
+   my $entry = delete $page->{pending}{$id} or return;
+   my $req = $entry->{request};
+   return if $req->{finished};
+
+   $success ? $req->result ({ value => $value }) : $req->error ($value)
+}
+
+sub finish_tab {
+   my ($tab, $reason) = @_;
+
+   return unless $tabs{$tab->{requested}} && $tabs{$tab->{requested}} == $tab;
+   delete $tab->{expiry};
+   delete $tabs{$tab->{requested}};
+   mcp_log "$tab->{requested}: session finished ($reason)";
+}
+
+sub expire_tab {
+   my ($tab) = @_;
+
+   delete $tab->{expiry};
+   return if $tab->{page} || $tab->{navigation};
+
+   $tab->{expiry} = AE::timer 30, 0, sub {
+      finish_tab $tab, "inactive for 30s"
+         unless $tab->{page} || $tab->{navigation};
+   };
+}
+
+sub finish_navigation {
+   my ($tab, $kind, $reason) = @_;
+
+   my $entry = delete $tab->{navigation} or return;
+   delete $entry->{timer};
+   my $req = $entry->{request};
+   return if $req->{finished};
+
+   my $page = $tab->{page};
+   $req->result ({
+      navigation => $kind,
+      revision   => $tab->{revision}*1,
+      ($page ? (%{$page->{state}}) : ()),
+      (defined $reason ? (reason => $reason) : ()),
+   });
+
+   expire_tab $tab unless $page;
+}
+
+sub close_page {
+   my ($page, $code, $reason) = @_;
+
+   delete $connections{$page+0} or return;
+   delete $pages{$page->{target}} if defined $page->{target} && $pages{$page->{target}} == $page;
+   delete $page->{hello_timer};
+
+   if (my $tab = $page->{tab}) {
+      delete $tab->{page} if $tab->{page} == $page;
+      expire_tab $tab;
+   }
+
+   finish_call $page, $_, 0, $reason for keys %{$page->{pending}};
+   $page->{conn}->close ($code, $reason);
+   if (defined $page->{target}) {
+      mcp_log "$page->{target}: disconnected ($reason)";
+   } else {
+      AE::log trace => "Browser WebSocket disconnected before hello ($reason)";
+   }
+}
+
+sub valid_state {
+   my ($state) = @_;
+
+   ref $state eq "HASH" && defined $state->{url} && !ref $state->{url}
+      && defined $state->{title} && !ref $state->{title}
+}
+
+sub receive_message {
+   my ($page, $packet) = @_;
+
+   ref $packet eq "ARRAY" && @$packet && defined $packet->[0] && !ref $packet->[0]
+      or die "Invalid browser message\n";
+
+   unless (defined $page->{target}) {
+      @$packet == 5 && $packet->[0] eq "mcp-webbrowser"
+         && defined $packet->[1] && !ref $packet->[1] && $packet->[1] eq "1"
+         && defined $packet->[2] && !ref $packet->[2] && $packet->[2] eq "0"
+         && defined $packet->[3] && !ref $packet->[3] && length $packet->[3]
+         && valid_state ($packet->[4])
+         or die "Invalid browser hello\n";
+
+      my $new = !exists $tabs{$page->{requested}};
+      my $tab = $tabs{$page->{requested}} ||= {
+         requested => $page->{requested}, revision => 0,
+      };
+      my $different = !defined $tab->{instance_id} || $tab->{instance_id} ne $packet->[3];
+      close_page $tab->{page}, 1000, "Page connection replaced" if $tab->{page};
+      delete $tab->{expiry};
+
+      ++$tab->{revision} if $different;
+      $tab->{instance_id} = $packet->[3];
+      @$page{qw(target instance_id state tab)} = ($page->{requested}, $packet->[3], $packet->[4], $tab);
+      $tab->{page} = $page;
+      delete $page->{hello_timer};
+      $pages{$page->{target}} = $page;
+      send_message $page, ["welcome", $page->{target}, $page->{instance_id}, $tab->{revision}*1];
+
+      if ($different && $tab->{navigation} && $tab->{navigation}{phase} eq "proceed") {
+         finish_navigation $tab, "document";
+      }
+
+      mcp_log "$page->{target}: session started (" . url_preview ($page->{state}{url}) . ")" if $new;
+      mcp_log "$page->{target}: connected (revision $tab->{revision})"
+         unless $new;
+      return
+   }
+
+   my $type = $packet->[0];
+
+   if ($type eq "reply") {
+      @$packet == 4 && defined $packet->[1] && !ref $packet->[1] && $packet->[1] =~ /\A[1-9][0-9]*\z/
+         && defined $packet->[2] && ($packet->[2] eq "0" || $packet->[2] eq "1")
+         && ($packet->[2] || defined $packet->[3] && !ref $packet->[3])
+         or die "Invalid browser reply\n";
+      my $entry = $page->{tab}{navigation};
+      if ($entry && $entry->{page} == $page && $entry->{id} == $packet->[1]) {
+         if (!$packet->[2]) {
+            delete $page->{tab}{navigation};
+            delete $entry->{timer};
+            $entry->{request}->error ($packet->[3]) unless $entry->{request}{finished};
+         }
+      } else {
+         finish_call $page, @$packet[1, 2, 3];
+      }
+   } elsif ($type eq "ready") {
+      @$packet == 2 && defined $packet->[1] && !ref $packet->[1]
+         && $packet->[1] =~ /\A[1-9][0-9]*\z/ or die "Invalid navigation acknowledgement\n";
+
+      my $entry = $page->{tab}{navigation};
+      if ($entry && $entry->{page} == $page && $entry->{id} == $packet->[1]
+          && $entry->{phase} eq "ready") {
+         $entry->{phase} = "proceed";
+         AE::log trace => "webbrowser navigate $page->{target} #$entry->{id}: " . code_preview ($entry->{code});
+         send_message $page, ["proceed", $packet->[1]*1];
+      }
+   } elsif ($type eq "navigated") {
+      @$packet == 3 && defined $packet->[1] && !ref $packet->[1]
+         && $packet->[1] =~ /\A[1-9][0-9]*\z/ && valid_state ($packet->[2])
+         or die "Invalid navigation result\n";
+
+      my $entry = $page->{tab}{navigation};
+      if ($entry && $entry->{page} == $page && $entry->{id} == $packet->[1]
+          && $entry->{phase} eq "proceed") {
+         $page->{state} = $packet->[2];
+         finish_navigation $page->{tab}, "same-document";
+      }
+   } elsif ($type eq "state") {
+      @$packet == 2 && valid_state ($packet->[1]) or die "Invalid browser state\n";
+      $page->{state} = $packet->[1];
+   } elsif ($type eq "quit") {
+      @$packet == 1 or die "Invalid browser quit\n";
+      close_page $page, 1000, "Page disconnected";
+      finish_tab $page->{tab}, "disabled"
+         if $page->{tab} && !$page->{tab}{navigation};
+   } else {
+      die "Unknown browser message\n";
+   }
+}
+
+sub accept_browser {
+   my ($fh) = @_;
+
+   my $requested;
+   my $ws = AnyEvent::WebSocket::Server->new (
+      max_payload_size => 16 * 1024 * 1024,
+      handshake => sub {
+         my ($req, $res) = @_;
+         my ($cookie, $target) = $req->{resource_name} =~ m{\A/([^/]+)/([^/?#]+)\z};
+         defined $cookie && $token{$cookie} or return;
+         $target =~ /%(?![0-9a-fA-F]{2})/ and return;
+         $target =~ s/%([0-9a-fA-F]{2})/chr hex $1/ge;
+         utf8::decode $target or return;
+         length $target && $target !~ /\0/ or return;
+         $requested = $target;
+
+         $res
+      },
+   );
+   $ws->establish ($fh)->cb (sub {
+      my $conn = eval { $_[0]->recv };
+      unless ($conn) {
+         AE::log warn => "Browser WebSocket establishment failed: " . ($@ || "no connection");
+         return;
+      }
+
+      my $page = { conn => $conn, requested => $requested, pending => {}, rpcid => 0 };
+      $connections{$page+0} = $page;
+      weaken (my $weak = $page);
+      $conn->on (finish => sub { close_page $weak, 1000, "Page disconnected" if $weak });
+      $conn->on (each_message => sub {
+         return unless $weak && exists $connections{$weak+0};
+         my $ok = eval {
+            $_[1]->opcode == 1 or die "Browser messages must be text\n";
+            receive_message $weak, $json->decode ($_[1]->body);
+            1
+         };
+         unless ($ok) {
+            AE::log warn => "Browser protocol error: $@";
+            close_page $weak, 1002, "Invalid browser protocol";
+         }
+      });
+      $page->{hello_timer} = AE::timer 15, 0, sub {
+         close_page $weak, 1002, "Browser hello timed out" if $weak;
+      };
+   });
+}
+
+my $toolset = AnyEvent::MCP::Server::Toolset->new;
+$toolset->tool (tabs => "List connected browser tabs and their client-reported metadata.",
+   { type => "object", properties => {}, additionalProperties => JSON::XS::false },
+   sub {
+      my ($req) = @_;
+      permission $req, "read";
+      AE::log debug => "webbrowser tabs";
+      $req->result ({ tabs => [map {
+         my $page = $pages{$_};
+         +{ %{$page->{state}}, target => $_, instance_id => $page->{instance_id},
+            revision => $page->{tab}{revision}*1 }
+      } sort keys %pages] });
+   },
+);
+$toolset->tool (execute => "Run code in the page as async () => CODE. A single expression returns implicitly; "
+      . "a { ... } statement body needs explicit return. await works; write object literals as ({ ... }). "
+      . "UTF-8 JSON replies default to max_bytes=16384 (16 KiB), configurable up to 2097152 (2 MiB); oversized output errors after execution, not truncated. "
+      . "With navigate=true, acknowledge before execution, "
+      . "then wait for a new document or observed same-document navigation. "
+      . "Revision/instance guards prevent executing in a replaced document.",
+   {
+      type => "object",
+      properties => {
+         target => { type => "string", minLength => 1 },
+         code => { type => "string" },
+         instance_id => { type => "string", minLength => 1 },
+         revision => { type => "integer", minimum => 1 },
+         navigate => { type => "boolean", default => JSON::XS::false },
+         max_bytes => { type => "integer", minimum => 1024, maximum => 2 * 1024 * 1024, default => 16 * 1024 },
+         timeout => { type => "number", minimum => 1, maximum => 300, default => 30 },
+      },
+      required => ["target", "code"], additionalProperties => JSON::XS::false,
+   },
+   sub {
+      my ($req, $args) = @_;
+
+      my $page = $pages{$args->{target}} or die "Browser page is not connected\n";
+      !defined $args->{instance_id} || $args->{instance_id} eq $page->{instance_id}
+         or die "Browser document instance changed\n";
+      !defined $args->{revision} || $args->{revision} == $page->{tab}{revision}
+         or die "Browser document revision changed (now $page->{tab}{revision})\n";
+      !$page->{tab}{navigation} or die "Navigation already in progress for this tab\n";
+      permission $req, exec => $args->{target}, $args->{code};
+
+      AE::log debug => "webbrowser " . ($args->{navigate} ? "navigate " : "execute ")
+         . $json->encode ($args->{target}) . " " . url_preview ($page->{state}{url})
+         . " " . code_preview ($args->{code}, 20);
+
+      $pages{$args->{target}} && $pages{$args->{target}} == $page
+         or die "Browser document changed while permission was pending\n";
+
+      my $id = ++$page->{rpcid};
+      if ($args->{navigate}) {
+         my $tab = $page->{tab};
+         my $entry = $tab->{navigation} = {
+            request => $req, page => $page, id => $id, phase => "ready", code => $args->{code},
+         };
+         $entry->{timer} = AE::timer $args->{timeout} // 30, 0, sub {
+            return unless $tab->{navigation} && $tab->{navigation} == $entry;
+            if ($entry->{phase} eq "proceed") {
+               send_message $entry->{page}, ["cancel", $id*1] if $tab->{page} && $tab->{page} == $entry->{page};
+               finish_navigation $tab, "timeout", "No completed navigation was observed before timeout";
+            } else {
+               delete $tab->{navigation};
+               send_message $page, ["cancel", $id*1] if $tab->{page} && $tab->{page} == $page;
+               $req->error ("Browser did not acknowledge navigation") unless $req->{finished};
+               expire_tab $tab unless $tab->{page};
+            }
+         };
+         $req->{on_cancel} = sub {
+            return unless $tab->{navigation} && $tab->{navigation} == $entry;
+            delete $tab->{navigation};
+            delete $entry->{timer};
+            send_message $page, ["cancel", $id*1] if $tab->{page} && $tab->{page} == $page;
+            expire_tab $tab unless $tab->{page};
+         };
+         send_message $page, ["call", $id*1, "navigate", { code => $args->{code}, max_bytes => $args->{max_bytes} // 16 * 1024 }];
+         return;
+      }
+
+      my $entry = $page->{pending}{$id} = { request => $req };
+      weaken (my $weak = $page);
+      $entry->{timer} = AE::timer $args->{timeout} // 30, 0, sub {
+         return unless $weak && exists $weak->{pending}{$id};
+         send_message $weak, ["cancel", $id*1];
+         finish_call $weak, $id, 0, "Browser execution timed out";
+      };
+      $req->{on_cancel} = sub {
+         return unless $weak && delete $weak->{pending}{$id};
+         send_message $weak, ["cancel", $id*1];
+      };
+      AE::log trace => "webbrowser execute $args->{target} #$id: " . code_preview ($args->{code});
+      send_message $page, ["call", $id*1, "execute", { code => $args->{code}, max_bytes => $args->{max_bytes} // 16 * 1024 }];
+   },
+);
+$toolset->tool (add_element => "Insert a DOM element via userscript GM_addElement, bypassing page CSP for style/script elements. "
+      . "Set HTML attributes with attributes and DOM properties (e.g. textContent or innerHTML) with properties. "
+      . "Optional parent is a CSS selector, default document.documentElement. "
+      . "Give the element your own distinctive id or data-* attribute if you want to find, change or remove it later via execute. "
+      . "No automatic id or registry is created.",
+   {
+      type => "object",
+      properties => {
+         target => { type => "string", minLength => 1 },
+         tag => { type => "string", minLength => 1 },
+         parent => { type => "string", minLength => 1 },
+         attributes => { type => "object", additionalProperties => { type => "string" } },
+         properties => { type => "object", additionalProperties => JSON::XS::true },
+         instance_id => { type => "string", minLength => 1 },
+         revision => { type => "integer", minimum => 1 },
+      },
+      required => ["target", "tag"], additionalProperties => JSON::XS::false,
+   },
+   sub {
+      my ($req, $args) = @_;
+
+      my $page = $pages{$args->{target}} or die "Browser page is not connected\n";
+      !defined $args->{instance_id} || $args->{instance_id} eq $page->{instance_id}
+         or die "Browser document instance changed\n";
+      !defined $args->{revision} || $args->{revision} == $page->{tab}{revision}
+         or die "Browser document revision changed (now $page->{tab}{revision})\n";
+      !$page->{tab}{navigation} or die "Navigation already in progress for this tab\n";
+      permission $req, exec => $args->{target}, "GM_addElement " . $json->encode ($args);
+      $pages{$args->{target}} && $pages{$args->{target}} == $page
+         or die "Browser document changed while permission was pending\n";
+
+      my $id = ++$page->{rpcid};
+      my $entry = $page->{pending}{$id} = { request => $req };
+      weaken (my $weak = $page);
+      $entry->{timer} = AE::timer 30, 0, sub {
+         return unless $weak && exists $weak->{pending}{$id};
+         send_message $weak, ["cancel", $id*1];
+         finish_call $weak, $id, 0, "Browser add_element timed out";
+      };
+      $req->{on_cancel} = sub {
+         return unless $weak && delete $weak->{pending}{$id};
+         send_message $weak, ["cancel", $id*1];
+      };
+      AE::log debug => "webbrowser add_element $args->{target}: " . $json->encode ($args->{tag});
+      send_message $page, ["call", $id*1, "add_element", {
+         map { exists $args->{$_} ? ($_ => $args->{$_}) : () } qw(tag parent attributes properties)
+      }];
+   },
+);
+
+mcp_tool_help ($options{tool_help}, $toolset);
+
+my $custom_instructions = $options{custom_instructions}
+   // $config->{section}{"instance $name"}{custom_instructions}
+   // $config->{section}{"program " . AnyEvent::MCP::Config::program_name ()}{custom_instructions};
+my %server = (
+   server_info => { name => "mcp-webbrowser", version => "0" },
+   auto_instructions  => 1,
+   short_instructions => "Inspect connected browser tabs or run JavaScript in their pages. Discover tools.",
+   (defined $custom_instructions ? (custom_instructions => $custom_instructions) : ()),
+   instructions => "Tabs have stable targets and document revisions. "
+      . "Use tabs to find current revision. execute runs code as async () => CODE in page context; "
+      . "CODE may be an expression or a braced body with explicit return; parenthesize object literals. "
+      . "navigate=true acknowledges before evaluation and waits for a document replacement or SPA navigation. "
+      . "The navigation result reports document, same-document or timeout; execution may still have happened and is never retried. "
+      . "Use revision to guard subsequent calls. Metadata is client-reported.",
+   toolsets => [$toolset], permissions => $permissions,
+   on_request => \&mcp_log_request,
+   on_error => sub { AE::log info => "mcp-tool $_[1]{tool}: $_[2]" },
+);
+my $http = AnyEvent::MCP::Server::HTTP->new (%server, %http, path => "/");
+my $stream;
+
+if (defined $connect) {
+   require AnyEvent::MCP::Server::Connect;
+   $stream = AnyEvent::MCP::Server::Connect->new (
+      %server, connect => $connect, on_close => sub { $done->send },
+   );
+   $stream->start;
+} elsif ($stdio) {
+   binmode STDIN;
+   binmode STDOUT;
+   $stream = AnyEvent::MCP::Server::JSONL->new (
+      %server, on_connection_close => sub { $done->send },
+   );
+   $stream->accept (\*STDIN, \*STDOUT);
+}
+
+my $listener = AnyEvent::Socket::tcp_server $http{host}, $http{port}, sub {
+   my ($fh) = @_ or return;
+   my $watcher; $watcher = AE::io $fh, 0, sub {
+      undef $watcher;
+      defined recv $fh, my $magic, 1, Socket::MSG_PEEK or return;
+      if ($magic eq "G") {
+         accept_browser $fh;
+      } else {
+         $http->accept ($fh);
+      }
+   };
+};
+my @signals = map { AE::signal $_, sub { $done->send } } qw(INT TERM);
+$done->recv;
+undef $listener;
+close_page $_, 1000, "Browser broker stopped" for values %connections;
+finish_tab $_, "broker stopped" for values %tabs;
+$stream->close if $stream;
+$http->close;

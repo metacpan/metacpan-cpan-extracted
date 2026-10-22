@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1alpha1::Fake;
 # ABSTRACT: Fake generator is used for testing. It lets you define a static set of credentials that is always returned.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::APIObject
     api_version     => 'generators.external-secrets.io/v1alpha1',
     resource_plural => 'fakes',
@@ -24,7 +24,7 @@ IO::K8s::ExternalSecrets::V1alpha1::Fake - Fake generator is used for testing. I
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 spec
 

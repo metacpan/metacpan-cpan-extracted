@@ -1,5 +1,11 @@
 Revision history for Algorithm-UrataniTakeda:
 
+v0.1.8    2026-10-21 23:14:53+01:00 Europe/London
+  [Enhancements]
+  - Improved the performance for setting up the fail shift cache.
+
+  - Improved the performance when checking for complete matches.
+
 v0.1.7    2026-10-20 20:48:11+01:00 Europe/London
   [Security]
   - Limit the size of the failure shift table. (CVE-2026-113811)

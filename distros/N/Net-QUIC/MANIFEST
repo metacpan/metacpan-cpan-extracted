@@ -58,6 +58,7 @@ t/34-protocol-engine-v2.t
 t/35-stream-index.t
 t/36-quic-datagram.t
 t/37-credit-limited-send.t
+t/38-max-data-wakeup.t
 t/data/server-cert.pem
 t/data/server-key.pem
 xs/net_quic_connection.h

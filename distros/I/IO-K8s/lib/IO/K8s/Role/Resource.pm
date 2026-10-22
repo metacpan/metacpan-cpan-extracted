@@ -1,6 +1,6 @@
 package IO::K8s::Role::Resource;
 # ABSTRACT: Role providing Kubernetes resource instance behavior
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use v5.10;
 use Moo ();
 use mro ();
@@ -306,6 +306,27 @@ sub TO_JSON {
             $data{$key} = [ map { $_->TO_JSON } @$value ];
         } elsif ($attr_info->{is_hash_of_objects}) {
             $data{$key} = { map { $_ => $value->{$_}->TO_JSON } keys %$value };
+        } elsif ($attr_info->{is_hash_of_object_arrays}) {
+            # map[string][]Object (k194): each list in a new array, each
+            # element serialized; a value the constructor never saw (a write
+            # through the accessor's hashref) that is not a list or an
+            # object goes out as it is.
+            $data{$key} = { map {
+                my $list = $value->{$_};
+                $_ => (ref $list eq 'ARRAY'
+                    ? [ map { blessed($_) && $_->can('TO_JSON') ? $_->TO_JSON : $_ } @$list ]
+                    : $list)
+            } keys %$value };
+        } elsif ($attr_info->{is_hash_of_str_arrays}) {
+            # map[string][]string (k194): every element a JSON string, the
+            # rule a [Str] element follows (k145), in new arrays (k54).
+            # undef and a reference element go out as they are.
+            $data{$key} = { map {
+                my $list = $value->{$_};
+                $_ => (ref $list eq 'ARRAY'
+                    ? [ map { defined($_) && !ref($_) ? "$_" : $_ } @$list ]
+                    : $list)
+            } keys %$value };
         } elsif ($attr_info->{is_hash_of_int}) {
             $data{$key} = { map { $_ => int($value->{$_}) } keys %$value };
         } elsif ($attr_info->{is_hash_of_num}) {
@@ -587,6 +608,8 @@ sub _describe_local_type {
     return 'array<boolean>' if $info->{is_array_of_bool};
     return 'array<object>'  if $info->{is_array_of_objects};
     return 'hash<string>'   if $info->{is_hash_of_str};
+    return 'hash<array<string>>' if $info->{is_hash_of_str_arrays};
+    return 'hash<array<object>>' if $info->{is_hash_of_object_arrays};
     return 'hash<number>'   if $info->{is_hash_of_num};
     return 'hash<object>'   if $info->{is_hash_of_objects};
     return 'object'         if $info->{is_hash_opaque};
@@ -639,7 +662,7 @@ IO::K8s::Role::Resource - Role providing Kubernetes resource instance behavior
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head1 UNKNOWN FIELDS
 
@@ -735,8 +758,9 @@ over the same canonical struct.
 
     my $yaml_string = $pod->to_yaml;
 
-Returns a YAML byte string for the object, suitable for C<kubectl apply
--f>. Thin wrapper over L</TO_YAML>; provided so the role offers both
+Returns the YAML document for the object as a character string (not encoded
+bytes), suitable for C<kubectl apply -f> once written out as UTF-8;
+L<IO::K8s::APIObject/save> does that encoding. Thin wrapper over L</TO_YAML>; provided so the role offers both
 C<TO_JSON> and L<IO::K8s::APIObject/save> a single canonical entry
 point.
 

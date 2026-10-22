@@ -1,7 +1,7 @@
 package Data::Pool::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 require XSLoader;
 XSLoader::load('Data::Pool::Shared', $VERSION);
@@ -18,7 +18,7 @@ sub CLONE_SKIP { 1 }  # blessed C-pointer handle: never clone into ithreads (dou
 # Guard -- auto-free on scope exit
 
 package Data::Pool::Shared::Guard {
-    our $VERSION = '0.10';   # indexable package: PAUSE needs a version here too
+    our $VERSION = '0.11';   # indexable package: PAUSE needs a version here too
     sub DESTROY {
         my $self = shift;
         # only the creating process frees the slot: after fork the child inherits
@@ -41,24 +41,6 @@ sub try_alloc_guard {
     return unless defined $idx;
     my $guard = bless [$self, $idx, $$], 'Data::Pool::Shared::Guard';
     return wantarray ? ($idx, $guard) : $guard;
-}
-
-# Convenience -- alloc + set in one call
-
-sub alloc_set {
-    my ($self, $val, $timeout) = @_;
-    my $idx = $self->alloc($timeout // -1);
-    return unless defined $idx;
-    $self->set($idx, $val);
-    return $idx;
-}
-
-sub try_alloc_set {
-    my ($self, $val) = @_;
-    my $idx = $self->try_alloc;
-    return unless defined $idx;
-    $self->set($idx, $val);
-    return $idx;
 }
 
 # Iterate allocated slots
@@ -172,10 +154,9 @@ B<Linux-only>. Requires 64-bit Perl.
 
 =head2 Allocation
 
-Allocation uses a CAS-based bitmap scan (lock-free). Each 64-slot group
-is managed by one atomic uint64_t word. On contention, CAS retries
-automatically. When the pool is full, C<alloc> blocks on a futex until
-a slot is freed.
+Allocation scans an atomic bitmap and claims a slot through its owner word
+with CAS (lock-free). Each 64-slot group has one bitmap word. When the pool
+is full, C<alloc> blocks on a futex until a slot is freed.
 
 =head2 Crash Safety
 
@@ -241,6 +222,7 @@ small for it gets an OOM kill rather than a croak.
     my $idx = $pool->try_alloc;         # non-blocking (same as alloc(0))
 
 Returns slot index on success, C<undef> on failure/timeout.
+Perl signal handlers run while C<alloc> and C<alloc_n> wait.
 
     $pool->free($idx);                  # release slot (returns true/false)
 
@@ -351,6 +333,8 @@ To modify the slot, use C<set()>.
     my $idx = $pool->alloc_set($val, $timeout); # with timeout
     my $idx = $pool->try_alloc_set($val);       # non-blocking
 
+If C<set> throws, the newly allocated slot is freed before the exception propagates.
+
     $pool->each_allocated(sub { my $idx = shift; ... });
 
 =head2 Common Methods
@@ -420,8 +404,7 @@ its contents while other processes are using it.
 =item * Allocation scans a bitmap of C<ceil(capacity/64)> words.
 O(capacity/64) worst case, O(1) amortized with scan_hint.
 
-=item * Each allocation is a single CAS on one bitmap word.
-Under contention, CAS retries on the same word are ~10ns each.
+=item * Each allocation claims an owner word with CAS, then sets its bitmap bit.
 
 =item * When pool is full, C<alloc> blocks on a futex (zero CPU).
 Woken by a single C<FUTEX_WAKE> syscall on C<free>.

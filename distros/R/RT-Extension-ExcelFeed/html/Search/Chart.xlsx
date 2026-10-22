@@ -28,7 +28,7 @@ my %columns = $report->SetupGroupings(
 
 $report->SortEntries;
 
-my %table = $report->FormatTable( %columns );
+my %table = $report->FormatTable( %columns, Format => 'text' );
 
 $m->clear_buffer;
 

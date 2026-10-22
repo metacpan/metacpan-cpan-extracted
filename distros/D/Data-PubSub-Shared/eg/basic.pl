@@ -31,9 +31,8 @@ my @msgs = $ssub->drain;
 print "drained: @msgs\n";
 
 # Multiprocess
+my $child_sub = $ps->subscribe;
 if (fork() == 0) {
-    my $child_ps = Data::PubSub::Shared::Int->new($path, 1024);
-    my $child_sub = $child_ps->subscribe;
     my $val = $child_sub->poll_wait(2);
     print "child got: $val\n" if defined $val;
     exit 0;

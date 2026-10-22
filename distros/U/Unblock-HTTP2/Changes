@@ -1,5 +1,17 @@
 Revision history for Unblock-HTTP2
 
+0.12  2026-10-21
+    - Add coordinated receive-mode selection and bounded body buffering
+      while preserving real HTTP/2 engine Transactions and Uniform objects.
+    - Normalize on_data, on_finish and exactly-once terminal notification
+      for complete, cancelled, and failed request streams.
+    - Maintain independent HTTP/2 multiplexed streams, inbound DATA credit,
+      Extended CONNECT, and per-stream output and reset behavior.
+    - Preserve attached-framework transport acceptance and backpressure;
+      keep NativeABI layout/version unchanged.
+    - Expand portable/native receive, empty body, overflow, completion
+      and cancellation regressions without requiring a specific event loop.
+
 0.11  2026-10-10
     - Add optional attached-transport integration for Client and Server.
       Frameworks provide unblock_send(), unblock_finish(), unblock_abort().

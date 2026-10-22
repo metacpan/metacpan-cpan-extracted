@@ -1,5 +1,10 @@
 Revision history for Data::RingBuffer::Shared
 
+0.08  2026-10-16
+    - Fix payload publication and retain a consistent to_list window.
+    - Dispatch signals safely during waits without extending their timeout.
+    - Recover safely on full filesystems and clean up failed allocations.
+
 0.07      2026-09-26
           - Segments are reserved, so a full filesystem fails the constructor;
             DATA_RINGBUFFER_SHARED_SPARSE=1 skips the reservation.

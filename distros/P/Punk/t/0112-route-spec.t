@@ -209,6 +209,16 @@ boot_fails q{sse '/s' => { cb => sub {1}, bogus => 1 }},
        '...and it is the resolver saying so';
 }
 
+# A controller that dies after `use parent` has a stash, so the load error
+# must still be the croak, not "has no method".
+{
+    eval "package RSc; use Punk; get '/x' => 'HalfLoaded#index'; RSc->to_app; 1";
+    my $err = $@ || '';
+    like $err, qr/RSc::Controller::HalfLoaded does not load: Can't locate RSc\/NoSuchModuleAnywhere\.pm/,
+       'a controller that half loads names the error that stopped it';
+    unlike $err, qr/has no method/, '...and does not claim the method is missing';
+}
+
 # ---- the positional form is untouched --------------------------------------
 
 {

@@ -1,7 +1,7 @@
 package WWW::Hetzner::Cloud::Network;
 # ABSTRACT: Hetzner Cloud Network object
 
-our $VERSION = '0.101';
+our $VERSION = '0.102';
 
 use Moo;
 use Carp qw(croak);
@@ -155,7 +155,7 @@ WWW::Hetzner::Cloud::Network - Hetzner Cloud Network object
 
 =head1 VERSION
 
-version 0.101
+version 0.102
 
 =head1 SYNOPSIS
 

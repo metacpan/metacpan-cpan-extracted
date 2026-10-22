@@ -1,6 +1,6 @@
 package IO::K8s::K3s::V1::AddonSpec;
 # ABSTRACT: AddonSpec
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s checksum => Str;
@@ -22,7 +22,7 @@ IO::K8s::K3s::V1::AddonSpec - AddonSpec
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 checksum
 

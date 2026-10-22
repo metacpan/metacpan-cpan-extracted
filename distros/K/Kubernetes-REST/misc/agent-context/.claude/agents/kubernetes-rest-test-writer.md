@@ -6,6 +6,7 @@ briefing:
   skills:
     - getty-perl-core
     - kubernetes-rest-core
+    - kubernetes-rest-hazards
     - perl-kubernetes-rest
     - perl-io-k8s-kubernetes-classes
     - kanban-issues-karr-ticket

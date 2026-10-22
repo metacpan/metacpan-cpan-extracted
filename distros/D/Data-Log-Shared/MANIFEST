@@ -24,6 +24,7 @@ t/eventfd_set.t
 t/pod_synopsis.t
 t/version_check.t
 t/05-foreign-invocant.t
+t/06-wait-signals.t
 xt/abandoned_slot.t
 xt/abi_skew.t
 xt/asan.t

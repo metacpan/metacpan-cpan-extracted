@@ -17,7 +17,7 @@ tkn_is_dsep(UV cp)
     return tkn_is_space_cp(cp) || cp == ',' || cp == ';' || cp == 0x060C || cp == 0x3001 || cp == 0x1363;
 }
 
-/* Whether a text has a letter: /\p{L}/ through Perl's engine past ASCII. */
+/* Whether a text has a letter: TKN_RX_LETTER through Perl's engine past ASCII. */
 static int
 tkn_has_letter(pTHX_ SV *sv)
 {
@@ -35,7 +35,7 @@ tkn_has_letter(pTHX_ SV *sv)
     if (!high)
         return 0;
     if (!MY_CXT.re_letter)
-        MY_CXT.re_letter = newSVsv(eval_pv("qr/\\p{L}/", TRUE));
+        MY_CXT.re_letter = newSVsv(eval_pv(TKN_RX_LETTER, TRUE));
     s = sv_2mortal(newSVpvn(b, len));
     SvUTF8_on(s);
     return pregexec(SvRX(MY_CXT.re_letter), SvPVX(s), SvEND(s), SvPVX(s), 0, s, 1) ? 1 : 0;

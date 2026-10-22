@@ -14,7 +14,7 @@ use WWW::Hetzner::Robot::API::RDNS;
 use WWW::Hetzner::Robot::API::Failover;
 use namespace::clean;
 
-our $VERSION = '0.101';
+our $VERSION = '0.102';
 
 
 has user => (
@@ -156,7 +156,7 @@ WWW::Hetzner::Robot - Perl client for Hetzner Robot API (Dedicated Servers)
 
 =head1 VERSION
 
-version 0.101
+version 0.102
 
 =head1 SYNOPSIS
 

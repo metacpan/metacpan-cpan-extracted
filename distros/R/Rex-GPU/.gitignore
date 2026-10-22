@@ -25,6 +25,9 @@
 .claude/todos/
 .claude/projects/
 
+# Claude Code worktrees (isolated agents) -- never commit
+/.claude/worktrees/
+
 # Perl / Dist::Zilla distribution
 
 # Build artifacts

@@ -5,6 +5,6 @@ run: command -v lspci >/dev/null 2>&1
 is_installed: pciutils
 pkg: pciutils ensure=present
 run: command -v lspci >/dev/null 2>&1
-run: lspci -nn 2>&1 | grep -E '\[03(00|02)\]'
+run: lspci -nn 2>&1 | grep -E '\[03(00|02)\]|\[0380\].*\[1002:'
 run: lspci -nn -d 10de: 2>/dev/null | grep -F '[0680]'
 run: lspci -vmmnn -d 10de: 2>/dev/null

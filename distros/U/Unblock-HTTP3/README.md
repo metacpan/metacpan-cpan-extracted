@@ -36,17 +36,26 @@ From CPAN:
 cpanm Unblock::HTTP3
 ```
 
-Unblock::HTTP3 0.12 requires:
+Unblock::HTTP3 0.13 requires:
 
 ```text
 Perl            5.20+
 Alien::nghttp3  0.01+
-Net::QUIC       0.04+
+Net::QUIC       0.05+
 Uniform::HTTP   0.06+
 ```
 
-Version 0.12 fixes NativeABI version metadata for PAUSE indexing. The public
-API and protocol implementation are unchanged.
+Version 0.13 adds bounded buffered reception and per-transaction
+`on_data` / `on_finish` lifecycle callbacks for the unified Unblock::HTTP
+layer while preserving standalone Client and Server use. It fixes retention
+of completed callback-delivered Transactions by keeping callback
+notifications weak, compacting expired weak slots without changing their
+ownership, and retaining strong references for pull-only notifications.
+Net::QUIC 0.05 remains the minimum dependency for credit-limited QUIC
+output and targeted shared-capacity wakeups. The native consumer ABI
+remains version 1.
+
+Version 0.12 fixed NativeABI version metadata for PAUSE indexing.
 
 Version 0.11 adds the same named-field Client request, Transaction response,
 and informational response forms as the HTTP1 and HTTP2 engines. Existing
@@ -121,7 +130,13 @@ my $transaction = $client->request(
 Many Transactions can be active on one Client at the same time.
 
 The existing pull interface remains available through `next_transaction()`
-and `next_informational()` for integrations that prefer polling.
+and `next_informational()` for integrations that prefer polling. Pull-only
+notifications retain a strong Transaction reference until retrieved.
+When callbacks deliver a Transaction, its optional pull-queue notification
+is weak: it remains accessible while the application or active engine holds
+the Transaction, but it does not retain completed response bodies indefinitely.
+Callback handlers should retain the Transaction themselves if they need it
+after completion. The Server follows the same rule for `on_request`.
 
 ## Server
 
@@ -158,6 +173,42 @@ See [the installed integration guide](lib/Unblock/HTTP3/Integration.pm) and
 programs are in [server](examples/linux-event-server.pl) and
 [client](examples/linux-event-client.pl). The transport examples require
 Linux::Event 0.117 or later, but it is not a distribution dependency.
+
+## Incoming body reception
+
+Incoming request and response bodies are buffered by default, with a finite
+64 MiB per-transaction limit. Configure `max_buffered_body_bytes` on the
+Client or Server to reduce this limit. The complete body is installed on the
+same Uniform message object before the body-completion callback; an empty
+completed body is the empty string. Header callbacks run before body arrival.
+
+Register `on_data` at request creation or during the incoming-header callback
+to receive chunks without retaining a second full body. For example:
+
+```perl
+my $tx = $client->request(
+    method    => 'GET',
+    target    => '/',
+    scheme    => 'https',
+    authority => 'example.com',
+    on_data   => sub {
+        my ($tx, $bytes) = @_;
+        process_bytes($bytes);
+    },
+    on_finish => sub {
+        my ($tx) = @_;
+        report_terminal_state($tx->state, $tx->error);
+    },
+);
+```
+
+On a Server, call `$tx->on_data(sub { ... })` inside `on_request` to select
+streaming for that incoming request. Do not combine `on_data` with the legacy
+`on_body` callback. Registration after body delivery has started is rejected.
+`on_finish` runs once after the transaction reaches complete, cancelled, or
+error state; it is not merely an incoming-body completion event. A receive
+limit failure resets the affected HTTP/3 stream without failing unrelated
+transactions. Consult the Client, Server and Transaction POD for details.
 
 ## Streaming bodies
 

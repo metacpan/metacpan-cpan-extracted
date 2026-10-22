@@ -8,7 +8,7 @@ use Email::Sender::Transport::SMTP;
 use oEdtk::Config qw(config_read);
 
 use Exporter;
-our $VERSION   = 2.1129;
+our $VERSION   = 2.1131;
 our @ISA       = qw(Exporter);
 our @EXPORT_OK = qw(oe_send_mail);
 

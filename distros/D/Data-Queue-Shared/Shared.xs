@@ -118,7 +118,7 @@ PROTOTYPES: DISABLE
 
 BOOT:
 #ifdef HAVE_XS_PARSE_KEYWORD
-    boot_xs_parse_keyword(0.40);
+    boot_xs_parse_keyword(0.50);
     sv_setiv(get_sv("Data::Queue::Shared::HAVE_KEYWORDS", GV_ADD), 1);
     REGISTER_Q_KW(int, push, "Data::Queue::Shared::Int::push");
     REGISTER_Q_KW(int, pop,  "Data::Queue::Shared::Int::pop");
@@ -510,7 +510,7 @@ eventfd_consume(self)
   PREINIT:
     EXTRACT_HANDLE("Data::Queue::Shared::Int", self);
   CODE:
-    int64_t v = queue_eventfd_consume(h);
+    IV v = (IV)queue_eventfd_consume(h);
     RETVAL = (v >= 0) ? newSViv((IV)v) : &PL_sv_undef;
   OUTPUT:
     RETVAL
@@ -766,8 +766,9 @@ pop_multi(self, count)
         items_buf[n].utf8 = utf8;
         n++;
     }
+    uint32_t wake = n ? queue_str_producer_wake_count(h->hdr, (uint32_t)n) : 0;
     queue_mutex_unlock(h->hdr);
-    if (n) queue_wake_producers_n(h->hdr, (uint32_t)n);
+    if (wake) queue_wake_producers_n(h->hdr, wake);
     EXTEND(SP, (SSize_t)n);
     for (UV j = 0; j < n; j++) {
         SV *sv = newSVpvn(items_buf[j].buf, items_buf[j].len);
@@ -964,8 +965,9 @@ drain(self, ...)
         drained_tail = it;
         drained_n++;
     }
+    uint32_t wake = drained_n ? queue_str_producer_wake_count(h->hdr, (uint32_t)drained_n) : 0;
     queue_mutex_unlock(h->hdr);
-    if (drained_n) queue_wake_producers_n(h->hdr, (uint32_t)drained_n);
+    if (wake) queue_wake_producers_n(h->hdr, wake);
     EXTEND(SP, (SSize_t)drained_n);
     while (drained_head) {
         struct drain_item *it = drained_head; drained_head = it->next;

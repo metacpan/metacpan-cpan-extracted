@@ -1,0 +1,145 @@
+{
+  "skills/getty-git-commit-style": {
+    "source": "getty",
+    "version": "local",
+    "files": {
+      "skills/getty-git-commit-style/.gitignore": "sha256:fc8e72cc019d4536c45df00567078e36003f1d7183747e03283549741c3424c9",
+      "skills/getty-git-commit-style/SKILL.md": "sha256:d69e6b556e277975e08cdea82471ac0689dd3418791e9cccc9bbe54f04b73c4d"
+    }
+  },
+  "skills/getty-git-usage": {
+    "source": "getty",
+    "version": "local",
+    "files": {
+      "skills/getty-git-usage/.gitignore": "sha256:fc8e72cc019d4536c45df00567078e36003f1d7183747e03283549741c3424c9",
+      "skills/getty-git-usage/SKILL.md": "sha256:d822ec8cba6bd63bd9fd7c0e3bb0c73268f101f931d8fae82b3a553b64756989"
+    }
+  },
+  "skills/getty-perl-core": {
+    "source": "getty",
+    "version": "local",
+    "files": {
+      "skills/getty-perl-core/.gitignore": "sha256:fc8e72cc019d4536c45df00567078e36003f1d7183747e03283549741c3424c9",
+      "skills/getty-perl-core/SKILL.md": "sha256:204d50a28c1c8216845efc649aa7e4c0184c61c57aa0c72cc1898ce2889d7ed1",
+      "skills/getty-perl-core/references/dbic.md": "sha256:ab308272fa65891d02fa1a36326f6fe7c5972ce95fa4323c1cb36e08cf519627"
+    }
+  },
+  "skills/getty-perl-pod": {
+    "source": "karr",
+    "version": "local",
+    "files": {
+      "skills/getty-perl-pod/.gitignore": "sha256:fc8e72cc019d4536c45df00567078e36003f1d7183747e03283549741c3424c9",
+      "skills/getty-perl-pod/SKILL.md": "sha256:105c0a002592f877eadc60246c71ab739a0bf4fbf52771b8fb7ea1ff8bbdec7c"
+    }
+  },
+  "skills/getty-perl-release-author-getty": {
+    "source": "karr",
+    "version": "local",
+    "files": {
+      "skills/getty-perl-release-author-getty/.gitignore": "sha256:fc8e72cc019d4536c45df00567078e36003f1d7183747e03283549741c3424c9",
+      "skills/getty-perl-release-author-getty/SKILL.md": "sha256:8142dbdc668449c99f514dec23a8740f9570a7884e61ad7541ea37a20ba5d902"
+    }
+  },
+  "skills/kanban-issues-karr-coordination": {
+    "source": "karr",
+    "version": "local",
+    "files": {
+      "skills/kanban-issues-karr-coordination/.gitignore": "sha256:fc8e72cc019d4536c45df00567078e36003f1d7183747e03283549741c3424c9",
+      "skills/kanban-issues-karr-coordination/SKILL.md": "sha256:60296bb91931ad9e2b90eb5b187716b810feb55c4f99c670fb0505bc5753d0c9",
+      "skills/kanban-issues-karr-coordination/references/cards.md": "sha256:ed1ed17fdffa756e8ee8ff5d72a3a22c3e414abdaadc9b0fc0ba08e176d95340",
+      "skills/kanban-issues-karr-coordination/references/claims.md": "sha256:81459998fe329f30bc6c10fcf750955fa2b6134e13093e59df5970c335e3aadb",
+      "skills/kanban-issues-karr-coordination/references/config.md": "sha256:1220e5d2069af5b760fc76572dbedeccda00f0ee51c3c770040a454671c15430",
+      "skills/kanban-issues-karr-coordination/references/cross-board.md": "sha256:7ece9e04470ebcd738dbd20b4ea372cbb730de10af27ab33ce0eb068be453a8d",
+      "skills/kanban-issues-karr-coordination/references/queries.md": "sha256:0c4c38c7aa36f050a61f4abdc79a2531b58b0148e57ca9e56581a31a5e9d63c8",
+      "skills/kanban-issues-karr-coordination/references/setup.md": "sha256:d90667962ec6301eb994d5a463f9441979711c031e67073dac3f98d584983a61",
+      "skills/kanban-issues-karr-coordination/references/storage.md": "sha256:4e50a5927f3a1582e4f08a8bbfad1d10a78cae386636f0007c498a85d9a823bf"
+    }
+  },
+  "skills/kanban-issues-karr-ticket": {
+    "source": "karr",
+    "version": "local",
+    "files": {
+      "skills/kanban-issues-karr-ticket/.gitignore": "sha256:fc8e72cc019d4536c45df00567078e36003f1d7183747e03283549741c3424c9",
+      "skills/kanban-issues-karr-ticket/SKILL.md": "sha256:a8885a983ac394c3e604e8a06fc483f5f953888a863373671df1bf460d1e9f93"
+    }
+  },
+  "skills/perl-release-dist-ini": {
+    "source": "getty",
+    "version": "local",
+    "files": {
+      "skills/perl-release-dist-ini/.gitignore": "sha256:fc8e72cc019d4536c45df00567078e36003f1d7183747e03283549741c3424c9",
+      "skills/perl-release-dist-ini/SKILL.md": "sha256:f7d074d471499db86ecd33d92fdbea0e35f20e94b04aaaa4669b705fcfd01c3b"
+    }
+  },
+  "skills/rex": {
+    "source": "getty",
+    "version": "local",
+    "files": {
+      "skills/rex/.gitignore": "sha256:fc8e72cc019d4536c45df00567078e36003f1d7183747e03283549741c3424c9",
+      "skills/rex/MANIFEST.json": "sha256:5f0003ddc175738999c2832b8855b91a96278dda941a6920ff1fd7214ecde622",
+      "skills/rex/README.md": "sha256:5cd6ef65d9c173e50c254a22643f89a4b34def52b2d93abd7aee03a054358542",
+      "skills/rex/SKILL.md": "sha256:e6a060adca7e219c2f6e8fdff5f1699162230170ac495212e65ebd7afc9c523f",
+      "skills/rex/SOURCE_LOCK.json": "sha256:17f3e77e7c9ad5baaacc6285fc6c761497786078b595f21456c6942a8e28d021",
+      "skills/rex/VALIDATION.md": "sha256:5059c0305547261a3b01e06f6d6c13a3bbcba58ef824df24b0780bb5a7c6a095",
+      "skills/rex/audit/original-skill.md": "sha256:b724af0012b4a206aeb980f436e824185cc0ac3e269b9aca2efa1e8e24794e16",
+      "skills/rex/audit/results/example-static-review.json": "sha256:3150b755f24e70acbae21632f8f871545d133713016870392fffbe8d6675db08",
+      "skills/rex/audit/results/module-inventory.json": "sha256:e542be83b9e1c4f82bc075477edd226867a998567297f55bd6b1c451d8bfcfa9",
+      "skills/rex/audit/results/perl-tests.txt": "sha256:244eb34aa3f811258e97392701ae55c7f1134c8abd3aa7086eb18b2ccaf45850",
+      "skills/rex/audit/results/python-tests.txt": "sha256:8099359d9cca9765c8d5340e1fdf487c9032be77d5c8c09b6370be569f131152",
+      "skills/rex/evals/README.md": "sha256:18f348cd65a56675a8bc850ca94ffc374400f8b0eba9d2e20da3536bfaad6194",
+      "skills/rex/evals/cases.json": "sha256:862f35c541e297385e3bd6b478493e423091954be2d5c5d117f5cf77dfd7d384",
+      "skills/rex/examples/README.md": "sha256:2179b45a9ead7cdfe8d096728fa005fe4a6f77e6e83945aadd41ff47e29c45bf",
+      "skills/rex/examples/Rexfile.libssh": "sha256:ba1994ff47f14428b0f4d1aa4ee51d0e2d8ce165abc8e2f7ed74107b8f616859",
+      "skills/rex/examples/Rexfile.local-smoke": "sha256:0ce52159be25224b61d210e7e2897f9b6bceab98b9d32597485c32ee63d0e721",
+      "skills/rex/examples/Rexfile.remote": "sha256:b3a0abd6497699c490ad7cf243f02d5075a6b323d438263da1b27e822153a680",
+      "skills/rex/examples/Rexfile.status": "sha256:efaac5d8c69f50165117baaa45bed51b8de247731610688d72cd76bbfc3e59e1",
+      "skills/rex/examples/cmdb/app-01.example.test.yml": "sha256:8bbcb8b2d72b1157ae6b15a3599b0a7dc91106793f515b9a9e853d182b2dc7b5",
+      "skills/rex/examples/cmdb/default.yml": "sha256:bc0c8b90ed5372634a273b5f6f474493b7cbd8053dd00c9fb0d3a7fc821065de",
+      "skills/rex/examples/config-activation.pl.example": "sha256:c476e30fa26fd5f62a33fae73747db004d8dede98bc399d04446f44e9364c9ad",
+      "skills/rex/examples/module/lib/Example/Plan.pm": "sha256:f64ca643a6a87e7067b57d821e5a0f779bd9f4fe2adea030cd6e541bcc41a761",
+      "skills/rex/examples/module/lib/Example/RexAdapter.pm": "sha256:8ede8c335211fd5e2bb95793b337ec4aba7a3cff5bbfdb36ed838f888d592f20",
+      "skills/rex/examples/module/t/plan.t": "sha256:1c1a1c4fb1ddae1631295138ed091b74c5ae5428087b79126b7d9fda74cecaf2",
+      "skills/rex/references/INDEX.md": "sha256:fb1685d61753c9ec49455a8cce037bc708adc612c537b435f0d272cc5d644c5c",
+      "skills/rex/references/execution/errors-timeouts.md": "sha256:29ea5b2ae5fffd6c338c48616d6d104f949c105f0582606a37f5d75b60bd62ba",
+      "skills/rex/references/execution/idempotency-notifications.md": "sha256:846e613bcdfd6bc1661fa85aa8e0b70ce699e5b9b062b1f978aa3741a00dff98",
+      "skills/rex/references/execution/quoting.md": "sha256:7dd02d99557169ad70908d06db98b4711d8a9d37f1ad0a0d6abb40bdacf2f6d0",
+      "skills/rex/references/execution/run-and-status.md": "sha256:3a6c22eacfca9cb3cc0e2b1e61e64ae1a744230513d3693951b99bec83e90bd6",
+      "skills/rex/references/extensions/backend-internals.md": "sha256:277d57bed42e919a1be0b369e32083e62cd42258965cd79043054f40b129e4ac",
+      "skills/rex/references/extensions/ecosystem.md": "sha256:32035c744d1d3b023d91808960943c907e039f07c5eaf1a36cbbadd6708b7d23",
+      "skills/rex/references/extensions/gpu.md": "sha256:87a5397aeff75f90295313169bc11fcfe4b37bbf50c028069db97c3e2f0aaa3a",
+      "skills/rex/references/extensions/module-authoring.md": "sha256:b85d9c422fde631b13783ce6a8f78bc05992d9e3b9d9f84035d18e70ce23c783",
+      "skills/rex/references/extensions/rancher.md": "sha256:156342c4c177271a241d97c5bd37018e760eee79637153b46a3ce430945eec9b",
+      "skills/rex/references/foundations/cli.md": "sha256:9c4d552c43e603d617c81e1667e71cbf4c601efe8d5c119e77d94efe26c8a146",
+      "skills/rex/references/foundations/configuration-cmdb.md": "sha256:12a2f3dd25e97d483cd759b9cc96eb09de1c8b8af5dd0c0e3b515cf3863cb001",
+      "skills/rex/references/foundations/execution-model.md": "sha256:8ee8fa59ff669585c41780998af090416c596a97692c654ea8ad8309b5761ed0",
+      "skills/rex/references/foundations/installation-features.md": "sha256:fbc98430ab96943677b87f4e49bb6f4feacda89a099cb697285432655c5f74b9",
+      "skills/rex/references/foundations/tasks-inventory.md": "sha256:c609cb7acb81e06172eaf3252c8c19a5049e06ae364498feed4653864dc38e3c",
+      "skills/rex/references/operations/debugging-performance.md": "sha256:437b0b43f6bfd1ec8b170c240ee6575bc0d3625a1a85893a74c033e4241f1fa0",
+      "skills/rex/references/operations/rollouts.md": "sha256:88786659d3ce66bc1e6b48c33a60c924e7d6fd6d8bf56ea05ee1fb1f0367d265",
+      "skills/rex/references/operations/security.md": "sha256:5acb252e41fb3ea7ba652ab7a270af99d3a656e2537ee591016ae93e376db1ac",
+      "skills/rex/references/operations/testing.md": "sha256:3cc6f00e8697b4f46a3325e9006747cc5d12482dc8962794ba767cb192e71cea",
+      "skills/rex/references/research/claim-audit.md": "sha256:d76cb18f1817afe55cc1135c45f6158e2d91362e115036e75d7a85b226985242",
+      "skills/rex/references/research/source-map.md": "sha256:dbf4e040a9c714455efea5f1a5cd82817a7cc027fffb00276b614c4e72b9494c",
+      "skills/rex/references/research/version-matrix.md": "sha256:090be640456104172a9ba02b803363b1bd75569349ce6d8e393426cf638f082e",
+      "skills/rex/references/resources/catalog.md": "sha256:9a24c7c908914e86f9e9bfed339f2e398985041d0f990797795b9a1a88fec694",
+      "skills/rex/references/resources/facts-platforms.md": "sha256:53070e2ea7800feda7ce5d01e19d0fd4ba3fe5ca61e1af6d1d99ceaec3a640dc",
+      "skills/rex/references/resources/files-templates.md": "sha256:1e0247ab16c61d3883ab351c47ec93d055ca83090ff2944700ad46a15ba99821",
+      "skills/rex/references/resources/packages.md": "sha256:e9ebf1527519b9068294692c67e6d973df36c0e1c2aff544c9ee50864e718701",
+      "skills/rex/references/resources/services.md": "sha256:b4ad1334a592c1aefe5f3738e334718afa5382001307ed54299cba5e890987c6",
+      "skills/rex/references/resources/users-cron.md": "sha256:debe666ff32f0d6c140d2f2f53aedaeb53ec6fd05f2c50fd16a91e9fbaff6512",
+      "skills/rex/references/transports/libssh.md": "sha256:0ddc24c89b3b7aa5bc6f747647acd6e13d4b8f10b3f646235b26a643e1c5dc8e",
+      "skills/rex/references/transports/selection-matrix.md": "sha256:ef9a7c7ccf7c07b9aa40cd45be574ac27bdca5ec7986d9a32df4e872b37d43af",
+      "skills/rex/references/transports/sftp-less.md": "sha256:2f88476b23f1a40161f95a8aa48990abc75745179fbae1ac15a508cb60b160c2",
+      "skills/rex/references/transports/ssh-openssh.md": "sha256:119533dedeb97a0ad3df85f74bc24197a7d12be7326a0083722bd46584352345",
+      "skills/rex/references/transports/sudo-local.md": "sha256:aa90d25b767cfa6de88272a03984f699d226ee33bea9090b8b2ecce27a3c4219",
+      "skills/rex/scripts/README.md": "sha256:7271f1f672384dbc0976accab4a37403d5def55c79adad3ae8f363df7a1832bd",
+      "skills/rex/scripts/audit_rexfile.py": "sha256:629389d2c9e5a2a9eec1b2571573a3b3f96861d3151fb578d82f35181334d909",
+      "skills/rex/scripts/inspect_rex.pl": "sha256:71a828e02a523689cd0481a0785f645257efb67e8a707e7de81e6488f4521ac3",
+      "skills/rex/scripts/validate_package.py": "sha256:0c725d223a13423178345cfbf7f863ffe2fbba833045c16c21edb50637b307b0",
+      "skills/rex/templates/bug-report.md": "sha256:cee65aae42388f75658609ae4161a890bd8c2463855d79d45f10367635b17495",
+      "skills/rex/templates/change-brief.md": "sha256:9a50306ba2c81f13c18ae02f85cf39c2d25df9f51a57633a78af02e62178aeb9",
+      "skills/rex/templates/test-matrix.md": "sha256:e004918413d525794e1be2b2ca196026573e954ef50fba9aa18ec015ec5be9fc",
+      "skills/rex/tests/test_tools.py": "sha256:69500e406b6a9dc84e007d02e9f98c2283731400a196af31b9e9000f7bf6b12d"
+    }
+  }
+}

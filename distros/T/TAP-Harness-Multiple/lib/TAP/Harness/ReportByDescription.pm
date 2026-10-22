@@ -2,15 +2,11 @@ package TAP::Harness::ReportByDescription;
 
 use strict;
 use base 'TAP::Harness';
-our $VERSION = '0.06';
+our $VERSION = '0.08';
 
 =head1 NAME
 
 TAP::Harness::ReportByDescription - Report TAP output by test file description rather than test file name
-
-=head1 VERSION
-
-0.01
 
 =head1 SYNOPSIS
 

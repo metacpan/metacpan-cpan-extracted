@@ -1,7 +1,7 @@
 package WWW::Hetzner::Role::HasAction;
 # ABSTRACT: Entity role exposing a creation action
 
-our $VERSION = '0.101';
+our $VERSION = '0.102';
 
 use Moo::Role;
 use namespace::clean;
@@ -28,7 +28,7 @@ WWW::Hetzner::Role::HasAction - Entity role exposing a creation action
 
 =head1 VERSION
 
-version 0.101
+version 0.102
 
 =head1 SYNOPSIS
 

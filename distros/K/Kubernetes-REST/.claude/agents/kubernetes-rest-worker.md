@@ -7,6 +7,7 @@ briefing:
     - getty-perl-core
     - getty-perl-moo
     - kubernetes-rest-core
+    - kubernetes-rest-hazards
     - perl-kubernetes-rest
     - perl-io-k8s-kubernetes-classes
     - kubernetes-concepts

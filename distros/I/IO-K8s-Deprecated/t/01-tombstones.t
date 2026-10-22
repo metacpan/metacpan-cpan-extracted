@@ -6,7 +6,7 @@ use Test::More;
 # contract of a redirect stub -- if it stops dying, the takeover is
 # silently useless.
 #
-# All 76 of these are the "consolidated" shape: IO-K8s replaced every
+# All 74 of these are the "consolidated" shape: IO-K8s replaced every
 # per-resource *List class with a single generic IO::K8s::List back in its
 # 1.00 Moose-to-Moo rewrite. Each one only ever emitted a deprecation
 # warning after that (never a real class in the 1.x series) and has now
@@ -87,8 +87,6 @@ my @old_list_classes = (
   'IO::K8s::Api::Storage::V1beta1::StorageClassList',
   'IO::K8s::Api::Storage::V1beta1::VolumeAttachmentList',
   'IO::K8s::ApiExtensionsApiServer::Pkg::Apis::Apiextensions::V1beta1::CustomResourceDefinitionList',
-  'IO::K8s::Apimachinery::Pkg::Apis::Meta::V1::APIGroupList',
-  'IO::K8s::Apimachinery::Pkg::Apis::Meta::V1::APIResourceList',
   'IO::K8s::KubeAggregator::Pkg::Apis::Apiregistration::V1::APIServiceList',
   'IO::K8s::KubeAggregator::Pkg::Apis::Apiregistration::V1beta1::APIServiceList',
 );

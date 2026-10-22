@@ -1,6 +1,6 @@
 package IO::K8s::Cilium::V2alpha1::CoreCiliumEndpoint;
 # ABSTRACT: CoreCiliumEndpoint is slim version of status of CiliumEndpoint.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s encryption        => '+IO::K8s::Cilium::V2alpha1::EncryptionSpec';
@@ -32,7 +32,7 @@ IO::K8s::Cilium::V2alpha1::CoreCiliumEndpoint - CoreCiliumEndpoint is slim versi
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 encryption
 

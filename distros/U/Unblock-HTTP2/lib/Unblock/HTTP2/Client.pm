@@ -10,7 +10,7 @@ use Unblock::HTTP2::_Headers;
 use Unblock::HTTP2::Transaction;
 use Uniform::HTTP::Request;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 use constant {
     H2_DATA              => 0,
@@ -29,6 +29,7 @@ my $BODY_LOW_WATER  = 32_768;
 sub new {
     my ($class, %option) = @_;
     my $transport = delete $option{transport};
+    my %receive = $class->_receive_options(\%option);
 
     my %callbacks;
     for my $name (qw(
@@ -109,6 +110,7 @@ sub new {
 
     $self->_initialize_connection(
         $session,
+        %receive,
         role      => 'client',
         callbacks => \%callbacks,
         transport => $transport,
@@ -167,7 +169,7 @@ sub request {
         croak 'request(): fields must be key/value pairs' if @arg % 2;
         my %field = @arg;
         for my $name (qw(
-            stream_body on_response on_body on_complete on_error
+            stream_body on_response on_body on_data on_finish on_complete on_error
             on_informational on_drain
         )) {
             $option{$name} = delete $field{$name} if exists $field{$name};
@@ -199,7 +201,7 @@ sub request {
 
     my %callbacks;
     for my $name (qw(
-        on_response on_body on_complete on_error on_informational on_drain
+        on_response on_body on_data on_finish on_complete on_error on_informational on_drain
     )) {
         next unless exists $option{$name};
         my $callback = delete $option{$name};
@@ -208,6 +210,10 @@ sub request {
         $callbacks{$name} = $callback if $callback;
     }
 
+    croak 'request(): on_data cannot be combined with on_body'
+        if $callbacks{on_data} && $callbacks{on_body};
+    croak 'request(): buffered reception cannot be combined with on_body'
+        if $self->{receive_body} eq 'buffered' && $callbacks{on_body};
     croak 'request(): unknown options: ' . join(', ', sort keys %option)
         if %option;
     croak 'request(): on_drain requires stream_body'
@@ -471,7 +477,7 @@ sub _on_data_chunk_recv {
 
     $transaction->_receive_body_bytes(length $data);
 
-    my $result = $transaction->_invoke('on_body', $response, $data);
+    my $result = $transaction->_receive_data($response, $data);
     if ($result ne '1') {
         $self->_stream_failure($stream_id, "$result");
         return 0;
@@ -497,6 +503,8 @@ sub _finish_response {
         return;
     }
 
+    return if $transaction->is_terminal;
+    $transaction->_finish_receive($response);
     $response->mark_complete->freeze;
 
     my $result = $transaction->_invoke('on_complete');
@@ -518,6 +526,7 @@ sub _on_stream_close {
         $self->_invoke_stream_error($transaction, $error, $error_code);
     }
     elsif ($state && $state->{response}) {
+        $transaction->_finish_receive($state->{response}) unless $state->{response_done};
         $state->{response}->mark_complete->freeze;
         if (!$state->{response_done}) {
             my $result = $transaction->_invoke('on_complete');
@@ -525,6 +534,7 @@ sub _on_stream_close {
                 unless $result eq '1';
         }
         $transaction->_mark_complete;
+        $transaction->_notify_finish;
     }
     else {
         my $error = 'HTTP/2 stream closed before final Response';
@@ -666,6 +676,23 @@ C<unblock_send()> method. Without an attached host, manually drain
 C<output()> while C<want_write()> is true.
 
 Many request transactions can be active at once.
+
+=head1 RECEIVE BODY OPTIONS
+
+C<receive_body> accepts C<buffered> or C<stream>. Streaming remains the default.
+C<max_buffered_body_bytes> is a positive byte limit, defaulting to 64 MiB.
+Zero does not mean unlimited. Buffered reception installs the body on the
+same Uniform message before freezing it and invoking the body-completion
+callback. Empty completed bodies have an empty string representation.
+The engine releases retained chunks on failure or cancellation.
+
+Select streaming per transaction with C<$tx-E<gt>on_data(...)> during the
+header callback. Do not combine buffered mode with legacy C<on_body>.
+Do not combine C<on_data> and C<on_body>. See
+L<Unblock::HTTP2::Transaction/RECEIVE AND FINISH CALLBACKS>.
+
+A buffer limit failure resets only the affected stream.
+It does not call successful body completion.
 
 =head1 CONSTRUCTOR
 

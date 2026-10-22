@@ -1,7 +1,7 @@
 package WWW::Hetzner::CLI::Cmd::StorageBox::Cmd::DisableSnapshotPlan;
 # ABSTRACT: Disable a Storage Box snapshot plan
 
-our $VERSION = '0.101';
+our $VERSION = '0.102';
 
 use Moo;
 use MooX::Cmd;
@@ -30,7 +30,7 @@ WWW::Hetzner::CLI::Cmd::StorageBox::Cmd::DisableSnapshotPlan - Disable a Storage
 
 =head1 VERSION
 
-version 0.101
+version 0.102
 
 =head1 SUPPORT
 

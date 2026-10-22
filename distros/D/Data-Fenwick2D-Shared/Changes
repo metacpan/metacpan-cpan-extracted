@@ -1,5 +1,10 @@
 Revision history for Data-Fenwick2D-Shared
 
+0.05  2026-10-16
+    - Fix shared-lock wakeups and frozen-data publication.
+    - Recover sparse files safely and define counter wraparound.
+    - Improve build portability and clarify interrupted-write limits.
+
 0.04      2026-09-26
           - DATA_FENWICK2D_SHARED_SPARSE=0 reserves segments up front, so a
             full filesystem fails the constructor, not a later write.

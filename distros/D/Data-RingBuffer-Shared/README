@@ -11,7 +11,7 @@ SYNOPSIS
         say $ring->latest(1);     # 42 (previous)
         say $ring->size;          # 2
 
-        # overwrites oldest when full -- never blocks
+        # overwrites oldest when full
         $ring->write($_) for 1..200;
         say $ring->size;          # 100 (capacity)
         say $ring->latest;        # 200
@@ -33,8 +33,8 @@ SYNOPSIS
 
 DESCRIPTION
     Fixed-size circular buffer in shared memory. Writes overwrite the oldest
-    entry when the buffer is full -- writes never block or fail. Readers
-    access data by relative position (0=latest) or absolute sequence number.
+    entry when the buffer is full. Readers access data by relative position
+    (0=latest) or absolute sequence number.
 
     Unlike Data::Queue::Shared (consumed on read, blocks when full) and
     Data::PubSub::Shared (subscription tracking), RingBuffer is a simple
@@ -68,14 +68,14 @@ METHODS
   Write
         my $seq = $ring->write($value);  # returns sequence number
 
-    Always succeeds. Overwrites oldest when full.
+    Returns a sequence number. Overwrites oldest when full.
 
   Read
         my $val = $ring->latest;       # most recent (undef if empty)
         my $val = $ring->latest($n);   # nth most recent (0=latest)
         my $val = $ring->read_seq($s); # by sequence (undef if overwritten)
 
-        my @all = $ring->to_list;      # entire ring, oldest first
+        my @all = $ring->to_list;      # starting window, oldest first
 
   Status
         $ring->size;       # entries in buffer (max = capacity)
@@ -87,7 +87,9 @@ METHODS
         my $ok = $ring->wait_for($expected_count);          # block until count changes
         my $ok = $ring->wait_for($expected_count, $timeout);
 
-    Returns 1 if new data arrived (count != expected), 0 on timeout.
+    Returns 1 if new data arrived (count != expected), 0 on timeout. An
+    omitted or negative timeout waits indefinitely; Perl signal handlers run
+    during waits.
 
   Lifecycle
         $ring->clear;      # reset head/count (NOT concurrency-safe)
@@ -103,7 +105,7 @@ BENCHMARKS
 
         Int write       11.7M/s
         Int latest      11.1M/s
-        Int read_seq    10.4M/s
+        Int read_seq(stale) 10.4M/s
         F64 write        8.8M/s
         F64 latest      12.0M/s
 
@@ -112,11 +114,11 @@ STATS
     "overwrites", "mmap_size".
 
 CONCURRENCY AND CRASH SAFETY
-    The ring is lock-free: there are no mutexes or rwlocks. A writer claims a
-    unique, monotonically increasing position with a single atomic increment
-    of the head counter, so multiple writer and reader processes may share one
-    buffer concurrently. Writes always succeed and never block; when the
-    buffer is full the oldest slot is overwritten.
+    Writers claim unique positions with an atomic increment of the head
+    counter, so multiple writer and reader processes may share one buffer
+    concurrently. Writers serialize on each slot using atomics; a stalled
+    writer can delay another writer until the recovery timeout. A full buffer
+    overwrites the oldest slot.
 
     Each slot carries a publication sequence used as a seqlock. A reader loads
     the sequence, copies the value, then re-checks the sequence; if a write
@@ -127,13 +129,12 @@ CONCURRENCY AND CRASH SAFETY
     If a writer crashes mid-write, its slot is left marked in-progress.
     Readers skip that slot (returning "undef") rather than block, and after a
     short recovery timeout a later writer reclaims the slot and overwrites the
-    partial data. Because there are no locks, a crash can never orphan one and
-    wedge other processes; the buffer as a whole stays usable. "wait_for"
-    blocks on a futex over an internal wake counter, so a crashed waiter
-    cannot stall writers either.
+    partial data. The buffer as a whole stays usable. "wait_for" blocks on a
+    futex over an internal wake counter, so a crashed waiter cannot stall
+    writers either.
 
     "clear" is not concurrency-safe: call it only when no other process is
-    writing to the buffer.
+    using the buffer.
 
     An interrupted create is recovered too. A creator killed after the backing
     file is sized but before its header is committed leaves a full-size,

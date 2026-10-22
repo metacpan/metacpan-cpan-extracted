@@ -19,6 +19,7 @@ file: /etc/modprobe.d/blacklist-nouveau.conf
   | blacklist nouveau
   | options nouveau modeset=0
 run: update-initramfs -u 2>/dev/null
+run: cat /proc/sys/kernel/random/boot_id 2>/dev/null
 run: nohup sh -c 'sleep 2 && shutdown -r now' >/dev/null 2>&1 &
 run: echo ok
 run: lsmod | grep '^nvidia '

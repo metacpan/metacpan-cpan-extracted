@@ -5,7 +5,7 @@ lib/IO/Capture/Stderr/Extended.pm
 lib/IO/Capture/Stdout/Extended.pm
 LICENSE
 Makefile.PL
-MANIFEST
+MANIFEST			This list of files
 MANIFEST.SKIP
 README.md
 t/01.t

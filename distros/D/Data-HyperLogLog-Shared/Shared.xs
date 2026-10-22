@@ -295,7 +295,7 @@ frozen(self)
   PREINIT:
     EXTRACT(self);
   CODE:
-    RETVAL = h->hdr->sealed ? 1 : 0;
+    RETVAL = __atomic_load_n(&h->hdr->sealed, __ATOMIC_ACQUIRE) ? 1 : 0;
   OUTPUT:
     RETVAL
 
@@ -339,6 +339,7 @@ stats(self)
         double   E;
         uint64_t ops;
         uint32_t precision, m;
+        uint8_t  sealed;
         /* Snapshot under the lock; do all (croak-capable) Perl allocation after
            releasing it -- so an OOM in newHV/newSVuv can never strand the lock. */
         if (!h->readonly) hll_rwlock_rdlock(h);   /* frozen: immutable, no lock */
@@ -346,6 +347,7 @@ stats(self)
         ops       = h->hdr->stat_ops;
         precision = h->hdr->precision;
         m         = h->hdr->m;
+        sealed    = __atomic_load_n(&h->hdr->sealed, __ATOMIC_RELAXED);
         if (!h->readonly) hll_rwlock_rdunlock(h);
 
         HV *hv = newHV();
@@ -354,7 +356,7 @@ stats(self)
         hv_stores(hv, "count",      newSVuv((UV)(E + 0.5)));
         hv_stores(hv, "ops",        newSVuv(ops));
         hv_stores(hv, "mmap_size",  newSVuv((UV)h->mmap_size));
-        hv_stores(hv, "frozen",     newSVuv(h->hdr->sealed ? 1 : 0));
+        hv_stores(hv, "frozen",     newSVuv(sealed ? 1 : 0));
         hv_stores(hv, "readonly",   newSVuv(h->readonly ? 1 : 0));
         RETVAL = newRV_noinc((SV *)hv);
     }

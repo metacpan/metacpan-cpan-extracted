@@ -17,7 +17,7 @@ use DBI;
 # use Sys::Hostname;
 
 use Exporter;
-our $VERSION   = 2.1129;         # release number : Y.YSSS -> Year, Sequence
+our $VERSION   = 2.1131;         # release number : Y.YSSS -> Year, Sequence
 our @ISA       = qw(Exporter);
 our @EXPORT_OK = qw(
 	omgr_check_acquit

@@ -1,6 +1,6 @@
 package IO::K8s::Traefik::V1alpha1::BasicAuth;
 # ABSTRACT: BasicAuth holds the basic auth middleware configuration.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s headerField  => Str;
@@ -26,7 +26,7 @@ IO::K8s::Traefik::V1alpha1::BasicAuth - BasicAuth holds the basic auth middlewar
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 headerField
 

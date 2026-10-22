@@ -7,7 +7,7 @@ use App::SlimPacker::Minify qw(
     rename_module_name rename_module_path
 );
 use Exporter 'import';
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 our @EXPORT_OK = qw(
     process process_deps minify_file name_gen needs_space
     pack_string perl_switches plugin_search_paths inline_plugins
@@ -29,7 +29,9 @@ sub perl_switches {
     my @out;
     for my $arg (@$m) { push @out, _use_line($arg, 0) }
     for my $arg (@$M) { push @out, _use_line($arg, 1) }
-    if (@$E) { push @out, 'use feature qw(:all);' }
+    # perl -E enables all features; the ':all' bundle only exists from perl
+    # 5.16, so fall back to ':5.10' (say/state/switch) on older perls.
+    if (@$E) { push @out, q{BEGIN{require feature;eval{feature->import(':all');1}or feature->import(':5.10')}} }
     if (@$e || @$E) { push @out, join("\n", @$e, @$E) }
     return join("\n", @out) . "\n";
 }
@@ -162,7 +164,7 @@ App::SlimPacker - fatpack-style bundling helpers with PPI-based minification for
 
 =head1 VERSION
 
-Version 0.07
+Version 0.08
 
 =head1 SYNOPSIS
 

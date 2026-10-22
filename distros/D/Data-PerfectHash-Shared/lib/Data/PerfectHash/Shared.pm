@@ -1,6 +1,6 @@
 package Data::PerfectHash::Shared;
 use strict; use warnings;
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 use XSLoader;
 XSLoader::load('Data::PerfectHash::Shared', $VERSION);
 
@@ -8,7 +8,7 @@ XSLoader::load('Data::PerfectHash::Shared', $VERSION);
 sub CLONE_SKIP { 1 }
 
 package Data::PerfectHash::Shared::Builder;   # blessed builder handle
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 sub CLONE_SKIP { 1 }
 
 1;
@@ -53,8 +53,8 @@ perfect hashing
 
 Data::PerfectHash::Shared is an immutable exact static set: build it once from a
 fixed collection of keys (integers or byte strings), then test membership from any
-number of processes with lock-free, O(1)-worst-case reads over a shared read-only
-mapping.
+number of processes with lock-free reads and O(1) index probes over a shared
+read-only mapping.
 
 Membership is computed with a CHD (compress, hash, displace) minimal perfect hash
 over XXH3: for the N distinct keys given to a builder, C<build> finds a
@@ -147,7 +147,7 @@ failure and otherwise return a true value.
 
     my $set = Data::PerfectHash::Shared->load($path);
 
-    $set->has($key);           # bool, O(1) worst case, exact (no false positives)
+    $set->has($key);           # bool, exact (no false positives)
     $set->count;                # number of distinct keys stored
     $set->each_key(sub { my ($key) = @_; ... });
     $set->type;                 # 'int' or 'str'
@@ -230,9 +230,9 @@ little-endian one (or vice versa) with a clear error rather than misreading it.
 =head1 PERFORMANCE
 
 Built once, queried many times -- so the read path is what matters. C<has> is
-one hash of the key, a single indexed probe into the displacement table, and one
-comparison against the stored key: lock-free, O(1) worst case, with no shared
-mutable state, so lookups scale linearly across processes.
+two hashes of the key, a displacement-table probe, and a comparison against the
+stored key: lock-free, with a constant number of index probes and no shared
+mutable state. String hashing and comparison take O(key length).
 
 A snapshot for one million keys, in a single process on one core of an Intel
 i5-1135G7 (perl 5.40) -- your numbers will vary:

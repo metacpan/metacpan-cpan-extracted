@@ -181,6 +181,31 @@ subtest 'eventfd_set' => sub {
 };
 
 # ---- no notification without eventfd ----
+subtest 'eventfd_set preserves ownership of the current fd' => sub {
+    plan skip_all => '/proc/self/fd required' unless -d '/proc/self/fd';
+    for my $variant (qw(Int Int32 Int16 Str)) {
+        my $q = "Data::Queue::Shared::$variant"->new(undef, 8);
+        my $fd = $q->eventfd;
+        $q->eventfd_set($fd);
+        $q->notify;
+        is $q->eventfd_consume, 1, "$variant: same fd still works";
+        undef $q;
+        ok !-e "/proc/self/fd/$fd", "$variant: owned fd closes on destruction";
+    }
+};
+
+subtest 'eventfd counts retain their full width' => sub {
+    for my $variant (qw(Int Int32 Int16 Str)) {
+        my $q = "Data::Queue::Shared::$variant"->new(undef, 8);
+        open my $writer, '>&', $q->eventfd or die "dup: $!";
+        for my $count (32768, 65539, 2147483665) {
+            is syswrite($writer, pack('Q', $count)), 8, "$variant: write notification count";
+            is $q->eventfd_consume, $count, "$variant: preserve $count notifications";
+        }
+        ok !defined($q->eventfd_consume), "$variant: counter is drained";
+    }
+};
+
 subtest 'no eventfd no overhead' => sub {
     my $p = tmpnam() . '.shm';
     my $q = Data::Queue::Shared::Int->new($p, 16);

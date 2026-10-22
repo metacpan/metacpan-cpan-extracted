@@ -1,6 +1,6 @@
 package IO::K8s::PrometheusOperator::V1::RemoteReadSpec;
 # ABSTRACT: RemoteReadSpec defines the configuration for Prometheus to read back samples from a remote endpoint.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s authorization        => '+IO::K8s::PrometheusOperator::V1::Authorization';
@@ -9,16 +9,16 @@ k8s bearerToken          => Str;
 k8s bearerTokenFile      => Str;
 k8s filterExternalLabels => Bool;
 k8s followRedirects      => Bool;
-k8s headers              => { Str => 1 };
+k8s headers              => HashRef[Str];
 k8s name                 => Str;
 k8s noProxy              => Str;
 k8s oauth2               => '+IO::K8s::PrometheusOperator::V1::OAuth2';
-k8s proxyConnectHeader   => Opaque;
+k8s proxyConnectHeader   => HashRef[ArrayRef[InstanceOf['IO::K8s::Api::Core::V1::SecretKeySelector']]];
 k8s proxyFromEnvironment => Bool;
 k8s proxyUrl             => Str, { pattern => qr/^(http|https|socks5):\/\/.+$/ };
 k8s readRecent           => Bool;
 k8s remoteTimeout        => Str, { pattern => qr/^(0|(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?)$/ };
-k8s requiredMatchers     => { Str => 1 };
+k8s requiredMatchers     => HashRef[Str];
 k8s tlsConfig            => '+IO::K8s::PrometheusOperator::V1::TLSConfig';
 k8s url                  => Str, { required => 'schema', pattern => qr/^(http|https):\/\/.+$/ };
 
@@ -54,7 +54,7 @@ IO::K8s::PrometheusOperator::V1::RemoteReadSpec - RemoteReadSpec defines the con
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 authorization
 

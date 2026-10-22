@@ -1,10 +1,9 @@
-.gitignore
 Changes
 lib/TAP/Harness/Archive/MultipleHarnesses.pm
 lib/TAP/Harness/ReportByDescription.pm
 LICENSE
 Makefile.PL
-MANIFEST
+MANIFEST			This list of files
 MANIFEST.SKIP
 README
 t/001_load.t
@@ -15,4 +14,5 @@ t/testlib/alpha.t
 t/testlib/beta.t
 t/testlib/beth.t
 Todo
-META.yml                                 Module meta-data (added by MakeMaker)
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -61,6 +61,7 @@ typedef struct {
     int fd; void *map; size_t map_size;
     const PhHeader *hdr; const uint8_t *disp; const void *slots; const uint8_t *arena;
     char *path;
+    uint8_t path_utf8;
 } PhSet;
 
 /* disp[b] = disp_width little-endian bytes at s->disp + b*disp_width; in bounds
@@ -137,6 +138,7 @@ static PhSet *ph_open(const char *path, char *err, size_t el) {
     PhSet *s = (PhSet*)malloc(sizeof *s);
     if (!s) { snprintf(err,el,"out of memory"); munmap(m,st.st_size); close(fd); return NULL; }
     s->type_tag = PH_SET_TAG;
+    s->path_utf8 = 0;
     s->path = strdup(path);
     if (!s->path) { snprintf(err,el,"strdup: %s", strerror(errno)); free(s); munmap(m,st.st_size); close(fd); return NULL; }
     s->fd=fd; s->map=m; s->map_size=st.st_size; s->hdr=h;

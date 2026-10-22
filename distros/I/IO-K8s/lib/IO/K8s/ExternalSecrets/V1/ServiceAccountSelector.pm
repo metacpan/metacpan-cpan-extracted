@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1::ServiceAccountSelector;
 # ABSTRACT: Service account field containing the name of a kubernetes ServiceAccount.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s audiences => [Str];
@@ -24,7 +24,7 @@ IO::K8s::ExternalSecrets::V1::ServiceAccountSelector - Service account field con
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 audiences
 

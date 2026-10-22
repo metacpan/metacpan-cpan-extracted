@@ -419,6 +419,8 @@ unlink $iu;
         my $v = $rep{$dt};
         $arr->set_flat(1, $v);
         is $arr->get_flat(1), $v, "$dt: round-trips representative value $v";
+        my $filled = Data::NDArray::Shared->new(undef, $dt, 257)->fill($v);
+        is_deeply $filled->to_list, [ ($v) x 257 ], "$dt: fill preserves every element's bits";
     }
 }
 

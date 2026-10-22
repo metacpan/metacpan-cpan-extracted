@@ -5,6 +5,9 @@ model: inherit
 briefing:
   skills:
     - nak-core
+    - nak-hazards
+    - nak-runtime
+    - nak-testing
     - getty-perl-core
     - perl-io-async-future
     - perl-kubernetes-rest

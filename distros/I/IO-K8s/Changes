@@ -1,5 +1,67 @@
 Revision history for IO-K8s
 
+1.111     2026-10-21 18:03:05Z
+
+  - New DSL forms HashRef[ArrayRef[Str]] and
+    HashRef[ArrayRef[InstanceOf['Full::Class']]] for map[string][]X (k194).
+    They are strict, serialize Str elements as strings, and to_crd emits
+    additionalProperties of type array; AutoGen reads that back into the
+    same form. UserInfo, SubjectAccessReviewSpec,
+    CertificateSigningRequestSpec and CertManager CertificateRequestSpec
+    extra, TokenRequestSpec attestations, ExternalSecrets getParameters and
+    PrometheusOperator params / proxyConnectHeader (28 classes) were Opaque
+    and are now typed: a value that is not a list of strings (or of
+    SecretKeySelector objects) is refused at construction. Other element
+    types (Int, Quantity, ...) are not supported in this form and stay
+    Opaque.
+
+  - The shipped classes and the CRD emitter declare typed maps as HashRef[X]
+    instead of the { X => 1 } sugar (k193). This also drops the lenient
+    { Str => 1 } from the real string maps: HashRef[Str] refuses a
+    reference value instead of passing it through. The { X => 1 } form
+    itself stays valid in the DSL. maint/crd-drift-check.pl no longer
+    equates the two spellings.
+
+  - maint/crd-schema-audit.pl descends into the values of object maps again
+    (k192): the walk keyed on a registry flag that is never set, so it never
+    entered them. It now uses is_hash_of_objects.
+
+  - to_crd puts the value constraints (enum, minimum, maximum, pattern) of an
+    [X] array on items and those of a typed map on additionalProperties
+    instead of on the array/object itself (k195). description, default,
+    nullable and preserve_unknown stay on the container. A CRD emitted
+    earlier for such a field constrained the container, so re-applying it
+    changes what the apiserver validates.
+
+  - add_crd no longer fails for a CRD with a property named like a Moo
+    keyword, a type or a method (k200), e.g. Kong's KongPlugin
+    ordering.after / ordering.before. A class no longer carries the k8s DSL,
+    the Moo keywords or the type names (Str, Int, ...) as methods once its
+    declarations are done, so after, before, with, extends, has, Str and the
+    like are ordinary fields. A property that still collides with a real
+    method (new, meta, does, can, isa, import, TO_JSON, role helpers such as
+    label or save) or whose sanitized name another key already holds (a-b
+    and a_b) gets an accessor with a leading underscore (_new, _label,
+    __new on a second collision); its JSON key is unchanged. Before, such a
+    property refused the whole CRD. Hand-written classes follow the same
+    rule: a field named like a method is renamed, not rejected, and the
+    runtime entry point for declaring fields is IO::K8s::Resource->_k8s.
+
+  - save() writes UTF-8 and checks print and close (k199). Before, non-ASCII
+    text below U+0100 (German, French, Spanish) was written as Latin-1 --
+    not valid UTF-8, so load_yaml and kubectl did not read back what was
+    saved -- and anything above U+00FF raised a 'Wide character' warning.
+    A failed write or close now croaks. The to_yaml POD called its result a
+    byte string; it is a character string, and save is the UTF-8 step.
+
+  - load_yaml and IO::K8s::CRD->load resolve plain scalars like kubectl (k198):
+    yes/no/on/off/y/n in any case are booleans and a leading-zero integer
+    such as 0644 is octal (420). Before, 'privileged: no' loaded as true
+    and 'defaultMode: 0644' as decimal 644. Quote a value to keep it a
+    string. Mapping keys are never converted (y:, on:, no: stay "y", "on",
+    "no"), unlike kubectl, so CRD properties with such names survive.
+    Writing is unchanged.
+
 1.110     2026-10-01 15:57:19Z
 
   - Fix a 1.109 regression: JSONSchemaProps minimum, maximum and multipleOf

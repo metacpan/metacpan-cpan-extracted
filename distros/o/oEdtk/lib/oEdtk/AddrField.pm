@@ -5,7 +5,7 @@ use warnings;
 
 use oEdtk::Main qw(oe_uc_sans_accents);
 use base 'oEdtk::Field';
-our $VERSION = 2.1129;
+our $VERSION = 2.1131;
 
 sub process {
 	my ( $self, $data ) = @_;

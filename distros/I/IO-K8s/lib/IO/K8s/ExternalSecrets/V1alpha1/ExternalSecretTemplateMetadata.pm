@@ -1,11 +1,11 @@
 package IO::K8s::ExternalSecrets::V1alpha1::ExternalSecretTemplateMetadata;
 # ABSTRACT: ExternalSecretTemplateMetadata defines metadata fields for the Secret blueprint.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
-k8s annotations => { Str => 1 };
+k8s annotations => HashRef[Str];
 k8s finalizers  => [Str];
-k8s labels      => { Str => 1 };
+k8s labels      => HashRef[Str];
 
 
 
@@ -24,7 +24,7 @@ IO::K8s::ExternalSecrets::V1alpha1::ExternalSecretTemplateMetadata - ExternalSec
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 annotations
 

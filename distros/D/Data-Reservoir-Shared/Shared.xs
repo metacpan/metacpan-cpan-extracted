@@ -173,7 +173,7 @@ add(self, item, weight = &PL_sv_undef)
     RETVAL = (h->mode == RSV_MODE_WEIGHTED)
         ? rsv_add_weighted_locked(h, s, (uint64_t)n, w)
         : rsv_add_locked(h, s, (uint64_t)n);
-    __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);
+    h->hdr->stat_ops++;
     rsv_rwlock_wrunlock(h);
   OUTPUT:
     RETVAL
@@ -262,7 +262,7 @@ add_many(self, items)
             for (i = 0; i < cnt; i++) stored += (UV)rsv_add_weighted_locked(h, ps[i], (uint64_t)ls[i], ws[i]);
         else
             for (i = 0; i < cnt; i++) stored += (UV)rsv_add_locked(h, ps[i], (uint64_t)ls[i]);
-        __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);
+        h->hdr->stat_ops++;
         rsv_rwlock_wrunlock(h);
     }
     RETVAL = stored;
@@ -357,7 +357,7 @@ clear(self)
   CODE:
     rsv_rwlock_wrlock(h);
     rsv_clear_locked(h);
-    __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);
+    h->hdr->stat_ops++;
     rsv_rwlock_wrunlock(h);
 
 void
@@ -466,8 +466,11 @@ unlink(self, ...)
   CODE:
     if (sv_isobject(self) && sv_derived_from(self, "Data::Reservoir::Shared")) {
         RsvHandle *h = INT2PTR(RsvHandle*, SvIV(SvRV(self)));
-        if (h && h->path && unlink(h->path) != 0 && errno != ENOENT)
-            croak("Data::Reservoir::Shared->unlink(%s): %s", h->path, strerror(errno));
+        if (h && h->path) {
+            const char *up = h->unlink_path ? h->unlink_path : h->path;
+            if (unlink(up) != 0 && errno != ENOENT)
+                croak("Data::Reservoir::Shared->unlink(%s): %s", h->path, strerror(errno));
+        }
     } else if (items >= 2 && (SvGETMAGIC(ST(1)), SvOK(ST(1)))) {
         {
             const char *up = SvPV_nolen(ST(1));

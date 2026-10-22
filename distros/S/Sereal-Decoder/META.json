@@ -1,7 +1,7 @@
 {
    "abstract" : "Fast, compact, powerful binary deserialization",
    "author" : [
-      "Steffen Mueller <smueller@cpan.org>, Yves Orton <yves@cpan.org>"
+      "Steffen Mueller <cpan@steffen-mueller.net>, Yves Orton <yves@cpan.org>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
@@ -34,7 +34,7 @@
       "runtime" : {
          "requires" : {
             "XSLoader" : "0",
-            "perl" : "5.008"
+            "perl" : "5.014"
          }
       },
       "test" : {
@@ -60,6 +60,6 @@
          "url" : "git://github.com/Sereal/Sereal.git"
       }
    },
-   "version" : "5.010",
+   "version" : "5.011",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

@@ -1,11 +1,11 @@
 package IO::K8s::Cilium::V2::IdentityTuple;
 # ABSTRACT: IdentityTuple specifies a peer by identity, destination port and protocol.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s 'dest-port'       => Int;
 k8s identity          => Int;
-k8s 'identity-labels' => { Str => 1 };
+k8s 'identity-labels' => HashRef[Str];
 k8s protocol          => Int;
 
 
@@ -26,7 +26,7 @@ IO::K8s::Cilium::V2::IdentityTuple - IdentityTuple specifies a peer by identity,
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 dest-port
 

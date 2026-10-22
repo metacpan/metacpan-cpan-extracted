@@ -1,6 +1,6 @@
 package IO::K8s::GatewayAPI::V1::TCPRoute;
 # ABSTRACT: TCPRoute provides a way to route TCP requests.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::APIObject
     api_version     => 'gateway.networking.k8s.io/v1',
     resource_plural => 'tcproutes',
@@ -26,7 +26,7 @@ IO::K8s::GatewayAPI::V1::TCPRoute - TCPRoute provides a way to route TCP request
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 spec
 

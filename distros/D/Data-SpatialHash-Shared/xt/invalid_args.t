@@ -25,10 +25,9 @@ eval { Data::SpatialHash::Shared->new(undef, 100, 0, "Inf"+0) }; ok $@, 'Inf cel
 { my $g = Data::SpatialHash::Shared->new(undef, 100, 0, 50000, sphere => 6371000);
   eval { $g->query_geo_radius(0,0,0, "Inf"+0) }; ok $@, 'query_geo_radius Inf dist croaks'; }
 ok defined($s->insert(1,2,3)), 'sane insert still works';
-# query_knn enforces the cell cap via shell expansion (a distinct code path from
-# the upfront span check used by query_radius/query_aabb)
+# Sparse knn falls back to the live entries instead of exhausting the cell cap.
 { my $c = Data::SpatialHash::Shared->new(undef, 10, 0, 1.0); $c->insert(0,0,1);
-  eval { $c->query_knn(1e9, 1e9, 2) }; like $@, qr/cell/i, 'query_knn cap croaks with a cells message'; }
+  is_deeply [$c->query_knn(1e9, 1e9, 2)], [1], 'sparse knn finds the available entry'; }
 # the pair emitters reach the same cap via sph_pairs on a large FINITE reach
 { my $c = Data::SpatialHash::Shared->new(undef, 10, 0, 1.0); $c->insert(0,0,1);
   eval { $c->each_pair_within(1e9, sub{}) }; like $@, qr/cell/i, 'each_pair_within TOOBIG (large finite max_r) croaks'; }

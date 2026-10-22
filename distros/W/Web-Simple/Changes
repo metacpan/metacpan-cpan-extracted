@@ -1,5 +1,8 @@
 Revision history for Web-Simple
 
+0.034 - 2026-10-21
+  - migrate repository to github
+
 0.033 - 2017-03-20
   - reinstate the right glob in XML::Tags
 

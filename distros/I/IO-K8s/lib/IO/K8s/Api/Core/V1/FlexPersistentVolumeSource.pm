@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::FlexPersistentVolumeSource;
 # ABSTRACT: FlexPersistentVolumeSource represents a generic persistent volume resource that is provisioned/attached using an exec based plugin.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s driver => Str, 'required';
@@ -9,7 +9,7 @@ k8s driver => Str, 'required';
 k8s fsType => Str;
 
 
-k8s options => { Str => 1 };
+k8s options => HashRef[Str];
 
 
 k8s readOnly => Bool;
@@ -32,7 +32,7 @@ IO::K8s::Api::Core::V1::FlexPersistentVolumeSource - FlexPersistentVolumeSource 
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 driver
 

@@ -2,6 +2,7 @@ use strict;
 use warnings;
 use Test::More;
 use File::Temp qw(tempdir);
+use POSIX qw(_exit);
 use Data::SpatialHash::Shared;
 
 my $dir  = tempdir(CLEANUP => 1);
@@ -233,6 +234,36 @@ like exception(sub { Data::SpatialHash::Shared->new_readonly(undef) }),
         'query_geo_radius matches producer via read-only view';
     like exception(sub { $gro->insert_geo(0, 0, 0, 1) }), qr/read-only/, 'insert_geo on read-only geo view croaks';
     like exception(sub { $gro->move_geo($geh, 0, 0, 0) }), qr/read-only/, 'move_geo on read-only geo view croaks';
+}
+
+{
+    my $p = "$dir/interrupted-freeze.sph";
+    my $producer = Data::SpatialHash::Shared->new($p, 16, 1, 1.0);
+    $producer->insert(0.5, 0.5, $_) for 1 .. 3;
+    my $peer = Data::SpatialHash::Shared->new($p, 16, 1, 1.0);
+    $producer->freeze;
+    my $ro = Data::SpatialHash::Shared->new_readonly($p);
+    my $read_image = sub {
+        open my $f, '<:raw', $p or die $!;
+        local $/;
+        return <$f>;
+    };
+    my $before = $read_image->();
+    my $data_off = unpack('Q<', substr($before, 48, 8));
+    my $pid = fork // die "fork: $!";
+    _exit(0) unless $pid;
+    waitpid($pid, 0);
+    # Model a freezer killed after publishing the seal but before unlocking.
+    open my $f, '+<:raw', $p or die $!;
+    sysseek($f, 72, 0) == 72 or die $!;
+    syswrite($f, pack('L<', 0x80000000 | $pid)) == 4 or die $!;
+    close $f;
+    is_deeply S([$peer->query_cell(0.5, 0.5)]), [1, 2, 3],
+        'existing peer recovers a lock left by an interrupted freeze';
+    ok substr($read_image->(), $data_off) eq substr($before, $data_off),
+        'frozen buckets and entries remain byte-for-byte immutable during recovery';
+    is_deeply S([$ro->query_cell(0.5, 0.5)]), [1, 2, 3],
+        'lock-free reader retains all entries after recovery';
 }
 
 done_testing;

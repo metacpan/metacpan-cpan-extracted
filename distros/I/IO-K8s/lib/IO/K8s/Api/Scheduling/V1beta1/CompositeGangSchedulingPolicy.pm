@@ -1,6 +1,6 @@
 package IO::K8s::Api::Scheduling::V1beta1::CompositeGangSchedulingPolicy;
 # ABSTRACT: CompositeGangSchedulingPolicy indicates that the groups belonging to the composite group should be scheduled using all-or-nothing semantics.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s minGroupCount => Int, 'required';
@@ -20,7 +20,7 @@ IO::K8s::Api::Scheduling::V1beta1::CompositeGangSchedulingPolicy - CompositeGang
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 minGroupCount
 

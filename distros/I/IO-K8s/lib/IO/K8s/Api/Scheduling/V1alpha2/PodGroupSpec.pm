@@ -1,6 +1,6 @@
 package IO::K8s::Api::Scheduling::V1alpha2::PodGroupSpec;
 # ABSTRACT: PodGroupSpec defines the desired state of a PodGroup.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s disruptionMode => Str;
@@ -38,7 +38,7 @@ IO::K8s::Api::Scheduling::V1alpha2::PodGroupSpec - PodGroupSpec defines the desi
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 disruptionMode
 

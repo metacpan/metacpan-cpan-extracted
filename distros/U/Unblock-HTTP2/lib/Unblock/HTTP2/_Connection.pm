@@ -6,7 +6,7 @@ use Carp qw(croak);
 use Scalar::Util qw(blessed weaken);
 use utf8 ();
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 my @SETTING_NAMES = qw(
     header_table_size
@@ -33,12 +33,33 @@ my %SETTING_ID = (
 my %SETTING_NAME = reverse %SETTING_ID;
 
 
+sub _receive_options {
+    my ($class, $option) = @_;
+    my $self = {};
+    $self->{receive_body} = exists $option->{receive_body}
+        ? delete $option->{receive_body} : 'stream';
+    croak 'new(): receive_body must be buffered or stream'
+        unless defined($self->{receive_body}) && !ref($self->{receive_body})
+            && $self->{receive_body} =~ /\A(?:buffered|stream)\z/;
+    $self->{max_buffered_body_bytes} = exists $option->{max_buffered_body_bytes}
+        ? delete $option->{max_buffered_body_bytes} : 64 * 1024 * 1024;
+    croak 'new(): max_buffered_body_bytes must be a positive integer'
+        unless defined($self->{max_buffered_body_bytes})
+            && !ref($self->{max_buffered_body_bytes})
+            && $self->{max_buffered_body_bytes} =~ /\A[0-9]+\z/
+            && $self->{max_buffered_body_bytes} > 0
+            && $self->{max_buffered_body_bytes} <= (~0);
+    return %$self;
+}
+
 sub _initialize_connection {
     my ($self, $session, %option) = @_;
 
     croak 'HTTP/2 session must be an object'
         unless blessed($session);
 
+    $self->{receive_body} = delete $option{receive_body};
+    $self->{max_buffered_body_bytes} = delete $option{max_buffered_body_bytes};
     my $transport = delete $option{transport};
     if (defined $transport) {
         croak 'new(): transport must be an object' unless blessed($transport);
@@ -57,6 +78,8 @@ sub _initialize_connection {
     croak 'unknown HTTP/2 connection options: ' . join(', ', sort keys %option)
         if %option;
 
+    croak 'new(): buffered reception cannot be combined with on_body'
+        if $self->{receive_body} eq 'buffered' && $callbacks->{on_body};
     $self->{transport}          = $transport;
     weaken($self->{transport}) if defined $transport;
     $self->{transport_attached} = defined($transport) ? 1 : 0;
@@ -352,6 +375,7 @@ sub _reset_stream {
 
     $self->{session}->submit_rst_stream($transaction->stream_id, 0 + $error_code);
     $transaction->_mark_cancelled(0 + $error_code, 0);
+    $transaction->_notify_finish;
     $self->_transport_sync if $self->{transport_attached};
     return;
 }
@@ -815,6 +839,7 @@ sub _finish_close {
 sub _invoke_stream_error {
     my ($self, $transaction, $error, $error_code) = @_;
     my $result = $transaction->_invoke('on_error', $error, $error_code);
+    $transaction->_notify_finish;
     return $result;
 }
 

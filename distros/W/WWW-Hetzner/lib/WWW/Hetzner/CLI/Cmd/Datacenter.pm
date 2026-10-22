@@ -1,12 +1,13 @@
 package WWW::Hetzner::CLI::Cmd::Datacenter;
 # ABSTRACT: Datacenter commands
 
-our $VERSION = '0.101';
+our $VERSION = '0.102';
 
 use Moo;
 use MooX::Cmd;
 use MooX::Options usage_string => 'USAGE: hcloud.pl datacenter [options]';
 use JSON::MaybeXS qw(encode_json);
+
 
 sub execute {
     my ($self, $args, $chain) = @_;
@@ -32,6 +33,7 @@ sub execute {
     }
 }
 
+
 1;
 
 __END__
@@ -46,7 +48,36 @@ WWW::Hetzner::CLI::Cmd::Datacenter - Datacenter commands
 
 =head1 VERSION
 
-version 0.101
+version 0.102
+
+=head1 SYNOPSIS
+
+    hcloud.pl datacenter
+
+=head1 DESCRIPTION
+
+List the Hetzner Cloud datacenters.
+
+B<Deprecated:> Hetzner removed the datacenters endpoint, so this command
+ends with the API error C<410 Gone> (C<deprecated_api_endpoint>). The
+command is kept for backward compatibility only; use C<hcloud.pl location>
+instead.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<WWW::Hetzner::CLI> - Main Cloud CLI
+
+=item * L<WWW::Hetzner::Cloud::API::Datacenters> - Datacenters API
+
+=item * L<WWW::Hetzner::Cloud::Datacenter> - Datacenter entity
+
+=item * L<WWW::Hetzner::CLI::Cmd::Location> - Location commands
+
+=item * L<WWW::Hetzner> - Main umbrella module
+
+=back
 
 =head1 SUPPORT
 

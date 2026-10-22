@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1alpha1::GrafanaBasicAuth;
 # ABSTRACT: Basic auth credentials used to authenticate against the Grafana instance.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s password => '+IO::K8s::ExternalSecrets::V1alpha1::SecretRef', { required => 'schema' };
@@ -22,7 +22,7 @@ IO::K8s::ExternalSecrets::V1alpha1::GrafanaBasicAuth - Basic auth credentials us
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 password
 

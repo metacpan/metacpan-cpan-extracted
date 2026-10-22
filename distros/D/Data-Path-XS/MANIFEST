@@ -30,6 +30,7 @@ t/kw-pathset.t
 t/leaks.t
 t/lvalue.t
 t/numeric-hash-keys.t
+t/production.t
 t/refs.t
 t/stress.t
 t/tied-and-validation.t
@@ -44,5 +45,6 @@ xt/sanitizer.t
 xt/spelling.t
 xt/synopsis.t
 xt/threads.t
+t/tainted-path.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

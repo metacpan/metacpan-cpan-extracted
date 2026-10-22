@@ -6,7 +6,7 @@ use Carp qw(croak);
 use Scalar::Util qw(blessed weaken);
 use Uniform::HTTP::Response;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 my %TERMINAL = map { $_ => 1 } qw(complete cancelled error);
 
@@ -42,6 +42,12 @@ sub _new {
         unconsumed_bytes => 0,
     }, $class;
 
+    $self->{receive_body} = $connection->{receive_body};
+    $self->{max_buffered_body_bytes} = $connection->{max_buffered_body_bytes};
+    my $on_data = delete $self->{callbacks}{on_data};
+    $self->on_data($on_data) if $on_data;
+    croak 'buffered reception cannot be combined with on_body'
+        if $self->{receive_body} eq 'buffered' && $self->{callbacks}{on_body};
     weaken($self->{connection});
     return $self;
 }
@@ -64,6 +70,74 @@ sub is_complete  { return $_[0]{state} eq 'complete' ? 1 : 0 }
 sub is_cancelled { return $_[0]{state} eq 'cancelled' ? 1 : 0 }
 sub is_error     { return $_[0]{state} eq 'error' ? 1 : 0 }
 sub is_terminal  { return $TERMINAL{$_[0]{state}} ? 1 : 0 }
+
+sub on_data {
+    my ($self, $cb) = @_;
+    croak 'on_data(): callback must be a coderef' unless ref($cb) eq 'CODE';
+    croak 'on_data(): receive body has already started or finished'
+        if $self->{receive_started} || $self->{receive_done} || $self->is_terminal;
+    my $owner = $self->{connection};
+    croak 'on_data(): cannot be combined with on_body'
+        if $self->{callbacks}{on_body} || ($owner && $owner->{callbacks}{on_body});
+    croak 'on_data(): callback is already registered' if $self->{callbacks}{on_data};
+    $self->{callbacks}{on_data} = $cb;
+    $self->{receive_body} = 'stream';
+    return $self;
+}
+
+sub on_finish {
+    my ($self, $cb) = @_;
+    croak 'on_finish(): callback must be a coderef' unless ref($cb) eq 'CODE';
+    croak 'on_finish(): Transaction is terminal' if $self->is_terminal;
+    croak 'on_finish(): callback is already registered' if $self->{callbacks}{on_finish};
+    $self->{callbacks}{on_finish} = $cb;
+    return $self;
+}
+
+sub _receive_data {
+    my ($self, $message, $bytes) = @_;
+    return 1 if $self->is_terminal;
+    $self->{receive_started} = 1;
+    if ($self->{receive_body} eq 'buffered') {
+        my $size = ($self->{received_bytes} || 0) + length($bytes);
+        if ($size > $self->{max_buffered_body_bytes}) {
+            delete $self->{receive_chunks};
+            delete $self->{received_bytes};
+            return 'received body exceeds max_buffered_body_bytes';
+        }
+        push @{ $self->{receive_chunks} }, $bytes;
+        $self->{received_bytes} = $size;
+        return 1;
+    }
+    return $self->_invoke('on_data', $bytes) if $self->{callbacks}{on_data};
+    my $owner = $self->{connection};
+    return $owner->_invoke_callback('on_body', $self, $message, $bytes)
+        if $owner && $owner->can('_invoke_callback');
+    return $self->_invoke('on_body', $message, $bytes);
+}
+
+sub _finish_receive {
+    my ($self, $message) = @_;
+    $self->{receive_done} = 1;
+    if ($self->{receive_body} eq 'buffered' && $message->body_is_mutable) {
+        $message->body(join '', @{ delete($self->{receive_chunks}) || [] });
+    }
+    delete $self->{receive_chunks};
+    delete $self->{received_bytes};
+    return;
+}
+
+sub _notify_finish {
+    my ($self) = @_;
+    return unless $self->is_terminal && !$self->{finish_called};
+    $self->{finish_pending} = 1;
+    return if $self->{callback_depth};
+    $self->{finish_called} = 1;
+    delete $self->{finish_pending};
+    # Terminal observers cannot undo cleanup or recursively report an error.
+    $self->_invoke('on_finish');
+    return;
+}
 
 sub write {
     my ($self, $bytes) = @_;
@@ -161,6 +235,11 @@ sub reset {
 sub cancel {
     my ($self) = @_;
     return $self if $self->is_terminal;
+    if (!$self->{connection}) {
+        $self->_mark_cancelled(8, 0);
+        $self->_notify_finish;
+        return $self;
+    }
     return $self->reset(8);
 }
 
@@ -263,6 +342,8 @@ sub _mark_complete {
 sub _mark_cancelled {
     my ($self, $error_code, $by_peer) = @_;
     return $self if $self->is_terminal;
+    delete $self->{receive_chunks};
+    delete $self->{received_bytes};
     $self->{state} = 'cancelled';
     if (defined $error_code) {
         $self->{error_code} = 0 + $error_code;
@@ -278,6 +359,8 @@ sub _fail {
     $error = 'HTTP/2 stream failed'
         unless defined($error) && length($error);
 
+    delete $self->{receive_chunks};
+    delete $self->{received_bytes};
     $self->{state} = 'error';
     $self->{error} = "$error";
     if (defined $error_code) {
@@ -291,12 +374,16 @@ sub _invoke {
     my ($self, $name, @args) = @_;
     my $callback = $self->{callbacks}{$name} or return 1;
 
+    $self->{callback_depth}++;
     my $ok = eval {
         $callback->($self, @args);
         1;
     };
 
-    return $ok ? 1 : $@;
+    my $error = "$@";
+    $self->{callback_depth}--;
+    $self->_notify_finish if $self->{finish_pending};
+    return $ok ? 1 : $error;
 }
 
 sub _drain {
@@ -329,6 +416,37 @@ The second example is an alternative to the first, not a second response
 on the same Transaction. C<respond()>, C<send_informational()>, and
 Client C<request()> accept named HTTP fields directly; creating a Uniform
 message by hand is optional.
+
+=head1 RECEIVE AND FINISH CALLBACKS
+
+    $tx->on_data(sub {
+        my ($tx, $bytes) = @_;
+        consume_chunk($bytes);
+    });
+
+Register during the incoming-header callback (server C<on_request> or client
+C<on_response>). This selects streaming for this transaction. Only decoded
+HTTP body bytes are passed; content encodings such as gzip are not decoded.
+No full body is accumulated. Registering after body delivery starts or ends,
+registering twice, or combining this callback with C<on_body> is an error.
+Client C<request()> also accepts C<on_data> before the request is dispatched.
+
+    $tx->on_finish(sub {
+        my ($tx) = @_;
+        record_outcome($tx->state, $tx->error);
+    });
+
+Runs once after the applicable completion or error callbacks for a terminal
+C<complete>, C<cancelled>, or C<error> transaction. The state is committed
+before the callback. Cancellation alone does not call C<on_error>.
+A completed incoming request can still have an unfinished response; it is
+not terminal until both sides required by the engine have finished.
+
+Client C<request()> also accepts C<on_finish>. Register it before the
+transaction becomes terminal. Duplicate and late registration are errors.
+An exception from this terminal observer is ignored so cleanup and other
+transactions can continue. Earlier callbacks keep the engine's exception
+policy, but cannot suppress this notification.
 
 =head1 DESCRIPTION
 

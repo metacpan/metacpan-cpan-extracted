@@ -1,6 +1,6 @@
 package IO::K8s::ApiextensionsApiserver::Pkg::Apis::Apiextensions::V1::CustomResourceDefinitionSpec;
 # ABSTRACT: CustomResourceDefinitionSpec describes how a user wants their resource to appear
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s conversion => 'Apiextensions::V1::CustomResourceConversion';
@@ -35,7 +35,7 @@ IO::K8s::ApiextensionsApiserver::Pkg::Apis::Apiextensions::V1::CustomResourceDef
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 conversion
 

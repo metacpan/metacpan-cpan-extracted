@@ -984,7 +984,7 @@ received_native_flags(U32 kind, int complete)
     }
 
     if (complete) {
-        flags |= UHTTP_COMPLETE;
+        flags |= UHTTP_COMPLETE | UHTTP_HAS_BUFFERED_BODY;
     }
     else {
         flags |= UHTTP_MUTABLE | UHTTP_BODY_MUTABLE
@@ -1132,6 +1132,9 @@ request_from_native_headers(pTHX_ unblock_h2_session *ps,
             input.flags = received_native_flags(
                 UHTTP_KIND_REQUEST,
                 (block->flags & NGHTTP2_FLAG_END_STREAM) ? 1 : 0);
+            if (input.flags & UHTTP_COMPLETE) {
+                set_native_span(&input.body, "", 0);
+            }
             set_native_span(&input.version, "2", 1);
             set_native_span(&input.method, method->value, method->valuelen);
             set_native_span(&input.target, target, target_len);
@@ -1247,6 +1250,9 @@ response_from_native_headers(pTHX_ unblock_h2_session *ps,
 
         uhttp_native_input_init(&input, UHTTP_KIND_RESPONSE);
         input.flags = received_native_flags(UHTTP_KIND_RESPONSE, complete);
+        if (complete) {
+            set_native_span(&input.body, "", 0);
+        }
         set_native_span(&input.version, "2", 1);
         input.status = status_value;
         input.headers = normal;

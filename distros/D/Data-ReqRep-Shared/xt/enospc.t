@@ -8,8 +8,8 @@ use File::Temp qw(tempdir);
 # Mounts a 4 MiB tmpfs in a private user and mount namespace.
 
 plan skip_all => 'Linux only' unless $^O eq 'linux';
-system('unshare -Urm true >/dev/null 2>&1') == 0
-    or plan skip_all => 'needs unshare -Urm (unprivileged user namespaces)';
+system(q{unshare -Urm sh -c 'mount -t tmpfs -o size=1m tmpfs /tmp' >/dev/null 2>&1}) == 0
+    or plan skip_all => 'needs a tmpfs mount in an unprivileged user namespace';
 
 my $root = dirname(dirname(abs_path(__FILE__)));
 my $mnt  = tempdir(CLEANUP => 1);

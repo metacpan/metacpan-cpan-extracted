@@ -1,5 +1,10 @@
 Revision history for Data-Histogram-Shared
 
+0.07  2026-10-16
+    - Keep exact percentile ranks in the correct bucket.
+    - Publish frozen data safely to read-only attachments.
+    - Clarify precision and interrupted-write guarantees.
+
 0.06      2026-09-26
           - A writer killed mid record, merge or reset no longer leaves a
             total the buckets cannot reach.

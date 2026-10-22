@@ -1,6 +1,6 @@
 package IO::K8s::PrometheusOperator::V1alpha1::NomadSDConfig;
 # ABSTRACT: NomadSDConfig configurations allow retrieving scrape targets from Nomad's Service API.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s allowStale           => Bool;
@@ -11,7 +11,7 @@ k8s followRedirects      => Bool;
 k8s namespace            => Str;
 k8s noProxy              => Str;
 k8s oauth2               => '+IO::K8s::PrometheusOperator::V1alpha1::OAuth2';
-k8s proxyConnectHeader   => Opaque;
+k8s proxyConnectHeader   => HashRef[ArrayRef[InstanceOf['IO::K8s::Api::Core::V1::SecretKeySelector']]];
 k8s proxyFromEnvironment => Bool;
 k8s proxyUrl             => Str, { pattern => qr/^(http|https|socks5):\/\/.+$/ };
 k8s refreshInterval      => Str, { pattern => qr/^(0|(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?)$/ };
@@ -50,7 +50,7 @@ IO::K8s::PrometheusOperator::V1alpha1::NomadSDConfig - NomadSDConfig configurati
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 allowStale
 

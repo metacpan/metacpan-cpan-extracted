@@ -34,6 +34,10 @@
 #include <linux/futex.h>
 #include <sys/eventfd.h>
 
+#ifndef POOL_WAIT_INTERRUPTED
+#define POOL_WAIT_INTERRUPTED() 0
+#endif
+
 /* ================================================================
  * Constants
  * ================================================================ */
@@ -238,6 +242,7 @@ static inline int64_t pool_alloc(PoolHandle *h, double timeout) {
     __atomic_add_fetch(&hdr->stat_waits, 1, __ATOMIC_RELAXED);
 
     for (;;) {
+        if (POOL_WAIT_INTERRUPTED()) { errno = EINTR; return -2; }
         uint32_t cur_used = __atomic_load_n(&hdr->used, __ATOMIC_RELAXED);
         if ((uint64_t)cur_used < hdr->capacity) {
             slot = pool_try_alloc(h);
@@ -270,6 +275,7 @@ static inline int64_t pool_alloc(PoolHandle *h, double timeout) {
         }
 
         __atomic_sub_fetch(&hdr->waiters, 1, __ATOMIC_RELAXED);
+        if (POOL_WAIT_INTERRUPTED()) { errno = EINTR; return -2; }
 
         slot = pool_try_alloc(h);
         if (slot >= 0) return slot;
@@ -387,6 +393,7 @@ static inline int pool_alloc_n(PoolHandle *h, uint64_t *out, uint32_t count,
         }
         if (got == count) return 1;
         if (got > 0) pool_free_n(h, out, got);   /* don't hold across the wait */
+        if (POOL_WAIT_INTERRUPTED()) { errno = EINTR; return -1; }
 
         if (has_deadline && !pool_remaining_time(&deadline, &remaining)) {
             __atomic_add_fetch(&hdr->stat_timeouts, 1, __ATOMIC_RELAXED);

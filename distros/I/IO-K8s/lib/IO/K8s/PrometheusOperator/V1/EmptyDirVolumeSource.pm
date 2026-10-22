@@ -1,6 +1,6 @@
 package IO::K8s::PrometheusOperator::V1::EmptyDirVolumeSource;
 # ABSTRACT: emptyDir to be used by the StatefulSet.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s medium    => Str;
@@ -22,7 +22,7 @@ IO::K8s::PrometheusOperator::V1::EmptyDirVolumeSource - emptyDir to be used by t
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 medium
 

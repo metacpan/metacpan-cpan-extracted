@@ -1,6 +1,6 @@
 ---
 name: kubernetes-gpu
-description: "Use when getting NVIDIA GPUs onto Kubernetes — host driver vs GPU Operator, container toolkit, ClusterPolicy, RuntimeClass, CDI, or nvidia.com/gpu missing from node capacity."
+description: "Use when getting NVIDIA GPUs onto Kubernetes — GPU Operator, container toolkit, RuntimeClass, CDI, or nvidia.com/gpu missing from node capacity."
 ---
 
 # NVIDIA GPUs on Kubernetes

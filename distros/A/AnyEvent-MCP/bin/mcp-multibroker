@@ -1,0 +1,857 @@
+#!/opt/bin/perl
+
+=head1 NAME
+
+mcp-multibroker - combine MCP servers under tool name prefixes
+
+=head1 SYNOPSIS
+
+   mcp-multibroker files 'stdio:mcp-fs /home/alice/src/project' \
+                   search https://example.org/mcp/ --bearer TOKEN
+   mcp-multibroker vim --- mcp-vim --bind :: --- --required
+
+=head1 DESCRIPTION
+
+C<mcp-multibroker> combines several MCP servers behind one connection to
+your MCP client. You can give an assistant access to filesystem tools,
+Vim editors and other services by configuring them here, then connecting
+the client to this broker.
+
+For each server, give a name prefix and an HTTP URL, a C<stdio:COMMAND>,
+or C<--- PROGRAM ARG... ---> to start it as a subprocess. These are the downstream
+servers. The multibroker starts or connects to them, obtains their tool
+definitions and forwards tool calls and replies between them and your
+client.
+
+The prefix identifies which server a tool belongs to. For example, a
+filesystem server configured as C<files> has a tool named
+C<files.read-lines>. Your client can ask the multibroker which servers and
+tools are available, then call a tool by its prefixed name.
+
+The connection from your MCP client to the multibroker is the upstream
+connection. It can use HTTP or stdin/stdout, independently of how the
+downstream servers connect. See L<AnyEvent::MCP::Intro> for a complete
+setup example.
+
+=head1 FIRST USE
+
+Configure a local MCP client to start a multibroker with two servers:
+
+   mcp-multibroker --stdio \
+      files --- mcp-fs --name project /home/alice/src/project --- \
+      questions --- mcp-ask-user ---
+
+The client launches only the broker; it starts children as needed. Ask:
+
+   Call discover-brokers and list-tools, then use files.workdirs
+   to show which project directories are configured.
+
+C<files> and C<questions> are routing prefixes, not child instance names
+or permission profiles. Each child still applies its own permissions.
+The broker selects stdio automatically for bundled AnyEvent::MCP children.
+Third-party servers must support MCP over stdio in their own startup mode.
+You can replace a child with any stdio-speaking MCP server by putting
+its executable and arguments between the C<---> delimiters, or connect
+an existing HTTP server by URL; see L</DOWNSTREAM SERVERS>.
+
+For HTTP clients, omit C<--stdio>, leave the broker running, and obtain
+its upstream URL with C<--print-url> using the same listener settings.
+For missing tools, try C<discover-brokers> for connection errors and
+C<list-tools> to refresh discovery; your MCP client may also need to
+refresh its cached list. C<--tool-help> only shows the broker's own
+tools, not those of its children. Ordinary children start lazily. Use C<--eager>
+after the child specification for services that accept independent
+connections, such as Vim or browser brokers.
+
+=head1 TOOLS
+
+The broker exposes three tools of its own:
+
+=over
+
+=item discover-brokers
+
+Lists the configured downstream servers and their instructions by prefix.
+An entry is a string of instructions, C<null> for a reachable server with
+no instructions, or C<{error: MESSAGE}> for an unreachable server.
+
+=item list-tools
+
+Queries downstream servers for their tool definitions and refreshes the
+combined list. An optional C<broker> argument selects one exact downstream
+prefix, excluding the multibroker's own tools. Unknown broker names or
+arguments are errors. Unreachable servers are omitted from tool listings
+but reported by C<discover-brokers>.
+
+=item call-tool
+
+Calls a downstream tool by its C<PREFIX.TOOL> name with the supplied
+arguments. Calls to an unavailable server fail as tool errors; calls are
+not replayed after transport failures.
+
+=back
+
+A refreshed list is a snapshot of what is reachable at that point. It
+includes configured servers and currently registered reverse connections.
+A listed server might become unavailable before a later call.
+
+=head1 DOWNSTREAM SERVERS
+
+Each prefix identifies one downstream server. HTTP URLs may include a URL-path token,
+or be followed by C<--bearer TOKEN>. C<bearer> and C<timeout> defaults
+are read from C<[client PREFIX]> in the global configuration; the URL in
+the command line overrides any configured C<url>. Stdio children receive
+C<PERL_ANYEVENT_MCP_MULTIBROKER_PROTOCOL=stdio> and
+C<PERL_ANYEVENT_MCP_MULTIBROKER_ALIAS=PREFIX> in their environment.
+The alias may be displayed in downstream permission prompts, without changing
+the server's instance name or permission rules.
+
+For direct execution, use C<PREFIX --- PROGRAM ARG... --->:
+
+   mcp-multibroker vim --- mcp-vim --bind :: --- --eager \
+                   files --- mcp-fs '/home/alice/project with spaces' ---
+
+The next exact C<---> argument closes the list. Everything inside, including
+C<-->, C<--eager> and C<--bearer>, is passed unchanged to the child. There is
+no shell interpretation. Empty arguments are preserved; the program must be
+nonempty. An empty list or missing closing delimiter is an error.
+
+A subprocess can also connect to an MCP server on another machine via SSH:
+
+   mcp-multibroker remote-fs --- ssh remotehost mcp-fs --stdio --ask mcp /workdir ---
+
+C<--stdio> tells the remote C<mcp-fs> to use stdin/stdout for MCP. It must be
+specified explicitly because the multibroker's environment variables are
+not passed through SSH. C<--ask mcp> forwards permission prompts over MCP to
+the local multibroker, instead of trying to display dialogs on the remote
+host. The local broker then presents them according to its own C<--ask> mode
+(normally using a local helper); see L</PERMISSION PROMPTS>.
+
+C<stdio:COMMAND> retains shell interpretation. Use it for shell syntax or
+when a child needs a literal C<---> argument. Quoting C<'---'> in the
+delimited form cannot escape the delimiter: shell quoting is already gone.
+
+Broker-wide options precede the first server entry. Downstream options
+follow that server's URL or closing C<--->; Getopt::Long stops at the next
+prefix. Options inside an argv list belong exclusively to the child.
+
+C<--eager> after either stdio form starts that child at
+multibroker startup rather than waiting for its first MCP use. This is useful
+for children that also provide their own TCP service, such as C<mcp-vim>.
+Other stdio children remain lazy. Eager startup attempts one connection and
+logs failures; it does not continually restart failed children.
+C<--required> implies C<--eager> and makes the multibroker exit with failure
+if that child cannot initialize or later disconnects unexpectedly. A supervisor
+can then restart the broker. An explicitly accepted managed idle shutdown is
+not a failure; the child can be started again on the next use. Both options
+apply only to spawned stdio children, never remote HTTP peers.
+
+=head2 Reverse connections
+
+The HTTP listener also accepts authenticated reverse MCP connections. It
+can run with no configured downstream servers. With upstream stdio, add
+C<--listen> to keep this listener active:
+
+   mcp-multibroker --stdio --listen --bind 127.0.0.1:31740
+   mcp-multibroker --bind 127.0.0.1:31740 --print-url
+   mcp-fs --connect http://127.0.0.1:31740/TOKEN/files /home/alice/project
+
+Use the token returned by C<--print-url>. The connecting server extracts
+the host, port, token and alias from this URL, sends
+C<["mcp-connect", token, alias]> followed by a newline, then ordinary MCP
+JSONL. The connection is raw TCP on the HTTP listener, not an HTTP request.
+It uses the same accepted tokens as HTTP. Authentication grants registration
+under any free alias; configured or connected aliases cannot be replaced.
+
+The connecting program remains the MCP server. The multibroker attaches an
+MCP client and discovers its tools immediately. Forms and cancellation follow
+the same routes as other downstream connections. A disconnect fails pending
+calls and removes the registration; the server retries once per second, up to
+sixty attempts, and registers again when the connection is restored.
+No interrupted operation is replayed. Plain HTTP endpoint URLs do not provide
+transport encryption; use an existing trusted connection or tunnel as needed.
+
+=head2 Process lifetime
+
+Each downstream connection advertises C<anyevent-mcp/multibroker> version 1
+in its client capabilities. A spawned stdio child can request managed idle
+shutdown with C<anyevent-mcp/idle-exit>. When no calls are outstanding, the
+broker may send C<anyevent-mcp/shutdown>; the child acknowledges before
+exiting. This is optional and never makes HTTP children exit. Unexpected
+disconnects are logged, not proactively restarted. A later use reconnects.
+
+=head1 PERMISSION PROMPTS
+
+C<--ask helper> (the default) answers downstream form challenges locally.
+Ordinary forms use C<anyevent-mcp-form-elicitation>; permission requests keep their
+specialised permission dialogs. C<--ask mcp> forwards modern challenges to
+the upstream client. C<--ask auto> uses upstream form support when advertised,
+otherwise the local helper. A decline or cancel is never retried through
+another interface. If a client advertises forms but silently declines them,
+select C<helper> explicitly.
+
+C<--ask tty> and C<--ask yad> select only the built-in terminal or YAD
+interface for both ordinary forms and permission dialogs. These modes
+ignore custom helper variables and do not fall back to another interface.
+
+The broker advertises its local form support to downstream calls when it
+will handle their forms itself. In C<mcp> mode it forwards the upstream
+caller's capabilities instead. Local forms work for HTTP and stdio children,
+including when the upstream caller cannot handle native input challenges.
+Continuation tokens remain opaque; the broker sends the human response back
+to the same downstream operation and returns its eventual result.
+
+The mode also sets C<PERL_ANYEVENT_MCP_PERMISSION_ASK> for spawned stdio
+children. Independently running servers keep their own configuration.
+Spawned C<mcp-ask-user> instances normally delegate presentation to this broker.
+Use C<--ask mcp> on a separately started C<mcp-ask-user> to delegate to its
+connecting client, including a multibroker.
+
+Local permission and question dialogs share one queue. Set
+C<PERL_ANYEVENT_MCP_ELICITATION_HELPER> to replace the form helper and
+C<PERL_ANYEVENT_MCP_PERMISSION_HELPER> to replace the permission helper.
+Cancelling a tool call cancels its downstream operation and pending local
+prompt. The original stdio permission extension is also supported.
+
+=head1 CLIENT CONNECTION
+
+The upstream listener uses L<AnyEvent::MCP::Server::Simple/mcp_start>: HTTP
+without stdout output by default, or stdio when run by another broker.
+The service instance name defaults to C<default>. Repeated
+C<--token TOKEN> options before the broker pairs configure credentials
+accepted by the upstream HTTP listener. They are separate from C<--bearer>
+after a downstream broker URL, which authenticates the client connection.
+C<--name NAME>
+selects C<[instance NAME]> in the global configuration, including its
+credentials and optional C<bind> address. C<--bind ADDRESS[:PORT]> overrides
+that address. The default is IPv4 loopback with a stable name-derived port
+in 16384..32767. Port zero requests an ephemeral port.
+C<--print-url> prints the credential-bearing URL without opening a listener
+or starting children; it requires a nonzero port. Upstream stdio startup
+skips HTTP listener configuration unless C<--listen> is specified; named HTTP
+children still load their client defaults. Browser origins are unrestricted by default; HTTP requests
+still require an accepted token. See L<AnyEvent::MCP::Intro> for examples.
+
+=head1 OPTIONS
+
+Put listener options B<before> the first prefix/URL pair. Options applying
+to one downstream server follow that pair immediately.
+Common options, including C<--name>, C<--bind>, C<--token>, C<--stdio>,
+C<--connect>, C<--print-url>, C<--auto-allow> and C<--auto-deny>,
+are documented in L<AnyEvent::MCP::Server::Simple/mcp_getoptions>.
+They configure the upstream server; C<--token> is distinct from the
+downstream C<--bearer>. The default upstream instance name is C<default>
+and does not affect downstream prefixes.
+C<--tool-help> lists only the multibroker's own tools; it does not connect
+to downstream servers to query their registries.
+
+=over
+
+=item --listen
+
+Keep the HTTP and extension listener active alongside upstream stdio or
+C<--connect>. Without stdio or C<--connect>, HTTP is already the default.
+
+=item --ask $method
+
+Select local or upstream form prompting for all downstream connections.
+Also pass the mode as the permission default to spawned stdio children.
+See L</PERMISSION PROMPTS>.
+
+=item --bearer $token
+
+Authenticate the preceding HTTP child connection with this bearer token.
+This option does not configure the upstream listener.
+
+=item --eager
+
+Start the preceding stdio child immediately. HTTP children cannot use
+this option.
+
+=item --required
+
+Require the preceding stdio child to initialize and stay connected.
+Implies C<--eager>; unexpected disconnect exits the multibroker with
+failure. Managed idle shutdown is allowed.
+
+=back
+
+=cut
+
+use common::sense;
+use Getopt::Long ();
+
+use AnyEvent ();
+use AnyEvent::MCP::Client::HTTP ();
+use AnyEvent::MCP::Client::JSONL ();
+use AnyEvent::MCP::Permissions::Ask ();
+use AnyEvent::MCP::Helper ();
+use AnyEvent::MCP::Config ();
+use AnyEvent::MCP::Server::Toolset ();
+
+use AnyEvent::MCP::Server::Simple;
+
+AnyEvent::detect; # Initialise child watchers before starting subprocesses.
+$| = 1;
+
+my $usage = "Usage: $0 [OPTION]... PREFIX (URL | --- PROGRAM ARG... ---) [CHILD-OPTION] ...\n";
+Getopt::Long::Configure ("require_order");
+my %server_options = mcp_getoptions ({
+   usage => $usage,
+   path => "/",
+   description => "Combine MCP servers behind one endpoint, with tools named PREFIX.TOOL.\n"
+      . "Each server is HTTP(S), stdio:COMMAND, or --- PROGRAM ARG... ---; downstream options follow its entry.",
+   options => [
+      "Broker-wide options:",
+      ["--ask MODE", "Before server entries: prompt locally (helper, default; tty; yad), upstream (mcp), or by capability (auto)"],
+      ["--listen", "Keep the upstream HTTP listener active alongside stdio or --connect"],
+      "Downstream options (after the URL or closing ---):",
+      ["--eager", "Start the preceding stdio child at broker startup"],
+      ["--required", "Require stdio child; implies --eager, exit on failure"],
+      ["--bearer TOKEN", "Authenticate to the preceding HTTP child"],
+   ],
+   examples => "  $0 --ask auto files 'stdio:mcp-fs /home/alice/src/project'\n"
+      . "  $0 files --- mcp-fs /home/alice/src/project --- --eager\n"
+      . "  $0 vim --- mcp-vim --bind :: --- --required\n"
+      . "  $0 remote https://example.org/mcp/ --bearer TOKEN\n"
+      . "  $0 --name tools --print-url",
+},
+   "ask=s" => \my $ask_mode,
+   "listen" => \my $listen,
+);
+$AnyEvent::Log::FILTER->level ("debug")
+   unless defined $ENV{PERL_ANYEVENT_VERBOSE}
+      || ($ENV{PERL_ANYEVENT_LOG} // "") =~ /(?:\A|\s)filter=/;
+$ask_mode //= $ENV{PERL_ANYEVENT_MCP_PERMISSION_ASK} || "helper";
+die "--ask must be helper, tty, yad, auto, or mcp\n"
+   if defined $ask_mode && $ask_mode !~ /\A(?:helper|tty|yad|auto|mcp)\z/;
+
+my (%broker, %stdio, %eager, %required);
+my $shutting_down;
+my @prompts;
+my $prompt;
+
+# keep local dialogs serial, including dialogs from different brokers.
+sub next_prompt;
+sub ask_prompt {
+   my ($req, $prepared, $done, $form) = @_;
+
+   my $entry = { request => $req, prepared => $prepared, done => $done, form => $form };
+   push @prompts, $entry;
+
+   my $old_cancel = $req->{on_cancel};
+   $req->{on_cancel} = sub {
+      $entry->{job}->cancel if $entry->{job};
+      $old_cancel->(@_) if $old_cancel;
+   };
+   next_prompt;
+}
+
+sub next_prompt {
+   return if $prompt;
+   while (@prompts) {
+      my $entry = shift @prompts;
+      next if $entry->{request}{finished};
+      $prompt = $entry;
+      $entry->{job} = $entry->{form}
+         ? AnyEvent::MCP::Helper->new (
+            helper => $ask_mode eq "tty" || $ask_mode eq "yad"
+               ? ["anyevent-mcp-form-elicitation", "--$ask_mode"]
+               : $ENV{PERL_ANYEVENT_MCP_ELICITATION_HELPER} || "anyevent-mcp-form-elicitation",
+            timeout => 1800,
+         )
+         : AnyEvent::MCP::Permissions::Ask->new (
+            ($ask_mode eq "tty" || $ask_mode eq "yad"
+               ? (helper => ["anyevent-mcp-askpermission", "--$ask_mode"]) : ()),
+         );
+      $entry->{job}->ask ($entry->{prepared}, sub {
+         my ($success, $result) = @_;
+
+         undef $prompt;
+         delete $entry->{job};
+         $entry->{done}->($success, $result) unless $entry->{request}{finished};
+         next_prompt;
+      });
+      return
+   }
+}
+
+sub on_input {
+   my ($client, $req) = @_;
+
+   return $req->error (-32601, "Only form elicitation is supported locally")
+      unless $req->{method} eq "elicitation/create";
+   my $meta = $req->{params}{_meta}{"anyevent-mcp/permission"};
+   unless (defined $meta) {
+      return $req->error (-32602, "Only form elicitation is supported locally")
+         if defined $req->{params}{mode} && $req->{params}{mode} ne "form";
+      defined $req->{params}{message} && !ref $req->{params}{message}
+         or return $req->error (-32602, "Form needs a message");
+      ask_prompt $req, {
+         %{$req->{params}},
+         message => "Server: $client->{name}\n\n$req->{params}{message}",
+      }, sub {
+         my ($success, $response) = @_;
+
+         return $req->error (-32603, $response) unless $success;
+         my $action = ref $response eq "HASH" ? $response->{action} : undef;
+         defined $action && !ref $action && $action =~ /\A(?:accept|decline|cancel)\z/
+            && ($action ne "accept" || ref $response->{content} eq "HASH")
+               or return $req->error (-32603, "Invalid form helper response");
+         $req->reply ({
+            action => $action,
+            ($action eq "accept" ? (content => $response->{content}) : ()),
+         });
+      }, 1;
+      return;
+   }
+   return $req->error (-32601, "Invalid permission elicitation")
+      unless ref $meta eq "HASH" && $meta->{version} == 1 && ref $meta->{request} eq "HASH";
+
+   my $stage = $meta->{stage};
+
+   ask_prompt $req, {
+      %{$meta->{request}},
+      _permission_stage     => $stage,
+      _permission_selection => $meta->{selection} || {},
+   }, sub {
+      my ($success, $decision) = @_;
+
+      return $req->error (-32603, $decision) unless $success;
+      my $valid = eval {
+         AnyEvent::MCP::Permissions::Ask::build ($meta->{request}, {
+            %$decision,
+            (ref $decision->{rule} eq "HASH"
+               ? (map { $_ => $decision->{rule}{$_} } qw(subject path)) : ()),
+         }, $stage, $meta->{selection})
+      };
+      return $req->error (-32603, "Invalid permission helper decision: $@") if $@;
+      $req->reply ({
+         action  => "accept",
+         content => {
+            decision => $valid->{decision},
+            (exists $valid->{sandbox_grants} ? (sandbox_grants => join (",", @{$valid->{sandbox_grants}})) : ()),
+            (defined $valid->{message} ? (message => $valid->{message}) : ()),
+            (ref $valid->{rule} eq "HASH" && defined $valid->{rule}{path}
+               ? (path => $valid->{rule}{path}) : ()),
+            (ref $valid->{rule} eq "HASH" && exists $valid->{rule}{subject}
+               ? (subject => $valid->{rule}{subject}) : ()),
+         },
+      });
+   };
+}
+
+sub on_child_notification {
+   my ($prefix, $client, $method) = @_;
+
+   return unless $stdio{$prefix} && $method eq "anyevent-mcp/idle-exit";
+   return if $client->{idle_shutdown_pending};
+   # The child offered to exit; only act while no broker calls need it.
+   return if keys %{$client->{operations}};
+
+   $client->{idle_shutdown_pending} = 1;
+   $client->rpc ("anyevent-mcp/shutdown", {}, sub {
+      my ($success, $result) = @_;
+
+      if ($success && $result->{accepted}) {
+         $client->{idle_shutdown_expected} = 1;
+      } else {
+         AE::log debug => "$prefix: idle shutdown declined: "
+            . ($result->{message} || "child is busy");
+      }
+      delete $client->{idle_shutdown_pending};
+   });
+}
+
+# required children must not leave spawned peers running after broker failure.
+sub required_failure {
+   my ($prefix, $message) = @_;
+   AE::log error => "$prefix: required child $message";
+   $shutting_down = 1;
+   $_->close for values %broker;
+   exit 1;
+}
+
+sub on_child_close {
+   my ($prefix, $client, $error) = @_;
+
+   return if $shutting_down;
+   if (delete $client->{idle_shutdown_expected}) {
+      mcp_log "$prefix: managed idle shutdown";
+   } elsif ($required{$prefix}) {
+      required_failure $prefix, "disconnected: $error->{message}"
+         . ($error->{pending} ? " ($error->{pending} outstanding requests)" : "");
+   } elsif ($stdio{$prefix} || $error->{pending}) {
+      my $message = "$prefix: unexpected disconnect: $error->{message}"
+         . ($error->{pending} ? " ($error->{pending} outstanding requests)" : "");
+      AE::log warn => $message or mcp_log $message;
+   } else {
+      mcp_log "$prefix: disconnected: $error->{message}";
+   }
+   delete $client->{idle_shutdown_pending};
+}
+
+sub broker_config {
+   my ($prefix) = @_;
+
+   (
+      name                => $prefix,
+      client_info         => { name => "mcp-multibroker", version => $AnyEvent::MCP::VERSION },
+      client_capabilities => {
+         elicitation => { form => {} },
+         extensions  => { "anyevent-mcp/multibroker" => { version => 1 } },
+      },
+      on_request      => \&on_input,
+      on_ready        => sub { mcp_log "$prefix: connected" },
+      on_notification => sub { on_child_notification ($prefix, @_) },
+      on_close        => sub { on_child_close ($prefix, @_) },
+   )
+}
+
+sub accept_extension {
+   my ($server, $handle, $hello) = @_;
+
+   @$hello == 3 && $hello->[0] eq "mcp-connect"
+      && defined $hello->[2] && !ref $hello->[2] && $hello->[2] =~ /\A[A-Za-z0-9_-]+\z/
+      or die "Invalid reverse MCP hello\n";
+   my $prefix = $hello->[2];
+   !exists $broker{$prefix} or die "Broker alias '$prefix' is occupied\n";
+
+   my $client = AnyEvent::MCP::Client::JSONL->new (
+      broker_config ($prefix),
+      on_close => sub {
+         on_child_close ($prefix, @_);
+         delete $broker{$prefix} if $broker{$prefix} == $_[0];
+      },
+   );
+   $broker{$prefix} = $client;
+   $client->attach ($handle);
+   $client->connect (sub {
+      my ($success, $error) = @_;
+
+      unless ($success) {
+         AE::log warn => "$prefix: reverse MCP initialization failed: $error->{message}";
+         delete $broker{$prefix} if $broker{$prefix} == $client;
+         $client->close;
+      }
+   });
+}
+
+while (@ARGV) {
+   @ARGV >= 2 or die $usage;
+   my ($prefix, $url) = splice @ARGV, 0, 2;
+   $prefix =~ /\A[A-Za-z0-9_-]+\z/ or die "Invalid broker prefix '$prefix'\n";
+   exists $broker{$prefix} and die "Duplicate broker prefix '$prefix'\n";
+
+   my $command;
+
+   if ($url eq "---") {
+      my ($end) = grep $ARGV[$_] eq "---", 0 .. $#ARGV;
+      defined $end or die "Missing closing --- for '$prefix'\n";
+      $command = [splice @ARGV, 0, $end];
+      shift @ARGV;
+      @$command && length $command->[0] or die "Empty stdio argv for '$prefix'\n";
+   } elsif ($url =~ s/\Astdio://) {
+      length $url or die "Empty stdio command for '$prefix'\n";
+      # preserve shell commands, but let ordinary programs receive TERM directly.
+      $command = $url =~ / ^\s*(?: exec\b | source\b | \.\s ) | = | ; | \( | \{ | \|\| | && /x
+         ? $url : "exec $url";
+   }
+
+   my %config = broker_config $prefix;
+   Getopt::Long::GetOptionsFromArray (\@ARGV,
+      "eager" => sub {
+         defined $command or die "--eager requires a stdio broker ('$prefix')\n";
+         $eager{$prefix} = 1;
+      },
+      "required" => sub {
+         defined $command or die "--required requires a stdio broker ('$prefix')\n";
+         $eager{$prefix} = $required{$prefix} = 1;
+      },
+      "bearer=s" => sub {
+         !defined $command && $url =~ m{\Ahttps?://} or die "Authentication options require an HTTP broker\n";
+         length $_[1] or die "Missing bearer token for '$prefix'\n";
+         $config{bearer} = $_[1];
+      },
+   ) or die $usage;
+
+   if (!defined $command && $url =~ m{\Ahttps?://}) {
+      $broker{$prefix} = AnyEvent::MCP::Client::HTTP->new (%config, url => $url);
+   } elsif (defined $command) {
+      $broker{$prefix} = AnyEvent::MCP::Client::JSONL->new (
+         %config, command => $command,
+         env => {
+            PERL_ANYEVENT_MCP_MULTIBROKER_PROTOCOL => "stdio",
+            PERL_ANYEVENT_MCP_MULTIBROKER_ALIAS => $prefix,
+            (defined $ask_mode ? (PERL_ANYEVENT_MCP_PERMISSION_ASK => $ask_mode) : ()),
+         },
+      );
+      $stdio{$prefix} = 1;
+   } else {
+      die "Invalid broker URL '$url'\n";
+   }
+}
+
+my $toolset = AnyEvent::MCP::Server::Toolset->new;
+
+sub broker_alias {
+   my ($name) = @_;
+   return $name if exists $broker{$name};
+   $name =~ tr/_/-/;
+   $name
+}
+
+sub all_tools {
+   my ($req, $done, $name) = @_;
+
+   my @tools = defined $name ? () : map @{$_->list}, @{$req->{server}{toolsets}};
+   my @prefix = defined $name ? ($name) : sort keys %broker;
+   my $next;
+   $next = sub {
+      if ($req->{finished}) {
+         undef $next;
+         return
+      }
+      unless (@prefix) {
+         undef $next;
+         return $done->(\@tools)
+      }
+      my $prefix = shift @prefix;
+      my $client = $broker{$prefix} or return $next->();
+      $client->tools (sub {
+         my ($success, $result) = @_;
+
+         if ($success) {
+            push @tools, map { +{ %$_, name => "$prefix.$_->{name}" } } @$result;
+         } else {
+            AE::log warn => "$prefix: $result->{message}";
+         }
+         $next->();
+      });
+   };
+   $next->();
+}
+
+sub call_tool {
+   my ($req, $name, $args) = @_;
+
+   return $req->error ("Invalid tool call") unless defined $name && !ref $name && ref $args eq "HASH";
+   if (my ($local) = grep exists $_->{tool}{$name}, @{$req->{server}{toolsets}}) {
+      local $req->{tool} = $name;
+      local $req->{args} = $args;
+      return $local->call ($req)
+   }
+
+   my ($prefix, $tool) = $name =~ /\A([^.]+)\.(.+)\z/;
+   $prefix = broker_alias $prefix if defined $prefix;
+   my $client = $broker{$prefix};
+   return $req->error ("Unknown tool '$name'") unless $client;
+
+   AE::log trace => "multibroker $name";
+   my %params = (%{$req->{params}}, name => $tool, arguments => $args);
+   $params{_meta} = { %{$params{_meta} || {}} };
+   my $caps = $params{_meta}{"io.modelcontextprotocol/clientCapabilities"};
+   $caps = ref $caps eq "HASH" ? { %$caps } : {};
+   my $native_forms = $req->{protocol_version} ge "2026"
+      && ref $caps->{elicitation} eq "HASH"
+      && (!keys %{$caps->{elicitation}} || ref $caps->{elicitation}{form} eq "HASH");
+   my $local_forms = $ask_mode =~ /\A(?:helper|tty|yad)\z/ || $ask_mode eq "auto" && !$native_forms;
+   if ($local_forms) {
+      $caps->{elicitation} = { form => {} };
+   } elsif ($req->{protocol_version} lt "2026") {
+      delete $caps->{elicitation};
+   }
+   $caps->{extensions} = {
+      %{ref $caps->{extensions} eq "HASH" ? $caps->{extensions} : {}},
+      "anyevent-mcp/multibroker" => { version => 1 },
+   };
+   $params{_meta}{"io.modelcontextprotocol/clientCapabilities"} = $caps;
+   my ($id, $rounds, $send);
+   my $old_cancel = $req->{on_cancel};
+   $req->{on_cancel} = sub {
+      $client->cancel ($id, $_[1]) if defined $id;
+      undef $send;
+      $old_cancel->(@_) if $old_cancel;
+   };
+   $send = sub {
+      my $done = sub {
+         my ($success, $result) = @_;
+
+         if ($req->{finished}) {
+            undef $send;
+            return
+         }
+         unless ($success) {
+            undef $send;
+            return $req->error ($result->{message})
+         }
+
+         # compatibility with the original stdio permission extension.
+         my $meta = ($result->{_meta} || {})->{"anyevent-mcp/permission"};
+         if ($stdio{$prefix} && $result->{isError} && ref $meta eq "HASH"
+            && $meta->{version} == 1 && ref $meta->{request} eq "HASH") {
+            if (++$rounds > 32) {
+               undef $send;
+               return $req->error ("Too many permission rounds")
+            }
+            ask_prompt $req, $meta->{request}, sub {
+               my ($success, $decision) = @_;
+
+               unless ($success) {
+                  undef $send;
+                  return $req->error ($decision)
+               }
+               $params{_meta} = {
+                  %{$params{_meta} || {}},
+                  "anyevent-mcp/permission" => {
+                     version  => 1,
+                     request  => $meta->{request},
+                     decision => $decision,
+                  },
+               };
+               $send->();
+            };
+            return
+         }
+         undef $send;
+         $req->reply ($result);
+      };
+      if ($local_forms || $req->{protocol_version} lt "2026") {
+         $id = $client->call ($tool, $args, $done, %params);
+      } else {
+         $id = $client->rpc ("tools/call", \%params, $done);
+      }
+   };
+   $send->();
+}
+
+$toolset->tool (discover_brokers =>
+   "Connect to all configured brokers and return instructions by name: string, null if reachable without instructions, or {error: MESSAGE} if unreachable.",
+   { type => "object", properties => {} },
+   sub {
+      my ($req) = @_;
+
+      my @prefix = sort keys %broker;
+      my %instructions;
+      my $next;
+      $next = sub {
+         if ($req->{finished}) {
+            undef $next;
+            return
+         }
+         unless (@prefix) {
+            undef $next;
+            return $req->result (\%instructions)
+         }
+         my $prefix = shift @prefix;
+         my $client = $broker{$prefix} or return $next->();
+         $client->connect (sub {
+            my ($success, $result) = @_;
+
+            if ($success) {
+               $instructions{$prefix} = $client->{instructions};
+            } else {
+               AE::log warn => "$prefix: $result->{message}";
+               $instructions{$prefix} = { error => $result->{message} };
+            }
+            $next->();
+         });
+      };
+      $next->();
+   },
+);
+$toolset->tool (list_tools =>
+   "Refresh and list currently available tools, optionally from one named downstream broker. Without broker, includes local tools and all reachable brokers.",
+   {
+      type => "object",
+      properties => {
+         broker => { type => "string", description => "Downstream broker name (underscores may stand for hyphens); omit to list all brokers and local tools." },
+      },
+      additionalProperties => JSON::XS::false,
+   },
+   sub {
+      my ($req, $args) = @_;
+
+      for (keys %$args) {
+         $_ eq "broker" or return $req->error ("Unknown list-tools argument '$_'");
+      }
+      my $name = $args->{broker};
+      $name = broker_alias $name if defined $name;
+      return $req->error ("Unknown broker '$name'") if defined $name && !exists $broker{$name};
+
+      all_tools $req, sub { $req->result ({ tools => $_[0] }) }, $name;
+   },
+);
+$toolset->tool (call_tool =>
+   "Call a tool by its prefixed name from list-tools.",
+   {
+      type       => "object",
+      required   => ["name"],
+      properties => {
+         name      => { type => "string" },
+         arguments => { type => "object" },
+      },
+   },
+   sub {
+      my ($req, $args) = @_;
+
+      return $req->error ("call-tool cannot call itself") if $args->{name} eq "call-tool";
+      call_tool $req, $args->{name}, $args->{arguments} || {};
+   },
+);
+
+sub log_request {
+   my ($server, $req) = @_;
+
+   # keep proxied calls at trace to avoid duplicating downstream activity logs.
+   return if $req->{method} eq "tools/call" && $req->{tool} =~ /\A[^.]+\./;
+
+   mcp_log_request $server, $req;
+}
+
+mcp_config
+   server_info => { name => "mcp-multibroker", version => $AnyEvent::MCP::VERSION },
+   on_request => \&log_request,
+   on_error => sub { AE::log error => "MCP dispatch $_[1]{method}: $_[2]" },
+   short_instructions => "MCP tool router. Discover tools for downstream servers; discover-brokers gives their purposes. Tools may change.",
+   instructions => <<'EOF';
+Multibroker proxies multiple MCP servers (e.g. vim, filesystem browser, etc.), prefixing tool names with server aliases. Its discovery, list-tools and call-tool facilities dynamically query and invoke tools, including new or updated tools not yet reflected in the exported tool catalog.
+EOF
+
+# start selected stdio children now, before the upstream event loop starts.
+# their asynchronous initialization completes once that loop is running.
+# optional children can still be reconnected by a later MCP request.
+mcp_tool_help ($server_options{tool_help}, $toolset);
+delete $server_options{tool_help};
+for my $prefix (sort keys %eager) {
+   $broker{$prefix}->connect (sub {
+      my ($success, $error) = @_;
+
+      if (!$success && $required{$prefix}) {
+         required_failure $prefix, "initialization failed: $error->{message}";
+      }
+      AE::log warn => "$prefix: eager startup failed: $error->{message}"
+         unless $success;
+   });
+}
+
+mcp_start
+   %server_options,
+   ($listen ? (listen => 1) : ()),
+   toolsets => [$toolset],
+   on_extension => \&accept_extension,
+   on_tools_list => sub {
+      my ($server, $req) = @_;
+
+      AE::log debug => "multibroker list-tools";
+      all_tools $req, sub { $req->reply ({ tools => $_[0] }) };
+   },
+   on_tools_call => sub {
+      my ($server, $req, $args) = @_;
+
+      call_tool $req, $req->{tool}, $args;
+   };
+
+$shutting_down = 1;
+$_->close for values %broker;
+

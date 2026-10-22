@@ -78,7 +78,7 @@ yourself — principle and lane are in `.claude/rules/rex-libssh-rules.md`.
 |---|---|
 | Implement / refactor / debug anything under `lib/` | `rex-libssh-worker` (default) |
 | Write/extend tests, reproduce connection failures | `rex-libssh-test-writer` |
-| Pre-release audit | `rex-libssh-release-checker` |
+| Commits, `Changes`, card → done, pre-release audit | `rex-libssh-release-manager` |
 | POD | `rex-libssh-doc-writer` |
 
 The agents carry their skills via `briefing.skills` (see `.claude/agents/`);

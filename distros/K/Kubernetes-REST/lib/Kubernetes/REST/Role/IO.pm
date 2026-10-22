@@ -1,5 +1,5 @@
 package Kubernetes::REST::Role::IO;
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 # ABSTRACT: Interface role for HTTP backends
 use Moo::Role;
 
@@ -30,7 +30,7 @@ Kubernetes::REST::Role::IO - Interface role for HTTP backends
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head1 SYNOPSIS
 
@@ -103,13 +103,58 @@ With L<LWP::UserAgent> that means C<< $res->decoded_content(charset => 'none') >
 rather than C<< $res->decoded_content >>. See also L<Kubernetes::REST/ENCODING>
 for the full picture from the caller's side of this module.
 
+=head2 Error contract
+
+C<call> and C<call_streaming> tell three kinds of failure apart, and a backend
+must keep them apart. A status code is the only thing L<Kubernetes::REST>
+reads to do so.
+
+=over
+
+=item *
+
+B<A transport failure is a response with status 599.> When no answer from the
+API server exists, the backend returns a L<Kubernetes::REST::HTTPResponse> with
+C<status> C<599> and the error message as C<content>; it does not die. That
+covers a refused or failed connect, a TLS error, a timeout, an unsupported URL
+scheme, a missing protocol module (C<LWP::Protocol::https not installed>) and a
+transfer that breaks off in the middle of the body, in C<call> and
+C<call_streaming> alike. A backend whose library reports such a failure as an
+ordinary-looking response, or as a truncated 200, must map it to 599 itself.
+
+=item *
+
+B<Every other status is the API server's answer> and is returned unchanged,
+C<500> and C<502> included. The backend does not retry it, rewrite it or
+turn it into an exception. Only the status values from the HTTP library's own
+internal failure reporting are the backend's to translate.
+
+=item *
+
+B<An exception thrown by the streaming callback is not a transport failure.>
+If C<$data_callback> dies, C<call_streaming> aborts the transfer and dies with
+that same exception, a string or an object, untouched. It returns no
+response, and in particular no 599. A library that catches the exception and
+reports it as an error status (L<HTTP::Tiny> turns it into a 599) must have it
+captured first and rethrown. The callback is not called again after it has
+thrown. This is how an exception from the C<on_event> or C<on_line> handler of
+L<Kubernetes::REST/watch> and L<Kubernetes::REST/log> reaches the caller of
+those methods.
+
+=back
+
+L<Kubernetes::REST> treats the 599 like any other status of 400 and up: its
+response check dies with a L<Kubernetes::REST::APIError> whose C<code> is
+C<599> and whose C<body> is the message the backend put in C<content>. A
+caller tells a transport failure from an answer of the server by that code.
+
 =head2 call
 
     my $response = $io->call($req);
 
 Required. Execute an HTTP request. Receives a L<Kubernetes::REST::HTTPRequest> with C<method>, C<url>, C<headers>, and optionally C<content> already set.
 
-Must return a L<Kubernetes::REST::HTTPResponse> with C<status> and C<content>, the latter as bytes - see L</Encoding contract>.
+Must return a L<Kubernetes::REST::HTTPResponse> with C<status> and C<content>, the latter as bytes - see L</Encoding contract>. A transport failure (no answer from the API server) is returned as status C<599> with the error message as C<content>, never thrown; every other status is the server's and stays as it is - see L</Error contract>.
 
 =head2 call_streaming
 
@@ -117,7 +162,9 @@ Must return a L<Kubernetes::REST::HTTPResponse> with C<status> and C<content>, t
 
 Required. Execute an HTTP request with streaming response. The C<$data_callback> is called with each chunk of data as it arrives: C<< $data_callback->($chunk) >>. Chunks are bytes - see L</Encoding contract>.
 
-Must return a L<Kubernetes::REST::HTTPResponse> when the stream ends.
+Must return a L<Kubernetes::REST::HTTPResponse> when the stream ends. A transport failure, including a break in the middle of the body, is returned as status C<599> with the error message as C<content>, as in C<call>.
+
+If C<$data_callback> dies, the backend aborts the transfer and dies with the same exception, unchanged and without a response; that is not a 599. See L</Error contract>.
 
 =head2 supports_duplex
 

@@ -18,10 +18,10 @@ my %WriteMakefileArgs = (
   "NAME" => "Rex::Rancher",
   "PREREQ_PM" => {
     "HTTP::Tiny" => 0,
-    "IO::K8s" => "1.109",
+    "IO::K8s" => "1.111",
     "IO::Socket::SSL" => 0,
     "JSON::MaybeXS" => 0,
-    "Kubernetes::REST" => "1.109",
+    "Kubernetes::REST" => "1.110",
     "Module::Runtime" => 0,
     "Moo" => 0,
     "Rex" => "1.14.0",
@@ -31,7 +31,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Test::More" => "0.98"
   },
-  "VERSION" => "0.003",
+  "VERSION" => "0.004",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -40,10 +40,10 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "HTTP::Tiny" => 0,
-  "IO::K8s" => "1.109",
+  "IO::K8s" => "1.111",
   "IO::Socket::SSL" => 0,
   "JSON::MaybeXS" => 0,
-  "Kubernetes::REST" => "1.109",
+  "Kubernetes::REST" => "1.110",
   "Module::Runtime" => 0,
   "Moo" => 0,
   "Rex" => "1.14.0",

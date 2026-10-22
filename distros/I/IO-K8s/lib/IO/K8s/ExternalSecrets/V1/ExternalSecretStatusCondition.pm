@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1::ExternalSecretStatusCondition;
 # ABSTRACT: ExternalSecretStatusCondition defines a status condition of an ExternalSecret resource.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s lastTransitionTime => Time;
@@ -28,7 +28,7 @@ IO::K8s::ExternalSecrets::V1::ExternalSecretStatusCondition - ExternalSecretStat
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 lastTransitionTime
 

@@ -377,8 +377,8 @@ DISPATCH STRATEGY
       /foo/        # match and strip path to '/'
       /foo/bar/baz # match and strip path to '/bar/baz'
 
-    Please note the difference between "sub(/foo/...)" and "sub(/foo...)".
-    In the first case, this is expecting to find something after "/foo" (and
+    Please note the difference between sub(/foo/...) and sub(/foo...). In
+    the first case, this is expecting to find something after "/foo" (and
     fails to match if nothing is found), while in the second case we can
     match both "/foo" and "/foo/more/to/come". The following are roughly the
     same:

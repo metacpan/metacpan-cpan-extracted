@@ -1,6 +1,6 @@
 package IO::K8s::VolumeSnapshot::V1beta2::VolumeGroupSnapshotClass;
 # ABSTRACT: VolumeGroupSnapshotClass specifies parameters for a volume group snapshot
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::APIObject
     api_version     => 'groupsnapshot.storage.k8s.io/v1beta2',
     resource_plural => 'volumegroupsnapshotclasses',
@@ -13,7 +13,7 @@ k8s deletionPolicy => Str, { required => 'schema', enum => [qw(Delete Retain)] }
 k8s driver => Str, { required => 'schema' };
 
 
-k8s parameters => { Str => 1 };
+k8s parameters => HashRef[Str];
 
 
 
@@ -31,7 +31,7 @@ IO::K8s::VolumeSnapshot::V1beta2::VolumeGroupSnapshotClass - VolumeGroupSnapshot
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head1 DESCRIPTION
 

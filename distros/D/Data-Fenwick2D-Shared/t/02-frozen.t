@@ -98,6 +98,22 @@ like exception(sub { Data::Fenwick2D::Shared->new($path, $R, $C) }),
          qr/not frozen/, 'new_readonly on an unsealed file croaks';
 }
 
+{
+    my $p = "$dir/peers.f2d";
+    my $writer = Data::Fenwick2D::Shared->new($p, 4, 4);
+    my $peer = Data::Fenwick2D::Shared->new($p, 4, 4);
+    $writer->update(2, 3, 17);
+    $writer->freeze;
+    ok $peer->frozen, 'an existing peer sees the seal';
+    like exception(sub { $peer->update(1, 1, 1) }), qr/frozen/, 'peer update rejects the seal';
+    like exception(sub { $peer->set(1, 1, 1) }), qr/frozen/, 'peer set rejects the seal';
+    like exception(sub { $peer->clear }), qr/frozen/, 'peer clear rejects the seal';
+    is $peer->total, 17, 'peer reads after rejected writes';
+    is $peer->stats->{ops}, 1, 'rejected writes do not count as operations';
+    my $ro = Data::Fenwick2D::Shared->new_readonly($p);
+    is $ro->point(2, 3), 17, 'read-only peer sees data published with the seal';
+}
+
 # ---- new_readonly error paths ----
 like exception(sub { Data::Fenwick2D::Shared->new_readonly("$dir/does-not-exist.f2d") }),
      qr/open|No such/, 'new_readonly on a missing path croaks';

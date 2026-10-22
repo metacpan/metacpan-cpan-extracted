@@ -124,7 +124,12 @@ struct RdxHeader {
     uint32_t slotless_rdepth;         /* readers holding with no reader-slot (documented residual) */
     uint64_t stat_ops;                /* 88 */
     uint8_t  sealed;                  /* 96  0 = mutable, 1 = frozen (read-only; lock-free reads) */
-    uint8_t  _pad[159];               /* 97..255 */
+    uint8_t  _pad0[7];
+    uint64_t pending_keys;            /* mutation journal in formerly reserved bytes */
+    uint64_t pending_off;
+    uint32_t pending_value;
+    uint8_t  pending_kind;
+    uint8_t  _pad[131];
 };
 typedef struct RdxHeader RdxHeader;
 
@@ -147,6 +152,7 @@ typedef struct RdxHandle {
     uint64_t       arena_off;     /* arena offset from trusted layout */
     size_t         mmap_size;
     char          *path;          /* backing file path (strdup'd) */
+    char         *unlink_path;   /* absolute path for relative backing files */
     int            backing_fd;    /* memfd or reopened-fd to close on destroy, -1 for file/anon */
     uint32_t       my_slot_idx;   /* UINT32_MAX if all slots taken (no recovery for this handle) */
     uint32_t       cached_pid;    /* getpid() cached at last slot claim */
@@ -226,14 +232,14 @@ static inline int rdx_pid_alive(uint32_t pid) {
  * CAS to OUR pid to hold the lock while fixing shared state, then release.
  * Using our pid (not a bare WRITER_BIT sentinel) means a subsequent recovering
  * process can detect and re-recover if we crash mid-recovery. */
+static void rdx_repair_mutation(RdxHandle *h);
 static inline void rdx_recover_stale_lock(RdxHandle *h, uint32_t observed_wlock) {
     RdxHeader *hdr = h->hdr;
     uint32_t mypid = RDX_RWLOCK_WR((uint32_t)getpid());
     if (!__atomic_compare_exchange_n(&hdr->wlock, &observed_wlock,
             mypid, 0, __ATOMIC_ACQUIRE, __ATOMIC_RELAXED))
         return;
-    /* We now hold the write lock as mypid.  No additional shared state needs
-     * repair here (this module has no seqlock); just release the lock. */
+    rdx_repair_mutation(h);
     __atomic_store_n(&hdr->wlock, 0, __ATOMIC_RELEASE);
     if (__atomic_load_n(&hdr->rwait, __ATOMIC_RELAXED) > 0)
         syscall(SYS_futex, &hdr->wlock, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
@@ -553,10 +559,6 @@ static inline uint8_t *rdx_arena(RdxHandle *h) {
  * Node allocation + arena append.  Callers hold the WRITE lock.
  * ================================================================ */
 
-/* Allocate a node: bump node_used, else 0 (pool exhausted).  Returns a zeroed
- * node index.  v1 has no freelist (delete is lazy and never frees nodes), so a
- * node always comes off the high-water mark.  The caller pre-checks capacity
- * before any mutation, so a 0 return must not happen mid-insert. */
 /* Push a node onto the free list.  Callers must hold the write lock and must
  * have already made the node unreachable from the tree.  Node 0 is NIL and is
  * never freed.  The free-list link lives in the dead node's label_off. */
@@ -566,10 +568,10 @@ static inline void rdx_free_node(RdxHandle *h, uint32_t idx) {
     RdxNode *nodes = rdx_nodes(h);
     memset(&nodes[idx], 0, sizeof(RdxNode));
     nodes[idx].label_off = hdr->free_head;        /* next-free link (0 terminates) */
-    __atomic_signal_fence(__ATOMIC_SEQ_CST);
-    hdr->free_head = idx;
+    __atomic_store_n(&hdr->free_head, idx, __ATOMIC_RELEASE);
 }
 
+/* Recycle a node or advance the high-water mark; return 0 if exhausted. */
 static inline uint32_t rdx_alloc_node(RdxHandle *h) {
     RdxHeader *hdr = h->hdr;
     RdxNode *nodes = rdx_nodes(h);
@@ -581,6 +583,7 @@ static inline uint32_t rdx_alloc_node(RdxHandle *h) {
     if (idx != 0 && idx < h->node_cap) {
         uint32_t next = nodes[idx].label_off;
         hdr->free_head = (next < h->node_cap) ? next : 0;
+        __atomic_thread_fence(__ATOMIC_RELEASE); /* unlink before reusing the free-list link */
         memset(&nodes[idx], 0, sizeof(RdxNode));
         return idx;
     }
@@ -669,6 +672,25 @@ static inline uint32_t rdx_cpl(const uint8_t *a, const uint8_t *b, uint32_t max)
     return i;
 }
 
+#define RDX_PENDING_VALUE  1
+#define RDX_PENDING_LINK   2
+#define RDX_PENDING_DELETE 3
+#define RDX_PENDING_CLEAR  4
+
+/* Record the count and commit word before changing the live tree. Recovery
+ * checks that word to distinguish an interrupted mutation from a committed one. */
+static inline void rdx_begin_mutation(RdxHandle *h, const void *commit, uint32_t value, uint8_t kind) {
+    RdxHeader *hdr = h->hdr;
+    hdr->pending_keys = hdr->keys;
+    hdr->pending_off = commit ? (const uint8_t *)commit - (const uint8_t *)h->base : 0;
+    hdr->pending_value = value;
+    __atomic_store_n(&hdr->pending_kind, kind, __ATOMIC_RELEASE);
+}
+
+static inline void rdx_finish_mutation(RdxHandle *h) {
+    __atomic_store_n(&h->hdr->pending_kind, 0, __ATOMIC_RELEASE);
+}
+
 /* Insert key -> value.  Returns 1 if a new key was added, 0 if an existing key
  * was updated.  Caller holds the write lock AND has verified rdx_insert_has_room
  * (so every rdx_alloc_node / rdx_arena_append below is guaranteed to succeed,
@@ -682,11 +704,10 @@ static inline int rdx_insert_locked(RdxHandle *h, const uint8_t *key, uint32_t k
     for (;;) {
         if (kpos == klen) {                       /* key ends here -> mark this node */
             int isnew = !nodes[cur].has_value;
+            if (isnew) rdx_begin_mutation(h, &nodes[cur].has_value, 1, RDX_PENDING_VALUE);
             nodes[cur].value = value;
-            /* The value before the flag that publishes it. */
-            __atomic_signal_fence(__ATOMIC_SEQ_CST);
-            nodes[cur].has_value = 1;
-            if (isnew) hdr->keys++;
+            __atomic_store_n(&nodes[cur].has_value, 1, __ATOMIC_RELEASE);
+            if (isnew) { hdr->keys++; rdx_finish_mutation(h); }
             return isnew;
         }
         uint8_t b = key[kpos];
@@ -713,9 +734,10 @@ static inline int rdx_insert_locked(RdxHandle *h, const uint8_t *key, uint32_t k
              * label_off/len are still garbage (which would drive an out-of-
              * bounds arena read). The link is the single-word commit; a crash
              * before it leaks the node but keeps the tree consistent. */
-            __atomic_thread_fence(__ATOMIC_RELEASE);
-            nodes[cur].children[b] = leaf;
+            rdx_begin_mutation(h, &nodes[cur].children[b], leaf, RDX_PENDING_LINK);
+            __atomic_store_n(&nodes[cur].children[b], leaf, __ATOMIC_RELEASE);
             hdr->keys++;
+            rdx_finish_mutation(h);
             return 1;
         }
         /* match the child's label against key[kpos..].  label_off/label_len also
@@ -781,11 +803,13 @@ static inline int rdx_insert_locked(RdxHandle *h, const uint8_t *key, uint32_t k
             nodes[mid].value = value;
         }
         /* Single-word commit: everything above is unreachable until this store. */
+        rdx_begin_mutation(h, &nodes[cur].children[b], mid, RDX_PENDING_LINK);
         __atomic_store_n(&nodes[cur].children[b], mid, __ATOMIC_RELEASE);
         /* A release store does not keep the recycle's memset below it. */
-        __atomic_signal_fence(__ATOMIC_SEQ_CST);
+        __atomic_thread_fence(__ATOMIC_RELEASE);
         rdx_free_node(h, ch);                              /* displaced: recycle post-commit */
         hdr->keys++;
+        rdx_finish_mutation(h);
         return 1;
     }
 }
@@ -869,10 +893,10 @@ static inline int rdx_delete_locked(RdxHandle *h, const uint8_t *key, uint32_t k
     if (!n) return 0;
     RdxNode *nodes = rdx_nodes(h);
     if (!nodes[n].has_value) return 0;
-    nodes[n].has_value = 0;
-    __atomic_signal_fence(__ATOMIC_SEQ_CST);
-    nodes[n].value = 0;
+    rdx_begin_mutation(h, &nodes[n].has_value, 0, RDX_PENDING_DELETE);
+    __atomic_store_n(&nodes[n].has_value, 0, __ATOMIC_RELEASE);
     h->hdr->keys--;
+    rdx_finish_mutation(h);
     return 1;
 }
 
@@ -881,19 +905,41 @@ static inline int rdx_delete_locked(RdxHandle *h, const uint8_t *key, uint32_t k
 static inline void rdx_clear_locked(RdxHandle *h) {
     RdxHeader *hdr = h->hdr;
     RdxNode *nodes = rdx_nodes(h);
-    if (hdr->root && hdr->root < h->node_cap)        /* root is peer-writable; keep the memset in-pool */
+    rdx_begin_mutation(h, NULL, 0, RDX_PENDING_CLEAR);
+    __atomic_thread_fence(__ATOMIC_RELEASE);
+    if (hdr->root && hdr->root < h->node_cap) {      /* root is peer-writable; keep the memset in-pool */
+        nodes[hdr->root].has_value = 0;
+        __atomic_thread_fence(__ATOMIC_RELEASE);
         memset(&nodes[hdr->root], 0, sizeof(RdxNode));   /* zero children + has_value + label */
+    }
     /* Unlink before reclaiming: a writer killed in between must not leave the root linking
      * nodes the counters already hand out again. */
-    __atomic_signal_fence(__ATOMIC_SEQ_CST);
+    __atomic_thread_fence(__ATOMIC_RELEASE);
+    hdr->free_head = 0;
+    __atomic_thread_fence(__ATOMIC_RELEASE);
     hdr->node_used = 2;
     hdr->arena_used = 0;
     hdr->keys = 0;
-    /* Drop the recycle list too. It names nodes above the reset high-water
-     * mark, so leaving it would hand the same node out twice -- once popped
-     * from the stale list and once from the bump path -- silently losing the
-     * keys stored under whichever insert lost the race. */
-    hdr->free_head = 0;
+    rdx_finish_mutation(h);
+}
+
+static void rdx_repair_mutation(RdxHandle *h) {
+    RdxHeader *hdr = h->hdr;
+    uint8_t kind = __atomic_load_n(&hdr->pending_kind, __ATOMIC_ACQUIRE);
+    if (!kind) return; /* a writer killed while draining readers has not mutated */
+    if (kind == RDX_PENDING_CLEAR) { rdx_clear_locked(h); return; }
+    uint64_t off = hdr->pending_off;
+    size_t width = kind == RDX_PENDING_LINK ? sizeof(uint32_t) : 1;
+    if (off < h->node_pool_off || off > h->arena_off - width) return;
+    if (kind == RDX_PENDING_LINK && off % sizeof(uint32_t)) return;
+    const uint8_t *p = (const uint8_t *)h->base + off;
+    uint32_t committed = kind == RDX_PENDING_LINK
+        ? __atomic_load_n((const uint32_t *)p, __ATOMIC_ACQUIRE)
+        : __atomic_load_n(p, __ATOMIC_ACQUIRE);
+    hdr->keys = hdr->pending_keys;
+    if (committed == hdr->pending_value)
+        hdr->keys += kind == RDX_PENDING_DELETE ? (uint64_t)-1 : 1;
+    rdx_finish_mutation(h);
 }
 
 /* ================================================================
@@ -950,7 +996,7 @@ static inline void rdx_init_header(void *base, uint32_t node_cap, uint32_t arena
 }
 
 static inline RdxHandle *rdx_setup(void *base, size_t map_size,
-                                   const char *path, int backing_fd) {
+                                   const char *path, int backing_fd, char *errbuf) {
     RdxHeader *hdr = (RdxHeader *)base;
     RdxHandle *h = (RdxHandle *)calloc(1, sizeof(RdxHandle));
     if (!h) {
@@ -974,6 +1020,24 @@ static inline RdxHandle *rdx_setup(void *base, size_t map_size,
     }
     h->mmap_size    = map_size;
     h->path         = path ? strdup(path) : NULL;
+    if (path && h->path && path[0] != '/') {
+        char *cwd = getcwd(NULL, 0);
+        if (cwd) {
+            size_t len = strlen(cwd) + strlen(path) + 2;
+            h->unlink_path = (char *)malloc(len);
+            if (h->unlink_path) snprintf(h->unlink_path, len, "%s/%s", cwd, path);
+            free(cwd);
+        }
+    }
+    if (path && (!h->path || (path[0] != '/' && !h->unlink_path))) {
+        RDX_ERR("backing path: %s", strerror(errno));
+        free(h->unlink_path);
+        free(h->path);
+        free(h);
+        munmap(base, map_size);
+        if (backing_fd >= 0) close(backing_fd);
+        return NULL;
+    }
     h->backing_fd   = backing_fd;
     h->my_slot_idx  = UINT32_MAX;
     return h;
@@ -1120,7 +1184,7 @@ static RdxHandle *rdx_create(const char *path, uint64_t node_cap_in, uint64_t ar
                     }
                     rdx_init_header(base, node_cap, arena_cap, total);
                     flock(fd, LOCK_UN); close(fd);
-                    return rdx_setup(base, map_size, path, -1);
+                    return rdx_setup(base, map_size, path, -1, errbuf);
                 }
                 if (((RdxHeader *)base)->magic == 0 && (uint64_t)st.st_size == total
                     && st.st_uid == geteuid()) {
@@ -1129,17 +1193,17 @@ static RdxHandle *rdx_create(const char *path, uint64_t node_cap_in, uint64_t ar
                 }
                 RDX_ERR("invalid radix-tree file"); munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
             }
-            if (((RdxHeader *)base)->sealed) {
+            if (__atomic_load_n(&((RdxHeader *)base)->sealed, __ATOMIC_ACQUIRE)) {
                 RDX_ERR("%s is frozen (read-only); open it with new_readonly", path);
                 munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
             }
             flock(fd, LOCK_UN); close(fd);
-            return rdx_setup(base, map_size, path, -1);
+            return rdx_setup(base, map_size, path, -1, errbuf);
         }
     }
     rdx_init_header(base, node_cap, arena_cap, total);
     if (fd >= 0) { flock(fd, LOCK_UN); close(fd); }
-    return rdx_setup(base, map_size, path, -1);
+    return rdx_setup(base, map_size, path, -1, errbuf);
 }
 
 static RdxHandle *rdx_create_memfd(const char *name, uint64_t node_cap_in, uint64_t arena_cap_in, char *errbuf) {
@@ -1161,7 +1225,7 @@ static RdxHandle *rdx_create_memfd(const char *name, uint64_t node_cap_in, uint6
     void *base = mmap(NULL, (size_t)total, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
     if (base == MAP_FAILED) { RDX_ERR("mmap: %s", strerror(errno)); close(fd); return NULL; }
     rdx_init_header(base, node_cap, arena_cap, total);
-    return rdx_setup(base, (size_t)total, NULL, fd);
+    return rdx_setup(base, (size_t)total, NULL, fd, errbuf);
 }
 
 static RdxHandle *rdx_open_fd(int fd, char *errbuf) {
@@ -1180,13 +1244,13 @@ static RdxHandle *rdx_open_fd(int fd, char *errbuf) {
     if (!rdx_validate_header((RdxHeader *)base, (uint64_t)st.st_size)) {
         RDX_ERR("invalid radix-tree table"); munmap(base, ms); return NULL;
     }
-    if (((RdxHeader *)base)->sealed) {
+    if (__atomic_load_n(&((RdxHeader *)base)->sealed, __ATOMIC_ACQUIRE)) {
         RDX_ERR("this radix tree is frozen (read-only); open it with new_readonly");
         munmap(base, ms); return NULL;
     }
     int myfd = fcntl(fd, F_DUPFD_CLOEXEC, 0);
     if (myfd < 0) { RDX_ERR("fcntl: %s", strerror(errno)); munmap(base, ms); return NULL; }
-    return rdx_setup(base, ms, NULL, myfd);
+    return rdx_setup(base, ms, NULL, myfd, errbuf);
 }
 
 static void rdx_destroy(RdxHandle *h) {
@@ -1207,6 +1271,7 @@ static void rdx_destroy(RdxHandle *h) {
     }
     if (h->backing_fd >= 0) close(h->backing_fd);
     if (h->base) munmap(h->base, h->mmap_size);
+    free(h->unlink_path);
     free(h->path);
     free(h);
 }
@@ -1240,11 +1305,11 @@ static RdxHandle *rdx_open_readonly(const char *path, char *errbuf) {
     if (!rdx_validate_header((RdxHeader *)base, (uint64_t)st.st_size)) {
         RDX_ERR("%s: invalid radix-tree file", path); munmap(base, ms); return NULL;
     }
-    if (!((RdxHeader *)base)->sealed) {
+    if (!__atomic_load_n(&((RdxHeader *)base)->sealed, __ATOMIC_ACQUIRE)) {
         RDX_ERR("%s is not frozen: call ->freeze on the producer before opening read-only", path);
         munmap(base, ms); return NULL;
     }
-    RdxHandle *h = rdx_setup(base, ms, path, -1);   /* munmaps on OOM */
+    RdxHandle *h = rdx_setup(base, ms, path, -1, errbuf);   /* munmaps on OOM */
     if (!h) { RDX_ERR("out of memory"); return NULL; }
     h->readonly = 1;
     return h;
@@ -1256,7 +1321,7 @@ static RdxHandle *rdx_open_readonly(const char *path, char *errbuf) {
  * mutator croaks and a read-write reopen is refused. */
 static int rdx_freeze(RdxHandle *h) {
     rdx_rwlock_wrlock(h);
-    h->hdr->sealed = 1;
+    __atomic_store_n(&h->hdr->sealed, 1, __ATOMIC_RELEASE);
     rdx_rwlock_wrunlock(h);
     if (h->path || h->backing_fd >= 0) return rdx_msync(h);  /* durability for file/memfd-backed */
     return 0;   /* anonymous: the seal lives in shared memory (visible to forks); nothing to flush */

@@ -1,15 +1,15 @@
 package IO::K8s::Api::Core::V1::ResourceRequirements;
 # ABSTRACT: ResourceRequirements describes the compute resource requirements.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s claims => ['Core::V1::ResourceClaim'];
 
 
-k8s limits => { Quantity => 1 };
+k8s limits => HashRef[Quantity];
 
 
-k8s requests => { Quantity => 1 };
+k8s requests => HashRef[Quantity];
 
 
 1;
@@ -26,7 +26,7 @@ IO::K8s::Api::Core::V1::ResourceRequirements - ResourceRequirements describes th
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 claims
 

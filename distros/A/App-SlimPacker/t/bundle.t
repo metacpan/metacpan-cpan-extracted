@@ -234,6 +234,25 @@ DL
     like file_content("$td/lonely_sb"), qr{^#!/opt/perl/bin/perl -w\n},
         '--shebang overrides the bundle shebang (#! added)';
 
+    # -- the Sub::Defer pattern: a q[...] template string-eval'd at runtime,
+    #    closing over a file lexical, a sub and the package name.  None of the
+    #    rename passes may touch names referenced from such a string.
+    write_fixture("$td/lib/App/Evalish.pm", <<'EV');
+package App::Evalish;
+use strict; use warnings;
+my $undeferred;
+my $template = q[ package App::Evalish; $undeferred ||= boost(); $undeferred ];
+sub boost { 41 }
+# run() must mention $undeferred, or perls <= 5.18 don't close over it and
+# the eval warns "Variable $undeferred is not available"
+sub run { my $v = eval $template; die $@ if $@; die 'stale' unless $v == $undeferred; $v + 1 }
+1;
+EV
+    write_fixture("$td/bin/evapp", "use lib 'lib';\nuse App::Evalish;\nprint App::Evalish::run(), \"\\n\";\n");
+    ($out, $rc) = run_cli('--rename-modules', '-o', "$td/evapp_bundled", '--lib', "$td/lib", "$td/bin/evapp");
+    is $rc, 0, 'string-eval template build exits 0';
+    is `"$^X" "$td/evapp_bundled"`, "42\n", 'q[...] template bundle runs (lexical, sub and package all frozen)';
+
     # -- pack_string endings under a real bundle: quote-rich module must land
     #    in a q<delim> literal, backslash module in an escaped single-quote,
     #    and both must still run against the embedded copies.
@@ -397,7 +416,7 @@ is `"$^X" "$td/ul"`, '5050', '-M List::Util=sum -e program runs';
     # -- -E enables features
     ($out, $rc) = run_cli('-o', "$td/sayb", '--no-compress', '-E', 'say "bye";');
     is $rc, 0, '-E program builds';
-    like file_content("$td/sayb"), qr/use feature qw\(:all\);\s*say "bye";/, '-E prepends feature pragma';
+    like file_content("$td/sayb"), qr/feature->import\(':all'\).*?say "bye";/s, '-E prepends feature pragma';
     is `"$^X" "$td/sayb"`, "bye\n", '-E program runs';
 
     # -- multiple -m
@@ -428,12 +447,18 @@ is `"$^X" "$td/ul"`, '5050', '-M List::Util=sum -e program runs';
     like $out, qr/Cannot write/, 'reports unwritable output';
 
     # -- unreadable module file under lib (reachable dependency)
-    {
+    SKIP: {
         mkpath("$td2/lib/App");
         write_fixture("$td2/lib/App/MyMod.pm", "package App::MyMod;\nuse App::Locked;\n1;\n");
         my $unread = "$td2/lib/App/Locked.pm";
         write_fixture($unread, "package App::Locked;\n1;\n");
         chmod 0000, $unread;
+        # root (and Cygwin administrators) read chmod-0 files anyway; probe
+        if (open my $fh, '<', $unread) {
+            close $fh;
+            chmod 0644, $unread;
+            skip 'chmod 0000 is not enforced for this user', 2;
+        }
         ($out, $rc) = run_cli('-o', "$td2/x", '--lib', "$td2/lib", '--fatlib', "$td/fatlib", "$td/bin/myapp");
         chmod 0644, $unread;
         isnt $rc, 0, 'unreadable reachable module exits nonzero';
@@ -650,7 +675,9 @@ sub greet {
 package main;
 print MyGreeter->new->greet;
 # report every module loaded from outside the bundle
-END { print "INC $_ $INC{$_}\n" for grep { defined $INC{$_} && !ref $INC{$_} && $INC{$_} !~ m{^(?:/loader/|\(eval )} } sort keys %INC }
+# only .pm entries are modules: old perls also put AutoLoader files
+# (auto/**/*.ix, *.al) and Config data (Config_git.pl) into %INC
+END { print "INC $_ $INC{$_}\n" for grep { defined $INC{$_} && !ref $INC{$_} && $INC{$_} !~ m{^(?:/loader/|\(eval )} && m{\.pm\z} } sort keys %INC }
 EOF
     my $is_core = sub {
         (my $mod = shift) =~ s{/}{::}g;

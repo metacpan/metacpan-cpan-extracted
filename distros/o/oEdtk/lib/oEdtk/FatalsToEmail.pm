@@ -3,7 +3,7 @@ package oEdtk::FatalsToEmail;
 use strict;
 use warnings;
 
-our $VERSION = '2.1129';
+our $VERSION = '2.1131';
 
 # by Randal L. Schwartz http://www.stonehenge.com/merlyn/LinuxMag/col14.html
 

@@ -1,6 +1,6 @@
 package IO::K8s::Traefik::V1alpha1::IngressRouteTCP;
 # ABSTRACT: IngressRouteTCP is the CRD implementation of a Traefik TCP Router.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::APIObject
     api_version     => 'traefik.io/v1alpha1',
     resource_plural => 'ingressroutetcps';
@@ -23,7 +23,7 @@ IO::K8s::Traefik::V1alpha1::IngressRouteTCP - IngressRouteTCP is the CRD impleme
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 spec
 

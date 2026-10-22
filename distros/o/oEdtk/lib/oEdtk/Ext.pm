@@ -22,7 +22,7 @@ no warnings 'experimental::signatures';
 use Exporter 'import';
 our @EXPORT_OK = qw( call_named_callable load_named_callable require_optional );
 
-our $VERSION = 2.1129;
+our $VERSION = 2.1131;
 
 use Carp qw(croak);
 use Readonly;

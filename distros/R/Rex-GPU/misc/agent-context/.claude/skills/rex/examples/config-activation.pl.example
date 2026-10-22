@@ -1,0 +1,14 @@
+# DESIGN SKELETON, not a runnable task or a universal application validator.
+# Supply application-specific stage/validate/replace/activate/health functions.
+# Use a trusted parent directory and separately authorize all mutations.
+my $plan = validate_desired_state($input);
+my $observed = observe_current_state($plan);
+if (needs_change($plan, $observed)) {
+    my $staged = stage_candidate($plan);
+    validate_candidate_with_application($staged);  # Must succeed before replacement.
+    my $previous = preserve_previous_state($observed);
+    replace_active_configuration($staged);
+    activate_with_explicit_failure_policy($plan);
+    verify_application_health($plan);              # Not just "service is running".
+    # Recovery must handle activation/health failure; no automatic transaction claimed.
+}

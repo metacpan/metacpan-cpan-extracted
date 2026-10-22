@@ -1,5 +1,5 @@
 package Kubernetes::REST::APIError;
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 # ABSTRACT: An HTTP error status answered by the Kubernetes API
 use Moo;
 use Carp ();
@@ -95,7 +95,7 @@ Kubernetes::REST::APIError - An HTTP error status answered by the Kubernetes API
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head1 SYNOPSIS
 
@@ -127,6 +127,11 @@ strings, location included:
 
 so code that prints C<$@>, matches it against a regex or compares it with
 C<eq> keeps working. It is always true in boolean context.
+
+A C<code> of C<599> is not an answer of the API server but a transport
+failure (unreachable, TLS, timeout, a body that broke off, a missing
+L<LWP::Protocol::https>), and its C<body> holds the error message - see the
+"Error contract" in L<Kubernetes::REST::Role::IO>.
 
 Everything else - invalid arguments, a resource name that resolves to no
 class - still croaks with a plain string. Where such a message reports an

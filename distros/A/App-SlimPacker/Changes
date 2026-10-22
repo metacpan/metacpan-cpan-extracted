@@ -1,5 +1,18 @@
 Revision history for App-SlimPacker
 
+0.08  2026-10-21
+    - Fix: require Module::CoreList 3.07; on perls <= 5.16 the core-shipped
+      version has no is_core() and slimpack died with "Undefined subroutine".
+    - Fix: names referenced from non-interpolating strings (q[...], '...',
+      <<'EOT') are no longer renamed — such strings can be string-eval'd at
+      runtime. Bundling Moo broke on perl < 5.22 (Sub::Defer builds deferred
+      subs from a q[...] template naming its lexicals, a sub and its package).
+    - Fix: keep the space in `$x && Foo::Bar->baz` and `$n - word(...)`;
+      removing it warns on perl <= 5.18 ("Operator or semicolon missing") or
+      turns `- e(...)` into a filetest.
+    - Fix: -e/-E bundles failed on perl < 5.16 (no ':all' feature bundle
+      there; those perls now get ':5.10').
+
 0.07  2026-10-19
     - Fix: perl -c on a packed script no longer runs the program.
 

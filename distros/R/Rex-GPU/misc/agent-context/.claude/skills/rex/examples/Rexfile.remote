@@ -1,0 +1,15 @@
+use strict;
+use warnings;
+use Rex -feature => ['1.4'];
+
+# Read-only remote task. This file contains no target mutation at load time.
+# Authentication and known_hosts are configured externally under site policy.
+set connection => 'OpenSSH';
+
+desc 'Print the kernel name from one explicitly selected remote host';
+task 'inspect_kernel', sub {
+    die "An explicitly selected remote host is required\n" if Rex::is_local();
+    my $output = run 'uname', ['-s'], auto_die => 1;
+    print "$output\n";
+};
+1;

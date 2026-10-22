@@ -65,7 +65,7 @@ inc::Sereal::BuildTools::check_external_libraries( \$libs, \$defines, \$objects,
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
 inc::Sereal::BuildTools::WriteMakefile(
-    MIN_PERL_VERSION => '5.008',
+    MIN_PERL_VERSION => '5.014',
     META_MERGE       => {
         resources => {
             repository => {
@@ -101,7 +101,7 @@ inc::Sereal::BuildTools::WriteMakefile(
     },                                          # e.g., Module::Name => 1.1
     LICENSE       => 'perl',
     ABSTRACT_FROM => 'lib/Sereal/Decoder.pm',
-    AUTHOR        => 'Steffen Mueller <smueller@cpan.org>, Yves Orton <yves@cpan.org>',
+    AUTHOR        => 'Steffen Mueller <cpan@steffen-mueller.net>, Yves Orton <yves@cpan.org>',
     LIBS          => [$libs],                                                             # e.g., '-lm'
     DEFINE        => $defines,
     INC           => $inc,                                                                # e.g., '-I. -I/usr/local/include'

@@ -1,7 +1,7 @@
 /*
  * ring.h -- Shared-memory fixed-size ring buffer for Linux
  *
- * Lock-free circular buffer: writes overwrite oldest when full.
+ * Atomic circular buffer: writes overwrite oldest when full.
  * Readers access by relative position (0=latest) or absolute sequence.
  * No consumer tracking -- data persists until overwritten.
  *
@@ -20,6 +20,7 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
@@ -180,10 +181,10 @@ static inline uint64_t ring_write(RingHandle *h, const void *val, uint32_t vlen)
          * the slot's epoch BACKWARDS to our stale mark -- which both loses the
          * newer write and leaves readers unable to match the slot at all. */
         if (__atomic_load_n(&h->seq[slot_idx], __ATOMIC_ACQUIRE) == my_writing) {
-            uint32_t sz = h->elem_size;
-            uint32_t cp = vlen < sz ? vlen : sz;
-            memcpy(ring_slot(h, pos), val, cp);
-            if (cp < sz) memset(ring_slot(h, pos) + cp, 0, sz - cp);
+            uint64_t bits = 0;
+            uint32_t cp = vlen < sizeof(bits) ? vlen : sizeof(bits);
+            memcpy(&bits, val, cp);
+            __atomic_store_n((uint64_t *)(h->data + slot_idx * h->elem_size), bits, __ATOMIC_RELEASE);
             /* Publish with a CAS, never a blind store: if ownership was lost
              * between the check above and here, the CAS simply fails and our
              * superseded write is dropped, instead of regressing seq. */
@@ -191,25 +192,19 @@ static inline uint64_t ring_write(RingHandle *h, const void *val, uint32_t vlen)
             (void)__atomic_compare_exchange_n(&h->seq[slot_idx], &expect, my_done,
                     0, __ATOMIC_RELEASE, __ATOMIC_RELAXED);
         }
-        /* Residual (unavoidable for a seqlock): a writer descheduled between
-         * the ownership check and the memcpy can still overwrite the bytes of
-         * a slot recovered in that gap. Recovery needs a >= 2s stall while the
-         * check-to-memcpy gap is sub-microsecond, so the epoch corruption above
-         * is eliminated and only a vanishingly narrow data race remains. */
+        /* A writer paused after the ownership check can still overwrite a
+         * recovered payload if it resumes after the recovery timeout. */
     }
 
-    uint64_t cnt = __atomic_add_fetch(&hdr->count, 1, __ATOMIC_RELEASE);
+    /* Count publication and waiter registration share one seq-cst order. */
+    uint64_t cnt = __atomic_add_fetch(&hdr->count, 1, __ATOMIC_SEQ_CST);
     if (cnt > hdr->capacity)
         __atomic_add_fetch(&hdr->stat_overwrites, 1, __ATOMIC_RELAXED);
     __atomic_add_fetch(&hdr->stat_writes, 1, __ATOMIC_RELAXED);
-    __atomic_add_fetch(&hdr->wake_seq, 1, __ATOMIC_RELEASE);
-
-    /* Wake readers. StoreLoad barrier: publish wake_seq++ before reading
-     * waiters, so we observe a reader that registered just before this write
-     * (else its wakeup is lost). Pairs with the fence in ring_wait. */
-    __atomic_thread_fence(__ATOMIC_SEQ_CST);
-    if (__atomic_load_n(&hdr->waiters, __ATOMIC_RELAXED) > 0)
+    if (__atomic_load_n(&hdr->waiters, __ATOMIC_SEQ_CST) > 0) {
+        __atomic_add_fetch(&hdr->wake_seq, 1, __ATOMIC_RELEASE);
         syscall(SYS_futex, &hdr->wake_seq, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
+    }
 
     return pos;
 }
@@ -233,9 +228,13 @@ static inline int ring_read_seq(RingHandle *h, uint64_t seq, void *out) {
         uint64_t s1 = __atomic_load_n(&h->seq[slot_idx], __ATOMIC_ACQUIRE);
         if (s1 & 1) continue;           /* writer in progress: spin and retry */
         if (s1 != expected) return 0;   /* stale epoch (overwritten) */
-        memcpy(out, ring_slot(h, seq), h->elem_size);
-        uint64_t s2 = __atomic_load_n(&h->seq[slot_idx], __ATOMIC_ACQUIRE);
-        if (s1 == s2) return 1;          /* stable: no concurrent writer touched us */
+        /* The payload acquire orders the epoch re-check after the value load. */
+        uint64_t bits = __atomic_load_n((uint64_t *)(h->data + slot_idx * h->elem_size), __ATOMIC_ACQUIRE);
+        uint64_t s2 = __atomic_load_n(&h->seq[slot_idx], __ATOMIC_RELAXED);
+        if (s1 == s2) {
+            memcpy(out, &bits, sizeof(bits));
+            return 1;
+        }
     }
     return 0;  /* too much contention to get a clean read */
 }
@@ -284,39 +283,42 @@ static inline int ring_remaining(const struct timespec *dl, struct timespec *rem
     return rem->tv_sec >= 0;
 }
 
-static inline int ring_wait(RingHandle *h, uint64_t expected_count, double timeout) {
+/* Returns -1 on syscall errors, with waiters balanced before handling signals. */
+static inline int ring_wait_until(RingHandle *h, uint64_t expected_count, const struct timespec *dl) {
     if (__atomic_load_n(&h->hdr->count, __ATOMIC_ACQUIRE) != expected_count) return 1;
-    if (timeout == 0) return 0;
-
-    struct timespec dl, rem;
-    int has_dl = (timeout > 0);
-    if (has_dl) ring_make_deadline(timeout, &dl);
+    struct timespec rem;
 
     for (;;) {
-        __atomic_add_fetch(&h->hdr->waiters, 1, __ATOMIC_RELEASE);
-        /* StoreLoad barrier: publish waiters++ before reading wake_seq/count,
-         * so a concurrent writer either sees our waiters++ (and wakes us) or
-         * we observe its wake_seq bump here (futex value check -> no sleep).
-         * Release/acquire alone lets these reorder on weak memory -> lost
-         * wakeup -> hang until timeout. */
-        __atomic_thread_fence(__ATOMIC_SEQ_CST);
+        /* Register before checking count, in the writer's seq-cst order. */
+        __atomic_add_fetch(&h->hdr->waiters, 1, __ATOMIC_SEQ_CST);
         uint32_t seq = __atomic_load_n(&h->hdr->wake_seq, __ATOMIC_ACQUIRE);
-        uint64_t cur = __atomic_load_n(&h->hdr->count, __ATOMIC_ACQUIRE);
+        uint64_t cur = __atomic_load_n(&h->hdr->count, __ATOMIC_SEQ_CST);
+        int error = 0;
         if (cur == expected_count) {
             struct timespec *pts = NULL;
-            if (has_dl) {
-                if (!ring_remaining(&dl, &rem)) {
+            if (dl) {
+                if (!ring_remaining(dl, &rem)) {
                     __atomic_sub_fetch(&h->hdr->waiters, 1, __ATOMIC_RELAXED);
                     return 0;
                 }
                 pts = &rem;
             }
-            syscall(SYS_futex, &h->hdr->wake_seq, FUTEX_WAIT, seq, pts, NULL, 0);
+            if (syscall(SYS_futex, &h->hdr->wake_seq, FUTEX_WAIT, seq, pts, NULL, 0) < 0)
+                error = errno;
         }
         __atomic_sub_fetch(&h->hdr->waiters, 1, __ATOMIC_RELAXED);
+        if (error && error != EAGAIN && error != ETIMEDOUT) { errno = error; return -1; }
         if (__atomic_load_n(&h->hdr->count, __ATOMIC_ACQUIRE) != expected_count) return 1;
-        if (has_dl && !ring_remaining(&dl, &rem)) return 0;
+        if (dl && !ring_remaining(dl, &rem)) return 0;
     }
+}
+
+static inline int ring_wait(RingHandle *h, uint64_t expected_count, double timeout) {
+    if (__atomic_load_n(&h->hdr->count, __ATOMIC_ACQUIRE) != expected_count) return 1;
+    if (timeout == 0) return 0;
+    struct timespec dl;
+    if (timeout > 0) ring_make_deadline(timeout, &dl);
+    return ring_wait_until(h, expected_count, timeout > 0 ? &dl : NULL);
 }
 
 /* ================================================================
@@ -356,12 +358,7 @@ static inline void ring_init_header(void *base, uint64_t total,
 
 }
 
-/* Fixed element size implied by a variant. Reads copy a slot into a
- * destination sized by the variant's C type, so a header whose elem_size does
- * not match this MUST be rejected at attach -- otherwise a tampered backing
- * file drives ring_read_seq to memcpy elem_size bytes past a fixed 8-byte
- * destination (CWE-787). Returns 0 for an unknown variant (validation then
- * rejects it via the variant_id check). */
+/* Fixed element size for each supported variant; zero for unknown variants. */
 static inline uint32_t ring_variant_elem_size(uint32_t variant_id) {
     switch (variant_id) {
         case RING_VAR_INT: return (uint32_t)sizeof(int64_t);
@@ -373,7 +370,7 @@ static inline uint32_t ring_variant_elem_size(uint32_t variant_id) {
 /* Validate a mapped header (shared by ring_create reopen and ring_open_fd). */
 static inline int ring_validate_header(const RingHeader *hdr, uint64_t file_size,
                                         uint32_t expected_variant) {
-    if (hdr->magic != RING_MAGIC) return 0;
+    if (__atomic_load_n(&hdr->magic, __ATOMIC_ACQUIRE) != RING_MAGIC) return 0;
     if (hdr->version != RING_VERSION) return 0;
     if (hdr->variant_id != expected_variant) return 0;
     if (hdr->elem_size == 0 || hdr->capacity == 0) return 0;
@@ -399,6 +396,9 @@ static inline RingHandle *ring_setup(void *base, size_t ms, const char *path, in
     h->elem_size = hdr->elem_size;
     h->capacity = hdr->capacity;
     h->path = path ? strdup(path) : NULL;
+    if (path && !h->path) {
+        munmap(base, ms); if (bfd >= 0) close(bfd); free(h); return NULL;
+    }
     h->notify_fd = -1;
     h->backing_fd = bfd;
     return h;
@@ -488,6 +488,20 @@ static RingHandle *ring_create(const char *path, uint64_t capacity,
         if (!is_new && (uint64_t)st.st_size < sizeof(RingHeader)) {
             RING_ERR("%s: file too small (%lld)", path, (long long)st.st_size);
             flock(fd, LOCK_UN); close(fd); return NULL;
+        }
+        if (!is_new && st.st_blocks == 0) {
+            uint32_t magic = UINT32_MAX;
+            if (pread(fd, &magic, sizeof magic, 0) != (ssize_t)sizeof magic || magic != RING_MAGIC) {
+                int recoverable = magic == 0 && (uint64_t)st.st_size == total && st.st_uid == geteuid();
+                if (recoverable && ring_file_is_zero(fd, total)) {
+                    is_new = 1;
+                } else {
+                    if (recoverable)
+                        RING_ERR("%s: incomplete ring file left by an interrupted create; remove it and retry", path);
+                    else RING_ERR("invalid ring file");
+                    flock(fd, LOCK_UN); close(fd); return NULL;
+                }
+            }
         }
         if (is_new && (st.st_uid != geteuid() || fchmod(fd, mode) < 0)) {
             RING_ERR("%s: refusing to initialize file not owned by us", path);

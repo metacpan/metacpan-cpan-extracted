@@ -113,9 +113,15 @@ add(self, delay, payload)
     id = hw_add_locked(h, (uint64_t)delay, (uint64_t)payload);
     __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);
     hw_rwlock_wrunlock(h);
-    if (id == -2)
-        croak("Data::HierTimingWheel::Shared->add: delay %" UVuf " exceeds the wheel range (max %" UVuf "); use more levels or slots",
-              (UV)delay, (UV)(h->tick[h->num_levels] - 1));
+    if (id == -2) {
+        if (delay > (UV)IV_MAX && SvIOKp(ST(1)) && !SvIsUV(ST(1))) {
+            hw_rwlock_wrlock(h);
+            id = hw_add_locked(h, 1, (uint64_t)payload);
+            hw_rwlock_wrunlock(h);
+        } else
+            croak("Data::HierTimingWheel::Shared->add: delay %" UVuf " exceeds the wheel range (max %" UVuf "); use more levels or slots",
+                  (UV)delay, (UV)(h->tick[h->num_levels] - 1));
+    }
     if (id < 0) croak("Data::HierTimingWheel::Shared->add: timer pool is full (capacity %u)", (unsigned)h->capacity);
     RETVAL = (UV)id;
   OUTPUT:

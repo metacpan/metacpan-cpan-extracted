@@ -10,11 +10,11 @@ use Carp;
 
 =head1 VERSION
 
-Version 0.49
+Version 0.51
 
 =cut
 
-our $VERSION = '0.49';
+our $VERSION = '0.51';
 
 use parent 'Geo::Coder::Free::Display';
 use JSON::MaybeXS;
@@ -36,8 +36,8 @@ sub html {
 		# error path that echoes the input.  500-char cap prevents DoS via
 		# absurdly long strings reaching the geocoder.
 		'q'        => qr/^[^<>\x00-\x1f\x7f]{1,500}$/,
-		# Free text for scantext mode — allow anything printable but cap
-		# length so the geocoder's O(N²) word-window scan stays bounded.
+		# Free text for scantext mode - allow anything printable but cap
+		# length so the geocoder's O(N^2) word-window scan stays bounded.
 		'scantext' => qr/^[^\x00-\x08\x0b\x0c\x0e-\x1f\x7f]{1,2000}$/,
 		'lang'     => qr/^[A-Z]{2}/i,
 	};

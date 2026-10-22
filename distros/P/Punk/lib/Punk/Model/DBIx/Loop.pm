@@ -6,7 +6,7 @@ use warnings;
 use Punk ();
 use DBIx::Loop ();
 
-our $VERSION = '0.63';
+our $VERSION = '0.64';
 
 1;
 

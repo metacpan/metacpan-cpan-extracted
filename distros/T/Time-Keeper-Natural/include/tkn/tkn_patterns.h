@@ -328,8 +328,8 @@ tkn_patterns_build(pTHX_ tkn_lexicon *L)
     tkn_pat *pats = NULL;
     I32 i, n, np = 0, pcap = 0;
 
-    letter = sv_2mortal(newSVsv(eval_pv("qr/\\p{L}/", TRUE)));
-    lns = sv_2mortal(newSVsv(eval_pv("qr/[\\p{L}\\p{N}\\s]/", TRUE)));
+    letter = sv_2mortal(newSVsv(eval_pv(TKN_RX_LETTER, TRUE)));
+    lns = sv_2mortal(newSVsv(eval_pv(TKN_RX_LNS, TRUE)));
     scratch = sv_2mortal(newSVpvs(""));
 
     args[0] = L->code;

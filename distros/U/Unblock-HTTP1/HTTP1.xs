@@ -634,7 +634,9 @@ ub_http1_parse_request_head_result(
             | UHTTP_TARGET_EXACT;
 
         if (body_mode == UB_BODY_NONE) {
-            input.flags |= UHTTP_COMPLETE;
+            input.flags |= UHTTP_COMPLETE | UHTTP_HAS_BUFFERED_BODY;
+            input.body.data = "";
+            input.body.len = 0;
         } else {
             input.flags |=
                 UHTTP_MUTABLE

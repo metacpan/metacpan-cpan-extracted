@@ -24,12 +24,14 @@ sub run_trace {
     for (1..$N) {
         my $r = rand;
         if ($r < 0.5 || !@live) {
-            my $s = $p->alloc;
+            my $s = $p->try_alloc;
             if (defined $s) {
                 my $v = int(rand(1e9));
                 $p->set($s, $v);
                 push @live, [$s, $v];
                 push @trace, ['alloc', $s, $v];
+            } else {
+                push @trace, ['full'];
             }
         } else {
             my $i = int(rand(@live));

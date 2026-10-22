@@ -1,5 +1,9 @@
 Revision history for Data::Log::Shared
 
+0.09  2026-10-16
+    - Dispatch signal handlers safely during wait_for.
+    - Keep the original timeout across interrupted waits.
+
 0.08  2026-09-26
     - Segments are reserved, so a full filesystem fails the constructor;
       DATA_LOG_SHARED_SPARSE=1 skips the reservation.

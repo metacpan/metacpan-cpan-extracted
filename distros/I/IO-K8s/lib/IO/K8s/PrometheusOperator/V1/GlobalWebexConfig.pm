@@ -1,6 +1,6 @@
 package IO::K8s::PrometheusOperator::V1::GlobalWebexConfig;
 # ABSTRACT: webex defines the default configuration for Webex.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s apiURL => Str, { pattern => qr/^(http|https):\/\/.+$/ };
@@ -20,7 +20,7 @@ IO::K8s::PrometheusOperator::V1::GlobalWebexConfig - webex defines the default c
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 apiURL
 

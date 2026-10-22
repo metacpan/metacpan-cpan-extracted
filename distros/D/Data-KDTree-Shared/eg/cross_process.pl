@@ -41,5 +41,7 @@ printf "parent: after %d children added %d points each, count=%d\n\n", $kids, $p
 my @q = (500, 500);
 my $near = $kd->nearest(\@q);
 printf "nearest point to (%.0f, %.0f): #%d at distance %.3f\n", @q, $near->{id}, $near->{dist};
-printf "points within radius 10 of centre: %d\n", scalar $kd->radius(\@q, 10);
-printf "points in the central 50x50 box  : %d\n", scalar $kd->range([475, 475], [525, 525]);
+my @ball = $kd->radius(\@q, 10);
+my @box = $kd->range([475, 475], [525, 525]);
+printf "points within radius 10 of centre: %d\n", scalar @ball;
+printf "points in the central 50x50 box  : %d\n", scalar @box;

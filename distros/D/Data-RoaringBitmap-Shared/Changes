@@ -1,5 +1,10 @@
 Revision history for Data-RoaringBitmap-Shared
 
+0.07  2026-10-16
+    - Finish interrupted clears without leaking or sharing slots.
+    - Preserve statistics on self and alias set operations.
+    - Respect frozen peers and publish frozen data safely.
+
 0.06      2026-09-26
           - A writer killed mid-call no longer tears a container or leaks
             slots; stats' containers_used may count one spare slot.

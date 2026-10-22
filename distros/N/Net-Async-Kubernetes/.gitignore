@@ -49,3 +49,6 @@ config.yml
 
 # karr-foundation per-repo state — local machine only, never commit
 .karr.state
+
+# Claude Code worktrees (claude --worktree / isolated agents) -- never commit
+/.claude/worktrees/

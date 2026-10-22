@@ -14,7 +14,7 @@ use Unblock::HTTP3::Connection;
 use Unblock::HTTP3::Server;
 use Unblock::HTTP3::_Native;
 
-is($Net::QUIC::VERSION, '0.04', 'ORIGIN loopback uses released Net::QUIC 0.04');
+ok($Net::QUIC::VERSION >= 0.05, 'ORIGIN loopback uses released Net::QUIC 0.05');
 
 my $empty_native = Unblock::HTTP3::_Native->server(
     65_536,

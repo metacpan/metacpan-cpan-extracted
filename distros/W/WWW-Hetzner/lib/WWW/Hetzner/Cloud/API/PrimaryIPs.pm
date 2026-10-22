@@ -1,7 +1,7 @@
 package WWW::Hetzner::Cloud::API::PrimaryIPs;
 # ABSTRACT: Hetzner Cloud Primary IPs API
 
-our $VERSION = '0.101';
+our $VERSION = '0.102';
 
 use Moo;
 with 'WWW::Hetzner::Role::Pagination';
@@ -162,7 +162,7 @@ WWW::Hetzner::Cloud::API::PrimaryIPs - Hetzner Cloud Primary IPs API
 
 =head1 VERSION
 
-version 0.101
+version 0.102
 
 =head1 SYNOPSIS
 
@@ -228,6 +228,9 @@ Returns L<WWW::Hetzner::Cloud::PrimaryIP> object.
     );
 
 Creates primary IP. Returns L<WWW::Hetzner::Cloud::PrimaryIP> object.
+
+The C<datacenter> parameter is deprecated by the Hetzner API, C<location> is
+its replacement. The parameter is still accepted and sent unchanged.
 
 =head2 update
 

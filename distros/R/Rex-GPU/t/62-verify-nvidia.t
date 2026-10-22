@@ -47,8 +47,9 @@ subtest 'verify_nvidia: all ok => 1, no warning' => sub {
   is_deeply($rec->{lines}, [
     q{run: lsmod | grep '^nvidia '},
     'run: nvidia-smi -L 2>&1',
-    'can_run: nvidia-ctk'
-  ], 'module, nvidia-smi, nvidia-ctk -- no libcuda probe');
+    'can_run: nvidia-ctk',
+    'can_run: crun'
+  ], 'module, nvidia-smi, nvidia-ctk, crun (karr #79) -- no libcuda probe');
 };
 
 subtest 'verify_nvidia: no nvidia-ctk => 0' => sub {

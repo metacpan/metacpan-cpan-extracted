@@ -1,6 +1,6 @@
 package IO::K8s::Api::Resource::V1::ResourceClaimTemplate;
 # ABSTRACT: ResourceClaimTemplate is used to produce ResourceClaim objects.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::APIObject;
 with 'IO::K8s::Role::Namespaced';
 
@@ -21,7 +21,7 @@ IO::K8s::Api::Resource::V1::ResourceClaimTemplate - ResourceClaimTemplate is use
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head1 DESCRIPTION
 

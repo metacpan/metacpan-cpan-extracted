@@ -11,7 +11,7 @@ use Unblock::HTTP1::_Native ();
 use Unblock::HTTP1::_Wire ();
 use Unblock::HTTP1::Transaction;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 sub new {
     my ($class, %option) = @_;
@@ -43,6 +43,8 @@ sub request {
             on_informational
             on_response
             on_body
+            on_data
+            on_finish
             on_complete
             on_error
             on_switch
@@ -59,7 +61,7 @@ sub request {
 
     my $stream_body = delete($option{stream_body}) ? 1 : 0;
     my %callbacks;
-    for my $name (qw(on_informational on_response on_body on_complete on_error on_switch on_drain)) {
+    for my $name (qw(on_informational on_response on_body on_data on_finish on_complete on_error on_switch on_drain)) {
         next unless exists $option{$name};
         my $cb = delete $option{$name};
         croak "request(): $name must be a coderef" unless ref($cb) eq 'CODE';
@@ -96,7 +98,8 @@ sub _start_next {
     };
     if (!$ok) {
         $tx->_fail("$@");
-        $tx->_invoke('on_error', "$@");
+        $tx->_invoke('on_error', $tx->error);
+        $tx->_notify_finish;
         return $self->_start_next;
     }
     $tx->{send_plan} = $plan;
@@ -230,6 +233,7 @@ sub _drive {
                 return $self->_connection_error(
                     'protocol switch received before streaming request body completed'
                 ) if $tx->{stream_body} && !$tx->{local_done};
+                $tx->_finish_receive($response);
                 $response->mark_complete->freeze;
                 $tx->_mark_remote_done;
                 $tx->_mark_complete;
@@ -259,7 +263,7 @@ sub _drive {
                     return $self->_connection_error(
                         '205 response must not contain content'
                     ) if $plan->{forbid_content} && length $bytes;
-                    my $body_cb = $tx->_invoke('on_body', $response, $bytes);
+                    my $body_cb = $tx->_receive_data($response, $bytes);
                     return $self->_connection_error($body_cb)
                         unless $body_cb eq '1';
                     return if $self->{closed};
@@ -281,8 +285,9 @@ sub _drive {
             $rx->{remaining} -= $take;
             return $self->_connection_error('205 response must not contain content')
                 if $rx->{forbid_content} && length $bytes;
-            my $cb = $tx->_invoke('on_body', $rx->{response}, $bytes);
+            my $cb = $tx->_receive_data($rx->{response}, $bytes);
             return $self->_connection_error($cb) unless $cb eq '1';
+            return if $tx->is_terminal;
             if ($rx->{remaining} == 0) {
                 $self->_finish_response;
                 next;
@@ -305,9 +310,10 @@ sub _drive {
             if (defined($decoded) && length($decoded)) {
                 return $self->_connection_error('205 response must not contain content')
                     if $rx->{forbid_content};
-                my $cb = $tx->_invoke('on_body', $rx->{response}, $decoded);
+                my $cb = $tx->_receive_data($rx->{response}, $decoded);
                 return $self->_connection_error($cb) unless $cb eq '1';
             }
+            return if $tx->is_terminal;
             return unless $done;
             $rx->{mode} = 'trailers';
             delete $rx->{decoder};
@@ -344,7 +350,7 @@ sub _drive {
             my $bytes = $self->_input_take($self->_input_length);
             return $self->_connection_error('205 response must not contain content')
                 if $rx->{forbid_content} && length $bytes;
-            my $cb = $tx->_invoke('on_body', $rx->{response}, $bytes);
+            my $cb = $tx->_receive_data($rx->{response}, $bytes);
             return $self->_connection_error($cb) unless $cb eq '1';
             return;
         }
@@ -374,6 +380,8 @@ sub _finish_response {
 
 sub _complete_response {
     my ($self, $tx, $response, $keep_alive) = @_;
+    return if $tx->is_terminal;
+    $tx->_finish_receive($response);
     $response->mark_complete->freeze;
     $tx->_mark_remote_done;
     $tx->{keep_alive} = $keep_alive ? 1 : 0;
@@ -398,6 +406,7 @@ sub _retire_if_done {
     return unless $tx->{local_done} && $tx->{remote_done};
     $tx->_mark_complete unless $tx->is_terminal;
     my $cb = $tx->_invoke('on_complete');
+    $tx->_notify_finish;
     return $self->_connection_error($cb) unless $cb eq '1';
 
     my $keep = $tx->{keep_alive} && $tx->{send_plan}{keep_alive};
@@ -464,6 +473,7 @@ sub _transaction_write {
 sub _deliver_switch_notice {
     my ($self, $tx, $response) = @_;
     my $result = $tx->_invoke('on_switch', $response);
+    $tx->_notify_finish;
     $self->_connection_error($result) unless $result eq '1';
     return;
 }
@@ -478,9 +488,10 @@ sub _transaction_cancel {
     $self->{rx} = undef;
     $self->{active} = undef if $self->{active} && $self->{active} == $tx;
     $self->{closed} = 1;
-    $self->_fail_queued('HTTP/1 connection closed after cancellation');
+    $self->_fail_all('HTTP/1 connection closed after cancellation');
     $self->_transport_abort('HTTP/1 transaction cancelled')
         if $self->{transport_attached};
+    $tx->_notify_finish;
     return;
 }
 
@@ -506,7 +517,7 @@ sub _on_eof {
     if ($rx && $rx->{mode} eq 'close') {
         if (length $self->{input}) {
             my $bytes = substr($self->{input}, 0, length($self->{input}), '');
-            my $cb = $tx->_invoke('on_body', $rx->{response}, $bytes);
+            my $cb = $tx->_receive_data($rx->{response}, $bytes);
             return $self->_connection_error($cb) unless $cb eq '1';
         }
         $rx->{keep_alive} = 0;
@@ -521,14 +532,15 @@ sub _on_eof {
 sub _connection_error {
     my ($self, $error) = @_;
     $error = 'HTTP/1 client protocol error' unless defined($error) && length($error);
-    my $tx = $self->{active};
-    if ($tx && !$tx->is_terminal) {
-        $tx->_fail($error);
-        eval { $tx->_invoke('on_error', $error) };
-    }
-    $self->{active} = undef;
+    my $tx = delete $self->{active};
     $self->{rx} = undef;
     $self->{closed} = 1;
+    $self->_input_clear;
+    if ($tx && !$tx->is_terminal) {
+        $tx->_fail($error);
+        $tx->_invoke('on_error', $error);
+        $tx->_notify_finish;
+    }
     $self->_fail_queued($error);
     $self->_transport_abort($error) if $self->{transport_attached};
     return;
@@ -540,6 +552,7 @@ sub _fail_queued {
         next if $tx->is_terminal;
         $tx->_fail($error);
         eval { $tx->_invoke('on_error', $error) };
+        $tx->_notify_finish;
     }
     $self->{queue} = [];
     return;
@@ -551,6 +564,7 @@ sub _fail_all {
         if (!$tx->is_terminal) {
             $tx->_fail($error);
             eval { $tx->_invoke('on_error', $error) };
+            $tx->_notify_finish;
         }
     }
     $self->{rx} = undef;
@@ -617,6 +631,23 @@ C<output()>.
 
 One Client object represents one HTTP/1 connection. Requests may be queued, but
 this implementation sends them serially. It does not enable HTTP/1 pipelining.
+
+=head1 RECEIVE BODY OPTIONS
+
+C<receive_body> accepts C<buffered> or C<stream>. Streaming remains the default.
+C<max_buffered_body_bytes> is a positive byte limit, defaulting to 64 MiB.
+Zero does not mean unlimited. Buffered reception installs the body on the
+same Uniform message before freezing it and invoking the body-completion
+callback. Empty completed bodies have an empty string representation.
+The engine releases retained chunks on failure or cancellation.
+
+Select streaming per transaction with C<$tx-E<gt>on_data(...)> during the
+header callback. Do not combine buffered mode with legacy C<on_body>.
+Do not combine C<on_data> and C<on_body>. See
+L<Unblock::HTTP1::Transaction/RECEIVE AND FINISH CALLBACKS>.
+
+A buffer limit failure closes the HTTP/1 connection.
+It does not call successful body completion.
 
 =head1 CONSTRUCTOR
 

@@ -1,5 +1,10 @@
 Revision history for Data-SpatialHash-Shared
 
+0.07  2026-10-16
+    - Keep frozen entries immutable during lock recovery.
+    - Fix 2D nearest-neighbor filtering and bound sparse searches.
+    - Release batch-query memory when numeric conversion fails.
+
 0.06      2026-09-26
           - A writer killed mid insert or remove is repaired from the live
             entries.

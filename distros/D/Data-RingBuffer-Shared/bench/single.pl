@@ -22,7 +22,9 @@ my $r = Data::RingBuffer::Shared::Int->new(undef, 1000);
 bench "write", $N, sub { $r->write($_) for 1..$N };
 bench "latest", $N, sub { $r->latest for 1..$N };
 bench "latest(10)", $N, sub { $r->latest(10) for 1..$N };
-bench "read_seq", $N, sub { $r->read_seq($_ % 1000) for 1..$N };
+my $available = $r->size;
+my $oldest = $r->head - $available;
+bench "read_seq", $N, sub { $r->read_seq($oldest + $_ % $available) for 1..$N };
 
 print "\nF64:\n";
 my $f = Data::RingBuffer::Shared::F64->new(undef, 1000);

@@ -1167,11 +1167,6 @@ sub _structural_signature {
         $stmt =~ s/\s+([)\]}])/$1/g;      # ... nor just inside a closing one
         $stmt =~ s/\A\s+//;
         $stmt =~ s/\s+\z//;
-        # k191: HashRef[X] and { X => 1 } are the same typed map, and the
-        # string map is one structure whether strict (HashRef[Str], what the
-        # emitter renders) or lenient ({ Str => 1 }, what lib carries): the
-        # lenient flag is a serialisation nuance, not structural drift.
-        $stmt =~ s/\bHashRef\[(\w+)\]/{$1 => 1}/g;
     }
     return join("\n", @stmts);
 }

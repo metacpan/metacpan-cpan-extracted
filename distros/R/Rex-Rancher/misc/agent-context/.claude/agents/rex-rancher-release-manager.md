@@ -9,6 +9,7 @@ briefing:
     - perl-release-dist-ini
     - getty-perl-core
     - rex-rancher-core
+    - rex-rancher-traps
     - kanban-issues-karr-ticket
 ---
 

@@ -1,6 +1,6 @@
 package IO::K8s::K3s::V1::HelmChartSpec;
 # ABSTRACT: HelmChartSpec represents the user-configurable details for installation and upgrade of a Helm chart release.
-our $VERSION = '1.110';
+our $VERSION = '1.111';
 use IO::K8s::Resource;
 
 k8s authPassCredentials   => Bool;
@@ -24,7 +24,7 @@ k8s repoCA                => Str;
 k8s repoCAConfigMap       => 'Core::V1::LocalObjectReference';
 k8s securityContext       => 'Core::V1::SecurityContext';
 k8s serverSide            => Str, { enum => [qw(true false auto)] };
-k8s set                   => { IntOrStr => 1 };
+k8s set                   => HashRef[IntOrStr];
 k8s takeOwnership         => Bool;
 k8s targetNamespace       => Str;
 k8s timeout               => Str, { pattern => "^([0-9]+(ns|us|\x{b5}s|ms|s|m|h)?)+\$" };
@@ -76,7 +76,7 @@ IO::K8s::K3s::V1::HelmChartSpec - HelmChartSpec represents the user-configurable
 
 =head1 VERSION
 
-version 1.110
+version 1.111
 
 =head2 authPassCredentials
 

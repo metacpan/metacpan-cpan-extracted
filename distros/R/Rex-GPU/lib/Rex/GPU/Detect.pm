@@ -1,7 +1,7 @@
 # ABSTRACT: GPU hardware detection via PCI class codes
 
 package Rex::GPU::Detect;
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 use v5.14.4;
 use warnings;
 
@@ -28,6 +28,11 @@ use vars qw(@EXPORT);
 # PCI class codes for display controllers
 # [0300] = VGA controller, [0302] = 3D controller (datacenter GPUs)
 my $PCI_DISPLAY_RE = qr/\[03(?:00|02)\]/;
+
+# [0380] = "Display controller" (karr #75): AMD Instinct MI100/MI200/MI300
+# enumerate there. Accepted for vendor 1002 only, never as a display class of
+# its own -- an NVIDIA device at [0380] stays unlisted, as before.
+my $AMD_ACCELERATOR_RE = qr/\[0380\]/;
 
 # Virtual GPU vendor IDs — skip these (no host driver needed): virtio,
 # QEMU/QXL, VMware, VirtualBox. Read through virtual_display_vendor_ids, by
@@ -75,7 +80,7 @@ sub detect {
   my $class = _invocant(@_) // return __PACKAGE__->configured_class->detect(@_);
   $class->_ensure_lspci;
 
-  my $pci_output = run "lspci -nn 2>&1 | grep -E '\\[03(00|02)\\]'",
+  my $pci_output = run "lspci -nn 2>&1 | grep -E '\\[03(00|02)\\]|\\[0380\\].*\\[1002:'",
     auto_die => 0;
 
   my $result = { nvidia => [], amd => [], nvswitch => [] };
@@ -92,6 +97,8 @@ sub detect {
   my $virtual = 0;
   my @nvidia_slots;
   for my $line (split /\n/, $pci_output) {
+    # [0380] counts for AMD only (karr #75), whatever the grep let through.
+    next if $line =~ $AMD_ACCELERATOR_RE && $line !~ $AMD_VENDOR_RE;
     if ($line =~ $NVIDIA_VENDOR_RE) {
       my $gpu = $class->_parse_nvidia_line($line);
       next unless $gpu;
@@ -459,7 +466,7 @@ Rex::GPU::Detect - GPU hardware detection via PCI class codes
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -484,7 +491,10 @@ C</sys/bus/pci/devices> instead, without C<lspci> (opt-in).
 
 PCI class codes C<0300> (VGA compatible controller) and C<0302> (3D
 controller) identify display/GPU hardware. The module filters C<lspci -nn>
-output for these class codes, then classifies devices by vendor ID:
+output for these class codes, then classifies devices by vendor ID. Class
+C<0380> (Display controller, where AMD Instinct MI100/MI200/MI300
+enumerate) is accepted for vendor C<1002> only; an NVIDIA device at C<0380>
+is not listed:
 
 =over
 

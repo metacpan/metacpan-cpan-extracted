@@ -4,7 +4,7 @@ package WWW::Hetzner::Role::IO;
 
 use Moo::Role;
 
-our $VERSION = '0.101';
+our $VERSION = '0.102';
 
 requires 'call';
 
@@ -22,7 +22,7 @@ WWW::Hetzner::Role::IO - Interface role for pluggable HTTP backends
 
 =head1 VERSION
 
-version 0.101
+version 0.102
 
 =head1 SYNOPSIS
 

@@ -19,6 +19,15 @@ print {$fh} <<'P';
 use strict; use warnings;
 use Data::Fenwick2D::Shared;
 my ($mnt, @args) = @ARGV;
+if ($ENV{RECOVER_FULL}) {
+    my $size = Data::Fenwick2D::Shared->new(undef, @args)->stats->{mmap_size};
+    open my $fh, '>', "$mnt/x.shm" or die $!;
+    truncate $fh, $size or die $!;
+    close $fh or die $!;
+    open $fh, '>', "$mnt/filler" or die $!;
+    print {$fh} 'x' x (4 * 1024 * 1024) or die $!;
+    close $fh or die $!;
+}
 my $h = eval { Data::Fenwick2D::Shared->new("$mnt/x.shm", @args) };
 print $h ? "created\n" : "refused: $@";
 P
@@ -48,5 +57,9 @@ diag $out unless $out =~ /^refused/;
 ($sig, $out) = on_small_tmpfs('', @big);
 is $sig, 0, 'by default: no signal';
 like $out, qr/^created/, '  it creates the sparse file';
+
+($sig, $out) = on_small_tmpfs('DATA_FENWICK2D_SHARED_SPARSE=0 RECOVER_FULL=1', 24, 7);
+is $sig, 0, 'recovering an unallocated file on a full tmpfs does not kill the process';
+like $out, qr/^refused: .*No space left on device/, '  reservation refuses it before a mapped read allocates a page';
 
 done_testing;
