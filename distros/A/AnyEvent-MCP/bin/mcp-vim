@@ -368,7 +368,7 @@ our $PORT;
 our $NICK;
 
 my $usage = "Usage: mcp-vim [OPTION]...\n";
-my %server_options = mcp_getoptions ({
+my $server_options = mcp_getoptions ({
    usage => $usage,
    path => "/",
    description => "Bridge live Vim buffers to MCP and browser WebSocket clients.\n"
@@ -380,11 +380,11 @@ my %server_options = mcp_getoptions ({
 }, "ask=s" => \my $ask);
 @ARGV and die $usage;
 
-my $name = $server_options{name};
-my $bind = $server_options{bind};
-my @tokens = @{$server_options{tokens} || []};
-my $connect = $server_options{connect};
-my $stdio = $server_options{stdio} || !defined $connect && $ENV{PERL_ANYEVENT_MCP_MULTIBROKER_PROTOCOL} eq "stdio";
+my $name = $server_options->{name};
+my $bind = $server_options->{bind};
+my @tokens = @{$server_options->{tokens} || []};
+my $connect = $server_options->{connect};
+my $stdio = $server_options->{stdio} || !defined $connect && $ENV{PERL_ANYEVENT_MCP_MULTIBROKER_PROTOCOL} eq "stdio";
 !($stdio && defined $connect) or die "Cannot combine --stdio and --connect\n";
 
 # private Vim/broker wire protocol (separate from the browser protocol)
@@ -909,7 +909,7 @@ my $permissions = AnyEvent::MCP::Server::Permissions->new (
       exec  => "Execute arbitrary Vim commands with full host-user privileges",
    },
    (defined $ask ? (ask => $ask) : ()),
-   auto_rules => [@{$server_options{auto_rules} || []},
+   auto_rules => [@{$server_options->{auto_rules} || []},
       $config->auto_rules ($name)],
 );
 
@@ -1566,7 +1566,7 @@ $toolset->tool (ex =>
    }
 );
 
-mcp_tool_help ($server_options{tool_help}, $toolset);
+mcp_tool_help ($server_options->{tool_help}, $toolset);
 
 my $instructions = <<'EOF';
    This server operates on live Vim editors and buffers, not filesystem snapshots.
@@ -1579,7 +1579,7 @@ my $instructions = <<'EOF';
    ex executes arbitrary Ex commands with full Vim privileges and separate exec permission; prefer narrower tools and simple commands.
 EOF
 
-my $custom_instructions = $server_options{custom_instructions}
+my $custom_instructions = $server_options->{custom_instructions}
    // $config->{section}{"instance $name"}{custom_instructions}
    // $config->{section}{"program " . AnyEvent::MCP::Config::program_name ()}{custom_instructions};
 my %guidance = (

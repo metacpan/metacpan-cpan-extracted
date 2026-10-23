@@ -61,6 +61,7 @@ lib/Playwright/Tracing.pm
 lib/Playwright/Util.pm
 lib/Playwright/Video.pm
 lib/Playwright/WebError.pm
+lib/Playwright/WebMCP.pm
 lib/Playwright/WebSocket.pm
 lib/Playwright/WebSocketFrame.pm
 lib/Playwright/WebSocketRoute.pm
@@ -74,6 +75,7 @@ t/author-cdp.t
 t/author-critic.t
 t/author-distmeta.t
 t/author-eol.t
+t/author-file_payloads.t
 t/author-js_dialogs.t
 t/author-minimum-version.t
 t/author-mojibake.t
@@ -89,3 +91,4 @@ t/release-cpan-changes.t
 t/release-dist-manifest.t
 t/release-kwalitee.t
 t/release-meta-json.t
+xt/lib/Playwright/AuthorTest.pm

@@ -1,7 +1,7 @@
 package Data::TimingWheel::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 require XSLoader;
 XSLoader::load('Data::TimingWheel::Shared', $VERSION);
 
@@ -98,8 +98,8 @@ including a negative delay, is treated as 1) carrying the integer C<$payload>,
 and returns an opaque timer id; it croaks if the timer pool is full. C<cancel>
 removes a still-pending timer by its id, returning 1 if it was cancelled or 0 if
 it had already fired or the id is not active. A timer id carries a generation
-tag, so cancelling a stale id whose slot has since been reused correctly returns
-0 rather than cancelling the unrelated timer now occupying that slot.
+tag, so a stale id does not cancel a reused slot until the tag wraps after 2^31
+uses of that slot.
 
 =head2 Advancing the clock
 

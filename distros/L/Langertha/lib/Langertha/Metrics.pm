@@ -1,7 +1,7 @@
 package Langertha::Metrics;
-our $VERSION = '0.503';
+our $VERSION = '0.504';
 our $DEPRECATED = 1;
-# ABSTRACT: DEPRECATED back-compat facade over Langertha::Usage / Pricing / Cost / UsageRecord — use the value objects directly
+# ABSTRACT: DEPRECATED back-compat facade over Langertha::Usage / Pricing / Cost / UsageRecord - use the value objects directly
 use strict;
 use warnings;
 use Carp ();
@@ -98,11 +98,11 @@ __END__
 
 =head1 NAME
 
-Langertha::Metrics - DEPRECATED back-compat facade over Langertha::Usage / Pricing / Cost / UsageRecord — use the value objects directly
+Langertha::Metrics - DEPRECATED back-compat facade over Langertha::Usage / Pricing / Cost / UsageRecord - use the value objects directly
 
 =head1 VERSION
 
-version 0.503
+version 0.504
 
 =head1 DEPRECATION
 

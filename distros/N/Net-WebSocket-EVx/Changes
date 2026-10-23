@@ -1,3 +1,8 @@
+0.22  2026-10-16
+    - Fix callback ownership, reentrant IO and close handshakes.
+    - Release queued callbacks on disconnect and improve masking entropy.
+    - Return empty strings for empty or unbuffered data messages.
+
 - 0.21
 	Fix memory safety and callback bugs, add rsv options, switch to ExtUtils::MakeMaker
 

@@ -64,6 +64,36 @@ sluz_test($sluz, '{!$true}'                               , ''            , 'Bas
 sluz_test($sluz, '{$car}'                                 , 'Honda'       , 'Basic #38 - String variable set from hash');
 sluz_test($sluz, '{$ltuae}'                               , '42'          , 'Basic #39 - Integer variable set from hash');
 sluz_test($sluz, '{$milk|join:":"}'                       , 'goat:cow:soy', 'Basic #40 - Array set from hash');
+sluz_test($sluz, '{$x - 3}'                               , '4'           , 'Basic #41 - Subtraction on a variable');
+sluz_test($sluz, '{3 - $x}'                               , '-4'          , 'Basic #42 - Subtraction with leading constant');
+sluz_test($sluz, '{$x / 2}'                               , '3.5'         , 'Basic #43 - Division on a variable');
+sluz_test($sluz, '{$x % 3}'                               , '1'           , 'Basic #44 - Modulo on a variable');
+sluz_test($sluz, '{$x * 3}'                               , '21'          , 'Basic #45 - Multiplication on a variable');
+sluz_test($sluz, '{$first . " " . $last}'                 , 'Scott Baker' , 'Basic #46 - String concatenation');
+sluz_test($sluz, '{$x > 3 ? "yes" : "no"}'                , 'yes'         , 'Basic #47 - Ternary expression');
+sluz_test($sluz, '{$number + $null}'                      , '15'          , 'Basic #48 - Mixed types: number + null');
+sluz_test($sluz, '{$number + $x}'                         , '22'          , 'Basic #49 - Mixed types: number + numeric string');
+sluz_test($sluz, '{$empty_string|default:"N/A"}'          , 'N/A'         , 'Basic #50 - Default with forward slash (empty)');
+sluz_test($sluz, '{$first|default:"N/A"}'                 , 'Scott'       , 'Basic #51 - Default with forward slash (non-empty)');
+sluz_test($sluz, '{$empty_string|default:"path/to/file"}' , 'path/to/file', 'Basic #52 - Default with path containing slashes');
+sluz_test($sluz, '{$empty_string|default:"yes/no"}'       , 'yes/no'      , 'Basic #53 - Default with slash abbreviation');
+sluz_test($sluz, '{$empty_string|default:"C:\\"}'         , 'C:\\'        , 'Basic #54 - Default with backslash');
+sluz_test($sluz, '{$animal|uc}'                           , 'KITTEN'      , 'Basic #55 - Modifier on a variable');
+sluz_test($sluz, '{$word|lc|ucfirst}'                     , 'Crazy'       , 'Basic #56 - Chaining modifiers');
+
+# Ported from PHP Basic #30-31, #49-55
+sluz_test($sluz, '{$bogus_var|default:"hello"|uc}',            'HELLO'     , 'Basic #57 - Default chained with modifier (empty var)');
+sluz_test($sluz, '{$last|default:"nobody"|uc}',                'BAKER'     , 'Basic #58 - Default chained with modifier (non-empty var)');
+sluz_test($sluz, '{$zero}',                                    '0'         , 'Basic #59 - Direct output of zero (falsy)');
+sluz_test($sluz, '{$true}',                                    '1'         , 'Basic #60 - Direct output of true');
+sluz_test($sluz, '{$false}',                                   '0'         , 'Basic #61 - Direct output of false (Perl 0 not empty)');
+sluz_test($sluz, '{$null}',                                    ''          , 'Basic #62 - Direct output of null (falsy)');
+sluz_test($sluz, '{$bogus_var|default:"a:b"}',                 'a:b'       , 'Basic #63 - Default with colon inside quotes');
+# Deep dotted path (PHP Basic #53-54) - setup deep hash
+$sluz->assign('deep', {a => {b => {c => 'deepval'}}});
+sluz_test($sluz, '{$deep.a.b.c}',                              'deepval'   , 'Basic #64 - Multi-level dot path (3 levels)');
+sluz_test($sluz, '{$deep.a.b.x|default:"dflt"}',               'dflt'      , 'Basic #65 - Multi-level dot path with default');
+sluz_test($sluz, '{$deep.a.b.c|default:"dflt"}',               'deepval'   , 'Basic #66 - Multi-level dot path with default (not used)');
 
 # -------------------------------------------------------------------
 # Custom/User functions
@@ -112,8 +142,8 @@ like($@, qr/73467/, 'Error #4 - syntax error');
 # -------------------------------------------------------------------
 # Plain text tests
 # -------------------------------------------------------------------
-sluz_test($sluz, 'Scott',              'Scott',              'Plain text #1 - Static text');
-sluz_test($sluz, '<div>Scott</div>',   '<div>Scott</div>',   'Plain text #2 - HTML');
+sluz_test($sluz, 'Scott'           , 'Scott'           , 'Plain text #1 - Static text');
+sluz_test($sluz, '<div>Scott</div>', '<div>Scott</div>', 'Plain text #2 - HTML');
 
 # -------------------------------------------------------------------
 # Bad block tests
@@ -155,6 +185,38 @@ $sluz->parent_tpl(undef);
 $sluz->{parent_tpl} = undef;
 
 # -------------------------------------------------------------------
+# Upstream PHP unit-test parity additions
+# -------------------------------------------------------------------
+
+sluz_test($sluz, '{$hashref.nested.nope|default:"dflt"}', 'dflt',
+    'Basic - Multi-level dotted path with default');
+
+sluz_test($sluz, '{$number > 3 ? "yes" : "no"}', 'yes',
+    'Basic - Ternary expression');
+
+sluz_test($sluz, '{$number + $null}', '15', 'Basic - Mixed types: number + null');
+# Upstream PHP unit tests expect 15 too (PHP null casts to 0 in arithmetic);
+# Perl undef also numerifies to 0, so both engines agree here.
+
+eval { $sluz->parse_string('{$number }') };
+like($@, qr/50981/, 'Basic - Trailing whitespace inside braces is invalid');
+
+eval { $sluz->parse_string('{ $number }') };
+like($@, qr/50981/, 'Basic - Leading whitespace inside braces is invalid');
+
+eval { $sluz->parse_string('{ 3 + 4 }') };
+like($@, qr/50981/, 'Basic - Whitespace around expression is invalid');
+
+# Assign a variable and render it back (upstream Basic #56/#57 pattern)
+$sluz->assign('upstream_roundtrip', 'RTVAL');
+sluz_test($sluz, '{$upstream_roundtrip}', 'RTVAL', 'Basic - Assigned and asserted roundtrip');
+
+# Assign-overwrite then restore
+$sluz->assign('upstream_overwrite', 'FIRST');
+$sluz->assign('upstream_overwrite', 'SECOND');
+sluz_test($sluz, '{$upstream_overwrite}', 'SECOND', 'Assign #3 - Overwrite previous value');
+
+# -------------------------------------------------------------------
 # Assign edge cases
 # -------------------------------------------------------------------
 eval { $sluz->assign('odd_args_test'); };
@@ -167,9 +229,6 @@ is($@, "", 'Assign #2 - Empty hashref (no-op)');
 # Variable edge cases
 # -------------------------------------------------------------------
 sluz_test($sluz, '{$hashref.nested.deep}',               'found',                     'Deep dive #1 - Three-level dotted hash access');
-sluz_test($sluz, '{$bogus_var}',                         '',                          'Deep dive #2 - Undefined variable returns empty');
-sluz_test($sluz, '{$null}',                              '',                          'Deep dive #3 - null variable returns empty');
-sluz_test($sluz, '{$array}',                             'ARRAY',                     'Deep dive #4 - Array returned as scalar');
 
 # -------------------------------------------------------------------
 # Error edge cases

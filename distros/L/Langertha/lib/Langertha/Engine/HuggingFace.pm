@@ -1,13 +1,15 @@
 package Langertha::Engine::HuggingFace;
 # ABSTRACT: HuggingFace Inference Providers API
-our $VERSION = '0.503';
+our $VERSION = '0.504';
 use Moose;
 use Carp qw( croak );
 use URI;
 
 extends 'Langertha::Engine::OpenAIBase';
 
-with 'Langertha::Role::Tools';
+# StreamUsage: the chat-completion task specification lists
+# stream_options.include_usage (ADR 0038).
+with 'Langertha::Role::Tools', 'Langertha::Role::StreamUsage';
 
 
 has '+url' => (
@@ -120,7 +122,7 @@ Langertha::Engine::HuggingFace - HuggingFace Inference Providers API
 
 =head1 VERSION
 
-version 0.503
+version 0.504
 
 =head1 SYNOPSIS
 

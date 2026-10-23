@@ -134,11 +134,24 @@ SUMMARY
         $content = "<p>" . loc("Scheduled reports are attached for dashboard ")
         . $dashboard->Name . "</p>";
 
-        my @searches = $dashboard->Searches();
+        # The subscription's dashboard is loaded as RT_System, which can see every
+        # search. Load the searches as the subscription owner, as
+        # /Dashboards/Render.html does.
+        my $owner_dashboard = RT::Dashboard->new($currentuser);
+        $owner_dashboard->LoadById( $dashboard->Id );
+        my @searches = $owner_dashboard->Searches();
         local $HTML::Mason::Commands::session{CurrentUser} = $context_user;
         # Run each search and push the resulting file into the @attachments array
         foreach my $search (@searches){
-            my $search_content = $search->Content;
+            # Skip searches that are missing, disabled, or hidden from the user, as
+            # /Elements/ShowSearch does. Content is empty when the user can't see
+            # the search.
+            my $search_content = $search->Id && !$search->Disabled ? $search->Content : undef;
+            unless ( $search_content ) {
+                RT->Logger->warning( "Unable to load saved search in dashboard " . $dashboard->Id . " for user " . $currentuser->Name . ", skipping" );
+                next;
+            }
+
             my $xlsx;
 
             if ( $search->Type =~ /Chart$/ ) {

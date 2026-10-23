@@ -1,0 +1,33 @@
+{
+  "schema_version": 2,
+  "ready": true,
+  "problems": 0,
+  "host": {
+    "os": "linux",
+    "name": "Linux",
+    "perl": "5.40.0",
+    "archname": "x86_64-linux"
+  },
+  "docker": {
+    "bin": "docker",
+    "client": "26.0.0",
+    "daemon": "26.0.0",
+    "containers": "linux"
+  },
+  "image": "alpine:3.20",
+  "mounts": [
+    {
+      "host": "/tmp/action-run-check-a1b2c3",
+      "container": "/action-run-check",
+      "ok": true
+    },
+    {
+      "host": "/home/dev/project",
+      "container": "/check-project",
+      "entries": 17,
+      "expected": 17,
+      "ok": true
+    }
+  ],
+  "issues": []
+}

@@ -13,7 +13,7 @@ install_share dist => "share";
 
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "The clan of fierce vikings with \x{1fa93} and \x{1f6e1}\x{fe0f} to AId your rAId",
+  "ABSTRACT" => "The clan of fierce vikings with axes and shields to AId your rAId",
   "AUTHOR" => "Torsten Raudssus <getty\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
@@ -67,7 +67,7 @@ my %WriteMakefileArgs = (
     "Test2::Suite" => 0,
     "Test::Perl::Critic" => 0
   },
-  "VERSION" => "0.503",
+  "VERSION" => "0.504",
   "test" => {
     "TESTS" => "t/*.t"
   }

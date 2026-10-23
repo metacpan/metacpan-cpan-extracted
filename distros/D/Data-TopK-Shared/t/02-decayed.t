@@ -153,4 +153,22 @@ my $LN2 = log(2);
     ok $ez == $ez && abs($ez - 1) < 0.5, 'tiny half-life: estimate stays ~1 (no stale accumulation)';
 }
 
+{
+    my $t = Data::TopK::Shared->new_decayed_memfd('clear-decay', 4, 16, 10);
+    my $peer = Data::TopK::Shared->new_from_fd($t->memfd);
+    $t->add('old', 1000);
+    $t->clear;
+    is $peer->seen, 0, 'decayed clear resets observations for every handle';
+    is $peer->estimate('old'), 0, 'decayed clear forgets old weights';
+    $peer->add('a', 10);
+    $t->add('b', 20);
+    cmp_ok abs($peer->estimate('a') - 0.5), '<', 1e-9,
+        'clear allows a fresh timestamp stream to decay normally';
+    is $t->estimate('b'), 1, 'new stream starts with unit weight';
+    $t->clear;
+    $t->add_many(['a', 'b']);
+    cmp_ok abs($t->estimate('a') - 2 ** (-1 / 10)), '<', 1e-9,
+        'implicit ticks also work after decayed clear';
+}
+
 done_testing;

@@ -349,4 +349,27 @@ my $func = "desync_$$";
     is $sub_err, 'disconnected', 'T-D2-7: submit callback got "disconnected"';
 }
 
+{
+    my $srv;
+    $srv = FakeGm->new(on_packet => sub {
+        my ($conn, $cmd, $body) = @_;
+        return unless $cmd == ECHO_REQ;
+        $srv->send($conn, ERROR, "JOB_NOT_FOUND\0Job expired");
+        $srv->send($conn, ECHO_RES, $body);
+    });
+    my (@errors, @result);
+    my $g = EV::Gearman->new(
+        host => '127.0.0.1', port => $srv->port,
+        on_error => sub { push @errors, $_[0] },
+    );
+    $g->echo('ping', sub { @result = @_; EV::break });
+    my $guard = EV::timer 3, 0, sub { EV::break };
+    EV::run;
+    is_deeply \@result, ['ping', undef],
+        'an expired worker job does not consume an unrelated echo callback';
+    is_deeply \@errors, ['JOB_NOT_FOUND: Job expired'],
+        'job expiry is reported at connection level';
+    is $g->pending_count, 0, 'echo response drains its own request';
+}
+
 done_testing;

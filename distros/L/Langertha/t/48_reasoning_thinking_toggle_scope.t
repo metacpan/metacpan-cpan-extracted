@@ -17,7 +17,9 @@ use Module::Runtime qw( require_module );
 # MoonshotAnthropic) emit the toggle; every other engine must send exactly what
 # it sent before the toggle rows existed. The expected bodies in
 # t/data/reasoning_thinking_toggle_scope_base.json were generated from the base
-# commit 4e7f9d8's lib/ (before k209), not hand-written.
+# commit 4e7f9d8's lib/ (before k209), not hand-written. The stream request's
+# stream_options (ADR 0038) came later and is no reasoning field, so it is
+# left out of the comparison rather than written into that base.
 
 my $canon = JSON::MaybeXS->new->canonical(1)->utf8(1);
 my $want  = $canon->decode( path('t/data/reasoning_thinking_toggle_scope_base.json')->slurp_raw );
@@ -28,8 +30,9 @@ for my $key ( sort keys %$want ) {
   require_module($class);
   my $engine = $class->new( url => 'http://localhost:1/v1', api_key => 'k', model => $model,
     ( $effort ne 'bare' ? ( reasoning_effort => $effort ) : () ), thinking_display => 'summarized' );
-  my $got = $canon->encode( $canon->decode(
-    $engine->$kind( [ { role => 'user', content => 'hi' } ] )->content ) );
+  my $body = $canon->decode( $engine->$kind( [ { role => 'user', content => 'hi' } ] )->content );
+  delete $body->{stream_options} if $kind eq 'chat_stream_request';
+  my $got = $canon->encode($body);
   is( $got, $want->{$key}, "unchanged since 4e7f9d8: $key" );
 }
 

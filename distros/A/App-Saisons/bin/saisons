@@ -1,0 +1,140 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use utf8;
+use open qw(:utf8);
+binmode STDOUT, ':utf8';
+binmode STDERR, ':utf8';
+# Windows has no HOME; normalize once so every "$ENV{HOME}/..." below works
+BEGIN { $ENV{HOME} //= $ENV{USERPROFILE} // '' }
+use lib "$ENV{HOME}/.local/lib";
+use lib 'lib';
+use Module::Pluggable (
+    search_path => 'App::Saisons::Adapter',
+    require     => 1,
+    inner       => 0,
+);
+use App::Saisons;
+use App::Saisons::UI;
+
+if (@ARGV && $ARGV[0] eq '--version') {
+    print 'saisons ' . App::Saisons::version_string() . "\n";
+    exit 0;
+}
+
+# ── load sessions from all adapters ──────────────────────────────────────────
+# To add a new agent: see lib/Saisons/Adapter/HOWTO.md
+
+my @adapters = map { $_->new }
+               grep { $_->can('find_sessions') }
+               plugins();
+
+my @sessions;
+my %running;
+
+# ── detect launcher ───────────────────────────────────────────────────────────
+
+my $launcher = $ENV{SAISONS_LAUNCHER} // $ENV{CLAUDE_SESSIONS_LAUNCHER} // do {
+    if    ($ENV{TMUX})                                          { 'tmux' }
+    elsif ($ENV{STY})                                           { 'screen' }
+    elsif (($ENV{DISPLAY} || $ENV{WAYLAND_DISPLAY})
+           && `which gnome-terminal 2>/dev/null` =~ /\S/)      { 'gnome-terminal' }
+    elsif (($ENV{TERM_PROGRAM} // '') eq 'iTerm.app')          { 'iterm' }
+    elsif ($^O eq 'darwin')                                     { 'terminal-app' }
+    else                                                        { 'inline' }
+};
+
+# ── UI loop — keep running until user quits ───────────────────────────────────
+
+my $ui = App::Saisons::UI->new;
+
+while (1) {
+    # Refresh sessions and running state each iteration
+    @sessions = ();
+    %running  = ();
+    for my $adapter (@adapters) {
+        push @sessions, $adapter->find_sessions;
+        %running = (%running, $adapter->running);
+    }
+    @sessions = sort { $b->{date} cmp $a->{date} } @sessions;
+    die "No sessions found.\n" unless @sessions;
+
+    my @selected = $ui->interactive_select(\@sessions, \%running);
+
+    # Empty selection means the user pressed q/ESC — exit
+    last unless @selected;
+
+    # Launch selected sessions then loop back to the list
+    my %by_adapter;
+    for my $s (@selected) {
+        push @{ $by_adapter{ ref $s->{_adapter} } }, $s;
+    }
+    for my $group (values %by_adapter) {
+        $group->[0]{_adapter}->launch($group, $launcher);
+    }
+}
+
+__END__
+
+=head1 NAME
+
+saisons - browse and resume AI coding agent sessions from one list
+
+=head1 SYNOPSIS
+
+    saisons
+    saisons --version
+
+=head1 DESCRIPTION
+
+saisons lists the coding agent sessions it finds on the machine - Claude
+Code, OpenAI Codex, Gemini CLI, Aider and opencode - in one terminal UI.
+The list shows each session's agent, age, size, path and title, and can be
+filtered, searched full-text, grouped and sorted.
+
+Pressing ENTER resumes the selected sessions by running each agent's
+resume command in the session's directory: in a new tmux or screen window,
+a new terminal tab, or inline in the current terminal, depending on the
+environment.
+
+=head1 KEYS
+
+    Up/Down, j/k     move            /        filter (title, path, date)
+    PgUp/PgDn        page            ?        full-text search
+    Home/End, g/G    top / bottom    Alt+C    toggle case sensitivity
+    Space            toggle select   s        sort mode (arrows pick)
+    a / A            select all/none S        flip sort direction
+    ENTER            open selected   t        cycle grouping
+    v                view history    r        refresh running markers
+    d                delete          m        move to other directory
+    q / ESC          quit
+
+With a filter or search active, ENTER, delete and move act only on the
+selected sessions it shows.
+
+=head1 ENVIRONMENT
+
+=over 4
+
+=item SAISONS_LAUNCHER
+
+Where selected sessions open: C<tmux>, C<screen>, C<gnome-terminal>,
+C<iterm>, C<terminal-app> or C<inline>. Without it, saisons picks one from
+the environment. The old name C<CLAUDE_SESSIONS_LAUNCHER> still works.
+
+=item SAISONS_SEARCH_DIRS
+
+Colon-separated directories to scan for Aider history files, instead of
+the default project directories.
+
+=back
+
+=head1 AUTHOR
+
+Nicolas Mendoza E<lt>mendoza@pvv.ntnu.noE<gt>
+
+=head1 LICENSE
+
+This software is licensed under the Artistic License 2.0.
+
+=cut

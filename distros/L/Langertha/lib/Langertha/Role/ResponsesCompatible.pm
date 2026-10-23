@@ -1,6 +1,6 @@
 package Langertha::Role::ResponsesCompatible;
 # ABSTRACT: Role for the Open-Responses wire envelope (input/instructions/output[])
-our $VERSION = '0.503';
+our $VERSION = '0.504';
 use Moose::Role;
 use Carp qw( croak carp );
 use JSON::MaybeXS;
@@ -728,7 +728,7 @@ Langertha::Role::ResponsesCompatible - Role for the Open-Responses wire envelope
 
 =head1 VERSION
 
-version 0.503
+version 0.504
 
 =head1 SYNOPSIS
 

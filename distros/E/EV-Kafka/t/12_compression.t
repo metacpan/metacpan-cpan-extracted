@@ -6,7 +6,21 @@ use EV::Kafka;
 
 my $broker = $ENV{TEST_KAFKA_BROKER} || '127.0.0.1:9092';
 plan skip_all => 'set TEST_KAFKA_BROKER to run' unless $ENV{TEST_KAFKA_BROKER};
-plan tests => 8;
+
+# Gate per codec: produce() croaks for a codec that was not built in,
+# which would abort the whole async chain below. Probe the built
+# artifact: a real encode sets the compression bits (attrs low byte at
+# offset 22), encode without the codec falls back to uncompressed.
+my %code = (gzip => 1, snappy => 2, lz4 => 3, zstd => 4);
+my @codecs = grep {
+    my $b = eval {
+        EV::Kafka::_test_encode_batch([{ key => 'k', value => 'x' x 64 }],
+            { compression => $code{$_} });
+    };
+    defined($b) && (ord(substr($b, 22, 1)) & 0x07) == $code{$_};
+} qw(gzip lz4 zstd snappy);
+
+plan tests => 4 + @codecs;
 
 my ($host, $port) = split /:/, $broker;
 my $conn = EV::Kafka::Conn::_new('EV::Kafka::Conn', undef);
@@ -20,54 +34,53 @@ $conn->on_connect(sub {
         my $t; $t = EV::timer 1, 0, sub {
             undef $t;
 
-            # produce with gzip
-            $conn->produce('compress-test', 0, 'gzip-key', 'gzip-value' x 10,
-                { compression => 'gzip' }, sub {
-                my ($res, $err) = @_;
-                ok !$err, 'gzip produce ok';
-                my $offset = $res->{topics}[0]{partitions}[0]{base_offset};
-                diag "gzip produced at offset $offset";
-
-                # produce with lz4
-                $conn->produce('compress-test', 0, 'lz4-key', 'lz4-value' x 10,
-                    { compression => 'lz4' }, sub {
-                    my ($res2, $err2) = @_;
-                    ok !$err2, 'lz4 produce ok';
-
-                    # produce with zstd
-                    $conn->produce('compress-test', 0, 'zstd-key', 'zstd-value' x 10,
-                        { compression => 'zstd' }, sub {
-                        my ($rzs, $ezs) = @_;
-                        ok !$ezs, 'zstd produce ok';
-
-                        # produce with snappy
-                        $conn->produce('compress-test', 0, 'snappy-key', 'snappy-value' x 10,
-                            { compression => 'snappy' }, sub {
-                            my ($rsn, $esn) = @_;
-                            ok !$esn, 'snappy produce ok';
-
-                            # produce uncompressed
-                            $conn->produce('compress-test', 0, 'none-key', 'none-value', sub {
-                                my ($res3, $err3) = @_;
-                                ok !$err3, 'uncompressed produce ok';
-
-                                # fetch all back
-                                $conn->fetch('compress-test', 0, $offset, sub {
-                                    my ($fres, $ferr) = @_;
-                                    ok !$ferr, 'fetch ok';
-                                    my $recs = $fres->{topics}[0]{partitions}[0]{records};
-                                    ok scalar @$recs >= 5, "fetched " . scalar(@$recs) . " records";
-                                    for my $r (@$recs) {
-                                        diag "  key=$r->{key} value_len=" . length($r->{value} // '');
-                                    }
-                                    $conn->disconnect;
-                                    EV::break;
-                                });
-                            });
+            my $offset;
+            my @steps = (
+                (map {
+                    my $codec = $_;
+                    sub {
+                        my ($next) = @_;
+                        $conn->produce('compress-test', 0, "$codec-key", "$codec-value" x 10,
+                            { compression => $codec }, sub {
+                            my ($res, $err) = @_;
+                            ok !$err, "$codec produce ok";
+                            if (!$err) {
+                                $offset //= $res->{topics}[0]{partitions}[0]{base_offset};
+                                diag "$codec produced at offset $offset";
+                            }
+                            $next->();
                         });
+                    };
+                } @codecs),
+                sub {
+                    my ($next) = @_;
+                    $conn->produce('compress-test', 0, 'none-key', 'none-value', sub {
+                        my ($res, $err) = @_;
+                        ok !$err, 'uncompressed produce ok';
+                        $offset //= $res->{topics}[0]{partitions}[0]{base_offset}
+                            if !$err;
+                        $next->();
                     });
-                });
-            });
+                },
+                sub {
+                    $conn->fetch('compress-test', 0, $offset // 0, sub {
+                        my ($fres, $ferr) = @_;
+                        ok !$ferr, 'fetch ok';
+                        my $recs = $fres->{topics}[0]{partitions}[0]{records};
+                        ok scalar @$recs >= 1 + @codecs, "fetched " . scalar(@$recs) . " records";
+                        for my $r (@$recs) {
+                            diag "  key=$r->{key} value_len=" . length($r->{value} // '');
+                        }
+                        $conn->disconnect;
+                        EV::break;
+                    });
+                },
+            );
+            my $run; $run = sub {
+                my $step = shift @steps;
+                $step->($run);
+            };
+            $run->();
         };
     });
 });

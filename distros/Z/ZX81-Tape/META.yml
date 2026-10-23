@@ -27,5 +27,5 @@ requires:
   Text::Diff: '1.46'
   ZX81: '0.001'
   ZX81::Tokenize: '0.004'
-version: '0.005'
+version: '0.006'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

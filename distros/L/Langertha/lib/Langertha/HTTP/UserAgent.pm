@@ -1,6 +1,6 @@
 package Langertha::HTTP::UserAgent;
 # ABSTRACT: LWP::UserAgent that keeps credentials on their origin across redirects
-our $VERSION = '0.503';
+our $VERSION = '0.504';
 use Moose;
 use MooseX::NonMoose;
 
@@ -252,7 +252,7 @@ Langertha::HTTP::UserAgent - LWP::UserAgent that keeps credentials on their orig
 
 =head1 VERSION
 
-version 0.503
+version 0.504
 
 =head1 SYNOPSIS
 

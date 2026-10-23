@@ -32,7 +32,7 @@ sub first_frame { # bytes a server-mode object put on the wire (unmasked)
     $ws->$method(@args);
     drain(0.2);
     sysread($b, my $buf, 4096);
-    return $buf // '';
+    return defined($buf) ? $buf : '';
 }
 
 subtest 'DESTROY is idempotent' => sub {
@@ -76,15 +76,15 @@ subtest 'the caller keeps ownership of the descriptor' => sub {
 
 subtest 'unsent fragmented source callbacks are released' => sub {
     my $gen = sub { ('data') };   # never reaches EOF
-    my $before = Devel::Peek::SvREFCNT($gen);
+    my $before = Devel::Peek::SvREFCNT(&$gen);
     {
         my ($a, $b) = pair();
         my $ws = server($a);
         $ws->stop_write;
         $ws->queue_fragmented($gen, 2);
-        is(Devel::Peek::SvREFCNT($gen), $before + 1, 'queueing holds a reference');
+        is(Devel::Peek::SvREFCNT(&$gen), $before + 1, 'queueing holds a reference');
     }
-    is(Devel::Peek::SvREFCNT($gen), $before, 'destroying with the message unsent gives it back');
+    is(Devel::Peek::SvREFCNT(&$gen), $before, 'destroying with the message unsent gives it back');
 };
 
 subtest 'a dying callback does not corrupt or leak the object' => sub {
@@ -213,20 +213,20 @@ subtest 'fragmented message aborted with WS_FRAGMENTED_ERROR' => sub {
     my $closed = 0;
     my $n = 0;
     my $gen = sub { $n++ ? ('', WS_FRAGMENTED_ERROR) : ('chunk') };
-    my $before = Devel::Peek::SvREFCNT($gen);
+    my $before = Devel::Peek::SvREFCNT(&$gen);
     my $srv = server($a, on_close => sub { $closed = 1 });
     my $cli = client($b);
     $srv->queue_fragmented($gen, 2);
     drain(0.5);
     ok($closed, 'the connection is torn down');
-    is(Devel::Peek::SvREFCNT($gen), $before, 'and the source callback is released');
+    is(Devel::Peek::SvREFCNT(&$gen), $before, 'and the source callback is released');
 };
 
 subtest 'replacing the wait() callback' => sub {
     my ($a, $b) = pair();
     my $first_ran = 0;
     my $first = sub { $first_ran++ };
-    my $before = Devel::Peek::SvREFCNT($first);
+    my $before = Devel::Peek::SvREFCNT(&$first);
     my $second_ran = 0;
     my $srv = server($a);
     my $cli = client($b);
@@ -236,7 +236,7 @@ subtest 'replacing the wait() callback' => sub {
     drain(0.5);
     is($first_ran, 0, 'the replaced callback does not fire');
     is($second_ran, 1, 'the replacement does');
-    is(Devel::Peek::SvREFCNT($first), $before, 'and the replaced one is released');
+    is(Devel::Peek::SvREFCNT(&$first), $before, 'and the replaced one is released');
 };
 
 subtest 'stop_read / start_read cycle' => sub {
@@ -261,7 +261,7 @@ subtest 'messages with extended payload lengths' => sub {
         my $cli = client($b);
         $cli->queue_msg('x' x $size, 2);
         drain(2);
-        is(length($got // ''), $size, "a $size byte message round-trips intact");
+        is(length(defined($got) ? $got : ''), $size, "a $size byte message round-trips intact");
     }
 };
 

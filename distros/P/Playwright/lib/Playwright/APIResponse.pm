@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::APIResponse;
-$Playwright::APIResponse::VERSION = '1.621';
+$Playwright::APIResponse::VERSION = '1.641';
 use parent 'Playwright::Base';
 
 sub new {
@@ -22,56 +22,6 @@ sub spec {
     return $Playwright::spec->{'APIResponse'}{members};
 }
 
-sub text {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'text',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub statusText {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'statusText',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub body {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'body',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub status {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'status',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub headersArray {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'headersArray',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
 sub serverAddr {
     my $self = shift;
     return $self->_api_request(
@@ -82,11 +32,11 @@ sub serverAddr {
     );
 }
 
-sub timing {
+sub ok {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'timing',
+        command => 'ok',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -112,11 +62,41 @@ sub json {
     );
 }
 
-sub securityDetails {
+sub url {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'securityDetails',
+        command => 'url',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub text {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'text',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub statusText {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'statusText',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub status {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'status',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -132,21 +112,41 @@ sub dispose {
     );
 }
 
-sub ok {
+sub headersArray {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'ok',
+        command => 'headersArray',
         object  => $self->{guid},
         type    => $self->{type}
     );
 }
 
-sub url {
+sub securityDetails {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'url',
+        command => 'securityDetails',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub timing {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'timing',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub body {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'body',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -196,7 +196,7 @@ Playwright::APIResponse - Automatically generated class for Playwright::APIRespo
 
 =head1 VERSION
 
-version 1.621
+version 1.641
 
 =head1 CONSTRUCTOR
 
@@ -207,47 +207,17 @@ Instead it should be returned to you as the result of calls on Playwright object
 
 =head1 METHODS
 
-=head2 text(@args)
-
-Execute the APIResponse::text playwright routine.
-
-See L<https://playwright.dev/docs/api/class-APIResponse#APIResponse-text> for more information.
-
-=head2 statusText(@args)
-
-Execute the APIResponse::statusText playwright routine.
-
-See L<https://playwright.dev/docs/api/class-APIResponse#APIResponse-statusText> for more information.
-
-=head2 body(@args)
-
-Execute the APIResponse::body playwright routine.
-
-See L<https://playwright.dev/docs/api/class-APIResponse#APIResponse-body> for more information.
-
-=head2 status(@args)
-
-Execute the APIResponse::status playwright routine.
-
-See L<https://playwright.dev/docs/api/class-APIResponse#APIResponse-status> for more information.
-
-=head2 headersArray(@args)
-
-Execute the APIResponse::headersArray playwright routine.
-
-See L<https://playwright.dev/docs/api/class-APIResponse#APIResponse-headersArray> for more information.
-
 =head2 serverAddr(@args)
 
 Execute the APIResponse::serverAddr playwright routine.
 
 See L<https://playwright.dev/docs/api/class-APIResponse#APIResponse-serverAddr> for more information.
 
-=head2 timing(@args)
+=head2 ok(@args)
 
-Execute the APIResponse::timing playwright routine.
+Execute the APIResponse::ok playwright routine.
 
-See L<https://playwright.dev/docs/api/class-APIResponse#APIResponse-timing> for more information.
+See L<https://playwright.dev/docs/api/class-APIResponse#APIResponse-ok> for more information.
 
 =head2 headers(@args)
 
@@ -261,11 +231,29 @@ Execute the APIResponse::json playwright routine.
 
 See L<https://playwright.dev/docs/api/class-APIResponse#APIResponse-json> for more information.
 
-=head2 securityDetails(@args)
+=head2 url(@args)
 
-Execute the APIResponse::securityDetails playwright routine.
+Execute the APIResponse::url playwright routine.
 
-See L<https://playwright.dev/docs/api/class-APIResponse#APIResponse-securityDetails> for more information.
+See L<https://playwright.dev/docs/api/class-APIResponse#APIResponse-url> for more information.
+
+=head2 text(@args)
+
+Execute the APIResponse::text playwright routine.
+
+See L<https://playwright.dev/docs/api/class-APIResponse#APIResponse-text> for more information.
+
+=head2 statusText(@args)
+
+Execute the APIResponse::statusText playwright routine.
+
+See L<https://playwright.dev/docs/api/class-APIResponse#APIResponse-statusText> for more information.
+
+=head2 status(@args)
+
+Execute the APIResponse::status playwright routine.
+
+See L<https://playwright.dev/docs/api/class-APIResponse#APIResponse-status> for more information.
 
 =head2 dispose(@args)
 
@@ -273,17 +261,29 @@ Execute the APIResponse::dispose playwright routine.
 
 See L<https://playwright.dev/docs/api/class-APIResponse#APIResponse-dispose> for more information.
 
-=head2 ok(@args)
+=head2 headersArray(@args)
 
-Execute the APIResponse::ok playwright routine.
+Execute the APIResponse::headersArray playwright routine.
 
-See L<https://playwright.dev/docs/api/class-APIResponse#APIResponse-ok> for more information.
+See L<https://playwright.dev/docs/api/class-APIResponse#APIResponse-headersArray> for more information.
 
-=head2 url(@args)
+=head2 securityDetails(@args)
 
-Execute the APIResponse::url playwright routine.
+Execute the APIResponse::securityDetails playwright routine.
 
-See L<https://playwright.dev/docs/api/class-APIResponse#APIResponse-url> for more information.
+See L<https://playwright.dev/docs/api/class-APIResponse#APIResponse-securityDetails> for more information.
+
+=head2 timing(@args)
+
+Execute the APIResponse::timing playwright routine.
+
+See L<https://playwright.dev/docs/api/class-APIResponse#APIResponse-timing> for more information.
+
+=head2 body(@args)
+
+Execute the APIResponse::body playwright routine.
+
+See L<https://playwright.dev/docs/api/class-APIResponse#APIResponse-body> for more information.
 
 =head2 on(@args)
 

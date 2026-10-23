@@ -14,7 +14,7 @@ use parent 'Data::TagDB::Link';
 
 use Carp;
 
-our $VERSION = v0.14;
+our $VERSION = v0.15;
 
 
 
@@ -74,7 +74,7 @@ Data::TagDB::Metadata - Work with Tag databases
 
 =head1 VERSION
 
-version v0.14
+version v0.15
 
 =head1 SYNOPSIS
 

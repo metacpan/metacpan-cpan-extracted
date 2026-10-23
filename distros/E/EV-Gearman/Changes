@@ -1,5 +1,10 @@
 Revision history for EV::Gearman
 
+0.03  2026-10-16
+    - Fix reconnect and callback ownership across connection changes.
+    - Fail queued work consistently and reject stale worker jobs.
+    - Validate protocol arguments and preserve reply ordering.
+
 0.02    2026-07-24
         - Memory safety hardening
 

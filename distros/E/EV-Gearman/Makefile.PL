@@ -30,8 +30,9 @@ WriteMakefile(
         'EV::MakeMaker'       => 0,
     },
     PREREQ_PM => {
-        'EV'       => '4.11',
-        'XSLoader' => '0.02',
+        'EV'           => '4.11',
+        'Scalar::Util' => '0',
+        'XSLoader'     => '0.02',
     },
     TEST_REQUIRES => {
         'Test::More' => '0.98',
@@ -48,6 +49,14 @@ WriteMakefile(
 
     META_MERGE => {
         'meta-spec' => { version => 2 },
+        prereqs => {
+            develop => {
+                requires => {
+                    # tools/gen-readme.pl, run by `make dist`
+                    'Pod::Markdown' => '0',
+                },
+            },
+        },
         resources => {
             repository => {
                 type => 'git',

@@ -1,6 +1,6 @@
 ---
 name: langertha-github-issues
-description: Use whenever GitHub, the gh CLI, public issues, pull requests or user bug reports come up in Langertha. Not the agent work board — that is kanban-issues-karr-cli.
+description: Use whenever GitHub, the gh CLI, public issues, pull requests or user bug reports come up in Langertha. Not the agent work board — that is kanban-issues-karr-coordination.
 ---
 
 # Langertha GitHub User Issues (`gh`)

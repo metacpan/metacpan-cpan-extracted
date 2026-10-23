@@ -229,4 +229,26 @@ is(scalar @dup2, 1, 'the failed duplicate does not fire again');
         'and the registration is dropped';
 }
 
+{
+    my $c = EV::Telegram::TDLib->new(api_id => 1, api_hash => 'x', auto_auth => 0);
+    my (@old, @new, @uploads);
+    $c->on_upload(31, sub { push @uploads, $_[0] });
+    $c->download(31, on_progress => sub {
+        $c->cancel_download(31);
+        $c->download(31, sub { push @new, [@_] });
+    }, sub { push @old, [@_] });
+    my $finished = q({"@type":"updateFile","file":{"id":31,)
+                 . q("local":{"is_downloading_completed":true},)
+                 . q("remote":{"is_uploading_active":true}}});
+    $c->inject_raw($finished);
+    is scalar @old, 1, 'cancel from on_progress resolves the old download once';
+    is $old[0][1]{message}, 'download canceled', 'cancellation keeps its outcome';
+    is scalar @new, 0, 'the old update does not complete the replacement';
+    ok $c->downloads->{31}, 'the replacement remains registered';
+    is scalar @uploads, 1, 'upload progress still receives the same update';
+    $c->inject_raw($finished);
+    is scalar @new, 1, 'the replacement completes on its own update';
+    is $new[0][1], undef, 'the replacement succeeds';
+}
+
 done_testing;

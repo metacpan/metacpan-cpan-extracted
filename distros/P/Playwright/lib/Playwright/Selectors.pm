@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::Selectors;
-$Playwright::Selectors::VERSION = '1.621';
+$Playwright::Selectors::VERSION = '1.641';
 use parent 'Playwright::Base';
 
 sub new {
@@ -86,7 +86,7 @@ Playwright::Selectors - Automatically generated class for Playwright::Selectors
 
 =head1 VERSION
 
-version 1.621
+version 1.641
 
 =head1 CONSTRUCTOR
 

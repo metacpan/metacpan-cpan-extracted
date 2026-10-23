@@ -10,6 +10,9 @@ use Test2::Plugin::NoWarnings;    ## no critic (ProhibitUnusedImports)
 use FindBin::libs;
 use File::Temp qw{tempdir};
 use File::Slurper::Temp();
+use DBI();
+use POSIX();
+use Time::HiRes();
 use DBD::SQLite::Constants qw{SQLITE_LIMIT_VARIABLE_NUMBER};
 
 use Trog::SQLite;
@@ -47,6 +50,76 @@ subtest 'dbh: the schema, and the pragmas that let processes share the file' => 
     is( Trog::SQLite::dbh( $schema, $file ), $db, 'a second call gets the cached handle' );
     Trog::SQLite::forget();
     ok( Trog::SQLite::dbh( $schema, $file ) != $db, 'and after forget, a new one' );
+};
+
+# A file in the default journal mode, as a new one is, where another process
+# holds a write transaction open for $seconds.  Returns the pid of that process
+# once it holds the lock.
+sub hold_write_lock {
+    my ( $file, $seconds ) = @_;
+
+    my $setup = DBI->connect( "dbi:SQLite:dbname=$file", q{}, q{}, { RaiseError => 1, PrintError => 0 } );
+    $setup->do($V0);
+    $setup->disconnect();
+
+    pipe( my $locked_r, my $locked_w ) or die "pipe: $!";
+    my $pid = fork() // die "fork: $!";
+    if ( !$pid ) {
+        close($locked_r) or POSIX::_exit(1);
+        my $holder = DBI->connect( "dbi:SQLite:dbname=$file", q{}, q{}, { RaiseError => 1, PrintError => 0 } );
+        $holder->do('BEGIN IMMEDIATE');
+        $holder->do(q{INSERT INTO things (name) VALUES ('held')});
+        print {$locked_w} "locked\n";
+        close($locked_w) or POSIX::_exit(1);
+        Time::HiRes::sleep($seconds);
+        $holder->do('COMMIT');
+        POSIX::_exit(0);
+    }
+    close($locked_w) or die "close: $!";
+    my $said = <$locked_r>;
+    die "The process that holds the lock said nothing\n" if !defined $said;
+    return $pid;
+}
+
+subtest 'dbh: a file that another process is writing waits for it, and is still set to WAL' => sub {
+    Trog::SQLite::forget();
+    my ( $schema, $file ) = schema_dir($V0);
+    my $pid = hold_write_lock( $file, 0.5 );
+
+    my $db = eval { Trog::SQLite::dbh( $schema, $file ) };
+    waitpid( $pid, 0 );
+    ok( $db, 'dbh waits for it rather than dying' ) or diag $@;
+    is( lc $db->selectrow_array('PRAGMA journal_mode'), 'wal', 'and sets WAL once the lock is gone' ) if $db;
+    is( $?,                                             0,     'and the other process finished its write' );
+};
+
+subtest 'dbh: a lock that outlasts the busy timeout is an error' => sub {
+    Trog::SQLite::forget();
+    my ( undef, $file ) = schema_dir($V0);
+    local $Trog::SQLite::BUSY_TIMEOUT = 200;
+    my $pid = hold_write_lock( $file, 1 );
+
+    # No schema, so that only the pragmas can fail.
+    my $db    = eval { Trog::SQLite::dbh( undef, $file ) };
+    my $error = $@;
+    waitpid( $pid, 0 );
+    is( $db, undef, 'dbh gives up' );
+    like( $error, qr/database[ ]is[ ]locked/, 'and says why' );
+};
+
+subtest 'dbh: an error other than a lock is not tried again' => sub {
+    Trog::SQLite::forget();
+    my ( undef, $file ) = schema_dir($V0);
+
+    # Not a read-only file, because root writes one anyway.
+    File::Slurper::Temp::write_text( $file, 'not a database ' x 100 );
+
+    my $start = Time::HiRes::time();
+    my $db    = eval { Trog::SQLite::dbh( undef, $file ) };
+    my $error = $@;
+    is( $db, undef, 'dbh refuses a file that is not a database' );
+    like( $error, qr/not[ ]a[ ]database/, 'and says why' );
+    cmp_ok( Time::HiRes::time() - $start, '<', 1, 'at once, not after the busy timeout' );
 };
 
 subtest 'dbh: each update once, in order, on a new database and on an old one' => sub {

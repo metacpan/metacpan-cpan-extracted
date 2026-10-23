@@ -6,7 +6,7 @@ use Carp 'croak';
 use EV;
 
 BEGIN {
-    our $VERSION = '0.08';
+    our $VERSION = '0.09';
     use XSLoader;
     XSLoader::load __PACKAGE__, $VERSION;
 }
@@ -41,7 +41,7 @@ sub new {
 
     my $self = $class->_new($args{loop} || EV::default_loop);
 
-    $self->on_error($args{on_error} || sub { die @_ });
+    $self->on_error($args{on_error} // sub { die @_ });
     $self->on_connect($args{on_connect}) if $args{on_connect};
 
     for my $key (@OPTION_KEYS) {
@@ -237,6 +237,7 @@ Allow multiple SQL statements per query string. B<Note:> only the first
 statement's result set is returned to the callback; secondary result sets
 are consumed and discarded. Errors in secondary statements are delivered
 via the C<on_error> handler.
+The first result callback or stream EOF is delivered after this drain.
 
 =item found_rows => 1
 
@@ -300,10 +301,12 @@ Methods divide into two scheduling classes:
 
 =item B<Queueable>
 
-C<query> can be called at any time the object is alive -- before connect
-completes, while a utility op is running, or while other queries are
-already in flight. Calls are pipelined and their callbacks fire in
-FIFO order.
+C<query> can be called before connect completes, while a utility
+op (C<ping>, C<select_db>, C<change_user>, C<reset_connection>,
+C<set_charset>, C<commit>, C<rollback>, C<autocommit>) is running, or
+while other queries are already in flight. Calls are pipelined and
+their callbacks fire in FIFO order. It croaks while a statement,
+streaming, or close operation is in flight (see L</query>).
 
 =item B<Exclusive>
 
@@ -335,8 +338,9 @@ C<user> is provided; use this directly for deferred connection:
 
 C<$port> defaults to C<3306>. C<$password>, C<$database>, and
 C<$unix_socket> may be empty strings or C<undef> when not needed.
-Dies with C<"already connected"> or C<"connection already in progress">
-if invoked twice on the same object.
+Dies with C<"already connected"> while connected, or C<"connection
+already in progress"> while a connection attempt is still running.
+After C<finish>, C<connect> may be called again on the same object.
 
 =head2 query
 
@@ -363,10 +367,12 @@ On error: C<(undef, $error_message)>.
 
 Queries are pipelined (see L</PIPELINING>): consecutive C<query> calls
 are dispatched as a batch and their callbacks fire in FIFO order. Safe
-to call before C<connect> completes or while an exclusive op
-(C<ping>, C<select_db>, ...) is in flight -- the query is buffered
-until the connection is idle. Dies with C<"not connected"> if no
-connection exists (never connected, or already closed via C<finish>).
+to call before C<connect> completes or while a utility op is in
+flight -- the query is buffered until the connection is idle. Croaks
+C<"cannot queue query: exclusive operation in progress"> while a
+statement, streaming, or close op is in flight (op classes are
+listed under L</METHODS>). Dies with C<"not connected"> if no connection
+exists (never connected, or already closed via C<finish>).
 
 By default, result strings are returned as raw bytes. Set
 C<< utf8 => 1 >> in the constructor to flag UTF-8 columns automatically;
@@ -382,7 +388,8 @@ the opaque C<$stmt> handle to C<execute>, C<bind_params>,
 C<send_long_data>, C<stmt_reset>, and C<close_stmt>.
 
 A prepared statement is invalidated by C<reset>, C<reset_connection>,
-C<change_user>, and C<finish>. Re-prepare after any of these.
+C<change_user>, C<close_async>, and C<finish>. Re-prepare after any of
+these.
 
 =head2 execute
 
@@ -394,6 +401,9 @@ types are detected from the SV: integers bind as C<MYSQL_TYPE_LONGLONG>
 C<MYSQL_TYPE_DOUBLE>, everything else as C<MYSQL_TYPE_STRING>. Pass
 C<undef> for C<NULL>. The callback receives results in the same shape
 as L</query>.
+
+For stored procedures, secondary results are drained before the callback;
+an error in any result is delivered to the callback.
 
 Pass C<undef> instead of C<\@params> to skip parameter binding and
 re-use parameters set by a prior C<bind_params>/C<send_long_data>.
@@ -408,17 +418,23 @@ is no longer needed, to free server-side state promptly; otherwise
 cleanup happens at object destruction.
 
 Already-invalidated handles (after C<reset>/C<reset_connection>/
-C<change_user>) are accepted: the callback fires synchronously with
-C<(1, undef)> and the wrapper is freed.
+C<change_user>/C<close_async>) are accepted: the callback fires
+synchronously with C<(1, undef)> and the wrapper is freed. After
+C<close_async> this still requires a live connection, so C<reset>
+must reconnect first -- until then the call croaks
+C<"not connected"> like every other operation.
 
 =head2 stmt_reset
 
     $m->stmt_reset($stmt, sub { my ($ok, $err) = @_ });
 
-Resets a prepared statement (clears errors, unbinds parameters)
-without closing it. Croaks
+Resets a prepared statement (clears errors, discards data sent via
+C<send_long_data>) without closing it. Parameter bindings are
+retained: C<execute($stmt, undef, $cb)> after a reset re-uses the
+previously bound values. Croaks
 C<"statement handle is no longer valid (connection was reset)"> on a
-handle invalidated by C<reset>/C<reset_connection>/C<change_user>.
+handle invalidated by C<reset>/C<reset_connection>/C<change_user>/
+C<close_async>.
 
 =head2 ping
 
@@ -518,6 +534,14 @@ result sets. No other queries can be queued while streaming is active.
 Gracefully closes the connection asynchronously (C<COM_QUIT> without
 blocking the event loop). C<is_connected> returns false once the
 callback has fired. Use C<finish> for an immediate synchronous close.
+
+B<Note:> Every statement handle held by Perl code is automatically
+marked closed; subsequent C<execute>/C<stmt_reset> calls on those
+handles croak C<"statement handle is no longer valid (connection was reset)">
+once reconnected. Until C<reset> reconnects, the handle is not
+connected at all, so C<execute>/C<stmt_reset>/C<close_stmt> (like
+every other operation) croak C<"not connected"> instead.
+Re-prepare any statements you need after reconnecting with C<reset>.
 
 =head2 send_long_data
 

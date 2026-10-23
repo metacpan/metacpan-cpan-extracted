@@ -13,6 +13,7 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <string.h>
+#include <signal.h>
 #include <zlib.h>
 
 #define CH_MAX_DECOMPRESS_SIZE (128 * 1024 * 1024)  /* 128 MB safety limit */
@@ -69,6 +70,12 @@ typedef struct ev_loop* EV__Loop;
 #define DBMS_MIN_REVISION_WITH_PROGRESS_WRITES     54420
 #define DBMS_MIN_REVISION_WITH_SERVER_TIMEZONE     54423
 #define DBMS_MIN_PROTOCOL_VERSION_WITH_ADDENDUM    54458
+#define DBMS_MIN_REVISION_WITH_PARAMETERS          54459
+/* Highest revision whose fields we unconditionally emit (ClientHello
+ * parallel_replicas) or consume (Data custom-serialization flag):
+ * older servers desync instead of erroring, so Hello below this
+ * fails fast. */
+#define DBMS_MIN_SUPPORTED_SERVER_REVISION        54453
 
 /* Client packet types */
 #define CLIENT_HELLO  0
@@ -113,19 +120,29 @@ typedef struct ev_loop* EV__Loop;
 struct ev_clickhouse_s {
     unsigned int magic;
     struct ev_loop *loop;
+    SV *loop_sv;                /* owned ref to the EV::Loop guts (mirrors
+                                   EV watchers): keeps a custom loop alive
+                                   while our watchers are registered */
 
     int fd;
     ev_io rio, wio;
     ev_timer timer;
     int reading, writing, timing;
     int connected, connecting;
+    int handshaking;            /* TCP up, TLS/ServerHello still pending;
+                                   queues like connecting, never "ready" */
     int dns_pending;            /* set while EV::cares is resolving the host;
                                    query()/insert()/ping() queue against this
                                    state so calls between new() and connect
                                    don't croak with "not connected" */
-    unsigned int connect_gen;   /* bumped by every start_connect; lets
-                                   fail_connection notice when the user
-                                   started a new connect from on_error */
+    int in_disconnect;          /* set while on_disconnect runs; lets the
+                                   handler queue queries per the documented
+                                   contract (they dispatch on reconnect, or
+                                   error at teardown if none comes) */
+    unsigned int connect_gen;   /* bumped by every start_connect and by
+                                   finish; lets fail_connection and the other
+                                   teardown paths notice when the user took
+                                   over from inside a callback */
     int protocol;               /* PROTO_HTTP or PROTO_NATIVE */
 
 #ifdef HAVE_OPENSSL
@@ -230,6 +247,27 @@ struct ev_clickhouse_s {
                                    * io_cb completes finish_connect after drain */
     ev_timer reconnect_timer;
     int reconnect_timing;
+    int cancel_after_meta;    /* cancel() during NATIVE_WAIT_INSERT_META:
+                               * the sample-block reply path appends
+                               * CLIENT_CANCEL after the data block instead
+                               * of letting send_replace drop it */
+    int in_trace;           /* emit_trace re-entry guard: a trace handler
+                               * that calls reset()/finish() would otherwise
+                               * recurse through a fresh trace; nested
+                               * emissions drop while this is set */
+    int force_zero_dur;     /* one-shot: the next on_query_complete reports
+                               * dur 0.0 (consumed by the fire, for teardown
+                               * of never-dispatched entries) */
+    int in_dispatch;        /* set while on_query_start runs: the entry is
+                               * dequeued but send_count isn't bumped yet, so
+                               * cancel() consults this instead of no-op'ing */
+    int dispatch_cancelled; /* cancel() from on_query_start (native): drop
+                               * the staged entry without writing anything */
+    int cancelled;          /* native CLIENT_CANCEL sent for the in-flight
+                               * query: EOS then reports "query cancelled"
+                               * instead of a misleading empty success */
+    unsigned dispatch_seq;  /* bumped per dispatch; lets on_query_complete
+                               * tell a nested dispatch from its own query */
     /* on_progress throttling (0 = fire every packet) */
     double progress_period;
     double progress_last;          /* ev_now() of last on_progress dispatch */
@@ -261,6 +299,16 @@ struct ev_ch_send_s {
     SV          *on_complete;    /* per-query on_query_complete override */
     double       query_timeout;  /* per-query timeout */
     char        *query_id;       /* query_id for tracking */
+    /* Pre-connect native builds: server_revision is unknown at enqueue,
+     * so the packet (whose params block depends on it) is built at
+     * dispatch from these retained inputs. data==NULL while deferred;
+     * non-NULL deferred_sql marks the entry. Snapshots: owned copies. */
+    char        *deferred_sql;
+    size_t       deferred_sql_len;
+    HV          *deferred_defaults;
+    HV          *deferred_overrides;
+    char        *deferred_ext;
+    size_t       deferred_ext_len;
     ngx_queue_t  queue;
 };
 
@@ -277,14 +325,22 @@ static void start_writing(ev_clickhouse_t *self);
 static void stop_writing(ev_clickhouse_t *self);
 static void emit_error(ev_clickhouse_t *self, const char *msg);
 static void emit_trace(ev_clickhouse_t *self, const char *fmt, ...);
-static int cleanup_connection(ev_clickhouse_t *self);
-static int  cancel_pending(ev_clickhouse_t *self, const char *errmsg);
+static int cleanup_connection(ev_clickhouse_t *self, int reconnecting);
+static int  cancel_pending(ev_clickhouse_t *self, const char *errmsg,
+                             int fail_requeues);
+static int  cancel_or_preserve(ev_clickhouse_t *self, const char *errmsg);
 static int  check_destroyed(ev_clickhouse_t *self);
 static char *safe_strdup(const char *s);
+static void store_conn_params(ev_clickhouse_t *self, const char *host,
+                              unsigned int port, const char *user,
+                              const char *password, const char *database);
 static void failover_free(ev_clickhouse_t *self);
 static int  finish_connect(ev_clickhouse_t *self);
 static int  try_write(ev_clickhouse_t *self);
 static int  pipeline_advance(ev_clickhouse_t *self);
+#ifdef HAVE_OPENSSL
+static void capture_tls_error(ev_clickhouse_t *self);
+#endif
 
 /* Two helpers shared between the PL_dirty and normal arms of DESTROY:
  * adding a new on_* slot or persistent string requires touching only
@@ -497,9 +553,9 @@ static int teardown_io_error(ev_clickhouse_t *self, const char *emit_msg,
     emit_error(self, emit_msg);
     if (check_destroyed(self)) return 1;
     if (self->connect_gen != gen) return 0;
-    if (cancel_pending(self, cancel_msg)) return 1;
+    if (cancel_or_preserve(self, cancel_msg)) return 1;
     if (self->connect_gen != gen) return 0;
-    return cleanup_connection(self);   /* 1 if on_disconnect freed self */
+    return cleanup_connection(self, 0);   /* 1 if on_disconnect freed self */
 }
 
 static int fail_connection(ev_clickhouse_t *self, const char *msg) {
@@ -507,6 +563,19 @@ static int fail_connection(ev_clickhouse_t *self, const char *msg) {
     if (teardown_io_error(self, msg, msg)) return 1;
     /* gen mismatch means user reset() inside a callback — don't override
      * their new connect with an auto-reconnect. */
+    if (self->connect_gen == gen && self->auto_reconnect && self->host)
+        schedule_reconnect(self);
+    return 0;
+}
+
+/* teardown_io_error that also re-arms auto_reconnect. cancel_or_preserve
+ * keeps the send queue on a connected auto_reconnect handle, so a bare
+ * teardown strands those entries (never dispatched, never failed). */
+static int teardown_io_error_reconnect(ev_clickhouse_t *self,
+                                       const char *emit_msg,
+                                       const char *cancel_msg) {
+    int gen = self->connect_gen;
+    if (teardown_io_error(self, emit_msg, cancel_msg)) return 1;
     if (self->connect_gen == gen && self->auto_reconnect && self->host)
         schedule_reconnect(self);
     return 0;
@@ -540,6 +609,7 @@ static void emit_trace(ev_clickhouse_t *self, const char *fmt, ...) {
     char buf[512];
     va_list ap;
     if (!self->on_trace) return;
+    if (self->in_trace) return;
     va_start(ap, fmt);
     vsnprintf(buf, sizeof(buf), fmt, ap);
     va_end(ap);
@@ -547,6 +617,7 @@ static void emit_trace(ev_clickhouse_t *self, const char *fmt, ...) {
     /* Guard callback_depth; deliberately skip check_destroyed because most
      * callers continue to use self after emit_trace — outer check_destroyed
      * picks up the EV_CH_FREED state on the next opportunity. */
+    self->in_trace = 1;
     self->callback_depth++;
     {
         dSP;
@@ -561,6 +632,7 @@ static void emit_trace(ev_clickhouse_t *self, const char *fmt, ...) {
         LEAVE;
     }
     self->callback_depth--;
+    self->in_trace = 0;
 }
 
 /* Pop the head cb_queue entry. If `out_on_complete` is non-NULL, the
@@ -641,8 +713,13 @@ static void fire_on_query_complete_ex(ev_clickhouse_t *self, const char *errmsg,
                                        SV *override) {
     SV *target = override ? override : self->on_query_complete;
     if (!target) return;
-    double dur = self->query_start_time > 0
+    double dur = self->force_zero_dur ? 0.0
+               : self->query_start_time > 0
                ? ev_now(self->loop) - self->query_start_time : 0.0;
+    /* Consumed by this fire: a nested teardown during the handler must
+     * see the real start time, not a leaked zero. */
+    self->force_zero_dur = 0;
+    unsigned seq0 = self->dispatch_seq;
     self->callback_depth++;
     {
         dSP;
@@ -662,11 +739,13 @@ static void fire_on_query_complete_ex(ev_clickhouse_t *self, const char *errmsg,
         FREETMPS; LEAVE;
     }
     self->callback_depth--;
-    /* Reset so a subsequent fire for a never-dispatched cancelled
-     * query (e.g. from cancel_pending draining send_queue) sees
-     * query_start_time == 0 and reports dur = 0.0, not a stale
-     * duration carried over from the previous in-flight query. */
-    self->query_start_time = 0;
+    /* Reset the start time only when nothing remains in flight: a queued
+     * entry's fire must not consume the live start time a nested teardown
+     * during its handler still needs (queued fires report dur 0.0 via
+     * force_zero_dur instead). Skip the reset when the handler dispatched
+     * a nested query (seq bumped) — the start time is the nested query's. */
+    if (self->dispatch_seq == seq0 && ngx_queue_empty(&self->cb_queue))
+        self->query_start_time = 0;
 }
 
 /* IS_KEEPALIVE_CB is defined in xs/macros.h; keepalive_noop_cb is the
@@ -759,9 +838,9 @@ static int teardown_after_deliver(ev_clickhouse_t *self,
     int gen = self->connect_gen;
     if (deliver_error(self, deliver_msg)) return 1;
     if (self->connect_gen != gen) return 0;
-    if (cancel_pending(self, cancel_msg)) return 1;
+    if (cancel_or_preserve(self, cancel_msg)) return 1;
     if (self->connect_gen != gen) return 0;
-    return cleanup_connection(self);   /* 1 if on_disconnect freed self */
+    return cleanup_connection(self, 0);   /* 1 if on_disconnect freed self */
 }
 
 /* on_complete refcount: caller transfers an already-owned ref (or NULL).
@@ -781,6 +860,9 @@ static void push_cb_owned_ex(ev_clickhouse_t *self, SV *cb, int raw,
 
 static SV* handler_accessor(SV **slot, SV *handler, int has_arg) {
     if (has_arg) {
+        if (handler && SvOK(handler)
+            && !(SvROK(handler) && SvTYPE(SvRV(handler)) == SVt_PVCV))
+            croak("handler must be a CODE reference or undef");
         CLEAR_SV(*slot);
         if (handler && SvROK(handler) && SvTYPE(SvRV(handler)) == SVt_PVCV) {
             *slot = SvREFCNT_inc(handler);
@@ -851,15 +933,26 @@ static int is_ip_literal(const char *s) {
 
 /* Tears down the socket + per-connection state, then fires on_disconnect.
  * Returns 1 if on_disconnect freed self (caller must not touch self), else 0. */
-static int cleanup_connection(ev_clickhouse_t *self) {
-    int was_connected = self->connected;
+static void stop_reconnect(ev_clickhouse_t *self) {
+    if (self->reconnect_timing) {
+        ev_timer_stop(self->loop, &self->reconnect_timer);
+        self->reconnect_timing = 0;
+    }
+}
 
-    if (was_connected) emit_trace(self, "disconnect");
-    stop_reading(self);
-    stop_writing(self);
-    stop_keepalive(self);
-    stop_timing(self);
+/* OpenSSL teardown as file-scope helpers: preprocessor conditionals are
+ * not allowed inside braced XSUB bodies (xsubpp mangles them), so the
+ * DESTROY arms and dump_state call these instead of #ifdef inline. */
+static void ch_ssl_free(ev_clickhouse_t *self) {
+#ifdef HAVE_OPENSSL
+    if (self->ssl) { SSL_free(self->ssl); self->ssl = NULL; }
+    if (self->ssl_ctx) { SSL_CTX_free(self->ssl_ctx); self->ssl_ctx = NULL; }
+#else
+    (void)self;
+#endif
+}
 
+static void ch_ssl_shutdown_free(ev_clickhouse_t *self) {
 #ifdef HAVE_OPENSSL
     if (self->ssl) {
         SSL_shutdown(self->ssl);
@@ -870,7 +963,39 @@ static int cleanup_connection(ev_clickhouse_t *self) {
         SSL_CTX_free(self->ssl_ctx);
         self->ssl_ctx = NULL;
     }
+#else
+    (void)self;
 #endif
+}
+
+static int ch_tls_active(ev_clickhouse_t *self) {
+#ifdef HAVE_OPENSSL
+    return self->ssl ? 1 : 0;
+#else
+    (void)self;
+    return 0;
+#endif
+}
+
+static int cleanup_connection(ev_clickhouse_t *self, int reconnecting) {
+    int was_connected = self->connected;
+
+    if (was_connected) {
+        int gen = self->connect_gen;
+        emit_trace(self, "disconnect");
+        /* The handler may have reset()/finished (or dropped $ch): a
+         * nested reset already tore down and reconnected — continuing
+         * would destroy the new connection. */
+        if (self->magic != EV_CH_MAGIC) return 1;
+        if (self->connect_gen != gen) return 0;
+    }
+    stop_reading(self);
+    stop_writing(self);
+    stop_keepalive(self);
+    stop_timing(self);
+    stop_reconnect(self);
+
+    ch_ssl_shutdown_free(self);
 
     if (self->fd >= 0) {
         close(self->fd);
@@ -879,6 +1004,7 @@ static int cleanup_connection(ev_clickhouse_t *self) {
 
     self->connected = 0;
     self->connecting = 0;
+    self->handshaking = 0;
     self->dns_pending = 0;       /* finish/reset interrupts async DNS */
     self->send_len = 0;
     self->send_pos = 0;
@@ -891,6 +1017,9 @@ static int cleanup_connection(ev_clickhouse_t *self) {
     self->http_chunk_active = 0;
     self->send_count = 0;
     self->pending_addendum_finish = 0;
+    self->cancel_after_meta = 0;
+    self->dispatch_cancelled = 0;
+    self->cancelled = 0;
     self->native_state = NATIVE_IDLE;
     CLEAR_SV(self->native_rows);
     CLEAR_SV(self->native_col_names);
@@ -905,8 +1034,18 @@ static int cleanup_connection(ev_clickhouse_t *self) {
      * new queries or calls reconnect sees clean state. The handler can
      * drop the last $ch ref (-> DESTROY); propagate that so callers
      * don't touch a freed self. */
-    if (was_connected && self->on_disconnect)
-        return fire_zero_arg_cb(self, self->on_disconnect, "disconnect");
+    if (was_connected && self->on_disconnect) {
+        int rc;
+        self->in_disconnect = 1;
+        rc = fire_zero_arg_cb(self, self->on_disconnect, "disconnect");
+        if (!rc) {
+            self->in_disconnect = 0;
+            if (!reconnecting && !self->auto_reconnect && !self->connected && !self->connecting &&
+                !self->handshaking && !self->dns_pending && !self->reconnect_timing)
+                return cancel_pending(self, "connection closed", 0);
+        }
+        return rc;
+    }
     return 0;
 }
 
@@ -934,28 +1073,48 @@ static void fire_err_and_complete(ev_clickhouse_t *self, SV *cb,
 }
 
 /* Drain in-flight cb_queue, delivering errmsg to each callback and resetting
- * send_count. Caller manages callback_depth. */
+ * send_count. Caller manages callback_depth. Aborts if a callback
+ * reconnected (reset()/connect() bumps connect_gen): the remaining
+ * entries belong to the new generation — firing them with the old
+ * teardown error would deliver a phantom error to a live query, and
+ * zeroing send_count would desync the new generation's in-flight
+ * accounting. */
 static void drain_cb_queue(ev_clickhouse_t *self, const char *errmsg) {
+    int gen = self->connect_gen;
     while (!ngx_queue_empty(&self->cb_queue)) {
         SV *oqc = NULL;
         SV *cb = pop_cb_ex(self, &oqc);
         if (cb == NULL) break;
         fire_err_and_complete(self, cb, errmsg, oqc);
         if (self->magic != EV_CH_MAGIC) break;
+        if (self->connect_gen != gen) break;
     }
-    self->send_count = 0;
+    if (self->connect_gen == gen)
+        self->send_count = 0;
 }
 
-/* Returns 1 if self was freed. */
-static int cancel_pending(ev_clickhouse_t *self, const char *errmsg) {
+/* Returns 1 if self was freed. Abandons the drain if a callback
+ * reconnected (connect_gen changed): an inner reset()/connect() already
+ * settled the old generation's queues, and anything queued since
+ * belongs to the live connection — firing it with the stale teardown
+ * error would deliver phantom errors to live queries. */
+static int cancel_pending(ev_clickhouse_t *self, const char *errmsg,
+                            int fail_requeues) {
+    int gen = self->connect_gen;
     self->callback_depth++;
 
+    /* Entries queued during the cb phase below: fail them right away
+     * when the connection is going away (they could never dispatch),
+     * else leave them queued for the reconnect/dispatch that follows. */
+again:
     while (!ngx_queue_empty(&self->send_queue)) {
         ngx_queue_t *q = ngx_queue_head(&self->send_queue);
         ev_ch_send_t *send = ngx_queue_data(q, ev_ch_send_t, queue);
         SV *cb  = send->cb;
         SV *oqc = send->on_complete;     /* transfer ownership for fire below */
+        char *qid = send->query_id;      /* adopted for the fire below */
         send->on_complete = NULL;
+        send->query_id = NULL;
         ngx_queue_remove(q);
         Safefree(send->data);
         CLEAR_INSERT(send);
@@ -963,10 +1122,80 @@ static int cancel_pending(ev_clickhouse_t *self, const char *errmsg) {
         release_send(send);
         self->pending_count--;
 
-        fire_err_and_complete(self, cb, errmsg, oqc);
+        /* Never-dispatched entries report dur 0.0 via the one-shot
+         * flag; the shared query_start_time stays live throughout (a
+         * nested teardown during the handler still measures the
+         * in-flight query correctly). The entry's own query_id is
+         * adopted for the fire; last_query_id still names an older
+         * (possibly in-flight) query and must not leak across. */
+        unsigned seq0 = self->dispatch_seq;
+        char *qid0 = self->last_query_id;
+        self->last_query_id = qid;
+        self->force_zero_dur = 1;
+        /* Inline fire_err_and_complete: the adopted id must be restored
+         * BEFORE any user code runs, so nested teardown/dispatch during
+         * the handlers sees the live id (and a nested CLEAR frees only
+         * what is current then). */
+        if (!IS_KEEPALIVE_CB(cb))
+            fire_on_query_complete_ex(self, errmsg, oqc);
+        self->force_zero_dur = 0;
+        if (self->dispatch_seq == seq0 && self->connect_gen == gen) {
+            CLEAR_STR(self->last_query_id);
+            self->last_query_id = qid0;
+        } else if (qid0) {
+            /* Nested teardown/dispatch already replaced (and freed)
+             * our adopted id; the pre-fire id it displaced is ours. */
+            Safefree(qid0);
+        }
+        if (oqc) SvREFCNT_dec(oqc);
+        /* A user error callback may drop the last ref to $ch (DESTROY
+         * runs deferred while callback_depth > 0). invoke_err_cb itself
+         * is safe either way — the magic check below handles the rest. */
+        invoke_err_cb(cb, errmsg);
         if (self->magic != EV_CH_MAGIC) break;
+        if (self->connect_gen != gen) break;
     }
 
+    if (self->magic == EV_CH_MAGIC && self->connect_gen == gen) {
+        drain_cb_queue(self, errmsg);
+        if (fail_requeues && self->magic == EV_CH_MAGIC
+            && self->connect_gen == gen
+            && !ngx_queue_empty(&self->send_queue))
+            goto again;
+
+        /* A registered drain waiter must not hang: every queue is drained,
+         * so pending work is settled (with errors) — release the waiter.
+         * Skip when a callback re-queued work or dropped the last $ch ref. */
+        if (self->magic == EV_CH_MAGIC && self->on_drain
+            && ngx_queue_empty(&self->send_queue)
+            && ngx_queue_empty(&self->cb_queue)
+            && self->pending_count == 0) {
+            SV *drain_cb = self->on_drain;
+            self->on_drain = NULL;
+            (void)fire_zero_arg_cb(self, drain_cb, "drain");
+            SvREFCNT_dec(drain_cb);
+        }
+    }
+
+    self->callback_depth--;
+    return check_destroyed(self);
+}
+
+/* Teardown variant for a live (connected==1) link: entries still in
+ * send_queue were never sent, so with auto_reconnect they are preserved
+ * for redispatch after the reconnect instead of failing. In-flight
+ * cb_queue entries are irrecoverable and fire the error. Without
+ * auto_reconnect, or with nothing queued, everything fails. Connect-phase
+ * failures (connected==0) always fail fast: queries must not hang
+ * silently across backoff before the first byte flows. Exhaustion and
+ * finish()/reset() drain preserved entries, so nothing strands.
+ * Returns 1 if self was freed. */
+static int cancel_or_preserve(ev_clickhouse_t *self, const char *errmsg) {
+    if (!self->connected || !self->auto_reconnect
+        || ngx_queue_empty(&self->send_queue))
+        return cancel_pending(self, errmsg,
+                              !(self->auto_reconnect && self->host));
+    self->callback_depth++;
     drain_cb_queue(self, errmsg);
     self->callback_depth--;
     return check_destroyed(self);
@@ -991,6 +1220,7 @@ static ssize_t ch_read(ev_clickhouse_t *self, void *buf, size_t len) {
                 return -1;
             }
             if (err == SSL_ERROR_ZERO_RETURN) return 0;
+            capture_tls_error(self);
             errno = EIO;
             return -1;
         }
@@ -1016,6 +1246,7 @@ static ssize_t ch_write(ev_clickhouse_t *self, const void *buf, size_t len) {
                 errno = EAGAIN;
                 return -1;
             }
+            capture_tls_error(self);
             errno = EIO;
             return -1;
         }
@@ -1245,44 +1476,27 @@ static int is_client_only_key(const char *key, I32 klen) {
         || (klen == 17 && memcmp(key, "on_query_complete", 17) == 0);
 }
 
-/* Upper bound on bytes needed for "&key=value" URL-encoded settings pairs. */
-static size_t settings_url_params_size(HV *defaults, HV *overrides) {
-    size_t total = 0;
-    HE *entry;
-    if (overrides) {
-        hv_iterinit(overrides);
-        while ((entry = hv_iternext(overrides))) {
-            I32 klen;
-            STRLEN vlen;
-            char *key = hv_iterkey(entry, &klen);
-            if (is_client_only_key(key, klen)) continue;
-            (void)SvPV(hv_iterval(overrides, entry), vlen);
-            total += 2 + (size_t)klen * 3 + (size_t)vlen * 3;
-        }
-    }
-    if (defaults) {
-        hv_iterinit(defaults);
-        while ((entry = hv_iternext(defaults))) {
-            I32 klen;
-            STRLEN vlen;
-            char *key = hv_iterkey(entry, &klen);
-            if (overrides && hv_exists(overrides, key, klen))
-                continue;  /* overridden */
-            if (is_client_only_key(key, klen)) continue;
-            (void)SvPV(hv_iterval(defaults, entry), vlen);
-            total += 2 + (size_t)klen * 3 + (size_t)vlen * 3;
-        }
-    }
-    return total;
+/* Append one "&key=encoded_value" pair, growing the buffer. */
+static void append_url_param(native_buf_t *b, const char *key, size_t klen,
+                             const char *val, size_t vlen) {
+    /* Guard the *3 arithmetic itself against size_t wraparound. */
+    if (klen > (SIZE_MAX - 64) / 3 || vlen > (SIZE_MAX - 64) / 3)
+        croak("URL parameter too large");
+    nbuf_grow(b, 2 + klen * 3 + vlen * 3);
+    b->data[b->len++] = '&';
+    b->len += url_encode(key, klen, b->data + b->len);
+    b->data[b->len++] = '=';
+    b->len += url_encode(val, vlen, b->data + b->len);
 }
 
 /* Append merged settings as URL params (&key=encoded_value).
  * Extracts query_id into *query_id_out (caller must not free — points into HV).
  * Per-query overrides take precedence over connection defaults.
- * Returns new position in params buffer. */
-static size_t append_settings_url_params(char *params, size_t plen,
-                                          HV *defaults, HV *overrides,
-                                          const char **query_id_out, STRLEN *query_id_len_out) {
+ * Single pass: each value is SvPV'd exactly once, so tied/magic values
+ * cannot change size between a sizing pass and the fill. */
+static void append_settings_url_params(native_buf_t *b,
+                                        HV *defaults, HV *overrides,
+                                        const char **query_id_out, STRLEN *query_id_len_out) {
     HE *entry;
     *query_id_out = NULL;
     *query_id_len_out = 0;
@@ -1294,17 +1508,18 @@ static size_t append_settings_url_params(char *params, size_t plen,
             I32 klen;
             STRLEN vlen;
             char *key = hv_iterkey(entry, &klen);
-            char *val = SvPV(hv_iterval(overrides, entry), vlen);
+            SV *sv = hv_iterval(overrides, entry);
+            char *val;
+            if (SvGMAGICAL(sv)) mg_get(sv);   /* tied settings: FETCH */
+            if (!SvOK(sv)) continue;   /* undef value means absent */
+            val = SvPV_nomg(sv, vlen); /* already FETCHed above */
             if (klen == 8 && memcmp(key, "query_id", 8) == 0) {
                 *query_id_out = val;
                 *query_id_len_out = vlen;
                 continue;
             }
             if (is_client_only_key(key, klen)) continue;
-            params[plen++] = '&';
-            plen += url_encode(key, (size_t)klen, params + plen);
-            params[plen++] = '=';
-            plen += url_encode(val, vlen, params + plen);
+            append_url_param(b, key, (size_t)klen, val, vlen);
         }
     }
     /* Write defaults, skipping keys present in overrides */
@@ -1314,9 +1529,13 @@ static size_t append_settings_url_params(char *params, size_t plen,
             I32 klen;
             STRLEN vlen;
             char *key = hv_iterkey(entry, &klen);
-            char *val = SvPV(hv_iterval(defaults, entry), vlen);
+            SV *sv = hv_iterval(defaults, entry);
+            char *val;
             if (overrides && hv_exists(overrides, key, klen))
                 continue;
+            if (SvGMAGICAL(sv)) mg_get(sv);   /* tied settings: FETCH */
+            if (!SvOK(sv)) continue;   /* undef value means absent */
+            val = SvPV_nomg(sv, vlen); /* already FETCHed above */
             if (klen == 8 && memcmp(key, "query_id", 8) == 0) {
                 if (!*query_id_out) {
                     *query_id_out = val;
@@ -1325,32 +1544,35 @@ static size_t append_settings_url_params(char *params, size_t plen,
                 continue;
             }
             if (is_client_only_key(key, klen)) continue;
-            params[plen++] = '&';
-            plen += url_encode(key, (size_t)klen, params + plen);
-            params[plen++] = '=';
-            plen += url_encode(val, vlen, params + plen);
+            append_url_param(b, key, (size_t)klen, val, vlen);
         }
     }
-    return plen;
 }
 
 /* Write merged param_* entries as native parameters block.
  * Format: (String name, VarUInt flags=2, String quoted-value)* — name is the
- * portion after the "param_" prefix. Caller writes the empty-name terminator. */
-static void write_native_params(native_buf_t *b, HV *defaults, HV *overrides) {
+ * portion after the "param_" prefix. Caller writes the empty-name terminator.
+ * Returns the number of entries written. */
+static int write_native_params(native_buf_t *b, HV *defaults, HV *overrides) {
     HE *entry;
+    int count = 0;
     if (overrides) {
         hv_iterinit(overrides);
         while ((entry = hv_iternext(overrides))) {
             I32 klen;
             STRLEN vlen;
             char *key = hv_iterkey(entry, &klen);
-            char *val = SvPV(hv_iterval(overrides, entry), vlen);
+            SV *sv = hv_iterval(overrides, entry);
+            char *val;
             if (klen <= 6 || memcmp(key, "param_", 6) != 0) continue;
+            if (SvGMAGICAL(sv)) mg_get(sv);   /* tied settings: FETCH */
+            if (!SvOK(sv)) continue;   /* undef value means absent */
+            val = SvPV_nomg(sv, vlen); /* already FETCHed above */
             nbuf_varuint(b, (uint64_t)(klen - 6));
             nbuf_append(b, key + 6, (size_t)(klen - 6));
             nbuf_varuint(b, 2);  /* flags: CUSTOM */
             nbuf_quoted_param(b, val, vlen);
+            count++;
         }
     }
     if (defaults) {
@@ -1359,16 +1581,21 @@ static void write_native_params(native_buf_t *b, HV *defaults, HV *overrides) {
             I32 klen;
             STRLEN vlen;
             char *key = hv_iterkey(entry, &klen);
+            SV *sv = hv_iterval(defaults, entry);
             char *val;
             if (klen <= 6 || memcmp(key, "param_", 6) != 0) continue;
             if (overrides && hv_exists(overrides, key, klen)) continue;
-            val = SvPV(hv_iterval(defaults, entry), vlen);
+            if (SvGMAGICAL(sv)) mg_get(sv);   /* tied settings: FETCH */
+            if (!SvOK(sv)) continue;   /* undef value means absent */
+            val = SvPV_nomg(sv, vlen); /* already FETCHed above */
             nbuf_varuint(b, (uint64_t)(klen - 6));
             nbuf_append(b, key + 6, (size_t)(klen - 6));
             nbuf_varuint(b, 2);  /* flags: CUSTOM */
             nbuf_quoted_param(b, val, vlen);
+            count++;
         }
     }
+    return count;
 }
 
 /* Write merged settings in native protocol wire format.
@@ -1383,7 +1610,11 @@ static void write_native_settings(native_buf_t *b, HV *defaults, HV *overrides) 
             I32 klen;
             STRLEN vlen;
             char *key = hv_iterkey(entry, &klen);
-            char *val = SvPV(hv_iterval(overrides, entry), vlen);
+            SV *sv = hv_iterval(overrides, entry);
+            char *val;
+            if (SvGMAGICAL(sv)) mg_get(sv);   /* tied settings: FETCH */
+            if (!SvOK(sv)) continue;   /* undef value means absent */
+            val = SvPV_nomg(sv, vlen); /* already FETCHed above */
             if (is_client_only_key(key, klen)) continue;
             /* param_* keys go in the parameters block, not settings */
             if (klen > 6 && memcmp(key, "param_", 6) == 0) continue;
@@ -1400,9 +1631,13 @@ static void write_native_settings(native_buf_t *b, HV *defaults, HV *overrides) 
             I32 klen;
             STRLEN vlen;
             char *key = hv_iterkey(entry, &klen);
-            char *val = SvPV(hv_iterval(defaults, entry), vlen);
+            SV *sv = hv_iterval(defaults, entry);
+            char *val;
             if (overrides && hv_exists(overrides, key, klen))
                 continue;
+            if (SvGMAGICAL(sv)) mg_get(sv);   /* tied settings: FETCH */
+            if (!SvOK(sv)) continue;   /* undef value means absent */
+            val = SvPV_nomg(sv, vlen); /* already FETCHed above */
             if (is_client_only_key(key, klen)) continue;
             if (klen > 6 && memcmp(key, "param_", 6) == 0) continue;
             nbuf_varuint(b, (uint64_t)klen);
@@ -1433,6 +1668,18 @@ MODULE = EV::ClickHouse  PACKAGE = EV::ClickHouse
 BOOT:
 {
     I_EV_API("EV::ClickHouse");
+    /* A reset peer must surface as EPIPE errors, not kill the process:
+     * ignore SIGPIPE, but only when the app left it at SIG_DFL (an
+     * explicit app handler or EV::signal watcher is respected). Same
+     * stance as the Go and Python runtimes. */
+    {
+        struct sigaction sa, old;
+        memset(&sa, 0, sizeof(sa));
+        sa.sa_handler = SIG_IGN;
+        sigemptyset(&sa.sa_mask);
+        if (sigaction(SIGPIPE, NULL, &old) == 0 && old.sa_handler == SIG_DFL)
+            sigaction(SIGPIPE, &sa, NULL);
+    }
     ch_openssl_init();
     /* Permanent no-op CV used for internal callbacks (HTTP keepalive ping). */
     keepalive_noop_cb = newRV_inc((SV*)get_cv("EV::ClickHouse::__keepalive_noop", GV_ADD));
@@ -1442,14 +1689,28 @@ BOOT:
     srand((unsigned)time(NULL) ^ (unsigned)getpid());
 }
 
+void
+__keepalive_noop(...)
+CODE:
+{
+    /* Internal no-op invoked for keepalive ping completions. A real
+     * empty XSUB, registered before the BOOT block runs, so
+     * keepalive_noop_cb binds to a callable CV instead of an
+     * undefined stub that would die. */
+    PERL_UNUSED_VAR(items);
+}
+
 EV::ClickHouse
-_new(char *class, EV::Loop loop)
+_new(char *class, SV *loop_sv)
 CODE:
 {
     PERL_UNUSED_VAR(class);
+    if (!SvROK(loop_sv) || !SvIOK(SvRV(loop_sv)))
+        croak("loop must be an EV::Loop object");
     Newxz(RETVAL, 1, ev_clickhouse_t);
     RETVAL->magic = EV_CH_MAGIC;
-    RETVAL->loop = loop;
+    RETVAL->loop = INT2PTR(struct ev_loop *, SvIVX(SvRV(loop_sv)));
+    RETVAL->loop_sv = SvREFCNT_inc(SvRV(loop_sv));
     RETVAL->fd = -1;
     RETVAL->protocol = PROTO_HTTP;
     ngx_queue_init(&RETVAL->cb_queue);
@@ -1476,10 +1737,7 @@ CODE:
     stop_writing(self);
     stop_timing(self);
     stop_keepalive(self);
-    if (self->reconnect_timing) {
-        ev_timer_stop(self->loop, &self->reconnect_timer);
-        self->reconnect_timing = 0;
-    }
+    stop_reconnect(self);
 
     if (PL_dirty) {
         self->magic = EV_CH_FREED;
@@ -1504,11 +1762,9 @@ CODE:
             release_cbt(cbt);
         }
 
-  #ifdef HAVE_OPENSSL
-        if (self->ssl) { SSL_free(self->ssl); self->ssl = NULL; }
-        if (self->ssl_ctx) { SSL_CTX_free(self->ssl_ctx); self->ssl_ctx = NULL; }
-  #endif
+        ch_ssl_free(self);
         if (self->fd >= 0) close(self->fd);
+        CLEAR_SV(self->loop_sv);
         CLEAR_CONNECTION_HANDLERS(self);
         CLEAR_PERSISTENT_STATE(self);
         failover_free(self);
@@ -1518,7 +1774,7 @@ CODE:
         return;
     }
 
-    if (cancel_pending(self, "object destroyed"))
+    if (cancel_pending(self, "object destroyed", 1))
         return;  /* inner DESTROY already freed self */
 
     /* A user callback fired from cancel_pending may have called
@@ -1529,22 +1785,9 @@ CODE:
     stop_writing(self);
     stop_timing(self);
     stop_keepalive(self);
-    if (self->reconnect_timing) {
-        ev_timer_stop(self->loop, &self->reconnect_timer);
-        self->reconnect_timing = 0;
-    }
+    stop_reconnect(self);
 
-  #ifdef HAVE_OPENSSL
-    if (self->ssl) {
-        SSL_shutdown(self->ssl);
-        SSL_free(self->ssl);
-        self->ssl = NULL;
-    }
-    if (self->ssl_ctx) {
-        SSL_CTX_free(self->ssl_ctx);
-        self->ssl_ctx = NULL;
-    }
-  #endif
+    ch_ssl_shutdown_free(self);
 
     if (self->fd >= 0) {
         close(self->fd);
@@ -1552,6 +1795,7 @@ CODE:
     }
 
     self->loop = NULL;
+    CLEAR_SV(self->loop_sv);
     self->connected = 0;
 
     CLEAR_CONNECTION_HANDLERS(self);
@@ -1595,21 +1839,16 @@ void
 connect(EV::ClickHouse self, const char *host, unsigned int port, const char *user, const char *password, const char *database)
 CODE:
 {
-    if (self->connected || self->connecting) croak("already connected");
+    /* An explicit connect supersedes outstanding async DNS: without
+     * this the stale resolver callback tears the new link down. */
+    self->dns_pending = 0;
+    if (self->connected || self->connecting || self->handshaking)
+        croak("already connected");
     if (has_http_unsafe_chars(host) || has_http_unsafe_chars(user) ||
         has_http_unsafe_chars(password) || has_http_unsafe_chars(database))
         croak("connection parameters must not contain CR or LF");
 
-    CLEAR_STR(self->host);
-    CLEAR_STR(self->user);
-    CLEAR_STR(self->password);
-    CLEAR_STR(self->database);
-
-    self->host = safe_strdup(host);
-    self->port = port;
-    self->user = safe_strdup(user);
-    self->password = safe_strdup(password);
-    self->database = safe_strdup(database);
+    store_conn_params(self, host, port, user, password, database);
 
     start_connect(self);
 }
@@ -1618,9 +1857,26 @@ void
 reset(EV::ClickHouse self)
 CODE:
 {
+    int gen;
     if (!self->host) croak("no previous connection to reset");
-    if (cancel_pending(self, "connection reset")) return;
-    if (cleanup_connection(self)) return;   /* on_disconnect freed self */
+    gen = self->connect_gen;
+    if (cancel_pending(self, "connection reset", 0)) return;
+    /* An inner reset()/connect() from a callback already reconnected; a
+     * query issued from a callback afterwards was enqueued at
+     * callback_depth > 0 (so undispatched) and would strand on the
+     * live connection — advance it. pipeline_advance may free self;
+     * return immediately without touching self afterwards. */
+    if (self->connect_gen != gen) {
+        if (self->connected && !ngx_queue_empty(&self->send_queue))
+            pipeline_advance(self);
+        return;
+    }
+    if (cleanup_connection(self, 1)) return;   /* on_disconnect freed self */
+    if (self->connect_gen != gen) {   /* reset()/connect() from on_disconnect won */
+        if (self->connected && !ngx_queue_empty(&self->send_queue))
+            pipeline_advance(self);
+        return;
+    }
     start_connect(self);
 }
 
@@ -1628,14 +1884,29 @@ void
 finish(EV::ClickHouse self)
 CODE:
 {
-    if (cancel_pending(self, "connection finished")) return;
-    (void)cleanup_connection(self);   /* nothing follows — freed-or-not is moot */
+    /* Rotate the generation so an enclosing fail_connection (user called
+     * finish from on_error) does not schedule a reconnect afterwards. */
+    self->connect_gen++;
+    if (cancel_pending(self, "connection finished", 1)) return;
+    if (cleanup_connection(self, 0)) return;   /* on_disconnect freed self */
+    if (!self->connected && !self->connecting && !self->dns_pending &&
+        cancel_pending(self, "connection finished", 1)) return;
+    /* Terminal call: drop handler refs so closures capturing $ch don't
+     * pin the struct (fd, watchers) past the last user ref. */
+    CLEAR_CONNECTION_HANDLERS(self);
+    if (self->on_failover) {
+        SvREFCNT_dec(self->on_failover);
+        self->on_failover = NULL;
+    }
 }
 
 void
 query(EV::ClickHouse self, SV *sql_sv, ...)
 CODE:
 {
+    /* Pin the invocant: stringify/FETCH below runs user code that may
+     * drop the last $ch ref (DESTROY frees self when depth is 0). */
+    sv_2mortal(SvREFCNT_inc(ST(0)));
     STRLEN sql_len;
     const char *sql;
     ev_ch_send_t *s;
@@ -1656,12 +1927,17 @@ CODE:
         croak("Usage: $ch->query($sql, [\\%%settings], $cb)");
     }
 
-    if (!self->connected && !self->connecting && !self->dns_pending) croak("not connected");
+    if (!self->connected && !self->connecting && !self->handshaking && !self->dns_pending &&
+        !self->reconnect_timing && !self->in_disconnect) croak("not connected");
     if (!(SvROK(cb) && SvTYPE(SvRV(cb)) == SVt_PVCV))
         croak("callback must be a CODE reference");
 
     if (self->protocol == PROTO_NATIVE && (self->insert_data || self->insert_av))
         croak("cannot queue native query while INSERT is pending");
+
+    /* Stringify SQL before owning anything: a dying tie must not
+     * longjmp over settings_copy. */
+    sql = SvPV(sql_sv, sql_len);
 
     /* Extract client-side options from settings */
     SV *on_data_sv = NULL;
@@ -1673,19 +1949,25 @@ CODE:
         if (settings_copy) settings = settings_copy;
         SV **svp = hv_fetch(settings, "raw", 3, 0);
         if (svp) raw = SvTRUE(*svp) ? 1 : 0;
+        /* hv_fetch on a tie returns a lazy FETCH proxy: materialize
+         * before the SvROK test, and wrap the referent (the send
+         * entry outlives the mortal proxy). */
         svp = hv_fetch(settings, "on_data", 7, 0);
+        if (svp && *svp && SvGMAGICAL(*svp)) mg_get(*svp);
         if (svp && SvROK(*svp) && SvTYPE(SvRV(*svp)) == SVt_PVCV)
-            on_data_sv = *svp;
+            on_data_sv = SvMAGICAL(*svp) ? sv_2mortal(newRV_inc(SvRV(*svp)))
+                                         : *svp;
         svp = hv_fetch(settings, "on_query_complete", 17, 0);
+        if (svp && *svp && SvGMAGICAL(*svp)) mg_get(*svp);
         if (svp && SvROK(*svp) && SvTYPE(SvRV(*svp)) == SVt_PVCV)
-            on_complete_sv = *svp;
+            on_complete_sv = SvMAGICAL(*svp) ? sv_2mortal(newRV_inc(SvRV(*svp)))
+                                             : *svp;
         svp = hv_fetch(settings, "external", 8, 0);
+        if (svp && *svp && SvGMAGICAL(*svp)) mg_get(*svp);
         if (svp && SvROK(*svp) && SvTYPE(SvRV(*svp)) == SVt_PVHV
             && HvKEYS((HV *)SvRV(*svp)) > 0)
             external = (HV *)SvRV(*svp);
     }
-
-    sql = SvPV(sql_sv, sql_len);
 
     if (self->max_query_size > 0 && sql_len > self->max_query_size) {
         if (settings_copy) SvREFCNT_dec((SV*)settings_copy);
@@ -1722,13 +2004,14 @@ CODE:
         sql_len = qlc_sql_len;
     }
 
+    char *ext_data = NULL;
+    size_t ext_len = 0;
+    int defer_build = 0;
     if (self->protocol == PROTO_HTTP) {
         req = build_http_post_request(self, NULL, 0, sql, sql_len,
                                        self->default_settings, settings,
                                        &req_len);
     } else {
-        char *ext_data = NULL;
-        size_t ext_len = 0;
         if (external) {
             char ext_errbuf[256];
             ext_errbuf[0] = '\0';
@@ -1740,16 +2023,35 @@ CODE:
                 croak("%s", ext_errbuf);
             }
         }
-        req = build_native_query(self, sql, sql_len,
-                                  self->default_settings, settings,
-                                  ext_data, ext_len, &req_len);
-        if (ext_data) Safefree(ext_data);
+        if (!self->connected) {
+            /* server_revision unknown: stash inputs, build at dispatch */
+            defer_build = 1;
+            req = NULL;
+            req_len = 0;
+        } else {
+            req = build_native_query(self, sql, sql_len,
+                                      self->default_settings, settings,
+                                      ext_data, ext_len, &req_len);
+            if (ext_data) Safefree(ext_data);
+            ext_data = NULL;
+            if (!req) {
+                if (settings_copy) SvREFCNT_dec((SV*)settings_copy);
+                if (qlc_sql) Safefree(qlc_sql);
+                croak("query parameters require server revision >= %d",
+                      DBMS_MIN_REVISION_WITH_PARAMETERS);
+            }
+        }
+    }
+    s = alloc_send();
+    if (defer_build) {
+        stash_send_deferred(aTHX_ s, sql, sql_len,
+                            self->default_settings, settings, &settings_copy,
+                            ext_data, ext_len);
+    } else {
+        s->data = req;
+        s->data_len = req_len;
     }
     if (qlc_sql) Safefree(qlc_sql);
-
-    s = alloc_send();
-    s->data = req;
-    s->data_len = req_len;
     s->raw = raw;
     if (on_data_sv)     s->on_data     = SvREFCNT_inc(on_data_sv);
     if (on_complete_sv) s->on_complete = SvREFCNT_inc(on_complete_sv);
@@ -1763,6 +2065,9 @@ void
 insert(EV::ClickHouse self, SV *table_sv, SV *data_sv, ...)
 CODE:
 {
+    /* Pin the invocant: stringify/FETCH below runs user code that may
+     * drop the last $ch ref (DESTROY frees self when depth is 0). */
+    sv_2mortal(SvREFCNT_inc(ST(0)));
     STRLEN table_len;
     const char *table;
     ev_ch_send_t *s;
@@ -1784,7 +2089,8 @@ CODE:
         croak("Usage: $ch->insert($table, $data, [\\%%settings], $cb)");
     }
 
-    if (!self->connected && !self->connecting && !self->dns_pending) croak("not connected");
+    if (!self->connected && !self->connecting && !self->handshaking && !self->dns_pending &&
+        !self->reconnect_timing && !self->in_disconnect) croak("not connected");
     if (!(SvROK(cb) && SvTYPE(SvRV(cb)) == SVt_PVCV))
         croak("callback must be a CODE reference");
 
@@ -1878,33 +2184,53 @@ CODE:
                                "insert into %.*s format TabSeparated",
                                (int)table_len, table);
 
+    int defer_build = 0;
     if (self->protocol == PROTO_HTTP) {
         req = build_http_post_request(self, insert_sql, insert_sql_len,
                                        http_data, tsv_len,
                                        self->default_settings, settings,
                                        &req_len);
         if (tsv_buf) Safefree(tsv_buf);
+    } else if (!self->connected) {
+        /* server_revision unknown: stash inputs, build at dispatch.
+         * INSERT carries no external tables. */
+        defer_build = 1;
+        req = NULL;
+        req_len = 0;
     } else {
         /* Native two-phase: phase 1 sends the query (no data), phase 2
-         * sends the binary Data block once we have the sample block.
-         * INSERT carries no external tables. */
+         * sends the binary Data block once we have the sample block. */
         req = build_native_query(self, insert_sql, insert_sql_len,
                                   self->default_settings, settings,
                                   NULL, 0, &req_len);
+        if (!req) {
+            Safefree(insert_sql);
+            if (settings_copy) SvREFCNT_dec((SV*)settings_copy);
+            croak("query parameters require server revision >= %d",
+                  DBMS_MIN_REVISION_WITH_PARAMETERS);
+        }
     }
-    Safefree(insert_sql);
 
     s = alloc_send();
-    s->data = req;
-    s->data_len = req_len;
+    if (defer_build) {
+        stash_send_deferred(aTHX_ s, insert_sql, insert_sql_len,
+                            self->default_settings, settings, &settings_copy,
+                            NULL, 0);
+    } else {
+        s->data = req;
+        s->data_len = req_len;
+    }
+    Safefree(insert_sql);
     if (settings) send_apply_settings(s, settings);
     /* Per-query on_query_complete override: extract BEFORE freeing
      * settings_copy (matches query() XSUB pattern; otherwise the
      * hv_fetch below would read a freed HV). */
     if (settings) {
         SV **svp = hv_fetch(settings, "on_query_complete", 17, 0);
+        if (svp && *svp && SvGMAGICAL(*svp)) mg_get(*svp);
         if (svp && SvROK(*svp) && SvTYPE(SvRV(*svp)) == SVt_PVCV)
-            s->on_complete = SvREFCNT_inc(*svp);
+            s->on_complete = SvMAGICAL(*svp) ? newRV_inc(SvRV(*svp))
+                                             : SvREFCNT_inc(*svp);
     }
     if (settings_copy) SvREFCNT_dec((SV*)settings_copy);
 
@@ -1913,13 +2239,14 @@ CODE:
      * DATA block. */
     if (self->protocol == PROTO_NATIVE) {
         if (data_is_av) {
-            s->insert_av = SvREFCNT_inc(data_sv);
+            s->insert_av = snapshot_insert_av(aTHX_ data_av);
         } else {
             STRLEN data_len;
             const char *data = SvPV(data_sv, data_len);
-            Newx(s->insert_data, data_len > 0 ? data_len : 1, char);
+            Newx(s->insert_data, data_len + 1, char);
             if (data_len > 0)
                 Copy(data, s->insert_data, data_len, char);
+            s->insert_data[data_len] = '\0';
             s->insert_data_len = data_len;
         }
     }
@@ -1936,7 +2263,8 @@ CODE:
     char *req;
     size_t req_len;
 
-    if (!self->connected && !self->connecting && !self->dns_pending) croak("not connected");
+    if (!self->connected && !self->connecting && !self->handshaking && !self->dns_pending &&
+        !self->reconnect_timing && !self->in_disconnect) croak("not connected");
     if (!(SvROK(cb) && SvTYPE(SvRV(cb)) == SVt_PVCV))
         croak("callback must be a CODE reference");
 
@@ -2049,7 +2377,7 @@ CODE:
 {
     HV *h = newHV();
     (void)hv_stores(h, "connected",       newSViv(self->connected ? 1 : 0));
-    (void)hv_stores(h, "connecting",      newSViv(self->connecting ? 1 : 0));
+    (void)hv_stores(h, "connecting",      newSViv((self->connecting || self->handshaking) ? 1 : 0));
     (void)hv_stores(h, "dns_pending",     newSViv(self->dns_pending ? 1 : 0));
     (void)hv_stores(h, "pending_count",   newSViv(self->pending_count));
     (void)hv_stores(h, "callback_depth",  newSViv(self->callback_depth));
@@ -2067,7 +2395,7 @@ CODE:
     (void)hv_stores(h, "port",            newSVuv(self->port));
     (void)hv_stores(h, "send_count",      newSVuv((UV)self->send_count));
     (void)hv_stores(h, "compress",        newSViv(self->compress ? 1 : 0));
-    (void)hv_stores(h, "tls",             newSViv(self->ssl ? 1 : 0));
+    (void)hv_stores(h, "tls",             newSViv(ch_tls_active(self)));
     RETVAL = newRV_noinc((SV *)h);
 }
 OUTPUT:
@@ -2147,12 +2475,34 @@ CODE:
     /* Cancel queued + in-flight callbacks first (delivers errors), then
      * tear down the socket if a request was on the wire — capture the
      * had_inflight state up front because cancel_pending zeroes send_count. */
+    int gen = self->connect_gen;
     int had_inflight = self->send_count > 0;
-    if (cancel_pending(self, "skipped")) return;
+    if (cancel_pending(self, "skipped", 0)) return;
+    /* From on_query_start the staged entry is dequeued with its bytes in
+     * send_buf; without this the dispatch guard (gen/connected
+     * unchanged, nothing torn down) would send the skipped query and
+     * its orphan response would corrupt the next query's accounting. */
+    if (self->in_dispatch)
+        self->dispatch_cancelled = 1;
+    /* A reset()/connect() from a callback already settled the old
+     * generation — tearing down now would kill the live connection,
+     * and work queued at depth > 0 would strand (same shape as
+     * reset(); pipeline_advance may free self, so return after it). */
+    if (self->connect_gen != gen) {
+        if (self->connected && !ngx_queue_empty(&self->send_queue))
+            pipeline_advance(self);
+        return;
+    }
     CLEAR_INSERT(self);
     CLEAR_STR(self->insert_err);
-    if (had_inflight)
-        (void)cleanup_connection(self);   /* nothing follows — freed-or-not is moot */
+    if (had_inflight) {
+        if (cleanup_connection(self, 0)) return;
+        if (self->connect_gen != gen) return;   /* reset() from on_disconnect won */
+        if (self->auto_reconnect && self->host)
+            schedule_reconnect(self);
+    }
+    else if (self->connected && !ngx_queue_empty(&self->send_queue))
+        pipeline_advance(self);   /* dispatch entries queued from skip callbacks */
 }
 
 void
@@ -2217,6 +2567,26 @@ CODE:
 }
 OUTPUT:
     RETVAL
+
+void
+_set_conn_params(EV::ClickHouse self, const char *host, unsigned int port, const char *user, const char *password, const char *database)
+CODE:
+{
+    /* Stash parameters without connecting, so the async-DNS path has a
+     * reconnect/failover target when resolution fails. */
+    store_conn_params(self, host, port, user, password, database);
+}
+
+void
+_dns_failed(EV::ClickHouse self, char *msg)
+CODE:
+{
+    /* Async-DNS failure takes the same path as a blocking getaddrinfo
+     * failure (failover rotation + auto_reconnect) instead of a bare
+     * on_error. Must not touch self afterwards: user callbacks may
+     * have freed it. */
+    fail_connection(self, msg);
+}
 
 void
 _set_connect_timeout(EV::ClickHouse self, NV val)
@@ -2299,16 +2669,17 @@ OUTPUT:
     RETVAL
 
 void
-_set_failover(EV::ClickHouse self, SV *hosts_av_ref, unsigned int default_port)
+_set_failover(EV::ClickHouse self, SV *hosts_av_ref, unsigned int default_port, unsigned int explicit_port = 0)
 CODE:
 {
-    failover_free_hosts(self);
-    if (!SvOK(hosts_av_ref)) return;
+    /* Validate before freeing so a bad call keeps the old config. */
+    if (!SvOK(hosts_av_ref)) { failover_free_hosts(self); return; }
     if (!(SvROK(hosts_av_ref) && SvTYPE(SvRV(hosts_av_ref)) == SVt_PVAV))
         croak("_set_failover: hosts must be an arrayref");
     AV *hosts = (AV*)SvRV(hosts_av_ref);
     SSize_t n = av_top_index(hosts) + 1;
-    if (n <= 0) return;
+    if (n <= 0) { failover_free_hosts(self); return; }
+    failover_free_hosts(self);
     Newx(self->failover_hosts, n, char *);
     Newx(self->failover_ports, n, unsigned int);
     self->failover_n = (int)n;
@@ -2325,7 +2696,9 @@ CODE:
         }
         STRLEN sl;
         const char *s = SvPV(*e, sl);
-        unsigned int port = default_port;
+        /* An explicit port => wins over embedded entry ports, matching
+         * the initial-connect precedence in new(). */
+        unsigned int port = explicit_port ? explicit_port : default_port;
         char *host = NULL;
         const char *colon;
         if (sl > 0 && s[0] == '[') {
@@ -2334,7 +2707,7 @@ CODE:
                 Newx(host, close - s, char);
                 memcpy(host, s + 1, close - s - 1);
                 host[close - s - 1] = '\0';
-                if (close + 1 < s + sl && close[1] == ':')
+                if (!explicit_port && close + 1 < s + sl && close[1] == ':')
                     port = (unsigned int)atoi(close + 2);
             }
         }
@@ -2343,7 +2716,8 @@ CODE:
             Newx(host, hl + 1, char);
             memcpy(host, s, hl);
             host[hl] = '\0';
-            port = (unsigned int)atoi(colon + 1);
+            if (!explicit_port)
+                port = (unsigned int)atoi(colon + 1);
         }
         if (!host) host = safe_strdup(s);
         self->failover_hosts[i] = host;
@@ -2553,10 +2927,17 @@ CODE:
 {
     if (!(SvROK(cb) && SvTYPE(SvRV(cb)) == SVt_PVCV))
         croak("drain callback must be a CODE reference");
+    if (self->on_drain)
+        croak("drain already pending");
     CLEAR_SV(self->on_drain);
     if (self->pending_count == 0 && ngx_queue_empty(&self->send_queue)) {
-        /* Nothing pending — fire immediately */
-        (void)fire_zero_arg_cb(self, cb, "drain");
+        /* Nothing pending — fire immediately. The handler runs at
+         * callback_depth > 0, so a query it issues is enqueued
+         * undispatched — advance afterwards or it strands until the
+         * next event (forever with keepalive off). */
+        if (fire_zero_arg_cb(self, cb, "drain")) return;
+        if (self->connected && !ngx_queue_empty(&self->send_queue))
+            pipeline_advance(self);
     } else {
         self->on_drain = SvREFCNT_inc(cb);
     }
@@ -2566,7 +2947,24 @@ void
 cancel(EV::ClickHouse self)
 CODE:
 {
-    if (self->protocol == PROTO_NATIVE && self->send_count > 0) {
+    if (self->protocol == PROTO_NATIVE && self->send_count > 0
+        && self->native_state == NATIVE_WAIT_INSERT_META) {
+        /* Answer the pending sample block with Cancel instead of data. */
+        self->cancel_after_meta = 1;
+        self->cancelled = 1;
+    } else if (self->protocol == PROTO_NATIVE && self->in_dispatch) {
+        /* From on_query_start the entry is dequeued but nothing is on
+         * the wire yet — abort the dispatch itself instead of sending
+         * a query plus a racing CANCEL. The cb_queue holds exactly
+         * this entry (send_count is 0 at dispatch, so nothing else is
+         * in flight); a nested second cancel finds it empty and just
+         * re-arms the flag. */
+        SV *oqc = NULL;
+        SV *cb = pop_cb_ex(self, &oqc);
+        if (cb != NULL)
+            fire_err_and_complete(self, cb, "query cancelled", oqc);
+        self->dispatch_cancelled = 1;
+    } else if (self->protocol == PROTO_NATIVE && self->send_count > 0) {
         /* Send CLIENT_CANCEL packet */
         native_buf_t pkt;
         nbuf_init(&pkt);
@@ -2576,14 +2974,18 @@ CODE:
         self->send_len += pkt.len;
         Safefree(pkt.data);
         start_writing(self);
+        self->cancelled = 1;
         /* We still need to wait for EndOfStream or Exception from server */
-    } else if (self->protocol == PROTO_HTTP && self->send_count > 0) {
-        /* HTTP: close connection to cancel */
+    } else if (self->protocol == PROTO_HTTP && (self->send_count > 0 || self->in_dispatch)) {
+        /* HTTP: close connection to cancel. From on_query_start the
+         * dispatch guard sees !connected and drops the staged entry.
+         * Never-sent queued entries survive for the reconnect. */
         CLEAR_SV(self->native_rows);
         int gen = self->connect_gen;
-        if (cancel_pending(self, "query cancelled")) return;
+        if (cancel_or_preserve(self, "query cancelled")) return;
         if (self->connect_gen != gen) return;
-        if (cleanup_connection(self)) return;   /* on_disconnect freed self */
+        if (cleanup_connection(self, 0)) return;   /* on_disconnect freed self */
+        if (self->connect_gen != gen) return;   /* reset() from on_disconnect won */
         if (self->auto_reconnect && self->host)
             schedule_reconnect(self);
     }
@@ -2598,6 +3000,9 @@ SV *
 _streamer_push_row(SV *self_sv, SV *row)
 CODE:
 {
+    /* Pin the streamer: _flush / on_high_water below run user code
+     * that may drop the last ref while HV *self is still in use. */
+    sv_2mortal(SvREFCNT_inc(self_sv));
     if (!(SvROK(self_sv) && SvTYPE(SvRV(self_sv)) == SVt_PVHV))
         croak("_streamer_push_row: self must be a hash ref");
     HV *self = (HV*)SvRV(self_sv);
@@ -2782,6 +3187,7 @@ CODE:
     } else {
         SV **idx_p = hv_fetchs(pool, "idx", 0);
         IV idx = idx_p ? SvIV(*idx_p) : 0;
+        if (idx < 0) idx = 0;
         picked = ties[idx % n_ties];
         /* Store a monotonic counter, not (idx+1) % n_ties: n_ties varies
          * per call, so a mod-n_ties write would pin idx into the smallest
@@ -2792,6 +3198,8 @@ CODE:
     if (ties != stack_ties) Safefree(ties);
 
     SV **csv = av_fetch(conns, picked, 0);
+    if (!csv || !*csv)
+        croak("_pool_pick: connection slot %d missing", picked);
     RETVAL = SvREFCNT_inc(*csv);
 }
 OUTPUT:
@@ -2801,6 +3209,9 @@ SV *
 _iterator_next(SV *self_sv, SV *timeout_sv = &PL_sv_undef)
 CODE:
 {
+    /* Pin the iterator: timeout stringify / ev_run below run user
+     * code that may drop the last ref while HV *self is in use. */
+    sv_2mortal(SvREFCNT_inc(self_sv));
     if (!(SvROK(self_sv) && SvTYPE(SvRV(self_sv)) == SVt_PVHV))
         croak("_iterator_next: self must be a hash ref");
     HV *self = (HV*)SvRV(self_sv);
@@ -2841,14 +3252,9 @@ CODE:
         }
         ev_run(loop, 0);
         if (armed) { ev_timer_stop(loop, &to); armed = 0; }
-        if (av_top_index(batches) < 0) {
-            SV **dp2 = hv_fetchs(self, "done", 0);
-            if (!dp2 || !SvTRUE(*dp2)) {
-                RETVAL = &PL_sv_undef;
-                goto out;
-            }
-            break;
-        }
+        /* ev_run returns for any break on the shared loop, not just
+         * ours: with no batch, no done flag and no timeout expiry,
+         * loop and keep waiting instead of truncating the results. */
     }
 
     if (av_top_index(batches) >= 0) {

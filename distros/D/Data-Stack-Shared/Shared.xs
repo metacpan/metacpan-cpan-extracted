@@ -3,6 +3,9 @@
 #include "perl.h"
 #include "XSUB.h"
 #include "ppport.h"
+static int stk_wait_interrupted(void) { dTHX; return PL_sig_pending != 0; }
+#define STK_WAIT_INTERRUPTED() stk_wait_interrupted()
+#define STK_WAIT_SLICE_NS 250000000L
 #include "stack.h"
 
 #define EXTRACT_STK(sv) \
@@ -32,6 +35,40 @@
     RETVAL = ref
 
 
+
+static int stk_perl_push(pTHX_ SV *self, StkHandle *h, const void *val, uint32_t len, double timeout) {
+    StkHandle *h0 = h;
+    struct timespec deadline, remaining;
+    if (timeout > 0) stk_make_deadline(timeout, &deadline);
+    double seconds = timeout;
+    for (;;) {
+        int result = stk_push(h, val, len, seconds);
+        if (result >= 0) return result;
+        PERL_ASYNC_CHECK();
+        REEXTRACT_STK(self);
+        if (timeout > 0) {
+            if (!stk_remaining(&deadline, &remaining)) return 0;
+            seconds = (double)remaining.tv_sec + (double)remaining.tv_nsec / 1e9;
+        }
+    }
+}
+
+static int stk_perl_pop(pTHX_ SV *self, StkHandle *h, void *out, double timeout) {
+    StkHandle *h0 = h;
+    struct timespec deadline, remaining;
+    if (timeout > 0) stk_make_deadline(timeout, &deadline);
+    double seconds = timeout;
+    for (;;) {
+        int result = stk_pop(h, out, seconds);
+        if (result >= 0) return result;
+        PERL_ASYNC_CHECK();
+        REEXTRACT_STK(self);
+        if (timeout > 0) {
+            if (!stk_remaining(&deadline, &remaining)) return 0;
+            seconds = (double)remaining.tv_sec + (double)remaining.tv_nsec / 1e9;
+        }
+    }
+}
 
 MODULE = Data::Stack::Shared  PACKAGE = Data::Stack::Shared
 
@@ -292,7 +329,7 @@ push_wait(self, val, ...)
     if (items > 2 && (SvGETMAGIC(ST(2)), SvOK(ST(2)))) timeout = SvNV(ST(2));
     int64_t v = (int64_t)val;
     REEXTRACT_STK(self);
-    RETVAL = stk_push(h, &v, sizeof(v), timeout);
+    RETVAL = stk_perl_push(aTHX_ self, h, &v, sizeof(v), timeout);
   OUTPUT:
     RETVAL
 
@@ -317,7 +354,7 @@ pop_wait(self, ...)
     if (items > 1 && (SvGETMAGIC(ST(1)), SvOK(ST(1)))) timeout = SvNV(ST(1));
     int64_t v;
     REEXTRACT_STK(self);
-    RETVAL = stk_pop(h, &v, timeout) ? newSViv((IV)v) : &PL_sv_undef;
+    RETVAL = stk_perl_pop(aTHX_ self, h, &v, timeout) ? newSViv((IV)v) : &PL_sv_undef;
   OUTPUT:
     RETVAL
 
@@ -402,7 +439,11 @@ push(self, val)
     const char *s = SvPV(val, slen);
     REEXTRACT_STK(self);
     uint32_t max_len = h->elem_size - sizeof(uint32_t);
-    if (slen > max_len) slen = max_len;
+    if (slen > max_len) {
+        slen = max_len;
+        if (SvUTF8(val))
+            while (slen && UTF8_IS_CONTINUATION((U8)s[slen])) slen--;
+    }
     uint8_t *buf;
     Newxz(buf, h->elem_size, uint8_t);
     uint32_t l32 = (uint32_t)slen | (SvUTF8(val) ? 0x80000000u : 0u);  /* bit 31 = SvUTF8 */
@@ -426,14 +467,18 @@ push_wait(self, val, ...)
     const char *s = SvPV(val, slen);
     REEXTRACT_STK(self);
     uint32_t max_len = h->elem_size - sizeof(uint32_t);
-    if (slen > max_len) slen = max_len;
+    if (slen > max_len) {
+        slen = max_len;
+        if (SvUTF8(val))
+            while (slen && UTF8_IS_CONTINUATION((U8)s[slen])) slen--;
+    }
     uint8_t *buf;
     Newxz(buf, h->elem_size, uint8_t);
+    SAVEFREEPV(buf);
     uint32_t l32 = (uint32_t)slen | (SvUTF8(val) ? 0x80000000u : 0u);  /* bit 31 = SvUTF8 */
     memcpy(buf, &l32, sizeof(uint32_t));
     memcpy(buf + sizeof(uint32_t), s, slen);
-    RETVAL = stk_push(h, buf, h->elem_size, timeout);
-    Safefree(buf);
+    RETVAL = stk_perl_push(aTHX_ self, h, buf, h->elem_size, timeout);
   OUTPUT:
     RETVAL
 
@@ -473,7 +518,7 @@ pop_wait(self, ...)
     uint8_t *buf;
     Newx(buf, h->elem_size, uint8_t);
     SAVEFREEPV(buf);
-    if (stk_pop(h, buf, timeout)) {
+    if (stk_perl_pop(aTHX_ self, h, buf, timeout)) {
         uint32_t len;
         memcpy(&len, buf, sizeof(uint32_t));
         int is_utf8 = (len & 0x80000000u) != 0;   /* bit 31 = SvUTF8 */

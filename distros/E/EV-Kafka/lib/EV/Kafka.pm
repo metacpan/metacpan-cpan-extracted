@@ -5,7 +5,7 @@ use EV;
 
 BEGIN {
     use XSLoader;
-    our $VERSION = '0.06';
+    our $VERSION = '0.08';
     XSLoader::load __PACKAGE__, $VERSION;
 }
 
@@ -987,25 +987,33 @@ sub flush {
         $cb->() if $cb;
         return;
     }
+    # A flush already in flight: join its wait rather than stranding it.
+    if ($cfg->{_flush_timer}) {
+        push @{$cfg->{_flush_cbs}}, $cb if $cb;
+        return;
+    }
     my $timeout  = $cfg->{flush_timeout} // 0;
     my $deadline = $timeout > 0 ? EV::now + $timeout : 0;
+    my $drain = sub {
+        my @args = @_;
+        my @cbs = @{delete $cfg->{_flush_cbs} // []};
+        $_->(@args) for @cbs;
+    };
     my $check; $check = EV::timer 0, 0.01, sub {
         if ($deadline && EV::now >= $deadline) {
             undef $check;
             $cfg->{_flush_timer} = undef;
-            my $fcb = delete $cfg->{_flush_cb};
-            $fcb->("flush timed out") if $fcb;
+            $drain->("flush timed out");
             return;
         }
         return if $outstanding->() > 0;
         undef $check;
         $cfg->{_flush_timer} = undef;
-        my $fcb = delete $cfg->{_flush_cb};
-        $fcb->() if $fcb;
+        $drain->();
     };
-    # Stored so close() can fail the callback instead of stranding it.
+    # Stored so close() can fail the callbacks instead of stranding them.
     $cfg->{_flush_timer} = $check;
-    $cfg->{_flush_cb} = $cb;
+    push @{$cfg->{_flush_cbs}}, $cb if $cb;
 }
 
 # --- Consumer ---
@@ -1824,6 +1832,20 @@ sub commit {
 
     $coord->offset_commit($g->{group_id}, $g->{generation}, $g->{member_id}, \@topics, sub {
         my ($res, $err) = @_;
+        unless ($err) {
+            for my $t (@{$res->{topics} // []}) {
+                for my $p (@{$t->{partitions} // []}) {
+                    my $ec = $p->{error_code} // 0;
+                    if ($ec) {
+                        $err = sprintf "OffsetCommit %s:%d: %s (code %d)",
+                            $t->{topic}, $p->{partition},
+                            $self->error_name($ec), $ec;
+                        last;
+                    }
+                }
+                last if $err;
+            }
+        }
         $cb->($err) if $cb;
     });
 }
@@ -2037,7 +2059,7 @@ sub close {
     }
     $cfg->{pending_ops} = [];
 
-    if (my $fcb = delete $cfg->{_flush_cb}) {
+    for my $fcb (@{delete $cfg->{_flush_cbs} // []}) {
         eval { $fcb->("client closed") };
         warn "EV::Kafka: flush callback error: $@" if $@;
     }
@@ -2076,6 +2098,11 @@ sub DESTROY {
 }
 
 package EV::Kafka::Conn;
+
+# ithreads: a conn wraps a C struct, an fd and EV watchers, none of which
+# can be cloned. Refuse cloning so the child thread gets undef instead of
+# a pointer that its DESTROY would free out from under the parent.
+sub CLONE_SKIP { 1 }
 
 1;
 
@@ -2661,8 +2688,9 @@ Options: C<acks> (default 1), C<headers> (hashref), C<timestamp>
 (epoch ms, default now), C<compression> (C<'none'>, C<'lz4'>,
 C<'gzip'>, C<'zstd'>, C<'snappy'>; each requires its respective
 library at build time). With C<acks =E<gt> 0> the broker sends no
-response, so the callback fires immediately with an empty success
-result: it means "handed to the socket", not "broker acknowledged".
+response, so the callback fires with an empty success result once the
+request bytes have left the socket buffer -- or with an error if the
+connection drops first.
 
 =head2 produce_batch($topic, $partition, \@records, [\%opts,] [$cb])
 
@@ -2979,6 +3007,7 @@ Minimal producer + consumer lifecycle:
         },
     );
 
+    my $poll;   # kept alive for the life of the program
     $kafka->connect(sub {
         # produce
         $kafka->produce('test', 'k1', 'hello', sub {
@@ -2987,8 +3016,7 @@ Minimal producer + consumer lifecycle:
             # consume from the beginning
             $kafka->assign([{topic=>'test', partition=>0, offset=>0}]);
             $kafka->seek('test', 0, -2, sub {
-                my $t = EV::timer 0, 0.1, sub { $kafka->poll };
-                $kafka->{cfg}{_t} = $t;
+                $poll = EV::timer 0, 0.1, sub { $kafka->poll };
             });
         });
     });
@@ -3082,6 +3110,7 @@ Minimal producer + consumer lifecycle:
             10000, sub { ... }
         );
     });
+    $conn->connect('127.0.0.1', 9092);
 
 =head1 BENCHMARKS
 
@@ -3187,6 +3216,13 @@ startup. Ignoring it is harmless: failed writes surface as EPIPE
 through the normal connection error path. The module deliberately does
 not set this itself -- a library must not change a process-global
 signal disposition its embedding application may rely on.
+
+=item * B<No fork or ithreads sharing> -- a connection holds an event
+loop, a socket and in-flight request state that cannot be shared.
+After C<fork>, methods on an inherited connection croak, apart from
+the read-only C<connected>/C<state>/C<pending> queries; under
+C<threads>, cloned connections come back as C<undef>. Create new
+connections in the child thread or process instead.
 
 =back
 

@@ -21,7 +21,7 @@ EV::ClickHouse - Async ClickHouse client using EV
     );
 
     # Or via URI: clickhouse[+native]://user:pass@host:port/db?key=val
-    my $ch = EV::ClickHouse->new(
+    $ch = EV::ClickHouse->new(
         uri        => 'clickhouse+native://default:@127.0.0.1:9000/default',
         on_connect => sub { ... },
     );
@@ -42,9 +42,9 @@ EV::ClickHouse - Async ClickHouse client using EV
 
     # insert - arrayref of rows (no TSV escaping needed)
     $ch->insert("my_table", [
-        [1, "hello\tworld"],   # embedded tab is fine
-        [2, undef],            # null
-        [3, [10, 20]],         # Array column
+        [1, "hello\tworld", [10, 20]],   # embedded tab is fine
+        [2, undef,          [30]],        # null
+        [3, "plain",        [40, 50]],    # Array column (native only)
     ], sub { my (undef, $err) = @_; warn "insert: $err" if $err });
 
     # insert - pre-formatted TSV string
@@ -66,6 +66,11 @@ the [EV](https://metacpan.org/pod/EV) event loop. It speaks both the ClickHouse 
 no external ClickHouse client library linked. zlib is required; OpenSSL
 (for TLS) and liblz4 (for native compression) are optional and detected
 at build time.
+
+Loading the module sets SIGPIPE to ignored when the process left it at
+its default, so a reset peer surfaces as ordinary EPIPE errors instead
+of killing the process. An explicitly installed handler (including an
+EV signal watcher) is respected and never overridden.
 
 ## Features
 
@@ -102,7 +107,9 @@ hashref leaves (Int64/Float64/Bool/String + Array variants).
 
 The connection is initiated immediately; `new` returns before it
 completes. Queries issued before `on_connect` fires are queued and
-dispatched once the connection is ready.
+dispatched once the connection is ready. Handles are not fork-safe:
+using one connection from parent and child concurrently silently
+mixes up responses - connect after forking instead.
 
 **Connection parameters:**
 
@@ -134,7 +141,8 @@ dispatched once the connection is ready.
     ServerHello stall), the client advances to the next host in round-robin
     order; pair with `auto_reconnect => 1` for automatic recovery.
     The single `host` argument is honoured as a fallback when
-    `hosts` isn't given.
+    `hosts` isn't given. An explicit `port` argument overrides any
+    embedded entry ports, on the initial connect and on rotation.
 
 - port => $port
 
@@ -227,6 +235,9 @@ dispatched once the connection is ready.
 
     Debug trace callback. Called with internal state-machine messages
     (connect, dispatch, disconnect). Useful for diagnosing protocol issues.
+    Keep the handler side-effect free: traces emitted from inside a
+    handler are dropped, and a reset()/finish() from the handler aborts
+    the interrupted connect/disconnect step.
 
 - on\_failover => sub { my ($old\_host, $old\_port, $new\_host, $new\_port, $msg) = @\_ }
 
@@ -241,7 +252,10 @@ dispatched once the connection is ready.
 
     Enable compression: gzip on HTTP (request and response), LZ4 with CityHash
     checksums on the native protocol. Default: `0`. Native compression
-    requires liblz4 at build time.
+    requires liblz4 at build time. With native compression the client pins
+    `network_compression_method=LZ4` on every query unless you set that
+    setting yourself, so servers whose default is ZSTD stay readable
+    (ZSTD responses are rejected loudly, never misdecoded).
 
 - session\_id => $id
 
@@ -274,11 +288,12 @@ dispatched once the connection is ready.
     query callback receives an appropriate error ("recv buffer overflow",
     "chunked response too large", or "gzip body exceeds max\_recv\_buffer")
     and the connection is torn down so no subsequent query can slip past
-    the cap on the same socket. `0` (default) keeps the historical
-    no-cap behaviour (still bounded internally by a hard 128 MB ceiling
-    on compressed paths). Recommended in production when the schema is
-    constrained and you want a hard upper bound (e.g.
-    `128 * 1024 * 1024` for 128 MB).
+    the cap on the same socket. With `auto_reconnect` the link is
+    re-established afterwards (the cap still applies to every response).
+    `0` (default) keeps the historical no-cap behaviour (still bounded
+    internally by a hard 128 MB ceiling on compressed paths). Recommended
+    in production when the schema is constrained and you want a hard upper
+    bound (e.g. `128 * 1024 * 1024` for 128 MB).
 
 - http\_basic\_auth => 0 | 1
 
@@ -296,16 +311,20 @@ dispatched once the connection is ready.
     receive an error.
 
     The reconnect path covers TCP/TLS connect failures, `connect_timeout`
-    or `query_timeout` expiry, and any clean server-side EOF (idle or
-    mid-request). Mid-query I/O errors (ECONNRESET / EPIPE) and a malformed
-    native ServerHello are **not** retried - they typically indicate a
-    misconfigured peer or client-side bug that retry would only loop on.
-    Combine with `reconnect_max_attempts` for an explicit ceiling.
+    or `query_timeout` expiry, any clean server-side EOF (idle or
+    mid-request), and mid-stream protocol corruption (a malformed native
+    packet leaves the byte stream unresyncable, so the connection is torn
+    down and re-established rather than risk misattributing the server's
+    remaining output to the next query). Mid-query I/O errors (ECONNRESET /
+    EPIPE) and a malformed native ServerHello are **not** retried - they
+    typically indicate a misconfigured peer or client-side bug that retry
+    would only loop on. Combine with `reconnect_max_attempts` for an
+    explicit ceiling.
 
 - settings => \\%hash
 
     ClickHouse settings applied to every query and insert. Per-call settings
-    (see ["query"](#query), ["insert"](#insert)) override these.
+    (see ["query"](#query), ["insert"](#insert)) override these. Undefined values are skipped.
 
         settings => { async_insert => 1, max_threads => 4 }
 
@@ -314,7 +333,11 @@ dispatched once the connection is ready.
     Send a keepalive request every N seconds while the connection is idle:
     a native CLIENT\_PING on the native protocol or a `GET /ping` on HTTP
     (some load balancers / NATs drop idle HTTP connections after a few
-    seconds; TCP-level keepalive is too coarse). Default: `0` (disabled).
+    seconds; TCP-level keepalive is too coarse). Idle timing starts at
+    connect. Each ping carries a deadline (the connection
+    `query_timeout`, else the keepalive interval itself), so a peer that
+    swallows the ping tears the connection down for `auto_reconnect`
+    instead of wedging it. Default: `0` (disabled).
 
 - reconnect\_delay => $seconds
 
@@ -428,7 +451,7 @@ to the server:
         );
 
     Works on both protocols (HTTP uses URL-encoded `param_*` query string;
-    native uses dedicated wire fields).
+    native uses dedicated wire fields, which need server revision >= 54459).
 
 - `query_id => $string`
 
@@ -513,6 +536,14 @@ newlines separate rows, with the standard ClickHouse escapes).
 When using arrayrefs, no TSV escaping is needed: `undef` maps to null
 and strings may contain tabs and newlines freely.
 
+On the native protocol, values are validated before sending: an
+invalid calendar date (month 13, February 30, hour 25), a non-digit
+where a digit belongs, a value outside the column type's range, or
+`undef` for a non-null column fails the whole batch with an
+encoding error instead of landing as a wrapped or zero value.
+Decimal and integer parsing matches the server's TSV verdicts
+(surplus fraction digits truncate; anything else malformed fails).
+
 Nested arrayrefs (Array/Tuple columns) and hashrefs (Map columns) are
 supported **only on the native protocol**, where the encoder has the
 column type from the server's sample block. On HTTP the same call
@@ -521,10 +552,8 @@ protocol or pre-serialise nested types into ClickHouse TSV literal form.
 
     # Native: nested types encode directly.
     $ch->insert("my_table", [
-        [1, "hello\tworld"],   # embedded tab
-        [2, undef],            # null
-        [3, [10, 20]],         # Array column   (native only)
-        [4, { a => 1, b => 2 }],  # Map column  (native only)
+        [1, "hello\tworld", [10, 20], { a => 1 }],   # embedded tab
+        [2, undef,          [30],     { b => 2 }],   # null
     ], sub { ... });
 
 The optional `\%settings` hashref works exactly as in ["query"](#query),
@@ -770,7 +799,9 @@ completes, or the optional timeout (seconds) expires. Useful for
 procedural ETL / export code that doesn't fit a callback shape.
 
 `->error`, `->is_done`, and `->cancel` are also
-available on the returned iterator object.
+available on the returned iterator object. An optional `\%settings`
+second argument passes through to the query; a supplied `on_data`
+fires per block in addition to batch capture.
 
 ## on\_log
 
@@ -851,8 +882,8 @@ Dispatches are serialised; push\_row keeps buffering while a batch is
 in flight (the native protocol cannot pipeline INSERTs). `finish`
 flushes the remaining buffer and fires its callback once all batches
 complete; if any batch failed the first error is delivered as
-`$err`. The streamer also offers `buffered_count` and `in_flight`
-accessors for backpressure logic.
+`$err`. The streamer also offers `buffered_count`, `in_flight`
+and `sticky_error` accessors for backpressure logic.
 
 `$streamer->reset` discards any rows still in the local buffer
 and clears the sticky error so the streamer can be reused after a
@@ -865,9 +896,11 @@ silently dropped.
 `high_water` + `on_high_water` trigger a one-shot notification when
 the buffered row count crosses the watermark, intended as a hint to
 slow the producer. Set `high_water` below `batch_size`; if
-`high_water > batch_size`, the buffer drains via `batch_size`
-flushes before the watermark is reached and `on_high_water` never
-fires. When `high_water == batch_size` the watermark and the flush
+`high_water > batch_size`, steady-state `batch_size` flushes
+keep the buffer below the watermark so `on_high_water` normally
+never fires (it still can while dispatch is stalled, e.g. before
+connect, when the buffer grows unchecked). When
+`high_water == batch_size` the watermark and the flush
 threshold coincide: `on_high_water` fires once per batch, right after
 the flush dispatches (so `in_flight` is already 1). The notification
 re-arms only after the buffer drops below `high_water`.
@@ -885,7 +918,8 @@ the backpressure loop:
     );
     $s->await_drain(sub { $producer->resume });
 
-Fires synchronously if the buffer is already at/below `low_water`.
+Fires synchronously if the buffer is already at/below `low_water`
+and no batch is in flight.
 Re-arms each call: register again from inside the callback if you
 want to keep watching. The callback receives one argument: `undef`
 on a normal drain, or an error string if the streamer was `reset`
@@ -934,7 +968,8 @@ success, an error string on failure).
 Generator-driven insert. Internally wraps ["insert\_streamer"](#insert_streamer) with an
 `EV::idle` pump that calls `$producer` repeatedly, respecting
 `high_water` for backpressure. `undef` from the producer signals
-end-of-stream and triggers `finish`. `%opts` is forwarded to
+end-of-stream and triggers `finish`; an exception aborts the pump
+and reaches `$cb` as the error. `%opts` is forwarded to
 ["insert\_streamer"](#insert_streamer).
 
 ## kill\_query
@@ -945,9 +980,9 @@ end-of-stream and triggers `finish`. `%opts` is forwarded to
     });
 
 Shortcut for `kill query where query_id = '...' sync`. Validates
-`$query_id` against `[A-Za-z0-9_-]+` before interpolating into the
-SQL. Pass `async => 1` to send `ASYNC` instead of `SYNC` when
-fire-and-forget semantics are wanted.
+`$query_id` against `[A-Za-z0-9_.:/-]+` before interpolating into
+the SQL. Pass `async => 1` to send `ASYNC` instead of `SYNC`
+when fire-and-forget semantics are wanted.
 
 ## cancel\_by\_query\_id
 
@@ -1160,6 +1195,7 @@ with whichever returns first. The callback receives
 `($rows, undef, $member_idx)` on success (so callers can attribute
 wins per member) or `(undef, $err)` if _every_ member fails.
 Extra completions after the winner are silently discarded.
+Pass `settings => \%h` for per-query options.
 Recommended for tail-latency-sensitive selects on replicated tables.
 **Do not** use for insert - would silently double-write when the
 server's dedupe window misses.
@@ -1196,7 +1232,9 @@ elapses before every member drains, members still in flight are
 force-finished and `$cb` receives the string
 `"Pool::shutdown timed out after Ns"`. On a clean shutdown `$cb`
 receives undef. `$grace_seconds` may be 0 (or undef) to wait
-indefinitely. The callback fires exactly once.
+indefinitely; `$pool->shutdown($cb)` omits it. A second
+shutdown while one is draining waits for the first instead of
+failing. The callback fires exactly once.
 
     $SIG{TERM} = sub { $pool->shutdown(10, sub { EV::break }) };
 
@@ -1206,15 +1244,20 @@ indefinitely. The callback fires exactly once.
 
     $ch->finish;
 
-Close the connection. Pending queries receive an error callback. Aliased
-as `disconnect`.
+Close the connection. Pending queries receive an error callback, and
+any pending `auto_reconnect` backoff is cancelled (no reconnect
+happens afterwards, even when called from inside `on_error`). Aliased
+as `disconnect`. Connection handlers are released, so closures that
+capture `$ch` stop pinning the handle once the last user ref drops.
 
 ## reset
 
     $ch->reset;
 
 Disconnect and immediately reconnect using the original parameters.
-Aliased as `reconnect`.
+Safe to call from inside error callbacks, including from another
+`reset`'s own callbacks (the inner call wins exactly once). Aliased
+as `reconnect`.
 
 ## drain
 
@@ -1222,7 +1265,9 @@ Aliased as `reconnect`.
 
 Register a callback to fire once all pending queries (queued + in-flight)
 have completed. If nothing is pending, the callback fires synchronously.
-The classic graceful-shutdown pattern:
+The waiter also fires when pending work is cancelled with errors
+(timeout, teardown), so it never hangs. Only one waiter may be pending;
+registering a second croaks. The classic graceful-shutdown pattern:
 
     $ch->query("select 1", sub { ... });
     $ch->query("select 2", sub { ... });
@@ -1238,7 +1283,9 @@ The classic graceful-shutdown pattern:
 Cancel the currently in-flight query. Native protocol sends CLIENT\_CANCEL
 and waits for the server's EndOfStream/Exception; HTTP closes the connection
 (use `auto_reconnect` or call ["reset"](#reset) to recover). The query's callback
-receives an error.
+receives an error. Cancelling a native INSERT while its sample block is
+in flight is safe: the cancel is flushed behind the data block. Calling
+cancel() from ["on\_query\_start"](#on_query_start) cancels the dispatch itself.
 
 ## skip\_pending
 
@@ -1328,9 +1375,11 @@ data. Connection-level accessors (`is_connected`, `server_info`,
     The most recent OpenSSL error string captured during TLS context setup
     or handshake (e.g. `certificate verify failed`, `key values mismatch`),
     or `undef` if no TLS error has occurred. Always `undef` when built
-    without OpenSSL. Useful for surfacing the actual crypto reason to the
-    operator after a connection has failed - the on\_error message itself
-    only names the failing call site (e.g. `SSL_connect failed`).
+    without OpenSSL. A handshake that dies at the TCP level (reset, EOF)
+    records the `errno` detail instead of going stale. Useful for surfacing
+    the actual crypto reason to the operator after a connection has failed -
+    the on\_error message itself only names the failing call site (e.g.
+    `SSL_connect failed`).
 
 - last\_error\_code
 
@@ -1460,8 +1509,10 @@ data. Connection-level accessors (`is_connected`, `server_info`,
 
     `on_data => sub { }` in the per-query settings is the
     lowest-overhead streaming path: each native data block is delivered as
-    soon as the parser has it, no per-row allocation overhead beyond the
-    batch arrayref. `iterate` is a synchronous-feeling pull wrapper around
+    soon as the parser has it, and rows are not accumulated across blocks.
+    (Rows within a block are still decoded to Perl values first, so
+    per-row decode work is the same - the saving is the accumulation.)
+    `iterate` is a synchronous-feeling pull wrapper around
     the same machinery - useful when the surrounding code is procedural
     (ETL scripts, exporters) and a callback shape doesn't fit. Both are
     native-only.
@@ -1476,8 +1527,10 @@ data. Connection-level accessors (`is_connected`, `server_info`,
 
 - Native vs HTTP
 
-    Native (port 9000) is typically 2-5x faster for insert and select-of-many-rows
-    because rows ship as binary columns instead of TSV text. Use HTTP only when
+    Native (port 9000) is typically 1.5-3x faster for select-of-many-rows
+    because rows ship as binary columns instead of TSV text. Inserts are
+    usually server-bound and land within noise of each other on either
+    protocol (measure with `bench/benchmark.pl`). Use HTTP only when
     the network path requires HTTPS-only or when you need `raw => 1` CSV /
     JSONEachRow / Parquet bodies.
 
@@ -1547,6 +1600,9 @@ data. Connection-level accessors (`is_connected`, `server_info`,
     Set `max_recv_buffer => 64 * 1024 * 1024` (64 MB) and let the
     parser tear the connection down with a clean error if exceeded - the
     caller's on\_error can decide whether to retry or surface to the user.
+    The cap bounds the wire buffer (HTTP bodies, single native blocks):
+    rows decoded from earlier blocks of a large native result still
+    accumulate, so pair it with `on_data` streaming for unbounded selects.
 
 - 4. Watch for head-of-line blocking
 
@@ -1651,13 +1707,18 @@ round-trip stable raw values by default; opt into string forms via
 - Decimal256
 
     Returns raw 32 LE bytes. Decode with [Math::BigInt](https://metacpan.org/pod/Math%3A%3ABigInt) (see
-    `eg/decimal_bigmath.pl`).
+    `eg/decimal_bigmath.pl`). Encode accepts decimal text or raw 32 LE bytes.
 
 - Date / Date32 / DateTime / DateTime64
 
     Default: integer (days since epoch / Unix seconds). With `decode_datetime`:
     `YYYY-MM-DD` or `YYYY-MM-DD HH:MM:SS` or `YYYY-MM-DD HH:MM:SS.ffffff`.
     DateTime carries a timezone string; the formatted output uses it.
+
+- Time / Time64
+
+    Integer (seconds, or 10^-scale seconds for `Time64`). Encode accepts
+    the same integers or `'HH:MM:SS'` text.
 
 - Bool
 
@@ -1671,7 +1732,7 @@ round-trip stable raw values by default; opt into string forms via
 - UUID
 
     Canonical hex form `xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`. Encode
-    accepts the same.
+    accepts the same, or 32 hex digits without dashes.
 
 - IPv4 / IPv6
 

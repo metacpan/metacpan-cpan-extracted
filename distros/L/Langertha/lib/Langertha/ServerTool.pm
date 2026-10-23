@@ -1,6 +1,6 @@
 package Langertha::ServerTool;
 # ABSTRACT: Provider-native server-side tool definition, pinned to one wire format
-our $VERSION = '0.503';
+our $VERSION = '0.504';
 use Moose;
 use Carp qw( croak );
 use Scalar::Util qw( blessed );
@@ -144,7 +144,7 @@ Langertha::ServerTool - Provider-native server-side tool definition, pinned to o
 
 =head1 VERSION
 
-version 0.503
+version 0.504
 
 =head1 SYNOPSIS
 

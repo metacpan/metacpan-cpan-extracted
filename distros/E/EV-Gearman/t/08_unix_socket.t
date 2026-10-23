@@ -61,7 +61,12 @@ EV::run;
 unless ($connected) {
     undef $g;
     kill 'TERM', $pid; waitpid $pid, 0;
-    plan skip_all => 'on_connect never fired (transport bridge issue)';
+    # gearmand and the bridge are both verified healthy above — a
+    # missing on_connect is a module regression, not an environment
+    # issue, so fail instead of skipping.
+    fail 'on_connect never fired despite healthy gearmand and bridge';
+    done_testing;
+    exit 1;
 }
 
 ok $connected, 'connected via Unix socket';

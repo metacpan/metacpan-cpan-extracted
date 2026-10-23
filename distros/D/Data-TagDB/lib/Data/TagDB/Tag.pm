@@ -13,9 +13,9 @@ use warnings;
 use Carp;
 use URI;
 
-our $VERSION = v0.14;
+our $VERSION = v0.15;
 
-use parent 'Data::Identifier::Interface::Simple';
+use parent qw(Data::Identifier::Interface::Simple Data::TagDB::Base);
 
 use Data::Identifier v0.34;
 
@@ -24,12 +24,6 @@ my %_key_to_data_identifier = (
     (map {$_ => $_} qw(uuid oid uri)),
 );
 
-
-
-sub db {
-    my ($self) = @_;
-    return $self->{db};
-}
 
 
 sub dbid {
@@ -367,80 +361,6 @@ sub cloudlet {
     return $self->db->_load_cloudlet(%opts);
 }
 
-
-sub get {
-    my ($self, $key, %opts) = @_;
-    my $value = ($self->{attribute_cache} //= {})->{$key};
-    my $has_default = exists $opts{default};
-    my $default = delete $opts{default};
-    my $listas = delete $opts{listas};
-    my $list = delete($opts{list}) // defined($listas);
-    my $as = delete $opts{as};
-    my $data;
-
-    croak 'Stray options passed' if scalar keys %opts;
-
-    unless (defined $value) {
-        my ($ns, $subkey) = $key =~ /^([^#]+)#(.+)\z/;
-        my $info = $self->db->_get_plugin_info($ns);
-
-        croak 'No such plugin loaded' unless defined $info;
-
-        $info = $info->{tag_attributes}{$subkey};
-
-        croak 'No such attribute' unless defined $info;
-        croak 'Attribute not readable' unless defined $info->{get};
-
-        {
-            my ($v, %extra) = $info->{get}->($self, $key);
-            unless ($extra{no_value}) {
-                $v = [$v] unless ref($v) eq 'ARRAY';
-                $extra{_data} = $v;
-            }
-            $value = \%extra;
-
-            $self->{attribute_cache}{$key} = $value unless $extra{no_cache};
-        }
-    }
-
-    $data = $value->{_data};
-    unless (defined $data) {
-        croak 'No such value' unless $has_default;
-        return @{$default} if $list;
-        return $default;
-    }
-
-    unless ($list) {
-        if (scalar(@{$data}) != 1) {
-            croak 'Not a single-value';
-        }
-    }
-
-    if (defined($as) && $as ne 'raw' && !(defined($value->{rawtype}) && $as eq $value->{rawtype})) {
-        my $db = $self->db;
-
-        $data = [map {Data::Identifier::as($_, $as, db => $db, rawtype => $value->{rawtype})} @{$data}];
-    }
-
-    if ($list) {
-        if (defined($listas)) {
-            if ($listas eq 'Data::TagDB::Iterator') {
-                require Data::TagDB::Iterator;
-                return Data::TagDB::Iterator->from_array($data, db => $self->db);
-            } elsif ($listas eq 'Data::TagDB::Cloudlet') {
-                require Data::TagDB::Cloudlet;
-                return Data::TagDB::Cloudlet->new(root => $data, db => $self->db);
-            } else {
-                ...
-            }
-        }
-
-        return @{$data};
-    } else {
-        return $data->[0];
-    }
-}
-
 # ---- Private helpers ----
 
 sub _new {
@@ -583,7 +503,7 @@ Data::TagDB::Tag - Work with Tag databases
 
 =head1 VERSION
 
-version v0.14
+version v0.15
 
 =head1 SYNOPSIS
 
@@ -595,7 +515,8 @@ version v0.14
 
 This package represents a single tag in the database.
 
-This package inherits from L<Data::Identifier::Interface::Simple> (since v0.11).
+This package inherits from L<Data::Identifier::Interface::Simple> (since v0.11),
+and L<Data::TagDB::Base> (since v0.15).
 
 =head1 UNIVERSAL OPTIONS
 
@@ -611,12 +532,6 @@ Can be C<undef> to switch the method from C<die>ing to returning C<undef> in cas
 Prevents the calculation of any fallback values.
 
 =head1 METHODS
-
-=head2 db
-
-    my Data::TagDB $db = $tag->db;
-
-Returns the current L<Data::TagDB> object.
 
 =head2 dbid
 
@@ -702,30 +617,6 @@ Gets the given cloudlet.
 
 B<Note:>
 This method is experimental. It may change prototype, and behaviour or may be removed in future versions without warning.
-
-=head2 get
-
-    my $value  = $tag->get($key [, %opts ] );
-    # or:
-    my @values = $tag->get($key [, %opts ], list => 1);
-
-(experimental since v0.14)
-
-Gets a value from the tag.
-
-This method is mainly used to read a value using a plugin.
-
-The format for the key is C<Package#subkey> (future versions may support additional formats).
-The package given is the full perl package name of the module. The subkey is any that is exported by the plugin.
-
-The following universal options are supported:
-C<default>, C<as>, C<listas>, C<list>.
-
-B<Note:>
-This method will try to cache the values (unless asked by the plugin not to cache).
-Details of the cache are subject to change.
-However the cache's lifetime is limited to the tag object's lifetime.
-(Which might itself be cached.)
 
 =head1 AUTHOR
 

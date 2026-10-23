@@ -18,8 +18,8 @@ treats as "move down" without returning to column 0; `ansi2html.pl` and
 `terminal_diff.pl` turn them into CRLF, as a pty's line discipline would.
 
 libghostty-vt keeps only a few hundred rows of scrollback unless `max_scrollback`
-is given. `session_recorder.pl` keeps 100000 rows; `ansi2html.pl` keeps as many
-rows as the input has lines, so nothing scrolls away.
+is given. `session_recorder.pl` keeps 100000 rows; `ansi2html.pl` sizes its
+history limit to retain wrapped input as well.
 
 ---
 

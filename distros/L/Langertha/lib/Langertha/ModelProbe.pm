@@ -1,6 +1,6 @@
 package Langertha::ModelProbe;
 # ABSTRACT: Reads model-scoped capability facts from a provider's own model metadata
-our $VERSION = '0.503';
+our $VERSION = '0.504';
 use Moose;
 use Carp qw( croak );
 use URI;
@@ -183,7 +183,7 @@ Langertha::ModelProbe - Reads model-scoped capability facts from a provider's ow
 
 =head1 VERSION
 
-version 0.503
+version 0.504
 
 =head1 SYNOPSIS
 

@@ -5,6 +5,15 @@ LICENSE
 META.json
 README.md
 cpanfile
+docs/reference/README.md
+docs/reference/build-and-deploy.md
+docs/reference/data-flow.md
+docs/reference/domains.md
+docs/reference/entry-points.md
+docs/reference/external-systems.md
+docs/reference/module-map.md
+docs/reference/overview.md
+docs/reference/test-landscape.md
 lib/Mojo/Darkpan.pm
 lib/Mojo/Darkpan/Config.pm
 lib/Mojo/Darkpan/Controller/Index.pm
@@ -15,5 +24,9 @@ minil.toml
 script/darkpan
 script/darkpan_app.pl
 t/00_compile.t
+t/01_routes.t
+t/02_publish.t
+t/03_config.t
+t/04_directory_handler.t
 META.yml
 MANIFEST

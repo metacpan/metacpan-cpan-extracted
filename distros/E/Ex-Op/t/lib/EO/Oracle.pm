@@ -11,6 +11,10 @@ my %FLAG = (SCALAR => 0x10, ARRAY => 0x20, HASH => 0x40, CODE => 0x80);
 my $N = 0;
 my $T = 0;
 
+# Exporter before 5.70 sets its own $SIG{__WARN__}, so its warnings and the
+# lines of its error cannot be caught. There only death is compared.
+our $QUIET = !eval { Exporter->VERSION('5.70'); 1 };
+
 # Two packages from one body: E on Exporter, X on Ex::Op. $style is
 # 'import' (use Exporter 'import' / use Ex::Op) or 'isa' (@ISA).
 sub build {
@@ -37,6 +41,7 @@ sub norm {
     $s =~ s/\Q$to\E\b/TGT/g;
     $s =~ s/ at (?:\(eval \d+\)|\S+) line \d+\.?\n?/ at FILE line N.\n/g;
     my @lines = split /\n/, $s;
+    s/^\s+(?=")// for @lines;
     my @bad = sort grep { /is not (?:exported|implemented)/ } @lines;
     @lines = map { /is not (?:exported|implemented)/ ? shift @bad : $_ } @lines;
     s/^(Import (?:add|del): )(.*?)(  at FILE)/$1 . join(' ', sort split ' ', $2) . $3/e for @lines;
@@ -86,12 +91,15 @@ sub slots {
     return \%out;
 }
 
+# Exporter before 5.64_03 leaves an empty @EXPORT_FAIL in every package.
 sub _stash {
     my ($pkg) = @_;
     return [ sort grep {
         my $g = ${"${pkg}::"}{$_};
         $_ ne 'BEGIN'
             && !(ref \$g eq 'GLOB' && B::svref_2object(\$g)->CVGEN)
+            && !($QUIET && $_ eq 'EXPORT_FAIL' && ref \$g eq 'GLOB'
+                 && !(*{$g}{ARRAY} && @{ *{$g}{ARRAY} }))
     } keys %{"${pkg}::"} ];
 }
 
@@ -109,6 +117,7 @@ sub run {
             my $ok = eval "package $to; ${from}->import(\@list); 1";
             $err = $ok ? undef : $@;
         }
+        ($err, @warn) = (defined $err ? 'died' : undef) if $QUIET;
         $out{$kind} = {
             error    => norm($err, $from, $to),
             warnings => [ map { norm($_, $from, $to) } @warn ],

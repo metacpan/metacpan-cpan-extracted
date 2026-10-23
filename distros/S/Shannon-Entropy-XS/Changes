@@ -11,3 +11,10 @@ Revision history for Shannon-Entropy-XS
 	- Only replace the call with the custom op when the argument is a
 	  single scalar; a list argument left extra values on the stack
 	- Register the custom op as a UNOP so B::Concise can walk it
+	- Require ExtUtils::MakeMaker 7.12 at configure time; XSMULTI builds
+	  no XS before it
+
+1.18	22/10/2026
+	- Honour the $ prototype on 5.14+ so a list argument takes scalar
+	  context on every perl (1.17 failed below 5.14)
+	- Export with Ex::Op instead of Import::Export; requires 5.010

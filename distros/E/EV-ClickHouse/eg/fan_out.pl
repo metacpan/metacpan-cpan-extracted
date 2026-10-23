@@ -11,7 +11,7 @@ use EV::ClickHouse;
 
 my @queries = (
     "select 'hello' as greeting",
-    "select count() as rows from system.numbers limit 1000",
+    "select count() as rows from numbers(1000)",
     "select version()",
     "select now() as now",
     "select uptime() as up",

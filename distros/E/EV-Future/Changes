@@ -1,5 +1,10 @@
 Revision history for EV-Future
 
+0.08  2026-10-16
+    - Retain workers and completion callbacks independently of caller variables.
+    - Preserve false exception objects and writable sparse map arguments.
+    - Handle cancellation during magical argument evaluation.
+
 0.07    Tue Sep 15 2026
         - Forged or Clone::clone'd handles are inert instead of crashing
         - Fix Inf or huge limits running parallel_limit one task at a time

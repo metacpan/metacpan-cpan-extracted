@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::WebStorage;
-$Playwright::WebStorage::VERSION = '1.621';
+$Playwright::WebStorage::VERSION = '1.641';
 use parent 'Playwright::Base';
 
 sub new {
@@ -22,21 +22,11 @@ sub spec {
     return $Playwright::spec->{'WebStorage'}{members};
 }
 
-sub items {
+sub removeItem {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'items',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub getItem {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'getItem',
+        command => 'removeItem',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -62,11 +52,21 @@ sub setItem {
     );
 }
 
-sub removeItem {
+sub getItem {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'removeItem',
+        command => 'getItem',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub items {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'items',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -116,7 +116,7 @@ Playwright::WebStorage - Automatically generated class for Playwright::WebStorag
 
 =head1 VERSION
 
-version 1.621
+version 1.641
 
 =head1 CONSTRUCTOR
 
@@ -127,17 +127,11 @@ Instead it should be returned to you as the result of calls on Playwright object
 
 =head1 METHODS
 
-=head2 items(@args)
+=head2 removeItem(@args)
 
-Execute the WebStorage::items playwright routine.
+Execute the WebStorage::removeItem playwright routine.
 
-See L<https://playwright.dev/docs/api/class-WebStorage#WebStorage-items> for more information.
-
-=head2 getItem(@args)
-
-Execute the WebStorage::getItem playwright routine.
-
-See L<https://playwright.dev/docs/api/class-WebStorage#WebStorage-getItem> for more information.
+See L<https://playwright.dev/docs/api/class-WebStorage#WebStorage-removeItem> for more information.
 
 =head2 clear(@args)
 
@@ -151,11 +145,17 @@ Execute the WebStorage::setItem playwright routine.
 
 See L<https://playwright.dev/docs/api/class-WebStorage#WebStorage-setItem> for more information.
 
-=head2 removeItem(@args)
+=head2 getItem(@args)
 
-Execute the WebStorage::removeItem playwright routine.
+Execute the WebStorage::getItem playwright routine.
 
-See L<https://playwright.dev/docs/api/class-WebStorage#WebStorage-removeItem> for more information.
+See L<https://playwright.dev/docs/api/class-WebStorage#WebStorage-getItem> for more information.
+
+=head2 items(@args)
+
+Execute the WebStorage::items playwright routine.
+
+See L<https://playwright.dev/docs/api/class-WebStorage#WebStorage-items> for more information.
 
 =head2 on(@args)
 

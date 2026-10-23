@@ -1,6 +1,6 @@
 package Langertha::ToolCall;
 # ABSTRACT: Immutable canonical tool invocation emitted by an LLM
-our $VERSION = '0.503';
+our $VERSION = '0.504';
 use Moose;
 use Carp qw( croak );
 use Encode qw( encode_utf8 );
@@ -390,7 +390,7 @@ Langertha::ToolCall - Immutable canonical tool invocation emitted by an LLM
 
 =head1 VERSION
 
-version 0.503
+version 0.504
 
 =head2 synthetic
 

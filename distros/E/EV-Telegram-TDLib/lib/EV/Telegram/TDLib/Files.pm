@@ -3,7 +3,7 @@ package EV::Telegram::TDLib::Files;
 use strict;
 use warnings;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 =head1 NAME
 
@@ -44,7 +44,8 @@ sub update_file {
     if (my $dl = $self->downloads->{ $file->{id} }) {
         if (my $cb = $dl->{on_progress}) { $self->guarded($cb, $file) }
         my $local = $file->{local};
-        if ($local && $local->{is_downloading_completed}) {
+        if ($local && $local->{is_downloading_completed}
+            && ($self->downloads->{ $file->{id} } // 0) == $dl) {
             delete $self->downloads->{ $file->{id} };
             $self->guarded($dl->{cb}, $file, undef);
         }
@@ -54,7 +55,8 @@ sub update_file {
         # started, then neither active nor completed: a permanent failure,
         # signalled only via updateFile; an inactive update before the
         # start is just the file's current state, not a failure
-        elsif ($local && $dl->{started}) {
+        elsif ($local && $dl->{started}
+               && ($self->downloads->{ $file->{id} } // 0) == $dl) {
             delete $self->downloads->{ $file->{id} };
             $self->guarded($dl->{cb}, undef,
                             { '@type' => 'error', code => -1,

@@ -1,16 +1,15 @@
 package Data::LnArray::XS;
 
-use 5.006;
+use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
-use base 'Import::Export';
+use Ex::Op ();
 
-our %EX = (
-        arr => [qw/all/],
-);
+our @EXPORT_OK = qw/arr/;
+our %EXPORT_TAGS = (all => [qw/arr/]);
 
 require XSLoader;
 XSLoader::load('Data::LnArray::XS', $VERSION);
@@ -30,7 +29,7 @@ Data::LnArray::XS - Arrays
 
 =head1 VERSION
 
-Version 0.11
+Version 0.12
 
 =cut
 
@@ -50,6 +49,15 @@ Version 0.11
 
 =head1 Exports
 
+Nothing is exported by default. Ask for C<arr> by name, or with the C<all>
+tag, with or without a leading colon:
+
+	use Data::LnArray::XS qw/arr/;
+	use Data::LnArray::XS qw/all/;
+
+Exporting is done by L<Ex::Op>, so everything L<Exporter> accepts in an
+import list is accepted here too.
+
 =head2 arr
 
 Shorthand for generating a new Data::LnArray::XS Object.
@@ -59,6 +67,18 @@ Shorthand for generating a new Data::LnArray::XS Object.
 	$dlna->$method;
 
 =head1 SUBROUTINES/METHODS
+
+=head2 new
+
+Returns a new object holding the values passed.
+
+	my $foo = Data::LnArray::XS->new(qw/one two three/);
+
+=head2 retrieve
+
+Returns the values in the array as a list.
+
+	my @values = $foo->retrieve;
 
 =head2 get
 

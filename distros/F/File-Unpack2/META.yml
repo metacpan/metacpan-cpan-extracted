@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '7.12'
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -46,5 +46,5 @@ resources:
   homepage: https://github.com/openSUSE/cavil
   license: https://dev.perl.org/licenses/
   repository: https://github.com/openSUSE/perl-File-Unpack2.git
-version: '2.02'
+version: '2.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

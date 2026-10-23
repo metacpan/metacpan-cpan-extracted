@@ -1,0 +1,4 @@
+{"type":"say","role":"user","message":{"role":"user","content":[{"type":"text","text":"Fix the login bug"}]},"timestamp":"2026-01-15T10:30:00.000Z","uuid":"uuid1"}
+{"type":"say","role":"assistant","message":{"role":"assistant","content":[{"type":"text","text":"Sure, let me look at that."}]},"timestamp":"2026-01-15T10:31:00.000Z","uuid":"uuid2"}
+{"type":"say","role":"user","message":{"role":"user","content":[{"type":"text","text":"Thanks"}]},"timestamp":"2026-01-15T10:32:00.000Z","uuid":"uuid3"}
+{"aiTitle":"Fix the login bug","cwd":"/home/user/myproject","timestamp":"2026-01-15T10:32:00.000Z"}

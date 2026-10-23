@@ -1,6 +1,6 @@
 package Langertha::Role::HTTP;
 # ABSTRACT: Role for HTTP APIs
-our $VERSION = '0.503';
+our $VERSION = '0.504';
 use Moose::Role;
 
 use Carp qw( croak );
@@ -8,6 +8,7 @@ use Scalar::Util ();
 use Log::Any qw( $log );
 use Time::HiRes qw( gettimeofday tv_interval );
 use URI;
+use URI::Escape ();
 use LWP::UserAgent;
 use Encode ();
 use File::Spec;
@@ -159,7 +160,7 @@ sub generate_http_request {
   my $uri = URI->new($url);
   my $content_type = (delete $args{content_type}||"");
   my $userinfo = $uri->userinfo;
-  $uri->userinfo(undef) if $userinfo;
+  $uri->userinfo(undef) if defined $userinfo;
   my $headers = [
     # multipart gets its Content-Type below, from the boundary the body used
     $content_type eq 'multipart/form-data' ? ()
@@ -180,10 +181,13 @@ sub generate_http_request {
     $request->header( 'Content-Type' => 'multipart/form-data; boundary="'.$used_boundary.'"' );
     $request->content($body);
   }
-  if ($userinfo) {
-    my ( $user, $pass ) = split(/:/, $userinfo);
-    if ($user and $pass) {
-      $request->authorization_basic($user, $pass);
+  # Userinfo is percent-encoded in the URL and the password may hold a colon:
+  # split once, decode both parts, test for presence not truth ("0" is a valid
+  # user or password). -- karr k377
+  if ( defined $userinfo && length $userinfo ) {
+    my ( $user, $pass ) = split( /:/, $userinfo, 2 );
+    if ( defined $user && length $user && defined $pass ) {
+      $request->authorization_basic( URI::Escape::uri_unescape($user), URI::Escape::uri_unescape($pass) );
     }
   }
   $self->update_request($request) if $self->can('update_request');
@@ -397,7 +401,7 @@ Langertha::Role::HTTP - Role for HTTP APIs
 
 =head1 VERSION
 
-version 0.503
+version 0.504
 
 =head2 url
 

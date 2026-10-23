@@ -1,5 +1,16 @@
 Revision history for Log-Abstraction
 
+0.41	Thu Oct 22 10:41:55 AM EDT 2026
+	[ Bug Fixes ]
+	- Loading Log::Abstraction no longer sets Sub::Private's mode to
+	  enforce for the whole process.  Every module loaded afterwards that
+	  marked subs :Private had them wrapped instead of removed, and code
+	  checking or setting the mode saw the wrong value.  The private subs
+	  are still marked :Private and enforced as before, but enforce mode
+	  is now set for Log::Abstraction and the journald backend only, with
+	  use Sub::Private { mode => 'enforce' }.  Sub::Private 0.07 is
+	  required for that.
+
 0.40	Sun Oct 11 02:48:00 PM EDT 2026
 	[ Enhancements ]
 	- New log_any and log_dispatch backends in the logger hash send

@@ -1,0 +1,6 @@
+# Script mode for Langertha::Engine::Virtual (t/71_engine_virtual.t), the
+# shape of a langertha-raider scenario's script.
+script:
+  - tool_calls:
+      - [ read_file, { path: app.txt } ]
+  - text: Done.

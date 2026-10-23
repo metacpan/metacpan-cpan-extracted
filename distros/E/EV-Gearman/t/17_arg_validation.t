@@ -122,4 +122,106 @@ like $@, qr/cannot specify both 'host' and 'path'/, 'new: host+path conflict cro
     $g->reconnect(0);
 }
 
+# NUL bytes in function names and unique keys would silently reframe
+# the NUL-separated SUBMIT body server-side (wrong route / dedup key /
+# workload). Only the workload may contain NULs.
+{
+    my $g = EV::Gearman->new(host => '127.0.0.1', port => 1,
+                             on_error => sub {});
+    eval { $g->submit_job("re\0size", 'w', sub {}) };
+    like $@, qr/NUL/, 'submit_job: NUL in function name croaks';
+    eval { $g->submit_job('f', 'w', { unique => "bin\0ary" }, sub {}) };
+    like $@, qr/NUL/, 'submit_job: NUL in unique key croaks';
+    eval { $g->submit_job_bg("re\0size", 'w', sub {}) };
+    like $@, qr/NUL/, 'submit_job_bg: NUL in function name croaks';
+    eval { $g->submit_job_epoch("re\0size", 'w', time + 60, sub {}) };
+    like $@, qr/NUL/, 'submit_job_epoch: NUL in function name croaks';
+    eval { $g->submit_job_epoch('f', 'w', time + 60, { unique => "a\0b" }, sub {}) };
+    like $@, qr/NUL/, 'submit_job_epoch: NUL in unique key croaks';
+    # control: NUL in the workload is legal (length-delimited, last arg)
+    eval { $g->submit_job_bg('f', "a\0b", sub {}) };
+    is $@, '', 'submit_job_bg: NUL in workload accepted';
+    $g->reconnect(0);
+}
+
+# Same NUL class on the worker side: the registry stores names via
+# savepv (NUL-truncated) while the wire sends full bytes, so a NUL
+# name could never match again (dup entries, un-removable, JOB_ASSIGN
+# misses). SET_CLIENT_ID has the same store/send split.
+{
+    my $g = EV::Gearman->new;
+    eval { $g->can_do("wo\0rk") };
+    like $@, qr/NUL/, 'can_do: NUL in function name croaks';
+    eval { $g->register_function("wo\0rk", sub {}) };
+    like $@, qr/NUL/, 'register_function: NUL in function name croaks';
+    eval { $g->set_client_id("id\0x") };
+    like $@, qr/NUL/, 'set_client_id: NUL croaks';
+    eval { $g->can_do('ok_name') };
+    is $@, '', 'can_do: clean name accepted';
+    my $g2 = eval {
+        EV::Gearman->new(client_id => "bad\0id", on_error => sub {})
+    };
+    like $@, qr/NUL/, 'new: NUL in client_id croaks';
+}
+
+# A negative epoch (e.g. an overdue $when - time()) must not wrap to
+# 2**32-1/2**64-1 and schedule the job eons out.
+{
+    my $g = EV::Gearman->new(host => '127.0.0.1', port => 1,
+                             on_error => sub {});
+    eval { $g->submit_job_epoch('f', 'w', -1, sub {}) };
+    like $@, qr/epoch/i, 'submit_job_epoch: negative epoch croaks';
+    eval { $g->submit_job_epoch('f', 'w', -0.5, sub {}) };
+    like $@, qr/non-negative/, 'submit_job_epoch: negative fraction croaks';
+    eval { $g->submit_job_epoch('f', 'w', undef, sub {}) };
+    like $@, qr/non-negative/, 'submit_job_epoch: undef epoch croaks';
+    eval { $g->submit_job_epoch('f', 'w', 'abc', sub {}) };
+    like $@, qr/non-negative/, 'submit_job_epoch: non-numeric epoch croaks';
+    eval { $g->submit_job_epoch('f', 'w', 0, sub {}) };
+    is $@, '', 'submit_job_epoch: zero epoch accepted';
+    $g->reconnect(0);
+}
+
+# admin() interpolates the command into the newline-delimited text
+# protocol; an embedded newline would inject a second command and
+# desync the reply framing. A single trailing newline stays legal.
+{
+    my $g = EV::Gearman->new(host => '127.0.0.1', port => 1,
+                             on_error => sub {});
+    eval { $g->admin("status\nshutdown", sub {}) };
+    like $@, qr/newline/, 'admin: embedded newline croaks';
+    eval { $g->admin("status\n", sub {}) };
+    is $@, '', 'admin: trailing newline accepted';
+    $g->reconnect(0);
+}
+
+# Constructor numeric options clamp exactly like their accessors —
+# the getter must not depend on which path stored the value.
+{
+    my $g = EV::Gearman->new(priority => 99);
+    is $g->priority, 2, 'new: priority 99 clamps to 2';
+    my $g2 = EV::Gearman->new(priority => -99);
+    is $g2->priority, -2, 'new: priority -99 clamps to -2';
+    my $g3 = EV::Gearman->new(connect_timeout => -5, command_timeout => -5,
+                              keepalive => -5);
+    is $g3->connect_timeout, 0, 'new: negative connect_timeout clamps to 0';
+    is $g3->command_timeout, 0, 'new: negative command_timeout clamps to 0';
+    is $g3->keepalive, 0, 'new: negative keepalive clamps to 0';
+}
+
+# A non-coderef handler assignment must not silently clear the slot
+# (ctor case also discards the default warn handler, so connection
+# errors would go nowhere). Explicit undef still clears.
+{
+    my $g = EV::Gearman->new;
+    ok ref($g->on_error) eq 'CODE', 'new: default on_error is a coderef';
+    $g->on_error(sub { });
+    $g->on_error('oops');
+    ok ref($g->on_error) eq 'CODE', 'on_error: junk assignment keeps old handler';
+    $g->on_error(undef);
+    is $g->on_error, undef, 'on_error: undef still clears';
+    my $g2 = EV::Gearman->new(on_error => 'x');
+    ok ref($g2->on_error) eq 'CODE', 'new: junk on_error keeps default';
+}
+
 done_testing;

@@ -53,3 +53,6 @@ __pycache__
 .claude/statsig/
 .claude/todos/
 .claude/projects/
+
+# Claude Code worktrees (claude --worktree / isolated agents) -- never commit
+/.claude/worktrees/

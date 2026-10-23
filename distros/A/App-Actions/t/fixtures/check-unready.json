@@ -1,0 +1,40 @@
+{
+  "schema_version": 2,
+  "ready": false,
+  "problems": 1,
+  "host": {
+    "os": "linux",
+    "name": "Linux",
+    "perl": "5.40.0",
+    "archname": "x86_64-linux"
+  },
+  "docker": {
+    "bin": "docker",
+    "client": "26.0.0",
+    "daemon": "26.0.0",
+    "containers": "linux"
+  },
+  "image": "alpine:3.20",
+  "mounts": [
+    {
+      "host": "/tmp/action-run-check-a1b2c3",
+      "container": "/action-run-check",
+      "ok": true
+    },
+    {
+      "host": "/home/dev/project",
+      "container": "/check-project",
+      "entries": 17,
+      "expected": 18,
+      "ok": false
+    }
+  ],
+  "issues": [
+    {
+      "problem": "'/home/dev/project' -> /check-project sees 17 entries, the host has 18",
+      "remedies": [
+        "share the drive that holds '/home/dev/project' in Docker Desktop > Settings > Resources > File sharing"
+      ]
+    }
+  ]
+}

@@ -23,9 +23,17 @@ my %TRANSIENT = map { $_ => 1 }
 my $r = EV::cares->new(timeout => 5, tries => 2);
 my %cache;       # name => { addrs, status, fetched }
 my $consec_fail = 0;
+my $reload = 0;
 
 my $tick = sub {
+    return if $r->is_busy;
     my $when = scalar localtime;
+    if ($reload) {
+        warn "[$when] reinit() to re-read system resolvers\n";
+        eval { $r->reinit };
+        warn $@ if $@;
+        $reload = 0;
+    }
     print "[$when] refresh ", scalar(@names), " names\n";
     $r->resolve_all(\@names, sub {
         my $results = shift;
@@ -56,8 +64,7 @@ my $tick = sub {
             $consec_fail++;
             warn "[$when] all names transient-failed; consec=$consec_fail\n";
             if ($consec_fail >= 3) {
-                warn "[$when] reinit() to re-read system resolvers\n";
-                eval { $r->reinit };
+                $reload = 1;
                 $consec_fail = 0;
             }
         } else {

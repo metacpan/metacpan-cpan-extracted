@@ -1,0 +1,3 @@
+{"type":"say","role":"user","message":{"role":"user","content":[{"type":"text","text":"Refactor the database layer"}]},"timestamp":"2026-01-15T11:00:00.000Z","uuid":"uuid-b1"}
+{"type":"say","role":"assistant","message":{"role":"assistant","content":[{"type":"text","text":"I will help refactor the database layer."}]},"timestamp":"2026-01-15T11:01:00.000Z","uuid":"uuid-b2"}
+{"aiTitle":"Refactor the database layer","cwd":"/home/user/myproject","timestamp":"2026-01-15T11:01:00.000Z"}

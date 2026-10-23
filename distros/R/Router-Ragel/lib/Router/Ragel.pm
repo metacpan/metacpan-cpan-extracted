@@ -1,6 +1,6 @@
 package Router::Ragel;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 use 5.010;
 use strict;
@@ -146,7 +146,7 @@ sub _segment_to_ragel {
                 croak "Router::Ragel: '<' is not allowed inside <type> in pattern '$pattern'"
                     if index($type, '<') >= 0;
                 _validate_type($pattern, $type) unless exists $TYPE_ALIAS{$type};
-                $class = $TYPE_ALIAS{$type} // $type;
+                $class = $TYPE_ALIAS{$type} // "(($type) & [^/]*)";
                 $i = $close + 1;
             }
             my $ci = $$cap_ref++;
@@ -154,7 +154,19 @@ sub _segment_to_ragel {
             # concatenation and union, so a multi-term type would otherwise
             # instrument its last term only, leaving the slot unset for the
             # branches that miss it.
-            $out .= "( ($class) >start_capture${ci} %end_capture${ci} )";
+            my $lit_end = index($seg, ':', $i);
+            $lit_end = $len if $lit_end < 0;
+            if ($i < $lit_end) {
+                my $lit = substr($seg, $i, $lit_end - $i);
+                my $suffix_len = length $lit;
+                $lit =~ s/(['\\])/\\$1/g;
+                # Record the boundary only after the full literal finishes.
+                $out .= "( ($class) >start_capture${ci} '$lit'"
+                    . " %{ capture_end[$ci] = p - data - $suffix_len; } )";
+                $i = $lit_end;
+            } else {
+                $out .= "( ($class) >start_capture${ci} %end_capture${ci} )";
+            }
         } else {
             my $next = index($seg, ':', $i);
             $next = $len if $next < 0;

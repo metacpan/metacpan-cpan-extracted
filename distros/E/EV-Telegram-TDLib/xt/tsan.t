@@ -47,10 +47,18 @@ plan tests => scalar @tests;
 
 for my $t (@tests) {
     my $out = `"$Config{perlpath}" -Iblib/lib -Iblib/arch $t 2>&1`;
-    my $rc = $? >> 8;
+    # The signal matters more than the exit code here: a child killed by
+    # SIGSEGV or SIGABRT has rc 0, which is exactly the crash this harness exists
+    # to catch.
+    my $status = $?;
+    my $rc  = $status >> 8;
+    my $sig = $status & 127;
 
     if ($out =~ /ThreadSanitizer/i) {
         fail "$t: TSAN report";
+        diag $out =~ s/^/  /gmr;
+    } elsif ($sig) {
+        fail "$t: killed by signal $sig";
         diag $out =~ s/^/  /gmr;
     } elsif ($rc != 0) {
         fail "$t: test failure (rc=$rc)";

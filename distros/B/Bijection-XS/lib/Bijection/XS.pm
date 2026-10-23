@@ -1,15 +1,20 @@
 package Bijection::XS;
 
-use 5.006;
+use 5.010;
 use strict;
 use warnings;
 
-use base qw/Import::Export/;
+use Ex::Op ();
 
-our %EX = (biject => [qw/all main/], inverse => [qw/all main/], bijection_set => [qw/all set/], offset_set => [qw/all set/]);
+our @EXPORT_OK = qw/biject inverse bijection_set offset_set/;
+our %EXPORT_TAGS = (
+	all  => [qw/biject inverse bijection_set offset_set/],
+	main => [qw/biject inverse/],
+	set  => [qw/bijection_set offset_set/],
+);
 
 BEGIN {
-	our $VERSION = '0.10';
+	our $VERSION = '0.11';
 	require XSLoader;
 	XSLoader::load("Bijection::XS", $VERSION);
 	bijection_set(qw/b c d f g h j k l m n p q r s t v w x y z B C D F G H J K L M N P Q R S T V W X Y Z 0 1 2 3 4 5 6 7 8 9/);
@@ -26,7 +31,7 @@ Bijection::XS - Bijection of an integer faster
 
 =head1 VERSION
 
-Version 0.10
+Version 0.11
 
 =cut
 
@@ -54,6 +59,16 @@ Perhaps a little code snippet.
 =cut
 
 =head1 EXPORT
+
+Nothing is exported by default. Each function can be asked for by name, and
+three tags name groups of them, with or without a leading colon:
+
+	use Bijection::XS qw/main/;     # biject and inverse
+	use Bijection::XS qw/:set/;     # bijection_set and offset_set
+	use Bijection::XS qw/all/;      # all four
+
+Exporting is done by L<Ex::Op>, so everything L<Exporter> accepts in an
+import list is accepted here too.
 
 =head2 biject
 

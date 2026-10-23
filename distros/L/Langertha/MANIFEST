@@ -13,6 +13,7 @@
 .claude/settings.json
 .claude/skilletor.json
 .claude/skills/langertha-adr/SKILL.md
+.claude/skills/langertha-core/SKILL.md
 .claude/skills/langertha-github-issues/SKILL.md
 .claude/skills/langertha-internals/SKILL.md
 .claude/skills/langertha-testing/SKILL.md
@@ -20,6 +21,7 @@
 .dockerignore
 .gitignore
 .perlcriticrc
+.worktreeinclude
 CLAUDE.md
 CONTEXT.md
 Changes
@@ -37,7 +39,6 @@ bin/langertha_openai_list_models
 bin/langertha_whisper
 cpanfile
 dist.ini
-docker-entrypoint.sh
 docs/adr/0001-tool-wire-translation-via-value-objects.md
 docs/adr/0002-capabilities-derived-from-role-inventory.md
 docs/adr/0003-response-tool-calls-single-source-of-truth.md
@@ -75,6 +76,8 @@ docs/adr/0034-non-chat-calls-return-a-call-result.md
 docs/adr/0035-bound-gemini-cache-owns-system-instruction-and-tools.md
 docs/adr/0036-one-redirect-policy-keeps-credentials-on-their-origin.md
 docs/adr/0037-connect-address-pins-the-engine-connection.md
+docs/adr/0038-stream-request-asks-for-token-usage.md
+docs/adr/0039-tool-result-media-is-a-public-capability.md
 docs/superpowers/plans/2026-08-14-symmetric-anthropic-wire-role.md
 docs/superpowers/plans/2026-09-21-sync-fallback-async-transport.md
 docs/superpowers/specs/2026-09-16-reasoning-profile-design.md
@@ -138,6 +141,7 @@ lib/Langertha/Engine/LlamaCpp.pm
 lib/Langertha/Engine/MiniMax.pm
 lib/Langertha/Engine/MiniMaxAnthropic.pm
 lib/Langertha/Engine/Mistral.pm
+lib/Langertha/Engine/Mock.pm
 lib/Langertha/Engine/Moonshot.pm
 lib/Langertha/Engine/MoonshotAnthropic.pm
 lib/Langertha/Engine/NousResearch.pm
@@ -155,6 +159,7 @@ lib/Langertha/Engine/Scaleway.pm
 lib/Langertha/Engine/TSystems.pm
 lib/Langertha/Engine/TranscriptionBase.pm
 lib/Langertha/Engine/VLLMHook.pm
+lib/Langertha/Engine/Virtual.pm
 lib/Langertha/Engine/Whisper.pm
 lib/Langertha/Engine/XAI.pm
 lib/Langertha/Engine/vLLM.pm
@@ -218,10 +223,13 @@ lib/Langertha/Role/RuntimeKnobs.pm
 lib/Langertha/Role/Seed.pm
 lib/Langertha/Role/ServerTools.pm
 lib/Langertha/Role/StaticModels.pm
+lib/Langertha/Role/StreamUsage.pm
 lib/Langertha/Role/Streaming.pm
 lib/Langertha/Role/SystemPrompt.pm
 lib/Langertha/Role/Temperature.pm
 lib/Langertha/Role/ThinkTag.pm
+lib/Langertha/Role/ToolResultImages.pm
+lib/Langertha/Role/ToolResultPDF.pm
 lib/Langertha/Role/Tools.pm
 lib/Langertha/Role/Transcription.pm
 lib/Langertha/RunContext.pm
@@ -244,6 +252,8 @@ lib/Langertha/ToolResult.pm
 lib/Langertha/Usage.pm
 lib/Langertha/UsageRecord.pm
 lib/Langertha/VLLMHook/Config.pm
+lib/Langertha/Virtual/Rules.pm
+lib/Langertha/Virtual/Server.pm
 lib/LangerthaX.pm
 maint/generate_spec_data.pl
 misc/agent-context/.claude/agents/langertha-adr-auditor.md
@@ -260,6 +270,8 @@ misc/agent-context/.claude/skilletor.json
 misc/agent-context/.claude/skilletor.lock.json
 misc/agent-context/.claude/skills/getty-git-commit-style/SKILL.md
 misc/agent-context/.claude/skills/getty-git-usage/SKILL.md
+misc/agent-context/.claude/skills/getty-perl-core/SKILL.md
+misc/agent-context/.claude/skills/getty-perl-core/references/dbic.md
 misc/agent-context/.claude/skills/getty-perl-moose/SKILL.md
 misc/agent-context/.claude/skills/getty-perl-pod/SKILL.md
 misc/agent-context/.claude/skills/getty-perl-release-author-getty/SKILL.md
@@ -273,6 +285,7 @@ misc/agent-context/.claude/skills/kanban-issues-karr-coordination/references/set
 misc/agent-context/.claude/skills/kanban-issues-karr-coordination/references/storage.md
 misc/agent-context/.claude/skills/kanban-issues-karr-ticket/SKILL.md
 misc/agent-context/.claude/skills/langertha-adr/SKILL.md
+misc/agent-context/.claude/skills/langertha-core/SKILL.md
 misc/agent-context/.claude/skills/langertha-github-issues/SKILL.md
 misc/agent-context/.claude/skills/langertha-internals/SKILL.md
 misc/agent-context/.claude/skills/langertha-testing/SKILL.md
@@ -286,6 +299,7 @@ share/mistral.yaml
 share/ollama.yaml
 share/openai.yaml
 t/00_load.t
+t/09_http_userinfo_basic_auth.t
 t/10_engine_hierarchy.t
 t/10_ollama_new_openai.t
 t/11_basic_auth.t
@@ -320,6 +334,7 @@ t/43_hermes_stream_tool_calls.t
 t/43_responses_stream_tool_calls.t
 t/43_stream_text_only_pin.t
 t/43_stream_tool_calls.t
+t/43_stream_usage_request.t
 t/43_streamed_thinking.t
 t/43_streamed_usage.t
 t/43_streaming_buffer_final.t
@@ -330,11 +345,13 @@ t/44_error_body_in_croak.t
 t/44_finish_reason_error.t
 t/44_malformed_response_guards.t
 t/44_response_decode_limits.t
+t/44_stream_error_frame_anthropic_ollama.t
 t/44_streamed_thinking_future.t
 t/44_streaming_future.t
 t/45_async_await.t
 t/45_async_http_connect_modules.t
 t/45_async_http_keepalive.t
+t/45_async_http_loop_lifecycle.t
 t/45_async_http_stream_die.t
 t/45_async_http_timeout.t
 t/45_cached_content_transport.t
@@ -350,6 +367,7 @@ t/45_stream_abort_client_future.t
 t/45_sync_http.t
 t/45_sync_http_real_lwp.t
 t/46_async_http_selection.t
+t/46_gemini4_controls.t
 t/46_gemini_array_content.t
 t/46_gemini_embeddings.t
 t/46_gemini_endpoint_seam.t
@@ -419,9 +437,16 @@ t/68_perplexity_function_tools.t
 t/69_chat_f_wire_tools.t
 t/70_response.t
 t/70_transcription_response.t
+t/71_engine_virtual.t
+t/71_engine_virtual_tool_loop.t
 t/72_langfuse.t
 t/72_langfuse_batch_cap.t
+t/72_virtual_error_reaction.t
+t/72_virtual_server.t
 t/73_runcontext_runnable.t
+t/73_virtual_stream.t
+t/73_virtual_usage.t
+t/74_response_object_readers.t
 t/75_think_tag.t
 t/76_drop_warning_location.t
 t/76_parallel_tool_use_capability_gate.t
@@ -450,6 +475,7 @@ t/78_model_override_warning.t
 t/78_model_scoped_capabilities.t
 t/78_prompt_cache_key_capability.t
 t/78_runtime_knobs.t
+t/78_tool_result_media_capability.t
 t/78_xai_prompt_cache_key.t
 t/79_anthropic_wire_drift.t
 t/79_kimi_temperature_gate.t
@@ -504,6 +530,7 @@ t/94_plugin_langfuse_generation.t
 t/94_wrapper_call_result.t
 t/95_image_cli.t
 t/95_imagegen.t
+t/95_whisper_cli.t
 t/96_manifest.t
 t/96_manifest_builder.t
 t/96_manifest_rejections.t
@@ -625,9 +652,25 @@ t/data/responses_web_search_echo.request.json
 t/data/responses_web_search_function_call.headers.json
 t/data/responses_web_search_function_call.json
 t/data/responses_web_search_function_call.request.json
+t/data/speaches_transcription_error_no_model.headers.json
+t/data/speaches_transcription_error_no_model.json
+t/data/speaches_transcription_json.headers.json
+t/data/speaches_transcription_json.json
+t/data/speaches_transcription_srt.headers.json
+t/data/speaches_transcription_srt.txt
+t/data/speaches_transcription_text.headers.json
+t/data/speaches_transcription_text.txt
+t/data/speaches_transcription_verbose_json.headers.json
+t/data/speaches_transcription_verbose_json.json
+t/data/speaches_transcription_verbose_json_words.headers.json
+t/data/speaches_transcription_verbose_json_words.json
+t/data/speaches_transcription_vtt.headers.json
+t/data/speaches_transcription_vtt.txt
 t/data/stream_text_only_golden.json
 t/data/testfile
 t/data/tsystems_models_probe.json
+t/data/virtual_rules.yml
+t/data/virtual_script.yml
 t/data/vllm_metrics_lora.prom
 t/data/xai_chat_cost_doc.json
 t/data/xai_image_url_doc.headers.json

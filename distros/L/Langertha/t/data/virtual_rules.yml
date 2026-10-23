@@ -1,0 +1,11 @@
+# Rules for Langertha::Engine::Virtual (t/71_engine_virtual.t): exact
+# trigger texts, tool calls in the langertha-raider scenario spelling.
+rules:
+  Write a note.:
+    tool_calls:
+      - [ write_file, { path: notes/a.txt, content: "hello\n", append: false } ]
+  Hello: { answer: "Hi there!" }
+  Just text: "plain answer"
+after:
+  write_file: { answer: Fertig. }
+fallback: { answer: done }

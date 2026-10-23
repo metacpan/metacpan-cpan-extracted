@@ -13,7 +13,7 @@ use File::Temp qw( tempfile );
 use URI;
 use Encode ();
 
-our $VERSION = '0.503';
+our $VERSION = '0.504';
 
 Configure(qw( no_auto_abbrev no_ignore_case ));
 
@@ -353,7 +353,7 @@ langertha_image - Generate images through OpenAI or an explicit subscription pro
 
 =head1 VERSION
 
-version 0.503
+version 0.504
 
 =head1 SYNOPSIS
 

@@ -24,9 +24,9 @@ $fab_multi->out__target_section('footer', 'LayoutB');
 push @{$fab_multi->{sections}{LayoutB}{footer}}, ['text', 'Footer from B'];
 
 $fab_multi->out__target_section('body', 'Page');
-$fab_multi->out__embed('header', 'Page');
+$fab_multi->out__embed('header', 'Page', [], {});
 push @{$fab_multi->{sections}{Page}{body}}, ['text', ' | Body | '];
-$fab_multi->out__embed('footer', 'Page');
+$fab_multi->out__embed('footer', 'Page', [], {});
 
 $fab_multi->NS__set_parents('Page', 'LayoutA', 'LayoutB');
 is($fab_multi->assemble('Page:body'), 'Header from A | Body | Footer from B',
@@ -34,16 +34,16 @@ is($fab_multi->assemble('Page:body'), 'Header from A | Body | Footer from B',
 
 my $fab_missing = Text::Fab->new();
 $fab_missing->out__target_section('main', 'NS');
-$fab_missing->out__embed('nonexistent', 'NS');
+$fab_missing->out__embed('nonexistent', 'NS', [], {});
 throws_ok { $fab_missing->assemble('NS:main') } qr/E_EMBED_NOT_FOUND/,
     'unresolvable embed placeholder dies with E_EMBED_NOT_FOUND';
 
 my $fab_loop = Text::Fab->new();
 $fab_loop->out__target_section('sec_a', 'NS');
-$fab_loop->out__embed('sec_b', 'NS');
+$fab_loop->out__embed('sec_b', 'NS', [], {});
 
 $fab_loop->out__target_section('sec_b', 'NS');
-$fab_loop->out__embed('sec_a', 'NS');
+$fab_loop->out__embed('sec_a', 'NS', [], {});
 
 throws_ok { $fab_loop->assemble('NS:sec_a') } qr/E_CIRCULAR_EMBED/,
     'circular embed chain dies with E_CIRCULAR_EMBED';
@@ -59,14 +59,14 @@ $fab_asif->NS__set_parents('Parent', 'GrandParent');
 $fab_asif->NS__set_parents('Child', 'Parent');
 
 $fab_asif->out__target_section('normal', 'Child');
-$fab_asif->out__embed('sidebar', 'Child');
+$fab_asif->out__embed('sidebar', 'Child', [], {});
 is($fab_asif->assemble('Child:normal'), 'Custom Parent Sidebar',
    'normal embed finds Child/Parent override');
 
 $fab_asif->out__target_section('static', 'Child');
-$fab_asif->out__embed('sidebar', 'Child', { asiffrom => 'GrandParent' });
+$fab_asif->out__embed('sidebar', 'Child', [], { aim => 'GrandParent' });
 is($fab_asif->assemble('Child:static'), 'Default Sidebar',
-   'asiffrom embed resolves starting directly from specified context');
+   'aim embed resolves starting directly from specified context');
 
 my $fab_blind = Text::Fab->new();
 $fab_blind->out__target_section('widget', 'GrandParent');
@@ -84,7 +84,7 @@ $fab_blind->cfg__set('Fab/blinders/hide_parent', sub {
 });
 
 $fab_blind->out__target_section('body', 'Child');
-$fab_blind->out__embed('widget', 'Child', { with_blinder => 'hide_parent' });
+$fab_blind->out__embed('widget', 'Child', [], { with_blinder => 'hide_parent' });
 
 is($fab_blind->assemble('Child:body'), 'GrandParent Widget',
    'with_blinder dynamically obscures specified namespace branch in DAG');
@@ -100,10 +100,10 @@ $fab_nest->out__target_section('inner_leaf', 'RootNS');
 push @{$fab_nest->{sections}{RootNS}{inner_leaf}}, ['text', 'Inner Content'];
 
 $fab_nest->out__target_section('mid_layer', 'RootNS');
-$fab_nest->out__embed('inner_leaf', 'RootNS', { with_blinder => 'inner_blinder' });
+$fab_nest->out__embed('inner_leaf', 'RootNS', [], { with_blinder => 'inner_blinder' });
 
 $fab_nest->out__target_section('top', 'RootNS');
-$fab_nest->out__embed('mid_layer', 'RootNS', { with_blinder => 'outer_blinder' });
+$fab_nest->out__embed('mid_layer', 'RootNS', [], { with_blinder => 'outer_blinder' });
 
 my @captured_stack;
 $fab_nest->cfg__set('Fab/blinders/outer_blinder', sub {
@@ -121,5 +121,53 @@ $fab_nest->assemble('RootNS:top');
 is(scalar @captured_stack, 1, 'inner blinder received 1 enclosing embed frame');
 is_deeply($captured_stack[0]{blinder_output}, ['DummyOuter'],
    'inner blinder successfully saw enclosing blinder_output on the stack');
+
+subtest 'Parameterized recipes with section operands ($ARGV0...)' => sub {
+    my $fab_p = Text::Fab->new();
+
+    $fab_p->out__target_section('wrap_two', 'Layout');
+    push @{$fab_p->{sections}{Layout}{wrap_two}},
+        ['text', '['],
+        ['embed', 'Layout', '$ARGV0', [], {}],
+        ['text', ' and '],
+        ['embed', 'Layout', '$ARGV1', [], {}],
+        ['text', ']'];
+
+    $fab_p->out__target_section('item1', 'Data');
+    push @{$fab_p->{sections}{Data}{item1}}, ['text', 'Item Alpha'];
+
+    $fab_p->out__target_section('item2', 'Data');
+    push @{$fab_p->{sections}{Data}{item2}}, ['text', 'Item Beta'];
+
+    $fab_p->out__target_section('main', 'Data');
+    $fab_p->process_string("#emb[in=Layout] wrap_two Data:item1 Data:item2");
+
+    is($fab_p->assemble('Data:main'), '[Item Alpha and Item Beta]',
+       'recipe successfully expanded operands bound to $ARGV0 and $ARGV1');
+};
+
+subtest 'Lens affection resolution with static joining _fmt_lens_join' => sub {
+    my $fab_lens = Text::Fab->new();
+
+    $fab_lens->cfg__set('Fab/lens_affects', {
+        'LaTeX/as_TOC' => 1,
+    });
+
+    $fab_lens->out__target_section('sec_title', 'Base');
+    push @{$fab_lens->{sections}{Base}{sec_title}}, ['text', 'Default Title'];
+
+    $fab_lens->out__target_section('sec_title', 'LaTeX/as_TOC');
+    push @{$fab_lens->{sections}{'LaTeX/as_TOC'}{sec_title}}, ['text', 'LaTeX Compact Title'];
+
+    $fab_lens->NS__set_parents('LaTeX/as_TOC', 'Base');
+
+    $fab_lens->{lens_stack} = ['_main', 'LaTeX'];
+
+    $fab_lens->out__target_section('main', '_main');
+    $fab_lens->process_string("#emb[aim=as_TOC] sec_title");
+
+    is($fab_lens->assemble('_main:main'), 'LaTeX Compact Title',
+       'aim as_TOC massaged to LaTeX/as_TOC via active lens affection and resolved override');
+};
 
 done_testing();

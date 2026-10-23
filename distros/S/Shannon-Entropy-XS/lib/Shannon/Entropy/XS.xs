@@ -62,8 +62,7 @@ static OP* pp_entropy(pTHX) {
 
 static OP* entropy_call_checker(pTHX_ OP *entersubop, GV *namegv, SV *ckobj) {
 	OP *pushop, *argop, *nextop, *newop;
-	PERL_UNUSED_ARG(namegv);
-	PERL_UNUSED_ARG(ckobj);
+	entersubop = ck_entersub_args_proto_or_list(entersubop, namegv, ckobj);
 	pushop = cLISTOPx(entersubop)->op_first;
 	if (!pushop) return entersubop;
 	if (pushop->op_type == OP_NULL && cLISTOPx(pushop)->op_first) {

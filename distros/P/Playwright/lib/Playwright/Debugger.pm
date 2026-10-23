@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::Debugger;
-$Playwright::Debugger::VERSION = '1.621';
+$Playwright::Debugger::VERSION = '1.641';
 use parent 'Playwright::Base';
 
 sub new {
@@ -22,6 +22,26 @@ sub spec {
     return $Playwright::spec->{'Debugger'}{members};
 }
 
+sub pausedStateChanged {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'pausedStateChanged',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub requestPause {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'requestPause',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
 sub pausedDetails {
     my $self = shift;
     return $self->_api_request(
@@ -32,11 +52,11 @@ sub pausedDetails {
     );
 }
 
-sub pausedStateChanged {
+sub next {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'pausedStateChanged',
+        command => 'next',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -57,26 +77,6 @@ sub resume {
     return $self->_api_request(
         args    => [@_],
         command => 'resume',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub next {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'next',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub requestPause {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'requestPause',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -126,7 +126,7 @@ Playwright::Debugger - Automatically generated class for Playwright::Debugger
 
 =head1 VERSION
 
-version 1.621
+version 1.641
 
 =head1 CONSTRUCTOR
 
@@ -137,17 +137,29 @@ Instead it should be returned to you as the result of calls on Playwright object
 
 =head1 METHODS
 
+=head2 pausedStateChanged(@args)
+
+Execute the Debugger::pausedStateChanged playwright routine.
+
+See L<https://playwright.dev/docs/api/class-Debugger#Debugger-pausedStateChanged> for more information.
+
+=head2 requestPause(@args)
+
+Execute the Debugger::requestPause playwright routine.
+
+See L<https://playwright.dev/docs/api/class-Debugger#Debugger-requestPause> for more information.
+
 =head2 pausedDetails(@args)
 
 Execute the Debugger::pausedDetails playwright routine.
 
 See L<https://playwright.dev/docs/api/class-Debugger#Debugger-pausedDetails> for more information.
 
-=head2 pausedStateChanged(@args)
+=head2 next(@args)
 
-Execute the Debugger::pausedStateChanged playwright routine.
+Execute the Debugger::next playwright routine.
 
-See L<https://playwright.dev/docs/api/class-Debugger#Debugger-pausedStateChanged> for more information.
+See L<https://playwright.dev/docs/api/class-Debugger#Debugger-next> for more information.
 
 =head2 runTo(@args)
 
@@ -160,18 +172,6 @@ See L<https://playwright.dev/docs/api/class-Debugger#Debugger-runTo> for more in
 Execute the Debugger::resume playwright routine.
 
 See L<https://playwright.dev/docs/api/class-Debugger#Debugger-resume> for more information.
-
-=head2 next(@args)
-
-Execute the Debugger::next playwright routine.
-
-See L<https://playwright.dev/docs/api/class-Debugger#Debugger-next> for more information.
-
-=head2 requestPause(@args)
-
-Execute the Debugger::requestPause playwright routine.
-
-See L<https://playwright.dev/docs/api/class-Debugger#Debugger-requestPause> for more information.
 
 =head2 on(@args)
 

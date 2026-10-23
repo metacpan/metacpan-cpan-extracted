@@ -30,6 +30,11 @@ use Business::GoCardless::Paginator;
     class
     info
     links
+    page_loader
+
+page_loader is an optional coderef that takes a URL and returns an arrayref of
+objects, a hashref of links, and a hashref of info for that page. It is used
+for the v2 API, which has cursor based pagination rather than Link headers.
 
 =cut
 
@@ -37,6 +42,7 @@ has [ qw/
     client
     objects
     class
+    page_loader
 / ] => (
     is => 'rw'
 );
@@ -66,6 +72,9 @@ has links => (
 
         my $links_hash = {};
         return $links_hash if ! $links;
+
+        # already parsed (v2 API cursor links)
+        return $links if ref( $links ) eq 'HASH';
 
         foreach my $link ( split( /, /,$links ) ) {
             my ( $rel,$url ) = reverse split( />; /,$link );
@@ -125,6 +134,13 @@ sub _objects_from_page {
     # see if we have more data to get
     if ( my $url = $self->links->{$page} ) {
 
+        if ( my $page_loader = $self->page_loader ) {
+            my ( $objects,$links,$info ) = $page_loader->( $url );
+            $self->links( $links );
+            $self->info( $info );
+            return $objects;
+        }
+
         my ( $data,$links,$info ) = $self->client->api_get( $url );
 
         my $class = $self->class;
@@ -141,13 +157,13 @@ sub _objects_from_page {
 
 =head1 AUTHOR
 
-Lee Johnson - C<leejo@cpan.org>
+Lee Johnson - C<lee@payprop.com>
 
 This library is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself. If you would like to contribute documentation,
 features, bug fixes, or anything else then please raise an issue / pull request:
 
-    https://github.com/Humanstate/business-gocardless
+    https://github.com/payprop/business-gocardless
 
 =cut
 

@@ -44,6 +44,7 @@ sub setup_sluz {
     $sluz->assign('subarr'       => {one => [2, 4, 6], two => [3, 6, 9]});
     $sluz->assign('arrayd'       => [[1, 2], [3, 4], [5, 6]]);
     $sluz->assign('empty'        => []);
+    $sluz->assign('single'       => ['only']);
     $sluz->assign('empty_string' => '');
     $sluz->assign('null'         => undef);
     $sluz->assign('true'         => 1);

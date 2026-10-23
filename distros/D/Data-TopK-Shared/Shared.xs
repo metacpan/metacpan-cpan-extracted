@@ -184,7 +184,7 @@ add(self, item, timestamp = &PL_sv_undef)
     tk_rwlock_wrlock(h);
     raw = tk_observe_locked(h, s, n, has_ts, ts);
     if (h->mode == TK_MODE_DECAYED) g = tk_g(h);
-    __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);
+    h->hdr->stat_ops++;
     tk_rwlock_wrunlock(h);
     RETVAL = (h->mode == TK_MODE_DECAYED) ? newSVnv(tk_w_get(raw) / g) : newSVuv((UV)raw);
   OUTPUT:
@@ -228,7 +228,7 @@ add_many(self, items)
         REEXTRACT(self);
         tk_rwlock_wrlock(h);                             /* locked region: NO croak-capable calls */
         for (i = 0; i < cnt; i++) { tk_observe_locked(h, ps[i], ls[i], 0, 0.0); processed++; }   /* decayed: per-add tick */
-        __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);  /* a call always counts, even an empty batch */
+        h->hdr->stat_ops++;  /* a call always counts, even an empty batch */
         tk_rwlock_wrunlock(h);
     }
     RETVAL = processed;
@@ -338,7 +338,7 @@ clear(self)
   CODE:
     tk_rwlock_wrlock(h);
     tk_clear_locked(h);
-    __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);
+    h->hdr->stat_ops++;
     tk_rwlock_wrunlock(h);
 
 UV

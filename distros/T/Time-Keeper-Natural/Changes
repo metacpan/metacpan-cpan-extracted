@@ -1,5 +1,8 @@
 Revision history for Time-Keeper-Natural
 
+0.08    2026-10-22
+        - Tests run on perls before 5.14
+
 0.07    2026-10-21
         - Reads Adlam and other scripts newer than the running perl's Unicode
         - No assertion failure on a perl built with -DDEBUGGING

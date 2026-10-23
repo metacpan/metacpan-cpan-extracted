@@ -29,7 +29,12 @@ for my $t (@tests) {
         . " --num-callers=20"
         . " \"$Config{perlpath}\" -Iblib/lib -Iblib/arch $t 2>&1";
     my $out = `$cmd`;
-    my $rc = $? >> 8;
+    # The signal matters more than the exit code here: a child killed by
+    # SIGSEGV or SIGABRT has rc 0, which is exactly the crash this harness exists
+    # to catch.
+    my $status = $?;
+    my $rc  = $status >> 8;
+    my $sig = $status & 127;
 
     my ($invalid) = $out =~ /Invalid (read|write)/;
 
@@ -56,6 +61,9 @@ for my $t (@tests) {
         diag $out =~ s/^/  /gmr;
     } elsif (@ours) {
         fail "$t: leaked from our own code (@ours)";
+        diag $out =~ s/^/  /gmr;
+    } elsif ($sig) {
+        fail "$t: killed by signal $sig under valgrind";
         diag $out =~ s/^/  /gmr;
     } elsif ($rc != 0 && $rc != 99) {
         fail "$t: test failure under valgrind (rc=$rc)";

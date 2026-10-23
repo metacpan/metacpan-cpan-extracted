@@ -92,7 +92,7 @@ static bool allowed_href(const char *v, STRLEN n) {
     size_t i, k;
     for (i = 0; i < sizeof(schemes) / sizeof(schemes[0]); i++) {
         const char *p = schemes[i];
-        for (k = 0; p[k] && k < n && toLOWER(v[k]) == p[k]; k++)
+        for (k = 0; p[k] && k < n && toLOWER((U8)v[k]) == p[k]; k++)
             ;
         if (!p[k])
             return true;
@@ -256,7 +256,9 @@ static void guard_leave(pTHX_ PerlGhostty *self) {
     self->error = NULL;
     self->busy = false;
     if (self->destroy_pending) {
-        mg_findext(obj, PERL_MAGIC_ext, &ghostty_vtbl)->mg_ptr = NULL;
+        MAGIC *mg = mg_findext(obj, PERL_MAGIC_ext, &ghostty_vtbl);
+        if (mg)
+            mg->mg_ptr = NULL;
         release(aTHX_ self);
     }
     SvREFCNT_dec(obj);

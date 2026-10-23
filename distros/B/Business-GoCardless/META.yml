@@ -1,10 +1,8 @@
 ---
 abstract: unknown
 author:
-  - 'Lee Johnson <leejo@cpan.org>'
+  - 'Lee Johnson <lee@payprop.com>'
 build_requires:
-  FindBin: '0'
-  LWP::Simple: '6'
   Test::Deep: '0.112'
   Test::Exception: '0.32'
   Test::MockObject: '1.20140408'
@@ -26,6 +24,8 @@ no_index:
 requires:
   Carp: '0'
   Digest::SHA: '0'
+  Encode: '0'
+  HTTP::Date: '0'
   JSON: '2.9'
   LWP::Protocol::https: '6'
   LWP::UserAgent: '6'
@@ -33,11 +33,13 @@ requires:
   Moo: '1.006'
   POSIX: '0'
   Throwable: '0.200011'
+  Time::HiRes: '0'
+  UUID: '0.34'
   perl: '5.020000'
 resources:
-  bugtracker: https://github.com/Humanstate/business-gocardless/issues
+  bugtracker: https://github.com/payprop/business-gocardless/issues
   homepage: https://metacpan.org/module/Business::GoCardless
   license: http://dev.perl.org/licenses/
-  repository: https://github.com/Humanstate/business-gocardless
-version: '0.45'
+  repository: https://github.com/payprop/business-gocardless
+version: '1.00'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

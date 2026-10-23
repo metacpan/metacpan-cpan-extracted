@@ -32,10 +32,13 @@ static int skip_block_info(const char *buf, size_t len, size_t *pos) {
  * Returns:
  *   1  = packet consumed, continue reading
  *   0  = need more data
- *  -1  = error (message in *errmsg, caller must Safefree)
+ *  -1  = stream corruption (message in *errmsg, caller must Safefree);
+ *        bytes NOT consumed, resync impossible
  *   2  = EndOfStream
  *   3  = Pong
  *   4  = Hello parsed (self->server_* fields populated)
+ *   5  = Server exception: a normal query error, bytes consumed,
+ *        stream stays in sync (message in *errmsg)
  */
 
 /* Parse a Data block (table_name + optional-LZ4-chain + block_info + columns)
@@ -43,9 +46,9 @@ static int skip_block_info(const char *buf, size_t len, size_t *pos) {
  * which carry a block in the same wire format as SERVER_DATA but whose contents
  * the client does not surface to Perl.
  *
- * `lz4_optional` (used by PROFILE_EVENTS only): if set, fall back to parsing
- * the body uncompressed when LZ4 hard-fails — older servers occasionally send
- * profile_events uncompressed even on a compressed connection.
+ * `lz4_optional` (PROFILE_EVENTS, server log): if set, fall back to parsing
+ * the body uncompressed when LZ4 hard-fails — servers don't always compress
+ * these auxiliary blocks even on a compressed connection.
  *
  * Returns 1 on success (advances *outer_pos past the consumed bytes),
  *         0 on need-more-data,
@@ -57,7 +60,6 @@ static int parse_and_discard_block(ev_clickhouse_t *self,
     size_t pos = *outer_pos;
     int rc;
     char *decompressed = NULL;
-    int more_maybe = 0;  /* chain stopped mid-frame: short block = need-more */
     const char *bbuf;
     size_t blen, bpos;
     char errbuf[64];
@@ -75,8 +77,7 @@ static int parse_and_discard_block(ev_clickhouse_t *self,
         int need_more = 0;
         const char *lz4_err = NULL;
         decompressed = ch_lz4_decompress_chain(buf, len, &pos, &blen,
-                                                &need_more, &lz4_err,
-                                                &more_maybe);
+                                                &need_more, &lz4_err);
         if (!decompressed) {
             if (need_more) return 0;
             if (!lz4_optional) {
@@ -138,7 +139,7 @@ static int parse_and_discard_block(ev_clickhouse_t *self,
                 SV **vals = decode_column(bbuf, blen, &bpos, nr, ct, &col_err, 0);
                 if (!vals) {
                     free_col_type(ct);
-                    if (col_err || (decompressed && !more_maybe)) {
+                    if (col_err) {
                         if (decompressed) Safefree(decompressed);
                         snprintf(errbuf, sizeof(errbuf), "malformed %s block", kind);
                         *errmsg = safe_strdup(errbuf);
@@ -185,9 +186,8 @@ static int parse_and_emit_log_block(ev_clickhouse_t *self,
     if (self->compress) {
         int need_more = 0;
         const char *lz4_err = NULL;
-        /* NULL: a short block here is already treated as need-more. */
         decompressed = ch_lz4_decompress_chain(buf, len, &pos, &blen,
-                                                &need_more, &lz4_err, NULL);
+                                                &need_more, &lz4_err);
         if (!decompressed) {
             if (need_more) return 0;
             /* server log frames are not always compressed even with
@@ -219,10 +219,10 @@ static int parse_and_emit_log_block(ev_clickhouse_t *self,
     char     **names = NULL;
     SV      ***data  = NULL;     /* data[col][row] */
     if (nc > 0) {
-        /* A column occupies at least one wire byte (its name-length varint),
-         * so more columns than remaining bytes is malformed — reject before
-         * the allocation rather than letting Newxz attempt a huge size. */
-        if (nc > (uint64_t)(blen - bpos)) _BAIL_LOG(-1);
+        /* More columns than remaining bytes proves nothing yet: on a
+         * live stream the rest may simply not have arrived. Wait for
+         * more; the column loop below rules on malformed data. */
+        if (nc > (uint64_t)(blen - bpos)) _BAIL_LOG(0);
         Newxz(names, nc, char *);
         Newxz(data,  nc, SV **);
     }
@@ -388,6 +388,16 @@ static int parse_native_packet(ev_clickhouse_t *self, char **errmsg) {
         self->server_version_minor = (unsigned int)minor;
         self->server_revision = (unsigned int)revision;
 
+        if (self->server_revision < DBMS_MIN_SUPPORTED_SERVER_REVISION) {
+            char emsg[128];
+            snprintf(emsg, sizeof(emsg),
+                     "ClickHouse server revision %u too old (minimum: %u)",
+                     self->server_revision,
+                     DBMS_MIN_SUPPORTED_SERVER_REVISION);
+            *errmsg = safe_strdup(emsg);
+            return -1;
+        }
+
         /* The server emits these fields per the negotiated revision =
          * min(server_rev, our advertised CH_CLIENT_REVISION). Gate on
          * server_revision so we don't read garbage from older servers. */
@@ -429,7 +439,6 @@ static int parse_native_packet(ev_clickhouse_t *self, char **errmsg) {
         const char *dbuf;   /* data buffer (may point to decompressed data) */
         size_t dlen, dpos;
         char *decompressed = NULL;
-        int more_maybe = 0;  /* chain stopped mid-frame: short block = need-more */
 
         /* table name — outside compression */
         rc = skip_native_string(buf, len, &pos);
@@ -442,8 +451,7 @@ static int parse_native_packet(ev_clickhouse_t *self, char **errmsg) {
             int need_more = 0;
             const char *lz4_err = NULL;
             decompressed = ch_lz4_decompress_chain(buf, len, &pos, &dlen,
-                                                    &need_more, &lz4_err,
-                                                    &more_maybe);
+                                                    &need_more, &lz4_err);
             if (!decompressed) {
                 if (need_more) return 0;
                 *errmsg = safe_strdup(lz4_err ? lz4_err : "LZ4 decompression failed");
@@ -463,12 +471,7 @@ static int parse_native_packet(ev_clickhouse_t *self, char **errmsg) {
         if (self->server_revision >= DBMS_MIN_REVISION_WITH_BLOCK_INFO) {
             rc = skip_block_info(dbuf, dlen, &dpos);
             if (rc == 0) {
-                if (decompressed) {
-                    Safefree(decompressed);
-                    if (more_maybe) return 0;
-                    *errmsg = safe_strdup("truncated compressed block");
-                    return -1;
-                }
+                if (decompressed) Safefree(decompressed);
                 return 0;
             }
             if (rc < 0) { if (decompressed) Safefree(decompressed); *errmsg = safe_strdup("malformed block info"); return -1; }
@@ -476,24 +479,14 @@ static int parse_native_packet(ev_clickhouse_t *self, char **errmsg) {
 
         rc = read_varuint(dbuf, dlen, &dpos, &num_cols);
         if (rc == 0) {
-            if (decompressed) {
-                Safefree(decompressed);
-                if (more_maybe) return 0;
-                *errmsg = safe_strdup("truncated compressed block");
-                return -1;
-            }
+            if (decompressed) Safefree(decompressed);
             return 0;
         }
         if (rc < 0) { if (decompressed) Safefree(decompressed); *errmsg = safe_strdup("malformed num_cols"); return -1; }
 
         rc = read_varuint(dbuf, dlen, &dpos, &num_rows);
         if (rc == 0) {
-            if (decompressed) {
-                Safefree(decompressed);
-                if (more_maybe) return 0;
-                *errmsg = safe_strdup("truncated compressed block");
-                return -1;
-            }
+            if (decompressed) Safefree(decompressed);
             return 0;
         }
         if (rc < 0) { if (decompressed) Safefree(decompressed); *errmsg = safe_strdup("malformed num_rows"); return -1; }
@@ -514,12 +507,13 @@ static int parse_native_packet(ev_clickhouse_t *self, char **errmsg) {
                 int meta_hard = 0;             /* 1 = hard error, 0 = need more */
                 const char *meta_err = NULL;   /* non-NULL → goto meta_cleanup */
 
-                /* Bound the column count to the remaining wire bytes before
-                 * allocating, same as the other block-decode sites. */
+                /* More columns than remaining bytes proves nothing yet: on
+                 * a live stream the rest may simply not have arrived (short
+                 * first read, split LZ4 chain). Wait for more; the column
+                 * loop below rules on genuinely malformed data. */
                 if (num_cols > (uint64_t)(dlen - dpos)) {
                     if (decompressed) Safefree(decompressed);
-                    *errmsg = safe_strdup("too many columns");
-                    return -1;
+                    return 0;
                 }
                 Newxz(cnames, num_cols, const char *);
                 Newxz(cname_lens, num_cols, size_t);
@@ -531,14 +525,14 @@ static int parse_native_packet(ev_clickhouse_t *self, char **errmsg) {
                     rc = read_native_string_ref(dbuf, dlen, &dpos,
                             &cnames[c], &cname_lens[c]);
                     if (rc <= 0) {
-                        meta_hard = (rc < 0 || decompressed != NULL);
+                        meta_hard = (rc < 0);
                         meta_err = "malformed cname";
                         goto meta_cleanup;
                     }
                     rc = read_native_string_ref(dbuf, dlen, &dpos,
                             &ctypes_str[c], &ctype_lens[c]);
                     if (rc <= 0) {
-                        meta_hard = (rc < 0 || decompressed != NULL);
+                        meta_hard = (rc < 0);
                         meta_err = "malformed ctype";
                         goto meta_cleanup;
                     }
@@ -546,7 +540,7 @@ static int parse_native_packet(ev_clickhouse_t *self, char **errmsg) {
 
                     /* custom serialization flag (revision >= 54446) */
                     if (dpos >= dlen) {
-                        meta_hard = (decompressed != NULL);
+                        meta_hard = 0;
                         meta_err = "truncated custom_ser";
                         goto meta_cleanup;
                     }
@@ -570,17 +564,78 @@ static int parse_native_packet(ev_clickhouse_t *self, char **errmsg) {
 
             meta_ok: ;
 
+                if (self->cancel_after_meta) {
+                    for (c = 0; c < num_cols; c++)
+                        free_col_type(ctypes[c]);
+                    Safefree(cnames); Safefree(cname_lens);
+                    Safefree(ctypes_str); Safefree(ctype_lens);
+                    Safefree(ctypes);
+                    if (decompressed) Safefree(decompressed);
+                    else pos = dpos;
+                    recv_consume(self, pos);
+                    self->cancel_after_meta = 0;
+                    self->native_state = NATIVE_WAIT_RESULT;
+                    Newx(data_pkt, 1, char);
+                    data_pkt[0] = (char)CLIENT_CANCEL;
+                    send_replace(self, data_pkt, 1);
+                    if (try_write(self)) return -2;
+                    return 1;
+                }
+
                 /* Build binary data block from stored data */
+                char ibuf[256];
+                ibuf[0] = '\0';
                 if (self->insert_av) {
+                    /* The AV build stringifies user SVs, so overload/tie
+                     * runs arbitrary Perl that may destroy/reset/finish
+                     * this very connection. Pin the rows (teardown would
+                     * free them) and hold depth (DESTROY then defers
+                     * Safefree); re-validate below before touching self. */
+                    SV *av_pin = self->insert_av;
+                    int gen0 = self->connect_gen;
+                    SvREFCNT_inc(av_pin);
+                    self->callback_depth++;
                     data_pkt = build_native_insert_data_from_av(aTHX_ self,
                         (AV *)SvRV(self->insert_av),
                         cnames, cname_lens, ctypes_str, ctype_lens,
-                        ctypes, (int)num_cols, &data_pkt_len);
+                        ctypes, (int)num_cols, &data_pkt_len,
+                        ibuf, sizeof(ibuf));
+                    /* Drop the pin BEFORE depth--: a cell holding the last
+                     * $ch ref must DESTROY into depth>0 (cf. on_data). */
+                    SvREFCNT_dec(av_pin);
+                    self->callback_depth--;
+                    if (self->magic != EV_CH_MAGIC) {
+                        if (data_pkt) Safefree(data_pkt);
+                        for (c = 0; c < num_cols; c++)
+                            free_col_type(ctypes[c]);
+                        Safefree(cnames); Safefree(cname_lens);
+                        Safefree(ctypes_str); Safefree(ctype_lens);
+                        Safefree(ctypes);
+                        if (decompressed) Safefree(decompressed);
+                        check_destroyed(self);
+                        return -2;
+                    }
+                    if (self->connect_gen != gen0 || !self->connected) {
+                        /* reset()/finish() from magic: the INSERT was
+                         * already failed by the teardown; drop the
+                         * built block instead of sending it into the
+                         * new/closed connection. */
+                        if (data_pkt) Safefree(data_pkt);
+                        for (c = 0; c < num_cols; c++)
+                            free_col_type(ctypes[c]);
+                        Safefree(cnames); Safefree(cname_lens);
+                        Safefree(ctypes_str); Safefree(ctype_lens);
+                        Safefree(ctypes);
+                        if (decompressed) Safefree(decompressed);
+                        /* recv is already empty (teardown zeroes it). */
+                        return 0;
+                    }
                 } else {
                     data_pkt = build_native_insert_data(self,
                         self->insert_data, self->insert_data_len,
                         cnames, cname_lens, ctypes_str, ctype_lens,
-                        ctypes, (int)num_cols, &data_pkt_len);
+                        ctypes, (int)num_cols, &data_pkt_len,
+                        ibuf, sizeof(ibuf));
                 }
 
                 for (c = 0; c < num_cols; c++)
@@ -607,14 +662,29 @@ static int parse_native_packet(ev_clickhouse_t *self, char **errmsg) {
                     nbuf_empty_data_block(&fallback, self->compress);
                     data_pkt = fallback.data;
                     data_pkt_len = fallback.len;
-                    if (encode_failed)
-                        self->insert_err = safe_strdup(
-                            "native INSERT encoding failed (unsupported type)");
+                    if (encode_failed) {
+                        char fbuf[320];
+                        if (ibuf[0])
+                            snprintf(fbuf, sizeof(fbuf), "native INSERT encoding "
+                                     "failed (%s)", ibuf);
+                        else
+                            snprintf(fbuf, sizeof(fbuf), "native INSERT encoding "
+                                     "failed (unsupported type or invalid value)");
+                        self->insert_err = safe_strdup(fbuf);
+                    }
                 }
                 }
 
-                /* Send the data block — write to send_buf and start writing */
+                /* Cancellation can also run while encoding user values. */
                 self->native_state = NATIVE_WAIT_RESULT;
+                if (self->cancel_after_meta) {
+                    self->cancel_after_meta = 0;
+                    Safefree(data_pkt);
+                    Newx(data_pkt, 1, char);
+                    data_pkt[0] = (char)CLIENT_CANCEL;
+                    data_pkt_len = 1;
+                    CLEAR_STR(self->insert_err);
+                }
                 send_replace(self, data_pkt, data_pkt_len);
                 if (try_write(self)) return -2;
                 return 1;
@@ -635,9 +705,15 @@ static int parse_native_packet(ev_clickhouse_t *self, char **errmsg) {
                 nbuf_init(&fallback);
                 nbuf_empty_data_block(&fallback, self->compress);
                 self->native_state = NATIVE_WAIT_RESULT;
+                if (self->cancel_after_meta) {
+                    self->cancel_after_meta = 0;
+                    fallback.len = 0;
+                    nbuf_u8(&fallback, (uint8_t)CLIENT_CANCEL);
+                } else {
+                    self->insert_err = safe_strdup(
+                        "INSERT failed: server sent 0-column sample block");
+                }
                 send_replace(self, fallback.data, fallback.len);
-                self->insert_err = safe_strdup(
-                    "INSERT failed: server sent 0-column sample block");
                 if (try_write(self)) return -2;
                 return 1;
             }
@@ -703,12 +779,13 @@ static int parse_native_packet(ev_clickhouse_t *self, char **errmsg) {
             uint64_t c, r;
             int named = (self->decode_flags & DECODE_NAMED_ROWS) ? 1 : 0;
 
-            /* More columns than remaining wire bytes is malformed; reject
-             * before allocating so a bogus count can't drive a huge Newxz. */
+            /* More columns than remaining bytes proves nothing yet: on
+             * a live stream the rest may simply not have arrived (short
+             * first read, split LZ4 chain). Wait for more; the column
+             * loop below rules on genuinely malformed data. */
             if (num_cols > (uint64_t)(dlen - dpos)) {
                 if (decompressed) Safefree(decompressed);
-                *errmsg = safe_strdup("too many columns");
-                return -1;
+                return 0;
             }
             Newxz(columns, num_cols, SV**);
             Newxz(col_types, num_cols, col_type_t*);
@@ -722,10 +799,7 @@ static int parse_native_packet(ev_clickhouse_t *self, char **errmsg) {
                 size_t cname_len, ctype_len;
 
                 rc = read_native_string_ref(dbuf, dlen, &dpos, &cname, &cname_len);
-                if (rc == 0) {
-                    if (decompressed) { *errmsg = safe_strdup("truncated cname"); goto data_error; }
-                    goto data_need_more;
-                }
+                if (rc == 0) goto data_need_more;
                 if (rc < 0) { *errmsg = safe_strdup("malformed cname"); goto data_error; }
 
                 if (named) {
@@ -746,20 +820,14 @@ static int parse_native_packet(ev_clickhouse_t *self, char **errmsg) {
                 av_push(self->native_col_names, newSVpvn(cname, cname_len));
 
                 rc = read_native_string_ref(dbuf, dlen, &dpos, &ctype, &ctype_len);
-                if (rc == 0) {
-                    if (decompressed) { *errmsg = safe_strdup("truncated ctype"); goto data_error; }
-                    goto data_need_more;
-                }
+                if (rc == 0) goto data_need_more;
                 if (rc < 0) { *errmsg = safe_strdup("malformed ctype"); goto data_error; }
 
                 col_types[c] = parse_col_type(ctype, ctype_len);
                 av_push(self->native_col_types, newSVpvn(ctype, ctype_len));
 
                 /* custom serialization flag (revision >= 54446) */
-                if (dpos >= dlen) {
-                    if (decompressed) { *errmsg = safe_strdup("truncated custom_ser"); goto data_error; }
-                    goto data_need_more;
-                }
+                if (dpos >= dlen) goto data_need_more;
                 if ((uint8_t)dbuf[dpos]) {
                     *errmsg = safe_strdup("custom serialization not supported");
                     goto data_error;
@@ -777,7 +845,7 @@ static int parse_native_packet(ev_clickhouse_t *self, char **errmsg) {
                     int col_err = 0;
                     columns[c] = decode_column_ex(dbuf, dlen, &dpos, num_rows, col_types[c], &col_err, self->decode_flags, self, (int)c);
                     if (!columns[c]) {
-                        if (col_err || (decompressed && !more_maybe)) {
+                        if (col_err) {
                             *errmsg = safe_strdup("decode_column failed");
                             goto data_error;
                         }
@@ -963,7 +1031,7 @@ static int parse_native_packet(ev_clickhouse_t *self, char **errmsg) {
         recv_consume(self, pos);
 
         *errmsg = err;
-        return -1;
+        return 5;
     }
 
     case SERVER_PROGRESS: {
@@ -1029,7 +1097,7 @@ static int parse_native_packet(ev_clickhouse_t *self, char **errmsg) {
         if (self->on_log) {
             rc = parse_and_emit_log_block(self, buf, len, &pos, self->on_log, errmsg);
         } else {
-            rc = parse_and_discard_block(self, buf, len, &pos, "server log", 0, errmsg);
+            rc = parse_and_discard_block(self, buf, len, &pos, "server log", 1, errmsg);
         }
         if (rc <= 0) return rc;
         recv_consume(self, pos);
@@ -1122,7 +1190,10 @@ static void process_native_response(ev_clickhouse_t *self) {
         }
 
         if (rc == -1) {
-            /* error */
+            /* Stream corruption: native packets aren't length-delimited,
+             * so resync is impossible — the server's remaining output
+             * for this query would be misattributed to the next one.
+             * Tear down; auto_reconnect re-establishes an idle link. */
             if (self->native_state == NATIVE_WAIT_HELLO) {
                 /* Skip auto_reconnect on a malformed ServerHello: the peer
                  * isn't a ClickHouse server, so retrying just spins.
@@ -1131,16 +1202,33 @@ static void process_native_response(ev_clickhouse_t *self) {
                 Safefree(errmsg);
                 return;
             }
+            fail_connection(self, errmsg);
+            Safefree(errmsg);
+            return;
+        }
 
-            /* Stop query timeout timer */
+        if (rc == 5) {
+            /* Server exception — a normal query error with its bytes
+             * consumed, so the stream stays in sync: deliver to the
+             * query callback and pipeline the next query. */
+            if (self->native_state == NATIVE_WAIT_HELLO) {
+                /* The server rejected the handshake itself (e.g. wrong
+                 * credentials) — fail fast with the real text, to
+                 * on_error and to any pre-connect queued queries. No
+                 * reconnect: retrying a rejected handshake just spins. */
+                teardown_io_error(self, errmsg, errmsg);
+                Safefree(errmsg);
+                return;
+            }
             stop_timing(self);
 
-            /* Query error — deliver to callback */
             CLEAR_SV(self->native_rows);
             CLEAR_INSERT(self);
             CLEAR_STR(self->insert_err);
             self->native_state = NATIVE_IDLE;
-            self->recv_len = 0; /* flush malformed data */
+            self->cancel_after_meta = 0;
+            self->cancelled = 0;
+            self->recv_len = 0; /* drop this dead query's tail, if coalesced */
             if (self->send_count > 0) self->send_count--;
             lc_free_dicts(self);
             int destroyed = deliver_error(self, errmsg);
@@ -1156,6 +1244,7 @@ static void process_native_response(ev_clickhouse_t *self) {
             /* EndOfStream — deliver accumulated rows or deferred error */
             stop_timing(self);
             self->native_state = NATIVE_IDLE;
+            self->cancel_after_meta = 0;
             CLEAR_INSERT(self);
             if (self->send_count > 0) self->send_count--;
             lc_free_dicts(self);
@@ -1182,6 +1271,10 @@ static void process_native_response(ev_clickhouse_t *self) {
                 int destroyed = deliver_error(self, err);
                 Safefree(err);
                 if (destroyed) return;
+            } else if (self->cancelled) {
+                self->cancelled = 0;
+                CLEAR_SV(self->native_rows);
+                if (deliver_error(self, "query cancelled")) return;
             } else {
                 AV *rows = self->native_rows;
                 self->native_rows = NULL;
@@ -1196,10 +1289,16 @@ static void process_native_response(ev_clickhouse_t *self) {
         if (rc == 3) {
             /* Pong — deliver to the queued cb (keepalive no-op or user ping) */
             self->native_state = NATIVE_IDLE;
+            self->cancel_after_meta = 0;
             stop_timing(self);
             if (self->send_count > 0) self->send_count--;
-            AV *rows = newAV();
-            if (deliver_rows(self, rows)) return;
+            if (self->cancelled) {
+                self->cancelled = 0;
+                if (deliver_error(self, "query cancelled")) return;
+            } else {
+                AV *rows = newAV();
+                if (deliver_rows(self, rows)) return;
+            }
             pipeline_advance(self);
             return;
         }

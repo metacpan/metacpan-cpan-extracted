@@ -1,5 +1,13 @@
 Revision history for Data-LnArray-XS
 
+0.12    2026-10-23
+        - Fix list returns overrunning the stack (retrieve, values, keys, entries, forEach)
+        - Fix entries returning half its pairs, find and findIndex returning NULL
+        - Fix map, forEach and sort losing callback results on perls before 5.12
+        - Fix $_ refcounting in from and forEach, and from taking over the caller's array
+        - Fix reduce and reduceRight ignoring the initial value
+        - Export with Ex::Op instead of Import::Export, perl 5.10 or later
+
 0.01    Date/time
         First version, released on an unsuspecting world.
 

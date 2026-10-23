@@ -39,8 +39,9 @@ static void xop_compat_register_custom_op(pTHX_ Perl_ppaddr_t ppfunc, XOP *xop) 
     if (!PL_custom_op_descs) {
         PL_custom_op_descs = newHV();
     }
-    hv_store(PL_custom_op_names, (char*)&ppfunc, sizeof(ppfunc), newSVpv(xop->xop_name, 0), 0);
-    hv_store(PL_custom_op_descs, (char*)&ppfunc, sizeof(ppfunc), newSVpv(xop->xop_desc, 0), 0);
+    SV *key = sv_2mortal(newSViv(PTR2IV(ppfunc)));
+    (void)hv_store_ent(PL_custom_op_names, key, newSVpv(xop->xop_name, 0), 0);
+    (void)hv_store_ent(PL_custom_op_descs, key, newSVpv(xop->xop_desc, 0), 0);
 }
 
 #endif

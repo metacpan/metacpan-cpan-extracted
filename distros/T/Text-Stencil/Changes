@@ -1,5 +1,10 @@
 Revision history for Text::Stencil
 
+0.04  2026-10-16
+    - Bound streaming memory and preserve callback exceptions.
+    - Fix encoding option overrides and EOF section markers.
+    - from_file now rejects malformed UTF-8 instead of substituting U+FFFD.
+
 0.03  2026-08-05
     - Correctness and robustness fixes across compilation, rendering,
       transforms, encoding and I/O

@@ -33,5 +33,5 @@ requires:
 resources:
   bugtracker: https://gitlab.com/deguest/Locale-Unicode/issues
   repository: https://gitlab.com/deguest/Locale-Unicode
-version: v0.4.4
+version: v0.4.6
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

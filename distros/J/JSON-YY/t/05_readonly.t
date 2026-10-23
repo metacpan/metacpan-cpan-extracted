@@ -25,6 +25,21 @@ like $@, qr/read-only|Modification|restrict/, 'cannot add hash key';
 eval { push @{$data->{tags}}, "c" };
 like $@, qr/read-only|Modification/, 'cannot modify array';
 
+for my $key (qw(tags nested)) {
+    eval { $data->{$key} = [] };
+    like $@, qr/read-only|Modification/, "cannot replace $key container";
+    my $slot = \$data->{$key};
+    eval { $$slot = undef };
+    like $@, qr/read-only|Modification/, "cannot replace $key through a scalar reference";
+}
+{
+    my $arr = decode_json_ro '[[],{}]';
+    for my $i (0, 1) {
+        eval { $arr->[$i] = 42 };
+        like $@, qr/read-only|Modification/, "cannot replace array container at $i";
+    }
+}
+
 # zero-copy: string SV has SvLEN=0 (doesn't own buffer)
 # extraction via assignment copies the string (sv_setsv copies SvLEN=0)
 {

@@ -1,5 +1,8 @@
 Revision history for Bijection-XS
 
+0.11    2026-10-23
+        - Export with Ex::Op instead of Import::Export, perl 5.10 or later
+
 0.01    Date/time
         First version, released on an unsuspecting world.
 

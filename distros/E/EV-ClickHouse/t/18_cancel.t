@@ -20,10 +20,9 @@ plan skip_all => "ClickHouse not reachable" unless $http_ok || $nat_ok;
 plan tests => 6;
 
 # 1-3: native cancel — query terminates early, connection stays usable.
-# The native protocol's CLIENT_CANCEL causes the server to end the stream
-# without raising an exception, so the query's callback fires with either
-# an error or a benign EndOfStream — what matters is that it returned well
-# before the sleep was supposed to finish, and the connection survives.
+# The server answers CLIENT_CANCEL with a bare EndOfStream, which the
+# client reports as a 'query cancelled' error — what matters is that it
+# returned well before the workload finished, and the connection survives.
 SKIP: {
     skip "Native port not reachable", 3 unless $nat_ok;
 

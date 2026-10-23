@@ -14,7 +14,7 @@ use Carp;
 
 use parent qw(Data::TagDB::WeakBaseObject Data::Identifier::Interface::Known);
 
-our $VERSION = v0.14;
+our $VERSION = v0.15;
 
 my %wk_ise = (
     # Hints as taken from tagdb-cgi-import;
@@ -309,7 +309,7 @@ Data::TagDB::WellKnown - Work with Tag databases
 
 =head1 VERSION
 
-version v0.14
+version v0.15
 
 =head1 SYNOPSIS
 

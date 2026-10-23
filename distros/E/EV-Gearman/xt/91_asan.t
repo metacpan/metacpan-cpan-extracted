@@ -75,10 +75,19 @@ make_path("$tmp/auto/EV/Gearman");
 my $obj = "$tmp/Gearman.o";
 my $so  = "$tmp/auto/EV/Gearman/Gearman.so";
 
+# Version must match $EV::Gearman::VERSION or the instrumented .so
+# refuses to bootstrap; read it from the source, not a literal.
+my $dist_version = do {
+    open my $fh, '<', 'lib/EV/Gearman.pm' or die $!;
+    local $/;
+    my $src = <$fh>;
+    $src =~ /our \$VERSION = '([^']+)'/ ? $1 : die 'no $VERSION found';
+};
+
 my $compile = join ' ', $cc,
     $Config{ccflags}, $Config{cccdlflags}, '-fsanitize=address -g -O1',
     '-Isrc', "-I$evinc/EV", "-I$evinc", "-I$Config{archlibexp}/CORE",
-    qq{-DVERSION=\\"0.01\\" -DXS_VERSION=\\"0.01\\"},
+    qq{-DVERSION=\\"$dist_version\\" -DXS_VERSION=\\"$dist_version\\"},
     '-o', $obj, '-c', 'Gearman.c';
 
 my $link = join ' ', $cc, '-fsanitize=address', $Config{lddlflags},
@@ -113,16 +122,15 @@ for my $scenario (qw(xt/89_leak.t xt/16_buffer_shrink.t t/18_admin_disconnect.t)
         local %ENV = %child_env;
         system("$cmd >$log 2>&1");
     };
-    my $exit = $rc >> 8;
     my $out  = '';
     if (open my $f, '<', $log) { local $/; $out = <$f> // ''; close $f; }
 
-    my $sanitizer_clean = $out !~ /ERROR: AddressSanitizer|runtime error:|SUMMARY: AddressSanitizer/;
-    ok $exit != 98,        "$scenario: no ASan abort";
+    my $sanitizer_clean = $out !~ /ERROR: AddressSanitizer|runtime error:|SUMMARY: AddressSanitizer|AddressSanitizer:DEADLYSIGNAL/;
+    ok(($rc >> 8) != 98,   "$scenario: no ASan abort");
     ok $sanitizer_clean,   "$scenario: no AddressSanitizer error in output";
-    ok $exit == 0,         "$scenario: scenario exits cleanly under ASan";
+    ok $rc == 0,           "$scenario: scenario exits cleanly under ASan";
 
-    diag $out if $exit != 0 || !$sanitizer_clean;
+    diag $out if $rc != 0 || !$sanitizer_clean;
 }
 
 done_testing;

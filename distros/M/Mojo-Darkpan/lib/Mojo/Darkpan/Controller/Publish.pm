@@ -8,7 +8,7 @@ use OrePAN2::Injector;
 use OrePAN2::Indexer;
 use Data::Dumper;
 use Mojo::Darkpan::Util;
-use Nice::Try;
+use Syntax::Keyword::Try;
 
 sub upload($self) {
     my $util = Mojo::Darkpan::Util->new(controller => $self);
@@ -20,12 +20,12 @@ sub upload($self) {
         }
     }
     catch($e) {
-        my ($message, $location) = split(' at ', $e->message);
+        my ($message, $location) = split(' at ', "$e");
         $self->render(
             text   => "unable to process upload, bad or missing parameters: $message",
             status => '400'
         );
-    };
+    }
 
 }
 

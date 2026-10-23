@@ -1,5 +1,9 @@
 Revision history for Router-Ragel
 
+0.06  2026-10-16
+    - Keep custom placeholder types within their path segment.
+    - Fix captures before repeated literals and multi-dot suffixes.
+
 0.05    2026-07-30
     - Security and correctness fixes in pattern validation, captures and
       serialization

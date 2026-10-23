@@ -8,7 +8,7 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     NAME             => 'Business::GoCardless',
     VERSION_FROM     => 'lib/Business/GoCardless.pm',
-    AUTHOR           => 'Lee Johnson <leejo@cpan.org>',
+    AUTHOR           => 'Lee Johnson <lee@payprop.com>',
     LICENSE          => 'perl',
     MIN_PERL_VERSION => '5.20.0',
     PREREQ_PM => {
@@ -20,14 +20,16 @@ WriteMakefile(
         'Digest::SHA'          => 0, # Digest::SHA was first released with perl v5.9.3
         'LWP::UserAgent'       => 6.00,
         'LWP::Protocol::https' => 6.00,
+        'HTTP::Date'           => 0, # required by LWP::UserAgent
+        'Time::HiRes'          => 0, # Time::HiRes was first released with perl v5.7.3
+        'Encode'               => 0, # Encode was first released with perl v5.7.3
+        'UUID'                 => 0.34, # uuid4, and reseeds after fork()
         'JSON'                 => 2.90,
     },
     BUILD_REQUIRES => {
         'Test::Most'       => 0.31,
         'Test::Deep'       => 0.112,
         'Test::Exception'  => 0.32,
-        'FindBin'          => 0, # FindBin was first released with perl 5.00307
-        'LWP::Simple'      => 6.00,
         'Test::MockObject' => 1.20140408,
         'Try::Tiny'        => 0.22,
     },
@@ -35,8 +37,8 @@ WriteMakefile(
         resources => {
             license    => 'http://dev.perl.org/licenses/',
             homepage   => 'https://metacpan.org/module/Business::GoCardless',
-            bugtracker => 'https://github.com/Humanstate/business-gocardless/issues',
-            repository => 'https://github.com/Humanstate/business-gocardless'
+            bugtracker => 'https://github.com/payprop/business-gocardless/issues',
+            repository => 'https://github.com/payprop/business-gocardless'
         },
     },
     test => {

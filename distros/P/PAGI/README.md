@@ -79,15 +79,16 @@ specification without pulling in a particular server or toolkit:
   multi-worker, and the `pagi-server` CLI. `PAGI::Spec::Server` documents
   application-loading and runtime integration; server plugin compatibility is
   defined by each runner.
-- **PAGI-Tools** — the application toolkit: middleware, ready-made apps, the
-  endpoint/router framework, request/response helpers, and `PAGI::App::WrapPSGI`.
+- **PAGI-Tools** — the application toolkit: conveniences built on the
+  specification, documented in that distribution.
 
 ## Status
 
 **Beta.** The PAGI *specification* is stable — breaking changes will not be made
 except for critical security issues, so raw PAGI applications you write today
 will keep working. The reference server and toolkit are beta. Requires **Perl
-5.18+**.
+5.24+**; see "Perl version support" in the PAGI documentation for the
+support horizon.
 
 This is a labor of love for the future of async web programming in Perl.
 Feedback, bug reports, and contributions are welcome.

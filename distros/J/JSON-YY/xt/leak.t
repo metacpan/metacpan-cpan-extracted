@@ -2,10 +2,10 @@ use strict;
 use warnings;
 use Test::More;
 
-eval { require Test::LeakTrace };
-plan skip_all => 'Test::LeakTrace required' if $@;
-
-use Test::LeakTrace;
+BEGIN {
+    eval { require Test::LeakTrace; Test::LeakTrace->import; 1 }
+        or plan skip_all => 'Test::LeakTrace required';
+}
 use JSON::YY qw(encode_json decode_json decode_json_ro);
 use JSON::YY ':doc';
 

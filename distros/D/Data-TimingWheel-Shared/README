@@ -78,9 +78,8 @@ METHODS
     $payload, and returns an opaque timer id; it croaks if the timer pool is
     full. "cancel" removes a still-pending timer by its id, returning 1 if it
     was cancelled or 0 if it had already fired or the id is not active. A
-    timer id carries a generation tag, so cancelling a stale id whose slot has
-    since been reused correctly returns 0 rather than cancelling the unrelated
-    timer now occupying that slot.
+    timer id carries a generation tag, so a stale id does not cancel a reused
+    slot until the tag wraps after 2^31 uses of that slot.
 
   Advancing the clock
         my @due = $tw->advance($ticks);   # advance by $ticks (default 1)

@@ -46,7 +46,7 @@ subtest '#include_scoped with 3 tokens (how data flavor)' => sub {
        '#include_scoped with 3 tokens runs and rolls back successfully');
 };
 
-subtest '#emb directive parsing with in, asiffrom, and with_blinder' => sub {
+subtest '#emb directive parsing with in, aim, and with_blinder' => sub {
     my $fab = Text::Fab->new();
     $fab->out__target_section('widget', 'Parent');
     push @{$fab->{sections}{Parent}{widget}}, ['text', 'Parent Widget'];
@@ -59,10 +59,10 @@ subtest '#emb directive parsing with in, asiffrom, and with_blinder' => sub {
     $fab->cfg__set('Fab/blinders/hide_parent', sub { return ('Parent') });
 
     $fab->out__target_section('main', 'Child');
-    $fab->process_string("#emb widget in Child asiffrom Child with_blinder hide_parent");
+    $fab->process_string("#emb[in=Child, aim=Child, with_blinder=hide_parent] widget");
 
     is($fab->assemble('Child:main'), 'GrandParent Widget',
-       '#emb directive with all optional clauses parsed and evaluated correctly');
+       '#emb directive with bracketed options parsed and evaluated correctly');
 };
 
 subtest 'group__postpone method name as string' => sub {
@@ -70,7 +70,6 @@ subtest 'group__postpone method name as string' => sub {
     $fab->cfg__set('str_var', 'initial');
 
     $fab->group__start();
-    # Pre-undo (-10.0) sets value; post-undo (10.0) sets final value after rollback
     $fab->group__postpone(0, -10.0, 'append', 'cfg__set', 'str_var', 'pre_undo_val');
     $fab->group__postpone(0,  10.0, 'append', 'cfg__set', 'str_var', 'post_undo_val');
     $fab->group__end();
@@ -100,7 +99,8 @@ subtest 'group__postpone validation exceptions' => sub {
 
 subtest '_handle_error fallback to _default_error_handler' => sub {
     my $fab = Text::Fab->new();
-    $fab->{config}{'Fab/callbacks'}{error_handler} = undef;
+    $fab->{config}{'Fab/callbacks_bundle/dbg0'}{error_handler} = undef;
+    $fab->{config}{'Fab/callbacks'} = 'dbg0';
 
     throws_ok { $fab->process_string("#unrecognized_cmd arg") } qr/Fab Error \(unknown_directive\):/,
         '_handle_error invokes _default_error_handler when error_handler callback is undef';
@@ -153,7 +153,7 @@ subtest 'Output primitives namespace defaulting' => sub {
     ok(exists $fab->{sections}{_main}{another_sec},
        'out__create_section defaults namespace to current target namespace');
 
-    $fab->out__embed('embed_default_ns');
+    $fab->out__embed('embed_default_ns', '_main', [], {});
     my $last_chunk = $fab->{sections}{_main}{defaulted_sec}[-1];
     is($last_chunk->[1], '_main',
        'out__embed defaults namespace to target namespace');
@@ -173,7 +173,7 @@ subtest 'out__get_joined and _join_list edge cases' => sub {
 
     $fab->out__create_section('mixed_sec', '_main');
     push @{$fab->{sections}{_main}{mixed_sec}}, ['text', 'first'];
-    push @{$fab->{sections}{_main}{mixed_sec}}, ['embed', '_main', 'dummy', {}];
+    push @{$fab->{sections}{_main}{mixed_sec}}, ['embed', '_main', 'dummy', [], {}];
     push @{$fab->{sections}{_main}{mixed_sec}}, ['text', 'second'];
     is($fab->out__get_joined('_main:mixed_sec', [' + ']), 'first + second',
        'out__get_joined filters embed placeholders and joins text chunks');

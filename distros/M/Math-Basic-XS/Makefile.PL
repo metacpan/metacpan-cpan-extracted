@@ -1,4 +1,4 @@
-use 5.006;
+use 5.010;
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
@@ -9,19 +9,17 @@ my %WriteMakefileArgs = (
     VERSION_FROM     => 'lib/Math/Basic/XS.pm',
     ABSTRACT_FROM    => 'lib/Math/Basic/XS.pm',
     LICENSE          => 'artistic_2',
-    MIN_PERL_VERSION => '5.006',
+    MIN_PERL_VERSION => '5.010',
     XSMULTI => 1,
     macro => { TARFLAGS   => "--format=ustar -c -v -f" },
     CONFIGURE_REQUIRES => {
-        'ExtUtils::MakeMaker' => '0',
+        'ExtUtils::MakeMaker' => '7.12',
     },
     TEST_REQUIRES => {
         'Test::More' => '0',
-	'Import::Export' => '0',
     },
     PREREQ_PM => {
-        #'ABC'              => '1.6',
-        #'Foo::Bar::Module' => '5.0401',
+        'Ex::Op' => '0.03',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Math-Basic-XS-*' },

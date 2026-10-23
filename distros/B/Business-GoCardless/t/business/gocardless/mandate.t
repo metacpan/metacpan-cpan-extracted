@@ -6,6 +6,7 @@ use warnings;
 use Test::Most;
 use Test::Deep;
 use Test::Exception;
+use Test::MockObject;
 
 use Business::GoCardless::Client;
 
@@ -87,6 +88,34 @@ ok( $Mandate->is_instant,'->is_instant after change' );
 
 $Mandate->id( 123 );
 is( $Mandate->uri,'https://api.gocardless.com/mandates/123','->uri' );
+
+# monkey patching LWP here to make this test work without
+# having to actually hit the endpoints or use credentials
+no warnings 'redefine';
+no warnings 'once';
+my $mock = Test::MockObject->new;
+my $request;
+$mock->mock( 'is_success',sub { 1 } );
+$mock->mock( 'header',sub {} );
+$mock->mock( 'content',sub {
+    '{"mandates":{"id":"123","status":"active","metadata":{"contract":"ABC"}}}'
+} );
+*LWP::UserAgent::request = sub { $request = $_[1]; $mock };
+
+isa_ok(
+    my $Updated = $Mandate->update( metadata => { contract => 'ABC' } ),
+    'Business::GoCardless::Mandate',
+    '->update returns a Mandate'
+);
+
+is( $request->method,'PUT','->update PUTs' );
+like( $request->uri,qr!/mandates/123$!,'->update to mandate endpoint' );
+is(
+    $request->content,
+    '{"mandates":{"metadata":{"contract":"ABC"}}}',
+    '->update request body'
+);
+cmp_deeply( $Mandate->metadata,{ contract => 'ABC' },'->update refreshes the object' );
 
 done_testing();
 

@@ -1,4 +1,9 @@
 Revision history for Term-Ghostty
 
+0.02  2026-10-16
+    - Fix release prerequisites and terminal wrapper lifecycle.
+    - Preserve wrapped log output during retention.
+    - Improve examples and terminal integration.
+
 0.01    2026-09-15
         - Initial release

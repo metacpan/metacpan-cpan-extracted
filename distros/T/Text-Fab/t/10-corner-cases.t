@@ -19,7 +19,6 @@ subtest 'Group lifecycle inside postponed undo action' => sub {
         my ($self) = @_;
         push @events, 'undo_started';
 
-        # Start and end a completely new nested group during an undo action
         $self->group__start('inner_undo_group');
         $self->cfg__set('outer_var', 'temp_during_undo');
         push @events, 'inner_val:' . $self->cfg__get('outer_var');
@@ -86,9 +85,7 @@ subtest 'Cascading multi-level time-machine rewinds' => sub {
 
 subtest 'Selective group key deletion on rollback' => sub {
     my $fab = Text::Fab->new(config => {
-        'Fab/group_flavors' => {
-            scoped => { keys => ['new_tracked_var'] }
-        }
+        'Fab/group_flavors/scoped/keys' => ['new_tracked_var']
     });
 
     ok(!exists $fab->{config}{new_tracked_var}, 'new_tracked_var does not exist initially');
@@ -171,13 +168,6 @@ subtest 'Consecutive and boundary comments fusion' => sub {
 subtest 'Diamond inheritance topology' => sub {
     my $fab = Text::Fab->new();
 
-    # Topology:
-    #      Base
-    #     /    \
-    #   Left   Right
-    #     \    /
-    #      Leaf
-
     $fab->out__target_section('common', 'Base');
     push @{$fab->{sections}{Base}{common}}, ['text', 'Base Common'];
 
@@ -195,9 +185,9 @@ subtest 'Diamond inheritance topology' => sub {
     $fab->NS__set_parents('Leaf', 'Left', 'Right');
 
     $fab->out__target_section('body', 'Leaf');
-    $fab->out__embed('override_me', 'Leaf');
+    $fab->out__embed('override_me', 'Leaf', [], {});
     push @{$fab->{sections}{Leaf}{body}}, ['text', ' | '];
-    $fab->out__embed('common', 'Leaf');
+    $fab->out__embed('common', 'Leaf', [], {});
 
     is($fab->assemble('Leaf:body'), 'Left Override | Base Common',
         'diamond inheritance resolves Left before Right, and reaches Base without looping');

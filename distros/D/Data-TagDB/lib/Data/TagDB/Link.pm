@@ -12,14 +12,10 @@ use warnings;
 
 use Carp;
 
-our $VERSION = v0.14;
+use parent 'Data::TagDB::Base';
 
+our $VERSION = v0.15;
 
-
-sub db {
-    my ($self) = @_;
-    return $self->{db};
-}
 
 
 #@returns Data::TagDB::Tag
@@ -66,7 +62,7 @@ Data::TagDB::Link - Work with Tag databases
 
 =head1 VERSION
 
-version v0.14
+version v0.15
 
 =head1 SYNOPSIS
 
@@ -74,13 +70,10 @@ version v0.14
 
 Parent package for L<Data::TagDB::Relation> and L<Data::TagDB::Metadata>.
 
+This package inherits from
+and L<Data::TagDB::Base> (since v0.15).
+
 =head1 METHODS
-
-=head2 db
-
-    my Data::TagDB $db = $db->db;
-
-Returns the current L<Data::TagDB> object
 
 =head2 tag, relation, context
 

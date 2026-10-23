@@ -1,0 +1,29 @@
+bin/saisons
+Changes
+lib/App/Saisons.pm
+lib/App/Saisons/Adapter/Aider.pm
+lib/App/Saisons/Adapter/Claude.pm
+lib/App/Saisons/Adapter/Codex.pm
+lib/App/Saisons/Adapter/Gemini.pm
+lib/App/Saisons/Adapter/HOWTO.md
+lib/App/Saisons/Adapter/Opencode.pm
+lib/App/Saisons/Launcher.pm
+lib/App/Saisons/UI.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.md
+t/.gitignore
+t/adapters.t
+t/fixtures/aider/myproject/.aider.chat.history.md
+t/fixtures/claude/.claude/projects/-home-user-myproject/aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee.jsonl
+t/fixtures/claude/.claude/projects/-home-user-myproject/aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee/subagents/agent-subagent1.jsonl
+t/fixtures/claude/.claude/projects/-home-user-myproject/bbbbbbbb-cccc-dddd-eeee-ffffffffffff.jsonl
+t/fixtures/claude/.claude/projects/-home-user-myproject/bbbbbbbb-cccc-dddd-eeee-ffffffffffff/subagents/agent-subagent2.jsonl
+t/fixtures/codex/sessions/2026/01/15/rollout-2026-01-15T10-30-00-cccccccc-dddd-eeee-ffff-000000000000.jsonl
+t/fixtures/gemini/.gemini/tmp/myproject-abc123/chats/session-2026-01-15T10-30-abcd1234.jsonl
+t/fixtures/opencode/.local/share/opencode/storage/session/global/dddddddd-eeee-ffff-0000-111111111111.json
+t/search.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

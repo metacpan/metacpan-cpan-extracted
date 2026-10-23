@@ -288,7 +288,7 @@ use JSON::XS ();
 use Socket ();
 use Scalar::Util qw(weaken);
 
-my %options = mcp_getoptions ({
+my $options = mcp_getoptions ({
    usage => "Usage: mcp-webbrowser [OPTION]...\n",
    path => "/",
    description => "Expose connected browser tabs to MCP; HTTP/WebSocket stays active with stdio or --connect.",
@@ -296,14 +296,14 @@ my %options = mcp_getoptions ({
    examples => "  mcp-webbrowser --auto-allow '*,*' # all actions in opted-in tabs",
 }, "ask=s" => \my $ask);
 @ARGV and die "Unexpected arguments\n";
-my $name = $options{name};
-my $connect = $options{connect};
-my $stdio = $options{stdio} || !defined $connect && $ENV{PERL_ANYEVENT_MCP_MULTIBROKER_PROTOCOL} eq "stdio";
+my $name = $options->{name};
+my $connect = $options->{connect};
+my $stdio = $options->{stdio} || !defined $connect && $ENV{PERL_ANYEVENT_MCP_MULTIBROKER_PROTOCOL} eq "stdio";
 !($stdio && defined $connect) or die "Cannot combine --stdio and --connect\n";
 
 my $config = AnyEvent::MCP::Config->global;
-my %http = $config->http_settings ($name, $options{bind});
-$http{tokens} = $options{tokens} if $options{tokens};
+my %http = $config->http_settings ($name, $options->{bind});
+$http{tokens} = $options->{tokens} if $options->{tokens};
 my %token = map { $_ => 1 } @{$http{tokens}};
 my $json = JSON::XS->new->utf8->max_depth (64);
 my (%connections, %pages, %tabs);
@@ -316,7 +316,7 @@ my $permissions = AnyEvent::MCP::Server::Permissions->new (
       exec => "Execute arbitrary JavaScript in a connected browser page",
    },
    (defined $ask ? (ask => $ask) : ()),
-   auto_rules => [@{$options{auto_rules} || []},
+   auto_rules => [@{$options->{auto_rules} || []},
       $config->auto_rules ($name)],
 );
 
@@ -749,9 +749,9 @@ $toolset->tool (add_element => "Insert a DOM element via userscript GM_addElemen
    },
 );
 
-mcp_tool_help ($options{tool_help}, $toolset);
+mcp_tool_help ($options->{tool_help}, $toolset);
 
-my $custom_instructions = $options{custom_instructions}
+my $custom_instructions = $options->{custom_instructions}
    // $config->{section}{"instance $name"}{custom_instructions}
    // $config->{section}{"program " . AnyEvent::MCP::Config::program_name ()}{custom_instructions};
 my %server = (

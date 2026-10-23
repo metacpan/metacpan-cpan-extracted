@@ -1,5 +1,10 @@
 Revision history for JSON-YY
 
+0.09  2026-10-16
+    - Fix borrowed document, iterator and conversion callback lifetimes.
+    - Preserve numeric precision and mutability; doubles encode as 5.0, not 5.
+    - Keep decoded booleans boolean; validate filenames and tied values.
+
 0.08  2026-09-15
     - new bool option and -bool flag decode JSON booleans as JSON::PP::Boolean
     - boolean objects encode as true/false

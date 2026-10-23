@@ -10,7 +10,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = v0.14;
+our $VERSION = v0.15;
 
 
 
@@ -33,7 +33,7 @@ Data::TagDB::Interface::Includeable - Work with Tag databases, plugin base packa
 
 =head1 VERSION
 
-version v0.14
+version v0.15
 
 =head1 SYNOPSIS
 

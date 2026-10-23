@@ -182,8 +182,10 @@ with_mariadb(
         $obj->server_info,    $obj->host_info,
         $obj->character_set_name,
     );
-    ok(1, 'accessors on disconnected: numeric accessors no crash');
-    ok(1, 'accessors on disconnected: SV accessors no crash');
+    is_deeply(\@numeric, [0, 0, 0, 0, 0, 0, -1],
+        'accessors on disconnected: numerics 0, socket -1');
+    ok(!(grep { defined $_ } @sv),
+        'accessors on disconnected: SV accessors all undef');
 }
 
 # --- MEDIUM: escape UTF-8 warning (test 18) ---

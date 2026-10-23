@@ -1,6 +1,6 @@
 package Langertha::ServerToolCall;
 # ABSTRACT: Record of one tool call the provider executed itself
-our $VERSION = '0.503';
+our $VERSION = '0.504';
 use Moose;
 use Carp qw( croak );
 
@@ -100,7 +100,7 @@ Langertha::ServerToolCall - Record of one tool call the provider executed itself
 
 =head1 VERSION
 
-version 0.503
+version 0.504
 
 =head1 SYNOPSIS
 

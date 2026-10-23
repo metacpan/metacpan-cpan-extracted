@@ -19,6 +19,7 @@
 #define FRAGMENTED_EOF 0
 #define FRAGMENTED_ERROR -1
 #define FRAGMENTED_DATA 1
+#define MASK_BUFFER_SIZE 1024
 
 #define REQUIRE_CTX(ws) if (!(ws)->ctx) { croak("WebSocket connection already closed"); }
 
@@ -40,10 +41,13 @@ typedef struct {
 	SV** frag_sources;
 	size_t frag_count;
 	size_t frag_size;
+	uint8_t* mask_buf;
+	size_t mask_remaining;
 	struct wslay_event_callbacks callbacks;
 	uint8_t default_rsv;
 	char read_stopped;
 	char write_stopped;
+	char busy;
 } websocket_object;
 
 /* no handlers; its address just identifies our magic among other PERL_MAGIC_ext */
@@ -65,9 +69,35 @@ static void stop_io_watcher(websocket_object* websock_object) {
 	}
 }
 
+static int duplicate_socket(int sock) {
+	int fd = dup(sock);
+	if (fd < 0) { croak("Net::WebSocket::EVx - dup(%d) failed: %s", sock, strerror(errno)); }
+	#ifndef WIN32
+	{
+		int fd_flags = fcntl(sock, F_GETFD);
+		if (fd_flags >= 0) { (void) fcntl(fd, F_SETFD, fd_flags); }
+	}
+	#endif
+	#if defined(SO_NOSIGPIPE) && !defined(MSG_NOSIGNAL)
+	{
+		int enabled = 1;
+		if (setsockopt(fd, SOL_SOCKET, SO_NOSIGPIPE, &enabled, sizeof(enabled)) < 0) {
+			int saved_errno = errno;
+			close(fd);
+			croak("Net::WebSocket::EVx - SO_NOSIGPIPE: %s", strerror(saved_errno));
+		}
+	}
+	#endif
+	return fd;
+}
+
 static ssize_t recv_callback(wslay_event_context_ptr ctx, uint8_t* buf, size_t len, int flags, void* data) {
 	websocket_object* websock_object = (websocket_object*) data;
 	ssize_t r;
+	if (websock_object->read_stopped) {
+		wslay_event_set_error(ctx, WSLAY_ERR_WOULDBLOCK);
+		return -1;
+	}
 	while ((r = recv(websock_object->io.fd, buf, len, 0)) == -1 && errno == EINTR);
 	if (r == -1) {
 		if (errno == EAGAIN || errno == EWOULDBLOCK) {
@@ -86,6 +116,13 @@ static ssize_t send_callback(wslay_event_context_ptr ctx, const uint8_t* buf, si
 	websocket_object* websock_object = (websocket_object*) data;
 	ssize_t r;
 	int sflags = 0;
+	#ifdef MSG_NOSIGNAL
+	sflags |= MSG_NOSIGNAL;
+	#endif
+	if (websock_object->write_stopped) {
+		wslay_event_set_error(ctx, WSLAY_ERR_WOULDBLOCK);
+		return -1;
+	}
 	#ifdef MSG_MORE
 	if(flags & WSLAY_MSG_MORE) { sflags |= MSG_MORE; }
 	#endif // MSG_MORE
@@ -137,7 +174,13 @@ static SV* take_perl_error(websocket_object* websock_object) {
 #define GUARD(ws)   SvREFCNT_inc((SV*) (ws)->perl_callbacks)
 #define UNGUARD(ws) SvREFCNT_dec((SV*) (ws)->perl_callbacks)
 
-static void track_fragmented_source(websocket_object* websock_object, SV* cb) {
+static SV* retain_callback(SV* cb) {
+	SvGETMAGIC(cb);
+	if (SvROK(cb) && SvTYPE(SvRV(cb)) == SVt_PVCV) { return SvREFCNT_inc(SvRV(cb)); }
+	return newSVsv(cb);
+}
+
+static SV* track_fragmented_source(websocket_object* websock_object, SV* cb) {
 	if (websock_object->frag_count == websock_object->frag_size) {
 		size_t size = websock_object->frag_size ? websock_object->frag_size * 2 : 4;
 		SV** sources = (SV**) realloc(websock_object->frag_sources, size * sizeof(SV*));
@@ -145,8 +188,9 @@ static void track_fragmented_source(websocket_object* websock_object, SV* cb) {
 		websock_object->frag_sources = sources;
 		websock_object->frag_size = size;
 	}
-	SvREFCNT_inc(cb);
+	cb = retain_callback(cb);
 	websock_object->frag_sources[websock_object->frag_count++] = cb;
+	return cb;
 }
 
 static void release_fragmented_source(websocket_object* websock_object, SV* cb) {
@@ -163,11 +207,7 @@ static void release_fragmented_source(websocket_object* websock_object, SV* cb) 
 static int genmask_callback(wslay_event_context_ptr ctx, uint8_t* buf, size_t len, void* data) {
 	websocket_object* websock_object = (websocket_object*) data;
 	SV** cb;
-	size_t i;
-	/* wslay reuses buf between frames, so seed it first: a failing callback must
-	   never leave the previous frame's key (or zeroes) in place */
-	for (i = 0; i < len; i++) { buf[i] = (uint8_t) (rand() & 0xff); }
-	if (websock_object->pending_error) { return 0; }
+	if (websock_object->pending_error) { return -1; }
 	if ((cb = hv_fetch(websock_object->perl_callbacks , "genmask", 7, 0))) {
 		int count, failed = 0;
 		SV* sv_data;
@@ -207,6 +247,40 @@ static int genmask_callback(wslay_event_context_ptr ctx, uint8_t* buf, size_t le
 			wslay_event_set_error(ctx, WSLAY_ERR_CALLBACK_FAILURE);
 			return -1;
 		}
+	} else {
+		if (len > websock_object->mask_remaining) {
+			int fd, saved_errno = 0;
+			size_t used = 0;
+			int oflags = O_RDONLY;
+			#ifdef O_CLOEXEC
+			oflags |= O_CLOEXEC;
+			#endif
+			if (!websock_object->mask_buf) {
+				websock_object->mask_buf = (uint8_t*) malloc(MASK_BUFFER_SIZE);
+				if (!websock_object->mask_buf) {
+					websock_object->pending_error = newSVpv("Net::WebSocket::EVx - out of memory", 0);
+					return -1;
+				}
+			}
+			do { fd = open("/dev/urandom", oflags); } while (fd < 0 && errno == EINTR);
+			if (fd < 0) { saved_errno = errno; }
+			else {
+				while (used < MASK_BUFFER_SIZE) {
+					ssize_t r = read(fd, websock_object->mask_buf + used, MASK_BUFFER_SIZE - used);
+					if (r > 0) { used += r; }
+					else if (r < 0 && errno == EINTR) { continue; }
+					else { saved_errno = r < 0 ? errno : EIO; break; }
+				}
+				close(fd);
+			}
+			if (saved_errno) {
+				websock_object->pending_error = newSVpvf("Net::WebSocket::EVx - mask entropy: %s", strerror(saved_errno));
+				return -1;
+			}
+			websock_object->mask_remaining = MASK_BUFFER_SIZE;
+		}
+		websock_object->mask_remaining -= len;
+		memcpy(buf, websock_object->mask_buf + websock_object->mask_remaining, len);
 	}
 	return 0;
 }
@@ -286,7 +360,7 @@ static void on_msg_recv_callback(wslay_event_context_ptr ctx, const struct wslay
 	if (!(cb = hv_fetch(websock_object->perl_callbacks, "on_msg_recv", 11, 0))) {
 		return;
 	}
-	msg_data = newSVpvn((const char*) msg->msg, msg->msg_length);
+	msg_data = newSVpvn(msg->msg ? (const char*) msg->msg : "", msg->msg_length);
 	if (!(msg->rsv & WSLAY_RSV1_BIT) && msg->opcode == 1) { SvUTF8_on(msg_data); }
 	{
 		dSP;
@@ -375,6 +449,9 @@ static ssize_t fragmented_msg_callback(wslay_event_context_ptr ctx, uint8_t* buf
 //////////////////////
 static void close_connection(websocket_object* websock_object) {
 	int status;
+	size_t i, frag_count;
+	SV** sources;
+	SV* waiter;
 	SV** cb;
 	if (!websock_object->ctx) { return; }
 	status = wslay_event_get_status_code_received(websock_object->ctx);
@@ -385,6 +462,19 @@ static void close_connection(websocket_object* websock_object) {
 		close(websock_object->io.fd); /* our own dup(), never the caller's descriptor */
 		websock_object->io.fd = -1;
 	}
+	free(websock_object->mask_buf);
+	websock_object->mask_buf = NULL;
+	websock_object->mask_remaining = 0;
+	frag_count = websock_object->frag_count;
+	sources = websock_object->frag_sources;
+	websock_object->frag_count = 0;
+	websock_object->frag_size = 0;
+	websock_object->frag_sources = NULL;
+	for (i = 0; i < frag_count; i++) { SvREFCNT_dec(sources[i]); }
+	free(sources);
+	waiter = websock_object->queue_wait_cb;
+	websock_object->queue_wait_cb = NULL;
+	if (waiter) { SvREFCNT_dec(waiter); }
 	/* no perl during global destruction: callbacks and what they close over may be gone */
 	if (PL_dirty) { return; }
 	if ((cb = hv_fetch(websock_object->perl_callbacks, "on_close", 8, 0))) {
@@ -406,21 +496,23 @@ static void wslay_io_event (struct ev_loop* loop, struct ev_io* w, int revents) 
 	websocket_object* websock_object = (websocket_object*) w->data;
 	SV* error;
 	GUARD(websock_object); /* wslay parses into the struct across every callback */
-	if (revents & EV_READ) {
+	websock_object->busy = 1;
+	if ((revents & EV_READ) && !websock_object->read_stopped) {
 		if (wslay_event_recv(websock_object->ctx)) {
 			close_connection(websock_object);
 			goto done;
 		}
 	}
 	if (!websock_object->ctx) { goto done; }
-	if (revents & EV_WRITE) {
+	if ((revents & EV_WRITE) && !websock_object->write_stopped && !websock_object->pending_error) {
 		if (wslay_event_send(websock_object->ctx)) {
 			close_connection(websock_object);
 			goto done;
 		}
 	}
-	wait_io_event(websock_object);
 	done:
+	websock_object->busy = 0;
+	wait_io_event(websock_object);
 	error = take_perl_error(websock_object);
 	UNGUARD(websock_object);
 	if (error) { RETHROW(sv_2mortal(error)); }
@@ -428,20 +520,15 @@ static void wslay_io_event (struct ev_loop* loop, struct ev_io* w, int revents) 
 
 static void wait_io_event(websocket_object* websock_object) {
 	int events = 0;
-	char wanted_io = 0;
-	stop_io_watcher(websock_object);
-	if (!websock_object->loop) { return; } /* loop destroyed under us: no more IO */
-	if (websock_object->read_stopped && websock_object->write_stopped) { return; }
-	if (!websock_object->ctx) { return; }
-	if (wslay_event_want_read(websock_object->ctx)) {
-		if (!websock_object->read_stopped) { events |= EV_READ; }
-		wanted_io = 1;
-	}
-	if (wslay_event_want_write(websock_object->ctx)) {
-		if (!websock_object->write_stopped) { events |= EV_WRITE; }
-		wanted_io = 1;
-	} else if (
+	if (websock_object->busy) { return; }
+	websock_object->busy = 1;
+	if (!websock_object->loop || !websock_object->ctx) { goto done; }
+	while (
 		websock_object->queue_wait_cb &&
+		websock_object->loop && websock_object->ctx &&
+		!websock_object->pending_error &&
+		!(websock_object->read_stopped && websock_object->write_stopped) &&
+		!wslay_event_want_write(websock_object->ctx) &&
 		!wslay_event_get_queued_msg_count(websock_object->ctx)
 	) {
 		SV* wait_cb = websock_object->queue_wait_cb;
@@ -457,26 +544,30 @@ static void wait_io_event(websocket_object* websock_object) {
 		}
 		SvREFCNT_dec(wait_cb);
 		catch_perl_error(websock_object);
-		/* the callback may have closed the connection under us */
-		if (!websock_object->ctx) { return; }
-		if (wslay_event_want_write(websock_object->ctx)) {
-			if (!websock_object->write_stopped) { events |= EV_WRITE; }
-			wanted_io = 1;
+	}
+	if (!websock_object->loop || !websock_object->ctx) { goto done; }
+	if (!websock_object->read_stopped && wslay_event_want_read(websock_object->ctx)) { events |= EV_READ; }
+	if (!websock_object->write_stopped && wslay_event_want_write(websock_object->ctx)) { events |= EV_WRITE; }
+	if (events) {
+		if (!ev_is_active(&(websock_object->io)) || (websock_object->io.events & (EV_READ | EV_WRITE)) != events) {
+			stop_io_watcher(websock_object);
+			ev_io_set(&(websock_object->io), websock_object->io.fd, events);
+			ev_io_start(websock_object->loop, &(websock_object->io));
+		}
+	} else {
+		stop_io_watcher(websock_object);
+		if (!wslay_event_get_read_enabled(websock_object->ctx) && !wslay_event_get_write_enabled(websock_object->ctx)) {
+			close_connection(websock_object);
 		}
 	}
-
-	if (events) {
-		ev_io_set(&(websock_object->io), websock_object->io.fd, events);
-		ev_io_start(websock_object->loop, &(websock_object->io));
-	} else if (!wanted_io && websock_object->ctx) {
-		close_connection(websock_object);
-	}
-
+	done:
+	websock_object->busy = 0;
 };
 
 /* wait_io_event for the XSUBs: guarded, and rethrows what a callback died with */
 static void wait_io_event_guarded(websocket_object* websock_object) {
 	SV* error;
+	if (websock_object->busy) { return; } /* finish wslay before changing watchers or freeing its context */
 	GUARD(websock_object);
 	wait_io_event(websock_object);
 	error = take_perl_error(websock_object);
@@ -491,8 +582,6 @@ MODULE = Net::WebSocket::EVx	PACKAGE = Net::WebSocket::EVx
 BOOT:
 {
 	I_EV_API("Net::WebSocket::EVx");
-	/* unseeded rand() emits the same mask sequence in every process */
-	srand((unsigned int) Perl_seed(aTHX));
 #ifdef WIN32
 	_setmaxstdio(2048);
 #endif
@@ -510,14 +599,7 @@ void _wslay_event_context_init(object, sock, is_server)
 		if (sock < 0) { croak("Net::WebSocket::EVx - invalid file descriptor: %d", sock); }
 		/* own a private copy: closing the caller's would have perl close it
 		   again when their handle is reaped, killing whatever reused the number */
-		fd = dup(sock);
-		if (fd < 0) { croak("Net::WebSocket::EVx - dup(%d) failed: %s", sock, strerror(errno)); }
-		#ifndef WIN32
-		{	/* keep the caller's close-on-exec setting, which dup() drops */
-			int fd_flags = fcntl(sock, F_GETFD);
-			if (fd_flags >= 0) { (void) fcntl(fd, F_SETFD, fd_flags); }
-		}
-		#endif
+		fd = duplicate_socket(sock);
 		websock_object = calloc(1, sizeof(websocket_object));
 		if (!websock_object) { close(fd); croak("Net::WebSocket::EVx - out of memory"); }
 		ev_io_init(&(websock_object->io), wslay_io_event, fd, EV_READ);
@@ -584,6 +666,7 @@ void shutdown_read(object)
 		websocket_object* websock_object = get_wslay_context(object);
 		REQUIRE_CTX(websock_object);
 		wslay_event_shutdown_read(websock_object->ctx);
+		wait_io_event_guarded(websock_object);
 
 void shutdown_write(object)
 	HV* object
@@ -591,6 +674,7 @@ void shutdown_write(object)
 		websocket_object* websock_object = get_wslay_context(object);
 		REQUIRE_CTX(websock_object);
 		wslay_event_shutdown_write(websock_object->ctx);
+		wait_io_event_guarded(websock_object);
 
 void stop(object)
 	HV* object
@@ -648,9 +732,9 @@ void _set_waiter(object, waiter)
 	CODE:
 		websocket_object* websock_object = get_wslay_context(object);
 		REQUIRE_CTX(websock_object);
+		SV* cb = retain_callback(waiter);
 		if (websock_object->queue_wait_cb) { SvREFCNT_dec(websock_object->queue_wait_cb); }
-		websock_object->queue_wait_cb = waiter;
-		SvREFCNT_inc(waiter);
+		websock_object->queue_wait_cb = cb;
 		wait_io_event_guarded(websock_object);
 
 int queue_msg (object, data, opcode=1)
@@ -704,11 +788,10 @@ int queue_fragmented (object, cb, opcode=2)
 		REQUIRE_CTX(websock_object);
 		struct wslay_event_fragmented_msg msg;
 		msg.opcode = opcode;
-		msg.source.data = cb;
+		msg.source.data = track_fragmented_source(websock_object, cb);
 		msg.read_callback = fragmented_msg_callback;
-		track_fragmented_source(websock_object, cb);
 		int result = wslay_event_queue_fragmented_msg(websock_object->ctx, &msg);
-		if (result) { release_fragmented_source(websock_object, cb); }
+		if (result) { release_fragmented_source(websock_object, (SV*) msg.source.data); }
 		if (result == WSLAY_ERR_INVALID_ARGUMENT) { croak("Wslay queue_fragmented - WSLAY_ERR_INVALID_ARGUMENT"); }
 		if (result == WSLAY_ERR_NOMEM) { croak("Wslay queue_fragmented - WSLAY_ERR_NOMEM"); }
 		wait_io_event_guarded(websock_object);
@@ -727,11 +810,10 @@ int queue_fragmented_ex (object, cb, opcode=2, rsv=-1)
 		struct wslay_event_fragmented_msg msg;
 		if (rsv < 0) { rsv = websock_object->default_rsv; }
 		msg.opcode = opcode;
-		msg.source.data = cb;
+		msg.source.data = track_fragmented_source(websock_object, cb);
 		msg.read_callback = fragmented_msg_callback;
-		track_fragmented_source(websock_object, cb);
 		int result = wslay_event_queue_fragmented_msg_ex(websock_object->ctx, &msg, (uint8_t) rsv);
-		if (result) { release_fragmented_source(websock_object, cb); }
+		if (result) { release_fragmented_source(websock_object, (SV*) msg.source.data); }
 		if (result == WSLAY_ERR_INVALID_ARGUMENT) { croak("Wslay queue_fragmented_ex - WSLAY_ERR_INVALID_ARGUMENT"); }
 		if (result == WSLAY_ERR_NOMEM) { croak("Wslay queue_fragmented_ex - WSLAY_ERR_NOMEM"); }
 		wait_io_event_guarded(websock_object);
@@ -752,7 +834,6 @@ int close (object, status_code = 0, data = NULL)
 		int result = wslay_event_queue_close(websock_object->ctx, status_code, (const uint8_t*) reason, reason_length);
 		if (result == WSLAY_ERR_INVALID_ARGUMENT) {croak("Wslay close - WSLAY_ERR_INVALID_ARGUMENT"); }
 		if (result == WSLAY_ERR_NOMEM) { croak("Wslay close - WSLAY_ERR_NOMEM"); }
-		wslay_event_shutdown_read(websock_object->ctx);
 		wait_io_event_guarded(websock_object);
 		RETVAL = result;
 	OUTPUT:
@@ -772,19 +853,14 @@ void DESTROY (object)
 	CODE:
 		MAGIC* mg = get_wslay_magic(object);
 		websocket_object* websock_object;
-		size_t i;
 		if (!mg || !mg->mg_ptr) { XSRETURN_EMPTY; } /* already destroyed */
 		websock_object = (websocket_object*) mg->mg_ptr;
 		/* detach first: an explicit DESTROY followed by GC must not free twice */
 		mg->mg_ptr = NULL;
-		if (websock_object->queue_wait_cb) { SvREFCNT_dec(websock_object->queue_wait_cb); }
 		close_connection(websock_object);
 		if (websock_object->loop && ev_is_active(&(websock_object->loop_cleanup))) {
 			ev_cleanup_stop(websock_object->loop, &(websock_object->loop_cleanup));
 		}
-		/* still-queued messages never reached EOF, so nothing released these */
-		for (i = 0; i < websock_object->frag_count; i++) { SvREFCNT_dec(websock_object->frag_sources[i]); }
-		free(websock_object->frag_sources);
 		if (websock_object->pending_error) {
 			if (!PL_dirty) { warn("%s", SvPV_nolen(websock_object->pending_error)); }
 			SvREFCNT_dec(websock_object->pending_error);

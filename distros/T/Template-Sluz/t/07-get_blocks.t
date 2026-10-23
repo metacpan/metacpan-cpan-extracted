@@ -93,4 +93,24 @@ my $sluz = setup_sluz();
 	is(scalar @x, 0, 'Get blocks #16 - Deeply nested comment (4 levels)');
 }
 
+{
+	my @x = $sluz->_get_blocks('{* Comment *}');
+	is(scalar @x, 0, 'Get blocks #17 - Only comments (PHP Get blocks #14)');
+}
+
+{
+	my @x = $sluz->_get_blocks('x{literal}{literal}{/literal}x');
+	is(scalar @x, 3, 'Get blocks #18 - Literal x{literal}x');
+}
+
+{
+	my @x = $sluz->_get_blocks('{literal}{literal}{/literal}');
+	is(scalar @x, 1, 'Get blocks #19 - Literal {literal}');
+}
+
+{
+	my @x = $sluz->_get_blocks('{literal}{literal}{/literal}x');
+	is(scalar @x, 2, 'Get blocks #20 - Literal {literal}x');
+}
+
 done_testing();

@@ -57,6 +57,6 @@
          "web" : "https://github.com/Luke-Popwell/forge-ops-tracker-perl"
       }
    },
-   "version" : "v0.15.0",
+   "version" : "v0.16.0",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

@@ -142,9 +142,9 @@ Default: C<server>
 
 =item buffering
 
-If set to 0, disables buffering: C<on_msg_recv> is then always called with an
-empty C<$msg> and you use the C<on_frame_recv_*> callbacks instead. Useful for
-handling large binary data without buffering it in memory.
+If set to 0, data messages reach C<on_msg_recv> with an empty C<$msg>; use
+C<on_frame_recv_*> for their payloads. Control frames remain buffered. Useful
+for handling large binary data without buffering it in memory.
 
 Default: 1
 
@@ -176,8 +176,8 @@ Default: C<WS_RSV1_BIT>
 =item on_msg_recv
 
 Called when a complete message has been received. Close messages are not
-reported here - use C<on_close>. When C<buffering> is disabled, C<$msg> is
-always empty.
+reported here - use C<on_close>. When C<buffering> is disabled, data-message
+payloads are empty.
 
     my ($rsv, $opcode, $msg, $status_code) = @_;
 
@@ -192,10 +192,8 @@ Called when the connection is closed.
 Client mode only. Must return a scalar of exactly C<$len> bytes to mask the
 message with; any other length is an error and aborts the connection.
 
-If not specified, a C<rand()> based generator seeded from perl's entropy source
-is used. That is adequate for the RFC's "unpredictable to intermediaries"
-requirement, but it is not cryptographically strong - supply your own callback
-if you need that.
+If not specified, masks come from buffered C</dev/urandom> bytes. Failure to
+obtain entropy aborts the connection.
 
     my ($len) = @_;
 
@@ -301,14 +299,12 @@ Queues a close frame. Both arguments are optional. C<reason_data> must not
 exceed 123 bytes; anything longer is rejected by wslay and croaks. (Wslay's own
 header says "less than 123 bytes", but the implementation accepts 123.)
 
-Possible attack vector: a client can hold the connection open after receiving
-the close frame, and open many such connections. To close for certain, call
-C<close()>, C<wait()> until the close frame has been sent, then close
-C<< $ws->{fh} >> yourself.
+The connection stays open until the peer replies with a close frame. Apply an
+application timeout if needed; C<shutdown_read()> and C<shutdown_write()> together
+abort the connection. Close your original filehandle separately.
 
-That handshake cannot complete while writing is suspended: call C<start_write()>
-first if you have used C<stop_write()>, otherwise the close frame is never sent
-and C<wait()> never fires.
+Resume paused reads or writes before closing (C<start()> resumes both), or the
+handshake cannot complete.
 
 =head1 ERRORS AND EXCEPTIONS
 

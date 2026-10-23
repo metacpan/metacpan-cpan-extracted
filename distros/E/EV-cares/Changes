@@ -1,5 +1,10 @@
 Revision history for EV::cares.
 
+0.05  2026-10-16
+    - Retain callbacks safely and support larger socket watcher sets.
+    - Fix DNS parsing, IPv6 ports and resolver lifecycle handling.
+    - Require c-ares 1.34.8 or newer.
+
 0.04  2026-07-23
     - fix use-after-free when the last resolver reference is dropped from
       inside a callback while other queries are still pending

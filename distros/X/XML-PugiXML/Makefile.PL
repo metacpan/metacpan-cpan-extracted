@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 use Config;
-use ExtUtils::MakeMaker;
+use ExtUtils::MakeMaker 6.64;
 use Alien::pugixml;
 
 # CCFLAGS *replaces* $Config{ccflags} in the generated Makefile rather than
@@ -13,9 +13,11 @@ use Alien::pugixml;
 # C++ compiler rejects.
 my $c_only = qr{^-(?:
       std=(?:gnu|c)[0-9]+
-    | W(?:error=)?(?: declaration-after-statement | nested-externs
+    | W(?:(?:no-)?error=|no-)?(?: declaration-after-statement | nested-externs
                     | old-style-definition   | strict-prototypes
                     | missing-prototypes     | implicit-function-declaration
+                    | incompatible-pointer-types | int-conversion
+                    | implicit-int           | return-mismatch
                     | pointer-sign           | bad-function-cast
                     | c\+\+-compat )
 )$}x;
@@ -45,7 +47,7 @@ WriteMakefile(
     clean            => { FILES => 'PugiXML.c' },
 
     CONFIGURE_REQUIRES => {
-        'ExtUtils::MakeMaker' => 0,
+        'ExtUtils::MakeMaker' => '6.64',
         'Alien::pugixml'      => '0.03',
     },
     BUILD_REQUIRES => {
@@ -53,7 +55,7 @@ WriteMakefile(
     },
     PREREQ_PM => {},
     TEST_REQUIRES => {
-        'Test::More' => 0,
+        'Test::More' => '0.88',
     },
 
     META_MERGE => {

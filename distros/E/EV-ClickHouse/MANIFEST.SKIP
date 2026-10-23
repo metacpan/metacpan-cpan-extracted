@@ -20,3 +20,6 @@
 # Author-only tests aren't shipped to CPAN testers (they require optional
 # Test::Pod / Test::Kwalitee::Extra / etc. or live tooling like valgrind).
 ^xt/
+# ClickHouse server droppings when its data dir points at the repo.
+^access/
+^preprocessed_configs/

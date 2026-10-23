@@ -1,5 +1,10 @@
 Revision history for Data-TopK-Shared
 
+0.07  2026-10-16
+    - Fix shared-lock wakeups.
+    - Reset the decay clock when clearing a timestamped summary.
+    - Clarify process-sharing limits.
+
 0.06      2026-09-26
           - A writer killed mid add, clear or decayed rescale is repaired by
             the next lock holder; every key is found again.

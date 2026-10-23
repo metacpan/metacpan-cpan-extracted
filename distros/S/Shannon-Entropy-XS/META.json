@@ -27,13 +27,13 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "7.12"
          }
       },
       "runtime" : {
          "requires" : {
-            "Import::Export" : "1.00",
-            "perl" : "5.006"
+            "Ex::Op" : "0.03",
+            "perl" : "5.010"
          }
       },
       "test" : {
@@ -43,6 +43,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "1.17",
+   "version" : "1.18",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

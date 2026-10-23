@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 use Test::More;
+use Scalar::Util qw(weaken);
 use FindBin qw($Bin);
 use lib "$Bin/../lib";
 use XML::PugiXML;
@@ -160,6 +161,40 @@ SKIP: {
     my $ratio = $t[1] / ($t[0] || 1e-9);
     cmp_ok $ratio, '<', 9,
         sprintf('bulk removal scales linearly (4x work took %.1fx time)', $ratio);
+}
+
+SKIP: {
+    skip 'set PUGIXML_TIMING_TESTS=1 to run the recycling checks', 2
+        unless $ENV{PUGIXML_TIMING_TESTS};
+    require Time::HiRes;
+    for my $kind (qw(node attribute)) {
+        my @t;
+        for my $n (4000, 16000) {
+            my @samples;
+            for (1 .. 3) {
+                my $d = XML::PugiXML->new;
+                $d->load_string('<r/>');
+                my $root = $d->root;
+                my @held;
+                my $t0 = Time::HiRes::time();
+                for (1 .. $n) {
+                    if ($kind eq 'node') {
+                        my $child = $root->append_child('c');
+                        push @held, $child;
+                        $root->remove_child($child);
+                    } else {
+                        push @held, $root->append_attr('k');
+                        $root->remove_attr('k');
+                    }
+                }
+                push @samples, Time::HiRes::time() - $t0;
+            }
+            push @t, (sort { $a <=> $b } @samples)[1];
+        }
+        my $ratio = $t[1] / ($t[0] || 1e-9);
+        cmp_ok $ratio, '<', 9,
+            sprintf('%s recycling scales linearly (4x work took %.1fx time)', $kind, $ratio);
+    }
 }
 
 done_testing;

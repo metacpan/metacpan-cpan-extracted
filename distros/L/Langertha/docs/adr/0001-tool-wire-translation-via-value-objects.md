@@ -540,3 +540,20 @@ in the project): the anthropic-compat docs only point to Anthropic's, the change
 Apr 2026) reports PDFs rejected with a 400 even for vision models, with no document type. The
 axis is the wire, not `image_input` (k371): a learned-vision model gets the same treatment. Flip
 back to the default if a probe shows `document` accepted.
+
+## Update (k380 — the tool-result form is chosen by public capabilities, ADR 0039)
+
+The private `_tool_result_images_on_wire` and `_tool_result_pdf_on_wire` hooks named in the
+k344, k359 and k361 Updates above are gone. `format_tool_results` now reads
+`supports('tool_result_images')` and `supports('tool_result_pdf')` (`Role::ToolResultImages` /
+`Role::ToolResultPDF`), which carry the same per-engine and per-model decisions: AKIAnthropic
+clears the image flag in its `around engine_capabilities`, Gemini grants both in layer 3 for
+Gemini 3 and later (widened from the 3 series: `gemini-4-argon`, Vertex docs), and Perplexity
+composes only the image role. The wire facts moved into the value object:
+`ToolResult->carries_native($fmt, $kind)` (which wire has a form) and
+`ToolResult->native_needs_vision($fmt, $kind)` (an image everywhere, a PDF on `responses` /
+`gemini`, not on `anthropic`), applied last in the base `engine_capabilities`.
+`_tool_result_source_blocks_on_wire` stays private; the Anthropic family's `tool_result_pdf`
+derives from it, and the `anthropic` serializer takes `native_pdf` (default 1) so the `document`
+block follows the flag. `image_input` still decides indirectly: the vision-needing forms require it.
+

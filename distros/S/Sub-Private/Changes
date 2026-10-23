@@ -1,5 +1,24 @@
 Revision history for Sub-Private
 
+0.07	Thu Oct 22 09:03:53 AM EDT 2026
+	[ Enhancements ]
+	use Sub::Private { mode => 'enforce' } sets the mode for the calling
+	    package only, for both the :Private attribute and the declarative
+	    form.  Setting $Sub::Private::config{mode} in a BEGIN block changes
+	    it for every package, and it must stay set until CHECK, so a module
+	    doing that (e.g. Log::Abstraction <= 0.40) made every other module's
+	    :Private subs wrapped instead of removed.  Modules should now use
+	    the option and leave the global mode alone
+
+	[ Bug Fixes ]
+	In namespace mode, a package loaded at run time after Sub::Private had
+	    been loaded at compile time lost its :Private subs while it was
+	    still being compiled, so its own direct calls to them died with
+	    "Undefined subroutine".  Attribute::Handlers calls the CHECK-phase
+	    handler straight away for such code, before the sub is installed;
+	    that call is now ignored.  In enforce mode the same call installed
+	    a stray wrapper as main::ANON
+
 0.06	Sun Oct  4 09:09:09 PM EDT 2026
 	[ Bug Fixes ]
 	Private subs are now protected when Sub::Private and the packages that

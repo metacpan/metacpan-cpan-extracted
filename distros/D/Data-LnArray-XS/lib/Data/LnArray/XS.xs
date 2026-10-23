@@ -5,6 +5,36 @@
 #include <stdlib.h>         // rand()
 #include <string.h>
 
+#ifndef G_LIST
+#define G_LIST G_ARRAY
+#endif
+
+#ifndef DEFSV_set
+#define DEFSV_set(sv) (DEFSV = (sv))
+#endif
+
+static SV * call_one (pTHX_ SV * cb, SV * arg) {
+	dSP;
+	SV * ret;
+	PUSHMARK(SP);
+	XPUSHs(arg);
+	PUTBACK;
+	call_sv(cb, G_SCALAR);
+	SPAGAIN;
+	ret = POPs;
+	PUTBACK;
+	return ret;
+}
+
+static void copy_into (pTHX_ AV * into, int count) {
+	SV ** sp = PL_stack_sp - count + 1;
+	int j;
+	for (j = 0; j < count; j++) {
+		av_push(into, newSVsv(sp[j]));
+	}
+	PL_stack_sp -= count;
+}
+
 static SV * new (SV * class, AV * array) {
 	dTHX;
 	if (SvTYPE(class) != SVt_PV) {
@@ -59,6 +89,36 @@ static int mmax (int first, int second) {
 
 MODULE = Data::LnArray::XS  PACKAGE = Data::LnArray::XS
 PROTOTYPES: ENABLE
+
+void
+import(...)
+	PROTOTYPE: DISABLE
+	CODE:
+		HV * tags = get_hv("Data::LnArray::XS::EXPORT_TAGS", 0);
+		AV * args = (AV *)sv_2mortal((SV *)newAV());
+		SSize_t i, top;
+		for (i = 0; i < items; i++) {
+			SV * arg = ST(i);
+			STRLEN len;
+			const char * name;
+			if (i > 0 && tags && SvOK(arg) && !SvROK(arg)) {
+				name = SvPV_const(arg, len);
+				if (len && isIDFIRST(name[0]) && hv_exists(tags, name, len)) {
+					arg = newSVpvs_flags(":", SVs_TEMP);
+					sv_catpvn(arg, name, len);
+				}
+			}
+			av_push(args, SvREFCNT_inc_simple_NN(arg));
+		}
+		top = av_len(args);
+		SP = MARK;
+		PUSHMARK(SP);
+		EXTEND(SP, top + 1);
+		for (i = 0; i <= top; i++)
+			PUSHs(*av_fetch(args, i, 0));
+		PUTBACK;
+		call_pv("Ex::Op::import", G_VOID | G_DISCARD);
+		XSRETURN_EMPTY;
 
 SV *
 arr(...)
@@ -129,21 +189,31 @@ from (...)
 				str += 1;
 			}
 		} else {
-			array = (AV*)SvRV(from);
+			AV * src = (AV*)SvRV(from);
+			int len = av_len(src);
+			for (i = 0; i <= len; i++) {
+				SV ** svp = av_fetch(src, i, 0);
+				av_push(array, svp ? newSVsv(*svp) : newSV(0));
+			}
 		}
-	
-		if (items > 2) {	
+
+		if (items > 2) {
 			SV * cb = ST(2);
+			ENTER;
+			SAVE_DEFSV;
 			for (i = 0; i <= av_len(array); i++) {
 				dSP;
-				GvSV(PL_defgv) = *av_fetch(array, i, 0);
+				SV * ret;
+				DEFSV_set(*av_fetch(array, i, 0));
 				PUSHMARK(SP);
+				PUTBACK;
 				call_sv(cb, G_SCALAR);
 				SPAGAIN;
-				SV * ret = POPs;
+				ret = POPs;
 				PUTBACK;
 				av_store(array, i, newSVsv(ret));
 			}
+			LEAVE;
 		}
 
 		RETVAL = newSVsv(new(self, array));
@@ -153,14 +223,14 @@ from (...)
 void
 retrieve(self)
 	SV * self
-	CODE:
+	PPCODE:
 		int i = 0;
 		AV * array = (AV*)SvRV(self);
     		int len = av_len(array);
+		EXTEND(SP, len + 1);
 		for (i = 0; i <= len; i++) {
-			ST(i) = newSVsv(*av_fetch(array, i, 0));
+			mPUSHs(newSVsv(*av_fetch(array, i, 0)));
 		}
-	        XSRETURN(i);
 
 SV *
 isArray(self, ...)
@@ -304,8 +374,12 @@ sort(self, cb)
 		AV * array = (AV*)SvRV(self);
 		AV * new_array = newAV();
     		int len = av_len(array), i = 0, j = 0;
-		GV * aa = gv_fetchpv("a", GV_ADD, SVt_PV);
-		GV * bb = gv_fetchpv("b", GV_ADD, SVt_PV);
+		HV * stash = (SvROK(cb) && SvTYPE(SvRV(cb)) == SVt_PVCV && CvSTASH((CV*)SvRV(cb)))
+			? CvSTASH((CV*)SvRV(cb)) : CopSTASH(PL_curcop);
+		const char * pkg = stash && HvNAME(stash) ? HvNAME(stash) : "main";
+		GV * aa = gv_fetchpv(Perl_form(aTHX_ "%s::a", pkg), GV_ADD, SVt_PV);
+		GV * bb = gv_fetchpv(Perl_form(aTHX_ "%s::b", pkg), GV_ADD, SVt_PV);
+		ENTER;
 		SAVESPTR(GvSV(aa));
 		SAVESPTR(GvSV(bb));
 		for (i = 0; i <= len; i++) {
@@ -314,19 +388,23 @@ sort(self, cb)
 		for (i = 0; i <= len; i++) {
 			for (j = 0; j < len; j++) {
 				dSP;
-				SV * a = GvSV(aa) = newSVsv(*av_fetch(new_array, j, 0));
-				SV * b = GvSV(bb) = newSVsv(*av_fetch(new_array, j + 1, 0));
+				SV * a = GvSV(aa) = sv_mortalcopy(*av_fetch(new_array, j, 0));
+				SV * b = GvSV(bb) = sv_mortalcopy(*av_fetch(new_array, j + 1, 0));
+				NV ret;
 				PUSHMARK(SP);
-				call_sv(cb, 3);
-				double ret = SvNV(ST(2));
+				PUTBACK;
+				call_sv(cb, G_SCALAR);
+				SPAGAIN;
+				ret = POPn;
+				PUTBACK;
 				if (ret > 0) {
 					av_store(new_array, j, newSVsv(b));
 					av_store(new_array, j + 1, newSVsv(a));
 				}
-				PUTBACK;
 			}
 		}
-		
+		LEAVE;
+
 		RETVAL = newSVsv(new(self, new_array));
 	OUTPUT:
 		RETVAL
@@ -367,13 +445,8 @@ filter(self, cb)
 		AV * new_array = newAV();
     		int len = av_len(array), i = 0;
 		for (i = 0; i <= len; i++) {
-                  	dSP;
 			SV * val = *av_fetch(array, i, 0);
-                        PUSHMARK(SP);
-                        XPUSHs(val);
-                        PUTBACK;
-                        call_sv(cb, G_SCALAR);
-			if (SvTRUEx(*PL_stack_sp)) {
+			if (SvTRUEx(call_one(aTHX_ cb, val))) {
 				av_push(new_array, newSVsv(val));
 			}
 		}
@@ -509,18 +582,15 @@ toString(self, join)
 void
 entries(self)
 	SV * self
-	CODE:
+	PPCODE:
 		int i = 0;
 		AV * array = (AV*)SvRV(self);
     		int len = av_len(array);
-		int st = 0;
+		EXTEND(SP, 2 * (len + 1));
 		for (i = 0; i <= len; i++) {
-			ST(st) = newSViv(i);
-			st++;
-			ST(st) = newSVsv(*av_fetch(array, i, 0));
-			st++;
+			mPUSHs(newSViv(i));
+			mPUSHs(newSVsv(*av_fetch(array, i, 0)));
 		}
-	        XSRETURN(i);
 
 SV *
 every(self, cb)
@@ -529,20 +599,14 @@ every(self, cb)
 	CODE:
 		AV * array = (AV*)SvRV(self);
     		int len = av_len(array), i = 0;
-		RETVAL = newRV_inc((SV*)newSViv(1));	
+		RETVAL = newRV_noinc((SV*)newSViv(1));
 		for (i = 0; i <= len; i++) {
-                  	dSP;
-			SV * val = *av_fetch(array, i, 0);
-                        PUSHMARK(SP);
-                        XPUSHs(val);
-                        PUTBACK;
-                        call_sv(cb, G_SCALAR);
-			if (!SvTRUEx(*PL_stack_sp)) {
-				PUTBACK;
-				RETVAL = newRV_inc((SV*)newSViv(0));
+			if (!SvTRUEx(call_one(aTHX_ cb, *av_fetch(array, i, 0)))) {
+				SvREFCNT_dec(RETVAL);
+				RETVAL = newRV_noinc((SV*)newSViv(0));
 				break;
 			}
-		}	
+		}
 	OUTPUT:
 		RETVAL
 
@@ -553,18 +617,15 @@ find(self, cb)
 	CODE:
 		AV * array = (AV*)SvRV(self);
 		int len = av_len(array), i = 0;
-		RETVAL = (SV*) 0;
+		RETVAL = NULL;
 		for (i = 0; i <= len; i++) {
 			SV * val = *av_fetch(array, i, 0);
-			PUSHMARK(SP);
-                        XPUSHs(val);
-                        PUTBACK;
-                        call_sv(cb, G_SCALAR);
-			if (SvTRUEx(*PL_stack_sp)) {
+			if (SvTRUEx(call_one(aTHX_ cb, val))) {
 				RETVAL = newSVsv(val);
 				break;
 			}
 		}
+		if (!RETVAL) RETVAL = newSV(0);
 	OUTPUT:
 		RETVAL
 
@@ -575,66 +636,59 @@ findIndex(self, cb)
 	CODE:
 		AV * array = (AV*)SvRV(self);
 		int len = av_len(array), i = 0;
-		RETVAL = (SV*) 0;
+		RETVAL = NULL;
 		for (i = 0; i <= len; i++) {
-			SV * val = *av_fetch(array, i, 0);
-			PUSHMARK(SP);
-                        XPUSHs(val);
-                        PUTBACK;
-                        call_sv(cb, G_SCALAR);
-			if (SvTRUEx(*PL_stack_sp)) {
+			if (SvTRUEx(call_one(aTHX_ cb, *av_fetch(array, i, 0)))) {
 				RETVAL = newSViv(i);
 				break;
 			}
 		}
+		if (!RETVAL) RETVAL = newSV(0);
 	OUTPUT:
 		RETVAL
 
-SV *
+void
 forEach(self, cb)
 	SV * self
 	SV * cb
-	CODE:
+	PPCODE:
 		AV * array = (AV*)SvRV(self);
-		int len = av_len(array), i = 0, j = 0;
-		AV * into = newAV();
+		int len = av_len(array), i = 0;
+		AV * into = (AV*)sv_2mortal((SV*)newAV());
+		PUTBACK;
+		ENTER;
+		SAVE_DEFSV;
 		for (i = 0; i <= len; i++) {
 			dSP;
-			GvSV(PL_defgv) = *av_fetch(array, i, 0);
+			int p;
+			DEFSV_set(*av_fetch(array, i, 0));
 			PUSHMARK(SP);
-			int p = call_sv(cb, 3);
-			SPAGAIN;
-			if (SvTRUEx(*PL_stack_sp)) {
-				AV * temp = newAV();
-				for (j = 0; j < p; j++) {
-					av_push(temp, newSVsv(POPs));
-				}
-				temp = reverse(temp);
-				for (j = 0; j < p; j++) {
-					av_push(into, *av_fetch(temp, j, 0));
-				}	
-			}
-			PUTBACK;	
+			PUTBACK;
+			p = call_sv(cb, G_LIST);
+			if (p > 0 && SvTRUEx(*PL_stack_sp))
+				copy_into(aTHX_ into, p);
+			else
+				PL_stack_sp -= p;
 		}
+		LEAVE;
+		SPAGAIN;
 		len = av_len(into);
+		EXTEND(SP, len + 1);
 		for (i = 0; i <= len; i++) {
-			ST(i) = newSVsv(*av_fetch(into, i, 0));
+			PUSHs(*av_fetch(into, i, 0));
 		}
-	        XSRETURN(i);
 
-SV *
+void
 keys(self)
 	SV * self
-	CODE:
+	PPCODE:
 		int i = 0;
 		AV * array = (AV*)SvRV(self);
     		int len = av_len(array);
+		EXTEND(SP, len + 1);
 		for (i = 0; i <= len; i++) {
-			ST(i) = newSViv(i);
+			mPUSHs(newSViv(i));
 		}
-	        XSRETURN(i);
-	OUTPUT:
-		RETVAL
 
 SV *
 map(self, cb)
@@ -643,28 +697,18 @@ map(self, cb)
 	CODE:
 		AV * array = (AV*)SvRV(self);
 		AV * new_array = newAV();
-    		int len = av_len(array), i = 0, j = 0;
-		int offset = 0;
+    		int len = av_len(array), i = 0;
 		for (i = 0; i <= len; i++) {
                   	dSP;
-			SV * val = *av_fetch(array, i, 0);
+			int p;
                         PUSHMARK(SP);
-                        XPUSHs(val);
+                        XPUSHs(*av_fetch(array, i, 0));
                         PUTBACK;
-			int p = call_sv(cb, 3);
-			SPAGAIN;
-			if (SvTRUEx(*PL_stack_sp)) {
-				AV * temp = newAV();
-				for (j = 0; j < p; j++) {
-					av_push(temp, newSVsv(POPs));
-				}
-				temp = reverse(temp);
-				for (j = 0; j < p; j++) {
-					av_push(new_array, *av_fetch(temp, j, 0));
-				}
-			}
-			PUTBACK;
-
+			p = call_sv(cb, G_LIST);
+			if (p > 0 && SvTRUEx(*PL_stack_sp))
+				copy_into(aTHX_ new_array, p);
+			else
+				PL_stack_sp -= p;
 		}
 		RETVAL = newSVsv(new(self, new_array));
 	OUTPUT:
@@ -675,7 +719,7 @@ reduce(self, cb, ...)
 	SV * self
 	SV * cb
 	CODE:
-		SV * red = items > 2 ? ST(3) : newSV(0);
+		SV * red = items > 2 ? ST(2) : sv_newmortal();
 		AV * array = (AV*)SvRV(self);
     		RETVAL = newSVsv(reduce(array, red, cb));
 	OUTPUT:
@@ -686,8 +730,8 @@ reduceRight(self, cb, ...)
 	SV * self
 	SV * cb
 	CODE:
-		SV * red = items > 2 ? ST(3) : newSV(0);
-		AV * array = reverse((AV*)SvRV(self));
+		SV * red = items > 2 ? ST(2) : sv_newmortal();
+		AV * array = (AV*)sv_2mortal((SV*)reverse((AV*)SvRV(self)));
     		RETVAL = newSVsv(reduce(array, red, cb));
 	OUTPUT:
 		RETVAL
@@ -699,17 +743,11 @@ some(self, cb)
 	CODE:
 		AV * array = (AV*)SvRV(self);
     		int len = av_len(array), i = 0;
-		RETVAL = newRV_inc((SV*)newSViv(0));	
+		RETVAL = newRV_noinc((SV*)newSViv(0));
 		for (i = 0; i <= len; i++) {
-                  	dSP;
-			SV * val = *av_fetch(array, i, 0);
-                        PUSHMARK(SP);
-                        XPUSHs(val);
-                        PUTBACK;
-                        call_sv(cb, G_SCALAR);
-			if (SvTRUEx(*PL_stack_sp)) {
-				PUTBACK;
-				RETVAL = newRV_inc((SV*)newSViv(1));
+			if (SvTRUEx(call_one(aTHX_ cb, *av_fetch(array, i, 0)))) {
+				SvREFCNT_dec(RETVAL);
+				RETVAL = newRV_noinc((SV*)newSViv(1));
 				break;
 			}
 		}
@@ -719,11 +757,11 @@ some(self, cb)
 void
 values(self)
 	SV * self
-	CODE:
+	PPCODE:
 		int i = 0;
 		AV * array = (AV*)SvRV(self);
     		int len = av_len(array);
+		EXTEND(SP, len + 1);
 		for (i = 0; i <= len; i++) {
-			ST(i) = newSVsv(*av_fetch(array, i, 0));
+			mPUSHs(newSVsv(*av_fetch(array, i, 0)));
 		}
-	        XSRETURN(i);

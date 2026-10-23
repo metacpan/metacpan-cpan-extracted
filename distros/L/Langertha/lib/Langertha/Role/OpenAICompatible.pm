@@ -1,6 +1,6 @@
 package Langertha::Role::OpenAICompatible;
 # ABSTRACT: Role for OpenAI-compatible API format
-our $VERSION = '0.503';
+our $VERSION = '0.504';
 use Moose::Role;
 use File::ShareDir::ProjectDistDir qw( :all );
 use Carp qw( croak carp );
@@ -522,6 +522,10 @@ sub chat_stream_request {
     $self->generation_kwargs_for(%$controls),
     ( $self->can('knobs_kwargs_for') ? $self->knobs_kwargs_for(%$controls) : () ),
     stream => JSON->true,
+    # The stream's token usage comes only when the request asks for it; before
+    # %extra, so a stream_options the caller passes wins. Gated: some
+    # compatible servers reject a field they do not know (ADR 0038).
+    $self->supports('stream_usage') ? ( stream_options => { include_usage => JSON->true } ) : (),
     %extra,
   );
 }
@@ -776,7 +780,7 @@ Langertha::Role::OpenAICompatible - Role for OpenAI-compatible API format
 
 =head1 VERSION
 
-version 0.503
+version 0.504
 
 =head1 SYNOPSIS
 
@@ -1060,6 +1064,15 @@ select the correct stream parser.
 
 Generates an OpenAI-format streaming chat request (C<stream =E<gt> true>).
 Returns an HTTP request object for use with streaming execution.
+
+On an engine that C<supports('stream_usage')> (see
+L<Langertha::Role::StreamUsage>) the body also carries
+C<< stream_options => { include_usage => true } >>, so the provider sends the
+stream's token usage as its last chunk (read by L</parse_stream_chunk>,
+collected by L<Langertha::Role::Chat/aggregate_usage>). A C<stream_options>
+in C<%extra> replaces it whole; C<< stream_options => { include_usage =>
+JSON->false } >> turns the usage off for this request. Engines without the
+capability send no C<stream_options> of their own.
 
 =head2 parse_stream_chunk
 

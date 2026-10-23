@@ -1,12 +1,14 @@
 package Langertha::Engine::OllamaOpenAI;
 # ABSTRACT: Ollama via OpenAI-compatible API
-our $VERSION = '0.503';
+our $VERSION = '0.504';
 use Moose;
 use Carp qw( croak );
 
 extends 'Langertha::Engine::OpenAIBase';
 
-with 'Langertha::Role::Embedding', 'Langertha::Role::Tools';
+# StreamUsage: the OpenAI-compatibility page lists stream_options.include_usage
+# for /v1/chat/completions; without it the stream has no usage (ADR 0038).
+with 'Langertha::Role::Embedding', 'Langertha::Role::Tools', 'Langertha::Role::StreamUsage';
 
 
 has '+url' => (
@@ -85,7 +87,7 @@ Langertha::Engine::OllamaOpenAI - Ollama via OpenAI-compatible API
 
 =head1 VERSION
 
-version 0.503
+version 0.504
 
 =head1 SYNOPSIS
 

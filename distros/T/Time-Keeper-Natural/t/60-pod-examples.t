@@ -26,7 +26,7 @@ for my $pm (map { $INC{$_} } 'Time/Keeper/Natural.pm', 'Time/Keeper/Natural/Matc
         my $p = $n;
         while ($chain =~ /->(in_locale|new)\(([^)]*)\)/g) {
             my ($m, $args) = ($1, $2);
-            my @args = map { s/^\s*'|'\s*$//gr } grep { /\S/ } split /\s*(?:,|=>)\s*/, $args;
+            my @args = map { (my $s = $_) =~ s/^\s*'|'\s*$//g; $s } grep { /\S/ } split /\s*(?:,|=>)\s*/, $args;
             $p = $p->$m(@args);
         }
         my $got = eval {

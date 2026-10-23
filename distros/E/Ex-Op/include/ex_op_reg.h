@@ -175,6 +175,11 @@ eo_walk_one(pTHX_ eo_walk_t *w, OP *o)
         w->why = "it has a signature";
         return;
 #endif
+#if PERL_VERSION_GE(5,43,3)
+    case OP_MULTIPARAM:
+        w->why = "it has a signature";
+        return;
+#endif
     case OP_RV2AV:
         if (eo_is_defgv(aTHX_ eo_kid(o))) {
             w->why = "it reads @_ after its parameters";

@@ -14,27 +14,27 @@ Getopt::Long::Configure ("require_order");
    local @ARGV = ("--name", "demo", "--bind", ":31740", "--token", "first",
       "--token", "second", "--stdio", "--custom", "yes", "positional");
    my $custom;
-   my %options = mcp_getoptions ({ usage => "usage example\n" }, "custom=s" => \$custom);
-   is $options{name}, "demo", "shared name";
-   is $options{bind}, ":31740", "shared bind";
-   is_deeply $options{tokens}, ["first", "second"], "repeatable ordered tokens";
-   ok $options{stdio}, "shared stdio";
+   my $options = mcp_getoptions ({ usage => "usage example\n" }, "custom=s" => \$custom);
+   is $options->{name}, "demo", "shared name";
+   is $options->{bind}, ":31740", "shared bind";
+   is_deeply $options->{tokens}, ["first", "second"], "repeatable ordered tokens";
+   ok $options->{stdio}, "shared stdio";
    is $custom, "yes", "Getopt::Long application option";
    is_deeply \@ARGV, ["positional"], "require_order leaves positional arguments";
 }
 
 {
    local @ARGV = ("--name", "memory", "--custom-instructions", "Use for lasting memories.");
-   my %options = mcp_getoptions;
-   is $options{custom_instructions}, "Use for lasting memories.",
+   my $options = mcp_getoptions;
+   is $options->{custom_instructions}, "Use for lasting memories.",
       "common custom-instructions option returns instance purpose";
 }
 
 {
    local @ARGV = ("--name", "example");
-   my %options = mcp_getoptions ({ path => "/custom/", auth => "none" });
-   is $options{path}, "/custom/", "custom endpoint path is returned for startup";
-   is $options{auth}, "none", "explicit unauthenticated mode passed to startup";
+   my $options = mcp_getoptions ({ path => "/custom/", auth => "none" });
+   is $options->{path}, "/custom/", "custom endpoint path is returned for startup";
+   is $options->{auth}, "none", "explicit unauthenticated mode passed to startup";
 }
 
 {
@@ -51,8 +51,8 @@ Getopt::Long::Configure ("require_order");
 
 {
    local @ARGV = ("--name", "example");
-   my %options = mcp_getoptions;
-   is_deeply \%options, { name => "example" }, "no unnecessary option defaults";
+   my $options = mcp_getoptions;
+   is_deeply $options, { name => "example" }, "no unnecessary option defaults";
 }
 
 my $dir = File::Temp::tempdir (CLEANUP => 1);
@@ -123,8 +123,8 @@ print {$fh} "\n[program perl]\ncustom_instructions = Program purpose\n"
 close $fh or die $!;
 
 my $probe = 'mcp_config instructions => "Operating rules", short_instructions => "Discover tools"; '
-   . 'my %options = mcp_getoptions; '
-   . 'mcp_start %options, auth => "none", port => 0, on_start => sub { '
+   . 'my $options = mcp_getoptions; '
+   . 'mcp_start %$options, auth => "none", port => 0, on_start => sub { '
    . 'print $_[0]{instructions}, "\\n"; $_[0]->close };';
 ($status, $out, $err) = command ($probe, "--name", "other");
 is $status, 0, "program-level custom instructions start";
@@ -206,14 +206,14 @@ INI
 
 my $auto_probe = q{
    require AnyEvent::MCP::Server::Permissions;
-   my %options = mcp_getoptions;
+   my $options = mcp_getoptions;
    my $p = AnyEvent::MCP::Server::Permissions->new (
       sandbox_grants => {
          "workdir-read" => [],
          "workdir-write" => ["workdir-read"],
       },
    );
-   mcp_start %options, permissions => $p, auth => "none", port => 0, on_start => sub {
+   mcp_start %$options, permissions => $p, auth => "none", port => 0, on_start => sub {
       print join (" ", map {
          $p->check ({ action => $_->[0], sandbox_grants => $_->[1], reason => "test" }, $_->[2])->{decision}
       } (["read", ["workdir-write"], "x"], ["write", ["workdir-write"], "x"],
@@ -283,8 +283,8 @@ my $tool_probe = q{
       },
       required => ["path", "target"],
    }, sub {};
-   my %opts = mcp_getoptions;
-   mcp_start %opts;
+   my $opts = mcp_getoptions;
+   mcp_start %$opts;
 };
 ($status, $out, $err) = command ($tool_probe, "--tool-help");
 is $status, 0, "tool-help exits without starting server";
@@ -322,7 +322,7 @@ for my $program (sort keys %tool_name) {
 local $ENV{PERL_ANYEVENT_LOG} = ""; # test the default logger, not the harness filter.
 my $log_probe = q{
    use JSON::XS ();
-   my %options = mcp_getoptions;
+   my $options = mcp_getoptions;
    my $req = {
       method => "tools/call", tool => "file-patch",
       args => { path => "lib/Foo.pm" },

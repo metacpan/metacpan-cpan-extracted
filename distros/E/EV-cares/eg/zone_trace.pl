@@ -26,7 +26,7 @@ while (@labels) {
 }
 @zones = reverse @zones;
 
-my $r = EV::cares->new(timeout => 5, tries => 2);
+my $r = EV::cares->new(timeout => 5, tries => 2, qcache => 0, flags => ARES_FLAG_EDNS);
 
 sub one_query {
     my ($name, $t) = @_;

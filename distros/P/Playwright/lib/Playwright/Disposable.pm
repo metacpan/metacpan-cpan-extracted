@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::Disposable;
-$Playwright::Disposable::VERSION = '1.621';
+$Playwright::Disposable::VERSION = '1.641';
 use parent 'Playwright::Base';
 
 sub new {
@@ -27,6 +27,16 @@ sub dispose {
     return $self->_api_request(
         args    => [@_],
         command => 'dispose',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub close {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'close',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -76,7 +86,7 @@ Playwright::Disposable - Automatically generated class for Playwright::Disposabl
 
 =head1 VERSION
 
-version 1.621
+version 1.641
 
 =head1 CONSTRUCTOR
 
@@ -92,6 +102,12 @@ Instead it should be returned to you as the result of calls on Playwright object
 Execute the Disposable::dispose playwright routine.
 
 See L<https://playwright.dev/docs/api/class-Disposable#Disposable-dispose> for more information.
+
+=head2 close(@args)
+
+Execute the Disposable::close playwright routine.
+
+See L<https://playwright.dev/docs/api/class-Disposable#Disposable-close> for more information.
 
 =head2 on(@args)
 

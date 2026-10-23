@@ -120,7 +120,7 @@ typedef struct {
     uint32_t waiters;        /* 68: waiter count */
     uint32_t generation;     /* 72: barrier generation / condvar epoch */
     uint32_t mutex;          /* 76: condvar mutex (0 or PID|0x80000000) */
-    uint32_t mutex_waiters;  /* 80: condvar mutex waiter count */
+    uint32_t mutex_waiters;  /* 80: condvar mutex / semaphore bulk waiter count */
     uint32_t stat_recoveries;/* 84 */
     uint64_t stat_acquires;  /* 88 */
     uint64_t stat_releases;  /* 96 */
@@ -886,7 +886,9 @@ static inline int sync_sem_acquire_n(SyncHandle *h, uint32_t n, double timeout) 
     int has_deadline = (timeout > 0);
     if (has_deadline) sync_make_deadline(timeout, &deadline);
 
+    if (n > 1) __atomic_add_fetch(&hdr->mutex_waiters, 1, __ATOMIC_RELAXED);
     __atomic_add_fetch(&hdr->stat_waits, 1, __ATOMIC_RELAXED);
+    int acquired = 0;
 
     for (;;) {
         uint32_t cur = __atomic_load_n(&hdr->value, __ATOMIC_RELAXED);
@@ -894,7 +896,8 @@ static inline int sync_sem_acquire_n(SyncHandle *h, uint32_t n, double timeout) 
             if (__atomic_compare_exchange_n(&hdr->value, &cur, cur - n,
                     1, __ATOMIC_ACQUIRE, __ATOMIC_RELAXED)) {
                 __atomic_add_fetch(&hdr->stat_acquires, 1, __ATOMIC_RELAXED);
-                return 1;
+                acquired = 1;
+                break;
             }
             continue;
         }
@@ -906,7 +909,7 @@ static inline int sync_sem_acquire_n(SyncHandle *h, uint32_t n, double timeout) 
             if (!sync_remaining_time(&deadline, &remaining)) {
                 __atomic_sub_fetch(&hdr->waiters, 1, __ATOMIC_RELEASE);
                 __atomic_add_fetch(&hdr->stat_timeouts, 1, __ATOMIC_RELAXED);
-                return 0;
+                break;
             }
             pts = &remaining;
         }
@@ -914,15 +917,20 @@ static inline int sync_sem_acquire_n(SyncHandle *h, uint32_t n, double timeout) 
         syscall(SYS_futex, &hdr->value, FUTEX_WAIT, cur, pts, NULL, 0);
         __atomic_sub_fetch(&hdr->waiters, 1, __ATOMIC_RELEASE);
 
-        if (sync_sem_try_acquire_n(h, n)) return 1;
+        if (sync_sem_try_acquire_n(h, n)) {
+            acquired = 1;
+            break;
+        }
 
         if (has_deadline) {
             if (!sync_remaining_time(&deadline, &remaining)) {
                 __atomic_add_fetch(&hdr->stat_timeouts, 1, __ATOMIC_RELAXED);
-                return 0;
+                break;
             }
         }
     }
+    if (n > 1) __atomic_sub_fetch(&hdr->mutex_waiters, 1, __ATOMIC_RELAXED);
+    return acquired;
 }
 
 static inline int sync_sem_acquire(SyncHandle *h, double timeout) {
@@ -986,8 +994,11 @@ static inline void sync_sem_release(SyncHandle *h) {
             __atomic_add_fetch(&hdr->stat_releases, 1, __ATOMIC_RELAXED);
             /* StoreLoad: publish the state change before reading the waiter count (weak-memory lost-wakeup guard). */
             __atomic_thread_fence(__ATOMIC_SEQ_CST);
-            if (__atomic_load_n(&hdr->waiters, __ATOMIC_RELAXED) > 0)
-                syscall(SYS_futex, &hdr->value, FUTEX_WAKE, 1, NULL, NULL, 0);
+            if (__atomic_load_n(&hdr->waiters, __ATOMIC_ACQUIRE) > 0) {
+                /* A bulk request may be ineligible while a smaller waiter can run. */
+                int wake = __atomic_load_n(&hdr->mutex_waiters, __ATOMIC_RELAXED) > 0 ? INT_MAX : 1;
+                syscall(SYS_futex, &hdr->value, FUTEX_WAKE, wake, NULL, NULL, 0);
+            }
             return;
         }
     }
@@ -1005,8 +1016,9 @@ static inline void sync_sem_release_n(SyncHandle *h, uint32_t n) {
             __atomic_add_fetch(&hdr->stat_releases, 1, __ATOMIC_RELAXED);
             /* StoreLoad: publish the state change before reading the waiter count (weak-memory lost-wakeup guard). */
             __atomic_thread_fence(__ATOMIC_SEQ_CST);
-            if (__atomic_load_n(&hdr->waiters, __ATOMIC_RELAXED) > 0) {
+            if (__atomic_load_n(&hdr->waiters, __ATOMIC_ACQUIRE) > 0) {
                 uint32_t wake = n < (uint32_t)INT_MAX ? n : INT_MAX;
+                if (__atomic_load_n(&hdr->mutex_waiters, __ATOMIC_RELAXED) > 0) wake = INT_MAX;
                 syscall(SYS_futex, &hdr->value, FUTEX_WAKE, wake, NULL, NULL, 0);
             }
             return;
@@ -1037,8 +1049,7 @@ static inline uint32_t sync_sem_value(SyncHandle *h) {
  *
  * Timeout breaks the barrier permanently; all waiters return -1 and all
  * future wait() calls also return -1 until sync_barrier_reset() is called.
- * This mirrors pthread_barrier "broken" semantics and avoids the race where
- * a timed-out waiter's reset raced with new-generation arrivals.
+ * This avoids racing a timed-out waiter's reset with new-generation arrivals.
  * ================================================================ */
 
 #define SYNC_BARRIER_BROKEN_BIT 0x80000000U
@@ -1090,8 +1101,8 @@ static inline int sync_barrier_wait(SyncHandle *h, double timeout) {
 
     for (;;) {
         uint32_t cur_raw = __atomic_load_n(&hdr->generation, __ATOMIC_ACQUIRE);
+        if ((cur_raw & SYNC_BARRIER_GEN_MASK) != gen_raw) return 0;  /* our cohort tripped */
         if (cur_raw & SYNC_BARRIER_BROKEN_BIT) return -1;  /* broken */
-        if (cur_raw != gen_raw) return 0;  /* barrier tripped */
 
         __atomic_add_fetch(&hdr->waiters, 1, __ATOMIC_RELAXED);
 
@@ -1099,16 +1110,12 @@ static inline int sync_barrier_wait(SyncHandle *h, double timeout) {
         if (has_deadline) {
             if (!sync_remaining_time(&deadline, &remaining)) {
                 __atomic_sub_fetch(&hdr->waiters, 1, __ATOMIC_RELAXED);
-                /* Try to break the barrier. If CAS fails with BROKEN_BIT
-                 * clear, only gen changed -- our cohort tripped -> return 0.
-                 * If CAS fails with BROKEN_BIT set, current state is
-                 * broken (whether by us, another waiter, or trip+re-break)
-                 * -> return -1, matching the non-timeout path. */
+                /* A later cohort's timeout cannot break our completed cohort. */
                 uint32_t g = gen_raw;
                 if (!__atomic_compare_exchange_n(&hdr->generation, &g,
                         gen_raw | SYNC_BARRIER_BROKEN_BIT,
                         0, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED)
-                    && !(g & SYNC_BARRIER_BROKEN_BIT)) {
+                    && (g & SYNC_BARRIER_GEN_MASK) != gen_raw) {
                     return 0;
                 }
                 __atomic_add_fetch(&hdr->stat_timeouts, 1, __ATOMIC_RELAXED);

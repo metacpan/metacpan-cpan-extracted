@@ -26,7 +26,7 @@ use_ok 'Sub::Private' or BAIL_OUT 'Sub::Private failed to load';
 # -------------------------------------------------------------------
 
 Readonly::Scalar my $SP      => 'Sub::Private';
-Readonly::Scalar my $VERSION => '0.06';
+Readonly::Scalar my $VERSION => '0.07';
 
 my %config = (
 	n_instances    => 5,

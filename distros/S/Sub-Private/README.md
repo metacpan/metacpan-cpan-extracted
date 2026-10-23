@@ -4,7 +4,7 @@ Sub::Private - Private subroutines and methods
 
 ## Version
 
-Version 0.06
+Version 0.07
 
 ## Synopsis
 
@@ -48,7 +48,20 @@ not inherit access: private means _this package only_.
     call time and either delegates (owner package) or croaks (anyone else).
     Works correctly with OO dispatch (`$self-`\_helper>).
 
-    Enable before declaring your first private sub:
+    Enable it for your package only, in the `use` line:
+
+    ```perl
+    package MyClass;
+    use Sub::Private { mode => 'enforce' };
+    sub _helper :Private { ... }
+    ```
+
+    This is the recommended form for modules.  Other packages keep the mode
+    they chose, or the global `$Sub::Private::config{mode}`.
+
+    The older form sets the mode for every package in the program, and must
+    stay set until `CHECK`, so it changes how other modules' `:Private`
+    subs are handled.  Use it only in a program, not in a module:
 
     ```perl
     BEGIN { $Sub::Private::config{mode} = 'enforce' }
@@ -95,8 +108,10 @@ $Sub::Private::config{harness_bypass} = 0;
 
 ### Configuration
 
-```
-$Sub::Private::config{mode}            -- 'namespace' (default) or 'enforce'
+```perl
+use Sub::Private { mode => 'enforce' };  -- this package only (recommended)
+$Sub::Private::config{mode}            -- 'namespace' (default) or 'enforce',
+                                          for packages that chose no mode
 $Sub::Private::config{harness_bypass}  -- 1 (default); set to 0 to test enforcement
 ```
 
@@ -113,6 +128,8 @@ bar() is a private subroutine of Foo and cannot be called from Bar
 ```perl
 use Sub::Private;                    # attribute form -- no arguments
 use Sub::Private qw(_a _b _c);      # declarative form (enforce mode only)
+use Sub::Private { mode => 'enforce' };              # mode for this package
+use Sub::Private { mode => 'enforce' }, qw(_a _b);   # both
 ```
 
 #### Purpose
@@ -122,16 +139,30 @@ Called automatically by `use Sub::Private`.
 With **no arguments**: makes the `:Private` attribute globally available
 via `UNIVERSAL`.  No other action is taken.
 
+With **a hash reference first**: sets options for the calling package
+only.  The one option is `mode`, `'namespace'` or `'enforce'`.  It
+decides what happens to that package's `:Private` subs and whether it
+may use the declarative form, whatever `$Sub::Private::config{mode}`
+says.  The global mode is not changed, so other packages are not
+affected.  The mode applies to subs in the package that made the `use`
+call, so put the `use` line inside the package.
+
 With **one or more sub names**: registers those named subs in the calling
 package for access-enforcement wrapping at `CHECK` time.  If `CHECK`
 has already fired (for example the package is loaded with `require` at
 run time), the subs are wrapped as soon as the enclosing scope (normally
 the rest of the file) has been compiled, so the `use` line can still
 come before the subs it names.  A direct `Sub::Private->import(...)`
-call at run time wraps immediately.  Requires `$Sub::Private::config{mode}` to equal
-`'enforce'`; croaks otherwise.
+call at run time wraps immediately.  Requires the package's mode (see
+above), or else `$Sub::Private::config{mode}`, to equal `'enforce'`;
+croaks otherwise.
 
 #### Arguments
+
+- `\%options` (optional)
+
+    A hash reference, before any sub names.  The only key allowed is
+    `mode`, whose value must be `'namespace'` or `'enforce'`.
 
 - `@subs` (optional)
 
@@ -145,6 +176,8 @@ The class name (`'Sub::Private'`) as a plain string in all cases.
 
 #### Side Effects
 
+- With `\%options`: records the mode for the calling package.  A
+later call from the same package replaces it.
 - Pre-CHECK: appends `[$owner_pkg, $sub_name]` pairs to the
 internal `@_pending` list.
 - Post-CHECK, during compilation: installs wrapper closures in the
@@ -165,6 +198,17 @@ sub _init   { ... }    # wrapped at CHECK time
 sub run     { my $s = shift; $s->_helper; $s->_init }
 ```
 
+Enforce mode for one package, leaving every other package alone:
+
+```perl
+package MyClass;
+use Sub::Private { mode => 'enforce' };
+
+sub new        { bless {}, shift }
+sub _helper :Private { ... }    # wrapped at CHECK time
+sub run        { (shift)->_helper }
+```
+
 #### Api Specification
 
 ##### Input
@@ -172,6 +216,21 @@ sub run     { my $s = shift; $s->_helper; $s->_init }
 ```perl
 # No-argument form: always valid.
 Sub::Private->import();
+
+# Options, first in the list (optional):
+{
+    options => {
+        type     => 'hashref',
+        optional => 1,
+        schema   => {
+            mode => {
+                type     => 'string',
+                memberof => [ 'namespace', 'enforce' ],
+                optional => 1,
+            },
+        },
+    }
+}
 
 # Declarative form (enforce mode only):
 {
@@ -198,9 +257,14 @@ Sub::Private->import();
 Message                                              Meaning / Action
 ---------------------------------------------------  -----------------------------------------------
 "Sub::Private->import: declarative form requires     use Sub::Private qw(...) was called while
- mode => 'enforce'"                                  $config{mode} is not 'enforce'.  Set
-                                                     $config{mode} = 'enforce' in a BEGIN block
-                                                     before "use Sub::Private".
+ mode => 'enforce'"                                  the package's mode is not 'enforce'.  Use
+                                                     use Sub::Private { mode => 'enforce' },
+                                                     qw(...) instead.
+
+"Sub::Private->import: unknown option 'KEY'"         The options hash has a key other than mode.
+
+"Sub::Private: unknown mode 'MODE' -- use            The mode option, or $config{mode}, is not
+ 'namespace' or 'enforce'"                           one of the two modes.
 
 "Sub::Private->import: 'NAME' is not a valid         The sub name failed the identifier regex.
  Perl identifier"                                    Check for typos, hyphens, leading digits,
@@ -228,7 +292,10 @@ Module-level configuration hash.  Supported keys:
 - `mode`
 
     `'namespace'` (default) or `'enforce'`.  Must be set in a `BEGIN`
-    block before `use Sub::Private` to take effect at `CHECK` time.
+    block before `use Sub::Private` to take effect at `CHECK` time.  It
+    applies to every package that did not choose its own mode with
+    `use Sub::Private { mode =` ... }>, so a module should use that form
+    instead of changing this value.
 
 - `harness_bypass`
 
@@ -321,6 +388,7 @@ forall caller, owner : Package .
 | bypass    : BOOL                                    |
 | config    : { mode : seq CHAR,                      |
 |               harness_bypass : BOOL }               |
+| pkg_mode  : Package -+> seq CHAR                   |
 +----------------------------------------------------+
 
 -- Initial state
@@ -331,6 +399,7 @@ forall caller, owner : Package .
 | bypass    = false                                  |
 | config    = { mode |-> 'namespace',                 |
 |               harness_bypass |-> true }             |
+| pkg_mode  = {}                                     |
 +----------------------------------------------------+
 
 -- Bypass predicate
@@ -371,9 +440,23 @@ valid_id(n) <=> n =~ /\A[_a-zA-Z]\w*\z/
 post_check  : BOOL
 compiling   : BOOL       -- true while $^S is undefined
 
+-- The mode that applies to a package's subs
+mode_for(p) = pkg_mode(p)   if p in dom pkg_mode
+            = config.mode   otherwise
+
+-- Options (hashref first): sets the caller's mode only
++-ImportOptions-------------------------------------+
+| Delta-Registry                                    |
+| mode? : seq CHAR                                  |
+|---------------------------------------------------|
+| mode? in { 'namespace', 'enforce' }               |
+| pkg_mode' = pkg_mode (+) { caller |-> mode? }     |
+| config' = config                                  |
++---------------------------------------------------+
+
 -- Pre-condition (declarative form)
 +-ImportPre-----------------------------------------+
-| config.mode = 'enforce'                           |
+| mode_for(caller) = 'enforce'                      |
 | forall n in subs . valid_id(n)                    |
 +---------------------------------------------------+
 

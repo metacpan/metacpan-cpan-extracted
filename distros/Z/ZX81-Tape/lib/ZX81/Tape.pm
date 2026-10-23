@@ -5,7 +5,7 @@ use Path::Tiny;
 use CPU::Z80::Assembler;
 use ZX81::Tokenize qw( tokenize_basic encode_chars encode_float );
 
-our $VERSION = '0.005';
+our $VERSION = '0.006';
 
 use Exporter qw(import);
 
@@ -45,6 +45,43 @@ our @EXPORT_OK = qw(
     sub dpeek_be {
         my ( $self, $addr ) = @_;
         return ( $self->peek($addr) << 8 ) | $self->peek( $addr + 1 );
+    }
+
+    sub peek_bytes {
+        my ( $self, $addr, $length ) = @_;
+        my @bytes;
+        for my $i ( 0 .. $length - 1 ) {
+            push @bytes, $self->peek( $addr + $i );
+        }
+        return @bytes;
+    }
+
+    sub poke {
+        my ( $self, $addr, $value ) = @_;
+        my $p = $addr - $self->start;
+        if ( $p < 0 ) {
+            return;
+        }
+        $self->data->[$p] = $value & 0xFF;
+    }
+
+    sub dpoke {
+        my ( $self, $addr, $value ) = @_;
+        $self->poke( $addr,     $value & 0xFF );
+        $self->poke( $addr + 1, ( $value >> 8 ) & 0xFF );
+    }
+
+    sub dpoke_be {
+        my ( $self, $addr, $value ) = @_;
+        $self->poke( $addr,     ( $value >> 8 ) & 0xFF );
+        $self->poke( $addr + 1, $value & 0xFF );
+    }
+
+    sub poke_bytes {
+        my ( $self, $addr, @bytes ) = @_;
+        for my $i ( 0 .. $#bytes ) {
+            $self->poke( $addr + $i, $bytes[$i] );
+        }
     }
 }
 
@@ -329,7 +366,7 @@ sub dump_p {
 
     # load memory
     my @bytes = ( map { ord } split //, path($p_filename)->slurp_raw );
-    my $mem   = ZX81::Tape::Memory->new( 0x4009, @bytes );
+    my $mem   = ZX81::Tape::Memory->new( $sysvars{VERSN}, @bytes );
 
     # memory access helpers
     my $peek_text = sub {
@@ -475,10 +512,9 @@ sub list_p {
 
     # load memory
     my @bytes = ( map { ord } split //, path($p_filename)->slurp_raw );
-    my $mem   = ZX81::Tape::Memory->new( 0x4009, @bytes );
+    my $mem   = ZX81::Tape::Memory->new( $sysvars{VERSN}, @bytes );
 
     # dump pragmas
-    my $need_newline = 0;
 
     # dump AUTOSTART, AUTOSTART_LINE
     my $d_file = $mem->dpeek( $sysvars{D_FILE} );
@@ -486,13 +522,11 @@ sub list_p {
     if ( $nxtlin < $d_file ) {
         print $bas_fh "#AUTOSTART=1\n";
         print $bas_fh "#AUTOSTART_LINE=" . $mem->dpeek_be($nxtlin) . "\n";
-        $need_newline = 1;
     }
 
     # dump FAST
     if ( ( $mem->peek( $sysvars{CDFLAG} ) & 0x40 ) == 0x00 ) {
         print $bas_fh "#FAST=1\n";
-        $need_newline = 1;
     }
 
     # dump VARS
@@ -503,7 +537,6 @@ sub list_p {
         my ( $size, $text ) = decode_var( $mem, $addr );
         print $bas_fh "#VARS $text\n";
         $addr += $size;
-        $need_newline = 1;
     }
 
     # dump DFILE, DFILE_COLLAPSED
@@ -511,7 +544,6 @@ sub list_p {
     if ( $vars - $d_file < 1 + 33 * 24 ) {
         print $bas_fh "#DFILE_COLLAPSED=1\n";
         $dfile_collapsed = 1;
-        $need_newline    = 1;
     }
     my @dfile_lines = decode_dfile($mem);
     if ( !$dfile_collapsed ) {
@@ -524,12 +556,15 @@ sub list_p {
     }
     for my $line (@dfile_lines) {
         print $bas_fh "#DFILE=\"$line\"\n";
-        $need_newline = 1;
     }
 
-    if ($need_newline) {
-        print $bas_fh "\n";
-    }
+    # dump SYSVARS
+    my @sysvars =
+      $mem->peek_bytes( $sysvars{VERSN}, $sysvars{PROG} - $sysvars{VERSN} );
+    print $bas_fh "#SYSVARS="
+      . join( ",", map { sprintf "0x%02X", $_ } @sysvars ) . "\n";
+
+    print $bas_fh "\n";
 
     # dump BASIC program
     my $prog = $sysvars{PROG};
@@ -573,6 +608,8 @@ sub list_p {
         }
 
         # BASIC text
+        check_numbers( $mem, $addr + 4, $size - 1 );
+
         my $in_quote = 0;
         for ( my $i = 0 ; $i < $size - 1 ; $i++ ) {
             my $byte = $mem->peek( $addr + 4 + $i );
@@ -597,7 +634,7 @@ sub list_p {
                 if ( $code =~ /^\w\w/ ) {
                     $code = " $code ";
                 }
-                printf $bas_fh $code;
+                print $bas_fh $code;
             }
             else {
                 printf $bas_fh "\\%02X", $byte;
@@ -607,6 +644,90 @@ sub list_p {
 
         $addr += 4 + $size;
         next;
+    }
+}
+
+# check that numbers have the correct floating point representation
+sub check_numbers {
+    my ( $mem, $addr, $size ) = @_;
+
+    # REM line
+    if ( $mem->peek($addr) == 0xEA ) {
+        return;
+    }
+
+    # scan the line for numbers
+    my $p = $addr;
+    while ( $p < $addr + $size ) {
+        my $byte = $mem->peek($p);
+
+        # quoted string
+        if ( $byte == 0x0B ) {
+            $p++;
+            while ( $p < $addr + $size && $mem->peek($p) != 0x0B ) {
+                $p++;
+            }
+            next;
+        }
+
+        # number
+        if ( $byte >= 0x1B && $byte <= 0x25 ) {    # '.', '0'..'9'
+                                                   # collect mantissa
+            my $digits = "";
+            while ($p < $addr + $size
+                && $mem->peek($p) >= 0x1B
+                && $mem->peek($p) <= 0x25 )
+            {
+                $digits .= $zx81chars{ $mem->peek($p) };
+                $p++;
+            }
+
+            # collect exponent
+            if ( $mem->peek($p) == 0x2A ) {        # 'E'
+                $digits .= $zx81chars{ $mem->peek($p) };
+                $p++;
+
+                # sign
+                if ( $p < $addr + $size
+                    && ( $mem->peek($p) == 0x15 || $mem->peek($p) == 0x16 ) )
+                {
+                    $digits .= $zx81chars{ $mem->peek($p) };
+                    $p++;
+                }
+                while ($p < $addr + $size
+                    && $mem->peek($p) >= 0x1C
+                    && $mem->peek($p) <= 0x25 )
+                {
+                    $digits .= $zx81chars{ $mem->peek($p) };
+                    $p++;
+                }
+            }
+
+            # collect floating point form
+            if ( $mem->peek($p) == 0x7E ) {
+                my @fp_bytes;
+                for my $i ( 1 .. 5 ) {
+                    push @fp_bytes, $mem->peek( $p + $i );
+                }
+
+                $digits = lc($digits);
+                my $value1 = eval($digits);
+                $@ and die "invalid number '$digits'";
+                my $value2 = zx81_to_float(@fp_bytes);
+
+                if ( abs( $value1 - $value2 ) > 1e-10 ) {
+                    die
+                      "error: wrong floating point representation at address ",
+                      sprintf( "0x%04X", $p + 1 ), ": $value1 != $value2\n";
+                }
+
+                $p += 6;
+            }
+            next;
+        }
+
+        # anything else
+        $p++;
     }
 }
 
@@ -676,20 +797,19 @@ sub decode_var {
     if ( ( $byte & 0xE0 ) == 0xA0 ) {
 
         # multiple letter variable
-        $byte = ( $byte & 0x3F ) | 0x20;
+        $byte = $byte & 0x3F;
         my $name = $zx81chars{$byte};    # first letter
 
         while ( ( $mem->peek($addr) & 0xC0 ) == 0x00 )
         {                                # second..before-last letters
             $byte = $mem->peek( $addr++ );
-            $byte = ( $byte & 0x3F ) | 0x20;
             $name .= $zx81chars{$byte};    # second..before-last letters
         }
 
         $byte = $mem->peek( $addr++ );
         ( $byte & 0xC0 ) == 0x80
           or die "decode_var: unexpected byte $byte at $addr";
-        $byte = ( $byte & 0x3F ) | 0x20;
+        $byte = $byte & 0x3F;
         $name .= $zx81chars{$byte};    # last letter
 
         my @bytes;
@@ -918,6 +1038,7 @@ use Object::Tiny::RW qw(
   asm_lines
   asm_labels
   asm_bytes
+  sysvars
   vars
   dfile
   dfile_collapsed
@@ -936,6 +1057,7 @@ sub new {
         asm_lines       => [],
         asm_labels      => {},
         asm_bytes       => '',
+        sysvars         => [],
         vars            => [],
         dfile           => [],
         dfile_collapsed =>  0,
@@ -1107,6 +1229,27 @@ sub parse_pragma {
     }
     if ( $line->text =~ /^\s*\#\s*DFILE_COLLAPSED\s*=\s*(\d+)/ ) {
         $self->dfile_collapsed( $1 == 0 ? 0 : 1 );
+        return 1;
+    }
+    if ( $line->text =~ /^\s*\#\s*SYSVARS\s*=\s*(.*)/ ) {
+        my $data = $1;
+        my @data = split( /\s*,\s*/, $data );
+        for (@data) {
+            /^\$([0-9a-f]+)$/i and do {
+                $_ = hex($1);
+                next;
+            };
+            /^0x([0-9a-f]+)$/i and do {
+                $_ = hex($1);
+                next;
+            };
+            /^\d+$/ and do {
+                $_ = 0 + $_;
+                next;
+            };
+            $line->error( "invalid sysvar value: " . $_ );
+        }
+        $self->sysvars( \@data );
         return 1;
     }
     if ( $line->text =~ /^\s*#/ ) {
@@ -1303,6 +1446,9 @@ sub compile {
             $text =~ s/0x([0-9A-Fa-f]+)/hex($1)/ge;
             $text =~ s/\$([0-9A-Fa-f]+)/hex($1)/ge;
 
+            # evaluate expressions in {}
+            $text =~ s/\{(.*?)\}/eval_expr($1)/ge;
+
             # convert BASIC to ZX81 tokens
             my $line_bytes = tokenize_basic($text);
             $line->bytes($line_bytes);
@@ -1316,6 +1462,13 @@ sub compile {
             $pass     = 0;           # repeat if size changed
         }
     }
+}
+
+sub eval_expr {
+    my ($expr) = @_;
+    my $value = eval($expr);
+    $@ and die "eval '$expr' failed: $@";
+    return $value;
 }
 
 sub invert_rem {
@@ -1404,18 +1557,98 @@ sub as_bytes {
     push @line_addr, [ 10000, $sysvars{PROG} + length($prog) ];
 
     my $prog_start = $sysvars{PROG};
-    my $e_ppc      = $prog eq '' ? 0 : unpack( "n", substr( $prog, 0, 2 ) );
 
-    # Create an empty display file
+    # Create display file
     my $dfile       = $self->dfile_as_bytes();
     my $dfile_start = $prog_start + length($prog);
 
-    # Create an empty vars area
+    # Create vars area
     my $vars       = $self->vars_as_bytes();
     my $vars_start = $dfile_start + length($dfile);
     my $mem_end    = $vars_start + length($vars);
 
-    # define autostart
+    # init sysvars from defaults
+    my $sysvars =
+      ZX81::Tape::Memory->new( $sysvars{VERSN}, @{ $self->sysvars } );
+
+    # VERSN
+    $sysvars->poke( $sysvars{VERSN}, 0 );
+
+    # E_PPC
+    my $e_ppc = $prog eq '' ? 0 : unpack( "n", substr( $prog, 0, 2 ) );
+    $sysvars->dpoke( $sysvars{E_PPC},
+        @{ $self->sysvars } ? $sysvars->dpeek( $sysvars{E_PPC} ) : $e_ppc );
+
+    # D_FILE and DF_CC
+    $sysvars->dpoke( $sysvars{D_FILE}, $dfile_start );
+    $sysvars->dpoke( $sysvars{DF_CC},
+        @{ $self->sysvars }
+        ? $sysvars->dpeek( $sysvars{DF_CC} )
+        : $dfile_start + 1 );
+
+    # VARS
+    $sysvars->dpoke( $sysvars{VARS}, $vars_start );
+
+    # DEST
+    $sysvars->dpoke( $sysvars{DEST},
+        @{ $self->sysvars } ? $sysvars->dpeek( $sysvars{DEST} ) : 0 );
+
+    # E_LINE
+    $sysvars->dpoke( $sysvars{E_LINE}, $mem_end );
+
+    # CH_ADD
+    $sysvars->dpoke( $sysvars{CH_ADD},
+        @{ $self->sysvars }
+        ? $sysvars->dpeek( $sysvars{CH_ADD} )
+        : $mem_end + 1 );
+
+    # X_PTR
+    $sysvars->dpoke( $sysvars{X_PTR},
+        @{ $self->sysvars } ? $sysvars->dpeek( $sysvars{X_PTR} ) : 0 );
+
+    # STKBOT and STKEND
+    $sysvars->dpoke( $sysvars{STKBOT},
+        @{ $self->sysvars }
+        ? $sysvars->dpeek( $sysvars{STKBOT} )
+        : $mem_end + 2 );
+    $sysvars->dpoke( $sysvars{STKEND},
+        @{ $self->sysvars }
+        ? $sysvars->dpeek( $sysvars{STKEND} )
+        : $mem_end + 2 );
+
+    # BREG
+    $sysvars->poke( $sysvars{BREG},
+        @{ $self->sysvars } ? $sysvars->peek( $sysvars{BREG} ) : 0 );
+
+    # MEM
+    $sysvars->dpoke( $sysvars{MEM},
+        @{ $self->sysvars }
+        ? $sysvars->dpeek( $sysvars{MEM} )
+        : $sysvars{MEMBOT} );
+
+    # FREE1
+    $sysvars->poke( $sysvars{FREE1},
+        @{ $self->sysvars } ? $sysvars->peek( $sysvars{FREE1} ) : 0 );
+
+    # DF_SZ
+    $sysvars->poke( $sysvars{DF_SZ},
+        @{ $self->sysvars } ? $sysvars->peek( $sysvars{DF_SZ} ) : 2 );
+
+    # S_TOP
+    $sysvars->dpoke( $sysvars{S_TOP},
+        @{ $self->sysvars } ? $sysvars->dpeek( $sysvars{S_TOP} ) : 0 );
+
+    # LAST_K and DEBOUNCE
+    $sysvars->dpoke( $sysvars{LAST_K},
+        @{ $self->sysvars } ? $sysvars->dpeek( $sysvars{LAST_K} ) : 0xFFFF );
+    $sysvars->poke( $sysvars{DEBOUNCE},
+        @{ $self->sysvars } ? $sysvars->peek( $sysvars{DEBOUNCE} ) : 0x0F );
+
+    # MARGIN
+    $sysvars->poke( $sysvars{MARGIN},
+        @{ $self->sysvars } ? $sysvars->peek( $sysvars{MARGIN} ) : 55 );
+
+    # NXTLIN - define autostart
     my $nxtlin = $dfile_start;
     if ( $self->autostart ) {
 
@@ -1428,47 +1661,78 @@ sub as_bytes {
             }
         }
     }
+    $sysvars->dpoke( $sysvars{NXTLIN}, $nxtlin );
 
-    # define fast mode
+    # OLDPPC
+    $sysvars->dpoke( $sysvars{OLDPPC},
+        @{ $self->sysvars } ? $sysvars->dpeek( $sysvars{OLDPPC} ) : 0 );
+
+    # FLAGX
+    $sysvars->poke( $sysvars{FLAGX},
+        @{ $self->sysvars } ? $sysvars->peek( $sysvars{FLAGX} ) : 0 );
+
+    # STRLEN
+    $sysvars->dpoke( $sysvars{STRLEN},
+        @{ $self->sysvars } ? $sysvars->dpeek( $sysvars{STRLEN} ) : 0 );
+
+    # T_ADDR
+    $sysvars->dpoke( $sysvars{T_ADDR},
+        @{ $self->sysvars } ? $sysvars->dpeek( $sysvars{T_ADDR} ) : 0x0C6B );
+
+    # SEED
+    $sysvars->dpoke( $sysvars{SEED},
+        @{ $self->sysvars } ? $sysvars->dpeek( $sysvars{SEED} ) : 0 );
+
+    # FRAMES
+    $sysvars->dpoke( $sysvars{FRAMES},
+        @{ $self->sysvars } ? $sysvars->dpeek( $sysvars{FRAMES} ) : 0xFFFF );
+
+    # COORDS
+    $sysvars->poke( $sysvars{COORDS_X},
+        @{ $self->sysvars } ? $sysvars->peek( $sysvars{COORDS_X} ) : 0 );
+    $sysvars->poke( $sysvars{COORDS_Y},
+        @{ $self->sysvars } ? $sysvars->peek( $sysvars{COORDS_Y} ) : 0 );
+
+    # PR_CC
+    $sysvars->poke( $sysvars{PR_CC},
+        @{ $self->sysvars } ? $sysvars->peek( $sysvars{PR_CC} ) : 0xBC );
+
+    # S_POSN
+    $sysvars->poke( $sysvars{S_POSN_COL},
+        @{ $self->sysvars } ? $sysvars->peek( $sysvars{S_POSN_COL} ) : 33 );
+    $sysvars->poke( $sysvars{S_POSN_ROW},
+        @{ $self->sysvars } ? $sysvars->peek( $sysvars{S_POSN_ROW} ) : 24 );
+
+    # CDFLAG - FAST mode flag
     my $cdflag = $self->fast ? 0x00 : 0x40;    # SLOW if not fast
+    $sysvars->poke( $sysvars{CDFLAG}, $cdflag );
 
-    # Create the system variables
+    # PRBUFF
+    for my $i ( 0 .. 31 ) {
+        $sysvars->poke( $sysvars{PRBUFF} + $i,
+            @{ $self->sysvars } ? $sysvars->peek( $sysvars{PRBUFF} + $i ) : 0 );
+    }
+    $sysvars->poke( $sysvars{PRBUFF} + 32,
+        @{ $self->sysvars } ? $sysvars->peek( $sysvars{PRBUFF} + 32 ) : 0x76 );
+
+    # MEMBOT
+    for my $i ( 0 .. 29 ) {
+        $sysvars->poke( $sysvars{MEMBOT} + $i,
+            @{ $self->sysvars } ? $sysvars->peek( $sysvars{MEMBOT} + $i ) : 0 );
+    }
+
+    # FREE2
+    $sysvars->dpoke( $sysvars{FREE2},
+        @{ $self->sysvars } ? $sysvars->dpeek( $sysvars{FREE2} ) : 0 );
+
+    # Create memory image
     my $bytes = '';
-    $bytes .= pack( "C",            0 );                   # VERSN
-    $bytes .= pack( "v",            $e_ppc );              # E_PPC
-    $bytes .= pack( "v",            $dfile_start );        # D_FILE
-    $bytes .= pack( "v",            $dfile_start + 1 );    # DF_CC
-    $bytes .= pack( "v",            $vars_start );         # VARS
-    $bytes .= pack( "v",            0 );                   # DEST
-    $bytes .= pack( "v",            $mem_end );            # E_LINE
-    $bytes .= pack( "v",            $mem_end + 1 );        # CH_ADD
-    $bytes .= pack( "v",            0 );                   # X_PTR
-    $bytes .= pack( "v",            $mem_end + 2 );        # STKBOT
-    $bytes .= pack( "v",            $mem_end + 2 );        # STKEND
-    $bytes .= pack( "C",            0 );                   # BREG
-    $bytes .= pack( "v",            0x405d );              # MEM
-    $bytes .= pack( "C",            0 );                   # not used
-    $bytes .= pack( "C",            2 );                   # DF_SZ
-    $bytes .= pack( "v",            0 );                   # S_TOP
-    $bytes .= pack( "v",            0xFFFF );              # LAST_K
-    $bytes .= pack( "C",            0x0F );                # DEBOUNCE
-    $bytes .= pack( "C",            55 );                  # MARGIN
-    $bytes .= pack( "v",            $nxtlin );             # NXTLIN
-    $bytes .= pack( "v",            0 );                   # OLDPPC
-    $bytes .= pack( "C",            0 );                   # FLAGX
-    $bytes .= pack( "v",            0 );                   # STRLEN
-    $bytes .= pack( "v",            0x0C6B );              # T_ADDR
-    $bytes .= pack( "v",            0 );                   # SEED
-    $bytes .= pack( "v",            0xFFFF );              # FRAMES
-    $bytes .= pack( "C*",           0, 0 );                # COORDS
-    $bytes .= pack( "C",            0xBC );                # PR_CC
-    $bytes .= pack( "C*",           33, 24 );              # S_POSN
-    $bytes .= pack( "C",            $cdflag );             # CDFLAG
-    $bytes .= pack( "C*", (0) x 32, 0x76 );                # Print buffer
-    $bytes .= pack( "C*", (0) x 30 );    # Calculator's memory area
-    $bytes .= pack( "C*", (0) x 2 );     # not used
-
-    # Pack the BASIC program, dfile and vars areas
+    $bytes .= pack(
+        "C*",
+        $sysvars->peek_bytes(
+            $sysvars{VERSN}, $sysvars{PROG} - $sysvars{VERSN}
+        )
+    );
     $bytes .= $prog;
     $bytes .= $dfile;
     $bytes .= $vars;
@@ -1618,9 +1882,9 @@ sub vars_as_bytes {
                     # 101-letter, 001-letter, 101-letter
                     $bytes .= pack( "C", ( $name_bytes[0] & 0x3F ) | 0xA0 );
                     for ( 1 .. $#name_bytes - 1 ) {
-                        $bytes .= pack( "C", $name_bytes[$_] & 0x3F );
+                        $bytes .= pack( "C", $name_bytes[$_] );
                     }
-                    $bytes .= pack( "C", ( $name_bytes[-1] & 0x3F ) | 0x80 );
+                    $bytes .= pack( "C", $name_bytes[-1] | 0x80 );
                 }
 
                 # pack value

@@ -19,8 +19,9 @@ use Langertha::Engine::Perplexity;
 # streamed (chat_stream_realtime_f). Before k240 the OpenAI-compatible streaming
 # builder dropped it (no parallel_tool_calls on the body), and so did the
 # Responses one. The golden here is the non-streaming body: the streaming body
-# must be the same apart from the `stream` flag, so the two builders cannot
-# drift on this control again.
+# must be the same apart from the `stream` flag (and the stream-only
+# stream_options of ADR 0038), so the two builders cannot drift on this
+# control again.
 
 my $json = JSON::MaybeXS->new->canonical(1)->utf8(1);
 
@@ -31,7 +32,7 @@ sub bodies {
     my $msgs = [ { role => 'user', content => 'weather?' } ];
     my $sync   = body_of( $engine->chat_request( $msgs, @args ) );
     my $stream = body_of( $engine->chat_stream_request( $msgs, @args ) );
-    delete $_->{stream} for $sync, $stream;
+    delete @{$_}{qw( stream stream_options )} for $sync, $stream;
     return ( $sync, $stream );
 }
 

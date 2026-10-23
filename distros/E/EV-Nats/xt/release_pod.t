@@ -26,6 +26,7 @@ my %internal = map { $_ => 1 } qw(
     msg_is_tombstone
     HAS_TLS
     HAS_NKEY
+    CLONE_SKIP
     pub
     hpub
     sub

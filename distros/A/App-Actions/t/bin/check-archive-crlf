@@ -1,0 +1,132 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use File::Find;
+use File::Spec;
+
+# The CRLF CI job builds a distribution from a checkout whose text files are
+# CRLF, unpacks it and runs this audit before testing the copy.  The archive a
+# release publishes should carry the same line endings as the checkout it came
+# from: a file normalised to LF on the way into the tarball would pass the
+# suite in a form no release contains.  It should also hold exactly the files
+# MANIFEST lists, so a file dropped on the way into the archive is not hidden
+# by a line-ending check that never sees it.  Keeping the audit here rather
+# than in the workflow lets t/archive-crlf.t exercise its rules against a
+# small synthetic tree as well as against the distribution it builds.
+
+my $MINIMUM_SOURCE_FILES = 40;
+
+my $root = shift @ARGV;
+if (!defined $root || @ARGV) {
+    print STDERR "Usage: $0 <unpacked-archive-directory>\n";
+    exit 2;
+}
+
+if (!-d $root) {
+    print STDERR "check-archive-crlf: '$root' is not a directory\n";
+    exit 2;
+}
+
+$root = File::Spec->rel2abs($root);
+
+my (@lf, @without_crlf, %checked, %present);
+
+find(
+    {
+        no_chdir => 1,
+        wanted   => sub {
+            return unless -f;
+
+            my $relative = File::Spec->abs2rel($File::Find::name, $root);
+            $relative =~ s{\\}{/}g;
+            $present{$relative} = 1;
+
+            # make dist writes META.yml and META.json itself, and rewrites its
+            # copy of MANIFEST, with LF.  They are packaging metadata rather
+            # than files the CRLF checkout converted, so they are not sources
+            # for this audit.
+            return if $relative =~ m{\A(?:META\.(?:yml|json)|MANIFEST)\z};
+
+            open my $in, '<:raw', $File::Find::name
+                or die "cannot read '$relative': $!\n";
+            my $bytes = do { local $/; <$in> };
+            close $in;
+            $bytes = '' unless defined $bytes;
+
+            # A NUL byte means a binary file, which has no line endings to
+            # preserve.
+            return if index($bytes, "\0") >= 0;
+
+            $checked{$relative} = 1;
+            push @lf, $relative if $bytes =~ /(?<!\r)\n/;
+            push @without_crlf, $relative unless $bytes =~ /\r\n/;
+        },
+    },
+    $root,
+);
+
+if (!%checked) {
+    print STDERR "check-archive-crlf: the archive has no source files to check\n";
+    exit 1;
+}
+
+if (scalar(keys %checked) < $MINIMUM_SOURCE_FILES) {
+    print STDERR 'check-archive-crlf: the archive has only '
+        . scalar(keys %checked)
+        . " source files; it looks incomplete\n";
+    exit 1;
+}
+
+# make dist copies the files MANIFEST names, then writes META.yml, META.json
+# and a MANIFEST that carries a description after each name.  The generated
+# metadata is the only file the archive may hold that MANIFEST does not list,
+# and the first field of a manifest line is the name whichever form it is in.
+my $manifest = File::Spec->catfile($root, 'MANIFEST');
+open my $listing, '<', $manifest
+    or do {
+        print STDERR "check-archive-crlf: cannot read '$manifest': $!\n";
+        exit 1;
+    };
+
+my %expected;
+while (my $line = <$listing>) {
+    $line =~ s/\r?\n\z//;
+    next if $line =~ /\A\s*(?:#|\z)/;
+
+    my ($relative) = split /\s+/, $line;
+    next unless defined $relative && length $relative;
+
+    $relative =~ s{\\}{/}g;
+    $expected{$relative} = 1;
+}
+close $listing;
+
+$expected{'META.yml'}  = 1;
+$expected{'META.json'} = 1;
+
+my @missing = sort grep { !$present{$_} } keys %expected;
+my @extra   = sort grep { !$expected{$_} } keys %present;
+
+if (@missing) {
+    print STDERR "check-archive-crlf: MANIFEST lists files missing from the archive: @missing\n";
+}
+if (@extra) {
+    print STDERR "check-archive-crlf: the archive has files MANIFEST does not list: @extra\n";
+}
+exit 1 if @missing || @extra;
+
+if (@lf) {
+    print STDERR "check-archive-crlf: archive line endings were normalised to LF: @lf\n";
+    exit 1;
+}
+
+if (@without_crlf) {
+    print STDERR "check-archive-crlf: archive source files without CRLF: @without_crlf\n";
+    exit 1;
+}
+
+print 'verified ' . scalar(keys %checked)
+    . " source files keep CRLF in the archive\n";
+
+exit 0;

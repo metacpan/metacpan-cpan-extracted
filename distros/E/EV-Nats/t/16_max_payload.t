@@ -13,6 +13,7 @@ plan skip_all => "NATS server not available at $host:$port" unless $sock;
 close $sock;
 
 plan tests => 6;
+my $guard;  # kept: an unkept EV::timer never fires
 
 my $nats = EV::Nats->new(
     host       => $host,
@@ -20,7 +21,7 @@ my $nats = EV::Nats->new(
     on_error   => sub { diag "error: @_" },
     on_connect => sub { EV::break },
 );
-EV::timer(5, 0, sub { EV::break });
+$guard = EV::timer(5, 0, sub { EV::break });
 EV::run;
 
 ok $nats->is_connected, 'connected';

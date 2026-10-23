@@ -1,6 +1,6 @@
 package Langertha::Engine::Gemini;
 # ABSTRACT: Google Gemini API
-our $VERSION = '0.503';
+our $VERSION = '0.504';
 use Moose;
 use Carp qw( croak );
 use JSON::MaybeXS;
@@ -23,23 +23,27 @@ with map { 'Langertha::Role::'.$_ } qw(
   Tools
   CachedContent
   ImageInput
+  ToolResultImages
+  ToolResultPDF
   Embedding
 );
 
 sub _build_reasoning_wire_format { 'gemini' }
 
 # Gemini splits its reasoning knob by model generation: Gemini 2.5-* takes
-# an integer thinking_budget (no level vocabulary), Gemini 3 takes a
-# thinkingLevel (minimal|low|medium|high, clamped to the model family's
-# subset by Langertha::Reasoning). Exactly one native control is honored per
-# model. Reflect that in the capability flags so callers can ask
+# an integer thinking_budget (no level vocabulary), Gemini 3 and Gemini 4
+# take a thinkingLevel (minimal|low|medium|high, clamped to the model family's
+# subset by Langertha::Reasoning; Gemini 4: low|medium|high). Exactly one
+# native control is honored per model. Reflect that in the capability flags so callers can ask
 # supports('thinking_budget') vs supports('reasoning_effort') and get the
 # truth for the configured model.
 #
 # The same around also gates cached_content: explicit cachedContent
-# resources are an "on" feature for Gemini 2.5+ and Gemini 3. Older
+# resources are an "on" feature for Gemini 2.5 and Gemini 3. Older
 # generations (1.x, 2.0) don't accept the cachedContents REST endpoints,
-# so we drop the flag there.
+# so we drop the flag there. Gemini 4 lands in the else branch too (no
+# thinking_budget, no explicit cache); its own row in
+# model_capability_corrections records why (karr k381).
 #
 # parallel_tool_use is cleared on every model (karr k241): the v1beta
 # ToolConfig is retrievalConfig | functionCallingConfig (mode +
@@ -57,8 +61,8 @@ around engine_capabilities => sub {
     $caps->{cached_content} = 1;
   }
   elsif ( $model =~ /\Agemini-3/ ) {
-    # Gemini 3 (and any future unknown Gemini generation) keeps the
-    # default reasoning_effort cap; thinking_budget is not advertised.
+    # Gemini 3 keeps the default reasoning_effort cap; thinking_budget is
+    # not advertised.
     delete $caps->{thinking_budget};
     $caps->{cached_content} = 1;
   }
@@ -77,32 +81,46 @@ around engine_capabilities => sub {
 # multimodal and keep the flag; Gemma 1/2 and the text-only gemma-3-1b clear
 # it (decision k266: restrict the exclusion to the text-only sizes rather than
 # the whole family).
+#
+# tool_result_images / tool_result_pdf (ADR 0039, k380; k344 images, k361
+# PDFs): an image or PDF in functionResponse.parts[].inlineData is documented
+# for Gemini 3 and later only -- default-deny, then the Gemini 3+ row grants
+# both. Sources: the Vertex function-calling page ("For Gemini 3 and later
+# models, you can include multimodal content (images and PDFs) in
+# functionResponse", docs.cloud.google.com/gemini-enterprise-agent-platform/
+# models/tools/function-calling) and the AI Studio guide (ai.google.dev/
+# gemini-api/docs/generate-content/function-calling: "available for Gemini 3
+# series models", MIME list "Documents: application/pdf, text/plain" beside
+# the image types; a text/plain blob is already decoded into the result
+# string). Fetched 2026-09-29/30 and 2026-10-19; docs-derived, not
+# live-verified. The row matches gemini-<major> with major >= 3 (gemini-3*,
+# gemini-4-argon, a future gemini-10), never 1.x / 2.x; (?!\d) makes it read
+# the whole major number (ADR 0023 k196). Images and PDFs on this wire also
+# need image_input (Gemini reads documents through its vision;
+# ToolResult->native_needs_vision, applied by Role::Capabilities).
+#
+# Gemini 4 (karr k381; ai.google.dev/gemini-api/docs/generate-content/
+# latest-model and the Vertex gemini-4-argon guide, fetched 2026-10-19,
+# docs-derived, not live-verified): explicit caching (cachedContents) "is not
+# supported and returns an error" -- only implicit caching remains -- so
+# cached_content is cleared; temperature is ignored ("If provided, sampling
+# parameters are ignored", "Remove temperature, top_p, top_k and
+# candidate_count"), so the flag is cleared and _temperature_kwargs keeps it off
+# the wire. thinking_budget is never claimed there (layer 2 above). (?!\d):
+# gemini-40 is an unknown id (ADR 0023 k196).
+my $GEMINI4 = qr/\Agemini-4(?!\d)/;
+
 sub model_capability_corrections {
   return (
+    qr/\A/                                                => { tool_result_images => 0, tool_result_pdf => 0 },
+    qr/\Agemini-(?:[3-9]|[1-9]\d+)(?!\d)/                 => { tool_result_images => 1, tool_result_pdf => 1 },
+    $GEMINI4                                              => { cached_content => 0, temperature => 0 },
     qr/(?:-tts|-live|native-audio|transcribe|embedding)/ => { image_input => 0 },
     qr/\A(?:lyria|imagen|veo|aqa)/                        => { image_input => 0 },
     qr/\Agemini-(?:1\.0-)?pro(?:-\d+)?\z/                => { image_input => 0 },
     qr/\Agemma-(?:[12](?!\d)|3-1b)/                      => { image_input => 0 },
   );
 }
-
-# Tool-result images (karr k344): functionResponse.parts[].inlineData is
-# documented for the Gemini 3 series only (function-calling guide, v1beta;
-# docs-derived, not live-verified, 2026-09-29). Other models keep the k336
-# placeholder string; a later generation joins when its docs say so. The
-# (?!\d) guard keeps a hypothetical gemini-30 out (ADR 0023 k196).
-sub _tool_result_images_on_wire {
-  my ($self) = @_;
-  return ( $self->chat_model // '' ) =~ /\Agemini-3(?!\d)/ ? 1 : 0;
-}
-
-# Tool-result PDFs (karr k361): the same guide section lists "Documents:
-# application/pdf, text/plain" beside the image types for Gemini 3
-# multimodal function responses (ai.google.dev/gemini-api/docs/
-# generate-content/function-calling, fetched 2026-09-30; docs-derived, not
-# live-verified), so a PDF follows the image predicate. (A text/plain blob is
-# already decoded into the result string.)
-sub _tool_result_pdf_on_wire { shift->_tool_result_images_on_wire }
 
 
 sub default_response_size { 2048 }
@@ -186,12 +204,21 @@ sub gemini_model_url {
 # Proposed fix: move those values to CachedContent from GenerateContent
 # request." They come from the cache, so they are left out here, with one
 # carp per engine (k327). Both JSON spellings of each field are dropped.
+#
+# A model without explicit caching (Gemini 4, karr k381) cannot take the
+# reference at all: the server answers with an error. Leaving the reference
+# out instead would send the request without the cached contents -- and
+# without the systemInstruction / tools the cache owns -- and answer a
+# different question, so it croaks. $model is the model the URL names (a
+# per-request model included).
 sub _cached_content_reference {
-  my ( $self, $body, $extra ) = @_;
+  my ( $self, $body, $extra, $model ) = @_;
   return unless $self->can('cached_content') && defined $self->cached_content;
   my $cc = $self->cached_content;
   croak "Langertha::Engine::Gemini: cached_content must be a Langertha::CachedContent with a 'name'"
     unless ref($cc) && eval { $cc->isa('Langertha::CachedContent') && $cc->has_name };
+  $self->_assert_explicit_cache_model( $model,
+    'cached_content ' . $cc->name . ' is bound, but' );
   $body->{cachedContent} = $cc->name;
   my @dropped;
   for my $field (
@@ -211,6 +238,55 @@ sub _cached_content_reference {
     . " systemInstruction, tools and toolConfig from the cache", 'cached_content_overrides' )
     if @dropped;
   return;
+}
+
+# Croaks when $model (a bare id or a models/... resource name) has no explicit
+# context caching: Gemini 4 "does not support" cachedContents "and returns an
+# error" (karr k381, docs-derived). Only the known family croaks; an unknown id
+# goes to the server, which has the last word.
+sub _assert_explicit_cache_model {
+  my ( $self, $model, $what ) = @_;
+  return unless defined $model && !ref $model;
+  ( my $id = $model ) =~ s{\A.*models/}{};
+  croak "".( ref $self ).": $what model '$id' has no explicit context caching"
+    . " (cachedContents); it caches long prompt prefixes implicitly"
+    if $id =~ $GEMINI4;
+  return;
+}
+
+# The create body names its own model (Langertha::CachedContent model); the
+# role does not look at model names, the engine does.
+before _create_cached_content_request => sub {
+  my ( $self, @args ) = @_;
+  my $model = @args == 1 && eval { $args[0]->isa('Langertha::CachedContent') }
+    ? $args[0]->model
+    : @args % 2 ? undef : {@args}->{model};
+  $self->_assert_explicit_cache_model( $model, 'cannot create a cachedContent:' );
+};
+
+# generationConfig.temperature, control beats attribute. Gemini 4 ignores
+# temperature (and topP / topK / candidateCount) and the docs say to remove it
+# (karr k381), so model_capability_corrections clears the flag there; then the
+# field stays off the wire. The same drop + carp as the wire roles' gates
+# (ADR 0025 k214/k220/k247 Updates): a caller-set value other than 1 carps,
+# once per engine for the attribute, every time for a per-request control; 1
+# is dropped quietly.
+sub _temperature_kwargs {
+  my ( $self, $controls ) = @_;
+  my $temp = exists $controls->{temperature} ? $controls->{temperature}
+           : $self->has_temperature          ? $self->temperature
+           :                                    undef;
+  return () unless defined $temp;
+  return ( temperature => $temp ) if $self->supports('temperature');
+  my $once = exists $controls->{temperature} ? undef
+    : 'temperature=' . $temp . ' model=' . ( $self->chat_model // '' );
+  $self->_langertha_carp( "".( ref $self ).": dropping temperature=$temp -- model '"
+    . ( $self->chat_model // '' )
+    . "' does not take a temperature (ignored server-side); "
+    . "unset temperature to silence this",
+    defined $once ? "$once unsupported" : undef )
+    if $temp != 1;
+  return ();
 }
 
 sub chat_request {
@@ -276,7 +352,7 @@ sub chat_request {
 
   # Reference an explicit cachedContent resource by name when one was bound
   # via $engine->cached_content (karr #22, k327).
-  $self->_cached_content_reference( \%request_body, \%extra );
+  $self->_cached_content_reference( \%request_body, \%extra, $model_name );
 
   # Add generation config
   my %generation_config;
@@ -286,12 +362,7 @@ sub chat_request {
   elsif ($self->get_response_size) {
     $generation_config{maxOutputTokens} = $self->get_response_size;
   }
-  if ( exists $controls->{temperature} ) {
-    $generation_config{temperature} = $controls->{temperature};
-  }
-  elsif ($self->has_temperature) {
-    $generation_config{temperature} = $self->temperature;
-  }
+  %generation_config = ( %generation_config, $self->_temperature_kwargs($controls) );
 
   # Translate response_format -> Gemini's generationConfig.responseJsonSchema /
   # responseMimeType. Accepts the OpenAI-shape response_format hash so that
@@ -582,7 +653,7 @@ sub chat_stream_request {
 
   # Reference an explicit cachedContent resource by name when one was bound
   # via $engine->cached_content (karr #22, k327). Same wire as chat_request.
-  $self->_cached_content_reference( \%request_body, \%extra );
+  $self->_cached_content_reference( \%request_body, \%extra, $model_name );
 
   my %generation_config;
   if ( exists $controls->{max_tokens} ) {
@@ -591,12 +662,7 @@ sub chat_stream_request {
   elsif ($self->get_response_size) {
     $generation_config{maxOutputTokens} = $self->get_response_size;
   }
-  if ( exists $controls->{temperature} ) {
-    $generation_config{temperature} = $controls->{temperature};
-  }
-  elsif ($self->has_temperature) {
-    $generation_config{temperature} = $self->temperature;
-  }
+  %generation_config = ( %generation_config, $self->_temperature_kwargs($controls) );
 
   # Translate response_format -> Gemini's generationConfig.responseJsonSchema /
   # responseMimeType. Same wire as chat_request: a per-request
@@ -804,7 +870,7 @@ Langertha::Engine::Gemini - Google Gemini API
 
 =head1 VERSION
 
-version 0.503
+version 0.504
 
 =head1 SYNOPSIS
 
@@ -857,6 +923,19 @@ The C<gemini-2.5-*> generation is still served but now classed as
 previous-generation. The default API endpoint is
 C<https://generativelanguage.googleapis.com>.
 
+C<gemini-4-argon> (and any other C<gemini-4*> id) differs in its request
+controls: C<reasoning_effort> becomes C<thinkingLevel> C<low>|C<medium>|C<high>
+(C<medium> is the model's default; C<none> and C<minimal> are sent as C<low>);
+C<thinking_budget> croaks and is never sent; C<temperature> is ignored by the
+model, so it is not sent and a value other than 1 carps;
+C<supports('temperature')> and C<supports('cached_content')> are false. There
+is no explicit context caching: a bound L</cached_content> or
+L<Langertha::Role::CachedContent/create_cached_content_f> for a Gemini 4 model
+croaks before the request is sent. Gemini 4 caches long prompt prefixes
+implicitly; C<usage> shows the cached tokens. Sources: the Gemini API's
+C<gemini-4-argon> migration guide and the Vertex AI model guide, read
+2026-10-19 (not verified against the live API).
+
 Embeddings (L<Langertha::Role::Embedding>) use C<gemini-embedding-001> by
 default; C<gemini-embedding-2> embeds into a different, incompatible vector
 space, so do not mix vectors of the two. See L</embedding_request> for
@@ -890,6 +969,11 @@ when the engine's C<system_prompt>, a system message, C<tools> or
 C<tool_choice> would set them, and the engine carps once. Put them into the
 cache when creating it (L<Langertha::CachedContent/system_instruction>,
 L<Langertha::CachedContent/tools>).
+
+Gemini 4 models have no explicit caching. A chat request for a C<gemini-4*>
+model (the configured C<chat_model> or a per-request C<model>) croaks while a
+cache is bound, instead of sending a request the server rejects; call
+C<clear_cached_content> first.
 
 Lifecycle (create / get / list / update / delete) is on the role —
 L<Langertha::Role::CachedContent/create_cached_content_f> and friends.

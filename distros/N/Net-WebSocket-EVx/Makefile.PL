@@ -8,7 +8,7 @@ my %args = (
     NAME             => 'Net::WebSocket::EVx',
     VERSION_FROM     => 'lib/Net/WebSocket/EVx.pm',
     ABSTRACT_FROM    => 'lib/Net/WebSocket/EVx.pod',
-    AUTHOR           => 'Yegor Korablev <egor@cpan.org>',
+    AUTHOR           => 'vividsnow',
     LICENSE          => 'perl_5',
     MIN_PERL_VERSION => '5.008',
 

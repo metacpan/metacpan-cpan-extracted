@@ -1,0 +1,30 @@
+{
+  "schema_version": 3,
+  "generated_at": 1792540920,
+  "logs_directory": "/home/me/.cache/action-run/logs",
+  "logs": [
+    {
+      "run": "20261021-121355-6ad8e4c30f83",
+      "name": "job-1-test_n_one.log",
+      "path": "/home/me/.cache/action-run/logs/20261021-121355-6ad8e4c30f83/job-1-test_n_one.log",
+      "size": 1229,
+      "mtime": 1792540800,
+      "age": 120
+    }
+  ],
+  "totals": {
+    "runs": 1,
+    "logs": 1,
+    "size": 1229
+  },
+  "prune": {
+    "removed": 2,
+    "freed": 1843,
+    "failed": [
+      {
+        "run": "20261021-121355-6ad8e4c30f83",
+        "error": "cannot remove '/home/me/.cache/action-run/logs/20261021-121355-6ad8e4c30f83/job-1-test_n_one.log': Permission denied"
+      }
+    ]
+  }
+}

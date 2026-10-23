@@ -39,6 +39,7 @@
       "runtime" : {
          "requires" : {
             "EV" : "4.11",
+            "JSON::PP" : "0",
             "XSLoader" : "0.02",
             "perl" : "5.012"
          }
@@ -47,6 +48,20 @@
          "requires" : {
             "Test::More" : "0.98"
          }
+      }
+   },
+   "provides" : {
+      "EV::Kafka" : {
+         "file" : "lib/EV/Kafka.pm",
+         "version" : "0.08"
+      },
+      "EV::Kafka::Client" : {
+         "file" : "lib/EV/Kafka.pm",
+         "version" : "0.08"
+      },
+      "EV::Kafka::Conn" : {
+         "file" : "lib/EV/Kafka.pm",
+         "version" : "0.08"
       }
    },
    "release_status" : "stable",
@@ -60,6 +75,6 @@
          "web" : "https://github.com/vividsnow/perl5-ev-kafka"
       }
    },
-   "version" : "0.06",
+   "version" : "0.08",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

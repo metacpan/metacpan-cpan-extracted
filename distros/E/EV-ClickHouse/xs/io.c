@@ -7,6 +7,24 @@
  */
 static void io_cb(EV_P_ ev_io *w, int revents);
 static void on_connect_done(ev_clickhouse_t *self);
+static void start_keepalive(ev_clickhouse_t *self);
+
+/* Stash connection parameters without connecting (async-DNS pre-store). */
+static void store_conn_params(ev_clickhouse_t *self, const char *host,
+                              unsigned int port, const char *user,
+                              const char *password, const char *database)
+{
+    CLEAR_STR(self->host);
+    CLEAR_STR(self->user);
+    CLEAR_STR(self->password);
+    CLEAR_STR(self->database);
+
+    self->host = safe_strdup(host);
+    self->port = port;
+    self->user = safe_strdup(user);
+    self->password = safe_strdup(password);
+    self->database = safe_strdup(database);
+}
 
 #ifdef HAVE_OPENSSL
 /* Drain OpenSSL's per-thread error queue into self->last_tls_error
@@ -21,18 +39,41 @@ static void capture_tls_error(ev_clickhouse_t *self) {
     CLEAR_STR(self->last_tls_error);
     self->last_tls_error = savepv(buf);
 }
+
+/* SSL_ERROR_SYSCALL leaves OpenSSL's error queue empty — the detail
+ * lives in errno (ret < 0) or is a bare EOF (ret == 0). Record it so
+ * last_tls_error says something useful instead of going stale. */
+static void capture_tls_syscall_error(ev_clickhouse_t *self, int ret) {
+    char ebuf[160];
+    if (ret == 0)
+        snprintf(ebuf, sizeof(ebuf), "TLS handshake EOF (SSL_ERROR_SYSCALL)");
+    else
+        snprintf(ebuf, sizeof(ebuf), "TLS handshake I/O error: %s (SSL_ERROR_SYSCALL)",
+                 strerror(errno));
+    CLEAR_STR(self->last_tls_error);
+    self->last_tls_error = savepv(ebuf);
+}
 #endif
 
 static void start_connect(ev_clickhouse_t *self) {
-    struct addrinfo hints, *res = NULL;
-    int fd, ret;
+    struct addrinfo hints, *res = NULL, *ai;
+    int fd = -1, ret;
     char port_str[16];
 
     self->connect_gen++;
 
-    emit_trace(self, "connect %s:%u (%s)",
-               self->host, self->port,
-               self->protocol == PROTO_NATIVE ? "native" : "http");
+    {
+        int gen = self->connect_gen;
+        emit_trace(self, "connect %s:%u (%s)",
+                   self->host, self->port,
+                   self->protocol == PROTO_NATIVE ? "native" : "http");
+        /* A finish()/reset() from the handler wins: the outer frame must
+         * not connect over it (a finish would be silently undone). All
+         * callers end right after start_connect, so freeing here is safe. */
+        if (check_destroyed(self)) return;
+        if (self->magic != EV_CH_MAGIC) return;
+        if (self->connect_gen != gen) return;
+    }
     snprintf(port_str, sizeof(port_str), "%u", self->port);
 
     Zero(&hints, 1, struct addrinfo);
@@ -47,35 +88,55 @@ static void start_connect(ev_clickhouse_t *self) {
         return;
     }
 
-    fd = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
-    if (fd < 0) {
-        freeaddrinfo(res);
-        fail_connection(self, "socket() failed");
-        return;
-    }
-
-    /* non-blocking */
+    /* Try each resolved address in turn: dual-stack names routinely
+     * list an unreachable family first, and DNS round-robin sets may
+     * hold a dead entry. The first connect() that starts (immediate or
+     * EINPROGRESS) wins; only total failure reports an error. */
     {
-        int fl = fcntl(fd, F_GETFL);
-        if (fl < 0 || fcntl(fd, F_SETFL, fl | O_NONBLOCK) < 0) {
-            freeaddrinfo(res);
+        int saved_errno = 0;
+        for (ai = res; ai != NULL; ai = ai->ai_next) {
+            int one = 1, fl;
+            fd = socket(ai->ai_family, ai->ai_socktype, ai->ai_protocol);
+            if (fd < 0) { saved_errno = errno; continue; }
+            fl = fcntl(fd, F_GETFL);
+            if (fl < 0 || fcntl(fd, F_SETFL, fl | O_NONBLOCK) < 0) {
+                saved_errno = errno;
+                close(fd);
+                fd = -1;
+                continue;
+            }
+            setsockopt(fd, IPPROTO_TCP, TCP_NODELAY, &one, sizeof(one));
+            ret = connect(fd, ai->ai_addr, ai->ai_addrlen);
+            if (ret == 0 || errno == EINPROGRESS) break;
+            saved_errno = errno;
             close(fd);
-            fail_connection(self, "fcntl O_NONBLOCK failed");
+            fd = -1;
+        }
+        freeaddrinfo(res);
+        if (fd < 0) {
+            char errbuf[256];
+            snprintf(errbuf, sizeof(errbuf), "connect: %s",
+                     strerror(saved_errno ? saved_errno : ECONNREFUSED));
+            fail_connection(self, errbuf);
             return;
         }
-    }
-
-    /* TCP_NODELAY */
-    {
-        int one = 1;
-        setsockopt(fd, IPPROTO_TCP, TCP_NODELAY, &one, sizeof(one));
     }
 
     self->fd = fd;
     self->connecting = 1;
 
-    ret = connect(fd, res->ai_addr, res->ai_addrlen);
-    freeaddrinfo(res);
+    ev_io_init(&self->rio, io_cb, self->fd, EV_READ);
+    self->rio.data = (void *)self;
+    ev_io_init(&self->wio, io_cb, self->fd, EV_WRITE);
+    self->wio.data = (void *)self;
+
+    /* Arm connect_timeout on both paths: an immediately-connected
+     * socket still stalls in the TLS handshake / ServerHello phases. */
+    if (self->connect_timeout > 0) {
+        ev_timer_set(&self->timer, (ev_tstamp)self->connect_timeout, 0.0);
+        ev_timer_start(self->loop, &self->timer);
+        self->timing = 1;
+    }
 
     if (ret == 0) {
         /* connected immediately — connected=1 is deferred for native
@@ -83,45 +144,26 @@ static void start_connect(ev_clickhouse_t *self) {
         self->connecting = 0;
         if (self->protocol != PROTO_NATIVE && !self->tls_enabled)
             self->connected = 1;
-        ev_io_init(&self->rio, io_cb, self->fd, EV_READ);
-        self->rio.data = (void *)self;
-        ev_io_init(&self->wio, io_cb, self->fd, EV_WRITE);
-        self->wio.data = (void *)self;
         on_connect_done(self);
         return;
     }
 
-    if (errno != EINPROGRESS) {
-        char errbuf[256];
-        snprintf(errbuf, sizeof(errbuf), "connect: %s", strerror(errno));
-        close(fd);
-        self->fd = -1;
-        self->connecting = 0;
-        fail_connection(self, errbuf);
-        return;
-    }
-
     /* in progress — wait for writability */
-    ev_io_init(&self->rio, io_cb, self->fd, EV_READ);
-    self->rio.data = (void *)self;
-    ev_io_init(&self->wio, io_cb, self->fd, EV_WRITE);
-    self->wio.data = (void *)self;
-
     start_writing(self);
-
-    if (self->connect_timeout > 0) {
-        ev_timer_set(&self->timer, (ev_tstamp)self->connect_timeout, 0.0);
-        ev_timer_start(self->loop, &self->timer);
-        self->timing = 1;
-    }
 }
 
 /* Mark the connection as ready, fire on_connect, dispatch queued queries.
  * Returns 1 if self was freed. */
 static int finish_connect(ev_clickhouse_t *self) {
+    self->handshaking = 0;
     stop_timing(self);
+    /* Reset only here — at TCP accept time a peer that stalls the TLS
+     * handshake or ServerHello would otherwise spin reconnects forever
+     * without ever tripping reconnect_max_attempts. */
+    self->reconnect_attempts = 0;
     self->connected = 1;
     CLEAR_STR(self->last_tls_error);    /* successful connect supersedes stale TLS error */
+    start_keepalive(self);              /* idle pings start at connect, not first query */
     if (self->on_connect &&
         fire_zero_arg_cb(self, self->on_connect, "connect")) return 1;
     if (!ngx_queue_empty(&self->send_queue))
@@ -131,7 +173,10 @@ static int finish_connect(ev_clickhouse_t *self) {
 
 static void on_connect_done(ev_clickhouse_t *self) {
     self->connecting = 0;
-    self->reconnect_attempts = 0;
+    /* TLS / native ServerHello may still be pending; queries issued in
+     * this window must queue, not croak "not connected". finish_connect
+     * clears it once the connection is fully ready. */
+    self->handshaking = 1;
 
     stop_writing(self);
     /* Keep the connect_timeout timer armed across the TLS handshake and
@@ -216,7 +261,10 @@ static void on_connect_done(ev_clickhouse_t *self) {
             } else if (err == SSL_ERROR_WANT_WRITE) {
                 start_writing(self);
             } else {
-                capture_tls_error(self);
+                if (err == SSL_ERROR_SYSCALL)
+                    capture_tls_syscall_error(self, ret);
+                else
+                    capture_tls_error(self);
                 fail_connection(self, "SSL_connect failed");
                 return;
             }
@@ -254,11 +302,11 @@ static int try_write(ev_clickhouse_t *self) {
                 start_writing(self);
                 return 0;
             }
-            return teardown_io_error(self, strerror(errno), "write error");
+            return teardown_io_error_reconnect(self, strerror(errno), "write error");
         }
         if (n == 0)
-            return teardown_io_error(self, "connection closed during write",
-                                     "connection closed");
+            return teardown_io_error_reconnect(self, "connection closed during write",
+                                               "connection closed");
         self->send_pos += n;
     }
 
@@ -285,7 +333,7 @@ static void on_readable(ev_clickhouse_t *self) {
 
     if (n < 0) {
         if (errno == EAGAIN || errno == EWOULDBLOCK) return;
-        teardown_io_error(self, strerror(errno), "read error");
+        teardown_io_error_reconnect(self, strerror(errno), "read error");
         return;
     }
 
@@ -294,16 +342,18 @@ static void on_readable(ev_clickhouse_t *self) {
          * have an in-flight request or haven't finished handshake */
         int had_inflight = (self->send_count > 0 || !self->connected);
         int has_queued = !ngx_queue_empty(&self->send_queue);
+        int gen = self->connect_gen;
 
         if (had_inflight) {
-            int gen = self->connect_gen;
             emit_error(self, "connection closed by server");
             if (check_destroyed(self)) return;
             if (self->connect_gen != gen) return;
             /* Only cancel in-flight cb_queue (irrecoverable).
              * Keep send_queue if auto_reconnect — those haven't been sent yet. */
             if (!self->auto_reconnect || !has_queued) {
-                if (cancel_pending(self, "connection closed")) return;
+                if (cancel_pending(self, "connection closed",
+                                   !(self->auto_reconnect && self->host)))
+                    return;
             } else {
                 /* Cancel only the in-flight cb_queue entries */
                 self->callback_depth++;
@@ -313,7 +363,11 @@ static void on_readable(ev_clickhouse_t *self) {
             }
             if (self->connect_gen != gen) return;
         }
-        if (cleanup_connection(self)) return;   /* on_disconnect freed self */
+        if (cleanup_connection(self, 0)) return;   /* on_disconnect freed self */
+        /* reset() from on_disconnect already reconnected — scheduling
+         * another reconnect would burn an attempt (inflating backoff,
+         * or tripping max_reconnect_attempts on a healthy link). */
+        if (self->connect_gen != gen) return;
 
         /* Auto-reconnect if we have queued requests or flag is set */
         if (self->auto_reconnect && self->host) {
@@ -324,6 +378,28 @@ static void on_readable(ev_clickhouse_t *self) {
 
     self->recv_len += n;
 
+#ifdef HAVE_OPENSSL
+    /* TLS records already sitting in OpenSSL's buffer don't trip the
+     * socket watcher: a reply whose tail stays buffered while the
+     * socket runs dry would stall for lack of a new EV_READ. Drain
+     * everything buffered before parsing. No user code runs here, so
+     * self cannot be freed mid-loop (teardown paths return outright). */
+    while (self->ssl && SSL_pending(self->ssl) > 0) {
+        ensure_recv_cap(self, self->recv_len + 4096);
+        n = ch_read(self, self->recv_buf + self->recv_len,
+                    self->recv_cap - self->recv_len);
+        if (n < 0) {
+            if (errno == EAGAIN || errno == EWOULDBLOCK) break;
+            teardown_io_error_reconnect(self, strerror(errno), "read error");
+            return;
+        }
+        /* Clean TLS close: the socket EOF follows on its own event;
+         * buffered bytes may still complete the response, so parse on. */
+        if (n == 0) break;
+        self->recv_len += n;
+    }
+#endif
+
     /* Defensive ceiling: a runaway response (server stuck in a bad state,
      * pathological row sizes, or a header-injection attack) shouldn't be
      * able to consume unbounded memory. Caller opts in via max_recv_buffer;
@@ -331,11 +407,18 @@ static void on_readable(ev_clickhouse_t *self) {
      * up to CH_MAX_DECOMPRESS_SIZE on compressed paths. */
     if (self->max_recv_buffer > 0 && self->recv_len > self->max_recv_buffer) {
         char errmsg[80];
+        int gen = self->connect_gen;
         snprintf(errmsg, sizeof(errmsg),
                  "recv buffer %lu exceeded max_recv_buffer %lu",
                  (unsigned long)self->recv_len,
                  (unsigned long)self->max_recv_buffer);
-        teardown_io_error(self, errmsg, "recv buffer overflow");
+        if (teardown_io_error(self, errmsg, "recv buffer overflow")) return;
+        /* The peer is healthy (it just answered too much), so
+         * re-establish the link like any other teardown — without
+         * this an auto_reconnect connection stays down forever after
+         * one oversize response. */
+        if (self->connect_gen == gen && self->auto_reconnect && self->host)
+            schedule_reconnect(self);
         return;
     }
 
@@ -407,7 +490,10 @@ static void io_cb(EV_P_ ev_io *w, int revents) {
             } else if (err == SSL_ERROR_WANT_WRITE) {
                 start_writing(self);
             } else {
-                capture_tls_error(self);
+                if (err == SSL_ERROR_SYSCALL)
+                    capture_tls_syscall_error(self, ret);
+                else
+                    capture_tls_error(self);
                 fail_connection(self, "SSL handshake failed");
             }
             return;
@@ -500,6 +586,8 @@ static void ka_timer_cb(EV_P_ ev_timer *w, int revents) {
         s->data = req;
         s->data_len = req_len;
         s->cb = SvREFCNT_inc(keepalive_noop_cb);
+        s->query_timeout = self->query_timeout > 0
+            ? self->query_timeout : self->keepalive;
         enqueue_send(self, s);
     }
 }
@@ -538,9 +626,13 @@ static void schedule_reconnect(ev_clickhouse_t *self) {
          * permanent failure (bad host, wrong creds). Drain any queries
          * still in send_queue first so their callbacks see the failure
          * instead of being silently orphaned. */
+        int gen = self->connect_gen;
         emit_error(self, "max reconnect attempts exceeded");
         if (check_destroyed(self)) return;
-        (void)cancel_pending(self, "max reconnect attempts exceeded");
+        /* reset() from on_error won: the new generation owns the
+         * queues — failing them here would kill its queries. */
+        if (self->connect_gen != gen) return;
+        (void)cancel_pending(self, "max reconnect attempts exceeded", 1);
         return;
     }
     /* Always defer through ev_timer so a synchronous start_connect failure
@@ -597,12 +689,18 @@ static void lc_free_dicts(ev_clickhouse_t *self) {
 /* Send one request at a time, wait for response, then send the next.
  * Returns 1 if self was freed (caller must not access self). */
 static int pipeline_advance(ev_clickhouse_t *self) {
-    if (!self->connected) return 0;
+    if (!self->connected || self->in_dispatch) return 0;
 
     if (self->send_count > 0) {
         start_reading(self);
         return 0;
     }
+
+    /* A cancel() from on_query_start drops the staged entry below and
+     * loops back here so the next queued query dispatches instead of
+     * stranding. Each iteration shrinks the queue or dispatches, so
+     * the loop terminates. */
+  again:
 
     /* Check drain callback when all pending work is done */
     if (ngx_queue_empty(&self->send_queue) && self->pending_count == 0
@@ -645,6 +743,113 @@ static int pipeline_advance(ev_clickhouse_t *self) {
         ngx_queue_t *q = ngx_queue_head(&self->send_queue);
         ev_ch_send_t *send = ngx_queue_data(q, ev_ch_send_t, queue);
 
+        if (send->deferred_sql) {
+            /* Pre-connect native entry: build now that server_revision
+             * is known. On old servers with query parameters the build
+             * fails — fail just this entry, the rest still dispatch. */
+            char *req;
+            size_t req_len;
+            /* The build stringifies stashed setting SVs: overload/tie
+             * runs arbitrary Perl that may destroy/reset/finish/cancel
+             * this connection, freeing the send entry and its inputs
+             * mid-build. Hold local refs/copies across the call, then
+             * re-validate everything before touching send/self. */
+            size_t dsql_len = send->deferred_sql_len;
+            char *dsql;
+            HV *ddef = send->deferred_defaults;
+            HV *dovr = send->deferred_overrides;
+            size_t dext_len = send->deferred_ext_len;
+            char *dext = NULL;
+            /* Counted copies (ext is a binary blob, not NUL-terminated). */
+            Newx(dsql, dsql_len + 1, char);
+            Copy(send->deferred_sql, dsql, dsql_len, char);
+            dsql[dsql_len] = '\0';
+            if (send->deferred_ext) {
+                Newx(dext, dext_len ? dext_len : 1, char);
+                Copy(send->deferred_ext, dext, dext_len, char);
+            }
+            int gen0 = self->connect_gen;
+            if (ddef) SvREFCNT_inc((SV *)ddef);
+            if (dovr) SvREFCNT_inc((SV *)dovr);
+            self->callback_depth++;
+            req = build_native_query(self, dsql, dsql_len, ddef, dovr,
+                                     dext, dext_len, &req_len);
+            /* Drop pins BEFORE depth-- (a setting holding the last
+             * $ch ref must DESTROY into depth>0). */
+            if (ddef) SvREFCNT_dec((SV *)ddef);
+            if (dovr) SvREFCNT_dec((SV *)dovr);
+            Safefree(dsql);
+            if (dext) Safefree(dext);
+            self->callback_depth--;
+            if (self->magic != EV_CH_MAGIC) {
+                if (req) Safefree(req);
+                check_destroyed(self);
+                return 1;
+            }
+            {
+                /* reset()/finish() own the queue now; cancel() already
+                 * failed the entry. Either way our send is gone. */
+                ngx_queue_t *qq;
+                int still_queued = 0;
+                if (self->connect_gen == gen0 && self->connected) {
+                    for (qq = ngx_queue_head(&self->send_queue);
+                         qq != ngx_queue_sentinel(&self->send_queue);
+                         qq = ngx_queue_next(qq)) {
+                        if (qq == q) { still_queued = 1; break; }
+                    }
+                }
+                if (!still_queued) {
+                    if (req) Safefree(req);
+                    return 0;
+                }
+            }
+            free_send_deferred(send);
+            if (!req) {
+                SV *fail_cb = send->cb;
+                SV *fail_oqc = send->on_complete;
+                char errmsg[64];
+                int gen0 = self->connect_gen;
+                unsigned seq0 = self->dispatch_seq;
+                /* Adopt the failed entry's own query_id for the fire so
+                 * on_query_complete doesn't report a stale earlier id
+                 * (same idiom as cancel_pending). */
+                char *qid0 = self->last_query_id;
+                self->last_query_id = send->query_id;
+                send->query_id = NULL;
+                send->on_complete = NULL;
+                ngx_queue_remove(q);
+                CLEAR_INSERT(send);
+                CLEAR_SV(send->on_data);
+                release_send(send);
+                self->pending_count--;
+                snprintf(errmsg, sizeof(errmsg),
+                         "query parameters require server revision >= %d",
+                         DBMS_MIN_REVISION_WITH_PARAMETERS);
+                self->callback_depth++;
+                self->force_zero_dur = 1;
+                fire_err_and_complete(self, fail_cb, errmsg, fail_oqc);
+                self->force_zero_dur = 0;
+                self->callback_depth--;
+                if (check_destroyed(self)) {
+                    /* Adopted id died with the struct; ours to free. */
+                    if (qid0) Safefree(qid0);
+                    return 1;
+                }
+                if (self->dispatch_seq == seq0 && self->connect_gen == gen0) {
+                    CLEAR_STR(self->last_query_id);
+                    self->last_query_id = qid0;
+                } else if (qid0) {
+                    Safefree(qid0);
+                }
+                /* A reset() from the handler owns the queue now — the
+                 * inner frame dispatches it (same as cancel_pending). */
+                if (self->connect_gen != gen0) return 0;
+                goto again;
+            }
+            send->data = req;
+            send->data_len = req_len;
+        }
+
         /* set up send buffer */
         ensure_send_cap(self, send->data_len);
         Copy(send->data, self->send_buf, send->data_len, char);
@@ -663,6 +868,7 @@ static int pipeline_advance(ev_clickhouse_t *self) {
         CLEAR_STR(self->last_query_id);
         if (send->query_id) { self->last_query_id = send->query_id; send->query_id = NULL; }
         self->query_start_time = ev_now(self->loop);
+        self->dispatch_seq++;
 
         /* on_query_start: fire with the resolved query_id, just before
          * the write side runs. Suppressed for keepalive PINGs to match
@@ -677,7 +883,11 @@ static int pipeline_advance(ev_clickhouse_t *self) {
             PUTBACK;
             int gen_before = self->connect_gen;
             self->callback_depth++;
+            /* Visible to cancel(): the entry is dequeued (and its bytes
+             * staged in send_buf) but send_count isn't bumped yet. */
+            self->in_dispatch = 1;
             PINNED_CALL_SV(self->on_query_start, G_EVAL | G_VOID | G_DISCARD);
+            self->in_dispatch = 0;
             self->callback_depth--;
             WARN_AND_CLEAR_ERRSV("on_query_start");
             FREETMPS; LEAVE;
@@ -696,7 +906,24 @@ static int pipeline_advance(ev_clickhouse_t *self) {
                 Safefree(send->data);
                 CLEAR_INSERT(send);
                 release_send(send);
+                /* A nested cancel() may have armed this before the
+                 * handler tore the connection down — don't let the
+                 * stale flag drop a healthy later dispatch. (When
+                 * destroyed, self is already freed: touch nothing.) */
+                if (!destroyed)
+                    self->dispatch_cancelled = 0;
                 return destroyed ? 1 : 0;
+            }
+            if (self->dispatch_cancelled) {
+                /* cancel() from on_query_start: the callback was
+                 * already failed with "query cancelled" — drop the
+                 * staged entry without writing anything and take the
+                 * next queued query. */
+                self->dispatch_cancelled = 0;
+                Safefree(send->data);
+                CLEAR_INSERT(send);
+                release_send(send);
+                goto again;
             }
         }
 
@@ -709,6 +936,7 @@ static int pipeline_advance(ev_clickhouse_t *self) {
         CLEAR_SV(self->native_col_types);
         CLEAR_SV(self->native_totals);
         CLEAR_SV(self->native_extremes);
+        self->cancelled = 0;
         self->last_error_code = 0;
         self->profile_rows = 0;
         self->profile_bytes = 0;

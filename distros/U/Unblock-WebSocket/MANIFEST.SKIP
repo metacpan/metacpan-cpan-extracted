@@ -1,0 +1,13 @@
+^\.git/
+^\.github/
+^blib/
+^Makefile$
+^Makefile\.old$
+^MYMETA\.
+^pm_to_blib$
+^Unblock-WebSocket-.*\.tar\.gz$
+^handoff\.md$
+^\.gitignore$
+^xt/
+^bench/
+^WebSocket\.c$

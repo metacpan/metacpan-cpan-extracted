@@ -26,7 +26,7 @@ use Langertha::Engine::LMStudioAnthropic;
 #     /v1/agent alike); input_image.image_url is a plain string, a data: URL
 #     is accepted, detail is optional.
 #   - Gemini 3 (v1beta): functionResponse.parts[] of { inlineData => {
-#     mimeType, data } }, documented for the Gemini 3 series only, image
+#     mimeType, data } }, documented for Gemini 3 and later (k380), image
 #     MIME types png / jpeg / webp.
 #
 # Both shapes are DOCS-DERIVED, NOT LIVE-VERIFIED (OpenAI API reference,
@@ -209,12 +209,14 @@ sub gemini_fr {
   return $msgs[1]{parts}[0]{functionResponse};
 }
 
-subtest 'format_tool_results: gemini parts only on Gemini 3' => sub {
-  for my $model (qw( gemini-3-flash-preview gemini-3.1-pro-preview gemini-3.8-flash )) {
+subtest 'format_tool_results: gemini parts only on Gemini 3 and later' => sub {
+  # "Gemini 3 and later" (Vertex function-calling docs, 2026-10-19, k380):
+  # gemini-4-argon and a hypothetical gemini-30 carry parts, 2.x does not.
+  for my $model (qw( gemini-3-flash-preview gemini-3.1-pro-preview gemini-3.8-flash gemini-4-argon gemini-30-future )) {
     is_deeply( gemini_fr($model)->{parts}, [ { inlineData => { mimeType => 'image/png', data => $PNG } } ],
       "$model: parts" );
   }
-  for my $model (qw( gemini-2.5-flash gemini-30-future gemma-3-27b-it gemini-3-flash-preview-tts )) {
+  for my $model (qw( gemini-2.5-flash gemini-1.5-pro gemma-3-27b-it gemini-3-flash-preview-tts )) {
     my $fr = gemini_fr($model);
     ok( !exists $fr->{parts}, "$model: no parts" );
     is( $fr->{response}{result}, '[image] image/png (18 bytes)', "$model: placeholder string" );
@@ -309,7 +311,7 @@ subtest 'AKIAnthropic keeps the placeholder even with an image_input claim' => s
   my $aki = $meta->name->new( api_key => 'k', model => 'qwen3.6-35b' );
   ok( $aki->supports('image_input'), 'the anon subclass claims image_input' );
   is_deeply( anthropic_content($aki), $ANT_PLACEHOLDER,
-    '_tool_result_images_on_wire keeps the placeholder' );
+    'tool_result_images stays cleared: placeholder' );
 };
 
 subtest 'the anthropic image survives the request envelope' => sub {

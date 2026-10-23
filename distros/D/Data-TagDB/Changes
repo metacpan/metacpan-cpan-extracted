@@ -1,3 +1,11 @@
+v0.15  2026-10-22Z
+    - Improved documentation
+    - Updated Data::TagDB::Interface::Plugin
+    - Added Data::TagDB::Base
+    - Made Data::TagDB, Data::TagDB::Tag, and Data::TagDB::Link a Data::TagDB::Base
+    - Moved $tag->get() to $base->get()
+    - Added $base->execute()
+
 v0.14  2026-10-04Z
     - Added support to import translations TSV files
     - Added most experimental interface Data::TagDB::Interface::Includeable

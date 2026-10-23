@@ -38,10 +38,10 @@ listener ownership on rejection; otherwise the handle is destroyed.
 
 =item ($host, $port, $token, $alias) = AnyEvent::MCP::Extension::parse_url $url
 
-Parse C<http://host:port/token/alias>, including bracketed IPv6 hosts. The URL
-names a raw TCP extension endpoint sharing an HTTP listener; no HTTP request
-is sent. Tokens use the ordinary listener token syntax and aliases use ASCII
-letters, digits, underscores and hyphens.
+Parse C<http://host[:port]/token/alias>, including bracketed IPv6 hosts.
+An omitted port defaults to 80. The URL names a raw TCP extension endpoint
+sharing an HTTP listener; no HTTP request is sent. Tokens use the ordinary
+listener token syntax and aliases use ASCII letters, digits, underscores and hyphens.
 
 =back
 
@@ -56,12 +56,12 @@ sub parse_url {
    my ($url) = @_;
 
    my ($host, $port, $token, $alias) =
-      $url =~ m{\Ahttp://(\[[^\]]+\]|[^/:?#]+):([0-9]+)/([A-Za-z0-9_.~-]+)/([A-Za-z0-9_-]+)\z};
-   defined $host && $port > 0 && $port <= 65535
-      or die "Expected extension URL http://host:port/token/alias\n";
+      $url =~ m{\Ahttp://(\[[^\]]+\]|[^/:?#]+)(?::([0-9]+))?/([A-Za-z0-9_.~-]+)/([A-Za-z0-9_-]+)\z};
+   defined $host && (!defined $port || $port > 0 && $port <= 65535)
+      or die "Expected extension URL http://host[:port]/token/alias\n";
    $host =~ s/\A\[(.*)\]\z/$1/;
 
-   ($host, 0 + $port, $token, $alias)
+   ($host, defined $port ? 0 + $port : 80, $token, $alias)
 }
 
 sub accept {

@@ -2272,4 +2272,114 @@ SKIP: {
     sub _vis { my $s = shift; $s =~ s/([^\x20-\x7e])/sprintf '\\x%02x', ord $1/ge; "[$s]" }
 }
 
+{
+    package TS_FalseException;
+    our $bool_calls = 0;
+    use overload bool => sub { ++$bool_calls; 0 },
+                 '""' => sub { 'stream failed' }, fallback => 1;
+
+    package main;
+    require Scalar::Util;
+    my $s = Text::Stencil->new(row => '{0}');
+    for my $stream (0, 1) {
+        open my $fh, '>', \my $sink or die $!;
+        my $error = bless {}, 'TS_FalseException';
+        my $ok = eval {
+            my $cb = sub { die $error };
+            $stream ? $s->render_cb($cb, $fh) : $s->render_cb($cb);
+            1;
+        };
+        my $caught = $@;
+        ok !$ok, 'render_cb propagates a false exception object';
+        is Scalar::Util::refaddr($caught), Scalar::Util::refaddr($error),
+            'the original exception object is preserved';
+        is $TS_FalseException::bool_calls, 0, 'exception detection runs no overload';
+        is $s->render_one([7]), '7', 'renderer recovers after the exception';
+        close $fh or die $!;
+    }
+}
+
+{
+    package TS_StreamValue;
+    our ($live, $peak) = (0, 0);
+    sub new { ++$live; $peak = $live if $live > $peak; bless {}, shift }
+    sub DESTROY { --$live }
+    use overload '""' => sub { 'value' }, fallback => 1;
+
+    package TS_StreamHash;
+    sub TIEHASH { bless {}, shift }
+    sub FETCH { TS_StreamValue->new }
+
+    package main;
+    for my $stream (0, 1) {
+        my $s = Text::Stencil->new(row => '{v}', separator => ',');
+        open my $fh, '>', \my $sink or die $!;
+        $TS_StreamValue::peak = 0;
+        my $n = 0;
+        my $cb = sub {
+            return undef if $n++ == 100;
+            tie my %row, 'TS_StreamHash';
+            return \%row;
+        };
+        my $out = $stream ? $s->render_cb($cb, $fh) : $s->render_cb($cb);
+        close $fh or die $!;
+        is $stream ? $sink : $out, join(',', ('value') x 100),
+            'streaming tied fields preserves every row';
+        cmp_ok $TS_StreamValue::peak, '<=', 2,
+            'streaming releases field temporaries between rows';
+        is $TS_StreamValue::live, 0, 'no field values outlive the render';
+        is $s->row_count, 100, 'streaming counts the consumed rows';
+    }
+    my @rows = map { tie my %row, 'TS_StreamHash'; \%row } 1 .. 100;
+    for my $skip (0, 1) {
+        my $s = Text::Stencil->new(row => '{v}', $skip ? (skip_if => 'hidden') : ());
+        my $sink = '';
+        open my $fh, '>', \$sink or die $!;
+        $TS_StreamValue::peak = 0;
+        $s->render_to_fh($fh, \@rows);
+        close $fh or die $!;
+        is $sink, $skip ? '' : ('value' x 100), 'render_to_fh handles tied fields';
+        cmp_ok $TS_StreamValue::peak, '<=', 64,
+            'render_to_fh bounds live field temporaries, skipped rows included';
+        is $TS_StreamValue::live, 0, 'no streamed fields outlive render_to_fh';
+    }
+}
+
+{
+    for my $case (['__ROW__', ''], ["__HEADER__\nH\n__ROW__", "H\n"],
+                  ["__ROW__\n{0}\n__FOOTER__", "x\n"],
+                  ["__ROW__\r\n{0}\r\n__FOOTER__\t", "x\r\n"]) {
+        my ($fh, $path) = tempfile(UNLINK => 1);
+        binmode $fh, ':raw';
+        print {$fh} $case->[0];
+        close $fh or die $!;
+        my $out = eval { Text::Stencil->from_file($path)->render_one(['x']) };
+        is $out, $case->[1], 'from_file recognises a section marker at EOF';
+    }
+    for my $bytes ("bad\xff", "truncated\xc3") {
+        my ($fh, $path) = tempfile(UNLINK => 1);
+        binmode $fh, ':raw';
+        print {$fh} $bytes;
+        close $fh or die $!;
+        my $ok = eval { Text::Stencil->from_file($path); 1 };
+        ok !$ok, 'from_file rejects malformed UTF-8';
+        like $@, qr/UTF-8|Unicode/, 'the error identifies the encoding';
+    }
+}
+
+{
+    my $decoded = "\x{e9}";
+    utf8::upgrade($decoded);
+    my %expected = (header => "\xe9xy", row => "\xe9\xe9",
+                    footer => "xy\xe9", separator => "x\xe9y");
+    for my $piece (qw(header row footer separator)) {
+        my %defaults = ($piece => $decoded);
+        my $s = Text::Stencil->new(row => '{0}', %defaults, $piece => "\xe9");
+        my $out = $s->render([['x'], ['y']]);
+        ok !utf8::is_utf8($out), "overriding $piece replaces its encoding too";
+        utf8::encode($out) if utf8::is_utf8($out);
+        is $out, $expected{$piece}, 'the replacement bytes are preserved';
+    }
+}
+
 done_testing;

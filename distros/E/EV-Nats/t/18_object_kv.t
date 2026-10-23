@@ -4,6 +4,7 @@ use Test::More;
 use MIME::Base64 qw(encode_base64 encode_base64url decode_base64);
 use Digest::SHA qw(sha256 sha256_hex);
 use JSON::PP ();
+use POSIX ();
 use EV::Nats::ObjectStore;
 use EV::Nats::KV;
 
@@ -23,15 +24,22 @@ use EV::Nats::KV;
     }
     sub js_publish {
         my ($self, $subj, $payload, $cb) = @_;
+        die "mock disconnected during chunk send\n"
+            if $self->{fail_chunk_send} && $self->{chunk_sends}++;
         $self->{store}{$subj} = { data => MIME::Base64::encode_base64($payload, ''),
                                   seq  => ++$self->{seq} };
         push @{ $self->{order} }, $subj;
         my $seq = $self->{seq};
-        push @{ $self->{pending} }, sub { $cb->({ seq => $seq }, undef) };
+        # Stored but unacked, like a lost PubAck: debris the client must clean.
+        my $fail = $self->{fail_chunks} && $subj =~ /\.C\./;
+        push @{ $self->{pending} }, $fail
+            ? sub { $cb->(undef, 'mock ack loss') }
+            : sub { $cb->({ seq => $seq }, undef) };
     }
     # Headered publish with PubAck (Nats-Rollup meta/marker writes).
     sub js_publish_h {
         my ($self, $subj, $headers, $payload, $cb) = @_;
+        die "mock disconnected during metadata send\n" if $self->{fail_hpub_send};
         my %m = (data => MIME::Base64::encode_base64($payload, ''),
                  seq  => ++$self->{seq});
         $m{hdrs} = MIME::Base64::encode_base64($headers, '') if defined $headers;
@@ -40,7 +48,10 @@ use EV::Nats::KV;
         push @{ $self->{hpubs} },
             { subject => $subj, headers => $headers, payload => $payload };
         my $seq = $self->{seq};
-        push @{ $self->{pending} }, sub { $cb->({ seq => $seq }, undef) };
+        my $fail = $self->{fail_hpub};
+        push @{ $self->{pending} }, $fail
+            ? sub { $cb->(undef, 'mock hpub failure') }
+            : sub { $cb->({ seq => $seq }, undef) };
     }
     sub drain {   # stand-in for the event loop
         my ($self) = @_;
@@ -90,6 +101,8 @@ use EV::Nats::KV;
 {
     package MockConn;
     sub new { bless {}, shift }
+    sub is_connected { 0 }   # serverless: put() skips its chunk guard
+    sub max_payload { 1048576 }
     sub new_inbox { '_INBOX.x.1' }
     sub subscribe { 1 }
     sub subscribe_max { 1 }
@@ -397,6 +410,70 @@ subtest 'KV key and bucket validation' => sub {
         ok eval { $kv->get($good, sub { }); 1 }, "key '$good' accepted"
             or diag $@;
     }
+};
+
+subtest 'failed put purges its chunks instead of orphaning them' => sub {
+    plan tests => 4;
+    my $js = MockJS->new;
+    $js->{fail_chunks} = 1;
+    my $os = EV::Nats::ObjectStore->new(js => $js, bucket => 'b', chunk_size => 100);
+    my ($info, $err);
+    $os->put('o', 'x' x 300, sub { ($info, $err) = @_ });
+    $js->drain;
+    like $err, qr/chunk.*failed/, 'chunk failure reported';
+    my @chunks = grep { /\.C\./ } keys %{ $js->{store} };
+    is scalar @chunks, 0, 'stored chunks purged';
+
+    my $js2 = MockJS->new;
+    $js2->{fail_hpub} = 1;
+    my $os2 = EV::Nats::ObjectStore->new(js => $js2, bucket => 'b');
+    my ($info2, $err2);
+    $os2->put('o', 'data', sub { ($info2, $err2) = @_ });
+    $js2->drain;
+    like $err2, qr/mock hpub failure/, 'meta failure reported';
+    my @chunks2 = grep { /\.C\./ } keys %{ $js2->{store} };
+    is scalar @chunks2, 0, 'chunks purged after meta failure';
+};
+
+subtest 'ObjectStore reports synchronous send failures and purges partial chunks' => sub {
+    for my $failure (qw(fail_chunk_send fail_hpub_send)) {
+        my $js = MockJS->new;
+        $js->{$failure} = 1;
+        my $os = EV::Nats::ObjectStore->new(js => $js, bucket => 'b', chunk_size => 100);
+        my ($calls, $err) = (0);
+        my $ok = eval {
+            $os->put('big', 'x' x 500, sub { $calls++; $err = $_[1] });
+            $js->drain;
+            1;
+        };
+        ok $ok, "$failure: workflow did not throw" or diag $@;
+        is $calls, 1, "$failure: callback fired exactly once";
+        like $err, qr/failed|disconnected/, "$failure: error reported";
+        is scalar(grep { /\.C\./ } keys %{ $js->{store} }), 0,
+            "$failure: partial chunks purged";
+    }
+};
+
+subtest 'forked ObjectStore workers use independent chunk IDs' => sub {
+    my @ids;
+    for (1..2) {
+        pipe(my $rd, my $wr) or die $!;
+        my $pid = fork;
+        die "fork: $!" unless defined $pid;
+        if (!$pid) {
+            close $rd;
+            print $wr EV::Nats::ObjectStore::_nuid(), "\n";
+            close $wr;
+            POSIX::_exit(0);
+        }
+        close $wr;
+        push @ids, scalar <$rd>;
+        close $rd;
+        my $status;
+        { local $?; waitpid $pid, 0; $status = $?; }
+        is $status, 0, 'worker generated its ID successfully';
+    }
+    isnt $ids[0], $ids[1], 'workers do not reuse the same chunk subject';
 };
 
 done_testing;

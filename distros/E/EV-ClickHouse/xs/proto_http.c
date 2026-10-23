@@ -54,45 +54,44 @@ static char* build_http_post_request(ev_clickhouse_t *self,
         }
     }
 
-    /* build URL params (dynamically allocated) */
+    /* build URL params (growable buffer; static prefix first) */
     const char *query_id = NULL;
     STRLEN query_id_len = 0;
-    size_t params_cap = 128
+    native_buf_t params;
+    size_t plen;
+    nbuf_init(&params);
+    nbuf_grow(&params, 128
         + (self->database ? strlen(self->database) * 3 : 0)
         + (self->session_id ? strlen(self->session_id) * 3 : 0)
-        + url_sql_len * 3
-        + settings_url_params_size(defaults, overrides);
-    char *params;
-    size_t plen = 0;
-    Newx(params, params_cap, char);
+        + url_sql_len * 3);
     if (self->database) {
-        plen = (size_t)snprintf(params, params_cap, "?database=");
-        plen += url_encode(self->database, strlen(self->database), params + plen);
-        plen += (size_t)snprintf(params + plen, params_cap - plen, "&wait_end_of_query=1");
+        nbuf_append(&params, "?database=", sizeof("?database=") - 1);
+        nbuf_grow(&params, strlen(self->database) * 3);
+        params.len += url_encode(self->database, strlen(self->database),
+                                params.data + params.len);
+        nbuf_append(&params, "&wait_end_of_query=1",
+                    sizeof("&wait_end_of_query=1") - 1);
     } else {
-        plen = (size_t)snprintf(params, params_cap, "?wait_end_of_query=1");
+        nbuf_append(&params, "?wait_end_of_query=1",
+                    sizeof("?wait_end_of_query=1") - 1);
     }
     if (self->session_id) {
-        plen += (size_t)snprintf(params + plen, params_cap - plen, "&session_id=");
-        plen += url_encode(self->session_id, strlen(self->session_id), params + plen);
+        nbuf_append(&params, "&session_id=", sizeof("&session_id=") - 1);
+        nbuf_grow(&params, strlen(self->session_id) * 3);
+        params.len += url_encode(self->session_id, strlen(self->session_id),
+                                params.data + params.len);
     }
     if (url_sql) {
-        plen += (size_t)snprintf(params + plen, params_cap - plen, "&query=");
-        plen += url_encode(url_sql, url_sql_len, params + plen);
+        nbuf_append(&params, "&query=", sizeof("&query=") - 1);
+        nbuf_grow(&params, url_sql_len * 3);
+        params.len += url_encode(url_sql, url_sql_len, params.data + params.len);
     }
-    plen = append_settings_url_params(params, plen,
-                                       defaults, overrides,
-                                       &query_id, &query_id_len);
-    if (query_id) {
-        size_t need = plen + 10 + query_id_len * 3 + 1;
-        if (need > params_cap) {
-            params_cap = need;
-            Renew(params, params_cap, char);
-        }
-        plen += (size_t)snprintf(params + plen, params_cap - plen, "&query_id=");
-        plen += url_encode(query_id, query_id_len, params + plen);
-    }
-    params[plen] = '\0';
+    append_settings_url_params(&params, defaults, overrides,
+                               &query_id, &query_id_len);
+    if (query_id)
+        append_url_param(&params, "query_id", 8, query_id, query_id_len);
+    nbuf_u8(&params, '\0');
+    plen = params.len - 1;
 
     /* user/password are quoted as-is in the X-ClickHouse-* form, or
      * base64-expanded ((n+2)/3)*4 in the Basic auth form. The 4/3 factor
@@ -100,15 +99,20 @@ static char* build_http_post_request(ev_clickhouse_t *self,
     req_cap = 512 + body_len + plen
            + (self->host ? strlen(self->host) : 0)
            + (self->user ? strlen(self->user) * 2 : 0)
-           + (self->password ? strlen(self->password) * 2 : 0);
+           + (self->password ? strlen(self->password) * 2 : 0)
+           + 2; /* IPv6 Host brackets */
     Newx(req, req_cap, char);
 
     /* request line + headers */
     pos += snprintf(req + pos, req_cap - pos,
-                    "POST /%s HTTP/1.1\r\n", params);
-    Safefree(params);
-    pos += snprintf(req + pos, req_cap - pos,
-                    "Host: %s:%u\r\n", self->host, self->port);
+                    "POST /%s HTTP/1.1\r\n", params.data);
+    Safefree(params.data);
+    {
+        int v6 = self->host && strchr(self->host, ':') != NULL;
+        pos += snprintf(req + pos, req_cap - pos, "Host: %s%s%s:%u\r\n",
+                        v6 ? "[" : "", self->host, v6 ? "]" : "",
+                        self->port);
+    }
     if (self->http_basic_auth && self->user) {
         /* "user:pass" → base64. Single allocation: [cred][b64]. */
         size_t ul = strlen(self->user);
@@ -159,15 +163,17 @@ static char* build_http_post_request(ev_clickhouse_t *self,
 /* Build HTTP GET /ping request */
 static char* build_http_ping_request(ev_clickhouse_t *self, size_t *req_len) {
     char *req;
-    size_t req_cap = 128 + (self->host ? strlen(self->host) : 0);
+    size_t req_cap = 130 + (self->host ? strlen(self->host) : 0);
     size_t pos = 0;
+    int v6 = self->host && strchr(self->host, ':') != NULL;
 
     Newx(req, req_cap, char);
     pos = snprintf(req, req_cap,
                    "GET /ping HTTP/1.1\r\n"
-                   "Host: %s:%u\r\n"
+                   "Host: %s%s%s:%u\r\n"
                    "Connection: keep-alive\r\n\r\n",
-                   self->host, self->port);
+                   v6 ? "[" : "", self->host, v6 ? "]" : "",
+                   self->port);
     if (pos >= req_cap) pos = req_cap - 1;
     *req_len = pos;
     return req;
@@ -285,6 +291,26 @@ static const char* find_header(const char *headers, size_t headers_len,
     return NULL;
 }
 
+/* Case-insensitive comma-separated token match (Transfer-Encoding and
+ * Content-Encoding are lists, e.g. "gzip, chunked"). val is NOT
+ * NUL-terminated; surrounding whitespace is tolerated. */
+static int header_has_token(const char *val, size_t vlen,
+                            const char *tok, size_t tlen) {
+    size_t i = 0;
+    while (i < vlen) {
+        size_t start, end;
+        while (i < vlen && (val[i] == ' ' || val[i] == '\t')) i++;
+        start = i;
+        while (i < vlen && val[i] != ',') i++;
+        end = i;
+        while (end > start && (val[end - 1] == ' ' || val[end - 1] == '\t')) end--;
+        if (end - start == tlen && strncasecmp(val + start, tok, tlen) == 0)
+            return 1;
+        if (i < vlen) i++;
+    }
+    return 0;
+}
+
 /* Parse a complete HTTP response from recv_buf. */
 static void process_http_response(ev_clickhouse_t *self) {
     size_t hdr_end;
@@ -316,15 +342,21 @@ static void process_http_response(ev_clickhouse_t *self) {
         content_length = (size_t)strtoul(val, NULL, 10);
     }
 
-    /* check Transfer-Encoding: chunked */
+    /* check Transfer-Encoding for the chunked token; a gzip token in
+     * the same list means the de-chunked body still needs gunzipping. */
     val = find_header(self->recv_buf, hdr_end, "Transfer-Encoding", &val_len);
-    if (val && val_len >= 7 && strncasecmp(val, "chunked", 7) == 0) {
-        chunked = 1;
+    if (val) {
+        if (header_has_token(val, val_len, "chunked", 7))
+            chunked = 1;
+        if (header_has_token(val, val_len, "gzip", 4)
+            || header_has_token(val, val_len, "x-gzip", 6))
+            is_gzip = 1;
     }
 
     /* check Content-Encoding: gzip */
     val = find_header(self->recv_buf, hdr_end, "Content-Encoding", &val_len);
-    if (val && val_len >= 4 && strncasecmp(val, "gzip", 4) == 0) {
+    if (val && (header_has_token(val, val_len, "gzip", 4)
+                || header_has_token(val, val_len, "x-gzip", 6))) {
         is_gzip = 1;
     }
 
@@ -412,8 +444,15 @@ static void process_http_response(ev_clickhouse_t *self) {
                     self->http_chunk_off = 0;
                     self->http_chunk_active = 0;
                     self->send_count--;
-                    teardown_after_deliver(self,
-                        "chunked response too large", "connection closed");
+                    {
+                        int ogen = self->connect_gen;
+                        if (teardown_after_deliver(self,
+                                "chunked response too large",
+                                "connection closed")) return;
+                        if (self->connect_gen == ogen
+                            && self->auto_reconnect && self->host)
+                            schedule_reconnect(self);
+                    }
                     return;
                 }
                 if (decoded == NULL) {
@@ -450,9 +489,14 @@ static void process_http_response(ev_clickhouse_t *self) {
         if (self->max_recv_buffer > 0 && self->max_recv_buffer < cl_cap)
             cl_cap = self->max_recv_buffer;
         if (content_length > cl_cap) {
+            int ogen;
             self->send_count--;
-            teardown_after_deliver(self,
-                "Content-Length exceeds limit", "connection closed");
+            ogen = self->connect_gen;
+            if (teardown_after_deliver(self,
+                    "Content-Length exceeds limit", "connection closed")) return;
+            if (self->connect_gen == ogen
+                && self->auto_reconnect && self->host)
+                schedule_reconnect(self);
             return;
         }
         if (self->recv_len < hdr_end + content_length) return; /* need more data */
@@ -478,6 +522,10 @@ static void process_http_response(ev_clickhouse_t *self) {
                 self->http_chunk_off = 0;
                 self->http_chunk_active = 0;
                 recv_consume(self, consumed);
+                /* Stop the timer BEFORE delivering: the handler may issue
+                 * a chained query (arming a fresh timer) that the old
+                 * post-deliver stop would kill. */
+                stop_timing(self);
                 int destroyed = deliver_error(self, "gzip decompression failed");
                 if (destroyed) return;
                 goto done;
@@ -492,8 +540,15 @@ static void process_http_response(ev_clickhouse_t *self) {
                 && dec_len > self->max_recv_buffer) {
                 Safefree(dec);
                 if (decoded) Safefree(decoded);
-                teardown_after_deliver(self,
-                    "gzip body exceeds max_recv_buffer", "connection closed");
+                {
+                    int ogen = self->connect_gen;
+                    if (teardown_after_deliver(self,
+                            "gzip body exceeds max_recv_buffer",
+                            "connection closed")) return;
+                    if (self->connect_gen == ogen
+                        && self->auto_reconnect && self->host)
+                        schedule_reconnect(self);
+                }
                 return;
             }
             final_body = dec;
@@ -503,6 +558,10 @@ static void process_http_response(ev_clickhouse_t *self) {
         {
             int is_raw = peek_cb_raw(self);
             int destroyed;
+            /* Stop the timer BEFORE delivering (native paths do the
+             * same): a chained query from the handler arms a fresh
+             * timer that a post-deliver stop would kill. */
+            stop_timing(self);
             if (is_raw) {
                 /* raw mode — deliver body as scalar, skip TSV parsing */
                 destroyed = deliver_raw_body(self, final_body, final_len);
@@ -514,14 +573,17 @@ static void process_http_response(ev_clickhouse_t *self) {
             }
             if (final_body != body) Safefree(final_body);
             if (decoded) Safefree(decoded);
-            recv_consume(self, consumed);
+            /* deliver_* may have freed self (DESTROY when the handler
+             * dropped the last ref) — never touch self afterwards. */
             if (destroyed) return;
+            recv_consume(self, consumed);
         }
     } else {
         /* error */
         char *errmsg = format_http_error(self, status, body, body_len, is_gzip);
         if (decoded) Safefree(decoded);
         recv_consume(self, consumed);
+        stop_timing(self);
         int destroyed = deliver_error(self, errmsg);
         Safefree(errmsg);
         if (destroyed) return;
@@ -530,8 +592,8 @@ static void process_http_response(ev_clickhouse_t *self) {
     if (self->magic != EV_CH_MAGIC) return;
 
 done:
-    /* Stop query timeout timer on response */
-    stop_timing(self);
+    /* The query timer was stopped before delivering (see above) so a
+     * chained query's fresh timer survives; just pipeline onwards. */
     pipeline_advance(self);
     return;
 

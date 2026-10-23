@@ -2443,6 +2443,7 @@ static SV *tpl_render_one(pTHX_ tpl_compiled *t, SV *row_sv) {
 static void tpl_render_to_fh(pTHX_ tpl_compiled *t, AV *rows, PerlIO *fh) {
     TS_ENC_ENTER(t);
     TS_PIN_AV(rows);
+    SAVETMPS;
     SSize_t nrows = av_count(rows);
     t->last_row_count = nrows;
     /* This streams, flushing every 64KB, so it never needs the whole output
@@ -2462,12 +2463,15 @@ static void tpl_render_to_fh(pTHX_ tpl_compiled *t, AV *rows, PerlIO *fh) {
         SV *row_sv;
         if (!ts_row_at(aTHX_ rows, i, &row_sv)) break;
         TS_PIN_ROW(row_sv);
-        if (should_skip_row(aTHX_ row_sv, t)) continue;
-        if (!first && t->sep_len) BUF_WRITE(t->sep, t->sep_len);
-        first = 0;
-        TS_EMIT_OPS(row_sv, i);
-        if (pos > 65536) { FH_WRITE(fh, buf, pos); pos = 0; }
+        if (!should_skip_row(aTHX_ row_sv, t)) {
+            if (!first && t->sep_len) BUF_WRITE(t->sep, t->sep_len);
+            first = 0;
+            TS_EMIT_OPS(row_sv, i);
+            if (pos > 65536) { FH_WRITE(fh, buf, pos); pos = 0; FREETMPS; }
+        }
+        if (UNLIKELY((i & 63) == 63)) FREETMPS;
     }
+    FREETMPS;
     t->last_row_count = nrows;
     BUF_WRITE(t->footer, t->footer_len);
     if (pos) FH_WRITE(fh, buf, pos);
@@ -2478,6 +2482,8 @@ static void tpl_render_to_fh(pTHX_ tpl_compiled *t, AV *rows, PerlIO *fh) {
 
 static SV *tpl_render_cb(pTHX_ tpl_compiled *t, SV *cb, PerlIO *fh) {
     TS_ENC_ENTER(t);
+    /* The next callback's FREETMPS also releases the previous row's fields. */
+    SAVETMPS;
     STRLEN alloc, pos;
     char *buf;
     int use_fh = (fh != NULL);
@@ -2514,7 +2520,7 @@ static SV *tpl_render_cb(pTHX_ tpl_compiled *t, SV *cb, PerlIO *fh) {
 
     while (1) {
         SPAGAIN;
-        ENTER; SAVETMPS;
+        ENTER;
         PUSHMARK(SP);
         PUTBACK;
         int count = call_sv(cb, G_SCALAR | G_EVAL);
@@ -2525,7 +2531,7 @@ static SV *tpl_render_cb(pTHX_ tpl_compiled *t, SV *cb, PerlIO *fh) {
            and let perl finish its unwind; the stackinfo is left for die_unwind,
            since getting here means perl is already mid-longjmp. */
         if (UNLIKELY(PL_savestack_ix < ts_floor)) return &PL_sv_undef;
-        if (SvTRUE(ERRSV)) {
+        if (SvROK(ERRSV) || (SvPOK(ERRSV) && SvCUR(ERRSV))) {
             /* The row callback died: free our render buffer (the fh path's
                own malloc, or the detached render_buf) before propagating, so
                a dying callback can't leak it. */
@@ -2548,10 +2554,6 @@ static SV *tpl_render_cb(pTHX_ tpl_compiled *t, SV *cb, PerlIO *fh) {
         SvREFCNT_inc_simple_void_NN(row_sv);
         PUTBACK; FREETMPS; LEAVE;
 
-        /* Own the row for exactly this iteration.  A bare inc/dec pair leaked
-           the whole row structure whenever rendering it croaked; SAVEFREESV is
-           released by the unwind too, and unlike a mortal it does not pile up
-           across a long callback stream. */
         ENTER;
         SAVEFREESV(row_sv);
         if (!should_skip_row(aTHX_ row_sv, t)) {
@@ -2646,10 +2648,10 @@ CODE:
         /* an overloaded "" on a later argument can free an earlier one, and we
            keep raw PVs until tpl_compile copies them */
         sv_2mortal(SvREFCNT_inc_simple_NN(val));
-        if (strcmp(key, "header") == 0) { int u_; header = ts_own_pv(aTHX_ val, &hlen, &u_); if (u_) tpl_utf8 |= TS_TPL_HDR; }
-        else if (strcmp(key, "row") == 0) { int u_; row = ts_own_pv(aTHX_ val, &rlen, &u_); if (u_) tpl_utf8 |= TS_TPL_ROW; }
-        else if (strcmp(key, "footer") == 0) { int u_; footer = ts_own_pv(aTHX_ val, &flen, &u_); if (u_) tpl_utf8 |= TS_TPL_FTR; }
-        else if (strcmp(key, "separator") == 0) { int u_; sep = ts_own_pv(aTHX_ val, &slen, &u_); if (u_) tpl_utf8 |= TS_TPL_SEP; }
+        if (strcmp(key, "header") == 0) { int u_; header = ts_own_pv(aTHX_ val, &hlen, &u_); if (u_) tpl_utf8 |= TS_TPL_HDR; else tpl_utf8 &= ~TS_TPL_HDR; }
+        else if (strcmp(key, "row") == 0) { int u_; row = ts_own_pv(aTHX_ val, &rlen, &u_); if (u_) tpl_utf8 |= TS_TPL_ROW; else tpl_utf8 &= ~TS_TPL_ROW; }
+        else if (strcmp(key, "footer") == 0) { int u_; footer = ts_own_pv(aTHX_ val, &flen, &u_); if (u_) tpl_utf8 |= TS_TPL_FTR; else tpl_utf8 &= ~TS_TPL_FTR; }
+        else if (strcmp(key, "separator") == 0) { int u_; sep = ts_own_pv(aTHX_ val, &slen, &u_); if (u_) tpl_utf8 |= TS_TPL_SEP; else tpl_utf8 &= ~TS_TPL_SEP; }
         else if (strcmp(key, "escape_char") == 0) {
             /* one byte, or the template silently stops substituting entirely */
             STRLEN el; const char *ev = SvPV(val, el);

@@ -1,12 +1,15 @@
 package Langertha::Engine::DeepSeek;
 # ABSTRACT: DeepSeek API
-our $VERSION = '0.503';
+our $VERSION = '0.504';
 use Moose;
 use Carp qw( croak );
 
 extends 'Langertha::Engine::OpenAIBase';
 
-with 'Langertha::Role::Tools';
+# StreamUsage: stream_options.include_usage is in the create-chat-completion
+# reference; the last chunk carries the usage either way (ADR 0038).
+with 'Langertha::Role::Tools',
+     'Langertha::Role::StreamUsage';
 
 
 sub _build_supported_operations {[qw(
@@ -133,7 +136,7 @@ Langertha::Engine::DeepSeek - DeepSeek API
 
 =head1 VERSION
 
-version 0.503
+version 0.504
 
 =head1 SYNOPSIS
 

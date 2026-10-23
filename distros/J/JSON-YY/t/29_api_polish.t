@@ -111,7 +111,8 @@ use JSON::YY ':doc';
     # ordinary values keep their short form
     is encode_json([0.1]),  '[0.1]',  '0.1 is unchanged';
     is encode_json([3.5]),  '[3.5]',  '3.5 is unchanged';
-    is encode_json([1e307]), '[1e+307]', '1e307 is unchanged';
+    cmp_ok decode_json(encode_json([1e307]))->[0], '==', as_double(1e307),
+        '1e307 retains its value';
     for my $v (0.1, 1e-7, 3.5, -2.25) {
         cmp_ok decode_json(encode_json([$v]))->[0], '==', as_double($v),
             "round-trip $v";
@@ -251,6 +252,24 @@ use JSON::YY ':doc';
     jset $e, "/users", [];
     jset $e, "/users/-", { name => "Bob" };
     is "$e", '{"users":[{"name":"Bob"}]}', 'the documented workaround gives an array';
+}
+
+{
+    for my $value (0.1 + 0.2, 1 / 3, 1.2345678901234567,
+                   -1.2345678901234567, 1.0000000000000002, 5e-324) {
+        my $num = as_double($value);
+        for my $cached (0, 1) {
+            my $str = "$num" if $cached;
+            for my $enc (
+                ['keyword', sub { encode_json($_[0]) }],
+                ['function', \&JSON::YY::encode_json],
+                ['OO', sub { JSON::YY->new(utf8 => 1)->encode($_[0]) }],
+            ) {
+                my $back = decode_json($enc->[1]->([$num]))->[0];
+                cmp_ok $back, '==', $num, "$enc->[0]: float round-trip (cached=$cached)";
+            }
+        }
+    }
 }
 
 done_testing;

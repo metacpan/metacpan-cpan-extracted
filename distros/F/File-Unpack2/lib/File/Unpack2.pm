@@ -42,12 +42,12 @@ File::Unpack2 - Aggressively unpack any archive, recursively, by mime type
 
 =head1 VERSION
 
-Version 2.02
+Version 2.03
 
 =cut
 
 # Please run perl Makefile.PL after changing the version here.
-our $VERSION = '2.02';
+our $VERSION = '2.03';
 
 POSIX::setlocale(&POSIX::LC_ALL, 'C');
 $ENV{PATH} = '/usr/bin:/bin';
@@ -180,7 +180,7 @@ sub _locate_cpio_i
   push @cpio_i, '--force-local'
     unless run([@cpio_i, '--force-local', '--usage'], {out_err => '/dev/null'});
 
-  @{$self->{_locate_cpio_i}} = \@cpio_i;
+  $self->{_locate_cpio_i} = \@cpio_i;
   return @cpio_i;
 }
 

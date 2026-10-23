@@ -1,0 +1,74 @@
+# The self test runs the command a user runs - "action-run t/lib/self_test.yml
+# ." - in a real container, so it needs a daemon.  The suite runs it against
+# the fake one by default; this job gives it a real one on every push, so the
+# live path is checked here rather than only on a developer's machine.
+#
+# The two daemon-specific files, t/real-docker.t and t/real-docker-preflight.t,
+# stay behind LIVE_TESTING=1 for a local run and the Real Docker on Windows
+# workflow, which is where a Windows daemon is available.
+name: Live Docker
+
+"on":
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  live:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      # The switch the live tests read.  Without it the self test still runs,
+      # against the fake Docker, and passes without touching the daemon - the
+      # green run this job exists to make impossible.
+      LIVE_TESTING: '1'
+      AUTOMATED_TESTING: 1
+      NO_NETWORK_TESTING: 1
+      NONINTERACTIVE_TESTING: 1
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Setup Perl
+        uses: shogo82148/actions-setup-perl@v1.44.2
+        with:
+          perl-version: '5.38'
+
+      - name: Install cpanm and local::lib
+        run: cpanm --notest --local-lib=~/perl5 local::lib
+
+      - name: Install dependencies
+        run: |
+          eval $(perl -I ~/perl5/lib/perl5 -Mlocal::lib)
+          cpanm --notest --installdeps .
+
+      # A daemon that cannot run Linux containers fails here, with the daemon
+      # saying why, rather than inside a test that then looks like a bug in
+      # the code.
+      - name: Check the daemon the test will use
+        run: docker info
+
+      # The Perl image this pulls is named in t/lib/self_test_cli.yml, pinned
+      # there by digest: the job tests the same image on every run rather than
+      # whatever the "perl:5.38" tag points at on the day it runs.
+      - name: Run the self test against a real daemon
+        run: |
+          if [ "$LIVE_TESTING" != "1" ]; then
+            echo 'LIVE_TESTING is not set to 1; the self test would run against the fake Docker and this job would pass without checking the daemon.' >&2
+            exit 1
+          fi
+
+          eval $(perl -I ~/perl5/lib/perl5 -Mlocal::lib)
+          prove -l t/self_test.t

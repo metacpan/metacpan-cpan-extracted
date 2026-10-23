@@ -4,10 +4,7 @@ use Test::More;
 use EV;
 use EV::cares qw(:all);
 
-# Drive concurrent queries against many unreachable nameservers in TCP
-# mode (one socket per server) to exercise the MAX_IO=16 slot table.
-# This mostly verifies that the warn-on-overflow path runs without
-# crashing and that all queries terminate (with timeout/cancel).
+# Concurrent TCP queries across several servers must all terminate.
 
 my @warnings;
 local $SIG{__WARN__} = sub { push @warnings, $_[0] };
@@ -34,6 +31,6 @@ EV::run until $stop || $done >= $count;
 ok($done > 0, "queries terminated ($done/$count)");
 is($r->active_queries, 0,
     'all callbacks fired (active_queries returned to 0)');
-diag "warnings emitted: " . scalar(grep /too many concurrent sockets/, @warnings);
+is_deeply(\@warnings, [], 'concurrent TCP queries need no warnings');
 
 done_testing;

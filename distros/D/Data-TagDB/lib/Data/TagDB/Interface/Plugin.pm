@@ -12,7 +12,7 @@ use warnings;
 
 use parent ();
 
-our $VERSION = v0.14;
+our $VERSION = v0.15;
 
 our %_known_plugins;
 
@@ -48,7 +48,7 @@ Data::TagDB::Interface::Plugin - Work with Tag databases, plugin base package
 
 =head1 VERSION
 
-version v0.14
+version v0.15
 
 =head1 SYNOPSIS
 
@@ -93,6 +93,7 @@ The default implementation will return an empty information structure.
 
 To be future-safe this interface reserves the following methods:
 C<new>,
+C<db>,
 C<plugin_*>,
 C<_*_provider>.
 

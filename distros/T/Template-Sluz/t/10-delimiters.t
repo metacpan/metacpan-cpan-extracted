@@ -80,4 +80,16 @@ sluz_test($sluz, '<$name> is <$age>', 'World is 42', 'Delimiters #19 - Multiple 
 # Delimiters #20 - Default modifier
 sluz_test($sluz, '<$missing|default:"fallback">', 'fallback', 'Delimiters #20 - Default modifier');
 
+# Ported from PHP AltDelim #9-10 - block counting and unclosed tag with alt delimiters
+# (using current delimiters < >)
+{
+    my @x = $sluz->_get_blocks('<$a><$b><$c>');
+    is(scalar @x, 3, 'Delimiters #21 - Block counting with alt delimiters');
+}
+eval { $sluz->parse_string('<$first') };
+like($@, qr/45821/, 'Delimiters #22 - Unclosed tag with alt delimiters');
+
+# Chained modifier with default under alt delimiters
+sluz_test($sluz, '<$missing|default:"hi"|uc>', 'HI', 'Delimiters #23 - Default chained with modifier');
+
 done_testing();

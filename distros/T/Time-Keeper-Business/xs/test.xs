@@ -130,12 +130,15 @@ _closed_days(self)
 SV *
 _on_day(value, day)
         SV *value
-        IV day
+        SV *day
     PREINIT:
         tkb_val v;
+        int64_t d;
     CODE:
         tkb_in_or_croak(aTHX_ value, &v, "_on_day");
-        RETVAL = tkb_out(aTHX_ &v, (int64_t)day, "_on_day");
+        if (!tkb_sv_to_i64(aTHX_ day, &d))
+            croak("_on_day: the day is not a whole number");
+        RETVAL = tkb_out(aTHX_ &v, d, "_on_day");
     OUTPUT:
         RETVAL
 

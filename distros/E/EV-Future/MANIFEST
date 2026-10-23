@@ -21,6 +21,8 @@ t/02-nested.t
 t/03-race.t
 t/04-map.t
 t/05-handle.t
+t/06-lifetime.t
+t/07-reentrant-flags.t
 t/repro_async_uaf.t
 t/repro_dangling_cv.t
 t/repro_parallel_uaf.t

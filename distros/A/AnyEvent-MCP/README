@@ -789,9 +789,13 @@ HTTP TOKENS AND SERVER IDENTITY
        POST /                 Authorization: Bearer TOKEN
 
     URL tokens are path components, not browser cookies. For another
-    configured endpoint, "/TOKEN" prefixes that endpoint path. All accepted
-    tokens authenticate the same operations; they are not separate users or
-    permission levels. Permissions still govern the tool operation.
+    configured endpoint, "/TOKEN" prefixes that endpoint path. The HTTP
+    server also accepts "/TOKEN" and the corresponding bare path without the
+    final slash when the endpoint is configured with one. This works around
+    clients (observed with Claude) that drop the final slash from a
+    configured URL. All accepted tokens authenticate the same operations;
+    they are not separate users or permission levels. Permissions still
+    govern the tool operation.
 
     By default, the master secret and server name determine one stable token
     and a port in 16384..32767. Changing a server's name changes its derived
@@ -971,9 +975,9 @@ TROUBLESHOOTING
 
   Authentication fails
     Obtain the URL with the same name, bind/token overrides and
-    configuration environment as the running process. Use the complete path,
-    including any required trailing slash. A clean URL needs an accepted
-    bearer token.
+    configuration environment as the running process. Use the complete path;
+    the final slash is optional for endpoints whose configured path ends in
+    one. A clean URL needs an accepted bearer token.
 
     A multibroker child credential is not necessarily the upstream
     listener's credential. "--bearer" after a child pair and "--token"

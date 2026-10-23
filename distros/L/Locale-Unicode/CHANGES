@@ -1,5 +1,11 @@
 Revision history for Perl module Locale::Unicode
 
+v0.4.6 2026-10-23T12:52:54+0900
+    - Corrected the instantiation of new Exception objects
+
+v0.4.5 2026-10-23T10:16:14+0900
+    - Added missing clone() method in subclass Locale::Unicode::Exception
+
 v0.4.4 2026-08-20T21:19:08+0900
     - Corrected a typo in the $LOCALE_BCP47_NAMELESS_RE regular expression
 

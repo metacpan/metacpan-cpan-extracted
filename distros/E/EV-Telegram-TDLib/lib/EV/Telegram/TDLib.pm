@@ -25,7 +25,7 @@ use EV::Telegram::TDLib::Stars;
 use EV::Telegram::TDLib::Business;
 use EV::Telegram::TDLib::Schema;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 our @ISA = map { "EV::Telegram::TDLib::$_" }
     qw(Users Chats Messages Files Connection Bots WebApps Forum Folders Payments
@@ -1184,7 +1184,11 @@ sub retry_policy {
 # it captures $self, so a single retrying send would pin the client for good.
 sub send_retrying {
     my ($self, $request, $cb, $opt, $policy) = @_;
-    my $st = { request => $request, cb => $cb || sub {}, opt => $opt,
+    return $self->send_once($request, $cb, $opt) unless $self->{client_id};
+    my %req = %$request;
+    delete $req{'@extra'};
+    my $st = { request => $self->{json}->encode(\%req),
+               cb => $cb || sub {}, opt => $opt,
                policy => $policy, left => $policy->{attempts},
                margin => $policy->{margin} };
     $self->retry_attempt($st);
@@ -1215,7 +1219,7 @@ sub retry_attempt {
             return;
         }
         $st->{cb}->($res, $err);
-    }, $st->{opt});
+    }, $st->{opt}, 1);
     $st->{first} = $extra unless defined $st->{first};
     return;
 }
@@ -1231,7 +1235,7 @@ sub send {
 }
 
 sub send_once {
-    my ($self, $request, $cb, $opt) = @_;
+    my ($self, $request, $cb, $opt, $encoded) = @_;
     # a closed client has no client_id: _send would address client 0 and
     # the pending entry could never be flushed, so fail deferred instead
     if (!$self->{client_id}) {
@@ -1249,11 +1253,18 @@ sub send_once {
         return undef;
     }
     my $extra = ++$self->{seq};
-    my %req = (%$request, '@extra' => "$extra");
     # encode before registering anything: an unencodable request croaks, and
     # a pending entry left behind would later fire a timeout for a request
     # that was never sent, failing the same call twice through two channels
-    my $payload = $self->{json}->encode(\%req);
+    my $payload;
+    if ($encoded) {
+        # Retrying reuses the submitted bytes, with a fresh correlation id.
+        $payload = substr($request, 0, -1)
+                 . (length($request) > 2 ? ',' : '') . qq("\@extra":"$extra"});
+    } else {
+        my %req = (%$request, '@extra' => "$extra");
+        $payload = $self->{json}->encode(\%req);
+    }
     $self->{pending}{$extra} = { cb => $cb || sub {} };
     if (my $t = defined $opt->{timeout} ? real('timeout', $opt->{timeout}) : 0) {
         # ev_now may be seconds stale after the process blocked outside
@@ -2543,7 +2554,8 @@ Pages getChatHistory backwards. Options: C<limit> (messages wanted,
 default 50), C<max_pages> (default 10), C<from_message_id>. The
 callback receives C<(\@messages, $err, $state)>; C<< $state->{complete} >>
 is true when the requested limit was reached or the history was
-exhausted.
+exhausted. Resume older with C<< $state->{next_from_message_id} >>
+when it is defined.
 
 =head3 edit_message($chat_id, $message_id, $text, %opt, $cb)
 

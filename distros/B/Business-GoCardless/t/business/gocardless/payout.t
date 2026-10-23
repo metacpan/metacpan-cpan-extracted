@@ -49,6 +49,7 @@ can_ok(
 
         pending
         paid
+        bounced
     /,
 );
 
@@ -57,6 +58,10 @@ is( $Payout->endpoint,'/payouts/%s','endpoint' );
 $Payout->status( 'pending' );
 ok( $Payout->pending,'->pending' );
 ok( ! $Payout->paid,'->paid' );
+ok( ! $Payout->bounced,'->bounced' );
+
+$Payout->status( 'bounced' );
+ok( $Payout->bounced,'->bounced after change' );
 
 $Payout->id( 'PO123' );
 is( $Payout->uri,'https://gocardless.com/payouts/PO123','->uri' );

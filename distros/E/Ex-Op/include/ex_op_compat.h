@@ -44,6 +44,11 @@ typedef OP *(*Perl_check_t)(pTHX_ OP *);
 #  define HvNAMEUTF8(hv) 0
 #endif
 
+#ifndef hv_deletes
+#  define hv_deletes(hv, key, flags) \
+      hv_delete((hv), ("" key ""), (sizeof(key) - 1), (flags))
+#endif
+
 #ifndef isWORDCHAR
 #  define isWORDCHAR(c) isALNUM(c)
 #endif

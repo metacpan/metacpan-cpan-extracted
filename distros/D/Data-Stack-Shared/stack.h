@@ -35,6 +35,10 @@
 #define STK_VERSION     2
 #define STK_ERR_BUFLEN  (PATH_MAX + 256)
 
+#ifndef STK_WAIT_INTERRUPTED
+#define STK_WAIT_INTERRUPTED() 0
+#endif
+
 #define STK_VAR_INT   0
 #define STK_VAR_STR   1
 
@@ -110,6 +114,16 @@ static inline int stk_remaining(const struct timespec *dl, struct timespec *rem)
     rem->tv_nsec = dl->tv_nsec - now.tv_nsec;
     if (rem->tv_nsec < 0) { rem->tv_sec--; rem->tv_nsec += 1000000000L; }
     return rem->tv_sec >= 0;
+}
+
+static inline void stk_futex_wait(uint32_t *word, uint32_t seq, struct timespec *timeout) {
+#ifdef STK_WAIT_SLICE_NS
+    /* Poll deferred signals even if one arrived just before the syscall. */
+    struct timespec slice = { 0, STK_WAIT_SLICE_NS };
+    if (!timeout || timeout->tv_sec > 0 || timeout->tv_nsec > slice.tv_nsec)
+        timeout = &slice;
+#endif
+    syscall(SYS_futex, word, FUTEX_WAIT, seq, timeout, NULL, 0);
 }
 
 static inline uint8_t *stk_slot(StkHandle *h, uint32_t idx) {
@@ -258,6 +272,7 @@ static inline int stk_push(StkHandle *h, const void *val, uint32_t vlen, double 
     __atomic_add_fetch(&hdr->stat_waits, 1, __ATOMIC_RELAXED);
 
     for (;;) {
+        if (STK_WAIT_INTERRUPTED()) { errno = EINTR; return -1; }
         uint32_t wseq = __atomic_load_n(&hdr->push_wake_seq, __ATOMIC_ACQUIRE);
         __atomic_add_fetch(&hdr->waiters_push, 1, __ATOMIC_RELEASE);
         /* StoreLoad barrier: publish waiters_push++ before re-reading `top`,
@@ -276,9 +291,10 @@ static inline int stk_push(StkHandle *h, const void *val, uint32_t vlen, double 
                 }
                 pts = &rem;
             }
-            syscall(SYS_futex, &hdr->push_wake_seq, FUTEX_WAIT, wseq, pts, NULL, 0);
+            stk_futex_wait(&hdr->push_wake_seq, wseq, pts);
         }
         __atomic_sub_fetch(&hdr->waiters_push, 1, __ATOMIC_RELAXED);
+        if (STK_WAIT_INTERRUPTED()) { errno = EINTR; return -1; }
         if (stk_try_push(h, val, vlen)) return 1;
         if (has_dl && !stk_remaining(&dl, &rem)) {
             __atomic_add_fetch(&hdr->stat_timeouts, 1, __ATOMIC_RELAXED);
@@ -348,6 +364,7 @@ static inline int stk_pop(StkHandle *h, void *out, double timeout) {
     __atomic_add_fetch(&hdr->stat_waits, 1, __ATOMIC_RELAXED);
 
     for (;;) {
+        if (STK_WAIT_INTERRUPTED()) { errno = EINTR; return -1; }
         uint32_t wseq = __atomic_load_n(&hdr->pop_wake_seq, __ATOMIC_ACQUIRE);
         __atomic_add_fetch(&hdr->waiters_pop, 1, __ATOMIC_RELEASE);
         /* StoreLoad barrier: see the push-wait path (pairs with a pusher). */
@@ -363,9 +380,10 @@ static inline int stk_pop(StkHandle *h, void *out, double timeout) {
                 }
                 pts = &rem;
             }
-            syscall(SYS_futex, &hdr->pop_wake_seq, FUTEX_WAIT, wseq, pts, NULL, 0);
+            stk_futex_wait(&hdr->pop_wake_seq, wseq, pts);
         }
         __atomic_sub_fetch(&hdr->waiters_pop, 1, __ATOMIC_RELAXED);
+        if (STK_WAIT_INTERRUPTED()) { errno = EINTR; return -1; }
         if (stk_try_pop(h, out)) return 1;
         if (has_dl && !stk_remaining(&dl, &rem)) {
             __atomic_add_fetch(&hdr->stat_timeouts, 1, __ATOMIC_RELAXED);
@@ -392,6 +410,8 @@ static inline int stk_peek(StkHandle *h, void *out) {
             continue;
         }
         memcpy(out, stk_slot(h, t - 1), h->elem_size);
+        /* Order payload reads before the final state check on weak memory. */
+        __atomic_thread_fence(__ATOMIC_ACQUIRE);
         uint64_t c2 = __atomic_load_n(&h->ctl[t - 1], __ATOMIC_ACQUIRE);
         uint32_t t2 = __atomic_load_n(&h->hdr->top, __ATOMIC_ACQUIRE);
         if (c1 == c2 && t == t2) return 1;

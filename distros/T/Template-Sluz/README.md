@@ -88,6 +88,16 @@ Info: red / 39
     template syntax.  All subsequent calls to `fetch`, `parse_string`, etc.
     will use the new delimiters.
 
+- **SLUZ\_INLINE**
+
+    The `SLUZ_INLINE` constant is exported by default and signals that the
+    template content is inline in the `__DATA__` section. `fetch` uses
+    `SLUZ_INLINE` automatically when called with no arguments:
+
+    ```
+    print $s->fetch(SLUZ_INLINE);          # equivalent to $s->fetch()
+    ```
+
 ## Template Syntax
 
 ### Variables

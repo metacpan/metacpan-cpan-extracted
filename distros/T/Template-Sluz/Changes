@@ -1,5 +1,31 @@
 Revision history for Template::Sluz
 
+0.9.8    2026-10-22
+    - Performance: ~108% faster on benchmark suite
+    - Bug fix: __DATA__ marker only matched at start of line (ignored inside comments)
+    - Bug fix: whitespace parity for {if} blocks
+    - Bug fix: reject unquoted non-numeric modifier params (#31558)
+    - Bug fix: unclosed if/foreach/literal blocks raise #45821
+    - Bug fix: bareword, undefined-function, and division-by-zero errors raise #18933
+    - Bug fix: templates read as raw bytes (CRLF handling on Windows)
+    - Error messages use backticks instead of <code>
+    - Tests: error paths (t/11-errors.t), inline templates (t/12-inline.t),
+      fetch extras (t/13-fetch-extra.t), compiled renderer parity (t/14-compiled.t)
+
+0.9.6    2026-07-06
+    - Whitespace parity: input whitespace faithfully preserved in output
+    - fetch() with no arguments defaults to SLUZ_INLINE
+    - Bug fix: parse_string() no longer tries to read template file from disk
+    - Bug fix: inline template errors show real filename and line number
+    - Bug fix: two subsequent comment-only lines no longer cause parse error
+    - Bug fix: comment-only lines no longer emit trailing newline
+    - Bug fix: all error numbers made unique
+    - Performance: cache modifier coderefs and precompile regexes (~11% speedup)
+    - Performance: use ord() for single-char comparisons
+    - Added runnable sample scripts in docs/
+    - Added GitHub Actions CI workflow
+    - Tests for whitespace in {if} blocks and comment-only lines
+
 0.9.4    2026-06-24
     - New escape modifier for HTML-encoding unsafe characters
     - New auto-escape mode (auto_escape => 1) with |noescape bypass

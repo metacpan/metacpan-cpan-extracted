@@ -1,0 +1,878 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use FindBin;
+use File::Basename qw(basename dirname);
+use File::Path qw(make_path);
+use Time::HiRes ();
+
+# The path helpers live in t/lib so that they can be unit tested on any
+# platform, including for Windows-style volume specifications.
+use lib "$FindBin::Bin/../lib";
+use App::Actions::FakeDocker qw(split_volume mounts to_host);
+
+my $state_dir = $ENV{FAKE_DOCKER_STATE};
+if (!defined $state_dir || !length $state_dir) {
+    print STDERR "fake-docker: FAKE_DOCKER_STATE is not set\n";
+    exit 2;
+}
+
+make_path($state_dir);
+
+# FAKE_DOCKER_LOG records each command with every "-e NAME" written out as
+# NAME=VALUE, the value docker would read from the client's environment: what
+# the container is given.  FAKE_DOCKER_ARGV_LOG records the arguments exactly
+# as they arrived, which is what any user of the host can see in ps, so a
+# test can show that a secret never appears there.
+my $log_file = $ENV{FAKE_DOCKER_LOG};
+if (defined $log_file && length $log_file) {
+    my @resolved = @ARGV;
+    for my $index (1 .. $#resolved) {
+        next unless $resolved[$index - 1] eq '-e' || $resolved[$index - 1] eq '--env';
+        next unless $resolved[$index] =~ /\A[A-Za-z_][A-Za-z0-9_]*\z/ && exists $ENV{ $resolved[$index] };
+        $resolved[$index] .= "=$ENV{ $resolved[$index] }";
+    }
+    open my $log, '>>', $log_file or die "fake-docker: cannot open log: $!";
+    binmode $log;
+    print {$log} join("\t", @resolved), "\n";
+    close $log;
+}
+
+my $argv_log_file = $ENV{FAKE_DOCKER_ARGV_LOG};
+if (defined $argv_log_file && length $argv_log_file) {
+    open my $log, '>>', $argv_log_file or die "fake-docker: cannot open log: $!";
+    binmode $log;
+    print {$log} join("\t", @ARGV), "\n";
+    close $log;
+}
+
+my @args = @ARGV;
+my $command = shift @args || '';
+
+if ($command eq '--version') {
+    print "Docker version 26.0.0, build fake\n";
+    exit 0;
+}
+
+if ($command eq 'version') {
+    my $format = _option_value(\@args, '--format') || '';
+    if ($format =~ /Server/) {
+        # The client version is available even when the daemon is not.
+        exit 1 if $ENV{FAKE_NO_DAEMON};
+        print "26.0.0\n";
+    } elsif ($format =~ /Client/) {
+        print "26.0.0\n";
+    }
+    exit 0;
+}
+
+if ($command eq 'info') {
+    exit 1 if $ENV{FAKE_NO_DAEMON};
+    my $format = _option_value(\@args, '--format') || '';
+    if ($format =~ /OSType/) {
+        my $os_type = defined $ENV{FAKE_OS_TYPE} && length $ENV{FAKE_OS_TYPE}
+            ? $ENV{FAKE_OS_TYPE}
+            : 'linux';
+        print "$os_type\n";
+    }
+    print "26.0.0\n" if $format =~ /ServerVersion/;
+    exit 0;
+}
+
+if ($command eq 'image') {
+    my $subcommand = shift @args || '';
+    if ($subcommand eq 'inspect') {
+        my $image = $args[-1];
+        my $exists = -e _image_marker($image) ? 1 : 0;
+
+        # The image cache asks for the size this way, one image at a time.
+        # FAKE_IMAGE_SIZE lets a test choose it; the default is large enough
+        # to be reported in megabytes rather than bytes.
+        if ($exists && grep { /Size/ } @args) {
+            my $size = $ENV{FAKE_IMAGE_SIZE};
+            $size = 123_456_789 if !defined $size || $size !~ /\A\d+\z/;
+            print "$size\n";
+        }
+
+        exit($exists ? 0 : 1);
+    }
+    if ($subcommand eq 'rm') {
+        my $image = $args[-1];
+
+        # FAKE_IMAGE_REMOVE_FAILURE names an image, or '*' for every image, a
+        # daemon refuses to remove: the case where a prune has to leave it in
+        # the record and say so.
+        my $broken = $ENV{FAKE_IMAGE_REMOVE_FAILURE};
+        if (defined $broken && length $broken
+            && ($broken eq '*' || $broken eq $image)) {
+            print STDERR "Error response from daemon: conflict: image '$image' is being used\n";
+            exit 1;
+        }
+
+        unlink _image_marker($image);
+        exit 0;
+    }
+    exit 0;
+}
+
+if ($command eq 'pull') {
+    my $image = $args[-1];
+
+    # FAKE_PULL_TIMING records when each pull starts and finishes, which is
+    # how a test can tell concurrent pulls from consecutive ones.
+    _timed_log('pull-start', $image) if _timing();
+
+    # FAKE_PULL_SLEEP makes a pull take long enough to be seen, so that
+    # overlapping pulls are not a race between two instant commands.
+    my $sleep = $ENV{FAKE_PULL_SLEEP};
+    Time::HiRes::sleep($sleep)
+        if defined $sleep && length $sleep && $sleep > 0;
+
+    # FAKE_PULL_FAILURE names an image, or '*' for every image, that cannot be
+    # pulled: the case where a run would otherwise fail halfway through.
+    my $broken = $ENV{FAKE_PULL_FAILURE};
+    if (defined $broken && length $broken && ($broken eq '*' || $broken eq $image)) {
+        print STDERR "Error response from daemon: pull access denied for $image\n";
+        _timed_log('pull-end', $image) if _timing();
+        exit 1;
+    }
+
+    open my $marker, '>', _image_marker($image) or die "fake-docker: $!";
+    binmode $marker;
+    print {$marker} $image;
+    close $marker;
+    print "Pulled $image\n";
+    _timed_log('pull-end', $image) if _timing();
+    exit 0;
+}
+
+if ($command eq 'network') {
+    my $subcommand = shift @args || '';
+    exit 0;
+}
+
+if ($command eq 'rm') {
+    my $index = 0;
+    $index++ while $index < @args && $args[$index] =~ /^-/;
+    my $name = $args[$index];
+    unlink _container_file($name) if defined $name;
+    exit 0;
+}
+
+if ($command eq 'inspect') {
+    exit 1 if $ENV{FAKE_INSPECT_FAILURE};
+
+    my $format = _option_value(\@args, '--format') || '';
+    my $name   = $args[-1];
+
+    if ($format =~ /ExitCode/) {
+        print _container_died($name) ? _died_status() : 0, "\n";
+        exit 0;
+    }
+
+    if ($format =~ /RestartCount/) {
+        print _restart_count($name), "\n";
+        exit 0;
+    }
+
+    if ($format =~ /State\.Status/) {
+        print _container_state($name), "\n";
+        exit 0;
+    }
+
+    print _container_died($name) ? "false\n" : "true\n";
+    exit 0;
+}
+
+if ($command eq 'logs') {
+    my $name = $args[-1];
+
+    # FAKE_CONTAINER_EXITS names a container that has stopped, and its last
+    # output is what a run is expected to quote back: FAKE_CONTAINER_LOGS on
+    # standard output, FAKE_CONTAINER_ERR on standard error, so a capture that
+    # loses one of the two streams is noticed.  A restarting container prints
+    # the same thing after every attempt, which is why its policy cannot cure
+    # it, so it quotes the same output.
+    if (_container_died($name) || _restarting_container($name)) {
+        my $stdout = $ENV{FAKE_CONTAINER_LOGS};
+        my $stderr = $ENV{FAKE_CONTAINER_ERR};
+
+        # The two streams are written to the same file description when a
+        # caller merges them, so the buffered one has to go first for the
+        # lines to keep the order the container printed them in.
+        local $| = 1;
+        print $stdout if defined $stdout;
+        print STDERR $stderr if defined $stderr && length $stderr;
+        exit 0;
+    }
+
+    # A container that is still up has printed nothing this fake did not see:
+    # an unset FAKE_CONTAINER_LOGS means no output, which is also how a test
+    # asks for none - Windows cannot hold an empty string in the environment,
+    # so setting one there deletes the variable instead.
+    exit 0;
+}
+
+if ($command eq 'run') {
+    my @run_args = @args;
+
+    # A real daemon cannot start a container from an image it does not have:
+    # it pulls the image first and gives up with 125 when that fails.
+    # FAKE_RUN_NEEDS_IMAGE turns that on, which is how a probe whose image
+    # cannot be pulled fails here the way it does on a real daemon.
+    if ($ENV{FAKE_RUN_NEEDS_IMAGE}) {
+        my $image = _run_image(\@run_args);
+        if (defined $image && !-e _image_marker($image)) {
+            my $broken = $ENV{FAKE_PULL_FAILURE};
+            if (defined $broken && length $broken
+                && ($broken eq '*' || $broken eq $image)) {
+                print STDERR "Unable to find image '$image' locally\n";
+                exit 125;
+            }
+
+            open my $marker, '>', _image_marker($image)
+                or die "fake-docker: $!";
+            binmode $marker;
+            print {$marker} $image;
+            close $marker;
+        }
+    }
+
+    my $name = _option_value(\@run_args, '--name');
+
+    # A daemon that refuses to start a container says why on standard error and
+    # exits non-zero, which is the only account of a bad image or a missing
+    # entrypoint a run gets.  FAKE_START_FAILURE holds a substring of the name,
+    # FAKE_START_ERROR what the daemon says, and FAKE_START_EXIT the status it
+    # gives: 125 when it could not create the container, 127 when the runtime
+    # could not exec the entrypoint.
+    if (_start_fails($name)) {
+        my $error = $ENV{FAKE_START_ERROR};
+        print STDERR $error if defined $error && length $error;
+
+        my $status = $ENV{FAKE_START_EXIT};
+        $status = 125 unless defined $status && $status =~ /\A-?\d+\z/;
+        exit $status + 0;
+    }
+
+    if (defined $name) {
+        open my $state, '>', _container_file($name) or die "fake-docker: $!";
+        binmode $state;
+        print {$state} join("\t", @run_args);
+        close $state;
+        print "fake-container-$name\n";
+        exit 0;
+    }
+
+    my $mounts = mounts(\@run_args);
+
+    # The mount probe used by "action-run check": read the marker back from
+    # the mounted temporary directory and count the project entries.
+    if (defined $mounts->{'/action-run-check'}) {
+        exit 1 if $ENV{FAKE_MOUNT_FAILURE};
+
+        my $marker = to_host('/action-run-check/marker', $mounts);
+        my $token = defined $marker && -f $marker ? _slurp($marker) : '';
+        $token = 'wrong' if $ENV{FAKE_BAD_MOUNT};
+
+        my $entries = 0;
+        if (defined $mounts->{'/check-project'}) {
+            if (opendir my $directory, $mounts->{'/check-project'}) {
+                $entries = grep { $_ ne '.' && $_ ne '..' } readdir $directory;
+                closedir $directory;
+            }
+        }
+
+        # A drive Docker Desktop has not shared shows the project as empty, or
+        # as something else entirely.
+        $entries = $ENV{FAKE_ENTRY_COUNT}
+            if defined $ENV{FAKE_ENTRY_COUNT} && length $ENV{FAKE_ENTRY_COUNT};
+
+        binmode STDOUT;
+        print $token, "\n", $entries, "\n";
+        exit 0;
+    }
+
+    # A one-shot "docker run --rm" action.  Its command is a program, so it is
+    # run rather than reported: the paths docker gave the container are mapped
+    # back to the host (that is what the mounts are), which is what makes what
+    # the action prints and the status it exits with the ones the run sees.  A
+    # command built from the control markers is test orchestration rather than
+    # a program and keeps the emulation, and so does a host with no POSIX
+    # shell - which is how the suite still passes on Windows.
+    my $environment = _environment(\@run_args);
+    my $description = join(' ', @run_args);
+
+    if ($description !~ /FAKE_(?:ACTION|ENV|OUTPUT|PATH|SUMMARY|EXIT)/) {
+        my $shell = _host_shell();
+
+        if (defined $shell) {
+            my $status = _run_container($shell, \@run_args, $mounts, $environment);
+            exit $status if defined $status;
+        }
+    }
+
+    _write_action_files($mounts, $environment, $description);
+    exit 0;
+}
+
+if ($command eq 'exec') {
+    my @exec_args = @args;
+    my $name = _exec_container(\@exec_args);
+
+    # A service that only begins restarting once the job is under way: the
+    # marker is what the restart count below reads, so a run that checks only
+    # at startup cannot see the restarts that happened during its steps.
+    if ($ENV{FAKE_RESTART_AFTER_EXEC}) {
+        open my $marker, '>', "$state_dir/exec-seen" or die "fake-docker: $!";
+        close $marker;
+    }
+
+    if ($ENV{FAKE_NO_BASH} && _probes_for(\@args, 'bash')) {
+        exit 1;
+    }
+
+    if ($ENV{FAKE_NO_NODE} && _probes_for(\@args, 'node')) {
+        exit 1;
+    }
+
+    if ($ENV{FAKE_NO_SUDO} && _probes_for(\@args, 'sudo')) {
+        exit 1;
+    }
+
+    # A JavaScript action step: docker exec ... <container> node <script>.
+    # Node accepts CRLF, so these are read in text mode like before.
+    my ($node_script, $node_container) = _node_script(\@exec_args);
+    if (defined $node_script) {
+        my $mounts = _container_mounts($node_container);
+        my $host_script = to_host($node_script, $mounts);
+        my $contents = -f $host_script ? _slurp($host_script) : '';
+        print "[fake-docker] executing node $node_script\n";
+        exit _emulate($contents, $mounts, _environment(\@exec_args));
+    }
+
+    my $script = _script_path(\@exec_args);
+    my $environment = _environment(\@exec_args);
+    my $mounts = _container_mounts($name);
+
+    my $contents = '';
+    my $host_script;
+    if (defined $script) {
+        $host_script = to_host($script, $mounts);
+        if (defined $host_script && -f $host_script) {
+            # Read the script exactly as the shell would: a CR used as a line
+            # ending is part of the command there, so a CRLF script fails.  In
+            # text mode the CR would be translated away and a CRLF regression
+            # in App::Actions::Runner would go unnoticed on Windows.
+            $contents = _slurp_bytes($host_script);
+            print "[fake-docker] executing $script\n";
+            if ($contents =~ /\r\n|\r\z/) {
+                my $kind = $contents =~ /\r\n/ ? 'CRLF' : 'CR';
+                print STDERR "fake-docker: $script has $kind line endings; "
+                    . "a shell would report \$'\\r': command not found\n";
+                exit 127;
+            }
+        }
+    }
+
+    # A step script is a program, so the nearest thing to a container that a
+    # host without one has is to run it: a test can then see what a step
+    # prints and what it writes to GITHUB_ENV, rather than reading a log line
+    # that says a script was found.  A script built from the control markers
+    # (FAKE_ENV and the rest) is test orchestration rather than a program, so
+    # it keeps the emulation, and so does a host with no POSIX shell - which is
+    # what lets the suite pass on Windows.
+    my $shell = defined $host_script ? _host_shell() : undef;
+    if (defined $shell
+        && $contents !~ /^\s*(?:#|\/\/)?\s*FAKE_(?:ENV|OUTPUT|EXIT|PATH|SUMMARY):/m) {
+        exit _execute_script(
+            $shell,
+            $host_script,
+            $mounts,
+            $environment,
+            _option_value(\@exec_args, '-w'),
+        );
+    }
+
+    exit _emulate($contents, $mounts, $environment);
+}
+
+exit 0;
+
+# A POSIX shell to run a step script with, or undef where there is not one:
+# Windows has no sh, and the suite has to pass there too.  bash is preferred
+# because that is the shell the runner uses when the image has one.
+sub _host_shell {
+    return undef if $^O eq 'MSWin32';
+
+    for my $candidate (qw(bash sh)) {
+        for my $directory (File::Spec->path) {
+            next unless defined $directory && length $directory;
+            my $path = File::Spec->catfile($directory, $candidate);
+            return $path if -x $path;
+        }
+    }
+
+    return undef;
+}
+
+# Run a step script the way the container's shell would, with the paths docker
+# exec was given mapped back to the host: that is what makes the files a step
+# writes - GITHUB_ENV, GITHUB_OUTPUT and the rest - the ones the runner reads,
+# which is the whole point of executing instead of emulating.
+sub _execute_script {
+    my ($shell, $script, $mounts, $environment, $workdir, $arguments) = @_;
+
+    return _run_program(
+        $shell,
+        [ '-e', $script, @{ $arguments || [] } ],
+        $mounts, $environment, $workdir,
+    );
+}
+
+# Run a command list the way a container would run it: the program is looked
+# up on the host's PATH, because an image's own binaries are not here to run.
+# "exec \"$@\"" keeps the argument boundaries the runner passed, which is what
+# a shellwords-split "with: args" relies on.
+sub _execute_program {
+    my ($shell, $program, $mounts, $environment, $workdir) = @_;
+
+    return _run_program(
+        $shell,
+        [ '-c', 'exec "$@"', 'sh', @$program ],
+        $mounts, $environment, $workdir,
+    );
+}
+
+# The program a one-shot container would run, and what it would run it with.
+# Returns undef when there is nothing to run - a bare image, whose entrypoint
+# only the image knows - which leaves the caller emulating as before.
+sub _run_container {
+    my ($shell, $args, $mounts, $environment) = @_;
+
+    my (undef, $command) = _run_command($args);
+    my $entrypoint = _option_value($args, '--entrypoint');
+    my $workdir    = _option_value($args, '-w');
+    $workdir = _option_value($args, '--workdir') unless defined $workdir;
+
+    my (@program, @arguments);
+    if (defined $entrypoint && length $entrypoint) {
+        @program   = ($entrypoint);
+        @arguments = @$command;
+    } elsif (@$command) {
+        @program   = ($command->[0]);
+        @arguments = @$command[ 1 .. $#$command ];
+    } else {
+        return undef;
+    }
+
+    # A program that lives in a mount is a file on this host: run it as the
+    # script it is, the way a step script is run, rather than making a shell
+    # look for it by name.
+    my $host = to_host($program[0], $mounts);
+    if (defined $host && -f $host) {
+        return _execute_script(
+            $shell, $host, $mounts, $environment, $workdir, \@arguments,
+        );
+    }
+
+    return _execute_program(
+        $shell, [ @program, @arguments ], $mounts, $environment, $workdir,
+    );
+}
+
+# Run one command with the container's environment and working directory, both
+# mapped back to the host.
+sub _run_program {
+    my ($shell, $arguments, $mounts, $environment, $workdir) = @_;
+
+    my %child = %ENV;
+
+    for my $key (keys %$environment) {
+        my $value = $environment->{$key};
+        if (defined $value && $value =~ m{^/}) {
+            my $host = to_host($value, $mounts);
+            $value = $host if defined $host;
+        }
+        $child{$key} = $value;
+    }
+
+    # The container's PATH names directories that exist only inside it.  The
+    # ones that are mounted are mapped.  The rest are kept, but after the
+    # host's own entries: a directory with the same name here is not the
+    # container's, and taking its tools for the image's would hand a step the
+    # host's perl or python under the image's name.  A shell ignores a
+    # directory that is not there anyway, which is what keeps the rest useful.
+    my @path = (_hostbin());
+    my @unmounted;
+    for my $entry (split /:/, defined $environment->{PATH} ? $environment->{PATH} : '') {
+        next unless length $entry;
+        my $host = to_host($entry, $mounts);
+        if (defined $host) {
+            push @path, $host;
+        } else {
+            push @unmounted, $entry;
+        }
+    }
+    push @path, split /:/, defined $ENV{PATH} ? $ENV{PATH} : '';
+    push @path, @unmounted;
+    $child{PATH} = join ':', grep { defined $_ && length $_ } @path;
+
+    my $directory = defined $workdir ? to_host($workdir, $mounts) : undef;
+    my $restore;
+    if (defined $directory && -d $directory) {
+        $restore = File::Spec->rel2abs(File::Spec->curdir);
+        chdir $directory or undef $restore;
+    }
+
+    my $status;
+    {
+        local %ENV = %child;
+        $status = system($shell, @$arguments);
+    }
+
+    chdir $restore if defined $restore;
+
+    return $status == -1 ? 127 : $status >> 8;
+}
+
+# The commands the fake answers itself.  It reports a Linux daemon, so a
+# workflow that asks the container what it is running on gets the container's
+# answer here rather than the host's, which a real container could differ on
+# (macOS would say Darwin) and a job would then fail for no reason.
+sub _hostbin {
+    my $directory = "$state_dir/hostbin";
+    my $uname = "$directory/uname";
+    return $directory if -f $uname;
+
+    make_path($directory);
+    open my $handle, '>', $uname or die "fake-docker: $!";
+    print {$handle} "#!/bin/sh\necho Linux\n";
+    close $handle;
+    chmod 0755, $uname;
+
+    return $directory;
+}
+
+# A container the daemon refuses to start.  FAKE_START_FAILURE holds a
+# substring of the name, for the same reason as FAKE_CONTAINER_EXITS: a test
+# knows which job it asked for but not the run's generated container name.
+sub _start_fails {
+    my ($name) = @_;
+
+    my $pattern = $ENV{FAKE_START_FAILURE};
+    return 0 unless defined $pattern && length $pattern;
+    return 0 unless defined $name && length $name;
+
+    return index($name, $pattern) >= 0 ? 1 : 0;
+}
+
+# A container the restart policy keeps bringing back: FAKE_CONTAINER_RESTARTS
+# holds a substring of its name, for the same reason as FAKE_CONTAINER_EXITS,
+# and FAKE_CONTAINER_STATE is the state the daemon reports for it, running by
+# default because a container between attempts is up and about to fail again.
+sub _restarting_container {
+    my ($name) = @_;
+
+    my $pattern = $ENV{FAKE_CONTAINER_RESTARTS};
+    return 0 unless defined $pattern && length $pattern;
+    return 0 unless defined $name && length $name;
+
+    return index($name, $pattern) >= 0 ? 1 : 0;
+}
+
+sub _restart_count {
+    my ($name) = @_;
+
+    return 0 unless _restarting_container($name);
+
+    # Until a step has run, the container has not restarted yet.
+    return 0 if $ENV{FAKE_RESTART_AFTER_EXEC} && !-e "$state_dir/exec-seen";
+
+    my $count = $ENV{FAKE_RESTART_COUNT};
+    return 1 unless defined $count && $count =~ /\A\d+\z/;
+
+    return $count + 0;
+}
+
+sub _container_state {
+    my ($name) = @_;
+
+    return 'exited' if _container_died($name);
+    return 'running' unless _restarting_container($name);
+
+    my $state = $ENV{FAKE_CONTAINER_STATE};
+    return defined $state && length $state ? $state : 'running';
+}
+
+# A container that the daemon reports as stopped rather than running.
+# FAKE_CONTAINER_EXITS holds a substring of the container name, because a test
+# knows which service it asked for but not the run's generated name.
+sub _container_died {
+    my ($name) = @_;
+
+    my $pattern = $ENV{FAKE_CONTAINER_EXITS};
+    return 0 unless defined $pattern && length $pattern;
+    return 0 unless defined $name && length $name;
+
+    return index($name, $pattern) >= 0 ? 1 : 0;
+}
+
+sub _died_status {
+    my $status = $ENV{FAKE_CONTAINER_STATUS};
+
+    return 1 unless defined $status && $status =~ /\A-?\d+\z/;
+
+    return $status + 0;
+}
+
+sub _image_marker {
+    my ($image) = @_;
+    $image = '' unless defined $image;
+    $image =~ s/[^A-Za-z0-9_.-]/_/g;
+    return "$state_dir/image-$image";
+}
+
+sub _container_file {
+    my ($name) = @_;
+    $name = '' unless defined $name;
+    $name =~ s/[^A-Za-z0-9_.-]/_/g;
+    return "$state_dir/container-$name";
+}
+
+# The options whose next token is a value rather than the image or the
+# command.  The list is written out here rather than in a variable because
+# this script answers its first command long before it reaches the middle of
+# the file, and a variable assigned down there would still be empty.
+sub _option_takes_value {
+    my ($argument) = @_;
+
+    return 0 unless defined $argument;
+
+    return $argument =~ /\A(?:
+          --name | --network | --hostname | --platform | --entrypoint
+        | --user | --workdir | --volume | --mount | --env | --label
+        | --publish | --memory | --cpus
+        | -v | -w | -e | -u | -p | -m
+    )\z/x ? 1 : 0;
+}
+
+# The image and the command a "docker run" argument list gives the container:
+# the image is the first token that is neither an option nor the value of one,
+# and everything after it is the command.
+sub _run_command {
+    my ($args) = @_;
+
+    for (my $index = 0; $index < @$args; $index++) {
+        my $argument = $args->[$index];
+        next unless defined $argument;
+
+        if (_option_takes_value($argument)) {
+            # Its value is not the image.
+            $index++;
+            next;
+        }
+
+        next if $argument =~ /^-/;
+
+        return ($argument, [ @$args[ $index + 1 .. $#$args ] ]);
+    }
+
+    return (undef, []);
+}
+
+sub _run_image {
+    my ($args) = @_;
+
+    my ($image) = _run_command($args);
+
+    return $image;
+}
+
+sub _option_value {
+    my ($args, $option) = @_;
+    for my $index (0 .. $#$args - 1) {
+        return $args->[$index + 1] if $args->[$index] eq $option;
+    }
+    return undef;
+}
+
+# Whether a docker exec asks the container if it has a command: the probe
+# is sh -c 'command -v "$1" ...' sh NAME.
+sub _probes_for {
+    my ($args, $name) = @_;
+
+    return @$args >= 3 && $args->[-3] =~ /\Acommand -v / && $args->[-1] eq $name;
+}
+
+sub _environment {
+    my ($args) = @_;
+    my %environment;
+    for my $index (0 .. $#$args - 1) {
+        next unless $args->[$index] eq '-e' || $args->[$index] eq '--env';
+        my $value = $args->[$index + 1];
+        next unless defined $value;
+        my ($key, $val) = split /=/, $value, 2;
+        # "-e NAME" takes the value from the client's own environment, as
+        # docker does, and passes nothing when the client has none.
+        if (!defined $val) {
+            next unless exists $ENV{$key};
+            $val = $ENV{$key};
+        }
+        $environment{$key} = $val;
+    }
+    return \%environment;
+}
+
+sub _exec_container {
+    my ($args) = @_;
+    for my $index (0 .. $#$args - 1) {
+        return $args->[$index - 1] if $args->[$index] eq 'sh'
+            && $index > 0 && $args->[$index + 1] eq '-c';
+    }
+    return undef;
+}
+
+sub _node_script {
+    my ($args) = @_;
+
+    for my $index (0 .. $#$args - 1) {
+        next unless $args->[$index] eq 'node' && $index > 0;
+        my $script = $args->[$index + 1];
+        next unless defined $script && $script =~ m{^/};
+        return ($script, $args->[$index - 1]);
+    }
+
+    return;
+}
+
+sub _container_mounts {
+    my ($name) = @_;
+
+    my $mounts = {};
+    return $mounts unless defined $name && -f _container_file($name);
+
+    open my $state, '<', _container_file($name) or die "fake-docker: $!";
+    local $/;
+    my $line = <$state>;
+    close $state;
+    return mounts([ split /\t/, defined $line ? $line : '' ]);
+}
+
+# Whether pulls should record when they started and finished.
+sub _timing {
+    my $timing = $ENV{FAKE_PULL_TIMING};
+    return defined $timing && length $timing && $timing ne '0';
+}
+
+# Add an event and its time to the log, for tests that need to know when a
+# command ran rather than only that it did.
+sub _timed_log {
+    my ($event, $image) = @_;
+
+    my $file = $ENV{FAKE_DOCKER_LOG};
+    return unless defined $file && length $file;
+
+    open my $log, '>>', $file or die "fake-docker: cannot open log: $!";
+    binmode $log;
+    printf {$log} "%s\t%s\t%.6f\n", $event, $image, Time::HiRes::time();
+    close $log;
+
+    return;
+}
+
+sub _slurp {
+    my ($file) = @_;
+
+    open my $handle, '<', $file or die "fake-docker: $!";
+    local $/;
+    my $contents = <$handle>;
+    close $handle;
+
+    return defined $contents ? $contents : '';
+}
+
+# Read a file without the text-mode translation, so that a CR written to disk
+# stays visible.
+sub _slurp_bytes {
+    my ($file) = @_;
+
+    open my $handle, '<', $file or die "fake-docker: $!";
+    binmode $handle;
+    local $/;
+    my $contents = <$handle>;
+    close $handle;
+
+    return defined $contents ? $contents : '';
+}
+
+# The fake shell and fake node only understand comment markers such as
+# "FAKE_ENV: NAME=value".  Both "#" comments and "//" comments are accepted.
+sub _emulate {
+    my ($contents, $mounts, $environment) = @_;
+
+    my $exit_code = 0;
+    if ($contents =~ /^\s*(?:#|\/\/)?\s*FAKE_EXIT:\s*(\d+)/m) {
+        $exit_code = $1;
+    }
+
+    while ($contents =~ /^\s*(?:#|\/\/)?\s*FAKE_ENV:\s*([A-Za-z_][A-Za-z0-9_]*)=(.*)$/mg) {
+        my ($key, $value) = ($1, $2);
+        _append_to_file($mounts, $environment->{GITHUB_ENV}, "$key=$value\n");
+    }
+
+    while ($contents =~ /^\s*(?:#|\/\/)?\s*FAKE_OUTPUT:\s*([A-Za-z_][A-Za-z0-9_]*)=(.*)$/mg) {
+        my ($key, $value) = ($1, $2);
+        _append_to_file($mounts, $environment->{GITHUB_OUTPUT}, "$key=$value\n");
+    }
+
+    # The shell idiom a real workflow uses for the same thing, so a scenario
+    # written as a user would write it can be exercised without a daemon:
+    #     echo "name=value" >> "$GITHUB_OUTPUT"
+    while ($contents =~ /^\s*echo\s+"([A-Za-z_][A-Za-z0-9_]*)=(.*?)"\s*>>\s*"?\$GITHUB_OUTPUT"?\s*$/mg) {
+        _append_to_file($mounts, $environment->{GITHUB_OUTPUT}, "$1=$2\n");
+    }
+    while ($contents =~ /^\s*echo\s+([A-Za-z_][A-Za-z0-9_]*)=(\S+)\s*>>\s*"?\$GITHUB_OUTPUT"?\s*$/mg) {
+        _append_to_file($mounts, $environment->{GITHUB_OUTPUT}, "$1=$2\n");
+    }
+
+    while ($contents =~ /^\s*(?:#|\/\/)?\s*FAKE_PATH:\s*(.+)$/mg) {
+        my $path = $1;
+        _append_to_file($mounts, $environment->{GITHUB_PATH}, "$path\n");
+    }
+
+    if ($contents =~ /^\s*(?:#|\/\/)?\s*FAKE_SUMMARY:\s*(.*)$/m) {
+        my $summary = $1;
+        _append_to_file($mounts, $environment->{GITHUB_STEP_SUMMARY}, "$summary\n");
+    }
+
+    return $exit_code;
+}
+
+sub _script_path {
+    my ($args) = @_;
+    my $command = $args->[-1];
+    return undef unless defined $command;
+    return $1 if $command =~ m{(/github/actions-runner/[^\s'"]+)};
+    return undef;
+}
+
+sub _append_to_file {
+    my ($mounts, $container_path, $text) = @_;
+    return unless defined $container_path && length $container_path;
+    my $host = to_host($container_path, $mounts);
+    return unless defined $host;
+    open my $handle, '>>', $host or die "fake-docker: $!";
+    binmode $handle;
+    print {$handle} $text;
+    close $handle;
+}
+
+sub _write_action_files {
+    my ($mounts, $environment, $description) = @_;
+    return unless $description =~ /FAKE_ACTION/;
+
+    _append_to_file($mounts, $environment->{GITHUB_ENV}, "FROM_ACTION=yes\n");
+    _append_to_file($mounts, $environment->{GITHUB_OUTPUT}, "result=ok\n");
+}

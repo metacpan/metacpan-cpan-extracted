@@ -5,7 +5,7 @@ use warnings;
 use EV;
 
 BEGIN {
-    our $VERSION = '0.04';
+    our $VERSION = '0.05';
     use XSLoader;
     XSLoader::load __PACKAGE__, $VERSION;
 }
@@ -212,6 +212,8 @@ sub getaddrinfo_all {
 # wrapper for the most common active_queries comparison.
 sub is_busy { $_[0]->active_queries > 0 }
 
+sub _callback_error { warn "EV::cares: callback error: $_[0]" }
+
 # wait_idle($timeout_seconds): pump the EV loop until either all of this
 # resolver's pending queries complete or the timeout elapses.  Returns
 # true if the channel drained, false on timeout.  Useful in mostly-
@@ -332,9 +334,9 @@ processing overhead.
 c-ares drives server rotation, retries, timeouts, and search-domain
 appending.  Multiple queries on the same channel run concurrently.
 
-Requires c-ares E<gt>= 1.24 (provided by L<Alien::cares>).
-HTTPS/SVCB/TLSA/DS/DNSKEY/RRSIG parsing requires c-ares E<gt>= 1.28;
-on older builds those types fall through to the raw response buffer.
+Requires c-ares E<gt>= 1.34.8 (provided by L<Alien::cares>).
+For older system libraries, reinstall L<Alien::cares> with
+C<ALIEN_INSTALL_TYPE=share>.
 
 =head1 CONSTRUCTOR
 
@@ -356,7 +358,7 @@ Per-try timeout (fractional seconds).
 
 =item maxtimeout => $seconds
 
-Maximum total timeout across all tries.
+Maximum timeout between retry attempts.
 
 =item tries => $n
 
@@ -408,6 +410,10 @@ Max queries per UDP connection before reconnect.
 
 Enable query result cache; C<$max_ttl> is the upper TTL bound in seconds.
 0 disables the cache.
+
+c-ares 1.31 through 1.34 can mix cache entries for unrecognized types
+(including DS/DNSKEY/RRSIG).  Use C<< qcache => 0 >> when querying
+multiple such types on one resolver.
 
 =item loop => $ev_loop
 
@@ -558,7 +564,7 @@ C<version.bind>) as the optional third argument.  Results are auto-parsed based 
 
 For TLSA (DANE, RFC 6698), C<data> is the raw fingerprint / certificate
 bytes; the integer fields are C<cert_usage> (0..3), C<selector> (0..1),
-and C<matching_type> (0..2).  TLSA parsing requires c-ares E<gt>= 1.28.
+and C<matching_type> (0..2).
 
 For DS / DNSKEY / RRSIG (DNSSEC, RFC 4034) binary fields are raw
 wire-format bytes; integer fields use host byte order.  C<digest>,
@@ -572,8 +578,7 @@ For HTTPS/SVCB, C<%p> may contain C<alpn> (arrayref of protocol IDs),
 C<no_default_alpn> (1 if set), C<port> (integer), C<ipv4hint> /
 C<ipv6hint> (arrayrefs of address strings), C<ech> (opaque bytes),
 C<dohpath> (string), and any unrecognized SVCB param as
-C<keyN =E<gt> $bytes>.  Parsing requires c-ares E<gt>= 1.28; on older
-c-ares HTTPS/SVCB falls through to the raw buffer like unknown types.
+C<keyN =E<gt> $bytes>.
 
 =head2 query
 
@@ -738,9 +743,9 @@ recently and races accordingly.  Remains callable after C<destroy>.
 
     $r->reinit;
 
-Re-read system DNS configuration (resolv.conf, hosts file) without
-destroying the channel.  Useful for long-running daemons where the
-resolver configuration may change at runtime.
+Re-read system DNS configuration (resolv.conf, hosts file) synchronously,
+preserving explicit options.  The resolver must be idle; drain or cancel
+pending queries first.  Croaks when called from a query callback.
 
 =head2 destroy
 

@@ -25,7 +25,7 @@ use Langertha::Engine::Ollama;
 #     the reference, required by the server in practice).
 #   - Gemini 3 (v1beta generateContent): functionResponse.parts[].inlineData;
 #     the multimodal-function-response MIME list names application/pdf
-#     beside the image types, Gemini 3 series only.
+#     beside the image types, Gemini 3 and later (k380).
 #
 # Perplexity's Agent API (/v1/agent) shares the Responses envelope but its
 # FunctionCallOutputInput.output lists only input_text and input_image, so it
@@ -33,10 +33,11 @@ use Langertha::Engine::Ollama;
 # API reference + PDF-files guide, docs.perplexity.ai agent-post reference,
 # ai.google.dev generate-content function-calling guide, fetched 2026-09-30).
 #
-# Gate: the wire must take it for the model (private _tool_result_pdf_on_wire:
-# OpenAIResponses, Gemini 3) AND the model must claim image_input, because
-# both providers document PDF understanding as a vision feature (OpenAI: page
-# text plus page images, "requires models with vision capabilities"). The tool
+# Gate: the engine's tool_result_pdf capability (ADR 0039, k380: composed
+# Role::ToolResultPDF on OpenAIResponses and Gemini, Gemini 3 and later only)
+# with a model that claims image_input, because both providers document PDF
+# understanding as a vision feature (OpenAI: page text plus page images,
+# "requires models with vision capabilities"). The tool
 # loop sends what an MCP server returned, not what the caller chose (the k344
 # reason), so a text-only model keeps the placeholder instead of a possible
 # 400. Every other wire keeps the placeholder too.
@@ -170,14 +171,13 @@ sub responses_output {
 }
 
 subtest 'format_tool_results: responses wire' => sub {
-  # The Role::Tools default is 0 too, so the Perplexity rows below would stay
-  # green without Perplexity's explicit override; pin the override itself, so
-  # the shared envelope's divergence cannot silently follow a changed default.
-  my $method = Langertha::Engine::Perplexity->meta->find_method_by_name('_tool_result_pdf_on_wire');
-  is( $method->original_package_name, 'Langertha::Engine::Perplexity',
-    'Perplexity defines its own _tool_result_pdf_on_wire (not the Role::Tools default)' );
+  # Perplexity shares the Responses envelope; the divergence is that it does
+  # not compose Role::ToolResultPDF (ADR 0039, k380). Pin that decision, so it
+  # cannot silently follow the envelope or OpenAIResponses.
+  ok( !Langertha::Engine::Perplexity->does('Langertha::Role::ToolResultPDF'),
+    'Perplexity does not compose Role::ToolResultPDF' );
   ok( !Langertha::Engine::Perplexity->new( api_key => 'k', model => 'openai/gpt-5.6' )
-    ->_tool_result_pdf_on_wire, '... and it says no' );
+    ->supports('tool_result_pdf'), '... and claims no tool_result_pdf for a vision model' );
 
   is_deeply( responses_output( Langertha::Engine::OpenAIResponses->new( api_key => 'k',
     model => 'gpt-5.6' ) ), [$PDF_FILE], 'OpenAIResponses, vision model: native input_file' );
@@ -203,12 +203,14 @@ sub gemini_fr {
   return $msgs[1]{parts}[0]{functionResponse};
 }
 
-subtest 'format_tool_results: gemini parts only on Gemini 3' => sub {
-  for my $model (qw( gemini-3-flash-preview gemini-3.1-pro-preview gemini-3.8-flash )) {
+subtest 'format_tool_results: gemini parts only on Gemini 3 and later' => sub {
+  # "Gemini 3 and later" (Vertex function-calling docs, 2026-10-19, k380):
+  # gemini-4-argon and a hypothetical gemini-30 carry parts, 2.x does not.
+  for my $model (qw( gemini-3-flash-preview gemini-3.1-pro-preview gemini-3.8-flash gemini-4-argon gemini-30-future )) {
     is_deeply( gemini_fr($model)->{parts},
       [ { inlineData => { mimeType => 'application/pdf', data => $PDF } } ], "$model: parts" );
   }
-  for my $model (qw( gemini-2.5-flash gemini-30-future gemini-3-flash-preview-tts )) {
+  for my $model (qw( gemini-2.5-flash gemini-1.5-pro gemini-3-flash-preview-tts )) {
     my $fr = gemini_fr($model);
     ok( !exists $fr->{parts}, "$model: no parts" );
     is( $fr->{response}{result}, $PDF_PLACEHOLDER, "$model: placeholder string" );

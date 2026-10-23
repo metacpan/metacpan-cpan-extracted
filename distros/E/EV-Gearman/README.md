@@ -1,4 +1,4 @@
-<!-- DO NOT EDIT — regenerated from lib/EV/Gearman.pm POD by tools/gen-readme.pl -->
+<!-- DO NOT EDIT -- regenerated from lib/EV/Gearman.pm POD by tools/gen-readme.pl -->
 
 # NAME
 
@@ -58,13 +58,13 @@ EV::Gearman - asynchronous Gearman client and worker on libev
         my $t; $t = EV::timer 5, 0, sub { $job->complete("done"); undef $t };
     });
 
-    $w->work;                            # GRAB → JOB_ASSIGN → WORK_COMPLETE
+    $w->work;                            # GRAB -> JOB_ASSIGN -> WORK_COMPLETE
     EV::run;
 
 # DESCRIPTION
 
 A pure-XS Gearman client and worker built on the [EV](https://metacpan.org/pod/EV) event loop.
-The binary protocol is implemented directly — no `libgearman` build
+The binary protocol is implemented directly -- no `libgearman` build
 dependency, no glue layer between Perl and a third-party C client.
 
 A single `EV::Gearman` instance can act as a client, a worker, or
@@ -139,8 +139,12 @@ on the wire. Encode UTF-8 yourself before passing data in:
     });
 
 Workload and result values can contain arbitrary bytes including
-embedded NULs — Gearman's framing puts the payload last in the
+embedded NULs -- Gearman's framing puts the payload last in the
 packet and uses the header's length field, so it is not NUL-bounded.
+
+Function names, unique keys, and the client id must not contain
+NUL bytes (only the workload may); NUL-separated framing would
+silently misroute such packets, so they `croak` instead.
 
 # CALLBACK CONVENTIONS
 
@@ -152,6 +156,12 @@ forwarded from the server (e.g. `"INVALID_FUNCTION_NAME: ..."`).
 Callback exceptions are caught with `G_EVAL` and surfaced via
 `warn` so a stray `die` from your code never unwinds the libev
 event loop. Use `EV::break` to abort the loop deliberately.
+
+Callbacks may call back into the object: `disconnect`, `connect`,
+submitting new work, and registering functions are all safe, and
+work submitted on a session you reconnect mid-teardown stays live
+on the new session. Destroying the object from inside its own
+callback is safe too.
 
 # CONSTRUCTOR
 
@@ -199,7 +209,7 @@ truthy value.
 
     Note that a `connect(2)` to a unix socket completes inline, so the
     connection is fully established (and `on_connect` has already fired)
-    before `new` returns — a `$g->on_connect(...)` assigned after
+    before `new` returns -- a `$g->on_connect(...)` assigned after
     construction will never fire for it. Pass `on_connect` to the
     constructor instead (the same can theoretically happen for a TCP
     connect that completes immediately).
@@ -211,11 +221,16 @@ truthy value.
 - `priority => $num`
 
     EV watcher priority in `-2 .. +2`. Higher = serviced before other
-    EV watchers in the same iteration. Default `0`.
+    EV watchers in the same iteration. Default `0`. Out-of-range
+    values are clamped to `-2 .. +2`.
 
 - `keepalive => $seconds`
 
     TCP keepalive idle interval. `0` disables. Ignored on Unix sockets.
+
+    Only the idle time is tuned; probing stays at system defaults, so
+    dead-peer detection still takes minutes. Tune those too for fast
+    failover.
 
 ### Timeouts
 
@@ -234,7 +249,7 @@ truthy value.
     the head request's budget nor shorten it, and once the head is
     answered the next request's own budget applies. A slow reply that
     keeps dribbling in is therefore safe as long as the request completes
-    within its budget — and a genuinely stuck request dies on schedule
+    within its budget -- and a genuinely stuck request dies on schedule
     even on an otherwise busy connection. `0` = no timeout (default).
 
 ### Reconnect
@@ -247,7 +262,9 @@ truthy value.
 
     Wait this many ms before each reconnect attempt. Default `1000`.
     The delay is always honored via a timer, so even `0` defers
-    through the event loop (no synchronous retry recursion).
+    through the event loop (no synchronous retry recursion). The
+    delay is fixed (no jitter/backoff); stagger it per process if a
+    fleet retrying in lockstep matters to you.
 
 - `max_reconnect_attempts => $num`
 
@@ -290,35 +307,39 @@ automatically.
     Fires once the TCP/Unix connection is fully established and the
     client has enqueued its options and worker-function CAN\_DOs.
     Those packets sit ahead of any user submissions made from inside
-    the callback — so submitting a job here is safe even though the
+    the callback -- so submitting a job here is safe even though the
     ability registrations haven't yet hit the socket.
 
     For unix sockets (`path`) the connect completes inline inside
-    `new`, so this callback fires before `new` returns — assign it via
+    `new`, so this callback fires before `new` returns -- assign it via
     the constructor, not after (see `path`).
 
 - `on_disconnect => $cb->()`
 
     Fires after a disconnect, after pending callbacks have been
     cancelled with the disconnect error. For server-initiated close,
-    this fires before `on_error`.
+    this fires before `on_error`. With reconnect enabled, work
+    submitted from here waits for the next session instead of
+    `croak`ing.
 
 # CONNECTION
 
 ## connect($host, \[$port\])
 
 Connect to a TCP host. Port defaults to 4730. Cancels any pending
-auto-reconnect timer and clears any prior `path`.
+auto-reconnect timer and clears any prior `path`. `croak`s if
+already connected or connecting.
 
 ## connect\_unix($path)
 
-Connect via Unix socket.
+Connect via Unix socket. `croak`s if already connected or
+connecting; an overlong path reports via `on_error` instead.
 
 ## disconnect
 
 Disconnect cleanly. Cancels reconnect, drains pending callbacks
 with `(undef, "disconnected")`, fires `on_disconnect`.
-`on_error` does **not** fire on user-initiated disconnect — this
+`on_error` does **not** fire on user-initiated disconnect -- this
 distinguishes it from server-initiated close.
 
 ## is\_connected
@@ -327,6 +348,10 @@ Returns true while a session is established **or** connection is in
 progress.
 
 # CLIENT API
+
+Methods that need the server `croak` `"not connected"` unless a
+session is up, connecting, or a reconnect is pending (then the
+request queues for the next session).
 
 ## echo($data, \[$cb->($echoed, $err)\])
 
@@ -378,9 +403,10 @@ emits no work events to a background submitter.
 ## submit\_job\_epoch($func, $workload, $epoch, \[\\%opts\], \[$cb\])
 
 Schedule a background job for absolute epoch time `$epoch`
-(seconds since 1970-01-01 UTC). Same callback shape as
+(seconds since 1970-01-01 UTC). Must be non-negative -- a negative
+epoch `croak`s instead of wrapping around. Same callback shape as
 `submit_job_bg`: `($handle, $err)` on `JOB_CREATED`. Of
-`%opts`, only `unique` is meaningful — the per-event handlers
+`%opts`, only `unique` is meaningful -- the per-event handlers
 (`on_data`, `on_warning`, etc.) are silently ignored because the
 server delivers no work events to the submitting client for
 scheduled / background jobs.
@@ -389,7 +415,7 @@ scheduled / background jobs.
 observed that the server accepts an epoch job and returns a handle
 but never executes it; a persistent queue type is required for
 scheduled delivery. Other gearmand versions or queue types may
-behave differently — verify against your deployment.
+behave differently -- verify against your deployment.
 
 ## get\_status($handle, $cb->($info, $err))
 
@@ -434,7 +460,7 @@ Async mode: the callback's return value is ignored; you must
 explicitly call `$job->complete($result)`, `$job->fail`,
 or `$job->exception($data)` from a later event. The worker
 loop **does** immediately grab the next job after dispatching to
-your async callback, so async workers process jobs concurrently —
+your async callback, so async workers process jobs concurrently --
 bounded only by what the server has queued. To cap concurrency,
 call `$g->work_stop` in the callback when you reach the cap
 and `$g->work` again from `complete`/`fail` when a slot
@@ -477,18 +503,18 @@ sleep state.
 Dispatch exactly one job, then stop the loop. Issues a
 `GRAB_JOB`; on `NO_JOB` the worker enters `PRE_SLEEP` and
 waits for the server's `NOOP` wake-up just like `work`, so
-this is a "wait for one job" — not "try once and bail" (use
+this is a "wait for one job" -- not "try once and bail" (use
 `grab_job` for that).
 
 In **sync** mode the loop stops after the user callback returns
 and the `WORK_COMPLETE`/`WORK_FAIL` packet has been queued.
 In **async** mode it stops as soon as the user callback has been
-**dispatched** — the job is still in flight at the server until
+**dispatched** -- the job is still in flight at the server until
 the user explicitly calls `$job->complete(...)` or
 `$job->fail`.
 
 The optional `$cb` is invoked when the worker enters the sleep
-state, and shares storage with `work`'s `$on_idle` — calling
+state, and shares storage with `work`'s `$on_idle` -- calling
 `work_one` after `work` overwrites whatever idle handler
 `work` set, and vice versa.
 
@@ -526,17 +552,18 @@ or printable (admin). Multi-line replies are accumulated to the
 
 ## admin($command, \[$cb->($text, $err)\])
 
-Send a raw text command (newline appended automatically). Replies
+Send a raw text command (newline appended automatically).
+Embedded newlines `croak` (a single trailing one is fine). Replies
 are accumulated until the `".\n"` terminator for the multi-line
 commands `status`, `workers`, `prioritystatus` (matched on the
 leading word, so arguments are tolerated), `show jobs`, and
-`show unique jobs` (exact forms only — with extra arguments
+`show unique jobs` (exact forms only -- with extra arguments
 gearmand answers a single-line `ERR` instead); everything else is
 treated as single-line.
 
 A single-line reply beginning with `ERR ` (gearmand's text-protocol
 error prefix, e.g. for an unrecognized command) is delivered as the
-error argument: `$cb->(undef, "ERR UNKNOWN_COMMAND ...")` — not
+error argument: `$cb->(undef, "ERR UNKNOWN_COMMAND ...")` -- not
 as a successful result. The connection stays up.
 
 If a command not in the multi-line set above nevertheless gets a
@@ -563,13 +590,14 @@ Single-line reply (e.g. `"OK 1.1.21+ds"`).
 
 ## maxqueue($func, $size, \[$cb\])
 
-Set the per-function queue size cap. Reply is `"OK\n"`.
+Set the per-function queue size cap. Reply is `"OK"` (the
+terminator is stripped, as for every single-line admin reply).
 
 # INTROSPECTION
 
 ## pending\_count
 
-Number of requests sent and awaiting a response — binary client
+Number of requests sent and awaiting a response -- binary client
 requests, admin (text-protocol) commands, and the worker's in-flight
 `GRAB_JOB` all count.
 
@@ -596,11 +624,14 @@ and (where meaningful) takes effect immediately:
     $g->on_connect($cb);
     $g->on_disconnect($cb);
 
+A defined non-coderef is ignored (the previous handler survives);
+only explicit `undef` clears the slot.
+
 The remaining `new` options (`host`, `port`, `path`,
 `exceptions`, `client_id`, `grab_unique`, ...) are set once at
 construction and have no accessor.
 
-`reconnect` is the exception — it is a setter only; pass `0`/`1`
+`reconnect` is the exception -- it is a setter only; pass `0`/`1`
 plus optional new delay and attempt cap:
 
     $g->reconnect($enable, [$delay_ms], [$max_attempts]);
@@ -627,7 +658,7 @@ then the FD is closed. The clean-shutdown idiom is:
     $g->disconnect;            # drains queues, fires on_disconnect
     undef $g;
 
-If callbacks close over `$g` (a common mistake — every reference
+If callbacks close over `$g` (a common mistake -- every reference
 inside a closure keeps the object alive), break the cycle first:
 
     $g->on_error(undef);
@@ -638,6 +669,19 @@ inside a closure keeps the object alive), break the cycle first:
 DESTROY is reentrancy-safe: if a callback fired during teardown
 drops the last external reference to a separate `EV::Gearman`,
 that object's DESTROY is correctly deferred and run once unwound.
+
+# FORK
+
+Do not use a connected object after `fork` except in the process
+that created it: parent and child share the socket, so running the
+loop on an inherited object steals the other's replies and can
+submit queued jobs twice. `fork` first, then connect in each
+child; a child that never touches the object is harmless.
+
+# SECURITY
+
+Gearman is plaintext with no authentication. Run gearmand on a
+trusted network or wrap the port in an SSH tunnel / stunnel.
 
 # PERFORMANCE
 
@@ -660,7 +704,7 @@ async). Numbers in operations / second:
     sequential round-trip  ~19,000          ~5,900             ~5,400
     background submits    ~248,000          ~5,400              n/a (1)
 
-    (1) Gearman::Client is synchronous — it has neither pipelining
+    (1) Gearman::Client is synchronous -- it has neither pipelining
         nor concurrent background submits.
 
 EV::Gearman is roughly **10x** the foreground throughput of
@@ -673,7 +717,7 @@ ships them in batched writes; responses are demultiplexed by
 handle as they stream back. AnyEvent::Gearman is async but
 serializes one request per round-trip, so it pays a full RTT per
 job.
-- The protocol implementation is C/XS — packet encode/decode,
+- The protocol implementation is C/XS -- packet encode/decode,
 buffer growth, and FIFO bookkeeping run without per-call Perl
 allocations.
 - The IO layer is direct `ev_io` on the gearmand socket, so each
@@ -681,8 +725,8 @@ read/write involves no AnyEvent guard-object construction or
 backend-dispatch overhead.
 
 Background submissions are particularly fast because the
-JOB\_CREATED reply is the only round-trip — no work events to
-demultiplex — so the limit is just network latency and parser
+JOB\_CREATED reply is the only round-trip -- no work events to
+demultiplex -- so the limit is just network latency and parser
 throughput.
 
 Sequential round-trip throughput is the worst case: each job
@@ -712,19 +756,19 @@ large payloads use the repeat operator (`$block x $count`) or
 The `eg/` directory has runnable scripts (point them at a local
 gearmand on `127.0.0.1:4730`):
 
-- **Clients** — `client.pl` (one foreground job), `pipeline.pl`
+- **Clients** -- `client.pl` (one foreground job), `pipeline.pl`
 (concurrent submissions), `background.pl` (fire-and-forget),
 `scheduled.pl` (`submit_job_epoch` delayed jobs), `unique.pl`
 (job coalescing + `get_status_unique`), `event_client.pl`
 (consume `WORK_DATA`/`WORK_STATUS`), `fanout.pl` (scatter/gather),
 `priority_queue.pl`, `json_payload.pl` (structured payloads),
 `retry.pl` (client-side backoff).
-- **Workers** — `worker.pl` (serve forever), `async_worker.pl`
+- **Workers** -- `worker.pl` (serve forever), `async_worker.pl`
 (timer-driven completion), `worker_pool.pl` (concurrency cap),
 `graceful_worker.pl` (drain on `SIGTERM`), `cron_consumer.pl`
 (`grab_job` drain-and-exit batch), `exceptions.pl`
 (`WORK_EXCEPTION` round-trip).
-- **Operations** — `admin.pl`, `monitoring.pl` (poll metrics),
+- **Operations** -- `admin.pl`, `monitoring.pl` (poll metrics),
 `reconnect.pl` (survive a server bounce), `multi_server.pl`
 (round-robin across a farm), `unix_socket.pl` (`connect_unix`),
 `error_handling.pl`, `anyevent.pl` (run under [AnyEvent](https://metacpan.org/pod/AnyEvent)).
@@ -733,12 +777,12 @@ gearmand on `127.0.0.1:4730`):
 
 [EV](https://metacpan.org/pod/EV), [AnyEvent](https://metacpan.org/pod/AnyEvent).
 
-[Gearman::Client](https://metacpan.org/pod/Gearman%3A%3AClient), [Gearman::Worker](https://metacpan.org/pod/Gearman%3A%3AWorker) — the synchronous reference
+[Gearman::Client](https://metacpan.org/pod/Gearman%3A%3AClient), [Gearman::Worker](https://metacpan.org/pod/Gearman%3A%3AWorker) -- the synchronous reference
 client and worker on CPAN.
 
-[AnyEvent::Gearman](https://metacpan.org/pod/AnyEvent%3A%3AGearman) — older AE-based async client.
+[AnyEvent::Gearman](https://metacpan.org/pod/AnyEvent%3A%3AGearman) -- older AE-based async client.
 
-[https://gearman.org/protocol/](https://gearman.org/protocol/) — the upstream protocol spec.
+[https://gearman.org/protocol/](https://gearman.org/protocol/) -- the upstream protocol spec.
 
 This module is one of the `EV-*` family on CPAN by the same
 author: [EV::Memcached](https://metacpan.org/pod/EV%3A%3AMemcached), [EV::Redis](https://metacpan.org/pod/EV%3A%3ARedis), [EV::Nats](https://metacpan.org/pod/EV%3A%3ANats), [EV::Pg](https://metacpan.org/pod/EV%3A%3APg),

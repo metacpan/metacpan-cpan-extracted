@@ -452,7 +452,14 @@ sub sweep {
     my (%o) = @_;
     my (%fail, %seen_class);
     for my $name (sort keys %base) {
-        for my $b (@{ $base{$name} }[0 .. ($o{first_only} ? 0 : $#{ $base{$name} })]) {
+        my @bases = @{ $base{$name} };
+        if ($o{first_only}) {
+            my ($followup) = grep {
+                grep { $_->{followup} } @{ $_->{res}{wire} }
+            } @bases;
+            @bases = ($followup || $bases[0]);
+        }
+        for my $b (@bases) {
             my ($m, $args) = @$b{qw(m args)};
             my %in_base;
             for my $f ($sw->check($b->{res}, $args, undef)) {

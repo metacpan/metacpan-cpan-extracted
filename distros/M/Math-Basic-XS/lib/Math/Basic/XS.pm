@@ -1,21 +1,15 @@
 package Math::Basic::XS;
 
-use 5.006;
+use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
-use base qw/Import::Export/;
+use Ex::Op ();
 
-our %EX = (
-        sum => [qw/all/],
-	min => [qw/all/],
-	max => [qw/all/],
-	mean => [qw/all/],
-	median => [qw/all/],
-	mode => [qw/all/]
-);
+our @EXPORT_OK = qw/sum min max mean median mode/;
+our %EXPORT_TAGS = (all => [@EXPORT_OK]);
 
 require XSLoader;
 XSLoader::load('Math::Basic::XS', $VERSION);
@@ -30,7 +24,7 @@ Math::Basic::XS - basic math faster
 
 =head1 VERSION
 
-Version 0.05
+Version 0.06
 
 =cut
 
@@ -41,6 +35,19 @@ Version 0.05
         my $sum = sum { $_->value } @objects;
 
 =head1 EXPORT
+
+Nothing is exported by default. Ask for each function by name, or for all
+six with the C<all> tag, with or without a leading colon:
+
+        use Math::Basic::XS qw/sum mean/;
+        use Math::Basic::XS qw/all/;
+
+Exporting is done by L<Ex::Op>, so everything L<Exporter> accepts in an
+import list is accepted here too.
+
+Each function calls the block once per value with C<$_> set to a copy of
+that value, and works on the numbers the block returns. With no values,
+C<sum> returns 0 and the others return C<undef>.
 
 =head2 min
 
@@ -69,6 +76,9 @@ Version 0.05
 =head2 median
 
         my $median = median { $_ } @numbers;
+
+The middle value once sorted. For an even count it is the upper of the two
+middle values, not their mean.
 
 =cut
 

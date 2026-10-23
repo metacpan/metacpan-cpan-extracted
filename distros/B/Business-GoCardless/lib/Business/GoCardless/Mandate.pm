@@ -34,7 +34,7 @@ extends 'Business::GoCardless::Resource';
     scheme
     status
     verified_at
-    
+
 =cut
 
 has [ qw/
@@ -65,27 +65,32 @@ has [ qw/
 
     $Mandate->cancel;
 
+    # optionally with metadata
+    $Mandate->cancel( metadata => { ... } );
+
+=head2 reinstate
+
+Reinstate a cancelled or expired mandate:
+
+    $Mandate->reinstate;
+
+    # optionally with metadata
+    $Mandate->reinstate( metadata => { ... } );
+
 =head2 update
 
-    $Mandate->update( %params );
+    $Mandate = $Mandate->update( %params );
 
-note that you can only update the metadata on a mandate, so you must pass the params
+Returns the (updated) Mandate object. note that you can only update the metadata on a mandate, so you must pass the params
 hash as something that looks like:
 
     %params = ( metadata => { ... } );
 
 =cut
 
-sub cancel { shift->_operation( undef,'api_post',undef,'actions/cancel' ); }
-
-sub update {
-    my ( $self,%params ) = @_;
-
-    return $self->client->api_put(
-        sprintf( $self->endpoint,$self->id ),
-        { mandates => { %params } },
-    );
-}
+sub cancel    { shift->_action( 'cancel',@_ ); }
+sub reinstate { shift->_action( 'reinstate',@_ ); }
+sub update    { shift->_update( @_ ); }
 
 =head1 Status checks on a mandate
 
@@ -149,13 +154,13 @@ sub is_vrp_sweeping   { return ( shift->mandate_type // '' ) eq 'vrp_sweeping' }
 
 =head1 AUTHOR
 
-Lee Johnson - C<leejo@cpan.org>
+Lee Johnson - C<lee@payprop.com>
 
 This library is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself. If you would like to contribute documentation,
 features, bug fixes, or anything else then please raise an issue / pull request:
 
-    https://github.com/Humanstate/business-gocardless
+    https://github.com/payprop/business-gocardless
 
 =cut
 

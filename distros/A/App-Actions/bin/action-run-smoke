@@ -1,0 +1,547 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use FindBin ();
+use File::Path qw(make_path);
+use File::Spec ();
+use File::Temp ();
+use Getopt::Long qw(GetOptions);
+use Pod::Usage qw(pod2usage);
+
+# Run straight from a checkout as well as from an installed location.
+BEGIN {
+    my $local = "$FindBin::Bin/../lib";
+    unshift @INC, $local if -f "$local/App/Actions.pm";
+}
+
+use App::Actions;
+use App::Actions::Check;
+
+my $docker_bin;
+my $image = 'alpine:3.20';
+my $platform;
+my $directory = File::Spec->curdir;
+my $scenario = 'smoke';
+my $verbose;
+my $help;
+my $version;
+
+# The image the deferred scenario has a step choose: small, and it prints a
+# banner when it runs, so the action really started.
+my $deferred_action_image = 'hello-world:latest';
+
+Getopt::Long::Configure('no_auto_abbrev', 'no_ignore_case');
+
+GetOptions(
+    'docker=s'    => \$docker_bin,
+    'image=s'     => \$image,
+    'platform=s'  => \$platform,
+    'directory=s' => \$directory,
+    'scenario=s'  => \$scenario,
+    'verbose|v'   => \$verbose,
+    'help|h'      => \$help,
+    'version|V'   => \$version,
+) or pod2usage(-exitval => 2, -verbose => 0);
+
+if ($help) {
+    pod2usage(-exitval => 0, -verbose => 1);
+}
+
+if ($version) {
+    print "action-run-smoke $App::Actions::VERSION\n";
+    exit 0;
+}
+
+if (@ARGV) {
+    pod2usage(
+        -exitval => 2,
+        -verbose => 0,
+        -message => "Usage: action-run-smoke [options]\n",
+    );
+}
+
+if ($scenario ne 'smoke' && $scenario ne 'deferred') {
+    pod2usage(
+        -exitval => 2,
+        -verbose => 0,
+        -message => "Unknown scenario '$scenario'; expected smoke or deferred\n",
+    );
+}
+
+print "action-run-smoke\n";
+print '  directory ', File::Spec->rel2abs($directory), "\n";
+
+# The same report "action-run check" prints, but without its heading or
+# verdict: this command has one heading and one verdict of its own.
+my $check = App::Actions::Check->new(
+    docker_bin => $docker_bin,
+    image      => $image,
+    platform   => $platform,
+    directory  => $directory,
+    title      => '',
+    summary    => 0,
+    # The smoke test prints no document, and its own verdict, so the check's
+    # schema line would name a contract this command does not produce.
+    schema_line => 0,
+);
+
+# The check prints a remedy beside each problem, so nothing is added here.
+if ($check->run != 0) {
+    _problem('the environment is not ready; apply the remedies above, then run this again');
+    print "Result: smoke test failed\n";
+    exit 2;
+}
+
+my $exit = _run_workflow($image, $scenario);
+
+if ($exit != 0) {
+    print "Result: smoke test failed\n";
+    exit($exit == 2 ? 2 : 1);
+}
+
+print "Result: smoke test passed\n";
+exit 0;
+
+# Write a throwaway project, prepare the images it needs, and run its workflow
+# against the real daemon.  The steps check the two things the fake Docker can
+# only pretend to do: that a bind mount from the host works, and that a file
+# written by one step is read by the next.
+sub _run_workflow {
+    my ($workflow_image, $which) = @_;
+
+    my $temp = File::Temp->newdir('action-run-smoke-XXXXXX', TMPDIR => 1, CLEANUP => 1);
+    my $project = "$temp";
+    make_path(File::Spec->catdir($project, '.github', 'workflows'));
+
+    my $workflow_file = File::Spec->catfile(
+        $project, '.github', 'workflows', 'smoke.yml',
+    );
+
+    open my $handle, '>', $workflow_file
+        or return _failed("cannot write '$workflow_file': $!");
+    binmode $handle;
+    print {$handle} _workflow_yaml($workflow_image, $which);
+    close $handle
+        or return _failed("cannot write '$workflow_file': $!");
+
+    my $description = $which eq 'deferred'
+        ? 'one job, two steps, an image a step decides'
+        : 'one job, four steps, GITHUB_ENV and GITHUB_OUTPUT';
+    print "  workflow  $description\n";
+
+    my $actions = eval {
+        App::Actions->new(
+            workflow_file => $workflow_file,
+            project_dir   => $project,
+            docker_bin    => $docker_bin,
+            image         => $workflow_image,
+            platform      => $platform,
+            verbose       => $verbose,
+        );
+    };
+
+    if (my $error = $@) {
+        return _failed(_trim($error));
+    }
+
+    # The images the workflow needs, named one by one.  The probes have
+    # already run, so --skip-check here means "do not probe again", not
+    # "prepare nothing"; a pull that fails stops the smoke test here rather
+    # than halfway through the workflow.
+    # The smoke test prints its own report and no document, so the preflight
+    # leaves its schema line out.
+    my $prepared = eval {
+        $actions->preflight(skip_check => 1, schema_line => 0)
+    };
+
+    if (my $error = $@) {
+        return _failed(_trim($error));
+    }
+
+    _image_problems($prepared->{summary});
+
+    return 2 if $prepared->{exit} != 0;
+
+    # The point of the deferred scenario is the report, so it fails rather
+    # than passing quietly when the preflight named the image instead.
+    if ($which eq 'deferred') {
+        my @deferred = grep { $_->{status} eq 'deferred' }
+            @{ $prepared->{summary}{images} || [] };
+
+        if (!@deferred) {
+            _problem('the preflight did not report the step-decided image as deferred, so this scenario proved nothing');
+            return 2;
+        }
+    }
+
+    my $exit = eval { $actions->run };
+
+    if (my $error = $@) {
+        return _failed(_trim($error));
+    }
+
+    return 0 if $exit == 0;
+
+    _problem('the smoke workflow failed; the steps above say why');
+
+    return $exit == 2 ? 2 : 1;
+}
+
+# No interpolation here: the shell metacharacters and the expression syntax
+# are easier to read when they are not backslashed.  The image is substituted
+# afterwards.
+sub _workflow_yaml {
+    my ($workflow_image, $which) = @_;
+
+    return _deferred_workflow_yaml($workflow_image) if $which eq 'deferred';
+
+    my $yaml = <<'YAML';
+name: Smoke
+on: push
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    container:
+      image: __IMAGE__
+    steps:
+      - name: Write the environment file
+        shell: sh
+        run: |
+          echo "SMOKE_VALUE=hello" >> "$GITHUB_ENV"
+      - name: Write the output file
+        id: values
+        shell: sh
+        run: |
+          echo "answer=42" >> "$GITHUB_OUTPUT"
+      - name: Check that they arrived
+        shell: sh
+        run: |
+          test "$SMOKE_VALUE" = hello || { echo "GITHUB_ENV did not reach this step" >&2; exit 1; }
+          test "${{ steps.values.outputs.answer }}" = 42 || { echo "GITHUB_OUTPUT did not reach this step" >&2; exit 1; }
+          echo env-and-output-ok
+      - name: Check the container
+        shell: sh
+        run: |
+          test "$(uname -s)" = Linux || { echo "the job container is not Linux" >&2; exit 1; }
+          echo container-ok
+YAML
+
+    $yaml =~ s/__IMAGE__/$workflow_image/g;
+
+    return $yaml;
+}
+
+# A workflow whose action image only a step can name.  The preflight can only
+# report it as deferred, and the step that needs it has to prepare it with its
+# own values when it runs.
+sub _deferred_workflow_yaml {
+    my ($workflow_image) = @_;
+
+    my $yaml = <<'YAML';
+name: Deferred image
+on: push
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    container:
+      image: __IMAGE__
+    steps:
+      - name: Decide the image
+        id: pick
+        shell: sh
+        run: echo "image=__ACTION_IMAGE__" >> "$GITHUB_OUTPUT"
+      - name: Run the image the step chose
+        uses: docker://${{ steps.pick.outputs.image }}
+YAML
+
+    $yaml =~ s/__ACTION_IMAGE__/$deferred_action_image/g;
+    $yaml =~ s/__IMAGE__/$workflow_image/g;
+
+    return $yaml;
+}
+
+# The preflight reports a problem with a remedy beside it, as the check does;
+# the image lines above it say which image the problem belongs to.
+sub _image_problems {
+    my ($summary) = @_;
+
+    for my $issue (@{ $summary->{issues} || [] }) {
+        _problem($issue->{problem});
+        print "  remedy    $_\n" for @{ $issue->{remedies} || [] };
+    }
+
+    return;
+}
+
+sub _failed {
+    my ($message) = @_;
+
+    _problem($message);
+    _hints();
+
+    return 2;
+}
+
+sub _problem {
+    my ($message) = @_;
+
+    print "  problem   $message\n";
+
+    return;
+}
+
+# Only Windows needs advice: on Unix a broken daemon is a daemon problem.
+sub _hints {
+    # Only Docker Desktop on Windows has these two ways of going wrong.
+    if ($^O eq 'MSWin32') {
+        print "  hint      Docker Desktop must run Linux containers: right-click the\n";
+        print "            tray icon and choose \"Switch to Linux containers\".\n";
+        print "  hint      The directories above must be on a drive that Docker Desktop\n";
+        print "            shares; see Settings > Resources > File sharing.\n";
+    }
+
+    return;
+}
+
+sub _trim {
+    my ($value) = @_;
+
+    my $trimmed = defined $value ? $value : '';
+    $trimmed =~ s/^\s+//;
+    $trimmed =~ s/\s+$//;
+
+    return $trimmed;
+}
+
+__END__
+
+=head1 NAME
+
+action-run-smoke - check that Docker can run an App::Actions workflow
+
+=head1 SYNOPSIS
+
+    action-run-smoke [options]
+
+Check this computer, with the defaults:
+
+    action-run-smoke
+
+Check the drive your projects are on, and show the Docker commands:
+
+    action-run-smoke --directory ~/src --verbose
+
+On an ARM computer, test x86 images:
+
+    action-run-smoke --platform linux/amd64
+
+Also test an image that only a step can name:
+
+    action-run-smoke --scenario deferred
+
+=head1 DESCRIPTION
+
+B<In short:> run this once after you install App::Actions, or after you
+change Docker.  It checks that Docker works, and then runs a tiny workflow
+for real.  If it says "ready" and the workflow passes, C<action-run> will
+work on this computer.
+
+C<action-run-smoke> is the end-to-end check to run after installing App::Actions
+or after changing Docker, a virtual machine, or a drive's sharing settings.  It
+does what C<action-run check> does and then one more thing: it runs a small
+workflow against the real daemon.
+
+The environment part reports the host platform, the Docker client and daemon
+versions, whether the daemon runs Linux containers, and whether Docker can
+bind-mount a temporary directory and the given directory.
+
+The image part then prepares the images the smoke workflow needs, without
+repeating the probes: it pulls what is missing and prints one line per image
+naming the job, service or action that needs it and whether it was pulled,
+already there, failed, skipped or deferred.  A deferred image is one whose
+name only a step can supply; its expression and the reason it could not be
+resolved are printed, and the step prepares it when the workflow runs.  An
+image that cannot be prepared stops the smoke test before the workflow starts,
+so a mistyped image or a registry login problem is reported here rather than
+halfway through a job.
+
+The workflow part starts one container from the image, runs four steps in it,
+and checks that a variable written to C<GITHUB_ENV> and an output written to
+C<GITHUB_OUTPUT> by one step are seen by the next, and that the container is
+Linux.  Those are the two things the fake Docker used by the test suite cannot
+really prove.
+
+C<--scenario deferred> runs a second, opt-in workflow whose action image is
+decided by a step.  The preflight cannot name that image, so it reports it as
+deferred with the expression it could not resolve; the step then prepares the
+image it chose and runs it.  The scenario fails rather than passing quietly if
+the deferred image was not reported as deferred, since proving that report is
+the whole point of it.
+
+The temporary project is removed afterwards, along with the containers,
+networks and images the run created.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--docker> I<command>
+
+The Docker command.  The default is C<$ENV{DOCKER}> or C<docker>.  A wrapper
+script is used as given; a wrapper written in Perl is run with the current
+interpreter, which is what makes it usable on Windows.
+
+=item B<--image> I<image>
+
+The Linux image used for the mount probe and the smoke workflow.  The default
+is C<alpine:3.20>.
+
+=item B<--platform> I<platform>
+
+Pass C<--platform> to Docker, for example C<linux/amd64> on an ARM host that
+emulates x86 images.
+
+=item B<--scenario> I<name>
+
+The workflow to run.  C<smoke>, the default, runs one job with four steps that
+check C<GITHUB_ENV>, C<GITHUB_OUTPUT> and the container.  C<deferred> runs an
+image that only a step can name: the preflight reports it as deferred rather
+than guessing, and the step prepares it when the workflow runs.  It is
+opt-in because it needs an extra image, C<hello-world:latest>, and because a
+deferral is the one part of the image preparation that the plain scenario
+never reaches.
+
+=item B<--directory> I<directory>
+
+The directory mounted read-only during the mount check, and reported at the
+top of the output.  It defaults to the current directory.  Use a directory on
+the drive where workflows live, so that a drive Docker Desktop has not shared
+is caught here rather than in the middle of a run.
+
+=item B<--verbose>, B<-v>
+
+Show the Docker commands that the smoke workflow runs.
+
+=item B<--help>, B<-h>
+
+Show this help.
+
+=item B<--version>, B<-V>
+
+Show the version.
+
+=back
+
+=head1 EXIT STATUS
+
+0 when the environment is ready, its images are prepared and the smoke workflow
+succeeded, 1 when the environment is ready but the workflow failed, and 2 when
+the environment or an image it needs has to be fixed before a workflow can
+run.
+
+=head1 EXAMPLES
+
+    action-run-smoke
+
+    action-run-smoke --directory C:\src\project
+
+    action-run-smoke --scenario deferred
+
+On Windows, with Docker Desktop:
+
+    C:\> action-run-smoke
+    C:\> action-run-smoke --directory C:\src\project --verbose
+
+Both require Docker Desktop to be running with the WSL 2 Linux engine, so that
+C<docker info --format "{{.OSType}}"> reports C<linux>.  If the report says the
+daemon runs C<windows> containers, switch Docker Desktop to Linux containers
+from its tray icon.  If the mount check fails, share the drive in Settings >
+Resources > File sharing.  Point C<--docker> at another executable when Docker
+is not on C<PATH>:
+
+    C:\> action-run-smoke --docker "C:\Program Files\Docker\Docker\resources\bin\docker.exe"
+
+=head1 COMMON PITFALLS
+
+=over 4
+
+=item * B<It downloads images.>  The first run pulls C<alpine:3.20> (and
+C<hello-world:latest> with C<--scenario deferred>).  It removes the images
+it pulled when it finishes.
+
+=item * B<Docker must run Linux containers.>  On Windows, switch Docker
+Desktop to Linux containers first.
+
+=item * B<C<--directory> must be on the drive you use.>  The default is the
+current directory, which may be on a drive Docker can see even if your
+projects are not.
+
+=item * B<The image needs a shell and the usual tools> (C<sh>, C<cat>,
+C<ls>, C<wc>).  A "distroless" image will fail.
+
+=item * B<Exit status 1 and 2 mean different things.>  2: fix the computer
+or Docker (the report says how).  1: Docker is ready, but the workflow
+failed; run again with C<--verbose> to see why.
+
+=back
+
+=head1 ENCODING
+
+The report is ASCII, apart from folder names and Docker's own output, which
+are shown as bytes.  The C<--directory> path may contain any characters your
+system allows, including non-ASCII characters and emoji.  The smoke workflow
+itself is ASCII.
+
+=head1 AUTHOR
+
+Nigel Horne, C<njh@nigelhorne.com>
+
+=head1 STATE DIAGRAM
+
+What one run of C<action-run-smoke> does:
+
+	 action-run-smoke [options]
+	        |
+	        v
+	+---------------------+  bad option -> usage; exit 2
+	| PARSE OPTIONS       |  --help / --version -> print; exit 0
+	+---------------------+
+	        |
+	        v
+	+---------------------+  Docker missing, not running, Windows
+	| ENVIRONMENT CHECK   |  containers, mount fails
+	| (as action-run      |  -> report with remedies; exit 2
+	|  check)             |
+	+---------------------+
+	        |
+	        v
+	+---------------------+  one line per image: pulled / present /
+	| PREPARE IMAGES      |  failed / skipped / deferred
+	|                     |  an image fails -> exit 2
+	+---------------------+
+	        |
+	        v
+	+---------------------+  smoke: 4 steps check GITHUB_ENV,
+	| RUN THE WORKFLOW    |  GITHUB_OUTPUT and that it is Linux
+	| in a temporary      |  deferred: the step names its image; it
+	| project             |  must have been reported as deferred
+	+---------------------+
+	        |
+	        v
+	+---------------------+  temporary project, containers, networks
+	| CLEAN UP            |  and pulled images removed
+	+---------------------+
+	        |
+	        v
+	  exit 0 = ready and passed, 1 = ready but the workflow failed
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2026 Nigel Horne.
+
+This program is released under the GNU General Public License, version 2.
+See the F<LICENSE> file that comes with this distribution.
+If you use it, please let me know.
+
+=cut

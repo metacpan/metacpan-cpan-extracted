@@ -9,6 +9,7 @@ t/00-load.t
 t/01-test.t
 t/03-longer.t
 t/04-fails.t
+t/05-export.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

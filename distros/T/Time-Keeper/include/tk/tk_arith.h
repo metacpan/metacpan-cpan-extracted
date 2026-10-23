@@ -998,19 +998,21 @@ tk_dur_count(const tk_duration *d, int unit)
     }
 }
 
-/* The seconds a clock unit is. */
+/* secs as a number of the clock unit. A sub-second unit multiplies by
+ * its exact count per second: dividing by an inexact 1e-3 leaves 1.5 s
+ * at 1499.99999999999997 ms where x87 keeps the extra precision. */
 static double
-tk_unit_seconds(int unit)
+tk_secs_in_unit(double secs, int unit)
 {
     switch (unit) {
-    case TK_U_WEEK:        return 604800.0;
-    case TK_U_DAY:         return 86400.0;
-    case TK_U_HOUR:        return 3600.0;
-    case TK_U_MINUTE:      return 60.0;
-    case TK_U_SECOND:      return 1.0;
-    case TK_U_MILLISECOND: return 1e-3;
-    case TK_U_MICROSECOND: return 1e-6;
-    default:               return 1e-9;
+    case TK_U_WEEK:        return secs / 604800.0;
+    case TK_U_DAY:         return secs / 86400.0;
+    case TK_U_HOUR:        return secs / 3600.0;
+    case TK_U_MINUTE:      return secs / 60.0;
+    case TK_U_SECOND:      return secs;
+    case TK_U_MILLISECOND: return secs * 1e3;
+    case TK_U_MICROSECOND: return secs * 1e6;
+    default:               return secs * 1e9;
     }
 }
 
@@ -1029,7 +1031,7 @@ tk_dur_total_from(pTHX_ double *total, const tk_duration *d, int unit, tk_value 
         return 0;
     if (unit >= TK_U_HOUR) {
         tk_value_minus_exact(&end, rel, &es, &en);
-        *total = ((double)es + (double)en / TK_NSECS_PER_SEC) / tk_unit_seconds(unit);
+        *total = tk_secs_in_unit((double)es + (double)en / TK_NSECS_PER_SEC, unit);
         return 1;
     }
     tk_value_until(aTHX_ &n, &end, rel, unit, unit, 1, TK_RM_TRUNC);

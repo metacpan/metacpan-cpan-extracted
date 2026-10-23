@@ -1,0 +1,26 @@
+{
+  "schema_version": 3,
+  "generated_at": 1792540920,
+  "cache_file": "/home/me/.cache/action-run/cache.json",
+  "docker": {
+    "bin": "docker",
+    "reachable": false
+  },
+  "images": [
+    {
+      "image": "alpine:3.20",
+      "pulls": 1,
+      "last_used": null,
+      "age": null,
+      "size": null,
+      "present": null
+    }
+  ],
+  "totals": {
+    "images": 1,
+    "size": null,
+    "present": null,
+    "missing": null
+  },
+  "prune": null
+}

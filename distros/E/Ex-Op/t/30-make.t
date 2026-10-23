@@ -29,7 +29,7 @@ my @accept = (
 
 for my $case (@accept) {
     my ($desc, $code) = @$case;
-    my $name = "acc_" . ($desc =~ s/\W+/_/gr);
+    (my $name = "acc_$desc") =~ s/\W+/_/g;
     ok( Ex::Op::make($name, $code), "accepted: $desc" );
     ok( Ex::Op::is_op($code), "... is_op" );
     is( Ex::Op::why_not($code), undef, '... why_not is undef' );
@@ -66,7 +66,7 @@ my @decline = (
 
 for my $case (@decline) {
     my ($desc, $why, $code) = @$case;
-    my $name = "dec_" . ($desc =~ s/\W+/_/gr);
+    (my $name = "dec_$desc") =~ s/\W+/_/g;
     ok( !Ex::Op::make($name, $code), "declined: $desc" );
     ok( !Ex::Op::is_op($code), "... not is_op" );
     is( Ex::Op::why_not($code), $why, "... because $why" );

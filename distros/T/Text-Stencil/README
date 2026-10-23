@@ -92,8 +92,8 @@ CONSTRUCTOR
   from_file
         my $s = Text::Stencil->from_file('template.tpl', separator => "\n");
 
-    Load template from a file. The file is read as UTF-8. It can use section
-    markers:
+    Load template from a file as UTF-8; malformed UTF-8 is an error. It can
+    use section markers:
 
         __HEADER__
         <table>
@@ -187,11 +187,11 @@ METHODS
 
     Leaving the callback with "last", "next" or "goto" aimed at a label
     outside the sub does not work, but it fails cleanly: the callback runs on
-    a call stack of its own, so the jump finds no such label and dies - Label
-    not found for "last LABEL", or "Can't find label LABEL" for "goto" - which
-    you can catch like any other error. (Before 0.03 it unwound this call
-    mid-flight and the interpreter could resume inside a block it had already
-    left, run the following statements twice, or crash.) "die" is the
+    a call stack of its own, so the jump finds no such label and dies - "Label
+    not found for "last LABEL"", or "Can't find label LABEL" for "goto" -
+    which you can catch like any other error. (Before 0.03 it unwound this
+    call mid-flight and the interpreter could resume inside a block it had
+    already left, run the following statements twice, or crash.) "die" is the
     supported way to abort early; it propagates out of "render_cb" unchanged.
     To stop without an error, return "undef".
 

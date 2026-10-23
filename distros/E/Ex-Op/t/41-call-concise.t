@@ -6,6 +6,10 @@ use Test::More;
 use B::Concise ();
 use Ex::Op ();
 
+# B names a custom op by its registered name from 5.14. Before that every
+# custom op is "custom", and Ex::Op's is the only one here.
+my $XOP = $] < 5.014 ? qr/\bcustom\b/ : qr/\bexop_call\b/;
+
 sub early { my $r = add(1, 2); $r }
 
 BEGIN { Ex::Op::make(add => sub { my ($x, $y) = @_; $x + $y }) }
@@ -24,11 +28,11 @@ sub ops_of {
     return $out;
 }
 
-like(   ops_of('main::later'), qr/\bexop_call\b/, 'a call compiled after make is an exop_call' );
+like(   ops_of('main::later'), $XOP, 'a call compiled after make is an exop_call' );
 unlike( ops_of('main::later'), qr/\bentersub\b/,      '... and not an entersub' );
 like(   ops_of('main::early'), qr/\bentersub\b/,      'a call compiled before make stays an entersub' );
 like(   ops_of('main::amp'),   qr/\bentersub\b/,      '&add(...) stays an entersub' );
-my @calls = ops_of('main::nested') =~ /\bexop_call\b/g;
+my @calls = ops_of('main::nested') =~ /$XOP/g;
 is( scalar @calls, 2, 'both calls in add(add(...)) are rewritten' );
 like(   ops_of('main::declined'), qr/\bentersub\b/,   'a call to a declined sub stays an entersub' );
 

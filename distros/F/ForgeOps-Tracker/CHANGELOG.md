@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.16.0 (2026-10-22)
+
+- Strict privacy: the message fingerprint now also replaces email addresses with `<email>` and quoted
+  values (`"..."`, and `'...'` when the quotes aren't part of a word) with `<str>`, before the existing
+  steps. `KeyError: 'Jane Doe'` and `KeyError: 'Bob Smith'` now group together, and no guessable value sits
+  behind the hash. Errors whose messages contain quotes or emails get new fingerprints once, so they open
+  new issues after upgrading.
+
+## 0.15.1 (2026-10-22)
+
+- The README says what strict privacy does in its opening lines.
+
 ## 0.15.0 (2026-10-20)
 
 - Strict privacy: a raw request path now keeps only its first segment, and the rest is sent as `:path` (`/patients/jane-doe/12` becomes `/patients/:path`; a first segment with a digit or over 40 characters becomes `:id`). Before, only segments holding a digit were replaced, so a path like `/patients/janedoe` went out whole. A route template (`/patients/:id/notes`, `{id}`, `<int:id>`, `[slug]`, `*path`) is kept as it is. This applies everywhere strict privacy names a request or a call by its path: span names and transaction names.

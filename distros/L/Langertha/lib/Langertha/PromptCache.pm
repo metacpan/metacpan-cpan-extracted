@@ -1,6 +1,6 @@
 package Langertha::PromptCache;
 # ABSTRACT: Immutable prompt-caching request control with cross-provider conversion
-our $VERSION = '0.503';
+our $VERSION = '0.504';
 use Moose;
 use Carp qw( croak );
 
@@ -76,7 +76,7 @@ Langertha::PromptCache - Immutable prompt-caching request control with cross-pro
 
 =head1 VERSION
 
-version 0.503
+version 0.504
 
 =head1 SYNOPSIS
 

@@ -1,6 +1,7 @@
 package EV::Nats::JetStream;
 use strict;
 use warnings;
+our $VERSION = '0.06';
 use EV;
 use JSON::PP ();
 
@@ -9,6 +10,7 @@ sub new {
     my $nats    = delete $opts{nats}    || die "nats connection required";
     my $prefix  = delete $opts{prefix}  || '$JS.API';
     my $timeout = delete $opts{timeout} || 5000;
+    warn "EV::Nats::JetStream::new: unknown option '$_'" for keys %opts;
     bless {
         nats    => $nats,
         prefix  => $prefix,
@@ -143,7 +145,8 @@ sub js_publish {
         return $cb->(undef, $err) if $err;
         my ($ack, $derr) = decode_json_or_error($resp);
         return $cb->(undef, $derr) if $derr;
-        return $cb->(undef, "$ack->{error}{description}") if $ack->{error};
+        return $cb->(undef, "$ack->{error}{description} (code $ack->{error}{code})")
+            if $ack->{error};
         $cb->($ack, undef);
     }, $self->{timeout});
 }
@@ -164,11 +167,16 @@ sub js_publish_h {
             if $ack->{error};
         $cb->($ack, undef);
     }, 1);
-    $timer = EV::timer($self->{timeout} / 1000.0, 0, sub {
-        $nats->unsubscribe($sid);
+    $timer = $nats->_timer($self->{timeout} / 1000.0, 0, sub {
+        eval { $nats->unsubscribe($sid) };
         $cb->(undef, "publish timeout");
     });
-    $nats->hpublish($subject, $headers, $payload, $inbox);
+    if (!eval { $nats->hpublish($subject, $headers, $payload, $inbox); 1 }) {
+        my $err = $@;
+        $timer->stop;
+        eval { $nats->unsubscribe($sid) };
+        die $err;
+    }
 }
 
 # Fetch messages (pull consumer).
@@ -199,7 +207,7 @@ sub fetch {
         return if $finished;
         $finished = 1;
         if ($timer) { $timer->stop; undef $timer; }
-        $nats->unsubscribe($sid) if defined $sid;
+        eval { $nats->unsubscribe($sid) } if defined $sid;
         $err ? $cb->(undef, $err) : $cb->(\@messages, undef);
     };
 
@@ -211,11 +219,14 @@ sub fetch {
             my $code = $1;
             # A NATS/1.0 status frame is a control message, never data, so it
             # must not be pushed as a result. 100 = idle heartbeat / flow
-            # control: ignore and keep waiting. Everything else (404 no
-            # messages, 408 expires elapsed, 409 consumer issue, 503 no
-            # responders, 400 bad request, ...) terminates the batch.
+            # control: ignore and keep waiting. 404/408 (no messages, wait
+            # elapsed) end the batch cleanly. Anything else (409 consumer
+            # deleted, 503 no responders, 400 bad request, ...) is a real
+            # failure the caller must see, not an empty batch.
             return if $code == 100;
-            return $finish->();
+            return $finish->() if $code == 404 || $code == 408;
+            my ($status) = split /\r\n/, $headers;
+            return $finish->("fetch failed: $status");
         }
         push @messages, {
             subject => $subject,
@@ -226,13 +237,20 @@ sub fetch {
         $finish->() if @messages >= $batch;
     });
 
-    my %req = (batch => $batch, expires => $expires_ns);
+    my %req = (batch => $batch);
+    # no_wait with an expires is pointless: the server waits the expires
+    # out instead of answering immediately.
+    $req{expires} = $expires_ns unless $no_wait;
     $req{no_wait} = JSON::PP::true() if $no_wait;
     my $req_body = JSON::PP::encode_json(\%req);
     my $subj = "$self->{prefix}.CONSUMER.MSG.NEXT.$stream.$consumer";
-    $nats->publish($subj, $req_body, $inbox);
+    if (!eval { $nats->publish($subj, $req_body, $inbox); 1 }) {
+        my $err = $@;
+        eval { $nats->unsubscribe($sid) };
+        die $err;
+    }
 
-    $timer = EV::timer($expires_sec + 1, 0, sub {
+    $timer = $nats->_timer($expires_sec + 1, 0, sub {
         $finish->();
     });
     return;
@@ -399,6 +417,7 @@ Maximum number of messages to fetch (default 1).
 =item C<expires>
 
 Server-side wait time in nanoseconds (default 5_000_000_000 = 5s).
+Ignored with C<no_wait>.
 
 =item C<no_wait>
 
@@ -420,6 +439,10 @@ To acknowledge a message:
     $nats->publish($msg->{reply}, '+ACK');   # success
     $nats->publish($msg->{reply}, '-NAK');   # negative --redeliver after ack_wait
     $nats->publish($msg->{reply}, '+WPI');   # work-in-progress --extend ack_wait
+
+An abnormal server status (e.g. 409, the consumer was deleted
+mid-fetch) arrives as C<$err>. An unknown stream or consumer yields
+an empty batch after C<expires>: the server answers nothing at all.
 
 =head1 INTERNAL
 

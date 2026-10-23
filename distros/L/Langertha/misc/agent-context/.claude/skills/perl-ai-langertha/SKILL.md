@@ -58,7 +58,7 @@ Flag names: `chat streaming tools_native tool_choice_{auto,any,none,named} tools
 response_format_json_{object,schema} embedding transcription image_generation temperature
 reasoning_effort prompt_cache prompt_cache_key cached_content seed context_size response_size
 system_prompt keep_alive parallel_tool_use runtime_metrics prefix_caching server_tools
-image_input` (`image_input` is model-scoped: "this model sees images"; it never blocks sending)
+image_input stream_usage` (`image_input` is model-scoped: "this model sees images"; it never blocks sending)
 (the `%ROLE_TO_CAPS` map in `Langertha::Role::Capabilities` is the authority).
 
 - The answer is evaluated for the current `chat_model` — the same engine class can answer

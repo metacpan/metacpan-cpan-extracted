@@ -26,7 +26,9 @@ my $ch; $ch = EV::ClickHouse->new(
         # Demo: a fast query (filtered) + a slow one (logged).
         $ch->query("select 1", sub { });
         $ch->query("select sleep(0.2), 'slow one'", sub {
-            EV::timer(0.1, 0, sub { EV::break });
+            # Keep the watcher: a discarded EV::timer is destroyed
+            # immediately and never fires.
+            my $done; $done = EV::timer(0.1, 0, sub { undef $done; EV::break });
         });
     },
     on_error => sub { warn "ch: $_[0]\n"; EV::break },

@@ -295,7 +295,7 @@ static yyjson_mut_val * sv_to_yyjson_val(pTHX_ yyjson_mut_doc *doc, SV *sv,
 typedef struct {
     yyjson_mut_doc *doc;   /* the mutable document */
     yyjson_mut_val *root;  /* value this handle points at (may be subtree) */
-    SV *owner;             /* NULL=owns doc, non-NULL=RV to parent Doc (borrowed) */
+    SV *owner;             /* NULL=owns doc, non-NULL=parent Doc referent */
 } json_yy_doc_t;
 
 static int
@@ -400,7 +400,7 @@ static OP * pp_jget_impl(pTHX) {
     if (!val)
         croak("jget: path not found: %.*s", (int)path_len, path);
 
-    SV *result = new_doc_sv(aTHX_ d->doc, val, doc_sv);
+    SV *result = new_doc_sv(aTHX_ d->doc, val, SvRV(doc_sv));
     XPUSHs(sv_2mortal(result));
     RETURN;
 }
@@ -469,12 +469,19 @@ doc_set_at_path(pTHX_ json_yy_doc_t *d, const char *path, STRLEN path_len,
 /* pp_jset: set value at path */
 static OP * pp_jset_impl(pTHX) {
     dSP;
-    SV *value_sv = POPs;
-    SV *path_sv = POPs;
-    SV *doc_sv = POPs;
+    SV *value_sv = TOPs;
+    SV *path_sv = *(SP - 1);
+    SV *doc_sv = *(SP - 2);
     json_yy_doc_t *d = get_doc(aTHX_ doc_sv);
     STRLEN path_len;
-    const char *path = sv_pv_utf8_nomod(aTHX_ path_sv, &path_len);
+    const char *path;
+    /* TO_JSON below runs arbitrary Perl, which may drop the document's last
+       reference or reallocate the path scalar while d and path are still live.
+       Pin the referent -- not doc_sv, which is the caller's scalar and can be
+       emptied -- and work from a snapshot of the path. */
+    if (SvROK(doc_sv))
+        sv_2mortal(SvREFCNT_inc(SvRV(doc_sv)));
+    path = sv_pv_utf8_nomod(aTHX_ sv_2mortal(newSVsv(path_sv)), &path_len);
 
     yyjson_mut_val *new_val;
 
@@ -495,7 +502,9 @@ static OP * pp_jset_impl(pTHX) {
 
     doc_set_at_path(aTHX_ d, path, path_len, new_val, "jset");
 
-    XPUSHs(doc_sv);
+    SPAGAIN;
+    SP -= 2;
+    SETs(doc_sv);
     RETURN;
 }
 
@@ -662,7 +671,7 @@ static OP * pp_jnum_impl(pTHX) {
             croak("jnum: cannot use NaN or Infinity as a JSON number");
     } else if (SvPOKp(val_sv)) {
         STRLEN nlen;
-        const char *nstr = SvPV_const(val_sv, nlen);
+        const char *nstr = SvPV_nomg(val_sv, nlen);
         UV uv;
         int m_int_ok = 0;
         int t = grok_number(nstr, nlen, &uv);
@@ -674,9 +683,9 @@ static OP * pp_jnum_impl(pTHX) {
             if (!(t & IS_NUMBER_NEG))                       { kind = NUM_UINT; uval = u; m_int_ok = 1; }
             else if (u <= (uint64_t)INT64_MAX)              { kind = NUM_SINT; ival = -(int64_t)u; m_int_ok = 1; }
             else if (u == (uint64_t)INT64_MAX + 1)          { kind = NUM_SINT; ival = INT64_MIN; m_int_ok = 1; }
-            else                                              nval = SvNV(val_sv);
+            else                                              nval = SvNV_nomg(val_sv);
         } else {
-            nval = SvNV(val_sv);
+            nval = SvNV_nomg(val_sv);
         }
         /* "1e999" groks fine but overflows to Inf as a double; reject it here
            rather than building a document that only fails later on write */
@@ -829,7 +838,7 @@ typedef struct {
     int is_obj;
     yyjson_mut_val *cur_key;   /* for objects: key from last jnext */
     yyjson_mut_doc *doc;
-    SV *owner;                 /* refcounted parent Doc SV */
+    SV *owner;                 /* refcounted parent Doc referent */
 } json_yy_iter_t;
 
 static int
@@ -879,8 +888,8 @@ static OP * pp_jiter_impl(pTHX) {
     json_yy_iter_t *it;
     Newxz(it, 1, json_yy_iter_t);
     it->doc = d->doc;
-    it->owner = doc_sv;
-    SvREFCNT_inc_simple_void_NN(doc_sv);
+    it->owner = SvRV(doc_sv);
+    SvREFCNT_inc_simple_void_NN(it->owner);
     it->cur_key = NULL;
 
     if (yyjson_mut_is_obj(val)) {
@@ -995,7 +1004,7 @@ static OP * pp_jmerge_impl(pTHX) {
 /* pp_jfrom: create Doc from Perl data (not JSON string) */
 static OP * pp_jfrom_impl(pTHX) {
     dSP;
-    SV *data = POPs;
+    SV *data = TOPs;
 
     yyjson_mut_doc *doc = yyjson_mut_doc_new(NULL);
     if (!doc) croak("jfrom: failed to create document");
@@ -1016,7 +1025,8 @@ static OP * pp_jfrom_impl(pTHX) {
     /* transfer doc ownership to the Doc SV; disarm the guard */
     mg_findext(guard, PERL_MAGIC_ext, &mut_docholder_vtbl)->mg_ptr = NULL;
     SV *result = new_doc_sv(aTHX_ doc, root, NULL);
-    XPUSHs(sv_2mortal(result));
+    SPAGAIN;
+    SETs(sv_2mortal(result));
     RETURN;
 }
 
@@ -1037,7 +1047,7 @@ static OP * pp_jvals_impl(pTHX) {
     yyjson_mut_val *key, *v;
     EXTEND(SP, (SSize_t)yyjson_mut_obj_size(val));
     yyjson_mut_obj_foreach(val, idx, max, key, v) {
-        SV *vsv = new_doc_sv(aTHX_ d->doc, v, doc_sv);
+        SV *vsv = new_doc_sv(aTHX_ d->doc, v, SvRV(doc_sv));
         PUSHs(sv_2mortal(vsv));
     }
     RETURN;
@@ -1149,6 +1159,8 @@ static OP * pp_jread_impl(pTHX) {
     SV *path_sv = POPs;
     STRLEN len;
     const char *path = SvPV(path_sv, len);
+    if (memchr(path, '\0', len))
+        croak("jread: filename contains a NUL byte");
 
     yyjson_read_err err;
     yyjson_doc *idoc = yyjson_read_file(path, YYJSON_READ_NOFLAG, NULL, &err);
@@ -1175,6 +1187,8 @@ static OP * pp_jwrite_impl(pTHX) {
     json_yy_doc_t *d = get_doc(aTHX_ doc_sv);
     STRLEN len;
     const char *path = SvPV(path_sv, len);
+    if (memchr(path, '\0', len))
+        croak("jwrite: filename contains a NUL byte");
 
     yyjson_write_err werr;
     /* write the subtree root, not necessarily the full doc */
@@ -1337,7 +1351,7 @@ static OP * pp_jfind_impl(pTHX) {
             m_num = 1;
             m_neg = (t & IS_NUMBER_NEG) ? 1 : 0;
             if (!(t & IS_NUMBER_NOT_INT) && (t & IS_NUMBER_IN_UV)) m_int = 1;
-            else m_nv = SvNV(match_sv);
+            else m_nv = SvNV_nomg(match_sv);
         }
     }
 
@@ -1356,7 +1370,7 @@ static OP * pp_jfind_impl(pTHX) {
         /* compare: string match */
         if (yyjson_mut_is_str(field)) {
             if (yyjson_mut_equals_strn(field, match, match_len)) {
-                SV *result = new_doc_sv(aTHX_ d->doc, item, doc_sv);
+                SV *result = new_doc_sv(aTHX_ d->doc, item, SvRV(doc_sv));
                 XPUSHs(sv_2mortal(result));
                 RETURN;
             }
@@ -1386,7 +1400,7 @@ static OP * pp_jfind_impl(pTHX) {
                 eq = ((double)nv == yyjson_mut_get_num(field));
             }
             if (eq) {
-                SV *result = new_doc_sv(aTHX_ d->doc, item, doc_sv);
+                SV *result = new_doc_sv(aTHX_ d->doc, item, SvRV(doc_sv));
                 XPUSHs(sv_2mortal(result));
                 RETURN;
             }
@@ -1396,7 +1410,7 @@ static OP * pp_jfind_impl(pTHX) {
             bool bval = yyjson_mut_get_bool(field);
             if ((bval && match_len == 4 && memcmp(match, "true", 4) == 0) ||
                 (!bval && match_len == 5 && memcmp(match, "false", 5) == 0)) {
-                SV *result = new_doc_sv(aTHX_ d->doc, item, doc_sv);
+                SV *result = new_doc_sv(aTHX_ d->doc, item, SvRV(doc_sv));
                 XPUSHs(sv_2mortal(result));
                 RETURN;
             }
@@ -1404,7 +1418,7 @@ static OP * pp_jfind_impl(pTHX) {
         /* compare: null -- match against the string "null" */
         else if (yyjson_mut_is_null(field)) {
             if (match_len == 4 && memcmp(match, "null", 4) == 0) {
-                SV *result = new_doc_sv(aTHX_ d->doc, item, doc_sv);
+                SV *result = new_doc_sv(aTHX_ d->doc, item, SvRV(doc_sv));
                 XPUSHs(sv_2mortal(result));
                 RETURN;
             }
@@ -1510,14 +1524,15 @@ static SV *
 yyjson_val_to_sv(pTHX_ yyjson_val *val, U32 budget, const json_yy_decode_ctx_t *ctx) {
     switch (yyjson_get_type(val)) {
         case YYJSON_TYPE_NULL:
-            return SvREFCNT_inc_simple_NN(&PL_sv_undef);
+            return newSV(0);
 
         case YYJSON_TYPE_BOOL:
             if (ctx && (ctx->flags & F_BOOL))
                 return newSVsv(yyjson_get_bool(val) ? ctx->bool_true : ctx->bool_false);
-            return yyjson_get_bool(val)
-                ? SvREFCNT_inc_simple_NN(&PL_sv_yes)
-                : SvREFCNT_inc_simple_NN(&PL_sv_no);
+            /* A copy, not newSViv: the slot has to be writable, but sv_setsv
+               carries SVf_IsBOOL across, so is_bool() and false's empty-string
+               form survive -- newSViv loses both. */
+            return newSVsv(yyjson_get_bool(val) ? &PL_sv_yes : &PL_sv_no);
 
         case YYJSON_TYPE_NUM:
             return yyjson_num_to_sv(aTHX_ val);
@@ -1582,12 +1597,10 @@ static SV *
 yyjson_mut_val_to_sv(pTHX_ yyjson_mut_val *val, U32 budget) {
     switch (yyjson_mut_get_type(val)) {
         case YYJSON_TYPE_NULL:
-            return SvREFCNT_inc_simple_NN(&PL_sv_undef);
+            return newSV(0);
 
         case YYJSON_TYPE_BOOL:
-            return yyjson_mut_get_bool(val)
-                ? SvREFCNT_inc_simple_NN(&PL_sv_yes)
-                : SvREFCNT_inc_simple_NN(&PL_sv_no);
+            return newSVsv(yyjson_mut_get_bool(val) ? &PL_sv_yes : &PL_sv_no);
 
         case YYJSON_TYPE_NUM:
             return yyjson_mut_num_to_sv(aTHX_ val);
@@ -1685,6 +1698,7 @@ yyjson_val_to_sv_ro(pTHX_ yyjson_val *val, SV *doc_sv, U32 budget) {
                 av_push(av, item_sv);
             }
             SvREADONLY_on((SV *)av);
+            SvREADONLY_on(rv);
             return rv;
         }
 
@@ -1708,6 +1722,7 @@ yyjson_val_to_sv_ro(pTHX_ yyjson_val *val, SV *doc_sv, U32 budget) {
                     hv_store(hv, kstr, (I32)klen, val_sv, 0);
             }
             SvREADONLY_on((SV *)hv);
+            SvREADONLY_on(rv);
             return rv;
         }
 
@@ -1962,6 +1977,14 @@ buf_cat_iv(pTHX_ SV *buf, IV val) {
 
 static void
 buf_cat_nv(pTHX_ SV *buf, NV val) {
+#if NVSIZE == 8
+    /* Shortest round-tripping decimal, without allocating a temporary SV. */
+    yyjson_val num = {0};
+    char tmp[40];
+    yyjson_set_real(&num, val);
+    char *end = yyjson_write_number(&num, tmp);
+    buf_cat_mem(aTHX_ buf, tmp, end - tmp);
+#else
     /* Stringify via Perl's NV->PV: sv_2pv does the correct per-nvtype thing
        (Gconvert for double/long double, quadmath_snprintf for __float128) and
        forces a C-locale '.' radix -- avoiding both the quadmath Gconvert
@@ -1981,6 +2004,7 @@ buf_cat_nv(pTHX_ SV *buf, NV val) {
         }
     }
     buf_cat_mem(aTHX_ buf, s, len);
+#endif
 }
 
 static json_yy_t default_self = { F_UTF8 | F_ALLOW_NONREF, MAX_DEPTH_DEFAULT };
@@ -2025,10 +2049,12 @@ sv_num_is_faithful(pTHX_ SV *sv, const char *str, STRLEN len) {
 #else
 /* no bool flag before 5.36: match the shape perl gives a copy of !!1 / !!0 --
    all three slots set, with PV "1"/IV 1 or PV ""/IV 0. An ordinary string that
-   was merely used numerically does not get all three. */
+   was merely used numerically does not get all three.
+   Private flags, not public: before 5.18 sv_setsv into a magical destination
+   sets only pIOK/pNOK/pPOK, so a tied boolean has no public flag to test. */
 #  define SV_IS_BOOL(sv)                                                   \
      ((sv) == &PL_sv_yes || (sv) == &PL_sv_no ||                           \
-      (SvIOK(sv) && SvNOK(sv) && SvPOK(sv) &&                              \
+      (SvIOKp(sv) && SvNOKp(sv) && SvPOKp(sv) &&                           \
        ((SvCUR(sv) == 0 && SvIVX(sv) == 0) ||                              \
         (SvCUR(sv) == 1 && SvPVX(sv)[0] == '1' && SvIVX(sv) == 1))))
 #endif
@@ -2156,7 +2182,7 @@ direct_encode_sv(pTHX_ SV *buf, SV *sv, U32 depth, json_yy_t *self) {
         croak("cannot encode NaN or Infinity as JSON");
 
     if (SV_IS_BOOL(sv)) {
-        buf_cat_c(aTHX_ buf, SvTRUE(sv) ? '1' : '0');
+        buf_cat_c(aTHX_ buf, SvTRUE_nomg(sv) ? '1' : '0');
         return;
     }
 
@@ -2307,7 +2333,7 @@ sv_to_yyjson_val(pTHX_ yyjson_mut_doc *doc, SV *sv, json_yy_t *self, U32 depth) 
         croak("cannot encode NaN or Infinity as JSON");
 
     if (SV_IS_BOOL(sv))
-        return yyjson_mut_sint(doc, SvTRUE(sv) ? 1 : 0);
+        return yyjson_mut_sint(doc, SvTRUE_nomg(sv) ? 1 : 0);
 
     /* see sv_num_is_faithful(). One SvPV for the whole branch: fetching twice
        could emit a different string than the one just tested. */
@@ -2859,6 +2885,8 @@ CODE:
 
     /* check nonref */
     if (!(self->flags & F_ALLOW_NONREF)) {
+        if (SvGMAGICAL(data))
+            data = sv_2mortal(newSVsv(data));
         if (!SvROK(data) || (SvTYPE(SvRV(data)) != SVt_PVAV && SvTYPE(SvRV(data)) != SVt_PVHV))
             croak("hash- or arrayref expected (not a simple scalar)");
     }

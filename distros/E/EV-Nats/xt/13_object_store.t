@@ -16,7 +16,8 @@ my $os     = EV::Nats::ObjectStore->new(js => $js, bucket => $bucket, chunk_size
 
 js_or_skip($nats, sub { my ($d) = @_; $os->create_bucket({}, sub { $d->($_[1]) }) });
 
-plan tests => 9;
+plan tests => 13;
+my $guard;  # kept: an unkept EV::timer never fires
 pass 'create_bucket';
 
 my $payload = 'A' x 100;  # 100 / 32 = 4 chunks
@@ -35,7 +36,7 @@ $os->put('report.txt', $payload, sub {
         });
     });
 });
-EV::timer(10, 0, sub { EV::break });
+$guard = EV::timer(10, 0, sub { EV::break });
 EV::run;
 
 is $put_info->{chunks}, 4, 'put produces 4 chunks for 100B with 32B chunk_size';
@@ -47,7 +48,7 @@ is $info->{name}, 'report.txt', 'info returns correct metadata' if $info;
 # status: shape sanity (sealed should be 0; this client never seals)
 my $status;
 $os->status(sub { $status = $_[0]; EV::break });
-EV::timer(3, 0, sub { EV::break });
+$guard = EV::timer(3, 0, sub { EV::break });
 EV::run;
 ok $status && $status->{bucket} eq $bucket, 'status returns bucket name';
 is $status->{sealed}, 0, 'status.sealed is 0 by default';
@@ -66,13 +67,35 @@ $os->delete('report.txt', sub {
         });
     });
 });
-EV::timer(5, 0, sub { EV::break });
+$guard = EV::timer(5, 0, sub { EV::break });
 EV::run;
 is $info_after, undef, 'delete tombstones the object (info returns undef)';
 ok ref($list_after) eq 'ARRAY' && (grep { $_ eq 'report.txt' } @$list_after),
    'list still surfaces the deleted entry (filter via info)';
 
+# Missing, empty, and deleted objects
+my ($miss_data, $miss_err, $empty_chunks, $empty_data, $del_data, $del_err);
+$os->get('no-such-object', sub {
+    ($miss_data, $miss_err) = @_;
+    $os->put('empty.txt', '', sub {
+        $empty_chunks = $_[0] ? $_[0]->{chunks} : undef;
+        $os->get('empty.txt', sub {
+            ($empty_data) = @_;
+            $os->get('report.txt', sub {
+                ($del_data, $del_err) = @_;
+                EV::break;
+            });
+        });
+    });
+});
+$guard = EV::timer(8, 0, sub { EV::break });
+EV::run;
+ok !defined($miss_data) && !defined($miss_err), 'get on missing object is a clean miss';
+is $empty_chunks, 1, 'empty object stored as one chunk';
+ok defined($empty_data) && $empty_data eq '', 'empty object reads back as empty string';
+ok !defined($del_data) && !defined($del_err), 'get on deleted object is a clean miss';
+
 $os->delete_bucket(sub { EV::break });
-EV::timer(3, 0, sub { EV::break });
+$guard = EV::timer(3, 0, sub { EV::break });
 EV::run;
 $nats->disconnect;

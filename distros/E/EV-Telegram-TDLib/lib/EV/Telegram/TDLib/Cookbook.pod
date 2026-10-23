@@ -397,12 +397,13 @@ requests:
                $state->{complete} ? '' : ' (max_pages hit, more exist)';
         # newest first; resume older with:
         # $td->history($chat_id, limit => 200,
-        #     from_message_id => $state->{last_message_id}, sub { ... });
+        #     from_message_id => $state->{next_from_message_id}, sub { ... });
     });
 
 C<< $state->{complete} >> is true when the limit was reached or the
 history was exhausted; C<< $state->{last_message_id} >> is the id of
-the oldest message fetched, for resuming.
+the oldest message fetched. Resume with C<< $state->{next_from_message_id} >>
+when it is defined.
 
 =head2 Downloading a file with progress
 

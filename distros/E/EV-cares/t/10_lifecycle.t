@@ -127,4 +127,61 @@ use EV::cares qw(:all);
     is($edestruction, 2, 'stranded callbacks fired with ARES_EDESTRUCTION');
 }
 
+{
+    my $r = EV::cares->new(servers => '127.0.0.1:9');
+    my ($original, $replacement) = (0, 0);
+    my $cb = sub { $original++ };
+    $r->query('callback.test.', C_IN, T_A, $cb);
+    $cb = sub { $replacement++ };
+    $r->cancel;
+    is($original, 1, 'queued request retains the original callback');
+    is($replacement, 0, 'reassigning callback variable does not replace it');
+
+    $cb = sub { $original++ };
+    $r->query('callback.test.', C_IN, T_A, $cb);
+    undef $cb;
+    $r->cancel;
+    is($original, 2, 'queued callback survives clearing its variable');
+    is($r->active_queries, 0, 'retained callbacks drain normally');
+}
+
+{
+    my $r = EV::cares->new(lookups => 'f');
+    local $SIG{__WARN__} = sub { die "warning hook failed\n" };
+    eval { $r->resolve('localhost', sub { die "callback failed\n" }) };
+    is($@, '', 'dying warning hook cannot unwind through c-ares');
+    is($r->active_queries, 0, 'callback error still releases its request');
+    $r->destroy;
+    ok($r->is_destroyed, 'resolver tears down after warning hook failure');
+}
+
+{
+    my $conf = File::Temp->new(SUFFIX => '.conf');
+    print $conf "nameserver 127.0.0.1\n";
+    close $conf;
+    my $r = EV::cares->new(resolvconf => $conf->filename);
+    SKIP: {
+        skip 'ARES_OPT_RESOLVCONF not reliable on macOS', 3 if $^O eq 'darwin';
+        for my $last (2 .. 4) {
+            open my $fh, '>', $conf->filename or die $!;
+            print $fh "nameserver 127.0.0.$last\n";
+            close $fh;
+            $r->reinit;
+            like($r->servers, qr/127\.0\.0\.$last\b/, 'reinit applies new servers before returning');
+        }
+    }
+    $r->set_servers('127.0.0.5:5353', '[::1]:5354');
+    my $servers = $r->servers;
+    $r->reinit;
+    is($r->servers, $servers, 'reinit preserves explicit server addresses and ports');
+
+    $r->query('pending.test.', C_IN, T_A, sub {});
+    eval { $r->reinit };
+    like($@, qr/must be idle/, 'busy reinit is rejected');
+    is($r->active_queries, 1, 'rejected reinit leaves the request intact');
+    $r->cancel;
+    $r->reinit;
+    is($r->active_queries, 0, 'reinit works after cancellation');
+}
+
 done_testing;

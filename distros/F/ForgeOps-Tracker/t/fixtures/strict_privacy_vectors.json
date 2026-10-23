@@ -104,6 +104,101 @@
       "message": "deadbeef-dead-beef-dead-beefdeadbeef9",
       "normalized": "deadbeef-dead-beef-dead-beefdeadbeef9",
       "fingerprint": "7170eee52b8572cdf20868d8cdae3b1b"
+    },
+    {
+      "message": "KeyError: 'Jane Doe'",
+      "normalized": "KeyError: <str>",
+      "fingerprint": "bd85ed2d417ae88441bd339b3111da79"
+    },
+    {
+      "message": "KeyError: 'Bob Smith'",
+      "normalized": "KeyError: <str>",
+      "fingerprint": "bd85ed2d417ae88441bd339b3111da79"
+    },
+    {
+      "message": "Couldn't find Patient with 'id'=12",
+      "normalized": "Couldn't find Patient with <str>=<n>",
+      "fingerprint": "1adcab54277bf5a28abfcfff7d239b42"
+    },
+    {
+      "message": "user jane.doe+test@example.co.uk not found",
+      "normalized": "user <email> not found",
+      "fingerprint": "7c9a2a8c14a4980aa3dc8295fc84e33a"
+    },
+    {
+      "message": "[EMAIL FILTERED] has already been taken",
+      "normalized": "[EMAIL FILTERED] has already been taken",
+      "fingerprint": "1f7ef178ec71b90a8201cb00cec0b91f"
+    },
+    {
+      "message": "no @ here, a@b.c, x@y.io",
+      "normalized": "no @ here, a@b.c, <email>",
+      "fingerprint": "e58a35bf00a1b5ef6fc048b11d0d581b"
+    },
+    {
+      "message": "{\"name\":\"Jane\",\"age\":42}",
+      "normalized": "{<str>:<str>,<str>:<n>}",
+      "fingerprint": "d6584c9acce8828d2c14ce896a118adf"
+    },
+    {
+      "message": "Key (email)=(jane@example.com) already exists",
+      "normalized": "Key (email)=(<email>) already exists",
+      "fingerprint": "3309dc969ad170dbc60a2805953cad53"
+    },
+    {
+      "message": "said \"\" and ''",
+      "normalized": "said <str> and <str>",
+      "fingerprint": "fbf8bb0e4335b0abcba2dbaf99f9b4e9"
+    },
+    {
+      "message": "'a'b c'",
+      "normalized": "'a'b c'",
+      "fingerprint": "c30444cb963ebc3541c2b065006cdad1"
+    },
+    {
+      "message": "it's 'x' and 'y'z' and don't",
+      "normalized": "it's <str> and 'y'z' and don't",
+      "fingerprint": "585862c0d35c8a1c9c17d604d66d1057"
+    },
+    {
+      "message": "'start' middle 'end'",
+      "normalized": "<str> middle <str>",
+      "fingerprint": "2fff39f0f2db2e7d6527d9ce83c2af68"
+    },
+    {
+      "message": "_'x'_ and ('y')",
+      "normalized": "_'x'_ and (<str>)",
+      "fingerprint": "ae20fe808864f47d2ecc9c565c1f2c6d"
+    },
+    {
+      "message": "line 'one\ntwo' 3",
+      "normalized": "line 'one\ntwo' <n>",
+      "fingerprint": "96f3220550882e43e098db8487c6f926"
+    },
+    {
+      "message": "unclosed \"quote here",
+      "normalized": "unclosed \"quote here",
+      "fingerprint": "7cf92eb7583cc38a82f016a7446f3f5f"
+    },
+    {
+      "message": "“curly” ‘quotes’ stay",
+      "normalized": "“curly” ‘quotes’ stay",
+      "fingerprint": "e6fab6c638099acc58566983095b691a"
+    },
+    {
+      "message": "nested \"it's\" 'say \"hi\"'",
+      "normalized": "nested <str> <str>",
+      "fingerprint": "7e82d5b63fdee5dba660b5b8f3d2ae15"
+    },
+    {
+      "message": "x'a 'b'",
+      "normalized": "x'a <str>",
+      "fingerprint": "c0d17ff679cf23d0c13072bb09c47d0b"
+    },
+    {
+      "message": "no'pe 'yes' and o'k 'z'",
+      "normalized": "no'pe <str> and o'k <str>",
+      "fingerprint": "18ceabe51f8bbf0a3ad63fe87ab1d4e9"
     }
   ],
   "span_name": [

@@ -10,9 +10,12 @@ use Cwd qw(abs_path);
 use File::Basename qw(dirname);
 my $root = dirname(dirname(abs_path(__FILE__)));
 chdir $root or die "chdir $root: $!";
+plan skip_all => 'requires a git checkout' unless -e '.git';
 
 # Collect: git-tracked files not covered by MANIFEST.SKIP
-my %git = map { chomp; $_ => 1 } qx(git ls-files);
+my @tracked = qx(git ls-files);
+BAIL_OUT('git ls-files failed') if $?;
+my %git = map { chomp; $_ => 1 } @tracked;
 delete $git{'.gitignore'};
 delete $git{$_} for grep /^\.github\//, keys %git;   # CI files optional
 delete $git{$_} for grep /^MANIFEST(\.SKIP)?$/, keys %git;  # MANIFEST self-excluded

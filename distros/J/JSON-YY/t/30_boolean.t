@@ -251,4 +251,29 @@ if (eval { require Types::Serialiser; 1 }) {
     like $pretty, qr/true.*false/s, 'pretty encode Types::Serialiser objects';
 }
 
+use JSON::YY ':doc';
+for my $decode (
+    ['keyword', sub { decode_json $_[0] }],
+    ['function', \&JSON::YY::decode_json],
+    ['OO', sub { JSON::YY->new->decode($_[0]) }],
+    ['Doc', sub { my $doc = jdoc $_[0]; jgetp $doc, "" }],
+) {
+    my $data = $decode->[1]->('{"t":true,"f":false,"n":null,"a":[true,false,null]}');
+    my $ok = eval {
+        $data->{t} = 2;
+        $data->{f} = 3;
+        $data->{n} = 4;
+        $data->{a}[0] = 5;
+        $data->{a}[1] = 6;
+        $data->{a}[2] = 7;
+        1;
+    };
+    is $@, '', "$decode->[0]: normal decoded booleans and nulls are writable";
+    SKIP: {
+        skip 'assignment failed', 1 unless $ok;
+        is_deeply $data, { t => 2, f => 3, n => 4, a => [5, 6, 7] },
+            "$decode->[0]: decoded scalar slots hold the new values";
+    }
+}
+
 done_testing;

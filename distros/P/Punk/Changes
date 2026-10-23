@@ -1,5 +1,11 @@
 Revision history for Punk
 
+0.65    2026-10-21
+        - Add Punk::Model::Computed, a base for read-only backends whose
+          rows are worked out from the question.
+        - Add Punk::Model::Computed::Error, a visitor's input error naming
+          its field.
+
 0.64    2026-10-21
         - A controller that dies while loading names its error, not
           "has no method".

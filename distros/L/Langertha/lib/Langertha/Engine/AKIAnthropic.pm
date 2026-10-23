@@ -1,6 +1,6 @@
 package Langertha::Engine::AKIAnthropic;
 # ABSTRACT: AKI.IO via Anthropic-compatible API
-our $VERSION = '0.503';
+our $VERSION = '0.504';
 use Moose;
 use Carp qw( croak );
 
@@ -74,18 +74,18 @@ around engine_capabilities => sub {
   my $caps = $self->$orig(@rest);
   # image_input (k266, ADR 0019): vision is undocumented / unverified on this face, so no claim.
   delete $caps->{image_input};
+  # Tool-result images (karr k359): the shim takes an image inside a tool_result
+  # without error but the model does not see it. Live probe 2026-09-30
+  # (llm-advisor, aki.io/anthropic/v1/messages): qwen3.6-35b read a plain
+  # user-message image correctly (16x16 red -> 'Red'), but the same kind of image
+  # inside a tool_result came back as 'White' (16x16 red) and 'Black' (64x64
+  # green), with ~340 input tokens whatever the image size; gpt-oss-120b answered
+  # 200 and saw only the text. The k336 placeholder at least says an image
+  # was there, so tool_result_images is cleared even if an image_input row is
+  # added for this face later (ADR 0039, k380).
+  delete $caps->{tool_result_images};
   return $caps;
 };
-
-# Tool-result images (karr k359): the shim takes an image inside a tool_result
-# without error but the model does not see it. Live probe 2026-09-30
-# (llm-advisor, aki.io/anthropic/v1/messages): qwen3.6-35b read a plain
-# user-message image correctly (16x16 red -> 'Red'), but the same kind of image
-# inside a tool_result came back as 'White' (16x16 red) and 'Black' (64x64
-# green), with ~340 input tokens whatever the image size; gpt-oss-120b answered
-# 200 and saw only the text. The k336 placeholder at least says an image was
-# there, so it stays even if an image_input row is added for this face later.
-sub _tool_result_images_on_wire { 0 }
 
 # Source blocks in a tool_result (karr k364, k366): live probes 2026-09-30
 # (llm-advisor, aki.io/anthropic/v1/messages) -- a text document answered
@@ -117,7 +117,7 @@ Langertha::Engine::AKIAnthropic - AKI.IO via Anthropic-compatible API
 
 =head1 VERSION
 
-version 0.503
+version 0.504
 
 =head1 SYNOPSIS
 
@@ -188,7 +188,8 @@ C<< $error->{error}{message} >> for the real diagnostic.
 B<Tool results carry text only.> In the tool loop, an image a tool returns
 goes out as a text placeholder (C<[image] image/png (N bytes)>) for every
 model: the shim accepts an image inside a C<tool_result> but the model does not
-see it (live probe 2026-09-30). An embedded text resource goes out as a
+see it (live probe 2026-09-30); C<supports('tool_result_images')> and
+C<supports('tool_result_pdf')> are false. An embedded text resource goes out as a
 C<text> block and a PDF as a placeholder, because the shim answers a
 C<document> block there with C<529> C<"Unsupported content type: document">;
 a native C<search_result> block (also a C<529>) or C<document> block becomes a

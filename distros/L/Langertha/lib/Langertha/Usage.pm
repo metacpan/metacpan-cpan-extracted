@@ -1,6 +1,6 @@
 package Langertha::Usage;
 # ABSTRACT: Immutable value object for LLM token usage with cross-provider conversion
-our $VERSION = '0.503';
+our $VERSION = '0.504';
 use Moose;
 use Scalar::Util qw( blessed looks_like_number );
 use Hash::Util::FieldHash qw( fieldhash );
@@ -390,7 +390,7 @@ Langertha::Usage - Immutable value object for LLM token usage with cross-provide
 
 =head1 VERSION
 
-version 0.503
+version 0.504
 
 =head2 from_raw
 
@@ -578,7 +578,9 @@ Responses, image and video generation) as the integer C<cost_in_usd_ticks>
 C<cost_in_usd_ticks> first as the finer unit; the integers stay verbatim in
 L</raw>, so C<< $usage->{cost_in_usd_ticks} >> still gives exact integer
 accounting. A stream carries it only in its usage frame, which comes when the
-request asks for it (C<stream_options =E<gt> { include_usage =E<gt> 1 }>).
+request asks for it (C<stream_options =E<gt> { include_usage =E<gt> 1 }>, sent
+by every engine that supports C<stream_usage>, see
+L<Langertha::Role::StreamUsage>).
 
 The Perplexity Agent API sends C<usage.cost> as an object that names its
 currency (C<currency>, C<total_cost>, and the parts such as C<input_cost> and

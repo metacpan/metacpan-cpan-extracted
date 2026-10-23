@@ -8,6 +8,7 @@ use EV;
 use EV::ClickHouse;
 use Data::Dumper; $Data::Dumper::Sortkeys = 1;
 
+my $geo_err;
 my $ch;
 $ch = EV::ClickHouse->new(
     host       => $ENV{CLICKHOUSE_HOST}        // '127.0.0.1',
@@ -15,10 +16,11 @@ $ch = EV::ClickHouse->new(
     protocol   => 'native',
     on_connect => sub {
         $ch->query(
-            "select toPoint(1, 2) as pt, "
+            "select (1, 2)::Point as pt, "
           . "[[(0,0),(0,1),(1,1),(1,0),(0,0)]]::Polygon as poly",
             sub {
-                my ($rows) = @_;
+                my ($rows, $err) = @_;
+                if ($err) { $geo_err = $err; EV::break; return; }
                 print Dumper($rows);
                 EV::break;
             },
@@ -27,3 +29,4 @@ $ch = EV::ClickHouse->new(
     on_error => sub { die "Error: $_[0]\n" },
 );
 EV::run;
+die "query failed: $geo_err\n" if $geo_err;

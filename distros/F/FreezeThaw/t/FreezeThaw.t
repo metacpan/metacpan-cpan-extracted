@@ -241,4 +241,19 @@ EOE
   }
 }
 
-sub last {35}
+my @lsts = ([11, \&Simple::new, 23], [111, \&Simple::new, 232], [311, \*Simple::new, 323], [3111, \*Simple::new, 3232]);
+my $f = safeFreeze @lsts;
+my @o = thaw $f;
+
+print @o eq 4 ? "ok 36\n": "not ok 36\n# \@o = " . (scalar @o) . "\n";
+
+
+my $c = 0;
+for my $i (0..$#lsts) {
+  for my $j (0..$#{$lsts[$i]}) {
+    print "not " unless $lsts[$i][$j] eq $o[$i][$j];
+    print "ok ", 37 + $c++, "\n";
+  }
+}
+
+sub last {48}

@@ -1,4 +1,5 @@
 Changes
+t/65_release_fixes.t
 cityhash.h
 ClickHouse.xs
 cpanfile
@@ -116,6 +117,18 @@ t/49_external_tables.t
 t/50_review_fixes.t
 t/51_lz4_multiframe.t
 t/52_http_chunked_trickle.t
+t/53_review_pass2.t
+t/54_pass2_review.t
+t/55_pass3_review.t
+t/56_pass4_review.t
+t/57_pass5_review.t
+t/58_pass6_review.t
+t/59_review_loop_r1.t
+t/60_review_loop_r2.t
+t/61_review_loop_r3.t
+t/62_review_loop_r4.t
+t/63_review_loop_r5.t
+t/64_review_loop_r7.t
 typemap
 xs/codecs.c
 xs/io.c

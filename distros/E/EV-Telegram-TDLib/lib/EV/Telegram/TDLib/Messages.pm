@@ -7,7 +7,7 @@ use EV;
 use Encode ();
 use overload ();
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 =head1 NAME
 
@@ -328,7 +328,8 @@ sub history {
     my $from      = num('from_message_id', $opt{from_message_id} // 0);
     my @msgs;
     my $pages = 0;
-    my $state = { complete => 0, last_message_id => undef };
+    my $state = { complete => 0, last_message_id => undef,
+                  next_from_message_id => undef };
     my ($fetch, $finish, $defer);
     $finish = sub {
         undef $fetch;  # break the fetch/finish closure cycle
@@ -367,13 +368,27 @@ sub history {
                 return;
             }
             my $batch = $res->{messages} // [];
-            if (!@$batch) { $state->{complete} = 1; $finish->(\@msgs, undef, $state); return }
+            if (!@$batch) {
+                $state->{complete} = 1;
+                $state->{next_from_message_id} = undef;
+                $finish->(\@msgs, undef, $state);
+                return;
+            }
             push @msgs, @$batch;
             my $last = $batch->[-1]{id};
             $state->{last_message_id} = $last;
-            # a batch that does not advance would loop forever
-            if ($last == $from) { $state->{complete} = 1; $finish->(\@msgs, undef, $state); return }
-            $from = $last;
+            if ($last <= 1) {
+                $state->{complete} = 1;
+                $state->{next_from_message_id} = undef;
+                $finish->(\@msgs, undef, $state);
+                return;
+            }
+            # Skip the inclusive boundary: server ids have 20 zero low bits,
+            # and local/unsent ids use low-three-bit tags 2/1.
+            $from = $last - 1;
+            $from = (($last - 3) & ~7) | 2
+                if ($from & 0xfffff) && ($from & 7) != 1 && ($from & 7) != 2;
+            $state->{next_from_message_id} = $from;
             $fetch->();
         });
     };

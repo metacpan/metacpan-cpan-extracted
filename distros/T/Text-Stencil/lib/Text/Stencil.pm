@@ -1,7 +1,7 @@
 package Text::Stencil;
 use v5.20;
 use warnings;
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 require XSLoader;
 XSLoader::load(__PACKAGE__, $VERSION);
 
@@ -17,7 +17,7 @@ sub STORABLE_freeze {
 
 sub from_file {
     my ($class, $file, %opts) = @_;
-    open my $fh, '<:encoding(UTF-8)', $file
+    open my $fh, '<:raw', $file
         or die "Text::Stencil: can't open $file: $!";
     local $/;
     my $content = <$fh>;
@@ -28,8 +28,10 @@ sub from_file {
     defined $content
         or die "Text::Stencil: can't read $file: $!";
     close $fh;
+    require Encode;
+    $content = Encode::decode('UTF-8', $content, Encode::FB_CROAK());
     # split on whichever section markers are present, in any order
-    my @parts = split /^__(HEADER|ROW|FOOTER)__[^\S\n]*\n/m, $content;
+    my @parts = split /^__(HEADER|ROW|FOOTER)__[^\S\n]*(?:\n|\z)/m, $content;
     if (@parts > 1) {
         shift @parts;                      # text before the first marker
         my %section;
@@ -161,8 +163,8 @@ to C<< Text::Stencil->new(row => $template) >>.
 
     my $s = Text::Stencil->from_file('template.tpl', separator => "\n");
 
-Load template from a file. The file is read as UTF-8. It can use section
-markers:
+Load template from a file as UTF-8; malformed UTF-8 is an error. It can use
+section markers:
 
     __HEADER__
     <table>

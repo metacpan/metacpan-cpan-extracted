@@ -45,19 +45,17 @@ my @cmd = (
 diag "running: @cmd";
 my $cmd = join(' ', map { /\s/ ? "'$_'" : $_ } @cmd) . " >$childlog 2>&1";
 my $rc = system $cmd;
-my $exit = $rc >> 8;
+ok(($rc >> 8) != 99, 'no definite leaks reported by valgrind');
+ok($rc == 0, 'leak suite exits cleanly under valgrind');
 
-ok($exit != 99, 'no definite leaks reported by valgrind');
-ok($exit == 0,  'leak suite exits cleanly under valgrind');
-
-if ($exit) {
-    diag "valgrind log: $logfile";
-    diag "child output: $childlog";
-    if (open my $fh, '<', $logfile) {
-        my @tail;
-        while (<$fh>) { push @tail, $_; shift @tail while @tail > 80 }
-        diag $_ for @tail;
+if ($rc) {
+    for my $log ([$logfile, 'valgrind'], [$childlog, 'child']) {
+        if (open my $fh, '<', $log->[0]) {
+            my @tail;
+            while (<$fh>) { push @tail, $_; shift @tail while @tail > 80 }
+            diag "$log->[1] output:";
+            diag $_ for @tail;
+        }
     }
-} else {
-    unlink $logfile, $childlog;
 }
+unlink $logfile, $childlog;

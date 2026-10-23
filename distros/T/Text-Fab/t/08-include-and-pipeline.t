@@ -90,4 +90,37 @@ is($fab_scoped->cfg__get('scoped_var'), 'original',
 throws_ok { $fab_scoped->process_string("#include_scoped only_one_arg") } qr/E_SYNTAX_ERROR/,
    '#include_scoped with insufficient arguments dies with E_SYNTAX_ERROR';
 
+subtest 'Strict arity and container modes for #include' => sub {
+    my $fab_c = Text::Fab->new(config => {
+        'Fab/list_keys' => { 'joiners/comma' => 1, 'my_list' => 1 },
+    });
+    $fab_c->cfg__set('joiners/comma', [', ']);
+    $fab_c->cfg__set('my_list', ['alpha', 'beta', 'gamma']);
+
+    $fab_c->out__create_section('src_sec', '_main');
+    push @{$fab_c->{sections}{_main}{src_sec}}, ['text', 'SecLine1'], ['text', 'SecLine2'];
+
+    $fab_c->out__create_section('dest_sec', '_main');
+    $fab_c->out__target_section('dest_sec', '_main');
+
+    $fab_c->process_string("#include configkey joiners/comma my_list");
+    $fab_c->process_string("#include section joiners/comma _main:src_sec");
+
+    my $joined_out = $fab_c->assemble('_main:dest_sec');
+    like($joined_out, qr/alpha, beta, gamma/, 'included configkey with cyclic joiner');
+    like($joined_out, qr/SecLine1, SecLine2/, 'included section with cyclic joiner');
+
+    throws_ok { $fab_c->process_string("#include section missing_arg") } qr/E_SYNTAX_ERROR/,
+        '#include section with missing arguments dies with E_SYNTAX_ERROR';
+
+    throws_ok { $fab_c->process_string("#include filename a b c") } qr/E_SYNTAX_ERROR/,
+        '#include filename with excess arguments dies with E_SYNTAX_ERROR';
+
+    throws_ok { $fab_c->include__text('filename', 'f1', 'f2') } qr/E_TYPE_MISMATCH/,
+        'include__text filename with excess arguments dies with E_TYPE_MISMATCH';
+
+    throws_ok { $fab_c->include__text('section', 'only_one') } qr/E_TYPE_MISMATCH/,
+        'include__text section with missing arguments dies with E_TYPE_MISMATCH';
+};
+
 done_testing();

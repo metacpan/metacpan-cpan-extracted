@@ -1,4 +1,4 @@
-use 5.006;
+use 5.010;
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
@@ -9,16 +9,16 @@ my %WriteMakefileArgs = (
     VERSION_FROM     => 'lib/Shannon/Entropy/XS.pm',
     ABSTRACT_FROM    => 'lib/Shannon/Entropy/XS.pm',
     LICENSE          => 'artistic_2',
-    MIN_PERL_VERSION => '5.006',
+    MIN_PERL_VERSION => '5.010',
     XSMULTI => 1,
     CONFIGURE_REQUIRES => {
-        'ExtUtils::MakeMaker' => '0',
+        'ExtUtils::MakeMaker' => '7.12',
     },
     TEST_REQUIRES => {
         'Test::More' => '0',
     },
     PREREQ_PM => {
-        "Import::Export" => '1.00'        
+        'Ex::Op' => '0.03',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     macro => { TARFLAGS => "--format=ustar -c -v -f" },

@@ -1,6 +1,6 @@
 package Langertha::Role::ImageInput;
 # ABSTRACT: Role for an engine whose wire can carry image input
-our $VERSION = '0.503';
+our $VERSION = '0.504';
 use Moose::Role;
 
 
@@ -19,7 +19,7 @@ Langertha::Role::ImageInput - Role for an engine whose wire can carry image inpu
 
 =head1 VERSION
 
-version 0.503
+version 0.504
 
 =head1 SYNOPSIS
 
@@ -71,16 +71,15 @@ The flag is advisory. Nothing blocks or strips an image when it is false; an
 image sent to an engine without the claim goes out on the wire as usual and the
 provider decides.
 
-One reader chooses a representation by it: in the tool loop,
-L<Langertha::Role::Tools/format_tool_results> sends an image a I<tool>
-returned as an image part on the C<responses>, Gemini 3 and C<anthropic> wires
-only when the flag is true, and as a text placeholder otherwise (see
-L<Langertha::ToolResult/DESCRIPTION>). A PDF a tool returned follows the same
-flag on OpenAI Responses and Gemini 3, which read PDFs through the model's
-vision. So a claim for a model that does not
-see images is no longer harmless there: the provider may reject the tool-loop
-turn, or (as AKI.IO's C</anthropic> shim does) accept it while the model never
-sees the image.
+One flag depends on it: C<tool_result_images>
+(L<Langertha::Role::ToolResultImages>), which decides whether an image a
+I<tool> returned goes to the model as an image part or as a text placeholder
+in the tool loop, holds only for a model that claims C<image_input> (ADR
+0039). On OpenAI Responses and Gemini 3 and later C<tool_result_pdf> needs it
+too, because those providers read PDFs through the model's vision. So a claim
+for a model that does not see images is no longer harmless there: the provider
+may reject the tool-loop turn, or accept it while the model never sees the
+image.
 
 This role has no methods or attributes of its own.
 
@@ -91,6 +90,8 @@ This role has no methods or attributes of its own.
 =item * L<Langertha::Content::Image> - Provider-agnostic image input
 
 =item * L<Langertha::Role::Capabilities> - The capability registry
+
+=item * L<Langertha::Role::ToolResultImages> - Images a tool returns, which depend on this flag
 
 =back
 

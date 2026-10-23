@@ -117,19 +117,23 @@ eo_unwind(pTHX_ void *p)
         cxstack[rp->cxix].blk_gimme = rp->oldgimme;
     if (rp->spcx <= cxstack_ix)
         cxstack[rp->spcx].blk_oldsp = rp->oldsp;
-    if (rp->runcx >= 0 && rp->runcx <= cxstack_ix) {
+    if (rp->runcx >= 0 && rp->runcx <= cxstack_ix
+#if PERL_VERSION_GE(5,20,0) && !PERL_VERSION_GE(5,24,0)
+        /* 5.20 and 5.22 run the save stack inside POPSUB, after it has read
+         * the cv: the context is as good as popped. */
+        && !(cxstack[rp->runcx].blk_u16 & CxPOPSUB_DONE)
+#endif
+        ) {
         cxstack[rp->runcx].blk_sub.cv = rp->oldruncv;
     }
 #if !PERL_VERSION_GE(5,24,0)
     else if (rp->runcx >= 0) {
-        /* Before 5.24 a die pops a sub context with POPSUB before the save
-         * stack runs, and it popped this one holding the op: it set the
-         * op's depth and released the op instead of the caller. */
-        CvDEPTH(rp->oldruncv) = rp->runolddepth;
-        if (!rp->runolddepth) {
-            SvREFCNT_inc_simple_void_NN(rp->cv);
-            SvREFCNT_dec(rp->oldruncv);
-        }
+        /* Before 5.24 a die pops a sub context with POPSUB, and it popped
+         * this one holding the op: it set the op's depth and released the
+         * op instead of the caller, which was not in the sub already. */
+        CvDEPTH(rp->oldruncv) = 0;
+        SvREFCNT_inc_simple_void_NN(rp->cv);
+        SvREFCNT_dec(rp->oldruncv);
     }
 #endif
     PL_comppad    = rp->oldpad;
@@ -193,6 +197,12 @@ eo_pp_call(pTHX)
         runcx = top_is_sub ? cxstack_ix : eo_runcv_cx(aTHX);
         if (runcx < 0)
             return PL_ppaddr[OP_ENTERSUB](aTHX);
+#if !PERL_VERSION_GE(5,24,0)
+        /* Before 5.24 a die pops a format, or a sub called again inside
+         * itself, by the op it holds, and its depth cannot be put back. */
+        if (CxTYPE(&cxstack[runcx]) != CXt_SUB || cxstack[runcx].blk_sub.olddepth)
+            return PL_ppaddr[OP_ENTERSUB](aTHX);
+#endif
     }
 
     markix = POPMARK;
@@ -218,9 +228,6 @@ eo_pp_call(pTHX)
     r->runcx = runcx;
     if (runcx >= 0) {
         r->oldruncv = cxstack[runcx].blk_sub.cv;
-#if !PERL_VERSION_GE(5,24,0)
-        r->runolddepth = (I32)cxstack[runcx].blk_sub.olddepth;
-#endif
         cxstack[runcx].blk_sub.cv = cv;
     }
     r->spcx  = cxstack_ix;

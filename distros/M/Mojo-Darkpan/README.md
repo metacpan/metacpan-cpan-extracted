@@ -44,6 +44,7 @@ was also taken from OrePAN2::Server as the functionality is similar if not ident
 
 - **/publish** or **/authenquery**:
     POST path(s) for releasing packages, set as the upload\_uri in your .pause file
+    (or as CPAN\_UPLOADER\_UPLOAD\_URI when using cpan-upload)
 - **/list**: 
     JSON list of packages and info about them
 - **/reindex**: 
@@ -162,7 +163,13 @@ See [CPAN::Uploader](https://metacpan.org/pod/CPAN::Uploader) for more detail.
     password myPassword
     
 
-_\*\* if you don't set the upload\_uri, you will upload to CPAN_
+_\*\* if you don't set the upload\_uri (or CPAN\_UPLOADER\_UPLOAD\_URI), you will upload to CPAN_
+
+The `cpan-upload` command line utility ignores the `upload_uri` setting (see
+[CPAN::Uploader GH #24](https://github.com/rjbs/CPAN-Uploader/issues/24)). When uploading
+with `cpan-upload`, set the upload URI with the environment variable instead:
+
+    CPAN_UPLOADER_UPLOAD_URI=http://my-darkpan.server/publish cpan-upload --user myUsername --password myPassword MyModule-0.01.tar.gz
 
 If basic auth is enabled, the username and password set in the .pause file will be
 used as basic auth credentials.

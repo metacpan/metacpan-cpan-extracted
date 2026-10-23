@@ -138,9 +138,9 @@ Built-in aliases:
 - `string` = `[^/]+` (default; explicit form)
 - `hex` = `[0-9a-fA-F]+`
 
-Anything else inside `<...>` is a **Ragel expression**, passed through to
-the generated state machine, so arbitrary character classes and quantifiers
-work:
+Anything else inside `<...>` is a **Ragel expression**, restricted to
+non-slash bytes in the generated state machine. Arbitrary character classes
+and quantifiers work:
 
     /code/:c<[0-9]{4}> # exactly four digits
     /file/:name<[a-z0-9\-]+> # slug-like (escape '-' inside a class)
@@ -189,23 +189,13 @@ Captures are returned positionally by `match`, in the order their
 placeholders appear in the pattern. Placeholder names are not used at match
 time.
 
-Where a segment puts a placeholder next to something else, the boundary
-between them must be decidable as the bytes arrive. The generated machine is
-a DFA and cannot backtrack, so a boundary it cannot settle on the spot is
-settled greedily and the captures can come back wrong. Two shapes are
-affected, both confined to a single segment:
+A final literal suffix is excluded from the capture: `/:name<string>.tar.gz`
+on `/x.tar.gz` captures `x`.
 
-- A placeholder followed by literal text its own type would also accept, where
-the literal's first byte occurs again later in the literal. One placeholder is
-enough: `/:a<string>ff` on `/xff` reports `a` as `'xf'`, and
-`/:a<string>.tar.gz` on `/x.tar.gz` reports `'x.tar'`. Neither is a
-reading of the pattern. A literal whose first byte does not recur (`_extra`,
-`.json`, `-v2`) splits correctly.
-- Placeholders with nothing between them, where the second one's type sets a
-minimum length. The greedy split can leave that capture shorter than its own
-type allows: `/:a<[0-9]*>:b<[0-9]{2,3}>` on `/90` reports `b` as
-`'0'`. A valid reading existed (`a` empty, `b` `'90'`); the machine just
-did not take it.
+With multiple placeholders in one segment, their boundaries must be decidable
+as the bytes arrive. The DFA cannot backtrack, so ambiguous boundaries can
+split captures incorrectly. For example, `/:a<[0-9]*>:b<[0-9]{2,3}>` on
+`/90` reports `b` as `'0'` instead of `'90'`.
 
 Denser versions of these can leave a capture closed before it opened; `match`
 `croak`s naming the pattern rather than returning nonsense. Separate the
@@ -341,8 +331,8 @@ contain consecutive slashes, use a bare `:` placeholder name, or contain a
 `<type>` that is empty, unterminated, contains a `<` or a `/`, or
 uses constructs outside the accepted Ragel subset (see
 ["Type constraints"](#type-constraints)). `compile` `croak`s on any of these.
-- A segment that packs a placeholder against a literal or another placeholder
-can have its captures split wrongly, and the densest of those shapes make
+- A segment with ambiguous boundaries between multiple placeholders can have
+its captures split wrongly, and the densest of those shapes make
 `match` `croak`; see ["Captures"](#captures).
 - Matching is exact: `/users` matches only `/users`, not `//users`,
 `/users/`, or `/users//`. `/users` and `/users/` are distinct routes.

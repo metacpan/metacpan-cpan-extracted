@@ -8,7 +8,7 @@ use Punk::Router::Scope;
 use Punk::Context;
 use Punk::Static;
 
-our $VERSION = '0.64';
+our $VERSION = '0.65';
 
 sub compile_extras {
     my ($self) = @_;

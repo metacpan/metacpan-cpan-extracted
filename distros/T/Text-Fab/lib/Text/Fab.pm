@@ -4,11 +4,12 @@ use 5.022;
 use strict;
 use warnings;
 
-our $VERSION = '0.05';
+our $VERSION = '0.0601';
 
 # FreezeThaw is required because Storable::dclone cannot serialize CODE references
 # stored in the configuration hash (such as custom sorters, parsers, and callbacks).
 use FreezeThaw qw(safeFreeze thaw);
+use FreezeThaw 1.00;
 
 sub dclone ($) { (thaw safeFreeze shift)[0] }
 
@@ -29,8 +30,16 @@ sub priority_for_file_close {
     return -1000.0 - $dist_from_end;
 }
 
+# Static lens name joiner: parenthesize parts containing '/' then join with '/'
+sub _fmt_lens_join {
+    my ($a, $b) = @_;
+    my $fa = ($a =~ m{/}) ? "($a)" : $a;
+    my $fb = ($b =~ m{/}) ? "($b)" : $b;
+    return "$fa/$fb";
+}
+
 # =========================================================================
-# Default Callbacks (The Pluggable Core Engine)
+# Default Callbacks (Canonical 'dbg0' Engine)
 # =========================================================================
 
 # Locates the next directive boundary.
@@ -51,9 +60,17 @@ sub _default_directive_parser {
 
     my $directive_line = substr($buffer, $offset, $line_end - $offset);
 
-    if ($directive_line =~ /^#(\w+)\s*(.*)/) {
-        my ($directive, $args) = (lc $1, $2);
+    if ($directive_line =~ /^#(\w+)(?:\[([^\]]*)\])?(?:\s+(.*))?$/s) {
+        my ($directive, $opt_str, $args) = (lc $1, $2, $3 // '');
         $args =~ s/\s+$//; # Strip trailing whitespace
+
+        my %opts;
+        if (defined $opt_str && length $opt_str) {
+            for my $pair (split /,\s*/, $opt_str) {
+                my ($k, $v) = split /=/, $pair, 2;
+                $opts{lc $k} = $v // 1;
+            }
+        }
 
         if ($directive eq 'target_section') {
             my ($basename, $ns) = ($args =~ /(\w+)(?:\s+in\s+(\w+))?/);
@@ -92,54 +109,85 @@ sub _default_directive_parser {
             $fab->NS__set_parents($ns, @parents);
         }
         elsif ($directive eq 'emb') {
-            # Grammar: #emb [namespace:]<basename> [in <namespace>] [asiffrom <StartNamespace>] [with_blinder <SubName>]
-            my ($first_token) = ($args =~ /^(\S+)/);
-            my ($ns)          = ($args =~ /\bin\s+(\S+)/);
-            my ($asiffrom)    = ($args =~ /\basiffrom\s+(\S+)/);
-            my ($blinder)     = ($args =~ /\bwith_blinder\s+(\S+)/);
+            # Modern Syntax: #emb[opts] recipe sec1 sec2 ...
+            my @tokens = split /\s+/, $args;
+            die "E_SYNTAX_ERROR: #emb requires a recipe/section target\n" unless @tokens;
 
-            my $basename = $first_token;
-            if (!defined $ns && defined $first_token && $first_token =~ /^([^:]+):([^:]+)$/) {
-                ($ns, $basename) = ($1, $2);
+            my $recipe = shift @tokens;
+            my @arg_sections = @tokens;
+
+            my ($recipe_ns, $recipe_basename);
+            if ($recipe =~ /^([^:]+):([^:]+)$/) {
+                ($recipe_ns, $recipe_basename) = ($1, $2);
+            } else {
+                $recipe_basename = $recipe;
+                $recipe_ns = $opts{in} // $fab->{current_target}->[0] // '_main';
             }
 
-            my %options;
-            $options{asiffrom}     = $asiffrom if defined $asiffrom;
-            $options{with_blinder} = $blinder  if defined $blinder;
+            # Map legacy asiffrom to aim if specified
+            $opts{aim} //= $opts{asiffrom} if exists $opts{asiffrom};
 
-            $fab->out__embed($basename, $ns, \%options);
+            $fab->out__embed($recipe_basename, $recipe_ns, \@arg_sections, \%opts);
         }
         elsif ($directive eq 'start_group') {
-            $fab->group__start($args);
+            $fab->group__start($args, \%opts);
         }
         elsif ($directive eq 'end_group') {
             $fab->group__end($args);
         }
         elsif ($directive eq 'include') {
-            # Syntax: #include [how] <data>
-            my ($how, $data);
-            if ($args =~ /^(\w+)\s+(.+)/) {
-                ($how, $data) = ($1, $2);
-            } else {
-                ($how, $data) = ('filename', $args);
+            # Strict arity check:
+            # 1 token -> filename
+            # filename -> exactly 1 argument
+            # string -> rest of line as payload
+            # section / configkey -> exactly 2 arguments (joiner, target)
+            my ($how, $joiner, $data);
+            if ($args =~ /^(section|configkey)\s+(\S+)\s+(\S+)$/) {
+                ($how, $joiner, $data) = ($1, $2, $3);
+                $fab->include__text($how, $joiner, $data);
             }
-            $fab->include__text($how, $data);
+            elsif ($args =~ /^(section|configkey)(?:\s+.*)?$/) {
+                die "E_SYNTAX_ERROR: #include $1 requires <joiner_key> <target>\n";
+            }
+            elsif ($args =~ /^filename\s+(\S+)$/) {
+                $fab->include__text('filename', $1);
+            }
+            elsif ($args =~ /^filename\s+\S+\s+\S+/) {
+                die "E_SYNTAX_ERROR: #include filename takes exactly 1 target argument\n";
+            }
+            elsif ($args =~ /^string\s+(.+)$/s) {
+                $fab->include__text('string', $1);
+            }
+            elsif ($args =~ /^\S+$/) {
+                # Bare #include <file>
+                $fab->include__text('filename', $args);
+            }
+            else {
+                die "E_SYNTAX_ERROR: Malformed #include directive\n";
+            }
         }
         elsif ($directive eq 'include_scoped') {
-            # Syntax: #include_scoped [how] <data> <flavor>
-            # Guarantees rollback of configuration alterations made by the included unit.
-            my ($how, $data, $flavor);
-            my @tokens = split /\s+/, $args;
-            if (@tokens == 3) {
-                ($how, $data, $flavor) = @tokens;
-            } elsif (@tokens == 2) {
-                ($how, $data, $flavor) = ('filename', $tokens[0], $tokens[1]);
-            } else {
-                die "E_SYNTAX_ERROR: #include_scoped requires <file> <flavor>\n";
+            my ($how, $joiner, $data, $flavor);
+            if ($args =~ /^(section|configkey)\s+(\S+)\s+(\S+)\s+(\S+)$/) {
+                ($how, $joiner, $data, $flavor) = ($1, $2, $3, $4);
             }
+            elsif ($args =~ /^(filename|string)\s+(\S+)\s+(\S+)$/) {
+                ($how, $data, $flavor) = ($1, $2, $3);
+            }
+            elsif ($args =~ /^(\S+)\s+(\S+)$/) {
+                ($how, $data, $flavor) = ('filename', $1, $2);
+            }
+            else {
+                die "E_SYNTAX_ERROR: #include_scoped parameter count error\n";
+            }
+
             $fab->group__start($flavor);
             eval {
-                $fab->include__text($how, $data);
+                if (defined $joiner) {
+                    $fab->include__text($how, $joiner, $data);
+                } else {
+                    $fab->include__text($how, $data);
+                }
                 1;
             } or do {
                 my $err = $@;
@@ -194,37 +242,62 @@ sub new {
     my ($class, %args) = @_;
     my $self = bless {}, $class;
 
+    my $dbg0_bundle = {
+        interleaver        => \&_default_interleaver,
+        directive_parser   => \&_default_directive_parser,
+        chunk_preprocessor => \&_default_chunk_preprocessor,
+        comment_recognizer => \&_default_comment_recognizer,
+        error_handler      => \&_default_error_handler,
+    };
+
     $self->{config} = {
         # Meta-configuration declaring value semantics
-        'Fab/list_keys'           => { 'Fab/list_keys' => 1 },
-        'Fab/hash_keys'           => { 'Fab/hash_keys' => 1 },
+        'Fab/list_keys'               => { 'Fab/list_keys' => 1 },
+        'Fab/hash_keys'               => { 'Fab/hash_keys' => 1, 'Fab/lens_affects' => 1 },
         # Sorting closure for hashes: per POD, accepts two arguments via @_
-        'Fab/hash_key_sort_order' => sub { $_[0] cmp $_[1] },
+        'Fab/hash_key_sort_order'     => sub { $_[0] cmp $_[1] },
         # Call stack prefix hierarchy for scoped filter evaluation
-        'Fab/call_stack_prefixes' => ['Fab/'],
-        'Fab/callbacks'           => {
-            interleaver        => \&_default_interleaver,
-            directive_parser   => \&_default_directive_parser,
-            chunk_preprocessor => \&_default_chunk_preprocessor,
-            comment_recognizer => \&_default_comment_recognizer,
-            error_handler      => \&_default_error_handler,
-        },
-        'Fab/inheritance_graph'   => {},
-        'opened_groups'           => [],
-        'opened_includes'         => [],
+        'Fab/call_stack_prefixes'     => ['Fab/'],
+        'Fab/callbacks_bundle/dbg0'   => $dbg0_bundle,
+        'Fab/callbacks'               => { %$dbg0_bundle },
+        'Fab/inheritance_graph'       => {},
+        'opened_groups'               => [],
+        'opened_includes'             => [],
     };
     $self->{sections}       = {}; # { namespace => { basename => [ [type, data...], ... ] } }
     $self->{current_target} = ['_main', 'body'];
     $self->{target_stack}   = []; # Stack of target sections for #end_section
     $self->{group_stack}    = []; # Stack of active group frames for rollback
     $self->{include_stack}  = []; # Active include path chain for cycle detection
+    $self->{arg_stack}      = []; # Call frame stack for parameterized embeds ($ARGV0...)
+    $self->{lens_stack}     = ['_main']; # Stack of active lenses during assembly
 
     if ($args{config}) {
         # Merge top-level configuration keys
         %{$self->{config}} = (%{$self->{config}}, %{$args{config}});
     }
 
+    # If callbacks was passed as a scalar bundle name, resolve to registered bundle
+    my $cb = $self->{config}{'Fab/callbacks'};
+    if (defined $cb && !ref($cb)) {
+        my $target = $self->{config}{"Fab/callbacks_bundle/$cb"}
+            // die "E_UNKNOWN_BUNDLE: Callback bundle '$cb' is not registered\n";
+        $self->{config}{'Fab/callbacks'} = { %$target };
+    }
+
     return $self;
+}
+
+sub _get_active_callbacks {
+    my ($self) = @_;
+    my $cb = $self->cfg__get_prefixed_scan('callbacks') // 'dbg0';
+
+    if (ref($cb) eq 'HASH') {
+        return $cb;
+    }
+    my $bundle = $self->cfg__get("Fab/callbacks_bundle/$cb")
+        // die "E_UNKNOWN_BUNDLE: Callback bundle '$cb' is not registered\n";
+    return $bundle;
 }
 
 # Main scanning loop: coordinates the de-interleaver, comment fusion,
@@ -233,9 +306,7 @@ sub process_string {
     my ($self, $string) = @_;
     my $offset = 0;
 
-    my $callbacks = $self->cfg__get_prefixed('callbacks')
-                 // $self->cfg__get('Fab/callbacks')
-                 // $self->{config}{'Fab/callbacks'};
+    my $callbacks = $self->_get_active_callbacks();
     my ($interleaver, $parser, $preprocessor, $comment_recognizer) = 
         @{$callbacks}{qw(interleaver directive_parser chunk_preprocessor comment_recognizer)};
 
@@ -279,15 +350,13 @@ sub _process_chunk {
     return unless length $chunk_text;
 
     my ($ns, $basename) = @{$self->{current_target}};
-    my $processed_chunk = $preprocessor->($self, $chunk_text);
+    my $processed_chunk = $preprocessor ? $preprocessor->($self, $chunk_text) : $chunk_text;
     push @{$self->{sections}{$ns}{$basename}}, ['text', $processed_chunk];
 }
 
 sub _handle_error {
     my ($self, $type, $details) = @_;
-    my $callbacks = $self->cfg__get_prefixed('callbacks')
-                 // $self->cfg__get('Fab/callbacks')
-                 // $self->{config}{'Fab/callbacks'};
+    my $callbacks = $self->_get_active_callbacks();
     my $handler = $callbacks ? $callbacks->{error_handler} : undef;
     if ($handler) {
         $handler->($self, $type, $details);
@@ -296,11 +365,15 @@ sub _handle_error {
     }
 }
 
-# Slurps or accepts literal text, enforcing cycle detection on active files.
+# Slurps or accepts literal text, enforcing strict arity and cycle detection.
 sub include__text {
-    my ($self, $how, $data) = @_;
+    my ($self, $how, @args) = @_;
 
     if ($how eq 'filename') {
+        die "E_TYPE_MISMATCH: include__text with filename requires exactly 1 target argument\n"
+            unless @args == 1;
+        my $data = $args[0];
+
         # Check active recursion stack for cycle prevention
         my %active = map { $_ => 1 } @{$self->{include_stack}};
         if ($active{$data}) {
@@ -326,8 +399,36 @@ sub include__text {
         pop @{$self->{include_stack}};
         $self->{config}{'opened_includes'} = [ @{$self->{include_stack}} ];
     }
+    elsif ($how eq 'string') {
+        die "E_TYPE_MISMATCH: include__text with string requires exactly 1 target argument\n"
+            unless @args == 1;
+        $self->process_string($args[0]);
+    }
+    elsif ($how eq 'section') {
+        die "E_TYPE_MISMATCH: include__text with section requires <joiner_key> and <spec>\n"
+            unless @args >= 2;
+        my ($joiner_key, $spec, $options) = @args;
+        my $joiners = $self->cfg__get($joiner_key)
+            // die "E_TYPE_MISMATCH: Joiner key '$joiner_key' not found in configuration\n";
+        my $content = $self->out__get_joined($spec, $joiners, $options);
+        $self->process_string($content);
+    }
+    elsif ($how eq 'configkey') {
+        die "E_TYPE_MISMATCH: include__text with configkey requires <joiner_key> and <key>\n"
+            unless @args >= 2;
+        my ($joiner_key, $key, $options) = @args;
+        my $type = $self->_get_key_type($key);
+        if ($type eq 'scalar') {
+            $self->process_string($self->cfg__get($key) // '');
+        } else {
+            my $joiners = $self->cfg__get($joiner_key)
+                // die "E_TYPE_MISMATCH: Joiner key '$joiner_key' not found in configuration\n";
+            my $content = $self->cfg__get_joined($key, $joiners, $options);
+            $self->process_string($content);
+        }
+    }
     else {
-        $self->process_string($data);
+        die "E_TYPE_MISMATCH: Unknown inclusion mode '$how'\n";
     }
 }
 
@@ -352,11 +453,14 @@ sub out__create_section {
 
 # Appends an unresolved embed promise to the current target section.
 sub out__embed {
-    my ($self, $basename, $namespace, $options) = @_;
+    my ($self, $recipe_basename, $recipe_ns, $arg_sections, $options) = @_;
+    $recipe_ns    //= $self->{current_target}->[0] // '_main';
+    $arg_sections //= [];
+    $options      //= {};
+
     my ($target_ns, $target_basename) = @{$self->{current_target}};
-    $namespace //= $target_ns;
     push @{$self->{sections}{$target_ns}{$target_basename}},
-        ['embed', $namespace, $basename, $options // {}];
+        ['embed', $recipe_ns, $recipe_basename, $arg_sections, $options];
 }
 
 # Converts text chunks of a section into a single string using cyclic joiners.
@@ -365,7 +469,11 @@ sub out__get_joined {
     die "E_TYPE_MISMATCH: out__get_joined requires an array reference for joiners\n"
         unless ref $joiners eq 'ARRAY';
 
-    my ($ns, $basename) = split /:/, $spec;
+    my ($ns, $basename) = split /:/, $spec, 2;
+    if (!defined $basename) {
+        $basename = $ns;
+        $ns = '_main';
+    }
     my $all_chunks = $self->{sections}{$ns}{$basename};
     return '' unless defined $all_chunks && @$all_chunks;
 
@@ -696,13 +804,14 @@ sub cfg__set_prefixed_uplevel_fixup {
 # =========================================================================
 
 sub group__start {
-    my ($self, $flavor) = @_;
+    my ($self, $flavor, $opts) = @_;
     $flavor = undef if defined $flavor && !length $flavor;
+    $opts //= {};
 
     # Verify nesting constraints against the enclosing group flavor
     if (defined $flavor && @{$self->{group_stack}}) {
         my $parent_flavor = $self->{group_stack}->[-1]{flavor};
-        my $allowed = $self->{config}{"Fab/group_nesting/$flavor/allowed_parents"}
+        my $allowed = $self->cfg__get("Fab/group_nesting/$flavor/allowed_parents")
                    // (ref($self->{config}{'Fab/group_nesting'}) eq 'HASH'
                        ? $self->{config}{'Fab/group_nesting'}{$flavor}{allowed_parents}
                        : undef);
@@ -721,7 +830,7 @@ sub group__start {
 
     # Selective vs full snapshotting: check if flavor restricts tracked keys
     my $flavor_keys = defined($flavor)
-        ? ($self->{config}{"Fab/group_flavors/$flavor/keys"}
+        ? ($self->cfg__get("Fab/group_flavors/$flavor/keys")
            // (ref($self->{config}{'Fab/group_flavors'}) eq 'HASH'
                ? $self->{config}{'Fab/group_flavors'}{$flavor}{keys}
                : undef))
@@ -743,6 +852,13 @@ sub group__start {
 
     push @{$self->{group_stack}}, $frame;
     $self->{config}{'opened_groups'} = [ map { $_->{flavor} } @{$self->{group_stack}} ];
+
+    # Scoped callback override if supplied
+    if (my $cb_override = $opts->{callbacks}) {
+        my $bundle = $self->cfg__get("Fab/callbacks_bundle/$cb_override")
+            // die "E_UNKNOWN_BUNDLE: Callback bundle '$cb_override' is not registered\n";
+        $self->cfg__set_prefixed('callbacks', $bundle);
+    }
 }
 
 sub group__end {
@@ -1005,6 +1121,20 @@ sub _join_list {
     return $output;
 }
 
+# Scans the active lens chain to fold affections into the resulting lens vertex
+sub _massage_lens {
+    my ($self, $requested_aim) = @_;
+    my $current_aim = $requested_aim;
+
+    for my $active_lens (reverse @{$self->{lens_stack}}) {
+        my $candidate = _fmt_lens_join($active_lens, $current_aim);
+        if ($self->cfg__get('Fab/lens_affects', $candidate)) {
+            $current_aim = $candidate;
+        }
+    }
+    return $current_aim;
+}
+
 # =========================================================================
 # Assembly Phase (DAG Traversal, Resolution, Blinding, & Expansion)
 # =========================================================================
@@ -1047,14 +1177,47 @@ sub _expand_section {
             $output .= $data[0];
         }
         elsif ($type eq 'embed') {
-            my ($target_ns, $target_basename, $options) = @data;
-            $options //= {};
+            my ($recipe_ns, $recipe_basename, $arg_sections, $options);
+            if (@data == 4) {
+                ($recipe_ns, $recipe_basename, $arg_sections, $options) = @data;
+            } else {
+                # 3-element compatibility
+                ($recipe_ns, $recipe_basename, $options) = @data;
+                $arg_sections = [];
+            }
+            $arg_sections //= [];
+            $options      //= {};
 
-            # POD: asiffrom initiates resolution directly from the specified context
-            my $start_ns = $options->{asiffrom} // $target_ns;
+            # Resolve aim via lens massaging
+            my $start_ns;
+            my $massaged_lens;
+            if (my $req_aim = $options->{aim}) {
+                $massaged_lens = $self->_massage_lens($req_aim);
+                $start_ns = $massaged_lens;
+            } else {
+                $start_ns = $recipe_ns;
+            }
 
-            # POD: with_blinder dynamically obscures an arbitrary subset of the DAG.
-            # Invokes callback with full embedding stack, start namespace, and blinder name.
+            # Intercept $ARGVn in the recipe basename using the CURRENT argument frame
+            # before pushing the child embed's own arguments.
+            if ($recipe_basename =~ /^\$ARGV(\d+)$/) {
+                my $idx = $1;
+                my $frame = $self->{arg_stack}->[-1]
+                    // die "E_ARGV_EMPTY: Referenced \$ARGV$idx outside recipe call\n";
+                die "E_ARGV_BOUNDS: \$ARGV$idx exceeds argument count (" . scalar(@$frame) . ")\n"
+                    if $idx >= @$frame;
+
+                my $target_spec = $frame->[$idx];
+                my ($t_ns, $t_basename) = split /:/, $target_spec, 2;
+                if (!defined $t_basename) {
+                    $recipe_basename = $t_ns;
+                } else {
+                    $start_ns        = $t_ns;
+                    $recipe_basename = $t_basename;
+                }
+            }
+
+            # Blinder evaluation
             my %local_blinded = %$blinded;
             my @obscured_namespaces;
             if (my $blinder_name = $options->{with_blinder}) {
@@ -1064,23 +1227,50 @@ sub _expand_section {
                         embed_stack     => $embed_stack,
                         start_namespace => $start_ns,
                         blinder_name    => $blinder_name,
-                        target_section  => "$start_ns:$target_basename",
+                        target_section  => "$start_ns:$recipe_basename",
                     });
                     $local_blinded{$_} = 1 for @obscured_namespaces;
                 }
             }
 
-            # Propagate updated embedding stack down to sub-resolutions
             my $next_embed_stack = [
                 @$embed_stack,
                 {
-                    section        => "$start_ns:$target_basename",
+                    section        => "$start_ns:$recipe_basename",
                     options        => $options,
                     blinder_output => \@obscured_namespaces,
                 }
             ];
 
-            $output .= $self->_expand_section($start_ns, $target_basename, \%next_seen, $next_embed_stack, \%local_blinded);
+            # Push active lens frame if massaged
+            push @{$self->{lens_stack}}, $massaged_lens if defined $massaged_lens;
+
+            # Push call frame for positional operands
+            push @{$self->{arg_stack}}, $arg_sections;
+
+            # Optional callback bundle switch during embed expansion
+            my $old_cb;
+            if (my $cb_name = $options->{callbacks}) {
+                $old_cb = $self->cfg__get_prefixed('callbacks');
+                my $bundle = $self->cfg__get("Fab/callbacks_bundle/$cb_name")
+                    // die "E_UNKNOWN_BUNDLE: Callback bundle '$cb_name' is not registered\n";
+                $self->cfg__set_prefixed('callbacks', $bundle);
+            }
+
+            eval {
+                $output .= $self->_expand_section($start_ns, $recipe_basename, \%next_seen, $next_embed_stack, \%local_blinded);
+                1;
+            } or do {
+                my $err = $@;
+                pop @{$self->{arg_stack}};
+                pop @{$self->{lens_stack}} if defined $massaged_lens;
+                $self->cfg__set_prefixed('callbacks', $old_cb) if defined $old_cb;
+                die $err;
+            };
+
+            $self->cfg__set_prefixed('callbacks', $old_cb) if defined $old_cb;
+            pop @{$self->{arg_stack}};
+            pop @{$self->{lens_stack}} if defined $massaged_lens;
         }
     }
 
@@ -1094,6 +1284,23 @@ sub _resolve_section {
     my ($self, $ns, $basename, $blinded, $visited_ns) = @_;
     $visited_ns //= {};
 
+    # Intercept $ARGVn argument section names
+    if ($basename =~ /^\$ARGV(\d+)$/) {
+        my $idx = $1;
+        my $frame = $self->{arg_stack}->[-1]
+            // die "E_ARGV_EMPTY: Referenced \$ARGV$idx outside recipe call\n";
+        die "E_ARGV_BOUNDS: \$ARGV$idx exceeds argument count (" . scalar(@$frame) . ")\n"
+            if $idx >= @$frame;
+
+        my $target_spec = $frame->[$idx];
+        my ($t_ns, $t_basename) = split /:/, $target_spec, 2;
+        if (!defined $t_basename) {
+            $t_basename = $t_ns;
+            $t_ns = $ns;
+        }
+        return $self->_resolve_section($t_ns, $t_basename, $blinded, $visited_ns);
+    }
+
     # Avoid redundant traversals across diamond inheritance topologies
     return undef if $visited_ns->{$ns}++;
 
@@ -1105,8 +1312,7 @@ sub _resolve_section {
     }
 
     # Continue fallback search through ancestors in the inheritance graph
-    my $parents_key = "Fab/inheritance_graph/$ns/parents";
-    my $parents = $self->{config}{$parents_key}
+    my $parents = $self->cfg__get("Fab/inheritance_graph/$ns/parents")
                // (ref($self->{config}{'Fab/inheritance_graph'}) eq 'HASH'
                    ? $self->{config}{'Fab/inheritance_graph'}{$ns}{parents}
                    : undef)
@@ -1128,17 +1334,18 @@ __END__
 
 =head1 NAME
 
-Text::Fab - A powerful, general-purpose document expansion framework (currently Control Flow, Loops, Caching, and Lenses are unimplemented {???})
+Text::Fab - A powerful, general-purpose document expansion framework (currently Control Flow, Loops, and Caching are unimplemented {???})
 
 =head1 SYNOPSIS
 
     # -- File: config.fab --   Example of merging multiple files (with almost no content!)
     # Declare which configuration keys will be treated as lists
-    #append Fab/list_keys chapters css_files
+    #append Fab/list_keys chapters css_files joiners/lines
 
     # Set some configuration variables
     #set site_title=My Awesome Book
     #append css_files global.css theme.css
+    #append joiners/lines "\n"
 
     # Define the inheritance graph for our namespaces
     #set_parents ChapterLayout BaseLayout
@@ -1218,8 +1425,8 @@ How to handle processing of all this mess through one pass over the initial docu
 intermediate steps of processing into 6 components,  One of them — The Configuration — is very special since all other components
 (except the content of output sections) are in fact encoded inside it.  The aim of these components is to provide carpets under
 which one can I<conveniently> sweep all the parts of complexity-dust which “require coding” — leaving only “the elementary core
-dependencies” exposed to both the user and the developer.  The intent is that after this sweeping all the necessary configuration /
-fine-tuning is done not by writing/editing new code, but by issuing I<processing directives>.
+dependencies” exposed to both the user and the developer.  The intent is that after this sweeping, all (or: better be all?) the
+necessary configuration/fine-tuning might be done not by writing/editing new code, but by issuing I<processing directives>.
 
 =over
 
@@ -1251,9 +1458,9 @@ the default actions for C<A>”. — Following the metaphor of inheritance, 
 =item A chain of “lenses”
 
 Each lens encodes “the aim of the currently active pipeline” of processing the promises in the sections.  Each request to set a
-new aim is translated (see L<"Lens names">) to just a particular vertex in the DAG of namespaces, a “virtual root” — so the name
-resolution is restricted to it and “its defaults”: whatever namespaces it overrides.  The resulting vertex is appended the chain of
-lenses.
+new aim is translated (see L<"Massaging of lens names">) to just a particular vertex in the DAG of namespaces, a “virtual
+root” — so the name resolution is restricted to it and “its defaults”: whatever namespaces it overrides.  The resulting vertex is
+appended the chain of lenses.
 
 =back
 
@@ -1261,8 +1468,6 @@ lenses.
 
 With our still contrived example, suppose that the initial pass over the document converted to an output section C<§base> with 4
 promises (and nothing else):
-
-	### Double-check that this conforms to the format documented below! ???
 
     #emb secname §sec1name
     #emb sectext §sec1text
@@ -1275,7 +1480,7 @@ the input files goes where (but one can as well also run the preprocessing steps
 C<LaTeX>: one of the first calls would establish the outermost lens to be C<LaTeX>.  When one needs to produce TOC, one processes
 C<§base> as
 
-    #emb as_TOC §base asiffrom as_TOC_lens   ???
+    #emb[aim=as_TOC_lens] as_TOC §base
 
 The installed “recipes for lenses” would (presumably) change the requested root C<as_TOC_lens> to C<LaTeX/as_TOC_lens>.  The
 resulting stack of lenses is now C<LaTeX LaTeX/as_TOC_lens>.  And the active lens C<LaTeX/as_TOC_lens> is (presumably) set up to
@@ -1294,7 +1499,7 @@ Unicode plain text. — This may be arranged as above, through a certain ins
 
 When one processes “the main body” of the output, one calls
 
-    #emb as_BODY §base asiffrom as_BODY_lens  ???
+    #emb[aim=as_BODY_lens] as_BODY §base
 
 which would lead (likewise) to the output sections of both C<secname>s and C<sectext>s to be fully processed (with suitable macros
 wrapping section names — which are also processed into a compact form to be put into the running headers).
@@ -1316,7 +1521,7 @@ the DAG of namespaces.
 The translation aim → lens above defaults to id (then the names of lenses conincide with “the request”).  More generally, it depends
 on the current chain of lenses — controlled on the registered list of “which lenses affect which”.  If a lens C<Foo> affects C<Bar>,
 then the result is the lens C<Foo/Bar>; additionally, in the longer chain C<A, B, Foo, C, D, Bar>, if C<A> affects C<Foo/Bar>, then
-the result is¹⁾ C<A/Foo/Bar>.
+the result is¹⁾ C<A/(Foo/Bar)>.
 
     ¹⁾ Caveat usor: in the chain C<A, Foo, Foo/Baz> a request for C<Bar> may result in²⁾ C<(Foo/Baz)/Bar>.
        (May later propagate to C<((Foo/Baz)/Bar)/Gee>.)  Since it is only the user/developer who could declare such “affections”,
@@ -1449,9 +1654,12 @@ Pops the target stack and restores the enclosing output target.
 
 Clears or creates a section buffer without redirecting output.
 
-=item B<< C<#emb [namespace:]<basename> [in <namespace>] [asiffrom <StartNamespace>] [with_blinder <SubName>]> >>
+=item B<< C<#emb[<options>] <recipe> [<arg_sections...>]> >>
 
-Inserts an unresolved embed placeholder into the current section. Supports qualified syntax (e.g. C<#emb ChapterLayout:title>) or explicit C<in <namespace>>.
+Inserts an unresolved embed placeholder into the current section. Options in C<[...]> accept
+comma-separated key-value pairs (e.g. C<aim=...>, C<in=...>, C<with_blinder=...>, C<callbacks=...>).
+Operands after C<recipe> are bound to C<$ARGV0>, C<$ARGV1>, etc. in the recipe body during assembly.
+Bare C<#emb recipe> acts as a direct section transclusion.
 
 =item B<< C<#set_parents <namespace> <parents...>> >>
 
@@ -1459,13 +1667,15 @@ Declares inheritance edges in the DAG. Validates cycle freedom (halting with C<E
 
 =item B<< C<#start_group [flavor]> >> / B<< C<#end_group [flavor]> >>
 
-Scoped configuration management and rollback boundaries.
+Scoped configuration management and rollback boundaries. Supports optional bracketed options C<#start_group[callbacks=...]>.
 
 =item B<< C<#include [how] <data>> >>
 
-Slurps and processes input. C<how> defaults to C<filename>. State changes persist into the caller.
+Slurps and processes input. For non-container modes (C<filename>, C<string>), strictly takes exactly 1 target argument.
+For container modes (C<section>, C<configkey>), strictly requires position 2 as the joiner key and position 3 as the target.
+Arity violations halt with C<E_SYNTAX_ERROR>.
 
-=item B<< C<#include_scoped [how] <data> <flavor>> >>
+=item B<< C<#include_scoped [how] [joiner] <data> <flavor>> >>
 
 Wraps inclusion in a group named C<flavor>, guaranteeing complete rollback of configuration modifications upon EOF.
 
@@ -1491,9 +1701,10 @@ Redirects subsequent output to the specified section. Creates the section if it 
 
 Creates a section, clearing its content if it already exists.
 
-=item C<out__embed( $basename, $namespace, \%options )>
+=item C<out__embed( $recipe_basename, $recipe_ns, \@arg_sections, \%options )>
 
-Places an C<embed> placeholder into the current target section. The C<%options> hash can contain advanced features like C<asiffrom> or C<with_blinder>.
+Places an C<embed> placeholder into the current target section. C<\@arg_sections> are positional operands
+mapped to C<$ARGVn>. The C<%options> hash can contain features like C<aim>, C<with_blinder>, or C<callbacks>.
 
 =item C<out__get_joined( $spec, \@joiners, \%options )>
 
@@ -1582,7 +1793,7 @@ arguments. The default is standard string comparison.
 
 =over 4
 
-=item C<group__start( [$flavor_name] )>
+=item C<group__start( [$flavor_name, \%options] )>
 
 Starts a scoped group.
 
@@ -1619,13 +1830,18 @@ is C<-1000.0>, distance 999 is C<-1999.0>, and distance C<< >= 1000 >> is C<-200
 
 =over 4
 
-=item C<include__text( $how, $data )>
+=item C<include__text( $how, [$joiner_key], $source )>
 
 Processes included input. If C<$how> is C<'filename'>, C<$data> is read from disk and processed.
 Recursion is tracked on an inclusion stack and mirrored in the configuration key C<opened_includes>;
 attempting to include a file currently in progress halts with C<E_CYCLIC_INCLUDE>. An unreadable
-file halts with C<E_FILE_READ_ERROR>. If C<$how> is not C<'filename'>, C<$data> is processed
+file halts with C<E_FILE_READ_ERROR>. If C<$how> is C<'string'>, C<$data> is processed
 directly as an in-memory string.
+
+If C<$how> is C<'section'> or C<'configkey'>, requires C<$joiner_key> (unless reading from a scalar-valued key); the C<$source> is
+interpreted as a section-name or a key, correspondingly.   This retrieves the joiner list from configuration and joins the content
+using cyclic separators before processing. {??? requires C<($joiner_key, $target, [$options])>}  {??? is reading from a
+scalar-valued key special-cased?}
 
 =back
 
@@ -1643,7 +1859,8 @@ C<E_CYCLIC_INHERITANCE>.
 =item C<assemble( $root_spec )>
 
 Assembles and expands the section specified by C<$root_spec> (e.g. C<Namespace:Basename> or bare
-C<Basename> defaulting to namespace C<_main>).
+C<Basename> defaulting to namespace C<_main>). Coordinates lens affection massaging, positional
+argument binding (C<$ARGV0...>), and blinder masks.
 
 =back
 
@@ -1703,7 +1920,7 @@ call won’t change the results of these calls on the levels between C<$level> a
 
 =head2 Input Processing and Recursion
 
-The primitive to support the C<#include> directive is C<include__text($how, $data)>. If C<$how> is C<filename>, the file C<$data> is searched for and slurped; if not, C<$data> is the input string to be processed. A special form C<#include_scoped> ensures that configuration changes made by the included file are temporary by wrapping the call in a group named by the last argument. Active inclusion paths are mirrored in C<opened_includes>.
+The primitive to support the C<#include> directive is C<include__text($how, @args)>. If C<$how> is C<filename>, the file C<$data> is searched for and slurped; if not, C<$data> is the input string to be processed. A special form C<#include_scoped> ensures that configuration changes made by the included file are temporary by wrapping the call in a group named by the last argument. Active inclusion paths are mirrored in C<opened_includes>.
 
 Recursive processing (e.g., using one C<Text::Fab> “process” to filter data for another) is managed entirely within the Configuration hash. A stack of configuration prefixes is maintained in C<Fab/call_stack_prefixes> (which usually starts as just C<Fab/>). When a named recursive filter is invoked, its name is pushed to the filter name stack C<Fab/call_stack_filter_name>. This also pushes a certain prefix onto C<Fab/call_stack_prefixes> via C<call_stack__push()>. Since it is the last prefix on this stack which is actually used by C<Text::Fab> for its operation, this allows a special predefined configuration (e.g., C<Fab/myList2ScalarFilter>) to take precedence without conflicting with the “normal” operation of the Fab.
 
@@ -1725,15 +1942,20 @@ The B<Assembly Phase> uses this graph to resolve embed placeholders in the outpu
 
 =over 4
 
-=item B<< C<#emb E<lt>basenameE<gt> in E<lt>namespaceE<gt> asiffrom E<lt>StartNamespaceE<gt>> >>
+=item B<< C<#emb[aim=E<lt>AimE<gt>, ...] E<lt>recipeE<gt> [E<lt>arg_sections...E<gt>]> >>
 
-This performs a "static" embed. It resolves the namespace of the section by starting the search directly from C<StartNamespace>'s context. When this context is not the root, this makes it "blind" to any “override sections” up the tree/DAG. C<StartNamespace> defaults to the root namespace in the DAG — which typically contains the most specific overrides. {??? In the current implementation, if asiffrom is omitted, resolution starts at the embed's target namespace, not the root namespace of the assembly.}
+This performs lens-guided resolution. The requested C<aim> is passed through C<_massage_lens> across the active lens stack
+via static joining rules and registered affections in C<Fab/lens_affects>, establishing the virtual root in the DAG.
+When the virtual root is not the root, this makes the name resolution "blind" to any “override sections” up the tree/DAG.
+(Recall that the root contains the most specific overrides.)
 
-=item B<< C<#emb E<lt>basenameE<gt> ... with_blinder E<lt>SubNameE<gt>> >>
+Operands are mapped to C<$ARGV0>, C<$ARGV1>, etc. in the recipe body.
+
+=item B<< C<#emb[with_blinder=E<lt>SubNameE<gt>, ...] E<lt>recipeE<gt> ...> >>
 
 Here C<SubName> provides a completely customizable analog of the previous call, looked up as
 a subroutine reference under C<Fab/blinders/$SubName>. Instead of (or in addition to) obscuring
-the part of DAG which is not reachable from C<StartNamespace>, the output of this user-defined
+the part of DAG which is not reachable from the aim, the output of this user-defined
 subroutine obscures an arbitrary subset of the DAG. Blinding a namespace masks that namespace's
 own section definitions from satisfying the embed, while allowing inheritance traversal to continue
 through its parents in the DAG. It receives the entire current embedding stack (each entry is the
@@ -1744,7 +1966,7 @@ embedded section).
 
 =back
 
-=head2 Support of Control-Flow-Like constructs (conditionals and/or loops) [Planned]
+=head2 Support of Control-Flow-Like constructs (conditionals and/or loops) [Planned] {???}
 
 To simplify support of matched nested control-constructs in the user-defined parser, Fab maintains 6 stacks of matched lengths. Because of this match, they should be modified only via the corresponding API. E.g., the last elements of these lists describe:
 
@@ -1793,7 +2015,7 @@ The API to deal with these stacks is:
 
 =over 4
 
-=item C<control__start( $type, $is_skipping, $label)> [Planned]
+=item C<control__start( $type, $is_skipping, $label)> [Planned] {???}
 
 Pushes a new frame onto the Control Stack.
 
@@ -1809,7 +2031,7 @@ The initial C<skipping_state> for the new frame is computed as follows: if the p
 
 =back
 
-=item C<control__set_skipping( 'flip' | $boolean )> [Planned]
+=item C<control__set_skipping( 'flip' | $boolean )> [Planned] {???}
 
 Modifies the C<skipping_state> of the current control block.
 
@@ -1825,15 +2047,15 @@ If a boolean is provided, the state is set accordingly, again respecting the imm
 
 =back
 
-=item C<control__end( $expected_type )> [Planned]
+=item C<control__end( $expected_type )> [Planned] {???}
 
 Pops the top frame from the Control Stack. For error-checking, the Parser must provide the C<$expected_type>. (Typically, this is used for loop-like constructs only when they are in “skipping mode”; see the next API.) C<Fab/control__loop_indices> is changed accordingly.
 
-=item control__define_invalidation_pointer($expected_type) [Planned]
+=item control__define_invalidation_pointer($expected_type) [Planned] {???}
 
 Mark the next position as “First postion not in the loop”. When this position “is activated”, or the jump is performed past this position (or before the starting position), the effect should be the same as C<control__end( $expected_type )>.
 
-=item C<control__set_pointer( $pointer_name, [$before], [$force] )> [Planned]
+=item C<control__set_pointer( $pointer_name, [$before], [$force] )> [Planned] {???}
 
 Records the current position in the input stream (file or buffer) (if C<$before>, this is the position I<before the directive>) and stores it under C<$pointer_name> in the "Custom Pointers" hash of the current control block. This is the B<sole mechanism> for defining loop start points, C<continue> targets, or any other labeled position. For all loop-like constructs, the Parser is expected to call this at the beginning of the loop body to define a C<'body_start'> pointer.
 
@@ -1841,7 +2063,7 @@ These pointers B<form I<the structural geometry> of the loop>. One must keep in 
 
 By default, this condition is auto-enforced: this call is ignored on the “replay passes” of “loop-like” constructs (i.e., if the current portion of the loop’s body “has already been read” — inside the current I<instance>). This filtering may be disabled by the C<$force> flag. (A similar flag C<$is_replay> is passed to the parser — just in case.)
 
-=item C<control__jump_to( $pointer_name, [$block_label] , [$incr_loop_counter])> [Planned]
+=item C<control__jump_to( $pointer_name, [$block_label] , [$incr_loop_counter])> [Planned] {???}
 
 This is the primitive for all control flow transfers. It instructs the C<Fab> core's main processing loop to B<change its read position>.
 
@@ -1869,7 +2091,7 @@ The C<loop_counter> is incremented by the number in C<$incr_loop_counter> (when 
 
 =back
 
-=head2 Support of Caching configuration-related data [Planned]
+=head2 Support of Caching configuration-related data [Planned] {???}
 
 Sometimes a callback may need a computationally expensive combination of individual entries from a configuration hash. (On may
 think of a regular expression depending on several values in this hash.) To avoid recalculating it every time, the callback may
@@ -1885,7 +2107,7 @@ This assumes that C<$fab-E<gt>{config}{cnt__parser_REx}> changes every time one 
 
 =over 4
 
-=item * config__append_dependent_counter($counter_key, $KEY1, ...) [Planned]
+=item * config__append_dependent_counter($counter_key, $KEY1, ...) [Planned] {???}
 
 =back
 
@@ -2084,9 +2306,21 @@ C<E_EMBED_NOT_FOUND>: A section referenced by an C<#emb> placeholder cannot be r
 
 C<E_CIRCULAR_EMBED>: An C<#emb> chain results in a loop during the final assembly.
 
+=item *
+
+C<E_UNKNOWN_BUNDLE>: A requested callback bundle is not registered under C<Fab/callbacks_bundle/>.
+
+=item *
+
+C<E_ARGV_EMPTY>: Referenced an C<$ARGVn> section parameter outside of a recipe invocation.
+
+=item *
+
+C<E_ARGV_BOUNDS>: Referenced an C<$ARGVn> index that exceeds the number of supplied section arguments.
+
 =back
 
-=head2 B<< Control Flow Errors (C<E_Control>) [Planned] >>
+=head2 B<< Control Flow Errors (C<E_Control>) [Planned] {???} >>
 
 =over 4
 
@@ -2138,12 +2372,14 @@ B<The default configuration schema> under the C<Fab/> key:
 
 =over 8
 
-=item C<Fab/callbacks>
+=item C<Fab/callbacks_bundle/dbg0>
 
-A hash reference containing the operational engine callbacks: C<interleaver>, C<directive_parser>,
-C<chunk_preprocessor>, C<comment_recognizer>, and C<error_handler>. The C<comment_recognizer> callback
+A hash reference containing the canonical operational engine callbacks: C<interleaver>, C<directive_parser>,
+C<chunk_preprocessor>, C<comment_recognizer>, and C<error_handler>.  {??? The active callbacks bundle is referenced via C<Fab/callbacks>.}
+
+The C<comment_recognizer> callback
 receives C<($fab, $buffer, $offset)> and returns the offset after the comment line if recognized (defaulting
-to lines prefixed with C<##>), which triggers chunk fusion across the comment boundary.
+to lines prefixed with C<##>), which triggers chunk fusion across the comment boundary.  {??? Docs of the rest?}
 
 =back
 
@@ -2225,6 +2461,9 @@ the internal calls know the filters needed for the enclosing calls???
 
 Resolving to C<_main> namespace is broken (too early); it should be left undefined, so the resolver knows it should do the late
 resolution — at runtime, when the lenses may be set up differently.
+
+When piping one output section to another, how to decide which promises are “executed”, and which are postponed?  Compare a real
+“watermark” set in the promise and in the piping stage?
 
 the preprocessor needs a guarantee that it is going to be reentered
 

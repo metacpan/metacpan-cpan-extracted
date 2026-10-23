@@ -139,6 +139,7 @@ typedef struct TwHandle {
     uint32_t      cached_pid;    /* getpid() cached at last slot claim */
     uint32_t      cached_fork_gen; /* tw_fork_gen value at last slot claim */
     uint32_t slotless_held; /* read-locks this process holds with no reader-slot */
+    char         *unlink_path;   /* absolute path for a relative backing path */
 } TwHandle;
 
 /* ================================================================
@@ -599,9 +600,8 @@ static inline uint64_t tw_timers_max(TwHandle *h) {
  * slot index has since fired/been freed and reused -- cannot cancel the unrelated
  * timer now occupying that slot.  Low 24 bits = timer index (capacity <= 2^24);
  * the rest = generation.  A timer's state word packs the active flag in bit 0 and
- * the generation in bits 1.. , bumped on each (re)activation.  The generation
- * wraps only after 2^31 reuses of a single slot -- a benign, astronomically
- * unlikely residual. */
+ * the generation in bits 1..31, bumped on each (re)activation and wrapping
+ * after 2^31 reuses of a single slot. */
 #define TW_ID_INDEX(id)      ((uint32_t)((uint64_t)(id) & 0xFFFFFFULL))
 #define TW_ID_GEN(id)        ((uint32_t)((uint64_t)(id) >> 24))
 #define TW_MAKE_ID(gen, idx) (((uint64_t)(gen) << 24) | (uint64_t)(uint32_t)(idx))
@@ -609,7 +609,7 @@ static inline uint64_t tw_timers_max(TwHandle *h) {
 #define TW_TIMER_GEN(tm)     ((tm)->state >> 1)
 
 static inline TwHandle *tw_setup(void *base, size_t map_size,
-                                 const char *path, int backing_fd) {
+                                 const char *path, int backing_fd, char *errbuf) {
     TwHeader *hdr = (TwHeader *)base;
     TwHandle *h = (TwHandle *)calloc(1, sizeof(TwHandle));
     if (!h) {
@@ -632,6 +632,24 @@ static inline TwHandle *tw_setup(void *base, size_t map_size,
         if ((uint64_t)h->capacity > fit) h->capacity = (uint32_t)fit;
     }
     h->path         = path ? strdup(path) : NULL;
+    if (path && h->path && path[0] != '/') {
+        char *cwd = getcwd(NULL, 0);
+        if (cwd) {
+            size_t len = strlen(cwd) + strlen(path) + 2;
+            h->unlink_path = (char *)malloc(len);
+            if (h->unlink_path) snprintf(h->unlink_path, len, "%s/%s", cwd, path);
+            free(cwd);
+        }
+    }
+    if (path && (!h->path || (path[0] != '/' && !h->unlink_path))) {
+        TW_ERR("backing path: %s", strerror(errno));
+        free(h->unlink_path);
+        free(h->path);
+        free(h);
+        munmap(base, map_size);
+        if (backing_fd >= 0) close(backing_fd);
+        return NULL;
+    }
     h->backing_fd   = backing_fd;
     h->my_slot_idx  = UINT32_MAX;
     return h;
@@ -779,7 +797,7 @@ static TwHandle *tw_create(const char *path, uint64_t num_slots, uint64_t capaci
                     }
                     tw_init_header(base, (uint32_t)num_slots, (uint32_t)capacity, total);
                     flock(fd, LOCK_UN); close(fd);
-                    return tw_setup(base, map_size, path, -1);
+                    return tw_setup(base, map_size, path, -1, errbuf);
                 }
                 if (((TwHeader *)base)->magic == 0 && (uint64_t)st.st_size == total
                     && st.st_uid == geteuid()) {
@@ -789,12 +807,12 @@ static TwHandle *tw_create(const char *path, uint64_t num_slots, uint64_t capaci
                 TW_ERR("invalid timing-wheel file"); munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
             }
             flock(fd, LOCK_UN); close(fd);
-            return tw_setup(base, map_size, path, -1);
+            return tw_setup(base, map_size, path, -1, errbuf);
         }
     }
     tw_init_header(base, (uint32_t)num_slots, (uint32_t)capacity, total);
     if (fd >= 0) { flock(fd, LOCK_UN); close(fd); }
-    return tw_setup(base, map_size, path, -1);
+    return tw_setup(base, map_size, path, -1, errbuf);
 }
 
 static TwHandle *tw_create_memfd(const char *name, uint64_t num_slots, uint64_t capacity, char *errbuf) {
@@ -814,7 +832,7 @@ static TwHandle *tw_create_memfd(const char *name, uint64_t num_slots, uint64_t 
     void *base = mmap(NULL, (size_t)total, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
     if (base == MAP_FAILED) { TW_ERR("mmap: %s", strerror(errno)); close(fd); return NULL; }
     tw_init_header(base, (uint32_t)num_slots, (uint32_t)capacity, total);
-    return tw_setup(base, (size_t)total, NULL, fd);
+    return tw_setup(base, (size_t)total, NULL, fd, errbuf);
 }
 
 static TwHandle *tw_open_fd(int fd, char *errbuf) {
@@ -835,7 +853,7 @@ static TwHandle *tw_open_fd(int fd, char *errbuf) {
     }
     int myfd = fcntl(fd, F_DUPFD_CLOEXEC, 0);
     if (myfd < 0) { TW_ERR("fcntl: %s", strerror(errno)); munmap(base, ms); return NULL; }
-    return tw_setup(base, ms, NULL, myfd);
+    return tw_setup(base, ms, NULL, myfd, errbuf);
 }
 
 static void tw_destroy(TwHandle *h) {
@@ -856,6 +874,7 @@ static void tw_destroy(TwHandle *h) {
     }
     if (h->backing_fd >= 0) close(h->backing_fd);
     if (h->base) munmap(h->base, h->mmap_size);
+    free(h->unlink_path);
     free(h->path);
     free(h);
 }
@@ -913,7 +932,8 @@ static int64_t tw_add_locked(TwHandle *h, uint64_t delay, uint64_t payload) {
     uint64_t rounds = (delay - 1) / h->num_slots;
 
     TwTimer *tm = tw_timer(h, t);
-    uint32_t gen = TW_TIMER_GEN(tm) + 1;                   /* new lease for this slot index */
+    uint32_t gen = (uint32_t)(tm->state + 2u) >> 1;        /* increment the packed generation before extracting it */
+    if (!gen) gen = 1;
     tm->payload = payload;
     tm->rounds  = rounds;
     tm->slot    = slot;

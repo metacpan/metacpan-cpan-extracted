@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 use EV;
-use Scalar::Util qw(refaddr weaken);
+use Scalar::Util qw(refaddr weaken looks_like_number);
 
 # Identifier validation regexes — single source of truth for the table
 # / column / function names that get spliced into SQL via the helpers.
@@ -11,7 +11,7 @@ my $RE_IDENT = qr/\A[A-Za-z_][A-Za-z0-9_]*\z/;
 my $RE_TABLE = qr/\A[A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)?\z/;
 
 BEGIN {
-    our $VERSION = '0.06';
+    our $VERSION = '0.07';
     use XSLoader;
     XSLoader::load __PACKAGE__, $VERSION;
 }
@@ -50,7 +50,9 @@ sub new {
     # Connection URI: clickhouse://user:pass@host:port/database
     # host accepts a bracketed IPv6 literal (e.g. clickhouse://[::1]:9000/db)
     if (my $uri = delete $args{uri}) {
-        if ($uri =~ m{^clickhouse(?:\+(\w+))?://(?:([^:@]*?)(?::([^@]*))?\@)?(\[[^\]]+\]|[^/:?]+)(?::(\d+))?(?:/([^?]*))?(?:\?(.*))?$}) {
+        # userinfo splits at the LAST @ before the path (RFC 3986), so a
+        # literal @ in the password parses instead of corrupting the host.
+        if ($uri =~ m{^clickhouse(?:\+(\w+))?://(?:([^:@]*?)(?::([^/]*))?\@)?(\[[^\]]+\]|[^/:?]+)(?::(\d+))?(?:/([^?]*))?(?:\?(.*))?$}) {
             my ($proto, $u, $pw, $h, $p, $db, $qs) = ($1, $2, $3, $4, $5, $6, $7);
             $h =~ s/^\[(.*)\]$/$1/;
             $args{protocol} //= $proto if $proto;
@@ -73,10 +75,14 @@ sub new {
     # via auto_reconnect (or the user calling reset). Falls back to single
     # host => '...' when not provided.
     my $hosts_list;
+    my $hosts_explicit_port;
     if (my $h = delete $args{hosts}) {
         die "hosts must be a non-empty arrayref"
             unless ref($h) eq 'ARRAY' && @$h;
         $hosts_list = $h;
+        # Capture before the embedded-port fill below: an explicit
+        # port => overrides embedded entry ports on rotation too.
+        $hosts_explicit_port = $args{port};
         if (!defined $args{host}) {
             my ($h0, $p0) = _split_host_port($h->[0], $args{port});
             $args{host} = $h0;
@@ -107,6 +113,12 @@ sub new {
 
     $port //= ($protocol eq 'native') ? 9000 : 8123;
 
+    # Stringify now: the async-DNS connect reuses these closures after
+    # new() returns, where an overload would run user code against a
+    # live $self. No $self escapes yet, so firing them here is safe.
+    $_ = "$_" for ($host, $user, $password, $database);
+    $port = 0 + $port;
+
     $self->_set_protocol($protocol eq 'native' ? 1 : 0);
 
     # Pass-through setters. Skip only when the key was absent — explicit
@@ -130,12 +142,11 @@ sub new {
         $self->$setter($val);
     }
 
-    # query_log_comment: 1 = auto-generate "ev_ch user=$ENV{USER} pid=$$"; any
-    # other defined non-empty string (including "0") is taken literally;
-    # undef / not present / empty string is disabled.
+    # query_log_comment: 1 = auto-generate "ev_ch user=$ENV{USER} pid=$$";
+    # any other truthy value is taken literally; falsy disables.
     {
         my $qlc = delete $args{query_log_comment};
-        if (defined $qlc && length $qlc) {
+        if ($qlc) {
             my $cmt = (!ref($qlc) && "$qlc" ne '1')
                     ? $qlc
                     : sprintf 'ev_ch user=%s pid=%d', $ENV{USER} // 'na', $$;
@@ -157,7 +168,7 @@ sub new {
         if %args;
 
     if ($hosts_list) {
-        $self->_set_failover($hosts_list, $port);
+        $self->_set_failover($hosts_list, $port, $hosts_explicit_port // 0);
     }
 
     # Async DNS via EV::cares when available — non-IP hostnames are
@@ -166,8 +177,11 @@ sub new {
     # queries fire once the resolved-address connect completes. Falls
     # back to the XS blocking resolver if EV::cares isn't installed
     # or the host is already an IP literal.
-    if ($host !~ /^[\d.]+$|^\[?[0-9a-fA-F:]+\]?$/
-        && eval { require EV::cares; 1 }) {
+    # An IPv6 literal carries 2+ colons; anything else that merely
+    # looks hex ("db", "cache") is a hostname. The old hex-class regex
+    # misclassified those and sent them down the blocking resolver.
+    my $is_literal = $host =~ /^[\d.]+$/ || $host =~ tr/:/:/ > 1;
+    if (!$is_literal && eval { require EV::cares; 1 }) {
         # Stash the resolver in %_failover, keyed by refaddr of the
         # resolver itself (NOT of $self). Two reasons:
         #   - never delete the resolver from inside its own callback —
@@ -182,6 +196,7 @@ sub new {
         my $key = refaddr($r);
         $_failover{$key} = $r;
         my $weak2 = $self; weaken $weak2;
+        $self->_set_conn_params($host, $port, $user, $password, $database);
         $self->_set_dns_pending(1);
         $r->resolve($host, sub {
             my ($status, @addrs) = @_;
@@ -191,13 +206,9 @@ sub new {
             # clears dns_pending; if it's 0 here, finish ran already).
             return unless $weak2 && $weak2->_take_dns_pending;
             if ($status != 0 || !@addrs) {
-                $weak2->skip_pending;
-                # Warn if the handler itself throws — matches the XS
-                # emit_error path (WARN_AND_CLEAR_ERRSV); a bare eval here
-                # would make a DNS failure vanish under the default
-                # `on_error => sub { die @_ }`.
-                eval { $weak2->on_error->("DNS resolution failed for '$host'"); 1 }
-                    or warn "EV::ClickHouse: exception in error handler: $@";
+                # Same treatment as a blocking getaddrinfo failure:
+                # failover rotation + auto_reconnect, not a bare error.
+                $weak2->_dns_failed("DNS resolution failed for '$host'");
                 return;
             }
             my ($v4) = grep /^[\d.]+$/, @addrs;
@@ -240,7 +251,12 @@ sub iterate {
         EV::break;
     };
     my %s = $settings ? %$settings : ();
-    $s{on_data} = $on_data;
+    # A caller-supplied on_data composes (fires after batch capture)
+    # instead of being overwritten or breaking the iterator.
+    my $user_on_data = delete $s{on_data};
+    $s{on_data} = $user_on_data
+        ? sub { $on_data->(@_); $user_on_data->(@_); }
+        : $on_data;
     $self->query($sql, \%s, sub {
         my (undef, $err) = @_;
         $it->{done} = 1;
@@ -289,9 +305,26 @@ sub insert_iter {
         # size here. $hi == 0 means the caller disabled backpressure — the
         # gate must then never fire (>= 0 would be permanently true).
         return if $hi && $s->buffered_count >= $hi;
-        my $row = $producer->();
+        my $row = eval { $producer->() };
+        if ($@) {
+            my $err = $@;
+            $pump->stop; undef $pump;
+            $s->{sticky_err} ||= "insert_iter producer died: $err";
+            $s->finish($cb);
+            return;
+        }
         if (defined $row) {
-            $s->push_row($row);
+            # push_row croaks on unusable rows (hashref without
+            # columns); a die here would be swallowed by EV and the
+            # pump would finish-success having inserted nothing.
+            my $ok = eval { $s->push_row($row); 1 };
+            if (!$ok) {
+                my $err = $@ || "push_row failed";
+                $pump->stop; undef $pump;
+                $s->{sticky_err} ||= "insert_iter push_row failed: $err";
+                $s->finish($cb);
+                return;
+            }
         } else {
             $pump->stop;
             undef $pump;
@@ -318,6 +351,8 @@ sub insert_async {
         unless defined $table && defined $data && ref($cb) eq 'CODE';
     my $wait     = exists $opts{wait_for_flush} ? delete($opts{wait_for_flush}) : 1;
     my %extra    = %{ delete($opts{settings}) // {} };
+    die "insert_async: unknown option(s): " . join(', ', sort keys %opts) . "\n"
+        if %opts;
     my %settings = (
         async_insert          => 1,
         wait_for_async_insert => $wait ? 1 : 0,
@@ -357,7 +392,7 @@ sub insert_aggregated {
             unless $func =~ $RE_IDENT;
         for my $t (@$args) {
             die "insert_aggregated: $ac arg type contains illegal chars"
-                unless $t =~ /\A[A-Za-z0-9_(),\s]+\z/;
+                unless $t =~ /\A[A-Za-z0-9_(),\s'=]+\z/;
         }
         push @agg_meta, { col => $ac, func => $func, types => [@$args] };
     }
@@ -410,8 +445,10 @@ sub kill_query {
     die "Usage: \$ch->kill_query(\$query_id, \$cb, [%opts])"
         unless defined $query_id && ref($cb) eq 'CODE';
     die "kill_query: invalid query_id '$query_id'"
-        unless $query_id =~ /\A[A-Za-z0-9_\-]+\z/;
-    my $mode = $opts{async} ? 'async' : 'sync';
+        unless $query_id =~ /\A[A-Za-z0-9_.:\/-]+\z/;
+    my $mode = delete($opts{async}) ? 'async' : 'sync';
+    die "kill_query: unknown option(s): " . join(', ', sort keys %opts) . "\n"
+        if %opts;
     $self->query("kill query where query_id = '$query_id' $mode", $cb);
 }
 
@@ -438,7 +475,11 @@ sub track_query_durations {
     my $key = refaddr($self);
     if ($size == 0) {
         if (my $st = delete $DUR_STATE{$key}) {
-            $self->on_query_complete($st->{prev});  # undef restores no-handler
+            # Restore prev only when our wrapper still owns the slot;
+            # a stacked helper installed later keeps its handler.
+            my $cur = $self->on_query_complete;
+            $self->on_query_complete($st->{prev})  # undef restores no-handler
+                if $cur && $st->{wrapper} && refaddr($cur) == refaddr($st->{wrapper});
         }
         return $self;
     }
@@ -452,9 +493,11 @@ sub track_query_durations {
         };
         my $guard = bless \(my $k = $key), 'EV::ClickHouse::_DurGuard';
         my $prev  = $st->{prev};
-        $self->on_query_complete(sub {
-            # Use captured $key (not refaddr at fire time) so we still
-            # reach the right ring after DESTROY zeroed the SV.
+        my $wrapper;
+        $wrapper = sub {
+            $prev->(@_) if $prev;
+            # Captured $key (not refaddr at fire time); fetched after
+            # $prev runs so a disable inside $prev isn't resurrected.
             my $ring = $DUR_STATE{$key};
             if ($ring) {
                 my $dur = $_[4];
@@ -467,9 +510,13 @@ sub track_query_durations {
                     }
                 }
             }
-            $prev->(@_) if $prev;
             $guard;     # keep the guard alive for the closure's lifetime
-        });
+        };
+        $self->on_query_complete($wrapper);
+        # Weak: a strong hold here would pin the guard and leak the
+        # entry past handler replacement (and risk refaddr reuse).
+        $st->{wrapper} = $wrapper;
+        weaken($st->{wrapper});
     } else {
         # Resize: linearize chronological order (oldest at $st->{pos}
         # once the ring is full), keep the newest min(N, $size) samples.
@@ -496,6 +543,7 @@ sub query_duration_p {
     my $st = $DUR_STATE{ refaddr($self) } or return undef;
     my @s = sort { $a <=> $b } @{ $st->{buf} };
     return undef unless @s;
+    $p //= 0.5;
     $p = 0 if $p < 0;
     $p = 1 if $p > 1;
     $s[ int($p * (@s - 1) + 0.5) ];
@@ -514,8 +562,12 @@ sub query_duration_count {
 sub cancel_by_query_id {
     my ($self, $query_id) = @_;
     die "cancel_by_query_id: query_id required" unless defined $query_id && length $query_id;
-    my $cur = $self->last_query_id;
-    return 0 unless defined $cur && $cur eq $query_id;
+    # last_query_id persists after its query completes, so match only
+    # against a query that is actually in flight right now.
+    my $pend = $self->pending_queries;
+    my $head = $pend->[0];
+    return 0 unless $head && $head->{state} eq 'in_flight'
+        && defined $head->{query_id} && $head->{query_id} eq $query_id;
     $self->cancel;
     return 1;
 }
@@ -537,6 +589,8 @@ sub retry {
     my $jitter   = delete $opts{jitter}   // 0;
     my $settings = delete $opts{settings};
     die "retry: cb must be a coderef" if ref($cb) ne 'CODE';
+    die "retry: unknown option(s): " . join(', ', sort keys %opts) . "\n"
+        if %opts;
 
     my $attempt = 0;
     my $timer;
@@ -643,13 +697,22 @@ sub is_healthy {
         $done = 1;
         $cb->(0, "health check timeout after ${timeout}s");
     });
-    $self->ping(sub {
-        return if $done;
+    my $sent = eval {
+        $self->ping(sub {
+            return if $done;
+            $done = 1;
+            undef $t;
+            my (undef, $err) = @_;
+            $cb->(!$err, $err);
+        });
+        1;
+    };
+    if (!$sent) {
+        my $e = $@ || 'unknown error';
         $done = 1;
         undef $t;
-        my (undef, $err) = @_;
-        $cb->(!$err, $err);
-    });
+        $cb->(0, $e);
+    }
     return;
 }
 
@@ -660,11 +723,18 @@ sub ping_round_trip {
     my ($self, $cb) = @_;
     die "Usage: \$ch->ping_round_trip(\$cb)" unless ref($cb) eq 'CODE';
     my $start = EV::time();
-    $self->ping(sub {
-        my (undef, $err) = @_;
-        return $cb->(undef, $err) if $err;
-        $cb->(EV::time() - $start, undef);
-    });
+    my $sent = eval {
+        $self->ping(sub {
+            my (undef, $err) = @_;
+            return $cb->(undef, $err) if $err;
+            $cb->(EV::time() - $start, undef);
+        });
+        1;
+    };
+    if (!$sent) {
+        my $e = $@ || 'unknown error';
+        $cb->(undef, $e);
+    }
     return;
 }
 
@@ -676,6 +746,8 @@ sub slow_query_log {
     my ($self, $threshold, $cb) = @_;
     die "Usage: \$ch->slow_query_log(\$threshold, \$cb)"
         unless defined $threshold && ref($cb) eq 'CODE';
+    die "slow_query_log: threshold must be a number"
+        unless looks_like_number($threshold);
     my $prev = $self->on_query_complete;
     $self->on_query_complete(sub {
         # on_query_complete args: ($query_id, $rows, $bytes, $code, $dur, $err)
@@ -684,6 +756,16 @@ sub slow_query_log {
         $prev->(@_) if $prev;
     });
     return $prev;
+}
+
+# First-row cell access that tolerates named_rows hashrefs (native)
+# as well as plain arrayref rows. $key is the column name used when
+# the row is a hashref; $col the position otherwise.
+sub _cell {
+    my ($rows, $col, $key) = @_;
+    return undef unless $rows && @$rows;
+    my $r = $rows->[0];
+    return ref $r eq 'HASH' ? $r->{$key} : $r->[$col];
 }
 
 # Fetch one value from system.settings. Identifier-safe ($name is
@@ -701,7 +783,7 @@ sub server_setting {
         sub {
             my ($rows, $err) = @_;
             return $cb->(undef, $err) if $err;
-            $cb->($rows && @$rows ? $rows->[0][0] : undef);
+            $cb->(_cell($rows, 0, 'value'));
         },
     );
 }
@@ -722,7 +804,7 @@ sub row_count {
     $self->query($sql, sub {
         my ($rows, $err) = @_;
         return $cb->(undef, $err) if $err;
-        $cb->($rows && @$rows ? $rows->[0][0] : 0);
+        $cb->(_cell($rows, 0, 'count()') // 0);
     });
 }
 
@@ -747,11 +829,10 @@ sub table_size {
     }, sub {
         my ($rows, $err) = @_;
         return $cb->(undef, $err) if $err;
-        my $r = $rows && @$rows ? $rows->[0] : [0, 0, 0];
         $cb->({
-            rows                    => $r->[0] // 0,
-            bytes_on_disk           => $r->[1] // 0,
-            data_uncompressed_bytes => $r->[2] // 0,
+            rows                    => _cell($rows, 0, 'sum(rows)') // 0,
+            bytes_on_disk           => _cell($rows, 1, 'sum(bytes_on_disk)') // 0,
+            data_uncompressed_bytes => _cell($rows, 2, 'sum(data_uncompressed_bytes)') // 0,
         });
     });
 }
@@ -788,9 +869,11 @@ sub wait_mutation {
     die "Usage: \$ch->wait_mutation(\$table, \$cb, [%opts])"
         unless defined $table && ref($cb) eq 'CODE';
     die "wait_mutation: invalid table '$table'" unless $table =~ $RE_TABLE;
-    my $poll    = $opts{poll} // 1;   # defined-or: an explicit poll => 0 is honored
-    my $timeout = $opts{timeout};
-    my $mid     = $opts{mutation_id};
+    my $poll    = delete $opts{poll} // 1;   # defined-or: an explicit poll => 0 is honored
+    my $timeout = delete $opts{timeout};
+    my $mid     = delete $opts{mutation_id};
+    die "wait_mutation: unknown option(s): " . join(', ', sort keys %opts) . "\n"
+        if %opts;
     my ($db, $name) = $table =~ /\./ ? split(/\./, $table, 2) : (undef, $table);
 
     # A mutation that keeps failing stays is_done=0 with latest_fail_reason
@@ -816,8 +899,8 @@ sub wait_mutation {
             $self->query($sql, { params => \%params }, sub {
                 my ($rows, $err) = @_;
                 if ($err) { undef $poll_once; return $cb->(undef, $err) }
-                my $r = $rows && @$rows ? $rows->[0] : [0, ''];
-                my ($pending, $fail) = @$r;
+                my $pending = _cell($rows, 0, 'pending') // 0;
+                my $fail    = _cell($rows, 1, 'fail');
                 # Require a fail reason to persist across polls: a single
                 # transient latest_fail_reason can clear on the mutation's
                 # next retry, so one sighting is not a terminal failure.
@@ -860,7 +943,7 @@ sub parse_uri {
     return undef unless defined $uri;
     return undef unless $uri =~ m{
         ^clickhouse(?:\+(\w+))?://
-        (?:([^:@]*?)(?::([^@]*))?\@)?
+        (?:([^:@]*?)(?::([^/]*))?\@)?
         (\[[^\]]+\]|[^/:?]+)
         (?::(\d+))?
         (?:/([^?]*))?
@@ -868,6 +951,8 @@ sub parse_uri {
     }x;
     my ($proto, $user, $pass, $host, $port, $db, $qs) =
         ($1, $2, $3, $4, $5, $6, $7);
+    return undef
+        if defined $proto && $proto !~ /^(?:http|native)$/;
     $host =~ s/^\[(.*)\]$/$1/;
     my %out = (host => $host);
     $out{protocol} = $proto                if defined $proto;
@@ -879,6 +964,7 @@ sub parse_uri {
     # win on collision) so the resulting hash can be passed verbatim to new().
     _uri_qs_into($qs, \%out);
     $out{protocol} //= 'http';         # apply default after QS merge
+    return undef unless $out{protocol} =~ /^(?:http|native)$/;
     return \%out;
 }
 
@@ -919,6 +1005,8 @@ sub bind_ident {
     die "bind_ident: identifier must be defined and non-empty"
         unless defined $name && length $name;
     my @parts = split /\./, $name, -1;
+    die "bind_ident: expected 'table' or 'db.table', got '$name'"
+        if @parts > 2;
     die "bind_ident: empty component in '$name'"
         if grep { !length } @parts;
     for my $p (@parts) {
@@ -959,6 +1047,12 @@ sub _new {
     # are reordered into arrayref by the streamer instead of the caller
     # having to know column position. `named => 1` is a tolerated alias
     # but `columns` is what actually drives the lookup.
+    my %known = map { $_ => 1 }
+        qw(columns named settings batch_size on_batch_error high_water
+           on_high_water low_water);
+    die "insert_streamer: unknown option(s): "
+        . join(', ', sort grep { !$known{$_} } keys %opts) . "\n"
+        if grep { !$known{$_} } keys %opts;
     my $columns = $opts{columns};
     die "insert_streamer: columns must be a non-empty arrayref"
         if defined $columns && (ref($columns) ne 'ARRAY' || !@$columns);
@@ -1001,7 +1095,8 @@ sub _flush {
         $self->{in_flight} = 0;
         if ($err) {
             $self->{sticky_err} //= $err;
-            $self->{on_batch_error}->($err);
+            eval { $self->{on_batch_error}->($err); 1 }
+                or warn "EV::ClickHouse: on_batch_error died: $@";
         }
         # Drain any buffered rows queued during the batch
         $self->_flush;
@@ -1019,14 +1114,20 @@ sub _flush {
             && @{ $self->{buffer} } <= ($low || 0)) {
             my @w = @{ $self->{drain_waiters} };
             $self->{drain_waiters} = [];
-            $_->(undef) for @w;     # undef err = normal drain
+            # One dying waiter must not starve the rest (same eval+warn
+            # shape as on_batch_error above).
+            for (@w) {
+                eval { $_->(undef); 1 }     # undef err = normal drain
+                    or warn "EV::ClickHouse: await_drain callback died: $@";
+            }
         }
         # Notify finish() if no work remains
         if ($self->{pending_finish}
             && !$self->{in_flight}
             && !@{ $self->{buffer} }) {
             my $fcb = delete $self->{pending_finish};
-            $fcb->(undef, $self->{sticky_err});
+            eval { $fcb->(undef, $self->{sticky_err}); 1 }
+                or warn "EV::ClickHouse: finish callback died: $@";
         }
     };
     my @opt = $self->{settings} ? ($self->{settings}) : ();
@@ -1046,6 +1147,14 @@ sub finish {
     $self->_flush;
     if (!$self->{in_flight} && !@{ $self->{buffer} }) {
         $cb->(undef, $self->{sticky_err});
+    } elsif ($self->{pending_finish}) {
+        my ($prev, $next) = ($self->{pending_finish}, $cb);
+        $self->{pending_finish} = sub {
+            eval { $prev->(@_); 1 }
+                or warn "EV::ClickHouse: finish callback died: $@";
+            eval { $next->(@_); 1 }
+                or warn "EV::ClickHouse: finish callback died: $@";
+        };
     } else {
         $self->{pending_finish} = $cb;
     }
@@ -1090,8 +1199,14 @@ sub reset {
     my $pf = delete $self->{pending_finish};
     my @dw = @{ delete $self->{drain_waiters} || [] };
     $self->{drain_waiters} = [];
-    $pf->(undef, 'streamer reset') if $pf;
-    $_->('streamer reset') for @dw;
+    # Eval-guarded like _flush: one dying callback must not starve
+    # the rest when reset runs inside a callback chain.
+    eval { $pf->(undef, 'streamer reset'); 1 }
+        or warn "EV::ClickHouse: finish callback died: $@" if $pf;
+    for (@dw) {
+        eval { $_->('streamer reset'); 1 }
+            or warn "EV::ClickHouse: await_drain callback died: $@";
+    }
     return $self;
 }
 
@@ -1113,7 +1228,7 @@ sub columns_from_table {
 }
 
 package EV::ClickHouse::Pool;
-use Scalar::Util qw(refaddr);
+use Scalar::Util qw(refaddr weaken);
 
 # Built-in connection pool. Round-robin dispatch with least-busy fallback;
 # each connection is independent (own auto_reconnect, own send_queue),
@@ -1127,7 +1242,7 @@ use Scalar::Util qw(refaddr);
 #   $pool->finish;
 sub new {
     my ($class, %args) = @_;
-    my $size = delete $args{size} || 4;
+    my $size = delete $args{size} // 4;
     die "Pool size must be >= 1" if $size < 1;
     # Circuit breaker per member. After `circuit_threshold` consecutive
     # query/insert failures, mark the member dead for `circuit_cooldown`
@@ -1199,7 +1314,7 @@ sub query  { shift->_dispatch(query  => @_) }
 sub insert { shift->_dispatch(insert => @_) }
 sub ping   { shift->_dispatch(ping   => @_) }
 
-sub for_table       { shift->_pick->for_table(@_) }
+sub for_table       { shift->_dispatch(for_table => @_) }
 sub iterate         { shift->_pick->iterate(@_) }
 sub insert_streamer { shift->_pick->insert_streamer(@_) }
 
@@ -1207,8 +1322,9 @@ sub insert_streamer { shift->_pick->insert_streamer(@_) }
 # polling _pick. Circuit-breaker observation still applies.
 sub _dispatch_to {
     my ($self, $method, $idx, @rest) = @_;
+    die "${method}_to: index required" unless defined $idx;
     die "${method}_to: index $idx out of range"
-        if $idx < 0 || $idx >= @{ $self->{conns} };
+        unless $idx =~ /^\d+$/ && $idx < @{ $self->{conns} };
     my $ch = $self->{conns}[$idx];
     $rest[-1] = $self->_cb_observer($ch, $rest[-1]) if ref $rest[-1] eq 'CODE';
     $ch->$method(@rest);
@@ -1221,7 +1337,9 @@ sub insert_to { shift->_dispatch_to(insert => @_) }
 # can't apply the circuit breaker to calls it doesn't see).
 sub nominate {
     my ($self, $idx) = @_;
-    die "nominate: index $idx out of range" if $idx < 0 || $idx >= @{ $self->{conns} };
+    die "nominate: index required" unless defined $idx;
+    die "nominate: index $idx out of range"
+        unless $idx =~ /^\d+$/ && $idx < @{ $self->{conns} };
     $self->{conns}[$idx];
 }
 
@@ -1283,8 +1401,16 @@ sub hedged_query {
         # Pass $i (not $ch) so _cb_observer can index cb_state directly
         # instead of walking conns via _slot_for.
         my $obs = $self->_cb_observer($i, $inner, !$all_dead);
-        if ($settings) { $ch->query($sql, $settings, $obs) }
-        else           { $ch->query($sql, $obs) }
+        # A member that is momentarily unconnected croaks synchronously;
+        # record it as that member's async result (fan_out precedent) so
+        # $pending accounting still converges on (undef, $err).
+        eval {
+            if ($settings) { $ch->query($sql, $settings, $obs) }
+            else           { $ch->query($sql, $obs) }
+            1;
+        } or do {
+            $obs->(undef, "$@" || 'hedged_query: dispatch failed');
+        };
     }
     return;
 }
@@ -1294,8 +1420,9 @@ sub hedged_query {
 sub circuit_state {
     my $self = shift;
     my $now  = EV::time();
-    map +{ %$_, alive => $_->{dead_until} <= $now },
+    my @st = map +{ %$_, alive => $_->{dead_until} <= $now },
         @{ $self->{cb_state} };
+    return wantarray ? @st : \@st;
 }
 
 # Aggregate stats
@@ -1330,6 +1457,8 @@ sub fan_out {
     my %opts     = @rest;
     my $settings = delete $opts{settings};
     die "fan_out: callback required" unless ref($cb) eq 'CODE';
+    die "fan_out: unknown option(s): " . join(', ', sort keys %opts) . "\n"
+        if %opts;
     my @c   = @{ $self->{conns} };
     die "fan_out: no members" unless @c;
     my @out = map { { member => $_, rows => undef, err => undef } } 0 .. $#c;
@@ -1391,6 +1520,8 @@ sub with_session {
 # Drain when ALL connections have completed pending work.
 sub drain {
     my ($self, $cb) = @_;
+    die "drain callback must be a CODE reference"
+        unless ref($cb) eq 'CODE';
     my $left = scalar @{ $self->{conns} };
     for my $c (@{ $self->{conns} }) {
         $c->drain(sub {
@@ -1401,6 +1532,20 @@ sub drain {
 }
 
 sub finish { $_->finish for @{ $_[0]{conns} } }
+
+# A pool dropped mid-shutdown still owes its chained shutdown
+# callbacks exactly one fire (the primary fires via finalize when
+# the members drain during teardown).
+sub DESTROY {
+    my ($self) = @_;
+    return if ${^GLOBAL_PHASE} eq 'DESTRUCT';
+    if (my $chain = delete $self->{shutdown_chain}) {
+        for (@$chain) {
+            eval { $_->('pool destroyed during shutdown'); 1 }
+                or warn "EV::ClickHouse: shutdown callback died: $@";
+        }
+    }
+}
 
 # Coordinated graceful shutdown: drain every member, then finish. If
 # the optional $grace_seconds elapses before all members drain, force
@@ -1420,27 +1565,65 @@ sub shutdown {
     ($grace, $cb) = (undef, $grace) if ref($grace) eq 'CODE';
     $cb //= sub { };
     die "Usage: \$pool->shutdown([\$grace_seconds], \$cb)" unless ref($cb) eq 'CODE';
+    # A second shutdown while one is draining chains behind it instead
+    # of dying on 'drain already pending' with its callback unfired.
+    if ($self->{shutdown_pending}) {
+        push @{ $self->{shutdown_chain} }, $cb;
+        return;
+    }
+    $self->{shutdown_pending} = 1;
     my $left  = scalar @{ $self->{conns} };
     my $err;
     my $timer;
     my $fired = 0;
+    # Weak: $finalize is reachable from the pool itself
+    # (pool -> members -> drain cbs -> $finalize), so a strong $self
+    # would strand the pool and its sockets when drains never
+    # complete and the user drops the last reference.
+    my $weakself = $self; weaken($weakself);
+    my $aborted = 0;
     my $finalize = sub {
+        return if $aborted;
         return if $fired++;
         undef $timer;
-        $self->finish;
+        if ($weakself) {
+            $weakself->finish;
+            $weakself->{shutdown_pending} = 0;
+            my @chained = @{ delete $weakself->{shutdown_chain} || [] };
+            for (@chained) {
+                eval { $_->($err); 1 }
+                    or warn "EV::ClickHouse: shutdown callback died: $@";
+            }
+        }
         $cb->($err);
     };
-    for my $c (@{ $self->{conns} }) {
-        $c->drain(sub {
-            # Per-connection drain callback takes no arguments.
-            $finalize->() if --$left == 0;
-        });
-    }
+    # Arm the grace timer before draining: idle members finish their
+    # drains synchronously, and arming after would strand a no-op
+    # timer that keeps the loop alive for the full grace period.
     if ($grace && $grace > 0) {
         $timer = EV::timer($grace, 0, sub {
             $err //= "Pool::shutdown timed out after ${grace}s";
             $finalize->();
         });
+    }
+    for my $c (@{ $self->{conns} }) {
+        # A member with a user drain already pending croaks here;
+        # abort cleanly (no stuck flag, no spurious timeout cb) so a
+        # later shutdown still works once that drain completes.
+        my $ok = eval {
+            $c->drain(sub {
+                # Per-connection drain callback takes no arguments.
+                $finalize->() if --$left == 0;
+            });
+            1;
+        };
+        if (!$ok) {
+            my $e = $@ || 'drain failed';
+            $aborted = 1;
+            undef $timer;
+            $self->{shutdown_pending} = 0;
+            die "Pool::shutdown: $e";
+        }
     }
     return;
 }
@@ -1459,7 +1642,16 @@ sub next { EV::ClickHouse::_iterator_next(@_) }
 
 sub error     { $_[0]{err} }
 sub is_done   { $_[0]{done} && !@{ $_[0]{batches} } }
-sub cancel    { $_[0]{ch}->cancel }
+sub cancel {
+    my $self = shift;
+    # The iterator shares its connection: once its own query is done
+    # (or already cancelled), $ch->cancel would kill whatever
+    # unrelated query happens to be in flight now. No-op instead.
+    return 0 if $self->{done} || $self->{cancelled};
+    $self->{cancelled} = 1;
+    $self->{ch}->cancel;
+    return 1;
+}
 
 package EV::ClickHouse::Error;
 
@@ -1565,7 +1757,7 @@ EV::ClickHouse - Async ClickHouse client using EV
     );
 
     # Or via URI: clickhouse[+native]://user:pass@host:port/db?key=val
-    my $ch = EV::ClickHouse->new(
+    $ch = EV::ClickHouse->new(
         uri        => 'clickhouse+native://default:@127.0.0.1:9000/default',
         on_connect => sub { ... },
     );
@@ -1586,9 +1778,9 @@ EV::ClickHouse - Async ClickHouse client using EV
 
     # insert - arrayref of rows (no TSV escaping needed)
     $ch->insert("my_table", [
-        [1, "hello\tworld"],   # embedded tab is fine
-        [2, undef],            # null
-        [3, [10, 20]],         # Array column
+        [1, "hello\tworld", [10, 20]],   # embedded tab is fine
+        [2, undef,          [30]],        # null
+        [3, "plain",        [40, 50]],    # Array column (native only)
     ], sub { my (undef, $err) = @_; warn "insert: $err" if $err });
 
     # insert - pre-formatted TSV string
@@ -1610,6 +1802,11 @@ the L<EV> event loop. It speaks both the ClickHouse HTTP protocol
 no external ClickHouse client library linked. zlib is required; OpenSSL
 (for TLS) and liblz4 (for native compression) are optional and detected
 at build time.
+
+Loading the module sets SIGPIPE to ignored when the process left it at
+its default, so a reset peer surfaces as ordinary EPIPE errors instead
+of killing the process. An explicitly installed handler (including an
+EV signal watcher) is respected and never overridden.
 
 =head2 Features
 
@@ -1660,7 +1857,9 @@ hashref leaves (Int64/Float64/Bool/String + Array variants).
 
 The connection is initiated immediately; C<new> returns before it
 completes. Queries issued before C<on_connect> fires are queued and
-dispatched once the connection is ready.
+dispatched once the connection is ready. Handles are not fork-safe:
+using one connection from parent and child concurrently silently
+mixes up responses - connect after forking instead.
 
 B<Connection parameters:>
 
@@ -1694,7 +1893,8 @@ bracketed-IPv6 literal. On a connect-phase failure (refused, timeout,
 ServerHello stall), the client advances to the next host in round-robin
 order; pair with C<auto_reconnect =E<gt> 1> for automatic recovery.
 The single C<host> argument is honoured as a fallback when
-C<hosts> isn't given.
+C<hosts> isn't given. An explicit C<port> argument overrides any
+embedded entry ports, on the initial connect and on rotation.
 
 =item port => $port
 
@@ -1791,6 +1991,9 @@ to queue new queries or call C<reset> from inside the handler.
 
 Debug trace callback. Called with internal state-machine messages
 (connect, dispatch, disconnect). Useful for diagnosing protocol issues.
+Keep the handler side-effect free: traces emitted from inside a
+handler are dropped, and a reset()/finish() from the handler aborts
+the interrupted connect/disconnect step.
 
 =item on_failover => sub { my ($old_host, $old_port, $new_host, $new_port, $msg) = @_ }
 
@@ -1809,7 +2012,10 @@ B<Options:>
 
 Enable compression: gzip on HTTP (request and response), LZ4 with CityHash
 checksums on the native protocol. Default: C<0>. Native compression
-requires liblz4 at build time.
+requires liblz4 at build time. With native compression the client pins
+C<network_compression_method=LZ4> on every query unless you set that
+setting yourself, so servers whose default is ZSTD stay readable
+(ZSTD responses are rejected loudly, never misdecoded).
 
 =item session_id => $id
 
@@ -1842,11 +2048,12 @@ user-visible payload regardless of transport encoding. On overflow the
 query callback receives an appropriate error ("recv buffer overflow",
 "chunked response too large", or "gzip body exceeds max_recv_buffer")
 and the connection is torn down so no subsequent query can slip past
-the cap on the same socket. C<0> (default) keeps the historical
-no-cap behaviour (still bounded internally by a hard 128 MB ceiling
-on compressed paths). Recommended in production when the schema is
-constrained and you want a hard upper bound (e.g.
-C<128 * 1024 * 1024> for 128 MB).
+the cap on the same socket. With C<auto_reconnect> the link is
+re-established afterwards (the cap still applies to every response).
+C<0> (default) keeps the historical no-cap behaviour (still bounded
+internally by a hard 128 MB ceiling on compressed paths). Recommended
+in production when the schema is constrained and you want a hard upper
+bound (e.g. C<128 * 1024 * 1024> for 128 MB).
 
 =item http_basic_auth => 0 | 1
 
@@ -1864,16 +2071,19 @@ queued (unsent) queries are preserved across reconnects; in-flight queries
 receive an error.
 
 The reconnect path covers TCP/TLS connect failures, C<connect_timeout>
-or C<query_timeout> expiry, and any clean server-side EOF (idle or
-mid-request). Mid-query I/O errors (ECONNRESET / EPIPE) and a malformed
-native ServerHello are B<not> retried - they typically indicate a
-misconfigured peer or client-side bug that retry would only loop on.
-Combine with C<reconnect_max_attempts> for an explicit ceiling.
+or C<query_timeout> expiry, any clean server-side EOF (idle or
+mid-request), and mid-stream protocol corruption (a malformed native
+packet leaves the byte stream unresyncable, so the connection is torn
+down and re-established rather than risk misattributing the server's
+remaining output to the next query). Mid-query I/O errors (ECONNRESET /
+EPIPE) also reconnect; the failed in-flight query receives an error.
+A malformed native ServerHello is not retried. Combine with
+C<reconnect_max_attempts> for an explicit ceiling.
 
 =item settings => \%hash
 
 ClickHouse settings applied to every query and insert. Per-call settings
-(see L</query>, L</insert>) override these.
+(see L</query>, L</insert>) override these. Undefined values are skipped.
 
     settings => { async_insert => 1, max_threads => 4 }
 
@@ -1882,7 +2092,11 @@ ClickHouse settings applied to every query and insert. Per-call settings
 Send a keepalive request every N seconds while the connection is idle:
 a native CLIENT_PING on the native protocol or a C<GET /ping> on HTTP
 (some load balancers / NATs drop idle HTTP connections after a few
-seconds; TCP-level keepalive is too coarse). Default: C<0> (disabled).
+seconds; TCP-level keepalive is too coarse). Idle timing starts at
+connect. Each ping carries a deadline (the connection
+C<query_timeout>, else the keepalive interval itself), so a peer that
+swallows the ping tears the connection down for C<auto_reconnect>
+instead of wedging it. Default: C<0> (disabled).
 
 =item reconnect_delay => $seconds
 
@@ -2010,7 +2224,7 @@ and quoting is the server's job, so values do not need escaping:
     );
 
 Works on both protocols (HTTP uses URL-encoded C<param_*> query string;
-native uses dedicated wire fields).
+native uses dedicated wire fields, which need server revision >= 54459).
 
 =item C<query_id =E<gt> $string>
 
@@ -2102,6 +2316,14 @@ newlines separate rows, with the standard ClickHouse escapes).
 When using arrayrefs, no TSV escaping is needed: C<undef> maps to null
 and strings may contain tabs and newlines freely.
 
+On the native protocol, values are validated before sending: an
+invalid calendar date (month 13, February 30, hour 25), a non-digit
+where a digit belongs, a value outside the column type's range, or
+C<undef> for a non-null column fails the whole batch with an
+encoding error instead of landing as a wrapped or zero value.
+Decimal and integer parsing matches the server's TSV verdicts
+(surplus fraction digits truncate; anything else malformed fails).
+
 Nested arrayrefs (Array/Tuple columns) and hashrefs (Map columns) are
 supported B<only on the native protocol>, where the encoder has the
 column type from the server's sample block. On HTTP the same call
@@ -2110,10 +2332,8 @@ protocol or pre-serialise nested types into ClickHouse TSV literal form.
 
     # Native: nested types encode directly.
     $ch->insert("my_table", [
-        [1, "hello\tworld"],   # embedded tab
-        [2, undef],            # null
-        [3, [10, 20]],         # Array column   (native only)
-        [4, { a => 1, b => 2 }],  # Map column  (native only)
+        [1, "hello\tworld", [10, 20], { a => 1 }],   # embedded tab
+        [2, undef,          [30],     { b => 2 }],   # null
     ], sub { ... });
 
 The optional C<\%settings> hashref works exactly as in L</query>,
@@ -2369,7 +2589,9 @@ completes, or the optional timeout (seconds) expires. Useful for
 procedural ETL / export code that doesn't fit a callback shape.
 
 C<-E<gt>error>, C<-E<gt>is_done>, and C<-E<gt>cancel> are also
-available on the returned iterator object.
+available on the returned iterator object. An optional C<\%settings>
+second argument passes through to the query; a supplied C<on_data>
+fires per block in addition to batch capture.
 
 =head2 on_log
 
@@ -2450,8 +2672,8 @@ Dispatches are serialised; push_row keeps buffering while a batch is
 in flight (the native protocol cannot pipeline INSERTs). C<finish>
 flushes the remaining buffer and fires its callback once all batches
 complete; if any batch failed the first error is delivered as
-C<$err>. The streamer also offers C<buffered_count> and C<in_flight>
-accessors for backpressure logic.
+C<$err>. The streamer also offers C<buffered_count>, C<in_flight>
+and C<sticky_error> accessors for backpressure logic.
 
 C<<< $streamer->reset >>> discards any rows still in the local buffer
 and clears the sticky error so the streamer can be reused after a
@@ -2464,9 +2686,11 @@ silently dropped.
 C<high_water> + C<on_high_water> trigger a one-shot notification when
 the buffered row count crosses the watermark, intended as a hint to
 slow the producer. Set C<high_water> below C<batch_size>; if
-C<high_water E<gt> batch_size>, the buffer drains via C<batch_size>
-flushes before the watermark is reached and C<on_high_water> never
-fires. When C<high_water == batch_size> the watermark and the flush
+C<high_water E<gt> batch_size>, steady-state C<batch_size> flushes
+keep the buffer below the watermark so C<on_high_water> normally
+never fires (it still can while dispatch is stalled, e.g. before
+connect, when the buffer grows unchecked). When
+C<high_water == batch_size> the watermark and the flush
 threshold coincide: C<on_high_water> fires once per batch, right after
 the flush dispatches (so C<in_flight> is already 1). The notification
 re-arms only after the buffer drops below C<high_water>.
@@ -2484,7 +2708,8 @@ the backpressure loop:
     );
     $s->await_drain(sub { $producer->resume });
 
-Fires synchronously if the buffer is already at/below C<low_water>.
+Fires synchronously if the buffer is already at/below C<low_water>
+and no batch is in flight.
 Re-arms each call: register again from inside the callback if you
 want to keep watching. The callback receives one argument: C<undef>
 on a normal drain, or an error string if the streamer was C<reset>
@@ -2533,7 +2758,8 @@ success, an error string on failure).
 Generator-driven insert. Internally wraps L</insert_streamer> with an
 C<EV::idle> pump that calls C<$producer> repeatedly, respecting
 C<high_water> for backpressure. C<undef> from the producer signals
-end-of-stream and triggers C<finish>. C<%opts> is forwarded to
+end-of-stream and triggers C<finish>; an exception aborts the pump
+and reaches C<$cb> as the error. C<%opts> is forwarded to
 L</insert_streamer>.
 
 =head2 kill_query
@@ -2544,9 +2770,9 @@ L</insert_streamer>.
     });
 
 Shortcut for C<kill query where query_id = '...' sync>. Validates
-C<$query_id> against C<[A-Za-z0-9_-]+> before interpolating into the
-SQL. Pass C<async =E<gt> 1> to send C<ASYNC> instead of C<SYNC> when
-fire-and-forget semantics are wanted.
+C<$query_id> against C<[A-Za-z0-9_.:/-]+> before interpolating into
+the SQL. Pass C<async =E<gt> 1> to send C<ASYNC> instead of C<SYNC>
+when fire-and-forget semantics are wanted.
 
 =head2 cancel_by_query_id
 
@@ -2759,6 +2985,7 @@ with whichever returns first. The callback receives
 C<($rows, undef, $member_idx)> on success (so callers can attribute
 wins per member) or C<(undef, $err)> if I<every> member fails.
 Extra completions after the winner are silently discarded.
+Pass C<settings =E<gt> \%h> for per-query options.
 Recommended for tail-latency-sensitive selects on replicated tables.
 B<Do not> use for insert - would silently double-write when the
 server's dedupe window misses.
@@ -2795,7 +3022,9 @@ elapses before every member drains, members still in flight are
 force-finished and C<$cb> receives the string
 C<"Pool::shutdown timed out after Ns">. On a clean shutdown C<$cb>
 receives undef. C<$grace_seconds> may be 0 (or undef) to wait
-indefinitely. The callback fires exactly once.
+indefinitely; C<<< $pool->shutdown($cb) >>> omits it. A second
+shutdown while one is draining waits for the first instead of
+failing. The callback fires exactly once.
 
     $SIG{TERM} = sub { $pool->shutdown(10, sub { EV::break }) };
 
@@ -2805,15 +3034,20 @@ indefinitely. The callback fires exactly once.
 
     $ch->finish;
 
-Close the connection. Pending queries receive an error callback. Aliased
-as C<disconnect>.
+Close the connection. Pending queries receive an error callback, and
+any pending C<auto_reconnect> backoff is cancelled (no reconnect
+happens afterwards, even when called from inside C<on_error>). Aliased
+as C<disconnect>. Connection handlers are released, so closures that
+capture C<$ch> stop pinning the handle once the last user ref drops.
 
 =head2 reset
 
     $ch->reset;
 
 Disconnect and immediately reconnect using the original parameters.
-Aliased as C<reconnect>.
+Safe to call from inside error callbacks, including from another
+C<reset>'s own callbacks (the inner call wins exactly once). Aliased
+as C<reconnect>.
 
 =head2 drain
 
@@ -2821,7 +3055,9 @@ Aliased as C<reconnect>.
 
 Register a callback to fire once all pending queries (queued + in-flight)
 have completed. If nothing is pending, the callback fires synchronously.
-The classic graceful-shutdown pattern:
+The waiter also fires when pending work is cancelled with errors
+(timeout, teardown), so it never hangs. Only one waiter may be pending;
+registering a second croaks. The classic graceful-shutdown pattern:
 
     $ch->query("select 1", sub { ... });
     $ch->query("select 2", sub { ... });
@@ -2837,7 +3073,9 @@ The classic graceful-shutdown pattern:
 Cancel the currently in-flight query. Native protocol sends CLIENT_CANCEL
 and waits for the server's EndOfStream/Exception; HTTP closes the connection
 (use C<auto_reconnect> or call L</reset> to recover). The query's callback
-receives an error.
+receives an error. Cancelling a native INSERT while its sample block is
+in flight is safe: the cancel is flushed behind the data block. Calling
+cancel() from L</on_query_start> cancels the dispatch itself.
 
 =head2 skip_pending
 
@@ -2929,9 +3167,11 @@ C<< { query_id => 'my-id' } >> in the settings hash of L</query>/L</insert>.
 The most recent OpenSSL error string captured during TLS context setup
 or handshake (e.g. C<certificate verify failed>, C<key values mismatch>),
 or C<undef> if no TLS error has occurred. Always C<undef> when built
-without OpenSSL. Useful for surfacing the actual crypto reason to the
-operator after a connection has failed - the on_error message itself
-only names the failing call site (e.g. C<SSL_connect failed>).
+without OpenSSL. A handshake that dies at the TCP level (reset, EOF)
+records the C<errno> detail instead of going stale. Useful for surfacing
+the actual crypto reason to the operator after a connection has failed -
+the on_error message itself only names the failing call site (e.g.
+C<SSL_connect failed>).
 
 =item last_error_code
 
@@ -3073,8 +3313,10 @@ omit the option for fresh inserts. See F<eg/idempotent_insert.pl>.
 
 C<<< on_data =E<gt> sub { } >>> in the per-query settings is the
 lowest-overhead streaming path: each native data block is delivered as
-soon as the parser has it, no per-row allocation overhead beyond the
-batch arrayref. C<iterate> is a synchronous-feeling pull wrapper around
+soon as the parser has it, and rows are not accumulated across blocks.
+(Rows within a block are still decoded to Perl values first, so
+per-row decode work is the same - the saving is the accumulation.)
+C<iterate> is a synchronous-feeling pull wrapper around
 the same machinery - useful when the surrounding code is procedural
 (ETL scripts, exporters) and a callback shape doesn't fit. Both are
 native-only.
@@ -3093,8 +3335,10 @@ Authorization verbatim while filtering proprietary headers.
 
 =item Native vs HTTP
 
-Native (port 9000) is typically 2-5x faster for insert and select-of-many-rows
-because rows ship as binary columns instead of TSV text. Use HTTP only when
+Native (port 9000) is typically 1.5-3x faster for select-of-many-rows
+because rows ship as binary columns instead of TSV text. Inserts are
+usually server-bound and land within noise of each other on either
+protocol (measure with F<bench/benchmark.pl>). Use HTTP only when
 the network path requires HTTPS-only or when you need C<raw =E<gt> 1> CSV /
 JSONEachRow / Parquet bodies.
 
@@ -3168,6 +3412,9 @@ gigabytes) will grow the recv buffer until the process is OOM-killed.
 Set C<max_recv_buffer =E<gt> 64 * 1024 * 1024> (64 MB) and let the
 parser tear the connection down with a clean error if exceeded - the
 caller's on_error can decide whether to retry or surface to the user.
+The cap bounds the wire buffer (HTTP bodies, single native blocks):
+rows decoded from earlier blocks of a large native result still
+accumulate, so pair it with C<on_data> streaming for unbounded selects.
 
 =item 4. Watch for head-of-line blocking
 
@@ -3285,13 +3532,18 @@ yourself with L<Math::BigInt> for exact arithmetic.
 =item Decimal256
 
 Returns raw 32 LE bytes. Decode with L<Math::BigInt> (see
-C<eg/decimal_bigmath.pl>).
+C<eg/decimal_bigmath.pl>). Encode accepts decimal text or raw 32 LE bytes.
 
 =item Date / Date32 / DateTime / DateTime64
 
 Default: integer (days since epoch / Unix seconds). With C<decode_datetime>:
 C<YYYY-MM-DD> or C<YYYY-MM-DD HH:MM:SS> or C<YYYY-MM-DD HH:MM:SS.ffffff>.
 DateTime carries a timezone string; the formatted output uses it.
+
+=item Time / Time64
+
+Integer (seconds, or 10^-scale seconds for C<Time64>). Encode accepts
+the same integers or C<'HH:MM:SS'> text.
 
 =item Bool
 
@@ -3305,7 +3557,7 @@ Bytes-in, bytes-out. No UTF-8 transformation.
 =item UUID
 
 Canonical hex form C<xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx>. Encode
-accepts the same.
+accepts the same, or 32 hex digits without dashes.
 
 =item IPv4 / IPv6
 

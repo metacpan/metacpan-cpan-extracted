@@ -1,5 +1,13 @@
 Revision history for Math-Basic-XS
 
+0.06    2026-10-23
+        - Require ExtUtils::MakeMaker 7.12, older ones build no XS
+        - Fix callbacks losing their result on perls before 5.12, and $_ not being restored
+        - Fix sum, min and max truncating to integers, and use the full NV on quadmath perls
+        - Fix median picking the wrong element for 3, 6, 7 and other counts
+        - Return undef from min, max, mean, median and mode for an empty list
+        - Export with Ex::Op instead of Import::Export, perl 5.10 or later
+
 0.01    Date/time
         First version, released on an unsuspecting world.
 

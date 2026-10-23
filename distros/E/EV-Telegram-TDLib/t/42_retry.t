@@ -353,4 +353,24 @@ my %FAST = (attempts => 3, margin => 0);
         undef, 'and a non-429 is never a retry, whatever it says';
 }
 
+{
+    my $td = new_client();
+    @sent = ();
+    my $request = { '@type' => 'sendMessage', '@extra' => 'caller', chat_id => -100,
+                    input_message_content => { '@type' => 'inputMessageText',
+                        text => { '@type' => 'formattedText',
+                                  text => "first \x{1f4e8}" } } };
+    my $first = $td->send($request, sub {}, retry => \%FAST);
+    my $original = last_req();
+    $request->{chat_id} = -200;
+    $request->{input_message_content}{text}{text} = 'second';
+    $td->inject_raw(flood($first, 0));
+    pump();
+    my $retried = last_req();
+    isnt delete $retried->{'@extra'}, delete $original->{'@extra'},
+        'a retried snapshot has a fresh correlation id';
+    is_deeply $retried, $original,
+        'retry preserves the submitted request when the caller reuses its hash';
+}
+
 done_testing;

@@ -184,6 +184,7 @@ subtest 'typed placeholders' => sub {
 subtest 'inline placeholders within segments' => sub {
     my $r = Router::Ragel->new
         ->add('/path/to_:type<string>/id_:id<int>/whatever', 'inline')
+        ->add('/pair/:name<string>--:id<int>', 'pair')
         ->compile;
 
     my @r = $r->match('/path/to_user/id_42/whatever');
@@ -191,6 +192,38 @@ subtest 'inline placeholders within segments' => sub {
 
     is_deeply([$r->match('/path/to_user/id_xx/whatever')], [], ':id<int> rejects non-digits in inline form');
     is_deeply([$r->match('/path/to_/id_42/whatever')], [], ':type<string> rejects empty');
+    is_deeply([$r->match('/pair/name--42')], ['pair', 'name', '42'],
+        'a repeated literal between placeholders is excluded from the captures');
+    is_deeply([$r->match('/pair/long--name--42')], ['pair', 'long--name', '42'],
+        'the last complete separator determines the capture boundary');
+};
+
+subtest 'custom types stay within a segment' => sub {
+    my $r = Router::Ragel->new
+        ->add('/any/:v<any+>/end', 'any')
+        ->add('/ascii/:v<ascii+>', 'ascii')
+        ->add('/neg/:v<[^0-9]+>', 'neg')
+        ->add('/file/:name<[^.]+>.:ext<[a-z]+>', 'file')
+        ->add('/numeric/:v<(0x2f|[a-z])+>', 'numeric')
+        ->add('/empty/:v<any*>/end', 'empty')
+        ->compile;
+
+    for my $case (
+        ['/any/value/end', ['any', 'value']],
+        ['/ascii/value', ['ascii', 'value']],
+        ['/neg/abc', ['neg', 'abc']],
+        ['/file/name.txt', ['file', 'name', 'txt']],
+        ['/numeric/abc', ['numeric', 'abc']],
+        ['/empty//end', ['empty', '']],
+    ) {
+        is_deeply([$r->match($case->[0])], $case->[1], "$case->[0] captures its segment");
+    }
+    is_deeply([$r->match("/any/\0\x80\xff/end")], ['any', "\0\x80\xff"],
+        'any+ preserves NUL and high bytes within a segment');
+    for my $path ('/any/a/b/end', '/ascii/a/b', '/neg/a/b',
+                  '/file/sub/name.txt', '/numeric/a/b', '/empty/a/b/end') {
+        is_deeply([$r->match($path)], [], "$path cannot cross a segment boundary");
+    }
 };
 
 subtest 'multiple placeholders in one segment' => sub {
@@ -263,6 +296,9 @@ subtest 'literal suffix after <type> within a segment' => sub {
     my $r = Router::Ragel->new
         ->add('/:name<string>_extra', 'suf')
         ->add('/:x<int>px', 'int_suf')
+        ->add('/archive/:name<string>.tar.gz', 'archive')
+        ->add('/repeat/:name<string>ff', 'repeat')
+        ->add('/optional/:name<[a-z]*>abab', 'optional')
         ->compile;
 
     is_deeply([$r->match('/hello_extra')], ['suf', 'hello'],
@@ -273,6 +309,16 @@ subtest 'literal suffix after <type> within a segment' => sub {
     is_deeply([$r->match('/42px')], ['int_suf', '42'],
         ':x<int>px captures digits and matches the literal suffix');
     is_deeply([$r->match('/42')], [], 'missing literal suffix fails to match');
+    is_deeply([$r->match('/archive/x.tar.gz')], ['archive', 'x'],
+        'a multi-dot suffix is excluded from the capture');
+    is_deeply([$r->match('/archive/x.tar.gz.tar.gz')], ['archive', 'x.tar.gz'],
+        'the last complete suffix determines the capture end');
+    is_deeply([$r->match('/repeat/xfff')], ['repeat', 'xf'],
+        'a repeated suffix byte does not truncate the suffix');
+    is_deeply([$r->match('/optional/abab')], ['optional', ''],
+        'a nullable type captures empty before its suffix');
+    is_deeply([$r->match('/optional/xababab')], ['optional', 'xab'],
+        'overlapping suffix candidates preserve the full capture');
 };
 
 subtest 'utf8-flagged (wide) path matched as UTF-8 bytes' => sub {

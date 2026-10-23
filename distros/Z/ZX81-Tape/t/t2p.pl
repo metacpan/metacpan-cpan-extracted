@@ -28,6 +28,9 @@ while ( $source =~ /^\s*\#\s*AUTOSTART_LINE\s*=\s*(\d+)/mg ) {
     $AUTOSTART_LINE = $1;
 }
 
+# replace {expr} by number
+$source =~ s/\{(.*?)\}/eval_expr($1)/ge;
+
 # save patched source to a temporary file
 path("$bas_file.2")->spew($source);
 
@@ -98,3 +101,10 @@ else {
 
 # write the file
 path($p_file)->spew_raw( join '', map { chr } @bytes );
+
+sub eval_expr {
+    my ($expr) = @_;
+    my $value = eval($expr);
+    $@ and die "eval '$expr' failed: $@";
+    return $value;
+}

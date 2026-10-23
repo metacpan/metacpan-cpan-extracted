@@ -1,6 +1,6 @@
 package Langertha::Role::PromptCache;
 # ABSTRACT: Role for an engine with a request-side prompt-caching control
-our $VERSION = '0.503';
+our $VERSION = '0.504';
 use Moose::Role;
 use Langertha::PromptCache;
 
@@ -86,7 +86,7 @@ Langertha::Role::PromptCache - Role for an engine with a request-side prompt-cac
 
 =head1 VERSION
 
-version 0.503
+version 0.504
 
 =head2 prompt_cache
 

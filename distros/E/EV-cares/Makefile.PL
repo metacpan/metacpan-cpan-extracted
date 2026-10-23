@@ -4,21 +4,6 @@ use ExtUtils::MakeMaker;
 use EV::MakeMaker;
 use Alien::cares;
 
-# servers() uses ares_get_servers_csv, which needs c-ares >= 1.24.
-my $cares_version = Alien::cares->version;
-if (defined $cares_version && length $cares_version) {
-    my @v = split /\./, $cares_version;
-    # per-field numeric compare: "1.7.2" must sort below "1.24"
-    my $too_old = ($v[0] // 0) < 1
-        || (($v[0] // 0) == 1 && ($v[1] // 0) < 24);
-    die "EV::cares requires c-ares >= 1.24, but Alien::cares provides"
-        . " $cares_version\n"
-        if $too_old;
-} else {
-    warn "EV::cares: could not determine the c-ares version from"
-        . " Alien::cares; continuing, but c-ares >= 1.24 is required\n";
-}
-
 my %ev = EV::MakeMaker::ev_args();
 
 WriteMakefile(

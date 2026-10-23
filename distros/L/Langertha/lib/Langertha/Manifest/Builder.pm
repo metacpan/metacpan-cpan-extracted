@@ -1,6 +1,6 @@
 package Langertha::Manifest::Builder;
 # ABSTRACT: Build a provider manifest from configured engines (offline, never copies a secret)
-our $VERSION = '0.503';
+our $VERSION = '0.504';
 use Moose;
 use Carp qw( carp croak );
 use Scalar::Util qw( blessed );
@@ -41,7 +41,13 @@ has _models    => ( is => 'ro', default => sub { [] } );
 #     cache knobs, keep_alive Ollama's model residency, cached_content
 #     Gemini's cache-resource lifecycle, context_size Ollama's server-side
 #     num_ctx allocation) are not provider claims about a model either, and
-#     would be wrong behind a proxy's public URL.
+#     would be wrong behind a proxy's public URL;
+#   - stream_usage says Langertha's own stream request asks for the usage
+#     (stream_options.include_usage, ADR 0038): a request-builder fact, and
+#     behind a proxy whether a stream reports usage is the proxy's behavior;
+#   - tool_result_images / tool_result_pdf say how Langertha serializes a
+#     tool's image or PDF on the engine's own wire (ADR 0039): behind a
+#     proxy's public URL that is the proxy's behavior too.
 # A capability added to %ROLE_TO_CAPS later is NOT published until it is
 # added here (t/96_manifest_builder.t forces that decision).
 my @MODEL_CAPABILITIES = qw(
@@ -353,7 +359,7 @@ Langertha::Manifest::Builder - Build a provider manifest from configured engines
 
 =head1 VERSION
 
-version 0.503
+version 0.504
 
 =head1 SYNOPSIS
 
@@ -464,7 +470,11 @@ model-scoped, see L<Langertha::Role::ImageInput>).
 Engine-level and client-side flags are never published on a model:
 C<embedding>, C<transcription>, C<image_generation>, C<runtime_metrics>,
 C<prefix_caching>, C<keep_alive>, C<cached_content>, C<context_size> (Ollama's
-server-side C<num_ctx> allocation, like C<keep_alive>).
+server-side C<num_ctx> allocation, like C<keep_alive>), C<stream_usage> (that
+Langertha's own stream request asks for the token usage; behind a proxy that
+is the proxy's behavior), C<tool_result_images> and C<tool_result_pdf> (how
+Langertha serializes a tool's image or PDF on the engine's own wire; behind a
+proxy that is the proxy's behavior too).
 
 This filters only what the Builder B<emits>. A parsed manifest accepts any
 capability name (L<Langertha::Manifest::Model/supports>).

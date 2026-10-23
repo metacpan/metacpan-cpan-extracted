@@ -1,0 +1,40 @@
+---
+abstract: 'event-loop and platform neutral WebSocket protocol engine'
+author:
+  - 'Joshua S. Day <hax@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150015'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Unblock-WebSocket
+no_index:
+  directory:
+    - t
+    - inc
+  package:
+    - Unblock::WebSocket::_Deflate
+    - Unblock::WebSocket::_Engine
+    - Unblock::WebSocket::_Frame
+    - Unblock::WebSocket::_Frame::Parser
+    - Unblock::WebSocket::_Native
+    - Unblock::WebSocket::_Random
+    - Unblock::WebSocket::_UTF8
+requires:
+  Compress::Raw::Zlib: '2.017'
+  Crypt::SysRandom: '0.006'
+  Digest::SHA: '0'
+  MIME::Base64: '0'
+  URI: '0'
+  Uniform::HTTP: '0.05'
+  perl: '5.016000'
+resources:
+  bugtracker: https://github.com/haxmeister/perl-Unblock-WebSocket/issues
+  repository: https://github.com/haxmeister/perl-Unblock-WebSocket.git
+version: '0.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

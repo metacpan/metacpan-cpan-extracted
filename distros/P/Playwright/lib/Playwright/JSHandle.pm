@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::JSHandle;
-$Playwright::JSHandle::VERSION = '1.621';
+$Playwright::JSHandle::VERSION = '1.641';
 use parent 'Playwright::Base';
 
 sub new {
@@ -20,36 +20,6 @@ sub new {
 
 sub spec {
     return $Playwright::spec->{'JSHandle'}{members};
-}
-
-sub evaluateHandle {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'evaluateHandle',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub getProperties {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'getProperties',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub jsonValue {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'jsonValue',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
 }
 
 sub dispose {
@@ -72,6 +42,36 @@ sub evaluate {
     );
 }
 
+sub asElement {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'asElement',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub evaluateHandle {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'evaluateHandle',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub jsonValue {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'jsonValue',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
 sub getProperty {
     my $self = shift;
     return $self->_api_request(
@@ -82,11 +82,11 @@ sub getProperty {
     );
 }
 
-sub asElement {
+sub getProperties {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'asElement',
+        command => 'getProperties',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -116,7 +116,7 @@ Playwright::JSHandle - Automatically generated class for Playwright::JSHandle
 
 =head1 VERSION
 
-version 1.621
+version 1.641
 
 =head1 CONSTRUCTOR
 
@@ -126,24 +126,6 @@ You shouldn't have to call this directly.
 Instead it should be returned to you as the result of calls on Playwright objects, or objects it returns.
 
 =head1 METHODS
-
-=head2 evaluateHandle(@args)
-
-Execute the JSHandle::evaluateHandle playwright routine.
-
-See L<https://playwright.dev/docs/api/class-JSHandle#JSHandle-evaluateHandle> for more information.
-
-=head2 getProperties(@args)
-
-Execute the JSHandle::getProperties playwright routine.
-
-See L<https://playwright.dev/docs/api/class-JSHandle#JSHandle-getProperties> for more information.
-
-=head2 jsonValue(@args)
-
-Execute the JSHandle::jsonValue playwright routine.
-
-See L<https://playwright.dev/docs/api/class-JSHandle#JSHandle-jsonValue> for more information.
 
 =head2 dispose(@args)
 
@@ -157,17 +139,35 @@ Execute the JSHandle::evaluate playwright routine.
 
 See L<https://playwright.dev/docs/api/class-JSHandle#JSHandle-evaluate> for more information.
 
+=head2 asElement(@args)
+
+Execute the JSHandle::asElement playwright routine.
+
+See L<https://playwright.dev/docs/api/class-JSHandle#JSHandle-asElement> for more information.
+
+=head2 evaluateHandle(@args)
+
+Execute the JSHandle::evaluateHandle playwright routine.
+
+See L<https://playwright.dev/docs/api/class-JSHandle#JSHandle-evaluateHandle> for more information.
+
+=head2 jsonValue(@args)
+
+Execute the JSHandle::jsonValue playwright routine.
+
+See L<https://playwright.dev/docs/api/class-JSHandle#JSHandle-jsonValue> for more information.
+
 =head2 getProperty(@args)
 
 Execute the JSHandle::getProperty playwright routine.
 
 See L<https://playwright.dev/docs/api/class-JSHandle#JSHandle-getProperty> for more information.
 
-=head2 asElement(@args)
+=head2 getProperties(@args)
 
-Execute the JSHandle::asElement playwright routine.
+Execute the JSHandle::getProperties playwright routine.
 
-See L<https://playwright.dev/docs/api/class-JSHandle#JSHandle-asElement> for more information.
+See L<https://playwright.dev/docs/api/class-JSHandle#JSHandle-getProperties> for more information.
 
 =head2 on(@args)
 

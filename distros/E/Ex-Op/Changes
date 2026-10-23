@@ -1,4 +1,14 @@
 Revision history for Ex-Op
 
+0.03    2026-10-22
+        - Fix a sub with a signature being made an op on perl 5.44
+
+0.02    2026-10-22
+        - Fix loading on perls before 5.16 (hv_deletes)
+        - Fix a crash on 5.20 and 5.22 when an op dies inside a sub
+        - Fix a sub's depth after an op dies inside it while it recurses, before 5.24
+        - Fix the name of the op before 5.14
+        - Fix tests for older Exporter, Carp and B, and s///r before 5.14
+
 0.01    2026-10-21
         - First version.

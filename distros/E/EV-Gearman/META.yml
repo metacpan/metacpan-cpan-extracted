@@ -9,7 +9,7 @@ configure_requires:
   EV::MakeMaker: '0'
   ExtUtils::MakeMaker: '6.64'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013'
+generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150015'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,10 +27,11 @@ no_index:
     - tools
 requires:
   EV: '4.11'
+  Scalar::Util: '0'
   XSLoader: '0.02'
   perl: '5.020000'
 resources:
   bugtracker: https://github.com/vividsnow/perl5-ev-gearman/issues
   repository: https://github.com/vividsnow/perl5-ev-gearman.git
-version: '0.02'
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

@@ -1,12 +1,15 @@
 package Langertha::Engine::TSystems;
 # ABSTRACT: T-Systems AI Foundation Services (LLM Hub)
-our $VERSION = '0.503';
+our $VERSION = '0.504';
 use Moose;
 use Carp qw( croak );
 
 extends 'Langertha::Engine::OpenAIBase';
 
-with 'Langertha::Role::Embedding', 'Langertha::Role::Tools';
+# StreamUsage: the LLM Server OpenAPI and the streaming guide name
+# stream_options.include_usage (documentation-derived, not live-verified;
+# ADR 0038).
+with 'Langertha::Role::Embedding', 'Langertha::Role::Tools', 'Langertha::Role::StreamUsage';
 
 # NOTE (karr #184 / ADR 0024): the project has no available developer key for AIFS (the
 # LANGERTHA_TSYSTEMS_API_KEY / test key is empty and none is obtainable), so this engine's wire
@@ -86,7 +89,7 @@ Langertha::Engine::TSystems - T-Systems AI Foundation Services (LLM Hub)
 
 =head1 VERSION
 
-version 0.503
+version 0.504
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,5 @@
 package Langertha::Input::Tools;
-our $VERSION = '0.503';
+our $VERSION = '0.504';
 # ABSTRACT: Backwards-compat facade over Langertha::Tool / Langertha::ToolChoice
 use strict;
 use warnings;
@@ -88,7 +88,7 @@ Langertha::Input::Tools - Backwards-compat facade over Langertha::Tool / Langert
 
 =head1 VERSION
 
-version 0.503
+version 0.504
 
 =head1 SUPPORT
 

@@ -142,4 +142,66 @@ close $probe;
     pass 'tombstone released with jobs';
 }
 
+# 7. grab_job + work_one round-trip with explicit job completion
+{
+    my $w = EV::Gearman->new(host => $host, port => $port);
+    my $c = EV::Gearman->new(host => $host, port => $port);
+    $w->can_do('xt_leak_grab_'.$$);
+    # Grab only after JOB_CREATED, so the job is queued server-side
+    # and the grab cannot lose a race with the submit.
+    $c->on_connect(sub {
+        $c->submit_job_bg('xt_leak_grab_'.$$, 'g', sub {
+            $w->grab_job(sub {
+                my ($job) = @_;
+                $job->complete(uc $job->workload) if $job;
+                EV::break;
+            });
+        });
+    });
+    my $t = EV::timer 5, 0, sub { EV::break };
+    EV::run;
+    $w->work_one(sub { EV::break });
+    $t = EV::timer 5, 0, sub { EV::break };
+    EV::run;
+    undef $w;
+    undef $c;
+    pass 'grab_job and work_one cycle';
+}
+
+# 8. Background flow plus an epoch submit, dropped mid-flight
+{
+    my $g = EV::Gearman->new(host => $host, port => $port);
+    $g->on_connect(sub { EV::break });
+    my $t = EV::timer 3, 0, sub { EV::break };
+    EV::run;
+    for (1..10) {
+        $g->submit_job_bg('xt_leak_bg_'.$$, "x", sub {});
+    }
+    $g->submit_job_epoch('xt_leak_bg_'.$$, 'x', time + 3600, sub {});
+    undef $g;
+    pass 'bg and epoch submit churn';
+}
+
+# 9. Large-payload round-trip through a worker (buffer growth + shrink)
+{
+    my $w = EV::Gearman->new(host => $host, port => $port);
+    my $c = EV::Gearman->new(host => $host, port => $port);
+    $w->register_function('xt_leak_big_'.$$ => sub { $_[0]->workload });
+    $w->work;
+    my $big = 'b' x (2 * 1024 * 1024);
+    my $got;
+    $c->on_connect(sub {
+        $c->submit_job('xt_leak_big_'.$$, $big, sub {
+            $got = $_[0]; EV::break;
+        });
+    });
+    my $t = EV::timer 10, 0, sub { EV::break };
+    EV::run;
+    undef $w;
+    undef $c;
+    undef $big;
+    undef $got;
+    pass 'large payload round-trip';
+}
+
 done_testing;

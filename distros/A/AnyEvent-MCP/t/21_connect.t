@@ -29,6 +29,13 @@ sub wait_for {
 
 is_deeply [AnyEvent::MCP::Extension::parse_url ("http://[::1]:1234/cookie/files")],
    ["::1", 1234, "cookie", "files"], "extension URL carries host, token and alias";
+is_deeply [AnyEvent::MCP::Extension::parse_url ("http://[::1]/cookie/files")],
+   ["::1", 80, "cookie", "files"], "extension URL defaults to port 80";
+is_deeply [AnyEvent::MCP::Extension::parse_url ("http://abc:443/_BDPejql_VZnuBaUwnD3n7znlOp863kgQSMmr2voTCc/abc")],
+   ["abc", 443, "_BDPejql_VZnuBaUwnD3n7znlOp863kgQSMmr2voTCc", "abc"],
+   "extension URL accepts an explicit port and underscore-prefixed token";
+eval { AnyEvent::MCP::Extension::parse_url ("http://localhost:0/cookie/files") };
+ok $@, "extension URL rejects port zero";
 eval { AnyEvent::MCP::Extension::parse_url ("http://localhost:1234/cookie/") };
 ok $@, "extension URL requires an alias";
 

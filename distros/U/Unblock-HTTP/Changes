@@ -1,0 +1,29 @@
+Revision history for Unblock::HTTP
+
+0.02  2026-10-21
+    - Introduce the unified, event-loop-neutral Client and Server API for
+      HTTP/1.1, HTTP/2, HTTP/3, and optional WebSockets.
+    - Support attached TCP/TLS and QUIC transports without adding any
+      framework-specific transport or adapter dependency.
+    - Add bounded Client pooling, operation handles, buffered and streamed
+      bodies, per-origin request admission, callback-driven lifecycle,
+      optional deadlines, same-host Alt-Svc and graceful shutdown.
+    - Support HTTP1 WebSocket Upgrade and HTTP2/HTTP3 Extended CONNECT
+      client/server sessions through the optional Unblock::WebSocket
+      distribution, without duplicating protocol framing.
+    - Preserve native H1 borrowed-input handoff and H2/H3 multiplexed
+      connection ownership, with per-stream deferred WebSocket output.
+    - Verify real Linux::Event TCP, authenticated TLS/ALPN HTTP2, and
+      QUIC/TLS HTTP3 integration in repository-only xt tests; ship
+      stand-alone reference programs with local adapter glue.
+    - Do not install or bundle event-loop adapters. Linux::Event
+      references are confined to optional examples and repository-only
+      integration tests, not public runtime dependencies.
+    - Require the coordinated release generations Unblock::HTTP1 0.12,
+      Unblock::HTTP2 0.12, Unblock::HTTP3 0.13 and Uniform::HTTP 0.06.
+    - Keep diagnostic benchmarks and the Linux::Event test adapter
+      fixture out of the release tarball.
+
+0.01  Development baseline (unreleased)
+    - Initial protocol selector, reusable Server definition and QUIC
+      manager with framework-owned transport interfaces.

@@ -24,4 +24,9 @@ sluz_test($sluz, "{include file=\"\$inc_file\"}"                    , '/e1ab49cf
 sluz_test($sluz, "{include file='tpls/nested_inc.stpl'}"            , '/e1ab49cf/', 'Include #6 - Nested include');
 sluz_test($sluz, "{include file='tpls/var_scope.stpl'}"             , '/SCOPE:15/', 'Include #7 - Variable scope (parent vars visible)');
 
+# Ported from PHP Include #8 - leak check
+$sluz->assign(secret => 'OUTER');
+sluz_test($sluz, "{include file='tpls/extra.stpl' secret='INNER'}{\$secret}", '/(?s)INNER.*OUTER/', 'Include #8 - Var set inside include does not leak to outer scope');
+$sluz->assign(secret => '');
+
 done_testing();

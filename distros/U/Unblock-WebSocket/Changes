@@ -1,0 +1,102 @@
+Revision history for Unblock-WebSocket
+
+0.02  (unreleased)
+
+    - Add an attached host transport to established Client and Server.
+      Keep the manual output mode and private native ABI unchanged.
+    - Define complete-buffer acceptance, congestion/resume signals,
+      producer on_drain and graceful finish/abort ownership.
+    - Prevent recursive output delivery into host send callbacks.
+    - Add regressions for native and Perl backends, compression,
+      Close handling, congestion, EOF and transport errors.
+    - Add HTTP/1.1 Upgrade and HTTP/2 Extended CONNECT integration
+      tests; exercise a live HTTP/3 QUIC/TLS handoff in CI.
+    - Keep the Linux, macOS and Windows matrix, distribution tests
+      and full Autobahn conformance workflow.
+    - Rewrite the README, transport integration guide, and public POD
+      around simple client/server examples and clear ownership rules.
+    - Add a runnable opening-handshake example and run all three
+      memory-only examples during CI.
+    - Give every public package an explicit matching 0.02 version.
+
+0.01  2026-10-04
+
+    - Begin standalone platform- and event-loop-neutral WebSocket engine.
+    - Add portable client and server byte-stream protocol engines.
+    - Add framing, masking, fragmentation, UTF-8, Ping/Pong, and Close handling.
+    - Add Uniform::HTTP handshake support for HTTP/1.1 Upgrade and HTTP/2 or
+      HTTP/3 Extended CONNECT.
+    - Define a private versioned native-adapter ABI for zero-copy-capable transports.
+    - Add a vendored bq_websocket native engine with portable secure random masking.
+    - Add Linux, macOS, and Windows CI for the native core.
+    - Use the native engine by default behind the public client/server API while
+      retaining the Perl engine as a differential reference backend.
+    - Port RFC 6455 parser vectors, UTF-8 edge cases, protocol-error mappings,
+      and close lifecycle regressions into standalone in-memory tests.
+    - Add callback-order and handshake rejection/subprotocol regression coverage.
+    - Preserve RFC 3629 Unicode noncharacters in the portable UTF-8 path while
+      still rejecting surrogates and values above U+10FFFF.
+    - Correct invalid UTF-8 Close reasons to use Close 1007 in the Perl backend.
+    - Add native rejected-Close memory-lifetime regressions for ownership safety.
+    - Add a repository-only Autobahn client/server author harness using blocking
+      socket adapters around the public byte API.
+    - Keep repository infrastructure and author tests out of the CPAN manifest.
+    - Fix generated client-handshake nonce validation and add a regression for
+      the real secure-random path.
+    - Preserve a valid pre-error application response before the protocol Close
+      when a later frame in the same native input batch is malformed.
+    - Add incremental native RFC 3629 validation for fail-fast UTF-8 rejection
+      across fragment boundaries and chopped frame input.
+    - Reach strict selected Autobahn RFC 6455 conformance in both directions:
+      298 OK, 0 NON-STRICT, 3 INFORMATIONAL out of 301 cases.
+    - Require Uniform::HTTP 0.05 and use its FastPath view for read-only
+      inspection of exact canonical handshake messages, with the portable
+      Uniform contract retained for subclasses and adapters.
+    - Begin RFC 7692 with a portable permessage-deflate codec using raw DEFLATE,
+      context takeover, RSV1 framing, and decompressed message-size limits.
+    - Add native RSV1/compressed-message support so permessage-deflate keeps
+      bq_websocket framing, masking, and fragment reassembly when XS is available
+      while sharing the same portable DEFLATE codec.
+    - Negotiate RFC 7692 permessage-deflate across HTTP/1.1, HTTP/2, and HTTP/3,
+      including context-takeover and window-bit parameters plus fallback offers.
+    - Export negotiated compression through connection_options() so handshake
+      state can configure Client/Server without coupling them to the HTTP engine.
+    - Enable Autobahn compression sections 12 and 13 in the repository-only
+      author harness for full RFC 7692 conformance work.
+    - Support an 8-bit RFC 7692 compressor window using Huffman-only raw
+      DEFLATE so zlib never emits a distance reference beyond the negotiated
+      256-byte window.
+    - Support valueless client_max_window_bits offers and treat a numeric client
+      value as an RFC 7692 preference hint rather than a response ceiling.
+    - Extend the private native ABI append-only with extension configuration and
+      flagged input/send operations while preserving the original ABI-v1 prefix.
+    - Advertise full client compression capabilities in the repository-only
+      Autobahn harness and require all 517 RFC 6455 + RFC 7692 cases per
+      direction.
+    - Add native compression error-path regressions for illegal RSV1 placement,
+      malformed DEFLATE, and compressed pre-error response ordering.
+    - Accept quoted RFC 7692 window-bit parameter values after unquoting and
+      validating the numeric value.
+    - Add repository-only public message-path benchmarks for Perl/native
+      framing with and without permessage-deflate.
+    - Record portable 517-case Autobahn baseline: server 514 OK / 3
+      INFORMATIONAL with zero failures; client capability-gap run 442 OK / 72
+      UNIMPLEMENTED / 3 INFORMATIONAL.
+    - Accept a server client_max_window_bits response above the client's numeric
+      hint and use the response value as the agreed compressor limit.
+    - Remove the obsolete Encode prerequisite after the portable UTF-8 path
+      moved to direct Perl UTF-8 handling.
+    - Document the HTTP/1.1, HTTP/2, HTTP/3, compression, FastPath, and
+      established Client/Server workflows in the public POD.
+    - Reach full native 517-case Autobahn compression conformance in both
+      directions: 514 OK, 0 NON-STRICT, 0 failures, 3 INFORMATIONAL.
+    - Record same-run public message-path benchmark results comparing Perl and
+      native framing with and without permessage-deflate.
+    - Remove the unnecessary Test::More runtime prerequisite; the minimum
+      supported Perl already provides it for the test suite.
+    - Add family-style README badges, installation guidance, backpressure
+      notes, and a complete established Client/Server API summary in public POD.
+    - Keep generated WebSocket.c out of future manifests and source
+      distributions.
+    - Complete the 0.01 release audit with four-platform CI, POD, distcheck,
+      disttest, full 517-case Autobahn conformance, and benchmark validation.

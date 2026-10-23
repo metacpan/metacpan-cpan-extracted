@@ -1,6 +1,6 @@
 package Langertha::Result;
-# ABSTRACT: Reserved namespace — the result value object moved to Langertha::Raider::Result
-our $VERSION = '0.503';
+# ABSTRACT: Reserved namespace - the result value object moved to Langertha::Raider::Result
+our $VERSION = '0.504';
 use strict;
 use warnings;
 
@@ -14,11 +14,11 @@ __END__
 
 =head1 NAME
 
-Langertha::Result - Reserved namespace — the result value object moved to Langertha::Raider::Result
+Langertha::Result - Reserved namespace - the result value object moved to Langertha::Raider::Result
 
 =head1 VERSION
 
-version 0.503
+version 0.504
 
 =head1 DESCRIPTION
 

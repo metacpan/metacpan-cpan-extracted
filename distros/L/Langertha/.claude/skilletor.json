@@ -19,7 +19,8 @@
       "getty-perl-pod@karr",
       "getty-perl-release-author-getty@karr",
       "kanban-issues-karr-coordination@karr",
-      "kanban-issues-karr-ticket@karr"
+      "kanban-issues-karr-ticket@karr",
+      "getty-perl-core@getty"
     ]
   },
   "targets": [

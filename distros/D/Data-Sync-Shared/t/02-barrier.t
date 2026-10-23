@@ -72,9 +72,7 @@ is $bar->arrived, 0, 'arrived starts at 0';
     cmp_ok time - $t0, '<', 30, 'wait returned (not hung)';
 }
 
-# Timeout breaks the barrier; reset() restores usability.
-# New semantics (pthread_barrier_t-style): timeout permanently breaks the
-# barrier. All subsequent wait() calls return -1 until reset() is called.
+# Timeout breaks the barrier until reset() is called.
 {
     my $b = Data::Sync::Shared::Barrier->new(undef, 2);
     is $b->wait(0.1), -1, 'timeout returns -1';

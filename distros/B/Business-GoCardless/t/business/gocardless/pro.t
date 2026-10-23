@@ -10,6 +10,8 @@ no warnings qw/ experimental::postderef /;
 use Test::MockObject;
 use Test::Exception;
 use JSON;
+use Encode ();
+use Digest::SHA ();
 
 # soft requirements of Business::GoCardless::Client
 # "soft" in that they're not required => 1 but must
@@ -68,7 +70,13 @@ no warnings 'once';
 my $mock = Test::MockObject->new;
 $mock->mock( 'is_success',sub { 1 } );
 $mock->mock( 'header',sub {} );
-*LWP::UserAgent::request = sub { $mock };
+# the fixtures in this test are character strings, but a real response is
+# UTF-8 encoded bytes, so encode the content as LWP would give it to us
+my $response = Test::MockObject->new;
+$response->mock( q{is_success},sub { $mock->is_success } );
+$response->mock( q{header},sub { shift; $mock->header( @_ ) } );
+$response->mock( q{content},sub { Encode::encode_utf8( $mock->content ) } );
+*LWP::UserAgent::request = sub { $response };
 
 test_payment( $GoCardless,$mock );
 test_payout( $GoCardless,$mock );
@@ -77,6 +85,7 @@ test_subscription( $GoCardless,$mock );
 test_user( $GoCardless,$mock );
 test_webhook( $GoCardless,$mock );
 test_webhooks( $GoCardless,$mock );
+test_pagination( $GoCardless,$mock );
 
 done_testing();
 
@@ -110,26 +119,55 @@ sub test_payment {
 
     $ENV{GOCARDLESS_DEV_TESTING} = 1;
 
+    # an incomplete redirect flow: GET (no mandate), complete, then the payment
     my $i = 0;
+    my @requests;
 
     $mock->mock(
         'content',
         sub {
-            $i++ < 2
-                ? _redirect_flow_json()
-                : _payment_json()
+            my $n = $i++;
+            return $n == 0 ? _redirect_flow_json( 0 )
+                 : $n == 1 ? _redirect_flow_json()
+                 : _payment_json()
         }
     );
 
+    my $Bill;
+    {
+        no warnings 'redefine';
+        local *LWP::UserAgent::request = sub {
+            my ( $ua,$req ) = @_;
+            push( @requests,[ $req->method,$req->uri->path,$req->content ] );
+            return $response;
+        };
+
+        cmp_deeply(
+            $Bill = $GoCardless->confirm_resource(
+                redirect_flow_id => 1,
+                type             => 'bill',
+                amount           => 100,
+                currency         => 'GBP',
+            ),
+            _payment_obj(),
+            '->confirm_resource returns a Business::GoCardless::Bill object'
+        );
+    }
+
     cmp_deeply(
-        my $Bill = $GoCardless->confirm_resource(
-            redirect_flow_id => 1,
-            type             => 'bill',
-            amount           => 100,
-            currency         => 'GBP',
-        ),
-        _payment_obj(),
-        '->confirm_resource returns a Business::GoCardless::Bill object'
+        [ map { "$_->[0] $_->[1]" } @requests ],
+        [
+            'GET /redirect_flows/1',
+            'POST /redirect_flows/1/actions/complete',
+            'POST /payments',
+        ],
+        '->confirm_resource completes an incomplete redirect flow'
+    );
+
+    cmp_deeply(
+        decode_json( $requests[-1][2] )->{payments}{links},
+        { mandate => 'MD123' },
+        '->confirm_resource only passes the mandate link to the payment'
     );
 
     $mock->mock(
@@ -185,9 +223,62 @@ sub test_payment {
 
     ok( $Bill->cancelled,'bill is cancelled' );
 
-    $mock->mock( 'content',sub { _payment_json( 'refunded' ) } );
+    my $refund_post_data;
+    my $refund_json = '{"refunds":{"id":"RF123","created_at":"2014-05-08T17:01:06.000Z",'
+        . '"amount":44,"currency":"GBP","status":"created","reference":null,'
+        . '"metadata":{},"fx":{},"links":{"payment":"PM123","mandate":"MD123"}}}';
 
-    ok( ! $Bill->refund,'->refund currently not supported' );
+    {
+        no warnings 'redefine';
+        my $orig = \&Business::GoCardless::Client::api_post;
+        local *Business::GoCardless::Client::api_post = sub {
+            my ( $client,$path,$params ) = @_;
+            $refund_post_data = [ $path,$params ];
+            return $orig->( @_ );
+        };
+
+        $mock->mock( 'content',sub { $refund_json } );
+        $Bill->amount( 44 );
+        $Bill->amount_refunded( 4 );
+
+        isa_ok(
+            my $Refund = $Bill->refund( amount => 10,reference => 'REFUND001' ),
+            'Business::GoCardless::Refund',
+            '->refund'
+        );
+
+        cmp_deeply(
+            $refund_post_data,
+            [ '/refunds',{ refunds => {
+                amount                    => 10,
+                total_amount_confirmation => 14,
+                reference                 => 'REFUND001',
+                links                     => { payment => 'PM123' },
+            } } ],
+            '->refund total_amount_confirmation includes previous refunds'
+        );
+
+        $Bill->refund( amount => 10,total_amount_confirmation => 20 );
+        is(
+            $refund_post_data->[1]{refunds}{total_amount_confirmation},
+            20,
+            '->refund with explicit total_amount_confirmation'
+        );
+
+        is( $Refund->id,'RF123','Refund id' );
+        is( $Refund->payment_id,'PM123','Refund payment_id' );
+        is( $Refund->mandate_id,'MD123','Refund mandate_id' );
+        ok( $Refund->created,'Refund created' );
+        ok( ! $Refund->paid,'! Refund paid' );
+
+        $refund_post_data = undef;
+        throws_ok(
+            sub { $Bill->refund },
+            'Business::GoCardless::Exception',
+            '->refund requires amount',
+        );
+        ok( ! $refund_post_data,'->refund without amount makes no request' );
+    }
 }
 
 sub test_payout {
@@ -297,16 +388,26 @@ sub test_subscription {
         '->new_subscription_url returns a url'
     );
 
+    # a redirect flow backed by a billing request is completed by gocardless,
+    # so the GET has the mandate and we shouldn't try to complete it again
     my $i = 0;
+    my @requests;
 
     $mock->mock(
         'content',
         sub {
-            $i++ < 2
+            $i++ < 1
                 ? _redirect_flow_json()
                 : _subscription_json()
         }
     );
+
+    no warnings 'redefine';
+    local *LWP::UserAgent::request = sub {
+        my ( $ua,$req ) = @_;
+        push( @requests,[ $req->method,$req->uri->path ] );
+        return $response;
+    };
 
     cmp_deeply(
         my $Subscription = $GoCardless->confirm_resource(
@@ -320,6 +421,12 @@ sub test_subscription {
         ),
         _subscription_obj(),
         '->confirm_resource returns a Business::GoCardless::Subscription object'
+    );
+
+    cmp_deeply(
+        [ map { "$_->[0] $_->[1]" } @requests ],
+        [ 'GET /redirect_flows/2','POST /subscriptions' ],
+        '->confirm_resource does not complete an already completed redirect flow'
     );
 
     $i = 0;
@@ -381,11 +488,17 @@ sub test_user {
         '->users returns an array of Business::GoCardless::User objects'
     );
 
+    $mock->mock( 'content',sub { '{"customers":' . _user_json() . '}' } );
+
     isa_ok(
-        $GoCardless->customer( 1 ),
+        my $Customer = $GoCardless->customer( 'CU123' ),
         'Business::GoCardless::Customer',
         '->customer'
     );
+
+    is( $Customer->id,'CU123','->customer populates id' );
+    is( $Customer->email,'user@example.com','->customer populates email' );
+    is( $Customer->family_name,'Osbörne','->customer populates family_name' );
 }
 
 sub test_webhook {
@@ -417,6 +530,58 @@ sub test_webhook {
     );
 }
 
+sub test_pagination {
+
+    my ( $GoCardless,$mock ) = @_;
+
+    note( "Pagination" );
+
+    my @pages = (
+        '{"payments":[{' . _payment_json_internal() . '}],'
+            . '"meta":{"cursors":{"before":null,"after":"PM123"},"limit":1}}',
+        '{"payments":[{' . _payment_json_internal( 'paid_out' ) . '}],'
+            . '"meta":{"cursors":{"before":"PM456","after":null},"limit":1}}',
+    );
+
+    # respond with the page matching the number of requests made
+    my @uris;
+    $mock->mock( q{content},sub { $pages[ $#uris ] } );
+
+    no warnings 'redefine';
+    local *LWP::UserAgent::request = sub {
+        my ( $ua,$req ) = @_;
+        push( @uris,$req->uri->path_query );
+        return $response;
+    };
+
+    my $Pager = $GoCardless->payments( limit => 1 );
+    isa_ok( $Pager,'Business::GoCardless::Paginator' );
+    is( $Pager->info->{limit},1,'->info contains meta' );
+
+    my @seen;
+    my $loops = 0;
+    while ( my @payments = $Pager->next ) {
+        last if ++$loops > 5; # guard against infinite loop
+        push( @seen,map { $_->status } @payments );
+    }
+
+    cmp_deeply(
+        \@seen,
+        [ 'pending_submission','paid_out' ],
+        '->next iterates through all pages via cursors'
+    );
+
+    cmp_deeply(
+        \@uris,
+        [ '/payments?limit=1','/payments?after=PM123&limit=1' ],
+        'cursor passed with original filters'
+    );
+
+    @uris = ();
+    $GoCardless->payments( limit => 1,after => q{PM000} );
+    is( $uris[-1],'/payments?after=PM000&limit=1','user supplied cursor' );
+}
+
 sub test_webhooks {
 
     my ( $GoCardless,$mock ) = @_;
@@ -429,6 +594,11 @@ sub test_webhooks {
 
     foreach my $Webhook ( $GoCardless->webhooks ) {
         isa_ok( $Webhook,'Business::GoCardless::Webhook::V2' );
+        is( $Webhook->id,'WB0085HZ1WH7W1','webhook ->id' );
+        is( $Webhook->url,'https://uk.payprop.com/gocardless','webhook ->url' );
+        is( $Webhook->response_code,204,'webhook ->response_code' );
+        ok( $Webhook->successful,'webhook ->successful' );
+        ok( ! $Webhook->is_test,'webhook ! ->is_test' );
         foreach my $Event ( $Webhook->events->@* ) {
             isa_ok( $Event,'Business::GoCardless::Webhook::Event' );
             foreach my $Resource ( $Event->resources ) {
@@ -437,6 +607,39 @@ sub test_webhooks {
             }
         }
     }
+
+    # webhook containing wide chars, the signature is of the UTF-8 encoded body
+    my $description = 'Le mandat de Jøhñsön a été annulé';
+    my $body = JSON->new->canonical->encode( {
+        events => [ {
+            id            => 'EV123',
+            created_at    => '2024-01-30T00:07:26.881Z',
+            resource_type => 'mandates',
+            action        => 'cancelled',
+            details       => { description => $description },
+            links         => { mandate => 'MD123' },
+        } ],
+    } );
+
+    $mock->mock( 'content',sub {
+        JSON->new->encode( { webhooks => [ {
+            id              => 'WB123',
+            request_body    => $body,
+            request_headers => {
+                'Webhook-Signature' => Digest::SHA::hmac_sha256_hex(
+                    Encode::encode_utf8( $body ),'bar'
+                ),
+            },
+        } ] } )
+    } );
+
+    my ( $Webhook ) = $GoCardless->webhooks;
+    isa_ok( $Webhook,'Business::GoCardless::Webhook::V2','webhook with wide chars' );
+    is(
+        $Webhook->events->[0]->details->{description},
+        $description,
+        ' ... event details decoded as characters'
+    );
 }
 
 sub _user_json {
@@ -477,6 +680,9 @@ sub _user_obj {
     'base_url' => 'https://api.gocardless.com',
     'token' => 'MvYX0i6snRh/1PXfPoc6',
     'user_agent' => ignore(),
+    'max_retries' => 3,
+    'max_retry_wait' => 60,
+    'raise_on_idempotency_conflict' => 0,
   }, 'Business::GoCardless::Client' ),
   'country_code' => 'GB',
   'created_at' => '2014-05-08T17:01:06.000Z',
@@ -565,6 +771,9 @@ return bless( {
     'base_url' => 'https://api.gocardless.com',
     'token' => 'MvYX0i6snRh/1PXfPoc6',
     'user_agent' => ignore(),
+    'max_retries' => 3,
+    'max_retry_wait' => 60,
+    'raise_on_idempotency_conflict' => 0,
   }, 'Business::GoCardless::Client' ),
   'created_at' => '2014-10-20T17:01:06.000Z',
   'currency' => 'GBP',
@@ -645,6 +854,9 @@ bless( {
     'base_url' => 'https://api.gocardless.com',
     'token' => 'MvYX0i6snRh/1PXfPoc6',
     'user_agent' => ignore(),
+    'max_retries' => 3,
+    'max_retry_wait' => 60,
+    'raise_on_idempotency_conflict' => 0,
   }, 'Business::GoCardless::Client' ),
   'created_at' => '2014-10-22T13:10:06.000Z',
   'description' => 'Winé boxes',
@@ -676,6 +888,9 @@ bless( {
     'base_url' => 'https://api.gocardless.com',
     'token' => 'MvYX0i6snRh/1PXfPoc6',
     'user_agent' => ignore(),
+    'max_retries' => 3,
+    'max_retry_wait' => 60,
+    'raise_on_idempotency_conflict' => 0,
   }, 'Business::GoCardless::Client' ),
   'endpoint' => '/mandates/%s',
     "id" => "MD000660000000",
@@ -773,6 +988,9 @@ sub _payout_obj {
     'base_url' => 'https://api.gocardless.com',
     'token' => 'MvYX0i6snRh/1PXfPoc6',
     'user_agent' => ignore(),
+    'max_retries' => 3,
+    'max_retry_wait' => 60,
+    'raise_on_idempotency_conflict' => 0,
   }, 'Business::GoCardless::Client' ),
   'created_at' => '2014-06-20T13:23:34.000Z',
   'currency' => 'GBP',
@@ -960,6 +1178,12 @@ sub _webhook_payload {
 
 sub _redirect_flow_json {
 
+    my ( $completed ) = @_;
+    $completed //= 1;
+
+    # an incomplete redirect flow has no mandate yet
+    my $mandate_link = $completed ? q{"mandate": "MD123",} : q{};
+
     return qq!{
           "redirect_flows": {
             "id": "RE123",
@@ -970,7 +1194,7 @@ sub _redirect_flow_json {
             "redirect_url": "http://pay.gocardless.dev/flow/RE123",
             "created_at": "2014-10-22T13:10:06.000Z",
             "links": {
-              "mandate": "MD123",
+              $mandate_link
               "creditor": "CR123"
             }
           }

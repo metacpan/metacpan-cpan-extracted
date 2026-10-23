@@ -1,14 +1,17 @@
 package Langertha::Engine::Moonshot;
 # ABSTRACT: Moonshot AI Kimi API (OpenAI-compatible)
-our $VERSION = '0.503';
+our $VERSION = '0.504';
 use Moose;
 use Carp qw( croak );
 
 extends 'Langertha::Engine::OpenAIBase';
 
+# StreamUsage: the chat API reference names stream_options.include_usage
+# (platform.kimi.ai/docs/api/chat, ADR 0038).
 with map { 'Langertha::Role::'.$_ } qw(
   StaticModels
   Tools
+  StreamUsage
 );
 
 
@@ -135,7 +138,7 @@ Langertha::Engine::Moonshot - Moonshot AI Kimi API (OpenAI-compatible)
 
 =head1 VERSION
 
-version 0.503
+version 0.504
 
 =head1 SYNOPSIS
 

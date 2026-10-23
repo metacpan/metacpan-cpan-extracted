@@ -6,12 +6,13 @@ use warnings;
 use EV;
 use EV::ClickHouse;
 use Math::BigInt;
+use Math::BigFloat;
 
 sub le_bytes_to_bigint {
     my ($buf, $signed) = @_;
     my @b = unpack 'C*', $buf;
     my $n = Math::BigInt->new(0);
-    my $bit = 1;
+    my $bit = Math::BigInt->new(1);
     for my $byte (@b) {
         $n += Math::BigInt->new($byte) * $bit;
         $bit *= 256;
@@ -34,10 +35,11 @@ $ch = EV::ClickHouse->new(
                 my ($rows) = @_;
                 my $raw = $rows->[0][0];     # 32 bytes LE
                 my $big = le_bytes_to_bigint($raw, 1);
-                # scale = 9 → divide by 10^9
+                # scale = 9 → divide by 10^9 (BigFloat keeps the fraction)
                 printf "raw  (%d bytes): %s\n", length($raw), unpack 'H*', $raw;
                 printf "int: %s\n", $big;
-                printf "as scaled decimal: %s\n", ($big / Math::BigInt->new(10)**9);
+                printf "as scaled decimal: %s\n",
+                    Math::BigFloat->new($big) / Math::BigFloat->new(10)**9;
                 EV::break;
             });
     },

@@ -14,7 +14,7 @@ my $input2 = <<'END';
 This is A.
 #target_section B
 This is B.
-#emb A in _main
+#emb[in=_main] A
 END
 $fab = Text::Fab->new();
 $fab->process_string($input2);
@@ -65,7 +65,7 @@ $fab = Text::Fab->new();
 $fab->process_string($input7);
 is($fab->assemble('Child:body'), 'Child Content', 'Test 7: Inheritance with override');
 
-my $input8 = "#target_section body in A\n#emb body in A";
+my $input8 = "#target_section body in A\n#emb[in=A] body";
 $fab = Text::Fab->new();
 $fab->process_string($input8);
 throws_ok { $fab->assemble('A:body') } qr/E_CIRCULAR_EMBED/, 'Test 8: Circular dependency detection throws E_CIRCULAR_EMBED';

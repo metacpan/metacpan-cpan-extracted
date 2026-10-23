@@ -1,7 +1,7 @@
 package Data::TopK::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 require XSLoader;
 XSLoader::load('Data::TopK::Shared', $VERSION);
 
@@ -128,7 +128,7 @@ rather than a croak.
     my @all   = $tk->top;                 # all tracked keys (k defaults to every counter)
     my $est   = $tk->estimate($key);      # estimated count of one key, 0 if untracked
     my $err   = $tk->error($key);         # the over-estimate bound for that key (0 if exact/untracked)
-    $tk->clear;                           # forget everything (counters and totals reset)
+    $tk->clear;                           # reset counters, totals and the decay clock
 
 C<add> observes one key and returns its B<estimated count after> the observation.
 C<add_many> feeds an array reference under a single write lock. C<top> returns a
@@ -182,6 +182,7 @@ new_from_fd($fd) >>. The descriptor you pass is duplicated
 (C<F_DUPFD_CLOEXEC>), so it stays yours to close and closing it does not
 disturb the handle. Every process's C<add> feeds the one shared summary, so a
 fleet of workers can each process part of a stream into a single top-k.
+Participants must share a PID namespace, as lock recovery uses PIDs.
 
 =head1 SECURITY
 

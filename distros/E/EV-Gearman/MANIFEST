@@ -62,6 +62,9 @@ t/26_submit_args.t
 t/27_admin_text.t
 t/28_cmd_timeout.t
 t/29_register_while_sleeping.t
+t/30_callback_reentrancy.t
+t/31_worker_protocol.t
+t/32_client_edge.t
 tools/gen-readme.pl
 typemap
 xt/01_stress.t

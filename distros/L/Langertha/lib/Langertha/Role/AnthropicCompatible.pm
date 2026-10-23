@@ -1,6 +1,6 @@
 package Langertha::Role::AnthropicCompatible;
 # ABSTRACT: Role for Anthropic-compatible API format
-our $VERSION = '0.503';
+our $VERSION = '0.504';
 use Moose::Role;
 use Carp qw( croak carp );
 use JSON::MaybeXS;
@@ -538,6 +538,15 @@ sub parse_stream_chunk {
   # Anthropic uses event types: content_block_delta, message_delta, message_stop
   my $type = $data->{type} // '';
 
+  # A mid-stream `event: error` ({"type":"error","error":{"type":
+  # "overloaded_error",...}}) is no content: skipping it ended the stream as a
+  # short, silent success. Fail the stream, as the non-streaming chat_response
+  # does for the same envelope (k338) -- karr k378
+  if ( $type eq 'error' ) {
+    croak "".(ref $self)." stream carried an error: "
+      .( $self->_body_error_text( $data->{error} ) // 'no error message' );
+  }
+
   # A streamed tool call is a tool_use content block: content_block_start
   # names it (id, name, an empty input), input_json_delta events carry its
   # input as partial_json fragments, content_block_stop closes it. Assemble the
@@ -784,7 +793,7 @@ Langertha::Role::AnthropicCompatible - Role for Anthropic-compatible API format
 
 =head1 VERSION
 
-version 0.503
+version 0.504
 
 =head1 SYNOPSIS
 

@@ -161,7 +161,7 @@ is(scalar @pwds, 1, 'cleared on_pwd_changed does not fire');
     }
     {
         my $g = bless {}, 'Guard2';
-        my $u = Term::Ghostty->new(on_bell => sub { $g; next });
+        my $u = Term::Ghostty->new(on_bell => sub { () = $g; next });
         LOOP: for (1) { eval { $u->feed("\a") } }
     }
     is($freed, 1, 'terminal freed after loop control in a callback');

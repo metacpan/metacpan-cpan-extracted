@@ -1,0 +1,28 @@
+# The workflow action-run runs against itself.  t/self_test.t passes this file
+# to bin/action-run with the project as the working directory, so the tool has
+# to start a container, mount the project into it, hand a step its environment
+# and remove what it started, through the command a user runs rather than
+# through the library.  The fake Docker executes these steps by default and
+# LIVE_TESTING=1 runs them in a real container; the image is one every daemon
+# can pull, so a failure here is a failure of the tool rather than of the
+# workflow.
+name: Self test
+on: push
+jobs:
+  self-test:
+    runs-on: ubuntu-latest
+    container:
+      image: alpine:3.20
+    steps:
+      - name: Say what is running
+        run: echo "action-run is testing itself"
+      - name: Check the project is mounted
+        run: |
+          test -f t/lib/self_test.yml
+          echo "the project is visible in the container"
+      - name: Check the step environment
+        env:
+          SELF_TEST: self-test-ok
+        run: |
+          test "$SELF_TEST" = self-test-ok
+          echo "the environment reached the step"

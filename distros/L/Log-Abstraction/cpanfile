@@ -12,17 +12,17 @@ requires 'JSON::PP';
 requires 'Log::Log4perl';
 requires 'POSIX';
 requires 'Params::Get', '0.15';
-requires 'parent';   # the Log::Abstraction::Backend::* classes
 requires 'Readonly';
 requires 'Readonly::Values::Syslog', '0.04';
 requires 'Return::Set', '0.04';
 requires 'Scalar::Util';
 requires 'Socket';
-requires 'Sub::Private', '0.06';
+requires 'Sub::Private', '0.07';
 requires 'Sys::Syslog', '0.28';
 requires 'Time::HiRes';
 requires 'Time::Local';
 requires 'autodie';
+requires 'parent';   # the Log::Abstraction::Backend::* classes
 recommends 'Email::Sender::Simple';
 recommends 'Email::Sender::Transport::SMTP';
 recommends 'Email::Simple';   # sendmail backend

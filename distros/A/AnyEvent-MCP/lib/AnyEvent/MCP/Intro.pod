@@ -803,6 +803,10 @@ token in either of these ways:
 
 URL tokens are path components, not browser cookies.
 For another configured endpoint, C</TOKEN> prefixes that endpoint path.
+The HTTP server also accepts C</TOKEN> and the corresponding bare path
+without the final slash when the endpoint is configured with one. This
+works around clients (observed with Claude) that drop the final slash
+from a configured URL.
 All accepted tokens authenticate the same operations; they are not separate
 users or permission levels. Permissions still govern the tool operation.
 
@@ -987,8 +991,9 @@ tunnel. An occupied port causes a listener error, so check the server log.
 =head2 Authentication fails
 
 Obtain the URL with the same name, bind/token overrides and configuration
-environment as the running process. Use the complete path, including any
-required trailing slash. A clean URL needs an accepted bearer token.
+environment as the running process. Use the complete path; the final
+slash is optional for endpoints whose configured path ends in one.
+A clean URL needs an accepted bearer token.
 
 A multibroker child credential is not necessarily the upstream listener's
 credential. C<--bearer> after a child pair and C<--token> before the pairs

@@ -12,7 +12,7 @@ use JSON::XS ();
 use MIME::Base64 ();
 use Socket;
 
-print "1..35\n";
+print "1..42\n";
 
 my $test;
 sub ok($$) {
@@ -110,7 +110,7 @@ my $printed = "";
    local *STDOUT;
    open STDOUT, ">", \$printed or die $!;
    my $timer;
-   mcp_start name => "example", on_start => sub {
+   mcp_start name => "example", server_version => 0.61, on_start => sub {
       $server = $_[0];
       $timer = AnyEvent->timer (after => 0.01, cb => sub { $server->close });
    };
@@ -120,7 +120,9 @@ ok $server->{port} && $printed eq "", "HTTP startup leaves stdout empty";
 my $config = AnyEvent::MCP::Config->global;
 ok $server->{tokens}[0] eq $config->credential ("token", "example"),
    "startup token matches derived utility";
-ok $server->{server_info}{name} eq "example", "startup server identity";
+ok $server->{server_info}{name} eq "AnyEvent::MCP", "instance name is not the server implementation name";
+ok JSON::XS::encode_json ($server->{server_info}) =~ /"version":"0\.61"/,
+   "Simple stringifies numeric module versions";
 $server->close;
 
 my $err = Symbol::gensym;
@@ -177,6 +179,40 @@ ok @messages == 2 && $messages[1]{id} == 2
    "EOF waits for an asynchronous reply and drains large output";
 
 my ($started, $closed, $timer);
+mcp_http auth => "none", port => 0, name => "local-instance",
+   server_name => "advertised", server_version => 1.2,
+   on_start => sub {
+      $server = $_[0];
+      $timer = AnyEvent->timer (after => 0.01, cb => sub { $server->close });
+   };
+ok $server->{server_info}{name} eq "advertised",
+   "Simple server name is independent of instance name";
+ok JSON::XS::encode_json ($server->{server_info}) =~ /"version":"1\.2"/,
+   "flat Simple version is sent as a JSON string";
+my $raw = { name => "raw", version => "7" };
+mcp_http auth => "none", port => 0, name => "local-instance",
+   server_info => $raw,
+   on_start => sub {
+      $server = $_[0];
+      $timer = AnyEvent->timer (after => 0.01, cb => sub { $server->close });
+   };
+ok $server->{server_info} == $raw,
+   "explicit raw server_info is passed through unchanged";
+eval { mcp_http auth => "none", port => 0,
+   server_name => "advertised", server_info => $raw };
+ok $@ =~ /Cannot combine server_info with server_name/,
+   "Simple rejects mixing raw and flat identity settings";
+
+mcp_http auth => "none", port => 0, name => "another-instance",
+   on_start => sub {
+      $server = $_[0];
+      $timer = AnyEvent->timer (after => 0.01, cb => sub { $server->close });
+   };
+ok $server->{server_info}{name} eq "AnyEvent::MCP",
+   "Simple defaults to the library implementation name";
+ok JSON::XS::encode_json ($server->{server_info}) =~ /"version":"\Q$AnyEvent::MCP::VERSION\E"/,
+   "Simple defaults to the library version as a JSON string";
+
 mcp_http auth => "none", port => 0, on_start => sub {
    my ($server) = @_;
    ++$started;
@@ -190,8 +226,8 @@ ok $@ =~ /startup failed/, "startup hook exception closes the server and propaga
 {
    local @ARGV = ("--auto-deny=*,write", "--auto-allow=read_lines,read",
       "--auto-deny=*,*,*");
-   my %options = mcp_getoptions ({ name => "auto-test" });
-   ok JSON::XS::encode_json ($options{auto_rules}) eq JSON::XS::encode_json ([
+   my $options = mcp_getoptions ({ name => "auto-test" });
+   ok JSON::XS::encode_json ($options->{auto_rules}) eq JSON::XS::encode_json ([
       ["deny", "*,write"], ["allow", "read_lines,read"], ["deny", "*,*,*"],
    ]), "CLI collects repeatable allow/deny rules in original order";
 
@@ -199,7 +235,7 @@ ok $@ =~ /startup failed/, "startup hook exception closes the server and propaga
       rules => [{ decision => "deny", action => "^" }],
    );
    my $timer;
-   mcp_http %options, auth => "none", port => 0, permissions => $perm,
+   mcp_http %$options, auth => "none", port => 0, permissions => $perm,
       on_start => sub {
          my ($server) = @_;
          $timer = AnyEvent->timer (after => 0.01, cb => sub { $server->close });

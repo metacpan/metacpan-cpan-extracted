@@ -47,6 +47,7 @@ t/27_blessed.t
 t/28_depth.t
 t/29_api_polish.t
 t/30_boolean.t
+t/31_reentrancy.t
 xt/leak.t
 YY.xs
 yyjson.c

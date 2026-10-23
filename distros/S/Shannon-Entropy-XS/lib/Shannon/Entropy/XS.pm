@@ -1,16 +1,15 @@
 package Shannon::Entropy::XS;
 
-use 5.006;
+use 5.010;
 use strict;
 use warnings;
 
-use base qw/Import::Export/;
- 
-our $VERSION = '1.17';
- 
-our %EX = (
-        entropy => [qw/all/]
-);
+use Ex::Op;
+
+our $VERSION = '1.18';
+
+our @EXPORT_OK = qw(entropy);
+our %EXPORT_TAGS = (all => [qw(entropy)]);
 
 require XSLoader;
 XSLoader::load("Shannon::Entropy::XS", $VERSION);
@@ -25,7 +24,7 @@ Shannon::Entropy::XS - Calculate the Shannon entropy H of a given input string f
  
 =head1 VERSION
  
-Version 1.17
+Version 1.18
  
 =cut
  

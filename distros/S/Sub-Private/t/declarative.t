@@ -75,9 +75,13 @@ throws_ok { Sub::Private->import(undef) }
 	qr/is not a valid Perl identifier/,
 	'import(undef): croaks with "not a valid Perl identifier", not a downstream error';
 
-throws_ok { Sub::Private->import({}) }
+throws_ok { Sub::Private->import({}, {}) }
 	qr/is not a valid Perl identifier/,
-	'import({}): hashref sub name croaks with "not a valid Perl identifier"';
+	'import({}, {}): a hashref after the options croaks with "not a valid Perl identifier"';
+
+throws_ok { Sub::Private->import('_a', {}) }
+	qr/is not a valid Perl identifier/,
+	'import(_a, {}): only a leading hashref is options';
 
 # ---- Test 5: declarative form with namespace mode croaks ----
 

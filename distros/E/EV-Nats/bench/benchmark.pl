@@ -19,7 +19,9 @@ print "  host=$host:$port msgs=$n_msgs payload=${payload_sz}B\n\n";
 my $nats;
 
 sub run_bench {
-    my ($name, $setup) = @_;
+    my ($name, $setup, $count, $psz) = @_;
+    $count //= $n_msgs;
+    $psz   //= $payload_sz;
 
     my $done = 0;
     my ($t0, $elapsed);
@@ -36,8 +38,8 @@ sub run_bench {
     EV::run;
 
     if ($elapsed && $elapsed > 0) {
-        my $ops = $n_msgs / $elapsed;
-        my $mbps = ($n_msgs * $payload_sz) / $elapsed / 1024 / 1024;
+        my $ops = $count / $elapsed;
+        my $mbps = ($count * $psz) / $elapsed / 1024 / 1024;
         printf "  %-30s %8.0f msgs/sec  %6.1f MB/s  (%.3fs)\n",
                $name, $ops, $mbps, $elapsed;
     }
@@ -123,7 +125,7 @@ run_bench("REQ/REP (${req_msgs} msgs)", sub {
         $$t0 = time;
         $send_batch->();
     };
-});
+}, $req_msgs);
 
 # 4. Small message throughput (8 bytes)
 {
@@ -148,7 +150,7 @@ run_bench("REQ/REP (${req_msgs} msgs)", sub {
                 $nats->publish('bench.small', $small);
             }
         };
-    });
+    }, $n_msgs, 8);
 }
 
 print "\ndone.\n";

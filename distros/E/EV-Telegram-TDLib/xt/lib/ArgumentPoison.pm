@@ -114,6 +114,7 @@ sub fake {
         my $v = $self->fake($f->{$k}, $depth + 1);
         $o->{$k} = $v if defined $v;
     }
+    $o->{id} = 1048576 if $c eq 'message';
     return $o;
 }
 
@@ -121,7 +122,7 @@ sub fake {
 # t/ file injected for the same function stands in; failing that, a bare ok,
 # which reaches no follow-up that reads a field of the reply.
 sub reply_json {
-    my ($self, $function, $extra) = @_;
+    my ($self, $function, $extra, $request) = @_;
     my $ret = $self->{func}{$function} ? $self->{func}{$function}{ret} : undef;
     my $j = $self->{fake}{$function} //= do {
         my $o = defined $ret ? $self->fake($ret, 0)
@@ -130,6 +131,12 @@ sub reply_json {
         delete $o{'@extra'};
         $CANON->encode(\%o);
     };
+    if ($function eq 'getChatHistory' && $request->{from_message_id}) {
+        my $o = $JSON->decode($j);
+        $o->{messages} = [ grep { $_->{id} <= $request->{from_message_id} }
+                          @{ $o->{messages} || [] } ];
+        $j = $CANON->encode($o);
+    }
     return '{"@extra":' . $JSON->encode("$extra") . ',' . substr($j, 1);
 }
 
@@ -318,7 +325,7 @@ sub invoke {
             my $o = decode_wire($w) or next;
             my $x = $o->{'@extra'};
             next if !defined $x || $answered->{$x}++ || !$td->{pending}{$x};
-            push @open, [ $o->{'@type'} // '', $x ];
+            push @open, [ $o->{'@type'} // '', $x, $o ];
         }
         last unless @open;
         for my $p (@open) {

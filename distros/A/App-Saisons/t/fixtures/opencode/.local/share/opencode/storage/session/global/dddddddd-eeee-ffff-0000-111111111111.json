@@ -1,0 +1,9 @@
+{
+  "id": "dddddddd-eeee-ffff-0000-111111111111",
+  "cwd": "/home/user/myproject",
+  "createdAt": "2026-01-15T10:30:00Z",
+  "messages": [
+    {"role": "user",      "content": [{"type": "text", "text": "Add opentelemetry tracing"}]},
+    {"role": "assistant", "content": [{"type": "text", "text": "I'll add tracing spans to the key paths."}]}
+  ]
+}

@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::BrowserServer;
-$Playwright::BrowserServer::VERSION = '1.621';
+$Playwright::BrowserServer::VERSION = '1.641';
 use parent 'Playwright::Base';
 
 sub new {
@@ -32,16 +32,6 @@ sub close {
     );
 }
 
-sub process {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'process',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
 sub kill {
     my $self = shift;
     return $self->_api_request(
@@ -57,6 +47,16 @@ sub wsEndpoint {
     return $self->_api_request(
         args    => [@_],
         command => 'wsEndpoint',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub process {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'process',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -106,7 +106,7 @@ Playwright::BrowserServer - Automatically generated class for Playwright::Browse
 
 =head1 VERSION
 
-version 1.621
+version 1.641
 
 =head1 CONSTRUCTOR
 
@@ -123,12 +123,6 @@ Execute the BrowserServer::close playwright routine.
 
 See L<https://playwright.dev/docs/api/class-BrowserServer#BrowserServer-close> for more information.
 
-=head2 process(@args)
-
-Execute the BrowserServer::process playwright routine.
-
-See L<https://playwright.dev/docs/api/class-BrowserServer#BrowserServer-process> for more information.
-
 =head2 kill(@args)
 
 Execute the BrowserServer::kill playwright routine.
@@ -140,6 +134,12 @@ See L<https://playwright.dev/docs/api/class-BrowserServer#BrowserServer-kill> fo
 Execute the BrowserServer::wsEndpoint playwright routine.
 
 See L<https://playwright.dev/docs/api/class-BrowserServer#BrowserServer-wsEndpoint> for more information.
+
+=head2 process(@args)
+
+Execute the BrowserServer::process playwright routine.
+
+See L<https://playwright.dev/docs/api/class-BrowserServer#BrowserServer-process> for more information.
 
 =head2 on(@args)
 

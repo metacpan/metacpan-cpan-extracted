@@ -1,6 +1,6 @@
 package Langertha::Reasoning::Profile;
 # ABSTRACT: Typed per-model reasoning wire-truth (accepted vocabulary + numeric bounds)
-our $VERSION = '0.503';
+our $VERSION = '0.504';
 use Moose;
 use Moose::Util::TypeConstraints;
 use Carp qw( croak );
@@ -234,6 +234,9 @@ my $GEMINI3_SRC = 'ai.google.dev/gemini-api/docs/thinking; k140 2026-09-01, 3.8-
 # ai.google.dev/gemini-api/docs/thinking budget table (2.5), advisor-verified
 # 2026-09-16 (karr k173).
 my $GEMINI25_SRC = 'ai.google.dev/gemini-api/docs/thinking budget table; k173 2026-09-16';
+# ai.google.dev/gemini-api/docs/generate-content/latest-model + the Vertex
+# gemini-4-argon guide, fetched 2026-10-19 (karr k381) -- doc-sourced, not live.
+my $GEMINI4_SRC = 'ai.google.dev/gemini-api/docs/generate-content/latest-model + Vertex gemini-4-argon guide; k381 2026-10-19 (doc-sourced, not live)';
 # Self-hosted Qwen3.x reasoning family: the loaded model's chat template — NOT
 # the vLLM/SGLang/llama.cpp server — fixes the accepted reasoning_effort
 # vocabulary. Live-probed 2026-09-17 on a cortex vLLM server (karr k79/k180):
@@ -317,14 +320,14 @@ sub _non_reasoning_like {
 }
 
 sub _gemini3_profile {
-  my ( $match, $levels ) = @_;
+  my ( $match, $levels, $source ) = @_;
   return __PACKAGE__->new(
     model_match => $match,
     control     => 'effort',
     wire_format => 'gemini',
     is_gemini3  => 1,
     levels      => $levels,
-    source      => $GEMINI3_SRC,
+    source      => $source // $GEMINI3_SRC,
   );
 }
 
@@ -594,6 +597,12 @@ sub _family_profiles {
     _gemini3_profile( qr/\Agemini-3\.1-pro/,      [qw( low medium high )] ),
     _gemini3_profile( qr/\Agemini-3-pro/,         [qw( low high )] ),
     _gemini3_profile( qr/\Agemini-3/,             [qw( minimal low medium high )] ),
+    # Gemini 4 (karr k381): the same thinkingLevel knob, low|medium|high
+    # (default medium); Vertex answers minimal with 400, so minimal and none
+    # rise to low, as on 3.7/3.8-flash. thinkingBudget is never sent (control
+    # 'effort': a budget croaks in Langertha::Reasoning BUILD). (?!\d): gemini-40
+    # is an unknown id (k196 guard).
+    _gemini3_profile( qr/\Agemini-4(?!\d)/,        [qw( low medium high )], $GEMINI4_SRC ),
 
     # Claude 4.6 (opus/sonnet): accepts low|medium|high|max but NOT xhigh —
     # Anthropic's effort doc lists 4.6 under `max`, not under `xhigh`. Matched
@@ -674,7 +683,7 @@ Langertha::Reasoning::Profile - Typed per-model reasoning wire-truth (accepted v
 
 =head1 VERSION
 
-version 0.503
+version 0.504
 
 =head1 SYNOPSIS
 
@@ -798,9 +807,10 @@ is a curation hint, not the dispatch key.
 
 =head2 is_gemini3
 
-Selects the Gemini serialization branch: true for the Gemini 3 family (map onto
-C<thinkingLevel> then clamp to L</levels>), false for everything else (the
-universally-accepted binary C<low>|C<high> collapse a non-Gemini-3 model takes).
+Selects the Gemini serialization branch: true for the C<thinkingLevel>
+families, Gemini 3 and Gemini 4 (map onto C<thinkingLevel> then clamp to
+L</levels>), false for everything else (the universally-accepted binary
+C<low>|C<high> collapse an unknown model takes). The name predates Gemini 4.
 
 =head2 budget_min
 

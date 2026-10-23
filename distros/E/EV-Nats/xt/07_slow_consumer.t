@@ -18,7 +18,7 @@ unless ($sock) {
 }
 close $sock;
 
-plan tests => 2;
+plan tests => 3;
 
 my $guard = EV::timer 15, 0, sub { fail 'timeout'; EV::break };
 
@@ -54,6 +54,10 @@ my $ready; $ready = EV::timer 0.1, 0.1, sub {
         undef $check;
         ok $slow_triggered > 0, "slow consumer callback fired ($slow_triggered times)";
         ok $slow_bytes > 4096, "reported $slow_bytes bytes pending (threshold 4096)";
+        my $burst_fires = 0;
+        $nats->slow_consumer(4096, sub { $burst_fires++ });
+        $nats->publish('slow.test', 'x' x 1024) for 1 .. 50;
+        is $burst_fires, 1, "burst of 50 fired once ($burst_fires)";
         $nats->disconnect;
         EV::break;
     };

@@ -285,7 +285,7 @@ package FreezeThaw;
 use Exporter;
 
 @ISA = qw(Exporter);
-$VERSION = '0.5001';
+$VERSION = '1.00';
 @EXPORT_OK = qw(freeze thaw cmpStr cmpStrHard safeFreeze);
 
 use strict;
@@ -671,6 +671,8 @@ sub copyContents {  # Given two references, copies contents of the
   } elsif (haveIsRex ? re::is_regexp($second)
 		     : ($ref eq 'Regexp' and not defined $$second)) {
     $first = qr/$second/;
+  } elsif ($ref eq 'CODE' or $ref eq 'GLOB') {
+    # Atomic types: already instantiated during allocation pass
   } else {
     croak "Don't know how to copyContents of type `$ref'";
   }

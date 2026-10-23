@@ -1,0 +1,2 @@
+{"type":"say","role":"user","message":{"role":"user","content":[{"type":"text","text":"Search for the frobnicator bug in the codebase"}]},"timestamp":"2026-01-15T10:33:00.000Z","uuid":"sub-uuid1"}
+{"type":"say","role":"assistant","message":{"role":"assistant","content":[{"type":"text","text":"Found the frobnicator issue in utils.pm"}]},"timestamp":"2026-01-15T10:33:01.000Z","uuid":"sub-uuid2"}

@@ -105,4 +105,44 @@ sub tied_array  { tie my @a, 'TA'; @a = @_; \@a }
     like encode_json({ p => $ENV{PATH} }), qr/^\{"p":"/, 'magical %ENV value';
 }
 
+for my $pretty (0, 1) {
+    my $coder = JSON::YY->new(allow_nonref => 0, pretty => $pretty);
+    tie my $ref, 'TCount', [1, 2];
+    local $TCount::N = 0;
+    my $json = eval { $coder->encode($ref) };
+    is $@, '', "strict encode accepts a tied arrayref (pretty=$pretty)";
+    is_deeply defined($json) ? decode_json($json) : undef, [1, 2],
+        "strict encode uses the fetched reference (pretty=$pretty)";
+    is $TCount::N, 1, "strict encode fetches once (pretty=$pretty)";
+}
+
+for my $enc (
+    ['keyword', sub { encode_json($_[0]) }],
+    ['function', \&JSON::YY::encode_json],
+    ['pretty', sub { JSON::YY->new(pretty => 1)->encode($_[0]) }],
+) {
+    for my $bool (!!0, !!1) {
+        tie my $value, 'TCount', $bool;
+        local $TCount::N = 0;
+        is $enc->[1]->($value), $bool ? '1' : '0', "$enc->[0]: tied core boolean";
+        is $TCount::N, 1, "$enc->[0]: core boolean fetched once";
+    }
+}
+
+{
+    tie my $number, 'TCount', '2.5';
+    local $TCount::N = 0;
+    my $doc = jnum $number;
+    is "$doc", '2.5', 'jnum accepts a tied numeric string';
+    is $TCount::N, 1, 'jnum fetches the number once';
+}
+{
+    my $doc = jdoc '[{"value":2.5}]';
+    tie my $number, 'TCount', '2.5';
+    local $TCount::N = 0;
+    my $found = jfind $doc, "", "/value", $number;
+    is "$found", '{"value":2.5}', 'jfind accepts a tied numeric match';
+    is $TCount::N, 1, 'jfind fetches the match once';
+}
+
 done_testing;

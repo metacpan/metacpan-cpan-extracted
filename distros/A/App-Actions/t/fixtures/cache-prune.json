@@ -1,0 +1,31 @@
+{
+  "schema_version": 3,
+  "generated_at": 1792540920,
+  "cache_file": "/home/me/.cache/action-run/cache.json",
+  "docker": {
+    "bin": "docker",
+    "reachable": true
+  },
+  "images": [
+    {
+      "image": "postgres:15",
+      "pulls": 1,
+      "last_used": 1792540800,
+      "age": 120,
+      "size": 432100000,
+      "present": true
+    }
+  ],
+  "totals": {
+    "images": 1,
+    "size": 432100000,
+    "present": 1,
+    "missing": 0
+  },
+  "prune": {
+    "removed": 1,
+    "freed": 12345678,
+    "forgotten": 1,
+    "failed": [ "postgres:15" ]
+  }
+}

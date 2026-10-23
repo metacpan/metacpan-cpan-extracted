@@ -1,15 +1,18 @@
 package Langertha::Engine::vLLM;
 # ABSTRACT: vLLM inference server
-our $VERSION = '0.503';
+our $VERSION = '0.504';
 use Moose;
 use Carp qw( croak );
 
 extends 'Langertha::Engine::OpenAIBase';
 
+# StreamUsage: ChatCompletionRequest has stream_options.include_usage
+# (vllm/entrypoints/openai/chat_completion/protocol.py, ADR 0038).
 with 'Langertha::Role::Tools',
      'Langertha::Role::Embedding',
      'Langertha::Role::Runtime::MetricsPoll',
-     'Langertha::Role::RuntimeKnobs';
+     'Langertha::Role::RuntimeKnobs',
+     'Langertha::Role::StreamUsage';
 
 # vLLM's only per-request runtime knob is cache_salt (prefix-cache isolation,
 # vLLM v1.x+). Speculative decoding is a server-launch flag
@@ -72,7 +75,7 @@ Langertha::Engine::vLLM - vLLM inference server
 
 =head1 VERSION
 
-version 0.503
+version 0.504
 
 =head1 SYNOPSIS
 

@@ -23,11 +23,11 @@ Sub::Private - Private subroutines and methods
 
 =head1 VERSION
 
-Version 0.06
+Version 0.07
 
 =cut
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 # ---------------------------------------------------------------------------
 # Mode-name constants.  Using Readonly prevents accidental overwriting.
@@ -39,6 +39,10 @@ Readonly::Scalar my $MODE_ENFORCE   => 'enforce';
 # Config-key constants -- avoids bare magic strings in %config lookups.
 Readonly::Scalar my $KEY_MODE           => 'mode';
 Readonly::Scalar my $KEY_HARNESS_BYPASS => 'harness_bypass';
+
+# The phase name the attribute handler passes to itself when it finishes,
+# at the end of the enclosing scope, a sub compiled after CHECK.
+Readonly::Scalar my $PHASE_SCOPE_END => 'SCOPE_END';
 
 # Self-referential constant: the canonical name of this package.
 Readonly::Scalar my $SELF => __PACKAGE__;
@@ -93,7 +97,18 @@ Replaces the subroutine with a wrapper closure that checks C<caller> at
 call time and either delegates (owner package) or croaks (anyone else).
 Works correctly with OO dispatch (C<$self->_helper>).
 
-Enable before declaring your first private sub:
+Enable it for your package only, in the C<use> line:
+
+    package MyClass;
+    use Sub::Private { mode => 'enforce' };
+    sub _helper :Private { ... }
+
+This is the recommended form for modules.  Other packages keep the mode
+they chose, or the global C<$Sub::Private::config{mode}>.
+
+The older form sets the mode for every package in the program, and must
+stay set until C<CHECK>, so it changes how other modules' C<:Private>
+subs are handled.  Use it only in a program, not in a module:
 
     BEGIN { $Sub::Private::config{mode} = 'enforce' }
     package MyClass;
@@ -151,7 +166,9 @@ The C<HARNESS_ACTIVE> bypass can be disabled:
 
 =head2 Configuration
 
-    $Sub::Private::config{mode}            -- 'namespace' (default) or 'enforce'
+    use Sub::Private { mode => 'enforce' };  -- this package only (recommended)
+    $Sub::Private::config{mode}            -- 'namespace' (default) or 'enforce',
+                                              for packages that chose no mode
     $Sub::Private::config{harness_bypass}  -- 1 (default); set to 0 to test enforcement
 
 =head2 Error message format (enforce mode)
@@ -172,6 +189,10 @@ $config{$KEY_HARNESS_BYPASS} //= 1;
 # Pending (owner_pkg, sub_name) pairs to be wrapped at CHECK time.
 # Populated by import(); consumed and cleared by the CHECK block.
 my @_pending;
+
+# Modes chosen per package with "use Sub::Private { mode => ... }", keyed by
+# package name.  A package not listed uses $config{mode}.
+my %_package_mode;
 
 # True once CHECK has run, so wrapping must happen without it.  Set by our
 # own CHECK block, or here when this module is first loaded after CHECK
@@ -200,17 +221,28 @@ sub UNIVERSAL::Private :ATTR(CODE,BEGIN,CHECK) {
 		B::Hooks::EndOfScope::on_scope_end(sub {
 			my ($pkg, $name) = get_code_info($referent);
 			no strict 'refs';	## no critic (ProhibitNoStrict)
-			UNIVERSAL::Private($pkg, \*{"${pkg}::$name"}, $referent, $attr, $data, 'CHECK');
+			UNIVERSAL::Private($pkg, \*{"${pkg}::$name"}, $referent, $attr, $data, $PHASE_SCOPE_END);
 		});
 		return;
 	}
 
+	# Once its own CHECK block has run, Attribute::Handlers also makes the
+	# CHECK-phase call straight away for code compiled later, before the sub
+	# is named or installed ($symbol is then 'ANON').  Acting on it removed
+	# the half-compiled sub in namespace mode, and installed a wrapper as
+	# main::ANON in enforce mode.  The BEGIN-phase call above deals with
+	# that code, so only the real CHECK phase is used here.
+	return if $phase eq 'CHECK' && ${^GLOBAL_PHASE} ne 'CHECK';
+
 	my $sub_name = *{$symbol}{NAME};
 
-	# Reject unrecognised mode values early rather than silently misbehaving.
-	_assert_known_mode($config{$KEY_MODE});
+	# The mode chosen by the sub's own package, or else the global one.
+	my $mode = _mode_for($package);
 
-	if ($config{$KEY_MODE} eq $MODE_ENFORCE) {
+	# Reject unrecognised mode values early rather than silently misbehaving.
+	_assert_known_mode($mode);
+
+	if ($mode eq $MODE_ENFORCE) {
 		# Enforce mode: replace the stash entry with an access-checking wrapper.
 		no warnings 'redefine';
 		*{$symbol} = _wrap($package, $sub_name, $referent);
@@ -233,6 +265,8 @@ sub UNIVERSAL::Private :ATTR(CODE,BEGIN,CHECK) {
 
     use Sub::Private;                    # attribute form -- no arguments
     use Sub::Private qw(_a _b _c);      # declarative form (enforce mode only)
+    use Sub::Private { mode => 'enforce' };              # mode for this package
+    use Sub::Private { mode => 'enforce' }, qw(_a _b);   # both
 
 =head3 Purpose
 
@@ -241,18 +275,32 @@ Called automatically by C<use Sub::Private>.
 With B<no arguments>: makes the C<:Private> attribute globally available
 via C<UNIVERSAL>.  No other action is taken.
 
+With B<a hash reference first>: sets options for the calling package
+only.  The one option is C<mode>, C<'namespace'> or C<'enforce'>.  It
+decides what happens to that package's C<:Private> subs and whether it
+may use the declarative form, whatever C<$Sub::Private::config{mode}>
+says.  The global mode is not changed, so other packages are not
+affected.  The mode applies to subs in the package that made the C<use>
+call, so put the C<use> line inside the package.
+
 With B<one or more sub names>: registers those named subs in the calling
 package for access-enforcement wrapping at C<CHECK> time.  If C<CHECK>
 has already fired (for example the package is loaded with C<require> at
 run time), the subs are wrapped as soon as the enclosing scope (normally
 the rest of the file) has been compiled, so the C<use> line can still
 come before the subs it names.  A direct C<< Sub::Private->import(...) >>
-call at run time wraps immediately.  Requires C<$Sub::Private::config{mode}> to equal
-C<'enforce'>; croaks otherwise.
+call at run time wraps immediately.  Requires the package's mode (see
+above), or else C<$Sub::Private::config{mode}>, to equal C<'enforce'>;
+croaks otherwise.
 
 =head3 Arguments
 
 =over 4
+
+=item C<\%options> (optional)
+
+A hash reference, before any sub names.  The only key allowed is
+C<mode>, whose value must be C<'namespace'> or C<'enforce'>.
 
 =item C<@subs> (optional)
 
@@ -269,6 +317,9 @@ The class name (C<'Sub::Private'>) as a plain string in all cases.
 =head3 Side effects
 
 =over 4
+
+=item * With C<\%options>: records the mode for the calling package.  A
+later call from the same package replaces it.
 
 =item * Pre-CHECK: appends C<[$owner_pkg, $sub_name]> pairs to the
 internal C<@_pending> list.
@@ -292,12 +343,36 @@ calling package's stash.
     sub _init   { ... }    # wrapped at CHECK time
     sub run     { my $s = shift; $s->_helper; $s->_init }
 
+Enforce mode for one package, leaving every other package alone:
+
+    package MyClass;
+    use Sub::Private { mode => 'enforce' };
+
+    sub new        { bless {}, shift }
+    sub _helper :Private { ... }    # wrapped at CHECK time
+    sub run        { (shift)->_helper }
+
 =head3 API SPECIFICATION
 
 =head4 Input
 
     # No-argument form: always valid.
     Sub::Private->import();
+
+    # Options, first in the list (optional):
+    {
+        options => {
+            type     => 'hashref',
+            optional => 1,
+            schema   => {
+                mode => {
+                    type     => 'string',
+                    memberof => [ 'namespace', 'enforce' ],
+                    optional => 1,
+                },
+            },
+        }
+    }
 
     # Declarative form (enforce mode only):
     {
@@ -320,9 +395,14 @@ calling package's stash.
     Message                                              Meaning / Action
     ---------------------------------------------------  -----------------------------------------------
     "Sub::Private->import: declarative form requires     use Sub::Private qw(...) was called while
-     mode => 'enforce'"                                  $config{mode} is not 'enforce'.  Set
-                                                         $config{mode} = 'enforce' in a BEGIN block
-                                                         before "use Sub::Private".
+     mode => 'enforce'"                                  the package's mode is not 'enforce'.  Use
+                                                         use Sub::Private { mode => 'enforce' },
+                                                         qw(...) instead.
+
+    "Sub::Private->import: unknown option 'KEY'"         The options hash has a key other than mode.
+
+    "Sub::Private: unknown mode 'MODE' -- use            The mode option, or $config{mode}, is not
+     'namespace' or 'enforce'"                           one of the two modes.
 
     "Sub::Private->import: 'NAME' is not a valid         The sub name failed the identifier regex.
      Perl identifier"                                    Check for typos, hyphens, leading digits,
@@ -339,13 +419,17 @@ calling package's stash.
 
 sub import {
 	my ($class, @subs) = @_;
+	my ($owner_pkg, $file, $line) = caller;
+
+	# A leading hashref holds options for the calling package only.
+	_set_package_options($owner_pkg, shift @subs) if ref($subs[0]) eq 'HASH';
 
 	# No sub names: the :Private attribute is always available via UNIVERSAL.
 	return set_return($class, { type => 'string' }) unless @subs;
 
 	# Declarative form is only meaningful in enforce mode.
 	croak "$SELF->import: declarative form requires mode => '$MODE_ENFORCE'"
-		if $config{$KEY_MODE} ne $MODE_ENFORCE;
+		if _mode_for($owner_pkg) ne $MODE_ENFORCE;
 
 	# Validate every name before touching the stash (fail-fast, all-or-nothing).
 	for my $sub_name (@subs) {
@@ -361,7 +445,6 @@ sub import {
 	}
 
 	# Schedule or immediately apply wrapping depending on compile phase.
-	my ($owner_pkg, $file, $line) = caller;
 	if ($_post_check) {
 		if (defined $^S) {
 			# Called at run time: the subs already exist, wrap them now.
@@ -416,6 +499,41 @@ sub _assert_known_mode {
 	return if $mode eq $MODE_NAMESPACE || $mode eq $MODE_ENFORCE;
 	croak "$SELF: unknown mode '$mode'"
 		. " -- use '$MODE_NAMESPACE' or '$MODE_ENFORCE'";
+}
+
+# _mode_for
+# Purpose      : Find the mode that applies to the subs of a package.
+# Entry        : $pkg -- a package name
+# Exit status  : Returns the mode the package chose with
+#                "use Sub::Private { mode => ... }", or else $config{mode}.
+# Side effects : None.
+sub _mode_for {
+	my ($pkg) = @_;
+
+	return $_package_mode{$pkg} // $config{$KEY_MODE};
+}
+
+# _set_package_options
+# Purpose      : Record the options a package gave in its "use" line.
+# Entry        : $pkg     -- the package that called import()
+#                $options -- hashref; the only key allowed is "mode"
+# Exit status  : Returns normally; croaks on an unknown key or mode.
+# Side effects : Sets the package's entry in %_package_mode.  The global
+#                $config{mode} is not touched, so other packages are not
+#                affected.
+sub _set_package_options {
+	my ($pkg, $options) = @_;
+
+	# Check every key before changing anything (all-or-nothing).
+	for my $key (sort keys %{$options}) {
+		croak "$SELF->import: unknown option '$key'" if $key ne $KEY_MODE;
+	}
+	if (exists $options->{$KEY_MODE}) {
+		my $mode = $options->{$KEY_MODE} // q{};
+		_assert_known_mode($mode);
+		$_package_mode{$pkg} = $mode;
+	}
+	return;
 }
 
 # _process_one
@@ -551,7 +669,10 @@ Module-level configuration hash.  Supported keys:
 =item C<mode>
 
 C<'namespace'> (default) or C<'enforce'>.  Must be set in a C<BEGIN>
-block before C<use Sub::Private> to take effect at C<CHECK> time.
+block before C<use Sub::Private> to take effect at C<CHECK> time.  It
+applies to every package that did not choose its own mode with
+C<use Sub::Private { mode => ... }>, so a module should use that form
+instead of changing this value.
 
 =item C<harness_bypass>
 
@@ -654,6 +775,7 @@ operation and C<import>.
     | bypass    : BOOL                                    |
     | config    : { mode : seq CHAR,                      |
     |               harness_bypass : BOOL }               |
+    | pkg_mode  : Package -+> seq CHAR                   |
     +----------------------------------------------------+
 
     -- Initial state
@@ -664,6 +786,7 @@ operation and C<import>.
     | bypass    = false                                  |
     | config    = { mode |-> 'namespace',                 |
     |               harness_bypass |-> true }             |
+    | pkg_mode  = {}                                     |
     +----------------------------------------------------+
 
     -- Bypass predicate
@@ -702,9 +825,23 @@ operation and C<import>.
     post_check  : BOOL
     compiling   : BOOL       -- true while $^S is undefined
 
+    -- The mode that applies to a package's subs
+    mode_for(p) = pkg_mode(p)   if p in dom pkg_mode
+                = config.mode   otherwise
+
+    -- Options (hashref first): sets the caller's mode only
+    +-ImportOptions-------------------------------------+
+    | Delta-Registry                                    |
+    | mode? : seq CHAR                                  |
+    |---------------------------------------------------|
+    | mode? in { 'namespace', 'enforce' }               |
+    | pkg_mode' = pkg_mode (+) { caller |-> mode? }     |
+    | config' = config                                  |
+    +---------------------------------------------------+
+
     -- Pre-condition (declarative form)
     +-ImportPre-----------------------------------------+
-    | config.mode = 'enforce'                           |
+    | mode_for(caller) = 'enforce'                      |
     | forall n in subs . valid_id(n)                    |
     +---------------------------------------------------+
 

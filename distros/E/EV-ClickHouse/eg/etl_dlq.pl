@@ -41,6 +41,7 @@ my @source = (
 my @chunks;
 while (my @c = splice @source, 0, $batch_size) { push @chunks, [@c] }
 
+my $report_err;
 my $ch; $ch = EV::ClickHouse->new(
     host => $host, port => $port, protocol => 'native',
     on_connect => sub {
@@ -65,9 +66,13 @@ my $ch; $ch = EV::ClickHouse->new(
         my $report = sub {
             $dlq->finish(sub {
                 $ch->query("select count() from events", sub {
-                    printf "events:     %d rows\n", $_[0][0][0];
+                    my ($rows, $err) = @_;
+                    if ($err) { $report_err = $err; EV::break; return; }
+                    printf "events:     %d rows\n", $rows->[0][0];
                     $ch->query("select count() from events_dlq", sub {
-                        printf "events_dlq: %d rows\n", $_[0][0][0];
+                        my ($rows2, $err2) = @_;
+                        if ($err2) { $report_err = $err2; EV::break; return; }
+                        printf "events_dlq: %d rows\n", $rows2->[0][0];
                         EV::break;
                     });
                 });
@@ -95,4 +100,5 @@ my $ch; $ch = EV::ClickHouse->new(
 );
 
 EV::run;
+die "report failed: $report_err\n" if $report_err;
 $ch->finish;

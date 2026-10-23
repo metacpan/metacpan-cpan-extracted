@@ -1,6 +1,6 @@
 package Langertha::Engine::TranscriptionBase;
 # ABSTRACT: Base class for OpenAI-compatible transcription-only engines
-our $VERSION = '0.503';
+our $VERSION = '0.504';
 use Moose;
 use Carp qw( croak );
 use Module::Runtime qw( use_module );
@@ -43,7 +43,7 @@ Langertha::Engine::TranscriptionBase - Base class for OpenAI-compatible transcri
 
 =head1 VERSION
 
-version 0.503
+version 0.504
 
 =head1 SYNOPSIS
 

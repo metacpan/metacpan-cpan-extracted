@@ -3,7 +3,7 @@ package PAGI;
 use strict;
 use warnings;
 
-our $VERSION = '0.003000';
+our $VERSION = '0.003001';
 
 1;
 
@@ -115,11 +115,9 @@ C<PAGI-Server> distribution.
 
 =item B<Beta: PAGI-Tools distribution>
 
-The application toolkit (L<PAGI::Request>, L<PAGI::Response>,
-L<PAGI::WebSocket>, L<PAGI::SSE>, L<PAGI::Endpoint::Router>,
-L<PAGI::App::Router>, middleware, and bundled apps) is convenience built on top
-of the spec. These APIs may change between releases as the helpers evolve.
-Ships in the C<PAGI-Tools> distribution.
+The application toolkit is convenience built on top of the spec. Its APIs may
+change between releases as the helpers evolve. Ships in the C<PAGI-Tools>
+distribution; see L<PAGI::Tools>.
 
 =back
 
@@ -152,10 +150,8 @@ and plugin compatibility are runner-specific APIs.
 
 =item C<PAGI-Tools>
 
-The application toolkit: the C<PAGI::Middleware::*> suite, C<PAGI::App::*>
-ready-made apps, the C<PAGI::Endpoint::*> framework,
-L<PAGI::Request>/L<PAGI::Response>/L<PAGI::Context> ergonomics, and
-L<PAGI::Test::Client> and friends for in-process testing.
+The application toolkit: conveniences built on the specification, documented
+in that distribution (see L<PAGI::Tools>).
 
 =back
 
@@ -291,12 +287,9 @@ Process startup/shutdown lifecycle events
 
 =head1 UTF-8 HANDLING OVERVIEW
 
-Applications built on the C<PAGI-Tools> toolkit rarely touch encoding at
-all: L<PAGI::Request> decodes on the way in and L<PAGI::Response> encodes on
-the way out, so handler code works purely in Perl character strings. The
-rules below govern the B<raw interface> underneath -- the contract that
-toolkits, frameworks, and servers implement so that applications never have
-to.
+Toolkits and frameworks usually handle encoding for the applications built on
+them. The rules below govern the B<raw interface> underneath -- the contract
+that toolkits, frameworks, and servers implement.
 
 PAGI scopes provide decoded text where mandated by the spec and preserve raw
 bytes where the application must decide. Broad guidance:
@@ -323,34 +316,8 @@ C<Content-Length> based on byte length.
 
 =back
 
-Here is the same application written both ways. This is how it looks with
-the toolkit, which is how most application code should look -- no C<Encode>
-in sight:
-
-    use PAGI::Request;
-    use PAGI::Response;
-    use Future::AsyncAwait;
-
-    async sub app {
-        my ($scope, $receive, $send) = @_;
-        my $req  = PAGI::Request->new($scope, $receive);
-        my $text = $req->query_param('text') // '';
-
-        await PAGI::Response->new($scope)
-            ->status(200)
-            ->text("You sent: $text")
-            ->respond($send);
-    }
-
-C<query_param> URL-decodes (including C<+> as space) and UTF-8-decodes with
-replacement characters for invalid bytes (pass C<< strict => 1 >> to raise
-instead); C<text> encodes the body as UTF-8, sets
-C<text/plain; charset=utf-8>, and computes an authoritative
-C<Content-Length> from the encoded bytes.
-
-And here is the raw-interface equivalent -- what a toolkit like the one
-above is doing on the application's behalf. It is shown so the underlying
-contract is explicit, not as a recommended application style:
+Here is what that means for an application that decodes a query parameter
+and answers in UTF-8 text:
 
     use Future::AsyncAwait;
     use Encode qw(encode decode);
@@ -409,12 +376,54 @@ L<PAGI::Spec> for the full specification.
 
 =head1 REQUIREMENTS
 
-The specification modules (C<PAGI.pm> and the C<PAGI::Spec::*> POD)
-are pure documentation and need only B<Perl 5.18+>. The C<PAGI-Server> and
-C<PAGI-Tools> distributions, installed separately (see L</INSTALLATION>),
-declare their own dependencies (the C<PAGI-Server> distribution
-requires L<IO::Async> and L<Future::AsyncAwait>; the C<PAGI-Tools> distribution
-requires L<Future::AsyncAwait>).
+PAGI requires B<Perl 5.24 or later>: the specification, the reference server
+(the C<PAGI-Server> distribution) and the toolkit (the C<PAGI-Tools>
+distribution) alike. The releases up to 0.003000 declared Perl 5.18.
+
+The specification modules (C<PAGI.pm> and the C<PAGI::Spec::*> POD) are pure
+documentation. The C<PAGI-Server> and C<PAGI-Tools> distributions, installed
+separately (see L</INSTALLATION>), declare their own dependencies (the
+C<PAGI-Server> distribution requires L<IO::Async> and L<Future::AsyncAwait>;
+the C<PAGI-Tools> distribution requires L<Future::AsyncAwait>). PAGI itself
+requires no event loop: L<IO::Async> is the event loop the reference server
+runs on, an implementation detail of that server, and an application written
+to the specification (using L<Future::IO> for timers and I/O) runs on any
+conforming server.
+
+=head2 Perl version support
+
+The specification is defined in terms of L<Future>: C<$receive>, C<$send> and
+the application itself all return Futures. Future is the one hard dependency
+of a PAGI application, and so Future's minimum Perl is PAGI's: when Future
+raises its floor, PAGI has no choice but to follow. L<Future::AsyncAwait> is
+not required, but it is how PAGI applications are meant to be written (the
+examples, the guides and the toolkit all use it), so its behaviour on a given
+Perl matters as much.
+
+The floor is Perl 5.24, rather than the 5.20 that Future itself needs,
+because 5.24 is the first Perl on which the async stack behaves the same
+everywhere: Future::AsyncAwait passes a cancel on to what an C<async sub>
+awaits (below 5.24 a cancelled C<async sub> stays suspended), and
+L<Future::XS> is available.
+
+The horizon PAGI works to is Future's maintainer's: Future supports Perl
+versions at least ten years old.
+
+=over 4
+
+=item * PAGI does not raise its floor automatically when a Perl turns ten.
+
+=item * A Perl more than ten years old is in B<grace time>: it still works,
+and it will not be broken casually, but it is the next floor that can go.
+Perl 5.24 (released 2016) is in grace time now.
+
+=item * PAGI's floor follows its upstream dependencies, which PAGI does not
+own, so advance notice of every change cannot be promised. What PAGI does
+promise is to work with those projects and pass on what it learns as early
+and as openly as it can, on the C<pagi-announce> list (see
+L</Announcements>).
+
+=back
 
 =head1 SEE ALSO
 

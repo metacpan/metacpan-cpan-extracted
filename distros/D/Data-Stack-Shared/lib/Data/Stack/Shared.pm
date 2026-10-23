@@ -1,7 +1,7 @@
 package Data::Stack::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 require XSLoader;
 XSLoader::load('Data::Stack::Shared', $VERSION);
@@ -97,6 +97,9 @@ usage is unaffected.
 =item C<Data::Stack::Shared::Str> - fixed-length strings
 
 =back
+
+C<max_len> is a byte limit; longer strings are truncated at a complete UTF-8
+character when UTF-8 flagged.
 
 C<new> and C<new_memfd> reserve the whole segment when they create one, so a
 full filesystem makes them croak instead of the initialization dying with

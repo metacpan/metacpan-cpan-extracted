@@ -21,7 +21,8 @@ my @servers;
 while (@ARGV && $ARGV[0] =~ /^\@(.+)/) { push @servers, $1; shift }
 my $name = shift // 'cloudflare.com';
 
-my $r = EV::cares->new(@servers ? (servers => \@servers) : (), timeout => 5);
+my $r = EV::cares->new(@servers ? (servers => \@servers) : (), timeout => 5,
+                       qcache => 0, flags => ARES_FLAG_EDNS);
 
 # build label suffixes (parent of each cut), skipping the bare TLD because
 # a TLD's signing material is identical to what we already get at the

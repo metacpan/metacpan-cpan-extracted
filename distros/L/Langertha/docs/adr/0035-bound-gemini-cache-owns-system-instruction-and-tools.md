@@ -100,3 +100,21 @@ While a cache is bound, the Gemini request builder leaves `systemInstruction`, `
 - **A `chat_with_tools_f` test with a bound cache** (asked for on karr k340): the loop's tools
   are not sent, and calls the model returns from the cache's declarations are still extracted
   and executed. Not done here. This ADR records the decision only.
+
+## Update (k381 — a model without explicit caching croaks on a bound or newly created cache)
+
+Gemini 4 has no explicit caching: `cachedContents` "is not supported … and returns an error"
+(ai.google.dev latest-model guide, read 2026-10-19; documentation only). With a cache bound,
+`_cached_content_reference` now takes the model the request URL names (`chat_model` or a
+per-request `model`) and croaks for a `gemini-4*` id before the request is built. The
+`cachedContents.create` builder croaks the same way, from an engine `before` on the role's
+`_create_cached_content_request`, because `Role::CachedContent` deliberately does not look at
+model names.
+
+**Croak, not this ADR's drop + carp.** Here the dropped field would be the cache reference
+itself, and the cache owns the cached contents and, by this ADR, the `systemInstruction`, `tools`
+and `toolConfig` that the request already left out. A request without the reference would answer
+a different question, and nothing would show it. Croaking before a known server error follows
+ADR 0021 / 0024. Only the documented family croaks (one `$GEMINI4` pattern shared with the ADR 0019
+k381 row), not every model without `supports('cached_content')`: aliases and unknown ids still
+reach the server, which decides. Pinned by `t/46_gemini4_controls.t`.

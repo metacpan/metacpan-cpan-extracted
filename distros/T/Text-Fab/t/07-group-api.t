@@ -32,9 +32,7 @@ throws_ok { $fab->group__end() } qr/E_DANGLING_END_GROUP/,
 
 subtest 'Group nesting constraints (E_INVALID_GROUP_NESTING)' => sub {
     my $fab_nest = Text::Fab->new(config => {
-        'Fab/group_nesting' => {
-            inner_flavor => { allowed_parents => ['valid_outer'] }
-        }
+        'Fab/group_nesting/inner_flavor/allowed_parents' => ['valid_outer']
     });
 
     $fab_nest->group__start('valid_outer');
@@ -167,9 +165,7 @@ subtest 'Fast-path insertion vs time-machine recalculation' => sub {
 };
 
 my $fab_select = Text::Fab->new(config => {
-    'Fab/group_flavors' => {
-        isolated => { keys => ['temporary_var'] }
-    }
+    'Fab/group_flavors/isolated/keys' => ['temporary_var']
 });
 $fab_select->cfg__set('permanent_var', 'perm_orig');
 $fab_select->cfg__set('temporary_var', 'temp_orig');

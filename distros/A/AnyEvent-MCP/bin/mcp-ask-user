@@ -174,7 +174,7 @@ use AnyEvent::MCP ();
 use JSON::XS ();
 use AnyEvent::MCP::Helper ();
 
-my %options = mcp_getoptions ({
+my $options = mcp_getoptions ({
    usage       => "Usage: $0 [OPTION]...\n",
    description => "Ask a human question or display an MCP form, locally or through native elicitation.",
    options     => [["--ask MODE", "Ask via helper (default), tty, yad, mcp, or auto"]],
@@ -420,8 +420,9 @@ mcp_tool ask_form =>
    \&ask_form;
 
 mcp_config
-   server_info => { name => "mcp-ask-user", version => $AnyEvent::MCP::VERSION },
+   server_name    => "mcp-ask-user",
+   server_version => $AnyEvent::MCP::VERSION,
    short_instructions => "Ask the human when input is needed: ask-user for a question, ask-form for structured fields. Decline and cancel are not answers.",
    instructions => "Use ask-user or ask-form only when human input is needed. ask-user offers one question with choices and free text; ask-form accepts an MCP form schema. A declined or cancelled request is not an answer.";
 
-mcp_start %options;
+mcp_start %$options;

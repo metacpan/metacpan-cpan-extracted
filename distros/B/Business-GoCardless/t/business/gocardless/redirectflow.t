@@ -50,6 +50,7 @@ can_ok(
         cancelled
         expired
         metadata
+        mandate_reference
     /,
 );
 

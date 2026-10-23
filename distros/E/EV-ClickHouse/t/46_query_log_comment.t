@@ -1,8 +1,9 @@
 #!/usr/bin/env perl
 # Per-connection query_log_comment + per-query query_log_comment via
-# settings should round-trip via system.query_log. Native and HTTP
-# both prepend the comment as `/* qlc */` so the server stores it
-# verbatim in the log_comment column.
+# settings should round-trip via system.query_log. Native and HTTP both
+# prepend the comment as `/* qlc */`, so it shows up in the logged query
+# text. It does not reach the log_comment column: that is fed by the
+# server-side `log_comment` setting, which this option does not send.
 use strict;
 use warnings;
 use Test::More;
@@ -54,7 +55,7 @@ my $ch; $ch = EV::ClickHouse->new(
             # Force the server to materialize the log entry.
             $ch->query("system flush logs", sub {
                 $ch->query(
-                    "select query_id, log_comment from system.query_log "
+                    "select query_id, query from system.query_log "
                   . "where query_id = {q:String} order by event_time desc limit 1",
                     { params => { q => $qid } },
                     sub { ($rows, $err) = @_; EV::break },
@@ -73,5 +74,5 @@ ok $rows && @$rows,
    "system.query_log has an entry for our query_id"
    or diag "err: " . ($err // '') . "; rows: " . ($rows ? scalar @$rows : 'undef');
 my $logged = $rows && @$rows ? ($rows->[0][1] // '') : '';
-like $logged, qr/\Q$tag\E/,
-   "log_comment column contains our query_log_comment tag";
+like $logged, qr{/\* \Q$tag\E \*/},
+   "query_log records the query text with our query_log_comment prefix";

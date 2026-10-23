@@ -13,7 +13,7 @@ Langertha::Runtime::Metrics::EngineContract - Wire contract for self-hosted infe
 
 =head1 VERSION
 
-version 0.503
+version 0.504
 
 =head1 DESCRIPTION
 

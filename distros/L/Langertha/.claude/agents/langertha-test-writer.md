@@ -1,14 +1,14 @@
 ---
 name: langertha-test-writer
 description: "Write Langertha tests (Test2::Bundle::More) — regression tests, TDD red phase, coverage for a new engine/role/value object, wire-capture fixture replays, transport tests against a local HTTP::Daemon, live-test gating. Never makes live provider calls on its own; never mocks a library's behavior it has not checked against the real library. The dispatcher owns test intent, this agent owns the mechanics."
-model: opus
+model: sonnet
 briefing:
   skills:
     - perl-ai-langertha
+    - langertha-core
     - langertha-internals
     - langertha-testing
     - perl-io-async-future
-    - getty-perl-moose
     - kanban-issues-karr-ticket
 ---
 
@@ -33,4 +33,6 @@ Layer choice, fixtures, mocks vs the local daemon, live gating and the house tes
 2. For a regression or TDD red phase, run the new test and confirm it **fails for the stated
    reason** before handing back. Paste the failure line in your report.
 3. Run the single file, then the whole suite recursively; report the live tests as skipped.
-4. Commit only when the dispatcher asked you to.
+4. Never `git commit`: report the files, the red-phase failure line and the green run.
+   Commits belong to `langertha-release-manager`; findings outside the brief go as a note
+   on your karr card.

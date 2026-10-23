@@ -25,6 +25,7 @@ eg/tail.pl
 eg/tls_sasl.pl
 eg/transaction.pl
 lib/EV/Kafka.pm
+LICENSE
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
@@ -66,6 +67,9 @@ t/30_group_retry.t
 t/31_fetch_errors.t
 t/32_disconnect_in_dispatch.t
 t/33_integration_gaps.t
+t/34_safety.t
+t/35_r2.t
+t/36_r4_fixes.t
 t/lib/EVKafkaTest.pm
 typemap
 xt/asan.t
@@ -79,7 +83,9 @@ xt/perl.supp
 xt/pod_caveats.t
 xt/pod_coverage.t
 xt/pod_syntax.t
+xt/readme.t
 xt/threads.t
 xt/valgrind.t
+t/36_custom_loop_release.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

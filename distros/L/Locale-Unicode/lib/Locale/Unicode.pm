@@ -1,16 +1,15 @@
 ##----------------------------------------------------------------------------
-## Unicode Locale Identifier - ~/lib/m
-## Version v0.4.4
+## Unicode Locale Identifier - ~/lib/Locale/Unicode.pm
+## Version v0.4.6
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2024/05/11
-## Modified 2026/08/20
+## Modified 2026/10/23
 ## All rights reserved
 ## 
-## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
-## under the same terms as Perl itself.##
-##----------------------------------------------------------------------------##
+## under the same terms as Perl itself.
+##----------------------------------------------------------------------------
 package Locale::Unicode;
 BEGIN
 {
@@ -407,7 +406,7 @@ BEGIN
     our $PROP_TO_SUB = {};
     # False, by default
     our $EXPLICIT_BOOLEAN = 0;
-    our $VERSION = 'v0.4.4';
+    our $VERSION = 'v0.4.6';
 };
 
 use strict;
@@ -1812,6 +1811,27 @@ sub vt { return( shift->colVariableTop( @_ ) ); }
 # t-x0
 sub x0 { return( shift->t_private( @_ ) ); }
 
+sub _get_args_as_hash
+{
+    my $self = shift( @_ );
+    my $ref = {};
+    if( scalar( @_ ) == 1 &&
+        defined( $_[0] ) &&
+        ( ref( $_[0] ) || '' ) eq 'HASH' )
+    {
+        $ref = shift( @_ );
+    }
+    elsif( !( scalar( @_ ) % 2 ) )
+    {
+        $ref = { @_ };
+    }
+    else
+    {
+        die( "Uneven number of parameters provided." );
+    }
+    return( $ref );
+}
+
 sub _set_get_prop
 {
     my $self = shift( @_ );
@@ -1909,27 +1929,6 @@ sub _set_get_prop
     # Returns undef in scalar context and an empty list in list context
     return if( !defined( $self->{ $field } ) );
     return( $self->{ $field } );
-}
-
-sub _get_args_as_hash
-{
-    my $self = shift( @_ );
-    my $ref = {};
-    if( scalar( @_ ) == 1 &&
-        defined( $_[0] ) &&
-        ( ref( $_[0] ) || '' ) eq 'HASH' )
-    {
-        $ref = shift( @_ );
-    }
-    elsif( !( scalar( @_ ) % 2 ) )
-    {
-        $ref = { @_ };
-    }
-    else
-    {
-        die( "Uneven number of parameters provided." );
-    }
-    return( $ref );
 }
 
 {
@@ -3732,38 +3731,35 @@ sub new
     my @info = caller;
     @$self{ qw( package file line ) } = @info[0..2];
     my $args = {};
-    if( scalar( @_ ) == 1 )
+    if( scalar( @_ ) == 1 &&
+        ( ref( $_[0] ) || '' ) eq 'HASH' )
     {
-        if( ( ref( $_[0] ) || '' ) eq 'HASH' )
+        $args = shift( @_ );
+        if( $args->{skip_frames} )
         {
-            $args = shift( @_ );
-            if( $args->{skip_frames} )
-            {
-                @info = caller( int( $args->{skip_frames} ) );
-                @$self{ qw( package file line ) } = @info[0..2];
-            }
-            $args->{message} ||= '';
-            foreach my $k ( qw( package file line message code type retry_after ) )
-            {
-                $self->{ $k } = $args->{ $k } if( CORE::exists( $args->{ $k } ) );
-            }
+            @info = caller( int( $args->{skip_frames} ) );
+            @$self{ qw( package file line ) } = @info[0..2];
         }
-        elsif( ref( $_[0] ) && $_[0]->isa( 'Locale::Unicode::Exception' ) )
+        $args->{message} ||= '';
+        foreach my $k ( qw( package file line message code type retry_after ) )
         {
-            my $o = $args->{object} = shift( @_ );
-            $self->{message} = $o->message;
-            $self->{code} = $o->code;
-            $self->{type} = $o->type;
-            $self->{retry_after} = $o->retry_after;
+            $self->{ $k } = $args->{ $k } if( CORE::exists( $args->{ $k } ) );
         }
-        else
-        {
-            die( "Unknown argument provided: '", overload::StrVal( $_[0] ), "'" );
-        }
+    }
+    elsif( scalar( @_ ) == 1 &&
+           defined( $_[0] ) &&
+           ref( $_[0] ) &&
+           $_[0]->isa( 'Locale::Unicode::Exception' ) )
+    {
+        my $o = shift( @_ );
+        $self->{message}     = $o->message;
+        $self->{code}        = $o->code;
+        $self->{type}        = $o->type;
+        $self->{retry_after} = $o->retry_after;
     }
     else
     {
-        $args->{message} = join( '', map( ref( $_ ) eq 'CODE' ? $_->() : $_, @_ ) );
+        $self->{message} = join( '', map( ref( $_ ) eq 'CODE' ? $_->() : $_, @_ ) );
     }
     return( $self );
 }
@@ -3782,6 +3778,16 @@ sub as_string
     $self->{_cache_value} = $str;
     CORE::delete( $self->{_reset} );
     return( $str );
+}
+
+sub clone
+{
+    my $self = shift( @_ );
+    # Safeguard
+    die( "$self->clone() cannot be called as a class function" ) unless( ref( $self ) );
+    my $new = bless( { %$self } => ref( $self ) );
+    CORE::delete( $new->{_cache_value} );
+    return( $new );
 }
 
 sub code { return( shift->reset(@_)->_set_get_prop( 'code', @_ ) ); }
@@ -4007,7 +4013,7 @@ In Scalar or in list context, the value returned is the last value set.
 
 =head1 VERSION
 
-    v0.4.4
+    v0.4.6
 
 =head1 DESCRIPTION
 

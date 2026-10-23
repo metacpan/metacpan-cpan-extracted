@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   Alien::Base::Wrapper: '1.97'
   Alien::ghostty: '0.01'
-  ExtUtils::MakeMaker: '6.52'
+  ExtUtils::MakeMaker: '6.64'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150015'
 license: perl
@@ -26,5 +26,5 @@ requires:
 resources:
   bugtracker: https://github.com/vividsnow/perl5-term-ghostty/issues
   repository: https://github.com/vividsnow/perl5-term-ghostty.git
-version: '0.01'
+version: '0.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

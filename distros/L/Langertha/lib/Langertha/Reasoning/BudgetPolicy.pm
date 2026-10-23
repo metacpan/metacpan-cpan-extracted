@@ -1,6 +1,6 @@
 package Langertha::Reasoning::BudgetPolicy;
 # ABSTRACT: Invented level<->token-budget interpolation, clamped to a Profile's enforced bounds
-our $VERSION = '0.503';
+our $VERSION = '0.504';
 use Moose;
 use Moose::Util::TypeConstraints;
 use Carp qw( croak );
@@ -236,7 +236,7 @@ Langertha::Reasoning::BudgetPolicy - Invented level<->token-budget interpolation
 
 =head1 VERSION
 
-version 0.503
+version 0.504
 
 =head1 SYNOPSIS
 

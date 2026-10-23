@@ -9,6 +9,7 @@ use EV;
 use EV::ClickHouse;
 use Data::Dumper; $Data::Dumper::Sortkeys = 1;
 
+my $zoo_err;
 my $ch;
 $ch = EV::ClickHouse->new(
     host            => $ENV{CLICKHOUSE_HOST}        // '127.0.0.1',
@@ -21,7 +22,7 @@ $ch = EV::ClickHouse->new(
         $ch->query(<<'SQL', sub {
             select
                 toInt8(-1)                                          as i8,
-                toUInt64(2**63)                                     as u64,
+                toUInt64(pow(2, 63))                               as u64,
                 toFloat32(1.5)                                      as f32,
                 toBFloat16(2.5)                                     as bf16,
                 'hello'                                             as s,
@@ -40,10 +41,10 @@ $ch = EV::ClickHouse->new(
                 map('k', 1)                                         as m,
                 toLowCardinality('xx')                              as lc,
                 toIntervalSecond(15)                                as iv,
-                toPoint(10, 20)                                     as pt
+                (10, 20)::Point                                   as pt
 SQL
             my ($rows, $err) = @_;
-            die $err if $err;
+            if ($err) { $zoo_err = $err; EV::break; return; }
             print Dumper($rows->[0]);
             EV::break;
         });
@@ -51,3 +52,4 @@ SQL
     on_error => sub { die "Error: $_[0]\n" },
 );
 EV::run;
+die "query failed: $zoo_err\n" if $zoo_err;

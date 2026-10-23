@@ -47,6 +47,7 @@ t/09-recover.t
 t/pod_synopsis.t
 t/version_check.t
 t/10-foreign-invocant.t
+t/11-wakeups.t
 xt/acquire_n_stress.t
 xt/asan.t
 xt/cloexec_exec.t

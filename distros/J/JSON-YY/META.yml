@@ -24,7 +24,7 @@ no_index:
 provides:
   JSON::YY:
     file: lib/JSON/YY.pm
-    version: '0.08'
+    version: '0.09'
 requires:
   JSON::PP: '0'
   Scalar::Util: '0'
@@ -32,5 +32,5 @@ requires:
   perl: '5.014'
 resources:
   repository: https://github.com/vividsnow/perl5-json-yy.git
-version: '0.08'
+version: '0.09'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

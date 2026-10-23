@@ -3,11 +3,16 @@ use strict;
 use warnings;
 use 5.016;
 
+# Always benchmark the working copy, not a stale installed copy that may
+# be shadowing it in @INC.
+use FindBin;
+use lib "$FindBin::Bin/lib";
+
 use Template::Sluz;
 use Time::HiRes;
 use Getopt::Long qw(GetOptions);
 
-my $ITERATIONS = 5000;
+my $ITERATIONS = 15000;
 my $filter;
 
 GetOptions(
@@ -36,7 +41,7 @@ print "$line\n";
 my $total_time = 0;
 my %results;
 
-for my $name (sort keys %templates) {
+foreach my $name (sort keys %templates) {
     my $t    = $templates{$name};
     my $tpl  = $t->{tpl};
     my $desc = $t->{desc};
@@ -44,10 +49,12 @@ for my $name (sort keys %templates) {
     if ($filter && $name !~ /$filter/i && $desc !~ /$filter/i) { next; }
 
     # Warmup
-    $sluz->parse_string($tpl) for 1..10;
+	foreach (1 .. 10) {
+		$sluz->parse_string($tpl);
+	}
 
     my $start = millis();
-    for (1..$ITERATIONS) {
+    foreach (1 .. $ITERATIONS) {
         $sluz->parse_string($tpl);
     }
     my $elapsed = millis() - $start;

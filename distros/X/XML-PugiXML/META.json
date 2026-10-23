@@ -28,7 +28,7 @@
       "configure" : {
          "requires" : {
             "Alien::pugixml" : "0.03",
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "6.64"
          }
       },
       "runtime" : {
@@ -38,14 +38,14 @@
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0"
+            "Test::More" : "0.88"
          }
       }
    },
    "provides" : {
       "XML::PugiXML" : {
          "file" : "lib/XML/PugiXML.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       }
    },
    "release_status" : "stable",
@@ -59,6 +59,6 @@
          "web" : "https://github.com/vividsnow/perl5-xml-pugixml"
       }
    },
-   "version" : "0.09",
+   "version" : "0.10",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

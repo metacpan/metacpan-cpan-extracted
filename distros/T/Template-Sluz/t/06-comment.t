@@ -37,4 +37,11 @@ sluz_test($sluz, "a\n{* x *}\n{* y *}\nb", "a\nb",
 sluz_test($sluz, "{* a *}\n{* b *}\n", "",
     'Comment #14 - Two consecutive comments with trailing newline');
 
+# Multi-line comments
+sluz_test($sluz, "{* line1\nline2 *}"                        , '', 'Comment #15 - Multi-line comment');
+sluz_test($sluz, "{* line1\n{\$first}\nline2 *}"             , '', 'Comment #16 - Multi-line comment with variable');
+sluz_test($sluz, "{* line1 *}\n{* line2 *}"                  , '', 'Comment #17 - Two subsequent comment lines');
+sluz_test($sluz, "{* a *}{* b *}"                            , '', 'Comment #18 - Adjacent comments no whitespace');
+sluz_test($sluz, "{* a *} {* b *}"                           , ' ', 'Comment #19 - Comments separated by a space');
+
 done_testing();

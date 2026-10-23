@@ -1,7 +1,7 @@
 package Data::Sync::Shared::Condvar;
 use strict;
 use warnings;
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 use Data::Sync::Shared ();
 1;
 

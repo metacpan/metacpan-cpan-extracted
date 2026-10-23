@@ -17,7 +17,7 @@ Data::TagDB::Tutorial::Conventions - Work with Tag databases
 
 =head1 VERSION
 
-version v0.14
+version v0.15
 
 =head1 Overview
 
@@ -204,7 +204,7 @@ B<Note:>
 While each subject has only one type, in a real world database a tag might have several C<has-type> relations.
 However this is only allowed if those types are actually in inherence. As the data might not be complete this
 might be hard to check.
-Therefore, it might be wide to allow multiple C<has-type> alike C<also-has-role> however print a warning.
+Therefore, it might be wise to allow multiple C<has-type> alike C<also-has-role> however print a warning.
 
 See also
 L<Data::TagDB::Tutorial::WellKnown/also-has-role>,
@@ -281,7 +281,7 @@ It is the super-role for all other entity and account roles and provides many co
 There are four different things people commonly refer to as files:
 I<hardlinks>, I<inodes>, I<bit exact copies>, and I<creative works>.
 
-We'll conver each in their own section. Here is a basic overview to find out
+We'll cover each in their own section. Here is a basic overview to find out
 what section is the correct one:
 
 =over

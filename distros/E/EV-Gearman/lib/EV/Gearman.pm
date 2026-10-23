@@ -2,12 +2,13 @@ package EV::Gearman;
 use strict;
 use warnings;
 use Carp ();
+use Scalar::Util ();
 use EV;
 use EV::Gearman::Job ();
 
 BEGIN {
     use XSLoader;
-    our $VERSION = '0.02';
+    our $VERSION = '0.03';
     XSLoader::load __PACKAGE__, $VERSION;
 }
 
@@ -24,7 +25,7 @@ BEGIN {
 # Parse the optional trailing ([\%opts], [\&cb]) pair shared by the
 # submit_job* family, submit_job_epoch and register_function. An
 # explicit undef in either slot is accepted as "absent"; any other
-# unrecognised argument croaks — silently dropping it would submit the
+# unrecognised argument croaks -- silently dropping it would submit the
 # job without the caller's callback and leave their code hanging.
 sub _opts_cb {
     my $who = shift;
@@ -48,7 +49,7 @@ sub _build_submitter {
         my $func     = shift;
         my $workload = shift;
         my ($opts, $cb) = _opts_cb($name, @_);
-        # undef would warn in SvPV and submit an empty string — croak
+        # undef would warn in SvPV and submit an empty string -- croak
         # instead of sending a job nobody asked for.
         Carp::croak("$name: function name required") unless defined $func;
         Carp::croak("$name: workload must be defined") unless defined $workload;
@@ -69,6 +70,9 @@ sub submit_job_epoch {
     my ($opts, $cb) = _opts_cb('submit_job_epoch', @_);
     Carp::croak("submit_job_epoch: function name required") unless defined $func;
     Carp::croak("submit_job_epoch: workload must be defined") unless defined $workload;
+    Carp::croak("submit_job_epoch: epoch must be a non-negative number")
+        unless defined($epoch) && Scalar::Util::looks_like_number($epoch)
+            && $epoch >= 0;
     my $unique = $opts ? $opts->{unique} : undef;
     $self->_submit_epoch($func, $workload, $unique, $epoch, $cb);
 }
@@ -166,13 +170,13 @@ EV::Gearman - asynchronous Gearman client and worker on libev
         my $t; $t = EV::timer 5, 0, sub { $job->complete("done"); undef $t };
     });
 
-    $w->work;                            # GRAB → JOB_ASSIGN → WORK_COMPLETE
+    $w->work;                            # GRAB -> JOB_ASSIGN -> WORK_COMPLETE
     EV::run;
 
 =head1 DESCRIPTION
 
 A pure-XS Gearman client and worker built on the L<EV> event loop.
-The binary protocol is implemented directly — no C<libgearman> build
+The binary protocol is implemented directly -- no C<libgearman> build
 dependency, no glue layer between Perl and a third-party C client.
 
 A single C<EV::Gearman> instance can act as a client, a worker, or
@@ -247,8 +251,12 @@ on the wire. Encode UTF-8 yourself before passing data in:
     });
 
 Workload and result values can contain arbitrary bytes including
-embedded NULs — Gearman's framing puts the payload last in the
+embedded NULs -- Gearman's framing puts the payload last in the
 packet and uses the header's length field, so it is not NUL-bounded.
+
+Function names, unique keys, and the client id must not contain
+NUL bytes (only the workload may); NUL-separated framing would
+silently misroute such packets, so they C<croak> instead.
 
 =head1 CALLBACK CONVENTIONS
 
@@ -260,6 +268,12 @@ forwarded from the server (e.g. C<"INVALID_FUNCTION_NAME: ...">).
 Callback exceptions are caught with C<G_EVAL> and surfaced via
 C<warn> so a stray C<die> from your code never unwinds the libev
 event loop. Use C<EV::break> to abort the loop deliberately.
+
+Callbacks may call back into the object: C<disconnect>, C<connect>,
+submitting new work, and registering functions are all safe, and
+work submitted on a session you reconnect mid-teardown stays live
+on the new session. Destroying the object from inside its own
+callback is safe too.
 
 =head1 CONSTRUCTOR
 
@@ -310,7 +324,7 @@ Unix-domain socket path. Mutually exclusive with C<host>.
 
 Note that a C<connect(2)> to a unix socket completes inline, so the
 connection is fully established (and C<on_connect> has already fired)
-before C<new> returns — a C<< $g->on_connect(...) >> assigned after
+before C<new> returns -- a C<< $g->on_connect(...) >> assigned after
 construction will never fire for it. Pass C<on_connect> to the
 constructor instead (the same can theoretically happen for a TCP
 connect that completes immediately).
@@ -322,11 +336,16 @@ EV loop to attach to. Default: C<EV::default_loop>.
 =item C<priority =E<gt> $num>
 
 EV watcher priority in C<-2 .. +2>. Higher = serviced before other
-EV watchers in the same iteration. Default C<0>.
+EV watchers in the same iteration. Default C<0>. Out-of-range
+values are clamped to C<-2 .. +2>.
 
 =item C<keepalive =E<gt> $seconds>
 
 TCP keepalive idle interval. C<0> disables. Ignored on Unix sockets.
+
+Only the idle time is tuned; probing stays at system defaults, so
+dead-peer detection still takes minutes. Tune those too for fast
+failover.
 
 =back
 
@@ -349,7 +368,7 @@ unrelated traffic: other packets arriving meanwhile neither extend
 the head request's budget nor shorten it, and once the head is
 answered the next request's own budget applies. A slow reply that
 keeps dribbling in is therefore safe as long as the request completes
-within its budget — and a genuinely stuck request dies on schedule
+within its budget -- and a genuinely stuck request dies on schedule
 even on an otherwise busy connection. C<0> = no timeout (default).
 
 =back
@@ -366,7 +385,9 @@ Enable automatic reconnect on transport errors.
 
 Wait this many ms before each reconnect attempt. Default C<1000>.
 The delay is always honored via a timer, so even C<0> defers
-through the event loop (no synchronous retry recursion).
+through the event loop (no synchronous retry recursion). The
+delay is fixed (no jitter/backoff); stagger it per process if a
+fleet retrying in lockstep matters to you.
 
 =item C<max_reconnect_attempts =E<gt> $num>
 
@@ -417,18 +438,20 @@ are run under C<G_EVAL>.
 Fires once the TCP/Unix connection is fully established and the
 client has enqueued its options and worker-function CAN_DOs.
 Those packets sit ahead of any user submissions made from inside
-the callback — so submitting a job here is safe even though the
+the callback -- so submitting a job here is safe even though the
 ability registrations haven't yet hit the socket.
 
 For unix sockets (C<path>) the connect completes inline inside
-C<new>, so this callback fires before C<new> returns — assign it via
+C<new>, so this callback fires before C<new> returns -- assign it via
 the constructor, not after (see C<path>).
 
 =item C<on_disconnect =E<gt> $cb-E<gt>()>
 
 Fires after a disconnect, after pending callbacks have been
 cancelled with the disconnect error. For server-initiated close,
-this fires before C<on_error>.
+this fires before C<on_error>. With reconnect enabled, work
+submitted from here waits for the next session instead of
+C<croak>ing.
 
 =back
 
@@ -437,17 +460,19 @@ this fires before C<on_error>.
 =head2 connect($host, [$port])
 
 Connect to a TCP host. Port defaults to 4730. Cancels any pending
-auto-reconnect timer and clears any prior C<path>.
+auto-reconnect timer and clears any prior C<path>. C<croak>s if
+already connected or connecting.
 
 =head2 connect_unix($path)
 
-Connect via Unix socket.
+Connect via Unix socket. C<croak>s if already connected or
+connecting; an overlong path reports via C<on_error> instead.
 
 =head2 disconnect
 
 Disconnect cleanly. Cancels reconnect, drains pending callbacks
 with C<(undef, "disconnected")>, fires C<on_disconnect>.
-C<on_error> does B<not> fire on user-initiated disconnect — this
+C<on_error> does B<not> fire on user-initiated disconnect -- this
 distinguishes it from server-initiated close.
 
 =head2 is_connected
@@ -456,6 +481,10 @@ Returns true while a session is established B<or> connection is in
 progress.
 
 =head1 CLIENT API
+
+Methods that need the server C<croak> C<"not connected"> unless a
+session is up, connecting, or a reconnect is pending (then the
+request queues for the next session).
 
 =head2 echo($data, [$cb-E<gt>($echoed, $err)])
 
@@ -507,9 +536,10 @@ emits no work events to a background submitter.
 =head2 submit_job_epoch($func, $workload, $epoch, [\%opts], [$cb])
 
 Schedule a background job for absolute epoch time C<$epoch>
-(seconds since 1970-01-01 UTC). Same callback shape as
+(seconds since 1970-01-01 UTC). Must be non-negative -- a negative
+epoch C<croak>s instead of wrapping around. Same callback shape as
 C<submit_job_bg>: C<($handle, $err)> on C<JOB_CREATED>. Of
-C<%opts>, only C<unique> is meaningful — the per-event handlers
+C<%opts>, only C<unique> is meaningful -- the per-event handlers
 (C<on_data>, C<on_warning>, etc.) are silently ignored because the
 server delivers no work events to the submitting client for
 scheduled / background jobs.
@@ -518,7 +548,7 @@ B<Server note:> with gearmand 1.1.21's default C<builtin> queue we
 observed that the server accepts an epoch job and returns a handle
 but never executes it; a persistent queue type is required for
 scheduled delivery. Other gearmand versions or queue types may
-behave differently — verify against your deployment.
+behave differently -- verify against your deployment.
 
 =head2 get_status($handle, $cb-E<gt>($info, $err))
 
@@ -563,7 +593,7 @@ Async mode: the callback's return value is ignored; you must
 explicitly call C<< $job->complete($result) >>, C<< $job->fail >>,
 or C<< $job->exception($data) >> from a later event. The worker
 loop B<does> immediately grab the next job after dispatching to
-your async callback, so async workers process jobs concurrently —
+your async callback, so async workers process jobs concurrently --
 bounded only by what the server has queued. To cap concurrency,
 call C<< $g->work_stop >> in the callback when you reach the cap
 and C<< $g->work >> again from C<complete>/C<fail> when a slot
@@ -606,18 +636,18 @@ sleep state.
 Dispatch exactly one job, then stop the loop. Issues a
 C<GRAB_JOB>; on C<NO_JOB> the worker enters C<PRE_SLEEP> and
 waits for the server's C<NOOP> wake-up just like C<work>, so
-this is a "wait for one job" — not "try once and bail" (use
+this is a "wait for one job" -- not "try once and bail" (use
 C<grab_job> for that).
 
 In B<sync> mode the loop stops after the user callback returns
 and the C<WORK_COMPLETE>/C<WORK_FAIL> packet has been queued.
 In B<async> mode it stops as soon as the user callback has been
-B<dispatched> — the job is still in flight at the server until
+B<dispatched> -- the job is still in flight at the server until
 the user explicitly calls C<< $job->complete(...) >> or
 C<< $job->fail >>.
 
 The optional C<$cb> is invoked when the worker enters the sleep
-state, and shares storage with C<work>'s C<$on_idle> — calling
+state, and shares storage with C<work>'s C<$on_idle> -- calling
 C<work_one> after C<work> overwrites whatever idle handler
 C<work> set, and vice versa.
 
@@ -655,17 +685,18 @@ C<".\n"> terminator and delivered as a single string.
 
 =head2 admin($command, [$cb-E<gt>($text, $err)])
 
-Send a raw text command (newline appended automatically). Replies
+Send a raw text command (newline appended automatically).
+Embedded newlines C<croak> (a single trailing one is fine). Replies
 are accumulated until the C<".\n"> terminator for the multi-line
 commands C<status>, C<workers>, C<prioritystatus> (matched on the
 leading word, so arguments are tolerated), C<show jobs>, and
-C<show unique jobs> (exact forms only — with extra arguments
+C<show unique jobs> (exact forms only -- with extra arguments
 gearmand answers a single-line C<ERR> instead); everything else is
 treated as single-line.
 
 A single-line reply beginning with C<ERR > (gearmand's text-protocol
 error prefix, e.g. for an unrecognized command) is delivered as the
-error argument: C<$cb-E<gt>(undef, "ERR UNKNOWN_COMMAND ...")> — not
+error argument: C<$cb-E<gt>(undef, "ERR UNKNOWN_COMMAND ...")> -- not
 as a successful result. The connection stays up.
 
 If a command not in the multi-line set above nevertheless gets a
@@ -692,13 +723,14 @@ Single-line reply (e.g. C<"OK 1.1.21+ds">).
 
 =head2 maxqueue($func, $size, [$cb])
 
-Set the per-function queue size cap. Reply is C<"OK\n">.
+Set the per-function queue size cap. Reply is C<"OK"> (the
+terminator is stripped, as for every single-line admin reply).
 
 =head1 INTROSPECTION
 
 =head2 pending_count
 
-Number of requests sent and awaiting a response — binary client
+Number of requests sent and awaiting a response -- binary client
 requests, admin (text-protocol) commands, and the worker's in-flight
 C<GRAB_JOB> all count.
 
@@ -725,11 +757,14 @@ and (where meaningful) takes effect immediately:
     $g->on_connect($cb);
     $g->on_disconnect($cb);
 
+A defined non-coderef is ignored (the previous handler survives);
+only explicit C<undef> clears the slot.
+
 The remaining C<new> options (C<host>, C<port>, C<path>,
 C<exceptions>, C<client_id>, C<grab_unique>, ...) are set once at
 construction and have no accessor.
 
-C<reconnect> is the exception — it is a setter only; pass C<0>/C<1>
+C<reconnect> is the exception -- it is a setter only; pass C<0>/C<1>
 plus optional new delay and attempt cap:
 
     $g->reconnect($enable, [$delay_ms], [$max_attempts]);
@@ -756,7 +791,7 @@ then the FD is closed. The clean-shutdown idiom is:
     $g->disconnect;            # drains queues, fires on_disconnect
     undef $g;
 
-If callbacks close over C<$g> (a common mistake — every reference
+If callbacks close over C<$g> (a common mistake -- every reference
 inside a closure keeps the object alive), break the cycle first:
 
     $g->on_error(undef);
@@ -767,6 +802,19 @@ inside a closure keeps the object alive), break the cycle first:
 DESTROY is reentrancy-safe: if a callback fired during teardown
 drops the last external reference to a separate C<EV::Gearman>,
 that object's DESTROY is correctly deferred and run once unwound.
+
+=head1 FORK
+
+Do not use a connected object after C<fork> except in the process
+that created it: parent and child share the socket, so running the
+loop on an inherited object steals the other's replies and can
+submit queued jobs twice. C<fork> first, then connect in each
+child; a child that never touches the object is harmless.
+
+=head1 SECURITY
+
+Gearman is plaintext with no authentication. Run gearmand on a
+trusted network or wrap the port in an SSH tunnel / stunnel.
 
 =head1 PERFORMANCE
 
@@ -789,7 +837,7 @@ async). Numbers in operations / second:
     sequential round-trip  ~19,000          ~5,900             ~5,400
     background submits    ~248,000          ~5,400              n/a (1)
 
-    (1) Gearman::Client is synchronous — it has neither pipelining
+    (1) Gearman::Client is synchronous -- it has neither pipelining
         nor concurrent background submits.
 
 EV::Gearman is roughly B<10x> the foreground throughput of
@@ -809,7 +857,7 @@ job.
 
 =item *
 
-The protocol implementation is C/XS — packet encode/decode,
+The protocol implementation is C/XS -- packet encode/decode,
 buffer growth, and FIFO bookkeeping run without per-call Perl
 allocations.
 
@@ -822,8 +870,8 @@ backend-dispatch overhead.
 =back
 
 Background submissions are particularly fast because the
-JOB_CREATED reply is the only round-trip — no work events to
-demultiplex — so the limit is just network latency and parser
+JOB_CREATED reply is the only round-trip -- no work events to
+demultiplex -- so the limit is just network latency and parser
 throughput.
 
 Sequential round-trip throughput is the worst case: each job
@@ -857,7 +905,7 @@ gearmand on C<127.0.0.1:4730>):
 
 =item *
 
-B<Clients> — C<client.pl> (one foreground job), C<pipeline.pl>
+B<Clients> -- C<client.pl> (one foreground job), C<pipeline.pl>
 (concurrent submissions), C<background.pl> (fire-and-forget),
 C<scheduled.pl> (C<submit_job_epoch> delayed jobs), C<unique.pl>
 (job coalescing + C<get_status_unique>), C<event_client.pl>
@@ -867,7 +915,7 @@ C<retry.pl> (client-side backoff).
 
 =item *
 
-B<Workers> — C<worker.pl> (serve forever), C<async_worker.pl>
+B<Workers> -- C<worker.pl> (serve forever), C<async_worker.pl>
 (timer-driven completion), C<worker_pool.pl> (concurrency cap),
 C<graceful_worker.pl> (drain on C<SIGTERM>), C<cron_consumer.pl>
 (C<grab_job> drain-and-exit batch), C<exceptions.pl>
@@ -875,7 +923,7 @@ C<graceful_worker.pl> (drain on C<SIGTERM>), C<cron_consumer.pl>
 
 =item *
 
-B<Operations> — C<admin.pl>, C<monitoring.pl> (poll metrics),
+B<Operations> -- C<admin.pl>, C<monitoring.pl> (poll metrics),
 C<reconnect.pl> (survive a server bounce), C<multi_server.pl>
 (round-robin across a farm), C<unix_socket.pl> (C<connect_unix>),
 C<error_handling.pl>, C<anyevent.pl> (run under L<AnyEvent>).
@@ -886,12 +934,12 @@ C<error_handling.pl>, C<anyevent.pl> (run under L<AnyEvent>).
 
 L<EV>, L<AnyEvent>.
 
-L<Gearman::Client>, L<Gearman::Worker> — the synchronous reference
+L<Gearman::Client>, L<Gearman::Worker> -- the synchronous reference
 client and worker on CPAN.
 
-L<AnyEvent::Gearman> — older AE-based async client.
+L<AnyEvent::Gearman> -- older AE-based async client.
 
-L<https://gearman.org/protocol/> — the upstream protocol spec.
+L<https://gearman.org/protocol/> -- the upstream protocol spec.
 
 This module is one of the C<EV-*> family on CPAN by the same
 author: L<EV::Memcached>, L<EV::Redis>, L<EV::Nats>, L<EV::Pg>,

@@ -31,18 +31,18 @@ Revision history for Perl extension Text::Fab.
 
 0.05    POD: Preview of the architecture on a (contrived) example.  (Might not map 100% to the current implementation.)
 		Completeness of Directive Parser:
-	Added handlers for #prepend, #pop, and #create_section, wiring them to cfg__prepend, cfg__pop, and out__create_section.
-	Added target section tracking stack ($fab->{target_stack}) to support #end_section (as shown in the SYNOPSIS), restoring
+	Added handlers forÂ #prepend,Â #pop, andÂ #create_section, wiring them toÂ cfg__prepend,Â cfg__pop, andÂ out__create_section.
+	Added target section tracking stack ($fab->{target_stack}) to supportÂ #end_sectionÂ (as shown in the SYNOPSIS), restoring
 	  the target section to the enclosing context.
-	Extended #emb parsing to support qualified namespace:basename syntax (e.g., #emb ChapterLayout:title and #emb _main:title).
-	Standardized default directive syntax errors to include E_SYNTAX_ERROR while maintaining compatibility with _handle_error.
+	ExtendedÂ #embÂ parsing to support qualifiedÂ namespace:basenameÂ syntax (e.g.,Â #emb ChapterLayout:titleÂ andÂ #emb _main:title).
+	Standardized default directive syntax errors to includeÂ E_SYNTAX_ERRORÂ while maintaining compatibility withÂ _handle_error.
 		Prefix Call Stack Lifecycle & Prefix-Aware Types:
-	Implemented call_stack__push($prefix, [$filter_name]) and call_stack__pop(), with underflow protection for the base prefix
-	  'Fab/'.
-	Updated _get_key_type to resolve hash_keys and list_keys using cfg__get_prefixed_scan (without redundant fallbacks),
+	ImplementedÂ call_stack__push($prefix, [$filter_name])Â andÂ call_stack__pop(), with underflow protection for the base prefix
+	 Â 'Fab/'.
+	UpdatedÂ _get_key_typeÂ to resolveÂ hash_keysÂ andÂ list_keysÂ usingÂ cfg__get_prefixed_scanÂ (without redundant fallbacks),
 	  enabling localized prefix-scoped type definitions.
 		Introspection of Inclusion State:
-	Initialized and maintained $self->{config}{'opened_includes'} alongside 'opened_groups' inside include__text, cleanly
+	Initialized and maintainedÂ $self->{config}{'opened_includes'}Â alongsideÂ 'opened_groups'Â insideÂ include__text, cleanly
 	  exposing the include path chain.
 
 	  Makefile.PL		put
@@ -55,3 +55,51 @@ Revision history for Perl extension Text::Fab.
 
 	  t/12-parser-and-prefix-lifecycle.t New file
 
+0.06  2026-10-22
+    [ Architecture & Callbacks ]
+    - Canonical engine callbacks moved to 'Fab/callbacks_bundle/dbg0'.
+    - 'Fab/callbacks' now accepts a bundle name string (e.g. 'dbg0') in addition
+      to direct hashrefs; resolved and propagated during initialization and scoping.
+    - Eliminated ad-hoc fallback guessing chains (//) across callback retrieval;
+      operational callbacks now resolve uniformly via cfg__get_prefixed_scan().
+    - Added support for scoped callback bundle switches via #start_group[callbacks=...]
+      and promise-local overrides via #emb[callbacks=...].
+
+    [ Embeds, Parameter Passing & Lenses ]
+    - Modernized #emb directive grammar to #emb[<opts>] <recipe> [<args...>].
+      Supported options in [...] include aim=..., in=..., with_blinder=...,
+      callbacks=..., and resolve_args=....
+    - Primitive out__embed() now takes ($recipe_basename, $recipe_ns, \@args, \%opts).
+    - Parameterized recipes: section arguments passed to a recipe are bound to
+      $ARGV0, $ARGV1, etc. in the recipe body via an internal call frame stack.
+    - Implemented lens affection massaging with deterministic static joining
+      (_fmt_lens_join) formatting candidate lenses as (A)/B and matching against
+      registered transitions in 'Fab/lens_affects'.
+    - Embed resolution now traverses the namespace DAG from the massaged virtual
+      root while respecting blinders and dynamic argument bindings.
+
+    [ Input & Inclusion ]
+    - Extended #include and include__text() to support container targets:
+      'section' and 'configkey'.
+    - Enforced strict arity validation across all inclusion modes:
+      * 'filename' and 'string' strictly require exactly 1 target argument.
+      * 'section' and 'configkey' strictly require 2 arguments: position 2 is
+        the joiner list key, and position 3 is the target container.
+      Arity mismatches now immediately halt with E_SYNTAX_ERROR (directives)
+      or E_TYPE_MISMATCH (Perl API).
+    - Section and configkey inclusions reuse the cyclic delimiter engine
+      (out__get_joined / cfg__get_joined).
+
+    [ Snapshot & Undo Engine ]
+    - Added a compatibility hook for FreezeThaw::copyContents treating compiled
+      CODE references as atomic/immutable values, preventing dclone() crashes
+      when configuration contains duplicated or shared code references across
+      snapshots and groups.
+
+    [ Documentation & Tests ]
+    - Updated POD to reflect modern #emb, #include, lens, and callback semantics
+      while preserving design rationale and marking planned subsystems as {???}.
+    - Modernized test suite (t/01 through t/12) to exercise strict arity,
+      parameterized recipes, lens affections, and container inclusion.
+
+0.0601	Update to requiring 1.00 of FreezeThawâ€‰â€”â€‰instead of patching!

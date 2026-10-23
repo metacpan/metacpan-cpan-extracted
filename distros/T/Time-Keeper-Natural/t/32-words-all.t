@@ -46,8 +46,8 @@ for my $code (@codes) {
           : $key eq 'range' ? $_->[1] =~ m{ / } && scalar(grep { my ($m) = /\{0\}(.*)\{1\}/; $m =~ s/^\s+|\s+\z//g; length $m && (index(lc $text, lc " $m ") >= 0 || (($w->{spaceless} || /\}\S|\S\{1\}/) && index(lc $text, lc $m) >= 0)) } @p)
           : $key eq 'skip' || $key eq 'last' ? scalar(grep { $text =~ /(?:^|[\s'\x{2019}])\Q$_\E(?:\s|['\x{2019}]|\z)/i || index(lc $text, lc $_) == 0 || ($w->{spaceless} && index($text, $_) >= 0) } @p)
           : $key eq 'alias' ? scalar(grep { my ($i) = split /=/; index(lc $text, lc $i) >= 0 } @p)
-          : $key eq 'nth' ? scalar(grep { my @l = grep { /\S/ } split /\{(?:period|n|weekday)\}/; !grep { index(lc $text, lc(s/^\s+|\s+\z//gr)) < 0 } @l } @p)
-          : scalar(() = $w->frame($text, $key)) || scalar(grep { index(lc $text, lc($_ =~ s/\s*\{0\}\s*//r)) >= 0 } @p);
+          : $key eq 'nth' ? scalar(grep { my @l = grep { /\S/ } split /\{(?:period|n|weekday)\}/; !grep { index(lc $text, lc(do { (my $s = $_) =~ s/^\s+|\s+\z//g; $s })) < 0 } @l } @p)
+          : scalar(() = $w->frame($text, $key)) || scalar(grep { index(lc $text, lc(do { (my $s = $_) =~ s/\s*\{0\}\s*//; $s })) >= 0 } @p);
         } @tests;
         ok($used, "$code: some test line uses its $key");
     }

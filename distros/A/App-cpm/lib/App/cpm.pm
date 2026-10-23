@@ -1,4 +1,4 @@
-package App::cpm v1.1.5;
+package App::cpm v1.1.6;
 use v5.24;
 use warnings;
 use experimental qw(lexical_subs signatures);
@@ -37,8 +37,12 @@ For tutorial, check out L<App::cpm::Tutorial>.
 
 =head1 ARTIFACT ATTESTATIONS
 
-GitHub Artifact Attestations are generated for release tarballs uploaded to
-CPAN. If you care about provenance for the uploaded tarballs, see:
+GitHub Artifact Attestations are generated for the self-contained cpm
+and release tarballs uploaded to CPAN. Verification establishes the
+provenance of the downloaded artifact; it does not verify CPAN
+distributions subsequently installed with cpm.
+
+See the repository's attestations:
 
 L<https://github.com/skaji/cpm/attestations>
 

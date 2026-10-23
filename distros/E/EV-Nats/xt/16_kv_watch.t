@@ -51,6 +51,6 @@ ok((grep { $_ eq 'DEL' || $_ eq 'PURGE' } @ops), 'watcher saw a DEL or PURGE')
     or diag "ops: @ops";
 
 $kv->delete_bucket(sub { EV::break });
-EV::timer(3, 0, sub { EV::break });
+$guard = EV::timer(3, 0, sub { EV::break });
 EV::run;
 $nats->disconnect;

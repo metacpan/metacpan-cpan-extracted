@@ -1,7 +1,7 @@
 package Data::Sync::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 require XSLoader;
 XSLoader::load('Data::Sync::Shared', $VERSION);
@@ -22,7 +22,7 @@ XSLoader::load('Data::Sync::Shared', $VERSION);
 # Guard objects -- auto-release on scope exit
 
 package Data::Sync::Shared::RWLock::Guard {
-    our $VERSION = '0.10';   # indexable package: PAUSE needs a version here too
+    our $VERSION = '0.11';   # indexable package: PAUSE needs a version here too
     sub DESTROY {
         # Only the process that took the lock may release it: after fork the
         # child inherits the guard object, and its global destruction would
@@ -46,7 +46,7 @@ sub Data::Sync::Shared::RWLock::wrlock_guard {
 }
 
 package Data::Sync::Shared::Condvar::Guard {
-    our $VERSION = '0.10';   # indexable package: PAUSE needs a version here too
+    our $VERSION = '0.11';   # indexable package: PAUSE needs a version here too
     sub DESTROY {
         # Only the process that took the mutex may release it -- see the note
         # on RWLock::Guard::DESTROY.
@@ -63,18 +63,21 @@ sub Data::Sync::Shared::Condvar::lock_guard {
 
 # Condvar wait_while -- loop until predicate returns false
 
+my $condvar_clock;
 sub Data::Sync::Shared::Condvar::wait_while {
     my ($self, $pred, $timeout) = @_;
     $timeout //= -1;
-    return $pred->() ? 0 : 1 if $timeout == 0;
+    return 1 unless $pred->();
+    return 0 if $timeout == 0;
     my $deadline;
     if ($timeout > 0) {
         require Time::HiRes;
-        $deadline = Time::HiRes::time() + $timeout;
+        $condvar_clock //= Time::HiRes::CLOCK_MONOTONIC();
+        $deadline = Time::HiRes::clock_gettime($condvar_clock) + $timeout;
     }
-    while ($pred->()) {
+    do {
         if (defined $deadline) {
-            my $remaining = $deadline - Time::HiRes::time();
+            my $remaining = $deadline - Time::HiRes::clock_gettime($condvar_clock);
             return 0 if $remaining <= 0;
             $self->wait($remaining);
             # Fall through to re-check predicate even on timeout -- the
@@ -82,7 +85,7 @@ sub Data::Sync::Shared::Condvar::wait_while {
         } else {
             $self->wait;
         }
-    }
+    } while ($pred->());
     return 1;
 }
 
@@ -100,7 +103,7 @@ sub Data::Sync::Shared::Semaphore::acquire_guard {
 }
 
 package Data::Sync::Shared::Semaphore::Guard {
-    our $VERSION = '0.10';   # indexable package: PAUSE needs a version here too
+    our $VERSION = '0.11';   # indexable package: PAUSE needs a version here too
     sub DESTROY {
         # Only the process that took the permits may release them: a forked
         # child's global destruction would otherwise release permits it never
@@ -227,7 +230,7 @@ detect the stale PID and a new initializer is elected.
 
 =item * File-backed mmap for cross-process sharing
 
-=item * Futex-based blocking (no busy-spin, no pthread)
+=item * Futex-based blocking (no busy-spin)
 
 =item * PID-based stale lock recovery (dead process detection)
 
@@ -242,9 +245,9 @@ provides only a non-blocking C<try_lock>)
 
 =head2 Crash Safety
 
-All primitives encode the holder's PID in the lock word. If a process
-dies while holding a lock, other processes detect the stale lock within
-2 seconds via C<kill(pid, 0)> and automatically recover.
+RWLock, Condvar and Once recover locks left by dead owners. RWLock also
+tracks reader processes. A dead Semaphore holder's permits are not restored;
+a missing Barrier party needs a timeout followed by C<reset>.
 
 Reader-slot exhaustion (slotless readers): dead-process recovery attributes a
 crashed lock holder's contribution through its reader-slot. The slot table holds
@@ -354,8 +357,7 @@ A zero timeout (C<< wait(0) >>) is a non-blocking probe: it returns C<-1> if the
 party would have to block, B<without> breaking the barrier. On a positive
 timeout that actually elapses the barrier is permanently broken: C<wait> returns
 C<-1> for the timing-out party and all other waiters, and every subsequent
-C<wait> also returns C<-1> until C<reset> is called. This matches POSIX
-C<pthread_barrier_t> broken semantics.
+C<wait> also returns C<-1> until C<reset> is called.
 
     my $gen = $bar->generation;    # how many times barrier has tripped
     my $n   = $bar->arrived;       # currently arrived count

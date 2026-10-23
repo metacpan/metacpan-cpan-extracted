@@ -15,10 +15,11 @@ sub list($self) {
 sub reindex($self) {
     my $util = Mojo::Darkpan::Util->new(controller => $self);
 
+    return unless $util->authorized;
+
     $util->createIndex();
 
-    $self->render(text => 'reindexing scheduled, may take some time to complete...') if ($util->authorized);
+    $self->render(text => 'reindexing scheduled, may take some time to complete...');
 }
-
 
 1;

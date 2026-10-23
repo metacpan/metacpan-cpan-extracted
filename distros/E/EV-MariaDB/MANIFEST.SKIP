@@ -16,3 +16,4 @@
 ^start_mariadb\.sh$
 ^repro_
 ^EV-MariaDB-
+^\.pcg/

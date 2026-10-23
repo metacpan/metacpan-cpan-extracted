@@ -1005,7 +1005,8 @@ METHODS
     Pages getChatHistory backwards. Options: "limit" (messages wanted,
     default 50), "max_pages" (default 10), "from_message_id". The callback
     receives "(\@messages, $err, $state)"; "$state->{complete}" is true when
-    the requested limit was reached or the history was exhausted.
+    the requested limit was reached or the history was exhausted. Resume
+    older with "$state->{next_from_message_id}" when it is defined.
 
    edit_message($chat_id, $message_id, $text, %opt, $cb)
     Edits a text message. Accepts parse_mode and disable_preview; parse

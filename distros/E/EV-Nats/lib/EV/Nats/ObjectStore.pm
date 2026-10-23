@@ -1,21 +1,31 @@
 package EV::Nats::ObjectStore;
 use strict;
 use warnings;
+our $VERSION = '0.06';
 use Digest::SHA qw(sha256 sha256_hex);
 use EV::Nats::JetStream;
 
 my $CHUNK_SIZE = 128 * 1024; # 128KB default
 
+my $NUID_PID = $$;
+srand();
+
 sub new {
     my ($class, %opts) = @_;
     my $js      = delete $opts{js}      || die "js (JetStream) required";
     my $bucket  = delete $opts{bucket}  || die "bucket name required";
+    die "invalid ObjectStore bucket name '$bucket'"
+        unless $bucket =~ /\A[a-zA-Z0-9_-]+\z/;
     my $timeout = delete $opts{timeout} || $js->{timeout};
+    my $chunk_size = delete $opts{chunk_size} || $CHUNK_SIZE;
+    die "invalid chunk_size '$chunk_size'"
+        unless $chunk_size =~ /\A\d+\z/ && $chunk_size > 0;
+    warn "EV::Nats::ObjectStore::new: unknown option '$_'" for keys %opts;
     bless {
         js         => $js,
         bucket     => $bucket,
         stream     => "OBJ_$bucket",
-        chunk_size => $opts{chunk_size} || $CHUNK_SIZE,
+        chunk_size => $chunk_size,
         timeout    => $timeout,
     }, $class;
 }
@@ -45,8 +55,29 @@ sub delete_bucket {
     $self->{js}->stream_delete($self->{stream}, $cb);
 }
 
+# Best-effort purge that survives a dead connection: a sync croak
+# (not connected, nothing queued) skips the purge and runs $cb now.
+sub _purge_best_effort {
+    my ($self, $filter, $cb) = @_;
+    my $ok = eval {
+        $self->{js}->_json_api('STREAM.PURGE.' . $self->{stream},
+            { filter => $filter }, $cb);
+        1;
+    };
+    $cb->() unless $ok;
+}
+
 sub put {
     my ($self, $name, $data, $cb) = @_;
+    # Fail fast on a chunk_size the server cannot take, instead of dying
+    # async in a chunk publish. Skipped pre-connect: max_payload is only
+    # the default until the first INFO arrives.
+    if ($self->{js}{nats}->is_connected) {
+        my $max = $self->{js}{nats}->max_payload;
+        if ($max > 0 && $self->{chunk_size} > $max) {
+            die "chunk_size ($self->{chunk_size}) exceeds max_payload ($max)";
+        }
+    }
     # Look up any existing object first so its old chunks / legacy %XX meta
     # can be purged after the new meta is rolled up. A real error aborts.
     $self->_raw_meta($name, sub {
@@ -68,7 +99,11 @@ sub put {
         # Define completion handler before starting any publishes
         my $on_all_chunks = sub {
             if ($chunk_errors) {
-                return $cb->(undef, "$chunk_errors chunk(s) failed to publish");
+                # Best-effort: purge this put's already-stored chunks so a
+                # failed put leaves no debris no meta points at.
+                $self->_purge_best_effort($chunk_subj,
+                    sub { $cb->(undef, "$chunk_errors chunk(s) failed to publish") });
+                return;
             }
             require JSON::PP;
             my $meta = JSON::PP::encode_json({
@@ -82,9 +117,13 @@ sub put {
             my $meta_subj = '$O.' . $self->{bucket} . '.M.' . _encode_name($name);
             # Nats-Rollup: sub keeps exactly one message on the meta subject.
             my $headers = "NATS/1.0\r\nNats-Rollup: sub\r\n\r\n";
-            $self->{js}->js_publish_h($meta_subj, $headers, $meta, sub {
+            my $on_meta = sub {
                 my ($ack, $err) = @_;
-                return $cb->(undef, $err) if $err;
+                if ($err) {
+                    $self->_purge_best_effort($chunk_subj,
+                        sub { $cb->(undef, $err) });
+                    return;
+                }
 
                 # Purge the previous object's chunks, and its legacy %XX
                 # meta subject when found there (migrate to base64url).
@@ -108,24 +147,27 @@ sub put {
                         undef $run_purge;
                         return $cb->({ name => $name, size => $size, chunks => $chunks, seq => $ack->{seq} }, undef);
                     }
-                    $self->{js}->_json_api(
-                        'STREAM.PURGE.' . $self->{stream},
-                        { filter => $filter },
-                        sub { $run_purge->() },   # ignore purge errors
-                    );
+                    $self->_purge_best_effort($filter,
+                        sub { $run_purge->() });   # ignore purge errors
                 };
                 $run_purge->();
-            });
+            };
+            if (!eval { $self->{js}->js_publish_h($meta_subj, $headers, $meta, $on_meta); 1 }) {
+                my $err = $@;
+                $self->_purge_best_effort($chunk_subj, sub { $cb->(undef, $err) });
+            }
         };
 
         my $publish_chunk = sub {
             my $chunk = shift;
-            $self->{js}->js_publish($chunk_subj, $chunk, sub {
+            my $on_ack = sub {
                 my ($ack, $err) = @_;
                 $chunk_errors++ if $err;
                 $chunks_acked++;
                 $on_all_chunks->() if $chunks_acked >= $chunks;
-            });
+            };
+            $on_ack->(undef, $@)
+                unless eval { $self->{js}->js_publish($chunk_subj, $chunk, $on_ack); 1 };
         };
 
         if ($size == 0) {
@@ -264,11 +306,7 @@ sub delete {
             my $step; $step = sub {
                 my $subj = shift @cleanup;
                 if (!defined $subj) { undef $step; return $cb ? $cb->(1, undef) : undef }
-                $self->{js}->_json_api(
-                    'STREAM.PURGE.' . $self->{stream},
-                    { filter => $subj },
-                    sub { $step->() },   # best-effort: ignore purge errors
-                );
+                $self->_purge_best_effort($subj, sub { $step->() });
             };
             $step->();
         });
@@ -346,7 +384,7 @@ sub _raw_meta {
                 my ($resp, $err) = @_;
                 if ($err) {
                     # Clean miss on this subject -> try the fallback form.
-                    return $attempt->() if $err =~ /no message found|10037/;
+                    return $attempt->() if $err =~ /no message found|\(code 10037\)/;
                     undef $attempt;
                     return $cb->(undef, undef, 0, $err);
                 }
@@ -374,6 +412,10 @@ sub _raw_meta {
 }
 
 sub _nuid {
+    if ($NUID_PID != $$) {
+        srand();
+        $NUID_PID = $$;
+    }
     my @chars = ('A'..'Z', 'a'..'z', '0'..'9');
     join '', map { $chars[rand @chars] } 1..22;
 }
@@ -428,6 +470,7 @@ EV::Nats::ObjectStore - Chunked object store on top of NATS JetStream
     my $nats = EV::Nats->new(host => '127.0.0.1');
     my $js   = EV::Nats::JetStream->new(nats => $nats);
     my $os   = EV::Nats::ObjectStore->new(js => $js, bucket => 'files');
+    my $pdf_data = '...';  # your file bytes here
 
     $os->create_bucket({}, sub {
         $os->put('report.pdf', $pdf_data, sub {
@@ -470,7 +513,10 @@ All callbacks fire on the L<EV> loop, not synchronously.
     new(js => $js, bucket => $name, [chunk_size => $bytes])
 
 Default C<chunk_size> is 128 KiB. C<timeout> defaults to the timeout
-of C<$js>.
+of C<$js>. The bucket name must match C<[a-zA-Z0-9_-]+> and
+C<chunk_size> must be a positive integer; both are validated up
+front. C<chunk_size> must also not exceed the server's
+C<max_payload> (checked on L</put> once connected).
 
 =head2 create_bucket
 

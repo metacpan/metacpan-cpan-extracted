@@ -10,5 +10,5 @@ requires "Mojolicious";
 requires "Mojolicious::Plugin::BasicAuthPlus";
 requires "Mojo::File";
 requires "Moo";
-requires "Nice::Try";
 requires "OrePAN2";
+requires "Syntax::Keyword::Try";

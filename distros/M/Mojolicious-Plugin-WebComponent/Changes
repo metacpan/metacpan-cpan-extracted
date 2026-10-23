@@ -1,5 +1,20 @@
 Revision history for Perl extension Mojolicious-Plugin-WebComponent
 
+0.08 2026-10-22T18:20:45Z
+    - BREAKING: the script url is now /component/:checksum/*component, where the checksum is the SHA-1 of the rendered script, replacing the per-request id; urls are stable until the script, template or parameters change
+    - script responses carry Cache-Control: public, max-age=31536000, immutable when the checksum matches, and no-cache otherwise
+    - the requestId helper option replaces the checksum and is served with no-cache; its value is percent-encoded in the url as UTF-8, and a value containing a slash now dies because the route could not match it
+    - the proxy base path is escaped for use inside the script tag and loses a trailing slash, so it no longer doubles the slash or ends the attribute
+    - the helper name must be a plain word; any other name now dies at registration
+    - a script that cannot be found is logged at debug level when the helper builds its tag
+    - security: component names are checked against an allowlist (a .js file name, optionally below sub folders, no segment starting with a dot), so a request can no longer read files outside the component folder; any other name gets a 404 and the helper dies on one
+    - security: the template is injected as one JSON string literal, so backticks, ${} and backslashes in a template can no longer end the string or run code; template names are checked against an allowlist
+    - the script route is created when the plugin is registered and placed ahead of the app's other routes, so every worker serves it from the first request and a catch-all route cannot hide it
+    - a missing component is a 404, not a 500; scripts are read and sent as UTF-8 with the content type application/javascript; charset=UTF-8
+    - the helper no longer puts a route capture or the internal callback in the script url; the template option applies only to its own helper call; only the whole values false, f, no and 0 switch templating off
+    - the helper option is honoured and the template lookup uses the public renderer API, so templates in __DATA__ sections and of other handlers are found
+    - requires Perl 5.20 and Mojolicious 9.27 (cpanfile); documentation typos fixed; unused code removed
+
 0.07 2024-03-23T16:52:32Z
     - updates to better handle reverse proxy installations where generated urls were not being handled correctly
 

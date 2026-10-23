@@ -14,8 +14,7 @@ use POSIX ();
 use Readonly ();
 
 # _send is private to this package (see Log::Abstraction)
-BEGIN { $Sub::Private::config{mode} = 'enforce' }
-use Sub::Private 0.06;
+use Sub::Private 0.07 { mode => 'enforce' };
 
 our $VERSION = '0.40';
 

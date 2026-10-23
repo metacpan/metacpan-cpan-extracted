@@ -16,8 +16,8 @@ for (1..$WORKERS) {
     my $pid = fork // die;
     if ($pid == 0) {
         for (1..$OPS) {
-            $stk->push_wait($$, 1.0);
-            $stk->pop_wait(1.0);
+            $stk->push_wait($$, 1.0) or _exit(1);
+            defined $stk->pop_wait(1.0) or _exit(2);
         }
         _exit(0);
     }
@@ -38,8 +38,8 @@ for (1..$WORKERS) {
     my $pid = fork // die;
     if ($pid == 0) {
         for (1..($OPS / 10)) {
-            $ss->push_wait("w=$$ i=$_", 1.0);
-            $ss->pop_wait(1.0);
+            $ss->push_wait("w=$$ i=$_", 1.0) or _exit(1);
+            defined $ss->pop_wait(1.0) or _exit(2);
         }
         _exit(0);
     }

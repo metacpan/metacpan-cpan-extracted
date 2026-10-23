@@ -1,13 +1,37 @@
-#define PERL_NO_GET_CONTEXT // we'll define thread context if necessary (faster)
-#include "EXTERN.h"         // globals/constant import locations
-#include "perl.h"           // Perl symbols, structures and constants definition
-#include "XSUB.h"           // xsubpp functions and macros
-#include <stdlib.h>         // rand()
+#define PERL_NO_GET_CONTEXT
+#include "EXTERN.h"
+#include "perl.h"
+#include "XSUB.h"
+#include <stdlib.h>
 #include <string.h>
 
-double mode(double arr[], int size) {
-	double max_value = 0, max_count = 0;
-	int i, j;
+static NV call_nv (pTHX_ SV * cb, SV * arg) {
+	dSP;
+	NV ret;
+	DEFSV_set(sv_mortalcopy(arg));
+	PUSHMARK(SP);
+	PUTBACK;
+	call_sv(cb, G_SCALAR);
+	SPAGAIN;
+	ret = POPn;
+	PUTBACK;
+	return ret;
+}
+
+static NV * collect (pTHX_ SV * cb, I32 first, int count) {
+	NV * vals;
+	int i;
+	Newx(vals, count, NV);
+	SAVEFREEPV(vals);
+	for (i = 0; i < count; i++) {
+		vals[i] = call_nv(aTHX_ cb, PL_stack_base[first + i]);
+	}
+	return vals;
+}
+
+static NV mode (NV * arr, int size) {
+	NV max_value = 0;
+	int max_count = 0, i, j;
 	for (i = 0; i < size; ++i) {
 		int cnt = 0;
 		for (j = 0; j < size; ++j) {
@@ -22,62 +46,76 @@ double mode(double arr[], int size) {
 	return max_value;
 }
 
-int compare( const void* a, const void* b)
-{
-     double int_a = * ( (double*) a );
-     double int_b = * ( (double*) b );
-     
-     if ( int_a == int_b ) return 0;
-     else if ( int_a < int_b ) return -1;
-     else return 1;
+static int compare (const void * a, const void * b) {
+	NV na = *(const NV *)a;
+	NV nb = *(const NV *)b;
+	return na < nb ? -1 : na > nb ? 1 : 0;
 }
 
 
 MODULE = Math::Basic::XS  PACKAGE = Math::Basic::XS
 PROTOTYPES: ENABLE
 
+void
+import(...)
+	PROTOTYPE: DISABLE
+	CODE:
+		HV * tags = get_hv("Math::Basic::XS::EXPORT_TAGS", 0);
+		AV * args = (AV *)sv_2mortal((SV *)newAV());
+		SSize_t i, top;
+		for (i = 0; i < items; i++) {
+			SV * arg = ST(i);
+			STRLEN len;
+			const char * name;
+			if (i > 0 && tags && SvOK(arg) && !SvROK(arg)) {
+				name = SvPV_const(arg, len);
+				if (len && isIDFIRST(name[0]) && hv_exists(tags, name, len)) {
+					arg = newSVpvs_flags(":", SVs_TEMP);
+					sv_catpvn(arg, name, len);
+				}
+			}
+			av_push(args, SvREFCNT_inc_simple_NN(arg));
+		}
+		top = av_len(args);
+		SP = MARK;
+		PUSHMARK(SP);
+		EXTEND(SP, top + 1);
+		for (i = 0; i <= top; i++)
+			PUSHs(*av_fetch(args, i, 0));
+		PUTBACK;
+		call_pv("Ex::Op::import", G_VOID | G_DISCARD);
+		XSRETURN_EMPTY;
+
 SV *
 sum(...)
 	PROTOTYPE: &@
 	CODE:
-		SV * callback = ST(0);
-		int sum = 0, i = 1;
+		NV sum = 0;
+		int i;
+		ENTER;
+		SAVE_DEFSV;
 		for (i = 1; i < items; i++) {
-			dSP;
-			GvSV(PL_defgv) = newSVsv(ST(i));
-			PUSHMARK(SP);
-			call_sv(callback, 3);
-			SPAGAIN;
-			SV * val = POPs;
-			sum += SvNV(val);
-			PUTBACK;
+			sum += call_nv(aTHX_ ST(0), ST(i));
 		}
+		LEAVE;
 		RETVAL = newSVnv(sum);
 	OUTPUT:
 		RETVAL
-
 
 SV *
 min(...)
 	PROTOTYPE: &@
 	CODE:
-		SV * callback = ST(0);
-		int min = 0, i = 1;
-		int set = 0;
+		NV min = 0;
+		int i;
+		if (items < 2) XSRETURN_UNDEF;
+		ENTER;
+		SAVE_DEFSV;
 		for (i = 1; i < items; i++) {
-			dSP;
-			GvSV(PL_defgv) = newSVsv(ST(i));
-			PUSHMARK(SP);
-			call_sv(callback, G_SCALAR);
-			SPAGAIN;
-			SV * val = POPs;
-			double ret = SvNV(val);
-			if (!set || ret < min) {
-				min = ret;
-				set = 1;
-			}
-			PUTBACK;
+			NV ret = call_nv(aTHX_ ST(0), ST(i));
+			if (i == 1 || ret < min) min = ret;
 		}
+		LEAVE;
 		RETVAL = newSVnv(min);
 	OUTPUT:
 		RETVAL
@@ -86,23 +124,16 @@ SV *
 max(...)
 	PROTOTYPE: &@
 	CODE:
-		SV * callback = ST(0);
-		int max = 0, i = 1;
-		int set = 0;
+		NV max = 0;
+		int i;
+		if (items < 2) XSRETURN_UNDEF;
+		ENTER;
+		SAVE_DEFSV;
 		for (i = 1; i < items; i++) {
-			dSP;
-			GvSV(PL_defgv) = newSVsv(ST(i));
-			PUSHMARK(SP);
-			call_sv(callback, G_SCALAR);
-			SPAGAIN;
-			SV * val = POPs;
-			int ret = SvNV(val);
-			if (!set || ret > max) {
-				max = ret;
-				set = 1;
-			}
-			PUTBACK;	
+			NV ret = call_nv(aTHX_ ST(0), ST(i));
+			if (i == 1 || ret > max) max = ret;
 		}
+		LEAVE;
 		RETVAL = newSVnv(max);
 	OUTPUT:
 		RETVAL
@@ -111,19 +142,15 @@ SV *
 mean(...)
 	PROTOTYPE: &@
 	CODE:
-		SV * callback = ST(0);
-		double sum = 0;
-		int i = 1;
+		NV sum = 0;
+		int i;
+		if (items < 2) XSRETURN_UNDEF;
+		ENTER;
+		SAVE_DEFSV;
 		for (i = 1; i < items; i++) {
-			dSP;
-			GvSV(PL_defgv) = newSVsv(ST(i));
-			PUSHMARK(SP);
-			call_sv(callback, 3);
-			SPAGAIN;
-			SV * val = POPs;
-			sum += SvNV(val);
-			PUTBACK;
+			sum += call_nv(aTHX_ ST(0), ST(i));
 		}
+		LEAVE;
 		RETVAL = newSVnv(sum / (items - 1));
 	OUTPUT:
 		RETVAL
@@ -132,49 +159,29 @@ SV *
 median(...)
 	PROTOTYPE: &@
 	CODE:
-		SV * callback = ST(0);
-		int i;
-		double median[items - 1];
-		for (i = 1; i < items; i++) {
-			dSP;
-			GvSV(PL_defgv) = newSVsv(ST(i));
-			PUSHMARK(SP);
-			call_sv(callback, 3);
-			SPAGAIN;
-			SV * val = POPs;
-			median[i - 1] = SvNV(val);
-			PUTBACK;
-		}
-		qsort( median, items - 1, sizeof(double), compare );
-		i = (items - 1) / 2;
-		if (i % 2 != 0) {
-			i++;
-		}
-		RETVAL = newSVnv(median[i]);
+		NV * vals;
+		int count = items - 1;
+		if (count < 1) XSRETURN_UNDEF;
+		ENTER;
+		SAVE_DEFSV;
+		vals = collect(aTHX_ ST(0), ax + 1, count);
+		qsort(vals, count, sizeof(NV), compare);
+		RETVAL = newSVnv(vals[count / 2]);
+		LEAVE;
 	OUTPUT:
 		RETVAL
-
 
 SV *
 mode(...)
 	PROTOTYPE: &@
 	CODE:
-		SV * callback = ST(0);
-		int i;
-		double arr[items - 1];
-		for (i = 1; i < items; i++) {
-			dSP;
-			GvSV(PL_defgv) = newSVsv(ST(i));
-			PUSHMARK(SP);
-			call_sv(callback, 3);
-			SPAGAIN;
-			SV * val = POPs;
-			arr[i - 1] = SvNV(val);
-			PUTBACK;
-		}
-		RETVAL = newSVnv(mode(arr, items - 1));
+		NV * vals;
+		int count = items - 1;
+		if (count < 1) XSRETURN_UNDEF;
+		ENTER;
+		SAVE_DEFSV;
+		vals = collect(aTHX_ ST(0), ax + 1, count);
+		RETVAL = newSVnv(mode(vals, count));
+		LEAVE;
 	OUTPUT:
 		RETVAL
-
-
-

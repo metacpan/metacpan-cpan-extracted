@@ -28,6 +28,7 @@ WriteMakefile(
     MIN_PERL_VERSION => '5.020',
     LICENSE       => 'perl_5',
     CONFIGURE_REQUIRES => { 'ExtUtils::MakeMaker' => '6.64' },
+    PREREQ_PM     => { 'Encode' => 0 },
     TEST_REQUIRES => { 'Test::More' => '0.88' },
     META_MERGE    => {
         'meta-spec' => { version => 2 },

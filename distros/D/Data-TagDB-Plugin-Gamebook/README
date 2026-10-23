@@ -1,0 +1,4 @@
+Data::TagDB::Plugin::Gamebook
+----------------
+
+Thos module provides a plugin to Data::TagDB that can be used to interact with gamebook data more easily.

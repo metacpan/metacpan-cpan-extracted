@@ -1,5 +1,17 @@
 Revision history for Trog-SQLite
 
+0.003 2026-10-22 TEODESIAN
+    - The test of an error other than a lock opens a file that is not a
+      database, not a read-only file.  Root writes a read-only file, so the
+      test failed when root installed the distribution.
+
+0.002 2026-10-22 TEODESIAN
+    - dbh waits for a write lock before it sets the journal mode to WAL.
+      SQLite fails that change at once with SQLITE_BUSY, and does not wait
+      for busy_timeout, so a process that opened a new database while
+      another one wrote to it died with "database is locked".  wal tries
+      again for as long as busy_timeout, with Sub::Retry.
+
 0.001 2026-10-18 TEODESIAN
     - Initial release, from the copies in tCMS and trog-provisioner.
     - Versioned schema updates: NAME.vN.update.sql beside NAME.sql, each run

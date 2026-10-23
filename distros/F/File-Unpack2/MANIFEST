@@ -20,6 +20,7 @@ t/09-no-intermediate-tar.t
 t/10-stall-timeout.t
 t/11-adversarial.t
 t/12-mime-helper.t
+t/13-locate-cpio.t
 t/boilerplate.t
 t/data/Archive.pax
 t/data/bad34.pdf

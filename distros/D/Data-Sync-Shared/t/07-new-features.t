@@ -222,6 +222,20 @@ use Data::Sync::Shared;
     $cv->unlock;
 }
 
+{
+    my $cv = Data::Sync::Shared::Condvar->new(undef);
+    my $wall = Time::HiRes::time();
+    my $reads = 0;
+    no warnings 'redefine';
+    local *Time::HiRes::time = sub { $wall + ($reads++ ? 3600 : 0) };
+    my $t0 = Time::HiRes::clock_gettime(Time::HiRes::CLOCK_MONOTONIC());
+    $cv->lock;
+    ok !$cv->wait_while(sub { 1 }, 0.05), 'wait_while still times out after a wall-clock jump';
+    $cv->unlock;
+    cmp_ok Time::HiRes::clock_gettime(Time::HiRes::CLOCK_MONOTONIC()) - $t0,
+        '>=', 0.04, 'wall-clock jump does not shorten the timeout';
+}
+
 # ============================================================
 # Semaphore: file-backed initial value
 # ============================================================

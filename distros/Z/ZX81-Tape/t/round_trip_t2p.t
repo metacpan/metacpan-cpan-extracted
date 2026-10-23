@@ -1,5 +1,9 @@
 # Test round-trip to files generated with t2p
 
+#use warnings FATAL => 'all';
+#use Carp qw(confess);
+#$SIG{__WARN__} = sub { confess @_ };
+
 use Modern::Perl;
 use Path::Tiny;
 use Test::HexDifferences;
@@ -25,7 +29,7 @@ for my $input_bas_file ( path("t/t2p/input")->children(qr/\.bas$/) ) {
     }
 
     # repeat using the stript
-    system $^X, "./bin/zx81_make_p", "-o", "$input_basename.p",
+    system $^X, "-Iblib/lib", "./bin/zx81_make_p", "-o", "$input_basename.p",
       "$input_bas_file";
     compare_p( $exp_p_file, "$input_basename.p" );
 
@@ -42,7 +46,8 @@ for my $input_bas_file ( path("t/t2p/input")->children(qr/\.bas$/) ) {
     }
 
     # repeat using the stript
-    system $^X, "./bin/zx81_dump_p", "-o", "$input_basename.txt", "$exp_p_file";
+    system $^X, "-Iblib/lib", "./bin/zx81_dump_p", "-o", "$input_basename.txt",
+      "$exp_p_file";
     compare_text( $exp_dump_file, "$input_basename.txt" );
 
     if ( Test::More->builder->is_passing ) {
@@ -58,7 +63,8 @@ for my $input_bas_file ( path("t/t2p/input")->children(qr/\.bas$/) ) {
     }
 
     # repeat using the stript
-    system $^X, "./bin/zx81_list_p", "-o", "$input_basename.bas", "$exp_p_file";
+    system $^X, "-Iblib/lib", "./bin/zx81_list_p", "-o", "$input_basename.bas",
+      "$exp_p_file";
     compare_text( $exp_list_file, "$input_basename.bas" );
 
     if ( Test::More->builder->is_passing ) {

@@ -12,6 +12,7 @@ use warnings;
 use EV;
 use EV::ClickHouse;
 use File::Spec;
+use POSIX qw(strftime);
 
 my $dir   = shift // die "Usage: $0 <migrations-dir>\n";
 my $host  = $ENV{CLICKHOUSE_HOST}        // '127.0.0.1';
@@ -67,7 +68,8 @@ for my $file (@files) {
     die "FAILED: $file: $err\n" if $err;
     # Idempotency marker: the insert dedupe token guards against a partial
     # apply leaving the registry out of sync if the next step fails.
-    $ch->insert('_migrations', [[$version, scalar localtime]],
+    my $now = strftime('%Y-%m-%d %H:%M:%S', localtime);
+    $ch->insert('_migrations', [[$version, $now]],
                 { idempotent => "mig-$version" }, sub {
         (undef, $err) = @_;
         EV::break;

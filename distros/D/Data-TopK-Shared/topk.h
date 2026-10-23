@@ -370,6 +370,13 @@ static int tk_self_reading(TkHandle *h) {
 
 static void tk_repair_locked(TkHandle *h);
 
+static inline void tk_release_writer(TkHeader *hdr) {
+    __atomic_store_n(&hdr->wlock, 0, __ATOMIC_RELEASE);
+    __atomic_thread_fence(__ATOMIC_SEQ_CST); /* pair with tk_park: do not miss a new waiter */
+    if (__atomic_load_n(&hdr->rwait, __ATOMIC_RELAXED) > 0)
+        syscall(SYS_futex, &hdr->wlock, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
+}
+
 /* Force-recover a stale WRITE lock left by a dead writer (held or mid-drain).
  * CAS to OUR pid to hold the lock while repairing shared state, then release.
  * Using our pid (not a bare WRITER_BIT sentinel) means a subsequent recovering
@@ -384,9 +391,7 @@ static inline void tk_recover_stale_lock(TkHandle *h, uint32_t observed_wlock) {
         tk_rwlock_drain(h);
         tk_repair_locked(h);
     }
-    __atomic_store_n(&hdr->wlock, 0, __ATOMIC_RELEASE);
-    if (__atomic_load_n(&hdr->rwait, __ATOMIC_RELAXED) > 0)
-        syscall(SYS_futex, &hdr->wlock, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
+    tk_release_writer(hdr);
 }
 
 /* Inspect the writer word after a futex-wait timeout.  If a dead writer holds
@@ -408,6 +413,7 @@ static inline void tk_recover_after_timeout(TkHandle *h) {
  * (harmless); it can never under-count, so no wakeup is lost. */
 static inline void tk_park(TkHandle *h) {
     __atomic_add_fetch(&h->hdr->rwait, 1, __ATOMIC_RELAXED);
+    __atomic_thread_fence(__ATOMIC_SEQ_CST);
 }
 static inline void tk_unpark(TkHandle *h) {
     __atomic_sub_fetch(&h->hdr->rwait, 1, __ATOMIC_RELAXED);
@@ -430,9 +436,9 @@ static inline void tk_rdepth_inc(TkHandle *h) {
 static inline void tk_rdepth_dec(TkHandle *h) {
     if (h->slotless_held > 0) {
         h->slotless_held--;
-        __atomic_sub_fetch(&h->hdr->slotless_rdepth, 1, __ATOMIC_RELEASE);
+        __atomic_sub_fetch(&h->hdr->slotless_rdepth, 1, __ATOMIC_SEQ_CST);
     } else if (h->my_slot_idx != UINT32_MAX) {
-        __atomic_sub_fetch(&h->reader_slots[h->my_slot_idx].rdepth, 1, __ATOMIC_RELEASE);
+        __atomic_sub_fetch(&h->reader_slots[h->my_slot_idx].rdepth, 1, __ATOMIC_SEQ_CST);
     }
 }
 
@@ -440,7 +446,7 @@ static inline void tk_rdepth_dec(TkHandle *h) {
  * after every rdepth decrement so a released read lock lets the writer re-scan
  * promptly instead of waiting out its timeout. */
 static inline void tk_reader_wake_drain(TkHandle *h) {
-    if (__atomic_load_n(&h->hdr->wlock, __ATOMIC_ACQUIRE) != 0) {
+    if (__atomic_load_n(&h->hdr->wlock, __ATOMIC_SEQ_CST) != 0) {
         __atomic_add_fetch(&h->hdr->drain_seq, 1, __ATOMIC_RELEASE);
         syscall(SYS_futex, &h->hdr->drain_seq, FUTEX_WAKE, 1, NULL, NULL, 0);
     }
@@ -495,7 +501,7 @@ static inline void tk_rwlock_rdlock(TkHandle *h) {
 }
 
 static inline void tk_rwlock_rdunlock(TkHandle *h) {
-    tk_rdepth_dec(h);                 /* RELEASE: drop our entire contribution */
+    tk_rdepth_dec(h);                 /* drop our entire contribution before checking the writer */
     tk_reader_wake_drain(h);          /* if a writer is draining, wake it to re-scan */
 }
 
@@ -542,10 +548,7 @@ static inline void tk_rwlock_wrlock(TkHandle *h) {
 }
 
 static inline void tk_rwlock_wrunlock(TkHandle *h) {
-    TkHeader *hdr = h->hdr;
-    __atomic_store_n(&hdr->wlock, 0, __ATOMIC_RELEASE);
-    if (__atomic_load_n(&hdr->rwait, __ATOMIC_RELAXED) > 0)
-        syscall(SYS_futex, &hdr->wlock, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
+    tk_release_writer(h->hdr);
 }
 
 /* ================================================================
@@ -1252,6 +1255,8 @@ static inline void tk_clear_locked(TkHandle *h) {
     __atomic_signal_fence(__ATOMIC_SEQ_CST);
     h->hdr->used = 0;
     h->hdr->seen = 0;
+    h->hdr->now = 0.0;
+    h->hdr->landmark = 0.0;
     __atomic_signal_fence(__ATOMIC_SEQ_CST);
     h->hdr->jsift = 0;
 }

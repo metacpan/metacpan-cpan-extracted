@@ -1,7 +1,7 @@
 {
    "abstract" : "unknown",
    "author" : [
-      "Lee Johnson <leejo@cpan.org>"
+      "Lee Johnson <lee@payprop.com>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
@@ -22,8 +22,6 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "FindBin" : "0",
-            "LWP::Simple" : "6",
             "Test::Deep" : "0.112",
             "Test::Exception" : "0.32",
             "Test::MockObject" : "1.20140408",
@@ -40,6 +38,8 @@
          "requires" : {
             "Carp" : "0",
             "Digest::SHA" : "0",
+            "Encode" : "0",
+            "HTTP::Date" : "0",
             "JSON" : "2.9",
             "LWP::Protocol::https" : "6",
             "LWP::UserAgent" : "6",
@@ -47,6 +47,8 @@
             "Moo" : "1.006",
             "POSIX" : "0",
             "Throwable" : "0.200011",
+            "Time::HiRes" : "0",
+            "UUID" : "0.34",
             "perl" : "5.020000"
          }
       }
@@ -54,16 +56,16 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/Humanstate/business-gocardless/issues"
+         "web" : "https://github.com/payprop/business-gocardless/issues"
       },
       "homepage" : "https://metacpan.org/module/Business::GoCardless",
       "license" : [
          "http://dev.perl.org/licenses/"
       ],
       "repository" : {
-         "url" : "https://github.com/Humanstate/business-gocardless"
+         "url" : "https://github.com/payprop/business-gocardless"
       }
    },
-   "version" : "0.45",
+   "version" : "1.00",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

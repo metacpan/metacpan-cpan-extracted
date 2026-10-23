@@ -24,12 +24,23 @@ no_index:
     - src
     - eg
     - bench
+provides:
+  EV::Kafka:
+    file: lib/EV/Kafka.pm
+    version: '0.08'
+  EV::Kafka::Client:
+    file: lib/EV/Kafka.pm
+    version: '0.08'
+  EV::Kafka::Conn:
+    file: lib/EV/Kafka.pm
+    version: '0.08'
 requires:
   EV: '4.11'
+  JSON::PP: '0'
   XSLoader: '0.02'
   perl: '5.012'
 resources:
   bugtracker: https://github.com/vividsnow/perl5-ev-kafka/issues
   repository: https://github.com/vividsnow/perl5-ev-kafka.git
-version: '0.06'
+version: '0.08'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

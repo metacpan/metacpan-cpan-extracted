@@ -1,0 +1,131 @@
+# The second workflow action-run runs against itself.  Where the first proves
+# the command surface - a container started, the project mounted, a step given
+# its environment, everything removed - this one runs the tool's own command
+# inside a Perl image, so action-run is exercised where it is being tested
+# rather than only from the checkout that started it.
+#
+# The command it runs needs the tool's own dependencies, which the image does
+# not have: they are installed only when they are missing, so the fake daemon
+# (which runs these steps on the host, where they are installed) does not touch
+# the network, and a real container fetches only what the image lacks.
+# t/self_test.t fails if a module lib/ or bin/ uses is missing from the list.
+#
+# The image is named by digest and not by the "perl:5.38" tag it came from: a
+# tag is a moving reference, so the live job would run against whatever that
+# tag means on the day it runs, and a rebuilt Perl image would change what the
+# test proves without a commit.  The digest below is the multi-architecture
+# index the tag resolved to on 2026-07-14, the linux/amd64 image among them.
+# To move it on deliberately, read the current digest with
+# "docker buildx imagetools inspect perl:5.38" and replace it here;
+# t/self_test.t fails if the reference is not pinned this way.
+name: Self test CLI
+on: push
+jobs:
+  self-test-cli:
+    runs-on: ubuntu-latest
+    container:
+      image: perl:5.38@sha256:587c0c65838dca2fa760e0a0ab169f7260894f208e68f38535ca644f397470c7
+    steps:
+      - name: Make the tool's dependencies available
+        run: |
+          for module in YAML::PP Readonly Params::Get Params::Validate::Strict \
+              Return::Set Sub::Private Sub::Protected Sub::Identify IPC::System::Simple \
+              Object::Configure; do
+            perl -M"$module" -e 1 2>/dev/null || cpanm --notest --quiet "$module"
+          done
+          echo "the dependencies the tool needs are available"
+      - name: Print the contract
+        run: |
+          perl -Ilib bin/action-run schema check > "$RUNNER_TEMP/check-schema.json"
+          perl -MJSON::PP -e '
+            local $/;
+            open my $handle, "<", $ARGV[0] or die "cannot read $ARGV[0]: $!";
+            my $schema = JSON::PP->new->decode(<$handle>);
+            die "the document is not a schema\n"
+                unless defined $schema->{version}
+                && defined $schema->{properties}{schema_version};
+            print "the CLI printed its check schema inside the container\n";
+          ' "$RUNNER_TEMP/check-schema.json"
+      - name: Validate every check document
+        run: |
+          for fixture in t/fixtures/check*.json
+          do
+            perl -Ilib bin/action-run validate check "$fixture"
+            echo "the CLI validated ${fixture##*/} inside the container"
+          done
+      - name: Print the preflight contract
+        run: |
+          perl -Ilib bin/action-run schema preflight > "$RUNNER_TEMP/preflight-schema.json"
+          perl -MJSON::PP -e '
+            local $/;
+            open my $handle, "<", $ARGV[0] or die "cannot read $ARGV[0]: $!\n";
+            my $schema = JSON::PP->new->decode(<$handle>);
+            die "the document is not the preflight schema\n"
+                unless defined $schema->{version}
+                && ref $schema->{properties} eq "HASH"
+                && ref $schema->{properties}{ready} eq "HASH"
+                && ref $schema->{properties}{images} eq "HASH"
+                && ref $schema->{properties}{pull_concurrency} eq "HASH";
+            die "the preflight schema is not the version its schema_version names\n"
+                unless defined $schema->{properties}{schema_version}{const}
+                && $schema->{properties}{schema_version}{const} == $schema->{version};
+            print "the CLI printed its preflight schema inside the container\n";
+          ' "$RUNNER_TEMP/preflight-schema.json"
+      - name: Validate every preflight document
+        run: |
+          for fixture in t/fixtures/preflight*.json
+          do
+            perl -Ilib bin/action-run validate preflight "$fixture"
+            echo "the CLI validated ${fixture##*/} inside the container"
+          done
+      - name: Print the cache contract
+        run: |
+          perl -Ilib bin/action-run schema cache > "$RUNNER_TEMP/cache-schema.json"
+          perl -MJSON::PP -e '
+            local $/;
+            open my $handle, "<", $ARGV[0] or die "cannot read $ARGV[0]: $!\n";
+            my $schema = JSON::PP->new->decode(<$handle>);
+            die "the document is not the cache schema\n"
+                unless defined $schema->{version}
+                && ref $schema->{properties} eq "HASH"
+                && ref $schema->{properties}{generated_at} eq "HASH"
+                && ref $schema->{properties}{images} eq "HASH"
+                && ref $schema->{properties}{images}{items}{properties}{age} eq "HASH"
+                && ref $schema->{properties}{totals} eq "HASH";
+            die "the cache schema is not the version its schema_version names\n"
+                unless defined $schema->{properties}{schema_version}{const}
+                && $schema->{properties}{schema_version}{const} == $schema->{version};
+            print "the CLI printed its cache schema inside the container\n";
+          ' "$RUNNER_TEMP/cache-schema.json"
+      - name: Validate every cache document
+        run: |
+          for fixture in t/fixtures/cache*.json
+          do
+            perl -Ilib bin/action-run validate cache "$fixture"
+            echo "the CLI validated ${fixture##*/} inside the container"
+          done
+      - name: Print the logs contract
+        run: |
+          perl -Ilib bin/action-run schema logs > "$RUNNER_TEMP/logs-schema.json"
+          perl -MJSON::PP -e '
+            local $/;
+            open my $handle, "<", $ARGV[0] or die "cannot read $ARGV[0]: $!\n";
+            my $schema = JSON::PP->new->decode(<$handle>);
+            die "the document is not the logs schema\n"
+                unless defined $schema->{version}
+                && ref $schema->{properties} eq "HASH"
+                && ref $schema->{properties}{generated_at} eq "HASH"
+                && ref $schema->{properties}{logs} eq "HASH"
+                && ref $schema->{properties}{totals} eq "HASH";
+            die "the logs schema is not the version its schema_version names\n"
+                unless defined $schema->{properties}{schema_version}{const}
+                && $schema->{properties}{schema_version}{const} == $schema->{version};
+            print "the CLI printed its logs schema inside the container\n";
+          ' "$RUNNER_TEMP/logs-schema.json"
+      - name: Validate every logs document
+        run: |
+          for fixture in t/fixtures/logs*.json
+          do
+            perl -Ilib bin/action-run validate logs "$fixture"
+            echo "the CLI validated ${fixture##*/} inside the container"
+          done

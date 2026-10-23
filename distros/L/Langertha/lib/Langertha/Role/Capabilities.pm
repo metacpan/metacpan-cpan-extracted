@@ -1,11 +1,12 @@
 package Langertha::Role::Capabilities;
 # ABSTRACT: Engine-capability registry derived from composed roles
-our $VERSION = '0.503';
+our $VERSION = '0.504';
 use Moose::Role;
 use Carp qw( croak );
 use Scalar::Util qw( blessed );
 use Future::AsyncAwait;
 use Langertha::ModelProbe;
+use Langertha::ToolResult;
 
 
 # Role-name => list of capability flag names that role contributes.
@@ -46,6 +47,9 @@ my %ROLE_TO_CAPS = (
   'Langertha::Role::RuntimeKnobs'    => [qw( prefix_caching )],
   'Langertha::Role::ServerTools'      => [qw( server_tools )],
   'Langertha::Role::ImageInput'       => [qw( image_input )],
+  'Langertha::Role::StreamUsage'      => [qw( stream_usage )],
+  'Langertha::Role::ToolResultImages' => [qw( tool_result_images )],
+  'Langertha::Role::ToolResultPDF'    => [qw( tool_result_pdf )],
 );
 
 sub engine_capabilities {
@@ -73,7 +77,44 @@ sub engine_capabilities {
   # the provider's statement beats the static default in both directions.
   # Empty until the caller probes: supports() never does network I/O.
   $self->_apply_learned_model_capabilities( \%caps, \%wire );
+  # Last, so a probed image_input flows through (ADR 0039).
+  $self->_apply_tool_result_media_dependencies( \%caps );
   return \%caps;
+}
+
+# Tool-result media (ADR 0039, karr k380): tool_result_images and
+# tool_result_pdf describe what format_tool_results sends, so they hold only
+# where the serializer can, on the engine's CURRENT tool_wire_format (a forced
+# wire included): the wire must have a native tool-result form for the kind
+# (ToolResult->carries_native), and where that form reaches only a model that
+# sees images -- an image everywhere, a PDF on responses / gemini, not on
+# anthropic (k371) -- the model must claim image_input
+# (ToolResult->native_needs_vision). Engine-specific gates (Gemini 3 and later,
+# the anthropic source blocks, AKIAnthropic) stay with the engines.
+my %TOOL_RESULT_MEDIA_CAP = ( image => 'tool_result_images', pdf => 'tool_result_pdf' );
+
+sub _apply_tool_result_media_dependencies {
+  my ( $self, $caps ) = @_;
+  my @kinds = grep { $caps->{ $TOOL_RESULT_MEDIA_CAP{$_} } } sort keys %TOOL_RESULT_MEDIA_CAP;
+  return unless @kinds;
+  my $fmt = $self->_capability_tool_wire_format;
+  for my $kind (@kinds) {
+    my $keep = Langertha::ToolResult->carries_native( $fmt, $kind )
+      && ( $caps->{image_input} || !Langertha::ToolResult->native_needs_vision( $fmt, $kind ) );
+    delete $caps->{ $TOOL_RESULT_MEDIA_CAP{$kind} } unless $keep;
+  }
+  return;
+}
+
+# The engine's tool_wire_format, or undef when it has none or its builder
+# croaks; like _capability_model, supports() leaves no croak in $@.
+sub _capability_tool_wire_format {
+  my ( $self ) = @_;
+  return undef unless $self->can('tool_wire_format');
+  my $fmt;
+  local $@;
+  my $ok = eval { $fmt = $self->tool_wire_format; 1 };
+  return $ok ? $fmt : undef;
 }
 
 # Default: no per-model corrections. Engines override with a declarative,
@@ -307,7 +348,7 @@ Langertha::Role::Capabilities - Engine-capability registry derived from composed
 
 =head1 VERSION
 
-version 0.503
+version 0.504
 
 =head1 SYNOPSIS
 
@@ -512,6 +553,29 @@ wire-only contract: it means B<the selected model sees an image part>
 resolved per model; engines whose model is unknown to the client (gateways,
 self-hosted servers, shims) make no claim. The flag is advisory: nothing
 blocks an image on an engine or model without it.
+
+C<stream_usage> (from C<Langertha::Role::StreamUsage>) means B<the engine's
+stream request asks the provider for the stream's token usage>, which then
+arrives as the stream's last chunk: on the OpenAI chat wire
+C<chat_stream_request> sends C<< stream_options => { include_usage => true } >>.
+Engines claim it only where the provider documents the option (ADR 0038);
+without the flag no C<stream_options> is sent, and a stream may still report
+usage on its own (DeepSeek, OpenRouter, Groq's C<x_groq.usage>).
+
+C<tool_result_images> (from C<Langertha::Role::ToolResultImages>) means B<an
+image a tool returns reaches the selected model as an image it sees>, in this
+engine's tool-result wire form; without it
+L<Langertha::Role::Tools/format_tool_results> sends the text placeholder.
+C<tool_result_pdf> (from C<Langertha::Role::ToolResultPDF>) means the same for
+a PDF (an embedded resource with an C<application/pdf> blob), read as a native
+document. Both are model-scoped, and the default method keeps them only while
+the engine's current C<tool_wire_format> has a native tool-result form for
+that kind (L<Langertha::ToolResult/carries_native>), and, where that form
+reaches only a model that sees images (L<Langertha::ToolResult/native_needs_vision>:
+an image on every wire, a PDF on C<responses> and C<gemini>, not on
+C<anthropic>), only while C<image_input> holds, so a probed C<image_input>
+fact switches it on (ADR 0039). This dependency runs last inside the default
+method, after the learned layer.
 
 =head2 model_capability_corrections
 

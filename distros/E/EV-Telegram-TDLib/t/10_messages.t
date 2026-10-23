@@ -146,7 +146,8 @@ like($sent[-1], qr/"limit":3/, 'the requested limit goes out');
 my $eh1 = extra_of($sent[-1]);
 $td->inject_raw(qq({"\@type":"messages","total_count":10,"messages":[{"\@type":"message","id":31457280},{"\@type":"message","id":20971520}],"\@extra":"$eh1"}));
 is($hist, undef, 'no callback after a partial page');
-like($sent[-1], qr/"from_message_id":20971520/, 'paging follows the oldest id of the batch');
+cmp_ok(Cpanel::JSON::XS->new->decode($sent[-1])->{from_message_id}, '<', 20971520,
+    'paging excludes the oldest message already returned');
 like($sent[-1], qr/"limit":1/, 'only the remaining count is requested');
 my $eh2 = extra_of($sent[-1]);
 $td->inject_raw(qq({"\@type":"messages","total_count":10,"messages":[{"\@type":"message","id":10485760}],"\@extra":"$eh2"}));
@@ -311,6 +312,62 @@ is($td->auth_state, 'authorizationStateClosed', 'client closed');
                   . q("message":{"@type":"message","id":901,"chat_id":222}}));
     is_deeply [sort @fired], ['A:111', 'B:222'],
         'and each callback receives its own chat\'s message';
+}
+
+# TDLib includes from_message_id and may return a short page.
+{
+    my $c = EV::Telegram::TDLib->new(api_id => 1, api_hash => 'x', auto_auth => 0);
+    my $json = Cpanel::JSON::XS->new->utf8;
+    my @history = map { +{ '@type' => 'message', id => $_ } }
+        5 * 1048576, 4 * 1048576 + 9, 4 * 1048576 + 2, 4 * 1048576 + 1,
+        map { $_ * 1048576 } reverse 1 .. 4;
+    for my $case ([3, 2, 0], [10, 2, 0], [5, 1, 0], [5, 1, 4 * 1048576 + 2]) {
+        my ($want, $page_size, $start) = @$case;
+        my $result;
+        my @cursors;
+        $c->history(-100123, limit => $want, from_message_id => $start,
+                    sub { $result = [@_] });
+        for (1 .. 10) {
+            last if $result;
+            my $req = $json->decode($sent[-1]);
+            push @cursors, $req->{from_message_id};
+            my @page = grep {
+                !$req->{from_message_id} || $_->{id} <= $req->{from_message_id}
+            } @history;
+            my $count = $req->{limit} < $page_size ? $req->{limit} : $page_size;
+            splice @page, $count if @page > $count;
+            $c->inject_raw($json->encode({
+                '@type' => 'messages', messages => \@page,
+                '@extra' => $req->{'@extra'},
+            }));
+        }
+        my @expected = grep { !$start || $_->{id} <= $start } @history;
+        splice @expected, $want if @expected > $want;
+        is_deeply [map { $_->{id} } @{ $result->[0] || [] }],
+            [map { $_->{id} } @expected],
+            "history returns distinct messages with page size $page_size";
+        ok $result && $result->[2]{complete}, 'the history walk completes';
+        is $result->[2]{last_message_id}, $expected[-1]{id},
+            'the cursor names the last returned message';
+        ok !(grep { $_ && ($_ & 0xfffff) && ($_ & 7) != 1 && ($_ & 7) != 2 } @cursors),
+            'every cursor is a valid TDLib message id';
+        my @older = grep { $_->{id} < $expected[-1]{id} } @history;
+        if (@older) {
+            my $more;
+            $c->history(-100123, limit => 1,
+                from_message_id => $result->[2]{next_from_message_id},
+                sub { $more = $_[0] });
+            my $req = $json->decode($sent[-1]);
+            my ($next) = grep { $_->{id} <= $req->{from_message_id} } @history;
+            $c->inject_raw($json->encode({
+                '@type' => 'messages', messages => [$next],
+                '@extra' => $req->{'@extra'},
+            }));
+            is $more->[0]{id}, $older[0]{id}, 'resuming starts at the next older message';
+        } else {
+            is $result->[2]{next_from_message_id}, undef, 'exhaustion leaves no cursor';
+        }
+    }
 }
 
 done_testing;

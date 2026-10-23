@@ -1,14 +1,17 @@
 package Langertha::Engine::MiniMax;
 # ABSTRACT: MiniMax API (OpenAI-compatible)
-our $VERSION = '0.503';
+our $VERSION = '0.504';
 use Moose;
 use Carp qw( croak );
 
 extends 'Langertha::Engine::OpenAIBase';
 
+# StreamUsage: the ChatCompletionReq schema has stream_options.include_usage
+# (platform.minimax.io text-chat-openai reference, ADR 0038).
 with map { 'Langertha::Role::'.$_ } qw(
   StaticModels
   Tools
+  StreamUsage
 );
 
 
@@ -100,7 +103,7 @@ Langertha::Engine::MiniMax - MiniMax API (OpenAI-compatible)
 
 =head1 VERSION
 
-version 0.503
+version 0.504
 
 =head1 SYNOPSIS
 

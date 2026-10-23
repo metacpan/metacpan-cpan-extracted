@@ -1,0 +1,58 @@
+{
+  "schema_version": 3,
+  "ready": true,
+  "problems": 0,
+  "pull_concurrency": 4,
+  "host": {
+    "os": "linux",
+    "name": "Linux",
+    "perl": "5.40.0",
+    "archname": "x86_64-linux"
+  },
+  "docker": {
+    "bin": "docker",
+    "client": "26.0.0",
+    "daemon": "26.0.0",
+    "containers": "linux"
+  },
+  "image": "perl:5.38",
+  "mounts": [
+    {
+      "host": "/tmp/action-run-check-a1b2c3",
+      "container": "/action-run-check",
+      "ok": true
+    },
+    {
+      "host": "/home/dev/project",
+      "container": "/check-project",
+      "entries": 17,
+      "expected": 17,
+      "ok": true
+    }
+  ],
+  "issues": [],
+  "images": [
+    {
+      "image": "perl:5.38",
+      "source": "job 'test'",
+      "status": "pulled"
+    },
+    {
+      "image": "postgres:15",
+      "source": "service 'db' of job 'test'",
+      "status": "present"
+    },
+    {
+      "image": "alpine:3.20",
+      "source": "action 'docker://alpine:3.20' in job 'test'",
+      "status": "pulled"
+    },
+    {
+      "image": null,
+      "source": "service 'cache' of job 'test'",
+      "status": "deferred",
+      "expression": "redis:${{ needs.build.result }}",
+      "error": "unable to resolve '${{ needs.build.result }}' from the values available"
+    }
+  ]
+}

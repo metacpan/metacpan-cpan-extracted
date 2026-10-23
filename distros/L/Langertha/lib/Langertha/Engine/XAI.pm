@@ -1,14 +1,17 @@
 package Langertha::Engine::XAI;
 # ABSTRACT: xAI Grok API
-our $VERSION = '0.503';
+our $VERSION = '0.504';
 use Moose;
 use Carp qw( carp croak );
 
 extends 'Langertha::Engine::OpenAIBase';
 
+# StreamUsage: ChatRequest.stream_options.include_usage is in the OpenAPI spec
+# (docs.x.ai/openapi.json, ADR 0038).
 with map { 'Langertha::Role::'.$_ } qw(
   ImageGeneration
   Tools
+  StreamUsage
 );
 
 
@@ -78,7 +81,7 @@ Langertha::Engine::XAI - xAI Grok API
 
 =head1 VERSION
 
-version 0.503
+version 0.504
 
 =head1 SYNOPSIS
 

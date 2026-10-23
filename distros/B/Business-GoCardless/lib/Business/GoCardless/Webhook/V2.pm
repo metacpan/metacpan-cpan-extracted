@@ -22,6 +22,7 @@ extends 'Business::GoCardless::Webhook';
 with 'Business::GoCardless::Utils';
 
 use JSON ();
+use Encode ();
 use Business::GoCardless::Client;
 use Business::GoCardless::Exception;
 use Business::GoCardless::Webhook::Event;
@@ -31,6 +32,23 @@ use Business::GoCardless::Webhook::Event;
     json
     signature
     has_legacy_data
+
+The following attributes are only populated when the object comes from the
+webhooks list endpoint (i.e. L<Business::GoCardless::Pro/webhooks>), and contain
+details of the webhook delivery itself:
+
+    id
+    created_at
+    url
+    request_headers
+    response_code
+    response_body
+    response_body_truncated
+    response_headers
+    response_headers_content_truncated
+    response_headers_count_truncated
+    is_test
+    successful
 
 =cut
 
@@ -44,6 +62,23 @@ has [ qw/
 / ] => (
     is => 'rw',
 	clearer => 1,
+);
+
+has [ qw/
+    id
+    created_at
+    url
+    request_headers
+    response_code
+    response_body
+    response_body_truncated
+    response_headers
+    response_headers_content_truncated
+    response_headers_count_truncated
+    is_test
+    successful
+/ ] => (
+    is => 'rw',
 );
 
 =head1 Operations on a webhook
@@ -75,7 +110,9 @@ has json => (
 
         # defensive decoding
 		my $params;
-		eval { $params = JSON->new->decode( $json ) };
+		# the json is the raw (UTF-8 encoded) request body, as that is what
+		# the signature is generated from
+		eval { $params = JSON->new->utf8->decode( $json ) };
 		$@ && do {
 			$self->clear_events;
 			$self->clear_signature;
@@ -141,6 +178,42 @@ See if the webhook is a legacy (Basic API) webhook
 
 sub is_legacy { 0 }
 
+=head2 retry
+
+Retry the delivery of a webhook, only for webhooks from the webhooks list
+endpoint (see L<Business::GoCardless::Pro/webhooks>). Returns a new
+Webhook::V2 object for the new delivery:
+
+    my $Retried = $Webhook->retry if ! $Webhook->successful;
+
+=cut
+
+sub retry {
+    my ( $self ) = @_;
+
+    my $data = $self->client->api_post(
+        "/webhooks/@{[ $self->id ]}/actions/retry"
+    );
+
+    return ref( $self )->_new_from_api( $self->client,$data->{webhooks} );
+}
+
+# create an object from the webhooks API, which has the details of the
+# delivery as well as the original request
+sub _new_from_api {
+    my ( $class,$client,$data ) = @_;
+
+    return $class->new(
+        client => $client,
+        %{ $data }, # delivery details: id, url, response_code, etc
+        # the signature is of the raw (UTF-8 encoded) request body
+        json   => Encode::encode_utf8( $data->{request_body} ),
+        # load ordering handled by setting _signature rather than signature
+        # signature will be set in the json trigger
+        _signature => $data->{request_headers}{'Webhook-Signature'},
+    );
+}
+
 =head1 CONFIRMING WEBHOOKS
 
 According to the gocardless API docs you should respond once the signature of the
@@ -153,13 +226,13 @@ https://developer.gocardless.com/#response for more information
 
 =head1 AUTHOR
 
-Lee Johnson - C<leejo@cpan.org>
+Lee Johnson - C<lee@payprop.com>
 
 This library is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself. If you would like to contribute documentation,
 features, bug fixes, or anything else then please raise an issue / pull request:
 
-    https://github.com/Humanstate/business-gocardless
+    https://github.com/payprop/business-gocardless
 
 =cut
 

@@ -1,6 +1,6 @@
 package Langertha::Engine::OpenAI;
 # ABSTRACT: OpenAI API
-our $VERSION = '0.503';
+our $VERSION = '0.504';
 use Moose;
 use Carp qw( croak );
 use Langertha::Engine::TranscriptionBase;
@@ -8,11 +8,14 @@ use Langertha::Reasoning::Profile;
 
 extends 'Langertha::Engine::OpenAIBase';
 
+# StreamUsage: stream_options.include_usage is in the chat completions API
+# reference (ADR 0038).
 with map { 'Langertha::Role::'.$_ } qw(
   Embedding
   Transcription
   ImageGeneration
   Tools
+  StreamUsage
 );
 
 
@@ -166,7 +169,7 @@ Langertha::Engine::OpenAI - OpenAI API
 
 =head1 VERSION
 
-version 0.503
+version 0.504
 
 =head1 SYNOPSIS
 

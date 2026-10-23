@@ -4,12 +4,12 @@ use warnings;
 use IO::Socket::INET;
 use IO::Socket::UNIX;
 
-our $host   = $ENV{TEST_MARIADB_HOST}   // '127.0.0.1';
+our $socket = $ENV{TEST_MARIADB_SOCKET};
+our $host   = $ENV{TEST_MARIADB_HOST}   // ($socket ? 'localhost' : '127.0.0.1');
 our $port   = $ENV{TEST_MARIADB_PORT}   // 3306;
 our $user   = $ENV{TEST_MARIADB_USER}   // 'root';
 our $pass   = $ENV{TEST_MARIADB_PASS}   // '';
 our $db     = $ENV{TEST_MARIADB_DB}     // 'test';
-our $socket = $ENV{TEST_MARIADB_SOCKET};
 
 sub server_available {
     if ($socket) {

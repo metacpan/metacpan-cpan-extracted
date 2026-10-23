@@ -134,14 +134,22 @@ sub resources {
 	return @resources;
 }
 
-=head2 is_bill
-
-=head2 is_pre_authorization
-
-=head2 is_subscription
+=pod
 
 Shortcut methods to get the type of data in the webhook, and thus the type of
 objects that will be returned by the call to ->resources
+
+=head2 is_bill
+
+True if the webhook is for bills
+
+=head2 is_pre_authorization
+
+True if the webhook is for pre authorizations
+
+=head2 is_subscription
+
+True if the webhook is for subscriptions
 
 =cut
 
@@ -173,13 +181,13 @@ https://developer.gocardless.com/#response for more information
 
 =head1 AUTHOR
 
-Lee Johnson - C<leejo@cpan.org>
+Lee Johnson - C<lee@payprop.com>
 
 This library is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself. If you would like to contribute documentation,
 features, bug fixes, or anything else then please raise an issue / pull request:
 
-    https://github.com/Humanstate/business-gocardless
+    https://github.com/payprop/business-gocardless
 
 =cut
 

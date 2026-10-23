@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::Screencast;
-$Playwright::Screencast::VERSION = '1.621';
+$Playwright::Screencast::VERSION = '1.641';
 use parent 'Playwright::Base';
 
 sub new {
@@ -22,11 +22,11 @@ sub spec {
     return $Playwright::spec->{'Screencast'}{members};
 }
 
-sub start {
+sub hideOverlays {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'start',
+        command => 'hideOverlays',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -42,21 +42,21 @@ sub showChapter {
     );
 }
 
-sub showOverlays {
+sub start {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'showOverlays',
+        command => 'start',
         object  => $self->{guid},
         type    => $self->{type}
     );
 }
 
-sub stop {
+sub showOverlays {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'stop',
+        command => 'showOverlays',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -72,31 +72,31 @@ sub hideActions {
     );
 }
 
-sub showActions {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'showActions',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub hideOverlays {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'hideOverlays',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
 sub showOverlay {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
         command => 'showOverlay',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub stop {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'stop',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub showActions {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'showActions',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -146,7 +146,7 @@ Playwright::Screencast - Automatically generated class for Playwright::Screencas
 
 =head1 VERSION
 
-version 1.621
+version 1.641
 
 =head1 CONSTRUCTOR
 
@@ -157,11 +157,11 @@ Instead it should be returned to you as the result of calls on Playwright object
 
 =head1 METHODS
 
-=head2 start(@args)
+=head2 hideOverlays(@args)
 
-Execute the Screencast::start playwright routine.
+Execute the Screencast::hideOverlays playwright routine.
 
-See L<https://playwright.dev/docs/api/class-Screencast#Screencast-start> for more information.
+See L<https://playwright.dev/docs/api/class-Screencast#Screencast-hideOverlays> for more information.
 
 =head2 showChapter(@args)
 
@@ -169,17 +169,17 @@ Execute the Screencast::showChapter playwright routine.
 
 See L<https://playwright.dev/docs/api/class-Screencast#Screencast-showChapter> for more information.
 
+=head2 start(@args)
+
+Execute the Screencast::start playwright routine.
+
+See L<https://playwright.dev/docs/api/class-Screencast#Screencast-start> for more information.
+
 =head2 showOverlays(@args)
 
 Execute the Screencast::showOverlays playwright routine.
 
 See L<https://playwright.dev/docs/api/class-Screencast#Screencast-showOverlays> for more information.
-
-=head2 stop(@args)
-
-Execute the Screencast::stop playwright routine.
-
-See L<https://playwright.dev/docs/api/class-Screencast#Screencast-stop> for more information.
 
 =head2 hideActions(@args)
 
@@ -187,23 +187,23 @@ Execute the Screencast::hideActions playwright routine.
 
 See L<https://playwright.dev/docs/api/class-Screencast#Screencast-hideActions> for more information.
 
-=head2 showActions(@args)
-
-Execute the Screencast::showActions playwright routine.
-
-See L<https://playwright.dev/docs/api/class-Screencast#Screencast-showActions> for more information.
-
-=head2 hideOverlays(@args)
-
-Execute the Screencast::hideOverlays playwright routine.
-
-See L<https://playwright.dev/docs/api/class-Screencast#Screencast-hideOverlays> for more information.
-
 =head2 showOverlay(@args)
 
 Execute the Screencast::showOverlay playwright routine.
 
 See L<https://playwright.dev/docs/api/class-Screencast#Screencast-showOverlay> for more information.
+
+=head2 stop(@args)
+
+Execute the Screencast::stop playwright routine.
+
+See L<https://playwright.dev/docs/api/class-Screencast#Screencast-stop> for more information.
+
+=head2 showActions(@args)
+
+Execute the Screencast::showActions playwright routine.
+
+See L<https://playwright.dev/docs/api/class-Screencast#Screencast-showActions> for more information.
 
 =head2 on(@args)
 

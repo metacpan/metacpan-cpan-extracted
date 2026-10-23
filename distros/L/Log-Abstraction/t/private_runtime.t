@@ -46,7 +46,11 @@ sub run_perl {
 }
 
 # Code that reports, one line each, whether a function and a method call
-# to a private sub from main are blocked, then logs through the public API
+# to a private sub from main are blocked, logs through the public API, and
+# reports whether a backend's private sub is blocked and Sub::Private's
+# process-wide mode.  Loading the module must leave that mode at its
+# default, namespace, so other modules' :Private subs are not changed
+# (before 0.41 it was set to enforce for the whole process)
 my $probe = <<'EOF';
 my $f = eval { Log::Abstraction::_level_number('debug'); 1 } ? 'allowed' : $@;
 print 'function: ', ($f =~ /is a private subroutine of Log::Abstraction/ ? 'blocked' : $f), "\n";
@@ -58,6 +62,9 @@ $log->warn('w', { k => 1 });
 $log->{format} = 'json';
 $log->info('i');
 print 'logged: ', scalar(@msgs), "\n";
+my $j = eval { Log::Abstraction::Backend::Journald::_send(); 1 } ? 'allowed' : $@;
+print 'backend: ', ($j =~ /is a private subroutine of Log::Abstraction::Backend::Journald/ ? 'blocked' : $j), "\n";
+print 'mode: ', $Sub::Private::config{mode}, "\n";
 EOF
 
 for my $load ('require Log::Abstraction;', q{eval 'use Log::Abstraction; 1' or die $@;}) {
@@ -70,6 +77,8 @@ for my $load ('require Log::Abstraction;', q{eval 'use Log::Abstraction; 1' or d
 		like($output, qr/^function: blocked$/m, 'private function call is blocked');
 		like($output, qr/^method: blocked$/m, 'private method call is blocked');
 		like($output, qr/^logged: 3$/m, 'the public methods still work');
+		like($output, qr/^backend: blocked$/m, "a backend's private sub is blocked");
+		like($output, qr/^mode: namespace$/m, 'the process-wide mode is left alone');
 		unlike($output, qr/^warning:/m, 'no warnings (e.g. "Too late to run CHECK block")');
 	};
 }
@@ -80,6 +89,8 @@ subtest 'loaded at compile time' => sub {
 	like($output, qr/^function: blocked$/m, 'private function call is blocked');
 	like($output, qr/^method: blocked$/m, 'private method call is blocked');
 	like($output, qr/^logged: 3$/m, 'the public methods still work');
+	like($output, qr/^backend: blocked$/m, "a backend's private sub is blocked");
+	like($output, qr/^mode: namespace$/m, 'the process-wide mode is left alone');
 };
 
 subtest 'loaded through Log::Any::Adapter->set' => sub {

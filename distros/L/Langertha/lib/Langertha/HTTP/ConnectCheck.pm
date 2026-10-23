@@ -1,6 +1,6 @@
 package Langertha::HTTP::ConnectCheck;
 # ABSTRACT: Check that the modules Net::Async::HTTP loads at connect time load
-our $VERSION = '0.503';
+our $VERSION = '0.504';
 use strict;
 use warnings;
 use URI;
@@ -49,7 +49,7 @@ Langertha::HTTP::ConnectCheck - Check that the modules Net::Async::HTTP loads at
 
 =head1 VERSION
 
-version 0.503
+version 0.504
 
 =head1 SYNOPSIS
 

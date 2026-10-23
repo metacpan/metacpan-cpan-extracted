@@ -15,7 +15,7 @@ sub compare_p {
         "diff $exp_p $got_p"
     );
     if ( $exp_bytes ne $got_bytes ) {
-        if ( $ENV{DEVELOPPER} ) {
+        if ( $ENV{DEVELOPER} ) {
             dump_p( $exp_p, "$exp_p.txt" );
             dump_p( $got_p, "$got_p.txt" );
             system "start \"\" WinMergeU.exe $exp_p.txt $got_p.txt";

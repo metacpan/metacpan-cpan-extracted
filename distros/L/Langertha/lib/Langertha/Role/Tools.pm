@@ -1,6 +1,6 @@
 package Langertha::Role::Tools;
 # ABSTRACT: Role for MCP tool calling support
-our $VERSION = '0.503';
+our $VERSION = '0.504';
 use Moose::Role;
 use Future::AsyncAwait;
 use Carp qw( croak );
@@ -260,8 +260,22 @@ sub format_tools {
 }
 
 
+# The parsed response body response_tool_calls and response_text_content read.
+# A Langertha::Response (what response_call returns for most engines) is read
+# through its raw body; any other blessed value is no body and croaks instead of
+# answering empty -- since 0.503 (k341) both went through ToolCall->locate,
+# which silently answered [] / '' for everything but a plain HASH.
+sub _body_data {
+  my ( $self, $data, $method ) = @_;
+  return $data unless blessed $data;
+  return $data->raw if $data->isa('Langertha::Response') && $data->has_raw;
+  croak ref($self)."->$method: expects the parsed response body (a plain HASH)"
+    . ( $data->isa('Langertha::Response') ? ', this Langertha::Response carries no raw body' : ', got a '.ref($data) );
+}
+
 sub response_tool_calls {
   my ( $self, $data ) = @_;
+  $data = $self->_body_data( $data, 'response_tool_calls' );
   my $fmt = $self->tool_wire_format;
   # The calls tool_loop_response would run, as raw structures -- karr k341.
   # Hermes: the calls of chat_response's reply (native ones, else the lift),
@@ -298,6 +312,12 @@ sub _raw_tool_calls {
 
 sub extract_tool_call {
   my ( $self, $tc ) = @_;
+  # A Langertha::ToolCall (what Response->tool_calls holds) is already parsed;
+  # any other object is no wire structure -- it used to answer (undef, undef).
+  if ( blessed $tc ) {
+    return ( $tc->name, $tc->arguments ) if $tc->isa('Langertha::ToolCall');
+    croak ref($self)."->extract_tool_call: expects a raw tool-call structure or a Langertha::ToolCall, got a ".ref($tc);
+  }
   my $fmt = $self->tool_wire_format;
   return ( $tc->{name}, $tc->{arguments} ) if $fmt eq 'hermes';
   my $call = Langertha::ToolCall->from_fmt( $fmt, $tc );
@@ -307,6 +327,7 @@ sub extract_tool_call {
 
 sub response_text_content {
   my ( $self, $data ) = @_;
+  $data = $self->_body_data( $data, 'response_text_content' );
   # The text chat_f and the tool loops answer (Gemini thought parts out,
   # content-chunk lists joined, think tags filtered), read by the engine's
   # chat_response. A body chat_response rejects falls back to the plain
@@ -422,41 +443,27 @@ sub _result_payload {
   );
 }
 
-# Tool-result images ride natively (ToolResult's image_input option; the
-# responses, gemini and anthropic wires have a form for it, karr k344, k359)
-# only when the selected model sees images (image_input, ADR 0019) and the
-# wire takes them for that model (_tool_result_images_on_wire). The tool loop
-# sends what an MCP server returned, not what the caller chose, so a model that
-# makes no claim keeps the k336 placeholder.
-sub _tool_result_images_on_wire { 1 }
-
-sub _tool_result_image_opts {
+# Tool-result images and PDFs ride natively (ToolResult's image_input /
+# native_pdf options, karr k344, k359, k361) exactly when the engine claims
+# tool_result_images / tool_result_pdf for the selected model (ADR 0039, karr
+# k380): the public capability is the single source of truth, so what
+# supports() tells a caller and what goes on the wire cannot disagree -- also on
+# a forced tool_wire_format. The registry keeps the flags only on a wire with a
+# native form (ToolResult->carries_native) and, where that form needs vision,
+# for an image_input model (ToolResult->native_needs_vision); the engines add
+# their own gates (Gemini 3 and later, AKIAnthropic, the anthropic source
+# blocks). Both options are passed explicitly: native_pdf defaults to true on
+# the anthropic wire (a bare to('anthropic') keeps its document block), so a
+# missing claim must say 0 there. The tool loop sends what an MCP server
+# returned, not what the caller chose, so without a claim an image or PDF keeps
+# the k336 placeholder.
+sub _tool_result_media_opts {
   my ( $self ) = @_;
-  return () unless $self->_tool_result_images_on_wire
-    && $self->can('supports') && $self->supports('image_input');
-  return ( image_input => 1 );
-}
-
-# Tool-result PDFs ride natively (ToolResult's native_pdf option, karr k361)
-# only where the wire documents a PDF inside a tool result for the selected
-# model (_tool_result_pdf_on_wire: OpenAIResponses' input_file, Gemini 3's
-# functionResponse.parts) and the model claims image_input: both providers
-# document PDF understanding as a vision feature (OpenAI parses page text and
-# page images and names vision models; Gemini reads documents through its
-# vision), so a text-only model keeps the k336 placeholder rather than risk a
-# 400 mid-loop. Off by default: every other wire (openai, ollama, hermes,
-# Perplexity's Agent API, older Gemini) has no documented form. The anthropic
-# wire's PDF document block is decided by _tool_result_source_blocks_on_wire
-# (k326, k364) and does not read this, nor image_input (k371): the Anthropic
-# dialect extracts PDF text without vision (MiniMax-M2.7, text-only, read one
-# live 2026-09-30), so the block is a wire fact, not a model question.
-sub _tool_result_pdf_on_wire { 0 }
-
-sub _tool_result_pdf_opts {
-  my ( $self ) = @_;
-  return () unless $self->_tool_result_pdf_on_wire
-    && $self->can('supports') && $self->supports('image_input');
-  return ( native_pdf => 1 );
+  my $claims = sub { $self->can('supports') && $self->supports( $_[0] ) ? 1 : 0 };
+  return (
+    image_input => $claims->('tool_result_images'),
+    native_pdf  => $claims->('tool_result_pdf'),
+  );
 }
 
 # Whether the anthropic wire takes Anthropic's source blocks (document,
@@ -464,7 +471,10 @@ sub _tool_result_pdf_opts {
 # documents them; a /anthropic shim that rejects them sets this to 0, and
 # ToolResult then sends a text document as a text block, a PDF as the k336
 # placeholder and a native document / search_result as its text. Wire truth,
-# not a model question, so it is a private predicate and not a capability flag.
+# not a model question, so it stays a private predicate; the Anthropic family
+# derives its public tool_result_pdf flag from it (AnthropicBase, ADR 0039; the
+# PDF document block then also needs that flag), and it alone governs text
+# documents and search_result blocks.
 sub _tool_result_source_blocks_on_wire { 1 }
 
 # A native document / search_result is the caller's choice for the Anthropic
@@ -487,7 +497,7 @@ sub format_tool_results {
 
   if ( $fmt eq 'anthropic' ) {
     my $source_blocks = $self->_tool_result_source_blocks_on_wire;
-    my @opts = ( $self->_tool_result_image_opts,
+    my @opts = ( $self->_tool_result_media_opts,
       ( $source_blocks ? () : ( source_blocks => 0 ) ) );
     my @blocks = map {
       my $result = Langertha::ToolResult->new(
@@ -505,7 +515,7 @@ sub format_tool_results {
   }
 
   if ( $fmt eq 'gemini' ) {
-    my @opts  = ( $self->_tool_result_image_opts, $self->_tool_result_pdf_opts );
+    my @opts  = ( $self->_tool_result_media_opts );
     my @parts = map {
       Langertha::ToolResult->new(
         name    => _result_call_name( $_->{tool_call} ),
@@ -569,7 +579,7 @@ sub format_tool_results {
     # the Agent input schema on Perplexity (karr k213, ADR 0020).
     @echo = map { $self->_responses_echo_item($_) } @echo
       if $self->can('_responses_echo_item');
-    my @opts = ( $self->_tool_result_image_opts, $self->_tool_result_pdf_opts );
+    my @opts = ( $self->_tool_result_media_opts );
     return (
       @echo,
       map {
@@ -870,7 +880,7 @@ Langertha::Role::Tools - Role for MCP tool calling support
 
 =head1 VERSION
 
-version 0.503
+version 0.504
 
 =head1 SYNOPSIS
 
@@ -999,7 +1009,9 @@ token limit are still returned; L</tool_loop_calls> drops them.
     my ($name, $args) = $engine->extract_tool_call($tool_call);
 
 Extracts the tool name and decoded argument HashRef from a single raw tool-call
-structure, via L<Langertha::ToolCall/from_fmt>.
+structure, via L<Langertha::ToolCall/from_fmt>. A L<Langertha::ToolCall> (an
+element of C<< $response->tool_calls >>) is accepted as it is; any other object
+croaks.
 
 =head2 response_text_content
 
@@ -1040,36 +1052,45 @@ Each result's C<tool_call> may be a L<Langertha::ToolCall> (what the tool
 loops pass) or the raw structure L</response_tool_calls> located.
 
 An image in a tool's output reaches the model as an image, not as a text
-placeholder, on the C<responses> wire (C<input_image> parts in
-C<function_call_output.output>), on Gemini 3 (C<functionResponse.parts>) and on
-the C<anthropic> wire (an C<image> block in the C<tool_result>), when
-C<< supports('image_input') >> is true for the configured model; see
-L<Langertha::ToolResult/DESCRIPTION>. The C<responses> and Gemini forms are
+placeholder, exactly when C<< supports('tool_result_images') >> is true for the
+configured model (L<Langertha::Role::ToolResultImages>, ADR 0039): on the
+C<responses> wire as C<input_image> parts in C<function_call_output.output>, on
+Gemini 3 and later as C<functionResponse.parts>, on the C<anthropic> wire as an
+C<image> block in the C<tool_result>; see L<Langertha::ToolResult/DESCRIPTION>.
+The flag needs C<image_input>. The C<responses> and Gemini forms are
 documentation-derived, not live-verified, and so is the C<anthropic> form on
 the C</anthropic> shims (Kimi documents it, MiniMax does not say).
-L<Langertha::Engine::AKIAnthropic> keeps the placeholder for every model: its
-shim answers a C<tool_result> image without error, but the model does not see
-it.
+L<Langertha::Engine::AKIAnthropic> never claims it: its shim answers a
+C<tool_result> image without error, but the model does not see it.
 
 A PDF in a tool's output (an embedded resource blob, C<application/pdf>)
-reaches the model as a file, not as a text placeholder, on
-L<Langertha::Engine::OpenAIResponses> (an C<input_file> part in
-C<function_call_output.output>) and on Gemini 3 (C<functionResponse.parts>),
-when C<< supports('image_input') >> is true for the configured model: both
-providers document PDF understanding as a vision feature. Both forms are
-documentation-derived, not live-verified. L<Langertha::Engine::Perplexity>
-keeps the placeholder (its Agent API documents only text and image parts
-there), as do the OpenAI chat, Ollama and Hermes wires and Gemini before 3.
+reaches the model as a document, not as a text placeholder, exactly when
+C<< supports('tool_result_pdf') >> is true (L<Langertha::Role::ToolResultPDF>):
+on L<Langertha::Engine::OpenAIResponses> as an C<input_file> part in
+C<function_call_output.output> and on Gemini 3 and later as
+C<functionResponse.parts>, both only for a model that claims C<image_input>
+(both providers document PDF understanding as a vision feature; both forms are
+documentation-derived, not live-verified), and on the C<anthropic> wire as the
+C<document> block below. L<Langertha::Engine::Perplexity> keeps the placeholder
+(its Agent API documents only text and image parts there), as do the OpenAI
+chat, Ollama and Hermes wires and Gemini before 3.
 
 On the C<anthropic> wire an embedded text resource or PDF goes out as a
 C<document> block, except on L<Langertha::Engine::AKIAnthropic>,
 L<Langertha::Engine::MoonshotAnthropic> and (conservatively, not live-verified)
 L<Langertha::Engine::LMStudioAnthropic>, whose C</anthropic> endpoints take no
 C<document> or C<search_result> in a C<tool_result>: there the text goes out as
-a C<text> block and a PDF as a placeholder. The PDF C<document> block elsewhere
-does not depend on C<image_input> (k371). An Anthropic-native C<document> or
-C<search_result> block in a tool's output becomes a C<text> block with its text
-there too, and the engine warns once.
+a C<text> block and a PDF as a placeholder, and C<tool_result_pdf> is false. The
+PDF C<document> block elsewhere does not depend on C<image_input> (k371), but it
+does follow C<tool_result_pdf>: an engine forced onto the C<anthropic> wire
+with C<tool_wire_format> that does not claim it sends the placeholder. An
+Anthropic-native C<document> or C<search_result> block in a tool's output
+becomes a C<text> block with its text there too, and the engine warns once.
+
+The two flags are evaluated on the engine's current C<tool_wire_format>, so
+forcing a wire changes them: an engine without the capability roles sends the
+placeholder on any wire, and on the C<responses> and C<gemini> wires a PDF
+needs C<image_input> whichever engine is forced there.
 
 =head2 tool_loop_response
 

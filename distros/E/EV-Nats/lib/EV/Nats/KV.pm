@@ -1,6 +1,8 @@
 package EV::Nats::KV;
 use strict;
 use warnings;
+our $VERSION = '0.06';
+use EV;
 use EV::Nats::JetStream;
 
 sub new {
@@ -10,6 +12,7 @@ sub new {
     # The bucket name is interpolated into subjects verbatim; validate (nats.go rule) up front.
     die "invalid KV bucket name '$bucket'" unless $bucket =~ /\A[a-zA-Z0-9_-]+\z/;
     my $timeout = delete $opts{timeout} || $js->{timeout};
+    warn "EV::Nats::KV::new: unknown option '$_'" for keys %opts;
     bless {
         js      => $js,
         bucket  => $bucket,
@@ -39,7 +42,7 @@ sub get {
             my ($resp, $err) = @_;
             if ($err) {
                 # 10037 = "no message found" -- treat as missing key
-                return $cb->(undef, undef) if $err =~ /no message found|10037/;
+                return $cb->(undef, undef) if $err =~ /no message found|\(code 10037\)/;
                 return $cb->(undef, $err);
             }
             my $msg = $resp->{message};
@@ -66,12 +69,9 @@ sub put {
     });
 }
 
-sub create {
-    my ($self, $key, $value, $cb) = @_;
-    _check_key($key);
+sub _expect_publish {
+    my ($self, $subj, $headers, $value, $cb, $what) = @_;
     my $nats = $self->{js}{nats};
-    my $headers = "NATS/1.0\r\nNats-Expected-Last-Subject-Sequence: 0\r\n\r\n";
-    my $subj = '$KV.' . $self->{bucket} . '.' . $key;
 
     if ($cb) {
         my $inbox = $nats->new_inbox;
@@ -81,17 +81,57 @@ sub create {
             if ($timer) { $timer->stop; undef $timer; }
             my ($ack, $derr) = EV::Nats::JetStream::decode_json_or_error($payload);
             return $cb->(undef, $derr) if $derr;
-            return $cb->(undef, $ack->{error}{description}) if $ack->{error};
+            return $cb->(undef, "$ack->{error}{description} (code $ack->{error}{code})")
+                if $ack->{error};
             $cb->($ack->{seq}, undef);
         }, 1);
-        $timer = EV::timer($self->{timeout} / 1000.0, 0, sub {
-            $nats->unsubscribe($sid);
-            $cb->(undef, "create timeout");
+        $timer = $nats->_timer($self->{timeout} / 1000.0, 0, sub {
+            eval { $nats->unsubscribe($sid) };
+            $cb->(undef, "$what timeout");
         });
-        $nats->hpublish($subj, $headers, $value, $inbox);
+        if (!eval { $nats->hpublish($subj, $headers, $value, $inbox); 1 }) {
+            my $err = $@;
+            $timer->stop;
+            eval { $nats->unsubscribe($sid) };
+            die $err;
+        }
     } else {
         $nats->hpublish($subj, $headers, $value);
     }
+}
+
+sub create {
+    my ($self, $key, $value, $cb) = @_;
+    _check_key($key);
+    my $subj = '$KV.' . $self->{bucket} . '.' . $key;
+    $self->_expect_publish($subj,
+        "NATS/1.0\r\nNats-Expected-Last-Subject-Sequence: 0\r\n\r\n",
+        $value, $cb ? sub {
+            my ($seq, $err) = @_;
+            return $cb->($seq, $err) unless $err && $err =~ /wrong last sequence/i;
+            $self->{js}->_json_api('STREAM.MSG.GET.' . $self->{stream},
+                { last_by_subj => $subj }, sub {
+                    my ($resp, $read_err) = @_;
+                    return $cb->(undef, $read_err) if $read_err;
+                    my $msg = $resp->{message};
+                    return $cb->(undef, $err)
+                        unless EV::Nats::JetStream::msg_is_tombstone($msg);
+                    $self->_expect_publish($subj,
+                        "NATS/1.0\r\nNats-Expected-Last-Subject-Sequence: $msg->{seq}\r\n\r\n",
+                        $value, $cb, 'create');
+                });
+        } : undef, 'create');
+}
+
+sub update {
+    my ($self, $key, $value, $rev, $cb) = @_;
+    _check_key($key);
+    die "invalid KV revision '" . ($rev // '') . "'"
+        unless defined $rev && $rev =~ /\A[1-9][0-9]*\z/;
+    my $subj = '$KV.' . $self->{bucket} . '.' . $key;
+    $self->_expect_publish($subj,
+        "NATS/1.0\r\nNats-Expected-Last-Subject-Sequence: $rev\r\n\r\n",
+        $value, $cb, 'update');
 }
 
 sub delete {
@@ -103,8 +143,7 @@ sub delete {
     my $headers = "NATS/1.0\r\nKV-Operation: DEL\r\n\r\n";
     my $subj = '$KV.' . $self->{bucket} . '.' . $key;
     my $nats = $self->{js}{nats};
-    $nats->hpublish($subj, $headers, '');
-    $nats->flush(sub { $cb->(defined $_[0] ? undef : 1, $_[0]) }) if $cb;
+    _fenced_publish($nats, $subj, $headers, $cb);
 }
 
 sub purge {
@@ -113,8 +152,22 @@ sub purge {
     my $headers = "NATS/1.0\r\nKV-Operation: PURGE\r\nNats-Rollup: sub\r\n\r\n";
     my $subj = '$KV.' . $self->{bucket} . '.' . $key;
     my $nats = $self->{js}{nats};
-    $nats->hpublish($subj, $headers, '');
-    $nats->flush(sub { $cb->(defined $_[0] ? undef : 1, $_[0]) }) if $cb;
+    _fenced_publish($nats, $subj, $headers, $cb);
+}
+
+# Report publish and flush failures through the supplied callback.
+sub _fenced_publish {
+    my ($nats, $subj, $headers, $cb) = @_;
+    return $nats->hpublish($subj, $headers, '') unless $cb;
+    my $ok = eval {
+        $nats->hpublish($subj, $headers, '');
+        $nats->flush(sub { $cb->(defined $_[0] ? undef : 1, $_[0]) });
+        1;
+    };
+    return if $ok;
+    (my $err = $@ || 'not connected') =~ s/ at \S+ line \d+.*//s;
+    $err =~ s/\n\z//;
+    my $t; $t = $nats->_timer(0, 0, sub { undef $t; $cb->(undef, $err) });
 }
 
 sub keys {
@@ -139,6 +192,8 @@ sub keys {
 sub watch {
     my ($self, $key_pattern, $cb) = @_;
     $key_pattern //= '>';
+    die "invalid KV watch pattern '$key_pattern'"
+        if !length $key_pattern || $key_pattern =~ /\s/;
     my $subj = '$KV.' . $self->{bucket} . '.' . $key_pattern;
     return $self->{js}{nats}->subscribe($subj, sub {
         my ($subject, $payload, $reply, $headers) = @_;
@@ -233,6 +288,9 @@ allowed, and deletes denied (purge tombstones are used instead).
 This module wraps that convention: C<put>/C<get> become single calls
 that hide the underlying C<js_publish> + C<STREAM.MSG.GET> dance.
 
+Keys must match C<[-/_=.a-zA-Z0-9]+> without leading or trailing
+dots, and are validated up front.
+
 =head1 METHODS
 
 All callbacks fire on the L<EV> loop, not synchronously.
@@ -242,7 +300,8 @@ All callbacks fire on the L<EV> loop, not synchronously.
     new(js => $js, bucket => $name, [timeout => $ms])
 
 The bucket need not exist yet; call L</create_bucket> first to
-provision it. C<timeout> defaults to the timeout of C<$js>.
+provision it. C<timeout> defaults to the timeout of C<$js>. The
+bucket name must match C<[a-zA-Z0-9_-]+>.
 
 =head2 get
 
@@ -261,11 +320,19 @@ the JetStream sequence number assigned by the server.
 
 =head2 create
 
-    create($key, $value, $cb)
+    create($key, $value, [$cb])
 
-Like C<put>, but only succeeds if C<$key> does not yet exist. Uses
-C<Nats-Expected-Last-Subject-Sequence: 0>; concurrent creators see
-a wrong-last-sequence error from the server. Callback: C<($seq, $err)>.
+Like C<put>, but only succeeds if C<$key> is missing. With a callback,
+deleted/purged keys can be recreated using the tombstone's revision;
+concurrent creators see a wrong-last-sequence error. Callback: C<($seq, $err)>.
+Without C<$cb> the headered publish is fire-and-forget.
+
+=head2 update
+
+    update($key, $value, $rev, [$cb])
+
+Like C<put>, but only succeeds if C<$key>'s current revision is
+C<$rev> (compare-and-swap). Callback: C<($seq, $err)>.
 
 =head2 delete
 
@@ -274,7 +341,8 @@ a wrong-last-sequence error from the server. Callback: C<($seq, $err)>.
 Mark C<$key> as deleted by publishing a C<KV-Operation: DEL> tombstone,
 followed by a C<flush> fence so a subsequent C<get> won't race the
 publish. Callback: C<($ok, $err)>; C<$err> is set if the connection
-dropped before the PONG arrived.
+dropped before the PONG arrived, or if the client is not currently
+connected.
 
 =head2 purge
 
@@ -282,7 +350,8 @@ dropped before the PONG arrived.
 
 Like C<delete>, but emits C<Nats-Rollup: sub> too -- the prior history
 of C<$key> is rolled up and replaced by the tombstone, freeing storage.
-Callback: C<($ok, $err)>.
+Callback: C<($ok, $err)>; C<$err> is set if the client is not
+currently connected.
 
 =head2 keys
 
@@ -297,9 +366,11 @@ Tombstoned keys are not filtered out -- check with C<get> if needed.
 
 Subscribe to live changes. C<$pattern> is a NATS subject suffix relative
 to the bucket (e.g. C<E<gt>> for all keys, C<app.E<gt>> for everything
-under C<app.>). Callback receives C<($key, $value, $op)> where C<$op>
+under C<app.>); it must be non-empty and contain no whitespace.
+Callback receives C<($key, $value, $op)> where C<$op>
 is C<PUT>, C<DEL>, or C<PURGE>. Returns the underlying subscription
-id; pass to L<EV::Nats/unsubscribe> to stop.
+id; pass to L<EV::Nats/unsubscribe> to stop. Resubscribes on
+reconnect; updates published while disconnected are missed.
 
 =head2 create_bucket
 

@@ -64,6 +64,7 @@ has [ qw/
 
     pending
     paid
+    bounced
 
     if ( $Payout->paid ) {
         ...
@@ -73,16 +74,29 @@ has [ qw/
 
 sub pending     { return shift->status eq 'pending' }
 sub paid        { return shift->status eq 'paid' }
+sub bounced     { return shift->status eq 'bounced' }
+
+=head1 Operations on a payout
+
+=head2 update
+
+Update the payout's metadata (Pro API only), returns the updated Payout object:
+
+    $Payout->update( metadata => { ... } );
+
+=cut
+
+sub update { shift->_update( @_ ); }
 
 =head1 AUTHOR
 
-Lee Johnson - C<leejo@cpan.org>
+Lee Johnson - C<lee@payprop.com>
 
 This library is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself. If you would like to contribute documentation,
 features, bug fixes, or anything else then please raise an issue / pull request:
 
-    https://github.com/Humanstate/business-gocardless
+    https://github.com/payprop/business-gocardless
 
 =cut
 

@@ -14,13 +14,13 @@ require "$FindBin::Bin/test_setup.pl";
 my $s_off = Template::Sluz->new(auto_escape => 0);
 my $s_on  = Template::Sluz->new(auto_escape => 1);
 
-$_->assign('name'        , 'Scott')                     for ($s_off, $s_on);
-$_->assign('xss'         , '<script>alert(1)</script>') for ($s_off, $s_on);
-$_->assign('safe_html'   , '<b>bold</b>')               for ($s_off, $s_on);
-$_->assign('nums'        , [1, 2, 3])                   for ($s_off, $s_on);
-$_->assign('hashref'     , {a => '<tag>'})              for ($s_off, $s_on);
-$_->assign('empty_string', '')                          for ($s_off, $s_on);
-$_->assign('zero'        , 0)                           for ($s_off, $s_on);
+$_->assign('name'        , 'Scott')                     foreach ($s_off, $s_on);
+$_->assign('xss'         , '<script>alert(1)</script>') foreach ($s_off, $s_on);
+$_->assign('safe_html'   , '<b>bold</b>')               foreach ($s_off, $s_on);
+$_->assign('nums'        , [1, 2, 3])                   foreach ($s_off, $s_on);
+$_->assign('hashref'     , {a => '<tag>'})              foreach ($s_off, $s_on);
+$_->assign('empty_string', '')                          foreach ($s_off, $s_on);
+$_->assign('zero'        , 0)                           foreach ($s_off, $s_on);
 
 # ---------------------------------------------------------------------------
 # auto_escape => 0 — everything raw (existing behaviour)
@@ -73,5 +73,20 @@ is($s_on->parse_string('{if $flag}{$payload|noescape}{/if}'), '<img src=x>'     
 $s_on->assign('items_hash', {one => '<1>', two => '<2>'});
 
 is($s_on->parse_string('{foreach $items_hash as $v}{$v}{/foreach}'), '&lt;1&gt;&lt;2&gt;', 'on: hash foreach sorted escaped');
+
+# ---------------------------------------------------------------------------
+# Expression blocks are not auto-escaped
+# ---------------------------------------------------------------------------
+is($s_on->parse_string('{$zero + 3}')              , '3'                                     , 'on: arithmetic expression not escaped');
+is($s_on->parse_string('{$xss . "!"}')             , '<script>alert(1)</script>!'           , 'on: concat expression bypasses auto-escape');
+is($s_on->parse_string('{$xss|escape}')            , '&lt;script&gt;alert(1)&lt;/script&gt;', 'on: sanity - variable block still escaped');
+
+# Ported from PHP Auto Escape #5, #10-11 - raw/noescape and default escaping
+is($s_on->parse_string('{$xss|raw}')                         , '<script>alert(1)</script>', 'on: raw alias bypass (PHP compat)');
+is($s_on->parse_string('{$empty_string|default:"<b>x</b>"}') , '&lt;b&gt;x&lt;/b&gt;'     , 'on: default value is escaped');
+is($s_on->parse_string('{$bogus_var|default:"<b>...</b>"}')  , '&lt;b&gt;...&lt;/b&gt;'   , 'on: default escapes even when var empty');
+is($s_on->parse_string('{$bogus_var|default:"<b>"|noescape}'), '<b>'                      , 'on: default with noescape bypass');
+is($s_on->parse_string('{$bogus_var|default:"<b>"|raw}')     , '<b>'                      , 'on: default with raw bypass');
+is($s_on->parse_string('{$bogus_var|default:"a"|uc}')        , 'A'                        , 'on: default chained with uc under auto-escape');
 
 done_testing();

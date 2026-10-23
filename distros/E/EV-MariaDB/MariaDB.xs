@@ -36,6 +36,8 @@ enum ev_mariadb_state {
     STATE_STMT_PREPARE,     /* boundary: states >= here block query queueing */
     STATE_STMT_EXECUTE,
     STATE_STMT_STORE,
+    STATE_STMT_NEXT_RESULT,
+    STATE_STMT_DRAIN_RESULT,
     STATE_STMT_CLOSE,
     STATE_STMT_RESET,
     STATE_STMT_SEND_LONG_DATA,
@@ -71,12 +73,13 @@ struct ev_mariadb_s {
     MYSQL_STMT  *op_stmt;
     ev_mariadb_stmt_t *op_stmt_ctx;  /* per-stmt wrapper for bind_params cleanup */
     ev_mariadb_stmt_t *stmt_list;    /* all allocated stmt wrappers */
+    AV           *result_args;
     IV next_stmt_id;   /* monotonic counter for statement handle ids */
     MYSQL       *op_conn_ret;
     my_bool      op_bool_ret;
     MYSQL_ROW    op_row;        /* for streaming fetch_row result */
     SV          *stream_cb;     /* streaming per-row callback */
-    char        *op_data_ptr;   /* copied data buffer for send_long_data */
+    char        *op_data_ptr;   /* copied buffer for in-flight op (send_long_data, prepare/query_stream SQL) */
 
     SV *on_connect;
     SV *on_error;
@@ -110,10 +113,13 @@ struct ev_mariadb_s {
     char *pending_password;
     char *pending_database;
     char *pending_charset;
+
+    int deferred_connect;    /* sync handshake completion pending on timer */
+    unsigned int finish_gen; /* bumped by finish(), read by reset() */
 };
 
 struct ev_mariadb_cb_s {
-    SV          *cb;
+    SV          *cb;            /* owned CV, independent of the caller's scalar */
     ngx_queue_t  queue;
 };
 
@@ -135,6 +141,7 @@ struct ev_mariadb_stmt_s {
 
 #define MAX_PIPELINE_DEPTH 64
 #define MAX_FREELIST_DEPTH 64
+#define MAX_RECANCEL_ROUNDS 8
 
 #define COPY_ERROR(buf, src) do { \
     strncpy((buf), (src), sizeof(buf) - 1); \
@@ -197,6 +204,9 @@ static AV*  build_field_names(MYSQL *conn, MYSQL_FIELD *fields, unsigned int nco
 static void on_real_query_done(ev_mariadb_t *self);
 static void on_stream_fetch_done(ev_mariadb_t *self);
 static void on_close_done(ev_mariadb_t *self);
+static void drain_stmt_results(ev_mariadb_t *self);
+static void on_stmt_next_result_done(ev_mariadb_t *self);
+static void on_stmt_drain_store_done(ev_mariadb_t *self);
 
 static void maybe_pipeline(ev_mariadb_t *self) {
     if (self->state != STATE_IDLE) return;
@@ -289,9 +299,20 @@ static void push_send(ev_mariadb_t *self, const char *sql, STRLEN sql_len, SV *c
     s = alloc_send();
     s->sql = sql_copy;
     s->sql_len = (unsigned long)sql_len;
-    s->cb = SvREFCNT_inc(cb);
+    s->cb = SvREFCNT_inc(SvRV(cb));
     ngx_queue_insert_tail(&self->send_queue, &s->queue);
     self->pending_count++;
+}
+
+/* Copy len bytes plus NUL for an async _start call: Perl temps die when the
+   calling statement ends, but the libmariadb fiber may re-read the buffer
+   from _cont (queries larger than the net buffer suspend mid-send). */
+static char *dup_bytes(const char *src, STRLEN len) {
+    char *p;
+    Newx(p, len + 1, char);
+    Copy(src, p, len, char);
+    p[len] = '\0';
+    return p;
 }
 
 static void drain_queues_silent(ev_mariadb_t *self) {
@@ -388,11 +409,11 @@ static int check_destroyed(ev_mariadb_t *self) {
 static void emit_error(ev_mariadb_t *self, const char *msg) {
     SV *cb;
     if (NULL == self->on_error) return;
-    cb = sv_2mortal(SvREFCNT_inc_simple_NN(self->on_error));
 
     dSP;
     ENTER;
     SAVETMPS;
+    cb = sv_2mortal(SvREFCNT_inc_simple_NN(self->on_error));
     PUSHMARK(SP);
     XPUSHs(sv_2mortal(newSVpv(msg, 0)));
     PUTBACK;
@@ -424,6 +445,15 @@ static SV* pop_cb(ev_mariadb_t *self) {
     release_cbt(cbt);
 
     return cb;
+}
+
+static void save_result_args(ev_mariadb_t *self, SV *cb, SV **arg, SV **last) {
+    ev_mariadb_cb_t *cbt = alloc_cbt();
+    self->result_args = newAV();
+    while (++arg <= last) av_push(self->result_args, SvREFCNT_inc(*arg));
+    cbt->cb = cb;
+    ngx_queue_insert_head(&self->cb_queue, &cbt->queue);
+    self->pending_count++;
 }
 
 /* Invoke a callback with (undef, errmsg). Decrements cb refcount. */
@@ -473,15 +503,44 @@ static void invoke_cb(SV *cb) {
     SvREFCNT_dec(cb);
 }
 
-/* Returns 1 if self was freed (caller must not touch self). */
+static int deliver_saved_result(ev_mariadb_t *self) {
+    AV *args = self->result_args;
+    SV *cb = pop_cb(self);
+    self->result_args = NULL;
+    if (cb) {
+        dSP;
+        SSize_t i;
+        self->callback_depth++;
+        ENTER;
+        SAVETMPS;
+        sv_2mortal((SV *)args);
+        PUSHMARK(SP);
+        for (i = 0; i <= av_len(args); i++) XPUSHs(*av_fetch(args, i, 0));
+        PUTBACK;
+        invoke_cb(cb);
+        FREETMPS;
+        LEAVE;
+        self->callback_depth--;
+        return check_destroyed(self);
+    }
+    SvREFCNT_dec((SV *)args);
+    return 0;
+}
+
+/* Returns 1 if self was freed or completion was deferred. */
 static int deliver_result(ev_mariadb_t *self) {
     MYSQL_RES *res = self->op_result;
     SV *cb = pop_cb(self);
+    int deferred = 0;
 
     if (cb == NULL) {
         if (res) {
             mysql_free_result(res);
             self->op_result = NULL;
+        }
+        if (self->conn && mysql_more_results(self->conn)) {
+            drain_multi_result(self);
+            return 1;
         }
         return 0;
     }
@@ -538,14 +597,28 @@ static int deliver_result(ev_mariadb_t *self) {
             PUSHs(sv_2mortal(newSVuv((UV)affected)));
         }
 
-        PUTBACK;
-        invoke_cb(cb);
+        if (mysql_more_results(self->conn)) {
+            SSize_t mark = TOPMARK;
+            save_result_args(self, cb, PL_stack_base + mark, SP);
+            SP = PL_stack_base + mark;
+            (void)POPMARK;
+            deferred = 1;
+            PUTBACK;
+        } else {
+            PUTBACK;
+            invoke_cb(cb);
+        }
         FREETMPS;
         LEAVE;
     }
 
     self->callback_depth--;
-    return check_destroyed(self);
+    if (check_destroyed(self)) return 1;
+    if (deferred) {
+        drain_multi_result(self);
+        return 1;
+    }
+    return 0;
 }
 
 /* Returns 1 if self was freed. */
@@ -589,16 +662,27 @@ static int deliver_value(ev_mariadb_t *self, SV *val) {
 }
 
 static void cleanup_connection(ev_mariadb_t *self) {
-    int saved_fd = self->fd;
+    int saved_fd = self->conn ? (int)mysql_get_socket(self->conn) : -1;
     int is_fork = IS_FORKED(self);
 
     stop_reading(self);
     stop_writing(self);
     stop_timer(self);
     self->fd = -1;
+    /* Interrupt network waits only when closing an unfinished operation. */
+    if (!is_fork && saved_fd >= 0 &&
+        (self->state != STATE_IDLE || self->send_count || self->op_result ||
+         self->draining || self->result_args))
+        shutdown(saved_fd, SHUT_RDWR);
     self->state = STATE_IDLE;
     self->send_count = 0;
     self->draining = 0;
+    self->deferred_connect = 0;
+
+    if (self->result_args) {
+        SvREFCNT_dec((SV *)self->result_args);
+        self->result_args = NULL;
+    }
 
     if (self->op_data_ptr) {
         Safefree(self->op_data_ptr);
@@ -635,8 +719,6 @@ static void cleanup_connection(ev_mariadb_t *self) {
         self->op_stmt = NULL;
         self->conn = NULL;
     } else {
-        if (self->op_result && saved_fd >= 0)
-            shutdown(saved_fd, SHUT_RDWR);
         /* Close op_stmt if not tracked in stmt_list (e.g., in-flight prepare) */
         if (self->op_stmt) {
             mysql_stmt_close(self->op_stmt);
@@ -682,6 +764,18 @@ static void cancel_pending(ev_mariadb_t *self, const char *errmsg) {
         invoke_error_cb(cb, errmsg);
     }
 
+    /* cancel sent-but-not-received */
+    while (!ngx_queue_empty(&local_cb)) {
+        ngx_queue_t *q = ngx_queue_head(&local_cb);
+        ev_mariadb_cb_t *cbt = ngx_queue_data(q, ev_mariadb_cb_t, queue);
+        SV *cb = cbt->cb;
+        ngx_queue_remove(q);
+        self->pending_count--;
+        release_cbt(cbt);
+
+        invoke_error_cb(cb, errmsg);
+    }
+
     /* cancel unsent queries */
     while (!ngx_queue_empty(&local_send)) {
         ngx_queue_t *q = ngx_queue_head(&local_send);
@@ -695,24 +789,32 @@ static void cancel_pending(ev_mariadb_t *self, const char *errmsg) {
         invoke_error_cb(cb, errmsg);
     }
 
-    /* cancel sent-but-not-received */
-    while (!ngx_queue_empty(&local_cb)) {
-        ngx_queue_t *q = ngx_queue_head(&local_cb);
-        ev_mariadb_cb_t *cbt = ngx_queue_data(q, ev_mariadb_cb_t, queue);
-        SV *cb = cbt->cb;
-        ngx_queue_remove(q);
-        self->pending_count--;
-        release_cbt(cbt);
-
-        invoke_error_cb(cb, errmsg);
-    }
-
     self->callback_depth--;
+}
+
+/* Re-run cancel_pending while error callbacks keep re-queueing entries, so
+   every queued callback fires exactly once. Bounded: a callback that queues
+   forever would loop forever, so leftovers are dropped silently after
+   MAX_RECANCEL_ROUNDS. Returns 1 if the caller must bail out (object
+   destroyed, or a callback started a new operation). */
+static int cancel_pending_bounded(ev_mariadb_t *self, const char *errmsg) {
+    int i;
+    for (i = 0; i < MAX_RECANCEL_ROUNDS; i++) {
+        cancel_pending(self, errmsg);
+        if (check_destroyed(self)) return 1;
+        if (self->state != STATE_IDLE) return 1;
+        if (ngx_queue_empty(&self->send_queue) &&
+            ngx_queue_empty(&self->cb_queue) &&
+            NULL == self->stream_cb)
+            return 0;
+    }
+    drain_queues_silent(self);
+    return 0;
 }
 
 static void push_cb(ev_mariadb_t *self, SV *cb) {
     ev_mariadb_cb_t *cbt = alloc_cbt();
-    cbt->cb = SvREFCNT_inc(cb);
+    cbt->cb = SvREFCNT_inc(SvRV(cb));
     ngx_queue_insert_tail(&self->cb_queue, &cbt->queue);
     self->pending_count++;
 }
@@ -733,16 +835,32 @@ static SV* handler_accessor(SV **slot, SV *handler, int has_arg) {
         }
         if (NULL != handler && SvOK(handler) &&
             SvROK(handler) && SvTYPE(SvRV(handler)) == SVt_PVCV) {
-            *slot = SvREFCNT_inc(handler);
+            *slot = SvREFCNT_inc(SvRV(handler));
         }
     }
 
     return (NULL != *slot)
-        ? SvREFCNT_inc(*slot)
+        ? newRV_inc(*slot)
         : &PL_sv_undef;
 }
 
 /* --- Multi-result drain --- */
+
+static int finish_multi_result(ev_mariadb_t *self) {
+    self->draining = 0;
+    self->state = STATE_IDLE;
+    if (self->result_args) return deliver_saved_result(self);
+    if (self->stream_cb) {
+        SV *cb = self->stream_cb;
+        self->stream_cb = NULL;
+        self->pending_count--;
+        self->callback_depth++;
+        invoke_eof_cb(cb);
+        self->callback_depth--;
+        return check_destroyed(self);
+    }
+    return 0;
+}
 
 static void drain_multi_result(ev_mariadb_t *self) {
     int status;
@@ -763,15 +881,18 @@ static void on_next_result_done(ev_mariadb_t *self) {
     for (;;) {
         if (self->op_ret > 0) {
             /* error in secondary result set — report and stop draining */
-            self->draining = 0;
-            self->state = STATE_IDLE;
+            char errbuf[512];
+            COPY_ERROR(errbuf, mysql_error(self->conn));
+            if (finish_multi_result(self)) return;
             self->callback_depth++;
-            emit_error(self, mysql_error(self->conn));
+            emit_error(self, errbuf);
             self->callback_depth--;
             if (check_destroyed(self)) return;
             if (self->state != STATE_IDLE) return;
-            if (self->conn && mysql_more_results(self->conn)) {
-                drain_multi_result(self);
+            if (self->conn && (mysql_more_results(self->conn)
+                || mysql_get_socket(self->conn) < 0)) {
+                if (cancel_pending_bounded(self, errbuf)) return;
+                cleanup_connection(self);
                 return;
             }
             pipeline_advance(self);
@@ -795,6 +916,9 @@ static void on_next_result_done(ev_mariadb_t *self) {
             if (self->op_result) {
                 mysql_free_result(self->op_result);
                 self->op_result = NULL;
+            } else {
+                self->op_ret = 1;
+                continue;
             }
         }
 
@@ -811,9 +935,8 @@ static void on_next_result_done(ev_mariadb_t *self) {
         /* synchronous completion — loop instead of recursing */
     }
 
-    self->draining = 0;
-    self->state = STATE_IDLE;
-    pipeline_advance(self);
+    if (finish_multi_result(self)) return;
+    if (self->state == STATE_IDLE) pipeline_advance(self);
 }
 
 /* --- Pipeline: send_query + read_query_result state machine --- */
@@ -823,23 +946,11 @@ static void handle_send_failure(ev_mariadb_t *self, ev_mariadb_send_t *send) {
        even for client-side errors (e.g. CR_NET_PACKET_TOO_LARGE) where nothing
        was sent and the session is still healthy. */
     char errbuf[512];
-    SV *cb = send->cb;
-    Safefree(send->sql);
-    release_send(send);
-    self->pending_count--;
-
     COPY_ERROR(errbuf, mysql_error(self->conn));
+    ngx_queue_insert_head(&self->send_queue, &send->queue);
 
     self->state = STATE_IDLE;
-    self->callback_depth++;
-    invoke_error_cb(cb, errbuf);
-    self->callback_depth--;
-    if (check_destroyed(self)) return;
-    if (self->state != STATE_IDLE) return;
-    cancel_pending(self, "send failed");
-    if (check_destroyed(self)) return;
-    if (self->state != STATE_IDLE) return;
-    drain_queues_silent(self);
+    if (cancel_pending_bounded(self, errbuf)) return;
     cleanup_connection(self);
 }
 
@@ -897,11 +1008,6 @@ static void on_read_result_done(ev_mariadb_t *self) {
         self->state = STATE_IDLE;
         if (deliver_result(self)) return;
         if (self->state != STATE_IDLE) return;
-        /* drain any extra result sets from multi-result queries */
-        if (self->conn && mysql_more_results(self->conn)) {
-            drain_multi_result(self);
-            return;
-        }
         pipeline_advance(self);
     }
 }
@@ -912,7 +1018,12 @@ static void on_store_result_done(ev_mariadb_t *self) {
         MYSQL_RES *res = self->op_result;
         self->op_result = NULL;
         /* draining multi-result: free and continue */
-        if (res) mysql_free_result(res);
+        if (!res) {
+            self->op_ret = 1;
+            on_next_result_done(self);
+            return;
+        }
+        mysql_free_result(res);
         if (self->conn && mysql_more_results(self->conn)) {
             int status = mysql_next_result_start(&self->op_ret, self->conn);
             if (status != 0) {
@@ -923,9 +1034,8 @@ static void on_store_result_done(ev_mariadb_t *self) {
             on_next_result_done(self);
             return;
         }
-        self->draining = 0;
-        self->state = STATE_IDLE;
-        pipeline_advance(self);
+        if (finish_multi_result(self)) return;
+        if (self->state == STATE_IDLE) pipeline_advance(self);
         return;
     }
 
@@ -934,11 +1044,6 @@ static void on_store_result_done(ev_mariadb_t *self) {
 
     if (deliver_result(self)) return;
     if (self->state != STATE_IDLE) return;
-    /* drain any extra result sets */
-    if (self->conn && mysql_more_results(self->conn)) {
-        drain_multi_result(self);
-        return;
-    }
     pipeline_advance(self);
 }
 
@@ -1029,10 +1134,6 @@ send_phase:
             if (deliver_result(self)) return;
             /* callback may have started a new operation */
             if (self->state != STATE_IDLE) return;
-            if (self->conn && mysql_more_results(self->conn)) {
-                drain_multi_result(self);
-                return;
-            }
             /* loop back to check send_queue (callback may have queued more) */
             if (!ngx_queue_empty(&self->send_queue)) goto send_phase;
         }
@@ -1056,10 +1157,7 @@ static void on_connect_done(ev_mariadb_t *self) {
         /* on_error handler may have called reset(), starting a new connection;
            if state is no longer IDLE, don't touch the new connection */
         if (self->state != STATE_IDLE) return;
-        cancel_pending(self, errbuf);
-        if (check_destroyed(self)) return;
-        if (self->state != STATE_IDLE) return;
-        drain_queues_silent(self);
+        if (cancel_pending_bounded(self, errbuf)) return;
         cleanup_connection(self);
         return;
     }
@@ -1077,10 +1175,7 @@ static void on_connect_done(ev_mariadb_t *self) {
         self->callback_depth--;
         if (check_destroyed(self)) return;
         if (self->state != STATE_IDLE) return;
-        cancel_pending(self, "invalid fd");
-        if (check_destroyed(self)) return;
-        if (self->state != STATE_IDLE) return;
-        drain_queues_silent(self);
+        if (cancel_pending_bounded(self, "invalid fd")) return;
         cleanup_connection(self);
         return;
     }
@@ -1088,13 +1183,14 @@ static void on_connect_done(ev_mariadb_t *self) {
     init_io_watchers(self);
 
     if (NULL != self->on_connect) {
-        SV *cb = sv_2mortal(SvREFCNT_inc_simple_NN(self->on_connect));
+        SV *cb;
         self->callback_depth++;
 
         {
             dSP;
             ENTER;
             SAVETMPS;
+            cb = sv_2mortal(SvREFCNT_inc_simple_NN(self->on_connect));
             PUSHMARK(SP);
             PUTBACK;
 
@@ -1122,6 +1218,11 @@ static void on_stmt_prepare_done(ev_mariadb_t *self) {
     MYSQL_STMT *stmt = self->op_stmt;
     self->op_stmt = NULL;
     self->state = STATE_IDLE;
+
+    if (self->op_data_ptr) {
+        Safefree(self->op_data_ptr);
+        self->op_data_ptr = NULL;
+    }
 
     if (self->op_ret != 0) {
         char errbuf[512];
@@ -1158,6 +1259,7 @@ static void on_stmt_execute_done(ev_mariadb_t *self) {
     {
         MYSQL_RES *meta;
         SV *cb;
+        int deferred = 0;
         meta = mysql_stmt_result_metadata(stmt);
         self->op_result = meta;
         cb = pop_cb(self);
@@ -1263,15 +1365,86 @@ static void on_stmt_execute_done(ev_mariadb_t *self) {
             }
 
         invoke:
-            PUTBACK;
-            invoke_cb(cb);
+            if (mysql_stmt_more_results(stmt)) {
+                SSize_t mark = TOPMARK;
+                save_result_args(self, cb, PL_stack_base + mark, SP);
+                self->op_stmt = stmt;
+                deferred = 1;
+                SP = PL_stack_base + mark;
+                (void)POPMARK;
+                PUTBACK;
+            } else {
+                PUTBACK;
+                invoke_cb(cb);
+            }
             FREETMPS;
             LEAVE;
         }
         self->callback_depth--;
         if (check_destroyed(self)) return;
+        if (deferred) {
+            drain_stmt_results(self);
+            return;
+        }
         maybe_pipeline(self);
     }
+}
+
+static void finish_stmt_drain(ev_mariadb_t *self, int failed) {
+    MYSQL_STMT *stmt = self->op_stmt;
+    self->op_stmt = NULL;
+    self->op_stmt_ctx = NULL;
+    self->state = STATE_IDLE;
+
+    if (failed) {
+        char errbuf[512];
+        COPY_ERROR(errbuf, mysql_stmt_error(stmt));
+        SvREFCNT_dec((SV *)self->result_args);
+        self->result_args = NULL;
+        if (deliver_error(self, errbuf)) return;
+    } else {
+        if (deliver_saved_result(self)) return;
+    }
+    maybe_pipeline(self);
+}
+
+static void drain_stmt_results(ev_mariadb_t *self) {
+    int status;
+    self->state = STATE_STMT_NEXT_RESULT;
+    status = mysql_stmt_next_result_start(&self->op_ret, self->op_stmt);
+    if (status) update_watchers(self, status);
+    else on_stmt_next_result_done(self);
+}
+
+static void on_stmt_next_result_done(ev_mariadb_t *self) {
+    int status;
+    for (;;) {
+        if (self->op_ret != 0) {
+            finish_stmt_drain(self, self->op_ret > 0);
+            return;
+        }
+        if (mysql_stmt_field_count(self->op_stmt)) {
+            self->state = STATE_STMT_DRAIN_RESULT;
+            status = mysql_stmt_store_result_start(&self->op_ret, self->op_stmt);
+            if (status) { update_watchers(self, status); return; }
+            if (self->op_ret != 0) { finish_stmt_drain(self, 1); return; }
+            mysql_stmt_free_result(self->op_stmt);
+        }
+        if (!mysql_stmt_more_results(self->op_stmt)) {
+            finish_stmt_drain(self, 0);
+            return;
+        }
+        self->state = STATE_STMT_NEXT_RESULT;
+        status = mysql_stmt_next_result_start(&self->op_ret, self->op_stmt);
+        if (status) { update_watchers(self, status); return; }
+    }
+}
+
+static void on_stmt_drain_store_done(ev_mariadb_t *self) {
+    if (self->op_ret != 0) { finish_stmt_drain(self, 1); return; }
+    mysql_stmt_free_result(self->op_stmt);
+    if (mysql_stmt_more_results(self->op_stmt)) drain_stmt_results(self);
+    else finish_stmt_drain(self, 0);
 }
 
 static void on_stmt_store_done(ev_mariadb_t *self) {
@@ -1450,6 +1623,11 @@ static void stream_error(ev_mariadb_t *self) {
 static void on_real_query_done(ev_mariadb_t *self) {
     int status;
 
+    if (self->op_data_ptr) {
+        Safefree(self->op_data_ptr);
+        self->op_data_ptr = NULL;
+    }
+
     if (self->op_ret != 0) {
         stream_error(self);
         if (check_destroyed(self)) return;
@@ -1465,6 +1643,10 @@ static void on_real_query_done(ev_mariadb_t *self) {
             if (check_destroyed(self)) return;
         } else {
             /* DML or no-result query: deliver EOF to stream callback */
+            if (mysql_more_results(self->conn)) {
+                drain_multi_result(self);
+                return;
+            }
             SV *cb = self->stream_cb;
             self->stream_cb = NULL;
             self->state = STATE_IDLE;
@@ -1473,6 +1655,7 @@ static void on_real_query_done(ev_mariadb_t *self) {
             invoke_eof_cb(cb);
             self->callback_depth--;
             if (check_destroyed(self)) return;
+            if (self->state != STATE_IDLE) return;
         }
         maybe_pipeline(self);
         return;
@@ -1520,14 +1703,14 @@ static void on_stream_fetch_done(ev_mariadb_t *self) {
             {
                 SV *saved_cb = self->stream_cb;
                 self->stream_cb = NULL;
-                self->pending_count--;
 
                 self->callback_depth++;
                 {
-                    SV *cb = sv_2mortal(SvREFCNT_inc_simple_NN(saved_cb));
+                    SV *cb;
                     dSP;
                     ENTER;
                     SAVETMPS;
+                    cb = sv_2mortal(SvREFCNT_inc_simple_NN(saved_cb));
                     PUSHMARK(SP);
                     PUSHs(sv_2mortal(newRV_noinc((SV*)r)));
                     PUTBACK;
@@ -1551,15 +1734,16 @@ static void on_stream_fetch_done(ev_mariadb_t *self) {
                        CHECK_READY rejects the only way stream_cb could be
                        reset while we're inside on_stream_fetch_done. Drop the
                        saved cb so the (hypothetical) new stream owns the slot. */
+                    self->pending_count--;
                     SvREFCNT_dec(saved_cb);
                 } else if (self->conn == NULL || self->op_result == NULL) {
                     /* connection torn down — stream is over */
+                    self->pending_count--;
                     SvREFCNT_dec(saved_cb);
                     return;
                 } else {
                     /* normal: restore for next row */
                     self->stream_cb = saved_cb;
-                    self->pending_count++;
                 }
             }
         }
@@ -1589,6 +1773,13 @@ static void on_stream_fetch_done(ev_mariadb_t *self) {
         self->state = STATE_IDLE;
         self->pending_count--;
 
+        if (!has_error && mysql_more_results(self->conn)) {
+            self->stream_cb = cb;
+            self->pending_count++;
+            drain_multi_result(self);
+            return;
+        }
+
         self->callback_depth++;
         if (has_error) {
             invoke_error_cb(cb, errbuf);
@@ -1597,11 +1788,7 @@ static void on_stream_fetch_done(ev_mariadb_t *self) {
         }
         self->callback_depth--;
         if (check_destroyed(self)) return;
-        /* drain any secondary result sets from multi_statements */
-        if (self->conn && mysql_more_results(self->conn)) {
-            drain_multi_result(self);
-            return;
-        }
+        if (self->state != STATE_IDLE) return;
         maybe_pipeline(self);
     }
 }
@@ -1618,6 +1805,10 @@ static void on_close_done(ev_mariadb_t *self) {
     stop_writing(self);
     stop_timer(self);
     self->state = STATE_IDLE;
+
+    /* mysql_close detached every MYSQL_STMT without freeing it; close the
+       client handles and invalidate the wrappers. */
+    invalidate_all_stmts(self);
 
     /* pop our callback before cancel_pending fires errors for remaining items */
     cb = pop_cb(self);
@@ -1747,6 +1938,18 @@ static void continue_operation(ev_mariadb_t *self, int events) {
         }
         break;
 
+    case STATE_STMT_NEXT_RESULT:
+        status = mysql_stmt_next_result_cont(&self->op_ret, self->op_stmt, events);
+        if (status) update_watchers(self, status);
+        else on_stmt_next_result_done(self);
+        break;
+
+    case STATE_STMT_DRAIN_RESULT:
+        status = mysql_stmt_store_result_cont(&self->op_ret, self->op_stmt, events);
+        if (status) update_watchers(self, status);
+        else on_stmt_drain_store_done(self);
+        break;
+
     case STATE_STMT_CLOSE:
         status = mysql_stmt_close_cont(&self->op_bool_ret, self->op_stmt, events);
         if (status == 0) {
@@ -1870,6 +2073,11 @@ static void timer_cb(EV_P_ ev_timer *w, int revents) {
     if (NULL == self->conn) return;
 
     self->timing = 0;
+    if (self->deferred_connect) {
+        self->deferred_connect = 0;
+        on_connect_done(self);
+        return;
+    }
     continue_operation(self, MYSQL_WAIT_TIMEOUT);
 }
 
@@ -1944,16 +2152,23 @@ static void apply_options(ev_mariadb_t *self) {
 }
 
 static int is_utf8_charset(unsigned int charsetnr) {
-    /* utf8mb3 collations: 33, 83, 192-211 */
-    /* utf8mb4 collations: 45, 46, 224-247, 255, 256-309 */
+    /* utf8mb3 collations: 33, 83, 192-215, 223, 576-579, 1057, 1107, 1216, 1238 */
+    /* utf8mb4 collations: 45, 46, 224-247, 255, 256-309, 608-611, 1069-1070, 1248, 1270 */
     /* MariaDB 10.10+ uca1400: utf8mb3 2048-2303, utf8mb4 2304-2559 */
     /* (2560+ are ucs2/utf16/utf32 uca1400 — NOT UTF-8) */
     return charsetnr == 33 || charsetnr == 83
-        || (charsetnr >= 192 && charsetnr <= 211)
+        || (charsetnr >= 192 && charsetnr <= 215)
+        || charsetnr == 223
         || charsetnr == 45 || charsetnr == 46
         || (charsetnr >= 224 && charsetnr <= 247)
         || charsetnr == 255
         || (charsetnr >= 256 && charsetnr <= 309)
+        || (charsetnr >= 576 && charsetnr <= 579)
+        || (charsetnr >= 608 && charsetnr <= 611)
+        || charsetnr == 1057
+        || (charsetnr >= 1069 && charsetnr <= 1070)
+        || charsetnr == 1107 || charsetnr == 1216 || charsetnr == 1238
+        || charsetnr == 1248 || charsetnr == 1270
         || (charsetnr >= 2048 && charsetnr <= 2559);
 }
 
@@ -2061,7 +2276,18 @@ static void start_connect(ev_mariadb_t *self) {
         self->port, self->unix_socket, self->client_flags);
 
     if (status == 0) {
-        on_connect_done(self);
+        if (!self->op_conn_ret) {
+            char errbuf[512];
+            COPY_ERROR(errbuf, mysql_error(self->conn));
+            cleanup_connection(self);
+            croak("%s", errbuf);
+        }
+        /* Synchronous completion — defer to the next loop iteration so
+           connect handlers never fire inside new()/connect(). */
+        self->deferred_connect = 1;
+        ev_timer_set(&self->timer, 0., 0.);
+        ev_timer_start(self->loop, &self->timer);
+        self->timing = 1;
     } else {
         self->fd = mysql_get_socket(self->conn);
         if (self->fd < 0) {
@@ -2142,6 +2368,12 @@ CODE:
         Safefree(self->pending_charset);
         self->stream_cb = NULL;
         /* skip loop_sv dec: global destruction, like the other SVs here */
+        if (!is_fork && self->conn &&
+            (self->state != STATE_IDLE || self->send_count || self->op_result ||
+             self->draining || self->result_args)) {
+            int fd = (int)mysql_get_socket(self->conn);
+            if (fd >= 0) shutdown(fd, SHUT_RDWR);
+        }
         {
             ev_mariadb_stmt_t *ctx = self->stmt_list;
             while (ctx) {
@@ -2166,6 +2398,13 @@ CODE:
     }
 
     cancel_pending(self, "object destroyed");
+
+    /* Callbacks may have called reset(), re-arming watchers on a new
+       connection — stop them and tear it down before freeing. */
+    stop_reading(self);
+    stop_writing(self);
+    stop_timer(self);
+    cleanup_connection(self);
 
     /* safety net: callbacks during cancel_pending could re-queue entries */
     drain_queues_silent(self);
@@ -2242,7 +2481,7 @@ CODE:
 }
 
 void
-connect(EV::MariaDB self, const char *host, const char *user, const char *password, const char *database, unsigned int port = 3306, SV *unix_socket_sv = NULL)
+connect(EV::MariaDB self, const char *host, const char *user, SV *password_sv, SV *database_sv, unsigned int port = 3306, SV *unix_socket_sv = NULL)
 CODE:
 {
     if (NULL != self->conn) {
@@ -2255,13 +2494,20 @@ CODE:
 
     self->host = safe_strdup(host);
     self->user = safe_strdup(user);
-    self->password = safe_strdup(password);
-    self->database = safe_strdup(database);
+    self->password = NULL;
+    self->database = NULL;
+    if (password_sv && SvOK(password_sv))
+        self->password = safe_strdup(SvPV_nolen(password_sv));
+    if (database_sv && SvOK(database_sv))
+        self->database = safe_strdup(SvPV_nolen(database_sv));
     self->port = port;
     self->unix_socket = NULL;
 
     if (unix_socket_sv && SvOK(unix_socket_sv)) {
-        self->unix_socket = safe_strdup(SvPV_nolen(unix_socket_sv));
+        STRLEN sock_len;
+        const char *sock = SvPV(unix_socket_sv, sock_len);
+        if (sock_len > 0)
+            self->unix_socket = safe_strdup(sock);
     }
 
     start_connect(self);
@@ -2276,17 +2522,21 @@ CODE:
     }
 
     cleanup_connection(self);
-    cancel_pending(self, "connection reset");
-    if (check_destroyed(self)) return;
-    if (self->state != STATE_IDLE) return;
-
-    start_connect(self);
+    {
+        unsigned int gen = self->finish_gen;
+        cancel_pending(self, "connection reset");
+        if (check_destroyed(self)) return;
+        if (self->state != STATE_IDLE) return;
+        if (gen != self->finish_gen) return;
+        start_connect(self);
+    }
 }
 
 void
 finish(EV::MariaDB self)
 CODE:
 {
+    self->finish_gen++;
     cleanup_connection(self);
     cancel_pending(self, "connection finished");
     if (check_destroyed(self)) return;
@@ -2361,9 +2611,10 @@ CODE:
     sql = SvPV(sql_sv, sql_len);
     push_cb(self, cb);
     self->op_stmt = stmt;
+    self->op_data_ptr = dup_bytes(sql, sql_len);
 
     self->state = STATE_STMT_PREPARE;
-    status = mysql_stmt_prepare_start(&self->op_ret, stmt, sql, (unsigned long)sql_len);
+    status = mysql_stmt_prepare_start(&self->op_ret, stmt, self->op_data_ptr, (unsigned long)sql_len);
     if (status == 0) {
         on_stmt_prepare_done(self);
     } else {
@@ -2431,12 +2682,19 @@ PREINIT:
     int status;
 CODE:
 {
-    CHECK_READY(self, cb);
+    /* Stale-handle accept needs no live connection: it only frees the
+       wrapper and fires the callback. Handle it before CHECK_READY so it
+       also works mid-reconnect, when conn exists but isn't ready. The
+       push/deliver below pairs only against an empty cb_queue, so anything
+       in flight falls through to CHECK_READY and croaks as before. */
+    if (!(SvROK(cb) && SvTYPE(SvRV(cb)) == SVt_PVCV))
+        croak("callback must be a CODE reference");
 
     ctx = find_stmt(self, stmt_iv);
-    if (!ctx) croak("invalid statement handle");
-    if (ctx->closed) {
-        /* already closed by cleanup_connection — just free the wrapper */
+    if (ctx && ctx->closed && self->conn != NULL
+        && (self->state == STATE_IDLE || self->state == STATE_CONNECTING)
+        && self->send_count == 0
+        && ngx_queue_empty(&self->cb_queue)) {
         unlink_stmt(self, ctx);
         Safefree(ctx);
         push_cb(self, cb);
@@ -2444,6 +2702,11 @@ CODE:
         maybe_pipeline(self);
         return;
     }
+
+    CHECK_READY(self, cb);
+
+    if (!ctx) croak("invalid statement handle");
+    CHECK_STMT(ctx);
     free_stmt_bind_params(ctx);
     push_cb(self, cb);
     self->op_stmt = ctx->stmt;
@@ -2606,17 +2869,19 @@ CODE:
 }
 
 void
-autocommit(EV::MariaDB self, int mode, SV *cb)
+autocommit(EV::MariaDB self, SV *mode, SV *cb)
 PREINIT:
     int status;
+    int imode;
 CODE:
 {
     CHECK_READY(self, cb);
 
+    imode = SvTRUE(mode) ? 1 : 0;
     push_cb(self, cb);
 
     self->state = STATE_AUTOCOMMIT;
-    status = mysql_autocommit_start(&self->op_bool_ret, self->conn, (my_bool)(mode ? 1 : 0));
+    status = mysql_autocommit_start(&self->op_bool_ret, self->conn, (my_bool)imode);
     dispatch_utility(self, status, self->op_bool_ret != 0);
 }
 
@@ -2631,11 +2896,12 @@ CODE:
     CHECK_READY(self, cb);
 
     sql = SvPV(sql_sv, sql_len);
-    self->stream_cb = SvREFCNT_inc(cb);
+    self->stream_cb = SvREFCNT_inc(SvRV(cb));
     self->pending_count++;
+    self->op_data_ptr = dup_bytes(sql, sql_len);
 
     self->state = STATE_REAL_QUERY;
-    status = mysql_real_query_start(&self->op_ret, self->conn, sql, (unsigned long)sql_len);
+    status = mysql_real_query_start(&self->op_ret, self->conn, self->op_data_ptr, (unsigned long)sql_len);
     if (status == 0) {
         on_real_query_done(self);
     } else {
@@ -2677,8 +2943,7 @@ CODE:
     CHECK_STMT(ctx);
     {
         const char *src = SvPV(data_sv, data_len);
-        Newx(data, data_len > 0 ? data_len : 1, char);
-        Copy(src, data, data_len, char);
+        data = dup_bytes(src, data_len);
     }
     push_cb(self, cb);
     self->op_stmt = ctx->stmt;
@@ -2737,7 +3002,8 @@ int
 is_connected(EV::MariaDB self)
 CODE:
 {
-    RETVAL = (NULL != self->conn && self->state != STATE_CONNECTING) ? 1 : 0;
+    RETVAL = (NULL != self->conn && self->state != STATE_CONNECTING
+        && mysql_get_socket(self->conn) >= 0) ? 1 : 0;
 }
 OUTPUT:
     RETVAL
@@ -2901,6 +3167,9 @@ CODE:
     }
     SvCUR_set(RETVAL, elen);
     *SvEND(RETVAL) = '\0';
+    /* escaping only prefixes ASCII bytes, so the bytes stay valid UTF-8 */
+    if (SvUTF8(str))
+        SvUTF8_on(RETVAL);
 }
 OUTPUT:
     RETVAL
@@ -2918,7 +3187,10 @@ void
 skip_pending(EV::MariaDB self)
 CODE:
 {
-    if (self->state != STATE_IDLE || self->send_count > 0) {
+    /* An embryonic handshake is neither "sent queries awaiting results" nor
+       an exclusive op in flight — leave it alone so the connect completes. */
+    if ((self->state != STATE_IDLE && self->state != STATE_CONNECTING) ||
+        self->send_count > 0) {
         cleanup_connection(self);
     }
     cancel_pending(self, "skipped");

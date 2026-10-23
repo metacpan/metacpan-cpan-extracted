@@ -46,7 +46,7 @@ is_deeply([ Time::Keeper::Natural->new(locale => 'en', zone => 'Europe/London', 
 # Every at-string CLDR has, in every locale: the ties, by name, so a CLDR
 # change that adds or removes one is noticed. Regional locales repeat their
 # language's and are counted, not listed.
-my %want = map { $_ => 1 } grep { length } map { s/^\s+//r } split /\n/, <<'TIES';
+my %want = map { $_ => 1 } grep { length } map { (my $s = $_) =~ s/^\s+//; $s } split /\n/, <<'TIES';
     ar السبت القادم
     chr ᎯᎠ ᎧᎸ.
     da på fr.

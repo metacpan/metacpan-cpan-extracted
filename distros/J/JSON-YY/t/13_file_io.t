@@ -104,4 +104,16 @@ use JSON::YY ':doc';
     is jencode $found, "/meta/id", '"x2"', 'jfind nested key path';
 }
 
+{
+    my ($fh, $file) = tempfile(UNLINK => 1);
+    print $fh '{"original":1}';
+    close $fh;
+    eval { jread "$file\0suffix" };
+    like $@, qr/jread: filename contains a NUL byte/, 'jread rejects a NUL filename';
+    my $doc = jdoc '{"replacement":2}';
+    eval { jwrite $doc, "$file\0suffix" };
+    like $@, qr/jwrite: filename contains a NUL byte/, 'jwrite rejects a NUL filename';
+    is "" . (jread $file), '{"original":1}', 'rejected filename leaves the file intact';
+}
+
 done_testing;

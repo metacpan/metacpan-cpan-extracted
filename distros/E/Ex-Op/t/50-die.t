@@ -96,6 +96,16 @@ is( die_keeps_arg(), 1, 'a die does not keep an argument alive in the parameter'
 sub die_fetch { tie my $t, 'EO::Die::Tied'; my $r = eval { boom($t) }; [$r, $@, depth_of(\&boom), scalar(boom(0))] }
 is_deeply( die_fetch(), [undef, "fetch\n", 0, 'ok'], 'a die in a tied argument\'s FETCH, while the call is being set up' );
 
+my $die_in = sub { my $r = boom(@_); $r };
+eval { $die_in->(1) } for 1 .. 3;
+is_deeply( [depth_of($die_in), depth_of(\&boom), scalar(boom(0))], [0, 0, 'ok'],
+           'a die out of a sub that called the op, three times: both depths back to 0' );
+
+sub die_rec { my ($n) = @_; return die_rec($n - 1) if $n; boom(1) }
+eval { die_rec(2) } for 1 .. 3;
+is_deeply( [depth_of(\&die_rec), depth_of(\&boom), scalar(boom(0))], [0, 0, 'ok'],
+           '... and out of a sub that called itself' );
+
 twin_all( 'a die',             'my ($x) = @_; die "no $x\n" if $x; "yes"', 1 );
 twin_all( 'no die',            'my ($x) = @_; die "no $x\n" if $x; "yes"', 0 );
 twin_all( 'a die after a local', 'my ($x) = @_; local $main::G = "in"; die "d\n" if $x; $main::G', 1 );

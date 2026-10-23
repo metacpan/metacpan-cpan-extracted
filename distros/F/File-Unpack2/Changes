@@ -1,3 +1,8 @@
+2.03	kraih Thu Oct 22 17:30:00 CEST 2026
+  - Fixed the cached cpio command being returned as an array reference on
+    every lookup after the first, which broke unpacking cpio archives when an
+    rpm had been unpacked before them in the same run.
+
 2.02	kraih Mon Jul 28 14:00:00 CEST 2026
   - Clean release tarball.
 

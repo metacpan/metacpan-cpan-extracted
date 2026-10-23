@@ -1,5 +1,14 @@
 Revision history for EV::Kafka
 
+0.08  2026-10-22
+    - Declare module versions in the provides metadata, so the release indexes.
+      0.07 was uploaded but never indexed; use this release instead.
+
+0.07  2026-10-16
+    - Release disconnected clients and custom loops without another loop iteration.
+    - Seed reconnect jitter and harden callback lifetimes.
+    - Improve protocol validation, retry handling and shutdown.
+
 0.06  2026-09-15
     - sasl no longer warns on undef arguments
 

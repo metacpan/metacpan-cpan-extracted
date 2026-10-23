@@ -93,6 +93,7 @@ the same change, or stops and reports.
 | `Response.tool_calls` as the single source | 0003 |
 | Structured output ↔ forced tool, the `chat_f` rewrite matrix | 0005 |
 | Capability registry, per-engine / per-model corrections, pairwise exclusions | 0002, 0019, 0021, 0024 |
+| Tool-result media capabilities (`tool_result_images` / `tool_result_pdf`, `ToolResult->carries_native`) | 0039, 0001 (k344/k359/k361 Updates) |
 | Learned model capabilities (metadata probe, `ModelProbe`, `model_metadata_format`) | 0032 |
 | Dialect inheritance vs capability roles, `*Compatible` envelopes, `-excludes` | 0006, 0013, 0015, 0016, 0020 |
 | Wire extras on the body / `Response` | 0004 |

@@ -223,7 +223,8 @@ subtest 'import() rejects coderef as sub name' => sub {
 
 subtest 'import() rejects hashref as sub name' => sub {
 	plan tests => 1;
-	throws_ok { Sub::Private->import({}) } $MSG_BAD_ID, 'hashref as sub name rejected';
+	# A leading hashref is options, so the bad name comes after it
+	throws_ok { Sub::Private->import({}, {}) } $MSG_BAD_ID, 'hashref as sub name rejected';
 };
 
 # Empty string fails the regex \A[_a-zA-Z]\w*\z because there is no first char.

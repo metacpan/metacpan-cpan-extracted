@@ -177,7 +177,7 @@ sub new {
 
    my $self = $class->SUPER::new (
       toolsets     => [],
-      server_info  => { name => "AnyEvent::MCP", version => $AnyEvent::MCP::VERSION },
+      server_info  => { name => "AnyEvent::MCP", version => "$AnyEvent::MCP::VERSION" },
       capabilities => { tools => {} },
       versions     => [qw(2026-07-28 2025-11-25 2025-06-18 2025-03-26)],
       @_,

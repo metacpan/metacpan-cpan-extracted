@@ -41,7 +41,7 @@ my $w = EV::timer(0, 1, sub {
     });
 });
 
-# Stop after 30 seconds.
-EV::timer(30, 0, sub { $ch->finish; EV::break });
+# Stop after 30 seconds (kept: a discarded watcher never fires).
+my $stop = EV::timer(30, 0, sub { $ch->finish; EV::break });
 
 EV::run;

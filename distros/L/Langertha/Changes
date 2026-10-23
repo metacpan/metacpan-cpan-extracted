@@ -1,5 +1,143 @@
 Revision history for Langertha
 
+0.504     2026-10-22 21:00:18Z
+
+    - Gemini 4 (gemini-4-argon, any gemini-4* id) gets its own request
+      controls (k381). reasoning_effort=medium went out as
+      thinkingLevel=low, because no reasoning profile matched gemini-4;
+      Gemini 4 now takes low, medium and high, and none/minimal are sent
+      as low. thinking_budget croaks and is never sent. temperature is not
+      sent (the model ignores it), and a value other than 1 carps;
+      supports('temperature') is false. Gemini 4 has no explicit context
+      caching: supports('cached_content') is false, and a bound
+      cached_content or a create_cached_content(_f) for a Gemini 4 model
+      croaks before the request. Gemini 3, 2.5 and older are unchanged.
+      Taken from the Gemini API and Vertex AI documentation, not tested
+      against the live API.
+    - New capabilities tool_result_images and tool_result_pdf
+      (Langertha::Role::ToolResultImages / ToolResultPDF): supports() now
+      says whether an image or a PDF a tool returns reaches the selected model
+      natively, or goes out as a text placeholder. format_tool_results reads
+      the same flags, so the answer and the wire agree. Images need
+      image_input; Anthropic sends PDFs where the endpoint takes document
+      blocks, also to text-only models; OpenAI Responses and Gemini need a
+      vision model for PDFs; Perplexity takes images only; AKIAnthropic
+      neither. Gemini now sends images and PDFs natively for Gemini 3 and
+      later (gemini-4-argon, any gemini-<N> with N >= 3), not only gemini-3.
+      The flags follow a tool_wire_format forced in the constructor:
+      an engine without the new roles forced onto the anthropic, responses
+      or gemini wire now sends the placeholder (before, a vision model there
+      got the native image, and on anthropic every engine the PDF document
+      block), and on the responses and gemini wires a PDF needs a vision
+      model whichever engine is forced there. New
+      Langertha::ToolResult->carries_native and ->native_needs_vision, and
+      a native_pdf option on to('anthropic') (default on). The flags are not
+      published in manifests (k380, ADR 0039).
+
+    - An engine now takes the Net::Async::HTTP client it built off its event
+      loop when the engine is destroyed, which also closes the client's
+      keep-alive connections. Before, every engine object left its client
+      and connections on the loop (the process-wide one by default) for the
+      rest of the process, so programs creating many short-lived engines
+      (langertha-raider: one per subagent) grew without bound. An injected
+      _async_http client is the caller's and stays where it is (k379).
+
+    - Langertha::Engine::Whisper documents speaches (the successor of
+      faster-whisper-server, which its links named) and how its answers
+      differ from OpenAI's: model is required (the empty default answers
+      422), a wrong key answers 403, errors are FastAPI's detail objects,
+      verbose_json gives language as a code (en), words / usage / logprobs
+      come as null when not asked for, words keep a leading space, and vtt
+      is served as text/vtt. The transcription tests now replay real
+      speaches 0.8.3 answers (json, verbose_json with and without words,
+      text, srt, vtt, the 422) next to the OpenAI documentation fixtures
+      (k370).
+    - langertha_whisper: LANGERTHA_WHISPER_WHISPER_MODEL had no effect -- it
+      set the engine's model, which transcription never reads -- so against
+      speaches every call failed with 422. It now sets transcription_model
+      (k370).
+
+    - langertha_whisper: new LANGERTHA_WHISPER_WHISPER_API_KEY, the bearer key
+      for a Whisper server that checks one (speaches with API_KEY answers 403
+      to the placeholder key) (k370).
+
+    - Streamed answers on OpenAI-wire engines carry their token usage: new
+      capability stream_usage (Langertha::Role::StreamUsage), and
+      chat_stream_request sends stream_options.include_usage itself where the
+      engine claims it, so the usage arrives as the stream's last chunk
+      (aggregate_usage). Claimed per provider documentation by OpenAI, vLLM,
+      SGLang, Virtual, DeepSeek, XAI, Groq, OllamaOpenAI, LlamaCpp, Moonshot,
+      MiniMax, Scaleway, TSystems and HuggingFace; not by Mistral (its schema
+      rejects unknown fields), Cerebras, OpenRouter (always sends usage),
+      LMStudioOpenAI, NousResearch, Hetzner, AKIOpenAI, Replicate or
+      OpenAIResponses. A stream_options the caller passes replaces the
+      engine's; { include_usage => 0 } turns it off.
+
+    - response_tool_calls and response_text_content no longer answer empty for
+      a Langertha::Response: since 0.503 (k341) both went through
+      ToolCall->locate, which answers [] / '' for anything but a plain HASH, so
+      handing them what response_call returns lost the tool calls and the text
+      without an error (0.502 died loudly). A Response is read through its raw
+      body; any other object, and a Response without a raw body, croaks.
+      Found by citiai-core#58. extract_tool_call likewise answered (undef,
+      undef) for a Langertha::ToolCall, the element of Response->tool_calls; it
+      now returns its name and arguments, and croaks on any other object.
+
+    - New engine Langertha::Engine::Virtual (also under the name Mock,
+      Langertha::Engine::Mock): answers without network, key or model, by
+      rules -- exact text, Regexp with captures, predicate subs, and after()
+      rules for the turn that brings tool results back -- or by a script of
+      one reply per request. Reactions are data (answer, tool, tools from the
+      new Langertha::Virtual::Rules) or subs that get the request. Rules can
+      come from YAML (rules_file); presets echo and files; requests, calls
+      and results are recorded for tests. Requests and replies go through the
+      real OpenAI-dialect builder and parser, so chat_f, simple_chat and the
+      MCP tool loops (core's, Langertha::Chat's, langertha-raider's public
+      hooks) run unchanged; only the HTTP round trip stays in the process.
+    - New Langertha::Virtual::Server: serves a Virtual engine over HTTP on
+      127.0.0.1 (POST /v1/chat/completions with tool_calls, stream:true as
+      server-sent events, GET /v1/models, JSON 404s; optional debug endpoint
+      GET /_virtual/requests), so programs that reach their upstream by URL
+      can run against it without network or key. Runs in the caller's
+      IO::Async loop (loop => $loop) or in its own process with
+      Langertha::Virtual::Server->spawn (pid and url) and ->reap; delay
+      makes a client run into its timeout. No new dependencies. The
+      Anthropic dialect (/v1/messages) is not served.
+    - Langertha::Virtual::Rules::error($status, $message): a Virtual reaction
+      that fails the request with an HTTP error status (429, 500, ...);
+      Langertha::Engine::Virtual::virtual_reply returns a request's answer
+      as data.
+    - Langertha::Engine::Virtual: token usage and streaming. A reaction can
+      carry usage (answer($text, usage => {...}), tool(..., usage => ...),
+      tools(..., usage => ...), usage: in YAML); default_usage (a HashRef or
+      a sub) gives it to replies without their own. Without either a reply
+      has no usage block, as before. The block is OpenAI's wire usage and
+      lands on Response->usage as a Langertha::Usage. The engine now composes
+      Role::Streaming: chat_stream_realtime_f, simple_chat_stream and the
+      iterator work, the text arrives in pieces of stream_chunk_size
+      characters (default 8), tool calls as delta fragments, and with
+      stream_options.include_usage the usage as a last event without a
+      choice. virtual_stream_chunks cuts a completion into these events;
+      Langertha::Virtual::Server serves the usage on chat completions and
+      streams through the same events.
+    - Streaming: a mid-stream error frame now fails the stream on the Anthropic
+      family (`event: error`) and native Ollama (`{"error":"..."}` NDJSON line)
+      with "<Class> stream carried an error: <text>", as the OpenAI-compatible,
+      Gemini and Responses parsers already did, instead of ending as a silent,
+      truncated success.
+    - HTTP: Basic auth taken from URL userinfo keeps a colon in the password,
+      percent-decodes user and password, and no longer drops the header for a
+      user or password of "0".
+    - Docker: the Dockerfile is rebuilt for the Dist::Zilla-built distribution
+      as build context: two stages on perl:5.40-slim, prerequisites through
+      cpm with the recommended async transport, Langertha installed into the
+      image. The release builds, tags (latest, <major>, <version>) and pushes
+      raudssus/langertha through the bundle's Dist::Zilla::Plugin::Docker::API
+      (docker_image in dist.ini). Every dzil build or dzil test now builds the
+      image unless DZIL_DOCKER_API_SKIP=1 is set. docker-entrypoint.sh and the
+      LANGERTHA_UID / LANGERTHA_GID / LANGERTHA_VERSION build arguments are
+      gone.
+
 0.503     2026-10-01 17:19:38Z
 
     - Manifest::Builder->engine_class_for_dialect($dialect), the inverse of

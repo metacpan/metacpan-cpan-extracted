@@ -80,9 +80,10 @@ use Time::Local ();
 # Sub::Private in enforce mode: _-prefixed subs decorated :Private croak when
 # called from outside this package.  HARNESS_ACTIVE bypasses checks during
 # make test so white-box tests can still reach private methods.  0.06 also
-# enforces when this module is loaded at run time (require, Log::Any).
-BEGIN { $Sub::Private::config{mode} = 'enforce' }
-use Sub::Private 0.06;
+# enforces when this module is loaded at run time (require, Log::Any).  The
+# mode is set for this package only (0.07), not in $Sub::Private::config,
+# which would change it for every other module using Sub::Private.
+use Sub::Private 0.07 { mode => 'enforce' };
 
 # The backends, one object per destination, built by new() (see
 # _build_backends).  Loaded now rather than on demand, so that they are
@@ -227,11 +228,11 @@ Log::Abstraction - Logging Abstraction Layer
 
 =head1 VERSION
 
-0.40
+0.41
 
 =cut
 
-our $VERSION = '0.40';
+our $VERSION = '0.41';
 
 =head1 SYNOPSIS
 

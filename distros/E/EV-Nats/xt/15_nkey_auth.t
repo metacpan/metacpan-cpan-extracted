@@ -17,6 +17,7 @@ my $PUBKEY = EV::Nats->nkey_public_from_seed($SEED);
 my $WRONG  = EV::Nats->nkey_generate_user_seed;
 
 plan tests => 4;
+my $guard;  # kept: an unkept EV::timer never fires
 
 my $tmp  = tempdir(CLEANUP => 1);
 my $port = free_port();
@@ -45,7 +46,7 @@ my $pid = spawn_nats($nats_bin, '-c', $conf);
         on_error   => sub { $err = $_[0]; EV::break },
         on_connect => sub { $connected = 1; EV::break },
     );
-    EV::timer(5, 0, sub { EV::break });
+    $guard = EV::timer(5, 0, sub { EV::break });
     EV::run;
     ok $connected, 'connect with valid NKey seed' or diag "err: $err";
     ok !$err, 'no error with valid NKey' or diag "got: $err";
@@ -63,7 +64,7 @@ my $pid = spawn_nats($nats_bin, '-c', $conf);
         on_error   => sub { $err = $_[0]; EV::break },
         on_connect => sub { $connected = 1; EV::break },
     );
-    EV::timer(5, 0, sub { EV::break });
+    $guard = EV::timer(5, 0, sub { EV::break });
     EV::run;
     ok !$connected, 'wrong NKey: no connection';
     like $err, qr/auth/i, 'wrong NKey: server reports auth error'

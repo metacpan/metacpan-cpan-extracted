@@ -1,14 +1,17 @@
 package Langertha::Engine::Groq;
 # ABSTRACT: GroqCloud API
-our $VERSION = '0.503';
+our $VERSION = '0.504';
 use Moose;
 use Carp qw( croak );
 
 extends 'Langertha::Engine::OpenAIBase';
 
+# StreamUsage: stream_options.include_usage is in the chat completion API
+# reference; x_groq.usage comes on the last chunk either way (ADR 0038).
 with map { 'Langertha::Role::'.$_ } qw(
   Transcription
   Tools
+  StreamUsage
 );
 
 
@@ -132,7 +135,7 @@ Langertha::Engine::Groq - GroqCloud API
 
 =head1 VERSION
 
-version 0.503
+version 0.504
 
 =head1 SYNOPSIS
 

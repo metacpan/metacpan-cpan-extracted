@@ -1,15 +1,18 @@
 package Langertha::Engine::SGLang;
 # ABSTRACT: SGLang inference server
-our $VERSION = '0.503';
+our $VERSION = '0.504';
 use Moose;
 use Carp qw( croak );
 
 extends 'Langertha::Engine::OpenAIBase';
 
+# StreamUsage: ChatCompletionRequest has stream_options.include_usage
+# (python/sglang/srt/entrypoints/openai/protocol.py, ADR 0038).
 with 'Langertha::Role::Tools',
      'Langertha::Role::Embedding',
      'Langertha::Role::Runtime::MetricsPoll',
-     'Langertha::Role::RuntimeKnobs';
+     'Langertha::Role::RuntimeKnobs',
+     'Langertha::Role::StreamUsage';
 
 # SGLang's per-request runtime knobs: cache_salt, extra_key, priority,
 # return_cached_tokens_details. Speculative decoding is a server-launch flag
@@ -107,7 +110,7 @@ Langertha::Engine::SGLang - SGLang inference server
 
 =head1 VERSION
 
-version 0.503
+version 0.504
 
 =head1 SYNOPSIS
 

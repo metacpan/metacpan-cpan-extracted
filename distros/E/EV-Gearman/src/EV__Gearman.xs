@@ -146,6 +146,10 @@ struct ev_gm_req_s {
     int admin_terminator; /* 0 = single-line; 1 = ".\n" terminator (status/workers) */
     ev_tstamp sent_at;    /* ev_now() when queued on cb_queue; per-request
                              command_timeout budget starts here */
+    /* conn_gen at queue time. A teardown drain only fails entries from
+       dead sessions (gen != current): work submitted on a nested new
+       session mid-drain is live and must survive the outer drain. */
+    unsigned int gen;
 };
 
 /* Pending packet awaiting connect / drain */
@@ -155,6 +159,8 @@ struct ev_gm_wait_s {
     size_t packet_len;
     /* if non-NULL, becomes a request entry on send */
     ev_gm_req_t *req;
+    /* conn_gen at queue time; teardown drains only dead sessions */
+    unsigned int gen;
 };
 
 /* Active foreground job (after JOB_CREATED) */
@@ -186,6 +192,10 @@ struct ev_gm_s {
     int fd;
     int connected;
     int connecting;
+    /* Bumped by cleanup_connection. The read path snapshots it across
+       callbacks: a disconnect()+connect() flip defeats `connected`
+       checks, so only the generation proves the session survived. */
+    unsigned int conn_gen;
 
     /* IO watchers */
     ev_io rio, wio;
@@ -253,7 +263,6 @@ struct ev_gm_s {
 
     /* Safety */
     int callback_depth;
-    int in_cb_cleanup;
     int in_wait_cleanup;
     int in_active_cleanup;
     /* Live EV::Gearman::Job objects holding a tombstone reference on
@@ -262,6 +271,7 @@ struct ev_gm_s {
        inert tombstone until the last job releases it, so job_resolve's
        magic-word check never reads freed memory. */
     U32 job_refs;
+    SV *job_session;        /* shared identity for jobs on this connection */
 
     /* Options */
     int priority;
@@ -490,9 +500,10 @@ static void emit_disconnect(pTHX_ ev_gm_t *self) {
 }
 
 static void apply_keepalive(ev_gm_t *self) {
-    if (self->keepalive <= 0 || self->path) return;
-    int one = 1;
-    setsockopt(self->fd, SOL_SOCKET, SO_KEEPALIVE, &one, sizeof(one));
+    if (self->path) return;
+    int enabled = self->keepalive > 0;
+    setsockopt(self->fd, SOL_SOCKET, SO_KEEPALIVE, &enabled, sizeof(enabled));
+    if (!enabled) return;
 #ifdef TCP_KEEPIDLE
     setsockopt(self->fd, IPPROTO_TCP, TCP_KEEPIDLE,
                &self->keepalive, sizeof(self->keepalive));
@@ -519,12 +530,17 @@ static int gm_set_socket_flags(int fd) {
     return 0;
 }
 
-/* Shared get/set body for on_error / on_connect / on_disconnect. */
+/* Shared get/set body for on_error / on_connect / on_disconnect.
+   Explicit undef clears the slot; a defined non-coderef is ignored
+   (the old handler survives) instead of silently clearing it. */
 static SV* handler_accessor(pTHX_ SV **slot, int items, SV *new_cb) {
     if (items > 1) {
-        if (*slot) { SvREFCNT_dec(*slot); *slot = NULL; }
-        if (SvOK(new_cb) && SvROK(new_cb) && SvTYPE(SvRV(new_cb)) == SVt_PVCV)
+        if (!SvOK(new_cb)) {
+            CLEAR_HANDLER(*slot);
+        } else if (SvROK(new_cb) && SvTYPE(SvRV(new_cb)) == SVt_PVCV) {
+            CLEAR_HANDLER(*slot);
             *slot = newSVsv(new_cb);
+        }
     }
     return *slot ? newSVsv(*slot) : &PL_sv_undef;
 }
@@ -604,20 +620,55 @@ static void cleanup_func(pTHX_ ev_gm_func_t *f) {
     self->flag = 0;                                                     \
 } while (0)
 
+/* Drain cb_queue, failing entries from dead sessions (gen != current).
+   No reentrancy flag: nested disconnects drain what their own session
+   orphaned, while entries submitted on a nested live session survive.
+   New entries land at the tail, so stopping at the first live one is
+   exact. */
 static void cancel_pending(pTHX_ ev_gm_t *self, const char *reason) {
-    CANCEL_QUEUE(&self->cb_queue, ev_gm_req_t, cleanup_req,
-                 pending_count, in_cb_cleanup, _e->cb);
-    self->pending_count = 0;
+    while (!ngx_queue_empty(&self->cb_queue)) {
+        ev_gm_req_t *head = ngx_queue_data(ngx_queue_head(&self->cb_queue),
+                                           ev_gm_req_t, queue);
+        if (head->gen == self->conn_gen) break;
+        ngx_queue_remove(&head->queue);
+        self->pending_count--;
+        if (head->cb)
+            invoke_cb2(aTHX_ self, head->cb, NULL, newSVpv(reason, 0));
+        if (self->magic == GM_MAGIC_FREED) {
+            cleanup_req(aTHX_ head);
+            return;
+        }
+        cleanup_req(aTHX_ head);
+    }
 }
 
+/* Drain wait_queue, failing entries from dead sessions (gen !=
+   current) and leaving entries submitted on a nested live session —
+   e.g. a retry queued while a nested connect is still in flight. The
+   count tracks removals exactly, so no reset is needed. */
 static void cancel_waiting(pTHX_ ev_gm_t *self, const char *reason) {
-    CANCEL_QUEUE(&self->wait_queue, ev_gm_wait_t, cleanup_wait,
-                 waiting_count, in_wait_cleanup,
-                 (_e->req ? _e->req->cb : NULL));
-    self->waiting_count = 0;
+    if (self->in_wait_cleanup) return;
+    self->in_wait_cleanup = 1;
+    while (!ngx_queue_empty(&self->wait_queue)) {
+        ev_gm_wait_t *head = ngx_queue_data(ngx_queue_head(&self->wait_queue),
+                                            ev_gm_wait_t, queue);
+        if (head->gen == self->conn_gen) break;
+        ngx_queue_remove(&head->queue);
+        self->waiting_count--;
+        if (head->req && head->req->cb)
+            invoke_cb2(aTHX_ self, head->req->cb, NULL, newSVpv(reason, 0));
+        if (self->magic == GM_MAGIC_FREED) {
+            cleanup_wait(aTHX_ head);
+            self->in_wait_cleanup = 0;
+            return;
+        }
+        cleanup_wait(aTHX_ head);
+    }
+    self->in_wait_cleanup = 0;
 }
 
 static void cancel_active(pTHX_ ev_gm_t *self, const char *reason) {
+    if (self->in_active_cleanup) return;
     CANCEL_QUEUE(&self->active_jobs, ev_gm_active_t, cleanup_active,
                  active_count_cached, in_active_cleanup, _e->on_complete);
     self->active_count_cached = 0;
@@ -639,9 +690,11 @@ static void cleanup_connection(pTHX_ ev_gm_t *self) {
     }
     self->connected = 0;
     self->connecting = 0;
+    self->conn_gen++;
     self->rbuf_len = 0;
     self->wbuf_len = 0;
     self->wbuf_off = 0;
+    CLEAR_HANDLER(self->job_session);
 
     /* Worker state resets: a reconnect must re-issue CAN_DO and re-start
        the GRAB loop from scratch. Registered functions are kept. */
@@ -699,6 +752,10 @@ static void schedule_reconnect(pTHX_ ev_gm_t *self) {
        kept alive by callback_depth); arming a timer on it would point
        libev at freed memory once the depth unwinds. */
     if (self->magic != GM_MAGIC_ALIVE) return;
+    /* A nested manual connect() can leave a live session behind by
+       the time the outer disconnect arms this timer; never arm onto
+       a live session. */
+    if (self->connected || self->connecting) return;
     if (self->reconnect_timer_active) return;
     if (self->max_reconnect_attempts > 0 &&
         self->reconnect_attempts >= self->max_reconnect_attempts) {
@@ -801,6 +858,9 @@ static void reconnect_timer_cb(EV_P_ ev_timer *w, int revents) {
     (void)loop; (void)revents;
     if (self->magic != GM_MAGIC_ALIVE) return;
     self->reconnect_timer_active = 0;
+    /* Defense in depth with schedule_reconnect's guard: never run a
+       connect sequence onto a live session. */
+    if (self->connected || self->connecting) return;
     self->callback_depth++;
     start_connect(aTHX_ self);
     self->callback_depth--;
@@ -837,6 +897,7 @@ static void submit_bytes(pTHX_ ev_gm_t *self,
         Safefree(pkt);
         if (req) {
             req->sent_at = ev_now(self->loop);
+            req->gen = self->conn_gen;
             ngx_queue_insert_tail(&self->cb_queue, &req->queue);
             self->pending_count++;
             arm_cmd_timer(self);
@@ -848,6 +909,7 @@ static void submit_bytes(pTHX_ ev_gm_t *self,
         w->packet = pkt;
         w->packet_len = plen;
         w->req = req;
+        w->gen = self->conn_gen;
         ngx_queue_insert_tail(&self->wait_queue, &w->queue);
         self->waiting_count++;
     }
@@ -871,6 +933,14 @@ static void gm_check_size(pTHX_ size_t len) {
               len, (unsigned)GM_MAX_PACKET);
 }
 
+/* Non-final packet fields are NUL-separated: a NUL inside one would
+   silently reframe the packet server-side. The registry also stores
+   names NUL-truncated while the wire sends full bytes. */
+static void gm_check_no_nul(pTHX_ const char *p, STRLEN len, const char *what) {
+    if (p && len > 0 && memchr(p, '\0', len))
+        croak("EV::Gearman: %s may not contain NUL bytes", what);
+}
+
 static void send_pending_waits(pTHX_ ev_gm_t *self) {
     while (!ngx_queue_empty(&self->wait_queue) && self->connected) {
         ngx_queue_t *q = ngx_queue_head(&self->wait_queue);
@@ -882,6 +952,7 @@ static void send_pending_waits(pTHX_ ev_gm_t *self) {
 
         if (w->req) {
             w->req->sent_at = ev_now(self->loop);
+            w->req->gen = self->conn_gen;
             ngx_queue_insert_tail(&self->cb_queue, &w->req->queue);
             self->pending_count++;
             w->req = NULL;
@@ -1011,18 +1082,24 @@ static void send_options_and_id(pTHX_ ev_gm_t *self) {
 
 static void report_connect_error(pTHX_ ev_gm_t *self, const char *errbuf) {
     self->callback_depth++;
-    emit_error(aTHX_ self, errbuf);
-    self->callback_depth--;
-    if (check_destroyed(self)) return;
     if (!self->intentional_disconnect && self->reconnect)
         schedule_reconnect(aTHX_ self);
+    if (self->magic == GM_MAGIC_ALIVE)
+        emit_error(aTHX_ self, errbuf);
+    if (self->magic == GM_MAGIC_ALIVE && !self->connected &&
+        !self->connecting && !self->reconnect_timer_active) {
+        self->conn_gen++;
+        cancel_waiting(aTHX_ self, "disconnected");
+    }
+    self->callback_depth--;
+    check_destroyed(self);
 }
 
 static void finish_connect_success(pTHX_ ev_gm_t *self) {
     self->reconnect_attempts = 0;
 
     start_reading(self);
-    apply_keepalive(self);
+    if (self->keepalive > 0) apply_keepalive(self);
 
     send_options_and_id(aTHX_ self);
     register_all_functions(aTHX_ self);
@@ -1225,6 +1302,8 @@ static ev_gm_t* job_resolve(pTHX_ SV *job_sv, const char **h, STRLEN *hl,
        server-side, so queuing can only produce that error. */
     if (!self->connected)
         croak("%s: not connected", op);
+    if (mg->mg_obj != self->job_session)
+        croak("%s: stale job (previous connection)", op);
     *h = SvPV(*handle_sv, *hl);
     return self;
 }
@@ -1407,6 +1486,7 @@ static void handle_response_packet(pTHX_ ev_gm_t *self,
     }
 
     case GM_CMD_NO_JOB: {
+        unsigned int gen = self->conn_gen;
         /* The grab round is over no matter what the queue looks like —
            clearing this FIRST is load-bearing: an early return with the
            flag stuck wedges the worker permanently (worker_continue
@@ -1414,7 +1494,7 @@ static void handle_response_packet(pTHX_ ev_gm_t *self,
         self->worker_grab_inflight = 0;
         ev_gm_req_t *r = pop_req_expect(aTHX_ self, cmd,
                                         GM_KIND_MASK(CB_GRAB_JOB));
-        if (!self->connected) return;   /* desync disconnect in progress */
+        if (!self->connected || self->conn_gen != gen) return;
         if (r) {
             /* grab_job's caller registered a cb; fire it with "no job"
                so it knows to back off. The high-level work() loop never
@@ -1424,6 +1504,7 @@ static void handle_response_packet(pTHX_ ev_gm_t *self,
                 invoke_cb2(aTHX_ self, r->cb, NULL, newSVpvs("no job"));
             cleanup_req(aTHX_ r);
             if (self->magic == GM_MAGIC_FREED) return;
+            if (!self->connected || self->conn_gen != gen) return;
         }
         /* else: empty queue — tolerate. NO_JOB carries no information,
            nothing remains to misroute, and the flag is already clear. */
@@ -1463,16 +1544,11 @@ static void handle_response_packet(pTHX_ ev_gm_t *self,
     }
 
     case GM_CMD_ERROR: {
-        /* ERRCODE\0ERR_TEXT. ERROR carries no handle, so attribution is
-           impossible in general — and "pop whatever is at the head" is
-           actively destructive: gearmand emits JOB_NOT_FOUND
-           asynchronously for a WORK_* we sent (e.g. a double
-           complete()), which on a worker arrives while the head is the
-           in-flight GRAB_JOB; popping it wedges the worker for good.
-           So: pop only a head kind that can actually fail this way
-           (in-order rejection of that request — GRAB_JOB is never
-           answered with ERROR, ADMIN expects text); anything else is
-           surfaced at connection level with the FIFO left intact. */
+        /* ERRCODE\0ERR_TEXT. JOB_NOT_FOUND answers a WORK_* packet,
+           which has no queued request; even with a client request at
+           the head it is a connection-level error. GRAB and ADMIN
+           likewise cannot be answered by ERROR. Other errors reject
+           the head request in wire order. */
         size_t cl, tl;
         const char *c = gm_arg(body, body_len, 0, 2, &cl);
         const char *t = gm_arg(body, body_len, 1, 2, &tl);
@@ -1484,7 +1560,8 @@ static void handle_response_packet(pTHX_ ev_gm_t *self,
         ev_gm_req_t *head = ngx_queue_empty(&self->cb_queue) ? NULL
             : ngx_queue_data(ngx_queue_head(&self->cb_queue),
                              ev_gm_req_t, queue);
-        if (head && head->kind != CB_GRAB_JOB && head->kind != CB_ADMIN) {
+        int job_not_found = c && cl == 13 && memcmp(c, "JOB_NOT_FOUND", 13) == 0;
+        if (!job_not_found && head && head->kind != CB_GRAB_JOB && head->kind != CB_ADMIN) {
             pop_req(self);
             if (head->cb) {
                 invoke_cb2(aTHX_ self, head->cb, NULL, err);
@@ -1511,6 +1588,7 @@ static void handle_response_packet(pTHX_ ev_gm_t *self,
 static void worker_dispatch_job(pTHX_ ev_gm_t *self, ev_gm_req_t *r,
     int with_unique, const char *body, size_t body_len)
 {
+    unsigned int gen = self->conn_gen;
     int total = with_unique ? 4 : 3;
     size_t hl, fl, ul, wl;
     const char *h = gm_arg(body, body_len, 0, total, &hl);
@@ -1543,7 +1621,8 @@ static void worker_dispatch_job(pTHX_ ev_gm_t *self, ev_gm_req_t *r,
        is stashed, with no handle left to stop it. The RV is the sole
        owner; jobs are observers. */
     self->job_refs++;
-    sv_magicext((SV *)job, NULL, PERL_MAGIC_ext,
+    if (!self->job_session) self->job_session = newSV(0);
+    sv_magicext((SV *)job, self->job_session, PERL_MAGIC_ext,
                 &ev_gm_job_magic_vtbl, (const char *)self, 0);
 
     /* Owned reference, NOT a mortal: io_cb is a raw libev callback and
@@ -1559,7 +1638,8 @@ static void worker_dispatch_job(pTHX_ ev_gm_t *self, ev_gm_req_t *r,
        invoke_cb2 mortalizes its arg, taking ownership of jobref. */
     if (r->cb) {
         invoke_cb2(aTHX_ self, r->cb, jobref, NULL);
-        worker_continue(aTHX_ self);
+        if (self->magic == GM_MAGIC_ALIVE && self->conn_gen == gen)
+            worker_continue(aTHX_ self);
         return;
     }
 
@@ -1615,7 +1695,7 @@ static void worker_dispatch_job(pTHX_ ev_gm_t *self, ev_gm_req_t *r,
        mode) its own reference keeps the job alive. */
     SvREFCNT_dec(jobref);
 
-    if (self->magic == GM_MAGIC_FREED) {
+    if (self->magic == GM_MAGIC_FREED || self->conn_gen != gen) {
         if (retval) SvREFCNT_dec(retval);
         if (err_sv) SvREFCNT_dec(err_sv);
         return;
@@ -1711,6 +1791,8 @@ static int parse_admin_response(pTHX_ ev_gm_t *self) {
         if (!nl) return 0;
         consumed = (nl - self->rbuf) + 1;
         result_len = nl - self->rbuf;
+        /* gearmand ends some single-line replies with \r\n */
+        if (result_len > 0 && self->rbuf[result_len - 1] == '\r') result_len--;
     }
 
     ngx_queue_remove(&r->queue);
@@ -1725,16 +1807,17 @@ static int parse_admin_response(pTHX_ ev_gm_t *self) {
                   memcmp(self->rbuf, "ERR ", 4) == 0);
     /* invoke_cb2 dec's the SV when r->cb is NULL, so build it
        unconditionally and let the helper handle the no-cb case. */
+    unsigned int gen = self->conn_gen;
     invoke_cb2(aTHX_ self, r->cb,
                is_err ? NULL : newSVpvn(self->rbuf, result_len),
                is_err ? newSVpvn(self->rbuf, result_len) : NULL);
     cleanup_req(aTHX_ r);
 
     if (self->magic == GM_MAGIC_FREED) return 1;
-    /* The callback may have called disconnect(), which zeroes rbuf_len
-       via cleanup_connection. Bail before the bookkeeping below would
-       underflow it (mirrors the binary path in process_responses). */
-    if (!self->connected) return 1;
+    /* Callbacks may disconnect (zeroing rbuf_len) or even reconnect;
+       bail before the bookkeeping below underflows it. The generation
+       check catches the disconnect()+connect() flip. */
+    if (!self->connected || self->conn_gen != gen) return 1;
 
     self->rbuf_len -= consumed;
     if (self->rbuf_len > 0)
@@ -1750,6 +1833,7 @@ static void process_responses(pTHX_ ev_gm_t *self) {
         int is_admin = (self->rbuf[0] != '\0');
 
         if (is_admin) {
+            unsigned int gen = self->conn_gen;
             int rv = parse_admin_response(aTHX_ self);
             if (rv == 0) {                      /* need more bytes */
                 /* A broken/hostile peer can stream an unterminated
@@ -1768,7 +1852,7 @@ static void process_responses(pTHX_ ev_gm_t *self) {
                 return;
             }
             if (self->magic == GM_MAGIC_FREED) return;
-            if (!self->connected) return;
+            if (!self->connected || self->conn_gen != gen) return;
             continue;
         }
 
@@ -1789,9 +1873,10 @@ static void process_responses(pTHX_ ev_gm_t *self) {
         /* rbuf is input-only — dispatch may grow wbuf but never rbuf,
            so the body pointer stays valid until the memmove below. */
         const char *body = self->rbuf + GM_HEADER_SIZE;
+        unsigned int gen = self->conn_gen;
         handle_response_packet(aTHX_ self, cmd, body, body_len);
         if (self->magic == GM_MAGIC_FREED) return;
-        if (!self->connected) return;
+        if (!self->connected || self->conn_gen != gen) return;
 
         self->rbuf_len -= total;
         if (self->rbuf_len > 0)
@@ -2012,6 +2097,10 @@ static void io_cb(EV_P_ ev_io *w, int revents) {
 static void start_connect(pTHX_ ev_gm_t *self) {
     int fd, ret;
 
+    /* Backstop for every caller: starting a connect sequence while
+       one is live would leak the old fd and re-init active watchers. */
+    if (self->connected || self->connecting) return;
+
     if (!self->path) {
         struct addrinfo hints, *res = NULL;
         char port_str[16];
@@ -2137,6 +2226,20 @@ static char* gm_encode_args(int n_args, const char **ptrs, const STRLEN *lens, s
  * XS interface
  * ================================================================ */
 
+/* Tear down a half-built object on a constructor croak path. */
+static void cleanup_partial_ctor(ev_gm_t *self) {
+    Safefree(self->rbuf);
+    Safefree(self->wbuf);
+    CLEAR_HANDLER(self->on_error);
+    CLEAR_HANDLER(self->on_connect);
+    CLEAR_HANDLER(self->on_disconnect);
+    CLEAR_HANDLER(self->loop_sv);
+    if (self->client_id) Safefree(self->client_id);
+    if (self->host) Safefree(self->host);
+    if (self->path) Safefree(self->path);
+    Safefree(self);
+}
+
 MODULE = EV::Gearman  PACKAGE = EV::Gearman
 
 BOOT:
@@ -2184,8 +2287,14 @@ CODE:
         else if (strEQ(k, "port"))                      port = SvIV(v);
         else if (strEQ(k, "path"))                      path_sv = v;
         else if (strEQ(k, "on_error")) {
-            CLEAR_HANDLER(RETVAL->on_error);
-            if (SvOK(v) && SvROK(v)) RETVAL->on_error = newSVsv(v);
+            /* Junk (defined non-coderef) is ignored so the default
+               warn handler survives; explicit undef clears it. */
+            if (!SvOK(v)) {
+                CLEAR_HANDLER(RETVAL->on_error);
+            } else if (SvROK(v) && SvTYPE(SvRV(v)) == SVt_PVCV) {
+                CLEAR_HANDLER(RETVAL->on_error);
+                RETVAL->on_error = newSVsv(v);
+            }
         }
         else if (strEQ(k, "on_connect")) {
             if (SvOK(v) && SvROK(v)) RETVAL->on_connect = newSVsv(v);
@@ -2193,28 +2302,42 @@ CODE:
         else if (strEQ(k, "on_disconnect")) {
             if (SvOK(v) && SvROK(v)) RETVAL->on_disconnect = newSVsv(v);
         }
-        else if (strEQ(k, "connect_timeout"))           RETVAL->connect_timeout_ms = SvIV(v);
-        else if (strEQ(k, "command_timeout"))           RETVAL->command_timeout_ms = SvIV(v);
-        else if (strEQ(k, "priority"))                  RETVAL->priority = SvIV(v);
-        else if (strEQ(k, "keepalive"))                 RETVAL->keepalive = SvIV(v);
+        else if (strEQ(k, "connect_timeout")) {
+            RETVAL->connect_timeout_ms = SvIV(v);
+            if (RETVAL->connect_timeout_ms < 0) RETVAL->connect_timeout_ms = 0;
+        }
+        else if (strEQ(k, "command_timeout")) {
+            RETVAL->command_timeout_ms = SvIV(v);
+            if (RETVAL->command_timeout_ms < 0) RETVAL->command_timeout_ms = 0;
+        }
+        else if (strEQ(k, "priority")) {
+            RETVAL->priority = SvIV(v);
+            if (RETVAL->priority < -2) RETVAL->priority = -2;
+            if (RETVAL->priority > 2) RETVAL->priority = 2;
+        }
+        else if (strEQ(k, "keepalive")) {
+            RETVAL->keepalive = SvIV(v);
+            if (RETVAL->keepalive < 0) RETVAL->keepalive = 0;
+        }
         else if (strEQ(k, "reconnect"))                 do_reconnect = SvTRUE(v) ? 1 : 0;
         else if (strEQ(k, "reconnect_delay"))           reconnect_delay = SvIV(v);
         else if (strEQ(k, "max_reconnect_attempts"))    max_reconnect_attempts = SvIV(v);
         else if (strEQ(k, "exceptions"))                RETVAL->opt_exceptions = SvTRUE(v) ? 1 : 0;
         else if (strEQ(k, "client_id")) {
-            if (SvOK(v)) RETVAL->client_id = savepv(SvPV_nolen(v));
+            if (SvOK(v)) {
+                STRLEN cid_len;
+                const char *cid = SvPV(v, cid_len);
+                if (cid_len > 0 && memchr(cid, '\0', cid_len)) {
+                    cleanup_partial_ctor(RETVAL);
+                    croak("EV::Gearman: client id may not contain NUL bytes");
+                }
+                RETVAL->client_id = savepv(cid);
+            }
         }
         else if (strEQ(k, "grab_unique"))               RETVAL->worker_grab_uniq = SvTRUE(v) ? 1 : 0;
         else if (strEQ(k, "loop")) {
             if (!SvROK(v) || !sv_derived_from(v, "EV::Loop")) {
-                Safefree(RETVAL->rbuf);
-                Safefree(RETVAL->wbuf);
-                CLEAR_HANDLER(RETVAL->on_error);
-                CLEAR_HANDLER(RETVAL->on_connect);
-                CLEAR_HANDLER(RETVAL->on_disconnect);
-                CLEAR_HANDLER(RETVAL->loop_sv);
-                if (RETVAL->client_id) Safefree(RETVAL->client_id);
-                Safefree(RETVAL);
+                cleanup_partial_ctor(RETVAL);
                 croak("loop => must be an EV::Loop object");
             }
             /* An EV::Loop object is a blessed scalar holding the
@@ -2229,37 +2352,24 @@ CODE:
         else {
             /* An unknown key is almost always a typo ("reconect") that
                would silently leave the intended option unset — fail
-               loudly. Tear the partial object down exactly like the
-               loop-validation branch above. */
-            Safefree(RETVAL->rbuf);
-            Safefree(RETVAL->wbuf);
-            CLEAR_HANDLER(RETVAL->on_error);
-            CLEAR_HANDLER(RETVAL->on_connect);
-            CLEAR_HANDLER(RETVAL->on_disconnect);
-            CLEAR_HANDLER(RETVAL->loop_sv);
-            if (RETVAL->client_id) Safefree(RETVAL->client_id);
-            Safefree(RETVAL);
+               loudly. */
+            cleanup_partial_ctor(RETVAL);
             croak("EV::Gearman: unknown constructor option '%s'", k);
         }
     }
 
     if (host_sv && path_sv) {
-        Safefree(RETVAL->rbuf);
-        Safefree(RETVAL->wbuf);
-        CLEAR_HANDLER(RETVAL->on_error);
-        CLEAR_HANDLER(RETVAL->on_connect);
-        CLEAR_HANDLER(RETVAL->on_disconnect);
-        CLEAR_HANDLER(RETVAL->loop_sv);
-        if (RETVAL->client_id) Safefree(RETVAL->client_id);
-        Safefree(RETVAL);
+        cleanup_partial_ctor(RETVAL);
         croak("cannot specify both 'host' and 'path'");
     }
 
     RETVAL->port = port;
+    /* Always store delay/cap, so a later $g->reconnect(1) gets the
+       documented 1000 ms default instead of the struct's zero. */
+    RETVAL->reconnect_delay_ms = reconnect_delay >= 0 ? reconnect_delay : 0;
+    RETVAL->max_reconnect_attempts = max_reconnect_attempts >= 0 ? max_reconnect_attempts : 0;
     if (do_reconnect) {
         RETVAL->reconnect = 1;
-        RETVAL->reconnect_delay_ms = reconnect_delay >= 0 ? reconnect_delay : 0;
-        RETVAL->max_reconnect_attempts = max_reconnect_attempts >= 0 ? max_reconnect_attempts : 0;
     }
 
     if (host_sv && SvOK(host_sv)) {
@@ -2330,6 +2440,7 @@ CODE:
         CLEAR_HANDLER(self->on_connect);
         CLEAR_HANDLER(self->on_disconnect);
         CLEAR_HANDLER(self->worker_on_idle);
+        CLEAR_HANDLER(self->job_session);
         Safefree(self->host);     self->host = NULL;
         Safefree(self->path);     self->path = NULL;
         Safefree(self->client_id);self->client_id = NULL;
@@ -2412,6 +2523,11 @@ CODE:
     if (self->connected || self->connecting) {
         handle_disconnect(aTHX_ self, NULL);
     } else {
+        /* No cleanup_connection here, so bump explicitly: queued
+           entries belong to the dead session and must drain, while
+           entries submitted on a nested session from a cancel
+           callback must survive. */
+        self->conn_gen++;
         cancel_waiting(aTHX_ self, "disconnected");
     }
     self->callback_depth--;
@@ -2524,6 +2640,9 @@ CODE:
     const char *uniq = "";
     if (SvOK(unique_sv)) uniq = SvPV(unique_sv, ulen);
 
+    gm_check_no_nul(aTHX_ fname, flen, "function name");
+    gm_check_no_nul(aTHX_ uniq, ulen, "unique key");
+
     /* Validate the eventual body size (3 args + 2 NUL separators)
        before allocating anything, so the croak can't leak r/body. */
     gm_check_size(aTHX_ flen + ulen + wlen + 2);
@@ -2549,7 +2668,7 @@ CODE:
 }
 
 void
-_submit_epoch(EV::Gearman self, SV *func_sv, SV *workload_sv, SV *unique_sv, UV epoch, SV *cb_sv)
+_submit_epoch(EV::Gearman self, SV *func_sv, SV *workload_sv, SV *unique_sv, SV *epoch_sv, SV *cb_sv)
 CODE:
 {
     GM_CROAK_UNLESS_ALIVE(self);
@@ -2558,6 +2677,15 @@ CODE:
     const char *wload = SvPV(workload_sv, wlen);
     const char *uniq = "";
     if (SvOK(unique_sv)) uniq = SvPV(unique_sv, ulen);
+
+    gm_check_no_nul(aTHX_ fname, flen, "function name");
+    gm_check_no_nul(aTHX_ uniq, ulen, "unique key");
+
+    /* Negative epochs croak instead of wrapping; genuine UVs are
+       never negative. */
+    if (!SvIsUV(epoch_sv) && SvIV(epoch_sv) < 0)
+        croak("EV::Gearman: submit_job_epoch: epoch must be non-negative");
+    UV epoch = SvUV(epoch_sv);
 
     char epoch_buf[32];
     int epoch_len = snprintf(epoch_buf, sizeof(epoch_buf), "%lu", (unsigned long)epoch);
@@ -2618,6 +2746,7 @@ CODE:
 {
     STRLEN ilen;
     const char *id = SvPV(id_sv, ilen);
+    gm_check_no_nul(aTHX_ id, ilen, "client id");
     Safefree(self->client_id);
     self->client_id = savepv(id);
     if (self->connected)
@@ -2630,8 +2759,10 @@ CODE:
 {
     STRLEN flen;
     const char *fname = SvPV(func_sv, flen);
+    gm_check_no_nul(aTHX_ fname, flen, "function name");
     int timeout = 0;
     if (items > 2 && SvOK(ST(2))) timeout = SvIV(ST(2));
+    if (timeout < 0) timeout = 0;
 
     /* Without a Perl handler the caller must use grab_job to receive
        jobs; the entry just records the ability so reconnect re-sends
@@ -2694,6 +2825,8 @@ CODE:
 {
     STRLEN nlen;
     const char *name = SvPV(name_sv, nlen);
+    gm_check_no_nul(aTHX_ name, nlen, "function name");
+    if (timeout < 0) timeout = 0;
     if (!SvROK(cb_sv) || SvTYPE(SvRV(cb_sv)) != SVt_PVCV)
         croak("register_function: callback must be a coderef");
 
@@ -2791,6 +2924,15 @@ CODE:
     SV *cb = NULL;
     if (items > 2 && SvOK(ST(items-1)) && SvROK(ST(items-1)) && SvTYPE(SvRV(ST(items-1))) == SVt_PVCV)
         cb = ST(items-1);
+
+    /* Embedded newlines would inject a second command and desync
+       the reply framing; a single trailing newline stays legal. */
+    {
+        size_t scan = clen;
+        if (scan > 0 && cmd[scan - 1] == '\n') scan--;
+        if (scan > 0 && memchr(cmd, '\n', scan))
+            croak("EV::Gearman: admin: command may not contain a newline");
+    }
 
     /* Multi-line admin commands terminate with ".\n"; single-line ones
        don't (gearmand 1.1.21):
@@ -2977,9 +3119,9 @@ CODE:
     const char *h;
     ev_gm_t *self = job_resolve(aTHX_ job_sv, &h, &hl, "_send_status");
 
-    STRLEN nl, dl;
-    const char *n = SvPV(num_sv, nl);
-    const char *d = SvPV(denom_sv, dl);
+    STRLEN nl = 0, dl = 0;
+    const char *n = SvOK(num_sv) ? SvPV(num_sv, nl) : "";
+    const char *d = SvOK(denom_sv) ? SvPV(denom_sv, dl) : "";
     const char *ptrs[3] = { h, n, d };
     STRLEN lens[3] = { hl, nl, dl };
     size_t blen;
@@ -2987,4 +3129,3 @@ CODE:
     enqueue_packet(aTHX_ self, GM_CMD_WORK_STATUS, body, blen, NULL);
     Safefree(body);
 }
-

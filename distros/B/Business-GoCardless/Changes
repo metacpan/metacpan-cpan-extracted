@@ -1,5 +1,105 @@
 Revision history for Business-GoCardless
 
+1.00     2026-10-19
+        - MAJOR UPDATE including some breaking changes, see below
+        - Add company_name, phone_number, and danish_identity_number
+          attributes to Business::GoCardless::Customer
+        - Add faster_ach and scheme attributes to Business::GoCardless::Payment
+        - Fix typo in Payment->withdrawn (customer_appoval_denied ->
+          customer_approval_denied)
+        - Add bounced status check to Business::GoCardless::Payout
+        - Add mandate_reference attribute to Business::GoCardless::RedirectFlow
+        - Add count, app_fee, retry_if_possible,
+          earliest_charge_date_after_resume, and parent_plan_paused
+          attributes to Business::GoCardless::Subscription
+        - Add pending_customer_approval, customer_approval_denied, finished,
+          and paused status checks to Business::GoCardless::Subscription
+        - Fix Pro->customer( $id ), which returned an unpopulated object due
+          to using the wrong response key
+        - Fix pagination in the Pro (v2) API: the Paginator now uses the
+          cursors in the response meta data, previously only the first page
+          of results was ever returned
+        - Payment->refund now creates a refund via the /refunds endpoint and
+          returns a new Business::GoCardless::Refund object (it previously
+          always returned 0). The amount to refund must be passed explicitly
+        - Mandate->update now returns the updated Mandate object rather than
+          the raw response data (BREAKING CHANGE if you used the return value)
+        - Webhook::Event->resources now supports refunds and customers events,
+          add is_customer method
+        - Webhook::V2 objects from Pro->webhooks now have the webhook delivery
+          attributes (id, url, response_code, successful, is_test, etc)
+        - Decode API responses as UTF-8, previously strings containing non
+          ASCII characters were returned as UTF-8 encoded bytes rather than
+          characters (BREAKING CHANGE if you were decoding them yourself).
+          Webhook::V2 now also decodes the webhook body as UTF-8
+        - Fix Pro->confirm_resource for redirect flows backed by a billing
+          request (the default for redirect flows now), these are completed
+          by GoCardless when the customer finishes the flow so trying to
+          complete them again caused an error
+        - Fix Pro->confirm_resource passing all of the redirect flow's links
+          when creating the payment / subscription, which is now rejected by
+          the API as only the mandate link is permitted
+        - Update t/004_end_to_end_pro.t to work with the current GoCardless
+          sandbox, it now plays the part of the customer through the billing
+          requests API rather than scraping the (now javascript) payment pages
+        - Remove t/gocardless_callback_reader.pl and t/end_to_end/ as they are
+          no longer needed by the end to end test, and the LWP::Simple and
+          FindBin build requirements that were only used by that test
+        - Pro (v2) API requests that create a resource are now sent with an
+          Idempotency-Key header (a UUID v4, or pass your own as a header to
+          the api_post method). If an idempotent_creation_conflict error is
+          returned the existing resource is fetched and returned, unless the
+          new raise_on_idempotency_conflict client attribute is set. Adds a
+          dependency on UUID (0.34+) for generating the keys
+        - Pro (v2) API requests are now retried on network errors, server
+          errors (500, 502, 503, 504), and when rate limited (429), if it is
+          safe to do so. See the new max_retries (default 3) and
+          max_retry_wait (default 60s) client attributes, set max_retries to
+          0 for the previous behaviour
+        - Add rate_limit client attribute, containing the details from the
+          ratelimit-* headers of the most recent response
+        - Add api_delete method to Business::GoCardless::Client, and allow
+          passing extra headers to all of the api_* methods
+        - Business::GoCardless::Exception now has the details of Pro (v2) API
+          errors: type, request_id, documentation_url, and errors attributes,
+          and reasons, has_reason, and conflicting_resource_id methods
+        - webhook_secret can now be an arrayref of secrets, allowing for the
+          rotation of webhook secrets
+        - Add support for the rest of the Pro (v2) API resources, see the
+          RESOURCE METHODS section of Business::GoCardless::Pro:
+            - Billing Requests, Billing Request Flows, Billing Request
+              Templates, Bank Authorisations, Institutions (Billing Requests
+              replace Redirect Flows for new integrations)
+            - Customer Bank Accounts, Customer Notifications, Bank Account
+              Details, Bank Details Lookups, Events
+            - Creditors, Creditor Bank Accounts, Verification Details
+            - Refunds, Instalment Schedules, Tax Rates
+            - Mandate Imports, Mandate Import Entries, Mandate PDFs,
+              Transferred Mandates
+            - Payout Items, Balances, Funds Availability, Negative Balance
+              Limits, Currency Exchange Rates
+            - Blocks, Logos, Payer Themes, Scheme Identifiers, Exports
+            - Outbound Payments, Outbound Payment Imports, Outbound Payment
+              Import Entries, Bank Account Holder Verifications, Payment
+              Accounts, Payment Account Transactions
+            - Scenario Simulators (sandbox only)
+        - Add the missing operations on existing resources: create, update,
+          and remove customers; list and create mandates, reinstate mandate;
+          create and update subscriptions, pause and resume subscription;
+          update payments, payouts, and refunds; retry webhooks; cancel and
+          retry payments with metadata
+        - All of the create_* methods take an idempotency_key param
+        - Webhook::Event objects now have the metadata, resource_metadata,
+          customer_notifications, and source attributes, and ->resources
+          supports more resource types
+        - Fix Business::GoCardless->payouts( %filters ) with the Pro (v2)
+          API, which passed the filters incorrectly
+        - Payer Authorisations are not supported as they are deprecated in
+          favour of Billing Requests
+        - Move github repo to payprop org
+          (https://github.com/payprop/business-gocardless)
+        - Update author email address to lee@payprop.com
+
 0.45     2026-06-15
         - Add mandate_type to Business::GoCardless::Mandate, with
           is_bank_debit, is_instant, is_recurring, is_vrp_commercial,

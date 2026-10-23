@@ -1,3 +1,8 @@
+0.09  2026-10-16
+    - Fix callback ownership, cancellation order and connection cleanup.
+    - Drain secondary results before completing queries and prepared calls.
+    - Preserve idle connection shutdown and callback query chaining.
+
 0.08  2026-07-23
     - Validate statement handles; fix use-after-free after close_stmt and
       segfault on invalid or stale handles

@@ -42,6 +42,8 @@ t/32-forEach.t
 t/33-arr.t
 t/43-get.t
 t/44-set.t
+t/45-regressions.t
+t/46-export.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

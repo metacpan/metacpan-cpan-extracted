@@ -505,9 +505,9 @@ LOW-LEVEL CONNECTION METHODS
     Options: "acks" (default 1), "headers" (hashref), "timestamp" (epoch ms,
     default now), "compression" ('none', 'lz4', 'gzip', 'zstd', 'snappy';
     each requires its respective library at build time). With "acks => 0"
-    the broker sends no response, so the callback fires immediately with an
-    empty success result: it means "handed to the socket", not "broker
-    acknowledged".
+    the broker sends no response, so the callback fires with an empty
+    success result once the request bytes have left the socket buffer -- or
+    with an error if the connection drops first.
 
   produce_batch($topic, $partition, \@records, [\%opts,] [$cb])
     Produce multiple records in a single RecordBatch. Each record is "{key,
@@ -783,6 +783,7 @@ QUICK START
             },
         );
 
+        my $poll;   # kept alive for the life of the program
         $kafka->connect(sub {
             # produce
             $kafka->produce('test', 'k1', 'hello', sub {
@@ -791,8 +792,7 @@ QUICK START
                 # consume from the beginning
                 $kafka->assign([{topic=>'test', partition=>0, offset=>0}]);
                 $kafka->seek('test', 0, -2, sub {
-                    my $t = EV::timer 0, 0.1, sub { $kafka->poll };
-                    $kafka->{cfg}{_t} = $t;
+                    $poll = EV::timer 0, 0.1, sub { $kafka->poll };
                 });
             });
         });
@@ -878,6 +878,7 @@ COOKBOOK
                 10000, sub { ... }
             );
         });
+        $conn->connect('127.0.0.1', 9092);
 
 BENCHMARKS
     Measured on Linux with TCP loopback to Redpanda, 100-byte values, Perl
@@ -973,6 +974,13 @@ CAVEATS
         normal connection error path. The module deliberately does not set
         this itself -- a library must not change a process-global signal
         disposition its embedding application may rely on.
+
+    *   No fork or ithreads sharing -- a connection holds an event loop, a
+        socket and in-flight request state that cannot be shared. After
+        "fork", methods on an inherited connection croak, apart from the
+        read-only "connected"/"state"/"pending" queries; under "threads",
+        cloned connections come back as "undef". Create new connections in
+        the child thread or process instead.
 
 AUTHOR
     vividsnow

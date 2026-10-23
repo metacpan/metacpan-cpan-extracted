@@ -68,27 +68,68 @@ static ev_ch_send_t* alloc_send(void) {
     s->on_complete = NULL;
     s->query_timeout = 0;
     s->query_id = NULL;
+    s->deferred_sql = NULL;
+    s->deferred_sql_len = 0;
+    s->deferred_defaults = NULL;
+    s->deferred_overrides = NULL;
+    s->deferred_ext = NULL;
+    s->deferred_ext_len = 0;
     return s;
+}
+
+/* Drop retained pre-connect build inputs. Idempotent (slots NULLed). */
+static void free_send_deferred(ev_ch_send_t *s) {
+    CLEAR_STR(s->deferred_sql);
+    s->deferred_sql_len = 0;
+    CLEAR_SV(s->deferred_defaults);
+    CLEAR_SV(s->deferred_overrides);
+    CLEAR_STR(s->deferred_ext);
+    s->deferred_ext_len = 0;
 }
 
 static void release_send(ev_ch_send_t *s) {
     CLEAR_STR(s->query_id);
+    free_send_deferred(s);
     *(ev_ch_send_t **)s = send_freelist;
     send_freelist = s;
+}
+
+/* Retain pre-connect native build inputs in the send entry as owned
+ * snapshots (dispatch builds the packet once server_revision is
+ * known). Transfers ext_data and *settings_copy_p ownership. */
+static void stash_send_deferred(pTHX_ ev_ch_send_t *s, const char *sql,
+                                size_t sql_len, HV *defaults, HV *settings,
+                                HV **settings_copy_p, char *ext_data,
+                                size_t ext_len) {
+    Newx(s->deferred_sql, sql_len + 1, char);
+    Copy(sql, s->deferred_sql, sql_len, char);
+    s->deferred_sql[sql_len] = '\0';
+    s->deferred_sql_len = sql_len;
+    s->deferred_defaults = defaults ? newHVhv(defaults) : NULL;
+    if (*settings_copy_p) {
+        s->deferred_overrides = *settings_copy_p;
+        *settings_copy_p = NULL;
+    } else {
+        s->deferred_overrides = settings ? newHVhv(settings) : NULL;
+    }
+    s->deferred_ext = ext_data;
+    s->deferred_ext_len = ext_len;
 }
 
 /* Copy settings->{query_id} into s->query_id and apply query_timeout. */
 static void send_apply_settings(ev_ch_send_t *s, HV *settings) {
     SV **svp = hv_fetch(settings, "query_id", 8, 0);
+    if (svp && *svp && SvGMAGICAL(*svp)) mg_get(*svp);
     if (svp && SvOK(*svp)) {
         STRLEN qlen;
-        const char *qstr = SvPV(*svp, qlen);
+        const char *qstr = SvPV_nomg(*svp, qlen);
         Newx(s->query_id, qlen + 1, char);
         Copy(qstr, s->query_id, qlen, char);
         s->query_id[qlen] = '\0';
     }
     svp = hv_fetch(settings, "query_timeout", 13, 0);
-    if (svp && SvOK(*svp)) s->query_timeout = SvNV(*svp);
+    if (svp && *svp && SvGMAGICAL(*svp)) mg_get(*svp);
+    if (svp && SvOK(*svp)) s->query_timeout = SvNV_nomg(*svp);
 }
 
 /* If settings has params => { x => 1 }, return a new HV* copy with the
@@ -97,6 +138,7 @@ static void send_apply_settings(ev_ch_send_t *s, HV *settings) {
  * to use the original settings hashref. */
 static HV* expand_params(pTHX_ HV *settings) {
     SV **svp = hv_fetch(settings, "params", 6, 0);
+    if (svp && *svp && SvGMAGICAL(*svp)) mg_get(*svp);
     if (!svp || !SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVHV)
         return NULL;
     HV *phv = (HV *)SvRV(*svp);

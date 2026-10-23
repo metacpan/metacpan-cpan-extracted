@@ -24,7 +24,9 @@ use Data::TagDB::WellKnown;
 use Data::TagDB::Cloudlet;
 use Data::URIID::Colour;
 
-our $VERSION = v0.14;
+use parent 'Data::TagDB::Base';
+
+our $VERSION = v0.15;
 
 my %_queries = (
     _default => {
@@ -511,6 +513,10 @@ sub load_plugin {
 
 # ---- Virtual methods ----
 
+# ---- Overrides for Data::TagDB::Base ----
+
+sub db { return $_[0] }
+
 # ---- Private helpers ----
 
 sub DESTROY {
@@ -883,7 +889,7 @@ Data::TagDB - Work with Tag databases
 
 =head1 VERSION
 
-version v0.14
+version v0.15
 
 =head1 SYNOPSIS
 
@@ -918,6 +924,9 @@ Future versions of this module will depend on L<Data::Identifier>.
 
 B<Note:>
 This module supports SQLite and PostgreSQL (experimental).
+
+This package inherits from
+and L<Data::TagDB::Base> (since v0.15).
 
 =head1 METHODS
 

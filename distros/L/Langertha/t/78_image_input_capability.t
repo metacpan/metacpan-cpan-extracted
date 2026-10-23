@@ -81,6 +81,9 @@ my %DEFAULT = (
   OllamaOpenAI      => 0,
   # native wire unverified: the role is not composed at all
   AKI               => 0,
+  # no model at all: rule-driven, the role is not composed
+  Virtual           => 0,
+  Mock              => 0,
 );
 my %NO_DEFAULT_MODEL = map { $_ => 1 } qw( Groq OpenRouter HuggingFace Replicate VLLMHook OllamaOpenAI );
 

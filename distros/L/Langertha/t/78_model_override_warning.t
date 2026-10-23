@@ -205,6 +205,31 @@ subtest 'Gemini: cached_content is consulted only with a bound cachedContent' =>
   like( $warns->[0], qr/supports\('cached_content'\)/, 'names the cached_content capability' );
 };
 
+subtest 'tool_result_images / tool_result_pdf are consulted only with tools (k380)' => sub {
+  # They pick the form of a tool's image or PDF in the tool loop (ADR 0039),
+  # so a request without tools sends no tool result and must stay quiet even
+  # when the override flips vision; with tools the flip is real.
+  my $gemini_reply = { candidates => [ { finishReason => 'STOP',
+    content => { role => 'model', parts => [ { text => 'ok' } ] } } ] };
+  my $gemini = sub { Langertha::Engine::Gemini->new( api_key => 'k', model => 'gemini-2.5-flash',
+    _async_http => mock($gemini_reply) ) };
+  my ($warns) = chat_f_run( $gemini->(), model => 'gemini-3-pro-preview' );
+  is( scalar @$warns, 0, 'Gemini 2.5 -> 3 without tools: no warning' ) or diag @$warns;
+  ($warns) = chat_f_run( $gemini->(), model => 'gemini-3-pro-preview', tools => [$TOOL] );
+  is( scalar @$warns, 1, 'Gemini 2.5 -> 3 with tools: one warning' ) or diag @$warns;
+  like( $warns->[0], qr/supports\('tool_result_images'\)/, 'names tool_result_images' );
+  like( $warns->[0], qr/supports\('tool_result_pdf'\)/, 'names tool_result_pdf' );
+
+  my $claude = sub { Langertha::Engine::Anthropic->new( api_key => 'k', model => 'claude-sonnet-4-6',
+    _async_http => mock($anthropic_reply) ) };
+  ($warns) = chat_f_run( $claude->(), model => 'claude-2.1' );
+  is( scalar @$warns, 0, 'Claude vision -> claude-2.1 without tools: no warning' ) or diag @$warns;
+  ($warns) = chat_f_run( $claude->(), model => 'claude-2.1', tools => [$TOOL] );
+  is( scalar @$warns, 1, '... with tools: one warning' ) or diag @$warns;
+  like( $warns->[0], qr/supports\('tool_result_images'\)/, 'names tool_result_images' );
+  unlike( $warns->[0], qr/tool_result_pdf/, 'not tool_result_pdf, which does not flip (k371)' );
+};
+
 {
   package Test::UnlistedFlagEngine;
   use Moose;

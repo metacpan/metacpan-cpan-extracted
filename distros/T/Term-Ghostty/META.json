@@ -30,7 +30,7 @@
          "requires" : {
             "Alien::Base::Wrapper" : "1.97",
             "Alien::ghostty" : "0.01",
-            "ExtUtils::MakeMaker" : "6.52"
+            "ExtUtils::MakeMaker" : "6.64"
          }
       },
       "runtime" : {
@@ -55,6 +55,6 @@
          "web" : "https://github.com/vividsnow/perl5-term-ghostty"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

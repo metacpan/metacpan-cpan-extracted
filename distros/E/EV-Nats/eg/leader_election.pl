@@ -61,10 +61,10 @@ sub contend {
         } elsif ($err && $err =~ /wrong last sequence/i) {
             # Someone else holds it — wait then retry.
             warn "[$self_id] not leader; retrying in ${tick}s\n";
-            EV::timer($tick, 0, \&contend);
+            my $ct; $ct = EV::timer($tick, 0, sub { undef $ct; contend() });
         } else {
             warn "[$self_id] create failed: " . ($err // '?') . "\n";
-            EV::timer($tick, 0, \&contend);
+            my $ct; $ct = EV::timer($tick, 0, sub { undef $ct; contend() });
         }
     });
 }
@@ -72,7 +72,8 @@ sub contend {
 # Refresh by overwriting the value (max_age expires the entry if we
 # stop). On lease loss, contend again.
 sub schedule_refresh {
-    EV::timer($tick, 0, sub {
+    my $rt; $rt = EV::timer($tick, 0, sub {
+        undef $rt;
         $kv->put($key, $self_id, sub {
             my ($seq, $err) = @_;
             if ($err) {

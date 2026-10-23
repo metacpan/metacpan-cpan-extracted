@@ -130,6 +130,13 @@ use EV::cares qw(:all);
     my $csv = $r->servers;
     like($csv, qr/127\.0\.0\.1:5353/, 'hashref with port -> host:port');
     like($csv, qr/127\.0\.0\.2/,      'hashref without port -> bare host');
+
+    for my $host ('::1', '[::1]') {
+        $r->set_servers([{ host => $host, port => 5353 }]);
+        like($r->servers, qr/^\[::1\]:5353$/, 'IPv6 hashref preserves host and port');
+        my $v6 = EV::cares->new(servers => [{ host => $host, port => 5353 }]);
+        like($v6->servers, qr/^\[::1\]:5353$/, 'constructor preserves IPv6 host and port');
+    }
 }
 
 # set_sortlist

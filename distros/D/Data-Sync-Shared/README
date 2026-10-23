@@ -94,7 +94,7 @@ DESCRIPTION
   Features
     *   File-backed mmap for cross-process sharing
 
-    *   Futex-based blocking (no busy-spin, no pthread)
+    *   Futex-based blocking (no busy-spin)
 
     *   PID-based stale lock recovery (dead process detection)
 
@@ -106,9 +106,9 @@ DESCRIPTION
     *   eventfd integration for event-loop wakeup
 
   Crash Safety
-    All primitives encode the holder's PID in the lock word. If a process dies
-    while holding a lock, other processes detect the stale lock within 2
-    seconds via "kill(pid, 0)" and automatically recover.
+    RWLock, Condvar and Once recover locks left by dead owners. RWLock also
+    tracks reader processes. A dead Semaphore holder's permits are not
+    restored; a missing Barrier party needs a timeout followed by "reset".
 
     Reader-slot exhaustion (slotless readers): dead-process recovery
     attributes a crashed lock holder's contribution through its reader-slot.
@@ -207,8 +207,7 @@ PRIMITIVES
     would have to block, without breaking the barrier. On a positive timeout
     that actually elapses the barrier is permanently broken: "wait" returns -1
     for the timing-out party and all other waiters, and every subsequent
-    "wait" also returns -1 until "reset" is called. This matches POSIX
-    "pthread_barrier_t" broken semantics.
+    "wait" also returns -1 until "reset" is called.
 
         my $gen = $bar->generation;    # how many times barrier has tripped
         my $n   = $bar->arrived;       # currently arrived count

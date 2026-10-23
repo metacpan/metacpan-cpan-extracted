@@ -504,7 +504,7 @@ my $sandbox_mode = "bwrap";
 my $usage = "Usage: $0 [OPTION]... WORKDIR [WORKDIR]...\n"
    . "       $0 --exec-cmd GRANT,... [--] [COMMAND [ARG]...]\n";
 
-my %server_options = mcp_getoptions ({
+my $server_options = mcp_getoptions ({
    usage => $usage,
    description => "Expose filesystem tools and command execution over MCP.\n"
       . "Operations require permission and normally run inside bubblewrap.",
@@ -527,8 +527,8 @@ my %server_options = mcp_getoptions ({
    "bwrap=s"         => \my $bwrap,
 );
 
-my $name = $server_options{name};
-my $stdio = delete $server_options{stdio};
+my $name = $server_options->{name};
+my $stdio = delete $server_options->{stdio};
 
 die "--ask must be helper, tty, yad, mcp, or auto\n"
    if defined $ask && $ask !~ /\A(?:helper|tty|yad|mcp|auto)\z/;
@@ -710,7 +710,7 @@ $permissions = AnyEvent::MCP::Server::Permissions->new (
       \%description
    },
    (defined $ask ? (ask => $ask) : ()),
-   auto_rules => [@{$server_options{auto_rules} || []},
+   auto_rules => [@{$server_options->{auto_rules} || []},
       ($config ? $config->auto_rules ($name) : ())],
    sandbox_implementation => $bwrap ? "bubblewrap" : "NONE - UNSANDBOXED (full host-user privileges)",
    actions => {
@@ -3059,7 +3059,8 @@ mcp_config
    name        => $name,
    idle_exit   => 300,
    max_size    => 8 * 1024 * 1024, # 4 MiB binary stdin expands to ~5.6 MiB of Base64 JSON.
-   server_info => { name => "mcp-fs", version => "0" },
+   server_name    => "mcp-fs",
+   server_version => 0,
    permissions => $permissions,
    on_error    => sub { AE::log info => "mcp-tool $_[1]{tool}: $_[2]" },
    on_start    => sub {
@@ -3069,5 +3070,5 @@ mcp_config
    short_instructions => "Filesystem access: read/edit files, run sandboxed commands, inspect VCS in configured workdirs. Discover tools when working with files.",
    instructions => "Use workdirs to inspect configured workdirs, mounts and sandbox_grants. Select workdir by persistent positive integer ID (or numeric string) from the listing object keys, or exact configured/resolved path; IDs are not argument positions. Inactive mappings expire after seven days and IDs may then be reused. Stale paths fail. Paths are relative to the selected workdir; workdir-read/write expose only that workdir. all-workdirs-read/write expose every configured workdir; all-workdirs-read plus workdir-write allows writing only the selected workdir. Absolute paths in another configured workdir require all-workdirs authority; other absolute paths request home/world authority or shared-tmp for host tmp. Multi-path stat must stay within the selected workdir; rename may target another path but requires the combined sandbox grants and can fail with EXDEV at a mount boundary. Symlinks resolve inside the granted sandbox mounts; overlapping workdirs have unspecified access behavior. Trusted mount entries add baseline authority independent of requested grants; world-read retains writable exceptions, world-write ignores them. Exec supports explicit sandbox_grants and requires a useful reason. Prefer vcs-diff/vcs-status with an explicit backend for working-copy inspection; these use fixed argv and automatically request needed grants. Exec and VCS tools share grep/max_lines/max_bytes output options; stderr is unfiltered and capture_truncated means matches beyond the capture cap are unknown.\n";
 
-mcp_start %server_options, (stdio => $stdio);
+mcp_start %$server_options, (stdio => $stdio);
 

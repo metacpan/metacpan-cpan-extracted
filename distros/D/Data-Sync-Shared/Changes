@@ -1,5 +1,10 @@
 Revision history for Data-Sync-Shared
 
+0.11  2026-10-16
+    - Wake eligible semaphore waiters behind larger requests.
+    - Preserve completed barrier generations after later timeouts.
+    - Use monotonic condition deadlines and link threading dependencies.
+
 0.10      2026-09-26
           - A create that fails at mmap no longer leaves a full-size file
             behind.

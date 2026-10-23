@@ -205,7 +205,7 @@ sub new {
    my $class = shift;
 
    $class->SUPER::new (
-      client_info         => { name => "AnyEvent::MCP", version => $AnyEvent::MCP::VERSION },
+      client_info         => { name => "AnyEvent::MCP", version => "$AnyEvent::MCP::VERSION" },
       client_capabilities => {},
       versions            => [qw(2026-07-28 2025-11-25 2025-06-18 2025-03-26)],
       @_,

@@ -55,6 +55,7 @@ t/15_utilities.t
 t/16_recovery.t
 t/17_wait_idle.t
 t/18_parse_header_integration.t
+t/19_local_dns.t
 typemap
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

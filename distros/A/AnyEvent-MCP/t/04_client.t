@@ -15,7 +15,7 @@ use File::Temp ();
 use Socket;
 use Scalar::Util qw(weaken);
 
-print "1..65\n";
+print "1..71\n";
 
 my $test;
 sub ok($$) {
@@ -73,9 +73,54 @@ $client = AnyEvent::MCP::Client::HTTP->new (url => $server->url);
 ($success, $result) = wait_for (sub { $client->call (echo => {}, $_[0]) });
 ok $success, "URL cookie without header auth";
 $client->close;
+my $url = $server->url;
+chop $url;
+$client = AnyEvent::MCP::Client::HTTP->new (url => $url);
+($success, $result) = wait_for (sub { $client->rpc ("ping", {}, $_[0]) });
+ok $success, "URL token works without trailing slash";
+$client->close;
+$url = $server->url (0);
+chop $url;
+$client = AnyEvent::MCP::Client::HTTP->new (url => $url, bearer => "secret");
+($success, $result) = wait_for (sub { $client->rpc ("ping", {}, $_[0]) });
+ok $success, "bearer-authenticated endpoint works without trailing slash";
+$client->close;
+$url = $server->url;
+$url =~ s{/secret/mcp/\z}{/wrong/mcp};
+$client = AnyEvent::MCP::Client::HTTP->new (url => $url);
+($success, $result) = wait_for (sub { $client->rpc ("ping", {}, $_[0]) });
+ok !$success && $result->{transport} && $result->{message} =~ /404/,
+   "unknown URL token without trailing slash still rejected";
+$client->close;
+$client = AnyEvent::MCP::Client::HTTP->new (url => $server->url . "extra");
+($success, $result) = wait_for (sub { $client->rpc ("ping", {}, $_[0]) });
+ok !$success && $result->{transport} && $result->{message} =~ /404/,
+   "extra path component still rejected";
+$client->close;
 $client = AnyEvent::MCP::Client::HTTP->new (url => $server->url (0), bearer => "wrong");
 ($success, $result) = wait_for (sub { $client->rpc ("ping", {}, $_[0]) });
 ok !$success && $result->{transport} && $result->{message} =~ /401/, "wrong bearer fails";
+$client->close;
+$server->close;
+
+$server = AnyEvent::MCP::Server::HTTP->new (toolsets => [$toolset],
+   tokens => ["secret"], path => "/custom/");
+$server->listen;
+$url = $server->url;
+chop $url;
+$client = AnyEvent::MCP::Client::HTTP->new (url => $url);
+($success, $result) = wait_for (sub { $client->rpc ("ping", {}, $_[0]) });
+ok $success, "configured endpoint path accepts omitted trailing slash";
+$client->close;
+$server->close;
+
+$server = AnyEvent::MCP::Server::HTTP->new (toolsets => [$toolset],
+   tokens => ["secret"], path => "/custom");
+$server->listen;
+$client = AnyEvent::MCP::Client::HTTP->new (url => $server->url . "/");
+($success, $result) = wait_for (sub { $client->rpc ("ping", {}, $_[0]) });
+ok !$success && $result->{transport} && $result->{message} =~ /404/,
+   "endpoint without trailing slash still rejects an added slash";
 $client->close;
 $server->close;
 

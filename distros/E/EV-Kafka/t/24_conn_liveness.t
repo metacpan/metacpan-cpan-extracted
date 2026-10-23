@@ -20,7 +20,7 @@ use EV::Kafka;
 #
 # Mock-broker pattern as in t/20-t/23 — no live broker needed.
 
-plan tests => 20;
+plan tests => 24;
 
 sub i16 { pack 'n', $_[0] }
 sub i32 { pack 'N', $_[0] }
@@ -192,11 +192,32 @@ for my $case (
     $conn->produce('t', 0, 'k', 'v', { acks => 0 }, sub {
         $fired++;
         ($res, $error) = @_;
+        EV::break;
     });
+    ok !$fired, 'L6: acks=0 callback is not synchronous';
+    my $safety = EV::timer 5, 0, sub { EV::break };
+    EV::run;
     is $fired, 1,
-        'L6: acks=0 callback fires immediately (handed to the socket)';
+        'L6: acks=0 callback fires once flushed (handed to the socket)';
     ok((ref $res eq 'HASH' && !keys %$res), 'L6: empty success result');
     ok !defined($error), 'L6: no error';
+
+    $conn->DESTROY;
+}
+
+# --- L6b: acks=0 callback fails when dropped before the flush ----------
+{
+    my ($conn, $broker) = ready_conn();
+
+    my ($fired, $res, $error);
+    $conn->produce('t', 0, 'k', 'v', { acks => 0 }, sub {
+        $fired++;
+        ($res, $error) = @_;
+    });
+    $conn->disconnect;
+    is $fired, 1, 'L6b: pre-flush disconnect fails the acks=0 callback';
+    ok !defined($res), 'L6b: no result on disconnect';
+    ok defined($error), 'L6b: disconnect error reported';
 
     $conn->DESTROY;
 }

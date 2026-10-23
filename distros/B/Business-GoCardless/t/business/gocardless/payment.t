@@ -38,11 +38,14 @@ can_ok(
         created_at
         currency
         description
+        faster_ach
         fx
         id
         links
         metadata
         reference
+        retry_if_possible
+        scheme
         status
 
         retry
@@ -74,6 +77,9 @@ ok( ! $Payment->withdrawn,'withdrawn' );
 ok( ! $Payment->refunded,'refunded' );
 ok( ! $Payment->submitted,'submitted' );
 ok( ! $Payment->confirmed,'confirmed' );
+
+$Payment->status( 'customer_approval_denied' );
+ok( $Payment->withdrawn,'->withdrawn (customer_approval_denied)' );
 
 $Payment->id( 123 );
 is( $Payment->uri,'https://api.gocardless.com/payments/123','->uri' );

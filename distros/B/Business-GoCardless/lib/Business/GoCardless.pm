@@ -5,24 +5,15 @@ package Business::GoCardless;
 Business::GoCardless - Top level namespace for the Business::GoCardless
 set of modules
 
-=for html
-<a href='https://travis-ci.org/Humanstate/business-gocardless?branch=master'><img src='https://travis-ci.org/Humanstate/business-gocardless.svg?branch=master' alt='Build Status' /></a>
-<a href='https://coveralls.io/r/Humanstate/business-gocardless?branch=master'><img src='https://coveralls.io/repos/Humanstate/business-gocardless/badge.png?branch=master' alt='Coverage Status' /></a>
-
 =head1 VERSION
 
-0.45
+1.00
 
 =head1 DESCRIPTION
 
 Business::GoCardless is a set of libraries for easy interface to the gocardless
-payment service, they implement most of the functionality currently found
+payment service, they implement all of the functionality currently found
 in the service's API documentation: https://developer.gocardless.com
-
-Current missing functionality is partner account handling, but all resource
-manipulation (Bill, Merchant, Payout etc) is handled along with webhooks and
-the checking/generation of signature, nonce, param normalisation, and other
-such lower level interface with the API.
 
 =head1 Do Not Use This Module Directly
 
@@ -39,7 +30,7 @@ use Carp qw/ confess /;
 use Business::GoCardless::Client;
 use Business::GoCardless::Webhook;
 
-$Business::GoCardless::VERSION = '0.45';
+$Business::GoCardless::VERSION = '1.00';
 
 has api_version => (
     is       => 'ro',
@@ -134,7 +125,7 @@ sub payouts {
     my ( $self,%filters ) = @_;
 
     if ( $self->client->api_version > 1 ) {
-        return $self->_list( 'payouts',%filters );
+        return $self->_list( 'payouts',\%filters );
     } else {
         return $self->merchant( $self->client->merchant_id )
             ->payouts( \%filters );
@@ -209,7 +200,7 @@ L<Business::GoCardless::Pro>
 
 =head1 AUTHOR
 
-Lee Johnson - C<leejo@cpan.org>
+Lee Johnson - C<lee@payprop.com>
 
 =head1 CONTRIBUTORS
 
@@ -221,7 +212,7 @@ This library is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself. If you would like to contribute documentation,
 features, bug fixes, or anything else then please raise an issue / pull request:
 
-    https://github.com/Humanstate/business-gocardless
+    https://github.com/payprop/business-gocardless
 
 =cut
 

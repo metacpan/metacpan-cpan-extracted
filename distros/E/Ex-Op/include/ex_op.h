@@ -19,7 +19,6 @@ typedef struct {
     I32      oldsp;
     I32      runcx;
     CV      *oldruncv;
-    I32      runolddepth;
     PADOFFSET targ;
     U8       gimme;
     U8       oldgimme;

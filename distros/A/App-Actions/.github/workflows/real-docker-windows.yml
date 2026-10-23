@@ -1,0 +1,118 @@
+# Opt-in: run the preflight and one workflow against a real Docker daemon
+# from a Windows host.
+#
+# GitHub-hosted Windows runners ship a Windows-only Docker daemon, so they
+# cannot start Linux containers.  Dispatch this workflow either on a
+# self-hosted Windows runner with Docker Desktop (WSL2 Linux engine), or set
+# the docker_host input to a Linux daemon that this runner can reach.
+name: Real Docker on Windows
+
+"on":
+  workflow_dispatch:
+    inputs:
+      runner:
+        description: Runner label for a Windows host with a Linux Docker daemon
+        required: false
+        default: windows-latest
+      docker_host:
+        description: Optional DOCKER_HOST pointing at a Linux daemon
+        required: false
+        default: ''
+      docker:
+        description: Docker command
+        required: false
+        default: docker
+      image:
+        description: Linux image used by the test workflow
+        required: false
+        default: alpine:3.20
+
+permissions:
+  contents: read
+
+jobs:
+  real-docker:
+    runs-on: ${{ inputs.runner }}
+    timeout-minutes: 30
+    env:
+      LIVE_TESTING: '1'
+      LIVE_TESTING_IMAGE: ${{ inputs.image }}
+      DOCKER: ${{ inputs.docker }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Setup Perl
+        uses: shogo82148/actions-setup-perl@v1.44.2
+        with:
+          perl-version: '5.38'
+
+      - name: Install cpanm and local::lib
+        shell: cmd
+        run: |
+          @echo off
+          cpanm --notest App::cpanminus local::lib
+
+      - name: Install dependencies
+        shell: cmd
+        run: |
+          @echo off
+          set "PATH=%USERPROFILE%\perl5\bin;%PATH%"
+          set "PERL5LIB=%USERPROFILE%\perl5\lib\perl5"
+          cpanm --notest --installdeps .
+
+      - name: Point Docker at the requested daemon
+        if: inputs.docker_host != ''
+        shell: pwsh
+        run: |
+          'DOCKER_HOST=${{ inputs.docker_host }}' | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+
+      # The documented smoke test: the environment report first, then one
+      # workflow run against the real daemon.  It exits 2 when the daemon runs
+      # Windows containers, which is what a GitHub-hosted Windows runner does.
+      - name: Smoke test Docker
+        shell: pwsh
+        run: |
+          $env:PATH = "$env:USERPROFILE\perl5\bin;$env:PATH"
+          $env:PERL5LIB = "$env:USERPROFILE\perl5\lib\perl5"
+          perl -Ilib bin/action-run-smoke --directory .
+          exit $LASTEXITCODE
+
+      # The deferred report against a real daemon: an image only a step can
+      # name is reported as deferred, then prepared and run by that step.  It
+      # is a separate scenario because it needs an extra image and because a
+      # deferral is what the plain smoke workflow never reaches.
+      - name: Smoke test a deferred image
+        shell: pwsh
+        run: |
+          $env:PATH = "$env:USERPROFILE\perl5\bin;$env:PATH"
+          $env:PERL5LIB = "$env:USERPROFILE\perl5\lib\perl5"
+          perl -Ilib bin/action-run-smoke --directory . --scenario deferred
+          exit $LASTEXITCODE
+
+      # The preflight on a real daemon: a probe that cannot run its container,
+      # images prepared before the first container, and an unpullable image
+      # reported before anything starts.
+      - name: Run the preflight against real Docker
+        shell: pwsh
+        run: |
+          if ($env:LIVE_TESTING -ne '1') {
+            throw 'LIVE_TESTING is not set to 1; refusing to report a skipped test as success.'
+          }
+
+          $env:PATH = "$env:USERPROFILE\perl5\bin;$env:PATH"
+          $env:PERL5LIB = "$env:USERPROFILE\perl5\lib\perl5"
+          perl -Ilib t/real-docker-preflight.t
+          exit $LASTEXITCODE
+
+      - name: Run one workflow against real Docker
+        shell: pwsh
+        run: |
+          # A skipped test would report success without touching Docker.
+          if ($env:LIVE_TESTING -ne '1') {
+            throw 'LIVE_TESTING is not set to 1; refusing to report a skipped test as success.'
+          }
+
+          $env:PATH = "$env:USERPROFILE\perl5\bin;$env:PATH"
+          $env:PERL5LIB = "$env:USERPROFILE\perl5\lib\perl5"
+          perl -Ilib t/real-docker.t
+          exit $LASTEXITCODE

@@ -76,10 +76,9 @@ struct PugiXPath {
    pugixml pointer, so entries left behind by a reset/reload (whose pointers
    dangle) are safe to walk past; the gen_snap guard skips them anyway.
 
-   `owner` is NULL once the document wrapper itself has been destroyed. That
-   happens during global destruction, where perl calls DESTROY in arbitrary
-   order and may free the document before its nodes; the document's DESTROY
-   detaches every live wrapper so their DESTROY never dereferences it. */
+   Removed handles leave the index once removal succeeds, so reused addresses
+   do not accumulate dead entries. `owner` is then NULL, as it is after the
+   document's DESTROY detaches handles during global destruction. */
 
 struct PugiNode;
 struct PugiAttr;
@@ -101,7 +100,7 @@ struct PugiDoc {
 struct PugiNode {
     xml_node node;
     SV* doc_sv;              /* Reference to document to keep it alive */
-    PugiDoc* owner;          /* NULL once the document has been destroyed */
+    PugiDoc* owner;          /* NULL once detached from the index */
     unsigned int gen_snap;   /* owner->generation at creation time */
     bool dead;               /* Removed from the tree: storage is gone */
     PugiNode*  hnext;
@@ -112,7 +111,7 @@ struct PugiAttr {
     xml_attribute attr;
     xml_node parent_node;    /* Element owning this attribute */
     SV* doc_sv;              /* Reference to document to keep it alive */
-    PugiDoc* owner;          /* NULL once the document has been destroyed */
+    PugiDoc* owner;          /* NULL once detached from the index */
     unsigned int gen_snap;   /* owner->generation at creation time */
     bool dead;               /* Removed from its element: storage is gone */
     PugiAttr*  hnext;
@@ -143,18 +142,18 @@ typedef PugiXPath* XML__PugiXML__XPath;
     if (!(self)) \
         croak("Node handle is uninitialized or has been destroyed"); \
     if (HANDLE_STALE(self)) \
-        croak("Stale node handle: document has been reset or reloaded"); \
-    if ((self)->dead) \
-        croak("Stale node handle: node has been removed from the document"); \
+        croak("Stale node handle: %s", (self)->dead \
+            ? "node has been removed from the document" \
+            : "document has been reset or reloaded"); \
 } STMT_END
 
 #define CHECK_ATTR_ALIVE(self) STMT_START { \
     if (!(self)) \
         croak("Attribute handle is uninitialized or has been destroyed"); \
     if (HANDLE_STALE(self)) \
-        croak("Stale attribute handle: document has been reset or reloaded"); \
-    if ((self)->dead) \
-        croak("Stale attribute handle: attribute has been removed from its element"); \
+        croak("Stale attribute handle: %s", (self)->dead \
+            ? "attribute has been removed from its element" \
+            : "document has been reset or reloaded"); \
 } STMT_END
 
 /* Two handles share a document iff they name the same PugiDoc. insert_child_*
@@ -240,7 +239,7 @@ static void doc_register_node(PugiDoc* doc, PugiNode* n) {
 }
 
 static void doc_unregister_node(PugiNode* n) {
-    if (!n->owner) return;   /* document already destroyed, index is gone */
+    if (!n->owner) return;
     hidx_erase(n);
     n->owner->node_count--;
     n->owner = NULL;
@@ -329,6 +328,11 @@ static void invalidate_attribute(PugiDoc* doc, xml_attribute victim,
 static void revive_handles(std::vector<PugiNode*>& nodes, std::vector<PugiAttr*>& attrs) {
     for (size_t i = 0; i < nodes.size(); i++) nodes[i]->dead = false;
     for (size_t i = 0; i < attrs.size(); i++) attrs[i]->dead = false;
+}
+
+static void retire_handles(std::vector<PugiNode*>& nodes, std::vector<PugiAttr*>& attrs) {
+    for (size_t i = 0; i < nodes.size(); i++) doc_unregister_node(nodes[i]);
+    for (size_t i = 0; i < attrs.size(); i++) doc_unregister_attr(attrs[i]);
 }
 
 static SV* wrap_node(pTHX_ xml_node node, SV* doc_sv) {
@@ -466,13 +470,13 @@ CODE:
     for (size_t i = 0; i < self->node_nbuckets; i++)
         for (PugiNode* p = self->node_buckets[i]; p; ) {
             PugiNode* next = p->hnext;
-            p->owner = NULL; p->hnext = NULL; p->hprev = NULL; p->dead = true;
+            p->owner = NULL; p->hnext = NULL; p->hprev = NULL;
             p = next;
         }
     for (size_t i = 0; i < self->attr_nbuckets; i++)
         for (PugiAttr* a = self->attr_buckets[i]; a; ) {
             PugiAttr* next = a->hnext;
-            a->owner = NULL; a->hnext = NULL; a->hprev = NULL; a->dead = true;
+            a->owner = NULL; a->hnext = NULL; a->hprev = NULL;
             a = next;
         }
     free(self->node_buckets);
@@ -1119,7 +1123,8 @@ CODE:
             if (child->node && child->node.parent() == self->node)
                 invalidate_subtree(self->owner, child->node, killed_nodes, killed_attrs);
             RETVAL = self->node.remove_child(child->node);
-            if (!RETVAL) revive_handles(killed_nodes, killed_attrs);
+            if (RETVAL) retire_handles(killed_nodes, killed_attrs);
+            else revive_handles(killed_nodes, killed_attrs);
         } catch (const std::exception& e) {
             revive_handles(killed_nodes, killed_attrs);
             snprintf(err, sizeof(err), "remove_child error: %s", e.what());
@@ -1139,19 +1144,19 @@ CODE:
        handles to it must be killed while it is still readable. */
     xml_attribute victim = self->node.attribute(name);
     char err[256] = "";
+    RETVAL = false;
     if (victim) {
         std::vector<PugiNode*> killed_nodes;
         std::vector<PugiAttr*> killed_attrs;
         try {
             invalidate_attribute(self->owner, victim, killed_attrs);
             RETVAL = self->node.remove_attribute(victim);
-            if (!RETVAL) revive_handles(killed_nodes, killed_attrs);
+            if (RETVAL) retire_handles(killed_nodes, killed_attrs);
+            else revive_handles(killed_nodes, killed_attrs);
         } catch (const std::exception& e) {
             revive_handles(killed_nodes, killed_attrs);
             snprintf(err, sizeof(err), "remove_attr error: %s", e.what());
         }
-    } else {
-        RETVAL = false;
     }
     if (err[0]) croak("%s", err);
 }

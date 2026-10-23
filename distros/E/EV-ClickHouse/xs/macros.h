@@ -9,6 +9,19 @@
 #ifndef EV_CH_MACROS_H
 #define EV_CH_MACROS_H
 
+/* perl < 5.32 has no newSVsv_nomg: copy a scalar without running get magic. */
+#ifndef newSVsv_nomg
+#  define newSVsv_nomg(sv) ev_ch_newSVsv_nomg(aTHX_ (sv))
+static SV *
+ev_ch_newSVsv_nomg(pTHX_ SV *sv) {
+    SV *copy;
+    if (!sv) return NULL;
+    copy = newSV(0);
+    sv_setsv_flags(copy, sv, SV_NOSTEAL);
+    return copy;
+}
+#endif
+
 /* Drop an owned C string and reset the slot to NULL. */
 #define CLEAR_STR(p) do { if (p) { Safefree(p); (p) = NULL; } } while (0)
 

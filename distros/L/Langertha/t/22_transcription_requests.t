@@ -324,4 +324,27 @@ my $multipart = sub {
   }
 }
 
+# karr k370: the request shape speaches accepted live (2026-10-19, speaches
+# 0.8.3, the t/data/speaches_transcription_* captures). speaches checks the
+# bearer token (403 otherwise) and requires a model field (422 without one),
+# so a set api_key and transcription_model must both reach the wire; the empty
+# default sends no model field at all, never an empty one.
+{
+  my $speaches = Langertha::Engine::Whisper->new(
+    url                 => 'http://crag:8000/v1',
+    api_key             => 'live-test-key',
+    transcription_model => 'Systran/faster-whisper-tiny.en',
+  );
+  my $req = $speaches->transcription($file, response_format => 'vtt');
+  is($req->uri, 'http://crag:8000/v1/audio/transcriptions', 'speaches: /v1/audio/transcriptions');
+  is($req->header('Authorization'), 'Bearer live-test-key', 'speaches: api_key as bearer token');
+  my %field = map { ( $_->header('Content-Disposition') =~ /name="([^"]+)"/ )[0] => $_->content } $req->parts;
+  is($field{model}, 'Systran/faster-whisper-tiny.en', 'speaches: model field carries the Hugging Face id');
+  is($field{response_format}, 'vtt', 'speaches: response_format as given');
+
+  my @names = map { ( $_->header('Content-Disposition') =~ /name="([^"]+)"/ )[0] }
+    Langertha::Engine::Whisper->new( url => $whisper_testurl )->transcription($file)->parts;
+  is_deeply(\@names, ['file'], 'default empty model: no model field is sent');
+}
+
 done_testing;

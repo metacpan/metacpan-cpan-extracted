@@ -1,6 +1,6 @@
 package Langertha::Role::ServerTools;
 # ABSTRACT: Role for an engine whose wire accepts provider-native server-side tools
-our $VERSION = '0.503';
+our $VERSION = '0.504';
 use Moose::Role;
 use Langertha::ServerTool;
 
@@ -33,7 +33,7 @@ Langertha::Role::ServerTools - Role for an engine whose wire accepts provider-na
 
 =head1 VERSION
 
-version 0.503
+version 0.504
 
 =head1 SYNOPSIS
 

@@ -16,10 +16,13 @@ is(sprintf('%.3f', entropy($a[0])) + 0, 1.846);
 
 sub two { return ('ab', 'cd') }
 my @r = (7, eval { entropy(two()) }, 8);
-is("@r", '7 8', 'a list argument leaves nothing behind');
-like($@, qr/Usage/, 'and is refused');
+is("@r", '7 1 8', 'a list argument takes scalar context');
+is($@, '');
 @r = (7, eval { entropy(@a) }, 8);
-is("@r", '7 8');
+is("@r", '7 0 8', 'an array argument is its count');
+@r = (7, eval { &entropy('ab', 'cd') }, 8);
+is("@r", '7 8', 'bypassing the prototype leaves nothing behind');
+like($@, qr/Usage/, 'and is refused');
 @r = (7, entropy(substr('1223334444', 0)), 8);
 is(sprintf('%d %.3f %d', @r), '7 1.846 8');
 

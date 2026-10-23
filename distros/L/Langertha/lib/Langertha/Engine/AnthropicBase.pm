@@ -1,6 +1,6 @@
 package Langertha::Engine::AnthropicBase;
 # ABSTRACT: Base class for Anthropic-compatible engines
-our $VERSION = '0.503';
+our $VERSION = '0.504';
 use Moose;
 use Carp qw( croak );
 
@@ -19,6 +19,8 @@ with 'Langertha::Role::Models',
      'Langertha::Role::ResponseFormat',
      'Langertha::Role::Streaming',
      'Langertha::Role::ImageInput',
+     'Langertha::Role::ToolResultImages',
+     'Langertha::Role::ToolResultPDF',
      # Role::Tools::_build_tool_wire_format defaults to 'openai'; AnthropicCompatible supplies 'anthropic'.
      'Langertha::Role::Tools' => { -excludes => ['_build_tool_wire_format'] },
      'Langertha::Role::AnthropicCompatible';
@@ -32,6 +34,12 @@ around engine_capabilities => sub {
   my ( $orig, $self, @rest ) = @_;
   my $caps = $self->$orig(@rest);
   delete $caps->{prompt_cache_key};
+  # tool_result_pdf (ADR 0039, k380): the PDF document block in a tool_result
+  # rides exactly where the endpoint takes Anthropic's source blocks there
+  # (k364), so the flag derives from that predicate and cannot disagree with
+  # what format_tool_results sends. Not image_input-gated: the dialect reads
+  # a PDF's text without vision (k371).
+  delete $caps->{tool_result_pdf} unless $self->_tool_result_source_blocks_on_wire;
   return $caps;
 };
 
@@ -69,7 +77,7 @@ Langertha::Engine::AnthropicBase - Base class for Anthropic-compatible engines
 
 =head1 VERSION
 
-version 0.503
+version 0.504
 
 =head1 SYNOPSIS
 

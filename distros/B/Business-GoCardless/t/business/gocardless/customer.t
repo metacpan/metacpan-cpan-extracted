@@ -32,12 +32,18 @@ can_ok(
         first_name
         id
         last_name
+        company_name
+        phone_number
+        danish_identity_number
     /,
 );
 
 is( $Customer->endpoint,'/customers/%s','endpoint' );
 is( $Customer->first_name,$Customer->given_name,'->first_name' );
 is( $Customer->last_name,$Customer->family_name,'->last_name' );
+ok( ! $Customer->company_name,'company_name' );
+ok( ! $Customer->phone_number,'phone_number' );
+ok( ! $Customer->danish_identity_number,'danish_identity_number' );
 
 done_testing();
 

@@ -1,0 +1,42 @@
+---
+abstract: 'One application interface for HTTP/1, HTTP/2, and HTTP/3'
+author:
+  - 'Joshua S. Day <HAX@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150015'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Unblock-HTTP
+no_index:
+  directory:
+    - t
+    - inc
+  package:
+    - Unblock::HTTP::_AltSvc
+    - Unblock::HTTP::_ClientOperation
+    - Unblock::HTTP::_EngineFactory
+    - Unblock::HTTP::_Policy
+    - Unblock::HTTP::_Session
+    - Unblock::HTTP::_WebSocketH2Body
+requires:
+  Carp: '0'
+  URI: '0'
+  Unblock::HTTP1: '0.12'
+  Unblock::HTTP2: '0.12'
+  Unblock::HTTP3: '0.13'
+  Uniform::HTTP: '0.06'
+  parent: '0'
+  perl: '5.020'
+resources:
+  bugtracker: https://github.com/haxmeister/perl-Unblock-HTTP/issues
+  homepage: https://github.com/haxmeister/perl-Unblock-HTTP
+  repository: https://github.com/haxmeister/perl-Unblock-HTTP.git
+version: '0.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

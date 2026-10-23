@@ -7,10 +7,8 @@ AnyEvent::MCP::Server::Simple - simple function interface for MCP servers
    use AnyEvent::MCP::Server::Simple;
 
    mcp_config
-      server_info   => {
-         name    => "example",
-         version => "0",
-      },
+      server_name    => "example",
+      server_version => 0,
       instructions => <<'EOF';
          Use echo to return the supplied text.
    EOF
@@ -76,7 +74,7 @@ Save the following as C<echo-mcp>:
    use common::sense;
    use AnyEvent::MCP::Server::Simple;
 
-   my %options = mcp_getoptions {
+   my $options = mcp_getoptions {
       name        => "echo-demo",
       usage       => "Usage: $0 [OPTION]...\n",
       description => "Return text supplied to the echo tool.",
@@ -86,10 +84,8 @@ Save the following as C<echo-mcp>:
       or die "Unexpected arguments\n";
 
    mcp_config
-      server_info => {
-         name    => "echo-demo",
-         version => "1",
-      },
+      server_name    => "echo-demo",
+      server_version => 1,
       instructions => "Use echo to return the supplied text.";
 
    mcp_tool echo =>
@@ -116,7 +112,7 @@ Save the following as C<echo-mcp>:
          });
       };
 
-   mcp_start %options;
+   mcp_start %$options;
 
 Use your installed Perl's explicit path in the shebang, or invoke the file
 with C<perl> as in the commands below.
@@ -217,9 +213,9 @@ Pass the printed URL as its first command-line argument.
 The rest of the call and result handling stays the same.
 
 C<mcp_start> supplies named HTTP settings and a token derived from the
-private global secret. Stdio needs no HTTP configuration. The advertised
-C<server_info> describes the program; the startup C<name> selects local
-settings and credentials. They need not be identical.
+private global secret. Stdio needs no HTTP configuration. C<name> selects
+local settings and credentials; C<server_name> identifies the advertised
+MCP implementation. The two need not be the same.
 See L<AnyEvent::MCP::Intro/CONFIGURING YOUR SETUP>.
 
 =head2 Add an application option
@@ -229,7 +225,7 @@ Replace the original C<mcp_getoptions> call with:
 
    my $max_length = 4096;
 
-   my %options = mcp_getoptions (
+   my $options = mcp_getoptions (
       {
          name        => "echo-demo",
          usage       => "Usage: $0 [OPTION]...\n",
@@ -514,9 +510,25 @@ Common options include:
 
 =over
 
+=item name => $instance
+
+Local instance name used to select configuration and credentials. Independent
+of the name reported to MCP clients.
+
+=item server_name => $name
+
+Advertised MCP server implementation name. Defaults to C<AnyEvent::MCP>.
+
+=item server_version => $version
+
+Advertised application version, not the MCP protocol revision. Accepts
+an ordinary Perl version number; Simple stringifies it for MCP.
+Defaults to the AnyEvent::MCP library version.
+
 =item server_info => { name => $name, version => $version }
 
-Advertised MCP server identity.
+Raw MCP server identity, passed through unchanged to the underlying
+server. Cannot be combined with C<server_name> or C<server_version>.
 
 =item instructions => $text
 
@@ -580,7 +592,7 @@ C<< $req->result ($data) >> and C<< $req->error ($message) >> for convenience.
 Request context is available directly in
 the hash, for example C<< $req->{tool} >> and C<< $req->{server} >>.
 
-=item %server_options = mcp_getoptions ({ %settings }, @getopt_options)
+=item $server_options = mcp_getoptions ({ %settings }, @getopt_options)
 
 Parse standard server options C<--name>, C<--bind>, repeatable
 C<--token>, C<--stdio>, C<--custom-instructions>, repeatable
@@ -588,7 +600,7 @@ C<--auto-allow> and C<--auto-deny>, C<--quiet>, C<--print-url>, C<--tool-help> a
 application-specific L<Getopt::Long> option specifications:
 
    my $verbose;
-   my %options = mcp_getoptions (
+   my $options = mcp_getoptions (
       {
          usage => "Usage: $0 [OPTION]... WORKDIR\n",
          description => "Provide example tools through MCP.",
@@ -602,7 +614,7 @@ application-specific L<Getopt::Long> option specifications:
       "verbose!" => \$verbose,
    );
    @ARGV == 1 or die "workdir required\n";
-   mcp_start %options;
+   mcp_start %$options;
 
 The optional leading hash accepts these help settings:
 
@@ -1062,7 +1074,7 @@ sub mcp_getoptions {
       exit;
    }
 
-   %server
+   \%server
 }
 
 sub _permission_options {
@@ -1072,6 +1084,24 @@ sub _permission_options {
       require AnyEvent::MCP::Server::Permissions;
       my $permissions = $kv{permissions} ||= AnyEvent::MCP::Server::Permissions->new;
       $permissions->auto_rules ($rules);
+   }
+
+   %kv
+}
+
+sub _server_options {
+   my %kv = @_;
+
+   if (exists $kv{server_name} || exists $kv{server_version}) {
+      !exists $kv{server_info}
+         or die "Cannot combine server_info with server_name/server_version\n";
+
+      my $name = delete $kv{server_name};
+      my $version = delete $kv{server_version};
+      $kv{server_info} = {
+         name => defined $name ? $name : "AnyEvent::MCP",
+         version => defined $version ? "$version" : "$AnyEvent::MCP::VERSION",
+      };
    }
 
    %kv
@@ -1103,7 +1133,6 @@ sub mcp_start {
    $stdio ||= !defined $connect && $ENV{PERL_ANYEVENT_MCP_MULTIBROKER_PROTOCOL} eq "stdio";
 
    $kv{name} = $name;
-   $kv{server_info} ||= { name => $name, version => "0" };
 
    if (!$listen) {
       return mcp_connect (%kv, connect => $connect) if defined $connect;
@@ -1116,7 +1145,7 @@ sub mcp_start {
 
    if ($stdio || defined $connect) {
       require AnyEvent::MCP::Server::HTTP;
-      my $listener = AnyEvent::MCP::Server::HTTP->new (toolsets => [$toolset], %options);
+      my $listener = AnyEvent::MCP::Server::HTTP->new (toolsets => [$toolset], _server_options (%options));
       $listener->listen;
       my $result = defined $connect
          ? mcp_connect (%kv, connect => $connect)
@@ -1131,7 +1160,7 @@ sub mcp_start {
 sub mcp_connect {
    require AnyEvent::MCP::Server::Connect;
 
-   my %kv = (%config, @_);
+   my %kv = _server_options (%config, @_);
    mcp_tool_help (delete $kv{tool_help}, @{$kv{toolsets} || [$toolset]});
    my $server = AnyEvent::MCP::Server::Connect->new (toolsets => [$toolset], _permission_options (%kv));
    $server->start;
@@ -1141,7 +1170,7 @@ sub mcp_connect {
 sub mcp_stdio {
    require AnyEvent::MCP::Server::JSONL;
 
-   my %kv = _permission_options (%config, @_);
+   my %kv = _permission_options (_server_options (%config, @_));
    mcp_tool_help (delete $kv{tool_help}, @{$kv{toolsets} || [$toolset]});
    my $idle_exit = delete $kv{idle_exit};
    binmode STDIN;
@@ -1198,7 +1227,7 @@ sub mcp_stdio {
 sub mcp_http {
    require AnyEvent::MCP::Server::HTTP;
 
-   my %kv = _permission_options (%config, @_);
+   my %kv = _permission_options (_server_options (%config, @_));
    mcp_tool_help (delete $kv{tool_help}, @{$kv{toolsets} || [$toolset]});
    my $server = AnyEvent::MCP::Server::HTTP->new (toolsets => [$toolset], %kv);
    $server->listen;

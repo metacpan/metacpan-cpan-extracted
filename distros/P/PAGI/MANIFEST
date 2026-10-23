@@ -75,7 +75,6 @@ lib/PAGI/Spec/Tls.pod
 lib/PAGI/Spec/Www.pod
 lib/PAGI/Tutorial.pod
 lib/PAGI/Upgrading.pod
-nytprof.out
 t/00-load.t
 t/pod-syntax.t
 t/tutorial.t

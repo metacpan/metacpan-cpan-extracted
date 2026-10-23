@@ -296,7 +296,7 @@ $| = 1;
 
 my $usage = "Usage: $0 [OPTION]... PREFIX (URL | --- PROGRAM ARG... ---) [CHILD-OPTION] ...\n";
 Getopt::Long::Configure ("require_order");
-my %server_options = mcp_getoptions ({
+my $server_options = mcp_getoptions ({
    usage => $usage,
    path => "/",
    description => "Combine MCP servers behind one endpoint, with tools named PREFIX.TOOL.\n"
@@ -496,7 +496,7 @@ sub broker_config {
 
    (
       name                => $prefix,
-      client_info         => { name => "mcp-multibroker", version => $AnyEvent::MCP::VERSION },
+      client_info         => { name => "mcp-multibroker", version => "$AnyEvent::MCP::VERSION" },
       client_capabilities => {
          elicitation => { form => {} },
          extensions  => { "anyevent-mcp/multibroker" => { version => 1 } },
@@ -606,30 +606,38 @@ sub all_tools {
 
    my @tools = defined $name ? () : map @{$_->list}, @{$req->{server}{toolsets}};
    my @prefix = defined $name ? ($name) : sort keys %broker;
-   my $next;
-   $next = sub {
-      if ($req->{finished}) {
-         undef $next;
-         return
-      }
-      unless (@prefix) {
-         undef $next;
-         return $done->(\@tools)
-      }
-      my $prefix = shift @prefix;
-      my $client = $broker{$prefix} or return $next->();
-      $client->tools (sub {
-         my ($success, $result) = @_;
+   my @results;
+   my %pending = map { $_ => 1 } @prefix;
+   my $remaining = @prefix;
+   my $finished;
+   my $timer;
+   my $finish = sub {
+      return if $finished++;
+      undef $timer;
+      push @tools, @{$_ || []} for @results;
+      $done->(\@tools) unless $req->{finished};
+   };
+   return $finish->() unless $remaining;
 
+   $timer = AnyEvent->timer (after => 15, cb => sub {
+      AE::log warn => "Tool discovery timed out: " . join ", ", sort keys %pending;
+      $finish->();
+   });
+   for my $i (0 .. $#prefix) {
+      my $prefix = $prefix[$i];
+      my $client = $broker{$prefix};
+      $client->tools (sub {
+         return if $finished;
+         my ($success, $result) = @_;
          if ($success) {
-            push @tools, map { +{ %$_, name => "$prefix.$_->{name}" } } @$result;
+            $results[$i] = [map { +{ %$_, name => "$prefix.$_->{name}" } } @$result];
          } else {
             AE::log warn => "$prefix: $result->{message}";
          }
-         $next->();
+         delete $pending{$prefix};
+         $finish->() unless --$remaining;
       });
-   };
-   $next->();
+   }
 }
 
 sub call_tool {
@@ -733,31 +741,34 @@ $toolset->tool (discover_brokers =>
 
       my @prefix = sort keys %broker;
       my %instructions;
-      my $next;
-      $next = sub {
-         if ($req->{finished}) {
-            undef $next;
-            return
-         }
-         unless (@prefix) {
-            undef $next;
-            return $req->result (\%instructions)
-         }
-         my $prefix = shift @prefix;
-         my $client = $broker{$prefix} or return $next->();
-         $client->connect (sub {
-            my ($success, $result) = @_;
+      my %pending = map { $_ => 1 } @prefix;
+      my $remaining = @prefix;
+      my $finished;
+      my $timer;
+      my $finish = sub {
+         return if $finished++;
+         undef $timer;
+         $instructions{$_} = { error => "Discovery timed out" } for keys %pending;
+         $req->result (\%instructions) unless $req->{finished};
+      };
+      return $finish->() unless $remaining;
 
+      $timer = AnyEvent->timer (after => 15, cb => sub { $finish->() });
+      for my $prefix (@prefix) {
+         my $client = $broker{$prefix};
+         $client->connect (sub {
+            return if $finished;
+            my ($success, $result) = @_;
             if ($success) {
                $instructions{$prefix} = $client->{instructions};
             } else {
                AE::log warn => "$prefix: $result->{message}";
                $instructions{$prefix} = { error => $result->{message} };
             }
-            $next->();
+            delete $pending{$prefix};
+            $finish->() unless --$remaining;
          });
-      };
-      $next->();
+      }
    },
 );
 $toolset->tool (list_tools =>
@@ -810,7 +821,8 @@ sub log_request {
 }
 
 mcp_config
-   server_info => { name => "mcp-multibroker", version => $AnyEvent::MCP::VERSION },
+   server_name    => "mcp-multibroker",
+   server_version => $AnyEvent::MCP::VERSION,
    on_request => \&log_request,
    on_error => sub { AE::log error => "MCP dispatch $_[1]{method}: $_[2]" },
    short_instructions => "MCP tool router. Discover tools for downstream servers; discover-brokers gives their purposes. Tools may change.",
@@ -821,8 +833,8 @@ EOF
 # start selected stdio children now, before the upstream event loop starts.
 # their asynchronous initialization completes once that loop is running.
 # optional children can still be reconnected by a later MCP request.
-mcp_tool_help ($server_options{tool_help}, $toolset);
-delete $server_options{tool_help};
+mcp_tool_help ($server_options->{tool_help}, $toolset);
+delete $server_options->{tool_help};
 for my $prefix (sort keys %eager) {
    $broker{$prefix}->connect (sub {
       my ($success, $error) = @_;
@@ -836,7 +848,7 @@ for my $prefix (sort keys %eager) {
 }
 
 mcp_start
-   %server_options,
+   %$server_options,
    ($listen ? (listen => 1) : ()),
    toolsets => [$toolset],
    on_extension => \&accept_extension,

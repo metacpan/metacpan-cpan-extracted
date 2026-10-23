@@ -216,18 +216,19 @@ static char* ch_lz4_compress(const char *data, size_t data_len, size_t *out_len)
  * Advances *pos past every consumed sub-block; *out_len is total decompressed
  * size. Returns malloc'd buffer (caller Safefrees) on success, NULL on
  * not-enough-data (sets *need_more=1) or on hard error (sets *err) — both for
- * the first frame, the only one known to belong to this packet. *more_maybe
- * (may be NULL) is set when the chain stopped on a not-yet-complete following
- * frame, so the caller reads a short block as need-more, not as malformed. */
+ * the first frame, the only one known to belong to this packet.
+ * A short decode over the returned bytes always means need-more-data: the
+ * region isn't length-delimited, so a missing continuation frame is
+ * indistinguishable from corruption, and every consumed frame passed its
+ * CityHash check. */
 static char* ch_lz4_decompress_chain(const char *buf, size_t len, size_t *pos,
                                       size_t *out_len, int *need_more,
-                                      const char **err, int *more_maybe) {
+                                      const char **err) {
     size_t comp_consumed;
     char *out;
 
     *need_more = 0;
     *err = NULL;
-    if (more_maybe) *more_maybe = 0;
 
     out = ch_lz4_decompress(buf + *pos, len - *pos, out_len,
                             &comp_consumed, need_more, err);
@@ -248,8 +249,8 @@ static char* ch_lz4_decompress_chain(const char *buf, size_t len, size_t *pos,
                                          &extra_need_more, &extra_err);
         if (!extra) {
             /* Not a validated continuation frame (truncated, or the checksum
-             * says these bytes are not ours). Keep what we have. */
-            if (extra_need_more && more_maybe) *more_maybe = 1;
+             * says these bytes are not ours). Keep what we have; a short
+             * decode over it reads as need-more-data upstream. */
             break;
         }
         if (extra_len > CH_MAX_DECOMPRESS_SIZE - *out_len) {
@@ -271,6 +272,64 @@ static char* ch_lz4_decompress_chain(const char *buf, size_t len, size_t *pos,
 
 /* --- Days-since-epoch calculation for Date encoding --- */
 
+/* Calendar validation for Date/DateTime string encoding. Encode callers
+ * must reject invalid input via the encode-failure channel — silently
+ * wrapping "2024-13-45" into some nearby date corrupts the table. */
+static int all_digits(const char *s, size_t n) {
+    size_t i;
+    for (i = 0; i < n; i++)
+        if (s[i] < '0' || s[i] > '9') return 0;
+    return 1;
+}
+
+static int valid_civil_date(int year, int month, int day) {
+    static const uint8_t dim[12] =
+        { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+    int max_day;
+    if (month < 1 || month > 12 || day < 1) return 0;
+    max_day = dim[month - 1];
+    if (month == 2 && year % 4 == 0 && (year % 100 != 0 || year % 400 == 0))
+        max_day = 29;
+    return day <= max_day;
+}
+
+/* 1 if s starts with a valid "YYYY-MM-DD" calendar date. */
+static int valid_date_prefix(const char *s, size_t len) {
+    int year, month, day;
+    if (len < 10 || s[4] != '-' || s[7] != '-') return 0;
+    if (!all_digits(s, 4) || !all_digits(s + 5, 2) || !all_digits(s + 8, 2))
+        return 0;
+    year = atoi(s);
+    month = atoi(s + 5);
+    day = atoi(s + 8);
+    return valid_civil_date(year, month, day);
+}
+
+/* 1 if the "HH:MM:SS" part at s[11..18] is valid. Caller checked len >= 19.
+ * s[10] may be a space, 'T', or anything else — the encoder ignores it. */
+static int valid_time_part(const char *s) {
+    int hour, min, sec;
+    if (s[13] != ':' || s[16] != ':') return 0;
+    if (!all_digits(s + 11, 2) || !all_digits(s + 14, 2) || !all_digits(s + 17, 2))
+        return 0;
+    hour = atoi(s + 11);
+    min = atoi(s + 14);
+    sec = atoi(s + 17);
+    return hour < 24 && min < 60 && sec < 60;
+}
+
+/* Seconds-since-midnight for the time part, 0 when absent (len < 19).
+ * Caller validated via valid_time_part when present. */
+static int32_t parse_hms(const char *s, size_t len) {
+    int hour = 0, min = 0, sec = 0;
+    if (len >= 19) {
+        hour = atoi(s + 11);
+        min = atoi(s + 14);
+        sec = atoi(s + 17);
+    }
+    return hour * 3600 + min * 60 + sec;
+}
+
 static int32_t date_string_to_days(const char *s, size_t len) {
     int year, month, day;
     if (len >= 10 && s[4] == '-' && s[7] == '-') {
@@ -291,22 +350,6 @@ static int32_t date_string_to_days(const char *s, size_t len) {
     return (int32_t)strtol(s, NULL, 10);
 }
 
-static uint32_t datetime_string_to_epoch(const char *s, size_t len) {
-    int hour = 0, min = 0, sec = 0;
-    if (len >= 10 && s[4] == '-' && s[7] == '-') {
-        if (len >= 19) {
-            hour = atoi(s + 11);
-            min = atoi(s + 14);
-            sec = atoi(s + 17);
-        }
-        {
-            int32_t days = date_string_to_days(s, 10);
-            return (uint32_t)((int64_t)days * 86400 + hour * 3600 + min * 60 + sec);
-        }
-    }
-    return (uint32_t)strtoul(s, NULL, 10);
-}
-
 /* --- TabSeparated parser --- */
 
 /* Parse TabSeparated body into AV of AV. Handles \N -> undef, backslash escapes. */
@@ -323,9 +366,9 @@ static AV* parse_tab_separated(const char *data, size_t len) {
     Newx(buf, len + 1, char);
 
     while (p < end) {
-        /* skip trailing empty line */
-        if (p + 1 == end && *p == '\n') break;
-
+        /* No trailing-newline special case: after each row p advances
+         * past its \n, so a final \n always starts a real (possibly
+         * empty) row rather than a spurious blank line. */
         row = newAV();
         line_start = p;
 

@@ -1,0 +1,34 @@
+{
+  "schema_version": 3,
+  "generated_at": 1792540920,
+  "cache_file": "/home/me/.cache/action-run/cache.json",
+  "docker": {
+    "bin": "docker",
+    "reachable": true
+  },
+  "images": [
+    {
+      "image": "alpine:3.20",
+      "pulls": 3,
+      "last_used": 1792540800,
+      "age": 120,
+      "size": 12345678,
+      "present": true
+    },
+    {
+      "image": "perl:5.38",
+      "pulls": 1,
+      "last_used": 1792440000,
+      "age": 100920,
+      "size": null,
+      "present": false
+    }
+  ],
+  "totals": {
+    "images": 2,
+    "size": 12345678,
+    "present": 1,
+    "missing": 1
+  },
+  "prune": null
+}

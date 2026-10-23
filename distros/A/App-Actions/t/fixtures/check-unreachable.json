@@ -1,0 +1,27 @@
+{
+  "schema_version": 2,
+  "ready": false,
+  "problems": 1,
+  "host": {
+    "os": "linux",
+    "name": "Linux",
+    "perl": "5.40.0",
+    "archname": "x86_64-linux"
+  },
+  "docker": {
+    "bin": "docker",
+    "client": null,
+    "daemon": null,
+    "containers": null
+  },
+  "image": null,
+  "mounts": [],
+  "issues": [
+    {
+      "problem": "the Docker command 'docker' could not be run",
+      "remedies": [
+        "install Docker, or pass --docker with the full path to the docker executable"
+      ]
+    }
+  ]
+}

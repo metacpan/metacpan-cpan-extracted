@@ -77,7 +77,7 @@ $input =~ s/\n/\r\n/g;
 
 my $lines = ($input =~ tr/\n//) + 1;
 my $term  = Term::Ghostty->new(cols => $cols, rows => min(65535, max($rows, $lines)),
-                               max_scrollback => $lines);
+                               max_scrollback => length($input));
 $term->feed($input);
 
 my $html = $term->get_html(scrollback => 1, trim => $trim, unwrap => $unwrap);

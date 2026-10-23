@@ -349,6 +349,7 @@ subtest 'every engine capability is classified' => sub {
   my %NOT_MODEL_SCOPED = map { $_ => 1 } qw(
     embedding transcription image_generation
     runtime_metrics prefix_caching keep_alive cached_content context_size
+    stream_usage tool_result_images tool_result_pdf
   );
   ok !( grep { $NOT_MODEL_SCOPED{$_} } keys %ALLOWED ), 'the two lists are disjoint';
   my %seen;

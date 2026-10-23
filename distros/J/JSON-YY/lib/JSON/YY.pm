@@ -5,7 +5,7 @@ use warnings;
 use Carp;
 use Scalar::Util ();
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 require XSLoader;
 XSLoader::load('JSON::YY', $VERSION);
@@ -749,6 +749,12 @@ on such a key removes every occurrence but returns only the first. JSON does
 not define duplicate-key semantics; avoid relying on either.
 
 =item * NaN and Infinity values cannot be encoded (croaks).
+
+=item * A Perl double always encodes with a decimal point or an exponent, so
+C<10/2> becomes C<5.0> and C<1e307> becomes C<1e307>. Both are valid JSON and
+decode back to the same double, but L<JSON::XS> and L<JSON::PP> would write
+C<5> and C<1e+307>. Every encoder here agrees on this form, pretty or not;
+pass an integer, or a string, if a consumer needs C<5>.
 
 =item * Nesting is bounded in both directions by C<max_depth> (default 512):
 input nested deeper than that is rejected with C<maximum nesting depth

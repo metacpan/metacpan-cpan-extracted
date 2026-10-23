@@ -14,7 +14,7 @@ use IO::Socket::INET ();
 use JSON::XS ();
 use Time::HiRes ();
 
-print "1..65\n";
+print "1..67\n";
 my $test;
 sub ok($$) {
    my ($condition, $name) = @_;
@@ -380,6 +380,63 @@ my $exact = AnyEvent::MCP::Client::JSONL->new (
 ok $success && $result->{structuredContent}{alias} eq "dash_name",
    "an exact underscore alias takes precedence over the hyphen fallback";
 $exact->close;
+
+# Two delayed HTTP peers must receive discovery concurrently.
+my (%pending, %timers, %parallel);
+my @delayed_servers;
+for my $label (qw(first second)) {
+   my $server = AnyEvent::MCP::Server::HTTP->new (
+      auth => "none",
+      on_http_request => sub {
+         my ($server, $request, $reply) = @_;
+         my $message = eval { JSON::XS::decode_json $request->{body} };
+         my $method = $message->{method} // "";
+         return 0 unless $method eq "server/discover" || $method eq "tools/list";
+
+         my $group = $method eq "server/discover" ? "discover" : "tools";
+         push @{$pending{$group}}, [$reply, $message->{id}, $label];
+         $parallel{$group} = 1 if @{$pending{$group}} == 2;
+         $timers{$group} ||= AnyEvent->timer (after => 0.15, cb => sub {
+            for my $item (@{delete $pending{$group} || []}) {
+               my ($send, $id, $name) = @$item;
+               my $result = $group eq "discover"
+                  ? { supportedVersions => ["2026-07-28"], capabilities => { tools => {} },
+                      instructions => $name }
+                  : { tools => [{ name => "echo", description => $name,
+                      inputSchema => { type => "object" } }] };
+               $result->{resultType} = "complete";
+               $result->{_meta} = { "io.modelcontextprotocol/serverInfo" =>
+                  { name => $name, version => "0" } };
+               $send->(200, "OK", {}, JSON::XS::encode_json ({
+                  jsonrpc => "2.0", id => $id, result => $result,
+               }));
+            }
+            delete $timers{$group};
+         });
+         1
+      },
+   );
+   $server->listen;
+   push @delayed_servers, $server;
+}
+my $parallel_client = AnyEvent::MCP::Client::JSONL->new (
+   command => [$^X, "-Ilib", "bin/mcp-multibroker",
+      first => $delayed_servers[0]->url (0),
+      second => $delayed_servers[1]->url (0)],
+   env => { PERL_ANYEVENT_MCP_MULTIBROKER_PROTOCOL => "stdio" },
+);
+($success, $result) = wait_for (sub { $parallel_client->call ("discover-brokers", {}, $_[0]) });
+ok $success && $parallel{discover}
+   && $result->{structuredContent}{first} eq "first"
+   && $result->{structuredContent}{second} eq "second",
+   "discover-brokers contacts independent HTTP peers concurrently";
+($success, $result) = wait_for (sub { $parallel_client->call ("list-tools", {}, $_[0]) });
+my @remote = grep /\A(?:first|second)\./, map $_->{name}, @{$result->{structuredContent}{tools} || []};
+ok $success && $parallel{tools}
+   && join (",", @remote) eq "first.echo,second.echo",
+   "list-tools contacts peers concurrently but retains sorted tool order";
+$parallel_client->close;
+$_->close for @delayed_servers;
 
 $http->close;
 

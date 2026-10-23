@@ -1,6 +1,6 @@
 package Langertha::Role::Chat;
 # ABSTRACT: Role for APIs with normal chat functionality
-our $VERSION = '0.503';
+our $VERSION = '0.504';
 use Moose::Role;
 use Future;
 use Future::AsyncAwait;
@@ -657,6 +657,9 @@ my %CAP_CONSULTED_BY = (
   # Gemini's per-generation flag: consulted only with a bound cachedContent
   cached_content              => ['cached_content'],
   image_input                 => [],
+  # the tool-result form (ADR 0039): only a tool loop sends tool results
+  tool_result_images          => ['tools'],
+  tool_result_pdf             => ['tools'],
 );
 
 # The request features that decide which model-scoped decisions a request
@@ -1340,7 +1343,7 @@ Langertha::Role::Chat - Role for APIs with normal chat functionality
 
 =head1 VERSION
 
-version 0.503
+version 0.504
 
 =head1 SYNOPSIS
 

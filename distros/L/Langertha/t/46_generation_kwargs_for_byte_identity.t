@@ -136,13 +136,15 @@ is( body( $ant_bare, controls => { temperature => 0.7, reasoning_effort => 'medi
   'Anthropic body: per-request controls (temperature + reasoning + cache)' );
 
 # --- Streaming parity: same helper, same byte order ---
+# OpenAI's stream request also asks for the stream's usage (stream_usage,
+# ADR 0038); that field comes from the envelope, not from the helper.
 
 is( stream_body($oai_bare),
-  q({"messages":[{"content":"hi","role":"user"}],"model":"gpt-4o-mini","stream":true}),
+  q({"messages":[{"content":"hi","role":"user"}],"model":"gpt-4o-mini","stream":true,"stream_options":{"include_usage":true}}),
   'OpenAI streaming bare body' );
 
 is( stream_body($oai_all),
-  q({"messages":[{"content":"hi","role":"user"}],"model":"gpt-4o-mini","prompt_cache_key":"my-key","reasoning_effort":"high","stream":true,"temperature":0.5}),
+  q({"messages":[{"content":"hi","role":"user"}],"model":"gpt-4o-mini","prompt_cache_key":"my-key","reasoning_effort":"high","stream":true,"stream_options":{"include_usage":true},"temperature":0.5}),
   'OpenAI streaming body: all params via helper' );
 
 is( stream_body($ant_bare),

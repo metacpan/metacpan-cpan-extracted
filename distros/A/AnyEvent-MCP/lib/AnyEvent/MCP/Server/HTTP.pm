@@ -65,7 +65,9 @@ Each token authorizes the same requests. For either token, a client may
 POST to C</TOKEN/mcp/> without an Authorization header, or POST to
 C</mcp/> with C<Authorization: Bearer TOKEN>. URL credentials are path
 components, B<not> HTTP cookies. C<url> advertises the first token;
-C<url (0)> returns the clean endpoint.
+C<url (0)> returns the clean endpoint. A trailing slash may be omitted
+from either request path when the configured endpoint path ends in one;
+this accommodates clients that strip it from a configured URL.
 
 The accepted tokens are static, URL-safe strings. HTTP Basic and OAuth
 access-token validation are not implemented here. There is no automatic
@@ -106,7 +108,9 @@ The listening port, defaulting to zero for an automatically assigned port.
 =item path => $path
 
 The MCP endpoint path, defaulting to C</mcp/>. Bearer authentication uses
-C<$path> directly; URL tokens prefix it with C</TOKEN>.
+C<$path> directly; URL tokens prefix it with C</TOKEN>. If this path ends
+in C</>, requests without that final slash are also accepted. Other
+path differences are not normalized.
 
 =item connection_close => $boolean
 
@@ -459,11 +463,14 @@ sub _request {
       return if $hook->($self, { %$hdr, body => $body }, $reply);
    }
 
+   # Some MCP clients strip a trailing slash from the configured URL.
+   my $uri = $hdr->{uri};
+   $uri .= "/" if $self->{path} =~ m{/$} && $uri !~ m{/$};
    my $token_path = $self->{tokens}
-      && grep $hdr->{uri} eq $self->_token_path ($_), @{$self->{tokens}};
+      && grep $uri eq $self->_token_path ($_), @{$self->{tokens}};
 
    return $self->_respond ($handle, 404, "Not Found", "")
-      unless $hdr->{uri} eq $self->{path} || $token_path;
+      unless $uri eq $self->{path} || $token_path;
 
    if (exists $hdr->{origin}) {
       my $wildcard = grep $_ eq "*", @{$self->{origins}};

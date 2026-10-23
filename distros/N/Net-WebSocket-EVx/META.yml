@@ -1,7 +1,7 @@
 ---
 abstract: 'Perl wrapper around Wslay websocket library'
 author:
-  - 'Yegor Korablev <egor@cpan.org>'
+  - vividsnow
 build_requires:
   Devel::Peek: '0'
   ExtUtils::MakeMaker: '0'
@@ -19,7 +19,7 @@ configure_requires:
   EV::MakeMaker: '0'
   ExtUtils::MakeMaker: '6.64'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013'
+generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150015'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -32,7 +32,7 @@ no_index:
 provides:
   Net::WebSocket::EVx:
     file: lib/Net/WebSocket/EVx.pm
-    version: '0.21'
+    version: '0.22'
 requires:
   Carp: '0'
   EV: '4.0'
@@ -43,5 +43,5 @@ requires:
 resources:
   bugtracker: https://github.com/vividsnow/Net-WebSocket-EVx/issues
   repository: https://github.com/vividsnow/Net-WebSocket-EVx.git
-version: '0.21'
+version: '0.22'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

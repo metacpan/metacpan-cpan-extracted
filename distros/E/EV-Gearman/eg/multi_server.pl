@@ -17,6 +17,23 @@ my @servers = qw(127.0.0.1:4730 127.0.0.1:4731 127.0.0.1:4732);
 my @clients;
 my @healthy;
 
+# Demo: fire 50 jobs once the first server is up, then report.
+# Nothing is healthy before the loop runs, so submitting eagerly
+# here would fail every job with "no healthy gearmand".
+my $remaining = 50;
+my @results;
+my $started = 0;
+sub start_demo {
+    return if $started++;
+    for my $i (1 .. 50) {
+        submit(reverse => "msg-$i", sub {
+            push @results, [$i, @_];
+            $remaining--;
+            EV::break if $remaining == 0;
+        });
+    }
+}
+
 for my $i (0 .. $#servers) {
     my ($h, $p) = split /:/, $servers[$i];
     $healthy[$i] = 0;
@@ -24,7 +41,10 @@ for my $i (0 .. $#servers) {
         host          => $h,
         port          => $p,
         reconnect     => 1,
-        on_connect    => sub { $healthy[$i] = 1; warn "[$i] $servers[$i] up\n"   },
+        on_connect    => sub {
+            $healthy[$i] = 1; warn "[$i] $servers[$i] up\n";
+            start_demo();
+        },
         on_disconnect => sub { $healthy[$i] = 0; warn "[$i] $servers[$i] down\n" },
         on_error      => sub { warn "[$i] $servers[$i]: $_[0]\n"                 },
     );
@@ -45,17 +65,6 @@ sub submit {
     my $g = pick_client;
     return $cb->(undef, "no healthy gearmand") unless $g;
     $g->submit_job($func, $workload, $cb);
-}
-
-# Demo: fire 50 jobs and report
-my $remaining = 50;
-my @results;
-for my $i (1 .. 50) {
-    submit(reverse => "msg-$i", sub {
-        push @results, [$i, @_];
-        $remaining--;
-        EV::break if $remaining == 0;
-    });
 }
 
 my $t = EV::timer 10, 0, sub { warn "timeout\n"; EV::break };

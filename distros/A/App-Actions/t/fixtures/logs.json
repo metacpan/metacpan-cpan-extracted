@@ -1,0 +1,37 @@
+{
+  "schema_version": 3,
+  "generated_at": 1792540920,
+  "logs_directory": "/home/me/.cache/action-run/logs",
+  "logs": [
+    {
+      "run": "20261021-121355-6ad8e4c30f83",
+      "name": "job-1-test_n_one.log",
+      "path": "/home/me/.cache/action-run/logs/20261021-121355-6ad8e4c30f83/job-1-test_n_one.log",
+      "size": 1229,
+      "mtime": 1792540800,
+      "age": 120
+    },
+    {
+      "run": "20261021-121355-6ad8e4c30f83",
+      "name": "job-2-test_n_two.log",
+      "path": "/home/me/.cache/action-run/logs/20261021-121355-6ad8e4c30f83/job-2-test_n_two.log",
+      "size": 819,
+      "mtime": 1792540800,
+      "age": 120
+    },
+    {
+      "run": "20261020-091201-1f4b2c3d4e5f",
+      "name": "job-1-test_n_one.log",
+      "path": "/home/me/.cache/action-run/logs/20261020-091201-1f4b2c3d4e5f/job-1-test_n_one.log",
+      "size": 1024,
+      "mtime": 1792456320,
+      "age": 84600
+    }
+  ],
+  "totals": {
+    "runs": 2,
+    "logs": 3,
+    "size": 3072
+  },
+  "prune": null
+}

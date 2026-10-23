@@ -9,3 +9,4 @@
 ^Ghostty\.(?:c|o|bs)$
 ^Term-Ghostty-
 \.tar\.gz$
+^\.pcg/

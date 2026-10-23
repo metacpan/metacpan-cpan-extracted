@@ -5,7 +5,7 @@
     <%= title %>
     </title>
 
-    %= component 'system-hosts'
+    %= component 'my-component'
 </head>
 <body>
 <div class="h-100">

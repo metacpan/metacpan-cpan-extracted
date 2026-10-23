@@ -57,4 +57,36 @@ EV::run;
 my $n_after = grep { /max reconnect/ } @errs;
 is $n_after, $n_before, 'no further retries after giving up';
 
+{
+    my @result;
+    my $client = EV::Gearman->new(host => '127.0.0.1', port => $port,
+                                  on_error => sub {});
+    $client->echo('pending', sub { @result = @_; EV::break });
+    my $timer = EV::timer 3, 0, sub { EV::break };
+    EV::run;
+    is_deeply \@result, [undef, 'disconnected'],
+        'failed initial connect completes the queued callback';
+    is $client->waiting_count, 0, 'failed initial connect drains the wait queue';
+}
+
+{
+    my ($client, $queued, @result, @warnings);
+    local $SIG{__WARN__} = sub { push @warnings, @_ };
+    $client = EV::Gearman->new(
+        host => '127.0.0.1', port => $port,
+        reconnect => 1, reconnect_delay => 30, max_reconnect_attempts => 2,
+        on_error => sub {
+            return if $_[0] =~ /max reconnect/ || $queued++;
+            $client->echo('retry', sub { @result = @_; EV::break });
+        },
+    );
+    my $timer = EV::timer 3, 0, sub { EV::break };
+    EV::run;
+    is_deeply \@warnings, [], 'on_error can queue work for the first retry';
+    is_deeply \@result, [undef, 'disconnected'],
+        'exhausted reconnects complete the queued callback';
+    is $client->waiting_count, 0, 'exhausted reconnects drain the wait queue';
+    $client->on_error(undef);
+}
+
 done_testing;

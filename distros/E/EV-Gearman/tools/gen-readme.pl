@@ -25,7 +25,7 @@ my $parser = Pod::Markdown->new(
 $parser->output_string(\my $out);
 $parser->parse_file($src);
 
-my $banner = "<!-- DO NOT EDIT \x{2014} regenerated from $src POD by tools/gen-readme.pl -->\n\n";
+my $banner = "<!-- DO NOT EDIT -- regenerated from $src POD by tools/gen-readme.pl -->\n\n";
 
 open my $fh, '>:encoding(UTF-8)', $dst or die "$dst: $!";
 print $fh $banner, $out;

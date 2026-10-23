@@ -8,6 +8,8 @@ installs them with the client. If they're missing, `init()` says so in one line 
 `[ForgeOps] Not sending`. `Plack` and `Dancer2` are only needed for their own optional
 integrations below.
 
+> For health or personal data, turn on [strict privacy](#strict-privacy): the SDK then sends only structured facts about each error (its type, stack trace, release and route), never the message, a raw path, breadcrumbs, or context you haven't allowed.
+
 ## Installation
 
 ```bash

@@ -1,6 +1,6 @@
 package Langertha::ToolResult;
 # ABSTRACT: Immutable canonical result of executing one tool, with cross-provider conversion
-our $VERSION = '0.503';
+our $VERSION = '0.504';
 use Moose;
 use Carp qw( croak );
 use JSON::MaybeXS;
@@ -183,9 +183,9 @@ sub _string_of {
 # parts; OpenAI /v1/responses and Perplexity /v1/agent) and Gemini 3's
 # functionResponse.parts[].inlineData (v1beta). Docs-derived, not
 # live-verified (2026-09-29). The caller (Role::Tools) passes image_input => 1
-# only when the model sees images; without it, and on every other wire but
-# Anthropic (same gate, karr k359, below), the image stays the k336
-# placeholder.
+# only when the engine claims tool_result_images (ADR 0039); without it, and on
+# every other wire but Anthropic (same gate, karr k359, below), the image stays
+# the k336 placeholder.
 
 my %RESPONSES_IMAGE_MIME = map { $_ => 1 } qw( image/jpeg image/png image/gif image/webp );
 my %GEMINI_IMAGE_MIME    = map { $_ => 1 } qw( image/jpeg image/png image/webp );
@@ -211,8 +211,8 @@ sub _native_image_data {
 # text/plain"). Perplexity's /v1/agent lists only input_text / input_image.
 # Docs-derived, not live-verified (developers.openai.com, ai.google.dev,
 # docs.perplexity.ai, 2026-09-30). The caller (Role::Tools) passes
-# native_pdf => 1 only where the wire takes it and the model claims
-# image_input; otherwise the PDF stays the k336 placeholder. A PDF is an MCP
+# native_pdf => 1 only when the engine claims tool_result_pdf (ADR 0039);
+# otherwise the PDF stays the k336 placeholder. A PDF is an MCP
 # embedded resource blob, the one MCP shape that carries a document (as on the
 # anthropic wire, k326).
 
@@ -322,7 +322,7 @@ sub _responses_output {
 # the tool loop: what Anthropic cannot carry (audio, resource_link, unsupported
 # MIME types) becomes a text placeholder.
 #
-# Two options, both decided by the caller (Role::Tools) per engine and model:
+# Three options, all decided by the caller (Role::Tools) per engine and model:
 #   image_input  an MCP image becomes an image block only with it (karr k359),
 #                as on the responses / gemini wires: the /anthropic shims
 #                answer 200 whether or not the model sees it. An
@@ -335,6 +335,11 @@ sub _responses_output {
 #                is wire truth, not a model question, so a native document or
 #                search_result is degraded the same way (Role::Tools carps
 #                when it does). Default 1.
+#   native_pdf   0 sends a PDF resource as the placeholder although the wire
+#                takes the document block: Role::Tools passes the engine's
+#                tool_result_pdf, so the block goes out only where supports()
+#                says so, also on a forced wire (ADR 0039, k380). Default 1 --
+#                a bare to('anthropic') keeps the k326 document block.
 
 my %ANTHROPIC_IMAGE_MIME = map { $_ => 1 } qw( image/jpeg image/png image/gif image/webp );
 
@@ -365,7 +370,8 @@ sub _anthropic_block {
       if $opts{image_input} && $ANTHROPIC_IMAGE_MIME{$mime};
     return { type => 'document',
       source => { type => 'base64', media_type => 'application/pdf', data => $data } }
-      if $source_blocks && $type eq 'resource' && $mime eq 'application/pdf';
+      if $source_blocks && ( $opts{native_pdf} // 1 )
+      && $type eq 'resource' && $mime eq 'application/pdf';
   }
   return { type => 'text', text => _placeholder( @{$item}{qw( type mime uri data )} ) };
 }
@@ -466,6 +472,41 @@ sub to {
   return $self->$method(%opts);
 }
 
+# The wires whose result block has a native form per media kind: what the
+# serializers above emit with image_input / native_pdf (anthropic: the image
+# block and, source_blocks allowing, the PDF document block), and whether that
+# form reaches only a model that sees images ('vision') or any model ('any').
+# The capability registry keys tool_result_images / tool_result_pdf on it (ADR
+# 0039, k380); t/78_tool_result_media_capability.t pins it against the
+# serializers. An image is a vision question everywhere; a PDF is one on the
+# responses and gemini wires, whose providers read PDFs through the model's
+# vision (OpenAI's PDF-files guide names vision models, k361; Gemini reads
+# documents through its vision), and not on anthropic, whose dialect extracts
+# a PDF's text for a text-only model (MiniMax-M2.7 read one live, k371).
+my %NATIVE_MEDIA = (
+  image => { anthropic => 'vision', responses => 'vision', gemini => 'vision' },
+  pdf   => { anthropic => 'any',    responses => 'vision', gemini => 'vision' },
+);
+
+sub _native_media_form {
+  my ( $self, $fmt, $kind, $method ) = @_;
+  my $wires = $NATIVE_MEDIA{ $kind // '' }
+    or croak "Langertha::ToolResult->$method: unknown media kind '" . ( $kind // '' ) . "'";
+  return defined $fmt && !ref $fmt ? $wires->{$fmt} : undef;
+}
+
+
+sub carries_native {
+  my ( $self, $fmt, $kind ) = @_;
+  return $self->_native_media_form( $fmt, $kind, 'carries_native' ) ? 1 : 0;
+}
+
+sub native_needs_vision {
+  my ( $self, $fmt, $kind ) = @_;
+  my $form = $self->_native_media_form( $fmt, $kind, 'native_needs_vision' );
+  return defined $form && $form eq 'vision' ? 1 : 0;
+}
+
 __PACKAGE__->meta->make_immutable;
 
 
@@ -483,7 +524,7 @@ Langertha::ToolResult - Immutable canonical result of executing one tool, with c
 
 =head1 VERSION
 
-version 0.503
+version 0.504
 
 =head1 SYNOPSIS
 
@@ -520,7 +561,8 @@ Anthropic takes structured blocks, so each MCP block is mapped onto one: text
 keeps only C<text> (and C<cache_control>); an image, or an embedded resource
 whose blob is an image, becomes a base64 C<image> (JPEG, PNG, GIF, WebP) when
 C<to> is called with C<< image_input => 1 >> (see below), else the text
-placeholder; a PDF blob becomes a base64 C<document>; a text resource (whatever
+placeholder; a PDF blob becomes a base64 C<document> (unless C<to> is called
+with C<< native_pdf => 0 >>, see below); a text resource (whatever
 its MIME type) or a C<text/*> blob becomes a text C<document>. Anthropic-native
 C<image> / C<document> blocks (with a C<source>) and C<search_result> pass
 through. Everything else -- C<resource_link>, audio, other MIME types -- becomes
@@ -544,9 +586,10 @@ followed by its text parts. Anything else becomes a placeholder.
 On every string wire and on Anthropic, empty content goes out as the
 JSON-encoded L</structured_content>, or as C<''>.
 
-Three wires carry an image natively, and do so only when C<to> is called with
-C<< image_input => 1 >> (L<Langertha::Role::Tools/format_tool_results> passes
-it when the model claims C<image_input>):
+Three wires carry an image natively (L</carries_native>), and do so only when
+C<to> is called with C<< image_input => 1 >>
+(L<Langertha::Role::Tools/format_tool_results> passes it when the engine
+claims C<tool_result_images> for the selected model, ADR 0039):
 
 =over
 
@@ -565,7 +608,7 @@ C</v1/agent> document the same shape.
 
 =item * C<gemini> -- an image (JPEG, PNG, WebP) moves out of the C<result>
 string into C<< functionResponse.parts[].inlineData >> (C<mimeType>,
-C<data>). Documented for the Gemini 3 series (v1beta) only.
+C<data>). Documented for Gemini 3 and later (v1beta).
 
 =back
 
@@ -575,8 +618,9 @@ tool result and ignore the option: the image stays a placeholder there.
 
 A PDF (an embedded resource whose blob is C<application/pdf>) rides natively
 on two more of those wires when C<to> is called with C<< native_pdf => 1 >>
-(L<Langertha::Role::Tools/format_tool_results> passes it on OpenAI Responses
-and Gemini 3, for a model that claims C<image_input>):
+(L<Langertha::Role::Tools/format_tool_results> passes it when the engine claims
+C<tool_result_pdf>: OpenAI Responses and Gemini 3 and later, for a model that
+claims C<image_input>):
 
 =over
 
@@ -590,13 +634,17 @@ PDF stays the placeholder there.
 
 =item * C<gemini> -- the PDF moves out of the C<result> string into
 C<< functionResponse.parts[].inlineData >> with C<mimeType>
-C<application/pdf>. Documented for the Gemini 3 series.
+C<application/pdf>. Documented for Gemini 3 and later.
 
 =back
 
-Both are B<documentation-derived, not live-verified>. The other wires ignore
-C<native_pdf>: C<openai>, C<ollama> and C<hermes> keep the placeholder, and
-C<anthropic> sends its C<document> block whenever C<source_blocks> allows it.
+Both are B<documentation-derived, not live-verified>. On C<anthropic>,
+C<native_pdf> defaults to true: the PDF C<document> block goes out unless
+C<< native_pdf => 0 >> (or C<< source_blocks => 0 >>) is passed, which sends
+the placeholder instead and leaves text documents and C<search_result> blocks
+alone. L<Langertha::Role::Tools/format_tool_results> passes the engine's
+C<tool_result_pdf> there. C<openai>, C<ollama> and C<hermes> ignore
+C<native_pdf> and keep the placeholder.
 
 Not every block is a chat message: the OpenAI Responses block is an C<input>
 I<item> discriminated by C<type> (C<function_call_output>), carrying its payload
@@ -639,8 +687,37 @@ C<functionResponse.response> whenever it is present.
 Serializes to the result block for the given C<tool_wire_format>. Extra options
 are passed through to the per-format serializer (Hermes accepts
 C<response_tag>; C<responses>, C<gemini> and C<anthropic> accept
-C<image_input>, C<responses> and C<gemini> also C<native_pdf>, C<anthropic>
-also C<source_blocks>, see L</DESCRIPTION>; the other formats ignore them).
+C<image_input> and C<native_pdf> (default true on C<anthropic>, false
+elsewhere), C<anthropic> also C<source_blocks>, see L</DESCRIPTION>; the other
+formats ignore them).
+
+=head2 carries_native
+
+    Langertha::ToolResult->carries_native( 'gemini', 'image' );   # 1
+    Langertha::ToolResult->carries_native( 'openai', 'pdf' );     # 0
+
+True when the result block of the given C<tool_wire_format> has a native form
+for a media kind (C<image> or C<pdf>) that a tool returned: C<anthropic>,
+C<responses> and C<gemini> for both. On every other wire (and an unknown or
+undefined one) it is false: the item goes out as the text placeholder whatever
+option is passed to L</to>. Croaks on an unknown kind.
+
+This is the wire's half only. Whether an engine sends the native form for the
+selected model is its C<tool_result_images> / C<tool_result_pdf> capability
+(L<Langertha::Role::Capabilities/engine_capabilities>), which requires it.
+
+=head2 native_needs_vision
+
+    Langertha::ToolResult->native_needs_vision( 'responses', 'pdf' );   # 1
+    Langertha::ToolResult->native_needs_vision( 'anthropic', 'pdf' );   # 0
+
+True when the native form of a media kind on the given wire reaches only a
+model that sees images (C<image_input>): an image on every wire that has a
+form, a PDF on C<responses> and C<gemini> (both providers read PDFs through
+the model's vision). False for a PDF on C<anthropic>, which a text-only model
+reads as extracted text (k371), and on a wire without a native form (see
+L</carries_native>). Croaks on an unknown kind. The capability registry clears
+C<tool_result_images> / C<tool_result_pdf> by it (ADR 0039).
 
 =head1 SEE ALSO
 

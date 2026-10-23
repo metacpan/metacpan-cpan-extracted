@@ -11,9 +11,6 @@ use Template::Sluz;
 
 my $s = Template::Sluz->new();
 
-#print joina(['one', 'two', 'three'], "-");
-#exit;
-
 $s->assign('name'   , "Jason");
 $s->assign('colors' , ['red','green', 'blue']);
 $s->assign('data'   , { color => 'red', animal => 'kitten', age => 39 });
@@ -22,8 +19,7 @@ $s->assign('color_white', color('bold_white'));
 $s->assign('color_yellow', color(228));
 $s->assign('color_reset', color('reset'));
 
-#print $s->parse_string('Hello {$name}');
-print $s->fetch(Template::Sluz::SLUZ_INLINE);
+print $s->fetch(SLUZ_INLINE);
 
 print $s->parse_string('HTML: <div>Name: {$name} / Colors: {$colors|join:", "}</div>') . "\n";
 
@@ -102,5 +98,5 @@ Hello {$name|uc}
 
 Literal: {literal}function foo() { ... }{/literal}
 
-Array index #1: {$colors.1}
+Array index #1: {$colors.1} + {$data.color}
 

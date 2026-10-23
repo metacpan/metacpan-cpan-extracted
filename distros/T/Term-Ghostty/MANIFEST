@@ -24,5 +24,6 @@ t/03-callbacks.t
 t/04-memory.t
 t/05-encoding.t
 t/06-threads.t
+t/07-examples.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

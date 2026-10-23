@@ -1,6 +1,6 @@
 package Langertha::Engine::Perplexity;
 # ABSTRACT: Perplexity Agent API (search-augmented)
-our $VERSION = '0.503';
+our $VERSION = '0.504';
 use Moose;
 use Carp qw( croak );
 
@@ -29,6 +29,7 @@ with 'Langertha::Role::Models',
      'Langertha::Role::Chat' => { -excludes => ['content_format'] },
      'Langertha::Role::StaticModels',
      'Langertha::Role::ImageInput',
+     'Langertha::Role::ToolResultImages',
      'Langertha::Role::ResponsesCompatible';
 
 
@@ -219,9 +220,10 @@ sub model_capability_corrections {
 # is "a JSON string or an array of input_text and input_image content parts",
 # and no input schema lists input_file (docs.perplexity.ai/api-reference/
 # agent-post, fetched 2026-09-30), so a PDF stays the k336 placeholder while
-# OpenAIResponses sends it as input_file. Spelled out (the Role::Tools default
-# is 0 too) because this is where the shared Responses envelope diverges.
-sub _tool_result_pdf_on_wire { 0 }
+# OpenAIResponses sends it as input_file. So this engine composes
+# Role::ToolResultImages (input_image is documented there) but not
+# Role::ToolResultPDF: this is where the shared Responses envelope diverges
+# (ADR 0039, k380).
 
 # Rate limit (karr k356, ADR 0022): the Agent API sends x-ratelimit-limit /
 # -remaining / -reset / -used with no -requests / -tokens suffix, and the Remote
@@ -267,7 +269,7 @@ Langertha::Engine::Perplexity - Perplexity Agent API (search-augmented)
 
 =head1 VERSION
 
-version 0.503
+version 0.504
 
 =head1 SYNOPSIS
 

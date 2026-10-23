@@ -81,6 +81,7 @@ include/punk/punk_cachefront.h
 include/punk/punk_cget.h
 include/punk/punk_compat.h
 include/punk/punk_compile.h
+include/punk/punk_computed.h
 include/punk/punk_config.h
 include/punk/punk_context.h
 include/punk/punk_cookie.h
@@ -204,6 +205,8 @@ lib/Punk/Generate/skel/view/welcome.tmpl
 lib/Punk/Headers.pm
 lib/Punk/Logger.pm
 lib/Punk/Model.pm
+lib/Punk/Model/Computed.pm
+lib/Punk/Model/Computed/Error.pm
 lib/Punk/Model/DBI.pm
 lib/Punk/Model/DBIx/Loop.pm
 lib/Punk/Model/JSONFile.pm
@@ -315,6 +318,7 @@ t/0530-model-query.t
 t/0540-txn.t
 t/0550-model-jsonfile.t
 t/0551-model-markdown.t
+t/0552-model-computed.t
 t/0600-openapi.t
 t/0601-under-openapi.t
 t/0602-oa-security.t
@@ -455,6 +459,7 @@ xs/auth.xs
 xs/blob.xs
 xs/cache.xs
 xs/compile.xs
+xs/computed.xs
 xs/conditionalget.xs
 xs/config.xs
 xs/context.xs

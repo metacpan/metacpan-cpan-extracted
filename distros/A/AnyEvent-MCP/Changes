@@ -1,5 +1,19 @@
 Revision history for AnyEvent::MCP
 
+0.62  Thu 22 Oct 2026 13:32:52 CEST
+	- mcp_getoptions now returns a hash reference instead of a key/value list
+	  (incompatible API change).
+	- Simple accepts server_name/server_version independently of the local
+	  instance name, leaving server_info as an unmodified protocol override.
+	- query multibroker children in parallel for tool and broker discovery,
+	  preserving tool order and returning partial results after 15 seconds
+	  instead of blocking on an unresponsive child.
+	- accept a missing trailing slash on HTTP MCP endpoint URLs, working
+	  around Claude's MCP connector wrongly dropping it from the configured URL,
+          thus corrupting it.
+	- allow omitted ports in reverse extension URLs, defaulting to port 80.
+	- fix MCP client/server version fields serialized as JSON numbers in 0.61.
+
 0.61  Thu 22 Oct 2026 08:57:42 CEST
 	- resolve bind hostnames via AnyEvent::Socket instead of Socket::getaddrinfo.
 	- honor user-selected file permissions and preserve them across replacements.

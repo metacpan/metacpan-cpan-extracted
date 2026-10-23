@@ -18,6 +18,10 @@ t/07-get_blocks.t
 t/08-include.t
 t/09-autoescape.t
 t/10-delimiters.t
+t/11-errors.t
+t/12-inline.t
+t/13-fetch-extra.t
+t/14-compiled.t
 t/test_setup.pl
 t/tpls/child.stpl
 t/tpls/extra.stpl

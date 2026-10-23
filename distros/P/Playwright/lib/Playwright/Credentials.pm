@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::Credentials;
-$Playwright::Credentials::VERSION = '1.621';
+$Playwright::Credentials::VERSION = '1.641';
 use parent 'Playwright::Base';
 
 sub new {
@@ -20,26 +20,6 @@ sub new {
 
 sub spec {
     return $Playwright::spec->{'Credentials'}{members};
-}
-
-sub delete {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'delete',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub get {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'get',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
 }
 
 sub install {
@@ -57,6 +37,26 @@ sub create {
     return $self->_api_request(
         args    => [@_],
         command => 'create',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub delete {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'delete',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub get {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'get',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -106,7 +106,7 @@ Playwright::Credentials - Automatically generated class for Playwright::Credenti
 
 =head1 VERSION
 
-version 1.621
+version 1.641
 
 =head1 CONSTRUCTOR
 
@@ -116,18 +116,6 @@ You shouldn't have to call this directly.
 Instead it should be returned to you as the result of calls on Playwright objects, or objects it returns.
 
 =head1 METHODS
-
-=head2 delete(@args)
-
-Execute the Credentials::delete playwright routine.
-
-See L<https://playwright.dev/docs/api/class-Credentials#Credentials-delete> for more information.
-
-=head2 get(@args)
-
-Execute the Credentials::get playwright routine.
-
-See L<https://playwright.dev/docs/api/class-Credentials#Credentials-get> for more information.
 
 =head2 install(@args)
 
@@ -140,6 +128,18 @@ See L<https://playwright.dev/docs/api/class-Credentials#Credentials-install> for
 Execute the Credentials::create playwright routine.
 
 See L<https://playwright.dev/docs/api/class-Credentials#Credentials-create> for more information.
+
+=head2 delete(@args)
+
+Execute the Credentials::delete playwright routine.
+
+See L<https://playwright.dev/docs/api/class-Credentials#Credentials-delete> for more information.
+
+=head2 get(@args)
+
+Execute the Credentials::get playwright routine.
+
+See L<https://playwright.dev/docs/api/class-Credentials#Credentials-get> for more information.
 
 =head2 on(@args)
 

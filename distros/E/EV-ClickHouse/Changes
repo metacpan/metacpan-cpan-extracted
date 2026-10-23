@@ -1,3 +1,8 @@
+0.07  2026-10-16
+    - Fix connection teardown, reconnect queues and callback lifetimes.
+    - Cancel native INSERTs before sending data; validate date and numeric inputs.
+    - Improve transport framing, compression and custom-loop ownership.
+
 0.06  2026-07-24
     - Fix LZ4 chain misparsing a coalesced next packet as a frame
     - Fix idempotent => 0 reaching the server, and a Streamer wedge when

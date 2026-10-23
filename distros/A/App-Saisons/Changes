@@ -1,0 +1,34 @@
+Revision history for App-Saisons
+
+0.2.1  2026-10-22
+    - Fix: reading Gemini sessions no longer dies on Windows, where
+      POSIX::tzset is unimplemented.
+    - Fix: no HOME warnings on Windows when the modules are loaded
+      directly, not just through the saisons command.
+
+0.2.0  2026-10-22
+    - New: running-session markers refresh by themselves every few
+      seconds; r still forces it.
+    - New: the list redraws itself on terminal resize; Ctrl+L forces a
+      full repaint.
+    - New: inline sort mode — press s, pick the column with left/right and
+      the direction with up/down; S flips direction directly.
+    - New: t cycles grouping: flat, by path, by agent.
+    - New: arrows browse the live results while typing a search; ENTER
+      keeps the highlighted session selected.
+    - New: Alt+C (or TAB) toggles case-sensitive matching in filter and
+      search.
+    - Fix: full-text search no longer rescans on every keypress; typing is
+      debounced and extending the query searches only the previous hits.
+    - Fix: ENTER, delete and move act only on selections visible under the
+      active filter, not on ones a filter hides.
+    - New: selection bars in muted blue and teal that keep the column
+      colors readable.
+    - New: --version and the banner show which build is running.
+    - New: SAISONS_LAUNCHER overrides where sessions open (the old name
+      CLAUDE_SESSIONS_LAUNCHER still works).
+    - Fix: no warnings on Windows; paths resolve via USERPROFILE.
+    - Fix: quits cleanly when stdin closes instead of spinning.
+
+0.1.0  2026-06-03
+    - First release.

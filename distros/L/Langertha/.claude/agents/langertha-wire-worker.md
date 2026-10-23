@@ -5,9 +5,11 @@ model: opus
 briefing:
   skills:
     - perl-ai-langertha
+    - langertha-core
     - langertha-internals
     - langertha-testing
     - getty-perl-moose
+    - getty-perl-core
     - langertha-adr
     - kanban-issues-karr-ticket
 ---
@@ -18,6 +20,8 @@ provider wire-translation seam.
 This is the densest decision area in the repo: most ADRs record a choice made here. Implement,
 refactor, debug and test the seam, and keep it honest against the ADRs. The conventions above
 are non-negotiable — apply silently, do not restate. Ordinary engine work that only *uses*
+the seam belongs to `langertha-worker`. HTTP transport, streaming and Future lifecycle belong
+to `langertha-async-worker`.
 
 Work the karr card you were handed: note progress on it, block it with a reason when
 stuck, hand it to `review` when done. Never `done`, never create cards — drift you
@@ -26,8 +30,6 @@ record a ticket (here or on another repo's board), that means a note on your car
 saying what and for which board; the dispatching agent files it.
 Never `git commit`: leave the tree commit-ready and report what changed and why, plus a proposed commit subject and
 `Changes` entry — commits belong to `langertha-release-manager`.
-the seam belongs to `langertha-worker`. HTTP transport, streaming and Future lifecycle belong
-to `langertha-async-worker`.
 
 Read the owning ADR first (area map in `langertha-adr`); a contradicting change amends it in
 the same change or stops and reports. Never drift silently. Seam invariants:

@@ -40,5 +40,6 @@ sluz_test($sluz, '{foreach $colors as $k => $v}{$k}:{$v} {/foreach}'            
 sluz_test($sluz, '{foreach $scores as $val}{$val} {/foreach}'                         , '76 95 88 '            , 'Foreach #24 - Hashref iteration value only (sorted)');
 sluz_test($sluz, '{foreach $empty as $k => $v}val{/foreach}'                          , ''                     , 'Foreach #25 - Empty array with key/val');
 sluz_test($sluz, '{foreach $members as $i => $m}{$i}:{$m.first} {/foreach}'           , '0:Scott 1:Jason '     , 'Foreach #26 - Array of hashes with key/val');
+sluz_test($sluz, '{foreach $single as $x}{$__FOREACH_FIRST}{$__FOREACH_LAST}{/foreach}', '11'                   , 'Foreach #27 - Single element FIRST/LAST both true');
 
 done_testing();

@@ -1,3 +1,17 @@
+TYPEMAP
 EV::Kafka        T_PTROBJ
-EV::Kafka::Conn  T_PTROBJ
+EV::Kafka::Conn  T_KFCONN
 EV::Loop         T_PTROBJ
+
+INPUT
+T_KFCONN
+    if (SvROK($arg) && sv_derived_from($arg, \"EV::Kafka::Conn\")) {
+        $var = INT2PTR($type, SvIV(SvRV($arg)));
+        conn_call_enter(aTHX_ $var, cv);
+    } else {
+        croak(\"Expected an EV::Kafka::Conn object\");
+    }
+
+OUTPUT
+T_KFCONN
+    sv_setref_pv($arg, \"EV::Kafka::Conn\", (void *)$var);

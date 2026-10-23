@@ -112,7 +112,7 @@ METHODS
         my @all   = $tk->top;                 # all tracked keys (k defaults to every counter)
         my $est   = $tk->estimate($key);      # estimated count of one key, 0 if untracked
         my $err   = $tk->error($key);         # the over-estimate bound for that key (0 if exact/untracked)
-        $tk->clear;                           # forget everything (counters and totals reset)
+        $tk->clear;                           # reset counters, totals and the decay clock
 
     "add" observes one key and returns its estimated count after the
     observation. "add_many" feeds an array reference under a single write
@@ -166,6 +166,7 @@ SHARING ACROSS PROCESSES
     ("F_DUPFD_CLOEXEC"), so it stays yours to close and closing it does not
     disturb the handle. Every process's "add" feeds the one shared summary, so
     a fleet of workers can each process part of a stream into a single top-k.
+    Participants must share a PID namespace, as lock recovery uses PIDs.
 
 SECURITY
     Backing files are created with mode 0600 (owner-only) by default; pass an

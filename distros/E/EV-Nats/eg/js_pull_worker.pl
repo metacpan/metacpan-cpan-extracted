@@ -53,7 +53,7 @@ sub loop_fetch {
         my ($msgs, $err) = @_;
         if ($err) {
             warn "[worker] fetch error: $err — retrying in 1s\n";
-            EV::timer(1, 0, \&loop_fetch);
+            my $rt; $rt = EV::timer(1, 0, sub { undef $rt; loop_fetch() });
             return;
         }
         for my $msg (@$msgs) {

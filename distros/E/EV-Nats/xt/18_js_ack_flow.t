@@ -19,6 +19,7 @@ js_or_skip($nats, sub {
 });
 
 plan tests => 5;
+my $guard;  # kept: an unkept EV::timer never fires
 pass 'stream_create';
 
 # Publish two messages.
@@ -33,7 +34,7 @@ $publish_one = sub {
     });
 };
 $publish_one->(1);
-EV::timer(5, 0, sub { EV::break });
+$guard = EV::timer(5, 0, sub { EV::break });
 EV::run;
 is $published, 2, 'published 2 messages';
 
@@ -43,7 +44,7 @@ $js->consumer_create($stream, {
     ack_policy   => 'explicit',
     ack_wait     => 1_000_000_000,  # 1s — short enough to test NAK redelivery
 }, sub { EV::break });
-EV::timer(3, 0, sub { EV::break });
+$guard = EV::timer(3, 0, sub { EV::break });
 EV::run;
 
 # Fetch 2: ACK first, NAK second.
@@ -52,7 +53,7 @@ $js->fetch($stream, 'acker', { batch => 2, expires => 1_000_000_000 }, sub {
     $first_fetch = $_[0];
     EV::break;
 });
-EV::timer(5, 0, sub { EV::break });
+$guard = EV::timer(5, 0, sub { EV::break });
 EV::run;
 is scalar(@$first_fetch), 2, 'first fetch got 2 messages'
     or diag explain $first_fetch;
@@ -68,7 +69,7 @@ $js->fetch($stream, 'acker', { batch => 1, expires => 2_000_000_000 }, sub {
     $second_fetch = $_[0];
     EV::break;
 });
-EV::timer(5, 0, sub { EV::break });
+$guard = EV::timer(5, 0, sub { EV::break });
 EV::run;
 
 is scalar(@$second_fetch), 1, 'second fetch redelivered NAK\'d message'
@@ -84,12 +85,12 @@ $js->fetch($stream, 'acker', { batch => 1, expires => 500_000_000, no_wait => 1 
     $third_fetch = $_[0];
     EV::break;
 });
-EV::timer(5, 0, sub { EV::break });
+$guard = EV::timer(5, 0, sub { EV::break });
 EV::run;
 
 is scalar(@$third_fetch), 0, 'third fetch returns no messages';
 
 $js->stream_delete($stream, sub { EV::break });
-EV::timer(3, 0, sub { EV::break });
+$guard = EV::timer(3, 0, sub { EV::break });
 EV::run;
 $nats->disconnect;

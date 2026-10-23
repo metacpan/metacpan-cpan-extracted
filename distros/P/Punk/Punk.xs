@@ -170,6 +170,7 @@ static const frx_abi *punk_frx(pTHX) {
 #include "punk/punk_blob.h"      /* content-addressed uploads, on Apophis */
 #include "punk/punk_sitemap.h"   /* which routes are URLs (needs route+app) */
 #include "punk/punk_mrows.h"     /* JSONFile + Markdown model backends (needs dbq, markdown, app) */
+#include "punk/punk_computed.h"  /* computed read-only backends (needs dbq, mrows) */
 #include "punk/punk_health.h"    /* /healthz and /readyz (needs response+app) */
 #include "punk/punk_metrics.h"   /* Prometheus /metrics (needs pk_abi_impl+obs) */
 #include "punk/punk_compile.h"    /* the boot compiler (needs static+serve) */
@@ -224,6 +225,7 @@ INCLUDE: xs/oamount.xs
 INCLUDE: xs/dbi.xs
 INCLUDE: xs/dbil.xs
 INCLUDE: xs/mrows.xs
+INCLUDE: xs/computed.xs
 INCLUDE: xs/txn.xs
 INCLUDE: xs/cache.xs
 INCLUDE: xs/blob.xs

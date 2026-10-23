@@ -4,7 +4,7 @@ use Test::More;
 use lib 't/lib';
 use TestMariaDB;
 plan skip_all => 'No MariaDB/MySQL server' unless TestMariaDB::server_available();
-plan tests => 93;
+plan tests => 98;
 use EV;
 use EV::MariaDB;
 
@@ -199,7 +199,13 @@ with_mariadb(cb => sub {
                 $m->execute($stmt, undef, sub {
                     my ($affected, $err3) = @_;
                     ok(!$err3, 'send_long_data: execute ok');
-                    $m->close_stmt($stmt, sub { EV::break });
+                    $m->q("select length(data), data from _blob_t where id = 1", sub {
+                        my ($rows, $err4) = @_;
+                        die $err4 if $err4;
+                        is($rows->[0][0], 10000, 'send_long_data: blob length round-trips');
+                        is($rows->[0][1], "x" x 10000, 'send_long_data: blob content round-trips');
+                        $m->close_stmt($stmt, sub { EV::break });
+                    });
                 });
             });
         });
@@ -223,7 +229,8 @@ with_mariadb(cb => sub {
     });
 });
 
-# --- Test 29: stream + finish from inside row callback ---
+# --- Test 29-30: stream + finish from inside row callback ---
+my ($finished_from_cb, $disconnected_after_finish);
 with_mariadb(cb => sub {
     $m->query_stream("select 1 union all select 2 union all select 3", sub {
         my ($row, $err) = @_;
@@ -233,6 +240,9 @@ with_mariadb(cb => sub {
         }
         if (defined $row && $row->[0] eq '1') {
             $m->finish;
+            $finished_from_cb = 1;
+            $disconnected_after_finish = !$m->is_connected;
+            EV::break;
             return;
         }
         if (!defined $row) {
@@ -240,8 +250,9 @@ with_mariadb(cb => sub {
             return;
         }
     });
-    ok(1, 'stream+finish: survived finish from row callback');
 });
+ok($finished_from_cb, 'stream+finish: finish from row callback returned');
+ok($disconnected_after_finish, 'stream+finish: is_connected false after finish');
 
 # --- Test 30: close_async on non-connected object ---
 {
@@ -323,25 +334,28 @@ with_mariadb(cb => sub {
     });
 });
 
-# stale stmt handle after reset: croaks instead of crashing
-with_mariadb(cb => sub {
-    $m->prepare("select 1", sub {
-        my ($stmt, $err) = @_;
-        ok(!$err, 'stale stmt: prepare ok');
-        $m->reset;
-    });
-    $m->on_connect(sub {
-        # now $stmt from the old connection is invalidated
-        # close_stmt should succeed (no-op) on an already-closed handle
-        # but execute should croak
-        # we don't have $stmt here, so test via a fresh prepare + reset cycle
+# stale stmt handle after reset: execute croaks, close_stmt fast-paths (1, undef)
+{
+    my $stale;
+    with_mariadb(cb => sub {
         $m->prepare("select 1", sub {
-            my ($stmt2, $err2) = @_;
-            ok(!$err2, 'stale stmt: prepare on new connection ok');
-            $m->close_stmt($stmt2, sub { EV::break });
+            my ($stmt, $err) = @_;
+            ok(!$err, 'stale stmt: prepare ok');
+            $stale = $stmt;
+            $m->on_connect(sub {
+                eval { $m->execute($stale, [], sub {}) };
+                like($@, qr/no longer valid/, 'stale stmt: execute croaks after reset');
+                $m->close_stmt($stale, sub {
+                    my ($ok, $cerr) = @_;
+                    ok($ok, 'stale stmt: close_stmt fast-path ok==1 after reset');
+                    ok(!defined $cerr, 'stale stmt: close_stmt fast-path undef err after reset');
+                    EV::break;
+                });
+            });
+            $m->reset;
         });
     });
-});
+}
 
 # fork safety: child DESTROY must not kill parent connection
 with_mariadb(cb => sub {
@@ -567,7 +581,10 @@ with_mariadb(cb => sub {
 
 # bind_params error paths
 with_mariadb(cb => sub {
-    $m->prepare("select ?", sub {
+    # sleep(?), not a bare placeholder: an execute the server answers at once
+    # can finish inside execute(), and then its cb has already closed the
+    # statement by the time bind_params runs.
+    $m->prepare("select sleep(?)", sub {
         my ($stmt, $err) = @_;
         die $err if $err;
 
@@ -578,7 +595,7 @@ with_mariadb(cb => sub {
         like($@, qr/ARRAY reference/, 'bind_params: undef croaks');
 
         # state != IDLE during in-flight execute -> croak
-        $m->execute($stmt, [1], sub {
+        $m->execute($stmt, [0.25], sub {
             $m->close_stmt($stmt, sub { EV::break });
         });
         eval { $m->bind_params($stmt, [2]) };

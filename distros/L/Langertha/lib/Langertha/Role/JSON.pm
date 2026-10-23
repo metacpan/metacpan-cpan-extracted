@@ -1,6 +1,6 @@
 package Langertha::Role::JSON;
 # ABSTRACT: Role for JSON
-our $VERSION = '0.503';
+our $VERSION = '0.504';
 use Moose::Role;
 use JSON::MaybeXS;
 use Encode qw( encode_utf8 decode_utf8 );
@@ -48,7 +48,7 @@ Langertha::Role::JSON - Role for JSON
 
 =head1 VERSION
 
-version 0.503
+version 0.504
 
 =head2 decode_json_text
 

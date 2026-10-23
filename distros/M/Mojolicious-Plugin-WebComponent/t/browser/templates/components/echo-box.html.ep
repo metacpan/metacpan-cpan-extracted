@@ -1,0 +1,1 @@
+<p id="q"><%= $params->{q} // '' %></p><p id="u">naïve €</p>

@@ -2,10 +2,12 @@ package EV::Gearman::Job;
 use strict;
 use warnings;
 
+our $VERSION = '0.03';
+
 # A job is a blessed hashref { handle, function, unique, workload },
 # built by EV::Gearman XS when a JOB_ASSIGN[_UNIQ] arrives. The
 # connection back-pointer is carried as perl magic (PERL_MAGIC_ext) on
-# the hash — not a key — together with a tombstone reference that keeps
+# the hash -- not a key -- together with a tombstone reference that keeps
 # the connection's control block allocated until every job referencing
 # it is released. Job methods validate the struct's magic word, so a
 # destroyed connection croaks instead of dereferencing freed memory,
@@ -65,25 +67,26 @@ C<JOB_ASSIGN_UNIQ> packet arrives, and passed as the sole argument
 to the function callback registered with C<register_function>.
 
 In B<sync> mode (default), you typically just C<return> a result
-from your callback — the worker translates that into
+from your callback -- the worker translates that into
 C<WORK_COMPLETE>. C<die> becomes C<WORK_FAIL>. The job methods
 below are still available for sending intermediate events.
 
 In B<async> mode, the callback returns immediately; you must
 explicitly call C<complete>, C<fail>, or C<exception> later. The
 job object can be stashed in a closure or any other long-lived
-container — it outlives the connection safely.
+container -- it outlives the connection safely.
 
 If the underlying L<EV::Gearman> connection has been destroyed by
 the time you call a job method, the call C<croak>s with
 C<"client destroyed">. If the client is alive but currently
 disconnected (even with reconnect armed), the call C<croak>s with
-C<"not connected">: gearmand forgets the job when the connection
-drops, so a packet queued for the next session would only earn a
+C<"not connected">; after reconnect, it croaks C<"stale job">.
+Gearmand forgets the job when the connection drops, so a packet
+queued for the next session would only earn a
 C<JOB_NOT_FOUND> error there. The job holds an internal tombstone
 reference that keeps the connection's control block allocated
 (but torn down) until every job referencing it is released, so
-this check is sound — it never reads freed memory. The
+this check is sound -- it never reads freed memory. The
 back-pointer is stored as perl magic, not a hash key: user code,
 hash walkers, and serializers cannot see or clobber it, and a
 job hash that did not come from a C<JOB_ASSIGN> croaks with

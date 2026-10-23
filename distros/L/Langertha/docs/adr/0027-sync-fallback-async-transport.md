@@ -268,3 +268,32 @@ hops. The default `user_agent` is now `Langertha::HTTP::UserAgent` (policy in `r
 through `Langertha::HTTP::Redirect`. That also closes the gap noted in the k353 Update above: an
 http→https redirect is now a hop core follows itself, so the connect-module check runs on it.
 Injected clients keep their own redirect behaviour. Decision and rationale: ADR 0036.
+
+## Update (k379 — the engine takes the client it built off the loop again)
+
+The builder adds its Net::Async::HTTP client to `_async_loop` (the process-wide loop by default),
+and the loop keeps every notifier until it is removed. Nothing removed it, so every engine object
+left its client, and that client's keep-alive connections with their sockets, on the loop for the
+rest of the process. langertha-raider builds an engine per subagent, so a long-running raider grew
+without bound (found in raider k160).
+
+- **Ownership decides.** The builder sets `_async_http_owned` when it adds its own client. The
+  role's `DEMOLISH` (through `_release_async_http`) removes exactly that client from whatever loop
+  it is on. `Net::Async::HTTP::_remove_from_loop` closes its connections. An injected
+  `_async_http` belongs to the caller and is never touched. The sync shim is not on a loop and
+  never sets the flag.
+- **In-flight requests are safe.** An engine is not destroyed while one of its `_f` calls is
+  pending: the suspended async sub holds `$self` until the request future, held by the client's
+  connection, completes.
+- **No work in global destruction.** By then the loop or the client may already be gone, and
+  the process is ending, so `DEMOLISH` returns early. Without that early return, an engine still
+  alive at exit warns `(in cleanup) Can't call method "loop" on an undefined value`.
+- **A role-provided `DEMOLISH`.** Moose runs every `DEMOLISH` of the hierarchy, so a subclass's
+  own `DEMOLISH` runs as well, and the role's is idempotent where several roles bring it in. A
+  class that composes the role directly and defines its own `DEMOLISH` replaces the role's and has
+  to call `_release_async_http` itself. No core class or sibling does that today.
+
+There is no path that moves the built client to another loop (`_async_loop` is `ro`), so a loop
+change needs no handling. Test: `t/45_async_http_loop_lifecycle.t` (many short-lived engines with
+and without a keep-alive request, an injected client, an own `_async_loop`, and silent global
+destruction). Before the fix it left 50 notifiers for 50 engines.

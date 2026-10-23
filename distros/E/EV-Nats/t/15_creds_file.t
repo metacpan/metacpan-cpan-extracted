@@ -9,10 +9,10 @@ plan skip_all => 'creds_file requires NKey support (build with OpenSSL)'
 
 plan tests => 6;
 
-# Sample seed/jwt strings copied from a real .creds file format. Not real
-# credentials — random bytes that pass the regex shape only.
+# Sample strings in real .creds file format. The JWT is shape-only
+# (never validated); the seed must be genuine — nkey_seed() checks it.
 my $JWT  = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJlZDI1NTE5LW5rZXkifQ.payload.sig';
-my $SEED = 'SUAFAKEFAKEFAKEFAKEFAKEFAKEFAKEFAKEFAKEFAKEFAKEFAKEFAKEFAKE';
+my $SEED = EV::Nats->nkey_generate_user_seed;
 
 sub write_creds {
     my ($content) = @_;

@@ -5,7 +5,7 @@ use Carp ();
 use XSLoader ();
 our $VERSION;
 BEGIN {
-    $VERSION = '0.21';
+    $VERSION = '0.22';
     XSLoader::load(__PACKAGE__, $VERSION);
 }
 use constant { WS_FRAGMENTED_EOF => 0, WS_FRAGMENTED_ERROR => -1, WS_FRAGMENTED_DATA => 1,

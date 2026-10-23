@@ -36,7 +36,7 @@ my %config = (
 	invalid_digit  => '123bad',
 	invalid_hyphen => 'has-hyphen',
 	invalid_empty  => q{},
-	documented_ver => '0.06',
+	documented_ver => '0.07',
 );
 
 # -------------------------------------------------------------------
@@ -490,7 +490,7 @@ subtest 'public variable: $BYPASS default value matches documentation' => sub {
 	is $Sub::Private::BYPASS, 0, '$BYPASS starts at 0 as documented';
 };
 
-# POD VERSION section: "Version 0.06"
+# POD VERSION section: "Version 0.07"
 subtest 'module: $VERSION matches documented value' => sub {
 	plan tests => 1;
 	is $Sub::Private::VERSION, $config{documented_ver},

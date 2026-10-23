@@ -1,5 +1,8 @@
 Revision history for Time-Keeper-Business
 
+0.04    2026-10-22
+        - Tests pass on 32-bit perls (a day past 32 bits).
+
 0.03    2026-10-20
         - Builds on perls before 5.36 (G_LIST).
         - Builds on perl 5.10.0 (mPUSHs, mXPUSHs).

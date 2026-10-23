@@ -1,6 +1,6 @@
 package Langertha::Role::AsyncHTTP;
 # ABSTRACT: Async HTTP backend selection (injected > Net::Async::HTTP > sync LWP fallback)
-our $VERSION = '0.503';
+our $VERSION = '0.504';
 use Moose::Role;
 use Future::AsyncAwait;
 use Future;
@@ -37,6 +37,7 @@ sub _build__async_http {
     # is aborted (karr k199, ADR 0027).
     my $http = Net::Async::HTTP->new( pipeline => 0 );
     $self->_async_loop->add($http);
+    $self->_set_async_http_owned(1);
     return $http;
   }
   unless ($WARNED) {
@@ -53,6 +54,42 @@ sub _build__async_http {
   }
   require Langertha::Request::SyncHTTP;
   return Langertha::Request::SyncHTTP->new( user_agent => $self->user_agent );
+}
+
+# Set by the builder when it added its own Net::Async::HTTP client to the loop:
+# that client is the engine's to take off again. An injected client is the
+# caller's and never sets it (karr k379).
+has _async_http_owned => (
+  is       => 'ro',
+  init_arg => undef,
+  writer   => '_set_async_http_owned',
+);
+
+# The loop holds every notifier added to it until it is removed, so without
+# this each engine left its client (and the client's keep-alive connections)
+# on the loop for the rest of the process (karr k379). An engine with a
+# request in flight is not destroyed: the suspended _f call holds it. At
+# global destruction the loop may already be gone and the process is ending,
+# so nothing is done. A class composing this role that defines its own
+# DEMOLISH replaces this one (Moose role composition) and has to call
+# _release_async_http itself; a subclass's DEMOLISH runs alongside it.
+sub DEMOLISH {
+  my ( $self, $in_global_destruction ) = @_;
+  $self->_release_async_http unless $in_global_destruction;
+  return;
+}
+
+sub _release_async_http {
+  my ($self) = @_;
+  return unless $self->_async_http_owned && $self->_has_async_http;
+  my $http = $self->_async_http;
+  my $loop = $http->loop;
+  # Already off the loop, or made a child of another notifier by someone who
+  # reached for the private client: then it is not ours to remove.
+  return unless $loop && !$http->parent;
+  local $@;
+  eval { $loop->remove($http); 1 };
+  return;
 }
 
 # The builder runs inside a generated Moose accessor called from a Langertha
@@ -395,7 +432,7 @@ Langertha::Role::AsyncHTTP - Async HTTP backend selection (injected > Net::Async
 
 =head1 VERSION
 
-version 0.503
+version 0.504
 
 =head2 _async_http
 
@@ -424,6 +461,17 @@ keep-alive connection per host; the C<NET_ASYNC_HTTP_MAXCONNS> environment
 variable changes it), so concurrent requests on one engine are sent one after
 another on that connection. Concurrent requests through different engines use
 their own clients. Inject a client configured otherwise to change either.
+
+The engine owns the L<Net::Async::HTTP> client it built: when the engine is
+destroyed it removes that client from its loop, which also closes the client's
+keep-alive connections, so short-lived engines (one per subagent, per job, per
+test) do not pile up on the process-wide loop (karr k379). An engine with a
+C<_f> call still running is not destroyed, the pending call holds it. Nothing
+is done during global destruction. An injected client belongs to the caller
+and is never removed: put it on a loop and take it off again yourself. A
+class that composes this role directly and defines its own C<DEMOLISH>
+replaces the role's and must call C<< $self->_release_async_http >> from it; a
+subclass's C<DEMOLISH> runs in addition, as usual.
 
 =head2 async_request_f
 

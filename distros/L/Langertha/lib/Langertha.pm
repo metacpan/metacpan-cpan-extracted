@@ -1,6 +1,6 @@
 package Langertha;
-# ABSTRACT: The clan of fierce vikings with 🪓 and 🛡️ to AId your rAId
-our $VERSION = '0.503';
+# ABSTRACT: The clan of fierce vikings with axes and shields to AId your rAId
+our $VERSION = '0.504';
 use utf8;
 use strict;
 use warnings;
@@ -152,11 +152,11 @@ __END__
 
 =head1 NAME
 
-Langertha - The clan of fierce vikings with 🪓 and 🛡️ to AId your rAId
+Langertha - The clan of fierce vikings with axes and shields to AId your rAId
 
 =head1 VERSION
 
-version 0.503
+version 0.504
 
 =head1 SYNOPSIS
 
@@ -213,7 +213,7 @@ B<THIS API IS WORK IN PROGRESS.>
 
 =over 4
 
-=item * B<35 engines> -- unified API across cloud and local LLM providers
+=item * B<37 engines> -- unified API across cloud and local LLM providers
 
 =item * B<Chat, streaming, embeddings, transcription, image generation>
 
@@ -388,6 +388,13 @@ namespace) rather than for direct use.
 
 =item * L<Langertha::Engine::Hetzner> - Hetzner Inference API (EU/Germany, OpenAI-compatible)
 
+=item * L<Langertha::Engine::Virtual> - Rule-driven engine without network,
+key or model, for tests, demos and manual runs (rules, script mode, presets
+C<echo> and C<files>, rules from YAML)
+
+=item * L<Langertha::Engine::Mock> - L<Langertha::Engine::Virtual> under the
+engine name C<Mock>
+
 =item * L<Langertha::Engine::TranscriptionBase> - Slim base for OpenAI-shape
 transcription-only engines (no chat / tools / embeddings / image generation).
 L<Langertha::Engine::OpenAI> exposes a C<whisper> attribute returning an
@@ -464,12 +471,21 @@ C<E<lt>tool_callE<gt>> XML tags for models without native API tool support
 
 =item * L<Langertha::Role::ParallelToolUse> - Parallel tool calling control
 
+=item * L<Langertha::Role::StreamUsage> - The stream request asks for the
+token usage (C<stream_usage> capability)
+
 =item * L<Langertha::Role::ServerTools> - Provider-native server-side tools
 (C<server_tools> capability and per-engine defaults)
 
 =item * L<Langertha::Role::ImageGeneration> - Image generation
 
 =item * L<Langertha::Role::ImageInput> - Image input (vision), claimed per model
+
+=item * L<Langertha::Role::ToolResultImages> - Images a tool returns reach the
+model as images (C<tool_result_images> capability, claimed per model)
+
+=item * L<Langertha::Role::ToolResultPDF> - PDFs a tool returns reach the model
+as documents (C<tool_result_pdf> capability, claimed per model)
 
 =item * L<Langertha::Role::KeepAlive> - Keep-alive duration for local models
 

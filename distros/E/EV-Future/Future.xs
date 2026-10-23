@@ -263,7 +263,7 @@ static void parallel_task_done(pTHX_ CV *cv) {
 
     if (--ctx->remaining <= 0) {
         SV *cb = ctx->final_cb;
-        if (IS_PVCV(cb)) {
+        if (cb) {
             dSP;
             ENTER;
             SAVETMPS;
@@ -325,6 +325,14 @@ static void series_next_cb(pTHX_ CV *cv) {
         XSRETURN_EMPTY;
     }
 
+    if (items > 0) {
+        int cancel = SvTRUE(ST(0));
+        /* A magical flag can complete or cancel this operation. */
+        ctx = (series_ctx *)CvXSUBANY(cv).any_ptr;
+        if (!ctx || ctx->abandoned) XSRETURN_EMPTY;
+        if (cancel) ctx->current_idx = ctx->total_tasks;
+    }
+
     if (!ctx->unsafe) {
         CvXSUBANY(cv).any_ptr = NULL;
         if (ctx->current_cv == cv) {
@@ -333,9 +341,6 @@ static void series_next_cb(pTHX_ CV *cv) {
         }
     }
 
-    if (items > 0 && SvTRUE(ST(0))) {
-        ctx->current_idx = ctx->total_tasks;
-    }
     _series_next(aTHX_ &ctx);
     XSRETURN_EMPTY;
 }
@@ -367,7 +372,7 @@ static void _series_next(pTHX_ series_ctx **ctx_ptr) {
         SV **task_ary = (AvREAL(ctx->tasks) && !SvMAGICAL(ctx->tasks)) ? AvARRAY(ctx->tasks) : NULL;
         if (ctx->current_idx >= ctx->total_tasks) {
             SV *cb = ctx->final_cb;
-            if (IS_PVCV(cb)) {
+            if (cb) {
                 dSP;
                 ENTER;
                 SAVETMPS;
@@ -417,7 +422,8 @@ static void _series_next(pTHX_ series_ctx **ctx_ptr) {
             }
             PUSHMARK(SP);
             if (have_worker) {
-                XPUSHs(task_sv ? sv_2mortal(SvREFCNT_inc(task_sv)) : &PL_sv_undef);
+                if (!task_sv) task_sv = *av_fetch(ctx->tasks, ctx->current_idx - 1, 1);
+                XPUSHs(sv_2mortal(SvREFCNT_inc(task_sv)));
             }
             XPUSHs(next_rv);
             PUTBACK;
@@ -429,7 +435,7 @@ static void _series_next(pTHX_ series_ctx **ctx_ptr) {
 
             if (!task_unsafe) {
                 SPAGAIN;
-                if (SvTRUE(ERRSV)) {
+                if (SvROK(ERRSV) || SvTRUE(ERRSV)) {
                     SV *err = sv_mortalcopy(ERRSV);
                     if (!*is_freed) {
                         series_cleanup(aTHX_ ctx_ptr);
@@ -512,7 +518,7 @@ static void plimit_task_done(pTHX_ CV *cv) {
 
     if (--ctx->remaining <= 0) {
         SV *cb = ctx->final_cb;
-        if (IS_PVCV(cb)) {
+        if (cb) {
             dSP;
             ENTER;
             SAVETMPS;
@@ -593,7 +599,8 @@ static void _plimit_dispatch(pTHX_ plimit_ctx **ctx_ptr) {
                 }
                 PUSHMARK(SP);
                 if (have_worker) {
-                    XPUSHs(task_sv ? sv_2mortal(SvREFCNT_inc(task_sv)) : &PL_sv_undef);
+                    if (!task_sv) task_sv = *av_fetch(ctx->tasks, ctx->current_idx - 1, 1);
+                    XPUSHs(sv_2mortal(SvREFCNT_inc(task_sv)));
                 }
                 XPUSHs(done_rv);
                 PUTBACK;
@@ -604,7 +611,7 @@ static void _plimit_dispatch(pTHX_ plimit_ctx **ctx_ptr) {
 
                 if (!task_unsafe) {
                     SPAGAIN;
-                    if (SvTRUE(ERRSV)) {
+                    if (SvROK(ERRSV) || SvTRUE(ERRSV)) {
                         SV *err = sv_mortalcopy(ERRSV);
                         if (!*is_freed) {
                             plimit_cleanup(aTHX_ ctx_ptr);
@@ -619,7 +626,7 @@ static void _plimit_dispatch(pTHX_ plimit_ctx **ctx_ptr) {
             } else {
                 if (--ctx->remaining <= 0) {
                     SV *cb = ctx->final_cb;
-                    if (IS_PVCV(cb)) {
+                    if (cb) {
                         dSP;
                         ENTER;
                         SAVETMPS;
@@ -703,7 +710,7 @@ static void race_task_done(pTHX_ CV *cv) {
     }
 
     SV *cb = ctx->final_cb;
-    if (IS_PVCV(cb)) {
+    if (cb) {
         dSP;
         ENTER;
         SAVETMPS;
@@ -756,8 +763,10 @@ static evf_handle *parallel_start(pTHX_ AV *list, SV *worker, SV *final_cb, int 
     ctx->is_freed_ptr = NULL;
     ctx->h = NULL;
     ctx->tasks = (AV*)SvREFCNT_inc((SV*)list);
-    ctx->final_cb = SvREFCNT_inc(final_cb);
-    ctx->worker = worker ? SvREFCNT_inc(worker) : NULL;
+    /* Retain the CV, not the caller's mutable scalar holding its reference. */
+    ctx->final_cb = IS_PVCV(final_cb) ? SvREFCNT_inc(SvRV(final_cb)) : NULL;
+    ctx->worker = worker ? SvREFCNT_inc(SvRV(worker)) : NULL;
+    worker = ctx->worker;
     ctx->remaining = len;
     ctx->cvs = NULL;
     ctx->num_cvs = 0;
@@ -823,7 +832,8 @@ static evf_handle *parallel_start(pTHX_ AV *list, SV *worker, SV *final_cb, int 
             }
             PUSHMARK(SP);
             if (have_worker) {
-                XPUSHs(task_sv ? sv_2mortal(SvREFCNT_inc(task_sv)) : &PL_sv_undef);
+                if (!task_sv) task_sv = *av_fetch(list, i, 1);
+                XPUSHs(sv_2mortal(SvREFCNT_inc(task_sv)));
             }
             XPUSHs(done_rv);
             PUTBACK;
@@ -831,7 +841,7 @@ static evf_handle *parallel_start(pTHX_ AV *list, SV *worker, SV *final_cb, int 
             call_sv(have_worker ? worker : task_sv, flags);
             SPAGAIN;
             if (!unsafe) {
-                if (SvTRUE(ERRSV)) {
+                if (SvROK(ERRSV) || SvTRUE(ERRSV)) {
                     SV *err = sv_mortalcopy(ERRSV);
                     if (!*is_freed) {
                         parallel_cleanup(aTHX_ &ctx);
@@ -845,7 +855,7 @@ static evf_handle *parallel_start(pTHX_ AV *list, SV *worker, SV *final_cb, int 
         } else {
             if (--ctx->remaining <= 0) {
                 SV *cb = ctx->final_cb;
-                if (IS_PVCV(cb)) {
+                if (cb) {
                     ENTER;
                     SAVETMPS;
                     SvREFCNT_inc(cb);
@@ -893,8 +903,8 @@ static evf_handle *series_start(pTHX_ AV *list, SV *worker, SV *final_cb, int un
     ctx->is_freed_ptr = NULL;
     ctx->h = NULL;
     ctx->tasks = (AV*)SvREFCNT_inc((SV*)list);
-    ctx->final_cb = SvREFCNT_inc(final_cb);
-    ctx->worker = worker ? SvREFCNT_inc(worker) : NULL;
+    ctx->final_cb = IS_PVCV(final_cb) ? SvREFCNT_inc(SvRV(final_cb)) : NULL;
+    ctx->worker = worker ? SvREFCNT_inc(SvRV(worker)) : NULL;
     ctx->current_idx = 0;
     ctx->running = 0;
     ctx->delayed = 0;
@@ -957,8 +967,8 @@ static evf_handle *plimit_start(pTHX_ AV *list, SV *worker, SV *limit_sv, SV *fi
     ctx->is_freed_ptr = NULL;
     ctx->h = NULL;
     ctx->tasks = (AV*)SvREFCNT_inc((SV*)list);
-    ctx->final_cb = SvREFCNT_inc(final_cb);
-    ctx->worker = worker ? SvREFCNT_inc(worker) : NULL;
+    ctx->final_cb = IS_PVCV(final_cb) ? SvREFCNT_inc(SvRV(final_cb)) : NULL;
+    ctx->worker = worker ? SvREFCNT_inc(SvRV(worker)) : NULL;
     ctx->remaining = len;
     ctx->current_idx = 0;
     ctx->total_tasks = len;
@@ -1013,25 +1023,25 @@ static void evf_handle_cancel(pTHX_ evf_handle *h, int fire) {
     switch (h->kind) {
         case EVF_KIND_PARALLEL: {
             parallel_ctx *ctx = (parallel_ctx *)h->ctx;
-            if (fire && IS_PVCV(ctx->final_cb)) cb = sv_2mortal(SvREFCNT_inc(ctx->final_cb));
+            if (fire && ctx->final_cb) cb = sv_2mortal(SvREFCNT_inc(ctx->final_cb));
             parallel_cleanup(aTHX_ &ctx);
             break;
         }
         case EVF_KIND_PLIMIT: {
             plimit_ctx *ctx = (plimit_ctx *)h->ctx;
-            if (fire && IS_PVCV(ctx->final_cb)) cb = sv_2mortal(SvREFCNT_inc(ctx->final_cb));
+            if (fire && ctx->final_cb) cb = sv_2mortal(SvREFCNT_inc(ctx->final_cb));
             plimit_cleanup(aTHX_ &ctx);
             break;
         }
         case EVF_KIND_SERIES: {
             series_ctx *ctx = (series_ctx *)h->ctx;
-            if (fire && IS_PVCV(ctx->final_cb)) cb = sv_2mortal(SvREFCNT_inc(ctx->final_cb));
+            if (fire && ctx->final_cb) cb = sv_2mortal(SvREFCNT_inc(ctx->final_cb));
             series_cleanup(aTHX_ &ctx);
             break;
         }
         case EVF_KIND_RACE: {
             race_ctx *ctx = (race_ctx *)h->ctx;
-            if (fire && IS_PVCV(ctx->final_cb)) cb = sv_2mortal(SvREFCNT_inc(ctx->final_cb));
+            if (fire && ctx->final_cb) cb = sv_2mortal(SvREFCNT_inc(ctx->final_cb));
             race_cleanup(aTHX_ &ctx);
             break;
         }
@@ -1228,7 +1238,7 @@ race(tasks, final_cb, ...)
         ctx->is_freed_ptr = NULL;
         ctx->h = NULL;
         ctx->tasks = (AV*)SvREFCNT_inc((SV*)tasks);
-        ctx->final_cb = SvREFCNT_inc(final_cb);
+        ctx->final_cb = IS_PVCV(final_cb) ? SvREFCNT_inc(SvRV(final_cb)) : NULL;
         ctx->settled = 0;
         ctx->total_tasks = len;
         ctx->abandoned = 0;
@@ -1294,7 +1304,7 @@ race(tasks, final_cb, ...)
                 call_sv(task_sv, flags);
                 SPAGAIN;
                 if (!unsafe) {
-                    if (SvTRUE(ERRSV)) {
+                    if (SvROK(ERRSV) || SvTRUE(ERRSV)) {
                         SV *err = sv_mortalcopy(ERRSV);
                         if (!*is_freed) {
                             race_cleanup(aTHX_ &ctx);
@@ -1308,7 +1318,7 @@ race(tasks, final_cb, ...)
             } else {
                 ctx->settled = 1;
                 SV *cb = ctx->final_cb;
-                if (IS_PVCV(cb)) {
+                if (cb) {
                     ENTER;
                     SAVETMPS;
                     SvREFCNT_inc(cb);
@@ -1351,8 +1361,8 @@ void
 cancel(self, ...)
     SV *self
     CODE:
-        evf_handle *h = evf_handle_from_sv(aTHX_ self);
         int fire = (items > 1 && SvTRUE(ST(1)));
+        evf_handle *h = evf_handle_from_sv(aTHX_ self);
         evf_handle_cancel(aTHX_ h, fire);
 
 IV

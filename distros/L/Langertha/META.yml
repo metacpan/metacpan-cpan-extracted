@@ -1,5 +1,5 @@
 ---
-abstract: 'The clan of fierce vikings with 🪓 and 🛡️ to AId your rAId'
+abstract: 'The clan of fierce vikings with axes and shields to AId your rAId'
 author:
   - 'Torsten Raudssus <getty@cpan.org>'
 build_requires:
@@ -22,400 +22,421 @@ name: Langertha
 provides:
   Langertha:
     file: lib/Langertha.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::CachedContent:
     file: lib/Langertha/CachedContent.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::CallResult:
     file: lib/Langertha/CallResult.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Chat:
     file: lib/Langertha/Chat.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Content:
     file: lib/Langertha/Content.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Content::Image:
     file: lib/Langertha/Content/Image.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Cost:
     file: lib/Langertha/Cost.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Embedder:
     file: lib/Langertha/Embedder.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Engine::AKI:
     file: lib/Langertha/Engine/AKI.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Engine::AKIAnthropic:
     file: lib/Langertha/Engine/AKIAnthropic.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Engine::AKIOpenAI:
     file: lib/Langertha/Engine/AKIOpenAI.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Engine::Anthropic:
     file: lib/Langertha/Engine/Anthropic.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Engine::AnthropicBase:
     file: lib/Langertha/Engine/AnthropicBase.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Engine::Cerebras:
     file: lib/Langertha/Engine/Cerebras.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Engine::DeepSeek:
     file: lib/Langertha/Engine/DeepSeek.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Engine::Gemini:
     file: lib/Langertha/Engine/Gemini.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Engine::Groq:
     file: lib/Langertha/Engine/Groq.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Engine::Hetzner:
     file: lib/Langertha/Engine/Hetzner.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Engine::HuggingFace:
     file: lib/Langertha/Engine/HuggingFace.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Engine::LMStudio:
     file: lib/Langertha/Engine/LMStudio.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Engine::LMStudioAnthropic:
     file: lib/Langertha/Engine/LMStudioAnthropic.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Engine::LMStudioOpenAI:
     file: lib/Langertha/Engine/LMStudioOpenAI.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Engine::LlamaCpp:
     file: lib/Langertha/Engine/LlamaCpp.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Engine::MiniMax:
     file: lib/Langertha/Engine/MiniMax.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Engine::MiniMaxAnthropic:
     file: lib/Langertha/Engine/MiniMaxAnthropic.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Engine::Mistral:
     file: lib/Langertha/Engine/Mistral.pm
-    version: '0.503'
+    version: '0.504'
+  Langertha::Engine::Mock:
+    file: lib/Langertha/Engine/Mock.pm
+    version: '0.504'
   Langertha::Engine::Moonshot:
     file: lib/Langertha/Engine/Moonshot.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Engine::MoonshotAnthropic:
     file: lib/Langertha/Engine/MoonshotAnthropic.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Engine::NousResearch:
     file: lib/Langertha/Engine/NousResearch.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Engine::Ollama:
     file: lib/Langertha/Engine/Ollama.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Engine::OllamaOpenAI:
     file: lib/Langertha/Engine/OllamaOpenAI.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Engine::OpenAI:
     file: lib/Langertha/Engine/OpenAI.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Engine::OpenAIBase:
     file: lib/Langertha/Engine/OpenAIBase.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Engine::OpenAIResponses:
     file: lib/Langertha/Engine/OpenAIResponses.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Engine::OpenRouter:
     file: lib/Langertha/Engine/OpenRouter.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Engine::Perplexity:
     file: lib/Langertha/Engine/Perplexity.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Engine::Remote:
     file: lib/Langertha/Engine/Remote.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Engine::Replicate:
     file: lib/Langertha/Engine/Replicate.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Engine::SGLang:
     file: lib/Langertha/Engine/SGLang.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Engine::Scaleway:
     file: lib/Langertha/Engine/Scaleway.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Engine::TSystems:
     file: lib/Langertha/Engine/TSystems.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Engine::TranscriptionBase:
     file: lib/Langertha/Engine/TranscriptionBase.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Engine::VLLMHook:
     file: lib/Langertha/Engine/VLLMHook.pm
-    version: '0.503'
+    version: '0.504'
+  Langertha::Engine::Virtual:
+    file: lib/Langertha/Engine/Virtual.pm
+    version: '0.504'
   Langertha::Engine::Whisper:
     file: lib/Langertha/Engine/Whisper.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Engine::XAI:
     file: lib/Langertha/Engine/XAI.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Engine::vLLM:
     file: lib/Langertha/Engine/vLLM.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::HTTP::BoundedDecode:
     file: lib/Langertha/HTTP/BoundedDecode.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::HTTP::ConnectCheck:
     file: lib/Langertha/HTTP/ConnectCheck.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::HTTP::Redirect:
     file: lib/Langertha/HTTP/Redirect.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::HTTP::UserAgent:
     file: lib/Langertha/HTTP/UserAgent.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::ImageGen:
     file: lib/Langertha/ImageGen.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Input:
     file: lib/Langertha/Input.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Input::Tools:
     file: lib/Langertha/Input/Tools.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Manifest:
     file: lib/Langertha/Manifest.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Manifest::Auth:
     file: lib/Langertha/Manifest/Auth.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Manifest::Builder:
     file: lib/Langertha/Manifest/Builder.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Manifest::Endpoint:
     file: lib/Langertha/Manifest/Endpoint.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Manifest::Model:
     file: lib/Langertha/Manifest/Model.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Manifest::Validation:
     file: lib/Langertha/Manifest/Validation.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Metrics:
     file: lib/Langertha/Metrics.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::ModelProbe:
     file: lib/Langertha/ModelProbe.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Moment:
     file: lib/Langertha/Moment.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Output:
     file: lib/Langertha/Output.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Output::Tools:
     file: lib/Langertha/Output/Tools.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Plugin:
     file: lib/Langertha/Plugin.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Plugin::Langfuse:
     file: lib/Langertha/Plugin/Langfuse.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Pricing:
     file: lib/Langertha/Pricing.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::PromptCache:
     file: lib/Langertha/PromptCache.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::RateLimit:
     file: lib/Langertha/RateLimit.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Reasoning:
     file: lib/Langertha/Reasoning.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Reasoning::BudgetPolicy:
     file: lib/Langertha/Reasoning/BudgetPolicy.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Reasoning::Profile:
     file: lib/Langertha/Reasoning/Profile.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Request::HTTP:
     file: lib/Langertha/Request/HTTP.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Request::SyncHTTP:
     file: lib/Langertha/Request/SyncHTTP.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Response:
     file: lib/Langertha/Response.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Result:
     file: lib/Langertha/Result.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Role::AnthropicCompatible:
     file: lib/Langertha/Role/AnthropicCompatible.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Role::AsyncHTTP:
     file: lib/Langertha/Role/AsyncHTTP.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Role::CachedContent:
     file: lib/Langertha/Role/CachedContent.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Role::Capabilities:
     file: lib/Langertha/Role/Capabilities.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Role::Chat:
     file: lib/Langertha/Role/Chat.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Role::ContextSize:
     file: lib/Langertha/Role/ContextSize.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Role::Embedding:
     file: lib/Langertha/Role/Embedding.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Role::HTTP:
     file: lib/Langertha/Role/HTTP.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Role::HermesTools:
     file: lib/Langertha/Role/HermesTools.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Role::ImageGeneration:
     file: lib/Langertha/Role/ImageGeneration.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Role::ImageInput:
     file: lib/Langertha/Role/ImageInput.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Role::JSON:
     file: lib/Langertha/Role/JSON.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Role::KeepAlive:
     file: lib/Langertha/Role/KeepAlive.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Role::Langfuse:
     file: lib/Langertha/Role/Langfuse.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Role::Models:
     file: lib/Langertha/Role/Models.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Role::OpenAICompatible:
     file: lib/Langertha/Role/OpenAICompatible.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Role::OpenAPI:
     file: lib/Langertha/Role/OpenAPI.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Role::ParallelToolUse:
     file: lib/Langertha/Role/ParallelToolUse.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Role::PluginHost:
     file: lib/Langertha/Role/PluginHost.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Role::PromptCache:
     file: lib/Langertha/Role/PromptCache.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Role::ReasoningEffort:
     file: lib/Langertha/Role/ReasoningEffort.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Role::ResponseFormat:
     file: lib/Langertha/Role/ResponseFormat.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Role::ResponseSize:
     file: lib/Langertha/Role/ResponseSize.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Role::ResponsesCompatible:
     file: lib/Langertha/Role/ResponsesCompatible.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Role::Runnable:
     file: lib/Langertha/Role/Runnable.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Role::Runtime::MetricsPoll:
     file: lib/Langertha/Role/Runtime/MetricsPoll.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Role::RuntimeKnobs:
     file: lib/Langertha/Role/RuntimeKnobs.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Role::Seed:
     file: lib/Langertha/Role/Seed.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Role::ServerTools:
     file: lib/Langertha/Role/ServerTools.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Role::StaticModels:
     file: lib/Langertha/Role/StaticModels.pm
-    version: '0.503'
+    version: '0.504'
+  Langertha::Role::StreamUsage:
+    file: lib/Langertha/Role/StreamUsage.pm
+    version: '0.504'
   Langertha::Role::Streaming:
     file: lib/Langertha/Role/Streaming.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Role::SystemPrompt:
     file: lib/Langertha/Role/SystemPrompt.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Role::Temperature:
     file: lib/Langertha/Role/Temperature.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Role::ThinkTag:
     file: lib/Langertha/Role/ThinkTag.pm
-    version: '0.503'
+    version: '0.504'
+  Langertha::Role::ToolResultImages:
+    file: lib/Langertha/Role/ToolResultImages.pm
+    version: '0.504'
+  Langertha::Role::ToolResultPDF:
+    file: lib/Langertha/Role/ToolResultPDF.pm
+    version: '0.504'
   Langertha::Role::Tools:
     file: lib/Langertha/Role/Tools.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Role::Transcription:
     file: lib/Langertha/Role/Transcription.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::RunContext:
     file: lib/Langertha/RunContext.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Runtime::Knobs:
     file: lib/Langertha/Runtime/Knobs.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Runtime::Metrics:
     file: lib/Langertha/Runtime/Metrics.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Runtime::Metrics::OTLP:
     file: lib/Langertha/Runtime/Metrics/OTLP.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::ServerTool:
     file: lib/Langertha/ServerTool.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::ServerToolCall:
     file: lib/Langertha/ServerToolCall.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Spec::LMStudio:
     file: lib/Langertha/Spec/LMStudio.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Spec::Mistral:
     file: lib/Langertha/Spec/Mistral.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Spec::Ollama:
     file: lib/Langertha/Spec/Ollama.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Spec::OpenAI:
     file: lib/Langertha/Spec/OpenAI.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Stream:
     file: lib/Langertha/Stream.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Stream::Chunk:
     file: lib/Langertha/Stream/Chunk.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Tool:
     file: lib/Langertha/Tool.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::ToolCall:
     file: lib/Langertha/ToolCall.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::ToolChoice:
     file: lib/Langertha/ToolChoice.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::ToolResult:
     file: lib/Langertha/ToolResult.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::Usage:
     file: lib/Langertha/Usage.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::UsageRecord:
     file: lib/Langertha/UsageRecord.pm
-    version: '0.503'
+    version: '0.504'
   Langertha::VLLMHook::Config:
     file: lib/Langertha/VLLMHook/Config.pm
-    version: '0.503'
+    version: '0.504'
+  Langertha::Virtual::Rules:
+    file: lib/Langertha/Virtual/Rules.pm
+    version: '0.504'
+  Langertha::Virtual::Server:
+    file: lib/Langertha/Virtual/Server.pm
+    version: '0.504'
   LangerthaX:
     file: lib/LangerthaX.pm
-    version: '0.503'
+    version: '0.504'
 recommends:
   IO::Async: '0'
   IO::Async::SSL: '0'
@@ -455,7 +476,7 @@ resources:
   bugtracker: https://github.com/Getty/langertha/issues
   homepage: https://github.com/Getty/langertha
   repository: https://github.com/Getty/langertha.git
-version: '0.503'
+version: '0.504'
 x_Dist_Zilla:
   perl:
     version: '5.040001'
@@ -467,7 +488,8 @@ x_Dist_Zilla:
           exclude_filename:
             - .karr
             - README.md
-          exclude_match: []
+          exclude_match:
+            - ^assets/
           include_dotfiles: 1
           prefix: ''
           prune_directory: []
@@ -739,7 +761,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.503'
+          tag: '0.504'
           tag_format: '%v'
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
@@ -804,6 +826,10 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::GitHub::CreateRelease
       name: '@Author::GETTY/GitHub::CreateRelease'
       version: '0.0012'
+    -
+      class: Dist::Zilla::Plugin::Docker::API
+      name: '@Author::GETTY/@Author::GETTY::Docker/Docker::API'
+      version: '0.104'
     -
       class: Dist::Zilla::Plugin::Test::Perl::Critic
       name: Test::Perl::Critic

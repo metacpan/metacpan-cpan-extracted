@@ -14,7 +14,7 @@ use EV::Nats;
 
 my $nats_bin = nats_bin_or_skip();
 
-plan tests => 5;
+plan tests => 6;
 
 my $tmp = tempdir(CLEANUP => 1);
 my @ports   = (free_port(), free_port(), free_port());
@@ -66,6 +66,8 @@ my $nats;
 my $connected_count  = 0;
 my $disconnected     = 0;
 my $received_after   = 0;
+my $phase2           = 0;
+my $recovered        = 0;
 
 $nats = EV::Nats->new(
     host                   => '127.0.0.1',
@@ -92,6 +94,22 @@ $nats = EV::Nats->new(
                 diag "killing node0 (pid $pids[0])";
                 kill 'TERM', $pids[0];
             };
+        } elsif ($phase2 && !$recovered) {
+            $recovered = 1;
+            pass "reconnected to restarted node0";
+            $received_after = 0;
+
+            my $pub2; $pub2 = EV::timer 0.5, 0, sub {
+                undef $pub2;
+                $nats->publish('cluster.test', 'after-failover');
+
+                my $check2; $check2 = EV::timer 1, 0, sub {
+                    undef $check2;
+                    is $received_after, 1, 'received message after restart recovery';
+                    $nats->disconnect;
+                    EV::break;
+                };
+            };
         } elsif ($connected_count == 2) {
             pass "reconnected to another node after failover";
 
@@ -103,9 +121,23 @@ $nats = EV::Nats->new(
                 my $check; $check = EV::timer 1, 0, sub {
                     undef $check;
                     is $received_after, 1, 'received message after failover';
-                    ok $connected_count >= 2, "connected $connected_count times total";
-                    $nats->disconnect;
-                    EV::break;
+
+                    # Kill the survivors, restart node0: the pool must
+                    # still know the dead seed so the client recovers.
+                    $phase2 = 1;
+                    diag "killing node1, node2";
+                    kill 'TERM', $pids[1], $pids[2];
+                    my $restart; $restart = EV::timer 1.5, 0, sub {
+                        undef $restart;
+                        waitpid($pids[0], 0);
+                        my $pid = fork;
+                        die "fork: $!" unless defined $pid;
+                        if ($pid == 0) {
+                            exec($nats_bin, '-c', "$tmp/nats0.conf") or _exit(1);
+                        }
+                        $pids[0] = $pid;
+                        diag "restarted node0 (pid $pid)";
+                    };
                 };
             };
         }

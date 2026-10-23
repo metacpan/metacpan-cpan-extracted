@@ -1,0 +1,16 @@
+{
+  "schema_version": 3,
+  "generated_at": 1792540920,
+  "logs_directory": "/home/me/.cache/action-run/logs",
+  "logs": [],
+  "totals": {
+    "runs": 0,
+    "logs": 0,
+    "size": 0
+  },
+  "prune": {
+    "removed": 3,
+    "freed": 3072,
+    "failed": []
+  }
+}

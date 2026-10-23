@@ -106,13 +106,9 @@ sub _operation {
     my $data = $self->client->$method( $uri,$params );
 
     if ( $self->client->api_version > 1 ) {
-
-        $data = $data->{payments}
-            if ref( $self ) eq 'Business::GoCardless::Payment';
-        $data = $data->{subscriptions}
-            if ref( $self ) eq 'Business::GoCardless::Subscription';
-        $data = $data->{mandates}
-            if ref( $self ) eq 'Business::GoCardless::Mandate';
+        # v2 responses wrap the resource in a key, e.g. { payments => { ... } }
+        my $key = $self->_resource_key;
+        $data = $data->{$key} if ref( $data->{$key} ) eq 'HASH';
     }
 
     foreach my $attr ( keys( %{ $data } ) ) {
@@ -123,6 +119,43 @@ sub _operation {
     }
 
     return $self;
+}
+
+# the following are for the v2 API, and used by the resource classes to
+# implement their operations (cancel, update, etc)
+
+# the key the resource is wrapped in for requests and responses, which is the
+# first part of the endpoint, e.g. /billing_requests/%s -> billing_requests
+sub _resource_key {
+    my ( $self ) = @_;
+    my ( $key ) = $self->endpoint =~ m!^/([^/]+)!;
+    return $key;
+}
+
+# POST to an action, e.g. /payments/PM123/actions/cancel, any params for the
+# action are sent wrapped in a data key as required by the API
+sub _action {
+    my ( $self,$action,%params ) = @_;
+
+    return $self->_operation(
+        undef,'api_post',
+        ( keys( %params ) ? { data => { %params } } : undef ),
+        "actions/$action",
+    );
+}
+
+# PUT to the resource with the params to update
+sub _update {
+    my ( $self,%params ) = @_;
+    return $self->_operation(
+        undef,'api_put',{ $self->_resource_key => { %params } }
+    );
+}
+
+# DELETE the resource
+sub _delete {
+    my ( $self ) = @_;
+    return $self->_operation( undef,'api_delete' );
 }
 
 sub uri {
@@ -164,13 +197,13 @@ sub to_json {
 
 =head1 AUTHOR
 
-Lee Johnson - C<leejo@cpan.org>
+Lee Johnson - C<lee@payprop.com>
 
 This library is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself. If you would like to contribute documentation,
 features, bug fixes, or anything else then please raise an issue / pull request:
 
-    https://github.com/Humanstate/business-gocardless
+    https://github.com/payprop/business-gocardless
 
 =cut
 

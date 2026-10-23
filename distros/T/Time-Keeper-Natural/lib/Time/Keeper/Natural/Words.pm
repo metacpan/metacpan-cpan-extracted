@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 use Time::Keeper::Locale;
 use Time::Keeper::Natural ();
@@ -22,7 +22,7 @@ Time::Keeper::Natural::Words - the words CLDR has none for, one small table a lo
 
 =head1 VERSION
 
-Version 0.07
+Version 0.08
 
 =head1 SYNOPSIS
 

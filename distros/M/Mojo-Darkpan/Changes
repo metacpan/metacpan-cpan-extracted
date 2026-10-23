@@ -1,5 +1,16 @@
 Revision history for Perl extension Mojo::Darkpan
 
+0.10 2026-10-22T13:35:18Z
+    - Fixed path traversal in DirectoryHandler that allowed reading files outside the repository directory
+    - /reindex now checks authorization before starting the reindex (thanks to José Joaquín Atria, GH #5)
+    - /list on a repository with no index file returns an empty object instead of warning
+    - A false compress_index (or empty DARKPAN_COMPRESS_INDEX) in the configuration is now honoured
+    - Documented that cpan-upload ignores upload_uri and needs CPAN_UPLOADER_UPLOAD_URI
+    - Rewrote the Dockerfile: Perl 5.44 (PERL_VERSION build arg), non-root user, volume for uploads, and a CMD
+    - Fixed other_versions in /list including distributions whose name merely starts with the same prefix (Foo-BarBaz listed under Foo-Bar)
+    - Replaced Nice::Try (a source filter) with Syntax::Keyword::Try
+    - Added route, publish, list and basic auth tests
+
 0.09 2022-11-20T18:20:24Z
     - Fixed an error where bad regex was causing similarly named packages to show up in the "other_versions" section when looking at the /list API endpoint
     - Updated the included Dockerfile to use smaller Alpine based image. Noted some warnings when running in Alpine Docker, will investigate later

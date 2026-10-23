@@ -397,8 +397,8 @@ total(self, unit, ...)
                 croak("%s: months have no fixed length; give relative_to, a value to measure from", what);
             if (d->days && u >= TK_U_HOUR)
                 croak("%s: a day is not always 24 hours; give relative_to, a value to measure from", what);
-            t = ((double)d->days * 86400 + (double)d->minutes * 60 + (double)d->seconds
-                 + (double)d->nsec / TK_NSECS_PER_SEC) / tk_unit_seconds(u);
+            t = tk_secs_in_unit((double)d->days * 86400 + (double)d->minutes * 60 + (double)d->seconds
+                                + (double)d->nsec / TK_NSECS_PER_SEC, u);
         }
         if (t == (double)(IV)t)
             RETVAL = newSViv((IV)t);

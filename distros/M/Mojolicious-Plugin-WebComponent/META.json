@@ -4,7 +4,7 @@
       "Russell Shingleton <reshingleton@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.23",
+   "generated_by" : "Minilla/v3.1.29",
    "license" : [
       "perl_5"
    ],
@@ -42,7 +42,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Mojolicious" : "0",
+            "Mojolicious" : "9.27",
             "perl" : "v5.20.0"
          }
       }
@@ -50,7 +50,7 @@
    "provides" : {
       "Mojolicious::Plugin::WebComponent" : {
          "file" : "lib/Mojolicious/Plugin/WebComponent.pm",
-         "version" : "0.07"
+         "version" : "0.08"
       }
    },
    "release_status" : "stable",
@@ -65,10 +65,10 @@
          "web" : "https://github.com/rshingleton/Mojolicious-Plugin-WebComponent"
       }
    },
-   "version" : "0.07",
+   "version" : "0.08",
    "x_contributors" : [
       "shingler <shingler@oclc.org>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.07",
+   "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 1
 }

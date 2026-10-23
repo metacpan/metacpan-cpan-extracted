@@ -6,6 +6,7 @@ briefing:
   skills:
     - langertha-adr
     - perl-ai-langertha
+    - langertha-core
     - langertha-internals
     - kanban-issues-karr-ticket
 ---
@@ -31,12 +32,11 @@ The decision list comes from the *shape of the codebase*:
    most-discussed decisions. Read `CONTEXT.md` — it is the distilled vocabulary of that
    discussion — then hold it against the code. Where the code drifts from the stated decision
    (e.g. a method the docs say is the API but the loop bypasses, or a value object missing a
-   dispatch its siblings have), that gap is itself worth recording or filing as a karr
-   reconciliation ticket.
+   dispatch its siblings have), that gap is itself worth recording, or noting on your karr card as a
+   reconciliation card for the dispatcher to file.
 3. **Confirm the WHY** from git history (the refactor commits and their messages), from
    `CONTEXT.md`, and from the code.
 
 ADR-worthiness, format, amend-vs-new, numbering and the index/area-map upkeep: `langertha-adr`.
 
-Report back: the ADRs written (number + title), and any drift/gaps deferred (with their karr
-ticket id).
+Report back: the ADRs written (number + title), and any drift/gaps deferred (as proposed cards).

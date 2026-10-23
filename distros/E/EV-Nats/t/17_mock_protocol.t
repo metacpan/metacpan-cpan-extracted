@@ -14,6 +14,9 @@ use MockNats;
 # Run EV::run with a hard cap so no assertion can hang the suite.
 sub run_guarded {
     my ($seconds) = @_;
+    # EV::timer anchors `after` to the cached loop time, which goes stale
+    # across out-of-loop mock waits; refresh it so the guard can't be born expired.
+    EV::now_update;
     my $g = EV::timer $seconds, 0, sub { EV::break };
     EV::run;
 }
@@ -134,6 +137,46 @@ subtest 'malformed frames are dropped, well-formed ones delivered intact' => sub
         or diag explain \@delivered;
     is $pong, 'pong=1', 'client still answered PING after the fuzz';
     is_deeply \@errs, [], 'no errors raised by malformed frames'
+        or diag explain \@errs;
+};
+
+subtest 'message split at every byte reassembles identically' => sub {
+    plan tests => 3;
+    my $mock = MockNats->new(on_accept => sub {
+        my ($c, $report) = @_;
+        MockNats->handshake($c) or return;
+        my $buf = MockNats->read_until($c, qr/SUB\s+\S+\s+(\d+)\r\n/) or return;
+        my ($sid) = $buf =~ /SUB\s+\S+\s+(\d+)\r\n/;
+        my $frame = "MSG s.a $sid rp 3\r\nabc\r\n";
+        for my $at (1 .. length($frame) - 1) {
+            syswrite($c, substr($frame, 0, $at));
+            select undef, undef, undef, 0.15;
+            syswrite($c, substr($frame, $at));
+            select undef, undef, undef, 0.05;
+        }
+        select undef, undef, undef, 1.0;
+    })->start;
+
+    my (@delivered, @errs);
+    my $expect = length("MSG s.a 1 rp 3\r\nabc\r\n") - 1;
+    my $nats;
+    $nats = EV::Nats->new(
+        host => '127.0.0.1', port => $mock->port,
+        on_error   => sub { push @errs, $_[0] },
+        on_connect => sub {
+            $nats->subscribe('s.>', sub {
+                push @delivered, [ @_ ];
+                EV::break if @delivered == $expect;
+            });
+        },
+    );
+    run_guarded(30);
+    $mock->stop;
+
+    is scalar @delivered, $expect, 'one delivery per split point';
+    ok !grep({ $_->[0] ne 's.a' || $_->[1] ne 'abc' || ($_->[2] // '') ne 'rp' } @delivered),
+        'every split reassembled identically';
+    is_deeply \@errs, [], 'no errors across the sweep'
         or diag explain \@errs;
 };
 
@@ -425,6 +468,39 @@ subtest 'NKey seed handling' => sub {
     is $@, '', 'generated seed round-trips through nkey_public_from_seed';
     like $pub, qr/\AU[A-Z2-7]{55}\z/, 'derived key is a user public key';
     is(EV::Nats->nkey_public_from_seed($seed), $pub, 'derivation is deterministic');
+};
+
+subtest 'overflowing inbox id cannot match a live request' => sub {
+    plan tests => 2;
+    my $mock = MockNats->new(on_accept => sub {
+        my ($c, $report) = @_;
+        MockNats->handshake($c) or return;
+        my $buf = MockNats->read_until($c, qr/PUB req\.b (\S+) /, 5) or return;
+        my ($reply) = $buf =~ /PUB req\.b (\S+) /;
+        (my $spoof = $reply) =~ s/\d+$/18446744073709551617/;
+        syswrite($c, "MSG $spoof 1 7\r\nSPOOFED\r\n");
+        select undef, undef, undef, 0.3;
+        syswrite($c, "MSG $reply 1 4\r\nREAL\r\n");
+        select undef, undef, undef, 1.0;
+    })->start;
+
+    my ($got, $err);
+    my $nats;
+    $nats = EV::Nats->new(
+        host => '127.0.0.1', port => $mock->port,
+        reconnect => 0,
+        on_error => sub { diag "error: $_[0]" },
+        on_connect => sub {
+            $nats->request('req.b', 'ping', sub {
+                ($got, $err) = @_; EV::break;
+            }, 5000);
+        },
+    );
+    run_guarded(6);
+    $mock->stop;
+
+    is $got, 'REAL', 'wrapped id ignored, real reply delivered';
+    is $err, undef, 'no error';
 };
 
 done_testing;

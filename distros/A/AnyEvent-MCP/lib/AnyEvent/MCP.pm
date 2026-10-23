@@ -6,9 +6,9 @@ AnyEvent::MCP - Model Context Protocol client/server support
 
    use AnyEvent::MCP::Server::Simple;
 
-   my %options = mcp_getoptions ...;
+   my $options = mcp_getoptions ...;
    mcp_tool ...;
-   mcp_start %options;
+   mcp_start %$options;
 
 or use the object interface directly:
 
@@ -445,7 +445,7 @@ package AnyEvent::MCP;
 
 use common::sense;
 
-our $VERSION = 0.61;
+our $VERSION = 0.62;
 
 sub json_class {
    our $JSON_CLASS ||= eval { require JSON::XS; "JSON::XS" }

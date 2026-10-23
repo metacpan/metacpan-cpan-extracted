@@ -77,7 +77,15 @@ sub register {
 
                 my $path;
                 if ($req_path ne $root_string) {
-                    $path = $root->rel_file(Mojo::Util::url_unescape($req_path));
+                    my $unescaped = Mojo::Util::url_unescape($req_path);
+
+                    # never resolve outside of the repository
+                    if (grep { $_ eq '..' } split m{[/\\]}, $unescaped) {
+                        $c->reply->not_found;
+                        return;
+                    }
+
+                    $path = $root->rel_file($unescaped);
                 }
 
                 if (-d $path) {

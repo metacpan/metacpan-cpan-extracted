@@ -33,6 +33,7 @@ my %WriteMakefileArgs = (
     "JSON::MaybeXS" => 0,
     "LWP::UserAgent" => 0,
     "List::Util" => "1.33",
+    "MIME::Base64" => 0,
     "Net::EmptyPort" => 0,
     "POSIX" => 0,
     "Proc::ProcessTable" => 0,
@@ -55,7 +56,7 @@ my %WriteMakefileArgs = (
     "Test::MockFile" => 0,
     "Test::MockModule" => 0
   },
-  "VERSION" => "1.621",
+  "VERSION" => "1.641",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -74,6 +75,7 @@ my %FallbackPrereqs = (
   "JSON::MaybeXS" => 0,
   "LWP::UserAgent" => 0,
   "List::Util" => "1.33",
+  "MIME::Base64" => 0,
   "Net::EmptyPort" => 0,
   "POSIX" => 0,
   "Proc::ProcessTable" => 0,

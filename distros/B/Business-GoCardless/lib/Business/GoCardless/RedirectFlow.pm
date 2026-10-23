@@ -22,6 +22,7 @@ use Business::GoCardless::Mandate;
 =head1 ATTRIBUTES
 
     confirmation_url
+    mandate_reference
     redirect_url
     scheme
     session_token
@@ -33,6 +34,7 @@ use Business::GoCardless::Mandate;
 
 has [ qw/
     confirmation_url
+    mandate_reference
     redirect_url
     scheme
     session_token
@@ -46,13 +48,13 @@ has [ qw/
 
 =head1 AUTHOR
 
-Lee Johnson - C<leejo@cpan.org>
+Lee Johnson - C<lee@payprop.com>
 
 This library is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself. If you would like to contribute documentation,
 features, bug fixes, or anything else then please raise an issue / pull request:
 
-    https://github.com/Humanstate/business-gocardless
+    https://github.com/payprop/business-gocardless
 
 =cut
 

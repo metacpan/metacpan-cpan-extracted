@@ -6,9 +6,7 @@ use Time::HiRes qw(time);
 
 use Data::Sync::Shared;
 
-# On SIGTERM, Perl runs DESTROY on live objects. Verify the Sync primitives'
-# cleanup paths complete (no deadlock, no lost resources) when a process
-# holding a primitive receives SIGTERM.
+# A surviving process must still operate after a peer receives SIGTERM.
 
 use File::Temp qw(tmpnam);
 my $path = tmpnam() . ".$$";
@@ -27,7 +25,7 @@ select undef, undef, undef, 0.2;
 kill TERM => $pid;
 waitpid $pid, 0;
 
-# Parent should still operate. If DESTROY deadlocked holding a lock, we'd hang.
+# Parent should still operate.
 my $t0 = time;
 my $got = $sem->acquire(2.0);
 my $dt = time - $t0;

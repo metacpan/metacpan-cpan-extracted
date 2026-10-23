@@ -44,10 +44,9 @@ DESCRIPTION
     Multiple queries run concurrently. c-ares handles server rotation,
     retries, timeouts, and search-domain appending.
 
-    Requires c-ares >= 1.24.0 (provided automatically by Alien::cares).
-    HTTPS/SVCB/TLSA/DS/DNSKEY/RRSIG record parsing additionally requires
-    c-ares >= 1.28.0; on older c-ares these types fall through to the raw
-    response buffer.
+    Requires c-ares >= 1.34.8 (provided by Alien::cares).
+    For older system libraries, reinstall Alien::cares with
+    ALIEN_INSTALL_TYPE=share.
 
 CONSTRUCTOR
   new
@@ -62,7 +61,7 @@ CONSTRUCTOR
         Per-try timeout (fractional seconds).
 
     maxtimeout => $seconds
-        Maximum total timeout across all tries.
+        Maximum timeout between retry attempts.
 
     tries => $n
         Number of query attempts.
@@ -103,6 +102,10 @@ CONSTRUCTOR
     qcache => $max_ttl
         Enable query result cache; $max_ttl is the upper TTL bound in
         seconds. 0 disables the cache.
+
+        c-ares 1.31 through 1.34 can mix cache entries for unrecognized types
+        (including DS/DNSKEY/RRSIG). Use "qcache => 0" when querying multiple
+        such types on one resolver.
 
     loop => $ev_loop
         An EV::Loop instance to attach all I/O and timer watchers to.
@@ -229,7 +232,7 @@ QUERY METHODS
 
     For TLSA (DANE, RFC 6698), "data" is the raw fingerprint / certificate
     bytes; the integer fields are "cert_usage" (0..3), "selector" (0..1),
-    and "matching_type" (0..2). TLSA parsing requires c-ares >= 1.28.
+    and "matching_type" (0..2).
 
     For DS / DNSKEY / RRSIG (DNSSEC, RFC 4034) the binary fields are the raw
     wire-format bytes; integer fields use host byte order. "digest",
@@ -243,9 +246,7 @@ QUERY METHODS
     For HTTPS/SVCB, %p may contain "alpn" (arrayref of protocol IDs),
     "no_default_alpn" (1 if set), "port" (integer), "ipv4hint" / "ipv6hint"
     (arrayrefs of address strings), "ech" (opaque bytes), "dohpath"
-    (string), and any unrecognized SVCB param as "keyN => $bytes". Parsing
-    requires c-ares >= 1.28; on older c-ares HTTPS/SVCB falls through to the
-    raw buffer like unknown types.
+    (string), and any unrecognized SVCB param as "keyN => $bytes".
 
   query
         $r->query($name, $class, $type, sub { my ($status, $buf) = @_ });
@@ -354,9 +355,9 @@ CHANNEL METHODS
   reinit
         $r->reinit;
 
-    Re-read system DNS configuration (resolv.conf, hosts file) without
-    destroying the channel. Useful for long-running daemons where the
-    resolver configuration may change at runtime.
+    Re-read system DNS configuration (resolv.conf, hosts file) synchronously,
+    preserving explicit options. The resolver must be idle; drain or cancel
+    pending queries first. Croaks when called from a query callback.
 
   destroy
         $r->destroy;

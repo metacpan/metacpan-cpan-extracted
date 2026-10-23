@@ -14,7 +14,7 @@ use Test::LocalHTTPDaemon;
 
 use Langertha::Engine::Whisper;
 
-# karr k288. The transcription endpoints (OpenAI, Groq, faster-whisper) take
+# karr k288. The transcription endpoints (OpenAI, Groq, speaches) take
 # response_format json | verbose_json | text | srt | vtt, and the POD
 # advertises %extra pass-through -- but transcription_response ran every body
 # through the JSON decoder, so text/srt/vtt croaked with a bare "malformed
@@ -29,15 +29,27 @@ use Langertha::Engine::Whisper;
 # groq_transcription_{json,verbose_json,text} fixtures ARE verbatim captures
 # (Groq whisper-large-v3-turbo, 2026-09-30, a 6 s English ogg; the headers
 # files keep only content-type).
+#
+# The speaches_transcription_* fixtures are verbatim captures too (k370), from
+# speaches -- the successor of faster-whisper-server, the server
+# Engine::Whisper is written for -- answering Engine::Whisper's own requests on
+# 2026-10-19: speaches 0.8.3 (OpenAPI info.version; source speaches-ai/speaches
+# master @ 993994f, faster-whisper 1.1.1), model Systran/faster-whisper-tiny.en,
+# audio ex/sample.ogg. Bodies are byte-exact; the headers files keep only
+# content-type, as for Groq -- speaches sends nothing else a parser reads (no
+# rate-limit or request-id headers; just date, server, content-length).
+# speaches_transcription_error_no_model is the 422 body for a request without
+# a model field (Engine::Whisper's default), verbose_json_words the answer to
+# timestamp_granularities[] = word, segment.
 
 my $data_dir = path(__FILE__)->parent->child('data');
 my $json     = JSON::MaybeXS->new->canonical(1)->utf8(1);
 
 sub fixture_http {
-  my ( $name, $ext ) = @_;
+  my ( $name, $ext, $code, $message ) = @_;
   my $body    = $data_dir->child("$name.$ext")->slurp_raw;
   my $headers = $json->decode( $data_dir->child("$name.headers.json")->slurp_raw );
-  my $http    = HTTP::Response->new(200, 'OK');
+  my $http    = HTTP::Response->new($code // 200, $message // 'OK');
   $http->header( $_ => $headers->{$_} ) for sort keys %$headers;
   $http->content($body);
   return $http;
@@ -131,8 +143,75 @@ subtest 'Groq text capture: upper-case charset=UTF-8 read as text' => sub {
     'plain body, no trailing newline on the wire');
 };
 
+# karr k370: what speaches really answers Engine::Whisper. Where it differs
+# from OpenAI, the parser must hand the caller the server's data unchanged
+# (language as a code, null fields, leading spaces) and must not choke on the
+# content types (vtt is text/vtt); the differences are documented in the
+# Engine::Whisper POD.
+subtest 'speaches json capture: null usage is no usage' => sub {
+  my $http = fixture_http('speaches_transcription_json', 'json');
+  is($whisper->transcription_response($http),
+    'This is an example sound file in August for Matt from Wikipedia, the free encyclopedia.',
+    'text field (no leading space, unlike Groq)');
+  my $result = $whisper->transcription_result($http);
+  ok(exists $result->{usage} && !defined $result->{usage}, 'usage arrives as JSON null');
+  require Langertha::CallResult;
+  my $call = Langertha::CallResult->from_http_response( $whisper, $http,
+    value => $whisper->transcription_response($http), model => 'Systran/faster-whisper-tiny.en' );
+  ok(!$call->has_usage, 'a null usage gives no Usage object, not invented zeros');
+  is($call->model, 'Systran/faster-whisper-tiny.en', 'model from the request (the body names none)');
+  ok(exists $call->raw->{logprobs}, 'raw keeps the body as sent');
+};
+
+subtest 'speaches verbose_json capture: code language, null words' => sub {
+  my $http = fixture_http('speaches_transcription_verbose_json', 'json');
+  my $result = $whisper->transcription_result($http);
+  is($result->{text}, 'This is an example sound file in August for Matt from Wikipedia, the free encyclopedia.', 'text');
+  is($result->{language}, 'en', 'language is the code the server sent, not rewritten to a name');
+  is($result->{duration}, 6.1040625, 'duration');
+  is(scalar @{ $result->{segments} }, 1, 'segments reachable');
+  is($result->{segments}[0]{id}, 1, 'segment ids start at 1');
+  is($result->{segments}[0]{end}, 6.104, 'segment timing');
+  like($result->{segments}[0]{text}, qr/\A This is/, 'segment text keeps its leading space');
+  ok(exists $result->{words} && !defined $result->{words}, 'words without word granularity: null, not missing');
+};
+
+subtest 'speaches verbose_json with word timestamps' => sub {
+  my $result = $whisper->transcription_result( fixture_http('speaches_transcription_verbose_json_words', 'json') );
+  is(scalar @{ $result->{words} }, 15, 'every word reachable');
+  is_deeply($result->{words}[0], { word => ' This', start => 0, end => 0.28 }, 'word keeps its leading space and timing');
+  is($result->{segments}[0]{end}, 5.6, 'segments still there next to words');
+};
+
+subtest 'speaches text, srt and vtt captures' => sub {
+  my $text = fixture_http('speaches_transcription_text', 'txt');
+  is($text->header('Content-Type'), 'text/plain; charset=utf-8', 'text: real header');
+  is($whisper->transcription_response($text),
+    'This is an example sound file in August for Matt from Wikipedia, the free encyclopedia.',
+    'text: body, no trailing newline on the wire');
+
+  my $srt = fixture_http('speaches_transcription_srt', 'txt');
+  is($srt->header('Content-Type'), 'text/plain; charset=utf-8', 'srt: served as text/plain');
+  is($whisper->transcription_response($srt),
+    "1\n00:00:00,000 --> 00:00:06,104\n This is an example sound file in August for Matt from Wikipedia, the free encyclopedia.\n\n",
+    'srt: the whole subtitle body');
+
+  my $vtt = fixture_http('speaches_transcription_vtt', 'txt');
+  is($vtt->header('Content-Type'), 'text/vtt; charset=utf-8', 'vtt: served as text/vtt, not text/plain');
+  is($whisper->transcription_response($vtt),
+    "WEBVTT\n\n00:00:00.000 --> 00:00:06.104\n This is an example sound file in August for Matt from Wikipedia, the free encyclopedia.\n\n",
+    'vtt: the whole subtitle body, read as text');
+};
+
+subtest 'speaches 422 without a model: the detail reaches the caller' => sub {
+  my $http = fixture_http('speaches_transcription_error_no_model', 'json', 422, 'Unprocessable Entity');
+  ok(!eval { $whisper->transcription_response($http); 1 }, 'croaks');
+  like($@, qr/Whisper request failed: 422 Unprocessable Entity - .*"loc":\["body","model"\],"msg":"Field required"/,
+    'FastAPI detail names the missing model field');
+};
+
 subtest 'simple_transcription_result round trip' => sub {
-  my $body = $data_dir->child('openai_transcription_verbose_json.json')->slurp_raw;
+  my $body = $data_dir->child('speaches_transcription_verbose_json_words.json')->slurp_raw;
   my $server = Test::LocalHTTPDaemon->start(sub {
     my ( $request ) = @_;
     my $content = $request->content;
@@ -152,7 +231,7 @@ subtest 'simple_transcription_result round trip' => sub {
     );
   };
   ok(defined $result, 'result returned') or diag($@);
-  is($result->{words}[1]{word}, 'beach', 'words from the server answer') if $result;
+  is($result->{words}[1]{word}, ' is', 'words from the server answer') if $result;
 };
 
 done_testing;

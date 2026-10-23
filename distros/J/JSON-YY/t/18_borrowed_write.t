@@ -1,5 +1,6 @@
 use strict; use warnings;
 use Test::More;
+use Scalar::Util qw(weaken);
 use JSON::YY ':doc';
 
 # Regression: jset/jdel/jraw on a borrowed (jget) Doc must resolve paths from
@@ -78,6 +79,59 @@ use JSON::YY ':doc';
     jdel $doc, "/x";
     my $x2 = jgetp $doc, "/x";
     is $x2, undef, 'jdel on owner Doc removes key';
+}
+
+for my $borrow (
+    ['jget',  sub { jget $_[0], "/a" }],
+    ['jvals', sub { my @v = jvals $_[0], ""; $v[0] }],
+    ['jfind', sub { jfind $_[0], "/a", "", 7 }],
+) {
+    my ($name, $get) = @$borrow;
+    my $doc = jdoc '{"a":[7]}';
+    my $weak = $doc;
+    weaken $weak;
+    my $sub = $get->($doc);
+    $doc = jdoc '{}';
+    ok defined($weak), "$name keeps the original document after reassignment";
+    SKIP: {
+        skip 'backing document was freed', 1 unless defined $weak;
+        is "$sub", $name eq 'jfind' ? '7' : '[7]', "$name remains readable";
+    }
+    undef $sub;
+    ok !defined($weak), "$name releases the original document";
+}
+
+{
+    my $doc = jdoc '{"a":{"b":7}}';
+    my $weak = $doc;
+    weaken $weak;
+    $doc = jget $doc, "/a";
+    $doc = jget $doc, "/b";
+    ok defined($weak), 'reassigning a handle to its subtree keeps the owner';
+    SKIP: {
+        skip 'backing document was freed', 1 unless defined $weak;
+        is "$doc", '7', 'reassigned subtree is readable';
+    }
+    undef $doc;
+    ok !defined($weak), 'reassigned subtrees do not create an ownership cycle';
+}
+
+{
+    my $doc = jdoc '[1,2]';
+    my $weak = $doc;
+    weaken $weak;
+    my $it = jiter $doc, "";
+    undef $doc;
+    ok defined($weak), 'iterator keeps its backing document after undef';
+    SKIP: {
+        skip 'backing document was freed', 3 unless defined $weak;
+        my $item = jnext $it;
+        undef $it;
+        ok defined($weak), 'iterator result keeps its backing document';
+        is "$item", '1', 'iterator result remains readable';
+        undef $item;
+        ok !defined($weak), 'iterator and result release the original document';
+    }
 }
 
 done_testing;

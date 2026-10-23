@@ -1,5 +1,5 @@
 {
-   "abstract" : "A powerful, general-purpose document expansion framework (currently Control Flow, Loops, Caching, and Lenses are unimplemented {???})",
+   "abstract" : "A powerful, general-purpose document expansion framework (currently Control Flow, Loops, and Caching are unimplemented {???})",
    "author" : [
       "Ilya Zakharevich <ilyaz@cpan.com>"
    ],
@@ -42,6 +42,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.05",
+   "version" : "0.0601",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

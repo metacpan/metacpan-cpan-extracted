@@ -39,7 +39,7 @@ sub js_or_skip {
         $available = $err ? 0 : 1;
         EV::break;
     });
-    EV::timer(3, 0, sub { EV::break });
+    my $guard = EV::timer(3, 0, sub { EV::break });
     EV::run;
     unless ($available) {
         $nats->disconnect;

@@ -2,7 +2,7 @@ use v5.10;
 use strict;
 use warnings;
 use Config;
-use ExtUtils::MakeMaker;
+use ExtUtils::MakeMaker 6.64;
 use Alien::Base::Wrapper ();
 
 my %args = Alien::Base::Wrapper->new('Alien::ghostty=0.01')->mm_args2(
@@ -29,6 +29,7 @@ my %args = Alien::Base::Wrapper->new('Alien::ghostty=0.01')->mm_args2(
         no_index => { directory => ['examples'] },
     },
 );
+$args{CONFIGURE_REQUIRES}{'ExtUtils::MakeMaker'} = '6.64';
 my @ldflags;
 push @ldflags, '-Wl,-S' unless grep { /^OPTIMIZE=.*-g/ } @ARGV, split ' ', $ENV{PERL_MM_OPT} // '';
 push @ldflags, '-Wl,--exclude-libs,ALL' if $^O =~ /^(?:linux|freebsd|netbsd|openbsd|dragonfly|gnu)/;

@@ -479,3 +479,21 @@ Source: platform.kimi.ai `docs/api/models-overview.md`, `docs/api/chat.md`,
 `docs/guide/use-thinking-models.md`, the K2.6 and K2.7-code quickstarts, advisor-verified
 2026-09-25. This is documentation only and not live-verified. Pinned by
 `t/48_reasoning_profile_moonshot.t` and the `Moonshot|kimi-k2.6` rows of the `t/47` golden.
+
+## Update (k381 — a Gemini 4 row on the thinkingLevel branch; `is_gemini3` now means "a thinkingLevel family")
+
+No row matched `gemini-4-argon`, so it resolved to the provider default and took the binary
+`low`|`high` collapse of an unknown id: `reasoning_effort => 'medium'` went out as
+`thinkingLevel=low`, below the model's own default. A new row `qr/\Agemini-4(?!\d)/` (built with
+`_gemini3_profile`, its own `source`) puts Gemini 4 on the `thinkingLevel` branch with
+`levels => [qw( low medium high )]`. `none` and `minimal` rise to `low` silently, exactly as on
+`gemini-3.7-flash` / `gemini-3.8-flash` (Vertex answers `minimal` with 400). The row keeps
+`control => 'effort'`, so a `thinking_budget` still croaks in `Reasoning` BUILD and is never sent
+(Vertex: 400; AI Studio maps it to a level with a warning; Langertha takes the strict reading for
+both). The `(?!\d)` guard follows the k196 rule: `gemini-40` is an unknown id.
+
+`is_gemini3` keeps its name (it is a public attribute) but now selects the `thinkingLevel` branch
+for Gemini 3 and Gemini 4; its POD says so. A later thinkingLevel generation gets its own row the
+same way. Source: ai.google.dev/gemini-api/docs/generate-content/latest-model and the Vertex
+`gemini-4-argon` guide, read 2026-10-19; documentation only, not live-verified. Pinned by
+`t/46_gemini4_controls.t`.

@@ -25,6 +25,11 @@ use constant FINGERPRINT_LENGTH => 32;
 # out as classes rather than \w, so Perl's own idea of a word (Unicode letters, digits in other
 # scripts) never changes the result on a string Perl holds as characters.
 my $WORD          = 'A-Za-z0-9_';
+my $EMAIL         = qr/[a-zA-Z0-9._%+-]+\@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/;
+# A quoted value (KeyError: 'Jane Doe') is data, not the shape of the error. A single quote only
+# opens or closes one where no ASCII word character touches it, so "Couldn't" never does.
+my $DOUBLE_QUOTED = qr/"[^"\r\n]*"/;
+my $SINGLE_QUOTED = qr/(?<![$WORD])'[^'\r\n]*'(?![$WORD])/;
 my $HEX_OBJECT_ID = qr/0x[0-9a-fA-F]{4,}/;
 my $UUID          = qr/(?<![$WORD])[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}(?![$WORD])/;
 my $NUMBER        = qr/(?<![$WORD])[0-9]+(?![$WORD])/;
@@ -39,11 +44,14 @@ my $ROUTE_PARAMETER = qr/\A(?::.+|\{.+\}|<.+>|\[.+\]|\*.*)\z/;
 my @EVENT_FIELDS_DROPPED  = qw(message breadcrumbs endpoint sql_statement);
 my @SOURCE_CONTEXT_FIELDS = qw(context_line pre_context post_context);
 
-# normalize_message($message): the message with hex object ids, UUIDs and standalone numbers
-# replaced, in that order.
+# normalize_message($message): the message with emails, quoted values, hex object ids, UUIDs and
+# standalone numbers replaced, in that order.
 sub normalize_message {
     my ($message) = @_;
     my $text = defined $message ? "$message" : '';
+    $text =~ s/$EMAIL/<email>/g;
+    $text =~ s/$DOUBLE_QUOTED/<str>/g;
+    $text =~ s/$SINGLE_QUOTED/<str>/g;
     $text =~ s/$HEX_OBJECT_ID/0x/g;
     $text =~ s/$UUID/<uuid>/g;
     $text =~ s/$NUMBER/<n>/g;

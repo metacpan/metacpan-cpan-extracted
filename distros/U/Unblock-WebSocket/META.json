@@ -1,0 +1,67 @@
+{
+   "abstract" : "event-loop and platform neutral WebSocket protocol engine",
+   "author" : [
+      "Joshua S. Day <hax@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150015",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Unblock-WebSocket",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ],
+      "package" : [
+         "Unblock::WebSocket::_Deflate",
+         "Unblock::WebSocket::_Engine",
+         "Unblock::WebSocket::_Frame",
+         "Unblock::WebSocket::_Frame::Parser",
+         "Unblock::WebSocket::_Native",
+         "Unblock::WebSocket::_Random",
+         "Unblock::WebSocket::_UTF8"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Compress::Raw::Zlib" : "2.017",
+            "Crypt::SysRandom" : "0.006",
+            "Digest::SHA" : "0",
+            "MIME::Base64" : "0",
+            "URI" : "0",
+            "Uniform::HTTP" : "0.05",
+            "perl" : "5.016000"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/haxmeister/perl-Unblock-WebSocket/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/haxmeister/perl-Unblock-WebSocket.git",
+         "web" : "https://github.com/haxmeister/perl-Unblock-WebSocket"
+      }
+   },
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

@@ -10,11 +10,16 @@
 
 #include <ares.h>
 
+#if ARES_VERSION < 0x012208
+#error EV::cares requires c-ares >= 1.34.8
+#endif
+
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <string.h>
+#include <strings.h>
 #include <stdlib.h>
 
 /* suppress c-ares deprecation warnings - these functions still work */
@@ -115,7 +120,7 @@
 #endif
 
 #define EV_CARES_MAGIC 0xCA7E5001
-#define MAX_IO 16
+#define INLINE_IO 16
 
 #define REQUIRE_LIVE(self) \
     STMT_START { \
@@ -137,16 +142,22 @@ typedef struct {
     ares_socket_t fd;
 } ev_cares_io_t;
 
+typedef struct ev_cares_extra_io_s {
+    ev_cares_io_t io;
+    struct ev_cares_extra_io_s *next;
+} ev_cares_extra_io_t;
+
 struct ev_cares_s {
     U32 magic;
     ares_channel channel;
     struct ev_loop *loop;
     SV *loop_sv;       /* keeps a custom EV::Loop alive; NULL for default loop */
     ev_timer timer;
-    ev_cares_io_t ios[MAX_IO];
+    ev_cares_io_t ios[INLINE_IO];
+    ev_cares_extra_io_t *extra_ios;
     int active_queries;
     int destroyed;
-    int in_callback;    /* prevent Safefree while callbacks run */
+    int in_callback;    /* ares call depth; keeps callbacks from freeing self */
     int free_pending;   /* deferred Safefree after last callback */
     int cleanup_pending; /* deferred channel teardown after last callback */
     int last_timeouts;  /* timeouts count from the most recent callback */
@@ -196,7 +207,7 @@ new_req(pTHX_ ev_cares_t *self, SV *cb) {
     ev_cares_req_t *req;
     Newxz(req, 1, ev_cares_req_t);
     req->resolver = self;
-    req->cb = SvREFCNT_inc_simple_NN(cb);
+    req->cb = SvREFCNT_inc_simple_NN(SvRV(cb));
     self->active_queries++;
     return req;
 }
@@ -223,8 +234,18 @@ av_to_csv(pTHX_ AV *av) {
                 croak("EV::cares: server hashref missing 'host' key (index %d)",
                       (int)i);
             if (written++) sv_catpvs(csv, ",");
-            sv_catsv(csv, *host);
-            if (port) sv_catpvf(csv, ":%d", (int)SvIV(*port));
+            if (port) {
+                const char *h = SvPV_nolen(*host);
+                const char *scope = strchr(h, '%');
+                int bracket = h[0] != '[' && strchr(h, ':') != NULL;
+                if (bracket) sv_catpvs(csv, "[");
+                sv_catpvn(csv, h, scope ? (STRLEN)(scope - h) : strlen(h));
+                if (bracket) sv_catpvs(csv, "]");
+                sv_catpvf(csv, ":%d", (int)SvIV(*port));
+                if (scope) sv_catpv(csv, scope);
+            } else {
+                sv_catsv(csv, *host);
+            }
         } else {
             if (written++) sv_catpvs(csv, ",");
             sv_catsv(csv, *elem);
@@ -246,6 +267,8 @@ static void
 sock_state_cb(void *data, ares_socket_t fd, int readable, int writable) {
     dTHX;
     ev_cares_t *self = (ev_cares_t *)data;
+    ev_cares_io_t *io = NULL;
+    ev_cares_extra_io_t **extra = NULL;
     int i, events = 0;
 
     if (self->destroyed) return;
@@ -254,33 +277,36 @@ sock_state_cb(void *data, ares_socket_t fd, int readable, int writable) {
     if (writable) events |= EV_WRITE;
 
     /* find existing watcher for this fd */
-    for (i = 0; i < MAX_IO; i++)
-        if (self->ios[i].fd == fd) break;
+    for (i = 0; i < INLINE_IO; i++)
+        if (self->ios[i].fd == fd) { io = &self->ios[i]; break; }
+    if (!io) {
+        for (extra = &self->extra_ios; *extra; extra = &(*extra)->next)
+            if ((*extra)->io.fd == fd) { io = &(*extra)->io; break; }
+    }
 
     if (events) {
-        if (i == MAX_IO) {
-            /* find empty slot */
-            for (i = 0; i < MAX_IO; i++)
-                if (self->ios[i].fd == ARES_SOCKET_BAD) break;
-            if (i == MAX_IO) {
-                warn("EV::cares: too many concurrent sockets (>%d), "
-                     "query on fd %d may hang until timeout",
-                     MAX_IO, (int)fd);
-                return;
+        if (!io) {
+            for (i = 0; i < INLINE_IO; i++)
+                if (self->ios[i].fd == ARES_SOCKET_BAD) { io = &self->ios[i]; break; }
+            if (!io) {
+                Newxz(*extra, 1, ev_cares_extra_io_t);
+                io = &(*extra)->io;
             }
-            self->ios[i].fd = fd;
-            ev_io_init(&self->ios[i].watcher, io_cb, (int)fd, events);
-            self->ios[i].watcher.data = (void *)self;
+            io->fd = fd;
+            ev_io_init(&io->watcher, io_cb, (int)fd, events);
+            io->watcher.data = (void *)self;
         } else {
-            ev_io_stop(self->loop, &self->ios[i].watcher);
-            ev_io_set(&self->ios[i].watcher, (int)fd, events);
+            ev_io_stop(self->loop, &io->watcher);
+            ev_io_set(&io->watcher, (int)fd, events);
         }
-        ev_io_start(self->loop, &self->ios[i].watcher);
-    } else {
-        /* fd closing */
-        if (i < MAX_IO) {
-            ev_io_stop(self->loop, &self->ios[i].watcher);
-            self->ios[i].fd = ARES_SOCKET_BAD;
+        ev_io_start(self->loop, &io->watcher);
+    } else if (io) {
+        ev_io_stop(self->loop, &io->watcher);
+        io->fd = ARES_SOCKET_BAD;
+        if (extra) {
+            ev_cares_extra_io_t *old = *extra;
+            *extra = old->next;
+            Safefree(old);
         }
     }
 }
@@ -290,25 +316,15 @@ sock_state_cb(void *data, ares_socket_t fd, int readable, int writable) {
 static void
 io_cb(EV_P_ ev_io *w, int revents) {
     ev_cares_t *self = (ev_cares_t *)w->data;
+    ev_cares_io_t *io = (ev_cares_io_t *)w;
     ares_socket_t rfd = ARES_SOCKET_BAD, wfd = ARES_SOCKET_BAD;
-    int i;
 
     if (self->destroyed) return;
 
-    for (i = 0; i < MAX_IO; i++) {
-        if (&self->ios[i].watcher == w) {
-            if (revents & EV_READ)  rfd = self->ios[i].fd;
-            if (revents & EV_WRITE) wfd = self->ios[i].fd;
-            /* Bare EV_ERROR (no READ/WRITE bits) signals an unrecoverable
-               watcher problem and libev has already stopped the watcher.
-               Hand the fd to c-ares anyway so its next I/O attempt fails
-               immediately instead of waiting for the per-query timeout. */
-            if ((revents & EV_ERROR) &&
-                rfd == ARES_SOCKET_BAD && wfd == ARES_SOCKET_BAD)
-                rfd = self->ios[i].fd;
-            break;
-        }
-    }
+    if (revents & EV_READ)  rfd = io->fd;
+    if (revents & EV_WRITE) wfd = io->fd;
+    if ((revents & EV_ERROR) && rfd == ARES_SOCKET_BAD && wfd == ARES_SOCKET_BAD)
+        rfd = io->fd;
 
     ARES_CALL_BEGIN(self);
     ares_process_fd(self->channel, rfd, wfd);
@@ -333,6 +349,8 @@ update_timer(ev_cares_t *self) {
     if (self->destroyed) return;
 
     tvp = ares_timeout(self->channel, NULL, &tv);
+    if (!tvp && !ev_is_active(&self->timer) && !ev_is_pending(&self->timer))
+        return;
     ev_timer_stop(self->loop, &self->timer);
     if (tvp) {
         double after = (double)tvp->tv_sec + (double)tvp->tv_usec / 1e6;
@@ -355,11 +373,17 @@ cleanup_now(ev_cares_t *self) {
     self->cleanup_pending = 0;
 
     ev_timer_stop(self->loop, &self->timer);
-    for (i = 0; i < MAX_IO; i++) {
+    for (i = 0; i < INLINE_IO; i++) {
         if (self->ios[i].fd != ARES_SOCKET_BAD) {
             ev_io_stop(self->loop, &self->ios[i].watcher);
             self->ios[i].fd = ARES_SOCKET_BAD;
         }
+    }
+    while (self->extra_ios) {
+        ev_cares_extra_io_t *extra = self->extra_ios;
+        self->extra_ios = extra->next;
+        ev_io_stop(self->loop, &extra->io.watcher);
+        Safefree(extra);
     }
 
     /* Nested epilogues fired by ares_destroy must see in_callback > 0. */
@@ -401,7 +425,7 @@ cleanup(ev_cares_t *self) {
     cleanup_now(self);
 }
 
-/* ---- callback prologue/epilogue (prevents UAF if resolver freed mid-callback) ---- */
+/* ---- Perl callbacks, guarded by the enclosing ares call ---- */
 
 /* All c-ares callbacks share this prologue. The macro relies on each
    caller having an `int timeouts` parameter (per the c-ares callback
@@ -411,7 +435,6 @@ cleanup(ev_cares_t *self) {
     ev_cares_t *self = req->resolver; \
     dTHX; dSP; \
     self->last_timeouts = timeouts; \
-    self->in_callback++; \
     ENTER; SAVETMPS; \
     PUSHMARK(SP); \
     mXPUSHi(status_val)
@@ -419,26 +442,18 @@ cleanup(ev_cares_t *self) {
 #define CB_EPILOGUE \
     PUTBACK; \
     { \
-        SV *_cb = SvREFCNT_inc_simple_NN(req->cb); \
-        call_sv(_cb, G_DISCARD | G_EVAL); \
+        call_sv(req->cb, G_DISCARD | G_EVAL); \
         if (SvTRUE(ERRSV)) { \
-            warn("EV::cares: callback error: %" SVf, SVfARG(ERRSV)); \
+            SPAGAIN; \
+            PUSHMARK(SP); \
+            mXPUSHs(newSVsv(ERRSV)); \
+            PUTBACK; \
+            call_pv("EV::cares::_callback_error", G_DISCARD | G_EVAL); \
             sv_setsv(ERRSV, &PL_sv_undef); \
         } \
-        SvREFCNT_dec(_cb); \
     } \
     FREETMPS; LEAVE; \
-    free_req(aTHX_ req); \
-    if (--self->in_callback == 0) { \
-        /* outermost frame: deferred teardown; cleanup_now may free self */ \
-        if (self->cleanup_pending) cleanup_now(self); \
-        else if (self->free_pending) { \
-            self->free_pending = 0; \
-            Safefree(self); \
-        } else update_timer(self); \
-    } else { \
-        update_timer(self); \
-    }
+    free_req(aTHX_ req)
 
 /* ---- query callbacks ---- */
 
@@ -449,8 +464,25 @@ addrinfo_cb(void *arg, int status, int timeouts, struct ares_addrinfo *result) {
     if (result) {
         if (status == ARES_SUCCESS) {
             struct ares_addrinfo_node *node;
-            /* result->cnames->name is always set when cnames is non-NULL */
-            const char *cname = result->cnames ? result->cnames->name : NULL;
+            struct ares_addrinfo_cname *cn;
+            const char *cname = NULL;
+            if (req->with_ttl && result->cnames) {
+                cname = result->name;
+                if (cname) {
+                    for (cn = result->cnames; cn; cn = cn->next)
+                        if (cn->alias && strcasecmp(cname, cn->alias) == 0) {
+                            cname = NULL;
+                            break;
+                        }
+                }
+                for (cn = result->cnames; !cname && cn; cn = cn->next) {
+                    struct ares_addrinfo_cname *alias;
+                    for (alias = result->cnames; alias; alias = alias->next)
+                        if (alias->alias && strcasecmp(cn->name, alias->alias) == 0)
+                            break;
+                    if (!alias) { cname = cn->name; break; }
+                }
+            }
             for (node = result->nodes; node; node = node->ai_next) {
                 char ip[INET6_ADDRSTRLEN];
                 if (node->ai_family == AF_INET) {
@@ -699,7 +731,7 @@ search_cb(void *arg, int status, int timeouts, unsigned char *abuf, int alen) {
                arrive as ARES_REC_TYPE_RAW_RR. Pull out the rdata and
                parse the wire format ourselves (RFC 4034). */
             ares_dns_record_t *dnsrec = NULL;
-            if (ares_dns_parse(abuf, alen, 0, &dnsrec) == ARES_SUCCESS && dnsrec) {
+            if (ares_dns_parse(abuf, alen, ARES_DNS_PARSE_AN_EXT_RAW, &dnsrec) == ARES_SUCCESS && dnsrec) {
                 size_t cnt = ares_dns_record_rr_cnt(dnsrec, ARES_SECTION_ANSWER);
                 size_t i;
                 for (i = 0; i < cnt; i++) {
@@ -780,7 +812,7 @@ search_cb(void *arg, int status, int timeouts, unsigned char *abuf, int alen) {
                                     ((U32)rd[14] <<  8) |  (U32)rd[15]));
                         hv_stores(hv, "key_tag",
                             newSViv((rd[16] << 8) | rd[17]));
-                        hv_stores(hv, "signer_name", newSVpv(signer, snlen));
+                        hv_stores(hv, "signer_name", newSVpvn(signer, snlen));
                         hv_stores(hv, "signature",
                             newSVpvn((const char *)rd + pos, rdlen - pos));
                     } else {
@@ -978,7 +1010,11 @@ BOOT:
 {
     I_EV_API("EV::cares");
     {
-        int rc = ares_library_init(ARES_LIB_INIT_ALL);
+        int version, rc;
+        const char *version_string = ares_version(&version);
+        if (version < 0x012208)
+            croak("EV::cares requires c-ares >= 1.34.8; linked version is %s", version_string);
+        rc = ares_library_init(ARES_LIB_INIT_ALL);
         if (rc != ARES_SUCCESS)
             croak("EV::cares: ares_library_init: %s", ares_strerror(rc));
     }
@@ -1202,7 +1238,7 @@ PPCODE:
        ev_loop_destroy().  Holding the outer RV is not enough; inc the
        underlying SV (the IV that stores the loop pointer). */
     if (loop_sv) self->loop_sv = SvREFCNT_inc_simple_NN(SvRV(loop_sv));
-    for (i = 0; i < MAX_IO; i++)
+    for (i = 0; i < INLINE_IO; i++)
         self->ios[i].fd = ARES_SOCKET_BAD;
 
     opts.sock_state_cb = sock_state_cb;
@@ -1506,7 +1542,9 @@ CODE:
         }
     }
 
+    ARES_CALL_BEGIN(self);
     rc = ares_set_servers_csv(self->channel, SvPV_nolen(csv));
+    ARES_CALL_END(self);
     if (rc != ARES_SUCCESS)
         croak("EV::cares::set_servers: %s", ares_strerror(rc));
 }
@@ -1635,10 +1673,17 @@ reinit(self)
 CODE:
 {
     int rc;
+    ares_channel channel;
     REQUIRE_LIVE(self);
-    rc = ares_reinit(self->channel);
+    if (self->active_queries || self->in_callback)
+        croak("EV::cares::reinit: resolver must be idle");
+    /* ares_reinit may change socket state from a background thread. */
+    rc = ares_dup(&channel, self->channel);
     if (rc != ARES_SUCCESS)
         croak("EV::cares::reinit: %s", ares_strerror(rc));
+    ares_destroy(self->channel);
+    self->channel = channel;
+    update_timer(self);
 }
 
 void

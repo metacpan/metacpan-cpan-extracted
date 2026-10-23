@@ -56,4 +56,9 @@ is($sluz->parse_string('{foreach $array as $x}{$x|escape}-{/foreach}'),
 is($sluz->parse_string('{foreach $bad_items as $x}{$x|escape}{/foreach}'),
     '&lt;a&gt;&lt;b&gt;&lt;c&gt;', 'Foreach with XSS payloads');
 
+# Ported from PHP Escape #6-7 - default chained with escape
+is($sluz->parse_string('{$null|default:"safe"|escape}')        , 'safe'     , 'Default chained with escape (null)');
+is($sluz->parse_string('{$empty_string|default:"text"|escape}'), 'text'     , 'Default with escape on empty');
+is($sluz->parse_string('{$bogus_var|default:"<b>"|escape}')    , '&lt;b&gt;', 'Default HTML escaped');
+
 done_testing();

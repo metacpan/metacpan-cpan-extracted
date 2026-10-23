@@ -1,12 +1,14 @@
 package Langertha::Engine::Scaleway;
 # ABSTRACT: Scaleway Generative APIs
-our $VERSION = '0.503';
+our $VERSION = '0.504';
 use Moose;
 use Carp qw( croak );
 
 extends 'Langertha::Engine::OpenAIBase';
 
-with 'Langertha::Role::Embedding', 'Langertha::Role::Tools';
+# StreamUsage: the Generative APIs OpenAPI schema has
+# ChatCompletionStreamOptions.include_usage (ADR 0038).
+with 'Langertha::Role::Embedding', 'Langertha::Role::Tools', 'Langertha::Role::StreamUsage';
 
 
 has '+url' => (
@@ -86,7 +88,7 @@ Langertha::Engine::Scaleway - Scaleway Generative APIs
 
 =head1 VERSION
 
-version 0.503
+version 0.504
 
 =head1 SYNOPSIS
 

@@ -1,0 +1,17 @@
+{
+  "schema_version": 3,
+  "generated_at": 1792540920,
+  "cache_file": "/home/me/.cache/action-run/cache.json",
+  "docker": {
+    "bin": "docker",
+    "reachable": true
+  },
+  "images": [],
+  "totals": {
+    "images": 0,
+    "size": 0,
+    "present": 0,
+    "missing": 0
+  },
+  "prune": null
+}

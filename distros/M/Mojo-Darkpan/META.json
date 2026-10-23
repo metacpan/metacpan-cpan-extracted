@@ -4,7 +4,7 @@
       "rshingleton <reshingleton@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.20",
+   "generated_by" : "Minilla/v3.1.29",
    "license" : [
       "perl_5"
    ],
@@ -48,8 +48,8 @@
             "Mojolicious" : "0",
             "Mojolicious::Plugin::BasicAuthPlus" : "0",
             "Moo" : "0",
-            "Nice::Try" : "0",
             "OrePAN2" : "0",
+            "Syntax::Keyword::Try" : "0",
             "perl" : "v5.20.0"
          }
       },
@@ -62,7 +62,7 @@
    "provides" : {
       "Mojo::Darkpan" : {
          "file" : "lib/Mojo/Darkpan.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       },
       "Mojo::Darkpan::Config" : {
          "file" : "lib/Mojo/Darkpan/Config.pm"
@@ -92,10 +92,11 @@
          "web" : "https://github.com/rshingleton/Mojo-Darkpan"
       }
    },
-   "version" : "0.09",
+   "version" : "0.10",
    "x_contributors" : [
+      "José Joaquín Atria <jjatria@gmail.com>",
       "shingler <shingler@oclc.org>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.06",
+   "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 1
 }

@@ -14,4 +14,11 @@
     - Accept hex notation $hh and 0xhh in BASIC
     - Add #ASM / #ENDASM to insert assembly code in line 0 REM
 
-
+0.006 2026-10-22
+    - Fix Invalid conversion in printf when inverse chars "%H" are used
+    - Fix coding of multi-character numeric variables; was wrong for names
+      with digits 0..3
+    - Add #SYSVARS
+    - Replace {expr} by number result of evaluating the expression
+    - Test malformed BASIC with text representation of number different
+      from floating point representation

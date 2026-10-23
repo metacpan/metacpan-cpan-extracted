@@ -1,5 +1,10 @@
 Revision history for EV::Nats
 
+0.06  2026-10-16
+    - Fix TLS retries, reconnect teardown and callback ordering.
+    - Report disconnected KV writes through callbacks and clean failed construction.
+    - Improve JetStream, KV and ObjectStore completion handling.
+
 0.05  2026-07-23
     - Fix stack overflow decoding an over-long NKey seed, and out-of-bounds
       reads in the INFO parser

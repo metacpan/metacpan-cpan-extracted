@@ -14,6 +14,7 @@ use Test::Most;
 use Test::Deep;
 use Test::Exception;
 use MIME::Base64 qw/ decode_base64 /;
+use Digest::SHA ();
 
 use Business::GoCardless::Utils;
 
@@ -115,6 +116,33 @@ ok(
         $app_secret
     ),
     'signature_valid',
+);
+
+note( "multiple secrets (e.g. rotating the webhook secret)" );
+
+my $body = '{"events":[]}';
+my $v2_sig = Digest::SHA::hmac_sha256_hex( $body,'new secret' );
+
+ok( $Utils->signature_valid( $body,'new secret',$v2_sig ),'v2 signature_valid' );
+ok( ! $Utils->signature_valid( $body,'old secret',$v2_sig ),'! v2 signature_valid (wrong secret)' );
+ok(
+    $Utils->signature_valid( $body,[ 'old secret','new secret' ],$v2_sig ),
+    'v2 signature_valid with any of multiple secrets'
+);
+ok(
+    ! $Utils->signature_valid( $body,[ 'old secret','other secret' ],$v2_sig ),
+    '! v2 signature_valid with none of multiple secrets'
+);
+
+ok(
+    $Utils->signature_valid(
+        {
+            %{ $test_params },
+            signature => $Utils->sign_params( $test_params,$app_secret ),
+        },
+        [ 'old secret',$app_secret ],
+    ),
+    'v1 signature_valid with any of multiple secrets',
 );
 
 my ( $time,$rand ) = ( split( '\|',decode_base64( $Utils->generate_nonce ) ) );

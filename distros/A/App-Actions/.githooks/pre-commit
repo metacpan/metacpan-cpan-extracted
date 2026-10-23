@@ -1,0 +1,235 @@
+#!/usr/bin/env perl
+
+# Two hand-maintained agreements are easy to apply in half: the schema version
+# a document in t/fixtures/ declares has to match the module that prints it,
+# and a live test's knobs have to be named by the tests, their whitelist and
+# their documentation.  The suite catches either, but only once it runs,
+# which is this hook's job: refuse the commit rather than let CI find it.
+#
+# A commit is checked as a snapshot: the staged files are written to a
+# temporary directory and the checks run there, so a change that is staged in
+# half is caught even if the working tree beside it looks complete.  The
+# pre-commit mode never reads the working tree.
+#
+# Enable it once per clone with
+#
+#     git config core.hooksPath .githooks
+#
+# and skip it for one commit with "git commit --no-verify".
+#
+# The same checks can be run from the command line without committing:
+#
+#     make check-staged    # against the index
+#     make check-worktree  # against the working tree, unstaged edits included
+#
+# They invoke this hook with --staged and --worktree.  The staged mode reads
+# the same index and writes the same snapshot as the hook, so the two cannot
+# disagree about what is committed; the worktree mode runs both checks in the
+# checkout itself, without changing it.
+
+use strict;
+use warnings;
+use File::Spec;
+use File::Temp qw(tempdir);
+use FindBin;
+
+use lib File::Spec->catdir($FindBin::Bin, File::Spec->updir, 'lib');
+
+use App::Actions::Process ();
+
+# A pre-commit hook is given no arguments; the make targets name the mode so
+# their reports do not claim a commit was refused.
+my $staged   = @ARGV && $ARGV[0] eq '--staged';
+my $worktree = @ARGV && $ARGV[0] eq '--worktree';
+shift @ARGV if $staged || $worktree;
+my $label = $staged ? 'check-staged'
+    : $worktree ? 'check-worktree'
+    : 'pre-commit';
+
+# The files whose staging can change what each check looks at.  A commit that
+# touches neither set has nothing for these checks to say, which keeps an
+# ordinary commit cheap.
+my @schema_relevant = ('lib', 'bin', 't/schema.t', 't/fixtures');
+my @live_relevant = (
+    't/real-docker.t',
+    't/real-docker-preflight.t',
+    't/self_test.t',
+    't/live-knobs.t',
+    'README.md',
+    'lib/App/Actions.pm',
+    '.github/workflows',
+);
+
+sub run_command {
+    my ($command, %options) = @_;
+
+    return App::Actions::Process::capture($command, %options);
+}
+
+# Not a git work tree - an unpacked distribution, say: there is no commit to
+# guard and no index to read.  git says so itself; its message is not this
+# hook's to repeat, so it is dropped.
+my ($root, $root_status) = run_command(
+    [qw(git rev-parse --show-toplevel)],
+    quiet_stderr => 1,
+);
+exit 0 if $root_status;
+
+chomp $root;
+chdir $root or do {
+    print STDERR "$label: cannot change to '$root': $!\n";
+    exit 0;
+};
+
+my @checks;
+
+# An explicit worktree check is asked for by a person rather than run for every
+# commit, so it runs both checks.  The tree also holds untracked files, which
+# the staged-path filter below could not see, so filtering here would risk
+# skipping a file the checks would have read.
+if ($worktree) {
+    @checks = (
+        { name => 'schema',     path => File::Spec->catfile('t', 'schema.t') },
+        { name => 'live knobs', path => File::Spec->catfile('t', 'live-knobs.t') },
+    );
+} else {
+    # Nothing staged that could move either agreement: the commit cannot be
+    # the half-applied change this guards against.  An unborn HEAD makes both
+    # diffs fail, and the first commit is checked like any other, so both
+    # checks run.
+    my ($schema_changed, $schema_status) = run_command(
+        [ 'git', 'diff', '--cached', '--name-only', 'HEAD', '--', @schema_relevant ],
+        quiet_stderr => 1,
+    );
+    my ($live_changed, $live_status) = run_command(
+        [ 'git', 'diff', '--cached', '--name-only', 'HEAD', '--', @live_relevant ],
+        quiet_stderr => 1,
+    );
+
+    exit 0 unless $schema_status || $live_status
+        || $schema_changed =~ /\S/ || $live_changed =~ /\S/;
+
+    push @checks, {
+        name => 'schema',
+        path => File::Spec->catfile('t', 'schema.t'),
+    } if $schema_status || $schema_changed =~ /\S/;
+    push @checks, {
+        name => 'live knobs',
+        path => File::Spec->catfile('t', 'live-knobs.t'),
+    } if $live_status || $live_changed =~ /\S/;
+}
+
+# The snapshot the checks read.  A commit is checked from the index written
+# out here, because that is what it will contain; the working tree is
+# deliberately not consulted.  A worktree check reads this checkout in place,
+# since that is the state being asked about.
+my $snapshot = $root;
+if (!$worktree) {
+    $snapshot = tempdir(
+        'app-actions pre-commit XXXX',
+        TMPDIR => 1, CLEANUP => 1,
+    );
+    (my $prefix = $snapshot) =~ s{\\}{/}g;
+
+    my ($checkout_error, $checkout_status) = run_command(
+        [ 'git', 'checkout-index', '-a', '-f', "--prefix=$prefix/" ],
+        merge_stderr => 1,
+    );
+
+    # A conflicted index cannot be written out.  A merge commit is not the
+    # half-applied change this is for, and refusing it would block the merge.
+    if ($checkout_status) {
+        print STDERR "$label: the staged files could not be read, so the "
+            . "checks were skipped.\n";
+        print STDERR "$checkout_error\n" if length $checkout_error;
+        exit 0;
+    }
+}
+
+my $lib = File::Spec->catdir($snapshot, 'lib');
+
+chdir $snapshot or do {
+    print STDERR "$label: cannot change to '$snapshot': $!\n";
+    exit 0;
+};
+
+# The checks are run for a person, not for the harness that may have started
+# this hook (a pre-commit hook run from "make test", say), so the children are
+# given a plain environment and print the TAP this reads.
+my @failed;
+for my $check (@checks) {
+    my ($output, $status);
+    {
+        local $ENV{HARNESS_ACTIVE};
+        local $ENV{HARNESS_VERSION};
+        local $ENV{HARNESS_OPTIONS};
+
+        ($output, $status) = run_command(
+            [ $^X, "-I$lib", $check->{path} ],
+            merge_stderr => 1,
+        );
+    }
+
+    next unless $status;
+
+    # The temporary directory is gone by the time anyone reads this, so its
+    # path would be a distraction in a file name the reader has to act on.
+    $output =~ s{\Q$snapshot\E/?}{}g;
+    push @failed, { %$check, output => $output };
+}
+
+exit 0 unless @failed;
+
+# A run that failed before it printed a verdict - a missing module, say - has
+# no failing assertion to show, so it is quoted instead of summarised.
+sub failing_tap {
+    my ($output) = @_;
+
+    my @report;
+    my $in_diagnostic = 0;
+    for my $line (split /\n/, $output) {
+        if ($line =~ /\A(?:not ok|Bail out!)/) {
+            push @report, $line;
+            $in_diagnostic = 1;
+            next;
+        }
+        if ($in_diagnostic && $line =~ /\A#/) {
+            push @report, $line;
+            next;
+        }
+        $in_diagnostic = 0;
+    }
+
+    return @report if @report;
+
+    my @lines = grep { /\S/ } split /\n/, $output;
+    return @lines > 20 ? @lines[-20 .. -1] : @lines;
+}
+
+my @report;
+for my $failed (@failed) {
+    push @report, "--- $failed->{name} ---", failing_tap($failed->{output});
+}
+
+if ($worktree) {
+    print STDERR "check-worktree: the checks failed against the working tree.\n\n";
+} elsif ($staged) {
+    print STDERR "check-staged: the checks failed against what is staged.\n\n";
+} else {
+    print STDERR "pre-commit: the checks failed against what this commit stages, so it "
+        . "was refused and nothing has been committed.\n\n";
+}
+print STDERR join("\n", @report), "\n\n";
+print STDERR <<"ADVICE";
+A schema version lives in the module that prints it - lib/App/Actions/Check.pm,
+lib/App/Actions/Runner.pm, lib/App/Actions/Cache.pm or lib/App/Actions/Logs.pm -
+and in every document in t/fixtures/ written for it.  A live knob lives in the
+live tests, the whitelist in t/live-knobs.t, README.md, lib/App/Actions.pm and
+the workflow that sets it.
+ADVICE
+print STDERR $worktree
+    ? "Fix the file named above and run \"make check-worktree\" again.\n"
+    : "Fix the file named above and stage it.  \"git commit --no-verify\" "
+        . "skips these checks when committing.\n";
+
+exit 1;

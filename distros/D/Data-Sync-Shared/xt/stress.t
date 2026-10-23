@@ -194,38 +194,35 @@ diag "stress: $WORKERS workers x $OPS ops each";
 # 5. Condvar: ping-pong signal/wait under pressure
 # ============================================================
 {
-    my $cv1 = Data::Sync::Shared::Condvar->new(undef);
-    my $cv2 = Data::Sync::Shared::Condvar->new(undef);
+    my $cv = Data::Sync::Shared::Condvar->new(undef);
+    my $turn = Data::Sync::Shared::Semaphore->new(undef, 1, 0);
     my $n = int($OPS / 10);
     $n = 1000 if $n < 1000;
 
     my $pid = fork // die "fork: $!";
     if ($pid == 0) {
         for (1..$n) {
-            $cv1->lock;
-            $cv1->wait(5);
-            $cv1->unlock;
-
-            $cv2->lock;
-            $cv2->signal;
-            $cv2->unlock;
+            $cv->lock;
+            $cv->wait_while(sub { $turn->value == 0 }, 5) or _exit(99);
+            $turn->try_acquire or _exit(1);
+            $cv->signal;
+            $cv->unlock;
         }
         _exit(0);
     }
 
     my $t0 = time;
     for (1..$n) {
-        $cv1->lock;
-        $cv1->signal;
-        $cv1->unlock;
-
-        $cv2->lock;
-        $cv2->wait(5);
-        $cv2->unlock;
+        $cv->lock;
+        $turn->release;
+        $cv->signal;
+        $cv->wait_while(sub { $turn->value > 0 }, 5) or die "condvar ping-pong timeout";
+        $cv->unlock;
     }
 
     waitpid($pid, 0);
-    is $? >> 8, 0, "condvar ping-pong: $n roundtrips";
+    is $?, 0, "condvar ping-pong: $n roundtrips";
+    is $turn->value, 0, 'condvar ping-pong: every turn acknowledged';
     diag sprintf "condvar: %d roundtrips in %.3fs", $n, time - $t0;
 }
 

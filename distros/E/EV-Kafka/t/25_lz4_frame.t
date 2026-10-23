@@ -10,12 +10,18 @@ use EV::Kafka;
 #   L8  decompression failure / unknown codec returns undef instead of
 #       parsing the compressed bytes as records
 
-# Capability probe, mirroring Makefile.PL's detection (HAVE_LZ4 now
-# implies the frame API).
-my $have_lz4 = system('pkg-config --exists liblz4 2>/dev/null') == 0
-    || -f '/usr/include/lz4frame.h';
+# Capability probe against the built artifact: a real LZ4 encode sets
+# the compression bits (attrs low byte at offset 22), encode without
+# the codec falls back to uncompressed with the bits cleared.
+my $have_lz4 = do {
+    my $b = eval {
+        EV::Kafka::_test_encode_batch([{ key => 'k', value => 'x' x 64 }],
+            { compression => 3 });
+    };
+    defined($b) && (ord(substr($b, 22, 1)) & 0x07) == 3;
+};
 
-plan skip_all => 'LZ4 frame support not built (liblz4 with lz4frame.h)'
+plan skip_all => 'LZ4 support not built'
     unless $have_lz4;
 plan tests => 5;
 

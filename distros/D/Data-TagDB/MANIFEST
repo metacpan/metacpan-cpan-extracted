@@ -9,6 +9,7 @@ README
 cpanfile
 dist.ini
 lib/Data/TagDB.pm
+lib/Data/TagDB/Base.pm
 lib/Data/TagDB/Cache.pm
 lib/Data/TagDB/Cloudlet.pm
 lib/Data/TagDB/Exporter.pm

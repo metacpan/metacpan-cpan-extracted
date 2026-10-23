@@ -80,13 +80,19 @@ static char* build_native_query(ev_clickhouse_t *self, const char *sql,
     STRLEN query_id_len = 0;
     nbuf_init(&b);
 
-    /* Pre-scan settings for query_id (needed before settings block) */
+    /* Pre-scan settings for query_id (needed before settings block).
+     * Undef values mean absent (matches the settings serializers). */
     {
         SV **svp;
-        if (overrides && (svp = hv_fetch(overrides, "query_id", 8, 0)))
-            query_id = SvPV(*svp, query_id_len);
-        else if (defaults && (svp = hv_fetch(defaults, "query_id", 8, 0)))
-            query_id = SvPV(*svp, query_id_len);
+        if (overrides && (svp = hv_fetch(overrides, "query_id", 8, 0))) {
+            if (SvGMAGICAL(*svp)) mg_get(*svp);
+            if (SvOK(*svp)) query_id = SvPV_nomg(*svp, query_id_len);
+        }
+        if (!query_id && defaults &&
+            (svp = hv_fetch(defaults, "query_id", 8, 0))) {
+            if (SvGMAGICAL(*svp)) mg_get(*svp);
+            if (SvOK(*svp)) query_id = SvPV_nomg(*svp, query_id_len);
+        }
     }
 
     /* Query packet */
@@ -135,6 +141,20 @@ static char* build_native_query(ev_clickhouse_t *self, const char *sql,
      * Format: repeated (String name, UInt8 is_important, String value),
      * terminated by empty name. */
     write_native_settings(&b, defaults, overrides);
+#ifdef HAVE_LZ4
+    /* We decode LZ4 only: pin the method so a server whose default is
+     * ZSTD (or anything else) still answers in a form we can read.
+     * An explicit user setting always wins. */
+    if (self->compress
+        && !(overrides && hv_exists(overrides, "network_compression_method", 26))
+        && !(defaults && hv_exists(defaults, "network_compression_method", 26))) {
+        nbuf_varuint(&b, 26);
+        nbuf_append(&b, "network_compression_method", 26);
+        nbuf_u8(&b, 0);  /* is_important = 0 */
+        nbuf_varuint(&b, 3);
+        nbuf_append(&b, "LZ4", 3);
+    }
+#endif
     nbuf_cstring(&b, "");  /* empty name = end of settings */
 
     /* interserver_secret: empty string (revision >= 54441) */
@@ -149,9 +169,19 @@ static char* build_native_query(ev_clickhouse_t *self, const char *sql,
 #endif
     nbuf_string(&b, sql, sql_len);
 
-    /* Parameters block: param_* keys, terminated by empty name. */
-    write_native_params(&b, defaults, overrides);
-    nbuf_cstring(&b, "");  /* end of parameters */
+    /* Parameters block: param_* keys, terminated by empty name.
+     * Servers below 54459 (22.1-22.7) read the terminator as the next
+     * packet and stall, so omit the whole block there — and fail
+     * callers that actually pass parameters rather than drop them. */
+    if (self->server_revision == 0 ||
+        self->server_revision >= DBMS_MIN_REVISION_WITH_PARAMETERS) {
+        write_native_params(&b, defaults, overrides);
+        nbuf_cstring(&b, "");  /* end of parameters */
+    }
+    else if (write_native_params(&b, defaults, overrides) > 0) {
+        Safefree(b.data);
+        return NULL;
+    }
 
     /* External tables: named Data packets the query can reference as
      * tables, sent before the terminating empty block. */

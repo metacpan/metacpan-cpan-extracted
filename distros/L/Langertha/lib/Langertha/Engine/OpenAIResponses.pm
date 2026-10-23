@@ -1,11 +1,12 @@
 package Langertha::Engine::OpenAIResponses;
 # ABSTRACT: OpenAI Responses API (reasoning models like gpt-5.5-pro)
-our $VERSION = '0.503';
+our $VERSION = '0.504';
 use Moose;
 
 extends 'Langertha::Engine::OpenAI';
 
-with 'Langertha::Role::ResponsesCompatible', 'Langertha::Role::ServerTools';
+with 'Langertha::Role::ResponsesCompatible', 'Langertha::Role::ServerTools',
+  'Langertha::Role::ToolResultImages', 'Langertha::Role::ToolResultPDF';
 
 
 # Protocol variant of OpenAI: shares the vendor's API key.
@@ -17,10 +18,17 @@ sub api_key_env { 'LANGERTHA_OPENAI_API_KEY' }
 # (ADR 0002 escape hatch). Both together keep supports('streaming') honest.
 sub stream_format { return undef }
 
+#
+# stream_usage comes along from Engine::OpenAI as well. It names the chat wire's
+# stream_options.include_usage, which the Responses envelope never sends (its
+# chat_stream_request is Role::ResponsesCompatible's, and a Responses stream
+# reports usage in response.completed unasked); without streaming it would
+# claim a request field this engine has no stream to put on (ADR 0038).
 around engine_capabilities => sub {
     my ( $orig, $self, @rest ) = @_;
     my $caps = $self->$orig(@rest);
     delete $caps->{streaming};
+    delete $caps->{stream_usage};
     return $caps;
 };
 
@@ -30,10 +38,11 @@ around engine_capabilities => sub {
 # ResponseInputFileContent", developers.openai.com/api/reference/resources/
 # responses/methods/create; data: URL + filename per the PDF-files guide,
 # developers.openai.com/api/docs/guides/pdf-files; fetched 2026-09-30).
-# Docs-derived, not live-verified. Role::Tools still requires image_input
-# (the guide names vision models for PDF input). Perplexity shares the
-# envelope but not this part, so the flag sits here, not on the role.
-sub _tool_result_pdf_on_wire { 1 }
+# Docs-derived, not live-verified. The guide names vision models for PDF
+# input, so tool_result_pdf needs image_input on this wire
+# (ToolResult->native_needs_vision, applied by Role::Capabilities). Perplexity
+# shares the envelope but not this part, so Role::ToolResultPDF is composed
+# here, not on Role::ResponsesCompatible (ADR 0039).
 
 __PACKAGE__->meta->make_immutable;
 
@@ -52,7 +61,7 @@ Langertha::Engine::OpenAIResponses - OpenAI Responses API (reasoning models like
 
 =head1 VERSION
 
-version 0.503
+version 0.504
 
 =head1 SYNOPSIS
 

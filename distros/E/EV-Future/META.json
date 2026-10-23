@@ -46,11 +46,11 @@
    "provides" : {
       "EV::Future" : {
          "file" : "lib/EV/Future.pm",
-         "version" : "0.07"
+         "version" : "0.08"
       },
       "EV::Future::Handle" : {
          "file" : "lib/EV/Future.pm",
-         "version" : "0.07"
+         "version" : "0.08"
       }
    },
    "release_status" : "stable",
@@ -61,6 +61,6 @@
          "web" : "https://github.com/vividsnow/perl5-ev-future"
       }
    },
-   "version" : "0.07",
+   "version" : "0.08",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

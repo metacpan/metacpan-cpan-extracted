@@ -410,3 +410,37 @@ both providers document PDF reading as a vision feature, so no new flag was made
 cost widens accordingly — an over-broad claim on OpenAIResponses or Gemini 3 can now also put a
 PDF part into a tool-loop turn for a model that cannot take it. Perplexity is unaffected (its
 Agent API has no `input_file`; the engine's `_tool_result_pdf_on_wire` is 0).
+
+## Update (k380 — the tool-result form is chosen by public capabilities, ADR 0039)
+
+The `_tool_result_images_on_wire` / `_tool_result_pdf_on_wire` hooks named in the k344, k359 and
+k361 Updates are gone: `format_tool_results` reads `supports('tool_result_images')` /
+`supports('tool_result_pdf')` (ADR 0039; details in the ADR 0001 k380 Update). `image_input` still
+decides indirectly, because `tool_result_images` requires it, so the k344 cost of an over-broad
+claim stands. Gemini's tool-result rows now cover Gemini 3 and later (`gemini-4-argon`).
+
+## Update (k381 — Gemini 4 clears `cached_content` and `temperature`)
+
+`Engine::Gemini` gets a layer-3 row `qr/\Agemini-4(?!\d)/ => { cached_content => 0,
+temperature => 0 }`. Gemini 4 has no explicit context caching (the docs: "not supported … and
+returns an error"; only implicit caching remains), and it ignores `temperature` (and
+`top_p` / `top_k` / `candidate_count`, which the docs tell callers to remove). `thinking_budget`
+was already never claimed there: layer 2's generation split puts every id that is neither
+`gemini-2.5` nor `gemini-3` in its `else` branch, which also clears `cached_content`. Layer 2
+runs after layer 3 and re-asserts `cached_content` for 2.5 and 3, so the row records the Gemini 4
+fact and is what a later widening of the layer-2 `gemini-3` arm would have to respect.
+
+Two field gates follow the flags:
+
+- **`temperature`**: Gemini had no gate, so the flag did not steer emission. A new
+  `Engine::Gemini::_temperature_kwargs`, a sibling of the three wire roles' gates, keeps the field
+  off `generationConfig` when `supports('temperature')` is false, with the ADR 0025 drop + carp
+  (k214/k247: a value other than 1 carps, once per engine for the attribute; 1 is dropped
+  quietly). The model ignores the field, so dropping it changes no answer; the carp tells the
+  caller the value had no effect. `top_p` / `top_k` / `candidateCount` are not touched: Langertha
+  never builds them, they arrive only through the caller's `%extra` (ADR 0004).
+- **`cached_content`**: see ADR 0035's k381 Update (croak, not drop).
+
+Documentation only (ai.google.dev latest-model guide and the Vertex `gemini-4-argon` guide, read
+2026-10-19), not live-verified. Pinned by `t/46_gemini4_controls.t`, which also holds Gemini 3,
+2.5 and 2.0 unchanged.

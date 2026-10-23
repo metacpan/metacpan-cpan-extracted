@@ -14,7 +14,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '6.64'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013'
+generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150015'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,7 +27,7 @@ no_index:
 provides:
   Router::Ragel:
     file: lib/Router/Ragel.pm
-    version: '0.05'
+    version: '0.06'
 requires:
   Carp: '0'
   Digest::MD5: '0'
@@ -38,5 +38,5 @@ requires:
 resources:
   bugtracker: https://github.com/vividsnow/Router-Ragel/issues
   repository: https://github.com/vividsnow/Router-Ragel.git
-version: '0.05'
+version: '0.06'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

@@ -58,7 +58,7 @@ my @durations;
 my $work = EV::timer(0, 0.2, sub {
     for (1 .. 20) {
         $pool->query(
-            "select count() from system.numbers limit 100000",
+            "select count() from numbers(100000)",
             sub {
                 my (undef, $err) = @_;
                 # Use the connection-level on_query_complete normally;

@@ -27,7 +27,8 @@ if ($ENV{LANGERTHA_WHISPER_OPENAI_API_KEY}) {
 } elsif ($ENV{LANGERTHA_WHISPER_WHISPER_URL}) {
   $engine = Langertha::Engine::Whisper->new(
     url => $ENV{LANGERTHA_WHISPER_WHISPER_URL},
-    $ENV{LANGERTHA_WHISPER_WHISPER_MODEL} ? ( model => $ENV{LANGERTHA_WHISPER_WHISPER_MODEL} ) : (),
+    $ENV{LANGERTHA_WHISPER_WHISPER_MODEL} ? ( transcription_model => $ENV{LANGERTHA_WHISPER_WHISPER_MODEL} ) : (),
+    $ENV{LANGERTHA_WHISPER_WHISPER_API_KEY} ? ( api_key => $ENV{LANGERTHA_WHISPER_WHISPER_API_KEY} ) : (),
   );
 } else {
   die "Requires LANGERTHA_WHISPER_WHISPER_URL or LANGERTHA_WHISPER_OPENAI_API_KEY or LANGERTHA_WHISPER_GROQ_API_KEY";
@@ -50,11 +51,12 @@ langertha_whisper - Simple transcription with a Whisper compatible server or Ope
 
 =head1 VERSION
 
-version 0.503
+version 0.504
 
 =head1 SYNOPSIS
 
-  $ LANGERTHA_WHISPER_WHISPER_URL=http://10.0.0.8:8000/v1 langertha_whisper sample.ogg
+  $ LANGERTHA_WHISPER_WHISPER_URL=http://10.0.0.8:8000/v1 \
+    LANGERTHA_WHISPER_WHISPER_MODEL=Systran/faster-whisper-small langertha_whisper sample.ogg
   This is an example sound file in AugVorbis format from Wikipedia, the free encyclopedia.
    -- 13 seconds
 
@@ -70,9 +72,17 @@ version 0.503
 
 Simple transcription with a Whisper compatible server, Groq or OpenAI.
 
+C<LANGERTHA_WHISPER_WHISPER_MODEL> names the transcription model; speaches
+requires one (see L<Langertha::Engine::Whisper>).
+
+C<LANGERTHA_WHISPER_WHISPER_API_KEY> is the bearer key for a server that checks
+one (speaches started with C<API_KEY> answers 403 to any other key). Without
+it the engine sends its placeholder key.
+
 =head1 HOW TO INSTALL FASTER WHISPER
 
-L<https://github.com/fedirz/faster-whisper-server>
+L<https://github.com/speaches-ai/speaches> (speaches, formerly
+faster-whisper-server)
 
 =head1 SUPPORT
 

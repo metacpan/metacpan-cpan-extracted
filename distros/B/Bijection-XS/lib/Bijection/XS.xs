@@ -46,6 +46,36 @@ static int _inverse (char * id) {
 MODULE = Bijection::XS  PACKAGE = Bijection::XS
 PROTOTYPES: ENABLE
 
+void
+import(...)
+	PROTOTYPE: DISABLE
+	CODE:
+		HV * tags = get_hv("Bijection::XS::EXPORT_TAGS", 0);
+		AV * args = (AV *)sv_2mortal((SV *)newAV());
+		SSize_t i, top;
+		for (i = 0; i < items; i++) {
+			SV * arg = ST(i);
+			STRLEN len;
+			const char * name;
+			if (i > 0 && tags && SvOK(arg) && !SvROK(arg)) {
+				name = SvPV_const(arg, len);
+				if (len && isIDFIRST(name[0]) && hv_exists(tags, name, len)) {
+					arg = newSVpvs_flags(":", SVs_TEMP);
+					sv_catpvn(arg, name, len);
+				}
+			}
+			av_push(args, SvREFCNT_inc_simple_NN(arg));
+		}
+		top = av_len(args);
+		SP = MARK;
+		PUSHMARK(SP);
+		EXTEND(SP, top + 1);
+		for (i = 0; i <= top; i++)
+			PUSHs(*av_fetch(args, i, 0));
+		PUTBACK;
+		call_pv("Ex::Op::import", G_VOID | G_DISCARD);
+		XSRETURN_EMPTY;
+
 SV *
 bijection_set(...)
 	CODE:

@@ -1,0 +1,52 @@
+NAME
+
+Logic::Probabilistic - Probabilistic Logic Programming in Perl.
+
+VERSION
+
+Version 0.01
+
+SYNOPSIS
+
+    use v5.38;
+    use Logic::Probabilistic::Syntax;
+
+    prob_logic AlarmNet {
+        pfacts {
+            0.7 => burglary;
+            0.2 => earthquake;
+        }
+
+        prule 0.9 => alarm { burglary; earthquake; }
+        prule 0.8 => alarm { burglary; not { earthquake; } }
+        prule 0.1 => alarm { not { burglary; } earthquake; }
+    }
+
+    # Condition on observing alarm
+    query_prob AlarmNet::burglary, evidence => { alarm => 1 } -> my $b_given_alarm;
+    say "P(burglary | alarm):   " . $b_given_alarm->probability;   # ~0.9897
+
+    query_prob AlarmNet::earthquake, evidence => { alarm => 1 } -> my $e_given_alarm;
+    say "P(earthquake | alarm): " . $e_given_alarm->probability; # ~0.2276
+
+DESCRIPTION
+
+Logic::Probabilistic builds on Logic::Relational to allow the association of probabilities with facts and rules, and queries that return probabilities and probability distributions. To do this, it uses Sato's Distribution Semantics to define and query over possible worlds.
+
+See the POD in Logic::Probabilistic for more details.
+
+AUTHOR
+
+Matt Johnson, <mjohnson at affectivesilicon.com>
+
+AI
+
+This module was developed with assistance from various AI/LLM, particularly Gemini Flash 3.8.
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2026 by Matt Johnson.
+
+This is free software, licensed under the GNU General Public License, Version 3.
+
+

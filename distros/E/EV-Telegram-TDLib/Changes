@@ -1,5 +1,9 @@
 Revision history for EV-Telegram-TDLib
 
+0.05    2026-10-20
+        Fix inclusive history paging and cancellation from download progress
+        Preserve submitted requests across rate-limit retries
+
 0.04    2026-09-22
         Stories, stickers, Stars, gifts, Business, routers, ask(), 429 retry
         SECURITY: an unusable TDLIB_LOG_VERBOSITY no longer logs credentials

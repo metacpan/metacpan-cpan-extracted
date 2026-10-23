@@ -52,6 +52,7 @@ for my $ch (@members) {
 
 # Producer side - in a real ETL this would be reading from Kafka/files/etc.
 my $produced = 0;
+my $failed   = 0;
 my $target   = 1_000_000;
 my $producer; $producer = EV::idle(sub {
     return if $pause;
@@ -64,6 +65,7 @@ my $producer; $producer = EV::idle(sub {
         my $left = scalar @streamers;
         $_->finish(sub {
             my (undef, $err) = @_;
+            $failed++ if $err;
             warn "[finish] err=$err\n" if $err;
             EV::break unless --$left;
         }) for @streamers;
@@ -82,4 +84,5 @@ my $unpause = EV::timer(0.1, 0.1, sub {
 
 EV::run;
 $pool->finish;
+die "FAILED: $failed streamer(s) reported errors; see [finish] lines above\n" if $failed;
 print "Inserted $produced rows via pool of ", scalar @members, " members.\n";
