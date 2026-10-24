@@ -1,6 +1,6 @@
 package Langertha::Skeid::UsageStore;
-our $VERSION = '0.003';
-# ABSTRACT: Usage event sink — config normalization and backend factory
+our $VERSION = '0.004';
+# ABSTRACT: Usage event sink - config normalization and backend factory
 use strict;
 use warnings;
 use Carp qw(croak);
@@ -33,6 +33,7 @@ sub normalize_config {
       schema_file  => ($cfg->{schema_file} // ''),
       auto_migrate => exists($cfg->{auto_migrate}) ? ($cfg->{auto_migrate} ? 1 : 0) : 1,
       flush_interval_ms => $class->_flush_interval_ms($cfg),
+      spool_dir    => $class->_spool_dir($cfg),
     };
   }
 
@@ -57,6 +58,7 @@ sub normalize_config {
       schema_file  => ($cfg->{schema_file} // ''),
       auto_migrate => exists($cfg->{auto_migrate}) ? ($cfg->{auto_migrate} ? 1 : 0) : 1,
       flush_interval_ms => $class->_flush_interval_ms($cfg),
+      spool_dir    => $class->_spool_dir($cfg),
     };
   }
 
@@ -89,6 +91,15 @@ sub _flush_interval_ms {
   return 0 + $ms;
 }
 
+# The usage spool of the DBI backends (skeid k110, ADR 0027). Empty -- the default -- keeps the
+# behavior from before: what the database cannot take is reported lost.
+sub _spool_dir {
+  my ($class, $cfg) = @_;
+  my $dir = $cfg->{spool_dir} // '';
+  croak 'usage_store.spool_dir must be a directory path' if ref $dir;
+  return "$dir";
+}
+
 
 sub for_config {
   my ($class, $cfg) = @_;
@@ -115,6 +126,7 @@ sub for_config {
     schema_file  => ($cfg->{schema_file} // ''),
     auto_migrate => (exists($cfg->{auto_migrate}) ? ($cfg->{auto_migrate} ? 1 : 0) : 1),
     flush_interval_ms => ($cfg->{flush_interval_ms} // 0),
+    spool_dir    => ($cfg->{spool_dir} // q{}),
   );
 }
 
@@ -146,11 +158,11 @@ __END__
 
 =head1 NAME
 
-Langertha::Skeid::UsageStore - Usage event sink — config normalization and backend factory
+Langertha::Skeid::UsageStore - Usage event sink - config normalization and backend factory
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 DESCRIPTION
 
@@ -167,7 +179,8 @@ L<Langertha::Skeid::UsageStore::JsonLog> or L<Langertha::Skeid::UsageStore::DBI>
 A store object answers C<backend> (its name), C<prepare> (create what it needs; called once
 when the store is configured, may croak), C<store($event)>, C<report(\%filters)> and
 C<disconnect>. A store that can hold events back also answers C<flush> (write what it holds,
-answer like C<store> with C<written> and C<lost> counts) and C<disconnect> flushes before it lets
+answer like C<store> with C<written> and C<lost> counts, and C<spooled> where a spool took
+some) and C<disconnect> flushes before it lets
 go; L<Langertha::Skeid::UsageStore::DBI> with C<flush_interval_ms> is one. C<store> and
 C<report> report failure in their answer rather than dying: the request an event describes has
 already been served. The proxy logs a failed C<store> at
@@ -177,7 +190,9 @@ C<password=> from its DSN.
 
 C<store> returns C<< { ok => 1 } >> (with an C<id> where the backend has one),
 C<< { ok => 1, queued => 1 } >> for an event held for a later C<flush> -- whose failures the store
-reports itself, the proxy's answer having gone out by then -- or
+reports itself, the proxy's answer having gone out by then --
+C<< { ok => 1, spooled => 1 } >> for an event a DBI store with C<spool_dir> kept on disk
+because the database was unreachable (it is written when the database is back), or
 C<< { ok => 0, error => $message } >>. C<report> takes the filters C<since> (an ISO 8601 UTC
 timestamp, compared as a string), C<api_key_id>, C<model> (the served model) and C<limit>, and
 returns
@@ -187,16 +202,23 @@ returns
     db_path  => '...',                  # DBI stores: the SQLite file, '' for postgresql
     log_path => '...',                  # jsonlog: the event directory or file
     totals   => { requests, input_tokens, output_tokens, total_tokens, cached_tokens,
-                  cache_write_tokens, tool_calls, total_cost_usd },
-    by_key   => [ { api_key_id, requests, total_tokens, total_cost_usd }, ... ],
-    by_model => [ { model, requests, total_tokens, total_cost_usd }, ... ],
+                  cache_write_tokens, tool_calls, audio_seconds, documents, pages,
+                  total_cost_usd },
+    by_key   => [ { api_key_id, requests, total_tokens, audio_seconds, documents, pages,
+                    total_cost_usd }, ... ],
+    by_model => [ { model, requests, total_tokens, audio_seconds, documents, pages,
+                    total_cost_usd }, ... ],
     recent   => [ { id, created_at, api_format, endpoint, api_key_id, model, requested_model,
                     node_id, status_code, ok, input_tokens, output_tokens, total_tokens,
                     cached_tokens, cache_write_tokens, tool_calls, cost_total_usd }, ... ],
   }
 
 or C<< { ok => 0, enabled => 0, error => $message } >>. The breakdowns are ordered by cost,
-highest first; C<recent> is newest first.
+highest first; C<recent> is newest first. C<audio_seconds> sums what the events of the audio
+routes carry, C<documents> what those of the rerank and documents routes carry and C<pages> what
+those of the documents routes read off their answers
+(L<Langertha::Skeid/Pluggable Usage Storage>); an event without the field adds nothing, so a
+sum is C<0> where no event had one.
 
 =head2 normalize_config
 
@@ -224,17 +246,20 @@ when the path is an existing directory or ends in C</>, else C<file>; C<fsync> (
 
 =item * sqlite -- C<sqlite_path> (or C<path>, C<db_path>), required; C<schema_file> (default:
 the shipped one); C<auto_migrate> (default on); C<flush_interval_ms> (default C<0>, write each
-event at once; see L<Langertha::Skeid::UsageStore::DBI/flush_interval_ms>).
+event at once; see L<Langertha::Skeid::UsageStore::DBI/flush_interval_ms>); C<spool_dir>
+(default empty, off: a local directory that keeps the events the database cannot take while it
+is down and replays them once it is back; see L<Langertha::Skeid::UsageStore::DBI/spool_dir>).
 
 =item * postgresql -- C<dsn>, else one built from C<host> (default C<127.0.0.1>), C<port> (5432)
 and C<dbname> or C<database> (C<skeid>); C<user>; C<password>, or C<password_env> naming the
-variable that holds it; C<schema_file>; C<auto_migrate> (default on); C<flush_interval_ms>, as
-for sqlite.
+variable that holds it; C<schema_file>; C<auto_migrate> (default on); C<flush_interval_ms> and
+C<spool_dir>, as for sqlite.
 
 =back
 
-Croaks on a config that is not a hashref, a missing path, an unknown backend, or a
-C<flush_interval_ms> that is not a whole number of milliseconds.
+Croaks on a config that is not a hashref, a missing path, an unknown backend, a
+C<flush_interval_ms> that is not a whole number of milliseconds, or a C<spool_dir> that is not
+a plain string.
 
 =head2 for_config
 

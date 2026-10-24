@@ -1,0 +1,29 @@
+title: One node answers the OpenAI, Anthropic and Ollama face; each request is one usage event in its own format
+setup:
+  nodes:
+    - id: gpu1
+      model: qwen
+      upstream:
+        rules:
+          "Hello": { answer: "Hi from gpu1" }
+steps:
+  - chat: { protocol: openai, model: qwen, prompt: Hello }
+    expect:
+      text: Hi from gpu1
+      model: qwen
+      finish_reason: stop
+      headers: { x-skeid-node: gpu1 }
+    upstream:
+      gpu1: { requests: 1, last_user_text: Hello, request_model: qwen }
+  - chat: { protocol: anthropic, model: qwen, prompt: Hello }
+    expect: { text: Hi from gpu1, finish_reason: end_turn }
+    upstream:
+      gpu1: { requests: 2, last_user_text: Hello }
+  - chat: { protocol: ollama, model: qwen, prompt: Hello }
+    expect: { text: Hi from gpu1 }
+    upstream:
+      gpu1: { requests: 3 }
+    usage:
+      - { api_format: openai, endpoint: /v1/chat/completions, node_id: gpu1, model: qwen, requested_model: qwen, status_code: 200, ok: 1 }
+      - { api_format: anthropic, endpoint: /v1/messages, node_id: gpu1, ok: 1 }
+      - { api_format: ollama, endpoint: /api/chat, node_id: gpu1, ok: 1 }

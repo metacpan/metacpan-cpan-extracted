@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Exporter ();
 our ($VERSION, @ISA, @EXPORT, @EXPORT_OK);
-$VERSION     = '0.10';
+$VERSION     = '0.11';
 @ISA         = qw( Exporter );
 @EXPORT      = qw( pod2multi );
 @EXPORT_OK   = qw( make_options_defaults );
@@ -41,7 +41,6 @@ sub pod2multi {
     # defaults file.  Those values will be overriden with any defined in a 
     # Perl script and passed to pod2multi() as arguments.
 
-#    if (defined %params) {
     if (%params) {
         foreach my $outputformat (keys %params) {
             croak "Value of personal defaults option $outputformat must be a hash ref"
@@ -428,22 +427,17 @@ request it with:
 =head2 CPAN Modules
 
     File::Save::Home
-    IO::Capture
+    IO::Capture (for testing)
 
 =head1 BUGS
 
 None reported yet.
 
-=head1 SUPPORT
-
-Contact author at his cpan [dot] org address below.
-
 =head1 AUTHOR
 
     James E Keenan
     CPAN ID: JKEENAN
-    jkeenan@cpan.org
-    http://search.cpan.org/~jkeenan/
+    jkeenan@pobox.com
     http://thenceforward.net/perl/modules/Pod-Multi/
 
 =head1 ACKNOWLEDGEMENTS
@@ -455,7 +449,7 @@ David H Adler and David A Golden assisted with debugging.
 
 =head1 COPYRIGHT
 
-Copyright 2006-2017 James E Keenan.  All rights reserved.
+Copyright 2006-2026 James E Keenan.  All rights reserved.
 
 This program is free software; you can redistribute
 it and/or modify it under the same terms as Perl itself.

@@ -1,5 +1,5 @@
 package Langertha::Skeid::Protocol::Ollama;
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 # ABSTRACT: Translate between the Ollama chat format and the upstream OpenAI call
 use strict;
 use warnings;
@@ -250,7 +250,7 @@ Langertha::Skeid::Protocol::Ollama - Translate between the Ollama chat format an
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 DESCRIPTION
 

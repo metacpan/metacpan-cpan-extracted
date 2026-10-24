@@ -5,9 +5,11 @@ model: sonnet
 briefing:
   skills:
     - skeid-core
+    - skeid-routing
     - skeid-protocols
+    - skeid-usage
     - getty-perl-core
-    - getty-perl-moo
+    - perl-mojo
     - kanban-issues-karr-ticket
 ---
 
@@ -36,3 +38,6 @@ House test rules:
 Existing suite: `t/00-load.t` … `t/22-key-broker.t`. Follow their style and numbering. Verify
 with `prove -lr t/` — recursive; plain `prove -l t/` silently skips subdirectories — and report
 what it printed, including skips. A skipped test is not a passing test.
+
+Never `git commit` — commits belong to `skeid-release-manager`; findings outside the brief
+go as a note on your karr card.

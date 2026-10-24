@@ -1,0 +1,38 @@
+{
+   "abstract" : "a scrolling terminal command prompt",
+   "author" : [
+      "Joel Roth <joelz@pobox.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "App::ModuleBuildTiny version 0.047",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Tickit-Terminal-Prompt",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.039"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "App::ModuleBuildTiny" : "0.047"
+         }
+      }
+   },
+   "provides" : {
+      "Tickit::Terminal::Prompt" : {
+         "file" : "lib/Tickit/Terminal/Prompt.pm",
+         "version" : "0.003"
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.003",
+   "x_serialization_backend" : "JSON::PP version 4.16",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+}

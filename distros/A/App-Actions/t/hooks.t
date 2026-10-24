@@ -152,6 +152,15 @@ is($commit, 0, 'the copy holds one commit');
 
 my ($clean_output, $clean_status) = run_hook();
 is($clean_status, 0, 'the hook passes when no schema can have moved');
+is($clean_output, '', 'a commit that passes the hook prints nothing');
+
+# A make target, by contrast, says what it did, even when that was nothing.
+my ($idle_output, $idle_status) = run_hook('--staged');
+is($idle_status, 0, 'check-staged passes when nothing is staged');
+like($idle_output, qr/^check-staged: nothing staged could change what the checks read, so none ran\.$/m,
+    'and says that no check ran');
+like($idle_output, qr/^  live knobs \(t\/live-knobs\.t\): skipped/m,
+    'naming each check it skipped');
 
 # A bump applied to the working tree but not to the index is the one that
 # would be committed in half: the staged document still declares the old
@@ -205,8 +214,14 @@ spew($fixture, $stale);
 my (undef, $passed_status) = run_hook();
 is($passed_status, 0, 'the hook checks the staged snapshot, not the working tree');
 
-my (undef, $staged_passed) = run_hook('--staged');
+my ($staged_passed_out, $staged_passed) = run_hook('--staged');
 is($staged_passed, 0, 'check-staged accepts the same staged snapshot');
+like($staged_passed_out, qr/^check-staged: every check that ran passed\.$/m,
+    'check-staged says its checks passed');
+like($staged_passed_out, qr/^  schema \(t\/schema\.t\): passed \(\d+ tests\)$/m,
+    'and that the schema check ran, with how many tests');
+like($staged_passed_out, qr/^  live knobs \(t\/live-knobs\.t\): skipped - nothing staged/m,
+    'and that the live-knob check was skipped, as nothing staged could move it');
 
 my ($worktree_refused, $worktree_refused_status) = run_hook('--worktree');
 isnt($worktree_refused_status, 0,
@@ -299,7 +314,7 @@ unlink $untracked_fixture
         or diag $configure_out;
 
     SKIP: {
-        skip 'the generated Makefile is not available', 16
+        skip 'the generated Makefile is not available', 21
             unless $configure_status == 0;
 
         my $makefile = slurp(File::Spec->catfile($repository, 'Makefile'));
@@ -310,7 +325,7 @@ unlink $untracked_fixture
 
         my $make = $Config{make};
         my (undef, $make_status) = run_in_repository($make, '-n', 'check-staged');
-        skip "the configured make command '$make' cannot run the target", 14
+        skip "the configured make command '$make' cannot run the target", 19
             unless $make_status == 0;
 
         my ($worktree_out, $worktree_status) = run_in_repository(
@@ -319,6 +334,10 @@ unlink $untracked_fixture
         is($worktree_status, 0,
             'make check-worktree succeeds when every check passes')
             or diag $worktree_out;
+        for my $check ('schema \(t\/schema\.t\)', 'live knobs \(t\/live-knobs\.t\)') {
+            like($worktree_out, qr/^  $check: passed \(\d+ tests\)$/m,
+                'make check-worktree reports each check it ran as passed');
+        }
 
         my $staged_fixture = File::Spec->catfile(
             $repository, 't', 'fixtures', 'target-staged.json',
@@ -408,6 +427,11 @@ unlink $untracked_fixture
             qr/live knobs/,
             'the staged target reports the live-knob check',
         );
+        like(
+            $live_staged_out,
+            qr/^  live knobs \(t\/live-knobs\.t\): FAILED/m,
+            'the failure report lists the live-knob check as failed',
+        );
 
         in_repository([ 'reset', '-q', '--', 't/real-docker.t' ]);
 
@@ -426,6 +450,16 @@ unlink $untracked_fixture
         is($live_staged_pass_status, 0,
             'make check-staged accepts a live knob staged with its prefix')
             or diag $live_staged_pass_out;
+        like(
+            $live_staged_pass_out,
+            qr/^check-staged: every check that ran passed\.$/m,
+            'make check-staged says the checks that ran passed',
+        );
+        like(
+            $live_staged_pass_out,
+            qr/^  live knobs \(t\/live-knobs\.t\): passed \(\d+ tests\)$/m,
+            'and shows the live-knob check ran, with its test count',
+        );
 
         in_repository([ 'reset', '-q', '--', 't/real-docker.t' ]);
     }

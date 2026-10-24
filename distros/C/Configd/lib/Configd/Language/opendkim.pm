@@ -1,5 +1,5 @@
 package Configd::Language::opendkim;
-$Configd::Language::opendkim::VERSION = '0.002';
+$Configd::Language::opendkim::VERSION = '0.005';
 #ABSTRACT: opendkim.conf, which has never had a conf.d.
 
 use 5.034;
@@ -35,7 +35,7 @@ Configd::Language::opendkim - opendkim.conf, which has never had a conf.d.
 
 =head1 VERSION
 
-version 0.002
+version 0.005
 
 =head1 SYNOPSIS
 

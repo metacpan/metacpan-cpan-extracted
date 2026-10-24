@@ -11,9 +11,9 @@ use App::Actions::Access;
 use App::Actions::Action;
 use App::Actions::Cache;
 use App::Actions::I18N qw(i18n throw validate_args);
-use App::Actions::Runner::Support qw(action_inputs local_action_dir trim_error);
+use App::Actions::Runner::Support qw(action_inputs chomp_error default_logger local_action_dir trim_error);
 
-our $VERSION = '0.001.0';
+our $VERSION = '0.002.0';
 
 # The image a job without a container or a known runner label runs in.
 Readonly::Scalar my $DEFAULT_IMAGE => 'ubuntu:latest';
@@ -29,6 +29,9 @@ Readonly::Scalar my $MAX_ACTION_DEPTH => 10;
 # Windows emulates fork() with threads that share the parent's handles, so
 # pulls run one after another there.
 Readonly::Scalar my $SERIAL_OS => 'MSWin32';
+
+# The status prepare reports for an image the pull results leave out.
+Readonly::Scalar my $NO_STATUS => -1;
 
 =encoding utf-8
 
@@ -111,6 +114,11 @@ flags.
 
 =item * C<pull_concurrency> - optional; how many pulls run at once (default 4).
 
+=item * C<logger> - optional; a L<Log::Abstraction> object (default:
+L<App::Actions::Runner::Support/default_logger>, standard error).  With
+C<verbose>, a failure to update the image cache is logged at the C<warn>
+level; the run goes on without it.
+
 =back
 
 =head3 RETURNS
@@ -138,7 +146,7 @@ None.
 
 	{
 		docker           => { type => 'object', can => 'image_exists' },
-		expression       => { type => 'object', can => 'interpolate' },
+		expression       => { type => 'object', can => [qw(interpolate interpolate_strict interpolate_known)] },
 		workflow         => { type => 'object', can => 'container_image' },
 		project_dir      => { type => 'string', min => 1 },
 		context          => { type => 'coderef' },
@@ -150,6 +158,7 @@ None.
 		pull             => { type => 'boolean', optional => 1 },
 		no_pull          => { type => 'boolean', optional => 1 },
 		pull_concurrency => { type => 'integer', min => 1, optional => 1 },
+		logger           => { type => 'object', can => [qw(warn error notice)], optional => 1 },
 	}
 
 =head4 OUTPUT
@@ -172,7 +181,7 @@ sub new {
 
 	my $params = validate_args(__PACKAGE__ . '::new', \@_, {
 		docker => { type => 'object', can => 'image_exists' },
-		expression => { type => 'object', can => 'interpolate' },
+		expression => { type => 'object', can => [qw(interpolate interpolate_strict interpolate_known)] },
 		workflow => { type => 'object', can => 'container_image' },
 		project_dir => { type => 'string', min => 1 },
 		context => { type => 'coderef' },
@@ -184,10 +193,13 @@ sub new {
 		pull => { type => 'boolean', optional => 1 },
 		no_pull => { type => 'boolean', optional => 1 },
 		pull_concurrency => { type => 'integer', min => 1, optional => 1 },
+		# Where warnings and errors go; standard error when none is given.
+		logger => { type => 'object', can => [qw(warn error notice)], optional => 1 },
 	});
 
 	return bless {
 		%{$params},
+		logger => $params->{logger} || default_logger(),
 		pull_concurrency => $params->{pull_concurrency} || 4,
 		# Images this run downloaded that were not there before, which a
 		# run told not to keep its images removes again.
@@ -273,6 +285,9 @@ None; an expression that fails to resolve is reported in its entry.
 sub required {
 	my ($self, $instances) = @_;
 
+	# The resolving and the action walk use eval; the caller's $@ is theirs.
+	local $@;
+
 	my @entries;
 	my %seen;
 
@@ -345,6 +360,8 @@ None; a local action that cannot be read contributes no images.
 
 sub job_expressions {
 	my ($self, $job, $runs_on, $context) = @_;
+
+	local $@;
 
 	my $name = defined $job->{display_name} ? $job->{display_name} : $job->{base_id};
 	my @entries;
@@ -436,7 +453,8 @@ Pulls images, prints progress unless quiet, and remembers what it pulled.
 	| Docker image 'X' is not     | --no-pull was given and the  | Pull it, or drop --no-pull  |
 	| available locally (--no-pull)| image is absent             |                             |
 	| Failed to pull Docker image | The pull exited non-zero     | Check the name, the registry|
-	| 'X' (exit N)                |                              | and the Docker login        |
+	| 'X' (exit N)                | (-1: the Docker object gave  | and the Docker login        |
+	|                             | no status for the image)     |                             |
 	+-----------------------------+------------------------------+-----------------------------+
 
 =head3 PSEUDOCODE
@@ -455,6 +473,8 @@ Pulls images, prints progress unless quiet, and remembers what it pulled.
 
 sub prepare {
 	my ($self, $instances, @options) = @_;
+
+	local $@;
 
 	my $params = validate_args(__PACKAGE__ . '::prepare', [ instances => $instances, @options ], {
 		instances => { type => 'arrayref' },
@@ -479,7 +499,10 @@ sub prepare {
 	# Every image that did arrive is recorded before the failure is
 	# reported, so the cleanup at the end of the run removes it.
 	for my $record (@pending) {
+		# A Docker object of the caller's that says nothing about an image
+		# has not shown that it arrived; -1 stands for "no exit status".
 		my $rc = $results->{ $record->{image} };
+		$rc = $NO_STATUS unless defined $rc;
 		if ($rc != 0) {
 			$record->{status} = 'failed';
 			$record->{error} = $self->i18n('runner.image.pull_failed', { image => $record->{image}, status => $rc })
@@ -568,6 +591,8 @@ Pulls images that are not present.
 sub prepare_job {
 	my ($self, $job, $context) = @_;
 
+	local $@;
+
 	my $runs_on = $self->{workflow}->runs_on_text($job->{'runs-on'}, $job->{matrix} || {});
 
 	my ($job_image, @deferred, %seen);
@@ -629,6 +654,8 @@ None.
 
 sub probe {
 	my ($self, $instances) = @_;
+
+	local $@;
 
 	for my $instance (@{$instances}) {
 		my $runs_on = $self->_linux_runs_on($instance);
@@ -821,11 +848,13 @@ Writes the cache record; warns (when verbose) if it cannot.
 sub remember {
 	my ($self, $cache_file) = @_;
 
+	local $@;
+
 	my @images = @{ $self->pulled };
 	return $self if !@images || $self->{dry_run};
 
 	my $recorded = eval { App::Actions::Cache->new(file => $cache_file)->remember(@images); 1 };
-	warn $self->i18n('runner.image.cache_failed', { error => $@ }), "\n"
+	$self->{logger}->warn($self->i18n('runner.image.cache_failed', { error => chomp_error($@) }))
 		if !$recorded && $self->{verbose};
 
 	return $self;
@@ -890,8 +919,10 @@ sub _linux_runs_on {
 sub _job_image {
 	my ($self, $job, $runs_on) = @_;
 
-	# container_image croaks for a container mapping without an image; that
-	# is reported when the job runs, so here it just names nothing.
+	# container_image croaks for an image it cannot read (an unclosed
+	# ${{, say); that is reported when the job runs, so here it just names
+	# nothing.  A container mapping without an image is not an error: the
+	# job runs in the runner's image.
 	return eval {
 		$self->{workflow}->container_image($job, $runs_on, $self->{image} || $DEFAULT_IMAGE, $self->{perl_image});
 	};
@@ -994,15 +1025,16 @@ sub _collect_step_images {
 
 	# What this context can resolve is resolved now - usually a composite
 	# action's inputs.  An expression that still needs a value only the job
-	# will have is kept as written, so the caller recognises it as deferred
-	# rather than mistaking an empty string for an image name.
+	# will have is left as written (interpolate would make it an empty
+	# string), so the caller recognises it as deferred rather than taking
+	# "alpine:" for an image name.
 	my $resolve = sub {
 		my ($text) = @_;
-		my $value = eval { $self->{expression}->interpolate($text, $context) };
-		return (defined $value && length $value && $value !~ /\{\{/) ? $value : $text;
+		my $value = eval { $self->{expression}->interpolate_known($text, $context) };
+		return (defined $value && length $value) ? $value : $text;
 	};
 
-	my $action = $uses =~ m{\Adocker://}s ? $uses : eval { $self->{expression}->interpolate($uses, $context) };
+	my $action = $uses =~ m{\Adocker://}s ? $uses : eval { $self->{expression}->interpolate_known($uses, $context) };
 	return unless defined $action && length $action;
 
 	if ($action =~ m{\A\.\.?/}) {
@@ -1107,7 +1139,7 @@ job.  Call L</ensure> freely.
 L</note_pulled> with them (the parallel runner does this for its children).
 
 =item * B<L</remember> never fails the run.>  If the cache file cannot be
-written, a warning is printed and the run goes on.
+written, the run goes on; with C<verbose> a warning is logged.
 
 =back
 

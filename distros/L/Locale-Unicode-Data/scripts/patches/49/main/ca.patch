@@ -1,0 +1,13 @@
+--- ca.xml
++++ ca.xml
+@@ -4462,6 +4462,10 @@
+ 				<displayName count="one">iuan xinès extracontinental</displayName>
+ 				<displayName count="other">iuans xinesos extracontinentals</displayName>
+ 			</currency>
++			<currency type="CNX">
++				<displayName count="one" draft="contributed">dòlar del Banc Popular Xinès</displayName>
++				<displayName count="other" draft="contributed">dòlars del Banc Popular Xinès</displayName>
++			</currency>
+ 			<currency type="CNY">
+ 				<displayName>iuan</displayName>
+ 				<displayName count="one">iuan</displayName>

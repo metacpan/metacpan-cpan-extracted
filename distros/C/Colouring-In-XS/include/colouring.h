@@ -20,6 +20,23 @@
 #include <stdio.h>
 #include <math.h>
 
+/* Inside a Perl XS translation unit on a PERL_IMPLICIT_SYS perl (Windows),
+ * XSUB.h remaps these libc names to interpreter-context macros that need
+ * my_perl in scope; this header is plain C with no pTHX, so restore the
+ * CRT names (CPAN Testers: Litavis 0.04 on Strawberry failed with
+ * "'my_perl' undeclared" wherever the default COLOURING_FATAL expanded).
+ * An XS consumer that wants croak() instead defines COLOURING_FATAL
+ * before including, as documented above. */
+#ifdef PERL_IMPLICIT_SYS
+#  undef fprintf
+#  undef stderr
+#  undef abort
+#  undef malloc
+#  undef calloc
+#  undef realloc
+#  undef free
+#endif
+
 /* ── Error handling ────────────────────────────────────────────── */
 
 #ifndef COLOURING_FATAL

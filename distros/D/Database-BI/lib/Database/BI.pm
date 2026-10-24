@@ -13,7 +13,7 @@ use Readonly;
 use Database::BI::Model::DataSource;
 use Database::BI::Tutorial;
 
-our $VERSION = '0.015.0';
+our $VERSION = '0.016.0';
 
 # Default config values used by the Config plugin and referenced explicitly
 # in startup() so callers always get a resolved value.
@@ -40,7 +40,7 @@ Database::BI - Web-based Business Intelligence viewer for data files
 
 =head1 VERSION
 
-0.015.0
+0.016.0
 
 =head1 DESCRIPTION
 
@@ -677,6 +677,33 @@ Supported patterns: C<%m/%d/%Y> (US), C<%d/%m/%Y> (EU), C<%d-%b-%Y> (DD-Mon-YYYY
 Removes a date-normalisation pattern.  Body: C<l=&col=>.
 Omit C<col=> to clear all patterns for the spec.
 
+=item C<GET /insights>
+
+Automatic statistical insights for a dataset.  Runs the same pipeline as
+C</join> then detects outliers (Tukey IQR fence), period-over-period deltas,
+top movers, and seasonality (lag-1 autocorrelation).  No LLM or network call
+is made.  Every insight links to a chart or stats view that shows it.
+Parameters: C<l=E<lt>specE<gt>> (required), repeatable C<f=> filters.
+
+=item C<POST /api/ask>
+
+Natural language to analysis spec (Phase 5.1).  Body params: C<l=E<lt>specE<gt>>
+(required), C<q=E<lt>questionE<gt>> (required), repeatable C<f=> filters.
+Returns C<{ spec, url, valid =E<gt> 1 }> on success.  The model receives only
+column names and types -- never raw row data or file paths.  Returns 503 when
+C<ai_api_key> is not configured; 400 for missing params; 422 for an
+unparseable or invalid-column spec; 502 for a provider error.
+
+=item C<POST /api/summary>
+
+Narrative summary of an analysis (Phase 5.3).  Body params: C<l=E<lt>specE<gt>>
+(required), repeatable C<f=> filters, C<ai=1> (optional, honours
+C<ai_api_key> config).  Returns C<{ text, source, cached }>.  Two paths:
+deterministic template sentences (always available, works offline) and
+optional LLM-polished prose when C<ai=1> is passed and C<ai_api_key> is
+set.  Only aggregate insight facts are sent to the LLM.  Results are cached
+in-process for one hour keyed on the analysis fingerprint.
+
 =back
 
 =head1 CONFIGURATION
@@ -881,7 +908,7 @@ renderer, giving visible progress on slow joins.
 # =============================================================================
 #
 # Items marked [NEW 0.010.0] were identified during the 0.010.0 gap analysis.
-# Items completed in 0.012.0 (Phase 0):
+# Items completed in 0.012.0:
 #   A. Pagination -- done: /view, /open, /join, /combine, /export all paginate.
 #   1. dbi_source() proxy -- done: DataSource::dbi_source() delegating method added.
 #   2. limit/offset plumbing -- done: /join, /combine, /export thread pagination.
@@ -889,7 +916,7 @@ renderer, giving visible progress on slow joins.
 #   4. Filter pushdown -- done: _filter_specs_to_criteria translates f= specs to
 #      SQL criteria for SQLite sources; _grouped_totals and _fetch_page both use it.
 #   5. Schema warnings UI -- partial: join_tables captures and passes schema_warnings;
-#      BI-side type-mismatch detection (P0-6 in BI-Phases0-1-TODO.md) is still open.
+#      BI-side type-mismatch detection is still open.
 #   6. updated() in DataSource -- done: DataSource::updated() delegates to inner DA.
 #
 # ---- POST-RELEASE FEATURE ROADMAP ----
@@ -1011,6 +1038,10 @@ sub startup ($self) {
 	$self->hook(before_render => sub {
 		my $c = shift;
 
+		# AI availability flag used by dashboard and insights templates.
+		$c->stash(ai_available => (length($c->app->config('ai_api_key') // '') ? 1 : 0))
+			unless defined $c->stash('ai_available');
+
 		# The chart pages and canvases read this from the stash.  Resolving it
 		# per request rather than once at startup means a deployment (and a
 		# test) can point D3 at a local copy by changing the config.
@@ -1125,8 +1156,11 @@ sub startup ($self) {
 	$r->get('/histogram')     ->to('Dashboard#histogram_view');
 	$r->get('/map')           ->to('Dashboard#map_view');
 	$r->get('/line')          ->to('Dashboard#graph_view');	# alias for /graph
+	$r->post('/api/ask')       ->to('Dashboard#ask_api');
+	$r->get('/insights')      ->to('Dashboard#insights_view');
+	$r->post('/api/summary')  ->to('Dashboard#summary_api');
 
-	# Phase 3.1 -- Saved analyses
+	# Saved analyses
 	# /api/analyses/import must be registered BEFORE /api/analyses/:id so that the
 	# literal segment "import" is matched before the :id placeholder captures it.
 	$r->get('/a/:id')                   ->to('Dashboard#canvas_render');
@@ -1140,7 +1174,7 @@ sub startup ($self) {
 	$r->patch('/api/analyses/:id/visuals/:visual')->to('Dashboard#analyses_update_visual');
 	$r->get('/api/analyses/:id/export') ->to('Dashboard#analyses_export');
 
-	# Phase 4 -- extracts, catalog, sharing, embedding, per-visual downloads
+	# extracts, catalog, sharing, embedding, per-visual downloads
 	$r->get('/catalog')                       ->to('Dashboard#catalog_view');
 	$r->get('/share/:id')                     ->to('Dashboard#share_view');
 	$r->get('/embed/:id')                     ->to('Dashboard#embed_view');

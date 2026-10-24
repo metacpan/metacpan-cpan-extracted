@@ -1,0 +1,14 @@
+--- tr.xml
++++ tr.xml
+@@ -4324,6 +4324,11 @@
+ 			<currency type="CNH">
+ 				<displayName>Çin yuanı (offshore)</displayName>
+ 			</currency>
++			<currency type="CNX">
++				<displayName draft="contributed">Çin Halk Cumhuriyeti Merkez Bankası Doları</displayName>
++				<displayName count="one" draft="contributed">Çin Halk Cumhuriyeti Merkez Bankası doları</displayName>
++				<displayName count="other" draft="contributed">Çin Halk Cumhuriyeti Merkez Bankası doları</displayName>
++			</currency>
+ 			<currency type="CNY">
+ 				<displayName>Çin yuanı</displayName>
+ 			</currency>

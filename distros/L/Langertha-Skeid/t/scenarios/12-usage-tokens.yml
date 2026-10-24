@@ -1,0 +1,47 @@
+title: Usage and cost are metered from the upstream's usage block; a node that reports none leaves 0, not a guess
+setup:
+  nodes:
+    - id: gpu
+      model: m
+      upstream:
+        rules:
+          "count me": { answer: ok, usage: { prompt_tokens: 3, completion_tokens: 4 } }
+          "cache me": { answer: ok, usage: { prompt_tokens: 10, completion_tokens: 2, prompt_tokens_details: { cached_tokens: 6 } } }
+        fallback: { answer: silent }
+  config:
+    pricing:
+      m: { input_per_million: 1000000, output_per_million: 2000000 }
+steps:
+  # the answer carries the block, the event the counts and the price (3 * 1 + 4 * 2 USD)
+  - chat: { protocol: openai, model: m, prompt: count me }
+    expect: { text: ok, json: { usage.prompt_tokens: 3, usage.completion_tokens: 4, usage.total_tokens: 7 } }
+    usage:
+      - { input_tokens: 3, output_tokens: 4, total_tokens: 7, cached_tokens: 0, cost_input_usd: 3, cost_output_usd: 8, cost_total_usd: 11 }
+  # Anthropic and Ollama clients get their own spelling of the same counts, and the event is the same
+  - chat: { protocol: anthropic, model: m, prompt: count me }
+    expect: { json: { usage.input_tokens: 3, usage.output_tokens: 4 } }
+    usage:
+      - { input_tokens: 3 }
+      - { api_format: anthropic, input_tokens: 3, output_tokens: 4, total_tokens: 7, cost_total_usd: 11 }
+  - chat: { protocol: ollama, model: m, prompt: count me }
+    expect: { json: { prompt_eval_count: 3, eval_count: 4 } }
+    usage:
+      - { input_tokens: 3 }
+      - { api_format: anthropic }
+      - { api_format: ollama, input_tokens: 3, output_tokens: 4, total_tokens: 7, cost_total_usd: 11 }
+  # prompt-cache reads are counted, and not priced differently (ADR 0013): 10 input, 2 output
+  - chat: { protocol: openai, model: m, prompt: cache me }
+    usage:
+      - { input_tokens: 3 }
+      - { api_format: anthropic }
+      - { api_format: ollama }
+      - { input_tokens: 10, output_tokens: 2, cached_tokens: 6, cost_input_usd: 10, cost_output_usd: 4, cost_total_usd: 14 }
+  # a node that reports no usage: nothing is invented, the event stays at 0
+  - chat: { protocol: openai, model: m, prompt: whatever }
+    expect: { absent: [ usage ] }
+    usage:
+      - { input_tokens: 3 }
+      - { api_format: anthropic }
+      - { api_format: ollama }
+      - { cached_tokens: 6 }
+      - { input_tokens: 0, output_tokens: 0, total_tokens: 0, cost_total_usd: 0, ok: 1 }

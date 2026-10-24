@@ -88,6 +88,7 @@ static const frx_abi *punk_frx(pTHX) {
 }
 
 #include "punk/punk_names.h"      /* fixed module/slot/key strings, named once */
+#include "punk/punk_escape.h"     /* HTML escaping, shared, and $c->escape_html */
 #include "punk/punk_xml.h"        /* the XML body path, on frx_abi's SV bridge */
 #include "punk/punk_obs.h"        /* the C ABI's observer registry - early,
                                    * because punk_context.h and punk_serve.h

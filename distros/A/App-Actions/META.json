@@ -44,7 +44,8 @@
             "IO::Handle" : "0",
             "IPC::System::Simple" : "0",
             "JSON::PP" : "0",
-            "Object::Configure" : "0",
+            "Log::Abstraction" : "0.41",
+            "Object::Configure" : "0.24",
             "POSIX" : "0",
             "Params::Get" : "0.17",
             "Params::Validate::Strict" : "0.33",
@@ -74,10 +75,11 @@
             "File::Temp" : "0",
             "FindBin" : "0",
             "JSON::PP" : "0",
-            "Test::DescribeMe" : "0",
             "Test::Exception" : "0",
+            "Test::Memory::Cycle" : "1.06",
+            "Test::Mockingbird" : "0.14",
             "Test::Most" : "0",
-            "Test::Warn" : "0"
+            "Test::Returns" : "0.05"
          }
       }
    },
@@ -85,17 +87,15 @@
    "resources" : {
       "bugtracker" : {
          "mailto" : "bug-App-Actions@rt.cpan.org",
-         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=App-Actions",
-         "x_url" : "https://rt.cpan.org/Public/Dist/Display.html?Name=App-Actions"
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=App-Actions"
       },
       "homepage" : "https://metacpan.org/pod/App::Actions",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/nigelhorne/App-Actions.git",
-         "web" : "https://github.com/nigelhorne/App-Actions",
-         "x_repository" : "https://github.com/nigelhorne/App-Actions"
+         "url" : "https://github.com/nigelhorne/App-Actions.git",
+         "web" : "https://github.com/nigelhorne/App-Actions"
       }
    },
-   "version" : "v0.001.0",
+   "version" : "v0.002.0",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

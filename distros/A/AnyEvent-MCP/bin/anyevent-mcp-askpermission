@@ -75,26 +75,37 @@ startup failure is detected from its exit status.
 
 =over
 
-=item --manage-rules $file
+=item --manage-rules FILE
 
-Opens a YAD list of rules in evaluation order. Select a rule to delete or move
-up/down. Under the file lock, changes are rejected if the list has changed.
+Open YAD rule list for FILE in evaluation order. Delete or reorder selected
+rules. File lock protects updates; changes fail if list changed elsewhere.
+Cannot combine with C<--edit-rules> or prompt-mode flags.
 
-=item --edit-rules $file
+=item --edit-rules FILE
 
-Edits the actual permission file with C<$VISUAL>, C<$EDITOR>,
-C<sensible-editor> or C<vi>. The editor handles external changes itself;
-this command does not validate or overwrite its saved contents.
+Edit permission rules in FILE using C<$VISUAL>, C<$EDITOR>,
+C<sensible-editor> or C<vi>. Does not validate or overwrite editor output.
+Cannot combine with C<--manage-rules> or prompt-mode flags.
+
+=item --tty
+
+Prompt only on C</dev/tty>, without YAD fallback. Unavailable terminal
+denies access. Cannot combine with C<--yad> or rule-management flags.
+
+=item --yad
+
+Prompt only with YAD, without terminal fallback. Unavailable YAD
+denies access. Cannot combine with C<--tty> or rule-management flags.
+
+=item --help
+
+Print short usage synopsis and exit.
 
 =back
 
-=head1 PROMPT INTERFACE
-
-C<--tty> uses only C</dev/tty>; C<--yad> uses only YAD. These options are
-mutually exclusive and apply only to permission prompts. Neither explicit
-mode falls back to another interface. Unavailable prompting denies access.
-Without either option the helper tries YAD, then a terminal if YAD cannot
-start. Closing or declining a working dialog never triggers fallback.
+Without explicit C<--tty> or C<--yad>, prompts try YAD first, then
+C</dev/tty> only if YAD cannot start. Closing or declining a working
+dialog never triggers fallback.
 
 =cut
 

@@ -14,9 +14,9 @@ use Time::HiRes ();
 
 use App::Actions::Access;
 use App::Actions::I18N qw(i18n throw validate_args);
-use App::Actions::Runner::Support qw(chomp_error);
+use App::Actions::Runner::Support qw(chomp_error default_logger);
 
-our $VERSION = '0.001.0';
+our $VERSION = '0.002.0';
 
 # How long the parent waits between looks at the jobs' logs.  Short enough
 # that a line appears while its job is still working, long enough that the
@@ -96,6 +96,11 @@ pulled).
 
 =item * C<quiet> - optional; show nothing of the jobs' logs.
 
+=item * C<logger> - optional; a L<Log::Abstraction> object (default:
+L<App::Actions::Runner::Support/default_logger>, standard error).  A job
+that dies in its child process is logged there at the C<error> level, so
+with the default logger it lands in that job's log file.
+
 =back
 
 =head3 RETURNS
@@ -120,6 +125,7 @@ See the L</SYNOPSIS>.
 		run_job   => { type => 'coderef' },
 		on_result => { type => 'coderef', optional => 1 },
 		quiet     => { type => 'boolean', optional => 1 },
+		logger    => { type => 'object', can => [qw(warn error notice)], optional => 1 },
 	}
 
 =head4 OUTPUT
@@ -146,9 +152,11 @@ sub new {
 		run_job => { type => 'coderef' },
 		on_result => { type => 'coderef', optional => 1 },
 		quiet => { type => 'boolean', optional => 1 },
+		# Where warnings and errors go; standard error when none is given.
+		logger => { type => 'object', can => [qw(warn error notice)], optional => 1 },
 	});
 
-	return bless { on_result => sub { }, %{$params}, slots => 0, logs => [] }, $class;
+	return bless { on_result => sub { }, %{$params}, logger => $params->{logger} || default_logger(), slots => 0, logs => [] }, $class;
 }
 
 =head2 run
@@ -245,12 +253,15 @@ sub run {
 		capacity => $capacity,
 	};
 
-	my $watched = eval {
-		$self->_start_more($group);
-		$self->_watch($group, $fail_fast);
-		1;
-	};
-	$group->{error} = $@ unless $watched;
+	# The caller's $@ is left as it was when the group runs to the end.
+	{
+		local $@;
+		eval {
+			$self->_start_more($group);
+			$self->_watch($group, $fail_fast);
+			1;
+		} or $group->{error} = $@;
+	}
 
 	if (defined $group->{error}) {
 		# An interrupted or broken run should not leave jobs working behind
@@ -378,14 +389,19 @@ sub _watch {
 			Time::HiRes::sleep($POLL_SECONDS);
 			next;
 		}
-		last if $pid < 0;
+		# -1 means there is no child left to wait for, although some are
+		# still listed: the caller set $SIG{CHLD} to IGNORE, say, and the
+		# system reaped them.  They have finished, so they are collected now
+		# rather than left out of the results without a word.
+		my @finished = $pid < 0 ? keys %{$running} : ($pid);
+		for my $done (@finished) {
+			my $entry = delete $running->{$done};
+			next unless $entry;
 
-		my $entry = delete $running->{$pid};
-		next unless $entry;
-
-		$self->_collect($entry);
-		$self->_note_missing($group, $entry);
-		$group->{stopping} = 1 if $entry->{result} && $entry->{result}{result} eq 'failure' && $fail_fast;
+			$self->_collect($entry);
+			$self->_note_missing($group, $entry);
+			$group->{stopping} = 1 if $fail_fast && $entry->{result} && ($entry->{result}{result} || '') eq 'failure';
+		}
 
 		$self->_start_more($group) unless $group->{stopping};
 	}
@@ -433,6 +449,10 @@ sub _child {
 	STDOUT->autoflush(1);
 	STDERR->autoflush(1);
 
+	# A plain print goes to the selected handle, which the caller may have
+	# pointed elsewhere; the job's output belongs in its log.
+	select STDOUT;
+
 	return $self->_run_job($entry);
 }
 
@@ -450,7 +470,7 @@ sub _run_job {
 	};
 	if (!$ok) {
 		my $error = chomp_error($@ || $self->i18n('runner.parallel.did_not_run', { name => $entry->{plan}{display_name} }));
-		print STDERR $self->i18n('runner.error', { error => $error }), "\n";
+		$self->{logger}->error($self->i18n('runner.error', { error => $error }));
 	}
 
 	STDOUT->flush;
@@ -480,7 +500,11 @@ sub _run_here {
 	STDOUT->autoflush(1);
 	STDERR->autoflush(1);
 
+	# As in a child, the job's plain prints go to its log whatever handle
+	# the caller had selected; the caller's choice is put back afterwards.
+	my $selected = select STDOUT;
 	$self->_run_job($entry);
+	select $selected;
 
 	{
 		no autodie qw(open);
@@ -555,7 +579,7 @@ sub _collect {
 	my $json = _read_from($path, 0);
 	$self->throw('runner.file_read_failed', { file => $path, error => "$!" }) unless defined $json;
 
-	my $result = eval { JSON::PP->new->decode($json) };
+	my $result = do { local $@; eval { JSON::PP->new->decode($json) } };
 	return unless ref $result eq 'HASH';
 
 	$entry->{result} = $result;
@@ -619,9 +643,10 @@ sub _log_name {
 	$name =~ s/[^A-Za-z0-9_.-]+/_/g;
 	# Each end separately: as one alternation the second branch rescans every
 	# inner run of separators from each of its positions, which is quadratic.
+	# The end is trimmed after the cut, which can leave a separator last.
 	$name =~ s/\A[_.-]+//;
-	$name =~ s/[_.-]+\z//;
 	$name = substr($name, 0, $LOG_NAME_LENGTH);
+	$name =~ s/[_.-]+\z//;
 
 	return length $name ? "job-$slot-$name.log" : "job-$slot.log";
 }

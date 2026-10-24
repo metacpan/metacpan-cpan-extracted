@@ -31,13 +31,13 @@ package Database::BI::Model::Geocode;
 use strict;
 use warnings;
 
-use Carp			qw(croak);
+use Carp			qw(croak carp);
 use Readonly;
 use Scalar::Util		qw(blessed);
 use Params::Get			();
 use Params::Validate::Strict	qw(validate_strict);
 
-our $VERSION = '0.015.0';
+our $VERSION = '0.016.0';
 
 # The version of Geo::Coder::Free this module asks for: 0.46 added valid_location()
 # and on_error => 'undef', 0.47 added geocode_many(), and this module asks for both
@@ -182,7 +182,7 @@ B<Ask whether the geocoder is available before offering it in the UI:>
     my ($ok, $why) = $geocode->geocoder_available();
 
     unless ($ok) {
-        warn "Map panel disabled: $why\n";
+        carp "Map panel disabled: $why";
     }
 
 B<Inject a test double so geocoding works without a real geocoder:>
@@ -438,7 +438,7 @@ The count invariant always holds:
     );
 
     if ($result->{'capped'}) {
-        warn "Some cities were not looked up; load the page again to finish them.\n";
+        carp "Some cities were not looked up; load the page again to finish them.";
     }
 
     for my $m (@{ $result->{'markers'} }) {

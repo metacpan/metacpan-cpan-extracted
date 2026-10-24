@@ -3,7 +3,7 @@ package Database::BI::Tutorial;
 use strict;
 use warnings;
 
-our $VERSION = '0.015.0';
+our $VERSION = '0.016.0';
 
 # ---------------------------------------------------------------------------
 # The tutorial that the application shows at GET /tutorial.
@@ -548,6 +548,23 @@ my @CHAPTERS = (
 		try    => { href => '/stats?l=table:virginia_counties', label => 'Try statistics on Virginia counties' },
 		routes => [ '/stats' ],
 	},
+	{
+		id    => 'insights',
+		part  => 'Charts and summaries',
+		title => 'Find outliers and trends automatically',
+		lead  => 'Insights scans your data and flags unusual values, changes over time, and repeating patterns.',
+		steps => [
+			'Open a table and click Insights.',
+			'Each card shows one finding: an outlier, a period change, a top mover, or a seasonal pattern.',
+			'An outlier is a value far outside the normal range for its group.',
+			'A period change compares the most recent month to the one before it.',
+			'A top mover is the category that changed the most between two periods.',
+			'Seasonality means the same pattern repeats from one period to the next.',
+			'Click View in chart on any card to open the chart that shows it.',
+		],
+		tip   => 'Insights need a date column and a number column to detect period changes and top movers.',
+		routes => [ '/insights' ],
+	},
 
 	# ---------------------------------------------------------------
 	# Save and share
@@ -769,6 +786,7 @@ my %ACTION_CHAPTERS = (
 	folder_view    => 'folder',
 	pivot_view     => 'pivot',
 	stats_view     => 'stats',
+	insights_view  => 'insights',
 	scatter_view   => 'scatter-chart',
 	stacked_view   => 'stacked-chart',
 	combo_view     => 'combo-chart',

@@ -2,15 +2,17 @@ package App::Actions::Check;
 
 use strict;
 use warnings;
+use Carp qw(croak);
 use Config;
 use File::Spec;
 use File::Temp ();
 use JSON::PP ();
+use Scalar::Util qw(blessed);
 
 use App::Actions::Docker;
 use App::Actions::Schema;
 
-our $VERSION = '0.001.0';
+our $VERSION = '0.002.0';
 
 # The shape of the JSON document this module prints.  Bump it whenever a key,
 # a value type or an enum changes, and update the schema below and the examples
@@ -190,14 +192,16 @@ sub run {
 
     # The report is built in a buffer so that a quiet run can drop it when
     # every check passed, without the checks themselves knowing.
+    # local puts the caller's handle back however the checks end, so one
+    # that dies cannot leave the object writing into a buffer nobody reads.
     my $target = $self->{output};
     my $report = '';
-    open my $buffer, '>', \$report or die "Unable to buffer the check report: $!";
-    $self->{output} = $buffer;
+    open my $buffer, '>', \$report or croak "Unable to buffer the check report: $!";
 
-    my $exit = $self->_run_checks;
-
-    $self->{output} = $target;
+    my $exit = do {
+        local $self->{output} = $buffer;
+        $self->_run_checks;
+    };
     close $buffer;
 
     # The JSON report replaces the text one rather than joining it, so that
@@ -261,7 +265,8 @@ sub _run_checks {
 sub host_info {
     my ($invocant, $os) = @_;
 
-    $os = $invocant->{os} if !defined $os && ref $invocant eq 'HASH';
+    # An object is blessed, so ref() names its class, not HASH.
+    $os = $invocant->{os} if !(defined $os && length $os) && blessed $invocant;
     $os = $^O unless defined $os && length $os;
 
     return {

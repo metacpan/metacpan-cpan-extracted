@@ -45,3 +45,6 @@ config.yml
 
 # Local deployment secrets (only the .example template is tracked)
 examples/service/.env
+
+# Claude Code worktrees (claude --worktree / isolated agents) -- never commit
+/.claude/worktrees/

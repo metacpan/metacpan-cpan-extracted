@@ -1,0 +1,12 @@
+--- ja.xml
++++ ja.xml
+@@ -5829,6 +5829,9 @@
+ 			<currency type="CNH">
+ 				<displayName>中国人民元(オフショア)</displayName>
+ 			</currency>
++			<currency type="CNX">
++				<displayName draft="contributed">中国人民銀行ドル</displayName>
++			</currency>
+ 			<currency type="CNY">
+ 				<displayName>中国人民元</displayName>
+ 				<symbol>元</symbol>

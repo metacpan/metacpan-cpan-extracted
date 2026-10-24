@@ -1,0 +1,18 @@
+--- cy.xml
++++ cy.xml
+@@ -4653,6 +4653,15 @@
+ 				<displayName count="many">yuan Tsieina (ar y môr)</displayName>
+ 				<displayName count="other">yuan Tsieina (ar y môr)</displayName>
+ 			</currency>
++			<currency type="CNX">
++				<displayName>Doler Banc Pobl Tsieina</displayName>
++				<displayName count="zero">doler Banc Pobl Tsieina</displayName>
++				<displayName count="one">ddoler Banc Pobl Tsieina</displayName>
++				<displayName count="two">ddoler Banc Pobl Tsieina</displayName>
++				<displayName count="few">doler Banc Pobl Tsieina</displayName>
++				<displayName count="many">doler Banc Pobl Tsieina</displayName>
++				<displayName count="other">doler Banc Pobl Tsieina</displayName>
++			</currency>
+ 			<currency type="CNY">
+ 				<displayName>Yuan Tsieina</displayName>
+ 				<displayName count="zero">yuan Tsieina</displayName>

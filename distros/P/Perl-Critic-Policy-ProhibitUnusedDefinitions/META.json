@@ -94,7 +94,7 @@
    "provides" : {
       "Perl::Critic::Policy::ProhibitUnusedDefinitions" : {
          "file" : "lib/Perl/Critic/Policy/ProhibitUnusedDefinitions.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       }
    },
    "release_status" : "stable",
@@ -109,7 +109,10 @@
          "web" : "https://github.com/Troglodyne-Internet-Widgets/perl-critic-policy-prohibitunuseddefinitions"
       }
    },
-   "version" : "0.006",
+   "version" : "0.007",
+   "x_contributors" : [
+      "troglodyne-bot <morpheus@troglodyne.net>"
+   ],
    "x_generated_by_perl" : "v5.44.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.43",
    "x_spdx_expression" : "MIT"

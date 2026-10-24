@@ -3,7 +3,7 @@ use 5.006001;
 use strict;
 use base qw(Exporter);
 our @EXPORT = qw{ make_varname };
-our $VERSION = "0.06";
+our $VERSION = "0.07";
 use Carp;
 
 our @lower =  qw(a b c d e f g h i j k l m n o p q r s t u v w x y z);
@@ -75,7 +75,7 @@ String::PerlIdentifier - Generate a random name for a Perl variable
 
 =head1 VERSION
 
-This document refers to version 0.06, released November 14 2016.
+This document refers to version 0.07, released October 23 2026.
 
 =head1 SYNOPSIS
 
@@ -201,21 +201,7 @@ ExtUtils::ModuleMaker and its test suite.
 
 	James E Keenan
 	CPAN ID: JKEENAN
-	jkeenan@cpan.org
-	http://search.cpan.org/~jkeenan
-
-=head1 SUPPORT
-
-Send email to jkeenan [at] cpan [dot] org.  Please include any of the
-following in the subject line:
-
-    String::PerlIdentifier
-    String-PerlIdentifier
-    make_varname
-
-in the subject line.  Please report any bugs or feature requests to
-C<bug-String-PerlIdentifier@rt.cpan.org>, or through the web interface at
-L<http://rt.cpan.org>.
+	jkeenan@pobox.com
 
 =head1 COPYRIGHT
 

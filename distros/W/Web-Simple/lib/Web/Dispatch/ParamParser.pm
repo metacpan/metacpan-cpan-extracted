@@ -5,6 +5,8 @@ use warnings FATAL => 'all';
 
 use Encode 'decode_utf8';
 
+our $MAX_BODY_SIZE = 8388608; # 8MiB
+
 sub UNPACKED_QUERY () { __PACKAGE__.'.unpacked_query' }
 sub UNPACKED_BODY () { __PACKAGE__.'.unpacked_body' }
 sub UNPACKED_BODY_OBJECT () { __PACKAGE__.'.unpacked_body_object' }
@@ -23,7 +25,8 @@ sub get_unpacked_body_from {
     if (!$_[0]->{CONTENT_LENGTH}) {
       {}
     } elsif (index($ct, 'application/x-www-form-urlencoded') >= 0) {
-      $_[0]->{'psgi.input'}->read(my $buf, $_[0]->{CONTENT_LENGTH});
+      my $buf = "";
+      _chunk_reader( $_[0], sub { $buf .= $_[0] } );
       _unpack_params($buf);
     } elsif (index($ct, 'multipart/form-data') >= 0) {
       my $p = get_unpacked_body_object_from($_[0])->param;
@@ -132,21 +135,28 @@ sub get_unpacked_uploads_from {
     require HTTP::Body;
     my $body = HTTP::Body->new(@{$_[0]}{qw(CONTENT_TYPE CONTENT_LENGTH)});
     $body->cleanup(1);
-    my $spin = 0;
+    _chunk_reader( $_[0], sub { $body->add( $_[0] ) } );
+    return $body;
+  }
+
+  sub _chunk_reader {
+    my ( $env, $callback ) = @_;
+    my $spin  = 0;
     my $input = $_[0]->{'psgi.input'};
-    my $cl = $_[0]->{CONTENT_LENGTH};
+    my $cl    = $_[0]->{CONTENT_LENGTH};
+    if ($cl > $MAX_BODY_SIZE) {
+      Carp::croak("Bad Content-Length: $cl > ${MAX_BODY_SIZE}");
+    }
     while ($cl) {
-      $input->read(my $chunk, $cl < 8192 ? $cl : 8192);
+      $input->read( my $chunk, $cl < 8192 ? $cl : 8192 );
       my $read = length $chunk;
       $cl -= $read;
-      $body->add($chunk);
-
-      if ($read == 0 && $spin++ > 2000) {
+      $callback->($chunk);
+      if ( $read == 0 && $spin++ > 2000 ) {
         require Carp;
         Carp::croak("Bad Content-Length: maybe client disconnect? ($cl bytes remaining)");
       }
     }
-    return $body;
   }
 }
 

@@ -20,22 +20,22 @@ name: TAP-DOM
 provides:
   TAP::DOM:
     file: lib/TAP/DOM.pm
-    version: '1.001'
+    version: '1.002'
   TAP::DOM::Archive:
     file: lib/TAP/DOM/Archive.pm
-    version: '1.001'
+    version: '1.002'
   TAP::DOM::Config:
     file: lib/TAP/DOM/Config.pm
-    version: '1.001'
+    version: '1.002'
   TAP::DOM::DocumentData:
     file: lib/TAP/DOM/DocumentData.pm
-    version: '1.001'
+    version: '1.002'
   TAP::DOM::Entry:
     file: lib/TAP/DOM/Entry.pm
-    version: '1.001'
+    version: '1.002'
   TAP::DOM::Summary:
     file: lib/TAP/DOM/Summary.pm
-    version: '1.001'
+    version: '1.002'
 requires:
   Archive::Tar: '0'
   Class::XSAccessor: '1.05'
@@ -58,7 +58,7 @@ resources:
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=TAP-DOM
   homepage: http://metacpan.org/release/TAP-DOM
   repository: git://github.com/renormalist/tap-dom.git
-version: '1.001'
+version: '1.002'
 x_Dist_Zilla:
   perl:
     version: '5.041003'
@@ -380,7 +380,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v1.001
+          tag: v1.002
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:

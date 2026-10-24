@@ -1,0 +1,16 @@
+--- sk.xml
++++ sk.xml
+@@ -4783,6 +4783,13 @@
+ 				<displayName count="many">čínskeho jüana (pobrežného)</displayName>
+ 				<displayName count="other">čínskych jüanov (pobrežných)</displayName>
+ 			</currency>
++			<currency type="CNX">
++				<displayName draft="contributed">čínsky dolár ČĽB</displayName>
++				<displayName count="one" draft="contributed">čínsky dolár ČĽB</displayName>
++				<displayName count="few" draft="contributed">čínske doláre ČĽB</displayName>
++				<displayName count="many" draft="contributed">čínskeho dolára ČĽB</displayName>
++				<displayName count="other" draft="contributed">čínskych dolárov ČĽB</displayName>
++			</currency>
+ 			<currency type="CNY">
+ 				<displayName>čínsky jüan</displayName>
+ 				<displayName count="one">čínsky jüan</displayName>

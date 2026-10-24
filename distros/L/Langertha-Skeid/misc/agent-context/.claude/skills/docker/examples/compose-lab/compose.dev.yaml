@@ -1,0 +1,11 @@
+# Explicit override; not named compose.override.yaml to avoid accidental loading.
+services:
+  app:
+    read_only: false
+    develop:
+      watch:
+        - action: sync+restart
+          path: ./app/app.py
+          target: /app/app.py
+        - action: rebuild
+          path: ./app/Dockerfile

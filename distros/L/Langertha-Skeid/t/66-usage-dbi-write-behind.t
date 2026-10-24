@@ -189,6 +189,7 @@ sub run_until {
     'each lost event reaches on_lost';
   ok !(grep { $_->[1] =~ /hunter2/ } @lost), 'with no password in the error';
 
+  $store->_reconnect_at(0);   # the reconnect backoff (k110) has run out
   ok $store->store(event('req-after'))->{ok}, 'once the database answers again, events are written';
   is rows($path, 'req-after'), 1, 'and are in the table';
 }

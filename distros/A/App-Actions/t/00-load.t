@@ -13,6 +13,6 @@ use_ok('App::Actions::Runner');
 use_ok('App::Actions::Schema');
 use_ok('App::Actions::Workflow');
 
-is($App::Actions::VERSION, '0.001.0', 'version is set');
+is($App::Actions::VERSION, '0.002.0', 'version is set');
 
 done_testing;

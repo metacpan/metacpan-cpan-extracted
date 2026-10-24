@@ -1,5 +1,5 @@
 package Configd::Syntax::Spaced;
-$Configd::Syntax::Spaced::VERSION = '0.002';
+$Configd::Syntax::Spaced::VERSION = '0.005';
 #ABSTRACT: Config files that are a directive, some whitespace and a value.
 
 use 5.034;
@@ -72,7 +72,7 @@ Configd::Syntax::Spaced - Config files that are a directive, some whitespace and
 
 =head1 VERSION
 
-version 0.002
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -93,12 +93,12 @@ Four of the files here are the same shape:
 
 opendkim, opendmarc, redis and chrony all write configuration this way -- a
 directive, whitespace, and the rest of the line -- and differ only in which
-directives may be said twice.  One reader and one writer between them, rather
+directives may be said twice, and which are lists that fragments add to.  One reader and one writer between them, rather
 than four that drift apart.
 
 A language in this shape subclasses this rather than L<Configd::Language>, and
 says only what is its own: its files, its units, and which of its directives may
-be said more than once.
+be said more than once or accumulate.
 
 It lives under C<Configd::Syntax::> rather than C<Configd::Language::> because
 L<Configd> finds languages by looking for modules under the latter, and a base

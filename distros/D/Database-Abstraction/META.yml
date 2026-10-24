@@ -38,7 +38,7 @@ build_requires:
   Test::Needs: '0'
   Test::NoWarnings: '0'
   Test::Permissions: '0'
-  Test::Returns: '0'
+  Test::Returns: '0.05'
   Test::Warn: '0'
   Test::Which: '0'
   Test::Without::Module: '0'
@@ -83,5 +83,5 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Database-Abstraction
   repository: git://github.com/nigelhorne/Database-Abstraction.git
-version: '0.51'
+version: '0.52'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

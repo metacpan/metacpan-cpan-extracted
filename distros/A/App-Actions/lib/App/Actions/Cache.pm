@@ -12,7 +12,7 @@ use JSON::PP ();
 use App::Actions::I18N qw(i18n);
 use App::Actions::Schema ();
 
-our $VERSION = '0.001.0';
+our $VERSION = '0.002.0';
 
 # The images action-run keeps are a cache: a run records what it pulled, so a
 # later command can list the images and say how much disk they take, and
@@ -21,6 +21,10 @@ our $VERSION = '0.001.0';
 # or replaced behind the tool's back.
 
 my $FORMAT = 1;
+
+# The width of a "YYYY-MM-DD HH:MM" stamp, the narrowest the LAST USED column
+# of a listing can be.
+my $STAMP_WIDTH = 16;
 
 # The shape of the JSON document this module prints.  Bump it whenever a key,
 # a value type or an enum changes, and update the schema below and the examples
@@ -155,8 +159,10 @@ sub base_directory {
         }
     } else {
         $base = $ENV{XDG_CACHE_HOME};
+        # Without HOME there is no home directory; catdir(undef, '.cache')
+        # would be /.cache, at the root of the file system.
         $base = File::Spec->catdir($ENV{HOME}, '.cache')
-            if !defined $base || !length $base;
+            if (!defined $base || !length $base) && defined $ENV{HOME} && length $ENV{HOME};
     }
 
     $base = File::Spec->catdir(File::Spec->curdir, '.cache')
@@ -166,7 +172,7 @@ sub base_directory {
 }
 
 sub default_path {
-	my $override = $ENV{ACTION_RUN_CACHE_FILE};
+    my $override = $ENV{ACTION_RUN_CACHE_FILE};
 
     # An empty variable is the same as an unset one.
     return (defined $override && length $override)
@@ -175,20 +181,20 @@ sub default_path {
 }
 
 sub new {
-	my ($class, %args) = @_;
+    my ($class, %args) = @_;
 
-	my $file = $args{file};
-	$file = default_path() if !defined $file || !length $file;
+    my $file = $args{file};
+    $file = default_path() if !defined $file || !length $file;
 
-	return bless { file => $file, data => undef }, $class;
+    return bless { file => $file, data => undef }, $class;
 }
 
 sub file { return $_[0]->{file} }
 
 sub load {
-	my ($self) = @_;
+    my ($self) = @_;
 
-	return $self->{data} if $self->{data};
+    return $self->{data} if $self->{data};
 
     my $images = {};
     my $path   = $self->{file};
@@ -203,15 +209,20 @@ sub load {
         $text = '' unless defined $text;
 
         # A cache that cannot be read is not worth failing a run over: the
-        # images are still there, and the next run records them again.
-        my $decoded = eval { JSON::PP->new->decode($text) };
+        # images are still there, and the next run records them again.  The
+        # caller's $@ is left as it was.
+        my $decoded = do { local $@; eval { JSON::PP->new->decode($text) } };
         if ($decoded && ref $decoded eq 'HASH' && ref $decoded->{images} eq 'HASH') {
             for my $image (keys %{ $decoded->{images} }) {
                 my $entry = $decoded->{images}{$image};
                 next unless ref $entry eq 'HASH';
+                # Only whole numbers are kept: a value someone edited into
+                # the file would otherwise be counted and subtracted, and
+                # make the cache document fail its own schema.
+                my ($pulls, $last_used) = @{$entry}{qw(pulls last_used)};
                 $images->{$image} = {
-                    pulls     => $entry->{pulls} || 0,
-                    last_used => $entry->{last_used},
+                    pulls     => (defined $pulls && !ref $pulls && $pulls =~ /\A\d+\z/) ? $pulls + 0 : 0,
+                    last_used => (defined $last_used && !ref $last_used && $last_used =~ /\A\d+\z/) ? $last_used + 0 : undef,
                 };
             }
         }
@@ -233,17 +244,37 @@ sub save {
         return 1;
     }
 
+    # A directory that cannot be made is reported as the folder the record
+    # cannot be written in, not with File::Path's own words and line.
     my $dir = dirname($path);
-    make_path($dir) unless -d $dir;
+    if (!-d $dir) {
+        make_path($dir, { error => \my $problems });
+        if (!-d $dir) {
+            my ($reason) = map { values %{$_} } @{ $problems || [] };
+            croak "cannot write a new cache file in '$dir': " . (defined $reason && length $reason ? $reason : 'unknown error');
+        }
+    }
 
     # The new contents go to a file File::Temp creates exclusively, with a
     # name nobody can predict, and replace the old by rename.  A name made of
     # the PID and rand() can be guessed, and open '>' follows a symbolic link
     # someone placed there, so in a shared directory (ACTION_RUN_CACHE_FILE
     # can point anywhere) the write would land in whatever file it named.
-    my $handle = eval {
-        File::Temp->new(TEMPLATE => '.cache-XXXXXXXXXX', DIR => $dir, SUFFIX => '.tmp', UNLINK => 0);
-    } or croak "cannot write a new cache file in '$dir': " . (length $@ ? $@ =~ s/\s+\z//r : 'unknown error');
+    # The caller's $@ is left as it was, and File::Temp's reason is given
+    # without its own file and line.
+    my ($handle, $failure);
+    {
+        local $@;
+        $handle = eval {
+            File::Temp->new(TEMPLATE => '.cache-XXXXXXXXXX', DIR => $dir, SUFFIX => '.tmp', UNLINK => 0);
+        };
+        $failure = $@;
+    }
+    if (!$handle) {
+        $failure = 'unknown error' unless defined $failure && length $failure;
+        1 while $failure =~ s/\s+at \S+ line \d+\.?\s*\z//;
+        croak "cannot write a new cache file in '$dir': $failure";
+    }
     my $temp = $handle->filename;
     binmode $handle;
     print {$handle} JSON::PP->new->canonical->pretty->encode($data);
@@ -311,15 +342,15 @@ sub forget {
         $count++ if delete $data->{images}{$image};
     }
 
-	$self->save if $count;
+    $self->save if $count;
 
-	return $count;
+    return $count;
 }
 
 sub format_size {
-	my ($bytes) = @_;
+    my ($bytes) = @_;
 
-	return '0 B' unless defined $bytes && $bytes > 0;
+    return '0 B' unless defined $bytes && $bytes > 0;
 
     my @units = qw(B KB MB GB TB);
     my $value = $bytes;
@@ -418,7 +449,9 @@ sub format_age {
     $seconds = 0 unless defined $seconds && $seconds =~ /\A-?\d+\z/;
     $seconds = 0 if $seconds < 0;
 
-    return $seconds < 60 ? 'just now' : format_span($seconds) . ' ago';
+    return $seconds < 60
+        ? __PACKAGE__->i18n('span.just_now')
+        : __PACKAGE__->i18n('span.ago', { span => format_span($seconds) });
 }
 
 # The entries a threshold selects.  An image with no recorded last use cannot
@@ -451,6 +484,32 @@ sub _stamp {
     );
 }
 
+# Purpose:     the first line of a listing or a prune, naming the record.
+# Entry:       $self - a Cache.
+# Exit:        the line, with its newline.
+# Side effects: none.
+sub _heading_line {
+    my ($self) = @_;
+
+    return __PACKAGE__->i18n('cache.file', { file => $self->{file} }) . "\n";
+}
+
+# Purpose:     what a listing or a prune says when it selected nothing: that
+#              nothing is old enough when there are images, or that nothing
+#              has been cached at all.
+# Entry:       $self - a Cache; $older_than - seconds, or undef.
+# Exit:        the sentence, with its newline.
+# Side effects: none.
+sub _nothing_selected {
+    my ($self, $older_than) = @_;
+
+    my $text = (defined $older_than && @{ $self->entries })
+        ? __PACKAGE__->i18n('cache.none_older', { span => format_span($older_than) })
+        : __PACKAGE__->i18n('cache.empty');
+
+    return "$text\n";
+}
+
 # The listing: one line per recorded image, with the size the daemon reports
 # and when a run last pulled it.  When the daemon cannot be reached the names
 # are still worth printing, so the sizes are left unknown instead of the
@@ -465,30 +524,32 @@ sub report {
         older_than => $older_than, now => $now,
     );
 
-    my $out = "Cache file: $self->{file}\n";
+    my $out = $self->_heading_line;
 
     if (!@$entries) {
-        if (defined $older_than && @{ $self->entries }) {
-            return $out . 'No cached images are older than '
-                . format_span($older_than) . ".\n";
-        }
-
-        return $out . "No images have been cached yet.\n";
+        return $out . $self->_nothing_selected($older_than);
     }
 
-    $out .= 'Only images older than ' . format_span($older_than) . ".\n"
+    $out .= __PACKAGE__->i18n('cache.only_older', { span => format_span($older_than) }) . "\n"
         if defined $older_than;
 
-    my $width = 5;
+    # Each column is as wide as its widest entry or its heading, whichever
+    # is longer, so a translated heading still lines up.
+    my %heading = map { $_ => __PACKAGE__->i18n("cache.heading.$_") }
+        qw(image size last_used age);
+    my $width = length $heading{image};
     for my $entry (@$entries) {
         $width = length $entry->{image} if length $entry->{image} > $width;
     }
+
+    my $stamp_width = length $heading{last_used};
+    $stamp_width = $STAMP_WIDTH if $stamp_width < $STAMP_WIDTH;
 
     my ($total, $sized, $missing) = (0, 0, 0);
     my @lines;
 
     for my $entry (@$entries) {
-        my $size_text = 'unknown';
+        my $size_text = __PACKAGE__->i18n('cache.unknown');
         if ($docker) {
             my $size = $docker->image_size($entry->{image});
             if (defined $size) {
@@ -497,25 +558,26 @@ sub report {
                 $size_text = format_size($size);
             } else {
                 $missing++;
-                $size_text = 'missing';
+                $size_text = __PACKAGE__->i18n('cache.size_missing');
             }
         }
 
         my $age_text = defined $entry->{last_used}
             ? format_age($now - $entry->{last_used})
-            : 'unknown';
+            : __PACKAGE__->i18n('cache.unknown');
 
         push @lines, sprintf(
-            '  %-*s  %10s  %-16s  %s',
-            $width, $entry->{image}, $size_text, _stamp($entry->{last_used}),
-            $age_text,
+            '  %-*s  %10s  %-*s  %s',
+            $width, $entry->{image}, $size_text, $stamp_width,
+            _stamp($entry->{last_used}), $age_text,
         );
     }
 
     $out .= "\n";
     $out .= sprintf(
-        "  %-*s  %10s  %-16s  %s\n",
-        $width, 'IMAGE', 'SIZE', 'LAST USED', 'AGE',
+        "  %-*s  %10s  %-*s  %s\n",
+        $width, $heading{image}, $heading{size}, $stamp_width,
+        $heading{last_used}, $heading{age},
     );
     $out .= "$_\n" for @lines;
 
@@ -525,12 +587,12 @@ sub report {
     ) . "\n";
 
     if (!$docker) {
-        $out .= "The Docker daemon is not reachable, so the sizes are unknown.\n";
+        $out .= __PACKAGE__->i18n('cache.unreachable') . "\n";
     } elsif ($missing) {
         $out .= __PACKAGE__->i18n('cache.missing', { count => $missing }) . "\n";
     }
 
-    $out .= "Remove them with \"action-run cache --prune\".\n" if $sized;
+    $out .= __PACKAGE__->i18n('cache.prune_hint') . "\n" if $sized;
 
     return $out;
 }
@@ -550,20 +612,10 @@ sub prune {
         older_than => $older_than, now => $now,
     );
 
-    my $out = "Cache file: $self->{file}\n";
+    my $out = $self->_heading_line;
     if (!@$entries) {
         my $data = { removed => 0, freed => 0, forgotten => 0, failed => [] };
-
-        if (defined $older_than && @{ $self->entries }) {
-            return (
-                $out . 'No cached images are older than '
-                    . format_span($older_than) . ".\n",
-                0,
-                $data,
-            );
-        }
-
-        return ($out . "No images have been cached yet.\n", 0, $data);
+        return ($out . $self->_nothing_selected($older_than), 0, $data);
     }
 
     my ($removed, $freed, $gone) = (0, 0, 0);
@@ -1337,7 +1389,9 @@ None.
     my $words = App::Actions::Cache::format_age($seconds);
 
 Says an age in words: C<just now> under a minute, otherwise L</format_span>
-followed by C<ago>, for example C<3 hours ago>.
+followed by C<ago>, for example C<3 hours ago>.  These are the English words;
+the text comes from the C<span.just_now> and C<span.ago> messages of
+L<App::Actions::I18N>, so another language says it its own way.
 
 =head3 API SPECIFICATION
 
@@ -1466,7 +1520,11 @@ JSON written as UTF-8 by L<JSON::PP>.  Its path may contain any characters
 your system allows, including non-ASCII and emoji; it is used as bytes.  The
 words that L</format_span> returns are in the current language of
 L<App::Actions::I18N> and may contain non-ASCII characters (for example in
-Chinese); encode them when you print.
+Chinese); encode them when you print.  The same is true of the text that
+L</report> and L</prune> return: every sentence and column heading in it is
+a message of that catalogue.  A column is padded by characters, not by
+screen columns, so headings in a language with wide characters (Chinese)
+may not line up exactly.  The JSON document is never translated.
 
 =head1 AUTHOR
 
@@ -1681,8 +1739,8 @@ are always true when the routine returns.
     │ seconds? : optional ℤ
     │ r!       : TEXT
     ├───────────────────────────────────────────────────
-    │ max(0, seconds?) < 60 ⇒ r! = "just now"
-    │ otherwise r! = format_span(seconds?) ⁀ " ago"
+    │ max(0, seconds?) < 60 ⇒ r! = i18n("span.just_now")
+    │ otherwise r! = i18n("span.ago", span ↦ format_span(seconds?))
     └───────────────────────────────────────────────────
 
 =head2 format_size

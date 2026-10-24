@@ -16,7 +16,12 @@ use App::Actions::Cache;
 use App::Actions::Check;
 use App::Actions::Logs;
 use App::Actions::Runner;
-use App::Actions::Schema qw(validate);
+use App::Actions::Schema qw(validate describe_errors);
+
+# Object::Configure reads the developer's own configuration files (~/.conf
+# and the like), where a UNIVERSAL logger would take the messages these tests
+# read off standard error.  An empty directory leaves the defaults in force.
+local $ENV{CONFIG_DIR} = tempdir(CLEANUP => 1);
 
 my $root = File::Spec->rel2abs(File::Spec->catdir(dirname(__FILE__), '..'));
 my $lib     = File::Spec->catdir($root, 'lib');
@@ -470,12 +475,26 @@ sub discover_examples {
                     && ref $example->{images} eq 'ARRAY'
                     ? 'preflight'
                     : 'check';
-        push @{ $examples{$document} }, $name;
-
         my $shipped  = $shipped_schema{$document};
         my $declared = $example->{schema_version};
+        my $current  = defined $declared && $declared eq $shipped->{version};
 
-        next if defined $declared && $declared eq $shipped->{version};
+        # A file that parses can still have the wrong shape, and the walk is
+        # what names the files, so it checks the shape too: a fixture that
+        # does not match its schema is rejected here and is not grouped, so it
+        # cannot count towards the coverage below.  The schema_version const
+        # is left out, since a stale version gets its own message below.
+        my @errors = grep { $current || !/\A\$\.schema_version: / }
+            validate($example, $shipped);
+        if (@errors) {
+            push @problems, "$name does not match the $document schema: "
+                . describe_errors(\@errors);
+            next;
+        }
+
+        push @{ $examples{$document} }, $name;
+
+        next if $current;
 
         push @problems, sprintf(
             '%s declares schema version %s, but %s ships %s',
@@ -602,6 +621,49 @@ for my $document (sort keys %shipped_schema) {
         qr/^\Q$malformed\E is not valid JSON/,
         'the rejection names the malformed fixture',
     );
+
+    # A fixture that parses but has the wrong shape - here a check document
+    # with the current version, one key missing and one it must not have - is
+    # named and rejected by the walk as well, not first by a later test.
+    my $misshapen = 'zz-temporary-misshapen-check.json';
+    my %misshapen = (%$check_example, unexpected => 1);
+    delete $misshapen{ready};
+    write_file(
+        File::Spec->catfile($copied, $misshapen),
+        JSON::PP->new->canonical->pretty->encode(\%misshapen),
+    );
+
+    my (undef, $sorted, $refused) = discover_examples($copied);
+
+    ok(
+        !grep({ $_ eq $misshapen } map { @{ $sorted->{$_} || [] } } keys %$sorted),
+        'the misshapen fixture is not grouped as an example',
+    );
+    is(scalar @$refused, 2, 'the misshapen fixture is rejected beside the malformed one');
+    like(
+        join("\n", @$refused),
+        qr/^\Q$misshapen\E does not match the check schema: \$\.\w+: (?:missing|unexpected key) \(and 1 more\)$/m,
+        'the rejection names the misshapen fixture and what is wrong with it',
+    );
+    unlink File::Spec->catfile($copied, $misshapen);
+
+    # A stale version is still reported as a version, not as a shape problem
+    # with schema_version, and the file is still grouped as before.
+    my $stale = 'zz-temporary-stale-check.json';
+    write_file(
+        File::Spec->catfile($copied, $stale),
+        JSON::PP->new->canonical->pretty->encode(
+            { %$check_example, schema_version => $check_schema->{version} - 1 },
+        ),
+    );
+
+    my (undef, $kept, $stale_problems) = discover_examples($copied);
+    my @stale = grep { /\A\Q$stale\E / } @$stale_problems;
+
+    is(scalar @stale, 1, 'a fixture with an old version gets one message');
+    like($stale[0], qr/^\Q$stale\E declares schema version \d+, but App::Actions::Check ships \d+$/,
+        'and it is about the version');
+    ok((grep { $_ eq $stale } @{ $kept->{check} }), 'and the fixture is still grouped');
 }
 
 # Now the documents the commands actually print, against the same schemas.

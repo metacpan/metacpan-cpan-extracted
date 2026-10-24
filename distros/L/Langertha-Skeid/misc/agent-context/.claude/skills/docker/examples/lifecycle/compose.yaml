@@ -1,0 +1,28 @@
+# Disposable readiness -> one-shot job -> application dependency graph.
+name: docker-lifecycle-lab
+services:
+  dependency:
+    image: python:3.13-slim
+    command: [python, -m, http.server, "8080"]
+    user: "10001:10001"
+    read_only: true
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080',timeout=2).close()"]
+      interval: 3s
+      timeout: 3s
+      retries: 10
+    restart: "no"
+  prepare:
+    image: python:3.13-slim
+    depends_on:
+      dependency:
+        condition: service_healthy
+    command: [python, -c, "print('Preparation succeeded; a real migration needs its own locking/idempotency')"]
+    restart: "no"
+  app:
+    image: python:3.13-slim
+    depends_on:
+      prepare:
+        condition: service_completed_successfully
+    command: [python, -c, "import time; print('Application started',flush=True); time.sleep(3600)"]
+    restart: "no"

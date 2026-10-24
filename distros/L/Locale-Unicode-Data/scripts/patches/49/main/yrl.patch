@@ -1,0 +1,14 @@
+--- yrl.xml
++++ yrl.xml
+@@ -4739,6 +4739,11 @@
+ 				<displayName count="one">Yuwã Xinawara (offshore)</displayName>
+ 				<displayName count="other">Yuwã-ita Xinawara (offshore)</displayName>
+ 			</currency>
++			<currency type="CNX">
++				<displayName>Dóra Bãku Pupulari Xinawara suí</displayName>
++				<displayName count="one" draft="contributed">Dóra Bãku Pupulari Xinawara suí</displayName>
++				<displayName count="other" draft="contributed">Dóra-ita Bãku Pupulari Xinawara suí</displayName>
++			</currency>
+ 			<currency type="CNY">
+ 				<displayName>Yuwã Xinawara</displayName>
+ 				<displayName count="one">Yuwã Xinawara</displayName>

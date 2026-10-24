@@ -144,6 +144,11 @@ jobs:
       - name: Run tests
         if: runner.os != 'Windows'
         shell: bash
+        # AUTOMATED_TESTING skips t/space-path.t; the plain test runs are where
+        # paths with spaces are still checked (not the coverage run, where the
+        # second pass of the suite takes most of an hour).
+        env:
+          SPACE_PATH: 1
         run: |
           eval $(perl -I ~/perl5/lib/perl5 -Mlocal::lib)
           prove -lr t/
@@ -151,6 +156,8 @@ jobs:
       - name: Run tests (Windows)
         if: runner.os == 'Windows'
         shell: cmd
+        env:
+          SPACE_PATH: 1
         run: |
           @echo off
           set "PATH=%USERPROFILE%\perl5\bin;%PATH%"

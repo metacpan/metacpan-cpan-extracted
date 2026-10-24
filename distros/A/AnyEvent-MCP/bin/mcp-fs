@@ -177,57 +177,47 @@ See L<AnyEvent::MCP/GLOBAL CONFIGURATION> for named HTTP settings.
 
 =head1 OPTIONS
 
-Common options, including C<--name>, C<--bind>, C<--token>,
-C<--stdio>, C<--connect>, C<--print-url>, C<--auto-allow> and
-C<--auto-deny>, are documented in
-L<AnyEvent::MCP::Server::Simple/mcp_getoptions>.
-The default service-instance name is C<default>; C<--name> also selects
-the filesystem permission-rule file described below.
-Unlike ordinary startup, C<--print-url> does not require a workdir.
-C<--tool-help> prints the tools available with the selected configuration
-and installed utilities, including argument types and descriptions, then
-exits without starting the MCP listener. Supply the usual WORKDIR arguments.
+Common server options: L<AnyEvent::MCP::Server::Simple/mcp_getoptions>.
+The default instance name is C<default>; C<--name> also selects filesystem
+permission file C<rules/fs-NAME.ini>. C<--print-url> needs no WORKDIR,
+while C<--tool-help> requires the usual WORKDIR arguments to report
+tools available with selected configuration and installed utilities.
 
 For example, C<--auto-allow '*,inspect,workdir-read'> together with
 C<--auto-allow '*,read,workdir-read'> approves only those action classes
 within workdir-read authority. C<--auto-allow '*,*,workdir-write'> approves
-any action needing at most workdir-write authority (including read and no grants).
+any action requiring at most workdir-write authority, including read.
 
 =over
 
 =item --exec-cmd SANDBOX-GRANT,...
 
-Run a command with the named sandbox grants. No MCP server or permission rules
-are used; the current directory is the workdir. With C<--sandbox=none> the
-command runs directly with normal host-user privileges.
-Defaults to C<$SHELL> or C</bin/sh> if no command is supplied.
-The C<--> separator before the command is optional.
+Run command with specified sandbox grants, using current directory as
+workdir; no MCP listener or permission rules. Supply command and arguments
+after optional C<--> delimiter. Without command, run C<$SHELL> or C</bin/sh>.
+C<--sandbox none> runs with normal host-user privileges.
+Example: C<mcp-fs --exec-cmd workdir-read -- ls>.
 
-=item --ask $method
+=item --ask MODE
 
-Selects permission prompting: C<helper> (default), C<tty>, C<yad>, C<mcp>, or C<auto>.
-C<tty> and C<yad> force the corresponding built-in interface without fallback.
-Overrides C<PERL_ANYEVENT_MCP_PERMISSION_ASK>, which can configure the
-default for all servers using C<AnyEvent::MCP::Server::Permissions>.
-The default keeps approval local. C<mcp> delegates to client form elicitation;
-C<auto> uses elicitation when advertised and otherwise the local helper.
+Permission prompts: C<helper> (default), C<tty>, C<yad>, C<mcp>, C<auto>.
+Local helper keeps decisions local; tty/yad force interface without fallback.
+C<mcp> asks client; C<auto> prefers client elicitation when advertised,
+otherwise local helper. Overrides C<PERL_ANYEVENT_MCP_PERMISSION_ASK>.
 
 =item --sandbox MODE
 
-Select C<bwrap> (default), C<auto>, or C<none>. C<bwrap> requires a usable
-bubblewrap executable. C<auto> uses bubblewrap if found, otherwise runs
-unsandboxed; it does not fall back if an existing executable fails.
-C<none> deliberately runs workers with full host-user privileges.
-
-In unsandboxed mode every MCP worker (including read-only tools) requires
-approval for the actual maximum execution authority: world-write, network,
-shared-tmp and host-proc. Narrower approvals do not authorize execution;
-the server does not pretend that workdir mounts restrict direct processes.
-Startup warns prominently when there is no sandbox.
+Worker sandbox mode: C<bwrap> (default), C<auto>, C<none>.
+C<bwrap> requires working bubblewrap. C<auto> uses bubblewrap if installed,
+otherwise runs unsandboxed; failing bubblewrap does not silently fall back.
+C<none> runs with full host-user privileges. Unsandboxed workers require
+approval for maximum authority (world-write, network, shared-tmp, host-proc)
+even for reads; narrower grants cannot authorize them. Startup warns.
 
 =item --bwrap PATH
 
-Selects the bubblewrap executable. Defaults to C<bwrap> in C<PATH>.
+Use specified bubblewrap executable. Default: C<bwrap> found in C<PATH>.
+Relevant with C<--sandbox bwrap> or C<--sandbox auto>.
 
 =back
 
@@ -1492,7 +1482,7 @@ sub fs_workdir {
 }
 
 my $workdir_schema = {
-   description => "Configured workdir: persistent positive integer ID (or numeric string), or exact path from workdirs/resolved_workdirs. IDs are object keys in those listings, not argument positions. Required when multiple workdirs are configured.",
+   description => "Workdir ID or configured absolute path. Get IDs/paths from cerebro-fs.workdirs. IDs are persistent.",
    anyOf => [
       { type => "integer", minimum => 1 },
       { type => "string", minLength => 1 },
@@ -1503,11 +1493,11 @@ sub fs_result;
 
 # command output options affect presentation, never argv or permission scope.
 my %output_schema = (
-   grep => { type => "string", description => "Optional PCRE line filter for stdout only. Runs after bounded capture, without a shell." },
+   grep => { type => "string", description => "Optional PCRE stdout line filter after capture; no shell." },
    max_lines => { type => "integer", minimum => 1, maximum => 100000, default => 2000,
-      description => "Maximum returned stdout lines after filtering." },
+      description => "Max stdout lines after filtering." },
    max_bytes => { type => "integer", minimum => 1, maximum => 1048576, default => 65536,
-      description => "Maximum returned UTF-8 bytes per stream; stderr is never filtered." },
+      description => "Max returned UTF-8 bytes per stream; stderr unfiltered." },
 );
 
 sub fs_output_options {
@@ -1662,7 +1652,7 @@ sub fs_result {
 }
 
 mcp_tool workdirs =>
-   "List configured workdirs, VCS metadata markers at each workdir (without recursion or parent search), available VCS clients, sandbox grants, trusted mounts and runtime paths.",
+   "List workdirs, local VCS markers (no parent/recursive search), available VCS clients, sandbox grants, trusted mounts, runtime paths.",
    {
       type                 => "object",
       properties           => {},
@@ -1860,17 +1850,17 @@ sub fs_list_find {
 }
 
 $find && mcp_tool list =>
-   "List immediate filesystem entries without following symlinks. "
-   . "Compact text output uses /relative-directory headers for directories, f<TAB>approx-size<TAB>name "
-   . "for regular files, TYPE<TAB>name for l/p/s/b/c/? nodes, "
-   . "with compact size suffixes k/M/G/T/P using IEC powers of 1024, "
-   . "and !truncated when the result limit was exceeded. Backslash and newline are escaped in names.",
+   "List immediate entries; no symlink following. "
+   . "Text format: /relative-directory headers; f<TAB>approx-size<TAB>name for files; "
+   . "TYPE<TAB>name for l/p/s/b/c/? nodes. "
+   . "Size suffixes k/M/G/T/P use IEC powers (1024); "
+   . "!truncated means limit exceeded. Names escape backslash/newline.",
    {
       type                 => "object",
       properties           => {
          path   => {
             type        => "string",
-            description => "Directory to list; defaults to the selected workdir.",
+            description => "Directory; default: selected workdir.",
          },
          limit  => {
             type    => "integer",
@@ -1881,7 +1871,7 @@ $find && mcp_tool list =>
          workdir => $workdir_schema,
          reason => {
             type        => "string",
-            description => "Reason for requesting permission.",
+            description => "Why access needed.",
          },
       },
       additionalProperties => JSON::XS::false,
@@ -1892,18 +1882,18 @@ $find && mcp_tool list =>
 ;
 
 $find && mcp_tool find =>
-   "Find non-directory filesystem entries recursively by literal basename substring without following symlinks. Same output format as list.",
+   "Find non-directory entries recursively by literal basename substring; no symlink following. Output as list.",
    {
       type                 => "object",
       properties           => {
          path   => {
             type        => "string",
-            description => "Path to search recursively; defaults to the selected workdir.",
+            description => "Search root; default: selected workdir.",
          },
          name   => {
             type        => "string",
             minLength   => 1,
-            description => "Literal substring of the basename to find.",
+            description => "Literal basename substring.",
          },
          limit  => {
             type    => "integer",
@@ -1914,7 +1904,7 @@ $find && mcp_tool find =>
          workdir => $workdir_schema,
          reason => {
             type        => "string",
-            description => "Reason for requesting permission.",
+            description => "Why access needed.",
          },
       },
       required             => ["name"],
@@ -1937,7 +1927,7 @@ my $file_read = q{#perl
 };
 
 $perl && mcp_tool file_read =>
-   "Read up to 1 MiB by byte offset; returns structured {data: BASE64} on success or {error: STRING} on filesystem failure.",
+   "Read up to 1 MiB at byte offset. Returns {data: BASE64}, even for text; {error: STRING} on filesystem failure. Prefer read-lines for source/text.",
    {
       type                 => "object",
       properties           => {
@@ -1958,7 +1948,7 @@ $perl && mcp_tool file_read =>
          workdir => $workdir_schema,
          reason   => {
             type        => "string",
-            description => "Reason for requesting permission.",
+            description => "Why access needed.",
          },
       },
       required             => ["path"],
@@ -2005,10 +1995,10 @@ $perl && mcp_tool file_read =>
 ;
 
 $sed && mcp_tool read_lines =>
-   "Read byte-LF-delimited (0x0A) lines by positive line-number ranges. "
-   . "encoding: utf-8 (strict, default), latin1 (raw bytes as Latin-1 text), or base64 (each range's exact sed output bytes). "
-   . "linenums=true prefixes each line with its absolute line number and a colon (before base64 encoding, if selected). "
-   . "Each requested range returns two MCP text items: [range=N,M] metadata (truncated=1 only if output was truncated), then the selected text without added line endings. Order, overlaps and duplicates are preserved; raw-byte output is limited to 1 MiB.",
+   "Read byte-LF (0x0A) lines by positive line ranges. "
+   . "encoding: strict utf-8 (default), latin1 (raw bytes as text), base64 (exact range bytes). "
+   . "linenums=true prefixes absolute line number plus colon (before base64 encoding). "
+   . "Per range: two MCP text items, [range=N,M] metadata (truncated=1 if cut), then lines without added newlines. Preserves order, overlaps, duplicates; max 1 MiB raw output.",
    {
       type                 => "object",
       properties           => {
@@ -2017,7 +2007,7 @@ $sed && mcp_tool read_lines =>
          },
          ranges => {
             type     => "array",
-            description => "Inclusive line ranges, each N or N,M.",
+            description => 'Inclusive line ranges as strings, e.g. ["1,60", "80"]. Comma, not dash.',
             items    => {
                type    => "string",
                pattern => q{^[1-9][0-9]*(?:,[1-9][0-9]*)?$},
@@ -2027,19 +2017,19 @@ $sed && mcp_tool read_lines =>
          },
          encoding => {
             type        => "string",
-            description => "How each selected byte range is represented: utf-8 (strict, default), latin1, or base64. Line numbers always count LF (0x0A) bytes.",
+            description => "Range format: strict utf-8 (default), latin1, base64. Lines split at byte LF (0x0A).",
             enum        => ["utf-8", "latin1", "base64"],
             default     => "utf-8",
          },
          linenums => {
             type        => "boolean",
-            description => "Prefix each line, including blanks, with absolute line number and colon.",
+            description => "Prefix all lines, including blanks, with absolute number and colon.",
             default     => JSON::XS::false,
          },
          workdir => $workdir_schema,
          reason => {
             type        => "string",
-            description => "Reason for requesting permission.",
+            description => "Why access needed.",
          },
       },
       required             => ["path", "ranges"],
@@ -2154,7 +2144,7 @@ my $file_write = q{#perl
 };
 
 $perl && mcp_tool file_write =>
-   "Write up to 1 MiB of base64 data at a byte offset without truncating; returns structured {bytes: INTEGER} on success or {error: STRING} on filesystem failure.",
+   "Write up to 1 MiB Base64-decoded bytes at offset; no truncation. Returns {bytes: INTEGER} or {error: STRING} on filesystem failure.",
    {
       type                 => "object",
       properties           => {
@@ -2172,7 +2162,7 @@ $perl && mcp_tool file_write =>
          workdir => $workdir_schema,
          reason  => {
             type        => "string",
-            description => "Reason for requesting permission.",
+            description => "Why access needed.",
          },
       },
       required             => ["path", "data"],
@@ -2283,9 +2273,9 @@ my $path_op = q{#perl
 };
 
 $perl && mcp_tool path_op =>
-   "Perform pathname mutations in fixed order: unlink, rmdir, mkpath, mkdir, symlink, truncate, chmod, rename. "
-   . "Operations stop at the first failure; earlier changes remain and are not rolled back. "
-   . "mkpath creates missing components in the worker; symlink targets are link contents, not authority.",
+   "Mutate paths in fixed order: unlink, rmdir, mkpath, mkdir, symlink, truncate, chmod, rename. "
+   . "Stop at first failure; earlier changes remain (no rollback). "
+   . "mkpath creates missing components in worker; symlink target is link text, not sandbox authority.",
    {
       type                 => "object",
       properties           => {
@@ -2299,14 +2289,14 @@ $perl && mcp_tool path_op =>
             type => "boolean",
          },
          mkdir    => {
-            description => "Create path as a directory with this final mode, overriding umask.",
+            description => "Create directory with final mode (ignores umask).",
             anyOf       => [
                { type => "string", pattern => q{^[0-7]+$} },
                { type => "integer", minimum => 0 },
             ],
          },
          mkpath   => {
-            description => "Create missing path components with this final mode, overriding umask.",
+            description => "Create missing directories with final mode (ignores umask).",
             anyOf       => [
                { type => "string", pattern => q{^[0-7]+$} },
                { type => "integer", minimum => 0 },
@@ -2315,7 +2305,7 @@ $perl && mcp_tool path_op =>
          symlink  => {
             type        => "string",
             minLength   => 1,
-            description => "Create path as a symlink containing this target.",
+            description => "Create symlink; value is link target.",
          },
          truncate => {
             type    => "integer",
@@ -2330,12 +2320,12 @@ $perl && mcp_tool path_op =>
          rename    => {
             type        => "string",
             minLength   => 1,
-            description => "Rename path to this destination.",
+            description => "Rename destination.",
          },
          workdir => $workdir_schema,
          reason    => {
             type        => "string",
-            description => "Reason for requesting permission.",
+            description => "Why access needed.",
          },
       },
       required             => ["path"],
@@ -2570,12 +2560,12 @@ my $file_patch = q{#perl
 };
 
 $perl && $patch && mcp_tool file_patch =>
-   "Apply a unified diff to one regular file. Hunk counts are recomputed, fuzz is disabled, "
-   . "whole-hunk relocation is limited per hunk by distinct old-side lines. "
-   . "Pure insertion is allowed only at the beginning; elsewhere include old-side context. "
-   . "The diff argument is Unicode text (converted to UTF-8 bytes for patch), "
-   . "or base64 of raw patch bytes (autodetected: text has @ hunk markers; "
-   . "base64 cannot contain @).",
+   "Patch one regular file via unified diff. Recompute hunk counts; no fuzz. "
+   . "Whole-hunk relocation bounded per hunk by distinct old-side lines. "
+   . "Pure insertion only at file start; elsewhere include old-side context. "
+   . "diff: Unicode text (encoded UTF-8) "
+   . "or Base64 raw bytes; autodetect by @ hunk markers ("
+   . "Base64 cannot contain @).",
    {
       type                 => "object",
       properties           => {
@@ -2584,7 +2574,7 @@ $perl && $patch && mcp_tool file_patch =>
          workdir => $workdir_schema,
          reason  => {
             type        => "string",
-            description => "Reason for requesting permission.",
+            description => "Why access needed.",
          },
       },
       required             => ["path", "diff"],
@@ -2653,15 +2643,15 @@ $perl && $patch && mcp_tool file_patch =>
 ;
 
 $find && $grep && mcp_tool grep =>
-   "Search regular files of at most 1 MiB recursively without following symlinks or descending .git. "
-   . "Fixed-string matching by default; mode=pcre uses GNU grep -P. "
-   . "Stops after the result limit; reports truncation and timeout separately.",
+   "Search regular files up to 1 MiB recursively; skip symlinks and .git. "
+   . "Literal match default; mode=pcre uses GNU grep -P. "
+   . "Stop at limit; report truncation and timeout separately.",
    {
       type                 => "object",
       properties           => {
          path    => {
             type        => "string",
-            description => "Path to search; defaults to the selected workdir.",
+            description => "Search root; default: selected workdir.",
          },
          pattern => {
             type      => "string",
@@ -2677,12 +2667,12 @@ $find && $grep && mcp_tool grep =>
             minimum     => 1,
             maximum     => 1000,
             default     => 200,
-            description => "Maximum number of matching lines to return.",
+            description => "Max matching lines.",
          },
          workdir => $workdir_schema,
          reason  => {
             type        => "string",
-            description => "Reason for requesting permission.",
+            description => "Why access needed.",
          },
       },
       required             => ["pattern"],
@@ -2765,7 +2755,7 @@ my $stat = q{#perl
 };
 
 $perl && mcp_tool stat =>
-   "Get lstat metadata for up to 100 paths; symlinks are not followed.",
+   "lstat up to 100 paths; no symlink following.",
    {
       type                 => "object",
       properties           => {
@@ -2780,7 +2770,7 @@ $perl && mcp_tool stat =>
          workdir => $workdir_schema,
          reason => {
             type        => "string",
-            description => "Reason for requesting permission.",
+            description => "Why access needed.",
          },
       },
       required             => ["paths"],
@@ -2841,10 +2831,10 @@ $perl && mcp_tool stat =>
 ;
 
 mcp_tool exec =>
-   "Run arbitrary argv " . ($bwrap ? "in bubblewrap" : "UNSANDBOXED with full host-user privileges") . "; stdin_encoding: utf-8 (default), latin1 or base64; 4 MiB limit after decoding. "
-   . "stdout/stderr are UTF-8, captured to 1 MiB each and returned with max_lines/max_bytes limits. Optional grep is a PCRE stdout postfilter; stderr is unfiltered. Capture truncation is explicit. Sandbox grants are optional; "
-   . "explicit grants replace the workdir-read default. A command's exit status, signal or timeout is returned as a normal result, not a tool error. There is no command-prefix safety classification. Timeouts above 300 seconds require "
-   . "long-running permission; the maximum is six hours.",
+   "Run argv " . ($bwrap ? "in bubblewrap" : "UNSANDBOXED with full host-user privileges") . "; stdin_encoding: utf-8 (default), latin1 or base64; max 4 MiB decoded. "
+   . "stdout/stderr UTF-8, captured to 1 MiB each; max_lines/max_bytes bound response. Optional grep: PCRE stdout filter after capture; stderr unfiltered. Reports capture truncation. "
+   . "Explicit sandbox_grants replace default workdir-read. Exit/signal/timeout are normal results, not tool errors. No command-prefix safety classification. Timeout >300 s requires "
+   . "long-running grant; max six hours.",
    {
       type       => "object",
       properties => {
@@ -2857,7 +2847,7 @@ mcp_tool exec =>
          },
          sandbox_grants => {
             type        => "array",
-            description => "If omitted, defaults to workdir-read under bubblewrap. If supplied (including []), replaces this default entirely rather than extending it. Without bubblewrap effective grants are always maximum host authority. host-proc is unavailable with bubblewrap.",
+            description => "Providing sandbox_grants (even []) replaces this default entirely; otherwise workdir-read under bubblewrap. Without bubblewrap: full host authority. host-proc unavailable under bubblewrap.",
             items       => {
                type => "string",
                enum => [sort keys %sandbox_grant],
@@ -2865,21 +2855,21 @@ mcp_tool exec =>
          },
          reason => {
             type        => "string",
-            description => "Useful reason for requesting arbitrary command authority.",
+            description => "Why command needs authority.",
          },
          stdin  => { type => "string" },
          stdin_encoding => {
             type => "string",
             default => "utf-8",
             enum => [qw(utf-8 latin1 base64)],
-            description => "Convert stdin text to bytes as UTF-8 (default), Latin-1 code points U+0000..U+00FF, or canonical Base64; 4 MiB byte limit.",
+            description => "stdin bytes: UTF-8 (default), Latin-1 code points U+0000..U+00FF, or canonical Base64; max 4 MiB decoded.",
          },
          timeout => {
             type    => "integer",
             minimum => 1,
             maximum => 21600,
             default => 30,
-            description => "Seconds; values above 300 also request long-running permission.",
+            description => "Timeout seconds; >300 also requires long-running grant.",
          },
       },
       required             => [qw(argv reason)],
@@ -2978,19 +2968,19 @@ mcp_tool exec =>
 # fixed operations accept filenames, never caller-supplied VCS options or shell code.
 for my $operation (qw(diff status)) {
    mcp_tool "vcs-$operation" =>
-      "Run $operation for Git, SVN, CVS or Mercurial in a configured workdir. "
-      . "backend is explicit; cwd selects a directory within the workdir (default .). "
-      . "files are relative to cwd and stay within the selected workdir, not options. "
-      . "Uses a dedicated permission action and workdir-read; CVS also requests ssh-agent (including network). "
-      . "Returns the normal command exit/signal, bounded stdout/stderr and truncation flags. "
-      . "grep filters stdout using PCRE after the 1 MiB capture cap; max_lines/max_bytes limit returned output. "
-      . "Clients and their local configuration are trusted; the sandbox enforces the approved filesystem/network grants.",
+      "Run $operation via Git, SVN, CVS or Mercurial in workdir. "
+      . "Explicit backend; cwd within workdir (default .). "
+      . "files relative to cwd; must stay in workdir; never options. "
+      . "Dedicated permission plus workdir-read; CVS also needs ssh-agent/network. "
+      . "Returns exit/signal, bounded stdout/stderr, truncation flags. "
+      . "grep filters stdout via PCRE after 1 MiB capture; max_lines/max_bytes bound output. "
+      . "Trusts VCS client/config; sandbox enforces approved filesystem/network grants.",
       {
          type => "object",
          properties => {
             workdir => $workdir_schema,
             cwd => { type => "string", default => ".", minLength => 1,
-               description => "Command directory relative to the selected workdir; must resolve inside it. Does not change the mount boundary." },
+               description => "cwd relative to workdir; must stay inside. Mount boundary unchanged." },
             backend => { type => "string", enum => [qw(git svn cvs hg)] },
             files => { type => "array", items => { type => "string" }, default => [] },
             %output_schema,
@@ -3068,7 +3058,7 @@ mcp_config
          if $_[0]->isa ("AnyEvent::MCP::Server::HTTP");
    },
    short_instructions => "Filesystem access: read/edit files, run sandboxed commands, inspect VCS in configured workdirs. Discover tools when working with files.",
-   instructions => "Use workdirs to inspect configured workdirs, mounts and sandbox_grants. Select workdir by persistent positive integer ID (or numeric string) from the listing object keys, or exact configured/resolved path; IDs are not argument positions. Inactive mappings expire after seven days and IDs may then be reused. Stale paths fail. Paths are relative to the selected workdir; workdir-read/write expose only that workdir. all-workdirs-read/write expose every configured workdir; all-workdirs-read plus workdir-write allows writing only the selected workdir. Absolute paths in another configured workdir require all-workdirs authority; other absolute paths request home/world authority or shared-tmp for host tmp. Multi-path stat must stay within the selected workdir; rename may target another path but requires the combined sandbox grants and can fail with EXDEV at a mount boundary. Symlinks resolve inside the granted sandbox mounts; overlapping workdirs have unspecified access behavior. Trusted mount entries add baseline authority independent of requested grants; world-read retains writable exceptions, world-write ignores them. Exec supports explicit sandbox_grants and requires a useful reason. Prefer vcs-diff/vcs-status with an explicit backend for working-copy inspection; these use fixed argv and automatically request needed grants. Exec and VCS tools share grep/max_lines/max_bytes output options; stderr is unfiltered and capture_truncated means matches beyond the capture cap are unknown.\n";
+   instructions => "Start with workdirs: IDs/paths, mounts, sandbox_grants. Select persistent integer ID (listing key, not array position) or configured/resolved path. Inactive mappings expire after seven days; IDs may be reused; stale paths fail. Paths relative to selected workdir. workdir-read/write grant only selected workdir; all-workdirs-read/write grant every workdir. all-workdirs-read + workdir-write: read all, write selected only. Absolute paths in other workdirs need all-workdirs grants; other absolute paths need home/world grants or shared-tmp for host tmp. Multi-path stat stays in selected workdir; rename across paths needs combined grants and may fail EXDEV at mount boundary. Symlinks resolve inside granted mounts; overlapping workdir access unspecified. Trusted mounts add baseline authority; world-read keeps writable exceptions, world-write ignores them. exec requires useful reason and explicit sandbox_grants when needed. Prefer vcs-diff/vcs-status for working copies: explicit backend, fixed argv, automatic grants. exec/VCS: grep filters stdout via PCRE after capture; max_lines/max_bytes bound output; stderr unfiltered. capture_truncated means possible unseen matches.\n";
 
 mcp_start %$server_options, (stdio => $stdio);
 

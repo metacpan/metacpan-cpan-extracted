@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Punk ();
 
-our $VERSION = '0.65';
+our $VERSION = '0.66';
 
 sub _chain {
     my ($future, $pairs) = @_;

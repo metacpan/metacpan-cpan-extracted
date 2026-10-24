@@ -1,5 +1,10 @@
 Revision history for Perl extension Trog-TOTP
 
+1.008 2026-10-23 TEODESIAN
+    - No longer loads Carp::Always.  A library that loads it puts a stack
+      trace on every warn and die in each program that uses it, and that
+      is the program's choice to make.
+
 1.007 2026-09-25 TEODESIAN
     - Encode base32 with MIME::Base32 rather than Encode::Base2N, which
       needs a C++ build that cpm cannot install.  The encoded text is the

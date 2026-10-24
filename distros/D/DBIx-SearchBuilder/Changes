@@ -1,5 +1,9 @@
 Revision history for Perl extension DBIx::SearchBuilder.
 
+1.86 2026-10-23
+ - Use GROUP BY for more DISTINCT searches with ORDER BY, fixing queries rejected
+   by PostgreSQL and MySQL 8 when ordering by expressions or unselected columns
+
 1.85 2026-04-14
  - Use state hashref to support Perl < 5.28. Pointed out by @erempel. Thanks!
 

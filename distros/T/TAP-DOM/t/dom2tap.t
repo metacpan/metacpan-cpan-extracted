@@ -8,7 +8,7 @@ use Test::More;
 use TAP::DOM;
 use Data::Dumper;
 
-sub check_tap
+sub check_tap_common
 {
     my ($comment, $tapdata) = @_;
 
@@ -16,21 +16,6 @@ sub check_tap
     is($tapdata->{tests_planned},  6, "$comment - tests_planned");
     is($tapdata->{version},       13, "$comment - version");
     is($tapdata->{plan},      "1..6", "$comment - plan");
-
-    is($tapdata->{lines}[2]{number},  1,                               "$comment - [2] number");
-    is($tapdata->{lines}[2]{is_test}, 1,                               "$comment - [2] is_test");
-    is($tapdata->{lines}[2]{is_ok},   1,                               "$comment - [2] is_ok");
-    is($tapdata->{lines}[2]{raw},       "ok 1 - use Data::DPath;",     "$comment - [2] raw");
-    is($tapdata->{lines}[2]{as_string}, "ok 1 - use Data::DPath;",     "$comment - [2] as_string");
-
-    is($tapdata->lines->[2]->number,    1,                             "$comment - [2] number via methods");
-    is($tapdata->lines->[2]->is_test,   1,                             "$comment - [2] is_test via methods");
-    is($tapdata->lines->[2]->is_ok,     1,                             "$comment - [2] is_ok via methods");
-    is($tapdata->lines->[2]->raw,       "ok 1 - use Data::DPath;",     "$comment - [2] raw via methods");
-    is($tapdata->lines->[2]->as_string, "ok 1 - use Data::DPath;",     "$comment - [2] as_string via methods");
-
-    is($tapdata->{lines}[2]{_children}[0]{data}[0]{name}, "Hash one",     "$comment - [2]...{data}");
-    is($tapdata->lines->[2]->_children->[0]->data->[0]{name}, "Hash one", "$comment - [2]...{data} via methods");
 
     is($tapdata->{summary}{todo},         4,      "$comment - summary todo");
     is($tapdata->{summary}{total},        8,      "$comment - summary total");
@@ -51,6 +36,39 @@ sub check_tap
     is($tapdata->summary->status,       "FAIL", "$comment - summary status via methods");
     is($tapdata->summary->all_passed,   0,      "$comment - summary all_passed via methods");
     is($tapdata->summary->has_problems, 1,      "$comment - summary has_problems via methods");
+
+    is($tapdata->{lines}[2]{_children}[0]{data}[0]{name}, "Hash one",     "$comment - [2]...{data}");
+    is($tapdata->lines->[2]->_children->[0]->data->[0]{name}, "Hash one", "$comment - [2]...{data} via methods");
+
+    is($tapdata->{lines}[2]{number},  1,                               "$comment - [2] number");
+    is($tapdata->{lines}[2]{is_test}, 1,                               "$comment - [2] is_test");
+    is($tapdata->{lines}[2]{is_ok},   1,                               "$comment - [2] is_ok");
+
+    is($tapdata->lines->[2]->number,    1,                             "$comment - [2] number via methods");
+    is($tapdata->lines->[2]->is_test,   1,                             "$comment - [2] is_test via methods");
+    is($tapdata->lines->[2]->is_ok,     1,                             "$comment - [2] is_ok via methods");
+}
+
+sub check_tap
+{
+    my ($comment, $tapdata) = @_;
+
+    check_tap_common($comment, $tapdata);
+    is($tapdata->{lines}[2]{raw},       "ok 1 - use Data::DPath;",     "$comment - [2] raw");
+    is($tapdata->{lines}[2]{as_string}, "ok 1 - use Data::DPath;",     "$comment - [2] as_string");
+    is($tapdata->lines->[2]->raw,       "ok 1 - use Data::DPath;",     "$comment - [2] raw via methods");
+    is($tapdata->lines->[2]->as_string, "ok 1 - use Data::DPath;",     "$comment - [2] as_string via methods");
+}
+
+sub check_tap_normalized
+{
+    my ($comment, $tapdata) = @_;
+
+    check_tap_common($comment, $tapdata);
+    is($tapdata->{lines}[2]{raw},       "ok use Data::DPath;",         "$comment - [2] raw");                      # we come from normalized
+    is($tapdata->{lines}[2]{as_string}, "ok 1 use Data::DPath;",       "$comment - [2] as_string");                # as_string puts number back in
+    is($tapdata->lines->[2]->raw,       "ok use Data::DPath;",         "$comment - [2] raw via methods");          # we come from normalized
+    is($tapdata->lines->[2]->as_string, "ok 1 use Data::DPath;",       "$comment - [2] as_string via methods");    # as_string puts number back in
 }
 
 my $tap;
@@ -66,11 +84,26 @@ check_tap("original TAP", $tapdom);
 
 my $tap2 = $tapdom->to_tap;
 my $tapdom2 = TAP::DOM->new( tap => $tap2 );
-check_tap("regenerated TAP", $tapdom2);
+check_tap("to_tap()", $tapdom2);
 
 # wantarray
 my @tap2 = $tapdom->to_tap;
 is(scalar(@tap2), 20, "to_tap - wantarray");
 is ($tap2, join("\n", @tap2)."\n", "to_tap - scalar is concatenated array");
+
+# use 'raw'
+my $tap3 = $tapdom->to_tap('raw');
+my $tapdom3 = TAP::DOM->new( tap => $tap3 );
+check_tap("to_tap(raw)", $tapdom3);
+
+# use 'as_string'
+my $tap4 = $tapdom->to_tap('as_string');
+my $tapdom4 = TAP::DOM->new( tap => $tap4 );
+check_tap("to_tap(as_string)", $tapdom4);
+
+# use 'normalized'
+my $tap5 = $tapdom->to_tap('normalized');
+my $tapdom5 = TAP::DOM->new( tap => $tap5 );
+check_tap_normalized("to_tap(normalized)", $tapdom5);
 
 done_testing();

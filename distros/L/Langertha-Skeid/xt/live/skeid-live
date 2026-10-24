@@ -1,0 +1,74 @@
+#!/usr/bin/env perl
+# Manages the Python AI services skeid's live tests run against: Perl for the management, Python
+# for the AI work. The services live in /opt/skeid-live on a host (default crag) and are started
+# over ssh, each in a memory-capped systemd scope.
+#
+#   xt/live/skeid-live start|stop|status|wait docling|speaches
+#   xt/live/skeid-live env          # the SKEID_LIVE_* variables for the tests
+use strict;
+use warnings;
+
+my $HOST = $ENV{SKEID_LIVE_HOST} // 'root@10.230.30.250';
+my $ROOT = '/opt/skeid-live';
+my $KEY  = $ENV{SKEID_LIVE_KEY} // 'live-test-key';
+
+my %SERVICE = (
+  docling => {
+    pat => q{docling-serve run},
+    port => 5001, health => '/health', mem => '8G',
+    env  => "HF_HOME=$ROOT/cache/hf DOCLING_SERVE_ENABLE_UI=false DOCLING_SERVE_API_KEY=$KEY",
+    cmd  => "$ROOT/docling/bin/docling-serve run --host 0.0.0.0 --port 5001",
+  },
+  speaches => {
+    pat => q{speaches.main:create_app},
+    port => 8000, health => '/health', mem => '10G',
+    env  => "HF_HOME=$ROOT/cache/hf API_KEY=$KEY LOOPBACK_HOST_URL=http://127.0.0.1:8000 WHISPER__COMPUTE_TYPE=int8 WHISPER__INFERENCE_DEVICE=cpu",   # the in-process ASGI transport of speaches breaks on commit
+    cmd  => "$ROOT/speaches/bin/uvicorn --factory speaches.main:create_app --host 0.0.0.0 --port 8000",
+    cwd  => "$ROOT/speaches-src",
+  },
+);
+
+sub ssh { my $out = qx(ssh -o BatchMode=yes -o ConnectTimeout=8 $HOST \Q$_[0]\E 2>&1 </dev/null); return ( $? >> 8, $out ) }
+
+sub is_up {
+  my ($svc) = @_;
+  my ( $rc, $out ) = ssh("curl -s -m5 -o /dev/null -w %{http_code} http://localhost:$SERVICE{$svc}{port}$SERVICE{$svc}{health}");
+  return $out =~ /\A(?:200|401)\z/;
+}
+
+my ( $cmd, $svc ) = @ARGV;
+defined $cmd or die "usage: skeid-live start|stop|status|wait <service> | env\n";
+
+if ( $cmd eq 'env' ) {
+  my ($h) = $HOST =~ /\@?([^@]+)\z/;
+  print "export SKEID_LIVE_DOCLING_URL=http://$h:$SERVICE{docling}{port}\n",
+        "export SKEID_LIVE_SPEACHES_URL=http://$h:$SERVICE{speaches}{port}\n",
+        "export SKEID_LIVE_DOCLING_KEY=$KEY SKEID_LIVE_SPEACHES_KEY=$KEY\n";
+  exit 0;
+}
+
+my $s = $SERVICE{ $svc // '' } or die "unknown service '" . ( $svc // '' ) . "' (docling, speaches)\n";
+
+if ( $cmd eq 'status' ) { print "$svc: ", ( is_up($svc) ? "up\n" : "down\n" ); exit( is_up($svc) ? 0 : 1 ) }
+if ( $cmd eq 'stop' ) {
+  ssh("systemctl stop skeid-live-$svc.service; pkill -f '[$s->{pat}]'; true");
+  print "$svc: stopped\n";
+  exit 0;
+}
+if ( $cmd eq 'start' ) {
+  if ( is_up($svc) ) { print "$svc: already up\n"; exit 0 }
+  my $cwd = $s->{cwd} // $ROOT;
+  # a transient systemd unit: returns at once, memory-capped, stopped by `stop`
+  my $setenv = join q{ }, map { "-E $_" } split q{ }, $s->{env};
+  ssh("mkdir -p $ROOT/run && systemctl reset-failed skeid-live-$svc.service 2>/dev/null; "
+    . "systemd-run --unit=skeid-live-$svc -p MemoryMax=$s->{mem} -p WorkingDirectory=$cwd "
+    . "-p StandardOutput=file:$ROOT/run/$svc.log -p StandardError=inherit $setenv --quiet $s->{cmd}");
+  print "$svc: starting\n";
+  $cmd = 'wait';
+}
+if ( $cmd eq 'wait' ) {
+  for ( 1 .. 90 ) { is_up($svc) and do { print "$svc: up\n"; exit 0 }; sleep 5 }
+  print "$svc: did not come up, see $ROOT/run/$svc.log\n";
+  exit 1;
+}
+die "unknown command '$cmd'\n";

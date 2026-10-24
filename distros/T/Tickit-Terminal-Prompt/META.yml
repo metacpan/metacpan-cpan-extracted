@@ -1,0 +1,21 @@
+---
+abstract: 'a scrolling terminal command prompt'
+author:
+  - 'Joel Roth <joelz@pobox.com>'
+build_requires: {}
+configure_requires:
+  Module::Build::Tiny: '0.039'
+dynamic_config: 0
+generated_by: 'App::ModuleBuildTiny version 0.047, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Tickit-Terminal-Prompt
+provides:
+  Tickit::Terminal::Prompt:
+    file: lib/Tickit/Terminal/Prompt.pm
+    version: '0.003'
+version: '0.003'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

@@ -1,0 +1,19 @@
+title: An operator drains a node through the admin API; traffic moves to the other node and no request fails
+setup:
+  admin_key: admin-secret
+  nodes:
+    - { id: a, model: m, upstream: { fallback: { answer: from a } } }
+    - { id: b, model: m, upstream: { fallback: { answer: from b } } }
+steps:
+  - http: { method: POST, path: /skeid/nodes/a/health, bearer: admin-secret, body: { healthy: false } }
+  - chat: { protocol: openai, model: m, prompt: 1 }
+    expect: { text: from b }
+  - chat: { protocol: openai, model: m, prompt: 2 }
+    expect: { text: from b }
+    upstream:
+      a: { requests: 0 }
+      b: { requests: 2 }
+  - http: { method: POST, path: /skeid/nodes/a/health, bearer: admin-secret, body: { healthy: false } }
+  - http: { method: POST, path: /skeid/nodes/b/health, bearer: admin-secret, body: { healthy: false } }
+  - chat: { protocol: openai, model: m, prompt: 3 }
+    expect: { status: 503 }

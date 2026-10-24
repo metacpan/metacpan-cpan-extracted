@@ -274,6 +274,40 @@ CREATE TABLE aliases (
 );
 CREATE UNIQUE INDEX idx_aliases_unique ON aliases(alias,type);
 
+/*
+ * Source: main/*.xml//alias[@source="locale"]
+ * An alias with source="locale" redirects the lookup of an element to another element
+ * in the locale being resolved, not in the file that contains the alias. UTS #35 states
+ * that such aliases appear only in root, which holds at least through CLDR v49.1.
+ * Each alias becomes a rule for every table that stores the data it points to: when no
+ * data is found for the source keys in the requested locale or any of its parents other
+ * than root, the lookup is restarted from the requested locale with the source keys
+ * replaced by the target keys.
+ * See Locale::Unicode::Data->resolve()
+ * <https://www.unicode.org/reports/tr35/#Alias_Elements>
+ */
+CREATE TABLE data_aliases (
+     data_alias_id      INTEGER
+    -- The locale of the file containing the alias, i.e. und for root.xml
+    ,locale             VARCHAR(20) NOT NULL COLLATE NOCASE
+    -- Example: calendar_terms
+    ,table_name         VARCHAR(42) NOT NULL
+    -- JSON object of the table columns and values identifying the aliased data
+    -- Example: {"calendar":"japanese","term_type":"month"}
+    ,source             TEXT NOT NULL
+    -- JSON object of the same columns, with the values identifying the data the alias points to
+    -- Example: {"calendar":"gregorian","term_type":"month"}
+    ,target             TEXT NOT NULL
+    -- Example: /ldml/dates/calendars/calendar[@type='japanese']/months
+    ,source_path        TEXT NOT NULL
+    -- Example: /ldml/dates/calendars/calendar[@type='gregorian']/months
+    ,target_path        TEXT NOT NULL
+    ,PRIMARY KEY(data_alias_id)
+    ,CHECK( table_name REGEXP '^[a-z][a-z0-9\_]+$' )
+    ,FOREIGN KEY(locale) REFERENCES locales(locale) ON UPDATE CASCADE ON DELETE RESTRICT
+);
+CREATE UNIQUE INDEX idx_data_aliases_unique ON data_aliases(locale, table_name, source);
+
 -- Source: supplemental/metaZones.xml/supplementalData/metaZones/metazoneInfo/timezone[@type]
 -- Source: bcp47/timezone.xml/ldmlBCP47/keyword/key[name="tz"]/type
 CREATE TABLE metazones (

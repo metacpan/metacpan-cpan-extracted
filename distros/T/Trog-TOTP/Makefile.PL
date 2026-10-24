@@ -17,7 +17,6 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.014",
   "NAME" => "Trog::TOTP",
   "PREREQ_PM" => {
-    "Carp::Always" => 0,
     "Crypt::PRNG" => 0,
     "Digest::SHA" => 0,
     "List::Util" => "1.33",
@@ -33,7 +32,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "1.007",
+  "VERSION" => "1.008",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -41,7 +40,6 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Carp::Always" => 0,
   "Crypt::PRNG" => 0,
   "Digest::SHA" => 0,
   "File::Spec" => 0,

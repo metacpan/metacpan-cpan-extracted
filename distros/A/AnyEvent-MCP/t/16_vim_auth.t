@@ -143,7 +143,7 @@ my $init = rpc (1, "initialize", {
 ok !$init->{error} && $init->{result}{serverInfo},
    "stdio control channel initializes while a TCP peer sends no first byte";
 is $init->{result}{serverInfo}{name}, "mcp-vim", "stdio reports mcp-vim as its identity";
-like $init->{result}{instructions}, qr/Live Vim editing/,
+like $init->{result}{instructions}, qr/Live Vim buffers/,
    "stdio gives MCP clients live-buffer guidance";
 unlike JSON::XS::encode_json ($init->{result}), qr/xpcse/i,
    "stdio initialization does not expose the legacy browser name";

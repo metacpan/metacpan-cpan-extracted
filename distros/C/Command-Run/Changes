@@ -1,5 +1,20 @@
 Revision history for Perl extension Command-Run
 
+1.04 2026-10-24T06:33:58Z
+
+    - nofork mode now restores STDOUT and STDERR with dup2() instead of
+      re-opening them over the saved dup.  When the destination is a
+      character device (a terminal, /dev/null), re-opening gave the
+      handle a fresh output-side PerlIO with no layers, so the caller's
+      :encoding layer was silently lost and non-ASCII output produced
+      "Wide character in print" warnings.  Pipes and files were not
+      affected.
+
+    - Layers pushed for a nofork execution are now popped back to the
+      depth recorded before the redirect, rather than by a single
+      unconditional :pop, so a caller's own :encoding layer survives
+      even if binmode becomes idempotent in a future perl.
+
 1.03 2026-08-03T14:38:29Z
 
     - run() now takes command, stdout and stderr as temporary

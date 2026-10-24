@@ -2,7 +2,7 @@
 // @name         mcp-webbrowser support
 // @namespace    https://dist.schmorp.de/mcp-webbrowser
 // @description  AnyEvent::MCP's mcp-webbrowser support script
-// @version      1.0.20261018.1
+// @version      1.0.20261022.2
 // @updateURL    https://dist.schmorp.de/mcp-webbrowser/1/mcp-webbrowser.user.js
 // @downloadURL  https://dist.schmorp.de/mcp-webbrowser/1/mcp-webbrowser.user.js
 // @match        *://*/*
@@ -57,14 +57,14 @@ function start (tab, allow_menu, allow) {
 
    const symbols = { connecting: "🟡", connected: "🟢", disconnected: "🔴" };
    const title_symbols = { connecting: "○", connected: "●", disconnected: "⊗" };
-   const title_prefix = /\[(?:○|●|⊗)MCP\] /g;
+   const title_prefix = /^(?:\[(?:○|●|⊗)MCP\]\s*)+/;
 
    function plain_title (title) {
       return title.replace (title_prefix, "");
    }
 
    function update_title () {
-      if (!document.head || !document.querySelector ("title"))
+      if (!document.head)
          return;
 
       const enabled = tab?.mcp_webbrowser?.enabled && indicators.title;
@@ -77,7 +77,7 @@ function start (tab, allow_menu, allow) {
       }
 
       const base = plain_title (document.title);
-      const title = enabled ? `[${title_symbols[status]}MCP] ${base}` : base;
+      const title = enabled ? `[${title_symbols[status]}MCP]${base ? " " + base : ""}` : base;
       if (document.title !== title)
          document.title = title;
    }
@@ -355,8 +355,14 @@ ${code}
 
                            Promise.resolve ().then (fn).then (
                               value => {
-                                 if (!${navigate})
-                                    report (true, value === undefined ? null : value);
+                                 if (!${navigate}) {
+                                    if (typeof value === "function")
+                                       report (false, "Cannot return function; pass CODE, not async () => CODE");
+                                    else if (typeof value === "symbol")
+                                       report (false, "Cannot return symbol; expected JSON value");
+                                    else
+                                       report (true, value === undefined ? null : value);
+                                 }
                               },
                               err => report (false, String (err))
                            );

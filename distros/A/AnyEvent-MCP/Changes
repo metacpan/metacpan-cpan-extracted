@@ -1,8 +1,16 @@
 Revision history for AnyEvent::MCP
 
+0.65  Fri 23 Oct 2026 22:41:32 CEST
+	- fix mcp-webbrowser userscript title indicator duplicating prefixes on empty titles.
+	- use built scripts in make test PATH, avoiding source shebangs and
+	  accidentally installed helpers in rule management tests.
+	- clarify browser execute code wrapper and reject function/symbol return
+	  values instead of silently converting them to null.
+        - fix many bugs in the testsuite.
+
 0.62  Thu 22 Oct 2026 13:32:52 CEST
-	- mcp_getoptions now returns a hash reference instead of a key/value list
-	  (incompatible API change).
+	- INCOMPATIBLE API CHANGE: mcp_getoptions now returns a hash reference instead of
+          a key/value list.
 	- Simple accepts server_name/server_version independently of the local
 	  instance name, leaving server_info as an unmodified protocol override.
 	- query multibroker children in parallel for tool and broker discovery,

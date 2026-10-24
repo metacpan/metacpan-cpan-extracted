@@ -1,0 +1,18 @@
+# Perl / Dist::Zilla distribution
+.build/
+_build/
+blib/
+/Build
+/Makefile
+/Makefile.old
+/pm_to_blib
+/MANIFEST.bak
+/MYMETA.*
+/Skilletor-*
+*.tar.gz
+cover_db/
+
+# Carton
+/local/
+/.carton/
+/cpanfile.snapshot

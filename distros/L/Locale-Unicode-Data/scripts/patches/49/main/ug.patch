@@ -1,0 +1,12 @@
+--- ug.xml
++++ ug.xml
+@@ -3146,6 +3146,9 @@
+ 			<currency type="CLP">
+ 				<displayName draft="contributed">چىلى پېسوسى</displayName>
+ 			</currency>
++			<currency type="CNX">
++				<displayName draft="contributed">جۇڭگو خەلق بانكىسى دوللىرى</displayName>
++			</currency>
+ 			<currency type="CNY">
+ 				<displayName draft="contributed">جۇڭگو يۈەنى</displayName>
+ 				<symbol>￥</symbol>

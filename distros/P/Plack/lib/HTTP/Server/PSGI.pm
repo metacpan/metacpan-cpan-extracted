@@ -31,6 +31,7 @@ BEGIN {
 }
 
 use constant MAX_REQUEST_SIZE => 131072;
+use constant CHUNKSIZE        => 64 * 1024;
 use constant MSWin32          => $^O eq 'MSWin32';
 
 sub new {
@@ -159,15 +160,24 @@ sub handle_connection {
         my $reqlen = parse_http_request($buf, $env);
         if ($reqlen >= 0) {
             $buf = substr $buf, $reqlen;
+            if (defined $env->{HTTP_TRANSFER_ENCODING}) {
+                # request bodies with Transfer-Encoding are not supported
+                $res = [ 501, [ 'Content-Type' => 'text/plain' ], [ 'Not Implemented' ] ];
+                last;
+            }
+            if (defined $env->{CONTENT_LENGTH} && $env->{CONTENT_LENGTH} !~ /\A[0-9]{1,18}\z/) {
+                # malformed, duplicate or too long (more than 18 digits) Content-Length
+                last;
+            }
             if (my $cl = $env->{CONTENT_LENGTH}) {
                 my $buffer = Stream::Buffered->new($cl);
                 while ($cl > 0) {
                     my $chunk;
                     if (length $buf) {
-                        $chunk = $buf;
-                        $buf = '';
+                        # $cl may be beyond UV_MAX, which substr() can't take
+                        $chunk = substr $buf, 0, ($cl < length $buf ? $cl : length $buf), '';
                     } else {
-                        $self->read_timeout($conn, \$chunk, $cl, 0, $self->{timeout})
+                        $self->read_timeout($conn, \$chunk, $cl < CHUNKSIZE ? $cl : CHUNKSIZE, 0, $self->{timeout})
                             or return;
                     }
                     $buffer->print($chunk);
@@ -175,7 +185,7 @@ sub handle_connection {
                 }
                 $env->{'psgi.input'} = $buffer->rewind;
             } else {
-                open my $input, "<", \$buf;
+                open my $input, "<", \"";
                 $env->{'psgi.input'} = $input;
             }
 
@@ -340,7 +350,8 @@ not be suitable for a production use.
 
 Some features in HTTP/1.1, notably chunked requests, responses and
 pipeline requests are B<NOT> supported, and it also does not support
-HTTP/0.9.
+HTTP/0.9. Requests with a C<Transfer-Encoding> header are rejected with
+501 Not Implemented.
 
 See L<Starman> or uWSGI server if you want HTTP/1.1 and other features
 ready for a production use.

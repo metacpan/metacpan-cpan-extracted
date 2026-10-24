@@ -33,6 +33,7 @@ t/database_span.t
 t/delivery_queue.t
 t/environment_warning.t
 t/event_builder.t
+t/fixtures/pii_scrubbing_vectors.json
 t/fixtures/strict_privacy_vectors.json
 t/histogram_bucketer.t
 t/https_warning.t

@@ -1,0 +1,14 @@
+--- pt.xml
++++ pt.xml
+@@ -4289,6 +4289,11 @@
+ 				<displayName count="one">Yuan chinês (offshore)</displayName>
+ 				<displayName count="other">Yuans chineses (offshore)</displayName>
+ 			</currency>
++			<currency type="CNX">
++				<displayName>Dólar do Banco Popular da China</displayName>
++				<displayName count="one" draft="contributed">Dólar do Banco Popular da China</displayName>
++				<displayName count="other" draft="contributed">Dólares do Banco Popular da China</displayName>
++			</currency>
+ 			<currency type="CNY">
+ 				<displayName>Yuan chinês</displayName>
+ 				<displayName count="one">Yuan chinês</displayName>

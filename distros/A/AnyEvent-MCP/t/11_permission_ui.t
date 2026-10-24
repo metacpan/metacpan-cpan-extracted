@@ -457,9 +457,12 @@ $decision = prompt { %$request, rules_file => "$dir/rules.ini" },
 is_deeply $decision, { decision => "deny-once" }, "approval dialog has no rule management button";
 
 # Rule deletion is a standalone command, by configured profile or explicit path.
-{
+SKIP: {
+   skip "build scripts with make before rule management tests", 22
+      unless -x "blib/script/anyevent-mcp-askpermission";
+   my $scripts = Cwd::abs_path "blib/script";
    local $ENV{XDG_CONFIG_HOME} = "$dir/config";
-   local $ENV{PATH} = "$dir:" . Cwd::abs_path ("bin") . ":$ENV{PATH}";
+   local $ENV{PATH} = "$dir:$scripts:$ENV{PATH}";
    mkdir "$dir/config" or die $!;
    mkdir "$dir/config/anyevent-mcp" or die $!;
    mkdir "$dir/config/anyevent-mcp/rules" or die $!;

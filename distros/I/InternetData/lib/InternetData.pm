@@ -14,7 +14,7 @@ use InternetData::Database;
 use InternetData::Error;
 use InternetData::Oauth;
 
-our $VERSION = '1.11.2';
+our $VERSION = '1.11.3';
 
 use constant DEFAULT_BASE_URL => 'https://internetdata.io';
 
@@ -33,7 +33,7 @@ sub new {
     Carp::croak("InternetData->new: unknown option(s): @unknown") if @unknown;
 
     my $retries = defined $args{retries} ? $args{retries} : 2;
-    Carp::croak('InternetData->new: retries cannot be negative') if $retries < 0;
+    Carp::croak('InternetData->new: retries must be a whole number, 0 or more') unless _is_count($retries);
     # Mojo arms a negative or non-numeric bound as a timer that fires at once, so
     # every call would fail as a network error after reaching the server.
     my $timeout = defined $args{timeout} ? $args{timeout} : 30;
@@ -51,11 +51,15 @@ sub new {
     }
     Carp::croak('InternetData->new: api_key holds a control character')
         if defined $api_key && $api_key =~ /[\x00-\x1f\x7f]/;
+    # Mojo writes a header as bytes, so a character past U+00FF dies in the
+    # reactor and every call fails after its whole timeout with nothing sent.
+    Carp::croak('InternetData->new: api_key holds a character past U+00FF')
+        if defined $api_key && $api_key =~ /[^\x00-\xff]/;
 
     my $self = bless {
         api_key => $api_key,
         base_url => _base_url($args{base_url}),
-        retries => $retries,
+        retries => 0 + $retries,
         # Held as a number: Mojo tests the bound for truth before arming it, and a
         # string such as '0.0' is true, so it would be a timer that fires at once
         # rather than no bound.
@@ -207,9 +211,9 @@ sub _retry_delay {
     return BACKOFF_BASE * 2**($tries < 6 ? $tries : 6);
 }
 
-# $timeout is the call's own bound, or undef for the client's. $member, when
-# given, is the one member of the answer the call returns, a reference of type
-# $type: an object without it is no answer at all, so it fails inside the attempt
+# $timeout is the call's own bound, or undef for the client's. $shape is the
+# whole answer's, and $member, when given, the one member of it the call returns.
+# An answer without the shape is no answer at all, so it fails inside the attempt
 # as a retried server_error, like any other 2xx that cannot be read, rather than
 # reaching the caller as undef.
 sub _json_p {
@@ -224,11 +228,9 @@ sub _json_p {
         };
         $unreadable->('the API did not answer with a JSON object') unless ref $body eq 'HASH';
         return $body unless $shape;
-        my $answer = defined $member ? $body->{$member} : $body;
-        $unreadable->("the API answered with no $member") unless defined $answer;
-        my $wrong = _nonconforming($shape, $answer, defined $member ? [$member] : []);
+        my $wrong = _nonconforming($shape, $body, []);
         $unreadable->($wrong) if defined $wrong;
-        return $answer;
+        return defined $member ? $body->{$member} : $body;
     });
 }
 
@@ -244,8 +246,8 @@ sub _nonconforming {
         return InternetData::Oauth::_is_string($value) ? undef : $wrong->();
     }
     if ($kind eq 'integer') {
-        return !ref $value && !InternetData::Oauth::_is_string($value) && $value =~ /\A-?[0-9]+\z/
-            ? undef : $wrong->();
+        return defined $value && !ref $value && !InternetData::Oauth::_is_string($value)
+            && $value =~ /\A-?[0-9]+\z/ ? undef : $wrong->();
     }
     if ($kind eq 'boolean') {
         return Scalar::Util::blessed($value) && $value->isa('JSON::PP::Boolean') ? undef : $wrong->();
@@ -337,6 +339,15 @@ sub _check_options {
     my $timeout = $options->{timeout};
     Carp::croak("InternetData::$method: timeout must be a number of seconds, 0 or more")
         if defined $timeout && !(Scalar::Util::looks_like_number($timeout) && $timeout >= 0);
+    Carp::croak("InternetData::$method: retries must be a whole number, 0 or more")
+        if defined $options->{retries} && !_is_count($options->{retries});
+}
+
+# A whole number from 0, or Inf for no limit. NaN compares false with 0, so it
+# would retry for good; a word reads as 0, and 1.5 as two retries.
+sub _is_count {
+    my ($n) = @_;
+    return !ref $n && Scalar::Util::looks_like_number($n) && $n >= 0 && $n == int $n;
 }
 
 sub _base_url {
@@ -398,7 +409,7 @@ so an existing key does not reach these endpoints until the scope is added to
 it. Optional: omit it, or pass an empty or blank one, and no C<Authorization>
 header is sent. Every database endpoint published today answers C<401> without
 one. The key is trimmed, so one read from a file with its newline works; a key
-still holding a control character croaks here.
+still holding a control character, or a character past U+00FF, croaks here.
 
 =item base_url
 
@@ -406,7 +417,8 @@ Defaults to C<https://internetdata.io>.
 
 =item retries
 
-Attempts after a retryable failure. Defaults to 2, and is overridable per call.
+Attempts after a retryable failure, a whole number from 0. Defaults to 2, and is
+overridable per call.
 Each retry waits the server's C<Retry-After> when it sent one, otherwise a
 backoff of 250 ms that doubles per retry, up to 16 seconds. A C<Retry-After>
 longer than about 24.8 days is waited out on that backoff instead.

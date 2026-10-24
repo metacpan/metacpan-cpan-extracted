@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ldml SYSTEM "../../common/dtd/ldml.dtd">
+<!-- Copyright © 1991-2026 Unicode, Inc.
+For terms of use, see http://www.unicode.org/copyright.html
+SPDX-License-Identifier: Unicode-3.0
+CLDR data files are interpreted according to the LDML specification (http://unicode.org/reports/tr35/)
+
+Warnings: All cp values have U+FE0F characters removed. See /annotationsDerived/ for derived annotations.
+-->
+<ldml>
+	<identity>
+		<version number="$Revision$"/>
+		<language type="ja"/>
+	</identity>
+	
+	
+	
+	
+	<numbers>
+		<defaultNumberingSystem>↑↑↑</defaultNumberingSystem>
+		<otherNumberingSystems>
+			<native>↑↑↑</native>
+			<traditional>jpan</traditional>
+			<finance>jpanfin</finance>
+		</otherNumberingSystems>
+		
+		<symbols numberSystem="latn">
+			<decimal>↑↑↑</decimal>
+			<group>↑↑↑</group>
+			<list draft="contributed">↑↑↑</list>
+			<percentSign>↑↑↑</percentSign>
+			<plusSign>↑↑↑</plusSign>
+			<minusSign>↑↑↑</minusSign>
+			<approximatelySign>約</approximatelySign>
+			<exponential>↑↑↑</exponential>
+			<superscriptingExponent>↑↑↑</superscriptingExponent>
+			<perMille>↑↑↑</perMille>
+			<infinity>↑↑↑</infinity>
+			<nan>↑↑↑</nan>
+			<timeSeparator>↑↑↑</timeSeparator>
+		</symbols>
+		<decimalFormats numberSystem="latn">
+			<decimalFormatLength>
+				<decimalFormat>
+					<pattern>↑↑↑</pattern>
+				</decimalFormat>
+			</decimalFormatLength>
+			<decimalFormatLength type="long">
+				<decimalFormat>
+					<pattern type="1000" count="other">↑↑↑</pattern>
+					<pattern type="10000" count="other">↑↑↑</pattern>
+					<pattern type="100000" count="other">↑↑↑</pattern>
+					<pattern type="1000000" count="other">↑↑↑</pattern>
+					<pattern type="10000000" count="other">↑↑↑</pattern>
+					<pattern type="100000000" count="other">↑↑↑</pattern>
+					<pattern type="1000000000" count="other">↑↑↑</pattern>
+					<pattern type="10000000000" count="other">↑↑↑</pattern>
+					<pattern type="100000000000" count="other">↑↑↑</pattern>
+					<pattern type="1000000000000" count="other">↑↑↑</pattern>
+					<pattern type="10000000000000" count="other">↑↑↑</pattern>
+					<pattern type="100000000000000" count="other">↑↑↑</pattern>
+					<pattern type="1000000000000000" count="other">↑↑↑</pattern>
+					<pattern type="10000000000000000" count="other">↑↑↑</pattern>
+					<pattern type="100000000000000000" count="other">↑↑↑</pattern>
+					<pattern type="1000000000000000000" count="other">↑↑↑</pattern>
+					<pattern type="10000000000000000000" count="other">↑↑↑</pattern>
+				</decimalFormat>
+			</decimalFormatLength>
+			<decimalFormatLength type="short">
+				<decimalFormat>
+					<pattern type="1000" count="other">0</pattern>
+					<pattern type="10000" count="other">0万</pattern>
+					<pattern type="100000" count="other">00万</pattern>
+					<pattern type="1000000" count="other">000万</pattern>
+					<pattern type="10000000" count="other">0000万</pattern>
+					<pattern type="100000000" count="other">0億</pattern>
+					<pattern type="1000000000" count="other">00億</pattern>
+					<pattern type="10000000000" count="other">000億</pattern>
+					<pattern type="100000000000" count="other">0000億</pattern>
+					<pattern type="1000000000000" count="other">0兆</pattern>
+					<pattern type="10000000000000" count="other">00兆</pattern>
+					<pattern type="100000000000000" count="other">000兆</pattern>
+					<pattern type="1000000000000000" count="other">0000兆</pattern>
+					<pattern type="10000000000000000" count="other">0京</pattern>
+					<pattern type="100000000000000000" count="other">00京</pattern>
+					<pattern type="1000000000000000000" count="other">000京</pattern>
+					<pattern type="10000000000000000000" count="other">0000京</pattern>
+				</decimalFormat>
+			</decimalFormatLength>
+		</decimalFormats>
+		
+		
+		
+		
+		
+		
+		
+	</numbers>
+	
+	
+	
+	
+	
+	
+</ldml>

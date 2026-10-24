@@ -74,7 +74,7 @@ on 'test' => sub {
 	requires 'Test::Needs';
 	requires 'Test::NoWarnings';
 	requires 'Test::Permissions';
-	requires 'Test::Returns';
+	requires 'Test::Returns', '0.05';
 	requires 'Test::Warn';
 	requires 'Test::Which';
 	requires 'Test::Without::Module';

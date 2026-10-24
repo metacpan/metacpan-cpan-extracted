@@ -1,10 +1,64 @@
 {
+  "skills/docker": {
+    "source": "getty",
+    "version": "local",
+    "files": {
+      "skills/docker/.gitignore": "sha256:fc8e72cc019d4536c45df00567078e36003f1d7183747e03283549741c3424c9",
+      "skills/docker/SKILL.md": "sha256:e18ac21f32712fa8aebc6319aa17a04f8862608c9f11624559a675d25556def7",
+      "skills/docker/examples/compose-lab/.env.example": "sha256:5f393a932cdbe141ea00467e957af8faeb0feb9ed108611d002e3269eef54957",
+      "skills/docker/examples/compose-lab/README.md": "sha256:ce830fea7a47a41d6ab274fe2dca9babb1d9449572800b9effca60ac4e611ea1",
+      "skills/docker/examples/compose-lab/app/.dockerignore": "sha256:39822c2e749a93ce8cad34e0b3e823e90f1dcc0be793124732a239d351d83cf1",
+      "skills/docker/examples/compose-lab/app/Dockerfile": "sha256:0872b4620142a1c20ebff049e6a5db9913441dfc2314ebe08d04424082689761",
+      "skills/docker/examples/compose-lab/app/app.py": "sha256:98691fc10a92a9aad046edf50ed1e67daec58e680d304b6b3160736acb7c242c",
+      "skills/docker/examples/compose-lab/compose.dev.yaml": "sha256:a6a360e2c83d9028a1a8b64c4e3de877eec03d15ae98615b0592b65fb85dc596",
+      "skills/docker/examples/compose-lab/compose.port-override.yaml": "sha256:88df11b9fad8a09182181ac7e865d5ed4d75b47cb6f1046acad1b71151a3de49",
+      "skills/docker/examples/compose-lab/compose.yaml": "sha256:c1a2c9e4354931272839ba2ed620e017ddaf46672466a2e66066ddd762f17464",
+      "skills/docker/examples/compose-lab/modules/tools/check.py": "sha256:eb0ccec3f6d4d5fc3d783d0d2908799dab41905e0ff3e27514ae2def50b6f012",
+      "skills/docker/examples/compose-lab/modules/tools/compose.yaml": "sha256:c62cc937dede84719dcd1cd97bf0ab1b8a5fb9bc36babef64ad80c626f87128e",
+      "skills/docker/examples/environment/README.md": "sha256:95709c00c214b2ff8fe234b9025851f01a33239fc3de12b082187cdbe11343fe",
+      "skills/docker/examples/environment/compose.yaml": "sha256:2e6b1de10b140093a7067bc1d155bc382726fabe399ae676db679906b3f0de3e",
+      "skills/docker/examples/lifecycle/README.md": "sha256:f843da4d105c20ca18af359a6f326cad9572229166a55a0f1191c4fc916d13a2",
+      "skills/docker/examples/lifecycle/compose.yaml": "sha256:77332ec9dc5757e1f564072646dc520194ab2040b6a89710924be3541d05f61c",
+      "skills/docker/references/INDEX.md": "sha256:0db6cb223ff492e5d61e0b8b2ece398945029b182fb0d73a7b2c9287606618dd",
+      "skills/docker/references/SOURCES.md": "sha256:53eaafbe94fa330c65d8bbf9b2b0ad2c322ebcc35b958c0a8e213d30219686c8",
+      "skills/docker/references/build/bake-and-build-orchestration.md": "sha256:edd385bce21cb41ca6dc86ff59a2a008cff0c4806efe2204eaf08ba5f34a0ab3",
+      "skills/docker/references/build/cache-and-ci.md": "sha256:8671186ed4273115333ec3312b3506e06666f0a031dc4e1e184a9670a7448637",
+      "skills/docker/references/build/contexts-and-ignore.md": "sha256:6e7720edbc6abf1522354366190d2018c506acff235880f61d4e402a9690c1bc",
+      "skills/docker/references/build/dockerfile-design.md": "sha256:1b48cac6b1eb4959f276f20d0e352b3fe096726d75438be9d59c6257b576860f",
+      "skills/docker/references/build/multi-platform.md": "sha256:a5b2e80de49005540cc00a45841b4151d127de868f129d44eeb0fb561351b08e",
+      "skills/docker/references/build/secrets-and-ssh.md": "sha256:d0f431461f0d67286aad36c30732a3b97d45444f3afcb4a47aebdcf9e07e7553",
+      "skills/docker/references/build/supply-chain-and-releases.md": "sha256:36bdf4d9f6473ef8ac41bc89eb07fdf22094493186f1bd48e4f4ca60a1ee3f8c",
+      "skills/docker/references/compose/INDEX.md": "sha256:7c47382e6a79895e49b2169c62436fc7d7f8c497628e900fbf38d96322e02f36",
+      "skills/docker/references/compose/ci-deploy-and-rollback.md": "sha256:4cdbf497cf9df57c32ae526ddb8fc545e46ccaaa9c21e6bc154c51162d2a9276",
+      "skills/docker/references/compose/development-watch-and-debug.md": "sha256:891473b48f30429f85fb05bf15f01ea3d175da6e9482538e044a00a4c663ebec",
+      "skills/docker/references/compose/health-lifecycle-and-restarts.md": "sha256:177caaffd71226aee0d125b47f99e10a56796d71d1da69908b438dfd5df76ce7",
+      "skills/docker/references/compose/include-and-modularization.md": "sha256:6d69b060bfa92de456a2926e630d1620bc6a2278a27a501104b7cda2e9095349",
+      "skills/docker/references/compose/interpolation-and-environment.md": "sha256:837e623464766a4f2b29651f8787e69565904075352af55d08d93dc101e9b946",
+      "skills/docker/references/compose/merge-overrides-and-fragments.md": "sha256:875c30a04ea0028085ed1baab98b9abe50676783742abef5672394f043fc3090",
+      "skills/docker/references/compose/networks-and-service-discovery.md": "sha256:949786076f6cb7097cff15bf0ebec027b0d1f29b676ea39f997c17f393b60ead",
+      "skills/docker/references/compose/profiles-and-jobs.md": "sha256:fdca7211a95c04abae75c37bfd72ddb86d976494b26f8115749f0d43442aae66",
+      "skills/docker/references/compose/project-model.md": "sha256:b621bece7226490674be17042f449e501a59a795956661d2542d9b384f9c9752",
+      "skills/docker/references/compose/resources-and-scaling.md": "sha256:b80a2499744525815e58cd6e9ef30ec33bae46c08e37fa32d47b12e37ecd1ccf",
+      "skills/docker/references/compose/secrets-configs-and-trust.md": "sha256:e1a3212c06c11e0bb690d36135328378c78b233a5d28855fc667b3e915317aae",
+      "skills/docker/references/compose/volumes-and-permissions.md": "sha256:fbabb5ad3c8f200531a07777b82e92c56c3a49d8014bd89aaf321515c877ff5f",
+      "skills/docker/references/concepts/contexts-and-remote-hosts.md": "sha256:3148cb035be7affe7ba4c4808501917d8226d13ec980aa056f85e9da057d23e6",
+      "skills/docker/references/concepts/execution-model.md": "sha256:b341ea484c67b7336cd1848b24f2ebe04038cd1bb1f83c696a946291c1a44db2",
+      "skills/docker/references/operations/backup-and-disaster-recovery.md": "sha256:b258fba0b3aaf20f3fb3c04430ac14dd9537ffa6186dd385ca1d64ccfa7c2989",
+      "skills/docker/references/operations/daemon-storage-and-cleanup.md": "sha256:7e4c72b2518f183f6f4fd288be3c515608688de0effdda23befd8d4b43cf45e8",
+      "skills/docker/references/operations/diagnostic-ladder.md": "sha256:e4b5ae0e5d74956c2886c5d0dec5a6652fb4fa84ab0e2a45352f4ede2139a4ac",
+      "skills/docker/references/operations/logging-and-monitoring.md": "sha256:6a686b55eb27ac2a301f31529f945c16f579b740f069501d397403dc79ad2261",
+      "skills/docker/references/operations/rootless-desktop-and-platforms.md": "sha256:f0406d5723e28da0f4eda1cacfcaa5aa8f5eb1b9af5493fcf41a5623c16eb689",
+      "skills/docker/references/operations/security-and-agent-access.md": "sha256:76e4a173d68cc0b5a2cd09fa4882d60a3e724492d54fe2912679d7a5a13b040e",
+      "skills/docker/references/versions-and-capabilities.md": "sha256:d7652eb39fa48652abe47298814018fb47853915f3571a431a19864761f3098a",
+      "skills/docker/scripts/collect-basics.sh": "sha256:33ba9161385de1154d415bea50b5e00e43ef7e6a6f44ca94369101b7986462b6"
+    }
+  },
   "skills/getty-git-commit-style": {
     "source": "getty",
     "version": "local",
     "files": {
       "skills/getty-git-commit-style/.gitignore": "sha256:fc8e72cc019d4536c45df00567078e36003f1d7183747e03283549741c3424c9",
-      "skills/getty-git-commit-style/SKILL.md": "sha256:959bed63af658dcec1abc3010a2a262d347851a8aae87d833736d065c0f9f863"
+      "skills/getty-git-commit-style/SKILL.md": "sha256:d69e6b556e277975e08cdea82471ac0689dd3418791e9cccc9bbe54f04b73c4d"
     }
   },
   "skills/getty-git-usage": {
@@ -12,7 +66,7 @@
     "version": "local",
     "files": {
       "skills/getty-git-usage/.gitignore": "sha256:fc8e72cc019d4536c45df00567078e36003f1d7183747e03283549741c3424c9",
-      "skills/getty-git-usage/SKILL.md": "sha256:9a4cdf50cc3991e16b2af8882175e8e9a4e27b40fd93605898348ed2db506630"
+      "skills/getty-git-usage/SKILL.md": "sha256:d822ec8cba6bd63bd9fd7c0e3bb0c73268f101f931d8fae82b3a553b64756989"
     }
   },
   "skills/getty-perl-core": {
@@ -20,7 +74,8 @@
     "version": "local",
     "files": {
       "skills/getty-perl-core/.gitignore": "sha256:fc8e72cc019d4536c45df00567078e36003f1d7183747e03283549741c3424c9",
-      "skills/getty-perl-core/SKILL.md": "sha256:eec7e726b0deab2a50dd5b99c2f16c68b332ba8ac6296642679f3bfd3bc46816"
+      "skills/getty-perl-core/SKILL.md": "sha256:204d50a28c1c8216845efc649aa7e4c0184c61c57aa0c72cc1898ce2889d7ed1",
+      "skills/getty-perl-core/references/dbic.md": "sha256:ab308272fa65891d02fa1a36326f6fe7c5972ce95fa4323c1cb36e08cf519627"
     }
   },
   "skills/getty-perl-moo": {
@@ -28,7 +83,7 @@
     "version": "local",
     "files": {
       "skills/getty-perl-moo/.gitignore": "sha256:fc8e72cc019d4536c45df00567078e36003f1d7183747e03283549741c3424c9",
-      "skills/getty-perl-moo/SKILL.md": "sha256:40935882df586ed9db50466c1c289913beaec39c74fced3d25e99a585100e03c"
+      "skills/getty-perl-moo/SKILL.md": "sha256:cef5be74d98ce708167760428282dcabb21a737b40325c6363918efe343ef923"
     }
   },
   "skills/getty-perl-pod": {
@@ -75,7 +130,15 @@
     "version": "local",
     "files": {
       "skills/perl-ai-langertha/.gitignore": "sha256:fc8e72cc019d4536c45df00567078e36003f1d7183747e03283549741c3424c9",
-      "skills/perl-ai-langertha/SKILL.md": "sha256:ce224aa403b9c30f6c502fa1808c50facac4e19ac22e9dd07b6d993c7612d87f"
+      "skills/perl-ai-langertha/SKILL.md": "sha256:c96b4aedf715f2f8f7f02e93eec0b2c41d9ce0fc6cc5a77b8d8e3bbf5754d5f9"
+    }
+  },
+  "skills/perl-mojo": {
+    "source": "getty",
+    "version": "local",
+    "files": {
+      "skills/perl-mojo/.gitignore": "sha256:fc8e72cc019d4536c45df00567078e36003f1d7183747e03283549741c3424c9",
+      "skills/perl-mojo/SKILL.md": "sha256:8604f44fdfb9199bd4c305e9dd674c262a3d40d4a7f14dbe4a2c4d3cf0b91a93"
     }
   },
   "skills/perl-release-dist-ini": {
@@ -83,7 +146,7 @@
     "version": "local",
     "files": {
       "skills/perl-release-dist-ini/.gitignore": "sha256:fc8e72cc019d4536c45df00567078e36003f1d7183747e03283549741c3424c9",
-      "skills/perl-release-dist-ini/SKILL.md": "sha256:968219fbff70237c642d39e5ece9cc619680a46c4493fee64138e9a9400a97bb"
+      "skills/perl-release-dist-ini/SKILL.md": "sha256:f7d074d471499db86ecd33d92fdbea0e35f20e94b04aaaa4669b705fcfd01c3b"
     }
   }
 }

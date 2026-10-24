@@ -1,4 +1,5 @@
 requires 'MCP' => '0.15';
+requires 'Mojolicious';
 requires 'Text::Trim';
 requires 'JSON::MaybeXS';
 requires 'Path::Tiny';

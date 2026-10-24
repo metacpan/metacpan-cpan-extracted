@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '0.001.0';
+our $VERSION = '0.002.0';
 
 # The French catalogue: message key to text, or to a hash that chooses a
 # text by gender or plural category; see App::Actions::I18N for the shape.
@@ -129,6 +129,32 @@ my %MESSAGES = (
 			other => "Impossible de supprimer %(count)d exécutions :",
 		},
 	},
+	# The text listings of the cache and logs commands.
+	'span.just_now' => "à l'instant",
+	'span.ago' => 'il y a %(span)s',
+	'cache.file' => 'Fichier du cache : %(file)s',
+	'cache.empty' => "Aucune image n'a encore été mise en cache.",
+	'cache.none_older' => "Aucune image en cache n'est plus ancienne que %(span)s.",
+	'cache.only_older' => 'Seulement les images plus anciennes que %(span)s.',
+	'cache.unreachable' => 'Le démon Docker est injoignable, les tailles sont donc inconnues.',
+	'cache.prune_hint' => 'Supprimez-les avec "action-run cache --prune".',
+	'cache.unknown' => 'inconnu',
+	'cache.size_missing' => 'absente',
+	'cache.heading.image' => 'IMAGE',
+	'cache.heading.size' => 'TAILLE',
+	'cache.heading.last_used' => 'DERNIÈRE UTILISATION',
+	'cache.heading.age' => 'ÂGE',
+	'logs.directory' => 'Répertoire des journaux : %(directory)s',
+	'logs.empty' => "Aucun journal de job n'a encore été conservé.",
+	'logs.none_older' => "Aucun journal de job n'est plus ancien que %(span)s.",
+	'logs.only_older' => 'Seulement les journaux de jobs plus anciens que %(span)s.',
+	'logs.prune_hint' => 'Supprimez-les avec "action-run logs --prune".',
+	'logs.heading.run' => 'EXÉCUTION',
+	'logs.heading.log' => 'JOURNAL',
+	'logs.heading.size' => 'TAILLE',
+	'logs.heading.age' => 'ÂGE',
+	'process.redirect_failed' => "Impossible de rediriger %(stream)s vers '%(file)s' : %(error)s",
+	'process.exec_failed' => "Impossible d'exécuter '%(program)s' : %(error)s",
 	# The runner and its parts.  "action-run: " is the program's name and is
 	# not translated; the line markers (==>, ---, !!) are kept too.
 	'runner.workflow_required' => 'Un workflow est obligatoire',
@@ -144,6 +170,7 @@ my %MESSAGES = (
 	'runner.dependency_cycle' => "Cycle de dépendances impliquant le job '%(job)s'",
 	'runner.unknown_job' => "Job inconnu '%(job)s'",
 	'runner.need_not_selected' => "action-run: le job '%(job)s' dépend de '%(need)s', qui n'est pas sélectionné ; on suppose qu'il a réussi",
+	'runner.env_cycle' => "La variable d'environnement '%(name)s' fait référence à elle-même, directement ou par d'autres variables",
 	'runner.env_failed' => "Impossible d'évaluer la variable d'environnement '%(name)s' : %(error)s",
 	'runner.write_failed' => "Impossible d'écrire %(what)s : %(error)s",
 	'runner.file_write_failed' => "Impossible d'écrire '%(file)s' : %(error)s",
@@ -179,7 +206,6 @@ my %MESSAGES = (
 	'runner.job.if_failed' => "action-run: impossible d'évaluer if pour '%(name)s' : %(error)s",
 	'runner.job.skipped' => '==> Job : %(name)s (ignoré)',
 	'runner.job.fail_fast' => '==> Job : %(name)s (ignoré par fail-fast)',
-	'runner.job.no_result' => "le job n'a renvoyé aucun résultat",
 	'runner.job.continue_failed' => "action-run: impossible d'évaluer continue-on-error pour '%(name)s' : %(error)s",
 	'runner.job.continued' => '!! Le job a échoué mais continue-on-error est activé : %(name)s',
 	'runner.job.not_linux' => "==> Job : %(name)s (ignoré : runs-on '%(runs_on)s' n'est pas Linux)",
@@ -188,7 +214,6 @@ my %MESSAGES = (
 	'runner.job.no_image' => "Impossible de déterminer une image de conteneur pour le job '%(name)s'",
 	'runner.job.image' => '    image : %(image)s',
 	'runner.job.deferred' => '  différée  %(expression)s (%(source)s)',
-	'runner.job.did_not_run' => "le job ne s'est pas exécuté",
 
 	'runner.parallel.did_not_run' => "le job '%(name)s' ne s'est pas exécuté",
 	'runner.parallel.dup_failed' => 'Impossible de dupliquer %(handle)s',
@@ -196,6 +221,7 @@ my %MESSAGES = (
 
 	'runner.service.not_mapping' => "Le service '%(id)s' doit être un mapping",
 	'runner.service.no_image' => "Le service '%(id)s' n'a pas d'image",
+	'runner.options_invalid' => "Impossible de lire les options du conteneur '%(options)s' : un guillemet n'est pas fermé",
 	'runner.service.credentials' => "action-run: les identifiants du service '%(id)s' ne sont pas pris en charge ; la connexion Docker locale est utilisée",
 	'runner.service.start_failed' => "Échec du démarrage du service '%(id)s' (code %(status)s)",
 	'runner.what.service' => "Le service '%(id)s'",
@@ -219,7 +245,6 @@ my %MESSAGES = (
 	'runner.container.daemon_silent' => "%(state)s ; le démon n'a rien dit",
 	'runner.container.daemon_said' => '%(state)s ; le démon a dit :',
 	'runner.fault.image' => "l'image '%(image)s'",
-	'runner.fault.image_unnamed' => "l'image",
 	'runner.fault.port' => 'le port publié',
 	'runner.fault.entrypoint' => "le point d'entrée '%(entrypoint)s'",
 
@@ -264,6 +289,7 @@ my %MESSAGES = (
 	'runner.unsupported.skipped' => "action '%(action)s' ignorée : %(reason)s",
 	'runner.unsupported.note' => '    (ignorée : %(reason)s)',
 	'runner.docker_action.no_image' => "L'action Docker '%(uses)s' du job '%(job)s' n'a pas de nom d'image ; vérifiez l'expression qu'elle utilise",
+	'runner.docker_action.bad_args' => "Impossible de lire les args de '%(uses)s' ('%(args)s') : un guillemet n'est pas fermé",
 	'runner.docker_action.bad_image' => "L'action Docker '%(uses)s' du job '%(job)s' donne '%(image)s', qui n'est pas un nom d'image ; vérifiez l'expression qu'elle utilise",
 	'runner.docker_action.exited' => "l'action Docker s'est terminée avec le code %(status)s",
 	'runner.local_action.missing' => "L'action locale '%(uses)s' n'existe pas (cherchée dans %(dir)s)",
@@ -281,6 +307,7 @@ my %MESSAGES = (
 	'runner.logs.kept' => 'Journaux des jobs conservés dans %(dir)s',
 	'runner.logs.keep_failed' => 'action-run: impossible de conserver les journaux des jobs : %(error)s',
 	'runner.logs.copy_failed' => "impossible de copier '%(from)s' vers '%(to)s' : %(error)s",
+	'runner.logs.bad_name' => "'%(name)s' n'est pas un simple nom de fichier",
 	'runner.kept.header' => 'Ressources Docker conservées :',
 	'runner.kept.container' => '  conteneur %(name)s',
 	'runner.kept.network' => '  réseau %(name)s',

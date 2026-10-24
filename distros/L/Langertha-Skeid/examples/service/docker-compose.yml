@@ -77,9 +77,11 @@ services:
       OPENBAO_ROLE_ID: ${OPENBAO_ROLE_ID:-}
       OPENBAO_SECRET_ID: ${OPENBAO_SECRET_ID:-}
 
-      # Named by skeid.yaml (admin.api_key_env, usage_store.password_env).
+      # Named by skeid.yaml (admin.api_key_env, usage_store.password_env,
+      # customer_source.password_env -- the last only read when that section is uncommented).
       SKEID_ADMIN_API_KEY: ${SKEID_ADMIN_API_KEY:-change-me-in-prod}
       SKEID_USAGE_DB_PASSWORD: ${POSTGRES_PASSWORD:-skeid_password_change_me}
+      SKEID_CUSTOMER_DB_PASSWORD: ${SKEID_CUSTOMER_DB_PASSWORD:-}
     volumes:
       # Skeid runs as uid 10001 in the image: the file has to be readable for others.
       - ./skeid.yaml:/etc/skeid/skeid.yaml:ro

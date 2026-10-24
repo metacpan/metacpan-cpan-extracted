@@ -90,7 +90,7 @@
             "Test::Needs" : "0",
             "Test::NoWarnings" : "0",
             "Test::Permissions" : "0",
-            "Test::Returns" : "0",
+            "Test::Returns" : "0.05",
             "Test::Warn" : "0",
             "Test::Which" : "0",
             "Test::Without::Module" : "0",
@@ -114,6 +114,6 @@
          "x_repository" : "https://github.com/nigelhorne/Database-Abstraction"
       }
    },
-   "version" : "0.51",
+   "version" : "0.52",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

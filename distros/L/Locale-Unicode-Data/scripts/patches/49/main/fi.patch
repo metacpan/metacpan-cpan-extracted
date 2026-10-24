@@ -1,0 +1,14 @@
+--- fi.xml
++++ fi.xml
+@@ -5051,6 +5051,11 @@
+ 				<displayName count="one">Kiinan juan (offshore)</displayName>
+ 				<displayName count="other">Kiinan juania (offshore)</displayName>
+ 			</currency>
++			<currency type="CNX">
++				<displayName>Kiinan kansanpankin dollari</displayName>
++				<displayName count="one">Kiinan kansanpankin dollari</displayName>
++				<displayName count="other">Kiinan kansanpankin dollaria</displayName>
++			</currency>
+ 			<currency type="CNY">
+ 				<displayName>Kiinan juan</displayName>
+ 				<displayName count="one">Kiinan juan</displayName>

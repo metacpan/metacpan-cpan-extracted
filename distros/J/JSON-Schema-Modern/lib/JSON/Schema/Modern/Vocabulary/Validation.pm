@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::Validation;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Validation vocabulary
 
-our $VERSION = '0.651';
+our $VERSION = '0.652';
 
 use 5.020;
 use Moo;
@@ -223,7 +223,8 @@ sub _traverse_keyword_pattern ($class, $schema, $state) {
 sub _eval_keyword_pattern ($class, $data, $schema, $state) {
   return 1 if not is_type('string', $data);
 
-  return 1 if $data =~ m/(?:$schema->{pattern})/;
+  # ECMA-262 restricts \d, \s, \w to ascii ranges
+  return 1 if $data =~ m/(?:$schema->{pattern})/a;
   return E($state, 'pattern does not match');
 }
 
@@ -361,7 +362,7 @@ JSON::Schema::Modern::Vocabulary::Validation - Implementation of the JSON Schema
 
 =head1 VERSION
 
-version 0.651
+version 0.652
 
 I use a linearly-increasing version numbering scheme. No meaning should be
 presumed or inferred from the version being less than 1.0.

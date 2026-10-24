@@ -115,7 +115,7 @@ if (my $err = $@) {
 
 `kind` is one of `bad_request`, `unauthorized`, `forbidden`, `rate_limited`, `quota_exceeded`, `server_error` or `network`. `message` is the API's own result code, so a 403 tells you whether it was `NOT_LICENSED`, `LICENSE_EXPIRED` or `IP_NOT_ALLOWED`, a call from an address the key or its organization does not allow.
 
-Note that `rate_limited` and `quota_exceeded` both arrive as HTTP 429 and are not the same thing. A rate limit is when the API faces extreme traffic bursts and so retrying later works; but a spent quota needs your allowance raised or the window to roll over. The library retries rate limits for you, but not if your quota is exceeded. Nothing else in the 4xx range is retried at all: a misspelled database id is a 404, and asking for it three times gets the same answer three times.
+`rate_limited` is a 429 that carries `Retry-After`, and the library retries it for you. `quota_exceeded` is a 429 without one, which it never retries. InternetData's database API has no quota, so you won't see `quota_exceeded` from it. Nothing else in the 4xx range is retried at all: a misspelled database id is a 404, and asking for it three times gets the same answer three times.
 
 Each attempt gives up after 30 seconds, and a transient failure is retried twice. Both can be changed for the client, and for a single call:
 

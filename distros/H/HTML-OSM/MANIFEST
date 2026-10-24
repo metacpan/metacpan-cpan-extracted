@@ -13,6 +13,7 @@ t/10-compile.t
 t/20-new.t
 t/30-basics.t
 t/40-layers.t
+t/circle_marker.t
 t/comment-spelling.t
 t/conf/new.yml
 t/conf/zoom.yml
@@ -27,6 +28,7 @@ t/integration.t
 t/limiting.t
 t/locales.t
 t/mock.t
+t/options.t
 t/pod-cm.t
 t/pod-coverage.t
 t/pod-snippets.t

@@ -1,13 +1,15 @@
 ---
 abstract: 'pod2man, pod2text, pod2html simultaneously'
 author:
-  - 'James E Keenan (jkeenan@cpan.org)'
+  - 'James E Keenan (jkeenan@pobox.com)'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  IO::Capture: '0.05'
+  Test::Simple: '0.44'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -24,10 +26,13 @@ requires:
   File::Path: '0'
   File::Save::Home: '0.03'
   File::Spec: '0'
-  IO::Capture: '0.05'
   Pod::Html: '0'
   Pod::Man: '0'
   Pod::Text: '0'
-  Test::Simple: '0.44'
-version: '0.10'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+  perl: '5.008000'
+resources:
+  bugtracker: https://github.com/jkeenan/Pod-Multi/issues
+  homepage: http://thenceforward.net/perl/modules/Pod-Multi/
+  repository: https://github.com/jkeenan/Pod-Multi.git
+version: '0.11'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

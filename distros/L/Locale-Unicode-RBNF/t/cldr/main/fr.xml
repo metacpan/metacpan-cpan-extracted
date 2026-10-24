@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ldml SYSTEM "../../common/dtd/ldml.dtd">
+<!-- Copyright © 1991-2026 Unicode, Inc.
+For terms of use, see http://www.unicode.org/copyright.html
+SPDX-License-Identifier: Unicode-3.0
+CLDR data files are interpreted according to the LDML specification (http://unicode.org/reports/tr35/)
+
+Warnings: All cp values have U+FE0F characters removed. See /annotationsDerived/ for derived annotations.
+-->
+<ldml>
+	<identity>
+		<version number="$Revision$"/>
+		<language type="fr"/>
+	</identity>
+	
+	<contextTransforms>
+		<contextTransformUsage type="day-format-except-narrow">
+			<contextTransform type="stand-alone">titlecase-firstword</contextTransform>
+		</contextTransformUsage>
+		<contextTransformUsage type="day-standalone-except-narrow">
+			<contextTransform type="stand-alone">titlecase-firstword</contextTransform>
+		</contextTransformUsage>
+		<contextTransformUsage type="languages">
+			<contextTransform type="uiListOrMenu">titlecase-firstword</contextTransform>
+		</contextTransformUsage>
+		<contextTransformUsage type="month-format-except-narrow">
+			<contextTransform type="stand-alone">titlecase-firstword</contextTransform>
+		</contextTransformUsage>
+		<contextTransformUsage type="month-standalone-except-narrow">
+			<contextTransform type="stand-alone">titlecase-firstword</contextTransform>
+		</contextTransformUsage>
+		<contextTransformUsage type="typographicNames">
+			<contextTransform type="stand-alone">titlecase-firstword</contextTransform>
+			<contextTransform type="uiListOrMenu">titlecase-firstword</contextTransform>
+		</contextTransformUsage>
+	</contextTransforms>
+	
+	
+	
+	<numbers>
+		<defaultNumberingSystem>↑↑↑</defaultNumberingSystem>
+		<otherNumberingSystems>
+			<native>↑↑↑</native>
+		</otherNumberingSystems>
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		<symbols numberSystem="latn">
+			<decimal>,</decimal>
+			<group> </group>
+			<list>↑↑↑</list>
+			<percentSign>↑↑↑</percentSign>
+			<plusSign>↑↑↑</plusSign>
+			<minusSign>↑↑↑</minusSign>
+			<approximatelySign>≃</approximatelySign>
+			<exponential>↑↑↑</exponential>
+			<superscriptingExponent>↑↑↑</superscriptingExponent>
+			<perMille>↑↑↑</perMille>
+			<infinity>↑↑↑</infinity>
+			<nan>↑↑↑</nan>
+			<timeSeparator>↑↑↑</timeSeparator>
+		</symbols>
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		<decimalFormats numberSystem="latn">
+			<decimalFormatLength>
+				<decimalFormat>
+					<pattern>↑↑↑</pattern>
+				</decimalFormat>
+			</decimalFormatLength>
+			<decimalFormatLength type="long">
+				<decimalFormat>
+					<pattern type="1000" count="1">mille</pattern>
+					<pattern type="1000" count="one">0 millier</pattern>
+					<pattern type="1000" count="other">0 mille</pattern>
+					<pattern type="10000" count="one">00 mille</pattern>
+					<pattern type="10000" count="other">00 mille</pattern>
+					<pattern type="100000" count="one">000 mille</pattern>
+					<pattern type="100000" count="other">000 mille</pattern>
+					<pattern type="1000000" count="one">0 million</pattern>
+					<pattern type="1000000" count="other">0 millions</pattern>
+					<pattern type="10000000" count="one">00 million</pattern>
+					<pattern type="10000000" count="other">00 millions</pattern>
+					<pattern type="100000000" count="one">000 million</pattern>
+					<pattern type="100000000" count="other">000 millions</pattern>
+					<pattern type="1000000000" count="one">0 milliard</pattern>
+					<pattern type="1000000000" count="other">0 milliards</pattern>
+					<pattern type="10000000000" count="one">00 milliard</pattern>
+					<pattern type="10000000000" count="other">00 milliards</pattern>
+					<pattern type="100000000000" count="one">000 milliard</pattern>
+					<pattern type="100000000000" count="other">000 milliards</pattern>
+					<pattern type="1000000000000" count="one">0 billion</pattern>
+					<pattern type="1000000000000" count="other">0 billions</pattern>
+					<pattern type="10000000000000" count="one">00 billion</pattern>
+					<pattern type="10000000000000" count="other">00 billions</pattern>
+					<pattern type="100000000000000" count="one">000 billion</pattern>
+					<pattern type="100000000000000" count="other">000 billions</pattern>
+				</decimalFormat>
+			</decimalFormatLength>
+			<decimalFormatLength type="short">
+				<decimalFormat>
+					<pattern type="1000" count="one">↑↑↑</pattern>
+					<pattern type="1000" count="other">0 k</pattern>
+					<pattern type="10000" count="one">↑↑↑</pattern>
+					<pattern type="10000" count="other">00 k</pattern>
+					<pattern type="100000" count="one">↑↑↑</pattern>
+					<pattern type="100000" count="other">000 k</pattern>
+					<pattern type="1000000" count="one">↑↑↑</pattern>
+					<pattern type="1000000" count="other">0 M</pattern>
+					<pattern type="10000000" count="one">↑↑↑</pattern>
+					<pattern type="10000000" count="other">00 M</pattern>
+					<pattern type="100000000" count="one">↑↑↑</pattern>
+					<pattern type="100000000" count="other">000 M</pattern>
+					<pattern type="1000000000" count="one">↑↑↑</pattern>
+					<pattern type="1000000000" count="other">0 Md</pattern>
+					<pattern type="10000000000" count="one">↑↑↑</pattern>
+					<pattern type="10000000000" count="other">00 Md</pattern>
+					<pattern type="100000000000" count="one">↑↑↑</pattern>
+					<pattern type="100000000000" count="other">000 Md</pattern>
+					<pattern type="1000000000000" count="one">↑↑↑</pattern>
+					<pattern type="1000000000000" count="other">0 Bn</pattern>
+					<pattern type="10000000000000" count="one">↑↑↑</pattern>
+					<pattern type="10000000000000" count="other">00 Bn</pattern>
+					<pattern type="100000000000000" count="one">↑↑↑</pattern>
+					<pattern type="100000000000000" count="other">000 Bn</pattern>
+				</decimalFormat>
+			</decimalFormatLength>
+		</decimalFormats>
+		
+		
+		
+		
+		
+		
+		
+	</numbers>
+	
+	
+	
+	
+	
+	
+</ldml>

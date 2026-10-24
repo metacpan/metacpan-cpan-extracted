@@ -66,8 +66,25 @@ applications whose rule files do not use the named-profile convention.
 Named profiles use
 C<anyevent-mcp/rules/NAME.ini> in the user configuration directory.
 Editing uses C<$VISUAL>, C<$EDITOR>, C<sensible-editor> or C<vi>.
-For the server's effective URL, use that server's C<--print-url> option.
+For server URLs, use each server's C<--print-url> option.
 
+=head1 OPTIONS
+
+=over
+
+=item --config FILE
+
+Use FILE instead of default global configuration
+(C<$XDG_CONFIG_HOME/anyevent-mcp/global.ini>, or
+C<~/.config/anyevent-mcp/global.ini>). Relevant to C<init>; the rule
+management commands use their own profile or explicit pathname.
+
+=item --help
+
+Print command synopsis, available commands and configuration defaults,
+then exit without running a command.
+
+=back
 
 =cut
 

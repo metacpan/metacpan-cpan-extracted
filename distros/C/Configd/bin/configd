@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 
 package Configd::Bin::Configd;
-$Configd::Bin::Configd::VERSION = '0.002';
+$Configd::Bin::Configd::VERSION = '0.005';
 # PODNAME: configd
 # ABSTRACT: Adopt a config file that has no conf.d, and keep it generated.
 
@@ -200,7 +200,7 @@ configd - Adopt a config file that has no conf.d, and keep it generated.
 
 =head1 VERSION
 
-version 0.002
+version 0.005
 
 =head1 SYNOPSIS
 

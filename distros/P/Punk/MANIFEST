@@ -94,6 +94,7 @@ include/punk/punk_dbiobs.h
 include/punk/punk_dbq.h
 include/punk/punk_dispatch.h
 include/punk/punk_entropy.h
+include/punk/punk_escape.h
 include/punk/punk_favicon.h
 include/punk/punk_filecache.h
 include/punk/punk_flash.h
@@ -295,6 +296,7 @@ t/0301-stencil-abi.t
 t/0302-render-layout.t
 t/0303-url-filter.t
 t/0304-before-render.t
+t/0305-escape-html.t
 t/0310-static.t
 t/0311-static-precompressed.t
 t/0312-compress-optout.t

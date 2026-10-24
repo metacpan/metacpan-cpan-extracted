@@ -1,3 +1,24 @@
+2.116000 - 2026-10-23
+
+  [NEW FEATURES]
+
+  * #1757 a schema upgrade step that fails now stops netdisco-db-deploy
+    and says what to do next, instead of leaving the database silently
+    missing tables, indexes or keys. new options: --force-step N skips
+    the failing statements of a step that cannot be fixed, and --check
+    compares the database with a fresh install. the upgrade also repairs
+    missing indexes and keys on databases created before 2.023000, and
+    warns when PostgreSQL is older than 14
+
+  [ENHANCEMENTS]
+
+  * #1771 write each ARP entry once, and skip macsuck writes that change nothing
+
+  [BUG FIXES]
+
+  * #1773 stop concurrent discovers failing on a new subnet, and keep
+    worker errors in the job log
+
 2.115000 - 2026-10-20
 
   [BUG FIXES]

@@ -7,7 +7,7 @@ use DBI ();
 use Punk::DBI::db ();
 use Punk::DBI::st ();
 
-our $VERSION = '0.65';
+our $VERSION = '0.66';
 our @ISA = ('DBI');
 
 

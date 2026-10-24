@@ -1,5 +1,27 @@
 Revision history for Perl extension Text::JSCalendar
 
+0.08  2026-10-22
+	- security: recurrenceOverrides patches could rewrite top-level-only
+	  properties when writing iCalendar, e.g. "uid" (exception emitted
+	  under a foreign UID, splitting the series), "@type" (a VTODO in a
+	  VEVENT's recurrence set) or "recurrenceRule"; such patches are
+	  now ignored, as they already were when reading iCalendar
+	- security: strip control characters from iCalendar output; a CR or
+	  LF in any field written as a property parameter (participant name,
+	  descriptionContentType, locale, link title, ...), or a lone CR in a
+	  value, could split the content line and forge extra properties
+	- top-level-only properties updated to jscalendarbis-21: add @type,
+	  privacy, sentBy, recurrenceId, recurrenceIdTimeZone and
+	  participants/*/calendarAddress; relatedTo may now be overridden
+	- a synthetic master built from orphan exceptions now has @type
+	  and version, so neither turns up as a patch in every override
+	- write an ATTENDEE for every participant with a calendarAddress, as
+	  jscalendarbis has no "attendee" role; a participant that the
+	  ORGANIZER fully represents is still left out
+	- a change inside an object in a recurrence exception is now a nested
+	  patch (e.g. one attendee's participationStatus) rather than a copy
+	  of the whole object
+
 0.07  2026-10-09
 	- write each participant's ATTENDEE from its jscalendarbis
 	  calendarAddress URI, falling back to the JSCalendar 1.0 "email";

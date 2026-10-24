@@ -243,6 +243,55 @@ sub decoded_name {
 ok($transport->mirrors_header_params,
   'the HTTP transport is the one that mirrors header params');
 
+# The legacy binding: a session id and the agreed revision on every POST, none
+# of the modern routing headers, and none of either taken from the caller. The
+# request opening the session goes out with neither. t/35_http_legacy.t runs
+# the same against a server; this pins the header list itself.
+{
+  my $t = Net::Async::MCP::Transport::HTTP->new(
+    url     => 'http://mcp.invalid/mcp',
+    headers => {
+      'Mcp-Session-Id'       => 'forged',
+      'MCP-Protocol-Version' => '1999-01-01',
+      'Mcp-Method'           => 'forged',
+      'Mcp-Param-Region'     => 'forged',
+      Authorization          => 'Bearer t0ken',
+    },
+  );
+
+  my $modern = HTTP::Request->new(POST => 'http://mcp.invalid/mcp',
+    [ $t->_standard_headers('tools/list', {}) ], '');
+  is($modern->header('Mcp-Session-Id'), undef,
+    'a caller cannot put a modern request into a session');
+  is($modern->header('MCP-Protocol-Version'), undef,
+    'nor give it a protocol version its body does not carry');
+  is($modern->header('Mcp-Param-Region'), undef,
+    'nor an Mcp-Param header the request does not derive');
+
+  $t->start_legacy_session;
+  ok(!$t->mirrors_header_params, 'a legacy session mirrors no tool arguments');
+
+  my $opening = HTTP::Request->new(POST => 'http://mcp.invalid/mcp',
+    [ $t->_standard_headers('initialize', {}, start_session => 1) ], '');
+  is([ sort $opening->header_field_names ], [qw( Accept Authorization Content-Type )],
+    'the initialize opening a session carries no session id, version or routing header');
+
+  $t->{session_id} = 'session-7';
+  $t->set_legacy_protocol_version('2025-06-18');
+  my $legacy = HTTP::Request->new(POST => 'http://mcp.invalid/mcp',
+    [ $t->_standard_headers('tools/call', { name => 'deploy' },
+      header_params => [ { name => 'Region', value => 'europe-west1' } ]) ], '');
+  is($legacy->header('Mcp-Session-Id'), 'session-7', 'a request in the session carries its id');
+  is($legacy->header('MCP-Protocol-Version'), '2025-06-18', 'and the agreed revision');
+  is([ grep { /^mcp-(method|name|param-)/i } $legacy->header_field_names ], [],
+    'and no modern routing header, header params or not');
+  is($legacy->header('Authorization'), 'Bearer t0ken', 'while Authorization still travels');
+
+  $t->end_legacy_session;
+  ok($t->mirrors_header_params, 'ending the legacy session restores the modern binding');
+  is($t->session_id, undef, 'and forgets the session');
+}
+
 # From here the whole path is under test, from the arguments a caller passes to
 # the headers that would go on the wire: a wrong or missing Mcp-Param header is
 # not a cosmetic defect, the server answers -32020 and the call never runs.

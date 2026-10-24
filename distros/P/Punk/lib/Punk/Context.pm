@@ -7,7 +7,7 @@ use Punk::Request;
 use Punk::Response;
 use Punk ();
 
-our $VERSION = '0.65';
+our $VERSION = '0.66';
 
 1;
 
@@ -351,6 +351,24 @@ under no static mount, under one that has not opted in, or naming a file
 that cannot be read comes back exactly as it went in - so a template can
 be written against this before the mount asks for it. See
 L<Punk::Static/Freshness>.
+
+=head2 escape_html($text)
+
+    my $safe = $c->escape_html($text);   # &amp; &lt; &gt; &quot; &#39;
+
+Text made safe to write into HTML, as an element's content or as an
+attribute's value in either kind of quotes: the five characters that can
+end one become entities, and nothing else changes. C<undef> is the empty
+string, and a character string stays one, so UTF-8 passes through.
+
+It is the escape Punk itself writes markup with (L</csrf_field>, the static
+mount's listing, the C<markdown> mount), for a handler or a plugin's
+C<before_render> hook building HTML without a template. A Stencil template
+does not need it: its output is escaped already.
+
+It is not an escape for anything else. A URL in an attribute is
+percent-encoded first, script text needs JSON, CSS needs its own, and XML
+spells C<'> as C<&apos;>.
 
 =head2 respond_to(%format_handlers)
 

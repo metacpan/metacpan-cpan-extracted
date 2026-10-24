@@ -7,7 +7,7 @@ use Carp ();
 
 use InternetData::Error;
 
-our $VERSION = '1.11.2';
+our $VERSION = '1.11.3';
 
 # The formats a database is published in. Anything else is refused before it
 # reaches the API, whose 400 would cost a round trip and name nothing to act on.
@@ -211,8 +211,8 @@ sub _transfer_p {
     });
 }
 
-# The member each call returns from one level down and the shape it must have,
-# or (no member) the shape of a call that returns the whole answer. The shapes
+# The member each call returns from one level down, or none for a call that
+# returns the whole answer, and the shape the whole answer must have. The shapes
 # are the pinned spec's schemas: a member it requires and never sends as null is
 # required, a nullable or optional one may be absent or null, and every one
 # present has the spec's type at every depth, so a version served as "3" fails
@@ -244,10 +244,12 @@ my $DOWNLOAD_SHAPE = [fields => [
     [user_agent => ['string']], [created => ['string'], 1],
 ]];
 my %UNWRAP = (
-    list => [databases => [list => $DATABASE_SHAPE]],
+    list => [databases => [fields => [[databases => [list => $DATABASE_SHAPE], 1]]]],
     metadata => [undef, $METADATA_SHAPE],
-    checksums => [checksums => $CHECKSUMS_SHAPE],
-    downloads => [downloads => [list => $DOWNLOAD_SHAPE]],
+    checksums => [checksums => [fields => [
+        [id => ['string'], 1], [format => ['string'], 1], [checksums => $CHECKSUMS_SHAPE, 1],
+    ]]],
+    downloads => [downloads => [fields => [[downloads => [list => $DOWNLOAD_SHAPE], 1]]]],
 );
 
 sub _body_p {

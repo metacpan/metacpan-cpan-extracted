@@ -26,7 +26,7 @@ WriteMakefile(
 		'CGI::Info'	=> 0,
 		'CGI::Lingua'		=> '0.85',
 		'Database::Abstraction'	=> '0.51',	# 0.50 added redis_key + standalone-key support; 0.49 added aggregate(); 0.48 added limit/offset support in selectall_arrayref
-		'Database::Join' => '0.010.0',	# 0.009.0 added aggregate(), limit/offset/sort_by, dbi_source(); 0.004.0 added backend=>'auto' SQLite spill
+		'Database::Join' => '0.009.0',	# 0.009.0 added aggregate(), limit/offset/sort_by, dbi_source(); 0.004.0 added backend=>'auto' SQLite spill
 		'DBI'		=> 0,
 		'Net::SFTP::Foreign' => 0,
 		'File::Path'	=> '2.07',	# For remove_tree in Dashboard.pm at runtime
@@ -38,6 +38,7 @@ WriteMakefile(
 		'Mojo::JSON' => 0,
 		'HTML::D3' => '0.23',	# 0.20 added radius_range support for render_scatter_chart_snippet; 0.19 added scatter/stacked/combo/treemap/histogram snippets
 		'HTML::TableExtract'	=> 0,
+		'HTTP::Request'			=> 0,		# Used by Ask.pm and Summary.pm for LLM API calls (ships with libwww-perl but not core)
 		'LWP::UserAgent'		=> 0,		# Needed for Test::Mojo HTTP testing; LWP::UserAgent::Cached is used by D::A url fetch path
 		'LWP::UserAgent::Cached'	=> 0,		# Used by Database::Abstraction for URL-backed tables (import_url)
 		'Scalar::Util'			=> 0,		# Used in DataSource.pm (blessed, looks_like_number)

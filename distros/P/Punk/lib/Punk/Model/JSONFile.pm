@@ -6,7 +6,7 @@ use warnings;
 use Punk ();
 use File::Raw::JSON ();
 
-our $VERSION = '0.65';
+our $VERSION = '0.66';
 
 1;
 

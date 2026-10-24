@@ -86,7 +86,7 @@ WriteMakefile(
 		'Test::Mockingbird' => 0.14,
 		'Test::NoWarnings' => 0,
 		'Test::Permissions' => 0,
-		'Test::Returns' => 0,
+		'Test::Returns' => 0.05,
 		'Test::Warn' => 0,
 		'Test::Which' => 0,
 		'Test::Without::Module' => 0,

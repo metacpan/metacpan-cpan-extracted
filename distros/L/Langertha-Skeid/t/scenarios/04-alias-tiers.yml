@@ -1,0 +1,19 @@
+title: An alias is a product name; a tier with no eligible node is skipped, the next tier serves it under its own model
+setup:
+  nodes:
+    - { id: gpu, model: qwen3-32b, tags: [local], healthy: 0, upstream: { fallback: { answer: "from local" } } }
+    - { id: groq, model: llama-3.3-70b, tags: [cloud], upstream: { fallback: { answer: "from cloud" } } }
+  config:
+    aliases:
+      house-model:
+        tiers:
+          - { tags: [local], model: qwen3-32b }
+          - { tags: [cloud], model: llama-3.3-70b }
+steps:
+  - chat: { protocol: openai, model: house-model, prompt: ask }
+    expect: { text: from cloud, headers: { x-skeid-node: groq } }
+    upstream:
+      gpu: { requests: 0 }
+      groq: { requests: 1, last_user_text: ask, request_model: llama-3.3-70b }
+    usage:
+      - { node_id: groq, requested_model: house-model, model: llama-3.3-70b, ok: 1 }

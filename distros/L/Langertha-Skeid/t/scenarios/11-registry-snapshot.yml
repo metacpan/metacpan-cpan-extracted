@@ -1,0 +1,30 @@
+title: The registry snapshot is signed, behind a key, and shows what the traffic did to each node (outcome of a node failure)
+setup:
+  admin_key: admin-secret
+  env:
+    SKEID_T200_REGISTRY_SECRET: registry-secret-200-0123456789abcdef-xyz
+  nodes:
+    - id: a
+      model: m
+      max_conns: 4
+      upstream:
+        rules:
+          "boom": { error: { status: 500, message: "node broke" } }
+        fallback: { answer: ok }
+  config:
+    registry: { enabled: 1, secret_env: SKEID_T200_REGISTRY_SECRET }
+steps:
+  - http: { method: GET, path: /skeid/registry/snapshot }
+    expect: { status: 401 }
+  - chat: { protocol: openai, model: m, prompt: fine }
+  - chat: { protocol: openai, model: m, prompt: boom }
+    expect: { status: 500 }
+  - http: { method: GET, path: /skeid/registry/snapshot, bearer: admin-secret }
+    expect:
+      headers_like: { x-skeid-registry-signature: "^sha256=[0-9a-f]{64}$" }
+      json:
+        nodes.0.id: a
+        nodes.0.errors_in_window: 1
+        nodes.0.inflight: 0
+        nodes.0.healthy: 1
+        nodes.0.max_conns: 4

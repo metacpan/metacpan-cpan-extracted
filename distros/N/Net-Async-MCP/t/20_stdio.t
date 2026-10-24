@@ -33,6 +33,11 @@ $loop->add($mcp);
     'TestServer', 'server name in result._meta serverInfo');
   ok($result->{capabilities}, 'capabilities returned');
   is($mcp->server_info->{name}, 'TestServer', 'server_info accessor');
+
+  # Unpinned, the client probes with server/discover, and a server answering
+  # it is modern: no fallback to initialize, and the modern revision kept.
+  ok(!$mcp->is_legacy, 'a server answering the probe is modern');
+  is($mcp->protocol_version, '2026-07-28', 'and keeps the modern revision');
 }
 
 # Test ping

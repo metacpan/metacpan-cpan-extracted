@@ -1193,6 +1193,21 @@ when C<XDG_CACHE_HOME> is not set, and F<%LOCALAPPDATA%\action-run\cache.json>
 on Windows.  Set it to keep one project's images out of the machine-wide
 record.
 
+=item C<App__Actions__>I<option>
+
+Sets one of L<App::Actions/new>'s options for a run, for example
+C<App__Actions__parallel=2> or C<App__Actions__keep_images=0>.  It B<wins over
+the command-line option> and over the configuration files below, and its
+value is not checked.
+
+=item C<CONFIG_DIR>
+
+The directory searched for configuration files (F<base.yaml>, then
+F<local.yaml>, or the same names ending C<.json>, C<.xml>, C<.ini> and so on).
+When it is not set, F<~/.conf>, F<~/config>, F<~/conf> and F<conf> are
+searched.  Options for a run go in an C<App__Actions> section, and they also
+win over the command line; see L<App::Actions/new>.
+
 =back
 
 =head1 EXAMPLES
@@ -1302,6 +1317,12 @@ C<--strict-actions> to make a skipped action fail the job.
 =item * B<Parallel output goes to logs.>  With C<--parallel> above 1, each
 job's lines are shown with its name in front, and the full logs are kept;
 see C<action-run logs>.
+
+=item * B<A setting in a configuration file or the environment beats the
+command line.>  An C<App__Actions> section in F<~/.conf/local.yaml> (or
+F<base.yaml>), or an C<App__Actions__parallel> variable, wins over
+C<--parallel> and the other run options.  If an option seems to be
+ignored, look there (see L</ENVIRONMENT>).
 
 =item * B<C<--older-than> needs a unit.>  C<30d> or C<2 weeks>, not C<30>.
 

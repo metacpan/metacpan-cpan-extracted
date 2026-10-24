@@ -1,0 +1,14 @@
+--- kab.xml
++++ kab.xml
+@@ -4045,6 +4045,11 @@
+ 				<displayName count="other" draft="unconfirmed">Ipisuten n Cili</displayName>
+ 				<symbol draft="unconfirmed">$CL</symbol>
+ 			</currency>
++			<currency type="CNX">
++				<displayName draft="unconfirmed">Adular n Lbanka Taɣerfant n Tacinwit</displayName>
++				<displayName count="one" draft="unconfirmed">Adular n Lbanka Taɣerfant n Tacinwit</displayName>
++				<displayName count="other" draft="unconfirmed">Idularen n Lbanka Taɣerfant n Tacinwit</displayName>
++			</currency>
+ 			<currency type="CNY">
+ 				<displayName>Ayuwan Renminbi Acinwa</displayName>
+ 				<displayName count="one" draft="unconfirmed">Ayuwan Acinwa</displayName>

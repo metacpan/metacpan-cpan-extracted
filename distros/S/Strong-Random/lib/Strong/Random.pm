@@ -19,10 +19,9 @@ use 5.022;
 use warnings;
 
 use Config;
-use Rand::Urandom;
 use Time::HiRes;
 
-our $VERSION = '0.92';
+our $VERSION = '0.94';
 
 =head1 METHODS
 
@@ -52,16 +51,12 @@ sub new {
 	return $self;
 }
 
-sub _system_rand {
-	my $class = shift;
-	return ($Config{osname} eq 'MSWin32' ? perl_rand () : (rand() || perl_rand()));
-}
 
 
 sub _shuffle_seed {
 	my $class = shift;
 	
-	return $class->_system_rand() * ((join '.', reverse Time::HiRes::gettimeofday) . $$);
+	return SUPER::rand() * ((join '.', reverse Time::HiRes::gettimeofday) . $$);
 }
 
 sub _harmonic {
@@ -133,11 +128,15 @@ sub rand {
 
 =head1 VERSION
 
-0.9
+0.94
 
 =head1 AUTHOR
 
 All code writen by Ivan Trunaev.
+
+=head1 LICENSE
+
+Commercial support by Author for Open Source!
 
 Contacts <ivan@trunaev.ru>
 

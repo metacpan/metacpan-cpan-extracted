@@ -13,8 +13,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 WORKDIR /opt/skeid
 
 COPY . .
-# requires,recommends: DBI, DBD::Pg and DBD::SQLite are what the cpanfile recommends, at the
-# versions it names. chmod: the runtime user is not the owner, and a checkout made under a
+# requires,recommends: DBI, DBD::Pg and DBD::SQLite (customer_source, ADR 0026) are
+# what the cpanfile recommends, at the versions it names. chmod: the runtime user is not the owner, and a checkout made under a
 # tight umask would otherwise be unreadable to it. Cpanel::JSON::XS is a recommends;
 # the -M line fails the build should it be missing, whatever cpm did with it. Without it the stream
 # relay decodes every SSE frame in pure Perl and loses 43 % throughput (ADR 0019).

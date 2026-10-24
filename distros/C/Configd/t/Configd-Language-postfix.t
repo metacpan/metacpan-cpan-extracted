@@ -206,6 +206,7 @@ subtest 'the map parameters two domains each name a table for' => sub {
         qw{
         virtual_mailbox_maps virtual_alias_maps transport_maps
         sender_dependent_relayhost_maps smtpd_sender_login_maps
+        smtp_sasl_password_maps smtp_tls_policy_maps
         }
     ) {
         ok( $postfix->accumulates($key), "$key accumulates" );
@@ -223,6 +224,54 @@ subtest 'the map parameters two domains each name a table for' => sub {
 
     # The restriction lists still must not, whatever else does.
     ok( !$postfix->accumulates('smtpd_recipient_restrictions'), 'a restriction list still does not' );
+};
+
+subtest 'an item that the list already holds is not added again' => sub {
+
+    # A fragment that repeats what the package said, such as inet_interfaces =
+    # all, means the same thing, and joining the two strings gives "all, all",
+    # which postfix refuses to start with.
+    my $merged = $postfix->merge(
+        $postfix->parse("mydestination = \$myhostname, mail.example.com, , localhost\n"),
+        $postfix->parse("mydestination = \$myhostname, localhost, second.example.com\n"),
+    );
+    is(
+        value_of( $merged, 'mydestination' ),
+        '$myhostname, mail.example.com, localhost, second.example.com',
+        'each item once, in the order it was first named'
+    );
+
+    $merged = $postfix->merge(
+        $postfix->parse("virtual_alias_maps = hash:/etc/postfix/a\n"),
+        $postfix->parse("virtual_alias_maps = hash:/etc/postfix/b hash:/etc/postfix/a\n"),
+    );
+    is( value_of( $merged, 'virtual_alias_maps' ), 'hash:/etc/postfix/a, hash:/etc/postfix/b', 'whitespace separates items as a comma does' );
+
+    $merged = $postfix->merge(
+        $postfix->parse("smtpd_milters = inline:{ a=b, c=d }\n"),
+        $postfix->parse("smtpd_milters = inline:{ a=b, c=d }, local:opendkim.sock\n"),
+    );
+    is( value_of( $merged, 'smtpd_milters' ), 'inline:{ a=b, c=d }, local:opendkim.sock', 'a separator inside braces does not split, because postfix reads them as one item' );
+};
+
+subtest 'inet_interfaces is all when any fragment says all' => sub {
+
+    # postfix refuses all beside an address, and all listens on every address
+    # anyway.
+    my %cases = (
+        'all and all'            => [ 'all',       'all',       'all' ],
+        'all and an address'     => [ 'all',       '127.0.0.1', 'all' ],
+        'an address and all'     => [ '127.0.0.1', 'all',       'all' ],
+        'two addresses and none' => [ '127.0.0.1', '[::1]',     '127.0.0.1, [::1]' ],
+    );
+    foreach my $case ( sort keys %cases ) {
+        my ( $first, $second, $want ) = @{ $cases{$case} };
+        my $merged = $postfix->merge( $postfix->parse("inet_interfaces = $first\n"), $postfix->parse("inet_interfaces = $second\n") );
+        is( value_of( $merged, 'inet_interfaces' ), $want, $case );
+    }
+
+    my $merged = $postfix->merge( $postfix->parse("mydestination = all\n"), $postfix->parse("mydestination = localhost\n") );
+    is( value_of( $merged, 'mydestination' ), 'all, localhost', 'and all means nothing special in another list' );
 };
 
 subtest 'an empty accumulating value resets what came before it' => sub {

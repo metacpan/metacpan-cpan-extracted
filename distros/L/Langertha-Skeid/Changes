@@ -1,6 +1,267 @@
 Revision history for Langertha-Skeid
 
-0.003     2026-10-01 21:11:26Z
+0.004     2026-10-24 04:04:43Z
+
+  [Status]
+    - Live backends: t/950-live-docling.t runs the document-conversion relay against a real
+      docling-serve 1.37.0 (document.json_content.pages keyed "1", "2" is counted as pages) and
+      t/951-live-speaches.t runs a realtime session against a real speaches node, with the
+      recorded frames in t/data/realtime/speaches.jsonl (flat session.update, usage as a
+      duration, no delta events). Both skip without SKEID_LIVE_*_URL; xt/live/skeid-live
+      starts and watches the Python services (Perl for the management, Python for the AI
+      work) and xt/live/record-realtime records a session. Still open: vLLM's realtime
+      dialect and usage block, GPU nodes, the cost of decoding realtime frames and parsing
+      pages (not measured).
+
+    - Tests: a scenario suite for the core features against Langertha::Virtual::Server
+      nodes (t/200-core-scenarios.t, t/scenarios/*.yml, t/lib/Test/Skeid/Virtual.pm):
+      chat in the three faces, routing, weighted round-robin, aliases and tiers, key
+      policy, a 429 node backed off, error pass-through, client_auth, the admin API,
+      draining a node, the registry snapshot, usage and cost metered from the node's
+      usage block and from streams in all three faces (streamed reads in the helper). It skips as a whole
+      when the installed Langertha has no Engine::Virtual with its HTTP endpoint.
+
+    - Document conversion through docling-serve: POST /v1/convert/file and
+      POST /v1/convert/source under docling's own paths, relayed (multipart
+      part for part from the spooled upload, a source body decoded once and
+      written again; the JSON or zip answer byte for byte), the synchronous
+      calls only. A request has no model: nodes get an option kind
+      (documents; default chat, unknown value fails the load) and the route
+      is planned over nodes of that kind under the routing key documents,
+      which a key policy's models grants (403 without it) and an alias of
+      that name tiers; chat routes, /v1/models and the manifest never see a
+      documents node and the reverse. New node option api_key_header
+      (RFC 7230 token, checked before the old node is removed): the node's key
+      goes raw in that header, X-Api-Key for docling, the client's credentials
+      still dropped. http_sources, callbacks and a target that is not
+      inbody/zip are 400 before admission (the field's name, never its value;
+      all spellings, a duplicate key) unless documents.allow_remote_sources.
+      uploads.documents_max_bytes (default 100 MiB) is the limit of both
+      routes, 413/401 before the body. New nullable usage field pages, read
+      off document.json_content.pages of a JSON answer up to 8 MiB (absent
+      otherwise, never 0): column in both schemas and by the additive
+      migration, jsonlog, the spool, totals/by_key/by_model, skeid usage.
+      documents counts the request's input documents. Relay hook
+      max_parse_bytes leaves a larger answer undecoded (k94, ADR 0028,
+      ADR 0021 Update).
+    - GET /v1/realtime: live transcription over the OpenAI realtime protocol, a
+      WebSocket relayed to the node's /realtime in the node's own events, both
+      client dialects (session.update and transcription_session.update) as
+      sent. A relayed route that is a session: routed, admitted and
+      authenticated like a request at the handshake, the node opened before the
+      client is upgraded (a refusing node is a 502, with no slot left), one
+      slot held until the session closes (max_conns of a realtime node means
+      concurrent sessions), one usage event when it closes (length, summed
+      usage, how it ended). model in the query is required. A browser's key may
+      come in the openai-insecure-api-key.<key> subprotocol, behind the same
+      client gate, never echoed, logged or forwarded. Every client frame is
+      decoded: a model other than the session's is refused with an error event
+      and not forwarded; a non-object or binary frame closes 1003. New realtime:
+      section (idle_timeout, max_session_seconds, max_message_bytes,
+      max_queued_bytes; hot-reloaded); a graceful stop closes sessions 1001
+      first. Not checked against a deployed vLLM or speaches node: the test
+      fixtures are hand-written (ADR 0029).
+
+    - MCP gateway, review follow-up: the server's response headers are an allowlist
+      (Content-Type, Cache-Control, Retry-After, Mcp-*), no longer everything
+      but hop-by-hop ones; an event stream is no longer cut at the user agent's
+      16 MiB message limit; a stream cut by the request timeout is recorded
+      ok 0 with error_type upstream_timeout instead of a clean 200; the
+      request body has its own limit, mcp.max_request_bytes (default 10 MiB,
+      413 over it). The client query going upstream as it came and the absent
+      OPTIONS/HEAD/CORS are documented (k103, ADR 0022).
+
+    - GET /openapi.json: an OpenAPI 3.1 description of the client routes the
+      configuration enables (manifest and MCP routes only with their section),
+      with the client_auth bearer scheme and example model names from the same
+      list as /v1/models; behind client_auth like the other client routes. The
+      admin routes are a separate document, GET /skeid/openapi.json, behind
+      the admin key. Routes are now registered from one route table
+      (Langertha::Skeid::Proxy->route_table) that also builds the documents,
+      and a test fails for a route without an entry (k105, ADR 0025).
+    - Optional Swagger UI at /docs, off by default (openapi.swagger_ui,
+      openapi.cache_dir). Not shipped: the first request fetches the pinned
+      swagger-ui-dist 5.17.14 non-blocking, verifies it against compiled-in
+      SHA-256 digests, caches it and serves it locally; a failed fetch is a
+      502, then 503 for a minute, never a retry storm (k105, ADR 0025).
+
+    - /v1/messages: the tool-result images and the client's own text of one
+      Anthropic message go upstream as one user message instead of two in a
+      row, which a strict-alternation chat template may refuse. Nothing is
+      merged across Anthropic messages; earlier turns are unchanged (k102).
+
+    - /v1/messages: an empty top-level `system: ""` is dropped like an empty
+      system block array, instead of going upstream as an empty system
+      message that a strict chat template may refuse (k101).
+
+    - request.finish has a fourth outcome, `rejected`, for a request the
+      client got wrong (upstream 400, 404, 413, 422, or a request refused
+      after admission as unsendable). It no longer counts as a node error:
+      not in the error counter, errors_in_window or last_failure_at. 401,
+      403, 429 and 5xx stay node errors. The registry snapshot carries the
+      count in a new node field, rejected_in_window; version stays 1 and the
+      existing fields keep their meaning (ADR 0024).
+    - The request goes upstream as the client spelled it. /v1/chat/completions
+      and /v1/embeddings forward the client's bytes with only model replaced,
+      instead of decoding the body and encoding it again -- which wrote every
+      object's keys sorted. A node renders tool definitions into the prompt in
+      the order they arrive, so the model got a prompt the client did not
+      write: a JSON schema as properties, required, type instead of type,
+      properties, required. One node answered such a prompt in gibberish. The
+      Anthropic and Ollama faces translate the body and so cannot forward it;
+      they carry each tool's JSON schema over as the client wrote it, in a
+      tool definition spelled in wire order (ADR 0023).
+    - A body that names model twice has both replaced by the served model, so
+      no node reads a model the request was not routed for.
+    - The usage report lists by_key and by_model rows of equal cost in a
+      stable order (key id resp. model name, ascending) instead of Perl hash
+      order; the sqlite/postgresql ORDER BY gained the same final key.
+    - A node's hop-by-hop response headers (Connection, Keep-Alive, ...) are
+      no longer relayed to the client on the JSON and stream routes; a node's
+      `Connection: close` made Skeid drop the customer's keep-alive
+      connection. One filter now serves the JSON, stream and MCP relays.
+    - add_node validates a node's engine before removing the node it
+      replaces, so a re-add with an unknown engine (POST /skeid/nodes,
+      nodes.add) no longer drops the working node from the inventory.
+    - POST /v1/audio/transcriptions and /v1/audio/translations on the OpenAI
+      face, for Whisper nodes (vLLM, speaches). The multipart form is routed by
+      its model field like a chat request (aliases, tiers, key policy,
+      max_conns, health, client_auth) and relayed to the node's own
+      /audio/... endpoint part for part; only model is rewritten when an alias
+      tier serves another one. The upload is sent from the spooled file, never
+      copied in memory. The answer comes back as the node gave it: json,
+      verbose_json, text, srt, vtt, or with stream=true the node's event
+      stream byte for byte, in whichever dialect it speaks. Nothing is
+      translated (ADR 0021).
+    - uploads: { max_bytes: N } limits the body of the upload routes (default
+      26214400, 25 MiB; hot reloaded). Over it: 413, no node touched, no usage
+      event. The limit holds while the body arrives, and with client_auth a
+      caller that is not on the list gets its 401 before the upload is
+      received. Every other route keeps the server's own request limit.
+    - Usage events of the audio routes carry audio_seconds when the node
+      reports a duration (usage.seconds of a usage.type duration block, else
+      the duration of a verbose_json answer) and no such key when it does not.
+      Tokens are recorded when the node reports them. jsonlog writes the field,
+      the DBI stores get a nullable audio_seconds column (added to an existing
+      table on start), reports sum it in totals, by_key and by_model, and
+      skeid usage prints it where there is some. Seconds are recorded, not
+      priced.
+    - POST /v1/rerank and its alias POST /rerank on the OpenAI face, for
+      reranker nodes. The JSON body (model, query, documents, top_n,
+      return_documents, ...) is routed by model like a chat request (aliases,
+      tiers, key policy, max_conns, health, client_auth) and relayed to
+      {node url}/rerank with only model replaced; the answer comes back as the
+      node gave it. That covers vLLM, infinity (started with --url-prefix
+      /v1), Jina and Cohere, whose differences are not evened out. A body that
+      is no JSON object, or has no model, no string query or no documents, is
+      400 before a node is touched.
+    - Node option rerank_format: tei for Hugging Face text-embeddings-inference:
+      the request is translated to POST /rerank at the server root (query,
+      texts, return_text, truncate) and TEI's bare array back into results
+      sorted by score, cut to top_n, with document { text } when asked for and
+      usage.total_tokens from the x-compute-tokens header. A document that is
+      not text is 400. An unknown rerank_format fails the config load.
+    - Usage events of the rerank route carry documents, the number of documents
+      the request held, when the node answered. The node's tokens are recorded
+      as input tokens, priced by input_per_million, from usage.prompt_tokens,
+      usage.total_tokens, meta.tokens.input_tokens (Cohere) or x-compute-tokens
+      (TEI). jsonlog writes documents, the DBI stores get a nullable documents
+      column (added to an existing table on start), reports sum it in totals,
+      by_key and by_model, and skeid usage prints it where there is some.
+      Documents are recorded, not priced.
+    - An optional client_auth: { keys: [...] } section turns the client routes
+      into an allowlist. Each entry is a names: entry or a key id (k_...),
+      never a key. With it, a missing key or one that is not listed gets 401
+      with WWW-Authenticate: Bearer realm="skeid" in the dialect of the route
+      (OpenAI invalid_api_key, Anthropic authentication_error, Ollama error
+      string) on every /v1/*, /api/* route and /.well-known/langertha.json,
+      before the body is read or any node is touched. /health stays open;
+      the /skeid/* admin routes keep their own bearer authentication and are
+      not gated by it. Without the section nothing is checked. The section is hot
+      reloaded; keys: [] lets nobody in. GET /v1/models, /api/tags, /api/ps and
+      the manifest now pick up a changed config themselves.
+    - The release builds, tags and pushes the Docker image through
+      Dist::Zilla::Plugin::Docker::API (docker_image in dist.ini) over the
+      container engine's HTTP API instead of shelling out to docker build /
+      docker push, so a release works against rootless Podman.
+      SKEID_DOCKER_BUILD_ARGS is gone.
+    - The GitHub release is published by the bundle's GitHub::CreateRelease
+      after the tag is pushed, with the Changes section as release notes. The
+      gh calls in run_after_release are gone: they ran before the tag existed,
+      so the release tag landed on the commit before the release commit.
+    - A system message inside messages on /v1/messages (Claude Code sends one
+      after the conversation started) no longer reaches the node in the middle
+      of the conversation, where chat templates such as vLLM's Qwen3.x answer
+      400 "System message must be at the beginning.". The node gets at most one
+      system message, at index 0: top-level system plus the system messages
+      before the first turn. A later one is wrapped in <system-reminder> and
+      becomes text of the adjacent user turn, never between an assistant's
+      tool_calls and their tool messages, so the prompt prefix stays stable
+      for prefix caching. Requests without such a message are translated as
+      before.
+    - MCP gateway: an optional mcp: section assigns MCP servers to customer key
+      ids (servers: { name: { url, description, api_key_ref, api_key_env,
+      headers, keys: [...] } }). POST, GET and DELETE /mcp/<name>, and paths
+      below it, are relayed to the server's url for a key the server is
+      assigned to: the body as it came, Content-Type, Accept, Last-Event-ID
+      and the Mcp-* headers up; status, headers and body down, an event stream
+      unbuffered and opened as soon as the server's headers arrive. Nothing of
+      MCP is read and no tool lists are merged (ADR 0022). The client's
+      Authorization never goes upstream; the server gets its own key as
+      Authorization: Bearer from the key broker or a variable, like a node,
+      and is not called when a named key source yields none (503). A name
+      that is unknown, assigned to another key, a stdio entry or followed by a
+      path with a .. segment is one and the same 404. A server's 401 and a
+      redirect from it are answered 502 and logged. No key is 401; with
+      client_auth its list applies first.
+    - GET /v1/mcp/servers lists the MCP servers assigned to the presented key:
+      name, transport, description and the public url (mcp.public_url, else
+      the request's) of a relayed server, command, args and env of a
+      transport: stdio entry, which is a hint for a server on the customer's
+      machine and is never proxied. Upstream URLs, key references and static
+      headers are not shown.
+    - Each relayed MCP request writes a usage event with api_format mcp and
+      endpoint /mcp/<name>: customer key id, status, duration, the server's
+      url as route_url; no model, tokens or cost. No store schema change.
+      Without the mcp: section both routes are unknown paths, as before.
+    - A stream relay now meters and translates upstreams that write
+      `data:{...}` without a space; before, such a stream was billed as zero
+      tokens and answered empty on the Anthropic and Ollama faces.
+    - Fix: a client's Expect: 100-continue (curl sends it above 1 MiB) is no
+      longer forwarded to the node on any route. A node answering it with
+      100 Continue could leave a streamed chat answer empty while the usage
+      event said ok.
+    - customer_source: reads customer key ids (key_id, name, policy, models)
+      from a PostgreSQL table or view through DBD::Pg. The connect and the
+      query run in a child process, so a database that does not answer never
+      blocks the event loop; a second child LISTENs. The rows are fetched in
+      the background every refresh_interval_s and sooner
+      on LISTEN/NOTIFY, and merged into the file's config at reload. The ids
+      join client_auth; the file wins per key id. Bad rows are rejected and
+      reported by name or position only, never by content. When the database
+      is unreachable the last good set is kept (max_stale_s bounds how long);
+      a failed fetch at startup is degraded and the start fails closed.
+      Status is on /skeid/config and /health (ADR 0026). GET /skeid/config
+      carries customer_names and customer_report. Under --workers N each
+      worker fetches (and opens its LISTEN connection) at start. t/90 checks
+      the source against a real PostgreSQL when SKEID_TEST_PG_* is set.
+    - usage_store: { spool_dir: DIR } (sqlite and postgresql; off by default)
+      keeps the usage events the database cannot take while it is
+      unreachable: they are appended to a JSON Lines file in DIR (fsync'd,
+      one file per process, the event's columns only -- key ids, never a key
+      or the database password) instead of being reported lost, and replayed
+      after the next successful write and at start, 500 per batch, without a
+      second row for an event already in the table (request_id and
+      created_at). A store with a spool also starts while the database is
+      down and migrates on its first connect. An event the database refuses
+      is still reported lost (ADR 0027).
+    - A failed connect to the usage database is no longer repeated for every
+      event or flush: the next attempt waits 1s, doubling up to 60s, and
+      writes in between fail (or spool) at once without touching the network.
+    - The usage schema gains a non-unique index on usage_events(request_id),
+      created on start with auto_migrate.
+
+0.003     2026-10-01 21:30:07Z
 
     - Docker image stops on SIGQUIT so write-behind usage events are flushed;
       serve handles SIGQUIT in single-process mode; the image build fails

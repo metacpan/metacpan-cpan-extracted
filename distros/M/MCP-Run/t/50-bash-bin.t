@@ -6,6 +6,13 @@ use Symbol        qw( gensym );
 use JSON::MaybeXS ();
 use Path::Tiny    qw( path tempdir );
 
+# MCP::Constants is upstream, not ours — importing it does not weaken the
+# subprocess-only discipline below, which is about never loading MCP::Run*.
+# The version pin mirrors t/20-integration.t: without it a stale MCP in @INC
+# dies with "not exported by MCP::Constants" instead of naming the real cause.
+use MCP 0.15;
+use MCP::Constants qw( META_SERVER_INFO );
+
 # Coverage for bin/mcp-run-bash driven the way a real MCP client drives it:
 # a subprocess speaking JSON-RPC over stdio.
 #
@@ -71,19 +78,84 @@ subtest 'default config: serverInfo identifies the distribution' => sub {
   ok $init, 'got a response for initialize' or return;
 
   # 0.15 puts serverInfo in result._meta; the legacy handshake also mirrors it
-  # into the result body, which is where a legacy client reads it.
-  my $info = $init->{result}{serverInfo}
-    // $init->{result}{_meta}{'io.modelcontextprotocol/serverInfo'};
+  # into the result body, which is where a legacy client reads it. The _meta
+  # key comes from the constant, not spelled out: if MCP renames it, the
+  # import fails loudly instead of the // silently yielding undef and the
+  # failure reading as "server name is wrong".
+  my $info = $init->{result}{serverInfo} // $init->{result}{_meta}{+META_SERVER_INFO};
 
   is $info->{name},    'mcp-run-bash', 'server name is the distribution, not PerlServer';
   is $info->{version}, $dist_version,  'server version is the distribution version, not 1.0.0';
 };
 
+# karr #21: MCP_RUN_TIMEOUT used to be numified with `+ 0`, which takes any
+# string: '30s' became 30, 'abc' became 0, '1e400' became Inf, each with a
+# Perl warning on the stderr of a stdio server and no word to the user that
+# the configured value had been dropped. The env var is configuration a human
+# wrote into .mcp.json, not a per-call argument from the model: a typo there
+# must not be guessed at, so the server refuses to start.
+#
+# 'abc' and '30s' are the warning cases; '0' and '-5' are values MCP::Run::Bash
+# would silently replace with its default; '9999999999' is digits-only and
+# looks fine here but is past the alarm() ceiling below, so it would be
+# dropped one layer down without a trace. All of them are configuration the
+# user got wrong, and all of them must say so rather than run as something
+# else.
+subtest 'an unusable MCP_RUN_TIMEOUT refuses the start instead of guessing' => sub {
+  for my $bad ('abc', '30s', '5m', '0', '-5', '1e400', '  ', '9999999999', '2.5') {
+    my ($responses, $stderr, $rc) = run_mcp({ MCP_RUN_TIMEOUT => $bad }, tool_call('echo hallo'));
+
+    isnt $rc, 0, "MCP_RUN_TIMEOUT='$bad': server exits non-zero";
+    is scalar keys %$responses, 0,
+      "MCP_RUN_TIMEOUT='$bad': no JSON-RPC response, the server never came up";
+
+    like $stderr, qr/MCP_RUN_TIMEOUT/,
+      "MCP_RUN_TIMEOUT='$bad': the message names the variable";
+    like $stderr, qr/\Q$bad\E/,
+      "MCP_RUN_TIMEOUT='$bad': the message quotes the rejected value";
+
+    # The other half of the finding: no Perl warning may reach the stderr of a
+    # stdio server. Every warn() and every uncaught die carries an "at FILE
+    # line N" tail, which our own message deliberately does not, so this goes
+    # red both for the old "isn't numeric" noise and for any later mishap.
+    unlike $stderr, qr/isn't numeric/,
+      "MCP_RUN_TIMEOUT='$bad': no numeric-conversion warning";
+    unlike $stderr, qr/ at \S+ line \d+/,
+      "MCP_RUN_TIMEOUT='$bad': nothing on stderr but the diagnosis";
+  }
+};
+
+# The flip side: a value that passes validation has to arrive as the server
+# default, not merely be accepted. A one second timeout against `sleep 5` is
+# the cheapest way to observe the number the runner actually armed alarm()
+# with -- MCP::Run::Bash reports it in the timeout message.
+subtest 'a valid MCP_RUN_TIMEOUT reaches the runner' => sub {
+  my ($responses, $stderr, $rc) = run_mcp({ MCP_RUN_TIMEOUT => '1' }, tool_call('sleep 5'));
+
+  my $text = $responses->{3}{result}{content}[0]{text} // '';
+  like $text, qr/Exit code: 124/,             'command was timed out';
+  like $text, qr/timed out after 1s/,         'the timeout that ran is the configured one';
+  is $stderr, '', 'clean stderr' or diag "stderr: $stderr";
+  is $rc, 0, 'server exited cleanly';
+};
+
 done_testing;
 
 # A classic 'initialize' handshake followed by the tools/call. This is what
-# Claude Desktop and Claude Code send, and it exercises the stdio transport's
-# own protocol-revision negotiation rather than hand-building a context.
+# Claude Desktop and Claude Code send, and driving it through a real pipe
+# exercises MCP::Server::Transport::Stdio and the MCP::Server::Legacy
+# handshake path — the one that skips _check_meta — instead of hand-building
+# an MCP::Server::Context.
+#
+# It does NOT exercise protocol-revision negotiation: legacy_request() echoes
+# a known revision back and silently substitutes its newest ('2025-11-25')
+# for anything else, so no version string is ever rejected and this test runs
+# identically with any value here. Real revision checking is asserted in the
+# 'protocol contract' subtest of t/20-integration.t, over the modern path.
+#
+# Keep this on the classic handshake (see karr #7): its value is that it goes
+# red the day MCP drops the legacy path, which is the early warning that
+# Claude Desktop and Claude Code can no longer talk to mcp-run-bash.
 sub tool_call {
   my ($command) = @_;
   return (
@@ -109,7 +181,7 @@ sub run_mcp {
     my $msg = eval { decode_json($line) } or next;
     $by_id{ $msg->{id} } = $msg if defined $msg->{id};
   }
-  return \%by_id;
+  return wantarray ? (\%by_id, $stderr, $rc) : \%by_id;
 }
 
 sub run {

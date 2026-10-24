@@ -128,12 +128,12 @@ subtest 'private routines are listed and enforced' => sub {
 	# Each module sets enforce mode only while it marks its own routines, so
 	# loading the distribution leaves every other user of Sub::Private alone.
 	TODO: {
-		# Object::Configure loads Log::Abstraction, which sets the mode for
-		# the whole process in a BEGIN block without local, and needs it to
-		# stay set until CHECK.  Remove this TODO once a Log::Abstraction
-		# that leaves the mode alone is released and required.
-		local $TODO = 'Log::Abstraction sets Sub::Private enforce mode process-wide'
-			if $INC{'Log/Abstraction.pm'};
+		# Log::Abstraction 0.40 and earlier set the mode for the whole
+		# process in a BEGIN block without local.  0.41, which the
+		# distribution requires, sets it for its own package only; the TODO
+		# covers a development machine that still has an older one.
+		local $TODO = 'Log::Abstraction < 0.41 sets Sub::Private enforce mode process-wide'
+			if $INC{'Log/Abstraction.pm'} && Log::Abstraction->VERSION < 0.41;
 		is($Sub::Private::config{mode} || 'namespace', 'namespace', 'the process-wide mode is left as it was');
 	}
 

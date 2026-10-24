@@ -1,3 +1,58 @@
+0.007     2026-10-22 15:43:38Z
+  - The client now reaches servers that answer only the initialize handshake
+    (the Node and Python SDKs, npx and uvx servers) as well as 2026-07-28
+    ones. Unpinned, it probes with server/discover and falls back to
+    initialize (2025-11-25, 2025-06-18, 2025-03-26, 2024-11-05) on any other
+    error or, over stdio, after the new discover_timeout (10 seconds).
+  - protocol_version pins the handshake: a legacy revision goes straight to
+    initialize, 2026-07-28 speaks the modern revision only. The new is_legacy
+    and instructions accessors report the agreed era and the server's
+    instructions.
+  - On a legacy connection requests carry no io.modelcontextprotocol/* _meta
+    keys, subscriptions_listen fails saying why, a server ping is answered
+    and other server requests are refused with -32601.
+  - The stdio transport takes env (undef removes a variable) and cwd, and
+    hands the subprocess's stderr to on_stderr line by line. A subprocess that
+    exits mid-request fails it with the real exit code and stderr_tail, the
+    last 20 stderr lines. A command that cannot be run fails the first request
+    with "MCP server failed to start: cannot run PROGRAM: REASON".
+  - The stdio transport closes stdin first on shutdown, then sends SIGTERM
+    after 2 seconds and SIGKILL 2 seconds later. A server that exits when its
+    stdin closes gets no signal at all; one that does not is signalled only
+    after 2 seconds, so shutdown can take up to 4 seconds.
+  - The HTTP transport speaks the legacy Streamable HTTP binding too: it keeps
+    the Mcp-Session-Id of the initialize answer and sends it with the agreed
+    MCP-Protocol-Version on every later POST, sends no Mcp-Method, Mcp-Name or
+    Mcp-Param headers, answers server requests on response streams, cancels
+    with notifications/cancelled and ends the session with a DELETE on
+    shutdown (405 and 404 count as ended).
+  - A 404 to a request in a legacy HTTP session starts a new session and sends
+    the request once more; concurrent requests share the new session, and a
+    second 404 fails the request in category mcp_session_expired.
+  - Over HTTP the probe falls back to initialize on a status without a
+    JSON-RPC error body as well, but not on a connection that could not be
+    made: those failures now carry a category (connect where Net::Async::HTTP
+    gave none).
+  - Configured headers can no longer set Mcp-Session-Id, MCP-Protocol-Version,
+    Mcp-Method, Mcp-Name or Mcp-Param-* on any request.
+  - A stdio server answering with an "error" that is no JSON-RPC error object
+    (a string, number or array) fails the request with the text it carries
+    and no category, as over HTTP, instead of killing the event loop. A false
+    error and "error": null without a result fail the request too.
+  - The in-process transport reads the "error" of a server object's answer
+    the same way: a shape that is no JSON-RPC error object fails the request
+    with "MCP in-process error response: TEXT" and no category instead of
+    dying in the caller, and "error": null without a result fails it too.
+  - Behaviour change: over HTTP, "error": null without a result now fails the
+    request with "MCP HTTP invalid response: a null error and no result"
+    instead of succeeding with undef, as over stdio. Next to a result it is
+    still a success.
+  - timeout applies to the stdio transport too. A request the server leaves
+    unanswered fails in category "timeout" once the limit runs out, and the
+    server is sent notifications/cancelled for it. Unset, nothing changes.
+    Over stdio it bounds the server/discover probe as well, and running out
+    of it counts as no answer there, so the client falls back to initialize.
+
 0.006     2026-10-19 02:08:03Z
   - The test phase requires JSON::MaybeXS 1.004 now. t/30_http.t spells JSON
     booleans as JSON::MaybeXS::false, which only exists since 1.004000, and

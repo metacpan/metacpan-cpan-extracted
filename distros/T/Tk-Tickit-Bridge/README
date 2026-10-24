@@ -1,0 +1,129 @@
+NAME
+
+    Tk::Tickit::Bridge - forward Perl/Tk keyboard events to Tickit
+
+SYNOPSIS
+
+        use Tk::Tickit::Bridge;
+        use Tk::Tickit::Bridge::Loop;
+    
+        # Create Tk widgets and a Tickit::Async object first.
+        $loop->add($tickit);
+        my $bridge = Tk::Tickit::Bridge->new(
+            widget => $mw,
+            term   => $tickit->term,
+        )->install;
+        my $pump = Tk::Tickit::Bridge::Loop->new(
+            widget => $mw, loop => $loop,
+        )->start;
+    
+        Tk::MainLoop();
+        $pump->stop;
+        $bridge->uninstall;
+        $tickit->term->teardown;
+
+DESCRIPTION
+
+    This module extracts Nama's Tk-to-Tickit keyboard bridge into an
+    independent distribution. It translates Tk keysyms, printable Unicode
+    text, function keys, and Shift/Control/Alt modifiers into
+    Tickit::Term->emit_key() calls. Delivery is queued until Tk's next idle
+    turn, avoiding delivery inside the original Tk key binding.
+
+    It does not embed a terminal in a Tk window. Tk and Tickit keep their
+    own windows and share a single process. See examples/bridge-demo.pl.
+
+CONSTRUCTOR
+
+    new(widget => $widget, term => $term, ...) takes a live Tk widget and a
+    Tickit terminal supporting emit_key (Tickit 0.70 or later).
+
+    forward
+
+      outside (default) forwards only when the mouse pointer is outside the
+      application's Tk windows, preserving Nama's pointer-based policy.
+      always forwards every supported key received by an attached widget. A
+      coderef receives ($source_widget, $keysym, $character, $state) and
+      returns true to forward. These policies only apply to events Tk
+      actually receives; they do not capture keys globally or move keyboard
+      focus.
+
+    consume
+
+      Defaults to true. A forwarded key stops further Tk binding
+      processing. Set to false to allow both interfaces to handle it. A
+      private bindtag runs before the widget's normal tags, so consumption
+      also protects native Tk entry widgets.
+
+    on_error
+
+      A coderef receiving a message when emit_key throws. Defaults to warn.
+      Errors from a custom forwarding policy are handled by Tk's error
+      mechanism.
+
+    shift_mask, control_mask, alt_mask
+
+      Tk modifier masks; defaults are 0x0001, 0x0004, and 0x0008. Alt
+      normally uses X11 Mod1; customize it for other mappings. Bare
+      modifiers, unsupported keysyms, and input-method composition are not
+      synthesized.
+
+METHODS
+
+    install
+
+      Installs a private binding and prepends its bindtag to widget and its
+      current descendants. Repeated installation is harmless. Keep the
+      bridge object alive. Existing application-wide all bindings are not
+      changed.
+
+    attach($widget)
+
+      Attaches another widget and its current descendants. Use this for
+      widgets or toplevels created after install. Attach widgets from the
+      same Tk application.
+
+    uninstall
+
+      Removes this bridge's tags and binding, cancels pending idle
+      delivery, and discards queued keys. Other bindings and bindtag
+      changes are preserved. Safe to repeat, including after the Tk window
+      has been destroyed. The object can subsequently be installed again.
+
+    translate_key($keysym, $character, $state)
+
+      Returns an event hashref containing type, str, and mod, or undef for
+      an unsupported key. Does not enqueue or deliver it.
+
+    enqueue(type => 'text' | 'key', str => $string, mod => $mask)
+
+      Queues a synthetic event and schedules idle delivery. mod defaults to
+      zero. This also works before install for applications using only
+      synthetic input.
+
+    pending
+
+      Returns the number of queued events.
+
+    drain
+
+      Delivers the current batch immediately. Events enqueued by a handler
+      are left for a later idle turn.
+
+EVENT LOOPS
+
+    Keyboard forwarding does not service terminal input, redraws, IO::Async
+    timers, or file descriptors. For that use Tk::Tickit::Bridge::Loop,
+    which periodically calls loop_once(0) while Tk owns the main loop.
+    Callbacks remain cooperative: a blocking callback in either interface
+    blocks both.
+
+AUTHOR
+
+    Copyright (c) 2026 Joel Roth.
+
+LICENSE
+
+    This is free software; you may redistribute it and/or modify it under
+    the same terms as Perl itself. Extracted from Audio::Nama; see LICENSE.
+

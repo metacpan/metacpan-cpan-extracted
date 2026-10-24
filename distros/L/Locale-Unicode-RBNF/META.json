@@ -1,0 +1,76 @@
+{
+   "abstract" : "Unicode CLDR Rule-Based Number Format, ported from ICU4C",
+   "author" : [
+      "Jacques Deguest <jack@deguest.jp>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Locale-Unicode-RBNF",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::CBuilder" : "0",
+            "ExtUtils::MakeMaker" : "6.64"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "5.57",
+            "File::Spec" : "0",
+            "Locale::Unicode" : "v0.4.6",
+            "Math::BigInt" : "0",
+            "POSIX" : "0",
+            "Scalar::Util" : "1.19",
+            "Unicode::Normalize" : "0",
+            "Unicode::UCD" : "0",
+            "Wanted" : "v0.1.2",
+            "XML::LibXML" : "1.70",
+            "XSLoader" : "0",
+            "parent" : "0",
+            "perl" : "5.010001",
+            "strict" : "0",
+            "vars" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98",
+            "lib" : "0",
+            "open" : "0",
+            "utf8" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://gitlab.com/deguest/Locale-Unicode-RBNF/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "web" : "https://gitlab.com/deguest/Locale-Unicode-RBNF"
+      }
+   },
+   "version" : "v0.1.0",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

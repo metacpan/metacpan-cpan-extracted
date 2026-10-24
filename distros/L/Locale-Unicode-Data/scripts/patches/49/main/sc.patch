@@ -1,0 +1,14 @@
+--- sc.xml
++++ sc.xml
+@@ -5126,6 +5126,11 @@
+ 				<displayName count="one">yuan tzinesu (extracontinentale)</displayName>
+ 				<displayName count="other">yuans tzinesos (extracontinentales)</displayName>
+ 			</currency>
++			<currency type="CNX">
++				<displayName>dòllaru de sa Banca Popolare Tzinesa</displayName>
++				<displayName count="one">dòllaru de sa Banca Popolare Tzinesa</displayName>
++				<displayName count="other">dòllaros de sa Banca Popolare Tzinesa</displayName>
++			</currency>
+ 			<currency type="CNY">
+ 				<displayName>renminbi tzinesu</displayName>
+ 				<displayName count="one">yuan tzinesu</displayName>

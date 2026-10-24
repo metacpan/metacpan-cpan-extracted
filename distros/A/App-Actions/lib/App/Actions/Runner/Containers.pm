@@ -11,9 +11,9 @@ use Text::ParseWords qw(shellwords);
 use App::Actions::Access;
 use App::Actions::Error;
 use App::Actions::I18N qw(i18n throw validate_args);
-use App::Actions::Runner::Support qw(env_args resolve_env);
+use App::Actions::Runner::Support qw(default_logger env_args resolve_env);
 
-our $VERSION = '0.001.0';
+our $VERSION = '0.002.0';
 
 # Where the project and the runner directory appear inside every container.
 Readonly::Scalar my $WORKSPACE => '/github/workspace';
@@ -115,6 +115,11 @@ Creates the container manager for one run.
 
 =item * C<quiet>, C<explain>, C<keep> - optional flags.
 
+=item * C<logger> - optional; a L<Log::Abstraction> object (default:
+L<App::Actions::Runner::Support/default_logger>, standard error).  A
+service's C<credentials>, which are not supported, are logged at the
+C<warn> level unless C<quiet> is set.
+
 =back
 
 =head3 RETURNS
@@ -149,6 +154,7 @@ None.
 		quiet       => { type => 'boolean', optional => 1 },
 		explain     => { type => 'boolean', optional => 1 },
 		keep        => { type => 'boolean', optional => 1 },
+		logger      => { type => 'object', can => [qw(warn error notice)], optional => 1 },
 	}
 
 =head4 OUTPUT
@@ -179,9 +185,11 @@ sub new {
 		quiet => { type => 'boolean', optional => 1 },
 		explain => { type => 'boolean', optional => 1 },
 		keep => { type => 'boolean', optional => 1 },
+		# Where warnings and errors go; standard error when none is given.
+		logger => { type => 'object', can => [qw(warn error notice)], optional => 1 },
 	});
 
-	return bless { %{$params}, containers => [], networks => [], counter => 0 }, $class;
+	return bless { %{$params}, logger => $params->{logger} || default_logger(), containers => [], networks => [], counter => 0 }, $class;
 }
 
 =head2 name
@@ -190,7 +198,9 @@ sub new {
 
 Makes a Docker resource name that is unique within the run and says what it
 is: C<action-run-RUN-N-KIND-JOB-INDEX[-SUFFIX]>, with unsafe characters
-replaced and cut to 63 characters.
+replaced and cut to 63 characters.  RUN is the last eight characters of the
+run id, N counts the names made so far, JOB is the job id (at most 20
+characters), and INDEX is the job's C<matrix_index> (0 when it has none).
 
 =head3 EXAMPLE
 
@@ -225,7 +235,9 @@ sub name {
 	(my $base = $job->{base_id}) =~ s/$NAME_UNSAFE/-/g;
 	$base = substr($base, 0, $JOB_NAME_LENGTH);
 
-	my $name = "action-run-$short_id-$counter-$kind-$base-$job->{matrix_index}";
+	# A job that is not one of a matrix has no index; it is the first.
+	my $index = defined $job->{matrix_index} ? $job->{matrix_index} : 0;
+	my $name = "action-run-$short_id-$counter-$kind-$base-$index";
 	$name .= "-$suffix" if defined $suffix && length $suffix;
 	$name =~ s/$NAME_UNSAFE/-/g;
 
@@ -328,6 +340,9 @@ Starts containers; prints an explanation block per service in an explain run.
 	+-----------------------------+------------------------------+-----------------------------+
 	| Service 'X' must be a       | The service entry is neither | Give it an image            |
 	| mapping / has no image      | a mapping nor an image name  |                             |
+	| Unable to read the container| The options text has a quote | Close the quote, or escape  |
+	| options 'X': a quote is not | that is not closed, so it    | it with a backslash         |
+	| closed                      | cannot be split into words   |                             |
 	| Failed to start service 'X' | docker run failed            | Check the image and options |
 	| (exit N)                    |                              |                             |
 	| Service 'X' did not stay    | It exited after starting     | Read the output quoted      |
@@ -379,7 +394,7 @@ sub start_services {
 			$image,
 		);
 
-		print STDERR $self->i18n('runner.service.credentials', { id => $id }), "\n"
+		$self->{logger}->warn($self->i18n('runner.service.credentials', { id => $id }))
 			if defined $service->{credentials} && !$self->{quiet};
 
 		$self->_explain(
@@ -523,6 +538,9 @@ it fails to start or stops at once.
 	| fault: ...; the daemon said:|                              |                             |
 	| Job container 'X' did not   | /bin/sh is missing or exited | Use an image with a shell   |
 	| stay running (exit N); ...  |                              |                             |
+	| Unable to read the container| The options text has a quote | Close the quote, or escape  |
+	| options 'X': a quote is not | that is not closed, so it    | it with a backslash         |
+	| closed                      | cannot be split into words   |                             |
 	+-----------------------------+------------------------------+-----------------------------+
 
 =head3 PSEUDOCODE
@@ -896,10 +914,31 @@ sub _user_args {
 sub _options_args {
 	my ($self, $options, $context) = @_;
 
-	return [
-		@{ $self->_platform_args },
-		(defined $options ? shellwords($self->{expression}->interpolate("$options", $context)) : ()),
-	];
+	return [ @{ $self->_platform_args }, @{ $self->_option_words($options, $context) } ];
+}
+
+# _option_words
+# Purpose:     Split a container's `options` into words, as a shell would.
+# Entry:       $options - the workflow's text, or undef; $context.
+# Exit status: Returns an array reference, empty for no options.  Throws
+#              runner.options_invalid when the text cannot be split (an
+#              unclosed quote): shellwords then returns nothing at all,
+#              and every option, --read-only and --user among them, would
+#              be dropped without a word.
+# Side effects: None.
+sub _option_words {
+	my ($self, $options, $context) = @_;
+
+	return [] unless defined $options;
+
+	my $text = $self->{expression}->interpolate("$options", $context);
+	my @words = shellwords($text);
+	# The text is quoted as the workflow wrote it, so a secret the
+	# interpolation filled in is not printed.
+	$self->throw('runner.options_invalid', { options => "$options", location => 0 })
+		if !@words && $text =~ /\S/;
+
+	return \@words;
 }
 
 # _list_args
@@ -943,7 +982,7 @@ sub _service_entrypoint {
 
 	return undef unless defined $service->{options};    ## no critic (ProhibitExplicitReturnUndef)
 
-	my @tokens = shellwords($self->{expression}->interpolate("$service->{options}", $context));
+	my @tokens = @{ $self->_option_words($service->{options}, $context) };
 	my $entrypoint;
 	for my $index (0 .. $#tokens) {
 		# --entrypoint X and --entrypoint=X both say it; the first one wins.
@@ -1059,7 +1098,7 @@ sub _start_fault {
 	# it is looked for first; an entrypoint is only blamed when the message
 	# names the one this container was given.
 	return (grep { index($lowered, $_) >= 0 } @IMAGE_COMPLAINTS)
-		? (defined $ran{image} ? $self->i18n('runner.fault.image', { image => $ran{image} }) : $self->i18n('runner.fault.image_unnamed'))
+		? $self->i18n('runner.fault.image', { image => $ran{image} })
 		: $said =~ /port is already allocated|address already in use/i
 		? $self->i18n('runner.fault.port')
 		: (defined $entrypoint && length $entrypoint && index($said, $entrypoint) >= 0
@@ -1096,14 +1135,21 @@ sub _with_output {
 # _hostname
 # Purpose:     A valid hostname for the job container, from the job's id.
 # Entry:       $value - the job id.
-# Exit status: Returns a name of at most 63 safe characters; 'local' if none.
+# Exit status: Returns a name of at most 63 safe characters, with no hyphen
+#              or dot at either end; 'local' if none is left.
 # Side effects: None.
 sub _hostname {
 	my ($value) = @_;
 
 	$value = '' unless defined $value;
 	$value =~ s/[^A-Za-z0-9.-]/-/g;
+
+	# A hostname may not begin or end with a hyphen or a dot, so a job id
+	# such as _build or build_ loses them.  Each end separately, and the
+	# end after the cut, which can leave one last.
+	$value =~ s/\A[.-]+//;
 	$value = substr($value, 0, $NAME_LENGTH);
+	$value =~ s/[.-]+\z//;
 
 	return length $value ? $value : 'local';
 }

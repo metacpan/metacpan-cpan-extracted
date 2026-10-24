@@ -7,27 +7,31 @@ use JSON::PP ();
 use Readonly;
 use Scalar::Util qw(looks_like_number);
 
+use App::Actions::Error;
 use App::Actions::Util ();
 
 # The tokenizer matches each token where the previous one ended (\G with
 # pos), rather than against substr($text, $pos), which copies the rest of the
 # expression for every token and so is quadratic in its length.
 
-# A number literal: 12, 1.5, 1., .5, and any of those with an exponent.
+# A number literal: 12, 1.5, 1., .5, and any of those with an exponent or
+# a minus sign.  The language has no subtraction, so a minus that starts a
+# token can only be a sign (a dash inside a name is part of the name).
 Readonly::Scalar my $NUMBER => qr/
-	\G
-	(
-		(?: \d++ (?: \. \d*+ )?    # 12, 1.5 or 1.
-		  | \. \d++               # .5
-		)
-		(?: [eE] [+-]? \d++ )?     # an exponent
-	)
+    \G
+    (
+        -?                         # a sign
+        (?: \d++ (?: \. \d*+ )?    # 12, 1.5 or 1.
+          | \. \d++               # .5
+        )
+        (?: [eE] [+-]? \d++ )?     # an exponent
+    )
 /x;
 
 # An identifier: a letter or underscore, then letters, digits, _ and -.
 Readonly::Scalar my $IDENTIFIER => qr/\G([A-Za-z_][A-Za-z0-9_-]*+)/;
 
-our $VERSION = '0.001.0';
+our $VERSION = '0.002.0';
 
 sub new {
     my ($class) = @_;
@@ -43,23 +47,39 @@ sub new {
 sub evaluate {
     my ($self, $expression, $context, $status) = @_;
 
+    return $self->_evaluate($expression, $context, $status)->{value};
+}
+
+# Purpose: evaluate one expression and say whether any lookup in it missed.
+# Entry: $expression is the text between ${{ and }}; $context and $status
+#   may be undef.
+# Exit: { value => the result, unresolved => 1 if a lookup found nothing }.
+#   Croaks on undefined, empty or malformed text.
+# Side effects: none that outlast the call.  The parse state lives in the
+#   object only while the call runs (local), so an evaluation started from
+#   inside another - a lookup that works out its value on demand, as
+#   App::Actions::Runner::Support::resolve_env's env does - cannot disturb
+#   the outer one, and the object does not keep the context alive afterwards.
+sub _evaluate {
+    my ($self, $expression, $context, $status) = @_;
+
     croak 'Cannot evaluate an undefined expression' unless defined $expression;
     my $text = "$expression";
     croak 'Cannot evaluate an empty expression' if $text =~ /^\s*$/;
 
-    $self->{context} = $context || {};
-    $self->{status}  = $status  || {};
-    $self->{tokens}  = $self->_tokenize($text);
-    $self->{pos}     = 0;
+    local $self->{context} = $context || {};
+    local $self->{status}  = $status  || {};
+    local $self->{tokens}  = $self->_tokenize($text);
+    local $self->{pos}     = 0;
     # Whether a lookup found nothing, which strict interpolation turns into an
     # error.  An existing value that happens to be empty is not a miss.
-    $self->{unresolved} = 0;
+    local $self->{unresolved} = 0;
 
     my $value = $self->_parse_expression;
     my $token = $self->_peek;
     croak "Unexpected '$token->{value}' in expression '$text'" if $token->{type} ne 'eof';
 
-    return $value;
+    return { value => $value, unresolved => $self->{unresolved} };
 }
 
 # Replace every ${{ ... }} in a string.
@@ -76,13 +96,14 @@ sub interpolate {
         my $open = index($out, '${{', $start);
         last if $open < 0;
 
-        my $close = index($out, '}}', $open + 3);
+        my $close = _closing($out, $open + 3);
         croak "Unclosed expression in '$text'" if $close < 0;
 
         my $expression = substr($out, $open + 3, $close - $open - 3);
-        my $value      = $self->evaluate($expression, $context, $status);
+        my $result     = $self->_evaluate($expression, $context, $status);
+        my $value      = $result->{value};
 
-        if ($self->{strict} && $self->{unresolved}) {
+        if ($self->{strict} && $result->{unresolved}) {
             my $written = App::Actions::Util::trim($expression);
             croak "unable to resolve '\${{ $written }}' from the values available";
         }
@@ -125,13 +146,14 @@ sub interpolate_known {
         my $open = index($out, '${{', $start);
         last if $open < 0;
 
-        my $close = index($out, '}}', $open + 3);
+        my $close = _closing($out, $open + 3);
         croak "Unclosed expression in '$text'" if $close < 0;
 
         my $expression = substr($out, $open + 3, $close - $open - 3);
-        my $value      = $self->evaluate($expression, $context, $status);
+        my $result     = $self->_evaluate($expression, $context, $status);
+        my $value      = $result->{value};
 
-        if ($self->{unresolved}) {
+        if ($result->{unresolved}) {
             # Step over the expression, which stays in the text.
             $start = $close + 2;
             next;
@@ -151,7 +173,10 @@ sub condition {
     my ($self, $condition, $context, $status) = @_;
 
     return 1 unless defined $condition;
-    return $condition ? 1 : 0 if ref $condition;
+    # A YAML boolean (if: false) is used as it is: a JSON::PP::Boolean, or,
+    # from Perl 5.36, one of Perl's own, which reads as '' for false and
+    # would otherwise be taken for an empty condition, which runs.
+    return $condition ? 1 : 0 if ref $condition || _is_core_boolean($condition);
 
     my $text = "$condition";
     $text =~ s/^\s+//;
@@ -165,6 +190,48 @@ sub condition {
     }
 
     return _truthy($self->evaluate($text, $context, $status));
+}
+
+# _is_core_boolean
+# Purpose:     Say whether a value is one of Perl's own booleans (5.36 and
+#              later), as YAML::PP loads true and false.
+# Entry:       $value - any defined scalar.
+# Exit status: Returns 1 or 0; always 0 before Perl 5.36.
+# Side effects: None.
+sub _is_core_boolean {
+    my ($value) = @_;
+
+    return 0 if $] < 5.036;
+
+    # builtin::is_bool is experimental in 5.36 and 5.38.
+    no warnings;
+    return builtin::is_bool($value) ? 1 : 0;
+}
+
+# _closing
+# Purpose:     Find the "}}" that ends an expression.
+# Entry:       $text - the text; $from - where the expression starts, just
+#              after its "${{".
+# Exit status: Returns the position of the first "}}" that is not inside a
+#              quoted string, or -1 when there is none (or a string is never
+#              closed).  A doubled quote inside a string ('it''s') needs no
+#              special case: it ends one string and starts the next.
+# Side effects: None.  Each part of the text is looked at once, so the cost
+#              is linear in its length.
+sub _closing {
+    my ($text, $from) = @_;
+
+    my $at = $from;
+    while (1) {
+        my $close = index($text, '}}', $at);
+        my $quote = index($text, q{'}, $at);
+        return $close if $quote < 0 || ($close >= 0 && $close < $quote);
+
+        # A string starts before the next "}}", so a "}}" inside it is text.
+        my $end = index($text, q{'}, $quote + 1);
+        return -1 if $end < 0;
+        $at = $end + 1;
+    }
 }
 
 sub _tokenize {
@@ -206,8 +273,14 @@ sub _tokenize {
             next;
         }
 
+        # After a name, ) or ], a dot reads a property, so "a.1" is a dot
+        # with no property name after it, not "a" followed by the number .1.
+        my $previous = @tokens ? $tokens[-1] : { type => '', value => '' };
+        my $after_value = $previous->{type} eq 'ident'
+            || ($previous->{type} eq 'punct' && ($previous->{value} eq ')' || $previous->{value} eq ']'));
+
         pos($text) = $pos;
-        if ($text =~ /$NUMBER/gc) {
+        if (!($char eq '.' && $after_value) && $text =~ /$NUMBER/gc) {
             my $number = $1;
             push @tokens, { type => 'num', value => $number + 0 };
             $pos += length($number);
@@ -315,7 +388,7 @@ sub _parse_equality {
         $self->_next;
         my $right = $self->_parse_relational;
         my $equal = _equal($left, $right);
-        $left = $operator eq '==' ? $equal : !$equal;
+        $left = _boolean($operator eq '==' ? $equal : !$equal);
     }
 
     return $left;
@@ -331,10 +404,10 @@ sub _parse_relational {
         $self->_next;
         my $right = $self->_parse_unary;
         my $comparison = _compare($left, $right);
-        $left = $operator eq '<'  ? $comparison < 0
+        $left = _boolean($operator eq '<'  ? $comparison < 0
               : $operator eq '<=' ? $comparison <= 0
               : $operator eq '>'  ? $comparison > 0
-              :                     $comparison >= 0;
+              :                     $comparison >= 0);
     }
 
     return $left;
@@ -347,7 +420,7 @@ sub _parse_unary {
     my $negated = $self->_peek_value eq '!';
     $self->_next if $negated;
 
-    return $negated ? (_truthy($self->_parse_unary) ? 0 : 1) : $self->_parse_primary;
+    return $negated ? _boolean(!_truthy($self->_parse_unary)) : $self->_parse_primary;
 }
 
 sub _parse_primary {
@@ -382,10 +455,10 @@ sub _parse_primary {
 
         my $lower = lc $name;
         if ($lower eq 'true') {
-            return $self->_postfix(1);
+            return $self->_postfix(_boolean(1));
         }
         if ($lower eq 'false') {
-            return $self->_postfix(0);
+            return $self->_postfix(_boolean(0));
         }
         if ($lower eq 'null') {
             return $self->_postfix(undef);
@@ -453,7 +526,9 @@ sub _lookup {
     }
 
     if (ref $object eq 'ARRAY') {
-        return $self->_missing unless $key =~ /\A-?\d+\z/;
+        # An index past either end finds nothing, as a missing key does, so
+        # strict interpolation reports it rather than writing ''.
+        return $self->_missing unless $key =~ /\A-?\d+\z/ && $key < @$object && $key >= -@$object;
         return $object->[$key];
     }
 
@@ -475,40 +550,44 @@ sub _call_function {
 
     my $function = lc $name;
 
-    return $self->{status}{success} ? 1 : 0   if $function eq 'success';
-    return $self->{status}{failure} ? 1 : 0   if $function eq 'failure';
-    return 1                                  if $function eq 'always';
-    return $self->{status}{cancelled} ? 1 : 0 if $function eq 'cancelled';
+    return _boolean($self->{status}{success})   if $function eq 'success';
+    return _boolean($self->{status}{failure})   if $function eq 'failure';
+    return _boolean(1)                          if $function eq 'always';
+    return _boolean($self->{status}{cancelled}) if $function eq 'cancelled';
 
     if ($function eq 'contains') {
         croak 'contains() expects two arguments' unless @$args == 2;
         my ($search, $item) = @$args;
         if (ref $search eq 'ARRAY') {
             for my $candidate (@$search) {
-                return 1 if _equal($candidate, $item);
+                return _boolean(1) if _equal($candidate, $item);
             }
-            return 0;
+            return _boolean(0);
         }
-        return index(lc(_stringify($search)), lc(_stringify($item))) >= 0 ? 1 : 0;
+        return _boolean(index(lc(_stringify($search)), lc(_stringify($item))) >= 0);
     }
 
     if ($function eq 'startswith' || $function eq 'endswith') {
         croak "$name() expects two arguments" unless @$args == 2;
         my ($haystack, $needle) = map { lc _stringify($_) } @$args;
-        return $function eq 'startswith'
-            ? (index($haystack, $needle) == 0 ? 1 : 0)
-            : (length($needle) <= length($haystack)
-                && substr($haystack, -length($needle)) eq $needle ? 1 : 0);
+        return _boolean($function eq 'startswith'
+            ? index($haystack, $needle) == 0
+            : length($needle) <= length($haystack)
+                && substr($haystack, -length($needle)) eq $needle);
     }
 
     if ($function eq 'format') {
         croak 'format() expects at least one argument' unless @$args;
-        my $format = _stringify(shift @$args);
-        $format =~ s/\{\{/\x00/g;
-        $format =~ s/\}\}/\x01/g;
-        $format =~ s/\{(\d+)\}/defined $args->[$1] ? _stringify($args->[$1]) : ''/ge;
-        $format =~ s/\x00/{/g;
-        $format =~ s/\x01/}/g;
+        my ($format, @values) = @$args;
+        $format = _stringify($format);
+        # One pass, left to right, as GitHub reads it: {{ is {, }} is } and
+        # {N} is argument N.  Replacing every }} first would take the brace
+        # that closes {0} in "{0}}}" as half of an escape.
+        $format =~ s{(\{\{|\}\}|\{(\d+)\})}{
+            $1 eq '{{' ? '{'
+                : $1 eq '}}' ? '}'
+                : defined $values[$2] ? _stringify($values[$2]) : ''
+        }ge;
         return $format;
     }
 
@@ -526,8 +605,20 @@ sub _call_function {
 
     if ($function eq 'fromjson') {
         croak 'fromJSON() expects one argument' unless @$args == 1;
-        my $value = eval { $self->{json}->decode(_stringify($args->[0])) };
-        croak "fromJSON() failed: $@" if $@;
+        # The caller's $@ is left alone, and JSON::PP's reason is given
+        # without its own file and line: croak names the caller's.
+        my ($value, $failure);
+        {
+            local $@;
+            eval { $value = $self->{json}->decode(_stringify($args->[0])); 1 }
+                or $failure = $@ || 'unknown error';
+        }
+        if (defined $failure) {
+            # describe() takes the last " at FILE line N.", so a path with
+            # spaces in it, or JSON::PP's own ", at character offset", is
+            # handled.
+            croak 'fromJSON() failed: ' . App::Actions::Error->describe($failure);
+        }
         return $value;
     }
 
@@ -582,6 +673,17 @@ sub _is_number {
 # shown in a job's display name.
 sub _stringify {
     return App::Actions::Util::stringify($_[0]);
+}
+
+# _boolean
+# Purpose:     Make a truth value into the expression language's boolean.
+# Entry:       $value - anything; it is taken as Perl takes it.
+# Exit status: Returns JSON::PP::true or JSON::PP::false.  These compare and
+#              count as 1 and 0, and interpolate as true and false, as
+#              GitHub writes a boolean.
+# Side effects: None.
+sub _boolean {
+    return $_[0] ? JSON::PP::true() : JSON::PP::false();
 }
 
 1;
@@ -642,13 +744,15 @@ locally:
 =over 4
 
 =item * B<Values:> strings in single quotes (write two quotes for one quote
-inside: C<'it''s'>), numbers (C<42>, C<1.5>, C<1e3>), and C<true>,
-C<false> and C<null>.
+inside: C<'it''s'>), numbers (C<42>, C<-1.5>, C<1e3>), and C<true>,
+C<false> and C<null>.  A C<}}> inside a string is part of the string, so
+C<${{ '}}' }}> is the text C<}}>.
 
 =item * B<Looking up values:> C<matrix.perl>, C<env['HOME']>,
-C<steps.build.outputs.path>, C<list[0]>.  Names are matched without regard
-to upper and lower case, as on GitHub.  A name that does not exist gives
-C<null>; it is not an error (but see L</interpolate_strict>).
+C<steps.build.outputs.path>, C<list[0]>, C<list[-1]> (the last).  Names are
+matched without regard to upper and lower case, as on GitHub.  A name that
+does not exist, or an index past either end of a list, gives C<null>; it is
+not an error (but see L</interpolate_strict>).
 
 =item * B<Operators,> from loosest to tightest: C<||>, C<&&>, C<==> and
 C<!=>, C<E<lt>> C<E<lt>=> C<E<gt>> C<E<gt>=>, C<!>, and brackets C<( )>.
@@ -657,7 +761,10 @@ C<a> if it is true, otherwise C<'x'>.
 
 =item * B<Comparisons:> two numbers are compared as numbers.  Anything else
 is compared as text, without regard to case, so C<'ABC' == 'abc'> is true.
-C<true> and C<false> count as 1 and 0 when compared with a number.
+C<true> and C<false> count as 1 and 0 when compared with a number.  A
+comparison, C<!>, C<true>, C<false> and the functions that answer yes or no
+give a boolean, which is written as C<true> or C<false> in text, as on
+GitHub.
 
 =item * B<Functions:> C<contains>, C<startsWith>, C<endsWith>, C<format>,
 C<join>, C<toJSON>, C<fromJSON>, and the status functions C<success>,
@@ -729,13 +836,16 @@ are false.  C<always()> is always true.
 
 =head3 RETURNS
 
-The value: a string, a number, 1 or 0 for a comparison, a reference for an
-array or object, or C<undef> for C<null> or a missing name.
+The value: a string, a number, a boolean (C<JSON::PP::true> or
+C<JSON::PP::false>, which count as 1 and 0) for a comparison, a reference
+for an array or object, or C<undef> for C<null> or a missing name.
 
 =head3 SIDE EFFECTS
 
-Remembers whether a name was missing, for L</interpolate_strict> and
-L</interpolate_known>.
+None.  The object holds the text being parsed only while the call runs, so
+a lookup that itself evaluates an expression with the same object (a tied
+hash in the context, say) is safe, and the object does not keep the context
+alive once the call returns.
 
 =head3 EXAMPLE
 
@@ -997,11 +1107,11 @@ look like numbers are compared as numbers.
 =item * B<C<||> and C<&&> do not always return true or false.>  They return
 an operand, so C<${{ a || 'default' }}> is a common way to give a default.
 
-=item * B<Booleans in text are not always C<true>/C<false>.>  In this
-version, C<${{ true }}> and C<${{ 1 == 1 }}> are written as C<1>, and
-C<${{ 1 == 2 }}> as C<0>, but C<${{ 1 != 1 }}> as C<false>.  GitHub writes
-C<true> or C<false> for all of them.  Use comparisons in C<if:>, where they
-work the same, rather than in text.
+=item * B<A boolean in text is C<true> or C<false>, not 1 or 0.>  C<echo
+${{ 1 == 1 }}> prints C<true>, as on GitHub.  Perl code that reads the value
+of L</evaluate> gets a C<JSON::PP> boolean, which is 1 or 0 in a number or a
+comparison but C<true> or C<false> when it goes through
+L<App::Actions::Util/stringify>.
 
 =item * B<An empty array is true.>  C<if: ${{ fromJSON('[]') }}> runs.
 
@@ -1034,8 +1144,6 @@ non-ASCII letters too.
 =item * The object filter C<*> (as in C<github.event.*.name>) is not
 supported.
 
-=item * Booleans made by an expression are not written as C<true>/C<false>
-in text; see L</COMMON PITFALLS>.
 
 =item * Arithmetic is not part of the GitHub Actions expression language and
 is not implemented.
@@ -1056,8 +1164,9 @@ sections above.
 How to read it: a box names a routine.  The lines above the middle rule
 declare the values it works with.  A name ending in C<?> is an input, and a
 name ending in C<!> is an output.  C<ΞEvaluator> means the routine leaves
-the evaluator's visible state alone.  The lines below the rule are always
-true when the routine returns.
+the evaluator's state alone: no routine changes it, because each keeps the
+expression it is parsing only while it runs.  The lines below the rule are
+always true when the routine returns.
 
     [VALUE, TEXT]
     CONTEXT == NAME ⇸ VALUE
@@ -1069,7 +1178,8 @@ true when the routine returns.
     show : VALUE → TEXT                           as App::Actions::Util::stringify
 
     ┌─ Evaluator ───────────────────────────────────────
-    │ unresolved : 𝔹
+    │ context : CONTEXT
+    │ status  : STATUS
     └───────────────────────────────────────────────────
 
 =head2 new
@@ -1077,13 +1187,13 @@ true when the routine returns.
     ┌─ New ─────────────────────────────────────────────
     │ Evaluator'
     ├───────────────────────────────────────────────────
-    │ unresolved' = false
+    │ context' = ∅ ∧ status' = ∅
     └───────────────────────────────────────────────────
 
 =head2 evaluate
 
     ┌─ Evaluate ────────────────────────────────────────
-    │ ΔEvaluator
+    │ ΞEvaluator
     │ text?    : TEXT
     │ context? : CONTEXT
     │ status?  : STATUS
@@ -1093,7 +1203,8 @@ true when the routine returns.
     │ text? is only white space ⇒ raises Empty
     │ text? ∉ dom value ⇒ raises Syntax
     │ otherwise v! = value(text?, context?, status?)
-    │     ∧ unresolved' = missing(text?, context?)
+    │ (a lookup may itself call Evaluate on the same evaluator:
+    │  the outer call's result is unchanged)
     └───────────────────────────────────────────────────
 
 =head2 interpolate
@@ -1105,7 +1216,7 @@ true when the routine returns.
     ├───────────────────────────────────────────────────
     │ text? = ⊥ ∨ text? ∈ REF ⇒ r! = text?
     │ text? = p₀ ⁀ "${{" ⁀ e₁ ⁀ "}}" ⁀ p₁ ⁀ … ⁀ "${{" ⁀ eₙ ⁀ "}}" ⁀ pₙ
-    │     where no pᵢ contains "${{" and no eᵢ contains "}}"
+    │     where no pᵢ contains "${{" and no eᵢ contains "}}" outside a quoted string
     │     ⇒ r! = p₀ ⁀ show(value(e₁)) ⁀ p₁ ⁀ … ⁀ show(value(eₙ)) ⁀ pₙ
     │ "${{" in pₙ with no "}}" after it ⇒ raises Unclosed
     └───────────────────────────────────────────────────
@@ -1143,8 +1254,10 @@ true when the routine returns.
 
 =head1 STATE DIAGRAM
 
-The evaluator has one piece of state: whether the last lookup found
-nothing.  Each call to L</evaluate> goes through these steps:
+The evaluator keeps nothing between calls.  While a call runs it holds the
+expression, its position and whether a lookup found nothing; these are
+put back when the call returns, so a call made from inside a lookup does
+not disturb the one that made it.  Each call goes through these steps:
 
                          evaluate($text, $context, $status)
                                      |

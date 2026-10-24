@@ -54,6 +54,11 @@ for my $set (
         unless @$found;
 }
 
+# Object::Configure reads the developer's own configuration files (~/.conf
+# and the like), where a UNIVERSAL logger would take the messages these tests
+# read off standard error.  An empty directory leaves the defaults in force.
+local $ENV{CONFIG_DIR} = tempdir(CLEANUP => 1);
+
 # Every run in this file goes through the command, which records the images it
 # kept; that record belongs in a temporary file, not the real cache.
 local $ENV{ACTION_RUN_CACHE_FILE}

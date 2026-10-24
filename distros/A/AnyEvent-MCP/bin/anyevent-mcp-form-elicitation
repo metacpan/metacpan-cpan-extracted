@@ -50,16 +50,17 @@ C<PERL_ANYEVENT_MCP_ELICITATION_HELPER> to select an alternative.
 
 =item --tty
 
-Use the terminal directly, without trying YAD.
+Display form on C</dev/tty>, never try YAD. Fails when terminal unavailable.
+Cannot combine with C<--yad>.
 
 =item --yad
 
-Use only YAD. If it cannot start, fail without trying a terminal.
-Mutually exclusive with C<--tty>.
+Display form with YAD only; fails when unavailable. No terminal fallback.
+Cannot combine with C<--tty>.
 
 =item --help
 
-Print a short usage message.
+Print short usage synopsis and exit.
 
 =back
 

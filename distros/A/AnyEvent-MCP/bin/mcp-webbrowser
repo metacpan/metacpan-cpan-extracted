@@ -148,10 +148,13 @@ C<navigation: "timeout"> with a reason, current revision and available metadata.
 Timeout does not imply that the command was not executed; no automatic retry
 is attempted. One navigation operation at a time is allowed per tab.
 
-The browser client injects C<code> as the body of C<async () =E<gt> code>
-in the page's JavaScript world. A single expression yields its value without
-C<return>; use a braced function body with explicit C<return> for multiple
-statements. Parenthesize object literals, e.g. C<({title: document.title})>.
+The browser client injects C<code> as body of C<async () =E<gt> CODE>
+in the page's JavaScript world. Supply only CODE, not the arrow-function
+wrapper. For example, C<({title: document.title})> returns an object;
+C<async () =E<gt> ({title: document.title})> returns a function and is
+rejected as a non-JSON result. Single expression yields its value without
+C<return>; braced function body needs explicit C<return> for multiple
+statements.
 C<await> works inside either form. Declarations in the body do not persist
 between calls unless assigned to page globals. Results are awaited. This
 does not use C<eval> or C<Function>. Syntax errors can prevent the injected
@@ -200,15 +203,21 @@ C<--ask> selects the same helper, tty, yad, mcp or auto modes as other servers.
 
 =head1 OPTIONS
 
-Common options, including C<--name>, C<--bind>, C<--token>,
-C<--stdio>, C<--connect>, C<--print-url>, C<--auto-allow> and
-C<--auto-deny>, are documented in
-L<AnyEvent::MCP::Server::Simple/mcp_getoptions>. This broker retains its
-HTTP/WebSocket listener when serving MCP over stdio or C<--connect>.
-C<--tool-help> prints registered tools and arguments without listening.
-C<--auto-allow '*,*'> approves both discovery and JavaScript execution:
-only explicitly opted-in tabs are exposed, but code has full authority
-in those pages.
+Common server options: L<AnyEvent::MCP::Server::Simple/mcp_getoptions>.
+The HTTP/WebSocket listener remains active under C<--stdio> or C<--connect>.
+C<--tool-help> lists registered tools and arguments without listening.
+For example, C<--auto-allow '*,*'> approves discovery and JavaScript
+execution in explicitly opted-in tabs; page code then has full authority.
+
+=over
+
+=item --ask MODE
+
+Permission prompts: C<helper> (default), C<tty>, C<yad>, C<mcp> or
+C<auto>. tty/yad force local interface; mcp delegates to client,
+auto prefers native elicitation when offered. See L</PERMISSIONS>.
+
+=back
 
 =head1 BROWSER PROTOCOL
 
@@ -605,7 +614,7 @@ sub accept_browser {
 }
 
 my $toolset = AnyEvent::MCP::Server::Toolset->new;
-$toolset->tool (tabs => "List connected browser tabs and their client-reported metadata.",
+$toolset->tool (tabs => "List connected tabs; metadata client-reported.",
    { type => "object", properties => {}, additionalProperties => JSON::XS::false },
    sub {
       my ($req) = @_;
@@ -618,17 +627,18 @@ $toolset->tool (tabs => "List connected browser tabs and their client-reported m
       } sort keys %pages] });
    },
 );
-$toolset->tool (execute => "Run code in the page as async () => CODE. A single expression returns implicitly; "
-      . "a { ... } statement body needs explicit return. await works; write object literals as ({ ... }). "
-      . "UTF-8 JSON replies default to max_bytes=16384 (16 KiB), configurable up to 2097152 (2 MiB); oversized output errors after execution, not truncated. "
-      . "With navigate=true, acknowledge before execution, "
-      . "then wait for a new document or observed same-document navigation. "
-      . "Revision/instance guards prevent executing in a replaced document.",
+$toolset->tool (execute => "Page JS: CODE becomes body of async () => CODE; supply CODE, not arrow-function wrapper. "
+      . "Example: ({title: document.title}); NOT async () => ({title: document.title}) (returns function, rejected). "
+      . "Single expression returns implicitly; { ... } body needs explicit return; await works. "
+      . "UTF-8 JSON reply max_bytes=16384 (16 KiB) default, max 2097152 (2 MiB). Oversize errors after execution; no truncation. "
+      . "navigate=true: acknowledge before execution, "
+      . "then wait for new document or observed same-document navigation. "
+      . "Revision/instance guards reject replaced documents.",
    {
       type => "object",
       properties => {
          target => { type => "string", minLength => 1 },
-         code => { type => "string" },
+         code => { type => "string", description => "Expression or { ... } body for async () => CODE. Do not include async () => wrapper." },
          instance_id => { type => "string", minLength => 1 },
          revision => { type => "integer", minimum => 1 },
          navigate => { type => "boolean", default => JSON::XS::false },
@@ -699,11 +709,11 @@ $toolset->tool (execute => "Run code in the page as async () => CODE. A single e
       send_message $page, ["call", $id*1, "execute", { code => $args->{code}, max_bytes => $args->{max_bytes} // 16 * 1024 }];
    },
 );
-$toolset->tool (add_element => "Insert a DOM element via userscript GM_addElement, bypassing page CSP for style/script elements. "
-      . "Set HTML attributes with attributes and DOM properties (e.g. textContent or innerHTML) with properties. "
-      . "Optional parent is a CSS selector, default document.documentElement. "
-      . "Give the element your own distinctive id or data-* attribute if you want to find, change or remove it later via execute. "
-      . "No automatic id or registry is created.",
+$toolset->tool (add_element => "Insert DOM element via userscript GM_addElement; style/script bypass page CSP. "
+      . "Set HTML attributes via attributes; DOM properties (textContent/innerHTML) via properties. "
+      . "parent: CSS selector; default document.documentElement. "
+      . "Set distinctive id or data-* to find/edit/remove later via execute. "
+      . "No automatic ID/registry.",
    {
       type => "object",
       properties => {
@@ -757,14 +767,14 @@ my $custom_instructions = $options->{custom_instructions}
 my %server = (
    server_info => { name => "mcp-webbrowser", version => "0" },
    auto_instructions  => 1,
-   short_instructions => "Inspect connected browser tabs or run JavaScript in their pages. Discover tools.",
+   short_instructions => "Inspect connected tabs; run page JavaScript. Discover tools.",
    (defined $custom_instructions ? (custom_instructions => $custom_instructions) : ()),
-   instructions => "Tabs have stable targets and document revisions. "
-      . "Use tabs to find current revision. execute runs code as async () => CODE in page context; "
-      . "CODE may be an expression or a braced body with explicit return; parenthesize object literals. "
-      . "navigate=true acknowledges before evaluation and waits for a document replacement or SPA navigation. "
-      . "The navigation result reports document, same-document or timeout; execution may still have happened and is never retried. "
-      . "Use revision to guard subsequent calls. Metadata is client-reported.",
+   instructions => "Tabs have stable targets/document revisions. "
+      . "Use tabs for current revision. execute runs async () => CODE in page; "
+      . "expression returns implicitly; { ... } body needs return; parenthesize object literals. "
+      . "navigate=true acknowledges before evaluation; waits for new document or SPA navigation. "
+      . "Navigation result: document, same-document, timeout. Execution may have happened even on timeout; never retried. "
+      . "Guard later calls with revision; metadata client-reported.",
    toolsets => [$toolset], permissions => $permissions,
    on_request => \&mcp_log_request,
    on_error => sub { AE::log info => "mcp-tool $_[1]{tool}: $_[2]" },

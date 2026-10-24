@@ -1,5 +1,5 @@
 package Configd::Unit;
-$Configd::Unit::VERSION = '0.002';
+$Configd::Unit::VERSION = '0.005';
 #ABSTRACT: The systemd drop-in that rebuilds a language's files before the daemon reads them.
 
 use 5.034;
@@ -138,7 +138,7 @@ Configd::Unit - The systemd drop-in that rebuilds a language's files before the 
 
 =head1 VERSION
 
-version 0.002
+version 0.005
 
 =head1 SYNOPSIS
 

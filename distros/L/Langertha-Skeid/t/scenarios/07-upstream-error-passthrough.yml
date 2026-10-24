@@ -1,0 +1,31 @@
+title: An upstream failure reaches the client with its status and message in the face it asked for, and the node stays healthy
+setup:
+  nodes:
+    - id: gpu
+      model: m
+      upstream:
+        rules:
+          "bad": { error: { status: 400, message: "context too long" } }
+          "boom": { error: { status: 503, message: "model is loading" } }
+        after: {}
+        fallback: { answer: ok }
+steps:
+  - chat: { protocol: openai, model: m, prompt: bad }
+    expect: { status: 400, body_like: context too long }
+  - chat: { protocol: anthropic, model: m, prompt: bad }
+    expect: { status: 400, json: { type: error }, body_like: context too long }
+  - chat: { protocol: ollama, model: m, prompt: bad }
+    expect: { status: 400, body_like: context too long }
+  - chat: { protocol: openai, model: m, prompt: boom }
+    expect: { status: 503, body_like: model is loading }
+  # nothing above made the node unhealthy: it still answers
+  - chat: { protocol: openai, model: m, prompt: fine }
+    expect: { text: ok }
+    upstream:
+      gpu: { requests: 5 }
+    usage:
+      - { ok: 0, status_code: 400 }
+      - { ok: 0, status_code: 400 }
+      - { ok: 0, status_code: 400 }
+      - { ok: 0, status_code: 503 }
+      - { ok: 1, status_code: 200 }

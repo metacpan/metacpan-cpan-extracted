@@ -1,5 +1,38 @@
 Revision history for Database-BI
 
+0.016.0	Fri Oct 23 08:58:00 AM EDT 2026
+	[ New Features ]
+	- POST /api/ask: Natural language to analysis spec.
+	  Translates a plain-English question into an analysis spec by
+	  calling the Anthropic Messages API.  The model receives only column
+	  names and types -- no raw row data, no file paths.  The returned spec
+	  is validated (column names and kind checked) before being returned.
+	  The feature is absent (503) when ai_api_key is not configured.
+	  Database::BI::Ask -- new module.
+	  Ask... button added to the dashboard toolbar when ai_api_key is set.
+	  New test suite t/ask.t.
+	- GET /insights: Automatic statistical insights panel.
+	  Detects outliers (Tukey IQR fence), period-over-period deltas,
+	  top movers by dimension, and seasonality (lag-1 autocorrelation
+	  on monthly totals, threshold r>=0.6).  No LLM or external service
+	  required.  Every insight includes a view_url linking to the chart
+	  or stats page that shows the underlying data.
+	  Database::BI::Insights -- new module; pure arithmetic, no eval.
+	  New test suite t/insights.t (218 subtests).
+	- Insights button added to the dashboard toolbar (next to Column stats).
+	- POST /api/summary: Narrative summary generation.
+	  Two paths: deterministic template sentences (offline, always available)
+	  and optional LLM polish via the Anthropic Messages API (opt-in,
+	  activated by setting ai_api_key in the app config and passing ai=1).
+	  Only aggregate insight facts are sent to the LLM -- no raw row data,
+	  no file paths.  Results are cached in-process for 1 hour.
+	  Database::BI::Summary -- new module.
+	  Summarize button added to /insights page; Use AI opt-in checkbox
+	  shown when ai_api_key is configured in the app.
+	  New test suite t/summary.t.
+	  [ Bug Fixes ]
+	  - Fixed https://matrix.perl-magpie.org/results/fbe5436e-cd3d-11f1-9632-bd4d6e8775ea
+
 0.015.0 Tue Oct 20 08:10:43 PM EDT 2026
 	[ New Features ]
 	- GET /tutorial: in-application tutorial with a chapter for every page

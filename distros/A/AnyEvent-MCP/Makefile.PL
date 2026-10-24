@@ -46,8 +46,10 @@ sub test_via_harness {
 
    # Keep errors visible, but not expected warnings or routine MCP activity.
    # An explicit PERL_ANYEVENT_LOG still takes precedence.
+   # Use MakeMaker's built scripts, not installed programs or source shebangs.
    $self->SUPER::test_via_harness (
-      'PERL_ANYEVENT_LOG="$${PERL_ANYEVENT_LOG:-filter=error log=error}" ' . $perl,
+      'PATH="`pwd`/$(INST_SCRIPT):$$PATH" '
+      . 'PERL_ANYEVENT_LOG="$${PERL_ANYEVENT_LOG:-filter=error log=error}" ' . $perl,
       $tests,
    )
 }

@@ -1,0 +1,15 @@
+--- cv.xml
++++ cv.xml
+@@ -7136,6 +7136,12 @@
+ 			<currency type="CNH">
+ 				<displayName>Китай юанӗ (офшор)</displayName>
+ 			</currency>
++			<currency type="CNX">
++				<displayName>Китай халӑх банкӗн долларӗ</displayName>
++				<displayName count="zero">Китай халӑх банкӗн долларӗ</displayName>
++				<displayName count="one">Китай халӑх банкӗн долларӗ</displayName>
++				<displayName count="other">Китай халӑх банкӗн долларӗ</displayName>
++			</currency>
+ 			<currency type="CNY">
+ 				<displayName>Китай юанӗ</displayName>
+ 			</currency>

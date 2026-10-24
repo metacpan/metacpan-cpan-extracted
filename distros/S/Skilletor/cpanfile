@@ -1,0 +1,33 @@
+requires 'perl', '5.020';
+
+requires 'B';
+requires 'Carp';
+requires 'Compress::Raw::Zlib';
+requires 'Cwd';
+requires 'Digest::SHA';
+requires 'Encode';
+requires 'Errno';
+requires 'Exporter';
+requires 'Fcntl';
+requires 'HTTP::Tiny', '0.083';
+requires 'IO::Select';
+requires 'IO::Socket::SSL', '1.968';
+requires 'JSON::MaybeXS', '1.004000';
+requires 'Moo', '2.000000';
+requires 'Moo::Role';
+requires 'Net::SSLeay', '1.49';
+requires 'POSIX';
+requires 'Path::Tiny', '0.119';
+requires 'Scalar::Util';
+requires 'Sys::Hostname';
+requires 'Time::HiRes';
+requires 'Unicode::Normalize';
+requires 'namespace::clean';
+
+on test => sub {
+  requires 'FindBin';
+  requires 'IO::Compress::Gzip';
+  requires 'IO::Socket::INET';
+  requires 'IPC::Open2';
+  requires 'Test::More', '0.96';
+};

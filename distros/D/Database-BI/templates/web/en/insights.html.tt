@@ -1,0 +1,230 @@
+[%- WRAPPER 'web/en/layouts/default.html.tt' -%]
+
+<style>
+  .insights-meta { font-size: 0.82rem; color: #666; margin-bottom: 1rem; }
+  .insights-list { list-style: none; margin: 0; padding: 0; }
+  .insight-card {
+    border: 1px solid #d0d4de;
+    border-radius: 6px;
+    padding: 0.75rem 1rem;
+    margin-bottom: 0.65rem;
+    background: #fff;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .insight-card {
+      background: #1e2128;
+      border-color: #3a3f50;
+    }
+  }
+  :root[data-theme="dark"] .insight-card {
+    background: #1e2128;
+    border-color: #3a3f50;
+  }
+  .insight-kind {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    padding: 0.1rem 0.4rem;
+    border-radius: 3px;
+    margin-right: 0.4rem;
+    vertical-align: middle;
+  }
+  .kind-outlier    { background: #fde8e8; color: #b92020; }
+  .kind-top_mover  { background: #e8f4fd; color: #1a6fa0; }
+  .kind-period_delta { background: #e8fde8; color: #1a7a30; }
+  .kind-seasonality  { background: #fdf5e8; color: #8a5a00; }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .kind-outlier    { background: #4a1010; color: #f4a0a0; }
+    :root:not([data-theme="light"]) .kind-top_mover  { background: #0e2a40; color: #7ecbf0; }
+    :root:not([data-theme="light"]) .kind-period_delta { background: #0e3318; color: #7ad898; }
+    :root:not([data-theme="light"]) .kind-seasonality  { background: #3a2800; color: #f0c060; }
+  }
+  :root[data-theme="dark"] .kind-outlier    { background: #4a1010; color: #f4a0a0; }
+  :root[data-theme="dark"] .kind-top_mover  { background: #0e2a40; color: #7ecbf0; }
+  :root[data-theme="dark"] .kind-period_delta { background: #0e3318; color: #7ad898; }
+  :root[data-theme="dark"] .kind-seasonality  { background: #3a2800; color: #f0c060; }
+  .insight-headline { font-weight: 600; font-size: 0.95rem; vertical-align: middle; }
+  .insight-detail   { font-size: 0.82rem; color: #555; margin-top: 0.25rem; }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .insight-detail { color: #aab; }
+  }
+  :root[data-theme="dark"] .insight-detail { color: #aab; }
+  .insight-view-link {
+    display: inline-block;
+    margin-top: 0.35rem;
+    font-size: 0.8rem;
+    color: #0066aa;
+    text-decoration: none;
+  }
+  .insight-view-link:hover { text-decoration: underline; }
+  .insight-drill-link {
+    display: inline-block;
+    margin-top: 0.35rem;
+    margin-left: 0.8rem;
+    font-size: 0.8rem;
+    color: #555;
+    text-decoration: none;
+  }
+  .insight-drill-link:hover { text-decoration: underline; color: #222; }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .insight-drill-link { color: #aab; }
+    :root:not([data-theme="light"]) .insight-drill-link:hover { color: #eee; }
+  }
+  :root[data-theme="dark"] .insight-drill-link { color: #aab; }
+  :root[data-theme="dark"] .insight-drill-link:hover { color: #eee; }
+  .insight-method {
+    display: inline-block;
+    font-size: 0.72rem;
+    color: #999;
+    margin-left: 0.6rem;
+    vertical-align: middle;
+    cursor: help;
+  }
+  .insights-empty {
+    color: #666;
+    font-style: italic;
+    margin-top: 1.5rem;
+  }
+  .summary-toolbar {
+    margin-top: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    flex-wrap: wrap;
+  }
+  .btn-summarize {
+    padding: 0.4rem 0.85rem;
+    border: 1px solid #bbb;
+    border-radius: 4px;
+    background: #f5f5f5;
+    cursor: pointer;
+    font-size: 0.88rem;
+  }
+  .btn-summarize:hover { background: #e8e8e8; }
+  .btn-summarize:disabled { opacity: 0.55; cursor: not-allowed; }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .btn-summarize { background: #2a2f3a; border-color: #55607a; color: #ccd; }
+    :root:not([data-theme="light"]) .btn-summarize:hover { background: #353c4a; }
+  }
+  :root[data-theme="dark"] .btn-summarize { background: #2a2f3a; border-color: #55607a; color: #ccd; }
+  :root[data-theme="dark"] .btn-summarize:hover { background: #353c4a; }
+  .summary-ai-label { font-size: 0.82rem; color: #666; cursor: pointer; }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .summary-ai-label { color: #aab; }
+  }
+  :root[data-theme="dark"] .summary-ai-label { color: #aab; }
+  #summary-box {
+    display: none;
+    margin-top: 1rem;
+    padding: 0.85rem 1rem;
+    border: 1px solid #c8d0e0;
+    border-radius: 6px;
+    background: #f0f4fc;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) #summary-box { background: #1a2035; border-color: #334; }
+  }
+  :root[data-theme="dark"] #summary-box { background: #1a2035; border-color: #334; }
+  .summary-text { margin: 0 0 0.4rem; font-size: 0.93rem; line-height: 1.5; }
+  .summary-source { font-size: 0.72rem; color: #888; }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .summary-source { color: #778; }
+  }
+  :root[data-theme="dark"] .summary-source { color: #778; }
+</style>
+
+<p class="back-link"><a href="/">&larr; Home</a>[% IF back_url && back_url != '/' %] &rsaquo; <a href="[% back_url | html %]">[% back_label | html %]</a>[% END %][%- IF back2_url -%] &rsaquo; <a href="[% back2_url | html %]">[% back2_label || 'Back' | html %]</a>[%- END -%]</p>
+
+<h2 style="margin-bottom:0.5rem">[% title | html %]</h2>
+<p class="insights-meta">Source: [% left_label | html %] &mdash; [% row_count %] row[% IF row_count != 1 %]s[% END %] analysed</p>
+
+[%- SET method_labels = {
+    iqr_fence  = 'Outlier detected using the interquartile range (IQR) fence rule',
+    pop_delta  = 'Period-over-period change between consecutive time periods',
+    autocorr   = 'Repeating seasonal pattern detected by lag autocorrelation',
+    top_mover  = 'Category with the largest change between time periods',
+} -%]
+[%- IF insights.size == 0 -%]
+<p class="insights-empty">No insights detected for this dataset. Try a dataset with a date column and numeric columns to see period-over-period changes and outliers.</p>
+[%- ELSE -%]
+<ul class="insights-list" aria-label="Automatic insights">
+[%- FOREACH ins IN insights -%]
+  <li class="insight-card">
+    <span class="insight-kind kind-[% ins.kind | html %]">[% ins.kind | html %]</span><span class="insight-headline">[% ins.headline | html %]</span>
+    <span class="insight-method" title="[% method_labels.${ins.method} || ins.method | html %]">&#x2139;</span>
+    [%- IF ins.detail -%]
+    <div class="insight-detail">[% ins.detail | html %]</div>
+    [%- END -%]
+    <a class="insight-view-link" href="[% ins.view_url | html %]">&#x1F50D; View in chart &rarr;</a>[%- IF ins.drill_url.length -%]<a class="insight-drill-link" href="[% ins.drill_url | html %]">&#x1F4CB; See rows &rarr;</a>[%- END -%]
+  </li>
+[%- END -%]
+</ul>
+[%- END -%]
+
+<div class="summary-toolbar">
+  <button class="btn-summarize" id="btn-summarize">&#x2728; Summarize</button>
+  [%- IF ai_available -%]
+  <label class="summary-ai-label"><input type="checkbox" id="summary-ai-chk"> Use AI for better prose</label>
+  [%- END -%]
+</div>
+<div id="summary-box" role="region" aria-live="polite"></div>
+
+<script>
+(function() {
+	var btn = document.getElementById('btn-summarize');
+	if (!btn) return;
+	var box = document.getElementById('summary-box');
+	var aiChk = document.getElementById('summary-ai-chk');
+
+	btn.addEventListener('click', function() {
+		btn.disabled = true;
+		btn.textContent = 'Generating\u2026';
+		box.style.display = 'none';
+		box.innerHTML = '';
+
+		var sp = new URLSearchParams(window.location.search);
+		var parts = ['l=' + encodeURIComponent(sp.get('l') || '')];
+		sp.getAll('f').forEach(function(f) {
+			parts.push('f=' + encodeURIComponent(f));
+		});
+		if (aiChk && aiChk.checked) {
+			parts.push('ai=1');
+		}
+
+		fetch('/api/summary', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+			body: parts.join('&')
+		})
+		.then(function(r) { return r.json(); })
+		.then(function(data) {
+			if (data.error) {
+				box.textContent = 'Error: ' + data.error;
+			} else {
+				var p = document.createElement('p');
+				p.className = 'summary-text';
+				p.textContent = data.text || '';
+				box.appendChild(p);
+				var sm = document.createElement('small');
+				sm.className = 'summary-source';
+				sm.textContent = 'Source: ' + (data.source || 'template')
+				               + (data.cached ? ' (cached)' : '');
+				box.appendChild(sm);
+			}
+			box.style.display = 'block';
+		})
+		.catch(function() {
+			box.textContent = 'Could not generate summary.';
+			box.style.display = 'block';
+		})
+		.finally(function() {
+			btn.disabled = false;
+			btn.textContent = '\u2728 Summarize';
+		});
+	});
+}());
+</script>
+
+[%- END -%]

@@ -1,16 +1,15 @@
 ##----------------------------------------------------------------------------
 ## Unicode Locale Identifier - ~/lib/m
-## Version v1.9.0
+## Version v1.10.0
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2024/06/15
-## Modified 2026/07/15
+## Modified 2026/10/23
 ## All rights reserved
 ## 
-## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
-## under the same terms as Perl itself.##
-##----------------------------------------------------------------------------##
+## under the same terms as Perl itself.
+##----------------------------------------------------------------------------
 package Locale::Unicode::Data;
 BEGIN
 {
@@ -20,7 +19,7 @@ BEGIN
     use warnings::register;
     use vars qw(
         $ERROR $VERSION $DEBUG $FATAL_EXCEPTIONS
-        $CLDR_VERSION $DB_FILE $DBH $STHS
+        $CLDR_VERSION $DB_FILE $DBH $STHS $IS_CHILD_THREAD $RESOLVABLE
     );
     use version;
     use Exporter ();
@@ -37,10 +36,48 @@ BEGIN
         HAS_CONSTANTS => ( version->parse( $DBD::SQLite::VERSION ) >= 1.48 ? 1 : 0 ),
         MISSING_AUTO_UTF8_DECODING => ( version->parse( $DBD::SQLite::VERSION ) < 1.68 ? 1 : 0 ),
     };
-    our $CLDR_VERSION = '48.2';
+    our $CLDR_VERSION = '49';
     our $DBH = {};
     our $STHS = {};
-    our $VERSION = 'v1.9.0';
+    our $IS_CHILD_THREAD = 0;
+    # The methods resolve() supports, with the table they query, and whether they return all the
+    # matching rows (an array reference) or only one (an hash reference).
+    our $RESOLVABLE =
+    {
+        calendar_append_format      => { table => 'calendar_append_formats',    all => 0 },
+        calendar_append_formats     => { table => 'calendar_append_formats',    all => 1 },
+        calendar_available_format   => { table => 'calendar_available_formats', all => 0 },
+        calendar_available_formats  => { table => 'calendar_available_formats', all => 1 },
+        calendar_cyclic_l10n        => { table => 'calendar_cyclics_l10n',      all => 0 },
+        calendar_cyclics_l10n       => { table => 'calendar_cyclics_l10n',      all => 1 },
+        calendar_datetime_format    => { table => 'calendar_datetime_formats',  all => 0 },
+        calendar_datetime_formats   => { table => 'calendar_datetime_formats',  all => 1 },
+        calendar_era_l10n           => { table => 'calendar_eras_l10n',         all => 0 },
+        calendar_eras_l10n          => { table => 'calendar_eras_l10n',         all => 1 },
+        calendar_format_l10n        => { table => 'calendar_formats_l10n',      all => 0 },
+        calendar_formats_l10n       => { table => 'calendar_formats_l10n',      all => 1 },
+        calendar_interval_format    => { table => 'calendar_interval_formats',  all => 0 },
+        calendar_interval_formats   => { table => 'calendar_interval_formats',  all => 1 },
+        calendar_term               => { table => 'calendar_terms',             all => 0 },
+        calendar_terms              => { table => 'calendar_terms',             all => 1 },
+        date_field_l10n             => { table => 'date_fields_l10n',           all => 0 },
+        date_fields_l10n            => { table => 'date_fields_l10n',           all => 1 },
+        date_term                   => { table => 'date_terms',                 all => 0 },
+        date_terms                  => { table => 'date_terms',                 all => 1 },
+        metazone_names              => { table => 'metazones_names',            all => 0 },
+        metazones_names             => { table => 'metazones_names',            all => 1 },
+        number_format_l10n          => { table => 'number_formats_l10n',        all => 0 },
+        number_formats_l10n         => { table => 'number_formats_l10n',        all => 1 },
+        number_symbol_l10n          => { table => 'number_symbols_l10n',        all => 0 },
+        number_symbols_l10n         => { table => 'number_symbols_l10n',        all => 1 },
+        person_name_format          => { table => 'person_name_formats',        all => 0 },
+        person_name_formats         => { table => 'person_name_formats',        all => 1 },
+        time_relative_l10n          => { table => 'time_relative_l10n',         all => 0 },
+        time_relatives_l10n         => { table => 'time_relative_l10n',         all => 1 },
+        unit_l10n                   => { table => 'units_l10n',                 all => 0 },
+        units_l10n                  => { table => 'units_l10n',                 all => 1 },
+    };
+    our $VERSION = 'v1.10.0';
 };
 
 use strict;
@@ -105,9 +142,8 @@ sub new
     }
 
     my $file = $self->{datafile} || return( $self->error( "No SQLite data file set." ) );
+    # We test the connection to the database, but for threads safety, we do not store the database handle in our object. $self->_dbh returns a cached value anyway, and handles well threaded environments.
     my $dbh = $self->_dbh || return( $self->pass_error );
-    $self->{_dbh} = $dbh;
-
     return( $self );
 }
 
@@ -531,9 +567,22 @@ sub currencies_l10n { return( shift->_fetch_all({
     by          => [qw( locale currency count )],
 }, @_ ) ); }
 
-sub database_handler { return( Scalar::Util::blessed( $_[0] ) ? shift->{_dbh} : undef ); }
+sub database_handler { return( Scalar::Util::blessed( $_[0] ) ? shift->_dbh : undef ); }
 
 sub datafile { return( shift->_set_get_prop( 'datafile', @_ ) ); }
+
+sub data_alias { return( shift->_fetch_one({
+    id          => 'get_data_alias',
+    field       => 'source',
+    table       => 'data_aliases',
+    requires    => [qw( locale table_name )],
+}, @_ ) ); }
+
+sub data_aliases { return( shift->_fetch_all({
+    id          => 'data_aliases',
+    table       => 'data_aliases',
+    by          => [qw( locale table_name )],
+}, @_ ) ); }
 
 sub date_field_l10n { return( shift->_fetch_one({
     id          => 'get_date_field_l10n',
@@ -988,7 +1037,7 @@ sub make_inheritance_tree
             return( $tree );
         }
     }
-    
+
     if( $locale->territory )
     {
         $locale->territory( undef );
@@ -1197,7 +1246,7 @@ sub normalise
             $locale->territory( $ref->{replacement}->[0] );
         }
     }
-    
+
     if( $locale->variant )
     {
         my $variants = [map{ lc( $_ ) } @{$locale->variants}];
@@ -1395,7 +1444,7 @@ sub pass_error
     # We set $class only if the hash provided is a one-element hash and not an error-defining hash
     $class = $opts->{class} if( CORE::exists( $opts->{class} ) && defined( $opts->{class} ) && CORE::length( $opts->{class} ) );
     $code  = $opts->{code} if( CORE::exists( $opts->{code} ) && defined( $opts->{code} ) && CORE::length( $opts->{code} ) );
-    
+
     # called with no argument, most likely from the same class to pass on an error 
     # set up earlier by another method; or
     # with an hash containing just one argument class => 'Some::ExceptionClass'
@@ -1421,7 +1470,7 @@ sub pass_error
     {
         $self->{error} = ${ $pack . '::ERROR' } = ( defined( $class ) ? bless( $err => $class ) : $err );
         $self->{error}->code( $code ) if( defined( $code ) && $self->{error}->can( 'code' ) );
-        
+
         if( $self->{fatal} || ( defined( ${"${class}\::FATAL_EXCEPTIONS"} ) && ${"${class}\::FATAL_EXCEPTIONS"} ) )
         {
             die( $self->{error} );
@@ -1432,7 +1481,7 @@ sub pass_error
     {
         return( $self->error( @_ ) );
     }
-    
+
     if( want( 'OBJECT' ) )
     {
         rreturn( Locale::Unicode::Data::NullObject->new );
@@ -2772,7 +2821,7 @@ EOT
     {
         $locale = $self->_locale_object( $locale ) ||
             return( $self->pass_error );
-    
+
         my $tree = $self->make_inheritance_tree( $locale->base ) ||
             return( $self->pass_error );
         foreach my $loc ( @$tree )
@@ -2857,6 +2906,47 @@ sub references { return( shift->_fetch_all({
     id          => 'refs',
     table       => 'refs',
 }, @_ ) ); }
+
+# Retrieves data with the method given (for example calendar_terms()), following locale
+# inheritance. When nothing is found in the locale or its parents other than root, the
+# aliases stored in data_aliases are applied, as UTS #35 specifies for source="locale"
+# aliases: the lookup is restarted from the requested locale with the alias target.
+# Root is looked up last.
+# <https://www.unicode.org/reports/tr35/#Alias_Elements>
+sub resolve
+{
+    my $self = shift( @_ );
+    my $meth = shift( @_ ) ||
+        return( $self->error( "No method was provided to resolve data." ) );
+    my $def = $RESOLVABLE->{ $meth } ||
+        return( $self->error( "The method '${meth}' does not support data resolution." ) );
+    my $opts = $self->_get_args_as_hash( @_ );
+    my $locale = CORE::delete( $opts->{locale} );
+    return( $self->error( "No locale was provided to resolve data with ${meth}()" ) ) if( !defined( $locale ) || !CORE::length( "$locale" ) );
+    my $tree  = $self->make_inheritance_tree( $locale ) || return( $self->pass_error );
+    my $rules = $self->_data_alias_rules( $def->{table} ) || return( $self->pass_error );
+    my $j     = JSON->new->canonical->allow_nonref;
+    my $keys  = { %$opts };
+    my $seen  = {};
+    while(1)
+    {
+        my $sig = $j->encode( $keys );
+        return( $self->error( "Circular data aliases found while resolving ${meth}() with ${sig}" ) ) if( $seen->{ $sig }++ );
+        foreach my $loc ( @$tree )
+        {
+            next if( $loc eq 'und' );
+            my( $found, $res ) = $self->_resolve_fetch( $meth, $def, $keys, $loc );
+            return( $self->pass_error ) if( !defined( $found ) );
+            return( $res ) if( $found );
+        }
+        my $rule = $self->_data_alias_match( $rules, $keys, $tree ) || last;
+        $keys = { %$keys, %{$rule->{target}} };
+    }
+    my( $found, $res ) = $self->_resolve_fetch( $meth, $def, $keys, 'und' );
+    return( $self->pass_error ) if( !defined( $found ) );
+    return( $res ) if( $found );
+    return( $def->{all} ? [] : undef );
+}
 
 sub script { return( shift->_fetch_one({
     id      => 'get_script',
@@ -3367,6 +3457,51 @@ sub week_preferences { return( shift->_fetch_all({
     has_array   => [qw( ordering )],
 }, @_ ) ); }
 
+# Returns the data_aliases rule that applies to the given keys: its locale must be in the
+# inheritance tree, and all its source columns must be among the keys with the same values.
+# When several rules apply, the most specific one is used.
+sub _data_alias_match
+{
+    my( $self, $rules, $keys, $tree ) = @_;
+    my $in_tree = { map{ $_ => 1 } @$tree };
+    my $best;
+    RULE: foreach my $rule ( @$rules )
+    {
+        next if( !$in_tree->{ $rule->{locale} } );
+        my $src = $rule->{source};
+        foreach my $col ( keys( %$src ) )
+        {
+            next RULE if( !CORE::exists( $keys->{ $col } ) );
+            my( $v, $w ) = ( $keys->{ $col }, $src->{ $col } );
+            # A search value (array of values, operator or regular expression) cannot
+            # be matched against a rule.
+            next RULE if( ref( $v ) && !( Scalar::Util::blessed( $v ) && overload::Method( $v => '""' ) ) );
+            next RULE if( defined( $v ) != defined( $w ) );
+            next RULE if( defined( $v ) && lc( "$v" ) ne lc( $w ) );
+        }
+        $best = $rule if( !defined( $best ) || scalar( keys( %$src ) ) > scalar( keys( %{$best->{source}} ) ) );
+    }
+    return( $best );
+}
+
+# Loads, once per object, the data_aliases rules for a given table.
+sub _data_alias_rules
+{
+    my( $self, $table ) = @_;
+    $self->{_data_alias_rules} //= {};
+    return( $self->{_data_alias_rules}->{ $table } ) if( CORE::exists( $self->{_data_alias_rules}->{ $table } ) );
+    my $all = $self->data_aliases( table_name => $table ) || return( $self->pass_error );
+    my $j = JSON->new;
+    my $rules = [];
+    foreach my $ref ( @$all )
+    {
+        my( $src, $tgt ) = eval{ ( $j->decode( $ref->{source} ), $j->decode( $ref->{target} ) ) };
+        return( $self->error( "Invalid JSON data for the data alias ID $ref->{data_alias_id}: $@" ) ) if( $@ );
+        push( @$rules, { %$ref, source => $src, target => $tgt } );
+    }
+    return( $self->{_data_alias_rules}->{ $table } = $rules );
+}
+
 sub _dbh
 {
     my $self = shift( @_ );
@@ -3869,7 +4004,7 @@ sub _fetch_one
         {
             return( $self->error( "No value for $_ was provided." ) );
         }
-        
+
         if( ref( $opts->{ $_ } // '' ) eq 'ARRAY' )
         {
             my $and_skels = [];
@@ -4059,6 +4194,22 @@ sub _locale_object
     return( $locale );
 }
 
+# Calls a data method for resolve(). Returns a two-element list: whether data was found
+# (or undef on error), and the data itself.
+sub _resolve_fetch
+{
+    my( $self, $meth, $def, $keys, $locale ) = @_;
+    # Clears any previous error, so that an undefined value can be distinguished from an error.
+    $self->{error} = undef;
+    my $res = $self->$meth( %$keys, locale => $locale );
+    if( !defined( $res ) )
+    {
+        return if( defined( $self->{error} ) );
+        return( 0, $res );
+    }
+    return( ( $def->{all} ? ( ref( $res ) eq 'ARRAY' && scalar( @$res ) ) : ( ref( $res ) eq 'HASH' && scalar( keys( %$res ) ) ) ) ? 1 : 0, $res );
+}
+
 sub _set_cached_statement
 {
     my $self = shift( @_ );
@@ -4185,6 +4336,17 @@ sub _get_args_as_hash
     return( $ref );
 }
 
+# NOTE: CLONE
+sub CLONE
+{
+    # Discard database and statement handles inherited from the parent thread.
+    # Each child thread will establish its own SQLite connections as needed.
+    $IS_CHILD_THREAD = 1;
+    $STHS = {};
+    $DBH  = {};
+}
+
+
 # NOTE: END
 END
 {
@@ -4196,45 +4358,51 @@ END
     # and OpenBSD aborts the process with a SIGSEGV. We therefore tear everything down
     # here, in a deterministic order, before global destruction begins: the statement
     # handles first, then the database handles.
-    if( defined( $STHS ) && ref( $STHS ) eq 'HASH' )
+    #
+    # Child threads must not explicitly finalise or disconnect DBI handles.
+    # Their inherited caches are discarded by CLONE, and DBI handles their normal
+    # destruction. The main interpreter retains ordered cleanup.
+    unless( $IS_CHILD_THREAD )
     {
-        foreach my $tid ( keys( %$STHS ) )
+        if( defined( $STHS ) && ref( $STHS ) eq 'HASH' )
         {
-            next unless( ref( $STHS->{ $tid } ) eq 'HASH' );
-            foreach my $db ( keys( %{ $STHS->{ $tid } } ) )
+            foreach my $tid ( keys( %$STHS ) )
             {
-                next unless( ref( $STHS->{ $tid }->{ $db } ) eq 'HASH' );
-                foreach my $id ( keys( %{$STHS->{ $tid }->{ $db }} ) )
+                next unless( ref( $STHS->{ $tid } ) eq 'HASH' );
+                foreach my $db ( keys( %{$STHS->{ $tid }} ) )
                 {
-                    my $sth = delete( $STHS->{ $tid }->{ $db }->{ $id } );
-                    if( defined( $sth ) &&
-                        Scalar::Util::blessed( $sth ) )
+                    next unless( ref( $STHS->{ $tid }->{ $db } ) eq 'HASH' );
+                    foreach my $id ( keys( %{$STHS->{ $tid }->{ $db }} ) )
                     {
-                        $sth->finish;
+                        my $sth = delete( $STHS->{ $tid }->{ $db }->{ $id } );
+                        if( defined( $sth ) && Scalar::Util::blessed( $sth ) )
+                        {
+                            $sth->finish;
+                        }
+                        # Drop our reference now so the handle is finalised while its
+                        # database handle is still open.
+                        undef( $sth );
                     }
-                    # Drop our reference now so the handle is finalised while its
-                    # database handle is still open.
-                    undef( $sth );
                 }
             }
         }
-    }
 
-    if( defined( $DBH ) && ref( $DBH ) eq 'HASH' )
-    {
-        foreach my $tid ( keys( %$DBH ) )
+        if( defined( $DBH ) && ref( $DBH ) eq 'HASH' )
         {
-            next unless( ref( $DBH->{ $tid } ) eq 'HASH' );
-            foreach my $db ( keys( %{ $DBH->{ $tid } } ) )
+            foreach my $tid ( keys( %$DBH ) )
             {
-                my $dbh = delete( $DBH->{ $tid }->{ $db } );
-                if( defined( $dbh ) &&
-                    Scalar::Util::blessed( $dbh ) &&
-                    $dbh->isa( 'DBI::db' ) )
+                next unless( ref( $DBH->{ $tid } ) eq 'HASH' );
+                foreach my $db ( keys( %{$DBH->{ $tid }} ) )
                 {
-                    $dbh->disconnect;
+                    my $dbh = delete( $DBH->{ $tid }->{ $db } );
+                    if( defined( $dbh ) &&
+                        Scalar::Util::blessed( $dbh ) &&
+                        $dbh->isa( 'DBI::db' ) )
+                    {
+                        $dbh->disconnect;
+                    }
+                    undef( $dbh );
                 }
-                undef( $dbh );
             }
         }
     }
@@ -4447,7 +4615,7 @@ sub new
     }
     else
     {
-        $args->{message} = join( '', map( ref( $_ ) eq 'CODE' ? $_->() : $_, @_ ) );
+        $self->{message} = join( '', map( ref( $_ ) eq 'CODE' ? $_->() : $_, @_ ) );
     }
     return( $self );
 }
@@ -4466,6 +4634,16 @@ sub as_string
     $self->{_cache_value} = $str;
     CORE::delete( $self->{_reset} );
     return( $str );
+}
+
+sub clone
+{
+    my $self = shift( @_ );
+    # Safeguard
+    die( "$self->clone() cannot be called as a class function" ) unless( ref( $self ) );
+    my $new = bless( { %$self } => ref( $self ) );
+    CORE::delete( $new->{_cache_value} );
+    return( $new );
 }
 
 sub code { return( shift->reset(@_)->_set_get_prop( 'code', @_ ) ); }
@@ -5335,7 +5513,7 @@ Or, you could set the global variable C<$FATAL_EXCEPTIONS> instead:
 
 =head1 VERSION
 
-    v1.9.0
+    v1.10.0
 
 =head1 DESCRIPTION
 
@@ -7611,6 +7789,49 @@ See the L<LDML specifications about language plural rules|https://unicode.org/re
 =item * C<currency>
 
 A 3-characters C<currency> ID as can be found in the table L<currencies|/"Table currencies">
+
+=back
+
+=head2 data_alias
+
+    my $ref = $cldr->data_alias(
+        locale      => 'und',
+        table_name  => 'calendar_terms',
+        source      => '{"calendar":"japanese","term_type":"month"}',
+    );
+    # Returns a hash reference such as:
+    {
+        data_alias_id   => 42,
+        locale          => 'und',
+        table_name      => 'calendar_terms',
+        source          => '{"calendar":"japanese","term_type":"month"}',
+        target          => '{"calendar":"gregorian","term_type":"month"}',
+        source_path     => "/ldml/dates/calendars/calendar[\@type='japanese']/months",
+        target_path     => "/ldml/dates/calendars/calendar[\@type='gregorian']/months",
+    }
+
+Returns a hash reference for a data alias from the L<data_aliases|/"Table data_aliases"> table, given a C<locale>, a C<table_name> and a C<source>. The C<source> is the JSON object of the source columns, encoded with its keys sorted.
+
+You normally do not need this: L</resolve> follows the data aliases for you.
+
+=head2 data_aliases
+
+    my $all = $cldr->data_aliases;
+    my $all = $cldr->data_aliases( table_name => 'metazones_names' );
+
+Returns all data aliases from the L<data_aliases|/"Table data_aliases"> table as an array reference of hash references.
+
+The following fields may be used, alone or in combination, to filter the results:
+
+=over 4
+
+=item * C<locale>
+
+The locale of the CLDR file that holds the alias. Up to at least CLDR v49.1 only root (C<und>) has any.
+
+=item * C<table_name>
+
+The name of the table whose data is aliased, for example C<calendar_terms>.
 
 =back
 
@@ -10187,6 +10408,46 @@ Returns an hash reference of a reference information from the table L<refs|/"Tab
 Returns all reference information from L<table refs|/"Table refs"> as an array reference of hash reference.
 
 No additional parameter is needed.
+
+=head2 resolve
+
+    my $all = $cldr->resolve( calendar_terms =>
+        locale          => 'fr',
+        calendar        => 'japanese',
+        term_type       => 'month',
+        term_context    => 'format',
+        term_width      => 'wide',
+    );
+    # The month names of the French Gregorian calendar: janvier, février, etc.
+
+    my $ref = $cldr->resolve( metazone_names =>
+        locale      => 'ckb',
+        metazone    => 'British',
+        width       => 'long',
+    );
+    # The long names of the GMT metazone in Central Kurdish
+
+Takes the name of a data method (for example L</calendar_terms>) and the same arguments as that method, including a C<locale>, and returns the data that method would return, resolved as the LDML specifications require:
+
+=over 4
+
+=item 1. The data is looked up in the C<locale>, then in each of its parents as returned by L</make_inheritance_tree>, excluding the root locale C<und>.
+
+=item 2. If nothing was found and a L<data alias|/"Table data_aliases"> applies to the arguments, its target values replace the source ones and the lookup restarts from step 1 with the requested C<locale>. For instance, the C<japanese> calendar month names are an alias of the C<gregorian> ones, and the C<narrow> era names an alias of the C<abbreviated> ones.
+
+=item 3. Otherwise the data is looked up in the root locale C<und>.
+
+=back
+
+This matters because an alias of root points to data of the locale being resolved, not of root: the C<japanese> calendar month names of C<fr> are the C<gregorian> month names of C<fr> (C<janvier>), not those of root (C<M01>). The data stored for root itself is resolved within root, which is correct for root and serves as the last resort.
+
+A data alias applies when all its source columns are among the arguments with the same values. The arguments must therefore be at least as specific as the alias (for example both C<calendar> and C<term_type> in the example above). When several aliases apply, the most specific one is used.
+
+It returns what the underlying method returns: an array reference (possibly empty) for a method that returns all matching rows, such as L</calendar_terms>, or a hash reference (or C<undef> if nothing was found) for a method that returns one row, such as L</calendar_term>. On error it sets an L<error|/error> and returns C<undef> in scalar context, or an empty list in list context.
+
+The methods supported are those of the tables that can be aliased: L</calendar_append_format>, L</calendar_append_formats>, L</calendar_available_format>, L</calendar_available_formats>, L</calendar_cyclic_l10n>, L</calendar_cyclics_l10n>, L</calendar_datetime_format>, L</calendar_datetime_formats>, L</calendar_era_l10n>, L</calendar_eras_l10n>, L</calendar_format_l10n>, L</calendar_formats_l10n>, L</calendar_interval_format>, L</calendar_interval_formats>, L</calendar_term>, L</calendar_terms>, L</date_field_l10n>, L</date_fields_l10n>, L</date_term>, L</date_terms>, L</metazone_names>, L</metazones_names>, L</number_format_l10n>, L</number_formats_l10n>, L</number_symbol_l10n>, L</number_symbols_l10n>, L</person_name_format>, L</person_name_formats>, L</time_relative_l10n>, L</time_relatives_l10n>, L</unit_l10n> and L</units_l10n>.
+
+See the L<LDML specifications|https://www.unicode.org/reports/tr35/#Alias_Elements> for more information.
 
 =head2 script
 
@@ -13368,6 +13629,8 @@ See the L<LDML specifications|https://unicode.org/reports/tr35/tr35-dates.html#D
 
 When performing data look-ups, some data, such as width, may be missing and the default C<wide> should be used, and sometime, the data is aliased. For example, C<narrow> would be aliased to C<abbreviated>.
 
+Those aliases are defined in the root locale, but they point to the data of the locale being resolved, not of root: for C<fr>, the C<narrow> era names are the C<abbreviated> era names of C<fr>. They are stored in the L<data_aliases|/"Table data_aliases"> table, and L</resolve> follows them, together with the vertical inheritance described below.
+
 Then, there is also a vertical inheritance, whereby a locale C<fr-CA> would lookup up data in its parent C<fr>. When the inheritance is not natural, the C<LDML> specifies a C<parent>. This information can be found in table L<locales|/"Table locales">. Ultimately, the root C<locale> with value C<und> is to be used.
 
 See the L<LDML specifications|https://unicode.org/reports/tr35/tr35.html#Parent_Locales> for more information.
@@ -14359,6 +14622,40 @@ A string field.
 =item * C<symbol>
 
 A string field.
+
+=back
+
+=head2 Table data_aliases
+
+=over 4
+
+=item * C<data_alias_id>
+
+Integer. Primary key.
+
+=item * C<locale>
+
+A string field. The locale of the CLDR file that holds the alias (C<und> for root).
+
+=item * C<table_name>
+
+A string field. The name of the table whose data is aliased.
+
+=item * C<source>
+
+A string field. The JSON object of the columns and values of the aliased data, for example C<{"calendar":"japanese","term_type":"month"}>, encoded with its keys sorted.
+
+=item * C<target>
+
+A string field. The JSON object of the same columns, with the values of the data the alias points to, for example C<{"calendar":"gregorian","term_type":"month"}>.
+
+=item * C<source_path>
+
+A string field. The path of the aliased element in the CLDR file.
+
+=item * C<target_path>
+
+A string field. The path of the element the alias points to.
 
 =back
 

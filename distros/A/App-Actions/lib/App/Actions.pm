@@ -6,13 +6,16 @@ use utf8;
 use autodie qw(:all);
 
 use Cwd qw(abs_path);
+use Log::Abstraction ();
 use Readonly;
+use Scalar::Util qw(blessed);
 
 use App::Actions::Cache;
 use App::Actions::Check;
 use App::Actions::I18N qw(i18n throw validate_args);
 use App::Actions::Logs;
 use App::Actions::Runner;
+use App::Actions::Runner::Support qw(default_logger null_logger);
 use App::Actions::Workflow;
 
 use Object::Configure;
@@ -43,11 +46,14 @@ Readonly::Hash my %DOCUMENT_OWNER => (
 
 # Where a workflow lives inside a repository, so the repository root can be
 # found from the workflow's own path.
-Readonly::Scalar my $WORKFLOW_IN_REPOSITORY => qr{^(.*)/\.github/workflows/[^/]+$};
+Readonly::Scalar my $WORKFLOW_IN_REPOSITORY => qr{\A(.*)/\.github/workflows/[^/]+\z}s;
 
 # The options list_jobs forces: listing never starts anything or prints
 # anything but the list.
 Readonly::Hash my %LIST_OPTIONS => (dry_run => 1, quiet => 1);
+
+# Object::Configure's word for "no logging".
+Readonly::Scalar my $NO_LOGGER => 'NULL';
 
 =head1 NAME
 
@@ -55,11 +61,11 @@ App::Actions - run GitHub Actions workflows locally
 
 =head1 VERSION
 
-0.001.0
+0.002.0
 
 =cut
 
-our $VERSION = '0.001.0';
+our $VERSION = '0.002.0';
 
 =head1 SYNOPSIS
 
@@ -101,6 +107,24 @@ Run the jobs of a matrix four at a time, and keep their logs:
 
 	App::Actions->new(workflow_file => '.github/workflows/ci.yml', parallel => 4)->run;
 	# logs: see "action-run logs"
+
+Set an option for every run on this computer, without changing the code
+(see L</new> for where the file may live; the environment wins over it):
+
+	# ~/.conf/local.yaml
+	---
+	App__Actions:
+	  keep_images: 0
+
+	# or, for one command:  App__Actions__keep_images=0 action-run ci.yml .
+
+Collect the warnings and errors instead of printing them, or turn them off:
+
+	my @messages;
+	my $exit = App::Actions->new(workflow_file => 'ci.yml', logger => \@messages)->run;
+	print "$_->{level}: $_->{message}\n" for @messages;
+
+	App::Actions->new(workflow_file => 'ci.yml', logger => 'NULL')->run;
 
 =head1 DESCRIPTION
 
@@ -202,6 +226,12 @@ C<keep_images>, C<pull>, C<no_pull>, C<strict_actions>, C<skip_check>,
 C<pull_concurrency>, C<parallel>, C<log_dir>, C<cache_file>, C<docker>, and
 C<docker_bin>.  Any other key is an error.
 
+=item * C<logger> - where warnings and errors go: a L<Log::Abstraction>
+object, an array reference to collect them in, a hash reference of
+L<Log::Abstraction> options (for example C<{ file =E<gt> $path }>), or the
+string C<'NULL'> to throw them away.  By default they are printed to standard
+error.
+
 =back
 
 C<parallel> says how many jobs of one matrix may run at the same time; it is
@@ -260,13 +290,67 @@ it works on Windows too, where the operating system cannot start a shebang
 script directly.  C<docker> may instead be an object with the
 L<App::Actions::Docker> interface, which is how the tests run without one.
 
+B<Configuration files and environment variables.>  After the arguments are
+checked, L<Object::Configure> adds settings from two more places.  Both can
+set any of the options above, and B<both win over the arguments>:
+
+=over 4
+
+=item 1. Configuration files.  L<Config::Abstraction> looks for files named
+F<base.yaml> and then F<local.yaml> (or C<.json>, C<.xml>, C<.ini> and so
+on) in the directory C<CONFIG_DIR> names or, when it is not set, in
+F<~/.conf>, F<~/config>, F<~/conf> and F<conf>.  The settings for this
+module go in a section called C<App__Actions>:
+
+	# ~/.conf/local.yaml
+	---
+	App__Actions:
+	  parallel: 2
+	  keep_images: 0
+
+=item 2. Environment variables named C<App__Actions__> and then the option,
+which win over everything else:
+
+	App__Actions__parallel=2 App__Actions__quiet=1 action-run ci.yml .
+
+=back
+
+So the order, from weakest to strongest, is: the arguments, then the
+configuration files, then the environment variables.  Only top-level options
+can be set this way; C<App__Actions__env__NAME> does not add to C<env>.  There
+is no argument for naming a configuration file: C<config_file> is refused as
+an unknown option.
+
+B<Warnings and errors.>  What a run reports as a problem - a step that
+failed, a job that could not run, a container that could not be removed -
+goes to a L<Log::Abstraction> logger, at the C<error> or C<warn> level.  The
+progress lines, the C<[dry-run]> and Docker command echoes and the job
+summary are the run's output, not diagnostics, and stay on standard output.
+The default logger prints each message to standard error as a plain line, as
+earlier versions did.  A C<logger> in the configuration replaces it: in the
+C<App__Actions> section, or in a C<UNIVERSAL> section of F<universal.yaml>,
+which L<Object::Configure> applies to every class that uses it.  A C<logger>
+argument replaces both.
+
+	# ~/.conf/local.yaml: keep this module's messages in a file
+	---
+	App__Actions:
+	  logger:
+	    file: /var/log/action-run.log
+	    level: warning
+
 =head3 RETURNS
 
-An C<App::Actions> object.
+An C<App::Actions> object.  Besides the options it holds C<logger>, a
+L<Log::Abstraction> object (a silent one for C<'NULL'>), and any other
+top-level keys found in the configuration files.  Only the options
+listed above are passed on to L<App::Actions::Runner>, so the other keys
+have no effect.
 
 =head3 SIDE EFFECTS
 
-Reads and parses the workflow file.
+Reads and parses the workflow file.  Reads the configuration files described
+above, if there are any, and the C<App__Actions__*> environment variables.
 
 =head3 EXAMPLE
 
@@ -307,6 +391,7 @@ Reads and parses the workflow file.
 		no_pull          => { type => 'string', optional => 1 },
 		strict_actions   => { type => 'string', optional => 1 },
 		skip_check       => { type => 'string', optional => 1 },
+		logger           => { type => [qw(object arrayref hashref string)], optional => 1 },
 	}
 
 =head4 OUTPUT
@@ -327,6 +412,11 @@ Reads and parses the workflow file.
 	| exist                             |                              |                               |
 	| Invalid arguments to              | An unknown option, or one of | Use the documented options    |
 	| App::Actions::new: REASON         | the wrong type               |                               |
+	| Object::Configure: config_path    | A configuration file or      | Remove the ".." from that     |
+	| contains path traversal           | variable names a path with   | setting                       |
+	| sequences: PATH                   | ".." in it                   |                               |
+	| Warning: Can't load configuration | A configuration file has a   | Fix the file; the run goes on |
+	| from FILE: DETAIL (a warning)     | syntax error                 | without it                    |
 	+-----------------------------------+------------------------------+-------------------------------+
 
 The messages of L<App::Actions::Workflow/load> apply to the workflow file.
@@ -334,6 +424,11 @@ The messages of L<App::Actions::Workflow/load> apply to the workflow file.
 =head3 PSEUDOCODE
 
 	validate the arguments, refusing unknown options
+	make the logger argument into a logger, or use the default (standard error)
+	merge in the App__Actions section of the configuration files, then the
+	    App__Actions__* environment variables (both win; neither is validated)
+	put back the logger made from the argument, or make the configured one
+	    into a logger ('NULL' is a silent one)
 	refuse a missing workflow_file, then one that does not exist
 	take project_dir as given, or the repository root that holds .github/workflows
 	refuse a project directory that does not exist
@@ -349,9 +444,24 @@ sub new {
 		workflow_file => { type => 'string', optional => 1 },
 		project_dir => { type => 'string', optional => 1 },
 		%OPTION_RULES,
+		# Anything Object::Configure turns into a logger: a Log::Abstraction
+		# object, an array to collect the messages in, a hash of
+		# Log::Abstraction options, or 'NULL' for none.
+		logger => { type => [qw(object arrayref hashref string)], optional => 1 },
 	});
 
+	# Warnings and errors go through a Log::Abstraction logger.  The default
+	# prints them to standard error as plain lines; a logger in the
+	# configuration (an App__Actions or UNIVERSAL section) replaces it, and a
+	# logger argument replaces both.  Object::Configure would let the
+	# configuration replace the argument too (it protects only an array), so
+	# the argument is made into a logger here and put back afterwards.
+	my $given_logger = defined $params->{logger} ? _logger($params->{logger}) : undef;
+	$params->{logger} = $given_logger || default_logger();
+
 	$params = Object::Configure::configure($class, $params);
+
+	$params->{logger} = $given_logger || _logger($params->{logger});
 
 	$class->throw('actions.workflow_file_required') unless defined $params->{workflow_file};
 
@@ -705,6 +815,35 @@ sub _runner {
 	);
 }
 
+# _logger
+# Purpose:     Make a Log::Abstraction logger from any of the forms new()
+#              accepts for one.
+# Entry:       $spec - a Log::Abstraction object, an array reference to
+#              collect the messages in, a hash reference of Log::Abstraction
+#              options, 'NULL' for none, or another string, which
+#              Log::Abstraction takes as the name of a logger.
+# Exit status: Returns a Log::Abstraction object; 'NULL' gives a silent one,
+#              because the runner always calls its logger.
+# Side effects: None; Log::Abstraction croaks on options it does not know.
+sub _logger {
+	my ($spec) = @_;
+
+	my $logger;
+	if (blessed $spec) {
+		$logger = $spec;
+	} elsif (ref $spec eq 'ARRAY') {
+		$logger = Log::Abstraction->new(array => $spec);
+	} elsif (ref $spec eq 'HASH') {
+		$logger = Log::Abstraction->new($spec);
+	} elsif ($spec eq $NO_LOGGER) {
+		$logger = null_logger();
+	} else {
+		$logger = Log::Abstraction->new(logger => $spec);
+	}
+
+	return $logger;
+}
+
 # _overrides
 # Purpose:     Validate the run options a method was given as overrides.
 # Entry:       $self - the object; $routine - the method's name, for the
@@ -732,6 +871,10 @@ sub _project_dir {
 	if (!defined $wanted) {
 		($wanted) = $workflow_file =~ $WORKFLOW_IN_REPOSITORY;
 		$class->throw('actions.project_dir_required') unless defined $wanted;
+
+		# /.github/workflows/ci.yml is in the root directory; an empty name
+		# would be taken by abs_path for the current directory instead.
+		$wanted = '/' unless length $wanted;
 	}
 
 	my $project_dir = abs_path($wanted);
@@ -767,7 +910,9 @@ spaces are covered on every platform.  The copy is made from F<MANIFEST>, so it
 holds exactly what the distribution ships and a test that reads a new file
 finds it there as soon as that file is listed.  That doubles the running time;
 set C<SPACE_PATH=0> to skip it, or run just that check with
-C<prove -l t/space-path.t>.
+C<prove -l t/space-path.t>.  It is skipped when C<AUTOMATED_TESTING> is set
+(continuous integration, CPAN testers) unless C<SPACE_PATH> is set to a true
+value.
 
 F<t/locales.t> covers the message catalogue: the country-to-language table
 for GB, US, FR, DE and CN, and the error paths under the C<en_US.UTF-8>,
@@ -896,6 +1041,19 @@ told so.
 have not been moved into the catalogue yet; see
 L<App::Actions::I18N/LIMITATIONS>.
 
+=item * Settings from configuration files and C<App__Actions__*> environment
+variables are merged in by L<Object::Configure> after L</new> has checked its
+arguments, so they are not checked: C<App__Actions__parallel=banana> is
+accepted.  They also win over the arguments, which is the reverse of what
+most programs do, and a caller cannot choose a configuration file.
+
+=item * Not everything a run prints goes through the logger.  The progress
+lines, the command echoes and the summary are output and stay on standard
+output.  L<App::Actions::I18N> warns about a missing catalogue entry with
+C<carp>, because it has no object to hold a logger.  A pulling child of
+L<App::Actions::Process> prints straight to the log file it was given, since
+it is a separate process whose output is already captured.
+
 =back
 
 =head1 COMMON PITFALLS
@@ -937,6 +1095,23 @@ of your computer into its containers, as it can on GitHub's own runners.
 =item * B<Parallel jobs write to log files, not the terminal.>  With
 C<parallel> above 1, read the output with C<action-run logs>.
 
+=item * B<A configuration file or environment variable beats an argument.>
+If F<~/.conf/local.yaml> has an C<App__Actions> section with C<parallel: 8>,
+then C<parallel =E<gt> 2> (and C<action-run --parallel=2>) still runs eight
+jobs at a time.  When an option seems to be ignored, look for an
+C<App__Actions> section in those files and for C<App__Actions__*>
+environment variables (C<env | grep App__Actions>).
+
+=item * B<Values from those places are not checked.>  A misspelt or
+nonsensical value there is not reported as an argument would be.
+
+=item * B<A UNIVERSAL logger takes the messages off the terminal.>
+L<Object::Configure> applies a C<UNIVERSAL> section of F<universal.yaml> to
+every class that uses it, this one included.  If that section has a
+C<logger> that writes to a file or to syslog, a failed step is reported
+there and not on standard error.  Give this module its own C<logger> in an
+C<App__Actions> section, or pass C<logger>, to choose where its messages go.
+
 =back
 
 =head1 ENCODING
@@ -949,13 +1124,18 @@ bytes (UTF-8 for text from the workflow).  What the containers print is
 passed through to your terminal unchanged.  Messages from this module are
 in English unless C<ACTION_RUN_LANG> chooses French (C<fr>), German
 (C<de>) or Chinese (C<zh>); those are character strings, so the terminal
-should use UTF-8.
+should use UTF-8.  Settings in configuration files and C<App__Actions__*>
+environment variables are used as L<Config::Abstraction> reads them; keep
+option values there in ASCII.
 
 =head1 SEE ALSO
 
 =over 4
 
-=item * L<Configure an Object at Runtime|Object::Configure>
+=item * L<Configure an Object at Runtime|Object::Configure>, which L</new>
+uses to read configuration files and environment variables
+
+=item * L<Config::Abstraction>, which finds and reads those files
 
 =item * L<Test Dashboard|https://nigelhorne.github.io/App-Actions/coverage/>
 
@@ -991,6 +1171,9 @@ rule are the conditions that are always true when the routine returns.
 	│ actions!      : Actions
 	├───────────────────────────────────────────────────
 	│ dom options? ⊆ RUNNER_OPTIONS
+	│ let settings == (args? ⊕ fileConfig(App__Actions)) ⊕ envConfig(App__Actions__)
+	│     where args? == options? ∪ {workflow_file ↦ workflowFile?, project_dir ↦ projectDir?}
+	│     -- dom fileConfig and dom envConfig are not checked against RUNNER_OPTIONS
 	│ workflowFile? = ⊥ ⇒ raises WorkflowFileRequired
 	│ abs(workflowFile?) ∉ regularFiles ⇒ raises WorkflowFileMissing
 	│ projectDir? = ⊥ ∧ abs(workflowFile?) ∉ (PATH ⁀ "/.github/workflows/" ⁀ NAME)
@@ -1000,8 +1183,19 @@ rule are the conditions that are always true when the routine returns.
 	│ root ∉ directories ⇒ raises ProjectDirMissing
 	│ actions!.workflow = Workflow.Load(abs(workflowFile?))
 	│ actions!.project_dir = root
-	│ actions!.options = options?
+	│ actions!.options = settings
+	│ let logged == (logger? ≠ ⊥ ⇒ logger?)
+	│             ∧ (logger? = ⊥ ∧ logger ∈ dom configured ⇒ configured(logger))
+	│             ∧ (logger? = ⊥ ∧ logger ∉ dom configured ⇒ stderrLogger)
+	│     where configured == fileConfig(App__Actions) ⊕ envConfig(App__Actions__)
+	│     -- fileConfig includes the UNIVERSAL section of universal.yaml
+	│ actions!.logger ∈ LogAbstraction
+	│ logged = NULL ⇒ actions!.logger = silentLogger
+	│ logged ≠ NULL ⇒ actions!.logger = toLogger(logged)
 	└───────────────────────────────────────────────────
+
+	The workflowFile? and projectDir? above are the values in settings, so a
+	configuration file or environment variable can replace them too.
 
 =head2 workflow, workflow_file, project_dir
 
@@ -1070,7 +1264,9 @@ through these states (the full detail of each is in L<App::Actions::Runner>
 and its parts):
 
 	 new(%options)
-	      |   options checked; workflow loaded (errors are thrown here)
+	      |   options checked; then App__Actions settings from configuration
+	      |   files and App__Actions__* environment variables merged over
+	      |   them (not checked); workflow loaded (errors are thrown here)
 	      v
 	+-------------+
 	|   READY     |<------------------------------------------------------+

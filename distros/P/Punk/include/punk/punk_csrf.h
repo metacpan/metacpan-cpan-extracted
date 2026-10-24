@@ -86,22 +86,7 @@ static int pk_ct_eq(const char *a, STRLEN alen, const char *b, STRLEN blen) {
 /* Escape for an HTML attribute. The token is base64url and needs none of
  * this, but the field name is configurable and lands in the same markup. */
 static void pcf_attr_escape(pTHX_ SV *out, const char *p, STRLEN len) {
-    STRLEN i, start = 0;
-    for (i = 0; i < len; i++) {
-        const char *rep = NULL;
-        switch (p[i]) {
-            case '&':  rep = "&amp;";  break;
-            case '<':  rep = "&lt;";   break;
-            case '>':  rep = "&gt;";   break;
-            case '"':  rep = "&quot;"; break;
-            case '\'': rep = "&#39;";  break;
-            default: continue;
-        }
-        if (i > start) sv_catpvn(out, p + start, i - start);
-        sv_catpv(out, rep);
-        start = i + 1;
-    }
-    if (len > start) sv_catpvn(out, p + start, len - start);
+    punk_html_escape(aTHX_ out, p, len);
 }
 
 /* ---- configuration -------------------------------------------------------- */

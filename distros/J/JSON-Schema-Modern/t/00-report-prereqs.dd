@@ -55,6 +55,7 @@ do { my $x = {
                                       'Mojolicious' => '7.87',
                                       'Moo' => '0',
                                       'MooX::TypeTiny' => '0.002002',
+                                      'Syntax::Operator::Equ' => '0',
                                       'Types::Standard' => '1.016003',
                                       'YAML::PP' => '0',
                                       'autovivification' => '0',

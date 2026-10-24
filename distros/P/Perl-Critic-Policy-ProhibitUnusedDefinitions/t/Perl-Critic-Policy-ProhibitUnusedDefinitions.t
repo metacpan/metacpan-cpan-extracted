@@ -104,6 +104,16 @@ subtest 'what it reports' => sub {
             'lib/Foo.pm', [ sub_unused('Foo::bar') ],
         ],
         [
+            'a method that only calls itself, its invocant in the signature',
+            { 'lib/Foo.pm' => "package Foo;\nuse feature 'signatures';\nsub bar (\$s, \@rest) { return \$s->bar }\n1;\n" },
+            'lib/Foo.pm', [ sub_unused('Foo::bar') ],
+        ],
+        [
+            'a method that only calls itself, on shift and on $_[0]',
+            { 'lib/Foo.pm' => "package Foo;\nsub bar { shift->bar; \$_[0]->bar }\n1;\n" },
+            'lib/Foo.pm', [ sub_unused('Foo::bar') ],
+        ],
+        [
             'a sub with the same name in another package, called qualified',
             { 'lib/Foo.pm' => $FOO_BAR, 'lib/Baz.pm' => "package Baz;\nsub bar { 1 }\nBaz::bar();\n1;\n" },
             'lib/Foo.pm', [ sub_unused('Foo::bar') ],
@@ -204,6 +214,22 @@ subtest 'what it deliberately says nothing about' => sub {
         [
             'a sub called through SUPER',
             { 'lib/Foo.pm' => $FOO_BAR, 'lib/Kid.pm' => "package Kid;\nsub baz { \$_[0]->SUPER::bar() }\n1;\n" },
+            'lib/Foo.pm',
+        ],
+        [
+            'a sub called through SUPER from an override of the same name',
+            {
+                'lib/Foo.pm' => $FOO_BAR,
+                'lib/Kid.pm' => "package Kid;\nsub bar { my \$s = shift; return \$s->SUPER::bar() }\nKid::bar('Kid');\n1;\n",
+            },
+            'lib/Foo.pm',
+        ],
+        [
+            'a sub that a sub of the same name delegates to',
+            {
+                'lib/Foo.pm' => $FOO_BAR,
+                'lib/Baz.pm' => "package Baz;\nsub bar { my (\$s) = \@_; my \$foo = Foo->new; return \$foo->bar }\nBaz::bar('Baz');\n1;\n",
+            },
             'lib/Foo.pm',
         ],
         [ 'a sub called with &', { 'lib/Foo.pm' => "package Foo;\nsub bar { 1 }\n&bar;\n1;\n" }, 'lib/Foo.pm' ],

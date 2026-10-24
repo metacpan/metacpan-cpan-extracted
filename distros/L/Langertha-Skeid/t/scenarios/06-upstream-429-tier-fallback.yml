@@ -1,0 +1,32 @@
+title: A node that answers 429 is backed off, not retried -- the next tier serves, the usage event records the failure
+setup:
+  nodes:
+    - id: gpu
+      model: qwen3-32b
+      tags: [local]
+      upstream:
+        rules:
+          "limit me": { error: { status: 429, message: "slot limit reached" } }
+        fallback: { answer: "from local" }
+    - { id: groq, model: llama-3.3-70b, tags: [cloud], upstream: { fallback: { answer: "from cloud" } } }
+  config:
+    aliases:
+      house-model:
+        tiers:
+          - { tags: [local], model: qwen3-32b }
+          - { tags: [cloud], model: llama-3.3-70b }
+steps:
+  # the failing answer reaches the client as the node gave it ...
+  - chat: { protocol: openai, model: qwen3-32b, prompt: limit me }
+    expect: { status: 429, body_like: slot limit reached }
+    upstream:
+      gpu: { requests: 1 }
+  # ... and the node is now skipped: the alias serves from the cloud tier, gpu is not asked again
+  - chat: { protocol: openai, model: house-model, prompt: ask }
+    expect: { text: from cloud, headers: { x-skeid-node: groq } }
+    upstream:
+      gpu: { requests: 1 }
+      groq: { requests: 1 }
+    usage:
+      - { node_id: gpu, ok: 0, status_code: 429, error_type: upstream_error }
+      - { node_id: groq, ok: 1, requested_model: house-model }

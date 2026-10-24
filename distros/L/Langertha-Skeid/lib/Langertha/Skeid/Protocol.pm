@@ -1,5 +1,5 @@
 package Langertha::Skeid::Protocol;
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 # ABSTRACT: Shared helpers for Skeid wire-format translation
 use strict;
 use warnings;
@@ -103,7 +103,7 @@ Langertha::Skeid::Protocol - Shared helpers for Skeid wire-format translation
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 DESCRIPTION
 
@@ -115,6 +115,13 @@ That is the whole rule, and it is load-bearing: a format-specific field name bel
 own translator and nowhere else. Routing, admission, usage accounting and the upstream request
 builder never learn that Anthropic calls it C<system> or that Ollama calls it
 C<prompt_eval_count>. See F<docs/adr/0001-one-upstream-call-shape-all-client-formats-translated.md>.
+
+One module here translates nothing: L<Langertha::Skeid::Protocol::Audio>. The audio routes of
+the OpenAI face are relayed to the node's own endpoint in their own shape (ADR 0021), and that
+module holds what Skeid knows of their wire, under the same rule.
+L<Langertha::Skeid::Protocol::Rerank> does the same for the rerank route, and translates for one
+kind of node: a reranker that speaks TEI's dialect (C<rerank_format: tei>) instead of the one
+clients speak -- on the upstream side, where the client-side translators above have nothing.
 
 This module itself holds only the handful of helpers the translators share. They are plain
 functions, called fully qualified (C<Langertha::Skeid::Protocol::utf8_length($text)>) and not
@@ -199,6 +206,10 @@ L<Langertha::Skeid::Protocol::Ollama/manifest_endpoint>).
 =item * L<Langertha::Skeid::Protocol::Anthropic>, L<Langertha::Skeid::Protocol::Anthropic::Stream>
 
 =item * L<Langertha::Skeid::Protocol::Ollama>, L<Langertha::Skeid::Protocol::Ollama::Stream>
+
+=item * L<Langertha::Skeid::Protocol::Audio> -- the relayed audio routes
+
+=item * L<Langertha::Skeid::Protocol::Rerank> -- the rerank route
 
 =item * L<Langertha::Skeid::Proxy> -- the routes that use them
 

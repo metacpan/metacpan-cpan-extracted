@@ -198,6 +198,44 @@ subtest 'schema_version: one row, and it stays one' => sub {
     is( Trog::SQLite::schema_version($db), 0, 'so the version is still the one it was' );
 };
 
+subtest 'transaction: all of the work, or none of it' => sub {
+    Trog::SQLite::forget();
+    my ( $schema, $file ) = schema_dir($V0);
+    my $db    = Trog::SQLite::dbh( $schema, $file );
+    my $count = sub { return $db->selectrow_array('SELECT count(*) FROM things') };
+    my $add   = sub {
+        my ($name) = @_;
+        return sub { $db->do( 'INSERT INTO things (name) VALUES (?)', undef, $name ) }
+    };
+
+    is( Trog::SQLite::transaction( $db, $add->('one') ), 1, 'it returns true' );
+    is( $count->(),                                      1, 'and the work is committed' );
+    ok( $db->{AutoCommit}, 'and the handle is out of the transaction' );
+
+    my $err = dies {
+        Trog::SQLite::transaction( $db, sub { $add->('two')->(); die "no more\n" } );
+    };
+    is( $err,       "no more\n", 'work that dies dies with its own error' );
+    is( $count->(), 1,           'and nothing it did is kept' );
+    ok( $db->{AutoCommit}, 'and the handle is out of the transaction' );
+
+    $db->begin_work();
+    Trog::SQLite::transaction( $db, $add->('three') );
+    ok( !$db->{AutoCommit}, 'inside a transaction, it leaves that one open' );
+    $db->rollback();
+    is( $count->(), 1, 'so the caller that began it can roll back the work' );
+
+    $db->begin_work();
+    ok(
+        dies {
+            Trog::SQLite::transaction( $db, sub { die "inner\n" } )
+        },
+        'work that dies inside a transaction dies'
+    );
+    ok( !$db->{AutoCommit}, 'and leaves the rollback to the caller that began it' );
+    $db->rollback();
+};
+
 subtest 'bulk_insert: many rows, in batches that fit the parameter limit' => sub {
     Trog::SQLite::forget();
     my ( $schema, $file ) = schema_dir('CREATE TABLE IF NOT EXISTS pairs (a INTEGER PRIMARY KEY, b INTEGER);');

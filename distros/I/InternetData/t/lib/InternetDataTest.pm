@@ -55,6 +55,17 @@ sub download {
     };
 }
 
+# A checksum answer with every member the spec requires.
+sub checksum {
+    my (%overrides) = @_;
+    return {
+        id => 'bogon_ip_v1',
+        format => 'csvgz',
+        checksums => { md5 => 'm', sha1 => 's1', sha256 => 's256', sha512 => 's512' },
+        %overrides,
+    };
+}
+
 # A dataset's metadata with every member the spec requires.
 sub metadata {
     my (%overrides) = @_;

@@ -1,5 +1,24 @@
 Revision history for HTML-OSM
 
+0.12	Fri Oct 23 09:19:01 PM EDT 2026
+	[ Enhancements ]
+	- new(search => 0) leaves out the Nominatim search box, the "Clear search
+	  markers" button and their script, so nothing typed on the page leaves
+	  the reader's machine.  The "Reset Map" button stays.  The default is
+	  still to include the search box
+	- new(max_zoom => N) sets maxZoom (0-28) on the tile layer, for tile
+	  servers that have no tiles beyond a given zoom level
+	- New add_circle_marker() draws a filled circle with a radius in pixels
+	  and a hex colour, for bubble maps.  It takes the same points as
+	  add_marker(), joins the cluster group when cluster => 1 is set, and
+	  counts towards the map's bounds, so a map of circles alone needs no
+	  center() call
+	- onload_render() checks max_zoom and the circle markers again, as it does
+	  zoom, width and height
+
+	[ Tests ]
+	- Add t/options.t (search, max_zoom) and t/circle_marker.t
+
 0.11	Mon Oct 19 09:48:31 PM EDT 2026
 	[ Bug Fixes ]
 	- Heatmap radius and blur are now forced to positive numbers, so they can

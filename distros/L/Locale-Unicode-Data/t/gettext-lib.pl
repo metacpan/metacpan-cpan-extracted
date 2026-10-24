@@ -209,7 +209,8 @@ our $expected =
     uz => "nplurals=2; plural=(n != 1);",
     ve => "nplurals=2; plural=(n != 1);",
     'vec' => "nplurals=2; plural=(n != 1);",
-    vi => "nplurals=1; plural=0;",
+    # Since CLDR v49, vi has the same plural rules as am, hi and others: one for i = 0 or n = 1
+    vi => "nplurals=2; plural=(n > 1);",
     vo => "nplurals=2; plural=(n != 1);",
     vun => "nplurals=2; plural=(n != 1);",
     wa => "nplurals=2; plural=(n > 1);",

@@ -1,0 +1,16 @@
+--- cs.xml
++++ cs.xml
+@@ -4949,6 +4949,13 @@
+ 				<displayName count="many">čínského jüanu (offshore)</displayName>
+ 				<displayName count="other">čínských jüanů (offshore)</displayName>
+ 			</currency>
++			<currency type="CNX">
++				<displayName draft="contributed">čínský dolar ČLB</displayName>
++				<displayName count="one" draft="contributed">čínský dolar ČLB</displayName>
++				<displayName count="few" draft="contributed">čínské dolary ČLB</displayName>
++				<displayName count="many" draft="contributed">čínského dolaru ČLB</displayName>
++				<displayName count="other" draft="contributed">čínských dolarů ČLB</displayName>
++			</currency>
+ 			<currency type="CNY">
+ 				<displayName>čínský jüan</displayName>
+ 				<displayName count="one">čínský jüan</displayName>

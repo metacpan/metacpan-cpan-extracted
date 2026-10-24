@@ -1,0 +1,15 @@
+title: Two nodes of one model share the traffic by weight (2:1)
+setup:
+  nodes:
+    - { id: big,   model: m, weight: 2, upstream: { fallback: { answer: big } } }
+    - { id: small, model: m, weight: 1, upstream: { fallback: { answer: small } } }
+steps:
+  - chat: { protocol: openai, model: m, prompt: 1 }
+  - chat: { protocol: openai, model: m, prompt: 2 }
+  - chat: { protocol: openai, model: m, prompt: 3 }
+  - chat: { protocol: openai, model: m, prompt: 4 }
+  - chat: { protocol: openai, model: m, prompt: 5 }
+  - chat: { protocol: openai, model: m, prompt: 6 }
+    upstream:
+      big: { requests: 4 }
+      small: { requests: 2 }

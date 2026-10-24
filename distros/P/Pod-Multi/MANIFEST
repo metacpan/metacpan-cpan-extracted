@@ -1,10 +1,9 @@
-.gitignore
 .version_info.pl
 Changes
 lib/Pod/Multi.pm
 LICENSE
 Makefile.PL
-MANIFEST
+MANIFEST			This list of files
 MANIFEST.SKIP
 README
 scripts/pod2multi

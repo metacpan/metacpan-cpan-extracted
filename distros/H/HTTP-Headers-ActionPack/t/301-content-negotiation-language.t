@@ -5,6 +5,7 @@ use warnings;
 
 use Test::More;
 use Test::Fatal;
+use Test::Timer;
 
 BEGIN {
     use_ok('HTTP::Headers::ActionPack');
@@ -86,6 +87,15 @@ is(
     '... got the right language back'
 );
 
-
+time_ok(
+    sub {
+        $n->choose_language( [ "en", "de-DE" ], "(a?|b?){20}z" );
+        $n->choose_language( [ "en", "de-DE" ], "(a?|b?){25}z" );
+        $n->choose_language( [ "en", "de-DE" ], "(a?|b?){30}z" );
+        $n->choose_language( [ "en", "de-DE" ], "(a?|b?){40}z" );
+    },
+    1,
+    'protect against regex DoS'
+);
 
 done_testing;

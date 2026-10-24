@@ -164,8 +164,8 @@ sub upstream_messages_for {
       ] },
     ],
   });
-  is_deeply([ map { $_->{role} } @$messages ], [qw(user assistant tool tool tool user user)],
-    'tool messages first, then the one images message, then the client text');
+  is_deeply([ map { $_->{role} } @$messages ], [qw(user assistant tool tool tool user)],
+    'tool messages first, then one user message: images and client text of one message (k102)');
   is_deeply($messages->[2], { role => 'tool', tool_call_id => 'toolu_1',
     content => '[{"text":"Bildschirm eins","type":"text"}]' },
     'the tool message keeps its other blocks as JSON text, without the image');
@@ -179,8 +179,8 @@ sub upstream_messages_for {
     { type => 'image_url', image_url => { url => "data:image/png;base64,$PNG" } },
     { type => 'text', text => 'Images from tool result toolu_2:' },
     { type => 'image_url', image_url => { url => 'https://img.example.com/two.jpg' } },
-  ] }, 'one user message carries every result\'s images, each labelled with its tool_use_id');
-  is_deeply($messages->[6], { role => 'user', content => 'Compare them.' }, 'the client text follows');
+    { type => 'text', text => 'Compare them.' },
+  ] }, 'one user message carries every result\'s images, each labelled, then the client text');
 
   # Without images a structured result is the JSON text it always was (non-regression).
   $messages = upstream_messages_for('/v1/messages', {

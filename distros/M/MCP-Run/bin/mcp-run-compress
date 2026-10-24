@@ -1,39 +1,73 @@
 #!/usr/bin/env perl
 # PODNAME: mcp-run-compress
-# ABSTRACT: Wrap a shell command through MCP::Run::Compress for LLM-friendly output
+# ABSTRACT: Claude Code hooks that run Bash tool output through MCP::Run::Compress
 
 use strict;
 use warnings;
 use Getopt::Long qw( GetOptions );
-use MIME::Base64 qw( encode_base64 decode_base64 );
-use Encode qw( encode_utf8 );
-use JSON::MaybeXS ();
-use Path::Tiny qw( path );
-use MCP::Run::Bash;
-use MCP::Run::Compress;
+use Encode qw( encode_utf8 decode_utf8 );
 
-my ( $hook, $b64, $install, $help, $filter_files, $cmd_b64 );
+# Only core modules are loaded at compile time. JSON::MaybeXS, Path::Tiny
+# and the MCP::Run::* classes are required at RUNTIME by the path that
+# needs them, so a broken or half-upgraded install cannot kill the script
+# before a single line of runtime code has run. See run_hook(). karr #19.
+
+# The pass-through hook responses as literals: emitting one must not depend
+# on JSON::MaybeXS being loadable, because that is exactly what may be
+# missing when we need it. hookEventName has to match the event that is
+# actually firing — with the wrong name Claude Code drops the whole
+# response silently.
+use constant HOOK_PASSTHROUGH_PRE  => '{"hookSpecificOutput":{"hookEventName":"PreToolUse"}}';
+use constant HOOK_PASSTHROUGH_POST => '{"hookSpecificOutput":{"hookEventName":"PostToolUse"}}';
+
+# What PreToolUse leaves behind in the command when the user typed the
+# `no-compress ` prefix, and what PostToolUse looks for. PostToolUse sees
+# the command as PreToolUse rewrote it, never the user's original, so the
+# wish has to survive inside the command itself. A trailing comment line is
+# the only carrier that is invisible to bash and leaves the command's first
+# word — and with it Claude Code's permission prefix matching — intact.
+use constant NO_COMPRESS_MARKER => '# mcp-run-compress: no-compress';
+
+# Claude Code caps a Bash tool_response.stdout at 30000 bytes and persists
+# anything longer to a file. That cap applies to the REPLACEMENT too:
+# an updatedToolOutput above it is written to a fresh tool-results file and
+# the model is shown a 2 KB preview of it. A compressor that returns 40 KB
+# therefore delivers 2 KB. Everything we emit has to stay below the cap,
+# with headroom for the harness's own framing. karr #9, karr #16.
+use constant OUTPUT_BYTE_CAP => 29000;
+
+# Ceiling on the persisted file we are willing to pull into memory and push
+# through 30+ regex stages inside a hook. Above it we leave the harness's
+# own <persisted-output> framing alone: a 2 KB preview plus a path beats
+# spending seconds and hundreds of megabytes to produce the same 29 KB.
+use constant MAX_PERSISTED_READ => 4_000_000;
+
+# Checked before GetOptions can fail on it: a hook entry carrying an option
+# this version no longer knows must not make the script exit non-zero. For
+# PreToolUse a non-zero exit does not mean "error", it means "block the
+# tool call" — on every single Bash command in every session.
+my $hook_requested = grep { $_ eq '--hook' } @ARGV;
+
+my ( $hook, $install, $help );
 GetOptions(
   'hook'           => \$hook,
-  'b64=s'          => \$b64,
   'install-claude' => \$install,
-  'filter-files'   => \$filter_files,
-  'cmd-b64=s'      => \$cmd_b64,
   'help|h'         => \$help,
-) or do { print_help(); exit 2 };
+) or do {
+  if ($hook_requested) { $hook = 1 }
+  else                 { print_help(); exit 2 }
+};
 
-if ($hook)         { exit run_hook() }
-if (defined $b64)  { exit run_command($b64) }
-if ($filter_files) { exit run_filter_files( $cmd_b64, @ARGV ) }
-if ($install)      { exit install_claude() }
+if ($hook)    { exit run_hook() }
+if ($install) { exit install_claude() }
 
 print_help();
 exit 0;
 
 # 'docker' means: install_claude writes a hook that spawns a docker
-# container, and --hook emits a pipe-through-docker rewrite instead of
-# a --b64 self-wrap. Baked into the Docker image via ENV; unset on a
-# native Perl install. Override manually by exporting the env var.
+# container instead of calling the script directly. Baked into the Docker
+# image via ENV; unset on a native Perl install. Override manually by
+# exporting the env var.
 sub install_mode {
   return $ENV{MCP_RUN_COMPRESS_INSTALL_MODE} // 'native';
 }
@@ -42,122 +76,383 @@ sub image_ref {
   return $ENV{MCP_RUN_COMPRESS_IMAGE} // 'raudssus/mcp-run-compress:latest';
 }
 
+# The one command string written into settings.json for BOTH events. The
+# script decides what to do from the payload's hook_event_name, so there is
+# nothing to keep in sync between the two entries.
+#
+# --network none: the hook reads stdin and writes stdout, nothing else.
+# karr #14.
+sub hook_command {
+  return install_mode() eq 'docker'
+    ? 'docker run --rm -i --network none ' . image_ref() . ' --hook'
+    : 'mcp-run-compress --hook';
+}
+
+sub output_byte_cap {
+  my $cap = $ENV{MCP_RUN_COMPRESS_MAX_BYTES};
+  return OUTPUT_BYTE_CAP
+    unless defined $cap && $cap =~ /\A[0-9]+\z/ && $cap > 0;
+  return $cap;
+}
+
 sub _json {
   return JSON::MaybeXS->new( utf8 => 1, canonical => 1, convert_blessed => 1 );
 }
 
+sub _bytelen {
+  my ($text) = @_;
+  return 0 unless defined $text;
+  return length encode_utf8($text);
+}
+
+# FAIL OPEN. A PreToolUse hook that exits non-zero tells Claude Code to
+# BLOCK the tool call, so anything this script cannot do must cost the user
+# compression, never their shell: on any failure we emit the pass-through
+# response and exit 0. Uncompressed output is a small harm, a dead Bash tool
+# in every session is a large one. That is why the modules are required at
+# runtime (below) rather than used at compile time — a `use` failure happens
+# before any eval here could catch it.
+#
+# The same applies to PostToolUse, for a smaller but real reason: the
+# command has already run, so a dying hook cannot cost the user their
+# output — but it can print a stack trace after every Bash call, which is
+# precisely the noise this product exists to remove.
+#
+# Deliberately the OPPOSITE of lib/MCP/Run.pm, which loads MCP::Run::Compress
+# at COMPILE time so a broken compressor kills the server at startup instead
+# of at the user's first tools/call (Sharp Edge in CLAUDE.md, Changes 0.106).
+# Server: fail fast, it is a startup concern. Hook: fail open, it sits in the
+# critical path of every Bash call. Do NOT align these two — same as the two
+# compression defaults that intentionally differ. karr #19.
 sub run_hook {
-  my ( $self ) = @_;
+  # Drain stdin before anything can fail: whatever goes wrong below, the
+  # caller writing the hook payload must not hit a closed pipe.
+  my $raw = do { local $/; <STDIN> };
+
+  my $response = eval { hook_response($raw) };
+
+  if ( !defined $response ) {
+    print STDERR 'mcp-run-compress: compression unavailable, output passed '
+      . 'through unchanged: ' . _brief_error($@) . "\n";
+    $response = _passthrough_for($raw);
+  }
+
+  print $response;
+  return 0;
+}
+
+# Picks the pass-through literal by looking at the raw payload text rather
+# than parsed JSON: this runs on the path where JSON::MaybeXS is what failed
+# to load. A pass-through with the wrong hookEventName would be dropped, and
+# a dropped pass-through is still a pass-through — but getting it right
+# keeps Claude Code from logging a mismatch on every command.
+sub _passthrough_for {
+  my ($raw) = @_;
+  return HOOK_PASSTHROUGH_POST
+    if defined $raw && $raw =~ /"hook_event_name"\s*:\s*"PostToolUse"/;
+  return HOOK_PASSTHROUGH_PRE;
+}
+
+# First line of an error, without the "at FILE line N." tail. The hook runs
+# on every single Bash command; a full Perl stack trace on stderr would be
+# exactly the noise this product exists to remove.
+sub _brief_error {
+  my ($err) = @_;
+  $err = 'unknown error' unless defined $err && length $err;
+  ($err) = split /\n/, $err;
+  # "Can't locate Foo.pm in @INC" drags the entire @INC listing along; the
+  # module name is the whole diagnosis, the rest is a screenful.
+  $err =~ s/\s*\(\@INC entries checked:[^)]*\)//;
+  $err =~ s/\s*\(you may need to install the \S+ module\)//;
+  $err =~ s/\s+at\s+\S+\s+line\s+\d+[^\n]*\z//;
+  $err =~ s/\s+\z//;
+  $err = substr( $err, 0, 120 ) . '...' if length $err > 123;
+  return length $err ? $err : 'unknown error';
+}
+
+# Builds the hook response string. Dies if anything is missing — run_hook()
+# turns that into the pass-through response.
+sub hook_response {
+  my ($raw) = @_;
+  require JSON::MaybeXS;
   my $json = _json();
-  my $raw  = do { local $/; <STDIN> };
   my $in   = eval { $json->decode($raw) } || {};
-  my $cmd  = $in->{tool_input}{command};
 
-  my $bypass =
-       !defined $cmd
-    || !length $cmd
-    || $in->{tool_input}{run_in_background}
-    || $cmd =~ /\bmcp-run-compress\b/;
+  my $event = $in->{hook_event_name};
+  # No event name (hand-written payload, older harness): a tool_response is
+  # only ever present after the tool ran.
+  $event = ref $in->{tool_response} eq 'HASH' ? 'PostToolUse' : 'PreToolUse'
+    unless defined $event && length $event;
 
-  my $out = {
-    hookSpecificOutput => {
-      hookEventName => 'PreToolUse',
-    },
-  };
+  return post_tool_use_response( $json, $in ) if $event eq 'PostToolUse';
+  return pre_tool_use_response( $json, $in )  if $event eq 'PreToolUse';
 
-  if ( !$bypass && $cmd =~ /\A\s*no-compress\s+(.+)\z/s ) {
-    $out->{hookSpecificOutput}{updatedInput} = { command => $1 };
-    $bypass = 1;
-  }
-
-  unless ($bypass) {
-    $cmd = MCP::Run::Compress->new->transform_command($cmd);
-    my $encoded  = encode_base64( encode_utf8($cmd), '' );
-    my $rewrite  = install_mode() eq 'docker'
-      ? docker_pipe_rewrite($encoded)
-      : "mcp-run-compress --b64 $encoded";
-    $out->{hookSpecificOutput}{updatedInput} = { command => $rewrite };
-  }
-
-  print $json->encode($out);
-  return 0;
+  # Anything else — PostToolUseFailure above all — has nothing for us to do.
+  # Answer with its own event name so the response is not silently dropped.
+  return $json->encode( { hookSpecificOutput => { hookEventName => $event } } );
 }
 
-# Emitted when the hook is running inside the Docker image. The rewritten
-# command runs the user's original bash on the HOST (host cwd, host env,
-# host binaries — `git`, `dzil`, etc. all work), then streams stdout and
-# stderr into the docker image for compression. The host only needs bash,
-# coreutils (mktemp, base64) and docker — no Perl.
-sub docker_pipe_rewrite {
-  my ($encoded) = @_;
-  my $image = image_ref();
-  # base64 alphabet is [A-Za-z0-9+/=] so single-quote wrapping is safe.
-  return join( ' ',
-    q({),
-    q(__o=$(mktemp) && __e=$(mktemp) || exit 1;),
-    q(trap 'rm -f "$__o" "$__e"' EXIT;),
-    qq(bash -c "\$(printf %s '$encoded' | base64 -d)" >"\$__o" 2>"\$__e";),
-    q(__ec=$?;),
-    qq(docker run --rm -v "\$__o:/in/stdout:ro" -v "\$__e:/in/stderr:ro" '$image' --filter-files --cmd-b64 '$encoded' /in/stdout /in/stderr;),
-    q(exit $__ec;),
-    q(}),
-  );
+# PreToolUse has exactly two jobs left, and both of them MUST happen before
+# the command runs: the Co-Authored-By rewrite, and turning the user's
+# `no-compress ` prefix into a marker PostToolUse can still see. Compression
+# itself moved to PostToolUse — the command is no longer touched for it.
+sub pre_tool_use_response {
+  my ( $json, $in ) = @_;
+
+  my $out = { hookSpecificOutput => { hookEventName => 'PreToolUse' } };
+  my $cmd = $in->{tool_input}{command};
+  return $json->encode($out) if !defined $cmd || !length $cmd;
+
+  # The two jobs are independent and must not ride on one flag. Everything
+  # about `no-compress` and background jobs governs COMPRESSION. The
+  # Co-Authored-By rewrite is a commit policy: it applies to every command
+  # and answers to exactly one switch, MCP_RUN_COMPRESS_NO_CO_AUTHORED,
+  # which transform_command honours itself. karr #26.
+  my $updated = $cmd;
+
+  my $no_compress = 0;
+  if ( $updated =~ /\A\s*no-compress\s+(\S.*)\z/s ) {
+    $updated     = $1;
+    $no_compress = 1;
+  }
+
+  # No self-bypass here, deliberately, and unlike the PostToolUse side.
+  # Until 0.106 this hook rewrote the command into a compressing wrapper
+  # and had to avoid wrapping its own wrapper; it does not rewrite anything
+  # for compression any more, so the only thing a name match still switched
+  # off was the trailer. `git commit -m "Fix mcp-run-compress hook"` losing
+  # its Co-Authored-By line, silently, is not a bypass anyone asked for —
+  # and in this repository that message is the common case. karr #26.
+  require MCP::Run::Compress;
+  $updated = MCP::Run::Compress->new->transform_command($updated);
+
+  # Marker last, so it stays the final line of whatever the transform
+  # produced. Skipped for background commands: their output never reaches
+  # PostToolUse as tool output, so the marker would have nothing to tell.
+  $updated = mark_no_compress($updated)
+    if $no_compress && !$in->{tool_input}{run_in_background};
+
+  # Only claim an updatedInput when something actually changed. An
+  # updatedInput identical to the input on every Bash call is noise that
+  # Claude Code has to re-run its permission matching over for nothing.
+  $out->{hookSpecificOutput}{updatedInput} = { command => $updated }
+    if $updated ne $cmd;
+
+  return $json->encode($out);
 }
 
-sub run_filter_files {
-  my ( $encoded, $stdout_path, $stderr_path ) = @_;
-  unless ( defined $stdout_path && defined $stderr_path ) {
-    print STDERR "mcp-run-compress: --filter-files needs STDOUT_PATH STDERR_PATH\n";
-    return 2;
-  }
-  my $command = defined $encoded ? decode_base64($encoded) : '';
-  my $stdout  = path($stdout_path)->slurp_raw;
-  my $stderr  = path($stderr_path)->slurp_raw;
-
-  my $compressor = MCP::Run::Compress->new;
-  my ( $o, $e ) = $compressor->compress( $command, $stdout, $stderr );
-
-  if ( length $o ) {
-    print STDOUT $o;
-    print STDOUT "\n" unless $o =~ /\n\z/;
-  }
-  if ( length $e ) {
-    print STDERR $e;
-    print STDERR "\n" unless $e =~ /\n\z/;
-  }
-  return 0;
+# Appends the marker as its own trailing comment line. Measured against 24
+# command shapes (multiline, heredocs incl. <<- and quoted, double heredocs,
+# functions, if/case/while blocks, subshells, line continuations, background
+# jobs): output and exit code stay byte-identical in all of them but two.
+#
+#   * a command ending in a dangling backslash — guarded below, the marker
+#     would be spliced onto the last command line by the line continuation
+#   * an UNTERMINATED heredoc, where the marker lands in the heredoc body.
+#     bash already warns about that command; not guarded, see POD.
+#
+# Dropping the marker costs the bypass for that one call (the output gets
+# compressed), never the command.
+sub mark_no_compress {
+  my ($cmd) = @_;
+  return $cmd if $cmd =~ /(?<!\\)(?:\\\\)*\\\z/;
+  return $cmd . "\n" . NO_COMPRESS_MARKER;
 }
 
-sub run_command {
-  my ( $encoded ) = @_;
-  my $command = decode_base64($encoded);
+# PostToolUse is where compression happens now. The command has already run;
+# we replace its recorded output with the compressed version through
+# hookSpecificOutput.updatedToolOutput.
+#
+# LIMIT, by design and not by omission: this never sees a command that
+# exited non-zero. Claude Code fires PostToolUseFailure for those, that
+# payload carries no tool_response at all, and updatedToolOutput is ignored
+# there (four shapes tested, karr #9). Failing builds — the loudest output
+# there is — arrive uncompressed. Making that visible in --help and POD is
+# part of the deal; hiding it is not.
+sub post_tool_use_response {
+  my ( $json, $in ) = @_;
 
-  my $server = MCP::Run::Bash->new;
-  my $result = $server->execute( $command, undef, 1800 );
+  my $out  = { hookSpecificOutput => { hookEventName => 'PostToolUse' } };
+  my $resp = $in->{tool_response};
+  return $json->encode($out) unless ref $resp eq 'HASH';
 
-  my $compressor = MCP::Run::Compress->new;
-  my ( $stdout, $stderr ) = $compressor->compress(
-    $command,
-    $result->{stdout} // '',
-    $result->{stderr} // '',
-  );
+  my $cmd = $in->{tool_input}{command} // '';
 
-  if ( length $stdout ) {
-    print STDOUT $stdout;
-    print STDOUT "\n" unless $stdout =~ /\n\z/;
+  # Background commands: the hook fires at START, not at completion.
+  # stdout/stderr are empty and the response is the "running in background"
+  # notice — compressing it would only glue a header onto that notice. The
+  # real output arrives later over the task file and is not a Bash tool
+  # response any more. noOutputExpected is present-but-false on ordinary
+  # responses, so this has to test truth, not existence.
+  return $json->encode($out)
+    if $resp->{backgroundTaskId} || $resp->{noOutputExpected};
+
+  # The user asked for raw output. Anchored at the end: only the marker
+  # PreToolUse appended counts, never the same text quoted inside a heredoc
+  # body somewhere in the middle of the command.
+  return $json->encode($out)
+    if $cmd =~ /\n\Q${\ NO_COMPRESS_MARKER }\E[ \t]*\z/;
+
+  # Self-bypass: a stale PreToolUse hook from an older install that still
+  # rewrites commands into a compressing wrapper. Whatever it produced is
+  # compressed already and doing it twice is worse than not at all.
+  #
+  # Narrower than the PreToolUse bypass, and on purpose. Matching every
+  # command that merely NAMES this tool would switch compression off for
+  # `grep -r mcp-run-compress`, for editing this script, and for the marker
+  # line above — silently, since an uncompressed output looks like any
+  # other. Only the two flags of the rewrite era identify an invocation
+  # that already compressed something.
+  return $json->encode($out)
+    if $cmd =~ /\bmcp-run-compress\b/ && $cmd =~ /--(?:b64|filter-files)\b/;
+
+  my $stdout = defined $resp->{stdout} ? $resp->{stdout} : '';
+
+  # Above 30000 bytes the harness truncates stdout and puts the full text
+  # in a file, which is readable and complete while the hook runs. Reading
+  # it is what lets compression work on the whole output instead of on a
+  # prefix — and deleting the two persist fields from the replacement is
+  # what removes the <persisted-output> framing with its 2 KB preview.
+  my ( $raw_path, $raw_unread );
+  if ( defined $resp->{persistedOutputPath} && length $resp->{persistedOutputPath} ) {
+    $raw_path = $resp->{persistedOutputPath};
+    my $size = $resp->{persistedOutputSize};
+
+    if ( defined $size && $size =~ /\A[0-9]+\z/ && $size > MAX_PERSISTED_READ ) {
+      # Too large to be worth a hook's memory and CPU. The harness's own
+      # framing already points at the file; leave it in place.
+      return $json->encode($out);
+    }
+
+    my $full = eval { _slurp_utf8($raw_path) };
+    if ( defined $full ) { $stdout = $full }
+
+    # Unreadable. In docker mode that is the normal case, not an error:
+    # persistedOutputPath is a HOST path and the container cannot see it.
+    # Mounting it is not on the table — the file lives in
+    # ~/.claude/projects/<project>/<session>/tool-results/, so the only
+    # ancestor known at install time is ~/.claude/projects, which holds
+    # every session transcript of every project. We compress the 30000
+    # bytes we were given, still drop the framing, and say so in the text:
+    # 29 KB compressed beats a 2 KB preview.
+    else { $raw_unread = 1 }
   }
-  if ( length $stderr ) {
-    print STDERR $stderr;
-    print STDERR "\n" unless $stderr =~ /\n\z/;
-  }
-  if ( defined $result->{error} ) {
-    print STDERR "mcp-run-compress: $result->{error}\n";
-  }
 
-  return $result->{exit_code} // 1;
+  return $json->encode($out) unless length $stdout;
+
+  require MCP::Run::Compress;
+
+  # stderr is deliberately not fed to the compressor. Claude Code merges
+  # both streams of the command into stdout; tool_response.stderr carries
+  # harness notices ("Shell cwd was reset"), not command output, and a
+  # filter with filter_stderr would fold those into the command's output.
+  my ($compressed) = MCP::Run::Compress->new->compress( $cmd, $stdout, '' );
+  $compressed = '' unless defined $compressed;
+
+  # Nothing gained and nothing to re-frame: leave the response alone. Any
+  # updatedToolOutput we return is a claim over the whole output, and a
+  # no-op claim is one more thing that can go wrong.
+  return $json->encode($out) if !defined $raw_path && $compressed eq $stdout;
+
+  my $header = _provenance_header( $raw_path, _bytelen($stdout), $raw_unread );
+
+  # Without a raw file on disk there is nothing to point the model at, so
+  # cutting would destroy output the harness was already willing to show
+  # inline. The cap can then only raise, never lower.
+  my $limit = output_byte_cap();
+  $limit = _bytelen($stdout) if !defined $raw_path && _bytelen($stdout) > $limit;
+  $limit -= _bytelen($header) + 1 if length $header;
+
+  $compressed = _cap_output( $compressed, $limit, $raw_path );
+  $compressed = $header . "\n" . $compressed if length $header;
+
+  my %updated = %$resp;
+  $updated{stdout} = $compressed;
+  delete $updated{persistedOutputPath};
+  delete $updated{persistedOutputSize};
+
+  $out->{hookSpecificOutput}{updatedToolOutput} = \%updated;
+  return $json->encode($out);
+}
+
+# Deleting persistedOutputPath is what removes the 2 KB preview framing,
+# and it takes the only pointer to the untouched original with it. So the
+# pointer goes into the text.
+sub _provenance_header {
+  my ( $raw_path, $bytes, $unread ) = @_;
+  return '' unless defined $raw_path;
+  return "[mcp-run-compress: only the first $bytes bytes were compressed, "
+    . "the raw output is not readable from here; full raw output: $raw_path]"
+    if $unread;
+  return "[mcp-run-compress: compressed from $bytes bytes; "
+    . "full raw output: $raw_path]";
+}
+
+# Head-and-tail cut to a byte budget, snapped to line boundaries, with the
+# cut named in the middle. Half and half: the start of an output carries
+# what ran, the end carries how it ended, and a generic cap cannot know
+# which of the two the caller is after. Silent shortening is the one thing
+# this product must never do, so the marker is not optional.
+sub _cap_output {
+  my ( $text, $limit, $raw_path ) = @_;
+
+  my $total = _bytelen($text);
+  return $text if $total <= $limit;
+
+  # Sized with the largest number it could hold so the marker can never
+  # push the result back over the limit.
+  my $reserve = _bytelen( _cap_marker( $total, $total, $raw_path ) ) + 2;
+  my $budget  = $limit - $reserve;
+  return _take_bytes( $text, $limit, 0 ) if $budget < 2;
+
+  my $head = _take_bytes( $text, int( $budget / 2 ), 0 );
+  my $tail = _take_bytes( $text, $budget - int( $budget / 2 ), 1 );
+
+  my $omitted = $total - _bytelen($head) - _bytelen($tail);
+  return join "\n", $head, _cap_marker( $omitted, $total, $raw_path ), $tail;
+}
+
+sub _cap_marker {
+  my ( $omitted, $total, $raw_path ) = @_;
+  return "[mcp-run-compress: $omitted of $total bytes omitted here; "
+    . "full output: $raw_path]"
+    if defined $raw_path;
+  return "[mcp-run-compress: $omitted of $total bytes omitted here to stay "
+    . 'under the tool output cap]';
+}
+
+# Byte-exact prefix or suffix, pulled back to a line boundary so no line is
+# served half. A single line longer than the budget is cut hard — a lenient
+# decode turns a split character into one replacement char rather than
+# poisoning the JSON response.
+sub _take_bytes {
+  my ( $text, $n, $from_end ) = @_;
+  return '' if $n <= 0;
+  my $bytes = encode_utf8($text);
+  return $text if length $bytes <= $n;
+
+  my $chunk = $from_end ? substr( $bytes, -$n ) : substr( $bytes, 0, $n );
+  if ( index( $chunk, "\n" ) >= 0 ) {
+    if   ($from_end) { $chunk =~ s/\A[^\n]*\n// }
+    else             { $chunk =~ s/\n[^\n]*\z// }
+  }
+  return decode_utf8($chunk);
+}
+
+sub _slurp_utf8 {
+  my ($path) = @_;
+  open my $fh, '<:raw', $path or die "cannot read $path: $!\n";
+  my $bytes = do { local $/; <$fh> };
+  close $fh;
+  return decode_utf8( defined $bytes ? $bytes : '' );
 }
 
 sub install_claude {
+  # Deliberately NOT fail-open: this is an interactive installer, and an
+  # install that silently did nothing would be worse than a loud failure.
+  require Path::Tiny; Path::Tiny->import('path');
+  require JSON::MaybeXS;
+
   my $file = path( $ENV{HOME} // glob('~'), '.claude', 'settings.json' );
   my $json = JSON::MaybeXS->new(
     utf8            => 1,
@@ -171,109 +466,199 @@ sub install_claude {
     my $raw = $file->slurp_utf8;
     $cfg = $json->decode($raw) if length $raw;
   }
+  $cfg->{hooks} //= {};
 
-  $cfg->{hooks}             //= {};
-  $cfg->{hooks}{PreToolUse} //= [];
+  my $hook_cmd = hook_command();
+  my $dirty    = 0;
 
-  for my $group ( @{ $cfg->{hooks}{PreToolUse} } ) {
-    next unless ref $group eq 'HASH' && ( $group->{matcher} // '' ) eq 'Bash';
-    for my $h ( @{ $group->{hooks} // [] } ) {
-      next unless ref $h eq 'HASH';
-      if ( ( $h->{command} // '' ) =~ /\bmcp-run-compress\b/ ) {
-        print "Already installed in $file\n";
-        return 0;
+  for my $stale ( _stale_hooks( $cfg, $hook_cmd ) ) {
+    print "Migrated stale hook command: $stale->{command}\n";
+    $stale->{command} = $hook_cmd;
+    $dirty++;
+  }
+
+  # Both events, one command. PreToolUse for the Co-Authored-By rewrite and
+  # the no-compress marker, PostToolUse for the compression itself. An
+  # install from before the PostToolUse move has only the first one; adding
+  # the second IS the migration for it, and it is the common case, not an
+  # edge one.
+  for my $event (qw( PreToolUse PostToolUse )) {
+    $cfg->{hooks}{$event} //= [];
+    if ( _hook_installed( $cfg, $event ) ) {
+      print "$event hook already installed in $file\n";
+      next;
+    }
+    push @{ $cfg->{hooks}{$event} }, {
+      matcher => 'Bash',
+      hooks   => [ { type => 'command', command => $hook_cmd } ],
+    };
+    print "Installed $event hook in $file\n";
+    $dirty++;
+  }
+
+  # Only rewrite the file when something changed: this is the user's
+  # settings.json, and reformatting it on every run is not our business.
+  if ($dirty) {
+    $file->parent->mkpath unless $file->parent->exists;
+    $file->spew_utf8( $json->encode($cfg) );
+  }
+
+  install_skill( $file->parent );
+  return 0;
+}
+
+# Every mcp-run-compress hook entry in the config, across all events.
+sub _our_hooks {
+  my ($cfg) = @_;
+  my @found;
+  for my $event ( sort keys %{ $cfg->{hooks} } ) {
+    next unless ref $cfg->{hooks}{$event} eq 'ARRAY';
+    for my $group ( @{ $cfg->{hooks}{$event} } ) {
+      next unless ref $group eq 'HASH';
+      for my $h ( @{ $group->{hooks} // [] } ) {
+        next unless ref $h eq 'HASH';
+        next unless ( $h->{command} // '' ) =~ /\bmcp-run-compress\b/;
+        push @found, { event => $event, group => $group, hook => $h };
       }
     }
   }
+  return @found;
+}
 
-  my $hook_cmd = install_mode() eq 'docker'
-    ? 'docker run --rm -i ' . image_ref() . ' --hook'
-    : 'mcp-run-compress --hook';
+sub _hook_installed {
+  my ( $cfg, $event ) = @_;
+  for my $found ( _our_hooks($cfg) ) {
+    next unless $found->{event} eq $event;
+    next unless ( $found->{group}{matcher} // '' ) eq 'Bash';
+    return 1;
+  }
+  return 0;
+}
 
-  push @{ $cfg->{hooks}{PreToolUse} }, {
-    matcher => 'Bash',
-    hooks   => [ { type => 'command', command => $hook_cmd } ],
-  };
+# Entries that would misbehave if left alone, returned as the hook hashrefs
+# so the caller can rewrite them in place:
+#
+#   * a flag this version no longer has (--b64, --filter-files, from the
+#     rewrite era). GetOptions would fail on it, and a PreToolUse hook that
+#     exits non-zero blocks every Bash call.
+#   * a `docker run` of an image ref that is not the one we would write now.
+#     A pinned older image still does the old PreToolUse rewrite, which
+#     compresses inside the command — with the new PostToolUse hook next to
+#     it that is two compressions on one output. The docker command is
+#     generated by us end to end, so replacing it wholesale is safe.
+#
+# A native command that merely differs in spelling (an absolute path, say)
+# is left alone: it still works, and rewriting it to a bare `mcp-run-compress`
+# could take the hook off a PATH that never had it.
+sub _stale_hooks {
+  my ( $cfg, $hook_cmd ) = @_;
+  my @stale;
+  for my $found ( _our_hooks($cfg) ) {
+    my $cmd = $found->{hook}{command} // '';
+    next if $cmd eq $hook_cmd;
+    push @stale, $found->{hook}
+      if $cmd =~ /--b64\b/
+      || $cmd =~ /--filter-files\b/
+      || $cmd =~ /\bdocker\s+run\b/;
+  }
+  return @stale;
+}
 
-  $file->parent->mkpath unless $file->parent->exists;
-  $file->spew_utf8( $json->encode($cfg) );
-  print "Installed PreToolUse hook in $file\n";
+# Installed independently of the hooks: the skill is what tells the model
+# that it is looking at compressed output and how to opt out. An
+# already-installed hook must not mask a deleted or outdated skill. karr #12.
+sub install_skill {
+  my ($claude_dir) = @_;
 
-  my $skill = $file->parent->child(
+  my $skill = $claude_dir->child(
     'skills', 'bash-output-is-compressed-prefix-no-compress-to-bypass', 'SKILL.md',
   );
-  $skill->parent->mkpath unless $skill->parent->exists;
-  $skill->spew_utf8(<<'SKILL');
+  my $skill_body = <<'SKILL';
 ---
 name: bash-output-is-compressed-prefix-no-compress-to-bypass
-description: READ THIS BEFORE RUNNING ANY Bash TOOL COMMAND. Every Bash tool call is routed through the mcp-run-compress hook, which strips columns, noise, and truncates long output so you see a compressed view — NOT the real shell output. If you need raw unfiltered output (full `ls -l` columns, verbose logs, exact byte counts, etc.), prefix the command with `no-compress ` for that single invocation.
+description: READ THIS BEFORE RUNNING ANY Bash TOOL COMMAND. Bash tool output is replaced by the mcp-run-compress hook, which strips columns and noise and shortens long output — what you see is a compressed view, NOT the real shell output. If you need the raw unfiltered output (full `ls -l` columns, verbose logs, exact byte counts, etc.), prefix the command with `no-compress ` for that single invocation.
 ---
 
-Every Bash command you run is silently rewritten by a PreToolUse hook into
-`mcp-run-compress --b64 <...>`, which filters and truncates the output.
+Every Bash command you run is compressed by a PostToolUse hook before you
+see its output. Over 30 command-specific filters strip noise, reduce
+columns, drop progress lines, and cap long output with head+tail.
 
-To get the real, unmodified output for one command, prefix it with `no-compress `:
+To get the real, unmodified output for one command, prefix it with
+`no-compress `:
 
     no-compress ls -l
     no-compress cat /var/log/syslog
     no-compress dmesg
 
-The hook strips the prefix and runs the rest raw. Use it whenever compressed
-output would hide something you actually need to see.
-SKILL
-  print "Installed skill at $skill\n";
+Use it whenever compressed output would hide something you actually need
+to see.
 
-  return 0;
+What is NOT compressed, so do not read anything into the difference:
+
+  * commands that exit non-zero — their output cannot be replaced, you
+    get it raw
+  * background commands — their output does not arrive as tool output
+
+Any line that starts with `[mcp-run-compress:` is the hook talking to you,
+not the command. Where output was shortened, that line says how much was
+dropped and names the file holding the complete original, which you can
+read directly.
+SKILL
+
+  if ( $skill->exists && $skill->slurp_utf8 eq $skill_body ) {
+    print "Skill already installed at $skill\n";
+  }
+  else {
+    $skill->parent->mkpath unless $skill->parent->exists;
+    $skill->spew_utf8($skill_body);
+    print "Installed skill at $skill\n";
+  }
+  return;
 }
 
 sub print_help {
   print <<'HELP';
-mcp-run-compress — wrap a shell command through MCP::Run::Compress filters
-so the output is LLM-friendly (noise stripped, long output truncated).
+mcp-run-compress — Claude Code hooks that run Bash tool output through the
+MCP::Run::Compress filters so what the model sees is LLM-friendly (noise
+stripped, long output shortened).
+
+HOW IT WORKS
+
+  Two hooks, one command (`mcp-run-compress --hook`), one job each:
+
+    PostToolUse   Compresses the output. The command is not touched; the
+                  recorded output is replaced via updatedToolOutput.
+
+    PreToolUse    Everything that has to happen BEFORE the command runs:
+                  the Co-Authored-By rewrite of `git commit`, and turning a
+                  `no-compress ` prefix into a marker the PostToolUse hook
+                  can still see.
 
 INSTALL MODES
 
-  Two install modes, selected automatically by the environment:
-
     native   User has Perl and installed MCP::Run (via cpanm / Dist::Zilla).
-             The hook is `mcp-run-compress --hook` and rewrites bash
-             commands to `mcp-run-compress --b64 <…>`, all in-process.
+             Both hooks are `mcp-run-compress --hook`.
 
-    docker   User has only Docker (no Perl). The hook is
-             `docker run --rm -i raudssus/mcp-run-compress --hook` and
-             rewrites bash commands to a small shell snippet that runs
-             the original command on the HOST and pipes stdout/stderr
-             through a Docker container for compression.
+    docker   User has only Docker (no Perl). Both hooks are
+             `docker run --rm -i --network none <image> --hook`, reading
+             the hook JSON on stdin and writing the response on stdout.
 
-  The mode is selected by the MCP_RUN_COMPRESS_INSTALL_MODE env var.
-  The Docker image sets this to `docker` in its ENV; native installs
-  leave it unset (default `native`). Override manually if you need to.
+  The mode is selected by the MCP_RUN_COMPRESS_INSTALL_MODE env var. The
+  Docker image sets this to `docker` in its ENV; native installs leave it
+  unset (default `native`). Override manually if you need to.
 
 USAGE
 
-  mcp-run-compress --b64 <BASE64>
-      Decode the base64-encoded command, execute it, and emit the compressed
-      stdout/stderr with the original exit code. Used by the native-mode
-      hook rewrite.
-
-  mcp-run-compress --filter-files --cmd-b64 <BASE64> STDOUT_PATH STDERR_PATH
-      Read captured stdout and stderr from two files, compress them using
-      the decoded command as context, emit compressed stdout to fd 1 and
-      compressed stderr to fd 2. Used by the docker-mode hook rewrite
-      (the host runs the original command and mounts the temp files into
-      the container).
-
   mcp-run-compress --hook
-      Claude Code PreToolUse hook mode. Reads the hook invocation JSON on
-      stdin, emits a response JSON on stdout that rewrites the Bash tool's
-      `command`. The exact rewrite depends on the install mode (see
-      above). Background jobs (`run_in_background: true`) and already-
-      wrapped commands are passed through untouched.
+      Hook entry point for both events. Reads the hook invocation JSON on
+      stdin, dispatches on its hook_event_name, and writes the response
+      JSON on stdout.
 
   mcp-run-compress --install-claude
-      Patch ~/.claude/settings.json to register the hook as a PreToolUse
-      hook on the Bash tool. The hook command written into settings.json
-      matches the current install mode. Idempotent.
+      Patch ~/.claude/settings.json to register the hook for both PreToolUse
+      and PostToolUse on the Bash tool, and drop the companion skill.
+      Idempotent, and it migrates an installation from before the
+      PostToolUse move. See MIGRATION below.
 
   mcp-run-compress [--help]
       Print this help.
@@ -281,11 +666,14 @@ USAGE
 ENV VARS
 
   MCP_RUN_COMPRESS_INSTALL_MODE   `native` (default) or `docker`.
-  MCP_RUN_COMPRESS_IMAGE          Docker image ref for the hook command
-                                  and for the pipe-through container.
+  MCP_RUN_COMPRESS_IMAGE          Docker image ref for the hook command.
                                   Defaults to `raudssus/mcp-run-compress:latest`
                                   but the shipped Docker image pins this
                                   to the exact version that built it.
+  MCP_RUN_COMPRESS_MAX_BYTES      Byte ceiling for the replaced output
+                                  (default 29000). See LIMITS.
+  MCP_RUN_COMPRESS_NO_CO_AUTHORED Disable the Co-Authored-By rewrite.
+  CO_AUTHORED_BY                  Replacement value for the trailer.
 
 MANUAL INSTALL
 
@@ -300,27 +688,71 @@ MANUAL INSTALL
               { "type": "command", "command": "mcp-run-compress --hook" }
             ]
           }
+        ],
+        "PostToolUse": [
+          {
+            "matcher": "Bash",
+            "hooks": [
+              { "type": "command", "command": "mcp-run-compress --hook" }
+            ]
+          }
         ]
       }
     }
 
-  From then on every Bash tool call is rewritten to:
+MIGRATION FROM THE PreToolUse REWRITE
 
-      mcp-run-compress --b64 <base64 of your command>
+  Up to 0.106 compression happened by rewriting the Bash command to
+  `mcp-run-compress --b64 <…>` from a PreToolUse hook. Those two flags
+  (--b64, --filter-files) are gone.
 
-  which executes via IPC::Open3, routes stdout/stderr through the
-  MCP::Run::Compress filter pipeline, and emits the compressed streams
-  with the original exit code — transparent to Claude Code.
+  `--install-claude` handles the upgrade: it adds the missing PostToolUse
+  hook, and it rewrites any hook entry that still names a removed flag or
+  a stale Docker image ref. Run it once after upgrading.
+
+  If you installed by hand, add the PostToolUse block above. Leaving an old
+  docker-mode PreToolUse hook in place next to the new PostToolUse one would
+  compress twice; the PostToolUse hook detects the old wrapper in the
+  command and steps aside, but the stale entry is still worth removing.
+
+LIMITS
+
+  * Commands that exit non-zero are NOT compressed. Claude Code fires
+    PostToolUseFailure for them, that event carries no tool output and
+    ignores a replacement, so the raw output of a failing command comes
+    through unchanged. Failing builds are the loudest output there is —
+    this is a real limit of the hook, not a bug in the filters.
+  * Background commands are not compressed. The hook fires when the
+    command STARTS; the output arrives later out of band.
+  * PostToolUse hooks do not chain. If another PostToolUse hook on Bash
+    also returns a replacement, the last registered one wins and the other
+    replacement is dropped without a word — that can silently switch
+    compression off. `--install-claude` appends, so a later install of
+    another hook takes precedence over this one.
+  * Replaced output has a byte ceiling (MCP_RUN_COMPRESS_MAX_BYTES,
+    default 29000). Claude Code persists a tool output above ~30000 bytes
+    to a file and shows the model a 2 KB preview of it — including output
+    this hook produced, so a compressed result over the cap would arrive
+    smaller than an uncompressed one. Output that would exceed the cap is
+    cut head-and-tail with a `[mcp-run-compress: … omitted …]` line naming
+    the file that holds the complete text.
+  * In docker mode, output above 30000 bytes is compressed only as far as
+    the 30000 bytes the hook is handed. The full text sits in a file on the
+    HOST that the container cannot read, and mounting it would mean
+    mounting ~/.claude/projects, which holds every session transcript.
+    The path is named in the output instead.
 
 NOTES
 
-  * The hook only rewrites the Bash `command`; it does not set a
-    permission decision, so the usual allow/deny prompts keep firing.
-  * Background commands (`run_in_background: true`) and commands that
-    already reference `mcp-run-compress` are not rewritten.
+  * The hooks make no permission decisions; the usual allow/deny prompts
+    keep firing untouched.
+  * Both hooks are fail-open. A PreToolUse hook that exits non-zero blocks
+    the tool call, so if this script cannot load its dependencies (broken
+    or half-upgraded install) it emits a valid pass-through response, exits
+    0, and notes it in one line on stderr. You lose compression, never your
+    shell.
   * Prefix a command with `no-compress ` to bypass compression for that
-    single invocation — the hook strips the prefix and runs the rest raw.
-    `--install-claude` also drops a minimal skill at
+    single invocation. `--install-claude` also drops a skill at
     ~/.claude/skills/bash-output-is-compressed-prefix-no-compress-to-bypass/
     that tells Claude about it.
 
@@ -337,11 +769,11 @@ __END__
 
 =head1 NAME
 
-mcp-run-compress - Wrap a shell command through MCP::Run::Compress for LLM-friendly output
+mcp-run-compress - Claude Code hooks that run Bash tool output through MCP::Run::Compress
 
 =head1 VERSION
 
-version 0.106
+version 0.107
 
 =head1 SYNOPSIS
 
@@ -358,76 +790,175 @@ version 0.106
 
 =head1 DESCRIPTION
 
-Registers a C<PreToolUse> hook on Claude Code's C<Bash> tool that rewrites
-every command so its output is passed through L<MCP::Run::Compress>. 30+
-command-specific filters strip noise (C<make> "Entering directory"),
-reduce columns (C<ls -l> to type+name), drop progress lines (C<cpanm>,
-C<cargo>, C<npm>), and cap long output with head+tail. Prefix a command
-with C<no-compress > to bypass the filter for a single invocation.
-
-=head1 NAME
-
-mcp-run-compress - Claude Code PreToolUse hook that compresses Bash output
-
-=head1 MODES
-
-Two install modes, selected by the C<MCP_RUN_COMPRESS_INSTALL_MODE> env
-var:
+Registers two hooks on Claude Code's C<Bash> tool so its output is passed
+through L<MCP::Run::Compress>. 30+ command-specific filters strip noise
+(C<make> "Entering directory"), reduce columns (C<ls -l> to type+name), drop
+progress lines (C<cpanm>, C<cargo>, C<npm>), and cap long output with
+head+tail.
 
 =over 4
 
-=item C<native> (default)
+=item C<PostToolUse>
 
-The hook is C<mcp-run-compress --hook> and rewrites commands to
-C<mcp-run-compress --b64 E<lt>...E<gt>>. Everything runs in one Perl process.
+Does the compression, by replacing the recorded tool output through
+C<hookSpecificOutput.updatedToolOutput>. The command itself is never
+touched.
 
-=item C<docker>
+=item C<PreToolUse>
 
-The hook is C<docker run --rm -i raudssus/mcp-run-compress --hook> and
-rewrites commands to a host-side shell snippet that runs the original
-command on the host, captures its output into temp files, and mounts
-those into a Docker container for compression. The host needs only
-C<bash>, C<mktemp>, C<base64>, and C<docker> — no Perl.
+Only what must happen before the command runs: the Co-Authored-By rewrite
+of C<git commit>, and turning a C<no-compress > prefix into a marker (see
+L</"THE no-compress MARKER">).
+
+Those two are independent. C<no-compress > and the background check govern
+B<compression>; they never touch the trailer. The Co-Authored-By rewrite is
+a commit policy that applies to every command and has exactly one off
+switch, C<MCP_RUN_COMPRESS_NO_CO_AUTHORED>. In particular a command that
+names this tool is treated like any other — up to 0.106 a self-bypass on
+the name stopped the hook from wrapping its own wrapper, but nothing is
+wrapped any more, so all that match still did was drop the trailer from
+messages like C<git commit -m "Fix mcp-run-compress hook">.
 
 =back
 
-The shipped Docker image bakes C<MCP_RUN_COMPRESS_INSTALL_MODE=docker>
-into its runtime ENV, so C<--install-claude> run inside the container
-produces the Docker-mode hook automatically. Native C<cpanm> installs
-leave the var unset.
+Both are the same command, C<mcp-run-compress --hook>; the script dispatches
+on the payload's C<hook_event_name>.
+
+=head1 NAME
+
+mcp-run-compress - Claude Code hooks that compress Bash tool output
+
+=head1 LIMITS
+
+=head2 Commands that fail are not compressed
+
+Claude Code does not fire C<PostToolUse> for a command that exits non-zero.
+It fires C<PostToolUseFailure>, whose payload carries no C<tool_response>
+at all and which ignores C<updatedToolOutput>. A failing command's output
+therefore arrives uncompressed, in full.
+
+This is the one real regression against the pre-0.107 rewrite, which
+compressed failures too because it worked from inside the execution. Failing
+builds are the loudest output there is, so the limit is worth knowing rather
+than discovering. The only thing that event accepts is C<additionalContext>,
+which B<adds> text instead of replacing it and so cannot save anything.
+
+=head2 Background commands are not compressed
+
+The hook fires when a background command B<starts>: C<tool_response> carries
+C<backgroundTaskId> and C<noOutputExpected>, and both output streams are
+empty. The real output arrives later over the task file and is not a Bash
+tool response any more. The hook passes those through untouched rather than
+gluing a header onto the "Command running in background" notice.
+
+=head2 PostToolUse hooks do not chain
+
+Every registered C<PostToolUse> hook is shown the B<original> tool response,
+not the previous hook's replacement. If more than one returns an
+C<updatedToolOutput>, the last registered one wins and the others are
+discarded silently. An unrelated hook on C<Bash> can therefore switch this
+compression off without any error. C<--install-claude> appends its entry,
+so whatever is installed after it takes precedence.
+
+=head2 Replaced output has a byte ceiling
+
+Claude Code persists a tool output above roughly 30000 bytes to a file and
+shows the model a 2 KB preview — and it applies that to the B<replacement>
+as well. A compressor returning 40 KB would therefore deliver 2 KB, worse
+than no compression at all. Output above the ceiling
+(C<MCP_RUN_COMPRESS_MAX_BYTES>, default 29000 bytes) is cut head-and-tail
+with a C<[mcp-run-compress: … omitted …]> line that names the file holding
+the complete text. The cut is never silent.
+
+When the original was persisted, the hook reads the full file, compresses
+that, and deletes C<persistedOutputPath>/C<persistedOutputSize> from the
+replacement — which is what removes the preview framing. Since deleting the
+path also removes the only pointer to the untouched original, the path is
+written into the compressed text.
+
+Files above 4 MB are left alone entirely: the harness's own preview plus
+path is a better answer than pulling that through a regex pipeline inside a
+hook.
+
+=head2 Docker mode cannot read the persisted file
+
+C<persistedOutputPath> is a path on the B<host>. In docker mode the hook
+compresses the 30000 bytes it was handed, still drops the preview framing,
+and names the file it could not read. Mounting the file is not offered: it
+lives in F<~/.claude/projects/E<lt>projectE<gt>/E<lt>sessionE<gt>/tool-results/>,
+so the only directory known at install time is F<~/.claude/projects>, which
+holds every session transcript of every project.
+
+=head1 THE no-compress MARKER
+
+C<PostToolUse> is shown the command as C<PreToolUse> rewrote it, never the
+user's original. A bypass prefix that C<PreToolUse> strips is therefore
+invisible by the time compression happens, so the wish has to survive
+B<inside> the command.
+
+C<no-compress ls -l> becomes:
+
+  ls -l
+  # mcp-run-compress: no-compress
+
+A trailing comment line is invisible to bash and leaves the command's first
+word intact, which keeps Claude Code's permission prefix matching working —
+a leading comment would not. Measured against 24 command shapes (multiline
+commands, heredocs including C<E<lt>E<lt>-> and quoted delimiters, two
+heredocs on one line, function definitions, C<if>/C<case>/C<while> blocks,
+subshells, line continuations, background jobs): output and exit code stay
+byte-identical except in two cases.
+
+=over 4
+
+=item a command ending in a dangling backslash
+
+The line continuation would splice the comment onto the last command line.
+Guarded: the marker is not appended, which costs the bypass for that one
+call, never the command.
+
+=item an unterminated heredoc
+
+C<cat E<lt>E<lt>EOF> with no closing C<EOF> swallows the marker into the
+heredoc body, so it appears in the output. bash already warns about such a
+command ("here-document delimited by end-of-file"); not guarded.
+
+=back
 
 =head1 OPTIONS
 
 =over 4
 
-=item C<--install-claude>
-
-Patch C<~/.claude/settings.json> to register the hook (idempotent), and
-drop a minimal skill under
-C<~/.claude/skills/bash-output-is-compressed-prefix-no-compress-to-bypass/>
-that tells Claude about the C<no-compress > bypass prefix. The hook
-command written into C<settings.json> matches the current install mode.
-
 =item C<--hook>
 
-Claude Code C<PreToolUse> hook entry point. Reads the hook invocation
-JSON on stdin, emits a response JSON on stdout with an C<updatedInput>
-that rewrites the Bash C<command> according to the install mode.
-Background jobs (C<run_in_background: true>) and already-wrapped
-commands pass through unchanged.
+Hook entry point for both events. Reads the hook invocation JSON on stdin,
+dispatches on C<hook_event_name>, writes the response JSON on stdout. A
+payload for any other event is answered with an empty response carrying
+that event's name.
 
-=item C<--b64 BASE64>
+Fail-open: if the script cannot load its own dependencies it still emits a
+valid pass-through response and exits 0. A C<PreToolUse> hook that exits
+non-zero B<blocks> the tool call, so a broken install must never be able to
+take the user's Bash tool down with it. The same response is emitted when
+the hook entry carries an option this version no longer knows.
 
-Native-mode executor. Decode the base64 command, run it via
-L<MCP::Run::Bash>, compress stdout and stderr, emit them with the
-original exit code.
+=item C<--install-claude>
 
-=item C<--filter-files --cmd-b64 BASE64 STDOUT_PATH STDERR_PATH>
+Patch F<~/.claude/settings.json> to register the hook for C<PreToolUse> and
+C<PostToolUse> (idempotent), and drop a skill under
+F<~/.claude/skills/bash-output-is-compressed-prefix-no-compress-to-bypass/>
+that tells Claude about the C<no-compress > bypass prefix. The hook command
+matches the current install mode. Hooks and skill are installed
+independently and each is idempotent, so a deleted skill is restored even if
+the hooks are already registered. The file is only rewritten when something
+actually changed.
 
-Docker-mode filter. Read captured stdout and stderr from two files,
-compress them using the decoded command as context, emit compressed
-stdout to fd 1 and compressed stderr to fd 2. Invoked by the
-pipe-through-docker rewrite.
+It also migrates an installation from before the PostToolUse move: adding
+the missing C<PostToolUse> hook is the migration itself, and any entry still
+naming a removed flag (C<--b64>, C<--filter-files>) or a stale Docker image
+ref is rewritten. A stale entry naming a removed flag is not cosmetic — the
+script would exit non-zero on it, and for C<PreToolUse> that blocks every
+Bash call.
 
 =item C<--help>
 
@@ -441,15 +972,31 @@ Print a more detailed help message.
 
 =item C<MCP_RUN_COMPRESS_INSTALL_MODE>
 
-C<native> (default) or C<docker>. Controls both the hook command written
-by C<--install-claude> and the rewrite produced by C<--hook>.
+C<native> (default) or C<docker>. Controls the hook command written by
+C<--install-claude>.
 
 =item C<MCP_RUN_COMPRESS_IMAGE>
 
 Image reference used by the docker-mode hook. Defaults to
-C<raudssus/mcp-run-compress:latest>. The shipped Docker image pins this
-to the exact version that built it, so C<--install-claude> from inside
-the container writes a versioned hook.
+C<raudssus/mcp-run-compress:latest>. The shipped Docker image pins this to
+the exact version that built it, so C<--install-claude> from inside the
+container writes a versioned hook.
+
+=item C<MCP_RUN_COMPRESS_MAX_BYTES>
+
+Byte ceiling for the replaced output, default 29000. Exists because the
+~30000 byte limit it stays below belongs to Claude Code, not to this
+distribution, and a changed harness would otherwise leave no lever.
+
+=item C<MCP_RUN_COMPRESS_NO_CO_AUTHORED>
+
+Disables the Co-Authored-By rewrite in the C<PreToolUse> hook, and is the
+only thing that does. Not to be confused with C<CO_AUTHORED_BY>, which
+replaces the value rather than switching the trailer off.
+
+=item C<CO_AUTHORED_BY>
+
+Replacement value for the Co-Authored-By trailer.
 
 =back
 

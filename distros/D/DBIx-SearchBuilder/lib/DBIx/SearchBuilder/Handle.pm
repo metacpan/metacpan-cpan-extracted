@@ -1455,6 +1455,61 @@ sub MayBeNull {
     return 1;
 }
 
+# Returns true if a DISTINCT search should use GROUP BY instead of
+# SELECT DISTINCT, i.e. when ORDER BY uses another alias or a column not
+# in the select list.
+sub _DistinctNeedsGroupBy {
+    my $self = shift;
+    my $sb   = shift;
+
+    # Other aliases may have several values per main row, needing MIN/MAX
+    return 1 if $sb->_OrderClause =~ /(?<!main)\./;
+
+    my $columns = $sb->_ColumnsForQuery;
+    return 0 if $columns =~ /(?:^|,)\s*main\.\*/;
+
+    # GROUP BY main.id doesn't work with columns of other aliases
+    return 0 if $columns =~ /(?<!main)\./;
+
+    for my $row ( @{ $sb->{'order_by'} || [] } ) {
+        next unless $row->{'FIELD'};
+        next     if $self->_DistinctOrderIsBareName($row);
+        return 1 if ( $row->{'ALIAS'} // 'main' ) ne 'main';
+        return 1 if $row->{'FIELD'} !~ /^\w+$/;
+        return 1 unless $columns =~ /(?:^|,)\s*main\.\Q$row->{'FIELD'}\E\b/i;
+    }
+    return 0;
+}
+
+# Returns true if an order row with an empty ALIAS is a bare name from
+# the select list, such as lname for "LOWER(main.Name) AS lname". Order by
+# it as it is.
+sub _DistinctOrderIsBareName {
+    my $self = shift;
+    my $row  = shift;
+
+    return
+           defined $row->{'ALIAS'}
+        && $row->{'ALIAS'} eq ''
+        && ( $row->{'FIELD'} // '' ) =~ /^\w+$/;
+}
+
+# Returns the order rows for the GROUP BY form, with columns of other
+# aliases wrapped in MIN() or MAX().
+sub _DistinctGroupByOrder {
+    my $self = shift;
+    my $sb   = shift;
+
+    return [
+        map {
+            my $function = ( $_->{'ORDER'} || '' ) =~ /^des/i ? 'MAX' : 'MIN';
+            ( $_->{'ALIAS'} // 'main' ) eq 'main'
+                ? $_
+                : { %$_, FIELD => "$function($_->{'FIELD'})" }
+        } @{ $sb->{'order_by'} || [] }
+    ];
+}
+
 =head2 DistinctQuery STATEMENTREF
 
 takes an incomplete SQL SELECT statement and massages it to return a DISTINCT result set.

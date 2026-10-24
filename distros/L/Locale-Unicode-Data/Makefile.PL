@@ -40,12 +40,12 @@ my %WriteMakefileArgs = (
         'File::Spec'            => '3.2501',
         # 2007-12-19
         'JSON'                  => '2.00',
-        'Locale::Unicode'       => 'v0.4.3',
+        'Locale::Unicode'       => 'v0.4.5',
         'Scalar::Util'          => 0,
         # 2004-11-05
         # 'URI::file'             => '4.19',
         # Version compatible with perl v5.10
-        'Wanted'                => 'v0.1.0',
+        'Wanted'                => 'v0.1.2',
     },
     TEST_REQUIRES =>
     {

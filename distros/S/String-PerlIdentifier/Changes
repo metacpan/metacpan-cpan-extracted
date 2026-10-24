@@ -1,5 +1,9 @@
 Revision history for Perl module String::PerlIdentifier
 
+v0.07 Fri Oct 23 02:46:32 PM EDT 2026
+    - No change in functionality.
+    - Modernize Makefile.PL and metadata handling.
+
 v0.06 Mon Nov 14 13:28:16 EST 2016
     - First version stored in Git.  Adapt to "default_inc_excludes_dot" for
       Perl 5.26.

@@ -70,6 +70,24 @@ print "Workers: $workers\n" if $workers > 1;
 # up queueing.
 warn "WARNING: $_\n" for @{ $app->skeid->worker_share_warnings };
 
+# Customer keys from a database relation (ADR 0026): one bounded fetch before listening, so the
+# first request already sees the source's customers. A failed fetch does not stop the start --
+# that would take down every customer the file declares too: Skeid starts degraded and
+# fail-closed, the file's config in force and no source rows, and keeps retrying. Before the
+# prefork manager forks, the connection this fetch opened is closed: each worker opens its own.
+if (my $source = $app->skeid->customer_source_status) {
+  print "Customer source: $source->{relation}\n";
+  if ($app->skeid->customer_source_startup_fetch) {
+    my $rows = $app->skeid->customer_source_status->{rows};
+    print "Customer source: $rows->{accepted} accepted, $rows->{rejected} rejected, "
+      . "$rows->{shadowed} shadowed\n";
+  } else {
+    warn "WARNING: customer_source: the first fetch failed; starting degraded and fail-closed "
+      . "(no source customer is let in until a fetch succeeds)\n";
+  }
+  $app->skeid->customer_source_release if $workers > 1;
+}
+
 if ($workers > 1) {
   my $prefork = Mojo::Server::Prefork->new(
     app     => $app,
@@ -84,7 +102,14 @@ if ($workers > 1) {
   );
   # Daemon->run handles INT and TERM only; SIGQUIT (the image's STOPSIGNAL) would otherwise
   # kill the process with its default action, before END could flush a write-behind queue.
-  $SIG{QUIT} = sub { $daemon->ioloop->stop };
+  # The loop's own `finish` event goes first, as it does in a prefork worker on SIGQUIT: open
+  # realtime sessions end (1001) and write their usage events (ADR 0029). Their close frames get
+  # a moment to go out before the loop stops.
+  $SIG{QUIT} = sub {
+    my $loop = $daemon->ioloop;
+    $loop->emit('finish');
+    $loop->timer(0.2 => sub { $loop->stop });
+  };
   $daemon->run;
 }
 
@@ -191,25 +216,34 @@ sub _run_usage {
     ($tot->{cache_write_tokens} // 0),
     ($tot->{tool_calls} // 0),
     ($tot->{total_cost_usd} // 0);
+  # Only where an audio route recorded some (skeid k91): a store without audio events prints
+  # what it always printed.
+  printf "Audio:  seconds=%s\n", _seconds($tot->{audio_seconds}) if $tot->{audio_seconds};
+  # Likewise the documents of the rerank route (skeid k92).
+  printf "Rerank: documents=%d\n", $tot->{documents} if $tot->{documents};
+  # And the pages of the documents routes (skeid k94): one line, only where there are pages.
+  printf "Pages:  pages=%d\n", $tot->{pages} if $tot->{pages};
 
   print "\nBy API key:\n";
   print "  (none)\n" unless @{$report->{by_key} || []};
   for my $row (@{$report->{by_key} || []}) {
-    printf "  %-16s requests=%d tokens=%d cost=\$%.8f\n",
+    printf "  %-16s requests=%d tokens=%d cost=\$%.8f%s\n",
       ($row->{api_key_id} || '(none)'),
       ($row->{requests} // 0),
       ($row->{total_tokens} // 0),
-      ($row->{total_cost_usd} // 0);
+      ($row->{total_cost_usd} // 0),
+      _row_units($row);
   }
 
   print "\nBy model:\n";
   print "  (none)\n" unless @{$report->{by_model} || []};
   for my $row (@{$report->{by_model} || []}) {
-    printf "  %-24s requests=%d tokens=%d cost=\$%.8f\n",
+    printf "  %-24s requests=%d tokens=%d cost=\$%.8f%s\n",
       ($row->{model} || '(none)'),
       ($row->{requests} // 0),
       ($row->{total_tokens} // 0),
-      ($row->{total_cost_usd} // 0);
+      ($row->{total_cost_usd} // 0),
+      _row_units($row);
   }
 
   print "\nRecent:\n";
@@ -229,6 +263,25 @@ sub _run_usage {
   }
 
   return 0;
+}
+
+# What a by-key or by-model row ends in: the units of the relayed routes, each only where the
+# row has some, so a row without any is printed as it always was.
+sub _row_units {
+  my ($row) = @_;
+  return join '',
+    ($row->{audio_seconds} ? ' audio_seconds=' . _seconds($row->{audio_seconds}) : ()),
+    ($row->{documents}     ? ' documents=' . (0 + $row->{documents})             : ()),
+    ($row->{pages}         ? ' pages=' . (0 + $row->{pages})                     : ());
+}
+
+# Seconds of audio for the report: a float sum, printed without the noise binary fractions
+# leave behind (12.300000000000001) and without trailing zeros.
+sub _seconds {
+  my ($seconds) = @_;
+  my $text = sprintf('%.3f', $seconds // 0);
+  $text =~ s/\.?0+\z// if $text =~ /\./;
+  return $text;
 }
 
 # The config file to load. Without --config, ./skeid.yaml is used when it exists and Skeid runs
@@ -289,7 +342,7 @@ skeid - Skeid control-plane CLI and proxy launcher
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 
@@ -352,12 +405,25 @@ the server writes them. Stop a prefork server with C<SIGQUIT> (graceful): on C<S
 C<SIGTERM> Mojolicious's prefork manager kills its workers with C<SIGKILL>, and what they still
 held is lost. A single process (C<--workers 1>) flushes on C<SIGINT>, C<SIGTERM> and C<SIGQUIT>.
 
+Open realtime sessions (C<GET /v1/realtime>, ADR 0029) are long: a session is one usage event,
+written when it closes. On C<SIGQUIT> -- a prefork worker's graceful stop, and the single process
+the same way -- every open session is closed C<1001> (going away) first, so its C<request.finish>
+and its usage event are written before the process exits. A kill without it (C<SIGKILL>, a
+prefork C<SIGINT>/C<SIGTERM>, an OOM kill) loses the events of the sessions then open, and a
+single process stopped with C<SIGINT> or C<SIGTERM> does not close them first. Stop with
+C<SIGQUIT>; the Docker image's C<STOPSIGNAL> already does.
+
 =head2 usage
 
   skeid usage --config /etc/skeid/skeid.yaml --since 2026-09-01T00:00:00Z --limit 50
 
 Prints a usage report: the backend and store (a C<jsonlog> path, the SQLite file, or
-C<configured DSN>), totals, per API key id, per model, and the newest events. The store is the
+C<configured DSN>), totals, per API key id, per model, and the newest events. Where the audio
+routes recorded any, an C<Audio: seconds=...> line follows the totals and the rows that have some
+end in C<audio_seconds=...>; a store without such events prints neither. The rerank route's
+documents are printed the same way: a C<Rerank: documents=...> line and C<documents=...> on the
+rows that have some, and the pages the documents routes (C</v1/convert/*>) read off their answers
+as a C<Pages: pages=...> line and C<pages=...> on the rows. The store is the
 config's C<usage_store>; any of C<--backend>, C<--log-path>, C<--db>, C<--dsn>, C<--db-user>,
 C<--db-pass> or C<--db-pass-env> replaces it with a store built from those options alone. Exits
 0, or 2 after printing C<ERROR: ...> when the report fails (no store configured, say) or

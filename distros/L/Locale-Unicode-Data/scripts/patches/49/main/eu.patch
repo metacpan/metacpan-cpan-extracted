@@ -1,0 +1,14 @@
+--- eu.xml
++++ eu.xml
+@@ -4632,6 +4632,11 @@
+ 				<displayName count="one">yuan txinatar (itsasoz haraindikoa)</displayName>
+ 				<displayName count="other">yuan txinatar (itsasoz haraindikoa)</displayName>
+ 			</currency>
++			<currency type="CNX">
++				<displayName>Txinako Herri Bankuaren dolarra</displayName>
++				<displayName count="one">Txinako Herri Bankuaren dolar</displayName>
++				<displayName count="other">Txinako Herri Bankuaren dolar</displayName>
++			</currency>
+ 			<currency type="CNY">
+ 				<displayName>yuan txinatarra</displayName>
+ 				<displayName count="one">yuan txinatar</displayName>

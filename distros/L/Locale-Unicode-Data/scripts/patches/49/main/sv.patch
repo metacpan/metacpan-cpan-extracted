@@ -1,0 +1,14 @@
+--- sv.xml
++++ sv.xml
+@@ -5138,6 +5138,11 @@
+ 			<currency type="CNH">
+ 				<displayName>kinesisk yuan (offshore)</displayName>
+ 			</currency>
++			<currency type="CNX">
++				<displayName>kinesisk dollar</displayName>
++				<displayName count="one">kinesisk dollar</displayName>
++				<displayName count="other">kinesiska dollar</displayName>
++			</currency>
+ 			<currency type="CNY">
+ 				<displayName>kinesisk yuan</displayName>
+ 				<displayName count="one">kinesisk yuan</displayName>

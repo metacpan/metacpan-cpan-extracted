@@ -1,5 +1,29 @@
 Revision history for Configd
 
+0.005 2026-10-24 TEODESIAN
+    - postfix: smtp_sasl_password_maps and smtp_tls_policy_maps accumulate.
+      A host that sends each mail domain through a relay of its own names a
+      table per domain in each.  The later fragment replaced the list, so the
+      mail of every domain but the last went to its relay with no login, and
+      the relay refused it.
+
+0.004 2026-10-23 TEODESIAN
+    - opendmarc: TrustedAuthservIDs accumulates.  One opendmarc serves every
+      mail domain on a host, and each domain's fragment names the ids that it
+      trusts.  The later fragment replaced the list, so opendmarc trusted only
+      the last domain's ids.  AuthservID is still one value.
+
+0.003 2026-10-23 TEODESIAN
+    - Accumulating directives now join as lists of items, not as strings.  An
+      item that the list already holds is not added again, so a fragment that
+      repeats what 00-original says changes nothing.  Joining the strings gave
+      inet_interfaces = all, all from two fragments that each said all, and
+      postfix refuses to start on that.
+    - postfix: inet_interfaces is all when any fragment says all, because
+      postfix refuses all beside an address.
+    - A separator inside braces does not split an item, as postfix reads an
+      inline: table.
+
 0.002 2026-09-06 TEODESIAN
     - postfix: accumulate sender_dependent_relayhost_maps and
       smtpd_sender_login_maps, which are lists of lookup tables like the rest of

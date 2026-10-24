@@ -31,10 +31,11 @@ sub slurp {
 # The variables the live tests read that are not knobs of their own: the Docker
 # command, where the daemon listens, the state directory of the fake daemon
 # they fall back to, the cache record and the log directory they keep out of
-# the real ones.
+# the real ones, and the configuration directory that keeps the developer's
+# own settings out of them.
 my %not_a_knob = map { $_ => 1 } qw(
     DOCKER DOCKER_HOST FAKE_DOCKER_STATE
-    ACTION_RUN_CACHE_FILE ACTION_RUN_LOG_DIR
+    ACTION_RUN_CACHE_FILE ACTION_RUN_LOG_DIR CONFIG_DIR
 );
 
 my (%read_by, @unprefixed);

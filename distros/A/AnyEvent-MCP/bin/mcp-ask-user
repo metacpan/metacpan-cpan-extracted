@@ -145,25 +145,26 @@ C<ask-user>.
 
 =head1 OPTIONS
 
-C<--ask helper> runs C<anyevent-mcp-form-elicitation>, or the executable named by
-C<PERL_ANYEVENT_MCP_ELICITATION_HELPER>. C<--ask mcp> delegates to the client.
-C<--ask auto> uses native forms when advertised and the helper otherwise.
-C<--ask tty> and C<--ask yad> force the built-in form renderer's terminal
-or YAD interface, ignoring the custom helper variable. They never fall back
-to another interface.
-A decline never causes another prompt through a different interface.
-Clients that advertise forms but silently decline them require explicit
-C<helper> mode.
+Common server options: L<AnyEvent::MCP::Server::Simple/mcp_getoptions>.
+HTTP is the default; C<--print-url> prints the authenticated URL without
+starting a listener.
 
-An explicit C<--ask> wins. Otherwise spawned multibroker instances delegate
-to the broker; standalone instances use C<PERL_ANYEVENT_MCP_PERMISSION_ASK>
-or default to C<helper>. The helper receives standard elicitation parameters
-and returns a standard response; see L<anyevent-mcp-form-elicitation>.
+=over
 
-C<--name>, C<--bind>, C<--token>, C<--stdio>, C<--connect>,
-C<--print-url> and other common server options are described in
-L<AnyEvent::MCP::Server::Simple/mcp_getoptions>. HTTP is the default;
-C<--print-url> prints the authenticated URL without starting a listener.
+=item --ask MODE
+
+Choose human prompting mode: C<helper> (default standalone), C<tty>,
+C<yad>, C<mcp> or C<auto>. C<helper> launches
+C<anyevent-mcp-form-elicitation> or
+C<PERL_ANYEVENT_MCP_ELICITATION_HELPER>; C<tty>/C<yad> force that local
+interface without fallback. C<mcp> asks client; C<auto> uses client
+forms when advertised, otherwise local helper. Declines never retry
+via another interface. Explicit C<--ask> overrides inherited
+C<PERL_ANYEVENT_MCP_PERMISSION_ASK>; spawned multibroker instances
+default to client mode. Clients that advertise but silently decline
+native forms require C<--ask helper>.
+
+=back
 
 =cut
 
@@ -375,18 +376,18 @@ sub ask_form {
 }
 
 mcp_tool ask_user =>
-   "Ask the human a question, wait for the response, and return the answer or a distinct decline/cancel status. The configured ask mode selects a local form helper or native MCP elicitation.",
+   "Ask human question; await answer or distinct decline/cancel status. Configured mode uses local helper or native MCP elicitation.",
    {
       type       => "object",
       required   => ["question"],
       properties => {
-         id       => { type => "string", description => "Stable question identifier (default: question)" },
-         header   => { type => "string", description => "Optional short form heading" },
-         question => { type => "string", description => "Question to display to the human" },
+         id       => { type => "string", description => "Stable question ID (default: question)" },
+         header   => { type => "string", description => "Optional short heading" },
+         question => { type => "string", description => "Question shown to human" },
          options => {
             type        => "array",
             maxItems    => 3,
-            description => "Optional suggested answers (up to three). Free text is always available.",
+            description => "Up to 3 suggested answers; free text always allowed.",
             items       => {
                type       => "object",
                required   => ["label"],
@@ -401,7 +402,7 @@ mcp_tool ask_user =>
    \&ask_user;
 
 mcp_tool ask_form =>
-   "Ask the human to fill an MCP elicitation form. Accepts message and requestedSchema and returns the standard accept/content, decline or cancel response. The configured ask mode selects a local form helper or native MCP elicitation; local helpers support their documented schema subset.",
+   "Ask human to fill MCP form. Takes message/requestedSchema; returns accept/content, decline or cancel. Configured mode: local helper or native elicitation; local helper supports limited schema subset.",
    {
       type                 => "object",
       required             => ["message", "requestedSchema"],
@@ -409,11 +410,11 @@ mcp_tool ask_form =>
       properties           => {
          message => {
             type        => "string",
-            description => "Text explaining what the form asks and why",
+            description => "Form purpose and explanation",
          },
          requestedSchema => {
             type        => "object",
-            description => "MCP form schema: an object with named properties",
+            description => "MCP form schema: object with named properties",
          },
       },
    },
@@ -422,7 +423,7 @@ mcp_tool ask_form =>
 mcp_config
    server_name    => "mcp-ask-user",
    server_version => $AnyEvent::MCP::VERSION,
-   short_instructions => "Ask the human when input is needed: ask-user for a question, ask-form for structured fields. Decline and cancel are not answers.",
-   instructions => "Use ask-user or ask-form only when human input is needed. ask-user offers one question with choices and free text; ask-form accepts an MCP form schema. A declined or cancelled request is not an answer.";
+   short_instructions => "Ask human when input needed: ask-user for question, ask-form for fields. Decline/cancel are not answers.",
+   instructions => "Use only when human input needed. ask-user: question, choices, free text. ask-form: MCP form schema. Decline/cancel are not answers.";
 
 mcp_start %$options;

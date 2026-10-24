@@ -20,6 +20,9 @@ CREATE TABLE IF NOT EXISTS usage_events (
   cached_tokens INTEGER,
   cache_write_tokens INTEGER,
   content_bytes INTEGER,
+  audio_seconds REAL,
+  documents INTEGER,
+  pages INTEGER,
   tool_calls INTEGER NOT NULL DEFAULT 0,
   cost_input_usd REAL NOT NULL DEFAULT 0,
   cost_output_usd REAL NOT NULL DEFAULT 0,
@@ -34,3 +37,6 @@ CREATE INDEX IF NOT EXISTS usage_events_created_at_idx ON usage_events(created_a
 CREATE INDEX IF NOT EXISTS usage_events_api_key_id_idx ON usage_events(api_key_id);
 CREATE INDEX IF NOT EXISTS usage_events_model_idx ON usage_events(model);
 CREATE INDEX IF NOT EXISTS usage_events_requested_model_idx ON usage_events(requested_model);
+-- Replay of the usage spool looks events up by request_id (k110, ADR 0027). Not unique: rows
+-- written before it may repeat a request_id, and a unique index would fail on them.
+CREATE INDEX IF NOT EXISTS usage_events_request_id_idx ON usage_events(request_id);

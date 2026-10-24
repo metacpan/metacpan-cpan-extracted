@@ -27,28 +27,28 @@ no_index:
 provides:
   Configd:
     file: lib/Configd.pm
-    version: '0.002'
+    version: '0.005'
   Configd::Language:
     file: lib/Configd/Language.pm
-    version: '0.002'
+    version: '0.005'
   Configd::Language::opendkim:
     file: lib/Configd/Language/opendkim.pm
-    version: '0.002'
+    version: '0.005'
   Configd::Language::opendmarc:
     file: lib/Configd/Language/opendmarc.pm
-    version: '0.002'
+    version: '0.005'
   Configd::Language::postfix:
     file: lib/Configd/Language/postfix.pm
-    version: '0.002'
+    version: '0.005'
   Configd::Language::redis:
     file: lib/Configd/Language/redis.pm
-    version: '0.002'
+    version: '0.005'
   Configd::Syntax::Spaced:
     file: lib/Configd/Syntax/Spaced.pm
-    version: '0.002'
+    version: '0.005'
   Configd::Unit:
     file: lib/Configd/Unit.pm
-    version: '0.002'
+    version: '0.005'
 requires:
   File::Basename: '0'
   File::Path: '0'
@@ -67,7 +67,9 @@ resources:
   bugtracker: https://github.com/teodesian/perl-configd/issues
   homepage: https://github.com/teodesian/perl-configd
   repository: https://github.com/teodesian/perl-configd.git
-version: '0.002'
+version: '0.005'
+x_contributors:
+  - 'troglodyne-bot <morpheus@troglodyne.net>'
 x_generated_by_perl: v5.44.0
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: MIT

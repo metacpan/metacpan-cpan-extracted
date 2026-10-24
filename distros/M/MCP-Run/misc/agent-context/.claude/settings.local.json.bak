@@ -1,0 +1,9 @@
+{
+  "enabledMcpjsonServers": [
+    "claude-code-history",
+    "context7",
+    "crawl4ai",
+    "serper",
+    "codex"
+  ]
+}

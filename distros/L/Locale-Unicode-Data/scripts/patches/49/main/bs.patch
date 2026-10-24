@@ -1,0 +1,15 @@
+--- bs.xml
++++ bs.xml
+@@ -5563,6 +5563,12 @@
+ 				<displayName count="few">kineska juana (izvanteritorijalni)</displayName>
+ 				<displayName count="other">kineskih juana (izvanteritorijalni)</displayName>
+ 			</currency>
++			<currency type="CNX">
++				<displayName>Dolar kineske narodne banke</displayName>
++				<displayName count="one">dolar kineske narodne banke</displayName>
++				<displayName count="few">dolara kineske narodne banke</displayName>
++				<displayName count="other">dolara kineske narodne banke</displayName>
++			</currency>
+ 			<currency type="CNY">
+ 				<displayName>Kineski juan</displayName>
+ 				<displayName count="one">kineski juan</displayName>

@@ -1,0 +1,12 @@
+--- nl.xml
++++ nl.xml
+@@ -5496,6 +5496,9 @@
+ 			<currency type="CNH">
+ 				<displayName>Chinese yuan (offshore)</displayName>
+ 			</currency>
++			<currency type="CNX">
++				<displayName draft="contributed">dollar van de Chinese Volksbank</displayName>
++			</currency>
+ 			<currency type="CNY">
+ 				<displayName>Chinese yuan</displayName>
+ 			</currency>

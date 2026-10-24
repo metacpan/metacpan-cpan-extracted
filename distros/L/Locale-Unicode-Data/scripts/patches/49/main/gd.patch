@@ -1,0 +1,16 @@
+--- gd.xml
++++ gd.xml
+@@ -5386,6 +5386,13 @@
+ 				<displayName count="few">yuan Sìneach (far-thìreach)</displayName>
+ 				<displayName count="other">yuan Sìneach (far-thìreach)</displayName>
+ 			</currency>
++			<currency type="CNX">
++				<displayName>Dolar an t-sluagh-bhanca Shìnich</displayName>
++				<displayName count="one">dolar an t-sluagh-bhanca Shìnich</displayName>
++				<displayName count="two">dholar an t-sluagh-bhanca Shìnich</displayName>
++				<displayName count="few">dolaran an t-sluagh-bhanca Shìnich</displayName>
++				<displayName count="other">dolar an t-sluagh-bhanca Shìnich</displayName>
++			</currency>
+ 			<currency type="CNY">
+ 				<displayName>Yuan Sìneach</displayName>
+ 				<displayName count="one">yuan Sìneach</displayName>

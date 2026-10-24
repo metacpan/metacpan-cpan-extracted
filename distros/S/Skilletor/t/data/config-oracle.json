@@ -1,0 +1,3836 @@
+[
+ {
+  "name": "nothing at all",
+  "files": {
+   "user": null,
+   "project": null,
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "loaded": {
+   "sources": [],
+   "checkInterval": 1800,
+   "user": {
+    "scope": "user",
+    "install": [],
+    "wildcards": [],
+    "bundles": [],
+    "vars": {},
+    "gitignore": true,
+    "claudeSettings": true
+   },
+   "project": {
+    "scope": "project",
+    "install": [],
+    "wildcards": [],
+    "bundles": [],
+    "vars": {},
+    "gitignore": true,
+    "claudeSettings": true
+   },
+   "userSources": []
+  }
+ },
+ {
+  "name": "no project dir",
+  "files": {
+   "user": "{\n  \"sources\": {\n    \"s\": {\n      \"git\": \"https://github.com/Getty/skills\"\n    }\n  },\n  \"install\": {\n    \"skills\": [\n      \"a@s\"\n    ]\n  }\n}\n",
+   "project": null,
+   "local": null
+  },
+  "noProject": true,
+  "unchecked": null,
+  "loaded": {
+   "sources": [
+    [
+     "s",
+     {
+      "name": "s",
+      "origins": {
+       "git": "user"
+      },
+      "git": "https://github.com/Getty/skills"
+     }
+    ]
+   ],
+   "checkInterval": 1800,
+   "user": {
+    "scope": "user",
+    "install": [
+     {
+      "type": "skill",
+      "name": "a",
+      "source": "s",
+      "target": "skills/a",
+      "raw": "a@s"
+     }
+    ],
+    "wildcards": [],
+    "bundles": [],
+    "vars": {},
+    "gitignore": true,
+    "claudeSettings": true
+   },
+   "userSources": [
+    [
+     "s",
+     {
+      "name": "s",
+      "origins": {
+       "git": "user"
+      },
+      "git": "https://github.com/Getty/skills"
+     }
+    ]
+   ]
+  }
+ },
+ {
+  "name": "empty objects",
+  "files": {
+   "user": "{}\n",
+   "project": "{}\n",
+   "local": "{}\n"
+  },
+  "noProject": false,
+  "unchecked": null,
+  "loaded": {
+   "sources": [],
+   "checkInterval": 1800,
+   "user": {
+    "scope": "user",
+    "install": [],
+    "wildcards": [],
+    "bundles": [],
+    "vars": {},
+    "gitignore": true,
+    "claudeSettings": true
+   },
+   "project": {
+    "scope": "project",
+    "install": [],
+    "wildcards": [],
+    "bundles": [],
+    "vars": {},
+    "gitignore": true,
+    "claudeSettings": true
+   },
+   "userSources": []
+  }
+ },
+ {
+  "name": "broken JSON user",
+  "files": {
+   "user": "{\"sources\": {",
+   "project": null,
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<HOME>/.claude/skilletor.json: invalid JSON (Expected property name or '}' in JSON at position 13 (line 1 column 14))"
+ },
+ {
+  "name": "broken JSON project",
+  "files": {
+   "user": null,
+   "project": "{\"a\":1 \"b\":2}",
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<PROJECT>/.claude/skilletor.json: invalid JSON (Expected ',' or '}' after property value in JSON at position 7 (line 1 column 8))"
+ },
+ {
+  "name": "broken JSON local with BOM",
+  "files": {
+   "user": null,
+   "project": null,
+   "local": "﻿{}"
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<PROJECT>/.claude/skilletor.local.json: invalid JSON (Unexpected token '﻿', \"﻿{}\" is not valid JSON)"
+ },
+ {
+  "name": "top level array",
+  "files": {
+   "user": "[]",
+   "project": null,
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<HOME>/.claude/skilletor.json: top level must be a JSON object"
+ },
+ {
+  "name": "top level null",
+  "files": {
+   "user": null,
+   "project": "null",
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<PROJECT>/.claude/skilletor.json: top level must be a JSON object"
+ },
+ {
+  "name": "top level string",
+  "files": {
+   "user": null,
+   "project": null,
+   "local": "\"x\""
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<PROJECT>/.claude/skilletor.local.json: top level must be a JSON object"
+ },
+ {
+  "name": "unknown key",
+  "files": {
+   "user": "{\n  \"sources\": {},\n  \"foo\": 1\n}\n",
+   "project": null,
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<HOME>/.claude/skilletor.json: unknown key \"foo\" (allowed: sources, install, vars, gitignore, claudeSettings, checkInterval, targets)"
+ },
+ {
+  "name": "unknown key order",
+  "files": {
+   "user": "{\"zeta\":1,\"alpha\":2}",
+   "project": null,
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<HOME>/.claude/skilletor.json: unknown key \"zeta\" (allowed: sources, install, vars, gitignore, claudeSettings, checkInterval, targets)"
+ },
+ {
+  "name": "checkInterval in project",
+  "files": {
+   "user": null,
+   "project": "{\n  \"checkInterval\": 5\n}\n",
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<PROJECT>/.claude/skilletor.json: \"checkInterval\" is user-only"
+ },
+ {
+  "name": "checkInterval in local",
+  "files": {
+   "user": null,
+   "project": null,
+   "local": "{\n  \"checkInterval\": 5\n}\n"
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<PROJECT>/.claude/skilletor.local.json: \"checkInterval\" is user-only"
+ },
+ {
+  "name": "checkInterval not a number",
+  "files": {
+   "user": "{\n  \"checkInterval\": \"5\"\n}\n",
+   "project": null,
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<HOME>/.claude/skilletor.json: \"checkInterval\" must be a number"
+ },
+ {
+  "name": "checkInterval null",
+  "files": {
+   "user": "{\n  \"checkInterval\": null\n}\n",
+   "project": null,
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<HOME>/.claude/skilletor.json: \"checkInterval\" must be a number"
+ },
+ {
+  "name": "checkInterval infinite",
+  "files": {
+   "user": "{\"checkInterval\": 1e999}",
+   "project": null,
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<HOME>/.claude/skilletor.json: \"checkInterval\" must be a number"
+ },
+ {
+  "name": "checkInterval set",
+  "files": {
+   "user": "{\n  \"checkInterval\": 600\n}\n",
+   "project": null,
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "loaded": {
+   "sources": [],
+   "checkInterval": 600,
+   "user": {
+    "scope": "user",
+    "install": [],
+    "wildcards": [],
+    "bundles": [],
+    "vars": {},
+    "gitignore": true,
+    "claudeSettings": true
+   },
+   "project": {
+    "scope": "project",
+    "install": [],
+    "wildcards": [],
+    "bundles": [],
+    "vars": {},
+    "gitignore": true,
+    "claudeSettings": true
+   },
+   "userSources": []
+  }
+ },
+ {
+  "name": "checkInterval float",
+  "files": {
+   "user": "{\n  \"checkInterval\": 0.5\n}\n",
+   "project": null,
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "loaded": {
+   "sources": [],
+   "checkInterval": 0.5,
+   "user": {
+    "scope": "user",
+    "install": [],
+    "wildcards": [],
+    "bundles": [],
+    "vars": {},
+    "gitignore": true,
+    "claudeSettings": true
+   },
+   "project": {
+    "scope": "project",
+    "install": [],
+    "wildcards": [],
+    "bundles": [],
+    "vars": {},
+    "gitignore": true,
+    "claudeSettings": true
+   },
+   "userSources": []
+  }
+ },
+ {
+  "name": "user error wins over project error",
+  "files": {
+   "user": "[",
+   "project": "[",
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<HOME>/.claude/skilletor.json: invalid JSON (Unexpected end of JSON input)"
+ },
+ {
+  "name": "project read before local",
+  "files": {
+   "user": null,
+   "project": "{x",
+   "local": "{y"
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<PROJECT>/.claude/skilletor.json: invalid JSON (Expected property name or '}' in JSON at position 1 (line 1 column 2))"
+ },
+ {
+  "name": "sources not an object",
+  "files": {
+   "user": "{\n  \"sources\": []\n}\n",
+   "project": null,
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<HOME>/.claude/skilletor.json: sources must be an object"
+ },
+ {
+  "name": "sources null",
+  "files": {
+   "user": "{\n  \"sources\": null\n}\n",
+   "project": null,
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<HOME>/.claude/skilletor.json: sources must be an object"
+ },
+ {
+  "name": "source def not an object",
+  "files": {
+   "user": "{\n  \"sources\": {\n    \"s\": \"https://x\"\n  }\n}\n",
+   "project": null,
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<HOME>/.claude/skilletor.json: sources.s must be an object"
+ },
+ {
+  "name": "source unknown key",
+  "files": {
+   "user": "{\n  \"sources\": {\n    \"s\": {\n      \"git\": \"https://x\",\n      \"branch\": \"main\"\n    }\n  }\n}\n",
+   "project": null,
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<HOME>/.claude/skilletor.json: sources.s: unknown key \"branch\""
+ },
+ {
+  "name": "source name invalid",
+  "files": {
+   "user": "{\n  \"sources\": {\n    \"-bad\": {\n      \"git\": \"https://github.com/Getty/skills\"\n    }\n  }\n}\n",
+   "project": null,
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<HOME>/.claude/skilletor.json: source name \"-bad\" is not valid (ASCII letters, digits, \".\", \"_\" and \"-\", starting with a letter or digit)"
+ },
+ {
+  "name": "source name invalid unicode",
+  "files": {
+   "user": null,
+   "project": "{\n  \"sources\": {\n    \"skïlls\": {\n      \"git\": \"https://github.com/Getty/skills\"\n    }\n  }\n}\n",
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<PROJECT>/.claude/skilletor.json: source name \"skïlls\" is not valid (ASCII letters, digits, \".\", \"_\" and \"-\", starting with a letter or digit)"
+ },
+ {
+  "name": "source name invalid empty",
+  "files": {
+   "user": null,
+   "project": null,
+   "local": "{\n  \"sources\": {\n    \"\": {\n      \"git\": \"https://github.com/Getty/skills\"\n    }\n  }\n}\n"
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<PROJECT>/.claude/skilletor.local.json: source name \"\" is not valid (ASCII letters, digits, \".\", \"_\" and \"-\", starting with a letter or digit)"
+ },
+ {
+  "name": "source names valid",
+  "files": {
+   "user": "{\n  \"sources\": {\n    \"a.b_c-d\": {\n      \"git\": \"https://github.com/Getty/skills\"\n    },\n    \"0x\": {\n      \"git\": \"https://github.com/Getty/skills\"\n    },\n    \"A\": {\n      \"git\": \"https://github.com/Getty/skills\"\n    }\n  },\n  \"install\": {\n    \"skills\": [\n      \"x@a.b_c-d\",\n      \"y@0x\",\n      \"z@A\"\n    ]\n  }\n}\n",
+   "project": null,
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "loaded": {
+   "sources": [
+    [
+     "a.b_c-d",
+     {
+      "name": "a.b_c-d",
+      "origins": {
+       "git": "user"
+      },
+      "git": "https://github.com/Getty/skills"
+     }
+    ],
+    [
+     "0x",
+     {
+      "name": "0x",
+      "origins": {
+       "git": "user"
+      },
+      "git": "https://github.com/Getty/skills"
+     }
+    ],
+    [
+     "A",
+     {
+      "name": "A",
+      "origins": {
+       "git": "user"
+      },
+      "git": "https://github.com/Getty/skills"
+     }
+    ]
+   ],
+   "checkInterval": 1800,
+   "user": {
+    "scope": "user",
+    "install": [
+     {
+      "type": "skill",
+      "name": "x",
+      "source": "a.b_c-d",
+      "target": "skills/x",
+      "raw": "x@a.b_c-d"
+     },
+     {
+      "type": "skill",
+      "name": "y",
+      "source": "0x",
+      "target": "skills/y",
+      "raw": "y@0x"
+     },
+     {
+      "type": "skill",
+      "name": "z",
+      "source": "A",
+      "target": "skills/z",
+      "raw": "z@A"
+     }
+    ],
+    "wildcards": [],
+    "bundles": [],
+    "vars": {},
+    "gitignore": true,
+    "claudeSettings": true
+   },
+   "project": {
+    "scope": "project",
+    "install": [],
+    "wildcards": [],
+    "bundles": [],
+    "vars": {},
+    "gitignore": true,
+    "claudeSettings": true
+   },
+   "userSources": [
+    [
+     "a.b_c-d",
+     {
+      "name": "a.b_c-d",
+      "origins": {
+       "git": "user"
+      },
+      "git": "https://github.com/Getty/skills"
+     }
+    ],
+    [
+     "0x",
+     {
+      "name": "0x",
+      "origins": {
+       "git": "user"
+      },
+      "git": "https://github.com/Getty/skills"
+     }
+    ],
+    [
+     "A",
+     {
+      "name": "A",
+      "origins": {
+       "git": "user"
+      },
+      "git": "https://github.com/Getty/skills"
+     }
+    ]
+   ]
+  }
+ },
+ {
+  "name": "integer source names keep object order",
+  "files": {
+   "user": "{\n  \"sources\": {\n    \"2\": {\n      \"git\": \"https://github.com/Getty/skills\"\n    },\n    \"10\": {\n      \"git\": \"https://github.com/Getty/skills\"\n    },\n    \"b\": {\n      \"git\": \"https://github.com/Getty/skills\"\n    },\n    \"a\": {\n      \"git\": \"https://github.com/Getty/skills\"\n    }\n  }\n}\n",
+   "project": null,
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "loaded": {
+   "sources": [
+    [
+     "2",
+     {
+      "name": "2",
+      "origins": {
+       "git": "user"
+      },
+      "git": "https://github.com/Getty/skills"
+     }
+    ],
+    [
+     "10",
+     {
+      "name": "10",
+      "origins": {
+       "git": "user"
+      },
+      "git": "https://github.com/Getty/skills"
+     }
+    ],
+    [
+     "b",
+     {
+      "name": "b",
+      "origins": {
+       "git": "user"
+      },
+      "git": "https://github.com/Getty/skills"
+     }
+    ],
+    [
+     "a",
+     {
+      "name": "a",
+      "origins": {
+       "git": "user"
+      },
+      "git": "https://github.com/Getty/skills"
+     }
+    ]
+   ],
+   "checkInterval": 1800,
+   "user": {
+    "scope": "user",
+    "install": [],
+    "wildcards": [],
+    "bundles": [],
+    "vars": {},
+    "gitignore": true,
+    "claudeSettings": true
+   },
+   "project": {
+    "scope": "project",
+    "install": [],
+    "wildcards": [],
+    "bundles": [],
+    "vars": {},
+    "gitignore": true,
+    "claudeSettings": true
+   },
+   "userSources": [
+    [
+     "2",
+     {
+      "name": "2",
+      "origins": {
+       "git": "user"
+      },
+      "git": "https://github.com/Getty/skills"
+     }
+    ],
+    [
+     "10",
+     {
+      "name": "10",
+      "origins": {
+       "git": "user"
+      },
+      "git": "https://github.com/Getty/skills"
+     }
+    ],
+    [
+     "b",
+     {
+      "name": "b",
+      "origins": {
+       "git": "user"
+      },
+      "git": "https://github.com/Getty/skills"
+     }
+    ],
+    [
+     "a",
+     {
+      "name": "a",
+      "origins": {
+       "git": "user"
+      },
+      "git": "https://github.com/Getty/skills"
+     }
+    ]
+   ]
+  }
+ },
+ {
+  "name": "git not a string",
+  "files": {
+   "user": "{\n  \"sources\": {\n    \"s\": {\n      \"git\": 5\n    }\n  }\n}\n",
+   "project": null,
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<HOME>/.claude/skilletor.json: sources.s.git 5 must be a string"
+ },
+ {
+  "name": "git null",
+  "files": {
+   "user": "{\n  \"sources\": {\n    \"s\": {\n      \"git\": null\n    }\n  }\n}\n",
+   "project": null,
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<HOME>/.claude/skilletor.json: sources.s.git null must be a string"
+ },
+ {
+  "name": "git empty",
+  "files": {
+   "user": "{\n  \"sources\": {\n    \"s\": {\n      \"git\": \"\"\n    }\n  }\n}\n",
+   "project": null,
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<HOME>/.claude/skilletor.json: sources.s.git \"\" must not be empty"
+ },
+ {
+  "name": "git dash",
+  "files": {
+   "user": "{\n  \"sources\": {\n    \"s\": {\n      \"git\": \"--upload-pack=x\"\n    }\n  }\n}\n",
+   "project": null,
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<HOME>/.claude/skilletor.json: sources.s.git \"--upload-pack=x\" must not start with \"-\" (git would read it as an option)"
+ },
+ {
+  "name": "ref empty",
+  "files": {
+   "user": "{\n  \"sources\": {\n    \"s\": {\n      \"git\": \"https://x\",\n      \"ref\": \"\"\n    }\n  }\n}\n",
+   "project": null,
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<HOME>/.claude/skilletor.json: sources.s.ref \"\" must not be empty (omit \"ref\" for the remote's HEAD)"
+ },
+ {
+  "name": "ref not a string",
+  "files": {
+   "user": "{\n  \"sources\": {\n    \"s\": {\n      \"git\": \"https://x\",\n      \"ref\": 1\n    }\n  }\n}\n",
+   "project": null,
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<HOME>/.claude/skilletor.json: sources.s.ref 1 must be a string"
+ },
+ {
+  "name": "ref dash",
+  "files": {
+   "user": "{\n  \"sources\": {\n    \"s\": {\n      \"git\": \"https://x\",\n      \"ref\": \"-x\"\n    }\n  }\n}\n",
+   "project": null,
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<HOME>/.claude/skilletor.json: sources.s.ref \"-x\" must not start with \"-\" (git would read it as an option)"
+ },
+ {
+  "name": "ref space",
+  "files": {
+   "user": "{\n  \"sources\": {\n    \"s\": {\n      \"git\": \"https://x\",\n      \"ref\": \"a b\"\n    }\n  }\n}\n",
+   "project": null,
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<HOME>/.claude/skilletor.json: sources.s.ref \"a b\" is not a git ref name (no whitespace, control characters, ~ ^ : ? * [ \\, \"..\" or \"@{\")"
+ },
+ {
+  "name": "ref dotdot",
+  "files": {
+   "user": "{\n  \"sources\": {\n    \"s\": {\n      \"git\": \"https://x\",\n      \"ref\": \"a..b\"\n    }\n  }\n}\n",
+   "project": null,
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<HOME>/.claude/skilletor.json: sources.s.ref \"a..b\" is not a git ref name (no whitespace, control characters, ~ ^ : ? * [ \\, \"..\" or \"@{\")"
+ },
+ {
+  "name": "ref reflog",
+  "files": {
+   "user": "{\n  \"sources\": {\n    \"s\": {\n      \"git\": \"https://x\",\n      \"ref\": \"a@{1}\"\n    }\n  }\n}\n",
+   "project": null,
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<HOME>/.claude/skilletor.json: sources.s.ref \"a@{1}\" is not a git ref name (no whitespace, control characters, ~ ^ : ? * [ \\, \"..\" or \"@{\")"
+ },
+ {
+  "name": "ref control",
+  "files": {
+   "user": "{\n  \"sources\": {\n    \"s\": {\n      \"git\": \"https://x\",\n      \"ref\": \"a\\u0001\"\n    }\n  }\n}\n",
+   "project": null,
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<HOME>/.claude/skilletor.json: sources.s.ref \"a\\u0001\" is not a git ref name (no whitespace, control characters, ~ ^ : ? * [ \\, \"..\" or \"@{\")"
+ },
+ {
+  "name": "ref ok forms",
+  "files": {
+   "user": "{\n  \"sources\": {\n    \"s\": {\n      \"git\": \"https://x\",\n      \"ref\": \"feature/x-1.2\"\n    },\n    \"t\": {\n      \"git\": \"https://x\",\n      \"ref\": \"v1.0.0\"\n    },\n    \"u\": {\n      \"git\": \"https://x\",\n      \"ref\": \"0123abcd\"\n    },\n    \"v\": {\n      \"git\": \"https://x\",\n      \"ref\": \"a@b\"\n    }\n  }\n}\n",
+   "project": null,
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "loaded": {
+   "sources": [
+    [
+     "s",
+     {
+      "name": "s",
+      "origins": {
+       "git": "user"
+      },
+      "git": "https://x",
+      "ref": "feature/x-1.2"
+     }
+    ],
+    [
+     "t",
+     {
+      "name": "t",
+      "origins": {
+       "git": "user"
+      },
+      "git": "https://x",
+      "ref": "v1.0.0"
+     }
+    ],
+    [
+     "u",
+     {
+      "name": "u",
+      "origins": {
+       "git": "user"
+      },
+      "git": "https://x",
+      "ref": "0123abcd"
+     }
+    ],
+    [
+     "v",
+     {
+      "name": "v",
+      "origins": {
+       "git": "user"
+      },
+      "git": "https://x",
+      "ref": "a@b"
+     }
+    ]
+   ],
+   "checkInterval": 1800,
+   "user": {
+    "scope": "user",
+    "install": [],
+    "wildcards": [],
+    "bundles": [],
+    "vars": {},
+    "gitignore": true,
+    "claudeSettings": true
+   },
+   "project": {
+    "scope": "project",
+    "install": [],
+    "wildcards": [],
+    "bundles": [],
+    "vars": {},
+    "gitignore": true,
+    "claudeSettings": true
+   },
+   "userSources": [
+    [
+     "s",
+     {
+      "name": "s",
+      "origins": {
+       "git": "user"
+      },
+      "git": "https://x",
+      "ref": "feature/x-1.2"
+     }
+    ],
+    [
+     "t",
+     {
+      "name": "t",
+      "origins": {
+       "git": "user"
+      },
+      "git": "https://x",
+      "ref": "v1.0.0"
+     }
+    ],
+    [
+     "u",
+     {
+      "name": "u",
+      "origins": {
+       "git": "user"
+      },
+      "git": "https://x",
+      "ref": "0123abcd"
+     }
+    ],
+    [
+     "v",
+     {
+      "name": "v",
+      "origins": {
+       "git": "user"
+      },
+      "git": "https://x",
+      "ref": "a@b"
+     }
+    ]
+   ]
+  }
+ },
+ {
+  "name": "local empty",
+  "files": {
+   "user": "{\n  \"sources\": {\n    \"s\": {\n      \"local\": \"\"\n    }\n  }\n}\n",
+   "project": null,
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<HOME>/.claude/skilletor.json: sources.s.local \"\" must not be empty"
+ },
+ {
+  "name": "local not a string",
+  "files": {
+   "user": "{\n  \"sources\": {\n    \"s\": {\n      \"local\": []\n    }\n  }\n}\n",
+   "project": null,
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<HOME>/.claude/skilletor.json: sources.s.local [] must be a string"
+ },
+ {
+  "name": "url http",
+  "files": {
+   "user": "{\n  \"sources\": {\n    \"s\": {\n      \"url\": \"http://x/a.tgz\"\n    }\n  }\n}\n",
+   "project": null,
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<HOME>/.claude/skilletor.json: sources.s.url \"http://x/a.tgz\" must be an https:// URL"
+ },
+ {
+  "name": "url not a string",
+  "files": {
+   "user": "{\n  \"sources\": {\n    \"s\": {\n      \"url\": 7\n    }\n  }\n}\n",
+   "project": null,
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<HOME>/.claude/skilletor.json: sources.s.url 7 must be an https:// URL"
+ },
+ {
+  "name": "url null",
+  "files": {
+   "user": "{\n  \"sources\": {\n    \"s\": {\n      \"url\": null\n    }\n  }\n}\n",
+   "project": null,
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<HOME>/.claude/skilletor.json: sources.s.url null must be an https:// URL"
+ },
+ {
+  "name": "url ok",
+  "files": {
+   "user": "{\n  \"sources\": {\n    \"s\": {\n      \"url\": \"https://x/a.tar.gz\"\n    }\n  }\n}\n",
+   "project": null,
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "loaded": {
+   "sources": [
+    [
+     "s",
+     {
+      "name": "s",
+      "origins": {
+       "url": "user"
+      },
+      "url": "https://x/a.tar.gz"
+     }
+    ]
+   ],
+   "checkInterval": 1800,
+   "user": {
+    "scope": "user",
+    "install": [],
+    "wildcards": [],
+    "bundles": [],
+    "vars": {},
+    "gitignore": true,
+    "claudeSettings": true
+   },
+   "project": {
+    "scope": "project",
+    "install": [],
+    "wildcards": [],
+    "bundles": [],
+    "vars": {},
+    "gitignore": true,
+    "claudeSettings": true
+   },
+   "userSources": [
+    [
+     "s",
+     {
+      "name": "s",
+      "origins": {
+       "url": "user"
+      },
+      "url": "https://x/a.tar.gz"
+     }
+    ]
+   ]
+  }
+ },
+ {
+  "name": "all three backends",
+  "files": {
+   "user": "{\n  \"sources\": {\n    \"s\": {\n      \"git\": \"https://x\",\n      \"url\": \"https://y/z.tgz\",\n      \"local\": \"~/dev/s\",\n      \"ref\": \"main\"\n    }\n  }\n}\n",
+   "project": null,
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "loaded": {
+   "sources": [
+    [
+     "s",
+     {
+      "name": "s",
+      "origins": {
+       "git": "user",
+       "url": "user",
+       "local": "user"
+      },
+      "git": "https://x",
+      "ref": "main",
+      "local": "~/dev/s",
+      "url": "https://y/z.tgz"
+     }
+    ]
+   ],
+   "checkInterval": 1800,
+   "user": {
+    "scope": "user",
+    "install": [],
+    "wildcards": [],
+    "bundles": [],
+    "vars": {},
+    "gitignore": true,
+    "claudeSettings": true
+   },
+   "project": {
+    "scope": "project",
+    "install": [],
+    "wildcards": [],
+    "bundles": [],
+    "vars": {},
+    "gitignore": true,
+    "claudeSettings": true
+   },
+   "userSources": [
+    [
+     "s",
+     {
+      "name": "s",
+      "origins": {
+       "git": "user",
+       "url": "user",
+       "local": "user"
+      },
+      "git": "https://x",
+      "ref": "main",
+      "local": "~/dev/s",
+      "url": "https://y/z.tgz"
+     }
+    ]
+   ]
+  }
+ },
+ {
+  "name": "no backend anywhere user",
+  "files": {
+   "user": "{\n  \"sources\": {\n    \"s\": {\n      \"ref\": \"main\"\n    }\n  }\n}\n",
+   "project": null,
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<HOME>/.claude/skilletor.json: sources.s needs one of \"git\", \"url\" or \"local\"; no other config file gives one (an entry without one only changes \"ref\" or \"path\" of a source another file defines)"
+ },
+ {
+  "name": "no backend anywhere project+local",
+  "files": {
+   "user": null,
+   "project": "{\n  \"sources\": {\n    \"s\": {\n      \"ref\": \"a\"\n    }\n  }\n}\n",
+   "local": "{\n  \"sources\": {\n    \"s\": {\n      \"path\": \"x\"\n    }\n  }\n}\n"
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<PROJECT>/.claude/skilletor.json and <PROJECT>/.claude/skilletor.local.json: sources.s needs one of \"git\", \"url\" or \"local\"; none of these files gives one (an entry without one only changes \"ref\" or \"path\" of a source another file defines)"
+ },
+ {
+  "name": "no backend in three files",
+  "files": {
+   "user": "{\n  \"sources\": {\n    \"s\": {\n      \"ref\": \"b\"\n    }\n  }\n}\n",
+   "project": "{\n  \"sources\": {\n    \"s\": {\n      \"ref\": \"a\"\n    }\n  }\n}\n",
+   "local": "{\n  \"sources\": {\n    \"s\": {\n      \"ref\": \"c\"\n    }\n  }\n}\n"
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<PROJECT>/.claude/skilletor.json and <HOME>/.claude/skilletor.json and <PROJECT>/.claude/skilletor.local.json: sources.s needs one of \"git\", \"url\" or \"local\"; none of these files gives one (an entry without one only changes \"ref\" or \"path\" of a source another file defines)"
+ },
+ {
+  "name": "no backend, no project scope",
+  "files": {
+   "user": "{\n  \"sources\": {\n    \"s\": {\n      \"ref\": \"x\"\n    }\n  }\n}\n",
+   "project": null,
+   "local": null
+  },
+  "noProject": true,
+  "unchecked": null,
+  "error": "<HOME>/.claude/skilletor.json: sources.s needs one of \"git\", \"url\" or \"local\"; no other config file gives one (an entry without one only changes \"ref\" or \"path\" of a source another file defines)"
+ },
+ {
+  "name": "empty source def",
+  "files": {
+   "user": "{\n  \"sources\": {\n    \"s\": {}\n  }\n}\n",
+   "project": null,
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<HOME>/.claude/skilletor.json: sources.s needs one of \"git\", \"url\" or \"local\"; no other config file gives one (an entry without one only changes \"ref\" or \"path\" of a source another file defines)"
+ },
+ {
+  "name": "path string",
+  "files": {
+   "user": "{\n  \"sources\": {\n    \"s\": {\n      \"git\": \"https://x\",\n      \"path\": \"skills\"\n    }\n  }\n}\n",
+   "project": null,
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "loaded": {
+   "sources": [
+    [
+     "s",
+     {
+      "name": "s",
+      "origins": {
+       "git": "user"
+      },
+      "git": "https://x",
+      "path": "skills"
+     }
+    ]
+   ],
+   "checkInterval": 1800,
+   "user": {
+    "scope": "user",
+    "install": [],
+    "wildcards": [],
+    "bundles": [],
+    "vars": {},
+    "gitignore": true,
+    "claudeSettings": true
+   },
+   "project": {
+    "scope": "project",
+    "install": [],
+    "wildcards": [],
+    "bundles": [],
+    "vars": {},
+    "gitignore": true,
+    "claudeSettings": true
+   },
+   "userSources": [
+    [
+     "s",
+     {
+      "name": "s",
+      "origins": {
+       "git": "user"
+      },
+      "git": "https://x",
+      "path": "skills"
+     }
+    ]
+   ]
+  }
+ },
+ {
+  "name": "path array",
+  "files": {
+   "user": "{\n  \"sources\": {\n    \"s\": {\n      \"git\": \"https://x\",\n      \"path\": [\n        \"skills\",\n        \"optional-skills\"\n      ]\n    }\n  }\n}\n",
+   "project": null,
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "loaded": {
+   "sources": [
+    [
+     "s",
+     {
+      "name": "s",
+      "origins": {
+       "git": "user"
+      },
+      "git": "https://x",
+      "path": [
+       "skills",
+       "optional-skills"
+      ]
+     }
+    ]
+   ],
+   "checkInterval": 1800,
+   "user": {
+    "scope": "user",
+    "install": [],
+    "wildcards": [],
+    "bundles": [],
+    "vars": {},
+    "gitignore": true,
+    "claudeSettings": true
+   },
+   "project": {
+    "scope": "project",
+    "install": [],
+    "wildcards": [],
+    "bundles": [],
+    "vars": {},
+    "gitignore": true,
+    "claudeSettings": true
+   },
+   "userSources": [
+    [
+     "s",
+     {
+      "name": "s",
+      "origins": {
+       "git": "user"
+      },
+      "git": "https://x",
+      "path": [
+       "skills",
+       "optional-skills"
+      ]
+     }
+    ]
+   ]
+  }
+ },
+ {
+  "name": "path empty array",
+  "files": {
+   "user": "{\n  \"sources\": {\n    \"s\": {\n      \"git\": \"https://x\",\n      \"path\": []\n    }\n  }\n}\n",
+   "project": null,
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<HOME>/.claude/skilletor.json: sources.s.path [] must not be empty (omit \"path\" for the default layout)"
+ },
+ {
+  "name": "path empty string",
+  "files": {
+   "user": "{\n  \"sources\": {\n    \"s\": {\n      \"git\": \"https://x\",\n      \"path\": \"\"\n    }\n  }\n}\n",
+   "project": null,
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<HOME>/.claude/skilletor.json: sources.s.path \"\" must not be empty (omit \"path\" for the default layout)"
+ },
+ {
+  "name": "path number",
+  "files": {
+   "user": "{\n  \"sources\": {\n    \"s\": {\n      \"git\": \"https://x\",\n      \"path\": 7\n    }\n  }\n}\n",
+   "project": null,
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<HOME>/.claude/skilletor.json: sources.s.path 7 must be a string or an array of strings"
+ },
+ {
+  "name": "path element number",
+  "files": {
+   "user": "{\n  \"sources\": {\n    \"s\": {\n      \"git\": \"https://x\",\n      \"path\": [\n        \"a\",\n        7\n      ]\n    }\n  }\n}\n",
+   "project": null,
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<HOME>/.claude/skilletor.json: sources.s.path[1] 7 must be a string"
+ },
+ {
+  "name": "path element empty",
+  "files": {
+   "user": "{\n  \"sources\": {\n    \"s\": {\n      \"git\": \"https://x\",\n      \"path\": [\n        \"a\",\n        \"\"\n      ]\n    }\n  }\n}\n",
+   "project": null,
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<HOME>/.claude/skilletor.json: sources.s.path[1] \"\" must not be empty"
+ },
+ {
+  "name": "path absolute",
+  "files": {
+   "user": "{\n  \"sources\": {\n    \"s\": {\n      \"git\": \"https://x\",\n      \"path\": \"/abs\"\n    }\n  }\n}\n",
+   "project": null,
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<HOME>/.claude/skilletor.json: sources.s.path \"/abs\" must not be absolute (it is relative to the source root)"
+ },
+ {
+  "name": "path backslash absolute",
+  "files": {
+   "user": "{\n  \"sources\": {\n    \"s\": {\n      \"git\": \"https://x\",\n      \"path\": [\n        \"\\\\abs\"\n      ]\n    }\n  }\n}\n",
+   "project": null,
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<HOME>/.claude/skilletor.json: sources.s.path[0] \"\\\\abs\" must not be absolute (it is relative to the source root)"
+ },
+ {
+  "name": "path dotdot",
+  "files": {
+   "user": "{\n  \"sources\": {\n    \"s\": {\n      \"git\": \"https://x\",\n      \"path\": \"../x\"\n    }\n  }\n}\n",
+   "project": null,
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<HOME>/.claude/skilletor.json: sources.s.path \"../x\" must not contain \"..\""
+ },
+ {
+  "name": "path dotdot inner",
+  "files": {
+   "user": "{\n  \"sources\": {\n    \"s\": {\n      \"git\": \"https://x\",\n      \"path\": [\n        \"a\",\n        \"a\\\\..\\\\b\"\n      ]\n    }\n  }\n}\n",
+   "project": null,
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<HOME>/.claude/skilletor.json: sources.s.path[1] \"a\\\\..\\\\b\" must not contain \"..\""
+ },
+ {
+  "name": "path root dot",
+  "files": {
+   "user": "{\n  \"sources\": {\n    \"s\": {\n      \"git\": \"https://x\",\n      \"path\": \".\"\n    }\n  }\n}\n",
+   "project": null,
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<HOME>/.claude/skilletor.json: sources.s.path \".\" must not be the source root (name the directories its skills lie in)"
+ },
+ {
+  "name": "path root dotslash",
+  "files": {
+   "user": "{\n  \"sources\": {\n    \"s\": {\n      \"git\": \"https://x\",\n      \"path\": [\n        \"./\"\n      ]\n    }\n  }\n}\n",
+   "project": null,
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<HOME>/.claude/skilletor.json: sources.s.path[0] \"./\" must not be the source root (name the directories its skills lie in)"
+ },
+ {
+  "name": "path null",
+  "files": {
+   "user": "{\n  \"sources\": {\n    \"s\": {\n      \"git\": \"https://x\",\n      \"path\": null\n    }\n  }\n}\n",
+   "project": null,
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<HOME>/.claude/skilletor.json: sources.s.path null must be a string or an array of strings"
+ },
+ {
+  "name": "distinct sources with origins",
+  "files": {
+   "user": "{\n  \"sources\": {\n    \"u\": {\n      \"git\": \"https://u\"\n    }\n  }\n}\n",
+   "project": "{\n  \"sources\": {\n    \"p\": {\n      \"git\": \"https://p\"\n    }\n  }\n}\n",
+   "local": "{\n  \"sources\": {\n    \"l\": {\n      \"git\": \"https://l\"\n    }\n  }\n}\n"
+  },
+  "noProject": false,
+  "unchecked": null,
+  "loaded": {
+   "sources": [
+    [
+     "p",
+     {
+      "name": "p",
+      "origins": {
+       "git": "project"
+      },
+      "git": "https://p"
+     }
+    ],
+    [
+     "u",
+     {
+      "name": "u",
+      "origins": {
+       "git": "user"
+      },
+      "git": "https://u"
+     }
+    ],
+    [
+     "l",
+     {
+      "name": "l",
+      "origins": {
+       "git": "user"
+      },
+      "git": "https://l"
+     }
+    ]
+   ],
+   "checkInterval": 1800,
+   "user": {
+    "scope": "user",
+    "install": [],
+    "wildcards": [],
+    "bundles": [],
+    "vars": {},
+    "gitignore": true,
+    "claudeSettings": true
+   },
+   "project": {
+    "scope": "project",
+    "install": [],
+    "wildcards": [],
+    "bundles": [],
+    "vars": {},
+    "gitignore": true,
+    "claudeSettings": true
+   },
+   "userSources": [
+    [
+     "u",
+     {
+      "name": "u",
+      "origins": {
+       "git": "user"
+      },
+      "git": "https://u"
+     }
+    ]
+   ]
+  }
+ },
+ {
+  "name": "author mode",
+  "files": {
+   "user": "{\n  \"sources\": {\n    \"s\": {\n      \"local\": \"~/dev/s\"\n    }\n  }\n}\n",
+   "project": "{\n  \"sources\": {\n    \"s\": {\n      \"git\": \"https://p\",\n      \"ref\": \"v1\"\n    }\n  },\n  \"install\": {\n    \"skills\": [\n      \"a@s\"\n    ]\n  }\n}\n",
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "loaded": {
+   "sources": [
+    [
+     "s",
+     {
+      "name": "s",
+      "origins": {
+       "git": "project",
+       "local": "user"
+      },
+      "git": "https://p",
+      "ref": "v1",
+      "local": "~/dev/s"
+     }
+    ]
+   ],
+   "checkInterval": 1800,
+   "user": {
+    "scope": "user",
+    "install": [],
+    "wildcards": [],
+    "bundles": [],
+    "vars": {},
+    "gitignore": true,
+    "claudeSettings": true
+   },
+   "project": {
+    "scope": "project",
+    "install": [
+     {
+      "type": "skill",
+      "name": "a",
+      "source": "s",
+      "target": "skills/a",
+      "raw": "a@s"
+     }
+    ],
+    "wildcards": [],
+    "bundles": [],
+    "vars": {},
+    "gitignore": true,
+    "claudeSettings": true
+   },
+   "userSources": [
+    [
+     "s",
+     {
+      "name": "s",
+      "origins": {
+       "local": "user"
+      },
+      "local": "~/dev/s"
+     }
+    ]
+   ]
+  }
+ },
+ {
+  "name": "local overrides user field",
+  "files": {
+   "user": "{\n  \"sources\": {\n    \"s\": {\n      \"git\": \"https://u\"\n    }\n  }\n}\n",
+   "project": "{\n  \"sources\": {\n    \"s\": {\n      \"git\": \"https://p\"\n    }\n  }\n}\n",
+   "local": "{\n  \"sources\": {\n    \"s\": {\n      \"git\": \"https://l\"\n    }\n  }\n}\n"
+  },
+  "noProject": false,
+  "unchecked": null,
+  "loaded": {
+   "sources": [
+    [
+     "s",
+     {
+      "name": "s",
+      "origins": {
+       "git": "user"
+      },
+      "git": "https://l"
+     }
+    ]
+   ],
+   "checkInterval": 1800,
+   "user": {
+    "scope": "user",
+    "install": [],
+    "wildcards": [],
+    "bundles": [],
+    "vars": {},
+    "gitignore": true,
+    "claudeSettings": true
+   },
+   "project": {
+    "scope": "project",
+    "install": [],
+    "wildcards": [],
+    "bundles": [],
+    "vars": {},
+    "gitignore": true,
+    "claudeSettings": true
+   },
+   "userSources": [
+    [
+     "s",
+     {
+      "name": "s",
+      "origins": {
+       "git": "user"
+      },
+      "git": "https://u"
+     }
+    ]
+   ]
+  }
+ },
+ {
+  "name": "ref merges, kept when higher gives git alone",
+  "files": {
+   "user": "{\n  \"sources\": {\n    \"s\": {\n      \"git\": \"https://u\"\n    }\n  }\n}\n",
+   "project": "{\n  \"sources\": {\n    \"s\": {\n      \"git\": \"https://p\",\n      \"ref\": \"v1\"\n    }\n  }\n}\n",
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "loaded": {
+   "sources": [
+    [
+     "s",
+     {
+      "name": "s",
+      "origins": {
+       "git": "user"
+      },
+      "git": "https://u",
+      "ref": "v1"
+     }
+    ]
+   ],
+   "checkInterval": 1800,
+   "user": {
+    "scope": "user",
+    "install": [],
+    "wildcards": [],
+    "bundles": [],
+    "vars": {},
+    "gitignore": true,
+    "claudeSettings": true
+   },
+   "project": {
+    "scope": "project",
+    "install": [],
+    "wildcards": [],
+    "bundles": [],
+    "vars": {},
+    "gitignore": true,
+    "claudeSettings": true
+   },
+   "userSources": [
+    [
+     "s",
+     {
+      "name": "s",
+      "origins": {
+       "git": "user"
+      },
+      "git": "https://u"
+     }
+    ]
+   ]
+  }
+ },
+ {
+  "name": "ref null unsets",
+  "files": {
+   "user": "{\n  \"sources\": {\n    \"s\": {\n      \"ref\": null\n    }\n  }\n}\n",
+   "project": "{\n  \"sources\": {\n    \"s\": {\n      \"git\": \"https://p\",\n      \"ref\": \"v1\"\n    }\n  }\n}\n",
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "loaded": {
+   "sources": [
+    [
+     "s",
+     {
+      "name": "s",
+      "origins": {
+       "git": "project"
+      },
+      "git": "https://p"
+     }
+    ]
+   ],
+   "checkInterval": 1800,
+   "user": {
+    "scope": "user",
+    "install": [],
+    "wildcards": [],
+    "bundles": [],
+    "vars": {},
+    "gitignore": true,
+    "claudeSettings": true
+   },
+   "project": {
+    "scope": "project",
+    "install": [],
+    "wildcards": [],
+    "bundles": [],
+    "vars": {},
+    "gitignore": true,
+    "claudeSettings": true
+   },
+   "userSources": []
+  }
+ },
+ {
+  "name": "ref null then local sets",
+  "files": {
+   "user": "{\n  \"sources\": {\n    \"s\": {\n      \"ref\": null\n    }\n  }\n}\n",
+   "project": "{\n  \"sources\": {\n    \"s\": {\n      \"git\": \"https://p\",\n      \"ref\": \"v1\"\n    }\n  }\n}\n",
+   "local": "{\n  \"sources\": {\n    \"s\": {\n      \"ref\": \"v4\"\n    }\n  }\n}\n"
+  },
+  "noProject": false,
+  "unchecked": null,
+  "loaded": {
+   "sources": [
+    [
+     "s",
+     {
+      "name": "s",
+      "origins": {
+       "git": "project"
+      },
+      "git": "https://p",
+      "ref": "v4"
+     }
+    ]
+   ],
+   "checkInterval": 1800,
+   "user": {
+    "scope": "user",
+    "install": [],
+    "wildcards": [],
+    "bundles": [],
+    "vars": {},
+    "gitignore": true,
+    "claudeSettings": true
+   },
+   "project": {
+    "scope": "project",
+    "install": [],
+    "wildcards": [],
+    "bundles": [],
+    "vars": {},
+    "gitignore": true,
+    "claudeSettings": true
+   },
+   "userSources": []
+  }
+ },
+ {
+  "name": "ref null in local",
+  "files": {
+   "user": null,
+   "project": "{\n  \"sources\": {\n    \"s\": {\n      \"git\": \"https://p\",\n      \"ref\": \"v1\"\n    }\n  }\n}\n",
+   "local": "{\n  \"sources\": {\n    \"s\": {\n      \"ref\": null,\n      \"path\": \"p\"\n    }\n  }\n}\n"
+  },
+  "noProject": false,
+  "unchecked": null,
+  "loaded": {
+   "sources": [
+    [
+     "s",
+     {
+      "name": "s",
+      "origins": {
+       "git": "project"
+      },
+      "git": "https://p",
+      "path": "p"
+     }
+    ]
+   ],
+   "checkInterval": 1800,
+   "user": {
+    "scope": "user",
+    "install": [],
+    "wildcards": [],
+    "bundles": [],
+    "vars": {},
+    "gitignore": true,
+    "claudeSettings": true
+   },
+   "project": {
+    "scope": "project",
+    "install": [],
+    "wildcards": [],
+    "bundles": [],
+    "vars": {},
+    "gitignore": true,
+    "claudeSettings": true
+   },
+   "userSources": []
+  }
+ },
+ {
+  "name": "ref null alone in user scope",
+  "files": {
+   "user": "{\n  \"sources\": {\n    \"s\": {\n      \"git\": \"https://u\",\n      \"ref\": null\n    }\n  },\n  \"install\": {\n    \"skills\": [\n      \"a@s\"\n    ]\n  }\n}\n",
+   "project": null,
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "loaded": {
+   "sources": [
+    [
+     "s",
+     {
+      "name": "s",
+      "origins": {
+       "git": "user"
+      },
+      "git": "https://u"
+     }
+    ]
+   ],
+   "checkInterval": 1800,
+   "user": {
+    "scope": "user",
+    "install": [
+     {
+      "type": "skill",
+      "name": "a",
+      "source": "s",
+      "target": "skills/a",
+      "raw": "a@s"
+     }
+    ],
+    "wildcards": [],
+    "bundles": [],
+    "vars": {},
+    "gitignore": true,
+    "claudeSettings": true
+   },
+   "project": {
+    "scope": "project",
+    "install": [],
+    "wildcards": [],
+    "bundles": [],
+    "vars": {},
+    "gitignore": true,
+    "claudeSettings": true
+   },
+   "userSources": [
+    [
+     "s",
+     {
+      "name": "s",
+      "origins": {
+       "git": "user"
+      },
+      "git": "https://u"
+     }
+    ]
+   ]
+  }
+ },
+ {
+  "name": "path merges whole",
+  "files": {
+   "user": "{\n  \"sources\": {\n    \"s\": {\n      \"git\": \"https://u\",\n      \"path\": \"c\"\n    }\n  }\n}\n",
+   "project": "{\n  \"sources\": {\n    \"s\": {\n      \"git\": \"https://p\",\n      \"path\": [\n        \"a\",\n        \"b\"\n      ]\n    }\n  }\n}\n",
+   "local": "{\n  \"sources\": {\n    \"s\": {\n      \"path\": [\n        \"d\"\n      ]\n    }\n  }\n}\n"
+  },
+  "noProject": false,
+  "unchecked": null,
+  "loaded": {
+   "sources": [
+    [
+     "s",
+     {
+      "name": "s",
+      "origins": {
+       "git": "user"
+      },
+      "git": "https://u",
+      "path": [
+       "d"
+      ]
+     }
+    ]
+   ],
+   "checkInterval": 1800,
+   "user": {
+    "scope": "user",
+    "install": [],
+    "wildcards": [],
+    "bundles": [],
+    "vars": {},
+    "gitignore": true,
+    "claudeSettings": true
+   },
+   "project": {
+    "scope": "project",
+    "install": [],
+    "wildcards": [],
+    "bundles": [],
+    "vars": {},
+    "gitignore": true,
+    "claudeSettings": true
+   },
+   "userSources": [
+    [
+     "s",
+     {
+      "name": "s",
+      "origins": {
+       "git": "user"
+      },
+      "git": "https://u",
+      "path": "c"
+     }
+    ]
+   ]
+  }
+ },
+ {
+  "name": "entry without backend overrides ref",
+  "files": {
+   "user": null,
+   "project": "{\n  \"sources\": {\n    \"s\": {\n      \"git\": \"https://p\"\n    }\n  },\n  \"install\": {\n    \"skills\": [\n      \"a@s\"\n    ]\n  }\n}\n",
+   "local": "{\n  \"sources\": {\n    \"s\": {\n      \"ref\": \"v2\"\n    }\n  }\n}\n"
+  },
+  "noProject": false,
+  "unchecked": null,
+  "loaded": {
+   "sources": [
+    [
+     "s",
+     {
+      "name": "s",
+      "origins": {
+       "git": "project"
+      },
+      "git": "https://p",
+      "ref": "v2"
+     }
+    ]
+   ],
+   "checkInterval": 1800,
+   "user": {
+    "scope": "user",
+    "install": [],
+    "wildcards": [],
+    "bundles": [],
+    "vars": {},
+    "gitignore": true,
+    "claudeSettings": true
+   },
+   "project": {
+    "scope": "project",
+    "install": [
+     {
+      "type": "skill",
+      "name": "a",
+      "source": "s",
+      "target": "skills/a",
+      "raw": "a@s"
+     }
+    ],
+    "wildcards": [],
+    "bundles": [],
+    "vars": {},
+    "gitignore": true,
+    "claudeSettings": true
+   },
+   "userSources": []
+  }
+ },
+ {
+  "name": "user entry without backend",
+  "files": {
+   "user": "{\n  \"sources\": {\n    \"s\": {\n      \"ref\": \"v2\"\n    }\n  },\n  \"install\": {\n    \"skills\": [\n      \"a@s\"\n    ]\n  }\n}\n",
+   "project": "{\n  \"sources\": {\n    \"s\": {\n      \"git\": \"https://p\"\n    }\n  }\n}\n",
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<HOME>/.claude/skilletor.json: user install \"a@s\" references source \"s\", which has no \"git\", \"url\" or \"local\" in this file (user-scope items are built from the user config's sources alone)"
+ },
+ {
+  "name": "user bundle on entry without backend",
+  "files": {
+   "user": "{\n  \"sources\": {\n    \"s\": {\n      \"ref\": \"v2\"\n    }\n  },\n  \"install\": {\n    \"bundles\": [\n      \"b@s\"\n    ]\n  }\n}\n",
+   "project": "{\n  \"sources\": {\n    \"s\": {\n      \"git\": \"https://p\"\n    }\n  }\n}\n",
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<HOME>/.claude/skilletor.json: user install \"b@s\" references source \"s\", which has no \"git\", \"url\" or \"local\" in this file (user-scope items are built from the user config's sources alone)"
+ },
+ {
+  "name": "user scope sees user sources only",
+  "files": {
+   "user": "{\n  \"install\": {\n    \"skills\": [\n      \"a@p\"\n    ]\n  }\n}\n",
+   "project": "{\n  \"sources\": {\n    \"p\": {\n      \"git\": \"https://p\"\n    }\n  }\n}\n",
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<HOME>/.claude/skilletor.json: user install \"a@p\" references unknown source \"p\""
+ },
+ {
+  "name": "project install of user source",
+  "files": {
+   "user": "{\n  \"sources\": {\n    \"u\": {\n      \"git\": \"https://u\"\n    }\n  }\n}\n",
+   "project": "{\n  \"install\": {\n    \"skills\": [\n      \"a@u\"\n    ]\n  }\n}\n",
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "loaded": {
+   "sources": [
+    [
+     "u",
+     {
+      "name": "u",
+      "origins": {
+       "git": "user"
+      },
+      "git": "https://u"
+     }
+    ]
+   ],
+   "checkInterval": 1800,
+   "user": {
+    "scope": "user",
+    "install": [],
+    "wildcards": [],
+    "bundles": [],
+    "vars": {},
+    "gitignore": true,
+    "claudeSettings": true
+   },
+   "project": {
+    "scope": "project",
+    "install": [
+     {
+      "type": "skill",
+      "name": "a",
+      "source": "u",
+      "target": "skills/a",
+      "raw": "a@u"
+     }
+    ],
+    "wildcards": [],
+    "bundles": [],
+    "vars": {},
+    "gitignore": true,
+    "claudeSettings": true
+   },
+   "userSources": [
+    [
+     "u",
+     {
+      "name": "u",
+      "origins": {
+       "git": "user"
+      },
+      "git": "https://u"
+     }
+    ]
+   ]
+  }
+ },
+ {
+  "name": "merge order user then local new names",
+  "files": {
+   "user": "{\n  \"sources\": {\n    \"c\": {\n      \"git\": \"https://github.com/Getty/skills\"\n    },\n    \"a\": {\n      \"git\": \"https://ua\"\n    }\n  }\n}\n",
+   "project": "{\n  \"sources\": {\n    \"b\": {\n      \"git\": \"https://github.com/Getty/skills\"\n    },\n    \"a\": {\n      \"git\": \"https://github.com/Getty/skills\"\n    }\n  }\n}\n",
+   "local": "{\n  \"sources\": {\n    \"d\": {\n      \"git\": \"https://github.com/Getty/skills\"\n    },\n    \"b\": {\n      \"ref\": \"x\"\n    }\n  }\n}\n"
+  },
+  "noProject": false,
+  "unchecked": null,
+  "loaded": {
+   "sources": [
+    [
+     "b",
+     {
+      "name": "b",
+      "origins": {
+       "git": "project"
+      },
+      "git": "https://github.com/Getty/skills",
+      "ref": "x"
+     }
+    ],
+    [
+     "a",
+     {
+      "name": "a",
+      "origins": {
+       "git": "user"
+      },
+      "git": "https://ua"
+     }
+    ],
+    [
+     "c",
+     {
+      "name": "c",
+      "origins": {
+       "git": "user"
+      },
+      "git": "https://github.com/Getty/skills"
+     }
+    ],
+    [
+     "d",
+     {
+      "name": "d",
+      "origins": {
+       "git": "user"
+      },
+      "git": "https://github.com/Getty/skills"
+     }
+    ]
+   ],
+   "checkInterval": 1800,
+   "user": {
+    "scope": "user",
+    "install": [],
+    "wildcards": [],
+    "bundles": [],
+    "vars": {},
+    "gitignore": true,
+    "claudeSettings": true
+   },
+   "project": {
+    "scope": "project",
+    "install": [],
+    "wildcards": [],
+    "bundles": [],
+    "vars": {},
+    "gitignore": true,
+    "claudeSettings": true
+   },
+   "userSources": [
+    [
+     "c",
+     {
+      "name": "c",
+      "origins": {
+       "git": "user"
+      },
+      "git": "https://github.com/Getty/skills"
+     }
+    ],
+    [
+     "a",
+     {
+      "name": "a",
+      "origins": {
+       "git": "user"
+      },
+      "git": "https://ua"
+     }
+    ]
+   ]
+  }
+ },
+ {
+  "name": "install not an object",
+  "files": {
+   "user": "{\n  \"install\": []\n}\n",
+   "project": null,
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<HOME>/.claude/skilletor.json: install must be an object"
+ },
+ {
+  "name": "install bad type",
+  "files": {
+   "user": "{\n  \"sources\": {\n    \"s\": {\n      \"git\": \"https://github.com/Getty/skills\"\n    }\n  },\n  \"install\": {\n    \"skill\": []\n  }\n}\n",
+   "project": null,
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<HOME>/.claude/skilletor.json: install.skill is not a valid type (skills, agents, rules, bundles)"
+ },
+ {
+  "name": "install proto key",
+  "files": {
+   "user": "{\"sources\":{\"s\":{\"git\":\"https://x\"}},\"install\":{\"constructor\":[\"a@s\"]}}",
+   "project": null,
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<HOME>/.claude/skilletor.json: install.constructor is not a valid type (skills, agents, rules, bundles)"
+ },
+ {
+  "name": "install list not array",
+  "files": {
+   "user": "{\n  \"sources\": {\n    \"s\": {\n      \"git\": \"https://github.com/Getty/skills\"\n    }\n  },\n  \"install\": {\n    \"skills\": \"a@s\"\n  }\n}\n",
+   "project": null,
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<HOME>/.claude/skilletor.json: install.skills must be an array"
+ },
+ {
+  "name": "install entry not string",
+  "files": {
+   "user": "{\n  \"sources\": {\n    \"s\": {\n      \"git\": \"https://github.com/Getty/skills\"\n    }\n  },\n  \"install\": {\n    \"agents\": [\n      \"a@s\",\n      5\n    ]\n  }\n}\n",
+   "project": null,
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<HOME>/.claude/skilletor.json: install.agents[1] must be a string"
+ },
+ {
+  "name": "install entry no at",
+  "files": {
+   "user": "{\n  \"sources\": {\n    \"s\": {\n      \"git\": \"https://github.com/Getty/skills\"\n    }\n  },\n  \"install\": {\n    \"skills\": [\n      \"a\"\n    ]\n  }\n}\n",
+   "project": null,
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<HOME>/.claude/skilletor.json: install.skills[0] \"a\" must be name@source"
+ },
+ {
+  "name": "install entry leading at",
+  "files": {
+   "user": "{\n  \"sources\": {\n    \"s\": {\n      \"git\": \"https://github.com/Getty/skills\"\n    }\n  },\n  \"install\": {\n    \"skills\": [\n      \"@s\"\n    ]\n  }\n}\n",
+   "project": null,
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<HOME>/.claude/skilletor.json: install.skills[0] \"@s\" must be name@source"
+ },
+ {
+  "name": "install entry trailing at",
+  "files": {
+   "user": "{\n  \"sources\": {\n    \"s\": {\n      \"git\": \"https://github.com/Getty/skills\"\n    }\n  },\n  \"install\": {\n    \"rules\": [\n      \"a@\"\n    ]\n  }\n}\n",
+   "project": null,
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<HOME>/.claude/skilletor.json: install.rules[0] \"a@\" must be name@source"
+ },
+ {
+  "name": "install entry empty name",
+  "files": {
+   "user": "{\n  \"sources\": {\n    \"s\": {\n      \"git\": \"https://github.com/Getty/skills\"\n    }\n  },\n  \"install\": {\n    \"skills\": [\n      \"skill:@s\"\n    ]\n  }\n}\n",
+   "project": null,
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<HOME>/.claude/skilletor.json: install.skills[0] \"skill:@s\" has an empty name"
+ },
+ {
+  "name": "install entry prefix mismatch",
+  "files": {
+   "user": "{\n  \"sources\": {\n    \"s\": {\n      \"git\": \"https://github.com/Getty/skills\"\n    }\n  },\n  \"install\": {\n    \"skills\": [\n      \"agent:a@s\"\n    ]\n  }\n}\n",
+   "project": null,
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<HOME>/.claude/skilletor.json: install.skills[0] \"agent:a@s\" declares type \"agent\" but is under skills"
+ },
+ {
+  "name": "install entry prefix match",
+  "files": {
+   "user": "{\n  \"sources\": {\n    \"s\": {\n      \"git\": \"https://github.com/Getty/skills\"\n    }\n  },\n  \"install\": {\n    \"skills\": [\n      \"skill:a@s\"\n    ],\n    \"agents\": [\n      \"agent:b@s\"\n    ],\n    \"rules\": [\n      \"rule:c@s\"\n    ]\n  }\n}\n",
+   "project": null,
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "loaded": {
+   "sources": [
+    [
+     "s",
+     {
+      "name": "s",
+      "origins": {
+       "git": "user"
+      },
+      "git": "https://github.com/Getty/skills"
+     }
+    ]
+   ],
+   "checkInterval": 1800,
+   "user": {
+    "scope": "user",
+    "install": [
+     {
+      "type": "skill",
+      "name": "a",
+      "source": "s",
+      "target": "skills/a",
+      "raw": "skill:a@s"
+     },
+     {
+      "type": "agent",
+      "name": "b",
+      "source": "s",
+      "target": "agents/b",
+      "raw": "agent:b@s"
+     },
+     {
+      "type": "rule",
+      "name": "c",
+      "source": "s",
+      "target": "rules/c",
+      "raw": "rule:c@s"
+     }
+    ],
+    "wildcards": [],
+    "bundles": [],
+    "vars": {},
+    "gitignore": true,
+    "claudeSettings": true
+   },
+   "project": {
+    "scope": "project",
+    "install": [],
+    "wildcards": [],
+    "bundles": [],
+    "vars": {},
+    "gitignore": true,
+    "claudeSettings": true
+   },
+   "userSources": [
+    [
+     "s",
+     {
+      "name": "s",
+      "origins": {
+       "git": "user"
+      },
+      "git": "https://github.com/Getty/skills"
+     }
+    ]
+   ]
+  }
+ },
+ {
+  "name": "install entry name with at",
+  "files": {
+   "user": "{\n  \"sources\": {\n    \"s\": {\n      \"git\": \"https://github.com/Getty/skills\"\n    }\n  },\n  \"install\": {\n    \"skills\": [\n      \"a@b@s\"\n    ]\n  }\n}\n",
+   "project": null,
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "loaded": {
+   "sources": [
+    [
+     "s",
+     {
+      "name": "s",
+      "origins": {
+       "git": "user"
+      },
+      "git": "https://github.com/Getty/skills"
+     }
+    ]
+   ],
+   "checkInterval": 1800,
+   "user": {
+    "scope": "user",
+    "install": [
+     {
+      "type": "skill",
+      "name": "a@b",
+      "source": "s",
+      "target": "skills/a@b",
+      "raw": "a@b@s"
+     }
+    ],
+    "wildcards": [],
+    "bundles": [],
+    "vars": {},
+    "gitignore": true,
+    "claudeSettings": true
+   },
+   "project": {
+    "scope": "project",
+    "install": [],
+    "wildcards": [],
+    "bundles": [],
+    "vars": {},
+    "gitignore": true,
+    "claudeSettings": true
+   },
+   "userSources": [
+    [
+     "s",
+     {
+      "name": "s",
+      "origins": {
+       "git": "user"
+      },
+      "git": "https://github.com/Getty/skills"
+     }
+    ]
+   ]
+  }
+ },
+ {
+  "name": "install unknown source",
+  "files": {
+   "user": "{\n  \"sources\": {\n    \"s\": {\n      \"git\": \"https://github.com/Getty/skills\"\n    }\n  },\n  \"install\": {\n    \"skills\": [\n      \"a@t\"\n    ]\n  }\n}\n",
+   "project": null,
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<HOME>/.claude/skilletor.json: user install \"a@t\" references unknown source \"t\""
+ },
+ {
+  "name": "install unknown source project",
+  "files": {
+   "user": null,
+   "project": "{\n  \"install\": {\n    \"skills\": [\n      \"a@t\"\n    ]\n  }\n}\n",
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<PROJECT>/.claude/skilletor.json: project install \"a@t\" references unknown source \"t\""
+ },
+ {
+  "name": "install duplicate",
+  "files": {
+   "user": "{\n  \"sources\": {\n    \"s\": {\n      \"git\": \"https://github.com/Getty/skills\"\n    },\n    \"t\": {\n      \"git\": \"https://github.com/Getty/skills\"\n    }\n  },\n  \"install\": {\n    \"skills\": [\n      \"a@s\",\n      \"a@t\"\n    ]\n  }\n}\n",
+   "project": null,
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<HOME>/.claude/skilletor.json: duplicate skill target \"a\" declared as a@s and a@t"
+ },
+ {
+  "name": "install duplicate case",
+  "files": {
+   "user": "{\n  \"sources\": {\n    \"s\": {\n      \"git\": \"https://github.com/Getty/skills\"\n    },\n    \"t\": {\n      \"git\": \"https://github.com/Getty/skills\"\n    }\n  },\n  \"install\": {\n    \"skills\": [\n      \"Foo@s\",\n      \"foo@t\"\n    ]\n  }\n}\n",
+   "project": null,
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<HOME>/.claude/skilletor.json: duplicate skill target \"foo\" declared as Foo@s and foo@t"
+ },
+ {
+  "name": "install duplicate sigma",
+  "files": {
+   "user": "{\n  \"sources\": {\n    \"s\": {\n      \"git\": \"https://github.com/Getty/skills\"\n    },\n    \"t\": {\n      \"git\": \"https://github.com/Getty/skills\"\n    }\n  },\n  \"install\": {\n    \"skills\": [\n      \"ΟΔΟΣ@s\",\n      \"οδος@t\"\n    ]\n  }\n}\n",
+   "project": null,
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<HOME>/.claude/skilletor.json: duplicate skill target \"οδος\" declared as ΟΔΟΣ@s and οδος@t"
+ },
+ {
+  "name": "install same name two types",
+  "files": {
+   "user": "{\n  \"sources\": {\n    \"s\": {\n      \"git\": \"https://github.com/Getty/skills\"\n    }\n  },\n  \"install\": {\n    \"skills\": [\n      \"a@s\"\n    ],\n    \"agents\": [\n      \"a@s\"\n    ],\n    \"rules\": [\n      \"a@s\"\n    ]\n  }\n}\n",
+   "project": null,
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "loaded": {
+   "sources": [
+    [
+     "s",
+     {
+      "name": "s",
+      "origins": {
+       "git": "user"
+      },
+      "git": "https://github.com/Getty/skills"
+     }
+    ]
+   ],
+   "checkInterval": 1800,
+   "user": {
+    "scope": "user",
+    "install": [
+     {
+      "type": "skill",
+      "name": "a",
+      "source": "s",
+      "target": "skills/a",
+      "raw": "a@s"
+     },
+     {
+      "type": "agent",
+      "name": "a",
+      "source": "s",
+      "target": "agents/a",
+      "raw": "a@s"
+     },
+     {
+      "type": "rule",
+      "name": "a",
+      "source": "s",
+      "target": "rules/a",
+      "raw": "a@s"
+     }
+    ],
+    "wildcards": [],
+    "bundles": [],
+    "vars": {},
+    "gitignore": true,
+    "claudeSettings": true
+   },
+   "project": {
+    "scope": "project",
+    "install": [],
+    "wildcards": [],
+    "bundles": [],
+    "vars": {},
+    "gitignore": true,
+    "claudeSettings": true
+   },
+   "userSources": [
+    [
+     "s",
+     {
+      "name": "s",
+      "origins": {
+       "git": "user"
+      },
+      "git": "https://github.com/Getty/skills"
+     }
+    ]
+   ]
+  }
+ },
+ {
+  "name": "install duplicate across project and local",
+  "files": {
+   "user": null,
+   "project": "{\n  \"sources\": {\n    \"s\": {\n      \"git\": \"https://github.com/Getty/skills\"\n    }\n  },\n  \"install\": {\n    \"skills\": [\n      \"a@s\"\n    ]\n  }\n}\n",
+   "local": "{\n  \"install\": {\n    \"skills\": [\n      \"A@s\"\n    ]\n  }\n}\n"
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<PROJECT>/.claude/skilletor.json: duplicate skill target \"A\" declared as a@s and A@s"
+ },
+ {
+  "name": "wildcards",
+  "files": {
+   "user": "{\n  \"sources\": {\n    \"s\": {\n      \"git\": \"https://github.com/Getty/skills\"\n    },\n    \"t\": {\n      \"git\": \"https://github.com/Getty/skills\"\n    }\n  },\n  \"install\": {\n    \"skills\": [\n      \"*@s\",\n      \"perl-*@s\",\n      \"*-style@t\",\n      \"x@s\"\n    ],\n    \"rules\": [\n      \"rule:*@s\"\n    ]\n  }\n}\n",
+   "project": null,
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "loaded": {
+   "sources": [
+    [
+     "s",
+     {
+      "name": "s",
+      "origins": {
+       "git": "user"
+      },
+      "git": "https://github.com/Getty/skills"
+     }
+    ],
+    [
+     "t",
+     {
+      "name": "t",
+      "origins": {
+       "git": "user"
+      },
+      "git": "https://github.com/Getty/skills"
+     }
+    ]
+   ],
+   "checkInterval": 1800,
+   "user": {
+    "scope": "user",
+    "install": [
+     {
+      "type": "skill",
+      "name": "x",
+      "source": "s",
+      "target": "skills/x",
+      "raw": "x@s"
+     }
+    ],
+    "wildcards": [
+     {
+      "type": "skill",
+      "source": "s",
+      "pattern": "*",
+      "raw": "*@s"
+     },
+     {
+      "type": "skill",
+      "source": "s",
+      "pattern": "perl-*",
+      "raw": "perl-*@s"
+     },
+     {
+      "type": "skill",
+      "source": "t",
+      "pattern": "*-style",
+      "raw": "*-style@t"
+     },
+     {
+      "type": "rule",
+      "source": "s",
+      "pattern": "*",
+      "raw": "rule:*@s"
+     }
+    ],
+    "bundles": [],
+    "vars": {},
+    "gitignore": true,
+    "claudeSettings": true
+   },
+   "project": {
+    "scope": "project",
+    "install": [],
+    "wildcards": [],
+    "bundles": [],
+    "vars": {},
+    "gitignore": true,
+    "claudeSettings": true
+   },
+   "userSources": [
+    [
+     "s",
+     {
+      "name": "s",
+      "origins": {
+       "git": "user"
+      },
+      "git": "https://github.com/Getty/skills"
+     }
+    ],
+    [
+     "t",
+     {
+      "name": "t",
+      "origins": {
+       "git": "user"
+      },
+      "git": "https://github.com/Getty/skills"
+     }
+    ]
+   ]
+  }
+ },
+ {
+  "name": "wildcard unknown source",
+  "files": {
+   "user": "{\n  \"sources\": {\n    \"s\": {\n      \"git\": \"https://github.com/Getty/skills\"\n    }\n  },\n  \"install\": {\n    \"skills\": [\n      \"*@t\"\n    ]\n  }\n}\n",
+   "project": null,
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<HOME>/.claude/skilletor.json: user install \"*@t\" references unknown source \"t\""
+ },
+ {
+  "name": "wildcard prefix mismatch",
+  "files": {
+   "user": "{\n  \"sources\": {\n    \"s\": {\n      \"git\": \"https://github.com/Getty/skills\"\n    }\n  },\n  \"install\": {\n    \"rules\": [\n      \"skill:*@s\"\n    ]\n  }\n}\n",
+   "project": null,
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<HOME>/.claude/skilletor.json: install.rules[0] \"skill:*@s\" declares type \"skill\" but is under rules"
+ },
+ {
+  "name": "wildcard twice",
+  "files": {
+   "user": "{\n  \"sources\": {\n    \"s\": {\n      \"git\": \"https://github.com/Getty/skills\"\n    }\n  },\n  \"install\": {\n    \"skills\": [\n      \"*@s\",\n      \"*@s\"\n    ]\n  }\n}\n",
+   "project": null,
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<HOME>/.claude/skilletor.json: duplicate skill target \"*\" declared as *@s and *@s"
+ },
+ {
+  "name": "wildcard twice across project and local",
+  "files": {
+   "user": null,
+   "project": "{\n  \"sources\": {\n    \"s\": {\n      \"git\": \"https://github.com/Getty/skills\"\n    }\n  },\n  \"install\": {\n    \"skills\": [\n      \"perl-*@s\"\n    ]\n  }\n}\n",
+   "local": "{\n  \"install\": {\n    \"skills\": [\n      \"perl-*@s\"\n    ]\n  }\n}\n"
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<PROJECT>/.claude/skilletor.json: duplicate skill wildcard for \"s\" declared as perl-*@s and perl-*@s"
+ },
+ {
+  "name": "wildcard pattern case matters",
+  "files": {
+   "user": null,
+   "project": "{\n  \"sources\": {\n    \"s\": {\n      \"git\": \"https://github.com/Getty/skills\"\n    }\n  },\n  \"install\": {\n    \"skills\": [\n      \"Perl-*@s\",\n      \"perl-*@s\"\n    ]\n  }\n}\n",
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "loaded": {
+   "sources": [
+    [
+     "s",
+     {
+      "name": "s",
+      "origins": {
+       "git": "project"
+      },
+      "git": "https://github.com/Getty/skills"
+     }
+    ]
+   ],
+   "checkInterval": 1800,
+   "user": {
+    "scope": "user",
+    "install": [],
+    "wildcards": [],
+    "bundles": [],
+    "vars": {},
+    "gitignore": true,
+    "claudeSettings": true
+   },
+   "project": {
+    "scope": "project",
+    "install": [],
+    "wildcards": [
+     {
+      "type": "skill",
+      "source": "s",
+      "pattern": "Perl-*",
+      "raw": "Perl-*@s"
+     },
+     {
+      "type": "skill",
+      "source": "s",
+      "pattern": "perl-*",
+      "raw": "perl-*@s"
+     }
+    ],
+    "bundles": [],
+    "vars": {},
+    "gitignore": true,
+    "claudeSettings": true
+   },
+   "userSources": []
+  }
+ },
+ {
+  "name": "wildcards two sources",
+  "files": {
+   "user": "{\n  \"sources\": {\n    \"s\": {\n      \"git\": \"https://github.com/Getty/skills\"\n    },\n    \"t\": {\n      \"git\": \"https://github.com/Getty/skills\"\n    }\n  },\n  \"install\": {\n    \"skills\": [\n      \"*@s\",\n      \"*@t\"\n    ]\n  }\n}\n",
+   "project": null,
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "loaded": {
+   "sources": [
+    [
+     "s",
+     {
+      "name": "s",
+      "origins": {
+       "git": "user"
+      },
+      "git": "https://github.com/Getty/skills"
+     }
+    ],
+    [
+     "t",
+     {
+      "name": "t",
+      "origins": {
+       "git": "user"
+      },
+      "git": "https://github.com/Getty/skills"
+     }
+    ]
+   ],
+   "checkInterval": 1800,
+   "user": {
+    "scope": "user",
+    "install": [],
+    "wildcards": [
+     {
+      "type": "skill",
+      "source": "s",
+      "pattern": "*",
+      "raw": "*@s"
+     },
+     {
+      "type": "skill",
+      "source": "t",
+      "pattern": "*",
+      "raw": "*@t"
+     }
+    ],
+    "bundles": [],
+    "vars": {},
+    "gitignore": true,
+    "claudeSettings": true
+   },
+   "project": {
+    "scope": "project",
+    "install": [],
+    "wildcards": [],
+    "bundles": [],
+    "vars": {},
+    "gitignore": true,
+    "claudeSettings": true
+   },
+   "userSources": [
+    [
+     "s",
+     {
+      "name": "s",
+      "origins": {
+       "git": "user"
+      },
+      "git": "https://github.com/Getty/skills"
+     }
+    ],
+    [
+     "t",
+     {
+      "name": "t",
+      "origins": {
+       "git": "user"
+      },
+      "git": "https://github.com/Getty/skills"
+     }
+    ]
+   ]
+  }
+ },
+ {
+  "name": "bundles",
+  "files": {
+   "user": "{\n  \"sources\": {\n    \"s\": {\n      \"git\": \"https://github.com/Getty/skills\"\n    }\n  },\n  \"install\": {\n    \"bundles\": [\n      \"perl@s\",\n      \"bundle:k8s@s\"\n    ]\n  }\n}\n",
+   "project": null,
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "loaded": {
+   "sources": [
+    [
+     "s",
+     {
+      "name": "s",
+      "origins": {
+       "git": "user"
+      },
+      "git": "https://github.com/Getty/skills"
+     }
+    ]
+   ],
+   "checkInterval": 1800,
+   "user": {
+    "scope": "user",
+    "install": [],
+    "wildcards": [],
+    "bundles": [
+     {
+      "name": "perl",
+      "source": "s",
+      "raw": "perl@s"
+     },
+     {
+      "name": "k8s",
+      "source": "s",
+      "raw": "bundle:k8s@s"
+     }
+    ],
+    "vars": {},
+    "gitignore": true,
+    "claudeSettings": true
+   },
+   "project": {
+    "scope": "project",
+    "install": [],
+    "wildcards": [],
+    "bundles": [],
+    "vars": {},
+    "gitignore": true,
+    "claudeSettings": true
+   },
+   "userSources": [
+    [
+     "s",
+     {
+      "name": "s",
+      "origins": {
+       "git": "user"
+      },
+      "git": "https://github.com/Getty/skills"
+     }
+    ]
+   ]
+  }
+ },
+ {
+  "name": "bundles not array",
+  "files": {
+   "user": "{\n  \"sources\": {\n    \"s\": {\n      \"git\": \"https://github.com/Getty/skills\"\n    }\n  },\n  \"install\": {\n    \"bundles\": {}\n  }\n}\n",
+   "project": null,
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<HOME>/.claude/skilletor.json: install.bundles must be an array"
+ },
+ {
+  "name": "bundles entry not string",
+  "files": {
+   "user": "{\n  \"sources\": {\n    \"s\": {\n      \"git\": \"https://github.com/Getty/skills\"\n    }\n  },\n  \"install\": {\n    \"bundles\": [\n      1\n    ]\n  }\n}\n",
+   "project": null,
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<HOME>/.claude/skilletor.json: install.bundles[0] must be a string"
+ },
+ {
+  "name": "bundles bad prefix",
+  "files": {
+   "user": "{\n  \"sources\": {\n    \"s\": {\n      \"git\": \"https://github.com/Getty/skills\"\n    }\n  },\n  \"install\": {\n    \"bundles\": [\n      \"skill:x@s\"\n    ]\n  }\n}\n",
+   "project": null,
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<HOME>/.claude/skilletor.json: install.bundles[0] \"skill:x@s\" declares type \"skill\" but is under bundles"
+ },
+ {
+  "name": "bundles pattern",
+  "files": {
+   "user": "{\n  \"sources\": {\n    \"s\": {\n      \"git\": \"https://github.com/Getty/skills\"\n    }\n  },\n  \"install\": {\n    \"bundles\": [\n      \"perl-*@s\"\n    ]\n  }\n}\n",
+   "project": null,
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<HOME>/.claude/skilletor.json: install.bundles[0] \"perl-*@s\": patterns over bundle names are not supported"
+ },
+ {
+  "name": "bundles empty name",
+  "files": {
+   "user": "{\n  \"sources\": {\n    \"s\": {\n      \"git\": \"https://github.com/Getty/skills\"\n    }\n  },\n  \"install\": {\n    \"bundles\": [\n      \"bundle:@s\"\n    ]\n  }\n}\n",
+   "project": null,
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<HOME>/.claude/skilletor.json: install.bundles[0] \"bundle:@s\" has an empty name"
+ },
+ {
+  "name": "bundles no at",
+  "files": {
+   "user": "{\n  \"sources\": {\n    \"s\": {\n      \"git\": \"https://github.com/Getty/skills\"\n    }\n  },\n  \"install\": {\n    \"bundles\": [\n      \"perl\"\n    ]\n  }\n}\n",
+   "project": null,
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<HOME>/.claude/skilletor.json: install.bundles[0] \"perl\" must be name@source"
+ },
+ {
+  "name": "bundles unknown source",
+  "files": {
+   "user": "{\n  \"sources\": {\n    \"s\": {\n      \"git\": \"https://github.com/Getty/skills\"\n    }\n  },\n  \"install\": {\n    \"bundles\": [\n      \"perl@t\"\n    ]\n  }\n}\n",
+   "project": null,
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<HOME>/.claude/skilletor.json: user install \"perl@t\" references unknown source \"t\""
+ },
+ {
+  "name": "bundles duplicate",
+  "files": {
+   "user": "{\n  \"sources\": {\n    \"s\": {\n      \"git\": \"https://github.com/Getty/skills\"\n    }\n  },\n  \"install\": {\n    \"bundles\": [\n      \"perl@s\",\n      \"bundle:perl@s\"\n    ]\n  }\n}\n",
+   "project": null,
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<HOME>/.claude/skilletor.json: duplicate bundle \"perl@s\" declared as perl@s and bundle:perl@s"
+ },
+ {
+  "name": "bundles case differs",
+  "files": {
+   "user": "{\n  \"sources\": {\n    \"s\": {\n      \"git\": \"https://github.com/Getty/skills\"\n    }\n  },\n  \"install\": {\n    \"bundles\": [\n      \"perl@s\",\n      \"Perl@s\"\n    ]\n  }\n}\n",
+   "project": null,
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "loaded": {
+   "sources": [
+    [
+     "s",
+     {
+      "name": "s",
+      "origins": {
+       "git": "user"
+      },
+      "git": "https://github.com/Getty/skills"
+     }
+    ]
+   ],
+   "checkInterval": 1800,
+   "user": {
+    "scope": "user",
+    "install": [],
+    "wildcards": [],
+    "bundles": [
+     {
+      "name": "perl",
+      "source": "s",
+      "raw": "perl@s"
+     },
+     {
+      "name": "Perl",
+      "source": "s",
+      "raw": "Perl@s"
+     }
+    ],
+    "vars": {},
+    "gitignore": true,
+    "claudeSettings": true
+   },
+   "project": {
+    "scope": "project",
+    "install": [],
+    "wildcards": [],
+    "bundles": [],
+    "vars": {},
+    "gitignore": true,
+    "claudeSettings": true
+   },
+   "userSources": [
+    [
+     "s",
+     {
+      "name": "s",
+      "origins": {
+       "git": "user"
+      },
+      "git": "https://github.com/Getty/skills"
+     }
+    ]
+   ]
+  }
+ },
+ {
+  "name": "bundles duplicate across project and local",
+  "files": {
+   "user": null,
+   "project": "{\n  \"sources\": {\n    \"s\": {\n      \"git\": \"https://github.com/Getty/skills\"\n    }\n  },\n  \"install\": {\n    \"bundles\": [\n      \"perl@s\"\n    ]\n  }\n}\n",
+   "local": "{\n  \"install\": {\n    \"bundles\": [\n      \"perl@s\"\n    ]\n  }\n}\n"
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<PROJECT>/.claude/skilletor.json: duplicate bundle \"perl@s\" declared as perl@s and perl@s"
+ },
+ {
+  "name": "install types checked before entries",
+  "files": {
+   "user": "{\n  \"sources\": {\n    \"s\": {\n      \"git\": \"https://github.com/Getty/skills\"\n    }\n  },\n  \"install\": {\n    \"skills\": [\n      5\n    ],\n    \"bogus\": []\n  }\n}\n",
+   "project": null,
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<HOME>/.claude/skilletor.json: install.bogus is not a valid type (skills, agents, rules, bundles)"
+ },
+ {
+  "name": "bundles checked after types",
+  "files": {
+   "user": "{\n  \"sources\": {\n    \"s\": {\n      \"git\": \"https://github.com/Getty/skills\"\n    }\n  },\n  \"install\": {\n    \"bundles\": [\n      1\n    ],\n    \"rules\": [\n      2\n    ]\n  }\n}\n",
+   "project": null,
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<HOME>/.claude/skilletor.json: install.rules[0] must be a string"
+ },
+ {
+  "name": "vars merge",
+  "files": {
+   "user": "{\n  \"vars\": {\n    \"a\": 1,\n    \"b\": \"u\",\n    \"n\": {\n      \"x\": 1\n    }\n  }\n}\n",
+   "project": "{\n  \"vars\": {\n    \"2\": 2,\n    \"b\": \"p\",\n    \"c\": true\n  }\n}\n",
+   "local": "{\n  \"vars\": {\n    \"c\": false,\n    \"d\": null\n  }\n}\n"
+  },
+  "noProject": false,
+  "unchecked": null,
+  "loaded": {
+   "sources": [],
+   "checkInterval": 1800,
+   "user": {
+    "scope": "user",
+    "install": [],
+    "wildcards": [],
+    "bundles": [],
+    "vars": {
+     "a": 1,
+     "b": "u",
+     "n": {
+      "x": 1
+     }
+    },
+    "gitignore": true,
+    "claudeSettings": true
+   },
+   "project": {
+    "scope": "project",
+    "install": [],
+    "wildcards": [],
+    "bundles": [],
+    "vars": {
+     "2": 2,
+     "a": 1,
+     "b": "p",
+     "n": {
+      "x": 1
+     },
+     "c": false,
+     "d": null
+    },
+    "gitignore": true,
+    "claudeSettings": true
+   },
+   "userSources": []
+  }
+ },
+ {
+  "name": "vars not object user",
+  "files": {
+   "user": "{\n  \"vars\": [\n    1\n  ]\n}\n",
+   "project": null,
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<HOME>/.claude/skilletor.json: vars must be an object"
+ },
+ {
+  "name": "vars not object project",
+  "files": {
+   "user": null,
+   "project": "{\n  \"vars\": \"x\"\n}\n",
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<PROJECT>/.claude/skilletor.json: vars must be an object"
+ },
+ {
+  "name": "vars null local",
+  "files": {
+   "user": null,
+   "project": null,
+   "local": "{\n  \"vars\": null\n}\n"
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<PROJECT>/.claude/skilletor.local.json: vars must be an object"
+ },
+ {
+  "name": "gitignore user false",
+  "files": {
+   "user": "{\n  \"gitignore\": false\n}\n",
+   "project": null,
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "loaded": {
+   "sources": [],
+   "checkInterval": 1800,
+   "user": {
+    "scope": "user",
+    "install": [],
+    "wildcards": [],
+    "bundles": [],
+    "vars": {},
+    "gitignore": false,
+    "claudeSettings": true
+   },
+   "project": {
+    "scope": "project",
+    "install": [],
+    "wildcards": [],
+    "bundles": [],
+    "vars": {},
+    "gitignore": true,
+    "claudeSettings": true
+   },
+   "userSources": []
+  }
+ },
+ {
+  "name": "gitignore user not bool",
+  "files": {
+   "user": "{\n  \"gitignore\": \"no\"\n}\n",
+   "project": null,
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<HOME>/.claude/skilletor.json: \"gitignore\" must be a boolean"
+ },
+ {
+  "name": "gitignore user null",
+  "files": {
+   "user": "{\n  \"gitignore\": null\n}\n",
+   "project": null,
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<HOME>/.claude/skilletor.json: \"gitignore\" must be a boolean"
+ },
+ {
+  "name": "gitignore project false",
+  "files": {
+   "user": null,
+   "project": "{\n  \"gitignore\": false\n}\n",
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "loaded": {
+   "sources": [],
+   "checkInterval": 1800,
+   "user": {
+    "scope": "user",
+    "install": [],
+    "wildcards": [],
+    "bundles": [],
+    "vars": {},
+    "gitignore": true,
+    "claudeSettings": true
+   },
+   "project": {
+    "scope": "project",
+    "install": [],
+    "wildcards": [],
+    "bundles": [],
+    "vars": {},
+    "gitignore": false,
+    "claudeSettings": true
+   },
+   "userSources": []
+  }
+ },
+ {
+  "name": "gitignore local over project",
+  "files": {
+   "user": null,
+   "project": "{\n  \"gitignore\": false\n}\n",
+   "local": "{\n  \"gitignore\": true\n}\n"
+  },
+  "noProject": false,
+  "unchecked": null,
+  "loaded": {
+   "sources": [],
+   "checkInterval": 1800,
+   "user": {
+    "scope": "user",
+    "install": [],
+    "wildcards": [],
+    "bundles": [],
+    "vars": {},
+    "gitignore": true,
+    "claudeSettings": true
+   },
+   "project": {
+    "scope": "project",
+    "install": [],
+    "wildcards": [],
+    "bundles": [],
+    "vars": {},
+    "gitignore": true,
+    "claudeSettings": true
+   },
+   "userSources": []
+  }
+ },
+ {
+  "name": "gitignore local bad named as project",
+  "files": {
+   "user": null,
+   "project": null,
+   "local": "{\n  \"gitignore\": 1\n}\n"
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<PROJECT>/.claude/skilletor.json: \"gitignore\" must be a boolean"
+ },
+ {
+  "name": "gitignore local null falls to project",
+  "files": {
+   "user": null,
+   "project": "{\n  \"gitignore\": false\n}\n",
+   "local": "{\n  \"gitignore\": null\n}\n"
+  },
+  "noProject": false,
+  "unchecked": null,
+  "loaded": {
+   "sources": [],
+   "checkInterval": 1800,
+   "user": {
+    "scope": "user",
+    "install": [],
+    "wildcards": [],
+    "bundles": [],
+    "vars": {},
+    "gitignore": true,
+    "claudeSettings": true
+   },
+   "project": {
+    "scope": "project",
+    "install": [],
+    "wildcards": [],
+    "bundles": [],
+    "vars": {},
+    "gitignore": false,
+    "claudeSettings": true
+   },
+   "userSources": []
+  }
+ },
+ {
+  "name": "gitignore project null",
+  "files": {
+   "user": null,
+   "project": "{\n  \"gitignore\": null\n}\n",
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<PROJECT>/.claude/skilletor.json: \"gitignore\" must be a boolean"
+ },
+ {
+  "name": "claudeSettings user false flows to project",
+  "files": {
+   "user": "{\n  \"claudeSettings\": false\n}\n",
+   "project": null,
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "loaded": {
+   "sources": [],
+   "checkInterval": 1800,
+   "user": {
+    "scope": "user",
+    "install": [],
+    "wildcards": [],
+    "bundles": [],
+    "vars": {},
+    "gitignore": true,
+    "claudeSettings": false
+   },
+   "project": {
+    "scope": "project",
+    "install": [],
+    "wildcards": [],
+    "bundles": [],
+    "vars": {},
+    "gitignore": true,
+    "claudeSettings": false
+   },
+   "userSources": []
+  }
+ },
+ {
+  "name": "claudeSettings project true over user false",
+  "files": {
+   "user": "{\n  \"claudeSettings\": false\n}\n",
+   "project": "{\n  \"claudeSettings\": true\n}\n",
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "loaded": {
+   "sources": [],
+   "checkInterval": 1800,
+   "user": {
+    "scope": "user",
+    "install": [],
+    "wildcards": [],
+    "bundles": [],
+    "vars": {},
+    "gitignore": true,
+    "claudeSettings": false
+   },
+   "project": {
+    "scope": "project",
+    "install": [],
+    "wildcards": [],
+    "bundles": [],
+    "vars": {},
+    "gitignore": true,
+    "claudeSettings": true
+   },
+   "userSources": []
+  }
+ },
+ {
+  "name": "claudeSettings local over project",
+  "files": {
+   "user": null,
+   "project": "{\n  \"claudeSettings\": true\n}\n",
+   "local": "{\n  \"claudeSettings\": false\n}\n"
+  },
+  "noProject": false,
+  "unchecked": null,
+  "loaded": {
+   "sources": [],
+   "checkInterval": 1800,
+   "user": {
+    "scope": "user",
+    "install": [],
+    "wildcards": [],
+    "bundles": [],
+    "vars": {},
+    "gitignore": true,
+    "claudeSettings": true
+   },
+   "project": {
+    "scope": "project",
+    "install": [],
+    "wildcards": [],
+    "bundles": [],
+    "vars": {},
+    "gitignore": true,
+    "claudeSettings": false
+   },
+   "userSources": []
+  }
+ },
+ {
+  "name": "claudeSettings bad local",
+  "files": {
+   "user": null,
+   "project": null,
+   "local": "{\n  \"claudeSettings\": \"x\"\n}\n"
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<PROJECT>/.claude/skilletor.local.json: \"claudeSettings\" must be a boolean"
+ },
+ {
+  "name": "claudeSettings bad project and local",
+  "files": {
+   "user": null,
+   "project": "{\n  \"claudeSettings\": 1\n}\n",
+   "local": "{\n  \"claudeSettings\": \"x\"\n}\n"
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<PROJECT>/.claude/skilletor.json: \"claudeSettings\" must be a boolean"
+ },
+ {
+  "name": "claudeSettings null project",
+  "files": {
+   "user": null,
+   "project": "{\n  \"claudeSettings\": null\n}\n",
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<PROJECT>/.claude/skilletor.json: \"claudeSettings\" must be a boolean"
+ },
+ {
+  "name": "targets all levels",
+  "files": {
+   "user": "{\n  \"targets\": [\n    \"claude\",\n    \"codex\"\n  ]\n}\n",
+   "project": "{\n  \"targets\": [\n    \"codex\"\n  ]\n}\n",
+   "local": "{\n  \"targets\": [\n    \"claude\"\n  ]\n}\n"
+  },
+  "noProject": false,
+  "unchecked": null,
+  "loaded": {
+   "sources": [],
+   "checkInterval": 1800,
+   "user": {
+    "scope": "user",
+    "install": [],
+    "wildcards": [],
+    "bundles": [],
+    "vars": {},
+    "gitignore": true,
+    "claudeSettings": true,
+    "targets": [
+     "claude",
+     "codex"
+    ]
+   },
+   "project": {
+    "scope": "project",
+    "install": [],
+    "wildcards": [],
+    "bundles": [],
+    "vars": {},
+    "gitignore": true,
+    "claudeSettings": true,
+    "targets": [
+     "claude"
+    ]
+   },
+   "userSources": []
+  }
+ },
+ {
+  "name": "targets project only",
+  "files": {
+   "user": null,
+   "project": "{\n  \"targets\": [\n    \"hermes\"\n  ]\n}\n",
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "loaded": {
+   "sources": [],
+   "checkInterval": 1800,
+   "user": {
+    "scope": "user",
+    "install": [],
+    "wildcards": [],
+    "bundles": [],
+    "vars": {},
+    "gitignore": true,
+    "claudeSettings": true
+   },
+   "project": {
+    "scope": "project",
+    "install": [],
+    "wildcards": [],
+    "bundles": [],
+    "vars": {},
+    "gitignore": true,
+    "claudeSettings": true,
+    "targets": [
+     "hermes"
+    ]
+   },
+   "userSources": []
+  }
+ },
+ {
+  "name": "targets empty",
+  "files": {
+   "user": "{\n  \"targets\": []\n}\n",
+   "project": null,
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<HOME>/.claude/skilletor.json: \"targets\" must be a non-empty array (of claude, codex, hermes)"
+ },
+ {
+  "name": "targets not array",
+  "files": {
+   "user": null,
+   "project": "{\n  \"targets\": \"claude\"\n}\n",
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<PROJECT>/.claude/skilletor.json: \"targets\" must be a non-empty array (of claude, codex, hermes)"
+ },
+ {
+  "name": "targets null",
+  "files": {
+   "user": null,
+   "project": null,
+   "local": "{\n  \"targets\": null\n}\n"
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<PROJECT>/.claude/skilletor.local.json: \"targets\" must be a non-empty array (of claude, codex, hermes)"
+ },
+ {
+  "name": "targets unknown",
+  "files": {
+   "user": "{\n  \"targets\": [\n    \"claude\",\n    \"cursor\"\n  ]\n}\n",
+   "project": null,
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<HOME>/.claude/skilletor.json: \"targets\" has unknown harness \"cursor\" (allowed: claude, codex, hermes)"
+ },
+ {
+  "name": "targets number",
+  "files": {
+   "user": "{\n  \"targets\": [\n    1\n  ]\n}\n",
+   "project": null,
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<HOME>/.claude/skilletor.json: \"targets\" has unknown harness 1 (allowed: claude, codex, hermes)"
+ },
+ {
+  "name": "targets duplicate",
+  "files": {
+   "user": "{\n  \"targets\": [\n    \"codex\",\n    \"codex\"\n  ]\n}\n",
+   "project": null,
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": null,
+  "error": "<HOME>/.claude/skilletor.json: \"targets\" lists \"codex\" twice"
+ },
+ {
+  "name": "unchecked source in user",
+  "files": {
+   "user": "{\n  \"sources\": {\n    \"s\": {\n      \"ref\": \"x\"\n    },\n    \"t\": {\n      \"git\": \"https://github.com/Getty/skills\"\n    }\n  }\n}\n",
+   "project": null,
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": {
+   "file": "user",
+   "name": "s"
+  },
+  "loaded": {
+   "sources": [
+    [
+     "s",
+     {
+      "name": "s",
+      "origins": {}
+     }
+    ],
+    [
+     "t",
+     {
+      "name": "t",
+      "origins": {
+       "git": "user"
+      },
+      "git": "https://github.com/Getty/skills"
+     }
+    ]
+   ],
+   "checkInterval": 1800,
+   "user": {
+    "scope": "user",
+    "install": [],
+    "wildcards": [],
+    "bundles": [],
+    "vars": {},
+    "gitignore": true,
+    "claudeSettings": true
+   },
+   "project": {
+    "scope": "project",
+    "install": [],
+    "wildcards": [],
+    "bundles": [],
+    "vars": {},
+    "gitignore": true,
+    "claudeSettings": true
+   },
+   "userSources": [
+    [
+     "s",
+     {
+      "name": "s",
+      "origins": {}
+     }
+    ],
+    [
+     "t",
+     {
+      "name": "t",
+      "origins": {
+       "git": "user"
+      },
+      "git": "https://github.com/Getty/skills"
+     }
+    ]
+   ]
+  }
+ },
+ {
+  "name": "unchecked invalid name tolerated",
+  "files": {
+   "user": null,
+   "project": "{\n  \"sources\": {\n    \"-x\": \"anything\"\n  }\n}\n",
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": {
+   "file": "project",
+   "name": "-x"
+  },
+  "loaded": {
+   "sources": [
+    [
+     "-x",
+     {
+      "name": "-x",
+      "origins": {}
+     }
+    ]
+   ],
+   "checkInterval": 1800,
+   "user": {
+    "scope": "user",
+    "install": [],
+    "wildcards": [],
+    "bundles": [],
+    "vars": {},
+    "gitignore": true,
+    "claudeSettings": true
+   },
+   "project": {
+    "scope": "project",
+    "install": [],
+    "wildcards": [],
+    "bundles": [],
+    "vars": {},
+    "gitignore": true,
+    "claudeSettings": true
+   },
+   "userSources": []
+  }
+ },
+ {
+  "name": "unchecked other file still checked",
+  "files": {
+   "user": null,
+   "project": "{\n  \"sources\": {\n    \"s\": {\n      \"ref\": \"a\"\n    }\n  }\n}\n",
+   "local": "{\n  \"sources\": {\n    \"s\": {\n      \"ref\": \"b\"\n    }\n  }\n}\n"
+  },
+  "noProject": false,
+  "unchecked": {
+   "file": "local",
+   "name": "s"
+  },
+  "loaded": {
+   "sources": [
+    [
+     "s",
+     {
+      "name": "s",
+      "origins": {},
+      "ref": "a"
+     }
+    ]
+   ],
+   "checkInterval": 1800,
+   "user": {
+    "scope": "user",
+    "install": [],
+    "wildcards": [],
+    "bundles": [],
+    "vars": {},
+    "gitignore": true,
+    "claudeSettings": true
+   },
+   "project": {
+    "scope": "project",
+    "install": [],
+    "wildcards": [],
+    "bundles": [],
+    "vars": {},
+    "gitignore": true,
+    "claudeSettings": true
+   },
+   "userSources": []
+  }
+ },
+ {
+  "name": "unchecked user entry not an override",
+  "files": {
+   "user": "{\n  \"sources\": {\n    \"s\": {\n      \"ref\": \"x\"\n    }\n  },\n  \"install\": {\n    \"skills\": [\n      \"a@s\"\n    ]\n  }\n}\n",
+   "project": null,
+   "local": null
+  },
+  "noProject": false,
+  "unchecked": {
+   "file": "user",
+   "name": "s"
+  },
+  "loaded": {
+   "sources": [
+    [
+     "s",
+     {
+      "name": "s",
+      "origins": {}
+     }
+    ]
+   ],
+   "checkInterval": 1800,
+   "user": {
+    "scope": "user",
+    "install": [
+     {
+      "type": "skill",
+      "name": "a",
+      "source": "s",
+      "target": "skills/a",
+      "raw": "a@s"
+     }
+    ],
+    "wildcards": [],
+    "bundles": [],
+    "vars": {},
+    "gitignore": true,
+    "claudeSettings": true
+   },
+   "project": {
+    "scope": "project",
+    "install": [],
+    "wildcards": [],
+    "bundles": [],
+    "vars": {},
+    "gitignore": true,
+    "claudeSettings": true
+   },
+   "userSources": [
+    [
+     "s",
+     {
+      "name": "s",
+      "origins": {}
+     }
+    ]
+   ]
+  }
+ }
+]

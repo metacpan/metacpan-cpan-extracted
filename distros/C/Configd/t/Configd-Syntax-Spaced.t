@@ -72,10 +72,9 @@ subtest 'opendkim and opendmarc are values, last one wins' => sub {
         );
         is( value_of( $merged, 'UMask' ), '000', "$name: the later fragment wins" );
 
-        # Nothing in either file is a list somebody adds to, so nothing should
-        # be quietly joined.
-        ok( !$language->accumulates('UMask'), "$name: nothing accumulates" );
-        ok( !$language->repeats('UMask'),     "$name: nothing repeats" );
+        # A value is not a list somebody adds to, so it is not quietly joined.
+        ok( !$language->accumulates('UMask'), "$name: a value does not accumulate" );
+        ok( !$language->repeats('UMask'),     "$name: nor repeat" );
     }
 
     # Both files hold a signing key's location and are 0600 because of it.
@@ -83,6 +82,27 @@ subtest 'opendkim and opendmarc are values, last one wins' => sub {
         my ($file) = "Configd::Language::$name"->files();
         is( $file->{mode}, 0o600, "$name: a file created from nothing is 0600" );
     }
+};
+
+subtest 'opendmarc trusts every authserv-id that a fragment names' => sub {
+
+    # Each mail domain on a host names its own trusted ids, and one opendmarc
+    # serves them all.  Last one wins would trust only the last domain's.
+    my $opendmarc = 'Configd::Language::opendmarc'->new();
+    my $merged    = $opendmarc->merge(
+        $opendmarc->parse("TrustedAuthservIDs mail.a.test.test, edge.a.test.test\n"),
+        $opendmarc->parse("TrustedAuthservIDs mail.b.test.test,edge.a.test.test\n"),
+    );
+
+    is(
+        value_of( $merged, 'TrustedAuthservIDs' ),
+        'mail.a.test.test, edge.a.test.test, mail.b.test.test',
+        'every id once, in the order first named'
+    );
+    is( scalar( lines_for( $opendmarc, $merged, 'TrustedAuthservIDs' ) ), 1, 'on the one line opendmarc reads' );
+
+    # opendmarc writes its own verdicts under one name.
+    ok( !$opendmarc->accumulates('AuthservID'), 'AuthservID stays one value' );
 };
 
 subtest 'redis says some things more than once and means each of them' => sub {

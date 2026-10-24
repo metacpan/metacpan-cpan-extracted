@@ -1,0 +1,21 @@
+title: A request goes to the node serving its model; a model nobody serves answers 503 model_not_found, no node is touched
+setup:
+  nodes:
+    - { id: alpha, model: m-alpha, upstream: { fallback: { answer: "from alpha" } } }
+    - { id: beta,  model: m-beta,  upstream: { fallback: { answer: "from beta" } } }
+steps:
+  - chat: { protocol: openai, model: m-alpha, prompt: x }
+    expect: { text: from alpha, headers: { x-skeid-node: alpha } }
+  - chat: { protocol: openai, model: m-beta, prompt: x }
+    expect: { text: from beta, headers: { x-skeid-node: beta } }
+    upstream:
+      alpha: { requests: 1 }
+      beta: { requests: 1 }
+  - chat: { protocol: openai, model: m-gamma, prompt: x }
+    expect: { status: 503, json: { error.type: model_not_found } }
+    upstream:
+      alpha: { requests: 1 }
+      beta: { requests: 1 }
+  - http: { method: GET, path: /v1/models }
+    expect:
+      json: { 'data.0.id': m-alpha, 'data.1.id': m-beta }

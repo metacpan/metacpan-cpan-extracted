@@ -13,11 +13,11 @@ use App::Actions::Action;
 use App::Actions::I18N qw(i18n throw validate_args);
 use App::Actions::Util ();
 use App::Actions::Runner::Support qw(
-	action_inputs boolean_value chomp_error env_args has_status_function
-	local_action_dir redact resolve_env status_flags write_container_file
+	action_inputs boolean_value default_logger env_args has_status_function
+	local_action_dir redact resolve_env status_flags trim_error write_container_file
 );
 
-our $VERSION = '0.001.0';
+our $VERSION = '0.002.0';
 
 # Where the project and the runner directory appear inside the container.
 Readonly::Scalar my $WORKSPACE => '/github/workspace';
@@ -149,7 +149,17 @@ C<path>, C<has_bash>, C<has_node>.
 =item * C<job_env>, C<context> - the job's environment and expression context.
 
 =item * C<quiet>, C<verbose>, C<dry_run>, C<strict_actions> - optional flags;
-C<user> - optional; the container user.
+C<user> - optional; the container user.  C<share_files> - optional; make the
+step files writable by every user (0666) rather than private (0600), for a
+container user other than the owner of the runner directory.
+
+=item * C<logger> - optional; a L<Log::Abstraction> object (default:
+L<App::Actions::Runner::Support/default_logger>, standard error).  A failed
+step and a post step that exited with an error are logged at the C<error>
+level.  A condition, environment or C<continue-on-error> value that could
+not be evaluated, an C<actions/checkout> input that is ignored, and a post
+step that could not be run are logged at the C<warn> level.  Nothing is
+logged with C<quiet>.
 
 =back
 
@@ -170,7 +180,7 @@ See the L</SYNOPSIS>.
 =head4 INPUT
 
 	{
-		expression     => { type => 'object', can => 'interpolate' },
+		expression     => { type => 'object', can => [qw(interpolate condition)] },
 		docker         => { type => 'object', can => 'container_exec' },
 		images         => { type => 'object', can => 'ensure' },
 		containers     => { type => 'object', can => 'run_action' },
@@ -184,10 +194,12 @@ See the L</SYNOPSIS>.
 		job_env        => { type => 'hashref' },
 		context        => { type => 'hashref' },
 		user           => { type => 'string', optional => 1 },
+		share_files    => { type => 'boolean', optional => 1 },
 		quiet          => { type => 'boolean', optional => 1 },
 		verbose        => { type => 'boolean', optional => 1 },
 		dry_run        => { type => 'boolean', optional => 1 },
 		strict_actions => { type => 'boolean', optional => 1 },
+		logger         => { type => 'object', can => [qw(warn error notice)], optional => 1 },
 	}
 
 =head4 OUTPUT
@@ -209,7 +221,7 @@ sub new {
 	my $class = shift;
 
 	my $params = validate_args(__PACKAGE__ . '::new', \@_, {
-		expression => { type => 'object', can => 'interpolate' },
+		expression => { type => 'object', can => [qw(interpolate condition)] },
 		docker => { type => 'object', can => 'container_exec' },
 		images => { type => 'object', can => 'ensure' },
 		containers => { type => 'object', can => 'run_action' },
@@ -228,6 +240,8 @@ sub new {
 		verbose => { type => 'boolean', optional => 1 },
 		dry_run => { type => 'boolean', optional => 1 },
 		strict_actions => { type => 'boolean', optional => 1 },
+		# Where warnings and errors go; standard error when none is given.
+		logger => { type => 'object', can => [qw(warn error notice)], optional => 1 },
 	});
 
 	my $counter = 0;
@@ -236,6 +250,7 @@ sub new {
 
 	return bless {
 		%{$params},
+		logger => $params->{logger} || default_logger(),
 		base_path => $facts->{path},
 		has_bash => $facts->{has_bash} ? 1 : 0,
 		has_node => $facts->{has_node} ? 1 : 0,
@@ -303,12 +318,36 @@ writes and removes the step files.
 	| skipped: REASON             |                              | it fail instead             |
 	| Shell 'bash' is not         | The image has no bash        | Use shell: sh, or an image  |
 	| available in the container  |                              | with bash                   |
+	| Unable to read the args of  | A docker:// action's         | Close the quote, or escape  |
+	| 'X' ('A'): a quote is not   | with.args has a quote that   | it with a backslash         |
+	| closed                      | is not closed                |                             |
+	| Docker action 'X' in job 'J'| A docker:// image resolved to| Fix the expression it uses  |
+	| has no image name / resolved| nothing, or to text that is  |                             |
+	| to 'I', which is not ...    | not an image name            |                             |
+	| Local action 'X' does not   | No directory at that path    | Check the uses: path        |
+	| exist (looked in D)         |                              |                             |
+	| Composite action 'X' is     | Local actions use each other | Break the loop              |
+	| nested more than N levels   | too deeply (or themselves)   |                             |
+	| JavaScript action 'X' needs | The job image has no node    | Use an image with Node.js   |
+	| Node.js, but 'node' was not |                              |                             |
+	| found in the job container  |                              |                             |
+	| !! post step for 'X' exited | A JavaScript action's post   | Read its output above       |
+	| with status N               | step failed                  |                             |
 	+-----------------------------+------------------------------+-----------------------------+
+
+A message raised while a step runs (the action, args and nesting messages
+above) is logged as C<action-run: MESSAGE> and then, because it fails the
+step, as C<!! MESSAGE>.  None names a source line: they are about the
+workflow.
 
 =cut
 
 sub run {
 	my ($self) = @_;
+
+	# A step's condition, environment and failure are each evaluated in an
+	# eval; the caller's $@ is its own.
+	local $@;
 
 	$self->_execute_step($_) for @{ $self->{job}{steps} };
 	$self->_run_post_actions;
@@ -338,7 +377,7 @@ sub _execute_step {
 	# condition is looked at, because the condition may read that env.
 	my $step_env = eval { resolve_env($self->{expression}, [ $job_env, $step->{env} ], $ctx) };
 	if (!$step_env) {
-		$self->_complain('runner.step.env_failed', { step => $internal_id, error => chomp_error($@) });
+		$self->_complain('runner.step.env_failed', { step => $internal_id, error => trim_error($@) });
 		$self->_fail_job;
 		$self->_record($step_id, 'failure', 'failure', {});
 		return 'failure';
@@ -349,8 +388,10 @@ sub _execute_step {
 
 	my $should_run = eval { $self->_should_run($step->{if}, \%condition_context, $status) };
 	if (!defined $should_run) {
-		$self->_complain('runner.step.if_failed', { step => $internal_id, error => chomp_error($@) });
+		$self->_complain('runner.step.if_failed', { step => $internal_id, error => trim_error($@) });
 		$self->_fail_job;
+		# Recorded as an env failure is, so a later steps.ID.outcome sees it.
+		$self->_record($step_id, 'failure', 'failure', {});
 		return 'failure';
 	}
 
@@ -370,7 +411,7 @@ sub _execute_step {
 		1;
 	};
 	if (!$ran) {
-		my $error = chomp_error($@);
+		my $error = trim_error($@);
 		$self->_complain('runner.error', { error => $error });
 		$result = { outcome => 'failure', error => $error };
 	}
@@ -417,7 +458,7 @@ sub _conclude {
 	my $continue = 0;
 	if (defined $step->{'continue-on-error'}) {
 		$continue = eval { boolean_value($self->{expression}, $step->{'continue-on-error'}, $context, $status) };
-		$self->_complain('runner.step.continue_failed', { error => chomp_error($@) }) unless defined $continue;
+		$self->_complain('runner.step.continue_failed', { error => trim_error($@) }) unless defined $continue;
 	}
 
 	my $outcome = $result->{outcome} || 'success';
@@ -428,7 +469,7 @@ sub _conclude {
 	} elsif ($outcome eq 'failure') {
 		$self->{failed} = 1;
 		my $message = $result->{error} || $self->i18n('runner.step.failed_default');
-		print STDERR $self->i18n('runner.step.failure', { message => $message }), "\n" unless $self->{quiet};
+		$self->{logger}->error($self->i18n('runner.step.failure', { message => $message })) unless $self->{quiet};
 	}
 
 	# What the step exported is the job's from now on, and a path it added
@@ -495,7 +536,7 @@ sub _run_post_actions {
 
 		my $should_run = eval { $self->{expression}->condition($post->{condition}, \%post_ctx, $status) };
 		if (!defined $should_run) {
-			$self->_complain('runner.post.if_failed', { uses => $post->{uses}, error => chomp_error($@) });
+			$self->_complain('runner.post.if_failed', { uses => $post->{uses}, error => trim_error($@) });
 			next;
 		}
 		next unless $should_run;
@@ -511,9 +552,9 @@ sub _run_post_actions {
 
 		# A failed post step fails the job, and later posts see failure().
 		if (!defined $rc) {
-			$self->_complain('runner.post.failed', { uses => $post->{uses}, error => chomp_error($@) });
+			$self->_complain('runner.post.failed', { uses => $post->{uses}, error => trim_error($@) });
 		} elsif ($rc != 0) {
-			print STDERR $self->i18n('runner.post.exited', { uses => $post->{uses}, status => $rc }), "\n"
+			$self->{logger}->error($self->i18n('runner.post.exited', { uses => $post->{uses}, status => $rc }))
 				unless $self->{quiet};
 		}
 		next if defined $rc && $rc == 0;
@@ -594,7 +635,10 @@ sub _run_uses_step {
 	}
 
 	return $self->_noop_result($self->i18n('runner.noop.cache')) if $action =~ $NO_OP;
-	return $self->_run_docker_action($step, $step_number, $1, $env, $context, $status) if $action =~ m{\Adocker://(.+)\z};
+	# The image is what is left of the resolved reference: it is not
+	# interpolated again, so a value from a step output is never read as an
+	# expression, and an empty one is reported as having no name.
+	return $self->_run_docker_action($step, $step_number, $1, $env, $context, $status) if $action =~ m{\Adocker://(.*)\z}s;
 	return $self->_run_local_action($step, $step_number, $action, $env, $context, $status) if $action =~ m{\A\.\.?/};
 
 	return $self->_unsupported_action($action, $self->i18n('runner.unsupported.remote'));
@@ -604,7 +648,7 @@ sub _run_uses_step {
 # Purpose:     Run a docker:// action in a container of its own on the job's
 #              network.  An image a step output decides is first known here,
 #              so it is checked and prepared here.
-# Entry:       $step; $step_number; $image - the text after docker://;
+# Entry:       $step; $step_number; $image - the resolved text after docker://;
 #              $env; $context; $status.
 # Exit status: Returns a step result hash.
 # Side effects: May pull the image; runs a container; reads the step files.
@@ -612,7 +656,6 @@ sub _run_docker_action {
 	my ($self, $step, $step_number, $image, $env, $context, $status) = @_;
 
 	my $job_id = $self->{job}{base_id};
-	$image = $self->{expression}->interpolate($image, $context, $status);
 
 	# It must be a real name before a container is started from it.
 	$self->throw('runner.docker_action.no_image', { uses => $step->{uses}, job => $job_id }) unless length $image;
@@ -634,11 +677,36 @@ sub _run_docker_action {
 		(defined $with->{entrypoint}
 			? (entrypoint => $self->{expression}->interpolate("$with->{entrypoint}", $context, $status))
 			: ()),
-		arguments => [ defined $with->{args} ? shellwords($self->{expression}->interpolate("$with->{args}", $context, $status)) : () ],
+		arguments => $self->_action_arguments($step, $with->{args}, $context, $status),
 		title => $self->i18n('runner.explain.action', { uses => $step->{uses}, job => $job_id }),
 	);
 
 	return $self->_collected($files, $rc, 'runner.docker_action.exited');
+}
+
+# _action_arguments
+# Purpose:     Split a docker:// action's `with.args` into words, as a shell
+#              would.
+# Entry:       $step - for the message; $args - the text, or undef; $context;
+#              $status.
+# Exit status: Returns an array reference.  Throws runner.docker_action.bad_args
+#              when the text cannot be split (an unclosed quote), because
+#              shellwords then returns nothing and the action would run with
+#              no arguments at all.
+# Side effects: None.
+sub _action_arguments {
+	my ($self, $step, $args, $context, $status) = @_;
+
+	return [] unless defined $args;
+
+	my $text = $self->{expression}->interpolate("$args", $context, $status);
+	my @words = shellwords($text);
+
+	# Quoted as written, so a secret the interpolation filled in is not shown.
+	$self->throw('runner.docker_action.bad_args', { uses => $step->{uses}, args => "$args" })
+		if !@words && $text =~ /\S/;
+
+	return \@words;
 }
 
 # _run_local_action
@@ -741,7 +809,7 @@ sub _run_javascript_action {
 		my $condition = defined $runs->{'pre-if'} ? $runs->{'pre-if'} : 'always()';
 		my $should_run = eval { $self->{expression}->condition($condition, $context, $status) };
 		if (!defined $should_run) {
-			$self->_complain('runner.javascript.pre_if_failed', { uses => $uses, error => chomp_error($@) });
+			$self->_complain('runner.javascript.pre_if_failed', { uses => $uses, error => trim_error($@) });
 		} elsif ($should_run) {
 			my $rc = $self->_run_node_phase("$container_path/$pre", "$step_number-pre", $env, $step_id, $container_path, $inputs, \%merged);
 			return $self->_result(
@@ -813,8 +881,11 @@ sub _run_node_script {
 	my ($self, $script, $env, $step_id, $action_path, $inputs) = @_;
 
 	my $exec_env = $self->_exec_env($env, undef, $step_id, $action_path);
+	# As GitHub names them, and as @actions/core's getInput reads them: upper
+	# case with spaces as _, a - or . kept (INPUT_PERL-VERSION).  Anything an
+	# environment name cannot hold becomes _ as well.
 	for my $name (keys %{$inputs}) {
-		(my $key = uc $name) =~ s/[^A-Z0-9_]/_/g;
+		(my $key = uc $name) =~ s/[^A-Z0-9_.-]/_/g;
 		$exec_env->{"INPUT_$key"} = $inputs->{$name};
 	}
 
@@ -1159,14 +1230,14 @@ sub _say {
 }
 
 # _complain
-# Purpose:     Print a warning from the catalogue unless the run is quiet.
+# Purpose:     Log a warning from the catalogue unless the run is quiet.
 # Entry:       $key; $args - optional.
 # Exit status: Returns nothing.
-# Side effects: Prints to standard error.
+# Side effects: Sends the message to the logger (by default, standard error).
 sub _complain {
 	my ($self, $key, $args) = @_;
 
-	print STDERR $self->i18n($key, $args), "\n" unless $self->{quiet};
+	$self->{logger}->warn($self->i18n($key, $args)) unless $self->{quiet};
 
 	return;
 }
@@ -1228,7 +1299,11 @@ C<NAME=value> to C<$GITHUB_ENV>.
 image has only C<sh>; the step then fails with C<Shell 'bash' is not
 available>.
 
-=item * B<JavaScript actions need C<node> in the image.>
+=item * B<JavaScript actions need C<node> in the image.>  Their inputs
+arrive as C<INPUT_*> variables named as GitHub names them: upper case, a
+space becomes C<_>, and C<-> and C<.> are kept, so C<perl-version> is
+C<INPUT_PERL-VERSION>.  A shell cannot read such a name as C<$NAME>; use
+C<printenv 'INPUT_PERL-VERSION'>.
 
 =item * B<A failed step stops the job's later steps>, except those with
 C<if: failure()> or C<if: always()>, and except when the step has

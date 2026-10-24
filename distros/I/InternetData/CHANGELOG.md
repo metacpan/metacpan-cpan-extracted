@@ -2,6 +2,12 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 1.6.1 are described by their release commits.
 
+## 1.11.3 - 2026-10-24
+
+### Fixes
+
+- Refuse a bad retries or a key past U+00FF; require checksum id and format ([`69a809e`](https://github.com/internetdata/sdk-perl/commit/69a809e762c94295c576efed2039a81c2241dc24))
+
 ## 1.11.2 - 2026-10-21
 
 ### Fixes

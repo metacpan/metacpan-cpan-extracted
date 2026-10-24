@@ -242,6 +242,12 @@
           title="Summarise the data as a pivot table - group by row and column dimensions and compute aggregates">&#x25A6; Pivot table&hellip;</button>
   <button class="btn-stats" id="btn-stats" type="button"
           title="Show column statistics: row count, nulls, distinct values, numeric min, max, mean and median">&#x03A3; Column stats</button>
+  <button class="btn-insights" id="btn-insights" type="button"
+          title="Automatic statistical insights: outliers, period-over-period changes, top movers, and seasonality">&#x1F4A1; Insights</button>
+  [%- IF ai_available -%]
+  <button class="btn-ask" id="btn-ask" type="button"
+          title="Ask a question in plain English; the AI suggests a chart or analysis">&#x1F4AC; Ask&hellip;</button>
+  [%- END -%]
   <span class="toolbar-sep" role="separator" aria-hidden="true"></span>
   <button class="btn-calc" id="btn-calc" type="button"
           title="Add virtual columns computed from expressions (e.g. revenue-cost). Saved fields are applied automatically whenever this data source is opened.">&fnof;(x) Calc fields&hellip;</button>
@@ -1149,6 +1155,29 @@
   </form>
 </div>
 
+[%- IF ai_available -%]
+<div class="graph-panel" id="ask-panel" hidden>
+  <h3 class="graph-panel-title">&#x1F4AC; Ask a question</h3>
+  <p class="graph-panel-desc">Describe what you want to see in plain English. The AI will suggest a chart or analysis which you can run or save as a canvas.</p>
+  <div class="ask-q-row">
+    <input type="text" id="ask-q-inp" class="ask-q-input"
+           placeholder="e.g. show me sales by region as a pie chart"
+           autocomplete="off" style="flex:1;min-width:0">
+    <button id="btn-ask-submit" class="btn-primary" disabled style="white-space:nowrap">Ask</button>
+  </div>
+  <div id="ask-result" hidden style="margin-top:0.85rem">
+    <div id="ask-result-title" style="font-weight:600;font-size:0.95rem;margin-bottom:0.25rem"></div>
+    <div id="ask-result-kind" style="font-size:0.82rem;color:#666;margin-bottom:0.65rem"></div>
+    <div style="display:flex;gap:0.5rem;flex-wrap:wrap;align-items:center">
+      <a id="ask-run-link" href="#" class="btn-primary">&#x25B6; Run it</a>
+      <button id="btn-ask-save" class="btn-secondary">&#x1F4BE; Save to canvas</button>
+    </div>
+    <div id="ask-save-msg" style="margin-top:0.5rem;font-size:0.82rem"></div>
+  </div>
+  <div id="ask-error" hidden style="margin-top:0.7rem;color:#b00;font-size:0.88rem"></div>
+</div>
+[%- END -%]
+
 <div class="graph-panel" id="pivot-panel" hidden>
   <form id="pivot-form" method="get" action="/pivot">
     <input type="hidden" name="l" value="[% left_spec | html %]">
@@ -1311,6 +1340,14 @@
   <input type="hidden" name="f" value="[% fs | html %]">
   [%- END -%]
   <input type="hidden" name="back" id="stats-form-back" value="">
+  <input type="hidden" name="back_label" value="Back to table">
+</form>
+<form id="insights-form" method="get" action="/insights" style="display:none">
+  <input type="hidden" name="l" value="[% left_spec | html %]">
+  [%- FOREACH fs IN filter_specs -%]
+  <input type="hidden" name="f" value="[% fs | html %]">
+  [%- END -%]
+  <input type="hidden" name="back" id="insights-form-back" value="">
   <input type="hidden" name="back_label" value="Back to table">
 </form>
 [%- END -%]
@@ -2368,7 +2405,7 @@ function parseAccounting(v) {
   var back2LabelInp = document.getElementById('graph-back2-label-inp');
   var graphForm     = document.getElementById('graph-form');
 
-  var otherPanels = ['join-panel', 'combine-panel', 'export-panel', 'pie-panel', 'heatmap-panel', 'bar-panel', 'stacked-panel', 'scatter-panel', 'combo-panel', 'treemap-panel', 'histogram-panel', 'folder-panel', 'pivot-panel', 'calc-panel', 'groups-panel', 'dates-panel', 'save-analysis-panel', 'map-panel'].map(function (id) {
+  var otherPanels = ['ask-panel', 'join-panel', 'combine-panel', 'export-panel', 'pie-panel', 'heatmap-panel', 'bar-panel', 'stacked-panel', 'scatter-panel', 'combo-panel', 'treemap-panel', 'histogram-panel', 'folder-panel', 'pivot-panel', 'calc-panel', 'groups-panel', 'dates-panel', 'save-analysis-panel', 'map-panel'].map(function (id) {
     return document.getElementById(id);
   }).filter(Boolean);
 
@@ -2486,7 +2523,7 @@ function parseAccounting(v) {
   var back2LabelInp = document.getElementById('pie-back2-label-inp');
   var pieForm       = document.getElementById('pie-form');
 
-  var otherPanels = ['join-panel', 'combine-panel', 'export-panel', 'graph-panel', 'heatmap-panel', 'bar-panel', 'stacked-panel', 'scatter-panel', 'combo-panel', 'treemap-panel', 'histogram-panel', 'folder-panel', 'pivot-panel', 'calc-panel', 'groups-panel', 'dates-panel', 'save-analysis-panel', 'map-panel'].map(function (id) {
+  var otherPanels = ['ask-panel', 'join-panel', 'combine-panel', 'export-panel', 'graph-panel', 'heatmap-panel', 'bar-panel', 'stacked-panel', 'scatter-panel', 'combo-panel', 'treemap-panel', 'histogram-panel', 'folder-panel', 'pivot-panel', 'calc-panel', 'groups-panel', 'dates-panel', 'save-analysis-panel', 'map-panel'].map(function (id) {
     return document.getElementById(id);
   }).filter(Boolean);
 
@@ -2571,7 +2608,7 @@ function parseAccounting(v) {
   var back2LabelInp = document.getElementById('heatmap-back2-label-inp');
   var heatmapForm   = document.getElementById('heatmap-form');
 
-  var otherPanels = ['join-panel', 'combine-panel', 'export-panel', 'graph-panel', 'pie-panel', 'bar-panel', 'stacked-panel', 'scatter-panel', 'combo-panel', 'treemap-panel', 'histogram-panel', 'folder-panel', 'pivot-panel', 'calc-panel', 'groups-panel', 'dates-panel', 'save-analysis-panel', 'map-panel'].map(function (id) {
+  var otherPanels = ['ask-panel', 'join-panel', 'combine-panel', 'export-panel', 'graph-panel', 'pie-panel', 'bar-panel', 'stacked-panel', 'scatter-panel', 'combo-panel', 'treemap-panel', 'histogram-panel', 'folder-panel', 'pivot-panel', 'calc-panel', 'groups-panel', 'dates-panel', 'save-analysis-panel', 'map-panel'].map(function (id) {
     return document.getElementById(id);
   }).filter(Boolean);
 
@@ -2642,7 +2679,7 @@ function parseAccounting(v) {
   var back2LabelInp = document.getElementById('bar-back2-label-inp');
   var barForm       = document.getElementById('bar-form');
 
-  var otherPanels = ['join-panel', 'combine-panel', 'export-panel', 'graph-panel', 'pie-panel', 'heatmap-panel', 'stacked-panel', 'scatter-panel', 'combo-panel', 'treemap-panel', 'histogram-panel', 'folder-panel', 'pivot-panel', 'calc-panel', 'groups-panel', 'dates-panel', 'save-analysis-panel', 'map-panel'].map(function (id) {
+  var otherPanels = ['ask-panel', 'join-panel', 'combine-panel', 'export-panel', 'graph-panel', 'pie-panel', 'heatmap-panel', 'stacked-panel', 'scatter-panel', 'combo-panel', 'treemap-panel', 'histogram-panel', 'folder-panel', 'pivot-panel', 'calc-panel', 'groups-panel', 'dates-panel', 'save-analysis-panel', 'map-panel'].map(function (id) {
     return document.getElementById(id);
   }).filter(Boolean);
 
@@ -2716,7 +2753,7 @@ function parseAccounting(v) {
   var back2LabelInp = document.getElementById('stacked-back2-label-inp');
   var stackedForm   = document.getElementById('stacked-form');
 
-  var otherPanels = ['join-panel', 'combine-panel', 'export-panel', 'graph-panel', 'pie-panel', 'heatmap-panel', 'bar-panel', 'scatter-panel', 'combo-panel', 'treemap-panel', 'histogram-panel', 'folder-panel', 'pivot-panel', 'calc-panel', 'groups-panel', 'dates-panel', 'save-analysis-panel', 'map-panel'].map(function (id) {
+  var otherPanels = ['ask-panel', 'join-panel', 'combine-panel', 'export-panel', 'graph-panel', 'pie-panel', 'heatmap-panel', 'bar-panel', 'scatter-panel', 'combo-panel', 'treemap-panel', 'histogram-panel', 'folder-panel', 'pivot-panel', 'calc-panel', 'groups-panel', 'dates-panel', 'save-analysis-panel', 'map-panel'].map(function (id) {
     return document.getElementById(id);
   }).filter(Boolean);
 
@@ -2770,7 +2807,7 @@ function parseAccounting(v) {
   var back2LabelInp = document.getElementById('scatter-back2-label-inp');
   var scatterForm   = document.getElementById('scatter-form');
 
-  var otherPanels = ['join-panel', 'combine-panel', 'export-panel', 'graph-panel', 'pie-panel', 'heatmap-panel', 'bar-panel', 'stacked-panel', 'combo-panel', 'treemap-panel', 'histogram-panel', 'folder-panel', 'pivot-panel', 'calc-panel', 'groups-panel', 'dates-panel', 'save-analysis-panel', 'map-panel'].map(function (id) {
+  var otherPanels = ['ask-panel', 'join-panel', 'combine-panel', 'export-panel', 'graph-panel', 'pie-panel', 'heatmap-panel', 'bar-panel', 'stacked-panel', 'combo-panel', 'treemap-panel', 'histogram-panel', 'folder-panel', 'pivot-panel', 'calc-panel', 'groups-panel', 'dates-panel', 'save-analysis-panel', 'map-panel'].map(function (id) {
     return document.getElementById(id);
   }).filter(Boolean);
 
@@ -2893,7 +2930,7 @@ function parseAccounting(v) {
   var back2LabelInp = document.getElementById('combo-back2-label-inp');
   var comboForm     = document.getElementById('combo-form');
 
-  var otherPanels = ['join-panel', 'combine-panel', 'export-panel', 'graph-panel', 'pie-panel', 'heatmap-panel', 'bar-panel', 'stacked-panel', 'scatter-panel', 'treemap-panel', 'histogram-panel', 'folder-panel', 'pivot-panel', 'calc-panel', 'groups-panel', 'dates-panel', 'save-analysis-panel', 'map-panel'].map(function (id) {
+  var otherPanels = ['ask-panel', 'join-panel', 'combine-panel', 'export-panel', 'graph-panel', 'pie-panel', 'heatmap-panel', 'bar-panel', 'stacked-panel', 'scatter-panel', 'treemap-panel', 'histogram-panel', 'folder-panel', 'pivot-panel', 'calc-panel', 'groups-panel', 'dates-panel', 'save-analysis-panel', 'map-panel'].map(function (id) {
     return document.getElementById(id);
   }).filter(Boolean);
 
@@ -2972,7 +3009,7 @@ function parseAccounting(v) {
   var back2LabelInp = document.getElementById('treemap-back2-label-inp');
   var treemapForm   = document.getElementById('treemap-form');
 
-  var otherPanels = ['join-panel', 'combine-panel', 'export-panel', 'graph-panel', 'pie-panel', 'heatmap-panel', 'bar-panel', 'stacked-panel', 'scatter-panel', 'combo-panel', 'histogram-panel', 'folder-panel', 'pivot-panel', 'calc-panel', 'groups-panel', 'dates-panel', 'save-analysis-panel', 'map-panel'].map(function (id) {
+  var otherPanels = ['ask-panel', 'join-panel', 'combine-panel', 'export-panel', 'graph-panel', 'pie-panel', 'heatmap-panel', 'bar-panel', 'stacked-panel', 'scatter-panel', 'combo-panel', 'histogram-panel', 'folder-panel', 'pivot-panel', 'calc-panel', 'groups-panel', 'dates-panel', 'save-analysis-panel', 'map-panel'].map(function (id) {
     return document.getElementById(id);
   }).filter(Boolean);
 
@@ -3017,7 +3054,7 @@ function parseAccounting(v) {
   var back2LabelInp = document.getElementById('histogram-back2-label-inp');
   var histogramForm = document.getElementById('histogram-form');
 
-  var otherPanels = ['join-panel', 'combine-panel', 'export-panel', 'graph-panel', 'pie-panel', 'heatmap-panel', 'bar-panel', 'stacked-panel', 'scatter-panel', 'combo-panel', 'treemap-panel', 'folder-panel', 'pivot-panel', 'calc-panel', 'groups-panel', 'dates-panel', 'save-analysis-panel', 'map-panel'].map(function (id) {
+  var otherPanels = ['ask-panel', 'join-panel', 'combine-panel', 'export-panel', 'graph-panel', 'pie-panel', 'heatmap-panel', 'bar-panel', 'stacked-panel', 'scatter-panel', 'combo-panel', 'treemap-panel', 'folder-panel', 'pivot-panel', 'calc-panel', 'groups-panel', 'dates-panel', 'save-analysis-panel', 'map-panel'].map(function (id) {
     return document.getElementById(id);
   }).filter(Boolean);
 
@@ -3108,7 +3145,7 @@ function parseAccounting(v) {
   var back2LabelInp = document.getElementById('map-back2-label-inp');
   var mapForm       = document.getElementById('map-form');
 
-  var otherPanels = ['join-panel', 'combine-panel', 'export-panel', 'graph-panel', 'pie-panel', 'heatmap-panel', 'bar-panel', 'stacked-panel', 'scatter-panel', 'combo-panel', 'treemap-panel', 'histogram-panel', 'folder-panel', 'pivot-panel', 'calc-panel', 'groups-panel', 'dates-panel', 'save-analysis-panel'].map(function (id) {
+  var otherPanels = ['ask-panel', 'join-panel', 'combine-panel', 'export-panel', 'graph-panel', 'pie-panel', 'heatmap-panel', 'bar-panel', 'stacked-panel', 'scatter-panel', 'combo-panel', 'treemap-panel', 'histogram-panel', 'folder-panel', 'pivot-panel', 'calc-panel', 'groups-panel', 'dates-panel', 'save-analysis-panel'].map(function (id) {
     return document.getElementById(id);
   }).filter(Boolean);
 
@@ -3317,7 +3354,7 @@ function parseAccounting(v) {
   var colSel    = document.getElementById('folder-col-sel');
   var backInp   = document.getElementById('folder-back-inp');
 
-  var otherPanels = ['join-panel', 'combine-panel', 'export-panel', 'graph-panel', 'pie-panel', 'heatmap-panel', 'bar-panel', 'stacked-panel', 'scatter-panel', 'combo-panel', 'treemap-panel', 'histogram-panel', 'pivot-panel', 'calc-panel', 'groups-panel', 'dates-panel', 'save-analysis-panel', 'map-panel'].map(function (id) {
+  var otherPanels = ['ask-panel', 'join-panel', 'combine-panel', 'export-panel', 'graph-panel', 'pie-panel', 'heatmap-panel', 'bar-panel', 'stacked-panel', 'scatter-panel', 'combo-panel', 'treemap-panel', 'histogram-panel', 'pivot-panel', 'calc-panel', 'groups-panel', 'dates-panel', 'save-analysis-panel', 'map-panel'].map(function (id) {
     return document.getElementById(id);
   }).filter(Boolean);
 
@@ -3356,6 +3393,157 @@ function parseAccounting(v) {
     form.submit();
   });
 }());
+
+// ---------------------------------------------------------------------------
+// Insights button -- navigate to /insights with current l= and f= params
+// ---------------------------------------------------------------------------
+(function () {
+  var btn  = document.getElementById('btn-insights');
+  var form = document.getElementById('insights-form');
+  if (!btn || !form) return;
+
+  btn.addEventListener('click', function () {
+    var backInp = document.getElementById('insights-form-back');
+    if (backInp) backInp.value = window.location.href;
+    form.submit();
+  });
+}());
+
+[%- IF ai_available -%]
+// ---------------------------------------------------------------------------
+// Ask panel (Phase 5.1) -- natural language to chart via /api/ask
+// ---------------------------------------------------------------------------
+(function () {
+  var btnOpen   = document.getElementById('btn-ask');
+  var panel     = document.getElementById('ask-panel');
+  if (!btnOpen || !panel) return;
+
+  var qInp       = document.getElementById('ask-q-inp');
+  var btnSubmit  = document.getElementById('btn-ask-submit');
+  var resultDiv  = document.getElementById('ask-result');
+  var titleDiv   = document.getElementById('ask-result-title');
+  var kindDiv    = document.getElementById('ask-result-kind');
+  var runLink    = document.getElementById('ask-run-link');
+  var btnSave    = document.getElementById('btn-ask-save');
+  var saveMsg    = document.getElementById('ask-save-msg');
+  var errDiv     = document.getElementById('ask-error');
+
+  var otherPanels = ['join-panel', 'combine-panel', 'export-panel', 'graph-panel', 'pie-panel',
+    'heatmap-panel', 'bar-panel', 'stacked-panel', 'scatter-panel', 'combo-panel',
+    'treemap-panel', 'histogram-panel', 'folder-panel', 'pivot-panel', 'calc-panel',
+    'groups-panel', 'dates-panel', 'save-analysis-panel', 'map-panel'].map(function (id) {
+    return document.getElementById(id);
+  }).filter(Boolean);
+
+  var pendingSpec = null;
+
+  btnOpen.addEventListener('click', function () {
+    var isOpen = !panel.hidden;
+    otherPanels.forEach(function (p) { p.hidden = true; });
+    panel.hidden = isOpen;
+  });
+
+  qInp.addEventListener('input', function () {
+    btnSubmit.disabled = (qInp.value.trim().length === 0);
+  });
+
+  function showError(msg) {
+    errDiv.textContent = msg;
+    errDiv.hidden = false;
+    resultDiv.hidden = true;
+  }
+
+  function hideError() {
+    errDiv.hidden = true;
+  }
+
+  btnSubmit.addEventListener('click', function () {
+    var q = qInp.value.trim();
+    if (!q) return;
+
+    btnSubmit.disabled = true;
+    btnSubmit.textContent = 'Asking\u2026';
+    hideError();
+    resultDiv.hidden = true;
+    pendingSpec = null;
+    if (saveMsg) { saveMsg.textContent = ''; saveMsg.hidden = true; }
+
+    var sp = new URLSearchParams(window.location.search);
+    var body = 'q=' + encodeURIComponent(q)
+      + '&l=' + encodeURIComponent(sp.get('l') || '');
+    sp.getAll('f').forEach(function (f) {
+      body += '&f=' + encodeURIComponent(f);
+    });
+
+    fetch('/api/ask', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: body,
+    })
+    .then(function (r) {
+      return r.json().then(function (data) {
+        data._status = r.status;
+        return data;
+      });
+    })
+    .then(function (data) {
+      if (data.error) {
+        showError(data.error || 'Could not generate a suggestion\u2014try rephrasing.');
+        return;
+      }
+      pendingSpec = data.spec;
+      if (titleDiv) titleDiv.textContent = (data.spec && data.spec.name) ? data.spec.name : '';
+      if (kindDiv)  kindDiv.textContent  = data.spec && data.spec.visuals && data.spec.visuals[0]
+                                         ? 'Chart type: ' + data.spec.visuals[0].kind : '';
+      if (runLink)  runLink.href = data.url || '#';
+      resultDiv.hidden = false;
+    })
+    .catch(function () {
+      showError('Could not reach the server. Please try again.');
+    })
+    .finally(function () {
+      btnSubmit.disabled = (qInp.value.trim().length === 0);
+      btnSubmit.textContent = 'Ask';
+    });
+  });
+
+  if (btnSave) {
+    btnSave.addEventListener('click', function () {
+      if (!pendingSpec) return;
+      btnSave.disabled = true;
+      if (saveMsg) { saveMsg.textContent = 'Saving\u2026'; saveMsg.hidden = false; }
+
+      fetch('/api/analyses', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(pendingSpec),
+      })
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        if (data.id) {
+          var link = document.createElement('a');
+          link.href = '/a/' + data.id;
+          link.textContent = 'Saved! Open canvas \u2192';
+          link.className = 'insight-view-link';
+          if (saveMsg) {
+            saveMsg.textContent = '';
+            saveMsg.appendChild(link);
+            saveMsg.hidden = false;
+          }
+        } else {
+          if (saveMsg) { saveMsg.textContent = 'Could not save.'; saveMsg.hidden = false; }
+        }
+      })
+      .catch(function () {
+        if (saveMsg) { saveMsg.textContent = 'Could not save.'; saveMsg.hidden = false; }
+      })
+      .finally(function () {
+        btnSave.disabled = false;
+      });
+    });
+  }
+}());
+[%- END -%]
 </script>
 
 <script>
@@ -3375,7 +3563,7 @@ function parseAccounting(v) {
   var measureList   = document.getElementById('pivot-measures');
   var chkTotals     = document.getElementById('pivot-totals');
 
-  var otherPanels = ['join-panel', 'combine-panel', 'export-panel', 'graph-panel', 'pie-panel', 'heatmap-panel', 'bar-panel', 'stacked-panel', 'scatter-panel', 'combo-panel', 'treemap-panel', 'histogram-panel', 'folder-panel', 'calc-panel', 'groups-panel', 'dates-panel', 'save-analysis-panel', 'map-panel'].map(function (id) {
+  var otherPanels = ['ask-panel', 'join-panel', 'combine-panel', 'export-panel', 'graph-panel', 'pie-panel', 'heatmap-panel', 'bar-panel', 'stacked-panel', 'scatter-panel', 'combo-panel', 'treemap-panel', 'histogram-panel', 'folder-panel', 'calc-panel', 'groups-panel', 'dates-panel', 'save-analysis-panel', 'map-panel'].map(function (id) {
     return document.getElementById(id);
   }).filter(Boolean);
 
@@ -3571,7 +3759,7 @@ function parseAccounting(v) {
 
   var lspec     = '[% left_spec | html %]';
 
-  var otherPanels = ['join-panel','combine-panel','export-panel','graph-panel',
+  var otherPanels = ['ask-panel', 'join-panel','combine-panel','export-panel','graph-panel',
     'pie-panel','heatmap-panel','bar-panel','stacked-panel','scatter-panel',
     'combo-panel','treemap-panel','histogram-panel','folder-panel','pivot-panel',
     'groups-panel','dates-panel','save-analysis-panel','map-panel'].map(function(id){
@@ -3670,7 +3858,7 @@ function parseAccounting(v) {
 
   var lspec = '[% left_spec | html %]';
 
-  var otherPanels = ['join-panel','combine-panel','export-panel','graph-panel',
+  var otherPanels = ['ask-panel', 'join-panel','combine-panel','export-panel','graph-panel',
     'pie-panel','heatmap-panel','bar-panel','stacked-panel','scatter-panel',
     'combo-panel','treemap-panel','histogram-panel','folder-panel','pivot-panel',
     'calc-panel','dates-panel','save-analysis-panel','map-panel'].map(function(id){
@@ -3800,7 +3988,7 @@ function parseAccounting(v) {
 
   var lspec = '[% left_spec | html %]';
 
-  var otherPanels = ['join-panel','combine-panel','export-panel','graph-panel',
+  var otherPanels = ['ask-panel', 'join-panel','combine-panel','export-panel','graph-panel',
     'pie-panel','heatmap-panel','bar-panel','stacked-panel','scatter-panel',
     'combo-panel','treemap-panel','histogram-panel','folder-panel','pivot-panel',
     'calc-panel','groups-panel','save-analysis-panel','map-panel'].map(function(id){
@@ -3931,7 +4119,7 @@ function parseAccounting(v) {
   var linkEl    = document.getElementById('save-analysis-link');
   var msgEl     = document.getElementById('save-analysis-msg');
 
-  var otherPanels = ['join-panel','combine-panel','export-panel','graph-panel',
+  var otherPanels = ['ask-panel', 'join-panel','combine-panel','export-panel','graph-panel',
     'pie-panel','heatmap-panel','bar-panel','stacked-panel','scatter-panel',
     'combo-panel','treemap-panel','histogram-panel','folder-panel','pivot-panel',
     'calc-panel','groups-panel','dates-panel','map-panel'].map(function(id){
@@ -4261,6 +4449,64 @@ function parseAccounting(v) {
       window.location = data.url;
     }
   };
+}());
+</script>
+
+<script>
+// ---------------------------------------------------------------------------
+// Row highlight: applied when ?hl_col=, ?hl_op=, ?hl_val= are present in the
+// URL.  Used by the insights drill-down so the specific outlier row stands out
+// within the category group (which may be 75+ rows).
+// hl_op must be one of: gt ge lt le eq (default gt)
+// ---------------------------------------------------------------------------
+(function () {
+  var params = new URLSearchParams(window.location.search);
+  var hlCol  = params.get('hl_col');
+  var hlOp   = params.get('hl_op') || 'gt';
+  var hlVal  = params.get('hl_val');
+  if (!hlCol || hlVal === null) return;
+
+  var table = document.querySelector('table[data-table]');
+  if (!table || !table.tHead || !table.tBodies[0]) return;
+
+  // Locate the column index by scanning the current header row (which includes
+  // the injected sel-th at index 0 -- but that cell has no text, so it won't
+  // match any column name).  Using the found index directly on row.cells is
+  // correct because both the header and body are shifted identically.
+  var headers = Array.from(table.tHead.rows[0].cells);
+  var colIdx  = -1;
+  for (var i = 0; i < headers.length; i++) {
+    if (headers[i].textContent.trim() === hlCol) { colIdx = i; break; }
+  }
+  if (colIdx < 0) return;
+
+  var refNum  = parseFloat(hlVal);
+  var firstHl = null;
+
+  Array.from(table.tBodies[0].rows).forEach(function (row) {
+    var cell = row.cells[colIdx];
+    if (!cell) return;
+    var raw     = cell.textContent.trim();
+    var cellNum = parseAccounting(raw);
+    var match;
+    if (isNaN(cellNum) || isNaN(refNum)) {
+      match = (hlOp === 'eq' && raw === hlVal);
+    } else {
+      if      (hlOp === 'gt') match = cellNum >  refNum;
+      else if (hlOp === 'ge') match = cellNum >= refNum;
+      else if (hlOp === 'lt') match = cellNum <  refNum;
+      else if (hlOp === 'le') match = cellNum <= refNum;
+      else                    match = Math.abs(cellNum - refNum) < 1e-9;
+    }
+    if (match) {
+      row.classList.add('hl-row');
+      if (!firstHl) firstHl = row;
+    }
+  });
+
+  if (firstHl) {
+    firstHl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
 }());
 </script>
 

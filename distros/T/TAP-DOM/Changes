@@ -1,5 +1,8 @@
 Revision history for TAP-DOM
 
+1.002     2026-10-23
+        - to_tap() allows option to use 'raw' field
+
 1.001     2025-07-10
         - new option 'sparse' to leave out "false" values
         - new option 'normalize' to generate normalized lines (EXPERIMENTAL)

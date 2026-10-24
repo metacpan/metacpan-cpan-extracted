@@ -1,0 +1,5413 @@
+{
+ "yaml": [
+  {
+   "text": "",
+   "result": {}
+  },
+  {
+   "text": "a: 1",
+   "result": {
+    "a": 1
+   }
+  },
+  {
+   "text": "name: my-agent\ndescription: \"Audit — says \\\"hi\\\"\\n and \\u00e9\"\nsingle: 'it''s # not a comment'\nplain: value # a comment\ncolon: a: b\nurl: https://example.com/x\nint: 42\nneg: -3\nfloat: 1.0\nyes: true\nno: False\nnothing: ~\nempty:\n# full-line comment",
+   "result": {
+    "name": "my-agent",
+    "description": "Audit — says \"hi\"\n and é",
+    "single": "it's # not a comment",
+    "plain": "value",
+    "colon": "a: b",
+    "url": "https://example.com/x",
+    "int": 42,
+    "neg": -3,
+    "float": {
+     "$float": 1
+    },
+    "yes": true,
+    "no": false,
+    "nothing": null,
+    "empty": null
+   }
+  },
+  {
+   "text": "lit: |\n  line one\n    indented\n\n  line three\nfold: >-\n  folded\n  together\nkeep: |+\n  k\n\nafter: x",
+   "result": {
+    "lit": "line one\n  indented\n\nline three\n",
+    "fold": "folded together",
+    "keep": "k\n\n",
+    "after": "x"
+   }
+  },
+  {
+   "text": "description: a long\n  description here\nq: \"two\n  lines\"",
+   "result": {
+    "description": "a long description here",
+    "q": "two lines"
+   }
+  },
+  {
+   "text": "tools: Read, Bash\nbriefing:\n  skills:\n    - skilletor-core\n    - 'kanban: karr'\ncodex:\n  model: gpt-5\n  nickname_candidates: [Ada, \"B, C\"]\n  features:\n    web: true\nlist_same_indent:\n- a\n- b\nflow_map: {a: 1, b: two}",
+   "result": {
+    "tools": "Read, Bash",
+    "briefing": {
+     "skills": [
+      "skilletor-core",
+      "kanban: karr"
+     ]
+    },
+    "codex": {
+     "model": "gpt-5",
+     "nickname_candidates": [
+      "Ada",
+      "B, C"
+     ],
+     "features": {
+      "web": true
+     }
+    },
+    "list_same_indent": [
+     "a",
+     "b"
+    ],
+    "flow_map": {
+     "a": 1,
+     "b": "two"
+    }
+   }
+  },
+  {
+   "text": "a: &anchor x",
+   "error": "line 1: anchors, aliases and tags are not supported",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "a: *alias",
+   "error": "line 1: anchors, aliases and tags are not supported",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "a: !tag x",
+   "error": "line 1: anchors, aliases and tags are not supported",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "list:\n  - key: value",
+   "error": "line 2: mappings inside sequences are not supported",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "a: [x, [nested]]",
+   "error": "line 1: nested collections are not supported",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "a: \"unterminated",
+   "error": "line 1: unterminated double-quoted string",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "a: b\na: c",
+   "error": "line 2: duplicate key \"a\"",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "  indented: first",
+   "error": "line 1: unexpected indentation",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "not a mapping line",
+   "error": "line 1: expected `key: value`",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "a: 1\nb: &x 2\n",
+   "error": "line 2: anchors, aliases and tags are not supported",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "a:\n\t- x",
+   "error": "line 2: tabs are not allowed in indentation",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "a: [1, 2",
+   "error": "line 1: expected \",\" or \"]\"",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "a: {x: 1, y}",
+   "error": "line 1: expected `key: value` in a flow mapping",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "a: {: 1}",
+   "error": "line 1: bad key in a flow mapping",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "a: [] # c",
+   "result": {
+    "a": []
+   }
+  },
+  {
+   "text": "a: {} trailing",
+   "error": "line 1: unexpected text after a value: \"trailing\"",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "a: \"\\x41\\u00e9\\U0001F600\\N\\_\\L\\P\\0\\e\"",
+   "result": {
+    "a": "Aé😀   \u0000\u001b"
+   }
+  },
+  {
+   "text": "a: \"\\q\"",
+   "error": "line 1: unknown escape \\q",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "a: \"\\xZZ\"",
+   "error": "line 1: bad \\x escape",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "a: \"\\U00110000\"",
+   "error": "line 1: bad \\U escape",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "a: \"tail\\\"",
+   "error": "line 1: unterminated double-quoted string",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "a: 'x' y",
+   "error": "line 1: unexpected text after a value: \"y\"",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "n: 9007199254740991\nm: 9007199254740992\no: -9007199254740993\nz: 007\np: +5\nf: .5\ng: 5.\nh: 1e3\ni: -1.5E-2\nj: 1_000\nk: 0x10\nl: 1e400",
+   "result": {
+    "n": 9007199254740991,
+    "m": "9007199254740992",
+    "o": "-9007199254740993",
+    "z": 7,
+    "p": 5,
+    "f": {
+     "$float": 0.5
+    },
+    "g": {
+     "$float": 5
+    },
+    "h": {
+     "$float": 1000
+    },
+    "i": {
+     "$float": -0.015
+    },
+    "j": "1_000",
+    "k": "0x10",
+    "l": {
+     "$float": null
+    }
+   }
+  },
+  {
+   "text": "b1: True\nb2: TRUE\nb3: yes\nn1: Null\nn2: NULL\nn3: null",
+   "result": {
+    "b1": true,
+    "b2": true,
+    "b3": "yes",
+    "n1": null,
+    "n2": null,
+    "n3": null
+   }
+  },
+  {
+   "text": "fold: >\n  one\n  two\n\n  three\n    more\n  four\n",
+   "result": {
+    "fold": "one two\nthree\n  more\nfour\n"
+   }
+  },
+  {
+   "text": "strip: |-\n  a\n\n\nkeep: |+\n  a\n\n\nclip: |\n  a\n\n\nnext: 1",
+   "result": {
+    "strip": "a",
+    "keep": "a\n\n\n",
+    "clip": "a\n",
+    "next": 1
+   }
+  },
+  {
+   "text": "ind: |2\n    two extra\n  base\n",
+   "result": {
+    "ind": "  two extra\nbase\n"
+   }
+  },
+  {
+   "text": "bad: |x\n  a",
+   "error": "line 1: unsupported block scalar header \"|x\"",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "bad: |1\n a\nlow: |\n    deep\n  shallow",
+   "error": "line 5: block scalar line is less indented than its first line",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "empty_block: |\nnext: 1",
+   "result": {
+    "empty_block": "",
+    "next": 1
+   }
+  },
+  {
+   "text": "seq:\n  - a\n  -\n  - b",
+   "error": "line 3: nested blocks inside sequences are not supported",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "seq:\n  - a\n    - b",
+   "error": "line 3: unexpected indentation in a sequence",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "seq:\n  - [a]",
+   "error": "line 2: nested collections are not supported",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "seq:\n  - a # c\n  - 'b' # d\n  - \"c\"",
+   "result": {
+    "seq": [
+     "a",
+     "b",
+     "c"
+    ]
+   }
+  },
+  {
+   "text": "\"quoted key\": 1\n'single key': 2\n'it''s': 3\n\"esc\\tkey\": 4",
+   "result": {
+    "quoted key": 1,
+    "single key": 2,
+    "it's": 3,
+    "esc\tkey": 4
+   }
+  },
+  {
+   "text": "a:\n  b:\n    c: 1\n  d: 2\ne: 3",
+   "result": {
+    "a": {
+     "b": {
+      "c": 1
+     },
+     "d": 2
+    },
+    "e": 3
+   }
+  },
+  {
+   "text": "a:\n  b: 1\n   c: 2",
+   "result": {
+    "a": {
+     "b": "1 c: 2"
+    }
+   }
+  },
+  {
+   "text": "- top",
+   "error": "line 1: unexpected sequence item",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "a: 1\n  - b",
+   "result": {
+    "a": "1 - b"
+   }
+  },
+  {
+   "text": "key with spaces: v\nkey-dash: v\n_under: v\n123: v\n",
+   "result": {
+    "123": "v",
+    "key with spaces": "v",
+    "key-dash": "v",
+    "_under": "v"
+   }
+  },
+  {
+   "text": "a: x\n  continued # not a comment\n  more # comment",
+   "result": {
+    "a": "x continued more"
+   }
+  },
+  {
+   "text": "a: [x,\n  y]",
+   "result": {
+    "a": [
+     "x",
+     "y"
+    ]
+   }
+  },
+  {
+   "text": "a: {x: 1,\n  y: 2}",
+   "result": {
+    "a": {
+     "x": 1,
+     "y": 2
+    }
+   }
+  },
+  {
+   "text": "a: # comment\n  b: 1",
+   "result": {
+    "a": {
+     "b": 1
+    }
+   }
+  },
+  {
+   "text": "description:\nskills: [a]",
+   "result": {
+    "description": null,
+    "skills": [
+     "a"
+    ]
+   }
+  },
+  {
+   "text": "a: 'one\n  two'",
+   "result": {
+    "a": "one two"
+   }
+  },
+  {
+   "text": "a: @x",
+   "result": {
+    "a": "@x"
+   }
+  },
+  {
+   "text": "a: `x`",
+   "result": {
+    "a": "`x`"
+   }
+  },
+  {
+   "text": "?complex: 1",
+   "error": "line 1: expected `key: value`",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "a: 1\r\nb: 2\r\n",
+   "result": {
+    "a": 1,
+    "b": 2
+   }
+  },
+  {
+   "text": "a: x y",
+   "error": "line 1: expected `key: value`",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "a: b",
+   "error": "line 1: expected `key: value`",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "node:test",
+   "error": "line 1: expected `key: value`",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "node:assert/strict",
+   "error": "line 1: expected `key: value`",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "../src/frontmatter.ts",
+   "error": "line 1: expected `key: value`",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "BODY\n",
+   "error": "line 1: expected `key: value`",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "no frontmatter: empty data, the whole text is the body",
+   "result": {
+    "no frontmatter": "empty data, the whole text is the body"
+   }
+  },
+  {
+   "text": "just text\n",
+   "error": "line 1: expected `key: value`",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "---\n---\nB\n",
+   "error": "line 1: expected `key: value`",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "B\n",
+   "error": "line 1: expected `key: value`",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "the body starts after the closing fence; leading blank lines are dropped, the rest is verbatim",
+   "error": "line 1: expected `key: value`",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "name: a",
+   "result": {
+    "name": "a"
+   }
+  },
+  {
+   "text": "\n\n  indented\n\ntrailing  \n\n",
+   "error": "line 3: unexpected indentation",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "  indented\n\ntrailing  \n\n",
+   "error": "line 1: unexpected indentation",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "---\r\nname: a\r\n---\r\nB\r\n",
+   "error": "line 1: expected `key: value`",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "B\r\n",
+   "error": "line 1: expected `key: value`",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "scalars: plain, quoted, typed, with comments",
+   "result": {
+    "scalars": "plain, quoted, typed, with comments"
+   }
+  },
+  {
+   "text": "name: my-agent",
+   "result": {
+    "name": "my-agent"
+   }
+  },
+  {
+   "text": "Audit — says \\",
+   "error": "line 1: expected `key: value`",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "\\n and \\u00e9",
+   "error": "line 1: expected `key: value`",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "single: 'it''s # not a comment'",
+   "result": {
+    "single": "it's # not a comment"
+   }
+  },
+  {
+   "text": "plain: value # a comment",
+   "result": {
+    "plain": "value"
+   }
+  },
+  {
+   "text": "colon: a: b",
+   "result": {
+    "colon": "a: b"
+   }
+  },
+  {
+   "text": "url: https://example.com/x",
+   "result": {
+    "url": "https://example.com/x"
+   }
+  },
+  {
+   "text": "int: 42",
+   "result": {
+    "int": 42
+   }
+  },
+  {
+   "text": "neg: -3",
+   "result": {
+    "neg": -3
+   }
+  },
+  {
+   "text": "float: 1.0",
+   "result": {
+    "float": {
+     "$float": 1
+    }
+   }
+  },
+  {
+   "text": "yes: true",
+   "result": {
+    "yes": true
+   }
+  },
+  {
+   "text": "no: False",
+   "result": {
+    "no": false
+   }
+  },
+  {
+   "text": "nothing: ~",
+   "result": {
+    "nothing": null
+   }
+  },
+  {
+   "text": "empty:",
+   "result": {
+    "empty": null
+   }
+  },
+  {
+   "text": "# full-line comment",
+   "result": {}
+  },
+  {
+   "text": "\n",
+   "result": {}
+  },
+  {
+   "text": "my-agent",
+   "error": "line 1: expected `key: value`",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "hi",
+   "error": "line 1: expected `key: value`",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "it's # not a comment",
+   "error": "line 1: expected `key: value`",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "value",
+   "error": "line 1: expected `key: value`",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "a: b",
+   "result": {
+    "a": "b"
+   }
+  },
+  {
+   "text": "https://example.com/x",
+   "error": "line 1: expected `key: value`",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "block scalars: literal and folded, with chomping",
+   "result": {
+    "block scalars": "literal and folded, with chomping"
+   }
+  },
+  {
+   "text": "lit: |",
+   "result": {
+    "lit": ""
+   }
+  },
+  {
+   "text": "  line one",
+   "error": "line 1: unexpected indentation",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "    indented",
+   "error": "line 1: unexpected indentation",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "  line three",
+   "error": "line 1: unexpected indentation",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "fold: >-",
+   "result": {
+    "fold": ""
+   }
+  },
+  {
+   "text": "  folded",
+   "error": "line 1: unexpected indentation",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "  together",
+   "error": "line 1: unexpected indentation",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "keep: |+",
+   "result": {
+    "keep": "\n"
+   }
+  },
+  {
+   "text": "  k",
+   "error": "line 1: unexpected indentation",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "after: x",
+   "result": {
+    "after": "x"
+   }
+  },
+  {
+   "text": "line one\n  indented\n\nline three\n",
+   "error": "line 1: expected `key: value`",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "folded together",
+   "error": "line 1: expected `key: value`",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "k\n\n",
+   "error": "line 1: expected `key: value`",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "x",
+   "error": "line 1: expected `key: value`",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "multi-line plain and quoted scalars fold with spaces",
+   "error": "line 1: expected `key: value`",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "  description here",
+   "error": "line 1: unexpected indentation",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "two', '  lines",
+   "error": "line 1: expected `key: value`",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "a long description here",
+   "error": "line 1: expected `key: value`",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "two lines",
+   "error": "line 1: expected `key: value`",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "sequences and nested mappings (the briefing and codex shapes)",
+   "error": "line 1: expected `key: value`",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "tools: Read, Bash",
+   "result": {
+    "tools": "Read, Bash"
+   }
+  },
+  {
+   "text": "briefing:",
+   "result": {
+    "briefing": null
+   }
+  },
+  {
+   "text": "  skills:",
+   "error": "line 1: unexpected indentation",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "    - skilletor-core",
+   "error": "line 1: unexpected indentation",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "    - 'kanban: karr'",
+   "error": "line 1: unexpected indentation",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "codex:",
+   "result": {
+    "codex": null
+   }
+  },
+  {
+   "text": "  model: gpt-5",
+   "error": "line 1: unexpected indentation",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "  model_reasoning_effort: high",
+   "error": "line 1: unexpected indentation",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "  nickname_candidates: [Ada, \"B, C\"]",
+   "error": "line 1: unexpected indentation",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "  features:",
+   "error": "line 1: unexpected indentation",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "    web: true",
+   "error": "line 1: unexpected indentation",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "list_same_indent:",
+   "result": {
+    "list_same_indent": null
+   }
+  },
+  {
+   "text": "- a",
+   "error": "line 1: unexpected sequence item",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "- b",
+   "error": "line 1: unexpected sequence item",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "flow_map: {a: 1, b: two}",
+   "result": {
+    "flow_map": {
+     "a": 1,
+     "b": "two"
+    }
+   }
+  },
+  {
+   "text": "Read, Bash",
+   "error": "line 1: expected `key: value`",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "skilletor-core",
+   "error": "line 1: expected `key: value`",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "kanban: karr",
+   "result": {
+    "kanban": "karr"
+   }
+  },
+  {
+   "text": "gpt-5",
+   "error": "line 1: expected `key: value`",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "high",
+   "error": "line 1: expected `key: value`",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "Ada",
+   "error": "line 1: expected `key: value`",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "B, C",
+   "error": "line 1: expected `key: value`",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "a",
+   "error": "line 1: expected `key: value`",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "b",
+   "error": "line 1: expected `key: value`",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "two",
+   "error": "line 1: expected `key: value`",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "outside the subset: a FrontmatterError naming the line",
+   "result": {
+    "outside the subset": "a FrontmatterError naming the line"
+   }
+  },
+  {
+   "text": "parseYamlDocument reads a whole file and numbers lines from 1",
+   "error": "line 1: expected `key: value`",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "description: D\nskills: [perl-*, testing]\nvars:\n  k: \"5.40\"\n",
+   "result": {
+    "description": "D",
+    "skills": [
+     "perl-*",
+     "testing"
+    ],
+    "vars": {
+     "k": "5.40"
+    }
+   }
+  },
+  {
+   "text": "D",
+   "error": "line 1: expected `key: value`",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "perl-*",
+   "error": "line 1: expected `key: value`",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "testing",
+   "error": "line 1: expected `key: value`",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "5.40",
+   "error": "line 1: expected `key: value`",
+   "class": "FrontmatterError"
+  }
+ ],
+ "frontmatter": [
+  {
+   "text": "just text\n",
+   "data": {},
+   "body": "just text\n"
+  },
+  {
+   "text": "---\n---\nB\n",
+   "data": {},
+   "body": "B\n"
+  },
+  {
+   "text": "---\nname: a\n---\n\n\n  indented\n\ntrailing  \n\n",
+   "data": {
+    "name": "a"
+   },
+   "body": "  indented\n\ntrailing  \n\n"
+  },
+  {
+   "text": "---\r\nname: a\r\n---\r\nB\r\n",
+   "data": {
+    "name": "a"
+   },
+   "body": "B\r\n"
+  },
+  {
+   "text": "---\nname: a\n",
+   "error": "frontmatter: no closing --- line",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "--- \nname: a\n---  \nB",
+   "data": {
+    "name": "a"
+   },
+   "body": "B"
+  },
+  {
+   "text": "---\nname: a\n---",
+   "data": {
+    "name": "a"
+   },
+   "body": ""
+  },
+  {
+   "text": "---\na: 1\n----\nb: 2\n---\nbody",
+   "error": "frontmatter line 3: expected `key: value`",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "---\na: |\n  x\n---\nb\n",
+   "data": {
+    "a": "x\n"
+   },
+   "body": "b\n"
+  },
+  {
+   "text": "x---\na: 1\n---\n",
+   "data": {},
+   "body": "x---\na: 1\n---\n"
+  },
+  {
+   "text": "﻿---\na: 1\n---\n",
+   "data": {},
+   "body": "﻿---\na: 1\n---\n"
+  },
+  {
+   "text": "---\na: 1\n...\n---\nz",
+   "error": "frontmatter line 3: expected `key: value`",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "---\na: &x 1\n---\n",
+   "error": "frontmatter line 2: anchors, aliases and tags are not supported",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "---\n\n\n---\n\n",
+   "data": {},
+   "body": ""
+  },
+  {
+   "text": "---\na: 1\r---\nb",
+   "error": "frontmatter line 2: expected `key: value`",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "---\na: 1\n---\rafter",
+   "data": {
+    "a": 1
+   },
+   "body": "\rafter"
+  },
+  {
+   "text": "---\n\n---\nBODY\n",
+   "data": {},
+   "body": "BODY\n"
+  },
+  {
+   "text": "---\na: 1\n---\nBODY\n",
+   "data": {
+    "a": 1
+   },
+   "body": "BODY\n"
+  },
+  {
+   "text": "---\nname: my-agent\ndescription: \"Audit — says \\\"hi\\\"\\n and \\u00e9\"\nsingle: 'it''s # not a comment'\nplain: value # a comment\ncolon: a: b\nurl: https://example.com/x\nint: 42\nneg: -3\nfloat: 1.0\nyes: true\nno: False\nnothing: ~\nempty:\n# full-line comment\n---\nBODY\n",
+   "data": {
+    "name": "my-agent",
+    "description": "Audit — says \"hi\"\n and é",
+    "single": "it's # not a comment",
+    "plain": "value",
+    "colon": "a: b",
+    "url": "https://example.com/x",
+    "int": 42,
+    "neg": -3,
+    "float": {
+     "$float": 1
+    },
+    "yes": true,
+    "no": false,
+    "nothing": null,
+    "empty": null
+   },
+   "body": "BODY\n"
+  },
+  {
+   "text": "---\nlit: |\n  line one\n    indented\n\n  line three\nfold: >-\n  folded\n  together\nkeep: |+\n  k\n\nafter: x\n---\nBODY\n",
+   "data": {
+    "lit": "line one\n  indented\n\nline three\n",
+    "fold": "folded together",
+    "keep": "k\n\n",
+    "after": "x"
+   },
+   "body": "BODY\n"
+  },
+  {
+   "text": "---\ndescription: a long\n  description here\nq: \"two\n  lines\"\n---\nBODY\n",
+   "data": {
+    "description": "a long description here",
+    "q": "two lines"
+   },
+   "body": "BODY\n"
+  },
+  {
+   "text": "---\ntools: Read, Bash\nbriefing:\n  skills:\n    - skilletor-core\n    - 'kanban: karr'\ncodex:\n  model: gpt-5\n  nickname_candidates: [Ada, \"B, C\"]\n  features:\n    web: true\nlist_same_indent:\n- a\n- b\nflow_map: {a: 1, b: two}\n---\nBODY\n",
+   "data": {
+    "tools": "Read, Bash",
+    "briefing": {
+     "skills": [
+      "skilletor-core",
+      "kanban: karr"
+     ]
+    },
+    "codex": {
+     "model": "gpt-5",
+     "nickname_candidates": [
+      "Ada",
+      "B, C"
+     ],
+     "features": {
+      "web": true
+     }
+    },
+    "list_same_indent": [
+     "a",
+     "b"
+    ],
+    "flow_map": {
+     "a": 1,
+     "b": "two"
+    }
+   },
+   "body": "BODY\n"
+  },
+  {
+   "text": "---\na: &anchor x\n---\nBODY\n",
+   "error": "frontmatter line 2: anchors, aliases and tags are not supported",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "---\na: *alias\n---\nBODY\n",
+   "error": "frontmatter line 2: anchors, aliases and tags are not supported",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "---\na: !tag x\n---\nBODY\n",
+   "error": "frontmatter line 2: anchors, aliases and tags are not supported",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "---\nlist:\n  - key: value\n---\nBODY\n",
+   "error": "frontmatter line 3: mappings inside sequences are not supported",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "---\na: [x, [nested]]\n---\nBODY\n",
+   "error": "frontmatter line 2: nested collections are not supported",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "---\na: \"unterminated\n---\nBODY\n",
+   "error": "frontmatter line 2: unterminated double-quoted string",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "---\na: b\na: c\n---\nBODY\n",
+   "error": "frontmatter line 3: duplicate key \"a\"",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "---\n  indented: first\n---\nBODY\n",
+   "error": "frontmatter line 2: unexpected indentation",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "---\nnot a mapping line\n---\nBODY\n",
+   "error": "frontmatter line 2: expected `key: value`",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "---\na: 1\nb: &x 2\n\n---\nBODY\n",
+   "error": "frontmatter line 3: anchors, aliases and tags are not supported",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "---\na:\n\t- x\n---\nBODY\n",
+   "error": "frontmatter line 3: tabs are not allowed in indentation",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "---\na: [1, 2\n---\nBODY\n",
+   "error": "frontmatter line 2: expected \",\" or \"]\"",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "---\na: {x: 1, y}\n---\nBODY\n",
+   "error": "frontmatter line 2: expected `key: value` in a flow mapping",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "---\na: {: 1}\n---\nBODY\n",
+   "error": "frontmatter line 2: bad key in a flow mapping",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "---\na: [] # c\n---\nBODY\n",
+   "data": {
+    "a": []
+   },
+   "body": "BODY\n"
+  },
+  {
+   "text": "---\na: {} trailing\n---\nBODY\n",
+   "error": "frontmatter line 2: unexpected text after a value: \"trailing\"",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "---\na: \"\\x41\\u00e9\\U0001F600\\N\\_\\L\\P\\0\\e\"\n---\nBODY\n",
+   "data": {
+    "a": "Aé😀   \u0000\u001b"
+   },
+   "body": "BODY\n"
+  },
+  {
+   "text": "---\na: \"\\q\"\n---\nBODY\n",
+   "error": "frontmatter line 2: unknown escape \\q",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "---\na: \"\\xZZ\"\n---\nBODY\n",
+   "error": "frontmatter line 2: bad \\x escape",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "---\na: \"\\U00110000\"\n---\nBODY\n",
+   "error": "frontmatter line 2: bad \\U escape",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "---\na: \"tail\\\"\n---\nBODY\n",
+   "error": "frontmatter line 2: unterminated double-quoted string",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "---\na: 'x' y\n---\nBODY\n",
+   "error": "frontmatter line 2: unexpected text after a value: \"y\"",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "---\nn: 9007199254740991\nm: 9007199254740992\no: -9007199254740993\nz: 007\np: +5\nf: .5\ng: 5.\nh: 1e3\ni: -1.5E-2\nj: 1_000\nk: 0x10\nl: 1e400\n---\nBODY\n",
+   "data": {
+    "n": 9007199254740991,
+    "m": "9007199254740992",
+    "o": "-9007199254740993",
+    "z": 7,
+    "p": 5,
+    "f": {
+     "$float": 0.5
+    },
+    "g": {
+     "$float": 5
+    },
+    "h": {
+     "$float": 1000
+    },
+    "i": {
+     "$float": -0.015
+    },
+    "j": "1_000",
+    "k": "0x10",
+    "l": {
+     "$float": null
+    }
+   },
+   "body": "BODY\n"
+  },
+  {
+   "text": "---\nb1: True\nb2: TRUE\nb3: yes\nn1: Null\nn2: NULL\nn3: null\n---\nBODY\n",
+   "data": {
+    "b1": true,
+    "b2": true,
+    "b3": "yes",
+    "n1": null,
+    "n2": null,
+    "n3": null
+   },
+   "body": "BODY\n"
+  },
+  {
+   "text": "---\nfold: >\n  one\n  two\n\n  three\n    more\n  four\n\n---\nBODY\n",
+   "data": {
+    "fold": "one two\nthree\n  more\nfour\n"
+   },
+   "body": "BODY\n"
+  },
+  {
+   "text": "---\nstrip: |-\n  a\n\n\nkeep: |+\n  a\n\n\nclip: |\n  a\n\n\nnext: 1\n---\nBODY\n",
+   "data": {
+    "strip": "a",
+    "keep": "a\n\n\n",
+    "clip": "a\n",
+    "next": 1
+   },
+   "body": "BODY\n"
+  },
+  {
+   "text": "---\nind: |2\n    two extra\n  base\n\n---\nBODY\n",
+   "data": {
+    "ind": "  two extra\nbase\n"
+   },
+   "body": "BODY\n"
+  },
+  {
+   "text": "---\nbad: |x\n  a\n---\nBODY\n",
+   "error": "frontmatter line 2: unsupported block scalar header \"|x\"",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "---\nbad: |1\n a\nlow: |\n    deep\n  shallow\n---\nBODY\n",
+   "error": "frontmatter line 6: block scalar line is less indented than its first line",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "---\nempty_block: |\nnext: 1\n---\nBODY\n",
+   "data": {
+    "empty_block": "",
+    "next": 1
+   },
+   "body": "BODY\n"
+  },
+  {
+   "text": "---\nseq:\n  - a\n  -\n  - b\n---\nBODY\n",
+   "error": "frontmatter line 4: nested blocks inside sequences are not supported",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "---\nseq:\n  - a\n    - b\n---\nBODY\n",
+   "error": "frontmatter line 4: unexpected indentation in a sequence",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "---\nseq:\n  - [a]\n---\nBODY\n",
+   "error": "frontmatter line 3: nested collections are not supported",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "---\nseq:\n  - a # c\n  - 'b' # d\n  - \"c\"\n---\nBODY\n",
+   "data": {
+    "seq": [
+     "a",
+     "b",
+     "c"
+    ]
+   },
+   "body": "BODY\n"
+  },
+  {
+   "text": "---\n\"quoted key\": 1\n'single key': 2\n'it''s': 3\n\"esc\\tkey\": 4\n---\nBODY\n",
+   "data": {
+    "quoted key": 1,
+    "single key": 2,
+    "it's": 3,
+    "esc\tkey": 4
+   },
+   "body": "BODY\n"
+  },
+  {
+   "text": "---\na:\n  b:\n    c: 1\n  d: 2\ne: 3\n---\nBODY\n",
+   "data": {
+    "a": {
+     "b": {
+      "c": 1
+     },
+     "d": 2
+    },
+    "e": 3
+   },
+   "body": "BODY\n"
+  },
+  {
+   "text": "---\na:\n  b: 1\n   c: 2\n---\nBODY\n",
+   "data": {
+    "a": {
+     "b": "1 c: 2"
+    }
+   },
+   "body": "BODY\n"
+  },
+  {
+   "text": "---\n- top\n---\nBODY\n",
+   "error": "frontmatter line 2: unexpected sequence item",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "---\na: 1\n  - b\n---\nBODY\n",
+   "data": {
+    "a": "1 - b"
+   },
+   "body": "BODY\n"
+  },
+  {
+   "text": "---\nkey with spaces: v\nkey-dash: v\n_under: v\n123: v\n\n---\nBODY\n",
+   "data": {
+    "123": "v",
+    "key with spaces": "v",
+    "key-dash": "v",
+    "_under": "v"
+   },
+   "body": "BODY\n"
+  },
+  {
+   "text": "---\na: x\n  continued # not a comment\n  more # comment\n---\nBODY\n",
+   "data": {
+    "a": "x continued more"
+   },
+   "body": "BODY\n"
+  },
+  {
+   "text": "---\na: [x,\n  y]\n---\nBODY\n",
+   "data": {
+    "a": [
+     "x",
+     "y"
+    ]
+   },
+   "body": "BODY\n"
+  },
+  {
+   "text": "---\na: {x: 1,\n  y: 2}\n---\nBODY\n",
+   "data": {
+    "a": {
+     "x": 1,
+     "y": 2
+    }
+   },
+   "body": "BODY\n"
+  },
+  {
+   "text": "---\na: # comment\n  b: 1\n---\nBODY\n",
+   "data": {
+    "a": {
+     "b": 1
+    }
+   },
+   "body": "BODY\n"
+  },
+  {
+   "text": "---\ndescription:\nskills: [a]\n---\nBODY\n",
+   "data": {
+    "description": null,
+    "skills": [
+     "a"
+    ]
+   },
+   "body": "BODY\n"
+  },
+  {
+   "text": "---\na: 'one\n  two'\n---\nBODY\n",
+   "data": {
+    "a": "one two"
+   },
+   "body": "BODY\n"
+  },
+  {
+   "text": "---\na: @x\n---\nBODY\n",
+   "data": {
+    "a": "@x"
+   },
+   "body": "BODY\n"
+  },
+  {
+   "text": "---\na: `x`\n---\nBODY\n",
+   "data": {
+    "a": "`x`"
+   },
+   "body": "BODY\n"
+  },
+  {
+   "text": "---\n?complex: 1\n---\nBODY\n",
+   "error": "frontmatter line 2: expected `key: value`",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "---\na: 1\r\nb: 2\r\n\n---\nBODY\n",
+   "data": {
+    "a": 1,
+    "b": 2
+   },
+   "body": "BODY\n"
+  },
+  {
+   "text": "---\na: x y\n---\nBODY\n",
+   "error": "frontmatter line 2: expected `key: value`",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "---\na: b\n---\nBODY\n",
+   "error": "frontmatter line 2: expected `key: value`",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "---\nnode:test\n---\nBODY\n",
+   "error": "frontmatter line 2: expected `key: value`",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "---\nnode:assert/strict\n---\nBODY\n",
+   "error": "frontmatter line 2: expected `key: value`",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "---\n../src/frontmatter.ts\n---\nBODY\n",
+   "error": "frontmatter line 2: expected `key: value`",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "---\nBODY\n\n---\nBODY\n",
+   "error": "frontmatter line 2: expected `key: value`",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "---\nno frontmatter: empty data, the whole text is the body\n---\nBODY\n",
+   "data": {
+    "no frontmatter": "empty data, the whole text is the body"
+   },
+   "body": "BODY\n"
+  },
+  {
+   "text": "---\njust text\n\n---\nBODY\n",
+   "error": "frontmatter line 2: expected `key: value`",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "---\n---\n---\nB\n\n---\nBODY\n",
+   "data": {},
+   "body": "---\nB\n\n---\nBODY\n"
+  },
+  {
+   "text": "---\nB\n\n---\nBODY\n",
+   "error": "frontmatter line 2: expected `key: value`",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "---\nthe body starts after the closing fence; leading blank lines are dropped, the rest is verbatim\n---\nBODY\n",
+   "error": "frontmatter line 2: expected `key: value`",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "---\nname: a\n---\nBODY\n",
+   "data": {
+    "name": "a"
+   },
+   "body": "BODY\n"
+  },
+  {
+   "text": "---\n\n\n  indented\n\ntrailing  \n\n\n---\nBODY\n",
+   "error": "frontmatter line 4: unexpected indentation",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "---\n  indented\n\ntrailing  \n\n\n---\nBODY\n",
+   "error": "frontmatter line 2: unexpected indentation",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "---\n---\r\nname: a\r\n---\r\nB\r\n\n---\nBODY\n",
+   "data": {},
+   "body": "name: a\r\n---\r\nB\r\n\n---\nBODY\n"
+  },
+  {
+   "text": "---\nB\r\n\n---\nBODY\n",
+   "error": "frontmatter line 2: expected `key: value`",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "---\nscalars: plain, quoted, typed, with comments\n---\nBODY\n",
+   "data": {
+    "scalars": "plain, quoted, typed, with comments"
+   },
+   "body": "BODY\n"
+  },
+  {
+   "text": "---\nname: my-agent\n---\nBODY\n",
+   "data": {
+    "name": "my-agent"
+   },
+   "body": "BODY\n"
+  },
+  {
+   "text": "---\nAudit — says \\\n---\nBODY\n",
+   "error": "frontmatter line 2: expected `key: value`",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "---\n\\n and \\u00e9\n---\nBODY\n",
+   "error": "frontmatter line 2: expected `key: value`",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "---\nsingle: 'it''s # not a comment'\n---\nBODY\n",
+   "data": {
+    "single": "it's # not a comment"
+   },
+   "body": "BODY\n"
+  },
+  {
+   "text": "---\nplain: value # a comment\n---\nBODY\n",
+   "data": {
+    "plain": "value"
+   },
+   "body": "BODY\n"
+  },
+  {
+   "text": "---\ncolon: a: b\n---\nBODY\n",
+   "data": {
+    "colon": "a: b"
+   },
+   "body": "BODY\n"
+  },
+  {
+   "text": "---\nurl: https://example.com/x\n---\nBODY\n",
+   "data": {
+    "url": "https://example.com/x"
+   },
+   "body": "BODY\n"
+  },
+  {
+   "text": "---\nint: 42\n---\nBODY\n",
+   "data": {
+    "int": 42
+   },
+   "body": "BODY\n"
+  },
+  {
+   "text": "---\nneg: -3\n---\nBODY\n",
+   "data": {
+    "neg": -3
+   },
+   "body": "BODY\n"
+  },
+  {
+   "text": "---\nfloat: 1.0\n---\nBODY\n",
+   "data": {
+    "float": {
+     "$float": 1
+    }
+   },
+   "body": "BODY\n"
+  },
+  {
+   "text": "---\nyes: true\n---\nBODY\n",
+   "data": {
+    "yes": true
+   },
+   "body": "BODY\n"
+  },
+  {
+   "text": "---\nno: False\n---\nBODY\n",
+   "data": {
+    "no": false
+   },
+   "body": "BODY\n"
+  },
+  {
+   "text": "---\nnothing: ~\n---\nBODY\n",
+   "data": {
+    "nothing": null
+   },
+   "body": "BODY\n"
+  },
+  {
+   "text": "---\nempty:\n---\nBODY\n",
+   "data": {
+    "empty": null
+   },
+   "body": "BODY\n"
+  },
+  {
+   "text": "---\n# full-line comment\n---\nBODY\n",
+   "data": {},
+   "body": "BODY\n"
+  },
+  {
+   "text": "---\n\n\n---\nBODY\n",
+   "data": {},
+   "body": "BODY\n"
+  },
+  {
+   "text": "---\nmy-agent\n---\nBODY\n",
+   "error": "frontmatter line 2: expected `key: value`",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "---\nhi\n---\nBODY\n",
+   "error": "frontmatter line 2: expected `key: value`",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "---\nit's # not a comment\n---\nBODY\n",
+   "error": "frontmatter line 2: expected `key: value`",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "---\nvalue\n---\nBODY\n",
+   "error": "frontmatter line 2: expected `key: value`",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "---\na: b\n---\nBODY\n",
+   "data": {
+    "a": "b"
+   },
+   "body": "BODY\n"
+  },
+  {
+   "text": "---\nhttps://example.com/x\n---\nBODY\n",
+   "error": "frontmatter line 2: expected `key: value`",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "---\nblock scalars: literal and folded, with chomping\n---\nBODY\n",
+   "data": {
+    "block scalars": "literal and folded, with chomping"
+   },
+   "body": "BODY\n"
+  },
+  {
+   "text": "---\nlit: |\n---\nBODY\n",
+   "data": {
+    "lit": ""
+   },
+   "body": "BODY\n"
+  },
+  {
+   "text": "---\n  line one\n---\nBODY\n",
+   "error": "frontmatter line 2: unexpected indentation",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "---\n    indented\n---\nBODY\n",
+   "error": "frontmatter line 2: unexpected indentation",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "---\n  line three\n---\nBODY\n",
+   "error": "frontmatter line 2: unexpected indentation",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "---\nfold: >-\n---\nBODY\n",
+   "data": {
+    "fold": ""
+   },
+   "body": "BODY\n"
+  },
+  {
+   "text": "---\n  folded\n---\nBODY\n",
+   "error": "frontmatter line 2: unexpected indentation",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "---\n  together\n---\nBODY\n",
+   "error": "frontmatter line 2: unexpected indentation",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "---\nkeep: |+\n---\nBODY\n",
+   "data": {
+    "keep": "\n\n"
+   },
+   "body": "BODY\n"
+  },
+  {
+   "text": "---\n  k\n---\nBODY\n",
+   "error": "frontmatter line 2: unexpected indentation",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "---\nafter: x\n---\nBODY\n",
+   "data": {
+    "after": "x"
+   },
+   "body": "BODY\n"
+  },
+  {
+   "text": "---\nline one\n  indented\n\nline three\n\n---\nBODY\n",
+   "error": "frontmatter line 2: expected `key: value`",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "---\nfolded together\n---\nBODY\n",
+   "error": "frontmatter line 2: expected `key: value`",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "---\nk\n\n\n---\nBODY\n",
+   "error": "frontmatter line 2: expected `key: value`",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "---\nx\n---\nBODY\n",
+   "error": "frontmatter line 2: expected `key: value`",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "---\nmulti-line plain and quoted scalars fold with spaces\n---\nBODY\n",
+   "error": "frontmatter line 2: expected `key: value`",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "---\n  description here\n---\nBODY\n",
+   "error": "frontmatter line 2: unexpected indentation",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "---\ntwo', '  lines\n---\nBODY\n",
+   "error": "frontmatter line 2: expected `key: value`",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "---\na long description here\n---\nBODY\n",
+   "error": "frontmatter line 2: expected `key: value`",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "---\ntwo lines\n---\nBODY\n",
+   "error": "frontmatter line 2: expected `key: value`",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "---\nsequences and nested mappings (the briefing and codex shapes)\n---\nBODY\n",
+   "error": "frontmatter line 2: expected `key: value`",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "---\ntools: Read, Bash\n---\nBODY\n",
+   "data": {
+    "tools": "Read, Bash"
+   },
+   "body": "BODY\n"
+  },
+  {
+   "text": "---\nbriefing:\n---\nBODY\n",
+   "data": {
+    "briefing": null
+   },
+   "body": "BODY\n"
+  },
+  {
+   "text": "---\n  skills:\n---\nBODY\n",
+   "error": "frontmatter line 2: unexpected indentation",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "---\n    - skilletor-core\n---\nBODY\n",
+   "error": "frontmatter line 2: unexpected indentation",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "---\n    - 'kanban: karr'\n---\nBODY\n",
+   "error": "frontmatter line 2: unexpected indentation",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "---\ncodex:\n---\nBODY\n",
+   "data": {
+    "codex": null
+   },
+   "body": "BODY\n"
+  },
+  {
+   "text": "---\n  model: gpt-5\n---\nBODY\n",
+   "error": "frontmatter line 2: unexpected indentation",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "---\n  model_reasoning_effort: high\n---\nBODY\n",
+   "error": "frontmatter line 2: unexpected indentation",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "---\n  nickname_candidates: [Ada, \"B, C\"]\n---\nBODY\n",
+   "error": "frontmatter line 2: unexpected indentation",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "---\n  features:\n---\nBODY\n",
+   "error": "frontmatter line 2: unexpected indentation",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "---\n    web: true\n---\nBODY\n",
+   "error": "frontmatter line 2: unexpected indentation",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "---\nlist_same_indent:\n---\nBODY\n",
+   "data": {
+    "list_same_indent": null
+   },
+   "body": "BODY\n"
+  },
+  {
+   "text": "---\n- a\n---\nBODY\n",
+   "error": "frontmatter line 2: unexpected sequence item",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "---\n- b\n---\nBODY\n",
+   "error": "frontmatter line 2: unexpected sequence item",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "---\nflow_map: {a: 1, b: two}\n---\nBODY\n",
+   "data": {
+    "flow_map": {
+     "a": 1,
+     "b": "two"
+    }
+   },
+   "body": "BODY\n"
+  },
+  {
+   "text": "---\nRead, Bash\n---\nBODY\n",
+   "error": "frontmatter line 2: expected `key: value`",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "---\nskilletor-core\n---\nBODY\n",
+   "error": "frontmatter line 2: expected `key: value`",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "---\nkanban: karr\n---\nBODY\n",
+   "data": {
+    "kanban": "karr"
+   },
+   "body": "BODY\n"
+  },
+  {
+   "text": "---\ngpt-5\n---\nBODY\n",
+   "error": "frontmatter line 2: expected `key: value`",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "---\nhigh\n---\nBODY\n",
+   "error": "frontmatter line 2: expected `key: value`",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "---\nAda\n---\nBODY\n",
+   "error": "frontmatter line 2: expected `key: value`",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "---\nB, C\n---\nBODY\n",
+   "error": "frontmatter line 2: expected `key: value`",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "---\na\n---\nBODY\n",
+   "error": "frontmatter line 2: expected `key: value`",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "---\nb\n---\nBODY\n",
+   "error": "frontmatter line 2: expected `key: value`",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "---\ntwo\n---\nBODY\n",
+   "error": "frontmatter line 2: expected `key: value`",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "---\noutside the subset: a FrontmatterError naming the line\n---\nBODY\n",
+   "data": {
+    "outside the subset": "a FrontmatterError naming the line"
+   },
+   "body": "BODY\n"
+  },
+  {
+   "text": "---\nparseYamlDocument reads a whole file and numbers lines from 1\n---\nBODY\n",
+   "error": "frontmatter line 2: expected `key: value`",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "---\ndescription: D\nskills: [perl-*, testing]\nvars:\n  k: \"5.40\"\n\n---\nBODY\n",
+   "data": {
+    "description": "D",
+    "skills": [
+     "perl-*",
+     "testing"
+    ],
+    "vars": {
+     "k": "5.40"
+    }
+   },
+   "body": "BODY\n"
+  },
+  {
+   "text": "---\nD\n---\nBODY\n",
+   "error": "frontmatter line 2: expected `key: value`",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "---\nperl-*\n---\nBODY\n",
+   "error": "frontmatter line 2: expected `key: value`",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "---\ntesting\n---\nBODY\n",
+   "error": "frontmatter line 2: expected `key: value`",
+   "class": "FrontmatterError"
+  },
+  {
+   "text": "---\n5.40\n---\nBODY\n",
+   "error": "frontmatter line 2: expected `key: value`",
+   "class": "FrontmatterError"
+  }
+ ],
+ "bundles": [
+  {
+   "text": "description: D\n",
+   "result": {
+    "description": "D",
+    "items": [],
+    "foreign": [],
+    "bundles": [],
+    "vars": {}
+   }
+  },
+  {
+   "text": "description: D\nskills: [perl-*, testing]\nagents:\n  - reviewer\nrules: [\"*-style\"]\nbundles: [base, extra]\nvars:\n  k: \"5.40\"\n  n: 1.5\n  i: 2\n  b: true\n  nested: {a: 1}\n  list: [x, 2]\n",
+   "result": {
+    "description": "D",
+    "items": [
+     {
+      "type": "skill",
+      "entry": "perl-*"
+     },
+     {
+      "type": "skill",
+      "entry": "testing"
+     },
+     {
+      "type": "agent",
+      "entry": "reviewer"
+     },
+     {
+      "type": "rule",
+      "entry": "*-style"
+     }
+    ],
+    "foreign": [],
+    "bundles": [
+     "base",
+     "extra"
+    ],
+    "vars": {
+     "k": "5.40",
+     "n": 1.5,
+     "i": 2,
+     "b": true,
+     "nested": {
+      "a": 1
+     },
+     "list": [
+      "x",
+      2
+     ]
+    }
+   }
+  },
+  {
+   "text": "description: D\nskills: [foo@Getty, \"perl-*@gitlab.com/peter\", x@https://h.example/s.tar.gz]\n",
+   "result": {
+    "description": "D",
+    "items": [],
+    "foreign": [
+     {
+      "type": "skill",
+      "entry": "foo@Getty",
+      "name": "foo",
+      "spec": "Getty",
+      "url": "https://github.com/Getty/skills",
+      "kind": "git",
+      "derivedName": "getty"
+     },
+     {
+      "type": "skill",
+      "entry": "perl-*@gitlab.com/peter",
+      "name": "perl-*",
+      "spec": "gitlab.com/peter",
+      "url": "https://gitlab.com/peter/skills",
+      "kind": "git",
+      "derivedName": "peter"
+     },
+     {
+      "type": "skill",
+      "entry": "x@https://h.example/s.tar.gz",
+      "name": "x",
+      "spec": "https://h.example/s.tar.gz",
+      "url": "https://h.example/s.tar.gz",
+      "kind": "url",
+      "derivedName": "h-example"
+     }
+    ],
+    "bundles": [],
+    "vars": {}
+   }
+  },
+  {
+   "text": "description: D\nskills: [foo@host.example/x]\n",
+   "error": "skills: \"foo@host.example/x\": a generic host must be written as a full https:// URL",
+   "class": "BundleError"
+  },
+  {
+   "text": "description: D\nskills: [foo@~/dev/skills]\n",
+   "error": "skills: \"foo@~/dev/skills\" names a local path; a bundle can only name remote sources",
+   "class": "BundleError"
+  },
+  {
+   "text": "description: D\nskills: [\"@Getty\"]\n",
+   "error": "skills: \"@Getty\" has an empty name or address",
+   "class": "BundleError"
+  },
+  {
+   "text": "description: D\nskills: [\"x@\"]\n",
+   "error": "skills: \"x@\" has an empty name or address",
+   "class": "BundleError"
+  },
+  {
+   "text": "description: D\nrules: [\"a@http://host/repo\", \"b@ssh://host/repo\", \"c@git@host:o/repo\"]\n",
+   "result": {
+    "description": "D",
+    "items": [],
+    "foreign": [
+     {
+      "type": "rule",
+      "entry": "a@http://host/repo",
+      "name": "a",
+      "spec": "http://host/repo",
+      "url": "http://host/repo",
+      "kind": "git",
+      "derivedName": "repo"
+     },
+     {
+      "type": "rule",
+      "entry": "b@ssh://host/repo",
+      "name": "b",
+      "spec": "ssh://host/repo",
+      "url": "ssh://host/repo",
+      "kind": "git",
+      "derivedName": "repo"
+     },
+     {
+      "type": "rule",
+      "entry": "c@git@host:o/repo",
+      "name": "c",
+      "spec": "git@host:o/repo",
+      "url": "git@host:o/repo",
+      "kind": "git",
+      "derivedName": "repo"
+     }
+    ],
+    "bundles": [],
+    "vars": {}
+   }
+  },
+  {
+   "text": "description: D\nskills: [a@github.com/Getty/karr, \"b@https://github.com/Getty/karr\"]\n",
+   "result": {
+    "description": "D",
+    "items": [],
+    "foreign": [
+     {
+      "type": "skill",
+      "entry": "a@github.com/Getty/karr",
+      "name": "a",
+      "spec": "github.com/Getty/karr",
+      "url": "https://github.com/Getty/karr",
+      "kind": "git",
+      "derivedName": "karr"
+     },
+     {
+      "type": "skill",
+      "entry": "b@https://github.com/Getty/karr",
+      "name": "b",
+      "spec": "https://github.com/Getty/karr",
+      "url": "https://github.com/Getty/karr",
+      "kind": "git",
+      "derivedName": "karr"
+     }
+    ],
+    "bundles": [],
+    "vars": {}
+   }
+  },
+  {
+   "text": "description: D\nskills: [\"a@https://github.com/Getty/karr/tree/main/skills\"]\n",
+   "error": "skills: \"a@https://github.com/Getty/karr/tree/main/skills\" pins ref \"main\" and path \"skills\", but an entry names its source by address alone: write a@https://github.com/Getty/karr",
+   "class": "BundleError"
+  },
+  {
+   "text": "description: D\nskills: [\"a@https://github.com/Getty/karr/tree/v1\"]\n",
+   "error": "skills: \"a@https://github.com/Getty/karr/tree/v1\" pins ref \"v1\", but an entry names its source by address alone: write a@https://github.com/Getty/karr",
+   "class": "BundleError"
+  },
+  {
+   "text": "description: D\nskills: [\"a@http://h.example/s.tar.gz\"]\n",
+   "error": "skills: \"a@http://h.example/s.tar.gz\" cannot be added as a source: sources.h-example.url \"http://h.example/s.tar.gz\" must be an https:// URL",
+   "class": "BundleError"
+  },
+  {
+   "text": "description: D\nskills: [\"a@-x\"]\n",
+   "error": "skills: \"a@-x\": cannot resolve \"-x\": a source must not start with \"-\"",
+   "class": "BundleError"
+  },
+  {
+   "text": "description: D\nskills: [\"a@ext::sh -c x\"]\n",
+   "result": {
+    "description": "D",
+    "items": [],
+    "foreign": [
+     {
+      "type": "skill",
+      "entry": "a@ext::sh -c x",
+      "name": "a",
+      "spec": "ext::sh -c x",
+      "url": "ext::sh -c x",
+      "kind": "git",
+      "derivedName": "sh--c-x"
+     }
+    ],
+    "bundles": [],
+    "vars": {}
+   }
+  },
+  {
+   "text": "description: D\nbundles: [x@y]\n",
+   "error": "bundles: \"x@y\" must be a bare name of this source",
+   "class": "BundleError"
+  },
+  {
+   "text": "description: D\nbundles: [x-*]\n",
+   "error": "bundles: \"x-*\": patterns over bundle names are not supported",
+   "class": "BundleError"
+  },
+  {
+   "text": "description: D\nbundles: [\"\"]\n",
+   "error": "bundles has an empty entry",
+   "class": "BundleError"
+  },
+  {
+   "text": "description: \"x\\U00110000\"\n",
+   "error": "line 1: bad \\U escape",
+   "class": "BundleError"
+  },
+  {
+   "text": "description: \"x\\U0010FFFF\"\n",
+   "result": {
+    "description": "x􏿿",
+    "items": [],
+    "foreign": [],
+    "bundles": [],
+    "vars": {}
+   }
+  },
+  {
+   "text": "skills: [a]\n",
+   "error": "description is required (a string)",
+   "class": "BundleError"
+  },
+  {
+   "text": "description: \"\"\n",
+   "error": "description is required (a string)",
+   "class": "BundleError"
+  },
+  {
+   "text": "description: 5\n",
+   "error": "description is required (a string)",
+   "class": "BundleError"
+  },
+  {
+   "text": "description: [a]\n",
+   "error": "description is required (a string)",
+   "class": "BundleError"
+  },
+  {
+   "text": "description:   \n",
+   "error": "description is required (a string)",
+   "class": "BundleError"
+  },
+  {
+   "text": "description: D\nextra: 1\n",
+   "error": "unknown key \"extra\" (allowed: description, skills, agents, rules, bundles, vars)",
+   "class": "BundleError"
+  },
+  {
+   "text": "description: D\nskills: a\n",
+   "error": "skills must be a list",
+   "class": "BundleError"
+  },
+  {
+   "text": "description: D\nskills: [1, 2]\n",
+   "error": "skills entries must be strings (got 1)",
+   "class": "BundleError"
+  },
+  {
+   "text": "description: D\nskills: [\"  \"]\n",
+   "error": "skills has an empty entry",
+   "class": "BundleError"
+  },
+  {
+   "text": "description: D\nskills: [\" padded \"]\n",
+   "result": {
+    "description": "D",
+    "items": [
+     {
+      "type": "skill",
+      "entry": "padded"
+     }
+    ],
+    "foreign": [],
+    "bundles": [],
+    "vars": {}
+   }
+  },
+  {
+   "text": "description: D\nskills: [null]\n",
+   "error": "skills entries must be strings (got null)",
+   "class": "BundleError"
+  },
+  {
+   "text": "description: D\nskills: [1.5]\n",
+   "error": "skills entries must be strings (got 1.5)",
+   "class": "BundleError"
+  },
+  {
+   "text": "description: D\nskills: [true]\n",
+   "error": "skills entries must be strings (got true)",
+   "class": "BundleError"
+  },
+  {
+   "text": "description: D\nvars: [a]\n",
+   "error": "vars must be a mapping",
+   "class": "BundleError"
+  },
+  {
+   "text": "description: D\nvars: x\n",
+   "error": "vars must be a mapping",
+   "class": "BundleError"
+  },
+  {
+   "text": "description: D\nvars: 1.5\n",
+   "error": "vars must be a mapping",
+   "class": "BundleError"
+  },
+  {
+   "text": "description: D\nvars:\n",
+   "result": {
+    "description": "D",
+    "items": [],
+    "foreign": [],
+    "bundles": [],
+    "vars": {}
+   }
+  },
+  {
+   "text": "description: D\nskills:\n",
+   "result": {
+    "description": "D",
+    "items": [],
+    "foreign": [],
+    "bundles": [],
+    "vars": {}
+   }
+  },
+  {
+   "text": "description: D\nvars: {}\n",
+   "result": {
+    "description": "D",
+    "items": [],
+    "foreign": [],
+    "bundles": [],
+    "vars": {}
+   }
+  },
+  {
+   "text": "a: &x 1\n",
+   "error": "line 1: anchors, aliases and tags are not supported",
+   "class": "BundleError"
+  },
+  {
+   "text": "description: D\nskills: [a, [b]]\n",
+   "error": "line 2: nested collections are not supported",
+   "class": "BundleError"
+  },
+  {
+   "text": "description: |\n  multi\n  line\n",
+   "result": {
+    "description": "multi\nline\n",
+    "items": [],
+    "foreign": [],
+    "bundles": [],
+    "vars": {}
+   }
+  },
+  {
+   "text": "node:test",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "node:assert/strict",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "node:fs",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "node:path",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "./helpers/tmp.ts",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "../src/bundles.ts",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "../src/catalog.ts",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "matchesPattern: * matches any run of characters anywhere, everything else literally",
+   "error": "line 1: anchors, aliases and tags are not supported",
+   "class": "BundleError"
+  },
+  {
+   "text": "*",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "anything",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "perl-*",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "perl-moo",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "perl-",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "xperl-moo",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "*-style",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "perl-style",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "a*b*c",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "a-x-b-y-c",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "a.b",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "axb",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "exact",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "exactly",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "parseBundle: every key, flow and block lists, vars as plain values",
+   "error": "unknown key \"parseBundle\" (allowed: description, skills, agents, rules, bundles, vars)",
+   "class": "BundleError"
+  },
+  {
+   "text": "description: Everything for Perl projects",
+   "result": {
+    "description": "Everything for Perl projects",
+    "items": [],
+    "foreign": [],
+    "bundles": [],
+    "vars": {}
+   }
+  },
+  {
+   "text": "skills: [perl-*, testing]",
+   "error": "description is required (a string)",
+   "class": "BundleError"
+  },
+  {
+   "text": "agents:",
+   "error": "description is required (a string)",
+   "class": "BundleError"
+  },
+  {
+   "text": "  - perl-reviewer",
+   "error": "line 1: unexpected indentation",
+   "class": "BundleError"
+  },
+  {
+   "text": "rules: [something, \"*-style\"]",
+   "error": "description is required (a string)",
+   "class": "BundleError"
+  },
+  {
+   "text": "bundles: [base]",
+   "error": "description is required (a string)",
+   "class": "BundleError"
+  },
+  {
+   "text": "vars:",
+   "error": "description is required (a string)",
+   "class": "BundleError"
+  },
+  {
+   "text": "  perl_version: \"5.40\"",
+   "error": "line 1: unexpected indentation",
+   "class": "BundleError"
+  },
+  {
+   "text": "  kubernetes: false",
+   "error": "line 1: unexpected indentation",
+   "class": "BundleError"
+  },
+  {
+   "text": "  ratio: 1.5",
+   "error": "line 1: unexpected indentation",
+   "class": "BundleError"
+  },
+  {
+   "text": "\n",
+   "error": "description is required (a string)",
+   "class": "BundleError"
+  },
+  {
+   "text": "Everything for Perl projects",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "skill",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "testing",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "agent",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "perl-reviewer",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "rule",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "something",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "base",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "5.40",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "parseBundle: only description is required",
+   "error": "unknown key \"parseBundle\" (allowed: description, skills, agents, rules, bundles, vars)",
+   "class": "BundleError"
+  },
+  {
+   "text": "D",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "parseBundle errors: parse error, unknown key, no description, bad shapes",
+   "error": "unknown key \"parseBundle errors\" (allowed: description, skills, agents, rules, bundles, vars)",
+   "class": "BundleError"
+  },
+  {
+   "text": "description: D\nskills: &a [x]\n",
+   "error": "line 2: anchors, aliases and tags are not supported",
+   "class": "BundleError"
+  },
+  {
+   "text": "description: D\nhooks: [x]\n",
+   "error": "unknown key \"hooks\" (allowed: description, skills, agents, rules, bundles, vars)",
+   "class": "BundleError"
+  },
+  {
+   "text": "hooks",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "skills: [x]\n",
+   "error": "description is required (a string)",
+   "class": "BundleError"
+  },
+  {
+   "text": "description: [x]\n",
+   "error": "description is required (a string)",
+   "class": "BundleError"
+  },
+  {
+   "text": "description: D\nskills: x\n",
+   "error": "skills must be a list",
+   "class": "BundleError"
+  },
+  {
+   "text": "description: D\nskills: [1]\n",
+   "error": "skills entries must be strings (got 1)",
+   "class": "BundleError"
+  },
+  {
+   "text": "description: D\nvars: [1]\n",
+   "error": "vars must be a mapping",
+   "class": "BundleError"
+  },
+  {
+   "text": "description: D\nbundles: [base@Getty]\n",
+   "error": "bundles: \"base@Getty\" must be a bare name of this source",
+   "class": "BundleError"
+  },
+  {
+   "text": "description: D\nbundles: [\"b*\"]\n",
+   "error": "bundles: \"b*\": patterns over bundle names are not supported",
+   "class": "BundleError"
+  },
+  {
+   "text": "description: D\nskills: [\"\"]\n",
+   "error": "skills has an empty entry",
+   "class": "BundleError"
+  },
+  {
+   "text": "parseBundle: name@<spec> entries are kept apart; a spec that needs a probe or is local is an error",
+   "error": "unknown key \"parseBundle\" (allowed: description, skills, agents, rules, bundles, vars)",
+   "class": "BundleError"
+  },
+  {
+   "text": "foo",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "Getty",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "https://github.com/Getty/skills",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "gitlab.com/peter",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "https://gitlab.com/peter/skills",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "x",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "https://h.example/s.tar.gz",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "k115: parseBundle refuses an entry address config load would refuse as a source",
+   "error": "unknown key \"k115\" (allowed: description, skills, agents, rules, bundles, vars)",
+   "class": "BundleError"
+  },
+  {
+   "text": "x@http://host/x.tar.gz",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "http://host/x.tar.gz",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "x@file:///x.tgz",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "file:///x.tgz",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "x@git@host:x.tar.gz",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "git@host:x.tar.gz",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "${entry}",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "git",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "http://host/repo",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "ssh://host/repo",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "git@host:o/repo",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "codecommit:",
+   "error": "unknown key \"codecommit\" (allowed: description, skills, agents, rules, bundles, vars)",
+   "class": "BundleError"
+  },
+  {
+   "text": "@",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "/",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": ".git",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "k118: parseBundle takes a transport::address entry as a full git address",
+   "error": "unknown key \"k118\" (allowed: description, skills, agents, rules, bundles, vars)",
+   "class": "BundleError"
+  },
+  {
+   "text": "description: D\nskills:\n  - x@codecommit::us-east-1://profile@my-repo\nrules: [\"r-*@hg::https://h.example/o/tools\"]\n",
+   "result": {
+    "description": "D",
+    "items": [],
+    "foreign": [
+     {
+      "type": "skill",
+      "entry": "x@codecommit::us-east-1://profile@my-repo",
+      "name": "x",
+      "spec": "codecommit::us-east-1://profile@my-repo",
+      "url": "codecommit::us-east-1://profile@my-repo",
+      "kind": "git",
+      "derivedName": "my-repo"
+     },
+     {
+      "type": "rule",
+      "entry": "r-*@hg::https://h.example/o/tools",
+      "name": "r-*",
+      "spec": "hg::https://h.example/o/tools",
+      "url": "hg::https://h.example/o/tools",
+      "kind": "git",
+      "derivedName": "tools"
+     }
+    ],
+    "bundles": [],
+    "vars": {}
+   }
+  },
+  {
+   "text": "codecommit::us-east-1://profile@my-repo",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "my-repo",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "r-*",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "hg::https://h.example/o/tools",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "tools",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "codecommit::us-east-1://my-repo",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "codecommit::us-east-1://my-repo/",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "CodeCommit::us-east-1://my-repo",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "k119: parseBundle refuses an entry naming its source by a GitHub tree, file or subdirectory link",
+   "error": "unknown key \"k119\" (allowed: description, skills, agents, rules, bundles, vars)",
+   "class": "BundleError"
+  },
+  {
+   "text": "x@github.com/Getty/karr/tree/v1",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "v1",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "r-*@https://github.com/Getty/karr/tree/main/",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "main",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "x@github.com/Getty/karr/tree/main/skills",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "skills",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "r-*@https://github.com/Getty/karr/tree/v1/skills/research/",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "skills/research",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "x@https://github.com/Getty/karr/blob/main/README.md",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "x@github.com/Getty/karr/tree/",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "${entry.slice(2)}",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "a",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "https://github.com/Getty/karr",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "karr",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "b",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "..",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "scan reads bundles/*.yaml and *.yml; a broken bundle carries its error, the scan does not fail",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "rules/r1.md",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "r1",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "bundles/perl.yaml",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "description: Perl\nrules: [r1]\n",
+   "result": {
+    "description": "Perl",
+    "items": [
+     {
+      "type": "rule",
+      "entry": "r1"
+     }
+    ],
+    "foreign": [],
+    "bundles": [],
+    "vars": {}
+   }
+  },
+  {
+   "text": "bundles/go.yml",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "description: Go\n",
+   "result": {
+    "description": "Go",
+    "items": [],
+    "foreign": [],
+    "bundles": [],
+    "vars": {}
+   }
+  },
+  {
+   "text": "bundles/broken.yaml",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "rules: [r1]\n",
+   "error": "description is required (a string)",
+   "class": "BundleError"
+  },
+  {
+   "text": "bundles/twice.yaml",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "description: A\n",
+   "result": {
+    "description": "A",
+    "items": [],
+    "foreign": [],
+    "bundles": [],
+    "vars": {}
+   }
+  },
+  {
+   "text": "bundles/twice.yml",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "description: B\n",
+   "result": {
+    "description": "B",
+    "items": [],
+    "foreign": [],
+    "bundles": [],
+    "vars": {}
+   }
+  },
+  {
+   "text": "bundles/README.md",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "not a bundle",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "broken",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "go",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "perl",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "twice",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "Perl",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "Go",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "expandBundle: names and patterns per type, then nested bundles depth first; one item once",
+   "error": "unknown key \"expandBundle\" (allowed: description, skills, agents, rules, bundles, vars)",
+   "class": "BundleError"
+  },
+  {
+   "text": "skills/perl-moo/SKILL.md",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "m",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "skills/perl-dbi/SKILL.md",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "d",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "skills/testing/SKILL.md",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "t",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "rules/perl-style.md",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "ps",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "rules/go-style.md",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "gs",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "agents/perl-reviewer.md",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "r",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "description: P\nskills: [perl-*, testing]\nrules: [perl-*, \"*-style\"]\nbundles: [base]\n",
+   "result": {
+    "description": "P",
+    "items": [
+     {
+      "type": "skill",
+      "entry": "perl-*"
+     },
+     {
+      "type": "skill",
+      "entry": "testing"
+     },
+     {
+      "type": "rule",
+      "entry": "perl-*"
+     },
+     {
+      "type": "rule",
+      "entry": "*-style"
+     }
+    ],
+    "foreign": [],
+    "bundles": [
+     "base"
+    ],
+    "vars": {}
+   }
+  },
+  {
+   "text": "bundles/base.yaml",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "description: B\nagents: [perl-reviewer]\nskills: [testing]\n",
+   "result": {
+    "description": "B",
+    "items": [
+     {
+      "type": "skill",
+      "entry": "testing"
+     },
+     {
+      "type": "agent",
+      "entry": "perl-reviewer"
+     }
+    ],
+    "foreign": [],
+    "bundles": [],
+    "vars": {}
+   }
+  },
+  {
+   "text": "agent:perl-reviewer",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "rule:go-style",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "rule:perl-style",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "skill:perl-dbi",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "skill:perl-moo",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "skill:testing",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "expandBundle: a missing name and a pattern that matches nothing each warn once",
+   "error": "unknown key \"expandBundle\" (allowed: description, skills, agents, rules, bundles, vars)",
+   "class": "BundleError"
+  },
+  {
+   "text": "bundles/b.yaml",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "description: B\nrules: [r1, ghost, \"zz-*\"]\n",
+   "result": {
+    "description": "B",
+    "items": [
+     {
+      "type": "rule",
+      "entry": "r1"
+     },
+     {
+      "type": "rule",
+      "entry": "ghost"
+     },
+     {
+      "type": "rule",
+      "entry": "zz-*"
+     }
+    ],
+    "foreign": [],
+    "bundles": [],
+    "vars": {}
+   }
+  },
+  {
+   "text": "rule:r1",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "expandBundle errors: missing bundle, broken nested bundle, cycle named in full",
+   "error": "unknown key \"expandBundle errors\" (allowed: description, skills, agents, rules, bundles, vars)",
+   "class": "BundleError"
+  },
+  {
+   "text": "bundles/a.yaml",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "description: A\nbundles: [b]\n",
+   "result": {
+    "description": "A",
+    "items": [],
+    "foreign": [],
+    "bundles": [
+     "b"
+    ],
+    "vars": {}
+   }
+  },
+  {
+   "text": "description: B\nbundles: [c]\n",
+   "result": {
+    "description": "B",
+    "items": [],
+    "foreign": [],
+    "bundles": [
+     "c"
+    ],
+    "vars": {}
+   }
+  },
+  {
+   "text": "bundles/c.yaml",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "description: C\nbundles: [a]\n",
+   "result": {
+    "description": "C",
+    "items": [],
+    "foreign": [],
+    "bundles": [
+     "a"
+    ],
+    "vars": {}
+   }
+  },
+  {
+   "text": "bundles/outer.yaml",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "description: O\nrules: [r1]\nbundles: [broken]\n",
+   "result": {
+    "description": "O",
+    "items": [
+     {
+      "type": "rule",
+      "entry": "r1"
+     }
+    ],
+    "foreign": [],
+    "bundles": [
+     "broken"
+    ],
+    "vars": {}
+   }
+  },
+  {
+   "text": "nope: 1\n",
+   "error": "unknown key \"nope\" (allowed: description, skills, agents, rules, bundles, vars)",
+   "class": "BundleError"
+  },
+  {
+   "text": "bundles/dangling.yaml",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "description: D\nbundles: [ghost]\n",
+   "result": {
+    "description": "D",
+    "items": [],
+    "foreign": [],
+    "bundles": [
+     "ghost"
+    ],
+    "vars": {}
+   }
+  },
+  {
+   "text": "nope",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "outer",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "dangling",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "expandBundle: a diamond is not a cycle",
+   "error": "unknown key \"expandBundle\" (allowed: description, skills, agents, rules, bundles, vars)",
+   "class": "BundleError"
+  },
+  {
+   "text": "bundles/top.yaml",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "description: T\nbundles: [l, r]\n",
+   "result": {
+    "description": "T",
+    "items": [],
+    "foreign": [],
+    "bundles": [
+     "l",
+     "r"
+    ],
+    "vars": {}
+   }
+  },
+  {
+   "text": "bundles/l.yaml",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "description: L\nbundles: [d]\n",
+   "result": {
+    "description": "L",
+    "items": [],
+    "foreign": [],
+    "bundles": [
+     "d"
+    ],
+    "vars": {}
+   }
+  },
+  {
+   "text": "bundles/r.yaml",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "description: R\nbundles: [d]\n",
+   "result": {
+    "description": "R",
+    "items": [],
+    "foreign": [],
+    "bundles": [
+     "d"
+    ],
+    "vars": {}
+   }
+  },
+  {
+   "text": "bundles/d.yaml",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "description: D\nrules: [r1]\n",
+   "result": {
+    "description": "D",
+    "items": [
+     {
+      "type": "rule",
+      "entry": "r1"
+     }
+    ],
+    "foreign": [],
+    "bundles": [],
+    "vars": {}
+   }
+  },
+  {
+   "text": "top",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "l",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "expandBundle: chain vars, the outer bundle wins over the included one; setters are recorded",
+   "error": "unknown key \"expandBundle\" (allowed: description, skills, agents, rules, bundles, vars)",
+   "class": "BundleError"
+  },
+  {
+   "text": "description: P\nbundles: [base]\nvars:\n  v: outer\n",
+   "result": {
+    "description": "P",
+    "items": [],
+    "foreign": [],
+    "bundles": [
+     "base"
+    ],
+    "vars": {
+     "v": "outer"
+    }
+   }
+  },
+  {
+   "text": "description: B\nrules: [r1]\nvars:\n  v: inner\n  w: base-only\n",
+   "result": {
+    "description": "B",
+    "items": [
+     {
+      "type": "rule",
+      "entry": "r1"
+     }
+    ],
+    "foreign": [],
+    "bundles": [],
+    "vars": {
+     "v": "inner",
+     "w": "base-only"
+    }
+   }
+  },
+  {
+   "text": "base-only",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "expandBundle: entries of other sources come back with their chain, unexpanded and unwarned",
+   "error": "unknown key \"expandBundle\" (allowed: description, skills, agents, rules, bundles, vars)",
+   "class": "BundleError"
+  },
+  {
+   "text": "description: B\nrules: [r1]\nbundles: [inner]\nvars:\n  v: outer\n",
+   "result": {
+    "description": "B",
+    "items": [
+     {
+      "type": "rule",
+      "entry": "r1"
+     }
+    ],
+    "foreign": [],
+    "bundles": [
+     "inner"
+    ],
+    "vars": {
+     "v": "outer"
+    }
+   }
+  },
+  {
+   "text": "bundles/inner.yaml",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "description: I\nrules: [x@Getty, \"p-*@gitlab.com/peter\"]\nvars:\n  v: inner\n  w: inner\n",
+   "result": {
+    "description": "I",
+    "items": [],
+    "foreign": [
+     {
+      "type": "rule",
+      "entry": "x@Getty",
+      "name": "x",
+      "spec": "Getty",
+      "url": "https://github.com/Getty/skills",
+      "kind": "git",
+      "derivedName": "getty"
+     },
+     {
+      "type": "rule",
+      "entry": "p-*@gitlab.com/peter",
+      "name": "p-*",
+      "spec": "gitlab.com/peter",
+      "url": "https://gitlab.com/peter/skills",
+      "kind": "git",
+      "derivedName": "peter"
+     }
+    ],
+    "bundles": [],
+    "vars": {
+     "v": "inner",
+     "w": "inner"
+    }
+   }
+  },
+  {
+   "text": "getty",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "inner",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "p-*",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "peter",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "sameIdentity ignores a trailing slash, .git and host case",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "https://GitHub.com/Getty/skills",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "https://github.com/Getty/skills.git/",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "https://github.com/getty/skills",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "file:///a/b.git",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "file:///a/b",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "https://h/x.tar.gz",
+   "error": "line 1: expected `key: value`",
+   "class": "BundleError"
+  },
+  {
+   "text": "expandBundle: a bare * that matches nothing stays silent, as in config (spec §3)",
+   "error": "unknown key \"expandBundle\" (allowed: description, skills, agents, rules, bundles, vars)",
+   "class": "BundleError"
+  },
+  {
+   "text": "description: B\nrules: [r1]\nagents: [\"*\"]\n",
+   "result": {
+    "description": "B",
+    "items": [
+     {
+      "type": "agent",
+      "entry": "*"
+     },
+     {
+      "type": "rule",
+      "entry": "r1"
+     }
+    ],
+    "foreign": [],
+    "bundles": [],
+    "vars": {}
+   }
+  }
+ ],
+ "patterns": [
+  {
+   "pattern": "perl-*",
+   "name": "perl-moo",
+   "match": true
+  },
+  {
+   "pattern": "perl-*",
+   "name": "perl-",
+   "match": true
+  },
+  {
+   "pattern": "perl-*",
+   "name": "xperl-moo",
+   "match": false
+  },
+  {
+   "pattern": "*",
+   "name": "",
+   "match": true
+  },
+  {
+   "pattern": "*",
+   "name": "anything",
+   "match": true
+  },
+  {
+   "pattern": "*-style",
+   "name": "perl-style",
+   "match": true
+  },
+  {
+   "pattern": "a*b*c",
+   "name": "aXXbYYc",
+   "match": true
+  },
+  {
+   "pattern": "a*b*c",
+   "name": "abc",
+   "match": true
+  },
+  {
+   "pattern": "a*b*c",
+   "name": "acb",
+   "match": false
+  },
+  {
+   "pattern": "a.b",
+   "name": "axb",
+   "match": false
+  },
+  {
+   "pattern": "a.b",
+   "name": "a.b",
+   "match": true
+  },
+  {
+   "pattern": "(x)",
+   "name": "(x)",
+   "match": true
+  },
+  {
+   "pattern": "x+",
+   "name": "xx",
+   "match": false
+  },
+  {
+   "pattern": "[a]",
+   "name": "[a]",
+   "match": true
+  },
+  {
+   "pattern": "a$",
+   "name": "a$",
+   "match": true
+  },
+  {
+   "pattern": "^a",
+   "name": "^a",
+   "match": true
+  },
+  {
+   "pattern": "a\\b",
+   "name": "a\\b",
+   "match": true
+  },
+  {
+   "pattern": "*",
+   "name": "a\nb",
+   "match": false
+  },
+  {
+   "pattern": "a*",
+   "name": "a\nb",
+   "match": false
+  },
+  {
+   "pattern": "",
+   "name": "",
+   "match": true
+  },
+  {
+   "pattern": "",
+   "name": "a",
+   "match": false
+  },
+  {
+   "pattern": "**",
+   "name": "x",
+   "match": true
+  },
+  {
+   "pattern": "é*",
+   "name": "élan",
+   "match": true
+  },
+  {
+   "pattern": "A*",
+   "name": "abc",
+   "match": false
+  }
+ ],
+ "identities": [
+  {
+   "a": "https://github.com/Getty/karr",
+   "b": "https://github.com/Getty/karr.git",
+   "same": true
+  },
+  {
+   "a": "https://github.com/Getty/karr/",
+   "b": "https://GitHub.com/Getty/karr",
+   "same": true
+  },
+  {
+   "a": "HTTPS://github.com/x",
+   "b": "https://github.com/x",
+   "same": true
+  },
+  {
+   "a": "https://github.com/Getty/Karr",
+   "b": "https://github.com/Getty/karr",
+   "same": false
+  },
+  {
+   "a": "  https://h/x.git/  ",
+   "b": "https://h/x",
+   "same": true
+  },
+  {
+   "a": "git@host:o/r.git",
+   "b": "git@host:o/r",
+   "same": true
+  },
+  {
+   "a": "git@Host:o/r",
+   "b": "git@host:o/r",
+   "same": false
+  },
+  {
+   "a": "https://h/x.git.git",
+   "b": "https://h/x.git",
+   "same": false
+  },
+  {
+   "a": "https://h/x//",
+   "b": "https://h/x",
+   "same": true
+  },
+  {
+   "a": "file:///tmp/x",
+   "b": "FILE:///tmp/x",
+   "same": true
+  }
+ ],
+ "catalogs": [
+  {
+   "name": "layout",
+   "scans": [
+    {
+     "paths": null,
+     "result": {
+      "items": [
+       {
+        "type": "skill",
+        "name": "Case",
+        "files": [
+         "skills/Case/SKILL.md",
+         "skills/case/SKILL.md"
+        ],
+        "error": "found in 2 directories, names equal ignoring case: skills/Case and skills/case"
+       },
+       {
+        "type": "skill",
+        "name": "case",
+        "files": [
+         "skills/Case/SKILL.md",
+         "skills/case/SKILL.md"
+        ],
+        "error": "found in 2 directories, names equal ignoring case: skills/Case and skills/case"
+       },
+       {
+        "type": "skill",
+        "name": "pair",
+        "files": [
+         "skills/pair/SKILL.md",
+         "skills/pair/a.txt",
+         "skills/pair/a.txt.njk"
+        ],
+        "dir": "skills/pair",
+        "description": "pair",
+        "error": "both skills/pair/a.txt and skills/pair/a.txt.njk exist"
+       },
+       {
+        "type": "skill",
+        "name": "perl-moo",
+        "files": [
+         "skills/perl-moo/SKILL.md",
+         "skills/perl-moo/reference.md",
+         "skills/perl-moo/scripts/run.sh"
+        ],
+        "dir": "skills/perl-moo",
+        "description": "Write Moo classes"
+       },
+       {
+        "type": "skill",
+        "name": "templ",
+        "files": [
+         "skills/templ/SKILL.md.njk"
+        ],
+        "dir": "skills/templ",
+        "description": "{{ vars.x }} raw"
+       },
+       {
+        "type": "skill",
+        "name": "twice",
+        "files": [
+         "skills/twice/SKILL.md",
+         "skills/twice/SKILL.md.njk",
+         "skills/twice/helper.txt",
+         "skills/twice/helper.txt.njk"
+        ],
+        "dir": "skills/twice",
+        "error": "both skills/twice/SKILL.md and skills/twice/SKILL.md.njk exist; both skills/twice/helper.txt and skills/twice/helper.txt.njk exist"
+       },
+       {
+        "type": "agent",
+        "name": "Spell",
+        "files": [
+         "agents/Spell.md",
+         "agents/spell.md"
+        ],
+        "error": "both agents/Spell.md and agents/spell.md exist, names equal ignoring case"
+       },
+       {
+        "type": "agent",
+        "name": "spell",
+        "files": [
+         "agents/Spell.md",
+         "agents/spell.md"
+        ],
+        "error": "both agents/Spell.md and agents/spell.md exist, names equal ignoring case"
+       },
+       {
+        "type": "agent",
+        "name": "bom",
+        "files": [
+         "agents/bom.md"
+        ],
+        "description": "bom"
+       },
+       {
+        "type": "agent",
+        "name": "crlf",
+        "files": [
+         "agents/crlf.md"
+        ],
+        "description": "crlf"
+       },
+       {
+        "type": "agent",
+        "name": "dup",
+        "files": [
+         "agents/dup.md",
+         "agents/dup.md.njk"
+        ],
+        "error": "both agents/dup.md and agents/dup.md.njk exist"
+       },
+       {
+        "type": "agent",
+        "name": "half",
+        "files": [
+         "agents/half.md"
+        ],
+        "description": "\"half"
+       },
+       {
+        "type": "agent",
+        "name": "nofm",
+        "files": [
+         "agents/nofm.md"
+        ]
+       },
+       {
+        "type": "agent",
+        "name": "quoted",
+        "files": [
+         "agents/quoted.md"
+        ],
+        "description": "single"
+       },
+       {
+        "type": "agent",
+        "name": "reviewer",
+        "files": [
+         "agents/reviewer.md"
+        ],
+        "description": "Reviews code"
+       },
+       {
+        "type": "agent",
+        "name": "spaced",
+        "files": [
+         "agents/spaced.md"
+        ],
+        "description": "padded value"
+       },
+       {
+        "type": "agent",
+        "name": "unclosed",
+        "files": [
+         "agents/unclosed.md"
+        ]
+       },
+       {
+        "type": "rule",
+        "name": ".hidden",
+        "files": [
+         "rules/.hidden.md"
+        ],
+        "description": "hidden"
+       },
+       {
+        "type": "rule",
+        "name": "gated",
+        "files": [
+         "rules/gated.md.njk"
+        ]
+       },
+       {
+        "type": "rule",
+        "name": "perl-style",
+        "files": [
+         "rules/perl-style.md"
+        ],
+        "description": "Style"
+       }
+      ],
+      "bundles": [],
+      "meta": {
+       "description": "A source",
+       "vars": {
+        "10": "ten",
+        "level": 1,
+        "team": "core"
+       }
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "symlink-in-skill",
+   "scans": [
+    {
+     "paths": null,
+     "error": "symlink not allowed in source: ${DIR}/skills/a/link.txt",
+     "class": "CatalogError"
+    }
+   ]
+  },
+  {
+   "name": "symlinked-type-dir",
+   "scans": [
+    {
+     "paths": null,
+     "error": "symlink not allowed in source: ${DIR}/agents",
+     "class": "CatalogError"
+    }
+   ]
+  },
+  {
+   "name": "symlinked-skill-md",
+   "scans": [
+    {
+     "paths": null,
+     "error": "symlink not allowed in source: ${DIR}/skills/a/SKILL.md",
+     "class": "CatalogError"
+    }
+   ]
+  },
+  {
+   "name": "dangling-skill-md",
+   "scans": [
+    {
+     "paths": null,
+     "error": "symlink not allowed in source: ${DIR}/skills/a/SKILL.md",
+     "class": "CatalogError"
+    }
+   ]
+  },
+  {
+   "name": "plugin",
+   "scans": [
+    {
+     "paths": null,
+     "result": {
+      "items": [
+       {
+        "type": "skill",
+        "name": "base",
+        "files": [
+         "skills/base/SKILL.md"
+        ],
+        "dir": "skills/base",
+        "description": "base"
+       },
+       {
+        "type": "skill",
+        "name": "fmt",
+        "files": [
+         "tools/fmt/SKILL.md"
+        ],
+        "dir": "tools/fmt",
+        "description": "fmt"
+       },
+       {
+        "type": "skill",
+        "name": "lint",
+        "files": [
+         "tools/lint/SKILL.md"
+        ],
+        "dir": "tools/lint",
+        "description": "lint"
+       },
+       {
+        "type": "skill",
+        "name": "one",
+        "files": [
+         "one/SKILL.md"
+        ],
+        "dir": "one",
+        "description": "one"
+       }
+      ],
+      "bundles": [],
+      "meta": {}
+     }
+    }
+   ]
+  },
+  {
+   "name": "plugin-string",
+   "scans": [
+    {
+     "paths": null,
+     "result": {
+      "items": [
+       {
+        "type": "skill",
+        "name": "fmt",
+        "files": [
+         "tools/fmt/SKILL.md"
+        ],
+        "dir": "tools/fmt",
+        "description": "fmt"
+       }
+      ],
+      "bundles": [],
+      "meta": {}
+     }
+    }
+   ]
+  },
+  {
+   "name": "plugin-twice",
+   "scans": [
+    {
+     "paths": null,
+     "error": "${DIR}/.claude-plugin/plugin.json: skill \"base\" found twice: skills/base and tools/base",
+     "class": "CatalogError"
+    }
+   ]
+  },
+  {
+   "name": "plugin-twice-case",
+   "scans": [
+    {
+     "paths": null,
+     "error": "${DIR}/.claude-plugin/plugin.json: skill \"Base\" found twice, names equal ignoring case: skills/base and tools/Base",
+     "class": "CatalogError"
+    }
+   ]
+  },
+  {
+   "name": "plugin-invalid-json",
+   "scans": [
+    {
+     "paths": null,
+     "error": "${DIR}/.claude-plugin/plugin.json: invalid JSON (Unexpected token '}', \"{\"skills\": [}\" is not valid JSON)",
+     "class": "CatalogError"
+    }
+   ]
+  },
+  {
+   "name": "plugin-bad-skills",
+   "scans": [
+    {
+     "paths": null,
+     "error": "${DIR}/.claude-plugin/plugin.json: \"skills\" must be a string or an array of strings",
+     "class": "CatalogError"
+    }
+   ]
+  },
+  {
+   "name": "plugin-null-skills",
+   "scans": [
+    {
+     "paths": null,
+     "error": "${DIR}/.claude-plugin/plugin.json: \"skills\" must be a string or an array of strings",
+     "class": "CatalogError"
+    }
+   ]
+  },
+  {
+   "name": "plugin-array",
+   "scans": [
+    {
+     "paths": null,
+     "result": {
+      "items": [],
+      "bundles": [],
+      "meta": {}
+     }
+    }
+   ]
+  },
+  {
+   "name": "plugin-escape",
+   "scans": [
+    {
+     "paths": null,
+     "error": "${DIR}/.claude-plugin/plugin.json: skills path must not contain \"..\": ../x",
+     "class": "CatalogError"
+    }
+   ]
+  },
+  {
+   "name": "plugin-absolute",
+   "scans": [
+    {
+     "paths": null,
+     "error": "${DIR}/.claude-plugin/plugin.json: skills path must not be absolute: /etc",
+     "class": "CatalogError"
+    }
+   ]
+  },
+  {
+   "name": "plugin-root",
+   "scans": [
+    {
+     "paths": null,
+     "error": "${DIR}/.claude-plugin/plugin.json: skills path must not be the source root: \".\"",
+     "class": "CatalogError"
+    }
+   ]
+  },
+  {
+   "name": "plugin-missing",
+   "scans": [
+    {
+     "paths": null,
+     "error": "${DIR}/.claude-plugin/plugin.json: skills path does not exist: nope",
+     "class": "CatalogError"
+    }
+   ]
+  },
+  {
+   "name": "plugin-file",
+   "scans": [
+    {
+     "paths": null,
+     "error": "${DIR}/.claude-plugin/plugin.json: skills path is not a directory: f",
+     "class": "CatalogError"
+    }
+   ]
+  },
+  {
+   "name": "claude-layout",
+   "scans": [
+    {
+     "paths": null,
+     "result": {
+      "items": [
+       {
+        "type": "skill",
+        "name": "published",
+        "files": [
+         "skills/published/SKILL.md"
+        ],
+        "dir": "skills/published",
+        "description": "published"
+       },
+       {
+        "type": "skill",
+        "name": "local-only",
+        "files": [
+         ".claude/skills/local-only/SKILL.md"
+        ],
+        "dir": ".claude/skills/local-only",
+        "description": "local only"
+       },
+       {
+        "type": "skill",
+        "name": "own-gitignore",
+        "files": [
+         ".claude/skills/own-gitignore/.gitignore",
+         ".claude/skills/own-gitignore/SKILL.md"
+        ],
+        "dir": ".claude/skills/own-gitignore",
+        "description": "own"
+       },
+       {
+        "type": "agent",
+        "name": "Twin",
+        "files": [
+         ".claude/agents/Twin.md",
+         ".claude/agents/twin.md"
+        ],
+        "error": "both .claude/agents/Twin.md and .claude/agents/twin.md exist, names equal ignoring case"
+       },
+       {
+        "type": "agent",
+        "name": "twin",
+        "files": [
+         ".claude/agents/Twin.md",
+         ".claude/agents/twin.md"
+        ],
+        "error": "both .claude/agents/Twin.md and .claude/agents/twin.md exist, names equal ignoring case"
+       },
+       {
+        "type": "agent",
+        "name": "helper",
+        "description": "helper",
+        "files": [
+         ".claude/agents/helper.md"
+        ],
+        "dir": ".claude/agents"
+       },
+       {
+        "type": "rule",
+        "name": "house",
+        "description": "house",
+        "files": [
+         ".claude/rules/house.md"
+        ],
+        "dir": ".claude/rules"
+       }
+      ],
+      "bundles": [],
+      "meta": {}
+     }
+    }
+   ]
+  },
+  {
+   "name": "claude-symlinked",
+   "scans": [
+    {
+     "paths": null,
+     "result": {
+      "items": [],
+      "bundles": [],
+      "meta": {}
+     }
+    }
+   ]
+  },
+  {
+   "name": "paths",
+   "scans": [
+    {
+     "paths": null,
+     "result": {
+      "items": [
+       {
+        "type": "skill",
+        "name": "ignored",
+        "files": [
+         "skills/ignored/SKILL.md"
+        ],
+        "dir": "skills/ignored"
+       }
+      ],
+      "bundles": [
+       {
+        "name": "x",
+        "files": [
+         "bundles/x.yaml"
+        ],
+        "def": {
+         "description": "ignored",
+         "items": [],
+         "foreign": [],
+         "bundles": [],
+         "vars": {}
+        }
+       }
+      ],
+      "meta": {
+       "vars": {
+        "a": 1,
+        "b": 2
+       }
+      }
+     }
+    },
+    {
+     "paths": [
+      "tools",
+      "tools/group",
+      "other",
+      ".dot"
+     ],
+     "result": {
+      "items": [
+       {
+        "type": "skill",
+        "name": "Zed",
+        "files": [
+         "other/Zed/SKILL.md"
+        ],
+        "dir": "other/Zed"
+       },
+       {
+        "type": "skill",
+        "name": "a",
+        "files": [
+         "tools/a/SKILL.md",
+         "tools/a/inner/SKILL.md"
+        ],
+        "dir": "tools/a",
+        "description": "a"
+       },
+       {
+        "type": "skill",
+        "name": "b",
+        "files": [
+         "other/b/SKILL.md",
+         "tools/group/b/SKILL.md"
+        ],
+        "error": "found in 2 directories: other/b and tools/group/b"
+       },
+       {
+        "type": "skill",
+        "name": "e",
+        "files": [
+         ".dot/e/SKILL.md"
+        ],
+        "dir": ".dot/e",
+        "description": "e"
+       }
+      ],
+      "bundles": [],
+      "meta": {
+       "vars": {
+        "a": 1,
+        "b": 2
+       }
+      }
+     }
+    },
+    {
+     "paths": [
+      "tools/group"
+     ],
+     "result": {
+      "items": [
+       {
+        "type": "skill",
+        "name": "b",
+        "files": [
+         "tools/group/b/SKILL.md"
+        ],
+        "dir": "tools/group/b",
+        "description": "b"
+       }
+      ],
+      "bundles": [],
+      "meta": {
+       "vars": {
+        "a": 1,
+        "b": 2
+       }
+      }
+     }
+    },
+    {
+     "paths": [
+      ".dot"
+     ],
+     "result": {
+      "items": [
+       {
+        "type": "skill",
+        "name": "e",
+        "files": [
+         ".dot/e/SKILL.md"
+        ],
+        "dir": ".dot/e",
+        "description": "e"
+       }
+      ],
+      "bundles": [],
+      "meta": {
+       "vars": {
+        "a": 1,
+        "b": 2
+       }
+      }
+     }
+    },
+    {
+     "paths": [
+      "tools/a"
+     ],
+     "result": {
+      "items": [
+       {
+        "type": "skill",
+        "name": "a",
+        "files": [
+         "tools/a/SKILL.md",
+         "tools/a/inner/SKILL.md"
+        ],
+        "dir": "tools/a",
+        "description": "a"
+       }
+      ],
+      "bundles": [],
+      "meta": {
+       "vars": {
+        "a": 1,
+        "b": 2
+       }
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "path-errors",
+   "scans": [
+    {
+     "paths": null,
+     "result": {
+      "items": [],
+      "bundles": [],
+      "meta": {}
+     }
+    },
+    {
+     "paths": [
+      "/abs"
+     ],
+     "error": "\"path\" must not be absolute: /abs",
+     "class": "CatalogError"
+    },
+    {
+     "paths": [
+      "a/../b"
+     ],
+     "error": "\"path\" must not contain \"..\": a/../b",
+     "class": "CatalogError"
+    },
+    {
+     "paths": [
+      "."
+     ],
+     "error": "\"path\" must not be the source root: \".\"",
+     "class": "CatalogError"
+    },
+    {
+     "paths": [
+      ""
+     ],
+     "error": "\"path\" must not be the source root: \"\"",
+     "class": "CatalogError"
+    },
+    {
+     "paths": [
+      "nope"
+     ],
+     "error": "\"path\" does not exist: nope",
+     "class": "CatalogError"
+    },
+    {
+     "paths": [
+      "f"
+     ],
+     "error": "\"path\" is not a directory: f",
+     "class": "CatalogError"
+    },
+    {
+     "paths": [
+      "l"
+     ],
+     "error": "symlink not allowed in source: ${DIR}/l",
+     "class": "CatalogError"
+    },
+    {
+     "paths": [
+      "d/missing"
+     ],
+     "error": "\"path\" does not exist: d/missing",
+     "class": "CatalogError"
+    }
+   ]
+  },
+  {
+   "name": "bundles",
+   "scans": [
+    {
+     "paths": null,
+     "result": {
+      "items": [
+       {
+        "type": "skill",
+        "name": "perl-dbi",
+        "files": [
+         "skills/perl-dbi/SKILL.md"
+        ],
+        "dir": "skills/perl-dbi",
+        "description": "DBI"
+       },
+       {
+        "type": "skill",
+        "name": "perl-moo",
+        "files": [
+         "skills/perl-moo/SKILL.md"
+        ],
+        "dir": "skills/perl-moo",
+        "description": "Moo"
+       },
+       {
+        "type": "skill",
+        "name": "testing",
+        "files": [
+         "skills/testing/SKILL.md"
+        ],
+        "dir": "skills/testing",
+        "description": "Tests"
+       },
+       {
+        "type": "agent",
+        "name": "reviewer",
+        "files": [
+         "agents/reviewer.md"
+        ],
+        "description": "Reviews"
+       },
+       {
+        "type": "rule",
+        "name": "perl-style",
+        "files": [
+         "rules/perl-style.md"
+        ]
+       }
+      ],
+      "bundles": [
+       {
+        "name": "base",
+        "files": [
+         "bundles/base.yml"
+        ],
+        "def": {
+         "description": "Base",
+         "items": [
+          {
+           "type": "skill",
+           "entry": "testing"
+          },
+          {
+           "type": "skill",
+           "entry": "perl-moo"
+          },
+          {
+           "type": "rule",
+           "entry": "*"
+          }
+         ],
+         "foreign": [],
+         "bundles": [],
+         "vars": {
+          "level": "base",
+          "base_only": true,
+          "nested": {
+           "a": 1
+          }
+         }
+        }
+       },
+       {
+        "name": "both",
+        "files": [
+         "bundles/both.yaml",
+         "bundles/both.yml"
+        ],
+        "error": "both bundles/both.yaml and bundles/both.yml exist"
+       },
+       {
+        "name": "broken",
+        "files": [
+         "bundles/broken.yaml"
+        ],
+        "error": "bundles/broken.yaml: line 2: nested collections are not supported"
+       },
+       {
+        "name": "c1",
+        "files": [
+         "bundles/c1.yaml"
+        ],
+        "def": {
+         "description": "C",
+         "items": [],
+         "foreign": [],
+         "bundles": [
+          "c2"
+         ],
+         "vars": {}
+        }
+       },
+       {
+        "name": "c2",
+        "files": [
+         "bundles/c2.yaml"
+        ],
+        "def": {
+         "description": "C",
+         "items": [],
+         "foreign": [],
+         "bundles": [
+          "c3"
+         ],
+         "vars": {}
+        }
+       },
+       {
+        "name": "c3",
+        "files": [
+         "bundles/c3.yaml"
+        ],
+        "def": {
+         "description": "C",
+         "items": [],
+         "foreign": [],
+         "bundles": [
+          "c1"
+         ],
+         "vars": {}
+        }
+       },
+       {
+        "name": "d",
+        "files": [
+         "bundles/d.yaml"
+        ],
+        "def": {
+         "description": "D",
+         "items": [
+          {
+           "type": "skill",
+           "entry": "testing"
+          }
+         ],
+         "foreign": [],
+         "bundles": [],
+         "vars": {}
+        }
+       },
+       {
+        "name": "dangling",
+        "files": [
+         "bundles/dangling.yaml"
+        ],
+        "def": {
+         "description": "D",
+         "items": [],
+         "foreign": [],
+         "bundles": [
+          "ghost"
+         ],
+         "vars": {}
+        }
+       },
+       {
+        "name": "foreign",
+        "files": [
+         "bundles/foreign.yaml"
+        ],
+        "def": {
+         "description": "F",
+         "items": [],
+         "foreign": [
+          {
+           "type": "skill",
+           "entry": "lint@https://example.com/other.git",
+           "name": "lint",
+           "spec": "https://example.com/other.git",
+           "url": "https://example.com/other.git",
+           "kind": "git",
+           "derivedName": "other"
+          },
+          {
+           "type": "skill",
+           "entry": "perl-*@gitlab.com/peter",
+           "name": "perl-*",
+           "spec": "gitlab.com/peter",
+           "url": "https://gitlab.com/peter/skills",
+           "kind": "git",
+           "derivedName": "peter"
+          },
+          {
+           "type": "rule",
+           "entry": "x@Getty",
+           "name": "x",
+           "spec": "Getty",
+           "url": "https://github.com/Getty/skills",
+           "kind": "git",
+           "derivedName": "getty"
+          }
+         ],
+         "bundles": [
+          "base"
+         ],
+         "vars": {}
+        }
+       },
+       {
+        "name": "l",
+        "files": [
+         "bundles/l.yaml"
+        ],
+        "def": {
+         "description": "L",
+         "items": [],
+         "foreign": [],
+         "bundles": [
+          "d"
+         ],
+         "vars": {
+          "side": "left"
+         }
+        }
+       },
+       {
+        "name": "nodesc",
+        "files": [
+         "bundles/nodesc.yaml"
+        ],
+        "error": "bundles/nodesc.yaml: description is required (a string)"
+       },
+       {
+        "name": "outer",
+        "files": [
+         "bundles/outer.yaml"
+        ],
+        "def": {
+         "description": "O",
+         "items": [],
+         "foreign": [],
+         "bundles": [
+          "broken"
+         ],
+         "vars": {}
+        }
+       },
+       {
+        "name": "perl",
+        "files": [
+         "bundles/perl.yaml"
+        ],
+        "def": {
+         "description": "Perl",
+         "items": [
+          {
+           "type": "skill",
+           "entry": "perl-*"
+          },
+          {
+           "type": "skill",
+           "entry": "nope"
+          },
+          {
+           "type": "agent",
+           "entry": "reviewer"
+          },
+          {
+           "type": "agent",
+           "entry": "ghost-*"
+          }
+         ],
+         "foreign": [],
+         "bundles": [
+          "base"
+         ],
+         "vars": {
+          "level": "perl",
+          "perl_version": "5.40",
+          "f": 1.5
+         }
+        }
+       },
+       {
+        "name": "r",
+        "files": [
+         "bundles/r.yaml"
+        ],
+        "def": {
+         "description": "R",
+         "items": [],
+         "foreign": [],
+         "bundles": [
+          "d"
+         ],
+         "vars": {
+          "side": "right"
+         }
+        }
+       },
+       {
+        "name": "top",
+        "files": [
+         "bundles/top.yaml"
+        ],
+        "def": {
+         "description": "T",
+         "items": [],
+         "foreign": [],
+         "bundles": [
+          "l",
+          "r"
+         ],
+         "vars": {
+          "t": 1
+         }
+        }
+       }
+      ],
+      "meta": {}
+     },
+     "expand": {
+      "perl": {
+       "result": {
+        "items": [
+         {
+          "type": "skill",
+          "name": "perl-dbi",
+          "chains": [
+           {
+            "path": [
+             "perl"
+            ],
+            "vars": {
+             "level": "perl",
+             "perl_version": "5.40",
+             "f": 1.5
+            },
+            "setters": {
+             "level": "perl",
+             "perl_version": "perl",
+             "f": "perl"
+            }
+           }
+          ]
+         },
+         {
+          "type": "skill",
+          "name": "perl-moo",
+          "chains": [
+           {
+            "path": [
+             "perl"
+            ],
+            "vars": {
+             "level": "perl",
+             "perl_version": "5.40",
+             "f": 1.5
+            },
+            "setters": {
+             "level": "perl",
+             "perl_version": "perl",
+             "f": "perl"
+            }
+           },
+           {
+            "path": [
+             "perl",
+             "base"
+            ],
+            "vars": {
+             "level": "perl",
+             "base_only": true,
+             "nested": {
+              "a": 1
+             },
+             "perl_version": "5.40",
+             "f": 1.5
+            },
+            "setters": {
+             "level": "perl",
+             "base_only": "base",
+             "nested": "base",
+             "perl_version": "perl",
+             "f": "perl"
+            }
+           }
+          ]
+         },
+         {
+          "type": "agent",
+          "name": "reviewer",
+          "chains": [
+           {
+            "path": [
+             "perl"
+            ],
+            "vars": {
+             "level": "perl",
+             "perl_version": "5.40",
+             "f": 1.5
+            },
+            "setters": {
+             "level": "perl",
+             "perl_version": "perl",
+             "f": "perl"
+            }
+           }
+          ]
+         },
+         {
+          "type": "skill",
+          "name": "testing",
+          "chains": [
+           {
+            "path": [
+             "perl",
+             "base"
+            ],
+            "vars": {
+             "level": "perl",
+             "base_only": true,
+             "nested": {
+              "a": 1
+             },
+             "perl_version": "5.40",
+             "f": 1.5
+            },
+            "setters": {
+             "level": "perl",
+             "base_only": "base",
+             "nested": "base",
+             "perl_version": "perl",
+             "f": "perl"
+            }
+           }
+          ]
+         },
+         {
+          "type": "rule",
+          "name": "perl-style",
+          "chains": [
+           {
+            "path": [
+             "perl",
+             "base"
+            ],
+            "vars": {
+             "level": "perl",
+             "base_only": true,
+             "nested": {
+              "a": 1
+             },
+             "perl_version": "5.40",
+             "f": 1.5
+            },
+            "setters": {
+             "level": "perl",
+             "base_only": "base",
+             "nested": "base",
+             "perl_version": "perl",
+             "f": "perl"
+            }
+           }
+          ]
+         }
+        ],
+        "foreign": [],
+        "warnings": [
+         {
+          "bundle": "perl",
+          "message": "skill nope not found in the source"
+         },
+         {
+          "bundle": "perl",
+          "message": "pattern agent:ghost-* matches nothing"
+         }
+        ]
+       }
+      },
+      "base": {
+       "result": {
+        "items": [
+         {
+          "type": "skill",
+          "name": "testing",
+          "chains": [
+           {
+            "path": [
+             "base"
+            ],
+            "vars": {
+             "level": "base",
+             "base_only": true,
+             "nested": {
+              "a": 1
+             }
+            },
+            "setters": {
+             "level": "base",
+             "base_only": "base",
+             "nested": "base"
+            }
+           }
+          ]
+         },
+         {
+          "type": "skill",
+          "name": "perl-moo",
+          "chains": [
+           {
+            "path": [
+             "base"
+            ],
+            "vars": {
+             "level": "base",
+             "base_only": true,
+             "nested": {
+              "a": 1
+             }
+            },
+            "setters": {
+             "level": "base",
+             "base_only": "base",
+             "nested": "base"
+            }
+           }
+          ]
+         },
+         {
+          "type": "rule",
+          "name": "perl-style",
+          "chains": [
+           {
+            "path": [
+             "base"
+            ],
+            "vars": {
+             "level": "base",
+             "base_only": true,
+             "nested": {
+              "a": 1
+             }
+            },
+            "setters": {
+             "level": "base",
+             "base_only": "base",
+             "nested": "base"
+            }
+           }
+          ]
+         }
+        ],
+        "foreign": [],
+        "warnings": []
+       }
+      },
+      "both": {
+       "error": "bundle both: both bundles/both.yaml and bundles/both.yml exist",
+       "class": "BundleError"
+      },
+      "broken": {
+       "error": "bundle broken: bundles/broken.yaml: line 2: nested collections are not supported",
+       "class": "BundleError"
+      },
+      "nodesc": {
+       "error": "bundle nodesc: bundles/nodesc.yaml: description is required (a string)",
+       "class": "BundleError"
+      },
+      "outer": {
+       "error": "bundle broken (included by outer): bundles/broken.yaml: line 2: nested collections are not supported",
+       "class": "BundleError"
+      },
+      "dangling": {
+       "error": "bundle ghost (included by dangling) not found",
+       "class": "BundleError"
+      },
+      "c1": {
+       "error": "bundle cycle c1 → c2 → c3 → c1",
+       "class": "BundleError"
+      },
+      "top": {
+       "result": {
+        "items": [
+         {
+          "type": "skill",
+          "name": "testing",
+          "chains": [
+           {
+            "path": [
+             "top",
+             "l",
+             "d"
+            ],
+            "vars": {
+             "side": "left",
+             "t": 1
+            },
+            "setters": {
+             "side": "l",
+             "t": "top"
+            }
+           },
+           {
+            "path": [
+             "top",
+             "r",
+             "d"
+            ],
+            "vars": {
+             "side": "right",
+             "t": 1
+            },
+            "setters": {
+             "side": "r",
+             "t": "top"
+            }
+           }
+          ]
+         }
+        ],
+        "foreign": [],
+        "warnings": []
+       }
+      },
+      "foreign": {
+       "result": {
+        "items": [
+         {
+          "type": "skill",
+          "name": "testing",
+          "chains": [
+           {
+            "path": [
+             "foreign",
+             "base"
+            ],
+            "vars": {
+             "level": "base",
+             "base_only": true,
+             "nested": {
+              "a": 1
+             }
+            },
+            "setters": {
+             "level": "base",
+             "base_only": "base",
+             "nested": "base"
+            }
+           }
+          ]
+         },
+         {
+          "type": "skill",
+          "name": "perl-moo",
+          "chains": [
+           {
+            "path": [
+             "foreign",
+             "base"
+            ],
+            "vars": {
+             "level": "base",
+             "base_only": true,
+             "nested": {
+              "a": 1
+             }
+            },
+            "setters": {
+             "level": "base",
+             "base_only": "base",
+             "nested": "base"
+            }
+           }
+          ]
+         },
+         {
+          "type": "rule",
+          "name": "perl-style",
+          "chains": [
+           {
+            "path": [
+             "foreign",
+             "base"
+            ],
+            "vars": {
+             "level": "base",
+             "base_only": true,
+             "nested": {
+              "a": 1
+             }
+            },
+            "setters": {
+             "level": "base",
+             "base_only": "base",
+             "nested": "base"
+            }
+           }
+          ]
+         }
+        ],
+        "foreign": [
+         {
+          "type": "skill",
+          "entry": "lint@https://example.com/other.git",
+          "name": "lint",
+          "spec": "https://example.com/other.git",
+          "url": "https://example.com/other.git",
+          "kind": "git",
+          "derivedName": "other",
+          "chain": {
+           "path": [
+            "foreign"
+           ],
+           "vars": {},
+           "setters": {}
+          }
+         },
+         {
+          "type": "skill",
+          "entry": "perl-*@gitlab.com/peter",
+          "name": "perl-*",
+          "spec": "gitlab.com/peter",
+          "url": "https://gitlab.com/peter/skills",
+          "kind": "git",
+          "derivedName": "peter",
+          "chain": {
+           "path": [
+            "foreign"
+           ],
+           "vars": {},
+           "setters": {}
+          }
+         },
+         {
+          "type": "rule",
+          "entry": "x@Getty",
+          "name": "x",
+          "spec": "Getty",
+          "url": "https://github.com/Getty/skills",
+          "kind": "git",
+          "derivedName": "getty",
+          "chain": {
+           "path": [
+            "foreign"
+           ],
+           "vars": {},
+           "setters": {}
+          }
+         }
+        ],
+        "warnings": []
+       }
+      },
+      "missing": {
+       "error": "bundle missing not found",
+       "class": "BundleError"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "meta-invalid",
+   "scans": [
+    {
+     "paths": null,
+     "error": "${DIR}/skilletor.json: invalid JSON (Expected property name or '}' in JSON at position 1 (line 1 column 2))",
+     "class": "CatalogError"
+    }
+   ]
+  },
+  {
+   "name": "meta-string",
+   "scans": [
+    {
+     "paths": null,
+     "result": {
+      "items": [
+       {
+        "type": "rule",
+        "name": "r",
+        "files": [
+         "rules/r.md"
+        ]
+       }
+      ],
+      "bundles": [],
+      "meta": {}
+     }
+    }
+   ]
+  },
+  {
+   "name": "meta-array-vars",
+   "scans": [
+    {
+     "paths": null,
+     "error": "${DIR}/skilletor.json: \"vars\" must be an object",
+     "class": "CatalogError"
+    }
+   ]
+  },
+  {
+   "name": "meta-string-vars",
+   "scans": [
+    {
+     "paths": null,
+     "error": "${DIR}/skilletor.json: \"vars\" must be an object",
+     "class": "CatalogError"
+    }
+   ]
+  },
+  {
+   "name": "meta-null-vars",
+   "scans": [
+    {
+     "paths": null,
+     "error": "${DIR}/skilletor.json: \"vars\" must be an object",
+     "class": "CatalogError"
+    }
+   ]
+  },
+  {
+   "name": "empty",
+   "scans": [
+    {
+     "paths": null,
+     "result": {
+      "items": [],
+      "bundles": [],
+      "meta": {}
+     }
+    }
+   ]
+  },
+  {
+   "name": "skills-file",
+   "scans": [
+    {
+     "paths": null,
+     "error": "ENOTDIR: not a directory, scandir '${DIR}/skills'",
+     "class": "Error"
+    }
+   ]
+  }
+ ]
+}

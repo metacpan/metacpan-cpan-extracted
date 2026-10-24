@@ -1,54 +1,67 @@
-0.09 Tue. Jun. 18, 2013
+0.10     2026-10-23
 
-    - If a header param's value somehow ended up as undef, this would produce
-      an unitialized value warning. (Dave Rolsky)
+  [Security]
+  - Accept-Language headers are checked as substrings, not regular expressions. (CVE-2026-113877)
 
-0.08 Tue. Apr. 23, 2013
+  [Bug Fixes]
+  - Authorization::Basic now handles passwords with a colon. (RT#179681)
 
-    - Fixed a bug in the handling of defaults in content negotiation that
-      could lead to errors like: Can't use string ("5") as an ARRAY ref while
-      "strict refs" in use at
-      /opt/perl5.16.3/lib/site_perl/5.16.3/HTTP/Headers/ActionPack/ContentNegotiation.pm
-      line 160. (Dave Rolsky)
+  [Documentation]
+  - Added CODE_OF_CONDUCT.md and updated README.md, LICENSE and CONTRIBUTING.md.
 
-0.07 Tue. Apr. 16, 2013
+0.09     2013-06-18
 
-    - The PriorityList class treated "q=0" as if it was "q=1". RFC 2616 makes
-      it clear that "0" is fine. (Dave Rolsky)
+* If a header param's value somehow ended up as undef, this would produce an
+  unitialized value warning. (Dave Rolsky)
 
-0.06 Mon. Apr. 15, 2013
+0.08     2013-04-23
 
-    - Language and character set negotiation now canonicalize all values. This
-      means that if you say you provide "UTF-8" and a client requests "utf8"
-      it will just work. (Dave Rolsky)
-    - There are two new classes, HTTP::Headers::ActionPackage::AcceptCharset
-      and AcceptLanguage. (Dave Rolsky)
-    - If an Accept-Charset header does not contain "*" or "ISO-8859-1", then
-      "ISO-8859-1" is given a priority of 1.0, per RFC-2616. (Dave Rolsky)
-    - Content negotiation will never return any item explicitly forbidden
-      ("q=0.0") in the headers, even if the header says it accepts "*" or that
-      item is specified as a default in your code. (Dave Rolsky)
-    - The HTTP::Headers::ActionPack->inflate method now works with
-      Web::Request object. (Jesse Luehrs)
-    - Fix tests that were broken in the absence of
-      HTTP::Message::PSGI. (Florian Ragwitz)
+* Fixed a bug in the handling of defaults in content negotiation that could
+  lead to errors like: Can't use string ("5") as an ARRAY ref while "strict
+  refs" in use at
+  /opt/perl5.16.3/lib/site_perl/5.16.3/HTTP/Headers/ActionPack/ContentNegotiation.pm
+  line 160. (Dave Rolsky)
 
-0.05 Mon. Nov. 26th, 2012
-    - fixed the HTTP::Message::PSGI errors
-    - when you inflate a header object that has already 
-      been inflated, ignore that header and keep looping
-        - thanks to Florian Ragwitz for spoting this
+0.07     2013-04-16
 
-0.04 Sun. Sept. 9th, 2012
-    - pulling the content negotiation out of
-      Web::Machine and moving it into here
-        - adding tests accordingly
+* The PriorityList class treated "q=0" as if it was "q=1". RFC 2616 makes it
+  clear that "0" is fine. (Dave Rolsky)
 
-0.03 Tues. June 19th, 2012
-    - make sure everything has $VERSION numbers
+0.06     2013-04-15
 
-0.02 Sun. June 17th, 2012
-    - forgot to add some dependencies
+* Language and character set negotiation now canonicalizes all values. This
+  means that if you say you provide "UTF-8" and a client requests "utf8" it
+  will just work. (Dave Rolsky)
+* There are two new classes, HTTP::Headers::ActionPackage::AcceptCharset and
+  AcceptLanguage. (Dave Rolsky)
+* If an Accept-Charset header does not contain "*" or "ISO-8859-1", then
+  "ISO-8859-1" is given a priority of 1.0, per RFC-2616. (Dave Rolsky)
+* Content negotiation will never return any item explicitly forbidden
+  ("q=0.0") in the headers, even if the header says it accepts "*" or that
+  item is specified as a default in your code. (Dave Rolsky)
+* The HTTP::Headers::ActionPack->inflate method now works with Web::Request
+  object. (Jesse Luehrs)
+* Fix tests that were broken in the absence of HTTP::Message::PSGI. (Florian
+  Ragwitz)
 
-0.01 Tues. June 12th, 2012
-    - First release
+0.05     2012-11-26
+
+* Fix the HTTP::Message::PSGI errors
+* When you inflate a header object that has already been inflated, ignore that
+  header and keep looping. (Florian Ragwitz)
+
+0.04     2012-09-09
+
+* Pull content negotiation out of Web::Machine and move it into here
+
+0.03     2012-06-19
+
+* Make sure everything has $VERSION numbers
+
+0.02     2012-06-17
+
+* Add missing dependencies
+
+0.01     2012-06-12
+
+* First release

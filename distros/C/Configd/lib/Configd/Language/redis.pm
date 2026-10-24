@@ -1,5 +1,5 @@
 package Configd::Language::redis;
-$Configd::Language::redis::VERSION = '0.002';
+$Configd::Language::redis::VERSION = '0.005';
 #ABSTRACT: redis.conf, which has no conf.d and a handful of directives you say more than once.
 
 use 5.034;
@@ -55,7 +55,7 @@ Configd::Language::redis - redis.conf, which has no conf.d and a handful of dire
 
 =head1 VERSION
 
-version 0.002
+version 0.005
 
 =head1 SYNOPSIS
 

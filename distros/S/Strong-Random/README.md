@@ -1,4 +1,3 @@
-[![Actions Status](https://github.com/vsepohui/Strong-Random/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/vsepohui/Strong-Random/actions?workflow=test)
 # NAME
 
 Strong::Random - Strong random generator
@@ -47,10 +46,14 @@ Parameters:
 
 # VERSION
 
-0.8
+0.93
 
 # AUTHOR
 
 All code writen by Ivan Trunaev.
+
+# LICENSE
+
+Commercial support by Author for Open Source!
 
 Contacts <ivan@trunaev.ru>

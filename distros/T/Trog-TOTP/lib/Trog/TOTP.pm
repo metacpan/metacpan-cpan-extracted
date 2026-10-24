@@ -1,4 +1,4 @@
-package Trog::TOTP 1.007;
+package Trog::TOTP 1.008;
 
 use strict;
 use warnings;
@@ -14,8 +14,6 @@ use MIME::Base32();
 use List::Util qw{first};
 use Crypt::PRNG();
 use POSIX qw{floor};
-
-use Carp::Always;
 
 
 
@@ -344,7 +342,7 @@ Trog::TOTP - Fork of Authen::TOTP
 
 =head1 VERSION
 
-version 1.007
+version 1.008
 
 =head1 DESCRIPTION
 
@@ -551,11 +549,21 @@ George S. Baugh <teodesian@gmail.com>
 
 =back
 
-=head1 CONTRIBUTOR
+=head1 CONTRIBUTORS
 
-=for stopwords Thanos Chatziathanassiou
+=for stopwords Thanos Chatziathanassiou troglodyne-bot
+
+=over 4
+
+=item *
 
 Thanos Chatziathanassiou <tchatzi@arx.net>
+
+=item *
+
+troglodyne-bot <morpheus@troglodyne.net>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 

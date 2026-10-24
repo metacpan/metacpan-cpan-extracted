@@ -4,7 +4,7 @@ HTML::OSM - Generate an interactive OpenStreetMap with Leaflet.js
 
 ## Version
 
-Version 0.11
+Version 0.12
 
 ## Synopsis
 
@@ -38,7 +38,14 @@ my ($head, $body) = $map->onload_render();
     Leaflet placeholders as the default, for example
     `http://tiles.internal/{z}/{x}/{y}.png`.  The attribution remains the
     OpenStreetMap credit, which is the usual requirement for OSM-derived tiles.
-    The optional in-page search box still calls Nominatim when a reader uses it.
+    The in-page search box still calls Nominatim when a reader uses it; set
+    `search => 0` to leave it out.
+
+- Maximum zoom
+
+    `max_zoom` (0 to 28) stops readers zooming in further than the tile server
+    has tiles for.  Without it, Leaflet allows zooming past the server's coverage
+    and the map shows empty grey tiles.  When it is not given, no limit is set.
 
 - Tile attribution
 
@@ -52,6 +59,13 @@ my ($head, $body) = $map->onload_render();
     `email` is added to every Nominatim request the module makes, as the
     Nominatim usage policy asks of heavy users.  It is not put into the rendered
     page, so the in-page search box sends no address.
+
+- Search box
+
+    By default the rendered page has a search box that sends whatever the reader
+    types to Nominatim, and a button that clears the markers it adds.  Set
+    `search => 0` to leave both out, so that nothing typed on the page leaves
+    the reader's machine.  The "Reset Map" button is always included.
 
 ## Description
 
@@ -107,7 +121,9 @@ merging `%overrides` onto the existing object's state without re-validating.
   host                    => { type => string,                    optional },
   js_url                  => { type => string,                    optional },
   logger                  => { type => object,                    optional },
+  max_zoom                => { type => integer, min => 0, max => 28, optional },
   min_interval            => { type => number,  min => 0,         optional },
+  search                  => { type => boolean,                   optional },
   tile_attribution        => { type => string,                    optional },
   tile_url                => { type => string,                    optional },
   ua                      => { type => object,                    optional },
@@ -207,6 +223,69 @@ for my $city (@cities) {
     $map->add_marker($city->{coords}, html => $city->{name})
         or warn "Could not place $city->{name}";
 }
+```
+
+### Add\_Circle\_Marker
+
+Add a filled circle whose size in pixels can show a quantity, such as the
+population of a town.
+
+```perl
+$map->add_circle_marker([51.5074, -0.1278],
+    html   => 'London',
+    radius => 12,
+    colour => '#e45c3a',
+);
+```
+
+The point may be anything `add_marker()` accepts.  The radius is in screen
+pixels, so a circle stays the same size as the reader zooms in and out.
+With `cluster => 1`, circles join the same cluster group as the pin
+markers.
+
+Returns 1 on success, 0 if the point cannot be resolved or is out of range.
+
+#### Api Specification
+
+##### Input
+
+```
+point  : arrayref [lat, lon] | string address | object with latitude()/longitude()
+html   : string   (optional popup label)
+radius : number > 0 and < 1e6   (optional, default 8)
+colour : string   hex #rrggbb or #rgb, any case   (optional, default '#3388ff')
+```
+
+##### Output
+
+```perl
+{ type => integer, enum => [0, 1] }
+```
+
+#### Messages
+
+```
+| Message                                             | Meaning / Resolution                        |
+|-----------------------------------------------------|---------------------------------------------|
+| add_circle_marker(): radius must be a positive number | radius is 0, negative, 1e6 or more, or not a plain number |
+| add_circle_marker(): invalid colour: VALUE          | colour is not a #rgb or #rrggbb hex string  |
+| add_circle_marker(): unknown point type: TYPE       | Point is a ref type with no lat/lon methods |
+| Skipping invalid coordinate: (LAT, LON)             | Warning: the point is not numeric or is out of range; 0 is returned |
+```
+
+#### Examples
+
+```perl
+# Bubble whose area shows the population
+$map->add_circle_marker([$lat, $lon],
+    html   => "$city ($pop)",
+    radius => sqrt($pop / $max_pop) * 30,
+    colour => '#e45c3a',
+);
+
+# Mixed map: pins for offices, circles for market size
+$map->add_marker([$lat1, $lon1], html => 'HQ');
+$map->add_circle_marker([$lat2, $lon2], html => 'Market A', radius => 20);
 ```
 
 ### Add\_Geojson
@@ -544,22 +623,25 @@ my ($head_html, $body_html) = $map->onload_render();
 `$head_html` contains the Leaflet CSS, JavaScript, and plugin assets.
 Place it inside `<head>...</head>`.
 
-`$body_html` contains the search box, control buttons, map `<div>`,
-and the initialisation `<script>`.
+`$body_html` contains the search box (unless `search => 0`), control
+buttons, map `<div>`, and the initialisation `<script>`.
 Place it inside `<body>...</body>` where the map should appear.
 
 The rendered page provides:
 
 - A Nominatim-powered search box that adds temporary markers.
+Left out when `search => 0`.
 - A "Clear search markers" button that removes those temporary markers,
 leaving static markers (added via `add_marker`) intact.
+Left out when `search => 0`.
 - A "Reset Map" button that returns the view to the initial centre and zoom.
 
 Values that reach the object without going through `new()`'s checks (from a
 config file or a clone) are checked again here.  A `zoom` that is not an
 integer from 0 to 19 is replaced by 12, and a `width` or `height` that is
 not a CSS length (such as `600px`, `100%` or `auto`) is replaced by the
-default.  Each replacement gives a warning.
+default.  A `max_zoom` that is not an integer from 0 to 28 is ignored.  Each
+replacement gives a warning.
 
 #### Api Specification
 
@@ -580,10 +662,11 @@ default.  Each replacement gives a warning.
 ```
 | Message                                          | Meaning / Resolution                        |
 |--------------------------------------------------|---------------------------------------------|
-| No map data provided                             | No markers, GeoJSON, heatmap, GPX, or choropleth added yet |
+| No map data provided                             | No markers, circle markers, GeoJSON, heatmap, GPX, or choropleth added yet |
 | center() must be called when no point markers are provided | Non-marker-only render needs explicit centre |
 | Skipping invalid coordinate: (LAT, LON)          | Warning: a marker is not numeric or out of range; it is left off the map |
 | onload_render: invalid zoom 'Z', using 12        | Warning: zoom from a config file or clone is out of range |
+| onload_render: invalid max_zoom 'Z', ignoring it | Warning: max_zoom from a config file or clone is not an integer from 0 to 28 |
 | onload_render: invalid width 'W', using 600px    | Warning: width is not a CSS length |
 | onload_render: invalid height 'H', using 400px   | Warning: height is not a CSS length |
 | _fetch_coordinates: failed to decode Nominatim response: ERROR | Warning: Nominatim returned something that is not JSON; the marker is skipped |
@@ -620,16 +703,22 @@ $tt->process('map.tt', {
 1. Gather all data layers; croak if none populated.
 2. Geocode/validate each coordinate tuple; discard invalids with a warning.
    A tuple with no coordinates and no address is discarded.
-   Re-check zoom, width and height; fall back to defaults with a warning.
-3. Determine map centre: caller-supplied > computed midpoint of marker bounds.
+   Check circle markers the same way.
+   Re-check zoom, max_zoom, width and height; fall back with a warning.
+3. Determine map centre: caller-supplied > computed midpoint of the bounds
+   of the pin and circle markers.
    Croak if neither is available.
 4. Build <head>: Leaflet CSS + JS; inject cluster/heatmap/GPX plugin assets
    only when the corresponding layer type is present.
-5. Build <body>: search box, clear-search button, reset button, map <div>.
-6. Initialise Leaflet map, tile layer, searchMarkers array.
-7. Emit JS for each marker (via clusterGroup when cluster is set).
+5. Build <body>: search box and clear-search button (when search is on),
+   reset button, map <div>.
+6. Initialise Leaflet map, tile layer (with maxZoom when max_zoom is set),
+   and the searchMarkers array when search is on.
+7. Emit JS for each pin and circle marker (via one clusterGroup when
+   cluster is set).
 8. Emit JS for each GeoJSON, heatmap, GPX, and choropleth layer.
-9. Attach event listeners: reset-view, clear-search-markers, search-on-Enter.
+9. Attach event listeners: reset-view, and when search is on,
+   clear-search-markers and search-on-Enter.
 10. Return ($head, $body).
 ```
 
@@ -644,11 +733,15 @@ can merge arbitrary state.  Callers are responsible for passing valid overrides.
 - **Config-file params unvalidated**: Keys injected by
 [Object::Configure](https://metacpan.org/pod/Object%3A%3AConfigure) from a config file are not re-run through the schema, so
 a malformed config file can introduce invalid types at runtime.
-`onload_render()` checks `zoom`, `width` and `height` again and
+`onload_render()` checks `zoom`, `max_zoom`, `width` and `height` again and
 HTML-escapes the CDN URLs, so a bad value cannot inject markup into the page.
 - **One map per page**: The rendered HTML uses fixed element IDs
 (`map`, `search-box`, `clear-search-button` and `reset-button`), so two
 maps on the same page will clash.
+- **Clustered circle markers**: With `cluster => 1`, circle markers
+are grouped with the pin markers, so at low zoom levels a cluster count is
+shown in place of the circles' sizes.  Leave `cluster` off for a bubble map
+whose sizes should always be visible.
 - **Private-method encapsulation**: `_fetch_coordinates`, `_validate`,
 and `_js_string` are named with a leading underscore by convention only.
 Using [Sub::Private](https://metacpan.org/pod/Sub%3A%3APrivate) in `enforce` mode would make the contract explicit, but

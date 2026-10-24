@@ -30,6 +30,11 @@ my $image  = defined $ENV{LIVE_TESTING_IMAGE} && length $ENV{LIVE_TESTING_IMAGE}
     ? $ENV{LIVE_TESTING_IMAGE}
     : 'alpine:3.20';
 
+# Object::Configure reads the developer's own configuration files (~/.conf
+# and the like), where a UNIVERSAL logger would take the messages these tests
+# read off standard error.  An empty directory leaves the defaults in force.
+local $ENV{CONFIG_DIR} = tempdir(CLEANUP => 1);
+
 # A live run records the images it kept; keep that record out of the test
 # host's real image cache.
 local $ENV{ACTION_RUN_CACHE_FILE}

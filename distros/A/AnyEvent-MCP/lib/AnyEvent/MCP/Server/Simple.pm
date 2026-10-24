@@ -645,54 +645,98 @@ Preformatted examples.
 
 =back
 
-This section is the canonical reference for common server options.
-Executable manpages document only their additional or differing behavior.
+Common command-line options parsed by C<mcp_getoptions>:
 
-The common MCP options are documented automatically and their descriptions
-are shared by all callers. Application option descriptions are explicit;
-a C<Getopt::Long> specification does not contain enough information to
-write one.
+=over
 
-Other settings in that hash, such as C<path>, C<auth> or C<url_scheme>,
-are passed through to C<mcp_start>. Without C<usage>, a default synopsis
-is generated. Standard C<--help> prints the expanded help and exits;
-a parsing error dies with the shorter usage synopsis.
-Standalone servers using this parser emit tool calls and tool-error replies
-to the configured L<AnyEvent::Log> output by default, including asynchronous
-failures. C<--quiet> suppresses this operational log, not warnings and other
-ordinary diagnostics. The process-wide default formatter uses a short
-day/time timestamp, program, instance and PID; custom formatting callbacks
-and output destinations configured through C<PERL_ANYEVENT_LOG> are retained.
-Verbose protocol diagnostics retain their normal AnyEvent log levels.
-C<--tool-help> prints the registered tools with their argument types,
-required fields, defaults and descriptions, then exits before listening.
-Call it only after registering tools; it reflects the actual registry,
-including conditional registration. See C<mcp_tool_help> for custom servers.
-C<--print-url> resolves the same name, bind, tokens and path as
-startup, prints the first accepted token in the URL and exits B<without>
-starting a listener. It requires a persistently stored master secret for
-derived credentials and cannot predict a port requested as zero.
+=item --name NAME
 
-All other option specifications and remaining C<@ARGV> follow the caller's
-normal Getopt::Long configuration, including C<require_order> if selected.
-C<--stdio> is understood by C<mcp_start> and skips HTTP configuration.
-C<--auto-allow TOOL[,ACTION[,CAPABILITY]]> and C<--auto-deny> with the same
-argument each add one process-local rule, in command-line order. Omitted
-fields and C<*> match any value. Named capabilities limit allowed authority
-or trigger a denial; see L<AnyEvent::MCP::Server::Permissions/auto_rules>.
-These rules are checked before saved rules. The startup functions apply them to the configured
-L<AnyEvent::MCP::Server::Permissions> object, creating an in-memory one if
-necessary. Only tools that request permission are affected; tools without
-permission checks are not blocked. In a multibroker they apply to
-broker-visible tool names, not to independent permission checks performed
-by downstream servers.
-C<--connect URL> connects to a multibroker at
-C<http://host:port/token/alias> instead of serving stdio or starting an HTTP
-listener by default. It overrides implicit stdio from the environment;
-explicit C<--stdio> and C<--connect> cannot be combined.
-The helper deliberately does not enforce application-specific positional
-arguments; C<--print-url> should not have to supply a workdir just to
-print an address. It is a parser, not a second command language.
+Select local instance (default C<default>). NAME starts with letter or
+underscore, followed by letters, digits, underscores or hyphens. Selects
+C<[instance NAME]> configuration, derived HTTP port and credentials; does
+not change advertised MCP implementation name. Example: C<--name project>.
+
+=item --bind ADDRESS[:PORT]
+
+Override HTTP listen address/port. Default: C<127.0.0.1> with
+stable instance-derived port (16384..32767). C<:31740> means loopback port
+31740; C<127.0.0.1:31740> chooses both. Port C<0> requests an ephemeral port
+and cannot be used with C<--print-url>. Ignored for stdio-only startup.
+
+=item --token TOKEN
+
+Accept TOKEN for HTTP authentication; repeat for multiple accepted tokens.
+Explicit tokens replace configured or secret-derived defaults. Tokens work
+in authenticated URL paths and C<Authorization: Bearer TOKEN> headers.
+Example: C<--token first --token second>.
+
+=item --stdio
+
+Serve MCP JSONL over stdin/stdout. For ordinary C<mcp_start>, replaces
+default HTTP listener; programs with additional listeners may keep them.
+Cannot combine explicitly with C<--connect>.
+
+=item --connect URL
+
+Connect server to upstream multibroker using reverse connection URL,
+e.g. C<http://host:port/TOKEN/alias>. Replaces default MCP listener and
+overrides implicit stdio selection from environment. Cannot combine with
+explicit C<--stdio>.
+
+=item --custom-instructions TEXT
+
+Override configured instance-purpose instructions describing when clients
+should use server. Example: C<--custom-instructions 'Use for build logs'>.
+
+=item --auto-allow TOOL[,ACTION[,CAPABILITY]]
+
+Add process-local permission allow rule; repeatable. TOOL identifies
+permission-checked tool; ACTION and CAPABILITY narrow rule. Omitted fields
+and C<*> match anything. Example: C<--auto-allow '*,read,workdir-read'>.
+Rules run in command-line order before saved rules; they never authorize
+tools that bypass permission checks. See
+L<AnyEvent::MCP::Server::Permissions/auto_rules>.
+
+=item --auto-deny TOOL[,ACTION[,CAPABILITY]]
+
+Add process-local deny rule with same pattern syntax as C<--auto-allow>.
+Repeatable; evaluated in command-line order before saved rules.
+Example: C<--auto-deny '*,exec'>. Rules affect permission-checked tools,
+not calls with no permission check.
+
+=item --quiet
+
+Suppress routine tool activity and tool-failure logging. Does not
+suppress warnings or normal diagnostics; C<PERL_ANYEVENT_LOG> still controls
+diagnostic levels and destinations.
+
+=item --print-url
+
+Print first accepted token in authenticated HTTP URL, then exit without
+starting listener. Uses same name, bind, token and endpoint configuration
+as startup. Derived tokens require persistent master secret; port C<0>
+cannot be predicted. Example: C<--name project --print-url>.
+
+=item --tool-help
+
+Print registered tool names, descriptions, argument types, required fields
+and defaults; exit without starting MCP listener. Registration may depend on
+available utilities and application setup. Invoke after registering tools.
+
+=item -h, --help
+
+Print common and application-specific command-line help; exit without
+starting server. Invalid options instead report usage.
+
+=back
+
+These switches also appear in C<--help>; application options are passed
+through to L<Getopt::Long>. Other leading hash settings (e.g. C<path>,
+C<auth>, C<url_scheme>) go to C<mcp_start>. Parse positional C<@ARGV>
+in the application; C<mcp_getoptions> deliberately does not require them
+for help or URL discovery. Default activity logging includes asynchronous
+tool failures and formats time, program, instance and PID. Environment
+C<PERL_ANYEVENT_LOG> can select destinations and verbosity.
 
 =item mcp_tool_help ($enabled, @toolsets)
 

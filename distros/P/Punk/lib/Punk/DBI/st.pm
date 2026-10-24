@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.65';
+our $VERSION = '0.66';
 our @ISA = ('DBI::st');
 
 # execute is C (include/punk/punk_dbiobs.h + xs/dbi.xs), installed into this

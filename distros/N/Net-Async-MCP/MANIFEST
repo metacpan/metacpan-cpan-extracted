@@ -8,6 +8,7 @@
 .claude/skilletor.json
 .claude/skills/net-async-mcp-core/SKILL.md
 .gitignore
+.worktreeinclude
 CLAUDE.md
 Changes
 LICENSE
@@ -19,6 +20,7 @@ README
 cpanfile
 dist.ini
 lib/Net/Async/MCP.pm
+lib/Net/Async/MCP/JSONRPC.pm
 lib/Net/Async/MCP/Transport/HTTP.pm
 lib/Net/Async/MCP/Transport/InProcess.pm
 lib/Net/Async/MCP/Transport/Stdio.pm
@@ -31,6 +33,7 @@ misc/agent-context/.claude/skilletor.lock.json
 misc/agent-context/.claude/skills/getty-git-commit-style/SKILL.md
 misc/agent-context/.claude/skills/getty-git-usage/SKILL.md
 misc/agent-context/.claude/skills/getty-perl-core/SKILL.md
+misc/agent-context/.claude/skills/getty-perl-core/references/dbic.md
 misc/agent-context/.claude/skills/getty-perl-pod/SKILL.md
 misc/agent-context/.claude/skills/getty-perl-release-author-getty/SKILL.md
 misc/agent-context/.claude/skills/kanban-issues-karr-coordination/SKILL.md
@@ -51,9 +54,14 @@ t/10_inprocess.t
 t/11_context.t
 t/15_client.t
 t/20_stdio.t
+t/21_stdio_timeout.t
+t/25_legacy.t
 t/30_http.t
+t/35_http_legacy.t
 t/40_errors.t
 t/50_subscriptions.t
 t/author-pod-syntax.t
+t/bin/legacy_http_server.pl
+t/bin/legacy_mcp_server.pl
 t/bin/test_mcp_server.pl
 t/release-changes_has_content.t

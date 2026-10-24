@@ -1,0 +1,13 @@
+--- ba.xml
++++ ba.xml
+@@ -5988,6 +5988,10 @@
+ 			<currency type="CNH">
+ 				<displayName>Ҡытай юане (офшор)</displayName>
+ 			</currency>
++			<currency type="CNX">
++				<displayName>Ҡытай Халыҡ Банкы доллары</displayName>
++				<displayName count="other">Ҡытай Халыҡ Банкы доллары</displayName>
++			</currency>
+ 			<currency type="CNY">
+ 				<displayName>Ҡытай юане</displayName>
+ 			</currency>

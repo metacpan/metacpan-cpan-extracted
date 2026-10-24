@@ -1,0 +1,14 @@
+--- ast.xml
++++ ast.xml
+@@ -4557,6 +4557,11 @@
+ 				<displayName count="one">pesu chilenu</displayName>
+ 				<displayName count="other">pesos chilenos</displayName>
+ 			</currency>
++			<currency type="CNX">
++				<displayName>Dólar del Bancu Popular Chinu</displayName>
++				<displayName count="one">dólar del Bancu Popular Chinu</displayName>
++				<displayName count="other">dólares del Bancu Popular Chinu</displayName>
++			</currency>
+ 			<currency type="CNY">
+ 				<displayName>Yuan chinu</displayName>
+ 				<displayName count="one">yuan chinu</displayName>

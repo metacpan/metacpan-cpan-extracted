@@ -108,9 +108,11 @@ t/HTTP-Message-PSGI/host.t
 t/HTTP-Message-PSGI/path_info.t
 t/HTTP-Message-PSGI/unknown_response.t
 t/HTTP-Message-PSGI/utf8_req.t
+t/HTTP-Server-PSGI/framing.t
 t/HTTP-Server-PSGI/harakiri.t
 t/HTTP-Server-PSGI/listen.t
 t/HTTP-Server-PSGI/post.t
+t/HTTP-Server-PSGI/read_size.t
 t/Plack-Builder/builder.t
 t/Plack-Builder/mount.t
 t/Plack-Builder/oo_interface.t

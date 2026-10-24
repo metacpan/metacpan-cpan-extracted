@@ -17,7 +17,7 @@ use Sub::Private ();
 
 use App::Actions::Access;
 
-our $VERSION = '0.001.0';
+our $VERSION = '0.002.0';
 
 our @EXPORT_OK = qw(load_yaml_mapping mapping normalize_step stringify trim);
 
@@ -196,8 +196,14 @@ sub load_yaml_mapping {
 
 	# Key order is preserved because job order and step order are what the
 	# user wrote, and a report that reorders them is harder to follow.
-	my $data = eval { YAML::PP->new(preserve => PRESERVE_ORDER)->load_file($file) };
-	if (my $error = $@) {
+	# $@ is localised so a caller's own error survives a file that loads.
+	my ($data, $error);
+	{
+		local $@;
+		$data = eval { YAML::PP->new(preserve => PRESERVE_ORDER)->load_file($file) };
+		$error = $@;
+	}
+	if ($error) {
 		throw(__PACKAGE__, "$kind.parse_failed", { file => $file, error => trim($error) });
 	}
 

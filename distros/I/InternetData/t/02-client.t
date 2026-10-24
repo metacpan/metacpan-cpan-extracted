@@ -3,6 +3,7 @@ use warnings;
 
 use lib 't/lib';
 
+use Encode ();
 use File::Temp ();
 use Mojo::Headers;
 use Mojo::IOLoop;
@@ -86,6 +87,31 @@ subtest 'a key holding a control character is refused where it is set' => sub {
     is($origin->count, 0, 'with nothing sent');
 };
 
+# Through 1.11.2 Mojo died writing such a header in its reactor, so every call
+# failed as a retried `Request timeout` after its whole bound, with nothing sent.
+subtest 'a key holding a character past U+00FF is refused where it is set' => sub {
+    my $origin = InternetDataTest::Origin->new(sub {
+        shift->render(json => { databases => [] });
+    });
+    for my $key ('sec' . chr(0x4e2d) . 'ret', 'sec' . chr(0x100) . 'ret') {
+        my $client = eval { InternetData->new(base_url => $origin->url, api_key => $key) };
+        ok(!defined $client, 'refused');
+        like($@, qr/api_key holds a character past U\+00FF/, 'naming the cause');
+        unlike($@, qr/sec/, 'and not the key');
+    }
+    is($origin->count, 0, 'with nothing sent');
+    # A Latin-1 character, and a key's UTF-8 bytes, go out as those bytes, which
+    # the server answers as it answers any wrong key.
+    for my $case (['k' . chr(0xe9) . 'y', "k\xe9y"], [Encode::encode('UTF-8', 'k' . chr(0x4e2d) . 'y'), "k\xe4\xb8\xady"]) {
+        $origin->reset;
+        my $client = eval { InternetData->new(base_url => $origin->url, api_key => $case->[0]) };
+        ok($client, 'accepted') or next;
+        $client->database->list;
+        my ($request) = $origin->requests;
+        is(unpack('H*', $request->{headers}{Authorization}), unpack('H*', "Bearer $case->[1]"), 'sent as its bytes');
+    }
+};
+
 subtest 'an empty result code gives way to the status' => sub {
     for my $case ([{ rc => 'UNAUTHORIZED_ID' }, 'UNAUTHORIZED_ID'], [{ rc => '' }, 'request failed with status 403'],
                   [{ rc => undef }, 'request failed with status 403'], [{}, 'request failed with status 403']) {
@@ -145,10 +171,7 @@ subtest 'responses are unwrapped at the right depth' => sub {
     my $open = InternetDataTest::family(base => 'asn', standing => 'unlicensed', open => true, license_type => undef);
     my %bodies = (
         '/api/v2/database/list' => { databases => [$family, $open] },
-        '/api/v2/database/checksum' => {
-            id => 'bogon_ip_v1', format => 'csvgz',
-            checksums => { md5 => 'm', sha1 => 's1', sha256 => 's256', sha512 => 's512' },
-        },
+        '/api/v2/database/checksum' => InternetDataTest::checksum(),
         '/api/v2/database/downloads' => { downloads => [InternetDataTest::download(open => true)] },
         '/api/v2/database/metadata' => InternetDataTest::metadata(),
     );
@@ -246,7 +269,7 @@ subtest 'a member of the wrong type at any depth is a retried server_error' => s
     my $family = InternetDataTest::family();
     my $version = $family->{versions}[0];
     my $listing = sub { { databases => [shift] } };
-    my %sums = (md5 => 'm', sha1 => 's1', sha256 => 's256', sha512 => 's512');
+    my $sums = sub { InternetDataTest::checksum(checksums => { %{ InternetDataTest::checksum()->{checksums} }, @_ }) };
     my @cases = (
         [list => $listing->({ %$family, versions => [{ %$version, version => '3' }] })],
         [list => $listing->({ %$family, versions => [{ %$version, version => 'x' }] })],
@@ -265,8 +288,16 @@ subtest 'a member of the wrong type at any depth is a retried server_error' => s
         [metadata => InternetDataTest::metadata(schema => { csvgz => [{ name => 1, type => 't' }] })],
         [metadata => InternetDataTest::metadata(sample => { csvgz => [1] })],
         [metadata => InternetDataTest::metadata(updated => undef)],
-        [checksums => { checksums => { %sums, sha256 => 1 } }],
-        [checksums => { checksums => { %sums, sha512 => undef } }],
+        [metadata => InternetDataTest::metadata(size => { csvgz => undef })],
+        [checksums => $sums->(sha256 => 1)],
+        [checksums => $sums->(sha512 => undef)],
+        # Through 1.11.2 nothing read the answer's id or format, so an answer
+        # without either came back whole.
+        [checksums => InternetDataTest::checksum(id => undef)],
+        [checksums => InternetDataTest::checksum(format => undef)],
+        [checksums => InternetDataTest::checksum(id => 7)],
+        [checksums => InternetDataTest::checksum(format => 7)],
+        [checksums => { id => 'bogon_ip_v1', checksums => InternetDataTest::checksum()->{checksums} }],
         [downloads => { downloads => [InternetDataTest::download(bytes => '10')] }],
         [downloads => { downloads => [InternetDataTest::download(open => 'true')] }],
         [downloads => { downloads => [InternetDataTest::download(created => undef)] }],
@@ -275,12 +306,15 @@ subtest 'a member of the wrong type at any depth is a retried server_error' => s
         (my $name, my $wire) = @$case;
         $body = Mojo::JSON::encode_json($wire);
         $origin->reset;
+        my @warnings;
+        local $SIG{__WARN__} = sub { push @warnings, @_ };
         my $error = eval { $calls{$name}->(); 1 } ? undef : $@;
         ok(ref $error && $error->isa('InternetData::Error'), "$name, $body: raised an InternetData::Error")
             or next;
         is($error->kind, 'server_error', "$name, $body: server_error");
         is($error->status, 200, "$name, $body: carrying the status");
         is($origin->count, 2, "$name, $body: retried like any outage");
+        is_deeply(\@warnings, [], "$name, $body: and warning the caller of nothing");
     }
 };
 
@@ -311,9 +345,7 @@ subtest 'the query a call makes says what it asked for' => sub {
         my ($c) = @_;
         my %body = (
             '/api/v2/database/downloads' => { downloads => [] },
-            '/api/v2/database/checksum' => {
-                checksums => { md5 => 'm', sha1 => 's1', sha256 => 's256', sha512 => 's512' },
-            },
+            '/api/v2/database/checksum' => InternetDataTest::checksum(id => 'bogon_asn_v1'),
             '/api/v2/database/metadata' => InternetDataTest::metadata(id => 'bogon_asn_v1'),
             '/api/v2/database/list' => { databases => [] },
         );
@@ -464,6 +496,46 @@ subtest 'a per-call timeout is refused where it cannot work' => sub {
     ok(!-e "$path.part", 'nor was a .part file left behind');
 };
 
+# Through 1.11.2 a count was taken as given: NaN compares false with 0, so a
+# failing call was retried for good, a word read as 0, 1.5 as two retries, and a
+# negative per call as none.
+subtest 'a retry count that cannot work is refused where it is set' => sub {
+    # A 404 is never retried, so a value that slips through fails its assertion
+    # rather than retrying for good.
+    my $status = 404;
+    my $origin = InternetDataTest::Origin->new(sub { shift->render(json => {}, status => $status) });
+    my $db = InternetData->new(base_url => $origin->url, api_key => 'k', retries => 0)->database;
+    my $dir = File::Temp->newdir;
+    my $path = $dir->dirname . '/bogon_ip_v1.mmdb';
+
+    for my $bad (-1, 'nan', -9**9**9, 1.5, 'two', '', [2]) {
+        my $shown = ref $bad ? 'a reference' : "'$bad'";
+        my $client = eval { InternetData->new(base_url => $origin->url, api_key => 'k', retries => $bad) };
+        like($@, qr/InternetData->new: retries must be a whole number/, "new refuses retries => $shown");
+        ok(!$client, "and builds no client for retries => $shown");
+        for my $call (
+            [list => sub { $db->list(retries => $bad) }],
+            [metadata => sub { $db->metadata('bogon_ip_v1', retries => $bad) }],
+            [download_url => sub { $db->download_url('bogon_ip_v1', 'mmdb', retries => $bad) }],
+            [download => sub { $db->download('bogon_ip_v1', 'mmdb', $path, retries => $bad) }],
+            [download_bytes => sub { $db->download_bytes('bogon_ip_v1', 'mmdb', retries => $bad) }],
+        ) {
+            eval { $call->[1]->() };
+            like($@, qr/database->\Q$call->[0]\E: retries must be a whole number/, "$call->[0] refuses retries => $shown");
+        }
+    }
+    is($origin->count, 0, 'and not one request was spent finding out');
+    ok(!-e "$path.part", 'nor was a .part file left behind');
+
+    # A count written as a string is that count, and Inf retries for good.
+    for my $good ('1', '1e0', 9**9**9) {
+        ok(eval { InternetData->new(api_key => 'k', retries => $good); 1 }, "new takes retries => '$good'");
+    }
+    $status = 503;
+    eval { $db->list(retries => '1') };
+    is($origin->count, 2, "and a per-call '1' is one retry");
+};
+
 subtest 'a client-wide timeout is refused where it cannot work' => sub {
     my $origin = InternetDataTest::Origin->new(sub { shift->render(json => { databases => [] }) });
 
@@ -502,7 +574,7 @@ subtest 'a zero written as a string is no bound too' => sub {
 subtest 'an unpublished format is refused before the network' => sub {
     my $origin = InternetDataTest::Origin->new(sub {
         my ($c, $o) = @_;
-        return $c->render(json => { checksums => { map { $_ => 'd' } qw(md5 sha1 sha256 sha512) } })
+        return $c->render(json => InternetDataTest::checksum(format => $c->param('format')))
             if $c->req->url->path->to_string =~ /checksum/;
         $c->res->headers->location($o->url . '/file');
         $c->rendered(302);
@@ -726,7 +798,7 @@ subtest 'an unknown option is refused rather than ignored' => sub {
     eval { $client->database->metadata('bogon_ip_v1', retires => 2) };
     like($@, qr/unknown option/, 'on every call, not just the first');
     eval { InternetData->new(api_key => 'k', retries => -1) };
-    like($@, qr/retries cannot be negative/, 'and a value that cannot work is refused too');
+    like($@, qr/retries must be a whole number/, 'and a value that cannot work is refused too');
 };
 
 subtest 'a call refuses arguments it cannot use' => sub {

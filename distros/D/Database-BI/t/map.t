@@ -191,7 +191,7 @@ subtest 'GET /map?loc= renders a map from a geocoded place column' => sub {
 
 	# Leaflet's CSS and JS come from onload_render's head part, which belongs in
 	# the layout's <head> and not in the body of the page.
-	like($body, qr{<head>.*leaflet\@1\.9\.4/dist/leaflet\.css.*</head>}s,
+	like($body, qr{<head>.*leaflet(?:\@[\d.]+)?/dist/leaflet\.css.*</head>}s,
 		'Leaflet CSS is in the document head');
 
 	like($body, qr/resolved by OpenAddresses/, 'the backend that answered is named');
@@ -372,7 +372,7 @@ subtest 'A saved map visual renders on a canvas with unique Leaflet ids' => sub 
 
 	$t->get_ok("/a/$cid")->status_is(200);
 	my $body = $t->tx->res->body;
-	like($body, qr/leaflet\@1\.9\.4\/dist\/leaflet\.css/, 'Leaflet CSS is in the canvas head');
+	like($body, qr{leaflet(?:\@[\d.]+)?/dist/leaflet\.css}, 'Leaflet CSS is in the canvas head');
 	like($body, qr/id="map-0"/, 'the first map has a unique element id');
 	like($body, qr/id="map-1"/, 'the second map has a unique element id');
 	like($body, qr/id="map-2"/, 'a map added after saving has a unique element id');
@@ -393,11 +393,11 @@ subtest 'Markers are clustered, so dense maps stay readable at low zoom' => sub 
 	$t->get_ok(_url(l => $places_spec, lat => 'lat', lon => 'lon'))->status_is(200);
 	my $page = $t->tx->res->body;
 
-	like($page, qr{unpkg\.com/leaflet\.markercluster\@1\.5\.3/dist/leaflet\.markercluster\.js},
+	like($page, qr{unpkg\.com/leaflet\.markercluster(?:\@[\d.]+)?/dist/leaflet\.markercluster\.js},
 		'the map page loads the cluster plugin');
-	like($page, qr{unpkg\.com/leaflet\.markercluster\@1\.5\.3/dist/MarkerCluster\.css},
+	like($page, qr{unpkg\.com/leaflet\.markercluster(?:\@[\d.]+)?/dist/MarkerCluster\.css},
 		'with its stylesheet');
-	like($page, qr{unpkg\.com/leaflet\.markercluster\@1\.5\.3/dist/MarkerCluster\.Default\.css},
+	like($page, qr{unpkg\.com/leaflet\.markercluster(?:\@[\d.]+)?/dist/MarkerCluster\.Default\.css},
 		'and the default cluster icons');
 	like($page, qr/var clusterGroup = L\.markerClusterGroup\(\);/,
 		'a cluster group holds the markers');
@@ -421,7 +421,7 @@ subtest 'Markers are clustered, so dense maps stay readable at low zoom' => sub 
 
 	$t->get_ok("/a/$cid")->status_is(200);
 	my $canvas = $t->tx->res->body;
-	like($canvas, qr{leaflet\.markercluster\@1\.5\.3}, 'a canvas with maps loads the plugin');
+	like($canvas, qr{leaflet\.markercluster}, 'a canvas with maps loads the plugin');
 	my $groups = () = $canvas =~ /var clusterGroup = L\.markerClusterGroup\(\);/g;
 	is($groups, 2, 'each map card has a cluster group of its own');
 	like($canvas, qr/map\.addLayer\(clusterGroup\)/, 'and adds it to its own map');
@@ -452,7 +452,7 @@ subtest 'A geocoded map can be appended to a canvas' => sub {
 		encode_json({ kind => 'map', encode => { loc => 'town' }, title => 'Towns mapped' }),
 	)->status_is(201)->json_is('/visual' => 1)
 		->json_is('/cf_col' => '')
-		->json_like('/head' => qr/leaflet\@1\.9\.4\/dist\/leaflet\.js/,
+		->json_like('/head' => qr{leaflet(?:\@[\d.]+)?/dist/leaflet\.js},
 			'the response carries the map assets for a canvas that has no map yet')
 		->json_like('/html' => qr/Plotting 2 markers for 2 of 2 rows/,
 			'the appended card plots the geocoded places')
@@ -605,6 +605,9 @@ subtest 'Leaflet assets and tiles can be self-hosted for an offline deployment' 
 	# A deployment with no outbound network access serves the library and the
 	# tiles itself.  Every asset is a config key, and both the map page and a
 	# map card on a canvas have to use the configured copies rather than the CDN.
+	# These config keys were added in HTML::OSM 0.11; skip on older installs.
+	plan skip_all => 'HTML::OSM >= 0.11 required for asset URL overrides'
+		unless $HTML::OSM::VERSION >= 0.11;
 	local $t->app->config->{leaflet_js_url}                  = '/static/leaflet/leaflet.js';
 	local $t->app->config->{leaflet_css_url}                 = '/static/leaflet/leaflet.css';
 	local $t->app->config->{leaflet_cluster_js_url}          = '/static/leaflet/leaflet.markercluster.js';

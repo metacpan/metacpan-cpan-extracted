@@ -1,0 +1,81 @@
+Revision history for Skilletor
+
+0.001     2026-10-24 03:08:52Z
+  - Follows the reference's k145: CLAUDE_CONFIG_DIR is the user scope's
+    .claude (config, lock, roots, state dir, markers, briefing lookup); a
+    source's non-object vars, a lock via that is no array of strings and a
+    truncated url tarball are errors.
+  - Initial release: the Perl port of skilletor, beside the TypeScript
+    reference in the same repository, sharing its config files, its
+    ~/.claude/skilletor/cache and its trust.json.
+  - Skilletor::Config loads the user, project and local config with the
+    reference's merge and precedence rules (per-field source merge with
+    origins, author mode, entries without a backend, "ref": null, vars,
+    gitignore, claudeSettings, targets), reports the same errors in the same
+    order, and edits a config file as `add`/`install`/`uninstall` do.
+  - Skilletor::Entry parses [type:]name@source, patterns and
+    [bundle:]name@source; Skilletor::Spec resolves `add` shorthands (forge
+    links, scp-like and transport::address forms, probed generic hosts).
+  - Sources: Skilletor::Source::Local, ::Git (shallow fetch, refs, SHA pins,
+    offline cache reuse, repair and restore after killed runs, lock-file
+    sweep) and ::Url (https tarball, ETag or sha256 version, staged swap,
+    sweep). Skilletor::Cache names cache directories as the reference does,
+    so both implementations share one fetch.
+  - Skilletor::Backend picks a source's backend (author mode) for trust and
+    fetch alike; Skilletor::State reads and writes trust.json;
+    Skilletor::Targets detects harnesses and merges targets.
+  - Skilletor::JSON parses like JSON.parse (key order, V8's messages) and
+    writes like JSON.stringify(value, null, 2), byte for byte;
+    Skilletor::URL, ::Gzip, ::Tar, ::JSString and ::FSUtil carry the Node
+    behaviour that reaches a name, a byte or a message.
+  - Skilletor resolves skills, agents and rules as a sync would install
+    them, without installing: resolve_skill, resolve_agent, resolve_rule
+    and resolve_rules give the main file in the source tree or the shared
+    cache, resolve_item, resolve_items and items the whole record. Both
+    scopes declaring a name follow Claude Code's precedence: the personal
+    skill wins, the project's agent wins, rules of both scopes apply (the
+    user's first) – resolve_rule throws Skilletor::Error::Ambiguous rather
+    than hide one. fetch => always, missing or never
+    picks the network use; no agent harness is needed (require_harness
+    restores the reference's check). An item with a .njk file is flagged
+    templated and refused as an include (Skilletor::Error::Unsupported):
+    the port renders no templates.
+  - Skilletor::Resolver ports the reference's resolveItems: trust, sources
+    into the cache, catalogs, wildcards, bundles with their vars and
+    entries of other sources, the overlap rules and the lock's kept
+    offers, with the reference's warnings and report, under its sync lock.
+  - Skilletor::Catalog scans a source tree (layout, plugin.json, the
+    Claude project layout, a source's path, item errors),
+    Skilletor::Bundles parses and expands bundle files, and
+    Skilletor::Frontmatter reads the reference's YAML subset, with its
+    error messages. Skilletor::Lock reads lock files.
+  - Skilletor::State takes the sync lock (sync.lock/) as the reference
+    does, so the two exclude each other; the git, url and local sources
+    gain cached, their cache without the network.
+  - Skilletor::Tar refuses a header whose size field is no non-negative
+    number as a corrupt archive ("corrupt tar entry (size): <name>"), as
+    the reference now does: a url source falls back to its cache.
+  - Skilletor->sync, ->check and ->status (Skilletor::Engine) port the
+    reference's commands for the Claude Code target: the same installed
+    files and executable bits, lock, .gitignore blocks, .worktreeinclude
+    and .claude/settings.json plugin requirement (k140), conflicts and
+    force, removal of what is no longer declared, partial entries after a
+    failed write, the briefing check, the same JSON reports and the same
+    state records (render-inputs.json, sources-read.json, unreached.json),
+    so either implementation's check accepts what the other synced. A
+    scope targeting Codex or Hermes, or a sync where the CLI left their
+    state, is refused with nothing touched. A .njk item is never installed
+    unrendered: the sync warns, keeps what the CLI installed, and leaves the
+    scope open for the CLI's next sync.
+  - Skilletor::Apply, ::Render (copy only), ::Gitignore, ::ClaudeSettings,
+    ::Briefing and ::Report port apply.ts, the copy half of render.ts,
+    gitignore.ts, claudesettings.ts, briefing.ts and report.ts (with the
+    CLI's status text and exit codes); Skilletor::Lock writes locks,
+    Skilletor::State keeps the records check reads, Skilletor::Targets has
+    the layout table, Skilletor::JSON takes a string indent.
+  - t/60-conformance.t runs every step of the shared conformance cases;
+    t/52-parity-sync.t has the reference and the port sync one machine and
+    compares every byte they leave.
+  - Tests replay oracles recorded from the reference (t/data) and, in a
+    checkout with node, drive the reference and the port against the same
+    remotes and cache (t/50-parity.t).

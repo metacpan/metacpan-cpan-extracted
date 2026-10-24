@@ -1,5 +1,5 @@
 package Langertha::Skeid::UsageStore::DBI;
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 # ABSTRACT: SQLite and PostgreSQL usage store
 use Moo;
 use strict;
@@ -9,8 +9,14 @@ use File::Basename qw(dirname);
 use File::Path qw(make_path);
 use File::Spec;
 use File::ShareDir qw(dist_dir);
+use Fcntl qw(LOCK_EX LOCK_NB);
+use IO::Handle;
+use JSON::MaybeXS qw(encode_json decode_json);
+use List::Util qw(min);
 use Mojo::IOLoop;
+use Mojo::Util qw(steady_time);
 use Scalar::Util qw(weaken);
+use Sys::Hostname ();
 use Langertha::Skeid::UsageStore;
 
 
@@ -23,22 +29,63 @@ has schema_file  => (is => 'ro', default => sub { '' });
 has auto_migrate => (is => 'ro', default => sub { 1 });
 has flush_interval_ms => (is => 'ro', default => sub { 0 });
 has on_lost      => (is => 'rw');
+has spool_dir    => (is => 'ro', default => sub { '' });
 
 has _dbh => (is => 'rw');
 has _queue => (is => 'ro', default => sub { [] });
 has _flush_timer => (is => 'rw');
+# Reconnect backoff (k110): no connect before _reconnect_at (steady clock); _backoff_s is the
+# wait the last failure set, _connect_error the masked error it failed with.
+has _reconnect_at   => (is => 'rw', default => sub { 0 });
+has _backoff_s      => (is => 'rw', default => sub { 0 });
+has _connect_error  => (is => 'rw', default => sub { '' });
+# Prepared while the database was down (spool_dir): the schema is applied on the first connect.
+has _schema_pending => (is => 'rw', default => sub { 0 });
+has _spool_pending  => (is => 'rw', default => sub { 0 });
+has _spool_announced => (is => 'rw', default => sub { 0 });
+has _replay_timer   => (is => 'rw');
+
+# The values ADR 0027 names; tests lower them.
+our $BACKOFF_START_S = 1;
+our $BACKOFF_MAX_S   = 60;
+our $REPLAY_BATCH    = 500;
 
 
 sub prepare {
   my ($self) = @_;
+  if (length $self->spool_dir) {
+    $self->_spool_pending(1) if $self->_spool_files('any');
+    my $dbh = eval { $self->dbh };
+    unless ($dbh) {
+      my $err = $@;
+      return unless defined($err) && length($err);   # no DBI: as without a spool
+      if ($self->auto_migrate) {
+        $self->_schema_path;                          # a missing file still croaks here
+        $self->_schema_pending(1);
+      }
+      warn 'skeid: usage database unreachable at start, usage events go to the spool in '
+        . $self->spool_dir . ': ' . $self->_error_text($err) . "\n";
+      $self->_spool_announced(1);
+      return 1;
+    }
+  }
   my $dbh = $self->dbh or return;
-  return 1 unless $self->auto_migrate;
+  $self->_apply_schema($dbh) if $self->auto_migrate;
+  $self->_schedule_replay;
+  return 1;
+}
 
+sub _schema_path {
+  my ($self) = @_;
   my $schema_file = $self->schema_file;
   $schema_file = $self->shipped_schema_file unless length $schema_file;
   croak "usage schema file not found: $schema_file" unless -f $schema_file;
+  return $schema_file;
+}
 
-  my $sql = Langertha::Skeid::UsageStore::read_text_file($schema_file);
+sub _apply_schema {
+  my ($self, $dbh) = @_;
+  my $sql = Langertha::Skeid::UsageStore::read_text_file($self->_schema_path);
   my @stmts = grep { /\S/ } map {
     my $s = $_;
     $s =~ s/^\s+//;
@@ -78,6 +125,14 @@ my @ADDED_COLUMNS = (
   ['cost_cache_write_usd', 'DOUBLE PRECISION'],
   # Prompt-cache write count (skeid #41), beside cached_tokens. Nullable: an old row reads NULL.
   ['cache_write_tokens', 'BIGINT'],
+  # Seconds of audio an audio route's node reported (skeid k91, ADR 0021). Nullable: an event
+  # whose node did not say reads NULL ("not measured"), not a measured zero.
+  ['audio_seconds', 'DOUBLE PRECISION'],
+  # Documents a rerank request carried (skeid k92). Nullable: only a rerank event has a count.
+  ['documents', 'BIGINT'],
+  # Pages a documents request converted (skeid k94, ADR 0028), read off the answer's
+  # json_content. Nullable: only a documents event whose answer carried a page count has one.
+  ['pages', 'BIGINT'],
 );
 
 sub _add_missing_columns {
@@ -122,14 +177,56 @@ sub dbh {
   );
   $connect_attr{sqlite_unicode} = 1 if $self->backend eq 'sqlite';
 
-  my $dbh = DBI->connect($self->dsn, $self->user, $self->password, \%connect_attr);
+  my $wait = $self->_reconnect_at - _now();
+  if ($wait > 0) {
+    die sprintf("usage database unreachable (next connect attempt in %.1fs): %s\n",
+      $wait, $self->_connect_error);
+  }
+
+  my $dbh = eval {
+    my $h = DBI->connect($self->dsn, $self->user, $self->password, \%connect_attr)
+      or die((DBI->errstr // 'failed to connect usage database') . "\n");
+    # Prepared while the database was down (spool_dir): the schema waited for this connect.
+    if ($self->_schema_pending) {
+      unless (eval { $self->_apply_schema($h); 1 }) {
+        my $err = $@;
+        eval { $h->disconnect };
+        die $err;
+      }
+      $self->_schema_pending(0);
+    }
+    $h;
+  };
+  unless ($dbh) {
+    my $err = $@ || 'failed to connect usage database';
+    # Back off (k110): one blocking connect per deadline while the database is away, never one
+    # per event or per flush tick.
+    my $backoff = $self->_backoff_s
+      ? min($self->_backoff_s * 2, $BACKOFF_MAX_S)
+      : $BACKOFF_START_S;
+    $self->_backoff_s($backoff);
+    $self->_reconnect_at(_now() + $backoff);
+    $self->_connect_error($self->_error_text($err));
+    die $err;
+  }
+  $self->_backoff_s(0);
+  $self->_reconnect_at(0);
+  $self->_connect_error('');
+  $self->_spool_announced(0);
   $self->_dbh($dbh);
   return $dbh;
 }
 
+# The steady clock the backoff is measured on; a test moves it.
+sub _now { steady_time() }
+
 
 sub disconnect {
   my ($self) = @_;
+  if (defined(my $timer = $self->_replay_timer)) {
+    Mojo::IOLoop->remove($timer);
+    $self->_replay_timer(undef);
+  }
   $self->flush;
   $self->_drop_handle;
   return;
@@ -185,10 +282,22 @@ sub store {
   # Whatever was queued while the loop ran goes first, so the table keeps the order the events
   # arrived in.
   $self->flush if @{ $self->_queue };
-  return $self->_with_handle(sub {
+  my $res = $self->_with_handle(sub {
     my ($dbh) = @_;
     return { ok => 1, $self->_insert($dbh, $event) };
   });
+  if ($res->{ok}) {
+    $self->_schedule_replay;
+    return $res;
+  }
+  # A live handle refused the event: spooling it would only replay the refusal.
+  return $res if $self->_dbh || !length($self->spool_dir);
+  my $spool_err = $self->_spool_events([$event]);
+  unless ($spool_err) {
+    $self->_announce_spool($res->{error});
+    return { ok => 1, spooled => 1 };
+  }
+  return $self->_failure("$res->{error}; spool write failed: $spool_err");
 }
 
 # Queue only while a loop runs to fire the flush timer. Outside one -- a script calling
@@ -237,12 +346,17 @@ sub flush {
     }
     return { ok => 1, written => scalar @events };
   });
-  return $batch if $batch->{ok};
+  if ($batch->{ok}) {
+    $self->_schedule_replay;
+    return $batch;
+  }
 
-  # No handle left: the reconnect failed, and one attempt per event would only repeat it.
-  return $self->_lose(0, \@events, $batch->{error}) unless $self->_dbh;
+  # No handle left: the reconnect failed (or the backoff runs), and one attempt per event would
+  # only repeat it.
+  return _flush_answer(0, $self->_spool_or_lose(\@events, $batch->{error}))
+    unless $self->_dbh;
 
-  my ($written, $lost, $error) = (0, 0);
+  my ($written, $spooled, $lost, $error) = (0, 0, 0);
   while (@events) {
     my $event = shift @events;
     my $one = $self->_with_handle(sub {
@@ -254,25 +368,60 @@ sub flush {
       $written++;
       next;
     }
-    $lost++;
-    $error = $one->{error};
-    $self->_report_lost($event, $error);
-    next if $self->_dbh;
-    # The handle died under the single writes and did not come back: the rest go with it.
-    $lost += $self->_lose(0, \@events, $error)->{lost};
+    if ($self->_dbh) {
+      # Refused on a live handle: this event alone is lost, and never spooled.
+      $lost++;
+      $error = $one->{error};
+      $self->_report_lost($event, $error);
+      next;
+    }
+    # The handle died under the single writes and did not come back: this event and the rest
+    # go with it.
+    my ($s, $l, $e) = $self->_spool_or_lose([$event, @events], $one->{error});
+    $spooled += $s;
+    $lost += $l;
+    $error = $e if $l;
     last;
   }
-  return $lost
-    ? { ok => 0, written => $written, lost => $lost, error => $error }
-    : { ok => 1, written => $written };
+  $self->_schedule_replay if $written;
+  return _flush_answer($written, $spooled, $lost, $error);
 }
 
-# Reports every event in $events as lost and answers the flush with it.
-sub _lose {
-  my ($self, $written, $events, $err) = @_;
+sub _flush_answer {
+  my ($written, $spooled, $lost, $error) = @_;
+  return {
+    ok      => ($lost ? 0 : 1),
+    written => $written,
+    ($spooled ? (spooled => $spooled) : ()),
+    ($lost ? (lost => $lost, error => $error) : ()),
+  };
+}
+
+# Events that could not be written for want of a connection: to the spool when there is one,
+# else -- or when the spool write fails -- reported lost. Answers ($spooled, $lost, $error).
+sub _spool_or_lose {
+  my ($self, $events, $err) = @_;
+  if (length $self->spool_dir) {
+    my $spool_err = $self->_spool_events($events);
+    unless ($spool_err) {
+      $self->_announce_spool($err);
+      return (scalar(@$events), 0, undef);
+    }
+    $err = $self->_error_text($err) . "; spool write failed: $spool_err";
+  }
   my $failure = $self->_failure($err);
   $self->_report_lost($_, $failure->{error}) for @$events;
-  return { ok => 0, written => $written, lost => scalar(@$events), error => $failure->{error} };
+  return (0, scalar(@$events), $failure->{error});
+}
+
+# Fail loud once per outage: spooled events are not lost, but the database is away.
+sub _announce_spool {
+  my ($self, $err) = @_;
+  return if $self->_spool_announced;
+  $self->_spool_announced(1);
+  warn 'skeid: usage database unreachable, usage events go to the spool in '
+    . $self->spool_dir . ' until it is back: ' . $self->_error_text($err) . "\n";
+  return;
 }
 
 sub _report_lost {
@@ -332,54 +481,282 @@ sub _error_text {
   return $err;
 }
 
+# The columns of one event, in the order _insert binds them. The spool writes exactly these keys
+# of an event and nothing else (k110), so a new column is added here once and reaches both.
+my @EVENT_COLUMNS = qw(
+  created_at request_id api_format endpoint api_key_id provider engine model node_id route_url
+  status_code ok duration_ms input_tokens output_tokens total_tokens cached_tokens tool_calls
+  cost_input_usd cost_output_usd cost_total_usd error_type error_message requested_model
+  content_bytes cost_cache_read_usd cost_cache_write_usd cache_write_tokens audio_seconds
+  documents pages
+);
+# Nullable, written as NULL when the event has no such key -- "not measured", not a zero:
+#   cached_tokens          an event that carried no cache count
+#   content_bytes          only a streamed request carries it
+#   cost_cache_read_usd,
+#   cost_cache_write_usd   an event from a caller that does not price the cache apart
+#   cache_write_tokens     an event that carried no cache write count
+#   audio_seconds          only an audio route's event, and only when its node reported it
+#   documents              only a rerank or documents event
+#   pages                  only a documents event whose answer said how many pages it was
+# requested_model falls back to model, then ''.
+my $INSERT_SQL = 'INSERT INTO usage_events (' . join(', ', @EVENT_COLUMNS) . ') VALUES ('
+  . join(', ', ('?') x @EVENT_COLUMNS) . ')';
+
 sub _insert {
   my ($self, $dbh, $event) = @_;
-  my $sth = $dbh->prepare_cached(q{
-    INSERT INTO usage_events (
-      created_at, request_id, api_format, endpoint, api_key_id, provider, engine, model, node_id, route_url,
-      status_code, ok, duration_ms, input_tokens, output_tokens, total_tokens, cached_tokens, tool_calls,
-      cost_input_usd, cost_output_usd, cost_total_usd, error_type, error_message, requested_model,
-      content_bytes, cost_cache_read_usd, cost_cache_write_usd, cache_write_tokens
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-  });
-  $sth->execute(
-    $event->{created_at},
-    $event->{request_id},
-    $event->{api_format},
-    $event->{endpoint},
-    $event->{api_key_id},
-    $event->{provider},
-    $event->{engine},
-    $event->{model},
-    $event->{node_id},
-    $event->{route_url},
-    $event->{status_code},
-    $event->{ok},
-    $event->{duration_ms},
-    $event->{input_tokens},
-    $event->{output_tokens},
-    $event->{total_tokens},
-    # Nullable: an event that carried no cache count writes NULL, not a measured zero.
-    $event->{cached_tokens},
-    $event->{tool_calls},
-    $event->{cost_input_usd},
-    $event->{cost_output_usd},
-    $event->{cost_total_usd},
-    $event->{error_type},
-    $event->{error_message},
-    ($event->{requested_model} // $event->{model} // ''),
-    # Nullable: only a streamed request carries it; anything else writes NULL, "not measured".
-    $event->{content_bytes},
-    # Nullable: an event from a caller that does not price the cache apart writes NULL.
-    $event->{cost_cache_read_usd},
-    $event->{cost_cache_write_usd},
-    # Nullable: an event that carried no cache write count writes NULL.
-    $event->{cache_write_tokens},
-  );
+  my $sth = $dbh->prepare_cached($INSERT_SQL);
+  $sth->execute(map {
+    $_ eq 'requested_model'
+      ? ($event->{requested_model} // $event->{model} // '')
+      : $event->{$_}
+  } @EVENT_COLUMNS);
 
   return ($self->backend eq 'sqlite' && $dbh->can('sqlite_last_insert_rowid'))
     ? ( id => Langertha::Skeid::UsageStore::num($dbh->sqlite_last_insert_rowid) )
     : ();
+}
+
+# Replay's insert (k110): skipped when the event is already in the table. The key is
+# request_id with created_at -- the spool holds the event as it was built, so a copy that made it
+# in carries both, while a client that sends the same x-request-id twice does not lose its
+# second, real event. Without a request_id there is no key: the event is written. Answers 1 for
+# a row written, 0 for one skipped.
+sub _insert_once {
+  my ($self, $dbh, $event) = @_;
+  my $request_id = $event->{request_id};
+  if (defined($request_id) && length($request_id)) {
+    my $found = $dbh->selectrow_arrayref(
+      'SELECT 1 FROM usage_events WHERE request_id = ? AND created_at = ?',
+      undef, $request_id, $event->{created_at});
+    return 0 if $found;
+  }
+  $self->_insert($dbh, $event);
+  return 1;
+}
+
+# --- The spool (k110, ADR 0027) ----------------------------------------------------------------
+#
+# Writers append to usage-spool-<host>-<pid>.jsonl, one per process. A replay first claims a
+# writer's file by renaming it to <name>.replay-<host>-<pid>-<n> under the file's lock; a writer
+# that was waiting for that lock sees the path no longer names its file and opens a new one. A
+# claimed file is then worked under its own lock, which only replays ever take -- so a writer
+# waits at most for a rename, never for a database. Temporary files start with a dot and match
+# neither pattern.
+
+my $SPOOL_FILE   = qr/\Ausage-spool-[A-Za-z0-9._-]+\.jsonl\z/;
+my $CLAIMED_FILE = qr/\Ausage-spool-[A-Za-z0-9._-]+\.jsonl\.replay-[A-Za-z0-9._-]+\z/;
+my $CLAIM_SEQ = 0;
+my $HOST;
+
+sub _host {
+  return $HOST //= do {
+    my $host = eval { Sys::Hostname::hostname() } // '';
+    $host =~ s/[^A-Za-z0-9.-]+/_/g;
+    length($host) ? $host : 'localhost';
+  };
+}
+
+sub _spool_files {
+  my ($self, $kind) = @_;
+  opendir(my $dh, $self->spool_dir) or return;
+  my @names = sort grep {
+      $kind eq 'writer'  ? $_ =~ $SPOOL_FILE
+    : $kind eq 'claimed' ? $_ =~ $CLAIMED_FILE
+    : ($_ =~ $SPOOL_FILE || $_ =~ $CLAIMED_FILE)
+  } readdir $dh;
+  closedir $dh;
+  return @names;
+}
+
+# True when the open $fh is still the file at $path: a replay may have renamed or removed it
+# between the open and the lock.
+sub _same_file {
+  my ($fh, $path) = @_;
+  my @open = stat $fh or return 0;
+  my @named = stat $path or return 0;
+  return $open[0] == $named[0] && $open[1] == $named[1];
+}
+
+# Appends $events to this process's spool file. Answers undef, or the error -- never dies.
+sub _spool_events {
+  my ($self, $events) = @_;
+  my $ok = eval { $self->_append_spool($events); 1 };
+  return $@ || 'unknown spool error' unless $ok;
+  $self->_spool_pending(1);
+  return undef;
+}
+
+sub _append_spool {
+  my ($self, $events) = @_;
+  my $dir = $self->spool_dir;
+  unless (-d $dir) {
+    make_path($dir, { error => \my $mkerr });
+    die "Cannot create spool directory $dir\n" unless -d $dir;
+  }
+  # Only the columns: whatever else an event hash carries never reaches the disk.
+  my $lines = join '', map {
+    my $event = $_;
+    encode_json({ map { exists $event->{$_} ? ($_ => $event->{$_}) : () } @EVENT_COLUMNS }) . "\n";
+  } @$events;
+  my $path = File::Spec->catfile($dir, 'usage-spool-' . _host() . "-$$.jsonl");
+
+  for (1 .. 5) {
+    open my $fh, '>>', $path or die "Cannot append $path: $!\n";
+    binmode $fh;
+    flock($fh, LOCK_EX) or die "Cannot lock $path: $!\n";
+    unless (_same_file($fh, $path)) {
+      close $fh;   # claimed by a replay meanwhile: append to a new file
+      next;
+    }
+    print {$fh} $lines or die "Cannot append $path: $!\n";
+    $fh->flush       or die "Cannot flush $path: $!\n";
+    $fh->sync        or die "Cannot sync $path: $!\n";
+    close $fh        or die "Cannot close $path: $!\n";
+    return 1;
+  }
+  die "Cannot append $path: claimed by a replay on every attempt\n";
+}
+
+
+sub replay_spool {
+  my ($self) = @_;
+  my %res = (ok => 1, replayed => 0, consumed => 0, remaining => 0);
+  return \%res unless length $self->spool_dir;
+  my $dir = $self->spool_dir;
+
+  # Claim: rename every writer file this process can lock right now.
+  for my $name ($self->_spool_files('writer')) {
+    my $path = File::Spec->catfile($dir, $name);
+    open my $fh, '<', $path or next;
+    flock($fh, LOCK_EX | LOCK_NB) or next;
+    rename($path, "$path.replay-" . _host() . "-$$-" . ++$CLAIM_SEQ) if _same_file($fh, $path);
+    close $fh;
+  }
+
+  my $budget = $REPLAY_BATCH;
+  for my $name ($self->_spool_files('claimed')) {
+    last if $budget <= 0;
+    my $one = $self->_replay_file(File::Spec->catfile($dir, $name), $budget);
+    $res{replayed} += $one->{replayed};
+    $res{consumed} += $one->{consumed};
+    $budget -= $one->{consumed};
+    next if $one->{ok};
+    @res{qw(ok error)} = (0, $one->{error});
+    last;
+  }
+
+  $res{remaining} = $self->_spool_files('any') ? 1 : 0;
+  $self->_spool_pending($res{remaining});
+  return \%res;
+}
+
+sub _replay_file {
+  my ($self, $path, $budget) = @_;
+  my %none = (ok => 1, replayed => 0, consumed => 0);
+  open my $fh, '<', $path or return \%none;         # finished by another process
+  flock($fh, LOCK_EX | LOCK_NB) or return \%none;   # being replayed by another process
+  return \%none unless _same_file($fh, $path);
+  binmode $fh;
+  my @lines = <$fh>;
+  my @take = splice @lines, 0, $budget;
+
+  my @events;
+  for my $i (0 .. $#take) {
+    next unless $take[$i] =~ /\S/;
+    my $event = eval { decode_json($take[$i]) };
+    if (ref($event) eq 'HASH') {
+      push @events, $event;
+      next;
+    }
+    # A torn last line (the process died mid-write, the disk filled up): nothing to replay.
+    warn "skeid: unreadable line dropped from usage spool $path\n";
+  }
+
+  my $written = $self->_replay_events(\@events);
+  return { ok => 0, replayed => 0, consumed => 0, error => $written->{error} }
+    unless $written->{ok};
+
+  # Committed: only now do the lines leave the spool. Should this fail, they stay and the next
+  # replay skips them as already present.
+  if (@lines) {
+    my ($vol, $dir) = File::Spec->splitpath($path);
+    my $tmp = File::Spec->catpath($vol, $dir, ".tmp-$$-" . ++$CLAIM_SEQ);
+    if (open my $out, '>', $tmp) {
+      binmode $out;
+      if ((print {$out} @lines) && $out->flush && $out->sync && close($out)) {
+        rename($tmp, $path) or unlink $tmp;
+      } else {
+        unlink $tmp;
+      }
+    }
+  } else {
+    unlink $path;
+  }
+  close $fh;
+  return { ok => 1, replayed => $written->{written}, consumed => scalar(@take) };
+}
+
+# One transaction for the batch. A refusal on a live handle falls back to one event at a time,
+# so a single event the database will never take is reported lost and does not hold up the
+# rest; a database that went away again stops the replay with the spool untouched.
+sub _replay_events {
+  my ($self, $events) = @_;
+  return { ok => 1, written => 0 } unless @$events;
+
+  my $batch = $self->_with_handle(sub {
+    my ($dbh) = @_;
+    $dbh->begin_work;
+    my $written = eval {
+      my $n = 0;
+      $n += $self->_insert_once($dbh, $_) for @$events;
+      $dbh->commit;
+      $n;
+    };
+    unless (defined $written) {
+      my $err = $@;
+      eval { $dbh->rollback };
+      die $err;
+    }
+    return { ok => 1, written => $written };
+  });
+  return $batch if $batch->{ok} || !$self->_dbh;
+
+  my $written = 0;
+  for my $event (@$events) {
+    my $one = $self->_with_handle(sub {
+      my ($dbh) = @_;
+      return { ok => 1, written => $self->_insert_once($dbh, $event) };
+    });
+    if ($one->{ok}) {
+      $written += $one->{written};
+      next;
+    }
+    return $one unless $self->_dbh;
+    $self->_report_lost($event, $one->{error});
+  }
+  return { ok => 1, written => $written };
+}
+
+# After a write that succeeded: replay one batch of the spool. Inside the loop on the next tick,
+# batch after batch while there is progress; outside it -- prepare at start, a script -- one
+# batch at once, the rest with the next write.
+sub _schedule_replay {
+  my ($self) = @_;
+  return unless $self->_spool_pending && length $self->spool_dir;
+  unless (Mojo::IOLoop->is_running) {
+    $self->replay_spool;
+    return;
+  }
+  return if defined $self->_replay_timer;
+  weaken(my $weak = $self);
+  $self->_replay_timer(Mojo::IOLoop->timer(0 => sub {
+    return unless $weak;
+    $weak->_replay_timer(undef);
+    my $res = $weak->replay_spool;
+    $weak->_schedule_replay if $res->{ok} && $res->{consumed} && $res->{remaining};
+  }));
+  return;
 }
 
 
@@ -427,6 +804,9 @@ sub _report {
        COALESCE(SUM(cached_tokens), 0) AS cached_tokens,
        COALESCE(SUM(cache_write_tokens), 0) AS cache_write_tokens,
        COALESCE(SUM(tool_calls), 0) AS tool_calls,
+       COALESCE(SUM(audio_seconds), 0) AS audio_seconds,
+       COALESCE(SUM(documents), 0) AS documents,
+       COALESCE(SUM(pages), 0) AS pages,
        COALESCE(SUM(cost_total_usd), 0) AS total_cost_usd
      FROM usage_events $where_sql",
     undef,
@@ -438,11 +818,14 @@ sub _report {
        COALESCE(api_key_id, '') AS api_key_id,
        COUNT(*) AS requests,
        COALESCE(SUM(total_tokens), 0) AS total_tokens,
+       COALESCE(SUM(audio_seconds), 0) AS audio_seconds,
+       COALESCE(SUM(documents), 0) AS documents,
+       COALESCE(SUM(pages), 0) AS pages,
        COALESCE(SUM(cost_total_usd), 0) AS total_cost_usd
      FROM usage_events
      $where_sql
      GROUP BY api_key_id
-     ORDER BY total_cost_usd DESC, requests DESC",
+     ORDER BY total_cost_usd DESC, requests DESC, api_key_id ASC",
     { Slice => {} },
     @bind,
   ) || [];
@@ -452,11 +835,14 @@ sub _report {
        COALESCE(model, '') AS model,
        COUNT(*) AS requests,
        COALESCE(SUM(total_tokens), 0) AS total_tokens,
+       COALESCE(SUM(audio_seconds), 0) AS audio_seconds,
+       COALESCE(SUM(documents), 0) AS documents,
+       COALESCE(SUM(pages), 0) AS pages,
        COALESCE(SUM(cost_total_usd), 0) AS total_cost_usd
      FROM usage_events
      $where_sql
      GROUP BY model
-     ORDER BY total_cost_usd DESC, requests DESC",
+     ORDER BY total_cost_usd DESC, requests DESC, model ASC",
     { Slice => {} },
     @bind,
   ) || [];
@@ -488,6 +874,9 @@ sub _report {
       cached_tokens  => $num->($totals->{cached_tokens}),
       cache_write_tokens => $num->($totals->{cache_write_tokens}),
       tool_calls     => $num->($totals->{tool_calls}),
+      audio_seconds  => $num->($totals->{audio_seconds}),
+      documents      => $num->($totals->{documents}),
+      pages          => $num->($totals->{pages}),
       total_cost_usd => $num->($totals->{total_cost_usd}),
     },
     by_key   => [ map {
@@ -495,6 +884,9 @@ sub _report {
         api_key_id     => ($_->{api_key_id} // ''),
         requests       => $num->($_->{requests}),
         total_tokens   => $num->($_->{total_tokens}),
+        audio_seconds  => $num->($_->{audio_seconds}),
+        documents      => $num->($_->{documents}),
+        pages          => $num->($_->{pages}),
         total_cost_usd => $num->($_->{total_cost_usd}),
       }
     } @$by_key ],
@@ -503,6 +895,9 @@ sub _report {
         model          => ($_->{model} // ''),
         requests       => $num->($_->{requests}),
         total_tokens   => $num->($_->{total_tokens}),
+        audio_seconds  => $num->($_->{audio_seconds}),
+        documents      => $num->($_->{documents}),
+        pages          => $num->($_->{pages}),
         total_cost_usd => $num->($_->{total_cost_usd}),
       }
     } @$by_model ],
@@ -545,7 +940,7 @@ Langertha::Skeid::UsageStore::DBI - SQLite and PostgreSQL usage store
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 DESCRIPTION
 
@@ -564,8 +959,24 @@ runs once per interval instead of once per request, it is not off the loop. The 
 loss window: events still queued when the process dies without a flush are lost (ADR 0005,
 Update skeid k78). Off by default.
 
+C<spool_dir> keeps the events the database cannot take while it is down: they are appended to a
+local file instead of being reported lost, and written once the database answers again (see
+L</spool_dir> and F<docs/adr/0027-usage-events-spool-while-the-database-is-down.md>). With or
+without it, a failed connect is not repeated for every event: the next attempt waits for a
+backoff deadline (L</Reconnect backoff>). Off by default.
+
 C<DBI> is loaded at runtime rather than compile time: a Skeid that never configures a database
 backend must not require one to be installed.
+
+=head2 Reconnect backoff
+
+After a connect fails, the store does not connect again before a deadline: 1 second after the
+first failure, doubling with every further failure up to 60 seconds. Until then every write
+fails at once with C<usage database unreachable (next connect attempt in ...)> and the last
+connect error, without touching the network -- a database host that does not answer costs one
+blocking connect per deadline, not one per event or per flush (ADR 0005). The first connect that
+succeeds clears the backoff. The events of that window go to the spool when L</spool_dir> is set,
+else to L</on_lost> (or the caller of a synchronous L</store>) as before.
 
 =head2 backend
 
@@ -612,18 +1023,58 @@ not write -- the request it describes was answered long ago, so there is no call
 the failure to. L<Langertha::Skeid> sets it to its own lost-event report. Without it the store
 C<warn>s one line naming the request id and the backend, never the DSN.
 
+=head2 spool_dir
+
+Directory for the usage spool; empty (the default) turns it off and leaves every failure to
+L</on_lost> as before. Set, an event the store cannot write because the database is unreachable
+-- the connect failed, the handle died and the one reconnect failed, or the reconnect backoff is
+running -- is appended to a file in this directory instead of being reported lost: JSON Lines,
+one event per line, flushed and C<fsync>'d before the write counts. A synchronous L</store>
+then answers C<< { ok => 1, spooled => 1 } >>, a L</flush> counts it in C<spooled>. An event the
+database I<refuses> on a live connection (a constraint, a dropped table) is not spooled -- it
+would be refused again on every replay -- and stays an L</on_lost> report. A spool write that
+fails reports the event lost, with both errors. The first event spooled after a connect
+C<warn>s once that the database is unreachable and where the events go.
+
+A spool line holds the event's columns and nothing else: key ids, never a key, never the DSN or
+the password. Each process appends to its own file,
+F<usage-spool-E<lt>hostE<gt>-E<lt>pidE<gt>.jsonl>, under an exclusive C<flock>, so the workers of
+one Skeid can share the directory. Several Skeid instances should each have their own; the
+spool is per instance.
+
+The spool is replayed once the database takes writes again: after a write that succeeded
+(L</store>, L</flush>) and when the store is prepared, so a restart picks up what an earlier
+process left behind. A replay claims a file by renaming it, writes at most 500 of its events in
+one transaction and removes those lines only after the commit; the rest follows on the next loop
+tick (or with the next write when no loop runs). Replay is idempotent: an event whose
+C<request_id> and C<created_at> are already in the table is skipped, so a replay that is
+interrupted and repeated, or an event that did make it in before its connection dropped, never
+adds a second row. An event without a C<request_id> cannot be recognized and is written again
+by a repeated replay -- at least once rather than lost. A line that does not parse is dropped
+with a warning; an event the database refuses on a live connection during the replay is
+reported to L</on_lost> and dropped, the rest of its batch is written. Nothing replays while the
+database is unreachable, and a replay that fails half way leaves the spool file as it was (what it did commit is skipped
+next time).
+
+A store prepared while the database is down does not die when it has a spool: it warns, starts
+with the backoff running and applies the schema on its first successful connect.
+
 =head2 prepare
 
 Connects if possible and applies the schema when C<auto_migrate> is on: its C<CREATE TABLE>
 statements, then any column an older table lacks (C<ALTER TABLE ... ADD COLUMN>; nothing is
 ever dropped or rewritten), then the rest. Returns false without complaint when C<DBI> is
 unavailable -- an unusable store degrades to "no usage recorded", it does not take the proxy
-down. Croaks when the schema file does not exist; a failing connect or statement dies.
+down. Croaks when the schema file does not exist; a failing connect or statement dies -- except
+a failing connect of a store with a L</spool_dir>, which warns and returns true: its events go
+to the spool and the schema is applied on the first connect that succeeds. With a spool, what
+an earlier process left in it starts to be replayed here.
 
 =head2 dbh
 
 The cached database handle, connecting on first use. Returns nothing when C<DBI> is not
-installed or no DSN is configured.
+installed or no DSN is configured. Dies when the connect fails, and -- without trying -- while
+the L</Reconnect backoff> a failed connect set is running.
 
 =head2 disconnect
 
@@ -656,9 +1107,13 @@ A dropped connection is survived: when the insert fails and the handle turns out
 (not C<Active>, or C<ping> fails -- checked only after a failure, so a healthy write costs
 nothing extra), the store connects once more and retries that one event once. The new handle
 serves every later event. A reconnect that fails is reported like any other failure (the next
-event tries again), and a failure on a live handle -- a dropped table, a constraint -- is
-reported without a reconnect. There is no loop and no wait: at most one extra synchronous
-connect per event, the cost ADR 0005 already accepts for this backend. The schema is not
+event tries again once the L</Reconnect backoff> has run out), and a failure on a live handle
+-- a dropped table, a constraint -- is reported without a reconnect. There is no loop and no
+wait: at most one extra synchronous connect per event, and while the database stays away at
+most one per backoff deadline, the cost ADR 0005 already accepts for this backend. With a
+L</spool_dir>, an event that could not be written for want of a connection is spooled and the
+answer is C<< { ok => 1, spooled => 1 } >>; a write that succeeds starts a replay of the
+spool. The schema is not
 re-applied on a reconnect; L</prepare> ran when the store was configured, and a lost connection
 does not lose the table. One corner remains: a connection that drops after the server committed
 the insert but before it answered is indistinguishable from one that dropped before, so that
@@ -671,25 +1126,42 @@ nothing to reconcile.
 
 Writes every queued event in one transaction and empties the queue. Returns
 C<< { ok => 1, written => $n } >>, or C<< { ok => 0, written => $n, lost => $m, error => … } >>
-when some could not be written; each of those is also handed to L</on_lost>. Never dies, never
-waits, never retries later: every queued event gets the one attempt a synchronous L</store>
-would have given it.
+when some could not be written; each of those is also handed to L</on_lost>. With a
+L</spool_dir>, events that went to the spool are counted in C<spooled> and are not lost. Never
+dies, never waits, never retries later: every queued event gets the one attempt a synchronous
+L</store> would have given it -- the spool's replay is a write of its own.
 
 A failing batch is rolled back, so nothing is half written. When the handle survived the failure
 -- one event a constraint rejects, a dropped table -- the events are written one by one, so a
 single bad event loses only itself. When the handle died, it is reconnected once and the batch
-retried once, as for L</store>; a reconnect that fails loses the whole batch with one connect
-attempt, not one per event. The duplicate corner of L</store> applies to a batch: a connection
-that drops after the server committed but before it answered is retried as a whole.
+retried once, as for L</store>; a reconnect that fails loses (or spools) the whole batch with
+one connect attempt, not one per event, and while the L</Reconnect backoff> runs a flush makes
+no connect attempt at all. The duplicate corner of L</store> applies to a batch: a connection
+that drops after the server committed but before it answered is retried as a whole. A flush
+that wrote something starts a replay of the spool.
 
 Called by the flush timer, by L</disconnect>, by L</report> (so a report counts what was queued)
 and by L</store> when it writes synchronously. L<Langertha::Skeid/flush_usage> calls it.
+
+=head2 replay_spool
+
+  my $res = $store->replay_spool;
+
+Writes up to one batch (500 events) of the L</spool_dir> to the database and removes what was
+committed. Returns C<< { ok => 1, replayed => $n, consumed => $m, remaining => 0|1 } >> --
+C<replayed> rows written, C<consumed> spool lines done with (written, already present, or
+dropped), C<remaining> whether spool files are left -- or the same with C<< ok => 0 >> and an
+C<error> when the database failed; the spool is then left as it was. Never dies. The store calls
+it itself (see L</spool_dir>); it is public for an operator's script and for tests.
 
 =head2 report
 
   my $report = $store->report(\%filters);
 
-Aggregates in SQL: totals, per-key and per-model breakdowns, and the newest C<limit> events.
+Aggregates in SQL: totals, per-key and per-model breakdowns (tokens, cost, the
+C<audio_seconds> the audio routes recorded, the C<documents> of the rerank and documents routes and
+the C<pages> of the documents routes), and the
+newest C<limit> events.
 The same C<since> / C<api_key_id> / C<model> filter set applies to every part of the report, so
 the breakdowns always add up to the totals shown next to them. C<limit> defaults to 20. The shape
 is described in L<Langertha::Skeid::UsageStore/The store contract>; a failure to connect or a

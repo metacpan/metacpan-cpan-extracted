@@ -123,7 +123,9 @@ sub new_store {
   };
   ok !$report->{ok} && !$report->{enabled}, 'report answers a failed reconnect the same way';
 
-  # The database comes back: the store recovers without a restart.
+  # The database comes back: the store recovers without a restart, with the first write after
+  # the reconnect backoff (k110) has run out.
+  $store->_reconnect_at(0);
   my $again = $store->store(event('req-db-back'));
   ok $again->{ok}, 'once the database answers again, the next event is written'
     or diag explain $again;

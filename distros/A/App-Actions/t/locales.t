@@ -14,6 +14,11 @@ use App::Actions::I18N;
 use App::Actions::Process;
 use App::Actions::Workflow;
 
+# Object::Configure reads the developer's own configuration files (~/.conf
+# and the like), where a UNIVERSAL logger would take the messages these tests
+# read off standard error.  An empty directory leaves the defaults in force.
+local $ENV{CONFIG_DIR} = tempdir(CLEANUP => 1);
+
 binmode Test::More->builder->$_, ':encoding(UTF-8)' for qw(output failure_output todo_output);
 
 # The suite's own environment must not choose a language for it.

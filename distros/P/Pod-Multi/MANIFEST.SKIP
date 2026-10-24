@@ -4,6 +4,9 @@
 ,v$
 .svn/
 .git/
+^.gitignore
+\B\.git\b
+\B\.github\b
 
 # ExtUtils::MakeMaker generated files and dirs.
 ^Makefile$
@@ -11,7 +14,7 @@
 ^blibdirs$
 ^pm_to_blib$
 ^MakeMaker-\d
-                                                                                                                    
+
 # Module::Build
 ^Build$
 ^_build

@@ -11,6 +11,7 @@ requires 'namespace::clean', '0.27';
 requires 'HTTP::Tiny', '0.080';
 requires 'Digest::SHA', '6.02';
 
+# DBD::Pg also serves customer_source (ADR 0026), loaded only when the config has the section.
 recommends 'DBD::Pg';
 
 on test => sub {

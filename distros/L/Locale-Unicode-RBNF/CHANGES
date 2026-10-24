@@ -1,0 +1,6 @@
+Revision history for Perl module Locale::Unicode::RBNF
+
+v0.1.0 2026-10-23T21:10:33+0900
+    - Initial release: port from ICU4C 79.1 RuleBasedNumberFormat (rbnf.cpp, nfrs.cpp,
+      nfrule.cpp, nfsubs.cpp), with a loader for the CLDR RBNF, number symbols, numbering
+      systems and plural rules data.

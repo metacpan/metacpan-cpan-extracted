@@ -18,6 +18,11 @@ my $fake_docker = File::Spec->catfile($root, 't', 'bin', 'fake-docker');
 
 my $scratch = tempdir(CLEANUP => 1);
 
+# Object::Configure reads the developer's own configuration files (~/.conf
+# and the like), where a UNIVERSAL logger would take the messages these tests
+# read off standard error.  An empty directory leaves the defaults in force.
+local $ENV{CONFIG_DIR} = tempdir(CLEANUP => 1);
+
 # Every run in this file records its images in the cache, so the record and the
 # fake daemon both live under one temporary directory.
 local $ENV{ACTION_RUN_CACHE_FILE} = File::Spec->catfile($scratch, 'cache.json');

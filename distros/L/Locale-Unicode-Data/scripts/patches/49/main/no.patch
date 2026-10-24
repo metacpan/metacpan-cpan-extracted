@@ -1,0 +1,12 @@
+--- no.xml
++++ no.xml
+@@ -5502,6 +5502,9 @@
+ 				<displayName count="one">kinesisk yuan (offshore)</displayName>
+ 				<displayName count="other">kinesiske yuan (offshore)</displayName>
+ 			</currency>
++			<currency type="CNX">
++				<displayName draft="contributed">Kinas folkebank dollar</displayName>
++			</currency>
+ 			<currency type="CNY">
+ 				<displayName>kinesiske yuan</displayName>
+ 				<displayName count="one">kinesisk yuan</displayName>

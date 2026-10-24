@@ -1,0 +1,7 @@
+{"synthetic":true,"recorded":false,"backend":"openai","dialect":"beta: transcription_session.update","note":"Written by hand after the OpenAI realtime transcription guide on 2026-10-15; NOT recorded from a live backend (k95 Task 0 could not be run offline). Audio payloads are placeholders."}
+{"dir":"s2c","frame":{"type":"transcription_session.created","event_id":"event_1","session":{"id":"sess_1","input_audio_transcription":{"model":"gpt-4o-transcribe"}}}}
+{"dir":"c2s","frame":{"type":"transcription_session.update","session":{"input_audio_format":"pcm16","input_audio_transcription":{"model":"gpt-4o-transcribe","prompt":"","language":"en"},"turn_detection":{"type":"server_vad","threshold":0.5}}}}
+{"dir":"s2c","frame":{"type":"transcription_session.updated","event_id":"event_2","session":{"id":"sess_1"}}}
+{"dir":"c2s","frame":{"type":"input_audio_buffer.append","audio":"AAAAAAAA"}}
+{"dir":"s2c","frame":{"type":"conversation.item.input_audio_transcription.delta","event_id":"event_3","item_id":"item_1","content_index":0,"delta":"Hallo"}}
+{"dir":"s2c","frame":{"type":"conversation.item.input_audio_transcription.completed","event_id":"event_4","item_id":"item_1","content_index":0,"transcript":"Hallo Welt","usage":{"type":"duration","seconds":3}}}

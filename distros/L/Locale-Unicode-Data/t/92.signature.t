@@ -4,7 +4,7 @@ use Test::More;
 
 if (!$ENV{AUTHOR_TESTING} || $ENV{AUTHOR_TESTING} < 2) {
     plan skip_all => 
-      "Set the environment variable AUTHOR_TESTING to enable this test.";
+      "Set the environment variable AUTHOR_TESTING to a value greater than 1 to enable this test.";
 }
 elsif (!eval { require Module::Signature; 1 }) {
     plan skip_all => 

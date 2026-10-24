@@ -14,6 +14,11 @@ my $fake_docker = File::Spec->catfile($root, 't', 'bin', 'fake-docker');
 my $state   = tempdir(CLEANUP => 1);
 my $project = tempdir(CLEANUP => 1);
 
+# Object::Configure reads the developer's own configuration files (~/.conf
+# and the like), where a UNIVERSAL logger would take the messages these tests
+# read off standard error.  An empty directory leaves the defaults in force.
+local $ENV{CONFIG_DIR} = tempdir(CLEANUP => 1);
+
 # The smoke script runs workflows, which record the images they keep.
 local $ENV{ACTION_RUN_CACHE_FILE}
     = File::Spec->catfile($state, 'cache.json');
@@ -46,7 +51,7 @@ sub run_smoke {
 
 my ($version_out, undef, $version_exit) = run_smoke('--version');
 is($version_exit, 0, '--version exits 0');
-like($version_out, qr/^action-run-smoke 0\.001\.0$/m, '--version prints the version');
+like($version_out, qr/^action-run-smoke 0\.002\.0$/m, '--version prints the version');
 
 my ($help_out, undef, $help_exit) = run_smoke('--help');
 is($help_exit, 0, '--help exits 0');

@@ -21,7 +21,7 @@ BEGIN
     }
     our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
     our $AUTHOR_TESTING = $DEBUG;  # Same thing, but different meaning
-    our $CLDR_VERSION = '48.2';
+    our $CLDR_VERSION = '49';
 };
 
 BEGIN
@@ -100,6 +100,8 @@ can_ok( $cldr, 'currency_info' );
 can_ok( $cldr, 'currencies_info' );
 can_ok( $cldr, 'currency_l10n' );
 can_ok( $cldr, 'currencies_l10n' );
+can_ok( $cldr, 'data_alias' );
+can_ok( $cldr, 'data_aliases' );
 can_ok( $cldr, 'database_handler' );
 can_ok( $cldr, 'datafile' );
 can_ok( $cldr, 'date_field_l10n' );
@@ -165,6 +167,7 @@ can_ok( $cldr, 'rbnf' );
 can_ok( $cldr, 'rbnfs' );
 can_ok( $cldr, 'reference' );
 can_ok( $cldr, 'references' );
+can_ok( $cldr, 'resolve' );
 can_ok( $cldr, 'script' );
 can_ok( $cldr, 'scripts' );
 can_ok( $cldr, 'script_l10n' );
@@ -247,7 +250,8 @@ SKIP:
         calendar_interval_formats calendar_terms calendars
         calendars_l10n casings code_mappings collations
         collations_l10n currencies currencies_info
-        currencies_l10n date_fields_l10n date_terms day_periods
+        currencies_l10n data_aliases date_fields_l10n
+        date_terms day_periods
         language_population languages languages_match
         likely_subtags locale_number_systems locales
         locales_info locales_l10n metainfos metazones
@@ -1492,7 +1496,8 @@ my $tests =
                 # This is highly doubtful, and is now part of an issue submitted to Unicode
                 # It should just be undef, as it was in version 45.0
                 # <https://unicode-org.atlassian.net/browse/CLDR-18095>
-                parent      => 'tut',
+                # Since CLDR v49, ryu belongs to the Japonic languages, jpx
+                parent      => 'jpx',
                 alt         => undef,
                 status      => 'regular',
             },
@@ -1852,8 +1857,9 @@ my $tests =
             expect      =>
             {
                 code    => 'R1131',
-                uri     => 'http://en.wikipedia.org/wiki/Singapore',
-                description => 'English is the first language learned by half the children by the time they reach preschool age; using 92.6% of pop for the English figure',
+                # CLDR v49 renumbered its references
+                uri     => 'https://www.ine.gov.py/assets/documento/24/Educaci%C3%B3n_Idioma%20hablado_dpto_EPHC%202022-2024.xlsx',
+                description => '2024 idioma hablado la mayor parte del tiempo',
             },
         },
         {
@@ -2312,15 +2318,17 @@ my $tests =
     [
         {
             method      => 'timezone_names',
-            args        => [timezone => 'Europe/London', locale => 'en', width => 'long'],
+            # Since CLDR v49, Europe/London no longer has its own names in en: they come from
+            # the new British metazone. Etc/UTC is the only time zone with a long name in en.
+            args        => [timezone => 'Etc/UTC', locale => 'en', width => 'long'],
             expect      =>
             {
                 locale      => 'en',
-                timezone    => 'Europe/London',
+                timezone    => 'Etc/UTC',
                 width       => 'long',
                 generic     => undef,
-                standard    => undef,
-                daylight    => 'British Summer Time',
+                standard    => 'Coordinated Universal Time',
+                daylight    => undef,
             },
         },
         {
@@ -2725,7 +2733,8 @@ subtest 'inheritance tree' => sub
         { locale => 'ja-JP', expect => ['ja-JP', 'ja', 'und'] },
         { locale => 'pt-FR', expect => ['pt-FR', 'pt-PT', 'pt', 'und'] },
         { locale => 'yue-Hant', expect => ['yue-Hant', 'zh-Hant', 'und'] },
-        { locale => 'sr-Cyrl-ME', expect => ['sr-Cyrl-ME', 'sr-ME', 'sr', 'und'] },
+        # Up to CLDR v48.2, parentLocales set sr_ME as the parent of sr_Cyrl_ME; CLDR v49 removed it.
+        { locale => 'sr-Cyrl-ME', expect => ['sr-Cyrl-ME', 'sr-ME', 'sr-Cyrl', 'sr', 'und'] },
         { locale => 'so-Arab', expect => ['so-Arab', 'und'] },
     ];
     foreach my $def ( @$tests )

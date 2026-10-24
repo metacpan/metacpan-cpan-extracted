@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Exporter 'import';
 
-our $VERSION = '0.65';
+our $VERSION = '0.66';
 
 our @EXPORT_OK = qw(
     encode_client encode_server decode_ref accept_key handshake_request

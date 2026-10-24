@@ -1,0 +1,23 @@
+title: client_auth admits only listed callers on the client routes; the admin key is not a client key
+setup:
+  clients: { alice: sk-alice, mallory: sk-mallory }
+  admin_key: admin-secret
+  nodes:
+    - { id: gpu, model: m, upstream: { fallback: { answer: ok } } }
+  config:
+    client_auth: { keys: ["@alice"] }
+steps:
+  - chat: { protocol: openai, model: m, prompt: x }
+    expect: { status: 401 }
+  - chat: { protocol: openai, model: m, prompt: x, bearer: mallory }
+    expect: { status: 401 }
+  - chat: { protocol: anthropic, model: m, prompt: x, bearer: mallory }
+    expect: { status: 401 }
+  - chat: { protocol: openai, model: m, prompt: x, bearer: admin-secret }
+    expect: { status: 401 }
+    upstream:
+      gpu: { requests: 0 }
+  - chat: { protocol: openai, model: m, prompt: x, bearer: alice }
+    expect: { text: ok }
+    upstream:
+      gpu: { requests: 1 }

@@ -1,6 +1,6 @@
 ---
 name: perl-io-async-future
-description: "Use when writing async Perl — IO::Async, Future, Future::AsyncAwait, Net::Async::*, notifier lifecycle, futures lost to GC, cancellation, reconnect loops."
+description: "Use when writing async Perl — IO::Async, Future, Future::AsyncAwait, Net::Async::*, futures lost to GC, cancellation, requests that hang."
 ---
 
 # Perl IO::Async + Future — Patterns & Pitfalls
@@ -311,6 +311,7 @@ is_deeply([$f->result], [...]);
 - **Calling `$self->loop` before `$loop->add($self)`** → `loop` is undef.
 - **Mixing `then` and `on_done` thinking they're the same** → `on_done` returns the original Future, your "chain" is actually two parallel observers.
 - **Cancelling a Future inside its own callback** → undefined; cancel from outside.
+- **Net::Async::HTTP (0.50): a module that dies loading at connect time leaks the host's connection slot** → the first request fails, every later one to that host hangs forever, no error. The modules are loaded by name only when a connection opens: `IO::Async::Internals::Connector`, and for https `IO::Async::SSL` (so also a missing `IO::Socket::SSL`/`Net::SSLeay`/libssl, or a PAR binary that didn't pack them). With the default `max_connections_per_host => 1` the slot never frees; raising it only postpones the hang. Before the first request, `require` those modules in an `eval` and fail with the module name; list `IO::Async::SSL` as a hard dependency whenever anything speaks https — upstream it is only a recommends. Redirects to https need the same check (`on_redirect` runs before the new connect).
 - **Using `Future->new` instead of `$loop->new_future`** when you need loop-aware behavior (the loop variant integrates with timeouts and is the recommended form inside Notifier subclasses).
 
 ---

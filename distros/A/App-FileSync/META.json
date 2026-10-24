@@ -1,0 +1,78 @@
+{
+   "abstract" : "cron-driven file synchronisation without a daemon",
+   "author" : [
+      "Nigel Horne (njh@nigelhorne.com)"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150015",
+   "license" : [
+      "gpl_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "App-FileSync",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Compress::Raw::Zlib" : "0",
+            "Config::Abstraction" : "0",
+            "Digest::SHA" : "0",
+            "Encode" : "0",
+            "Exporter" : "0",
+            "Fcntl" : "0",
+            "File::Basename" : "0",
+            "File::Copy" : "0",
+            "File::Path" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "Getopt::Long" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "JSON::PP" : "0",
+            "Log::Abstraction" : "0",
+            "Object::Configure" : "0",
+            "POSIX" : "0",
+            "Time::HiRes" : "0",
+            "Time::Local" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Temp" : "0",
+            "Test::Deep" : "0",
+            "Test::Exception" : "0",
+            "Test::Mockingbird::TimeTravel" : "0.14",
+            "Test::Most" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/nigelhorne/App-FileSync.git",
+         "web" : "https://github.com/nigelhorne/App-FileSync"
+      }
+   },
+   "version" : "v0.001.0",
+   "x_serialization_backend" : "JSON::PP version 4.18"
+}

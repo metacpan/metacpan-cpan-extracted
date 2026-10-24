@@ -1,0 +1,59 @@
+NAME
+
+    Tickit::Terminal::Prompt - a scrolling terminal command prompt
+
+SYNOPSIS
+
+    my $ui = Tickit::Terminal::Prompt->new( prompt => 'demo> ', on_enter =>
+    sub ($ui, $line) { $ui->say("You entered: $line"); $ui->stop if $line
+    eq 'quit'; }, ); $ui->run;
+
+DESCRIPTION
+
+    A shell-like terminal interface with a command prompt and a scrolling
+    output. The command line allows editing using Backspace, Left, Home,
+    Ctrl-A, Ctrl-E, Ctrl-H, Ctrl-K, Ctrl-U and Ctrl-W as in ReadLine.
+    Ctrl-C stops the interface.
+
+    The application supplies a callback that receives the command text when
+    the user presses Enter.
+
+    With a small amount of additional code this library can be used to
+    build a command processor for terminal applications, or an actual unix
+    shell.
+
+METHODS
+
+ new
+
+    Requires on_enter => sub ($ui, $line) { ... }. The optional prompt
+    defaults to >. Prompts must fit on one line.
+
+ print, say
+
+    Append text to the scroller. say adds a newline. Calls to print without
+    a newline continue the current output line.
+
+ set_prompt
+
+    Replace the prompt while retaining any command currently being edited.
+
+ run, stop
+
+    Start or stop the event loop. stop scrolls to the bottom, lets the
+    final redraw complete, and places the terminal cursor on the bottom row
+    before stopping. After Tickit restores the terminal, run flushes and
+    prints a newline so the shell prompt appears on the next line. Ctrl-C
+    calls stop.
+
+AUTHOR
+
+    Joel Roth <joelz@pobox.com>
+
+LICENSE
+
+    Copyright (C) 2026 Joel Roth.
+
+    This is free software; you may redistribute it and/or modify it under
+    the same terms as Perl itself.
+

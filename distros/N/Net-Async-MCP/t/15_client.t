@@ -24,7 +24,7 @@ skip_all 'MCP is required for the client tests'
 # is decided by the request shapes it builds, and taking the installed server
 # library's word for it here would let these tests pass for a reason that has
 # nothing to do with the client. It is the one entry of
-# @SPOKEN_PROTOCOL_VERSIONS in Net::Async::MCP, and if that list ever names a
+# @MODERN_PROTOCOL_VERSIONS in Net::Async::MCP, and if that list ever names a
 # different revision this is the second place to change.
 my $spoken = '2026-07-28';
 

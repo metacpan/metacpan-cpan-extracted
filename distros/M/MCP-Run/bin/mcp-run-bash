@@ -16,8 +16,28 @@ if (my $wd = $ENV{MCP_RUN_WORKING_DIRECTORY}) {
   $args{working_directory} = $wd;
 }
 
+# Configuration a human wrote into a client config, not an argument the model
+# passes per call - so a bad value is a mistake worth stopping for. `+ 0` took
+# any string ('30s' became 30, 'abc' became 0, '1e400' became Inf), warned on
+# the stderr of a stdio server, and left the user believing the timeout they
+# configured was in force. MCP::Run::Bash normalises unusable per-call
+# timeouts to the server default instead of dying, because those arrive
+# mid-session from the model and must not take the server down with them;
+# here nothing is running yet, and a client that cannot start its server says
+# so, while a silent default is invisible until a command dies early.
+# The ceiling is the module's own constant, so the two layers cannot drift:
+# anything above it is a timeout alarm() cannot arm.
 if (defined $ENV{MCP_RUN_TIMEOUT} && length $ENV{MCP_RUN_TIMEOUT}) {
-  $args{timeout} = $ENV{MCP_RUN_TIMEOUT} + 0;
+  my $timeout = $ENV{MCP_RUN_TIMEOUT};
+  my $max     = MCP::Run::Bash->MAX_TIMEOUT;
+
+  # Digits only: whole seconds is what alarm() counts, and a pattern rules out
+  # the numeric warning as much as the wrong value behind it.
+  die "MCP_RUN_TIMEOUT must be a whole number of seconds between 1 and $max, "
+    . "got '$timeout'\n"
+    unless $timeout =~ /\A[0-9]+\z/ && $timeout > 0 && $timeout <= $max;
+
+  $args{timeout} = $timeout + 0;
 }
 
 $args{compress} = 1;
@@ -43,7 +63,7 @@ mcp-run-bash - MCP server that executes shell commands via bash over stdio
 
 =head1 VERSION
 
-version 0.106
+version 0.107
 
 =head1 SYNOPSIS
 
@@ -91,7 +111,14 @@ tool's C<working_directory> argument.
 
 =item C<MCP_RUN_TIMEOUT>
 
-Default timeout in seconds. Defaults to C<30>. Overridable per-call.
+Default timeout in seconds: a whole number from C<1> up to C<2147483647>,
+which is the largest value C<alarm> can still represent. Defaults to C<30>.
+Overridable per-call.
+
+Any other value — C<0>, a negative number, C<30s>, C<2.5>, a typo — aborts
+the start with a message on stderr rather than falling back quietly, since a
+server running on a timeout its client configuration does not name is not
+something the user would notice.
 
 =item C<MCP_RUN_COMPRESS>
 

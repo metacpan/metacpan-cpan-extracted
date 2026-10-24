@@ -8,7 +8,7 @@ use Carp qw(croak);
 use Readonly;
 use Sub::Identify qw(get_code_info);
 
-our $VERSION = '0.001.0';
+our $VERSION = '0.002.0';
 
 # A routine whose name starts with this is private to its package.
 Readonly::Scalar my $PRIVATE => qr/\A_[A-Za-z0-9]\w*\z/;
@@ -197,6 +197,12 @@ does not match; only C<_> followed by a letter or digit does.
 
 =item * B<Imported routines are not listed.>  A routine imported from
 another module belongs to that module.
+
+=item * B<Once Sub::Private has wrapped them, they are not listed either.>
+The wrapper belongs to L<Sub::Private>, so asking about a module that has
+already run its C<BEGIN> block (for example C<App::Actions::Util>, once it
+is loaded) returns an empty list.  Ask before the C<import>, as the
+C<BEGIN> block does.
 
 =item * B<Tests run with the checks off.>  Under C<prove>,
 C<HARNESS_ACTIVE> is set and the checks are bypassed.  Run

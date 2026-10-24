@@ -234,45 +234,47 @@ still require an accepted token. See L<AnyEvent::MCP::Intro> for examples.
 
 =head1 OPTIONS
 
-Put listener options B<before> the first prefix/URL pair. Options applying
+Common upstream server options:
+L<AnyEvent::MCP::Server::Simple/mcp_getoptions>.
+The default upstream instance name is C<default>; it does not affect child
+prefixes. C<--token> authenticates upstream; C<--bearer> authenticates
+a downstream HTTP child. C<--tool-help> lists broker's own tools only,
+not child registries. Automatic permission rules match broker-visible
+tool names, not downstream servers' independent permission checks.
+
+Put upstream options B<before> first PREFIX/URL pair. Options applying
 to one downstream server follow that pair immediately.
-Common options, including C<--name>, C<--bind>, C<--token>, C<--stdio>,
-C<--connect>, C<--print-url>, C<--auto-allow> and C<--auto-deny>,
-are documented in L<AnyEvent::MCP::Server::Simple/mcp_getoptions>.
-They configure the upstream server; C<--token> is distinct from the
-downstream C<--bearer>. The default upstream instance name is C<default>
-and does not affect downstream prefixes.
-C<--tool-help> lists only the multibroker's own tools; it does not connect
-to downstream servers to query their registries.
 
 =over
 
 =item --listen
 
-Keep the HTTP and extension listener active alongside upstream stdio or
-C<--connect>. Without stdio or C<--connect>, HTTP is already the default.
+Keep upstream HTTP/extension listener active alongside C<--stdio> or
+C<--connect>. Without those, HTTP is already default. Applies to
+upstream broker, not child connections.
 
-=item --ask $method
+=item --ask MODE
 
-Select local or upstream form prompting for all downstream connections.
-Also pass the mode as the permission default to spawned stdio children.
-See L</PERMISSION PROMPTS>.
+Permission prompts for downstream servers: C<helper> (default), C<tty>,
+C<yad>, C<mcp>, or C<auto>. Selects local prompt interface or upstream
+client elicitation; passes mode to spawned stdio children as their
+permission default. See L</PERMISSION PROMPTS>.
 
-=item --bearer $token
+=item --bearer TOKEN
 
-Authenticate the preceding HTTP child connection with this bearer token.
-This option does not configure the upstream listener.
+Authenticate preceding HTTP(S) child with bearer token; does not configure
+upstream listener. Supply after child URL; invalid for stdio children.
 
 =item --eager
 
-Start the preceding stdio child immediately. HTTP children cannot use
-this option.
+Start preceding stdio child immediately at startup, rather than lazily
+on request. Not available for HTTP children.
 
 =item --required
 
-Require the preceding stdio child to initialize and stay connected.
-Implies C<--eager>; unexpected disconnect exits the multibroker with
-failure. Managed idle shutdown is allowed.
+Require preceding stdio child to initialize and stay connected. Implies
+C<--eager>; unexpected disconnect exits multibroker with failure,
+but managed idle shutdown is permitted. Not available for HTTP children.
 
 =back
 
@@ -734,7 +736,7 @@ sub call_tool {
 }
 
 $toolset->tool (discover_brokers =>
-   "Connect to all configured brokers and return instructions by name: string, null if reachable without instructions, or {error: MESSAGE} if unreachable.",
+   "Get instructions from all brokers by name: string; null if reachable but none; {error: MESSAGE} if unreachable.",
    { type => "object", properties => {} },
    sub {
       my ($req) = @_;
@@ -772,11 +774,11 @@ $toolset->tool (discover_brokers =>
    },
 );
 $toolset->tool (list_tools =>
-   "Refresh and list currently available tools, optionally from one named downstream broker. Without broker, includes local tools and all reachable brokers.",
+   "Refresh available tools; optional broker filters to one downstream. Omit for local + all reachable brokers.",
    {
       type => "object",
       properties => {
-         broker => { type => "string", description => "Downstream broker name (underscores may stand for hyphens); omit to list all brokers and local tools." },
+         broker => { type => "string", description => "Downstream broker; underscores may replace hyphens. Omit for all brokers + local tools." },
       },
       additionalProperties => JSON::XS::false,
    },
@@ -794,7 +796,7 @@ $toolset->tool (list_tools =>
    },
 );
 $toolset->tool (call_tool =>
-   "Call a tool by its prefixed name from list-tools.",
+   "Call tool by prefixed name from list-tools. Use when not directly exposed; call loaded tools directly.",
    {
       type       => "object",
       required   => ["name"],
@@ -825,9 +827,9 @@ mcp_config
    server_version => $AnyEvent::MCP::VERSION,
    on_request => \&log_request,
    on_error => sub { AE::log error => "MCP dispatch $_[1]{method}: $_[2]" },
-   short_instructions => "MCP tool router. Discover tools for downstream servers; discover-brokers gives their purposes. Tools may change.",
+   short_instructions => "MCP tool router. Find downstream tools; discover-brokers gives purposes. Tools may change.",
    instructions => <<'EOF';
-Multibroker proxies multiple MCP servers (e.g. vim, filesystem browser, etc.), prefixing tool names with server aliases. Its discovery, list-tools and call-tool facilities dynamically query and invoke tools, including new or updated tools not yet reflected in the exported tool catalog.
+Proxy MCP servers (Vim, filesystem, browser, etc.) as PREFIX.TOOL. discover-brokers returns server purposes; list-tools refreshes tools; call-tool invokes by prefixed name, including tools not yet loaded. Tools may change dynamically.
 EOF
 
 # start selected stdio children now, before the upstream event loop starts.

@@ -1,0 +1,50 @@
+{
+   "abstract" : "forward Perl/Tk keyboard events to Tickit",
+   "author" : [
+      "Copyright (c) 2026 Joel Roth."
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "App::ModuleBuildTiny version 0.047",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Tk-Tickit-Bridge",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.039"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "App::ModuleBuildTiny" : "0.047"
+         }
+      }
+   },
+   "provides" : {
+      "Tk::Tickit::Bridge" : {
+         "file" : "lib/Tk/Tickit/Bridge.pm",
+         "version" : "0.002"
+      },
+      "Tk::Tickit::Bridge::Loop" : {
+         "file" : "lib/Tk/Tickit/Bridge/Loop.pm",
+         "version" : "0.001"
+      },
+      "Tk::TickitBridge" : {
+         "file" : "lib/Tk/TickitBridge.pm",
+         "version" : "0.001"
+      },
+      "Tk::TickitBridge::Loop" : {
+         "file" : "lib/Tk/TickitBridge/Loop.pm",
+         "version" : "0.001"
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.002",
+   "x_serialization_backend" : "JSON::PP version 4.16",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+}

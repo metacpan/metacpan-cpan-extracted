@@ -4204,5 +4204,557 @@ subtest 'Geocode::models_with_cache -- result has no circular references' => sub
 	memory_cycle_ok($r, 'models_with_cache result has no circular references');
 };
 
+
+# ============================================================================
+# PART A: Database::BI::Util -- urlencode
+# ============================================================================
+# Strategy: urlencode is a small function with a big blast radius -- it is
+# called on every spec_key and encode value that reaches the URL query string.
+# A missed encode would let a colon, slash, or ampersand break the URL
+# semantics silently.  At least 60% of subtests are negative/hostile.
+
+use_ok('Database::BI::Util');
+use Database::BI::Util qw(urlencode);
+
+# RFC 3986 section 2.3 unreserved characters: ALPHA / DIGIT / "-" / "." / "_" / "~"
+Readonly my $UNRESERVED_CHARS =>
+	'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~';
+
+subtest 'Util::urlencode -- undef returns empty string (no croak)' => sub {
+	is urlencode(undef), '', 'undef input -> empty string';
+};
+
+subtest 'Util::urlencode -- empty string is a no-op' => sub {
+	is urlencode(''), '', 'empty string -> empty string';
+};
+
+subtest 'Util::urlencode -- all RFC 3986 unreserved chars pass through unchanged' => sub {
+	# If any unreserved char is encoded the URL becomes unnecessarily verbose
+	# and breaks round-trip comparison in tests that assert ?l=table:sales etc.
+	is urlencode($UNRESERVED_CHARS), $UNRESERVED_CHARS,
+		'letters, digits, hyphen, dot, underscore, tilde are never encoded';
+};
+
+subtest 'Util::urlencode -- pure alphabetic string unchanged' => sub {
+	is urlencode('HelloWorld'), 'HelloWorld', 'letters pass through';
+};
+
+subtest 'Util::urlencode -- pure digits unchanged' => sub {
+	is urlencode('1234567890'), '1234567890', 'digits pass through';
+};
+
+# --- Spec-key forms that appear in production ---
+
+subtest 'Util::urlencode -- table: spec encodes only the colon' => sub {
+	# table:sales -> table%3Asales; letters untouched
+	is urlencode('table:sales'), 'table%3Asales',
+		'colon -> %3A; letters and digits untouched';
+};
+
+subtest 'Util::urlencode -- path: spec encodes colon and forward slashes' => sub {
+	is urlencode('path:/data/file.csv'), 'path%3A%2Fdata%2Ffile.csv',
+		'colon=%3A, slash=%2F; dot and letters untouched';
+};
+
+subtest 'Util::urlencode -- tilde is NOT encoded (RFC 3986 unreserved)' => sub {
+	is urlencode('v1.0~beta'), 'v1.0~beta',
+		'tilde must not be encoded -- it is explicitly unreserved in RFC 3986';
+};
+
+# --- Hostile: chars that would break a query string if not encoded ---
+
+subtest 'Util::urlencode -- space encoded as %20 (not +)' => sub {
+	# This function encodes for query-parameter VALUES, not form data;
+	# %20 is correct, not the form-encoding + sign.
+	is urlencode('hello world'), 'hello%20world', 'space -> %20';
+};
+
+subtest 'Util::urlencode -- ampersand encoded (would split params)' => sub {
+	is urlencode('a&b'), 'a%26b', 'ampersand -> %26';
+};
+
+subtest 'Util::urlencode -- equals sign encoded (would split key=val)' => sub {
+	is urlencode('a=b'), 'a%3Db', 'equals -> %3D';
+};
+
+subtest 'Util::urlencode -- hash encoded (would start a URL fragment)' => sub {
+	is urlencode('a#b'), 'a%23b', 'hash -> %23';
+};
+
+subtest 'Util::urlencode -- question mark encoded (would start a query)' => sub {
+	is urlencode('a?b'), 'a%3Fb', 'question mark -> %3F';
+};
+
+subtest 'Util::urlencode -- percent sign itself encoded (prevents double-encode ambiguity)' => sub {
+	is urlencode('50%'), '50%25', 'bare percent -> %25';
+};
+
+subtest 'Util::urlencode -- plus sign encoded (not an unreserved char)' => sub {
+	is urlencode('a+b'), 'a%2Bb', 'plus -> %2B (not confused with form-encoding)';
+};
+
+subtest 'Util::urlencode -- at-sign encoded' => sub {
+	is urlencode('user@host'), 'user%40host', 'at-sign -> %40';
+};
+
+subtest 'Util::urlencode -- forward slash encoded (path separator must not leak)' => sub {
+	is urlencode('/etc/passwd'), '%2Fetc%2Fpasswd', 'each slash -> %2F';
+};
+
+# --- Hostile: control characters and injection attempts ---
+
+subtest 'Util::urlencode -- NUL byte encoded (injection defence)' => sub {
+	is urlencode("a\x00b"), 'a%00b', 'NUL byte -> %00';
+};
+
+subtest 'Util::urlencode -- newline encoded (HTTP header injection defence)' => sub {
+	is urlencode("line1\nline2"), 'line1%0Aline2', 'LF -> %0A';
+};
+
+subtest 'Util::urlencode -- carriage return encoded' => sub {
+	is urlencode("a\rb"), 'a%0Db', 'CR -> %0D';
+};
+
+subtest 'Util::urlencode -- tab encoded' => sub {
+	is urlencode("a\tb"), 'a%09b', 'tab -> %09';
+};
+
+# RFC 3986 section 2.1 mandates uppercase hex digits in percent-encoding
+subtest 'Util::urlencode -- encoded hex digits are uppercase (RFC 3986 s2.1)' => sub {
+	is urlencode('/'), '%2F', 'slash -> %2F (uppercase, not %2f)';
+};
+
+subtest 'Util::urlencode -- all-upcase hex: check second nibble too' => sub {
+	# ord('A') = 65 = 0x41; confirm both nibbles are uppercase
+	is urlencode("\x1b"), '%1B', 'ESC -> %1B (both nibbles uppercase)';
+};
+
+# Already-encoded input: the function is NOT idempotent by design.
+# The caller is responsible for not double-encoding; this test verifies that
+# a literal percent sign in the input is encoded, not silently swallowed.
+subtest 'Util::urlencode -- already-encoded input gets double-encoded' => sub {
+	is urlencode('%2F'), '%252F',
+		'percent in input -> %25 (double-encoding; caller must not pre-encode)';
+};
+
+subtest 'Util::urlencode -- return value has no circular references' => sub {
+	my $r = urlencode('table:sales');
+	memory_cycle_ok(\$r, 'scalar return has no cycles');
+};
+
+# ============================================================================
+# PART B: Database::BI::Ask -- internal helpers
+# ============================================================================
+# Strategy: the helpers in Ask.pm are the bridge between untrusted LLM output
+# and the URL/spec that goes into the browser.  A bug here can produce broken
+# URLs, spec-injection, or silent bad column names.  60%+ hostile tests.
+
+use_ok('Database::BI::Ask');
+
+# Direct references to private subs -- function.t is white-box by design.
+Readonly my $PARSE_VISUAL    => \&Database::BI::Ask::_parse_visual;
+Readonly my $VALIDATE_ENCODE => \&Database::BI::Ask::_validate_encode;
+Readonly my $BUILD_URL       => \&Database::BI::Ask::_build_url;
+Readonly my $BUILD_SPEC      => \&Database::BI::Ask::_build_spec;
+Readonly my $INFER_TYPE      => \&Database::BI::Ask::_infer_type;
+
+Readonly my $BAR_JSON_STR =>
+	'{"kind":"bar","title":"Test","encode":{"cat":"region","val":"amount"}}';
+Readonly my $PIE_JSON_STR =>
+	'{"kind":"pie","title":"Pie","encode":{"cat":"region"}}';
+Readonly my $TABLE_JSON_STR => '{"kind":"table","title":"Data","encode":{}}';
+
+# ---------------------------------------------------------------------------
+# _infer_type -- determines column data type from a sample of values
+# ---------------------------------------------------------------------------
+
+subtest 'Ask::_infer_type -- empty list -> string (safe fallback)' => sub {
+	is $INFER_TYPE->([]), 'string', 'no values -> string (never crashes)';
+};
+
+subtest 'Ask::_infer_type -- 100% numeric values -> number' => sub {
+	is $INFER_TYPE->([qw(1 2 3.5 -4)]), 'number', 'all numeric -> number';
+};
+
+subtest 'Ask::_infer_type -- majority numeric (75%) -> number' => sub {
+	# 3 of 4 pass looks_like_number; 0.75 > 0.5 threshold
+	is $INFER_TYPE->([qw(1 2 3 hello)]), 'number', '75% numeric -> number';
+};
+
+subtest 'Ask::_infer_type -- exactly 50% numeric -> NOT number (strict >)' => sub {
+	# The threshold is $numeric / $n > 0.5; 2/4 = 0.5 must NOT qualify.
+	# After failing the number check the date check runs; 0% date -> string.
+	is $INFER_TYPE->([qw(1 2 hello world)]), 'string',
+		'50% numeric does not cross the strict > 0.5 threshold';
+};
+
+subtest 'Ask::_infer_type -- 25% numeric -> string' => sub {
+	is $INFER_TYPE->([qw(1 two three four)]), 'string', '25% numeric -> string';
+};
+
+subtest 'Ask::_infer_type -- 100% ISO-8601 dates -> date' => sub {
+	is $INFER_TYPE->([qw(2024-01-01 2024-02-15 2025-12-31)]), 'date',
+		'100% YYYY-MM-DD -> date';
+};
+
+subtest 'Ask::_infer_type -- 100% slash-date (M/D/YYYY) -> date' => sub {
+	is $INFER_TYPE->([qw(1/15/2024 2/28/2024 12/1/2023)]), 'date',
+		'M/D/YYYY format -> date';
+};
+
+subtest 'Ask::_infer_type -- mixed ISO and slash dates -> date' => sub {
+	is $INFER_TYPE->([qw(2024-01-01 1/15/2024 2/28/2024)]), 'date',
+		'both date patterns match the date regex';
+};
+
+subtest 'Ask::_infer_type -- minority dates (25%) -> string' => sub {
+	is $INFER_TYPE->(['2024-01-01', 'hello', 'world', 'foo']), 'string',
+		'25% date does not cross the strict > 0.5 threshold';
+};
+
+subtest 'Ask::_infer_type -- plain categorical strings -> string' => sub {
+	is $INFER_TYPE->([qw(North South East West)]), 'string',
+		'non-numeric non-date values -> string';
+};
+
+subtest 'Ask::_infer_type -- scientific notation is numeric' => sub {
+	# looks_like_number() returns true for scientific notation
+	is $INFER_TYPE->([qw(1e2 2e3 3e4)]), 'number',
+		'scientific notation is numeric per Scalar::Util::looks_like_number';
+};
+
+# ---------------------------------------------------------------------------
+# _parse_visual -- extracts and validates the JSON object from LLM output
+# ---------------------------------------------------------------------------
+
+subtest 'Ask::_parse_visual -- clean JSON string -> parsed hashref' => sub {
+	my $v = $PARSE_VISUAL->($BAR_JSON_STR);
+	is ref($v), 'HASH',   'valid JSON returns hashref';
+	is $v->{kind}, 'bar', 'kind preserved';
+	is ref($v->{encode}), 'HASH', 'encode is hashref';
+	is $v->{encode}{cat}, 'region', 'encode.cat preserved';
+};
+
+subtest 'Ask::_parse_visual -- preamble text before JSON (bracket-depth fallback)' => sub {
+	my $text = "Here is the analysis:\n$BAR_JSON_STR";
+	my $v    = $PARSE_VISUAL->($text);
+	is ref($v), 'HASH', 'JSON extracted despite preamble text';
+	is $v->{kind}, 'bar', 'correct kind after preamble extraction';
+};
+
+subtest 'Ask::_parse_visual -- suffix text after JSON (depth counter stops at close)' => sub {
+	my $text = "$PIE_JSON_STR\nI chose pie because it shows proportions.";
+	my $v    = $PARSE_VISUAL->($text);
+	is ref($v), 'HASH', 'JSON extracted despite suffix text';
+	is $v->{kind}, 'pie', 'correct kind after suffix extraction';
+};
+
+subtest 'Ask::_parse_visual -- preamble + nested JSON + suffix' => sub {
+	# The encode object creates two levels of nesting; the counter must not
+	# stop at the inner } but continue until the outer one is balanced.
+	my $text = "Consider:\n$BAR_JSON_STR\nThis is the best choice.";
+	my $v    = $PARSE_VISUAL->($text);
+	is ref($v), 'HASH', 'nested JSON extracted with preamble and suffix';
+	is $v->{encode}{val}, 'amount', 'inner encode value preserved';
+};
+
+subtest 'Ask::_parse_visual -- multiple JSON objects: first one wins' => sub {
+	# This is the exact failure mode the old /\{.*\}/s regex caused: it would
+	# match from the first '{' to the LAST '}', spanning BOTH objects and
+	# producing unparseable text.  The bracket-depth counter stops at the
+	# first balanced close.
+	my $text = '{"kind":"bar","title":"Bar","encode":{"cat":"x"}} '
+	         . 'or {"kind":"pie","title":"Pie","encode":{"cat":"y"}}';
+	my $v = $PARSE_VISUAL->($text);
+	is ref($v), 'HASH',  'returns a hashref';
+	is $v->{kind}, 'bar', 'first JSON object wins, not the last';
+};
+
+subtest 'Ask::_parse_visual -- missing encode key defaults to empty hashref' => sub {
+	my $v = $PARSE_VISUAL->('{"kind":"table","title":"Data"}');
+	is ref($v), 'HASH',                     'parses without encode key';
+	is ref($v->{encode}), 'HASH',           'encode defaulted to hashref';
+	is scalar(keys %{ $v->{encode} }), 0,   'defaulted encode is empty';
+};
+
+# --- Negative tests (60%) ---
+
+subtest 'Ask::_parse_visual -- empty string -> undef' => sub {
+	is $PARSE_VISUAL->(''), undef, 'empty string -> undef';
+};
+
+subtest 'Ask::_parse_visual -- no opening brace -> undef' => sub {
+	is $PARSE_VISUAL->('no braces here'), undef,
+		'no { means no JSON object can be found';
+};
+
+subtest 'Ask::_parse_visual -- unclosed brace -> undef (depth never reaches 0)' => sub {
+	# The bracket-depth counter walks to end-of-string without $depth hitting 0.
+	is $PARSE_VISUAL->('{"kind":"bar"'), undef,
+		'unclosed { -> depth counter never returns to 0 -> undef';
+};
+
+subtest 'Ask::_parse_visual -- single { only -> undef' => sub {
+	is $PARSE_VISUAL->('{'), undef, 'bare { with no closing -> undef';
+};
+
+subtest 'Ask::_parse_visual -- unknown kind -> undef' => sub {
+	is $PARSE_VISUAL->('{"kind":"unknown_chart_type","encode":{}}'), undef,
+		'kind not in %SUPPORTED_KINDS is rejected';
+};
+
+subtest 'Ask::_parse_visual -- missing kind key -> undef' => sub {
+	is $PARSE_VISUAL->('{"title":"Sales","encode":{"cat":"region"}}'), undef,
+		'missing kind returns undef';
+};
+
+subtest 'Ask::_parse_visual -- encode is array (not hash) -> undef' => sub {
+	is $PARSE_VISUAL->('{"kind":"bar","encode":["cat","region"]}'), undef,
+		'encode as arrayref is rejected (must be hashref or absent)';
+};
+
+subtest 'Ask::_parse_visual -- encode is scalar string -> undef' => sub {
+	is $PARSE_VISUAL->('{"kind":"bar","encode":"cat"}'), undef,
+		'encode as scalar string is rejected';
+};
+
+subtest 'Ask::_parse_visual -- completely non-JSON text -> undef' => sub {
+	is $PARSE_VISUAL->('not json at all'), undef, 'non-JSON -> undef';
+};
+
+subtest 'Ask::_parse_visual -- hostile: very long preamble (10,000 chars)' => sub {
+	# Ensures the bracket-depth scan does not have a hardcoded length limit.
+	my $text = ('A' x 10_000) . $BAR_JSON_STR;
+	my $v    = $PARSE_VISUAL->($text);
+	is ref($v), 'HASH', 'long preamble does not prevent extraction';
+	is $v->{kind}, 'bar', 'correct kind despite 10k-char preamble';
+};
+
+subtest 'Ask::_parse_visual -- hostile: extra closing braces in suffix' => sub {
+	# The old greedy /\{.*\}/s would extend the match to include "} brackets".
+	# The bracket-depth counter must stop at the first balanced close.
+	my $text = $BAR_JSON_STR . ' Note: use } brackets carefully.';
+	my $v    = $PARSE_VISUAL->($text);
+	is ref($v), 'HASH', 'extra } in suffix does not break extraction';
+	is $v->{kind}, 'bar', 'correct JSON parsed despite } in trailing text';
+};
+
+subtest 'Ask::_parse_visual -- result has no circular references' => sub {
+	my $v = $PARSE_VISUAL->($BAR_JSON_STR);
+	memory_cycle_ok($v, '_parse_visual result has no circular references');
+};
+
+# ---------------------------------------------------------------------------
+# _validate_encode -- checks that every non-empty encode value is a known col
+# ---------------------------------------------------------------------------
+
+subtest 'Ask::_validate_encode -- all columns valid -> undef (no error)' => sub {
+	my $visual  = { encode => { cat => 'region', val => 'amount' } };
+	my $col_set = { region => 1, amount => 1, date => 1 };
+	is $VALIDATE_ENCODE->($visual, $col_set), undef,
+		'all encode values match known columns -> no error';
+};
+
+subtest 'Ask::_validate_encode -- empty encode -> undef (nothing to check)' => sub {
+	my $visual  = { encode => {} };
+	my $col_set = { region => 1 };
+	is $VALIDATE_ENCODE->($visual, $col_set), undef,
+		'empty encode hash -> undef (no columns to validate)';
+};
+
+subtest 'Ask::_validate_encode -- undef encode value -> skipped' => sub {
+	my $visual  = { encode => { cat => undef, val => 'amount' } };
+	my $col_set = { amount => 1 };
+	is $VALIDATE_ENCODE->($visual, $col_set), undef,
+		'undef encode value is skipped, not treated as a bad column';
+};
+
+subtest 'Ask::_validate_encode -- empty-string encode value -> skipped' => sub {
+	my $visual  = { encode => { cat => '', val => 'amount' } };
+	my $col_set = { amount => 1 };
+	is $VALIDATE_ENCODE->($visual, $col_set), undef,
+		'empty-string encode value is skipped';
+};
+
+subtest 'Ask::_validate_encode -- unknown column -> returns bad column name' => sub {
+	my $visual  = { encode => { cat => 'nonexistent' } };
+	my $col_set = { region => 1, amount => 1 };
+	is $VALIDATE_ENCODE->($visual, $col_set), 'nonexistent',
+		'unknown column name returned as error value';
+};
+
+subtest 'Ask::_validate_encode -- one bad column among valid ones -> returns bad name' => sub {
+	# Keys are iterated sorted; 'bad_col' < 'region' alphabetically
+	my $visual  = { encode => { cat => 'bad_col', val => 'region' } };
+	my $col_set = { region => 1 };
+	is $VALIDATE_ENCODE->($visual, $col_set), 'bad_col',
+		'first sorted bad column name returned';
+};
+
+subtest 'Ask::_validate_encode -- hostile: injection string returned verbatim' => sub {
+	# The caller receives the value and rejects it; the function must not
+	# sanitize or truncate it (the ask() caller builds the error code from it).
+	my $bad_col = "'; DROP TABLE sales; --";
+	my $visual  = { encode => { cat => $bad_col } };
+	my $col_set = { region => 1 };
+	is $VALIDATE_ENCODE->($visual, $col_set), $bad_col,
+		'injection string returned verbatim so caller can log/reject it';
+};
+
+# ---------------------------------------------------------------------------
+# _build_url -- constructs the data-view URL from a validated visual + spec
+# ---------------------------------------------------------------------------
+
+subtest 'Ask::_build_url -- bar chart with table: spec' => sub {
+	my $visual = { kind => 'bar', encode => { cat => 'region', val => 'amount' } };
+	my $url    = $BUILD_URL->($visual, 'table:sales');
+	like   $url, qr{^/bar\?},         'bar kind maps to /bar route';
+	like   $url, qr{l=table%3Asales}, 'table: spec key colon is encoded';
+	like   $url, qr{cat=region},      'cat param present';
+	like   $url, qr{val=amount},      'val param present';
+};
+
+subtest 'Ask::_build_url -- line kind maps to /graph route' => sub {
+	my $visual = { kind => 'line', encode => { x => 'date', y => 'amount' } };
+	my $url    = $BUILD_URL->($visual, 'table:sales');
+	like $url, qr{^/graph\?}, 'line kind -> /graph route (KIND_ROUTE mapping)';
+};
+
+subtest 'Ask::_build_url -- graph kind also maps to /graph route' => sub {
+	my $visual = { kind => 'graph', encode => { x => 'date', y => 'amount' } };
+	my $url    = $BUILD_URL->($visual, 'table:sales');
+	like $url, qr{^/graph\?}, 'graph kind -> /graph route';
+};
+
+subtest 'Ask::_build_url -- table kind with table: spec -> /view/<name>' => sub {
+	my $visual = { kind => 'table', encode => {} };
+	is $BUILD_URL->($visual, 'table:sales'), '/view/sales',
+		'table + table: spec -> /view/sales (no query string)';
+};
+
+subtest 'Ask::_build_url -- table kind with path: spec -> /open?path=' => sub {
+	my $visual = { kind => 'table', encode => {} };
+	my $url    = $BUILD_URL->($visual, 'path:/data/file.csv');
+	like   $url, qr{^/open\?path=}, 'table + path: spec -> /open?path=';
+	like   $url, qr{%2F},           'slashes in the path are percent-encoded';
+	unlike $url, qr{path:},         'the "path:" prefix is stripped';
+};
+
+subtest 'Ask::_build_url -- l= param value has colon encoded' => sub {
+	my $visual = { kind => 'pie', encode => { cat => 'region' } };
+	my $url    = $BUILD_URL->($visual, 'table:sales');
+	like $url, qr{l=table%3Asales},
+		'colon in spec_key is %3A; must not appear as raw : in URL';
+};
+
+subtest 'Ask::_build_url -- encode params are sorted alphabetically in URL' => sub {
+	# Sorted order: cat < series < val
+	my $visual = {
+		kind   => 'bar',
+		encode => { val => 'amount', cat => 'region', series => 'type' },
+	};
+	my $url = $BUILD_URL->($visual, 'table:sales');
+	my $cat_pos    = index($url, 'cat=');
+	my $series_pos = index($url, 'series=');
+	my $val_pos    = index($url, 'val=');
+	ok $cat_pos    >= 0,               'cat= present';
+	ok $series_pos >= 0,               'series= present';
+	ok $val_pos    >= 0,               'val= present';
+	ok $cat_pos    < $series_pos,      'cat before series (sorted)';
+	ok $series_pos < $val_pos,         'series before val (sorted)';
+};
+
+subtest 'Ask::_build_url -- empty encode value omitted from URL' => sub {
+	my $visual = { kind => 'bar', encode => { cat => 'region', val => '' } };
+	my $url    = $BUILD_URL->($visual, 'table:sales');
+	unlike $url, qr{val=}, 'empty encode value not emitted as a URL param';
+};
+
+subtest 'Ask::_build_url -- undef encode value omitted from URL' => sub {
+	my $visual = { kind => 'bar', encode => { cat => 'region', val => undef } };
+	my $url    = $BUILD_URL->($visual, 'table:sales');
+	unlike $url, qr{val=}, 'undef encode value not emitted as a URL param';
+};
+
+subtest 'Ask::_build_url -- encode column name with special chars is encoded' => sub {
+	# Column names are validated before _build_url is called, but the function
+	# must still encode whatever it receives in case a future caller skips
+	# _validate_encode.  Spaces (from DBD::CSV name normalisation) are encoded.
+	my $visual = { kind => 'bar', encode => { cat => 'First Name' } };
+	my $url    = $BUILD_URL->($visual, 'table:sales');
+	like   $url, qr{cat=First%20Name}, 'space in column name encoded as %20';
+	unlike $url, qr{cat=First Name},   'raw space must not appear in URL';
+};
+
+subtest 'Ask::_build_url -- result has no circular references' => sub {
+	my $visual = { kind => 'bar', encode => { cat => 'region' } };
+	my $url    = $BUILD_URL->($visual, 'table:sales');
+	memory_cycle_ok(\$url, '_build_url scalar result has no cycles');
+};
+
+# ---------------------------------------------------------------------------
+# _build_spec -- constructs the Phase 3 analysis spec hashref
+# ---------------------------------------------------------------------------
+
+subtest 'Ask::_build_spec -- returns required Phase 3 spec keys' => sub {
+	my $visual = {
+		kind    => 'bar',
+		title   => 'Test',
+		encode  => { cat => 'region' },
+		options => {},
+	};
+	my $spec = $BUILD_SPEC->($visual, 'sales', 'table:sales');
+	is   ref($spec), 'HASH',        'returns hashref';
+	is   $spec->{version}, 1,       'version is 1';
+	ok  exists $spec->{name},       'name key present';
+	ok  exists $spec->{datasets},   'datasets key present';
+	ok  exists $spec->{visuals},    'visuals key present';
+};
+
+subtest 'Ask::_build_spec -- name comes from visual title' => sub {
+	my $visual = { kind => 'bar', title => 'Sales by region', encode => {} };
+	my $spec   = $BUILD_SPEC->($visual, 'sales', 'table:sales');
+	is $spec->{name}, 'Sales by region', 'name taken from visual title';
+};
+
+subtest 'Ask::_build_spec -- empty title falls back to "<label> analysis"' => sub {
+	my $visual = { kind => 'bar', title => '', encode => {} };
+	my $spec   = $BUILD_SPEC->($visual, 'sales', 'table:sales');
+	is $spec->{name}, 'sales analysis', 'empty title -> "<label> analysis"';
+};
+
+subtest 'Ask::_build_spec -- missing title key falls back to "<label> analysis"' => sub {
+	# No title key at all -- $visual->{title} is undef; undef || 'X' gives 'X'
+	my $visual = { kind => 'bar', encode => {} };
+	my $spec   = $BUILD_SPEC->($visual, 'sales', 'table:sales');
+	is $spec->{name}, 'sales analysis', 'missing title -> "<label> analysis"';
+};
+
+subtest 'Ask::_build_spec -- datasets contains the spec_key' => sub {
+	my $visual = { kind => 'pie', title => 'T', encode => {} };
+	my $spec   = $BUILD_SPEC->($visual, 'sales', 'table:sales');
+	is scalar(@{ $spec->{datasets} }), 1,          'one dataset entry';
+	is $spec->{datasets}[0]{spec}, 'table:sales',  'spec_key in datasets[0].spec';
+};
+
+subtest 'Ask::_build_spec -- visuals array has one entry with correct kind' => sub {
+	my $visual = { kind => 'pie', title => 'T', encode => { cat => 'region' } };
+	my $spec   = $BUILD_SPEC->($visual, 'sales', 'table:sales');
+	is scalar(@{ $spec->{visuals} }), 1,       'one visual entry';
+	is $spec->{visuals}[0]{kind}, 'pie',       'visual kind preserved';
+	is $spec->{visuals}[0]{encode}{cat}, 'region', 'visual encode preserved';
+};
+
+subtest 'Ask::_build_spec -- result has no circular references' => sub {
+	my $visual = {
+		kind    => 'bar',
+		title   => 'T',
+		encode  => { cat => 'region' },
+		options => {},
+	};
+	my $spec = $BUILD_SPEC->($visual, 'sales', 'table:sales');
+	memory_cycle_ok($spec, '_build_spec result has no circular references');
+};
+
 done_testing();
 

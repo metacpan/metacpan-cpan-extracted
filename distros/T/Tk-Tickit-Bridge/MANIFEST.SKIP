@@ -1,0 +1,8 @@
+^blib/
+^_build/
+^_build_params$
+^Build$
+^MYMETA\.
+^\.git/
+~$
+\.bak$

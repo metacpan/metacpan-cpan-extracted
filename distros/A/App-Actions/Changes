@@ -1,4 +1,37 @@
 Revision history for App-Actions - run GitHub Actions workflows locally
 
+0.002.0	Fri Oct 23 02:52:55 PM EDT 2026
+	- Security: an environment value is interpolated only once, so ${{ }}
+	  text from a context value (a commit message, say) is no longer
+	  evaluated again; a variable that refers to itself is an error
+	  (runner.env_cycle).  A docker:// image is likewise interpolated once.
+	- Security: keep_logs refuses a log name or run id that is not a plain
+	  file name (runner.logs.bad_name).
+	- if: false, pre-if, post-if and fail-fast: false are honoured on Perl
+	  5.36 and later.
+	- Warnings and errors go through a Log::Abstraction logger;
+	  App::Actions->new takes a logger argument.  Progress and the summary
+	  stay on standard output.  Log::Abstraction 0.41 is required.
+	- Documented the configuration Object::Configure adds (App__Actions
+	  config sections and environment variables).
+	- The cache and logs listings and a child process's error lines are
+	  translated.
+	- Windows: a missing program is status 255 and is no longer retried
+	  through cmd.exe.
+	- Bug fixes in Expression (re-entrant, booleans, negative numbers,
+	  quoted }}, format()), Workflow (matrix instances share no job data),
+	  Runner (continue-on-error under fail-fast), Steps, Containers,
+	  Images, Parallel, Process, Cache, Check, Schema, Action and the
+	  preflight's deferred images.  Run errors no longer show a Perl
+	  source location, the caller's $@ is preserved, and invalid
+	  arguments are an App::Actions::Error (actions.invalid_arguments).
+	- Removed three unreachable messages.
+	- New tests: t/function.t (white-box), t/unit.t (black-box, against
+	  the POD) and t/changes.t; the fixture, pre-commit, regex and
+	  space-path tests were improved.  New test dependencies:
+	  Test::Mockingbird, Test::Returns and Test::Memory::Cycle.
+	- META: https repository URL; non-standard keys removed.
+	- POD fixes.
+
 0.001.0	Thu Oct 22 12:40:02 PM EDT 2026
 	- First release

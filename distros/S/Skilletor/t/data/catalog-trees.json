@@ -1,0 +1,236 @@
+[
+  {
+    "name": "layout",
+    "files": {
+      "skills/perl-moo/SKILL.md": "---\nname: perl-moo\ndescription: \"Write Moo classes\"\n---\nbody\n",
+      "skills/perl-moo/reference.md": "ref\n",
+      "skills/perl-moo/scripts/run.sh": "#!/bin/sh\n",
+      "skills/templ/SKILL.md.njk": "---\ndescription: '{{ vars.x }} raw'\n---\n{{ x }}\n",
+      "skills/no-main/README.md": "not a skill\n",
+      "skills/stray.md": "a file in skills/\n",
+      "skills/twice/SKILL.md": "---\ndescription: twice\n---\n",
+      "skills/twice/SKILL.md.njk": "---\ndescription: twice njk\n---\n",
+      "skills/twice/helper.txt": "h\n",
+      "skills/twice/helper.txt.njk": "h\n",
+      "skills/pair/SKILL.md": "---\ndescription: pair\n---\n",
+      "skills/pair/a.txt": "a\n",
+      "skills/pair/a.txt.njk": "a\n",
+      "skills/Case/SKILL.md": "---\ndescription: upper\n---\n",
+      "skills/case/SKILL.md": "---\ndescription: lower\n---\n",
+      "agents/reviewer.md": "---\ndescription: Reviews code\ntools: Read\n---\nYou review.\n",
+      "agents/dup.md": "---\ndescription: dup\n---\n",
+      "agents/dup.md.njk": "---\ndescription: dup njk\n---\n",
+      "agents/Spell.md": "---\ndescription: S\n---\n",
+      "agents/spell.md": "---\ndescription: s\n---\n",
+      "agents/notes.txt": "not an agent\n",
+      "agents/crlf.md": "---\r\ndescription: crlf\r\n---\r\nbody\r\n",
+      "agents/bom.md": "﻿---\ndescription: bom\n---\n",
+      "agents/nofm.md": "no frontmatter\n",
+      "agents/unclosed.md": "---\ndescription: open\nbody\n",
+      "agents/spaced.md": "---\ndescription:    padded value   \n---\n",
+      "agents/quoted.md": "---\ndescription: 'single'\n---\n",
+      "agents/half.md": "---\ndescription: \"half\n---\n",
+      "agents/sub/nested.md": "---\ndescription: nested\n---\n",
+      "rules/perl-style.md": "---\ndescription: Style\n---\nUse strict.\n",
+      "rules/gated.md.njk": "{% if vars.x %}x{% endif %}\n",
+      "rules/.hidden.md": "---\ndescription: hidden\n---\n",
+      "snippets/x.md": "not installable\n",
+      "skilletor.json": "{\"description\": \"A source\", \"vars\": {\"level\": 1, \"team\": \"core\", \"10\": \"ten\"}}\n"
+    },
+    "modes": { "skills/perl-moo/scripts/run.sh": 493 }
+  },
+  {
+    "name": "symlink-in-skill",
+    "files": { "skills/a/SKILL.md": "---\ndescription: a\n---\n", "skills/a/real.txt": "r\n" },
+    "symlinks": { "skills/a/link.txt": "real.txt" }
+  },
+  {
+    "name": "symlinked-type-dir",
+    "files": { "real/agents/a.md": "x\n" },
+    "symlinks": { "agents": "real/agents" }
+  },
+  {
+    "name": "symlinked-skill-md",
+    "files": { "skills/a/other.md": "x\n" },
+    "symlinks": { "skills/a/SKILL.md": "other.md" }
+  },
+  {
+    "name": "dangling-skill-md",
+    "files": { "skills/a/SKILL.md.njk": "---\ndescription: njk\n---\n" },
+    "symlinks": { "skills/a/SKILL.md": "missing.md" }
+  },
+  {
+    "name": "plugin",
+    "files": {
+      ".claude-plugin/plugin.json": "{\"name\": \"p\", \"skills\": [\"./tools\", \"one\", \"skills\"]}\n",
+      "tools/fmt/SKILL.md": "---\ndescription: fmt\n---\n",
+      "tools/lint/SKILL.md": "---\ndescription: lint\n---\n",
+      "tools/not-a-skill/x.md": "x\n",
+      "one/SKILL.md": "---\ndescription: one\n---\n",
+      "skills/base/SKILL.md": "---\ndescription: base\n---\n"
+    }
+  },
+  {
+    "name": "plugin-string",
+    "files": { ".claude-plugin/plugin.json": "{\"skills\": \"tools\"}", "tools/fmt/SKILL.md": "---\ndescription: fmt\n---\n" }
+  },
+  {
+    "name": "plugin-twice",
+    "files": {
+      ".claude-plugin/plugin.json": "{\"skills\": [\"tools\"]}",
+      "tools/base/SKILL.md": "x\n",
+      "skills/base/SKILL.md": "y\n"
+    }
+  },
+  {
+    "name": "plugin-twice-case",
+    "files": {
+      ".claude-plugin/plugin.json": "{\"skills\": [\"tools\"]}",
+      "tools/Base/SKILL.md": "x\n",
+      "skills/base/SKILL.md": "y\n"
+    }
+  },
+  {
+    "name": "plugin-invalid-json",
+    "files": { ".claude-plugin/plugin.json": "{\"skills\": [}" }
+  },
+  {
+    "name": "plugin-bad-skills",
+    "files": { ".claude-plugin/plugin.json": "{\"skills\": [1]}" }
+  },
+  {
+    "name": "plugin-null-skills",
+    "files": { ".claude-plugin/plugin.json": "{\"skills\": null}" }
+  },
+  {
+    "name": "plugin-array",
+    "files": { ".claude-plugin/plugin.json": "[\"skills\"]" }
+  },
+  {
+    "name": "plugin-escape",
+    "files": { ".claude-plugin/plugin.json": "{\"skills\": [\"../x\"]}" }
+  },
+  {
+    "name": "plugin-absolute",
+    "files": { ".claude-plugin/plugin.json": "{\"skills\": [\"/etc\"]}" }
+  },
+  {
+    "name": "plugin-root",
+    "files": { ".claude-plugin/plugin.json": "{\"skills\": [\".\"]}" }
+  },
+  {
+    "name": "plugin-missing",
+    "files": { ".claude-plugin/plugin.json": "{\"skills\": [\"nope\"]}" }
+  },
+  {
+    "name": "plugin-file",
+    "files": { ".claude-plugin/plugin.json": "{\"skills\": [\"f\"]}", "f": "x\n" }
+  },
+  {
+    "name": "claude-layout",
+    "files": {
+      "skills/published/SKILL.md": "---\ndescription: published\n---\n",
+      ".claude/skills/published/SKILL.md": "---\ndescription: shadowed\n---\n",
+      ".claude/skills/local-only/SKILL.md": "---\ndescription: local only\n---\n",
+      ".claude/skills/installed/SKILL.md": "---\ndescription: installed copy\n---\n",
+      ".claude/skills/installed/.gitignore": "# installed by skilletor, not committed (\"gitignore\": false in skilletor.json to commit)\n*\n",
+      ".claude/skills/own-gitignore/SKILL.md": "---\ndescription: own\n---\n",
+      ".claude/skills/own-gitignore/.gitignore": "*.tmp\n",
+      ".claude/skills/bad/SKILL.md": "---\ndescription: bad\n---\n",
+      ".claude/skills/bad/real": "r\n",
+      ".claude/agents/helper.md": "---\ndescription: helper\n---\n",
+      ".claude/agents/helper.md.njk": "---\ndescription: helper njk\n---\n",
+      ".claude/agents/.local.mine.md": "---\ndescription: mine\n---\n",
+      ".claude/agents/Twin.md": "x\n",
+      ".claude/agents/twin.md": "y\n",
+      ".claude/rules/house.md": "---\ndescription: house\n---\n"
+    },
+    "symlinks": { ".claude/skills/bad/link": "real", ".claude/rules/linked.md": "house.md" }
+  },
+  {
+    "name": "claude-symlinked",
+    "files": { "real/skills/x/SKILL.md": "x\n" },
+    "symlinks": { ".claude": "real" }
+  },
+  {
+    "name": "paths",
+    "files": {
+      "tools/a/SKILL.md": "---\ndescription: a\n---\n",
+      "tools/a/inner/SKILL.md": "---\ndescription: inner\n---\n",
+      "tools/group/b/SKILL.md": "---\ndescription: b\n---\n",
+      "tools/group/.hidden/c/SKILL.md": "---\ndescription: c\n---\n",
+      "tools/.git/d/SKILL.md": "x\n",
+      "tools/installed/SKILL.md": "x\n",
+      "tools/installed/.gitignore": "# installed by skilletor, not committed (\"gitignore\": false in skilletor.json to commit)\n*\n",
+      "other/b/SKILL.md": "---\ndescription: other b\n---\n",
+      "other/Zed/SKILL.md": "x\n",
+      ".dot/e/SKILL.md": "---\ndescription: e\n---\n",
+      "skills/ignored/SKILL.md": "x\n",
+      "bundles/x.yaml": "description: ignored\n",
+      "skilletor.json": "{\"vars\": {\"a\": 1, \"b\": 2}}"
+    },
+    "paths": [ ["tools", "tools/group", "other", ".dot"], ["tools/group"], [".dot"], ["tools/a"] ]
+  },
+  {
+    "name": "path-errors",
+    "files": { "f": "x\n", "d/x": "y\n" },
+    "symlinks": { "l": "d" },
+    "paths": [ ["/abs"], ["a/../b"], ["."], [""], ["nope"], ["f"], ["l"], ["d/missing"] ]
+  },
+  {
+    "name": "bundles",
+    "files": {
+      "skills/perl-moo/SKILL.md": "---\ndescription: Moo\n---\n",
+      "skills/perl-dbi/SKILL.md": "---\ndescription: DBI\n---\n",
+      "skills/testing/SKILL.md": "---\ndescription: Tests\n---\n",
+      "agents/reviewer.md": "---\ndescription: Reviews\n---\n",
+      "rules/perl-style.md": "x\n",
+      "bundles/perl.yaml": "description: Perl\nskills: [perl-*, nope]\nagents:\n  - reviewer\n  - ghost-*\nbundles: [base]\nvars:\n  level: perl\n  perl_version: \"5.40\"\n  f: 1.5\n",
+      "bundles/base.yml": "description: Base\nskills: [testing, perl-moo]\nrules: [\"*\"]\nvars:\n  level: base\n  base_only: true\n  nested: {a: 1}\n",
+      "bundles/both.yaml": "description: Y\n",
+      "bundles/both.yml": "description: Y\n",
+      "bundles/broken.yaml": "description: B\nskills: [a, [b]]\n",
+      "bundles/nodesc.yaml": "skills: [a]\n",
+      "bundles/outer.yaml": "description: O\nbundles: [broken]\n",
+      "bundles/dangling.yaml": "description: D\nbundles: [ghost]\n",
+      "bundles/c1.yaml": "description: C\nbundles: [c2]\n",
+      "bundles/c2.yaml": "description: C\nbundles: [c3]\n",
+      "bundles/c3.yaml": "description: C\nbundles: [c1]\n",
+      "bundles/top.yaml": "description: T\nbundles: [l, r]\nvars: {t: 1}\n",
+      "bundles/l.yaml": "description: L\nbundles: [d]\nvars: {side: left}\n",
+      "bundles/r.yaml": "description: R\nbundles: [d]\nvars: {side: right}\n",
+      "bundles/d.yaml": "description: D\nskills: [testing]\n",
+      "bundles/foreign.yaml": "description: F\nskills:\n  - lint@https://example.com/other.git\n  - \"perl-*@gitlab.com/peter\"\nrules: [x@Getty]\nbundles: [base]\n",
+      "bundles/notes.txt": "not a bundle\n"
+    },
+    "expand": ["perl", "base", "both", "broken", "nodesc", "outer", "dangling", "c1", "top", "foreign", "missing"]
+  },
+  {
+    "name": "meta-invalid",
+    "files": { "skilletor.json": "{nope" }
+  },
+  {
+    "name": "meta-string",
+    "files": { "skilletor.json": "\"text\"", "rules/r.md": "x\n" }
+  },
+  {
+    "name": "meta-array-vars",
+    "files": { "skilletor.json": "{\"vars\": [\"a\", \"b\"]}" }
+  },
+  {
+    "name": "meta-string-vars",
+    "files": { "skilletor.json": "{\"vars\": \"x\"}" }
+  },
+  {
+    "name": "meta-null-vars",
+    "files": { "skilletor.json": "{\"description\": 5, \"vars\": null}" }
+  },
+  {
+    "name": "empty",
+    "files": {}
+  },
+  {
+    "name": "skills-file",
+    "files": { "skills": "a file, not a dir\n" }
+  }
+]

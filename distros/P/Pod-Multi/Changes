@@ -1,5 +1,8 @@
 Changes for Pod::Multi
 
+0.11 Fri Oct 23 09:57:53 PM EDT 2026
+    - No change in functionality.  Updated Makefile.PL and metadata handling.
+
 0.10 Tue May 16 12:32:19 EDT 2017
     - Move into git and github.com; add one test file mistakenly omitted.
 

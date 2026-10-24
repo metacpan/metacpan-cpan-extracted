@@ -1,5 +1,348 @@
 Revision history for MCP-Run
 
+0.107     2026-10-24 03:14:19Z
+  - Document that the limit on failed commands belongs to the hook and
+    not to the distribution: the MCP server produces the output itself
+    and compresses it whether the command succeeded or failed, with the
+    same command-specific filters.
+  - Stop the command's process group even when the calling program has
+    installed a handler of its own for `SIGHUP`, `SIGINT` or `SIGTERM`.
+    The signal is taken over for the duration of the command, the group
+    is stopped, and the program's own handler is chained afterwards: the
+    program still gets the signal it was sent, and the command no
+    longer outlives the run. A signal the program ignores is left
+    alone, as before.
+  - Recognise the date column of `ls --time-style=` in every shape it
+    produces: the locale default, `iso`, `long-iso`, `full-iso` and the
+    date alone. The filter matches the date forms as alternatives
+    instead of loosening the regex, so a strftime format that prints
+    neither an ISO date nor an ISO time still stays uncollapsed.
+  - Fix the SYNOPSIS of `MCP::Run::Bash`: it called `$server->run`, a
+    method that exists neither in `MCP::Run::Bash` nor in `MCP::Run` nor
+    in `MCP::Server`, so the first line a reader copied died at runtime
+    with "Can't locate object method". The example calls
+    `$server->to_stdio` now, and a new test, `t/07-pod.t`, checks that
+    every method call in the SYNOPSIS of `MCP::Run` and `MCP::Run::Bash`
+    exists.
+  - Remove `test_ci.txt` from the distribution. The file was tracked in
+    git and therefore shipped in the CPAN tarball, where it says
+    nothing.
+  - Apply `working_directory` with `chdir` in the child process instead of
+    prefixing the command with `cd 'DIR' && `. The prefix bound only to the
+    first command of a list: with `;`, newlines or a background `&` the
+    other members ran in the server's directory, and when the `cd` failed
+    the rest of the list ran anyway, there. A directory that is missing or
+    cannot be entered is now an error (exit 1, `error` names the directory
+    and the reason) and the command is not run (karr #42, found by
+    langertha-raider).
+  - Fix the ls filter doing nothing on every system whose `ls` marks the
+    mode column. Fedora, Rocky and RHEL append a `.` there for the
+    SELinux context, systems with POSIX ACLs a `+`, macOS an `@` for
+    extended attributes -- and the filter's regex demanded whitespace
+    directly after the nine rwx characters, so on those machines not one
+    line was ever collapsed and `ls -la` came back at full length. Plain
+    Debian appends nothing, which is the whole reason this survived: the
+    only test that would have caught it runs `ls` on the build host, and
+    on the development machine it passed. It took a CPAN smoker to
+    report it (GitHub #3, karr #35). The same regex accepted only `d`
+    and `-` as the type letter, so symlinks, devices, fifos, sockets and
+    doors went through uncollapsed everywhere, and a listing holding
+    nothing but such entries was not even recognised as a long listing.
+    All types are now handled; for a symlink the whole `link -> target`
+    is kept, because the target is the only thing the entry states.
+  - Compress in a PostToolUse hook instead of rewriting the Bash
+    command. `--install-claude` now registers the same command on two
+    events: PostToolUse does the compression, PreToolUse keeps only what
+    has to happen before the command runs -- the Co-Authored-By trailer
+    and the `no-compress` marker. `--b64` and `--filter-files` are gone,
+    and with them the hardcoded 1800-second timeout, the base64 round
+    trip, and the host-side docker snippet that captured output into
+    temp files and lost every byte of it whenever `docker run` failed.
+    Both install modes now run the same code -- JSON in on stdin, JSON
+    out -- and the mode only picks the command string written into
+    settings.json. Upgrading is `--install-claude` again: it adds the
+    missing hook and replaces entries naming the removed flags, which
+    would otherwise make GetOptions exit non-zero and, from a PreToolUse
+    hook, block every Bash call.
+    Three limits come with the move and are documented in --help, in
+    the POD and in the installed skill rather than left to be
+    discovered. A command that exits non-zero is not compressed at all:
+    the harness raises PostToolUseFailure there and ignores any
+    replacement. That is the one thing the rewrite did better, and it is
+    the noisiest output there is. Background commands have produced
+    nothing yet when the hook runs. And two PostToolUse hooks do not
+    chain -- each is handed the original output and whichever answers
+    last wins, silently, so another output-replacing hook simply
+    switches compression off.
+  - Stop the self-bypass from silently switching off the Co-Authored-By
+    trailer. It skipped any command mentioning `mcp-run-compress`, which
+    existed so the hook would not wrap its own wrapper -- and once the
+    wrapper was gone, all it still did was drop the trailer from commits
+    whose message happens to name this tool. In this repository that is
+    the common case, not the odd one. `no-compress` did the same thing:
+    it means "do not compress the output", not "suspend the commit
+    policy". Both now control compression only, and
+    MCP_RUN_COMPRESS_NO_CO_AUTHORED is the single documented way to
+    suppress the trailer.
+  - Cap the replaced output at MCP_RUN_COMPRESS_MAX_BYTES, default
+    29000. The harness caps what a hook is handed at 30 KB and files the
+    rest away; the replacement is subject to that same cap, so
+    compressing 100 KB down to 40 KB would have the harness file the
+    result away too and show the model a 2 KB preview -- worse than not
+    compressing. The cap trims the middle with a visible marker, and
+    only when a raw file exists to point at: without one, cutting would
+    destroy output the harness had already accepted. The compressed text
+    names the raw file's path, which the harness stops providing once
+    the persist fields are cleared.
+  - Add the 26 filters the reference document had been promising without
+    them existing, and delete the 18 entries that had no defensible
+    specification behind them -- 70 documented commands against 48 real
+    filters, and nothing had ever compared the two. Filters.pm is
+    documentation only: no code loads it and no test read it, so it
+    drifted quietly and told anyone checking whether their tool was
+    supported the wrong answer for a third of the entries. A new test
+    reduces both sides to a command identity and fails on any drift in
+    either direction. Where a documented filter could not be built to a
+    standard worth shipping -- `jq`, `sops`, `gcloud`, whose output *is*
+    the answer, or `ty`, described as something it is not -- the entry
+    was struck and the reason written down.
+  - Decide the output filter and the command transform separately. They
+    shared one selection, and the git-commit filter is the only one not
+    anchored to the start of the command, so any compound command put
+    them in competition: `cat msg.txt && git commit -m "fix"` either got
+    its trailer and no filtering, or filtering and no trailer, decided
+    by Perl's per-process hash order. Measured across twelve seeds:
+    never both, nine times one and three times the other. The
+    git-commit filter shapes no output at all -- it exists purely for
+    its transform -- so it no longer takes part in choosing an output
+    filter, and both now apply.
+  - Stop the make filter from eating its own error lines. Its strip
+    list discarded every `make[N]:` line, which was aimed at the
+    Entering/Leaving directory chatter of a recursive build but took
+    with it the line naming the failed target and Makefile line, the
+    `No rule to make target` stop, the circular-dependency warning, and
+    the "not remade because of errors" summary. On a failed recursive
+    build the only survivor was the top-level `Error 2` -- the fact that
+    it broke, with the answer to *where* removed. The rule now names the
+    two chatter forms it was meant for, so a no-op build across twenty
+    subdirectories still compresses to `make: ok`. Every other filter's
+    strip list was checked the same way -- 322 patterns against 41
+    shapes a diagnosis takes -- and make was the only one; a test keeps
+    it that way, with an exception list that is empty on purpose.
+  - Drop three match_output short-circuits that never fired and should
+    not have. All three were written without /m, so `^` meant start of
+    string and none could ever match past the first line -- `cpanm: ok`
+    has never once been emitted. Adding /m was the obvious repair and
+    the wrong one. The cpanm pattern would then fire on a run where one
+    distribution failed to build, replacing the output -- including the
+    only line mentioning the failure -- with `cpanm: ok`: not a missing
+    hint but a false statement. The make circular-dependency pattern
+    needs two `make[N]:` on one line, which never happens, and reports a
+    warning as though the build had stopped. The gcc one looks for a
+    capital `Error` on a line starting with `gcc`, and gcc writes
+    lowercase `error:` after the filename. Behaviour is unchanged by
+    their removal, precisely because they never fired; what is gone is
+    three promises. The rule they violated is now written down:
+    match_output replaces the *entire* output, so it is only ever honest
+    for success, when there is nothing left to say. A test refuses any
+    match_output pattern that anchors without /m.
+  - Reject unknown attributes in register_filter instead of storing them
+    in silence. `replace` had been accepted and never read since it was
+    added; a typo in a filter definition behaved exactly the same way.
+    `replace` is removed -- rewriting lines is `transform`, replacing
+    everything is `match_output`, discarding lines is
+    `strip_lines_matching`. Note for anyone calling register_filter from
+    outside: an unknown attribute is now fatal rather than ignored.
+  - Refuse a parsed filter that shadows a more specific one. A filter
+    naming only a program matches every subcommand too, and the
+    selection stops at the first parsed filter it finds, so a bare
+    `kubectl` entry would decide `kubectl get` by hash order. The table
+    has no such pair today -- the filters added here deliberately avoid
+    it -- and now a test says so rather than a comment.
+  - Say so when the head of the output was dropped. The tail-only
+    truncation branch cut silently while every neighbouring path
+    announces itself, and it stopped being dead code in this very
+    release: the new `shopify theme push` filter keeps the last five
+    lines, so sixty lines arrived as five with nothing to suggest the
+    other fifty-five had existed. Silent truncation is the exact failure
+    this tool exists to prevent -- the model takes what it is given for
+    the whole output and has no reason to ask. The marker now leads the
+    kept lines, where the following max_lines stage cannot cut it off
+    and leave a number that lies. A test walks the filter table and
+    insists that anything which truncates also says so; it found the
+    shopify case on its own rather than being told about it.
+  - Fix head_lines/tail_lines truncating to nothing. `min($n, @lines)`
+    flattens the array into min's argument list, so it compared the line
+    limit against the line *contents*: text lines yielded 0 and the
+    stage returned an empty string, with a warning per line. No shipped
+    filter reached the branch, which is why it survived; the first new
+    filter to use it hit the bug immediately.
+  - Report 128 + signal number when a command is killed by a signal,
+    the way a shell does. `$? >> 8` is 0 for a signalled child, so
+    execute() returned exit_code 0 and format_result derived no error
+    flag from it: a build killed by the OOM killer came back looking
+    like a successful run with oddly short output. Measured before the
+    fix, SIGTERM, SIGKILL and SIGSEGV all reported success; they now
+    report 143, 137 and 139.
+  - Enforce the timeout even when the command refuses to die. The
+    alarm was cleared before the SIGTERM was sent, leaving the final
+    waitpid unguarded, so a child ignoring the signal blocked the
+    server until it finished on its own — `trap "" TERM; sleep 12` at
+    timeout 2 returned after 12 seconds, and would have held an MCP
+    server for an hour just as happily. SIGTERM is now followed by a
+    two second grace period and then SIGKILL; the same case returns
+    after 4.
+  - Run each command in its own process group so a timeout reaches its
+    grandchildren. Only the bash itself used to be signalled, so
+    `sleep 987 & wait` left the sleep running after the timeout had
+    already reported 124. The child sets its own group before exec'ing
+    (open3 with '-', then setpgrp, then exec), which needs no setsid
+    binary. Note for anyone revisiting this: doing it from the parent
+    after open3 does not work, setpgid on an already-exec'd child is
+    refused with EACCES, and it fails silently.
+  - Fall back to the configured default for any timeout the runner
+    cannot enforce, instead of switching the timeout off. The tool
+    schema accepts any integer and `0 // 30` is 0, so a client asking
+    for `timeout: 0` reached alarm(0), which cancels the alarm rather
+    than firing it — an unbounded command holding the server for as
+    long as it liked. Infinities are the same trap through a different
+    door: `1e400` is numeric and greater than zero, so it passed a
+    plain positivity check, and alarm() then took it for a negative
+    argument, warned, and ran unbounded anyway. Non-numeric values,
+    NaN, infinities and anything alarm() cannot represent now fall back
+    together. `0` does not mean unbounded, and says so in the POD and
+    in the schema description. No `minimum` was added to the schema on
+    purpose: MCP answers a validation failure with a bare
+    `-32602 Invalid arguments` that never names the offending field, so
+    a rejected call would tell the model less than a quietly corrected
+    one — and the env-var path has no schema in front of it, so the two
+    would have disagreed. There is a test pinning that decision.
+  - Stop losing output when a signal interrupts the read loop.
+    `while (my @ready = $select->can_read)` treats an interrupted
+    select as end of input, so with any signal handler in the
+    embedding program the rest of the command's output was dropped
+    without a trace. The loop now runs on the handle count and retries;
+    a sysread returning EINTR is no longer taken for EOF.
+  - Close a second way around the timeout: a command that closed its
+    own pipes (`exec >/dev/null 2>&1; sleep 20`) hit EOF immediately,
+    disarmed the alarm and then blocked in an unguarded waitpid,
+    running to completion and reporting success. The reap now happens
+    inside the alarm window.
+  - Collapse carriage-return overwrites before the line-based filters
+    run. Every stage of the pipeline splits on /\n/, and a progress bar
+    has no newlines at all — cargo, npm, pnpm, yarn, pip, docker, wget
+    and curl draw thousands of states over each other with \r. Such a
+    bar is one line, so max_lines cannot help, and 28 of the 48 filters
+    set no truncate_lines_at: a measured 224 KB bar passed through
+    entirely unchanged for `cargo build`, `make`, `npm install` and
+    `docker build`, which is to say compression failed completely on
+    the single most common shape of noisy output. Each line is now
+    reduced to its last non-empty \r-separated state — what stayed on
+    the screen — so nothing the user saw is lost. \r\n is normalised to
+    \n first so Windows output is not mistaken for a progress bar. The
+    stage is unconditional and identity-preserving on input without \r,
+    verified byte for byte across 56 command variants.
+  - Validate CO_AUTHORED_BY and ANTHROPIC_MODEL instead of splicing
+    them into the command line unchecked. The trailer is written inside
+    the double quotes of the `git commit -m "..."` argument, so a value
+    containing a quote ended the string and turned whatever followed
+    into further shell commands, and `$(...)` needed no quote at all to
+    run. Demonstrated end to end with a stub git: the injected command
+    executed. A value now has to look like a trailer — words, plus an
+    optional <mail@host> — and anything else leaves the command
+    untouched. Rejecting beats escaping here: a mangled trailer sits
+    unnoticed in a real commit, a missing one does not.
+  - Never let a broken installation block the Bash tool. The hook
+    loaded its modules at compile time, so a missing dependency killed
+    it before any runtime code, and exit 2 from a PreToolUse hook does
+    not mean "error" to Claude Code, it means "block the tool call".
+    Every Bash command in every session would have failed until the
+    user repaired the install by hand — not hypothetical, this is
+    exactly the state the development machine was found in. The hook
+    now loads what it needs at runtime, answers any load failure with
+    the pass-through response and exit 0, and says so in one line on
+    stderr rather than dumping @INC. `--b64` runs the command
+    uncompressed instead of swallowing it, since by then it is the only
+    thing that would ever run it. `--filter-files` and
+    `--install-claude` stay loud on purpose. Loading only the compressor
+    rather than the whole MCP server stack also made the hook about
+    twice as fast.
+  - Print the raw captured output when docker-mode compression cannot
+    run. The rewritten command captured stdout and stderr into temp
+    files and left printing them to `docker run`; a docker daemon that
+    was down, an image not yet pulled, a rate limit or a user outside
+    the docker group meant nothing printed them and the trap deleted
+    them. The exit code still came through, so a command whose output
+    had vanished was indistinguishable from one that produced none. The
+    mode degrades to uncompressed rather than to silent.
+  - Install the hook and the skill independently in
+    `mcp-run-compress --install-claude`. An already-installed hook
+    returned early, so a deleted or outdated skill was never restored
+    while the command cheerfully reported success — and the skill is
+    what tells the model that it is looking at compressed output and
+    how to opt out with `no-compress`.
+  - Reject a tool call whose `command` is missing, empty or
+    whitespace-only before either gate and before execute(). Such a
+    request used to run `bash -c ""` and come back as "Exit code: 0",
+    a malformed request answered as a successful run. Over the wire the
+    reachable cases are the empty and whitespace-only string, which
+    pass the schema's `type: string` unchallenged. The check sits in
+    MCP::Run, so every future runner subclass inherits it, and
+    whitespace-only counts as empty because the allowlist path has
+    always said so.
+  - Stop emitting an uninitialized warning when `allowed_commands` is
+    set and the command is empty.
+  - Collapse carriage returns for commands no filter matches, too. The
+    pipeline returned early when nothing matched, so the normalisation
+    never ran and a progress bar from bun, gradle, deno or any
+    hand-written script still arrived whole -- 176 KB of it. Only that
+    one stage runs for unmatched commands; the pass-through contract is
+    otherwise untouched, because collapsing \r is display semantics
+    rather than filtering. Cost on output that has no \r at all:
+    1.1 ms for 9.9 MB, and the result is byte-identical.
+  - Set the Co-Authored-By trailer whatever case it is written in.
+    Detection was case-insensitive and the substitution behind it was
+    not, so `co-authored-by:` entered the replacement branch, replaced
+    nothing, and returned before the injection could run -- leaving no
+    trailer at all. The substitution is now the condition, so
+    "recognised but not replaced, therefore not injected either" cannot
+    come back, and the trailer is normalised to the canonical spelling.
+  - Merge compress() and process() into one pipeline. They were two
+    near-identical copies of the same eleven stages, which is why the
+    carriage-return hole had to be fixed twice and why a third fix
+    could easily have landed in only one of them. Pinned by an
+    equivalence test written before the merge: 54 commands x 16 output
+    shapes x 4 stderr variants, 3456 comparisons, and it catches an
+    injected divergence in either direction.
+  - Declare Mojolicious in cpanfile. All three modules use Mojo::Base
+    directly and it is not core; it only ever resolved because MCP
+    happens to pull Mojolicious in. A direct dependency belongs in the
+    metadata, not in someone else's dependency tree.
+  - Refuse to start on an unusable MCP_RUN_TIMEOUT instead of guessing.
+    The value was numified with `+ 0`, so `5m` silently became 5
+    seconds and `abc` became 0, both with a Perl warning on the stderr
+    of a stdio server and no word to the user. It is now whole seconds
+    from 1 to the runner's own MAX_TIMEOUT, and anything else aborts
+    with a message naming the value. This is configuration a human
+    wrote, checked once at startup where a client still reports the
+    failure -- deliberately stricter than the per-call timeout, which
+    arrives mid-session from the model and therefore falls back
+    silently rather than killing a running server. One narrowing worth
+    knowing: a fractional value like `2.5` is refused here, while the
+    per-call path rounds it up to 3.
+  - Stop shipping .claude/ in the distribution. The agent skills, rules
+    and worker definitions are instructions for working *on* MCP-Run
+    and were a third of the tarball; they stay in the repository.
+    CLAUDE.md still ships -- it describes the architecture and is the
+    first file a packager or contributor reads.
+  - Iterate filters in sorted order in transform_command, which stops
+    at the first filter carrying a command_transform. There is exactly
+    one such filter today, so Perl's per-process hash order decided
+    nothing; fixed while it is still free. The filter selection in
+    compress() is deliberately not sorted — it has an explicit
+    precedence rule instead, and sorting there would change which
+    filter wins.
+
 0.106     2026-08-13 18:19:29Z
   - Fix mcp-run-bash dying on every tools/call in its default
     configuration. MCP::Run::format_result calls

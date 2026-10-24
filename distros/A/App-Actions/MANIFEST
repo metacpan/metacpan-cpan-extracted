@@ -30,6 +30,7 @@ lib/App/Actions/Runner/Parallel.pm
 lib/App/Actions/Runner/Report.pm
 lib/App/Actions/Runner/Steps.pm
 lib/App/Actions/Runner/Support.pm
+lib/App/Actions/Runner/Support/Env.pm
 lib/App/Actions/Schema.pm
 lib/App/Actions/Schema/Invalid.pm
 lib/App/Actions/Util.pm
@@ -46,6 +47,7 @@ t/archive-crlf.t
 t/bin/check-archive-crlf
 t/bin/fake-docker
 t/cache.t
+t/changes.t
 t/check.t
 t/cli.t
 t/docker.t
@@ -68,6 +70,7 @@ t/fixtures/preflight-not-ready.json
 t/fixtures/preflight-unready.json
 t/fixtures/preflight-unreachable.json
 t/fixtures/preflight.json
+t/function.t
 t/hooks.t
 t/i18n.t
 t/lib/App/Actions/FakeDocker.pm
@@ -88,6 +91,7 @@ t/schema.t
 t/self_test.t
 t/smoke.t
 t/space-path.t
+t/unit.t
 t/util.t
 t/workflow.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

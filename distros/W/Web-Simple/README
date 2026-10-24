@@ -717,6 +717,19 @@ EXPORTED SUBROUTINES
     Note, this is not the same as returning an HTTP 3xx redirect as a
     response; rather it is a much more efficient internal process.
 
+SECURITY CONSIDERATIONS
+    Request bodies now have a maximum size, which defaults to 8 MiB.
+
+    If you want to adjust the size, you need to change
+    $Web::Dispatch::ParamParser::MAX_BODY_SIZE, for example,
+
+      $Web::Dispatch::ParamParser::MAX_BODY_SIZE = 33554432; # 32MiB
+
+    Requests with larger bodies will croak.
+
+    You will need to validate the Content-Length header before dispatching
+    it, if you want a user-friendly response.
+
 CHANGES BETWEEN RELEASES
   Changes between 0.004 and 0.005
     *   dispatch {} replaced by declaring a dispatch_request method
@@ -838,6 +851,8 @@ CONTRIBUTORS
     Hakim Cassimally (osfameron) <osfameron@cpan.org>
 
     Karen Etheridge (ether) <ether@cpan.org>
+
+    Robert Rothenberg <perl@rhizomnic.com>
 
 COPYRIGHT
     Copyright (c) 2011 the Web::Simple "AUTHOR" and "CONTRIBUTORS" as listed

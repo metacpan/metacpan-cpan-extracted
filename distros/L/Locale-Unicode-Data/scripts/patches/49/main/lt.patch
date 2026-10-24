@@ -1,0 +1,16 @@
+--- lt.xml
++++ lt.xml
+@@ -5475,6 +5475,13 @@
+ 				<displayName count="many">Kinijos Užsienio juanio</displayName>
+ 				<displayName count="other">Kinijos Užsienio juanių</displayName>
+ 			</currency>
++			<currency type="CNX">
++				<displayName>Kinijos &quot;People&quot; banko doleris</displayName>
++				<displayName count="one">Kinijos &quot;People&quot; banko doleris</displayName>
++				<displayName count="few">Kinijos &quot;People&quot; banko doleriai</displayName>
++				<displayName count="many">Kinijos &quot;People&quot; banko dolerio</displayName>
++				<displayName count="other">Kinijos &quot;People&quot; banko dolerių</displayName>
++			</currency>
+ 			<currency type="CNY">
+ 				<displayName>Kinijos ženminbi juanis</displayName>
+ 				<displayName count="one">Kinijos ženminbi juanis</displayName>

@@ -163,7 +163,7 @@ sub DistinctQuery {
     my $sb = shift;
 
     return $self->SUPER::DistinctQuery( $statementref, $sb, @_ )
-        if $sb->_OrderClause !~ /(?<!main)\./;
+        unless $self->_DistinctNeedsGroupBy($sb);
 
     if ( substr($self->DatabaseVersion, 0, 1) == 4 ) {
         local $sb->{'group_by'} = [{FIELD => 'id'}];
@@ -188,14 +188,7 @@ sub DistinctQuery {
         $$statementref .= $sb->_OrderClause;
     } else {
         local $sb->{'group_by'} = [{FIELD => 'id'}];
-        local $sb->{'order_by'} = [
-            map {
-                ($_->{'ALIAS'}||'') ne "main"
-                ? { %{$_}, FIELD => ((($_->{'ORDER'}||'') =~ /^des/i)?'MAX':'MIN') ."(".$_->{FIELD}.")" }
-                : $_
-            }
-            @{$sb->{'order_by'}}
-        ];
+        local $sb->{'order_by'} = $self->_DistinctGroupByOrder($sb);
         $$statementref = "SELECT main.* FROM $$statementref";
         $$statementref .= $sb->_GroupClause;
         $$statementref .= $sb->_OrderClause;

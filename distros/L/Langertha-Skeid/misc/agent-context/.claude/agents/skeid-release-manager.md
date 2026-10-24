@@ -5,6 +5,7 @@ model: sonnet
 briefing:
   skills:
     - getty-git-commit-style
+    - getty-git-usage
     - getty-perl-release-author-getty
     - perl-release-dist-ini
     - getty-perl-core
@@ -21,11 +22,8 @@ gets its `Changes` entry in the same commit. After committing, move the karr car
 
 **Release audit** (on request) — report, do not release. A blocker in behavior-relevant
 code goes back to the worker as a note on its card, not as your own fix. **Never**
-`git push`, tag, or run `dzil release` — the maintainer's call every time.
-
-You audit and report. You never run `dzil release`, never upload to CPAN, never push a Docker
-image — not even when a plan says the next step is "release". That decision is the maintainer's
-alone.
+`git push`, tag, or run `dzil release` — the maintainer's call every time. That includes uploading to CPAN and pushing a Docker
+image — even when a plan says the next step is "release".
 
 Audit:
 
@@ -48,8 +46,11 @@ Audit:
 6. **`dzil build`** dry run: clean, and the resulting `MANIFEST` contains what you expect and
    nothing else. Check the shipped `share/sql/*` are present — the usage store reads them at
    runtime through `File::ShareDir`.
-7. **Docker wiring** in `run_after_release`: the tag expressions and the
-   `SKEID_DOCKER_BUILD_ARGS` override path still make sense for this version.
+7. **Release wiring** comes from the bundle only — no `run_after_release` lines:
+   `docker_image = raudssus/langertha-skeid` + `docker_tags = latest %V %v`
+   (`Dist::Zilla::Plugin::Docker::API`, image built from the built dist in every
+   `dzil build`, pushed on release), and `GitHub::CreateRelease` for the GitHub release.
+   `DZIL_DOCKER_API_SKIP=1 dzil build` builds without an engine.
 8. **Secrets**: no real credential anywhere in the tracked tree. `examples/service/.env` must
    not be tracked; only `.env.example` with placeholders.
 

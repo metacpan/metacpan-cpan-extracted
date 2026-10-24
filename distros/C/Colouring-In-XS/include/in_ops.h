@@ -580,12 +580,21 @@ static peep_t colouring_prev_peep = NULL;
  * and replace them with the corresponding custom op. */
 static void colouring_peep(pTHX_ OP *o) {
 	OP *orig = o;
+	HV *seen;
 
 	/* chain to any previous peep first */
 	if (colouring_prev_peep)
 		colouring_prev_peep(aTHX_ o);
 
+	/* op_next is not a list: a loop's ops lead back round to its start, so
+	 * walking it without remembering where it has been never ends. Stop at
+	 * the first op seen twice. */
+	seen = newHV();
 	for (; o; o = o->op_next) {
+		if (hv_exists(seen, (const char *)&o, sizeof(o)))
+			break;
+		(void)hv_store(seen, (const char *)&o, sizeof(o), newSViv(1), 0);
+
 		OP *cv_op, *method_op, *first;
 		const char *methname;
 		STRLEN methlen;
@@ -626,6 +635,7 @@ static void colouring_peep(pTHX_ OP *o) {
 			}
 		}
 	}
+	SvREFCNT_dec((SV *)seen);
 }
 
 /* ══════════════════════════════════════════════════════════════════

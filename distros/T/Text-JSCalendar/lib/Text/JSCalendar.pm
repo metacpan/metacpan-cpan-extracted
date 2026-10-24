@@ -54,6 +54,7 @@ my (
   %RecurrenceProperties,
   %UTCLinks,
   %MustBeTopLevel,
+  %OrganizerOnly,
 );
 
 BEGIN {
@@ -214,14 +215,28 @@ BEGIN {
   );
 
   %MustBeTopLevel = map { $_ => 1 } qw{
+    @type
     uid
-    relatedTo
     prodId
     showWithoutTime
     recurrenceRule
     recurrenceOverrides
     organizerCalendarAddress
     method
+    privacy
+    sentBy
+    recurrenceId
+    recurrenceIdTimeZone
+  };
+
+  # Participant properties that convert to ORGANIZER parameters
+  %OrganizerOnly = map { $_ => 1 } qw{
+    @type
+    calendarAddress
+    email
+    name
+    roles
+    sentBy
   };
 
   # Color names defined in CSS Color Module Level 3
@@ -402,11 +417,11 @@ Text::JSCalendar
 
 =head1 VERSION
 
-Version 0.07
+Version 0.08
 
 =cut
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 =head1 SYNOPSIS
 
@@ -1858,7 +1873,14 @@ sub _argsToVEvents {
         ? $Attendee->{roles}
         : { map { $_ => 1 } @{$Attendee->{roles} || []} };
 
-      next unless $roles->{attendee};
+      # jscalendarbis: every participant is an ATTENDEE unless the
+      # ORGANIZER fully represents it (jscalendar-icalendar 3.6)
+      unless ($roles->{attendee}) {
+        my $OrgUri = $Args->{organizerCalendarAddress};
+        next if defined $OrgUri and lc $OrgUri eq lc $Uri
+          and not grep { $_ ne 'owner' } keys %$roles
+          and not grep { !$OrganizerOnly{$_} } keys %$Attendee;
+      }
 
       $AttendeeProps{"CUTYPE"}     = uc $Attendee->{"kind"} if defined $Attendee->{"kind"};
       $AttendeeProps{"RSVP"}       = "TRUE" if $Attendee->{"expectReply"};
@@ -2032,7 +2054,47 @@ sub _argsToVCalendar {
     $VCalendar->add_entry($VEvent);
   }
 
+  _sanitizeEntry($VCalendar);
+
   return $VCalendar;
+}
+
+# Data::ICal escapes newlines in values, but not a lone CR, and puts
+# parameter values out verbatim, so a CR or LF from the event data
+# would start a new content line.  RFC 5545 allows no control characters
+# other than HTAB in either, so strip them before serialising.
+sub _sanitizeEntry {
+  my $Entry = shift;
+
+  foreach my $Props (values %{$Entry->properties}) {
+    foreach my $Prop (@$Props) {
+      my $value = $Prop->value;
+      if (defined $value and not ref $value) {
+        $value =~ s/\r\n?/\n/g;
+        $value =~ s/[\x00-\x08\x0b-\x1f\x7f]//g;
+        $Prop->value($value);
+      }
+
+      my %params;
+      while (my ($name, $val) = each %{$Prop->parameters}) {
+        $params{$name} = ref $val eq 'ARRAY'
+          ? [ map { _sanitizeParam($_) } @$val ]
+          : _sanitizeParam($val);
+      }
+      $Prop->parameters(\%params);
+    }
+  }
+
+  _sanitizeEntry($_) for @{$Entry->entries};
+}
+
+sub _sanitizeParam {
+  my $val = shift;
+  return $val unless defined $val;
+  $val =~ s/[\r\n]+/ /g;
+  # DQUOTE can't be escaped either; Data::ICal drops it with a warning
+  $val =~ s/[\x00-\x08\x0a-\x1f\x7f"]//g;
+  return $val;
 }
 
 sub _makeRecurrence {
@@ -2275,10 +2337,11 @@ sub vcalendarToEvents {
       my $First = $exceptions{$uid}[0];
       $map{$uid} = {
         uid => $uid,
-        # these two are required at top level, but may be different
-        # in recurrences so aren't in MustBeTopLevel
+        # required at top level, but may be different in recurrences
+        # so not in MustBeTopLevel
         start => $First->{start},
         updated => $First->{updated},
+        version => $First->{version},
       };
       $map{$uid}{timeZone} = $First->{timeZone} unless $First->{showWithoutTime};
       foreach my $key (keys %MustBeTopLevel) {
@@ -2317,7 +2380,7 @@ sub _add_override {
   my ($override, $prefix, $New, $Old) = @_;
 
   # basic case - it's not an object, so we just override
-  if ($ENV{JMAP_ALWAYS_FULL} or ref($New) ne 'HASH' or ref($Old) or 'HASH') {
+  if ($ENV{JMAP_ALWAYS_FULL} or ref($New) ne 'HASH' or ref($Old) ne 'HASH') {
     $override->{$prefix} = $New;
     return;
   }
@@ -2378,6 +2441,11 @@ sub _maximise {
   delete $new->{recurrenceOverrides};
 
   foreach my $path (sort keys %$Recurrence) {
+    # overrides can't change the identity or type of the master event
+    my ($first) = $path =~ m{^([^/]*)};
+    my $key = _unquotekey($first);
+    next if $MustBeTopLevel{$key};
+    next if $path =~ m{^participants/[^/]+/calendarAddress$};
     my $value = $Recurrence->{$path};
     _apply_patch($path, $new, $value);
   }

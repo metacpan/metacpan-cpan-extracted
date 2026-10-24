@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 BEGIN { use_ok( 'String::PerlIdentifier' ); }
-use lib ("t/");
+use lib ("./t");
 use Auxiliary qw{ _first_and_subsequent };
 
 four_basic_tests() for (1..10);

@@ -44,7 +44,7 @@
             "DBI" : "0",
             "DB_File" : "0",
             "Database::Abstraction" : "0.51",
-            "Database::Join" : "v0.10.0",
+            "Database::Join" : "v0.9.0",
             "Digest::MD5" : "0",
             "Digest::SHA" : "0",
             "Excel::Writer::XLSX" : "1.07",
@@ -53,6 +53,7 @@
             "File::Temp" : "0.22",
             "HTML::D3" : "0.23",
             "HTML::TableExtract" : "0",
+            "HTTP::Request" : "0",
             "IPC::System::Simple" : "0",
             "LWP::UserAgent" : "0",
             "LWP::UserAgent::Cached" : "0",
@@ -107,6 +108,6 @@
          "web" : "https://github.com/nigelhorne/Database-BI"
       }
    },
-   "version" : "v0.015.0",
+   "version" : "v0.016.0",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

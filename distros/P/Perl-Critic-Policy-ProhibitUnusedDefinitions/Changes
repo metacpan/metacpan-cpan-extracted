@@ -1,5 +1,12 @@
 Revision history for Perl-Critic-Policy-ProhibitUnusedDefinitions
 
+0.007 2026-10-24 TEODESIAN
+    - Count a method call from a sub of the same name as a use, unless its
+      invocant is the sub's own first argument.  Delegation to another
+      object's method of the same name, and a call through SUPER from an
+      override, were taken for recursion, and the subs they reach were
+      reported as never called.
+
 0.006 2026-10-22 TEODESIAN
     - Take the subs that perl calls, the cache and cache_dir parameters, and
       the walk of a document from Perl::Critic::Distribution 0.002, which

@@ -793,6 +793,7 @@
     .btn-folder,
     .btn-pivot,
     .btn-stats,
+    .btn-insights,
     .btn-calc,
     .btn-groups,
     .btn-dates,
@@ -824,6 +825,7 @@
     .btn-folder:hover,
     .btn-pivot:hover,
     .btn-stats:hover,
+    .btn-insights:hover,
     .btn-calc:hover,
     .btn-groups:hover,
     .btn-dates:hover,
@@ -846,6 +848,30 @@
       cursor: not-allowed;
     }
 
+
+    /* Row highlight: used by dashboard.html.tt when ?hl_col=&hl_op=&hl_val= is set */
+    tr.hl-row > td {
+      background-color: #fffde0;
+      border-top: 1px solid #f0d060;
+      border-bottom: 1px solid #f0d060;
+    }
+    tr.hl-row > td:first-child { border-left: 3px solid #f59e0b; }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) tr.hl-row > td {
+        background-color: #3d3900;
+        border-color: #806000;
+      }
+      :root:not([data-theme="light"]) tr.hl-row > td:first-child {
+        border-left-color: #f59e0b;
+      }
+    }
+    :root[data-theme="dark"] tr.hl-row > td {
+      background-color: #3d3900;
+      border-color: #806000;
+    }
+    :root[data-theme="dark"] tr.hl-row > td:first-child {
+      border-left-color: #f59e0b;
+    }
 
     /* Graph panel: selects + buttons on one row */
     .graph-fields-row {

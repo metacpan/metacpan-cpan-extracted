@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '0.001.0';
+our $VERSION = '0.002.0';
 
 # The English catalogue: message key to text, or to a hash that chooses a
 # text by gender or plural category; see App::Actions::I18N for the shape.
@@ -117,6 +117,34 @@ my %MESSAGES = (
 	'logs.remove_failed' => {
 		plural => { one => 'Could not remove %(count)d run:', other => 'Could not remove %(count)d runs:' },
 	},
+	# The text listings of the cache and logs commands.  The column headings
+	# are padded to the widest entry, so a longer translation still lines up.
+	'span.just_now' => 'just now',
+	'span.ago' => '%(span)s ago',
+	'cache.file' => 'Cache file: %(file)s',
+	'cache.empty' => 'No images have been cached yet.',
+	'cache.none_older' => 'No cached images are older than %(span)s.',
+	'cache.only_older' => 'Only images older than %(span)s.',
+	'cache.unreachable' => 'The Docker daemon is not reachable, so the sizes are unknown.',
+	'cache.prune_hint' => 'Remove them with "action-run cache --prune".',
+	'cache.unknown' => 'unknown',
+	'cache.size_missing' => 'missing',
+	'cache.heading.image' => 'IMAGE',
+	'cache.heading.size' => 'SIZE',
+	'cache.heading.last_used' => 'LAST USED',
+	'cache.heading.age' => 'AGE',
+	'logs.directory' => 'Logs directory: %(directory)s',
+	'logs.empty' => 'No job logs have been kept yet.',
+	'logs.none_older' => 'No job logs are older than %(span)s.',
+	'logs.only_older' => 'Only job logs older than %(span)s.',
+	'logs.prune_hint' => 'Remove them with "action-run logs --prune".',
+	'logs.heading.run' => 'RUN',
+	'logs.heading.log' => 'LOG',
+	'logs.heading.size' => 'SIZE',
+	'logs.heading.age' => 'AGE',
+	# Printed by a child process between fork and exec.
+	'process.redirect_failed' => "Unable to redirect %(stream)s to '%(file)s': %(error)s",
+	'process.exec_failed' => "Unable to run '%(program)s': %(error)s",
 	# The runner and its parts.  A text that begins with "action-run: " is a
 	# warning printed as it stands; the others are part of a longer line or
 	# are reported by the caller, which adds the prefix.
@@ -133,6 +161,7 @@ my %MESSAGES = (
 	'runner.dependency_cycle' => "Dependency cycle involving job '%(job)s'",
 	'runner.unknown_job' => "Unknown job '%(job)s'",
 	'runner.need_not_selected' => "action-run: job '%(job)s' needs '%(need)s', which was not selected; assuming it succeeded",
+	'runner.env_cycle' => "Environment variable '%(name)s' refers to itself, directly or through other variables",
 	'runner.env_failed' => "Unable to evaluate environment variable '%(name)s': %(error)s",
 	'runner.write_failed' => 'Unable to write %(what)s: %(error)s',
 	'runner.file_write_failed' => "Unable to write '%(file)s': %(error)s",
@@ -168,7 +197,6 @@ my %MESSAGES = (
 	'runner.job.if_failed' => "action-run: unable to evaluate if for '%(name)s': %(error)s",
 	'runner.job.skipped' => '==> Job: %(name)s (skipped)',
 	'runner.job.fail_fast' => '==> Job: %(name)s (skipped by fail-fast)',
-	'runner.job.no_result' => 'the job did not report a result',
 	'runner.job.continue_failed' => "action-run: unable to evaluate continue-on-error for '%(name)s': %(error)s",
 	'runner.job.continued' => '!! Job failed but continue-on-error is set: %(name)s',
 	'runner.job.not_linux' => "==> Job: %(name)s (skipped: runs-on '%(runs_on)s' is not Linux)",
@@ -177,7 +205,6 @@ my %MESSAGES = (
 	'runner.job.no_image' => "Unable to determine a container image for job '%(name)s'",
 	'runner.job.image' => '    image: %(image)s',
 	'runner.job.deferred' => '  deferred  %(expression)s (%(source)s)',
-	'runner.job.did_not_run' => 'job did not run',
 
 	'runner.parallel.did_not_run' => "job '%(name)s' did not run",
 	'runner.parallel.dup_failed' => 'Unable to duplicate %(handle)s',
@@ -185,6 +212,7 @@ my %MESSAGES = (
 
 	'runner.service.not_mapping' => "Service '%(id)s' must be a mapping",
 	'runner.service.no_image' => "Service '%(id)s' has no image",
+	'runner.options_invalid' => "Unable to read the container options '%(options)s': a quote is not closed",
 	'runner.service.credentials' => "action-run: service '%(id)s' credentials are not supported; using the local Docker login",
 	'runner.service.start_failed' => "Failed to start service '%(id)s' (exit %(status)s)",
 	'runner.what.service' => "Service '%(id)s'",
@@ -208,7 +236,6 @@ my %MESSAGES = (
 	'runner.container.daemon_silent' => '%(state)s; the daemon said nothing',
 	'runner.container.daemon_said' => '%(state)s; the daemon said:',
 	'runner.fault.image' => "the image '%(image)s'",
-	'runner.fault.image_unnamed' => 'the image',
 	'runner.fault.port' => 'the published port',
 	'runner.fault.entrypoint' => "the entrypoint '%(entrypoint)s'",
 
@@ -253,6 +280,7 @@ my %MESSAGES = (
 	'runner.unsupported.skipped' => "action '%(action)s' skipped: %(reason)s",
 	'runner.unsupported.note' => '    (skipped: %(reason)s)',
 	'runner.docker_action.no_image' => "Docker action '%(uses)s' in job '%(job)s' has no image name; check the expression it uses",
+	'runner.docker_action.bad_args' => "Unable to read the args of '%(uses)s' ('%(args)s'): a quote is not closed",
 	'runner.docker_action.bad_image' => "Docker action '%(uses)s' in job '%(job)s' resolved to '%(image)s', which is not an image name; check the expression it uses",
 	'runner.docker_action.exited' => 'docker action exited with status %(status)s',
 	'runner.local_action.missing' => "Local action '%(uses)s' does not exist (looked in %(dir)s)",
@@ -270,6 +298,7 @@ my %MESSAGES = (
 	'runner.logs.kept' => 'Job logs kept in %(dir)s',
 	'runner.logs.keep_failed' => 'action-run: could not keep the job logs: %(error)s',
 	'runner.logs.copy_failed' => "cannot copy '%(from)s' to '%(to)s': %(error)s",
+	'runner.logs.bad_name' => "'%(name)s' is not a plain file name",
 	'runner.kept.header' => 'Kept Docker resources:',
 	'runner.kept.container' => '  container %(name)s',
 	'runner.kept.network' => '  network %(name)s',

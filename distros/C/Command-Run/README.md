@@ -46,7 +46,7 @@ Command::Run - Execute external command or code reference
 
 # VERSION
 
-Version 1.03
+Version 1.04
 
 # DESCRIPTION
 
@@ -255,7 +255,7 @@ STDOUT, STDERR, and STDIN file descriptors to temporary files using
     open $save, '>&', \*STDOUT;           # save original
     open STDOUT, '>&', $tmpfile;          # redirect to tmpfile
     $code->(@args);                       # execute code ref
-    open STDOUT, '>&', $save;             # restore original
+    dup2(fileno($save), fileno(STDOUT));  # restore original
     $tmpfile->seek(0, 0);
     $output = do { local $/; <$tmpfile> }; # read captured output
 
@@ -286,10 +286,12 @@ conversion.
 ### PerlIO Encoding Layer Accumulation
 
 Nofork mode temporarily redirects the standard filehandles and
-restores them with `open FH, '>&', ...`.  Perl keeps the
-existing PerlIO layer stack when a filehandle is re-opened this way,
-and `binmode FH, ':encoding(utf8)'` pushes a new layer even when one
-is already present.  In earlier versions of this module, the encoding
+restores them with `open FH, '>&', ...`.  A handle on file
+descriptor 0, 1 or 2 keeps its existing PerlIO layer stack across such
+a re-open -- ordinary handles adopt the layer stack of the dup source
+instead -- and `binmode FH, ':encoding(utf8)'` pushes a new layer even
+when one is already present.  In earlier versions of this module, the
+encoding
 layer pushed on each execution therefore accumulated on STDIN/STDOUT
 one layer per execution, making long-running processes progressively
 slower (nofork could end up slower than fork) and growing memory
@@ -297,10 +299,11 @@ without bound.  See
 [https://github.com/kaz-utashiro/perl-perlio-leak-bench](https://github.com/kaz-utashiro/perl-perlio-leak-bench) for the
 underlying Perl behavior.
 
-This is fixed: the layer change is now undone before the handles are
-restored, so the layer stack of the standard filehandles stays
-exactly as the caller left it.  With the fix, nofork is much faster
-than fork in either mode, and most of the historical gap between
+This is fixed in 1.02: the layer change is now undone before the
+handles are restored, so the layer stack of the standard filehandles
+stays exactly as the caller left it.  With the fix, nofork is much
+faster than fork in either mode, and most of the historical gap
+between
 `:encoding` and raw mode (which was caused by the accumulation) is
 gone:
 
@@ -309,6 +312,24 @@ gone:
     fork:                    495/s (baseline)
     nofork + :encoding:   15,997/s (32x)
     nofork + :utf8 (raw): 20,038/s (40x)
+
+### Output Side of Character Devices
+
+Re-opening a handle over a dup has a second effect besides the
+accumulation above.  When the handle writes to a **character device**
+(a terminal, `/dev/null`), perl gives it a new output-side PerlIO with
+no layers; only the input side receives the dup source's layer stack.
+After `open STDOUT, '>&', $save` on a terminal, the caller's
+later output therefore bypasses its `:encoding(utf8)`: non-ASCII text
+produces `Wide character` warnings, other encodings produce wrong
+bytes.  `PerlIO::get_layers(STDOUT)` still shows the layer, because it
+reports the input side by default (pass `output => 1` to see the
+output side).  Pipes and regular files are not affected.
+
+Since 1.04, STDOUT and STDERR are restored with `dup2()` on the file
+descriptor instead of being re-opened, which leaves the PerlIO object
+and its layers in place.  STDIN has no output side and is still
+restored with `open`.
 
 ## Zero-Modification Callee Integration
 

@@ -11,6 +11,8 @@ use Encode qw( encode is_utf8 );
 use MIME::Base64 qw( encode_base64 );
 use Scalar::Util qw( blessed weaken );
 
+use Net::Async::MCP::JSONRPC;
+
 
 # The methods whose name-ish parameter is mirrored into Mcp-Name, and the
 # parameter it is taken from. Same table as MCP::Client and MCP::Server's HTTP
@@ -56,6 +58,12 @@ sub _init {
   # stream to close.
   $self->{subscriptions} = {};
 
+  # Exchanges this transport starts on its own and nobody waits for - the
+  # answer to a request the server sent, the notifications/cancelled of a
+  # cancelled legacy request - held until they finish, since a Future nothing
+  # refers to is collected mid-flight.
+  $self->{background} = {};
+
   $self->SUPER::_init($params);
 }
 
@@ -65,10 +73,9 @@ sub configure {
     $self->{url} = delete $params{url};
   }
   $self->{headers} = delete $params{headers} if exists $params{headers};
-  $self->{on_notification} = delete $params{on_notification}
-    if exists $params{on_notification};
-  $self->{on_subscription_end} = delete $params{on_subscription_end}
-    if exists $params{on_subscription_end};
+  for my $event (qw( on_notification on_subscription_end on_request )) {
+    $self->{$event} = delete $params{$event} if exists $params{$event};
+  }
   for my $key (qw( timeout stall_timeout )) {
     next unless exists $params{$key};
     $self->{$key} = delete $params{$key};
@@ -122,6 +129,11 @@ sub _remove_from_loop {
     $exchange->cancel if $exchange && !$exchange->is_ready;
   }
 
+  for my $future (values %{ $self->{background} }) {
+    $future->cancel unless $future->is_ready;
+  }
+  $self->{background} = {};
+
   $self->SUPER::_remove_from_loop($loop);
 }
 
@@ -156,6 +168,10 @@ sub send_request {
     $body,
   );
 
+  # The session this request is made in, if any: a 404 to it means the server
+  # ended that session, and only that session - see _handle_response.
+  $options{sent_session} = $http_req->header('Mcp-Session-Id');
+
   # The Future the caller holds, and deliberately not the one the exchange
   # below ends in. What answers a request is its message, and the end of the
   # body that message arrived in is a different moment: a server is free to
@@ -170,18 +186,30 @@ sub send_request {
   my $exchange = $self->{http}->do_request(
     request   => $http_req,
     on_header => sub { $self->_response_reader($outcome, $id, \%options, @_) },
-  )->then(sub {
-    my ( $result ) = @_;
+  )->then(
+    sub {
+      my ( $result ) = @_;
 
-    # Both body readers end in the Future for the JSON-RPC outcome, and
-    # Net::Async::HTTP passes whatever they return through as the result of
-    # its own. A response object instead means the body never reached them:
-    # a redirect, which it consumes itself rather than handing over - it does
-    # not follow one for a POST, so this is where a redirected endpoint ends
-    # up, and the status line is all there is to report.
-    return $result if blessed($result) && $result->isa('Future');
-    return $self->_handle_response($result);
-  });
+      # Both body readers end in the Future for the JSON-RPC outcome, and
+      # Net::Async::HTTP passes whatever they return through as the result of
+      # its own. A response object instead means the body never reached them:
+      # a redirect, which it consumes itself rather than handing over - it does
+      # not follow one for a POST, so this is where a redirected endpoint ends
+      # up, and the status line is all there is to report.
+      return $result if blessed($result) && $result->isa('Future');
+      return $self->_handle_response($result, $options{sent_session});
+    },
+    sub {
+      my ( $message, $category, @details ) = @_;
+
+      # Net::Async::HTTP failing on its own means no answer came: the
+      # connection could not be made, broke off or timed out. It reports a
+      # refused connection or an unknown host with no category at all, which
+      # would make it look like a status line - a server's answer - so it is
+      # given one here.
+      return Future->fail($message, $category // 'connect', @details);
+    },
+  );
 
   # Held on the transport because the caller no longer holds it: a Future
   # nothing refers to is collected mid-flight, and this one is the request.
@@ -198,8 +226,15 @@ sub send_request {
   # notifications/cancelled in this binding. Reached through the pending table
   # rather than by capturing the exchange, which would be the other half of
   # the same cycle.
+  #
+  # The legacy revisions say otherwise: a closed stream is not a cancellation
+  # there, and the server is told with notifications/cancelled instead. The
+  # stream is closed all the same, there being nobody left to read it.
   $outcome->on_cancel(sub {
     my $self = $weak_self or return;
+    $self->_in_background($self->send_notification('notifications/cancelled',
+      { requestId => $id, reason => 'cancelled by the client' }))
+      if $self->{legacy} && $self->{http};
     my $exchange = ( $self->{pending}{$id} // {} )->{exchange} or return;
     $exchange->cancel unless $exchange->is_ready;
   });
@@ -261,9 +296,10 @@ sub send_notification {
     $body,
   );
 
+  my $sent_session = $http_req->header('Mcp-Session-Id');
   return $self->{http}->do_request(request => $http_req)->then(sub {
     my ( $response ) = @_;
-    return $self->_handle_notification_response($response);
+    return $self->_handle_notification_response($response, $sent_session);
   });
 }
 
@@ -271,7 +307,36 @@ sub send_notification {
 sub close {
   my ( $self ) = @_;
   $self->stop_subscription($_) for keys %{ $self->{subscriptions} };
-  return Future->done;
+
+  my $session = delete $self->{session_id};
+  return Future->done unless defined $session && $self->{http};
+
+  require HTTP::Request;
+  my @headers = (
+    'Mcp-Session-Id' => $session,
+    defined $self->{legacy_protocol_version}
+      ? ( 'MCP-Protocol-Version' => $self->{legacy_protocol_version} ) : (),
+  );
+  my $http_req = HTTP::Request->new(DELETE => $self->{url},
+    [ $self->_caller_headers(@headers), @headers ]);
+
+  # 405 is the answer the specification gives a server that lets no client end
+  # its session, and 404 one whose session is already gone: either way there is
+  # no session left on this side, which is all a close is after.
+  return $self->{http}->do_request(request => $http_req)->then(
+    sub {
+      my ( $response ) = @_;
+      my $code = $response->code;
+      return Future->done
+        if $response->is_success || $code == 404 || $code == 405;
+      return Future->fail("MCP HTTP session $session could not be ended: "
+        . $response->status_line);
+    },
+    sub {
+      my ( $message ) = @_;
+      return Future->fail("MCP HTTP session $session could not be ended: $message");
+    },
+  );
 }
 
 
@@ -290,7 +355,33 @@ sub stop_subscription {
 sub is_alive { 1 }
 
 
-sub mirrors_header_params { 1 }
+sub mirrors_header_params { $_[0]->{legacy} ? 0 : 1 }
+
+
+sub start_legacy_session {
+  my ( $self ) = @_;
+  $self->{legacy} = 1;
+  delete $self->{legacy_protocol_version};
+  delete $self->{session_id};
+  return;
+}
+
+
+sub set_legacy_protocol_version {
+  my ( $self, $version ) = @_;
+  $self->{legacy_protocol_version} = $version;
+  return;
+}
+
+
+sub end_legacy_session {
+  my ( $self ) = @_;
+  delete @{$self}{qw( legacy legacy_protocol_version session_id )};
+  return;
+}
+
+
+sub session_id { $_[0]->{session_id} }
 
 
 
@@ -302,13 +393,26 @@ sub mirrors_header_params { 1 }
 sub _response_reader {
   my ( $self, $outcome, $id, $options, $header ) = @_;
 
+  # The answer to the initialize that opens a legacy session is where the
+  # session id is handed out, in a header of the response rather than in the
+  # message, so it is taken here before the body is read at all.
+  if ($options->{start_session} && $header->is_success) {
+    my $session = $header->header('Mcp-Session-Id');
+    if (defined $session && $session !~ /\A[\x21-\x7e]+\z/) {
+      $outcome->fail("MCP HTTP server sent an Mcp-Session-Id that is not visible "
+        . "ASCII, which the specification requires");
+      return sub { return $outcome };
+    }
+    $self->{session_id} = $session;
+  }
+
   return $self->_sse_reader($outcome, $id, $options)
     if $header->is_success
     && ($header->content_type // '') =~ m{^text/event-stream}i;
 
   return sub {
     return $header->add_content(@_) if @_;
-    return $self->_handle_response($header);
+    return $self->_handle_response($header, $options->{sent_session});
   };
 }
 
@@ -383,11 +487,13 @@ sub _sse_reader {
     # than at the end of the body: a stream holds the answer to exactly one
     # request, so the first one is kept and what comes after cannot make an
     # earlier answer untrue. An id without a result or an error is a
-    # server-initiated request, which this client does not answer, so it is
-    # dropped.
-    $self->_settle_response($outcome, $decoded)
-      if !$outcome->is_ready
-      && (exists $decoded->{result} || exists $decoded->{error});
+    # server-initiated request, which goes to on_request.
+    unless (exists $decoded->{result} || exists $decoded->{error}) {
+      $self->_on_server_request($decoded) if defined $decoded->{method};
+      return;
+    }
+
+    $self->_settle_response($outcome, $decoded) unless $outcome->is_ready;
 
     return;
   };
@@ -417,6 +523,59 @@ sub _sse_reader {
   };
 }
 
+# A request the server sent on a response stream, answered with whatever
+# on_request returns, if anything. The answer is a POST of its own - there is
+# no other way back to the server - carrying the session like every POST.
+sub _on_server_request {
+  my ( $self, $request ) = @_;
+  return unless $self->can_event('on_request');
+
+  my $answer = $self->invoke_event(on_request => $request);
+  return unless ref $answer eq 'HASH'
+    && ( exists $answer->{result} || exists $answer->{error} );
+  return unless $self->{http};
+
+  my $response = {
+    jsonrpc => '2.0',
+    id      => $request->{id},
+    exists $answer->{error}
+      ? ( error  => $answer->{error} )
+      : ( result => $answer->{result} ),
+  };
+
+  # A response has no method of its own to name in Mcp-Method, which only a
+  # modern server would read and no modern server sends requests to answer.
+  my @headers = $self->_session_headers;
+  my @standard = (
+    'Content-Type' => 'application/json',
+    'Accept'       => 'application/json, text/event-stream',
+    @headers,
+  );
+
+  require HTTP::Request;
+  my $http_req = HTTP::Request->new(POST => $self->{url},
+    [ $self->_caller_headers(@standard), @standard ],
+    $self->{json}->encode($response));
+
+  $self->_in_background($self->{http}->do_request(request => $http_req));
+  return;
+}
+
+# Private: a Future nobody waits for, held until it is done - see the
+# background table in _init.
+sub _in_background {
+  my ( $self, $future ) = @_;
+  my $key = "$future";
+  $self->{background}{$key} = $future;
+
+  weaken( my $weak_self = $self );
+  $future->on_ready(sub {
+    my $self = $weak_self or return;
+    delete $self->{background}{$key};
+  });
+  return;
+}
+
 # The answer an event carrying one settles the request with, taken as it lands
 # rather than held until the stream ends.
 sub _settle_response {
@@ -427,6 +586,12 @@ sub _settle_response {
     return $outcome->fail(@failure) if @failure;
     return $outcome->fail($self->_foreign_error_message($err));
   }
+
+  # "error": null sits next to every result in JSON-RPC 1.0 and says nothing
+  # there. Without a result it answers nothing, and an undef handed out as the
+  # result would be a success the server never reported.
+  return $outcome->fail($self->_null_error_message)
+    if exists $data->{error} && !exists $data->{result};
 
   return $outcome->done($data->{result});
 }
@@ -504,6 +669,14 @@ sub _standard_headers {
     'Accept'       => 'application/json, text/event-stream',
   );
 
+  # A legacy session describes itself with its session id and the revision
+  # agreed on, and nothing about the request is mirrored - those headers are
+  # the modern revision's. The request opening the session has neither yet.
+  if ($self->{legacy}) {
+    push @headers, $self->_session_headers unless $options{start_session};
+    return ( $self->_caller_headers(@headers), @headers );
+  }
+
   # Absent for a request built without _meta, and for a notification sent
   # through send_notification with no params at all - this client sends none
   # itself, but the method stays open to callers. Sending a made up version
@@ -532,24 +705,43 @@ sub _standard_headers {
   return ( $self->_caller_headers(@headers), @headers );
 }
 
+# The headers that place a POST in a legacy session: its id, where the server
+# assigned one, and the revision agreed on, once there is one.
+sub _session_headers {
+  my ( $self ) = @_;
+  return (
+    defined $self->{session_id}
+      ? ( 'Mcp-Session-Id' => $self->{session_id} ) : (),
+    defined $self->{legacy_protocol_version}
+      ? ( 'MCP-Protocol-Version' => $self->{legacy_protocol_version} ) : (),
+  );
+}
+
+# The headers only this transport sets, whether or not a given request carries
+# them: a caller's version of one would at best be ignored and at worst put a
+# request into a session or a revision it is not in.
+my %RESERVED_HEADERS = map { $_ => 1 }
+  qw( mcp-session-id mcp-protocol-version mcp-method mcp-name );
+
 # The headers configured on this transport, minus every field the request
-# derives from its body. Dropping them is not the same as ordering them:
-# HTTP::Headers keeps a field given twice in one list as two values of one
-# header rather than letting the later win, so a colliding caller header would
-# travel alongside the derived one and diverge from the body just as visibly.
+# derives from its body and every one reserved above. Dropping them is not the
+# same as ordering them: HTTP::Headers keeps a field given twice in one list as
+# two values of one header rather than letting the later win, so a colliding
+# caller header would travel alongside the derived one and diverge from the
+# body just as visibly.
 sub _caller_headers {
   my ( $self, @derived ) = @_;
 
   my $headers = $self->{headers};
   return () unless ref $headers eq 'HASH';
 
-  my %derived;
+  my %derived = %RESERVED_HEADERS;
   for (my $i = 0; $i < @derived; $i += 2) {
     $derived{ lc $derived[$i] } = 1;
   }
 
   return map  { $_ => $headers->{$_} }
-         grep { !$derived{ lc $_ } }
+         grep { !$derived{ lc $_ } && !/^mcp-param-/i }
          sort keys %$headers;
 }
 
@@ -566,9 +758,13 @@ sub _encode_header {
 }
 
 sub _handle_response {
-  my ( $self, $response ) = @_;
+  my ( $self, $response, $sent_session ) = @_;
 
   my $status = $response->code;
+
+  if (my @expired = $self->_session_expired($response, $sent_session)) {
+    return Future->fail(@expired);
+  }
 
   unless ($response->is_success) {
     # An MCP server renders JSON-RPC errors with a non-2xx status taken from
@@ -608,15 +804,36 @@ sub _handle_response {
 # normal case. Deliberately not routed through _handle_response, which would
 # fail exactly that empty body as invalid JSON.
 sub _handle_notification_response {
-  my ( $self, $response ) = @_;
+  my ( $self, $response, $sent_session ) = @_;
 
   return Future->done if $response->is_success;
+
+  if (my @expired = $self->_session_expired($response, $sent_session)) {
+    return Future->fail(@expired);
+  }
 
   if (my @failure = $self->_jsonrpc_error_from_body($response)) {
     return Future->fail(@failure);
   }
 
   return Future->fail("MCP HTTP error: " . $response->status_line);
+}
+
+# The failure of a POST the server answered with 404 although it carried a
+# legacy session id, or nothing. The specification has a client read that
+# status as the end of the session whatever the body says, so the session is
+# forgotten - unless a newer one has replaced it meanwhile, which a 404 to the
+# old one says nothing about - and the failure names it, for the client to
+# start a new one.
+sub _session_expired {
+  my ( $self, $response, $sent_session ) = @_;
+  return unless defined $sent_session && $response->code == 404;
+
+  delete $self->{session_id}
+    if defined $self->{session_id} && $self->{session_id} eq $sent_session;
+
+  return ("MCP HTTP session $sent_session not found (" . $response->status_line . ")",
+    mcp_session_expired => $sent_session);
 }
 
 sub _jsonrpc_error_from_body {
@@ -629,28 +846,16 @@ sub _jsonrpc_error_from_body {
   return $self->_jsonrpc_error_failure($data);
 }
 
+# Private: the class that reads the error of a response, named once.
+sub _jsonrpc_class { 'Net::Async::MCP::JSONRPC' }
+
 # The Future->fail arguments for a decoded body that carries a JSON-RPC error
-# object, and the empty list for anything else. Not every JSON error body is a
-# JSON-RPC one: an MCP server answers a bad method with
-# {error => 'Method not allowed'}, and a gateway in between may invent its own
-# shape, so the shape is checked before it is read as an object.
-#
-# The message alone cannot carry a code to switch on or an error->{data} to
-# read, so the raw error object travels with it as the details of a failure in
-# category "mcp". The message stays the first element, so a caller reading the
-# failure in scalar context sees exactly what it saw before.
+# object, and the empty list for anything else - see
+# Net::Async::MCP::JSONRPC, which the stdio transport reads its answers with
+# too.
 sub _jsonrpc_error_failure {
   my ( $self, $data ) = @_;
-
-  return () unless ref $data eq 'HASH';
-
-  my $err = $data->{error};
-  return () unless ref $err eq 'HASH' && defined $err->{code};
-
-  return (
-    "MCP error $err->{code}: " . ($err->{message} // '(no message)'),
-    mcp => $err,
-  );
+  return $self->_jsonrpc_class->error_failure($data);
 }
 
 # A body that says "error" in a shape this client cannot read as JSON-RPC still
@@ -658,10 +863,11 @@ sub _jsonrpc_error_failure {
 # holds rather than reaching into it as if it were an object.
 sub _foreign_error_message {
   my ( $self, $err ) = @_;
-
-  my $text = ref $err ? eval { $self->{json}->encode($err) } // 'unknown error' : $err;
-  return "MCP HTTP error response: $text";
+  return 'MCP HTTP error response: '.$self->_jsonrpc_class->error_text($err);
 }
+
+# An "error": null with no result beside it, which answers nothing.
+sub _null_error_message { 'MCP HTTP invalid response: a null error and no result' }
 
 sub _handle_json_response {
   my ( $self, $body ) = @_;
@@ -675,6 +881,10 @@ sub _handle_json_response {
     return Future->fail(@failure) if @failure;
     return Future->fail($self->_foreign_error_message($err));
   }
+
+  # The null error of _settle_response, read the same in a whole JSON body.
+  return Future->fail($self->_null_error_message)
+    if exists $data->{error} && !exists $data->{result};
 
   return Future->done($data->{result});
 }
@@ -705,7 +915,7 @@ Net::Async::MCP::Transport::HTTP - Streamable HTTP MCP transport via Net::Async:
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 
@@ -727,13 +937,15 @@ over HTTP using the Streamable HTTP transport defined in the MCP specification
 responses may arrive as either C<application/json> or C<text/event-stream>
 (Server-Sent Events).
 
-There is no session to manage. The current revision is stateless: it dropped
-protocol sessions and the C<Mcp-Session-Id> header entirely, and every request
-describes itself through its own C<_meta>. A conforming server must ignore that
-header and never mint or echo a session ID, so this transport neither sends nor
-reads one.
+It speaks the binding of both protocol eras L<Net::Async::MCP> speaks, and the
+client tells it which one - see L</Legacy sessions>. In the modern revision
+there is no session to manage. It is stateless: it dropped protocol sessions
+and the C<Mcp-Session-Id> header entirely, and every request describes itself
+through its own C<_meta>. A conforming server must ignore that header and never
+mint or echo a session ID, so in the modern binding this transport neither
+sends nor reads one.
 
-The revision mirrors a request's metadata into HTTP headers so that
+The modern revision mirrors a request's metadata into HTTP headers so that
 intermediaries can route on it without parsing the body:
 C<MCP-Protocol-Version>, C<Mcp-Method>, and for the three methods with a
 name-ish parameter (C<tools/call>, C<prompts/get>, C<resources/read>) also
@@ -759,6 +971,59 @@ subscription does. See L</Subscriptions>.
 This transport is selected automatically by L<Net::Async::MCP> when constructed
 with a C<url> argument.
 
+=head2 Legacy sessions
+
+The handshake-based revisions C<2025-03-26> to C<2025-11-25> speak Streamable
+HTTP with a session, and L<Net::Async::MCP> switches this transport to that
+binding when its handshake settles on one of them:
+
+=over 4
+
+=item *
+
+The C<initialize> request goes out without a session id and without an
+C<MCP-Protocol-Version>, the revision not being agreed yet. An
+C<Mcp-Session-Id> on its response is the session, and travels on every later
+POST - requests, notifications, the answers to requests the server sent - and
+on the C<DELETE> of L</close>. A server that sends none runs without one.
+
+=item *
+
+Every POST after the handshake carries C<MCP-Protocol-Version> with the agreed
+revision, even for C<2025-03-26>, which predates the header: a server of that
+revision ignores a header it does not know, and one of a later revision
+requires it.
+
+=item *
+
+There is no C<Mcp-Method>, C<Mcp-Name> or C<Mcp-Param-{Name}>: those are the
+modern revision's, so L</mirrors_header_params> is false.
+
+=item *
+
+A request the server sends on a response stream - C<ping> above all - is
+handed to L</on_request>, and its answer is POSTed back.
+
+=item *
+
+Cancelling a request sends C<notifications/cancelled> naming it, as these
+revisions want, besides closing its stream.
+
+=item *
+
+A C<404> to a POST that carried a session id means the server ended the
+session. The request fails in category C<mcp_session_expired>, with the
+expired session id as its detail, and the session is forgotten;
+L<Net::Async::MCP> then starts a new session and sends the request once more.
+
+=back
+
+Out of scope: the standalone C<GET> stream a server may offer for messages
+outside any request, resuming a broken stream with C<Last-Event-ID>, and the
+HTTP+SSE transport of C<2024-11-05>, which predates Streamable HTTP - a
+C<2024-11-05> server is reachable over stdio. A Streamable HTTP server that
+agrees on C<2024-11-05> in its C<initialize> answer is accepted.
+
 =head2 new
 
     my $transport = Net::Async::MCP::Transport::HTTP->new(
@@ -775,11 +1040,15 @@ C<headers> is a HashRef of headers added to every POST - the place for
 everything the protocol does not describe, an C<Authorization: Bearer ...> for
 a server behind OAuth above all. They go on the request underneath the headers
 this transport derives from the body, so a caller can add its own but cannot
-replace C<MCP-Protocol-Version>, C<Mcp-Method>, C<Mcp-Name> or an
-C<Mcp-Param-{Name}>: a header that disagrees with the body is exactly what a
-conforming server answers with C<-32020>. A colliding header is dropped rather
-than sent alongside the derived one, which would be the same divergence in
-another shape.
+set C<MCP-Protocol-Version>, C<Mcp-Method>, C<Mcp-Name>, an
+C<Mcp-Param-{Name}> or C<Mcp-Session-Id>: a header that disagrees with the
+body is exactly what a conforming server answers with C<-32020>, and a session
+id or protocol version of the caller's own would put a request into a session
+or a revision this transport is not in. A header of one of these names is
+dropped, whether or not the request carries one of its own, rather than sent
+alongside the derived one, which would be the same divergence in another shape.
+That holds for the legacy binding too, where C<Authorization> and every other
+header travels as it does in the modern one.
 
 C<timeout> and C<stall_timeout> are handed to the underlying
 L<Net::Async::HTTP>, in seconds. C<stall_timeout> defaults to 60 and is the
@@ -825,6 +1094,13 @@ requests are answered by a notification is MCP semantics, and a transport
 deciding for itself would be guessing where it can be told. See
 L</Subscriptions> for the whole shape.
 
+C<start_session>, when true, marks the request that opens a legacy session -
+the C<initialize>: it goes out without C<Mcp-Session-Id> and
+C<MCP-Protocol-Version>, and the C<Mcp-Session-Id> of its response becomes the
+session, replacing any before it. A session id that is not visible ASCII, as
+the specification requires, fails the request rather than being sent on every
+later one. See L</Legacy sessions>.
+
 Returns a L<Future> that resolves to the C<result> value from the JSON-RPC
 response. Handles both C<application/json> and C<text/event-stream> response
 content types.
@@ -855,7 +1131,10 @@ with the HTTP status line.
 An C<error> member that is not a JSON-RPC error object - a bare string, as
 L<MCP::Server>'s own HTTP transport renders its refusals, or whatever shape a
 gateway in between invents - fails the L<Future> as well, carrying the text the
-body held.
+body held. A C<"error": null> next to a C<result> is a success, as JSON-RPC 1.0
+wrote it; without one it fails with
+C<MCP HTTP invalid response: a null error and no result>, in a JSON body and
+on an event stream alike.
 
 A JSON-RPC error fails the L<Future> with more than its message, wherever in
 the body or the stream it was found. L<Future>'s failure convention is
@@ -874,12 +1153,26 @@ The C<mcp> category marks a genuine JSON-RPC error from the server and nothing
 else. The failures around it - the HTTP status line, an unreadable or
 unexpected body, the foreign C<error> shape above, and a stream that ended
 without a response - carry their message alone, so a caller that finds no
-category knows there is no server error object behind it.
+category knows there is no server error object behind it, and that the server
+did answer. A request that got no answer at all - a connection that could not
+be made or broke off, a timeout - fails with the category L<Net::Async::HTTP>
+gave it (C<http>, C<timeout>, ...), or C<connect> where it gave none, as it
+does for a refused connection or an unknown host. That difference is what
+L<Net::Async::MCP/initialize> tells a legacy server's refusal from an
+unreachable one by.
 
 Cancelling the returned L<Future> cancels the request by closing the stream it
-would have been answered on, which is what cancellation is over Streamable
-HTTP: this binding defines no C<notifications/cancelled>, so nothing is sent -
-see L<Net::Async::MCP::Transport::Stdio/send_request> for the other form.
+would have been answered on, which is what cancellation is over modern
+Streamable HTTP: this binding defines no C<notifications/cancelled>, so nothing
+is sent - see L<Net::Async::MCP::Transport::Stdio/send_request> for the other
+form. In a legacy session that other form is the one the revision asks for, and
+a C<notifications/cancelled> naming the request is POSTed as well.
+
+A C<404> to a request that carried a legacy session id fails it with
+C<MCP HTTP session SESSION not found (404 Not Found)> in category
+C<mcp_session_expired>, the session id being its detail, whatever the body
+says: the specification has a client read that status as the end of the
+session.
 
 Removing the transport from its L<IO::Async::Loop> while the request is still
 pending fails it with C<MCP HTTP transport left the loop before the request
@@ -965,24 +1258,36 @@ body without one falls back to the HTTP status line. Such an error carries the
 C<mcp> category and the raw error object like any other, as described under
 L</send_request>.
 
-The revision defines no header requirements for notification POSTs, so a
-notification carries whatever its body supports and nothing more: always
+The modern revision defines no header requirements for notification POSTs, so
+a notification carries whatever its body supports and nothing more: always
 C<Mcp-Method>, and C<MCP-Protocol-Version> only when the notification has an
-C<_meta> to take it from.
+C<_meta> to take it from. In a legacy session it carries what every POST of
+the session does - C<Mcp-Session-Id> and the agreed C<MCP-Protocol-Version> -
+and a C<404> to it ends the session the same way as for L</send_request>.
 
 =head2 close
 
     my $future = $transport->close;
 
-Ends every subscription still running and returns an immediately resolved
-L<Future>.
+Ends every subscription still running and, in a legacy session, the session
+itself, and returns a L<Future> for that.
 
-Nothing is sent. There is no session to terminate, since the current revision
-is stateless and each request stands on its own, and a server on this revision
-answers C<DELETE> on the MCP endpoint with C<405 Method Not Allowed>. What
-there is to end are the streams L</send_request> opened for a subscription:
-those are the one thing this transport holds that outlives the request that
-started it, and closing the stream is what unsubscribes.
+In the modern revision nothing is sent and the L<Future> is resolved
+immediately. There is no session to terminate, since that revision is
+stateless and each request stands on its own, and a server on it answers
+C<DELETE> on the MCP endpoint with C<405 Method Not Allowed>. What there is to
+end are the streams L</send_request> opened for a subscription: those are the
+one thing this transport holds that outlives the request that started it, and
+closing the stream is what unsubscribes.
+
+In a legacy session with a session id - see L</Legacy sessions> - the session
+is ended with a C<DELETE> carrying it, as the specification asks a client that
+is done to do, and the L<Future> resolves with its answer. A C<405>, which a
+server that does not let clients end sessions answers, and a C<404>, for a
+session already gone, both count as ended. Any other status, and a request
+that could not be made at all, fail the L<Future> with
+C<MCP HTTP session SESSION could not be ended: REASON> - reported, not thrown,
+and the session is forgotten on this side either way.
 
 Requests still in flight are left alone. Their caller holds a L<Future> and is
 waiting for an answer that may well still arrive, and a close is not a reason
@@ -1030,12 +1335,46 @@ L<Net::Async::MCP/ping> for its transport-level liveness check.
 
     my $mirrors = $transport->mirrors_header_params;
 
-Always true: this binding mirrors tool arguments annotated with
+True in the modern binding: it mirrors tool arguments annotated with
 C<x-mcp-header> into C<Mcp-Param-{Name}> headers, so
 L<Net::Async::MCP/call_tool> has to resolve them from the tool's input schema
 before calling L</send_request> - and is worth fetching a tool list for when it
-does not know the schema yet. The other transports answer false and are spared
-that request.
+does not know the schema yet. False in a legacy session, which has no such
+headers; the other transports answer false too and are spared that request.
+
+=head2 start_legacy_session
+
+    $transport->start_legacy_session;
+
+Switches this transport to the binding of the legacy revisions and forgets any
+session and protocol version it held, ready for the C<initialize> that opens a
+session - see L</Legacy sessions>. Called by L<Net::Async::MCP> before every
+legacy handshake, the one that starts a new session after a C<404> included.
+
+=head2 set_legacy_protocol_version
+
+    $transport->set_legacy_protocol_version('2025-06-18');
+
+The revision the legacy handshake agreed on, sent as C<MCP-Protocol-Version>
+on every POST of the session from then on. Called by L<Net::Async::MCP> as
+soon as the C<initialize> answer is accepted, so the
+C<notifications/initialized> carries it already.
+
+=head2 end_legacy_session
+
+    $transport->end_legacy_session;
+
+Switches back to the modern binding and forgets the session, without telling
+the server - which is what a legacy handshake that failed leaves behind. Use
+L</close> to end a session that was established.
+
+=head2 session_id
+
+    my $id = $transport->session_id;
+
+The C<Mcp-Session-Id> of the current legacy session, or undef where there is
+none: in the modern binding, before the handshake, after a C<404> ended the
+session, after L</close>, and with a server that assigns none.
 
 =head2 on_notification
 
@@ -1059,6 +1398,19 @@ Set through C<new> or C<configure> like any L<IO::Async::Notifier> event, or
 by a subclass implementing a method of this name. Notifications are dropped
 while nothing handles them: a server sends them whether or not this client
 asked, and there is nothing sensible to do with one no caller wants.
+
+=head2 on_request
+
+Invoked for every request the server sends on a response stream - an event
+with an C<id> and a C<method> but neither a C<result> nor an C<error> - with
+the decoded JSON-RPC request. A handler that returns a HashRef holding a
+C<result> or an C<error> has it POSTed back as the response to that request,
+in the session the stream belongs to; anything else leaves the request
+unanswered. Without a handler every such request is dropped.
+
+L<Net::Async::MCP> sets this to its own handler, which answers a legacy
+server's C<ping> and refuses the rest - see
+L<Net::Async::MCP::Transport::Stdio/on_request>, which works the same way.
 
 =head2 on_subscription_end
 

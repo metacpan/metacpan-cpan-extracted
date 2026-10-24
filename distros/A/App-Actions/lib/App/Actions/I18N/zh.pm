@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '0.001.0';
+our $VERSION = '0.002.0';
 
 # The Chinese catalogue: message key to text, or to a hash that chooses a
 # text by gender or plural category; see App::Actions::I18N for the shape.
@@ -89,6 +89,32 @@ my %MESSAGES = (
 	'logs.summary' => { plural => { other => '%(count)d 个日志，占用磁盘 %(size)s。' } },
 	'logs.removed' => { plural => { other => '已删除 %(count)d 个日志，释放 %(size)s。' } },
 	'logs.remove_failed' => { plural => { other => '无法删除 %(count)d 次运行：' } },
+	# The text listings of the cache and logs commands.
+	'span.just_now' => '刚刚',
+	'span.ago' => '%(span)s前',
+	'cache.file' => '缓存文件：%(file)s',
+	'cache.empty' => '尚未缓存任何镜像。',
+	'cache.none_older' => '没有超过 %(span)s 的缓存镜像。',
+	'cache.only_older' => '仅显示超过 %(span)s 的镜像。',
+	'cache.unreachable' => '无法连接 Docker 守护进程，因此大小未知。',
+	'cache.prune_hint' => '使用 "action-run cache --prune" 删除它们。',
+	'cache.unknown' => '未知',
+	'cache.size_missing' => '缺失',
+	'cache.heading.image' => '镜像',
+	'cache.heading.size' => '大小',
+	'cache.heading.last_used' => '上次使用',
+	'cache.heading.age' => '距今',
+	'logs.directory' => '日志目录：%(directory)s',
+	'logs.empty' => '尚未保留任何作业日志。',
+	'logs.none_older' => '没有超过 %(span)s 的作业日志。',
+	'logs.only_older' => '仅显示超过 %(span)s 的作业日志。',
+	'logs.prune_hint' => '使用 "action-run logs --prune" 删除它们。',
+	'logs.heading.run' => '运行',
+	'logs.heading.log' => '日志',
+	'logs.heading.size' => '大小',
+	'logs.heading.age' => '距今',
+	'process.redirect_failed' => "无法将 %(stream)s 重定向到 '%(file)s'：%(error)s",
+	'process.exec_failed' => "无法运行 '%(program)s'：%(error)s",
 	# The runner and its parts.  "action-run: " is the program's name and is
 	# not translated; the line markers (==>, ---, !!) are kept too.
 	'runner.workflow_required' => '必须提供工作流',
@@ -104,6 +130,7 @@ my %MESSAGES = (
 	'runner.dependency_cycle' => "作业 '%(job)s' 存在循环依赖",
 	'runner.unknown_job' => "未知作业 '%(job)s'",
 	'runner.need_not_selected' => "action-run: 作业 '%(job)s' 依赖未被选中的 '%(need)s'；假定其已成功",
+	'runner.env_cycle' => "环境变量 '%(name)s' 直接或通过其他变量引用了自身",
 	'runner.env_failed' => "无法求值环境变量 '%(name)s'：%(error)s",
 	'runner.write_failed' => '无法写入%(what)s：%(error)s',
 	'runner.file_write_failed' => "无法写入 '%(file)s'：%(error)s",
@@ -139,7 +166,6 @@ my %MESSAGES = (
 	'runner.job.if_failed' => "action-run: 无法求值 '%(name)s' 的 if：%(error)s",
 	'runner.job.skipped' => '==> 作业：%(name)s（已跳过）',
 	'runner.job.fail_fast' => '==> 作业：%(name)s（因 fail-fast 跳过）',
-	'runner.job.no_result' => '作业未报告结果',
 	'runner.job.continue_failed' => "action-run: 无法求值 '%(name)s' 的 continue-on-error：%(error)s",
 	'runner.job.continued' => '!! 作业失败，但设置了 continue-on-error：%(name)s',
 	'runner.job.not_linux' => "==> 作业：%(name)s（已跳过：runs-on '%(runs_on)s' 不是 Linux）",
@@ -148,7 +174,6 @@ my %MESSAGES = (
 	'runner.job.no_image' => "无法确定作业 '%(name)s' 的容器镜像",
 	'runner.job.image' => '    镜像：%(image)s',
 	'runner.job.deferred' => '  延后      %(expression)s（%(source)s）',
-	'runner.job.did_not_run' => '作业未运行',
 
 	'runner.parallel.did_not_run' => "作业 '%(name)s' 未运行",
 	'runner.parallel.dup_failed' => '无法复制 %(handle)s',
@@ -156,6 +181,7 @@ my %MESSAGES = (
 
 	'runner.service.not_mapping' => "服务 '%(id)s' 必须是映射",
 	'runner.service.no_image' => "服务 '%(id)s' 没有镜像",
+	'runner.options_invalid' => "无法读取容器选项 '%(options)s'：有引号未闭合",
 	'runner.service.credentials' => "action-run: 不支持服务 '%(id)s' 的凭据；将使用本地 Docker 登录",
 	'runner.service.start_failed' => "无法启动服务 '%(id)s'（退出码 %(status)s）",
 	'runner.what.service' => "服务 '%(id)s'",
@@ -179,7 +205,6 @@ my %MESSAGES = (
 	'runner.container.daemon_silent' => '%(state)s；守护进程没有给出任何信息',
 	'runner.container.daemon_said' => '%(state)s；守护进程报告：',
 	'runner.fault.image' => "镜像 '%(image)s'",
-	'runner.fault.image_unnamed' => '镜像',
 	'runner.fault.port' => '发布的端口',
 	'runner.fault.entrypoint' => "入口点 '%(entrypoint)s'",
 
@@ -224,6 +249,7 @@ my %MESSAGES = (
 	'runner.unsupported.skipped' => "已跳过操作 '%(action)s'：%(reason)s",
 	'runner.unsupported.note' => '    （已跳过：%(reason)s）',
 	'runner.docker_action.no_image' => "作业 '%(job)s' 中的 Docker 操作 '%(uses)s' 没有镜像名称；请检查它使用的表达式",
+	'runner.docker_action.bad_args' => "无法读取 '%(uses)s' 的 args（'%(args)s'）：有引号未闭合",
 	'runner.docker_action.bad_image' => "作业 '%(job)s' 中的 Docker 操作 '%(uses)s' 解析为 '%(image)s'，这不是镜像名称；请检查它使用的表达式",
 	'runner.docker_action.exited' => 'Docker 操作以状态 %(status)s 退出',
 	'runner.local_action.missing' => "本地操作 '%(uses)s' 不存在（查找位置：%(dir)s）",
@@ -241,6 +267,7 @@ my %MESSAGES = (
 	'runner.logs.kept' => '作业日志保存在 %(dir)s',
 	'runner.logs.keep_failed' => 'action-run: 无法保存作业日志：%(error)s',
 	'runner.logs.copy_failed' => "无法将 '%(from)s' 复制到 '%(to)s'：%(error)s",
+	'runner.logs.bad_name' => "'%(name)s' 不是简单的文件名",
 	'runner.kept.header' => '保留的 Docker 资源：',
 	'runner.kept.container' => '  容器 %(name)s',
 	'runner.kept.network' => '  网络 %(name)s',

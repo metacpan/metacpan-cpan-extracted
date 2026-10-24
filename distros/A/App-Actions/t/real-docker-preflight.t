@@ -29,6 +29,11 @@ plan skip_all => 'set LIVE_TESTING=1 to exercise the preflight against a real Do
 
 my $docker = defined $ENV{DOCKER} && length $ENV{DOCKER} ? $ENV{DOCKER} : 'docker';
 
+# Object::Configure reads the developer's own configuration files (~/.conf
+# and the like), where a UNIVERSAL logger would take the messages these tests
+# read off standard error.  An empty directory leaves the defaults in force.
+local $ENV{CONFIG_DIR} = tempdir(CLEANUP => 1);
+
 # A preflight keeps the images it pulls and records them, so point that record
 # at a temporary file rather than the test host's real image cache.
 local $ENV{ACTION_RUN_CACHE_FILE}

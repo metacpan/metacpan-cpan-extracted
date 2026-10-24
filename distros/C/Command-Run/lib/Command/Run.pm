@@ -1,11 +1,12 @@
 package Command::Run;
 
-our $VERSION = "1.03";
+our $VERSION = "1.04";
 
 use v5.14;
 use warnings;
 use utf8;
 use Carp;
+use POSIX ();
 use Fcntl;
 use IO::File;
 
@@ -221,35 +222,37 @@ sub _tmpfile {
 }
 
 ##
-## Remove an encoding layer pushed on the handle.  Re-opening a
-## filehandle over a dup (open FH, '>&', ...) keeps the existing
-## layer stack, so without this the layer pushed for each execution
+## Undo the layer change made for the execution, bringing the handle
+## back to the layer list captured before the redirect.
+##
+## A handle on fd 0, 1 or 2 keeps its existing layer stack when
+## re-opened over a dup (open FH, '>&', ...); ordinary handles adopt
+## the dup source's stack instead, which is why only the standard
+## handles need this.  Without it the layer pushed for each execution
 ## would accumulate indefinitely.
 ## See https://github.com/kaz-utashiro/perl-perlio-leak-bench
 ##
-sub _pop_encoding {
-    my $fh = shift;
-    my @layers = PerlIO::get_layers($fh);
-    if (grep { defined && /^encoding\b/ } @layers[-2 .. -1]) {
-        binmode $fh, ':pop';
-    }
-}
-
-sub _utf8_flagged {
-    my $fh = shift;
-    !! grep { $_ eq 'utf8' } PerlIO::get_layers($fh);
-}
-
+## We compare against the saved list rather than assuming the push
+## added exactly one layer.  binmode ':encoding' is currently not
+## idempotent (perl/perl5#10454), so pushing it always stacks; should
+## that ever change, an unconditional ':pop' would take away a layer
+## the caller set.  Popping only down to the saved depth is correct
+## either way.
 ##
-## Undo the layer change made for the execution: pop the :encoding
-## layer (non-raw), or clear the :utf8 flag if we set it (raw).
-##
-sub _restore_encoding {
-    my($fh, $raw, $was_utf8) = @_;
+sub _restore_layers {
+    my($fh, $raw, $before) = @_;
+    ## ':utf8' only sets a flag on the handle, there is no layer to pop
     if ($raw) {
-        binmode $fh, ':bytes' unless $was_utf8;
-    } else {
-        _pop_encoding($fh);
+        binmode $fh, ':bytes' unless grep { $_ eq 'utf8' } @$before;
+        return;
+    }
+    my $want = scalar @$before;
+    my $have = () = PerlIO::get_layers($fh);
+    while ($have > $want) {
+        binmode $fh, ':pop';
+        my $now = () = PerlIO::get_layers($fh);
+        last if $now >= $have;  # ':pop' made no progress; stop rather than spin
+        $have = $now;
     }
 }
 
@@ -267,7 +270,7 @@ sub _execute_in_place {
 
     # Save and redirect STDOUT (always needed)
     open my $save_stdout, '>&', \*STDOUT or die "dup STDOUT: $!\n";
-    my $stdout_was_utf8 = _utf8_flagged(\*STDOUT);
+    my @stdout_layers = PerlIO::get_layers(\*STDOUT);
     open STDOUT, '>&', $tmp_stdout or die "redirect STDOUT: $!\n";
     binmode STDOUT, $raw ? ':utf8' : ':encoding(utf8)';
 
@@ -284,19 +287,19 @@ sub _execute_in_place {
 
     # Handle STDIN — only save/redirect when needed
     my $save_stdin;
-    my $stdin_was_utf8;
+    my @stdin_layers;
     if (exists $opt{stdin}) {
         my $tmp_stdin = $obj->_tmpfile('NOFORK_STDIN', raw => $raw);
         $tmp_stdin->print($opt{stdin});
         $tmp_stdin->seek(0, 0) or die "seek: $!\n";
         open $save_stdin, '<&', \*STDIN or die "dup STDIN: $!\n";
-        $stdin_was_utf8 = _utf8_flagged(\*STDIN);
+        @stdin_layers = PerlIO::get_layers(\*STDIN);
         open STDIN, '<&', $tmp_stdin or die "redirect STDIN: $!\n";
         binmode STDIN, $raw ? ':utf8' : ':encoding(utf8)';
     } elsif (my $input = $obj->{INPUT}) {
         $input->seek(0, 0) or die "seek: $!\n";
         open $save_stdin, '<&', \*STDIN or die "dup STDIN: $!\n";
-        $stdin_was_utf8 = _utf8_flagged(\*STDIN);
+        @stdin_layers = PerlIO::get_layers(\*STDIN);
         open STDIN, '<&', $input->fileno or die "redirect STDIN: $!\n";
         binmode STDIN, $raw ? ':utf8' : ':encoding(utf8)';
     }
@@ -317,19 +320,30 @@ sub _execute_in_place {
         $result = -1;
     }
 
-    # Flush and restore — only what was redirected.  Undo the layer
-    # change made above; restoring by re-open keeps the layer stack,
-    # so it would persist (and :encoding would accumulate on every
-    # execution) otherwise.
+    # Flush and restore — only what was redirected.
+    #
+    # Pop the layer pushed for raw mode first; the redirect reused the
+    # handle's PerlIO object, so it would accumulate on every call.
+    #
+    # Restore the destination with dup2(), not `open STDOUT, ">&"`:
+    # re-opening onto a character device (terminal, /dev/null) gives
+    # the handle a new output side with no layers, and the caller's
+    # later output would lose its :encoding.  dup2() leaves the PerlIO
+    # object and its layers alone.
+    # See https://github.com/kaz-utashiro/perl-perlio-leak-bench
     STDOUT->flush;
-    _restore_encoding(\*STDOUT, $raw, $stdout_was_utf8);
-    open STDOUT, '>&', $save_stdout or die "restore STDOUT: $!\n";
+    _restore_layers(\*STDOUT, $raw, \@stdout_layers);
+    defined POSIX::dup2(fileno($save_stdout), fileno(STDOUT))
+        or die "restore STDOUT: $!\n";
+    close $save_stdout;
     if ($save_stderr) {
         STDERR->flush;
-        open STDERR, '>&', $save_stderr or die "restore STDERR: $!\n";
+        defined POSIX::dup2(fileno($save_stderr), fileno(STDERR))
+            or die "restore STDERR: $!\n";
+        close $save_stderr;
     }
     if ($save_stdin) {
-        _restore_encoding(\*STDIN, $raw, $stdin_was_utf8);
+        _restore_layers(\*STDIN, $raw, \@stdin_layers);
         open STDIN, '<&', $save_stdin or die "restore STDIN: $!\n";
     }
     if (defined $orig_0) {
@@ -447,7 +461,7 @@ Command::Run - Execute external command or code reference
 
 =head1 VERSION
 
-Version 1.03
+Version 1.04
 
 =head1 DESCRIPTION
 
@@ -688,7 +702,7 @@ C<dup>, executes the code reference, then restores them:
     open $save, '>&', \*STDOUT;           # save original
     open STDOUT, '>&', $tmpfile;          # redirect to tmpfile
     $code->(@args);                       # execute code ref
-    open STDOUT, '>&', $save;             # restore original
+    dup2(fileno($save), fileno(STDOUT));  # restore original
     $tmpfile->seek(0, 0);
     $output = do { local $/; <$tmpfile> }; # read captured output
 
@@ -719,10 +733,12 @@ conversion.
 =head3 PerlIO Encoding Layer Accumulation
 
 Nofork mode temporarily redirects the standard filehandles and
-restores them with C<open FH, 'E<gt>&', ...>.  Perl keeps the
-existing PerlIO layer stack when a filehandle is re-opened this way,
-and C<binmode FH, ':encoding(utf8)'> pushes a new layer even when one
-is already present.  In earlier versions of this module, the encoding
+restores them with C<open FH, 'E<gt>&', ...>.  A handle on file
+descriptor 0, 1 or 2 keeps its existing PerlIO layer stack across such
+a re-open -- ordinary handles adopt the layer stack of the dup source
+instead -- and C<binmode FH, ':encoding(utf8)'> pushes a new layer even
+when one is already present.  In earlier versions of this module, the
+encoding
 layer pushed on each execution therefore accumulated on STDIN/STDOUT
 one layer per execution, making long-running processes progressively
 slower (nofork could end up slower than fork) and growing memory
@@ -730,10 +746,11 @@ without bound.  See
 L<https://github.com/kaz-utashiro/perl-perlio-leak-bench> for the
 underlying Perl behavior.
 
-This is fixed: the layer change is now undone before the handles are
-restored, so the layer stack of the standard filehandles stays
-exactly as the caller left it.  With the fix, nofork is much faster
-than fork in either mode, and most of the historical gap between
+This is fixed in 1.02: the layer change is now undone before the
+handles are restored, so the layer stack of the standard filehandles
+stays exactly as the caller left it.  With the fix, nofork is much
+faster than fork in either mode, and most of the historical gap
+between
 C<:encoding> and raw mode (which was caused by the accumulation) is
 gone:
 
@@ -742,6 +759,24 @@ gone:
     fork:                    495/s (baseline)
     nofork + :encoding:   15,997/s (32x)
     nofork + :utf8 (raw): 20,038/s (40x)
+
+=head3 Output Side of Character Devices
+
+Re-opening a handle over a dup has a second effect besides the
+accumulation above.  When the handle writes to a B<character device>
+(a terminal, C</dev/null>), perl gives it a new output-side PerlIO with
+no layers; only the input side receives the dup source's layer stack.
+After C<open STDOUT, 'E<gt>&', $save> on a terminal, the caller's
+later output therefore bypasses its C<:encoding(utf8)>: non-ASCII text
+produces C<Wide character> warnings, other encodings produce wrong
+bytes.  C<PerlIO::get_layers(STDOUT)> still shows the layer, because it
+reports the input side by default (pass C<output =E<gt> 1> to see the
+output side).  Pipes and regular files are not affected.
+
+Since 1.04, STDOUT and STDERR are restored with C<dup2()> on the file
+descriptor instead of being re-opened, which leaves the PerlIO object
+and its layers in place.  STDIN has no output side and is still
+restored with C<open>.
 
 =head2 Zero-Modification Callee Integration
 

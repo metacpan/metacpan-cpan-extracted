@@ -1,4 +1,4 @@
-package Trog::SQLite 0.003;
+package Trog::SQLite 0.004;
 
 # ABSTRACT: An SQLite handle with its schema applied, its updates run, and its pragmas set
 
@@ -191,6 +191,27 @@ sub forget {
 }
 
 
+sub transaction {
+    my ( $db, $work ) = @_;
+
+    # begin_work dies rather than nest.
+    if ( !$db->{AutoCommit} ) {
+        $work->();
+        return 1;
+    }
+
+    $db->begin_work();
+    my $ok = eval { $work->(); $db->commit(); 1 };
+    unless ($ok) {
+        my $err = $@ || "The transaction failed\n";
+        eval { $db->rollback() };    ## no critic (ErrorHandling::RequireCheckingReturnValueOfEval) -- report $err, not a failed rollback after it
+        die $err;
+    }
+
+    return 1;
+}
+
+
 sub bulk_insert {
     my ( $db, $table, $keys, $action, @values ) = @_;
     $action //= 'IGNORE';
@@ -233,7 +254,7 @@ Trog::SQLite - An SQLite handle with its schema applied, its updates run, and it
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 
@@ -354,6 +375,16 @@ update then changes nothing.
 Drops the cached handles and returns 1.  A forked child calls this so that it
 opens its own handle and does not use the handle of its parent.
 
+=head2 transaction($db, $work)
+
+Runs the sub C<$work> in one transaction on the handle C<$db>, and returns 1.
+If C<$work> dies, the transaction is rolled back, and this dies with the error
+of C<$work>.
+
+If C<$db> is already in a transaction, C<$work> runs in that one, and the code
+that began it commits it or rolls it back.  So a sub that needs a transaction
+can call this whether or not its caller began one.
+
 =head2 bulk_insert($dbh, $table, \@keys, $action, @values)
 
 Inserts C<@values> into the columns C<@keys> of C<$table>, and returns 1.
@@ -395,6 +426,12 @@ Current Maintainers:
 George S. Baugh <george@troglodyne.net>
 
 =back
+
+=head1 CONTRIBUTOR
+
+=for stopwords troglodyne-bot
+
+troglodyne-bot <morpheus@troglodyne.net>
 
 =head1 COPYRIGHT AND LICENSE
 

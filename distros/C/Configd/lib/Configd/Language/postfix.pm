@@ -1,5 +1,5 @@
 package Configd::Language::postfix;
-$Configd::Language::postfix::VERSION = '0.002';
+$Configd::Language::postfix::VERSION = '0.005';
 #ABSTRACT: main.cf and master.cf, which postfix has never had a conf.d for.
 
 use 5.034;
@@ -45,6 +45,8 @@ my %ACCUMULATES = map { $_ => 1 } qw{
   alias_database
   sender_dependent_relayhost_maps
   smtpd_sender_login_maps
+  smtp_sasl_password_maps
+  smtp_tls_policy_maps
   smtpd_milters
   non_smtpd_milters
   inet_interfaces
@@ -82,6 +84,13 @@ sub services {
 sub accumulates {
     my ( $self, $key ) = @_;
     return $ACCUMULATES{$key} // 0;
+}
+
+
+sub combine {
+    my ( $self, $key, @items ) = @_;
+    return 'all' if $key eq 'inet_interfaces' && grep { $_ eq 'all' } @items;
+    return @items;
 }
 
 
@@ -245,7 +254,7 @@ Configd::Language::postfix - main.cf and master.cf, which postfix has never had 
 
 =head1 VERSION
 
-version 0.002
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -303,6 +312,12 @@ naming because the second one fails dangerously.  It is what
 C<reject_authenticated_sender_login_mismatch> reads, so a host where it does not
 accumulate ends up naming one domain's table -- and every other domain's users,
 whose addresses are then owned by nobody, are refused when they try to send.
+
+C<smtp_sasl_password_maps> and C<smtp_tls_policy_maps> were missed the same
+way.  A host that sends each domain's mail through a relay of its own, with
+C<smtp_sender_dependent_authentication>, names a table per domain in each.
+Where they do not accumulate, the mail of every domain but the last goes to
+its relay with no login and no TLS policy, and the relay refuses it.
 
 The parameters postfix documents as comma-or-space separated lists, where two
 fragments each naming a domain, a map or a milter both meant it:
@@ -392,6 +407,12 @@ True for the list parameters above.  Never true of a master.cf entry, which is a
 row rather than a list: two fragments configuring one service disagree about it,
 and the later one wins.  The base class's comma is therefore the only separator
 this language ever needs.
+
+=head2 @items = $language->combine($key, @items)
+
+C<all> alone for an C<inet_interfaces> that has C<all> among its items,
+because postfix refuses C<all> beside an address, and C<all> already listens
+on every address.  C<@items> as they are for anything else.
 
 =head2 parse($text)
 

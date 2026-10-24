@@ -1,0 +1,56 @@
+title: A streamed chat is relayed event by event, with the Anthropic and Ollama faces translated on the way; usage is metered from the stream
+setup:
+  nodes:
+    - id: gpu
+      model: m
+      stream_chunk_size: 4
+      upstream:
+        rules:
+          "count me": { answer: "Hello streamed world", usage: { prompt_tokens: 3, completion_tokens: 5 } }
+        fallback: { answer: silent }
+  config:
+    pricing:
+      m: { input_per_million: 1000000, output_per_million: 2000000 }
+steps:
+  # OpenAI: the text arrives in the node's pieces of four characters (5 events), the client asked for usage
+  - chat: { protocol: openai, model: m, prompt: count me, stream: true, include_usage: true }
+    expect:
+      text: Hello streamed world
+      finish_reason: stop
+      headers_like: { content-type: text/event-stream }
+      headers: { x-skeid-node: gpu }
+      json: { events: 5, stopped: 1, usage.prompt_tokens: 3, usage.completion_tokens: 5, usage.total_tokens: 8 }
+    usage:
+      - { api_format: openai, ok: 1, input_tokens: 3, output_tokens: 5, total_tokens: 8, cost_total_usd: 13, content_bytes: 20 }
+  # OpenAI without include_usage: the face never changes what the client asked for (ADR 0021), so nothing is metered
+  - chat: { protocol: openai, model: m, prompt: count me, stream: true }
+    expect:
+      text: Hello streamed world
+      absent: [ usage ]
+    usage:
+      - { input_tokens: 3 }
+      - { api_format: openai, ok: 1, input_tokens: 0, output_tokens: 0, content_bytes: 20 }
+  # Anthropic: message events, the stop reason translated, counts from message_start/message_delta
+  - chat: { protocol: anthropic, model: m, prompt: count me, stream: true }
+    expect:
+      text: Hello streamed world
+      finish_reason: end_turn
+      headers_like: { content-type: text/event-stream }
+      json: { stopped: 1, usage.output_tokens: 5 }
+    usage:
+      - { input_tokens: 3 }
+      - { input_tokens: 0 }
+      - { api_format: anthropic, ok: 1, input_tokens: 3, output_tokens: 5, total_tokens: 8, cost_total_usd: 13 }
+  # Ollama: newline-delimited objects, counts on the closing one
+  - chat: { protocol: ollama, model: m, prompt: count me, stream: true }
+    expect:
+      text: Hello streamed world
+      finish_reason: stop
+      json: { stopped: 1, usage.prompt_eval_count: 3, usage.eval_count: 5 }
+    usage:
+      - { input_tokens: 3 }
+      - { input_tokens: 0 }
+      - { api_format: anthropic }
+      - { api_format: ollama, ok: 1, input_tokens: 3, output_tokens: 5, total_tokens: 8, cost_total_usd: 13 }
+    upstream:
+      gpu: { requests: 4, last_user_text: count me }

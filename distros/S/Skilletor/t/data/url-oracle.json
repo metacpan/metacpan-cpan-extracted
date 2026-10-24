@@ -1,0 +1,458 @@
+[
+ {
+  "input": "https://example.com",
+  "protocol": "https:",
+  "hostname": "example.com",
+  "port": "",
+  "pathname": "/"
+ },
+ {
+  "input": "https://example.com/",
+  "protocol": "https:",
+  "hostname": "example.com",
+  "port": "",
+  "pathname": "/"
+ },
+ {
+  "input": "https://Example.COM/a/../b/Repo.git",
+  "protocol": "https:",
+  "hostname": "example.com",
+  "port": "",
+  "pathname": "/b/Repo.git"
+ },
+ {
+  "input": "https://example.com/ü/skills",
+  "protocol": "https:",
+  "hostname": "example.com",
+  "port": "",
+  "pathname": "/%C3%BC/skills"
+ },
+ {
+  "input": "https://example.com/a b/c",
+  "protocol": "https:",
+  "hostname": "example.com",
+  "port": "",
+  "pathname": "/a%20b/c"
+ },
+ {
+  "input": "https://example.com:8080/x/y",
+  "protocol": "https:",
+  "hostname": "example.com",
+  "port": "8080",
+  "pathname": "/x/y"
+ },
+ {
+  "input": "https://example.com:443/x",
+  "protocol": "https:",
+  "hostname": "example.com",
+  "port": "",
+  "pathname": "/x"
+ },
+ {
+  "input": "https://example.com:99999/x",
+  "error": "Invalid URL"
+ },
+ {
+  "input": "https://example.com:/x",
+  "protocol": "https:",
+  "hostname": "example.com",
+  "port": "",
+  "pathname": "/x"
+ },
+ {
+  "input": "https://example.com:8a/x",
+  "error": "Invalid URL"
+ },
+ {
+  "input": "https://user:pw@example.com/team/repo.git?x=1#frag",
+  "protocol": "https:",
+  "hostname": "example.com",
+  "port": "",
+  "pathname": "/team/repo.git"
+ },
+ {
+  "input": "ssh://git@Example.com/Team/Repo",
+  "protocol": "ssh:",
+  "hostname": "Example.com",
+  "port": "",
+  "pathname": "/Team/Repo"
+ },
+ {
+  "input": "ssh://git@example.com:22/a/./b/../c.git",
+  "protocol": "ssh:",
+  "hostname": "example.com",
+  "port": "22",
+  "pathname": "/a/c.git"
+ },
+ {
+  "input": "git://host/a%2e%2e/b",
+  "protocol": "git:",
+  "hostname": "host",
+  "port": "",
+  "pathname": "/a%2e%2e/b"
+ },
+ {
+  "input": "file:///srv/repos/My.Repo.git",
+  "protocol": "file:",
+  "hostname": "",
+  "port": "",
+  "pathname": "/srv/repos/My.Repo.git"
+ },
+ {
+  "input": "file://localhost/srv/x",
+  "protocol": "file:",
+  "hostname": "",
+  "port": "",
+  "pathname": "/srv/x"
+ },
+ {
+  "input": "file://Host/x",
+  "protocol": "file:",
+  "hostname": "host",
+  "port": "",
+  "pathname": "/x"
+ },
+ {
+  "input": "https://exämple.com/x.tar.gz",
+  "protocol": "https:",
+  "hostname": "xn--exmple-cua.com",
+  "port": "",
+  "pathname": "/x.tar.gz"
+ },
+ {
+  "input": "https://EXAMPLE.com/S.TAR.GZ",
+  "protocol": "https:",
+  "hostname": "example.com",
+  "port": "",
+  "pathname": "/S.TAR.GZ"
+ },
+ {
+  "input": "https://example.com/%7Euser/repo",
+  "protocol": "https:",
+  "hostname": "example.com",
+  "port": "",
+  "pathname": "/%7Euser/repo"
+ },
+ {
+  "input": "https://example.com/a\\b\\c",
+  "protocol": "https:",
+  "hostname": "example.com",
+  "port": "",
+  "pathname": "/a/b/c"
+ },
+ {
+  "input": "ssh://host/a\\b",
+  "protocol": "ssh:",
+  "hostname": "host",
+  "port": "",
+  "pathname": "/a\\b"
+ },
+ {
+  "input": "https://[::1]/x/y",
+  "protocol": "https:",
+  "hostname": "[::1]",
+  "port": "",
+  "pathname": "/x/y"
+ },
+ {
+  "input": "https://[::1]:8080/x",
+  "protocol": "https:",
+  "hostname": "[::1]",
+  "port": "8080",
+  "pathname": "/x"
+ },
+ {
+  "input": "https://127.0.0.1/a.tgz",
+  "protocol": "https:",
+  "hostname": "127.0.0.1",
+  "port": "",
+  "pathname": "/a.tgz"
+ },
+ {
+  "input": "https://0x7f.1/a.tgz",
+  "protocol": "https:",
+  "hostname": "127.0.0.1",
+  "port": "",
+  "pathname": "/a.tgz"
+ },
+ {
+  "input": "https://0177.0.0.1/",
+  "protocol": "https:",
+  "hostname": "127.0.0.1",
+  "port": "",
+  "pathname": "/"
+ },
+ {
+  "input": "https://1.2.3/",
+  "protocol": "https:",
+  "hostname": "1.2.0.3",
+  "port": "",
+  "pathname": "/"
+ },
+ {
+  "input": "https://4294967295/",
+  "protocol": "https:",
+  "hostname": "255.255.255.255",
+  "port": "",
+  "pathname": "/"
+ },
+ {
+  "input": "https://4294967296/",
+  "error": "Invalid URL"
+ },
+ {
+  "input": "https://1.256.1.1/",
+  "error": "Invalid URL"
+ },
+ {
+  "input": "https://example.1/",
+  "error": "Invalid URL"
+ },
+ {
+  "input": "https://ex%41mple.com/a.tgz",
+  "protocol": "https:",
+  "hostname": "example.com",
+  "port": "",
+  "pathname": "/a.tgz"
+ },
+ {
+  "input": "https://exa mple.com/a.tgz",
+  "error": "Invalid URL"
+ },
+ {
+  "input": "https://example.com/.",
+  "protocol": "https:",
+  "hostname": "example.com",
+  "port": "",
+  "pathname": "/"
+ },
+ {
+  "input": "https://example.com/..",
+  "protocol": "https:",
+  "hostname": "example.com",
+  "port": "",
+  "pathname": "/"
+ },
+ {
+  "input": "https://example.com/a/.",
+  "protocol": "https:",
+  "hostname": "example.com",
+  "port": "",
+  "pathname": "/a/"
+ },
+ {
+  "input": "https://example.com/a/%2E%2e/b",
+  "protocol": "https:",
+  "hostname": "example.com",
+  "port": "",
+  "pathname": "/b"
+ },
+ {
+  "input": "https://example.com/a?b/c",
+  "protocol": "https:",
+  "hostname": "example.com",
+  "port": "",
+  "pathname": "/a"
+ },
+ {
+  "input": "https://example.com/a#b/c",
+  "protocol": "https:",
+  "hostname": "example.com",
+  "port": "",
+  "pathname": "/a"
+ },
+ {
+  "input": "https://example.com/C%C3%BC/x",
+  "protocol": "https:",
+  "hostname": "example.com",
+  "port": "",
+  "pathname": "/C%C3%BC/x"
+ },
+ {
+  "input": "https://example.com/\u0001x/y",
+  "protocol": "https:",
+  "hostname": "example.com",
+  "port": "",
+  "pathname": "/%01x/y"
+ },
+ {
+  "input": "https://",
+  "error": "Invalid URL"
+ },
+ {
+  "input": "https:///x",
+  "protocol": "https:",
+  "hostname": "x",
+  "port": "",
+  "pathname": "/"
+ },
+ {
+  "input": "https:example.com/x",
+  "protocol": "https:",
+  "hostname": "example.com",
+  "port": "",
+  "pathname": "/x"
+ },
+ {
+  "input": "ssh://",
+  "protocol": "ssh:",
+  "hostname": "",
+  "port": "",
+  "pathname": ""
+ },
+ {
+  "input": "ssh://h",
+  "protocol": "ssh:",
+  "hostname": "h",
+  "port": "",
+  "pathname": ""
+ },
+ {
+  "input": "ssh://h/",
+  "protocol": "ssh:",
+  "hostname": "h",
+  "port": "",
+  "pathname": "/"
+ },
+ {
+  "input": "ssh://a b/c",
+  "error": "Invalid URL"
+ },
+ {
+  "input": "ssh://ho%st/x",
+  "protocol": "ssh:",
+  "hostname": "ho%st",
+  "port": "",
+  "pathname": "/x"
+ },
+ {
+  "input": "ssh://hÖst/x",
+  "protocol": "ssh:",
+  "hostname": "h%C3%96st",
+  "port": "",
+  "pathname": "/x"
+ },
+ {
+  "input": "codecommit://profile@my-repo",
+  "protocol": "codecommit:",
+  "hostname": "my-repo",
+  "port": "",
+  "pathname": ""
+ },
+ {
+  "input": "s3://bucket/path/skills.tar.gz",
+  "protocol": "s3:",
+  "hostname": "bucket",
+  "port": "",
+  "pathname": "/path/skills.tar.gz"
+ },
+ {
+  "input": "https://a:b:c/x",
+  "error": "Invalid URL"
+ },
+ {
+  "input": "https://münchen.de/",
+  "protocol": "https:",
+  "hostname": "xn--mnchen-3ya.de",
+  "port": "",
+  "pathname": "/"
+ },
+ {
+  "input": "https://BÜCHER.example/",
+  "protocol": "https:",
+  "hostname": "xn--bcher-kva.example",
+  "port": "",
+  "pathname": "/"
+ },
+ {
+  "input": "https://example.com./x",
+  "protocol": "https:",
+  "hostname": "example.com.",
+  "port": "",
+  "pathname": "/x"
+ },
+ {
+  "input": "https://a..b/",
+  "protocol": "https:",
+  "hostname": "a..b",
+  "port": "",
+  "pathname": "/"
+ },
+ {
+  "input": "https://xn--nxasmq6b.com/",
+  "protocol": "https:",
+  "hostname": "xn--nxasmq6b.com",
+  "port": "",
+  "pathname": "/"
+ },
+ {
+  "input": "https://日本.jp/x",
+  "protocol": "https:",
+  "hostname": "xn--wgv71a.jp",
+  "port": "",
+  "pathname": "/x"
+ },
+ {
+  "input": "https://ß.de/",
+  "protocol": "https:",
+  "hostname": "xn--zca.de",
+  "port": "",
+  "pathname": "/"
+ },
+ {
+  "input": "  https://example.com/x  ",
+  "protocol": "https:",
+  "hostname": "example.com",
+  "port": "",
+  "pathname": "/x"
+ },
+ {
+  "input": "https://exa\tmple.com/x",
+  "protocol": "https:",
+  "hostname": "example.com",
+  "port": "",
+  "pathname": "/x"
+ },
+ {
+  "input": "http://localhost:3000/a.tgz",
+  "protocol": "http:",
+  "hostname": "localhost",
+  "port": "3000",
+  "pathname": "/a.tgz"
+ },
+ {
+  "input": "https://example.com/{a}`b`<c>\"d\"",
+  "protocol": "https:",
+  "hostname": "example.com",
+  "port": "",
+  "pathname": "/%7Ba%7D%60b%60%3Cc%3E%22d%22"
+ },
+ {
+  "input": "https://example.com/a%zz",
+  "protocol": "https:",
+  "hostname": "example.com",
+  "port": "",
+  "pathname": "/a%zz"
+ },
+ {
+  "input": "ssh://user@[::1]:2222/repo",
+  "protocol": "ssh:",
+  "hostname": "[::1]",
+  "port": "2222",
+  "pathname": "/repo"
+ },
+ {
+  "input": "git+ssh://host/x/y.git",
+  "protocol": "git+ssh:",
+  "hostname": "host",
+  "port": "",
+  "pathname": "/x/y.git"
+ },
+ {
+  "input": "HTTP://EXAMPLE.COM/",
+  "protocol": "http:",
+  "hostname": "example.com",
+  "port": "",
+  "pathname": "/"
+ }
+]

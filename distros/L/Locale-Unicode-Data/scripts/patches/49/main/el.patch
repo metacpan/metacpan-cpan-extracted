@@ -1,0 +1,13 @@
+--- el.xml
++++ el.xml
+@@ -5377,6 +5377,10 @@
+ 				<displayName count="one">γουάν Κίνας (υπεράκτιο)</displayName>
+ 				<displayName count="other">γουάν Κίνας (υπεράκτια)</displayName>
+ 			</currency>
++			<currency type="CNX">
++				<displayName count="one" draft="provisional">Δολάριο Λαϊκής Τράπεζας Κίνας</displayName>
++				<displayName count="other" draft="provisional">Δολάρια Λαϊκής Τράπεζας Κίνας</displayName>
++			</currency>
+ 			<currency type="CNY">
+ 				<displayName>Γουάν Κίνας</displayName>
+ 				<displayName count="one">γουάν Κίνας</displayName>

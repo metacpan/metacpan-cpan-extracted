@@ -5,7 +5,7 @@ use warnings;
 
 package Text::JSContact;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 # vCard <=> JSContact (RFC 9553) conversion
 # Follows RFC 9555 for vCard mapping and RFC 9554 for extensions
@@ -1034,7 +1034,7 @@ sub jscontact_to_vcard {
     properties => \%by_name,
   };
 
-  return hash2vcard({ objects => [$vcard] });
+  return _hash2vcard($vcard);
 }
 
 ###############################################################################
@@ -1644,7 +1644,34 @@ sub patch_vcard {
     push @{$props->{$prop->{name}}}, $prop;
   }
 
+  return _hash2vcard($vcard);
+}
+
+# Text::VCardFast escapes LF in values (\n) and parameters (^n), but
+# writes every other control character raw, so a CR from the card data
+# could end the content line early and forge extra properties.  vCard
+# allows no control characters but HTAB, so turn CR into LF and drop
+# the rest.
+sub _hash2vcard {
+  my ($vcard) = @_;
+
+  for my $prop (map { @$_ } values %{$vcard->{properties}}) {
+    $prop->{value} = _clean_vcard_text($prop->{value}) if exists $prop->{value};
+    $prop->{values} = _clean_vcard_text($prop->{values}) if $prop->{values};
+    my $params = $prop->{params} // {};
+    $params->{$_} = _clean_vcard_text($params->{$_}) for keys %$params;
+  }
+
   return hash2vcard({ objects => [$vcard] });
+}
+
+sub _clean_vcard_text {
+  my ($val) = @_;
+  return [ map { _clean_vcard_text($_) } @$val ] if ref $val eq 'ARRAY';
+  return $val if !defined $val || ref $val;
+  $val =~ s/\r\n?/\n/g;
+  $val =~ s/[\x00-\x08\x0b-\x1f\x7f]//g;
+  return $val;
 }
 
 # Compare two JSContact cards and return hash of changed property names

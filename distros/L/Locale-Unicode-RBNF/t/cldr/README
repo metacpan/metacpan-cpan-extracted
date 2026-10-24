@@ -1,0 +1,4 @@
+This directory contains an abridged subset of the Unicode CLDR data (common/rbnf, the numbers and contextTransforms sections of common/main, and common/supplemental files), that are used only by the test suites.
+It was taken from the CLDR repository at commit 96e54b273d2da4ec6fbad350ba19ff23fa24a588 (2026-10-21).
+
+Copyright (c) 1991-2026 Unicode, Inc. Distributed under the Unicode License V3, whose text is in the LICENSE-UNICODE file at the root of this distribution.

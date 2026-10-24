@@ -12,7 +12,7 @@ use Sub::Protected;
 use Params::Validate::Strict qw(validate_strict);
 use Params::Get		();
 
-our $VERSION = '0.015.0';
+our $VERSION = '0.016.0';
 
 =head1 NAME
 
@@ -707,8 +707,7 @@ sub _detect_file_info :Protected {
 				return { _file_is_empty => 1, file_size => -s $path }
 					unless @cols;
 
-				my $safe_re = qr/\A[a-zA-Z_][a-zA-Z0-9_]*\z/;
-				my ($safe_id) = grep { $_ =~ $safe_re } @cols;
+				my ($safe_id) = grep { $_ =~ $TABLE_NAME_RE } @cols;
 
 				# Data rows.
 				my @rows;
@@ -796,8 +795,7 @@ sub _detect_file_info :Protected {
 		# whether a given index position is blank -- sufficient for id selection.
 		# Fall back to the first safe column in the header if the data row
 		# check is inconclusive (e.g. file has only a header line).
-		my $safe_re = qr/\A[a-zA-Z_][a-zA-Z0-9_]*\z/;
-		my ($safe_id) = grep { $_ =~ $safe_re } @cols;	# header-only fallback
+		my ($safe_id) = grep { $_ =~ $TABLE_NAME_RE } @cols;	# header-only fallback
 
 		my $data_line;
 		while (defined($data_line = <$fh>)) {
@@ -808,7 +806,7 @@ sub _detect_file_info :Protected {
 		if (defined $data_line) {
 			my @vals = split /\Q$sep\E/, $data_line, -1;
 			for my $i (0 .. $#cols) {
-				next unless $cols[$i] =~ $safe_re;
+				next unless $cols[$i] =~ $TABLE_NAME_RE;
 				my $val = $vals[$i] // '';
 				$val =~ s/\A[\s"]+//;
 				$val =~ s/[\s"]+\z//;

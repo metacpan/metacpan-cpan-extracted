@@ -121,6 +121,7 @@ OpenBao in dev mode.
 | `SKEID_ADMIN_API_KEY` | control plane | bearer token for `/skeid/*` |
 | `SKEID_USAGE_DB` | control plane | sqlite path, used only when the config has no `usage_store` |
 | `SKEID_USAGE_DB_PASSWORD` | example stack | what its `usage_store.password_env` names |
+| `SKEID_CUSTOMER_DB_PASSWORD` | example stack | what its (commented) `customer_source.password_env` names: the read-only role of the customer view |
 | `SKEID_ROUTE_WAIT_TIMEOUT_MS` / `SKEID_ROUTE_WAIT_POLL_MS` | routing | saturation wait defaults |
 | `SKEID_FRONTEND_COUNT` | routing | Skeid hosts sharing the nodes (ADR 0012), default 1 |
 | `SKEID_CAPACITY_MAX_AGE_MS` | admission | capacity reading lifetime, default 5000 |
@@ -130,8 +131,20 @@ OpenBao in dev mode.
 | `SKEID_UPSTREAM_TIMEOUT` | proxy | seconds an upstream request may take and be silent for (default 300); the client connection of a proxied request gets the same on top of the server's inactivity timeout |
 
 Secrets the config needs are named, never written: a node's `api_key_env`,
-`admin.api_key_env`, a usage store's `password_env`, and the registry's `secret_env` /
-`read_key_env`.
+`admin.api_key_env`, a usage store's and a customer source's `password_env`, and the
+registry's `secret_env` / `read_key_env`. `customer_source` refuses a `password:` outright.
+
+**Customer source in deployment** (ADR 0026). The application that owns customer keys provides
+a relation (a view, typically filtered on `revoked_at IS NULL`) and grants `SELECT` on it to a
+role of its own — recommended even with `from_usage_store: true`, since the usage store's role
+writes and migrates. Every fetch connects from a short-lived child process and disconnects
+again; with `listen` (LISTEN/NOTIFY) a second child holds one connection: the owner's
+`max_connections` must allow `workers × frontends × 2` at peak. No connection is shared with the
+parent or inherited across the prefork fork. The driver is DBD::Pg, already in the image — no
+extra module. A database outage at start is a degraded, fail-closed start, not a failed one;
+during a run the last good keys stay (`max_stale_s: 0`) or expire after `max_stale_s`. The
+manual check against the stack's PostgreSQL is in `examples/service/skeid.yaml` next to the
+commented section.
 
 **Precedence:** a value in the config wins over its ENV default. The admin key is resolved on
 every reload as `serve --admin-api-key` > the config's key (any of its four spellings; set empty
@@ -153,6 +166,32 @@ nodes:
     api_key_env: VLLM_TOKEN                 # fallback when there is no broker
 ```
 
+## A realtime node
+
+`/v1/realtime` (ADR 0029) holds a node's slot for a whole WebSocket session, minutes long, so
+`max_conns` of such a node means **concurrent sessions**. Give it a node of its own (a Whisper
+node serving file transcription *and* live sessions has two meanings of `max_conns`), with its
+own model name:
+
+```yaml
+nodes:
+  - id: whisper-live
+    url: http://speaches:8000/v1        # Skeid calls ws://speaches:8000/v1/realtime
+    model: whisper-live
+    engine: openaibase
+    max_conns: 8                         # concurrent sessions; at least the worker count
+realtime:
+  idle_timeout: 300
+  max_session_seconds: 3600
+```
+
+Under `serve --workers N` each worker admits `max_conns / N` sessions (floor 1, ADR 0010), and a
+session stays on the worker that accepted it: `max_conns: 4` with 4 workers admits one session per
+worker, so a fifth is refused when one worker has two clients — size `max_conns` above what you
+mean to allow. `SIGQUIT` (the image's `STOPSIGNAL`) closes open sessions `1001` and writes their
+events; `SIGTERM` does not. Behind a reverse proxy the WebSocket needs `Upgrade`/`Connection`
+forwarded and read/idle timeouts above `realtime.idle_timeout`.
+
 ## Usage schema
 
 `share/sql/usage_events.postgresql.sql` and `usage_events.sqlite.sql` are the shipped schemas
@@ -171,11 +210,12 @@ longer. `jsonlog` remains the recommended default.
 
 ## Docker image
 
-Built and pushed by `dzil release` via `run_after_release` (see the release rule — never run
-that yourself). Tags: `raudssus/langertha-skeid:<version>`, `:<major>`, `:latest`. Source
-overrides for an unreleased Langertha go through `SKEID_DOCKER_BUILD_ARGS`
-(`--build-arg LANGERTHA_SRC=…`, a CPAN author path or tarball URL), documented at the top of
-`dist.ini`. For a local test image:
+Built in every `dzil build` and pushed by `dzil release` through the bundle's
+`docker_image` (`Dist::Zilla::Plugin::Docker::API`; see the release rule — never run a release
+yourself). Tags: `raudssus/langertha-skeid:<version>`, `:<major>`, `:latest`. The release path
+passes no build arguments; a source override for an unreleased Langertha
+(`--build-arg LANGERTHA_SRC=…`, a CPAN author path or tarball URL) only works with a manual
+`docker build`. For a local test image:
 `docker build -t raudssus/langertha-skeid:test .`, then `SKEID_IMAGE=raudssus/langertha-skeid:test`
 in `examples/service/.env` to run the compose stack on it.
 

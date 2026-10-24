@@ -233,6 +233,24 @@ sub _MakeClauseCaseInsensitive {
 }
 
 
+# Pg also needs GROUP BY for ORDER BY expressions like LOWER(main.Name),
+# even with "SELECT DISTINCT main.*".
+sub _DistinctNeedsGroupBy {
+    my $self = shift;
+    my $sb   = shift;
+
+    # GROUP BY main.id doesn't work with columns of other aliases
+    return $self->SUPER::_DistinctNeedsGroupBy($sb) if $sb->_ColumnsForQuery =~ /(?<!main)\./;
+
+    for my $row ( @{ $sb->{'order_by'} || [] } ) {
+        next unless $row->{'FIELD'};
+        next     if $self->_DistinctOrderIsBareName($row);
+        return 1 if ( $row->{'ALIAS'} // 'main' ) ne 'main';
+        return 1 if $row->{'FIELD'} !~ /^\w+$/;
+    }
+    return $self->SUPER::_DistinctNeedsGroupBy($sb);
+}
+
 =head2 DistinctQuery STATEMENTREF
 
 takes an incomplete SQL SELECT statement and massages it to return a DISTINCT result set.
@@ -246,7 +264,7 @@ sub DistinctQuery {
     my $table = $sb->Table;
 
     return $self->SUPER::DistinctQuery( $statementref, $sb, @_ )
-        if $sb->_OrderClause !~ /(?<!main)\./;
+        unless $self->_DistinctNeedsGroupBy($sb);
 
     # "SELECT main.* FROM ( SELECT id FROM ... ORDER BY ... ) as dist,
     # X main WHERE (main.id = dist.id);" doesn't work in some cases.
@@ -262,14 +280,7 @@ sub DistinctQuery {
         $groups = [ map {+{FIELD => $_}} $self->Fields($table) ];
     }
     local $sb->{group_by} = $groups;
-    local $sb->{'order_by'} = [
-        map {
-            ($_->{'ALIAS'}||'') ne "main"
-            ? { %{$_}, FIELD => ((($_->{'ORDER'}||'') =~ /^des/i)?'MAX':'MIN') ."(".$_->{FIELD}.")" }
-            : $_
-        }
-        @{$sb->{'order_by'}}
-    ];
+    local $sb->{'order_by'} = $self->_DistinctGroupByOrder($sb);
     my $group = $sb->_GroupClause;
     my $order = $sb->_OrderClause;
     $$statementref = "SELECT main.* FROM $$statementref $group $order";

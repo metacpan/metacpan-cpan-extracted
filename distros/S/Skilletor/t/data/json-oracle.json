@@ -1,0 +1,546 @@
+{
+ "stringify": [
+  {
+   "text": "{}",
+   "pretty": "{}",
+   "compact": "{}"
+  },
+  {
+   "text": "[]",
+   "pretty": "[]",
+   "compact": "[]"
+  },
+  {
+   "text": "{\"a\":{},\"b\":[],\"c\":[{}],\"d\":[[]]}",
+   "pretty": "{\n  \"a\": {},\n  \"b\": [],\n  \"c\": [\n    {}\n  ],\n  \"d\": [\n    []\n  ]\n}",
+   "compact": "{\"a\":{},\"b\":[],\"c\":[{}],\"d\":[[]]}"
+  },
+  {
+   "text": "[1,[2,[3,{\"x\":null}]]]",
+   "pretty": "[\n  1,\n  [\n    2,\n    [\n      3,\n      {\n        \"x\": null\n      }\n    ]\n  ]\n]",
+   "compact": "[1,[2,[3,{\"x\":null}]]]"
+  },
+  {
+   "text": "{\"b\":1,\"a\":2,\"10\":3,\"2\":4,\"-1\":5,\"01\":6,\"4294967294\":7,\"4294967295\":8}",
+   "pretty": "{\n  \"2\": 4,\n  \"10\": 3,\n  \"4294967294\": 7,\n  \"b\": 1,\n  \"a\": 2,\n  \"-1\": 5,\n  \"01\": 6,\n  \"4294967295\": 8\n}",
+   "compact": "{\"2\":4,\"10\":3,\"4294967294\":7,\"b\":1,\"a\":2,\"-1\":5,\"01\":6,\"4294967295\":8}"
+  },
+  {
+   "text": "{\"a\":1,\"b\":2,\"a\":3}",
+   "pretty": "{\n  \"a\": 3,\n  \"b\": 2\n}",
+   "compact": "{\"a\":3,\"b\":2}"
+  },
+  {
+   "text": "{\"__proto__\":1,\"constructor\":2}",
+   "pretty": "{\n  \"__proto__\": 1,\n  \"constructor\": 2\n}",
+   "compact": "{\"__proto__\":1,\"constructor\":2}"
+  },
+  {
+   "text": "\"\\u0000\\u0001\\u001f\\b\\f\\n\\r\\t\\\"\\\\\\/\\u007f\\u2028\\u2029\"",
+   "pretty": "\"\\u0000\\u0001\\u001f\\b\\f\\n\\r\\t\\\"\\\\/  \"",
+   "compact": "\"\\u0000\\u0001\\u001f\\b\\f\\n\\r\\t\\\"\\\\/  \""
+  },
+  {
+   "text": "\"plain / slash and é € 😀 日本\"",
+   "pretty": "\"plain / slash and é € 😀 日本\"",
+   "compact": "\"plain / slash and é € 😀 日本\""
+  },
+  {
+   "text": "\"\\ud800\"",
+   "pretty": "\"\\ud800\"",
+   "compact": "\"\\ud800\""
+  },
+  {
+   "text": "\"\\udc00x\"",
+   "pretty": "\"\\udc00x\"",
+   "compact": "\"\\udc00x\""
+  },
+  {
+   "text": "\"\\ud83d\\ude00\"",
+   "pretty": "\"😀\"",
+   "compact": "\"😀\""
+  },
+  {
+   "text": "\"\\uD83D\"",
+   "pretty": "\"\\ud83d\"",
+   "compact": "\"\\ud83d\""
+  },
+  {
+   "text": "true",
+   "pretty": "true",
+   "compact": "true"
+  },
+  {
+   "text": "false",
+   "pretty": "false",
+   "compact": "false"
+  },
+  {
+   "text": "null",
+   "pretty": "null",
+   "compact": "null"
+  },
+  {
+   "text": "[true,false,null]",
+   "pretty": "[\n  true,\n  false,\n  null\n]",
+   "compact": "[true,false,null]"
+  },
+  {
+   "text": "0",
+   "pretty": "0",
+   "compact": "0"
+  },
+  {
+   "text": "-0",
+   "pretty": "0",
+   "compact": "0"
+  },
+  {
+   "text": "1",
+   "pretty": "1",
+   "compact": "1"
+  },
+  {
+   "text": "-1",
+   "pretty": "-1",
+   "compact": "-1"
+  },
+  {
+   "text": "1.5",
+   "pretty": "1.5",
+   "compact": "1.5"
+  },
+  {
+   "text": "0.1",
+   "pretty": "0.1",
+   "compact": "0.1"
+  },
+  {
+   "text": "0.2",
+   "pretty": "0.2",
+   "compact": "0.2"
+  },
+  {
+   "text": "1e21",
+   "pretty": "1e+21",
+   "compact": "1e+21"
+  },
+  {
+   "text": "1e20",
+   "pretty": "100000000000000000000",
+   "compact": "100000000000000000000"
+  },
+  {
+   "text": "123456789012345680000",
+   "pretty": "123456789012345680000",
+   "compact": "123456789012345680000"
+  },
+  {
+   "text": "1e-7",
+   "pretty": "1e-7",
+   "compact": "1e-7"
+  },
+  {
+   "text": "1.234e-7",
+   "pretty": "1.234e-7",
+   "compact": "1.234e-7"
+  },
+  {
+   "text": "0.000001",
+   "pretty": "0.000001",
+   "compact": "0.000001"
+  },
+  {
+   "text": "0.0000012",
+   "pretty": "0.0000012",
+   "compact": "0.0000012"
+  },
+  {
+   "text": "5e-324",
+   "pretty": "5e-324",
+   "compact": "5e-324"
+  },
+  {
+   "text": "1.7976931348623157e308",
+   "pretty": "1.7976931348623157e+308",
+   "compact": "1.7976931348623157e+308"
+  },
+  {
+   "text": "100",
+   "pretty": "100",
+   "compact": "100"
+  },
+  {
+   "text": "9007199254740993",
+   "pretty": "9007199254740992",
+   "compact": "9007199254740992"
+  },
+  {
+   "text": "18446744073709551615",
+   "pretty": "18446744073709552000",
+   "compact": "18446744073709552000"
+  },
+  {
+   "text": "-1.5e-10",
+   "pretty": "-1.5e-10",
+   "compact": "-1.5e-10"
+  },
+  {
+   "text": "3.14159",
+   "pretty": "3.14159",
+   "compact": "3.14159"
+  },
+  {
+   "text": "1E+2",
+   "pretty": "100",
+   "compact": "100"
+  },
+  {
+   "text": "2.50",
+   "pretty": "2.5",
+   "compact": "2.5"
+  },
+  {
+   "text": "1e999",
+   "pretty": "null",
+   "compact": "null"
+  },
+  {
+   "text": "-1e999",
+   "pretty": "null",
+   "compact": "null"
+  },
+  {
+   "text": "123e-20",
+   "pretty": "1.23e-18",
+   "compact": "1.23e-18"
+  },
+  {
+   "text": "1.0000000000000002",
+   "pretty": "1.0000000000000002",
+   "compact": "1.0000000000000002"
+  },
+  {
+   "text": "4.35",
+   "pretty": "4.35",
+   "compact": "4.35"
+  },
+  {
+   "text": "0.30000000000000004",
+   "pretty": "0.30000000000000004",
+   "compact": "0.30000000000000004"
+  },
+  {
+   "text": " \t\n\r[ 1 , 2 ]\n ",
+   "pretty": "[\n  1,\n  2\n]",
+   "compact": "[1,2]"
+  },
+  {
+   "text": "{\"k\":\"v\",\"n\":{\"deep\":{\"deeper\":[1,\"two\",{\"three\":3}]}}}",
+   "pretty": "{\n  \"k\": \"v\",\n  \"n\": {\n    \"deep\": {\n      \"deeper\": [\n        1,\n        \"two\",\n        {\n          \"three\": 3\n        }\n      ]\n    }\n  }\n}",
+   "compact": "{\"k\":\"v\",\"n\":{\"deep\":{\"deeper\":[1,\"two\",{\"three\":3}]}}}"
+  }
+ ],
+ "errors": [
+  {
+   "text": "",
+   "message": "Unexpected end of JSON input"
+  },
+  {
+   "text": " ",
+   "message": "Unexpected end of JSON input"
+  },
+  {
+   "text": "{",
+   "message": "Expected property name or '}' in JSON at position 1 (line 1 column 2)"
+  },
+  {
+   "text": "{\"a\"",
+   "message": "Expected ':' after property name in JSON at position 4 (line 1 column 5)"
+  },
+  {
+   "text": "{\"a\":",
+   "message": "Unexpected end of JSON input"
+  },
+  {
+   "text": "{\"a\":1",
+   "message": "Expected ',' or '}' after property value in JSON at position 6 (line 1 column 7)"
+  },
+  {
+   "text": "{\"a\":1,",
+   "message": "Expected double-quoted property name in JSON at position 7 (line 1 column 8)"
+  },
+  {
+   "text": "{a:1}",
+   "message": "Expected property name or '}' in JSON at position 1 (line 1 column 2)"
+  },
+  {
+   "text": "[1,]",
+   "message": "Unexpected token ']', \"[1,]\" is not valid JSON"
+  },
+  {
+   "text": "[1 2]",
+   "message": "Expected ',' or ']' after array element in JSON at position 3 (line 1 column 4)"
+  },
+  {
+   "text": "{\"a\":1}x",
+   "message": "Unexpected non-whitespace character after JSON at position 7 (line 1 column 8)"
+  },
+  {
+   "text": "\"abc",
+   "message": "Unterminated string in JSON at position 4 (line 1 column 5)"
+  },
+  {
+   "text": "\"a\u0001\"",
+   "message": "Bad control character in string literal in JSON at position 2 (line 1 column 3)"
+  },
+  {
+   "text": "\"\\x\"",
+   "message": "Bad escaped character in JSON at position 2 (line 1 column 3)"
+  },
+  {
+   "text": "-",
+   "message": "No number after minus sign in JSON at position 1 (line 1 column 2)"
+  },
+  {
+   "text": "1.",
+   "message": "Unterminated fractional number in JSON at position 2 (line 1 column 3)"
+  },
+  {
+   "text": "1e",
+   "message": "Exponent part is missing a number in JSON at position 2 (line 1 column 3)"
+  },
+  {
+   "text": "01",
+   "message": "Unexpected number in JSON at position 1 (line 1 column 2)"
+  },
+  {
+   "text": "tru",
+   "message": "Unexpected end of JSON input"
+  },
+  {
+   "text": "nul",
+   "message": "Unexpected end of JSON input"
+  },
+  {
+   "text": "{\"a\" 1}",
+   "message": "Expected ':' after property name in JSON at position 5 (line 1 column 6)"
+  },
+  {
+   "text": "[",
+   "message": "Unexpected end of JSON input"
+  },
+  {
+   "text": "﻿{}",
+   "message": "Unexpected token '﻿', \"﻿{}\" is not valid JSON"
+  },
+  {
+   "text": "{\"a\":1 \"b\":2}",
+   "message": "Expected ',' or '}' after property value in JSON at position 7 (line 1 column 8)"
+  },
+  {
+   "text": "\"\\u12g4\"",
+   "message": "Bad Unicode escape in JSON at position 5 (line 1 column 6)"
+  },
+  {
+   "text": "x",
+   "message": "Unexpected token 'x', \"x\" is not valid JSON"
+  },
+  {
+   "text": "{\"aé\":\"bü\"x}",
+   "message": "Expected ',' or '}' after property value in JSON at position 10 (line 1 column 11)"
+  },
+  {
+   "text": "\n\n  {\"a\":tru}",
+   "message": "Unexpected token '}', \"\n\n  {\"a\":tru}\" is not valid JSON"
+  },
+  {
+   "text": "[1,2",
+   "message": "Expected ',' or ']' after array element in JSON at position 4 (line 1 column 5)"
+  },
+  {
+   "text": "{\"a\":1,\"b\"",
+   "message": "Expected ':' after property name in JSON at position 10 (line 1 column 11)"
+  },
+  {
+   "text": "trux",
+   "message": "Unexpected token 'x', \"trux\" is not valid JSON"
+  },
+  {
+   "text": "[tru]",
+   "message": "Unexpected token ']', \"[tru]\" is not valid JSON"
+  },
+  {
+   "text": "[nulx]",
+   "message": "Unexpected token 'x', \"[nulx]\" is not valid JSON"
+  },
+  {
+   "text": "{\"a\":1}\"x\"",
+   "message": "Unexpected non-whitespace character after JSON at position 7 (line 1 column 8)"
+  },
+  {
+   "text": "[1]]",
+   "message": "Unexpected non-whitespace character after JSON at position 3 (line 1 column 4)"
+  },
+  {
+   "text": "\r\n{\r\n\"a\" 1}",
+   "message": "Expected ':' after property name in JSON at position 9 (line 3 column 5)"
+  },
+  {
+   "text": "\r{\"a\" 1}",
+   "message": "Expected ':' after property name in JSON at position 6 (line 2 column 6)"
+  },
+  {
+   "text": "[-a]",
+   "message": "No number after minus sign in JSON at position 2 (line 1 column 3)"
+  },
+  {
+   "text": "[1.e5]",
+   "message": "Unterminated fractional number in JSON at position 3 (line 1 column 4)"
+  },
+  {
+   "text": "[1e+]",
+   "message": "Exponent part is missing a number in JSON at position 4 (line 1 column 5)"
+  },
+  {
+   "text": "[\"\\u12\"]",
+   "message": "Bad Unicode escape in JSON at position 6 (line 1 column 7)"
+  },
+  {
+   "text": "[\"\t\"]",
+   "message": "Bad control character in string literal in JSON at position 2 (line 1 column 3)"
+  },
+  {
+   "text": "{\"a\":1,\"a\"}",
+   "message": "Expected ':' after property name in JSON at position 10 (line 1 column 11)"
+  },
+  {
+   "text": "[1,2,3",
+   "message": "Expected ',' or ']' after array element in JSON at position 6 (line 1 column 7)"
+  },
+  {
+   "text": "{\"\"",
+   "message": "Expected ':' after property name in JSON at position 3 (line 1 column 4)"
+  },
+  {
+   "text": "\"x\\",
+   "message": "Unexpected end of JSON input"
+  },
+  {
+   "text": "[\"x\\",
+   "message": "Unexpected end of JSON input"
+  },
+  {
+   "text": "[\"x\\u",
+   "message": "Bad Unicode escape in JSON at position 5 (line 1 column 6)"
+  },
+  {
+   "text": "[-",
+   "message": "No number after minus sign in JSON at position 2 (line 1 column 3)"
+  },
+  {
+   "text": "[0x1]",
+   "message": "Expected ',' or ']' after array element in JSON at position 2 (line 1 column 3)"
+  },
+  {
+   "text": "[.5]",
+   "message": "Unexpected token '.', \"[.5]\" is not valid JSON"
+  },
+  {
+   "text": "[+1]",
+   "message": "Unexpected token '+', \"[+1]\" is not valid JSON"
+  },
+  {
+   "text": "[1}",
+   "message": "Expected ',' or ']' after array element in JSON at position 2 (line 1 column 3)"
+  },
+  {
+   "text": "{\"a\":1]",
+   "message": "Expected ',' or '}' after property value in JSON at position 6 (line 1 column 7)"
+  },
+  {
+   "text": "{]",
+   "message": "Expected property name or '}' in JSON at position 1 (line 1 column 2)"
+  },
+  {
+   "text": "[,]",
+   "message": "Unexpected token ',', \"[,]\" is not valid JSON"
+  },
+  {
+   "text": "{\"a\":01}",
+   "message": "Unexpected number in JSON at position 6 (line 1 column 7)"
+  },
+  {
+   "text": "[00]",
+   "message": "Unexpected number in JSON at position 2 (line 1 column 3)"
+  },
+  {
+   "text": "[-01]",
+   "message": "Unexpected number in JSON at position 3 (line 1 column 4)"
+  },
+  {
+   "text": "[1.5.5]",
+   "message": "Expected ',' or ']' after array element in JSON at position 4 (line 1 column 5)"
+  },
+  {
+   "text": "[1e5e5]",
+   "message": "Expected ',' or ']' after array element in JSON at position 4 (line 1 column 5)"
+  },
+  {
+   "text": "  x",
+   "message": "Unexpected token 'x', \"  x\" is not valid JSON"
+  },
+  {
+   "text": "x1,1,1,1,1,1,1,1,1,1,",
+   "message": "Unexpected token 'x', \"x1,1,1,1,1\"... is not valid JSON"
+  },
+  {
+   "text": "[1,1,x,1,1,1,1,1,1,1,",
+   "message": "Unexpected token 'x', \"[1,1,x,1,1,1,1,\"... is not valid JSON"
+  },
+  {
+   "text": "[1,1,1,1,1,1,1,x,1,1,",
+   "message": "Unexpected token 'x', ...\"1,1,1,1,1,x,1,1,\" is not valid JSON"
+  },
+  {
+   "text": "[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,x",
+   "message": "Unexpected token 'x', ...\"1,1,1,1,1,x\" is not valid JSON"
+  },
+  {
+   "text": "[1,1,1,1,1,1,1,x,1,1,1,1,1,1,1,1,1,1,1,1",
+   "message": "Unexpected token 'x', ...\"1,1,1,1,1,x,1,1,1,1,\"... is not valid JSON"
+  },
+  {
+   "text": "[\n1,\n2,x]",
+   "message": "Unexpected token 'x', \"[\n1,\n2,x]\" is not valid JSON"
+  },
+  {
+   "text": "{\"sources\": {\"a\": {\"git\": \"x\",}}}",
+   "message": "Expected double-quoted property name in JSON at position 30 (line 1 column 31)"
+  },
+  {
+   "text": "falsy",
+   "message": "Unexpected token 'y', \"falsy\" is not valid JSON"
+  },
+  {
+   "text": "[nan]",
+   "message": "Unexpected token 'a', \"[nan]\" is not valid JSON"
+  },
+  {
+   "text": "\" \" x",
+   "message": "Unexpected non-whitespace character after JSON at position 4 (line 1 column 5)"
+  },
+  {
+   "text": "{\"😀\": 1 x}",
+   "message": "Expected ',' or '}' after property value in JSON at position 9 (line 1 column 10)"
+  },
+  {
+   "text": "[1] // comment",
+   "message": "Unexpected non-whitespace character after JSON at position 4 (line 1 column 5)"
+  },
+  {
+   "text": "{\n  \"a\": 1,\n  \"b\": 2,\n}\n",
+   "message": "Expected double-quoted property name in JSON at position 22 (line 4 column 1)"
+  }
+ ]
+}

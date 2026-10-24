@@ -31,6 +31,7 @@
          "requires" : {
             "JSON::MaybeXS" : "0",
             "MCP" : "0.15",
+            "Mojolicious" : "0",
             "Path::Tiny" : "0",
             "Text::Trim" : "0"
          }
@@ -44,19 +45,19 @@
    "provides" : {
       "MCP::Run" : {
          "file" : "lib/MCP/Run.pm",
-         "version" : "0.106"
+         "version" : "0.107"
       },
       "MCP::Run::Bash" : {
          "file" : "lib/MCP/Run/Bash.pm",
-         "version" : "0.106"
+         "version" : "0.107"
       },
       "MCP::Run::Compress" : {
          "file" : "lib/MCP/Run/Compress.pm",
-         "version" : "0.106"
+         "version" : "0.107"
       },
       "MCP::Run::Compress::Filters" : {
          "file" : "lib/MCP/Run/Compress/Filters.pm",
-         "version" : "0.106"
+         "version" : "0.107"
       }
    },
    "release_status" : "stable",
@@ -71,10 +72,10 @@
          "web" : "https://github.com/Getty/p5-mcp-run"
       }
    },
-   "version" : "0.106",
+   "version" : "0.107",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.036000"
+         "version" : "5.040001"
       },
       "plugins" : [
          {
@@ -82,6 +83,7 @@
             "config" : {
                "Dist::Zilla::Plugin::GatherDir" : {
                   "exclude_filename" : [
+                     ".karr",
                      "README.md"
                   ],
                   "exclude_match" : [],
@@ -98,6 +100,11 @@
             "version" : "2.052"
          },
          {
+            "class" : "Dist::Zilla::Plugin::GatherAgentContext",
+            "name" : "@Author::GETTY/GatherAgentContext",
+            "version" : "0.001"
+         },
+         {
             "class" : "Dist::Zilla::Plugin::ManifestSkip",
             "name" : "@Author::GETTY/@Filter/ManifestSkip",
             "version" : "6.037"
@@ -105,11 +112,6 @@
          {
             "class" : "Dist::Zilla::Plugin::MetaYAML",
             "name" : "@Author::GETTY/@Filter/MetaYAML",
-            "version" : "6.037"
-         },
-         {
-            "class" : "Dist::Zilla::Plugin::License",
-            "name" : "@Author::GETTY/@Filter/License",
             "version" : "6.037"
          },
          {
@@ -163,6 +165,11 @@
             "version" : "6.037"
          },
          {
+            "class" : "Dist::Zilla::Plugin::LicenseFile",
+            "name" : "@Author::GETTY/LicenseFile",
+            "version" : "0.002"
+         },
+         {
             "class" : "Dist::Zilla::Plugin::MetaConfig",
             "name" : "@Author::GETTY/MetaConfig",
             "version" : "6.037"
@@ -202,7 +209,7 @@
                   "meta_noindex" : 1
                },
                "Dist::Zilla::Role::ModuleMetadata" : {
-                  "Module::Metadata" : "1.000037",
+                  "Module::Metadata" : "1.000038",
                   "version" : "0.006"
                }
             },
@@ -228,12 +235,12 @@
             "class" : "Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch",
             "config" : {
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.39.5",
+                  "git_version" : "2.47.3",
                   "repo_root" : "."
                }
             },
             "name" : "@Author::GETTY/Git::CheckFor::CorrectBranch",
-            "version" : "0.014"
+            "version" : "0.015"
          },
          {
             "class" : "Dist::Zilla::Plugin::Prereqs::FromCPANfile",
@@ -365,8 +372,8 @@
                "Dist::Zilla::Plugin::RewriteVersion" : {
                   "add_tarball_name" : 0,
                   "finders" : [
-                     ":ExecFiles",
-                     ":InstallModules"
+                     ":InstallModules",
+                     ":PerlExecFiles"
                   ],
                   "global" : 0,
                   "skip_version_provider" : 0
@@ -410,7 +417,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.39.5",
+                  "git_version" : "2.47.3",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -427,12 +434,12 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "0.106",
+                  "tag" : "0.107",
                   "tag_format" : "%v",
                   "tag_message" : "v%V"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.39.5",
+                  "git_version" : "2.47.3",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -447,8 +454,8 @@
             "config" : {
                "Dist::Zilla::Plugin::BumpVersionAfterRelease" : {
                   "finders" : [
-                     ":ExecFiles",
-                     ":InstallModules"
+                     ":InstallModules",
+                     ":PerlExecFiles"
                   ],
                   "global" : 0,
                   "munge_makefile_pl" : 1
@@ -478,12 +485,13 @@
                      "Makefile.PL"
                   ],
                   "allow_dirty_match" : [
+                     "(?^:^bin/)",
                      "(?^:^lib/.*\\.pm$)"
                   ],
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.39.5",
+                  "git_version" : "2.47.3",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -503,7 +511,7 @@
                   "remotes_must_exist" : 1
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.39.5",
+                  "git_version" : "2.47.3",
                   "repo_root" : "."
                }
             },
@@ -513,12 +521,17 @@
          {
             "class" : "Dist::Zilla::Plugin::GitHub::CreateRelease",
             "name" : "@Author::GETTY/GitHub::CreateRelease",
-            "version" : "0.0009"
+            "version" : "0.0012"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PruneFiles",
+            "name" : "PruneFiles",
+            "version" : "6.037"
          },
          {
             "class" : "Dist::Zilla::Plugin::Docker::API",
             "name" : "compress/Docker::API",
-            "version" : "0.103"
+            "version" : "0.104"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
@@ -585,8 +598,8 @@
       }
    },
    "x_authority" : "cpan:GETTY",
-   "x_generated_by_perl" : "v5.36.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.40",
+   "x_generated_by_perl" : "v5.40.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.53",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

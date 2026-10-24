@@ -1,0 +1,14 @@
+--- ku.xml
++++ ku.xml
+@@ -5373,6 +5373,11 @@
+ 				<displayName count="one">yûanê çînî (offshore)</displayName>
+ 				<displayName count="other">yûanên çînî (offshore)</displayName>
+ 			</currency>
++			<currency type="CNX">
++				<displayName>dolarê Banka Xelkî ya çînî</displayName>
++				<displayName count="one">dolarê Banka Xelkî ya çînî</displayName>
++				<displayName count="other">dolarên Banka Xelkî ya çînî</displayName>
++			</currency>
+ 			<currency type="CNY">
+ 				<displayName>yûanê çînî</displayName>
+ 				<displayName count="one">yûanê çînî</displayName>

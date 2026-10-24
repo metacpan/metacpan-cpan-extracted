@@ -65,27 +65,27 @@
    "provides" : {
       "TAP::DOM" : {
          "file" : "lib/TAP/DOM.pm",
-         "version" : "1.001"
+         "version" : "1.002"
       },
       "TAP::DOM::Archive" : {
          "file" : "lib/TAP/DOM/Archive.pm",
-         "version" : "1.001"
+         "version" : "1.002"
       },
       "TAP::DOM::Config" : {
          "file" : "lib/TAP/DOM/Config.pm",
-         "version" : "1.001"
+         "version" : "1.002"
       },
       "TAP::DOM::DocumentData" : {
          "file" : "lib/TAP/DOM/DocumentData.pm",
-         "version" : "1.001"
+         "version" : "1.002"
       },
       "TAP::DOM::Entry" : {
          "file" : "lib/TAP/DOM/Entry.pm",
-         "version" : "1.001"
+         "version" : "1.002"
       },
       "TAP::DOM::Summary" : {
          "file" : "lib/TAP/DOM/Summary.pm",
-         "version" : "1.001"
+         "version" : "1.002"
       }
    },
    "release_status" : "stable",
@@ -101,7 +101,7 @@
          "web" : "http://github.com/renormalist/tap-dom"
       }
    },
-   "version" : "1.001",
+   "version" : "1.002",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.041003"
@@ -517,7 +517,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v1.001",
+                  "tag" : "v1.002",
                   "tag_format" : "v%V",
                   "tag_message" : "v%V"
                },

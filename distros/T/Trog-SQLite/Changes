@@ -1,5 +1,10 @@
 Revision history for Trog-SQLite
 
+0.004 2026-10-23 TEODESIAN
+    - transaction runs a sub in one transaction, and rolls it back if the
+      sub dies.  Inside a transaction that the caller began, it runs the
+      sub in that one, and leaves the commit to the caller.
+
 0.003 2026-10-22 TEODESIAN
     - The test of an error other than a lock opens a file that is not a
       database, not a read-only file.  Root writes a read-only file, so the

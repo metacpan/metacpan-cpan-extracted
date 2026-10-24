@@ -1,6 +1,6 @@
 package Langertha::Skeid::UsageStore::JsonLog;
-our $VERSION = '0.003';
-# ABSTRACT: Append-only JSON usage store — one file per event, or one line per event
+our $VERSION = '0.004';
+# ABSTRACT: Append-only JSON usage store - one file per event, or one line per event
 use Moo;
 use strict;
 use warnings;
@@ -192,7 +192,7 @@ sub report {
     @events = grep { ($_->{model} // '') eq $filters->{model} } @events;
   }
 
-  my %totals = (requests => 0, input_tokens => 0, output_tokens => 0, total_tokens => 0, cached_tokens => 0, cache_write_tokens => 0, tool_calls => 0, total_cost_usd => 0);
+  my %totals = (requests => 0, input_tokens => 0, output_tokens => 0, total_tokens => 0, cached_tokens => 0, cache_write_tokens => 0, tool_calls => 0, audio_seconds => 0, documents => 0, pages => 0, total_cost_usd => 0);
   my (%by_key, %by_model);
   for my $ev (@events) {
     $totals{requests}++;
@@ -203,16 +203,28 @@ sub report {
     $totals{cached_tokens} += $num->($ev->{cached_tokens});
     $totals{cache_write_tokens} += $num->($ev->{cache_write_tokens});
     $totals{tool_calls}    += $num->($ev->{tool_calls});
+    # Only an audio route's event carries it (skeid k91); every other event adds nothing.
+    $totals{audio_seconds} += $num->($ev->{audio_seconds});
+    # Likewise the documents of a rerank event (skeid k92).
+    $totals{documents}     += $num->($ev->{documents});
+    # And the pages a documents event read off its answer (skeid k94).
+    $totals{pages}         += $num->($ev->{pages});
     $totals{total_cost_usd} += $num->($ev->{cost_total_usd});
 
     my $kid = $ev->{api_key_id} // '';
     $by_key{$kid}{requests}++;
     $by_key{$kid}{total_tokens}   += $num->($ev->{total_tokens});
+    $by_key{$kid}{audio_seconds}  += $num->($ev->{audio_seconds});
+    $by_key{$kid}{documents}      += $num->($ev->{documents});
+    $by_key{$kid}{pages}          += $num->($ev->{pages});
     $by_key{$kid}{total_cost_usd} += $num->($ev->{cost_total_usd});
 
     my $mid = $ev->{model} // '';
     $by_model{$mid}{requests}++;
     $by_model{$mid}{total_tokens}   += $num->($ev->{total_tokens});
+    $by_model{$mid}{audio_seconds}  += $num->($ev->{audio_seconds});
+    $by_model{$mid}{documents}      += $num->($ev->{documents});
+    $by_model{$mid}{pages}          += $num->($ev->{pages});
     $by_model{$mid}{total_cost_usd} += $num->($ev->{cost_total_usd});
   }
 
@@ -228,11 +240,11 @@ sub report {
     since    => ($filters->{since} // ''),
     totals  => \%totals,
     by_key  => [ map {
-      +{ api_key_id => $_, requests => $by_key{$_}{requests}, total_tokens => $by_key{$_}{total_tokens}, total_cost_usd => $by_key{$_}{total_cost_usd} }
-    } sort { ($by_key{$b}{total_cost_usd} || 0) <=> ($by_key{$a}{total_cost_usd} || 0) } keys %by_key ],
+      +{ api_key_id => $_, requests => $by_key{$_}{requests}, total_tokens => $by_key{$_}{total_tokens}, audio_seconds => $by_key{$_}{audio_seconds}, documents => $by_key{$_}{documents}, pages => $by_key{$_}{pages}, total_cost_usd => $by_key{$_}{total_cost_usd} }
+    } sort { ($by_key{$b}{total_cost_usd} || 0) <=> ($by_key{$a}{total_cost_usd} || 0) or $a cmp $b } keys %by_key ],
     by_model => [ map {
-      +{ model => $_, requests => $by_model{$_}{requests}, total_tokens => $by_model{$_}{total_tokens}, total_cost_usd => $by_model{$_}{total_cost_usd} }
-    } sort { ($by_model{$b}{total_cost_usd} || 0) <=> ($by_model{$a}{total_cost_usd} || 0) } keys %by_model ],
+      +{ model => $_, requests => $by_model{$_}{requests}, total_tokens => $by_model{$_}{total_tokens}, audio_seconds => $by_model{$_}{audio_seconds}, documents => $by_model{$_}{documents}, pages => $by_model{$_}{pages}, total_cost_usd => $by_model{$_}{total_cost_usd} }
+    } sort { ($by_model{$b}{total_cost_usd} || 0) <=> ($by_model{$a}{total_cost_usd} || 0) or $a cmp $b } keys %by_model ],
     recent  => [ map {
       +{
         id => ($_->{id} // ''), created_at => ($_->{created_at} // ''), api_format => ($_->{api_format} // ''),
@@ -260,11 +272,11 @@ __END__
 
 =head1 NAME
 
-Langertha::Skeid::UsageStore::JsonLog - Append-only JSON usage store — one file per event, or one line per event
+Langertha::Skeid::UsageStore::JsonLog - Append-only JSON usage store - one file per event, or one line per event
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 DESCRIPTION
 
@@ -321,7 +333,9 @@ that was already served. The proxy logs such an answer at C<error> level as a lo
   my $report = $store->report(\%filters);
 
 Reads every event, applies the C<since> / C<api_key_id> / C<model> filters, and aggregates
-totals plus per-key and per-model breakdowns. C<recent> holds the newest C<limit> events
+totals plus per-key and per-model breakdowns, the C<audio_seconds> of the audio routes and the
+C<documents> of the rerank and documents routes and the C<pages> of the documents routes
+among them. C<recent> holds the newest C<limit> events
 (default 20). Unreadable files and lines are skipped. The shape is described in
 L<Langertha::Skeid::UsageStore/The store contract>.
 

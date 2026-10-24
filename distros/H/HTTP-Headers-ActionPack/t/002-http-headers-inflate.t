@@ -41,15 +41,15 @@ Link: <http://example.com/TheBook/chapter2>; rel="previous"; title="previous cha
 {
     my $h = HTTP::Headers->new(
         "link" => '</buckets/data-riak-test-5277610365cc43728be2c70dc14b3044/keys/baz>;'
-                . ' riaktag=\"contained\",' 
-                . '</buckets/data-riak-test-5277610365cc43728be2c70dc14b3044/keys/bar>;' 
                 . ' riaktag=\"contained\",'
-                . '</buckets/data-riak-test-5277610365cc43728be2c70dc14b3044/keys/foo>;' 
+                . '</buckets/data-riak-test-5277610365cc43728be2c70dc14b3044/keys/bar>;'
+                . ' riaktag=\"contained\",'
+                . '</buckets/data-riak-test-5277610365cc43728be2c70dc14b3044/keys/foo>;'
                 . ' riaktag=\"contained\"',
-    ); 
+    );
 
     $pack->inflate( $h );
-    is(exception { $pack->inflate( $h ) }, undef, '... this does not throw an exception');    
+    is(exception { $pack->inflate( $h ) }, undef, '... this does not throw an exception');
 }
 
 

@@ -3,7 +3,32 @@ use warnings;
 use Test::More;
 use FindBin qw($Bin);
 use lib "$Bin/../lib";
-use ForgeOps::Tracker::PiiScrubber qw(scrub scrub_string);
+use JSON::PP;
+use ForgeOps::Tracker::PiiScrubber qw(scrub scrub_string REDACTED);
+
+# A byte-identical copy of sdks/pii_scrubbing_vectors.json, generated from the server's own
+# PiiScrubber; every SDK checks itself against the same file.
+my $vectors = do {
+    open my $fh, '<:raw', "$Bin/fixtures/pii_scrubbing_vectors.json" or die "can't read vectors: $!";
+    local $/;
+    decode_json(<$fh>);
+};
+
+subtest 'scrubs every shared card number and IBAN vector exactly as the server does' => sub {
+    ok(scalar @{ $vectors->{strings} } > 0, 'string vectors loaded');
+    for my $vector (@{ $vectors->{strings} }) {
+        my $label = JSON::PP->new->ascii->allow_nonref->encode($vector->{input});
+        is(scrub_string($vector->{input}), $vector->{scrubbed}, "scrubbed $label");
+    }
+};
+
+subtest 'redacts every shared bank-detail key vector exactly as the server does' => sub {
+    ok(scalar @{ $vectors->{keys} } > 0, 'key vectors loaded');
+    for my $vector (@{ $vectors->{keys} }) {
+        my $expected = $vector->{redacted} ? REDACTED : 'x';
+        is_deeply(scrub({ $vector->{key} => 'x' }), { $vector->{key} => $expected }, "key $vector->{key}");
+    }
+};
 
 subtest 'redacts an email address embedded in free text' => sub {
     is(

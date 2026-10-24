@@ -37,7 +37,7 @@ use Object::Configure 0.16;
 use Params::Get 0.17;
 use Return::Set qw(set_return);
 use Scalar::Util;
-use Sub::Private;
+use Sub::Private { mode => 'enforce' };
 use Sub::Protected;
 
 # File::Slurp::Remote is loaded lazily in _open() when host => '...' is given.
@@ -105,11 +105,11 @@ Database::Abstraction - Read-only Database Abstraction Layer (ORM)
 
 =head1 VERSION
 
-Version 0.51
+Version 0.52
 
 =cut
 
-our $VERSION = '0.51';
+our $VERSION = '0.52';
 
 =head1 DESCRIPTION
 

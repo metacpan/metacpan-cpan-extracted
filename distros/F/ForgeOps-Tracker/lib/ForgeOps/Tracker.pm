@@ -25,7 +25,7 @@ use Time::HiRes ();
 # directly: retrying the identical 0.2.0 tarball came back 409 Conflict, not the original success
 # response repeated). No functional change from 0.2.0; this bump exists solely to get a fresh,
 # uploadable version number.
-our $VERSION = '0.16.0';
+our $VERSION = '0.17.0';
 
 my $configuration;
 my $reporter;

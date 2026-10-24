@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '0.001.0';
+our $VERSION = '0.002.0';
 
 # The German catalogue: message key to text, or to a hash that chooses a
 # text by gender or plural category; see App::Actions::I18N for the shape.
@@ -129,6 +129,33 @@ my %MESSAGES = (
 			other => '%(count)d Läufe konnten nicht entfernt werden:',
 		},
 	},
+	# The text listings of the cache and logs commands.  "her" rather than
+	# "vor", which would need the dative plural (Tagen) the span lacks.
+	'span.just_now' => 'gerade eben',
+	'span.ago' => '%(span)s her',
+	'cache.file' => 'Cache-Datei: %(file)s',
+	'cache.empty' => 'Es wurden noch keine Images zwischengespeichert.',
+	'cache.none_older' => 'Kein Image im Cache ist älter als %(span)s.',
+	'cache.only_older' => 'Nur Images, die älter als %(span)s sind.',
+	'cache.unreachable' => 'Der Docker-Daemon ist nicht erreichbar, daher sind die Größen unbekannt.',
+	'cache.prune_hint' => 'Mit "action-run cache --prune" entfernen.',
+	'cache.unknown' => 'unbekannt',
+	'cache.size_missing' => 'fehlt',
+	'cache.heading.image' => 'IMAGE',
+	'cache.heading.size' => 'GRÖSSE',
+	'cache.heading.last_used' => 'ZULETZT VERWENDET',
+	'cache.heading.age' => 'ALTER',
+	'logs.directory' => 'Log-Verzeichnis: %(directory)s',
+	'logs.empty' => 'Es wurden noch keine Job-Logs aufbewahrt.',
+	'logs.none_older' => 'Kein Job-Log ist älter als %(span)s.',
+	'logs.only_older' => 'Nur Job-Logs, die älter als %(span)s sind.',
+	'logs.prune_hint' => 'Mit "action-run logs --prune" entfernen.',
+	'logs.heading.run' => 'LAUF',
+	'logs.heading.log' => 'LOG',
+	'logs.heading.size' => 'GRÖSSE',
+	'logs.heading.age' => 'ALTER',
+	'process.redirect_failed' => "%(stream)s konnte nicht nach '%(file)s' umgeleitet werden: %(error)s",
+	'process.exec_failed' => "'%(program)s' konnte nicht ausgeführt werden: %(error)s",
 	# The runner and its parts.  "action-run: " is the program's name and is
 	# not translated; the line markers (==>, ---, !!) are kept too.
 	'runner.workflow_required' => 'Ein Workflow ist erforderlich',
@@ -144,6 +171,7 @@ my %MESSAGES = (
 	'runner.dependency_cycle' => "Abhängigkeitszyklus mit Job '%(job)s'",
 	'runner.unknown_job' => "Unbekannter Job '%(job)s'",
 	'runner.need_not_selected' => "action-run: Job '%(job)s' braucht '%(need)s', der nicht ausgewählt ist; er gilt als erfolgreich",
+	'runner.env_cycle' => "Die Umgebungsvariable '%(name)s' verweist auf sich selbst, direkt oder über andere Variablen",
 	'runner.env_failed' => "Die Umgebungsvariable '%(name)s' kann nicht ausgewertet werden: %(error)s",
 	'runner.write_failed' => '%(what)s kann nicht geschrieben werden: %(error)s',
 	'runner.file_write_failed' => "'%(file)s' kann nicht geschrieben werden: %(error)s",
@@ -179,7 +207,6 @@ my %MESSAGES = (
 	'runner.job.if_failed' => "action-run: if für '%(name)s' kann nicht ausgewertet werden: %(error)s",
 	'runner.job.skipped' => '==> Job: %(name)s (übersprungen)',
 	'runner.job.fail_fast' => '==> Job: %(name)s (wegen fail-fast übersprungen)',
-	'runner.job.no_result' => 'der Job hat kein Ergebnis gemeldet',
 	'runner.job.continue_failed' => "action-run: continue-on-error für '%(name)s' kann nicht ausgewertet werden: %(error)s",
 	'runner.job.continued' => '!! Job fehlgeschlagen, aber continue-on-error ist gesetzt: %(name)s',
 	'runner.job.not_linux' => "==> Job: %(name)s (übersprungen: runs-on '%(runs_on)s' ist nicht Linux)",
@@ -188,7 +215,6 @@ my %MESSAGES = (
 	'runner.job.no_image' => "Für Job '%(name)s' lässt sich kein Container-Image bestimmen",
 	'runner.job.image' => '    Image: %(image)s',
 	'runner.job.deferred' => '  später    %(expression)s (%(source)s)',
-	'runner.job.did_not_run' => 'der Job ist nicht gelaufen',
 
 	'runner.parallel.did_not_run' => "Job '%(name)s' ist nicht gelaufen",
 	'runner.parallel.dup_failed' => '%(handle)s kann nicht dupliziert werden',
@@ -196,6 +222,7 @@ my %MESSAGES = (
 
 	'runner.service.not_mapping' => "Der Dienst '%(id)s' muss ein Mapping sein",
 	'runner.service.no_image' => "Der Dienst '%(id)s' hat kein Image",
+	'runner.options_invalid' => "Die Container-Optionen '%(options)s' können nicht gelesen werden: ein Anführungszeichen ist nicht geschlossen",
 	'runner.service.credentials' => "action-run: Zugangsdaten für den Dienst '%(id)s' werden nicht unterstützt; die lokale Docker-Anmeldung wird verwendet",
 	'runner.service.start_failed' => "Der Dienst '%(id)s' konnte nicht gestartet werden (Status %(status)s)",
 	'runner.what.service' => "Dienst '%(id)s'",
@@ -219,7 +246,6 @@ my %MESSAGES = (
 	'runner.container.daemon_silent' => '%(state)s; der Daemon hat nichts gemeldet',
 	'runner.container.daemon_said' => '%(state)s; der Daemon meldete:',
 	'runner.fault.image' => "das Image '%(image)s'",
-	'runner.fault.image_unnamed' => 'das Image',
 	'runner.fault.port' => 'der veröffentlichte Port',
 	'runner.fault.entrypoint' => "der Entrypoint '%(entrypoint)s'",
 
@@ -264,6 +290,7 @@ my %MESSAGES = (
 	'runner.unsupported.skipped' => "Action '%(action)s' übersprungen: %(reason)s",
 	'runner.unsupported.note' => '    (übersprungen: %(reason)s)',
 	'runner.docker_action.no_image' => "Die Docker-Action '%(uses)s' in Job '%(job)s' hat keinen Image-Namen; prüfen Sie den verwendeten Ausdruck",
+	'runner.docker_action.bad_args' => "Die args von '%(uses)s' ('%(args)s') können nicht gelesen werden: ein Anführungszeichen ist nicht geschlossen",
 	'runner.docker_action.bad_image' => "Die Docker-Action '%(uses)s' in Job '%(job)s' ergibt '%(image)s', was kein Image-Name ist; prüfen Sie den verwendeten Ausdruck",
 	'runner.docker_action.exited' => 'die Docker-Action endete mit Status %(status)s',
 	'runner.local_action.missing' => "Die lokale Action '%(uses)s' existiert nicht (gesucht in %(dir)s)",
@@ -281,6 +308,7 @@ my %MESSAGES = (
 	'runner.logs.kept' => 'Job-Protokolle aufbewahrt in %(dir)s',
 	'runner.logs.keep_failed' => 'action-run: Die Job-Protokolle konnten nicht aufbewahrt werden: %(error)s',
 	'runner.logs.copy_failed' => "'%(from)s' kann nicht nach '%(to)s' kopiert werden: %(error)s",
+	'runner.logs.bad_name' => "'%(name)s' ist kein einfacher Dateiname",
 	'runner.kept.header' => 'Aufbewahrte Docker-Ressourcen:',
 	'runner.kept.container' => '  Container %(name)s',
 	'runner.kept.network' => '  Netzwerk %(name)s',

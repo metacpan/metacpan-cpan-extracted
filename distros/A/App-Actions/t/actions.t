@@ -10,6 +10,11 @@ use Test::Most;
 
 use App::Actions;
 
+# Object::Configure reads the developer's own configuration files (~/.conf
+# and the like), where a UNIVERSAL logger would take the messages these tests
+# read off standard error.  An empty directory leaves the defaults in force.
+local $ENV{CONFIG_DIR} = tempdir(CLEANUP => 1);
+
 delete local $ENV{ACTION_RUN_LANG};
 
 my $project = tempdir(CLEANUP => 1);

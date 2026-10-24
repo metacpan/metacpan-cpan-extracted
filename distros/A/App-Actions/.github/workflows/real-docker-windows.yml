@@ -63,8 +63,10 @@ jobs:
       - name: Point Docker at the requested daemon
         if: inputs.docker_host != ''
         shell: pwsh
+        env:
+          DOCKER_HOST_INPUT: ${{ inputs.docker_host }}
         run: |
-          'DOCKER_HOST=${{ inputs.docker_host }}' | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+          "DOCKER_HOST=$env:DOCKER_HOST_INPUT" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
 
       # The documented smoke test: the environment report first, then one
       # workflow run against the real daemon.  It exits 2 when the daemon runs

@@ -1,5 +1,5 @@
 package Configd::Language::opendmarc;
-$Configd::Language::opendmarc::VERSION = '0.002';
+$Configd::Language::opendmarc::VERSION = '0.005';
 #ABSTRACT: opendmarc.conf, which has never had a conf.d.
 
 use 5.034;
@@ -21,6 +21,12 @@ sub units {
 }
 
 
+sub accumulates {
+    my ( $self, $key ) = @_;
+    return $key eq 'TrustedAuthservIDs';
+}
+
+
 1;
 
 __END__
@@ -35,7 +41,7 @@ Configd::Language::opendmarc - opendmarc.conf, which has never had a conf.d.
 
 =head1 VERSION
 
-version 0.002
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -62,6 +68,14 @@ F</etc/opendmarc.conf>, 0600 opendmarc:opendmarc if it has to be created.
 =head2 units()
 
 C<opendmarc.service>.
+
+=head2 accumulates($key)
+
+True for C<TrustedAuthservIDs>, a comma-separated list.  One opendmarc
+serves every domain on the host, and each domain can name the ids that it
+trusts, so a later fragment adds to the list.  C<AuthservID> is one name, the
+one that opendmarc writes its own verdicts under, so the later fragment wins.
+The comma of the base class is the separator.
 
 =head1 SEE ALSO
 

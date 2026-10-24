@@ -3,6 +3,7 @@ use warnings;
 
 use lib 't/lib';
 
+use Data::Dumper ();
 use Mojo::JSON ();
 use Mojo::URL ();
 use Mojo::Util ();
@@ -367,7 +368,9 @@ subtest 'register posts exactly its JSON body, and refuses an empty URI unsent' 
     );
     for my $uris (@refused) {
         serve({ status => 201, body => \%EVERY_REQUIRED_MEMBER });
-        my $label = Mojo::JSON::encode_json([$uris]);
+        # Not encode_json: Cpanel::JSON::XS, which Mojo::JSON uses where it is
+        # installed, dies on the lone surrogate.
+        my $label = Data::Dumper->new([$uris])->Terse(1)->Indent(0)->Useqq(1)->Dump;
         my $error = settle(sub { client()->oauth->register($uris) });
         like("$error", qr/oauth->register/, "$label: croaked");
         is(scalar @requests, 0, "$label: nothing sent");

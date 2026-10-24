@@ -5,6 +5,7 @@ data/cats.csv
 data/cities.csv
 data/dogs.csv
 data/employees.tsv
+data/insights_fixture.csv
 data/products.psv
 data/sales.csv
 data/states.csv
@@ -14,6 +15,10 @@ lib/Database/BI.pm
 lib/Database/BI/Calc.pm
 lib/Database/BI/Controller/Dashboard.pm
 lib/Database/BI/Extract.pm
+lib/Database/BI/Ask.pm
+lib/Database/BI/Insights.pm
+lib/Database/BI/Summary.pm
+lib/Database/BI/Util.pm
 lib/Database/BI/Model/DataSource.pm
 lib/Database/BI/Model/Geocode.pm
 lib/Database/BI/Tutorial.pm
@@ -50,7 +55,10 @@ t/filter.t
 t/function.t
 t/geocode-real.t
 t/geocode.t
+t/ask.t
+t/insights.t
 t/integration.t
+t/summary.t
 t/lib/BI/Test/Browser.pm
 t/lib/BI/Test/Marionette.pm
 t/locales.t
@@ -80,6 +88,7 @@ templates/web/en/heatmap.html.tt
 templates/web/en/histogram.html.tt
 templates/web/en/home.html.tt
 templates/web/en/layouts/default.html.tt
+templates/web/en/insights.html.tt
 templates/web/en/map.html.tt
 templates/web/en/pie.html.tt
 templates/web/en/pivot.html.tt

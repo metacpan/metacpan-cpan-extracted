@@ -3,6 +3,7 @@ use warnings FATAL => 'all';
 
 use Test::More qw(no_plan);
 
+use IO::Scalar;
 use Web::Dispatch::ParamParser;
 
 my $param_sample = 'foo=bar&baz=quux&foo=%2F&xyzzy';
@@ -52,5 +53,56 @@ is_deeply(
   $unpacked,
   'Body cached multipart ok'
 );
+
+eval {
+
+    open( my $in, '<', \ "x=1" );
+
+    local $Web::Dispatch::ParamParser::MAX_BODY_SIZE = 2**41;
+
+    Web::Dispatch::ParamParser::get_unpacked_body_from(
+        {
+            CONTENT_LENGTH => 2**40,
+            CONTENT_TYPE   => "application/x-www-form-urlencoded",
+            "psgi.input"   => $in,
+            REQUEST_METHOD => "POST",
+        }
+    );
+
+};
+
+like $@, qr/^Bad Content-Length: maybe client disconnect/, "Bad Content-Length (body smaller than Content-Length)";
+
+eval {
+    open( my $in, '<', \ "x=1" );
+    Web::Dispatch::ParamParser::get_unpacked_body_from(
+        {
+            CONTENT_LENGTH => 2**40,
+            CONTENT_TYPE   => "application/x-www-form-urlencoded",
+            "psgi.input"   => $in,
+            REQUEST_METHOD => "POST",
+        }
+    );
+};
+
+like $@, qr/^Bad Content-Length: [0-9]+ > ${Web::Dispatch::ParamParser::MAX_BODY_SIZE}/, "Bad Content-Length (MAX_BODY_SIZE)";
+
+
+{
+    local $Web::Dispatch::ParamParser::MAX_BODY_SIZE = 2;
+    eval {
+        open( my $in, '<', \ "x=1" );
+
+        Web::Dispatch::ParamParser::get_unpacked_body_from(
+            {
+                CONTENT_LENGTH => 3,
+                CONTENT_TYPE   => "application/x-www-form-urlencoded",
+                "psgi.input"   => $in,
+                REQUEST_METHOD => "POST",
+            }
+        );
+    };
+    like $@, qr/^Bad Content-Length: [0-9]+ > ${Web::Dispatch::ParamParser::MAX_BODY_SIZE}/, "Bad Content-Length (MAX_BODY_SIZE)";
+}
 
 1;

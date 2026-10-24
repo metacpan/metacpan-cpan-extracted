@@ -46,6 +46,7 @@
          },
          "requires" : {
             "Data::Dumper::Concise" : "2.020",
+            "IO::Scalar" : "0",
             "Test::More" : "0.88"
          }
       }
@@ -62,6 +63,6 @@
          "web" : "https://github.com/p5sagit/Web-Simple"
       }
    },
-   "version" : "0.034",
+   "version" : "0.035",
    "x_serialization_backend" : "JSON::MaybeXS version 1.004008"
 }

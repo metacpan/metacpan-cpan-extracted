@@ -7,6 +7,8 @@ use Future;
 use Scalar::Util qw( blessed );
 use Carp qw( croak );
 
+use Net::Async::MCP::JSONRPC;
+
 
 sub new {
   my ( $class, %args ) = @_;
@@ -106,16 +108,29 @@ sub _process_response {
   return Future->fail("Invalid response from MCP server")
     unless ref $response eq 'HASH';
 
-  # The message alone cannot carry a code to switch on or an error->{data} to
-  # read, so the raw JSON-RPC error object travels with it as the details of a
-  # failure in category "mcp". The message stays the first element, so a caller
-  # reading the failure in scalar context sees exactly what it saw before.
-  if (my $err = $response->{error}) {
-    return Future->fail("MCP error $err->{code}: $err->{message}", mcp => $err);
+  # The raw JSON-RPC error object travels with the message as the details of a
+  # failure in category "mcp" - see Net::Async::MCP::JSONRPC, which the wire
+  # transports read their answers with too. MCP::Server always renders one,
+  # but the server object may be anything with a handle(), so an error in any
+  # other shape still says the request failed, with the text it carries and no
+  # category.
+  if (defined(my $err = $response->{error})) {
+    my @failure = $self->_jsonrpc_class->error_failure($response);
+    return Future->fail(@failure) if @failure;
+    return Future->fail('MCP in-process error response: '.$self->_jsonrpc_class->error_text($err));
   }
+
+  # "error": null sits next to every result in JSON-RPC 1.0 and says nothing
+  # there. Without a result it answers nothing, and an undef handed out as the
+  # result would be a success the server never reported.
+  return Future->fail('MCP in-process invalid response: a null error and no result')
+    if exists $response->{error} && !exists $response->{result};
 
   return Future->done($response->{result});
 }
+
+# Private: the class that reads the error of a response, named once.
+sub _jsonrpc_class { 'Net::Async::MCP::JSONRPC' }
 
 
 1;
@@ -132,7 +147,7 @@ Net::Async::MCP::Transport::InProcess - In-process MCP transport via direct MCP:
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 
@@ -217,6 +232,14 @@ else. The failures this transport raises on its own - a missing or unusable
 response, an async tool that rejected, and the C<subscriptions/listen> refusal
 below - carry their message alone, so a caller that finds no category knows
 there is no server error object behind it.
+
+An C<error> that is no JSON-RPC error object - a string, a number, an array, a
+hash without a C<code> - still fails the request, with
+C<MCP in-process error response: TEXT> carrying the value or its JSON, and no
+category. L<MCP::Server> never answers that way, but the server object may be
+anything with a C<handle()> method. A C<"error": null> next to a C<result> is a
+success, as JSON-RPC 1.0 wrote it; without one it fails with
+C<MCP in-process invalid response: a null error and no result>.
 
 Accepts the same optional trailing name/value options as the other transports,
 C<header_params> among them, and ignores all of them: they describe how a

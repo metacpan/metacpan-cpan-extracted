@@ -1,5 +1,5 @@
 package MCP::Run;
-our $VERSION = '0.106';
+our $VERSION = '0.107';
 use Mojo::Base 'MCP::Server', -signatures;
 
 use MCP::Run::Compress;
@@ -51,7 +51,15 @@ sub _register_run_tool ($self) {
       properties => {
         command           => { type => 'string',  description => 'The command to execute' },
         working_directory => { type => 'string',  description => 'Working directory for the command' },
-        timeout           => { type => 'integer', description => 'Timeout in seconds' },
+        # No `minimum` here on purpose: MCP validates the schema for real, so a
+        # `minimum => 1` would answer `timeout: 0` with a hard -32602 "Invalid
+        # arguments" and run nothing at all, while the same 0 arriving via
+        # MCP_RUN_TIMEOUT has no schema in front of it and would still fall
+        # back. One value, two answers. The fallback handles it instead.
+        timeout           => {
+          type        => 'integer',
+          description => 'Timeout in seconds; must be a positive number. Any other value falls back to the server default - 0 does not disable the timeout',
+        },
         compress          => { type => 'boolean', description => 'Compress output for LLM efficiency' },
       },
       required => ['command'],
@@ -63,9 +71,22 @@ sub _register_run_tool ($self) {
 sub _handle_run ($self, $tool, $args) {
   my $command = $args->{command};
 
+  # 'command' is required by the input schema, but nothing enforces the schema,
+  # so a request without one used to fall through both gates into execute() and
+  # come back as a cheerful 'Exit code: 0' — indistinguishable from a real run,
+  # and a process started for nothing. Whitespace-only counts as empty: the
+  # allowlist has always said so (/^\s*(\S+)/ finds no first word there), and
+  # the two paths must not disagree about what an empty command is.
+  unless (defined $command && $command =~ /\S/) {
+    return $tool->text_result('No command given: the command parameter must be a non-empty string', 1);
+  }
+
   if (my $allowed = $self->allowed_commands) {
+    # $command holds at least one non-whitespace character by now, so
+    # $first_word is always defined. The guard is `defined` and not truth so
+    # that a command literally named "0" stays matchable.
     my ($first_word) = $command =~ /^\s*(\S+)/;
-    unless ($first_word && grep { $_ eq $first_word } @$allowed) {
+    unless (defined $first_word && grep { $_ eq $first_word } @$allowed) {
       return $tool->text_result("Command not allowed: $first_word", 1);
     }
   }
@@ -148,7 +169,7 @@ MCP::Run - MCP server with a command execution tool
 
 =head1 VERSION
 
-version 0.106
+version 0.107
 
 =head1 SYNOPSIS
 
@@ -171,6 +192,11 @@ execution mechanism.
 The registered tool accepts a C<command> string, an optional
 C<working_directory>, and an optional C<timeout>. The tool returns a text
 result containing the exit code, stdout, and stderr of the executed command.
+
+C<command> is required and must contain at least one non-whitespace
+character. A missing, undefined, empty or whitespace-only command is rejected
+with an error result before L</execute> is reached, so an incomplete request
+is never answered as a successful run.
 
 See L<MCP::Run::Bash> for a concrete implementation using
 C<bash -c>.
@@ -217,6 +243,14 @@ Default timeout in seconds for command execution. Can be overridden per
 invocation via the C<timeout> argument passed to the MCP tool. Defaults to
 C<30>.
 
+A per-call C<timeout> the runner cannot enforce - C<0>, a negative value or
+something non-numeric, among others - falls back to this default instead of
+being used as given. C<0> does B<not> mean "no timeout": runners are required
+not to let a command run unbounded, because that would occupy the server for
+as long as the command keeps running. See L</execute> for the contract and
+L<MCP::Run::Bash/execute> for the enforcement and the full list of values
+that fall back.
+
 =head2 tool_name
 
 Name of the MCP tool registered by this server. Defaults to C<run>.
@@ -251,6 +285,14 @@ entry point for C<bin/> scripts.
 
 Abstract method that subclasses must implement. Executes C<$command> in
 C<$working_directory> (may be C<undef>) with the given C<$timeout> in seconds.
+
+Implementations must not let a command run unbounded. A C<$timeout> the
+implementation cannot honour - C<0>, a negative value, C<undef>, garbage, or a
+value its timing mechanism cannot represent - must fall back to the server's
+L</timeout> attribute rather than switching the limit off, because an
+unbounded command occupies the server for as long as it runs. C<MCP::Run>
+passes the value through untouched, so this is the runner's responsibility and
+every runner owes it.
 
 Must return a hashref with the following keys:
 

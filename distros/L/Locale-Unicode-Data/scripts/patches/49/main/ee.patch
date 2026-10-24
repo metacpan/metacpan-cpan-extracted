@@ -1,0 +1,14 @@
+--- ee.xml
++++ ee.xml
+@@ -3171,6 +3171,11 @@
+ 			<currency type="CLP">
+ 				<displayName>chilega peso</displayName>
+ 			</currency>
++			<currency type="CNX">
++				<displayName>tsainatɔwo ƒe gadzraɖoƒe dollar</displayName>
++				<displayName count="one">tsainatɔwo ƒe gadzraɖoƒe dollar</displayName>
++				<displayName count="other">tsainatɔwo ƒe gadzraɖoƒe dollarwo</displayName>
++			</currency>
+ 			<currency type="CNY">
+ 				<displayName>Chinesega yuan</displayName>
+ 			</currency>

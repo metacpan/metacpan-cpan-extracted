@@ -94,6 +94,12 @@ This returns a string representation of the Exception such as :
 
     Invalid property within package My::Module at line 120 in file /home/john/lib/My/Module.pm
 
+=head2 clone
+
+This returns a cloned copy of the exception.
+
+It is used by the special C<PROPAGATE> method called by Perl's C<die>
+
 =head2 code
 
 Set or get the error code. It returns the current value.

@@ -5,7 +5,7 @@ use warnings::illegalproto ();
 use Moo ();
 use Web::Dispatch::Wrapper ();
 
-our $VERSION = '0.034';
+our $VERSION = '0.035';
 
 sub import {
   my ($class, $app_package) = @_;
@@ -754,6 +754,20 @@ request had been made to C</other/url> instead.
 Note, this is not the same as returning an HTTP 3xx redirect as a response;
 rather it is a much more efficient internal process.
 
+=head1 SECURITY CONSIDERATIONS
+
+Request bodies now have a maximum size, which defaults to 8 MiB.
+
+If you want to adjust the size, you need to change
+C<$Web::Dispatch::ParamParser::MAX_BODY_SIZE>, for example,
+
+  $Web::Dispatch::ParamParser::MAX_BODY_SIZE = 33554432; # 32MiB
+
+Requests with larger bodies will croak.
+
+You will need to validate the Content-Length header before dispatching it,
+if you want a user-friendly response.
+
 =head1 CHANGES BETWEEN RELEASES
 
 =head2 Changes between 0.004 and 0.005
@@ -891,6 +905,8 @@ Robert Sedlacek (phaylon) <r.sedlacek@shadowcat.co.uk>
 Hakim Cassimally (osfameron) <osfameron@cpan.org>
 
 Karen Etheridge (ether) <ether@cpan.org>
+
+Robert Rothenberg <perl@rhizomnic.com>
 
 =head1 COPYRIGHT
 

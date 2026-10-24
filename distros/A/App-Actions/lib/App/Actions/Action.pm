@@ -17,7 +17,7 @@ use Sub::Private ();
 
 use App::Actions::Access;
 
-our $VERSION = '0.001.0';
+our $VERSION = '0.002.0';
 
 # An error in an action's metadata is reported where the action was asked
 # for, which is the runner step that uses it.
@@ -34,7 +34,7 @@ Readonly::Scalar my $KIND_JAVASCRIPT => 'javascript';
 Readonly::Scalar my $KIND_DOCKER => 'docker';
 
 # The YAML words a required: input may be written with to mean true.
-Readonly::Scalar my $TRUE_WORD => qr/^(?:true|yes|1)$/i;
+Readonly::Scalar my $TRUE_WORD => qr/\A(?:true|yes|1)\z/i;
 
 # The fields of a declared input and output, with what an absent or scalar
 # declaration means.  An input written as "who: world" is an optional input

@@ -11,6 +11,11 @@ use JSON::PP ();
 use App::Actions::Logs;
 use App::Actions::Schema ();
 
+# Object::Configure reads the developer's own configuration files (~/.conf
+# and the like), where a UNIVERSAL logger would take the messages these tests
+# read off standard error.  An empty directory leaves the defaults in force.
+local $ENV{CONFIG_DIR} = tempdir(CLEANUP => 1);
+
 my $root = File::Spec->rel2abs(File::Spec->catdir(dirname(__FILE__), '..'));
 my $lib  = File::Spec->catdir($root, 'lib');
 my $script = File::Spec->catfile($root, 'bin', 'action-run');

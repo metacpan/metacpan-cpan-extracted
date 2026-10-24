@@ -8,7 +8,9 @@ use File::Temp ();
 use IO::Handle ();
 use POSIX ();
 
-our $VERSION = '0.001.0';
+use App::Actions::I18N qw(i18n);
+
+our $VERSION = '0.002.0';
 
 # Turn Perl's $? into an exit code.  Windows reports $? in the same
 # POSIX-compatible form as Unix, so no platform check is needed.
@@ -18,7 +20,7 @@ sub exit_code {
     # A signal is reported as a shell reports it, 128 plus its number.
     return !$status ? 0
         : ($status & 127) ? 128 + ($status & 127)
-        : $status >> 8;
+        : ($status >> 8) & 255;
 }
 
 # How many jobs this machine can usefully run at once.  Linux reports the
@@ -129,18 +131,65 @@ sub _spawn_args {
     return $^O eq 'MSWin32' ? ($args[0], map { quote_win32($_) } @args[1 .. $#args]) : @args;
 }
 
+# Purpose:     say whether Windows would find $program to start it: as a
+#              path when it names a directory, otherwise in the current
+#              directory or on PATH; with a PATHEXT extension added when it
+#              has none of its own.
+# Entry:       $program - the program name or path.
+# Exit:        1 when a file is found, 0 when not.
+# Side effects: none; reads PATH and PATHEXT.
+sub _windows_program_found {
+    my ($program) = @_;
+
+    return 0 unless defined $program && length $program;
+
+    # A name with its own extension is looked for as it is; Windows adds an
+    # extension only to a bare name.
+    my @extensions = $program =~ /\.[^.\\\/:]+\z/
+        ? ('')
+        : split /;/, (defined $ENV{PATHEXT} && length $ENV{PATHEXT} ? $ENV{PATHEXT} : '.COM;.EXE;.BAT;.CMD');
+
+    my @directories = $program =~ m{[\\/:]}
+        ? ('')
+        : (File::Spec->curdir, File::Spec->path);
+
+    for my $directory (@directories) {
+        my $base = length $directory ? File::Spec->catfile($directory, $program) : $program;
+        for my $extension (@extensions) {
+            return 1 if -f "$base$extension";
+        }
+    }
+
+    return 0;
+}
+
 # Start $command and wait for it.  A list of one element is handed to the
 # shell by system() when it contains a shell metacharacter, so the program
 # is named separately (system PROGRAM LIST), which never uses a shell:
 # whatever the arguments hold, they are arguments.  Windows keeps the plain
 # list, because there the arguments are already quoted into one command line
 # by _spawn_args and Perl starts the program itself.
+#
+# When Windows cannot start the program, Perl tries the command line again
+# through cmd.exe, which would read & and | in the arguments as commands and
+# report a missing program as status 1.  So a program that is not there is
+# never handed to system() on Windows: the result is that of a program that
+# could not start, as it is elsewhere.
 sub _system {
     my ($command) = @_;
 
     my @args = _spawn_args($command);
 
-    return $^O eq 'MSWin32' ? system(@args) : system { $args[0] } @args;
+    if ($^O eq 'MSWin32') {
+        if (!_windows_program_found($args[0])) {
+            $! = POSIX::ENOENT();
+            $? = -1;
+            return -1;
+        }
+        return system(@args);
+    }
+
+    return system { $args[0] } @args;
 }
 
 # Run $command with both streams discarded.
@@ -176,10 +225,16 @@ sub _redirect_child {
         next unless defined $file;
 
         my $handle = $stream eq 'stdout' ? \*STDOUT : \*STDERR;
-        open $handle, '>', $file or do {
-            print STDERR "Unable to redirect $stream to '$file': $!\n";
+        open $handle, $redirect{append} ? '>>' : '>', $file or do {
+            print STDERR __PACKAGE__->i18n('process.redirect_failed', {
+                stream => $stream, file => $file, error => "$!",
+            }), "\n";
             POSIX::_exit(127);
         };
+
+        # The child ends with POSIX::_exit, which flushes nothing, so a
+        # buffered handle would lose the message that says why exec failed.
+        $handle->autoflush(1);
     }
 
     return;
@@ -209,6 +264,19 @@ sub run_parallel {
     my %redirect;
     $redirect{stdout} = $options{stdout} if defined $options{stdout};
     $redirect{stderr} = $options{stderr} if defined $options{stderr};
+
+    # Every program's output goes to the same files.  Each program opening
+    # them afresh would keep only the last one's, so they are emptied once
+    # here and each program adds to them.
+    if (%redirect) {
+        my %seen;
+        for my $file (grep { !$seen{$_}++ } values %redirect) {
+            next if $file eq File::Spec->devnull;
+            open my $handle, '>', $file or croak "Unable to open '$file': $!";
+            close $handle or croak "Unable to open '$file': $!";
+        }
+        $redirect{append} = 1;
+    }
 
     my $run_one = sub {
         my ($command) = @_;
@@ -241,10 +309,15 @@ sub run_parallel {
 
             if ($pid == 0) {
                 _redirect_child(%redirect);
-                # exec PROGRAM LIST, so no command ever reaches a shell.
+                # exec PROGRAM LIST, so no command ever reaches a shell.  Perl's
+                # own "Can't exec" warning is left out, as run() leaves it out:
+                # the line below says the same.
                 my @command = @{ $commands->[$index] };
+                no warnings 'exec';
                 exec { $command[0] } @command or do {
-                    print STDERR "Unable to run '$commands->[$index][0]': $!\n";
+                    print STDERR __PACKAGE__->i18n('process.exec_failed', {
+                        program => $command[0], error => "$!",
+                    }), "\n";
                     POSIX::_exit(127);
                 };
             }
@@ -308,15 +381,19 @@ sub run {
     open my $saved_stderr, '>&', \*STDERR
         or croak "Unable to duplicate STDERR: $!";
 
+    # append adds to the files rather than replacing them, which is how
+    # run_parallel sends several programs to one file.
+    my $mode = $options{append} ? '>>' : '>';
+
     my $error;
-    my $redirected = open STDOUT, '>', $stdout;
+    my $redirected = open STDOUT, $mode, $stdout;
     if ($redirected && $options{merge_stderr}) {
         # The shell's 2>&1: standard error is a duplicate of the handle
         # standard output was just opened to, so the two share one offset and
         # the child's writes arrive in the order it made them.
         $redirected = open STDERR, '>&', \*STDOUT;
     } elsif ($redirected && defined $options{stderr}) {
-        $redirected = open STDERR, '>', $options{stderr};
+        $redirected = open STDERR, $mode, $options{stderr};
     }
     $error = $! unless $redirected;
 
@@ -393,7 +470,12 @@ C<$>, C<;> or C<|>.  So text from a workflow cannot run a second command.
 Windows has no separate arguments: a program gets one command line and
 splits it up itself.  On Windows this module quotes each argument with
 L</quote_win32> so that it is split back correctly.  On other systems the
-arguments are passed as they are.
+arguments are passed as they are.  When Windows cannot start a program,
+Perl would retry the whole command line through F<cmd.exe>, which reads C<&>
+and C<|> as commands; this module looks for the program first (in the
+current directory and on C<PATH>, adding a C<PATHEXT> extension to a bare
+name) and, when it is not there, never starts anything, so the result is
+the status 255 of a program that could not start, as on other systems.
 
 Every function returns an I<exit status> as a shell shows it:
 
@@ -576,6 +658,9 @@ terminal.
 =item * C<merge_stderr> - optional.  True to send the error output to the
 C<stdout> file too.  It wins over C<stderr>.
 
+=item * C<append> - optional.  True to add to the C<stdout> and C<stderr>
+files rather than replace what is in them.
+
 =back
 
 =head3 RETURNS
@@ -601,6 +686,7 @@ put back afterwards.
         stdout       => { type => 'string', optional => 1 },
         stderr       => { type => 'string', optional => 1 },
         merge_stderr => { type => 'boolean', optional => 1 },
+        append       => { type => 'boolean', optional => 1 },
     }
 
 =head4 OUTPUT
@@ -706,8 +792,9 @@ L</stream>.
 time.  Default 4.
 
 =item * C<stdout>, C<stderr> - optional.  Files for every program's output,
-as for L</run>.  Without them, the output goes to your terminal, mixed
-together.
+as for L</run>.  Each file is emptied once, before the first program starts,
+and then every program adds to it, so it holds the output of them all.
+Without them, the output goes to your terminal, mixed together.
 
 =back
 
@@ -751,6 +838,8 @@ waiting, the programs still running are killed.
     | Message                  | Meaning                          | What to do                   |
     +--------------------------+----------------------------------+------------------------------+
     | No commands given (croak)| \@commands is not an array ref   | pass an array reference      |
+    | Unable to open 'F': ERR  | the stdout or stderr file could  | check the path               |
+    | (croak)                  | not be emptied before the start  |                              |
     | Unable to run 'P': ERR   | (printed by the child) program P | install P or fix its path;   |
     |                          | could not start; status 127      | the status is 127            |
     | Unable to redirect       | (printed by the child) the file  | check the path; status 127   |
@@ -823,7 +912,11 @@ C<$? E<gt>E<gt> 8>.
 
 =item * B<A missing program is status 255, not an exception.>  Perl also
 prints a "Can't exec" warning, except in L</run>, L</run_quiet> and
-L</capture>, which hide it.
+L</capture>, which hide it.  On Windows it is 255 too, rather than the
+status 1 and "is not recognized" message of F<cmd.exe>, because the
+program is looked for before anything is started.  A program Windows finds
+somewhere this module does not look (such as the folder of the running
+program, when it is not on C<PATH>) counts as missing.
 
 =item * B<Output from parallel programs is mixed.>  Without C<stdout>,
 L</run_parallel> lets every program write to the same terminal, so their
@@ -841,7 +934,10 @@ non-ASCII characters or emoji (for example with
 C<Encode::encode('UTF-8', $text)>) before you put it in a command, and decode
 captured output if you need characters.  On Windows, the program receives the
 command line through the Windows "ANSI" code page, so characters outside it
-may be lost.  An argument cannot contain a NUL character.
+may be lost.  An argument cannot contain a NUL character.  The line a child
+prints when it cannot redirect its output or start its program is in the
+current language of L<App::Actions::I18N>, encoded as the standard error
+handle is.
 
 =head1 AUTHOR
 
@@ -907,13 +1003,14 @@ the computer, whose processes and files the routines change.
     │ ΔHost
     │ command? : COMMAND
     │ stdout?, stderr? : optional FILE
-    │ merge? : 𝔹
+    │ merge?, append? : 𝔹
     │ r! : STATUS
     ├───────────────────────────────────────────────────
     │ (s, out, err) = exec(command?)
     │ r! = s
-    │ contents'(stdout? or null) = out ⋈ (if merge? then err else ⟨⟩)
-    │ ¬merge? ∧ stderr? ≠ ⊥ ⇒ contents'(stderr?) = err
+    │ let before(F) == (if append? then contents(F) else ⟨⟩)
+    │ contents'(stdout? or null) = before(stdout?) ⁀ (out ⋈ (if merge? then err else ⟨⟩))
+    │ ¬merge? ∧ stderr? ≠ ⊥ ⇒ contents'(stderr?) = before(stderr?) ⁀ err
     │ STDOUT' = STDOUT ∧ STDERR' = STDERR
     └───────────────────────────────────────────────────
 
@@ -945,6 +1042,7 @@ the computer, whose processes and files the routines change.
     │ #r! = #commands?
     │ ∀ i ∈ dom commands? • r!(i) = first(exec(commands?(i)))
     │ at no time do more than min(concurrency?, #commands?) commands run
+    │ ∀ F ∈ {stdout?, stderr?} • contents'(F) = ⋈ { i ∈ dom commands? • output_F(i) }
     │ Windows ∨ concurrency? < 2 ⇒ the commands run one after another
     └───────────────────────────────────────────────────
 

@@ -1,0 +1,321 @@
+[
+ {
+  "name": "from nothing",
+  "start": null,
+  "steps": [
+   {
+    "op": [
+     "addSource",
+     "shared",
+     {
+      "git": "https://github.com/Getty/skills",
+      "ref": "main"
+     }
+    ],
+    "result": null,
+    "file": "{\n  \"sources\": {\n    \"shared\": {\n      \"git\": \"https://github.com/Getty/skills\",\n      \"ref\": \"main\"\n    }\n  }\n}\n"
+   },
+   {
+    "op": [
+     "addInstallEntry",
+     "skill",
+     "perl-moo@shared"
+    ],
+    "result": null,
+    "file": "{\n  \"sources\": {\n    \"shared\": {\n      \"git\": \"https://github.com/Getty/skills\",\n      \"ref\": \"main\"\n    }\n  },\n  \"install\": {\n    \"skills\": [\n      \"perl-moo@shared\"\n    ]\n  }\n}\n"
+   },
+   {
+    "op": [
+     "addInstallEntry",
+     "skill",
+     "perl-moo@shared"
+    ],
+    "result": null,
+    "file": "{\n  \"sources\": {\n    \"shared\": {\n      \"git\": \"https://github.com/Getty/skills\",\n      \"ref\": \"main\"\n    }\n  },\n  \"install\": {\n    \"skills\": [\n      \"perl-moo@shared\"\n    ]\n  }\n}\n"
+   },
+   {
+    "op": [
+     "addInstallEntry",
+     "rule",
+     "*@shared"
+    ],
+    "result": null,
+    "file": "{\n  \"sources\": {\n    \"shared\": {\n      \"git\": \"https://github.com/Getty/skills\",\n      \"ref\": \"main\"\n    }\n  },\n  \"install\": {\n    \"skills\": [\n      \"perl-moo@shared\"\n    ],\n    \"rules\": [\n      \"*@shared\"\n    ]\n  }\n}\n"
+   },
+   {
+    "op": [
+     "addBundleEntry",
+     "perl@shared"
+    ],
+    "result": null,
+    "file": "{\n  \"sources\": {\n    \"shared\": {\n      \"git\": \"https://github.com/Getty/skills\",\n      \"ref\": \"main\"\n    }\n  },\n  \"install\": {\n    \"skills\": [\n      \"perl-moo@shared\"\n    ],\n    \"rules\": [\n      \"*@shared\"\n    ],\n    \"bundles\": [\n      \"perl@shared\"\n    ]\n  }\n}\n"
+   },
+   {
+    "op": [
+     "addBundleEntry",
+     "bundle:perl@shared"
+    ],
+    "result": null,
+    "file": "{\n  \"sources\": {\n    \"shared\": {\n      \"git\": \"https://github.com/Getty/skills\",\n      \"ref\": \"main\"\n    }\n  },\n  \"install\": {\n    \"skills\": [\n      \"perl-moo@shared\"\n    ],\n    \"rules\": [\n      \"*@shared\"\n    ],\n    \"bundles\": [\n      \"perl@shared\"\n    ]\n  }\n}\n"
+   },
+   {
+    "op": [
+     "addSource",
+     "2",
+     {
+      "url": "https://x/y.tgz"
+     }
+    ],
+    "result": null,
+    "file": "{\n  \"sources\": {\n    \"2\": {\n      \"url\": \"https://x/y.tgz\"\n    },\n    \"shared\": {\n      \"git\": \"https://github.com/Getty/skills\",\n      \"ref\": \"main\"\n    }\n  },\n  \"install\": {\n    \"skills\": [\n      \"perl-moo@shared\"\n    ],\n    \"rules\": [\n      \"*@shared\"\n    ],\n    \"bundles\": [\n      \"perl@shared\"\n    ]\n  }\n}\n"
+   },
+   {
+    "op": [
+     "findInstallEntries",
+     "PERL-MOO"
+    ],
+    "result": [
+     {
+      "type": "skill",
+      "entry": "perl-moo@shared"
+     }
+    ],
+    "file": "{\n  \"sources\": {\n    \"2\": {\n      \"url\": \"https://x/y.tgz\"\n    },\n    \"shared\": {\n      \"git\": \"https://github.com/Getty/skills\",\n      \"ref\": \"main\"\n    }\n  },\n  \"install\": {\n    \"skills\": [\n      \"perl-moo@shared\"\n    ],\n    \"rules\": [\n      \"*@shared\"\n    ],\n    \"bundles\": [\n      \"perl@shared\"\n    ]\n  }\n}\n"
+   },
+   {
+    "op": [
+     "findInstallEntries",
+     "perl-moo",
+     "other"
+    ],
+    "result": [],
+    "file": "{\n  \"sources\": {\n    \"2\": {\n      \"url\": \"https://x/y.tgz\"\n    },\n    \"shared\": {\n      \"git\": \"https://github.com/Getty/skills\",\n      \"ref\": \"main\"\n    }\n  },\n  \"install\": {\n    \"skills\": [\n      \"perl-moo@shared\"\n    ],\n    \"rules\": [\n      \"*@shared\"\n    ],\n    \"bundles\": [\n      \"perl@shared\"\n    ]\n  }\n}\n"
+   },
+   {
+    "op": [
+     "findWildcardEntries",
+     "shared"
+    ],
+    "result": [
+     {
+      "type": "rule",
+      "entry": "*@shared",
+      "pattern": "*"
+     }
+    ],
+    "file": "{\n  \"sources\": {\n    \"2\": {\n      \"url\": \"https://x/y.tgz\"\n    },\n    \"shared\": {\n      \"git\": \"https://github.com/Getty/skills\",\n      \"ref\": \"main\"\n    }\n  },\n  \"install\": {\n    \"skills\": [\n      \"perl-moo@shared\"\n    ],\n    \"rules\": [\n      \"*@shared\"\n    ],\n    \"bundles\": [\n      \"perl@shared\"\n    ]\n  }\n}\n"
+   },
+   {
+    "op": [
+     "bundleEntries"
+    ],
+    "result": [
+     {
+      "name": "perl",
+      "source": "shared",
+      "entry": "perl@shared"
+     }
+    ],
+    "file": "{\n  \"sources\": {\n    \"2\": {\n      \"url\": \"https://x/y.tgz\"\n    },\n    \"shared\": {\n      \"git\": \"https://github.com/Getty/skills\",\n      \"ref\": \"main\"\n    }\n  },\n  \"install\": {\n    \"skills\": [\n      \"perl-moo@shared\"\n    ],\n    \"rules\": [\n      \"*@shared\"\n    ],\n    \"bundles\": [\n      \"perl@shared\"\n    ]\n  }\n}\n"
+   },
+   {
+    "op": [
+     "sourceEntry",
+     "shared"
+    ],
+    "result": {
+     "git": "https://github.com/Getty/skills",
+     "ref": "main"
+    },
+    "file": "{\n  \"sources\": {\n    \"2\": {\n      \"url\": \"https://x/y.tgz\"\n    },\n    \"shared\": {\n      \"git\": \"https://github.com/Getty/skills\",\n      \"ref\": \"main\"\n    }\n  },\n  \"install\": {\n    \"skills\": [\n      \"perl-moo@shared\"\n    ],\n    \"rules\": [\n      \"*@shared\"\n    ],\n    \"bundles\": [\n      \"perl@shared\"\n    ]\n  }\n}\n"
+   },
+   {
+    "op": [
+     "sourceEntry",
+     "nope"
+    ],
+    "result": null,
+    "file": "{\n  \"sources\": {\n    \"2\": {\n      \"url\": \"https://x/y.tgz\"\n    },\n    \"shared\": {\n      \"git\": \"https://github.com/Getty/skills\",\n      \"ref\": \"main\"\n    }\n  },\n  \"install\": {\n    \"skills\": [\n      \"perl-moo@shared\"\n    ],\n    \"rules\": [\n      \"*@shared\"\n    ],\n    \"bundles\": [\n      \"perl@shared\"\n    ]\n  }\n}\n"
+   },
+   {
+    "op": [
+     "removeInstallEntries",
+     "Perl-Moo"
+    ],
+    "result": 1,
+    "file": "{\n  \"sources\": {\n    \"2\": {\n      \"url\": \"https://x/y.tgz\"\n    },\n    \"shared\": {\n      \"git\": \"https://github.com/Getty/skills\",\n      \"ref\": \"main\"\n    }\n  },\n  \"install\": {\n    \"rules\": [\n      \"*@shared\"\n    ],\n    \"bundles\": [\n      \"perl@shared\"\n    ]\n  }\n}\n"
+   },
+   {
+    "op": [
+     "removeInstallEntries",
+     "*",
+     "shared",
+     "rule"
+    ],
+    "result": 1,
+    "file": "{\n  \"sources\": {\n    \"2\": {\n      \"url\": \"https://x/y.tgz\"\n    },\n    \"shared\": {\n      \"git\": \"https://github.com/Getty/skills\",\n      \"ref\": \"main\"\n    }\n  },\n  \"install\": {\n    \"bundles\": [\n      \"perl@shared\"\n    ]\n  }\n}\n"
+   },
+   {
+    "op": [
+     "removeBundleEntries",
+     "perl",
+     "shared"
+    ],
+    "result": 1,
+    "file": "{\n  \"sources\": {\n    \"2\": {\n      \"url\": \"https://x/y.tgz\"\n    },\n    \"shared\": {\n      \"git\": \"https://github.com/Getty/skills\",\n      \"ref\": \"main\"\n    }\n  }\n}\n"
+   },
+   {
+    "op": [
+     "removeSource",
+     "shared"
+    ],
+    "result": null,
+    "file": "{\n  \"sources\": {\n    \"2\": {\n      \"url\": \"https://x/y.tgz\"\n    }\n  }\n}\n"
+   },
+   {
+    "op": [
+     "removeSource",
+     "2"
+    ],
+    "result": null,
+    "file": "{}\n"
+   }
+  ]
+ },
+ {
+  "name": "keeps order and unknown content",
+  "start": "{\n    \"vars\": {\"z\": 1, \"a\": [1,2,{\"q\":null}]},\n  \"sources\": {\"b\": {\"local\": \"~/b\"}, \"a\": {\"git\": \"https://a\"}},\n  \"install\": {\"agents\": [\"x@a\"], \"skills\": [\"y@b\"]}\n}",
+  "steps": [
+   {
+    "op": [
+     "addSource",
+     "c",
+     {
+      "local": "~/c",
+      "path": [
+       "skills"
+      ]
+     }
+    ],
+    "result": null,
+    "file": "{\n  \"vars\": {\n    \"z\": 1,\n    \"a\": [\n      1,\n      2,\n      {\n        \"q\": null\n      }\n    ]\n  },\n  \"sources\": {\n    \"b\": {\n      \"local\": \"~/b\"\n    },\n    \"a\": {\n      \"git\": \"https://a\"\n    },\n    \"c\": {\n      \"local\": \"~/c\",\n      \"path\": [\n        \"skills\"\n      ]\n    }\n  },\n  \"install\": {\n    \"agents\": [\n      \"x@a\"\n    ],\n    \"skills\": [\n      \"y@b\"\n    ]\n  }\n}\n"
+   },
+   {
+    "op": [
+     "addSource",
+     "a",
+     {
+      "git": "https://a2"
+     }
+    ],
+    "result": null,
+    "file": "{\n  \"vars\": {\n    \"z\": 1,\n    \"a\": [\n      1,\n      2,\n      {\n        \"q\": null\n      }\n    ]\n  },\n  \"sources\": {\n    \"b\": {\n      \"local\": \"~/b\"\n    },\n    \"a\": {\n      \"git\": \"https://a2\"\n    },\n    \"c\": {\n      \"local\": \"~/c\",\n      \"path\": [\n        \"skills\"\n      ]\n    }\n  },\n  \"install\": {\n    \"agents\": [\n      \"x@a\"\n    ],\n    \"skills\": [\n      \"y@b\"\n    ]\n  }\n}\n"
+   },
+   {
+    "op": [
+     "addInstallEntry",
+     "agent",
+     "z@c"
+    ],
+    "result": null,
+    "file": "{\n  \"vars\": {\n    \"z\": 1,\n    \"a\": [\n      1,\n      2,\n      {\n        \"q\": null\n      }\n    ]\n  },\n  \"sources\": {\n    \"b\": {\n      \"local\": \"~/b\"\n    },\n    \"a\": {\n      \"git\": \"https://a2\"\n    },\n    \"c\": {\n      \"local\": \"~/c\",\n      \"path\": [\n        \"skills\"\n      ]\n    }\n  },\n  \"install\": {\n    \"agents\": [\n      \"x@a\",\n      \"z@c\"\n    ],\n    \"skills\": [\n      \"y@b\"\n    ]\n  }\n}\n"
+   },
+   {
+    "op": [
+     "removeInstallEntries",
+     "y"
+    ],
+    "result": 1,
+    "file": "{\n  \"vars\": {\n    \"z\": 1,\n    \"a\": [\n      1,\n      2,\n      {\n        \"q\": null\n      }\n    ]\n  },\n  \"sources\": {\n    \"b\": {\n      \"local\": \"~/b\"\n    },\n    \"a\": {\n      \"git\": \"https://a2\"\n    },\n    \"c\": {\n      \"local\": \"~/c\",\n      \"path\": [\n        \"skills\"\n      ]\n    }\n  },\n  \"install\": {\n    \"agents\": [\n      \"x@a\",\n      \"z@c\"\n    ]\n  }\n}\n"
+   },
+   {
+    "op": [
+     "removeInstallEntries",
+     "x",
+     "a",
+     "agent"
+    ],
+    "result": 1,
+    "file": "{\n  \"vars\": {\n    \"z\": 1,\n    \"a\": [\n      1,\n      2,\n      {\n        \"q\": null\n      }\n    ]\n  },\n  \"sources\": {\n    \"b\": {\n      \"local\": \"~/b\"\n    },\n    \"a\": {\n      \"git\": \"https://a2\"\n    },\n    \"c\": {\n      \"local\": \"~/c\",\n      \"path\": [\n        \"skills\"\n      ]\n    }\n  },\n  \"install\": {\n    \"agents\": [\n      \"z@c\"\n    ]\n  }\n}\n"
+   },
+   {
+    "op": [
+     "removeInstallEntries",
+     "z"
+    ],
+    "result": 1,
+    "file": "{\n  \"vars\": {\n    \"z\": 1,\n    \"a\": [\n      1,\n      2,\n      {\n        \"q\": null\n      }\n    ]\n  },\n  \"sources\": {\n    \"b\": {\n      \"local\": \"~/b\"\n    },\n    \"a\": {\n      \"git\": \"https://a2\"\n    },\n    \"c\": {\n      \"local\": \"~/c\",\n      \"path\": [\n        \"skills\"\n      ]\n    }\n  }\n}\n"
+   },
+   {
+    "op": [
+     "removeSource",
+     "b"
+    ],
+    "result": null,
+    "file": "{\n  \"vars\": {\n    \"z\": 1,\n    \"a\": [\n      1,\n      2,\n      {\n        \"q\": null\n      }\n    ]\n  },\n  \"sources\": {\n    \"a\": {\n      \"git\": \"https://a2\"\n    },\n    \"c\": {\n      \"local\": \"~/c\",\n      \"path\": [\n        \"skills\"\n      ]\n    }\n  }\n}\n"
+   }
+  ]
+ },
+ {
+  "name": "unicode and escapes",
+  "start": "{\"vars\":{\"s\":\"\\u00e9\\/\\ud83d\\ude00\\u2028\",\"n\":1.50,\"e\":1e3}}",
+  "steps": [
+   {
+    "op": [
+     "addSource",
+     "u",
+     {
+      "git": "https://example.com/ü"
+     }
+    ],
+    "result": null,
+    "file": "{\n  \"vars\": {\n    \"s\": \"é/😀 \",\n    \"n\": 1.5,\n    \"e\": 1000\n  },\n  \"sources\": {\n    \"u\": {\n      \"git\": \"https://example.com/ü\"\n    }\n  }\n}\n"
+   }
+  ]
+ },
+ {
+  "name": "non-string install entry",
+  "start": "{\"install\":{\"skills\":[\"y@b\",5]}}",
+  "steps": [
+   {
+    "op": [
+     "removeInstallEntries",
+     "y"
+    ],
+    "result": 1,
+    "file": "{\n  \"install\": {\n    \"skills\": [\n      5\n    ]\n  }\n}\n"
+   }
+  ]
+ },
+ {
+  "name": "broken file",
+  "start": "{\"sources\": [",
+  "steps": [
+   {
+    "op": [
+     "addSource",
+     "a",
+     {
+      "git": "https://a"
+     }
+    ],
+    "error": "<FILE>: invalid JSON (Unexpected end of JSON input)",
+    "file": "{\"sources\": ["
+   }
+  ]
+ },
+ {
+  "name": "top level array",
+  "start": "[]",
+  "steps": [
+   {
+    "op": [
+     "sourceEntry",
+     "a"
+    ],
+    "error": "<FILE>: invalid JSON (top level must be an object)",
+    "file": "[]"
+   }
+  ]
+ }
+]

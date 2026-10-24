@@ -1,11 +1,11 @@
 #!/usr/bin/env perl
 ##----------------------------------------------------------------------------
 ## Unicode Locale Identifier - ~/scripts/create_database.pl
-## Version v0.3.0
+## Version v0.4.0
 ## Copyright(c) 2024-2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2024/06/15
-## Modified 2026/07/14
+## Modified 2026/10/22
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -18,6 +18,7 @@ use warnings;
 use open ':std' => ':utf8';
 use utf8;
 use vars qw( $VERSION $DEBUG $VERBOSE $LOG_LEVEL $PROG_NAME $MAINTAINER
+             $DATA_ALIAS_TABLES $DATA_ALIAS_IGNORE
              $opt $opts
              $out $err @argv
              $topdir $basedir $cldr_version
@@ -34,12 +35,13 @@ use IPC::Run;
 use JSON;
 use List::Util qw( uniq );
 use Locale::Unicode;
+use Locale::Unicode::RBNF::CLDR;
 use Module::Generic::File qw( file stdout stderr tempfile );
 use Module::Generic::Array;
 use Pod::Usage;
 use Scalar::Util qw( looks_like_number );
 use XML::LibXML;
-our $VERSION = 'v0.3.0';
+our $VERSION = 'v0.4.0';
 our $DEBUG = 0;
 our $VERBOSE = 0;
 our $LOG_LEVEL = 0;
@@ -55,11 +57,11 @@ my $live_db_file;
 our( $cldr_version, $topdir, $basedir, $patch_dir );
 
 my $credit = <<EOT;
- 
-  
+
+
           Locale::Unicode::Data database builder v.$VERSION
                Jacques Deguest <jack\@deguest.jp>
-         
+
          Copyright(c) 2024-2025 DEGUEST Pte. Ltd..
          This program is free software; you can redistribute it and/or modify it
          under the same terms as Perl itself.
@@ -143,7 +145,7 @@ $credit
     $error
     Please, use option '-h' or '--help' to find out and properly call
     this program in interactive mode:
-    
+
     $PROG_NAME -h
 EOT
     }
@@ -175,6 +177,253 @@ local $SIG{INT} = $SIG{TERM} = sub
 };
 my @files;
 our $json = JSON->new->relaxed->allow_nonref->allow_blessed->convert_blessed;
+
+# NOTE: Data aliases
+# How the paths of the elements aliased in root map to the columns of the tables storing
+# their data. Each definition has the tables concerned, the path template, one step per
+# element, with a regular expression for the element name and, for the distinguishing
+# steps, the columns they give, and 'min', the number of steps an alias path must have
+# at least to concern these tables.
+# A column is given either as an attribute, such as '@type', with an optional default
+# value, such as '@type|standard', or with '?' if it may be absent, such as '@order?',
+# or as a code reference receiving the step.
+# See load_data_aliases()
+my $ldml_cal = [
+    [ qr/^ldml$/ ],
+    [ qr/^dates$/ ],
+    [ qr/^calendars$/ ],
+    [ qr/^calendar$/, { calendar => '@type' } ]
+];
+
+my $field_split = sub
+{
+    my $t = $_[0]->{attr}->{type};
+    return if( !defined( $t ) );
+    return( [ split( /[^a-zA-Z0-9]/, $t, 2 ) ] );
+};
+
+$DATA_ALIAS_TABLES =
+[
+    {
+        tables  => [qw( calendar_terms )],
+        min     => 4,
+        path    =>
+        [
+            @$ldml_cal,
+            [ qr/^(?:months|days|quarters|dayPeriods)$/, {
+                term_type => sub
+                {
+                    {
+                        months     => 'month',
+                        days       => 'day',
+                        quarters   => 'quarter',
+                        dayPeriods => 'day_period'
+                    }->{ $_[0]->{name} }
+                }
+            }],
+            [ qr/^(?:month|day|quarter|dayPeriod)Context$/, { term_context => '@type' } ],
+            [ qr/^(?:month|day|quarter|dayPeriod)Width$/,   { term_width => '@type' } ],
+        ],
+    },
+    {
+        tables  => [qw( calendar_eras_l10n )],
+        min     => 4,
+        path    =>
+        [
+            @$ldml_cal,
+            [ qr/^eras$/ ],
+            [ qr/^era(?:Names|Abbr|Narrow)$/, {
+                era_width => sub
+                {
+                    {
+                        eraNames  => 'wide',
+                        eraAbbr   => 'abbreviated',
+                        eraNarrow => 'narrow' }->{ $_[0]->{name}
+                    }
+                }
+            }],
+        ],
+    },
+    {
+        tables  => [qw( calendar_formats_l10n )],
+        min     => 4,
+        path    =>
+        [
+            @$ldml_cal,
+            [ qr/^(?:date|time)Formats$/, {
+                format_type => sub
+                {
+                    $_[0]->{name} eq 'dateFormats' ? 'date' : 'time'
+                }
+            }],
+            [ qr/^(?:date|time)FormatLength$/, { format_length => '@type' } ],
+        ],
+    },
+    {
+        tables  => [qw( calendar_datetime_formats )],
+        min     => 4,
+        path    =>
+        [
+            @$ldml_cal,
+            [ qr/^dateTimeFormats$/ ],
+            [ qr/^dateTimeFormatLength$/, { format_length => '@type' } ],
+            # The script stores a dateTimeFormat without type as 'standard'
+            [ qr/^dateTimeFormat$/, { format_type => '@type|standard' } ],
+        ],
+    },
+    {
+        tables  => [qw( calendar_available_formats )],
+        min     => 4,
+        path    => [ @$ldml_cal, [ qr/^dateTimeFormats$/ ], [ qr/^availableFormats$/ ] ],
+    },
+    {
+        tables  => [qw( calendar_append_formats )],
+        min     => 4,
+        path    => [ @$ldml_cal, [ qr/^dateTimeFormats$/ ], [ qr/^appendItems$/ ] ],
+    },
+    {
+        tables  => [qw( calendar_interval_formats )],
+        min     => 4,
+        path    => [ @$ldml_cal, [ qr/^dateTimeFormats$/ ], [ qr/^intervalFormats$/ ] ],
+    },
+    {
+        tables  => [qw( calendar_cyclics_l10n )],
+        min     => 4,
+        path    =>
+        [
+            @$ldml_cal,
+            [ qr/^cyclicNameSets$/ ],
+            [ qr/^cyclicNameSet$/,     { format_set    => '@type' } ],
+            [ qr/^cyclicNameContext$/, { format_type   => '@type' } ],
+            [ qr/^cyclicNameWidth$/,   { format_length => '@type' } ],
+        ],
+    },
+    {
+        tables  => [qw( date_fields_l10n time_relative_l10n )],
+        min     => 4,
+        path    =>
+        [
+            [ qr/^ldml$/ ], [ qr/^dates$/ ], [ qr/^fields$/ ],
+            [ qr/^field$/, {
+                field_type => sub
+                {
+                    my $p = $field_split->( @_ ) || return;
+                    return( $p->[0] );
+                },
+                field_length => sub
+                {
+                    my $p = $field_split->( @_ ) || return;
+                    return( $p->[1] // 'standard' );
+                }
+            }],
+        ],
+    },
+    {
+        tables  => [qw( date_terms )],
+        min     => 4,
+        path    =>
+        [
+            [ qr/^ldml$/ ], [ qr/^dates$/ ], [ qr/^fields$/ ],
+            [ qr/^field$/, {
+                term_type => sub
+                {
+                    my $p = $field_split->( @_ ) || return;
+                    return( $p->[0] );
+                },
+                term_length => sub
+                {
+                    my $p = $field_split->( @_ ) || return;
+                    return( $p->[1] // 'standard' );
+                }
+            }],
+        ],
+    },
+    {
+        tables  => [qw( metazones_names )],
+        min     => 4,
+        path    =>
+        [
+            [ qr/^ldml$/ ],
+            [ qr/^dates$/ ],
+            [ qr/^timeZoneNames$/ ],
+            [ qr/^metazone$/,       { metazone => '@type' } ],
+            [ qr/^(?:long|short)$/, { width => sub{ $_[0]->{name} } } ],
+        ],
+    },
+    {
+        tables  => [qw( number_formats_l10n )],
+        min     => 3,
+        path    =>
+        [
+            [ qr/^ldml$/ ],
+            [ qr/^numbers$/ ],
+            [ qr/^(?:(?:decimal|percent|currency|scientific)Formats|miscPatterns)$/, {
+                number_system => '@numberSystem',
+                number_type => sub
+                {
+                    {
+                        decimalFormats => 'decimal',
+                        percentFormats => 'percent',
+                        currencyFormats => 'currency',
+                        scientificFormats => 'scientific',
+                        miscPatterns => 'misc'
+                    }->{ $_[0]->{name} }
+                }
+            }],
+            # The script stores a length or a format without type as 'default'
+            [ qr/^(?:decimal|percent|currency|scientific)FormatLength$/, { format_length => '@type|default' } ],
+            [ qr/^(?:decimal|percent|currency|scientific)Format$/,       { format_type   => '@type|default' } ],
+        ],
+    },
+    {
+        tables  => [qw( number_symbols_l10n )],
+        min     => 3,
+        path    => [
+            [ qr/^ldml$/ ],
+            [ qr/^numbers$/ ],
+            [ qr/^symbols$/, { number_system => '@numberSystem' } ]
+        ],
+    },
+    {
+        tables  => [qw( units_l10n )],
+        min     => 3,
+        path    =>
+        [
+            [ qr/^ldml$/ ],
+            [ qr/^units$/ ],
+            [ qr/^unitLength$/, { format_length => '@type' } ],
+            [ qr/^unit$/,       { unit_id       => '@type' } ],
+        ],
+    },
+    {
+        tables  => [qw( person_name_formats )],
+        min     => 3,
+        path    =>
+        [
+            [ qr/^ldml$/ ],
+            [ qr/^personNames$/ ],
+            [ qr/^personName$/, {
+                name_order => '@order?',
+                name_length => '@length?',
+                name_usage => '@usage?',
+                name_formality => '@formality?'
+            }],
+        ],
+    },
+];
+
+# Aliased elements whose data this script does not store, given as regular expressions matched
+# against the element names of the alias source path.
+$DATA_ALIAS_IGNORE =
+[
+    qr{^ldml/dates/calendars/calendar/dayOfMonths(?:/|$)},
+    qr{^ldml/dates/calendars/calendar/monthPatterns(?:/|$)},
+    qr{^ldml/dates/calendars/calendar/dateTimeFormats/numericSeparators(?:/|$)},
+    qr{^ldml/dates/calendars/calendar/dateTimeFormats/intervalFormats/intervalFormatRanges(?:/|$)},
+    qr{^ldml/listPatterns(?:/|$)},
+    qr{^ldml/numbers/rationalFormats(?:/|$)},
+    qr{^ldml/numbers/currencyFormats/currencySpacing(?:/|$)},
+];
 
 $tmpfile = $opts->{db_file};
 &log( "Using database file ${tmpfile}" );
@@ -252,6 +501,24 @@ sub process
     {
         die( "The IANA Olson time zone database file 'zone1970.tab' does not exist. Please download it from ftp://ftp.iana.org/tz/tzdata-latest.tar.gz and place it in the 'scripts' folder." );
     }
+
+    # $cldr_version is already declared as a global variable
+    # cldr-common-45.0
+    if( $opts->{cldr_version} )
+    {
+        $cldr_version = $opts->{cldr_version};
+        &log( "Found the CLDR version from the option provided '", ( $opts->{cldr_version} // 'undef' ), "'" );
+    }
+    elsif( $topdir =~ /\-(\d+(?:\.\d+)*)$/ )
+    {
+        $cldr_version = $1;
+        &log( "Found the CLDR version from the top dir ($topdir) -> $cldr_version" );
+    }
+    else
+    {
+        die( "Unable to figure out the CLDR version from the directory of its data: ${topdir}" );
+    }
+
     # $patch_dir is used by the subroutine 'apply_patch'
     $patch_dir = $script_dir->child( "patches/${cldr_version}" );
     my $anno_dir = $basedir->child( 'annotations' );
@@ -278,7 +545,7 @@ sub process
         'true'  => 1,
         'false' => 0,
     };
-    
+
     # NOTE: Preparing all SQL queries
     &log( "Preparing all SQL queries." );
     my $queries =
@@ -306,6 +573,7 @@ sub process
         currencies => "INSERT INTO currencies (currency, digits, rounding, cash_digits, cash_rounding, is_obsolete, status) VALUES(?, ?, ?, ?, ?, ?, ?)",
         currencies_info => "INSERT INTO currencies_info (territory, currency, start, until, is_tender, hist_sequence, is_obsolete) VALUES(?, ?, ?, ?, ?, ?, ?)",
         currencies_l10n => "INSERT INTO currencies_l10n (locale, currency, count, locale_name, symbol) VALUES(?, ?, ?, ?, ?)",
+        data_aliases => "INSERT INTO data_aliases (locale, table_name, source, target, source_path, target_path) VALUES(?, ?, ?, ?, ?, ?)",
         date_fields_l10n => "INSERT INTO date_fields_l10n (locale, field_type, field_length, relative, locale_name) VALUES(?, ?, ?, ?, ?)",
         date_terms => "INSERT INTO date_terms (locale, term_type, term_length, display_name) VALUES(?, ?, ?, ?)",
         day_periods => "INSERT INTO day_periods (locale, day_period, start, until) VALUES(?, ?, ?, ?)",
@@ -365,7 +633,7 @@ sub process
         week_preferences => "INSERT INTO week_preferences (locale, ordering) VALUES(?, ?)",
     ];
     my $sths = {};
-    
+
     for( my $i = 0; $i < scalar( @$queries ); $i += 2 )
     {
         my $id = $queries->[$i];
@@ -394,7 +662,7 @@ sub process
             warn( "Warning only: No table '$id' found in our a tables-to-query map check." );
         }
     }
-    
+
     if( scalar( keys( %$tables_to_query_check ) ) )
     {
         die( sprintf( "There are %d tables with no statement defined: %s", scalar( keys( %$tables_to_query_check ) ), join( ', ', sort( keys( %$tables_to_query_check ) ) ) ) );
@@ -403,24 +671,10 @@ sub process
     {
         &log( "All tables have a statement defined." );
     }
-    
+
     # NOTE: Add meta information
     &log( "Add meta information." );
     my $today = DateTime->from_epoch( epoch => $opts->{created_time} );
-    # $cldr_version is already declared as a global variable
-    # cldr-common-45.0
-    if( $opts->{cldr_version} )
-    {
-        $cldr_version = $opts->{cldr_version};
-    }
-    elsif( $topdir =~ /\-(\d+(?:\.\d+)*)$/ )
-    {
-        $cldr_version = $1;
-    }
-    else
-    {
-        die( "Unable to figure out the CLDR version from the directory of its data: ${topdir}" );
-    }
     $sth = $sths->{metainfos} || die( "Unable to get a statement object for table metainfos" );
     my $meta =
     [
@@ -435,7 +689,7 @@ sub process
             $sth->execute( @$def{ qw( property value ) } );
         } || die( "Error adding meta information property '$def->{property}' with value '$def->{value}': ", ( $@ || $sth->errstr ), "\nwith SQL query: ", $sth->{Statement}, "\n", dump( $def ) );
     }
-    
+
     # NOTE: Pre-loading all known currencies, languages, regions, scripts, subdivisions, variants
     &log( "Pre-loading all known currencies, languages, regions, scripts, subdivisions, variants." );
     my $known = {};
@@ -472,7 +726,7 @@ sub process
                 type => 'variant',
             },
     };
-    
+
     # Sorting does not really matter, but it is just so I get the same order of output
     foreach my $prop ( sort( keys( %$known_data ) ) )
     {
@@ -523,10 +777,10 @@ sub process
         $known->{ $prop } = $hash;
         $out->print( "ok. ${n} ${prop} added.\n" ) if( $DEBUG );
     }
-    
+
     my $supplemental_data_file = $basedir->child( 'supplemental/supplementalData.xml' );
     my $suppDoc = load_xml( $supplemental_data_file );
-    
+
     # NOTE: Pre-loading currencies data (BCP47 and locale data)
     &log( "Pre-loading currencies data (BCP47 and locale data)" );
     my $bcp_currency_file = $basedir->child( 'bcp47/currency.xml' );
@@ -636,7 +890,7 @@ sub process
         }
         exit(1);
     }
-    
+
     # NOTE: Loading currencies
     &log( "Loading currencies." );
     $n = 0;
@@ -673,7 +927,7 @@ sub process
         }
         $currenciesData->{ $def->{currency} } = $def;
     }
-    
+
     # Now, we merge our main currencies data to ensure we have a complete set, although many will not have the rounding or digits information provided.
     foreach my $code ( keys( %$currMap ) )
     {
@@ -686,7 +940,7 @@ sub process
             }
         }
     }
-    
+
     # Add missing currencies and set the status using the known currencies we loaded at the beginning.
     foreach my $code ( keys( %{$known->{currencies}} ) )
     {
@@ -696,12 +950,12 @@ sub process
         }
         $currenciesData->{ $code }->{status} = $known->{currencies}->{ $code }->{status};
     }
-    
+
     foreach my $code ( sort( keys( %$currenciesData ) ) )
     {
         my $def = $currenciesData->{ $code };
         $out->print( "[", $def->{currency}, "] " ) if( $DEBUG );
-    
+
         eval
         {
             $sth->execute( @$def{qw( currency digits rounding cash_digits cash_rounding is_obsolete status )} );
@@ -710,7 +964,7 @@ sub process
         $n++;
     }
     &log( "${n} currencies added." );
-    
+
     # NOTE: Loading BCP47 currencies
     &log( "Loading BCP47 currencies." );
     $n = 0;
@@ -727,7 +981,7 @@ sub process
         $n++;
     }
     &log( "${n} BCP47 currencies added." );
-    
+
     # NOTE: Pre-loading core regional territories
     &log( "Pre-loading core regional territories" );
     my $containersRes = $suppDoc->findnodes( '//territoryContainment/group' ) ||
@@ -777,7 +1031,7 @@ sub process
         }
     }
     &log( "${n} core regional territories pre-loaded." );
-    
+
     # NOTE: Collecting territories data
     &log( "Collecting territories data." );
     $n = 0;
@@ -822,7 +1076,7 @@ sub process
         $territoryInfo->{ $code }->{language_population} = $langs;
         $territoryInfo->{ $code }->{_langs} = $langs_order;
     }
-    
+
     # NOTE: Adding missing territory codes
     &log( "Adding missing territory codes." );
     my $missingButRequiredTerritoryCodes =
@@ -830,7 +1084,7 @@ sub process
         # Used in supplemental/supplementalData.xml//weekData/minDays
         AN => { status => 'deprecated' },
     };
-    
+
     foreach my $code ( keys( %$missingButRequiredTerritoryCodes ) )
     {
         if( !exists( $territoryInfo->{ $code } ) )
@@ -839,7 +1093,7 @@ sub process
             $territoryInfo->{ $code } = $missingButRequiredTerritoryCodes->{ $code };
         }
     }
-    
+
     # NOTE: Processing territories currencies historical data to derive current currency code for each territory
     &log( "Pre-loading territories currency historical data." );
     $n = 0;
@@ -952,7 +1206,7 @@ sub process
                     }
                 }
             }
-    
+
             # If there is no end date for this currency, this means it is still active.
             if( defined( $from ) && !defined( $to ) )
             {
@@ -1004,7 +1258,7 @@ sub process
             {
                 $activeCurrency = $curr;
             }
-    
+
             my $is_tender = 0;
             if( $el_curr->hasAttribute( 'tender' ) )
             {
@@ -1020,7 +1274,7 @@ sub process
                     die( "Value for attribute 'tender' (${this}) for this currency '${curr}' is unsupported. I was expecting either 'true' or 'false': ", $el_curr->toString() );
                 }
             }
-    
+
             push( @{$currenciesInfo->{ $code }},
             {
                 code        => $code,
@@ -1031,7 +1285,7 @@ sub process
                 hist_sequence   => ++$seq,
                 is_obsolete => ( defined( $to ) ? 1 : 0 ),
             });
-    
+
             $o++;
         }
         if( defined( $activeCurrency ) )
@@ -1050,7 +1304,7 @@ sub process
         $n++;
     }
     &log( "${n} territory currencies pre-loaded for ${o} historical records" );
-    
+
     # NOTE: Pre-loading BCP47 calendar names
     &log( "Pre-loading BCP47 calendar names." );
     $n = 0;
@@ -1069,7 +1323,7 @@ sub process
         $cals_names->{ $id } = $desc;
         $out->print( "[${id}] ${desc}\n" ) if( $DEBUG );
     }
-    
+
     # NOTE: Loading calendars
     &log( "Loading calendars." );
     $n = 0;
@@ -1107,17 +1361,17 @@ sub process
                 $def->{inherits} = $inheritRes->getAttribute( 'calendar' );
             }
         }
-    
+
         if( exists( $cals_names->{ $def->{calendar} } ) )
         {
             $def->{description} = $cals_names->{ $def->{calendar} };
         }
-    
+
         eval
         {
             $sth->execute( @$def{qw( calendar system inherits description )} );
         } || die( "Error adding data for calendar code '${calendar}': ", ( $@ || $sth->errstr ), "\n", dump( $def ) );
-    
+
         my $erasRes = $el->findnodes( './eras/era[@type]' );
         if( $erasRes->size )
         {
@@ -1150,7 +1404,7 @@ sub process
     }
     &log( "${n} calendars and ${era_n} eras added." );
     $sth_era->finish;
-    
+
     # NOTE: Adding some more calendars from main/en.xml
     &log( "Adding some more calendars from main/en.xml" );
     $n = 0;
@@ -1177,7 +1431,7 @@ sub process
         $n++;
     }
     &log( "${n} additional calendar IDs added." );
-    
+
     # NOTE: Loading territories calendars preferences
     &log( "Loading territories calendars preferences." );
     $n = 0;
@@ -1197,7 +1451,7 @@ sub process
         {
             $_ = [split( /[[:blank:]\h\v]+/, $_ )];
         }
-    
+
         # Check calendars actually exist
         foreach my $cal ( @$cals )
         {
@@ -1206,7 +1460,7 @@ sub process
                 die( "Calendar '${cal}' is unknown. Used in element: ", $el->toString() );
             }
         }
-    
+
         foreach my $code ( @$codes )
         {
             # 'World' is used to define a default value. That default value is set in the SQL schema
@@ -1224,7 +1478,7 @@ sub process
         }
     }
     &log( "${n} territories were associated calendar preferences. The rest defaults to 'gregorian'" );
-    
+
     # NOTE: Loading week data
     &log( "Loading week data." );
     my $week_map =
@@ -1302,7 +1556,7 @@ sub process
             }
         }
     }
-    
+
     # NOTE: Loadding missing territories from the known territories dictionary
     &log( "Loadding missing territories from the known territories dictionary." );
     $n = 0;
@@ -1333,7 +1587,7 @@ sub process
         }
     }
     &log( sprintf( "%d territories missing (%.2f%%) added out of %d\n", $n, ( ( $n / scalar( keys( %{$known->{territories}} ) ) ) * 100 ), scalar( keys( %{$known->{territories}} ) ) ) );
-    
+
     # NOTE: Loading possible additional territories from the locale data files
     &log( "Loading possible additional territories from the locale data files." );
     $n = 0;
@@ -1352,7 +1606,7 @@ sub process
         }
     }
     &log( "${n} additional territories added to known territories." );
-    
+
     my $territory_parent_lookup = sub
     {
         my $code = shift( @_ );
@@ -1372,7 +1626,7 @@ sub process
         }
         return;
     };
-    
+
     # NOTE: Loading territories
     &log( "Loading territories." );
     $n = 0;
@@ -1423,7 +1677,7 @@ sub process
         $n++;
     }
     &log( "${n} territories added." );
-    
+
     # NOTE: Loading territories currency historical data
     &log( "Loading territories currency historical data." );
     $n = 0;
@@ -1443,7 +1697,7 @@ sub process
         }
     }
     &log( "${n} territory currencies added for ${o} historical records" );
-    
+
     # NOTE: Pre-loading language information
     &log( "Pre-loading language information." );
     my $languageDataRes = $suppDoc->findnodes( '//languageData/language' ) ||
@@ -1477,7 +1731,7 @@ sub process
         {
             $known_langs->{ $lang } = $def;
         }
-    
+
         my $hasScripts = scalar( @{$def->{scripts}} );
         if( scalar( @{$def->{territories}} ) )
         {
@@ -1508,7 +1762,7 @@ sub process
             $known_locales->{ $lang } = { locale => $lang };
         }
     }
-    
+
     # NOTE: Adding missing languages
     &log( "Adding missing languages." );
     $n = 0;
@@ -1535,7 +1789,7 @@ sub process
         $out->print( "\n" ) if( $DEBUG );
     }
     &log( sprintf( "%d languages added (%.2f%%) out of %d", $n, ( ( $n / scalar( keys( %{$known->{languages}} ) ) ) * 100 ), scalar( keys( %{$known->{languages}} ) ) ) );
-    
+
     # NOTE: Processing language groups to derive parent (iso-639-5)
     &log( "Processing language groups to derive parent (iso-639-5)." );
     # See <https://www.loc.gov/standards/iso639-5/id.php>
@@ -1574,7 +1828,7 @@ sub process
         }
     }
     &log( "${n} languages allocated a parent." );
-    
+
     # NOTE: Loading language information
     &log( "Loading language information." );
     $n = 0;
@@ -1595,7 +1849,7 @@ sub process
         $n++;
     }
     &log( "${n} languages added." );
-    
+
     my $possibly_missing =
     {
         'zh-Hant-TW' => { language => 'zh', scripts => ['Hant'], territories => ['TW'] },
@@ -1604,7 +1858,7 @@ sub process
         'zh-MO' => { language => 'zh', territories => ['MO'] },
         'zh-SG' => { language => 'zh', territories => ['SG'] },
     };
-    
+
     # NOTE: Adding possibly missing languages
     &log( "Adding possibly missing languages." );
     $n = 0;
@@ -1621,7 +1875,7 @@ sub process
         $known_locales->{ $lang } = { locale => $lang };
     }
     &log( "${n} additional languages added." );
-    
+
     # NOTE: Loading known locales
     &log( "Loading known locales" );
     my $supp_meta_file = $basedir->child( 'supplemental/supplementalMetadata.xml' );
@@ -1650,7 +1904,7 @@ sub process
         }
         $known_locales->{ $locale } = { locale => $locale };
     }
-    
+
     # NOTE: Adding more locales from the known languages
     &log( "Adding more locales from the known languages." );
     $n = 0;
@@ -1664,7 +1918,7 @@ sub process
         $known_locales->{ $code }->{status} = $known->{languages}->{ $code }->{status};
     }
     &log( sprintf( "%d languages were added as locales (%.2f%%) out of %d", $n, ( ( $n / scalar( keys( %{$known->{languages}} ) ) ) * 100 ), scalar( keys( %{$known->{languages}} ) ) ) );
-    
+
     # NOTE: Adding even more locales from the locale data files
     &log( "Adding even more locales from the locale data files." );
     $n = 0;
@@ -1684,7 +1938,7 @@ sub process
         }
     }
     &log( "${n} additional locales added to known locales." );
-    
+
     # NOTE: Adding possibly missing locales from the the main identities
     &log( "Adding possibly missing locales from the the main identities." );
     $n = 0;
@@ -1728,7 +1982,7 @@ sub process
     }
     &log( "${n} additional locales added to known locales." );
     $main_dir->close;
-    
+
     # NOTE: Adding parent information to locales
     &log( "Adding parent information to locales." );
     my $localesParentsRes = $suppDoc->findnodes( '/supplementalData/parentLocales/parentLocale' );
@@ -1886,7 +2140,7 @@ sub process
         $n++;
     }
     &log( "${n} locales added." );
-    
+
     # NOTE: Loading likely subtags
     &log( "Loading likely subtags." );
     my $likely_file = $basedir->child( 'supplemental/likelySubtags.xml' );
@@ -1927,7 +2181,7 @@ sub process
         $n++;
         $likely->{ $locale } = $target;
     }
-    
+
     # Ref: <cldr-common-45.0/common/properties/scriptMetadata.txt>
     # 1 - Web Rank:
     #               The approximate rank of this script from a large sample of the web,
@@ -1963,7 +2217,7 @@ sub process
     #               and typical commercial products for those languages would need IME support in order to be competitive.
     # 10- Cased
     #               YES if in modern (or most recent) usage case distinctions are customary.
-    
+
     # NOTE: Pre-loading scripts
     &log( "Pre-loading scripts." );
     $n = 0;
@@ -1999,7 +2253,7 @@ sub process
         {
             die( "Incorrect number of columns retrieved (", scalar( @values ), ") where ", scalar( @script_fields ), " were expected at line $lineno in file $scripts_file" );
         }
-    
+
         foreach my $bool_field ( @bool_fields )
         {
             if( !defined( $def->{ $bool_field } ) ||
@@ -2016,7 +2270,7 @@ sub process
                 die( "Unknown value '", $def->{ $bool_field }, "' for boolean field '${bool_field}' for script '$def->{script}' in file ${scripts_file}" );
             }
         }
-    
+
         # Find out the likely language
         my $likely_lang = 'und-' . $def->{script};
         if( exists( $likely->{ $likely_lang } ) )
@@ -2028,7 +2282,7 @@ sub process
         $n++;
     }
     &log( "${n} scripts pre-loaded." );
-    
+
     # NOTE: Adding possible missing scripts
     &log( "Adding possible missing scripts." );
     $n = 0;
@@ -2042,7 +2296,7 @@ sub process
         $known_scripts->{ $code }->{status} = $known->{scripts}->{ $code }->{status};
     }
     &log( sprintf( "%d missing scripts added (%.2f%%) out of %d", $n, ( ( $n / scalar( keys( %{$known->{scripts}} ) ) ) * 100 ), scalar( keys( %{$known->{scripts}} ) ) ) );
-    
+
     # NOTE: Adding even more scripts from the locale data files
     &log( "Adding even more scripts from the locale data files." );
     $n = 0;
@@ -2062,7 +2316,7 @@ sub process
         }
     }
     &log( "${n} additional scripts added to known scripts." );
-    
+
     # NOTE: Loading scripts
     &log( "Loading scripts." );
     $sth = $sths->{scripts} || die( "No SQL statement object for scripts" );
@@ -2080,7 +2334,7 @@ sub process
     }
     &log( "${n} scripts added." );
     %$known_scripts = ();
-    
+
     # NOTE: Pre-loading variants
     &log( "Pre-loading variants." );
     $n = 0;
@@ -2102,13 +2356,13 @@ sub process
         $n++;
     }
     &log( "${n} variants pre-loaded." );
-    
+
     # NOTE: Adding even more variants from the locale data files
     &log( "Adding even more variants from the locale data files." );
     $n = 0;
     &log( "${n} additional variants added to known variants." );
-    
-    
+
+
     # NOTE: Adding possibly missing variants
     &log( "Adding possibly missing variants." );
     $n = 0;
@@ -2122,7 +2376,7 @@ sub process
         $known_variants->{ $code }->{status} = $known->{variants}->{ $code }->{status};
     }
     &log( sprintf( "%d missing variants added (%.2f%%) out of %d", $n, ( ( $n / scalar( keys( %{$known->{variants}} ) ) ) * 100 ), scalar( keys( %{$known->{variants}} ) ) ) );
-    
+
     # NOTE: Loading variants
     &log( "Loading variants." );
     $n = 0;
@@ -2141,7 +2395,7 @@ sub process
     }
     &log( "${n} variants added." );
     %$known_variants = ();
-    
+
     # NOTE: Loading language population
     &log( "Loading language population" );
     $n = 0;
@@ -2172,7 +2426,7 @@ sub process
         $out->print( "\n" ) if( $DEBUG );
     }
     &log( "${n} language populations added." );
-    
+
     # NOTE: Loading aliases
     &log( "Processing aliases." );
     $sth = $sths->{aliases} || die( "No SQL statement object for aliases" );
@@ -2228,7 +2482,7 @@ sub process
         }
         &log( "${n} ${type} aliases added." );
     }
-    
+
     my $zone_file = $basedir->child( 'supplemental/metaZones.xml' );
     my $zoneDoc = load_xml( $zone_file );
 
@@ -2306,7 +2560,7 @@ sub process
             }
         }
         $fh->close;
-        
+
         my $worldTerritoriesRes = $zoneDoc->findnodes( '/supplementalData/metaZones/mapTimezones/mapZone[@territory="001"]' );
         $out->printf( "Found %d time zones with incorrect territories.\n", $worldTerritoriesRes->size ) if( $DEBUG );
         while( my $el = $worldTerritoriesRes->shift )
@@ -2336,7 +2590,7 @@ sub process
         }) || die( $cache_tz_corrections_file->error );
     }
     &log( sprintf( "%d time zone corrections loaded.", scalar( keys( %$tz_corrections ) ) ) );
-    
+
     # NOTE: Building map of territory name to territory code
     &log( "Building map of territory name to territory code." );
     my $engTerritoriesRes = $engLocaleDoc->findnodes( '//localeDisplayNames/territories/territory' ) ||
@@ -2372,7 +2626,7 @@ sub process
         }
         $eng_territories_names_to_code->{ $name } = $code;
     }
-    
+
     # NOTE: Pre-loading time zones
     &log( "Pre-loading time zones." );
     $n = 0;
@@ -2405,7 +2659,7 @@ sub process
             is_golden => 0,
         }
     };
-    
+
     # NOTE: Pre-loading time zone information
     &log( "Pre-loading time zone information." );
     my $timezonesRes = $zoneDoc->findnodes( '//metaZones/metazoneInfo/timezone' ) ||
@@ -2414,7 +2668,7 @@ sub process
     {
         die( "No meta timezones information found in ${zone_file}" );
     }
-    my $tzRe = qr/(?<year>\d{4})\D(?<month>\d{1,2})\D(?<day>\d{1,2})[[:blank:]\h]+(?<hour>\d{1,2})\D(?<minute>\d{1,2})/;
+    my $tzRe = qr/(?<year>\d{4})\D(?<month>\d{1,2})\D(?<day>\d{1,2})[[:blank:]\h]+(?<hour>\d{1,2})\D(?<minute>\d{1,2})(?:\D(?<second>\d{1,2}))?/;
     $n = 0;
     my $tz_infos = {};
     # NOTE: Collecting timezones from metaZones.xml//metaZones/metazoneInfo/timezone
@@ -2502,7 +2756,7 @@ sub process
         $tzs->{ $tz }->{metazone} = $metazone;
     }
     &log( "${n} time zone information pre-loaded." );
-    
+
     # Now check the primary zones that also are golden zones.
     # See the specs: <https://www.unicode.org/reports/tr35/tr35-dates.html#Using_Time_Zone_Names>
     # NOTE: Collecting primary (golden) timezones from metaZones.xml//primaryZones/primaryZone
@@ -2525,7 +2779,7 @@ sub process
         $tzs->{ $tz }->{is_primary} = 1;
         $tzs->{ $tz }->{territory} = $territory unless( $tzs->{ $tz }->{territory} );
     }
-    
+
     # We use it so we can add the CLDR 4-characters time zone id in a separate iteration
     # NOTE: Collecting metazones from metaZones.xml//metaZones/mapTimezones/mapZone
     &log( "Collecting metazones from metaZones.xml//metaZones/mapTimezones/mapZone" );
@@ -2599,7 +2853,7 @@ sub process
             # $this->{is_golden} = $metazone_to_dict->{ $this->{metazone} }->[0]->{is_golden};
         }
     }
-    
+
     # NOTE: Collecting timezone IDs from metaZones.xml//metaZones/metazoneIds/metazoneId
     &log( "Collecting timezone IDs from metaZones.xml//metaZones/metazoneIds/metazoneId" );
     while( my $el = $metazoneIdsRes->shift )
@@ -2617,7 +2871,7 @@ sub process
             $out->print( "Set ID '${id}' to metazone '${metazone}' (", $tzs->{ $tz }->{timezone}, "). Time zone now has this tzid (", $tzs->{ $tz }->{tzid}, ")\n" ) if( $DEBUG );
         }
     }
-    
+
     # NOTE: Loading additional information from windowsZones
     &log( "Loading additional information from windowsZones." );
     my $windows_zones_file = $basedir->child( 'supplemental/windowsZones.xml' );
@@ -2671,7 +2925,7 @@ sub process
         }
     }
     &log( "${n} additional time zone information added." );
-    
+
     # NOTE: Loading BCP47 timezones
     &log( "Loading BCP47 timezones." );
     $n = 0;
@@ -2717,6 +2971,24 @@ sub process
             $def->{alias} = [split( /[[:blank:]\h\v]+/, $def->{alias} )];
             # We check each of the IANA timezone ID, and if we find it in the list of timezones previously built, we add our BCP47 timezone ID to it dictionary definition.
             my $main_tz;
+            my @known = grep { exists( $tzs->{ $_ } ) } @{$def->{alias}};
+            $main_tz = $known[0] if( @known );
+
+            if( !defined( $main_tz ) )
+            {
+                # A standalone BCP47 timezone may have a single alias matching its identifier.
+                if( @{$def->{alias}} == 1 && lc( $def->{alias}->[0] ) eq lc( $def->{tzid} ) )
+                {
+                    $main_tz = $def->{alias}->[0];
+                    $tzs->{ $main_tz } = { timezone => $main_tz };
+                    $out->print( "Adding standalone BCP47 timezone '${main_tz}'.\n" ) if( $DEBUG );
+                }
+                else
+                {
+                    die( "No known timezone found for BCP47 tz ID '$def->{tzid}' among its aliases: '", join( "', '", @{$def->{alias}} ), "'" );
+                }
+            }
+
             foreach my $tz ( @{$def->{alias}} )
             {
                 if( exists( $tzs->{ $tz } ) )
@@ -2727,29 +2999,14 @@ sub process
                     $tzs->{ $tz }->{is_preferred} = 0 unless( defined( $tzs->{ $tz }->{is_preferred} ) );
                     $tzs->{ $tz }->{is_canonical} = 0 unless( defined( $tzs->{ $tz }->{is_canonical} ) );
                     $out->print( "alias added to time zone '${tz}'. " ) if( $DEBUG );
-                    $main_tz = $tz if( !defined( $main_tz ) );
                 }
                 else
                 {
                     $out->print( "Unknown time zone '${tz}' found in BCP47 time zones for BCP47 tz ID '$def->{tzid}', adding it to our list of known timezones.\n" ) if( $DEBUG );
-                    unless( defined( $main_tz ) )
-                    {
-                        foreach my $tz ( @{$def->{alias}} )
-                        {
-                            if( exists( $tzs->{ $tz } ) )
-                            {
-                                $main_tz = $tz;
-                                last;
-                            }
-                        }
-                    }
-                    if( !defined( $main_tz ) )
-                    {
-                        die( "This timezone ID '${tz}' is not known to us yet, and none of its aliases are either: '", join( "', '", @{$def->{alias}} ), "'" );
-                    }
+
                     my $tz_info = Clone::clone( $tzs->{ $main_tz } );
                     $tz_info->{timezone} = $tz;
-                    # $tz_info->{region} = [split( '/', $tz )]->[0];
+                    # Set the region from the timezone path when one is present.
                     $tz_info->{region} = [split( '/', $tz )]->[0] if( index( $tz, '/' ) != -1 );
                     $tz_info->{tz_bcpid} = $def->{tzid};
                     $tz_info->{alias} = [grep( $_ ne $tz, @{$def->{alias}} )];
@@ -2759,10 +3016,11 @@ sub process
                     $tzs->{ $tz } = $tz_info;
                 }
             }
+
             # The first one is the canonical timezone as per the LDML specifications
             $tzs->{ $def->{alias}->[0] }->{is_canonical} = 1;
         }
-    
+
         eval
         {
             $sth->execute( $def->{tzid}, to_array( $def->{alias} ), @$def{qw( preferred description deprecated )} );
@@ -2771,11 +3029,11 @@ sub process
         $n++;
     }
     &log( "${n} BCP47 timezones added." );
-    
+
     # NOTE: Dumping timezones to JSON
     my $tz_debug_file = $script_dir->child( 'timezones.json' );
     $tz_debug_file->unload_json( $tzs => { pretty => 1, canonical => 1 } ) || die( $tz_debug_file->error );
-    
+
     # NOTE: Loading time zones
     &log( "Loading time zones." );
     $n = 0;
@@ -2844,7 +3102,7 @@ sub process
         $n++;
     }
     &log( "${n} timezones added." );
-    
+
     # NOTE: Loading time zone information
     &log( "Loading time zone historical records." );
     $sth = $sths->{timezones_info} || die( "No SQL statement object for timezones_info" );
@@ -2866,7 +3124,7 @@ sub process
         }
     }
     &log( "${n} historical records added." );
-    
+
     # NOTE: Pre-loading subdivisions
     &log( "Pre-loading subdivisions." );
     $n = 0;
@@ -2899,7 +3157,7 @@ sub process
             $territories_having_subdivisions->{ $parent }++;
             $territory = $parent;
         }
-    
+
         foreach my $kid ( @$kids )
         {
             $known_subdivisions->{ $kid } =
@@ -2919,7 +3177,7 @@ sub process
         push( @$leftout, $code ) if( !exists( $territories_having_subdivisions->{ $code } ) );
     }
     &log( scalar( @$leftout ), " territories did not have subdivision: ", join( ', ', @$leftout ) );
-    
+
     # NOTE: Adding possibly missing subdivisions
     &log( "Adding possibly missing subdivisions." );
     $n = 0;
@@ -2933,7 +3191,7 @@ sub process
         $known_subdivisions->{ $code }->{status} = $known->{subdivisions}->{ $code }->{status};
     }
     &log( sprintf( "%d missing subdivisions added (%.2f%%) out of %d", $n, ( ( $n / scalar( keys( %{$known->{subdivisions}} ) ) ) * 100 ), scalar( keys( %{$known->{subdivisions}} ) ) ) );
-    
+
     # NOTE: Associating a territory code for each subdivision by looking up its associated territory
     &log( "Associating a territory code for each subdivision by looking up its associated territory." );
     $n = 0;
@@ -2964,7 +3222,7 @@ sub process
             die( "Subdivision code '${code}' is unknown." );
         }
     };
-    
+
     foreach my $sub ( sort( keys( %$known_subdivisions ) ) )
     {
         if( !exists( $known_subdivisions->{ $sub }->{territory} ) ||
@@ -2989,7 +3247,7 @@ sub process
         }
     }
     &log( "${n} territory code associated for subdivisions." );
-    
+
     my @missing_subdivision_territory = ();
     foreach my $sub ( sort( keys( %$known_subdivisions ) ) )
     {
@@ -2999,7 +3257,7 @@ sub process
             push( @missing_subdivision_territory, $sub );
         }
     }
-    
+
     if( scalar( @missing_subdivision_territory ) )
     {
         warn( scalar( @missing_subdivision_territory ), " deprecated or unknown subdivisions found without an asociated territory: ", join( ', ', @missing_subdivision_territory ) );
@@ -3008,7 +3266,7 @@ sub process
     {
         $out->print( "All ", scalar( keys( %$known_subdivisions ) ), " subdivisions have an associated territory.\n" ) if( $DEBUG );
     }
-    
+
     # NOTE: Loading subdivisions
     &log( "Loading subdivisions." );
     $n = 0;
@@ -3026,7 +3284,7 @@ sub process
     }
     &log( "${n} subdivisions added." );
     %$known_subdivisions = ();
-    
+
     # NOTE: Loading localised subdivisions
     &log( "Loading localised subdivisions." );
     $n = 0;
@@ -3044,7 +3302,7 @@ sub process
         $out->print( "[${basename}] " ) if( $DEBUG );
         my $locDoc = load_xml( $f );
         # Returned an XML::LibXML::Attr
-        
+
         # my $langAttr = $locDoc->findnodes( '//identity/language/@type' ) ||
         #     die( "No language node with attribute could be found in the XML file $f" );
         # my $locale = $langAttr->getValue();
@@ -3093,7 +3351,7 @@ sub process
             {
                 $name = decode_entities( $name );
             }
-    
+
             eval
             {
                 $sth->execute( $locale, $id, $name );
@@ -3106,119 +3364,248 @@ sub process
         $n++;
     }
     &log( "${n} locales processed adding a total of ${total_localised} localised subdivisions." );
-    
+
     # NOTE: Loading core numbering systems rules
     &log( "Loading core numbering systems rules." );
     $n = 0;
     my $root_num_sys_file = $basedir->child( 'rbnf/root.xml' );
     my $rootSysNumDoc = load_xml( $root_num_sys_file );
-    my $sysNumRulesRes = $rootSysNumDoc->findnodes( '/ldml/rbnf/rulesetGrouping[@type="NumberingSystemRules"]/ruleset' ) ||
-        die( "Unable to get the core numbering systems in file ${root_num_sys_file}" );
-    &log( sprintf( "%d rules found.", $sysNumRulesRes->size ) );
+    # Up until CLDR v48.2, the RBNF rules are available as <ruleset> and <rbnfrule>
+    # elements. CLDR v48 also provides them as a <rbnfRules> CDATA block in the ICU
+    # syntax and deprecated the elements, which CLDR v49 removed.
+    # If the elements are available, we use them as before; otherwise, we use
+    # Locale::Unicode::RBNF::CLDR, which divides the <rbnfRules> block into rule sets
+    # and rules exactly as ICU does.
+    my $rbnf_legacy = $rootSysNumDoc->exists( '/ldml/rbnf/rulesetGrouping[@type="NumberingSystemRules"]/ruleset' ) ? 1 : 0;
+    &log( $rbnf_legacy ? "RBNF rules provided as <ruleset> elements." : "RBNF rules provided as <rbnfRules> blocks." );
+    my $rbnf_cldr = Locale::Unicode::RBNF::CLDR->new( "$basedir", \my $rbnf_err );
+    die( "Unable to instantiate a Locale::Unicode::RBNF::CLDR object: ${rbnf_err}" ) if( $rbnf_err );
+    # Returns the rule sets of a grouping in an RBNF document, as an array reference
+    # in document order, and as an hash reference keyed by rule set type, that is the
+    # name without its leading % or %%
+    my $rbnf_rule_sets = sub
+    {
+        my( $doc, $group, $file ) = @_;
+        my( $grouping ) = grep{ $_->{grouping} eq $group } @{$rbnf_cldr->rbnf_groupings( $doc )};
+        die( "No rulesetGrouping '${group}' found in the RBNF file ${file}" ) if( !$grouping );
+        return( $grouping->{rule_sets}, { map{ $_->{type} => $_ } @{$grouping->{rule_sets}} } );
+    };
     my $numbering_systems = {};
     my $fetch_numbers;
-    $fetch_numbers = sub
+    my( $sysNumRulesRes, $rootSysNumList, $rootSysNumSets );
+    if( $rbnf_legacy )
     {
-        my $el = shift( @_ );
-        my $args = shift( @_ ) // {};
-        my $start = $args->{start} // 0;
-        my $lang = $args->{locale} // 'und';
-        my $rbnfDoc = $args->{doc} // $rootSysNumDoc;
-        my $rbnf_file = $args->{file} // $root_num_sys_file;
-        my $group = $args->{group} // 'NumberingSystemRules';
-        my $id = $el->getAttribute( 'id' );
-        my $numRulesRes = $el->findnodes( "./rbnfrule[\@value >= \"${start}\" and \@value < \"10\"]" );
-        my @numbers = ();
-        if( !$numRulesRes->size )
+        $sysNumRulesRes = $rootSysNumDoc->findnodes( '/ldml/rbnf/rulesetGrouping[@type="NumberingSystemRules"]/ruleset' ) ||
+            die( "Unable to get the core numbering systems in file ${root_num_sys_file}" );
+        &log( sprintf( "%d rules found.", $sysNumRulesRes->size ) );
+        $fetch_numbers = sub
         {
-            die( "No number found in the RBNF file ${rbnf_file} for the numbering system id '${id}' with rulesetGrouping 'NumberingSystemRules' and ruleset type '${id}'" );
-        }
-        # All is good
-        elsif( $numRulesRes->size == 10 )
-        {
-            @numbers = map( [split( ';', $_->textContent )]->[0], $numRulesRes->get_nodelist );
-        }
-        # <rbnfrule value="1">=%%cyrillic-lower-1-10=҃;</rbnfrule>
-        else
-        {
-            foreach my $node ( $numRulesRes->get_nodelist )
+            my $el = shift( @_ );
+            my $args = shift( @_ ) // {};
+            my $start = $args->{start} // 0;
+            my $lang = $args->{locale} // 'und';
+            my $rbnfDoc = $args->{doc} // $rootSysNumDoc;
+            my $rbnf_file = $args->{file} // $root_num_sys_file;
+            my $group = $args->{group} // 'NumberingSystemRules';
+            my $id = $el->getAttribute( 'id' );
+            my $numRulesRes = $el->findnodes( "./rbnfrule[\@value >= \"${start}\" and \@value < \"10\"]" );
+            my @numbers = ();
+            if( !$numRulesRes->size )
             {
-                # my $node = $nodes[$i];
-                my $val = $node->textContent;
-                $out->print( "\tFound value '${val}'\n" ) if( $DEBUG );
-                if( index( $val, '%' ) != -1 )
+                die( "No number found in the RBNF file ${rbnf_file} for the numbering system id '${id}' with rulesetGrouping 'NumberingSystemRules' and ruleset type '${id}'" );
+            }
+            # All is good
+            elsif( $numRulesRes->size == 10 )
+            {
+                @numbers = map( [split( ';', $_->textContent )]->[0], $numRulesRes->get_nodelist );
+            }
+            # <rbnfrule value="1">=%%cyrillic-lower-1-10=҃;</rbnfrule>
+            else
+            {
+                foreach my $node ( $numRulesRes->get_nodelist )
                 {
-                    # =%%cyrillic-lower-1-10=;
-                    # >҃=%%cyrillic-lower-1-10=;
-                    if( $val =~ /^(?<prefix>.*)\=\%{1,2}(?<target>[^\=]+)\=/ )
+                    # my $node = $nodes[$i];
+                    my $val = $node->textContent;
+                    $out->print( "\tFound value '${val}'\n" ) if( $DEBUG );
+                    if( index( $val, '%' ) != -1 )
                     {
-                        my $target = $+{target};
-                        # Actually, we ignore it, because I am not that sure this is really a prefix.
-                        my $prefix = $+{prefix};
-                        $out->print( "\tFound alias pointing to ${target} with prefix '", ( $prefix // 'undef' ), "'\n" ) if( $DEBUG );
-                        if( exists( $numbering_systems->{ $target } ) )
+                        # =%%cyrillic-lower-1-10=;
+                        # >҃=%%cyrillic-lower-1-10=;
+                        if( $val =~ /^(?<prefix>.*)\=\%{1,2}(?<target>[^\=]+)\=/ )
                         {
-                            $out->printf( "\tFound cached data with %d elements for number system ${target}\n", scalar( @{$numbering_systems->{ $target }} ) ) if( $DEBUG );
-                            # if( defined( $prefix ) )
-                            # {
-                            #     push( @numbers, map( $prefix . $_, @{$numbering_systems->{ $target }} ) );
-                            # }
-                            # else
-                            # {
-                                push( @numbers, @{$numbering_systems->{ $target }} );
-                            # }
+                            my $target = $+{target};
+                            # Actually, we ignore it, because I am not that sure this is really a prefix.
+                            my $prefix = $+{prefix};
+                            $out->print( "\tFound alias pointing to ${target} with prefix '", ( $prefix // 'undef' ), "'\n" ) if( $DEBUG );
+                            if( exists( $numbering_systems->{ $target } ) )
+                            {
+                                $out->printf( "\tFound cached data with %d elements for number system ${target}\n", scalar( @{$numbering_systems->{ $target }} ) ) if( $DEBUG );
+                                # if( defined( $prefix ) )
+                                # {
+                                #     push( @numbers, map( $prefix . $_, @{$numbering_systems->{ $target }} ) );
+                                # }
+                                # else
+                                # {
+                                    push( @numbers, @{$numbering_systems->{ $target }} );
+                                # }
+                            }
+                            else
+                            {
+                                my $resolverRes = $rbnfDoc->findnodes( '/ldml/rbnf/rulesetGrouping[@type="' . $group . '"]/ruleset[@type="' . $target . '"]' );
+                                if( !$resolverRes->size )
+                                {
+                                    die( "RBNF alias points to ${target}, but I was unable to find it in file ${rbnf_file}" );
+                                }
+                                my $el_target = $resolverRes->shift;
+                                $args->{start} = $start;
+                                my $nums = $fetch_numbers->( $el_target, $args );
+                                $out->print( "\tResolved for element with ID '", $el->getAttribute( 'type' ), "' pointing to ${target} returned ", scalar( @$nums ), ": ", join( ', ', @$nums ), "\n" ) if( $DEBUG );
+                                push( @numbers, @$nums );
+                            }
                         }
                         else
                         {
-                            my $resolverRes = $rbnfDoc->findnodes( '/ldml/rbnf/rulesetGrouping[@type="' . $group . '"]/ruleset[@type="' . $target . '"]' );
-                            if( !$resolverRes->size )
-                            {
-                                die( "RBNF alias points to ${target}, but I was unable to find it in file ${rbnf_file}" );
-                            }
-                            my $el_target = $resolverRes->shift;
-                            $args->{start} = $start;
-                            my $nums = $fetch_numbers->( $el_target, $args );
-                            $out->print( "\tResolved for element with ID '", $el->getAttribute( 'type' ), "' pointing to ${target} returned ", scalar( @$nums ), ": ", join( ', ', @$nums ), "\n" ) if( $DEBUG );
-                            push( @numbers, @$nums );
+                            die( "Unknown RBFN alias found in string '${val}' in file ${rbnf_file}" );
                         }
                     }
                     else
                     {
-                        die( "Unknown RBFN alias found in string '${val}' in file ${rbnf_file}" );
+                        my $rule_id = $node->getAttribute( 'value' );
+                        if( $rule_id =~ /^\d$/ )
+                        {
+                            push( @numbers, [split( ';', $val )]->[0] );
+                        }
+                        else
+                        {
+                            die( "I was expecting a number, but instead found '${id}'" );
+                        }
                     }
+                    $start++;
                 }
-                else
+            }
+            $out->print( "\treturning: ", join( ', ', @numbers ), "\n" ) if( $DEBUG );
+            return( \@numbers );
+        };
+
+        while( my $el = $sysNumRulesRes->shift )
+        {
+            # Example: <ruleset type="roman-upper">
+            my $id = $el->getAttribute( 'type' ) ||
+                die( "No ruleset name value found with attribute 'type': ", $el->toString() );
+            $out->print( "[${id}] \n" ) if( $DEBUG );
+            my $nums = $fetch_numbers->( $el );
+            $numbering_systems->{ $id } = $nums;
+            $n++;
+            $out->print( "\t@$nums\n" ) if( $DEBUG );
+        }
+    }
+    else
+    {
+        ( $rootSysNumList, $rootSysNumSets ) = $rbnf_rule_sets->( $rootSysNumDoc, 'NumberingSystemRules', $root_num_sys_file );
+        &log( sprintf( "%d rules found.", scalar( @$rootSysNumList ) ) );
+        $fetch_numbers = sub
+        {
+            my $set = shift( @_ );
+            my $args = shift( @_ ) // {};
+            my $start = $args->{start} // 0;
+            my $lang = $args->{locale} // 'und';
+            my $sets = $args->{sets} // $rootSysNumSets;
+            my $rbnf_file = $args->{file} // $root_num_sys_file;
+            my $group = $args->{group} // 'NumberingSystemRules';
+            my $id = $set->{type};
+            # Same selection as the former XPath ./rbnfrule[@value >= start and @value < 10]
+            my @rules = grep{ defined( $_->{descriptor} ) && looks_like_number( $_->{descriptor} ) && $_->{descriptor} >= $start && $_->{descriptor} < 10 } @{$set->{rules}};
+            my @numbers = ();
+            if( !scalar( @rules ) )
+            {
+                die( "No number found in the RBNF file ${rbnf_file} for the numbering system id '${id}' with rulesetGrouping '${group}' and ruleset type '${id}'" );
+            }
+            # All is good
+            elsif( scalar( @rules ) == 10 )
+            {
+                @numbers = map( [split( ';', $_->{text} )]->[0], @rules );
+            }
+            # 1: =%%cyrillic-lower-1-10=҃;
+            else
+            {
+                foreach my $rule ( @rules )
                 {
-                    my $rule_id = $node->getAttribute( 'value' );
-                    if( $rule_id =~ /^\d$/ )
+                    my $val = $rule->{text};
+                    $out->print( "\tFound value '${val}'\n" ) if( $DEBUG );
+                    if( index( $val, '%' ) != -1 )
                     {
-                        push( @numbers, [split( ';', $val )]->[0] );
+                        # =%%cyrillic-lower-1-10=;
+                        # >҃=%%cyrillic-lower-1-10=;
+                        if( $val =~ /^(?<prefix>.*)\=\%{1,2}(?<target>[^\=]+)\=/ )
+                        {
+                            my $target = $+{target};
+                            # Actually, we ignore it, because I am not that sure this is really a prefix.
+                            my $prefix = $+{prefix};
+                            $out->print( "\tFound alias pointing to ${target} with prefix '", ( $prefix // 'undef' ), "'\n" ) if( $DEBUG );
+                            if( exists( $numbering_systems->{ $target } ) )
+                            {
+                                $out->printf( "\tFound cached data with %d elements for number system ${target}\n", scalar( @{$numbering_systems->{ $target }} ) ) if( $DEBUG );
+                                # if( defined( $prefix ) )
+                                # {
+                                #     push( @numbers, map( $prefix . $_, @{$numbering_systems->{ $target }} ) );
+                                # }
+                                # else
+                                # {
+                                    push( @numbers, @{$numbering_systems->{ $target }} );
+                                # }
+                            }
+                            else
+                            {
+                                my $set_target = $sets->{ $target };
+                                if( !$set_target )
+                                {
+                                    die( "RBNF alias points to ${target}, but I was unable to find it in file ${rbnf_file}" );
+                                }
+                                $args->{start} = $start;
+                                my $nums = $fetch_numbers->( $set_target, $args );
+                                $out->print( "\tResolved for rule set '${id}' pointing to ${target} returned ", scalar( @$nums ), ": ", join( ', ', @$nums ), "\n" ) if( $DEBUG );
+                                push( @numbers, @$nums );
+                            }
+                        }
+                        else
+                        {
+                            die( "Unknown RBFN alias found in string '${val}' in file ${rbnf_file}" );
+                        }
                     }
                     else
                     {
-                        die( "I was expecting a number, but instead found '${id}'" );
+                        my $rule_id = $rule->{descriptor};
+                        if( $rule_id =~ /^\d$/ )
+                        {
+                            push( @numbers, [split( ';', $val )]->[0] );
+                        }
+                        else
+                        {
+                            die( "I was expecting a number, but instead found '${rule_id}'" );
+                        }
                     }
+                    $start++;
                 }
-                $start++;
             }
+            $out->print( "\treturning: ", join( ', ', @numbers ), "\n" ) if( $DEBUG );
+            return( \@numbers );
+        };
+
+        foreach my $set ( @$rootSysNumList )
+        {
+            # Example: %roman-upper. All the rule sets are loaded, private ones included, in document
+            # order, as was the case with the former <ruleset> elements.
+            my $id = $set->{type} ||
+                die( "No ruleset name value found in the rule sets of file ${root_num_sys_file}" );
+            $out->print( "[${id}] \n" ) if( $DEBUG );
+            my $nums = $fetch_numbers->( $set );
+            $numbering_systems->{ $id } = $nums;
+            $n++;
+            $out->print( "\t@$nums\n" ) if( $DEBUG );
         }
-        $out->print( "\treturning: ", join( ', ', @numbers ), "\n" ) if( $DEBUG );
-        return( \@numbers );
-    };
-    
-    while( my $el = $sysNumRulesRes->shift )
-    {
-        # Example: <ruleset type="roman-upper">
-        my $id = $el->getAttribute( 'type' ) ||
-            die( "No ruleset name value found with attribute 'type': ", $el->toString() );
-        $out->print( "[${id}] \n" ) if( $DEBUG );
-        my $nums = $fetch_numbers->( $el );
-        $numbering_systems->{ $id } = $nums;
-        $n++;
-        $out->print( "\t@$nums\n" ) if( $DEBUG );
     }
     &log( "${n} numbering systems loaded." );
-    
+
     # NOTE: Loading numbering systems
     &log( "Loading numbering systems." );
     $n = 0;
@@ -3274,19 +3661,39 @@ sub process
                     die( "RBNF file ${rbnfFile} for locale ${locale} does not exist." );
                 }
                 my $rbnfDoc = load_xml( $rbnfFile );
-                my $numRulesRes = $rbnfDoc->findnodes( "/ldml/rbnf/rulesetGrouping[\@type=\"${rbnfType}\"]/ruleset[\@type=\"${ruleType}\"]" );
-                if( !$numRulesRes->size )
+                my $nums;
+                if( $rbnf_legacy )
                 {
-                    die( "No number found in the RBNF file ${rbnfFile} for the numbering system id '${id}' with rulesetGrouping '${rbnfType}' and ruleset type '${ruleType}'" );
+                    my $numRulesRes = $rbnfDoc->findnodes( "/ldml/rbnf/rulesetGrouping[\@type=\"${rbnfType}\"]/ruleset[\@type=\"${ruleType}\"]" );
+                    if( !$numRulesRes->size )
+                    {
+                        die( "No number found in the RBNF file ${rbnfFile} for the numbering system id '${id}' with rulesetGrouping '${rbnfType}' and ruleset type '${ruleType}'" );
+                    }
+                    my $el_rule = $numRulesRes->shift;
+                    $nums = $fetch_numbers->( $el_rule,
+                    {
+                        locale => $locale,
+                        file => $rbnfFile,
+                        doc => $rbnfDoc,
+                        group => $rbnfType,
+                    });
                 }
-                my $el_rule = $numRulesRes->shift;
-                my $nums = $fetch_numbers->( $el_rule,
+                else
                 {
-                    locale => $locale,
-                    file => $rbnfFile,
-                    doc => $rbnfDoc,
-                    group => $rbnfType,
-                });
+                    my( undef, $sets ) = $rbnf_rule_sets->( $rbnfDoc, $rbnfType, $rbnfFile );
+                    my $set_rule = $sets->{ $ruleType };
+                    if( !$set_rule )
+                    {
+                        die( "No number found in the RBNF file ${rbnfFile} for the numbering system id '${id}' with rulesetGrouping '${rbnfType}' and ruleset type '${ruleType}'" );
+                    }
+                    $nums = $fetch_numbers->( $set_rule,
+                    {
+                        locale => $locale,
+                        file => $rbnfFile,
+                        sets => $sets,
+                        group => $rbnfType,
+                    });
+                }
                 # @numbers = map( [split( ';', $_->textContent )]->[0], $numRulesRes->get_nodelist );
                 @numbers = @$nums;
             }
@@ -3311,7 +3718,7 @@ sub process
             die( "This numbering system has no 'digits' nor 'rules' attribute defined: ", $el->toString() );
         }
         my $digits = \@numbers;
-    
+
         eval
         {
             $sth->execute( $id, to_array( $digits ), $type );
@@ -3319,7 +3726,7 @@ sub process
         $out->print( "ok\n" ) if( $DEBUG );
         $n++;
     }
-    
+
     # NOTE: Loading time formats
     &log( "Loading time formats." );
     $n = 0;
@@ -3373,7 +3780,7 @@ sub process
             {
                 die( "Unknown territory territory code '${territory}' for property 'region' with value '${code}'. Not previous defined in CLDR as a territory." );
             }
-    
+
             eval
             {
                 $sth->bind_param( 1, "$code", SQL_VARCHAR );
@@ -3388,7 +3795,7 @@ sub process
         }
     }
     &log( "Time formatting added to ${n} territories." );
-    
+
     # NOTE: Loading week of preference
     &log( "Loading week of preference." );
     $n = 0;
@@ -3426,7 +3833,7 @@ sub process
                     $locale = 'und';
                 }
             }
-    
+
             $out->print( "[${locale}] " ) if( $DEBUG );
             eval
             {
@@ -3437,7 +3844,7 @@ sub process
         }
     }
     &log( "${n} week of preference information added." );
-    
+
     # NOTE: Loading code mappings
     &log( "Loading code mappings." );
     $n = 0;
@@ -3475,7 +3882,7 @@ sub process
         }
     }
     &log( "${n} code mappings added." );
-    
+
     # NOTE: Loading person name defaults
     &log( "Loading person name defaults." );
     $n = 0;
@@ -3522,7 +3929,7 @@ sub process
         $out->print( "ok\n" ) if( $DEBUG );
     }
     &log( "${n} person name defaults added." );
-    
+
     # NOTE: Loading Rule-Based Number Formats
     &log( "Loading Rule-Based Number Formats." );
     $n = 0;
@@ -3556,48 +3963,105 @@ sub process
             }
         }
         $out->print( "[${locale}] " ) if( $DEBUG );
-        my $rbnfRes = $rbnfDoc->findnodes( '//rbnf/rulesetGrouping' );
-        if( !$rbnfRes->size )
+        # Up to CLDR v48.2, the rules are read from the <ruleset> elements, as we always
+        # did, and from CLDR v49 onward, from the <rbnfRules> blocks.
+        if( $rbnfDoc->exists( '//rbnf/rulesetGrouping/ruleset' ) )
         {
-            warn( "Warning only: no RBNF grouping found for locale '${locale}' in file $f" );
-            $out->print( "ignored\n" ) if( $DEBUG );
-            next;
-        }
-        while( my $el = $rbnfRes->shift )
-        {
-            my $grouping = $el->getAttribute( 'type' ) ||
-                die( "Unable to get the attribute 'type' for this grouping element: ", $el->toString() );
-            my @sets = $el->getChildrenByTagName( 'ruleset' );
-            foreach my $set ( @sets )
+            my $rbnfRes = $rbnfDoc->findnodes( '//rbnf/rulesetGrouping' );
+            if( !$rbnfRes->size )
             {
-                my $ruleset = $set->getAttribute( 'type' ) ||
-                    die( "Unable to get the attribute 'type' for this ruleset: ", $set->toString() );
-                my @rules = $set->getChildrenByTagName( 'rbnfrule' );
-                foreach my $rule ( @rules )
+                warn( "Warning only: no RBNF grouping found for locale '${locale}' in file $f" );
+                $out->print( "ignored\n" ) if( $DEBUG );
+                next;
+            }
+            while( my $el = $rbnfRes->shift )
+            {
+                my $grouping = $el->getAttribute( 'type' ) ||
+                    die( "Unable to get the attribute 'type' for this grouping element: ", $el->toString() );
+                my @sets = $el->getChildrenByTagName( 'ruleset' );
+                foreach my $set ( @sets )
                 {
-                    my $id;
-                    if( !length( ( $id = $rule->getAttribute( 'value' ) ) // '' ) )
+                    my $ruleset = $set->getAttribute( 'type' ) ||
+                        die( "Unable to get the attribute 'type' for this ruleset: ", $set->toString() );
+                    my @rules = $set->getChildrenByTagName( 'rbnfrule' );
+                    foreach my $rule ( @rules )
                     {
-                        die( "Unable to get the attribute 'value' for this rule: ", $rule->toString() );
+                        my $id;
+                        if( !length( ( $id = $rule->getAttribute( 'value' ) ) // '' ) )
+                        {
+                            die( "Unable to get the attribute 'value' for this rule: ", $rule->toString() );
+                        }
+                        my $value = $rule->textContent;
+                        if( !defined( $value ) ||
+                            !length( $value ) )
+                        {
+                            die( "Unable to get the rule value for the rule id '${id}' in grouping '${grouping}': ", $rule->toString() );
+                        }
+                        eval
+                        {
+                            $sth->execute( $locale, $grouping, $ruleset, $id, $value );
+                        } || die( "Error adding RBNF information for groupind '${grouping}, locale '${locale}', rule set '${ruleset}', and id '${id}': ", ( $@ || $sth->errstr ) );
+                        $n++;
                     }
-                    my $value = $rule->textContent;
-                    if( !defined( $value ) ||
-                        !length( $value ) )
+                }
+            }
+        }
+        else
+        {
+            my $groupings = $rbnf_cldr->rbnf_groupings( $rbnfDoc );
+            if( !scalar( @$groupings ) )
+            {
+                warn( "Warning only: no RBNF grouping found for locale '${locale}' in file $f" );
+                $out->print( "ignored\n" ) if( $DEBUG );
+                next;
+            }
+            foreach my $def ( @$groupings )
+            {
+                my $grouping = $def->{grouping} ||
+                    die( "Unable to get the attribute 'type' for a grouping element in file $f" );
+                my @sets = @{$def->{rule_sets}};
+                # The %%lenient-parse rules, which ICU extracts before parsing the rules, are stored as
+                # the private rule set they used to be with the former <ruleset> elements, in first
+                # position as in the CLDR files.
+                if( defined( $def->{lenient_parse} ) )
+                {
+                    unshift( @sets, { type => 'lenient-parse', private => 1, rules => [ { descriptor => 0, text => $def->{lenient_parse} } ] } );
+                }
+                foreach my $set ( @sets )
+                {
+                    my $ruleset = $set->{type} ||
+                        die( "Unable to get the type of a rule set in grouping '${grouping}' in file $f" );
+                    foreach my $rule ( @{$set->{rules}} )
                     {
-                        die( "Unable to get the rule value for the rule id '${id}' in grouping '${grouping}': ", $rule->toString() );
+                        # The rule descriptor, such as 0, 1100/100, -x or x.x. It includes the radix, which
+                        # the former <rbnfrule> elements held in a separate attribute that was not stored.
+                        my $id = $rule->{descriptor};
+                        if( !length( $id // '' ) )
+                        {
+                            die( "Unable to get the descriptor of a rule in rule set '${ruleset}' of grouping '${grouping}' in file $f: ", ( $rule->{text} // 'undef' ) );
+                        }
+                        # The rule text is stored with its terminating semicolon, as the former
+                        # <rbnfrule> elements had it. It may be empty, as in "0: ;", which is then
+                        # stored as ";".
+                        my $value = $rule->{text};
+                        if( !defined( $value ) )
+                        {
+                            die( "Unable to get the rule value for the rule id '${id}' in grouping '${grouping}' in file $f" );
+                        }
+                        $value .= ';';
+                        eval
+                        {
+                            $sth->execute( $locale, $grouping, $ruleset, $id, $value );
+                        } || die( "Error adding RBNF information for groupind '${grouping}, locale '${locale}', rule set '${ruleset}', and id '${id}': ", ( $@ || $sth->errstr ) );
+                        $n++;
                     }
-                    eval
-                    {
-                        $sth->execute( $locale, $grouping, $ruleset, $id, $value );
-                    } || die( "Error adding RBNF information for groupind '${grouping}, locale '${locale}', rule set '${ruleset}', and id '${id}': ", ( $@ || $sth->errstr ) );
-                    $n++;
                 }
             }
         }
         $out->print( "ok\n" ) if( $DEBUG );
     }
     &log( "${n} RBNF rules added." );
-    
+
     # NOTE: Loading references
     &log( "Loading references." );
     $n = 0;
@@ -3625,7 +4089,7 @@ sub process
         {
             $def->{description} = decode_entities( $def->{description} );
         }
-    
+
         if( defined( $def->{description} ) &&
             length( $def->{description} ) )
         {
@@ -3634,7 +4098,7 @@ sub process
         $def->{description} = undef unless( length( $def->{description} // '' ) );
         # A common issue, or so it seems, is for some URL to be missing the first letter 'h', such as: 'ttps://translatorswithoutborders.org/language-data-for-el-salvador'
         $def->{uri} = 'h' . $def->{uri} if( $def->{uri} && substr( lc( $def->{uri} ), 0, 1 ) ne 'h' );
-    
+
         eval
         {
             $sth->execute( @$def{qw( code uri description )} );
@@ -3643,7 +4107,7 @@ sub process
         $n++;
     }
     &log( "${n} references added." );
-    
+
     # NOTE: Loading BCP47 extensions
     &log( "Loading BCP47 extensions and values." );
     $n = 0;
@@ -3687,13 +4151,13 @@ sub process
                     die( "The BCP47 extension $def->{extension} has a deprecated status ($def->{deprecated}), but its value is unknown (neither true or false): ", dump( $def ) );
                 }
             }
-    
+
             eval
             {
                 $sth->execute( @$def{qw( category extension alias value_type description deprecated )} );
             } || die( "Error adding BCP47 extension information for category '$def->{category}' and extension '$def->{extension}' from file ${f}: ", ( $@ || $sth->errstr ), "\n", dump( $def ) );
             $n++;
-    
+
             my @values = $el->getChildrenByTagName( 'type' );
             scalar( @values ) || die( "No data found for BCP47 extension '$def->{extension}' in category '${cat}' in file ${f}" );
             # <type name="japanese" description="Japanese Imperial calendar"/>
@@ -3713,7 +4177,7 @@ sub process
         $n++;
     }
     &log( "${n} extensions data added." );
-    
+
     # NOTE: Loading casings
     &log( "Loading casings." );
     $casings_dir->open || die( "Unable to open directory $casings_dir: ", $casings_dir->error );
@@ -3774,7 +4238,7 @@ sub process
         $n++;
     }
     &log( "${n} locale casing information added." );
-    
+
     # NOTE: Loading day periods
     &log( "Loading day periods." );
     $n = 0;
@@ -3835,7 +4299,7 @@ sub process
                         $locale = 'und';
                     }
                 }
-    
+
                 eval
                 {
                     $sth->execute( $locale, $token, $from, $before );
@@ -3968,7 +4432,18 @@ sub process
         }
         $out->print( "Processing ${locale} data from file ${f}\n" ) if( $DEBUG );
         my $added = {};
-        # Check whether there is any data at all. Some XML file, such as the one for ja_JP.xml contains only the 'identity' tag
+        # NOTE: Loading data aliases
+        # An alias with source="locale" redirects the lookup of an element to another
+        # one in the locale being resolved, not in the file that contains the alias.
+        # Each such alias becomes a rule in the data_aliases table, used by
+        # Locale::Unicode::Data->resolve().
+        # The data of the file itself is still loaded below, with its aliases resolved
+        # within the file (correct for that locale, and the last resort for the others).
+        # <https://www.unicode.org/reports/tr35/#Alias_Elements>
+        &log( "\tLoading data aliases." );
+        $added->{data_aliases} = load_data_aliases( $mainDoc, $locale, $f, $sths->{data_aliases} );
+        # Check whether there is any data at all. Some XML file, such as the one for
+        # ja_JP.xml contains only the 'identity' tag
         my $hasData = $mainDoc->findnodes( '//localeDisplayNames' );
         if( $hasData->size )
         {
@@ -4005,7 +4480,7 @@ sub process
                     {
                         $id = 'und';
                     }
-                    
+
                     my $hasUndLocaleRes = $mainDoc->findnodes( '/ldml/localeDisplayNames/languages/language[@type="und"]' );
                     if( $id eq 'und' &&
                         $hasUndLocaleRes->size )
@@ -4055,14 +4530,14 @@ sub process
                 {
                     $alt = $el->getAttribute( 'alt' );
                 }
-        
+
                 eval
                 {
                     $sth_script->execute( $locale, $id, $val, $alt );
                 } || die( "Error adding localised information from file ${f} for locale ${locale} and for script ${id}: ", ( $@ || $sth_script->errstr ), "\nwith query: ", $sth_script->{Statement} );
                 $added->{scripts}++;
             }
-        
+
             # NOTE: Loading territories L10N
             &log( "\tLoading territories L10N." );
             $localesRes = $mainDoc->findnodes( '//localeDisplayNames/territories/territory[@type]' );
@@ -4086,7 +4561,7 @@ sub process
                 {
                     $alt = $el->getAttribute( 'alt' );
                 }
-        
+
                 eval
                 {
                     $sth_territory->bind_param( 1, $locale, SQL_VARCHAR );
@@ -4097,7 +4572,7 @@ sub process
                 } || die( "Error adding localised information from file ${f} for locale ${locale} and for territory ${id}: ", ( $@ || $sth_territory->errstr ), "\nwith query: ", $sth_territory->{Statement} );
                 $added->{territories}++;
             }
-        
+
             # NOTE: Loading variants L10N
             &log( "\tLoading variants L10N." );
             $localesRes = $mainDoc->findnodes( '//localeDisplayNames/variants/variant[@type]' );
@@ -4122,14 +4597,14 @@ sub process
                 {
                     $alt = $el->getAttribute( 'alt' );
                 }
-        
+
                 eval
                 {
                     $sth_variant->execute( $locale, $id, $val, $alt );
                 } || die( "Error adding localised information from file ${f} for locale ${locale} and for variant ${id}: ", ( $@ || $sth_variant->errstr ), "\nwith query: ", $sth_variant->{Statement} );
                 $added->{variants}++;
             }
-        
+
             # NOTE: Loading currencies L10N
             &log( "\tLoading currencies L10N." );
             $localesRes = $mainDoc->findnodes( '//numbers/currencies/currency[@type]' );
@@ -4182,7 +4657,7 @@ sub process
                         $val = decode_entities( $val );
                     }
                     $def->{locale_name} = $val;
-        
+
                     eval
                     {
                         $sth_currency->execute( @$def{qw( locale currency count locale_name symbol )} );
@@ -4196,7 +4671,7 @@ sub process
             $out->print( "no data, skipping.\n" ) if( $DEBUG );
             # next;
         }
-    
+
         # NOTE: Load calendar terms, locale eras, formats, timezones and more
         &log( "\tLoad calendar terms, locale eras, formats and more." );
         my $calLocalesDatesRes = $mainDoc->findnodes( '/ldml/dates' );
@@ -4331,7 +4806,7 @@ sub process
                         }
                     }
                 }
-        
+
                 # NOTE: Check for calendar eras
                 &log( "\tCheck for calendar eras." );
                 my $calErasRes = $el->findnodes( './eras' );
@@ -4388,7 +4863,7 @@ sub process
                 {
                     $out->print( "\tno era found for calendar ${cal_id} in locale ${locale}\n" ) if( $DEBUG );
                 }
-        
+
                 # NOTE: Check for calendar date/time formats
                 &log( "\tCheck for calendar date/time formats." );
                 my $cal_date_time_map =
@@ -4489,7 +4964,7 @@ sub process
                                 $calendars_date_time_skeletons->{ $cal_id }->{ $type }->{ $len } = $pattern_id;
                             }
                         }
-    
+
                         if( !$calFormatValueRes->size )
                         {
                             die( "No value (pattern) for this ${type} format for locale ${locale} in file ${f} for this element: ", $el_len->toString() );
@@ -4530,7 +5005,7 @@ sub process
                             {
                                 $def->{alt} = $el_dt_val->getAttribute( 'alt' );
                             }
-        
+
                             eval
                             {
                                 $sth_dt_fmt->execute( @$def{qw( locale calendar format_type format_length alt format_id format_pattern )} );
@@ -4539,7 +5014,7 @@ sub process
                         }
                     }
                 }
-        
+
                 # NOTE: Checking datetime formats
                 &log( "\tChecking datetime formats." );
                 my $calDateTimeContainerRes = $el->findnodes( './dateTimeFormats' );
@@ -4605,7 +5080,7 @@ sub process
                             }
                         }
                     }
-        
+
                     # NOTE: Checking available datetime formats
                     &log( "\tChecking available datetime formats." );
                     my $calAvailableFormatsRes = $el_container->findnodes( './availableFormats' );
@@ -4635,17 +5110,17 @@ sub process
                             {
                                 die( "No pattern found for this available format with id '$def->{format_id}' for calendar '${cal_id}' and locale '${locale}' in file $f: ", $el_item->toString() );
                             }
-                
+
                             if( $el_item->hasAttribute( 'count' ) )
                             {
                                 $def->{count} = $el_item->getAttribute( 'count' );
                             }
-                
+
                             if( $el_item->hasAttribute( 'alt' ) )
                             {
                                 $def->{alt} = $el_item->getAttribute( 'alt' );
                             }
-                
+
                             eval
                             {
                                 $sth_avail_fmt->execute( @$def{qw( locale calendar format_id format_pattern count alt )} );
@@ -4653,7 +5128,7 @@ sub process
                             $added->{cal_available_format}++;
                         }
                     }
-        
+
                     # NOTE: Checking calendar append items
                     &log( "\tChecking calendar append items." );
                     my $calDateTimeAppendRes = $el_container->findnodes( './appendItems' );
@@ -4691,7 +5166,7 @@ sub process
                             $added->{cal_append_format}++;
                         }
                     }
-            
+
                     # NOTE: Checking calendar interval formats
                     &log( "\tChecking calendar interval formats." );
                     my $calIntervalFormatRes = $el_container->findnodes( './intervalFormats' );
@@ -4722,7 +5197,7 @@ sub process
                                     greatest_diff_id    => $el_diff->getAttribute( 'id' ),
                                     format_pattern      => $el_diff->textContent,
                                 };
-    
+
                                 if( $opts->{apply_patch} &&
                                     exists( $patch->{ $cldr_version } ) &&
                                     ref( $patch->{ $cldr_version } ) eq 'HASH' &&
@@ -4737,7 +5212,7 @@ sub process
                                     warn( "Warning only: Datetime interval with format ID '$def->{format_id}' and greatest difference ID '$def->{greatest_diff_id}' has a patch (", $patch->{ $cldr_version }->{calendar_interval_formats}->{ $locale }->{ $def->{format_id} }->{ $def->{greatest_diff_id} }, "), applying it instead of the default pattern (", $def->{format_pattern}, ")" );
                                     $def->{format_pattern} = $patch->{ $cldr_version }->{calendar_interval_formats}->{ $locale }->{ $def->{format_id} }->{ $def->{greatest_diff_id} };
                                 }
-    
+
                                 foreach my $prop ( qw( greatest_diff_id format_pattern ) )
                                 {
                                     if( !defined( $def->{ $prop } ) ||
@@ -4746,12 +5221,12 @@ sub process
                                         die( "No pattern found for this append item format with id '$def->{format_id}' for calendar '${cal_id}' and locale '${locale}' in file $f: ", $el_diff->toString() );
                                     }
                                 }
-        
+
                                 if( $el_diff->hasAttribute( 'alt' ) )
                                 {
                                     $def->{alt} = $el_diff->getAttribute( 'alt' );
                                 }
-    
+
                                 my( $p1, $sep, $p2, $repeating_field ) = find_interval_repeating_field({
                                     pattern => $def->{format_pattern},
                                     greatest_diff => $def->{greatest_diff_id},
@@ -4766,7 +5241,7 @@ sub process
                                     die( "Reconstructed string '${p1}${sep}${p2}' does not match original string '$def->{format_pattern}' for locale '${locale}' in file ${f} for element: ", $el_diff->toString() );
                                 }
                                 @$def{qw( part1 separator part2 repeating_field )} = ( $p1, $sep, $p2, $repeating_field );
-    
+
                                 eval
                                 {
                                     $sth_inter_fmt->execute( @$def{qw( locale calendar format_id greatest_diff_id format_pattern alt part1 separator part2 repeating_field )} );
@@ -4788,12 +5263,12 @@ sub process
                                 greatest_diff_id    => 'default',
                                 format_pattern      => $el_interval_default_fmt->textContent,
                             };
-        
+
                             if( $el_interval_default_fmt->hasAttribute( 'alt' ) )
                             {
                                 $def->{alt} = $el_interval_default_fmt->getAttribute( 'alt' );
                             }
-    
+
                             my( $p1, $sep, $p2, $repeating_field ) = find_interval_repeating_field({
                                 pattern => $def->{format_pattern},
                                 greatest_diff => $def->{greatest_diff_id},
@@ -4808,7 +5283,7 @@ sub process
                                 die( "Reconstructed string '${p1}${sep}${p2}' does not match original string '$def->{format_pattern}' for locale '${locale}' in file ${f} for element: ", $el_interval_default_fmt->toString() );
                             }
                             @$def{qw( part1 separator part2 repeating_field )} = ( $p1, $sep, $p2, $repeating_field );
-    
+
                             eval
                             {
                                 $sth_inter_fmt->execute( @$def{qw( locale calendar format_id greatest_diff_id format_pattern alt part1 separator part2 repeating_field )} );
@@ -4818,7 +5293,7 @@ sub process
                     }
                 }
                 # Done with DateTime formats
-        
+
                 # NOTE: Checking calendar cyclic name sets
                 &log( "\tChecking calendar cyclic name sets." );
                 my $calCyclicContainerRes = $el->findnodes( './cyclicNameSets' );
@@ -4880,7 +5355,7 @@ sub process
                                         format_id       => $el_name->getAttribute( 'type' ),
                                         format_pattern  => $el_name->textContent,
                                     };
-            
+
                                     eval
                                     {
                                         $sth_cyclic->execute( @$def{qw( locale calendar format_set format_type format_length format_id format_pattern )} );
@@ -4897,7 +5372,7 @@ sub process
                 }
             }
             # End looping through all calendar systems
-    
+
             # NOTE: Checking locale date fields
             &log( "\tChecking locale date fields." );
             my $calDateFieldsRes = $el_dates->findnodes( './fields' );
@@ -5056,7 +5531,7 @@ sub process
                         {
                             $def->{subtype} = $el_tz_fmt->getAttribute( 'type' );
                         }
-    
+
                         eval
                         {
                             $sth_tz_formats->execute( @$def{qw( locale type subtype format_pattern )} );
@@ -5151,7 +5626,7 @@ sub process
                 {
                     $out->print( "\tno localised time zone sample cities for locale ${locale} in file ${f}\n" ) if( $DEBUG );
                 }
-    
+
                 # NOTE: Checking for locale metazones
                 &log( "\tChecking for locale metazones." );
                 my $MetazonesRes = $el_dates->findnodes( './timeZoneNames/metazone[@type]' );
@@ -5177,7 +5652,31 @@ sub process
                             my $tzNamesTypesRes = $el_tz_width->findnodes( './*[local-name()="generic" or local-name()="standard" or local-name()="daylight"]' );
                             if( !$tzNamesTypesRes->size )
                             {
-                                die( "Locale '${locale}' has the metazone '${metazone}' set with metazone name of width '${tz_name_width}', but no data could be found in file ${f} for this element: ", $el->toString() );
+                                # In root an alias with source="locale" is resolved in
+                                # the requesting locale, not in root (UTS #35). Since
+                                # CLDR v49 the British and Irish metazones alias to the
+                                # GMT metazone of the requesting locale, which root does
+                                # not have. Root therefore has no data for this metazone
+                                # width; the alias is recorded in data_aliases by
+                                # load_data_aliases().
+                                # <https://www.unicode.org/reports/tr35/#Alias_Elements>
+                                my $tzNamesAliasRes = $el_tz_width->findnodes( './alias[@path]' );
+                                if( $locale eq 'und' && $tzNamesAliasRes->size )
+                                {
+                                    my $xpath = $tzNamesAliasRes->get_node(1)->getAttribute( 'path' );
+                                    if( !$el_tz_width->exists( $xpath ) )
+                                    {
+                                        $out->print( "\t\tmetazone '${metazone}' of width '${tz_name_width}' is aliased to ${xpath}, which root does not have; skipping it.\n" ) if( $DEBUG );
+                                        next;
+                                    }
+                                    my $el_resolved = resolve_alias( $tzNamesAliasRes ) ||
+                                        die( "The metazone '${metazone}' of width '${tz_name_width}' is aliased to ${xpath}, but I could not resolve it for locale ${locale} in file ${f}" );
+                                    $tzNamesTypesRes = $el_resolved->findnodes( './*[local-name()="generic" or local-name()="standard" or local-name()="daylight"]' );
+                                }
+                            }
+                            if( !$tzNamesTypesRes->size )
+                            {
+                                die( "Locale '${locale}' has the metazone '${metazone}' set with metazone name of width '${tz_name_width}', but no data could be found in file ${f} for this element: ", $el_tz_width->toString() );
                             }
                             while( my $el_tz_name = $tzNamesTypesRes->shift )
                             {
@@ -5185,7 +5684,7 @@ sub process
                                 my $name_value = trim( $el_tz_name->textContent );
                                 $def->{ $name_type } = $name_value;
                             }
-                            
+
                             eval
                             {
                                 $sth_metatz_names->execute( @$def{qw( locale metazone width generic standard daylight )} );
@@ -5203,9 +5702,9 @@ sub process
                 $out->print( "\t\tno localised timezones and metazones for locale ${locale} in file ${f}\n" ) if( $DEBUG );
             }
         }
-    
+
         $out->printf( "\tok, added %d locales, %d scripts, %d territories, %d variants, %d currencies, %d calendar terms, %d eras, %d date or time formats, %d datetime formats, %d available formats, %d appended formats, %d interval formats, %d cyclic, %d fields\n", @$added{qw( languages scripts territories variants currencies cal_terms cal_era cal_date_or_time_format cal_datetime_format cal_available_format cal_append_format cal_interval_format cal_cyclic cal_field )} ) if( $DEBUG );
-    
+
         # NOTE: Checking for layout orientation (left-to-right)
         &log( "\tChecking for layout orientation (left-to-right)." );
         my $layoutLTRRes = $mainDoc->findnodes( '//layout/orientation/characterOrder' );
@@ -5228,7 +5727,7 @@ sub process
         {
             $out->print( "\tNo layout orientation found.\n" ) if( $DEBUG );
         }
-    
+
         # NOTE: Checking for quotation marks
         &log( "\tChecking for quotation marks." );
         # Example:
@@ -5262,7 +5761,7 @@ sub process
             $j++;
         }
         $out->printf( "\t%d quotation mark information added.\n", $j ) if( $DEBUG );
-    
+
         # NOTE: Checking for POSIX yes/no string
         &log( "\tChecking for POSIX yes/no string." );
         # Example:
@@ -5301,7 +5800,7 @@ sub process
             {
                 die( "Found a yes/no string value, but its content after spliting it is empty for locale '${locale}' in file ${f} for this element: ", $el->toString() );
             }
-    
+
             eval
             {
                 $sth_locale_info->execute( $locale, $yes_no_map->{ $tag }, $val );
@@ -5309,7 +5808,7 @@ sub process
             $j++;
         }
         $out->printf( "\t%d yes/no string information added.\n", $j ) if( $DEBUG );
-    
+
         # NOTE: Adding locale number system properties (punctuation, percent, group, etc)
         &log( "\tAdding locale number system symbols (punctuation, percent, group, etc)." );
         my $localeNumberSymbolRes = $mainDoc->findnodes( '/ldml/numbers/symbols[@numberSystem]' );
@@ -5333,7 +5832,7 @@ sub process
             #     <nan>NaN</nan>
             #     <timeSeparator>:</timeSeparator>
             # </symbols>
-    
+
             my $symbols_map =
             {
                 approximatelySign       => 'approximately',
@@ -5367,7 +5866,7 @@ sub process
                     $el = resolve_alias( $numSymbolAliasRes ) ||
                         die( "This number symbol with number system '${sys_id}' is aliased, but I could not resolve it for locale ${locale} in file ${f} for this element." );
                 }
-    
+
                 if( !exists( $symbols_data->{ $sys_id } ) )
                 {
                     $symbols_data->{ $sys_id } = {}
@@ -5398,14 +5897,14 @@ sub process
                     {
                         $def->{alt} = $el_kid->getAttribute( 'alt' );
                     }
-    
+
                     my $prop_key = join( ';', map( $_ // '', @$def{qw( property alt )} ) );
                     if( exists( $symbols_data->{ $sys_id }->{ $prop_key } ) )
                     {
                         die( "Symbol property ${tag} ('${prop}') is being redefined for number system ${sys_id} and locale ${locale} in file ${f} for this element: ", $el->toString() );
                     }
                     $symbols_data->{ $sys_id }->{ $prop_key } = $val;
-    
+
                     eval
                     {
                         $sth->execute( @$def{qw( locale number_system property value alt )} );
@@ -5419,7 +5918,7 @@ sub process
         {
             &log( "\tNo numbering system symbols for locale ${locale} in file ${f}" );
         }
-    
+
         # NOTE: Adding formats for decimal, scientific, percent, currency and miscellaneous
         &log( "\tAdding formats for decimal, scientific, percent, currency and miscellaneous." );
         $j = 0;
@@ -5629,7 +6128,7 @@ sub process
                     #         </decimalFormat>
                     #     </decimalFormatLength>
                     # </decimalFormats>
-                    
+
                     # <currencyFormats numberSystem="arab">
                     #     <currencySpacing>
                     #         <alias source="locale" path="../../currencyFormats[@numberSystem='latn']/currencySpacing"/>
@@ -5768,7 +6267,7 @@ sub process
         {
             $out->print( "\tno number formats defined for this locale ${locale} in file ${f}\n" ) if( $DEBUG );
         }
-    
+
         # NOTE: Adding locale units
         &log( "\tAdding locale units." );
         $j = 0;
@@ -5865,13 +6364,13 @@ sub process
                         $el_unit = resolve_alias( $unitAliasRes ) ||
                             die( "This unit length with ID ${id} is aliased, but could not resolve it with length ${len} for this locale ${locale} in file ${f} for this element: ", $el->toString() );
                     }
-    
+
                     my @kids = $el_unit->nonBlankChildNodes;
                     if( !scalar( @kids ) )
                     {
                         warn( "Warning only: no definition elements for this unit ID ${id} with length ${len} for locale ${locale} in file ${f} for this element: ", $el_unit->toString() );
                     }
-    
+
                     my $patterns = [];
                     my( $locale_name, $gender );
                     foreach my $el_kid ( @kids )
@@ -5928,7 +6427,7 @@ sub process
                             die( "Unknown element tag '${tag}' for this unit ID ${id} for unit length ${len} for locale ${locale} in file ${f} for this element: ", $el_kid->toString() );
                         }
                     }
-    
+
                     foreach my $def ( @$patterns )
                     {
                         eval
@@ -5944,7 +6443,7 @@ sub process
         }
         # Done checking all unit length definitions
         $out->printf( "\t%d locale unit information added.\n", $j ) if( $DEBUG );
-    
+
         # NOTE: Checking localised names for calendar IDs
         &log( "Checking localised names for calendar IDs." );
         my $calendarNamesRes = $mainDoc->findnodes( '/ldml/localeDisplayNames/types/type[@key="calendar" and @type and not(@scope) and not(@alt)]' );
@@ -5964,7 +6463,7 @@ sub process
             $j++;
         }
         $out->printf( "\t%d locale calendar ID information added.\n", $j ) if( $DEBUG );
-    
+
         # NOTE: Checking localised names for number system IDs
         &log( "Checking localised names for number system IDs." );
         # /ldml/localeDisplayNames/types/type[@key="calendar" and @type and not(@scope)]
@@ -5992,7 +6491,7 @@ sub process
                 $out->print( "unknown, skipping.\n" ) if( $DEBUG );
                 next;
             }
-    
+
             eval
             {
                 $sth_num_sys_l10n->execute( @$def{qw( locale number_system locale_name alt )} );
@@ -6001,7 +6500,7 @@ sub process
             $out->print( "ok\n" ) if( $DEBUG );
         }
         $out->printf( "\t%d locale number system ID information added.\n", $j ) if( $DEBUG );
-    
+
         # NOTE: Checking localised names for collation IDs
         &log( "Checking localised names for collation IDs." );
         my $collationNamesRes = $mainDoc->findnodes( '/ldml/localeDisplayNames/types/type[@key="collation" and @type and not(@scope)]' );
@@ -6248,7 +6747,7 @@ sub process
         $n++;
     }
     &log( "${n} locales information processed." );
-    
+
     # NOTE: Loading annotations
     &log( "Loading annotations." );
     $n = 0;
@@ -6340,7 +6839,7 @@ sub process
         $out->print( "ok ${i} annotations added.\n" ) if( $DEBUG );
     }
     &log( "${n} annotations added for ${l} locales." );
-    
+
     # NOTE: Loading languages match rules
     &log( "Loading languages match rules." );
     $n = 0;
@@ -6377,10 +6876,10 @@ sub process
         $out->print( "Found variable '${var}' with values: ", join( ', ', @$val ), "\n" ) if( $DEBUG );
         $lang_vars->{ $var } = $val;
     }
-    
+
     while( my $el = $langMatchRes->shift )
     {
-        # <languageMatch desired="hr"	supported="bs"	distance="4"/>
+        # <languageMatch desired="hr"   supported="bs"  distance="4"/>
         my $def = {};
         foreach my $prop ( qw( desired supported distance ) )
         {
@@ -6405,21 +6904,21 @@ sub process
             $def->{is_symetric} = ( $lang_match_bool_map->{ $bool } ? 0 : 1 );
         }
         $out->print( "[$def->{desired} -> $def->{supported}] " ) if( $DEBUG );
-        # <languageMatch desired="en_*_$enUS"	supported="en_*_$enUS"	distance="4"/>
-        # <languageMatch desired="en_*_$!enUS"	supported="en_*_GB"	distance="3"/>
+        # <languageMatch desired="en_*_$enUS"   supported="en_*_$enUS"  distance="4"/>
+        # <languageMatch desired="en_*_$!enUS"  supported="en_*_GB" distance="3"/>
         # There is a match variable embedded
         if( index( $def->{desired}, '*' ) != -1 ||
             index( $def->{desired}, '$' ) != -1 )
         {
             $def->{sequence} = ++$seq;
             # $def->{was} = { desired => $def->{desired} };
-            # <languageMatch desired="*_*_*"	supported="*_*_*"	distance="4"/>
-            # <languageMatch desired="pt_*_*"	supported="pt_*_*"	distance="5"/>
-            # <languageMatch desired="en_*_*"	supported="en_*_*"	distance="5"/>
-            # <languageMatch desired="*_*"	supported="*_*"	distance="50"/>
-            # <languageMatch desired="en_*_$enUS"	supported="en_*_$enUS"	distance="4"/>
-            # <languageMatch desired="en_*_$!enUS"	supported="en_*_GB"	distance="3"/>
-            # <languageMatch desired="zh_Hant_*"	supported="zh_Hant_*"	distance="5"/>
+            # <languageMatch desired="*_*_*"    supported="*_*_*"   distance="4"/>
+            # <languageMatch desired="pt_*_*"   supported="pt_*_*"  distance="5"/>
+            # <languageMatch desired="en_*_*"   supported="en_*_*"  distance="5"/>
+            # <languageMatch desired="*_*"  supported="*_*" distance="50"/>
+            # <languageMatch desired="en_*_$enUS"   supported="en_*_$enUS"  distance="4"/>
+            # <languageMatch desired="en_*_$!enUS"  supported="en_*_GB" distance="3"/>
+            # <languageMatch desired="zh_Hant_*"    supported="zh_Hant_*"   distance="5"/>
             $def->{desired} =~ s{
                 ^
                 (?:
@@ -6517,7 +7016,7 @@ sub process
             }exs;
             $out->print( "[$def->{supported}] " ) if( $DEBUG );
         }
-    
+
         eval
         {
             $sth->execute( @$def{qw( desired supported distance is_symetric is_regexp sequence )} );
@@ -6526,7 +7025,7 @@ sub process
         $out->print( "ok\n" ) if( $DEBUG );
     }
     &log( "${n} languages match rules added." );
-    
+
     # NOTE: Loading units
     &log( "Loading units." );
     $n = 0;
@@ -6570,7 +7069,7 @@ sub process
         {
             die( "This element has no power10 or power2 attribute in file $units_file: ", $el->toString() );
         }
-    
+
         eval
         {
             $sth->execute( @$def{qw( unit_id symbol power factor )} );
@@ -6580,7 +7079,7 @@ sub process
         $out->print( "ok\n" ) if( $DEBUG );
     }
     &log( "${j} unit prefixes added." );
-    
+
     # NOTE: Loading unit constants
     &log( "Loading unit constants." );
     $j = 0;
@@ -6638,15 +7137,15 @@ sub process
         {
             $def->{value} = $def->{expression};
         }
-    
+
         $unit_constants->{ $def->{constant} } = $def->{value};
-    
+
         if( $el->hasAttribute( 'status' ) )
         {
             $def->{status} = $el->getAttribute( 'status' );
         }
         $def->{description} = $el->getAttribute( 'description' );
-    
+
         eval
         {
             $sth->execute( @$def{qw( constant expression value description status )} );
@@ -6656,7 +7155,7 @@ sub process
         $out->print( "ok\n" ) if( $DEBUG );
     }
     &log( "${j} unit constants added." );
-    
+
     # NOTE: Loading unit quantities
     &log( "Loading unit quantities." );
     $j = 0;
@@ -6669,7 +7168,7 @@ sub process
             quantity => ( $el->getAttribute( 'quantity' ) || die( "Unable to get the unit quantity value in the attribute 'quantity' for this element in file $units_file: ", $el->toString() ) ),
         };
         $out->print( "[$def->{base_unit}] " ) if( $DEBUG );
-    
+
         if( $el->hasAttribute( 'status' ) )
         {
             $def->{status} = $el->getAttribute( 'status' );
@@ -6681,7 +7180,7 @@ sub process
             $def->{comment} = trim( $def->{comment} ) if( defined( $def->{comment} ) );
             $def->{comment} = undef if( $def->{comment} eq 'null' );
         }
-    
+
         eval
         {
             $sth->execute( @$def{qw( base_unit quantity status comment )} );
@@ -6691,7 +7190,7 @@ sub process
         $out->print( "ok\n" ) if( $DEBUG );
     }
     &log( "${j} unit quantities added." );
-    
+
     # NOTE: Loading unit conversions
     &log( "Loading unit conversions." );
     $j = 0;
@@ -6706,7 +7205,7 @@ sub process
             base_unit => ( $el->getAttribute( 'baseUnit' ) || die( "Unable to get the base unit value in the attribute 'baseUnit' for this element in file $units_file: ", $el->toString() ) ),
         };
         $out->print( "[$def->{base_unit}] " ) if( $DEBUG );
-    
+
         my $this = $el->previousNonBlankSibling;
         if( $this && $this->isa( 'XML::LibXML::Comment' ) )
         {
@@ -6719,7 +7218,7 @@ sub process
         }
         $def->{category} = $cat if( defined( $cat ) );
         $out->print( defined( $cat ) ? "-> ${cat} " : '-> no category ' ) if( $DEBUG );
-    
+
         if( $el->hasAttribute( 'factor' ) )
         {
             my $expr = $def->{expression} = $el->getAttribute( 'factor' ) ||
@@ -6744,9 +7243,9 @@ sub process
                 }
             }
         }
-    
+
         $def->{systems} = [split( /[[:blank:]\h]+/, ( $el->getAttribute( 'systems' ) || '' ) )];
-    
+
         eval
         {
             $sth->execute( @$def{qw( source base_unit expression factor )}, to_array( $def->{systems} ), $def->{category} );
@@ -6756,7 +7255,7 @@ sub process
         $out->print( "ok\n" ) if( $DEBUG );
     }
     &log( "${j} unit conversions added." );
-    
+
     # NOTE: Loading unit preferences
     &log( "Loading unit preferences." );
     $j = 0;
@@ -6809,7 +7308,7 @@ sub process
         }
     }
     &log( "${j} unit conversions added." );
-    
+
     # NOTE: Loading unit aliases
     &log( "Loading unit aliases." );
     $j = 0;
@@ -6824,7 +7323,7 @@ sub process
             reason => ( $el->getAttribute( 'reason' ) || die( "Unable to get the alias replacement reason value in the attribute 'reason' for this element in file $units_file: ", $el->toString() ) ),
         };
         $out->print( "[$def->{alias} -> $def->{target}] " ) if( $DEBUG );
-    
+
         eval
         {
             $sth->execute( @$def{qw( alias target reason )} );
@@ -6834,7 +7333,7 @@ sub process
         $out->print( "ok\n" ) if( $DEBUG );
     }
     &log( "${j} unit conversions added." );
-    
+
     &log( "${n} units data added." );
 
     # NOTE: Loading plural rules
@@ -6899,7 +7398,7 @@ sub process
                 die( "No attribute 'count' for this plural rule in file $plural_rules_file: ", $el_rule->toString() );
             $def->{rule} = $el_rule->textContent ||
                 die( "No value found for this plural rule '$def->{count}' for locales @$locales in file $plural_rules_file: ", $el_rule->toString() );
-            
+
             foreach my $locale ( @$locales )
             {
                 $def->{locale} = $locale;
@@ -6989,7 +7488,7 @@ sub process
                 $def->{ $map->{ $t } } = $el_range->getAttribute( $t ) ||
                     die( "No attribute '${t}' for this plural range: ", $el_range->toString() );
             }
-            
+
             foreach my $locale ( @$locales )
             {
                 $def->{locale} = $locale;
@@ -7007,7 +7506,7 @@ sub process
     }
     &log( "${n} plural ranges added for ${total_locales} locales." );
 
-    
+
     # NOTE: Apply fixes on missing languages in territories and vice versa
     if( $opts->{apply_patch} )
     {
@@ -7018,7 +7517,7 @@ sub process
     {
         &extend;
     }
-    
+
     # NOTE: Done !
     $out->print( "Data import into SQLite database ${tmpfile} is complete.\n" ) if( $DEBUG || !$opts->{replace} );
     if( $opts->{replace} )
@@ -7035,26 +7534,153 @@ sub apply_patch
     # $basedir is a Module::Generic::File object and something like /tmp/cldr-common-48/common
     # $patch_dir is a global variable
 
-    # Would provide the path relative to the base directory, which is something like '/tmp/cldr-common-48/common', so the relative path would be something like 'supplemental/supplementalData.xml'
+    # Would provide the path relative to the base directory, which is something like
+    # '/tmp/cldr-common-48/common', so the relative path would be something like
+    # 'supplemental/supplementalData.xml'
     my $rel_path   = $file->relative( $basedir );
-    # Use the relative path derived to make the local path under the 'patches' directories, and change the resulting file extension to 'patch'. 
+    # Use the relative path derived to make the local path under the 'patches'
+    # directories, and change the resulting file extension to 'patch'. 
     my $patch_file = $patch_dir->child( $rel_path )->extension( 'patch' );
     return( $file ) if( !$patch_file->exists );
     $out->print( "Applying patch ${patch_file} to ${file}\n" );
-    my $backup = $file->copy( "${file}.bak" ) ||
+    my $backup = $file->copy( "${file}.bak", { overwrite => 1 } ) ||
         die( "Unable to create backup file \"${file}.bak\": ", $file->error );
-    my @cmd = ( 'patch', '--silent', $file, $patch_file );
-    my( $out, $err );
+    my @cmd = ( 'patch', '--batch', '--fuzz=0', '--silent', $file, $patch_file );
+    my( $stdout, $stderr );
     # Nothing in STDIN so we use undef
-    my $ok = IPC::Run::run( \@cmd, \undef, \$out, \$err );
+    my $ok = IPC::Run::run( \@cmd, \undef, \$stdout, \$stderr );
     unless( $ok )
     {
         # Rollback the backup
         $backup->copy( "$file", { overwrite => 1 } );
-        die( "Rolling back. Patch failed for patch $file < $patch_file:\n$err" );
+        die( "Rolling back. Patch failed for patch $file < $patch_file:\n$stderr" );
     }
     $out->print( "Applied patch ${patch_file}\n" );
     return( $file );
+}
+
+# The absolute path of an element, with all its attributes but draft and references,
+# such as /ldml/dates/calendars/calendar[@type='japanese']/months
+sub data_alias_abs_path
+{
+    my $node = shift( @_ );
+    my @parts;
+    for( my $n = $node; $n && $n->nodeType == XML::LibXML::XML_ELEMENT_NODE; $n = $n->parentNode )
+    {
+        my $step = $n->nodeName;
+        foreach my $att ( sort{ $a->nodeName cmp $b->nodeName } grep( $_->nodeName ne 'draft' && $_->nodeName ne 'references', $n->attributes ) )
+        {
+            $step .= sprintf( "[\@%s='%s']", $att->nodeName, $att->value );
+        }
+        unshift( @parts, $step );
+    }
+    return( '/' . join( '/', @parts ) );
+}
+
+# Resolves the relative path of an alias against the absolute path of the element
+# containing it.
+sub data_alias_join_path
+{
+    my( $base, $rel ) = @_;
+    my @steps = map( $_->{raw}, @{data_alias_steps( $base )} );
+    foreach my $step ( @{data_alias_split( $rel )} )
+    {
+        if( $step eq '..' ) { pop( @steps ); }
+        elsif( $step eq '.' || $step eq '' ) { next; }
+        else { push( @steps, $step ); }
+    }
+    return( '/' . join( '/', @steps ) );
+}
+
+# Returns, for the table definition given, the hash of the column values that the path
+# steps identify, or undef if the path does not belong to that table.
+sub data_alias_keys
+{
+    my( $def, $steps ) = @_;
+    my $template = $def->{path};
+    # The path may stop at any level of the template, but must at least reach its first
+    # distinguishing level, given by 'min'.
+    return if( scalar( @$steps ) < $def->{min} || scalar( @$steps ) > scalar( @$template ) );
+    my $keys = {};
+    for( my $i = 0; $i < scalar( @$steps ); $i++ )
+    {
+        my( $name_re, $cols ) = @{$template->[$i]};
+        my $step = $steps->[$i];
+        return if( $step->{name} !~ $name_re );
+        next if( !defined( $cols ) );
+        foreach my $col ( sort( keys( %$cols ) ) )
+        {
+            my $how = $cols->{ $col };
+            if( ref( $how ) eq 'CODE' )
+            {
+                my $val = $how->( $step );
+                return if( !defined( $val ) );
+                $keys->{ $col } = $val;
+            }
+            # An attribute, possibly optional, such as '@order?', or with a default
+            # value, such as '@type|standard'
+            elsif( $how =~ /^\@([\w\-]+)(\?)?(?:\|(.*))?$/ )
+            {
+                my( $att, $optional, $default ) = ( $1, $2, $3 );
+                my $val = $step->{attr}->{ $att } // $default;
+                return if( !defined( $val ) && !$optional );
+                $keys->{ $col } = $val;
+            }
+            else
+            {
+                die( "Invalid column definition '${how}' for column ${col} of table $def->{tables}->[0]" );
+            }
+        }
+    }
+    return( $keys );
+}
+
+# Splits a path into its steps, ignoring slashes inside predicates.
+sub data_alias_split
+{
+    my $path = shift( @_ );
+    my @steps;
+    my $cur = '';
+    my $depth = 0;
+    foreach my $c ( split( //, $path ) )
+    {
+        if( $c eq '[' )
+        {
+            $depth++;
+        }
+        elsif( $c eq ']' )
+        {
+            $depth--;
+        }
+
+        if( $c eq '/' && !$depth )
+        {
+            push( @steps, $cur ) if( length( $cur ) );
+            $cur = '';
+            next;
+        }
+        $cur .= $c;
+    }
+    push( @steps, $cur ) if( length( $cur ) );
+    return( \@steps );
+}
+
+# Parses an absolute path into an array of {name, attr, raw}.
+sub data_alias_steps
+{
+    my $path = shift( @_ );
+    my @steps;
+    foreach my $raw ( @{data_alias_split( $path )} )
+    {
+        my( $name ) = ( $raw =~ /^([^\[]+)/ );
+        my $attr = {};
+        while( $raw =~ /\[\@([\w\-]+)=(["'])(.*?)\2\]/g )
+        {
+            $attr->{ $1 } = $3;
+        }
+        push( @steps, { name => $name, attr => $attr, raw => $raw } );
+    }
+    return( \@steps );
 }
 
 sub extend
@@ -7360,6 +7986,77 @@ sub identity_to_locale
     return( join( '-', @$parts ) );
 }
 
+# Converts each source="locale" alias of a main locale file into rules stored in
+# data_aliases, one per table that holds the data the alias points to. The source and
+# target of an alias are absolute paths with their distinguishing attributes
+# (for example /ldml/dates/calendars/calendar[@type='japanese']/months), which are
+# mapped to table columns via $DATA_ALIAS_TABLES. An alias that points to data this
+# script does not store must be listed in $DATA_ALIAS_IGNORE; any other unmappable alias
+# is fatal, so that new aliases in future CLDR releases are noticed.
+# Returns the number of rules added.
+# <https://www.unicode.org/reports/tr35/#Alias_Elements>
+sub load_data_aliases
+{
+    my( $doc, $locale, $file, $sth ) = @_;
+    my $aliasesRes = $doc->findnodes( '//alias' );
+    return(0) if( !$aliasesRes->size );
+    die( "No SQL statement object for data_aliases" ) if( !$sth );
+    my $canon = JSON->new->canonical->utf8(0);
+    my $n = 0;
+    while( my $el_alias = $aliasesRes->shift )
+    {
+        my $source = $el_alias->getAttribute( 'source' ) // '';
+        if( $source ne 'locale' )
+        {
+            die( "Alias with source '${source}' found for locale ${locale} in file ${file}, but only source=\"locale\" is supported: ", $el_alias->toString() );
+        }
+        # "The XPath is not relative to the location of the alias element itself, but
+        # rather to the location of the element that contains the alias element"
+        my $source_path = data_alias_abs_path( $el_alias->parentNode );
+        my $rel = $el_alias->getAttribute( 'path' );
+        # "The default value if the path is not present is the same position in the tree."
+        my $target_path = ( defined( $rel ) && length( $rel ) ) ? data_alias_join_path( $source_path, $rel ) : $source_path;
+        my $src_steps = data_alias_steps( $source_path );
+        my $tgt_steps = data_alias_steps( $target_path );
+        my $src_names = join( '/', map( $_->{name}, @$src_steps ) );
+        if( grep( $src_names =~ $_, @$DATA_ALIAS_IGNORE ) )
+        {
+            $out->print( "\tIgnoring alias ${source_path} -> ${target_path} for locale ${locale}, since we do not store this data.\n" ) if( $DEBUG );
+            next;
+        }
+        my $found = 0;
+        foreach my $def ( @$DATA_ALIAS_TABLES )
+        {
+            my $src_keys = data_alias_keys( $def, $src_steps );
+            next if( !defined( $src_keys ) );
+            my $tgt_keys = data_alias_keys( $def, $tgt_steps );
+            if( !defined( $tgt_keys ) )
+            {
+                die( "The alias ${source_path} for locale ${locale} in file ${file} points to ${target_path}, which does not belong to the same table $def->{tables}->[0]" );
+            }
+            elsif( join( ',', sort( keys( %$src_keys ) ) ) ne join( ',', sort( keys( %$tgt_keys ) ) ) )
+            {
+                die( "The alias ${source_path} for locale ${locale} in file ${file} points to ${target_path}, whose columns (", join( ', ', sort( keys( %$tgt_keys ) ) ), ") differ from the source ones (", join( ', ', sort( keys( %$src_keys ) ) ), ")" );
+            }
+            $found++;
+            foreach my $table ( @{$def->{tables}} )
+            {
+                $out->print( "\t[${table}] ${source_path} -> ${target_path}\n" ) if( $DEBUG );
+                eval
+                {
+                    $sth->execute( $locale, $table, $canon->encode( $src_keys ), $canon->encode( $tgt_keys ), $source_path, $target_path );
+                } || die( "Error adding the data alias ${source_path} -> ${target_path} for table ${table} and locale ${locale} from file ${file}: ", ( $@ || $sth->errstr ), "\nwith query: ", $sth->{Statement} );
+                $n++;
+            }
+        }
+        if( !$found )
+        {
+            die( "Unable to map the alias ${source_path} -> ${target_path} for locale ${locale} in file ${file} to any table. Add it to \$DATA_ALIAS_TABLES, or to \$DATA_ALIAS_IGNORE if we do not store this data." );
+        }
+    }
+    return( $n );
+}
+
 sub load_schema
 {
     my $schema_file = shift( @_ ) ||
@@ -7461,9 +8158,9 @@ sub patch_territories_languages
         }
     }
     $out->print( "\tDone building the language to territory map.\n" ) if( $DEBUG );
-    
+
     $out->print( "\tChecking languages territory value now.\n" ) if( $DEBUG );
-    
+
     my $langs = {};
     $out->print( "Pre-processing languages.\n" ) if( $DEBUG );
     foreach my $ref ( @$langs_ref )
@@ -7471,7 +8168,7 @@ sub patch_territories_languages
         $langs->{ $ref->{language} } ||= [];
         push( @{$langs->{ $ref->{language} }}, $ref );
     }
-    
+
     foreach my $lang ( sort( keys( %$langs ) ) )
     {
         my $expected_territories = $lang2territory->{ $lang } || [];
@@ -7496,7 +8193,7 @@ sub patch_territories_languages
                         }
                     }
                 }
-        
+
                 foreach my $territory ( @{$ref->{territories}} )
                 {
                     my $expected_langs = $territory2langs->{ $territory } || [];
@@ -7514,19 +8211,19 @@ sub patch_territories_languages
 #                 $missing_territory_in_languages->{ $ref->{language} } = $expected_territories;
 #             }
         }
-    
+
         if( scalar( @$expected_territories ) )
         {
             $out->print( "\tExpected territories missing from language ${lang}: ", join( ', ', @$expected_territories ), "\n" ) if( $DEBUG );
             $missing_territory_in_languages->{ $lang } = $expected_territories;
         }
     }
-    
+
     foreach my $territory ( keys( %$missing_language_in_territories ) )
     {
         @{$missing_language_in_territories->{ $territory }} = uniq( @{$missing_language_in_territories->{ $territory }} );
     }
-    
+
     if( scalar( keys( %$missing_territory_in_languages ) ) ||
         scalar( keys( %$missing_language_in_territories ) ) )
     {

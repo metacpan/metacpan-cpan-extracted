@@ -15,6 +15,11 @@ my $lib = File::Spec->catdir($root, 'lib');
 my $script = File::Spec->catfile($root, 'bin', 'action-run');
 my $fake_docker = File::Spec->catfile($root, 't', 'bin', 'fake-docker');
 
+# Object::Configure reads the developer's own configuration files (~/.conf
+# and the like), where a UNIVERSAL logger would take the messages these tests
+# read off standard error.  An empty directory leaves the defaults in force.
+local $ENV{CONFIG_DIR} = tempdir(CLEANUP => 1);
+
 # The images a run keeps are recorded for "action-run cache"; point that
 # record at a temporary file so the suite does not touch the real cache.
 local $ENV{ACTION_RUN_CACHE_FILE}
@@ -65,7 +70,7 @@ sub effective_concurrency {
 
 my ($version_out, $version_err, $version_exit) = run_cli('--version');
 is($version_exit, 0, '--version exits 0');
-like($version_out, qr/^action-run 0\.001\.0$/, '--version prints the version');
+like($version_out, qr/^action-run 0\.002\.0$/, '--version prints the version');
 
 my ($help_out, $help_err, $help_exit) = run_cli('--help');
 is($help_exit, 0, '--help exits 0');

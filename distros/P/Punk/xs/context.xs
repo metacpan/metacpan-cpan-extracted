@@ -581,6 +581,29 @@ asset(self, url)
     OUTPUT:
         RETVAL
 
+# $c->escape_html($text) - the five HTML characters escaped (punk_escape.h),
+# the escape Punk writes its own markup with; the empty string for an
+# undefined value, the UTF-8 flag kept.
+SV *
+escape_html(self, text)
+        SV *self
+        SV *text
+    CODE:
+    {
+        STRLEN len;
+        const char *p;
+        PERL_UNUSED_VAR(self);
+        RETVAL = newSVpvs("");
+        if (SvOK(text)) {
+            p = SvPV_const(text, len);
+            SvGROW(RETVAL, len + 1);
+            punk_html_escape(aTHX_ RETVAL, p, len);
+            if (SvUTF8(text)) SvUTF8_on(RETVAL);
+        }
+    }
+    OUTPUT:
+        RETVAL
+
 SV *
 redirect(self, url, status = &PL_sv_undef)
         SV *self

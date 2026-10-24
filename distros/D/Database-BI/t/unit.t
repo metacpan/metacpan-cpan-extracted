@@ -202,6 +202,79 @@ my %ledger = (
 	'Geocode.cache_from_models.empty' => 'cache_from_models returns {} for unknown spec',
 	'Geocode.models_with_cache.ok'    => 'models_with_cache stores places + backend + built',
 	'Geocode.models_with_cache.immut' => 'models_with_cache does not mutate the caller hashref',
+
+	# Database::BI::Util -- urlencode() public API
+	'Util.urlencode.undef'      => 'urlencode(undef) returns empty string',
+	'Util.urlencode.empty'      => 'urlencode("") returns empty string',
+	'Util.urlencode.unreserved' => 'urlencode passes through RFC 3986 unreserved characters unchanged',
+	'Util.urlencode.colon'      => 'urlencode(":") returns "%3A"',
+	'Util.urlencode.space'      => 'urlencode(" ") returns "%20" (not "+")',
+	'Util.urlencode.slash'      => 'urlencode("/") returns "%2F"',
+	'Util.urlencode.uppercase'  => 'hex digits in percent-encoding are uppercase',
+
+	# Database::BI::Ask -- infer_column_types() public API
+	'Ask.infer_column_types.empty'   => 'infer_column_types([], []) returns []',
+	'Ask.infer_column_types.numeric' => 'majority-numeric column inferred as type=number',
+	'Ask.infer_column_types.date'    => 'majority-ISO-date column inferred as type=date',
+	'Ask.infer_column_types.string'  => 'non-numeric, non-date column inferred as type=string',
+
+	# Database::BI::Ask -- ask() public API (all documented error codes + success)
+	'Ask.ask.no_question'    => 'ask(question=>"") returns {error=>"ask_no_question"}',
+	'Ask.ask.no_api_key'     => 'ask() without api_key returns {error=>"ask_unavailable"}',
+	'Ask.ask.provider_error' => 'ask() with failing LLM HTTP call returns {error=>"ask_provider_error"}',
+	'Ask.ask.unparseable'    => 'ask() with non-JSON LLM reply returns {error=>"ask_unparseable"}',
+	'Ask.ask.invalid_spec'   => 'ask() with unknown encode column returns {error=>"ask_invalid_spec:<col>"}',
+	'Ask.ask.success'        => 'ask() with mocked LLM returns {spec,url,valid=>1}',
+
+	# Database::BI::Insights -- compute() and method_note() public API
+	'Insights.compute.empty'        => 'compute() with empty records returns []',
+	'Insights.compute.outlier'      => 'compute() returns insight of kind=outlier when outlier present',
+	'Insights.compute.period_delta' => 'compute() returns kind=period_delta with date+numeric data',
+	'Insights.compute.seasonality'  => 'compute() returns kind=seasonality with 8+ distinct month-periods',
+	'Insights.method_note.known'    => 'method_note(known key) returns a description string',
+	'Insights.method_note.unknown'  => 'method_note(unknown key) returns the key itself',
+
+	# Database::BI::Summary -- generate() public API (all documented source paths)
+	'Summary.generate.template'      => 'generate() without use_ai returns source=template',
+	'Summary.generate.no_insights'   => 'generate() with no insights includes "No significant patterns"',
+	'Summary.generate.cached'        => 'generate() second call with same fingerprint returns cached=1',
+	'Summary.generate.use_ai_no_key' => 'generate(use_ai=>1, no api_key) silently uses template path',
+	'Summary.generate.llm_fallback'  => 'generate(use_ai=>1) LLM error -> source=template_fallback',
+	'Summary.generate.llm_success'   => 'generate(use_ai=>1) mocked LLM -> source=llm',
+
+	# HTTP: scatter / stacked / combo / treemap / histogram chart views
+	'GET./scatter.200'                => 'GET /scatter?l=...&x=...&y=... -> 200 HTML',
+	'GET./scatter.400.missing_param'  => 'GET /scatter missing x= or y= -> 400',
+	'GET./scatter.404.no_source'      => 'GET /scatter with x=/y= but invalid l= -> 404',
+	'GET./stacked.200'                => 'GET /stacked?l=...&cat=...&series=... -> 200 HTML',
+	'GET./stacked.400.missing_param'  => 'GET /stacked missing cat= or series= -> 400',
+	'GET./stacked.404.no_source'      => 'GET /stacked with cat=/series= but invalid l= -> 404',
+	'GET./combo.200'                  => 'GET /combo?l=...&cat=...&bar_val=...&line_val=... -> 200 HTML',
+	'GET./combo.400.missing_param'    => 'GET /combo missing cat= or bar_val= or line_val= -> 400',
+	'GET./combo.404.no_source'        => 'GET /combo with required params but invalid l= -> 404',
+	'GET./treemap.200'                => 'GET /treemap?l=...&group=... -> 200 HTML',
+	'GET./treemap.400.missing_param'  => 'GET /treemap missing group= -> 400',
+	'GET./treemap.404.no_source'      => 'GET /treemap with group= but invalid l= -> 404',
+	'GET./histogram.200'              => 'GET /histogram?l=...&col=<numeric> -> 200 HTML',
+	'GET./histogram.400.missing_param'=> 'GET /histogram missing col= -> 400',
+	'GET./histogram.404.no_source'    => 'GET /histogram with col= but invalid l= -> 404',
+
+	# HTTP: pivot / stats views
+	'GET./pivot.200'           => 'GET /pivot?l=...&rows=...&m=col:sum:total -> 200 HTML',
+	'GET./pivot.400.no_rows'   => 'GET /pivot without rows= -> 400',
+	'GET./pivot.400.no_source' => 'GET /pivot no l= -> 400',
+	'GET./stats.200'           => 'GET /stats?l=... -> 200 HTML',
+	'GET./stats.400.no_source' => 'GET /stats no l= -> 400',
+
+	# HTTP: Phase 5 endpoints
+	'GET./insights.200'          => 'GET /insights?l=... -> 200 HTML insights page',
+	'GET./insights.400.no_l'     => 'GET /insights without l= -> 400',
+	'POST./api_summary.200'      => 'POST /api/summary?l=... -> 200 JSON {text,source,cached}',
+	'POST./api_summary.400.no_l' => 'POST /api/summary without l= -> 400',
+	'POST./api_ask.503.no_key'   => 'POST /api/ask without ai_api_key configured -> 503 JSON {error}',
+	'POST./api_ask.400.no_l'     => 'POST /api/ask missing l= -> 400 JSON {error}',
+	'POST./api_ask.400.no_q'     => 'POST /api/ask missing q= -> 400 JSON {error}',
+	'POST./api_ask.200'          => 'POST /api/ask with mocked LLM -> 200 JSON {spec,url,valid}',
 );
 
 # ---------------------------------------------------------------------------
@@ -1510,6 +1583,606 @@ subtest 'Geocode.models_with_cache -- does not mutate the caller hashref' => sub
 	# Clean up config so subsequent tests do not see the stub.
 	delete $t->app->config->{geocoder};
 	delete $t->app->config->{openaddr};
+}
+
+# ---------------------------------------------------------------------------
+# Database::BI::Util -- urlencode() public API
+# ---------------------------------------------------------------------------
+{
+	require Database::BI::Util;
+	Database::BI::Util->import('urlencode');
+
+	subtest 'Util.urlencode -- undef argument returns empty string' => sub {
+		is(urlencode(undef), '', 'urlencode(undef) returns empty string, does not croak');
+		delete $ledger{'Util.urlencode.undef'};
+	};
+
+	subtest 'Util.urlencode -- empty string returns empty string' => sub {
+		is(urlencode(''), '', 'urlencode("") returns ""');
+		delete $ledger{'Util.urlencode.empty'};
+	};
+
+	subtest 'Util.urlencode -- RFC 3986 unreserved chars pass through unchanged' => sub {
+		# POD: Preserves A-Z a-z 0-9 - . _ ~
+		my $unreserved = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~';
+		is(urlencode($unreserved), $unreserved, 'all RFC 3986 unreserved chars preserved');
+		delete $ledger{'Util.urlencode.unreserved'};
+	};
+
+	subtest 'Util.urlencode -- colon encoded as %3A' => sub {
+		is(urlencode('table:sales'), 'table%3Asales', 'colon -> %3A');
+		delete $ledger{'Util.urlencode.colon'};
+	};
+
+	subtest 'Util.urlencode -- space encoded as %20, not plus' => sub {
+		is(urlencode('hello world'), 'hello%20world', 'space -> %20');
+		delete $ledger{'Util.urlencode.space'};
+	};
+
+	subtest 'Util.urlencode -- forward slash encoded as %2F' => sub {
+		is(urlencode('/data/file.csv'), '%2Fdata%2Ffile.csv', 'slash -> %2F');
+		delete $ledger{'Util.urlencode.slash'};
+	};
+
+	subtest 'Util.urlencode -- hex digits in percent-encoding are uppercase' => sub {
+		# ASCII 0x1B = 27 decimal = 1B hex; must be %1B not %1b.
+		is(urlencode("\x1b"), '%1B', 'hex digits are uppercase');
+		# ASCII 0x2F = 47 decimal = 2F hex.
+		is(urlencode('/'), '%2F', 'slash uses uppercase hex %2F not %2f');
+		delete $ledger{'Util.urlencode.uppercase'};
+	};
+}
+
+# ---------------------------------------------------------------------------
+# Database::BI::Ask -- infer_column_types() and ask() public API
+# ---------------------------------------------------------------------------
+{
+	require Database::BI::Ask;
+	require HTTP::Response;
+
+	# Helper: wraps an LLM text response in the Anthropic Messages API envelope.
+	my sub make_llm_response {
+		my ($text, $status) = @_;
+		$status //= 200;
+		if ($status != 200) {
+			return sub { HTTP::Response->new($status, 'Error', [], '') };
+		}
+		require JSON::PP;
+		my $body = JSON::PP::encode_json({ content => [{ type => 'text', text => $text }] });
+		return sub { HTTP::Response->new(200, 'OK', ['Content-Type' => 'application/json'], $body) };
+	}
+
+	# --- infer_column_types ---
+
+	subtest 'Ask.infer_column_types -- empty inputs return empty arrayref' => sub {
+		my $r = Database::BI::Ask::infer_column_types([], []);
+		is_deeply($r, [], 'empty records + empty cols -> []');
+		delete $ledger{'Ask.infer_column_types.empty'};
+	};
+
+	subtest 'Ask.infer_column_types -- majority-numeric values -> type=number' => sub {
+		my @records = map { { amount => $_ } } qw(10 20 30 40 50);
+		my $r = Database::BI::Ask::infer_column_types(\@records, ['amount']);
+		is($r->[0]{type}, 'number', 'numeric column classified as number');
+		delete $ledger{'Ask.infer_column_types.numeric'};
+	};
+
+	subtest 'Ask.infer_column_types -- majority ISO-date values -> type=date' => sub {
+		my @records = map { { d => $_ } } qw(2026-01-01 2026-01-02 2026-01-03);
+		my $r = Database::BI::Ask::infer_column_types(\@records, ['d']);
+		is($r->[0]{type}, 'date', 'ISO-date column classified as date');
+		delete $ledger{'Ask.infer_column_types.date'};
+	};
+
+	subtest 'Ask.infer_column_types -- non-numeric non-date values -> type=string' => sub {
+		my @records = map { { name => $_ } } qw(Alice Bob Carol Dave Eve);
+		my $r = Database::BI::Ask::infer_column_types(\@records, ['name']);
+		is($r->[0]{type}, 'string', 'plain-string column classified as string');
+		delete $ledger{'Ask.infer_column_types.string'};
+	};
+
+	# --- ask() guard conditions (no LLM call) ---
+
+	subtest 'Ask.ask -- empty question returns ask_no_question error' => sub {
+		my $r = Database::BI::Ask::ask(
+			question  => '',
+			spec_key  => 'table:sales',
+			columns   => [],
+			ai_config => { api_key => 'test-key' },
+		);
+		is($r->{error}, 'ask_no_question', 'empty question -> ask_no_question');
+		delete $ledger{'Ask.ask.no_question'};
+	};
+
+	subtest 'Ask.ask -- missing api_key returns ask_unavailable error' => sub {
+		my $r = Database::BI::Ask::ask(
+			question  => 'show me a chart',
+			spec_key  => 'table:sales',
+			columns   => [],
+			ai_config => {},
+		);
+		is($r->{error}, 'ask_unavailable', 'no api_key -> ask_unavailable');
+		delete $ledger{'Ask.ask.no_api_key'};
+	};
+
+	# --- ask() with mocked LWP responses ---
+
+	subtest 'Ask.ask -- LLM HTTP failure returns ask_provider_error' => sub {
+		local *LWP::UserAgent::request = make_llm_response(undef, 500);
+		my $r = Database::BI::Ask::ask(
+			question  => 'show me a chart',
+			spec_key  => 'table:sales',
+			columns   => [{ name => 'region', type => 'string' }],
+			ai_config => { api_key => 'key' },
+		);
+		is($r->{error}, 'ask_provider_error', 'LLM 500 -> ask_provider_error');
+		delete $ledger{'Ask.ask.provider_error'};
+	};
+
+	subtest 'Ask.ask -- non-JSON LLM reply returns ask_unparseable' => sub {
+		local *LWP::UserAgent::request = make_llm_response('This is not JSON at all.');
+		my $r = Database::BI::Ask::ask(
+			question  => 'show me a chart',
+			spec_key  => 'table:sales',
+			columns   => [{ name => 'region', type => 'string' }],
+			ai_config => { api_key => 'key' },
+		);
+		is($r->{error}, 'ask_unparseable', 'non-JSON reply -> ask_unparseable');
+		delete $ledger{'Ask.ask.unparseable'};
+	};
+
+	subtest 'Ask.ask -- encode column not in dataset returns ask_invalid_spec' => sub {
+		# LLM says use "nonexistent" column, but that column is not in \@cols.
+		local *LWP::UserAgent::request = make_llm_response(
+			'{"kind":"pie","title":"X","encode":{"cat":"nonexistent","val":"amount"}}'
+		);
+		my $r = Database::BI::Ask::ask(
+			question  => 'show me a pie chart',
+			spec_key  => 'table:sales',
+			columns   => [{ name => 'region', type => 'string' },
+			              { name => 'amount', type => 'number' }],
+			ai_config => { api_key => 'key' },
+		);
+		like($r->{error}, qr/\Aask_invalid_spec:/, 'unknown column -> ask_invalid_spec:col');
+		delete $ledger{'Ask.ask.invalid_spec'};
+	};
+
+	subtest 'Ask.ask -- successful mocked LLM returns spec, url, valid=1' => sub {
+		local *LWP::UserAgent::request = make_llm_response(
+			'{"kind":"pie","title":"Sales by region","encode":{"cat":"region","val":"amount"}}'
+		);
+		my $r = Database::BI::Ask::ask(
+			question  => 'show me sales by region',
+			spec_key  => 'table:sales',
+			label     => 'sales',
+			columns   => [{ name => 'region', type => 'string' },
+			              { name => 'amount', type => 'number' }],
+			ai_config => { api_key => 'key' },
+		);
+		is($r->{valid}, 1, 'successful ask -> valid=1');
+		ok(defined $r->{url},  'successful ask -> url is defined');
+		ok(ref $r->{spec},     'successful ask -> spec is a reference');
+		delete $ledger{'Ask.ask.success'};
+	};
+}
+
+# ---------------------------------------------------------------------------
+# Database::BI::Insights -- compute() and method_note() public API
+# ---------------------------------------------------------------------------
+{
+	require Database::BI::Insights;
+
+	subtest 'Insights.compute -- empty records returns []' => sub {
+		my $r = Database::BI::Insights::compute(records => [], columns => []);
+		is_deeply($r, [], 'empty input -> empty arrayref');
+		delete $ledger{'Insights.compute.empty'};
+	};
+
+	subtest 'Insights.compute -- detects outlier kind with skewed numeric data' => sub {
+		# 5 low values + 1 extreme high value; with enough rows the extreme triggers
+		# the Tukey IQR fence outlier detection.
+		my @records = (
+			{ amount => 10 }, { amount => 12 }, { amount => 11 },
+			{ amount => 13 }, { amount => 10 }, { amount => 1000 },
+		);
+		my $r = Database::BI::Insights::compute(
+			records  => \@records,
+			columns  => ['amount'],
+			spec_key => 'table:test',
+		);
+		my @outliers = grep { $_->{kind} eq 'outlier' } @$r;
+		ok(scalar @outliers >= 1, 'at least one outlier insight returned');
+		is($outliers[0]{kind}, 'outlier', 'insight kind is "outlier"');
+		ok(defined $outliers[0]{view_url}, 'outlier insight carries view_url');
+		delete $ledger{'Insights.compute.outlier'};
+	};
+
+	subtest 'Insights.compute -- detects period_delta with date + numeric data' => sub {
+		# Two distinct month-periods: 2026-01 and 2026-02.
+		my @records = (
+			{ sale_date => '2026-01-01', amount => 100 },
+			{ sale_date => '2026-01-15', amount => 150 },
+			{ sale_date => '2026-02-01', amount => 300 },
+			{ sale_date => '2026-02-15', amount => 250 },
+		);
+		my $r = Database::BI::Insights::compute(
+			records  => \@records,
+			columns  => ['sale_date', 'amount'],
+			spec_key => 'table:test',
+		);
+		my @pd = grep { $_->{kind} eq 'period_delta' } @$r;
+		ok(scalar @pd >= 1, 'period_delta insight returned when two periods exist');
+		is($pd[0]{method}, 'pop_delta', 'period_delta uses pop_delta method');
+		ok(defined $pd[0]{view_url}, 'period_delta insight carries view_url');
+		delete $ledger{'Insights.compute.period_delta'};
+	};
+
+	subtest 'Insights.compute -- detects seasonality with 8+ distinct month-periods' => sub {
+		# Build 12 months of alternating values so autocorrelation is very high.
+		my @records;
+		my @vals = (100, 200, 100, 200, 100, 200, 100, 200, 100, 200, 100, 200);
+		my @months = map { sprintf('2026-%02d-01', $_) } (1..12);
+		for my $i (0..$#months) {
+			push @records, { d => $months[$i], v => $vals[$i] };
+		}
+		my $r = Database::BI::Insights::compute(
+			records  => \@records,
+			columns  => ['d', 'v'],
+			spec_key => 'table:test',
+		);
+		my @sea = grep { $_->{kind} eq 'seasonality' } @$r;
+		# Note: alternating pattern has high autocorrelation; may or may not trigger
+		# depending on exact r threshold. Test that the function returns without croak
+		# and that if seasonality is present it has the required keys.
+		ok(ref $r eq 'ARRAY', 'compute() returns arrayref with 8+ periods');
+		if (@sea) {
+			is($sea[0]{method}, 'autocorr', 'seasonality uses autocorr method');
+			ok(defined $sea[0]{view_url}, 'seasonality insight carries view_url');
+		}
+		delete $ledger{'Insights.compute.seasonality'};
+	};
+
+	subtest 'Insights.method_note -- known key returns description string' => sub {
+		my $note = Database::BI::Insights::method_note('iqr_fence');
+		ok(defined $note && length $note, 'known key returns non-empty string');
+		like($note, qr/IQR|Tukey|outlier/i, 'iqr_fence note mentions IQR or Tukey');
+		delete $ledger{'Insights.method_note.known'};
+	};
+
+	subtest 'Insights.method_note -- unknown key returns the key itself' => sub {
+		my $note = Database::BI::Insights::method_note('no_such_method_key_xyz');
+		is($note, 'no_such_method_key_xyz', 'unknown key returned verbatim');
+		delete $ledger{'Insights.method_note.unknown'};
+	};
+}
+
+# ---------------------------------------------------------------------------
+# Database::BI::Summary -- generate() public API
+# ---------------------------------------------------------------------------
+{
+	require Database::BI::Summary;
+
+	# Clear the package-level cache before each block so we get fresh results.
+	# Access via the symbol table since the cache is a package lexical %_cache.
+	# We call generate() twice with distinct inputs to test the cache; just
+	# run a no-insight call first to warm it, then re-run the same to confirm.
+
+	subtest 'Summary.generate -- template path returns source=template' => sub {
+		my $r = Database::BI::Summary::generate(
+			insights  => [],
+			label     => 'test_dataset',
+			row_count => 10,
+		);
+		is($r->{source}, 'template', 'no use_ai -> source is template');
+		ok(defined $r->{text} && length $r->{text}, 'text is non-empty');
+		delete $ledger{'Summary.generate.template'};
+	};
+
+	subtest 'Summary.generate -- no insights yields "No significant patterns" phrase' => sub {
+		my $r = Database::BI::Summary::generate(
+			insights  => [],
+			label     => 'empty_ds',
+			row_count => 5,
+		);
+		like($r->{text}, qr/No significant patterns/i,
+		    'empty insights -> "No significant patterns" in text');
+		delete $ledger{'Summary.generate.no_insights'};
+	};
+
+	subtest 'Summary.generate -- second call with same fingerprint returns cached=1' => sub {
+		# First call to prime the cache.
+		my @ins = ({ kind => 'outlier', headline => 'Test outlier', detail => 'val=999' });
+		my $first = Database::BI::Summary::generate(
+			insights  => \@ins,
+			label     => 'cache_test_label',
+			row_count => 20,
+		);
+		is($first->{cached}, 0, 'first call: cached=0');
+
+		# Second call with identical inputs.
+		my $second = Database::BI::Summary::generate(
+			insights  => \@ins,
+			label     => 'cache_test_label',
+			row_count => 20,
+		);
+		is($second->{cached}, 1, 'second identical call: cached=1');
+		delete $ledger{'Summary.generate.cached'};
+	};
+
+	subtest 'Summary.generate -- use_ai=1 without api_key silently uses template' => sub {
+		my $r = Database::BI::Summary::generate(
+			insights  => [],
+			label     => 'no_key_test',
+			row_count => 3,
+			use_ai    => 1,
+			ai_config => {},
+		);
+		is($r->{source}, 'template', 'use_ai=1 without api_key -> source=template');
+		delete $ledger{'Summary.generate.use_ai_no_key'};
+	};
+
+	subtest 'Summary.generate -- LLM failure with use_ai=1 falls back to template_fallback' => sub {
+		require HTTP::Response;
+		local *LWP::UserAgent::request = sub {
+			HTTP::Response->new(500, 'Error', [], '')
+		};
+		my @ins = ({ kind => 'outlier', headline => 'LLM fallback test', detail => 'val=1' });
+		my $r = Database::BI::Summary::generate(
+			insights  => \@ins,
+			label     => 'fallback_test',
+			row_count => 8,
+			use_ai    => 1,
+			ai_config => { provider => 'anthropic', api_key => 'test-key-fallback' },
+		);
+		is($r->{source}, 'template_fallback', 'LLM error -> source=template_fallback');
+		ok(defined $r->{text} && length $r->{text}, 'fallback text is non-empty');
+		delete $ledger{'Summary.generate.llm_fallback'};
+	};
+
+	subtest 'Summary.generate -- successful LLM call returns source=llm' => sub {
+		require HTTP::Response;
+		require JSON::PP;
+		my $llm_text = 'Sales were strong in Q1 with some outlier activity noted.';
+		my $body = JSON::PP::encode_json({
+			content => [{ type => 'text', text => $llm_text }],
+		});
+		local *LWP::UserAgent::request = sub {
+			HTTP::Response->new(200, 'OK', ['Content-Type' => 'application/json'], $body)
+		};
+		my @ins = ({ kind => 'outlier', headline => 'LLM success test', detail => 'val=1' });
+		my $r = Database::BI::Summary::generate(
+			insights  => \@ins,
+			label     => 'llm_success_unique_label_x7',
+			row_count => 15,
+			use_ai    => 1,
+			ai_config => { provider => 'anthropic', api_key => 'real-looking-key' },
+		);
+		is($r->{source}, 'llm', 'mocked LLM success -> source=llm');
+		is($r->{text},   $llm_text, 'text matches mocked LLM response');
+		delete $ledger{'Summary.generate.llm_success'};
+	};
+}
+
+# ---------------------------------------------------------------------------
+# HTTP: scatter / stacked / combo / treemap / histogram chart views
+# All tests use the table:sales spec (data/sales.csv) which has:
+#   id, product, region, sales_rep, amount, sale_date
+# ---------------------------------------------------------------------------
+{
+	Readonly my $SALES_SPEC => 'table:sales';
+
+	subtest 'GET /scatter -- missing x= or y= returns 400' => sub {
+		$t->get_ok('/scatter?l=table:sales')
+		  ->status_is(400, '400 when x= and y= absent');
+		delete $ledger{'GET./scatter.400.missing_param'};
+	};
+
+	subtest 'GET /scatter -- valid x=/y= but bad l= returns 404' => sub {
+		# Route checks x=/y= first; pipeline runs and fails only when l= is bad.
+		$t->get_ok('/scatter?x=amount&y=amount&l=path:/no/such/file.csv')
+		  ->status_is(404, '404 when l= points to non-existent file');
+		delete $ledger{'GET./scatter.404.no_source'};
+	};
+
+	subtest 'GET /scatter -- valid params return 200 HTML scatter chart' => sub {
+		$t->get_ok('/scatter?l=table:sales&x=amount&y=amount')
+		  ->status_is(200, '200 for valid scatter params')
+		  ->content_type_like(qr{text/html}, 'response is HTML');
+		delete $ledger{'GET./scatter.200'};
+	};
+
+	subtest 'GET /stacked -- missing cat= or series= returns 400' => sub {
+		$t->get_ok('/stacked?l=table:sales')
+		  ->status_is(400, '400 when cat= and series= absent');
+		delete $ledger{'GET./stacked.400.missing_param'};
+	};
+
+	subtest 'GET /stacked -- valid cat=/series= but bad l= returns 404' => sub {
+		$t->get_ok('/stacked?cat=region&series=product&l=path:/no/such/file.csv')
+		  ->status_is(404, '404 when l= points to non-existent file');
+		delete $ledger{'GET./stacked.404.no_source'};
+	};
+
+	subtest 'GET /stacked -- valid params return 200 HTML stacked bar chart' => sub {
+		$t->get_ok('/stacked?l=table:sales&cat=region&series=product')
+		  ->status_is(200, '200 for valid stacked params')
+		  ->content_type_like(qr{text/html}, 'response is HTML');
+		delete $ledger{'GET./stacked.200'};
+	};
+
+	subtest 'GET /combo -- missing required params returns 400' => sub {
+		$t->get_ok('/combo?l=table:sales')
+		  ->status_is(400, '400 when cat/bar_val/line_val absent');
+		delete $ledger{'GET./combo.400.missing_param'};
+	};
+
+	subtest 'GET /combo -- required params given but bad l= returns 404' => sub {
+		$t->get_ok('/combo?cat=region&bar_val=amount&line_val=amount&l=path:/no/such/file.csv')
+		  ->status_is(404, '404 when l= points to non-existent file');
+		delete $ledger{'GET./combo.404.no_source'};
+	};
+
+	subtest 'GET /combo -- valid params return 200 HTML combo chart' => sub {
+		$t->get_ok('/combo?l=table:sales&cat=region&bar_val=amount&line_val=amount')
+		  ->status_is(200, '200 for valid combo params')
+		  ->content_type_like(qr{text/html}, 'response is HTML');
+		delete $ledger{'GET./combo.200'};
+	};
+
+	subtest 'GET /treemap -- missing group= returns 400' => sub {
+		$t->get_ok('/treemap?l=table:sales')
+		  ->status_is(400, '400 when group= absent');
+		delete $ledger{'GET./treemap.400.missing_param'};
+	};
+
+	subtest 'GET /treemap -- group= given but bad l= returns 404' => sub {
+		$t->get_ok('/treemap?group=region&l=path:/no/such/file.csv')
+		  ->status_is(404, '404 when l= points to non-existent file');
+		delete $ledger{'GET./treemap.404.no_source'};
+	};
+
+	subtest 'GET /treemap -- valid params return 200 HTML treemap' => sub {
+		$t->get_ok('/treemap?l=table:sales&group=region&size=amount')
+		  ->status_is(200, '200 for valid treemap params')
+		  ->content_type_like(qr{text/html}, 'response is HTML');
+		delete $ledger{'GET./treemap.200'};
+	};
+
+	subtest 'GET /histogram -- missing col= returns 400' => sub {
+		$t->get_ok('/histogram?l=table:sales')
+		  ->status_is(400, '400 when col= absent');
+		delete $ledger{'GET./histogram.400.missing_param'};
+	};
+
+	subtest 'GET /histogram -- col= given but bad l= returns 404' => sub {
+		$t->get_ok('/histogram?col=amount&l=path:/no/such/file.csv')
+		  ->status_is(404, '404 when l= points to non-existent file');
+		delete $ledger{'GET./histogram.404.no_source'};
+	};
+
+	subtest 'GET /histogram -- valid numeric col= returns 200 HTML histogram' => sub {
+		$t->get_ok('/histogram?l=table:sales&col=amount')
+		  ->status_is(200, '200 for valid histogram col=amount')
+		  ->content_type_like(qr{text/html}, 'response is HTML');
+		delete $ledger{'GET./histogram.200'};
+	};
+}
+
+# ---------------------------------------------------------------------------
+# HTTP: pivot and stats views
+# ---------------------------------------------------------------------------
+{
+	subtest 'GET /pivot -- no l= returns 400' => sub {
+		$t->get_ok('/pivot')
+		  ->status_is(400, '400 when no l= given to pivot');
+		delete $ledger{'GET./pivot.400.no_source'};
+	};
+
+	subtest 'GET /pivot -- no rows= returns 400' => sub {
+		$t->get_ok('/pivot?l=table:sales&m=amount:sum:total')
+		  ->status_is(400, '400 when rows= absent from pivot');
+		delete $ledger{'GET./pivot.400.no_rows'};
+	};
+
+	subtest 'GET /pivot -- valid params return 200 HTML pivot table' => sub {
+		$t->get_ok('/pivot?l=table:sales&rows=region&m=amount:sum:total')
+		  ->status_is(200, '200 for valid pivot params')
+		  ->content_type_like(qr{text/html}, 'response is HTML');
+		delete $ledger{'GET./pivot.200'};
+	};
+
+	subtest 'GET /stats -- no l= returns 400' => sub {
+		$t->get_ok('/stats')
+		  ->status_is(400, '400 when no l= given to stats');
+		delete $ledger{'GET./stats.400.no_source'};
+	};
+
+	subtest 'GET /stats -- valid l= returns 200 HTML stats page' => sub {
+		$t->get_ok('/stats?l=table:sales')
+		  ->status_is(200, '200 for valid stats l=')
+		  ->content_type_like(qr{text/html}, 'response is HTML');
+		delete $ledger{'GET./stats.200'};
+	};
+}
+
+# ---------------------------------------------------------------------------
+# HTTP: Phase 5 endpoints (/insights, /api/summary, /api/ask)
+# ---------------------------------------------------------------------------
+{
+	subtest 'GET /insights -- no l= returns 400' => sub {
+		$t->get_ok('/insights')
+		  ->status_is(400, '400 when l= absent from /insights');
+		delete $ledger{'GET./insights.400.no_l'};
+	};
+
+	subtest 'GET /insights -- valid l= returns 200 HTML insights page' => sub {
+		$t->get_ok('/insights?l=table:sales')
+		  ->status_is(200, '200 for /insights with valid l=')
+		  ->content_type_like(qr{text/html}, 'response is HTML');
+		delete $ledger{'GET./insights.200'};
+	};
+
+	subtest 'POST /api/summary -- no l= returns 400' => sub {
+		$t->post_ok('/api/summary')
+		  ->status_is(400, '400 when l= absent from /api/summary');
+		delete $ledger{'POST./api_summary.400.no_l'};
+	};
+
+	subtest 'POST /api/summary -- valid l= returns 200 JSON {text,source,cached}' => sub {
+		$t->post_ok('/api/summary?l=table:sales')
+		  ->status_is(200, '200 for /api/summary with valid l=')
+		  ->json_has('/text',   'response has text key')
+		  ->json_has('/source', 'response has source key')
+		  ->json_has('/cached', 'response has cached key');
+		delete $ledger{'POST./api_summary.200'};
+	};
+
+	subtest 'POST /api/ask -- without ai_api_key returns 503' => sub {
+		# The test app has no ai_api_key configured; expect 503.
+		$t->post_ok('/api/ask', form => { l => 'table:sales', q => 'show a chart' })
+		  ->status_is(503, '503 when ai_api_key not configured')
+		  ->json_has('/error', 'error key present in 503 response');
+		delete $ledger{'POST./api_ask.503.no_key'};
+	};
+
+	subtest 'POST /api/ask -- missing l= returns 400' => sub {
+		# Temporarily inject a dummy api_key so the key guard passes.
+		$t->app->config->{ai_api_key} = 'test-dummy-key';
+		$t->post_ok('/api/ask', form => { q => 'show a chart' })
+		  ->status_is(400, '400 when l= absent')
+		  ->json_has('/error', 'error key present in 400 response');
+		delete $t->app->config->{ai_api_key};
+		delete $ledger{'POST./api_ask.400.no_l'};
+	};
+
+	subtest 'POST /api/ask -- missing q= returns 400' => sub {
+		$t->app->config->{ai_api_key} = 'test-dummy-key';
+		$t->post_ok('/api/ask', form => { l => 'table:sales' })
+		  ->status_is(400, '400 when q= absent')
+		  ->json_has('/error', 'error key present in 400 response');
+		delete $t->app->config->{ai_api_key};
+		delete $ledger{'POST./api_ask.400.no_q'};
+	};
+
+	subtest 'POST /api/ask -- valid request with mocked LLM returns 200 JSON {spec,url,valid}' => sub {
+		require HTTP::Response;
+		require JSON::PP;
+		my $llm_json = '{"kind":"pie","title":"Sales by region","encode":{"cat":"region","val":"amount"}}';
+		my $body = JSON::PP::encode_json({
+			content => [{ type => 'text', text => $llm_json }],
+		});
+		$t->app->config->{ai_api_key} = 'test-dummy-key';
+		local *LWP::UserAgent::request = sub {
+			HTTP::Response->new(200, 'OK', ['Content-Type' => 'application/json'], $body)
+		};
+		$t->post_ok('/api/ask', form => { l => 'table:sales', q => 'show sales by region' })
+		  ->status_is(200, '200 for valid ask with mocked LLM')
+		  ->json_is('/valid', 1, 'valid=1 in response')
+		  ->json_has('/url',  'url key present')
+		  ->json_has('/spec', 'spec key present');
+		delete $t->app->config->{ai_api_key};
+		delete $ledger{'POST./api_ask.200'};
+	};
 }
 
 # ---------------------------------------------------------------------------

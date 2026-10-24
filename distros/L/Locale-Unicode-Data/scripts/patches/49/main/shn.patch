@@ -1,0 +1,13 @@
+--- shn.xml
++++ shn.xml
+@@ -4648,6 +4648,10 @@
+ 			<currency type="CNH">
+ 				<displayName>ယွၼ်ႇၶႄႇ (ၼွၵ်ႈၽၢင်ႇပၢင်ႇလၢႆႇ)</displayName>
+ 			</currency>
++			<currency type="CNX">
++				<displayName>တေႃႇလႃႇယေးငိုၼ်းၵူၼ်းမိူင်းၶႄႇ</displayName>
++				<displayName count="other">တေႃႇလႃႇယေးငိုၼ်းၵူၼ်းမိူင်းၶႄႇ</displayName>
++			</currency>
+ 			<currency type="CNY">
+ 				<displayName>ယွၼ်ႇၶႄႇ</displayName>
+ 			</currency>

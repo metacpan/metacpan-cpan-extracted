@@ -21,7 +21,7 @@ use App::Actions::I18N::en;
 use App::Actions::I18N::fr;
 use App::Actions::I18N::zh;
 
-our $VERSION = '0.001.0';
+our $VERSION = '0.002.0';
 
 our @EXPORT_OK = qw(i18n throw validate_args);
 
@@ -313,6 +313,9 @@ sub new {
 		$wanted = $DEFAULT_LANGUAGE;
 	}
 
+	# Return::Set clears $@, and a caller's own error must survive the
+	# translator that the first message of a language creates.
+	local $@;
 	return set_return(bless({ language => $wanted }, $class), { type => 'object', isa => __PACKAGE__ });
 }
 
@@ -554,7 +557,8 @@ gendered form, where the entry has them.
 
 The rendered message as a character string.  Placeholders without a value
 render as an empty string (or 0 for a numeric conversion), never as a
-warning.
+warning.  A key that is in no catalogue is warned about and returned as
+it is, so the reader still sees which message was meant.
 
 =head3 SIDE EFFECTS
 
@@ -919,11 +923,12 @@ sub _render {
 	my $params = validate_args(__PACKAGE__ . '::load', \@_, \%schema, 'file');
 
 Normalises a routine's arguments with L<Params::Get> and validates them with
-L<Params::Validate::Strict>, croaking with the catalogue's
-C<actions.invalid_arguments> message when they do not match.  It is the one
-place the distribution turns a validator failure into a user-facing message,
-so every public routine reports bad arguments in the same words and the same
-language.
+L<Params::Validate::Strict>.  When they do not match, it throws an
+L<App::Actions::Error> with the code C<actions.invalid_arguments>, which
+reads (as a string) as the catalogue's message and the caller's line, as
+a C<croak> would.  It is the one place the distribution turns a validator
+failure into a user-facing message, so every public routine reports bad
+arguments in the same words and the same language.
 
 =head3 ARGUMENTS
 
@@ -937,6 +942,11 @@ language.
 
 =item * C<$positional> - optional; the L<Params::Get> default: a key name
 for a lone positional argument, or an array reference of positional names.
+L<Params::Get> maps an array of names by position only, so arguments that
+outnumber the names and come in pairs whose keys are all in the schema are
+taken as named pairs instead: C<load_yaml_mapping(file =E<gt> $f, kind =E<gt>
+'workflow')> works as well as C<load_yaml_mapping($f, 'workflow')>.  A single
+pair is still positional, since it cannot be told apart from two values.
 
 =back
 
@@ -946,7 +956,7 @@ The validated hash reference.
 
 =head3 SIDE EFFECTS
 
-None; croaks on invalid arguments.
+None; throws an App::Actions::Error on invalid arguments.
 
 =head3 EXAMPLE
 
@@ -990,24 +1000,75 @@ sub validate_args {
 	# Positional calls ($i18n->message('key', {...})) and named ones are both
 	# accepted; Params::Get turns either into one hash.  An empty argument
 	# list is an empty hash rather than Params::Get's usage error, so the
-	# schema alone decides whether that is allowed.
-	my $params = eval {
-		validate_strict({
-			args => @{$args} ? get_params($positional, @{$args}) : {},
-			schema => $schema,
-		});
-	};
+	# schema alone decides whether that is allowed.  Params::Get maps an
+	# array of names by position only, so named pairs given to a routine
+	# with positional names are passed as pairs.
+	my $names = (ref $positional eq 'ARRAY' && @{$args} > @{$positional} && _named_pairs($args, $schema))
+		? undef : $positional;
+	my $given = @{$args} ? get_params($names, @{$args}) : {};
+
+	# Params::Get fills the positions a caller left out with undef, which
+	# the validator takes as given; they are removed, so that a required
+	# argument that was left out is reported as missing.
+	if (ref $names eq 'ARRAY') {
+		delete $given->{$_} for grep { !defined $given->{$_} } @{$names}[ scalar(@{$args}) .. $#{$names} ];
+	}
+
+	# For the same reason, an undef given for a required argument would pass;
+	# it is removed so that it is reported as missing.  An optional argument
+	# may still be passed as undef, which means "not given".
+	if (ref $given eq 'HASH') {
+		delete $given->{$_} for grep {
+			!defined $given->{$_} && ref $schema->{$_} eq 'HASH' && !$schema->{$_}{optional}
+		} keys %{$given};
+	}
+
+	# $@ is localised: every public routine validates its arguments here, and
+	# a caller's own error must survive a call that succeeds.
+	my ($params, $failure);
+	{
+		local $@;
+		$params = eval {
+			validate_strict({
+				args => $given,
+				schema => $schema,
+			});
+		};
+		$failure = $@;
+	}
 	return $params if $params;
 
 	# The innermost "validate_strict:" clause is the specific reason, and the
 	# validator may append more than one " at FILE line N." to it.
-	(my $reason = $@ || 'invalid') =~ s/\A.*validate_strict:\s*//s;
+	(my $reason = $failure || 'invalid') =~ s/\A.*validate_strict:\s*//s;
 	1 while $reason =~ s/\s+at \S+ line \d+\.?\s*\z//s;
 
 	# Reported from the caller of the routine that was called wrongly, which
-	# is where the mistake is.
+	# is where the mistake is.  It is an error with a code, like every other
+	# failure, and reads as the croak it replaced.
 	local our @CARP_NOT = (scalar caller);
-	croak(shared()->message('actions.invalid_arguments', { routine => $routine, reason => $reason }));
+	my $details = { routine => $routine, reason => $reason };
+	die App::Actions::Error->new(
+		code => 'actions.invalid_arguments',
+		message => shared()->message('actions.invalid_arguments', $details),
+		args => $details,
+		location => Carp::shortmess(''),
+	);
+}
+
+# _named_pairs
+# Purpose:     Say whether a routine's arguments are key => value pairs.
+# Entry:       $args - the arguments; $schema - the routine's schema.
+# Exit status: Returns 1 when there is an even number of arguments and every
+#              key position holds a plain string the schema names, else 0.
+# Side effects: None.
+sub _named_pairs {
+	my ($args, $schema) = @_;
+
+	my @keys = @{$args}[ grep { $_ % 2 == 0 } 0 .. $#{$args} ];
+	my $named = (@{$args} % 2 == 0) && !grep { !defined || ref || !exists $schema->{$_} } @keys;
+
+	return $named ? 1 : 0;
 }
 
 # Every _name routine above may be called only from this package.

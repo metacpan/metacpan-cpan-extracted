@@ -1,16 +1,12 @@
 package HTTP::Headers::ActionPack::AcceptLanguage;
-BEGIN {
-  $HTTP::Headers::ActionPack::AcceptLanguage::AUTHORITY = 'cpan:STEVAN';
-}
-{
-  $HTTP::Headers::ActionPack::AcceptLanguage::VERSION = '0.09';
-}
 # ABSTRACT: A Priority List customized for Media Types
 
 use strict;
 use warnings;
 
 use parent 'HTTP::Headers::ActionPack::PriorityList';
+
+our $VERSION = '0.10';
 
 # We'll just assume that any script or variant names are being given in the
 # right form. To do this all properly would basically require having all the
@@ -35,13 +31,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 HTTP::Headers::ActionPack::AcceptLanguage - A Priority List customized for Media Types
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 SYNOPSIS
 
@@ -78,17 +76,21 @@ scripts or variants in the locale code.
 
 =back
 
-=head1 AUTHOR
+=head1 SUPPORT
 
-Stevan Little <stevan.little@iinteractive.com>
+Bugs may be submitted at L<https://github.com/sartak/http-headers-actionpack/issues>.
 
-=head1 CONTRIBUTORS
+=head1 SOURCE
+
+The source code repository for HTTP-Headers-ActionPack can be found at L<https://github.com/sartak/http-headers-actionpack>.
+
+=head1 AUTHORS
 
 =over 4
 
 =item *
 
-Andrew Nelson <anelson@cpan.org>
+Stevan Little <stevan@cpan.org>
 
 =item *
 
@@ -96,23 +98,18 @@ Dave Rolsky <autarch@urth.org>
 
 =item *
 
-Florian Ragwitz <rafl@debian.org>
-
-=item *
-
-Jesse Luehrs <doy@tozt.net>
-
-=item *
-
-Karen Etheridge <ether@cpan.org>
+Robert Rothenberg <perl@rhizomnic.com>
 
 =back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 by Infinity Interactive, Inc..
+This software is copyright (c) 2012 - 2026 by Infinity Interactive, Inc.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+The full text of the license can be found in the
+F<LICENSE> file included with this distribution.
 
 =cut

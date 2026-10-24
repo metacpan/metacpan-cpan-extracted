@@ -1,4 +1,3 @@
-.gitignore
 .version_info.pl
 Changes
 lib/String/PerlIdentifier.pm

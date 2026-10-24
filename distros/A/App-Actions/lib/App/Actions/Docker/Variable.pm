@@ -3,7 +3,7 @@ package App::Actions::Docker::Variable;
 use strict;
 use warnings;
 
-our $VERSION = '0.001.0';
+our $VERSION = '0.002.0';
 
 # A job variable on its way to docker: "-e" followed by one of these.  It
 # reads as NAME=VALUE wherever it is printed or compared, and lets
@@ -183,8 +183,8 @@ string, so a container cannot tell an undefined value from an empty one.
 
 =head1 ENCODING
 
-The name should be ASCII letters, digits and C<_>, and must not start with a
-digit; any other name stays on the command line.  The value may hold any
+The name should be ASCII letters, digits, C<_>, C<-> and C<.>, and must
+start with a letter or C<_>; any other name stays on the command line.  The value may hold any
 text, including non-ASCII characters and emoji, but encode it to bytes (for
 example UTF-8 with L<Encode>) before you pass it, because an environment and
 a command line hold bytes, not characters.  A value with a NUL character

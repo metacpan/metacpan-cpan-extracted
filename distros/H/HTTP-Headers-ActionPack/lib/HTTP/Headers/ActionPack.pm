@@ -1,14 +1,10 @@
 package HTTP::Headers::ActionPack;
-BEGIN {
-  $HTTP::Headers::ActionPack::AUTHORITY = 'cpan:STEVAN';
-}
-{
-  $HTTP::Headers::ActionPack::VERSION = '0.09';
-}
 # ABSTRACT: HTTP Action, Adventure and Excitement
 
 use strict;
 use warnings;
+
+our $VERSION = '0.10';
 
 use Scalar::Util    qw[ blessed ];
 use Carp            qw[ confess ];
@@ -136,13 +132,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 HTTP::Headers::ActionPack - HTTP Action, Adventure and Excitement
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 SYNOPSIS
 
@@ -172,6 +170,8 @@ This top-level class is basically a Factory for creating
 instances of the other classes in this module. It contains
 a number of convenience methods to help make common cases
 easy to write.
+
+=for Pod::Coverage has_mapping
 
 =head1 DEFAULT MAPPINGS
 
@@ -210,7 +210,7 @@ above for details). Each class is expected to have a
 C<new_from_string> method which can parse the string
 representation of the given header and return an object.
 
-=item C<mapping>
+=item C<mappings>
 
 This returns the set of mappings in this instance.
 
@@ -291,21 +291,41 @@ do what you would expect (stringify in a sensible way). However
 this is not certain and so care should be taken when passing
 object headers onto another library that is expecting strings.
 
-=head1 AUTHOR
+=head1 SUPPORT
 
-Stevan Little <stevan.little@iinteractive.com>
+Bugs may be submitted at L<https://github.com/sartak/http-headers-actionpack/issues>.
+
+=head1 SOURCE
+
+The source code repository for HTTP-Headers-ActionPack can be found at L<https://github.com/sartak/http-headers-actionpack>.
+
+=head1 AUTHORS
+
+=over 4
+
+=item *
+
+Stevan Little <stevan@cpan.org>
+
+=item *
+
+Dave Rolsky <autarch@urth.org>
+
+=item *
+
+Robert Rothenberg <perl@rhizomnic.com>
+
+=back
 
 =head1 CONTRIBUTORS
+
+=for stopwords Andrew Nelson Florian Ragwitz Jesse Luehrs Karen Etheridge
 
 =over 4
 
 =item *
 
 Andrew Nelson <anelson@cpan.org>
-
-=item *
-
-Dave Rolsky <autarch@urth.org>
 
 =item *
 
@@ -323,9 +343,12 @@ Karen Etheridge <ether@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 by Infinity Interactive, Inc..
+This software is copyright (c) 2012 - 2026 by Infinity Interactive, Inc.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+The full text of the license can be found in the
+F<LICENSE> file included with this distribution.
 
 =cut

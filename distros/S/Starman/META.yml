@@ -3,6 +3,7 @@ abstract: 'High-performance preforking PSGI/Plack web server'
 author:
   - 'Tatsuhiko Miyagawa <miyagawa@bulknews.net>'
 build_requires:
+  HTTP::Tiny: '0.064'
   LWP::UserAgent: '0'
   Test::More: '0'
   Test::Requires: '0'
@@ -37,7 +38,7 @@ resources:
   bugtracker: https://github.com/miyagawa/Starman/issues
   homepage: https://github.com/miyagawa/Starman
   repository: https://github.com/miyagawa/Starman.git
-version: '0.4018'
+version: '0.4019'
 x_contributors:
   - 'Adam Guthrie <adam.guthrie@dvlgames.com>'
   - 'Alex Vandiver <alex@chmrr.net>'

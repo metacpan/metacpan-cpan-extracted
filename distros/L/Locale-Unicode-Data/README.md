@@ -449,11 +449,72 @@ Locale::Unicode::Data - Unicode CLDR SQL Data
     my $all = $cldr->number_systems;
     my $ref = $cldr->person_name_default( locale => 'ja' );
     my $all = $cldr->person_name_defaults;
+    my $ref = $cldr->person_name_format(
+        locale          => 'ja',
+        name_order      => 'surnameFirst',
+        name_length     => 'long',
+        name_usage      => 'referring',
+        name_formality  => 'formal',
+    );
+    my $all = $cldr->person_name_formats( locale => 'ja' );
+    my $all = $cldr->person_name_formats(
+        locale      => 'ja',
+        name_order  => 'surnameFirst',
+    );
+    my $ref = $cldr->person_name_initial_pattern(
+        locale          => 'en',
+        pattern_type    => 'initial',
+    );
+    my $all = $cldr->person_name_initial_patterns( locale => 'en' );
+    my $ref = $cldr->person_name_order_locale(
+        locale      => 'ja',
+        name_locale => 'ko',
+    );
+    my $all = $cldr->person_name_order_locales( locale => 'ja' );
+    my $all = $cldr->person_name_order_locales(
+        locale      => 'ja',
+        name_order  => 'surnameFirst',
+    );
+    my $ref = $cldr->person_name_sample(
+        locale      => 'ja',
+        sample_type => 'nativeFull',
+        field_type  => 'given',
+    );
+    my $all = $cldr->person_name_samples( locale => 'ja' );
+    my $all = $cldr->person_name_samples(
+        locale      => 'ja',
+        sample_type => 'foreignFull',
+    );
+    my $order = $cldr->person_name_derive_order(
+        formatting_locale   => 'ja',
+        name_locale         => 'ko',
+    );
+    # 'surnameFirst'
+    my $sep = $cldr->person_name_space_replacement(
+        formatting_locale   => 'ja',
+        name_locale         => 'de',
+    );
+    # '・'
+    my $sep = $cldr->person_name_space_replacement(
+        formatting_locale   => 'ja',
+        name_locale         => 'ja',
+    );
+    # ''
     my $ref = $cldr->rbnf(
         locale  => 'ja',
         ruleset => 'spellout-cardinal',
         rule_id => 7,
     );
+
+    my $rule = $cldr->plural_forms( 'en' );
+    # nplurals=2; plural=(n != 1);
+
+    my $rule = $cldr->plural_forms( 'ja' );
+    # nplurals=1; plural=0;
+
+    my $rule = $cldr->plural_forms( 'ar' );
+    # nplurals=6; plural=(n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 ? 4 : 5);
+
     my $all = $cldr->rbnfs;
     my $all = $cldr->rbnfs( locale => 'ko' );
     my $all = $cldr->rbnfs( grouping => 'SpelloutRules' );
@@ -640,7 +701,7 @@ Or, you could set the global variable `$FATAL_EXCEPTIONS` instead:
 
 # VERSION
 
-    v1.0.4
+    v1.10.0
 
 # DESCRIPTION
 
@@ -767,6 +828,22 @@ The data available from the `CLDR` via this module includes:
 - [Person name defaults](#table-person_name_defaults)
 
     This specifies, for a given `locale`, whether a person's given name comes first before the surname, or after.
+
+- [Person name format patterns](#table-person_name_formats)
+
+    This stores the locale-specific name format patterns for each combination of ordering (`givenFirst`, `surnameFirst`, `sorting`), length (`long`, `medium`, `short`), usage (`referring`, `addressing`, `monogram`), and formality (`formal`, `informal`). Where a locale provides alternate patterns for the same context, these are distinguished by the `alt` column.
+
+- [Person name initial patterns](#table-person_name_initial_patterns)
+
+    This stores locale-specific patterns for rendering name initials. The `initial` type controls how a single initial is produced (e.g. `{0}.` giving `W.`), and `initialSequence` controls how multiple initials are joined (e.g. `{0} {1}` giving `W. J.`). Only approximately 19 locales define these; all others inherit the root defaults.
+
+- [Person name order locales](#table-person_name_order_locales)
+
+    This records, for a given display locale, which ordering convention (`givenFirst` or `surnameFirst`) applies to names from a given source locale. The value `und` is the catch-all fallback; `und-XX` scopes the fallback to a specific region.
+
+- [Person name samples](#table-person_name_samples)
+
+    This stores sample names used to illustrate how format patterns render in practice. Each sample is identified by a category (such as `nativeFull` or `foreignGS`) and contains individual name field values. These are for CLDR testing and survey tooling only; they must not be used as UI prompts in production software.
 
 - [References](#table-refs)
 
@@ -2290,7 +2367,7 @@ The meaning of the fields are as follows:
 
 - `type`
 
-    The mapping &lt;type>
+    The mapping `type`
 
 ## code\_mappings
 
@@ -2693,6 +2770,45 @@ A combination of the following fields may be provided to filter the information 
 - `currency`
 
     A 3-characters `currency` ID as can be found in the table [currencies](#table-currencies)
+
+## data\_alias
+
+    my $ref = $cldr->data_alias(
+        locale      => 'und',
+        table_name  => 'calendar_terms',
+        source      => '{"calendar":"japanese","term_type":"month"}',
+    );
+    # Returns a hash reference such as:
+    {
+        data_alias_id   => 42,
+        locale          => 'und',
+        table_name      => 'calendar_terms',
+        source          => '{"calendar":"japanese","term_type":"month"}',
+        target          => '{"calendar":"gregorian","term_type":"month"}',
+        source_path     => "/ldml/dates/calendars/calendar[\@type='japanese']/months",
+        target_path     => "/ldml/dates/calendars/calendar[\@type='gregorian']/months",
+    }
+
+Returns a hash reference for a data alias from the [data\_aliases](#table-data_aliases) table, given a `locale`, a `table_name` and a `source`. The `source` is the JSON object of the source columns, encoded with its keys sorted.
+
+You normally do not need this: ["resolve"](#resolve) follows the data aliases for you.
+
+## data\_aliases
+
+    my $all = $cldr->data_aliases;
+    my $all = $cldr->data_aliases( table_name => 'metazones_names' );
+
+Returns all data aliases from the [data\_aliases](#table-data_aliases) table as an array reference of hash references.
+
+The following fields may be used, alone or in combination, to filter the results:
+
+- `locale`
+
+    The locale of the CLDR file that holds the alias. Up to at least CLDR v49.1 only root (`und`) has any.
+
+- `table_name`
+
+    The name of the table whose data is aliased, for example `calendar_terms`.
 
 ## database\_handler
 
@@ -3609,7 +3725,7 @@ The meaning of the fields are as follows:
 
     A string representing a property.
 
-    Known properties are: `char_orientation`, `quotation2_end`, `quotation2_start`, `quotation_end`, `quotation_start`, `yes` and `no`
+    Known properties are: `char_orientation`, `person_name_default_formality`, `person_name_default_length`, `person_name_foreign_space`, `person_name_native_space`, `quotation2_end`, `quotation2_start`, `quotation_end`, `quotation_start`, `yes` and `no`
 
 - `value`
 
@@ -4603,6 +4719,412 @@ This is the way the Unicode CLDR data is structured.
 
 Returns all person name defaults information from [table person\_name\_defaults](#table-person_name_defaults) as an array reference of hash reference.
 
+## person\_name\_derive\_order
+
+    my $order = $cldr->person_name_derive_order(
+        formatting_locale   => 'ja',
+        name_locale         => 'ko',
+    );
+    # Returns 'surnameFirst'
+
+    my $order = $cldr->person_name_derive_order(
+        formatting_locale   => 'en',
+        name_locale         => 'fr',
+    );
+    # Returns 'givenFirst'
+
+Returns either `givenFirst` or `surnameFirst` by consulting the [person\_name\_order\_locales](#table-person_name_order_locales) table for `formatting_locale`, looking for a match on the base language of `name_locale`, then falling back to `und` if no explicit entry is found.
+
+This implements step 3 of the CLDR **Derive the name order** algorithm ([UTS #35 Part 8](https://www.unicode.org/reports/tr35/tr35-personNames.html#derive-the-name-order)). The default return value when neither the base language nor `und` is found is `givenFirst`, as specified by CLDR.
+
+**Important:** This method implements a simplified single-level lookup. The full CLDR algorithm traverses the entire parent locale chain and also considers region subtags (e.g. `und-JP`). For complete correctness with locale tags that include script or region subtags, the caller should iterate through the parent chain manually and call this method for each ancestor.
+
+The caller is also responsible for handling steps 1 and 2 of the algorithm: if the calling API has requested sorting order, that takes priority; if the PersonName object itself supplies a `preferredOrder` field, that takes priority over the result of this method.
+
+## person\_name\_space\_replacement
+
+    my $sep = $cldr->person_name_space_replacement(
+        formatting_locale   => 'ja',
+        name_locale         => 'de',
+    );
+    # Returns '・'  (KATAKANA MIDDLE DOT, for foreign names in Japanese)
+
+    my $sep = $cldr->person_name_space_replacement(
+        formatting_locale   => 'ja',
+        name_locale         => 'ja',
+    );
+    # Returns ''  (empty string, for native Japanese names)
+
+    my $sep = $cldr->person_name_space_replacement(
+        formatting_locale   => 'en',
+        name_locale         => 'fr',
+    );
+    # Returns ' '  (space, default for most locales)
+
+Returns the string that should replace each space character in a formatted name, according to the CLDR **Setting the spaceReplacement** algorithm (UTS #35 Part 8).
+
+The CLDR algorithm is:
+
+1. If the formatting base language matches the name base language, the `nativeSpaceReplacement` applies; otherwise the `foreignSpaceReplacement`
+applies.
+2. Two base languages **match** when they are identical, or when both belong to the group `{ja, zh, yue}`. This reflects the fact that Japanese, Mandarin Chinese, and Cantonese share the same spacing conventions for names.
+3. If the relevant replacement value is not explicitly defined for the formatting locale (i.e. not present in [locales\_info](#table-locales_info) under the key `person_name_native_space` or `person_name_foreign_space`), the default is a single SPACE character `" "`, as specified by CLDR.
+
+In practice, only locales that do not require spaces between words (such as `ja`, `zh`, `yue`) define non-default values. For `ja`, the `nativeSpaceReplacement` is an empty string `""` (native Japanese names have no separator between name parts), and the `foreignSpaceReplacement` is `"・"` (U+30FB KATAKANA MIDDLE DOT, used to separate words in foreign names rendered in Japanese).
+
+The values are stored in the [locales\_info](#table-locales_info) table under the property keys `person_name_native_space` and `person_name_foreign_space`.
+
+**Note:** This method compares base languages only (the first BCP 47 subtag).
+The caller is responsible for deriving the correct base languages after applying the **Switch the formatting locale if necessary** step of the CLDR algorithm, which may change the effective formatting locale when the name script differs from the formatting script.
+
+After obtaining the replacement string, apply it by replacing every sequence of whitespace in the formatted name with this value:
+
+    my $sep = $cldr->person_name_space_replacement(
+        formatting_locale   => 'ja',
+        name_locale         => 'de',
+    );
+    # $formatted_name = 'アルベルト アインシュタイン'
+    $formatted_name =~ s/[[:blank:]]+/$sep/g;
+    # $formatted_name = 'アルベルト・アインシュタイン'
+
+## person\_name\_format
+
+    my $ref = $cldr->person_name_format(
+        locale          => 'ja',
+        name_order      => 'surnameFirst',
+        name_length     => 'long',
+        name_usage      => 'referring',
+        name_formality  => 'formal',
+    );
+    # Returns an hash reference like this:
+    {
+        pers_name_fmt_id    => 12,
+        locale              => 'ja',
+        name_order          => 'surnameFirst',
+        name_length         => 'long',
+        name_usage          => 'referring',
+        name_formality      => 'formal',
+        alt                 => undef,
+        name_pattern        => '{surname} {given2} {given}{title}',
+    }
+
+Returns an hash reference of a person name format pattern from the table [person\_name\_formats](#table-person_name_formats) for the given combination of `locale`, `name_order`, `name_length`, `name_usage`, `name_formality`, and optionally `alt`.
+
+The `alt` parameter defaults to `undef` (primary pattern). Pass `alt => '1'` to retrieve the alternate pattern where one exists.
+
+The `name_pattern` value uses CLDR placeholder notation.
+
+Known field placeholders include: `{given}`, `{given2}`, `{given-informal}`, `{given-initial}`, `{given2-initial}`, `{given-monogram-allCaps}`, `{surname}`, `{surname-core}`, `{surname-prefix}`, `{surname2}`, `{title}`, `{generation}`, `{credentials}`, and locale-specific modifier combinations such as `{surname-allCaps}` or `{given-informal-monogram-allCaps}`.
+
+## person\_name\_formats
+
+    my $all = $cldr->person_name_formats;
+    my $all = $cldr->person_name_formats( locale => 'ja' );
+    my $all = $cldr->person_name_formats(
+        locale      => 'ja',
+        name_order  => 'surnameFirst',
+    );
+
+Returns all person name format patterns from the table [person\_name\_formats](#table-person_name_formats) as an array reference of hash references. Optionally filter by `locale`, `name_order`, `name_length`, `name_usage`, `name_formality`, and/or `alt`.
+
+## person\_name\_initial\_pattern
+
+    my $ref = $cldr->person_name_initial_pattern(
+        locale          => 'en',
+        pattern_type    => 'initial',
+    );
+    # Returns an hash reference like this:
+    {
+        pers_name_init_id   => 3,
+        locale              => 'en',
+        pattern_type        => 'initial',
+        pattern_value       => '{0}.',
+        is_draft            => 0,
+    }
+
+Returns an hash reference of a person name initial pattern from the table [person\_name\_initial\_patterns](#table-person_name_initial_patterns) for the given `locale` and `pattern_type`.
+
+Only approximately 19 locales define these explicitly. For all others, the root locale defaults apply: `initial => '{0}.'` and `initialSequence => '{0} {1}'`.
+
+The `pattern_type` is either `initial` (pattern for a single initial, such as `{0}.` producing `W.`) or `initialSequence` (pattern for joining multiple initials, such as `{0} {1}` producing `W. J.` or `{0}{1}` producing `WJ`).
+
+## person\_name\_initial\_patterns
+
+    my $all = $cldr->person_name_initial_patterns;
+    my $all = $cldr->person_name_initial_patterns( locale => 'en' );
+
+Returns all person name initial pattern records from the table [person\_name\_initial\_patterns](#table-person_name_initial_patterns) as an array reference of hash references. Optionally filter by `locale`.
+
+## person\_name\_order\_locale
+
+    my $ref = $cldr->person_name_order_locale(
+        locale      => 'ja',
+        name_locale => 'ko',
+    );
+    # Returns an hash reference like this:
+    {
+        pers_name_ord_id    => 8,
+        locale              => 'ja',
+        name_locale         => 'ko',
+        name_order          => 'surnameFirst',
+        is_draft            => 0,
+    }
+
+Returns an hash reference from the table [person\_name\_order\_locales](#table-person_name_order_locales) for the given `locale` and `name_locale`.
+
+This table records how a given display `locale` orders names whose origin locale is `name_locale`. For example, when rendering names in Japanese (`locale = 'ja'`), names of Korean origin (`name_locale = 'ko'`) should be ordered `surnameFirst`.
+
+The `name_locale` may be `und` (catch-all fallback for any locale not otherwise listed) or `und-XX` (region-scoped fallback, e.g. `und-JP`).
+
+This is semantically distinct from ["person\_name\_default"](#person_name_default), which records the global default ordering for a given locale as defined in the supplemental data.
+
+## person\_name\_order\_locales
+
+    my $all = $cldr->person_name_order_locales;
+    my $all = $cldr->person_name_order_locales( locale => 'ja' );
+    my $all = $cldr->person_name_order_locales(
+        locale      => 'ja',
+        name_order  => 'surnameFirst',
+    );
+
+Returns all person name order locale records from the table [person\_name\_order\_locales](#table-person_name_order_locales) as an array reference of hash references. Optionally filter by `locale` and/or `name_order`.
+
+## person\_name\_sample
+
+    my $ref = $cldr->person_name_sample(
+        locale      => 'ja',
+        sample_type => 'nativeFull',
+        field_type  => 'given',
+    );
+    # Returns an hash reference like this:
+    {
+        pers_name_samp_id   => 42,
+        locale              => 'ja',
+        sample_type         => 'nativeFull',
+        field_type          => 'given',
+        field_value         => '恵子',
+    }
+
+Returns an hash reference of one name field from a sample name, from the table [person\_name\_samples](#table-person_name_samples) for the given `locale`, `sample_type`, and `field_type`.
+
+Note: sample names are provided for CLDR testing and the CLDR Survey Tool only.
+They must not be used as prompts or placeholders in production software.
+
+Known `sample_type` values: `nativeG`, `nativeGS`, `nativeGGS`, `nativeFull`, `foreignG`, `foreignGS`, `foreignGGS`, `foreignFull`.
+
+Known `field_type` values: `given`, `given2`, `given-informal`, `surname`, `surname-prefix`, `surname-core`, `surname2`, `title`, `generation`, `credentials`.
+
+The field value `∅∅∅` is a CLDR convention indicating that the field is explicitly absent in this sample (as opposed to simply not specified).
+
+## person\_name\_samples
+
+    my $all = $cldr->person_name_samples;
+    my $all = $cldr->person_name_samples( locale => 'ja' );
+    my $all = $cldr->person_name_samples(
+        locale      => 'ja',
+        sample_type => 'nativeFull',
+    );
+
+Returns all person name sample fields from the table [person\_name\_samples](#table-person_name_samples) as an array reference of hash references. Optionally filter by `locale` and/or `sample_type`.
+
+## plural\_count
+
+    my $str = $cldr->plural_count( 3, 'ja-t-de-t0-und-x0-medical' );
+    # "other"
+    my $str = $cldr->plural_count( -2, 'he-IL-u-ca-hebrew-tz-jeruslm' );
+    # "two"
+    my $str = $cldr->plural_count( 3.5, 'ru' );
+    # "other"
+
+Provided with a number, and a `locale`, and this will return a string representing the type of `count` for the plural value, which may be one of `zero`, `one`, `two`, `few`, `many` or `other`
+
+This is used for example by [DateTime::Format::RelativeTime](https://metacpan.org/pod/DateTime%3A%3AFormat%3A%3ARelativeTime) to query [time\_relative\_l10n](#time_relative_l10n) to get the localised relative time value.
+
+If an error has occurred, this will set an [error object](https://metacpan.org/pod/Locale%3A%3AUnicode%3A%3AData%3A%3AException), and return `undef` in scalar context, or an empty list in list context.
+
+See also [plural\_range](#plural_range) and [plural\_rule](#plural_rule)
+
+## plural\_forms
+
+    my $rule = $cldr->plural_forms( 'en' );
+    # nplurals=2; plural=(n != 1);
+
+    my $rule = $cldr->plural_forms( 'ja' );
+    # nplurals=1; plural=0;
+
+    my $rule = $cldr->plural_forms( 'ar' );
+    # nplurals=6; plural=(n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 ? 4 : 5);
+
+    # Alias to 'ar'
+    my $rule = $cldr->plural_forms( 'ars' );
+    # nplurals=6; plural=(n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 ? 4 : 5);
+
+    # No rule found
+    my $rule = $cldr->plural_forms( 'xxx' );
+    # Returns an empty string
+
+This method returns the gettext Plural-Forms string for a given locale, or an empty string if no rule was found.
+
+It returns a gettext `Plural-Forms` string, or an empty string if no rule was found for the given locale.
+
+If no locale is provided, or if there is an error retrieving the data, an error is set in the object, and `undef` is returned in scalar context, or an empty list in list context.
+
+See also ["plural\_rules" in Locale::Unicode::Data](https://metacpan.org/pod/Locale%3A%3AUnicode%3A%3AData#plural_rules)
+
+## plural\_range
+
+    my $ref = $cldr->plural_range(
+        locale => 'am',
+        start  => 'one',
+        stop   => 'other',
+    );
+    # Returns an hash reference like this:
+    {
+        plural_range_id => 1335,
+        locale          => 'am',
+        aliases         => [qw(as bn gu hi hy kn mr ps zu)],
+        start           => 'one',
+        stop            => 'other',
+        result          => 'other',
+    }
+
+Returns an hash reference of a `plural_range` information from the table [plural\_ranges](#table-plural_ranges) for a given `start` count, a `stop` count and a `locale` ID.
+
+For example:
+
+    my $num   = '2-7';
+    my $range = [split( /-/, $num, 2 )];
+    # Will get a string like: zero, one, two, few, many, or other
+    my $start = $cldr->plural_count( $range->[0], $locale );
+    my $end   = $cldr->plural_count( $range->[1], $locale );
+    my $ref   = $cldr->plural_range( locale => $locale, start => $start, stop => $end );
+    # zero, one, two, few, many, or other
+    my $count = $ref->{result};
+    my $def   = $cldr->time_relative_l10n(
+        locale => $locale,
+        # For example: second, minute, hour, day, week, month, quarter, or year
+        field_type => $unit,
+        # long, short or narrow
+        field_length => $this_style,
+        # -1 for past, or 1 for present or future
+        relative => substr( $num, 0, 1 ) eq '-' ? -1 : 1,
+        count => $count,
+    );
+    # Resulting in a pattern containing {0} that needs to be replaced with the range
+    $def->{pattern} =~ s/\{0\}/$num/;
+    say $def->{pattern};
+
+The meaning of the fields are as follows:
+
+- `plural_range_id`
+
+    A unique incremental value automatically generated by SQLite.
+
+- `aliases`
+
+    An array reference of `locale` values.
+
+- `start`
+
+    A string representing the starting count value.
+
+- `stop`
+
+    A string representing the ending count value.
+
+- `result`
+
+    A string representing the resulting count value.
+
+## plural\_ranges
+
+    my $all = $cldr->plural_ranges;
+    my $all = $cldr->plural_ranges( locale => 'he' );
+    my $all = $cldr->plural_ranges( start => 'one' );
+    my $all = $cldr->plural_ranges( start => 'one', stop => 'many' );
+    my $all = $cldr->plural_ranges( result => 'other' );
+
+Returns all plural ranges information from [table plural\_ranges](#table-plural_ranges) as an array reference of hash reference.
+
+A combination of the following fields may be provided to filter the information returned:
+
+- `locale`
+
+    A `locale` such as `en` or `ja-JP` as can be found in table [locales](#table-locales)
+
+- `start`
+
+    A string representing the starting count value.
+
+- `stop`
+
+    A string representing the ending count value.
+
+- `result`
+
+    A string representing the resulting count value.
+
+## plural\_rule
+
+    my $ref = $cldr->plural_rule(
+        locale => 'am',
+        count  => 'one',
+    );
+    # Returns an hash reference like this:
+    {
+        plural_rule_id => 1335,
+        locale          => 'am',
+        aliases         => [qw(as bn doi fa gu hi kn pcm zu)],
+        count           => 'one',
+        rule            => 'i = 0 or n = 1 @integer 0, 1 @decimal 0.0~1.0, 0.00~0.04',
+    }
+
+Returns an hash reference of a `plural_rule` information from the table [plural\_rules](#table-plural_rules) for a given `start` count, a `stop` count and a `locale` ID.
+
+The meaning of the fields are as follows:
+
+- `plural_rule_id`
+
+    A unique incremental value automatically generated by SQLite.
+
+- `aliases`
+
+    An array reference of `locale` values.
+
+- `count`
+
+    A string representing the count value.
+
+- `rule`
+
+    A string representing the plural rule.
+
+See also the [Unicode documentation](https://unicode.org/reports/tr35/tr35-numbers.html#Language_Plural_Rules), and [also here](https://cldr.unicode.org/index/cldr-spec/plural-rules), and [here](https://unicode.org/reports/tr35/tr35-dates.html#Contents).
+
+## plural\_rules
+
+    my $all = $cldr->plural_rules;
+    my $all = $cldr->plural_rules( locale => 'he' );
+    my $all = $cldr->plural_rules( count => 'one' );
+
+Returns all plural ranges information from [table plural\_rules](#table-plural_rules) as an array reference of hash reference.
+
+A combination of the following fields may be provided to filter the information returned:
+
+- `locale`
+
+    A `locale` such as `en` or `ja-JP` as can be found in table [locales](#table-locales)
+
+- `aliases`
+
+    An array reference of `locale` values.
+
+- `count`
+
+    A string representing the count value.
+
+See also the [Unicode documentation](https://unicode.org/reports/tr35/tr35-numbers.html#Language_Plural_Rules), and [also here](https://cldr.unicode.org/index/cldr-spec/plural-rules), and [here](https://unicode.org/reports/tr35/tr35-dates.html#Contents).
+
 ## rbnf
 
     my $ref = $cldr->rbnf(
@@ -4695,6 +5217,40 @@ Returns an hash reference of a reference information from the table [refs](#tabl
 Returns all reference information from [table refs](#table-refs) as an array reference of hash reference.
 
 No additional parameter is needed.
+
+## resolve
+
+    my $all = $cldr->resolve( calendar_terms =>
+        locale          => 'fr',
+        calendar        => 'japanese',
+        term_type       => 'month',
+        term_context    => 'format',
+        term_width      => 'wide',
+    );
+    # The month names of the French Gregorian calendar: janvier, février, etc.
+
+    my $ref = $cldr->resolve( metazone_names =>
+        locale      => 'ckb',
+        metazone    => 'British',
+        width       => 'long',
+    );
+    # The long names of the GMT metazone in Central Kurdish
+
+Takes the name of a data method (for example ["calendar\_terms"](#calendar_terms)) and the same arguments as that method, including a `locale`, and returns the data that method would return, resolved as the LDML specifications require:
+
+- 1. The data is looked up in the `locale`, then in each of its parents as returned by ["make\_inheritance\_tree"](#make_inheritance_tree), excluding the root locale `und`.
+- 2. If nothing was found and a [data alias](#table-data_aliases) applies to the arguments, its target values replace the source ones and the lookup restarts from step 1 with the requested `locale`. For instance, the `japanese` calendar month names are an alias of the `gregorian` ones, and the `narrow` era names an alias of the `abbreviated` ones.
+- 3. Otherwise the data is looked up in the root locale `und`.
+
+This matters because an alias of root points to data of the locale being resolved, not of root: the `japanese` calendar month names of `fr` are the `gregorian` month names of `fr` (`janvier`), not those of root (`M01`). The data stored for root itself is resolved within root, which is correct for root and serves as the last resort.
+
+A data alias applies when all its source columns are among the arguments with the same values. The arguments must therefore be at least as specific as the alias (for example both `calendar` and `term_type` in the example above). When several aliases apply, the most specific one is used.
+
+It returns what the underlying method returns: an array reference (possibly empty) for a method that returns all matching rows, such as ["calendar\_terms"](#calendar_terms), or a hash reference (or `undef` if nothing was found) for a method that returns one row, such as ["calendar\_term"](#calendar_term). On error it sets an [error](#error) and returns `undef` in scalar context, or an empty list in list context.
+
+The methods supported are those of the tables that can be aliased: ["calendar\_append\_format"](#calendar_append_format), ["calendar\_append\_formats"](#calendar_append_formats), ["calendar\_available\_format"](#calendar_available_format), ["calendar\_available\_formats"](#calendar_available_formats), ["calendar\_cyclic\_l10n"](#calendar_cyclic_l10n), ["calendar\_cyclics\_l10n"](#calendar_cyclics_l10n), ["calendar\_datetime\_format"](#calendar_datetime_format), ["calendar\_datetime\_formats"](#calendar_datetime_formats), ["calendar\_era\_l10n"](#calendar_era_l10n), ["calendar\_eras\_l10n"](#calendar_eras_l10n), ["calendar\_format\_l10n"](#calendar_format_l10n), ["calendar\_formats\_l10n"](#calendar_formats_l10n), ["calendar\_interval\_format"](#calendar_interval_format), ["calendar\_interval\_formats"](#calendar_interval_formats), ["calendar\_term"](#calendar_term), ["calendar\_terms"](#calendar_terms), ["date\_field\_l10n"](#date_field_l10n), ["date\_fields\_l10n"](#date_fields_l10n), ["date\_term"](#date_term), ["date\_terms"](#date_terms), ["metazone\_names"](#metazone_names), ["metazones\_names"](#metazones_names), ["number\_format\_l10n"](#number_format_l10n), ["number\_formats\_l10n"](#number_formats_l10n), ["number\_symbol\_l10n"](#number_symbol_l10n), ["number\_symbols\_l10n"](#number_symbols_l10n), ["person\_name\_format"](#person_name_format), ["person\_name\_formats"](#person_name_formats), ["time\_relative\_l10n"](#time_relative_l10n), ["time\_relatives\_l10n"](#time_relatives_l10n), ["unit\_l10n"](#unit_l10n) and ["units\_l10n"](#units_l10n).
+
+See the [LDML specifications](https://www.unicode.org/reports/tr35/#Alias_Elements) for more information.
 
 ## script
 
@@ -5252,6 +5808,105 @@ A combination of the following fields may be provided to filter the information 
 - `territory`
 
     A `territory` code as can be found in table [territories](#table-territories)
+
+## time\_relative\_l10n
+
+    my $ref = $cldr->time_relative_l10n(
+        locale          => 'en',
+        field_type      => 'day',
+        field_length    => 'short',
+        relative        => -1,
+        # optionally a 'count' value; defaults to 'one'
+        # count         => 'one'
+    );
+    # Returns an hash reference like this:
+    {
+        time_relative_id    => 2087,
+        locale              => 'en',
+        field_type          => 'day',
+        field_length        => 'short',
+        relative            => -1,
+        format_pattern      => '{0} day ago',
+        count               => 'one',
+    }
+
+Returns an hash reference of a field localised information from the table [time\_relative\_l10n](#table-time_relative_l10n) for a given `locale` ID, `field_type`, `field_length` and `relative` value.
+
+The meaning of the fields are as follows:
+
+- `time_relative_id`
+
+    A unique incremental value automatically generated by SQLite.
+
+- `locale`
+
+    A `locale`, such as `en` or `ja-JP` as can be found in table [locales](#table-locales)
+
+- `field_type`
+
+    A string representing a field type.
+
+    Known values are: `day`, `fri`, `hour`, `minute`, `mon`, `month`, `quarter`, `sat`, `second`, `sun`, `thu`, `tue`, `wed`, `week`, `year`
+
+- `field_length`
+
+    A string representing a field length.
+
+    Known values are: `narrow`, `short`, `standard`
+
+- `relative`
+
+    An integer representing the relative value of the field. For example, `-1` being the past, and `1` being the future.
+
+    Posible values are: `-1`, `1`
+
+- `format_pattern`
+
+    A string containing the localised pattern based on the `locale`
+
+- `count`
+
+    A string representing the count for the pattern. If none is provided, it defaults to `one`
+
+    Possible values may be: `zero`, `one`, `two`, `few`, `many`, `other`
+
+See the [LDML specifications](https://unicode.org/reports/tr35/tr35-dates.html#Calendar_Fields) for more information.
+
+## time\_relatives\_l10n
+
+    my $all = $cldr->time_relatives_l10n;
+    my $all = $cldr->time_relatives_l10n( locale => 'en' );
+    my $all = $cldr->time_relatives_l10n(
+        locale          => 'en',
+        field_type      => 'day',
+        field_length    => 'short',
+    );
+
+Returns all time relative localised information from [table time\_relative\_l10n](#table-time_relative_l10n) as an array reference of hash reference.
+
+A combination of the following fields may be provided to filter the information returned:
+
+- `locale`
+
+    A `locale`, such as `en` or `ja-JP` as can be found in table [locales](#table-locales)
+
+- `field_type`
+
+    A string representing a field type.
+
+    Known values are: `day`, `fri`, `hour`, `minute`, `mon`, `month`, `quarter`, `sat`, `second`, `sun`, `thu`, `tue`, `wed`, `week`, `year`
+
+- `field_length`
+
+    A string representing a field length.
+
+    Known values are: `narrow`, `short`, `standard`
+
+- `count`
+
+    A string representing the count for the pattern.
+
+    Possible values may be: `zero`, `one`, `two`, `few`, `many`, `other`
 
 ## timezone
 
@@ -6432,6 +7087,8 @@ Returns all the week preferences information as an array reference of hash refer
 
 The following is taken directly from the [Unicode LDML specifications](https://unicode.org/reports/tr35/tr35-dates.html#table-date-field-symbol-table) and placed here for your convenience.
 
+See also the [ICU format patterns table](https://unicode-org.github.io/icu/userguide/format_parse/datetime/#date-field-symbol-table).
+
 Examples:
 
 - `yyyy.MM.dd G 'at' HH:mm:ss zzz`
@@ -7429,6 +8086,8 @@ See the [LDML specifications](https://unicode.org/reports/tr35/tr35-dates.html#D
 
 When performing data look-ups, some data, such as width, may be missing and the default `wide` should be used, and sometime, the data is aliased. For example, `narrow` would be aliased to `abbreviated`.
 
+Those aliases are defined in the root locale, but they point to the data of the locale being resolved, not of root: for `fr`, the `narrow` era names are the `abbreviated` era names of `fr`. They are stored in the [data\_aliases](#table-data_aliases) table, and ["resolve"](#resolve) follows them, together with the vertical inheritance described below.
+
 Then, there is also a vertical inheritance, whereby a locale `fr-CA` would lookup up data in its parent `fr`. When the inheritance is not natural, the `LDML` specifies a `parent`. This information can be found in table [locales](#table-locales). Ultimately, the root `locale` with value `und` is to be used.
 
 See the [LDML specifications](https://unicode.org/reports/tr35/tr35.html#Parent_Locales) for more information.
@@ -8321,6 +8980,36 @@ The tables used are as follows, in alphabetical order:
 
     A string field.
 
+## Table data\_aliases
+
+- `data_alias_id`
+
+    Integer. Primary key.
+
+- `locale`
+
+    A string field. The locale of the CLDR file that holds the alias (`und` for root).
+
+- `table_name`
+
+    A string field. The name of the table whose data is aliased.
+
+- `source`
+
+    A string field. The JSON object of the columns and values of the aliased data, for example `{"calendar":"japanese","term_type":"month"}`, encoded with its keys sorted.
+
+- `target`
+
+    A string field. The JSON object of the same columns, with the values of the data the alias points to, for example `{"calendar":"gregorian","term_type":"month"}`.
+
+- `source_path`
+
+    A string field. The path of the aliased element in the CLDR file.
+
+- `target_path`
+
+    A string field. The path of the element the alias points to.
+
 ## Table date\_fields\_l10n
 
 - `date_field_id`
@@ -8767,6 +9456,111 @@ The tables used are as follows, in alphabetical order:
 
     A string field.
 
+## Table person\_name\_formats
+
+- `pers_name_fmt_id`
+
+    An integer field. Primary key, automatically generated by SQLite.
+
+- `locale`
+
+    A string field. The locale to which this format pattern applies. Foreign key into table [locales](#table-locales).
+
+- `name_order`
+
+    A string field. The ordering convention for this pattern. Known values: `givenFirst`, `surnameFirst`, `sorting`.
+
+- `name_length`
+
+    A string field. The relative length of the formatted name. Known values: `long`, `medium`, `short`.
+
+- `name_usage`
+
+    A string field. The context of use. Known values: `referring`, `addressing`, `monogram`.
+
+- `name_formality`
+
+    A string field. The social register. Known values: `formal`, `informal`.
+
+- `alt`
+
+    A nullable string field. `NULL` for the primary pattern. The value `1` identifies an alternate pattern within the same context, used when a locale provides two patterns covering different combinations of name fields (such as one including `surname2` and one without).
+
+- `name_pattern`
+
+    A string field of up to 120 characters. The format pattern using CLDR placeholder notation. Example: `{surname} {given2} {given}{title}`
+
+## Table person\_name\_initial\_patterns
+
+- `pers_name_init_id`
+
+    An integer field. Primary key, automatically generated by SQLite.
+
+- `locale`
+
+    A string field. The locale for which this initial pattern applies. Foreign key into table [locales](#table-locales). Only approximately 19 locales define these explicitly; all others use the root locale defaults.
+
+- `pattern_type`
+
+    A string field. Known values: `initial` and `initialSequence`.
+
+    `initial` is the pattern used to render a single initial from one word, for example `{0}.` produces `W.` from `Wolcott`.
+
+    `initialSequence` is the pattern for joining multiple initials from a multi-word field, for example `{0} {1}` produces `W. J.` from `Wolcott Janus`, while `{0}{1}` (no space) produces `WJ`.
+
+- `pattern_value`
+
+    A string field. The pattern itself, using `{0}` and `{1}` as positional placeholders.
+
+- `is_draft`
+
+    A boolean field. `TRUE` if the CLDR entry is marked `draft="unconfirmed"`.
+
+## Table person\_name\_order\_locales
+
+- `pers_name_ord_id`
+
+    An integer field. Primary key, automatically generated by SQLite.
+
+- `locale`
+
+    A string field. The display locale, i.e. the locale doing the rendering.
+    Foreign key into table [locales](#table-locales).
+
+- `name_locale`
+
+    A string field. The locale whose names are being ordered. May be `und` for the catch-all fallback, or `und-XX` for a region-scoped fallback such as `und-JP`. Not a foreign key because `und` and region-scoped values are not always present as rows in the locales table.
+
+- `name_order`
+
+    A string field. The ordering to apply to names from `name_locale` when displaying them in `locale`. Known values: `givenFirst`, `surnameFirst`.
+
+- `is_draft`
+
+    A boolean field. `TRUE` if the CLDR entry is marked `draft="unconfirmed"`.
+
+## Table person\_name\_samples
+
+- `pers_name_samp_id`
+
+    An integer field. Primary key, automatically generated by SQLite.
+
+- `locale`
+
+    A string field. The locale to which this sample belongs. Foreign key into table [locales](#table-locales).
+
+- `sample_type`
+
+    A string field. The category of the sample name. Known values: `nativeG`, `nativeGS`, `nativeGGS`, `nativeFull`, `foreignG`, `foreignGS`, `foreignGGS`, `foreignFull`. These may change in future CLDR versions.
+
+- `field_type`
+
+    A string field. The name component type. Known values: `given`, `given2`, `given-informal`, `surname`, `surname-prefix`, `surname-core`, `surname2`, `title`, `generation`, `credentials`.
+
+- `field_value`
+
+    A text field. The sample value for this name component. The value `∅∅∅` is a CLDR convention indicating an explicitly absent field.
+
 ## Table rbnf
 
 - `rbnf_id`
@@ -9040,6 +9834,36 @@ The tables used are as follows, in alphabetical order:
 - `time_allowed`
 
     A string array field.
+
+## Table time\_relative\_l10n
+
+- `time_relative_id`
+
+    An integer field.
+
+- `locale`
+
+    A string field.
+
+- `field_type`
+
+    A string field.
+
+- `field_length`
+
+    A string field.
+
+- `relative`
+
+    An integer field.
+
+- `format_pattern`
+
+    A string field.
+
+- `count`
+
+    A string field.
 
 ## Table timezones
 

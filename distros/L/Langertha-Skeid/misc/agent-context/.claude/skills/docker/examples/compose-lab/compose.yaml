@@ -1,0 +1,34 @@
+name: docker-skill-lab
+include:
+  - ./modules/tools/compose.yaml
+services:
+  app:
+    image: docker-skill-lab-app:local
+    build:
+      context: ./app
+    init: true
+    read_only: true
+    cap_drop: [ALL]
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      APP_MODE: "${APP_MODE:-lab}"
+      STATE_DIR: /state
+    ports:
+      - "127.0.0.1:${APP_PORT:-18080}:8080"
+    volumes:
+      - app-state:/state
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=16m
+    mem_limit: 128m
+    cpus: 0.5
+    pids_limit: 64
+    stop_grace_period: 10s
+    restart: "no"
+    logging:
+      driver: local
+      options:
+        max-size: "5m"
+        max-file: "2"
+volumes:
+  app-state: {}

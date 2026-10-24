@@ -105,8 +105,14 @@ my $listing = rpc ("tools/list", {});
 is_deeply [sort map $_->{name}, @{$listing->{result}{tools}}],
    ["add-element", "execute", "meta-instructions", "tabs"], "browser toolset includes instructions";
 like +(grep { $_->{name} eq "execute" } @{$listing->{result}{tools}})[0]{description},
-   qr/single expression returns implicitly.*statement body needs explicit return/, "tool advertises expression/body contract";
+   qr/Single expression returns implicitly.*body needs explicit return/, "tool advertises expression/body contract";
 my ($execute_tool) = grep { $_->{name} eq "execute" } @{$listing->{result}{tools}};
+like $execute_tool->{description}, qr/CODE becomes body of async \(\) => CODE; supply CODE, not arrow-function wrapper/,
+   "execute documents injected wrapper and forbids supplying it";
+like $execute_tool->{description}, qr/NOT async \(\) => .*returns function, rejected/,
+   "execute advertises wrong-wrapper failure";
+like $execute_tool->{inputSchema}{properties}{code}{description}, qr/Do not include async \(\) => wrapper/,
+   "code argument documents expression/body rather than wrapper";
 is $execute_tool->{inputSchema}{properties}{max_bytes}{default}, 16384, "16 KiB default result budget";
 is $execute_tool->{inputSchema}{properties}{max_bytes}{maximum}, 2097152, "2 MiB maximum result budget";
 my ($element_tool) = grep { $_->{name} eq "add-element" } @{$listing->{result}{tools}};

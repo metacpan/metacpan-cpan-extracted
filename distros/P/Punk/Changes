@@ -1,5 +1,8 @@
 Revision history for Punk
 
+0.66    2026-10-23
+        - Add $c->escape_html to escape html
+
 0.65    2026-10-21
         - Add Punk::Model::Computed, a base for read-only backends whose
           rows are worked out from the question.

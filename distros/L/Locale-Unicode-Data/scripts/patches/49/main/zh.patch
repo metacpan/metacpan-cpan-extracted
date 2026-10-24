@@ -1,0 +1,12 @@
+--- zh.xml
++++ zh.xml
+@@ -5964,6 +5964,9 @@
+ 			<currency type="CNH">
+ 				<displayName>人民币（离岸）</displayName>
+ 			</currency>
++			<currency type="CNX">
++				<displayName draft="contributed">中国人民银行元</displayName>
++			</currency>
+ 			<currency type="CNY">
+ 				<displayName>人民币</displayName>
+ 				<symbol>¥</symbol>

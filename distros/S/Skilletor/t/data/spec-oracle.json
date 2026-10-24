@@ -1,0 +1,4379 @@
+[
+ {
+  "spec": "node:test",
+  "error": "cannot resolve \"node:test\": unknown prefix \"node:\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "node:assert/strict",
+  "error": "cannot resolve \"node:assert/strict\": unknown prefix \"node:\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "../src/spec.ts",
+  "result": {
+   "kind": "local",
+   "value": "../src/spec.ts",
+   "derivedName": "spec-ts"
+  },
+  "probed": []
+ },
+ {
+  "spec": "probe must not be called for this spec",
+  "error": "cannot resolve \"probe must not be called for this spec\": GitHub owner \"probe must not be called for this spec\" may only contain ASCII letters, digits and \"-\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "git",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/git/skills",
+   "derivedName": "git"
+  },
+  "probed": []
+ },
+ {
+  "spec": "url",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/url/skills",
+   "derivedName": "url"
+  },
+  "probed": []
+ },
+ {
+  "spec": "local",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/local/skills",
+   "derivedName": "local"
+  },
+  "probed": []
+ },
+ {
+  "spec": "/abs/path/myskills",
+  "result": {
+   "kind": "local",
+   "value": "/abs/path/myskills",
+   "derivedName": "myskills"
+  },
+  "probed": []
+ },
+ {
+  "spec": "myskills",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/myskills/skills",
+   "derivedName": "myskills"
+  },
+  "probed": []
+ },
+ {
+  "spec": "./rel",
+  "result": {
+   "kind": "local",
+   "value": "./rel",
+   "derivedName": "rel"
+  },
+  "probed": []
+ },
+ {
+  "spec": "rel",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/rel/skills",
+   "derivedName": "rel"
+  },
+  "probed": []
+ },
+ {
+  "spec": "~/dev/skills",
+  "result": {
+   "kind": "local",
+   "value": "~/dev/skills",
+   "derivedName": "skills"
+  },
+  "probed": []
+ },
+ {
+  "spec": "skills",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/skills/skills",
+   "derivedName": "skills"
+  },
+  "probed": []
+ },
+ {
+  "spec": "../up/skills/",
+  "result": {
+   "kind": "local",
+   "value": "../up/skills/",
+   "derivedName": "skills"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://github.com/Getty/skills",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/Getty/skills",
+   "derivedName": "getty"
+  },
+  "probed": []
+ },
+ {
+  "spec": "getty",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/getty/skills",
+   "derivedName": "getty"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://example.com/s.tar.gz",
+  "result": {
+   "kind": "url",
+   "value": "https://example.com/s.tar.gz",
+   "derivedName": "example-com"
+  },
+  "probed": []
+ },
+ {
+  "spec": "example-com",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/example-com/skills",
+   "derivedName": "example-com"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://example.com/s.tgz",
+  "result": {
+   "kind": "url",
+   "value": "https://example.com/s.tgz",
+   "derivedName": "example-com"
+  },
+  "probed": []
+ },
+ {
+  "spec": "git@github.com:Getty/skills.git",
+  "result": {
+   "kind": "git",
+   "value": "git@github.com:Getty/skills.git",
+   "derivedName": "getty"
+  },
+  "probed": []
+ },
+ {
+  "spec": "ssh://git@example.com/Getty/skills",
+  "result": {
+   "kind": "git",
+   "value": "ssh://git@example.com/Getty/skills",
+   "derivedName": "getty"
+  },
+  "probed": []
+ },
+ {
+  "spec": "github:Getty/repo",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/Getty/repo",
+   "derivedName": "repo"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://github.com/Getty/repo",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/Getty/repo",
+   "derivedName": "repo"
+  },
+  "probed": []
+ },
+ {
+  "spec": "repo",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/repo/skills",
+   "derivedName": "repo"
+  },
+  "probed": []
+ },
+ {
+  "spec": "Getty",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/Getty/skills",
+   "derivedName": "getty"
+  },
+  "probed": []
+ },
+ {
+  "spec": "GETTY",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/GETTY/skills",
+   "derivedName": "getty"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://github.com/GETTY/skills",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/GETTY/skills",
+   "derivedName": "getty"
+  },
+  "probed": []
+ },
+ {
+  "spec": "Getty/repo",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/Getty/repo",
+   "derivedName": "repo"
+  },
+  "probed": []
+ },
+ {
+  "spec": "hf.co/user",
+  "result": {
+   "kind": "git",
+   "value": "https://hf.co/user/skills",
+   "derivedName": "user"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://hf.co/user/skills",
+  "result": {
+   "kind": "git",
+   "value": "https://hf.co/user/skills",
+   "derivedName": "user"
+  },
+  "probed": []
+ },
+ {
+  "spec": "user",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/user/skills",
+   "derivedName": "user"
+  },
+  "probed": []
+ },
+ {
+  "spec": "hf.co/user/repo",
+  "result": {
+   "kind": "git",
+   "value": "https://hf.co/user/repo",
+   "derivedName": "repo"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://hf.co/user/repo",
+  "result": {
+   "kind": "git",
+   "value": "https://hf.co/user/repo",
+   "derivedName": "repo"
+  },
+  "probed": []
+ },
+ {
+  "spec": "huggingface.co/user",
+  "result": {
+   "kind": "git",
+   "value": "https://huggingface.co/user/skills",
+   "derivedName": "user"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://huggingface.co/user/skills",
+  "result": {
+   "kind": "git",
+   "value": "https://huggingface.co/user/skills",
+   "derivedName": "user"
+  },
+  "probed": []
+ },
+ {
+  "spec": "codeberg.org/u",
+  "result": {
+   "kind": "git",
+   "value": "https://codeberg.org/u/skills",
+   "derivedName": "u"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://codeberg.org/u/skills",
+  "result": {
+   "kind": "git",
+   "value": "https://codeberg.org/u/skills",
+   "derivedName": "u"
+  },
+  "probed": []
+ },
+ {
+  "spec": "u",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/u/skills",
+   "derivedName": "u"
+  },
+  "probed": []
+ },
+ {
+  "spec": "gitlab.com/u/r",
+  "result": {
+   "kind": "git",
+   "value": "https://gitlab.com/u/r",
+   "derivedName": "r"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://gitlab.com/u/r",
+  "result": {
+   "kind": "git",
+   "value": "https://gitlab.com/u/r",
+   "derivedName": "r"
+  },
+  "probed": []
+ },
+ {
+  "spec": "r",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/r/skills",
+   "derivedName": "r"
+  },
+  "probed": []
+ },
+ {
+  "spec": "Getty/karr",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/Getty/karr",
+   "derivedName": "karr"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://github.com/Getty/karr",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/Getty/karr",
+   "derivedName": "karr"
+  },
+  "probed": []
+ },
+ {
+  "spec": "karr",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/karr/skills",
+   "derivedName": "karr"
+  },
+  "probed": []
+ },
+ {
+  "spec": "obra/superpowers",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/obra/superpowers",
+   "derivedName": "superpowers"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://github.com/obra/superpowers",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/obra/superpowers",
+   "derivedName": "superpowers"
+  },
+  "probed": []
+ },
+ {
+  "spec": "superpowers",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/superpowers/skills",
+   "derivedName": "superpowers"
+  },
+  "probed": []
+ },
+ {
+  "spec": "github:Getty/karr",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/Getty/karr",
+   "derivedName": "karr"
+  },
+  "probed": []
+ },
+ {
+  "spec": "gitlab.com/u/tools",
+  "result": {
+   "kind": "git",
+   "value": "https://gitlab.com/u/tools",
+   "derivedName": "tools"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://gitlab.com/u/tools",
+  "result": {
+   "kind": "git",
+   "value": "https://gitlab.com/u/tools",
+   "derivedName": "tools"
+  },
+  "probed": []
+ },
+ {
+  "spec": "tools",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/tools/skills",
+   "derivedName": "tools"
+  },
+  "probed": []
+ },
+ {
+  "spec": "Getty/My_Repo.git",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/Getty/My_Repo.git",
+   "derivedName": "my-repo"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://github.com/Getty/My_Repo.git",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/Getty/My_Repo.git",
+   "derivedName": "my-repo"
+  },
+  "probed": []
+ },
+ {
+  "spec": "my-repo",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/my-repo/skills",
+   "derivedName": "my-repo"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://github.com/Getty/karr.git",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/Getty/karr.git",
+   "derivedName": "karr"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://github.com/Getty/karr/",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/Getty/karr/",
+   "derivedName": "karr"
+  },
+  "probed": []
+ },
+ {
+  "spec": "git@github.com:Getty/karr.git",
+  "result": {
+   "kind": "git",
+   "value": "git@github.com:Getty/karr.git",
+   "derivedName": "karr"
+  },
+  "probed": []
+ },
+ {
+  "spec": "ssh://git@example.com/Getty/karr.git",
+  "result": {
+   "kind": "git",
+   "value": "ssh://git@example.com/Getty/karr.git",
+   "derivedName": "karr"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://gitlab.com/group/sub/Tools.git",
+  "result": {
+   "kind": "git",
+   "value": "https://gitlab.com/group/sub/Tools.git",
+   "derivedName": "tools"
+  },
+  "probed": []
+ },
+ {
+  "spec": "anthropics",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/anthropics/skills",
+   "derivedName": "anthropics"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://github.com/anthropics/skills",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/anthropics/skills",
+   "derivedName": "anthropics"
+  },
+  "probed": []
+ },
+ {
+  "spec": "github:Getty",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/Getty/skills",
+   "derivedName": "getty"
+  },
+  "probed": []
+ },
+ {
+  "spec": "Getty/skills",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/Getty/skills",
+   "derivedName": "getty"
+  },
+  "probed": []
+ },
+ {
+  "spec": "Getty/Skills.git",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/Getty/Skills.git",
+   "derivedName": "getty"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://github.com/Getty/Skills.git",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/Getty/Skills.git",
+   "derivedName": "getty"
+  },
+  "probed": []
+ },
+ {
+  "spec": "github.com/u",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/u/skills",
+   "derivedName": "u"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://github.com/u/skills",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/u/skills",
+   "derivedName": "u"
+  },
+  "probed": []
+ },
+ {
+  "spec": "gitlab.com/u/skills",
+  "result": {
+   "kind": "git",
+   "value": "https://gitlab.com/u/skills",
+   "derivedName": "u"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://gitlab.com/u/skills",
+  "result": {
+   "kind": "git",
+   "value": "https://gitlab.com/u/skills",
+   "derivedName": "u"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://github.com/Getty/skills.git",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/Getty/skills.git",
+   "derivedName": "getty"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://gitlab.com/group/sub/skills",
+  "result": {
+   "kind": "git",
+   "value": "https://gitlab.com/group/sub/skills",
+   "derivedName": "group"
+  },
+  "probed": []
+ },
+ {
+  "spec": "group",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/group/skills",
+   "derivedName": "group"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://example.com/Tools.git",
+  "result": {
+   "kind": "git",
+   "value": "https://example.com/Tools.git",
+   "derivedName": "tools"
+  },
+  "probed": []
+ },
+ {
+  "spec": "git@example.com:tools.git",
+  "result": {
+   "kind": "git",
+   "value": "git@example.com:tools.git",
+   "derivedName": "tools"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://example.com/org/pack.tar.gz",
+  "result": {
+   "kind": "url",
+   "value": "https://example.com/org/pack.tar.gz",
+   "derivedName": "example-com"
+  },
+  "probed": []
+ },
+ {
+  "spec": "~/dev/karr",
+  "result": {
+   "kind": "local",
+   "value": "~/dev/karr",
+   "derivedName": "karr"
+  },
+  "probed": []
+ },
+ {
+  "spec": "github:Getty/",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/Getty/skills",
+   "derivedName": "getty"
+  },
+  "probed": []
+ },
+ {
+  "spec": "github:Getty//",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/Getty/skills",
+   "derivedName": "getty"
+  },
+  "probed": []
+ },
+ {
+  "spec": "github:Getty//karr",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/Getty/karr",
+   "derivedName": "karr"
+  },
+  "probed": []
+ },
+ {
+  "spec": "Getty/",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/Getty/skills",
+   "derivedName": "getty"
+  },
+  "probed": []
+ },
+ {
+  "spec": "Getty//karr",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/Getty/karr",
+   "derivedName": "karr"
+  },
+  "probed": []
+ },
+ {
+  "spec": "github.com/Getty/",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/Getty/skills",
+   "derivedName": "getty"
+  },
+  "probed": []
+ },
+ {
+  "spec": "github.com/Getty//karr",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/Getty/karr",
+   "derivedName": "karr"
+  },
+  "probed": []
+ },
+ {
+  "spec": "gitlab.com/u/",
+  "result": {
+   "kind": "git",
+   "value": "https://gitlab.com/u/skills",
+   "derivedName": "u"
+  },
+  "probed": []
+ },
+ {
+  "spec": "GitHub:Getty",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/Getty/skills",
+   "derivedName": "getty"
+  },
+  "probed": []
+ },
+ {
+  "spec": "GITHUB:Getty/karr",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/Getty/karr",
+   "derivedName": "karr"
+  },
+  "probed": []
+ },
+ {
+  "spec": "Github:Getty/",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/Getty/skills",
+   "derivedName": "getty"
+  },
+  "probed": []
+ },
+ {
+  "spec": "HTTPS://host/x.tar.gz",
+  "result": {
+   "kind": "url",
+   "value": "https://host/x.tar.gz",
+   "derivedName": "host"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://host/x.tar.gz",
+  "result": {
+   "kind": "url",
+   "value": "https://host/x.tar.gz",
+   "derivedName": "host"
+  },
+  "probed": []
+ },
+ {
+  "spec": "host",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/host/skills",
+   "derivedName": "host"
+  },
+  "probed": []
+ },
+ {
+  "spec": "HTTPS://Host/X.tar.gz",
+  "result": {
+   "kind": "url",
+   "value": "https://Host/X.tar.gz",
+   "derivedName": "host"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://Host/X.tar.gz",
+  "result": {
+   "kind": "url",
+   "value": "https://Host/X.tar.gz",
+   "derivedName": "host"
+  },
+  "probed": []
+ },
+ {
+  "spec": "Https://github.com/Getty/karr",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/Getty/karr",
+   "derivedName": "karr"
+  },
+  "probed": []
+ },
+ {
+  "spec": "SSH://git@Example.com/Getty/Karr.git",
+  "result": {
+   "kind": "git",
+   "value": "ssh://git@Example.com/Getty/Karr.git",
+   "derivedName": "karr"
+  },
+  "probed": []
+ },
+ {
+  "spec": "ssh://git@Example.com/Getty/Karr.git",
+  "result": {
+   "kind": "git",
+   "value": "ssh://git@Example.com/Getty/Karr.git",
+   "derivedName": "karr"
+  },
+  "probed": []
+ },
+ {
+  "spec": "Git+SSH://git@host/o/r",
+  "result": {
+   "kind": "git",
+   "value": "git+ssh://git@host/o/r",
+   "derivedName": "r"
+  },
+  "probed": []
+ },
+ {
+  "spec": "git+ssh://git@host/o/r",
+  "result": {
+   "kind": "git",
+   "value": "git+ssh://git@host/o/r",
+   "derivedName": "r"
+  },
+  "probed": []
+ },
+ {
+  "spec": "HTTP://Host/x.tar.gz",
+  "result": {
+   "kind": "url",
+   "value": "http://Host/x.tar.gz",
+   "derivedName": "host"
+  },
+  "probed": []
+ },
+ {
+  "spec": "http://Host/x.tar.gz",
+  "result": {
+   "kind": "url",
+   "value": "http://Host/x.tar.gz",
+   "derivedName": "host"
+  },
+  "probed": []
+ },
+ {
+  "spec": "FILE:///Tmp/X",
+  "result": {
+   "kind": "git",
+   "value": "file:///Tmp/X",
+   "derivedName": "x"
+  },
+  "probed": []
+ },
+ {
+  "spec": "file:///Tmp/X",
+  "result": {
+   "kind": "git",
+   "value": "file:///Tmp/X",
+   "derivedName": "x"
+  },
+  "probed": []
+ },
+ {
+  "spec": "x",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/x/skills",
+   "derivedName": "x"
+  },
+  "probed": []
+ },
+ {
+  "spec": "http://host/x.tar.gz",
+  "result": {
+   "kind": "url",
+   "value": "http://host/x.tar.gz",
+   "derivedName": "host"
+  },
+  "probed": []
+ },
+ {
+  "spec": "file:///tmp/x",
+  "result": {
+   "kind": "git",
+   "value": "file:///tmp/x",
+   "derivedName": "x"
+  },
+  "probed": []
+ },
+ {
+  "spec": "git://example.com/Getty/karr",
+  "result": {
+   "kind": "git",
+   "value": "git://example.com/Getty/karr",
+   "derivedName": "karr"
+  },
+  "probed": []
+ },
+ {
+  "spec": "Git@GitHub.com:Getty/karr.git",
+  "result": {
+   "kind": "git",
+   "value": "Git@GitHub.com:Getty/karr.git",
+   "derivedName": "karr"
+  },
+  "probed": []
+ },
+ {
+  "spec": "user:pw@host:o/r",
+  "result": {
+   "kind": "git",
+   "value": "user:pw@host:o/r",
+   "derivedName": "r"
+  },
+  "probed": []
+ },
+ {
+  "spec": "/abs/with:colon",
+  "result": {
+   "kind": "local",
+   "value": "/abs/with:colon",
+   "derivedName": "with-colon"
+  },
+  "probed": []
+ },
+ {
+  "spec": "with-colon",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/with-colon/skills",
+   "derivedName": "with-colon"
+  },
+  "probed": []
+ },
+ {
+  "spec": "./rel:colon",
+  "result": {
+   "kind": "local",
+   "value": "./rel:colon",
+   "derivedName": "rel-colon"
+  },
+  "probed": []
+ },
+ {
+  "spec": "rel-colon",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/rel-colon/skills",
+   "derivedName": "rel-colon"
+  },
+  "probed": []
+ },
+ {
+  "spec": "../x:y",
+  "result": {
+   "kind": "local",
+   "value": "../x:y",
+   "derivedName": "x-y"
+  },
+  "probed": []
+ },
+ {
+  "spec": "x-y",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/x-y/skills",
+   "derivedName": "x-y"
+  },
+  "probed": []
+ },
+ {
+  "spec": "~/dir:x",
+  "result": {
+   "kind": "local",
+   "value": "~/dir:x",
+   "derivedName": "dir-x"
+  },
+  "probed": []
+ },
+ {
+  "spec": "dir-x",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/dir-x/skills",
+   "derivedName": "dir-x"
+  },
+  "probed": []
+ },
+ {
+  "spec": "my-org/my.repo_x",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/my-org/my.repo_x",
+   "derivedName": "my-repo-x"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://github.com/my-org/my.repo_x",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/my-org/my.repo_x",
+   "derivedName": "my-repo-x"
+  },
+  "probed": []
+ },
+ {
+  "spec": "my-repo-x",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/my-repo-x/skills",
+   "derivedName": "my-repo-x"
+  },
+  "probed": []
+ },
+ {
+  "spec": "github:my-org/my.repo_x",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/my-org/my.repo_x",
+   "derivedName": "my-repo-x"
+  },
+  "probed": []
+ },
+ {
+  "spec": "github.com/my-org/my.repo_x",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/my-org/my.repo_x",
+   "derivedName": "my-repo-x"
+  },
+  "probed": []
+ },
+ {
+  "spec": "123/456",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/123/456",
+   "derivedName": "456"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://github.com/123/456",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/123/456",
+   "derivedName": "456"
+  },
+  "probed": []
+ },
+ {
+  "spec": "456",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/456/skills",
+   "derivedName": "456"
+  },
+  "probed": []
+ },
+ {
+  "spec": "gitlab.com/group.name/sub_repo",
+  "result": {
+   "kind": "git",
+   "value": "https://gitlab.com/group.name/sub_repo",
+   "derivedName": "sub-repo"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://gitlab.com/group.name/sub_repo",
+  "result": {
+   "kind": "git",
+   "value": "https://gitlab.com/group.name/sub_repo",
+   "derivedName": "sub-repo"
+  },
+  "probed": []
+ },
+ {
+  "spec": "sub-repo",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/sub-repo/skills",
+   "derivedName": "sub-repo"
+  },
+  "probed": []
+ },
+ {
+  "spec": "codeberg.org/user_name/re.po",
+  "result": {
+   "kind": "git",
+   "value": "https://codeberg.org/user_name/re.po",
+   "derivedName": "re-po"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://codeberg.org/user_name/re.po",
+  "result": {
+   "kind": "git",
+   "value": "https://codeberg.org/user_name/re.po",
+   "derivedName": "re-po"
+  },
+  "probed": []
+ },
+ {
+  "spec": "re-po",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/re-po/skills",
+   "derivedName": "re-po"
+  },
+  "probed": []
+ },
+ {
+  "spec": "hf.co/Org-X/model_1",
+  "result": {
+   "kind": "git",
+   "value": "https://hf.co/Org-X/model_1",
+   "derivedName": "model-1"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://hf.co/Org-X/model_1",
+  "result": {
+   "kind": "git",
+   "value": "https://hf.co/Org-X/model_1",
+   "derivedName": "model-1"
+  },
+  "probed": []
+ },
+ {
+  "spec": "model-1",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/model-1/skills",
+   "derivedName": "model-1"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://github.com//skills",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com//skills",
+   "derivedName": "skills"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://github.com/a b/re:po",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/a b/re:po",
+   "derivedName": "re-po"
+  },
+  "probed": []
+ },
+ {
+  "spec": "ssh+git://git@host/o/r",
+  "result": {
+   "kind": "git",
+   "value": "ssh+git://git@host/o/r",
+   "derivedName": "r"
+  },
+  "probed": []
+ },
+ {
+  "spec": "ftp://host.example/o/r",
+  "result": {
+   "kind": "git",
+   "value": "ftp://host.example/o/r",
+   "derivedName": "r"
+  },
+  "probed": []
+ },
+ {
+  "spec": "foo://bar",
+  "result": {
+   "kind": "git",
+   "value": "foo://bar",
+   "derivedName": "bar"
+  },
+  "probed": []
+ },
+ {
+  "spec": "bar",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/bar/skills",
+   "derivedName": "bar"
+  },
+  "probed": []
+ },
+ {
+  "spec": "FOO://bar",
+  "result": {
+   "kind": "git",
+   "value": "foo://bar",
+   "derivedName": "bar"
+  },
+  "probed": []
+ },
+ {
+  "spec": "codecommit://my-repo",
+  "result": {
+   "kind": "git",
+   "value": "codecommit://my-repo",
+   "derivedName": "my-repo"
+  },
+  "probed": []
+ },
+ {
+  "spec": "persistent-https://host/o/r",
+  "result": {
+   "kind": "git",
+   "value": "persistent-https://host/o/r",
+   "derivedName": "r"
+  },
+  "probed": []
+ },
+ {
+  "spec": "x-tar-gz",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/x-tar-gz/skills",
+   "derivedName": "x-tar-gz"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://host/X.TAR.GZ",
+  "result": {
+   "kind": "url",
+   "value": "https://host/X.TAR.GZ",
+   "derivedName": "host"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://host/x.TGZ",
+  "result": {
+   "kind": "url",
+   "value": "https://host/x.TGZ",
+   "derivedName": "host"
+  },
+  "probed": []
+ },
+ {
+  "spec": "HTTPS://Host/X.Tar.Gz",
+  "result": {
+   "kind": "url",
+   "value": "https://Host/X.Tar.Gz",
+   "derivedName": "host"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://Host/X.Tar.Gz",
+  "result": {
+   "kind": "url",
+   "value": "https://Host/X.Tar.Gz",
+   "derivedName": "host"
+  },
+  "probed": []
+ },
+ {
+  "spec": "git@host.example:team/X.TGZ",
+  "result": {
+   "kind": "url",
+   "value": "git@host.example:team/X.TGZ",
+   "derivedName": "team"
+  },
+  "probed": []
+ },
+ {
+  "spec": "team",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/team/skills",
+   "derivedName": "team"
+  },
+  "probed": []
+ },
+ {
+  "spec": "github:Getty/ /x",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/Getty/x",
+   "derivedName": "x"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://github.com/Getty/x",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/Getty/x",
+   "derivedName": "x"
+  },
+  "probed": []
+ },
+ {
+  "spec": "github:Getty/ /",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/Getty/skills",
+   "derivedName": "getty"
+  },
+  "probed": []
+ },
+ {
+  "spec": "Getty/ /karr",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/Getty/karr",
+   "derivedName": "karr"
+  },
+  "probed": []
+ },
+ {
+  "spec": "Getty/\t/",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/Getty/skills",
+   "derivedName": "getty"
+  },
+  "probed": []
+ },
+ {
+  "spec": "github.com/Getty/ /karr",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/Getty/karr",
+   "derivedName": "karr"
+  },
+  "probed": []
+ },
+ {
+  "spec": "gitlab.com/u/ /r",
+  "result": {
+   "kind": "git",
+   "value": "https://gitlab.com/u/r",
+   "derivedName": "r"
+  },
+  "probed": []
+ },
+ {
+  "spec": "codecommit:",
+  "error": "cannot resolve \"codecommit:\": unknown prefix \"codecommit:\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "+",
+  "error": "cannot resolve \"+\": GitHub owner \"+\" may only contain ASCII letters, digits and \"-\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": ".",
+  "error": "cannot resolve \".\": neither https://./skills (git) nor https://./skills.tar.gz (tarball) responded",
+  "probed": [
+   "https://./skills"
+  ]
+ },
+ {
+  "spec": "-",
+  "error": "cannot resolve \"-\": a source must not start with \"-\"",
+  "probed": []
+ },
+ {
+  "spec": "::",
+  "error": "cannot resolve \"::\": unknown prefix \":\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "codecommit::us-east-1://my-repo",
+  "result": {
+   "kind": "git",
+   "value": "codecommit::us-east-1://my-repo",
+   "derivedName": "my-repo"
+  },
+  "probed": []
+ },
+ {
+  "spec": "codecommit::us-east-1://profile@my-repo",
+  "result": {
+   "kind": "git",
+   "value": "codecommit::us-east-1://profile@my-repo",
+   "derivedName": "my-repo"
+  },
+  "probed": []
+ },
+ {
+  "spec": "CodeCommit::US-East-1://Profile@My-Repo",
+  "result": {
+   "kind": "git",
+   "value": "CodeCommit::US-East-1://Profile@My-Repo",
+   "derivedName": "my-repo"
+  },
+  "probed": []
+ },
+ {
+  "spec": " codecommit::eu-west-1://tools ",
+  "result": {
+   "kind": "git",
+   "value": "codecommit::eu-west-1://tools",
+   "derivedName": "tools"
+  },
+  "probed": []
+ },
+ {
+  "spec": "codecommit::eu-west-1://tools",
+  "result": {
+   "kind": "git",
+   "value": "codecommit::eu-west-1://tools",
+   "derivedName": "tools"
+  },
+  "probed": []
+ },
+ {
+  "spec": "hg::https://hg.example.com/team/tools",
+  "result": {
+   "kind": "git",
+   "value": "hg::https://hg.example.com/team/tools",
+   "derivedName": "tools"
+  },
+  "probed": []
+ },
+ {
+  "spec": "hg::HTTPS://Host/Getty/skills",
+  "result": {
+   "kind": "git",
+   "value": "hg::HTTPS://Host/Getty/skills",
+   "derivedName": "getty"
+  },
+  "probed": []
+ },
+ {
+  "spec": "hg::https://host/x.tar.gz",
+  "result": {
+   "kind": "git",
+   "value": "hg::https://host/x.tar.gz",
+   "derivedName": "x-tar-gz"
+  },
+  "probed": []
+ },
+ {
+  "spec": "gcrypt::rsync://host/path/repo.git",
+  "result": {
+   "kind": "git",
+   "value": "gcrypt::rsync://host/path/repo.git",
+   "derivedName": "repo"
+  },
+  "probed": []
+ },
+ {
+  "spec": "gcrypt::git@host:team/secret.git",
+  "result": {
+   "kind": "git",
+   "value": "gcrypt::git@host:team/secret.git",
+   "derivedName": "secret"
+  },
+  "probed": []
+ },
+ {
+  "spec": "secret",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/secret/skills",
+   "derivedName": "secret"
+  },
+  "probed": []
+ },
+ {
+  "spec": "testgit::/srv/git/repo.git",
+  "result": {
+   "kind": "git",
+   "value": "testgit::/srv/git/repo.git",
+   "derivedName": "repo"
+  },
+  "probed": []
+ },
+ {
+  "spec": "bzr::lp:project",
+  "result": {
+   "kind": "git",
+   "value": "bzr::lp:project",
+   "derivedName": "lp-project"
+  },
+  "probed": []
+ },
+ {
+  "spec": "lp-project",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/lp-project/skills",
+   "derivedName": "lp-project"
+  },
+  "probed": []
+ },
+ {
+  "spec": "my.helper+x-1::addr",
+  "result": {
+   "kind": "git",
+   "value": "my.helper+x-1::addr",
+   "derivedName": "addr"
+  },
+  "probed": []
+ },
+ {
+  "spec": "addr",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/addr/skills",
+   "derivedName": "addr"
+  },
+  "probed": []
+ },
+ {
+  "spec": "github::Getty",
+  "result": {
+   "kind": "git",
+   "value": "github::Getty",
+   "derivedName": "getty"
+  },
+  "probed": []
+ },
+ {
+  "spec": "main",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/main/skills",
+   "derivedName": "main"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://github.com/Getty/karr/tree/main",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/Getty/karr",
+   "derivedName": "karr",
+   "ref": "main"
+  },
+  "probed": []
+ },
+ {
+  "spec": "github.com/Getty/karr/tree/main",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/Getty/karr",
+   "derivedName": "karr",
+   "ref": "main"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://github.com/Getty/karr/tree/main/",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/Getty/karr",
+   "derivedName": "karr",
+   "ref": "main"
+  },
+  "probed": []
+ },
+ {
+  "spec": " github.com/Getty/karr/tree/v1.2.0/ ",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/Getty/karr",
+   "derivedName": "karr",
+   "ref": "v1.2.0"
+  },
+  "probed": []
+ },
+ {
+  "spec": "v1.2.0",
+  "error": "cannot resolve \"v1.2.0\": neither https://v1.2.0/skills (git) nor https://v1.2.0/skills.tar.gz (tarball) responded",
+  "probed": [
+   "https://v1.2.0/skills"
+  ]
+ },
+ {
+  "spec": "HTTPS://GitHub.com/Getty/Karr/tree/v1",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/Getty/Karr",
+   "derivedName": "karr",
+   "ref": "v1"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://github.com/Getty/Karr",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/Getty/Karr",
+   "derivedName": "karr"
+  },
+  "probed": []
+ },
+ {
+  "spec": "v1",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/v1/skills",
+   "derivedName": "v1"
+  },
+  "probed": []
+ },
+ {
+  "spec": "GitHub.com/Getty/karr/tree/0f3a9c1",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/Getty/karr",
+   "derivedName": "karr",
+   "ref": "0f3a9c1"
+  },
+  "probed": []
+ },
+ {
+  "spec": "0f3a9c1",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/0f3a9c1/skills",
+   "derivedName": "0f3a9c1"
+  },
+  "probed": []
+ },
+ {
+  "spec": "github.com/Getty/skills/tree/main",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/Getty/skills",
+   "derivedName": "getty",
+   "ref": "main"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://github.com/obra/superpowers/tree/release-1.x",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/obra/superpowers",
+   "derivedName": "superpowers",
+   "ref": "release-1.x"
+  },
+  "probed": []
+ },
+ {
+  "spec": "release-1.x",
+  "error": "cannot resolve \"release-1.x\": neither https://release-1.x/skills (git) nor https://release-1.x/skills.tar.gz (tarball) responded",
+  "probed": [
+   "https://release-1.x/skills"
+  ]
+ },
+ {
+  "spec": "github.com/Getty//karr/tree/main",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/Getty/karr",
+   "derivedName": "karr",
+   "ref": "main"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://github.com/Getty/karr/tree/main~1",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/Getty/karr",
+   "derivedName": "karr",
+   "ref": "main~1"
+  },
+  "probed": []
+ },
+ {
+  "spec": "main~1",
+  "error": "cannot resolve \"main~1\": GitHub owner \"main~1\" may only contain ASCII letters, digits and \"-\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "#",
+  "error": "cannot resolve \"#\": GitHub owner \"#\" may only contain ASCII letters, digits and \"-\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "?",
+  "error": "cannot resolve \"?\": GitHub owner \"?\" may only contain ASCII letters, digits and \"-\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "https://github.com/Getty/karr/tree/main#installation",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/Getty/karr",
+   "derivedName": "karr",
+   "ref": "main"
+  },
+  "probed": []
+ },
+ {
+  "spec": "github.com/Getty/karr/tree/v1?tab=readme-ov-file",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/Getty/karr",
+   "derivedName": "karr",
+   "ref": "v1"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://github.com/Getty/karr/tree/v1/?x=a/b#c/d",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/Getty/karr",
+   "derivedName": "karr",
+   "ref": "v1"
+  },
+  "probed": []
+ },
+ {
+  "spec": "tree",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/tree/skills",
+   "derivedName": "tree"
+  },
+  "probed": []
+ },
+ {
+  "spec": "blob",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/blob/skills",
+   "derivedName": "blob"
+  },
+  "probed": []
+ },
+ {
+  "spec": "github.com/Getty/tree",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/Getty/tree",
+   "derivedName": "tree"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://github.com/Getty/tree",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/Getty/tree",
+   "derivedName": "tree"
+  },
+  "probed": []
+ },
+ {
+  "spec": "github.com/tree/blob",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/tree/blob",
+   "derivedName": "blob"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://github.com/tree/blob",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/tree/blob",
+   "derivedName": "blob"
+  },
+  "probed": []
+ },
+ {
+  "spec": "http://github.com/Getty/karr/tree/main",
+  "result": {
+   "kind": "git",
+   "value": "http://github.com/Getty/karr/tree/main",
+   "derivedName": "main"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://www.github.com/Getty/karr/tree/main",
+  "result": {
+   "kind": "git",
+   "value": "https://www.github.com/Getty/karr/tree/main",
+   "derivedName": "main"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://github.com/Getty/karr/archive/refs/tags/v1.tar.gz",
+  "result": {
+   "kind": "url",
+   "value": "https://github.com/Getty/karr/archive/refs/tags/v1.tar.gz",
+   "derivedName": "github-com"
+  },
+  "probed": []
+ },
+ {
+  "spec": "github-com",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/github-com/skills",
+   "derivedName": "github-com"
+  },
+  "probed": []
+ },
+ {
+  "spec": "/",
+  "result": {
+   "kind": "local",
+   "value": "/",
+   "derivedName": "source"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://github.com/NousResearch/hermes-agent/tree/main/optional-skills",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/NousResearch/hermes-agent",
+   "derivedName": "hermes-agent",
+   "ref": "main",
+   "path": "optional-skills"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://github.com/NousResearch/hermes-agent",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/NousResearch/hermes-agent",
+   "derivedName": "hermes-agent"
+  },
+  "probed": []
+ },
+ {
+  "spec": "hermes-agent",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/hermes-agent/skills",
+   "derivedName": "hermes-agent"
+  },
+  "probed": []
+ },
+ {
+  "spec": "optional-skills",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/optional-skills/skills",
+   "derivedName": "optional-skills"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://github.com/Getty/karr/tree/main/skills/foo",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/Getty/karr",
+   "derivedName": "karr",
+   "ref": "main",
+   "path": "skills/foo"
+  },
+  "probed": []
+ },
+ {
+  "spec": "skills/foo",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/skills/foo",
+   "derivedName": "foo"
+  },
+  "probed": []
+ },
+ {
+  "spec": "github.com/Getty/karr/tree/main/skills/",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/Getty/karr",
+   "derivedName": "karr",
+   "ref": "main",
+   "path": "skills"
+  },
+  "probed": []
+ },
+ {
+  "spec": " GitHub.com/Getty/karr/tree/v1.2.0//skills//research/ ",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/Getty/karr",
+   "derivedName": "karr",
+   "ref": "v1.2.0",
+   "path": "skills/research"
+  },
+  "probed": []
+ },
+ {
+  "spec": "skills/research",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/skills/research",
+   "derivedName": "research"
+  },
+  "probed": []
+ },
+ {
+  "spec": "HTTPS://GitHub.com/Getty/skills/tree/0f3a9c1/Skills/Research",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/Getty/skills",
+   "derivedName": "getty",
+   "ref": "0f3a9c1",
+   "path": "Skills/Research"
+  },
+  "probed": []
+ },
+ {
+  "spec": "Skills/Research",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/Skills/Research",
+   "derivedName": "research"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://github.com/Getty/karr/tree/main/skills/research?tab=readme-ov-file#usage",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/Getty/karr",
+   "derivedName": "karr",
+   "ref": "main",
+   "path": "skills/research"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://github.com/Getty/karr/tree/feature/x",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/Getty/karr",
+   "derivedName": "karr",
+   "ref": "feature",
+   "path": "x"
+  },
+  "probed": []
+ },
+ {
+  "spec": "feature",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/feature/skills",
+   "derivedName": "feature"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://github.com/Getty/karr/tree/main/skills/../..",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/Getty/karr",
+   "derivedName": "karr",
+   "ref": "main",
+   "path": "skills/../.."
+  },
+  "probed": []
+ },
+ {
+  "spec": "skills/../..",
+  "error": "cannot resolve \"skills/../..\": a GitHub \"..\" page is not a source; add https://github.com/skills/..",
+  "probed": []
+ },
+ {
+  "spec": "github.com/Getty/karr/tree/main/.",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/Getty/karr",
+   "derivedName": "karr",
+   "ref": "main",
+   "path": "."
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://github.com/Getty/karr#readme",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/Getty/karr",
+   "derivedName": "karr"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://github.com/Getty/karr?tab=readme-ov-file",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/Getty/karr",
+   "derivedName": "karr"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://github.com/Getty/karr/#readme",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/Getty/karr/",
+   "derivedName": "karr"
+  },
+  "probed": []
+ },
+ {
+  "spec": "HTTPS://GitHub.com/Getty/karr.git?x=1",
+  "result": {
+   "kind": "git",
+   "value": "https://GitHub.com/Getty/karr.git",
+   "derivedName": "karr"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://GitHub.com/Getty/karr.git",
+  "result": {
+   "kind": "git",
+   "value": "https://GitHub.com/Getty/karr.git",
+   "derivedName": "karr"
+  },
+  "probed": []
+ },
+ {
+  "spec": "github.com/Getty/karr?tab=readme-ov-file#x",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/Getty/karr",
+   "derivedName": "karr"
+  },
+  "probed": []
+ },
+ {
+  "spec": "Getty/karr#readme",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/Getty/karr",
+   "derivedName": "karr"
+  },
+  "probed": []
+ },
+ {
+  "spec": "github:Getty/karr?tab=x",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/Getty/karr",
+   "derivedName": "karr"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://gitlab.com/group/sub/Tools#readme",
+  "result": {
+   "kind": "git",
+   "value": "https://gitlab.com/group/sub/Tools",
+   "derivedName": "tools"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://gitlab.com/group/sub/Tools",
+  "result": {
+   "kind": "git",
+   "value": "https://gitlab.com/group/sub/Tools",
+   "derivedName": "tools"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://github.com/Getty/karr/releases/tag/v1.2.0",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/Getty/karr",
+   "derivedName": "karr",
+   "ref": "v1.2.0"
+  },
+  "probed": []
+ },
+ {
+  "spec": "github.com/Getty/karr/releases/tag/v1/",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/Getty/karr",
+   "derivedName": "karr",
+   "ref": "v1"
+  },
+  "probed": []
+ },
+ {
+  "spec": "github.com/Getty/karr/commit/0f3a9c1d",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/Getty/karr",
+   "derivedName": "karr",
+   "ref": "0f3a9c1d"
+  },
+  "probed": []
+ },
+ {
+  "spec": "0f3a9c1d",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/0f3a9c1d/skills",
+   "derivedName": "0f3a9c1d"
+  },
+  "probed": []
+ },
+ {
+  "spec": "Getty/karr/releases/tag/v1",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/Getty/karr",
+   "derivedName": "karr",
+   "ref": "v1"
+  },
+  "probed": []
+ },
+ {
+  "spec": "github:Getty/karr/commit/abc123#diff-1",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/Getty/karr",
+   "derivedName": "karr",
+   "ref": "abc123"
+  },
+  "probed": []
+ },
+ {
+  "spec": "abc123",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/abc123/skills",
+   "derivedName": "abc123"
+  },
+  "probed": []
+ },
+ {
+  "spec": "github:Getty/karr/tree/main",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/Getty/karr",
+   "derivedName": "karr",
+   "ref": "main"
+  },
+  "probed": []
+ },
+ {
+  "spec": "Getty/karr/tree/main",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/Getty/karr",
+   "derivedName": "karr",
+   "ref": "main"
+  },
+  "probed": []
+ },
+ {
+  "spec": "Getty/karr/tree/main/skills",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/Getty/karr",
+   "derivedName": "karr",
+   "ref": "main",
+   "path": "skills"
+  },
+  "probed": []
+ },
+ {
+  "spec": "github:Getty//karr/tree/v1/skills/research/",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/Getty/karr",
+   "derivedName": "karr",
+   "ref": "v1",
+   "path": "skills/research"
+  },
+  "probed": []
+ },
+ {
+  "spec": "Getty/skills/tree/main",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/Getty/skills",
+   "derivedName": "getty",
+   "ref": "main"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://github.com/Getty/karr/tree/main/my%20skills",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/Getty/karr",
+   "derivedName": "karr",
+   "ref": "main",
+   "path": "my skills"
+  },
+  "probed": []
+ },
+ {
+  "spec": "my skills",
+  "error": "cannot resolve \"my skills\": GitHub owner \"my skills\" may only contain ASCII letters, digits and \"-\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "https://github.com/Getty/karr/tree/feature%2Fx",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/Getty/karr",
+   "derivedName": "karr",
+   "ref": "feature/x"
+  },
+  "probed": []
+ },
+ {
+  "spec": "feature/x",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/feature/x",
+   "derivedName": "x"
+  },
+  "probed": []
+ },
+ {
+  "spec": "github.com/Getty/karr/tree/feature%2fx/skills",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/Getty/karr",
+   "derivedName": "karr",
+   "ref": "feature/x",
+   "path": "skills"
+  },
+  "probed": []
+ },
+ {
+  "spec": "github.com/Getty/karr/tree/v%C3%BC/a%2Fb",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/Getty/karr",
+   "derivedName": "karr",
+   "ref": "vü",
+   "path": "a/b"
+  },
+  "probed": []
+ },
+ {
+  "spec": "vü",
+  "error": "cannot resolve \"vü\": GitHub owner \"vü\" may only contain ASCII letters, digits and \"-\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "a/b",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/a/b",
+   "derivedName": "b"
+  },
+  "probed": []
+ },
+ {
+  "spec": "github.com/Getty/karr/releases/tag/v1%2B2",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/Getty/karr",
+   "derivedName": "karr",
+   "ref": "v1+2"
+  },
+  "probed": []
+ },
+ {
+  "spec": "v1+2",
+  "error": "cannot resolve \"v1+2\": GitHub owner \"v1+2\" may only contain ASCII letters, digits and \"-\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "https://gitlab.com/u/r/-/tree/main",
+  "result": {
+   "kind": "git",
+   "value": "https://gitlab.com/u/r",
+   "derivedName": "r",
+   "ref": "main"
+  },
+  "probed": []
+ },
+ {
+  "spec": "gitlab.com/u/r/-/tree/main",
+  "result": {
+   "kind": "git",
+   "value": "https://gitlab.com/u/r",
+   "derivedName": "r",
+   "ref": "main"
+  },
+  "probed": []
+ },
+ {
+  "spec": "GitLab.com/group/sub/repo/-/tree/v1/skills#x",
+  "result": {
+   "kind": "git",
+   "value": "https://gitlab.com/group/sub/repo",
+   "derivedName": "repo",
+   "ref": "v1",
+   "path": "skills"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://gitlab.com/group/sub/repo",
+  "result": {
+   "kind": "git",
+   "value": "https://gitlab.com/group/sub/repo",
+   "derivedName": "repo"
+  },
+  "probed": []
+ },
+ {
+  "spec": "gitlab.com/group/sub/repo",
+  "result": {
+   "kind": "git",
+   "value": "https://gitlab.com/group/sub/repo",
+   "derivedName": "repo"
+  },
+  "probed": []
+ },
+ {
+  "spec": "gitlab.com/u/r/-/commit/abc123",
+  "result": {
+   "kind": "git",
+   "value": "https://gitlab.com/u/r",
+   "derivedName": "r",
+   "ref": "abc123"
+  },
+  "probed": []
+ },
+ {
+  "spec": "gitlab.com/u/r/-/tags/v1",
+  "result": {
+   "kind": "git",
+   "value": "https://gitlab.com/u/r",
+   "derivedName": "r",
+   "ref": "v1"
+  },
+  "probed": []
+ },
+ {
+  "spec": "gitlab.com/u/r/-/releases/v1",
+  "result": {
+   "kind": "git",
+   "value": "https://gitlab.com/u/r",
+   "derivedName": "r",
+   "ref": "v1"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://codeberg.org/u/r/src/branch/main/skills",
+  "result": {
+   "kind": "git",
+   "value": "https://codeberg.org/u/r",
+   "derivedName": "r",
+   "ref": "main",
+   "path": "skills"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://codeberg.org/u/r",
+  "result": {
+   "kind": "git",
+   "value": "https://codeberg.org/u/r",
+   "derivedName": "r"
+  },
+  "probed": []
+ },
+ {
+  "spec": "codeberg.org/u/r/src/branch/main",
+  "result": {
+   "kind": "git",
+   "value": "https://codeberg.org/u/r",
+   "derivedName": "r",
+   "ref": "main"
+  },
+  "probed": []
+ },
+ {
+  "spec": "codeberg.org/u/r/src/tag/v1",
+  "result": {
+   "kind": "git",
+   "value": "https://codeberg.org/u/r",
+   "derivedName": "r",
+   "ref": "v1"
+  },
+  "probed": []
+ },
+ {
+  "spec": "codeberg.org/u/r/src/commit/abc123",
+  "result": {
+   "kind": "git",
+   "value": "https://codeberg.org/u/r",
+   "derivedName": "r",
+   "ref": "abc123"
+  },
+  "probed": []
+ },
+ {
+  "spec": "codeberg.org/u/r/releases/tag/v1",
+  "result": {
+   "kind": "git",
+   "value": "https://codeberg.org/u/r",
+   "derivedName": "r",
+   "ref": "v1"
+  },
+  "probed": []
+ },
+ {
+  "spec": "codeberg.org/u/r/commit/abc123",
+  "result": {
+   "kind": "git",
+   "value": "https://codeberg.org/u/r",
+   "derivedName": "r",
+   "ref": "abc123"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://huggingface.co/u/r/tree/main/skills",
+  "result": {
+   "kind": "git",
+   "value": "https://huggingface.co/u/r",
+   "derivedName": "r",
+   "ref": "main",
+   "path": "skills"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://huggingface.co/u/r",
+  "result": {
+   "kind": "git",
+   "value": "https://huggingface.co/u/r",
+   "derivedName": "r"
+  },
+  "probed": []
+ },
+ {
+  "spec": "hf.co/u/r/commit/abc123",
+  "result": {
+   "kind": "git",
+   "value": "https://hf.co/u/r",
+   "derivedName": "r",
+   "ref": "abc123"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://hf.co/u/r",
+  "result": {
+   "kind": "git",
+   "value": "https://hf.co/u/r",
+   "derivedName": "r"
+  },
+  "probed": []
+ },
+ {
+  "spec": "hf.co/datasets/u/r/tree/main",
+  "result": {
+   "kind": "git",
+   "value": "https://hf.co/datasets/u/r",
+   "derivedName": "r",
+   "ref": "main"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://hf.co/datasets/u/r",
+  "result": {
+   "kind": "git",
+   "value": "https://hf.co/datasets/u/r",
+   "derivedName": "r"
+  },
+  "probed": []
+ },
+ {
+  "spec": "hf.co/spaces/u/r",
+  "result": {
+   "kind": "git",
+   "value": "https://hf.co/spaces/u/r",
+   "derivedName": "r"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://hf.co/spaces/u/r",
+  "result": {
+   "kind": "git",
+   "value": "https://hf.co/spaces/u/r",
+   "derivedName": "r"
+  },
+  "probed": []
+ },
+ {
+  "spec": "hf.co/datasets/u",
+  "result": {
+   "kind": "git",
+   "value": "https://hf.co/datasets/u/skills",
+   "derivedName": "u"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://hf.co/datasets/u/skills",
+  "result": {
+   "kind": "git",
+   "value": "https://hf.co/datasets/u/skills",
+   "derivedName": "datasets"
+  },
+  "probed": []
+ },
+ {
+  "spec": "kind",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/kind/skills",
+   "derivedName": "kind"
+  },
+  "probed": []
+ },
+ {
+  "spec": "value",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/value/skills",
+   "derivedName": "value"
+  },
+  "probed": []
+ },
+ {
+  "spec": "derivedName",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/derivedName/skills",
+   "derivedName": "derivedname"
+  },
+  "probed": []
+ },
+ {
+  "spec": "ref",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/ref/skills",
+   "derivedName": "ref"
+  },
+  "probed": []
+ },
+ {
+  "spec": "path",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/path/skills",
+   "derivedName": "path"
+  },
+  "probed": []
+ },
+ {
+  "spec": "generic host, probe says git",
+  "error": "cannot resolve \"generic host, probe says git\": GitHub owner \"generic host, probe says git\" may only contain ASCII letters, digits and \"-\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "https://host.tld/skills",
+  "result": {
+   "kind": "git",
+   "value": "https://host.tld/skills",
+   "derivedName": "skills"
+  },
+  "probed": []
+ },
+ {
+  "spec": "host.tld",
+  "error": "cannot resolve \"host.tld\": neither https://host.tld/skills (git) nor https://host.tld/skills.tar.gz (tarball) responded",
+  "probed": [
+   "https://host.tld/skills"
+  ]
+ },
+ {
+  "spec": "host-tld",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/host-tld/skills",
+   "derivedName": "host-tld"
+  },
+  "probed": []
+ },
+ {
+  "spec": "generic host with trailing slash defaults to /skills",
+  "error": "cannot resolve \"generic host with trailing slash defaults to /skills\": GitHub owner \"generic host with trailing slash defaults to \" may only contain ASCII letters, digits and \"-\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "host.tld/",
+  "error": "cannot resolve \"host.tld/\": neither https://host.tld/skills (git) nor https://host.tld/skills.tar.gz (tarball) responded",
+  "probed": [
+   "https://host.tld/skills"
+  ]
+ },
+ {
+  "spec": "k101: a probed generic host keeps the host's name, whatever its path",
+  "error": "cannot resolve \"k101: a probed generic host keeps the host's name, whatever its path\": unknown prefix \"k101:\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "mydir.com/team/tools",
+  "error": "cannot resolve \"mydir.com/team/tools\": neither https://mydir.com/team/tools (git) nor https://mydir.com/team/tools.tar.gz (tarball) responded",
+  "probed": [
+   "https://mydir.com/team/tools"
+  ]
+ },
+ {
+  "spec": "https://mydir.com/team/tools",
+  "result": {
+   "kind": "git",
+   "value": "https://mydir.com/team/tools",
+   "derivedName": "tools"
+  },
+  "probed": []
+ },
+ {
+  "spec": "mydir-com",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/mydir-com/skills",
+   "derivedName": "mydir-com"
+  },
+  "probed": []
+ },
+ {
+  "spec": "generic host with a path, probe says tarball",
+  "error": "cannot resolve \"generic host with a path, probe says tarball\": GitHub owner \"generic host with a path, probe says tarball\" may only contain ASCII letters, digits and \"-\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "https://mydir.com/x",
+  "result": {
+   "kind": "git",
+   "value": "https://mydir.com/x",
+   "derivedName": "x"
+  },
+  "probed": []
+ },
+ {
+  "spec": "mydir.com/x",
+  "error": "cannot resolve \"mydir.com/x\": neither https://mydir.com/x (git) nor https://mydir.com/x.tar.gz (tarball) responded",
+  "probed": [
+   "https://mydir.com/x"
+  ]
+ },
+ {
+  "spec": "https://mydir.com/x.tar.gz",
+  "result": {
+   "kind": "url",
+   "value": "https://mydir.com/x.tar.gz",
+   "derivedName": "mydir-com"
+  },
+  "probed": []
+ },
+ {
+  "spec": "generic host where nothing responds errors with both attempted addresses",
+  "error": "cannot resolve \"generic host where nothing responds errors with both attempted addresses\": GitHub owner \"generic host where nothing responds errors with both attempted addresses\" may only contain ASCII letters, digits and \"-\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "owner/repo with a dotted first segment is a generic host, not GitHub",
+  "error": "cannot resolve \"owner/repo with a dotted first segment is a generic host, not GitHub\": GitHub repo \"repo with a dotted first segment is a generic host, not GitHub\" may only contain ASCII letters, digits, \".\", \"_\" and \"-\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "first segment has a dot",
+  "error": "cannot resolve \"first segment has a dot\": GitHub owner \"first segment has a dot\" may only contain ASCII letters, digits and \"-\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "k104: github: with an empty owner is still an error",
+  "error": "cannot resolve \"k104: github: with an empty owner is still an error\": unknown prefix \"k104:\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "github:/karr",
+  "error": "cannot resolve \"github:/karr\": expected github:owner[/repo]",
+  "probed": []
+ },
+ {
+  "spec": "expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, ",
+  "error": "cannot resolve \"expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, \": GitHub owner \"expected a local path (\" may only contain ASCII letters, digits and \"-\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "error": "cannot resolve \"github:owner[/repo], owner[/repo] or host.tld[/path]\": GitHub owner \"owner[\" may only contain ASCII letters, digits and \"-\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "k109: an unknown word: prefix is a SpecError, never a GitHub owner, never probed",
+  "error": "cannot resolve \"k109: an unknown word: prefix is a SpecError, never a GitHub owner, never probed\": unknown prefix \"k109:\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "gitlab:u/r",
+  "error": "cannot resolve \"gitlab:u/r\": unknown prefix \"gitlab:\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "gitlab:",
+  "error": "cannot resolve \"gitlab:\": unknown prefix \"gitlab:\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "Gitlab:u/r",
+  "error": "cannot resolve \"Gitlab:u/r\": unknown prefix \"Gitlab:\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "Gitlab:",
+  "error": "cannot resolve \"Gitlab:\": unknown prefix \"Gitlab:\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "gitlab:u",
+  "error": "cannot resolve \"gitlab:u\": unknown prefix \"gitlab:\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "bitbucket:team/repo",
+  "error": "cannot resolve \"bitbucket:team/repo\": unknown prefix \"bitbucket:\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "bitbucket:",
+  "error": "cannot resolve \"bitbucket:\": unknown prefix \"bitbucket:\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "HTTPS:/host",
+  "error": "cannot resolve \"HTTPS:/host\": unknown prefix \"HTTPS:\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "HTTPS:",
+  "error": "cannot resolve \"HTTPS:\": unknown prefix \"HTTPS:\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "https:host",
+  "error": "cannot resolve \"https:host\": unknown prefix \"https:\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "https:",
+  "error": "cannot resolve \"https:\": unknown prefix \"https:\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "localhost:8080",
+  "error": "cannot resolve \"localhost:8080\": unknown prefix \"localhost:\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "localhost:",
+  "error": "cannot resolve \"localhost:\": unknown prefix \"localhost:\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "localhost:8080/x",
+  "error": "cannot resolve \"localhost:8080/x\": unknown prefix \"localhost:\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": ":foo",
+  "error": "cannot resolve \":foo\": unknown prefix \":\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": ":",
+  "error": "cannot resolve \":\": unknown prefix \":\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "user:pw@localhost/x",
+  "error": "cannot resolve \"user:pw@localhost/x\": unknown prefix \"user:\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "user:",
+  "error": "cannot resolve \"user:\": unknown prefix \"user:\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "win32",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/win32/skills",
+   "derivedName": "win32"
+  },
+  "probed": []
+ },
+ {
+  "spec": "C:\\skills",
+  "error": "cannot resolve \"C:\\skills\": unknown prefix \"C:\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "C:",
+  "error": "cannot resolve \"C:\": unknown prefix \"C:\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "${spec}",
+  "error": "cannot resolve \"${spec}\": GitHub owner \"${spec}\" may only contain ASCII letters, digits and \"-\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "${prefix}",
+  "error": "cannot resolve \"${prefix}\": GitHub owner \"${prefix}\" may only contain ASCII letters, digits and \"-\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "GitHub:/karr",
+  "error": "cannot resolve \"GitHub:/karr\": expected github:owner[/repo]",
+  "probed": []
+ },
+ {
+  "spec": "k109: a dotted host keeps its port or userinfo and is probed as before",
+  "error": "cannot resolve \"k109: a dotted host keeps its port or userinfo and is probed as before\": unknown prefix \"k109:\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "mydir.com:8080/x",
+  "error": "cannot resolve \"mydir.com:8080/x\": neither https://mydir.com:8080/x (git) nor https://mydir.com:8080/x.tar.gz (tarball) responded",
+  "probed": [
+   "https://mydir.com:8080/x"
+  ]
+ },
+ {
+  "spec": "https://mydir.com:8080/x",
+  "result": {
+   "kind": "git",
+   "value": "https://mydir.com:8080/x",
+   "derivedName": "x"
+  },
+  "probed": []
+ },
+ {
+  "spec": "mydir-com-8080",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/mydir-com-8080/skills",
+   "derivedName": "mydir-com-8080"
+  },
+  "probed": []
+ },
+ {
+  "spec": "mydir.com:8080",
+  "error": "cannot resolve \"mydir.com:8080\": neither https://mydir.com:8080/skills (git) nor https://mydir.com:8080/skills.tar.gz (tarball) responded",
+  "probed": [
+   "https://mydir.com:8080/skills"
+  ]
+ },
+ {
+  "spec": "https://mydir.com:8080/skills",
+  "result": {
+   "kind": "git",
+   "value": "https://mydir.com:8080/skills",
+   "derivedName": "skills"
+  },
+  "probed": []
+ },
+ {
+  "spec": "user:pw@host.tld/x",
+  "error": "cannot resolve \"user:pw@host.tld/x\": neither https://user:pw@host.tld/x (git) nor https://user:pw@host.tld/x.tar.gz (tarball) responded",
+  "probed": [
+   "https://user:pw@host.tld/x"
+  ]
+ },
+ {
+  "spec": "https://user:pw@host.tld/x",
+  "result": {
+   "kind": "git",
+   "value": "https://user:pw@host.tld/x",
+   "derivedName": "x"
+  },
+  "probed": []
+ },
+ {
+  "spec": "user-pw-host-tld",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/user-pw-host-tld/skills",
+   "derivedName": "user-pw-host-tld"
+  },
+  "probed": []
+ },
+ {
+  "spec": "source",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/source/skills",
+   "derivedName": "source"
+  },
+  "probed": []
+ },
+ {
+  "spec": "k111: an empty spec or a blank owner is a SpecError, never https://github.com//skills, never probed",
+  "error": "cannot resolve \"k111: an empty spec or a blank owner is a SpecError, never https://github.com//skills, never probed\": unknown prefix \"k111:\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "",
+  "error": "cannot resolve \"\": empty source; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": " ",
+  "error": "cannot resolve \" \": empty source; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "  \t\n ",
+  "error": "cannot resolve \"  \t\n \": empty source; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "github: /karr",
+  "error": "cannot resolve \"github: /karr\": expected github:owner[/repo]",
+  "probed": []
+ },
+ {
+  "spec": "github:owner[/repo]",
+  "error": "cannot resolve \"github:owner[/repo]\": GitHub owner \"owner[\" may only contain ASCII letters, digits and \"-\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "GitHub:\t/karr",
+  "error": "cannot resolve \"GitHub:\t/karr\": expected github:owner[/repo]",
+  "probed": []
+ },
+ {
+  "spec": "github.com/ /karr",
+  "error": "cannot resolve \"github.com/ /karr\": expected github.com/owner[/repo]",
+  "probed": []
+ },
+ {
+  "spec": "github.com/owner[/repo]",
+  "error": "cannot resolve \"github.com/owner[/repo]\": GitHub owner \"owner[\" may only contain ASCII letters, digits and \"-\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "gitlab.com/ /r",
+  "error": "cannot resolve \"gitlab.com/ /r\": expected gitlab.com/owner[/repo]",
+  "probed": []
+ },
+ {
+  "spec": "gitlab.com/owner[/repo]",
+  "result": {
+   "kind": "git",
+   "value": "https://gitlab.com/owner[/repo]",
+   "derivedName": "repo"
+  },
+  "probed": []
+ },
+ {
+  "spec": "github:",
+  "error": "cannot resolve \"github:\": expected github:owner[/repo]",
+  "probed": []
+ },
+ {
+  "spec": "github: ",
+  "error": "cannot resolve \"github: \": expected github:owner[/repo]",
+  "probed": []
+ },
+ {
+  "spec": "github.com/",
+  "error": "cannot resolve \"github.com/\": expected github.com/owner[/repo]",
+  "probed": []
+ },
+ {
+  "spec": "_",
+  "error": "cannot resolve \"_\": GitHub owner \"_\" may only contain ASCII letters, digits and \"-\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "@",
+  "error": "cannot resolve \"@\": GitHub owner \"@\" may only contain ASCII letters, digits and \"-\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "k117: an owner, repo or port no forge takes is a SpecError, never stored, never probed",
+  "error": "cannot resolve \"k117: an owner, repo or port no forge takes is a SpecError, never stored, never probed\": unknown prefix \"k117:\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "${seg}",
+  "error": "cannot resolve \"${seg}\": GitHub owner \"${seg}\" may only contain ASCII letters, digits and \"-\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "github:gitlab:u",
+  "error": "cannot resolve \"github:gitlab:u\": GitHub owner \"gitlab:u\" may only contain ASCII letters, digits and \"-\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "GitHub:HTTPS://x",
+  "error": "cannot resolve \"GitHub:HTTPS://x\": GitHub owner \"HTTPS:\" may only contain ASCII letters, digits and \"-\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "Getty/re:po",
+  "error": "cannot resolve \"Getty/re:po\": GitHub repo \"re:po\" may only contain ASCII letters, digits, \".\", \"_\" and \"-\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "re:po",
+  "error": "cannot resolve \"re:po\": unknown prefix \"re:\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "github:Getty/re:po",
+  "error": "cannot resolve \"github:Getty/re:po\": GitHub repo \"re:po\" may only contain ASCII letters, digits, \".\", \"_\" and \"-\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "@/karr",
+  "error": "cannot resolve \"@/karr\": GitHub owner \"@\" may only contain ASCII letters, digits and \"-\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "a b",
+  "error": "cannot resolve \"a b\": GitHub owner \"a b\" may only contain ASCII letters, digits and \"-\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "a b/karr",
+  "error": "cannot resolve \"a b/karr\": GitHub owner \"a b\" may only contain ASCII letters, digits and \"-\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "github: Getty",
+  "error": "cannot resolve \"github: Getty\": GitHub owner \" Getty\" may only contain ASCII letters, digits and \"-\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": " Getty",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/Getty/skills",
+   "derivedName": "getty"
+  },
+  "probed": []
+ },
+ {
+  "spec": "___",
+  "error": "cannot resolve \"___\": GitHub owner \"___\" may only contain ASCII letters, digits and \"-\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "Gétty/karr",
+  "error": "cannot resolve \"Gétty/karr\": GitHub owner \"Gétty\" may only contain ASCII letters, digits and \"-\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "Gétty",
+  "error": "cannot resolve \"Gétty\": GitHub owner \"Gétty\" may only contain ASCII letters, digits and \"-\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "github.com/a_b/r",
+  "error": "cannot resolve \"github.com/a_b/r\": GitHub owner \"a_b\" may only contain ASCII letters, digits and \"-\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "a_b",
+  "error": "cannot resolve \"a_b\": GitHub owner \"a_b\" may only contain ASCII letters, digits and \"-\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "github:Getty/re po",
+  "error": "cannot resolve \"github:Getty/re po\": GitHub repo \"re po\" may only contain ASCII letters, digits, \".\", \"_\" and \"-\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "re po",
+  "error": "cannot resolve \"re po\": GitHub owner \"re po\" may only contain ASCII letters, digits and \"-\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "github.com/Getty/re@po",
+  "error": "cannot resolve \"github.com/Getty/re@po\": GitHub repo \"re@po\" may only contain ASCII letters, digits, \".\", \"_\" and \"-\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "re@po",
+  "error": "cannot resolve \"re@po\": GitHub owner \"re@po\" may only contain ASCII letters, digits and \"-\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "GitHub.com/u/r!",
+  "error": "cannot resolve \"GitHub.com/u/r!\": GitHub repo \"r!\" may only contain ASCII letters, digits, \".\", \"_\" and \"-\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "r!",
+  "error": "cannot resolve \"r!\": GitHub owner \"r!\" may only contain ASCII letters, digits and \"-\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "gitlab.com/a b/r",
+  "error": "cannot resolve \"gitlab.com/a b/r\": gitlab.com owner \"a b\" must not contain whitespace, control characters, \":\" or \"@\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "gitlab.com",
+  "result": {
+   "kind": "git",
+   "value": "https://gitlab.com/skills",
+   "derivedName": "gitlab-com"
+  },
+  "probed": [
+   "https://gitlab.com/skills"
+  ]
+ },
+ {
+  "spec": "owner",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/owner/skills",
+   "derivedName": "owner"
+  },
+  "probed": []
+ },
+ {
+  "spec": "codeberg.org/u:x/r",
+  "error": "cannot resolve \"codeberg.org/u:x/r\": codeberg.org owner \"u:x\" must not contain whitespace, control characters, \":\" or \"@\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "codeberg.org",
+  "error": "cannot resolve \"codeberg.org\": neither https://codeberg.org/skills (git) nor https://codeberg.org/skills.tar.gz (tarball) responded",
+  "probed": [
+   "https://codeberg.org/skills"
+  ]
+ },
+ {
+  "spec": "u:x",
+  "error": "cannot resolve \"u:x\": unknown prefix \"u:\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "hf.co/u/re@po",
+  "error": "cannot resolve \"hf.co/u/re@po\": hf.co repo \"re@po\" must not contain whitespace, control characters, \":\" or \"@\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "hf.co",
+  "error": "cannot resolve \"hf.co\": neither https://hf.co/skills (git) nor https://hf.co/skills.tar.gz (tarball) responded",
+  "probed": [
+   "https://hf.co/skills"
+  ]
+ },
+ {
+  "spec": "huggingface.co",
+  "error": "cannot resolve \"huggingface.co\": neither https://huggingface.co/skills (git) nor https://huggingface.co/skills.tar.gz (tarball) responded",
+  "probed": [
+   "https://huggingface.co/skills"
+  ]
+ },
+ {
+  "spec": "GitLab.com/u/re po",
+  "error": "cannot resolve \"GitLab.com/u/re po\": GitLab.com repo \"re po\" must not contain whitespace, control characters, \":\" or \"@\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "GitLab.com",
+  "error": "cannot resolve \"GitLab.com\": neither https://GitLab.com/skills (git) nor https://GitLab.com/skills.tar.gz (tarball) responded",
+  "probed": [
+   "https://GitLab.com/skills"
+  ]
+ },
+ {
+  "spec": "github.com:Getty/karr",
+  "error": "cannot resolve \"github.com:Getty/karr\": port \"Getty\" of github.com is not a number; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "github.com",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/skills",
+   "derivedName": "github-com"
+  },
+  "probed": [
+   "https://github.com/skills"
+  ]
+ },
+ {
+  "spec": "gitlab.com:u/r",
+  "error": "cannot resolve \"gitlab.com:u/r\": port \"u\" of gitlab.com is not a number; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "host.tld:/x",
+  "error": "cannot resolve \"host.tld:/x\": port \"\" of host.tld is not a number; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "mydir.com:80a/x",
+  "error": "cannot resolve \"mydir.com:80a/x\": port \"80a\" of mydir.com is not a number; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "80a",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/80a/skills",
+   "derivedName": "80a"
+  },
+  "probed": []
+ },
+ {
+  "spec": "mydir.com",
+  "error": "cannot resolve \"mydir.com\": neither https://mydir.com/skills (git) nor https://mydir.com/skills.tar.gz (tarball) responded",
+  "probed": [
+   "https://mydir.com/skills"
+  ]
+ },
+ {
+  "spec": "mydir.com:x",
+  "error": "cannot resolve \"mydir.com:x\": port \"x\" of mydir.com is not a number; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "gitlab:u.x/r",
+  "error": "cannot resolve \"gitlab:u.x/r\": port \"u.x\" of gitlab is not a number; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "u.x",
+  "error": "cannot resolve \"u.x\": neither https://u.x/skills (git) nor https://u.x/skills.tar.gz (tarball) responded",
+  "probed": [
+   "https://u.x/skills"
+  ]
+ },
+ {
+  "spec": "gitlab",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/gitlab/skills",
+   "derivedName": "gitlab"
+  },
+  "probed": []
+ },
+ {
+  "spec": "${port}",
+  "error": "cannot resolve \"${port}\": GitHub owner \"${port}\" may only contain ASCII letters, digits and \"-\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "k118: a single colon, an empty address or no transport word stays an unknown prefix",
+  "error": "cannot resolve \"k118: a single colon, an empty address or no transport word stays an unknown prefix\": unknown prefix \"k118:\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "codecommit:us-east-1://my-repo",
+  "error": "cannot resolve \"codecommit:us-east-1://my-repo\": unknown prefix \"codecommit:\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "codecommit::",
+  "error": "cannot resolve \"codecommit::\": unknown prefix \"codecommit:\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "codecommit:: ",
+  "error": "cannot resolve \"codecommit:: \": unknown prefix \"codecommit:\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "1helper::x",
+  "error": "cannot resolve \"1helper::x\": unknown prefix \"1helper:\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "1helper:",
+  "error": "cannot resolve \"1helper:\": unknown prefix \"1helper:\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "my_helper::x",
+  "error": "cannot resolve \"my_helper::x\": unknown prefix \"my_helper:\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "my_helper:",
+  "error": "cannot resolve \"my_helper:\": unknown prefix \"my_helper:\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "::x",
+  "error": "cannot resolve \"::x\": unknown prefix \":\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "k119: a GitHub file link or a tree link without a ref is a SpecError, never probed",
+  "error": "cannot resolve \"k119: a GitHub file link or a tree link without a ref is a SpecError, never probed\": unknown prefix \"k119:\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "${ref}",
+  "error": "cannot resolve \"${ref}\": GitHub owner \"${ref}\" may only contain ASCII letters, digits and \"-\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "https://github.com/Getty/karr/blob/main/README.md",
+  "error": "cannot resolve \"https://github.com/Getty/karr/blob/main/README.md\": a GitHub file link; a source is a repository, not a file: add https://github.com/Getty/karr, or https://github.com/Getty/karr/tree/main to pin ref \"main\"",
+  "probed": []
+ },
+ {
+  "spec": "github.com/Getty/karr/blob/v1/skills/x/SKILL.md",
+  "error": "cannot resolve \"github.com/Getty/karr/blob/v1/skills/x/SKILL.md\": a GitHub file link; a source is a repository, not a file: add https://github.com/Getty/karr, or https://github.com/Getty/karr/tree/v1 to pin ref \"v1\"",
+  "probed": []
+ },
+ {
+  "spec": "GITHUB.COM/Getty/karr/blob",
+  "error": "cannot resolve \"GITHUB.COM/Getty/karr/blob\": a GitHub file link; a source is a repository, not a file: add https://github.com/Getty/karr",
+  "probed": []
+ },
+ {
+  "spec": "https://github.com/Getty/karr/blob/main/README.md#L10",
+  "error": "cannot resolve \"https://github.com/Getty/karr/blob/main/README.md#L10\": a GitHub file link; a source is a repository, not a file: add https://github.com/Getty/karr, or https://github.com/Getty/karr/tree/main to pin ref \"main\"",
+  "probed": []
+ },
+ {
+  "spec": "https://github.com/Getty/karr/tree",
+  "error": "cannot resolve \"https://github.com/Getty/karr/tree\": a GitHub tree link without a ref; add https://github.com/Getty/karr",
+  "probed": []
+ },
+ {
+  "spec": "github.com/Getty/karr/tree/",
+  "error": "cannot resolve \"github.com/Getty/karr/tree/\": a GitHub tree link without a ref; add https://github.com/Getty/karr",
+  "probed": []
+ },
+ {
+  "spec": "https://github.com/Get_ty/karr/tree/main",
+  "error": "cannot resolve \"https://github.com/Get_ty/karr/tree/main\": GitHub owner \"Get_ty\" may only contain ASCII letters, digits and \"-\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "Get_ty",
+  "error": "cannot resolve \"Get_ty\": GitHub owner \"Get_ty\" may only contain ASCII letters, digits and \"-\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "github.com/Getty/re:po/tree/main",
+  "error": "cannot resolve \"github.com/Getty/re:po/tree/main\": GitHub repo \"re:po\" may only contain ASCII letters, digits, \".\", \"_\" and \"-\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "github.com/Getty/re:po/tree/main/skills",
+  "error": "cannot resolve \"github.com/Getty/re:po/tree/main/skills\": GitHub repo \"re:po\" may only contain ASCII letters, digits, \".\", \"_\" and \"-\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "known forges are never probed",
+  "error": "cannot resolve \"known forges are never probed\": GitHub owner \"known forges are never probed\" may only contain ASCII letters, digits and \"-\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "github.com/user",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/user/skills",
+   "derivedName": "user"
+  },
+  "probed": []
+ },
+ {
+  "spec": "gitlab.com/user/repo",
+  "result": {
+   "kind": "git",
+   "value": "https://gitlab.com/user/repo",
+   "derivedName": "repo"
+  },
+  "probed": []
+ },
+ {
+  "spec": "---",
+  "error": "cannot resolve \"---\": a source must not start with \"-\"",
+  "probed": []
+ },
+ {
+  "spec": "~",
+  "result": {
+   "kind": "local",
+   "value": "~",
+   "derivedName": "source"
+  },
+  "probed": []
+ },
+ {
+  "spec": "~/",
+  "result": {
+   "kind": "local",
+   "value": "~/",
+   "derivedName": "source"
+  },
+  "probed": []
+ },
+ {
+  "spec": "./",
+  "result": {
+   "kind": "local",
+   "value": "./",
+   "derivedName": "source"
+  },
+  "probed": []
+ },
+ {
+  "spec": "../",
+  "result": {
+   "kind": "local",
+   "value": "../",
+   "derivedName": "source"
+  },
+  "probed": []
+ },
+ {
+  "spec": "/tmp/日本",
+  "result": {
+   "kind": "local",
+   "value": "/tmp/日本",
+   "derivedName": "source"
+  },
+  "probed": []
+ },
+ {
+  "spec": "./___",
+  "result": {
+   "kind": "local",
+   "value": "./___",
+   "derivedName": "source"
+  },
+  "probed": []
+ },
+ {
+  "spec": "github:---",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/---/skills",
+   "derivedName": "source"
+  },
+  "probed": []
+ },
+ {
+  "spec": "github.com/---",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/---/skills",
+   "derivedName": "source"
+  },
+  "probed": []
+ },
+ {
+  "spec": "gitlab.com/___/skills",
+  "result": {
+   "kind": "git",
+   "value": "https://gitlab.com/___/skills",
+   "derivedName": "source"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://example.com/___/___",
+  "result": {
+   "kind": "git",
+   "value": "https://example.com/___/___",
+   "derivedName": "source"
+  },
+  "probed": []
+ },
+ {
+  "spec": "git@host:___.git",
+  "result": {
+   "kind": "git",
+   "value": "git@host:___.git",
+   "derivedName": "source"
+  },
+  "probed": []
+ },
+ {
+  "spec": "git@host:___/x.tar.gz",
+  "result": {
+   "kind": "url",
+   "value": "git@host:___/x.tar.gz",
+   "derivedName": "source"
+  },
+  "probed": []
+ },
+ {
+  "spec": "file:///",
+  "result": {
+   "kind": "git",
+   "value": "file:///",
+   "derivedName": "source"
+  },
+  "probed": []
+ },
+ {
+  "spec": "file:///x.tar.gz",
+  "result": {
+   "kind": "url",
+   "value": "file:///x.tar.gz",
+   "derivedName": "source"
+  },
+  "probed": []
+ },
+ {
+  "spec": "日本.__/x",
+  "error": "cannot resolve \"日本.__/x\": neither https://日本.__/x (git) nor https://日本.__/x.tar.gz (tarball) responded",
+  "probed": [
+   "https://日本.__/x"
+  ]
+ },
+ {
+  "spec": "codecommit::us-east-1://___",
+  "result": {
+   "kind": "git",
+   "value": "codecommit::us-east-1://___",
+   "derivedName": "source"
+  },
+  "probed": []
+ },
+ {
+  "spec": "x::___",
+  "result": {
+   "kind": "git",
+   "value": "x::___",
+   "derivedName": "source"
+  },
+  "probed": []
+ },
+ {
+  "spec": "x::日本",
+  "result": {
+   "kind": "git",
+   "value": "x::日本",
+   "derivedName": "source"
+  },
+  "probed": []
+ },
+ {
+  "spec": "-oProxyCommand=touch x@host:repo",
+  "error": "cannot resolve \"-oProxyCommand=touch x@host:repo\": a source must not start with \"-\"",
+  "probed": []
+ },
+ {
+  "spec": "--upload-pack=touch x",
+  "error": "cannot resolve \"--upload-pack=touch x\": a source must not start with \"-\"",
+  "probed": []
+ },
+ {
+  "spec": " -x.tld",
+  "error": "cannot resolve \" -x.tld\": a source must not start with \"-\"",
+  "probed": []
+ },
+ {
+  "spec": "-owner/repo",
+  "error": "cannot resolve \"-owner/repo\": a source must not start with \"-\"",
+  "probed": []
+ },
+ {
+  "spec": "k125: a known forge's page, release or commit link without its ref, or a bad %-escape is a SpecError",
+  "error": "cannot resolve \"k125: a known forge's page, release or commit link without its ref, or a bad %-escape is a SpecError\": unknown prefix \"k125:\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "GitHub",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/GitHub/skills",
+   "derivedName": "github"
+  },
+  "probed": []
+ },
+ {
+  "spec": "${view}",
+  "error": "cannot resolve \"${view}\": GitHub owner \"${view}\" may only contain ASCII letters, digits and \"-\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "https://github.com/Getty/karr/issues",
+  "error": "cannot resolve \"https://github.com/Getty/karr/issues\": a GitHub \"issues\" page is not a source; add https://github.com/Getty/karr",
+  "probed": []
+ },
+ {
+  "spec": "issues",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/issues/skills",
+   "derivedName": "issues"
+  },
+  "probed": []
+ },
+ {
+  "spec": "github.com/Getty/karr/issues/12#issuecomment-1",
+  "error": "cannot resolve \"github.com/Getty/karr/issues/12#issuecomment-1\": a GitHub \"issues/12\" page is not a source; add https://github.com/Getty/karr",
+  "probed": []
+ },
+ {
+  "spec": "issues/12",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/issues/12",
+   "derivedName": "12"
+  },
+  "probed": []
+ },
+ {
+  "spec": "Getty/karr/pull/12",
+  "error": "cannot resolve \"Getty/karr/pull/12\": a GitHub \"pull/12\" page is not a source; add https://github.com/Getty/karr",
+  "probed": []
+ },
+ {
+  "spec": "pull/12",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/pull/12",
+   "derivedName": "12"
+  },
+  "probed": []
+ },
+ {
+  "spec": "github:Getty/karr/pulls",
+  "error": "cannot resolve \"github:Getty/karr/pulls\": a GitHub \"pulls\" page is not a source; add https://github.com/Getty/karr",
+  "probed": []
+ },
+ {
+  "spec": "pulls",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/pulls/skills",
+   "derivedName": "pulls"
+  },
+  "probed": []
+ },
+ {
+  "spec": "Getty/karr/extra",
+  "error": "cannot resolve \"Getty/karr/extra\": a GitHub \"extra\" page is not a source; add https://github.com/Getty/karr",
+  "probed": []
+ },
+ {
+  "spec": "extra",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/extra/skills",
+   "derivedName": "extra"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://github.com/Getty/karr/releases",
+  "error": "cannot resolve \"https://github.com/Getty/karr/releases\": a GitHub \"releases\" page is not a source; add https://github.com/Getty/karr",
+  "probed": []
+ },
+ {
+  "spec": "releases",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/releases/skills",
+   "derivedName": "releases"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://github.com/Getty/karr/releases/latest",
+  "error": "cannot resolve \"https://github.com/Getty/karr/releases/latest\": a GitHub \"releases/latest\" page is not a source; add https://github.com/Getty/karr",
+  "probed": []
+ },
+ {
+  "spec": "releases/latest",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/releases/latest",
+   "derivedName": "latest"
+  },
+  "probed": []
+ },
+ {
+  "spec": "github.com/Getty/karr/commits/main",
+  "error": "cannot resolve \"github.com/Getty/karr/commits/main\": a GitHub \"commits/main\" page is not a source; add https://github.com/Getty/karr",
+  "probed": []
+ },
+ {
+  "spec": "commits/main",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/commits/main",
+   "derivedName": "main"
+  },
+  "probed": []
+ },
+ {
+  "spec": "github.com/Getty/karr/commit/abc/x",
+  "error": "cannot resolve \"github.com/Getty/karr/commit/abc/x\": a GitHub \"commit/abc/x\" page is not a source; add https://github.com/Getty/karr",
+  "probed": []
+ },
+ {
+  "spec": "commit/abc/x",
+  "error": "cannot resolve \"commit/abc/x\": a GitHub \"x\" page is not a source; add https://github.com/commit/abc",
+  "probed": []
+ },
+ {
+  "spec": "https://github.com/Getty/karr/releases/tag",
+  "error": "cannot resolve \"https://github.com/Getty/karr/releases/tag\": a GitHub release link without a tag; add https://github.com/Getty/karr",
+  "probed": []
+ },
+ {
+  "spec": "Getty/karr/commit/",
+  "error": "cannot resolve \"Getty/karr/commit/\": a GitHub commit link without a commit; add https://github.com/Getty/karr",
+  "probed": []
+ },
+ {
+  "spec": "gitlab.com/u/r/-/issues",
+  "error": "cannot resolve \"gitlab.com/u/r/-/issues\": a GitLab \"issues\" page is not a source; add https://gitlab.com/u/r",
+  "probed": []
+ },
+ {
+  "spec": "GitLab",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/GitLab/skills",
+   "derivedName": "gitlab"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://gitlab.com/u/r/-/merge_requests/3",
+  "error": "cannot resolve \"https://gitlab.com/u/r/-/merge_requests/3\": a GitLab \"merge_requests/3\" page is not a source; add https://gitlab.com/u/r",
+  "probed": []
+ },
+ {
+  "spec": "merge_requests/3",
+  "error": "cannot resolve \"merge_requests/3\": GitHub owner \"merge_requests\" may only contain ASCII letters, digits and \"-\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "gitlab.com/u/r/-/tree",
+  "error": "cannot resolve \"gitlab.com/u/r/-/tree\": a GitLab tree link without a ref; add https://gitlab.com/u/r",
+  "probed": []
+ },
+ {
+  "spec": "codeberg.org/u/r/issues",
+  "error": "cannot resolve \"codeberg.org/u/r/issues\": a Codeberg \"issues\" page is not a source; add https://codeberg.org/u/r",
+  "probed": []
+ },
+ {
+  "spec": "Codeberg",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/Codeberg/skills",
+   "derivedName": "codeberg"
+  },
+  "probed": []
+ },
+ {
+  "spec": "codeberg.org/u/r/src/main",
+  "error": "cannot resolve \"codeberg.org/u/r/src/main\": a Codeberg \"src/main\" page is not a source; add https://codeberg.org/u/r",
+  "probed": []
+ },
+ {
+  "spec": "src/main",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/src/main",
+   "derivedName": "main"
+  },
+  "probed": []
+ },
+ {
+  "spec": "codeberg.org/u/r/src/branch/",
+  "error": "cannot resolve \"codeberg.org/u/r/src/branch/\": a Codeberg tree link without a ref; add https://codeberg.org/u/r",
+  "probed": []
+ },
+ {
+  "spec": "https://hf.co/u/r/discussions",
+  "error": "cannot resolve \"https://hf.co/u/r/discussions\": a Hugging Face \"discussions\" page is not a source; add https://hf.co/u/r",
+  "probed": []
+ },
+ {
+  "spec": "discussions",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/discussions/skills",
+   "derivedName": "discussions"
+  },
+  "probed": []
+ },
+ {
+  "spec": "Hugging Face",
+  "error": "cannot resolve \"Hugging Face\": GitHub owner \"Hugging Face\" may only contain ASCII letters, digits and \"-\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "gitlab.com/u/r/-/blob/main/README.md",
+  "error": "cannot resolve \"gitlab.com/u/r/-/blob/main/README.md\": a GitLab file link; a source is a repository, not a file: add https://gitlab.com/u/r, or https://gitlab.com/u/r/-/tree/main to pin ref \"main\"",
+  "probed": []
+ },
+ {
+  "spec": "codeberg.org/u/r/raw/tag/v1/x.md",
+  "error": "cannot resolve \"codeberg.org/u/r/raw/tag/v1/x.md\": a Codeberg file link; a source is a repository, not a file: add https://codeberg.org/u/r, or https://codeberg.org/u/r/src/tag/v1 to pin ref \"v1\"",
+  "probed": []
+ },
+ {
+  "spec": "hf.co/u/r/resolve/main/x.bin",
+  "error": "cannot resolve \"hf.co/u/r/resolve/main/x.bin\": a Hugging Face file link; a source is a repository, not a file: add https://hf.co/u/r, or https://hf.co/u/r/tree/main to pin ref \"main\"",
+  "probed": []
+ },
+ {
+  "spec": "https://github.com/Getty/karr/tree/100%",
+  "error": "cannot resolve \"https://github.com/Getty/karr/tree/100%\": \"100%\" in the link is not a valid %-escape",
+  "probed": []
+ },
+ {
+  "spec": "100%",
+  "error": "cannot resolve \"100%\": GitHub owner \"100%\" may only contain ASCII letters, digits and \"-\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "github.com/Getty/karr/tree/main/a%zzb",
+  "error": "cannot resolve \"github.com/Getty/karr/tree/main/a%zzb\": \"a%zzb\" in the link is not a valid %-escape",
+  "probed": []
+ },
+ {
+  "spec": "a%zzb",
+  "error": "cannot resolve \"a%zzb\": GitHub owner \"a%zzb\" may only contain ASCII letters, digits and \"-\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "hf.co/datasets",
+  "error": "cannot resolve \"hf.co/datasets\": expected hf.co/datasets/owner[/repo]",
+  "probed": []
+ },
+ {
+  "spec": "https://Example.COM/a/../b/Repo.git",
+  "result": {
+   "kind": "git",
+   "value": "https://Example.COM/a/../b/Repo.git",
+   "derivedName": "repo"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://example.com/ü/skills",
+  "result": {
+   "kind": "git",
+   "value": "https://example.com/ü/skills",
+   "derivedName": "c3-bc"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://example.com/a b/c",
+  "result": {
+   "kind": "git",
+   "value": "https://example.com/a b/c",
+   "derivedName": "c"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://example.com",
+  "result": {
+   "kind": "git",
+   "value": "https://example.com",
+   "derivedName": "example-com"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://example.com/",
+  "result": {
+   "kind": "git",
+   "value": "https://example.com/",
+   "derivedName": "example-com"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://example.com:8080/x/y",
+  "result": {
+   "kind": "git",
+   "value": "https://example.com:8080/x/y",
+   "derivedName": "y"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://example.com:99999/x",
+  "result": {
+   "kind": "git",
+   "value": "https://example.com:99999/x",
+   "derivedName": "https-example-com-99999-x"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://user:pw@example.com/team/repo.git?x=1#frag",
+  "result": {
+   "kind": "git",
+   "value": "https://user:pw@example.com/team/repo.git?x=1#frag",
+   "derivedName": "repo"
+  },
+  "probed": []
+ },
+ {
+  "spec": "ssh://git@Example.com/Team/Repo",
+  "result": {
+   "kind": "git",
+   "value": "ssh://git@Example.com/Team/Repo",
+   "derivedName": "repo"
+  },
+  "probed": []
+ },
+ {
+  "spec": "ssh://git@example.com:22/a/./b/../c.git",
+  "result": {
+   "kind": "git",
+   "value": "ssh://git@example.com:22/a/./b/../c.git",
+   "derivedName": "c"
+  },
+  "probed": []
+ },
+ {
+  "spec": "git://host/a%2e%2e/b",
+  "result": {
+   "kind": "git",
+   "value": "git://host/a%2e%2e/b",
+   "derivedName": "b"
+  },
+  "probed": []
+ },
+ {
+  "spec": "file:///srv/repos/My.Repo.git",
+  "result": {
+   "kind": "git",
+   "value": "file:///srv/repos/My.Repo.git",
+   "derivedName": "my-repo"
+  },
+  "probed": []
+ },
+ {
+  "spec": "file://localhost/srv/x",
+  "result": {
+   "kind": "git",
+   "value": "file://localhost/srv/x",
+   "derivedName": "x"
+  },
+  "probed": []
+ },
+ {
+  "spec": "HTTPS://github.com/Getty/karr",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/Getty/karr",
+   "derivedName": "karr"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://github.com/Getty/karr/tree/main/skills/x",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/Getty/karr",
+   "derivedName": "karr",
+   "ref": "main",
+   "path": "skills/x"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://github.com/Getty/karr/tree/feat%2Fx/sub%20dir",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/Getty/karr",
+   "derivedName": "karr",
+   "ref": "feat/x",
+   "path": "sub dir"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://github.com/Getty/karr/tree/%E0%A4%A",
+  "error": "cannot resolve \"https://github.com/Getty/karr/tree/%E0%A4%A\": \"%E0%A4%A\" in the link is not a valid %-escape",
+  "probed": []
+ },
+ {
+  "spec": "https://gitlab.com/g/sub/r/-/tree/v1/p",
+  "result": {
+   "kind": "git",
+   "value": "https://gitlab.com/g/sub/r",
+   "derivedName": "r",
+   "ref": "v1",
+   "path": "p"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://codeberg.org/u/r/src/branch/main/x",
+  "result": {
+   "kind": "git",
+   "value": "https://codeberg.org/u/r",
+   "derivedName": "r",
+   "ref": "main",
+   "path": "x"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://hf.co/datasets/u/r/tree/main",
+  "result": {
+   "kind": "git",
+   "value": "https://hf.co/datasets/u/r",
+   "derivedName": "r",
+   "ref": "main"
+  },
+  "probed": []
+ },
+ {
+  "spec": "s3://bucket/path/skills.tar.gz",
+  "result": {
+   "kind": "url",
+   "value": "s3://bucket/path/skills.tar.gz",
+   "derivedName": "bucket"
+  },
+  "probed": []
+ },
+ {
+  "spec": "host.tld/pkg//",
+  "result": {
+   "kind": "url",
+   "value": "https://host.tld/pkg.tar.gz",
+   "derivedName": "host-tld"
+  },
+  "probed": [
+   "https://host.tld/pkg"
+  ]
+ },
+ {
+  "spec": "my.git.host/team/repo",
+  "result": {
+   "kind": "git",
+   "value": "https://my.git.host/team/repo",
+   "derivedName": "my-git-host"
+  },
+  "probed": [
+   "https://my.git.host/team/repo"
+  ]
+ },
+ {
+  "spec": "my.tar.host/x",
+  "result": {
+   "kind": "url",
+   "value": "https://my.tar.host/x.tar.gz",
+   "derivedName": "my-tar-host"
+  },
+  "probed": [
+   "https://my.tar.host/x"
+  ]
+ },
+ {
+  "spec": "nothing.example",
+  "error": "cannot resolve \"nothing.example\": neither https://nothing.example/skills (git) nor https://nothing.example/skills.tar.gz (tarball) responded",
+  "probed": [
+   "https://nothing.example/skills"
+  ]
+ },
+ {
+  "spec": "~/日本",
+  "result": {
+   "kind": "local",
+   "value": "~/日本",
+   "derivedName": "source"
+  },
+  "probed": []
+ },
+ {
+  "spec": "  Getty/karr  ",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/Getty/karr",
+   "derivedName": "karr"
+  },
+  "probed": []
+ },
+ {
+  "spec": "-x",
+  "error": "cannot resolve \"-x\": a source must not start with \"-\"",
+  "probed": []
+ },
+ {
+  "spec": "   ",
+  "error": "cannot resolve \"   \": empty source; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "user@host.tld:1x/y",
+  "result": {
+   "kind": "git",
+   "value": "user@host.tld:1x/y",
+   "derivedName": "y"
+  },
+  "probed": []
+ },
+ {
+  "spec": "a b/c",
+  "error": "cannot resolve \"a b/c\": GitHub owner \"a b\" may only contain ASCII letters, digits and \"-\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "github:  /x",
+  "error": "cannot resolve \"github:  /x\": expected github:owner[/repo]",
+  "probed": []
+ },
+ {
+  "spec": "GitHub:Getty/Repo",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/Getty/Repo",
+   "derivedName": "repo"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://exämple.com/x.tar.gz",
+  "result": {
+   "kind": "url",
+   "value": "https://exämple.com/x.tar.gz",
+   "derivedName": "xn--exmple-cua-com"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://EXAMPLE.com/S.TAR.GZ",
+  "result": {
+   "kind": "url",
+   "value": "https://EXAMPLE.com/S.TAR.GZ",
+   "derivedName": "example-com"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://example.com/%7Euser/repo",
+  "result": {
+   "kind": "git",
+   "value": "https://example.com/%7Euser/repo",
+   "derivedName": "repo"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://example.com/a\\b\\c",
+  "result": {
+   "kind": "git",
+   "value": "https://example.com/a\\b\\c",
+   "derivedName": "c"
+  },
+  "probed": []
+ },
+ {
+  "spec": "ssh://host/a\\b",
+  "result": {
+   "kind": "git",
+   "value": "ssh://host/a\\b",
+   "derivedName": "a-b"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://[::1]/x/y",
+  "result": {
+   "kind": "git",
+   "value": "https://[::1]/x/y",
+   "derivedName": "y"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://127.0.0.1/a.tgz",
+  "result": {
+   "kind": "url",
+   "value": "https://127.0.0.1/a.tgz",
+   "derivedName": "127-0-0-1"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://0x7f.1/a.tgz",
+  "result": {
+   "kind": "url",
+   "value": "https://0x7f.1/a.tgz",
+   "derivedName": "127-0-0-1"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://ex%41mple.com/a.tgz",
+  "result": {
+   "kind": "url",
+   "value": "https://ex%41mple.com/a.tgz",
+   "derivedName": "example-com"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://exa mple.com/a.tgz",
+  "result": {
+   "kind": "url",
+   "value": "https://exa mple.com/a.tgz",
+   "derivedName": "https-exa-mple-com-a-tgz"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://example.com/.",
+  "result": {
+   "kind": "git",
+   "value": "https://example.com/.",
+   "derivedName": "example-com"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://example.com/..",
+  "result": {
+   "kind": "git",
+   "value": "https://example.com/..",
+   "derivedName": "example-com"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://example.com/a/.",
+  "result": {
+   "kind": "git",
+   "value": "https://example.com/a/.",
+   "derivedName": "a"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://example.com/a/%2E%2e/b",
+  "result": {
+   "kind": "git",
+   "value": "https://example.com/a/%2E%2e/b",
+   "derivedName": "b"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://example.com/a?b/c",
+  "result": {
+   "kind": "git",
+   "value": "https://example.com/a?b/c",
+   "derivedName": "a"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://example.com/a#b/c",
+  "result": {
+   "kind": "git",
+   "value": "https://example.com/a#b/c",
+   "derivedName": "a"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://example.com/C%C3%BC/x",
+  "result": {
+   "kind": "git",
+   "value": "https://example.com/C%C3%BC/x",
+   "derivedName": "x"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://example.com/\u0001x/y",
+  "result": {
+   "kind": "git",
+   "value": "https://example.com/\u0001x/y",
+   "derivedName": "y"
+  },
+  "probed": []
+ },
+ {
+  "spec": "constructor/foo",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/constructor/foo",
+   "derivedName": "foo"
+  },
+  "probed": []
+ },
+ {
+  "spec": "__proto__/x",
+  "error": "cannot resolve \"__proto__/x\": GitHub owner \"__proto__\" may only contain ASCII letters, digits and \"-\"; expected a local path (/path, ./path, ../path, ~/path), scheme://..., transport::address, user@host:path, github:owner[/repo], owner[/repo] or host.tld[/path]",
+  "probed": []
+ },
+ {
+  "spec": "toString/x",
+  "result": {
+   "kind": "git",
+   "value": "https://github.com/toString/x",
+   "derivedName": "x"
+  },
+  "probed": []
+ },
+ {
+  "spec": "https://constructor/foo/bar.git",
+  "result": {
+   "kind": "git",
+   "value": "https://constructor/foo/bar.git",
+   "derivedName": "bar"
+  },
+  "probed": []
+ }
+]

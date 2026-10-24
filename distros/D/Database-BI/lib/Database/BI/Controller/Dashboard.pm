@@ -3,7 +3,7 @@ package Database::BI::Controller::Dashboard;
 use strict;
 use warnings;
 
-our $VERSION = '0.015.0';
+our $VERSION = '0.016.0';
 
 use Mojo::Base 'Mojolicious::Controller', -strict, -signatures;
 
@@ -124,7 +124,16 @@ Readonly my %MESSAGES => (
 	warn_map_coordinate_rows    => 'Plotted %d of %d rows; %d hold no usable coordinate',
 	warn_map_markers_capped     => 'Showing the first %d of %d markers; add f= filters to see the rest',
 	warn_map_cache_unwritten    => 'The resolved places could not be remembered in the model store, so the next request will look them up again',
-	# Phase 4
+	error_insights_no_data      => 'No data available to analyse',
+	insights_insufficient_data  => 'Insufficient data for this insight type (need more rows or periods)',
+	ask_unavailable    => 'Ask a question is not available: no AI provider is configured',
+	ask_no_question    => 'Please enter a question',
+	ask_provider_error => 'AI provider error; could not generate an analysis',
+	ask_unparseable    => 'Could not parse a valid visualization from the response; please rephrase your question',
+	ask_invalid_spec   => 'Generated spec contains an unknown column: %s',
+	summary_consent_required    => 'AI consent is required before sending data to an external provider',
+	summary_ai_unavailable      => 'AI provider not configured; using template summary',
+	summary_provider_error      => 'AI provider error; using template summary',
 	error_token_invalid         => 'Share token is invalid or has expired',
 	error_token_missing         => 'A share token is required to view this analysis',
 	error_extract_unwritable    => 'Extract store is not writable; using direct read',
@@ -150,7 +159,7 @@ Readonly my $MAX_PER_PAGE          => 2_000;
 Readonly my %SCATTER_SCHEMES       => map { $_ => 1 } qw(tableau10 category10 set2 set3 paired);
 
 # Valid aggregate function vocabulary shared by _measure, _grouped_totals,
-# and the /pivot measure-spec parser (Phase 2).  Do not add functions here
+# and the /pivot measure-spec parser.  Do not add functions here
 # without a corresponding implementation in _grouped_totals's Perl fold AND
 # a corresponding entry in the lower-layer aggregate() implementations.
 Readonly my @MEASURE_FNS  => qw(sum avg min max count count_distinct);
@@ -746,10 +755,6 @@ sub _filter_specs_to_criteria {
 	return (\%criteria, \@residual);
 }
 
-# ---------------------------------------------------------------------------
-# Phase 1 semantic-layer helpers
-# ---------------------------------------------------------------------------
-
 # _measure($fn, $col, $as) -> \%measure
 #
 # Build one measure descriptor in the vocabulary shared by Database::Abstraction
@@ -772,7 +777,7 @@ sub _numeric_cell {
 	my $v = shift;
 	return undef unless defined $v && length($v);
 	my $is_acct_neg = ($v =~ /\A\s*\(/);
-	(my $n = $v) =~ s/[^\d.\-]//g;
+	(my $n = $v) =~ s/[^\d.-]//g;
 	$n = "-$n" if $is_acct_neg && $n =~ /\A\d/;
 	return undef unless $n =~ /\A-?\d+(?:\.\d+)?\z/;
 	return $n + 0;
@@ -839,7 +844,7 @@ sub _measure_pushable {
 # _parse_measure_param($spec_str) -> \%measure | undef
 #
 # Parse 'col:fn:as' into { col => ..., fn => ..., as => ... }.
-# Shared dialect for /pivot (Phase 2) so it does not invent a second format.
+# Shared dialect for /pivot so it does not invent a second format.
 # Returns undef for an invalid or unrecognised spec.
 sub _parse_measure_param {
 	my $str = shift;
@@ -1085,33 +1090,15 @@ sub _fetch_page :Protected ($self, $source, $params) {
 		return (\@page, $has_next);
 	}
 
-	# Criteria pushdown: translate as many f= specs as possible into SQL
-	# criteria (_filter_specs_to_criteria returns a criteria hashref and a
-	# residual list for any spec that cannot be safely pushed to SQL).
-	my ($criteria, $residual) = _filter_specs_to_criteria(\@f_specs, $source);
-	my $has_criteria = %$criteria;
+	# Always fetch all rows in Perl and filter with _apply_filter_spec.
+	# SQL criteria pushdown (passing %criteria to selectall_arrayref) is
+	# intentionally avoided: on some Perl/D::A version combinations the WHERE
+	# clause is silently dropped, returning the full unfiltered set.  The Perl
+	# path is correct on every supported version.  Memory cost: bounded by the
+	# source file size (the same as the dedup path already accepted).
+	my $all = $source->selectall_arrayref(@sort_args) // [];
 
-	# Full-pushdown fast path: all specs translated, no dedup, SQL-backed source.
-	# Use N+1 trick with SQL criteria + LIMIT/OFFSET -- avoids full-table fetch.
-	# Copy before pop: D::A may return a read-only ref to its internal cache.
-	if ($is_sql && !$dedup && !@$residual) {
-		my @records = @{ $source->selectall_arrayref(
-			%$criteria, limit => $per_page + 1, offset => $offset, @sort_args,
-		) // [] };
-		my $has_next = (@records > $per_page) ? 1 : 0;
-		pop @records if $has_next;
-		return (\@records, $has_next);
-	}
-
-	# Partial-pushdown / dedup path: fetch the SQL-filtered (and sorted) set,
-	# apply residual specs and/or dedup in Perl, then paginate the reduced set.
-	# Memory cost: the full reduced set.
-	my $all = $has_criteria
-		? $source->selectall_arrayref(%$criteria, @sort_args)
-		: $source->selectall_arrayref(@sort_args);
-	$all //= [];
-
-	$all = _apply_filter_spec($all, $_) for @$residual;
+	$all = _apply_filter_spec($all, $_) for @f_specs;
 
 	if ($dedup) {
 		my $cols = $source->columns;
@@ -1290,7 +1277,7 @@ sub _write_sqlite_db :Protected ($self, $records, $columns) {
 #          all rows, and runs any c= combine step.  Does NOT apply f= filters,
 #          dedup, or pagination -- that is the caller's responsibility.
 #          Chart routes call this directly so they can access $src for the
-#          Phase 1 aggregate() push path.  Row-viewing routes and export routes
+#          aggregate() push path.  Row-viewing routes and export routes
 #          call the thin _run_export_pipeline wrapper instead.
 # Exit:    On success: ($src_or_undef, $records_aref, $columns_aref, $label).
 #          $src is undef when a c= combine makes the result non-aggregatable.
@@ -1638,10 +1625,6 @@ sub _write_models :Protected ($self, $models) {
 	return $ok ? 1 : 0;
 }
 
-# ---------------------------------------------------------------------------
-# Phase 3.1 -- Saved analyses
-# ---------------------------------------------------------------------------
-
 # _analyses_path($self) -> $path_string_or_undef
 #
 # Returns the path to model_dir/analyses.json (creating model_dir on first call),
@@ -1815,7 +1798,7 @@ sub _validate_analysis :Protected ($self, $doc) {
 # _analysis_to_url($self, \%analysis) -> $url_string_or_undef
 #
 # Reconstructs a /join?l=...&j=...&f=... URL from a saved analysis.
-# Used by canvas_render (Phase 3.1) to redirect when no visuals exist yet.
+# Used by canvas_render to redirect when no visuals exist yet.
 sub _analysis_to_url :Protected ($self, $a) {
 	my @datasets = @{ $a->{datasets} // [] };
 	return undef unless @datasets;
@@ -1846,10 +1829,6 @@ sub _analysis_to_url :Protected ($self, $a) {
 
 	return '/join?' . join('&', @params);
 }
-
-# ---------------------------------------------------------------------------
-# Controller actions for Phase 3.1 -- /api/analyses and /a/:id
-# ---------------------------------------------------------------------------
 
 # GET /api/analyses
 sub analyses_list ($self) {
@@ -2212,10 +2191,6 @@ sub analyses_import ($self) {
 	$self->res->headers->location("/api/analyses/$id");
 	$self->render(json => { id => $id, imported => 1 }, status => 201);
 }
-
-# ---------------------------------------------------------------------------
-# Phase 3.2 -- canvas pipeline and per-visual rendering helpers
-# ---------------------------------------------------------------------------
 
 # _build_canvas_pipeline($self, \%analysis) -> ($src, $records, \@cols) or ()
 #
@@ -2834,9 +2809,9 @@ sub _vis_cf_col {
 
 # GET /a/:id  -- render a saved canvas
 #
-# Phase 3.1 bridge: redirects to the reconstructed data-view URL when the
+# redirects to the reconstructed data-view URL when the
 # canvas has no visuals array.
-# Phase 3.2: renders N visuals in a CSS grid when visuals are present.
+# renders N visuals in a CSS grid when visuals are present.
 # _bound_canvas_params($self, $a, $lookup) -> (\%bound, \@errors)
 #
 # Resolve the canvas's declared parameters against URL values.  $lookup takes a
@@ -2890,14 +2865,20 @@ sub canvas_render ($self) {
 		unless exists $analyses->{$id};
 	my $a = $analyses->{$id};
 
-	# Phase 4.2 -- freshness: compare each dataset's current mtime against
+	# freshness: compare each dataset's current mtime against
 	# the analysis's saved updated timestamp.  Flag stale when any source
 	# is newer.  Non-fatal: the canvas renders with a stale banner.
 	my ($freshness_stale, $freshness_msg, $freshness_source_mtime) = (0, '', '');
 	{
 		my $analysis_updated = $a->{updated} // 0;
 		# Parse ISO-8601 to epoch for comparison if needed.
-		if ($analysis_updated && $analysis_updated =~ /\A(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})Z?\z/) {
+		if ($analysis_updated && $analysis_updated =~ /
+			\A
+			(\d{4}) - (\d{2}) - (\d{2})	# $1 yr  $2 mon  $3 day
+			T
+			(\d{2}) : (\d{2}) : (\d{2})	# $4 hr  $5 min  $6 sec
+			Z? \z
+		/x) {
 			require POSIX;
 			$analysis_updated = POSIX::mktime($6, $5, $4, $3, $2 - 1, $1 - 1900);
 		}
@@ -2918,11 +2899,11 @@ sub canvas_render ($self) {
 		}
 	}
 
-	# Phase 3.2 / 3.3: if visuals array is non-empty, render the canvas.
+	# if visuals array is non-empty, render the canvas.
 	my @visuals = @{ $a->{visuals} // [] };
 	if (@visuals) {
 
-		# Phase 3.5 -- bound parameters from URL ?p.<name>=<value>.
+		# bound parameters from URL ?p.<name>=<value>.
 		# Parameter definitions live in the analysis: params => { name => { type, default, min, max } }.
 		# URL values are type-coerced and range-checked; out-of-range returns 400.
 		my ($bound_ref, $p_errors) = $self->_bound_canvas_params(
@@ -2980,7 +2961,7 @@ sub canvas_render ($self) {
 			return $self->render(text => $e, status => 400);
 		}
 
-		# Phase 3.3 -- cross-filter state from URL params.
+		# cross-filter state from URL params.
 		# ?cf=col:op:val (repeatable) filters all visuals except the source.
 		# ?cv=N identifies the source visual (shown unfiltered but highlighted).
 		# Semantics: self-highlighting (source shown in full; others filtered).
@@ -3013,7 +2994,7 @@ sub canvas_render ($self) {
 			$cf_display = join(' AND ', @parts);
 		}
 
-		# Phase 3.4 -- drill-through and drill-down.
+		# drill-through and drill-down.
 		#
 		# Drill-through: when cross-filters are active, build a URL to the
 		# primary data source with those filters applied as ?f= params so the
@@ -3151,7 +3132,7 @@ sub canvas_render ($self) {
 			};
 		}
 
-		# Phase 3.6 -- bookmarks list for the toolbar panel.
+		# bookmarks list for the toolbar panel.
 		my @canvas_bookmarks = @{ $a->{bookmarks} // [] };
 		# Pre-encode as JSON for the JS canvasBookmarks variable.
 		# Escape </ so the array literal cannot prematurely close a <script> tag.
@@ -3198,7 +3179,7 @@ sub canvas_render ($self) {
 		);
 	}
 
-	# Phase 3.1 bridge: no visuals yet -- reconstruct the data-view URL and redirect.
+	# no visuals yet -- reconstruct the data-view URL and redirect.
 	my $url = $self->_analysis_to_url($a);
 	return $self->render(text => 'Cannot reconstruct URL from this analysis', status => 422)
 		unless defined $url;
@@ -7263,7 +7244,7 @@ sub histogram_view ($self) {
 # ---------------------------------------------------------------------------
 # Map  (GET /map)
 #
-# Phase 6.1/6.2: one route, one template, two ways for a row to get a
+# one route, one template, two ways for a row to get a
 # position.  With lat= and lon= the columns already hold coordinates; with
 # loc=<column> every distinct value of that column is geocoded once, by
 # Database::BI::Model::Geocode.  Answers are remembered in one shared cache in
@@ -7886,10 +7867,6 @@ sub _iso8601_utc {
 	return POSIX::strftime('%Y-%m-%dT%H:%M:%SZ', gmtime());
 }
 
-# ---------------------------------------------------------------------------
-# Phase 4.1 -- Extract helper
-# ---------------------------------------------------------------------------
-
 # _get_or_build_extract($self, $src, $records, $columns, $spec) -> $path | undef
 #
 # Returns a path to a cached SQLite extract for the current source fingerprint,
@@ -7933,10 +7910,6 @@ sub _get_or_build_extract :Protected ($self, $src, $records, $columns, $spec) {
 
 	return $path;
 }
-
-# ---------------------------------------------------------------------------
-# Phase 4.3 shared pipeline helper (used by catalog_view and bi-alert)
-# ---------------------------------------------------------------------------
 
 # _catalog_entry($self, $mf, $analyses) -> \%entry
 #
@@ -7995,10 +7968,6 @@ sub _catalog_entry :Protected ($self, $mf, $analyses) {
 	};
 }
 
-# ---------------------------------------------------------------------------
-# Phase 4.7 -- Catalog
-# ---------------------------------------------------------------------------
-
 # GET /catalog
 sub catalog_view ($self) {
 	my $data_dir  = $self->app->config('data_dir') // 'data';
@@ -8023,10 +7992,6 @@ sub catalog_view ($self) {
 		catalog_entries => \@entries,
 	);
 }
-
-# ---------------------------------------------------------------------------
-# Phase 4.6 -- Sharing and embedding
-# ---------------------------------------------------------------------------
 
 # _share_secret($self) -> $secret_string
 sub _share_secret :Protected ($self) {
@@ -8206,6 +8171,198 @@ sub visual_download ($self) {
 	return $self->render(
 		text   => 'PNG download requires the browser SVG renderer; use the in-page Save Image button',
 		status => 501,
+	);
+}
+
+# ask_api($self)
+#
+# POST /api/ask
+#
+# Translates a plain-English question into an analysis spec by
+# calling the configured AI provider.  The model receives only column
+# names and types -- never raw row data, file paths, or spec_key.
+#
+# Body params:
+#   l=<spec>      (required) -- left table spec
+#   q=<question>  (required) -- natural language question
+#   f=<filter>    (repeatable, optional)
+#
+# Returns JSON: { spec, url, valid => 1 }
+# On error:     { error } with 400, 503, or 502 status
+sub ask_api ($self) {
+	my $api_key = $self->app->config('ai_api_key') // '';
+	return $self->render(json => { error => $MESSAGES{ask_unavailable} }, status => 503)
+		unless length $api_key;
+
+	my $left_spec = $self->param('l') // '';
+	return $self->render(json => { error => 'Missing required parameter: l' }, status => 400)
+		unless length $left_spec;
+
+	my $question = $self->param('q') // '';
+	return $self->render(json => { error => $MESSAGES{ask_no_question} }, status => 400)
+		unless length $question;
+
+	my ($src, $records, $columns, $left_label) = $self->_run_pipeline_source;
+	return $self->render(json => { error => 'Could not open data source' }, status => 404)
+		unless defined $records;
+
+	eval { ($records, $columns) = $self->_apply_calc_fields($records, $columns) };
+
+	# Sample up to 200 rows for type inference; avoids slurping huge files.
+	my @sample = @{$records}[0 .. ($#$records < 199 ? $#$records : 199)];
+
+	require Database::BI::Ask;
+	my $typed_cols = Database::BI::Ask::infer_column_types(\@sample, $columns);
+
+	my $ai_config = {
+		provider => $self->app->config('ai_provider') // 'anthropic',
+		api_key  => $api_key,
+		model    => $self->app->config('ai_model')    // 'claude-haiku-5-5',
+	};
+
+	my $result = Database::BI::Ask::ask(
+		question  => $question,
+		spec_key  => $left_spec,
+		label     => $left_label // $left_spec,
+		columns   => $typed_cols,
+		ai_config => $ai_config,
+	);
+
+	if (my $err = $result->{error}) {
+		my ($status, $msg) =
+			$err eq 'ask_unavailable'              ? (503, $MESSAGES{ask_unavailable})
+		  : $err eq 'ask_no_question'              ? (400, $MESSAGES{ask_no_question})
+		  : $err eq 'ask_provider_error'           ? (502, $MESSAGES{ask_provider_error})
+		  : $err eq 'ask_unparseable'              ? (422, $MESSAGES{ask_unparseable})
+		  : $err =~ /\Aask_invalid_spec:(.+)\z/   ? (422, sprintf($MESSAGES{ask_invalid_spec}, $1))
+		  :                                          (500, $err);
+		return $self->render(json => { error => $msg }, status => $status);
+	}
+
+	return $self->render(json => $result);
+}
+
+# summary_api($self)
+#
+# POST /api/summary
+#
+# Runs the same pipeline as insights_view, computes insights, then generates
+# a narrative summary via Database::BI::Summary::generate().
+#
+# Body params:
+#   l=<spec>   (required) -- left table spec
+#   f=<filter> (repeatable, optional)
+#   ai=1       (optional) -- request LLM polish (honoured only when ai_api_key
+#                           is set in the app config)
+#
+# Returns JSON: { text, source, cached }
+# On error:     { error } with 400 or 404 status
+sub summary_api ($self) {
+	my $left_spec = $self->param('l') // '';
+	return $self->render(json => { error => 'Missing required parameter: l' }, status => 400)
+		unless length $left_spec;
+
+	my ($src, $records, $columns) = $self->_run_pipeline_source;
+	return $self->render(json => { error => 'Could not open data source' }, status => 404)
+		unless defined $records;
+
+	eval { ($records, $columns) = $self->_apply_calc_fields($records, $columns) };
+	if ($@) { (my $e = $@) =~ s/ at \S+ line \d+\.?\n?$//; return $self->render(json => { error => $e }, status => 400) }
+
+	for my $s (@{ $self->every_param('f') }) {
+		$records = _apply_filter_spec($records, $s);
+	}
+
+	my $row_count = scalar @$records;
+	(my $label = $left_spec) =~ s/\A(?:table:|path:|url:|redis:[^|]+\|)//;
+
+	require Database::BI::Insights;
+	my $insights = Database::BI::Insights::compute(
+		records  => $records,
+		columns  => $columns,
+		spec_key => $left_spec,
+	);
+
+	my $use_ai = $self->param('ai') ? 1 : 0;
+	my $ai_config = {
+		provider => $self->app->config('ai_provider') // 'anthropic',
+		api_key  => $self->app->config('ai_api_key')  // '',
+		model    => $self->app->config('ai_model')    // 'claude-haiku-5-5',
+	};
+
+	require Database::BI::Summary;
+	my $result = Database::BI::Summary::generate(
+		insights  => $insights,
+		spec_key  => $left_spec,
+		label     => $label,
+		row_count => $row_count,
+		use_ai    => $use_ai,
+		ai_config => $ai_config,
+	);
+
+	return $self->render(json => $result);
+}
+
+# insights_view($self)
+#
+# Accepts the same l=, j=, f=, c= pipeline as /stats.  Runs the standard
+# pipeline (date normalisation, calc fields, filters), then delegates to
+# Database::BI::Insights::compute() for pure-arithmetic insight detection.
+#
+# No LLM or external service is invoked.  Every returned insight carries a
+# view_url linking to the chart or stats page that shows the underlying data.
+#
+# Stash keys:
+#   insights   -- arrayref of insight hashrefs (kind/headline/detail/view_url/method)
+#   left_spec  -- the l= value
+#   left_label -- human-readable data-source label
+#   row_count  -- number of rows analysed
+#   base_url   -- current request URL (passed to Insights for fallback URLs)
+sub insights_view ($self) {
+	my $left_spec = $self->param('l') // '';
+	return $self->render(text => 'Missing l= parameter', status => 400)
+		unless length $left_spec;
+
+	my $back      = _safe_back_url($self->param('back')) // '/';
+	my $back2     = _safe_back_url($self->param('back2'));
+	my $back2_lbl = $self->param('back2_label') // '';
+
+	my ($src, $records, $columns) = $self->_run_pipeline_source;
+	return $self->render(text => 'Could not open data source', status => 404)
+		unless defined $records;
+
+	eval { ($records, $columns) = $self->_apply_calc_fields($records, $columns) };
+	if ($@) { (my $e = $@) =~ s/ at \S+ line \d+\.?\n?$//; return $self->render(text => $e, status => 400) }
+
+	for my $s (@{ $self->every_param('f') }) {
+		$records = _apply_filter_spec($records, $s);
+	}
+
+	my $row_count = scalar @$records;
+	(my $left_label = $left_spec) =~ s/\A(?:table:|path:|url:|redis:[^|]+\|)//;
+
+	require Database::BI::Insights;
+	my $insights = Database::BI::Insights::compute(
+		records  => $records,
+		columns  => $columns,
+		spec_key => $left_spec,
+		base_url => $self->req->url->path_query,
+	);
+
+	my ($platform, $language) = $self->_resolve_template;
+	$self->render(
+		handler      => 'tt',
+		template     => "$platform/$language/insights",
+		format       => 'html',
+		title        => 'Automatic insights',
+		insights     => $insights,
+		left_spec    => $left_spec,
+		left_label   => $left_label,
+		row_count    => $row_count,
+		ai_available => (length($self->app->config('ai_api_key') // '') ? 1 : 0),
+		back_url     => ($back2 // $back),
+		back_label   => ($back2 ? ($back2_lbl || 'Back') : ($self->param('back_label') // 'Back to table')),
+		($back2 ? (back2_url => $back, back2_label => ($self->param('back_label') // 'Back to table')) : ()),
 	);
 }
 

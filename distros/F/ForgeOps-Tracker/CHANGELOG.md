@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.17.0 (2026-10-23)
+
+- PII scrubbing catches card numbers however they're grouped (bare, 4-4-4-4, Amex's 4-6-5, or next to a
+  security code) when the digits have a card network's prefix and pass the Luhn check, so long ids stay
+  readable; IBANs, compact or in groups of four, by their own check digits; and fields named `iban`,
+  `account_number`, `routing_number` or `bank_account`. The rules are in sdks/PII_SCRUBBING.md, the same in
+  every SDK.
+
 ## 0.16.0 (2026-10-22)
 
 - Strict privacy: the message fingerprint now also replaces email addresses with `<email>` and quoted

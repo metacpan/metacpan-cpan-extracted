@@ -26,6 +26,10 @@
 # the same index and writes the same snapshot as the hook, so the two cannot
 # disagree about what is committed; the worktree mode runs both checks in the
 # checkout itself, without changing it.
+# Either target lists every check with what became of it - passed, with its
+# test count, failed, or skipped because nothing staged could change what it
+# reads - so a clean run shows which checks ran.  The commit hook itself says
+# nothing when it passes.
 
 use strict;
 use warnings;
@@ -45,6 +49,22 @@ shift @ARGV if $staged || $worktree;
 my $label = $staged ? 'check-staged'
     : $worktree ? 'check-worktree'
     : 'pre-commit';
+
+# A make target is run by a person who wants to know what was checked, so it
+# says which checks ran and passed, and which were skipped; a silent success
+# could not be told apart from a check that never ran.  The commit hook stays
+# quiet when it passes, as hooks are expected to.
+my $explicit = $staged || $worktree;
+
+# The checks, in the order they run and are reported.
+my @check_names = ('schema', 'live knobs');
+# Each check's test file as it is shown (with / on every platform, so the
+# report reads the same everywhere) and as it is run (the native path).
+my %check_label = (
+    'schema'     => 't/schema.t',
+    'live knobs' => 't/live-knobs.t',
+);
+my %check_path = map { $_ => File::Spec->catfile(split m{/}, $check_label{$_}) } keys %check_label;
 
 # The files whose staging can change what each check looks at.  A commit that
 # touches neither set has nothing for these checks to say, which keeps an
@@ -73,7 +93,10 @@ my ($root, $root_status) = run_command(
     [qw(git rev-parse --show-toplevel)],
     quiet_stderr => 1,
 );
-exit 0 if $root_status;
+if ($root_status) {
+    print "$label: not a git work tree, so nothing was checked.\n" if $explicit;
+    exit 0;
+}
 
 chomp $root;
 chdir $root or do {
@@ -81,17 +104,14 @@ chdir $root or do {
     exit 0;
 };
 
-my @checks;
+my %wanted;
 
 # An explicit worktree check is asked for by a person rather than run for every
 # commit, so it runs both checks.  The tree also holds untracked files, which
 # the staged-path filter below could not see, so filtering here would risk
 # skipping a file the checks would have read.
 if ($worktree) {
-    @checks = (
-        { name => 'schema',     path => File::Spec->catfile('t', 'schema.t') },
-        { name => 'live knobs', path => File::Spec->catfile('t', 'live-knobs.t') },
-    );
+    %wanted = map { $_ => 1 } @check_names;
 } else {
     # Nothing staged that could move either agreement: the commit cannot be
     # the half-applied change this guards against.  An unborn HEAD makes both
@@ -106,17 +126,40 @@ if ($worktree) {
         quiet_stderr => 1,
     );
 
-    exit 0 unless $schema_status || $live_status
-        || $schema_changed =~ /\S/ || $live_changed =~ /\S/;
+    $wanted{'schema'} = 1 if $schema_status || $schema_changed =~ /\S/;
+    $wanted{'live knobs'} = 1 if $live_status || $live_changed =~ /\S/;
+}
 
-    push @checks, {
-        name => 'schema',
-        path => File::Spec->catfile('t', 'schema.t'),
-    } if $schema_status || $schema_changed =~ /\S/;
-    push @checks, {
-        name => 'live knobs',
-        path => File::Spec->catfile('t', 'live-knobs.t'),
-    } if $live_status || $live_changed =~ /\S/;
+my @checks = map { { name => $_, path => $check_path{$_} } }
+    grep { $wanted{$_} } @check_names;
+
+# One line per check: what happened to it.  A check that ran shows how many
+# tests it ran, which is the evidence that it ran at all.
+sub outcome_lines {
+    my ($results) = @_;
+
+    my @lines;
+    for my $name (@check_names) {
+        my $result = $results->{$name};
+        if (!$result) {
+            push @lines, "  $name ($check_label{$name}): skipped - nothing staged "
+                . 'could change what it reads';
+            next;
+        }
+
+        my $tests = $result->{tests};
+        my $count = defined $tests ? " ($tests tests)" : '';
+        push @lines, "  $name ($check_label{$name}): "
+            . ($result->{passed} ? 'passed' : 'FAILED') . $count;
+    }
+
+    return @lines;
+}
+
+if (!@checks) {
+    print "$label: nothing staged could change what the checks read, so none ran.\n",
+        map({ "$_\n" } outcome_lines({})) if $explicit;
+    exit 0;
 }
 
 # The snapshot the checks read.  A commit is checked from the index written
@@ -156,7 +199,7 @@ chdir $snapshot or do {
 # The checks are run for a person, not for the harness that may have started
 # this hook (a pre-commit hook run from "make test", say), so the children are
 # given a plain environment and print the TAP this reads.
-my @failed;
+my (@failed, %results);
 for my $check (@checks) {
     my ($output, $status);
     {
@@ -170,6 +213,10 @@ for my $check (@checks) {
         );
     }
 
+    # The plan, "1..N", says how many tests ran; done_testing prints it last.
+    my ($tests) = $output =~ /^1\.\.(\d+)/m;
+    $results{ $check->{name} } = { passed => !$status, tests => $tests };
+
     next unless $status;
 
     # The temporary directory is gone by the time anyone reads this, so its
@@ -178,7 +225,11 @@ for my $check (@checks) {
     push @failed, { %$check, output => $output };
 }
 
-exit 0 unless @failed;
+if (!@failed) {
+    print "$label: every check that ran passed.\n",
+        map({ "$_\n" } outcome_lines(\%results)) if $explicit;
+    exit 0;
+}
 
 # A run that failed before it printed a verdict - a missing module, say - has
 # no failing assertion to show, so it is quoted instead of summarised.
@@ -219,6 +270,7 @@ if ($worktree) {
     print STDERR "pre-commit: the checks failed against what this commit stages, so it "
         . "was refused and nothing has been committed.\n\n";
 }
+print STDERR join("\n", outcome_lines(\%results)), "\n\n" if $explicit;
 print STDERR join("\n", @report), "\n\n";
 print STDERR <<"ADVICE";
 A schema version lives in the module that prints it - lib/App/Actions/Check.pm,

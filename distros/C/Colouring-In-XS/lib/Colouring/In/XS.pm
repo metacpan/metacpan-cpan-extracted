@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.10';
+our $VERSION = '0.12';
 
 require XSLoader;
 XSLoader::load('Colouring::In::XS', $VERSION);
@@ -58,7 +58,7 @@ Colouring::In::XS - color or colour.
 
 =head1 VERSION
 
-Version 0.09
+Version 0.12
 
 =cut
 

@@ -19,64 +19,97 @@ name: Langertha-Skeid
 provides:
   Langertha::Skeid:
     file: lib/Langertha/Skeid.pm
-    version: '0.003'
+    version: '0.004'
   Langertha::Skeid::CapacityProbe:
     file: lib/Langertha/Skeid/CapacityProbe.pm
-    version: '0.003'
+    version: '0.004'
   Langertha::Skeid::CapacityProbe::Custom:
     file: lib/Langertha/Skeid/CapacityProbe/Custom.pm
-    version: '0.003'
+    version: '0.004'
   Langertha::Skeid::CapacityProbe::Prometheus:
     file: lib/Langertha/Skeid/CapacityProbe/Prometheus.pm
-    version: '0.003'
+    version: '0.004'
   Langertha::Skeid::CapacityProbe::Registry:
     file: lib/Langertha/Skeid/CapacityProbe/Registry.pm
-    version: '0.003'
+    version: '0.004'
+  Langertha::Skeid::CustomerSource:
+    file: lib/Langertha/Skeid/CustomerSource.pm
+    version: '0.004'
+  Langertha::Skeid::CustomerSource::DBI:
+    file: lib/Langertha/Skeid/CustomerSource/DBI.pm
+    version: '0.004'
   Langertha::Skeid::KeyBroker:
     file: lib/Langertha/Skeid/KeyBroker.pm
-    version: '0.003'
+    version: '0.004'
   Langertha::Skeid::KeyBroker::OpenBao:
     file: lib/Langertha/Skeid/KeyBroker/OpenBao.pm
-    version: '0.003'
+    version: '0.004'
+  Langertha::Skeid::OpenAPI:
+    file: lib/Langertha/Skeid/OpenAPI.pm
+    version: '0.004'
   Langertha::Skeid::Protocol:
     file: lib/Langertha/Skeid/Protocol.pm
-    version: '0.003'
+    version: '0.004'
   Langertha::Skeid::Protocol::Anthropic:
     file: lib/Langertha/Skeid/Protocol/Anthropic.pm
-    version: '0.003'
+    version: '0.004'
   Langertha::Skeid::Protocol::Anthropic::Stream:
     file: lib/Langertha/Skeid/Protocol/Anthropic/Stream.pm
-    version: '0.003'
+    version: '0.004'
+  Langertha::Skeid::Protocol::Audio:
+    file: lib/Langertha/Skeid/Protocol/Audio.pm
+    version: '0.004'
+  Langertha::Skeid::Protocol::Documents:
+    file: lib/Langertha/Skeid/Protocol/Documents.pm
+    version: '0.004'
+  Langertha::Skeid::Protocol::MCP:
+    file: lib/Langertha/Skeid/Protocol/MCP.pm
+    version: '0.004'
   Langertha::Skeid::Protocol::Ollama:
     file: lib/Langertha/Skeid/Protocol/Ollama.pm
-    version: '0.003'
+    version: '0.004'
   Langertha::Skeid::Protocol::Ollama::Stream:
     file: lib/Langertha/Skeid/Protocol/Ollama/Stream.pm
-    version: '0.003'
+    version: '0.004'
+  Langertha::Skeid::Protocol::RawBody:
+    file: lib/Langertha/Skeid/Protocol/RawBody.pm
+    version: '0.004'
+  Langertha::Skeid::Protocol::Realtime:
+    file: lib/Langertha/Skeid/Protocol/Realtime.pm
+    version: '0.004'
   Langertha::Skeid::Protocol::Refusal:
     file: lib/Langertha/Skeid/Protocol/Refusal.pm
-    version: '0.003'
+    version: '0.004'
+  Langertha::Skeid::Protocol::Rerank:
+    file: lib/Langertha/Skeid/Protocol/Rerank.pm
+    version: '0.004'
   Langertha::Skeid::Proxy:
     file: lib/Langertha/Skeid/Proxy.pm
-    version: '0.003'
+    version: '0.004'
+  Langertha::Skeid::Proxy::Realtime:
+    file: lib/Langertha/Skeid/Proxy/Realtime.pm
+    version: '0.004'
   Langertha::Skeid::Proxy::RelayContent:
     file: lib/Langertha/Skeid/Proxy/RelayContent.pm
-    version: '0.003'
+    version: '0.004'
   Langertha::Skeid::Registry:
     file: lib/Langertha/Skeid/Registry.pm
-    version: '0.003'
+    version: '0.004'
   Langertha::Skeid::Secret:
     file: lib/Langertha/Skeid/Secret.pm
-    version: '0.003'
+    version: '0.004'
+  Langertha::Skeid::SwaggerUI:
+    file: lib/Langertha/Skeid/SwaggerUI.pm
+    version: '0.004'
   Langertha::Skeid::UsageStore:
     file: lib/Langertha/Skeid/UsageStore.pm
-    version: '0.003'
+    version: '0.004'
   Langertha::Skeid::UsageStore::DBI:
     file: lib/Langertha/Skeid/UsageStore/DBI.pm
-    version: '0.003'
+    version: '0.004'
   Langertha::Skeid::UsageStore::JsonLog:
     file: lib/Langertha/Skeid/UsageStore/JsonLog.pm
-    version: '0.003'
+    version: '0.004'
 recommends:
   Cpanel::JSON::XS: '4.20'
   DBD::Pg: '0'
@@ -98,7 +131,7 @@ resources:
   bugtracker: https://github.com/Getty/langertha-skeid/issues
   homepage: https://github.com/Getty/langertha-skeid
   repository: https://github.com/Getty/langertha-skeid.git
-version: '0.003'
+version: '0.004'
 x_Dist_Zilla:
   perl:
     version: '5.040001'
@@ -114,6 +147,7 @@ x_Dist_Zilla:
             - ^CLAUDE\.md$
             - ^CONTEXT\.md$
             - ^\.claude/
+            - ^assets/
             - ^bench/
             - ^docs/
           include_dotfiles: 1
@@ -179,22 +213,6 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::LicenseFile
       name: '@Author::GETTY/LicenseFile'
       version: '0.002'
-    -
-      class: Dist::Zilla::Plugin::Run::AfterRelease
-      config:
-        Dist::Zilla::Plugin::Run::Role::Runner:
-          fatal_errors: 1
-          quiet: 0
-          run:
-            - "${GH_BIN:-gh} release view %v -R Getty/langertha-skeid >/dev/null 2>&1 || ${GH_BIN:-gh} release create %v -R Getty/langertha-skeid --title %v --notes 'Dist::Zilla release'"
-            - '${GH_BIN:-gh} release upload %v -R Getty/langertha-skeid Langertha-Skeid-%v.tar.gz --clobber'
-            - 'docker build ${SKEID_DOCKER_BUILD_ARGS:-} -t raudssus/langertha-skeid:%v -t raudssus/langertha-skeid:latest -t raudssus/langertha-skeid:$(echo %v | cut -d. -f1) %d'
-            - 'docker push raudssus/langertha-skeid:%v'
-            - 'docker push raudssus/langertha-skeid:$(echo %v | cut -d. -f1)'
-            - 'docker push raudssus/langertha-skeid:latest'
-          version: '0.050'
-      name: '@Author::GETTY/Run::AfterRelease'
-      version: '0.050'
     -
       class: Dist::Zilla::Plugin::MetaConfig
       name: '@Author::GETTY/MetaConfig'
@@ -403,7 +421,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.003'
+          tag: '0.004'
           tag_format: '%v'
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
@@ -468,6 +486,10 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::GitHub::CreateRelease
       name: '@Author::GETTY/GitHub::CreateRelease'
       version: '0.0012'
+    -
+      class: Dist::Zilla::Plugin::Docker::API
+      name: '@Author::GETTY/@Author::GETTY::Docker/Docker::API'
+      version: '0.104'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'

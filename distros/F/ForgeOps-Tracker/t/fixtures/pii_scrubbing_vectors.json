@@ -1,0 +1,234 @@
+{
+  "strings": [
+    {
+      "input": "Card 4242424242424242 was declined",
+      "scrubbed": "Card [CREDIT CARD FILTERED] was declined"
+    },
+    {
+      "input": "Card 4242 4242 4242 4242 was declined",
+      "scrubbed": "Card [CREDIT CARD FILTERED] was declined"
+    },
+    {
+      "input": "Card 4242-4242-4242-4242 was declined",
+      "scrubbed": "Card [CREDIT CARD FILTERED] was declined"
+    },
+    {
+      "input": "Amex 3782 822463 10005 failed",
+      "scrubbed": "Amex [CREDIT CARD FILTERED] failed"
+    },
+    {
+      "input": "Amex 378282246310005 failed",
+      "scrubbed": "Amex [CREDIT CARD FILTERED] failed"
+    },
+    {
+      "input": "MC 5555555555554444 and 2223003122003222",
+      "scrubbed": "MC [CREDIT CARD FILTERED] and [CREDIT CARD FILTERED]"
+    },
+    {
+      "input": "Discover 6011111111111117, JCB 3530111333300000, Diners 30569309025904",
+      "scrubbed": "Discover [CREDIT CARD FILTERED], JCB [CREDIT CARD FILTERED], Diners [CREDIT CARD FILTERED]"
+    },
+    {
+      "input": "UnionPay 6200000000000005",
+      "scrubbed": "UnionPay [CREDIT CARD FILTERED]"
+    },
+    {
+      "input": "Visa 13 digits 4222222222222",
+      "scrubbed": "Visa 13 digits [CREDIT CARD FILTERED]"
+    },
+    {
+      "input": "19 digits 4000056655665556123",
+      "scrubbed": "19 digits 4000056655665556123"
+    },
+    {
+      "input": "wrong digit 4242424242424241",
+      "scrubbed": "wrong digit 4242424242424241"
+    },
+    {
+      "input": "Invoice 88214451 missing",
+      "scrubbed": "Invoice 88214451 missing"
+    },
+    {
+      "input": "id 1234567890123456789",
+      "scrubbed": "id 1234567890123456789"
+    },
+    {
+      "input": "ts 1729700000000",
+      "scrubbed": "ts 1729700000000"
+    },
+    {
+      "input": "phone 4155552671",
+      "scrubbed": "phone 4155552671"
+    },
+    {
+      "input": "order-4242424242424242",
+      "scrubbed": "order-[CREDIT CARD FILTERED]"
+    },
+    {
+      "input": "x4242424242424242",
+      "scrubbed": "x4242424242424242"
+    },
+    {
+      "input": "4242424242424242y",
+      "scrubbed": "4242424242424242y"
+    },
+    {
+      "input": "_4242424242424242",
+      "scrubbed": "_4242424242424242"
+    },
+    {
+      "input": "card 4242424242424242.",
+      "scrubbed": "card [CREDIT CARD FILTERED]."
+    },
+    {
+      "input": "(4242424242424242)",
+      "scrubbed": "([CREDIT CARD FILTERED])"
+    },
+    {
+      "input": "4242424242424242",
+      "scrubbed": "[CREDIT CARD FILTERED]"
+    },
+    {
+      "input": "two 4242424242424242 4000056655665556",
+      "scrubbed": "two [CREDIT CARD FILTERED] [CREDIT CARD FILTERED]"
+    },
+    {
+      "input": "joined 4242 4242 4242 4242 2026",
+      "scrubbed": "joined [CREDIT CARD FILTERED] 2026"
+    },
+    {
+      "input": "dashes 4-2-4-2-4-2-4-2-4-2-4-2-4-2-4-2",
+      "scrubbed": "dashes [CREDIT CARD FILTERED]"
+    },
+    {
+      "input": "double  space 4242  4242424242424242",
+      "scrubbed": "double  space 4242  [CREDIT CARD FILTERED]"
+    },
+    {
+      "input": "Payout failed for DE89370400440532013000",
+      "scrubbed": "Payout failed for [IBAN FILTERED]"
+    },
+    {
+      "input": "IBAN DE89 3704 0044 0532 0130 00 bad",
+      "scrubbed": "IBAN [IBAN FILTERED] bad"
+    },
+    {
+      "input": "GB82 WEST 1234 5698 7654 32",
+      "scrubbed": "[IBAN FILTERED]"
+    },
+    {
+      "input": "GB82WEST12345698765432",
+      "scrubbed": "[IBAN FILTERED]"
+    },
+    {
+      "input": "bad check DE89370400440532013001",
+      "scrubbed": "bad check DE89370400440532013001"
+    },
+    {
+      "input": "lowercase de89370400440532013000",
+      "scrubbed": "lowercase de89370400440532013000"
+    },
+    {
+      "input": "short DE8937040044",
+      "scrubbed": "short DE8937040044"
+    },
+    {
+      "input": "FR1420041010050500013M02606 ok",
+      "scrubbed": "[IBAN FILTERED] ok"
+    },
+    {
+      "input": "not iban ISBN1234567890123",
+      "scrubbed": "not iban ISBN1234567890123"
+    },
+    {
+      "input": "card and cvv 4242424242424242 123",
+      "scrubbed": "card and cvv [CREDIT CARD FILTERED] 123"
+    },
+    {
+      "input": "a12 4242424242424242",
+      "scrubbed": "a12 [CREDIT CARD FILTERED]"
+    },
+    {
+      "input": "4242424242424242 4a",
+      "scrubbed": "[CREDIT CARD FILTERED] 4a"
+    },
+    {
+      "input": "x1 4242424242424242 2y",
+      "scrubbed": "x1 [CREDIT CARD FILTERED] 2y"
+    },
+    {
+      "input": "ab4242424242424242 4242424242424242",
+      "scrubbed": "ab4242424242424242 [CREDIT CARD FILTERED]"
+    },
+    {
+      "input": "4242 4242 4242 4242a 5555555555554444",
+      "scrubbed": "4242 4242 4242 4242a [CREDIT CARD FILTERED]"
+    },
+    {
+      "input": "9-4242424242424242",
+      "scrubbed": "9-[CREDIT CARD FILTERED]"
+    },
+    {
+      "input": "card dash cvv 4242424242424242-123",
+      "scrubbed": "card dash cvv [CREDIT CARD FILTERED]-123"
+    },
+    {
+      "input": "three 4242424242424242 4000056655665556 5555555555554444",
+      "scrubbed": "three [CREDIT CARD FILTERED] [CREDIT CARD FILTERED] [CREDIT CARD FILTERED]"
+    },
+    {
+      "input": "ünïcödé 4242424242424242 日本",
+      "scrubbed": "ünïcödé [CREDIT CARD FILTERED] 日本"
+    },
+    {
+      "input": "éDE89370400440532013000 and DE89370400440532013000é",
+      "scrubbed": "é[IBAN FILTERED] and [IBAN FILTERED]é"
+    },
+    {
+      "input": "email jane@example.com and card 4242424242424242",
+      "scrubbed": "email [EMAIL FILTERED] and card [CREDIT CARD FILTERED]"
+    }
+  ],
+  "keys": [
+    {
+      "key": "iban",
+      "redacted": true
+    },
+    {
+      "key": "billing_iban",
+      "redacted": true
+    },
+    {
+      "key": "IBAN",
+      "redacted": true
+    },
+    {
+      "key": "account_number",
+      "redacted": true
+    },
+    {
+      "key": "accountNumber",
+      "redacted": true
+    },
+    {
+      "key": "bank_account_id",
+      "redacted": true
+    },
+    {
+      "key": "routing_number",
+      "redacted": true
+    },
+    {
+      "key": "routingNumber",
+      "redacted": true
+    },
+    {
+      "key": "amount",
+      "redacted": false
+    },
+    {
+      "key": "account_name",
+      "redacted": false
+    }
+  ]
+}

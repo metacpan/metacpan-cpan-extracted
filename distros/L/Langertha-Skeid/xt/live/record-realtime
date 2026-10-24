@@ -1,0 +1,92 @@
+#!/usr/bin/env perl
+# Records the frames of a real realtime transcription node into a fixture file for
+# t/data/realtime/ (see the README there). Usage:
+#
+#   SKEID_LIVE_SPEACHES_URL=http://host:8000 SKEID_LIVE_SPEACHES_KEY=... \
+#     xt/live/record-realtime speaches <model> <audio.wav> <ga|beta> > t/data/realtime/speaches-ga.jsonl
+#
+# The wav must be 16 bit mono PCM; it is resampled to 24 kHz and sent in 100 ms chunks.
+use strict;
+use warnings;
+use JSON::MaybeXS ();
+use Mojo::UserAgent;
+use Mojo::IOLoop;
+
+my ( $backend, $model, $wav, $dialect ) = @ARGV;
+$dialect //= 'ga';
+my $base = $ENV{SKEID_LIVE_SPEACHES_URL} or die "set SKEID_LIVE_SPEACHES_URL\n";
+( my $ws = $base ) =~ s/^http/ws/;
+my $json = JSON::MaybeXS->new( utf8 => 1, canonical => 1 );
+my $text = JSON::MaybeXS->new;   # websocket messages arrive decoded already
+
+open my $fh, '<:raw', $wav or die "$wav: $!";
+local $/; my $data = <$fh>;
+my ( $rate ) = unpack 'x24V', $data;
+my $pcm = substr $data, 44;
+my @in = unpack 's<*', $pcm;
+my $n = int( @in * 24000 / $rate );
+my @out = map { my $p = $_ * $rate / 24000; my $i = int $p; my $f = $p - $i;
+  int( $in[$i] * ( 1 - $f ) + ( $in[ $i + 1 < @in ? $i + 1 : $i ] ) * $f ) } 0 .. $n - 1;
+my $audio = pack q{s<*}, @out;
+$audio .= "\0" x 120000;   # 2.5 s of silence: speaches ends a turn by VAD only after 3 s of audio
+
+my @frames;
+my $note = { recorded => JSON::MaybeXS::true(), synthetic => JSON::MaybeXS::false(), backend => $backend,
+  dialect => $dialect, model => $model, recorded_at => scalar gmtime() . ' UTC',
+  note => "Recorded from a live $backend node by xt/live/record-realtime; audio shortened to the first $n samples at 24 kHz; audio payloads truncated to 16 base64 characters." };
+sub rec { my ( $dir, $frame ) = @_; push @frames, { dir => $dir, frame => $frame } }
+sub short { my $f = { %{ $_[0] } }; $f->{audio} = substr( $f->{audio}, 0, 16 ) if defined $f->{audio}; $f }
+
+my $ua = Mojo::UserAgent->new( inactivity_timeout => 120 );
+my $url = "$ws/v1/realtime?model=" . $model . '&intent=transcription';
+my %h = ( Authorization => 'Bearer ' . ( $ENV{SKEID_LIVE_SPEACHES_KEY} // '' ) );
+my $done = 0;
+$ua->websocket( $url => \%h => sub {
+  my ( $ua, $tx ) = @_;
+  die "websocket failed: " . ( $tx->res->code // 'no response' ) . ' ' . ( $tx->error ? $tx->error->{message} : '' ) . "\n" unless $tx->is_websocket;
+  my $sent = 0;
+  $tx->on( message => sub {
+    my ( $tx, $msg ) = @_;
+    my $f = eval { $text->decode($msg) } or return;
+    rec( s2c => $f );
+    if ( $f->{type} eq 'session.created' && !$sent++ ) {
+      my $fmt = { type => 'audio/pcm', rate => 24000 };
+      # ga: session.update with a transcription session; beta: transcription_session.update;
+      # flat: session.update with the flat session of the conversation API (what speaches sends)
+      my $upd = $dialect eq q{beta}
+        ? { type => q{transcription_session.update}, session => { input_audio_format => q{pcm16},
+            input_audio_transcription => { model => $model, language => q{en} } } }
+        : $dialect eq q{flat}
+        ? { type => q{session.update}, session => { input_audio_transcription => { model => $model, language => q{en} } } }
+        : { type => q{session.update}, session => { type => q{transcription}, audio => { input => { format => $fmt,
+            transcription => { model => $model, language => q{en} } } } } };
+      $tx->send( $json->encode($upd) ); rec( c2s => $upd );
+    }
+    elsif ( $f->{type} =~ /^(?:session|transcription_session)\.updated$/ ) {
+      my $chunk = 4800;
+      for ( my $o = 0; $o < length $audio; $o += $chunk ) {
+        my $a = { type => 'input_audio_buffer.append', audio => Mojo::Util::b64_encode( substr( $audio, $o, $chunk ), '' ) };
+        $tx->send( $json->encode($a) ); rec( c2s => short($a) );
+      }
+      if ( $ENV{RECORD_COMMIT} ) {   # a manual commit, for the nodes that take one
+        my $c = { type => 'input_audio_buffer.commit' };
+        $tx->send( $json->encode($c) ); rec( c2s => $c );
+      }
+    }
+    elsif ( $f->{type} eq 'conversation.item.input_audio_transcription.completed' || $f->{type} eq 'error' ) {
+      $done = 1; $tx->finish; Mojo::IOLoop->stop;
+    }
+  } );
+  $tx->on( finish => sub { Mojo::IOLoop->stop } );
+} );
+Mojo::IOLoop->timer( 100 => sub { Mojo::IOLoop->stop } );
+Mojo::IOLoop->start;
+print $json->encode($note), "\n";
+# the hundred append frames carry the same audio; keep the first three and the count
+my ( $kept, @lines ) = (0);
+for my $r (@frames) {
+  if ( $r->{dir} eq 'c2s' && ( $r->{frame}{type} // '' ) eq 'input_audio_buffer.append' ) { next if ++$kept > 3 }
+  print $json->encode($r), "\n";
+}
+warn $done ? "done, " . scalar(@frames) . " frames\n" : "no completed event within the timeout\n";
+exit( $done ? 0 : 1 );

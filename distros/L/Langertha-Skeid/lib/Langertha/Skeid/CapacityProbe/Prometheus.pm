@@ -1,5 +1,5 @@
 package Langertha::Skeid::CapacityProbe::Prometheus;
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 # ABSTRACT: Capacity probe reading vLLM/SGLang/TGI Prometheus metrics
 use Moo;
 use Mojo::UserAgent;
@@ -159,7 +159,7 @@ Langertha::Skeid::CapacityProbe::Prometheus - Capacity probe reading vLLM/SGLang
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 

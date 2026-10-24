@@ -1,5 +1,13 @@
 Revision history for Perl extension Text::JSContact
 
+0.04  2026-10-22
+	- security: strip control characters from vCard output; Text::VCardFast
+	  escapes LF but writes a CR raw, so a CR in any card field could end
+	  the content line early and forge extra properties.  CR and CRLF now
+	  become LF (escaped as \n, or ^n in parameters) and control
+	  characters other than HTAB are dropped
+	- add t/injection.t
+
 0.03  2026-10-09
 	- read IMPP's RFC 9554 SERVICE-TYPE and USERNAME parameters, the ones
 	  jscontact_to_vcard writes, as well as the older X-SERVICE-TYPE and

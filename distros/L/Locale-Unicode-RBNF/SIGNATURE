@@ -1,0 +1,77 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.88.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 2da5b59036972de7a55a7430251c89bf18f0589ec05133c9712cc9e0629d6ae4 CHANGES
+SHA256 5cba0cc0b60a659761e6c6a1a581e6fa64148aa6a3b118e89bcfcdbcf9a6fb8a LICENSE-UNICODE
+SHA256 be7da8d254c6b6ccd429c928e49b82cc19a5b64231b9f6e7f2594e038745b335 Locale-Unicode-RBNF.xs
+SHA256 92008c2081cbb551c9f0d25bc44bffbd77d733809424e7515cd720b5a1022c7d MANIFEST
+SHA256 60694c7e9d9b0dfee77969ed110a5d44e4820105518549c77d0d2c5f4dfac4f2 META.json
+SHA256 22fc215895dffea59db7280a7c61371ef93a3d7b69b05cdfd9e6e9ed83441d73 META.yml
+SHA256 6bde290ac89d3a5ee8973234f03995b3137c7d4165e139631934e83fb5990bfc Makefile.PL
+SHA256 b60cbfc800d8fad31a5c66024ed1a08f350350a02303f1e50ddc0f630232291c README.md
+SHA256 7968be06a3f11e1aa9ff6d220b28a2c5540f3a02bf290934ba77e8f13805d66a lib/Locale/Unicode/RBNF.pm
+SHA256 633d3cd23db28c4e3ed353657c87440b67b2f4f66d48f957de162eaf2039892c lib/Locale/Unicode/RBNF/CLDR.pm
+SHA256 ed3e2a0c62af07deb1118ff84afcfdc4cb29dcd34bdeb9a26461797a55702871 lib/Locale/Unicode/RBNF/DecimalFormat.pm
+SHA256 b02e6d12afa8bba2bbe18a1c49ca5c380995447af851c63e2eda1e9ade6ea39e lib/Locale/Unicode/RBNF/PP.pm
+SHA256 edeb7b59e288ad30c851943d6f8e878e03727baf6e3ea4c831ab609e9e073603 lib/Locale/Unicode/RBNF/PluralFormat.pm
+SHA256 7da9ed8651c43a542b9b0be194e4571c905dc0383657d744c756b1c74ea96fb8 lib/Locale/Unicode/RBNF/PluralRules.pm
+SHA256 9f879bb2e38fab4180c9c23721bae17e1ba59e216d019964550b7bd6c5841b53 lib/Locale/Unicode/RBNF/Rule.pm
+SHA256 0eb09716ddcde9e782f27f6fc02e024dd5250694c6d84647a21eab48fdd1acda lib/Locale/Unicode/RBNF/RuleSet.pm
+SHA256 4a28b6dc1e24fef6d708bc183975e86d49ee9bf2e34564590895d3911135a326 lib/Locale/Unicode/RBNF/Substitution.pm
+SHA256 76089ff48ae6bb19866d764175dc2559af255f8e37100d5474ef394ae19c44a6 lib/Locale/Unicode/RBNF/Util.pm
+SHA256 8f4cc4e18c790a522ea066dc934d7e20fb5fafc2c2342cc0cb303a61155941af ppport.h
+SHA256 8dca02923754f0e8f5c60d9b59f6d417168e8292c53dd1a0c825d1dfedb37a93 t/00.load.t
+SHA256 44274fe72d6f693043c5317552e37b3a5d5a645cb4cd746df0743683d908e2f5 t/01.custom_rules.t
+SHA256 19942b96ce94514c88c86a110065ef824cfda82fbfb1c33e70ab10d38377f407 t/02.cldr.t
+SHA256 bd54b9f222e22ff9b2ae437c0466816b6de8e087b820b732cd6eed5e83eac18f t/03.api.t
+SHA256 640593acff0b8dd2285c3fe21faf4fc392de98de6380903f5fbfe226358b597e t/04.rule_sets.t
+SHA256 2bbaca9d966b3bec14123d717746f5f951a1eb9f05be44513316fc280d348cc5 t/05.xs.t
+SHA256 4692a60c5c70e8d9f945054c718abda013daa1ecfd93da65d7bc0bb8e9bcc566 t/cldr/README
+SHA256 1e7fa83a9e89184dfad42147cf727595ae94d13c4bd16d060dcbea4ea45fe30b t/cldr/main/en.xml
+SHA256 57b7936e5268f5335930fb92343c7f7399672565575bbca64b224636eb02fdef t/cldr/main/en_001.xml
+SHA256 09c73adda94ec601216045309faf9a7dcc27fa3ad89101dc91138053c75000fe t/cldr/main/fr.xml
+SHA256 7e634f2c94016527ef775f4c7d409433f342e0e6ffd71b8eb6629fb4167b95e9 t/cldr/main/fr_CH.xml
+SHA256 bb12cbc01db60e6e96dafbbc89631707e57be4f81b8183b87a76e821a3c1a3cf t/cldr/main/ja.xml
+SHA256 a41b0e6e3c6182b3d7a5a9e20a2c4739a024943b103576cf32927afaee6bebc2 t/cldr/main/root.xml
+SHA256 d9942e09090089a53011f7bd90214433b34eb3ecbdbba0a00ae9ef1c64faf273 t/cldr/main/tr.xml
+SHA256 d648f618051e7f082d05157b19dbaaeebb0517232c87ce87c9fc8ac61f840d28 t/cldr/rbnf/en.xml
+SHA256 27aa4198acfe74626eb24a30a2deac2df9a1314fd03224f5405c30bab374909b t/cldr/rbnf/en_001.xml
+SHA256 4708d4dc60eb43e1040ebeab0efe49db3542ed6882522798d860066ca4f30d76 t/cldr/rbnf/fr.xml
+SHA256 45e31deb3c86e91992cc1ec09853791f15c3fc606616aa623b875165420c4f44 t/cldr/rbnf/fr_CH.xml
+SHA256 ee473bf926e57217b539e8483f3e302b6b9712548db7a06b2f308f9a78e813e5 t/cldr/rbnf/ja.xml
+SHA256 43fcb8dab6f1afa8c59be9eb6be9b6df0da45dc5cc91f6a3710cf2631e01ed2e t/cldr/rbnf/root.xml
+SHA256 0481ad790c59aad6bf76a7e5706883e8219bfb5dd13b0635cf47a34e95e257f2 t/cldr/rbnf/tr.xml
+SHA256 c5b9b208c6fe7bd3ce4e1c6cbb8f3337480aca620c9cf703ef3b6c74d4258c16 t/cldr/supplemental/numberingSystems.xml
+SHA256 6c62fa2250f4f0150a3c7e24fc93c20ae6722f65bd26b49aaad799b40f8014b3 t/cldr/supplemental/ordinals.xml
+SHA256 69a30c57a621de9c52ec6ca95fe7bf9f06df6f8c13ca71a72e447b532c92cff7 t/cldr/supplemental/plurals.xml
+SHA256 c87f17b59da243ecf5cc6b27e0c235902b21cbe14c5ede0fde24310e4d5f7e9e t/cldr/supplemental/supplementalData.xml
+SHA256 48a4a50b0883b979b19da24c61efa378e7d4c5642422469f8f730ecf872d6103 t/legacy/rbnf/xx.xml
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBAwAdFiEENa28Ovg1XoRROdiWXzwCYc2y51IFAmra08wACgkQXzwCYc2y
+51ImGw//VoswmcRj0+QiiWXtzybkD1Fp+wMN6z+/NX/5pt0EgNUyUoCylVUUd2iD
+H3WfSawxBVMncMR+h+Qze7bLGc4zOxjM70UAVFce2QzIHc+RUCczngMooAhlGt+t
+ifUWu+MoyCHuIx6Hno/+ulC7jLvUf/QlIGMc7aJ2sZlyw0Sk+c0o7QAloA9lvM5/
+gZp4Z3QXZff8NWWcJgZmgopckyDJF/825+PPoIiiJ+85FsHIfqOngzLfwwNviIy8
+1aJsY9enFXwvugPz685SUmF7Fdtk0ZQWs6ePewu4ObehgtGUUsr7jNDdS45u0O4S
+J4V7r8YuhvvTPiHezgC7cnGXeSlGuPzW7998TQS+tTnhQY1G+IP57jmcIDLCMkLH
+qH0z6MYSYTeWKZfe0wrt20h9sZhaoDhyPaYNEVAnwJF288kwi5I1lf+rQmtKxswj
+9GzGWbMqL7OxvSpdo4U4S19mD5PAY/uq+FpGW/yXNHR1POyZm6FHIKOyP1zkYpv6
+6sYQNrOZ80DC9+mPOVyzfAs95lgJyX48ULw+9dc/FesKWcrBktKXE1RLtrRhjAEY
+lQWObusLdJFI798R3aN3ws1YvPK0Gv7QDJov8iXPIw8268d8y7J0Q4C5lc9bNzhh
+O6jFZ5m2APXbalcJnzlSXSdiveRTd8aB73eCrPNvohb3XUBe4Lw=
+=1pWE
+-----END PGP SIGNATURE-----

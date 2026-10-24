@@ -224,22 +224,7 @@ static STRLEN ps_dir_index(char *file, STRLEN flen,
 /* A filename is not markup and it is not a URL. Two escapes, because the one
  * name goes into both a href and the text of the link. */
 static void ps_html_esc(pTHX_ SV *out, const char *s, STRLEN len) {
-    STRLEN i, run = 0;
-    for (i = 0; i < len; i++) {
-        const char *rep = NULL;
-        switch (s[i]) {
-            case '&':  rep = "&amp;";  break;
-            case '<':  rep = "&lt;";   break;
-            case '>':  rep = "&gt;";   break;
-            case '"':  rep = "&quot;"; break;
-            case '\'': rep = "&#39;";  break;
-            default:   run++;          continue;
-        }
-        if (run) sv_catpvn(out, s + i - run, run);
-        run = 0;
-        sv_catpv(out, rep);
-    }
-    if (run) sv_catpvn(out, s + len - run, run);
+    punk_html_escape(aTHX_ out, s, len);
 }
 
 static void ps_url_esc(pTHX_ SV *out, const char *s, STRLEN len) {

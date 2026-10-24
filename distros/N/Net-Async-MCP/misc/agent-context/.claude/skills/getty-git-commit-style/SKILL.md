@@ -1,6 +1,6 @@
 ---
 name: getty-git-commit-style
-description: Use when writing or amending a commit message in a Getty repository, including a commit that spans several repos.
+description: Use when writing or amending a commit message or a Changes/CHANGELOG entry in a Getty repository, stamping a release's version line, or committing across several repos.
 ---
 
 # Commit Message Style
@@ -65,11 +65,43 @@ bundle. Additionally, it fixes an issue where...
 
 ## Changelog entries
 
-Where the repo carries a `Changes` or `CHANGELOG`, the entry belongs in the same commit
-as the change it describes, and the rules above apply to it unchanged. One thing makes
-it harder than a commit message: a message is written once and never seen again, while
-the unreleased section stays open for weeks and is edited again every time the same
-area is touched.
+Every repo that cuts releases keeps one file named `Changes`, in the CPAN format,
+whatever it is written in — a Perl dist, a Node CLI, a Claude Code or Codex plugin:
+
+```
+Revision history for <name>
+
+{{$NEXT}}
+  - Entry for what is on main and not released yet, wrapped at 78 columns,
+    continuation lines under the text.
+
+0.006     2026-08-30 14:35:09Z
+  - Entry.
+```
+
+- **`{{$NEXT}}`, alone on its line, is the unreleased section.** Entries go directly
+  under it: two spaces, `- `, plain text. The file has no other structure — no `#`
+  headings, no `Added`/`Fixed` groups, newest release first.
+- **A release turns that line into the version line** — the version padded to nine
+  columns, a space, the UTC time (`printf '%-9s %s' "$version" "$(date -u '+%F %TZ')"`)
+  — and puts a fresh `{{$NEXT}}` and a blank line above it. Dist::Zilla does this
+  during `dzil release`; there a version line is never written by hand. Everywhere
+  else it is part of the commit that bumps the version in the manifests, or of the
+  release workflow that does.
+- **An entry is not a release.** It lands under `{{$NEXT}}` and leaves every version
+  number alone.
+- **A `CHANGELOG.md` or a README section that plays this part is converted**, not
+  kept beside it: same text, this format, the old file removed and its references
+  repointed. A repo without any gets `Changes` with its released versions as far as
+  tags and history name them. A version line written this way takes its time from
+  git — the tagged commit, without a tag the commit that set the version
+  (`TZ=UTC git log -1 --date=format-local:'%F %TZ' --format=%cd <commit>`) — not
+  from a guess.
+
+The entry belongs in the same commit as the change it describes, and the rules above
+apply to it unchanged. One thing makes it harder than a commit message: a message is
+written once and never seen again, while the unreleased section stays open for weeks
+and is edited again every time the same area is touched.
 
 **One topic, one entry.** Before writing a bullet, read the unreleased section for the
 topic you are about to describe. If it already has one, **rewrite that bullet** to say

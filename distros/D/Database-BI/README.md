@@ -4,7 +4,7 @@ Database::BI - Web-based Business Intelligence viewer for data files
 
 ## Version
 
-0.015.0
+0.016.0
 
 ## Description
 
@@ -631,6 +631,33 @@ perl Makefile.PL
 
     Removes a date-normalisation pattern.  Body: `l=&col=`.
     Omit `col=` to clear all patterns for the spec.
+
+- `GET /insights`
+
+    Automatic statistical insights for a dataset.  Runs the same pipeline as
+    `/join` then detects outliers (Tukey IQR fence), period-over-period deltas,
+    top movers, and seasonality (lag-1 autocorrelation).  No LLM or network call
+    is made.  Every insight links to a chart or stats view that shows it.
+    Parameters: `l=<spec>` (required), repeatable `f=` filters.
+
+- `POST /api/ask`
+
+    Natural language to analysis spec (Phase 5.1).  Body params: `l=<spec>`
+    (required), `q=<question>` (required), repeatable `f=` filters.
+    Returns `{ spec, url, valid => 1 }` on success.  The model receives only
+    column names and types -- never raw row data or file paths.  Returns 503 when
+    `ai_api_key` is not configured; 400 for missing params; 422 for an
+    unparseable or invalid-column spec; 502 for a provider error.
+
+- `POST /api/summary`
+
+    Narrative summary of an analysis (Phase 5.3).  Body params: `l=<spec>`
+    (required), repeatable `f=` filters, `ai=1` (optional, honours
+    `ai_api_key` config).  Returns `{ text, source, cached }`.  Two paths:
+    deterministic template sentences (always available, works offline) and
+    optional LLM-polished prose when `ai=1` is passed and `ai_api_key` is
+    set.  Only aggregate insight facts are sent to the LLM.  Results are cached
+    in-process for one hour keyed on the analysis fingerprint.
 
 ## Configuration
 

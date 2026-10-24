@@ -24,11 +24,11 @@ HTML::OSM - Generate an interactive OpenStreetMap with Leaflet.js
 
 =head1 VERSION
 
-Version 0.11
+Version 0.12
 
 =cut
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 # CDN URLs pinned to tested versions.  Override via constructor params to use
 # a self-hosted copy or a different version.
@@ -60,6 +60,14 @@ Readonly::Scalar my $LON_MIN => -180;
 Readonly::Scalar my $LON_MAX =>  180;
 Readonly::Scalar my $ZOOM_MIN =>  0;
 Readonly::Scalar my $ZOOM_MAX => 19;
+
+# The highest maxZoom Leaflet supports on a tile layer
+Readonly::Scalar my $MAX_ZOOM_LIMIT => 28;
+
+# Circle markers: Leaflet's default path colour, and a hex colour check
+Readonly::Scalar my $DEFAULT_CIRCLE_RADIUS => 8;
+Readonly::Scalar my $DEFAULT_CIRCLE_COLOUR => '#3388ff';
+Readonly::Scalar my $HEX_COLOUR            => qr/\A#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})\z/;
 
 =head1 SYNOPSIS
 
@@ -93,7 +101,14 @@ internal tile server or run on an air-gapped network.  It accepts the same
 Leaflet placeholders as the default, for example
 C<http://tiles.internal/{z}/{x}/{y}.png>.  The attribution remains the
 OpenStreetMap credit, which is the usual requirement for OSM-derived tiles.
-The optional in-page search box still calls Nominatim when a reader uses it.
+The in-page search box still calls Nominatim when a reader uses it; set
+C<< search => 0 >> to leave it out.
+
+=item * Maximum zoom
+
+C<max_zoom> (0 to 28) stops readers zooming in further than the tile server
+has tiles for.  Without it, Leaflet allows zooming past the server's coverage
+and the map shows empty grey tiles.  When it is not given, no limit is set.
 
 =item * Tile attribution
 
@@ -107,6 +122,13 @@ trusted text.
 C<email> is added to every Nominatim request the module makes, as the
 Nominatim usage policy asks of heavy users.  It is not put into the rendered
 page, so the in-page search box sends no address.
+
+=item * Search box
+
+By default the rendered page has a search box that sends whatever the reader
+types to Nominatim, and a button that clears the markers it adds.  Set
+C<< search => 0 >> to leave both out, so that nothing typed on the page leaves
+the reader's machine.  The "Reset Map" button is always included.
 
 =back
 
@@ -161,7 +183,9 @@ merging C<%overrides> onto the existing object's state without re-validating.
     host                    => { type => string,                    optional },
     js_url                  => { type => string,                    optional },
     logger                  => { type => object,                    optional },
+    max_zoom                => { type => integer, min => 0, max => 28, optional },
     min_interval            => { type => number,  min => 0,         optional },
+    search                  => { type => boolean,                   optional },
     tile_attribution        => { type => string,                    optional },
     tile_url                => { type => string,                    optional },
     ua                      => { type => object,                    optional },
@@ -232,7 +256,9 @@ sub new
 			host                    => { type => 'string',                         optional => 1 },
 			js_url                  => { type => 'string',                         optional => 1 },
 			logger                  => { type => 'object',                         optional => 1 },
+			max_zoom                => { type => 'integer', min => $ZOOM_MIN, max => $MAX_ZOOM_LIMIT, optional => 1 },
 			min_interval            => { type => 'number',  min => 0,              optional => 1 },
+			search                  => { type => 'boolean',                        optional => 1 },
 			tile_attribution        => { type => 'string',                         optional => 1 },
 			tile_url                => { type => 'string',                         optional => 1 },
 			ua                      => { type => 'object',                         optional => 1 },
@@ -261,6 +287,7 @@ sub new
 		min_interval            => 0,
 		last_request            => 0,
 		cluster                 => 0,
+		search                  => 1,
 		css_url                 => $LEAFLET_CSS_URL,
 		js_url                  => $LEAFLET_JS_URL,
 		cluster_js_url          => $CLUSTER_JS_URL,
@@ -335,52 +362,95 @@ also returns 0.
 sub add_marker
 {
 	my $self = shift;
-	my ($params, $point);
 
-	if(ref($_[0]) eq 'ARRAY') {
-		$point  = shift;
-		$params = Params::Get::get_params(undef, \@_) || {};
-		# Single-element arrayref is a wrapped address string
-		$point  = $point->[0] if scalar(@{$point}) == 1;
-	} elsif(blessed($_[0]) && $_[0]->can('latitude')) {
-		# Geo object as first positional arg: extract before Params::Get sees it,
-		# otherwise Params::Get mistakes the blessed hashref for the params hash.
-		$point  = shift;
-		$params = Params::Get::get_params(undef, \@_) || {};
-	} elsif(defined($_[0]) && !ref($_[0]) && scalar(@_) % 2 != 0) {
-		# Plain string as first positional arg, optionally followed by key-value pairs.
-		# An odd total count signals a leading positional; even count means all key-value.
-		$point  = shift;
-		$params = Params::Get::get_params(undef, \@_) || {};
-	} else {
-		$params = Params::Get::get_params('point', @_);
-		$point  = $params->{'point'};
-	}
+	my ($lat, $lon, $params) = $self->_point_args('add_marker', @_);
+	return 0 unless defined($lat);
 
-	my ($lat, $lon);
+	push @{$self->{coordinates}}, [$lat, $lon, $params->{'html'}, $params->{'icon'}];
+	return 1;
+}
 
-	if(ref($point) eq 'ARRAY') {
-		return 0 if scalar(@{$point}) != 2;
-		($lat, $lon) = @{$point};
-	} elsif(!ref($point)) {
-		# An empty or missing address cannot be resolved
-		return 0 unless defined($point) && length($point);
-		($lat, $lon) = $self->_fetch_coordinates($point);
-	} elsif($point->can('latitude')) {
-		($lat, $lon) = ($point->latitude(), $point->longitude());
-	} else {
-		my $msg = 'add_marker(): unknown point type: ' . ref($point);
+=head2 add_circle_marker
+
+Add a filled circle whose size in pixels can show a quantity, such as the
+population of a town.
+
+    $map->add_circle_marker([51.5074, -0.1278],
+        html   => 'London',
+        radius => 12,
+        colour => '#e45c3a',
+    );
+
+The point may be anything C<add_marker()> accepts.  The radius is in screen
+pixels, so a circle stays the same size as the reader zooms in and out.
+With C<< cluster => 1 >>, circles join the same cluster group as the pin
+markers.
+
+Returns 1 on success, 0 if the point cannot be resolved or is out of range.
+
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+  point  : arrayref [lat, lon] | string address | object with latitude()/longitude()
+  html   : string   (optional popup label)
+  radius : number > 0 and < 1e6   (optional, default 8)
+  colour : string   hex #rrggbb or #rgb, any case   (optional, default '#3388ff')
+
+=head4 OUTPUT
+
+  { type => integer, enum => [0, 1] }
+
+=head3 MESSAGES
+
+  | Message                                             | Meaning / Resolution                        |
+  |-----------------------------------------------------|---------------------------------------------|
+  | add_circle_marker(): radius must be a positive number | radius is 0, negative, 1e6 or more, or not a plain number |
+  | add_circle_marker(): invalid colour: VALUE          | colour is not a #rgb or #rrggbb hex string  |
+  | add_circle_marker(): unknown point type: TYPE       | Point is a ref type with no lat/lon methods |
+  | Skipping invalid coordinate: (LAT, LON)             | Warning: the point is not numeric or is out of range; 0 is returned |
+
+=head3 EXAMPLES
+
+    # Bubble whose area shows the population
+    $map->add_circle_marker([$lat, $lon],
+        html   => "$city ($pop)",
+        radius => sqrt($pop / $max_pop) * 30,
+        colour => '#e45c3a',
+    );
+
+    # Mixed map: pins for offices, circles for market size
+    $map->add_marker([$lat1, $lon1], html => 'HQ');
+    $map->add_circle_marker([$lat2, $lon2], html => 'Market A', radius => 20);
+
+=cut
+
+sub add_circle_marker
+{
+	my $self = shift;
+
+	my ($lat, $lon, $params) = $self->_point_args('add_circle_marker', @_);
+
+	# Check the options even when the point is unusable, so a bad radius or
+	# colour is reported whatever the data
+	my $radius = $params->{'radius'} // $DEFAULT_CIRCLE_RADIUS;
+	my $checked = _positive_number($radius, undef);
+	if(!defined($checked)) {
+		my $msg = 'add_circle_marker(): radius must be a positive number';
 		$self->{logger}->error($msg) if $self->{logger};
 		croak $msg;
 	}
 
-	return 0 unless defined($lat) && defined($lon);
+	my $colour = $params->{'colour'} // $DEFAULT_CIRCLE_COLOUR;
+	if(ref($colour) || $colour !~ $HEX_COLOUR) {
+		my $msg = "add_circle_marker(): invalid colour: $colour";
+		$self->{logger}->error($msg) if $self->{logger};
+		croak $msg;
+	}
 
-	# Store the text form with a '.' decimal point, whatever the locale
-	($lat, $lon) = (_num_str($lat), _num_str($lon));
-	return 0 unless _validate($lat, $lon);
+	return 0 unless defined($lat);
 
-	push @{$self->{coordinates}}, [$lat, $lon, $params->{'html'}, $params->{'icon'}];
+	push @{$self->{circle_markers}}, [$lat, $lon, $params->{'html'}, $checked, lc($colour)];
 	return 1;
 }
 
@@ -794,8 +864,8 @@ Render the map and return a two-element list suitable for embedding in HTML.
 C<$head_html> contains the Leaflet CSS, JavaScript, and plugin assets.
 Place it inside C<< <head>...</head> >>.
 
-C<$body_html> contains the search box, control buttons, map C<< <div> >>,
-and the initialisation C<< <script> >>.
+C<$body_html> contains the search box (unless C<< search => 0 >>), control
+buttons, map C<< <div> >>, and the initialisation C<< <script> >>.
 Place it inside C<< <body>...</body> >> where the map should appear.
 
 The rendered page provides:
@@ -803,9 +873,11 @@ The rendered page provides:
 =over 4
 
 =item * A Nominatim-powered search box that adds temporary markers.
+Left out when C<< search => 0 >>.
 
 =item * A "Clear search markers" button that removes those temporary markers,
 leaving static markers (added via C<add_marker>) intact.
+Left out when C<< search => 0 >>.
 
 =item * A "Reset Map" button that returns the view to the initial centre and zoom.
 
@@ -815,7 +887,8 @@ Values that reach the object without going through C<new()>'s checks (from a
 config file or a clone) are checked again here.  A C<zoom> that is not an
 integer from 0 to 19 is replaced by 12, and a C<width> or C<height> that is
 not a CSS length (such as C<600px>, C<100%> or C<auto>) is replaced by the
-default.  Each replacement gives a warning.
+default.  A C<max_zoom> that is not an integer from 0 to 28 is ignored.  Each
+replacement gives a warning.
 
 =head3 API SPECIFICATION
 
@@ -831,10 +904,11 @@ default.  Each replacement gives a warning.
 
   | Message                                          | Meaning / Resolution                        |
   |--------------------------------------------------|---------------------------------------------|
-  | No map data provided                             | No markers, GeoJSON, heatmap, GPX, or choropleth added yet |
+  | No map data provided                             | No markers, circle markers, GeoJSON, heatmap, GPX, or choropleth added yet |
   | center() must be called when no point markers are provided | Non-marker-only render needs explicit centre |
   | Skipping invalid coordinate: (LAT, LON)          | Warning: a marker is not numeric or out of range; it is left off the map |
   | onload_render: invalid zoom 'Z', using 12        | Warning: zoom from a config file or clone is out of range |
+  | onload_render: invalid max_zoom 'Z', ignoring it | Warning: max_zoom from a config file or clone is not an integer from 0 to 28 |
   | onload_render: invalid width 'W', using 600px    | Warning: width is not a CSS length |
   | onload_render: invalid height 'H', using 400px   | Warning: height is not a CSS length |
   | _fetch_coordinates: failed to decode Nominatim response: ERROR | Warning: Nominatim returned something that is not JSON; the marker is skipped |
@@ -867,16 +941,22 @@ default.  Each replacement gives a warning.
   1. Gather all data layers; croak if none populated.
   2. Geocode/validate each coordinate tuple; discard invalids with a warning.
      A tuple with no coordinates and no address is discarded.
-     Re-check zoom, width and height; fall back to defaults with a warning.
-  3. Determine map centre: caller-supplied > computed midpoint of marker bounds.
+     Check circle markers the same way.
+     Re-check zoom, max_zoom, width and height; fall back with a warning.
+  3. Determine map centre: caller-supplied > computed midpoint of the bounds
+     of the pin and circle markers.
      Croak if neither is available.
   4. Build <head>: Leaflet CSS + JS; inject cluster/heatmap/GPX plugin assets
      only when the corresponding layer type is present.
-  5. Build <body>: search box, clear-search button, reset button, map <div>.
-  6. Initialise Leaflet map, tile layer, searchMarkers array.
-  7. Emit JS for each marker (via clusterGroup when cluster is set).
+  5. Build <body>: search box and clear-search button (when search is on),
+     reset button, map <div>.
+  6. Initialise Leaflet map, tile layer (with maxZoom when max_zoom is set),
+     and the searchMarkers array when search is on.
+  7. Emit JS for each pin and circle marker (via one clusterGroup when
+     cluster is set).
   8. Emit JS for each GeoJSON, heatmap, GPX, and choropleth layer.
-  9. Attach event listeners: reset-view, clear-search-markers, search-on-Enter.
+  9. Attach event listeners: reset-view, and when search is on,
+     clear-search-markers and search-on-Enter.
   10. Return ($head, $body).
 
 =cut
@@ -893,9 +973,11 @@ sub onload_render
 	my $heatmap_layers    = $self->{heatmap_layers}      || [];
 	my $gpx_tracks        = $self->{gpx_tracks}          || [];
 	my $choropleth_layers = $self->{choropleth_layers}   || [];
+	my $circle_markers    = $self->{circle_markers}      || [];
 
 	unless(@$coordinates || @$geojson_layers || @$heatmap_layers
-	                     || @$gpx_tracks     || @$choropleth_layers) {
+	                     || @$gpx_tracks     || @$choropleth_layers
+	                     || @$circle_markers) {
 		$self->{logger}->error('No map data provided') if $self->{logger};
 		croak 'No map data provided';
 	}
@@ -925,13 +1007,37 @@ sub onload_render
 		push @valid_coordinates, [$lat, $lon, $label, $icon_url];
 	}
 
+	# add_circle_marker checked these, but a clone can bring in anything
+	my @valid_circles;
+	for my $circle (@$circle_markers) {
+		my ($lat, $lon, $label, $radius, $colour) = @$circle;
+		next unless defined($lat) && defined($lon);
+		($lat, $lon) = (_num_str($lat), _num_str($lon));
+		next unless _validate($lat, $lon);
+		$radius = _positive_number($radius, $DEFAULT_CIRCLE_RADIUS);
+		$colour = $DEFAULT_CIRCLE_COLOUR unless defined($colour) && !ref($colour) && $colour =~ $HEX_COLOUR;
+		push @valid_circles, [$lat, $lon, $label, $radius, lc($colour)];
+	}
+
+	# Only an integer in Leaflet's range is put into the tile layer options
+	my $max_zoom = $self->{'max_zoom'};
+	if(defined($max_zoom) && ($max_zoom !~ /\A[0-9]+\z/ || $max_zoom > $MAX_ZOOM_LIMIT)) {
+		carp "onload_render: invalid max_zoom '$max_zoom', ignoring it";
+		undef $max_zoom;
+	}
+	my $max_zoom_js = defined($max_zoom) ? ",\n\t\t\t\tmaxZoom: $max_zoom" : '';
+
+	# A config file can give the words 'false', 'no' or 'off'
+	my $search = $self->{'search'};
+	$search = 0 if defined($search) && $search =~ /\A(?:false|no|off)\z/i;
+
 	# Determine map centre: caller-set wins; else compute from marker bounds.
 	my ($center_lat, $center_lon);
 	if($self->{'center'}) {
 		($center_lat, $center_lon) = @{$self->{'center'}};
-	} elsif(@valid_coordinates) {
+	} elsif(@valid_coordinates || @valid_circles) {
 		my ($min_lat, $min_lon, $max_lat, $max_lon) = (90, 180, -90, -180);
-		for my $c (@valid_coordinates) {
+		for my $c (@valid_coordinates, @valid_circles) {
 			# Convert with _num_val: some perls read '51.5074' as 51 under de_DE
 			my ($lat, $lon) = (_num_val($c->[0]), _num_val($c->[1]));
 			$min_lat = $lat if $lat < $min_lat;
@@ -965,34 +1071,47 @@ sub onload_render
 	$head .= qq{\t\t<script src="$url{heatmap_js_url}"></script>\n} if @$heatmap_layers;
 	$head .= qq{\t\t<script src="$url{gpx_js_url}"></script>\n}     if @$gpx_tracks;
 
-	$head .= qq{
+	if($search) {
+		$head .= qq{
 		<style>
 			#map { width: $width; height: $height; }
 			#search-box { margin: 10px; padding: 5px; }
 			#reset-button, #clear-search-button { margin: 10px; padding: 5px; cursor: pointer; }
 		</style>
-	};
+		};
+	} else {
+		$head .= qq{
+		<style>
+			#map { width: $width; height: $height; }
+			#reset-button { margin: 10px; padding: 5px; cursor: pointer; }
+		</style>
+		};
+	}
 
 	# --- <body> ---
 	my $tile_url         = _js_string($self->{tile_url});
 	my $tile_attribution = _js_string($self->{tile_attribution});
-	my $body = qq{
+	my $body = '';
+	if($search) {
+		$body .= qq{
 		<input type="text" id="search-box" placeholder="Enter location">
-		<button id="clear-search-button">Clear search markers</button>
+		<button id="clear-search-button">Clear search markers</button>};
+	}
+	$body .= qq{
 		<button id="reset-button">Reset Map</button>
 		<div id="map"></div>
 		<script>
 			var map = L.map('map').setView([$center_lat, $center_lon], $zoom);
 			L.tileLayer('$tile_url', {
-				attribution: '$tile_attribution'
+				attribution: '$tile_attribution'$max_zoom_js
 			}).addTo(map);
-
-			var searchMarkers = [];
 	};
+	$body .= "\n\t\t\tvar searchMarkers = [];\n" if $search;
 
-	# Point markers — optionally grouped into a cluster layer.
+	# Point and circle markers — optionally grouped into one cluster layer.
+	my $clustered = $self->{cluster} && (@valid_coordinates || @valid_circles);
+	$body .= "\t\t\tvar clusterGroup = L.markerClusterGroup();\n" if $clustered;
 	if(@valid_coordinates) {
-		$body .= "\t\t\tvar clusterGroup = L.markerClusterGroup();\n" if $self->{cluster};
 
 		for my $coord (@valid_coordinates) {
 			my ($lat, $lon, $label, $icon_url) = @$coord;
@@ -1015,9 +1134,22 @@ sub onload_render
 				$body .= "\t\t\tL.marker([$lat, $lon]).addTo(map).bindPopup('$js_label');\n";
 			}
 		}
-
-		$body .= "\t\t\tmap.addLayer(clusterGroup);\n" if $self->{cluster};
 	}
+
+	for my $circle (@valid_circles) {
+		my ($lat, $lon, $label, $radius, $colour) = @$circle;
+		my $popup = (defined($label) && length($label))
+			? ".bindPopup('" . _js_string($label) . "')"
+			: '';
+		my $circle_js = "L.circleMarker([$lat, $lon], { radius: $radius, color: '$colour', fillColor: '$colour', fillOpacity: 0.7 })$popup";
+		if($self->{cluster}) {
+			$body .= "\t\t\tclusterGroup.addLayer($circle_js);\n";
+		} else {
+			$body .= "\t\t\t$circle_js.addTo(map);\n";
+		}
+	}
+
+	$body .= "\t\t\tmap.addLayer(clusterGroup);\n" if $clustered;
 
 	# GeoJSON layers.
 	for my $layer (@$geojson_layers) {
@@ -1084,7 +1216,10 @@ sub onload_render
 			document.getElementById('reset-button').addEventListener('click', function() {
 				map.setView([$center_lat, $center_lon], $zoom);
 			});
+	};
 
+	if($search) {
+		$body .= qq{
 			document.getElementById('clear-search-button').addEventListener('click', function() {
 				searchMarkers.forEach(function(m) { map.removeLayer(m); });
 				searchMarkers = [];
@@ -1111,10 +1246,70 @@ sub onload_render
 					});
 				}
 			});
-		</script>
-	};
+		};
+	}
+	$body .= "\t\t</script>\n";
 
 	return ($head, $body);
+}
+
+# _point_args: Split a marker method's arguments into a point and options,
+#          and resolve the point to coordinates.
+# Purpose: add_marker and add_circle_marker take the same kinds of point.
+# Entry:   $self, $caller (method name for messages), then the caller's @_.
+# Exit:    ($lat, $lon, \%params) with dot-decimal, range-checked coordinates;
+#          (undef, undef, \%params) when the point cannot be used.
+# Side Effects: May call the geocoder; croaks on an unknown point type; _validate carps.
+sub _point_args
+{
+	my ($self, $caller, @args) = @_;
+	my ($params, $point);
+
+	if(ref($args[0]) eq 'ARRAY') {
+		$point  = shift @args;
+		$params = Params::Get::get_params(undef, \@args) || {};
+		# Single-element arrayref is a wrapped address string
+		$point  = $point->[0] if scalar(@{$point}) == 1;
+	} elsif(blessed($args[0]) && $args[0]->can('latitude')) {
+		# Geo object as first positional arg: extract before Params::Get sees it,
+		# otherwise Params::Get mistakes the blessed hashref for the params hash.
+		$point  = shift @args;
+		$params = Params::Get::get_params(undef, \@args) || {};
+	} elsif(defined($args[0]) && !ref($args[0]) && scalar(@args) % 2 != 0) {
+		# Plain string as first positional arg, optionally followed by key-value pairs.
+		# An odd total count signals a leading positional; even count means all key-value.
+		$point  = shift @args;
+		$params = Params::Get::get_params(undef, \@args) || {};
+	} else {
+		$params = Params::Get::get_params('point', @args);
+		$point  = $params->{'point'};
+	}
+	$params ||= {};
+
+	my ($lat, $lon);
+
+	if(ref($point) eq 'ARRAY') {
+		return (undef, undef, $params) if scalar(@{$point}) != 2;
+		($lat, $lon) = @{$point};
+	} elsif(!ref($point)) {
+		# An empty or missing address cannot be resolved
+		return (undef, undef, $params) unless defined($point) && length($point);
+		($lat, $lon) = $self->_fetch_coordinates($point);
+	} elsif($point->can('latitude')) {
+		($lat, $lon) = ($point->latitude(), $point->longitude());
+	} else {
+		my $msg = "$caller(): unknown point type: " . ref($point);
+		$self->{logger}->error($msg) if $self->{logger};
+		croak $msg;
+	}
+
+	return (undef, undef, $params) unless defined($lat) && defined($lon);
+
+	# Store the text form with a '.' decimal point, whatever the locale
+	($lat, $lon) = (_num_str($lat), _num_str($lon));
+	return (undef, undef, $params) unless _validate($lat, $lon);
+
+	return ($lat, $lon, $params);
 }
 
 # _fetch_coordinates: Resolve a place-name string to a (lat, lon) pair.
@@ -1383,12 +1578,17 @@ can merge arbitrary state.  Callers are responsible for passing valid overrides.
 =item * B<Config-file params unvalidated>: Keys injected by
 L<Object::Configure> from a config file are not re-run through the schema, so
 a malformed config file can introduce invalid types at runtime.
-C<onload_render()> checks C<zoom>, C<width> and C<height> again and
+C<onload_render()> checks C<zoom>, C<max_zoom>, C<width> and C<height> again and
 HTML-escapes the CDN URLs, so a bad value cannot inject markup into the page.
 
 =item * B<One map per page>: The rendered HTML uses fixed element IDs
 (C<map>, C<search-box>, C<clear-search-button> and C<reset-button>), so two
 maps on the same page will clash.
+
+=item * B<Clustered circle markers>: With C<< cluster => 1 >>, circle markers
+are grouped with the pin markers, so at low zoom levels a cluster count is
+shown in place of the circles' sizes.  Leave C<cluster> off for a bubble map
+whose sizes should always be visible.
 
 =item * B<Private-method encapsulation>: C<_fetch_coordinates>, C<_validate>,
 and C<_js_string> are named with a leading underscore by convention only.

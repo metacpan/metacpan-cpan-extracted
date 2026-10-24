@@ -3,7 +3,7 @@ package Database::BI::Extract;
 use strict;
 use warnings;
 
-our $VERSION = '0.015.0';
+our $VERSION = '0.016.0';
 
 use Carp		qw(croak carp);
 use Digest::MD5		qw(md5_hex);
@@ -11,8 +11,6 @@ use File::Path		qw(make_path remove_tree);
 use Mojo::File;
 
 # ---------------------------------------------------------------------------
-# Phase 4.1 -- SQLite extract cache
-#
 # An extract is a SQLite materialisation of one dataset, stored at:
 #   <model_dir>/extracts/<fingerprint>.db
 #
@@ -115,7 +113,7 @@ __END__
 
 =head1 NAME
 
-Database::BI::Extract -- SQLite materialisation cache for Database::BI (Phase 4.1)
+Database::BI::Extract -- SQLite materialisation cache for Database::BI
 
 =head1 SYNOPSIS
 

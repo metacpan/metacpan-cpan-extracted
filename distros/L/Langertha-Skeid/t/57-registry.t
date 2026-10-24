@@ -197,7 +197,7 @@ sub downstream_config {
   is $node{'gpu-hot'}{healthy}, 1, 'health';
   is_deeply $node{'gpu-hot'}{tags}, ['local'], 'tags';
   is_deeply [sort keys %{$node{'gpu-hot'}}],
-    [sort qw(id tags healthy inflight max_conns errors_in_window last_failure_at)],
+    [sort qw(id tags healthy inflight max_conns errors_in_window last_failure_at rejected_in_window)],
     'exactly the whitelisted fields per node -- nothing else can slip in';
 
   # A scan of the bytes, not of the decoded fields: whatever reaches the wire is what leaks.

@@ -1,5 +1,5 @@
 package Langertha::Skeid;
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 # ABSTRACT: Dynamic routing control-plane for multi-node LLM serving with normalized metrics and cost accounting
 use Moo;
 use strict;
@@ -12,9 +12,13 @@ use Time::HiRes ();
 use YAML::PP;
 use Langertha ();
 use Langertha::Skeid::UsageStore;
+use Langertha::Skeid::CustomerSource;
 use Langertha::Skeid::Protocol;
 use Langertha::Skeid::Protocol::Anthropic;
+use Langertha::Skeid::Protocol::Documents;
+use Langertha::Skeid::Protocol::MCP;
 use Langertha::Skeid::Protocol::Ollama;
+use Langertha::Skeid::Protocol::Rerank;
 use Langertha::Usage;
 use Langertha::Cost;
 use Langertha::Pricing;
@@ -94,6 +98,107 @@ has key_manifests => (
   is      => 'rw',
   default => sub { {} },
 );
+
+
+# Key id -> 1, from client_auth.keys (skeid k90). Undef is off -- every caller gets in, as
+# before the section existed -- and is a different thing from {}, which lets nobody in.
+has client_auth_keys => (
+  is      => 'rw',
+  default => sub { undef },
+);
+
+
+# Server name -> resolved entry, from mcp.servers (skeid k103, ADR 0022). Undef is off -- both
+# MCP routes are the unknown path they were before the section existed -- and is a different
+# thing from {}, a gateway that is on and has no server.
+has mcp_servers => (
+  is      => 'rw',
+  default => sub { undef },
+);
+
+has mcp_public_url => (
+  is      => 'rw',
+  default => sub { undef },
+);
+
+
+my $MCP_MAX_REQUEST_BYTES = 10485760;
+
+has mcp_max_request_bytes => (
+  is      => 'rw',
+  default => sub { $MCP_MAX_REQUEST_BYTES },
+);
+
+
+has openapi_swagger_ui => (
+  is      => 'rw',
+  default => sub { 0 },
+);
+
+has openapi_cache_dir => (
+  is      => 'rw',
+  default => sub { undef },
+);
+
+
+has customer_source_fetcher => (
+  is        => 'ro',
+  predicate => 'has_customer_source_fetcher',
+);
+
+# The customer source (ADR 0026). The normalized section of the config in force and a digest of
+# it (a changed one restarts the fetcher), the loop that fetches, the latest snapshot -- the rows
+# of the last successful fetch, merged into the file's config at every reload -- and what the
+# last merge accepted, rejected and shadowed.
+has _source_cfg        => (is => 'rw');
+has _source_cfg_print  => (is => 'rw');
+has _source_ctl        => (is => 'rw');
+has _source_snapshot   => (is => 'rw');
+has _source_report     => (is => 'rw');
+has _source_started    => (is => 'rw', default => sub { 0 });
+has _source_stale_timer => (is => 'rw');
+has _source_gate_warned => (is => 'rw', default => sub { 0 });
+
+
+# uploads.max_bytes (skeid k91): the body limit of the multipart routes, read per request by
+# the proxy, so a reload holds from the next upload. The default is OpenAI's own limit for an
+# audio file, 25 MiB.
+my $UPLOAD_MAX_BYTES = 26214400;
+
+has upload_max_bytes => (
+  is      => 'rw',
+  default => sub { $UPLOAD_MAX_BYTES },
+);
+
+
+# uploads.documents_max_bytes (skeid k94, ADR 0028): the body limit of /v1/convert/file and
+# /v1/convert/source. Documents are bigger than audio, so it is a limit of its own.
+my $DOCUMENTS_MAX_BYTES = 104857600;
+
+has documents_max_bytes => (
+  is      => 'rw',
+  default => sub { $DOCUMENTS_MAX_BYTES },
+);
+
+
+has documents_allow_remote_sources => (
+  is      => 'rw',
+  default => sub { 0 },
+);
+
+
+# realtime: (skeid k95, ADR 0029). Read when a session opens, so a reload holds for the next one.
+my %REALTIME_DEFAULT = (
+  idle_timeout        => 300,
+  max_session_seconds => 3600,
+  max_message_bytes   => 1048576,
+  max_queued_bytes    => 4194304,
+);
+
+has realtime_idle_timeout        => (is => 'rw', default => sub { $REALTIME_DEFAULT{idle_timeout} });
+has realtime_max_session_seconds => (is => 'rw', default => sub { $REALTIME_DEFAULT{max_session_seconds} });
+has realtime_max_message_bytes   => (is => 'rw', default => sub { $REALTIME_DEFAULT{max_message_bytes} });
+has realtime_max_queued_bytes    => (is => 'rw', default => sub { $REALTIME_DEFAULT{max_queued_bytes} });
 
 
 # Whether x-skeid-key-id / x-api-key-id from the client may name the customer. Off by default:
@@ -375,6 +480,13 @@ has _failures => (
   default => sub { {} },
 );
 
+# The same shape for requests the client's own fault ended (k99): the registry snapshot's
+# rejected_in_window. Kept apart from _failures so errors_in_window keeps its meaning.
+has _rejections => (
+  is      => 'rw',
+  default => sub { {} },
+);
+
 has _stats => (
   is      => 'rw',
   default => sub { {} },
@@ -463,16 +575,31 @@ sub add_node {
     Langertha::Skeid::CapacityProbe::Registry->validate_config($node{capacity}, $id);
   }
 
+  # An unknown format croaks, like an unknown engine: a TEI node called in the default dialect
+  # answers every request with an error (skeid k92).
+  my $rerank_format = Langertha::Skeid::Protocol::Rerank->normalize_format($node{rerank_format});
+
+  # The same for the kind of node and the header its key goes in (skeid k94, ADR 0028): a node of
+  # a kind nobody spelled right would be sent the wrong sort of request, and a header name that
+  # is no token could carry a line break upstream.
+  my $kind    = Langertha::Skeid::Protocol::Documents->normalize_kind($node{kind});
+  my $key_header = Langertha::Skeid::Protocol::Documents->normalize_key_header($node{api_key_header});
+
+  # Every check that can croak runs before the removal: a bad re-add must leave the working
+  # node in the inventory (skeid k98).
+  my $engine = $self->normalize_engine_id((defined($node{engine}) && length($node{engine})) ? $node{engine} : 'OpenAIBase');
+  my $tags   = $self->normalize_tags($node{tags});
+
   $self->remove_node($id);
   push @{$self->nodes}, {
     id          => $id,
     url         => $url,
     model       => ($node{model} // ''),
-    engine      => $self->normalize_engine_id((defined($node{engine}) && length($node{engine})) ? $node{engine} : 'OpenAIBase'),
+    engine      => $engine,
     weight      => (defined $node{weight} ? 0 + $node{weight} : 1),
     max_conns   => (defined $node{max_conns} ? 0 + $node{max_conns} : 0),
     healthy     => (exists $node{healthy} ? ($node{healthy} ? 1 : 0) : 1),
-    tags        => $self->normalize_tags($node{tags}),
+    tags        => $tags,
     metadata    => (ref($node{metadata}) eq 'HASH' ? $node{metadata} : {}),
     (defined($node{api_key_env}) && length($node{api_key_env})
       ? (api_key_env => "$node{api_key_env}")
@@ -483,6 +610,16 @@ sub add_node {
     # How this node's capacity is found (ADR 0009). Absent means inflight, which is every
     # deployment that existed before probes did.
     (ref($node{capacity}) eq 'HASH' ? (capacity => { %{$node{capacity}} }) : ()),
+    # The dialect the node's rerank route speaks when it is not the client's (skeid k92).
+    # Absent means the request is relayed as it came.
+    (length($rerank_format) ? (rerank_format => $rerank_format) : ()),
+    # What the node serves when it is not chat completions: `documents` is a docling-serve node,
+    # reached by the documents routes and by nothing else (ADR 0028). Absent means chat, which
+    # is every node there was before the option.
+    (length($kind) ? (kind => $kind) : ()),
+    # The header the node's key is sent in, raw, instead of `Authorization: Bearer` (docling's
+    # `X-Api-Key`). Absent means Authorization.
+    (length($key_header) ? (api_key_header => $key_header) : ()),
   };
   $self->_bump_inventory;
   return 1;
@@ -500,6 +637,7 @@ sub remove_node {
   if ($removed) {
     $self->forget_capacity($id);
     delete $self->_failures->{$id};
+    delete $self->_rejections->{$id};
   }
   return $removed ? 1 : 0;
 }
@@ -576,10 +714,15 @@ sub list_models {
   for my $n (@{$self->nodes || []}) {
     my $model = $n->{model};
     next unless defined $model && length $model;
+    # A documents node names no model a client can ask for (ADR 0028).
+    next if length($n->{kind} // '');
     next if $self->_node_has_any_tag($n, $deny);
     $entry{$model} //= { model => $model, engine => ($n->{engine} // '') };
   }
+  my $documents_key = Langertha::Skeid::Protocol::Documents->routing_key;
   for my $name (keys %{$self->model_aliases || {}}) {
+    # The alias of the documents routing key tiers documents nodes: it is not a chat model.
+    next if $name eq $documents_key;
     $entry{$name} //= { model => $name, engine => '' };
   }
 
@@ -666,7 +809,11 @@ my @CONFIG_STATE = qw(
   model_aliases policies default_policy key_policies key_names nodes
   route_wait_timeout_ms route_wait_poll_ms trust_key_id_header frontend_count
   admin_api_key _config_admin_api_key
-  manifest_enabled manifest_available key_manifests
+  manifest_enabled manifest_available key_manifests client_auth_keys upload_max_bytes
+  documents_max_bytes documents_allow_remote_sources
+  mcp_servers mcp_public_url mcp_max_request_bytes openapi_swagger_ui openapi_cache_dir
+  realtime_idle_timeout realtime_max_session_seconds realtime_max_message_bytes
+  realtime_max_queued_bytes
   registry_enabled registry_secret registry_read_key registry_ttl_s registry_instance_id registry_error_window_s
 );
 
@@ -679,6 +826,11 @@ sub reload_config {
     $self->_record_reload_failure($err, undef);
     die $err;
   }
+
+  # With a customer_source, the config is two inputs: the file and the snapshot merged into it
+  # (ADR 0026). Either changing is a changed config; neither changing is the no-op below.
+  $fingerprint .= ';customer_source:' . $self->_source_digest
+    if exists $cfg->{customer_source};
 
   # Same config as last applied: nothing to do. Rebuilding would replace the node list, which
   # bumps the inventory generation, restarts every capacity probe and forgets health an admin
@@ -703,13 +855,14 @@ sub reload_config {
   my ($generation, $route_cache, $probe_key_cache, $rr_cursor)
     = ($self->_inventory_generation, $self->_route_cache, $self->_probe_key_cache, $self->_rr_cursor);
 
-  my ($nodes_print, $declared, $notices);
-  if (eval { ($nodes_print, $declared, $notices) = $self->_apply_config($cfg); 1 }) {
+  my ($nodes_print, $declared, $notices, $source);
+  if (eval { ($nodes_print, $declared, $notices, $source) = $self->_apply_config($cfg); 1 }) {
     $self->_forget_departed_nodes;
     $self->_config_fingerprint($fingerprint);
     $self->_nodes_fingerprint($nodes_print);
     $self->_config_declared($declared);
     $self->_clear_reload_failure;
+    push @$notices, $self->_commit_customer_source($source);
     warn 'skeid: ' . $_ . "\n" for @$notices;
     return $cfg;
   }
@@ -742,7 +895,7 @@ sub reload_config {
 sub _forget_departed_nodes {
   my ($self) = @_;
   my %present = map { (($_->{id} // '') => 1) } @{$self->nodes};
-  for my $store ($self->_capacity, $self->_failures) {
+  for my $store ($self->_capacity, $self->_failures, $self->_rejections) {
     delete $store->{$_} for grep { !$present{$_} } keys %$store;
   }
   return;
@@ -871,6 +1024,23 @@ sub _apply_config {
   my $before = $self->_config_declared;
   my (%declared, @notices);
 
+  # First: the customer source's snapshot is merged into the file's config before any section
+  # reads it (ADR 0026). Rows are checked against the file, the file wins per key id, and no row
+  # can fail the load -- only the section itself can. A stale or absent snapshot merges nothing:
+  # source customers are then refused (fail-closed).
+  my %source;
+  if (exists $cfg->{customer_source}) {
+    $declared{customer_source} = 1;
+    $source{cfg} = Langertha::Skeid::CustomerSource->normalize_config($cfg->{customer_source},
+      usage_store => $cfg->{usage_store});
+    $self->_require_customer_source_driver unless $self->has_customer_source_fetcher;
+    my $snapshot = $self->_source_snapshot;
+    if ($snapshot && !$snapshot->{stale}) {
+      $source{merge} = Langertha::Skeid::CustomerSource->merge_into($cfg, $snapshot->{rows});
+      $cfg = $source{merge}{config};
+    }
+  }
+
   if (exists $cfg->{pricing}) {
     $declared{pricing} = 1;
     # Replaced wholesale, not merged: a model removed from the section loses its price.
@@ -890,6 +1060,74 @@ sub _apply_config {
     $self->_load_policies($cfg);
   } elsif ($before->{policies}) {
     $self->_load_policies({});
+  }
+
+  # After the policies: client_auth entries may be names: names, resolved through key_names.
+  # Removed from the file, client authentication is off again -- as a restart without the
+  # section would have it (skeid k90).
+  if (exists $cfg->{client_auth}) {
+    $declared{client_auth} = 1;
+    my @said = $self->_load_client_auth($cfg->{client_auth});
+    # With a customer source, an empty list in the file is the expected setup: the ids come
+    # from the source. Every accepted row joins the file's own ids -- a union, so the database
+    # cannot revoke an id the file lists.
+    push @notices, @said unless $source{cfg};
+    if ($source{merge}) {
+      my %allowed = %{$self->client_auth_keys};
+      $allowed{$_} = 1 for @{$source{merge}{allow}};
+      $self->client_auth_keys(\%allowed);
+    }
+  } elsif ($before->{client_auth}) {
+    $self->client_auth_keys(undef);
+  }
+  $source{no_gate} = 1 if $source{cfg} && !exists $cfg->{client_auth};
+
+  # The MCP gateway (skeid k103). After the policies as well: a server's keys: may be names:
+  # names. Removed from the file, the gateway is off again and its routes are unknown paths.
+  if (exists $cfg->{mcp}) {
+    $declared{mcp} = 1;
+    push @notices, $self->_load_mcp($cfg->{mcp});
+  } elsif ($before->{mcp}) {
+    $self->mcp_servers(undef);
+    $self->mcp_public_url(undef);
+    $self->mcp_max_request_bytes($MCP_MAX_REQUEST_BYTES);
+  }
+
+  # The OpenAPI document and its optional Swagger UI (skeid k105). Removed from the file, the
+  # UI is off again and its cache directory forgotten.
+  if (exists $cfg->{openapi}) {
+    $declared{openapi} = 1;
+    $self->_load_openapi($cfg->{openapi});
+  } elsif ($before->{openapi}) {
+    $self->openapi_swagger_ui(0);
+    $self->openapi_cache_dir(undef);
+  }
+
+  # The upload limit of the multipart routes (skeid k91). Removed from the file, it is the
+  # built-in default again.
+  if (exists $cfg->{uploads}) {
+    $declared{uploads} = 1;
+    $self->_load_uploads($cfg->{uploads});
+  } elsif ($before->{uploads}) {
+    $self->upload_max_bytes($UPLOAD_MAX_BYTES);
+    $self->documents_max_bytes($DOCUMENTS_MAX_BYTES);
+  }
+
+  # Whether the documents routes pass requests that make the node fetch from an address the
+  # client names (skeid k94, ADR 0028). Removed from the file, it is refused again.
+  if (exists $cfg->{documents}) {
+    $declared{documents} = 1;
+    $self->_load_documents($cfg->{documents});
+  } elsif ($before->{documents}) {
+    $self->documents_allow_remote_sources(0);
+  }
+
+  # The limits of a realtime session (skeid k95). Removed from the file, the defaults again.
+  if (exists $cfg->{realtime}) {
+    $declared{realtime} = 1;
+    $self->_load_realtime($cfg->{realtime});
+  } elsif ($before->{realtime}) {
+    $self->_load_realtime({});
   }
 
   if (exists $cfg->{aliases}) {
@@ -963,7 +1201,7 @@ sub _apply_config {
       . ' store stays in force until restart (usage events are billing data, ADR 0004)';
   }
 
-  return ($nodes_print, \%declared, \@notices);
+  return ($nodes_print, \%declared, \@notices, \%source);
 }
 
 # The admin API key a config names (skeid k64). It may be named directly or handed over by
@@ -1076,6 +1314,276 @@ sub _reload_on_request {
 }
 
 sub _now { Time::HiRes::time() }
+
+# --- customer source (ADR 0026) -------------------------------------------------------------
+
+# What the snapshot contributes to the config fingerprint.
+sub _source_digest {
+  my ($self) = @_;
+  my $snapshot = $self->_source_snapshot;
+  return 'none' unless $snapshot;
+  return $snapshot->{stale} ? 'stale' : $snapshot->{digest};
+}
+
+sub _require_customer_source_driver {
+  my ($self) = @_;
+  return 1 if eval { require DBI; require DBD::Pg; 1 };
+  croak 'customer_source needs DBD::Pg (and DBI), which is not installed: install DBD::Pg, '
+    . 'or remove the customer_source section';
+}
+
+# Runs once a config applied: the source as the config now declares it. A removed section stops
+# the fetcher and drops the snapshot; a changed one restarts the fetcher, the snapshot staying in
+# force until the new source answered. Returns the notices to log.
+sub _commit_customer_source {
+  my ($self, $source) = @_;
+  $source ||= {};
+  my $cfg = $source->{cfg};
+  unless ($cfg) {
+    $self->_stop_source_controller;
+    $self->_source_snapshot(undef);
+    $self->_source_report(undef);
+    $self->_source_cfg(undef);
+    $self->_source_cfg_print(undef);
+    return;
+  }
+
+  my @notices;
+  my $merge = $source->{merge};
+  $self->_source_report($merge ? {
+    accepted => $merge->{accepted},
+    rejected => $merge->{rejected},
+    shadowed => $merge->{shadowed},
+    names    => $merge->{names} || {},
+  } : undef);
+  if ($merge) {
+    # By label and reason only: a rejected value may be a key pasted where its id belongs.
+    my @rejected = @{$merge->{rejected}};
+    push @notices, map { "customer_source: $_->{row} rejected: $_->{reason}" } @rejected[0 .. _last(19, @rejected)];
+    push @notices, 'customer_source: ' . (@rejected - 20) . ' more rows rejected' if @rejected > 20;
+    my @shadowed = @{$merge->{shadowed}};
+    push @notices, map { "customer_source: $_ shadowed: the file's keys: entry for that key id wins" }
+      @shadowed[0 .. _last(19, @shadowed)];
+    push @notices, 'customer_source: ' . (@shadowed - 20) . ' more rows shadowed' if @shadowed > 20;
+  }
+  if ($source->{no_gate} && !$self->_source_gate_warned) {
+    $self->_source_gate_warned(1);
+    push @notices, 'customer_source is configured but client_auth is not: source keys are not '
+      . 'gated, and a revoked key is not refused -- it routes under default_policy. Declare '
+      . 'client_auth (client_auth: { keys: [] } is enough)';
+  }
+  $self->_source_gate_warned(0) unless $source->{no_gate};
+
+  my $print = _config_digest($cfg);
+  my $changed = !defined($self->_source_cfg_print) || $print ne $self->_source_cfg_print;
+  $self->_source_cfg($cfg);
+  $self->_source_cfg_print($print);
+  $self->_start_source_controller if $changed && $self->_source_started;
+  return @notices;
+}
+
+sub _last { my ($max, @list) = @_; return $#list < $max ? $#list : $max }
+
+sub _start_source_controller {
+  my ($self) = @_;
+  $self->_stop_source_controller;
+  my $cfg = $self->_source_cfg or return;
+  my $fetcher = $self->has_customer_source_fetcher
+    ? $self->customer_source_fetcher->($self, $cfg)
+    : do {
+      require Langertha::Skeid::CustomerSource::DBI;
+      Langertha::Skeid::CustomerSource::DBI->new(config => $cfg);
+    };
+  my $weak = $self;
+  weaken($weak);
+  my $ctl = Langertha::Skeid::CustomerSource->new(
+    config     => $cfg,
+    fetcher    => $fetcher,
+    on_rows    => sub { $weak->_source_rows($_[0]) if $weak },
+    on_failure => sub { $weak->_source_failed($_[0]) if $weak },
+  );
+  $self->_source_ctl($ctl);
+  $ctl->start;
+  return $ctl;
+}
+
+sub _stop_source_controller {
+  my ($self) = @_;
+  my $ctl = $self->_source_ctl;
+  $ctl->stop if $ctl;
+  $self->_source_ctl(undef);
+  my $timer = $self->_source_stale_timer;
+  Mojo::IOLoop->remove($timer) if defined $timer;
+  $self->_source_stale_timer(undef);
+  return;
+}
+
+# A successful fetch. An unchanged snapshot only renews its age: no reload, no inventory bump, no
+# probe restart. A changed one is merged by a reload -- in-memory work, run here, from the loop,
+# never from a request.
+sub _source_rows {
+  my ($self, $rows) = @_;
+  my $digest = Langertha::Skeid::CustomerSource->snapshot_digest($rows);
+  $self->_arm_source_stale_timer;
+  my $snapshot = $self->_source_snapshot;
+  if ($snapshot && !$snapshot->{stale} && $snapshot->{digest} eq $digest) {
+    $snapshot->{fetched_at} = $self->_now;
+    return;
+  }
+  $self->_source_snapshot({ rows => $rows, digest => $digest, fetched_at => $self->_now, stale => 0 });
+  $self->_reload_for_source;
+  return;
+}
+
+sub _source_failed {
+  my ($self, $err) = @_;
+  $self->_check_source_stale;
+  return;
+}
+
+# max_stale_s: how old the last good snapshot may get while fetches fail. Checked when a fetch
+# fails and when the limit runs out after the last success, whichever is first.
+sub _arm_source_stale_timer {
+  my ($self) = @_;
+  my $timer = $self->_source_stale_timer;
+  Mojo::IOLoop->remove($timer) if defined $timer;
+  $self->_source_stale_timer(undef);
+  my $max = $self->_source_cfg ? $self->_source_cfg->{max_stale_s} : 0;
+  return unless $max > 0;
+  my $weak = $self;
+  weaken($weak);
+  $self->_source_stale_timer(Mojo::IOLoop->timer($max => sub {
+    return unless $weak;
+    $weak->_source_stale_timer(undef);
+    my $ctl = $weak->_source_ctl;
+    $weak->_check_source_stale if $ctl && $ctl->failures;
+  }));
+  return;
+}
+
+sub _check_source_stale {
+  my ($self) = @_;
+  my $cfg = $self->_source_cfg or return;
+  my $max = $cfg->{max_stale_s};
+  return unless $max > 0;
+  my $snapshot = $self->_source_snapshot;
+  return unless $snapshot && !$snapshot->{stale};
+  return if $self->_now - $snapshot->{fetched_at} < $max - 0.001;
+  warn "skeid: customer_source: the last good snapshot is older than max_stale_s (${max}s); its "
+    . "rows are dropped until a fetch succeeds\n";
+  $self->_source_snapshot({ %$snapshot, rows => [], stale => 1 });
+  $self->_reload_for_source;
+  return;
+}
+
+# The reload a new snapshot triggers: the existing all-or-nothing reload_config, with the file
+# read again and the snapshot in memory. It never dies -- it runs from a loop callback -- and a
+# failure is logged when its reason is new, like a reload a request triggers.
+sub _reload_for_source {
+  my ($self) = @_;
+  return if $self->has_config_file && !-f $self->config_file;
+  my $error_before = $self->last_reload_error;
+  return if eval { $self->reload_config; 1 };
+  my $err = $@ || 'config reload failed';
+  if (!defined($error_before) || $error_before ne $err) {
+    (my $msg = $err) =~ s/\s+\z//;
+    warn "skeid: config reload for a new customer_source snapshot failed, keeping the previous "
+      . "config: $msg\n";
+  }
+  return;
+}
+
+
+sub start_customer_source {
+  my ($self) = @_;
+  return 1 if $self->_source_started && $self->_source_ctl;
+  $self->_source_started(1);
+  return $self->_start_source_controller ? 1 : 0;
+}
+
+
+sub stop_customer_source {
+  my ($self) = @_;
+  $self->_source_started(0);
+  $self->_stop_source_controller;
+  return;
+}
+
+
+sub customer_source_startup_fetch {
+  my ($self) = @_;
+  my $ctl = $self->_source_ctl or return 0;
+  my $done = $ctl->completed;
+  $ctl->fetch_now;
+  my $end  = $self->_now + $ctl->config->{connect_timeout_s} + 1;
+  my $tick = Mojo::IOLoop->recurring(0.05 => sub { });
+  Mojo::IOLoop->one_tick while $ctl->completed == $done && $self->_now < $end;
+  Mojo::IOLoop->remove($tick);
+  return ($ctl->completed > $done && !$ctl->failures) ? 1 : 0;
+}
+
+
+sub customer_source_release {
+  my ($self) = @_;
+  my $ctl = $self->_source_ctl;
+  return unless $ctl;
+  $ctl->release;
+  weaken(my $weak = $self);
+  Mojo::IOLoop->next_tick(sub {
+    my $c = $weak && $weak->_source_ctl;
+    $c->fetch_now if $c;
+  });
+  return;
+}
+
+
+sub customer_source_status {
+  my ($self) = @_;
+  my $cfg = $self->_source_cfg or return undef;
+  my $ctl = $self->_source_ctl;
+  my $status = $ctl ? $ctl->status : {
+    ok => 0, last_success_at => undef, failed_at => undef, failures => 0,
+    error => 'the customer source is not being fetched (not started)',
+  };
+  my $report   = $self->_source_report || { accepted => 0, rejected => [], shadowed => [] };
+  my @rejected = @{$report->{rejected}};
+  my @shadowed = @{$report->{shadowed}};
+  my $snapshot = $self->_source_snapshot;
+  return {
+    %$status,
+    relation => $cfg->{relation},
+    listen   => $cfg->{listen},
+    stale    => ($snapshot && $snapshot->{stale}) ? 1 : 0,
+    rows     => {
+      accepted => 0 + $report->{accepted},
+      rejected => scalar(@rejected),
+      shadowed => scalar(@shadowed),
+    },
+    rejected => [ map { +{ %$_ } } @rejected[0 .. _last(49, @rejected)] ],
+    shadowed => [ @shadowed[0 .. _last(49, @shadowed)] ],
+  };
+}
+
+
+sub customer_names {
+  my ($self) = @_;
+  my $report = $self->_source_report or return {};
+  return { %{$report->{names} || {}} };
+}
+
+
+sub customer_report {
+  my ($self) = @_;
+  $self->_source_cfg or return undef;
+  my $report   = $self->_source_report || { accepted => 0, rejected => [], shadowed => [] };
+  my @rejected = @{$report->{rejected}};
+  my @shadowed = @{$report->{shadowed}};
+  return {
+    accepted => 0 + $report->{accepted},
+    rejected => [ map { +{ %$_ } } @rejected[0 .. _last(49, @rejected)] ],
+    shadowed => [ @shadowed[0 .. _last(49, @shadowed)] ],
+  };
+}
 
 # The client-facing faces Skeid serves, as manifest endpoints. Each face's spec -- dialect,
 # path under public_url, and the capability flags its translator actually carries upstream --
@@ -1319,7 +1827,7 @@ sub _manifest_model_reachable {
   my $plan = $self->route_plan(model => $model, api_key_id => $api_key_id);
   return 0 unless $plan->{permitted};
   for my $tier (@{$plan->{tiers}}) {
-    for my $node (@{$self->select_nodes(tags => $tier->{tags}, deny_tags => $tier->{deny_tags})}) {
+    for my $node (@{$self->select_nodes(tags => $tier->{tags}, deny_tags => $tier->{deny_tags}, kind => '')}) {
       my $served = $node->{model};
       return 1 if !defined($served) || !length($served) || $served eq $tier->{model};
     }
@@ -1359,7 +1867,8 @@ sub _configure_usage_store {
     && (($old->{password} // '') eq ($normalized->{password} // ''))
     && (($old->{schema_file} // '') eq ($normalized->{schema_file} // ''))
     && ((($old->{auto_migrate} // 1) ? 1 : 0) == (($normalized->{auto_migrate} // 1) ? 1 : 0))
-    && (($old->{flush_interval_ms} // 0) == ($normalized->{flush_interval_ms} // 0));
+    && (($old->{flush_interval_ms} // 0) == ($normalized->{flush_interval_ms} // 0))
+    && (($old->{spool_dir} // '') eq ($normalized->{spool_dir} // ''));
 
   # Rebuild when the config changed, and also when there simply is no store object yet:
   # BUILD hands us the caller's raw config as $old, which can compare equal to its own
@@ -1525,6 +2034,16 @@ sub record_usage {
   # non-streamed event has no such key, which a store records as "not measured". An observation
   # beside the token counts -- never used to estimate or replace them.
   $event{content_bytes} = _num($args{content_bytes}) if defined $args{content_bytes};
+  # Seconds of audio an audio route's node reported (skeid k91, ADR 0021). Optional and additive
+  # like content_bytes: absent means the node did not say, which is not a measured zero. Recorded
+  # as reported, never priced here.
+  $event{audio_seconds} = _num($args{audio_seconds}) if defined $args{audio_seconds};
+  # How many documents a rerank request carried (skeid k92, ADR 0021), counted off the request
+  # the node answered. Optional and additive like the two above; recorded, never priced.
+  $event{documents} = _num($args{documents}) if defined $args{documents};
+  # The pages a documents request converted (skeid k94, ADR 0028), read off json_content of the
+  # answer when it carries one. Optional like audio_seconds: absent is not measured, never 0.
+  $event{pages} = _num($args{pages}) if defined $args{pages};
 
   return $self->_store_usage_event(\%event);
 }
@@ -1667,8 +2186,22 @@ sub _route_key {
   # Tags belong in the key: two selections over the same model address different node sets, and
   # a shared round-robin cursor across different-sized sets picks the wrong node. Denied tags
   # too -- a key that may not use cloud addresses a smaller set than one that may.
-  return join('|', $model, $engine, $tags, ($deny ? "-$deny" : ())) if length($tags) || length($deny);
+  # A kind other than chat addresses a different set of nodes under the same name (a chat model
+  # may be called `documents` too), so it is part of the key like the tags are.
+  my $kind = $self->_selector_kind(%args);
+  my @kind = length($kind) ? ("=$kind") : ();
+  return join('|', $model, $engine, $tags, ($deny ? "-$deny" : ()), @kind)
+    if length($tags) || length($deny) || @kind;
   return join('|', $model, $engine);
+}
+
+# The kind of node a selection is over: '' for chat, which is what every selection was before the
+# option, else a kind of Protocol::Documents.
+sub _selector_kind {
+  my ($self, %args) = @_;
+  my $kind = $args{kind};
+  return '' unless defined($kind) && length($kind) && $kind ne 'chat';
+  return $kind;
 }
 
 sub _node_can_take {
@@ -1824,8 +2357,14 @@ sub _route_entry {
   my $tags   = $self->normalize_tags($args{tags});
   my $deny   = $self->normalize_tags($args{deny_tags});
 
+  # Chat and documents nodes are never each other's: a documents node carries no model name
+  # Skeid reads, so a chat selection must not take it for one that serves any model, and a
+  # documents selection takes the nodes of its kind whatever they are called (ADR 0028).
+  my $kind = $self->_selector_kind(%args);
+
   my @nodes = grep {
-    (!defined($model) || !length($model) || !defined($_->{model}) || !length($_->{model}) || $_->{model} eq $model)
+    (($_->{kind} // '') eq $kind)
+      && (length($kind) || !defined($model) || !length($model) || !defined($_->{model}) || !length($_->{model}) || $_->{model} eq $model)
       && (!defined($engine) || !length($engine) || !defined($_->{engine}) || !length($_->{engine}) || $_->{engine} eq $engine)
       && (($_->{healthy} // 0) ? 1 : 0)
       && $self->_node_has_tags($_, $tags)
@@ -2096,26 +2635,342 @@ sub key_id_for_name {
   return $self->key_names->{$name};
 }
 
+# The client_auth section (skeid k90), resolved once at config load into a key id set. An entry
+# is a names: name or a key id; anything else fails the load (see _key_id_set). Returns the
+# notices to log once the config applied.
+sub _load_client_auth {
+  my ($self, $section) = @_;
+  croak 'client_auth must be a hash with a keys list' unless ref($section) eq 'HASH';
+  for my $key (sort keys %$section) {
+    croak "client_auth: unknown key '$key' (known: keys)" unless $key eq 'keys';
+  }
+  my $list = $section->{keys};
+  croak 'client_auth needs a keys list: the key ids (or names: entries) that may use the '
+    . 'client routes' unless defined $list;
+  $list = [ $list ] unless ref $list;
+  croak 'client_auth.keys must be a list of key ids or names: entries' unless ref($list) eq 'ARRAY';
+
+  my $allowed = $self->_key_id_set($list, 'client_auth.keys');
+  $self->client_auth_keys($allowed);
+  return %$allowed ? () : ('client_auth.keys is empty: no key can use the client routes, every '
+    . 'request on them answers 401');
+}
+
+# A list of customer keys in the config -- client_auth.keys, an MCP server's keys -- resolved
+# into a key id set, id to 1. An entry is a names: name or a key id; anything else fails the
+# load. The message names the entry by its position and never by its value: a value that is
+# neither is most likely a key someone pasted, and a reload error ends up in the log and on
+# /skeid/config (ADR 0003). $label is the list's place in the config, for that message. A short
+# (pre-ADR 0016) id is kept as it is and warned about once; _configured_key_id matches it.
+sub _key_id_set {
+  my ($self, $list, $label) = @_;
+  my (%allowed, @legacy);
+  my $position = 0;
+  for my $entry (@$list) {
+    $position++;
+    my $name = (defined($entry) && !ref($entry) && exists $self->key_names->{$entry}) ? $entry : undef;
+    my $id   = defined($name) ? $self->key_names->{$name} : $entry;
+    my $full = defined($id) && !ref($id) && $id =~ /\Ak_[0-9a-f]{40}\z/;
+    unless ($full || _is_legacy_key_id($id)) {
+      croak defined($name)
+        ? "$label entry $position is the names: entry '$name', which does not map to a "
+          . 'key id (k_ + 40 hex from `skeid keyid`)'
+        : "$label entry $position is neither a names: entry nor a key id (k_ + 40 hex "
+          . 'from `skeid keyid`); a key itself never goes into the config';
+    }
+    push @legacy, $id unless $full;
+    $allowed{$id} = 1;
+  }
+  _warn_legacy_key_id($_) for @legacy;
+  return \%allowed;
+}
+
+# The mcp section (skeid k103, ADR 0022), resolved once at config load into the server table.
+# Strict like client_auth and uploads: a misspelled key, a key of the other transport or a URL
+# that is none fails the load, and the previous config stays in force. No message repeats a
+# value that could be a secret -- a URL, a header value, a keys entry. What the wire allows --
+# the transports, a server name, the headers a server may set -- is Protocol::MCP's to know.
+# Returns the notices to log once the config applied.
+my %MCP_KEYS = map { $_ => 1 } qw( public_url servers max_request_bytes );
+my %MCP_SERVER_KEYS = (
+  common  => [qw( transport description keys )],
+  relayed => [qw( url api_key_ref api_key_env headers )],
+  stdio   => [qw( command args env )],
+);
+
+sub _load_mcp {
+  my ($self, $section) = @_;
+  my $mcp = 'Langertha::Skeid::Protocol::MCP';
+  croak 'mcp must be a hash with a servers map' unless ref($section) eq 'HASH';
+  for my $key (sort keys %$section) {
+    croak "mcp: unknown key '$key' (known: " . join(' ', sort keys %MCP_KEYS) . ')'
+      unless $MCP_KEYS{$key};
+  }
+
+  my $public_url;
+  if (defined $section->{public_url}) {
+    my $problem = $mcp->url_problem($section->{public_url});
+    croak "mcp.public_url $problem: it is where clients reach Skeid" if defined $problem;
+    ($public_url = "$section->{public_url}") =~ s{/+\z}{};
+  }
+
+  my $max_request = $MCP_MAX_REQUEST_BYTES;
+  if (exists $section->{max_request_bytes}) {
+    my $max = $section->{max_request_bytes};
+    croak 'mcp.max_request_bytes must be an integer of at least 1 (bytes)'
+      unless defined($max) && !ref($max) && $max =~ /\A[0-9]+\z/ && $max >= 1;
+    $max_request = 0 + $max;
+  }
+
+  my $servers = $section->{servers} // {};
+  croak 'mcp.servers must be a hash of server name to server' unless ref($servers) eq 'HASH';
+
+  my (%resolved, @notices);
+  for my $name (sort keys %$servers) {
+    my $problem = $mcp->name_problem($name);
+    croak "mcp.servers: $problem" if defined $problem;
+    my $at    = "mcp.servers.$name";
+    my $entry = $servers->{$name};
+    croak "$at must be a hash" unless ref($entry) eq 'HASH';
+
+    my $transport = $entry->{transport} // $mcp->default_transport;
+    croak "$at: unknown transport (known: " . join(' ', $mcp->transports) . ')'
+      unless $mcp->is_transport($transport);
+    my $relayed = $mcp->is_relayed($transport);
+    my %own     = map { $_ => 1 } @{$MCP_SERVER_KEYS{common}}, @{$MCP_SERVER_KEYS{$relayed ? 'relayed' : 'stdio'}};
+    my %other   = map { $_ => 1 } @{$MCP_SERVER_KEYS{$relayed ? 'stdio' : 'relayed'}};
+    for my $key (sort keys %$entry) {
+      next if $own{$key};
+      croak "$at: '$key' " . ($relayed ? 'belongs to a stdio server' : 'does not belong to a stdio server')
+        if $other{$key};
+      croak "$at: unknown key '$key' (known: " . join(' ', sort keys %own) . ')';
+    }
+
+    my $description = $entry->{description} // '';
+    croak "$at.description must be a string" if ref $description;
+
+    my %server = (name => $name, transport => "$transport", description => "$description");
+    if ($relayed) {
+      croak "$at needs a url: where the MCP server is reached" unless defined $entry->{url};
+      $problem = $mcp->url_problem($entry->{url});
+      croak "$at.url $problem" if defined $problem;
+      $server{url} = "$entry->{url}";
+
+      for my $source (qw( api_key_ref api_key_env )) {
+        next unless defined $entry->{$source};
+        croak "$at.$source must be a non-empty string"
+          if ref($entry->{$source}) || !length($entry->{$source});
+        $server{$source} = "$entry->{$source}";
+      }
+
+      my $headers = $entry->{headers} // {};
+      croak "$at.headers must be a map of header name to value" unless ref($headers) eq 'HASH';
+      for my $header (sort keys %$headers) {
+        croak "$at.headers: a header name must be an HTTP token"
+          unless $header =~ /\A[A-Za-z0-9!#\$%&'*+.^_`|~-]+\z/;
+        $problem = $mcp->config_header_problem($header);
+        croak "$at.headers: '$header' may not be set here: $problem" if defined $problem;
+        my $value = $headers->{$header};
+        croak "$at.headers: the value of '$header' must be a string on one line"
+          if !defined($value) || ref($value) || $value =~ /[\r\n\0]/;
+        $server{headers}{$header} = "$value";
+      }
+      $server{headers} ||= {};
+    } else {
+      croak "$at needs a command: what the customer runs on its own machine"
+        unless defined($entry->{command}) && !ref($entry->{command}) && length($entry->{command});
+      $server{command} = "$entry->{command}";
+
+      my $args = $entry->{args} // [];
+      croak "$at.args must be a list of strings"
+        unless ref($args) eq 'ARRAY' && !grep { !defined($_) || ref($_) } @$args;
+      $server{args} = [ map { "$_" } @$args ];
+
+      my $env = $entry->{env} // {};
+      croak "$at.env must be a map of strings"
+        unless ref($env) eq 'HASH' && !grep { !defined($_) || ref($_) } values %$env;
+      $server{env} = { map { $_ => "$env->{$_}" } keys %$env };
+    }
+
+    my $list = $entry->{keys} // [];
+    $list = [ $list ] unless ref $list;
+    croak "$at.keys must be a list of key ids or names: entries" unless ref($list) eq 'ARRAY';
+    $server{keys} = $self->_key_id_set($list, "$at.keys");
+    push @notices, "$at is assigned to no key: no customer can reach or see it"
+      unless %{$server{keys}};
+
+    $resolved{$name} = \%server;
+  }
+
+  $self->mcp_servers(\%resolved);
+  $self->mcp_public_url($public_url);
+  $self->mcp_max_request_bytes($max_request);
+  return @notices;
+}
+
+# The uploads section (skeid k91). Strict like client_auth: a misspelled key or a limit that is
+# not a positive integer fails the load rather than leaving the default in force unnoticed --
+# and 0, which the server underneath reads as "no limit", is refused with the rest.
+sub _load_uploads {
+  my ($self, $section) = @_;
+  croak 'uploads must be a hash, as in uploads: { max_bytes: 26214400 }'
+    unless ref($section) eq 'HASH';
+  for my $key (sort keys %$section) {
+    croak "uploads: unknown key '$key' (known: max_bytes, documents_max_bytes)"
+      unless $key eq 'max_bytes' || $key eq 'documents_max_bytes';
+  }
+  my %limit = (max_bytes => $UPLOAD_MAX_BYTES, documents_max_bytes => $DOCUMENTS_MAX_BYTES);
+  for my $key (sort keys %limit) {
+    next unless exists $section->{$key};
+    my $max = $section->{$key};
+    croak "uploads.$key must be an integer of at least 1 (bytes)"
+      unless defined($max) && !ref($max) && $max =~ /\A[0-9]+\z/ && $max >= 1;
+    $limit{$key} = 0 + $max;
+  }
+  $self->upload_max_bytes($limit{max_bytes});
+  $self->documents_max_bytes($limit{documents_max_bytes});
+  return;
+}
+
+# The documents section (skeid k94, ADR 0028). Strict like uploads: an unknown key or a switch
+# that is no boolean fails the load rather than leaving the default in force unnoticed. There is
+# no model name here: documents nodes are chosen by their kind.
+sub _load_documents {
+  my ($self, $section) = @_;
+  croak 'documents must be a hash, as in documents: { allow_remote_sources: false }'
+    unless ref($section) eq 'HASH';
+  for my $key (sort keys %$section) {
+    croak "documents: unknown key '$key' (known: allow_remote_sources)"
+      unless $key eq 'allow_remote_sources';
+  }
+  my $allow = 0;
+  if (defined(my $v = $section->{allow_remote_sources})) {
+    croak 'documents.allow_remote_sources must be true or false' if ref($v) && !blessed($v);
+    my $s = lc "$v";
+    if    ($s =~ /\A(?:1|true|yes|on)\z/)   { $allow = 1 }
+    elsif ($s =~ /\A(?:0|false|no|off|)\z/) { $allow = 0 }
+    else { croak 'documents.allow_remote_sources must be true or false' }
+  }
+  $self->documents_allow_remote_sources($allow);
+  return;
+}
+
+# The realtime section (skeid k95, ADR 0029). Strict like uploads: a misspelled key or a value
+# that is not an integer of at least 1 fails the load. A key left out is its default, also on a
+# reload that drops it.
+sub _load_realtime {
+  my ($self, $section) = @_;
+  croak 'realtime must be a hash, as in realtime: { idle_timeout: 300, max_session_seconds: 3600 }'
+    unless ref($section) eq 'HASH';
+  my @known = sort keys %REALTIME_DEFAULT;
+  for my $key (sort keys %$section) {
+    croak "realtime: unknown key '$key' (known: " . join(', ', @known) . ')'
+      unless exists $REALTIME_DEFAULT{$key};
+  }
+  my %value;
+  for my $key (@known) {
+    my $v = exists $section->{$key} ? $section->{$key} : $REALTIME_DEFAULT{$key};
+    croak "realtime.$key must be an integer of at least 1"
+      unless defined($v) && !ref($v) && $v =~ /\A[0-9]+\z/ && $v >= 1;
+    $value{$key} = 0 + $v;
+  }
+  $self->realtime_idle_timeout($value{idle_timeout});
+  $self->realtime_max_session_seconds($value{max_session_seconds});
+  $self->realtime_max_message_bytes($value{max_message_bytes});
+  $self->realtime_max_queued_bytes($value{max_queued_bytes});
+  return;
+}
+
+# The openapi section (skeid k105). Strict like uploads: an unknown key, a switch that is no
+# boolean or a cache_dir that is not an absolute path fails the load -- a relative path would
+# mean "wherever the process was started".
+sub _load_openapi {
+  my ($self, $section) = @_;
+  croak 'openapi must be a hash, as in openapi: { swagger_ui: true, cache_dir: /var/cache/skeid }'
+    unless ref($section) eq 'HASH';
+  for my $key (sort keys %$section) {
+    croak "openapi: unknown key '$key' (known: swagger_ui, cache_dir)"
+      unless $key eq 'swagger_ui' || $key eq 'cache_dir';
+  }
+
+  my $ui = 0;
+  if (defined $section->{swagger_ui}) {
+    my $v = $section->{swagger_ui};
+    croak 'openapi.swagger_ui must be true or false' if ref($v) && !blessed($v);
+    my $s = lc "$v";
+    if    ($s =~ /\A(?:1|true|yes|on)\z/)    { $ui = 1 }
+    elsif ($s =~ /\A(?:0|false|no|off|)\z/)  { $ui = 0 }
+    else { croak 'openapi.swagger_ui must be true or false' }
+  }
+
+  my $dir = $section->{cache_dir};
+  croak 'openapi.cache_dir must be an absolute path'
+    if defined($dir) && (ref($dir) || $dir !~ m{\A/} || $dir =~ /[\0\n]/);
+
+  $self->openapi_swagger_ui($ui);
+  $self->openapi_cache_dir($dir);
+  return;
+}
+
+
+sub client_auth_enabled { defined $_[0]->client_auth_keys ? 1 : 0 }
+
+
+sub client_key_allowed {
+  my ($self, $api_key_id) = @_;
+  my $allowed = $self->client_auth_keys;
+  return 1 unless defined $allowed;
+  return defined($self->_configured_key_id($allowed, $api_key_id)) ? 1 : 0;
+}
+
+
+sub mcp_enabled { defined $_[0]->mcp_servers ? 1 : 0 }
+
+
+sub mcp_server_for_key {
+  my ($self, $name, $api_key_id) = @_;
+  my $servers = $self->mcp_servers;
+  return undef unless $servers && defined($name) && length($name);
+  my $server = $servers->{$name} or return undef;
+  return defined($self->_configured_key_id($server->{keys}, $api_key_id)) ? $server : undef;
+}
+
+
+sub mcp_servers_for_key {
+  my ($self, $api_key_id) = @_;
+  my $servers = $self->mcp_servers || {};
+  return [
+    grep { defined $self->_configured_key_id($_->{keys}, $api_key_id) }
+    map  { $servers->{$_} } sort keys %$servers
+  ];
+}
+
 
 sub route_plan {
   my ($self, %args) = @_;
   my $model  = $args{model} // '';
   my $policy = $self->policy_for_key($args{api_key_id});
   my $deny   = $policy ? $policy->{deny_tags} : [];
+  my $kind   = $self->_selector_kind(%args);
+  my @kind   = length($kind) ? (kind => $kind) : ();
 
   if ($policy && $policy->{allow_models} && !$policy->{allow_models}{$model}) {
     return { tiers => [], permitted => 0, reason => 'model_not_permitted' };
   }
 
+  # Every tier carries the kind of the route, whatever an alias says: a documents route plans
+  # over documents nodes and a chat route over chat nodes, so the alias named like the documents
+  # routing key tiers the one and finds nothing for the other.
   my $alias = $self->model_aliases->{$model};
   my @tiers = $alias
-    ? (map { +{ %$_, deny_tags => $deny } } @{$alias->{tiers}})
+    ? (map { +{ %$_, deny_tags => $deny, @kind } } @{$alias->{tiers}})
     : ({
         tags      => [],
         model     => $model,
         engine    => $self->normalize_engine_id($args{engine} // ''),
         wait_ms   => 0 + ($self->route_wait_timeout_ms // 0),
         deny_tags => $deny,
+        @kind,
       });
 
   my $before = scalar @tiers;
@@ -2138,9 +2993,13 @@ sub select_nodes {
   my ($self, %args) = @_;
   my $tags = $self->normalize_tags($args{tags});
   my $deny = $self->normalize_tags($args{deny_tags});
+  my $kind = exists($args{kind}) ? $self->_selector_kind(%args) : undef;
   return [
     map { +{%$_} }
-    grep { $self->_node_has_tags($_, $tags) && !$self->_node_has_any_tag($_, $deny) }
+    grep {
+      $self->_node_has_tags($_, $tags) && !$self->_node_has_any_tag($_, $deny)
+        && (!defined($kind) || ($_->{kind} // '') eq $kind)
+    }
     @{$self->nodes || []}
   ];
 }
@@ -2437,6 +3296,10 @@ sub finish_request {
   if ($args{aborted}) {
     # The client left. The node did nothing wrong: not an error, not a failure in the window.
     $self->_stats->{$node_id}{aborted} = 1 + ($self->_stats->{$node_id}{aborted} // 0);
+  } elsif ($args{rejected}) {
+    # The client's to fix: not an error, not a failure in the window, and not the node's ok.
+    $self->_stats->{$node_id}{rejected} = 1 + ($self->_stats->{$node_id}{rejected} // 0);
+    $self->_record_failure($node_id, $self->_rejections);
   } elsif ($args{ok}) {
     $self->_stats->{$node_id}{ok} = 1 + ($self->_stats->{$node_id}{ok} // 0);
   } else {
@@ -2455,9 +3318,9 @@ sub finish_request {
 # One bucket per second, pruned to the window on every write, so a node that fails a lot costs
 # at most error_window_s buckets.
 sub _record_failure {
-  my ($self, $node_id) = @_;
+  my ($self, $node_id, $store) = @_;
   my $now = Time::HiRes::time();
-  my $f = $self->_failures->{$node_id} //= { buckets => {} };
+  my $f = ($store || $self->_failures)->{$node_id} //= { buckets => {} };
   $f->{last_at} = $now;
   $f->{buckets}{int $now}++;
   my $oldest = int($now - (0 + ($self->registry_error_window_s || 60)));
@@ -2468,8 +3331,8 @@ sub _record_failure {
 }
 
 sub _errors_in_window {
-  my ($self, $node_id) = @_;
-  my $f = $self->_failures->{$node_id} or return 0;
+  my ($self, $node_id, $store) = @_;
+  my $f = ($store || $self->_failures)->{$node_id} or return 0;
   my $oldest = int(Time::HiRes::time() - (0 + ($self->registry_error_window_s || 60)));
   my $count = 0;
   for my $second (keys %{$f->{buckets}}) {
@@ -2500,6 +3363,7 @@ sub registry_snapshot {
       max_conns        => 0 + $self->worker_max_conns($node),
       errors_in_window => 0 + $self->_errors_in_window($id),
       last_failure_at  => ($failure && defined $failure->{last_at} ? 0 + $failure->{last_at} : undef),
+      rejected_in_window => 0 + $self->_errors_in_window($id, $self->_rejections),
       ($reading ? (capacity => {
         used   => (defined $reading->{used}  ? 0 + $reading->{used}  : undef),
         limit  => (defined $reading->{limit} ? 0 + $reading->{limit} : undef),
@@ -2532,6 +3396,7 @@ sub node_metrics {
       ok => 0 + ($s->{ok} // 0),
       error => 0 + ($s->{error} // 0),
       aborted => 0 + ($s->{aborted} // 0),
+      rejected => 0 + ($s->{rejected} // 0),
       duration_ms_total => 0 + ($s->{duration_ms_total} // 0),
       # Present only when a probe has something current to say. A report must not present a
       # measured node and an inferred one as equally known (ADR 0009).
@@ -2589,6 +3454,7 @@ sub call_function {
       model      => ($args->{model} // ''),
       engine     => $args->{engine},
       api_key_id => $args->{api_key_id},
+      kind       => $args->{kind},
     );
   }
   if ($name eq 'policy.set') {
@@ -2613,6 +3479,7 @@ sub call_function {
       engine => $self->normalize_engine_id($args->{engine} // ''),
       tags   => $args->{tags},
       deny_tags => $args->{deny_tags},
+      kind   => $args->{kind},
     );
     return { node => $node };
   }
@@ -2623,6 +3490,7 @@ sub call_function {
       engine => $engine,
       tags   => $args->{tags},
       deny_tags => $args->{deny_tags},
+      kind   => $args->{kind},
     );
   }
   if ($name eq 'capacity.set') {
@@ -2670,7 +3538,9 @@ sub call_function {
 }
 
 sub DEMOLISH {
-  my ($self) = @_;
+  my ($self, $global) = @_;
+  # The customer source's timers hold only weak references; this takes them off the loop.
+  $self->_stop_source_controller unless $global;
   $self->_disconnect_usage_store;
 }
 
@@ -2697,7 +3567,7 @@ Langertha::Skeid - Dynamic routing control-plane for multi-node LLM serving with
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 
@@ -2804,6 +3674,32 @@ there. It is an observation, not a billing quantity: Skeid never derives token c
 or cost from it. The DBI stores keep it in a nullable C<content_bytes> column (C<NULL>
 for a non-streamed or pre-existing row); C<jsonlog> writes it as part of the event.
 
+An audio route's event (C</v1/audio/transcriptions>, C</v1/audio/translations>) carries
+C<audio_seconds> when the node said how much audio it worked on: C<usage.seconds> of an answer
+whose C<usage.type> is C<duration>, else the C<duration> of a C<verbose_json> answer. A node that
+reports neither -- a plain C<json>, C<text>, C<srt> or C<vtt> answer, most streams -- leaves the
+key out: not measured, never a zero. It is recorded as the node reported it and is not priced
+(ADR 0021); the DBI stores keep it in a nullable C<audio_seconds> column, C<jsonlog> writes it
+as part of the event, and a report sums it in C<totals>, C<by_key> and C<by_model>.
+
+A rerank request's event (C</v1/rerank>, also for the C</rerank> spelling) carries C<documents>:
+how many documents the request held. Skeid counts them off the request, so the number does not
+depend on what the node reports; it is on the event of a request the node answered and absent
+from a failed one. The node's tokens are recorded as B<input> tokens -- a reranker generates
+nothing -- so the model's C<input_per_million> prices them, wherever the node reported them:
+C<usage.prompt_tokens> or C<usage.total_tokens>, Cohere's C<meta.tokens.input_tokens>, a TEI
+node's C<x-compute-tokens> header (L<Langertha::Skeid::Protocol::Rerank/usage>). C<documents>
+itself is recorded and not priced, and is stored like C<audio_seconds>: a nullable C<documents>
+column, a key in C<jsonlog>, a sum in the reports.
+
+A documents request's event (C</v1/convert/file>, C</v1/convert/source>; C<api_format> C<docling>,
+model C<documents>) carries C<documents> too -- the files or sources the request held, on the
+event of a request the node answered -- and C<pages>: the page count of the converted document,
+read off C<document.json_content.pages> of a JSON answer of up to 8 MiB. A zip, a larger answer,
+an answer without C<json_content> and a document format without pages leave C<pages> out: not
+measured, never a zero. It is the unit to bill a conversion by, recorded and not priced, stored
+like C<documents> (L<Langertha::Skeid::Protocol::Documents/pages>).
+
 When a callback or override is provided, the configured store is bypassed entirely
 and no database connection is created.  DBI, DBD::SQLite and DBD::Pg are C<recommends>
 dependencies — they are not required for C<jsonlog> or when usage is handled externally.
@@ -2896,8 +3792,8 @@ once and stored under the key id, so a request costs one hash lookup and one key
 cannot be served for another. The load croaks on a model the key's routing policy does not
 let it reach (not granted, or served only by nodes it is denied), on an unknown capability,
 one no face carries, an unknown face, and an enabled manifest without C<public_url>. A config
-that fails to load keeps the previous one in force, manifests included. The route never
-reloads the config itself; the request paths that already do pick up a change.
+that fails to load keeps the previous one in force, manifests included. Like every client route,
+it runs L</maybe_reload_config> before it answers, so a changed config is in force for it too.
 Without a key the route answers C<401>. Needs a Langertha with L<Langertha::Manifest>; on an
 older one the route answers C<404>. See ADR 0015 in the distribution repository.
 
@@ -2925,6 +3821,24 @@ L</ENVIRONMENT>, else built in.
 =item * The admin key: absent falls back to C<SKEID_ADMIN_API_KEY>, else off -- see L</admin>.
 
 =item * C<registry> and C<manifest>: absent means off.
+
+=item * C<client_auth>: removed from the file, client authentication is off again.
+
+=item * C<uploads>: removed from the file, the upload limits are the built-in defaults again.
+
+=item * C<documents>: removed from the file, remote sources are refused again.
+
+=item * C<realtime>: removed from the file, the realtime limits are the built-in defaults again.
+
+=item * C<mcp>: removed from the file, the MCP gateway is off again and its routes are unknown
+paths.
+
+=item * C<openapi>: removed from the file, the Swagger UI is off again and C</docs> is an
+unknown path; C</openapi.json> is served either way.
+
+=item * C<customer_source>: removed from the file, the fetcher stops and the source's rows are
+dropped at that reload; changed, the fetcher restarts and the rows in force stay until the new
+source answered. See L</customer_source>.
 
 =back
 
@@ -2955,8 +3869,12 @@ set by C<skeid serve --workers>).
       api_key_ref: secret/skeid/remote/groq   # upstream key, resolved through the key broker
       api_key_env: GROQ_API_KEY        # upstream key from this variable when the ref resolves none
       capacity: { probe: prometheus }  # default none: inflight admission, see below
+      rerank_format: tei               # default none; a reranker that speaks TEI's dialect, see below
+      kind: documents                  # default chat; a docling-serve node, see below
+      api_key_header: X-Api-Key        # default none: the key goes in Authorization: Bearer
 
-An entry without C<id> or C<url> is skipped; one with an unknown C<engine> fails the load. When
+An entry without C<id> or C<url> is skipped; one with an unknown C<engine>, C<rerank_format> or
+C<kind>, or an C<api_key_header> that is no header name, fails the load. When
 a node has a key of its own it replaces the client's C<Authorization> upstream (see
 L<Langertha::Skeid::Proxy>); otherwise the client's headers go through. Key references and
 variable names are the only key material a config holds (ADR 0003).
@@ -2972,6 +3890,26 @@ C<custom>; C<interval_ms> (default 2000) sets the poll rate. Rate-limit headers 
 upstream response whatever the block says, so C<ratelimit> starts nothing. The keys per probe
 are documented in L<Langertha::Skeid::CapacityProbe/for_node>,
 L<Langertha::Skeid::CapacityProbe::Prometheus> and L<Langertha::Skeid::CapacityProbe::Registry>.
+
+C<rerank_format> names the dialect a reranker node speaks on its rerank route when it is not the
+one clients speak. Without it -- vLLM, infinity started with C<--url-prefix /v1>, Jina, Cohere --
+a C</v1/rerank> request is relayed to C<{url}/rerank> as it came. C<tei> is Hugging Face
+text-embeddings-inference: the request is translated and sent to C</rerank> at the server root
+(the node's C<url> with or without a trailing C</v1>), the answer translated back. It is the
+only value; see L<Langertha::Skeid::Proxy/Rerank route>.
+
+C<kind> says what a node serves. The default, C<chat>, is every node there was: chat completions
+and embeddings, matched by C<model>. C<documents> is a docling-serve node: it is reached by
+C</v1/convert/file> and C</v1/convert/source> and by nothing else, and the chat routes, the model
+lists and the manifest never see it (ADR 0028). Its C<model> is not read. The documents route
+is planned under the routing key C<documents>, which a policy's C<models> grants and an alias of
+that name tiers (by C<tags>); a key whose C<models> do not name it is answered C<403>.
+
+C<api_key_header> names the header a node's key is sent in, raw, instead of C<Authorization:
+Bearer>: C<X-Api-Key> for docling-serve, which takes no Bearer token. The key source
+(C<api_key_ref>, C<api_key_env>) is unchanged and the client's own credentials are dropped in
+every spelling, as for any node with a key. A name that is no RFC 7230 token fails the load;
+C<Authorization> is the default spelled out.
 
 =head2 pricing
 
@@ -3025,6 +3963,260 @@ C<default_policy> or a C<keys> entry naming an undefined policy, on a C<names> v
 a non-empty string, and on two entries that resolve to one key id -- including a short
 (pre-ADR 0016) id beside the full id it is the prefix of. Short ids still match, with a one-time
 warning.
+
+=head2 client_auth
+
+  names:
+    shared: k_5f0e1a2b3c4de5f60718293a4b5c6d7e8f901a2b   # `skeid keyid <key>` -- never the key
+  client_auth:
+    keys: [shared, k_9c8b7a6f5e4de5f60718293a4b5c6d7e8f901a2b]
+
+Client authentication (skeid k90), for a Skeid that is itself the public entry rather than
+sitting behind a gateway that authenticates. With the section, the client routes -- C</v1/*>,
+C</api/*> and the provider manifest -- answer C<401> to a request without a key or with a key
+whose id is not on the list, before anything is routed, forwarded or metered; C</health> and
+the C</skeid/*> routes keep their own rules. Without it nothing is checked, as before. See
+L<Langertha::Skeid::Proxy/Customer identity>.
+
+C<keys> lists customer key ids from C<skeid keyid>, or C<names:> entries that map to one; a
+single id may stand without the list. A short (pre-ADR 0016) id matches the full id it is the
+prefix of, with the same deprecation warning as in C<keys:>. The load fails on a section without
+C<keys>, an unknown key in the section, and an entry that is neither a name nor a key id --
+C<anonymous> included; that message names the entry by its position, never by its value, since
+a value that is neither is most likely a key pasted where its id belongs (ADR 0003). An empty
+list loads, lets no key in, and says so once. The list is independent of C<keys:> and
+C<default_policy>: being let in does not widen what a key's policy routes it to.
+
+The check takes the same identity routing does: with C<routing.trust_key_id_header> the header's
+key id is what has to be on the list.
+
+=head2 customer_source
+
+  customer_source:
+    backend: postgresql                  # the only backend; the default
+    dsn: dbi:Pg:dbname=console;host=db   # or host / port / dbname, as in usage_store
+    user: skeid_reader
+    password_env: SKEID_CUSTOMER_DB_PASSWORD   # never a password in the file
+    # from_usage_store: true             # instead: the usage store's connection (postgresql);
+    #                                    # user / password_env here override its own
+    relation: skeid.customer_keys        # table or view, schema-qualified allowed
+    refresh_interval_s: 30               # default 30; the poll that always runs
+    listen: skeid_customer_keys          # optional NOTIFY channel: a notification fetches sooner
+    max_stale_s: 0                       # default 0: keep the last good rows during an outage
+    connect_timeout_s: 5                 # default 5; also bounds each query
+
+Customer keys from a database relation (ADR 0026), for when another application -- a
+self-service console -- issues and revokes them. Skeid runs one statement,
+C<SELECT key_id, name, policy, models FROM "skeid"."customer_keys">, and nothing else; the
+owner provides the relation, typically as a view over its own tables, and grants C<SELECT> on it.
+The relation is quoted as written, so its case counts. One row per customer key id:
+
+=over 4
+
+=item * C<key_id> (C<text>, not null): C<k_> + 40 lowercase hex, as C<skeid keyid> prints it.
+
+=item * C<name> (C<text>): a label for warnings and C</skeid/config>. Never an identity, and not
+a C<names:> entry: the file cannot refer to it.
+
+=item * C<policy> (C<text>): a profile of the file's C<policies>; C<NULL> takes C<default_policy>.
+
+=item * C<models> (C<text[]>): replaces the profile's model list, as a C<keys:> override does;
+C<NULL> keeps it, C<'{}'> is no models.
+
+=back
+
+A row present means the key is active: the owner revokes a key by making its row disappear. The
+relation decides only which ids exist and which existing profile each takes -- profiles,
+C<deny_tags>, aliases, nodes and the manifest stay in the file.
+
+The rows of the last successful fetch -- the B<source snapshot> -- are merged into the file's
+config at every reload, before any section is read:
+
+=over 4
+
+=item * Rows are checked first. A row is rejected, and grants nothing, when its C<key_id> is not
+a full key id, when another row has the same C<key_id> (both are rejected), when C<policy> names
+no profile, or when C<models> is not a list of names. A rejected row is reported by its C<name>,
+else by its position, never by its values. No row can fail a reload.
+
+=item * The file wins per key id. A row whose id the file's C<keys:> names -- directly, through
+C<names:>, or by a short id that is its prefix -- is B<shadowed>: its C<policy> and C<models> are
+ignored.
+
+=item * Every accepted row's id joins C<client_auth>, beside the file's own ids: the database
+cannot revoke an id the file lists. It does so only when the file declares C<client_auth> --
+C<client_auth: { keys: [] }> is enough, and its empty list is then not warned about. Without
+C<client_auth> the load warns once: nothing is gated, and a revoked key routes under
+C<default_policy>.
+
+=back
+
+The rows are fetched on the event loop, never on the request path (ADR 0005): every
+C<refresh_interval_s>, and sooner after a C<NOTIFY> on C<listen> (one fetch per 0.25 s, however
+many arrive), each worker for itself. A snapshot whose digest changed triggers a reload from the
+fetch's callback; an unchanged one does nothing. The config's fingerprint is the file's plus the
+snapshot's digest, so a reload a request triggers still only reads the file.
+
+When a fetch fails, the last good snapshot stays in force, the fetch is retried with the reload
+back-off (C<refresh_interval_s> doubling per failure, at most 60 s), and the reason is logged when
+it is new. C<max_stale_s> above 0 drops the source's rows once the last good snapshot is that
+old, until a fetch succeeds. A fetch that has not answered within C<connect_timeout_s> counts as
+failed. C<skeid serve> runs one fetch before it listens; when it fails, Skeid starts degraded and
+fail-closed -- the file's config in force, no source rows. C<GET /skeid/config> shows the source's
+state (L</customer_source_status>), C</health> only C<ok>, C<failed_at> and C<failures>.
+
+The section is checked at load: an unknown key, a C<password> (only C<password_env>), a backend
+other than PostgreSQL, a C<relation> that is not a plain or schema-qualified identifier, a
+C<listen> that is not an identifier, and C<from_usage_store> without a PostgreSQL usage store
+fail it, as does a missing L<DBD::Pg> -- a C<recommends>, loaded only for a configured source.
+The connect and the query run in a child process, so a slow database never blocks the event
+loop. See L<Langertha::Skeid::CustomerSource> and L<Langertha::Skeid::CustomerSource::DBI>.
+
+=head2 uploads
+
+  uploads:
+    max_bytes: 26214400            # default 26214400 (25 MiB); an integer of at least 1
+    documents_max_bytes: 104857600 # default 104857600 (100 MiB); an integer of at least 1
+
+The largest request body the upload routes take -- C</v1/audio/transcriptions> and
+C</v1/audio/translations>, the routes with a C<multipart/form-data> body: the file plus the form
+around it. A larger one is answered C<413> before any node is asked and without a usage event;
+see L<Langertha::Skeid::Proxy/Uploads>. Every other route keeps the server's own request limit
+(Mojolicious' C<MOJO_MAX_MESSAGE_SIZE>, 16 MiB), whatever this says. The load fails on a section
+that is not a hash, an unknown key in it, and a C<max_bytes> that is not an integer of at least
+1 -- there is no "unlimited". A changed value holds from the next request.
+
+C<documents_max_bytes> is the limit of the documents routes, C</v1/convert/file> and
+C</v1/convert/source>, which have their own because documents are bigger than audio. It bounds
+the request body: a source request carries its files as base64 in JSON, a third more than the
+file, and is decoded in memory -- send large files to C</v1/convert/file>, which is spooled to
+disk. The node's own time to convert is the upstream timeout, unchanged.
+
+=head2 documents
+
+  documents:
+    allow_remote_sources: false   # default false
+
+Settings of the documents routes, C</v1/convert/file> and C</v1/convert/source>, which relay to
+nodes of C<kind: documents>. A request that makes the node fetch from, or write to, an address
+the client names -- docling's C<http_sources>, C<callbacks>, a C<target> that is not C<inbody> or
+C<zip>, a C<sources> entry that is not a file -- is a server-side request from inside the cluster
+network, and is answered C<400> before a node is chosen unless C<allow_remote_sources> is true.
+There is no model name here: the nodes are chosen by their kind, and the route is authorised under
+the routing key C<documents> (a policy's C<models>). The load fails on a section that is not a
+hash, an unknown key, and an C<allow_remote_sources> that is no boolean. Removed from the file,
+remote sources are refused again.
+
+=head2 realtime
+
+  realtime:
+    idle_timeout: 300          # seconds a session may be silent, default 300
+    max_session_seconds: 3600  # longest a session may last, default 3600
+    max_message_bytes: 1048576 # largest single WebSocket message, default 1 MiB
+    max_queued_bytes: 4194304  # most bytes held for a slow peer, per direction, default 4 MiB
+
+The limits of the realtime route, C<GET /v1/realtime> (a WebSocket relayed to a node's realtime
+endpoint, ADR 0029; see L<Langertha::Skeid::Proxy/Realtime route>). Every value is an integer of
+at least 1 and every key is optional. A session ends C<1000> at C<max_session_seconds>, C<1009>
+on a message above C<max_message_bytes>, C<1013> when a peer that does not read lets more than
+C<max_queued_bytes> pile up, and a socket silent for C<idle_timeout> seconds is closed. The
+values are read when a session opens, so a reload holds for the next session and leaves the open
+ones alone. The load fails on a section that is not a hash, an unknown key and a value that is no
+integer of at least 1.
+
+A realtime node holds its slot for the whole session, so C<max_conns> of such a node means
+concurrent sessions; give it a node of its own and see L<Langertha::Skeid::Proxy/Realtime route>
+for what that means under prefork workers (ADR 0010).
+
+=head2 openapi
+
+  openapi:
+    swagger_ui: false              # default false; true serves the Swagger UI under /docs
+    cache_dir: /var/cache/skeid    # optional: where the UI assets are kept once fetched
+
+C<GET /openapi.json> is always served: an OpenAPI 3.1 description of the client routes this
+configuration enables (the manifest and the MCP routes appear only when their section is on),
+behind C<client_auth> like every client route. The admin routes are a separate document,
+C<GET /skeid/openapi.json>, behind the admin key. C<swagger_ui> adds the UI at C</docs>.
+Skeid ships no UI assets: the first request for the UI fetches the pinned swagger-ui-dist
+release (5.17.14, from cdn.jsdelivr.net, checked against SHA-256 digests compiled into
+Skeid) and caches it in C<cache_dir> -- default C<$XDG_CACHE_HOME/skeid/swagger-ui-5.17.14>,
+else C<~/.cache/skeid/...>, else a per-uid directory under the temp directory -- and serves it
+from there from then on. With C<swagger_ui> off Skeid makes no network request for it and
+C</docs> is an unknown path. See L<Langertha::Skeid::SwaggerUI> and ADR 0025. The load fails
+on an unknown key, a C<swagger_ui> that is not a boolean and a C<cache_dir> that is not an
+absolute path.
+
+=head2 mcp
+
+  names:
+    alice: k_5f0e1a2b3c4de5f60718293a4b5c6d7e8f901a2b   # `skeid keyid <key>` -- never the key
+  mcp:
+    public_url: https://llm.example.com    # optional: where clients reach Skeid
+    max_request_bytes: 10485760            # optional: request body limit of /mcp/*
+    servers:
+      bookrag:                             # the name in /mcp/bookrag
+        url: http://bookrag-mcp.internal:8080/mcp
+        description: Book search over the house library
+        api_key_ref: secret/skeid/mcp/bookrag   # the server's key, through the key broker
+        api_key_env: BOOKRAG_MCP_KEY            # ... or from this variable
+        headers: { X-Tenant: example }          # static headers that are no secret
+        keys: [alice, k_9c8b7a6f5e4de5f60718293a4b5c6d7e8f901a2b]
+      files:
+        transport: stdio                   # a hint: runs on the customer's own machine
+        command: mcp-files
+        args: ["--root", "/srv/data"]
+        env: {}
+        description: Files on your own machine
+        keys: [alice]
+
+The MCP gateway (skeid k103, ADR 0022): MCP servers assigned to customer key ids. A key reaches
+a server assigned to it under C</mcp/E<lt>nameE<gt>> with its own Skeid key, and
+C</v1/mcp/servers> lists what it was assigned; see L<Langertha::Skeid::Proxy/MCP routes>.
+Without the section both routes are unknown paths, as before.
+
+C<public_url> is where clients reach this Skeid -- the base of the URLs in the listing. Without
+it the listing uses the scheme and host of the request, which behind a TLS proxy is C<http://>
+unless the server runs in reverse-proxy mode; an edge deployment sets it.
+
+A server is C<transport: streamable-http> (the default) or C<stdio>:
+
+=over 4
+
+=item * B<streamable-http> is relayed. C<url> is where Skeid reaches it. Its credential is
+named like a node's: C<api_key_ref> through the key broker, else C<api_key_env>, sent upstream as
+C<Authorization: Bearer>; a server that names one and gets no key from it is not called. A
+server that names neither is called without a credential -- never with the client's.
+C<headers> are sent with every request and are for what is no secret: C<Authorization>,
+C<Proxy-Authorization>, C<X-Api-Key> and C<Cookie> are refused there, as are the headers the
+relay itself passes on or that belong to the connection.
+
+=item * B<stdio> is a hint. Such a server runs on the customer's machine; Skeid neither starts
+nor reaches it, and it has no C</mcp/E<lt>nameE<gt>> route. C<command>, C<args> (a list of
+strings) and C<env> (a map of strings) are shown to the assigned key as written, so they are
+no place for a secret.
+
+=back
+
+C<keys> is the assignment: customer key ids from C<skeid keyid> or C<names:> entries, a single
+one without the list, resolved at config load as in L</client_auth> -- a short (pre-ADR 0016) id
+matches the full id it is the prefix of. A server without C<keys> is assigned to nobody and says
+so once. C<description> is free text for the listing.
+
+C<max_request_bytes> (default 10485760, 10 MiB; a positive integer) is the largest request body
+the MCP routes take, instead of the server's own limit: a larger one is C<413>, and is counted
+as rejected (ADR 0024). It bounds the request only; an event stream coming back has no size
+limit, it ends by the upstream, the client or the time limit.
+
+Two things the gateway does not do, by design (ADR 0022 update): the client's query string goes
+upstream as it came, and C<OPTIONS>, C<HEAD> and CORS are not answered -- an MCP client is not a
+browser page, and a browser-based one belongs behind its own edge.
+
+The load fails on an unknown key in the section or in a server, a key of the other transport, a
+server name that is not letters, digits, C<.>, C<_> and C<-> (starting with a letter or digit, at
+most 64), a C<url> that is not absolute C<http(s)> or carries C<user:password@>, a C<stdio>
+server without C<command>, and a C<keys> entry that is neither a name nor a key id. No message
+repeats a URL, a header value or a C<keys> entry.
 
 =head2 routing
 
@@ -3082,7 +4274,9 @@ The provider manifest: C<enabled>, C<public_url>, C<provider_id> (default C<skei
     # postgresql: dsn, or host (127.0.0.1) / port (5432) / dbname or database (skeid);
     #             user, password or password_env, schema_file, auto_migrate (default on)
     # sqlite and postgresql: flush_interval_ms (default 0) -- above 0, queue events and
-    #             write them in one transaction per interval (write-behind)
+    #             write them in one transaction per interval (write-behind);
+    #             spool_dir (default off) -- a local directory, one per instance, that keeps
+    #             the events the database cannot take while it is down and replays them
 
 Where usage events go; see L<Langertha::Skeid::UsageStore/normalize_config> for the inference and
 the defaults. C<usage_db_path>, a top-level key, is the older spelling of a sqlite store and is
@@ -3094,12 +4288,20 @@ once and the queued events are written together once per interval. Queued events
 memory until then; a process that is killed rather than stopped loses them. See
 L<Langertha::Skeid::UsageStore::DBI/flush_interval_ms> and ADR 0005.
 
+A failed connect to the usage database is not repeated per event: the next attempt waits for a
+backoff deadline (1 second, doubling up to 60). C<spool_dir> keeps the events of an outage: they
+are appended to a JSON Lines file in that directory -- key ids, never a key or the database
+password -- instead of being reported lost, and written once the database is back, without a second row for an event already in the
+table. With it, Skeid also starts while the database is down. See
+L<Langertha::Skeid::UsageStore::DBI/spool_dir> and ADR 0027.
+
 =head1 ENVIRONMENT
 
 Defaults for the attributes of the same meaning; a value in the config wins. Besides these, the
-config names variables of its own -- C<api_key_env> on a node, C<admin.api_key_env>, a usage
-store's C<password_env>, the registry's C<secret_env> and C<read_key_env> -- so that no secret has
-to be written into it. L<Langertha::Skeid::Proxy/build_app> reads the C<OPENBAO_*> variables,
+config names variables of its own -- C<api_key_env> on a node or an MCP server,
+C<admin.api_key_env>, a usage store's and a customer source's C<password_env>, the registry's
+C<secret_env> and
+C<read_key_env> -- so that no secret has to be written into it. L<Langertha::Skeid::Proxy/build_app> reads the C<OPENBAO_*> variables,
 C<SKEID_UPSTREAM_POOL> and C<SKEID_UPSTREAM_TIMEOUT>.
 
 =head2 SKEID_ROUTE_WAIT_TIMEOUT_MS
@@ -3193,6 +4395,86 @@ answers C<404> instead of failing the config (default 0).
 Customer key id to the canonical JSON of that key's manifest, built at config load (default
 empty). Read through L</manifest_for_key>.
 
+=head2 client_auth_keys
+
+The customer key ids allowed onto the client routes, as a hashref of id to 1, built from the
+config's C<client_auth> section (default undef: client authentication is off). An empty hash
+lets no key in. Read through L</client_auth_enabled> and L</client_key_allowed>.
+
+=head2 mcp_servers
+
+The MCP servers of the config's C<mcp> section, as a hashref of server name to resolved entry,
+built at config load (default undef: the MCP gateway is off). An entry holds C<name>,
+C<transport>, C<description> and C<keys> -- the customer key ids it is assigned to, id to 1 --
+and for a relayed server C<url>, C<api_key_ref>, C<api_key_env> and C<headers>, for a C<stdio>
+one C<command>, C<args> and C<env>. Read through L</mcp_enabled>, L</mcp_server_for_key> and
+L</mcp_servers_for_key>.
+
+=head2 mcp_public_url
+
+Where clients reach this Skeid, for the URLs of the MCP listing (config C<mcp.public_url>,
+default undef: the listing takes the URL of the request).
+
+=head2 mcp_max_request_bytes
+
+The largest request body, in bytes, the MCP routes accept (default 10485760, 10 MiB; config
+C<mcp.max_request_bytes>). See L</mcp>.
+
+=head2 openapi_swagger_ui
+
+Whether the config switches on the Swagger UI under C</docs> (config C<openapi.swagger_ui>,
+default 0). Off, only C</openapi.json> is served and the UI paths are unknown. See L</openapi>.
+
+=head2 openapi_cache_dir
+
+Where the Swagger UI assets are cached once fetched (config C<openapi.cache_dir>, default
+undef: the proxy picks a per-user cache directory).
+
+=head2 customer_source_fetcher
+
+A code ref that builds the fetcher of a C<customer_source> section: called with the Skeid and
+the normalized section, it returns an object with C<fetch($cb)> and optionally C<on_notify($cb)>
+and C<release> (see L<Langertha::Skeid::CustomerSource>). Without it the fetcher is a
+L<Langertha::Skeid::CustomerSource::DBI>, and a config with the section needs L<DBD::Pg>. Tests
+give a fake here; see L</customer_source>.
+
+=head2 upload_max_bytes
+
+The largest request body, in bytes, the upload routes accept (default 26214400, 25 MiB; config
+C<uploads.max_bytes>). See L</uploads>.
+
+=head2 documents_max_bytes
+
+The largest request body, in bytes, the documents routes accept (default 104857600, 100 MiB;
+config C<uploads.documents_max_bytes>). It bounds the body: for C</v1/convert/source>, whose
+files travel as base64 in JSON, that is a third more than the file. See L</uploads>.
+
+=head2 documents_allow_remote_sources
+
+Whether a documents request may name an address for the node to fetch from or call (docling's
+C<http_sources>, C<callbacks>, a C<target> to put to). Default false; config
+C<documents.allow_remote_sources>. See L</documents>.
+
+=head2 realtime_idle_timeout
+
+Seconds a realtime session may be silent before it is closed (default 300; config
+C<realtime.idle_timeout>). See L</realtime>.
+
+=head2 realtime_max_session_seconds
+
+The longest a realtime session may last, in seconds (default 3600; config
+C<realtime.max_session_seconds>). See L</realtime>.
+
+=head2 realtime_max_message_bytes
+
+The largest single WebSocket message a realtime session takes, in either direction (default
+1048576; config C<realtime.max_message_bytes>). See L</realtime>.
+
+=head2 realtime_max_queued_bytes
+
+The most bytes of a realtime session that may wait for a peer that is not reading, per
+direction (default 4194304; config C<realtime.max_queued_bytes>). See L</realtime>.
+
 =head2 trust_key_id_header
 
 Whether a client's C<x-skeid-key-id> (or C<x-api-key-id>) header names the customer key id
@@ -3246,7 +4528,8 @@ C<limit>.
   $skeid->on_usage_lost(sub { my ($skeid, $event, $error) = @_; ... });
 
 Optional code ref (C<has_on_usage_lost> is its predicate), called for every usage event a
-write-behind store (C<usage_store.flush_interval_ms>) queued and then could not write. The
+write-behind store (C<usage_store.flush_interval_ms>) queued and then could not write, or a
+store's spool (C<usage_store.spool_dir>) could neither keep nor replay. The
 request was answered before the write was tried, so this is the only place that failure can be
 said. L<Langertha::Skeid::Proxy/build_app> sets it to the proxy's C<usage event lost> log line;
 without it Skeid C<warn>s. A failure of a synchronous write is the caller's to report, from the
@@ -3382,7 +4665,7 @@ and C<registry_error_window_s> hold the other fields.
 
 Adds a node, replacing any node with the same id. Takes the fields of a config C<nodes> entry
 and fills in their defaults (see L</nodes>). Returns 1. Croaks without C<id> or C<url>, on an
-unknown C<engine>, and on a C<registry> capacity block that
+unknown C<engine>, C<rerank_format> or C<kind>, on an C<api_key_header> that is no header name, and on a C<registry> capacity block that
 L<Langertha::Skeid::CapacityProbe::Registry/validate_config> rejects. The C<nodes.add> function
 and C<POST /skeid/nodes> call it.
 
@@ -3496,6 +4779,69 @@ failed version's retry window. A config file that has disappeared is not a reloa
 config in force stays, and the loss is warned once until the file is back. Only construction
 and an explicit C<config.reload> still die on a bad or missing config.
 
+=head2 start_customer_source
+
+  $skeid->start_customer_source;
+
+Starts fetching the config's C<customer_source> on L<Mojo::IOLoop>: the first fetch on the next
+loop turn, then one per C<refresh_interval_s>. A source added, changed or removed by a later
+reload is started, restarted or stopped with it. L<Langertha::Skeid::Proxy/build_app> calls this;
+a Skeid that is not serving (C<skeid usage>) never fetches. Returns true when a source is
+configured.
+
+=head2 stop_customer_source
+
+Stops fetching. The snapshot in force stays.
+
+=head2 customer_source_startup_fetch
+
+  my $ok = $skeid->customer_source_startup_fetch;
+
+Runs one fetch now and waits for it, at most C<connect_timeout_s>, by running the event loop --
+so only before the loop is started: C<skeid serve> calls it before it listens. Returns true when
+the fetch succeeded and its rows are in force. When it fails, Skeid starts degraded and
+fail-closed: the file's config is in force and no source rows are, and the fetch is retried
+with the back-off. Returns false without a started source.
+
+=head2 customer_source_release
+
+Lets the fetcher close its database connections; the next fetch opens new ones. C<skeid serve>
+calls it before the prefork manager forks, so each worker opens its own. It also queues a fetch
+for the next turn of the loop: the manager never runs the loop, each worker inherits the queue and
+fetches as it starts -- which opens its connections, the C<listen> one included, at once, not one
+C<refresh_interval_s> after the start.
+
+=head2 customer_source_status
+
+  my $status = $skeid->customer_source_status;   # undef without a customer_source
+  # { ok => 1, relation => 'skeid.customer_keys', last_success_at => '...', failed_at => undef,
+  #   failures => 0, error => undef, stale => 0,
+  #   rows => { accepted => 120, rejected => 1, shadowed => 2 },
+  #   rejected => [ { row => "'acme'", reason => '...' } ], shadowed => [ "'bigcorp'" ] }
+
+The state of the customer source, for C<GET /skeid/config>. C<ok> is true once a fetch
+succeeded and the last one did; C<error> says why not. C<stale> is true while C<max_stale_s> has
+dropped the rows. C<rows> counts what the last merge accepted (shadowed ones included), rejected
+and shadowed; C<rejected> and C<shadowed> list the first 50 by label -- the row's C<name>, else
+its position -- never by value. C</health> carries only C<ok>, C<failed_at> and C<failures>.
+
+=head2 customer_names
+
+  my $names = $skeid->customer_names;   # { 'k_5f0e...' => 'acme', ... }
+
+The display names of the customer source's accepted rows, by customer key id: whom a key id
+belongs to, for C<GET /skeid/config>. Rows without a name are absent. Key ids and the labels
+the owning application chose, never a key. Empty without a customer source.
+
+=head2 customer_report
+
+  my $report = $skeid->customer_report;   # undef without a customer_source
+  # { accepted => 120, rejected => [ { row => "'acme'", reason => '...' } ], shadowed => [ "'bigcorp'" ] }
+
+What the last merge did with the source's rows: how many it accepted, and which it rejected or
+shadowed by label (first 50 of each) with the reason -- never a value. C<GET /skeid/config>
+carries it as C<customer_report>.
+
 =head2 manifest_for_key
 
   my $json = $skeid->manifest_for_key($api_key_id);   # UTF-8 JSON bytes, or undef
@@ -3547,8 +4893,8 @@ C<route_url>, C<status_code>, C<ok>, C<duration_ms>, C<error_type>, C<error_mess
 C<metrics> the token counts (C<input_tokens>, C<output_tokens>, C<total_tokens>,
 C<cached_tokens>, C<cache_write_tokens>), C<tool_calls> and the costs (C<cost_input_usd>,
 C<cost_output_usd>, C<cost_total_usd>, C<cost_cache_read_usd>, C<cost_cache_write_usd>). Costs
-arrive already priced; nothing is priced here. C<content_bytes> is set only when given. The
-C<usage.record> function calls it.
+arrive already priced; nothing is priced here. C<content_bytes>, C<audio_seconds>,
+C<documents> and C<pages> are set only when given. The C<usage.record> function calls it.
 
 =head2 flush_usage
 
@@ -3689,6 +5035,44 @@ the name is not registered. The registry is a config-authoring convenience -- it
 C<keys:> entry be written by name and confines key rotation to one line -- and is resolved to
 ids at config load, so it never appears on the request path.
 
+=head2 client_auth_enabled
+
+  if ($skeid->client_auth_enabled) { ... }
+
+Whether the config has a C<client_auth> section, so that the client routes answer C<401> to a
+key not on its list. See L</client_auth>.
+
+=head2 client_key_allowed
+
+  my $ok = $skeid->client_key_allowed($key_id);   # k_5f0e...
+
+Whether a customer key id may use the client routes: always true while client authentication
+is off, otherwise true only for an id on the C<client_auth> list -- one hash lookup. A short
+(pre-ADR 0016) id on the list matches the full id it is the prefix of, as in C<keys:>.
+C<anonymous> -- no key presented -- is never on the list.
+
+=head2 mcp_enabled
+
+  if ($skeid->mcp_enabled) { ... }
+
+Whether the config has an C<mcp> section, so that the MCP routes exist. See L</mcp>.
+
+=head2 mcp_server_for_key
+
+  my $server = $skeid->mcp_server_for_key('bookrag', $key_id);   # the resolved entry, or undef
+
+The MCP server of that name, if it is assigned to this customer key id -- two hash lookups.
+Undef for an unknown name and for a server assigned to other keys alike: the caller must not be
+able to tell the two apart. A short (pre-ADR 0016) id in a server's C<keys> matches the full id
+it is the prefix of, as in C<client_auth>; C<anonymous> is assigned nothing.
+
+=head2 mcp_servers_for_key
+
+  my $servers = $skeid->mcp_servers_for_key($key_id);   # [ $server, ... ], sorted by name
+
+Every MCP server assigned to this customer key id, relayed and C<stdio> ones alike. Empty for a
+key with no assignment and while the gateway is off.
+
 =head2 route_plan
 
   my $plan = $skeid->route_plan(model => 'our-fast-model', api_key_id => $key_id);
@@ -3698,6 +5082,10 @@ The ordered tiers to try for a requested model, under the policy of the key that
 with no alias yields a single implicit tier that selects on the name itself and inherits the
 global C<route_wait_timeout_ms>, which is what makes an aliasless config behave exactly as it
 did before aliases existed.
+
+C<kind> (default chat, else C<documents>) is the kind of node the route is over: it is put on
+every tier, so the selection and its round-robin cursor are over nodes of that kind only. The
+documents route plans under the model C<documents> (ADR 0028).
 
 C<permitted> is false when the policy does not grant this model, or when every tier of it was
 denied. Both mean the same thing to a caller — this key may not reach this model — and neither
@@ -3713,7 +5101,9 @@ cloud node by asking for its raw model name instead of the alias.
 
 Nodes carrying every listed tag, as copies. No tags selects everything. Selection is by tag,
 never by node id, so a config can talk about C<local> or C<cloud> without naming machines.
-C<deny_tags> drops every node carrying any of those tags. Health is not considered. The
+C<deny_tags> drops every node carrying any of those tags. C<kind> (C<''> for chat, or
+C<documents>), when given, keeps the nodes of that kind only; without it every kind is selected.
+Health is not considered. The
 C<nodes.select> function calls it.
 
 =head2 pick_node
@@ -3843,12 +5233,15 @@ C<request.start> function calls it.
 
   $skeid->finish_request('gpu-1', ok => 1, duration_ms => 840);
   $skeid->finish_request('gpu-1', aborted => 1);   # the client hung up
+  $skeid->finish_request('gpu-1', rejected => 1);  # the request was the client's to fix
 
 Releases the slot L</start_request> took and counts the outcome for L</node_metrics>. There are
-three outcomes: C<ok>, failed (neither C<ok> nor C<aborted>), and C<aborted> -- the client went
-away, which says nothing about the node. A failed request counts toward the registry snapshot's
-C<errors_in_window> and C<last_failure_at>; an aborted one is counted apart and toward neither.
-C<aborted> wins over C<ok>. Never touches C<healthy>. Returns 1. The C<request.finish> function calls it.
+four outcomes: C<ok>, failed (none of the others), C<aborted> -- the client went away -- and
+C<rejected> -- the client sent something no node would take (400, 404, 413, 422; not 401, 403 or
+429, which speak of the node's key or capacity). Both say nothing about the node. A failed request
+counts toward the registry snapshot's C<errors_in_window> and C<last_failure_at>; an aborted one is
+counted apart and toward neither; a rejected one is counted apart and shows as C<rejected_in_window>.
+C<aborted> wins over C<rejected>, which wins over C<ok>. Never touches C<healthy>. Returns 1. The C<request.finish> function calls it.
 
 =head2 registry_snapshot
 
@@ -3856,7 +5249,8 @@ C<aborted> wins over C<ok>. Never touches C<healthy>. Returns 1. The C<request.f
 
 What this Skeid publishes to a fronting tier (ADR 0017): schema C<version> 1, C<instance>,
 C<generated_at>, C<ttl>, C<workers>, and per node C<id>, C<tags>, C<healthy>, C<inflight>,
-C<max_conns> (this process's share), C<errors_in_window>, C<last_failure_at> and, when a
+C<max_conns> (this process's share), C<errors_in_window>, C<last_failure_at>,
+C<rejected_in_window> (requests the client's own fault ended, counted apart; ADR 0024) and, when a
 current reading exists, C<capacity> (C<used>, C<limit>, C<source>, C<retry_after>).
 
 Built from a whitelist, so it cannot carry what it must not: no node URL, no key reference, no
@@ -3868,7 +5262,7 @@ metadata, no customer key id, no policy, no usage. L<Langertha::Skeid::Registry>
   my $all = $skeid->node_metrics;
 
 Volatile per-process counters for operations, never billed: C<node_id>, C<inflight>,
-C<started>, C<ok>, C<error>, C<aborted>, C<duration_ms_total>, and C<capacity> while a current reading
+C<started>, C<ok>, C<error>, C<aborted>, C<rejected>, C<duration_ms_total>, and C<capacity> while a current reading
 exists. With no id, an arrayref with one entry per node. Served by C<GET /skeid/metrics/nodes>.
 
 =head2 call_function
@@ -3892,15 +5286,15 @@ function names a required argument.
   alias.set           name, alias (or the tiers inline)     { ok }
   policy.set          name, policy (or the spec inline)     { ok }
   policy.for_key      api_key_id                            { policy }
-  route.plan          model, engine, api_key_id             route_plan
-  route.next          model, engine, tags, deny_tags        { node } (pick_node)
-  route.state         model, engine, tags, deny_tags        route_state
+  route.plan          model, engine, api_key_id, kind       route_plan
+  route.next          model, engine, tags, deny_tags, kind  { node } (pick_node)
+  route.state         model, engine, tags, deny_tags, kind  route_state
   capacity.set        id, and the reading                   { capacity }
   capacity.get        id                                    { capacity }
   capacity.observe    id, headers, status                   { capacity }
   capacity.forget     id (optional)                         { ok }
   request.start       id                                    { ok }
-  request.finish      id, ok|aborted, duration_ms                 { ok }
+  request.finish      id, ok|aborted|rejected, duration_ms                 { ok }
   config.reload                                             { config } (dies on failure)
   config.status                                             reload_status
   usage.record        as record_usage                       record_usage

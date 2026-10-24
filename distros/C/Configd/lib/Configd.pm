@@ -1,5 +1,5 @@
 package Configd;
-$Configd::VERSION = '0.002';
+$Configd::VERSION = '0.005';
 #ABSTRACT: Give software without a conf.d one anyway.
 
 use 5.034;
@@ -131,7 +131,7 @@ Configd - Give software without a conf.d one anyway.
 
 =head1 VERSION
 
-version 0.002
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -323,6 +323,12 @@ Current Maintainers:
 George S. Baugh <george@troglodyne.net>
 
 =back
+
+=head1 CONTRIBUTOR
+
+=for stopwords troglodyne-bot
+
+troglodyne-bot <morpheus@troglodyne.net>
 
 =head1 COPYRIGHT AND LICENSE
 

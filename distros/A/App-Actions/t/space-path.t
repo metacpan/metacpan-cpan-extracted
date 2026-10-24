@@ -18,6 +18,10 @@ plan skip_all => 'the suite was already copied here for the space-in-path run'
     if $ENV{APP_ACTIONS_SPACE_PATH_CHILD};
 plan skip_all => 'SPACE_PATH=0 turns off the space-in-path run'
     if defined $ENV{SPACE_PATH} && $ENV{SPACE_PATH} eq '0';
+# Automated runs (CI, CPAN testers) skip it unless SPACE_PATH asks for it:
+# under Devel::Cover the second run takes most of an hour.
+plan skip_all => 'AUTOMATED_TESTING skips the space-in-path run; set SPACE_PATH=1 to run it'
+    if $ENV{AUTOMATED_TESTING} && !$ENV{SPACE_PATH};
 plan skip_all => 'the suite is already running from a path with spaces'
     if $root =~ / /;
 

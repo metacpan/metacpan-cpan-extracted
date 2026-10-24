@@ -37,11 +37,18 @@ COPY --from=builder /usr/local/lib/perl5/site_perl/ /usr/local/lib/perl5/site_pe
 COPY --from=builder /usr/local/bin/                 /usr/local/bin/
 
 # Marks this image as the "docker" install flavor. bin/mcp-run-compress reads
-# MCP_RUN_COMPRESS_INSTALL_MODE to decide whether --install-claude should
-# register a native (`mcp-run-compress --hook`) or Docker
-# (`docker run … --hook`) hook command, and whether --hook should rewrite
-# Bash commands to `--b64 …` (native) or to a host-side pipe-through-docker
-# snippet (docker). Native Perl installs never have this var set.
+# MCP_RUN_COMPRESS_INSTALL_MODE to decide whether --install-claude registers a
+# native (`mcp-run-compress --hook`) or Docker (`docker run … --hook`) hook
+# command. Since compression moved to PostToolUse the two modes run the same
+# code — JSON in on stdin, JSON out — and the mode only picks the command
+# string that gets written into settings.json. Native Perl installs never have
+# this var set.
+#
+# The one thing the container cannot do is read the harness' persisted-output
+# file for outputs over 30 KB: it lives under the user's ~/.claude and the only
+# mountable ancestor holds every project's transcripts. In docker mode the hook
+# therefore compresses the 30 KB it was handed and names the raw file's path in
+# the text instead of reading it.
 ARG MCP_RUN_VERSION=dev
 ENV MCP_RUN_COMPRESS_INSTALL_MODE=docker \
     MCP_RUN_COMPRESS_IMAGE=raudssus/mcp-run-compress:${MCP_RUN_VERSION}

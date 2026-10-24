@@ -190,21 +190,7 @@ static SV *pmd_slurp(pTHX_ const char *path) {
  * the query echoed on the search page. The rendered markdown is not escaped
  * here - Markdown::Simple has already made it safe. */
 static void pmd_esc(pTHX_ SV *out, const char *s, STRLEN n) {
-    STRLEN i, run = 0;
-    for (i = 0; i < n; i++) {
-        const char *rep = NULL;
-        switch (s[i]) {
-            case '<':  rep = "&lt;";   break;
-            case '>':  rep = "&gt;";   break;
-            case '&':  rep = "&amp;";  break;
-            case '"':  rep = "&quot;"; break;
-            case '\'': rep = "&#39;";  break;
-            default: run++; continue;
-        }
-        if (run) { sv_catpvn(out, s + i - run, run); run = 0; }
-        sv_catpv(out, rep);
-    }
-    if (run) sv_catpvn(out, s + n - run, run);
+    punk_html_escape(aTHX_ out, s, n);
 }
 
 /* The same, with runs of whitespace collapsed to a single space and the

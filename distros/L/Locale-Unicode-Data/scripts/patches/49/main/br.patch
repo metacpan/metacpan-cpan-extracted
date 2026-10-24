@@ -1,0 +1,17 @@
+--- br.xml
++++ br.xml
+@@ -4925,6 +4925,14 @@
+ 				<displayName count="many">a yuanoù Sina (diavaez)</displayName>
+ 				<displayName count="other">yuan Sina (diavaez)</displayName>
+ 			</currency>
++			<currency type="CNX">
++				<displayName>dollar Bank poblel Sina</displayName>
++				<displayName count="one">dollar Bank poblel Sina</displayName>
++				<displayName count="two">zollar Bank poblel Sina</displayName>
++				<displayName count="few">dollar Bank poblel Sina</displayName>
++				<displayName count="many">a zollaroù Bank poblel Sina</displayName>
++				<displayName count="other">dollar Bank poblel Sina</displayName>
++			</currency>
+ 			<currency type="CNY">
+ 				<displayName>yuan Sina</displayName>
+ 				<displayName count="one">yuan Sina</displayName>

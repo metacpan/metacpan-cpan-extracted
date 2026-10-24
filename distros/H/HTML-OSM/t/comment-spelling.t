@@ -30,6 +30,7 @@ JS
 js
 lon
 macOS
+maxZoom
 Nominatim
 num
 onload

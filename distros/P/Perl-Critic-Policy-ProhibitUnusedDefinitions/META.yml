@@ -32,7 +32,7 @@ no_index:
 provides:
   Perl::Critic::Policy::ProhibitUnusedDefinitions:
     file: lib/Perl/Critic/Policy/ProhibitUnusedDefinitions.pm
-    version: '0.006'
+    version: '0.007'
 requires:
   Cpanel::JSON::XS: '0'
   Cwd: '0'
@@ -60,7 +60,9 @@ resources:
   bugtracker: https://github.com/Troglodyne-Internet-Widgets/perl-critic-policy-prohibitunuseddefinitions/issues
   homepage: https://github.com/Troglodyne-Internet-Widgets/perl-critic-policy-prohibitunuseddefinitions
   repository: https://github.com/Troglodyne-Internet-Widgets/perl-critic-policy-prohibitunuseddefinitions.git
-version: '0.006'
+version: '0.007'
+x_contributors:
+  - 'troglodyne-bot <morpheus@troglodyne.net>'
 x_generated_by_perl: v5.44.0
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: MIT

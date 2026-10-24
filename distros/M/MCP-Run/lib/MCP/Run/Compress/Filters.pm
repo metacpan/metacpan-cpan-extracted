@@ -1,6 +1,6 @@
 package MCP::Run::Compress::Filters;
 # ABSTRACT: Command Output Compression Reference
-our $VERSION = '0.106';
+our $VERSION = '0.107';
 
 
 1;
@@ -17,13 +17,39 @@ MCP::Run::Compress::Filters - Command Output Compression Reference
 
 =head1 VERSION
 
-version 0.106
+version 0.107
 
 =head1 DESCRIPTION
 
 This document lists all commands that L<MCP::Run::Compress> filters and how
 they are compressed. Each filter removes noise, truncates verbose output,
 and limits lines to reduce token count while preserving essential information.
+
+The file holds no code. It is a promise about another file's behaviour, and
+kept honest by F<t/60-filters-doc.t>, which compares every command named in
+an C<=item> below against the filters L<MCP::Run::Compress> actually
+registers, and fails on drift in either direction. Two rules follow from that,
+and both matter when adding an entry:
+
+=over 4
+
+=item *
+
+The command named in an C<=item> is the filter's B<identity> -- the shortest
+command line that makes it match -- and nothing else. A filter registered for
+the program C<iptables> is documented as C<iptables>, not as C<iptables -L>,
+even though C<-L> is what one usually types; the C<-L> belongs in the prose.
+Flags appear in the name only when the filter genuinely requires them, as
+C<git diff --stat> does.
+
+=item *
+
+An entry documents a filter that exists. A command listed here is a command
+the compressor really compresses. Anything else makes this reference worse
+than silence: someone checking whether their tool is supported reads exactly
+this file.
+
+=back
 
 =head1 COMMANDS
 
@@ -35,15 +61,31 @@ and limits lines to reduce token count while preserving essential information.
 
 Long listing format (C<-l>, C<-la>, etc.) is detected automatically from the
 output. When detected, the filter strips permissions, owner, group, size,
-date, inode, and device information. Only the file type (C<d> or C<->) and
-the filename are preserved.
+date, inode, and device information. Only the file type letter and the
+filename are preserved.
+
+Every type C<ls -l> prints is recognised (C<-> C<b> C<c> C<d> C<D> C<l> C<p>
+C<s>), as is the character some systems append to the mode column for the
+file's alternate access method: C<.> for an SELinux context, C<+> for a POSIX
+ACL, C<@> for macOS extended attributes. For a symlink the preserved name is
+the whole C<< link -> target >>, because the target is the only thing the
+entry actually states.
+
+The date column is recognised in every shape C<ls --time-style=> produces:
+the locale default (C<Aug 14 08:44>, and C<Mar 12 2024> for an older file),
+C<iso> (C<08-23 10:00>), C<long-iso> (C<2026-08-23 10:00>), C<full-iso>
+(C<2026-08-23 10:00:00.123456789 +0200>) and the date alone, as in
+C<+%Y-%m-%d> (C<2026-08-23>). A strftime format that prints neither an ISO
+date nor an ISO time is not recognised, and such a line stays uncollapsed.
 
 For non-long listings, common noise directories are filtered:
 F<node_modules>, F<.git>, F<.target>, F<.next>, F<.nuxt>, F<.cache>,
 F<__pycache__>, F<.DS_Store>, F<vendor/bundle>.
 
-    # Before: drwxr-xr-x 14 getty getty 4096 Apr 24 02:32 .build
+    # Before: drwxr-xr-x. 14 getty getty 4096 Apr 24 02:32 .build
     # After:  d .build
+    # Before: lrwxrwxrwx   1 getty getty    9 Apr 24 02:32 link -> target
+    # After:  l link -> target
 
 =item C<stat>
 
@@ -64,7 +106,8 @@ Truncates columns at 80 characters, limits to 20 lines.
 
 =item C<du>
 
-Filters out F<.git> and F<node_modules> directories.
+Strips F<.git> and F<node_modules> directories, truncates at 150 characters,
+max 50 lines.
 
 =back
 
@@ -107,6 +150,18 @@ Strips blank lines, max 30 lines.
 
 Strips blank lines, max 30 lines.
 
+=item C<git commit>
+
+The one filter that rewrites the B<command> instead of its output. When
+C<CO_AUTHORED_BY> or C<ANTHROPIC_MODEL> is set, the Co-Authored-By trailer in
+the commit message is replaced, or added to the last C<-m>/C<--message>
+argument when none is present. Set C<MCP_RUN_COMPRESS_NO_CO_AUTHORED> to
+disable it entirely.
+
+Unlike every other git entry here this one matches inside compound commands,
+so C<cd project && git add . && git commit -m "..."> is rewritten too. The
+output of C<git commit> itself is left untouched.
+
 =back
 
 =head2 Build & Compile Commands
@@ -120,45 +175,58 @@ and C<Nothing to be done> messages.
 
     # On empty output: "make: ok"
 
-=item C<gcc>, C<g++>
-
-Strips include chain, compiler notes. Keeps errors and warnings.
-
-    # Before:
-    #   In file included from /usr/include/stdio.h:42:
-    #   main.c:10:5: error: use of undeclared identifier 'foo'
-    # After:
-    #   main.c:10:5: error: use of undeclared identifier 'foo'
-
 =item C<cargo build>
 
-Strips C<Compiling> and C<Fresh> lines. Keeps errors.
+Strips C<Compiling>, C<Fresh> and C<Finished> lines. Keeps errors.
 
 =item C<cargo test>
 
 Strips compilation and running noise. Max 100 lines.
 
+=item C<gcc>, C<g++>
+
+Merges stderr into stdout -- a compiler says everything there -- then strips
+the include chain, the C<note:> lines and the echoed source with its caret
+markers. The diagnostics themselves are kept: file, line, column, message.
+
+    # Before:
+    #   In file included from /usr/include/stdio.h:42:
+    #   main.c:10:5: error: use of undeclared identifier 'foo'
+    #      10 |     foo();
+    #         |     ^
+    # After:
+    #   main.c:10:5: error: use of undeclared identifier 'foo'
+
 =item C<swift build>
 
-Short-circuits successful builds to C<ok (build complete)>,
-unless warnings or errors are present.
+Strips the build chatter (C<[N/M]>, C<Compiling>, C<Fetching>, resolution and
+C<Build complete!>), so that what remains is exactly the warnings and errors.
+On a clean build nothing remains and the output becomes
+C<swift build: ok (build complete)>.
 
 =item C<mix compile>
 
-Elixir Mix compiler. Strips C<Compiling N files>, C<Generated> lines.
+Elixir Mix compiler. Strips C<Compiling N files>, C<Generated ... app> and Hex
+dependency resolution lines. On empty output: C<mix compile: ok>.
 
 =item C<pio run>
 
-PlatformIO build. Strips verbose mode, configuration, LDF, library
-manager, compiling, linking, building, and size checking messages.
+PlatformIO build. Strips the environment report (CONFIGURATION, PLATFORM,
+HARDWARE, DEBUG, PACKAGES), the library dependency finder, and the compiling,
+archiving, linking and size checking lines. The C<RAM:>/C<Flash:> usage lines
+are kept. On empty output: C<pio run: ok>.
 
-=item C<mvn build>, C<gradle>
+=item C<mvn>
 
-Build system noise stripped, errors preserved.
+Strips the C<[INFO]> bookkeeping -- separators, plugin banners, downloads,
+C<Total time>, C<Finished at> -- but not every C<[INFO]> line: surefire
+reports its test results there. C<[WARNING]> and C<[ERROR]> are untouched.
 
-=item C<webpack>, C<esbuild>, C<vite>
+=item C<gradle>
 
-Bundler/Build tool output condensed.
+Strips C<< > Task : >> lines for tasks that succeeded, were up to date,
+skipped or came from the cache, plus daemon and download noise. A task line
+carrying C<FAILED> is kept.
 
 =back
 
@@ -187,6 +255,12 @@ Truncates columns at 150 characters, max 50 lines.
 Strips name, namespace, labels, annotations noise.
 Max 100 lines.
 
+=item C<docker-compose>, C<docker compose>
+
+Both the v1 binary and the v2 subcommand. Strips network, volume and
+container lifecycle lines (C<Creating>, C<Started>, C<Healthy>, ...),
+C<Pulling> and C<Attaching to>. Service log output is kept.
+
 =back
 
 =head2 Cloud & Infrastructure Commands
@@ -197,10 +271,6 @@ Max 100 lines.
 
 Strips C<Refreshing state...> and progress messages.
 
-=item C<tofu plan>, C<tofu validate>, C<tofu init>, C<tofu fmt>
-
-OpenTofu variants. Strips tofu-specific noise.
-
 =item C<helm install>, C<helm upgrade>
 
 Strips NAME, NAMESPACE, STATUS, REVISION, NOTES noise.
@@ -210,17 +280,16 @@ Strips NAME, NAMESPACE, STATUS, REVISION, NOTES noise.
 Strips PLAY/TASK banners, running handlers, and recap headers.
 Max 100 lines.
 
-=item C<docker-compose>
+=item C<tofu plan>, C<tofu apply>
 
-Compose service output filtered.
+OpenTofu is a Terraform fork and prints the same lines; these filters mirror
+the C<terraform> ones above.
 
-=item C<kubectl>
+=item C<tofu init>
 
-K8s CLI output compacted.
-
-=item C<gcloud>
-
-GCP CLI output filtered.
+Short-circuits a successful init to C<tofu init: ok> -- there is nothing else
+in it. A failing init keeps its output, minus provider discovery
+(C<- Finding>, C<- Installing>, C<- Installed>).
 
 =back
 
@@ -233,41 +302,51 @@ GCP CLI output filtered.
 Strips C<--> Working on, C<OK>, C<FAIL> noise.
 Shows only essential progress.
 
-=item C<cpan>
-
-CPAN shell output filtered.
-
-=item C<cpm>
-
-Perl C<cpm> package manager output filtered.
-
 =item C<npm install>
 
 Strips added/found packages confirmation and warnings.
 
-=item C<yarn>, C<pnpm>
+=item C<yarn install>, C<yarn add>, C<pnpm install>, C<pnpm add>
 
 Strips C<Done in...>, C<Resolving completed>, C<Linking completed>.
-
-=item C<composer install>
-
-Strips repository loading, dependency updating, lock file operations.
 
 =item C<pip install>
 
 Strips C<Collecting>, C<Downloading>, C<Installing collected packages>.
 
+=item C<cpan>
+
+Strips the CPAN shell's narration: C<Reading '...'>, C<Database was generated
+on>, C<Fetching with>, C<Checksum for>, C<Running make/test/install for>.
+
+=item C<cpm>
+
+Strips the per-distribution C<DONE ...> lines and keeps the summary. On empty
+output: C<cpm: ok>.
+
+=item C<composer install>
+
+Strips repository loading, dependency updating, the per-package operation
+lines, lock file writing and autoload generation. On empty output:
+C<composer install: ok>.
+
 =item C<brew install>
 
-Package manager output filtered.
+Strips C<< ==> Downloading >>, C<< ==> Pouring >>, C<< ==> Fetching >>,
+auto-update noise and C<Already downloaded:>.
+C<< ==> Installing dependencies for ... >> goes,
+C<< ==> Installing ... >> stays.
 
 =item C<poetry install>
 
-Python Poetry dependency installer output.
+Strips C<Installing dependencies from lock file>, C<Package operations:> and
+the per-package bullet lines. On empty output: C<poetry install: ok>.
 
 =item C<uv sync>
 
-Python UV package manager.
+Strips the C<Resolved/Prepared/Audited N packages in ...> timings and the
+C<+>/C<-> package list; C<Installed N packages> is kept. On empty output:
+C<uv sync: ok>.
 
 =back
 
@@ -279,22 +358,14 @@ Python UV package manager.
 
 Truncates columns at 120 characters, max 30 lines.
 
-=item C<systemctl status>
+=item C<iptables>
 
-Strips status bullets (C<●>), Loaded, Main PID lines.
-
-=item C<journalctl>
-
-Strips C<-- Reboot -->, C<-- Logs begin at...>, C<-- No entries -->.
-Max 100 lines.
-
-=item C<iptables -L>
-
-Truncates columns at 150 characters, max 50 lines.
+Any invocation, C<iptables -L> in particular: truncates columns at 150
+characters, max 50 lines.
 
 =item C<ping>
 
-Strips PING header, resolves, and statistics.
+Strips PING header, replies, and statistics.
 
 =item C<rsync>
 
@@ -306,7 +377,8 @@ Truncates columns at 150 characters, max 50 lines.
 
 =item C<ip addr>, C<ip route>, C<ip link>
 
-Truncates at 150 characters, max 30-50 lines.
+C<ip addr> truncates at 150 characters, max 50 lines; C<ip route> and
+C<ip link> strip blank lines, max 30 lines.
 
 =item C<mount>
 
@@ -320,13 +392,21 @@ Lists block devices in tree format. Truncates at 150 characters, max 50 lines.
 
 Lists block device attributes. Truncates at 200 characters, max 50 lines.
 
+=item C<systemctl status>
+
+Removes the state glyph from the unit line and strips the accounting block:
+Loaded, Docs, Main PID, Tasks, Memory, CPU, CGroup and the process tree under
+it. C<Active:> and the recent log lines are kept -- C<Active:> also carries
+the state the glyph stood for.
+
+=item C<journalctl>
+
+Strips C<-- Reboot -->, C<-- Logs begin at ...>, C<-- Journal begins at ...>,
+C<-- No entries --> and boot markers. Max 100 lines.
+
 =item C<fail2ban-client>
 
 Strips blank lines, max 30 lines.
-
-=item C<jira>
-
-Strips verbose metadata and CLI option noise.
 
 =back
 
@@ -358,12 +438,14 @@ Strips coverage and HTML report generation lines.
 
 =item C<ollama run>
 
-Strips ANSI spinner characters (⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏).
+Strips ANSI escapes and the braille spinner frames. Nothing else: the output
+is the model's answer, so no line of it is dropped, truncated or counted.
 
 =item C<quarto render>
 
-Short-circuits on C<Output created:> success to C<ok (output created)>.
-Strips processing, validating, resolving messages.
+Short-circuits on C<Output created:> to C<quarto render: ok (output created)>.
+Otherwise strips processing, validating and resolving messages and the
+percentage progress lines.
 
 =back
 
@@ -373,88 +455,77 @@ Strips processing, validating, resolving messages.
 
 =item C<jj>
 
-Jujutsu VCS. Strips Hint lines and C<Working copy now at:> messages.
-Max 30 lines.
+Jujutsu VCS. Strips C<Hint:> lines, C<Working copy now at:>, C<Parent commit:>
+and rebase counts, all of which arrive on stderr. Max 30 lines.
 
 =item C<shopify theme push>, C<shopify theme pull>
 
-Keeps only the last 5 lines (typically the success/failure result).
-
-=back
-
-=head2 Other Commands
-
-=over 4
-
-=item C<sops>
-
-Secrets management output filtered.
-
-=item C<ty>
-
-TigerBeetle CLI. Strips F<zig> noise.
-
-=item C<yamllint>, C<hadolint>, C<shellcheck>
-
-Linter output filtered for essential findings.
-
-=item C<jq>
-
-JSON processor output handled.
-
-=item C<just>
-
-Justfile runner output filtered.
-
-=item C<mise>
-
-DEV tools version manager.
+Keeps only the last 5 lines -- the result and the preview URL. Deliberately
+not registered for C<shopify theme> as a whole: C<shopify theme list> is
+nothing but its answer, and a tail of 5 would cut it.
 
 =back
 
 =head1 FILTER STAGES
 
-Each filter applies output through this pipeline:
+Each filter applies output through this pipeline, in this order:
 
 =over 4
 
 =item 1.
 
-B<strip_ansi> - Removes ANSI escape codes (colors, cursor control)
+B<filter_stderr> - Merges stderr into stdout if configured
 
 =item 2.
 
-B<filter_stderr> - Merges stderr into stdout if configured
+B<strip_ansi> - Removes ANSI escape codes (colors, cursor control)
 
 =item 3.
 
-B<match_output> - Short-circuits on pattern match (e.g., success messages)
+B<collapse_cr> - Reduces carriage-return overwrites to the last state on each
+line, which is what a terminal would have shown. Unconditional, with no filter
+attribute: a progress bar carries no newlines at all, so to every stage below it
+is a single line that C<max_lines> cannot shorten. Runs for commands no filter
+matches, too: normalising C<\r> is display semantics rather than filtering.
 
 =item 4.
 
-B<transform> - Line-by-line transformation (e.g., strip ls permissions)
+B<match_output> - Short-circuits on pattern match, replacing the B<entire>
+output with a fixed message. Only ever honest for success, when there is
+nothing left to say: a diagnostic short-circuit deletes precisely what the
+output was being read for. Patterns want C</m>, since they are matched against
+the whole text rather than line by line.
 
 =item 5.
 
-B<strip_lines_matching> - Removes lines matching regex patterns
+B<transform> - Line-by-line transformation (e.g., strip ls permissions)
 
 =item 6.
 
-B<keep_lines_matching> - Keeps only lines matching patterns
+B<strip_lines_matching> - Removes lines matching regex patterns
 
 =item 7.
 
-B<truncate_lines_at> - Truncates each line to N characters
+B<keep_lines_matching> - Keeps only lines matching patterns
 
 =item 8.
 
-B<head_lines> / B<tail_lines> - Keeps first/last N lines
+B<truncate_lines_at> - Truncates each line to N characters, appending C<...>
 
 =item 9.
 
-B<max_lines> - Absolute line limit
+B<head_lines> / B<tail_lines> - Keeps first/last N lines, and says so:
+C<... N lines omitted ...> goes after the kept lines when only the head is
+kept, and before them when only the tail is kept. Truncating without a marker
+would leave the model holding a fragment it has no reason to doubt.
 
 =item 10.
+
+B<max_lines> - Absolute line limit, appending C<... N more lines ...>. This
+counts separately from the marker above: two markers in one output are normal
+and their numbers do not add up to a single total.
+
+=item 11.
 
 B<on_empty> - Fallback message when output is empty after filtering
 
@@ -489,6 +560,9 @@ B<on_empty> - Fallback message when output is empty after filtering
         max_lines => 50,
     );
 
+A filter added to the default table in L<MCP::Run::Compress> belongs in the
+COMMANDS section above; F<t/60-filters-doc.t> fails until it is there.
+
 =head1 PARSED COMMAND APPROACH
 
 Filters can use either regex-based C<command> matching (legacy) or the new
@@ -507,6 +581,12 @@ and flags using L<Getopt::Long>, enabling order-independent flag matching.
 
 The C<flags> hash specifies which flags must be present. Flag values are
 ignored - only presence matters for matching.
+
+Matching a program without a subcommand matches B<every> invocation of that
+program, so such a filter shadows any program+subcommand filter for the same
+program: the compressor stops at the first matching parsed filter, and which
+one that is depends on hash order. C<kubectl get> and a bare C<kubectl> cannot
+both exist as long as that is true.
 
 =head1 SEE ALSO
 

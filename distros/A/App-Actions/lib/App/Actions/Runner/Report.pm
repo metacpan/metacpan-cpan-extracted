@@ -14,9 +14,9 @@ use Sub::Private ();
 
 use App::Actions::Access;
 use App::Actions::I18N qw(i18n validate_args);
-use App::Actions::Runner::Support qw(chomp_error redact);
+use App::Actions::Runner::Support qw(default_logger redact);
 
-our $VERSION = '0.001.0';
+our $VERSION = '0.002.0';
 
 # The width of the job-name column of the summary.
 Readonly::Scalar my $NAME_WIDTH => 50;
@@ -24,6 +24,10 @@ Readonly::Scalar my $NAME_WIDTH => 50;
 # Kept logs may quote secrets from a job's environment, so they are private.
 Readonly::Scalar my $DIRECTORY_MODE => oct('0700');
 Readonly::Scalar my $FILE_MODE => oct('0600');
+
+# A name keep_logs joins to a path must stay one name: letters, digits, _ . -
+# but never . or .., which are directories.
+Readonly::Scalar my $PLAIN_NAME => qr/\A(?!\.\.?\z)[A-Za-z0-9_.-]+\z/;
 
 =encoding utf-8
 
@@ -76,6 +80,10 @@ C<action-run logs> lists them).
 
 =item * C<quiet> - optional; print nothing.
 
+=item * C<logger> - optional; a L<Log::Abstraction> object (default:
+L<App::Actions::Runner::Support/default_logger>, standard error).  Logs
+the jobs' logs that could not be kept, at the C<warn> level.
+
 =back
 
 =head3 RETURNS
@@ -97,6 +105,7 @@ None.
 	{
 		docker => { type => 'object' },
 		quiet  => { type => 'boolean', optional => 1 },
+		logger => { type => 'object', can => [qw(warn error notice)], optional => 1 },
 	}
 
 =head4 OUTPUT
@@ -120,9 +129,11 @@ sub new {
 	my $params = validate_args(__PACKAGE__ . '::new', \@_, {
 		docker => { type => 'object' },
 		quiet => { type => 'boolean', optional => 1 },
+		# Where warnings and errors go; standard error when none is given.
+		logger => { type => 'object', can => [qw(warn error notice)], optional => 1 },
 	});
 
-	return bless { %{$params}, entries => [], failed => 0, kept_dir => undef, kept_logs => [] }, $class;
+	return bless { %{$params}, logger => $params->{logger} || default_logger(), entries => [], failed => 0, kept_dir => undef, kept_logs => [] }, $class;
 }
 
 =head2 record
@@ -337,11 +348,13 @@ run.  Returns the object.
 
 =over 4
 
-=item * C<$logs> - from L<App::Actions::Runner::Parallel/logs>.
+=item * C<$logs> - from L<App::Actions::Runner::Parallel/logs>.  Each
+C<file> must be a plain file name (letters, digits, C<_>, C<.> and C<->,
+not C<.> or C<..>).
 
 =item * C<$root> - where the run's log directories go.
 
-=item * C<$run_id> - the run's identifier.
+=item * C<$run_id> - the run's identifier, also a plain name.
 
 =back
 
@@ -376,6 +389,11 @@ Creates a private directory and copies the logs into it; warns on failure.
 	| the job logs: cannot copy   | made or a log copied         | space and permissions       |
 	| 'X' to 'Y': E               |                              |                             |
 	+-----------------------------+------------------------------+-----------------------------+
+	| action-run: could not keep  | A log's file name, or the    | Use a plain name: letters,  |
+	| the job logs: 'X' is not a  | run's identifier, has a      | digits, _ . and -; the      |
+	| plain file name             | directory in it, or is . or  | parallel runner always does |
+	|                             | ..                           |                             |
+	+-----------------------------+------------------------------+-----------------------------+
 
 =cut
 
@@ -387,30 +405,60 @@ sub keep_logs {
 
 	my $directory = File::Spec->catdir($root, POSIX::strftime('%Y%m%d-%H%M%S', localtime) . "-$run_id");
 
-	my $kept = eval {
-		# A filesystem that will not take the mode still holds the logs, so
-		# a failed chmod does not cost the copies.
-		no autodie qw(chmod);
-		make_path($directory);
-		chmod $DIRECTORY_MODE, $directory;
-		for my $entry (@present) {
-			my $target = File::Spec->catfile($directory, $entry->{file});
-			copy($entry->{path}, $target)
-				or die $self->i18n('runner.logs.copy_failed', { from => $entry->{path}, to => $target, error => "$!" }), "\n";
-			chmod $FILE_MODE, $target;
-			$entry->{kept} = $target;
-		}
-		1;
-	};
+	# The parallel runner makes these names safe, but this method is public:
+	# a name such as ../x would copy a log out of the private directory, and
+	# so it is refused before anything is made.
+	my @bad = grep { !(defined $_ && $_ =~ $PLAIN_NAME) } ($run_id, map { $_->{file} } @present);
+	my $problem = @bad
+		? $self->i18n('runner.logs.bad_name', { name => defined $bad[0] ? $bad[0] : '' })
+		: $self->_copy_logs(\@present, $directory);
 
-	if ($kept) {
-		$self->{kept_dir} = $directory;
-		$self->{kept_logs} = [ grep { $_->{kept} } @present ];
-	} else {
-		warn $self->i18n('runner.logs.keep_failed', { error => chomp_error($@) }), "\n";
+	if (defined $problem) {
+		$self->{logger}->warn($self->i18n('runner.logs.keep_failed', { error => $problem }));
+		return $self;
 	}
 
+	$self->{kept_dir} = $directory;
+	$self->{kept_logs} = [ grep { $_->{kept} } @present ];
+
 	return $self;
+}
+
+# _copy_logs
+# Purpose:     Copy the logs into the directory keep_logs chose for the run.
+# Entry:       $self - the report; $present - the log entries whose files
+#              exist; $directory - the run's log directory (not made yet).
+# Exit status: Returns undef when every log was copied, else the reason, in
+#              the catalogue's words: the first log could not be copied to a
+#              directory that could not be made, or a log could not be copied.
+# Side effects: Makes the directory, copies the logs (owner-only modes where
+#              the filesystem takes them) and sets each copied entry's kept.
+sub _copy_logs {
+	my ($self, $present, $directory) = @_;
+
+	# make_path reports a directory it could not make in its own words and
+	# with its own line; the reader needs the log that could not be kept.
+	make_path($directory, { error => \my $problems });
+	if (!-d $directory) {
+		my ($reason) = map { values %{$_} } @{ $problems || [] };
+		return $self->i18n('runner.logs.copy_failed', {
+			from => $present->[0]{path}, to => $directory, error => defined $reason ? $reason : 'unknown error',
+		});
+	}
+
+	# A filesystem that will not take the mode still holds the logs, so a
+	# failed chmod does not cost the copies.
+	no autodie qw(chmod);
+	chmod $DIRECTORY_MODE, $directory;
+	for my $entry (@{$present}) {
+		my $target = File::Spec->catfile($directory, $entry->{file});
+		copy($entry->{path}, $target)
+			or return $self->i18n('runner.logs.copy_failed', { from => $entry->{path}, to => $target, error => "$!" });
+		chmod $FILE_MODE, $target;
+		$entry->{kept} = $target;
+	}
+
+	return;
 }
 
 =head2 print_kept_logs
@@ -647,6 +695,7 @@ rule are the conditions that are always true when the routine returns.
 	├───────────────────────────────────────────────────
 	│ let present == {l : ran logs? | exists(l.path)}
 	│ present = ∅ ⇒ kept' = kept
+	│ (∃ l : present • l.file ∉ PLAIN) ∨ run_id? ∉ PLAIN ⇒ kept' = kept ∧ warns
 	│ present ≠ ∅ ∧ copied ⇒ kept' = dir ∧ files(dir) = {l.file | l ∈ present}
 	└───────────────────────────────────────────────────
 

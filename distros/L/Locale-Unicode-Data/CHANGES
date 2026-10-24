@@ -1,5 +1,33 @@
 Revision history for Perl module Locale::Unicode::Data
 
+v1.10.0 2026-10-23T22:08:36+0900
+    - Release v1.10.0 for for CLDR 49
+    - Added the data_aliases table, which stores the aliases of root as rules, and the
+      resolve() method, which follows them after locale inheritance and before root, as
+      UTS #35 specifies for aliases with source="locale". An alias of root points to the
+      data of the locale being resolved, not of root: for instance, the Japanese calendar
+      months of fr are its Gregorian months (janvier), not those of root (M01).
+    - Added the data_alias() and data_aliases() methods.
+    - scripts/create_database.pl: the aliases of root are now converted into rules in
+      the data_aliases table, and an alias that cannot be mapped to a table is fatal.
+      Root no longer causes a fatal error for the British and Irish metazones of
+      CLDR v49, which are aliased to the GMT metazone of the locale being resolved.
+    - Added missing clone() method in subclass Locale::Unicode::Data::Exception
+    - Fixed a DBD::SQLite thread ownership error during interpreter shutdown.
+      Added a CLONE method to discard inherited database and prepared statement caches,
+      ensuring that child threads establish their own SQLite connections.
+    - Updated the END block to perform ordered cleanup of cached prepared statements and
+      database handles only in the main interpreter.
+      Child threads rely on DBI's normal handle destruction, avoiding explicit calls to
+      finish() or disconnect() on handles owned by other threads.
+      This preserves the deterministic cleanup introduced to prevent SQLite
+      use-after-free crashes on OpenBSD.
+    - Removed the redundant database handle reference stored in each object.
+      The constructor still validates the database connection, but no longer retains the
+      handle in $self->{_dbh}.
+    - Updated database_handler() to retrieve the connection through _dbh(), ensuring that
+      callers receive the database handle associated with the current thread or process.
+
 v1.9.0 2026-07-15T07:46:50+0900
     - Added support for Person Name Formatting - CLDR UTS #35 Part 8
     - Added four new SQLite tables covering person name formatting data extracted from

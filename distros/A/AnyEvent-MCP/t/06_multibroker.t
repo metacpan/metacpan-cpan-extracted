@@ -148,7 +148,7 @@ ok exists $tools{"http.echo"} && exists $tools{"child.echo"} && exists $tools{"c
 ($success, $result) = wait_for (sub { $client->call ("child.meta-instructions", {}, $_[0]) });
 ok $success && $result->{content}[0]{text} eq "child", "downstream synthetic instructions are callable";
 ($success, $result) = wait_for (sub { $client->call ("meta-instructions", {}, $_[0]) });
-ok $success && $result->{content}[0]{text} =~ /Multibroker proxies multiple MCP servers/,
+ok $success && $result->{content}[0]{text} =~ /Proxy MCP servers.*PREFIX\.TOOL/,
    "multibroker synthetic instructions are callable with custom routing";
 ok !$tools{"list-tools"}{inputSchema}{additionalProperties},
    "list-tools schema forbids unknown arguments";

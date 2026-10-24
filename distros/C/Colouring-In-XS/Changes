@@ -1,5 +1,18 @@
 Revision history for Colouring-In-XS
 
+0.12    2026-10-23
+        - The method rewrite no longer hangs compiling a loop.
+
+0.11    2026-08-15
+        colouring.h now restores the CRT libc names (fprintf, stderr,
+        abort, the allocators) when included inside a Perl XS translation
+        unit on a PERL_IMPLICIT_SYS perl: XSUB.h remaps them to
+        interpreter-context macros that need my_perl, and this header is
+        plain C with no pTHX. Found via Litavis 0.04's Strawberry FAILs
+        ("'my_perl' undeclared" in the default COLOURING_FATAL); the
+        dist's own XS was unaffected because it defines COLOURING_FATAL
+        as croak before including.
+
 0.10    2026-04-26
         Memory-safety fixes addressing CPAN-tester SEGVs on threaded
         and longdouble Perls (5.10–5.43) on Linux/OpenBSD.

@@ -1,8 +1,14 @@
 {
   "sources": {
-    "getty": { "git": "https://github.com/Getty/skills" },
-    "karr": { "git": "https://github.com/Getty/karr" },
-    "langertha": { "git": "https://github.com/Getty/langertha" }
+    "getty": {
+      "git": "https://github.com/Getty/skills"
+    },
+    "karr": {
+      "git": "https://github.com/Getty/karr"
+    },
+    "langertha": {
+      "git": "https://github.com/Getty/langertha"
+    }
   },
   "install": {
     "skills": [
@@ -15,8 +21,12 @@
       "getty-perl-release-author-getty@karr",
       "kanban-issues-karr-coordination@karr",
       "kanban-issues-karr-ticket@karr",
-      "perl-ai-langertha@langertha"
+      "perl-ai-langertha@langertha",
+      "perl-mojo@getty",
+      "docker@getty"
     ]
   },
-  "targets": ["claude"]
+  "targets": [
+    "claude"
+  ]
 }

@@ -1,5 +1,5 @@
 package Configd::Language;
-$Configd::Language::VERSION = '0.002';
+$Configd::Language::VERSION = '0.005';
 #ABSTRACT: Base class for the languages: how one config file format is read, merged and written back.
 
 use 5.034;
@@ -119,6 +119,32 @@ sub separator {
 }
 
 
+sub items {
+    my ( $self, $key, $value ) = @_;
+    return () unless defined $value;
+
+    my $punctuation = $self->separator($key) =~ s/\s+//gr;
+    my @items       = (q{});
+    my $depth       = 0;
+    foreach my $char ( split m//, $value ) {
+        if ( !$depth && ( $char =~ m/\s/ || index( $punctuation, $char ) >= 0 ) ) {
+            push @items, q{} if length $items[-1];
+            next;
+        }
+        $depth++ if $char eq '{';
+        $depth-- if $char eq '}' && $depth;
+        $items[-1] .= $char;
+    }
+    return grep { length } @items;
+}
+
+
+sub combine {
+    my ( $self, $key, @items ) = @_;
+    return @items;
+}
+
+
 sub new {
     my ( $class, %opts ) = @_;
     $opts{root} //= q{};
@@ -207,12 +233,9 @@ sub merge {
                     next;
                 }
 
-                my $separator = $self->separator($key);
-                $by_key{$key}{value} = join(
-                    $separator,
-                    grep { defined && length }
-                      map { _trim( $_, $separator ) } $by_key{$key}{value}, $directive->{value}
-                );
+                my %seen;
+                my @items = grep { !$seen{$_}++ } map { $self->items( $key, $_ ) } $by_key{$key}{value}, $directive->{value};
+                $by_key{$key}{value} = join( $self->separator($key), $self->combine( $key, @items ) );
                 next;
             }
 
@@ -222,21 +245,6 @@ sub merge {
     }
 
     return [ map { $by_key{$_} } @order ];
-}
-
-# A value that already ends in the separator is common -- postfix's own
-# mydestination is written over several lines and the last one keeps its comma
-# -- and joining onto it gives ",, " which postfix reads but nobody meant.
-sub _trim {
-    my ( $value, $separator ) = @_;
-    return $value unless defined $value;
-
-    my $punctuation = $separator =~ s/\s+//gr;
-    my $class       = length $punctuation ? "[\\s\Q$punctuation\E]" : '\\s';
-
-    $value =~ s/\A$class+//;
-    $value =~ s/$class+\z//;
-    return $value;
 }
 
 
@@ -366,7 +374,7 @@ Configd::Language - Base class for the languages: how one config file format is 
 
 =head1 VERSION
 
-version 0.002
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -615,6 +623,21 @@ A key cannot both accumulate and repeat; C<accumulates> is checked first.
 What joins the parts of an accumulating directive.  A comma and a space by
 default, which is what postfix uses; whitespace-separated languages override it.
 
+=head2 @items = $language->items($key, $value)
+
+The items of the value of an accumulating directive, in order.  They are
+separated by whitespace and by the punctuation of C<separator>, so a value
+written over several lines, or with a trailing comma as postfix's own
+C<mydestination> has, gives no empty item.  A separator inside braces does not
+split, because postfix reads C<{ ... }> as one item, as in an C<inline:> table.
+
+=head2 @items = $language->combine($key, @items)
+
+The items that an accumulating directive ends with, after the merge has
+dropped the repeats.  C<@items> as they are by default.  A language overrides
+this for a parameter whose items are not a plain set, such as C<all> in the
+C<inet_interfaces> of postfix.
+
 =head1 METHODS
 
 =head2 $class->new(%opts)
@@ -658,6 +681,12 @@ and a stray backup silently taking part in the merge is a bad afternoon.
 
 One list of directives out of several, applying C<accumulates> to decide which
 of two directives for the same key wins and which of them join up.
+
+An accumulating directive joins as a list of items, not as two strings.  Each
+value is split into its items with C<items>, an item that the list already
+holds is dropped, and C<combine> has the last word.  So a fragment that
+repeats what C<00-original> says changes nothing, which is what it meant, and
+does not make C<inet_interfaces = all, all>, which postfix refuses.
 
 An accumulating directive with an B<empty value> resets it: whatever earlier
 fragments put there is dropped, and anything after this adds to nothing rather

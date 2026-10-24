@@ -9,10 +9,16 @@ use File::Spec;
 use File::Temp qw(tempdir);
 
 use App::Actions;
+use Log::Abstraction ();
 
 my $fake_docker = File::Spec->rel2abs(
     File::Spec->catfile(dirname(__FILE__), 'bin', 'fake-docker'),
 );
+
+# Object::Configure reads the developer's own configuration files (~/.conf
+# and the like), where a UNIVERSAL logger would take the messages these tests
+# read off standard error.  An empty directory leaves the defaults in force.
+local $ENV{CONFIG_DIR} = tempdir(CLEANUP => 1);
 
 # A run records the images it kept for "action-run cache"; keep that record in
 # a temporary file so the suite never writes to the machine-wide cache.
@@ -463,6 +469,64 @@ YAML
 is($failure->{exit}, 1, 'failing workflow exits 1');
 like($failure->{stderr}, qr/step exited with status 7/, 'step failure is reported');
 like($failure->{log}, qr/^rm\t-f\t/m, 'failed runs still clean up containers');
+
+# Warnings and errors go through a Log::Abstraction logger.  The default one
+# prints them to standard error, as above; a logger given to the run gets
+# them instead, with their level, and 'NULL' drops them.
+my $failing_workflow = <<'YAML';
+name: Failure
+on: push
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fail
+        run: |
+          FAKE_EXIT: 7
+YAML
+
+my @logged;
+my $captured = run_workflow($failing_workflow, logger => \@logged);
+is($captured->{exit}, 1, 'a run with its own logger still fails the job');
+unlike($captured->{stderr}, qr/step exited with status 7/,
+    'the step failure goes to the given logger, not standard error');
+ok(
+    (grep { $_->{level} eq 'error' && $_->{message} =~ /step exited with status 7/ } @logged),
+    'and is logged at the error level',
+) or diag explain \@logged;
+
+my $silenced = run_workflow($failing_workflow, logger => 'NULL');
+is($silenced->{exit}, 1, 'a run with logging turned off still fails the job');
+unlike($silenced->{stderr}, qr/step exited with status 7/, "logger => 'NULL' drops the message");
+
+# A logger in the configuration replaces the default, and a logger argument
+# replaces that: Object::Configure would let the configuration win over an
+# argument other than an array.
+{
+    my $config_dir = tempdir(CLEANUP => 1);
+    my $log_file   = File::Spec->catfile($config_dir, 'action-run.log');
+    open my $config, '>', File::Spec->catfile($config_dir, 'local.yaml') or die $!;
+    print {$config} "---\nApp__Actions:\n  logger:\n    file: $log_file\n    level: debug\n";
+    close $config;
+    local $ENV{CONFIG_DIR} = $config_dir;
+
+    my $configured = run_workflow($failing_workflow);
+    unlike($configured->{stderr}, qr/step exited with status 7/,
+        'a configured logger takes the message off standard error');
+    like(slurp_if_present($log_file), qr/step exited with status 7/, 'and writes it where it was told to');
+
+    my @argument_log;
+    unlink $log_file;
+    run_workflow($failing_workflow, logger => \@argument_log);
+    ok((grep { $_->{message} =~ /step exited with status 7/ } @argument_log),
+        'a logger argument wins over the configured one');
+    is(slurp_if_present($log_file), '', 'which then logs nothing');
+
+    my $collected = Log::Abstraction->new(array => \my @object_log);
+    run_workflow($failing_workflow, logger => $collected);
+    ok((grep { $_->{message} =~ /step exited with status 7/ } @object_log),
+        'so does a Log::Abstraction object');
+}
 
 my $skipped = run_workflow(<<'YAML');
 name: Windows only

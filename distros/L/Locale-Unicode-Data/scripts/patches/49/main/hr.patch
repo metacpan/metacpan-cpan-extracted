@@ -1,0 +1,15 @@
+--- hr.xml
++++ hr.xml
+@@ -4628,6 +4628,12 @@
+ 				<displayName count="few">kineska juana (offshore)</displayName>
+ 				<displayName count="other">kineskih juana (offshore)</displayName>
+ 			</currency>
++			<currency type="CNX">
++				<displayName>kineski narodni dolar</displayName>
++				<displayName count="one" draft="contributed">kineski narodni dolar</displayName>
++				<displayName count="few" draft="contributed">kineska narodna dolara</displayName>
++				<displayName count="other" draft="contributed">kineskih narodnih dolara</displayName>
++			</currency>
+ 			<currency type="CNY">
+ 				<displayName>kineski yuan</displayName>
+ 				<displayName count="one">kineski yuan</displayName>

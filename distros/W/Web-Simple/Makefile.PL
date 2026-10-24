@@ -51,6 +51,7 @@ my %WriteMakefileArgs = (
       test => {
         requires => {
           'Data::Dumper::Concise' => '2.020',
+          'IO::Scalar' => 0,
           'Test::More' => '0.88',
         },
         recommends => {

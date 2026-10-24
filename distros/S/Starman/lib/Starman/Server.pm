@@ -10,12 +10,16 @@ use HTTP::Status qw(status_message);
 use HTTP::Date qw(time2str);
 use POSIX qw(EINTR EPIPE ECONNRESET);
 use Symbol;
+use Time::HiRes ();
 
 use Plack::Util;
 use Plack::TempBuffer;
 
 use constant DEBUG        => $ENV{STARMAN_DEBUG} || 0;
 use constant CHUNKSIZE    => 64 * 1024;
+use constant MAX_CHUNK_LINE => 4096;
+use constant MAX_TRAILER_SIZE => 16 * 1024;
+use constant MAX_HEADER_SIZE  => 128 * 1024;
 
 my $null_io = do { open my $io, "<", \""; $io };
 
@@ -65,6 +69,9 @@ sub run {
     }
     if (! exists $options->{read_timeout}) {
         $options->{read_timeout} = 5;
+    }
+    if (! exists $options->{body_timeout}) {
+        $options->{body_timeout} = 300;
     }
     if (! exists $options->{proctitle}) {
         $options->{proctitle} = 1;
@@ -238,11 +245,20 @@ sub process_request {
         };
 
         # Parse headers
-        my $reqlen = parse_http_request(delete $self->{client}->{headerbuf}, $env);
-        if ( $reqlen == -1 ) {
+        my $headerbuf = delete $self->{client}->{headerbuf};
+        my $reqlen = parse_http_request($headerbuf, $env);
+        if ( $reqlen != length $headerbuf || !_valid_header_names($headerbuf) ) {
             # Bad request
             DEBUG && warn "[$$] Bad request\n";
             $self->_http_error(400, { SERVER_PROTOCOL => "HTTP/1.0" });
+            last;
+        }
+
+        # Reject ambiguous message framing before we touch the body
+        my($framing_error, $close_after) = $self->_check_framing($env);
+        if ( $framing_error ) {
+            DEBUG && warn "[$$] Invalid message framing, returning $framing_error\n";
+            $self->_http_error( $framing_error, $env );
             last;
         }
 
@@ -294,7 +310,27 @@ sub process_request {
             $self->{client}->{keepalive} = 0;
         }
 
-        $self->_prepare_env($env);
+        if ($close_after) {
+            DEBUG && warn "[$$] Both Transfer-Encoding and Content-Length present. Closing the connection after this request\n";
+            $self->{client}->{keepalive} = 0;
+        }
+
+        # Read the request body. _prepare_env dies with "Timed out" if the
+        # client is too slow; the app is run after that, outside any alarm.
+        my $status = eval { $self->_prepare_env($env) };
+        alarm(0);
+
+        if ( $@ ) {
+            die $@ unless $@ eq "Timed out\n";
+            DEBUG && warn "[$$] Timed out reading the request body\n";
+            $status = 408;
+        }
+
+        if ( $status ) {
+            DEBUG && warn "[$$] Bad request body, returning $status\n";
+            $self->_http_error( $status, $env );
+            last;
+        }
 
         $self->dispatch_request($env);
 
@@ -302,25 +338,15 @@ sub process_request {
 
         if ( $self->{client}->{keepalive} ) {
             # If we still have data in the input buffer it may be a pipelined request
+            # The request body has been read exactly, so this is the next request
             if ( $self->{client}->{inputbuf} ne '' ) {
-                if ( $self->{client}->{inputbuf} =~ /^(?:GET|HEAD)/ ) {
-                    if ( DEBUG ) {
-                        warn "Pipelined GET/HEAD request in input buffer: "
-                            . dump( $self->{client}->{inputbuf} ) . "\n";
-                    }
-
-                    # Continue processing the input buffer
-                    next;
+                if ( DEBUG ) {
+                    warn "Pipelined request in input buffer: "
+                        . dump( $self->{client}->{inputbuf} ) . "\n";
                 }
-                else {
-                    # Input buffer just has junk, clear it
-                    if ( DEBUG ) {
-                        warn "Clearing junk from input buffer: "
-                            . dump( $self->{client}->{inputbuf} ) . "\n";
-                    }
 
-                    $self->{client}->{inputbuf} = '';
-                }
+                # Continue processing the input buffer
+                next;
             }
 
             DEBUG && warn "[$$] Waiting on previous connection for keep-alive request...\n";
@@ -342,10 +368,17 @@ sub _read_headers {
         alarm( $self->{options}->{read_timeout} );
 
         while (1) {
+            # Ignore empty lines before the request line (RFC 9112 section 2.2)
+            $self->{client}->{inputbuf} =~ s/\A(?:$CR?$LF)+//;
+
             # Do we have a full header in the buffer?
             # This is before sysread so we don't read if we have a pipelined request
             # waiting in the buffer
-            last if $self->{client}->{inputbuf} ne '' && $self->{client}->{inputbuf} =~ /$CR?$LF$CR?$LF/s;
+            if ( $self->{client}->{inputbuf} ne '' && $self->{client}->{inputbuf} =~ /$CR?$LF$CR?$LF/s ) {
+                die "Header too large\n" if $-[0] > MAX_HEADER_SIZE;
+                last;
+            }
+            die "Header too large\n" if length $self->{client}->{inputbuf} > MAX_HEADER_SIZE;
 
             # If not, read some data
             my $read = _sysread($self->{server}->{client}, my $buf, CHUNKSIZE);
@@ -374,15 +407,76 @@ sub _read_headers {
             DEBUG && warn "[$$] Read error: $!\n";
             return;
         }
+
+        if ( $@ =~ /Header too large/ ) {
+            DEBUG && warn "[$$] Request header too large, returning 431\n";
+            $self->_http_error(431, { SERVER_PROTOCOL => "HTTP/1.0" });
+            return;
+        }
     }
 
-    # Pull out the complete header into a new buffer
-    $self->{client}->{headerbuf} = $self->{client}->{inputbuf};
-
-    # Save any left-over data, possibly body data or pipelined requests
-    $self->{client}->{inputbuf} =~ s/.*?$CR?$LF$CR?$LF//s;
+    # Pull out the complete header into a new buffer, leaving any body data
+    # or pipelined requests in the input buffer
+    $self->{client}->{inputbuf} =~ /$CR?$LF$CR?$LF/;
+    $self->{client}->{headerbuf} = substr $self->{client}->{inputbuf}, 0, $+[0], '';
 
     return 1;
+}
+
+# Field names must be tokens directly followed by ":" and must not use
+# obs-fold (RFC 9112 section 5). The parser maps "_" to "-", so
+# Content-Length and Transfer-Encoding spelled with "_" are rejected too.
+sub _valid_header_names {
+    my $header = shift;
+
+    my @lines = split /$CR?$LF/, $header;
+    shift @lines; # request line
+    for my $line (@lines) {
+        my($name) = $line =~ /\A([!#\$%&'*+\-.^_`|~0-9A-Za-z]+):/ or return;
+        return if $name =~ /_/ && $name =~ /\A(?:content[-_]length|transfer[-_]encoding)\z/i;
+    }
+
+    return 1;
+}
+
+# Returns an error status if the request framing is invalid, and
+# whether the connection must be closed after this request.
+sub _check_framing {
+    my($self, $env) = @_;
+
+    if ( defined $env->{HTTP_TRANSFER_ENCODING} ) {
+        # Only "chunked" is supported, and it must be the only coding
+        # (RFC 9112 section 6.1). HTTP/1.0 has no Transfer-Encoding.
+        return 400 if $env->{SERVER_PROTOCOL} ne 'HTTP/1.1';
+
+        my @codings = map { s/^[ \t]+|[ \t]+$//g; lc } split /,/, $env->{HTTP_TRANSFER_ENCODING}, -1;
+        return 400 unless @codings && $codings[-1] eq 'chunked';
+        return 400 if grep { $_ eq 'chunked' } @codings[0..$#codings-1];
+        return 501 if @codings > 1;
+
+        $env->{HTTP_TRANSFER_ENCODING} = 'chunked';
+
+        # Transfer-Encoding overrides Content-Length, but a message with
+        # both may be an attempt at request smuggling (RFC 9112 6.3).
+        my $close_after = defined delete $env->{CONTENT_LENGTH};
+        return (undef, $close_after);
+    }
+
+    if ( defined $env->{CONTENT_LENGTH} ) {
+        # Duplicate headers arrive joined with ",". They are only acceptable
+        # if every value is the same valid length (RFC 9112 section 6.3).
+        my @values = split /\s*,\s*/, $env->{CONTENT_LENGTH}, -1;
+        my %seen;
+        for my $v (@values) {
+            $v =~ s/^[ \t]+|[ \t]+$//g;
+            return 400 unless $v =~ /\A[0-9]{1,18}\z/;
+            $seen{0 + $v}++;
+        }
+        return 400 unless keys %seen == 1;
+        ($env->{CONTENT_LENGTH}) = keys %seen;
+    }
+
+    return;
 }
 
 sub _http_error {
@@ -404,65 +498,142 @@ sub _http_error {
 sub _prepare_env {
     my($self, $env) = @_;
 
-    my $get_chunk = sub {
-        if ($self->{client}->{inputbuf} ne '') {
-            my $chunk = delete $self->{client}->{inputbuf};
-            return ($chunk, length $chunk);
+    # Body bytes are taken from the input buffer, leaving anything after
+    # the body there for the next request on this connection.
+    my $input = \$self->{client}->{inputbuf};
+
+    # Wait at most read_timeout seconds for each read, and body_timeout
+    # seconds in total, so a slow client cannot hold on to a worker.
+    my $idle_timeout = $self->{options}->{read_timeout} || 0;
+    my $deadline = $self->{options}->{body_timeout}
+        ? Time::HiRes::time() + $self->{options}->{body_timeout} : 0;
+
+    my $read_more = sub {
+        my $timeout = $idle_timeout;
+        if ($deadline) {
+            my $left = $deadline - Time::HiRes::time();
+            die "Timed out\n" if $left <= 0;
+            $timeout = $left if !$timeout || $left < $timeout;
         }
+
+        # Time::HiRes::alarm, because alarm() would truncate a fraction of a
+        # second left to 0, which disables the alarm
+        local $SIG{ALRM} = sub { die "Timed out\n"; };
+        Time::HiRes::alarm($timeout);
         my $read = _sysread($self->{server}->{client}, my($chunk), CHUNKSIZE);
-        return ($chunk, $read);
+        alarm(0);
+
+        $$input .= $chunk if $read;
+        return $read;
     };
 
-    my $chunked = do { no warnings; lc delete $env->{HTTP_TRANSFER_ENCODING} eq 'chunked' };
+    my $chunked = do { no warnings; delete $env->{HTTP_TRANSFER_ENCODING} eq 'chunked' };
 
     if ($chunked) {
         my $buf = Plack::TempBuffer->new;
-        my $chunk_buffer = '';
-        my $length;
+        my $length = 0;
+        my $remaining;    # bytes left in the current chunk, undef while reading a size line
+        my $trailer_size; # defined once the last chunk has been read
 
     DECHUNK:
         while (1) {
-            my($chunk, $read) = $get_chunk->();
-            $chunk_buffer .= $chunk;
+            while ($$input ne '') {
+                if (defined $trailer_size) {
+                    my $eol = index $$input, "\015\012";
+                    if ($eol < 0) {
+                        return 400 if $trailer_size + length $$input > MAX_TRAILER_SIZE;
+                        last;
+                    }
+                    $trailer_size += $eol + 2;
+                    return 400 if $trailer_size > MAX_TRAILER_SIZE;
 
-            while ( $chunk_buffer =~ s/^(([0-9a-fA-F]+).*\015\012)// ) {
-                my $trailer   = $1;
-                my $chunk_len = hex $2;
-
-                if ($chunk_len == 0) {
-                    last DECHUNK;
-                } elsif (length $chunk_buffer < $chunk_len + 2) {
-                    $chunk_buffer = $trailer . $chunk_buffer;
-                    last;
+                    my $line = substr $$input, 0, $eol + 2, '';
+                    last DECHUNK if $eol == 0;
+                    return 400 if $line =~ /[\015\012].*\015\012/s;
+                    next;
                 }
 
-                $buf->print(substr $chunk_buffer, 0, $chunk_len, '');
-                $chunk_buffer =~ s/^\015\012//;
+                if (defined $remaining) {
+                    if ($remaining > 0) {
+                        # Write chunk data out as it arrives
+                        my $data = substr $$input, 0, _min($remaining, length $$input), '';
+                        $buf->print($data);
+                        $remaining -= length $data;
+                        $length    += length $data;
+                        next;
+                    }
 
-                $length += $chunk_len;
+                    last if length $$input < 2;
+                    return 400 unless substr($$input, 0, 2, '') eq "\015\012";
+                    undef $remaining;
+                    next;
+                }
+
+                my $eol = index $$input, "\015\012";
+                if ($eol < 0) {
+                    return 400 if length $$input > MAX_CHUNK_LINE;
+                    last;
+                }
+                return 400 if $eol > MAX_CHUNK_LINE;
+
+                my $chunk_len = _parse_chunk_size(substr $$input, 0, $eol + 2, '');
+                return 400 unless defined $chunk_len;
+
+                if ($chunk_len == 0) {
+                    $trailer_size = 0;
+                } else {
+                    $remaining = $chunk_len;
+                }
             }
 
-            last unless $read && $read > 0;
+            # The connection ended before the body did
+            return 400 unless $read_more->();
         }
+
+        # The buffer could not store the whole body, e.g. the disk is full
+        return 500 unless $buf->size == $length;
 
         $env->{CONTENT_LENGTH} = $length;
         $env->{'psgi.input'}   = $buf->rewind;
     } elsif (my $cl = $env->{CONTENT_LENGTH}) {
         my $buf = Plack::TempBuffer->new($cl);
         while ($cl > 0) {
-            my($chunk, $read) = $get_chunk->();
-
-            if ( !defined $read || $read == 0 ) {
-                die "Read error: $!\n";
+            if ($$input eq '') {
+                # The connection ended before the body did
+                return 400 unless $read_more->();
             }
 
-            $cl -= $read;
-            $buf->print($chunk);
+            my $data = substr $$input, 0, _min($cl, length $$input), '';
+            $cl -= length $data;
+            $buf->print($data);
         }
+
+        # The buffer could not store the whole body, e.g. the disk is full
+        return 500 unless $buf->size == $env->{CONTENT_LENGTH};
+
         $env->{'psgi.input'} = $buf->rewind;
     } else {
         $env->{'psgi.input'} = $null_io;
     }
+
+    return;
+}
+
+# Older perls truncate substr() lengths to 32 bits, so never pass more
+# than what is in the buffer.
+sub _min { $_[0] < $_[1] ? $_[0] : $_[1] }
+
+# chunk-size [ chunk-ext ] CRLF (RFC 9112 section 7.1). Returns undef if
+# the line is malformed or the size is too large to count exactly.
+sub _parse_chunk_size {
+    my $line = shift;
+
+    $line =~ /\A([0-9A-Fa-f]+)(?:[ \t]*;[^\015\012]*)?\015\012\z/
+        or return;
+    (my $size = $1) =~ s/\A0+(?=.)//;
+    return if length $size > 13;
+
+    return hex $size;
 }
 
 sub _finalize_response {
@@ -477,6 +648,9 @@ sub _finalize_response {
     my $status   = $res->[0];
     my $message  = status_message($status);
 
+    # These responses never have a body (RFC 9110 sections 6.4.1 and 9.3.2)
+    my $no_body = $env->{REQUEST_METHOD} eq 'HEAD' || $status =~ /^(?:1\d\d|204|304)$/;
+
     my(@headers, %headers);
     push @headers, "$protocol $status $message";
 
@@ -487,17 +661,20 @@ sub _finalize_response {
         my $k = $headers->[$i];
         my $v = $headers->[$i + 1];
         next if $k eq 'Connection';
+        # 1xx and 204 responses must not have these (RFC 9110 8.6, RFC 9112 6.1)
+        next if $status =~ /^(?:1\d\d|204)$/ && $k =~ /^(?:Content-Length|Transfer-Encoding)$/i;
         push @headers, "$k: $v";
         $headers{lc $k} = $v;
     }
 
-    if ( $protocol eq 'HTTP/1.1' ) {
+    if ( $no_body ) {
+        # Do not frame (or send) a body, whatever the headers say
+    }
+    elsif ( $protocol eq 'HTTP/1.1' ) {
         if ( !exists $headers{'content-length'} ) {
-            if ( $status !~ /^1\d\d|[23]04$/ && $env->{REQUEST_METHOD} ne 'HEAD' ) {
-                DEBUG && warn "[$$] Using chunked transfer-encoding to send unknown length body\n";
-                push @headers, 'Transfer-Encoding: chunked';
-                $chunked = 1;
-            }
+            DEBUG && warn "[$$] Using chunked transfer-encoding to send unknown length body\n";
+            push @headers, 'Transfer-Encoding: chunked';
+            $chunked = 1;
         }
         elsif ( my $te = $headers{'transfer-encoding'} ) {
             if ( $te eq 'chunked' ) {
@@ -530,6 +707,11 @@ sub _finalize_response {
     _syswrite($conn, \(join( $CRLF, @headers, '' ) . $CRLF));
 
     if (defined $res->[2]) {
+        if ($no_body) {
+            # Release the body without reading it
+            $res->[2]->close if ref $res->[2] ne 'ARRAY';
+            return;
+        }
         Plack::Util::foreach($res->[2], sub {
             my $buffer = $_[0];
             if ($chunked) {
@@ -543,6 +725,7 @@ sub _finalize_response {
     } else {
         return Plack::Util::inline_object
             write => sub {
+                return if $no_body;
                 my $buffer = $_[0];
                 if ($chunked) {
                     my $len = length $buffer;

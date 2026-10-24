@@ -311,24 +311,21 @@ loading behaviour; these permissions do not sandbox Vim.
 
 =head1 OPTIONS
 
-Common options, including C<--name>, C<--bind>, C<--token>,
-C<--stdio>, C<--connect>, C<--print-url>, C<--auto-allow> and
-C<--auto-deny>, are documented in
-L<AnyEvent::MCP::Server::Simple/mcp_getoptions>.
-For this server, C<--bind> also controls the Vim and WebSocket listener;
-all configured tokens authenticate those connections as well as MCP.
-C<--stdio> adds an MCP JSONL connection while keeping the TCP listener
-active, and C<--print-url> reports its credential-bearing URL prefix.
-C<--tool-help> prints registered tools and arguments without starting a
-listener. For example, C<--auto-allow '*,write'> approves buffer-editing
-actions but not C<save>, C<open> or unrestricted C<exec>.
+Common server options: L<AnyEvent::MCP::Server::Simple/mcp_getoptions>.
+Here C<--bind> and C<--token> also govern private Vim/WebSocket connections;
+C<--stdio> and C<--connect> retain that listener. C<--print-url> reports
+the credential-bearing URL prefix without Vim target. C<--tool-help> lists
+registered tools without starting MCP listener. For example,
+C<--auto-allow '*,write'> allows buffer edits, but not C<save>,
+C<open> or unrestricted C<exec>.
 
 =over
 
 =item --ask MODE
 
-Select permission prompting: C<helper>, C<tty>, C<yad>, C<mcp> or C<auto>.
-See L</PERMISSIONS>.
+Permission prompts: C<helper> (default), C<tty>, C<yad>, C<mcp> or
+C<auto>. tty/yad force local interface; mcp delegates to client,
+auto prefers native elicitation when offered. See L</PERMISSIONS>.
 
 =back
 
@@ -980,7 +977,7 @@ sub rpc_reply {
 }
 
 $toolset->tool (targets =>
-   "List Vim targets. Target is human-readable editor/session id. Use before other tools if target is unknown.",
+   "List connected Vim targets (human-readable editor/session IDs). Use if target unknown.",
    {
       type       => "object",
       properties => {},
@@ -1002,12 +999,12 @@ $toolset->tool (targets =>
 );
 
 $toolset->tool (state =>
-   "Get Vim state. Optional target restricts to one editor; omitted means all targets. "
-      . "Returns target => state mapping. State has cwd, current buffer/cursor, and buffer metadata. "
-      . "Unloaded buffers have null changedtick/line_count; read or search them before guarded edits. "
-      . "Explicit buffer access loads buffers on demand. "
-      . "Call state before operating on Vim if current editor/buffer state is not known for this user turn. "
-      . "Vim buffers are live editor state, not disk-file snapshots.",
+   "Get live Vim state; optional target selects one editor, omit for all. "
+      . "Returns target => state: cwd, current buffer/cursor, buffer metadata. "
+      . "Unloaded buffers have null changedtick/line_count; read/search before guarded edits. "
+      . "Explicit buffer access loads on demand. "
+      . "Call state each turn if current editor/buffer unknown. "
+      . "Buffers are live editor state, not disk snapshots.",
    {
       type       => "object",
       properties => {
@@ -1057,8 +1054,8 @@ $toolset->tool (state =>
 );
 
 $toolset->tool (read_lines =>
-   "With linenums=true, prefix lines with their absolute line number and a colon. " .
-   "Read live Vim buffer ranges, loading the explicitly named buffer on demand. Returns JSON changedtick/range metadata first, then two MCP text entries per range: [range=start,end] and newline-terminated buffer lines, separately.",
+   "linenums=true prefixes absolute line number and colon. " .
+   "Read live Vim ranges; load explicit buffer on demand. Returns JSON changedtick/range metadata, then two MCP text items per range: [range=start,end], newline-terminated lines.",
    {
       type       => "object",
       properties => {
@@ -1134,9 +1131,9 @@ $toolset->tool (read_lines =>
 );
 
 $toolset->tool (grep =>
-   "Search Vim buffers. Explicit buffer ids are loaded on demand; empty buffers means all currently loaded buffers. "
-      . "mode=regex uses native Vim regex syntax; mode=word matches literal whole word. "
-      . "Returns buffer/tick/line/column/text matches and truncated flag.",
+   "Search Vim buffers; load explicit IDs on demand; empty buffers = all loaded buffers. "
+      . "mode=regex: native Vim regex; mode=word: literal whole word. "
+      . "Returns buffer/tick/line/column/text matches, truncated flag.",
    {
       type       => "object",
       properties => {
@@ -1146,12 +1143,12 @@ $toolset->tool (grep =>
          },
          buffers => {
             type        => "array",
-            description => "Buffer ids. Explicit ids load on demand; empty array = all currently loaded buffers.",
+            description => "Buffer IDs; explicit IDs load on demand; [] = all loaded buffers.",
             items       => { type => "integer" },
          },
          pattern => {
             type        => "string",
-            description => "Search pattern. Native Vim regex for mode=regex; literal word for mode=word.",
+            description => "Native Vim regex (mode=regex) or literal word (mode=word).",
          },
          mode => {
             type        => "string",
@@ -1161,7 +1158,7 @@ $toolset->tool (grep =>
          max_results => {
             type        => "integer",
             minimum     => 1,
-            description => "Stop after this many matches.",
+            description => "Max matches.",
          },
       },
       required => ["target", "buffers", "pattern", "mode", "max_results"],
@@ -1269,11 +1266,11 @@ sub normalize_udiff {
 }
 
 $toolset->tool (open =>
-   "Load a pathname into a listed Vim buffer without selecting it. Reuses an existing buffer without rereading it. "
-      . "Requires the separate open permission. Relative paths use Vim's current effective directory. "
-      . "No shell, wildcard or Ex-command parsing. Missing files become empty named buffers; nothing is saved. "
-      . "Normal load autocommands and modelines run and may change editor state or fail after side effects. "
-      . "Returns buffer, filename, changedtick, line_count and modified.",
+   "Load pathname into Vim buffer without selecting; reuse existing buffer without rereading. "
+      . "Requires separate open permission. Relative paths use Vim's current directory. "
+      . "No shell/wildcard/Ex parsing. Missing files create empty named buffers; no save. "
+      . "Load autocommands/modelines run: may change editor or fail after side effects. "
+      . "Returns buffer, filename, changedtick, line_count, modified.",
    {
       type       => "object",
       properties => {
@@ -1301,9 +1298,9 @@ $toolset->tool (open =>
 );
 
 $toolset->tool (apply_diff =>
-   "Apply relaxed unified diff to a live Vim buffer. NUL-containing diffs are rejected before forwarding. In @@ headers only old start (-N) matters; -N is the old-file line of the first hunk body line, including context; "
-      . "all other numbers are ignored/recomputed and may be 0; '\@\@ -N \@\@' is valid. "
-      . "Guarded by expected_changedtick; context must match exactly (fuzz=0), with per-hunk relocation limited by distinct old-side lines. Pure insertion is allowed only at the beginning; elsewhere include old-side context.",
+   "Apply relaxed unified diff to live Vim buffer; reject NUL. In @@ headers only old start (-N) matters: first hunk body line, including context; "
+      . "other numbers ignored/recomputed (may be 0); '\@\@ -N \@\@' valid. "
+      . "Requires current expected_changedtick and exact context (fuzz=0). Hunk relocation bounded by distinct old-side lines per hunk. Pure insertion only at buffer start; elsewhere include old-side context.",
    {
       type       => "object",
       properties => {
@@ -1318,7 +1315,7 @@ $toolset->tool (apply_diff =>
          diff => {
             type        => "string",
             minLength   => 1,
-            description => "Unified diff; only \@\@ old start (-N) matters; -N is the old-file line of the first hunk body line, including context. Other numbers are ignored and may be 0; \@\@ -N \@\@ is valid. Pure insertion is allowed only at the beginning; elsewhere include old-side context. Whole-hunk relocation tolerance is derived per hunk from distinct old-side lines.",
+            description => "Unified diff: \@\@ old start (-N) is first hunk body line including context; other counts ignored (may be 0); \@\@ -N \@\@ valid. Pure insertion only at start; elsewhere old-side context required. Hunk relocation bound derived from distinct old-side lines.",
          },
          expected_changedtick => {
             type        => "integer",
@@ -1363,11 +1360,11 @@ $toolset->tool (apply_diff =>
 );
 
 $toolset->tool (substitute =>
-   "Run guarded Vim :substitute on live buffer range for simple mechanical regex replacements. "
-      . "Prefer apply-diff for structural or multiline edits. Pattern uses native Vim regex syntax. "
-      . "Replacement uses native Vim :substitute replacement syntax. Flags are Vim substitute flags. "
+   "Guarded Vim :substitute over live buffer range; for mechanical regex replacements. "
+      . "Prefer apply-diff for structural/multiline edits. Native Vim regex pattern. "
+      . "Native Vim :substitute replacement/flags. "
       . q{To clear the whole buffer, use range %, pattern \%^\_.*\%$, replacement empty, flags empty; Vim leaves one empty line. }
-      . "expected_changedtick must match or operation fails stale.",
+      . "expected_changedtick must match; otherwise stale error.",
    {
       type       => "object",
       properties => {
@@ -1431,16 +1428,16 @@ $toolset->tool (substitute =>
 for my $operation (qw(undo redo update)) {
    $toolset->tool (($operation eq "update" ? "save" : $operation) =>
       $operation eq "update"
-         ? "Run Vim :update in the selected buffer: save to its current filename only if modified. "
-            . "Requires separate save permission and a current expected_changedtick. No filename or force option. "
-            . "Normal write autocommands run and may have side effects; a failure does not roll them back. "
-            . "Returns buffer, changedtick, modified and filename after the command. "
-            . "Preserves the caller's current buffer/view when possible."
-         : ucfirst ($operation) . " one change in the selected Vim buffer using its normal undo tree. "
-         . "Requires write permission and expected_changedtick from the latest read/state. "
-         . "Leaves buffers unsaved and preserves the caller's current buffer when operating on another buffer. "
-         . "At the history boundary returns changed=false. "
-         . "Returns buffer, changedtick, changed, seq_cur (reached undo sequence), seq_last and modified.",
+         ? "Run Vim :update: save selected buffer to current filename only if modified. "
+            . "Requires save permission and current expected_changedtick; no filename/force option. "
+            . "Write autocommands run; failure may leave side effects (no rollback). "
+            . "Returns buffer, changedtick, modified, filename. "
+            . "Preserves caller's current buffer/view when possible."
+         : ucfirst ($operation) . " one change in selected Vim buffer via undo tree. "
+         . "Requires write permission and latest expected_changedtick. "
+         . "Leaves edits unsaved; preserves caller's current buffer when editing another. "
+         . "At history boundary: changed=false. "
+         . "Returns buffer, changedtick, changed, seq_cur (reached undo sequence), seq_last, modified.",
       {
          type       => "object",
          properties => {
@@ -1476,10 +1473,10 @@ for my $operation (qw(undo redo update)) {
 }
 
 $toolset->tool (set_cursor =>
-   "Make buffer current/visible as needed and set Vim cursor. Unlike read/edit helpers this intentionally changes user's "
-      . "editor position. Optional expected_changedtick guards against stale buffer. "
-      . "After making an edit in the user's current buffer, normally move the cursor to the edited region so the user can immediately see the change. "
-      . "Do not move the cursor for purely investigative reads/searches unless useful.",
+   "Show/select buffer and position Vim cursor. Unlike read/edit, intentionally changes user's "
+      . "editor position. Optional expected_changedtick rejects stale buffer. "
+      . "After edits in user's current buffer, move cursor to changed region so user sees it. "
+      . "Avoid cursor movement for exploratory reads/searches unless useful.",
    {
       type       => "object",
       properties => {
@@ -1526,14 +1523,14 @@ $toolset->tool (set_cursor =>
 );
 
 $toolset->tool (ex =>
-   "Execute unrestricted Ex commands in a Vim editor's current context. Requires the separate exec permission. "
-      . "Can run shell commands, read/write files, invoke configured code or exit Vim with the user's full privileges. "
-      . "Prefer the dedicated read/edit/navigation tools when sufficient. "
-      . "command is Ex text, allowing command separators and newlines; keep it simple and directly reviewable. "
-      . "Optional buffer makes that buffer current; expected_changedtick requires buffer and is checked immediately before execution. "
-      . "Persistent permission can cover the exact command in this editor, any command here, or all editors. "
-      . "Returns {output: captured Vim messages}, or a Vim error. Errors do not roll back earlier effects. "
-      . "Use noninteractive commands: prompts or long-running commands can block Vim, and cancellation cannot undo execution.",
+   "Execute unrestricted Vim Ex in current editor context; needs separate exec permission. "
+      . "Can run shell, read/write files, invoke code, exit Vim with user's privileges. "
+      . "Prefer dedicated read/edit/navigation tools. "
+      . "command: Ex text, including separators/newlines; keep reviewable. "
+      . "Optional buffer becomes current; expected_changedtick requires buffer, checked just before execution. "
+      . "Persistent grants may cover exact command, any command in this editor, or all editors. "
+      . "Returns {output: Vim messages} or Vim error; no rollback of earlier effects. "
+      . "Use noninteractive commands; prompts/long runs block Vim; cancellation cannot undo execution.",
    {
       type       => "object",
       properties => {
@@ -1569,14 +1566,13 @@ $toolset->tool (ex =>
 mcp_tool_help ($server_options->{tool_help}, $toolset);
 
 my $instructions = <<'EOF';
-   This server operates on live Vim editors and buffers, not filesystem snapshots.
-   Use targets to discover connected editors, then state to find buffer IDs and changedticks.
-   Use read-lines or grep to inspect buffers; explicit access may load an unloaded buffer.
-   open loads a pathname into a listed buffer without selecting it and requires separate open permission.
-   apply-diff, substitute, undo and redo modify live buffers and require a current expected_changedtick.
-   Editing tools leave buffers unsaved. save writes the current file only if modified and explicitly authorized; it requires save permission and a current expected_changedtick.
-   set-cursor deliberately changes the visible editor position; use it to navigate or show edits.
-   ex executes arbitrary Ex commands with full Vim privileges and separate exec permission; prefer narrower tools and simple commands.
+   Live Vim buffers, not disk snapshots. Use targets for editors, state for buffer IDs/changedticks.
+   Read via read-lines/grep; explicit access may load unloaded buffers.
+   open loads pathname without selecting; requires separate open permission.
+   apply-diff/substitute/undo/redo modify live buffers; require current expected_changedtick; leave unsaved.
+   save writes current filename only if modified; needs save permission and current expected_changedtick.
+   set-cursor moves visible editor cursor; use to show edits or navigate.
+   ex runs unrestricted Ex with full Vim privileges; requires separate exec permission. Prefer narrow tools.
 EOF
 
 my $custom_instructions = $server_options->{custom_instructions}
@@ -1584,7 +1580,7 @@ my $custom_instructions = $server_options->{custom_instructions}
    // $config->{section}{"program " . AnyEvent::MCP::Config::program_name ()}{custom_instructions};
 my %guidance = (
    instructions       => $instructions,
-   short_instructions => "Live Vim editing: inspect buffers, make guarded unsaved edits, navigate editors. Discover tools.",
+   short_instructions => "Live Vim buffers: inspect, edit with changedtick guards (unsaved), navigate. Discover tools.",
    auto_instructions  => 1,
    on_request         => \&mcp_log_request,
    (defined $custom_instructions ? (custom_instructions => $custom_instructions) : ()),

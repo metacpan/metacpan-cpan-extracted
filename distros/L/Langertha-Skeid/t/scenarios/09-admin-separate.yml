@@ -1,0 +1,17 @@
+title: The admin API (/skeid/*) and its OpenAPI document sit behind the admin key; the client document describes client routes only
+setup:
+  clients: { alice: sk-alice }
+  admin_key: admin-secret
+  nodes:
+    - { id: gpu, model: m, upstream: { fallback: { answer: ok } } }
+steps:
+  - http: { method: GET, path: /skeid/nodes }
+    expect: { status: 401 }
+  - http: { method: GET, path: /skeid/nodes, bearer: alice }
+    expect: { status: 401 }
+  - http: { method: GET, path: /skeid/nodes, bearer: admin-secret }
+    expect: { json: { 'nodes.0.id': gpu } }
+  - http: { method: GET, path: /skeid/openapi.json }
+    expect: { status: 401 }
+  - http: { method: GET, path: /skeid/openapi.json, bearer: admin-secret }
+    expect: { json: { 'paths./skeid/nodes.get.operationId': admin_nodes } }

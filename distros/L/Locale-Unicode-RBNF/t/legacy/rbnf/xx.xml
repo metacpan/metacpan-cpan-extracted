@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE ldml SYSTEM "../../common/dtd/ldml.dtd">
+<!-- Fixture in the legacy CLDR RBNF format, with arrows instead of angle brackets. -->
+<ldml>
+    <identity>
+        <version number="$Revision$"/>
+        <language type="xx"/>
+    </identity>
+    <rbnf>
+        <rulesetGrouping type="SpelloutRules">
+            <ruleset type="spellout-numbering">
+                <rbnfrule value="-x">minus →→;</rbnfrule>
+                <rbnfrule value="0">zero;</rbnfrule>
+                <rbnfrule value="1">one;</rbnfrule>
+                <rbnfrule value="2">two;</rbnfrule>
+                <rbnfrule value="3">three;</rbnfrule>
+                <rbnfrule value="10">ten;</rbnfrule>
+                <rbnfrule value="20">twenty[-→→];</rbnfrule>
+                <rbnfrule value="100">←← hundred[ →→];</rbnfrule>
+                <rbnfrule value="1100" radix="100">←%%teen← hundred[ →→];</rbnfrule>
+                <rbnfrule value="2000">←← thousand[ →→];</rbnfrule>
+            </ruleset>
+            <ruleset type="teen" access="private">
+                <rbnfrule value="0">=%spellout-numbering=;</rbnfrule>
+                <rbnfrule value="11">eleven;</rbnfrule>
+                <rbnfrule value="12">twelve;</rbnfrule>
+                <rbnfrule value="13">thirteen;</rbnfrule>
+            </ruleset>
+        </rulesetGrouping>
+    </rbnf>
+</ldml>

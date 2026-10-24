@@ -1,0 +1,14 @@
+--- kgp.xml
++++ kgp.xml
+@@ -4808,6 +4808,11 @@
+ 				<displayName count="one">Sĩnỹ Yuãn (offshore)</displayName>
+ 				<displayName count="other">Sĩnỹ Yuãn ag (offshore)</displayName>
+ 			</currency>
++			<currency type="CNX">
++				<displayName>Nórar vẽnhkar mỹ máko mĩ Sĩnỹ tá</displayName>
++				<displayName count="one" draft="contributed">Nórar vẽnhkar mỹ máko mĩ Sĩnỹ tá</displayName>
++				<displayName count="other" draft="contributed">Nórar vẽnhkar mỹ máko mĩ Sĩnỹ tá ag</displayName>
++			</currency>
+ 			<currency type="CNY">
+ 				<displayName>Sĩnỹ Yvỹn</displayName>
+ 				<displayName count="one">Sĩnỹ Yvỹn</displayName>

@@ -1,0 +1,14 @@
+--- bs_Cyrl.xml
++++ bs_Cyrl.xml
+@@ -5001,6 +5001,11 @@
+ 				<displayName count="few">кинеска јуана (острвска)</displayName>
+ 				<displayName count="other">кинеских јуана (острвских)</displayName>
+ 			</currency>
++			<currency type="CNX">
++				<displayName count="one" draft="provisional">долар кинеске народне банке</displayName>
++				<displayName count="few" draft="provisional">долара кинеске народне банке</displayName>
++				<displayName count="other" draft="provisional">долара кинеске народне банке</displayName>
++			</currency>
+ 			<currency type="CNY">
+ 				<displayName>Кинески јуан</displayName>
+ 				<displayName count="one">кинески јуан</displayName>

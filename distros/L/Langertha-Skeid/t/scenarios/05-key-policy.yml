@@ -1,0 +1,39 @@
+title: The caller's key decides what it may reach -- deny_tags, an allowed-models list, and no way to rename into another policy
+setup:
+  clients: { alice: sk-alice-local, bob: sk-bob-cloud, carol: sk-carol-trial }
+  nodes:
+    - { id: gpu, model: qwen3-32b, tags: [local], upstream: { fallback: { answer: "from local" } } }
+    - { id: groq, model: llama-3.3-70b, tags: [cloud], upstream: { fallback: { answer: "from cloud" } } }
+  config:
+    policies:
+      local-only: { deny_tags: [cloud] }
+      anywhere: {}
+      trial: { models: [qwen3-32b] }
+    default_policy: local-only
+    keys:
+      "@bob": anywhere
+      "@carol": trial
+steps:
+  # the default policy keeps alice off the cloud node, even asking for its model by name
+  - chat: { protocol: openai, model: qwen3-32b, prompt: x, bearer: alice }
+    expect: { text: from local }
+  - chat: { protocol: openai, model: llama-3.3-70b, prompt: x, bearer: alice }
+    expect: { status: 403, json: { error.type: permission_error } }
+    upstream:
+      groq: { requests: 0 }
+  - chat: { protocol: openai, model: llama-3.3-70b, prompt: x, bearer: bob }
+    expect: { text: from cloud }
+  # a key cannot name itself into another policy
+  - chat: { protocol: openai, model: llama-3.3-70b, prompt: x, bearer: alice, headers: { x-skeid-key-id: "@bob" } }
+    expect: { status: 403 }
+    upstream:
+      groq: { requests: 1 }
+  # carol's trial grants one model only
+  - chat: { protocol: openai, model: qwen3-32b, prompt: x, bearer: carol }
+    expect: { text: from local }
+  - chat: { protocol: openai, model: llama-3.3-70b, prompt: x, bearer: carol }
+    expect: { status: 403 }
+    usage:
+      - { api_key_id: "@alice", node_id: gpu }
+      - { api_key_id: "@bob", node_id: groq }
+      - { api_key_id: "@carol", node_id: gpu }

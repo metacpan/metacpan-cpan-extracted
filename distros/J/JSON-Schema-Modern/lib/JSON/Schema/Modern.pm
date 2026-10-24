@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package JSON::Schema::Modern; # git description: v0.650-3-g14fa0f89
+package JSON::Schema::Modern; # git description: v0.651-6-g2c58516d
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema using a JSON Schema
 # KEYWORDS: JSON Schema validator data validation structure specification
 
-our $VERSION = '0.651';
+our $VERSION = '0.652';
 
 use 5.020;  # for fc, unicode_strings features
 use Moo;
@@ -1307,7 +1307,7 @@ JSON::Schema::Modern - Validate data against a schema using a JSON Schema
 
 =head1 VERSION
 
-version 0.651
+version 0.652
 
 I use a linearly-increasing version numbering scheme. No meaning should be
 presumed or inferred from the version being less than 1.0.
@@ -2132,6 +2132,8 @@ additional "official" output formats beyond C<flag>, C<basic>, and C<terse> (L<h
 
 =head1 SECURITY CONSIDERATIONS
 
+=for stopwords const maxLength minLength uniqueItems
+
 The C<pattern> and C<patternProperties> keywords evaluate regular expressions from the schema,
 the C<regex> format validator evaluates regular expressions from the data, and some keywords
 in the Validation vocabulary perform floating point operations on potentially-very large numbers.
@@ -2143,6 +2145,11 @@ UNTRUSTED SOURCES.>
 (In particular, see vulnerability
 L<perl5363delta/CVE-2023-47038-Write-past-buffer-end-via-illegal-user-defined-Unicode-property>,
 which was fixed in Perl releases 5.34.3, 5.36.3 and 5.38.1.)
+
+Additionally, stringwise operations (e.g. with the "const", "enum", "uniqueItems", "pattern",
+"minLength" and "maxLength" keywords) are performed on Unicode strings, where comparisons are
+performed codepoint-for-codepoint, without normalization; this may cause issues if strings are
+compared that are in different normal forms.
 
 =head1 BUNDLED META-SCHEMAS
 

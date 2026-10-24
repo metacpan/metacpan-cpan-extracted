@@ -1,15 +1,14 @@
-#$Id$
 README for Pod::Multi
 
-This document refers to version 0.10 of Pod::Multi.  This version was
-released May 16 2017.
+This document refers to version 0.11 of Pod::Multi.  This version was
+released October 23 2026.
 
 To install this module on your system, place the tarball archive file in a
 temporary directory and call the following:
 
-% gunzip Pod-Multi-0.10.tar.gz
-% tar xf Pod-Multi-0.10.tar
-% cd Pod-Multi-0.10
+% gunzip Pod-Multi-0.11.tar.gz
+% tar xf Pod-Multi-0.11.tar
+% cd Pod-Multi-0.11
 % perl Makefile.PL
 % make
 % make test
@@ -33,10 +32,10 @@ substitute 'nmake' for 'make' in the sequence of commands above.
 In sending e-mail to the author, please put "Pod::Multi" or
 "Pod-Multi" in the subject line.
 
-Author:  James E. Keenan (jkeenan@cpan.org).
+Author:  James E. Keenan (jkeenan@pobox.com).
 Originally created May 22, 2006.
 
-Copyright (c) 2006-2017 James E. Keenan.  United States.  All rights reserved.
+Copyright (c) 2006-2026 James E. Keenan.  United States.  All rights reserved.
 This is free software and may be distributed under the same terms as Perl
 itself.
 

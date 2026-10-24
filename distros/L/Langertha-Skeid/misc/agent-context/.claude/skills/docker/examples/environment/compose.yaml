@@ -1,0 +1,11 @@
+services:
+  literal:
+    image: alpine:3
+    environment:
+      MODE: production
+    command: [sh, -c, 'printf "MODE=%s\n" "$$MODE"']
+  interpolated:
+    image: alpine:3
+    environment:
+      MODE: "${MODE:-development}"
+    command: [sh, -c, 'printf "MODE=%s\n" "$$MODE"']

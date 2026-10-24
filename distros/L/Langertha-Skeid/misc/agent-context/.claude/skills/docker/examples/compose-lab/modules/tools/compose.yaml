@@ -1,0 +1,21 @@
+services:
+  check:
+    image: python:3.13-slim
+    profiles: [tools]
+    depends_on:
+      app:
+        condition: service_healthy
+    volumes:
+      - type: bind
+        source: ./check.py
+        target: /check.py
+        read_only: true
+        bind:
+          create_host_path: false
+    command: [python, /check.py]
+    user: "10001:10001"
+    read_only: true
+    cap_drop: [ALL]
+    security_opt:
+      - no-new-privileges:true
+    restart: "no"

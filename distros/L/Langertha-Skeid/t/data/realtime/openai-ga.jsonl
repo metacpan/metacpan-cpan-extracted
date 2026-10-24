@@ -1,0 +1,9 @@
+{"synthetic":true,"recorded":false,"backend":"openai","dialect":"ga: session.update with a transcription session","note":"Written by hand after the OpenAI realtime transcription guide on 2026-10-15; NOT recorded from a live backend (k95 Task 0 could not be run offline). Audio payloads are placeholders."}
+{"dir":"s2c","frame":{"type":"session.created","event_id":"event_1","session":{"type":"transcription","id":"sess_1"}}}
+{"dir":"c2s","frame":{"type":"session.update","session":{"type":"transcription","audio":{"input":{"format":{"type":"audio/pcm","rate":24000},"transcription":{"model":"gpt-4o-transcribe","language":"en"},"turn_detection":{"type":"server_vad"}}}}}}
+{"dir":"s2c","frame":{"type":"session.updated","event_id":"event_2","session":{"type":"transcription","id":"sess_1"}}}
+{"dir":"c2s","frame":{"type":"input_audio_buffer.append","audio":"AAAAAAAA"}}
+{"dir":"c2s","frame":{"type":"input_audio_buffer.commit"}}
+{"dir":"s2c","frame":{"type":"input_audio_buffer.committed","event_id":"event_3","item_id":"item_1"}}
+{"dir":"s2c","frame":{"type":"conversation.item.input_audio_transcription.delta","event_id":"event_4","item_id":"item_1","content_index":0,"delta":"Hello"}}
+{"dir":"s2c","frame":{"type":"conversation.item.input_audio_transcription.completed","event_id":"event_5","item_id":"item_1","content_index":0,"transcript":"Hello world","usage":{"type":"tokens","input_tokens":14,"output_tokens":6,"total_tokens":20,"input_token_details":{"text_tokens":0,"audio_tokens":14}}}}

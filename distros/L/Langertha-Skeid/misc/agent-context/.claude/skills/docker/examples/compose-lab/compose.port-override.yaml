@@ -1,0 +1,5 @@
+# !override requires Compose 2.24.4+ (also supported by suitable v5 releases).
+services:
+  app:
+    ports: !override
+      - "127.0.0.1:${ALT_APP_PORT:-18081}:8080"

@@ -21,6 +21,22 @@ nodes:
   #   engine: openai
   #   api_key_ref: secret/skeid/remote/openai
 
+# A docling-serve node (ADR 0028) is a node of kind documents: reached by /v1/convert/file and
+# /v1/convert/source only, authorised under the name `documents` (a key policy with `models:`
+# has to list it), and called with its key in X-Api-Key. No model is configured.
+#
+#   - id: docling-1
+#     url: http://docling:5001
+#     kind: documents
+#     api_key_env: SKEID_DOCLING_KEY
+#     api_key_header: X-Api-Key
+#     max_conns: 4
+#
+# uploads:
+#   documents_max_bytes: 104857600   # default 100 MiB
+# documents:
+#   allow_remote_sources: false      # true: http_sources / callbacks are passed to the node
+
 # Usage storage via PostgreSQL.
 # This stack chooses postgresql over the (faster, simpler) jsonlog dir mode on
 # purpose: it is a multi-frontend deployment that wants one queryable billing
@@ -89,6 +105,107 @@ routing:
 # Unlisted keys take default_policy, so a deployment where every customer is configured the
 # same way carries no key entries at all.
 
+# Client authentication. Skeid does not check client keys unless this section is here: behind
+# another gateway that authenticates, leave it out. When Skeid itself is the public entry, list
+# the key ids that may come in -- every /v1/* and /api/* route and the provider manifest then
+# answer 401 to a missing key or one not listed; /health and the admin API keep their own rules.
+# Entries are key ids from `skeid keyid <key>` or names: entries, never the keys themselves.
+# One shared client key today is one id; give clients keys of their own later by adding names:
+# entries here, and taking a name out locks that client out on the next request.
+#
+# client_auth:
+#   keys: [shared]          # with names: { shared: k_... } above, or the k_... id directly
+
+# MCP servers (ADR 0022). Assign MCP servers to customer key ids; a customer then reaches
+# /mcp/<name> with its own Skeid key, and GET /v1/mcp/servers tells it what it was assigned.
+# Skeid relays MCP's Streamable HTTP and reads none of it. The client's key never goes upstream:
+# a server's own key is named like a node's -- api_key_ref through OpenBao, or api_key_env --
+# and sent as Authorization: Bearer. `transport: stdio` entries are not proxied; they tell the
+# customer what to run on its own machine, so keep secrets out of command, args and env.
+# Without this section the routes do not exist.
+#
+# mcp:
+#   public_url: https://llm.example.com   # where clients reach Skeid; else taken from the request
+#   servers:
+#     bookrag:
+#       url: http://bookrag-mcp:8080/mcp
+#       description: Book search over the house library
+#       api_key_ref: secret/skeid/mcp/bookrag
+#       keys: [alice]                     # names: entries or key ids from `skeid keyid`
+#     files:
+#       transport: stdio
+#       command: mcp-files
+#       args: ["--root", "/srv/data"]
+#       description: Files on your own machine
+#       keys: [alice]
+
+# Realtime transcription (ADR 0029). GET /v1/realtime is a WebSocket relayed to a node's
+# /realtime; one session holds one slot of its node until it closes, so give such a node an
+# entry of its own, with max_conns = concurrent sessions (at least the worker count: each
+# worker admits max_conns / workers, floor 1, and keeps the sessions it accepted).
+#
+# nodes:
+#   - id: whisper-live
+#     url: http://speaches:8000/v1
+#     model: whisper-live
+#     engine: openaibase
+#     max_conns: 8
+#
+# The limits, all optional, read when a session opens:
+# realtime:
+#   idle_timeout: 300          # seconds of silence
+#   max_session_seconds: 3600  # longest session
+#   max_message_bytes: 1048576 # one WebSocket message
+#   max_queued_bytes: 4194304  # held for a peer that does not read, per direction
+
+# Customer keys from a database view (ADR 0026). When another application -- a self-service
+# console -- issues and revokes customer keys, Skeid reads them from a relation that application
+# provides: one row per key id (key_id, name, policy, models), a row present = the key is active.
+# Fetched in a child process every refresh_interval_s, and sooner on a NOTIFY; never on the
+# request path. The rows join client_auth (declare it, `keys: []` is enough) and take a profile
+# from policies: -- the file stays the boundary for profiles and deny_tags.
+#
+# customer_source:
+#   from_usage_store: true                      # the usage store's database, below ...
+#   user: skeid_reader                          # ... with a role that can only read the view
+#   password_env: SKEID_CUSTOMER_DB_PASSWORD
+#   relation: skeid.customer_keys
+#   refresh_interval_s: 30
+#   listen: skeid_customer_keys                 # optional: revocation in well under a second
+#   max_stale_s: 0                              # 0: keep the last good keys while the DB is down
+#
+# Checking it against this stack's PostgreSQL by hand (there is no automated test against a
+# real database). With the stack up:
+#
+#   docker compose exec -T postgres psql -U skeid -d skeid <<'SQL'
+#   CREATE SCHEMA console;
+#   CREATE TABLE console.api_keys (key_id text PRIMARY KEY, label text, plan text,
+#                                  revoked_at timestamptz);
+#   CREATE SCHEMA skeid;
+#   CREATE VIEW skeid.customer_keys AS
+#     SELECT key_id, label AS name, plan AS policy, NULL::text[] AS models
+#       FROM console.api_keys WHERE revoked_at IS NULL;
+#   CREATE ROLE skeid_reader LOGIN PASSWORD 'the-value-of-SKEID_CUSTOMER_DB_PASSWORD';
+#   GRANT USAGE ON SCHEMA skeid TO skeid_reader;
+#   GRANT SELECT ON skeid.customer_keys TO skeid_reader;   -- the view reads console.* as its owner
+#   CREATE FUNCTION console.notify_skeid() RETURNS trigger LANGUAGE plpgsql AS
+#     $$ BEGIN PERFORM pg_notify('skeid_customer_keys', ''); RETURN NULL; END $$;
+#   CREATE TRIGGER api_keys_notify AFTER INSERT OR UPDATE OR DELETE ON console.api_keys
+#     FOR EACH STATEMENT EXECUTE FUNCTION console.notify_skeid();
+#   SQL
+#
+#   1. Uncomment customer_source above and `client_auth: { keys: [] }`, set
+#      SKEID_CUSTOMER_DB_PASSWORD in .env, then `docker compose up -d skeid`. The log says
+#      "Customer source: skeid.customer_keys" and how many rows it accepted.
+#   2. `skeid keyid sk-test-customer` prints the id; insert it:
+#        INSERT INTO console.api_keys VALUES ('k_...', 'test customer', NULL, NULL);
+#      A chat request with `Authorization: Bearer sk-test-customer` answers 200.
+#   3. UPDATE console.api_keys SET revoked_at = now(); the next request answers 401 -- within a
+#      second with listen, within refresh_interval_s without.
+#   4. GET /skeid/config (admin key) shows the customer_source block; `docker compose stop
+#      postgres` turns it to ok: false while the key in force stays valid (max_stale_s: 0), and
+#      /health stays status: ok.
+
 # Capacity probes (ADR 0009). inflight counts only what THIS Skeid sent, so two frontends in
 # front of the same GPU each think it is half as busy as it is. A probe reads what the node
 # itself reports, including traffic Skeid never saw.
@@ -109,3 +226,11 @@ routing:
 # Cloud nodes need no configuration: rate-limit headers are read off responses Skeid already
 # receives, so a provider that says "0 remaining" stops being admitted until it says otherwise.
 # A probe can only ever narrow max_conns, never raise it.
+
+# API description (ADR 0025). GET /openapi.json is always served; the Swagger UI at /docs is
+# off unless switched on. Skeid does not ship the UI: the first request for it downloads the
+# pinned swagger-ui-dist and caches it in cache_dir (writable for the skeid user).
+#
+# openapi:
+#   swagger_ui: true
+#   cache_dir: /var/lib/skeid/swagger-ui

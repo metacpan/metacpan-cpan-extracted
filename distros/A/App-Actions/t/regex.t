@@ -19,8 +19,14 @@ use App::Actions::Util;
 # times what the linear code needs and far below what the old patterns took
 # (they ran for seconds to minutes on the same input), so a regression fails
 # without making a slow machine flaky.
-
-Readonly::Scalar my $LIMIT => 2;
+#
+# Devel::Cover, which the CI coverage job loads for the whole suite, makes
+# every statement several times slower (the tokenizer about five times), which
+# took the 40,000-comparison case past the limit.  Under it the limit is scaled
+# up: the timing is no longer what is being measured there, and the jobs that
+# run without coverage still hold the code to the plain limit.
+Readonly::Scalar my $COVERAGE_FACTOR => 10;
+Readonly::Scalar my $LIMIT => 2 * ($INC{'Devel/Cover.pm'} ? $COVERAGE_FACTOR : 1);
 
 # Runs $code and says whether it finished within the limit.
 sub quick {
