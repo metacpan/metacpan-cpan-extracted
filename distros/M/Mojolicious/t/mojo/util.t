@@ -242,6 +242,36 @@ subtest 'html_unescape (multi-character entity)' => sub {
   is html_unescape('&acE;'), "\x{223e}\x{0333}", 'right HTML unescaped result';
 };
 
+subtest 'html_unescape (invalid code points)' => sub {
+  is html_unescape('&#0;'),             "\N{U+FFFD}",           'null character reference';
+  is html_unescape('&#x0;'),            "\N{U+FFFD}",           'null character reference';
+  is html_unescape('&#xD800;'),         "\N{U+FFFD}",           'leading surrogate';
+  is html_unescape('&#xDBFF;'),         "\N{U+FFFD}",           'leading surrogate';
+  is html_unescape('&#xDC00;'),         "\N{U+FFFD}",           'trailing surrogate';
+  is html_unescape('&#xDFFF;'),         "\N{U+FFFD}",           'trailing surrogate';
+  is html_unescape('&#55296;'),         "\N{U+FFFD}",           'surrogate in decimal';
+  is html_unescape('&#1114112;'),       "\N{U+FFFD}",           'outside unicode range';
+  is html_unescape('&#9999999;'),       "\N{U+FFFD}",           'outside unicode range';
+  is html_unescape('&#xD83D;&#xDE00;'), "\N{U+FFFD}\N{U+FFFD}", 'surrogate pairs are not combined';
+  is html_unescape('&#xD7FF;'),         "\N{U+D7FF}",           'below surrogate range';
+  is html_unescape('&#xE000;'),         "\N{U+E000}",           'above surrogate range';
+  is html_unescape('&#x10FFFF;'),       "\N{U+10FFFF}",         'noncharacters are preserved';
+  is html_unescape('&#xFFFE;'),         "\N{U+FFFE}",           'noncharacters are preserved';
+};
+
+subtest 'html_unescape (windows-1252 remap)' => sub {
+  is html_unescape('&#x80;'),  "\N{U+20AC}", 'euro sign';
+  is html_unescape('&#128;'),  "\N{U+20AC}", 'euro sign in decimal';
+  is html_unescape('&#0128;'), "\N{U+20AC}", 'euro sign with leading zero';
+  is html_unescape('&#x93;'),  "\N{U+201C}", 'left double quotation mark';
+  is html_unescape('&#x99;'),  "\N{U+2122}", 'trade mark sign';
+  is html_unescape('&#x9F;'),  "\N{U+0178}", 'latin capital letter y with diaeresis';
+  is html_unescape('&#x81;'),  "\N{U+81}",   'unmapped control is preserved';
+  is html_unescape('&#x9D;'),  "\N{U+9D}",   'unmapped control is preserved';
+  is html_unescape('&#x7F;'),  "\N{U+7F}",   'delete is not remapped';
+  is html_unescape('&#xA0;'),  "\N{U+A0}",   'no-break space is not remapped';
+};
+
 subtest 'html_unescape (apos)' => sub {
   is html_unescape('foobar&apos;&lt;baz&gt;&#x26;&#34;'), "foobar'<baz>&\"", 'right HTML unescaped result';
 };
@@ -459,6 +489,7 @@ subtest 'xor_encode' => sub {
   is xor_encode("\x10\x1d\x14\x14\x17\x58\x0f\x17\x0a\x14\x1c", 'x'),         'hello world',          'right result';
   is xor_encode('hello',                                        '123456789'), "\x59\x57\x5f\x58\x5a", 'right result';
   is xor_encode("\x59\x57\x5f\x58\x5a",                         '123456789'), 'hello',                'right result';
+  is xor_encode('',                                             'foo'),       '',                     'right result';
 };
 
 subtest 'steady_time' => sub {
@@ -628,7 +659,8 @@ subtest 'gzip/gunzip' => sub {
   isnt $compressed, $uncompressed, 'string changed';
   ok length $compressed < length $uncompressed, 'string is shorter';
   my $result = gunzip $compressed;
-  is $result, $uncompressed, 'same string';
+  is $result,                        $uncompressed, 'same string';
+  is gunzip(gzip(b($uncompressed))), $uncompressed, 'same string';
 };
 
 subtest 'scope_guard' => sub {

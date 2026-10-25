@@ -23,16 +23,31 @@
          "requires" : {
             "App::ModuleBuildTiny" : "0.047"
          }
+      },
+      "runtime" : {
+         "requires" : {
+            "IO::Async::Loop" : "0",
+            "Tickit::Async" : "0",
+            "Tickit::Widget::Entry" : "0",
+            "Tickit::Widget::Scroller" : "0",
+            "Tickit::Widget::Scroller::Item::Text" : "0",
+            "perl" : "5.036"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
       }
    },
    "provides" : {
       "Tickit::Terminal::Prompt" : {
          "file" : "lib/Tickit/Terminal/Prompt.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       }
    },
    "release_status" : "stable",
-   "version" : "0.003",
+   "version" : "0.004",
    "x_serialization_backend" : "JSON::PP version 4.16",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }

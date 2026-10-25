@@ -1,6 +1,6 @@
 package Langertha::Knarr::Role::UpstreamHTTP;
 # ABSTRACT: Timed Net::Async::HTTP client for handlers that call an upstream
-our $VERSION = '1.102';
+our $VERSION = '1.103';
 use Moose::Role;
 use Future;
 use Net::Async::HTTP;
@@ -72,7 +72,7 @@ Langertha::Knarr::Role::UpstreamHTTP - Timed Net::Async::HTTP client for handler
 
 =head1 VERSION
 
-version 1.102
+version 1.103
 
 =head1 SYNOPSIS
 

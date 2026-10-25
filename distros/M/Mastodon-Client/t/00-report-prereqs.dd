@@ -1,0 +1,59 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'Module::Build::Tiny' => '0.034',
+                                        'perl' => 'v5.10.0'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'File::Spec' => '0',
+                                      'IO::Handle' => '0',
+                                      'IPC::Open3' => '0',
+                                      'Test::More' => '0',
+                                      'Test::Pod' => '1.41'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'Class::Load' => '0.25',
+                                      'DateTime' => '1.51',
+                                      'DateTime::Format::Strptime' => '1.73',
+                                      'Future' => '0.35',
+                                      'HTTP::Request::Common' => '6.18',
+                                      'HTTP::Thin' => '0.006',
+                                      'IO::Async' => '0.66',
+                                      'Image::Info' => '1.41',
+                                      'JSON::MaybeXS' => '1.003009',
+                                      'List::Util' => '1.47',
+                                      'Log::Any' => '1.049',
+                                      'Moo' => '2.003002',
+                                      'Net::Async::HTTP' => '0.41',
+                                      'Role::EventEmitter' => '0.002',
+                                      'Try::Tiny' => '0.28',
+                                      'Type::Params' => '1.000006',
+                                      'Types::Common::String' => '1.000006',
+                                      'Types::Path::Tiny' => '0.005',
+                                      'Types::Standard' => '1.003003',
+                                      'URI' => '1.71',
+                                      'perl' => '5.010'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900',
+                                     'Plack' => '1.0043',
+                                     'Test::TCP' => '2.17'
+                                   },
+                   'requires' => {
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'Test2::V0' => '0.000126',
+                                   'Test::More' => '0',
+                                   'Test::Pod' => '1.51',
+                                   'perl' => '5.010'
+                                 }
+                 }
+     };
+  $x;
+ }

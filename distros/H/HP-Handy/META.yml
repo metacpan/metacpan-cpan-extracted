@@ -3,7 +3,7 @@ meta-spec:
   version: 1.4
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
 name: HP-Handy
-version: 0.01
+version: 0.02
 abstract: A tiny Jinja2-compatible template engine for Perl 5.5.3+
 author:
   - ina <ina@cpan.org>
@@ -22,10 +22,10 @@ minimum_perl_version: 5.00503
 provides:
   HP::Handy:
     file: lib/HP/Handy.pm
-    version: 0.01
+    version: 0.02
   HP::Handy::SafeString:
     file: lib/HP/Handy.pm
-    version: 0.01
+    version: 0.02
 resources:
   license: http://dev.perl.org/licenses/
   bugtracker: https://github.com/ina-cpan/HP-Handy/issues

@@ -1,6 +1,6 @@
 package Langertha::Knarr::Handler::Passthrough;
 # ABSTRACT: Knarr handler that forwards requests verbatim to an upstream HTTP API
-our $VERSION = '1.102';
+our $VERSION = '1.103';
 use Moose;
 use Future;
 use Future::AsyncAwait;
@@ -302,6 +302,23 @@ async sub handle_stream_f {
     request => $http_req,
     on_header => sub {
       my ($r) = @_;
+      # A non-2xx answer is an error body, not a stream: collect it and
+      # fail the stream like handle_chat_f does (k74).
+      unless ( $r->is_success ) {
+        my $err = '';
+        my $status = $r->status_line;
+        return sub {
+          my ($data) = @_;
+          if ( defined $data ) { $err .= $data if length $err < 1024; return }
+          $err = substr( $err, 0, 500 );
+          $err =~ s/\s+/ /g;
+          $err =~ s/^ | $//g;
+          @error = ( "Passthrough upstream failed: $status" . ( length $err ? ": $err" : '' ) . "\n" );
+          $finished = 1;
+          if ( $pending ) { my $p = $pending; $pending = undef; $p->fail(@error) }
+          return;
+        };
+      }
       return sub {
         my ($data) = @_;
         if ( !defined $data ) {
@@ -357,7 +374,7 @@ Langertha::Knarr::Handler::Passthrough - Knarr handler that forwards requests ve
 
 =head1 VERSION
 
-version 1.102
+version 1.103
 
 =head1 SYNOPSIS
 

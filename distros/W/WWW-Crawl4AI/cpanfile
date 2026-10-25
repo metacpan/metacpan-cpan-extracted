@@ -2,6 +2,7 @@ requires 'perl', '5.010';
 
 requires 'HTTP::Request', '6.00';
 requires 'JSON::MaybeXS', '1.004000';
+requires 'LWP::Protocol::https';
 requires 'LWP::UserAgent', '6.00';
 requires 'Moo', '2.000000';
 requires 'Safe::Isa', '1.000005';

@@ -299,8 +299,9 @@ sub url_for {
     $base->scheme($base->protocol eq 'https' ? 'wss' : 'ws') if $generated->{websocket};
   }
 
-  # Make path absolute
+  # Make path absolute (skip parsing if there is no base path and nothing would need to be decoded)
   my $base_path = $base->path;
+  return $url if $base_path->to_string eq '' && index($path->to_string, '%') < 0;
   unshift @{$path->parts}, @{$base_path->parts};
   $base_path->parts([])->trailing_slash(0);
 
@@ -309,7 +310,12 @@ sub url_for {
 
 sub url_for_asset {
   my ($self, $asset) = @_;
-  return $self->url_for($asset =~ $ABSOLUTE ? $asset : $self->app->static->asset_path($asset));
+  return $self->url_for($asset) if $asset =~ $ABSOLUTE;
+
+  # Bundlers can rebuild assets with new names at any time during development
+  my $app = $self->app;
+  $app->static->warmup if $app->mode eq 'development';
+  return $self->url_for($app->static->asset_path($asset));
 }
 
 sub url_for_file {
@@ -845,7 +851,8 @@ current request.
 
   my $url = $c->url_for_asset('/app.js');
 
-Generate a portable L<Mojo::URL> object with base for a static asset.
+Generate a portable L<Mojo::URL> object with base for a static asset. In C<development> mode the asset directories are
+scanned again every time, so assets that have just been rebuilt with a different name are found too.
 
 =head2 url_for_file
 

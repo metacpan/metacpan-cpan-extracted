@@ -1,5 +1,27 @@
 Revision history for Mastodon::Client
 
+0.019     2026-10-24 15:53:44 BST
+
+  * Fixes:
+    * Fixed a bug in the example script for Mastodon::Listener added in
+      0.017
+  * Changes:
+    * [internal] The Dist::Zilla setup used to manage this distribution
+      is now simpler, and no longer relies on keeping a separate 'builds'
+      branch.
+    * The test phase no longer depends on Test::TCP or Plack. It will still
+      use these if they are installed, though, so they are now marked as
+      'recommended' dependencies.
+    * All example scripts now live in the top-level 'examples' directory in
+      this distribution.
+
+0.018     2026-10-19 23:16:29+01:00 Europe/London (TRIAL RELEASE)
+
+  * Fixes:
+    * Fixed a long-standing issue with authentication, where the client would
+      attempt to authenticate to /api/v1/oauth/token instead of the correct
+      /oauth/token
+
 0.017     2020-04-17 23:46:11+01:00 Europe/London
 
   * New:

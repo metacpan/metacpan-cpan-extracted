@@ -2,7 +2,8 @@
 abstract: 'a scrolling terminal command prompt'
 author:
   - 'Joel Roth <joelz@pobox.com>'
-build_requires: {}
+build_requires:
+  Test::More: '0'
 configure_requires:
   Module::Build::Tiny: '0.039'
 dynamic_config: 0
@@ -15,7 +16,14 @@ name: Tickit-Terminal-Prompt
 provides:
   Tickit::Terminal::Prompt:
     file: lib/Tickit/Terminal/Prompt.pm
-    version: '0.003'
-version: '0.003'
+    version: '0.004'
+requires:
+  IO::Async::Loop: '0'
+  Tickit::Async: '0'
+  Tickit::Widget::Entry: '0'
+  Tickit::Widget::Scroller: '0'
+  Tickit::Widget::Scroller::Item::Text: '0'
+  perl: '5.036'
+version: '0.004'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

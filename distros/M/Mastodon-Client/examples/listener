@@ -11,7 +11,7 @@ my $access_token = shift
 
 my $listener = Mastodon::Listener->new(
     url => 'https://botsin.space/api/v1/streaming/public',
-    access_token => $ARGV[0],
+    access_token => $access_token,
     coerce_entities => 1,
 );
 

@@ -39,12 +39,14 @@ method process () {
 
     my @c = $self->get_children;
 
-    if ( $x =~ /,/ ) {
+    if ( $x =~ /,/ || $y =~ /,/ ) {
 	if ( @c > 1 || ref($c[0]) ne "SVGPDF::TextElement" ) {
 	    die("text: Cannot combine coordinate list with multiple elements\n");
 	}
 	$x = [ $self->getargs($x) ];
 	$y = [ $self->getargs($y) ];
+	$x = [ ($x->[0]) x @$y ] if @$x == 1 && @$y > 1;
+	$y = [ ($y->[0]) x @$x ] if @$x > 1 && @$y == 1;
 	$text = [ split( //, $c[0]->content ) ];
 	die( "\"", $self->get_cdata, "\" ", 0+@$x, " ", 0+@$y, " ", 0+@$text )
 	  unless @$x == @$y && @$y == @$text;

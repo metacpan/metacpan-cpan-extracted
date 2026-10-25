@@ -1,5 +1,5 @@
 package Langertha::Knarr::Router;
-our $VERSION = '1.102';
+our $VERSION = '1.103';
 # ABSTRACT: Model name to Langertha engine routing with caching
 use Moo;
 use Carp qw( croak );
@@ -94,6 +94,12 @@ sub resolve {
 
   return ($engine, $resolved_model, $alias_only);
 }
+
+sub engine_for {
+  my ($self, $def, $model_name) = @_;
+  return $self->_get_engine( $def, $model_name );
+}
+
 
 sub _get_engine {
   my ($self, $def, $model_name) = @_;
@@ -407,7 +413,7 @@ Langertha::Knarr::Router - Model name to Langertha engine routing with caching
 
 =head1 VERSION
 
-version 1.102
+version 1.103
 
 =head1 SYNOPSIS
 
@@ -518,6 +524,20 @@ when no model is named and there is no default engine. Pass
 C<skip_default =E<gt> 1> to allow the caller to try passthrough before
 falling back to the default engine; with it, an unresolved or missing model
 name returns an empty list.
+
+=head2 engine_for
+
+    my $engine = $router->engine_for(
+      { engine => 'OpenAI', url => $url, api_key_env => 'KEY_VAR', model => 'gpt-4o' },
+      'gpt-4o',
+    );
+
+The engine for one model config, built and cached exactly as L</resolve>
+builds those of L<Langertha::Knarr::Config/models> (key from
+C<api_key_env>, L<Langertha::Knarr::Config/upstream_timeout>, Langfuse
+keys), without looking the model up. L<Langertha::Knarr::Handler::TokenRoutes>
+builds its engines through it. Croaks like L</resolve> when the key
+variable is unset.
 
 =head2 list_models
 

@@ -514,4 +514,19 @@ YAML
     'empty engine name has no default model');
 }
 
+# Test: empty proxy_api_key is not a key (k73)
+{
+  local $ENV{KNARR_API_KEY};
+  my $c = Langertha::Knarr::Config->new(data => { proxy_api_key => '' });
+  ok !$c->has_proxy_api_key, 'empty proxy_api_key in config is no key';
+  {
+    local $ENV{KNARR_API_KEY} = '';
+    ok !Langertha::Knarr::Config->new(data => {})->has_proxy_api_key, 'empty KNARR_API_KEY is no key';
+  }
+  {
+    local $ENV{KNARR_API_KEY} = 'x';
+    ok +Langertha::Knarr::Config->new(data => {})->has_proxy_api_key, 'non-empty KNARR_API_KEY is a key';
+  }
+}
+
 done_testing;

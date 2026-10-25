@@ -1,0 +1,313 @@
+=pod
+
+=for vim
+   vim: tw=72 ts=3 sts=3 sw=3 et ai :
+
+=encoding utf8
+
+=head1 NAME
+
+Mojolicious::Plugin::Branding - Global and per-request branding of templates and public files
+
+
+=head1 VERSION
+
+This document describes Mojolicious::Plugin::Branding version 0.002.
+
+=begin html
+
+<a href="https://www.perl.org/">
+<img alt="Perl Version" src="https://img.shields.io/badge/perl-5.24+-brightgreen.svg">
+</a>
+<a href="https://badge.fury.io/pl/Mojolicious-Plugin-Branding">
+<img alt="Current CPAN version" src="https://badge.fury.io/pl/Mojolicious-Plugin-Branding.svg">
+</a>
+<a href="http://cpants.cpanauthors.org/dist/Mojolicious-Plugin-Branding">
+<img alt="Kwalitee" src="http://cpants.cpanauthors.org/dist/Mojolicious-Plugin-Branding.png">
+</a>
+<a href="http://www.cpantesters.org/distro/O/Mojolicious-Plugin-Branding.html?distmat=1">
+<img alt="CPAN Testers" src="https://img.shields.io/badge/cpan-testers-blue.svg">
+</a>
+<a href="http://matrix.cpantesters.org/?dist=Mojolicious-Plugin-Branding">
+<img alt="CPAN Testers Matrix" src="https://img.shields.io/badge/matrix-@testers-blue.svg">
+</a>
+
+=end html
+
+=head1 SYNOPSIS
+
+   # Mojolicious::Lite
+
+   # individual branding: the application decides the brand of each
+   # request and puts it in the stash, before the plugin is loaded
+   my %brand_for = (
+      'acme.example.com'     => 'acme',
+      'umbrella.example.com' => 'umbrella',
+   );
+   hook before_dispatch => sub {
+      my $c = shift;
+      my $brand = $brand_for{$c->req->url->to_abs->host // ''};
+      $c->stash(variant => $brand) if defined $brand;
+   };
+
+   plugin Branding => {
+
+      # global branding: these directories override the application's
+      # own templates/ and public/, first listed wins
+      global => [ '/etc/myapp/look-and-feel' ],
+
+      # individual branding: one directory per brand, named after it
+      individual => {
+         paths => [ 'brands/acme', 'brands/umbrella' ],
+      },
+   };
+
+
+=head1 DESCRIPTION
+
+This plugin lets you change the templates and public files of a
+L<Mojolicious> application without touching its source code. It
+supports two styles of branding, which can be used separately or
+together.
+
+=over
+
+=item Global branding
+
+A project ships its own "brand-neutral" templates and public files,
+and whoever deploys it can customize the look and feel by pointing the
+plugin to one or more directories with the same layout:
+
+   /etc/myapp/look-and-feel/templates/layouts/default.html.ep
+   /etc/myapp/look-and-feel/public/css/site.css
+   /etc/myapp/look-and-feel/public/img/logo.png
+
+Files found there take precedence over the application's own; anything
+else falls back to the application. See L</global>.
+
+=item Individual branding
+
+In a multi-tenant setup the brand is decided for each request, e.g.
+from the C<Host> header, and each brand keeps its own files in one or
+more directories named after it:
+
+   brands/acme/templates/index.html.ep
+   brands/acme/public/css/site.css
+   brands/umbrella/public/img/logo.png
+
+Again, only the files that a brand overrides need to be there,
+everything else falls back to the (possibly globally branded)
+application files. Deciding the brand of a request is up to the
+application, see L</individual> and L</How the brand is applied>.
+
+=back
+
+Templates and public files are looked up at the same URLs and with the
+same names as usual, so C<< stylesheet '/css/site.css' >> or
+C<< render(template => 'index') >> pick the branded version
+automatically. This includes layouts and partial templates.
+
+
+=head1 CONFIGURATION
+
+The plugin accepts a hash reference with the following keys, both
+optional.
+
+=head2 global
+
+   global => '/path/to/dir',
+   global => [ 'dir1', $mojo_file, ... ],
+
+One directory or an array of directories, as strings or L<Mojo::File>
+objects. Relative paths are resolved from the application home.
+
+For each directory, its C<templates> and C<public> sub-directories (if
+present) are put in front of the application's renderer and static
+paths. When the same file exists in more than one directory, the first
+directory in the list wins.
+
+Directories that do not exist, or that have neither a C<templates> nor
+a C<public> sub-directory, are silently skipped, and so are C<undef>
+items: this allows using the same configuration across environments,
+e.g. C<< global => [ $ENV{MYAPP_LOOK} ] >>. Anything else that is not a
+non-empty string or a L<Mojo::File> object makes the plugin croak.
+
+=head2 individual
+
+A hash reference with the following keys, both optional:
+
+=over
+
+=item paths
+
+   paths => 'brands/acme',
+   paths => [ 'brands/acme', '/srv/more/umbrella', $mojo_file, ... ],
+
+One directory or an array of directories, accepted as in L</global>,
+each holding the files of one brand in its C<templates> and C<public>
+sub-directories:
+
+   <dir>/templates/...
+   <dir>/public/...
+
+The name of the brand is the last component of the directory's path,
+e.g. C<acme> for C<brands/acme>. Several directories may have the same
+name, e.g. C<brands/acme> and C<shared/acme>: their files are merged
+into the same brand and, when the same file exists in more than one of
+them, the first directory in the list wins.
+
+Directories are skipped as in L</global>; without any usable directory,
+individual branding has no effect.
+
+=item stash_key
+
+   stash_key => 'tenant',
+
+The stash key where the application puts the brand of the request,
+C<variant> by default. See L</How the brand is applied>.
+
+=back
+
+The plugin can be registered more than once: brands from all
+registrations are merged, earlier registrations winning for files
+that exist in more than one directory.
+
+
+=head1 How the brand is applied
+
+The plugin does not decide the brand of a request: the application
+puts it in the stash key L</stash_key> (C<variant> by default), from a
+C<before_dispatch> hook registered I<before> loading the plugin. The
+brand can come from anywhere: the C<Host> header (as in the
+L</SYNOPSIS>), a header set by a reverse proxy, a cookie, a database...
+
+The plugin registers its own C<before_dispatch> hook which, for each
+request:
+
+=over
+
+=item *
+
+does nothing if an earlier hook has already rendered a response (e.g.
+a redirect, or a C<401> from an authentication hook);
+
+=item *
+
+does nothing if there is no brand in the stash key;
+
+=item *
+
+copies the brand to the stash value C<variant>, if L</stash_key> is a
+different key;
+
+=item *
+
+serves the file from the brand's C<public> directories if there is
+one, otherwise lets Mojolicious serve the application's public files
+as usual. C<after_static> hooks run for branded files too.
+
+=back
+
+Templates are rendered according to the stash value C<variant>: the
+renderer looks for C<< <dir>/templates/<name> >> in the brand's
+directories first, then falls back to the usual templates. Brand
+templates can use any handler (e.g. C<.ep> or C<.epl>), independently
+of the application's template with the same name.
+
+Because the brand travels in C<variant>, standard Mojolicious variants
+work too: C<templates/index.html+acme.ep> is used for brand C<acme> if
+the brand has no C<index.html.ep>. Note that a variant file in the
+application templates takes precedence over a plain template in the
+brand directories, so avoid having both.
+
+A route can also set C<variant> itself; this changes the brand of the
+templates rendered by that route, but not of the public files, which
+are served before routing.
+
+Only brands listed in L</paths> are ever used: any other value in the
+stash, including one coming straight from the request, just means "no
+branding". There is no need to validate the brand against path
+traversal, although the application should still make sure that it is
+I<allowed> for the request.
+
+
+=head1 INTERFACE
+
+=head2 register
+
+   $plugin->register($app, \%config);
+
+Registers the plugin in the application, see L</CONFIGURATION>. Called
+by L<Mojolicious/plugin>, you should not need to call it directly.
+
+
+=head1 BUGS AND LIMITATIONS
+
+Minimum perl version 5.24, minimum Mojolicious version 9.34.
+
+=over
+
+=item *
+
+C<url_for_asset> and C<< reply->static >> use the application's static
+files and ignore the brand.
+
+=item *
+
+Mojolicious computes ETags of static files from their modification time
+only. When the brand does not come from the host (e.g. from a cookie),
+a browser switching brand may get a C<304 Not Modified> for a file of
+the previous brand. In that case, put the brand in the URL.
+
+=item *
+
+The plugin's C<before_dispatch> hook must run after the hook that sets
+the brand, and after any hook that rewrites the request path or base
+URL (e.g. for a reverse proxy): register the plugin after those hooks.
+
+=item *
+
+Directories are scanned at startup: adding a new brand directory, or a
+C<templates> or C<public> sub-directory to an existing one, requires a
+restart. Files inside existing sub-directories are picked up as usual.
+
+=item *
+
+As in plain Mojolicious, a leading C</> in a template name is ignored,
+i.e. template names are always relative to the template directories.
+
+=back
+
+Report bugs through Codeberg (patches welcome) at
+L<https://codeberg.org/polettix/Mojolicious-Plugin-Branding>.
+
+=head1 USE OF AI
+
+This module was developed with the help of an AI coding assistant
+(Claude, by Anthropic). It was used to review the code and find bugs,
+to write most of the test suite and to draft this documentation. All
+changes were reviewed by the author, who designed the module and wrote
+or approved every fix.
+
+=head1 AUTHOR
+
+Flavio Poletti <flavio@polettix.it>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2026 by Flavio Poletti <flavio@polettix.it>
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+
+=cut

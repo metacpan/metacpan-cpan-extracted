@@ -3212,6 +3212,30 @@ EOF
   is $dom->at('.test')->text, 'works', 'right text';
 };
 
+subtest 'Unclosed comments, CDATA sections, processing instructions and RCDATA elements' => sub {
+  my $dom = Mojo::DOM->new('<p><!-- a <p><!-- b <![CDATA[ c <? d <![CDATA[ e <? f');
+  is $dom->find('p')->size, 2,                                                 'right number of elements';
+  is $dom->all_text,        '<!-- a <!-- b <![CDATA[ c <? d <![CDATA[ e <? f', 'right text';
+
+  $dom = Mojo::DOM->new('<div><textarea>a<p><textarea>b</div><p><!--c-->');
+  is_deeply $dom->find('textarea')->map('text')->to_array, ['a', 'b'], 'right text';
+  is $dom->find('p')->size, 2, 'right number of elements';
+};
+
+subtest 'Stray "=" after tag name' => sub {
+  my $dom = Mojo::DOM->new('<div ="x"><img ="foo" src="bar"></div =y><p ="">a</p>');
+  is $dom->at('img')->attr('src'),    'bar',                                             'right attribute';
+  is $dom->at('div')->children->size, 1,                                                 'right number of children';
+  is $dom->at('p')->text,             'a',                                               'right text';
+  is "$dom",                          '<div "x"><img "foo" src="bar"></div><p "">a</p>', 'right result';
+};
+
+subtest 'Runaway "<" in what looks like an attribute value' => sub {
+  my $dom = Mojo::DOM->new('<a&amp;=<b x="1">test</b>');
+  is $dom->at('b')->text, 'test',                         'right text';
+  is "$dom",              '&lt;a&amp;=<b x="1">test</b>', 'right result';
+};
+
 subtest '"<" followed by space is not a tag opener' => sub {
   my $dom = Mojo::DOM->new('if a < script then="<!--"> </script> <p>FAIL</p>-->');
   is_deeply $dom->find('script, p')->map('to_string')->to_array, [], 'fragment contains no tags, just a comment';
@@ -3306,6 +3330,15 @@ subtest 'Descendant combinator chain with non-matching selector' => sub {
 
   my $exists = Mojo::DOM->new('<div id="x"><a><b><c><d>ok</d></c></b></a></div>');
   is $exists->at('#x * * * *')->text, 'ok', 'matching id still resolves descendants';
+};
+
+subtest 'First match without combinators' => sub {
+  my $dom = Mojo::DOM->new('<div><p id="a">A</p><span><b class="x">B</b></span></div><p class="x">C</p>');
+  is $dom->at('b, p')->text,               'A',   'first match in document order';
+  is $dom->at('.x')->text,                 'B',   'nested match comes first';
+  is $dom->at('span')->at('b.x, p')->text, 'B',   'only matches inside the element';
+  is $dom->at('div')->at('p.x'),           undef, 'no match inside the element';
+  is $dom->at('i'),                        undef, 'no match';
 };
 
 subtest 'Unknown CSS selector' => sub {

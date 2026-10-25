@@ -26,7 +26,7 @@ sub is { my($g,$e,$n)=@_; $T++;
 
 sub r { HP::Handy->new(auto_escape=>0)->render_string($_[0], $_[1]||{}) }
 
-print "1..68\n";
+print "1..74\n";
 
 ###############################################################################
 # Basic if / endif
@@ -161,5 +161,13 @@ is(r('{% if x is defined %}y{% endif %}',   {x=>1}), 'y', 'if is defined');
 is(r('{% if x is none %}y{% endif %}',       {}),     'y', 'if is none');
 is(r('{% if x is odd %}y{% endif %}',       {x=>3}), 'y', 'if is odd');
 is(r('{% if x is not even %}y{% endif %}',  {x=>3}), 'y', 'if is not even');
+
+# Jinja2 truth value: empty list / empty dict are false
+is(r('{% if xs %}T{% else %}F{% endif %}', {xs=>[]}),        'F', 'if: empty list is false');
+is(r('{% if xs %}T{% else %}F{% endif %}', {xs=>[0]}),       'T', 'if: non-empty list is true');
+is(r('{% if h %}T{% else %}F{% endif %}',  {h=>{}}),         'F', 'if: empty dict is false');
+is(r('{% if not xs %}N{% endif %}',        {xs=>[]}),        'N', 'not: empty list');
+is(r('{{ xs or "e" }}',                    {xs=>[]}),        'e', 'or: empty list');
+is(r('{{ "y" if xs else "n" }}',           {xs=>[]}),        'n', 'ternary: empty list');
 
 END { print "# $PASS passed, $FAIL failed\n"; exit($FAIL ? 1 : 0) }

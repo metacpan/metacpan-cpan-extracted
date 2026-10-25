@@ -1,7 +1,7 @@
 package Langertha::Knarr::Protocol::ACP;
 # ABSTRACT: BeeAI/IBM Agent Communication Protocol (ACP) for Knarr
 
-our $VERSION = '1.102';
+our $VERSION = '1.103';
 use Moose;
 use JSON::MaybeXS;
 use Data::UUID;
@@ -121,6 +121,26 @@ sub format_stream_close {
 
 sub format_stream_done { '' }
 
+
+
+sub format_error_response {
+  my ($self, $status, $message) = @_;
+  return ( $status, { 'Content-Type' => 'application/json' },
+    $self->_json->encode({ code => $self->_status_error_code($status), message => "$message" }) );
+}
+
+sub format_stream_error {
+  my ($self, $status, $message, $request) = @_;
+  return $self->_sse_event( 'run.failed' => {
+    run_id => $request ? $request->extra->{run_id} : undef,
+    status => 'failed',
+    error  => {
+      code    => $self->_status_error_code($status),
+      message => "$message",
+    },
+  });
+}
+
 __PACKAGE__->meta->make_immutable;
 1;
 
@@ -136,7 +156,7 @@ Langertha::Knarr::Protocol::ACP - BeeAI/IBM Agent Communication Protocol (ACP) f
 
 =head1 VERSION
 
-version 1.102
+version 1.103
 
 =head1 DESCRIPTION
 
@@ -154,6 +174,22 @@ L<Langertha::Knarr::Protocol>. Loaded by default.
 Streaming mode emits the standard ACP event sequence:
 C<run.created>, C<message.created>, C<message.part>×N,
 C<message.completed>, C<run.completed>.
+
+=head2 format_stream_error
+
+    my $bytes = $proto->format_stream_error( 500, 'boom', $request );
+
+C<event: run.failed> carrying the run with C<status: failed> and an
+C<error> (C<code> C<server_error>, C<not_found> or C<invalid_input>, and
+the C<message>). It takes the place of C<run.completed>.
+
+=head2 format_error_response
+
+    my ($status, $headers, $body) = $proto->format_error_response( 500, 'boom' );
+
+ACP's C<Error> object at the top of the body: C<{"code":"server_error","message":"boom"}>,
+C<code> being C<server_error> (5xx), C<not_found> (404) or C<invalid_input>
+(any other status, the 401 included -- ACP has no other code).
 
 =head1 SUPPORT
 

@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '0.017';
+our $VERSION = '0.019';
 
 use Carp;
 use Mastodon::Types qw( Acct Account DateTime Image URI Instance );
@@ -131,7 +131,7 @@ sub authorize {
 
   $data->{scope} = join q{ }, sort @{ $self->scopes };
 
-  my $response = $self->post( 'oauth/token' => $data );
+  my $response = $self->post( '/oauth/token' => $data );
 
   if ( defined $response->{error} ) {
     $log->warn( $response->{error_description} );

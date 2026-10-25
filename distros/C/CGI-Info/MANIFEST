@@ -75,7 +75,7 @@ t/is_search.t
 t/is_tablet.t
 t/json.t
 t/kwalitee.t
-t/lib/MyLogger.pm
+t/limits.t
 t/locales.t
 t/logdir.t
 t/logger.t

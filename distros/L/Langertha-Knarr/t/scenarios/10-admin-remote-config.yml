@@ -1,0 +1,68 @@
+title: remote_config - 503 before the setup, PUT/PATCH/DELETE under the admin key, a bad push changes nothing
+setup:
+  admin_key: admin-key-0123456789-abcdef
+  remote_config: true
+  config: {}
+  backends:
+    v-alpha: { fallback: { answer: "from alpha" } }
+steps:
+  - chat: { protocol: openai, model: alpha, prompt: x }
+    expect: { status: 503 }
+  - chat: { protocol: anthropic, model: alpha, prompt: x }
+    expect: { status: 503 }
+  - http: { method: GET, path: /knarr/admin/status, bearer: admin-key-0123456789-abcdef }
+    expect:
+      json: { configured: false, remote_config: true, generation: 0 }
+  - http: { method: GET, path: /knarr/admin/status, bearer: wrong-admin-key-000000 }
+    expect: { status: 401 }
+  - http:
+      method: PUT
+      path: /knarr/admin/config
+      bearer: admin-key-0123456789-abcdef
+      body:
+        proxy_api_key: pushed-proxy-key-0001
+        models:
+          alpha: { engine: KnarrVirtual, model: v-alpha, api_key: sk-provider-one }
+    expect:
+      json: { generation: 1, 'models.0': alpha, layers: [ push ] }
+  # the pushed proxy key guards the chat now, and the pushed model answers
+  - chat: { protocol: openai, model: alpha, prompt: x }
+    expect: { status: 401 }
+  - chat: { protocol: openai, model: alpha, prompt: x, bearer: pushed-proxy-key-0001 }
+    expect: { text: from alpha }
+    backend:
+      v-alpha: { api_key: sk-provider-one }
+  - http:
+      method: PATCH
+      path: /knarr/admin/keys
+      bearer: admin-key-0123456789-abcdef
+      body: { alpha: sk-provider-two }
+    expect:
+      json: { generation: 2 }
+      absent: [ keys ]
+  - chat: { protocol: openai, model: alpha, prompt: x, bearer: pushed-proxy-key-0001 }
+    expect: { text: from alpha }
+    backend:
+      v-alpha: { api_key: sk-provider-two }
+  # a broken push is refused and the running setup stays
+  - http:
+      method: PUT
+      path: /knarr/admin/config
+      bearer: admin-key-0123456789-abcdef
+      body: { models: { broken: { api_key: sk-provider-three } } }
+    expect:
+      status: 400
+      body_like: "missing 'engine'"
+  - http: { method: GET, path: /knarr/admin/status, bearer: admin-key-0123456789-abcdef }
+    expect:
+      json: { generation: 2, configured: true }
+  - chat: { protocol: openai, model: alpha, prompt: x, bearer: pushed-proxy-key-0001 }
+    expect: { text: from alpha }
+  # the admin key opens nothing but the admin routes
+  - chat: { protocol: openai, model: alpha, prompt: x, bearer: admin-key-0123456789-abcdef }
+    expect: { status: 401 }
+  - http: { method: DELETE, path: /knarr/admin/config, bearer: admin-key-0123456789-abcdef }
+    expect:
+      json: { configured: false }
+  - chat: { protocol: openai, model: alpha, prompt: x, bearer: pushed-proxy-key-0001 }
+    expect: { status: 503 }

@@ -57,6 +57,7 @@ schemas\.yml$
 \bcover_html\b
 \bcoverage_history\b
 \bcovered\b
+nytprof.out
 
 # Avoid MYMETA files
 ^MYMETA\.
@@ -74,3 +75,11 @@ mutation.json
 CLAUDE.md
 \.claude
 \.circleci
+
+# Super-linter per-repo tuning files - not for distribution
+^\.perlcriticrc$
+^\.jscpd\.json$
+^\.markdown-lint\.yml$
+# Super-linter tuning files - not for distribution
+^\.prettierignore$
+^\.textlintrc$

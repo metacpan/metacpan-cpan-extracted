@@ -1,6 +1,6 @@
 package Langertha::Knarr::Handler::A2AClient;
 # ABSTRACT: Knarr handler that consumes a remote A2A (Agent2Agent) agent
-our $VERSION = '1.102';
+our $VERSION = '1.103';
 use Moose;
 use Future::AsyncAwait;
 use JSON::MaybeXS;
@@ -95,7 +95,7 @@ Langertha::Knarr::Handler::A2AClient - Knarr handler that consumes a remote A2A 
 
 =head1 VERSION
 
-version 1.102
+version 1.103
 
 =head1 SYNOPSIS
 

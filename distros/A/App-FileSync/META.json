@@ -16,7 +16,9 @@
    "no_index" : {
       "directory" : [
          "t",
-         "inc"
+         "inc",
+         "t",
+         "xt"
       ]
    },
    "prereqs" : {
@@ -27,7 +29,7 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "6.64"
          }
       },
       "runtime" : {
@@ -35,8 +37,8 @@
             "Carp" : "0",
             "Compress::Raw::Zlib" : "0",
             "Config::Abstraction" : "0",
+            "Cwd" : "0",
             "Digest::SHA" : "0",
-            "Encode" : "0",
             "Exporter" : "0",
             "Fcntl" : "0",
             "File::Basename" : "0",
@@ -44,21 +46,34 @@
             "File::Path" : "0",
             "File::Spec" : "0",
             "File::Temp" : "0",
+            "FindBin" : "0",
             "Getopt::Long" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
+            "IPC::System::Simple" : "1.30",
             "JSON::PP" : "0",
+            "List::Util" : "1.54",
             "Log::Abstraction" : "0",
             "Object::Configure" : "0",
-            "POSIX" : "0",
+            "Params::Get" : "0.17",
+            "Params::Validate::Strict" : "0.41",
+            "Readonly" : "2.05",
+            "Scalar::Util" : "0",
+            "Sub::Private" : "0.07",
+            "Sub::Protected" : "0.03",
+            "Sys::Hostname" : "0",
             "Time::HiRes" : "0",
-            "Time::Local" : "0"
+            "Time::Local" : "0",
+            "autodie" : "2.37",
+            "perl" : "5.014",
+            "version" : "0.77"
          }
       },
       "test" : {
          "requires" : {
+            "Errno" : "0",
+            "File::Find" : "0",
             "File::Temp" : "0",
-            "Test::Deep" : "0",
             "Test::Exception" : "0",
             "Test::Mockingbird::TimeTravel" : "0.14",
             "Test::Most" : "0"
@@ -67,12 +82,15 @@
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/nigelhorne/App-FileSync/issues"
+      },
       "repository" : {
          "type" : "git",
          "url" : "https://github.com/nigelhorne/App-FileSync.git",
          "web" : "https://github.com/nigelhorne/App-FileSync"
       }
    },
-   "version" : "v0.001.0",
+   "version" : "0.001.2",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

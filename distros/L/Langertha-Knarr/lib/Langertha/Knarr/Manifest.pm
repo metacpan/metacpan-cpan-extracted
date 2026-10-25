@@ -1,6 +1,6 @@
 package Langertha::Knarr::Manifest;
 # ABSTRACT: Build Knarr's provider manifest (/.well-known/langertha.json) from its exposed model surface
-our $VERSION = '1.102';
+our $VERSION = '1.103';
 use Moose;
 use URI;
 use Log::Any qw( $log );
@@ -173,7 +173,7 @@ Langertha::Knarr::Manifest - Build Knarr's provider manifest (/.well-known/lange
 
 =head1 VERSION
 
-version 1.102
+version 1.103
 
 =head1 SYNOPSIS
 

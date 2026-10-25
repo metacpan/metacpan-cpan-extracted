@@ -98,6 +98,16 @@ passthrough:
 # Optional: proxy authentication (or KNARR_API_KEY)
 # proxy_api_key: your-secret-key
 
+# Optional: admin routes under /knarr/admin/ to deliver the setup and keys
+# at runtime, held in memory only. Prefer KNARR_ADMIN_KEY over a key in this
+# file; at least 16 characters, not the proxy key. With an admin key Knarr
+# runs one worker.
+# admin_key: ...
+# remote_config: true   # (or KNARR_REMOTE_CONFIG / --remote-config) a start
+#                       # without models is allowed: 503 until PUT
+#                       # /knarr/admin/config. What this file holds is always
+#                       # in effect; a delivered setup lies over it, in RAM.
+
 # Optional: public base URL for /.well-known/langertha.json (or
 # KNARR_PUBLIC_URL); default: taken from each request
 # public_url: https://knarr.example
@@ -139,3 +149,23 @@ passthrough:
 # logging:
 #   file: /var/log/knarr/requests.jsonl
 #   dir: /var/log/knarr/requests
+
+# Optional: token auth instead of one shared key (needs DBD::Pg). A platform
+# issues a short-lived token for exactly one model; Knarr checks
+# sha256(token) against a PostgreSQL view and routes by the row's provider.
+# Excludes proxy_api_key / KNARR_API_KEY, models, default, passthrough,
+# auto_discover and remote_config; not changeable by an admin push.
+# token_auth:
+#   backend: postgresql
+#   dsn: dbi:Pg:host=db;dbname=platform
+#   user: tester_knarr
+#   password_env: TESTER_DB_PASSWORD   # name of the variable, not the password
+#   relation: tester_token_auth        # view or table, optionally schema.name
+#   listen: tester_token               # NOTIFY channel on issue and revocation
+#   hash: sha256                       # default
+#   columns: { hash: token_hash, model: model, provider: provider, expires: expires_at }  # defaults
+#   match_model: true                  # default: the request model must be the token's
+# routes:                              # by the provider column of the token's row
+#   local:     { upstream: http://api:8080/v1, key_env: SKEID_KEY }
+#   openai:    { provider: openai,    key_env: OPENAI_API_KEY }
+#   anthropic: { provider: anthropic, key_env: ANTHROPIC_API_KEY }   # url: for another endpoint

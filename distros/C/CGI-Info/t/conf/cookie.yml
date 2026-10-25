@@ -10,4 +10,4 @@ input:
   cookie_name:
     type: string
     min: 1
-    matches: "^[!#-'*+\\-\\.\\^_`|~0-9A-Za-z]+$"  # RFC6265
+    matches: "^[!#-'*+\\-\\.\\^_`|~0-9A-Za-z]+$" # RFC6265

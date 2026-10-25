@@ -1098,10 +1098,37 @@
       </div>
       <div class="graph-btn-col">
         <span class="graph-btn-spacer"></span>
+        <label class="check-label">
+          <input type="checkbox" id="map-remember-chk">
+          Remember columns
+        </label>
         <div class="graph-btn-row">
           <button type="submit" id="btn-do-map" class="btn-primary" disabled>Open map</button>
           <button type="button" id="btn-cancel-map" class="btn-secondary">Cancel</button>
         </div>
+      </div>
+    </div>
+
+    <div class="graph-fields-row" id="map-opts-row">
+      <div class="join-field">
+        <label class="check-label" title="Add a heatmap density layer behind the markers">
+          <input type="checkbox" id="map-heat-chk">
+          Heatmap layer
+        </label>
+      </div>
+      <div class="join-field" id="map-weight-field" hidden>
+        <label for="map-weight-sel">Heat weight column</label>
+        <select id="map-weight-sel">
+          <option value="">(equal weight)</option>
+          [%- FOREACH col IN columns -%]
+          <option value="[% col | html %]">[% col | html %]</option>
+          [%- END -%]
+        </select>
+      </div>
+      <div class="join-field">
+        <label for="map-zoom-inp">Initial zoom (0&ndash;19)</label>
+        <input type="number" id="map-zoom-inp" min="0" max="19"
+               style="width:5rem" placeholder="auto">
       </div>
     </div>
 
@@ -3198,6 +3225,26 @@ function parseAccounting(v) {
     }
   }
 
+  // Pre-populate selects from /geo/list, then fall back to guessColumns().
+  function applyGeoPrefs(cols) {
+    var kindMap = { lat: latSel, lon: lonSel, location: locSel };
+    var anySet  = false;
+    Object.keys(cols).forEach(function (col) {
+      var kind = (cols[col] || {}).kind;
+      var sel  = kindMap[kind];
+      if (!sel) return;
+      for (var i = 0; i < sel.options.length; i++) {
+        if (sel.options[i].value === col) {
+          sel.value = col;
+          anySet = true;
+          if (kind === 'location') modeSel.value = 'loc';
+          break;
+        }
+      }
+    });
+    if (!anySet) guessColumns();
+  }
+
   btnOpen.addEventListener('click', function () {
     otherPanels.forEach(function (p) { p.hidden = true; });
     backInp.value = window.location.href;
@@ -3206,11 +3253,27 @@ function parseAccounting(v) {
       back2Inp.value = pb;
       if (back2LabelInp) back2LabelInp.value = pb ? (mapForm.getAttribute('data-parent-back-label') || '') : '';
     }
-    guessColumns();
     buildColorSelect();
     panel.hidden = !panel.hidden;
     syncMode();
     if (!panel.hidden) modeSel.focus();
+    // Fetch saved column prefs, fall back to heuristic guess if unavailable.
+    var lSpec = mapForm ? (mapForm.querySelector('input[name="l"]') || {}).value || '' : '';
+    if (lSpec) {
+      fetch('/geo/list?l=' + encodeURIComponent(lSpec))
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (data) {
+          if (data && data.columns && Object.keys(data.columns).length) {
+            applyGeoPrefs(data.columns);
+          } else {
+            guessColumns();
+          }
+          checkMap();
+        })
+        .catch(function () { guessColumns(); checkMap(); });
+    } else {
+      guessColumns();
+    }
   });
 
   btnCancel && btnCancel.addEventListener('click', function () {
@@ -3243,7 +3306,6 @@ function parseAccounting(v) {
       }).filter(function (v) { return v !== ''; });
       if (vals.length === 0) return;
       if (vals.every(isMapDateVal)) return;
-      if (!vals.every(function (v) { return !isNaN(parseAccounting(v)); })) return;
       var opt = document.createElement('option');
       opt.value = name; opt.textContent = name;
       if (name === prev) opt.selected = true;
@@ -3313,14 +3375,57 @@ function parseAccounting(v) {
   btnAddRule && btnAddRule.addEventListener('click', addColorRule);
   colorSel && colorSel.addEventListener('change', toggleColorSection);
 
+  var heatChk   = document.getElementById('map-heat-chk');
+  var weightFld = document.getElementById('map-weight-field');
+  heatChk && heatChk.addEventListener('change', function () {
+    if (weightFld) weightFld.hidden = !heatChk.checked;
+  });
+
   mapForm.addEventListener('submit', function () {
-    var col = colorSel ? colorSel.value : '';
-    if (!col) return;
     function addHidden(nm, val) {
       var inp = document.createElement('input');
       inp.type = 'hidden'; inp.name = nm; inp.value = val;
       mapForm.appendChild(inp);
     }
+
+    // Save column preferences when the checkbox is checked.
+    var remChk = document.getElementById('map-remember-chk');
+    if (remChk && remChk.checked) {
+      var lInp = mapForm.querySelector('input[name="l"]');
+      var lVal = lInp ? lInp.value : '';
+      if (lVal) {
+        var saves = [];
+        if (!byLocation() && latSel.value)
+          saves.push({ col: latSel.value, kind: 'lat' });
+        if (!byLocation() && lonSel.value)
+          saves.push({ col: lonSel.value, kind: 'lon' });
+        if (byLocation() && locSel.value)
+          saves.push({ col: locSel.value, kind: 'location' });
+        saves.forEach(function (s) {
+          fetch('/geo/save', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: 'l=' + encodeURIComponent(lVal) +
+                  '&col=' + encodeURIComponent(s.col) +
+                  '&kind=' + encodeURIComponent(s.kind),
+          });
+        });
+      }
+    }
+
+    var heatChkEl  = document.getElementById('map-heat-chk');
+    var weightSel  = document.getElementById('map-weight-sel');
+    var zoomInpEl  = document.getElementById('map-zoom-inp');
+    if (heatChkEl && heatChkEl.checked) {
+      addHidden('heat', '1');
+      var wVal = weightSel ? weightSel.value.trim() : '';
+      if (wVal) addHidden('weight', wVal);
+    }
+    var zVal = zoomInpEl ? zoomInpEl.value.trim() : '';
+    if (zVal !== '') addHidden('zoom', zVal);
+
+    var col = colorSel ? colorSel.value : '';
+    if (!col) return;
     addHidden('color', col);
     var def = colorDefaultInp ? colorDefaultInp.value.trim() : '';
     if (def) addHidden('color_default', def);

@@ -1,0 +1,19 @@
+title: A backend that fails (no reaction) becomes an error answer in each protocol, not a hang or a 200
+setup:
+  config:
+    models:
+      broken: { engine: KnarrVirtual, model: v-broken }
+  backends:
+    v-broken:
+      rules:
+        "known": { answer: ok }
+steps:
+  - chat: { protocol: openai, model: broken, prompt: unknown prompt }
+    expect: { status: 500, body_like: 'No Reaction' }
+  - chat: { protocol: anthropic, model: broken, prompt: unknown prompt }
+    expect: { status: 500, body_like: 'No Reaction' }
+  - chat: { protocol: ollama, model: broken, prompt: unknown prompt }
+    expect: { status: 500, body_like: 'No Reaction' }
+  # the failure did not poison the server
+  - chat: { protocol: openai, model: broken, prompt: known }
+    expect: { text: ok }

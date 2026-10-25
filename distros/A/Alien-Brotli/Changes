@@ -1,5 +1,31 @@
 Revision history for Alien-Brotli:
 
+v0.2.3    2026-10-24 16:37:44+01:00 Europe/London
+  [Security]
+  - Bumped minimum version of libbrotli to 1.2.1 (CVE-2026-111497)
+
+  [Bug Fixes]
+  - Updated build prerequisites.
+
+  - Build now works with the latest versions of libbrotli.
+
+  [Documentation]
+  - Updated maintainer email addresses.
+
+  - Updated copyright year.
+
+  - README generated from the UsefulReadme dzil plugin.
+
+  [Tests]
+  - Add exe() method to diagnostics (mspacek).
+
+  - Updated author tests, which are now in xt.
+
+  [Toolchain]
+  - Switched from Module::Signature to sigstore.
+
+  - Updated Dist::Zilla configuration.
+
 v0.2.2    2022-09-03 13:40:15+01:00 Europe/London
   [Bug Fixes]
   - Add missing bc to bootstrap, GH#5 (mspacek).

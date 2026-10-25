@@ -1,5 +1,48 @@
 Revision history for CGI-Info
 
+1.16	Sat Oct 24 07:51:38 PM EDT 2026
+	[ Enhancements ]
+	- Add configurable request-complexity limits: max_body_size, max_params,
+	  max_parts, max_part_headers and max_nesting_depth. Exceeding one sets
+	  status 413 and makes params() return undef.
+	- Allow those limits to be overridden per params() call, individually or
+	  through a single limits hash-ref; the override applies only to that call
+	  and cannot be bypassed by a cached result.
+	- Apply max_params and max_nesting_depth to text/xml, application/xml and
+	  structured application/*+xml bodies (for example application/soap+xml),
+	  counting XML elements and element nesting depth before returning the
+	  body.
+	- Reject XML request bodies containing a DOCTYPE or ENTITY declaration,
+	  setting status 403 and making params() return undef.  The new allow_dtd
+	  constructor option accepts such bodies for trusted feeds, and logs a
+	  warning naming the declaration.  The new dtd_warning_interval option
+	  (default 60 seconds, 0 for every occurrence) rate limits that warning,
+	  separately for each request path, and reports how many declarations were
+	  suppressed for it, so a polled feed does not flood the log or silence a
+	  different XML endpoint served by the same process.  Paths are normalised
+	  (query string dropped, %XX decoded, repeated slashes collapsed, '.' and
+	  '..' segments resolved), so the usual spellings of one feed share a
+	  single budget.
+
+	[ Bug fixes ]
+	- upload_dir is accepted anywhere in a temporary area, not just below
+	  tmpdir(): a CGI process usually has no TMPDIR exported, so a directory in
+	  the platform's own temporary tree (e.g. /var/folders/... on macOS) was
+	  rejected with a 500.  The check now compares resolved paths, so '..'
+	  cannot escape the temporary area and a sibling that only shares a name
+	  prefix no longer matches; %XX escapes are decoded first, so an encoded
+	  spelling is judged like its decoded form.  On Windows backslashes are
+	  translated after that decoding, so an encoded %5C cannot hide a '..'
+	  traversal from the area check.  A drive-relative path (C:uploads) or an
+	  8.3 short name (PROGRA~1) is refused with a 500, because neither can be
+	  checked against the temporary areas by comparing strings.  The root of a
+	  temporary area, such as /tmp itself, is now rejected: upload_dir has to
+	  be a directory inside the area.
+
+	[ Tests ]
+	- Use Test::Log::Adapter
+	- Update to latest all_fuzz.t from App::Test::Generator
+
 1.15	Fri Oct  2 11:36:07 AM EDT 2026
 	[ Bug fixes ]
 	- Bumped to latest version of Params::Validate::Strict

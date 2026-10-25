@@ -1,7 +1,7 @@
 package Langertha::Knarr::Protocol::AGUI;
 # ABSTRACT: AG-UI (Agent-UI) event protocol for Knarr
 
-our $VERSION = '1.102';
+our $VERSION = '1.103';
 use Moose;
 use JSON::MaybeXS;
 use Data::UUID;
@@ -123,6 +123,28 @@ sub format_stream_close {
 
 sub format_stream_done { '' }
 
+
+sub _run_error {
+  my ($self, $status, $message) = @_;
+  return {
+    type    => 'RUN_ERROR',
+    message => "$message",
+    code    => $self->_status_error_code($status),
+  };
+}
+
+sub format_stream_error {
+  my ($self, $status, $message) = @_;
+  return $self->_sse( $self->_run_error( $status, $message ) );
+}
+
+
+sub format_error_response {
+  my ($self, $status, $message) = @_;
+  return ( $status, { 'Content-Type' => 'application/json' },
+    $self->_json->encode( $self->_run_error( $status, $message ) ) );
+}
+
 __PACKAGE__->meta->make_immutable;
 1;
 
@@ -138,7 +160,7 @@ Langertha::Knarr::Protocol::AGUI - AG-UI (Agent-UI) event protocol for Knarr
 
 =head1 VERSION
 
-version 1.102
+version 1.103
 
 =head1 DESCRIPTION
 
@@ -155,6 +177,22 @@ Streaming emits the typed AG-UI event sequence:
 C<RUN_STARTED>, C<TEXT_MESSAGE_START>, C<TEXT_MESSAGE_CONTENT>×N,
 C<TEXT_MESSAGE_END>, C<RUN_FINISHED>. Sync mode synthesizes the same
 sequence into a single response body for non-streaming clients.
+
+=head2 format_stream_error
+
+    my $bytes = $proto->format_stream_error( 500, 'boom' );
+
+AG-UI's C<RUN_ERROR> event (C<message>, C<code>); it takes the place of
+C<RUN_FINISHED>.
+
+=head2 format_error_response
+
+    my ($status, $headers, $body) = $proto->format_error_response( 500, 'boom' );
+
+An error before the stream started: AG-UI defines no error body of its
+own, only the C<RUN_ERROR> event, so the body is that event as plain JSON
+(C<application/json>, the HTTP status kept) -- the same object the stream
+sends as an SSE frame once it has started.
 
 =head1 SUPPORT
 

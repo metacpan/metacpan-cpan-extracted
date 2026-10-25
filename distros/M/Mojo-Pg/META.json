@@ -37,7 +37,7 @@
             "DBD::Pg" : "3.007004",
             "Mojo::SQL" : "0.01",
             "Mojolicious" : "8.50",
-            "SQL::Abstract::Pg" : "1.0",
+            "SQL::Abstract::Pg" : "1.01",
             "perl" : "5.020"
          }
       }
@@ -61,6 +61,6 @@
          "web" : "https://web.libera.chat/#mojo"
       }
    },
-   "version" : "5.0",
+   "version" : "5.01",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

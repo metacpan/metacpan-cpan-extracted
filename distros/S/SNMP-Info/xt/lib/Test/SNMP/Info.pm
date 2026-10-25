@@ -144,6 +144,37 @@ sub bulk_order_check : Tests(4) {
   };
 }
 
+# net-snmp labels an object defined in two MIBs after whichever loaded first,
+# and SNMP::Info loads %MIBS in hash order, so a class can ask for
+# RFC1213-MIB::ifDescr while a test stored IF-MIB::ifDescr.
+sub mock_module_labels : Tests(3) {
+  my $test = shift;
+
+  SNMP::loadModules('RFC1213-MIB');
+  my $session = $test->mock_session;
+  $session->{Data}{'IF-MIB::ifDescr'}
+    = {1 => 'GigabitEthernet1', 3 => 'GigabitEthernet3'};
+
+  subtest 'mock_get__data_under_other_module_label__answers_by_oid' => sub {
+    plan tests => 1;
+    my $vb = SNMP::Varbind->new(['RFC1213-MIB::ifDescr', 1]);
+    is(scalar $session->get($vb), 'GigabitEthernet1', 'row 1 found');
+  };
+  subtest 'mock_getnext__data_under_other_module_label__answers_by_oid' => sub {
+    plan tests => 2;
+    my $vb = SNMP::Varbind->new(['RFC1213-MIB::ifDescr', 1]);
+    $session->getnext($vb);
+    is($vb->[1], 3, 'next row is 3');
+    is($vb->[2], 'GigabitEthernet3', 'with its value');
+  };
+  subtest 'mock_bulkwalk__data_under_other_module_label__answers_by_oid' => sub {
+    plan tests => 1;
+    my ($rows) = $session->bulkwalk(0, 10,
+      SNMP::Varbind->new(['RFC1213-MIB::ifDescr']));
+    is(scalar @{$rows || []}, 2, 'both rows walked');
+  };
+}
+
 sub bulk_backoff : Tests(3) {
   my $test = shift;
 
@@ -349,7 +380,7 @@ sub loopdetect : Tests(4) {
     'Loopdetect off');
 }
 
-sub device_type : Tests(+6) {
+sub device_type : Tests(+12) {
   my $test = shift;
   $test->SUPER::device_type();
 
@@ -393,6 +424,50 @@ sub device_type : Tests(+6) {
   is($test->{info}->device_type,
     'SNMP::Info::Layer2::Orinoco', 'Layer 2 device type by sysObjectID');
   $test->{info}->clear_cache();
+
+  # Some Ruckus access points omit sysServices and use a generic sysDescr.
+  $cache_data = {
+    '_layers'      => 0,
+    '_description' => 'Ruckus Wireless Inc (C) 2006',
+    '_id'          => '.1.3.6.1.4.1.25053.3.1.4.121'
+  };
+  $test->{info}->cache($cache_data);
+  is($test->{info}->device_type,
+    'SNMP::Info::Layer2::RuckusAP', 'Ruckus product OID without sysServices');
+  $test->{info}->clear_cache();
+
+  # Unleashed APs report a null or ZoneDirector sysObjectID; R850 Unleashed
+  # and a ZD1200 share 25053.3.1.5.15, so only sysDescr separates them.
+  my %unleashed = (
+    'Ruckus Wireless R650' => '0.0.0',
+    'Ruckus Wireless R850' => '.1.3.6.1.4.1.25053.3.1.5.15',
+    'Ruckus Wireless T300' => '.1.3.6.1.4.1.25053.3.1.5.20',
+  );
+  foreach my $description (sort keys %unleashed) {
+    $test->{info}->cache({
+      '_layers'      => 0,
+      '_description' => $description,
+      '_id'          => $unleashed{$description},
+    });
+    is($test->{info}->device_type, 'SNMP::Info::Layer2::RuckusAP',
+      "Unleashed AP by sysDescr: $description");
+    $test->{info}->clear_cache();
+  }
+
+  my %zonedirector = (
+    'Ruckus Wireless ZD1106' => '.1.3.6.1.4.1.25053.3.1.5.2',
+    'Ruckus Wireless ZD1200' => '.1.3.6.1.4.1.25053.3.1.5.15',
+  );
+  foreach my $description (sort keys %zonedirector) {
+    $test->{info}->cache({
+      '_layers'      => 0,
+      '_description' => $description,
+      '_id'          => $zonedirector{$description},
+    });
+    isnt($test->{info}->device_type, 'SNMP::Info::Layer2::RuckusAP',
+      "ZoneDirector is not an access point: $description");
+    $test->{info}->clear_cache();
+  }
 
   # Layer 1
   $cache_data = {
@@ -1787,6 +1862,35 @@ sub private_load_attr : Tests(19) {
     # i_octet_out64 was walked again by a partial fetch, so its ENDOFMIBVIEW
     # walk shows only as the absence of a failure
     cmp_deeply($test->{info}->walk_failures(), [], 'no walk recorded a failure');
+  };
+}
+
+# net-snmp returns the whole OID as the tag, with an empty iid, for a row of
+# a column no loaded MIB defines, such as Layer3::DLink's dlink_serial_no.
+sub private_load_attr_non_leaf_tag : Tests(3) {
+  my $test   = shift;
+  my $column = '.1.3.6.1.4.1.171.12.1.1.12';
+  my $rows   = {1 => 'SERIAL-1', 2 => 'SERIAL-2'};
+
+  foreach my $case ([getnext => 0], [bulkwalk => 1]) {
+    my ($walk, $bulkwalk) = @{$case};
+    subtest "load_attr__non_leaf_tag_${walk}__returns_every_row" => sub {
+      plan tests => 1;
+      my $info = $test->_fresh_walk_info();
+      $test->mock_session->{Data}{$column} = {%{$rows}};
+      $info->bulkwalk($bulkwalk);
+      $info->{funcs}{non_leaf_oid} = $column;
+      cmp_deeply($info->non_leaf_oid(), $rows, "$walk stores each row by iid");
+    };
+  }
+
+  subtest 'load_attr__non_leaf_tag_partial__returns_that_row' => sub {
+    plan tests => 1;
+    my $info = $test->_fresh_walk_info();
+    $test->mock_session->{Data}{$column} = {%{$rows}};
+    $info->{funcs}{non_leaf_oid} = $column;
+    cmp_deeply($info->non_leaf_oid(2), {2 => 'SERIAL-2'},
+      'partial fetch stores the row under its iid');
   };
 }
 

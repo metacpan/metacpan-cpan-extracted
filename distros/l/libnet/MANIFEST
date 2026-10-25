@@ -30,6 +30,7 @@ MANIFEST                                 This list of files
 MANIFEST.SKIP                            Manifest skip specs
 README                                   The Instructions
 t/changes.t                              See if Changes file format is OK
+t/cmd_buffer_limits.t                    Test Net::Cmd response-buffer limits
 t/config.t                               Test script
 t/critic.t                               See if coding style is OK
 t/datasend.t                             Test script

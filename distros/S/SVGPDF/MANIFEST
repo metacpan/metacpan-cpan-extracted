@@ -94,6 +94,8 @@ t/regtest/08_path1t1.ref
 t/regtest/08_path1t1.svg
 t/regtest/09_text1.ref
 t/regtest/09_text1.svg
+t/regtest/09_text2.ref
+t/regtest/09_text2.svg
 t/regtest/09_tspan1.ref
 t/regtest/09_tspan1.svg
 t/regtest/10_transform1.ref

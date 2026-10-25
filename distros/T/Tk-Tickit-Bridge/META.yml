@@ -2,7 +2,10 @@
 abstract: 'forward Perl/Tk keyboard events to Tickit'
 author:
   - 'Copyright (c) 2026 Joel Roth.'
-build_requires: {}
+build_requires:
+  CPAN::Meta: '0'
+  Pod::Simple::Checker: '0'
+  Test::More: '0'
 configure_requires:
   Module::Build::Tiny: '0.039'
 dynamic_config: 0
@@ -15,16 +18,14 @@ name: Tk-Tickit-Bridge
 provides:
   Tk::Tickit::Bridge:
     file: lib/Tk/Tickit/Bridge.pm
-    version: '0.002'
+    version: '0.003'
   Tk::Tickit::Bridge::Loop:
     file: lib/Tk/Tickit/Bridge/Loop.pm
     version: '0.001'
-  Tk::TickitBridge:
-    file: lib/Tk/TickitBridge.pm
-    version: '0.001'
-  Tk::TickitBridge::Loop:
-    file: lib/Tk/TickitBridge/Loop.pm
-    version: '0.001'
-version: '0.002'
+requires:
+  Tickit: '0.70'
+  Tk: '0'
+  perl: '5.036'
+version: '0.003'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

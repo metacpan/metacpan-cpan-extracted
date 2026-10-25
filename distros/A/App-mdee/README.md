@@ -22,7 +22,7 @@ mdee - em·dee, Markdown Easy on the Eyes
          --[no-]rule        use Unicode rules for tables (default: on)
      -V  --cat-v            visualize whitespace via cat-v
      -w  --width=#          fold width (default: 80)
-     -t  --theme=#[,#,...]  color theme(s) (default: hashed,nomark)
+     -t  --theme=#[,#,...]  color theme(s) (default: hashed,nomark,markcell)
      -m  --mode=#           light or dark (default: light)
      -B  --base-color=#     override base color of theme
                             (e.g., Ivory, #780043, (120,0,67))
@@ -41,7 +41,7 @@ mdee - em·dee, Markdown Easy on the Eyes
 
 # VERSION
 
-Version 1.07
+Version 1.08
 
 # DESCRIPTION
 
@@ -222,6 +222,24 @@ Use [tecolicom/tap](https://github.com/tecolicom/homebrew-tap):
     `:---:` for center, `---:` for right) is respected.
     Default is enabled.
 
+    When folding is enabled, a table wider than `--width` is fit into
+    that width: columns that fit keep their width, and the cells of
+    over-wide columns are wrapped.  A table that already fits is not
+    changed.  Use `--config table_width=0` to disable wrapping, or
+    `--config table_width=N` to use a different width.  Per-column
+    widths can be given with `--config table_cell=SPEC`, where SPEC
+    is a colon-separated list passed to ansicolumn's `--cell` option
+    (for example `0:10` fixes the second column at 10 columns, and
+    `'<30'` caps every column at 30).  Marks can be put at the
+    start of cell lines, in place of the cell's leading space so that
+    column widths do not change.  `--config table_cell_mark=STRING`
+    marks the first line of every cell in a table that has a wrapped
+    cell; the default theme `markcell` sets it to `·` (U+00B7).
+    `--config table_wrap_mark=STRING` marks the second and later
+    lines of a wrapped cell, so that they are not read as new rows;
+    the theme `markwrap` sets it to `›` (U+203A).  Without these
+    themes no mark is used.
+
 - **--\[no-\]trim**
 
     Trim whitespace from table cell content before formatting.
@@ -257,7 +275,7 @@ Use [tecolicom/tap](https://github.com/tecolicom/homebrew-tap):
     Set the fold width for text wrapping.  Default is calculated from
     `--pane-width` minus 5 (margin for borders and padding), which
     gives 80 when pane-width is 85.  Only effective when `--fold` is
-    enabled.
+    enabled.  The same width is used to fit tables (see `--table`).
 
 ## Theme Options
 
@@ -267,16 +285,19 @@ bold text, etc.).
 
 - **-t** _NAME_, **--theme**=_NAME_\[,_NAME_,...\]
 
-    Select color themes.  The default is `hashed,nomark`, which
-    appends closing hashes to h3-h6 headers and hides markup
-    characters for a clean reading experience.
+    Select color themes.  The default is `hashed,nomark,markcell`,
+    which appends closing hashes to h3-h6 headers, hides markup
+    characters for a clean reading experience, and marks the rows of
+    tables whose cells are wrapped.
 
     Themes specified with `--theme` are added to the default, not
-    replacing it.  Multiple themes can be specified as comma-separated
-    names or by repeating the option.  Each theme is applied in order
-    as a transformation:
+    replacing it (`default[theme]` in the configuration file replaces
+    it).  Multiple themes can be specified as comma-separated names or
+    by repeating the option.  Each theme is applied in order as a
+    transformation, and when two themes set the same value the later
+    one wins:
 
-        mdee --theme=warm file.md         # hashed,nomark (default) + warm
+        mdee --theme=warm file.md         # hashed,nomark,markcell (default) + warm
         mdee --no-theme --theme=warm      # warm only (clear default first)
         mdee --no-theme file.md           # no theme (show all markup)
 
@@ -315,7 +336,8 @@ bold text, etc.).
         inline code backticks, and link brackets (`[`, `]`).
         Content text keeps its formatting (bold, italic,
         strikethrough, code, clickable links) but the surrounding
-        markers are not displayed.
+        markers are not displayed.  Table marks (`markcell`,
+        `markwrap`) are independent of this theme.
 
     - `warm`
 
@@ -326,6 +348,23 @@ bold text, etc.).
         Add decorative border lines (`#`) above and below h1 headings,
         using `=+` to append a text transformation while preserving the
         original heading color.
+
+    - `markcell` (default)
+
+        In a table that has wrapped cells, mark the first line of every
+        cell with `·` (U+00B7), so that the rows read like a bulleted
+        list and the continuation lines stand apart.  Tables that fit are
+        not marked.  Sets `table_cell_mark`; `nomark` does not affect it.
+        To use another character, set it in the configuration file or in a
+        theme of your own:
+
+            md_config+=(table_cell_mark=∙)    # U+2219
+
+    - `markwrap`
+
+        Mark the second and later lines of a wrapped table cell with `›`
+        (U+203A).  Sets `table_wrap_mark`.  It can be combined with
+        `markcell`.
 
     Use `-d` to dump current theme values in sourceable format.
 
@@ -416,7 +455,8 @@ bold text, etc.).
     All other keys are passed to the md module as config parameters.
     See ["Highlight Options"](#highlight-options) for the list of available color labels.
     The md module also accepts operational parameters such as
-    `table_trim`, `rule`, `osc8`, `tick_open`, `tick_close`, etc.
+    `table_trim`, `table_width`, `table_cell`, `rule`, `osc8`,
+    `tick_open`, `tick_close`, etc.
 
 ## Highlight Options
 
@@ -572,6 +612,11 @@ mechanism as theme files:
 
     # Enable md module features
     md_config+=(hashed.h3=1 hashed.h4=1 hashed.h5=1 hashed.h6=1)
+
+    # Use another character for the table cell mark
+    md_config+=(table_cell_mark=∙)
+
+These settings take precedence over the default themes.
 
 Changing the base color automatically affects all derived colors
 (h1, h2, bold, etc.) because the md module expands `${base}`

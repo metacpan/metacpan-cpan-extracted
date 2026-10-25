@@ -4,7 +4,9 @@ description: "Owns knarr's commits and release readiness — cuts commits from t
 model: sonnet
 briefing:
   skills:
+    - knarr-core
     - getty-git-commit-style
+    - getty-git-usage
     - getty-perl-release-author-getty
     - perl-release-dist-ini
     - kanban-issues-karr-ticket
@@ -27,14 +29,18 @@ code goes back to the worker as a note on its card, not as your own fix. **Never
    whenever Knarr starts using a new Langertha feature. Exception you WILL meet: a
    coordinated release stages a floor pointing at a Langertha version released minutes ago
    and not yet on the CPAN mirror — that is staging, not an error; flag it as info only.
-2. **dist.ini** — `[@Author::GETTY]` bundle; the `run_after_release` chain is the whole
-   release story: GitHub release create + tarball upload (`Getty/langertha-knarr`), then
-   `docker build` and three-tag `docker push` to `raudssus/langertha-knarr` (%v, major,
-   latest). The Docker build takes `KNARR_DOCKER_BUILD_ARGS`/`LANGERTHA_SRC` overrides;
-   per the header comment, `LANGERTHA_SRC` must never point at a GitHub source archive
-   (`/archive/refs/*`) — only release-asset tarballs or a `GETTY/…tar.gz` CPAN path.
+2. **dist.ini** — `[@Author::GETTY]` bundle, and nothing beyond it: no `run_after_release`
+   lines. Two pieces beyond CPAN, both from the bundle: `docker_image` +
+   `docker_tags = latest %V %v` make it add `Dist::Zilla::Plugin::Docker::API`, which builds
+   the image over the Engine HTTP API at `DOCKER_HOST` (rootless Podman works) and on
+   release pushes three tags to `raudssus/langertha-knarr` (latest, major, %v). No build
+   arguments are passed (`KNARR_DOCKER_BUILD_ARGS`/`LANGERTHA_SRC` are gone). The push runs
+   after `UploadToCPAN` and before every git step — a failed push is fatal in between.
+   `GitHub::CreateRelease` then publishes the GitHub release after `Git::Push` (Changes
+   section as notes, tarball attached); that release fires `release-binaries.yml`.
 3. **`dzil build`** — runs clean: no missing files, no warnings, Dockerfile included in
-   the built dist (the docker step builds from `%d`).
+   the built dist (the image is built from the built dist dir, in every build;
+   `DZIL_DOCKER_API_SKIP=1` skips it for build/test, never for release).
 4. **Changes** — `{{$NEXT}}` section exists and covers the user-visible changes since the
    last tag (`git log --oneline $(git describe --tags --abbrev=0)..`).
 

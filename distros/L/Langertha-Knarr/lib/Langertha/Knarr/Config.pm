@@ -1,9 +1,10 @@
 package Langertha::Knarr::Config;
-our $VERSION = '1.102';
+our $VERSION = '1.103';
 # ABSTRACT: YAML configuration loader and validator
 use Moo;
 use YAML::PP;
 use Carp qw( croak );
+use JSON::MaybeXS qw( is_bool );
 use Log::Any qw( $log );
 use Langertha ();
 
@@ -291,7 +292,8 @@ sub _build_proxy_api_key {
 
 sub has_proxy_api_key {
   my ($self) = @_;
-  return defined $self->proxy_api_key;
+  my $key = $self->proxy_api_key;
+  return defined $key && !ref $key && length $key ? 1 : 0;
 }
 
 has public_url => (
@@ -303,6 +305,235 @@ has public_url => (
 sub _build_public_url {
   my ($self) = @_;
   return $self->data->{public_url} // $ENV{KNARR_PUBLIC_URL} // undef;
+}
+
+
+has admin_key => (
+  is      => 'lazy',
+  builder => '_build_admin_key',
+);
+
+
+sub _build_admin_key {
+  my ($self) = @_;
+  return $self->data->{admin_key} // $ENV{KNARR_ADMIN_KEY} // undef;
+}
+
+sub has_admin_key {
+  my ($self) = @_;
+  my $key = $self->admin_key;
+  return defined $key && !ref $key && length $key ? 1 : 0;
+}
+
+
+sub admin_key_min_length { 16 }
+
+
+has remote_config => (
+  is      => 'lazy',
+  builder => '_build_remote_config',
+);
+
+
+sub _build_remote_config {
+  my ($self) = @_;
+  my $value = $self->data->{remote_config};
+  $value = _strip_quotes($ENV{KNARR_REMOTE_CONFIG}) unless defined $value;
+  return 0 unless defined $value && length $value;
+  return !$value || $value =~ /\A(?:false|no|off)\z/i ? 0 : 1;
+}
+
+my %TOKEN_AUTH_KEYS = map { $_ => 1 } qw(
+  backend dsn user password_env relation listen hash columns match_model
+);
+my %TOKEN_COLUMN_DEFAULTS = (
+  hash    => 'token_hash',
+  model   => 'model',
+  provider => 'provider',
+  expires => 'expires_at',
+);
+my %ROUTE_KEYS = map { $_ => 1 } qw( upstream provider key_env url );
+
+has token_auth => (
+  is      => 'lazy',
+  builder => '_build_token_auth',
+);
+
+
+sub _build_token_auth {
+  my ($self) = @_;
+  my $raw = $self->_section('token_auth');
+  return undef unless defined $raw;
+  my $columns = ref $raw->{columns} eq 'HASH' ? $raw->{columns} : {};
+  my $match = $raw->{match_model};
+  return {
+    %$raw,
+    hash        => $raw->{hash} // 'sha256',
+    columns     => { %TOKEN_COLUMN_DEFAULTS, %$columns },
+    match_model => ( defined $match && length $match ? _bool($match) : 1 ),
+  };
+}
+
+has routes => (
+  is      => 'lazy',
+  builder => '_build_routes',
+);
+
+
+sub _build_routes {
+  my ($self) = @_;
+  return $self->_section('routes') // {};
+}
+
+sub _bool {
+  my ($value) = @_;
+  return !$value || $value =~ /\A(?:false|no|off)\z/i ? 0 : 1;
+}
+
+# Errors of token_auth and routes, and of their conflicts with the other
+# settings (see validate). No text holds a value of the section.
+sub _token_auth_errors {
+  my ($self) = @_;
+  my $raw = $self->data->{token_auth};
+  my $routes = $self->data->{routes};
+  my @errors;
+
+  unless ( defined $raw ) {
+    push @errors, "routes needs token_auth" if defined $routes;
+    return @errors;
+  }
+
+  if ( ref $raw eq 'HASH' ) {
+    push @errors, "token_auth: unknown key '$_'"
+      for grep { !$TOKEN_AUTH_KEYS{$_} } sort keys %$raw;
+    my $backend = $raw->{backend};
+    push @errors, "token_auth: backend must be 'postgresql'"
+      unless defined $backend && !ref $backend && $backend eq 'postgresql';
+    for my $key (qw( dsn relation listen )) {
+      push @errors, "token_auth: $key is required and must be a non-empty string"
+        unless defined $raw->{$key} && !ref $raw->{$key} && length $raw->{$key};
+    }
+    push @errors, "token_auth: user must be a string" if ref $raw->{user};
+    if ( defined $raw->{password_env} ) {
+      push @errors, "token_auth: password_env must be the name of an environment variable,"
+        . " not the password"
+        unless !ref $raw->{password_env} && $raw->{password_env} =~ /\A[A-Za-z_][A-Za-z0-9_]*\z/;
+    }
+    push @errors, "token_auth: hash must be 'sha256'"
+      if defined $raw->{hash} && ( ref $raw->{hash} || $raw->{hash} ne 'sha256' );
+    if ( defined $raw->{columns} ) {
+      if ( ref $raw->{columns} eq 'HASH' ) {
+        for my $key ( sort keys %{ $raw->{columns} } ) {
+          push @errors, "token_auth: unknown columns key '$key'"
+            unless exists $TOKEN_COLUMN_DEFAULTS{$key};
+          push @errors, "token_auth: columns.$key must be a non-empty string"
+            if exists $TOKEN_COLUMN_DEFAULTS{$key}
+              && !( defined $raw->{columns}{$key} && !ref $raw->{columns}{$key}
+                    && length $raw->{columns}{$key} );
+        }
+      }
+      else {
+        push @errors, "token_auth: columns must be a mapping";
+      }
+    }
+    if ( defined $raw->{match_model} ) {
+      push @errors, "token_auth: match_model must be true or false"
+        unless is_bool( $raw->{match_model} )
+          || ( !ref $raw->{match_model}
+               && $raw->{match_model} =~ /\A(?:true|false|yes|no|on|off|0|1)\z/i );
+    }
+  }
+  else {
+    push @errors, "token_auth must be a mapping";
+  }
+
+  # routes
+  if ( !defined $routes ) {
+    push @errors, "token_auth needs routes";
+  }
+  elsif ( ref $routes ne 'HASH' || !%$routes ) {
+    push @errors, "routes must be a mapping of provider: route, with at least one route";
+  }
+  else {
+    my %known = map { lc $_->{engine} => 1 } @{ $self->engine_catalog };
+    for my $name ( sort keys %$routes ) {
+      my $route = $routes->{$name};
+      unless ( ref $route eq 'HASH' ) {
+        push @errors, "routes.$name must be a mapping";
+        next;
+      }
+      push @errors, "routes.$name: unknown key '$_'"
+        for grep { !$ROUTE_KEYS{$_} } sort keys %$route;
+      my $has_up = defined $route->{upstream} && length $route->{upstream};
+      my $has_pr = defined $route->{provider} && length $route->{provider};
+      push @errors, "routes.$name: needs exactly one of upstream and provider"
+        unless $has_up xor $has_pr;
+      push @errors, "routes.$name: key_env must be the name of an environment variable"
+        unless defined $route->{key_env} && !ref $route->{key_env}
+          && $route->{key_env} =~ /\A[A-Za-z_][A-Za-z0-9_]*\z/;
+      if ($has_up) {
+        push @errors, "routes.$name: upstream must be an http:// or https:// URL"
+          unless !ref $route->{upstream} && $route->{upstream} =~ m{\Ahttps?://[^\s/]}i;
+        push @errors, "routes.$name: url goes with provider, not with upstream"
+          if defined $route->{url};
+      }
+      if ($has_pr) {
+        push @errors, "routes.$name: unknown provider (see the engine catalog)"
+          unless !ref $route->{provider} && $known{ lc $route->{provider} };
+        push @errors, "routes.$name: url must be an http:// or https:// URL"
+          if defined $route->{url}
+            && ( ref $route->{url} || $route->{url} !~ m{\Ahttps?://[^\s/]}i );
+      }
+    }
+  }
+
+  # One identity scheme per Knarr: each of these would reach past the
+  # per-model token (a shared key opens every model, a static model or
+  # passthrough serves without a route) or is delivered over the admin route.
+  push @errors, "token_auth cannot be combined with proxy_api_key (or KNARR_API_KEY):"
+    . " a shared key would open every model the per-model token limits"
+    if $self->has_proxy_api_key;
+  push @errors, "token_auth cannot be combined with models: routing comes from routes"
+    if %{ $self->models };
+  push @errors, "token_auth cannot be combined with a default engine: routing comes from routes"
+    if $self->default_engine;
+  push @errors, "token_auth cannot be combined with passthrough: it would send the client's key upstream"
+    if %{ $self->passthrough };
+  push @errors, "token_auth cannot be combined with auto_discover: routing comes from routes"
+    if $self->auto_discover && _bool( $self->auto_discover );
+  push @errors, "token_auth cannot be combined with remote_config: the setup is not delivered"
+    if $self->remote_config;
+  return @errors;
+}
+
+# What an admin push may set (k75): the routing setup and the Langfuse
+# tracing. Everything else is bound when the process starts.
+my @RUNTIME_KEYS = qw(
+  models default passthrough auto_discover proxy_api_key
+  upstream_timeout upstream_stall_timeout probe_capabilities probe_timeout
+  langfuse
+);
+
+sub runtime_keys { @RUNTIME_KEYS }
+
+
+sub admin_errors {
+  my ($self) = @_;
+  my @errors;
+  my $min = $self->admin_key_min_length;
+  if ( $self->has_admin_key ) {
+    push @errors, "admin_key must be at least $min characters"
+      if length $self->admin_key < $min;
+    push @errors, "admin_key must differ from proxy_api_key"
+      if $self->has_proxy_api_key && $self->proxy_api_key eq $self->admin_key;
+  }
+  elsif ( defined $self->admin_key && ref $self->admin_key ) {
+    push @errors, "admin_key must be a string";
+  }
+  push @errors, "remote_config needs an admin_key (or KNARR_ADMIN_KEY): without one"
+    . " the setup can never be delivered"
+    if $self->remote_config && !$self->has_admin_key;
+  return @errors;
 }
 
 
@@ -504,7 +735,7 @@ sub validate {
   return $self->_error_text($@) unless eval { $self->data; 1 };
 
   # A section that is not a mapping croaks when read (k67)
-  for my $key (qw( models default langfuse logging a2a )) {
+  for my $key (qw( models default langfuse logging a2a token_auth routes )) {
     push @errors, $self->_error_text($@) unless eval { $self->_section($key); 1 };
   }
   for my $attr (qw( passthrough listen )) {
@@ -528,6 +759,7 @@ sub validate {
     unless ( eval { _seconds( user_agent_timeout => $def->{user_agent_timeout}, 0 ); 1 } ) {
       push @errors, "Model '$name': user_agent_timeout must be a number of seconds";
     }
+    push @errors, "Model '$name': api_key must be a string" if ref $def->{api_key};
   }
 
   if (my $default = $self->default_engine) {
@@ -540,9 +772,12 @@ sub validate {
     unless ( eval { _seconds( user_agent_timeout => $default->{user_agent_timeout}, 0 ); 1 } ) {
       push @errors, "Default: user_agent_timeout must be a number of seconds";
     }
+    push @errors, "Default: api_key must be a string" if ref $default->{api_key};
   }
 
-  unless (keys %$models || $self->default_engine) {
+  # Under remote_config the models may arrive later, by admin push (k75).
+  # Under token_auth the routing comes from routes.
+  unless (keys %$models || $self->default_engine || $self->remote_config || defined $self->data->{token_auth}) {
     push @errors, "No models configured and no default engine set";
   }
 
@@ -550,6 +785,13 @@ sub validate {
     next if eval { $self->$attr; 1 };
     push @errors, $self->_error_text($@);
   }
+
+  push @errors, "proxy_api_key must be a string"
+    if ref $self->proxy_api_key;
+
+  push @errors, $self->_token_auth_errors;
+
+  push @errors, $self->admin_errors;
 
   return @errors;
 }
@@ -701,7 +943,7 @@ Langertha::Knarr::Config - YAML configuration loader and validator
 
 =head1 VERSION
 
-version 1.102
+version 1.103
 
 =head1 SYNOPSIS
 
@@ -860,7 +1102,8 @@ non-negative number croaks when read, and L</validate> reports it.
 
 Optional shared secret that clients must present in the C<Authorization: Bearer>
 or C<x-api-key> header. Falls back to the C<KNARR_API_KEY> environment variable.
-When not set, the proxy is open (no auth required). It is never forwarded to a
+When not set -- or set to an empty string -- the proxy is open (no auth
+required); C<knarr start> warns about an explicitly empty key. It is never forwarded to a
 passthrough upstream; see L<Langertha::Knarr/auth_token>.
 
 =head2 public_url
@@ -875,6 +1118,104 @@ manifest takes the base URL from each request.
     if ($config->has_proxy_api_key) { ... }
 
 Returns true when a L</proxy_api_key> is configured.
+
+=head2 admin_key
+
+Optional secret for Knarr's admin routes under C</knarr/admin/> (see
+L<Langertha::Knarr::Admin>): the only key they accept, and a key no other
+route accepts. Falls back to the C<KNARR_ADMIN_KEY> environment variable.
+Unset or empty: the admin routes do not exist (C<404>). It must be at least
+L</admin_key_min_length> characters and differ from L</proxy_api_key>;
+L</validate> reports either. Prefer the environment variable: a key in the
+config file sits on disk.
+
+=head2 has_admin_key
+
+    if ($config->has_admin_key) { ... }
+
+True when a non-empty L</admin_key> is set.
+
+=head2 admin_key_min_length
+
+The shortest L</admin_key> Knarr accepts: C<16> characters.
+
+=head2 remote_config
+
+Boolean, default C<0>. Lets Knarr start without any model: it then answers
+every request except the admin routes with C<503> (C<not configured>) until
+a central service delivers the routing setup with C<PUT
+/knarr/admin/config>. What is in the config file (models, default engine,
+passthrough, proxy key, ...) is always in effect, with or without
+C<remote_config>; a delivered setup lies as a layer over it (same model
+name: the delivered one wins) and is held in memory only, so a restart
+forgets it. Needs an L</admin_key>. Falls back to
+C<KNARR_REMOTE_CONFIG>; C<knarr start --remote-config> sets it too.
+
+=head2 token_auth
+
+Optional HashRef, or C<undef> without a C<token_auth:> section: Knarr checks
+a short-lived token per model against a database view instead of one shared
+key (see L<Langertha::Knarr::Authorizer::Token>). The attribute holds the
+section with its defaults filled in:
+
+    token_auth:
+      backend: postgresql
+      dsn: dbi:Pg:host=db;dbname=platform
+      user: tester_knarr
+      password_env: TESTER_DB_PASSWORD   # name of the variable, never the password
+      relation: tester_token_auth        # view or table, optionally schema.name
+      listen: tester_token               # NOTIFY channel: issue and revocation
+      hash: sha256                       # default; sha256(token) in hex is looked up
+      columns: { hash: token_hash, model: model, provider: provider, expires: expires_at }
+      match_model: true                  # default
+
+C<backend> must be C<postgresql>; C<dsn>, C<relation> and C<listen> are
+required. C<columns> is optional with the defaults shown (C<token_hash>,
+C<model>, C<provider>, C<expires_at>), any other column key is an error, and
+so is any other key of the section. C<match_model> defaults to true. The
+password is only ever read from the environment variable C<password_env>
+names. C<token_auth> needs L</routes>, and excludes L</proxy_api_key>,
+L</models>, L</default_engine>, L</passthrough>, L</auto_discover> and
+L</remote_config>: see L</validate>. It is a start-time setting, never part
+of an admin push.
+
+=head2 routes
+
+HashRef of the C<provider> value of a token to the route its requests take,
+required with L</token_auth> and only valid with it:
+
+    routes:
+      local:     { upstream: http://api:8080/v1, key_env: SKEID_KEY }
+      openai:    { provider: openai,    key_env: OPENAI_API_KEY }
+      anthropic: { provider: anthropic, key_env: ANTHROPIC_API_KEY, url: https://eu.api.example }
+
+Each route has exactly one of C<upstream> (an OpenAI-compatible endpoint,
+C<http://> or C<https://>) and C<provider> (an engine of
+L</engine_catalog>, any case), and a C<key_env>: the name of the
+environment variable that holds the key Knarr uses there (read when a
+request comes). A C<provider> route may name another endpoint of that
+provider with C<url>. A token whose provider has no route is refused with
+C<403>. See L<Langertha::Knarr::Handler::TokenRoutes>.
+
+=head2 runtime_keys
+
+    my @keys = Langertha::Knarr::Config->runtime_keys;
+
+The top-level keys an admin push (C<PUT /knarr/admin/config>) may set:
+C<models>, C<default>, C<passthrough>, C<auto_discover>, C<proxy_api_key>,
+C<upstream_timeout>, C<upstream_stall_timeout>, C<probe_capabilities>,
+C<probe_timeout> and C<langfuse> (validated like in the file). Every other
+key takes effect only at start; C<logging> in particular never arrives by
+push.
+
+=head2 admin_errors
+
+    my @errors = $config->admin_errors;
+
+The part of L</validate> about L</admin_key> and L</remote_config>: the
+key's length, that it differs from L</proxy_api_key>, and that
+L</remote_config> has a key. The messages never contain a key. C<knarr start> runs it
+for every config, also one built by C<--from-env>.
 
 =head2 ollama_compat_version
 
@@ -1012,13 +1353,24 @@ and C<listen> when it is not a string or a list of strings: reading such a
 section croaks. Otherwise it checks that every model entry is a
 mapping with an
 C<engine> key, that the default engine (if set) has an C<engine> key,
-that at least one model or default engine is configured, that a model's
+that at least one model or default engine is configured (not under
+L</remote_config>), that a model's
 C<context_size> (and the default engine's), when set, is a positive integer, and its
 C<user_agent_timeout> a non-negative number, and that
 L</ollama_compat_version>, when set, is three dot-separated numbers, and that
 L</upstream_timeout>, L</upstream_stall_timeout> and L</probe_timeout> are
 non-negative numbers, and that L</workers> is a whole number of C<1> or
-more.
+more, plus everything L</admin_errors> checks.
+
+With a L</token_auth> section it checks the section (backend
+C<postgresql>, C<dsn>, C<relation> and C<listen>, C<hash> C<sha256>, known
+C<columns> keys, a C<password_env> that is a variable name), that every
+L</routes> entry has C<key_env> and exactly one of C<upstream> and
+C<provider> (a known engine), and reports L</token_auth> without
+C<routes>, C<routes> without L</token_auth>, and a L</token_auth> together
+with L</proxy_api_key> (or C<KNARR_API_KEY>), L</models>, a L</default_engine>,
+L</passthrough>, L</auto_discover> or L</remote_config>. No model is needed
+then. None of these messages holds a value of the section, only key names.
 
 =head2 scan_env
 

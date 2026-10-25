@@ -1,6 +1,6 @@
 package Langertha::Knarr::Handler::ACPClient;
 # ABSTRACT: Knarr handler that consumes a remote ACP (BeeAI) agent
-our $VERSION = '1.102';
+our $VERSION = '1.103';
 use Moose;
 use Future::AsyncAwait;
 use JSON::MaybeXS;
@@ -78,7 +78,7 @@ Langertha::Knarr::Handler::ACPClient - Knarr handler that consumes a remote ACP 
 
 =head1 VERSION
 
-version 1.102
+version 1.103
 
 =head1 SYNOPSIS
 

@@ -17,7 +17,7 @@ use Mojo::DOM58::_HTML 'tag_to_html';
 use Scalar::Util qw(blessed weaken);
 use Storable 'dclone';
 
-our $VERSION = '3.002';
+our $VERSION = '3.003';
 
 our @EXPORT_OK = 'tag_to_html';
 
@@ -266,13 +266,15 @@ sub _content {
 
 sub _css { Mojo::DOM58::_CSS->new(tree => shift->tree) }
 
-sub _fragment { _link(my $r = ['root', @_], [@_]); $r }
+sub _fragment { _link(my $r = ['root', @_], [@_], 1); $r }
 
 sub _link {
-  my ($parent, $children) = @_;
+  my ($parent, $children, $fragment) = @_;
 
-  # Link parent to children
+  # Link parent to children (raw text is only allowd in script and style elements)
+  my $raw = $fragment || $parent->[0] eq 'tag' && ($parent->[1] eq 'script' || $parent->[1] eq 'style');
   for my $node (@$children) {
+    $node->[0] = 'text' if $node->[0] eq 'raw' && !$raw;
     my $offset = $node->[0] eq 'tag' ? 3 : 2;
     $node->[$offset] = $parent;
     weaken $node->[$offset];
@@ -422,7 +424,8 @@ on L<Mojo::DOM>. It supports the L<HTML Living Standard|https://html.spec.whatwg
 and L<Extensible Markup Language (XML) 1.0|https://www.w3.org/TR/xml/>, and
 matching based on L<CSS3 selectors|https://www.w3.org/TR/selectors/>. It will
 even try to interpret broken HTML and XML, so you should not use it for
-validation.
+validation or sanitization. Its interpretation of broken markup can differ from
+that of a web browser.
 
 =head1 FORK INFO
 
@@ -431,7 +434,7 @@ closely compatible with upstream. It differs only in the standalone format and
 compatibility with Perl 5.8. Any bugs or patches not related to these changes
 should be reported directly to the L<Mojolicious> issue tracker.
 
-This release of L<Mojo::DOM58> is up to date with version C<9.40> of
+This release of L<Mojo::DOM58> is up to date with version C<9.53> of
 L<Mojolicious>.
 
 =head1 NODES AND ELEMENTS
@@ -469,8 +472,8 @@ names are lowercased and selectors need to be lowercase as well.
   my $dom = Mojo::DOM58->new('<P ID="greeting">Hi!</P>');
   say $dom->at('p[id]')->text;
 
-If an XML declaration is found, the parser will automatically switch into XML
-mode and everything becomes case-sensitive.
+If the document starts with an XML declaration, the parser will automatically
+switch into XML mode and everything becomes case-sensitive.
 
   # XML semantics
   my $dom = Mojo::DOM58->new('<?xml version="1.0"?><P ID="greeting">Hi!</P>');
@@ -1770,7 +1773,7 @@ upstream L<Mojolicious> issue tracker.
 
 =head1 AUTHOR
 
-Dan Book <dbook@cpan.org>
+Dan Book <book.d.wit@proton.me>
 
 Code and tests adapted from L<Mojo::DOM>, a lightweight DOM parser by the L<Mojolicious> team.
 

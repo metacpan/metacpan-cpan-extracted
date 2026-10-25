@@ -1,0 +1,29 @@
+title: The proxy key is checked on every chat route, as Bearer or x-api-key; right, wrong, missing
+setup:
+  config:
+    proxy_api_key: sk-proxy-secret-0001
+    models:
+      alpha: { engine: KnarrVirtual, model: v-alpha }
+  backends:
+    v-alpha: { fallback: { answer: "from alpha" } }
+steps:
+  - chat: { protocol: openai, model: alpha, prompt: x }
+    expect: { status: 401 }
+    backend: { v-alpha: { requests: 0 } }
+  - chat: { protocol: openai, model: alpha, prompt: x, bearer: wrong-key }
+    expect: { status: 401 }
+  - chat: { protocol: openai, model: alpha, prompt: x, bearer: sk-proxy-secret-0001 }
+    expect: { text: from alpha }
+  - chat: { protocol: openai, model: alpha, prompt: x, xkey: sk-proxy-secret-0001 }
+    expect: { text: from alpha }
+  - chat: { protocol: anthropic, model: alpha, prompt: x }
+    expect: { status: 401 }
+  - chat: { protocol: anthropic, model: alpha, prompt: x, xkey: wrong-key }
+    expect: { status: 401 }
+  - chat: { protocol: anthropic, model: alpha, prompt: x, xkey: sk-proxy-secret-0001 }
+    expect: { text: from alpha }
+  - chat: { protocol: ollama, model: alpha, prompt: x }
+    expect: { status: 401 }
+  - chat: { protocol: ollama, model: alpha, prompt: x, bearer: sk-proxy-secret-0001 }
+    expect: { text: from alpha }
+    backend: { v-alpha: { requests: 4 } }

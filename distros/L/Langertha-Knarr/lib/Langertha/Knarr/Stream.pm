@@ -1,6 +1,6 @@
 package Langertha::Knarr::Stream;
 # ABSTRACT: Async chunk iterator returned by streaming Knarr handlers
-our $VERSION = '1.102';
+our $VERSION = '1.103';
 use Moose;
 use Future;
 use Scalar::Util qw( blessed weaken );
@@ -29,12 +29,16 @@ sub from_callback {
   # The whole failure is kept, not just its message: a timeout's category
   # (the second value, k36) has to reach the protocol. A read already
   # waiting gets the failure too, not an undef that would end the stream
-  # as if it were complete.
+  # as if it were complete. With no read waiting, the failure comes after
+  # the chunks already queued (the source reads it once they are gone),
+  # never an undef: a producer that fails before the first read -- an
+  # engine that refuses at once -- must not look like an empty, complete
+  # stream (k78).
   my $fail = sub {
     @error = ( $_[0] // 'unknown error', @_[ 1 .. $#_ ] );
     $finished = 1;
-    if ( $pending && $error[0] ) { my $p = $pending; $pending = undef; $p->fail(@error) }
-    else                         { $deliver->(undef) }
+    return $deliver->(undef) unless $error[0];
+    if ( $pending ) { my $p = $pending; $pending = undef; $p->fail(@error) }
   };
 
   my $stream = $class->new(
@@ -208,7 +212,7 @@ Langertha::Knarr::Stream - Async chunk iterator returned by streaming Knarr hand
 
 =head1 VERSION
 
-version 1.102
+version 1.103
 
 =head1 SYNOPSIS
 
@@ -348,7 +352,10 @@ streamed usage is cumulative, so a later report wins, and an C<undef> or
 empty one is ignored. C<$model> sets L</upstream_model>; an C<undef> or
 empty name is ignored, a later one wins. Internally maintains a queue and
 pending Future so the consumer side can sit on C<next_chunk_f> without
-polling.
+polling. After C<$fail>, the chunks emitted before it are still read, then
+C<next_chunk_f> fails with the failure as given (category included) -- also
+when the producer fails before the first read, which is never taken for
+an empty, complete stream.
 
 This is the canonical replacement for the queue/pending/finished/error
 pump that engine-backed handlers used to inline.

@@ -4,8 +4,7 @@ use strict;
 use warnings;
 use Test::Most tests => 6;
 use Test::NoWarnings;
-use lib 't/lib';
-use MyLogger;
+use Test::Log::Abstraction;
 
 eval 'use autodie qw(:all)';	# Test for open/close failures
 
@@ -26,7 +25,7 @@ JSON: {
 	open (my $fin, '<', \$json);
 	local *STDIN = $fin;
 
-	my $i = new_ok('CGI::Info' => [ logger => MyLogger->new() ]);
+	my $i = new_ok('CGI::Info' => [ logger => Test::Log::Abstraction->new() ]);
 	ok(defined($i->params(allow => $allowed)));
 	ok($i->first() eq 'Nigel');
 	ok(!defined($i->foo()));

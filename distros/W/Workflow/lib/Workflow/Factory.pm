@@ -12,7 +12,7 @@ use Scalar::Util 'blessed';
 use Syntax::Keyword::Try;
 use Module::Runtime qw( require_module );
 
-$Workflow::Factory::VERSION = '2.11';
+$Workflow::Factory::VERSION = '2.12';
 
 # Extra action attribute validation is off by default for compatibility.
 our $VALIDATE_ACTION_CONFIG = 0;
@@ -79,9 +79,7 @@ sub _initialize_instance {
     unless ( $INSTANCES{$class} ) {
         $log->debug( "Creating empty instance of '$class' factory for ",
                      "singleton use" );
-        my $instance = bless {} => $class;
-        $instance->init();
-        $INSTANCES{$class} = $instance;
+        $INSTANCES{$class} = bless {} => $class;
     }
     return $INSTANCES{$class};
 }
@@ -835,7 +833,7 @@ Workflow::Factory - Generates new workflow and supporting objects
 
 =head1 VERSION
 
-This documentation describes version 2.11 of this package
+This documentation describes version 2.12 of this package
 
 =head1 SYNOPSIS
 

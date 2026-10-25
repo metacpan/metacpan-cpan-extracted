@@ -1,11 +1,49 @@
 #!/usr/bin/env perl
 
+# Thin wrapper: everything, including error reporting and the exit code,
+# lives in App::FileSync::CLI so it can be tested without a subprocess.
+
 use strict;
 use warnings;
+use autodie qw(:all);
 
 use FindBin qw($Bin);
+
+# A checkout's lib/ first, so bin/ runs the code beside it; an installed
+# copy finds the modules on @INC as usual.
 use lib "$Bin/../lib";
 
+use App::FileSync::Platform;
 use App::FileSync::CLI;
 
 exit App::FileSync::CLI::run_admin(@ARGV);
+
+__END__
+
+=head1 NAME
+
+filesync-admin - administer a filesync server root
+
+=head1 SYNOPSIS
+
+	filesync-admin --root /srv/filesync repo list
+
+Run C<filesync-admin help> for the full usage.
+
+=head1 DESCRIPTION
+
+See L<App::FileSync::CLI> and L<App::FileSync>.
+
+=head1 AUTHOR
+
+Nigel Horne, C<< <njh at nigelhorne.com> >>
+
+=head1 LICENCE AND COPYRIGHT
+
+Copyright 2026 Nigel Horne.
+
+Usage is subject to the GPL2 licence terms.
+If you use it,
+please let me know.
+
+=cut

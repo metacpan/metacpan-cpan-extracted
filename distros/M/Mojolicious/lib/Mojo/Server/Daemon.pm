@@ -80,8 +80,9 @@ sub _build_tx {
   $tx->res->headers->server('Mojolicious (Perl)');
   my $handle = $self->ioloop->stream($id)->timeout($self->inactivity_timeout)->handle;
   unless ($handle->isa('IO::Socket::UNIX')) {
-    $tx->local_address($handle->sockhost)->local_port($handle->sockport);
-    $tx->remote_address($handle->peerhost)->remote_port($handle->peerport);
+    my $addr = $c->{addr} //= [$handle->sockhost, $handle->sockport, $handle->peerhost, $handle->peerport];
+    $tx->local_address($addr->[0])->local_port($addr->[1]);
+    $tx->remote_address($addr->[2])->remote_port($addr->[3]);
   }
   $tx->req->url->base->scheme('https') if $c->{tls};
 
@@ -106,7 +107,7 @@ sub _build_tx {
       my $c = $self->{connections}{$id};
       $tx->res->headers->connection('close') if ($c->{requests} || 1) >= $self->max_requests || $req->error;
 
-      $tx->on(resume => sub { $self->_write($id) });
+      $tx->on(resume => sub { $self && $self->_write($id) });
       $self->_write($id);
     }
   );
@@ -141,7 +142,7 @@ sub _finish {
     if ($ws->handshake->res->code == 101) {
       $c->{tx} = $ws->established(1);
       weaken $self;
-      $ws->on(resume => sub { $self->_write($id) });
+      $ws->on(resume => sub { $self && $self->_write($id) });
       $self->_write($id);
       return $ws->server_read($tx->req->content->leftovers);
     }
@@ -200,8 +201,8 @@ sub _listen {
 
       $stream->on(close   => sub { $self && $self->_close($id) });
       $stream->on(error   => sub { $self && $self->app->log->error(pop) && $self->_close($id) });
-      $stream->on(read    => sub { $self->_read($id => pop) });
-      $stream->on(timeout => sub { $self->_trace($id, 'Inactivity timeout (see FAQ for more)') });
+      $stream->on(read    => sub { $self && $self->_read($id => pop) });
+      $stream->on(timeout => sub { $self && $self->_trace($id, 'Inactivity timeout (see FAQ for more)') });
     }
   );
 
@@ -245,7 +246,7 @@ sub _write {
   my $next = $tx->is_finished ? '_finish' : length $chunk ? '_write' : undef;
   return $self->ioloop->stream($id)->write($chunk) unless $next;
   weaken $self;
-  $self->ioloop->stream($id)->write($chunk => sub { $self->$next($id) });
+  $self->ioloop->stream($id)->write($chunk => sub { $self && $self->$next($id) });
 }
 
 1;

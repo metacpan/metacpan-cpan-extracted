@@ -1,0 +1,248 @@
+#!/usr/bin/env perl
+# bi-geocode -- Phase 6 geocode-cache warming CLI for Database::BI
+#
+# Opens a dataset spec, geocodes every distinct value of the named column,
+# and writes the resolved coordinates into the shared geocode cache in
+# models.json.  Subsequent map views for the same dataset serve from the
+# cache without making any geocoder requests.
+#
+# The script is idempotent: a second run against the same column with a
+# warm cache resolves zero additional places (and says so).
+#
+# Usage:
+#   bi-geocode --spec <l-spec> --col <column>
+#              [--data-dir <dir>] [--model-dir <dir>]
+#              [--openaddr <path>] [--region <CC>]
+#              [--dry-run] [--verbose]
+#
+# Exit codes:  0 = ok
+#              1 = column not found or no records loaded
+#              2 = bad arguments / data source unavailable
+#
+# Suitable for cron:
+#   0 2 * * * cd /opt/myapp && ./script/bi-geocode \
+#       --spec table:customers --col city --region US --verbose
+
+use strict;
+use warnings;
+
+use FindBin qw($Bin);
+use lib "$Bin/../lib";
+
+use Getopt::Long qw(GetOptions :config no_ignore_case);
+use File::Spec;
+use Mojo::JSON qw(decode_json encode_json);
+use Mojo::File;
+use POSIX qw(strftime);
+
+# ---------------------------------------------------------------------------
+# Parse arguments
+# ---------------------------------------------------------------------------
+
+my ($opt_spec, $opt_col, $opt_data_dir, $opt_model_dir,
+    $opt_openaddr, $opt_region, $opt_dry_run, $opt_verbose, $opt_help);
+
+GetOptions(
+	'spec|s=s'       => \$opt_spec,
+	'col|c=s'        => \$opt_col,
+	'data-dir|d=s'   => \$opt_data_dir,
+	'model-dir|m=s'  => \$opt_model_dir,
+	'openaddr|o=s'   => \$opt_openaddr,
+	'region|r=s'     => \$opt_region,
+	'dry-run|n'      => \$opt_dry_run,
+	'verbose|v'      => \$opt_verbose,
+	'help|h'         => \$opt_help,
+) or do { _usage(); exit 2 };
+
+if ($opt_help) { _usage(); exit 0 }
+
+unless (defined $opt_spec && length $opt_spec) {
+	warn "bi-geocode: --spec <l-spec> is required\n";
+	exit 2;
+}
+unless (defined $opt_col && length $opt_col) {
+	warn "bi-geocode: --col <column> is required\n";
+	exit 2;
+}
+
+my $data_dir  = $opt_data_dir  // 'data';
+my $model_dir = $opt_model_dir // '.bi';
+
+# ---------------------------------------------------------------------------
+# Load the data source
+# ---------------------------------------------------------------------------
+
+require Database::BI::Model::DataSource;
+
+my ($table, $path, $url);
+if ($opt_spec =~ /\Atable:(.+)\z/) {
+	$table = $1;
+} elsif ($opt_spec =~ /\Apath:(.+)\z/) {
+	$path = $1;
+} elsif ($opt_spec =~ /\Aurl:(.+)\z/) {
+	$url = $1;
+} else {
+	warn "bi-geocode: spec must start with table:, path:, or url:\n";
+	exit 2;
+}
+
+my $source = eval {
+	if (defined $table) {
+		Database::BI::Model::DataSource->new(
+			table     => $table,
+			directory => $data_dir,
+		);
+	} elsif (defined $path) {
+		my $f = Mojo::File->new($path);
+		Database::BI::Model::DataSource->new(
+			table     => $f->basename,
+			directory => $f->dirname->to_string,
+		);
+	} else {
+		Database::BI::Model::DataSource->new(url => $url);
+	}
+};
+if ($@ || !defined $source) {
+	(my $e = $@ // 'unknown error') =~ s/ at \S+ line \d+\.?\n?$//;
+	warn "bi-geocode: could not open data source: $e\n";
+	exit 2;
+}
+
+my $records = eval { $source->fetch_all };
+if ($@ || !defined $records || !@$records) {
+	(my $e = $@ // '') =~ s/ at \S+ line \d+\.?\n?$//;
+	warn "bi-geocode: no records loaded" . ($e ? ": $e" : '') . "\n";
+	exit 1;
+}
+
+# Validate column
+my $columns = $source->columns // [ keys %{ $records->[0] } ];
+my %col_set = map { $_ => 1 } @$columns;
+unless ($col_set{$opt_col}) {
+	warn "bi-geocode: column \"$opt_col\" not found in dataset\n";
+	warn "  available: " . join(', ', sort keys %col_set) . "\n";
+	exit 1;
+}
+
+_log("Loaded %d records from %s", scalar @$records, $opt_spec);
+
+# ---------------------------------------------------------------------------
+# Load models / geocode cache
+# ---------------------------------------------------------------------------
+
+my $models_file = Mojo::File->new($model_dir, 'models.json');
+my $models = {};
+if (-f $models_file) {
+	eval { $models = decode_json($models_file->slurp) };
+	warn "bi-geocode: could not read models.json: $@\n" if $@;
+}
+
+require Database::BI::Model::Geocode;
+
+my $cache_spec = $opt_spec . '|loc=' . $opt_col;
+my $legacy  = Database::BI::Model::Geocode->cache_from_models($models, $cache_spec);
+my $shared  = Database::BI::Model::Geocode->shared_cache_from_models($models);
+my %cache   = (%$legacy, %$shared);
+
+my %args;
+$args{openaddr} = $opt_openaddr if defined $opt_openaddr && length $opt_openaddr;
+
+my $geocode = Database::BI::Model::Geocode->new(%args);
+
+my %opts;
+$opts{cache} = \%cache;
+$opts{max}   = 0;  # no cap for the warming script
+if (defined $opt_region && $opt_region =~ /\A[A-Za-z]{2}\z/) {
+	$opts{region} = $opt_region;
+}
+
+# ---------------------------------------------------------------------------
+# Resolve
+# ---------------------------------------------------------------------------
+
+my $t0 = time;
+my $result = $geocode->resolve_column($records, $opt_col, %opts);
+my $elapsed = time - $t0;
+
+my $counts   = $result->{counts};
+my $messages = $result->{messages};
+
+_log("Resolved %d/%d distinct places in %ds",
+	$counts->{plotted} // 0, $counts->{distinct} // 0, $elapsed);
+_log("  cache hits: %d  new: %d  unresolved: %d",
+	$counts->{cache_hit} // 0, $counts->{attempted} // 0,
+	($counts->{distinct} // 0) - ($counts->{plotted} // 0));
+
+for my $msg (@$messages) {
+	_log("  [%s] %s", $msg->{key} // 'info', $msg->{text} // '');
+}
+
+# ---------------------------------------------------------------------------
+# Persist
+# ---------------------------------------------------------------------------
+
+if ($opt_dry_run) {
+	_log("Dry run: cache not written.");
+	exit 0;
+}
+
+if ($counts->{attempted} // 0) {
+	my $backend = $result->{backend};
+	my $updated = Database::BI::Model::Geocode->models_with_shared_cache(
+		$models, $result->{cache},
+		(defined($backend) ? (backend => $backend) : ()),
+		built => strftime('%Y-%m-%dT%H:%M:%SZ', gmtime),
+	);
+
+	eval {
+		Mojo::File->new($model_dir)->make_path;
+		my $tmp = Mojo::File->new($models_file . '.tmp');
+		$tmp->spurt(encode_json($updated));
+		rename $tmp->to_string, $models_file->to_string
+			or die "rename failed: $!\n";
+	};
+	if ($@) {
+		(my $e = $@) =~ s/ at \S+ line \d+\.?\n?$//;
+		warn "bi-geocode: could not write models.json: $e\n";
+		exit 2;
+	}
+	_log("Cache written to %s", $models_file->to_string);
+} else {
+	_log("Nothing new to write (all places already cached).");
+}
+
+exit 0;
+
+# ---------------------------------------------------------------------------
+# Helpers
+# ---------------------------------------------------------------------------
+
+sub _log {
+	return unless $opt_verbose;
+	my ($fmt, @args) = @_;
+	printf STDERR "$fmt\n", @args;
+}
+
+sub _usage {
+	print STDERR <<'USAGE';
+Usage: bi-geocode --spec <l-spec> --col <column> [options]
+
+Required:
+  --spec, -s <spec>     Dataset spec: table:<name>, path:</abs/path>, url:<url>
+  --col,  -c <column>   Column holding place names to geocode
+
+Options:
+  --data-dir,  -d <dir>   Data directory (default: data)
+  --model-dir, -m <dir>   Model store directory (default: .bi)
+  --openaddr,  -o <path>  Path to an OpenAddresses data directory for Geo::Coder::Free
+  --region,    -r <CC>    ISO 3166-1 alpha-2 region hint (e.g. US, GB)
+  --dry-run,   -n         Resolve but do not write the cache
+  --verbose,   -v         Print progress to STDERR
+  --help,      -h         Show this message
+
+Exit codes:
+  0 = success
+  1 = column not found or no records
+  2 = bad arguments or data source error
+USAGE
+}

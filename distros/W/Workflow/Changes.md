@@ -1,5 +1,16 @@
 # Revision history for the Workflow Perl Distribution
 
+## 2.12 2026-10-24 maintenance release, update not required
+
+### Changed
+
+- `Workflow::Factory` no longer calls `init()` when constructing its singleton instance. The call was a no-op inherited from `Workflow::Base`, invoked without arguments on an empty instance, and never documented as an extension point. If you subclass `Workflow::Factory` and override `init()`, that method is no longer invoked. Issue [#290](https://github.com/perl-workflow/perl-workflow/issues/290) reported by @ehuelsmann, fixed via PR [#297](https://github.com/perl-workflow/perl-workflow/pull/297)
+
+### Documentation
+
+- Added missing whatis entries (the brief description after the hyphen) to the `NAME` sections of `Workflow::Condition::LazyAND`, `Workflow::Condition::LazyOR`, `Workflow::Manual::Configuration` and `Workflow::Manual::Overview`, so they are picked up by `apropos` and `whatis`. PR [#302](https://github.com/perl-workflow/perl-workflow/pull/302) by @sean-anderson-brivo
+- Fixed an unresolved internal POD link in `Workflow`: the `add_observer` documentation linked to `notify_observers`, which did not match the actual heading `notify_observers( @arguments )`. PR [#304](https://github.com/perl-workflow/perl-workflow/pull/304)
+
 ## 2.11 2026-08-10 bug fix release, update recommended
 
 ### Fixed

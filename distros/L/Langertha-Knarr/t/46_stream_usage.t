@@ -342,6 +342,18 @@ my %UPSTREAM = (
     { choices => [ { index => 0, delta => {}, finish_reason => 'stop' } ],
       usage => { prompt_tokens => 13, completion_tokens => 5, total_tokens => 18 } },
   ],
+  # Like OpenAI itself: the usage frame (_asked) only for stream_options.include_usage
+  ask => [
+    { choices => [ { index => 0, delta => { role => 'assistant', content => 'Hi' } } ] },
+    { choices => [ { index => 0, delta => {}, finish_reason => 'stop' } ] },
+    { _asked => 1, choices => [], usage => { prompt_tokens => 17, completion_tokens => 9, total_tokens => 26 } },
+  ],
+  'ask-tool' => [
+    { choices => [ { index => 0, delta => { role => 'assistant', tool_calls => [ { index => 0, id => 'call_1',
+      type => 'function', function => { name => 'get_weather', arguments => '{"city":"Berlin"}' } } ] } } ] },
+    { choices => [ { index => 0, delta => {}, finish_reason => 'tool_calls' } ] },
+    { _asked => 1, choices => [], usage => { prompt_tokens => 31, completion_tokens => 12, total_tokens => 43 } },
+  ],
 );
 my @upstream_bodies;
 my $upstream = Net::Async::HTTP::Server->new(
@@ -350,7 +362,9 @@ my $upstream = Net::Async::HTTP::Server->new(
     my $body = $json->decode( $r->body );
     push @upstream_bodies, $body;
     my $frames = $UPSTREAM{ $body->{model} } or return $r->respond( HTTP::Response->new(404) );
-    my $sse = join '', ( map { 'data: ' . $json->encode( { model => "$body->{model}-upstream", %$_ } ) . "\n\n" } @$frames ),
+    my $asked = ref $body->{stream_options} eq 'HASH' && $body->{stream_options}{include_usage};
+    my @frames = map { my %f = %$_; delete $f{_asked} ? ( $asked ? \%f : () ) : \%f } @$frames;
+    my $sse = join '', ( map { 'data: ' . $json->encode( { model => "$body->{model}-upstream", %$_ } ) . "\n\n" } @frames ),
       "data: [DONE]\n\n";
     my $resp = HTTP::Response->new(200);
     $resp->header( 'Content-Type' => 'text/event-stream' );
@@ -387,6 +401,57 @@ subtest 'real core engine: usage from the stream chunks' => sub {
     }
     else {
       is $stream->usage, undef, 'inc: no usage, no failure';
+    }
+  }
+};
+
+# A routed stream does not depend on the client asking: core's
+# chat_stream_request asks an engine that claims stream_usage for the usage
+# itself (Knarr passes no stream_options on). Its frame comes after the finish
+# chunk as a content-less, non-final chunk: it must neither reach the client as
+# an empty delta nor take the finish reason or the tool calls with it (k77).
+
+subtest 'core that asks for the usage: a routed stream carries it' => sub {
+  skip_all 'needs Langertha::Role::StreamUsage (a Langertha whose stream request asks for the usage)'
+    unless eval { require Langertha::Role::StreamUsage; 1 };
+  my $tools = [ { type => 'function', function => { name => 'get_weather',
+    parameters => { type => 'object', properties => { city => { type => 'string' } } } } } ];
+
+  for my $model ( 'ask', 'ask-tool' ) {
+    my $engine = Langertha::Engine::OpenAI->new(
+      url => "http://127.0.0.1:$uport/v1", api_key => 'test', model => $model,
+    );
+    my $tracer = RecTracer->new;
+    my $log    = RecLog->new;
+    my $req = Langertha::Knarr::Request->new(
+      protocol => 'openai', model => $model, stream => 1,
+      messages => [ { role => 'user', content => 'hi' } ],
+      ( $model eq 'ask-tool' ? ( tools => $tools ) : () ),
+    );
+    my $stream = Langertha::Knarr::Handler::Tracing->new(
+      wrapped => Langertha::Knarr::Handler::RequestLog->new(
+        wrapped     => Langertha::Knarr::Handler::Engine->new( engine => $engine ),
+        request_log => $log,
+      ),
+      tracing => $tracer,
+    )->handle_stream_f( $session, $req )->get;
+    my @chunks;
+    while ( defined( my $c = $loop->await( $stream->next_chunk_f )->get ) ) { push @chunks, $c }
+
+    is $upstream_bodies[-1]{stream_options}, { include_usage => JSON::MaybeXS::true() },
+      "$model: core asked the upstream for the usage";
+    is counts( $stream->usage ), $model eq 'ask' ? [ 17, 9, 26 ] : [ 31, 12, 43 ], "$model: usage of the frame after the finish chunk";
+    is counts( $tracer->ended->{usage} ), counts( $stream->usage ), "$model: trace has the usage";
+    is counts( $log->ended->{usage} ), counts( $stream->usage ), "$model: request log has the usage";
+    if ( $model eq 'ask' ) {
+      is \@chunks, ['Hi'], 'ask: the content chunk only, no empty one for the usage frame';
+      is $stream->finish_reason, 'stop', 'ask: finish reason kept';
+    }
+    else {
+      is \@chunks, [], 'ask-tool: no content chunk, no empty one for the usage frame';
+      is $stream->finish_reason, 'tool_calls', 'ask-tool: finish reason kept';
+      is [ map { [ $_->name, $_->arguments ] } @{ $stream->tool_calls } ], [ [ 'get_weather', { city => 'Berlin' } ] ],
+        'ask-tool: tool call kept';
     }
   }
 };

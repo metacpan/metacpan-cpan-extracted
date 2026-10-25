@@ -1,8 +1,9 @@
 package Langertha::Knarr::Protocol::A2A;
 # ABSTRACT: Google Agent2Agent (A2A) wire protocol for Knarr
 
-our $VERSION = '1.102';
+our $VERSION = '1.103';
 use Moose;
+use Carp qw( croak );
 use JSON::MaybeXS;
 use Data::UUID;
 use Time::HiRes qw( time );
@@ -85,6 +86,8 @@ sub protocol_routes {
 sub parse_chat_request {
   my ($self, $http_req, $body_ref) = @_;
   my $env = $self->_json->decode( $$body_ref || '{}' );
+  # JSON that is no object (null would pass as an empty request): -32600.
+  croak('request is not a JSON object') unless ref $env eq 'HASH';
   my $method = $env->{method} // '';
   my $params = $env->{params} // {};
   my $stream = $method eq 'tasks/sendSubscribe' ? 1 : 0;
@@ -181,6 +184,62 @@ sub format_stream_close {
 
 sub format_stream_done { '' }
 
+# JSON-RPC's error object (k79): -32603 Internal error for a server-side
+# status, -32600 Invalid Request for a client-side one; the HTTP status in
+# data. The id is the request's: from the parsed request, else read off the
+# raw body (the 401 comes before the parse), else null -- JSON-RPC 2.0: null
+# when the id could not be detected. A body that is not JSON at all is the
+# failure of the parse: 400, -32700 Parse error, id null, the decoder's own
+# text kept out of the answer (k80).
+sub _rpc_error {
+  my ($self, $status, $message, $request, $body) = @_;
+  my ($id, $code) = ( undef, $status >= 500 ? -32603 : -32600 );
+  if ( $request ) {
+    $id = $request->extra->{jsonrpc_id};
+  }
+  elsif ( defined $body && length $body ) {
+    my $env;
+    my $decoded = eval { $env = $self->_json->decode($body); 1 };
+    if ( !$decoded && $status == 500 ) {
+      ( $status, $code, $message ) = ( 400, -32700, 'Parse error' );
+    }
+    elsif ( ref $env eq 'HASH' ) {
+      $id = $env->{id} if defined $env->{id} && !ref $env->{id};
+    }
+    elsif ( $status == 500 ) {
+      ( $status, $code, $message ) = ( 400, -32600, 'Invalid Request' );
+    }
+  }
+  return {
+    jsonrpc => '2.0',
+    id      => $id,
+    error   => {
+      code    => $code,
+      message => "$message",
+      data    => { status => $status + 0 },
+    },
+  };
+}
+
+sub error_uses_body { 1 }
+
+# A body that is not JSON is answered by _rpc_error as -32700 / -32600 (k80).
+sub request_body_error { return }
+
+
+sub format_error_response {
+  my ($self, $status, $message, $request, $body) = @_;
+  my $error = $self->_rpc_error( $status, $message, $request, $body );
+  return ( $error->{error}{data}{status}, { 'Content-Type' => 'application/json' },
+    $self->_json->encode($error) );
+}
+
+
+sub format_stream_error {
+  my ($self, $status, $message, $request) = @_;
+  return "data: " . $self->_json->encode( $self->_rpc_error( $status, $message, $request ) ) . "\n\n";
+}
+
 __PACKAGE__->meta->make_immutable;
 1;
 
@@ -196,7 +255,7 @@ Langertha::Knarr::Protocol::A2A - Google Agent2Agent (A2A) wire protocol for Kna
 
 =head1 VERSION
 
-version 1.102
+version 1.103
 
 =head1 DESCRIPTION
 
@@ -238,6 +297,22 @@ L</agent_name>, L</agent_description>, Knarr's own version
 C<streaming: true>; pass a whole
 card to advertise specific skills, version, etc. (L</agent_name> and
 L</agent_description> are then not used).
+
+=head2 format_error_response
+
+    my ($status, $headers, $body) = $proto->format_error_response( 500, 'boom', $request, $raw_body );
+
+A2A answers an error as a JSON-RPC response with an C<error> object (C<code>,
+C<message>, C<data.status>) and the C<id> of the request, not the OpenAI
+wire's C<{"error":{"message":...}}>. The HTTP status is kept. The C<id> comes
+from the parsed request, else from the raw body (a C<401> is decided before
+the parse), else it is C<null>. A 500 whose body is not JSON was a failed
+parse: it becomes 400 with C<-32700> C<Parse error>, and C<id> C<null>, as
+JSON-RPC 2.0 requires when the id cannot be detected.
+
+=head2 format_stream_error
+
+The same JSON-RPC error response as an SSE event; it ends the stream.
 
 =head1 SUPPORT
 

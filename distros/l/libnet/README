@@ -46,16 +46,14 @@ FEEDBACK
     include a transcript of a run.)
 
     Currently active requests on the CPAN Request Tracker can be viewed at
-    <https://rt.cpan.org/Public/Dist/Display.html?Status=Active;Queue=libnet>.
+    <https://rt.cpan.org/Public/Dist/Display.html?Queue=libnet>.
 
-    Please test this distribution.  See CPAN Testers Reports at
+    Please test this distribution.  See CPAN Testers at
     <https://www.cpantesters.org/> for details of how to get involved.
 
-    Previous test results on CPAN Testers Reports can be viewed at
-    <https://www.cpantesters.org/distro/L/libnet.html>.
-
-    Please rate this distribution on CPAN Ratings at
-    <https://cpanratings.perl.org/rate/?distribution=libnet>.
+    Previous test results on CPAN Testers can be viewed at
+    <https://www.cpantesters.org/distro/L/libnet.html> and
+    <https://fast2-matrix.cpantesters.org/?dist=libnet>.
 
 AVAILABILITY
 
@@ -78,7 +76,7 @@ INSTALLATION
 COPYRIGHT
 
     Copyright (C) 1996-2007 Graham Barr.  All rights reserved.
-    Copyright (C) 2013-2017, 2020-2023 Steve Hay.  All rights reserved.
+    Copyright (C) 2013-2017, 2020-2023, 2026 Steve Hay.  All rights reserved.
 
 LICENCE
 

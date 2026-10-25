@@ -18,7 +18,7 @@ knarr - Langertha LLM Proxy with Langfuse Tracing
 
 =head1 VERSION
 
-version 1.102
+version 1.103
 
 =head1 SYNOPSIS
 
@@ -124,7 +124,19 @@ that exits (pausing up to 30 seconds when one keeps dying right after its
 start or cannot be forked, while the others serve on) and passes
 C<SIGTERM>/C<SIGINT> on to all of them, exiting once they are gone. Each worker keeps its own sessions: a Raider conversation
 continues only when its next request reaches the same worker, which
-nothing guarantees.
+nothing guarantees. With the admin key set (C<KNARR_ADMIN_KEY>) the
+count is set to C<1> with a warning: a delivered setup lives in one
+process's memory.
+
+=item B<--remote-config>
+
+Allow a start without models; take the routing setup from
+C<PUT /knarr/admin/config>, laid over the config file's setup and held in
+memory only, gone on restart (see L<Langertha::Knarr::Admin>). Until a setup
+is there (config file or push), every other request answers C<503>. Needs
+C<KNARR_ADMIN_KEY> (or C<admin_key:>); no config file is needed, and
+C<--from-env> is then ignored. Same as C<remote_config: true> or
+C<KNARR_REMOTE_CONFIG=1>.
 
 =item B<-n>, B<--trace-name> I<name>
 

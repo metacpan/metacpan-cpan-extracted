@@ -5,9 +5,7 @@ use warnings;
 
 use Test::Most tests => 33;
 use Data::Dumper;
-
-use lib 't/lib';
-use MyLogger;
+use Test::Log::Abstraction;
 
 BEGIN { use_ok('CGI::Info') }
 
@@ -44,7 +42,7 @@ ROBOT: {
 	$ENV{'REMOTE_ADDR'} = '82.94.176.140';
 	$ENV{'HTTP_USER_AGENT'} = 'Mozilla/4.0 (compatible;  Vagabondo/4.0; webcrawler at wise-guys dot nl; http://webagent.wise-guys.nl/; http://www.wise-guys.nl/)';
 	$i = new_ok('CGI::Info' => [
-		logger => MyLogger->new()
+		logger => Test::Log::Abstraction->new()
 	]);
 	ok($i->is_robot() == 1);
 	ok($i->browser_type() eq 'robot');
@@ -90,7 +88,7 @@ ROBOT: {
 		logger => \@messages,
 	]);
 	$i->cache($cache);
-	$i->set_logger(logger => MyLogger->new());
+	$i->set_logger(logger => Test::Log::Abstraction->new());
 	ok($i->is_robot() == 1);
 	SKIP: {
 		skip 'Test requires CHI access', 2 unless($cache);
@@ -103,7 +101,7 @@ ROBOT: {
 		logger => \@messages,
 	]);
 	$i->cache($cache);
-	$i->set_logger(MyLogger->new());
+	$i->set_logger(Test::Log::Abstraction->new());
 	ok($i->is_robot() == 1);
 	cmp_ok($i->status(), '==', 200, 'Default HTTP status is 200');
 

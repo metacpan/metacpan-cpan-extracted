@@ -1,3 +1,22 @@
+Revision history for WWW-Crawl4AI
+
+0.007     2026-10-25 00:49:59Z
+
+ - do_request now raises a type=transport error (status_code 0) also for the
+   synthetic 500 that LWP::UserAgent returns on connection failure (marked by
+   the 'Client-Warning: Internal response' header), not only for status 599.
+   Previously an unreachable server surfaced as type=api, status 500.
+ - SYNOPSIS: enable the 'say' feature so the example runs as written
+ - A redirect is not followed, a 3xx is an error that names the
+   status, the method and the path
+ - An answer that is no JSON is an error that names the status, the
+   method and the path
+ - The task id is encoded as one path segment
+ - The distribution declares LWP::Protocol::https, without it every
+   https target fails
+ - The declared prerequisites are checked by a test that reads the
+   cpanfile
+
 0.006     2026-09-19 17:09:50Z
 
  - The chain win/continue decision now runs through an overridable

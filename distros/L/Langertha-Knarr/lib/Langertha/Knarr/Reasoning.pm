@@ -1,6 +1,6 @@
 package Langertha::Knarr::Reasoning;
 # ABSTRACT: Map a face's native reasoning controls onto the normalized reasoning_effort level
-our $VERSION = '1.102';
+our $VERSION = '1.103';
 use Moose;
 use Carp qw( croak );
 use JSON::MaybeXS ();
@@ -146,7 +146,7 @@ Langertha::Knarr::Reasoning - Map a face's native reasoning controls onto the no
 
 =head1 VERSION
 
-version 1.102
+version 1.103
 
 =head1 SYNOPSIS
 

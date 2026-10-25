@@ -1,0 +1,65 @@
+title: Tool definitions reach the backend and its tool calls come back in each protocol's shape
+setup:
+  config:
+    models:
+      tooly: { engine: KnarrVirtual, model: v-tool }
+  backends:
+    v-tool:
+      rules:
+        "Weather in Berlin?":
+          tool_calls:
+            - [ get_weather, { city: Berlin } ]
+      after:
+        get_weather: { answer: "It is sunny in Berlin." }
+steps:
+  - chat:
+      protocol: openai
+      model: tooly
+      prompt: "Weather in Berlin?"
+      tools:
+        - { name: get_weather, description: Current weather, parameters: { type: object, properties: { city: { type: string } }, required: [ city ] } }
+    expect:
+      finish_reason: tool_calls
+      tool_calls:
+        - { name: get_weather, args: { city: Berlin } }
+    backend:
+      v-tool: { requests: 1, calls: 1, tools: [ get_weather ] }
+  - chat:
+      protocol: anthropic
+      model: tooly
+      prompt: "Weather in Berlin?"
+      tools:
+        - { name: get_weather, description: Current weather, parameters: { type: object, properties: { city: { type: string } }, required: [ city ] } }
+    expect:
+      finish_reason: tool_use
+      tool_calls:
+        - { name: get_weather, args: { city: Berlin } }
+    backend:
+      v-tool: { requests: 2, calls: 2, tools: [ get_weather ] }
+  - chat:
+      protocol: ollama
+      model: tooly
+      prompt: "Weather in Berlin?"
+      tools:
+        - { name: get_weather, description: Current weather, parameters: { type: object, properties: { city: { type: string } }, required: [ city ] } }
+    expect:
+      tool_calls:
+        - { name: get_weather, args: { city: Berlin } }
+    backend:
+      v-tool: { requests: 3, calls: 3, tools: [ get_weather ] }
+  # the client runs the tool and sends the result back: the backend answers from it
+  - chat:
+      protocol: openai
+      model: tooly
+      messages:
+        - { role: user, content: "Weather in Berlin?" }
+        - role: assistant
+          content: null
+          tool_calls:
+            - { id: call_1, type: function, function: { name: get_weather, arguments: '{"city":"Berlin"}' } }
+        - { role: tool, tool_call_id: call_1, content: sunny }
+      tools:
+        - { name: get_weather }
+    expect:
+      text: It is sunny in Berlin.
+      finish_reason: stop

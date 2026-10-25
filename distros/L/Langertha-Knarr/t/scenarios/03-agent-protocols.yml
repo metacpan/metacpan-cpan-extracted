@@ -1,0 +1,25 @@
+title: A2A and ACP clients reach the backend (A2A through the default engine, ACP by agent name)
+setup:
+  config:
+    default: { engine: KnarrVirtual, model: v-agent }
+    models:
+      worker: { engine: KnarrVirtual, model: v-worker }
+  backends:
+    v-agent:
+      rules:
+        "plan the trip": { answer: "Agent plan" }
+    v-worker:
+      rules:
+        "do the job": { answer: "Worker done" }
+steps:
+  - chat: { protocol: a2a, prompt: plan the trip }
+    expect:
+      text: Agent plan
+      state: completed
+    backend:
+      v-agent: { requests: 1, last_user_text: plan the trip }
+  - chat: { protocol: acp, model: worker, prompt: do the job }
+    expect:
+      text: Worker done
+    backend:
+      v-worker: { requests: 1, last_user_text: do the job }

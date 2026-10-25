@@ -1,0 +1,23 @@
+title: Without a default engine an unknown model answers 404 in the protocol's error shape
+setup:
+  config:
+    models:
+      alpha: { engine: KnarrVirtual, model: v-alpha }
+  backends:
+    v-alpha: { fallback: { answer: "from alpha" } }
+steps:
+  - chat: { protocol: openai, model: nobody, prompt: x }
+    expect:
+      status: 404
+      body_like: nobody
+      json: { 'error.message': "Model 'nobody' is not configured and there is no default engine" }
+  - chat: { protocol: anthropic, model: nobody, prompt: x }
+    expect:
+      status: 404
+      json: { type: error, 'error.type': not_found_error }
+  - chat: { protocol: ollama, model: nobody, prompt: x }
+    expect:
+      status: 404
+      body_like: nobody
+  - chat: { protocol: openai, model: alpha, prompt: x }
+    expect: { text: from alpha }

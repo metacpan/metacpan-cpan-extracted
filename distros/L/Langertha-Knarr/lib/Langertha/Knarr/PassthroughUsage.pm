@@ -1,6 +1,6 @@
 package Langertha::Knarr::PassthroughUsage;
 # ABSTRACT: Token usage and model read off a copy of a raw passthrough answer
-our $VERSION = '1.102';
+our $VERSION = '1.103';
 use Moose;
 use JSON::MaybeXS;
 
@@ -135,7 +135,7 @@ Langertha::Knarr::PassthroughUsage - Token usage and model read off a copy of a 
 
 =head1 VERSION
 
-version 1.102
+version 1.103
 
 =head1 SYNOPSIS
 

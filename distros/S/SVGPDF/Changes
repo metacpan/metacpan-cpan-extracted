@@ -1,22 +1,27 @@
 Revision history for SVGPDF
 
-1.000	2025-04-26
+1.001	2026-10-24
+
+	- Fix issue when the x and y properties in a text element did
+          not have the same number of values.
+
+1.000	2026-04-26
 
 	- Release 1.000.
 
-0.092.3 2025-04-23
+0.092.3 2026-04-23
 
 	- Add PDF::Builder version to diag.
 
-0.092.2 2025-04-20
+0.092.2 2026-04-20
 
 	- Bump PDF::Builder requirement to 3.027.
 
-0.092.1 2025-04-19
+0.092.1 2026-04-19
 
 	- Fix failing tests for longdouble perls.
 
-0.092	2025-04-18
+0.092	2026-04-18
 
 	- Allow a document to be parsed into a series of similar elements.
           This elminates the need for enclosing the document in

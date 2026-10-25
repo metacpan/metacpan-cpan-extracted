@@ -1,0 +1,282 @@
+#!/usr/bin/env perl
+
+package MilterProbe 0.002;
+
+# ABSTRACT: Give a milter one message, as an MTA would, and print what it did with it
+
+use 5.014;
+use strict;
+use warnings FATAL => 'all';
+use re '/aa';
+
+use Getopt::Long qw{GetOptionsFromArray};
+use Cpanel::JSON::XS;
+use Pod::Usage;
+use Sys::Hostname qw{hostname};
+
+use Milter::Client qw{:constants};
+
+
+sub main {
+    my @args = @_;
+    my %opts = ( timeout => 10, header => [], rcpt => [], macro => [] );
+    GetOptionsFromArray(
+        \@args, \%opts,
+        qw{socket=s client-ip=s client-host=s helo=s from=s rcpt=s@ header=s@ body=s message=s macro=s@ timeout=f json help},
+    ) or return print_synopsis(2);
+    return print_synopsis(0) if $opts{help};
+    return print_synopsis( 2, '--socket is required' )            if !$opts{socket};
+    return print_synopsis( 2, '--body and --message do not mix' ) if defined $opts{body} && defined $opts{message};
+    return print_synopsis( 2, "Unexpected arguments: @args" )     if @args;
+
+    my %macros = ( connect => { j => hostname() }, mail => { i => 'MILTERPROBE' } );
+    foreach my $macro ( @{ $opts{macro} } ) {
+        my ( $stage, $name, $value ) = $macro =~ m/\A ([[:lower:]]+) : ([^=]+) = (.*) \z/xs or return print_synopsis( 2, "--macro $macro is not STAGE:NAME=VALUE" );
+        $macros{$stage}{$name} = $value;
+    }
+
+    my $raw  = eval { message( \%opts ) } // return print_synopsis( 2, $@ );
+    my @cmds = eval {
+        Milter::Client::conversation(
+            $raw,
+            {
+                client_ip   => $opts{'client-ip'},
+                client_host => $opts{'client-host'},
+                helo        => $opts{helo},
+                mail_from   => $opts{from},
+                ( @{ $opts{rcpt} } ? ( rcpt_to => $opts{rcpt} ) : () ),
+                macros => \%macros,
+            }
+        );
+    } or return print_synopsis( 2, $@ );
+
+    my $sock = eval { Milter::Client::milter_socket( $opts{socket}, $opts{timeout} ) } or return print_synopsis( 2, $@ );
+    my ( $code, $payload, $mods ) = Milter::Client::sendmail( $sock, { timeout => $opts{timeout} }, @cmds );
+
+    my $verdict = Milter::Client::decode( $code, $payload );
+    my @changes = map { Milter::Client::decode(@$_) } @$mods;
+    if ( $opts{json} ) {
+        print Cpanel::JSON::XS->new->canonical->encode( { verdict => $verdict, changes => \@changes } ), "\n";
+    }
+    else {
+        print describe($_), "\n" for @changes, $verdict;
+    }
+    return ( $code eq CLIENT_TIMEOUT || $code eq CLIENT_EOF ) ? 1 : 0;
+}
+
+
+sub message {
+    my ($opts) = @_;
+    foreach my $field ( @{ $opts->{header} } ) {
+        die "--header $field is not Name: value\n" unless $field =~ m/\A [^:\s]+ :/xs;
+    }
+    my $head = join( '', map { "$_\n" } @{ $opts->{header} } );
+    return $head . "\n" . ( $opts->{body} // '' ) unless defined $opts->{message};
+
+    my $file = $opts->{message};
+    open( my $fh, '<', $file eq '-' ? '/dev/stdin' : $file ) or die "Cannot read $file: $!\n";
+    my $raw = do { local $/ = undef; <$fh> };
+    close $fh or die "Cannot read $file: $!\n";
+    return $head . $raw;
+}
+
+
+sub describe {
+    my ($what) = @_;
+    my %w      = %$what;
+    my $action = $w{action};
+    ( $w{value} //= '' ) =~ s/\r?\n(?=[ \t])//xsg;
+
+    my $line =
+        $action eq 'add_header'                                  ? "$w{name}: $w{value}"
+      : $action eq 'insert_header' || $action eq 'change_header' ? "$w{index} $w{name}: $w{value}"
+      : $action eq 'delete_header'                               ? "$w{index} $w{name}"
+      : $action eq 'add_rcpt' || $action eq 'delete_rcpt'        ? join( ' ', grep { defined } $w{rcpt}, $w{args} )
+      : $action eq 'change_from'                                 ? join( ' ', grep { defined } $w{from}, $w{args} )
+      : $action eq 'replace_body'                                ? length( $w{body} )
+      : $action eq 'quarantine'                                  ? $w{reason}
+      : $action eq 'reply'                                       ? $w{reply}
+      :                                                            undef;
+    return defined $line ? "$action $line" : $action;
+}
+
+# Print the USAGE section of the POD, with a reason if there is one, and return the exit status for main() to hand back
+sub print_synopsis {
+    my ( $exit, $msg ) = @_;
+    Pod::Usage::pod2usage( -exitval => 'NOEXIT', -verbose => 0, -input => __FILE__, -output => $exit ? \*STDERR : \*STDOUT, ( $msg ? ( -message => $msg ) : () ) );
+    return $exit;
+}
+
+exit main(@ARGV) unless caller;
+
+1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+MilterProbe - Give a milter one message, as an MTA would, and print what it did with it
+
+=head1 VERSION
+
+version 0.002
+
+=head1 DESCRIPTION
+
+Connects to the milter at C<--socket>, and gives it one message the way postfix or sendmail would:
+the connection from C<--client-ip>, HELO, the envelope, the header, the body and the end of the message.
+Then it prints each change the milter asked for, one to a line, and last of all the milter's verdict.
+
+    add_header Authentication-Results: mx.test.test; dmarc=pass header.from=test.test
+    accept
+
+It obeys what the milter negotiates, as an MTA does:
+a step the milter asked to leave out is not sent, and no reply is waited for where the milter said it sends none.
+
+=head1 USAGE
+
+    milterprobe --socket SPEC [--client-ip IP] [--client-host NAME] [--helo NAME]
+                [--from ADDRESS] [--rcpt ADDRESS ...] [--header 'Name: value' ...]
+                [--body TEXT | --message FILE] [--macro STAGE:NAME=VALUE ...]
+                [--timeout SECONDS] [--json]
+
+=head1 OPTIONS
+
+=over 4
+
+=item C<--socket>
+
+Where the milter listens, as postfix writes it: C<unix:/path> or C</path>, C<inet:port@host> or C<inet6:port@host>.
+Required.
+
+=item C<--client-ip>, C<--client-host>, C<--helo>
+
+What the MTA tells the milter about the client.
+Without C<--client-ip>, the milter is told the family of the address is unknown.
+
+=item C<--from>, C<--rcpt>
+
+The envelope sender, and each recipient.
+Without them, the null sender and one null recipient.
+
+=item C<--header>
+
+A header field, C<Name: value>, put ahead of the ones in C<--message>.
+Give it once per field.
+
+=item C<--body>, C<--message>
+
+The body, or a file holding the whole message, header and body (C<-> for standard input).
+Bare LF becomes CRLF, as on the wire.
+
+=item C<--macro>
+
+A macro sent before a stage: C<connect>, C<helo>, C<mail>, C<rcpt>, C<data>, C<eoh> or C<eom>.
+For example C<--macro mail:i=QUEUEID>.
+Give it once per macro.
+C<connect:j> defaults to the name of this host, and C<mail:i> to C<MILTERPROBE>, as an MTA sends both.
+
+=item C<--timeout>
+
+Seconds to wait for each reply, 10 by default.
+
+=item C<--json>
+
+Print one JSON object instead: C<verdict>, and C<changes>, a list of them as C<decode()> in L<Milter::Client> gives them.
+
+=back
+
+=head1 OUTPUT
+
+Each change is its action, then what it changes:
+
+    add_header NAME: VALUE
+    insert_header INDEX NAME: VALUE
+    change_header INDEX NAME: VALUE
+    delete_header INDEX NAME
+    add_rcpt ADDRESS [ARGS]
+    delete_rcpt ADDRESS
+    change_from ADDRESS [ARGS]
+    replace_body BYTES
+    quarantine REASON
+
+A folded header value is printed unfolded, so that each change takes one line.
+The verdict is C<accept>, C<continue> (the milter let the whole message through without saying so), C<discard>, C<reject>, C<tempfail>, C<reply> and the SMTP reply, C<timeout> or C<eof>.
+The change and the verdict are the same words as the C<action> of C<decode()> in L<Milter::Client>.
+
+=head1 EXIT STATUS
+
+0 when the milter gave a verdict, whatever it was.
+1 when it did not reply in time or hung up.
+2 when the arguments are wrong, or the milter cannot be reached.
+
+=head1 FUNCTIONS
+
+=head2 $raw = message(\%opts)
+
+The message to send: each C<--header>, then the header and body of C<--message>, or else a blank line and C<--body>.
+Dies when C<--message> cannot be read, or a C<--header> is not C<Name: value>.
+
+=head2 $line = describe(\%what)
+
+One line for a change or a verdict, as C<decode()> in L<Milter::Client> gives it.
+
+=head1 SEE ALSO
+
+Please see those modules/websites for more information related to this module.
+
+=over 4
+
+=item *
+
+L<Milter::Client|Milter::Client>
+
+=back
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/Troglodyne-Internet-Widgets/Milter-Client/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHORS
+
+Current Maintainers:
+
+=over 4
+
+=item *
+
+George S. Baugh <george@troglodyne.net>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2026 Troglodyne LLC
+
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+=cut

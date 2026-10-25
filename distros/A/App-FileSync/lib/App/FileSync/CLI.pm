@@ -1,1438 +1,1431 @@
 package App::FileSync::CLI;
 
+# The three command-line programs: filesync (client), filesync-admin and
+# filesync-server.  Each run_* parses arguments, calls the library and prints;
+# all text comes from the message catalogue, so this module holds no prose.
+
+use App::FileSync::Platform;
+
 use strict;
 use warnings;
+use autodie qw(:all);
 
 use Cwd qw(abs_path);
-use File::Path qw(make_path);
 use File::Spec;
 use Getopt::Long qw(GetOptionsFromArray);
+use List::Util qw(any first);
+use Readonly;
+use Sub::Private { mode => 'enforce' };
 use Sys::Hostname ();
 
-use App::FileSync qw(json_encode format_utc);
+use App::FileSync qw(json_encode format_utc validate_repo_name validate_client_id parse_since parse_until write_atomic);
 use App::FileSync::Admin;
 use App::FileSync::Client;
 use App::FileSync::Config;
+use App::FileSync::Constants qw(
+	$EXIT_OK $EXIT_FATAL $EXIT_LOCKED $EXIT_WARNINGS $EXIT_DRIFT $EXIT_MAX
+	$DEFAULT_SERVER_ROOT $PROTOCOL_VERSION $ROLE_CLIENT @ROLES $ROOT_MARKER $MAX_ID_LENGTH $TYPE_FILE
+);
+use App::FileSync::I18N qw(message throw strip_location);
+use App::FileSync::IO qw(ensure_dir);
 use App::FileSync::Protocol;
 use App::FileSync::Server;
 use App::FileSync::Settings;
 use App::FileSync::Transport::SSH;
 
+use version; our $VERSION = version->declare('0.001.2');
+
+# What the marker file says to anyone who finds it.  File content, not a
+# message: it must not change with the reader's language.
+Readonly my $MARKER_TEXT => "This directory is a filesync root; do not delete this file.\n";
+
+# The client's default local-trash retention, written by init.
+Readonly my $LOCAL_TRASH_DAYS => 30;
+
+# How many journal events "filesync-admin log" shows by default.
+Readonly my $ADMIN_LOG_LIMIT => 20;
+
+# Size units for human-readable byte counts.
+Readonly my $KIB => 1024;
+Readonly my @SIZE_UNITS => ([ $KIB ** 3, 'GB' ], [ $KIB ** 2, 'MB' ], [ $KIB, 'kB' ]);
+
+# The client commands and their handlers.
+Readonly my %CLIENT_COMMANDS => (
+	help     => '_client_help',
+	'--help' => '_client_help',
+	version  => '_client_version',
+	init     => '_client_init',
+	sync     => '_client_sync',
+	status   => '_client_status',
+	log      => '_client_log',
+	settings => '_client_settings',
+	verify   => '_client_verify',
+	restore  => '_client_restore',
+	snapshot => '_client_snapshot',
+);
+
+# The admin commands; a hashref value is a group of sub-commands.
+Readonly my %ADMIN_COMMANDS => (
+	repo    => { create => '_admin_repo_create', list => '_admin_repo_list', show => '_admin_repo_show' },
+	client  => { allow => '_admin_client_allow', list => '_admin_client_list', forget => '_admin_client_forget' },
+	log     => '_admin_log',
+	verify  => '_admin_verify',
+	reindex => '_admin_reindex',
+	restore => '_admin_restore',
+);
+
+# Settings whose empty value means "the transport's default", and what to
+# show instead of a blank column.
+Readonly my %BLANK_SETTING => (
+	log_file        => 'cli.settings.stderr',
+	ssh_identity    => 'cli.settings.ssh_default',
+	ssh_known_hosts => 'cli.settings.ssh_default',
+	server_command  => 'cli.settings.server_default',
+);
+
+# Journal fields "filesync-admin log" prints as key=value, in this order.
+Readonly my @EVENT_FIELDS   => qw(from winner loser_name exit trash sha256);
+Readonly my @EVENT_COUNTERS => qw(actions deletions conflicts pulled pushed deleted);
+Readonly my %EVENT_LABEL    => (loser_name => 'loser');
+
+=encoding utf8
+
+=head1 NAME
+
+App::FileSync::CLI - the filesync, filesync-admin and filesync-server commands
+
+=head1 SYNOPSIS
+
+	# bin/filesync
+	use App::FileSync::CLI;
+	exit App::FileSync::CLI::run_client(@ARGV);
+
+=head1 DESCRIPTION
+
+Each C<run_*> function runs one command line and returns the exit code; it
+never dies.  Errors are reported through the logger (or standard error if the
+settings that configure the logger are themselves broken), without Perl file
+and line numbers.  Text output goes to standard output; C<--json> prints one
+JSON document instead.
+
+Client exit codes: 0 ok, 1 fatal, 2 another run holds the lock, 3 completed
+with warnings, 4 verification found drift.  Admin: 0, 1 and 4.
+
+=head1 FUNCTIONS
+
+=head2 run_client
+
+Documented with L</run_server> below.
+
+=head2 run_admin
+
+Documented with L</run_server> below.
+
+=head2 run_server
+
+Purpose: run C<filesync>, C<filesync-admin> or C<filesync-server>.
+
+Args: the command line, without the program name.
+
+Returns: the exit code.
+
+Side Effects: whatever the command does; prints to standard output and logs
+to standard error.  C<run_server> speaks the protocol on standard input and
+output and refuses to run on a terminal unless C<FILESYNC_ALLOW_TTY> is set.
+
+Usage:
+
+	exit App::FileSync::CLI::run_client(@ARGV);
+
+=head3 EXAMPLE
+
+	my $code = App::FileSync::CLI::run_client('sync', '--repo', 'docs', '--json');
+	my $code = App::FileSync::CLI::run_admin('--root', '/srv/filesync', 'repo', 'list');
+
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+	[ { name => 'args', type => 'arrayref' } ]	# passed as a list
+
+=head4 OUTPUT
+
+	{ type => 'integer', min => 0, max => 255 }
+
+=head3 MESSAGES
+
+	Key                 Meaning                                   Resolution
+	cli.unknown_command the command is not known                  run "filesync help"
+	cli.usage.*         the options could not be parsed           see the usage line
+	cli.unexpected      extra arguments were given                remove them
+	cli.required        a required argument is missing            supply it
+	cli.no_repos        no repos are configured                   filesync init
+	cli.no_repo         the named repo is not configured          check --repo
+	cli.need_repo       several repos and no --repo               pass --repo
+	cli.init.*          init was given an unusable value          see the message
+	cli.server.*        the server was started wrongly            fix authorized_keys
+
+=head3 FORMAL SPECIFICATION
+
+	run(args) = dispatch(args)                  if dispatch succeeds
+	run(args) = 1 ∧ log(strip_location(error))  if it raises
+
+=cut
+
 sub run_client {
 	my (@args) = @_;
 
-	my $code = eval { _client_dispatch(@args) };
-	if (my $error = $@) {
-		chomp $error;
-		_report_error($error);
-		return 1;
-	}
-
-	return $code;
-}
-
-sub _logger {
-	my (%opts) = @_;
-	return App::FileSync::Settings::logger(%opts);
-}
-
-# An unusable settings file must not hide the error that says so.
-sub _report_error {
-	my ($error) = @_;
-
-    my $logger = eval { _logger() };
-    if ($logger) {
-        $logger->error($error);
-        return 1;
-    }
-
-    print STDERR "$error\n";
-    return 0;
+	return _run(sub {
+		my ($command, @rest) = @_;
+		return _dispatch(\%CLIENT_COMMANDS, 'filesync', $command // 'help', @rest);
+	}, @args);
 }
 
 sub run_admin {
-    my (@args) = @_;
+	my (@args) = @_;
 
-    my $code = eval { _admin_dispatch(@args) };
-    if (my $error = $@) {
-        chomp $error;
-        _report_error($error);
-        return 1;
-    }
-
-    return $code;
+	return _run(\&_admin_dispatch, @args);
 }
 
 sub run_server {
-    my (@args) = @_;
+	my (@args) = @_;
 
-    my $code = eval { _server_main(@args) };
-    if (my $error = $@) {
-        chomp $error;
-        _report_error($error);
-        return 1;
-    }
-
-    return $code;
+	return _run(\&_server_main, @args);
 }
 
-sub _server_main {
-    my (@args) = @_;
+# _run
+# Purpose:     run a dispatcher, turning any error into exit code 1.
+# Entry:       $code takes the arguments and returns an exit code.
+# Exit:        returns the exit code.
+# Side effects: reports the error without its Perl location.
+sub _run :Private {
+	my ($code, @args) = @_;
 
-    my ($root, $repo, $client, $role, $proto, $forced);
-    GetOptionsFromArray(\@args,
-        'root=s'   => \$root,
-        'repo=s'   => \$repo,
-        'client=s' => \$client,
-        'role=s'   => \$role,
-        'proto=i'  => \$proto,
-        'forced'   => \$forced,
-    ) or die "Usage: filesync-server [--root DIR] --repo NAME --client ID "
-        . "--role client|replica [--proto 2]\n";
+	my $exit = eval { $code->(@args) };
+	return $exit if defined $exit;
 
-    die "filesync-server: unexpected arguments: @args\n" if @args;
-
-    # Under sshd the root comes from the forced command (or FILESYNC_ROOT) and is
-    # never taken from the client.
-    $root = $ENV{FILESYNC_ROOT} if !defined($root) || !length($root);
-    $root = '/srv/filesync'    if !defined($root) || !length($root);
-
-    die "filesync-server: --repo is required\n"   unless defined $repo && length $repo;
-    die "filesync-server: --client is required\n" unless defined $client && length $client;
-    die "filesync-server: --role is required\n"   unless defined $role && length $role;
-    die "filesync-server: bad role '$role'\n"     unless $role eq 'client' || $role eq 'replica';
-    die "filesync-server: unsupported protocol '$proto'\n"
-        if defined $proto && $proto != $App::FileSync::Server::PROTO;
-
-    if (defined $ENV{SSH_ORIGINAL_COMMAND} && length $ENV{SSH_ORIGINAL_COMMAND}) {
-        my ($ok, $reason) = App::FileSync::Server::validate_forced_command(
-            $ENV{SSH_ORIGINAL_COMMAND},
-            { repo => $repo, client => $client, role => $role,
-              root => $root },
-        );
-        die "filesync-server: $reason\n" unless $ok;
-    }
-
-    if (-t STDIN && !$ENV{FILESYNC_ALLOW_TTY}) {
-        die "filesync-server speaks the sync protocol on stdin and is not for interactive "
-            . "use; it is the forced command in authorized_keys\n";
-    }
-
-    my $connection = App::FileSync::Protocol->new(in => \*STDIN, out => \*STDOUT);
-    my $server = App::FileSync::Server->new(
-        root       => $root,
-        repo       => $repo,
-        client     => $client,
-        role       => $role,
-        connection => $connection,
-        logger     => _logger(),
-    );
-
-    return $server->run() ? 0 : 1;
+	_report_error(strip_location($@));
+	return $EXIT_FATAL;
 }
 
-sub _client_dispatch {
-    my (@args) = @_;
+# _report_error
+# Purpose:     show an error to the user.
+# Entry:       $error is the text.
+# Exit:        returns 1 if logged, 0 if printed directly.
+# Side effects: logs it; if the logger cannot be built (an unusable settings
+#              file), prints to standard error, so the error that says so is
+#              never hidden.
+sub _report_error :Private {
+	my ($error) = @_;
 
-    my $command = shift @args;
-    $command = 'help' unless defined $command;
+	my $logger = eval { App::FileSync::Settings::logger() };
+	if ($logger) {
+		$logger->error($error);
+		return 1;
+	}
 
-    return _client_help() if $command eq 'help' || $command eq '--help';
-    return _client_version() if $command eq 'version';
-    return _client_init(@args) if $command eq 'init';
-    return _client_sync(@args) if $command eq 'sync';
-    return _client_status(@args) if $command eq 'status';
-    return _client_log(@args) if $command eq 'log';
-    return _client_settings(@args) if $command eq 'settings';
-    return _client_verify(@args) if $command eq 'verify';
-    return _client_restore(@args) if $command eq 'restore';
-    return _client_snapshot(@args) if $command eq 'snapshot';
-
-    die "Unknown command '$command' (try: filesync help)\n";
+	print STDERR "$error\n";
+	return 0;
 }
 
-sub _client_help {
-    print <<'USAGE';
-filesync - keep a directory in step with a master copy
+# _dispatch
+# Purpose:     run one command from a table.
+# Entry:       $table maps command names to handler names.
+# Exit:        returns the handler's exit code.
+# Side effects: raises cli.unknown_command.
+sub _dispatch :Private {
+	my ($table, $program, $command, @args) = @_;
 
-    filesync init --repo NAME --root DIR --server USER@HOST [--remote-repo NAME]
-                  [--id ID] [--role client|replica] [--port N] [--identity FILE]
-                  [--accept-host-key] [--known-hosts FILE] [--server-command PATH]
-                  [--snapshot-mode hardlink|copy]
-    filesync init --repo NAME --root DIR --transport local --server-root DIR
-                  [--remote-repo NAME] [--id ID] [--role client|replica]
-    filesync sync   [--repo NAME]... [--dry-run] [--force] [--verbose] [--quiet]
-                    [--json] [--no-prune] [--no-delta]
-    filesync status [--repo NAME] [--json]
-    filesync log    [--repo NAME] [-n N] [--since YYYY-MM-DD|EPOCH]
-                    [--until YYYY-MM-DD|EPOCH] [--exit N]... [--warnings] [--json]
-    filesync settings [--config FILE] [--json]
-    filesync verify [--repo NAME] [--deep] [--json]
-    filesync restore PATH [--repo NAME] [--to DIR] [--list]
-    filesync snapshot [--repo NAME] [--keep N]
-    filesync snapshot list [--repo NAME]
-    filesync snapshot restore DATE [PATH] [--repo NAME] [--to DIR]
-    filesync version
-
-The sync root must contain the .filesync-root marker created by "filesync init".
-Diagnostics go to stderr; settings are read from ~/.conf/app-filesync.json or
-$FILESYNC_SETTINGS (log_level, log_format, log_file, ssh_identity,
-ssh_known_hosts, server_command).  "filesync settings" prints the effective
-values and where each came from.  Per-repo values from "filesync init" win;
-port and host_key_checking exist per repo only and are marked [repo only].
-
-Exit codes: 0 ok, 1 fatal, 2 another run holds the lock, 3 completed with
-warnings, 4 verification found drift.
-USAGE
-
-    return 0;
+	my $handler = $table->{$command} or throw('cli.unknown_command', { command => $command, program => $program });
+	my $code = __PACKAGE__->can($handler);
+	return $code->(@args);
 }
 
-sub _client_version {
-    print "filesync $App::FileSync::VERSION (protocol 2)\n";
-    return 0;
+# _say
+# Purpose:     print one catalogued line.
+# Entry:       $key and its arguments.
+# Exit:        returns 1.
+# Side effects: prints to standard output.
+sub _say :Private {
+	my ($key, $args) = @_;
+
+	print message($key, $args), "\n";
+	return 1;
 }
 
-sub _client_init {
-    my (@args) = @_;
+# _options
+# Purpose:     parse options for a command, with its usage line on failure.
+# Entry:       $args is the argument list (consumed); $spec is the
+#              Getopt::Long specification; $command names the usage key.
+# Exit:        returns 1.
+# Side effects: removes the options from @$args; raises cli.usage.
+sub _options :Private {
+	my ($args, $spec, $command) = @_;
 
-    my ($repo, $root, $server, $remote, $id, $port, $identity, $role,
-        $transport, $server_root, $config_path, $accept_host_key, $known_hosts,
-        $server_command, $snapshot_mode);
-    GetOptionsFromArray(\@args,
-        'repo=s'          => \$repo,
-        'root=s'          => \$root,
-        'server=s'        => \$server,
-        'remote-repo=s'   => \$remote,
-        'id=s'            => \$id,
-        'port=i'          => \$port,
-        'identity=s'      => \$identity,
-        'role=s'          => \$role,
-        'transport=s'     => \$transport,
-        'server-root=s'   => \$server_root,
-        'config=s'        => \$config_path,
-        'accept-host-key' => \$accept_host_key,
-        'known-hosts=s'   => \$known_hosts,
-        'server-command=s' => \$server_command,
-        'snapshot-mode=s'  => \$snapshot_mode,
-    ) or die "Usage: filesync init --repo NAME --root DIR ...\n";
-
-    die "init: --repo is required\n" unless defined $repo && length $repo;
-    die "init: --root is required\n" unless defined $root && length $root;
-    die "init: bad repo name '$repo'\n"
-        unless $repo =~ /\A[A-Za-z0-9][A-Za-z0-9._-]*\z/;
-
-    $role = 'client' unless defined $role;
-    die "init: bad role '$role'\n" unless $role eq 'client' || $role eq 'replica';
-
-    die "init: bad snapshot mode '$snapshot_mode' (want hardlink or copy)\n"
-        if defined $snapshot_mode && length $snapshot_mode
-            && $snapshot_mode ne 'hardlink' && $snapshot_mode ne 'copy';
-
-    my $use = $transport || ($server_root ? 'local' : 'ssh');
-    die "init: unknown transport '$use'\n" unless $use eq 'local' || $use eq 'ssh';
-    die "init: the local transport needs --server-root\n"
-        if $use eq 'local' && !(defined $server_root && length $server_root);
-    die "init: the ssh transport needs --server\n"
-        if $use eq 'ssh' && !(defined $server && length $server);
-
-    if ($use eq 'ssh' && !App::FileSync::Transport::SSH::valid_server($server)) {
-        die "init: bad server '$server' (want user\@host or host)\n";
-    }
-
-    die "init: --known-hosts does not exist: $known_hosts\n"
-        if defined $known_hosts && length $known_hosts && !-f $known_hosts;
-
-    die "init: --accept-host-key only applies to the ssh transport\n"
-        if $accept_host_key && $use ne 'ssh';
-
-    make_path($root) unless -d $root;
-    die "init: cannot use $root as a sync root\n" unless -d $root;
-    $root = abs_path($root);
-
-    my $marker = File::Spec->catfile($root, '.filesync-root');
-    unless (-e $marker) {
-        open my $fh, '>', $marker or die "Cannot create $marker: $!\n";
-        print {$fh} "This directory is a filesync root; do not delete this file.\n";
-        close $fh;
-    }
-
-    if (defined $server_root) {
-        make_path($server_root) unless -d $server_root;
-        $server_root = abs_path($server_root);
-    }
-
-    my $config = App::FileSync::Config::load_client($config_path);
-
-    unless (defined $config->{client_id} && length $config->{client_id}) {
-        $config->{client_id} = _default_client_id();
-    }
-    $config->{client_id} = $id if defined $id && length $id;
-
-    $config->{repos}{$repo} = {
-        root             => $root,
-        remote_repo      => defined $remote && length $remote ? $remote : $repo,
-        role             => $role,
-        transport        => $use,
-        local_trash_days => 30,
-        (defined $server_root ? (server_root => $server_root) : ()),
-        (defined $server      ? (server      => $server)      : ()),
-        (defined $port        ? (port        => $port)        : ()),
-        (defined $identity    ? (identity    => $identity)    : ()),
-        ($accept_host_key     ? (host_key_checking => 'accept-new') : ()),
-        (defined $known_hosts ? (known_hosts => $known_hosts) : ()),
-        (defined $server_command && length $server_command
-            ? (server_command => $server_command) : ()),
-        (defined $snapshot_mode && length $snapshot_mode
-            ? (snapshot_mode => $snapshot_mode) : ()),
-    };
-
-    my $path = App::FileSync::Config::save_client($config, $config_path);
-
-    print "Initialised repo '$repo'\n";
-    print "  client id: $config->{client_id}\n";
-    print "  root:      $root\n";
-    print "  transport: $use\n";
-    if ($use eq 'ssh') {
-        print "  server:    $server\n";
-        print '  host key:  ',
-            $accept_host_key ? "accept-new (trusted on first use)\n" : "strict\n";
-    }
-    print "  config:    $path\n";
-
-    return 0;
+	GetOptionsFromArray($args, %{$spec}) or throw('cli.usage', { usage => message("cli.usage.$command") });
+	return 1;
 }
 
-sub _client_sync {
-    my (@args) = @_;
+# _no_more
+# Purpose:     refuse arguments a command does not take.
+# Entry:       $args holds what is left after parsing.
+# Exit:        returns 1.
+# Side effects: raises cli.unexpected.
+sub _no_more :Private {
+	my ($args, $command) = @_;
 
-    my (@repos, $dry_run, $force, $verbose, $quiet, $json, $no_prune, $no_delta, $config_path);
-    GetOptionsFromArray(\@args,
-        'repo=s@'    => \@repos,
-        'dry-run'    => \$dry_run,
-        'force'      => \$force,
-        'verbose'    => \$verbose,
-        'quiet'      => \$quiet,
-        'json'       => \$json,
-        'no-prune'   => \$no_prune,
-        'no-delta'   => \$no_delta,
-        'config=s'   => \$config_path,
-    ) or die "Usage: filesync sync [--repo NAME] [--dry-run] [--force]\n";
-
-    my $config = App::FileSync::Config::load_client($config_path);
-
-    die "No repos configured; run filesync init first\n"
-        unless keys %{ $config->{repos} };
-
-    @repos = sort keys %{ $config->{repos} } unless @repos;
-
-    for my $name (@repos) {
-        die "No repo '$name' in the configuration\n"
-            unless $config->{repos}{$name};
-    }
-
-    my (@results, @errors);
-    my $fatal = 0;
-    my $warned = 0;
-    my $locked = 0;
-
-    my $logger = _logger(verbose => $verbose, quiet => $quiet);
-
-    for my $name (@repos) {
-        my $result = eval {
-            App::FileSync::Client->new(
-                config => $config,
-                name   => $name,
-                opts   => {
-                    dry_run  => $dry_run,
-                    force    => $force,
-                    no_prune => $no_prune,
-                    no_delta => $no_delta,
-                    verbose  => $verbose,
-                },
-                logger => $logger,
-            )->sync();
-        };
-
-        if (my $error = $@) {
-            chomp $error;
-            push @errors, { repo => $name, error => $error };
-            $logger->error("$name: $error") unless $json;
-            $fatal = 1;
-            next;
-        }
-
-        push @results, $result;
-        if (($result->{exit} || 0) == 2) {
-            $locked = 1;
-            $logger->warn("$name: $result->{error}")
-                unless $json || $quiet;
-            next;
-        }
-        $warned = 1 if ($result->{exit} || 0) == 3;
-
-        next if $json;
-
-        if ($dry_run) {
-            for my $action (@{ $result->{actions} || [] }) {
-                my $verb = $action->{a};
-                $verb =~ s/_/ /g;
-                print '  would ', $verb, ' ', $action->{p}, "\n";
-            }
-        }
-
-        my $summary = $result->{summary} || {};
-        printf "%s%s: pulled %d, pushed %d, deleted %d, conflicts %d\n",
-            $name,
-            $dry_run ? ' (dry run)' : '',
-            $summary->{pulled}    || 0,
-            $summary->{pushed}    || 0,
-            $summary->{deleted}   || 0,
-            $summary->{conflicts} || 0;
-
-        # A dry run sends no file payloads, so it has nothing to account for.
-        print '  transfer: ', _transfer_report($summary), "\n" unless $dry_run;
-
-        next if $quiet;
-        for my $warning (@{ $result->{warnings} || [] }) {
-            print "  warning: $warning\n";
-        }
-    }
-
-    if ($json) {
-        print json_encode({
-            results => \@results,
-            errors  => \@errors,
-        }), "\n";
-    }
-
-    return 1 if $fatal;
-    return 3 if $warned;
-    return 2 if $locked;
-    return 0;
+	throw('cli.unexpected', { command => $command, args => "@{$args}" }) if @{$args};
+	return 1;
 }
 
-sub _client_status {
-    my (@args) = @_;
+# _require
+# Purpose:     insist on a non-empty value.
+# Entry:       $what names it in the message.
+# Exit:        returns the value.
+# Side effects: raises cli.required.
+sub _require :Private {
+	my ($value, $command, $what) = @_;
 
-    my (@repos, $json, $config_path);
-    GetOptionsFromArray(\@args, 'repo=s@' => \@repos, 'json' => \$json, 'config=s' => \$config_path)
-        or die "Usage: filesync status [--repo NAME] [--json]\n";
-
-    my $config = App::FileSync::Config::load_client($config_path);
-    @repos = sort keys %{ $config->{repos} } unless @repos;
-
-    my @status;
-    for my $name (@repos) {
-        die "No repo '$name' in the configuration\n"
-            unless $config->{repos}{$name};
-
-        my $repo = $config->{repos}{$name};
-        my $cache_path = File::Spec->catfile(
-            App::FileSync::Config::home_dir(), 'cache', "$name.json"
-        );
-
-        my $cache;
-        if (-e $cache_path) {
-            $cache = eval { App::FileSync::json_decode(App::FileSync::read_text($cache_path)) };
-        }
-
-        my $last = $cache && ref($cache) eq 'HASH' ? $cache->{last_run} : undef;
-
-        push @status, {
-            repo       => $name,
-            root       => $repo->{root},
-            transport  => $repo->{transport} || 'ssh',
-            last_run   => $last ? scalar(gmtime($last->{ts})) . ' UTC' : 'never',
-            last_summary => $last ? $last->{summary} : undef,
-            files      => $cache && $cache->{entries}
-                ? scalar(grep { ($cache->{entries}{$_}{t} || 'f') eq 'f' } keys %{ $cache->{entries} })
-                : 0,
-        };
-    }
-
-    if ($json) {
-        print json_encode({ repos => \@status }), "\n";
-    } else {
-        for my $entry (@status) {
-            print "$entry->{repo}: $entry->{root}\n";
-            print "  transport: $entry->{transport}\n";
-            print "  last run:  $entry->{last_run}\n";
-
-            # Caches written before the byte counters existed have no transfer
-            # figures; skip the line rather than invent zeros.
-            my $summary = $entry->{last_summary};
-            if (ref($summary) eq 'HASH' && defined $summary->{bytes_sent}) {
-                print '  transfer:  ', _transfer_report($summary), "\n";
-            }
-
-            print "  files:     $entry->{files}\n";
-        }
-    }
-
-    return 0;
+	throw('cli.required', { command => $command, what => $what }) unless defined $value && length $value;
+	return $value;
 }
 
-sub _client_log {
-    my (@args) = @_;
+# _repos
+# Purpose:     the repos a multi-repo command works on.
+# Entry:       $given are --repo values (maybe none); $require_any says
+#              whether an empty configuration is an error.
+# Exit:        returns an arrayref of names: the given ones, or all, sorted.
+# Side effects: raises cli.no_repos or cli.no_repo.
+sub _repos :Private {
+	my ($config, $given, $require_any) = @_;
 
-    my (@repos, @exits, $limit, $since, $until, $json, $config_path, $warnings);
-    GetOptionsFromArray(\@args,
-        'repo=s@'  => \@repos,
-        'n=i'      => \$limit,
-        'since=s'  => \$since,
-        'until=s'  => \$until,
-        'exit=i@'  => \@exits,
-        'warnings' => \$warnings,
-        'json'     => \$json,
-        'config=s' => \$config_path,
-    ) or die "Usage: filesync log [--repo NAME] [-n N] [--since DATE] [--until DATE] "
-        . "[--exit N] [--warnings] [--json]\n";
-    die "log: unexpected arguments: @args\n" if @args;
-    die "log: -n must be positive\n" if defined $limit && $limit < 1;
-    die "log: --exit must be between 0 and 255\n"
-        if grep { $_ < 0 || $_ > 255 } @exits;
+	throw('cli.no_repos') if $require_any && !%{ $config->{repos} };
+	my @names = @{$given} ? @{$given} : sort keys %{ $config->{repos} };
+	$config->{repos}{$_} or throw('cli.no_repo', { repo => $_ }) for @names;
 
-    # Report a bad date before any repo is touched.
-    App::FileSync::parse_since($since) if defined $since;
-    App::FileSync::parse_until($until) if defined $until;
-
-    my $config = App::FileSync::Config::load_client($config_path);
-    die "No repos configured; run filesync init first\n"
-        unless keys %{ $config->{repos} };
-
-    @repos = sort keys %{ $config->{repos} } unless @repos;
-
-    my @results;
-
-    for my $name (@repos) {
-        die "No repo '$name' in the configuration\n"
-            unless $config->{repos}{$name};
-
-        my $result = App::FileSync::Client->new(
-            config => $config,
-            name   => $name,
-        )->log(limit => $limit, since => $since, until => $until,
-            exits => \@exits, warnings => $warnings);
-
-        push @results, $result;
-        next if $json;
-
-        if (!@{ $result->{runs} }) {
-            print "$name: no runs recorded\n";
-            next;
-        }
-
-        for my $run (@{ $result->{runs} }) {
-            my $summary = $run->{summary} || {};
-
-            # A failed or lock-refused attempt has no counts worth printing;
-            # the message is what explains it.
-            if (defined $run->{error} && length $run->{error}) {
-                my $message = $run->{error};
-                $message =~ s/\s+/ /g;
-                printf "%s  %s  exit %d  %s\n",
-                    $name, format_utc($run->{ts}), $run->{exit} || 0, $message;
-                next;
-            }
-
-            # Older entries predate the byte counters; they keep the shorter line.
-            my $transfer = !$run->{dry_run} && defined $summary->{bytes_sent}
-                ? ', ' . _transfer_report($summary)
-                : '';
-
-            printf "%s  %s  exit %d  pulled %d, pushed %d, deleted %d, conflicts %d%s%s%s\n",
-                $name,
-                format_utc($run->{ts}),
-                $run->{exit} || 0,
-                $summary->{pulled}    || 0,
-                $summary->{pushed}    || 0,
-                $summary->{deleted}   || 0,
-                $summary->{conflicts} || 0,
-                $summary->{skipped} ? ", skipped $summary->{skipped}" : '',
-                $transfer,
-                $run->{dry_run} ? '  (dry run)' : '';
-
-            for my $warning (@{ $run->{warnings} || [] }) {
-                print "  warning: $warning\n";
-            }
-        }
-    }
-
-    if ($json) {
-        print json_encode({ results => \@results }), "\n";
-    }
-
-    return 0;
+	return \@names;
 }
 
-sub _client_settings {
-    my (@args) = @_;
+# _one_repo
+# Purpose:     the repo a single-repo command works on.
+# Entry:       $name is --repo, maybe undef.
+# Exit:        returns the name; the only repo when there is just one.
+# Side effects: raises cli.no_repos, cli.need_repo or cli.no_repo.
+sub _one_repo :Private {
+	my ($config, $name, $command) = @_;
 
-    my ($json, $config_path);
-    GetOptionsFromArray(\@args, 'json' => \$json, 'config=s' => \$config_path)
-        or die "Usage: filesync settings [--config FILE] [--json]\n";
-    die "settings: unexpected arguments: @args\n" if @args;
+	my @names = sort keys %{ $config->{repos} };
+	throw('cli.no_repos') unless @names;
+	$name //= $names[0] if @names == 1;
+	throw('cli.need_repo', { command => $command }) unless defined $name;
+	throw('cli.no_repo', { repo => $name }) unless $config->{repos}{$name};
 
-    my $report = App::FileSync::Settings::explain();
-    my $file   = $report->{settings_file};
-
-    my $client_config = App::FileSync::Config::load_client($config_path);
-    my $client_file   = defined $config_path && length $config_path
-        ? $config_path
-        : App::FileSync::Config::client_config_path();
-
-    $report->{config_file} = $client_file;
-    $report->{repos} = App::FileSync::Settings::explain_repos(
-        config      => $client_config,
-        report      => $report,
-        config_file => $client_file,
-    );
-
-    if ($json) {
-        print json_encode($report), "\n";
-        return 0;
-    }
-
-    print 'settings file: ', (defined $file && length $file ? $file : '(none)'), "\n\n";
-
-    for my $row (@{ $report->{settings} }) {
-        printf "  %-16s %-40s %s\n",
-            $row->{key}, _display_setting($row->{key}, $row->{value}), _describe_source($row);
-    }
-
-    print "\nAn empty ssh_identity or ssh_known_hosts means ssh's own default; "
-        . "an empty server_command means filesync-server.\n";
-    print "In the repo sections, [repo only] marks port and host_key_checking, "
-        . "which have no process-wide default.\n";
-
-    if (my @repos = @{ $report->{repos} || [] }) {
-        print "\nrepos:\n";
-        for my $repo (@repos) {
-            printf "  %s (%s%s)\n",
-                $repo->{repo},
-                $repo->{transport},
-                defined $repo->{server} ? ", $repo->{server}" : '';
-
-            if (!defined $repo->{ssh}) {
-                print "    the local transport does not use the SSH settings\n";
-                next;
-            }
-
-            for my $row (@{ $repo->{ssh} }) {
-                printf "    %-18s %-38s %s\n",
-                    $row->{key},
-                    _display_setting($row->{key}, $row->{value}),
-                    _describe_repo_source($row);
-            }
-        }
-    }
-
-    return 0;
+	return $name;
 }
 
-sub _describe_repo_source {
-    my ($row) = @_;
+# _client
+# Purpose:     a Client for one configured repo.
+# Entry:       %extra is passed to Client->new.
+# Exit:        returns the client.
+# Side effects: none.
+sub _client :Private {
+	my ($config, $name, %extra) = @_;
 
-    my $description =
-          $row->{source} eq 'repo'    ? "repo ($row->{label})"
-        : $row->{source} eq 'process' ? "process ($row->{label})"
-        :                               $row->{label};
-
-    # Port and host-key checking have no process-wide fallback, so say so.
-    return $row->{repo_only} ? "$description [repo only]" : $description;
+	return App::FileSync::Client->new(config => $config, name => $name, %extra);
 }
 
-# Blank means "use the transport default" for these, so name that explicitly
-# rather than printing an empty column.
-sub _display_setting {
-    my ($key, $value) = @_;
+# ------------------------------------------------------------------ server
 
-    my $blank = !defined($value) || !length($value);
+# _server_main
+# Purpose:     filesync-server: serve one session on stdin/stdout.
+# Entry:       @args is the forced command's arguments.
+# Exit:        returns 0 when the session finished, 1 when it failed.
+# Side effects: runs the session.  Under sshd the root comes from the
+#              forced command (or FILESYNC_ROOT), never from the client,
+#              and SSH_ORIGINAL_COMMAND must agree with the pinned values.
+sub _server_main :Private {
+	my (@args) = @_;
 
-    return '(stderr)'        if $blank && $key eq 'log_file';
-    return '(ssh default)'   if $blank && $key eq 'ssh_identity';
-    return '(ssh default)'   if $blank && $key eq 'ssh_known_hosts';
-    return 'filesync-server' if $blank && $key eq 'server_command';
+	# --forced is accepted (older authorized_keys lines carry it) but implies
+	# nothing: SSH_ORIGINAL_COMMAND is checked whenever sshd sets it.
+	my %opt;
+	_options(\@args, {
+		'root=s'   => \$opt{root},
+		'repo=s'   => \$opt{repo},
+		'client=s' => \$opt{client},
+		'role=s'   => \$opt{role},
+		'proto=i'  => \$opt{proto},
+		'forced'   => \$opt{forced},
+	}, 'server');
+	_no_more(\@args, 'filesync-server');
 
-    return defined $value ? $value : '';
+	my $root = first { defined && length } $opt{root}, $ENV{FILESYNC_ROOT}, $DEFAULT_SERVER_ROOT;
+	_require($opt{$_}, 'filesync-server', "--$_") for qw(repo client role);
+	throw('cli.server.bad_role', { role => $opt{role} }) unless any { $_ eq $opt{role} } @ROLES;
+	throw('cli.server.proto', { proto => $opt{proto} }) if defined $opt{proto} && $opt{proto} != $PROTOCOL_VERSION;
+
+	my $original = $ENV{SSH_ORIGINAL_COMMAND};
+	if (defined $original && length $original) {
+		my ($ok, $reason) = App::FileSync::Server::validate_forced_command(
+			$original, { map({ $_ => $opt{$_} } qw(repo client role)), root => $root },
+		);
+		throw('cli.server.forced', { reason => $reason }) unless $ok;
+	}
+
+	throw('cli.server.tty') if -t STDIN && !$ENV{FILESYNC_ALLOW_TTY};
+
+	my $server = App::FileSync::Server->new(
+		root       => $root,
+		(map { $_ => $opt{$_} } qw(repo client role)),
+		connection => App::FileSync::Protocol->new(in => \*STDIN, out => \*STDOUT),
+		logger     => App::FileSync::Settings::logger(),
+	);
+
+	return $server->run() ? $EXIT_OK : $EXIT_FATAL;
 }
 
-sub _describe_source {
-    my ($row) = @_;
+# ------------------------------------------------------------------ client
 
-    return $row->{label} if $row->{source} eq 'default';
-    return "merged: $row->{label}" if $row->{source} eq 'merged';
-    return "environment $row->{label}" if $row->{source} eq 'env';
-    return "file $row->{label}";
+# _client_help / _client_version
+# Purpose:     print the usage summary, or the version.
+# Entry:       none.
+# Exit:        returns 0.
+# Side effects: prints.
+sub _client_help :Private {
+	print message('cli.help.client');
+	return $EXIT_OK;
 }
 
-sub _client_verify {
-    my (@args) = @_;
-
-    my (@repos, $deep, $json, $config_path);
-    GetOptionsFromArray(\@args,
-        'repo=s@'  => \@repos,
-        'deep'     => \$deep,
-        'json'     => \$json,
-        'config=s' => \$config_path,
-    ) or die "Usage: filesync verify [--repo NAME] [--deep] [--json]\n";
-    die "verify: unexpected arguments: @args\n" if @args;
-
-    my $config = App::FileSync::Config::load_client($config_path);
-    die "No repos configured; run filesync init first\n"
-        unless keys %{ $config->{repos} };
-
-    @repos = sort keys %{ $config->{repos} } unless @repos;
-
-    my @reports;
-    for my $name (@repos) {
-        die "No repo '$name' in the configuration\n"
-            unless $config->{repos}{$name};
-
-        push @reports, App::FileSync::Client->new(
-            config => $config,
-            name   => $name,
-        )->verify(deep => $deep);
-    }
-
-    if ($json) {
-        print json_encode({ results => \@reports }), "\n";
-        return (grep { !$_->{ok} } @reports) ? 4 : 0;
-    }
-
-    for my $report (@reports) {
-        printf "%s: %s (%s, %d rehashed, %d unchanged)\n",
-            $report->{repo},
-            $report->{ok} ? 'clean' : 'drift detected',
-            _plural($report->{files}, 'file'),
-            $report->{rehashed},
-            $report->{trusted};
-
-        print "  no cached base for this repo (it has not synced yet)\n"
-            unless $report->{known};
-
-        for my $entry (@{ $report->{modified} }) {
-            print "  modified: $entry->{p}",
-                (defined $entry->{reason} ? " ($entry->{reason})" : ''), "\n";
-        }
-        print "  missing:  $_->{p}\n" for @{ $report->{missing} };
-        print "  extra:    $_->{p}\n" for @{ $report->{extra} };
-    }
-
-    return (grep { !$_->{ok} } @reports) ? 4 : 0;
+sub _client_version :Private {
+	_say('cli.version', { version => $App::FileSync::VERSION, proto => $PROTOCOL_VERSION });
+	return $EXIT_OK;
 }
 
-sub _client_restore {
-    my (@args) = @_;
+# _client_init
+# Purpose:     filesync init: register a repo in the client configuration.
+# Entry:       @args are init's options.
+# Exit:        returns 0.
+# Side effects: creates the sync root and its marker (and a local server
+#              root); writes the client configuration.  Every id that will
+#              reach the server is checked here, so a bad one is reported
+#              at init rather than as a refusal at the first sync.
+sub _client_init :Private {
+	my (@args) = @_;
 
-    my ($repo_name, $to, $list, $config_path);
-    GetOptionsFromArray(\@args,
-        'repo=s'   => \$repo_name,
-        'to=s'     => \$to,
-        'list'     => \$list,
-        'config=s' => \$config_path,
-    ) or die "Usage: filesync restore PATH [--repo NAME] [--to DIR] [--list]\n";
+	my %opt;
+	_options(\@args, {
+		(map { ("$_=s" => \$opt{$_}) } qw(repo root server remote-repo id identity role transport server-root config known-hosts server-command snapshot-mode)),
+		'port=i'          => \$opt{port},
+		'accept-host-key' => \$opt{accept},
+	}, 'init');
 
-    my $path = shift @args;
-    die "restore: PATH is required\n" unless defined $path && length $path;
-    die "restore: unexpected arguments: @args\n" if @args;
+	my $repo = _require($opt{repo}, 'init', '--repo');
+	my $root = _require($opt{root}, 'init', '--root');
+	_check_id(\&validate_repo_name, $repo);
+	_check_id(\&validate_repo_name, $opt{'remote-repo'}) if defined $opt{'remote-repo'} && length $opt{'remote-repo'};
+	_check_id(\&validate_client_id, $opt{id}) if defined $opt{id} && length $opt{id};
 
-    my $config = App::FileSync::Config::load_client($config_path);
-    my @names = sort keys %{ $config->{repos} };
-    die "No repos configured; run filesync init first\n" unless @names;
+	my $role = $opt{role} // $ROLE_CLIENT;
+	throw('cli.init.bad_role', { role => $role }) unless any { $_ eq $role } @ROLES;
 
-    $repo_name = $names[0] if !defined $repo_name && @names == 1;
-    die "restore: --repo is required when several repos are configured\n"
-        unless defined $repo_name;
-    die "No repo '$repo_name' in the configuration\n"
-        unless $config->{repos}{$repo_name};
+	my $mode = $opt{'snapshot-mode'};
+	throw('cli.init.bad_mode', { mode => $mode })
+		if defined $mode && length $mode && $mode ne 'hardlink' && $mode ne 'copy';
 
-    my $result = App::FileSync::Client->new(
-        config => $config,
-        name   => $repo_name,
-    )->restore(path => $path, to => $to, list => $list);
+	my ($server, $server_root, $known) = @opt{qw(server server-root known-hosts)};
+	my $use = $opt{transport} || ($server_root ? 'local' : 'ssh');
+	throw('cli.init.bad_transport', { transport => $use }) unless $use eq 'local' || $use eq 'ssh';
+	throw('cli.init.need_server_root') if $use eq 'local' && !(defined $server_root && length $server_root);
+	throw('cli.init.need_server') if $use eq 'ssh' && !(defined $server && length $server);
+	throw('cli.init.bad_server', { server => $server }) if $use eq 'ssh' && !App::FileSync::Transport::SSH::valid_server($server);
+	throw('cli.init.no_known_hosts', { path => $known }) if defined $known && length $known && !-f $known;
+	throw('cli.init.accept_ssh_only') if $opt{accept} && $use ne 'ssh';
 
-    if ($list) {
-        if (!@{ $result->{versions} }) {
-            print "No trashed versions of '$path'\n";
-            return 0;
-        }
+	ensure_dir($root);
+	throw('cli.init.bad_root', { root => $root }) unless -d $root;
+	$root = abs_path($root);
 
-        for my $version (@{ $result->{versions} }) {
-            printf "%-12s %10s  %s  %s\n",
-                (defined $version->{date} ? $version->{date} : '-'),
-                (defined $version->{size} ? _format_bytes($version->{size}) : '-'),
-                (defined $version->{mtime}
-                    ? scalar(gmtime($version->{mtime})) . ' UTC'
-                    : '-'),
-                $version->{path};
-        }
+	my $marker = File::Spec->catfile($root, $ROOT_MARKER);
+	write_atomic($marker, $MARKER_TEXT) unless -e $marker;
 
-        return 0;
-    }
+	if (defined $server_root) {
+		ensure_dir($server_root);
+		$server_root = abs_path($server_root);
+	}
 
-    print "Restored $path to $result->{to}\n";
-    return 0;
+	my $config = App::FileSync::Config::load_client($opt{config});
+	$config->{client_id} = _default_client_id() unless defined $config->{client_id} && length $config->{client_id};
+	$config->{client_id} = $opt{id} if defined $opt{id} && length $opt{id};
+
+	my %optional = (
+		server_root       => $server_root,
+		server            => $server,
+		port              => $opt{port},
+		identity          => $opt{identity},
+		known_hosts       => $known,
+		host_key_checking => $opt{accept} ? 'accept-new' : undef,
+		server_command    => $opt{'server-command'},
+		snapshot_mode     => $mode,
+	);
+	$config->{repos}{$repo} = {
+		root             => $root,
+		remote_repo      => (defined $opt{'remote-repo'} && length $opt{'remote-repo'}) ? $opt{'remote-repo'} : $repo,
+		role             => $role,
+		transport        => $use,
+		local_trash_days => $LOCAL_TRASH_DAYS,
+		map { $_ => $optional{$_} } grep { defined $optional{$_} && length $optional{$_} } keys %optional,
+	};
+
+	my $path = App::FileSync::Config::save_client($config, $opt{config});
+
+	_say('cli.init.done', { repo => $repo });
+	_say('cli.init.client_id', { id => $config->{client_id} });
+	_say('cli.init.root', { root => $root });
+	_say('cli.init.transport', { transport => $use });
+	if ($use eq 'ssh') {
+		_say('cli.init.server', { server => $server });
+		_say($opt{accept} ? 'cli.init.host_key_tofu' : 'cli.init.host_key_strict');
+	}
+	_say('cli.init.config', { path => $path });
+
+	return $EXIT_OK;
 }
 
-sub _client_snapshot {
-    my (@args) = @_;
+# _check_id
+# Purpose:     validate an id given to init.
+# Entry:       $validate is validate_repo_name or validate_client_id.
+# Exit:        returns 1.
+# Side effects: raises cli.init.bad_id with the validator's reason.
+sub _check_id :Private {
+	my ($validate, $value) = @_;
 
-    my $verb = @args && $args[0] !~ /\A-/ ? shift @args : 'create';
-
-    return _client_snapshot_create(@args) if $verb eq 'create' || $verb eq 'take';
-    return _client_snapshot_list(@args)   if $verb eq 'list';
-    return _client_snapshot_restore(@args) if $verb eq 'restore';
-
-    die "Unknown snapshot command '$verb' (try: filesync help)\n";
+	my ($ok, $reason) = $validate->($value);
+	throw('cli.init.bad_id', { reason => $reason }) unless $ok;
+	return 1;
 }
 
-sub _client_snapshot_create {
-    my (@args) = @_;
+# _client_sync
+# Purpose:     filesync sync: sync each selected repo.
+# Entry:       @args are sync's options.
+# Exit:        returns 1 if any repo failed, else 3 if any warned, else 2 if
+#              any was locked, else 0.
+# Side effects: syncs; prints a summary per repo (or JSON); logs errors.
+#              One repo failing does not stop the others.
+sub _client_sync :Private {
+	my (@args) = @_;
 
-    my ($repo_name, $keep, $config_path);
-    GetOptionsFromArray(\@args,
-        'repo=s'   => \$repo_name,
-        'keep=i'   => \$keep,
-        'config=s' => \$config_path,
-    ) or die "Usage: filesync snapshot [--repo NAME] [--keep N]\n";
-    die "snapshot: unexpected arguments: @args\n" if @args;
+	my (%opt, @given);
+	_options(\@args, {
+		'repo=s@' => \@given,
+		(map { ($_ => \$opt{$_}) } qw(dry-run force verbose quiet json no-prune no-delta)),
+		'config=s' => \$opt{config},
+	}, 'sync');
 
-    die "snapshot: --keep must be positive\n" if defined $keep && $keep < 1;
+	my $config = App::FileSync::Config::load_client($opt{config});
+	my $names = _repos($config, \@given, 1);
+	my $logger = App::FileSync::Settings::logger(verbose => $opt{verbose}, quiet => $opt{quiet});
+	my $client_opts = { map { (my $key = $_) =~ tr/-/_/; $key => $opt{$_} } qw(dry-run force no-prune no-delta verbose) };
 
-    my $config = App::FileSync::Config::load_client($config_path);
-    my @names = sort keys %{ $config->{repos} };
-    die "No repos configured; run filesync init first\n" unless @names;
+	my (@results, @errors, %seen);
+	for my $name (@{$names}) {
+		my $result = eval { _client($config, $name, opts => $client_opts, logger => $logger)->sync() };
+		unless ($result) {
+			my $error = strip_location($@);
+			push @errors, { repo => $name, error => $error };
+			$logger->error(message('cli.repo_error', { repo => $name, error => $error })) unless $opt{json};
+			$seen{$EXIT_FATAL} = 1;
+			next;
+		}
 
-    $repo_name = $names[0] if !defined $repo_name && @names == 1;
-    die "snapshot: --repo is required when several repos are configured\n"
-        unless defined $repo_name;
-    die "No repo '$repo_name' in the configuration\n"
-        unless $config->{repos}{$repo_name};
+		push @results, $result;
+		my $exit = $result->{exit} || $EXIT_OK;
+		$seen{$exit} = 1;
+		if ($exit == $EXIT_LOCKED) {
+			$logger->warn(message('cli.repo_error', { repo => $name, error => $result->{error} })) unless $opt{json} || $opt{quiet};
+			next;
+		}
 
-    my $result = App::FileSync::Client->new(
-        config => $config,
-        name   => $repo_name,
-    )->snapshot_create(keep => $keep);
+		_print_sync($name, $result, \%opt) unless $opt{json};
+	}
 
-    if (($result->{exit} || 0) == 2) {
-        _logger()->warn("$repo_name: $result->{error}");
-        return 2;
-    }
+	print json_encode({ results => \@results, errors => \@errors }), "\n" if $opt{json};
 
-    unless ($result->{created}) {
-        print "$repo_name: snapshot $result->{date} already exists; left as it was\n";
-        return 0;
-    }
-
-    printf "%s: snapshot %s taken (%s, %s) in %s\n",
-        $repo_name,
-        $result->{date},
-        _plural($result->{files}, 'file'),
-        _format_bytes($result->{bytes}),
-        $result->{path};
-
-    if (my @pruned = @{ $result->{pruned} || [] }) {
-        printf "%s: pruned %d old snapshot%s (kept %d): %s\n",
-            $repo_name, scalar @pruned, @pruned == 1 ? '' : 's',
-            scalar @{ $result->{older} || [] }, join(' ', @pruned);
-    }
-
-    return 0;
+	# Severity order, not numeric order: a failure outranks warnings, which
+	# outrank a lock refusal (nothing went wrong; it just did not run).
+	return (first { $seen{$_} } $EXIT_FATAL, $EXIT_WARNINGS, $EXIT_LOCKED) // $EXIT_OK;
 }
 
-sub _client_snapshot_list {
-    my (@args) = @_;
+# _print_sync
+# Purpose:     the text report of one repo's sync.
+# Entry:       $result is a sync result; $opt the parsed options.
+# Exit:        returns 1.
+# Side effects: prints the planned actions (dry run), the counts, the
+#              transfer accounting (a dry run sends no payloads, so it has
+#              none) and, unless --quiet, the warnings.
+sub _print_sync :Private {
+	my ($name, $result, $opt) = @_;
 
-    my ($repo_name, $config_path);
-    GetOptionsFromArray(\@args, 'repo=s' => \$repo_name, 'config=s' => \$config_path)
-        or die "Usage: filesync snapshot list [--repo NAME]\n";
-    die "snapshot list: unexpected arguments: @args\n" if @args;
+	if ($opt->{'dry-run'}) {
+		for my $action (@{ $result->{actions} || [] }) {
+			(my $verb = $action->{a}) =~ tr/_/ /;
+			_say('cli.sync.would', { verb => $verb, path => $action->{p} });
+		}
+	}
 
-    my $config = App::FileSync::Config::load_client($config_path);
-    my @names = sort keys %{ $config->{repos} };
-    die "No repos configured; run filesync init first\n" unless @names;
+	my $summary = $result->{summary} || {};
+	_say('cli.sync.summary', {
+		repo => $name,
+		dry  => $opt->{'dry-run'} ? message('cli.sync.dry_tag') : '',
+		map { $_ => $summary->{$_} || 0 } qw(pulled pushed deleted conflicts),
+	});
+	_say('cli.sync.transfer', { report => _transfer_report($summary) }) unless $opt->{'dry-run'};
 
-    $repo_name = $names[0] if !defined $repo_name && @names == 1;
-    die "snapshot list: --repo is required when several repos are configured\n"
-        unless defined $repo_name;
-    die "No repo '$repo_name' in the configuration\n"
-        unless $config->{repos}{$repo_name};
-
-    my $result = App::FileSync::Client->new(
-        config => $config,
-        name   => $repo_name,
-    )->snapshot_list();
-
-    my $snapshots = $result->{snapshots};
-    if (!@{$snapshots}) {
-        print "No snapshots for $repo_name\n";
-        return 0;
-    }
-
-    printf "%-12s %8s %10s  %s\n", 'DATE', 'FILES', 'SIZE', 'PATH';
-    for my $snapshot (@{$snapshots}) {
-        printf "%-12s %8d %10s  %s\n",
-            $snapshot->{date},
-            $snapshot->{files},
-            _format_bytes($snapshot->{bytes}),
-            $snapshot->{path};
-    }
-
-    return 0;
+	_print_warnings($result->{warnings}) unless $opt->{quiet};
+	return 1;
 }
 
-sub _client_snapshot_restore {
-    my (@args) = @_;
+# _print_warnings
+# Purpose:     print warnings, one per line.
+# Entry:       $warnings is an arrayref or undef.
+# Exit:        returns 1.
+# Side effects: prints.
+sub _print_warnings :Private {
+	my ($warnings) = @_;
 
-    my ($repo_name, $to, $config_path);
-    GetOptionsFromArray(\@args,
-        'repo=s'   => \$repo_name,
-        'to=s'     => \$to,
-        'config=s' => \$config_path,
-    ) or die "Usage: filesync snapshot restore DATE [PATH] [--repo NAME] [--to DIR]\n";
-
-    my $date = shift @args;
-    my $path = shift @args;
-
-    die "snapshot restore: DATE is required\n" unless defined $date && length $date;
-    die "snapshot restore: unexpected arguments: @args\n" if @args;
-
-    my $config = App::FileSync::Config::load_client($config_path);
-    my @names = sort keys %{ $config->{repos} };
-    die "No repos configured; run filesync init first\n" unless @names;
-
-    $repo_name = $names[0] if !defined $repo_name && @names == 1;
-    die "snapshot restore: --repo is required when several repos are configured\n"
-        unless defined $repo_name;
-    die "No repo '$repo_name' in the configuration\n"
-        unless $config->{repos}{$repo_name};
-
-    my $result = App::FileSync::Client->new(
-        config => $config,
-        name   => $repo_name,
-    )->snapshot_restore(date => $date, path => $path, to => $to);
-
-    if (($result->{exit} || 0) == 2) {
-        _logger()->warn("$repo_name: $result->{error}");
-        return 2;
-    }
-
-    printf "%s: restored %s from snapshot %s (%s, %s) to %s\n",
-        $repo_name,
-        @{ $result->{paths} } ? join(' ', @{ $result->{paths} }) : 'the whole tree',
-        $result->{date},
-        _plural($result->{files}, 'file'),
-        _format_bytes($result->{bytes}),
-        $result->{to};
-
-    if ($result->{into_root}) {
-        print "note: a replica mirrors the master again on the next sync; "
-            . "use --to DIR to keep an exported copy\n";
-    }
-
-    return 0;
+	_say('cli.warning', { warning => $_ }) for @{ $warnings || [] };
+	return 1;
 }
 
-sub _plural {
-    my ($count, $word) = @_;
+# _client_status
+# Purpose:     filesync status: when each repo last synced, and how big it is.
+# Entry:       @args are status's options.
+# Exit:        returns 0.
+# Side effects: reads each repo's cache; prints.
+sub _client_status :Private {
+	my (@args) = @_;
 
-    $count = 0 unless defined $count;
-    return "$count $word" . ($count == 1 ? '' : 's');
+	my (@given, %opt);
+	_options(\@args, { 'repo=s@' => \@given, json => \$opt{json}, 'config=s' => \$opt{config} }, 'status');
+
+	my $config = App::FileSync::Config::load_client($opt{config});
+	my @status;
+	for my $name (@{ _repos($config, \@given, 0) }) {
+		my $repo = $config->{repos}{$name};
+		my $cache = _client($config, $name)->cache();
+		my $last = ref($cache->{last_run}) eq 'HASH' ? $cache->{last_run} : undef;
+
+		push @status, {
+			repo         => $name,
+			root         => $repo->{root},
+			transport    => $repo->{transport} || 'ssh',
+			last_run     => $last ? scalar(gmtime($last->{ts})) . ' UTC' : 'never',
+			last_summary => $last ? $last->{summary} : undef,
+			files        => scalar(grep { ($_->{t} || $TYPE_FILE) eq $TYPE_FILE } values %{ $cache->{entries} }),
+		};
+	}
+
+	if ($opt{json}) {
+		print json_encode({ repos => \@status }), "\n";
+		return $EXIT_OK;
+	}
+
+	for my $entry (@status) {
+		_say('cli.status.repo', $entry);
+		_say('cli.status.transport', $entry);
+		# JSON keeps the literal 'never' (it is data); the text is translated.
+		_say('cli.status.last_run', { last_run => $entry->{last_run} eq 'never' ? message('cli.never') : $entry->{last_run} });
+
+		# Caches written before the byte counters existed have no transfer
+		# figures; skip the line rather than invent zeros.
+		my $summary = $entry->{last_summary};
+		_say('cli.status.transfer', { report => _transfer_report($summary) })
+			if ref($summary) eq 'HASH' && defined $summary->{bytes_sent};
+		_say('cli.status.files', $entry);
+	}
+
+	return $EXIT_OK;
 }
 
-sub _format_bytes {
-    my ($bytes) = @_;
+# _client_log
+# Purpose:     filesync log: recent run attempts per repo.
+# Entry:       @args are log's options.
+# Exit:        returns 0.
+# Side effects: reads the run logs; prints (or JSON).  Bad dates are
+#              reported before any repo is touched.
+sub _client_log :Private {
+	my (@args) = @_;
 
-    $bytes = 0 unless defined $bytes;
-    return "$bytes B" if $bytes < 1024;
-    return sprintf('%.1f kB', $bytes / 1024) if $bytes < 1024 * 1024;
-    return sprintf('%.1f MB', $bytes / (1024 * 1024)) if $bytes < 1024 * 1024 * 1024;
-    return sprintf('%.1f GB', $bytes / (1024 * 1024 * 1024));
+	my (@given, @exits, %opt);
+	_options(\@args, {
+		'repo=s@' => \@given,
+		'n=i'     => \$opt{limit},
+		'exit=i@' => \@exits,
+		(map { ("$_=s" => \$opt{$_}) } qw(since until config)),
+		(map { ($_ => \$opt{$_}) } qw(warnings json)),
+	}, 'log');
+	_no_more(\@args, 'log');
+	throw('cli.positive', { command => 'log', option => '-n' }) if defined $opt{limit} && $opt{limit} < 1;
+	_check_exits(\@exits);
+	_check_window(@opt{qw(since until)});
+
+	my $config = App::FileSync::Config::load_client($opt{config});
+	my @results;
+	for my $name (@{ _repos($config, \@given, 1) }) {
+		my $result = _client($config, $name)->log(
+			limit => $opt{limit}, since => $opt{since}, until => $opt{until}, exits => \@exits, warnings => $opt{warnings},
+		);
+		push @results, $result;
+		_print_runs($name, $result->{runs}) unless $opt{json};
+	}
+
+	print json_encode({ results => \@results }), "\n" if $opt{json};
+	return $EXIT_OK;
 }
 
-# Transfer accounting is exact: these bytes are what the peer actually read
-# off the connection, so rounding them would defeat the purpose.
-sub _bytes_exact {
-    my ($bytes) = @_;
+# _print_runs
+# Purpose:     the text form of one repo's run log.
+# Entry:       $runs is from Client->log.
+# Exit:        returns 1.
+# Side effects: prints one line per run (and its warnings).  A failed or
+#              lock-refused attempt has no counts worth printing: its
+#              message explains it.  Entries older than the byte counters
+#              keep the shorter line.
+sub _print_runs :Private {
+	my ($name, $runs) = @_;
 
-    $bytes = 0 unless defined $bytes && $bytes =~ /\A\d+\z/;
-    1 while $bytes =~ s/(\d)(\d{3})\z/$1,$2/;
+	return _say('cli.log.none', { repo => $name }) unless @{$runs};
 
-    return "$bytes B";
+	for my $run (@{$runs}) {
+		my %line = (repo => $name, ts => format_utc($run->{ts}), exit => $run->{exit} || 0);
+
+		if (defined $run->{error} && length $run->{error}) {
+			(my $text = $run->{error}) =~ s/\s+/ /g;
+			_say('cli.log.error', { %line, message => $text });
+			next;
+		}
+
+		my $summary = $run->{summary} || {};
+		_say('cli.log.run', {
+			%line,
+			(map { $_ => $summary->{$_} || 0 } qw(pulled pushed deleted conflicts)),
+			skipped  => $summary->{skipped} ? message('cli.log.skipped', { count => $summary->{skipped} }) : '',
+			transfer => (!$run->{dry_run} && defined $summary->{bytes_sent}) ? ', ' . _transfer_report($summary) : '',
+			dry      => $run->{dry_run} ? message('cli.log.dry_tag') : '',
+		});
+		_print_warnings($run->{warnings});
+	}
+
+	return 1;
 }
 
-# One line of per-run accounting: payload bytes in each direction, then how many
-# files moved as a delta rather than as a whole file.
-sub _transfer_report {
-    my ($summary) = @_;
+# _client_settings
+# Purpose:     filesync settings: effective settings and where each came from.
+# Entry:       @args are settings's options.
+# Exit:        returns 0.
+# Side effects: reads the settings and the client configuration; prints.
+sub _client_settings :Private {
+	my (@args) = @_;
 
-    my $pulled = $summary->{delta_pulled} || 0;
-    my $pushed = $summary->{delta_pushed} || 0;
+	my %opt;
+	_options(\@args, { json => \$opt{json}, 'config=s' => \$opt{config} }, 'settings');
+	_no_more(\@args, 'settings');
 
-    my @delta;
-    push @delta, "$pulled pulled" if $pulled;
-    push @delta, "$pushed pushed" if $pushed;
+	my $report = App::FileSync::Settings::explain();
+	my $client_file = (defined $opt{config} && length $opt{config}) ? $opt{config} : App::FileSync::Config::client_config_path();
+	$report->{config_file} = $client_file;
+	$report->{repos} = App::FileSync::Settings::explain_repos(
+		config      => App::FileSync::Config::load_client($opt{config}),
+		report      => $report,
+		config_file => $client_file,
+	);
 
-    return sprintf('sent %s, received %s, %s by delta%s',
-        _bytes_exact($summary->{bytes_sent}),
-        _bytes_exact($summary->{bytes_received}),
-        _plural($pulled + $pushed, 'file'),
-        @delta ? ' (' . join(', ', @delta) . ')' : '');
+	if ($opt{json}) {
+		print json_encode($report), "\n";
+		return $EXIT_OK;
+	}
+
+	my $file = $report->{settings_file};
+	_say('cli.settings.file', { file => (defined $file && length $file) ? $file : message('cli.settings.no_file') });
+	print "\n";
+	_say('cli.settings.row', { key => $_->{key}, value => _display_setting($_), source => _describe_source($_) })
+		for @{ $report->{settings} };
+	print "\n";
+	_say('cli.settings.note');
+
+	my @repos = @{ $report->{repos} || [] };
+	return $EXIT_OK unless @repos;
+
+	print "\n";
+	_say('cli.settings.repos');
+	for my $repo (@repos) {
+		_say('cli.settings.repo', { %{$repo}, server => defined $repo->{server} ? ", $repo->{server}" : '' });
+		unless (defined $repo->{ssh}) {
+			_say('cli.settings.local');
+			next;
+		}
+		_say('cli.settings.repo_row', { key => $_->{key}, value => _display_setting($_), source => _describe_repo_source($_) })
+			for @{ $repo->{ssh} };
+	}
+
+	return $EXIT_OK;
 }
 
-sub _admin_dispatch {
-    my (@args) = @_;
+# _describe_repo_source / _describe_source / _display_setting
+# Purpose:     the text columns of "filesync settings".
+# Entry:       $row is a row from Settings::explain or explain_repos.
+# Exit:        returns the text.
+# Side effects: none.  Port and host-key checking have no process-wide
+#              fallback, so their rows say [repo only]; a blank value that
+#              means "the transport's default" is named rather than shown
+#              as an empty column.
+sub _describe_repo_source :Private {
+	my ($row) = @_;
 
-    my $root = $ENV{FILESYNC_ROOT};
-    $root = '/srv/filesync' unless defined $root && length $root;
-
-    while (@args && $args[0] =~ /\A--root(?:=(.*))?\z/) {
-        if (defined $1) {
-            $root = $1;
-            shift @args;
-        } else {
-            shift @args;
-            $root = shift @args;
-            die "filesync-admin: --root needs a value\n" unless defined $root;
-        }
-    }
-
-    my $admin = App::FileSync::Admin->new(root => $root);
-
-    my $group = shift @args;
-    $group = 'help' unless defined $group;
-
-    if ($group eq 'help' || $group eq '--help') {
-        print <<'USAGE';
-filesync-admin --root DIR <command>
-
-    repo create NAME [--trash-days N] [--max-deletes N] [--max-delete-percent N]
-                     [--ignore PATTERN]...
-    repo list
-    repo show NAME
-    client allow ID --repo NAME [--role client|replica]
-    client list --repo NAME
-    client forget ID --repo NAME
-    reindex NAME [--dry-run] [--json]
-    verify NAME [--deep] [--sample N] [--json]
-    restore NAME PATH [--to DIR] [--list] [--date YYYY-MM-DD]
-    log NAME... [-n N] [--client ID] [--since YYYY-MM-DD|EPOCH]
-                  [--until YYYY-MM-DD|EPOCH] [--exit N]... [--warnings] [--json]
-
-Exit codes: 0 ok, 1 fatal, 4 verification found drift.
-USAGE
-        return 0;
-    }
-
-    if ($group eq 'repo') {
-        my $verb = shift @args;
-        $verb = '' unless defined $verb;
-
-        return _admin_repo_create($admin, @args) if $verb eq 'create';
-        return _admin_repo_list($admin) if $verb eq 'list';
-        return _admin_repo_show($admin, @args) if $verb eq 'show';
-
-        die "Unknown repo command '$verb'\n";
-    }
-
-    if ($group eq 'log') {
-        return _admin_log($admin, @args);
-    }
-
-    if ($group eq 'verify') {
-        return _admin_verify($admin, @args);
-    }
-
-    if ($group eq 'reindex') {
-        return _admin_reindex($admin, @args);
-    }
-
-    if ($group eq 'restore') {
-        return _admin_restore($admin, @args);
-    }
-
-    if ($group eq 'client') {
-        my $verb = shift @args;
-        $verb = '' unless defined $verb;
-
-        return _admin_client_allow($admin, @args) if $verb eq 'allow';
-        return _admin_client_list($admin, @args) if $verb eq 'list';
-        return _admin_client_forget($admin, @args) if $verb eq 'forget';
-
-        die "Unknown client command '$verb'\n";
-    }
-
-    die "Unknown command '$group' (try: filesync-admin help)\n";
+	my $description = message("cli.repo_source.$row->{source}", $row);
+	return $row->{repo_only} ? message('cli.source.repo_only', { description => $description }) : $description;
 }
 
-sub _admin_repo_create {
-    my ($admin, @args) = @_;
+sub _describe_source :Private {
+	my ($row) = @_;
 
-    my ($trash_days, $max_deletes, $max_delete_percent, @ignore);
-    GetOptionsFromArray(\@args,
-        'trash-days=i'         => \$trash_days,
-        'max-deletes=i'        => \$max_deletes,
-        'max-delete-percent=i' => \$max_delete_percent,
-        'ignore=s'             => \@ignore,
-    ) or die "Usage: filesync-admin repo create NAME [--trash-days N] ...\n";
-
-    my $name = shift @args;
-    die "repo create: NAME is required\n" unless defined $name && length $name;
-    die "repo create: unexpected arguments: @args\n" if @args;
-
-    my $result = $admin->repo_create(
-        name               => $name,
-        trash_days         => $trash_days,
-        max_deletes        => $max_deletes,
-        max_delete_percent => $max_delete_percent,
-        ignore             => \@ignore,
-    );
-
-    print "Created repo '$result->{name}'\n";
-    print "  master: $result->{master}\n";
-    print "  config: $result->{config}\n";
-
-    return 0;
+	# Config::Abstraction reports file-like sources under several names.
+	my $source = $row->{source} =~ /\A(?:default|merged|env)\z/ ? $row->{source} : 'file';
+	return message("cli.source.$source", $row);
 }
 
-sub _admin_repo_list {
-    my ($admin) = @_;
+sub _display_setting :Private {
+	my ($row) = @_;
 
-    my $repos = $admin->repo_list();
-    if (!@{$repos}) {
-        print "No repos under $admin->{root}\n";
-        return 0;
-    }
-
-    print "$_\n" for @{$repos};
-    return 0;
+	my $value = $row->{value};
+	my $blank = $BLANK_SETTING{ $row->{key} };
+	return (!(defined $value && length $value) && $blank) ? message($blank) : $value // '';
 }
 
-sub _admin_repo_show {
-    my ($admin, @args) = @_;
+# _client_verify
+# Purpose:     filesync verify: compare each repo's tree with its base.
+# Entry:       @args are verify's options.
+# Exit:        returns 4 if any repo drifted, else 0.
+# Side effects: reads the trees; prints (or JSON).
+sub _client_verify :Private {
+	my (@args) = @_;
 
-    my $name = shift @args;
-    die "repo show: NAME is required\n" unless defined $name && length $name;
+	my (@given, %opt);
+	_options(\@args, { 'repo=s@' => \@given, (map { ($_ => \$opt{$_}) } qw(deep json)), 'config=s' => \$opt{config} }, 'verify');
+	_no_more(\@args, 'verify');
 
-    my $info = $admin->repo_show($name);
-    print "name:    $info->{config}{name}\n";
-    print "master:  $info->{master}\n";
-    print "meta:    $info->{meta}\n";
-    print "trash:   $info->{config}{trash_days} days\n";
-    print "limits:  $info->{config}{max_deletes} files / "
-        . "$info->{config}{max_delete_percent}%\n";
-    print "clients: " . (@{ $info->{clients} } ? join(', ', @{ $info->{clients} }) : '(none)') . "\n";
+	my $config = App::FileSync::Config::load_client($opt{config});
+	my @reports = map { _client($config, $_)->verify(deep => $opt{deep}) } @{ _repos($config, \@given, 1) };
 
-    return 0;
+	if ($opt{json}) {
+		print json_encode({ results => \@reports }), "\n";
+	} else {
+		_print_verify($_, 1) for @reports;
+	}
+
+	return (any { !$_->{ok} } @reports) ? $EXIT_DRIFT : $EXIT_OK;
 }
 
-sub _admin_log {
-    my ($admin, @args) = @_;
+# _print_verify
+# Purpose:     the text form of a verify report (client or admin).
+# Entry:       $report is from Verify; $base_note says whether to mention a
+#              missing base (client only: the admin always has an index).
+# Exit:        returns 1.
+# Side effects: prints.
+sub _print_verify :Private {
+	my ($report, $base_note) = @_;
 
-    my ($limit, $client, $since, $until, @exits, $json, $warnings);
-    GetOptionsFromArray(\@args,
-        'n=i'      => \$limit,
-        'client=s' => \$client,
-        'since=s'  => \$since,
-        'until=s'  => \$until,
-        'exit=i@'  => \@exits,
-        'warnings' => \$warnings,
-        'json'     => \$json,
-    ) or die "Usage: filesync-admin log NAME... [-n N] [--client ID] [--since DATE] "
-        . "[--until DATE] [--exit N] [--warnings] [--json]\n";
+	_say('cli.verify.summary', {
+		repo     => $report->{repo},
+		state    => message($report->{ok} ? 'cli.verify.clean' : 'cli.verify.drift'),
+		files    => message('word.file', { count => $report->{files} || 0 }),
+		rehashed => $report->{rehashed},
+		trusted  => $report->{trusted},
+	});
+	_say('cli.verify.no_base') if $base_note && !$report->{known};
 
-    die "log: --exit must be between 0 and 255\n"
-        if grep { $_ < 0 || $_ > 255 } @exits;
+	for my $entry (@{ $report->{modified} }) {
+		_say('cli.verify.modified', { path => $entry->{p}, reason => defined $entry->{reason} ? " ($entry->{reason})" : '' });
+	}
+	_say('cli.verify.missing', { path => $_->{p} }) for @{ $report->{missing} };
+	_say('cli.verify.extra', { path => $_->{p} }) for @{ $report->{extra} };
 
-    # Report a bad date before any repo is touched.
-    App::FileSync::parse_since($since) if defined $since;
-    App::FileSync::parse_until($until) if defined $until;
-
-    my @names = @args;
-    die "log: NAME is required\n" unless @names;
-    die "log: NAME must not be empty\n"
-        if grep { !defined $_ || !length $_ } @names;
-
-    $limit = 20 unless defined $limit;
-
-    # Check every name before printing, so text mode never shows a partial
-    # answer before failing on a later repo.
-    App::FileSync::Config::load_repo($admin->root, $_) for @names;
-
-    my $multiple = @names > 1;
-    my $indent   = $multiple ? '  ' : '';
-    my @results;
-
-    for my $name (@names) {
-        my $events = $admin->journal_read(
-            repo     => $name,
-            limit    => $limit,
-            client   => $client,
-            since    => $since,
-            until    => $until,
-            exits    => \@exits,
-            warnings => $warnings,
-        );
-
-        my %result = (
-            repo   => $name,
-            path   => $admin->journal_dir($name),
-            events => $events,
-        );
-        $result{client} = $client if defined $client && length $client;
-        $result{since}  = App::FileSync::parse_since($since) if defined $since;
-        $result{until}  = App::FileSync::parse_until($until) if defined $until;
-        $result{exits}  = [ map { $_ + 0 } @exits ] if @exits;
-        $result{warnings} = 1 if $warnings;
-
-        push @results, \%result;
-        next if $json;
-
-        # With one repo the lines stand alone; with several, head each group.
-        print "$name:\n" if $multiple;
-
-        if (!@{$events}) {
-            print "No journal entries for $name\n";
-            next;
-        }
-
-        for my $event (@{$events}) {
-            my @detail;
-
-            push @detail, $event->{path} if defined $event->{path};
-            push @detail, 'from=' . $event->{from} if defined $event->{from};
-            push @detail, 'winner=' . $event->{winner} if defined $event->{winner};
-            push @detail, 'loser=' . $event->{loser_name} if defined $event->{loser_name};
-            push @detail, 'exit=' . $event->{exit} if defined $event->{exit};
-            push @detail, 'trash=' . $event->{trash} if defined $event->{trash};
-            push @detail, 'sha256=' . $event->{sha256} if defined $event->{sha256};
-
-            for my $counter (qw(actions deletions conflicts pulled pushed deleted)) {
-                push @detail, "$counter=$event->{$counter}" if defined $event->{$counter};
-            }
-
-            push @detail, 'dry-run' if $event->{dry_run};
-            push @detail, 'locked' if $event->{locked};
-
-            if (defined $event->{error} && length $event->{error}) {
-                my $message = $event->{error};
-                $message =~ s/\s+/ /g;
-                push @detail, $message;
-            }
-
-            printf "%s%s  %-12s %-12s %s\n",
-                $indent,
-                format_utc($event->{ts}),
-                defined $event->{client} ? $event->{client} : '-',
-                defined $event->{action} ? $event->{action} : '?',
-                join(' ', @detail);
-        }
-    }
-
-    print json_encode({ results => \@results }), "\n" if $json;
-
-    return 0;
+	return 1;
 }
 
-sub _admin_reindex {
-    my ($admin, @args) = @_;
+# _client_restore
+# Purpose:     filesync restore: put a path back from the local trash.
+# Entry:       @args are PATH and options.
+# Exit:        returns 0.
+# Side effects: copies the version out, or lists versions.
+sub _client_restore :Private {
+	my (@args) = @_;
 
-    my ($dry_run, $json);
-    GetOptionsFromArray(\@args, 'dry-run' => \$dry_run, 'json' => \$json)
-        or die "Usage: filesync-admin reindex NAME [--dry-run] [--json]\n";
+	my %opt;
+	_options(\@args, { (map { ("$_=s" => \$opt{$_}) } qw(repo to config)), list => \$opt{list} }, 'restore');
+	my $path = _require(shift @args, 'restore', 'PATH');
+	_no_more(\@args, 'restore');
 
-    my $name = shift @args;
-    die "reindex: NAME is required\n" unless defined $name && length $name;
-    die "reindex: unexpected arguments: @args\n" if @args;
+	my $config = App::FileSync::Config::load_client($opt{config});
+	my $name = _one_repo($config, $opt{repo}, 'restore');
+	my $result = _client($config, $name)->restore(path => $path, to => $opt{to}, list => $opt{list});
 
-    my $result = $admin->reindex(repo => $name, dry_run => $dry_run);
+	return _print_versions($result->{versions}, 'cli.restore.no_versions', { path => $path }) if $opt{list};
 
-    if ($json) {
-        print json_encode($result), "\n";
-        return 0;
-    }
-
-    printf "%s: %s %s, %s (%s)%s\n",
-        $name,
-        $dry_run ? 'would index' : 'indexed',
-        _plural($result->{files}, 'file'),
-        _plural($result->{dirs}, 'empty dir'),
-        _format_bytes($result->{bytes}),
-        $dry_run ? '; index unchanged' : '; master index written';
-
-    for my $path (sort keys %{ $result->{skipped} || {} }) {
-        print "  skipped: $path ($result->{skipped}{$path})\n";
-    }
-
-    return 0;
+	_say('cli.restore.done', { path => $path, to => $result->{to} });
+	return $EXIT_OK;
 }
 
-sub _admin_verify {
-    my ($admin, @args) = @_;
+# _print_versions
+# Purpose:     list trashed versions (client or admin).
+# Entry:       $versions are Trash::version_info rows; $empty_key and
+#              $empty_args say what to print when there are none.
+# Exit:        returns 0.
+# Side effects: prints.
+sub _print_versions :Private {
+	my ($versions, $empty_key, $empty_args) = @_;
 
-    my ($deep, $sample, $json);
-    GetOptionsFromArray(\@args,
-        'deep'   => \$deep,
-        'sample=i' => \$sample,
-        'json'   => \$json,
-    ) or die "Usage: filesync-admin verify NAME [--deep] [--sample N] [--json]\n";
+	return _say($empty_key, $empty_args) && $EXIT_OK unless @{$versions};
 
-    my $name = shift @args;
-    die "verify: NAME is required\n" unless defined $name && length $name;
-    die "verify: unexpected arguments: @args\n" if @args;
-    die "verify: --sample must be positive\n" if defined $sample && $sample < 1;
+	for my $version (@{$versions}) {
+		_say('cli.restore.version', {
+			date  => $version->{date} // '-',
+			size  => defined $version->{size} ? _format_bytes($version->{size}) : '-',
+			mtime => defined $version->{mtime} ? scalar(gmtime($version->{mtime})) . ' UTC' : '-',
+			path  => $version->{path},
+		});
+	}
 
-    my $report = $admin->verify(repo => $name, deep => $deep, sample => $sample);
-
-    if ($json) {
-        print json_encode($report), "\n";
-        return $report->{ok} ? 0 : 4;
-    }
-
-    printf "%s: %s (%s, %d rehashed, %d unchanged)\n",
-        $name,
-        $report->{ok} ? 'clean' : 'drift detected',
-        _plural($report->{files}, 'file'),
-        $report->{rehashed},
-        $report->{trusted};
-
-    for my $entry (@{ $report->{modified} }) {
-        print "  modified: $entry->{p}",
-            (defined $entry->{reason} ? " ($entry->{reason})" : ''), "\n";
-    }
-    print "  missing:  $_->{p}\n" for @{ $report->{missing} };
-    print "  extra:    $_->{p}\n" for @{ $report->{extra} };
-
-    return $report->{ok} ? 0 : 4;
+	return $EXIT_OK;
 }
 
-sub _admin_restore {
-    my ($admin, @args) = @_;
+# _client_snapshot
+# Purpose:     filesync snapshot [create|take|list|restore].
+# Entry:       @args start with the verb, or an option (meaning create).
+# Exit:        returns the sub-command's exit code.
+# Side effects: raises cli.unknown_snapshot.
+sub _client_snapshot :Private {
+	my (@args) = @_;
 
-    my ($to, $list, $date);
-    GetOptionsFromArray(\@args,
-        'to=s'   => \$to,
-        'list'   => \$list,
-        'date=s' => \$date,
-    ) or die "Usage: filesync-admin restore NAME PATH [--to DIR] [--list] "
-        . "[--date YYYY-MM-DD]\n";
+	my $verb = (@args && $args[0] !~ /\A-/) ? shift @args : 'create';
+	my %verbs = (create => '_client_snapshot_create', take => '_client_snapshot_create',
+		list => '_client_snapshot_list', restore => '_client_snapshot_restore');
+	my $handler = $verbs{$verb} or throw('cli.unknown_snapshot', { verb => $verb });
 
-    my $name = shift @args;
-    my $path = shift @args;
-
-    die "restore: NAME and PATH are required\n"
-        unless defined $name && length $name && defined $path && length $path;
-    die "restore: unexpected arguments: @args\n" if @args;
-
-    my $result = $admin->restore(
-        repo => $name,
-        path => $path,
-        to   => $to,
-        list => $list,
-        date => $date,
-    );
-
-    if ($list) {
-        if (!@{ $result->{versions} }) {
-            print "No trashed versions of '$path' in $name\n";
-            return 0;
-        }
-
-        for my $version (@{ $result->{versions} }) {
-            printf "%-12s %10s  %s  %s\n",
-                (defined $version->{date} ? $version->{date} : '-'),
-                (defined $version->{size} ? _format_bytes($version->{size}) : '-'),
-                (defined $version->{mtime}
-                    ? scalar(gmtime($version->{mtime})) . ' UTC'
-                    : '-'),
-                $version->{path};
-        }
-
-        return 0;
-    }
-
-    printf "Restored %s:%s from %s to %s\n",
-        $name,
-        $path,
-        (defined $result->{date} ? $result->{date} : 'the trash'),
-        $result->{to};
-
-    return 0;
+	return __PACKAGE__->can($handler)->(@args);
 }
 
-sub _admin_client_allow {
-    my ($admin, @args) = @_;
+# _client_snapshot_create
+# Purpose:     take today's snapshot of a replica, pruning old ones.
+# Entry:       @args are the options.
+# Exit:        returns 0, or 2 when another run holds the lock.
+# Side effects: creates and prunes snapshots; prints.
+sub _client_snapshot_create :Private {
+	my (@args) = @_;
 
-    my ($repo, $role);
-    GetOptionsFromArray(\@args, 'repo=s' => \$repo, 'role=s' => \$role)
-        or die "Usage: filesync-admin client allow ID --repo NAME [--role R]\n";
+	my %opt;
+	_options(\@args, { 'repo=s' => \$opt{repo}, 'keep=i' => \$opt{keep}, 'config=s' => \$opt{config} }, 'snapshot');
+	_no_more(\@args, 'snapshot');
+	throw('cli.positive', { command => 'snapshot', option => '--keep' }) if defined $opt{keep} && $opt{keep} < 1;
 
-    my $client = shift @args;
-    die "client allow: ID is required\n" unless defined $client && length $client;
-    die "client allow: --repo is required\n" unless defined $repo && length $repo;
+	my $config = App::FileSync::Config::load_client($opt{config});
+	my $name = _one_repo($config, $opt{repo}, 'snapshot');
+	my $result = _client($config, $name)->snapshot_create(keep => $opt{keep});
+	return _warn_locked($name, $result) if ($result->{exit} || 0) == $EXIT_LOCKED;
 
-    my $result = $admin->client_allow(
-        repo   => $repo,
-        client => $client,
-        role   => $role,
-    );
+	return _say('cli.snapshot.exists', { repo => $name, date => $result->{date} }) && $EXIT_OK unless $result->{created};
 
-    print "Allowed $result->{client} on $repo as $result->{role}\n";
-    return 0;
+	_say('cli.snapshot.taken', {
+		repo  => $name,
+		date  => $result->{date},
+		files => message('word.file', { count => $result->{files} }),
+		size  => _format_bytes($result->{bytes}),
+		path  => $result->{path},
+	});
+
+	my @pruned = @{ $result->{pruned} || [] };
+	_say('cli.snapshot.pruned', { repo => $name, count => scalar @pruned, kept => scalar @{ $result->{older} || [] }, dates => "@pruned" })
+		if @pruned;
+
+	return $EXIT_OK;
 }
 
-sub _admin_client_list {
-    my ($admin, @args) = @_;
+# _client_snapshot_list
+# Purpose:     list a replica's snapshots.
+# Entry:       @args are the options.
+# Exit:        returns 0.
+# Side effects: prints.
+sub _client_snapshot_list :Private {
+	my (@args) = @_;
 
-    my $repo;
-    GetOptionsFromArray(\@args, 'repo=s' => \$repo)
-        or die "Usage: filesync-admin client list --repo NAME\n";
-    die "client list: --repo is required\n" unless defined $repo && length $repo;
+	my %opt;
+	_options(\@args, { 'repo=s' => \$opt{repo}, 'config=s' => \$opt{config} }, 'snapshot_list');
+	_no_more(\@args, 'snapshot list');
 
-    my $clients = $admin->client_list($repo);
-    if (!@{$clients}) {
-        print "No clients registered for $repo\n";
-        return 0;
-    }
+	my $config = App::FileSync::Config::load_client($opt{config});
+	my $name = _one_repo($config, $opt{repo}, 'snapshot list');
+	my $snapshots = _client($config, $name)->snapshot_list()->{snapshots};
 
-    for my $client (@{$clients}) {
-        printf "%-24s %-8s %s\n", $client->{client}, $client->{role},
-            $client->{base} ? 'has synced' : 'never synced';
-    }
+	return _say('cli.snapshot.none', { repo => $name }) && $EXIT_OK unless @{$snapshots};
 
-    return 0;
+	_say('cli.snapshot.header', { map { $_ => message("cli.snapshot.column.$_") } qw(date files size path) });
+	_say('cli.snapshot.row', { %{$_}, size => _format_bytes($_->{bytes}) }) for @{$snapshots};
+	return $EXIT_OK;
 }
 
-sub _admin_client_forget {
-    my ($admin, @args) = @_;
+# _client_snapshot_restore
+# Purpose:     copy a snapshot (or one path) back.
+# Entry:       @args are DATE [PATH] and options.
+# Exit:        returns 0, or 2 when another run holds the lock.
+# Side effects: replaces files; prints, with a reminder that a replica is
+#              mirrored again on its next sync.
+sub _client_snapshot_restore :Private {
+	my (@args) = @_;
 
-    my $repo;
-    GetOptionsFromArray(\@args, 'repo=s' => \$repo)
-        or die "Usage: filesync-admin client forget ID --repo NAME\n";
-    die "client forget: --repo is required\n" unless defined $repo && length $repo;
+	my %opt;
+	_options(\@args, { map { ("$_=s" => \$opt{$_}) } qw(repo to config) }, 'snapshot_restore');
+	my $date = _require(shift @args, 'snapshot restore', 'DATE');
+	my $path = shift @args;
+	_no_more(\@args, 'snapshot restore');
 
-    my $client = shift @args;
-    die "client forget: ID is required\n" unless defined $client && length $client;
+	my $config = App::FileSync::Config::load_client($opt{config});
+	my $name = _one_repo($config, $opt{repo}, 'snapshot restore');
+	my $result = _client($config, $name)->snapshot_restore(date => $date, path => $path, to => $opt{to});
+	return _warn_locked($name, $result) if ($result->{exit} || 0) == $EXIT_LOCKED;
 
-    my $result = $admin->client_forget(repo => $repo, client => $client);
-    print $result->{removed}
-        ? "Forgot $client (removed $result->{path})\n"
-        : "No stored state for $client\n";
+	_say('cli.snapshot.restored', {
+		repo  => $name,
+		what  => @{ $result->{paths} } ? "@{ $result->{paths} }" : message('cli.snapshot.whole_tree'),
+		date  => $result->{date},
+		files => message('word.file', { count => $result->{files} }),
+		size  => _format_bytes($result->{bytes}),
+		to    => $result->{to},
+	});
+	_say('cli.snapshot.into_root') if $result->{into_root};
 
-    return 0;
+	return $EXIT_OK;
 }
 
-sub _default_client_id {
-    my $name = Sys::Hostname::hostname();
-    $name =~ s/\..*//;
-    $name = lc $name;
-    $name =~ s/[^a-z0-9._-]+/-/g;
-    $name =~ s/\A-+|-+\z//g;
-    $name = 'client' unless length $name;
+# _warn_locked
+# Purpose:     report a lock refusal from a snapshot command.
+# Entry:       $result has error.
+# Exit:        returns 2.
+# Side effects: logs a warning.
+sub _warn_locked :Private {
+	my ($name, $result) = @_;
 
-    return $name;
+	App::FileSync::Settings::logger()->warn(message('cli.repo_error', { repo => $name, error => $result->{error} }));
+	return $EXIT_LOCKED;
+}
+
+# ------------------------------------------------------------ formatting
+
+# _format_bytes
+# Purpose:     a byte count for people: B, kB, MB or GB with one decimal.
+# Entry:       $bytes may be undef (shown as 0).
+# Exit:        returns the text.
+# Side effects: none.
+sub _format_bytes :Private {
+	my ($bytes) = @_;
+
+	$bytes //= 0;
+	my $unit = first { $bytes >= $_->[0] } @SIZE_UNITS;
+	return $unit
+		? message('cli.size.scaled', { value => $bytes / $unit->[0], unit => $unit->[1] })
+		: message('cli.size.bytes', { value => $bytes });
+}
+
+# _bytes_exact
+# Purpose:     an exact byte count with thousands separators.
+# Entry:       $bytes may be undef or junk (shown as 0).
+# Exit:        returns the text.
+# Side effects: none.  Transfer accounting is exact: these bytes are what
+#              the peer actually read, so rounding them would defeat it.
+sub _bytes_exact :Private {
+	my ($bytes) = @_;
+
+	$bytes = 0 unless defined $bytes && $bytes =~ /\A\d+\z/;
+	1 while $bytes =~ s/(\d)(\d{3})(?!\d)/$1,$2/;
+	return message('cli.size.exact', { value => $bytes });
+}
+
+# _transfer_report
+# Purpose:     one line of per-run accounting.
+# Entry:       $summary has bytes_sent, bytes_received, delta_pulled,
+#              delta_pushed.
+# Exit:        returns the text: bytes each way, then how many files moved
+#              as a delta rather than whole.
+# Side effects: none.
+sub _transfer_report :Private {
+	my ($summary) = @_;
+
+	my %delta = map { $_ => $summary->{"delta_$_"} || 0 } qw(pulled pushed);
+	my @parts = map { message("cli.transfer.$_", { count => $delta{$_} }) } grep { $delta{$_} } qw(pulled pushed);
+
+	return message('cli.transfer.report', {
+		sent     => _bytes_exact($summary->{bytes_sent}),
+		received => _bytes_exact($summary->{bytes_received}),
+		files    => message('word.file', { count => $delta{pulled} + $delta{pushed} }),
+		detail   => @parts ? ' (' . join(', ', @parts) . ')' : '',
+	});
+}
+
+# _check_exits / _check_window
+# Purpose:     validate log filters before anything is read.
+# Entry:       exit codes; since and until (maybe undef).
+# Exit:        returns 1.
+# Side effects: raises cli.exit_range or when.bad.
+sub _check_exits :Private {
+	my ($exits) = @_;
+
+	throw('cli.exit_range', { max => $EXIT_MAX }) if any { $_ < 0 || $_ > $EXIT_MAX } @{$exits};
+	return 1;
+}
+
+sub _check_window :Private {
+	my ($since, $until) = @_;
+
+	parse_since($since) if defined $since;
+	parse_until($until) if defined $until;
+	return 1;
+}
+
+# _default_client_id
+# Purpose:     a client id derived from the host name.
+# Entry:       none.
+# Exit:        returns a valid client id: the short host name, lower-cased,
+#              with anything else replaced by '-', starting with a letter
+#              or digit and at most 64 characters; "client" if nothing is
+#              left.
+# Side effects: none.
+sub _default_client_id :Private {
+	my $name = lc Sys::Hostname::hostname();
+	$name =~ s/\..*//s;
+	$name =~ s/[^a-z0-9._-]+/-/g;
+	$name =~ s/\A[^a-z0-9]+//;
+	$name = substr($name, 0, $MAX_ID_LENGTH);
+	$name =~ s/-+\z//;
+
+	return length $name ? $name : $ROLE_CLIENT;
+}
+
+# ------------------------------------------------------------------- admin
+
+# _admin_dispatch
+# Purpose:     filesync-admin: parse --root, then run the command.
+# Entry:       @args is the command line.
+# Exit:        returns the command's exit code.
+# Side effects: raises cli.admin.* for an unknown command or verb.
+sub _admin_dispatch :Private {
+	my (@args) = @_;
+
+	my $root = $ENV{FILESYNC_ROOT};
+	while (@args && $args[0] =~ /\A--root(?:=(.*))?\z/s) {
+		shift @args;
+		$root = defined $1 ? $1 : shift @args;
+		throw('cli.admin.root_value') unless defined $root;
+	}
+
+	my $group = shift(@args) // 'help';
+	if ($group eq 'help' || $group eq '--help') {
+		print message('cli.help.admin');
+		return $EXIT_OK;
+	}
+
+	my $admin = App::FileSync::Admin->new(root => $root);
+	my $entry = $ADMIN_COMMANDS{$group} or throw('cli.unknown_command', { command => $group, program => 'filesync-admin' });
+
+	unless (ref $entry) {
+		return __PACKAGE__->can($entry)->($admin, @args);
+	}
+
+	my $verb = shift(@args) // '';
+	my $handler = $entry->{$verb} or throw('cli.admin.unknown_verb', { group => $group, verb => $verb });
+	return __PACKAGE__->can($handler)->($admin, @args);
+}
+
+# _admin_repo_create / _admin_repo_list / _admin_repo_show
+# Purpose:     filesync-admin repo create|list|show.
+# Entry:       $admin, then the command's arguments.
+# Exit:        returns 0.
+# Side effects: create makes the repo; all print.
+sub _admin_repo_create :Private {
+	my ($admin, @args) = @_;
+
+	my (%opt, @ignore);
+	_options(\@args, {
+		(map { ("$_=i" => \$opt{$_}) } qw(trash-days max-deletes max-delete-percent)),
+		'ignore=s' => \@ignore,
+	}, 'repo_create');
+	my $name = _require(shift @args, 'repo create', 'NAME');
+	_no_more(\@args, 'repo create');
+
+	my $result = $admin->repo_create(
+		name               => $name,
+		trash_days         => $opt{'trash-days'},
+		max_deletes        => $opt{'max-deletes'},
+		max_delete_percent => $opt{'max-delete-percent'},
+		ignore             => \@ignore,
+	);
+
+	_say("cli.repo.created.$_", { %{$result}, repo => $result->{name} }) for qw(name master config);
+	return $EXIT_OK;
+}
+
+sub _admin_repo_list :Private {
+	my ($admin) = @_;
+
+	my $repos = $admin->repo_list();
+	return _say('cli.repo.none', { root => $admin->root }) && $EXIT_OK unless @{$repos};
+
+	print "$_\n" for @{$repos};
+	return $EXIT_OK;
+}
+
+sub _admin_repo_show :Private {
+	my ($admin, @args) = @_;
+
+	my $info = $admin->repo_show(_require(shift @args, 'repo show', 'NAME'));
+	my $config = $info->{config};
+	_say('cli.repo.show', {
+		%{$config},
+		master  => $info->{master},
+		meta    => $info->{meta},
+		clients => @{ $info->{clients} } ? join(', ', @{ $info->{clients} }) : message('cli.repo.no_clients'),
+	});
+
+	return $EXIT_OK;
+}
+
+# _admin_log
+# Purpose:     filesync-admin log: journal events for one or more repos.
+# Entry:       $admin, then NAME... and options.
+# Exit:        returns 0.
+# Side effects: reads journals; prints (or JSON).  Every name is checked
+#              before anything is printed, so text mode never shows a
+#              partial answer before failing on a later repo.
+sub _admin_log :Private {
+	my ($admin, @args) = @_;
+
+	my (@exits, %opt);
+	_options(\@args, {
+		'n=i'     => \$opt{limit},
+		'exit=i@' => \@exits,
+		(map { ("$_=s" => \$opt{$_}) } qw(client since until)),
+		(map { ($_ => \$opt{$_}) } qw(warnings json)),
+	}, 'admin_log');
+	_check_exits(\@exits);
+	_check_window(@opt{qw(since until)});
+
+	my @names = @args;
+	throw('cli.required', { command => 'log', what => 'NAME' }) unless @names;
+	throw('cli.admin.empty_name') if any { !defined $_ || !length $_ } @names;
+	App::FileSync::Config::load_repo($admin->root, $_) for @names;
+
+	my $multiple = @names > 1;
+	my @results;
+	for my $name (@names) {
+		my %filters = (
+			(defined $opt{client} && length $opt{client} ? (client => $opt{client}) : ()),
+			(defined $opt{since} ? (since => parse_since($opt{since})) : ()),
+			(defined $opt{until} ? (until => parse_until($opt{until})) : ()),
+			(@exits ? (exits => [ map { $_ + 0 } @exits ]) : ()),
+			($opt{warnings} ? (warnings => 1) : ()),
+		);
+		my $events = $admin->journal_read(
+			repo => $name, limit => $opt{limit} // $ADMIN_LOG_LIMIT, client => $opt{client},
+			since => $opt{since}, until => $opt{until}, exits => \@exits, warnings => $opt{warnings},
+		);
+		push @results, { repo => $name, path => $admin->journal_dir($name), events => $events, %filters };
+		next if $opt{json};
+
+		# With one repo the lines stand alone; with several, head each group.
+		_say('cli.log.heading', { repo => $name }) if $multiple;
+		_say('cli.log.no_events', { repo => $name }) unless @{$events};
+		_say('cli.log.event', {
+			indent => $multiple ? '  ' : '',
+			ts     => format_utc($_->{ts}),
+			client => $_->{client} // '-',
+			action => $_->{action} // '?',
+			detail => _event_detail($_),
+		}) for @{$events};
+	}
+
+	print json_encode({ results => \@results }), "\n" if $opt{json};
+	return $EXIT_OK;
+}
+
+# _event_detail
+# Purpose:     the free-form tail of a journal line.
+# Entry:       $event is a journal event.
+# Exit:        returns the text: path, key=value fields, counters, flags,
+#              then the error with its white space flattened.
+# Side effects: none.
+sub _event_detail :Private {
+	my ($event) = @_;
+
+	my @detail = grep { defined } $event->{path};
+	push @detail, map { ($EVENT_LABEL{$_} // $_) . "=$event->{$_}" } grep { defined $event->{$_} } @EVENT_FIELDS, @EVENT_COUNTERS;
+	push @detail, 'dry-run' if $event->{dry_run};
+	push @detail, 'locked' if $event->{locked};
+
+	if (defined $event->{error} && length $event->{error}) {
+		(my $text = $event->{error}) =~ s/\s+/ /g;
+		push @detail, $text;
+	}
+
+	return join(' ', @detail);
+}
+
+# _admin_reindex
+# Purpose:     filesync-admin reindex: rebuild the master index.
+# Entry:       $admin, then NAME and options.
+# Exit:        returns 0.
+# Side effects: rewrites the index (unless --dry-run); prints (or JSON).
+sub _admin_reindex :Private {
+	my ($admin, @args) = @_;
+
+	my %opt;
+	_options(\@args, { (map { ($_ => \$opt{$_}) } qw(dry-run json)) }, 'reindex');
+	my $name = _require(shift @args, 'reindex', 'NAME');
+	_no_more(\@args, 'reindex');
+
+	my $result = $admin->reindex(repo => $name, dry_run => $opt{'dry-run'});
+	if ($opt{json}) {
+		print json_encode($result), "\n";
+		return $EXIT_OK;
+	}
+
+	_say($opt{'dry-run'} ? 'cli.reindex.would' : 'cli.reindex.done', {
+		repo  => $name,
+		files => message('word.file', { count => $result->{files} }),
+		dirs  => message('word.empty_dir', { count => $result->{dirs} }),
+		size  => _format_bytes($result->{bytes}),
+	});
+	_say('cli.reindex.skipped', { path => $_, reason => $result->{skipped}{$_} }) for sort keys %{ $result->{skipped} || {} };
+
+	return $EXIT_OK;
+}
+
+# _admin_verify
+# Purpose:     filesync-admin verify: rehash the master against its index.
+# Entry:       $admin, then NAME and options.
+# Exit:        returns 4 on drift, else 0.
+# Side effects: reads the master; prints (or JSON).
+sub _admin_verify :Private {
+	my ($admin, @args) = @_;
+
+	my %opt;
+	_options(\@args, { deep => \$opt{deep}, 'sample=i' => \$opt{sample}, json => \$opt{json} }, 'admin_verify');
+	my $name = _require(shift @args, 'verify', 'NAME');
+	_no_more(\@args, 'verify');
+	throw('cli.positive', { command => 'verify', option => '--sample' }) if defined $opt{sample} && $opt{sample} < 1;
+
+	my $report = $admin->verify(repo => $name, deep => $opt{deep}, sample => $opt{sample});
+	$opt{json} ? print(json_encode($report), "\n") : _print_verify($report, 0);
+
+	return $report->{ok} ? $EXIT_OK : $EXIT_DRIFT;
+}
+
+# _admin_restore
+# Purpose:     filesync-admin restore: put a path back from the server trash.
+# Entry:       $admin, then NAME PATH and options.
+# Exit:        returns 0.
+# Side effects: restores into the master or --to; or lists versions.
+sub _admin_restore :Private {
+	my ($admin, @args) = @_;
+
+	my %opt;
+	_options(\@args, { 'to=s' => \$opt{to}, list => \$opt{list}, 'date=s' => \$opt{date} }, 'admin_restore');
+	my ($name, $path) = splice(@args, 0, 2);
+	throw('cli.required', { command => 'restore', what => 'NAME and PATH' })
+		unless defined $name && length $name && defined $path && length $path;
+	_no_more(\@args, 'restore');
+
+	my $result = $admin->restore(repo => $name, path => $path, %opt);
+	return _print_versions($result->{versions}, 'cli.restore.no_versions_in', { path => $path, repo => $name }) if $opt{list};
+
+	_say('cli.restore.admin_done', {
+		repo => $name,
+		path => $path,
+		from => $result->{date} // message('cli.restore.the_trash'),
+		to   => $result->{to},
+	});
+	return $EXIT_OK;
+}
+
+# _admin_client_allow / _admin_client_list / _admin_client_forget
+# Purpose:     filesync-admin client allow|list|forget.
+# Entry:       $admin, then the command's arguments.
+# Exit:        returns 0.
+# Side effects: allow and forget change the repo; all print.
+sub _admin_client_allow :Private {
+	my ($admin, @args) = @_;
+
+	my %opt;
+	_options(\@args, { 'repo=s' => \$opt{repo}, 'role=s' => \$opt{role} }, 'client_allow');
+	my $client = _require(shift @args, 'client allow', 'ID');
+	my $repo = _require($opt{repo}, 'client allow', '--repo');
+
+	my $result = $admin->client_allow(repo => $repo, client => $client, role => $opt{role});
+	_say('cli.client.allowed', { %{$result}, repo => $repo });
+	return $EXIT_OK;
+}
+
+sub _admin_client_list :Private {
+	my ($admin, @args) = @_;
+
+	my %opt;
+	_options(\@args, { 'repo=s' => \$opt{repo} }, 'client_list');
+	my $repo = _require($opt{repo}, 'client list', '--repo');
+
+	my $clients = $admin->client_list($repo);
+	return _say('cli.client.none', { repo => $repo }) && $EXIT_OK unless @{$clients};
+
+	_say('cli.client.row', { %{$_}, state => message($_->{base} ? 'cli.client.synced' : 'cli.client.never') }) for @{$clients};
+	return $EXIT_OK;
+}
+
+sub _admin_client_forget :Private {
+	my ($admin, @args) = @_;
+
+	my %opt;
+	_options(\@args, { 'repo=s' => \$opt{repo} }, 'client_forget');
+	my $repo = _require($opt{repo}, 'client forget', '--repo');
+	my $client = _require(shift @args, 'client forget', 'ID');
+
+	my $result = $admin->client_forget(repo => $repo, client => $client);
+	_say($result->{removed} ? 'cli.client.forgot' : 'cli.client.nothing', { client => $client, path => $result->{path} });
+	return $EXIT_OK;
 }
 
 1;
+
+__END__
+
+=head1 LIMITATIONS
+
+=over 4
+
+=item * Option parsing is Getopt::Long's: its own diagnostics for an unknown
+option are printed in English before the catalogued usage line.
+
+=item * C<--json> output is not localised (field names and values such as
+C<never> are data), while the text output is.
+
+=item * C<filesync-admin> reads C<--root> only before the command name.
+
+=back
+
+=head1 AUTHOR
+
+Nigel Horne, C<< <njh at nigelhorne.com> >>
+
+=head1 LICENCE AND COPYRIGHT
+
+Copyright 2026 Nigel Horne.
+
+Usage is subject to the GPL2 licence terms.
+If you use it,
+please let me know.
+
+=cut

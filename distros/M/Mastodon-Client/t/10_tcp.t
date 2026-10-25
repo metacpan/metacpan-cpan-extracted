@@ -1,18 +1,13 @@
 use Test2::V0;
-use Test::TCP;
 use Mastodon::Client;
 use Try::Tiny;
 
 use lib 't/lib';
 
-use Plack::Runner;
-use Plack::App::Mastodon::MockServer::v1;
+use Test2::Require::Module 'Plack::Runner';
+use Test2::Require::Module 'Test::TCP';
 
-# use Log::Any::Adapter;
-# Log::Any::Adapter->set( 'Stderr',
-#   category => 'Mastodon',
-#   log_level => 'debug',
-# );
+use Plack::App::Mastodon::MockServer::v1;
 
 my $host = '127.0.0.1';
 

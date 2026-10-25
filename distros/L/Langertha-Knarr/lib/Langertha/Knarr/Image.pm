@@ -1,6 +1,6 @@
 package Langertha::Knarr::Image;
 # ABSTRACT: Translate a client's image parts into Langertha::Content::Image objects
-our $VERSION = '1.102';
+our $VERSION = '1.103';
 use strict;
 use warnings;
 use Scalar::Util qw( blessed );
@@ -187,7 +187,7 @@ Langertha::Knarr::Image - Translate a client's image parts into Langertha::Conte
 
 =head1 VERSION
 
-version 1.102
+version 1.103
 
 =head1 SYNOPSIS
 

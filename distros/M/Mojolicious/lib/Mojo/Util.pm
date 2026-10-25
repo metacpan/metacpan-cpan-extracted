@@ -67,6 +67,37 @@ my %ENTITIES;
 # Characters that should be escaped in XML
 my %XML = ('&' => '&amp;', '<' => '&lt;', '>' => '&gt;', '"' => '&quot;', '\'' => '&#39;');
 
+# Numeric character references to C1 controls are remapped through windows-1252 (WHATWG HTML)
+my %C1 = (
+  0x80 => 0x20AC,
+  0x82 => 0x201A,
+  0x83 => 0x0192,
+  0x84 => 0x201E,
+  0x85 => 0x2026,
+  0x86 => 0x2020,
+  0x87 => 0x2021,
+  0x88 => 0x02C6,
+  0x89 => 0x2030,
+  0x8A => 0x0160,
+  0x8B => 0x2039,
+  0x8C => 0x0152,
+  0x8E => 0x017D,
+  0x91 => 0x2018,
+  0x92 => 0x2019,
+  0x93 => 0x201C,
+  0x94 => 0x201D,
+  0x95 => 0x2022,
+  0x96 => 0x2013,
+  0x97 => 0x2014,
+  0x98 => 0x02DC,
+  0x99 => 0x2122,
+  0x9A => 0x0161,
+  0x9B => 0x203A,
+  0x9C => 0x0153,
+  0x9E => 0x017E,
+  0x9F => 0x0178
+);
+
 # "Sun, 06 Nov 1994 08:49:37 GMT" and "Sunday, 06-Nov-94 08:49:37 GMT"
 my $EXPIRES_RE = qr/(\w+\W+\d+\W+\w+\W+\d+\W+\d+:\d+:\d+\W*\w+)/;
 
@@ -142,6 +173,7 @@ sub decrypt_cookie {
 
 sub decode {
   my ($encoding, $bytes) = @_;
+  return "$bytes" if $encoding eq 'UTF-8' && $bytes !~ /[^\x00-\x7f]/;    # ASCII is valid UTF-8
   return undef unless eval { $bytes = _encoding($encoding)->decode("$bytes", 1); 1 };
   return $bytes;
 }
@@ -153,7 +185,11 @@ sub deprecated {
 
 sub dumper { Data::Dumper->new([@_])->Indent(1)->Sortkeys(1)->Terse(1)->Useqq(1)->Dump }
 
-sub encode { _encoding($_[0])->encode("$_[1]", 0) }
+sub encode {
+  return _encoding($_[0])->encode("$_[1]", 0) unless $_[0] eq 'UTF-8' && $_[1] !~ /[^\x00-\x7f]/;
+  utf8::downgrade(my $bytes = "$_[1]");    # ASCII stays the same in UTF-8
+  return $bytes;
+}
 
 sub encrypt_cookie {
   my ($value, $key, $salt) = @_;
@@ -199,7 +235,7 @@ sub gunzip {
 }
 
 sub gzip {
-  my $uncompressed = shift;
+  my $uncompressed = "" . shift;
   IO::Compress::Gzip::gzip \$uncompressed, \my $compressed or croak "Couldn't gzip: $IO::Compress::Gzip::GzipError";
   return $compressed;
 }
@@ -480,11 +516,9 @@ sub xml_escape {
 sub xor_encode {
   my ($input, $key) = @_;
 
-  # Encode with variable key length
-  my $len    = length $key;
-  my $buffer = my $output = '';
-  $output .= $buffer ^ $key while length($buffer = substr($input, 0, $len, '')) == $len;
-  return $output .= $buffer ^ substr($key, 0, length $buffer, '');
+  # Encode with variable key length (repeat key to match input length)
+  my $len = length $input;
+  return $input ^ substr($key x (int($len / length $key) + 1), 0, $len);
 }
 
 sub _adapt {
@@ -508,7 +542,11 @@ sub _entity {
   my ($point, $name, $attr) = @_;
 
   # Code point
-  return chr($point !~ /^x/ ? $point : hex $point) unless defined $name;
+  unless (defined $name) {
+    my $cp = $point !~ /^x/ ? $point + 0 : hex $point;
+    return "\N{U+FFFD}" if $cp == 0 || $cp > 0x10FFFF || ($cp >= 0xD800 && $cp <= 0xDFFF);
+    return chr($C1{$cp} // $cp);
+  }
 
   # Named character reference
   my $rest = my $last = '';

@@ -1,5 +1,18 @@
 Revision history for HP-Handy
 
+0.02  2026-10-25 JST (Japan Standard Time)
+
+    - new() accepts a hash reference: HP::Handy->new({ template_dir => ... }).
+      0.01 warned "Odd number of elements" and ignored the arguments.
+    - An empty array reference [] and an empty hash reference {} are now
+      false in {% if %}, not, and, or, inline if, and for ... if, as in
+      Jinja2.  0.01 treated them as true.
+    - <, >, <= and >= compare as strings unless both operands look like
+      numbers, as in Jinja2.  0.01 always compared numerically, so
+      "2026-09-30" < "2026-10-01" was false and warned.
+    - New test t/0013-jinja2-compat.t.  More tests for truth values in
+      t/0004-tags-if.t and for new(\%args) in t/0012-api.t.
+
 0.01  2026-05-24 JST (Japan Standard Time)
 
     - First release on CPAN.

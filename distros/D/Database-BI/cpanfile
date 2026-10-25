@@ -19,8 +19,8 @@ requires 'File::Spec', '3.40';
 requires 'File::Temp', '0.22';
 requires 'HTML::D3', '0.23';   # 0.20 added radius_range support for render_scatter_chart_snippet; 0.19 added scatter/stacked/combo/treemap/histogram snippets
 requires 'HTML::TableExtract';
-requires 'IPC::System::Simple';   # For autodie (:all) in DataSource.pm at runtime
 requires 'HTTP::Request';   # Used by Ask.pm and Summary.pm for LLM API calls (ships with libwww-perl but not core)
+requires 'IPC::System::Simple';   # For autodie (:all) in DataSource.pm at runtime
 requires 'LWP::UserAgent';   # Needed for Test::Mojo HTTP testing; LWP::UserAgent::Cached is used by D::A url fetch path
 requires 'LWP::UserAgent::Cached';   # Used by Database::Abstraction for URL-backed tables (import_url)
 requires 'List::Util', '1.40';
@@ -38,8 +38,9 @@ requires 'Scalar::Util';   # Used in DataSource.pm (blessed, looks_like_number)
 requires 'Socket', '2.010';
 requires 'Spreadsheet::ParseXLSX';
 requires 'Sub::Protected', '0.03';
+requires 'version', '0.77';
 recommends 'Geo::Coder::Free', '0.48';
-recommends 'HTML::OSM', '0.11';
+recommends 'HTML::OSM', '0.12';
 
 on 'test' => sub {
 	requires 'DBD::CSV';

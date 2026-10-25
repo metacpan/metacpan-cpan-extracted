@@ -3,7 +3,7 @@ use Test::Alien;
 use Test::Alien::Diag;
 use Alien::Brotli;
 
-alien_diag 'Alien::Brotli';
+alien_diag 'Alien::Brotli', { 'properties' => ['exe'] };
 alien_ok 'Alien::Brotli';
 
 ok my $exe = Alien::Brotli->exe, 'exe';

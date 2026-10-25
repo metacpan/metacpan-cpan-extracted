@@ -1,4 +1,4 @@
-requires 'perl', '5.024';
+requires 'perl', '5.026';
 
 requires 'File::Share';
 requires 'Text::ANSI::Fold', '2.3304';
@@ -6,7 +6,7 @@ requires 'URI::Escape';
 
 requires 'App::ansiecho';
 requires 'App::ansifold', '1.35';
-requires 'App::ansicolumn', '1.5702';
+requires 'App::ansicolumn', '1.59';
 requires 'Term::ANSIColor::Concise', '3.02';
 
 requires 'App::nup', '1.07';
@@ -15,7 +15,7 @@ requires 'Getopt::Long::Bash', '0.7.2';
 requires 'App::Greple', '10.04';
 requires 'App::Greple::tee', '1.04';
 requires 'Getopt::EX::Config', '1.0202';
-requires 'Command::Run';
+requires 'Command::Run', '1.04';
 
 requires 'Getopt::EX::termcolor';
 

@@ -3,7 +3,7 @@
 use alienfile;
 use version 0.77;
 
-use constant MINIMUM_VERSION => '1.0.9';
+use constant MINIMUM_VERSION => '1.2.1';
 
 plugin 'PkgConfig' => (
     pkg_name        => [qw/ libbrotlicommon libbrotlienc libbrotlidec /],
@@ -30,14 +30,6 @@ share {
     plugin 'Extract' => 'tar.gz';
 
     plugin 'Build::CMake';
-    plugin 'Build::Autoconf';
-
-    build [
-        './bootstrap',
-        '%{configure}',
-        '%{make}',
-        '%{make} install',
-    ];
 
     after 'gather' => sub {
         my($build) = @_;

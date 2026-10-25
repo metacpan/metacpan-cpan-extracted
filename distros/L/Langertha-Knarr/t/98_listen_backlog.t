@@ -11,23 +11,12 @@ use Langertha::Knarr::Handler::Code;
 # caps it), not IO::Async's default of 3 -- with workers, connections wait
 # there while the supervisor probes before the fork.
 
-sub free_port {
-  require IO::Socket::INET;
-  my $s = IO::Socket::INET->new( Listen => 1, LocalAddr => '127.0.0.1', LocalPort => 0 )
-    or die "free_port: $!";
-  my $p = $s->sockport;
-  $s->close;
-  return $p;
-}
-
 my $expected = eval { Socket::SOMAXCONN() } || 128;
-my @ports = ( free_port(), free_port() );
-
 my @asked;
 my $knarr = Langertha::Knarr->new(
   handler => Langertha::Knarr::Handler::Code->new( code => sub { 'x' } ),
   loop    => IO::Async::Loop->new,
-  listen  => [ map { "127.0.0.1:$_" } @ports ],
+  listen  => [ ( '127.0.0.1:0' ) x 2 ],   # the kernel picks; read back below (k79)
 );
 {
   no warnings 'redefine';
@@ -39,6 +28,8 @@ my $knarr = Langertha::Knarr->new(
   };
   $knarr->start;
 }
+
+my @ports = map { $_->read_handle->sockport } @{ $knarr->_servers };
 
 is( \@asked, [ $expected, $expected ], "both listen addresses ask for a backlog of $expected" );
 ok( $expected > 3, 'more than the IO::Async default of 3' );

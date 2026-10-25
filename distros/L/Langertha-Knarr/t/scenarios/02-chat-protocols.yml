@@ -1,0 +1,26 @@
+title: The same backend answers OpenAI, Anthropic and Ollama clients, each in its own wire format
+setup:
+  config:
+    models:
+      fast: { engine: KnarrVirtual, model: v-fast }
+  backends:
+    v-fast:
+      rules:
+        "Hello": { answer: "Hi from the backend" }
+steps:
+  - chat: { protocol: openai, model: fast, prompt: Hello }
+    expect:
+      text: Hi from the backend
+      finish_reason: stop
+      json: { object: chat.completion }
+  - chat: { protocol: anthropic, model: fast, prompt: Hello }
+    expect:
+      text: Hi from the backend
+      finish_reason: end_turn
+      json: { type: message, role: assistant, 'content.0.type': text }
+  - chat: { protocol: ollama, model: fast, prompt: Hello }
+    expect:
+      text: Hi from the backend
+      json: { done: true, 'message.role': assistant }
+    backend:
+      v-fast: { requests: 3, last_user_text: Hello }

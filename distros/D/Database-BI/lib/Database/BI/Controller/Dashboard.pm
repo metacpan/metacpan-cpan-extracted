@@ -3,7 +3,7 @@ package Database::BI::Controller::Dashboard;
 use strict;
 use warnings;
 
-our $VERSION = '0.016.0';
+our $VERSION = '0.017.0';
 
 use Mojo::Base 'Mojolicious::Controller', -strict, -signatures;
 
@@ -64,9 +64,8 @@ Readonly my $REDIS_URL_RE  => qr{\Aredis://[^\s|]+\z}si;
 # because the [...] notation would be ambiguous in the path syntax).
 Readonly my $REMOTE_HOST_RE => qr/\A(?:[a-zA-Z0-9][a-zA-Z0-9._-]*\@)?[a-zA-Z0-9][a-zA-Z0-9._-]*\z/;
 
-# The tile layer HTML::OSM 0.10 hardcodes.  Older releases have no tile_url
-# constructor argument, so the app substitutes its configured URL in the
-# rendered body; 0.11 and later take the argument directly.
+# The tile layer HTML::OSM 0.10 hardcodes.  HTML::OSM >= 0.12 is required;
+# that release introduced search => 0, max_zoom, and tile_url (0.11).
 Readonly my $DEFAULT_TILE_URL => 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
 
 # ---------------------------------------------------------------------------
@@ -124,6 +123,7 @@ Readonly my %MESSAGES => (
 	warn_map_coordinate_rows    => 'Plotted %d of %d rows; %d hold no usable coordinate',
 	warn_map_markers_capped     => 'Showing the first %d of %d markers; add f= filters to see the rest',
 	warn_map_cache_unwritten    => 'The resolved places could not be remembered in the model store, so the next request will look them up again',
+	error_map_tiles_unknown     => 'Unknown tile source "%s"; define it under tile_sources in database_bi.conf',
 	error_insights_no_data      => 'No data available to analyse',
 	insights_insufficient_data  => 'Insufficient data for this insight type (need more rows or periods)',
 	ask_unavailable    => 'Ask a question is not available: no AI provider is configured',
@@ -6680,6 +6680,63 @@ sub dates_list ($self) {
 }
 
 # ---------------------------------------------------------------------------
+# Geo column preferences CRUD  (POST /geo/save, POST /geo/delete, GET /geo/list)
+#
+# Stores the user's choice of lat/lon/loc columns for a given l= spec in
+# models.json under geo.<spec>.columns.  The geocode cache itself lives under
+# geo.<spec>.places and is written by _map_data independently.
+# ---------------------------------------------------------------------------
+
+# geo_save: POST /geo/save?l=<spec>&col=<col>&kind=lat|lon|location
+sub geo_save ($self) {
+	my $spec = $self->param('l')    // '';
+	my $col  = $self->param('col')  // '';
+	my $kind = $self->param('kind') // '';
+
+	return $self->render(json => { error => 'l= required' }, status => 400)
+		unless length $spec;
+	return $self->render(json => { error => 'col= required' }, status => 400)
+		unless length $col;
+	return $self->render(json => { error => 'kind must be lat, lon, or location' }, status => 400)
+		unless $kind =~ /\A(?:lat|lon|location)\z/;
+
+	my $models = $self->_read_models;
+	$models->{geo}{$spec}{columns}{$col} = { kind => $kind };
+	$self->_write_models($models);
+	$self->render(json => { ok => 1 });
+}
+
+# geo_delete: POST /geo/delete?l=<spec>&col=<col>
+# Omit col= to clear all column preferences for the spec.
+sub geo_delete ($self) {
+	my $spec = $self->param('l')   // '';
+	my $col  = $self->param('col') // '';
+
+	return $self->render(json => { error => 'l= required' }, status => 400)
+		unless length $spec;
+
+	my $models = $self->_read_models;
+	if (length $col) {
+		delete $models->{geo}{$spec}{columns}{$col};
+	} else {
+		delete $models->{geo}{$spec}{columns};
+	}
+	$self->_write_models($models);
+	$self->render(json => { ok => 1 });
+}
+
+# geo_list: GET /geo/list?l=<spec>
+# Returns { columns: { col: { kind: "lat"|"lon"|"location" }, ... } }.
+sub geo_list ($self) {
+	my $spec = $self->param('l') // '';
+	return $self->render(json => { error => 'l= required' }, status => 400)
+		unless length $spec;
+
+	my $models = $self->_read_models;
+	$self->render(json => { columns => $models->{geo}{$spec}{columns} // {} });
+}
+
+# ---------------------------------------------------------------------------
 # Scatter chart  (GET /scatter)
 # ---------------------------------------------------------------------------
 
@@ -7491,20 +7548,23 @@ sub _map_data :Protected ($self, $records, $columns, $encode, $options, $spec_ke
 			$tile_url = undef
 				unless defined($tile_url) && !ref($tile_url) && length($tile_url);
 
-			# HTML::OSM 0.11 added tile_url.  An older release would reject it
-			# as an unknown constructor argument, so substitute the URL in the
-			# rendered body instead and keep the config working either way.
-			my $native_tile_url = eval {
-				version->parse($HTML::OSM::VERSION) >= version->parse('0.11')
-			};
+			# options{tile_url} wins over the global config tile_url when set.
+			# HTML::OSM >= 0.12 is the minimum, so tile_url is always accepted.
+			my $eff_tile_url = $options->{tile_url} // $tile_url;
+			$eff_tile_url = undef
+				unless defined($eff_tile_url) && !ref($eff_tile_url) && length($eff_tile_url);
 
-			my $map = HTML::OSM->new(
-				height  => '560px',
-				width   => '100%',
-				cluster => 1,
-				($tile_url && $native_tile_url ? (tile_url => $tile_url) : ()),
+			my %osm_args = (
+				height   => '560px',
+				width    => '100%',
+				cluster  => 1,
+				search   => 0,
+				($eff_tile_url                  ? (tile_url => $eff_tile_url)        : ()),
+				(defined($options->{zoom})      ? (zoom     => $options->{zoom})     : ()),
+				(defined($options->{max_zoom})  ? (max_zoom => $options->{max_zoom}) : ()),
 				%leaflet_assets,
 			);
+			my $map = HTML::OSM->new(%osm_args);
 			my $color_col     = $options->{color_col} // '';
 			my $color_rules   = $options->{color_rules}   // [];
 			my $color_default = $options->{color_default} // $DEFAULT_MARKER_COLOR;
@@ -7519,9 +7579,36 @@ sub _map_data :Protected ($self, $records, $columns, $encode, $options, $spec_ke
 				$map->add_marker([ $marker->{lat}, $marker->{lon} ],
 					html => $marker->{label}, @icon_arg);
 			}
+
+			# Heat map overlay: when heat=1 is requested, plot a density
+			# heatmap in addition to the regular markers.  The weight column
+			# (weight=<col>) drives the intensity of each point; absent the
+			# column every point has equal weight 1.0.  Normalisation to [0,1]
+			# ensures the heatmap library gets values in the expected range.
+			if ($options->{heat}) {
+				my $weight_col  = $options->{weight} // '';
+				my @heat_pts;
+				for my $marker (@markers) {
+					my $row = $records->[ $marker->{first_row} ];
+					my $w;
+					if (length $weight_col && defined $row) {
+						$w = _numeric_cell($row->{$weight_col} // '');
+					}
+					push @heat_pts, [ $marker->{lat}, $marker->{lon},
+						(defined($w) ? $w : 1) ];
+				}
+				# Normalise weights to [0,1] when a weight column was used.
+				if (length $weight_col && @heat_pts) {
+					my $max_w = 0;
+					$max_w = $_->[2] > $max_w ? $_->[2] : $max_w for @heat_pts;
+					if ($max_w > 0) {
+						$_->[2] = $_->[2] / $max_w for @heat_pts;
+					}
+				}
+				eval { $map->add_heatmap(\@heat_pts) };
+			}
+
 			($map_head, $map_body) = $map->onload_render();
-			$map_body = _replace_map_tile_url($map_body, $tile_url)
-				if $tile_url && !$native_tile_url;
 			($map_head, $map_body) = _canvas_map_html($map_head, $map_body, $id_suffix)
 				if defined($id_suffix) && length($id_suffix);
 		} else {
@@ -7541,6 +7628,12 @@ sub _map_data :Protected ($self, $records, $columns, $encode, $options, $spec_ke
 	$chart_spec{options}{popup} = \@popup if @popup;
 	$chart_spec{options}{max}   = $options->{max}
 		if defined($options->{max}) && $options->{max} =~ /\A\d+\z/ && $options->{max} > 0;
+	$chart_spec{options}{zoom}  = $options->{zoom}  if defined $options->{zoom};
+	$chart_spec{options}{heat}  = 1                 if $options->{heat};
+	$chart_spec{options}{weight} = $options->{weight}
+		if defined($options->{weight}) && length($options->{weight});
+	$chart_spec{options}{agg}   = $options->{agg}
+		if defined($options->{agg}) && $options->{agg} ne 'count';
 	if (defined($options->{color_col}) && length($options->{color_col})) {
 		$chart_spec{encode}{color}         = $options->{color_col};
 		$chart_spec{options}{color_rules}  = $options->{color_rules}
@@ -7565,35 +7658,14 @@ sub _map_data :Protected ($self, $records, $columns, $encode, $options, $spec_ke
 	};
 }
 
-# _replace_map_tile_url($body, $url) -> $body
-#
-# Replace the tile layer URL in a body rendered by HTML::OSM releases that
-# predate tile_url.  The URL is escaped for the single-quoted JavaScript
-# literal the renderer emits, so a quote, backslash or newline in the config
-# cannot end the string or the enclosing <script>.
-sub _replace_map_tile_url {
-	my ($body, $url) = @_;
-	return $body unless defined($body) && defined($url) && length($url);
-
-	my $escaped = $url;
-	$escaped =~ s/\\/\\\\/g;
-	$escaped =~ s/'/\\'/g;
-	$escaped =~ s/\r?\n/\\n/g;
-	$escaped =~ s|</|<\\/|g;
-
-	$body =~ s{\Q$DEFAULT_TILE_URL\E}{$escaped}g;
-	return $body;
-}
-
 # _canvas_map_html($head, $body, $id_suffix) -> ($head, $body)
 #
-# HTML::OSM names the map element "map" and its controls "search-box",
-# "reset-button" and "clear-search-button".  Those names are fine for one map
-# on a page and collide as soon as a canvas has two, so a card suffixes them and
-# wraps the generated script in a function: the script's map and searchMarkers
-# variables become local to that card instead of overwriting the previous
-# map's.  The head is the same Leaflet stylesheet and script for every map, so
-# only the first head is passed to the layout.
+# HTML::OSM names the map element "map" and its reset button "reset-button".
+# With search => 0 (always set by _map_data), the search-box and
+# clear-search-button elements are absent.  Suffixing still happens so a
+# canvas with two maps gets distinct element ids and local variable scopes.
+# The head is the same Leaflet stylesheet and script for every map, so only
+# the first head is passed to the layout.
 sub _canvas_map_html {
 	my ($head, $body, $id_suffix) = @_;
 
@@ -7633,6 +7705,46 @@ sub map_view ($self) {
 	my $back      = _safe_back_url($self->param('back')) // '/';
 	my $back2     = _safe_back_url($self->param('back2'));
 	my $back2_lbl = $self->param('back2_label') // '';
+
+	# Optional display params
+	my $zoom_raw     = $self->param('zoom')     // '';
+	my $max_zoom_raw = $self->param('max_zoom') // '';
+	my $tiles_name   = $self->param('tiles')    // '';
+	my $heat         = $self->param('heat')     // 0;
+	my $weight_col   = $self->param('weight')   // '';
+	my $agg          = $self->param('agg')      // 'count';
+
+	# tiles= names a source from tile_sources in config; an arbitrary URL is
+	# never accepted so a crafted share link cannot redirect tiles fetches.
+	my $tile_url_override;
+	if (length $tiles_name) {
+		my $sources = $self->app->config('tile_sources') // {};
+		unless (exists $sources->{$tiles_name}) {
+			return $self->render(
+				text   => $self->_i18n('error_map_tiles_unknown', $tiles_name),
+				status => 400,
+			);
+		}
+		$tile_url_override = $sources->{$tiles_name}{url};
+	}
+
+	my $zoom_val;
+	if (length $zoom_raw && $zoom_raw =~ /\A\d+\z/) {
+		$zoom_val = int $zoom_raw;
+		$zoom_val = 0  if $zoom_val < 0;
+		$zoom_val = 19 if $zoom_val > 19;
+	}
+
+	my $max_zoom_val;
+	if (length $max_zoom_raw && $max_zoom_raw =~ /\A\d+\z/) {
+		$max_zoom_val = int $max_zoom_raw;
+		$max_zoom_val = 0  if $max_zoom_val < 0;
+		$max_zoom_val = 28 if $max_zoom_val > 28;
+	} else {
+		my $cfg_max_zoom = $self->app->config('map_max_zoom');
+		$max_zoom_val = int($cfg_max_zoom)
+			if defined($cfg_max_zoom) && $cfg_max_zoom =~ /\A\d+\z/;
+	}
 
 	my $by_location = length $loc_col;
 
@@ -7675,7 +7787,13 @@ sub map_view ($self) {
 	$options{color_rules}   = $color_rules  if @$color_rules;
 	$options{color_default} = $color_default;
 	my $max = $self->param('max');
-	$options{max} = $max if defined($max) && $max =~ /\A\d+\z/ && $max > 0;
+	$options{max}      = $max            if defined($max) && $max =~ /\A\d+\z/ && $max > 0;
+	$options{zoom}     = $zoom_val       if defined $zoom_val;
+	$options{max_zoom} = $max_zoom_val   if defined $max_zoom_val;
+	$options{tile_url} = $tile_url_override if defined $tile_url_override;
+	$options{heat}     = 1               if $heat;
+	$options{weight}   = $weight_col     if length($weight_col) && $col_set{$weight_col};
+	$options{agg}      = $agg            if length $agg;
 
 	# Build colour legend for the template
 	my @color_legend;

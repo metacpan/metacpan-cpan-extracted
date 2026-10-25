@@ -16,6 +16,8 @@ services:
       - LANGFUSE_SECRET_KEY
       - LANGFUSE_TRACE_NAME
       - KNARR_API_KEY
+      - KNARR_ADMIN_KEY
+      - KNARR_REMOTE_CONFIG
       - KNARR_DEBUG
       - KNARR_TRACE_NAME
       # The Langfuse v2 below has only the ingestion API, so leave

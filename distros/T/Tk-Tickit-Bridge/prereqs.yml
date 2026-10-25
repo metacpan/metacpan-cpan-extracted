@@ -1,0 +1,10 @@
+runtime:
+  requires:
+    perl: '5.036'
+    Tk: 0
+    Tickit: '0.70'
+test:
+  requires:
+    Test::More: 0
+    CPAN::Meta: 0
+    Pod::Simple::Checker: 0

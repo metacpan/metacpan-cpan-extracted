@@ -9,6 +9,7 @@ use 5.010;	# Minimum version for features used here
 # Core modules
 use boolean;
 use Carp;
+use Cwd ();
 use Readonly;
 use Scalar::Util;
 use Socket;	# AF_INET constant
@@ -30,6 +31,13 @@ use namespace::clean;
 # Module-level constants -- avoids magic numbers scattered through the code
 # ---------------------------------------------------------------------------
 Readonly my $MAX_UPLOAD_SIZE_DEFAULT => 512 * 1024;	# 512 KB default upload cap
+Readonly my $MAX_PARAMS_DEFAULT       => 1000;		# Maximum number of input parameters
+Readonly my $MAX_PARTS_DEFAULT        => 100;		# Maximum number of multipart parts
+Readonly my $MAX_PART_HEADERS_DEFAULT => 20;		# Maximum header lines per multipart part
+Readonly my $MAX_NESTING_DEPTH_DEFAULT => 8;		# Maximum [] nesting in parameter names
+Readonly my $DTD_WARNING_INTERVAL_DEFAULT => 60;	# Seconds between allow_dtd audit warnings
+Readonly my $DTD_WARNING_MAX_KEYS => 100;		# Request paths tracked by that limiter
+Readonly my @COMPLEXITY_LIMITS      => qw(max_body_size max_params max_parts max_part_headers max_nesting_depth);
 Readonly my $CACHE_TTL_ROBOT         => '1 day';	# TTL for robot-detection cache entries
 Readonly my $CACHE_TTL_SEARCH        => '1 day';	# TTL for search-engine cache entries
 
@@ -87,11 +95,11 @@ CGI::Info - Information about the CGI environment
 
 =head1 VERSION
 
-Version 1.15
+Version 1.16
 
 =cut
 
-our $VERSION = '1.15';
+our $VERSION = '1.16';
 
 =head1 SYNOPSIS
 
@@ -132,8 +140,9 @@ it is another layer and every little helps.
 
 Creates a CGI::Info object.
 
-It takes four optional arguments: allow, logger, expect and upload_dir,
-which are documented in the params() method.
+It takes optional arguments allow, logger and upload_dir,
+which are documented in the params() method, plus the request-complexity
+limits documented below.
 
 It takes other optional parameters:
 
@@ -182,13 +191,107 @@ An object that is used to cache IP lookups.
 This cache object is an object that understands get() and set() messages,
 such as a L<CHI> object.
 
+=item * C<allow_dtd>
+
+When false (the default), an XML request body containing a C<!DOCTYPE> or
+C<!ENTITY> declaration is rejected before it is returned: C<params()>
+returns undef and the status is set to C<403>.
+Set this to a true value to accept such bodies, for example when parsing a
+trusted feed that ships its own DTD.
+Entity expansion and external entity resolution are then the caller's
+responsibility: parse the body with a proper XML parser that has entity
+expansion disabled.
+Every body accepted under this option is logged as a warning naming the
+declaration, so use of the exception is visible in the audit trail; see
+C<dtd_warning_interval> for how those warnings are rate limited.
+This is a constructor, configuration file or environment
+(C<CGI__Info__allow_dtd>) setting; it cannot be overridden per C<params()>
+call.
+
+=item * C<dtd_warning_interval>
+
+The minimum number of seconds between audit warnings for XML bodies accepted
+because of C<allow_dtd>.
+The default is 60.
+Declarations that are accepted but not logged are counted, and the next
+warning reports how many were suppressed, so a frequently polled feed does
+not hide its traffic while still not writing a line per request.
+Set this to C<0> to log every accepted declaration.
+
+The limit is per process and per request path, so the warnings for
+F</feed/a> and F</feed/b> are counted separately and one busy feed does not
+silence another.
+The path is taken from C<PATH_INFO>, falling back to C<SCRIPT_NAME> and then
+to the path part of C<REQUEST_URI>, and normalised lexically: the query string
+is dropped, C<%XX> escapes are decoded, repeated slashes are collapsed and
+C<.> and C<..> segments are resolved, so the usual spellings of one feed
+(F</feed/a>, F</feed/a/>, F</feed//a>, F</feed/%61>) share a single budget
+instead of splitting it.
+The limiter is not per object, so it also applies when a persistent handler
+(such as mod_perl, FastCGI or PSGI) creates a new object for every request,
+and C<reset()> does not clear it.
+At most 100 paths are tracked at once; when that many are in use the table is
+cleared, which can produce one extra warning per feed.
+It is a constructor, configuration file or environment
+(C<CGI__Info__dtd_warning_interval>) setting.
+
 =item * C<max_upload_size>
 
 The maximum file size in bytes you can upload.
 Use C<-1> for no limit.
 The default is 512 KB (524288 bytes).
 
+=item * C<max_body_size>
+
+The maximum number of bytes read from a POST body.
+This is checked against C<CONTENT_LENGTH> before anything is read and
+against any pre-populated body, so it caps the raw request rather than
+the parsed parameter values.
+Use C<-1> for no limit.
+When omitted it falls back to C<max_upload_size>, preserving the historical
+512 KB default.
+
+=item * C<max_params>
+
+The maximum number of parameters accepted from one request.
+The check is made on the raw key=value pairs before decoding, so it also
+bounds the amount of work done by the parser.
+For XML bodies (C<text/xml>, C<application/xml> and structured
+C<application/*+xml> types such as C<application/soap+xml>), this is the
+number of XML elements, including the root element.
+Use C<0> to reject every parameter and C<-1> for no limit.
+The default is 1000.
+
+=item * C<max_parts>
+
+The maximum number of parts in a C<multipart/form-data> body.
+Use C<0> to reject every part and C<-1> for no limit.
+The default is 100.
+
+=item * C<max_part_headers>
+
+The maximum number of header lines allowed in one C<multipart/form-data>
+part, including C<Content-Disposition> and C<Content-Type>.
+Use C<0> to reject any part with headers and C<-1> for no limit.
+The default is 20.
+
+=item * C<max_nesting_depth>
+
+The maximum depth of square-bracket nesting in a parameter name, for
+example C<a[b][c]> has a depth of 2.
+This applies to URL-encoded, JSON and multipart parameter names, not to
+values.
+For XML bodies (C<text/xml>, C<application/xml> and structured
+C<application/*+xml> types such as C<application/soap+xml>), this is the XML
+element nesting depth, where the root element is depth 1.
+Use C<0> to reject any bracketed name (or any XML element) and C<-1> for no
+limit.
+The default is 8.
+
 =back
+
+Any of these limits can also be overridden for a single C<params()> call,
+either individually or through its C<limits> hash reference; see L</params>.
 
 The class can be configured at runtime using environment variables and configuration
 files; for example, setting C<$ENV{'CGI__INFO__carp_on_warn'}> causes warnings to
@@ -200,12 +303,19 @@ use L<Carp>.  For more information see L<Object::Configure>.
 
   {
     allow          => { type => 'hashref',  optional => 1 },
+    allow_dtd      => { type => 'boolean',  optional => 1 },
     auto_load      => { type => 'boolean',  optional => 1 },
     cache          => { type => 'object',   optional => 1 },
     carp_on_warn   => { type => 'boolean',  optional => 1 },
     config_dirs    => { type => 'arrayref', optional => 1 },
     config_file    => { type => 'string',   optional => 1 },
+    dtd_warning_interval => { type => 'integer', optional => 1, min => 0 },
     logger         => { type => 'object',   optional => 1 },
+    max_body_size  => { type => 'integer',  optional => 1, min => -1 },
+    max_nesting_depth => { type => 'integer', optional => 1, min => -1 },
+    max_params     => { type => 'integer',  optional => 1, min => -1 },
+    max_part_headers => { type => 'integer', optional => 1, min => -1 },
+    max_parts      => { type => 'integer',  optional => 1, min => -1 },
     max_upload_size=> { type => 'integer',  optional => 1, min => -1 },
     upload_dir     => { type => 'string',   optional => 1 },
   }
@@ -243,6 +353,14 @@ B<Action>: replace C<expect =E<gt> [...]> with C<allow =E<gt> { key =E<gt> qr/..
 
 our $stdin_data;	# Class variable storing STDIN in case the class
 			# is instantiated more than once
+
+# Rate limiter for the allow_dtd audit warning, keyed by request path so that
+# different XML endpoints do not share one warning budget.  Process-wide rather
+# than per object: a persistent handler (mod_perl, FastCGI, PSGI) creates a new
+# object for each request while sharing one log, and reset() must not defeat
+# the limit.
+#   $DTD_WARNING_STATE{$path} = { last => <time>, suppressed => <count> }
+our %DTD_WARNING_STATE = ();
 
 sub new
 {
@@ -287,6 +405,7 @@ sub new
 		# Drop cached params so a new allow schema is applied on next call
 		my %merged = (%{$class}, %{$params});
 		delete $merged{'paramref'};
+		delete $merged{'_limits_key'};
 		return bless \%merged, ref($class);
 	}
 
@@ -313,9 +432,16 @@ sub new
 
 	# Return the blessed object with sensible defaults
 	return bless {
-		max_upload_size => $MAX_UPLOAD_SIZE_DEFAULT,
-		allow           => undef,
-		upload_dir      => undef,
+		max_upload_size    => $MAX_UPLOAD_SIZE_DEFAULT,
+		allow_dtd          => 0,		# Reject DOCTYPE/ENTITY declarations unless asked
+		dtd_warning_interval => $DTD_WARNING_INTERVAL_DEFAULT,	# Rate-limit its audit warning
+		max_body_size      => undef,	# Falls back to max_upload_size
+		max_params         => $MAX_PARAMS_DEFAULT,
+		max_parts          => $MAX_PARTS_DEFAULT,
+		max_part_headers   => $MAX_PART_HEADERS_DEFAULT,
+		max_nesting_depth  => $MAX_NESTING_DEPTH_DEFAULT,
+		allow              => undef,
+		upload_dir         => undef,
 		%{$params}	# Caller-supplied args override the defaults above
 	}, $class;
 }
@@ -609,7 +735,28 @@ separated string.
 
 The returned hash value can be passed into L<CGI::Untaint>.
 
-Takes four optional parameters: allow, logger and upload_dir.
+Takes the optional parameters allow, logger and upload_dir.
+The request-complexity limits (C<max_body_size>, C<max_params>, C<max_parts>,
+C<max_part_headers> and C<max_nesting_depth>) can be set on the constructor or
+in the configuration file, and can also be overridden for a single call.
+Pass them individually:
+
+	my $params = $info->params(max_params => 50, max_nesting_depth => 2);
+
+or use a shared C<limits> hash reference:
+
+	my $params = $info->params(limits => {
+		max_params        => 50,
+		max_nesting_depth => 2,
+	});
+
+The C<limits> hash may contain any of the five limit names; unknown names are
+rejected. Individual limit arguments take precedence over values in the
+C<limits> hash. Passing a limit to C<params()> also makes that call re-parse
+the request if the cached result was produced with different limits, so a
+stricter limit cannot be bypassed by an earlier C<params()> call. The per-call
+values apply only to that call; the instance's configured limits are unchanged
+afterwards.
 The parameters are passed in a hash, or a reference to a hash.
 The latter is more efficient since it puts less on the stack.
 
@@ -627,7 +774,30 @@ This is useful to help to block attacks on your site.
 
 Upload_dir is a string containing a directory where files being uploaded are to
 be stored.
-It must be a writeable directory in the temporary area.
+It must be a writeable directory inside a temporary area: the directory
+returned by L</tmpdir>, a classic system temporary directory such as F</tmp>,
+F</var/tmp> or F</usr/tmp>, the area named by C<TMPDIR>, C<TEMP> or C<TMP>, or
+on macOS any directory below F</var/folders>.
+This matters because a web server usually does not export C<TMPDIR>, so
+L</tmpdir> can point somewhere different from the platform's temporary tree.
+
+It has to be a directory I<inside> an area, not the area root itself: C</tmp>
+and the like are shared and world-writable, so pass a subdirectory created for
+the application instead.
+The test is made against the resolved path, so a directory reached through
+C<..> is judged by where it really is, and a sibling that merely shares a name
+prefix with a temporary area is not accepted.
+C<%XX> escapes are decoded first, so an encoded spelling of a path is judged
+like its decoded form.
+On Windows both C</> and C<\> separate directories, and that is applied after
+decoding, so an encoded C<%5C> cannot hide a C<..> traversal either.
+Two Windows spellings are refused because they cannot be checked against a
+temporary area by comparing strings: a drive-relative path such as C<C:uploads>
+(and a bare C<C:>), which starts at the current directory on that drive rather
+than at its root, and an 8.3 short name such as C<PROGRA~1>, which is an alias
+for a long name that only the filesystem can expand.
+Pass a long, absolute path instead.
+The filesystem root is never treated as a temporary area.
 
 Takes an optional parameter logger, which is used for warnings and traces.
 It can be an object that understands warn() and trace() messages,
@@ -680,8 +850,10 @@ constructor.
 		}
 	}
 
-If the request is an XML request (i.e. the content type of the POST is text/xml),
-CGI::Info will put the request into the params element 'XML', thus:
+If the request is an XML request (i.e. the content type of the POST is
+text/xml, application/xml or a structured application/*+xml type such as
+application/soap+xml), CGI::Info will put the request into the params
+element 'XML', thus:
 
 	use CGI::Info;
 	# ...
@@ -690,6 +862,17 @@ CGI::Info will put the request into the params element 'XML', thus:
 	my $xml = $$paramsref{'XML'};
 	# ... parse and process the XML request in $xml
 
+Before returning the body, XML is checked against C<max_params> (the number
+of elements, including the root) and C<max_nesting_depth> (element depth,
+with the root at depth 1). Comments, CDATA sections and processing
+instructions are ignored. A body containing a C<!DOCTYPE> or C<!ENTITY>
+declaration is rejected with status C<403> and C<params()> returns undef,
+because such declarations enable entity expansion and external entity
+attacks. Pass C<< allow_dtd => 1 >> to the constructor to accept them for a
+trusted feed; each accepted declaration is still logged as a warning, so the
+exception is recorded. These are structural checks, not an XML parser; use a
+proper parser with entity expansion disabled for untrusted XML.
+
 Carp if logger is not set and we detect something serious.
 
 Blocks some attacks,
@@ -697,6 +880,12 @@ such as SQL and XSS injections,
 mustleak and directory traversals,
 thus creating a primitive web application firewall (WAF).
 Warning - this is an extra layer, not a replacement for your other security layers.
+
+The request-complexity limits (C<max_body_size>, C<max_params>, C<max_parts>,
+C<max_part_headers> and C<max_nesting_depth>) are applied before parameter
+decoding and, for multipart bodies, while the body is parsed.
+A request that exceeds one of them causes C<params()> to return undef
+and sets the HTTP status to 413 (Payload Too Large).
 
 =head3 Validation Subroutine Support
 
@@ -744,12 +933,271 @@ Advanced features:
     }
 =cut
 
+# Validate one per-call limit.  Undef means "no override" so that
+# max_body_size can still fall back to max_upload_size.
+sub _validate_limit :Protected {
+	my ($self, $name, $value) = @_;
+
+	if(ref($value) || ($value !~ /\A[+-]?\d+\z/)) {
+		Carp::croak(__PACKAGE__ . "::params: $name must be an integer");
+	}
+
+	return $value + 0;
+}
+
+# Collect per-call complexity-limit overrides from either a shared limits
+# hash-ref, the individual limit arguments, or both.  Individual arguments
+# take precedence over values in the shared profile.
+sub _per_call_limits :Protected {
+	my ($self, $params) = @_;
+
+	return {} unless(defined($params) && (ref($params) eq 'HASH'));
+
+	my %known = map { $_ => 1 } @COMPLEXITY_LIMITS;
+	my %limits;
+
+	if(exists($params->{limits}) && defined($params->{limits})) {
+		my $profile = $params->{limits};
+		unless(ref($profile) eq 'HASH') {
+			Carp::croak(__PACKAGE__ . '::params: limits must be a hash reference');
+		}
+
+		foreach my $name (keys %{$profile}) {
+			unless($known{$name}) {
+				Carp::croak(__PACKAGE__ . "::params: unknown complexity limit '$name' in limits");
+			}
+			next unless(defined($profile->{$name}));
+			$limits{$name} = $self->_validate_limit($name, $profile->{$name});
+		}
+	}
+
+	foreach my $name (@COMPLEXITY_LIMITS) {
+		next unless(exists($params->{$name}));
+		next unless(defined($params->{$name}));
+		$limits{$name} = $self->_validate_limit($name, $params->{$name});
+	}
+
+	return \%limits;
+}
+
+# The effective raw-body limit.  max_body_size is optional so that existing
+# callers keep the historical max_upload_size behaviour when they do not set it.
+sub _body_limit :Protected {
+	my $self = shift;
+
+	return $self->{max_body_size} if defined($self->{max_body_size});
+	return $self->{max_upload_size};
+}
+
+# A negative limit means "unlimited"; the comparison is deliberately inclusive
+# so that a body or parameter count exactly at the limit is accepted.
+sub _over_limit :Protected {
+	my ($self, $value, $limit) = @_;
+
+	return 0 unless defined($limit);
+	return 0 if($limit < 0);
+	return $value > $limit;
+}
+
+# Maximum depth of square-bracket nesting in a parameter name:
+# a[b][c] is 2, as is a[b[c]].  Counting opening brackets treats sibling
+# groups as successive levels, which is how form-to-array names are used.
+sub _param_nesting_depth :Protected {
+	my ($self, $key) = @_;
+
+	my $depth = () = $key =~ /\[/g;
+	return $depth;
+}
+
+# Find the '>' that closes a tag, ignoring '>' inside quoted attribute values.
+sub _xml_tag_end :Protected {
+	my ($self, $xml, $pos) = @_;
+
+	my $length = length($xml);
+	my $quote;
+	while($pos < $length) {
+		my $char = substr($xml, $pos, 1);
+		if(defined($quote)) {
+			$quote = undef if($char eq $quote);
+		} elsif(($char eq '"') || ($char eq "'")) {
+			$quote = $char;
+		} elsif($char eq '>') {
+			return $pos;
+		}
+		$pos++;
+	}
+
+	return -1;
+}
+
+# Count XML elements and their maximum nesting depth without parsing the
+# document.  Comments, CDATA sections and processing instructions are skipped.
+# The root element is at depth 1.  A self-closing element counts as one
+# element at depth + 1 but does not open a level for its siblings.
+# A DOCTYPE or ENTITY declaration is reported as forbidden: it enables entity
+# expansion and external entity attacks, so such a body is rejected unless the
+# caller opted in with allow_dtd.
+sub _xml_complexity :Protected {
+	my ($self, $xml) = @_;
+
+	my $elements = 0;
+	my $depth = 0;
+	my $max_depth = 0;
+	my $forbidden;
+	my $pos = 0;
+	my $length = length($xml);
+
+	while($pos < $length) {
+		my $start = index($xml, '<', $pos);
+		last if($start < 0);
+
+		if(substr($xml, $start, 4) eq '<!--') {
+			my $end = index($xml, '-->', $start + 4);
+			last if($end < 0);
+			$pos = $end + 3;
+			next;
+		}
+		if(substr($xml, $start, 9) eq '<![CDATA[') {
+			my $end = index($xml, ']]>', $start + 9);
+			last if($end < 0);
+			$pos = $end + 3;
+			next;
+		}
+
+		my $end = $self->_xml_tag_end($xml, $start + 1);
+		last if($end < 0);
+		my $tag = substr($xml, $start + 1, $end - $start - 1);
+		$pos = $end + 1;
+
+		if($tag =~ /^\s*!\s*(DOCTYPE|ENTITY)\b/i) {
+			$forbidden = uc($1);
+		}
+
+		# Declarations, DOCTYPE declarations and processing instructions.
+		next if($tag =~ /^\s*[!?]/);
+
+		if($tag =~ m{^/\s*[A-Za-z_][\w.:-]*\s*$}) {
+			$depth-- if($depth > 0);
+			next;
+		}
+
+		next unless($tag =~ m{^\s*[A-Za-z_][\w.:-]*});
+		$elements++;
+
+		my $element_depth = $depth + 1;
+		$max_depth = $element_depth if($element_depth > $max_depth);
+		$depth = $element_depth unless($tag =~ m{/\s*$});
+	}
+
+	return { elements => $elements, depth => $max_depth, forbidden => $forbidden };
+}
+
+# Identify the effective limits so a cached parameter set is only reused when
+# it was produced under the same limits.  _body_limit() is used rather than
+# max_body_size because an unset max_body_size falls back to max_upload_size.
+sub _limits_key :Protected {
+	my $self = shift;
+
+	return join("\0", map { defined($_) ? $_ : 'undef' } (
+		$self->_body_limit(),
+		$self->{max_params},
+		$self->{max_parts},
+		$self->{max_part_headers},
+		$self->{max_nesting_depth},
+	));
+}
+
+# Record a complexity rejection once, set the status and log it.  The private
+# flag lets callers such as _multipart_data() abort a nested parse and have
+# params() stop without confusing an empty result with a successful parse.
+sub _reject_complexity :Protected {
+	my ($self, $what) = @_;
+
+	$self->{_limit_exceeded} = 1;
+	$self->status(413);
+	$self->_warn("Request complexity limit exceeded: $what");
+	return;
+}
+
+# The feed an audit warning belongs to.  This is the request path, so two XML
+# endpoints served by one process each get their own warning budget.  The path
+# is normalised lexically -- query string dropped, %XX decoded, repeated
+# slashes collapsed and '.' or '..' segments resolved -- so the usual spellings
+# of one feed share its budget instead of letting a client fragment it.
+# Nothing is looked up on disk: these are URL paths, not files.
+sub _dtd_audit_key :Protected {
+	my $self = shift;
+
+	foreach my $var (qw(PATH_INFO SCRIPT_NAME REQUEST_URI)) {
+		my $path = $ENV{$var};
+		next unless(defined($path) && length($path));
+
+		$path =~ s/\?.*//s;
+
+		my $key = $self->_tidy_path($path);
+		next unless(defined($key) && length($key));
+		return $key;
+	}
+
+	return '';
+}
+
+# Log that allow_dtd let a DOCTYPE/ENTITY declaration through, at most once per
+# dtd_warning_interval seconds per request path.  A trusted feed that is polled
+# continuously would otherwise write one warning per request; the number of
+# declarations accepted for that feed but not logged is reported by its next
+# warning.  An interval of 0 (or less) logs every occurrence.
+sub _audit_allowed_dtd :Protected {
+	my ($self, $declaration) = @_;
+
+	my $interval = $self->{dtd_warning_interval};
+	$interval = $DTD_WARNING_INTERVAL_DEFAULT unless defined($interval);
+
+	my $key = $self->_dtd_audit_key();
+	# The key comes from the request path, so cap the table: a server that sees
+	# an unbounded number of paths must not accumulate entries forever.
+	%DTD_WARNING_STATE = () if(scalar(keys %DTD_WARNING_STATE) >= $DTD_WARNING_MAX_KEYS);
+
+	my $now = time();
+	my $state = $DTD_WARNING_STATE{$key};
+	if(($interval > 0) && defined($state) && $state->{last} && (($now - $state->{last}) < $interval)) {
+		$state->{suppressed}++;
+		return;
+	}
+
+	my $suppressed = defined($state) ? $state->{suppressed} : 0;
+	$DTD_WARNING_STATE{$key} = { last => $now, suppressed => 0 };
+
+	my $earlier = $suppressed
+		? " ($suppressed earlier declaration" . (($suppressed == 1) ? '' : 's') . ' not logged)'
+		: '';
+	$self->_warn("XML $declaration declaration allowed by allow_dtd$earlier");
+
+	return;
+}
+
 sub params {
 	my $self = shift;
 
 	my $params = Params::Get::get_params(undef, @_);
+	my $overrides = $self->_per_call_limits($params);
 
-	if((defined($self->{paramref})) && ((!defined($params->{'allow'})) || defined($self->{allow}) && ($params->{'allow'} eq $self->{allow}))) {
+	# Localise the limit slots so per-call values apply to the rest of this
+	# call (including _multipart_data()) and are restored on return.
+	local $self->{max_body_size} = exists($overrides->{max_body_size})
+		? $overrides->{max_body_size} : $self->{max_body_size};
+	local $self->{max_params} = exists($overrides->{max_params})
+		? $overrides->{max_params} : $self->{max_params};
+	local $self->{max_parts} = exists($overrides->{max_parts})
+		? $overrides->{max_parts} : $self->{max_parts};
+	local $self->{max_part_headers} = exists($overrides->{max_part_headers})
+		? $overrides->{max_part_headers} : $self->{max_part_headers};
+	local $self->{max_nesting_depth} = exists($overrides->{max_nesting_depth})
+		? $overrides->{max_nesting_depth} : $self->{max_nesting_depth};
+
+	my $limits_key = $self->_limits_key();
+
+	if((defined($self->{paramref})) && (defined($self->{_limits_key})) && ($self->{_limits_key} eq $limits_key) && ((!defined($params->{'allow'})) || defined($self->{allow}) && ($params->{'allow'} eq $self->{allow}))) {
 		return $self->{paramref};
 	}
 
@@ -763,6 +1211,12 @@ sub params {
 		$self->set_logger($params->{'logger'});
 	}
 	$self->_trace('Entering params');
+
+	# A fresh parse may fail part-way through; do not leave a previous call's
+	# accepted parameter set (or its limit key) available for a later call.
+	delete $self->{paramref};
+	delete $self->{_limits_key};
+	delete $self->{_limit_exceeded};
 
 	my @pairs;
 	my $content_type = $ENV{'CONTENT_TYPE'};
@@ -815,9 +1269,20 @@ sub params {
 			$self->{status} = 411;
 			return;
 		}
-		if(($self->{max_upload_size} >= 0) && ($content_length > $self->{max_upload_size})) {	# Set maximum posts
+		my $body_limit = $self->_body_limit();
+		if($self->_over_limit($content_length, $body_limit)) {
 			# TODO: Design a way to tell the caller to send HTTP
 			# status 413
+			$self->{status} = 413;
+			$self->_warn('Large upload prohibited');
+			return;
+		}
+		if(($self->{max_upload_size} >= 0) && ($content_length > $self->{max_upload_size})) {	# Set maximum posts
+			$self->{status} = 413;
+			$self->_warn('Large upload prohibited');
+			return;
+		}
+		if(defined($stdin_data) && $self->_over_limit(length($stdin_data), $body_limit)) {
 			$self->{status} = 413;
 			$self->_warn('Large upload prohibited');
 			return;
@@ -874,6 +1339,7 @@ sub params {
 			}
 			if(!-w $self->{upload_dir}) {
 				delete $self->{paramref};
+				delete $self->{_limits_key};
 				$self->_warn({
 					warning => "upload_dir $self->{upload_dir} isn't writeable"
 				});
@@ -881,10 +1347,21 @@ sub params {
 				delete $self->{upload_dir};
 				return;
 			}
-			my $tmpdir = $self->tmpdir();
-			if($self->{'upload_dir'} !~ /^\Q$tmpdir\E/) {
+			if(my $problem = $self->_win32_path_problem($self->{'upload_dir'})) {
 				$self->_warn({
-					warning => 'upload_dir ' . $self->{'upload_dir'} . " isn't somewhere in the temporary area $tmpdir"
+					warning => 'upload_dir ' . $self->{'upload_dir'} . " $problem, so it can't be checked against the temporary areas"
+				});
+				$self->status(500);
+				delete $self->{upload_dir};
+				return;
+			}
+			if(!$self->_in_temp_area($self->{'upload_dir'})) {
+				my $root = $self->_temp_area_root($self->{'upload_dir'});
+				$self->_warn({
+					warning => defined($root)
+						? 'upload_dir ' . $self->{'upload_dir'} . " is the temporary area root $root, not a directory inside it"
+						: 'upload_dir ' . $self->{'upload_dir'} . " isn't in a temporary area ("
+							. join(', ', $self->_temp_areas()) . ')'
 				});
 				$self->status(500);
 				delete $self->{upload_dir};
@@ -895,8 +1372,9 @@ sub params {
 					length => $content_length,
 					boundary => $1
 				});
+				return if($self->{_limit_exceeded});
 			}
-		} elsif($content_type =~ /text\/xml/i) {
+		} elsif($content_type =~ m{^\s*(?:(?:text|application)/xml|application/[^/;\s]+\+xml)\s*(?:;.*)?$}i) {
 			my $buffer;
 			if($stdin_data) {
 				$buffer = $stdin_data;
@@ -909,9 +1387,30 @@ sub params {
 				$stdin_data = $buffer;
 			}
 
+			my $complexity = $self->_xml_complexity($buffer);
+			if(defined($complexity->{forbidden})) {
+				if(!$self->{allow_dtd}) {
+					$self->status(403);
+					$self->_warn("XML $complexity->{forbidden} declaration blocked");
+					return;
+				}
+				# Audit trail: a DTD is only ever accepted because the caller
+				# opted in, so record that the exception was used.
+				$self->_audit_allowed_dtd($complexity->{forbidden});
+			}
+			if($self->_over_limit($complexity->{elements}, $self->{max_params})) {
+				$self->_reject_complexity("more than $self->{max_params} XML elements");
+				return;
+			}
+			if($self->_over_limit($complexity->{depth}, $self->{max_nesting_depth})) {
+				$self->_reject_complexity("XML nesting deeper than $self->{max_nesting_depth}");
+				return;
+			}
+
 			$FORM{XML} = $buffer;
 
 			$self->{paramref} = \%FORM;
+			$self->{_limits_key} = $limits_key;
 
 			return \%FORM;
 		} elsif($content_type =~ /application\/json/i) {
@@ -969,6 +1468,11 @@ sub params {
 		});
 	}
 
+	if($self->_over_limit(scalar(@pairs), $self->{max_params})) {
+		$self->_reject_complexity("more than $self->{max_params} parameters");
+		return;
+	}
+
 	unless(scalar @pairs) {
 		return;
 	}
@@ -996,6 +1500,11 @@ sub params {
 			$value =~ s/%00//g;   # Strip literal %00
 		} else {
 			$value = '';
+		}
+
+		if($self->_over_limit($self->_param_nesting_depth($key), $self->{max_nesting_depth})) {
+			$self->_reject_complexity("parameter name nesting deeper than $self->{max_nesting_depth}");
+			return;
 		}
 
 		$key = _sanitise_input($key);
@@ -1201,6 +1710,7 @@ sub params {
 	}
 
 	$self->{paramref} = \%FORM;
+	$self->{_limits_key} = $limits_key;
 
 	return Return::Set::set_return(\%FORM, { type => 'hashref', min => 1 });
 }
@@ -1329,11 +1839,20 @@ sub _multipart_data :Protected {
 	}
 
 	unless($stdin_data) {
-		while(<STDIN>) {
-			chop(my $line = $_);
-			$line =~ s/[\r\n]//g;
-			$stdin_data .= "$line\n";
+		# Read no more than the declared body length.  The old line loop read
+		# until EOF, which ignored CONTENT_LENGTH and could grow without bound
+		# if the server passed more bytes than the declared request body.
+		my $buffer = '';
+		my $remaining = $total_bytes;
+		while($remaining > 0) {
+			my $chunk;
+			my $got = read(STDIN, $chunk, $remaining);
+			last unless(defined($got) && ($got > 0));
+			$buffer .= $chunk;
+			$remaining -= $got;
 		}
+		$buffer =~ s/\r//g;
+		$stdin_data = $buffer;
 		if(!$stdin_data) {
 			return;
 		}
@@ -1347,12 +1866,20 @@ sub _multipart_data :Protected {
 	my $value;
 	my $in_header = 0;
 	my $fout;
+	my $part_count = 0;
+	my $header_count = 0;
 
 	foreach my $line(split(/\n/, $stdin_data)) {
 		if($line =~ /^--\Q$boundary\E--$/) {
 			last;
 		}
 		if($line =~ /^--\Q$boundary\E$/) {
+			$part_count++;
+			if($self->_over_limit($part_count, $self->{max_parts})) {
+				close $fout if($writing_file);
+				$self->_reject_complexity("more than $self->{max_parts} multipart parts");
+				return;
+			}
 			if($writing_file) {
 				close $fout;
 				$writing_file = 0;
@@ -1361,36 +1888,50 @@ sub _multipart_data :Protected {
 				$value = undef;
 			}
 			$in_header = 1;
+			$header_count = 0;
 		} elsif($in_header) {
 			if(length($line) == 0) {
 				$in_header = 0;
-			} elsif($line =~ /^Content-Disposition: (.+)/i) {
-				my $field = $1;
-				if($field =~ /name="(.+?)"/) {
-					$key = $1;
+			} else {
+				$header_count++;
+				if($self->_over_limit($header_count, $self->{max_part_headers})) {
+					close $fout if($writing_file);
+					$self->_reject_complexity("more than $self->{max_part_headers} headers in a multipart part");
+					return;
 				}
-				# [^"]+ instead of .+ : stops at first '"' without backtracking,
-				# and cannot accidentally capture across the closing delimiter.
-				if($field =~ /filename="([^"]+)?"/) {
-					my $filename = $1;
-					unless(defined($filename)) {
-						$self->_warn('No upload filename given');
-					} elsif($filename =~ /[\\\/\|]/) {
-						$self->_warn("Disallowing invalid filename: $filename");
-					} else {
-						$filename = $self->_create_file_name({
-							filename => $filename
-						});
-
-						# Don't do this since it taints the string and I can't work out how to untaint it
-						# my $full_path = Cwd::realpath(File::Spec->catfile($self->{upload_dir}, $filename));
-						# $full_path =~ m/^(\/[\w\.]+)$/;
-						my $full_path = File::Spec->catfile($self->{upload_dir}, $filename);
-						unless(open($fout, '>', $full_path)) {
-							$self->_warn("Can't open $full_path");
+				if($line =~ /^Content-Disposition: (.+)/i) {
+					my $field = $1;
+					if($field =~ /name="(.+?)"/) {
+						$key = $1;
+						if($self->_over_limit($self->_param_nesting_depth($key), $self->{max_nesting_depth})) {
+							close $fout if($writing_file);
+							$self->_reject_complexity("parameter name nesting deeper than $self->{max_nesting_depth}");
+							return;
 						}
-						$writing_file = 1;
-						push(@pairs, "$key=$filename");
+					}
+					# [^"]+ instead of .+ : stops at first '"' without backtracking,
+					# and cannot accidentally capture across the closing delimiter.
+					if($field =~ /filename="([^"]+)?"/) {
+						my $filename = $1;
+						unless(defined($filename)) {
+							$self->_warn('No upload filename given');
+						} elsif($filename =~ /[\\\/\|]/) {
+							$self->_warn("Disallowing invalid filename: $filename");
+						} else {
+							$filename = $self->_create_file_name({
+								filename => $filename
+							});
+
+							# Don't do this since it taints the string and I can't work out how to untaint it
+							# my $full_path = Cwd::realpath(File::Spec->catfile($self->{upload_dir}, $filename));
+							# $full_path = m/^(\/[\w\.]+)$/;
+							my $full_path = File::Spec->catfile($self->{upload_dir}, $filename);
+							unless(open($fout, '>', $full_path)) {
+								$self->_warn("Can't open $full_path");
+							}
+							$writing_file = 1;
+							push(@pairs, "$key=$filename");
+						}
 					}
 				}
 			}
@@ -1734,6 +2275,160 @@ sub tmpdir {
 		croak(ref($self), ': tmpdir must be given a scalar');
 	}
 	return $params->{default} ? $params->{default} : File::Spec->tmpdir();
+}
+
+# Lexical tidy-up shared by the audit key and the upload directory check:
+# decode %XX, collapse repeated slashes and resolve '.' and '..' segments
+# without touching the filesystem.  A leading slash is preserved for absolute
+# paths; an empty result means the path had no usable segments.  With
+# $windows set, backslashes are separators too, and are translated after
+# decoding so that an encoded '%5C' cannot hide a traversal from the segment
+# resolution.
+sub _tidy_path :Protected {
+	my ($self, $path, $windows) = @_;
+
+	return unless defined($path);
+
+	# Decoding first means '%2e%2e' is treated like '..' and '%2F' like '/'.
+	$path =~ s/%([0-9A-Fa-f]{2})/chr(hex($1))/ge;
+	$path =~ tr{\\}{/} if($windows);
+	$path =~ s{/+}{/}g;
+
+	my $absolute = ($path =~ m{\A/}) ? 1 : 0;
+	my @segments;
+	foreach my $segment (split(m{/}, $path, -1)) {
+		next if(($segment eq '') || ($segment eq '.'));
+		if($segment eq '..') {
+			pop(@segments);
+			next;
+		}
+		push(@segments, $segment);
+	}
+
+	my $normalised = join('/', @segments);
+	return $absolute ? "/$normalised" : $normalised;
+}
+
+# Canonicalise a path for comparison: resolve '.' and '..' and symlinks when
+# the path exists (so '/tmp/../etc' cannot masquerade as '/tmp/...'), then
+# apply the lexical tidy-up above.  Decoding there means an encoded spelling of
+# a temporary path is judged like its decoded form, and on Windows both
+# separator kinds are resolved, including an encoded '%5C'.
+sub _temp_path :Protected {
+	my $self = shift;
+	my $path = shift;
+
+	return unless(defined($path) && length($path));
+	if(-d $path) {
+		my $real = Cwd::abs_path($path);
+		$path = $real if(defined($real) && length($real));
+	}
+	my $windows = ($^O eq 'MSWin32');
+	$path = lc($path) if($windows);
+
+	return $self->_tidy_path($path, $windows);
+}
+
+# Windows spellings that cannot be checked by comparing strings.  A
+# drive-relative path (C:foo) starts from the per-drive current directory
+# rather than from the drive root, so it can point anywhere; and an 8.3 short
+# name (PROGRA~1) is an alias for a long name that cannot be expanded without
+# asking the filesystem.  Both are refused rather than guessed at, so
+# upload_dir is always judged by an unambiguous path.  A tilde that is not
+# followed by digits is an ordinary character, not an alias.
+sub _win32_path_problem :Protected {
+	my ($self, $dir) = @_;
+
+	return unless(defined($dir) && ($^O eq 'MSWin32'));
+
+	my $path = $dir;
+	$path =~ s/%([0-9A-Fa-f]{2})/chr(hex($1))/ge;
+	$path =~ tr{\\}{/};
+
+	# 'C:foo', and a bare 'C:', are relative to the working directory on that
+	# drive, unlike 'C:/foo'.
+	if($path =~ m{\A[A-Za-z]:(?!/)}) {
+		return "is relative to the current directory on its drive";
+	}
+
+	foreach my $segment (split(m{/}, $path, -1)) {
+		if($segment =~ m{\A[^~]*~\d{1,6}(?:\.[^.]*)?\z}) {
+			return "uses the 8.3 short name '$segment'";
+		}
+	}
+
+	return;
+}
+
+# The directories that count as temporary work areas for upload_dir.
+# tmpdir() on its own is not enough: a web server normally does not export
+# TMPDIR, so a directory that an operator created interactively in the
+# platform's own temporary tree (for example /var/folders/... on macOS) would
+# not be recognised and every upload would fail with a 500.  The classic
+# system temp directories and the TMPDIR/TEMP/TMP overrides are accepted too.
+sub _temp_areas :Protected {
+	my $self = shift;
+
+	my @areas = ($self->tmpdir(), File::Spec->tmpdir());
+	push(@areas, @ENV{qw(TMPDIR TEMP TMP)});
+	if($^O eq 'MSWin32') {
+		push(@areas, map { File::Spec->catdir($_, 'Temp') } grep { defined($_) } @ENV{qw(SYSTEMROOT WINDIR)});
+	} elsif($^O eq 'darwin') {
+		# Core Perl has no confstr(_CS_DARWIN_USER_TEMP_DIR), but the whole of
+		# /var/folders is the per-user temporary tree.
+		push(@areas, '/var/folders', '/private/var/folders');
+	} else {
+		push(@areas, qw(/tmp /var/tmp /usr/tmp));
+	}
+
+	my %seen;
+	# The filesystem root is never a temporary area: accepting it would defeat
+	# the point of the check.
+	return grep { defined($_) && (length($_) > 1) && !$seen{$_}++ }
+		map { $self->_temp_path($_) } @areas;
+}
+
+# Is $dir a directory inside one of the temporary areas?  Compared on
+# canonical paths and on directory boundaries, so '/tmpfoo' is not accepted
+# for '/tmp'.  The root of an area is not accepted either: those directories
+# are shared and world-writable, while an upload directory should be one the
+# operator created for this application.  That applies even when the area is
+# itself nested in another one, such as a TMPDIR of /tmp/1234.
+sub _in_temp_area :Protected {
+	my ($self, $dir) = @_;
+
+	return if($self->_win32_path_problem($dir));
+
+	my $path = $self->_temp_path($dir);
+	return unless defined($path);
+
+	my @areas = $self->_temp_areas();
+	# An area root is never an upload directory, even when it sits inside
+	# another area (a TMPDIR of /tmp/1234, for example).
+	foreach my $area (@areas) {
+		return if($path eq $area);
+	}
+	foreach my $area (@areas) {
+		return 1 if(index($path, "$area/") == 0);
+	}
+
+	return;
+}
+
+# The temporary area whose root $dir is, if any.  Used to explain why such a
+# directory was rejected rather than calling it "not in a temporary area".
+sub _temp_area_root :Protected {
+	my ($self, $dir) = @_;
+
+	return if($self->_win32_path_problem($dir));
+
+	my $path = $self->_temp_path($dir);
+	return unless defined($path);
+	foreach my $area ($self->_temp_areas()) {
+		return $area if($path eq $area);
+	}
+
+	return;
 }
 
 =head2 rootdir

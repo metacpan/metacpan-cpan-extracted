@@ -1,3 +1,6 @@
 
+1.01  2026-10-25
+  - Added support for bulk inserts. (array of hashes)
+
 1.0  2021-02-20
   - First release.

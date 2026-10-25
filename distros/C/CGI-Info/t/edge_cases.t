@@ -1449,6 +1449,452 @@ subtest 'upload_dir: file path (not a dir) rejected with 500' => sub {
     is($info->status(), 500, 'upload_dir pointing to a file rejected with 500');
 };
 
+# A web server usually does not export TMPDIR, so tmpdir() can point somewhere
+# other than the platform's temporary tree where the operator created the
+# upload directory.  Such a directory must still be accepted.
+subtest 'upload_dir: system temp area accepted when tmpdir() points elsewhere' => sub {
+    plan skip_all => 'POSIX temporary directories only' if $^O eq 'MSWin32';
+
+    # A classic system temporary directory.  This is not necessarily what
+    # tmpdir() reports, especially once TMPDIR is gone from the environment.
+    my ($system_temp) = grep { -d $_ && -w $_ } qw(/var/tmp /tmp /usr/tmp);
+    plan skip_all => 'no writable system temporary directory' unless defined($system_temp);
+
+    reset_env();
+    CGI::Info->reset();
+
+    my $upload_dir = tempdir(DIR => $system_temp, CLEANUP => 1);
+
+    # Make $info->tmpdir() resolve to a different writable directory.
+    my $elsewhere = tempdir(CLEANUP => 1);
+    mkdir File::Spec->catdir($elsewhere, 'tmp')
+        or die "Can't create " . File::Spec->catdir($elsewhere, 'tmp') . ": $!";
+    local $ENV{C_DOCUMENT_ROOT} = $elsewhere;
+    local $ENV{TMPDIR};
+    delete $ENV{TMPDIR};
+
+    my $body = "--BOUND\nContent-Disposition: form-data; name=\"a\"\n\n1\n"
+        . "--BOUND\nContent-Disposition: form-data; name=\"b\"\n\n2\n--BOUND--\n";
+    $ENV{GATEWAY_INTERFACE} = 'CGI/1.1';
+    $ENV{REQUEST_METHOD}    = 'POST';
+    $ENV{CONTENT_TYPE}      = 'multipart/form-data; boundary=BOUND';
+    $ENV{CONTENT_LENGTH}    = length($body);
+    $ENV{REMOTE_ADDR}       = '1.2.3.4';
+
+    local *STDIN;
+    open STDIN, '<', \$body or die "Can't open scalar handle: $!";
+
+    my $info = CGI::Info->new(upload_dir => $upload_dir);
+    my $p    = eval { $info->params() };
+    is($@, '', 'does not die for a directory in the system temp area');
+    is($info->status(), 200, 'directory in the system temp area is accepted');
+    is_deeply($p, { a => '1' }, 'multipart body parsed');
+};
+
+# The temporary area root itself is too shared and world-writable to be an
+# upload directory, so it must be rejected like any other non-temp path.
+subtest 'upload_dir: temporary area root rejected with 500' => sub {
+    plan skip_all => 'POSIX temporary directories only' if $^O eq 'MSWin32';
+
+    reset_env();
+    my $info = CGI::Info->new();
+    my $root = File::Spec->tmpdir();
+
+    SKIP: {
+        skip "$root is not a writable temporary area root", 4
+            unless (-d $root) && (-w $root) && $info->_temp_area_root($root);
+
+        # Supply the body through the class variable so that a regression which
+        # accepts the area root fails instead of blocking on STDIN.
+        my $body = qq{--BOUND\nContent-Disposition: form-data; name="a"\n\n1\n--BOUND--\n};
+        local $CGI::Info::stdin_data = $body;
+
+        $ENV{GATEWAY_INTERFACE} = 'CGI/1.1';
+        $ENV{REQUEST_METHOD}    = 'POST';
+        $ENV{CONTENT_TYPE}      = 'multipart/form-data; boundary=BOUND';
+        $ENV{CONTENT_LENGTH}    = length($body);
+        $ENV{REMOTE_ADDR}       = '1.2.3.4';
+
+        my $p = eval { $info->params(upload_dir => $root) };
+        ok(!$@, 'does not die on the temporary area root');
+        is($info->status(), 500, 'the temporary area root is rejected with 500');
+        ok(!defined($p), 'no parameters are returned for the area root');
+        like($info->messages_as_string(), qr/is the temporary area root/,
+            'the warning explains that the area root is not allowed');
+    }
+};
+
+# An upload_dir whose name looks like an escaped traversal is judged by its
+# decoded path, even though the literal directory exists and is writable.
+subtest 'upload_dir: encoded traversal rejected when the literal directory exists' => sub {
+    plan skip_all => 'POSIX path semantics only' if $^O eq 'MSWin32';
+
+    reset_env();
+    my $base = tempdir(CLEANUP => 1);
+
+    # A single directory whose name decodes to enough '..' segments to reach
+    # /etc from anywhere under the temporary tree.
+    my $escaped = File::Spec->catdir($base, ('%2e%2e%2f' x 15) . 'etc');
+    mkdir $escaped or die "Can't create $escaped: $!";
+
+    my $probe = CGI::Info->new();
+    ok(-d $escaped, 'the literal directory exists');
+    is($probe->_temp_path($escaped), '/etc', 'the name decodes to /etc');
+
+    # Supply the body through the class variable so that a regression which
+    # accepts the directory fails instead of blocking on STDIN.
+    my $body = qq{--BOUND\nContent-Disposition: form-data; name="a"\n\n1\n--BOUND--\n};
+    local $CGI::Info::stdin_data = $body;
+
+    $ENV{GATEWAY_INTERFACE} = 'CGI/1.1';
+    $ENV{REQUEST_METHOD}    = 'POST';
+    $ENV{CONTENT_TYPE}      = 'multipart/form-data; boundary=BOUND';
+    $ENV{CONTENT_LENGTH}    = length($body);
+    $ENV{REMOTE_ADDR}       = '1.2.3.4';
+
+    my $info = CGI::Info->new(upload_dir => $escaped);
+    my $p    = eval { $info->params() };
+    ok(!$@, 'does not die on an encoded traversal');
+    is($info->status(), 500, 'the encoded traversal is rejected with 500');
+    ok(!defined($p), 'no parameters are returned');
+    like($info->messages_as_string(), qr/isn't in a temporary area/,
+        'the warning says the decoded path is outside the temporary areas');
+
+    rmdir $escaped;
+};
+
+# The area test must not be fooled by the root, by '..', or by a name that
+# merely shares a prefix with a temporary directory.
+subtest 'temp-area check rejects the root and cannot be escaped with ..' => sub {
+    reset_env();
+
+    my $info = CGI::Info->new();
+    ok(!$info->_in_temp_area('/'), 'filesystem root is not a temporary area');
+
+    SKIP: {
+        skip 'POSIX path semantics only', 4 if $^O eq 'MSWin32';
+
+        my $tmp     = $info->tmpdir();
+        my $escaped = File::Spec->catdir($tmp, ('..') x 20, 'etc');
+        ok(!$info->_in_temp_area($escaped), "'..' cannot escape the temporary area");
+        ok(!$info->_in_temp_area($tmp), 'a temporary area root is not inside itself');
+
+        # An encoded spelling of the same directory is judged like the literal
+        # one, the same way the DOCTYPE audit key is normalised.
+        my $last = substr($tmp, -1);
+        if(ord($last) > 127) {
+            pass('percent-encoded paths skipped for a non-ASCII temp path');
+        } else {
+            my $encoded = substr($tmp, 0, -1) . sprintf('%%%02X', ord($last));
+            is($info->_temp_path($encoded), $info->_temp_path($tmp),
+                'a percent-encoded path is resolved like its decoded form');
+        }
+
+        # '/tmpfoo' shares the name prefix of '/tmp' but is not inside it.
+        my $sibling = File::Spec->catdir(File::Spec->rootdir(), 'tmp') . 'foo';
+        ok(!$info->_in_temp_area($sibling), 'a shared name prefix is not inside the area');
+    }
+};
+
+# macOS keeps its per-user temporary tree under /var/folders, which a CGI
+# process sees even though TMPDIR is usually not exported.  $^O is overridden
+# so the Darwin branch is exercised on every platform, not only on a Mac.
+subtest 'macOS temporary tree is recognised as a temporary area' => sub {
+    reset_env();
+    CGI::Info->reset();
+
+    # A web server does not export these, so the Darwin area comes from the
+    # platform defaults rather than from the environment.
+    local $ENV{TMPDIR};
+    local $ENV{TEMP};
+    local $ENV{TMP};
+    delete $ENV{TMPDIR};
+    delete $ENV{TEMP};
+    delete $ENV{TMP};
+
+    # Shaped like a real per-user temporary directory, but never created, so
+    # the check sees the literal path rather than a resolved symlink.
+    my $user_temp = '/var/folders/k3/abcd1234efgh0000gn/T/cgi-info-uploads';
+
+    {
+        local $^O = 'darwin';
+        my $info  = CGI::Info->new();
+        my @areas = $info->_temp_areas();
+
+        ok(scalar(grep { $_ eq '/var/folders' } @areas),
+            'the macOS area list contains /var/folders');
+        ok(scalar(grep { $_ eq '/private/var/folders' } @areas),
+            'the macOS area list contains /private/var/folders');
+        ok($info->_in_temp_area($user_temp),
+            'a directory in the macOS temporary tree is accepted');
+        ok($info->_in_temp_area('/private/var/folders/k3/abcd1234efgh0000gn/T/uploads'),
+            'the /private spelling of the tree is accepted');
+        ok(!$info->_in_temp_area('/var/folders'),
+            'the /var/folders root itself is not an upload directory');
+        ok(!$info->_in_temp_area('/var/foldersx/k3/T/uploads'),
+            'a shared name prefix is not inside the macOS tree');
+        ok(!$info->_in_temp_area('/Users/Shared/uploads'),
+            'a directory outside the macOS tree is still rejected');
+    }
+
+    # The same path on a platform without the Darwin branch is rejected, so the
+    # assertions above really depend on that branch rather than on a path
+    # happening to sit under a system temporary directory.
+    {
+        local $^O = 'linux';
+        my $info = CGI::Info->new();
+        ok(!(grep { $_ eq '/var/folders' } $info->_temp_areas()),
+            'a non-macOS area list does not contain /var/folders');
+        ok(!$info->_in_temp_area($user_temp),
+            'the macOS temporary tree is rejected on a non-macOS platform');
+    }
+};
+
+# Windows keeps its per-machine temporary directory under %SYSTEMROOT%\Temp,
+# which a CGI process sees even though TMPDIR is usually not exported.  $^O is
+# overridden so the Windows branch is exercised on every platform.
+subtest 'Windows system temporary directory is recognised as a temporary area' => sub {
+    reset_env();
+    CGI::Info->reset();
+
+    local $ENV{TMPDIR};
+    local $ENV{TEMP};
+    local $ENV{TMP};
+    delete $ENV{TMPDIR};
+    delete $ENV{TEMP};
+    delete $ENV{TMP};
+
+    local $ENV{SYSTEMROOT} = 'C:\\Windows';
+    local $ENV{WINDIR};
+    delete $ENV{WINDIR};
+
+    {
+        local $^O = 'MSWin32';
+        my $info  = CGI::Info->new();
+        my @areas = $info->_temp_areas();
+
+        ok(scalar(grep { $_ eq 'c:/windows/temp' } @areas),
+            'the Windows area list contains %SYSTEMROOT%\\Temp, lowercased');
+        ok($info->_in_temp_area('C:\\Windows\\Temp\\cgi-info-uploads'),
+            'a directory in %SYSTEMROOT%\\Temp is accepted');
+        ok($info->_in_temp_area('C:/Windows/Temp/uploads'),
+            'a forward-slash spelling of %SYSTEMROOT%\\Temp is accepted');
+        ok(defined($info->_temp_area_root('C:\\Windows\\Temp')),
+            'the Windows temporary directory is reported as an area root');
+        ok(!$info->_in_temp_area('C:\\Windows\\Temp'),
+            'the %SYSTEMROOT%\\Temp root itself is not an upload directory');
+        ok(!$info->_in_temp_area('C:\\Windows\\TempFiles\\uploads'),
+            'a shared name prefix is not inside %SYSTEMROOT%\\Temp');
+        ok(!$info->_in_temp_area('C:\\Windows\\System32'),
+            'a directory outside the Windows temporary tree is still rejected');
+    }
+
+    # %WINDIR% is the historical spelling of the same directory, used by older
+    # servers that do not export %SYSTEMROOT%.
+    {
+        local $^O = 'MSWin32';
+        local $ENV{SYSTEMROOT};
+        delete $ENV{SYSTEMROOT};
+        local $ENV{WINDIR} = 'D:\\WinNT';
+
+        my $info = CGI::Info->new();
+        ok(scalar(grep { $_ eq 'd:/winnt/temp' } $info->_temp_areas()),
+            '%WINDIR% contributes %WINDIR%\\Temp when %SYSTEMROOT% is unset');
+        ok($info->_in_temp_area('D:\\WinNT\\Temp\\uploads'),
+            'a directory in %WINDIR%\\Temp is accepted');
+    }
+
+    # The same path on a platform without the Windows branch is rejected, so
+    # the assertions above really depend on that branch.
+    {
+        local $^O = 'linux';
+        my $info = CGI::Info->new();
+        ok(!(grep { $_ eq 'c:/windows/temp' } $info->_temp_areas()),
+            'a non-Windows area list does not contain %SYSTEMROOT%\\Temp');
+        ok(!$info->_in_temp_area('C:\\Windows\\Temp\\cgi-info-uploads'),
+            'the Windows temporary tree is rejected on a non-Windows platform');
+    }
+};
+
+# A '..' traversal in upload_dir must not be able to walk out of the Windows
+# temporary directory, however its separators are spelled.
+subtest 'upload_dir: traversal cannot escape %SYSTEMROOT%\\Temp' => sub {
+    reset_env();
+    CGI::Info->reset();
+
+    local $ENV{TMPDIR};
+    local $ENV{TEMP};
+    local $ENV{TMP};
+    delete $ENV{TMPDIR};
+    delete $ENV{TEMP};
+    delete $ENV{TMP};
+
+    local $ENV{SYSTEMROOT} = 'C:\\Windows';
+    local $ENV{WINDIR};
+    delete $ENV{WINDIR};
+
+    local $^O = 'MSWin32';
+    my $info = CGI::Info->new();
+
+    my $outside = 'C:\\Windows\\Temp\\..\\..\\Windows\\System32\\uploads';
+    is($info->_temp_path($outside), 'c:/windows/system32/uploads',
+        'the traversal is resolved before the area check');
+    ok(!$info->_in_temp_area($outside),
+        'a backslash traversal out of %SYSTEMROOT%\\Temp is rejected');
+    ok(!$info->_in_temp_area('C:/Windows/Temp/../../Windows/System32/uploads'),
+        'a forward-slash traversal out of %SYSTEMROOT%\\Temp is rejected');
+    ok(!$info->_in_temp_area('C:\\Windows\\Temp\\%2e%2e\\%2e%2e\\Windows\\System32\\uploads'),
+        'a percent-encoded traversal is rejected');
+    ok(!$info->_in_temp_area('C:\\Windows\\Temp\\%2e%2e%5c%2e%2e%5cWindows\\System32\\uploads'),
+        'an encoded separator cannot hide a traversal');
+
+    # A traversal that stays inside the temporary directory is just a tidier
+    # spelling of a directory in it, so it must still be accepted.
+    is($info->_temp_path('C:\\Windows\\Temp\\sub\\..\\uploads'), 'c:/windows/temp/uploads',
+        'a traversal that stays inside is resolved');
+    ok($info->_in_temp_area('C:\\Windows\\Temp\\sub\\..\\uploads'),
+        'a traversal that stays inside is still accepted');
+};
+
+# Two Windows spellings cannot be compared with a temporary area as strings:
+# 'C:foo' starts at the current directory on C: rather than at the drive root,
+# and an 8.3 short name is an alias for a long name.  Both are refused.
+subtest 'upload_dir: ambiguous Windows spellings are rejected' => sub {
+    reset_env();
+    CGI::Info->reset();
+
+    local $ENV{SYSTEMROOT} = 'C:\\Windows';
+    local $ENV{WINDIR};
+    delete $ENV{WINDIR};
+
+    # Created before $^O is overridden, so File::Temp runs with the real
+    # platform settings.
+    my $base = tempdir(CLEANUP => 1);
+    my $alias = File::Spec->catdir($base, 'UPLOADS~1');
+    mkdir $alias or die "Can't create $alias: $!";
+    ok(-d $alias, 'the directory with an 8.3-shaped name exists');
+
+    local $^O = 'MSWin32';
+    my $info = CGI::Info->new();
+
+    like($info->_win32_path_problem('C:Temp\\uploads'),
+        qr/relative to the current directory on its drive/,
+        'a drive-relative path is reported');
+    like($info->_win32_path_problem('C:'),
+        qr/relative to the current directory on its drive/,
+        'a bare drive is reported');
+    ok(!$info->_in_temp_area('C:Windows\\Temp\\uploads'),
+        'a drive-relative spelling is rejected although it looks like the area');
+    ok(!defined($info->_temp_area_root('C:Windows\\Temp\\uploads')),
+        'a drive-relative spelling is not explained as an area root');
+
+    like($info->_win32_path_problem('C:\\WINDOW~1\\Temp\\uploads'),
+        qr/8\.3 short name 'WINDOW~1'/,
+        'an 8.3 short name is reported');
+    ok(!$info->_in_temp_area('C:\\Windows\\Temp\\UPLOADS~1'),
+        'an 8.3 short name inside the area is rejected');
+    ok(!$info->_in_temp_area('C:\\Windows\\Temp\\%55PLOADS~1'),
+        'a percent-encoded 8.3 short name is rejected too');
+
+    ok(!defined($info->_win32_path_problem('C:\\Windows\\Temp\\uploads')),
+        'a plain long path is not reported');
+    ok($info->_in_temp_area('C:\\Windows\\Temp\\uploads'),
+        'a plain long path is still accepted');
+    ok(!defined($info->_win32_path_problem('C:\\Windows\\Temp\\back~up')),
+        'a tilde not followed by digits is an ordinary character');
+    ok($info->_in_temp_area('C:\\Windows\\Temp\\back~up'),
+        'a tilde name that is not an 8.3 alias is still accepted');
+
+    # An 8.3 ordinal is at most six digits, so a longer suffix is not an alias
+    # and must not cost the operator a working upload directory.
+    ok(!defined($info->_win32_path_problem('C:\\Windows\\Temp\\file~1234567')),
+        'a seven-digit tilde suffix is an ordinary name');
+    ok($info->_in_temp_area('C:\\Windows\\Temp\\file~1234567'),
+        'an over-long tilde suffix is still accepted');
+    like($info->_win32_path_problem('C:\\Windows\\Temp\\file~123456'),
+        qr/8\.3 short name 'file~123456'/,
+        'the six-digit form is still treated as an 8.3 alias');
+
+    # End to end: a real directory whose name looks like an 8.3 alias is
+    # refused by params() although it sits inside the temporary area.
+    my $body = qq{--BOUND\nContent-Disposition: form-data; name="a"\n\n1\n--BOUND--\n};
+    local $CGI::Info::stdin_data = $body;
+
+    $ENV{GATEWAY_INTERFACE} = 'CGI/1.1';
+    $ENV{REQUEST_METHOD}    = 'POST';
+    $ENV{CONTENT_TYPE}      = 'multipart/form-data; boundary=BOUND';
+    $ENV{CONTENT_LENGTH}    = length($body);
+    $ENV{REMOTE_ADDR}       = '1.2.3.4';
+
+    my $upload = CGI::Info->new(upload_dir => $alias);
+    my $p      = eval { $upload->params() };
+    ok(!$@, 'does not die on an 8.3 alias');
+    is($upload->status(), 500, 'an 8.3 alias is rejected with 500');
+    ok(!defined($p), 'no parameters are returned for an 8.3 alias');
+    like($upload->messages_as_string(), qr/uses the 8\.3 short name 'UPLOADS~1'/,
+        'the warning names the 8.3 alias');
+
+    rmdir $alias;
+};
+
+# The 8.3 rule is Windows-only.  On a POSIX host 'build~1' is an ordinary
+# name, so a directory called that is a perfectly good upload directory and
+# must not be rejected by a check that only understands Windows spellings.
+subtest 'upload_dir: a POSIX name shaped like an 8.3 alias is accepted' => sub {
+    reset_env();
+
+    local $ENV{TMPDIR} = tempdir(CLEANUP => 1);
+    my $dir = File::Spec->catdir($ENV{TMPDIR}, 'build~1');
+    mkdir $dir or die "Can't create $dir: $!";
+    ok(-d $dir, 'a directory named like an 8.3 alias exists');
+
+    # Both non-Windows platforms the area check knows about, so the assertion
+    # cannot depend on whichever one happens to be running.
+    foreach my $os (qw(linux darwin)) {
+        local $^O = $os;
+        my $info = CGI::Info->new();
+        ok(!defined($info->_win32_path_problem($dir)),
+            "the 8.3 rule does not apply on $os");
+        ok($info->_in_temp_area($dir),
+            "a tilde-and-digits name is inside the temporary area on $os");
+    }
+
+    # The name really is 8.3-shaped, so the acceptance above is the platform
+    # guard at work rather than a name the rule happens not to match.
+    {
+        local $^O = 'MSWin32';
+        my $info = CGI::Info->new();
+        like($info->_win32_path_problem($dir), qr/8\.3 short name 'build~1'/,
+            'the same name would be an 8.3 alias on Windows');
+    }
+
+    # End to end: the directory is accepted and the body is parsed normally.
+    my $body = join("\n", '--BOUND',
+        'Content-Disposition: form-data; name="a"', '', '1',
+        '--BOUND',
+        'Content-Disposition: form-data; name="b"', '', '2',
+        '--BOUND--', '');
+    local $CGI::Info::stdin_data = $body;
+
+    $ENV{GATEWAY_INTERFACE} = 'CGI/1.1';
+    $ENV{REQUEST_METHOD}    = 'POST';
+    $ENV{CONTENT_TYPE}      = 'multipart/form-data; boundary=BOUND';
+    $ENV{CONTENT_LENGTH}    = length($body);
+    $ENV{REMOTE_ADDR}       = '1.2.3.4';
+
+    my $upload = CGI::Info->new(upload_dir => $dir);
+    my $p      = eval { $upload->params() };
+    ok(!$@, 'does not die on a tilde-and-digits name');
+    is($upload->status(), 200, 'a tilde-and-digits name is accepted with 200');
+    # A part's value is only flushed by the boundary that follows it, so the
+    # body carries a second part to close the first one.
+    ok(defined($p) && ($p->{a} eq '1'), 'the multipart body is parsed');
+    unlike($upload->messages_as_string(), qr/8\.3|temporary area/,
+        'no path-spelling warning is logged');
+
+    rmdir $dir;
+};
+
 # ============================================================
 # 24. Global variable integrity: $_ and $@ must not be clobbered
 # ============================================================

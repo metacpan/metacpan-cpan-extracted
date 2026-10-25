@@ -33,7 +33,7 @@
       "runtime" : {
          "recommends" : {
             "Geo::Coder::Free" : "0.48",
-            "HTML::OSM" : "0.11"
+            "HTML::OSM" : "0.12"
          },
          "requires" : {
             "CGI::Info" : "0",
@@ -72,7 +72,8 @@
             "Socket" : "2.010",
             "Spreadsheet::ParseXLSX" : "0",
             "Sub::Protected" : "0.03",
-            "perl" : "5.020000"
+            "perl" : "5.020000",
+            "version" : "0.77"
          }
       },
       "test" : {
@@ -108,6 +109,6 @@
          "web" : "https://github.com/nigelhorne/Database-BI"
       }
    },
-   "version" : "v0.016.0",
+   "version" : "0.017.0",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

@@ -79,7 +79,7 @@ sub _match {
 
   # Match children
   my $snapshot = $r->parent ? [@{$self->stack}] : [];
-  for my $child (@{$r->children}) {
+  for my $child (@{$r->_candidates($path)}) {
     return 1 if $self->_match($child, $c, $options);
     $self->stack([@$snapshot]);
   }

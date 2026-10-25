@@ -42,6 +42,17 @@ any patches you have. I use `prove` for 99% of my testing during development.
 Please try to match any existing coding style.  If there is a `.perltidyrc`
 file, please install Perl::Tidy and use perltidy before submitting patches.
 
+## AI/LLM contributions
+
+Contributions containing code written by LLM tools will not be accepted.
+Documentation or metadata written by LLM tools, and code written by humans with
+the assistance of LLM tools, will be evaluated with the same rigor as any other
+contributions.
+
+Failure to notate the participation of LLM tools in an attempt to subvert this
+policy, or excessive volume of unsolicited contributions from such tools, may
+result in warnings or bans from contributing to this project.
+
 ## Installing and using Dist::Zilla
 
 [Dist::Zilla](https://metacpan.org/pod/Dist::Zilla) is a very powerful
@@ -88,18 +99,17 @@ You can learn more about Dist::Zilla at http://dzil.org/
 ## Other notes
 
 This distribution maintains the generated `META.json` and either `Makefile.PL`
-or `Build.PL` in the repository. This allows two things:
-[Travis CI](https://travis-ci.org/) can build and test the distribution without
-requiring Dist::Zilla, and the distribution can be installed directly from
-Github or a local git repository using `cpanm` for testing (again, not
-requiring Dist::Zilla).
+or `Build.PL` in the repository. This allows the distribution or its
+dependencies to be installed directly from GitHub or a local git repository
+without needing Dist::Zilla for testing or
+[CI](https://en.wikipedia.org/wiki/Continuous_integration).
 
     $ cpanm git://github.com/Author/Distribution-Name.git
-    $ cd Distribution-Name; cpanm .
+    $ cd Distribution-Name; cpanm --installdeps .
 
-Contributions are preferred in the form of a Github pull request. See
+Contributions are preferred in the form of a GitHub pull request. See
 [Using pull requests](https://help.github.com/articles/using-pull-requests/)
-for further information. You can use the Github issue tracker to report issues
+for further information. You can use the GitHub issue tracker to report issues
 without an accompanying patch.
 
 # CREDITS

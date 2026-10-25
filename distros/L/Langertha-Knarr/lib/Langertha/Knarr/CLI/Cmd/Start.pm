@@ -1,5 +1,5 @@
 package Langertha::Knarr::CLI::Cmd::Start;
-our $VERSION = '1.102';
+our $VERSION = '1.103';
 # ABSTRACT: Start the Knarr proxy server
 use Moo;
 with 'Langertha::Knarr::CLI::Role::GlobalOptions';
@@ -39,6 +39,12 @@ option from_env => (
   default => 0,
 );
 
+option remote_config => (
+  is      => 'ro',
+  doc     => 'Allow a start without models; the routing setup comes from PUT /knarr/admin/config, layered over the config file, held in memory (needs KNARR_ADMIN_KEY; or remote_config: / KNARR_REMOTE_CONFIG)',
+  default => 0,
+);
+
 option trace_name => (
   is      => 'ro',
   format  => 's',
@@ -71,9 +77,13 @@ sub execute {
 
   my $config_file = $self->config_file($chain);
   my $config;
+  # KNARR_REMOTE_CONFIG, read the way the config reads it (k75).
+  my $remote_config_requested = $self->remote_config
+    || Langertha::Knarr::Config->new( data => {} )->remote_config;
 
   if (-f $config_file) {
     $config = Langertha::Knarr::Config->new(file => $config_file);
+    $config->data->{remote_config} = 1 if $self->remote_config;
     my @errors = $config->validate;
     if (@errors) {
       _err("Configuration errors:");
@@ -81,9 +91,27 @@ sub execute {
       exit 1;
     }
     _log("Config: loaded from $config_file");
+  } elsif ($remote_config_requested) {
+    # The setup arrives by admin push; nothing to read, not even the
+    # environment's provider keys (--from-env is the Docker default).
+    $config = Langertha::Knarr::Config->new( data => { remote_config => 1 } );
+    my @errors = $config->validate;
+    if (@errors) {
+      _err("Configuration errors:");
+      _err("  - $_") for @errors;
+      exit 1;
+    }
+    _log("Config: remote config, no config file" . ( $self->from_env ? " (--from-env ignored)" : '' ));
   } elsif ($self->from_env) {
     _log("Config: auto-detecting from environment variables");
     $config = Langertha::Knarr::Config->from_env(include_test => 0);
+    # Not validated as a whole (no keys found is passthrough-only mode),
+    # but an admin key must still hold (k75).
+    if ( my @errors = $config->admin_errors ) {
+      _err("Configuration errors:");
+      _err("  - $_") for @errors;
+      exit 1;
+    }
   } else {
     print STDERR "Config file not found: $config_file\n";
     print STDERR "\n";
@@ -94,6 +122,13 @@ sub execute {
   }
 
   my $workers = $self->_workers($config);
+  my $remote_config = $config->remote_config;
+  my $admin_on = $config->has_admin_key;
+  if ( $admin_on && $workers > 1 ) {
+    _log("WARNING: workers forced to 1 (was $workers): the admin routes keep the"
+      . " delivered setup in this process's memory, a push would reach one worker only");
+    $workers = 1;
+  }
 
   # Inject CLI trace_name into config
   if ($self->has_trace_name) {
@@ -128,7 +163,15 @@ sub execute {
   # Log discovered engines and models
   my $models = $config->models;
   my $model_count = scalar keys %$models;
-  if ($model_count) {
+  my $token_auth = $config->token_auth;
+  if ($token_auth) {
+    # Which backend and routes; never the dsn, user, password or relation.
+    _log("Auth: token_auth ($token_auth->{backend}, routes: "
+      . join( ', ', sort keys %{ $config->routes } ) . ")");
+    _log("Engines: none configured, models come from the tokens");
+  } elsif ( $remote_config && !$model_count && !$config->default_engine && !keys %{ $config->passthrough } ) {
+    _log("Engines: none yet (remote config: requests answer 503 until PUT /knarr/admin/config)");
+  } elsif ($model_count) {
     _log("Engines: $model_count provider(s) configured");
     _log("");
     for my $name (sort keys %$models) {
@@ -146,7 +189,7 @@ sub execute {
     _log("Engines: none (passthrough only mode)");
   }
 
-  if ($config->auto_discover) {
+  if ($config->auto_discover && !$token_auth) {
     _log("Auto-discover: enabled (will query provider model lists)");
   }
 
@@ -156,7 +199,9 @@ sub execute {
 
   # Passthrough status
   my $pt = $config->passthrough;
-  if (keys %$pt) {
+  if ($token_auth) {
+    _log("Passthrough: off (token_auth)");
+  } elsif (keys %$pt) {
     my @fmts;
     for my $fmt (sort keys %$pt) {
       push @fmts, "$fmt -> $pt->{$fmt}";
@@ -177,11 +222,25 @@ sub execute {
   }
 
   # Proxy auth status
-  if ($config->has_proxy_api_key) {
+  if ($token_auth) {
+    # the Auth line above says it
+  } elsif ($config->has_proxy_api_key) {
     _log("Proxy auth: enabled (KNARR_API_KEY)");
+  } elsif (defined $config->proxy_api_key) {
+    _log("WARNING: proxy_api_key / KNARR_API_KEY is empty, proxy is OPEN (no authentication)");
   } else {
     _log("Proxy auth: open (set KNARR_API_KEY to require authentication)");
   }
+
+  # Admin routes status; never the key itself
+  if ($admin_on) {
+    _log("Admin routes: enabled under /knarr/admin/ (admin key set)");
+  } else {
+    _log("Admin routes: off (set KNARR_ADMIN_KEY to enable)");
+  }
+
+  _log("Remote config: on (PUT /knarr/admin/config lays a setup over this one, in memory only)")
+    if $remote_config && $admin_on;
 
   # Request logging status
   my $log_file = $config->log_file;
@@ -199,59 +258,56 @@ sub execute {
 
   # Build server
   require Langertha::Knarr;
-  require Langertha::Knarr::Router;
-  require Langertha::Knarr::Handler::Router;
+  require Langertha::Knarr::Stack;
+  require Langertha::Knarr::Tracing;
+  require Langertha::Knarr::RequestLog;
   require IO::Async::Loop;
 
   my $loop = IO::Async::Loop->new;
-  my $router = Langertha::Knarr::Router->new( config => $config );
+  my $tracing = Langertha::Knarr::Tracing->new( config => $config );
+  my $rlog = Langertha::Knarr::RequestLog->new( config => $config );
 
-  my $passthrough;
-  if ( my $upstreams = $config->passthrough ) {
-    if ( %$upstreams ) {
-      require Langertha::Knarr::Handler::Passthrough;
-      $passthrough = Langertha::Knarr::Handler::Passthrough->new(
-        upstreams     => $upstreams,
-        loop          => $loop,
-        timeout       => $config->upstream_timeout,
-        stall_timeout => $config->upstream_stall_timeout,
-      );
+  # Router, passthrough, handler chain and proxy key from the config; an
+  # admin push builds the next one the same way (k75).
+  my $stack = Langertha::Knarr::Stack->new(
+    config      => $config,
+    loop        => $loop,
+    tracing     => $tracing->_enabled ? $tracing : undef,
+    request_log => $rlog->_enabled ? $rlog : undef,
+  );
+
+  # Builds the token store, which loads DBD::Pg (not connecting: each
+  # serving process does that once it serves, never this one before a
+  # fork): a missing driver stops here, not at the first request.
+  if ($token_auth) {
+    unless ( eval { $stack->build; 1 } ) {
+      ( my $err = $@ ) =~ s/ at \S+ line \d+\.?\n?\z//;
+      _err($err);
+      exit 1;
     }
   }
 
-  my $handler = Langertha::Knarr::Handler::Router->new(
-    router => $router,
-    ( $passthrough ? ( passthrough => $passthrough ) : () ),
-  );
-
-  require Langertha::Knarr::Tracing;
-  my $tracing = Langertha::Knarr::Tracing->new( config => $config );
-  if ( $tracing->_enabled ) {
-    require Langertha::Knarr::Handler::Tracing;
-    $handler = Langertha::Knarr::Handler::Tracing->new(
-      wrapped => $handler,
-      tracing => $tracing,
+  my $admin;
+  if ($admin_on) {
+    require Langertha::Knarr::Admin;
+    $admin = Langertha::Knarr::Admin->new(
+      key      => $config->admin_key,
+      stack    => $stack,
+      remote_config => $remote_config,
     );
   }
 
-  require Langertha::Knarr::RequestLog;
-  my $rlog = Langertha::Knarr::RequestLog->new( config => $config );
-  if ( $rlog->_enabled ) {
-    require Langertha::Knarr::Handler::RequestLog;
-    $handler = Langertha::Knarr::Handler::RequestLog->new(
-      wrapped     => $handler,
-      request_log => $rlog,
-    );
-  }
-
+  my $passthrough = $stack->raw_passthrough;
   my $knarr = Langertha::Knarr->new(
-    handler => $handler,
+    handler => $stack->handler,
     loop    => $loop,
     listen  => $listen_addrs,
-    router  => $router,
+    router  => $stack->router,
     ( $passthrough ? ( raw_passthrough => $passthrough ) : () ),
     ( $tracing->_enabled ? ( tracing => $tracing ) : () ),
-    ( $config->has_proxy_api_key ? ( auth_token => $config->proxy_api_key ) : () ),
+    ( defined $stack->auth_token ? ( auth_token => $stack->auth_token ) : () ),
+    ( $stack->authorizer ? ( authorizer => $stack->authorizer ) : () ),
+    ( $admin ? ( admin => $admin ) : () ),
     ( defined $config->public_url ? ( public_url => $config->public_url ) : () ),
     ( defined $config->ollama_compat_version
       ? ( ollama_compat_version => $config->ollama_compat_version ) : () ),
@@ -309,7 +365,7 @@ Langertha::Knarr::CLI::Cmd::Start - Start the Knarr proxy server
 
 =head1 VERSION
 
-version 1.102
+version 1.103
 
 =head1 DESCRIPTION
 
@@ -331,6 +387,28 @@ then forks N workers that accept on the same sockets, and supervises them
 -- a worker that exits is restarted, C<SIGTERM>/C<SIGINT> stops them all.
 Sessions (a Raider conversation) live in one worker and are not routed
 back to it. See L<Langertha::Knarr/workers> and L<Langertha::Knarr/run>.
+
+C<--remote-config> (else the config's C<remote_config:> or
+C<KNARR_REMOTE_CONFIG>) allows a start without any model: no config file is
+needed (C<--from-env> is then ignored), and every request but the admin
+routes answers C<503> until the setup arrives by C<PUT /knarr/admin/config>
+(see L<Langertha::Knarr::Admin>). A config file may hold models and the rest
+of a setup as well: it is always in effect, and a delivered setup lies over
+it, in memory only. It needs C<KNARR_ADMIN_KEY> (or C<admin_key:>). With an
+admin key set the admin routes are on, and the
+worker count is set to C<1> with a warning: a push reaches the memory of one
+process only.
+
+With a C<token_auth:> section (see L<Langertha::Knarr::Config/token_auth>)
+the proxy checks a per-model token against the database instead of one shared
+key, and the requests are routed by the token's provider
+(L<Langertha::Knarr::Config/routes>). The banner says
+C<Auth: token_auth (postgresql, routes: ...)> and never the DSN, user,
+password or relation. The stack is built before the server starts, so a
+missing C<DBD::Pg> stops C<start> with C<token_auth backend postgresql needs
+DBD::Pg> instead of failing the first request. The database connection is
+opened by the first token check of each serving process, so with C<-w> every
+worker has its own and the parent never connects.
 
 See L<knarr> for the full option reference and L<Langertha::Knarr::Config>
 for the configuration file format.

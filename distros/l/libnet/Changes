@@ -1,5 +1,10 @@
 Revision history for Perl distribution libnet
 
+3.16 2026-10-24
+
+    - Fix unbounded response buffering vulnerabilities in Net::Cmd.  [Jitka
+      Plesnikova, CVE-2026-93469]
+
 3.15 2023-03-20
 
     - Release for updating bleadperl to avoid cmp_version.t trouble.  No code
@@ -47,7 +52,7 @@ Revision history for Perl distribution libnet
 3.10 2016-08-01
 
     - Removed . from @INC when loading optional modules.  [Tony Cook, Perl
-      RT#127834, CVE-2016-1238]
+      GH#15263, CVE-2016-1238]
 
     - Removed the default Net::Cmd::timeout() since it inadvertently overrode
       the timeout() method in whatever IO::Socket::INET-like class sub-classes
@@ -137,7 +142,7 @@ Revision history for Perl distribution libnet
 3.06 2015-04-01
 
     - Fixed INSTALLDIRS to account for the @INC reordering change in Perl 5.12.
-      See Perl RT#116479 for details.  (libnet entered the perl core in Perl
+      See Perl GH#12722 for details.  (libnet entered the perl core in Perl
       5.7.2 so that's what the lower bound of the check should strictly be, but
       since we only support Perl 5.8.1 and higher anyway it suffices to check
       for Perl 5.8.  The upper bound is correctly Perl 5.11.0 since the @INC

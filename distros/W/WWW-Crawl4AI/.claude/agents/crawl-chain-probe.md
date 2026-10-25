@@ -1,7 +1,7 @@
 ---
 name: crawl-chain-probe
 description: Use when a crawl unexpectedly returns ok==0, bot_wall_detected, thin_content, or http_NNN, when a URL needs to be tested against the live strategy chain, or when Crawl4AI service reachability is in question.
-tools: Bash, Read, Grep, Glob
+disallowedTools: Edit, Write, NotebookEdit
 briefing:
   skills:
     - perl-www-crawl4ai

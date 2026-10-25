@@ -361,6 +361,28 @@ EOF
   is $dom->at('script')->text, "alert('lalala');", 'right script content';
 };
 
+subtest 'Script tag with HTML comment containing nested script tags' => sub {
+  my $dom = Mojo::DOM58->new(q{<script> console.log("<!--"); </script>});
+  is $dom->at('script')->text, ' console.log("<!--"); ', 'right script content';
+
+  $dom = Mojo::DOM58->new(q{<script> console.log("<!-- <script> -->"); </script>});
+  is $dom->at('script')->text, ' console.log("<!-- <script> -->"); ', 'right script content';
+
+  $dom = Mojo::DOM58->new(q{<script> console.log("<!-- <script> </script>"); </script>});
+  is $dom->at('script')->text, ' console.log("<!-- <script> </script>"); ', 'right script content';
+
+  $dom = Mojo::DOM58->new(q{<script> console.log("<!-- <script> </script> -->"); </script>});
+  is $dom->at('script')->text, ' console.log("<!-- <script> </script> -->"); ', 'right script content';
+};
+
+subtest 'Script tag with HTML comment containing stray characters' => sub {
+  my $dom = Mojo::DOM58->new(q{<script>/* <!-- <foo --> */</script>});
+  is $dom->at('script')->text, '/* <!-- <foo --> */', 'right script content';
+
+  $dom = Mojo::DOM58->new(q{<script>/* <!-- a-b --> */</script>});
+  is $dom->at('script')->text, '/* <!-- a-b --> */', 'right script content';
+};
+
 subtest 'HTML5 (unquoted values)' => sub {
   my $dom = Mojo::DOM58->new(
     '<div id = test foo ="bar" class=tset bar=/baz/ value baz=//>works</div>');
@@ -613,15 +635,15 @@ EOF
   is_deeply [$dom->at('title')->ancestors->map('tag')->each], [qw(channel rss)],
     'right results';
   is $dom->at('extension')->attr('foo:id'), 'works', 'right id';
-  like $dom->at('#works')->text,       qr/\[awesome\]\]/, 'right text';
-  like $dom->at('[id="works"]')->text, qr/\[awesome\]\]/, 'right text';
+  like $dom->at('[foo\:id]')->text,         qr/\[awesome\]\]/, 'right text';
+  like $dom->at('[foo\:id="works"]')->text, qr/\[awesome\]\]/, 'right text';
   is $dom->find('description')->[1]->text, "\n        <p>trololololo>\n      ",
     'right text';
   is $dom->at('pubDate')->text,        'Mon, 12 Jul 2010 20:42:00', 'right text';
-  like $dom->at('[id*="ork"]')->text,  qr/\[awesome\]\]/,           'right text';
-  like $dom->at('[id*="orks"]')->text, qr/\[awesome\]\]/,           'right text';
-  like $dom->at('[id*="work"]')->text, qr/\[awesome\]\]/,           'right text';
-  like $dom->at('[id*="or"]')->text,   qr/\[awesome\]\]/,           'right text';
+  like $dom->at('[foo\:id*="ork"]')->text,  qr/\[awesome\]\]/, 'right text';
+  like $dom->at('[foo\:id*="orks"]')->text, qr/\[awesome\]\]/, 'right text';
+  like $dom->at('[foo\:id*="work"]')->text, qr/\[awesome\]\]/, 'right text';
+  like $dom->at('[foo\:id*="or"]')->text,   qr/\[awesome\]\]/, 'right text';
   ok $dom->at('rss')->xml,             'XML mode active';
   ok $dom->at('extension')->parent->xml, 'XML mode active';
   ok $dom->at('extension')->root->xml,   'XML mode active';
@@ -661,11 +683,6 @@ EOF
   is $dom->at('k\:book'), undef, 'no result';
   is $dom->at('ook'),     undef, 'no result';
   is $dom->at('[xmlns\:bk]')->{'xmlns:bk'}, 'uri:book-ns', 'right attribute';
-  is $dom->at('[bk]')->{'xmlns:bk'},        'uri:book-ns', 'right attribute';
-  is $dom->at('[bk]')->attr('xmlns:bk'), 'uri:book-ns', 'right attribute';
-  is $dom->at('[bk]')->attr('s:bk'),     undef,         'no attribute';
-  is $dom->at('[bk]')->attr('bk'),       undef,         'no attribute';
-  is $dom->at('[bk]')->attr('k'),        undef,         'no attribute';
   is $dom->at('[s\:bk]'), undef, 'no result';
   is $dom->at('[k]'),     undef, 'no result';
   is $dom->at('number')->ancestors('meta')->first->{xmlns}, 'uri:meta-ns',
@@ -1335,6 +1352,32 @@ EOF
   is $dom->at('#♥ ~ #☃ ~ *:nth-last-child(1)')->text, 'G', 'right text';
   is $dom->at('#♥ + *:nth-last-child(2)')->text,        'F', 'right text';
   is $dom->at('#♥ ~ *:nth-last-child(2)')->text,        'F', 'right text';
+  ok $dom->at('#♥')->matches('h1 + p'),   'match';
+  ok !$dom->at('#☃')->matches('h1 + p'),  'no match';
+  ok !$dom->at('h1')->matches('h1 + p'),  'no match';
+  ok $dom->at('#☃')->matches('h1 ~ p'),   'match';
+  ok $dom->at('#♥')->matches('h1 ~ p'),   'match';
+  ok !$dom->at('div')->matches('h1 ~ p'), 'no match';
+  ok !$dom->matches('h1 + p'),            'no match';
+};
+
+subtest 'Whitespace as descendant combinator' => sub {
+  my $dom = Mojo::DOM58->new("<ul> <li>Ax1</li> </ul>");
+  is $dom->at("ul li")->text,    'Ax1', 'space combinator';
+  is $dom->at("ul\tli")->text,   'Ax1', 'tab combinator';
+  is $dom->at("ul \tli")->text,  'Ax1', 'space + tab combinator';
+  is $dom->at("ul\t li")->text,  'Ax1', 'tab + space combinator';
+  is $dom->at("ul\t\tli")->text, 'Ax1', 'multiple tab combinator';
+  is $dom->at("ul\nli")->text,   'Ax1', 'newline combinator';
+  is $dom->at("ul\rli")->text,   'Ax1', 'carriage return combinator';
+  is $dom->at("ul\fli")->text,   'Ax1', 'form feed combinator';
+
+  my $multi = Mojo::DOM58->new("<ul><li>A</li><li>B</li></ul>");
+  is_deeply $multi->find("ul\tli")->map('text')->to_array, ['A', 'B'], 'find with tab combinator';
+
+  my $child = Mojo::DOM58->new("<ul><li>Ax1</li></ul>");
+  is $child->at("ul\t>\tli")->text, 'Ax1', 'tabs around child combinator';
+  is $child->at("ul\n>\nli")->text, 'Ax1', 'newlines around child combinator';
 };
 
 subtest 'Scoped selectors' => sub {
@@ -1863,7 +1906,6 @@ subtest 'Real world JavaScript and CSS' => sub {
         alert('<123>');
       }
     </script>
-    < sCriPt two="23" >if (b > c) { alert('&<ohoh>') }</scRiPt  >
   <body>Foo!</body>
 EOF
   is $dom->find('html > body')->[0]->text, 'Foo!', 'right text';
@@ -1871,8 +1913,6 @@ EOF
     "#style { foo: style('<test>'); }", 'right text';
   is $dom->find('html > head > script')->[0]->text,
     "\n      if (a < b) {\n        alert('<123>');\n      }\n    ", 'right text';
-  is $dom->find('html > head > script')->[1]->text,
-    "if (b > c) { alert('&<ohoh>') }", 'right text';
 };
 
 subtest 'More real world JavaScript' => sub {
@@ -1919,8 +1959,7 @@ EOF
     'right attribute';
   is $dom->find('html > head > script')->[2]->attr('src'), '/js/three.js',
     'right attribute';
-  is $dom->find('html > head > script')->[2]->text, "\n  ", 'no text';
-  is $dom->at('html > body')->text, 'Bar', 'right text';
+  is $dom->find('html > head > script')->[2]->text, "\n  </head>\n  <body>Bar</body>\n</html>\n", 'raw content to EOF';
 };
 
 subtest 'Inline DTD' => sub {
@@ -1953,8 +1992,8 @@ EOF
   is $dom->tree->[1][1], ' book
   SYSTEM "usr.dtd"
   [
-    <!ENTITY test "yeah">
-  ]', 'right doctype';
+    <!ENTITY test "yeah"', 'right doctype (ends at first ">" in HTML)';
+  is $dom->tree->[2][1], "\n  ]>\n", 'right text';
   ok !$dom->xml, 'XML mode not detected';
   is $dom->at('foo'), '<foo></foo>', 'right element';
   $dom = Mojo::DOM58->new(<<EOF);
@@ -1976,7 +2015,7 @@ EOF
   ]  ', 'right doctype';
   is $dom->at('foo')->attr->{'xml:lang'}, 'de', 'right attribute';
   is $dom->at('foo')->text, "Check!\n", 'right text';
-  $dom = Mojo::DOM58->new(<<EOF);
+  $dom = Mojo::DOM58->new->xml(1)->parse(<<EOF);
 <!DOCTYPE TESTSUITE PUBLIC "my.dtd" 'mhhh' [
     <!ELEMENT foo ANY>
     <!ATTLIST foo bar ENTITY 'true'>
@@ -2702,10 +2741,9 @@ subtest 'Dot and hash in class and id attributes' => sub {
 
 subtest 'Extra whitespace' => sub {
   my $dom = Mojo::DOM58->new('< span>a< /span><b >b</b><span >c</ span>');
-  is $dom->at('span')->text,     'a', 'right text';
-  is $dom->at('span + b')->text, 'b', 'right text';
-  is $dom->at('b + span')->text, 'c', 'right text';
-  is "$dom", '<span>a</span><b>b</b><span>c</span>', 'right result';
+  is $dom->at('b')->text,        'b',                                                  'right text';
+  is $dom->at('b + span')->text, 'c',                                                  'right text';
+  is "$dom",                     '&lt; span&gt;a&lt; /span&gt;<b>b</b><span>c</span>', 'right result';
 };
 
 subtest 'Selectors with leading and trailing whitespace' => sub {
@@ -2727,8 +2765,8 @@ subtest '"0"' => sub {
 
 subtest 'Not self-closing' => sub {
   my $dom = Mojo::DOM58->new('<div />< div ><pre />test</div >123');
-  is $dom->at('div > div > pre')->text, 'test', 'right text';
-  is "$dom", '<div><div><pre>test</pre></div>123</div>', 'right result';
+  is $dom->at('div > pre')->text, 'test', 'right text';
+  is "$dom", '<div>&lt; div &gt;<pre>test</pre></div>123', 'right result';
   $dom = Mojo::DOM58->new('<p /><svg><circle /><circle /></svg>');
   is $dom->find('p > svg > circle')->size, 2, 'two circles';
   is "$dom", '<p><svg><circle></circle><circle></circle></svg></p>',
@@ -2762,27 +2800,177 @@ subtest '"image"' => sub {
 
 subtest '"title"' => sub {
   my $dom = Mojo::DOM58->new('<title> <p>test&lt;</title>');
-  is $dom->at('title')->text, ' <p>test<', 'right text';
-  is "$dom", '<title> <p>test<</title>', 'right result';
+  is $dom->at('title')->text, ' <p>test<',                         'right text';
+  is "$dom",                  '<title> &lt;p&gt;test&lt;</title>', 'right result';
+
+  $dom = Mojo::DOM58->new('<title>&lt;/title&gt;&lt;img src=x onerror=alert(1)&gt;</title>');
+  is $dom->at('title')->text, '</title><img src=x onerror=alert(1)>',           'right text';
+  is "$dom", '<title>&lt;/title&gt;&lt;img src=x onerror=alert(1)&gt;</title>', 'end tag stays escaped';
 };
 
 subtest '"textarea"' => sub {
   my $dom = Mojo::DOM58->new('<textarea id="a"> <p>test&lt;</textarea>');
-  is $dom->at('textarea#a')->text, ' <p>test<', 'right text';
-  is "$dom", '<textarea id="a"> <p>test<</textarea>', 'right result';
+  is $dom->at('textarea#a')->text, ' <p>test<',                                      'right text';
+  is "$dom",                       '<textarea id="a"> &lt;p&gt;test&lt;</textarea>', 'right result';
+
+  $dom = Mojo::DOM58->new('<textarea>&lt;/textarea&gt;&lt;script&gt;alert(1)&lt;/script&gt;</textarea>');
+  is $dom->at('textarea')->text, '</textarea><script>alert(1)</script>',                    'right text';
+  is "$dom", '<textarea>&lt;/textarea&gt;&lt;script&gt;alert(1)&lt;/script&gt;</textarea>', 'end tag stays escaped';
+};
+
+subtest 'CDATA, processing instructions and DOCTYPE end at the first ">" in HTML' => sub {
+  my $dom = Mojo::DOM58->new('<![CDATA[><img src=x onerror=alert(1)>]]>');
+  is $dom->child_nodes->[0]->type,    'cdata',    'right type';
+  is $dom->child_nodes->[0]->content, '',         'no content';
+  is $dom->at('img')->{onerror},      'alert(1)', 'right attribute';
+  is $dom->child_nodes->[2]->content, ']]>',      'right text';
+  $dom->find('img')->each('remove');
+  is "$dom", '<![CDATA[]]>]]&gt;', 'right result';
+
+  $dom = Mojo::DOM58->new('<?><img src=x onerror=alert(1)>?>');
+  is $dom->child_nodes->[0]->type, 'pi',       'right type';
+  is $dom->at('img')->{onerror},   'alert(1)', 'right attribute';
+  $dom->find('img')->each('remove');
+  is "$dom", '<??>?&gt;', 'right result';
+
+  $dom = Mojo::DOM58->new('<!DOCTYPE html [><img src=x onerror=alert(1)>]>');
+  is $dom->child_nodes->[0]->type,    'doctype',  'right type';
+  is $dom->child_nodes->[0]->content, ' html [',  'right content';
+  is $dom->at('img')->{onerror},      'alert(1)', 'right attribute';
+  $dom->find('img')->each('remove');
+  is "$dom", '<!DOCTYPE html [>]&gt;', 'right result';
+
+  $dom = Mojo::DOM58->new('<p><![CDATA[1 < 2]]><?php echo 1?></p>');
+  is $dom->at('p')->child_nodes->[0]->content, '1 < 2',                                  'right content';
+  is $dom->at('p')->child_nodes->[1]->content, 'php echo 1',                             'right content';
+  is "$dom",                                   '<p><![CDATA[1 < 2]]><?php echo 1?></p>', 'successful roundtrip';
+
+  $dom = Mojo::DOM58->new('<svg><script><![CDATA[ if (a > b) {} ]]></script></svg>');
+  is $dom->at('script')->child_nodes->first->type,    'cdata',           'right type';
+  is $dom->at('script')->child_nodes->first->content, ' if (a > b) {} ', 'right content';
+  is "$dom", '<svg><script><![CDATA[ if (a > b) {} ]]></script></svg>',  'successful roundtrip';
+
+  $dom = Mojo::DOM58->new('<svg><foreignObject><![CDATA[><img src=x onerror=alert(1)>]]></foreignObject></svg>');
+  is $dom->at('foreignobject img')->{onerror}, 'alert(1)', 'right attribute';
+
+  $dom = Mojo::DOM58->new->xml(1)->parse('<root><![CDATA[><img src=x onerror=alert(1)>]]></root>');
+  ok !$dom->at('img'), 'no img element in XML mode';
+  is $dom->at('root')->text, '><img src=x onerror=alert(1)>', 'right text';
+};
+
+subtest '"style" and "script" in foreign content' => sub {
+  my $dom = Mojo::DOM58->new('<svg><style><img src=x onerror=alert(1)></style></svg>');
+  is $dom->at('svg > style > img')->{onerror}, 'alert(1)', 'right attribute';
+  $dom->find('img')->each('remove');
+  is "$dom", '<svg><style></style></svg>', 'right result';
+
+  $dom = Mojo::DOM58->new('<math><script><img src=x onerror=alert(1)></script></math>');
+  is $dom->at('math > script > img')->{onerror}, 'alert(1)', 'right attribute';
+
+  $dom = Mojo::DOM58->new('<svg><title><img src=x onerror=alert(1)></title></svg>');
+  is $dom->at('svg > title > img')->{onerror}, 'alert(1)', 'right attribute';
+
+  $dom = Mojo::DOM58->new('<svg><foreignObject><style><b>test</b></style></foreignObject></svg>');
+  ok !$dom->at('b'), 'no b element';
+  is $dom->at('style')->text, '<b>test</b>', 'right text';
+
+  $dom = Mojo::DOM58->new('<math><mi><style><b>test</b></style></mi></math>');
+  ok !$dom->at('b'), 'no b element';
+
+  $dom = Mojo::DOM58->new('<math><annotation-xml><style><b>test</b></style></annotation-xml></math>');
+  ok $dom->at('b'), 'b element';
+  $dom
+    = Mojo::DOM58->new('<math><annotation-xml encoding="text/html"><style><b>test</b></style></annotation-xml></math>');
+  ok !$dom->at('b'), 'no b element';
+};
+
+subtest 'Raw text end tags' => sub {
+  my $dom = Mojo::DOM58->new('<style></style/><img src=x onerror=alert(1)></style>');
+  is $dom->at('style')->text,    '',         'no text';
+  is $dom->at('img')->{onerror}, 'alert(1)', 'right attribute';
+  $dom->find('img')->each('remove');
+  is "$dom", '<style></style>', 'right result';
+
+  $dom = Mojo::DOM58->new('<script>1</script/><img src=x onerror=alert(1)></script>');
+  is $dom->at('script')->text,   '1',        'right text';
+  is $dom->at('img')->{onerror}, 'alert(1)', 'right attribute';
+
+  $dom = Mojo::DOM58->new('<style>a</style foo="bar">b');
+  is $dom->at('style')->text, 'a',                 'right text';
+  is "$dom",                  '<style>a</style>b', 'right result';
+
+  $dom = Mojo::DOM58->new('<title>a</title/>b');
+  is $dom->at('title')->text, 'a',                 'right text';
+  is "$dom",                  '<title>a</title>b', 'right result';
+
+  $dom = Mojo::DOM58->new('<div><p>a</p/>b</div>');
+  is "$dom", '<div><p>a</p>b</div>', 'right result';
+};
+
+subtest 'Raw text moved out of "style" and "script"' => sub {
+  my $dom = Mojo::DOM58->new('<p><style><img src=x onerror=alert(1)></style></p>');
+  $dom->find(':not(p)')->each('strip');
+  is "$dom",                                  '<p>&lt;img src=x onerror=alert(1)&gt;</p>', 'right result';
+  is $dom->at('p')->child_nodes->first->type, 'text',                                      'right type';
+
+  $dom = Mojo::DOM58->new('<div><script><b>test</b></script></div>');
+  $dom->at('div')->append_content($dom->at('script')->child_nodes->first);
+  is "$dom", '<div><script><b>test</b></script>&lt;b&gt;test&lt;/b&gt;</div>', 'right result';
+
+  $dom = Mojo::DOM58->new('<script></script>');
+  $dom->at('script')->append_content(Mojo::DOM58->new('<style>a < b</style>')->at('style')->child_nodes->first);
+  is "$dom", '<script>a < b</script>', 'raw text stays raw';
+
+  is tag_to_html('div', sub {'<b>test</b>'}), '<div><b>test</b></div>', 'raw content';
+  $dom = Mojo::DOM58->new('<p></p>');
+  $dom->at('p')->append_content($dom->new_tag('div', sub {'<b>test</b>'}));
+  is "$dom", '<p><div><b>test</b></div></p>', 'raw content';
+};
+
+subtest 'Only a leading XML declaration enables XML mode' => sub {
+  my $dom = Mojo::DOM58->new('<p>x</p><?php echo "xml"?><SCRIPT>alert(1)</SCRIPT>');
+  ok !$dom->xml, 'XML mode not detected';
+  is $dom->find('script')->size, 1, 'one script element';
+
+  $dom = Mojo::DOM58->new('<?xml-stylesheet href="test.xsl"?><SCRIPT>alert(1)</SCRIPT>');
+  ok !$dom->xml, 'XML mode not detected';
+  is $dom->find('script')->size, 1, 'one script element';
+
+  $dom = Mojo::DOM58->new('<p>x</p><?xml version="1.0"?><SCRIPT>alert(1)</SCRIPT>');
+  ok !$dom->xml, 'XML mode not detected';
+  is $dom->find('script')->size, 1, 'one script element';
+
+  ok(Mojo::DOM58->new('<?xml version="1.0"?><Foo/>')->xml,           'XML mode detected');
+  ok(Mojo::DOM58->new("\n  <?xml version=\"1.0\"?><Foo/>")->xml,     'XML mode detected');
+  ok(Mojo::DOM58->new("\x{feff}<?xml version=\"1.0\"?><Foo/>")->xml, 'XML mode detected');
+  ok(Mojo::DOM58->new('<?xml?><Foo/>')->xml,                         'XML mode detected');
+  ok !Mojo::DOM58->new->xml(0)->parse('<?xml version="1.0"?><Foo/>')->xml, 'XML mode not detected';
 };
 
 subtest 'Comments' => sub {
   my $dom = Mojo::DOM58->new(<<EOF);
 <!-- HTML5 -->
 <!-- bad idea -- HTML5 -->
-<!-- HTML4 -- >
-<!-- bad idea -- HTML4 -- >
 EOF
   is $dom->tree->[1][1], ' HTML5 ',             'right comment';
   is $dom->tree->[3][1], ' bad idea -- HTML5 ', 'right comment';
-  is $dom->tree->[5][1], ' HTML4 ',             'right comment';
-  is $dom->tree->[7][1], ' bad idea -- HTML4 ', 'right comment';
+};
+
+subtest 'Comment is not terminated by "-- >"' => sub {
+  my $dom = Mojo::DOM58->new('<!-- a > -- > b <blink>c</blink> -->');
+  is $dom->at('blink'), undef,                          'blink element is inside comment';
+  is $dom->tree->[1][1], ' a > -- > b <blink>c</blink> ', 'right comment';
+};
+
+subtest 'Abrupt and bang-terminated comments' => sub {
+  my $dom = Mojo::DOM58->new("<!DOCTYPE html>\n<!--> <p>OK</p> <!-- -->");
+  is $dom->at('p')->text, 'OK', 'abrupt empty comment closure';
+
+  $dom = Mojo::DOM58->new("<!DOCTYPE html>\n<!---> <p>OK</p> <!-- -->");
+  is $dom->at('p')->text, 'OK', 'dash-terminated empty comment';
+
+  $dom = Mojo::DOM58->new("<!DOCTYPE html>\n<!-- --!> <p>OK</p> <!-- -->");
+  is $dom->at('p')->text, 'OK', 'bang-terminated comment';
 };
 
 subtest 'Huge number of attributes' => sub {
@@ -3199,6 +3387,43 @@ EOF
   is $dom->at('.test')->text, 'works', 'right text';
 };
 
+subtest 'Unclosed comments, CDATA sections, processing instructions and RCDATA elements' => sub {
+  my $dom = Mojo::DOM58->new('<p><!-- a <p><!-- b <![CDATA[ c <? d <![CDATA[ e <? f');
+  is $dom->find('p')->size, 2,                                                 'right number of elements';
+  is $dom->all_text,        '<!-- a <!-- b <![CDATA[ c <? d <![CDATA[ e <? f', 'right text';
+
+  $dom = Mojo::DOM58->new('<div><textarea>a<p><textarea>b</div><p><!--c-->');
+  is_deeply $dom->find('textarea')->map('text')->to_array, ['a', 'b'], 'right text';
+  is $dom->find('p')->size, 2, 'right number of elements';
+};
+
+subtest 'Stray "=" after tag name' => sub {
+  my $dom = Mojo::DOM58->new('<div ="x"><img ="foo" src="bar"></div =y><p ="">a</p>');
+  is $dom->at('img')->attr('src'),    'bar',                                             'right attribute';
+  is $dom->at('div')->children->size, 1,                                                 'right number of children';
+  is $dom->at('p')->text,             'a',                                               'right text';
+  is "$dom",                          '<div "x"><img "foo" src="bar"></div><p "">a</p>', 'right result';
+};
+
+subtest 'Runaway "<" in what looks like an attribute value' => sub {
+  my $dom = Mojo::DOM58->new('<a&amp;=<b x="1">test</b>');
+  is $dom->at('b')->text, 'test',                         'right text';
+  is "$dom",              '&lt;a&amp;=<b x="1">test</b>', 'right result';
+};
+
+subtest '"<" followed by space is not a tag opener' => sub {
+  my $dom = Mojo::DOM58->new('if a < script then="<!--"> </script> <p>FAIL</p>-->');
+  is_deeply $dom->find('script, p')->map('to_string')->to_array, [], 'fragment contains no tags, just a comment';
+
+  $dom = Mojo::DOM58->new('a < b');
+  is "$dom", 'a &lt; b', 'right result';
+  is_deeply $dom->find('*')->to_array, [], 'no elements';
+
+  $dom = Mojo::DOM58->new('a < b <p>ok</p>');
+  is_deeply $dom->find('*')->map('tag')->to_array, ['p'], 'only one element';
+  is $dom->at('p')->text, 'ok', 'right text';
+};
+
 subtest 'XML name characters' => sub {
   my $dom = Mojo::DOM58->new->xml(1)->parse('<Foo><1a>foo</1a></Foo>');
   is $dom->at('Foo')->text, '<1a>foo</1a>',                        'right text';
@@ -3266,6 +3491,29 @@ EOF
 EOF
   like $dom->at('script')->text, qr/console\.log.+scriptxyz is safe/s, 'right text';
   like $dom->at('div')->text,    qr/^\s+$/s,                           'right text';
+};
+
+subtest 'Descendant combinator chain with non-matching selector' => sub {
+  my $dom = Mojo::DOM58->new('<div> ' x 100 . '</div> ' x 100);
+  is_deeply $dom->find('#gobbledygook * * * *')->map(sub { $_->to_string })->to_array, [],
+    'non-existent elements have no descendants';
+  is $dom->at('#gobbledygook * * * *'), undef, 'no match';
+
+  is_deeply $dom->find('* * * * #gobbledygook')->map(sub { $_->to_string })->to_array, [],
+    'non-existent elements have no ancestors';
+  is $dom->at('* * * * #gobbledygook'), undef, 'no match';
+
+  my $exists = Mojo::DOM58->new('<div id="x"><a><b><c><d>ok</d></c></b></a></div>');
+  is $exists->at('#x * * * *')->text, 'ok', 'matching id still resolves descendants';
+};
+
+subtest 'First match without combinators' => sub {
+  my $dom = Mojo::DOM58->new('<div><p id="a">A</p><span><b class="x">B</b></span></div><p class="x">C</p>');
+  is $dom->at('b, p')->text,               'A',   'first match in document order';
+  is $dom->at('.x')->text,                 'B',   'nested match comes first';
+  is $dom->at('span')->at('b.x, p')->text, 'B',   'only matches inside the element';
+  is $dom->at('div')->at('p.x'),           undef, 'no match inside the element';
+  is $dom->at('i'),                        undef, 'no match';
 };
 
 subtest 'Unknown CSS selector' => sub {

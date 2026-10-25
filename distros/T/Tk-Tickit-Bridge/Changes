@@ -1,10 +1,12 @@
 Revision history for Tk-Tickit-Bridge
 
+0.003  2026-10-24
+    - bump for fixing dependencies in META.yml
+0.002  2026-10-23
+    - documentation and licensing
 0.001  2026-10-23
     - Name distribution Tk-Tickit-Bridge and modules Tk::Tickit::Bridge.
     - Extract the keyboard bridge from Audio::Nama (source commit 268eb75).
     - Add configurable forwarding, private bindtags, attach and uninstall.
     - Add a cancellable Tk timer helper for IO::Async integration.
     - Include a standalone demo and automated tests.
-0.002  2026-10-23
-    - documentation and licensing

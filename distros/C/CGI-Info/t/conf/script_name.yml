@@ -13,7 +13,4 @@ new:
 output:
   type: string
   min: 1
-  nomatch: '^[\/\\]'	# Does not return absolute path
-accessor:
-  property: script_name
-  type: getter
+  nomatch: '^[\/\\]' # Does not return absolute path

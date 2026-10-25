@@ -197,6 +197,16 @@ my @tests = (
         is($hp->render_string('<% if 1 %>yes<% endif %>', {}), 'yes', 'custom delimiters: block');
     },
 
+    # --- new(\%args) (0.02) ---
+    sub {
+        my $hp = HP::Handy->new({ auto_escape => 0 });
+        is($hp->render_string('{{ x }}', {x=>'<b>'}), '<b>', 'new(\%args): auto_escape');
+    },
+    sub {
+        my $hp = HP::Handy->new({ auto_escape => 0, var_start => '[[', var_end => ']]' });
+        is($hp->render_string('[[ x ]]', {x=>'hi'}), 'hi', 'new(\%args): custom delimiters');
+    },
+
     # --- multiple render_string calls reuse object ---
     sub {
         my $hp = HP::Handy->new(auto_escape => 0);

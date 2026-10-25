@@ -11,8 +11,10 @@ use Test2::V0;
 # mid-stream as an '[error: ...]' text chunk the client reads as model
 # output. The category now survives the chain: a timeout answers 504 in the
 # client protocol's error shape, or ends a started stream with the
-# protocol's error frame, like the raw passthrough (k35). Any other failure
-# keeps its 500 / '[error: ...]' answer. A core without k278 has no timeout
+# protocol's error frame, like the raw passthrough (k35). A routed stream
+# sends its 200 only with its first chunk (k78): one that times out before
+# that answers 504 like a non-streaming request. Any other failure answers
+# 500 in the protocol's error shape (k78). A core without k278 has no timeout
 # on its async requests, so the routed-engine cases need a core with
 # _async_do_request_f; the Handler::Passthrough cases run on any core.
 
@@ -181,15 +183,13 @@ for my $p (@paths) {
       ok( $took < 5, "$label: answered after the timeout (${took}s)" );
     }
 
-    # --- Stream, no answer. Natively the stream's headers are already out:
-    #     the protocol's error frame ends it, no '[error: ...]' text chunk.
-    #     PSGI buffers the stream, nothing is out yet: 504.
+    # --- Stream, no answer. Nothing has gone out before the first chunk,
+    #     natively (k78) as under PSGI, which buffers the stream: 504.
     {
       my ($resp, $took) = send_request( 'native', $proto, "$prefix-hang", 1 );
-      is( $resp->code, 200, "$via native $proto stream, no answer: the stream had started" );
-      like( $resp->content, $error_frame{$proto}, "$via native $proto stream, no answer: ends with the error frame" );
-      unlike( $resp->content, qr/\[error:/, "$via native $proto stream, no answer: no error text chunk" );
-      ok( $took < 5, "$via native $proto stream, no answer: closed after the timeout (${took}s)" );
+      is( $resp->code, 504, "$via native $proto stream, no answer: 504, the stream never started" );
+      is( decoded($resp), $error_shape{$proto}->(), "$via native $proto stream, no answer: protocol's error shape" );
+      ok( $took < 5, "$via native $proto stream, no answer: answered after the timeout (${took}s)" );
 
       my ($presp) = send_request( 'psgi', $proto, "$prefix-hang", 1 );
       is( $presp->code, 504, "$via psgi $proto stream, no answer: 504" );
@@ -218,14 +218,16 @@ ok( ( grep { ( $_->{error} // '' ) =~ /timed out after 1s/ } @{ $tracer->{ends} 
 ok( ( grep { ( $_->{error} // '' ) =~ /timed out after 1s/ } @{ $rlog->{ends} } ),
   'RequestLog decorator: the timeout is the recorded error' );
 
-# --- Any other failure keeps its answer: 500 and, mid-stream, the text chunk.
+# --- Any other failure: 500, also for a stream that failed before its first
+#     chunk (k78) -- no 200 with an '[error: ...]' text chunk.
 SKIP: {
-  skip 'routed engine: core without k278', 3 unless $core_times_out;
+  skip 'routed engine: core without k278', 4 unless $core_times_out;
   my ($resp) = send_request( 'native', 'openai', 'routed-broken', 0 );
   is( $resp->code, 500, 'other failure, sync: still 500' );
   like( decoded($resp)->{error}{message}, qr/500/, 'other failure, sync: its message' );
   ($resp) = send_request( 'native', 'openai', 'routed-broken', 1 );
-  like( $resp->content, qr/\[error: /, 'other failure, stream: still the error text chunk' );
+  is( $resp->code, 500, 'other failure, stream before its first chunk: 500' );
+  like( decoded($resp)->{error}{message}, qr/upstream exploded/, 'other failure, stream: the error, not a text chunk' );
 }
 
 note 'routed-engine cases skipped: core without k278 timeouts' unless $core_times_out;

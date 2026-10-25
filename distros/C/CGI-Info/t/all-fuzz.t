@@ -47,27 +47,7 @@ my @fuzz_report;
 # When adding an entry here, first check whether extract-schemas produces a
 # wrong schema (fix SchemaExtractor) before resorting to a skip.
 #
-#   generate       - requires schemas/generate.yml on disk (memberof path) and
-#                    takes 40+ s; tested separately via fuzz-harness-generator
-#   DB::DB         - Perl debugger hook; auto-filtered by SchemaExtractor since
-#                    0.45 (cross-package subs skipped); kept here as a belt-and-
-#                    suspenders guard in case the schema somehow surfaces it
-#   get_data_section - returns a ref type that Test::Returns cannot validate
-#   new            - constructors need properly typed args (hashref/object);
-#                    SchemaExtractor infers 'string' and the harness sends
-#                    random strings, crashing every call
-#   merge          - requires valid file paths that exist on disk
-#   mutate         - requires a live PPI::Document object; schema has new: ~
-#                    so auto-detected as OOP, but kept here for clarity
-#   applies_to     - requires a live PPI::Document object; same as mutate
 my %no_fuzz = map { $_ => 1 } qw(
-	generate
-	DB::DB
-	get_data_section
-	new
-	merge
-	mutate
-	applies_to
 );
 
 # Collect every .pm under lib/
@@ -158,9 +138,12 @@ for my $pm_file (@pm_files) {
 				next;
 			}
 
-			if (exists $schema->{new}) {
+			if (exists $schema->{new} && !defined($schema->{new})) {
+				# new: null means SchemaExtractor could not generate representative
+				# constructor args (e.g. constructor needs a coderef or object param).
+				# Skip — the harness can't build $self automatically in this case.
 				push @fuzz_report, { module => $module, func => $func, status => 'oop' };
-				pass("$func: skipped (OOP instance method)");
+				pass("$func: skipped (OOP instance method - constructor not auto-buildable)");
 				next;
 			}
 
@@ -229,7 +212,7 @@ if (@fuzz_report) {
 			$r->{status} eq 'failed'  ? 'FAILED'                              :
 			$r->{status} eq 'private' ? 'skipped (internal helper)'           :
 			$r->{status} eq 'no_fuzz' ? 'skipped (excluded from fuzz list)'   :
-			$r->{status} eq 'oop'     ? 'skipped (instance method, needs $self)' :
+			$r->{status} eq 'oop'     ? 'skipped (constructor not auto-buildable)' :
 			$r->{status} eq 'no_can'  ? 'skipped (object param without can:)' : '?';
 		diag(sprintf '  %-*s  %-*s  %s', $mw, $r->{module}, $fw, $r->{func}, $tests_col);
 		$total += $r->{tests} // 0;

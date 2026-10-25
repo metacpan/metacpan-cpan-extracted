@@ -1,5 +1,5 @@
 ---
-abstract: 'Universal LLM hub — proxy, server, and translator across OpenAI/Anthropic/Ollama/A2A/ACP/AG-UI'
+abstract: 'Universal LLM hub - proxy, server, and translator across OpenAI/Anthropic/Ollama/A2A/ACP/AG-UI'
 author:
   - 'Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>'
 build_requires:
@@ -19,129 +19,159 @@ name: Langertha-Knarr
 provides:
   Langertha::Knarr:
     file: lib/Langertha/Knarr.pm
-    version: '1.102'
+    version: '1.103'
+  Langertha::Knarr::Admin:
+    file: lib/Langertha/Knarr/Admin.pm
+    version: '1.103'
+  Langertha::Knarr::Authorizer:
+    file: lib/Langertha/Knarr/Authorizer.pm
+    version: '1.103'
+  Langertha::Knarr::Authorizer::StaticKey:
+    file: lib/Langertha/Knarr/Authorizer/StaticKey.pm
+    version: '1.103'
+  Langertha::Knarr::Authorizer::Token:
+    file: lib/Langertha/Knarr/Authorizer/Token.pm
+    version: '1.103'
   Langertha::Knarr::CLI:
     file: lib/Langertha/Knarr/CLI.pm
-    version: '1.102'
+    version: '1.103'
   Langertha::Knarr::CLI::Cmd::Check:
     file: lib/Langertha/Knarr/CLI/Cmd/Check.pm
-    version: '1.102'
+    version: '1.103'
   Langertha::Knarr::CLI::Cmd::Container:
     file: lib/Langertha/Knarr/CLI/Cmd/Container.pm
-    version: '1.102'
+    version: '1.103'
   Langertha::Knarr::CLI::Cmd::Init:
     file: lib/Langertha/Knarr/CLI/Cmd/Init.pm
-    version: '1.102'
+    version: '1.103'
   Langertha::Knarr::CLI::Cmd::Models:
     file: lib/Langertha/Knarr/CLI/Cmd/Models.pm
-    version: '1.102'
+    version: '1.103'
   Langertha::Knarr::CLI::Cmd::Start:
     file: lib/Langertha/Knarr/CLI/Cmd/Start.pm
-    version: '1.102'
+    version: '1.103'
   Langertha::Knarr::CLI::Role::GlobalOptions:
     file: lib/Langertha/Knarr/CLI/Role/GlobalOptions.pm
-    version: '1.102'
+    version: '1.103'
   Langertha::Knarr::Config:
     file: lib/Langertha/Knarr/Config.pm
-    version: '1.102'
+    version: '1.103'
   Langertha::Knarr::Handler:
     file: lib/Langertha/Knarr/Handler.pm
-    version: '1.102'
+    version: '1.103'
   Langertha::Knarr::Handler::A2AClient:
     file: lib/Langertha/Knarr/Handler/A2AClient.pm
-    version: '1.102'
+    version: '1.103'
   Langertha::Knarr::Handler::ACPClient:
     file: lib/Langertha/Knarr/Handler/ACPClient.pm
-    version: '1.102'
+    version: '1.103'
   Langertha::Knarr::Handler::Code:
     file: lib/Langertha/Knarr/Handler/Code.pm
-    version: '1.102'
+    version: '1.103'
   Langertha::Knarr::Handler::Engine:
     file: lib/Langertha/Knarr/Handler/Engine.pm
-    version: '1.102'
+    version: '1.103'
   Langertha::Knarr::Handler::Passthrough:
     file: lib/Langertha/Knarr/Handler/Passthrough.pm
-    version: '1.102'
+    version: '1.103'
   Langertha::Knarr::Handler::Raider:
     file: lib/Langertha/Knarr/Handler/Raider.pm
-    version: '1.102'
+    version: '1.103'
   Langertha::Knarr::Handler::RequestLog:
     file: lib/Langertha/Knarr/Handler/RequestLog.pm
-    version: '1.102'
+    version: '1.103'
   Langertha::Knarr::Handler::Router:
     file: lib/Langertha/Knarr/Handler/Router.pm
-    version: '1.102'
+    version: '1.103'
+  Langertha::Knarr::Handler::TokenRoutes:
+    file: lib/Langertha/Knarr/Handler/TokenRoutes.pm
+    version: '1.103'
   Langertha::Knarr::Handler::Tracing:
     file: lib/Langertha/Knarr/Handler/Tracing.pm
-    version: '1.102'
+    version: '1.103'
   Langertha::Knarr::Image:
     file: lib/Langertha/Knarr/Image.pm
-    version: '1.102'
+    version: '1.103'
   Langertha::Knarr::Manifest:
     file: lib/Langertha/Knarr/Manifest.pm
-    version: '1.102'
+    version: '1.103'
   Langertha::Knarr::PSGI:
     file: lib/Langertha/Knarr/PSGI.pm
-    version: '1.102'
+    version: '1.103'
   Langertha::Knarr::PSGI::FakeReq:
     file: lib/Langertha/Knarr/PSGI/FakeReq.pm
-    version: '1.102'
+    version: '1.103'
   Langertha::Knarr::PassthroughUsage:
     file: lib/Langertha/Knarr/PassthroughUsage.pm
-    version: '1.102'
+    version: '1.103'
   Langertha::Knarr::Protocol:
     file: lib/Langertha/Knarr/Protocol.pm
-    version: '1.102'
+    version: '1.103'
   Langertha::Knarr::Protocol::A2A:
     file: lib/Langertha/Knarr/Protocol/A2A.pm
-    version: '1.102'
+    version: '1.103'
   Langertha::Knarr::Protocol::ACP:
     file: lib/Langertha/Knarr/Protocol/ACP.pm
-    version: '1.102'
+    version: '1.103'
   Langertha::Knarr::Protocol::AGUI:
     file: lib/Langertha/Knarr/Protocol/AGUI.pm
-    version: '1.102'
+    version: '1.103'
   Langertha::Knarr::Protocol::Anthropic:
     file: lib/Langertha/Knarr/Protocol/Anthropic.pm
-    version: '1.102'
+    version: '1.103'
   Langertha::Knarr::Protocol::Ollama:
     file: lib/Langertha/Knarr/Protocol/Ollama.pm
-    version: '1.102'
+    version: '1.103'
   Langertha::Knarr::Protocol::OpenAI:
     file: lib/Langertha/Knarr/Protocol/OpenAI.pm
-    version: '1.102'
+    version: '1.103'
   Langertha::Knarr::Reasoning:
     file: lib/Langertha/Knarr/Reasoning.pm
-    version: '1.102'
+    version: '1.103'
   Langertha::Knarr::Request:
     file: lib/Langertha/Knarr/Request.pm
-    version: '1.102'
+    version: '1.103'
   Langertha::Knarr::RequestLog:
     file: lib/Langertha/Knarr/RequestLog.pm
-    version: '1.102'
+    version: '1.103'
   Langertha::Knarr::Response:
     file: lib/Langertha/Knarr/Response.pm
-    version: '1.102'
+    version: '1.103'
   Langertha::Knarr::Role::UpstreamHTTP:
     file: lib/Langertha/Knarr/Role/UpstreamHTTP.pm
-    version: '1.102'
+    version: '1.103'
   Langertha::Knarr::Router:
     file: lib/Langertha/Knarr/Router.pm
-    version: '1.102'
+    version: '1.103'
   Langertha::Knarr::Session:
     file: lib/Langertha/Knarr/Session.pm
-    version: '1.102'
+    version: '1.103'
+  Langertha::Knarr::Stack:
+    file: lib/Langertha/Knarr/Stack.pm
+    version: '1.103'
   Langertha::Knarr::Stream:
     file: lib/Langertha/Knarr/Stream.pm
-    version: '1.102'
+    version: '1.103'
+  Langertha::Knarr::TokenStore:
+    file: lib/Langertha/Knarr/TokenStore.pm
+    version: '1.103'
+  Langertha::Knarr::TokenStore::Memory:
+    file: lib/Langertha/Knarr/TokenStore/Memory.pm
+    version: '1.103'
+  Langertha::Knarr::TokenStore::Pg:
+    file: lib/Langertha/Knarr/TokenStore/Pg.pm
+    version: '1.103'
   Langertha::Knarr::Tracing:
     file: lib/Langertha/Knarr/Tracing.pm
-    version: '1.102'
+    version: '1.103'
 recommends:
+  DBD::Pg: '0'
+  DBI: '0'
   HTTP::Message::PSGI: '0'
   Plack: '0'
 requires:
   Data::UUID: '0'
+  Digest::SHA: '0'
   Future: '0'
   Future::AsyncAwait: '0.66'
   HTTP::Request: '0'
@@ -149,7 +179,7 @@ requires:
   IO::Async: '0.802'
   IO::Async::SSL: '0'
   JSON::MaybeXS: '0'
-  Langertha: '0.503'
+  Langertha: '0.504'
   Log::Any: '0'
   MIME::Base64: '0'
   Module::Runtime: '0'
@@ -159,6 +189,7 @@ requires:
   Moose: '0'
   Net::Async::HTTP: '0'
   Net::Async::HTTP::Server: '0'
+  Storable: '0'
   Time::HiRes: '0'
   Try::Tiny: '0'
   URI: '0'
@@ -169,7 +200,7 @@ resources:
   bugtracker: https://github.com/Getty/langertha-knarr/issues
   homepage: https://github.com/Getty/langertha-knarr
   repository: https://github.com/Getty/langertha-knarr.git
-version: '1.102'
+version: '1.103'
 x_Dist_Zilla:
   perl:
     version: '5.040001'
@@ -181,7 +212,8 @@ x_Dist_Zilla:
           exclude_filename:
             - .karr
             - README.md
-          exclude_match: []
+          exclude_match:
+            - ^assets/
           include_dotfiles: 1
           prefix: ''
           prune_directory: []
@@ -245,22 +277,6 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::LicenseFile
       name: '@Author::GETTY/LicenseFile'
       version: '0.002'
-    -
-      class: Dist::Zilla::Plugin::Run::AfterRelease
-      config:
-        Dist::Zilla::Plugin::Run::Role::Runner:
-          fatal_errors: 1
-          quiet: 0
-          run:
-            - "${GH_BIN:-gh} release view %v -R Getty/langertha-knarr >/dev/null 2>&1 || ${GH_BIN:-gh} release create %v -R Getty/langertha-knarr --title %v --notes 'Dist::Zilla release'"
-            - '${GH_BIN:-gh} release upload %v -R Getty/langertha-knarr Langertha-Knarr-%v.tar.gz --clobber'
-            - 'docker build ${KNARR_DOCKER_BUILD_ARGS:-} -t raudssus/langertha-knarr:%v -t raudssus/langertha-knarr:latest -t raudssus/langertha-knarr:$(echo %v | cut -d. -f1) %d'
-            - 'docker push raudssus/langertha-knarr:%v'
-            - 'docker push raudssus/langertha-knarr:$(echo %v | cut -d. -f1)'
-            - 'docker push raudssus/langertha-knarr:latest'
-          version: '0.050'
-      name: '@Author::GETTY/Run::AfterRelease'
-      version: '0.050'
     -
       class: Dist::Zilla::Plugin::MetaConfig
       name: '@Author::GETTY/MetaConfig'
@@ -469,7 +485,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '1.102'
+          tag: '1.103'
           tag_format: '%v'
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
@@ -534,6 +550,10 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::GitHub::CreateRelease
       name: '@Author::GETTY/GitHub::CreateRelease'
       version: '0.0012'
+    -
+      class: Dist::Zilla::Plugin::Docker::API
+      name: '@Author::GETTY/@Author::GETTY::Docker/Docker::API'
+      version: '0.104'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'

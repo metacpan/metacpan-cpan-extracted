@@ -1,0 +1,5 @@
+<svg width="200" height="100" xmlns="http://www.w3.org/2000/svg">
+  <text x="10" y="50,70">AB</text>
+  <text x="20,40" y="50">PQ</text>
+  <text x="40,40" y="50,70">XY</text>
+</svg>

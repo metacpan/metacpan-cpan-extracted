@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use File::Spec;
-use File::Temp qw/tempfile/;
+use File::Temp qw/tempfile tempdir/;
 use Test::Most;
 
 # Load the module being tested
@@ -123,7 +123,10 @@ subtest 'CGI::Info' => sub {
 			}, sub {
 				local *STDIN;
 				open STDIN, '<', \"------boundary\nContent-Disposition: form-data; name=\"file\"; filename=\"test.txt\"\n\ncontent\n------boundary--";
-				my $info = CGI::Info->new(upload_dir => File::Spec->tmpdir());
+				# A directory inside the temporary area: the area root itself is
+				# rejected as too shared to be an upload directory.
+				my $upload_dir = tempdir(CLEANUP => 1);
+				my $info = CGI::Info->new(upload_dir => $upload_dir);
 				my $params = $info->params();
 				like($params->{file}, qr/test\.txt/, 'File upload handled');
 				unlink $params->{'file'}

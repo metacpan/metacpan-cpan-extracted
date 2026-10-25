@@ -10,6 +10,8 @@
 !.claude/agents/**
 !.claude/skills/
 !.claude/skills/**
+!.claude/rules/
+!.claude/rules/**
 !.claude/hooks/
 !.claude/hooks/**
 
@@ -47,3 +49,7 @@
 .env.*
 docker-compose.override.yml
 docker-compose.override.yaml
+
+# skilletor: committe Config + Ignore-Block
+!.claude/skilletor.json
+!.claude/.gitignore

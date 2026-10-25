@@ -25,7 +25,7 @@ BEGIN { pop @INC if $INC[-1] eq '.' }
 use Carp qw(croak);
 use File::Spec;
 use vars qw($VERSION);
-$VERSION = '0.01';
+$VERSION = '0.02';
 $VERSION = $VERSION;
 # $VERSION self-assignment suppresses "used only once" warning under strict.
 
@@ -267,7 +267,11 @@ my %TESTS = (
 # Constructor
 ###############################################################################
 sub new {
-    my ($class, %args) = @_;
+    my $class = shift;
+    # new(key => value, ...) or new({ key => value, ... })  (0.02)
+    # Jinja2's Environment and many Perl modules take a hash reference;
+    # accept both so that either style works.
+    my %args = (@_ == 1 && ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
     my $self = {
         template_dir    => defined $args{template_dir}    ? $args{template_dir}    : '.',
         auto_escape     => defined $args{auto_escape}     ? $args{auto_escape}     : 1,
@@ -888,12 +892,27 @@ sub _eval_if {
     my $result = '';
     for my $branch (@branches) {
         my ($cond, $body) = @$branch;
-        if (!defined $cond || $self->_eval_expr($cond, $vars)) {
+        if (!defined $cond || _truthy($self->_eval_expr($cond, $vars))) {
             $result = $self->_eval_tokens($body, $vars, 0, $filename);
             last;
         }
     }
     return ($result, $i);
+}
+
+###############################################################################
+# _truthy - Truth value of a template value (0.02)
+#
+# Jinja2 treats an empty list and an empty dict as false.  In Perl a
+# reference is always true, so 0.01 treated [] and {} as true.
+# Scalars keep Perl's rule (undef, '' and '0' are false).
+###############################################################################
+sub _truthy {
+    my ($v) = @_;
+    return 0 unless defined $v;
+    if (ref($v) eq 'ARRAY') { return scalar(@$v) ? 1 : 0 }
+    if (ref($v) eq 'HASH')  { return scalar(keys %$v) ? 1 : 0 }
+    return $v ? 1 : 0;
 }
 
 ###############################################################################
@@ -944,7 +963,7 @@ sub _eval_for {
         for my $item (@items) {
             my %loop_vars = %$vars;
             $self->_assign_loop_var(\%loop_vars, $loop_var, $item);
-            push @filtered, $item if $self->_eval_expr($cond_expr, \%loop_vars);
+            push @filtered, $item if _truthy($self->_eval_expr($cond_expr, \%loop_vars));
         }
         @items = @filtered;
     }
@@ -1157,12 +1176,12 @@ sub _eval_expr {
     # Conditional expression: a if cond else b
     if ($expr =~ /^(.+?)\s+if\s+(.+?)\s+else\s+(.+)$/) {
         my ($a, $cond, $b) = ($1, $2, $3);
-        return $self->_eval_expr($cond, $vars) ? $self->_eval_expr($a, $vars) : $self->_eval_expr($b, $vars);
+        return _truthy($self->_eval_expr($cond, $vars)) ? $self->_eval_expr($a, $vars) : $self->_eval_expr($b, $vars);
     }
 
     # 'not' operator
     if ($expr =~ /^not\s+(.+)$/) {
-        return $self->_eval_expr($1, $vars) ? 0 : 1;
+        return _truthy($self->_eval_expr($1, $vars)) ? 0 : 1;
     }
 
     # 'in' / 'not in' operator
@@ -1176,12 +1195,12 @@ sub _eval_expr {
     # Boolean operators: and / or
     if ($expr =~ /^(.+?)\s+or\s+(.+)$/) {
         my $a = $self->_eval_expr($1, $vars);
-        return $a if $a;
+        return $a if _truthy($a);
         return $self->_eval_expr($2, $vars);
     }
     if ($expr =~ /^(.+?)\s+and\s+(.+)$/) {
         my $a = $self->_eval_expr($1, $vars);
-        return $a ? $self->_eval_expr($2, $vars) : $a;
+        return _truthy($a) ? $self->_eval_expr($2, $vars) : $a;
     }
 
     # Filter pipeline: expr | filter1 | filter2(arg)
@@ -1242,10 +1261,14 @@ sub _eval_expr {
         my $numeric = ($l =~ /^-?(?:\d+\.?\d*|\.\d+)$/ && $r =~ /^-?(?:\d+\.?\d*|\.\d+)$/);
         if ($op eq '==') { return $numeric ? ($l == $r ? 1 : 0) : ($l eq $r ? 1 : 0) }
         if ($op eq '!=') { return $numeric ? ($l != $r ? 1 : 0) : ($l ne $r ? 1 : 0) }
-        if ($op eq '>')  { return $l >  $r ? 1 : 0 }
-        if ($op eq '<')  { return $l <  $r ? 1 : 0 }
-        if ($op eq '>=') { return $l >= $r ? 1 : 0 }
-        if ($op eq '<=') { return $l <= $r ? 1 : 0 }
+        # 0.02: ordering compares numbers as numbers and anything else
+        # as strings (Jinja2).  0.01 always compared numerically, so
+        # '2026-09-30' < '2026-10-01' was false (both became 2026) and
+        # warned "isn't numeric".
+        if ($op eq '>')  { return ($numeric ? $l >  $r : $l gt $r) ? 1 : 0 }
+        if ($op eq '<')  { return ($numeric ? $l <  $r : $l lt $r) ? 1 : 0 }
+        if ($op eq '>=') { return ($numeric ? $l >= $r : $l ge $r) ? 1 : 0 }
+        if ($op eq '<=') { return ($numeric ? $l <= $r : $l le $r) ? 1 : 0 }
     }
 
     # Arithmetic: match ** and // before single-char operators
@@ -1599,7 +1622,7 @@ HP::Handy - A tiny Jinja2-compatible template engine for Perl 5.5.3 and later
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 SYNOPSIS
 
@@ -1668,7 +1691,7 @@ No CPAN modules are required.
 
 =head1 CONSTRUCTOR
 
-=head2 C<new(%args)>
+=head2 C<new(%args)> / C<new(\%args)>
 
 Creates a new template engine instance.
 
@@ -1678,6 +1701,10 @@ Creates a new template engine instance.
       trim_blocks   => 0,              # default: 0 (remove newline after {% %})
       lstrip_blocks => 0,              # default: 0 (strip leading whitespace before {% %})
   );
+
+The arguments may also be given as a hash reference (since 0.02):
+
+  my $tmpl = HP::Handy->new({ template_dir => './templates' });
 
 =over 4
 
@@ -1800,6 +1827,18 @@ Whitespace control: add a dash inside the delimiter to strip whitespace.
 Inline conditional:
 
   {{ "yes" if flag else "no" }}
+
+B<Truth values> (C<if>, C<elif>, C<not>, C<and>, C<or>, inline C<if>, and
+C<for ... if>): C<undef>, the empty string, C<0> and C<"0"> are false, and
+so are an B<empty array reference> and an B<empty hash reference>, as in
+Jinja2 (since 0.02; 0.01 treated C<[]> and C<{}> as true).  Everything else
+is true.
+
+B<Comparisons>: C<==>, C<!=>, C<E<lt>>, C<E<gt>>, C<E<lt>=> and C<E<gt>=> compare
+two values numerically when both look like plain numbers (C<-12>, C<3.50>,
+C<.5>) and as strings otherwise.  So C<"1.50" == "1.5"> is true and
+C<"2026-09-30" E<lt> "2026-10-01"> is true (since 0.02; 0.01 compared
+C<E<lt>> C<E<gt>> C<E<lt>=> C<E<gt>=> numerically in every case).
 
 =head2 For Loop
 

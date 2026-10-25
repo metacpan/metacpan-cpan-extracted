@@ -1,0 +1,52 @@
+title: Token usage of a streamed backend answer reaches the client stream and the request log
+needs:
+  Langertha::Role::StreamUsage: >-
+    a routed stream carries the backend's usage only when core's chat_stream_request asks
+    for it (stream_options.include_usage on engines that claim stream_usage); an older
+    Langertha streams without usage
+setup:
+  request_log: true
+  config:
+    models:
+      counted: { engine: KnarrVirtual, model: v-counted }
+  backends:
+    v-counted:
+      engine_args: { stream_chunk_size: 4 }
+      rules:
+        "Hello": { answer: "Hi there friend", usage: { prompt_tokens: 11, completion_tokens: 7 } }
+        "Weather?": { tool_calls: [ [ get_weather, { city: Berlin } ] ], usage: { prompt_tokens: 13, completion_tokens: 5 } }
+steps:
+  # Knarr does not pass the client's stream_options on: core asks the backend for the
+  # usage on its own. Its usage frame comes after the finish chunk and has no content,
+  # so the content frames, the finish reason and the end marker stay as they were.
+  - chat: { protocol: openai, model: counted, prompt: Hello, stream: true, extra: { stream_options: { include_usage: true } } }
+    expect: { text: Hi there friend, chunks: 4, finish_reason: stop, ended: 1, usage: { input: 11, output: 7 } }
+    backend:
+      v-counted: { body: { stream_options.include_usage: 1 } }
+  - chat: { protocol: anthropic, model: counted, prompt: Hello, stream: true }
+    expect: { text: Hi there friend, chunks: 4, finish_reason: end_turn, ended: 1, usage: { input: 11, output: 7 } }
+  - chat: { protocol: ollama, model: counted, prompt: Hello, stream: true }
+    expect: { text: Hi there friend, chunks: 4, finish_reason: stop, ended: 1, usage: { input: 11, output: 7 } }
+  # an OpenAI client that did not ask for the usage gets no usage chunk; the request log has it anyway
+  - chat: { protocol: openai, model: counted, prompt: Hello, stream: true }
+    expect: { text: Hi there friend, chunks: 4, finish_reason: stop, ended: 1, no_usage: 1 }
+  # a streamed tool call keeps its calls and finish reason next to the usage frame
+  - chat: { protocol: openai, model: counted, prompt: "Weather?", stream: true, tools: [ { name: get_weather } ], extra: { stream_options: { include_usage: true } } }
+    expect:
+      tool_calls: [ { name: get_weather, args: { city: Berlin } } ]
+      finish_reason: tool_calls
+      ended: 1
+      usage: { input: 13, output: 5 }
+  - chat: { protocol: anthropic, model: counted, prompt: "Weather?", stream: true, tools: [ { name: get_weather } ] }
+    expect:
+      tool_calls: [ { name: get_weather, args: { city: Berlin } } ]
+      finish_reason: tool_use
+      ended: 1
+      usage: { input: 13, output: 5 }
+      log:
+        - { model: counted, format: openai, stream: true, 'usage.input_tokens': 11, 'usage.output_tokens': 7 }
+        - { model: counted, format: anthropic, stream: true, 'usage.input_tokens': 11, 'usage.output_tokens': 7 }
+        - { model: counted, format: ollama, stream: true, 'usage.input_tokens': 11, 'usage.output_tokens': 7 }
+        - { model: counted, format: openai, stream: true, 'usage.input_tokens': 11, 'usage.output_tokens': 7 }
+        - { model: counted, format: openai, stream: true, 'usage.input_tokens': 13, 'usage.output_tokens': 5 }
+        - { model: counted, format: anthropic, stream: true, 'usage.input_tokens': 13, 'usage.output_tokens': 5 }

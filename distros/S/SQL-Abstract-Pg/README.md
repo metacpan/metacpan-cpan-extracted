@@ -20,5 +20,4 @@ say $abstract->select('some_table');
 
 ## Want to know more?
 
-  Take a look at our excellent
-  [documentation](https://mojolicious.org/perldoc/SQL/Abstract/Pg)!
+  Take a look at our excellent [documentation](https://mojolicious.org/perldoc/SQL/Abstract/Pg)!

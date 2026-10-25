@@ -13,7 +13,7 @@ use Readonly;
 use Database::BI::Model::DataSource;
 use Database::BI::Tutorial;
 
-our $VERSION = '0.016.0';
+use version; our $VERSION = version->declare('0.017.0');
 
 # Default config values used by the Config plugin and referenced explicitly
 # in startup() so callers always get a resolved value.
@@ -40,7 +40,7 @@ Database::BI - Web-based Business Intelligence viewer for data files
 
 =head1 VERSION
 
-0.016.0
+0.017.0
 
 =head1 DESCRIPTION
 
@@ -677,6 +677,21 @@ Supported patterns: C<%m/%d/%Y> (US), C<%d/%m/%Y> (EU), C<%d-%b-%Y> (DD-Mon-YYYY
 Removes a date-normalisation pattern.  Body: C<l=&col=>.
 Omit C<col=> to clear all patterns for the spec.
 
+=item C<GET /geo/list>
+
+Returns C<{ columns: { col: { kind: "lat"|"lon"|"location" } } }> for the
+saved coordinate-column preferences of the given C<l=> spec.
+
+=item C<POST /geo/save>
+
+Saves a coordinate-column preference.  Body: C<l=&col=&kind=>,
+where C<kind> is C<lat>, C<lon>, or C<location>.
+
+=item C<POST /geo/delete>
+
+Removes a coordinate-column preference.  Body: C<l=&col=>.
+Omit C<col=> to clear all preferences for the spec.
+
 =item C<GET /insights>
 
 Automatic statistical insights for a dataset.  Runs the same pipeline as
@@ -1149,6 +1164,9 @@ sub startup ($self) {
 	$r->post('/dates/save')   ->to('Dashboard#dates_save');
 	$r->post('/dates/delete') ->to('Dashboard#dates_delete');
 	$r->get('/dates/list')    ->to('Dashboard#dates_list');
+	$r->post('/geo/save')     ->to('Dashboard#geo_save');
+	$r->post('/geo/delete')   ->to('Dashboard#geo_delete');
+	$r->get('/geo/list')      ->to('Dashboard#geo_list');
 	$r->get('/scatter')       ->to('Dashboard#scatter_view');
 	$r->get('/stacked')       ->to('Dashboard#stacked_view');
 	$r->get('/combo')         ->to('Dashboard#combo_view');

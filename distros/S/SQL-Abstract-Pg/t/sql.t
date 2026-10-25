@@ -19,7 +19,7 @@ my $abstract = SQL::Abstract::Pg->new(array_datatypes => 1, name_sep => '.', quo
 subtest 'Basics' => sub {
   is_query [$abstract->insert('foo', {bar => 'baz'})], ['INSERT INTO "foo" ( "bar") VALUES ( ? )', 'baz'],
     'right query';
-  is_query [$abstract->select('foo', '*')], ['SELECT * FROM "foo"'], 'right query';
+  is_query [$abstract->select('foo', '*')],            ['SELECT * FROM "foo"'],               'right query';
   is_query [$abstract->select(['foo', 'bar', 'baz'])], ['SELECT * FROM "foo", "bar", "baz"'], 'right query';
 };
 
@@ -41,6 +41,23 @@ subtest 'ON CONFLICT' => sub {
   $result = ['INSERT INTO "foo" ( "bar") VALUES ( ? )' . ' ON CONFLICT ("foo", "bar") DO UPDATE SET "foo" = ?', 'baz',
     'yada'];
   is_query \@sql, $result, 'right query';
+};
+
+subtest 'Bulk insert' => sub {
+  my @sql = $abstract->insert('foo', [{bar => 'baz', yada => 1}, {bar => 'yada', yada => 2}]);
+  is_query \@sql, ['INSERT INTO "foo" ( "bar", "yada") VALUES ( ?, ? ), ( ?, ? )', 'baz', 1, 'yada', 2], 'right query';
+  @sql = $abstract->insert('foo', [{bar => 'baz'}, {yada => 2}]);
+  is_query \@sql, ['INSERT INTO "foo" ( "bar", "yada") VALUES ( ?, DEFAULT ), ( DEFAULT, ? )', 'baz', 2], 'right query';
+  @sql = $abstract->insert('foo', [{bar => 'baz'}, {bar => 'yada'}], {on_conflict => undef, returning => 'id'});
+  is_query \@sql,
+    ['INSERT INTO "foo" ( "bar") VALUES ( ? ), ( ? ) ON CONFLICT DO NOTHING RETURNING "id"', 'baz', 'yada'],
+    'right query';
+  @sql = $abstract->insert('foo', [{bar => [1, 2]}, {bar => {-json => [3]}}, {bar => \'now()'}]);
+  is_query \@sql, ['INSERT INTO "foo" ( "bar") VALUES ( ? ), ( ? ), ( now() )', [1, 2], {json => [3]}], 'right query';
+  @sql = $abstract->insert('foo', ['baz', {-json => [1]}]);
+  is_query \@sql, ['INSERT INTO "foo" VALUES ( ?, ? )', 'baz', {json => [1]}], 'right query';
+  eval { $abstract->insert('foo', [{bar => 'baz'}, 'yada']) };
+  like $@, qr/bulk insert values must all be hash references/, 'right error';
 };
 
 subtest 'ON CONFLICT (unsupported value)' => sub {

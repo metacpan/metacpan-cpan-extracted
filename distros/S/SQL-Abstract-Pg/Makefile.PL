@@ -26,7 +26,7 @@ WriteMakefile(
         url  => 'https://github.com/mojolicious/sql-abstract-pg.git',
         web  => 'https://github.com/mojolicious/sql-abstract-pg',
       },
-      x_IRC => {url => 'irc://chat.freenode.net/#mojo', web => 'https://webchat.freenode.net/#mojo'}
+      x_IRC => {url => 'irc://irc.libera.chat/#mojo', web => 'https://web.libera.chat/#mojo'}
     },
   },
   PREREQ_PM => {'SQL::Abstract' => '2.0'},

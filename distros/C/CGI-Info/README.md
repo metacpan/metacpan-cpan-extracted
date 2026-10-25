@@ -17,7 +17,7 @@ CGI::Info - Information about the CGI environment
 
 ## Version
 
-Version 1.15
+Version 1.16
 
 ## Synopsis
 
@@ -60,8 +60,9 @@ my $id = $info->param('id');        # Validated against allow schema
 
 Creates a CGI::Info object.
 
-It takes four optional arguments: allow, logger, expect and upload\_dir,
-which are documented in the params() method.
+It takes optional arguments allow, logger and upload\_dir,
+which are documented in the params() method, plus the request-complexity
+limits documented below.
 
 It takes other optional parameters:
 
@@ -110,11 +111,105 @@ It takes other optional parameters:
     This cache object is an object that understands get() and set() messages,
     such as a [CHI](https://metacpan.org/pod/CHI) object.
 
+- `allow_dtd`
+
+    When false (the default), an XML request body containing a `!DOCTYPE` or
+    `!ENTITY` declaration is rejected before it is returned: `params()`
+    returns undef and the status is set to `403`.
+    Set this to a true value to accept such bodies, for example when parsing a
+    trusted feed that ships its own DTD.
+    Entity expansion and external entity resolution are then the caller's
+    responsibility: parse the body with a proper XML parser that has entity
+    expansion disabled.
+    Every body accepted under this option is logged as a warning naming the
+    declaration, so use of the exception is visible in the audit trail; see
+    `dtd_warning_interval` for how those warnings are rate limited.
+    This is a constructor, configuration file or environment
+    (`CGI__Info__allow_dtd`) setting; it cannot be overridden per `params()`
+    call.
+
+- `dtd_warning_interval`
+
+    The minimum number of seconds between audit warnings for XML bodies accepted
+    because of `allow_dtd`.
+    The default is 60.
+    Declarations that are accepted but not logged are counted, and the next
+    warning reports how many were suppressed, so a frequently polled feed does
+    not hide its traffic while still not writing a line per request.
+    Set this to `0` to log every accepted declaration.
+
+    The limit is per process and per request path, so the warnings for
+    `/feed/a` and `/feed/b` are counted separately and one busy feed does not
+    silence another.
+    The path is taken from `PATH_INFO`, falling back to `SCRIPT_NAME` and then
+    to the path part of `REQUEST_URI`, and normalised lexically: the query string
+    is dropped, `%XX` escapes are decoded, repeated slashes are collapsed and
+    `.` and `..` segments are resolved, so the usual spellings of one feed
+    (`/feed/a`, `/feed/a/`, `/feed//a`, `/feed/%61`) share a single budget
+    instead of splitting it.
+    The limiter is not per object, so it also applies when a persistent handler
+    (such as mod\_perl, FastCGI or PSGI) creates a new object for every request,
+    and `reset()` does not clear it.
+    At most 100 paths are tracked at once; when that many are in use the table is
+    cleared, which can produce one extra warning per feed.
+    It is a constructor, configuration file or environment
+    (`CGI__Info__dtd_warning_interval`) setting.
+
 - `max_upload_size`
 
     The maximum file size in bytes you can upload.
     Use `-1` for no limit.
     The default is 512 KB (524288 bytes).
+
+- `max_body_size`
+
+    The maximum number of bytes read from a POST body.
+    This is checked against `CONTENT_LENGTH` before anything is read and
+    against any pre-populated body, so it caps the raw request rather than
+    the parsed parameter values.
+    Use `-1` for no limit.
+    When omitted it falls back to `max_upload_size`, preserving the historical
+    512 KB default.
+
+- `max_params`
+
+    The maximum number of parameters accepted from one request.
+    The check is made on the raw key=value pairs before decoding, so it also
+    bounds the amount of work done by the parser.
+    For XML bodies (`text/xml`, `application/xml` and structured
+    `application/*+xml` types such as `application/soap+xml`), this is the
+    number of XML elements, including the root element.
+    Use `0` to reject every parameter and `-1` for no limit.
+    The default is 1000.
+
+- `max_parts`
+
+    The maximum number of parts in a `multipart/form-data` body.
+    Use `0` to reject every part and `-1` for no limit.
+    The default is 100.
+
+- `max_part_headers`
+
+    The maximum number of header lines allowed in one `multipart/form-data`
+    part, including `Content-Disposition` and `Content-Type`.
+    Use `0` to reject any part with headers and `-1` for no limit.
+    The default is 20.
+
+- `max_nesting_depth`
+
+    The maximum depth of square-bracket nesting in a parameter name, for
+    example `a[b][c]` has a depth of 2.
+    This applies to URL-encoded, JSON and multipart parameter names, not to
+    values.
+    For XML bodies (`text/xml`, `application/xml` and structured
+    `application/*+xml` types such as `application/soap+xml`), this is the XML
+    element nesting depth, where the root element is depth 1.
+    Use `0` to reject any bracketed name (or any XML element) and `-1` for no
+    limit.
+    The default is 8.
+
+Any of these limits can also be overridden for a single `params()` call,
+either individually or through its `limits` hash reference; see ["params"](#params).
 
 The class can be configured at runtime using environment variables and configuration
 files; for example, setting `$ENV{'CGI__INFO__carp_on_warn'}` causes warnings to
@@ -127,12 +222,19 @@ use [Carp](https://metacpan.org/pod/Carp).  For more information see [Object::Co
 ```perl
 {
   allow          => { type => 'hashref',  optional => 1 },
+  allow_dtd      => { type => 'boolean',  optional => 1 },
   auto_load      => { type => 'boolean',  optional => 1 },
   cache          => { type => 'object',   optional => 1 },
   carp_on_warn   => { type => 'boolean',  optional => 1 },
   config_dirs    => { type => 'arrayref', optional => 1 },
   config_file    => { type => 'string',   optional => 1 },
+  dtd_warning_interval => { type => 'integer', optional => 1, min => 0 },
   logger         => { type => 'object',   optional => 1 },
+  max_body_size  => { type => 'integer',  optional => 1, min => -1 },
+  max_nesting_depth => { type => 'integer', optional => 1, min => -1 },
+  max_params     => { type => 'integer',  optional => 1, min => -1 },
+  max_part_headers => { type => 'integer', optional => 1, min => -1 },
+  max_parts      => { type => 'integer',  optional => 1, min => -1 },
   max_upload_size=> { type => 'integer',  optional => 1, min => -1 },
   upload_dir     => { type => 'string',   optional => 1 },
 }
@@ -288,7 +390,32 @@ separated string.
 
 The returned hash value can be passed into [CGI::Untaint](https://metacpan.org/pod/CGI%3A%3AUntaint).
 
-Takes four optional parameters: allow, logger and upload\_dir.
+Takes the optional parameters allow, logger and upload\_dir.
+The request-complexity limits (`max_body_size`, `max_params`, `max_parts`,
+`max_part_headers` and `max_nesting_depth`) can be set on the constructor or
+in the configuration file, and can also be overridden for a single call.
+Pass them individually:
+
+```perl
+    my $params = $info->params(max_params => 50, max_nesting_depth => 2);
+```
+
+or use a shared `limits` hash reference:
+
+```perl
+    my $params = $info->params(limits => {
+            max_params        => 50,
+            max_nesting_depth => 2,
+    });
+```
+
+The `limits` hash may contain any of the five limit names; unknown names are
+rejected. Individual limit arguments take precedence over values in the
+`limits` hash. Passing a limit to `params()` also makes that call re-parse
+the request if the cached result was produced with different limits, so a
+stricter limit cannot be bypassed by an earlier `params()` call. The per-call
+values apply only to that call; the instance's configured limits are unchanged
+afterwards.
 The parameters are passed in a hash, or a reference to a hash.
 The latter is more efficient since it puts less on the stack.
 
@@ -306,7 +433,30 @@ This is useful to help to block attacks on your site.
 
 Upload\_dir is a string containing a directory where files being uploaded are to
 be stored.
-It must be a writeable directory in the temporary area.
+It must be a writeable directory inside a temporary area: the directory
+returned by ["tmpdir"](#tmpdir), a classic system temporary directory such as `/tmp`,
+`/var/tmp` or `/usr/tmp`, the area named by `TMPDIR`, `TEMP` or `TMP`, or
+on macOS any directory below `/var/folders`.
+This matters because a web server usually does not export `TMPDIR`, so
+["tmpdir"](#tmpdir) can point somewhere different from the platform's temporary tree.
+
+It has to be a directory _inside_ an area, not the area root itself: `/tmp`
+and the like are shared and world-writable, so pass a subdirectory created for
+the application instead.
+The test is made against the resolved path, so a directory reached through
+`..` is judged by where it really is, and a sibling that merely shares a name
+prefix with a temporary area is not accepted.
+`%XX` escapes are decoded first, so an encoded spelling of a path is judged
+like its decoded form.
+On Windows both `/` and `\` separate directories, and that is applied after
+decoding, so an encoded `%5C` cannot hide a `..` traversal either.
+Two Windows spellings are refused because they cannot be checked against a
+temporary area by comparing strings: a drive-relative path such as `C:uploads`
+(and a bare `C:`), which starts at the current directory on that drive rather
+than at its root, and an 8.3 short name such as `PROGRA~1`, which is an alias
+for a long name that only the filesystem can expand.
+Pass a long, absolute path instead.
+The filesystem root is never treated as a temporary area.
 
 Takes an optional parameter logger, which is used for warnings and traces.
 It can be an object that understands warn() and trace() messages,
@@ -361,8 +511,10 @@ constructor.
     }
 ```
 
-If the request is an XML request (i.e. the content type of the POST is text/xml),
-CGI::Info will put the request into the params element 'XML', thus:
+If the request is an XML request (i.e. the content type of the POST is
+text/xml, application/xml or a structured application/\*+xml type such as
+application/soap+xml), CGI::Info will put the request into the params
+element 'XML', thus:
 
 ```perl
     use CGI::Info;
@@ -373,6 +525,17 @@ CGI::Info will put the request into the params element 'XML', thus:
     # ... parse and process the XML request in $xml
 ```
 
+Before returning the body, XML is checked against `max_params` (the number
+of elements, including the root) and `max_nesting_depth` (element depth,
+with the root at depth 1). Comments, CDATA sections and processing
+instructions are ignored. A body containing a `!DOCTYPE` or `!ENTITY`
+declaration is rejected with status `403` and `params()` returns undef,
+because such declarations enable entity expansion and external entity
+attacks. Pass `allow_dtd => 1` to the constructor to accept them for a
+trusted feed; each accepted declaration is still logged as a warning, so the
+exception is recorded. These are structural checks, not an XML parser; use a
+proper parser with entity expansion disabled for untrusted XML.
+
 Carp if logger is not set and we detect something serious.
 
 Blocks some attacks,
@@ -380,6 +543,12 @@ such as SQL and XSS injections,
 mustleak and directory traversals,
 thus creating a primitive web application firewall (WAF).
 Warning - this is an extra layer, not a replacement for your other security layers.
+
+The request-complexity limits (`max_body_size`, `max_params`, `max_parts`,
+`max_part_headers` and `max_nesting_depth`) are applied before parameter
+decoding and, for multipart bodies, while the body is parsed.
+A request that exceeds one of them causes `params()` to return undef
+and sets the HTTP status to 413 (Payload Too Large).
 
 #### Validation Subroutine Support
 

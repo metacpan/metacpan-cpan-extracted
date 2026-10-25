@@ -42,7 +42,7 @@ use SNMP::Info;
 
 our ($VERSION, $DEBUG, %MIBS, %FUNCS, %GLOBALS, %MUNGE, $INIT);
 
-$VERSION = '3.981001';
+$VERSION = '3.982000';
 
 %MIBS = (
     'BRIDGE-MIB'   => 'dot1dBaseBridgeAddress',
@@ -916,7 +916,13 @@ index (iid).
 =item $bridge->i_stp_state()
 
 Returns the mapping of (C<dot1dStpPortState>) to the interface
-index (iid).
+index (iid): the port state in the device's default spanning tree.
+
+C<BRIDGE-MIB> indexes spanning tree ports by port number alone, with no
+instance or VLAN.  On a device running more than one tree (MSTP
+instances, a tree per VLAN, or vendor STP domains) this is the one tree
+the agent exposes in the polled context, not the port's state in every
+VLAN.
 
 =item $bridge->i_stp_id()
 

@@ -1,5 +1,13 @@
 Revision history for Org-ReadTables
 
+v0.0.4  2026-10-24 15:04:12 CDT
+        - Correct behavior with fixed columns
+        - Update documentation for pivot, and complete its tests
+
+v0.0.3  2026-10-24 11:01:12 CDT
+        - Preliminary pivot working, including secondary table.
+        - NOTE: t/pivot.t is incomplete
+
 v0.0.2  2025-02-10 09:15:13 CST
         - Remove unnecessary dependencies
 

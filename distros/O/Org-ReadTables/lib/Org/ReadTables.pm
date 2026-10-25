@@ -1,4 +1,10 @@
-package Org::ReadTables v0.0.2 {
+#
+# from directory above this, use e.g.,
+#
+#    $ prove -l lib t/prove.t
+#
+
+package Org::ReadTables v0.0.4 {
 
     use v5.38;
     use List::Util qw(any);
@@ -51,6 +57,14 @@ package Org::ReadTables v0.0.2 {
         }
     }
 
+    sub secondary ($self, $table = undef) {
+        if (defined $table) {
+            return defined $self->{alt} && exists $self->{alt}->{$table} ? $self->{alt}->{$table} : undef;
+        } else {
+            return $self->{alt};  # All tables
+        }
+    }
+
     sub parse ($self, $text, $default_table = undef) {
 
         state $table; # as a 'state' so the nested 'walk' subroutine can use it
@@ -59,28 +73,39 @@ package Org::ReadTables v0.0.2 {
         state $inserted = 0; # 'state' so it can be seen by 'walk'
         state $saved; # ...and by 'flush_row'
         state $self_copy;
-        state @fixed_columns;
-        state @fixed_values;
-        state $data_column; # for pivot tables ~~~~~~~~ TODO
+        state $fixed_columns;
+        state $pivot;
+        state $data_column;
         state $caption;
 
         sub flush_row {
             my ($columns, $values) = @_;
-            my $save_fields = {};
-
+            my $save_fields;
             return unless defined $table && length($table);
-            @{$save_fields}{@{$columns}} = @{$values};
-            if ( defined $self_copy->{cb} ) {
-                if ( $self_copy->{cb}->($table, $save_fields) ) {
-                    do { push @{$saved->{$table}}, $save_fields; 1; };
-                    $inserted++;
+            foreach my $generated ( 0 .. (defined $pivot ? scalar $pivot->{column_ids}->@* -1 : 0) ) {
+                $save_fields = { defined $fixed_columns ? %$fixed_columns : () }; # Start with a copy of any fixed columns
+                if (defined $pivot) {
+                    # Save ordinary columns
+                    foreach my $c ($pivot->{ordinary_column_ids}->@*) {
+                        $save_fields->{$columns->[$c]} = $values->[$c];
+                    }
+                    $save_fields->{$pivot->{column_name}} = $pivot->{columns}->[$generated];
+                    next unless defined ( $save_fields->{$pivot->{data_column}} = $values->[$pivot->{column_ids}->[$generated]]);
+                } else {
+                    @{$save_fields}{@{$columns}} = @{$values};
                 }
-            } elsif ( defined $db ?
-                      eval { $db->insert($table, $save_fields); 1; } :
-                      do { push @{$saved->{$table}}, $save_fields; 1; } ) {
-                $inserted++;
-            } else {
-                push @{$errors} , [ $save_fields, $@ ];
+                if ( defined $self_copy->{cb} ) {
+                    if ( $self_copy->{cb}->($table, $save_fields) ) {
+                        do { push @{$saved->{$table}}, $save_fields; 1; };
+                        $inserted++;
+                    }
+                } elsif ( defined $db ?
+                          eval { $db->insert($table, $save_fields); 1; } :
+                          do { push @{$saved->{$table}}, $save_fields; 1; } ) {
+                    $inserted++;
+                } else {
+                    push @{$errors} , [ $save_fields, $@ ];
+                }
             }
         }
 
@@ -101,48 +126,85 @@ package Org::ReadTables v0.0.2 {
             state $is_data_row;
             state @columns;
             state @values;
-            # print sprintf("%4d %2d%-30s\n", $_[1], $column, ref $_[0]) ;
             if ((ref $el) =~ /Table\z/i) {
                 $in_header = 1;
                 $found_header_row = 0;
                 $inserted = 0;
-                @columns = @fixed_columns;
-                @values = @fixed_values;
+                @columns = ();
+                @values = ();
+                $pivot = defined $data_column ? {data_column => $data_column} : undef;
             } elsif ((ref $el) =~ /TableHLine\z/i) {
                 if ($found_header_row) {
                     #
                     # Skip this table if the callback returns a false value.
                     #
+                    @columns = map {lc} @columns if $in_header;
+                    my @reported_columns = @columns;
+                    if (defined $pivot) { # Remove pivoted columns
+                        if (defined $pivot->{data_column} && (!exists $pivot->{column_ids} || !scalar $pivot->{column_ids}->@*)) {
+                            # 'data' was used as a fixed value, without any pivot columns being defined.
+                            $fixed_columns->{'data'} = $pivot->{data_column};
+                            undef $pivot;
+                        } else {
+                            foreach my $c (0..$#columns) { # Exclude pivoted columns from ordinary processing
+                                push $pivot->{ordinary_column_ids}->@*, $c unless any { $_==$c } $pivot->{column_ids}->@*;
+                            }
+                            @reported_columns = map { $columns[$_] } $pivot->{ordinary_column_ids}->@*;
+                            if (defined $pivot->{alt}) {
+                                $self_copy->{alt}->{$table} = { lc($pivot->{column_name}) => $pivot->{alt} };
+                            }
+                        }
+                    }
                     if ($in_header && defined $self_copy->{cb_table}) {
                         undef $table unless $self_copy->{cb_table}->({ name => $table,
                                                                        nameref => \$table, # Modifiable
-                                                                       ( scalar @fixed_columns ? (
-                                                                           fixed => {map {($fixed_columns[$_], $fixed_values[$_])}
-                                                                                     0..(scalar @fixed_columns -1)} ) : () ),
+                                                                       ( defined $fixed_columns ? (fixed => $fixed_columns) : ()),
                                                                        columns => \@columns,
-                                                                       data_column => $data_column,
                                                                        caption => $caption,
                                                                    });
                     }
                     $in_header = 0;
                 }
             } elsif ((ref $el) =~ /TableRow\z/i) {
+                if ($in_header) {
+                    foreach my $c (0 .. scalar @columns-1) {
+                        if ($columns[$c] =~ /(.+)>/) {
+                            last unless defined $pivot; # Skip this row if no usable data column
+                            if (!defined $pivot->{column_name}) {  # Create new pivot table
+                                $pivot->{column_name} = $1;
+                                $pivot->{column_ids} = [grep { $_ != $c && defined $columns[$_] } 0 .. scalar @columns-1];
+                                $pivot->{columns} = [@columns[$pivot->{column_ids}->@*]];
+                                last;
+                            } else { # Define a secondary table
+                                my $row_name = $1;
+                                foreach my $cci (0 .. scalar $pivot->{column_ids}->@* -1 ) { #
+                                    my $cc = ($pivot->{column_ids}->[$cci]);
+                                    my $col_key = lc( $pivot->{columns}->[$cci] );
+                                    my $row_key = lc( $row_name );
+                                    my $val = \$pivot->{alt}->{$col_key}->{$row_key};
+                                    $$val = length $$val ? "$$val $columns[$cc]" : $columns[$cc];
+                                }
+                            }
+                        }
+                    }
+                }
                 if ($is_data_row) { # Flush previous row
                     flush_row (\@columns, \@values);
                     $is_data_row = 0;
                 }
                 $found_header_row = 1;
-                $column = scalar @fixed_columns - 1;
-                @values = @fixed_values;
+                $column = -1;
+                @values = ();
             } elsif ((ref $el) =~ /TableCell\z/i) {
                 $column++;
             } elsif ((ref $el) =~ /Text\z/i) {
                 if ($in_header) {
-                    $columns[$column] = lc($el->as_string);
+                    $columns[$column] = $el->as_string;
                 } else {
                     $values[$column] = $el->as_string;
                     $is_data_row = 1;
                 }
+                $is_data_row = 1 unless ($in_header);
             }
         }
 
@@ -161,8 +223,9 @@ package Org::ReadTables v0.0.2 {
             # whitespace-only Text elements
             undef $table;
             my $prev_elem = $t->prev_sibling;
-            @fixed_columns = ();
-            @fixed_values = ();
+            undef $fixed_columns;
+            undef $pivot;
+            undef $data_column;
 
             if (defined $prev_elem) {
             ELEMENT:
@@ -190,11 +253,11 @@ package Org::ReadTables v0.0.2 {
                         } elsif ($prev_elem-> name =~ /^caption\z/i) {
                             $caption = $prev_elem->args->[0];
                         } elsif ($prev_elem->name =~ /^property\z/i && scalar @{$prev_elem->args} > 1) {
-                            push @fixed_columns, $prev_elem->args->[0];
                             # Double quotes may be used around a
                             # string with spaces; otherwise this will
                             # add a single space between words.
-                            push @fixed_values, join(' ',@{$prev_elem->args}[1..scalar @{$prev_elem->args}-1]);
+                            $fixed_columns->{$prev_elem->args->[0]} =
+                              join(' ',@{$prev_elem->args}[1..scalar @{$prev_elem->args}-1]);
                         }
                     } elsif (ref $prev_elem eq 'Org::Element::Drawer') {
                         # We regard the internal-link-target syntax
@@ -215,8 +278,7 @@ package Org::ReadTables v0.0.2 {
                             } elsif ($k =~ /^data\z/i) {
                                 $data_column = $prev_elem->properties->{$k};
                             } else {
-                                push @fixed_columns, $k;
-                                push @fixed_values, $prev_elem->properties->{$k};
+                                $fixed_columns->{$k} = $prev_elem->properties->{$k};
                             }
                         }
                         last ELEMENT unless !defined $table;
@@ -333,8 +395,6 @@ of each record, all having the value '.us'.
 
 =head2 Pivot Tables
 
-NOTE: This is a future feature, not yet fully implemented.
-
 When it is desirable to enter data two-dimensionally, a construct like
 this may be used:
 
@@ -353,16 +413,29 @@ the pivoted value. The above table would generate eight data records
 for the `sizes` table:
 
     size_code='1', class='A', size_desc='1-2'
-    size_code='2', class='A', size_desc='3-4'
-    size_code='3', class='A', size_desc='5-6'
     size_code='1', class='B', size_desc='22-26'
+    size_code='2', class='A', size_desc='3-4'
     size_code='2', class='B', size_desc='26-30'
-    size_code='3', class='B', size_desc='30-34'
     size_code='2', class='C', size_desc='XS'
+    size_code='3', class='A', size_desc='5-6'
+    size_code='3', class='B', size_desc='30-34'
     size_code='3', class='C', size_desc='S'
 
 Note that no record is created for class 'C' with size_code '1' as
 that entry in the pivot table is blank.
+
+Values in consecutive rows with the same field name will be
+concatenated, separated by a space. Train names in the table below
+will be "Texas Eagle" and "Southwest Chief" for example.
+
+    | Train_no>   | 21    | 22    | 3         | 4         |
+    | Train_name> | Texas | Texas | Southwest | Southwest |
+    | Train_name> | Eagle | Eagle | Chief     | Chief     |
+    | Station     |       |       |           |           |
+    |-------------+-------+-------+-----------+-----------|
+
+Also note, renaming pivot columns in the table callback is not
+permitted.
 
 =head1 ATTRIBUTES
 

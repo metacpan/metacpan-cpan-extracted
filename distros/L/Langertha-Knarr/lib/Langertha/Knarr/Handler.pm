@@ -1,6 +1,6 @@
 package Langertha::Knarr::Handler;
 # ABSTRACT: Role for Knarr backend handlers (Raider, Engine, Code, ...)
-our $VERSION = '1.102';
+our $VERSION = '1.103';
 use Moose::Role;
 use Future::AsyncAwait;
 use Langertha::Knarr::Stream;
@@ -35,7 +35,7 @@ Langertha::Knarr::Handler - Role for Knarr backend handlers (Raider, Engine, Cod
 
 =head1 VERSION
 
-version 1.102
+version 1.103
 
 =head1 SYNOPSIS
 

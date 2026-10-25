@@ -1,6 +1,6 @@
 package Langertha::Knarr::Protocol;
 # ABSTRACT: Role for Knarr wire protocols (OpenAI, Anthropic, Ollama, A2A, ACP, AG-UI)
-our $VERSION = '1.102';
+our $VERSION = '1.103';
 use Moose::Role;
 use JSON::MaybeXS ();
 use Scalar::Util ();
@@ -38,8 +38,31 @@ sub format_stream_open  { '' }
 sub format_stream_close { '' }
 
 # An error answer in the protocol's own shape; default is the OpenAI wire's.
+sub error_uses_body { 0 }
+
+# The reason a request body cannot be a chat request, or nothing: it is not
+# JSON, or JSON that is no object (array, string, number, null). An empty
+# body counts as {} like in the parsers. The texts are fixed -- the
+# decoder's own message never reaches a client (k81). A protocol with its
+# own error for a broken body (A2A's JSON-RPC parse error) overrides it.
+sub request_body_error {
+  my ($self, $body_ref) = @_;
+  my $body = $$body_ref;
+  return unless defined $body && length $body;
+  my $data = eval { JSON::MaybeXS->new( utf8 => 1 )->decode($body) };
+  return 'request body is not valid JSON' if $@;
+  return 'request body must be a JSON object' unless ref $data eq 'HASH';
+  return;
+}
+
+# The code of a status in the error vocabulary ACP and AG-UI share.
+sub _status_error_code {
+  my ($self, $status) = @_;
+  return $status == 404 ? 'not_found' : $status >= 500 ? 'server_error' : 'invalid_input';
+}
+
 sub format_error_response {
-  my ($self, $status, $message) = @_;
+  my ($self, $status, $message, $request) = @_;
   return ( $status, { 'Content-Type' => 'application/json' },
     JSON::MaybeXS->new( utf8 => 1, canonical => 1 )->encode({ error => { message => "$message" } }) );
 }
@@ -88,7 +111,7 @@ Langertha::Knarr::Protocol - Role for Knarr wire protocols (OpenAI, Anthropic, O
 
 =head1 VERSION
 
-version 1.102
+version 1.103
 
 =head1 DESCRIPTION
 
@@ -133,6 +156,15 @@ Action names map to C<_action_*> methods on the Knarr core.
 
 Required. Returns a L<Langertha::Knarr::Request>.
 
+=head2 request_body_error
+
+    my $reason = $proto->request_body_error(\$body);
+
+Returns why the body cannot be a chat request (not JSON, or JSON that is no
+object) as a fixed text without the decoder's message, else nothing. Knarr
+answers it with a 400 in the protocol's error shape (k81). A2A overrides it
+to nothing: its parse failure is a JSON-RPC error of its own.
+
 =head2 format_chat_response
 
     my ($status, \%headers, $body) = $proto->format_chat_response($response, $request);
@@ -167,23 +199,40 @@ asked for it with C<stream_options.include_usage>.
 
 =head2 format_error_response
 
-    my ($status, \%headers, $body) = $proto->format_error_response( 504, 'upstream timed out' );
+    my ($status, \%headers, $body) = $proto->format_error_response( 504, 'upstream timed out', $request );
 
 An error answer in this protocol's shape. Default: the OpenAI wire's
 C<{"error":{"message":...}}>; Anthropic answers
 C<{"type":"error","error":{"type":...,"message":...}}>, Ollama a plain
-C<{"error":"..."}>.
+C<{"error":"..."}>, A2A a JSON-RPC response with an C<error> object. The
+optional third argument is the parsed L<Langertha::Knarr::Request> (absent
+when the request never parsed); the optional fourth is the request's raw body
+(see L</error_uses_body>). A2A takes the JSON-RPC C<id> from them. ACP answers
+its C<Error> object C<{"code":...,"message":...}> (C<server_error>,
+C<not_found>, C<invalid_input>), AG-UI the C<RUN_ERROR> event as JSON. Knarr
+answers every error of its own through it, the C<401> and the C<500> of a
+failed backend included (see L<Langertha::Knarr/ERRORS>).
+
+=head2 error_uses_body
+
+True for a protocol whose error answer reads the request body (A2A's
+JSON-RPC C<id>, which is in the body even when the request was rejected
+before it parsed): the PSGI adapter reads the body for such an error only
+then. Default false.
 
 =head2 format_stream_error
 
-    my $bytes = $proto->format_stream_error( 504, 'upstream timed out' );
+    my $bytes = $proto->format_stream_error( 504, 'upstream timed out', $request );
 
 The frame that tells a client its stream failed after the response
 headers went out, or C<''> (the default) when the protocol has none.
 OpenAI sends C<data: {"error":{...}}>, Anthropic an C<event: error>,
-Ollama an C<{"error":"..."}> line. The raw passthrough writes it before
-closing a stream the upstream stopped feeding, and so does a routed stream
-whose handler failed with an upstream timeout.
+Ollama an C<{"error":"..."}> line, A2A a JSON-RPC error event, ACP
+C<event: run.failed>, AG-UI C<RUN_ERROR>. The frame is the end of the
+stream: no end marker follows it. A routed stream whose handler fails after
+its first chunk ends with it (500, or the status of the failure's
+category), and so does the raw passthrough when the upstream stops feeding
+its stream.
 
 =head2 stream_content_type
 

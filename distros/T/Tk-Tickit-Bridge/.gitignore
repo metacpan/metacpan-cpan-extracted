@@ -1,0 +1,10 @@
+blib
+_build_params
+Build
+Build.PL 
+META*
+MYMETA*
+MANIFEST
+*gz
+.gitignore
+TODO

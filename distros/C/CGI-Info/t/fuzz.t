@@ -9,7 +9,7 @@ use Test::Needs {
 };
 
 use Test::Which 'fuzz-harness-generator';
-# use Test::DescribeMe qw(extended);
+use Test::DescribeMe qw(extended);
 use FindBin qw($Bin);
 use IPC::Run3;
 use IPC::System::Simple qw(system);

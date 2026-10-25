@@ -257,27 +257,36 @@ subtest 'params: multipart with upload_dir pointing to a file => 500' => sub {
 };
 
 # ============================================================
-# 13. params() — upload_dir not inside tmpdir => 500
-#     Branch: upload_dir !~ /^\Q$tmpdir\E/
+# 13. params() — upload_dir not inside any temporary area => 500
+#     Branch: !$self->_in_temp_area($self->{upload_dir})
 # ============================================================
 
-subtest 'params: upload_dir outside tmpdir => 500' => sub {
+subtest 'params: upload_dir outside every temporary area => 500' => sub {
     reset_env();
-    my $outside = tempdir(CLEANUP => 1);
 
-    $ENV{GATEWAY_INTERFACE} = 'CGI/1.1';
-    $ENV{REQUEST_METHOD}    = 'POST';
-    $ENV{CONTENT_TYPE}      = 'multipart/form-data; boundary=----b';
-    $ENV{CONTENT_LENGTH}    = 100;
+    # A temporary directory is accepted by design, so the rejection branch
+    # needs a directory outside every temporary area: the distribution root,
+    # which is where the tests are run from.
+    my $outside = File::Spec->rel2abs(File::Spec->curdir());
+    SKIP: {
+        skip "$outside is inside a temporary area", 3
+            if CGI::Info->new()->_in_temp_area($outside);
 
-    # Make tmpdir() return something different from $outside by mocking
-    my $guard = mock_scoped 'CGI::Info::tmpdir' => sub { return '/nonexistent/tmpdir/xyz' };
+        $ENV{GATEWAY_INTERFACE} = 'CGI/1.1';
+        $ENV{REQUEST_METHOD}    = 'POST';
+        $ENV{CONTENT_TYPE}      = 'multipart/form-data; boundary=----b';
+        $ENV{CONTENT_LENGTH}    = 100;
 
-    my $info = CGI::Info->new(upload_dir => $outside);
-    my $p    = eval { $info->params() };
-    ok(!$@,           'does not die when upload_dir outside tmpdir');
-    ok(!defined($p),  'upload_dir outside tmpdir returns undef');
-    is($info->status(), 500, 'upload_dir outside tmpdir sets status 500');
+        # Rejection must not depend on what tmpdir() reports, so point it
+        # somewhere unrelated as well.
+        my $guard = mock_scoped 'CGI::Info::tmpdir' => sub { return '/nonexistent/tmpdir/xyz' };
+
+        my $info = CGI::Info->new(upload_dir => $outside);
+        my $p    = eval { $info->params() };
+        ok(!$@,           'does not die when upload_dir outside every temporary area');
+        ok(!defined($p),  'upload_dir outside every temporary area returns undef');
+        is($info->status(), 500, 'upload_dir outside every temporary area sets status 500');
+    }
 };
 
 # ============================================================

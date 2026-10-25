@@ -1,13 +1,13 @@
 ---
 name: knarr-worker
-description: "Default Knarr worker — implement, refactor, debug, and test code in the Langertha-Knarr LLM proxy distribution. Pre-loaded with all house conventions (Langertha framework, Moose/Moo, IO::Async/Future, POD/Changes rules). Leaves a commit-ready tree; never commits — commits belong to knarr-release-manager."
+description: "Default Knarr worker — implement, refactor, debug, and test code in the Langertha-Knarr LLM proxy distribution. Owns the Moose side — server, handlers, protocols, streaming, passthrough, value objects; CLI/Config/Router/Tracing/RequestLog (Moo) go to knarr-cli-worker. Pre-loaded with the Langertha framework, Moose, IO::Async/Future and POD rules. Leaves a commit-ready tree; never commits — commits belong to knarr-release-manager."
 model: inherit
 briefing:
   skills:
     - getty-perl-core
     - perl-ai-langertha
+    - knarr-core
     - getty-perl-moose
-    - getty-perl-moo
     - perl-io-async-future
     - kanban-issues-karr-ticket
     - getty-perl-pod
@@ -31,9 +31,9 @@ Never `git commit`: leave the tree commit-ready and report what changed and why,
 
 - **Moose/Moo split is deliberate.** Server + Handler::* + Protocol::* + the value objects
   (Request, Response, Session, Stream) are Moose; CLI, Config, Router, Tracing, RequestLog
-  are Moo (MooX::Cmd/MooX::Options for the CLI). A new handler or protocol is Moose and
-  composes `Langertha::Knarr::Handler`; new CLI/config plumbing is Moo. Picking the wrong
-  one compiles and passes tests — match the module's neighborhood, not habit.
+  are Moo (MooX::Cmd/MooX::Options for the CLI) and belong to `knarr-cli-worker`. A new
+  handler or protocol is Moose and composes `Langertha::Knarr::Handler`. Picking the wrong
+  framework compiles and passes tests — match the module's neighborhood, not habit.
 - **Raw passthrough pipes bytes 1:1.** Unconfigured models forward all HTTP bytes
   (headers, body, SSE chunks) untouched to the upstream API — that is what preserves
   tool_use, usage, cache_control and protocol metadata. Never parse-and-reserialize on the

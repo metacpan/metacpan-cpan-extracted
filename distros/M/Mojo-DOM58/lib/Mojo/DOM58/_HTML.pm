@@ -10,7 +10,7 @@ use Exporter 'import';
 use Mojo::DOM58::Entities qw(html_attr_unescape html_escape html_unescape);
 use Scalar::Util 'weaken';
 
-our $VERSION = '3.002';
+our $VERSION = '3.003';
 
 our @EXPORT_OK = 'tag_to_html';
 
@@ -22,31 +22,19 @@ my $ATTR_RE = qr/
   )?
   \s*
 /x;
-my $TOKEN_RE = qr/
-  ([^<]+)?                                            # Text
-  (?:
-    <(?:
-      !(?:
-        DOCTYPE(
-        \s+\w+                                        # Doctype
-        (?:(?:\s+\w+)?(?:\s+(?:"[^"]*"|'[^']*'))+)?   # External ID
-        (?:\s+\[.+?\])?                               # Int Subset
-        \s*)
-      |
-        --(.*?)--\s*                                  # Comment
-      |
-        \[CDATA\[(.*?)\]\]                            # CDATA
-      )
-    |
-      \?(.*?)\?                                       # Processing Instruction
-    |
-      \s*((?:\/\s*)?[^<>\s\/0-9.\-][^<>\s\/]*\s*(?>(?:$ATTR_RE){0,32766})*)   # Tag
-      # Workaround for perl's limit of * to {0,32767}
-    )>
-  |
-    (<)                                               # Runaway "<"
-  )??
-/xis;
+my %MARKUP = (
+  doctype => qr/
+    \G<!DOCTYPE(
+    \s+\w+                                        # Doctype
+    (?:(?:\s+\w+)?(?:\s+(?:"[^"]*"|'[^']*'))+)?   # External ID
+    (?:\s+\[.+?\])?                               # Int Subset
+    \s*)>
+  /xis,
+  comment => qr/\G<!--(.*?)(?:--!?|(?<=<!--)-?(?=>))>/s,
+  cdata   => qr/\G<!\[CDATA\[(.*?)\]\]>/is,
+  pi      => qr/\G<\?(.*?)\?>/s
+);
+my $TAG_RE = qr/<(\/\s*)?([^<>\s\/0-9.\-][^<>\s\/]*)\s*/;
 
 # HTML elements that only contain raw text
 my %RAW = map { $_ => 1 } qw(script style);
@@ -65,6 +53,9 @@ $END{$_} = 'p' for
 
 # Container HTML elements that create their own scope
 my %SCOPE = map { $_ => 1 } qw(math svg);
+
+# SVG and MathML elements that are HTML integration points
+my %INTEGRATION = map { $_ => 1 } qw(desc foreignobject mi mn mo ms mtext title);
 
 # HTML table elements with optional end tags
 my %TABLE = map { $_ => 1 } qw(colgroup tbody td tfoot th thead tr);
@@ -134,75 +125,117 @@ sub xml {
 sub parse {
   my ($self, $html) = (shift, "$_[0]");
 
+  # Detect XML from a leading declaration
+  $self->xml(1) if !exists $self->{xml} && $html =~ /^\x{feff}?\s*<\?xml[\s?]/i;
+
   my $xml = $self->xml;
   my $current = my $tree = ['root'];
-  while ($html =~ /\G$TOKEN_RE/gcso) {
-    my ($text, $doctype, $comment, $cdata, $pi, $tag, $runaway)
-      = ($1, $2, $3, $4, $5, $6, $11);
+  my %unclosed;
+  while ((my $offset = pos($html) || 0) < length $html) {
 
-    # Text (and runaway "<")
-    $text .= '<' if defined $runaway;
-    _node($current, 'text', html_unescape $text) if defined $text;
+    # Text
+    if ($html =~ /\G([^<]+)/gc) {
+      _node($current, 'text', html_unescape $1);
+      next;
+    }
+
+    # DOCTYPE, comment, CDATA and processing instruction (only trying the regex for the opener keeps failures flat)
+    my $next = substr $html, $offset + 1, 1;
+    if ($next eq '!' || $next eq '?') {
+      my $opener = uc substr $html, $offset, 9;
+      my $type
+        = substr($opener, 0, 4) eq '<!--' ? 'comment'
+        : $opener eq '<!DOCTYPE'          ? 'doctype'
+        : $opener eq '<![CDATA['          ? 'cdata'
+        : $next eq '?'                    ? 'pi'
+        :                                   undef;
+
+      if ($type && !$unclosed{$type}) {
+        if ($html =~ /$MARKUP{$type}/gc) {
+          my $value = $1;
+
+          # DOCTYPE, CDATA (outside of foreign content) and processing instructions end at the first ">" in HTML
+          my $i = $xml || $type eq 'comment' ? -1 : index $value, '>';
+          if ($i >= 0 && !($type eq 'cdata' && _foreign($current))) {
+            pos($html) = $-[1] + $i + 1;
+            $value = substr $value, 0, $i;
+          }
+
+          _node($current, $type, $value);
+          next;
+        }
+
+        # Without an end for this one, there is none for later ones either (DOCTYPE can fail for other reasons)
+        $unclosed{$type} = 1 unless $type eq 'doctype';
+      }
+    }
 
     # Tag
-    if (defined $tag) {
+    if ($html =~ /\G$TAG_RE/gco) {
+      my ($is_end, $tag) = (defined $1, $xml ? $2 : lc $2);
+
+      # Stray "=" right after the tag name (like an empty attribute name)
+      $html =~ /\G=\s*/gc;
+
+      # Attributes
+      my (%attrs, $closing);
+      while ($html =~ /\G$ATTR_RE/gco) {
+        my ($key, $value) = ($xml ? $1 : lc $1, defined $2 ? $2 : defined $3 ? $3 : $4);
+
+        # Empty tag
+        ++$closing and next if $key eq '/';
+
+        $attrs{$key} = defined $value ? html_attr_unescape $value : $value;
+      }
+
+      # Incomplete tag
+      if ($html !~ /\G>/gc) { pos($html) = $offset }
 
       # End
-      if ($tag =~ /^\/\s*(\S+)/) {
-        my $end = $xml ? $1 : lc $1;
+      elsif ($is_end) {
 
         # No more content
-        if (!$xml && (my $tags = $NO_MORE_CONTENT{$end})) { _end($_, $xml, \$current) for @$tags }
+        if (!$xml && (my $tags = $NO_MORE_CONTENT{$tag})) { _end($_, $xml, \$current) for @$tags }
 
-        _end($end, $xml, \$current);
+        _end($tag, $xml, \$current);
+        next;
       }
 
       # Start
-      elsif ($tag =~ m!^([^\s/]+)([\s\S]*)!) {
-        my ($start, $attr) = ($xml ? $1 : lc $1, $2);
-
-        # Attributes
-        my (%attrs, $closing);
-        while ($attr =~ /$ATTR_RE/go) {
-          my $key = $xml ? $1 : lc $1;
-          my $value = defined($2) ? $2 : defined($3) ? $3 : $4;
-
-          # Empty tag
-          ++$closing and next if $key eq '/';
-
-          $attrs{$key} = defined $value ? html_attr_unescape $value : $value;
-        }
+      else {
 
         # "image" is an alias for "img"
-        $start = 'img' if !$xml && $start eq 'image';
-        _start($start, \%attrs, $xml, \$current);
+        $tag = 'img' if !$xml && $tag eq 'image';
+        _start($tag, \%attrs, $xml, \$current);
 
         # Element without end tag (self-closing)
-        _end($start, $xml, \$current)
-          if !$xml && $EMPTY{$start} || ($xml || !$BLOCK{$start}) && $closing;
+        _end($tag, $xml, \$current) if !$xml && $EMPTY{$tag} || ($xml || !$BLOCK{$tag}) && $closing;
 
-        # Raw text elements
-        next if $xml || !$RAW{$start} && !$RCDATA{$start};
-        next unless $html =~ m!\G(.*?)</\Q$start\E(?:\s+|\s*>)!gcsi;
-        _node($current, 'raw', $RCDATA{$start} ? html_unescape $1 : $1);
-        _end($start, 0, \$current);
+        # Raw text elements (not in foreign content)
+        next if $xml || !$RAW{$tag} && !$RCDATA{$tag} || _foreign($current->[3]);
+
+        if ($tag eq 'script') {
+          my ($script, $found_end) = _script_content(\$html);
+          _node($current, 'raw', $script) if length $script;
+          _end($tag, 0, \$current) if $found_end;
+          next;
+        }
+
+        # Without an end tag for this element, there is none for later elements of the same type either
+        next if $unclosed{$tag};
+        unless ($html =~ m!\G(.*?)</\Q$tag\E(?=[\s/>])[^>]*>?!gcsi) {
+          $unclosed{$tag} = 1;
+          next;
+        }
+        _node($current, $RCDATA{$tag} ? ('text', html_unescape $1) : ('raw', $1));
+        _end($tag, 0, \$current);
+        next;
       }
     }
 
-    # DOCTYPE
-    elsif (defined $doctype) { _node($current, 'doctype', $doctype) }
-
-    # Comment
-    elsif (defined $comment) { _node($current, 'comment', $comment) }
-
-    # CDATA
-    elsif (defined $cdata) { _node($current, 'cdata', $cdata) }
-
-    # Processing instruction (try to detect XML)
-    elsif (defined $pi) {
-      $self->xml($xml = 1) if !exists $self->{xml} && $pi =~ /xml/i;
-      _node($current, 'pi', $pi);
-    }
+    # Runaway "<"
+    _node($current, 'text', '<');
+    pos($html) = $offset + 1;
   }
 
   return $self->tree($tree);
@@ -230,6 +263,21 @@ sub _end {
     return if !$xml && $PHRASING{$end} && !$PHRASING{$next->[1]};
 
   } while $next = $next->[3];
+}
+
+sub _foreign {
+  my $next = shift;
+
+  # Search stack for SVG and MathML elements, but stop at HTML integration points
+  while ($next->[0] ne 'root') {
+    return 1 if $SCOPE{$next->[1]};
+    return 0 if $INTEGRATION{$next->[1]};
+    return 0 if $next->[1] eq 'annotation-xml' && defined $next->[2]{encoding}
+      && $next->[2]{encoding} =~ m!^(?:text/html|application/xhtml\+xml)$!i;
+    $next = $next->[3];
+  }
+
+  return 0;
 }
 
 sub _node {
@@ -293,6 +341,38 @@ sub _render {
 
   # Everything else
   return '';
+}
+
+sub _script_content {
+  my $html = shift;
+  my $start = pos $$html;
+
+  my $state = 0;
+
+  while (1) {
+    if ($state == 0) { $$html =~ /\G[^<]*/gcs }
+    else             { $$html =~ /\G[^<\-]*/gcs }
+
+    my $p = pos $$html;
+    return (substr($$html, $start), 0) if $p >= length $$html;
+
+    if ($state == 0) {
+      if ($$html =~ m!\G</script(?=[\s/>])[^>]*>?!gcsi) { return (substr($$html, $start, $p - $start), 1) }
+      elsif ($$html =~ /\G<!--/gcs) { $state = 1 }
+      else { pos($$html) = $p + 1 }
+    }
+    elsif ($state == 1) {
+      if ($$html =~ m!\G</script(?=[\s/>])[^>]*>?!gcsi) { return (substr($$html, $start, $p - $start), 1) }
+      elsif ($$html =~ /\G-->/gcs) { $state = 0 }
+      elsif ($$html =~ m!\G<script(?=[\s/>])!gcsi) { $state = 2 }
+      else { pos($$html) = $p + 1 }
+    }
+    else {
+      if ($$html =~ m!\G</script(?=[\s/>])!gcsi) { $state = 1 }
+      elsif ($$html =~ /\G-->/gcs) { $state = 0 }
+      else { pos($$html) = $p + 1 }
+    }
+  }
 }
 
 sub _start {

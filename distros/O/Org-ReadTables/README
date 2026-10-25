@@ -76,8 +76,6 @@ DESCRIPTION
 
  Pivot Tables
 
-    NOTE: This is a future feature, not yet fully implemented.
-
     When it is desirable to enter data two-dimensionally, a construct like
     this may be used:
 
@@ -96,16 +94,29 @@ DESCRIPTION
     for the `sizes` table:
 
         size_code='1', class='A', size_desc='1-2'
-        size_code='2', class='A', size_desc='3-4'
-        size_code='3', class='A', size_desc='5-6'
         size_code='1', class='B', size_desc='22-26'
+        size_code='2', class='A', size_desc='3-4'
         size_code='2', class='B', size_desc='26-30'
-        size_code='3', class='B', size_desc='30-34'
         size_code='2', class='C', size_desc='XS'
+        size_code='3', class='A', size_desc='5-6'
+        size_code='3', class='B', size_desc='30-34'
         size_code='3', class='C', size_desc='S'
 
     Note that no record is created for class 'C' with size_code '1' as that
     entry in the pivot table is blank.
+
+    Values in consecutive rows with the same field name will be
+    concatenated, separated by a space. Train names in the table below will
+    be "Texas Eagle" and "Southwest Chief" for example.
+
+        | Train_no>   | 21    | 22    | 3         | 4         |
+        | Train_name> | Texas | Texas | Southwest | Southwest |
+        | Train_name> | Eagle | Eagle | Chief     | Chief     |
+        | Station     |       |       |           |           |
+        |-------------+-------+-------+-----------+-----------|
+
+    Also note, renaming pivot columns in the table callback is not
+    permitted.
 
 ATTRIBUTES
 

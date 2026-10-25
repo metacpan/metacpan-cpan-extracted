@@ -8,7 +8,7 @@ use Tickit::Widget::Entry;
 use Tickit::Widget::Scroller;
 use Tickit::Widget::Scroller::Item::Text;
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 
 # A scroller item reserves one line for an Entry in a floating child window.
 {

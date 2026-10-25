@@ -3,8 +3,7 @@
 use strict;
 use warnings;
 use Test::Most tests => 39;
-use lib 't/lib';
-use MyLogger;
+use Test::Log::Abstraction;
 
 BEGIN { use_ok('CGI::Info') }
 
@@ -106,7 +105,7 @@ PARAM: {
 
 	$ENV{'QUERY_STRING'} = 'foo=&fred=wilma&foo=bar';
 	$i = new_ok('CGI::Info');
-	ok($i->param('foo', logger => MyLogger->new()) eq 'bar');
+	ok($i->param('foo', logger => Test::Log::Abstraction->new()) eq 'bar');
 	ok($i->param('fred') eq 'wilma');
 	ok($i->as_string() eq 'foo=bar; fred=wilma');
 

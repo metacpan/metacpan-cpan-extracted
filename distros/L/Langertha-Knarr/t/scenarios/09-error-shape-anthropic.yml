@@ -1,0 +1,65 @@
+title: Anthropic and Ollama clients get their own error shape on 401 and on a backend failure, streamed or not
+setup:
+  config:
+    proxy_api_key: sk-proxy-secret-0001
+    models:
+      broken: { engine: KnarrVirtual, model: v-broken }
+      broken-plain: { engine: KnarrVirtual, model: v-broken-plain }
+  backends:
+    v-broken:
+      rules:
+        "known": { answer: ok }
+    # a backend that cannot stream: a streamed request fails in the handler itself
+    v-broken-plain:
+      engine_args: { no_streaming: 1 }
+      rules:
+        "known": { answer: ok }
+steps:
+  # 401: the protocol's shape (k78); OpenAI keeps its own
+  - chat: { protocol: anthropic, model: broken, prompt: x }
+    expect:
+      status: 401
+      json: { type: error, 'error.type': authentication_error, 'error.message': unauthorized }
+  - chat: { protocol: ollama, model: broken, prompt: x }
+    expect:
+      status: 401
+      json: { error: unauthorized }
+  - chat: { protocol: openai, model: broken, prompt: x }
+    expect:
+      status: 401
+      json: { 'error.message': unauthorized }
+  # 500 of a failed backend
+  - chat: { protocol: anthropic, model: broken, prompt: unknown prompt, xkey: sk-proxy-secret-0001 }
+    expect:
+      status: 500
+      json: { type: error, 'error.type': api_error }
+      body_like: 'No Reaction'
+  - chat: { protocol: ollama, model: broken, prompt: unknown prompt, bearer: sk-proxy-secret-0001 }
+    expect:
+      status: 500
+      body_like: '^\{"error":"[^"]*No Reaction'
+  # streamed: the backend fails before its first chunk, so the status is still free
+  - chat: { protocol: anthropic, model: broken, prompt: unknown prompt, xkey: sk-proxy-secret-0001, stream: true }
+    expect:
+      status: 500
+      json: { type: error, 'error.type': api_error }
+      body_like: 'No Reaction'
+  - chat: { protocol: ollama, model: broken, prompt: unknown prompt, bearer: sk-proxy-secret-0001, stream: true }
+    expect:
+      status: 500
+      body_like: '^\{"error":"[^"]*No Reaction'
+  - chat: { protocol: openai, model: broken, prompt: unknown prompt, bearer: sk-proxy-secret-0001, stream: true }
+    expect:
+      status: 500
+      body_like: '^\{"error":\{"message":"[^"]*No Reaction'
+  - chat: { protocol: anthropic, model: broken-plain, prompt: unknown prompt, xkey: sk-proxy-secret-0001, stream: true }
+    expect:
+      status: 500
+      json: { type: error, 'error.type': api_error }
+  - chat: { protocol: ollama, model: broken-plain, prompt: unknown prompt, bearer: sk-proxy-secret-0001, stream: true }
+    expect:
+      status: 500
+      body_like: '^\{"error":"[^"]*No Reaction'
+  # the failures did not poison the server
+  - chat: { protocol: anthropic, model: broken, prompt: known, xkey: sk-proxy-secret-0001, stream: true }
+    expect: { text: ok, ended: 1 }

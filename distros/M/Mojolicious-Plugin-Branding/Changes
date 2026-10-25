@@ -1,0 +1,18 @@
+0.002  2026-10-25 00:38:32 CEST
+   - BREAKING: individual branding is configured with "paths" (one
+     directory per brand, named after it) instead of "bases"; options
+     "mapping", "helper" and "helper_name" are gone, as well as the
+     "brand" helper. The application now puts the brand in the stash
+     (new option "stash_key", default "variant") from a before_dispatch
+     hook registered before the plugin.
+   - Branded static files are no longer served when an earlier hook
+     already rendered a response (e.g. a 401 or a redirect).
+   - Brand templates are resolved to the checked file, never looked up
+     again across other directories.
+   - Brand templates can use a handler different from the application's.
+   - A brand can be spread across several directories, and the plugin
+     can be registered more than once.
+   - Invalid configuration items croak with clearer messages.
+
+0.001  2026-10-24 14:52:04 CEST
+   - Initial release

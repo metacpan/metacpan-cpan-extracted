@@ -3,7 +3,7 @@ package Database::BI::Insights;
 use strict;
 use warnings;
 
-our $VERSION = '0.016.0';
+our $VERSION = '0.017.0';
 
 use Database::BI::Util  qw(urlencode);
 use List::Util          qw(sum min max);

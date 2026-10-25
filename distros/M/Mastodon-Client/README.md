@@ -70,8 +70,8 @@ new features in version 2, would be greatfully appreciated.
 - **user\_agent**
 
     The user agent to use for the requests. Defaults to an instance of
-    [HTTP::Thin](https://metacpan.org/pod/HTTP::Thin). It is expected to have a `request` method that
-    accepts [HTTP::Request](https://metacpan.org/pod/HTTP::Request) objects.
+    [HTTP::Thin](https://metacpan.org/pod/HTTP%3A%3AThin). It is expected to have a `request` method that
+    accepts [HTTP::Request](https://metacpan.org/pod/HTTP%3A%3ARequest) objects.
 
 - **coerce\_entities**
 
@@ -80,7 +80,7 @@ new features in version 2, would be greatfully appreciated.
     make the objects easier to use.
 
     Although this does require some additional processing, the coercion is done by
-    [Type::Tiny](https://metacpan.org/pod/Type::Tiny), so the impact is negligible.
+    [Type::Tiny](https://metacpan.org/pod/Type%3A%3ATiny), so the impact is negligible.
 
     For now, it defaults to **false** (but this will likely change, so I recommend
     you use it).
@@ -665,7 +665,7 @@ of updates. To do this, there is the **stream()** method.
     the particular tag.
 
     For more details on how to use this object, see the documentation for
-    [Mastodon::Listener](https://metacpan.org/pod/Mastodon::Listener).
+    [Mastodon::Listener](https://metacpan.org/pod/Mastodon%3A%3AListener).
 
     Accessing streaming public timeline does not require authentication.
 
@@ -689,7 +689,7 @@ remaining parts will be filled-in appropriately internally.
 
     Query parameters can be passed as part of the [URI](https://metacpan.org/pod/URI) object, but it is not
     recommended you do so, since Mastodon has expectations for array parameters
-    that do not meet those of eg. [URI::QueryParam](https://metacpan.org/pod/URI::QueryParam). It will be easier and safer
+    that do not meet those of eg. [URI::QueryParam](https://metacpan.org/pod/URI%3A%3AQueryParam). It will be easier and safer
     if any additional parameters are passed as a hash reference, which will be
     added to the URL before the request is sent.
 

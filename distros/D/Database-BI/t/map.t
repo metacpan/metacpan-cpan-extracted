@@ -605,9 +605,10 @@ subtest 'Leaflet assets and tiles can be self-hosted for an offline deployment' 
 	# A deployment with no outbound network access serves the library and the
 	# tiles itself.  Every asset is a config key, and both the map page and a
 	# map card on a canvas have to use the configured copies rather than the CDN.
-	# These config keys were added in HTML::OSM 0.11; skip on older installs.
-	plan skip_all => 'HTML::OSM >= 0.11 required for asset URL overrides'
-		unless $HTML::OSM::VERSION >= 0.11;
+	# These config keys were added in HTML::OSM 0.11; skip on older installs
+	# (0.12 is the new minimum, so this guard is now effectively always true).
+	plan skip_all => 'HTML::OSM >= 0.12 required for asset URL overrides'
+		unless $HTML::OSM::VERSION >= 0.12;
 	local $t->app->config->{leaflet_js_url}                  = '/static/leaflet/leaflet.js';
 	local $t->app->config->{leaflet_css_url}                 = '/static/leaflet/leaflet.css';
 	local $t->app->config->{leaflet_cluster_js_url}          = '/static/leaflet/leaflet.markercluster.js';
@@ -652,9 +653,92 @@ subtest 'Leaflet assets and tiles can be self-hosted for an offline deployment' 
 	unlike($canvas, qr{unpkg\.com}, 'and asks the CDN for nothing');
 };
 
+subtest 'Nominatim search box is suppressed (search => 0 set by _map_data)' => sub {
+	# HTML::OSM >= 0.12 added the search => 0 constructor param; _map_data always
+	# passes it so no keystrokes leave the server.
+	plan skip_all => 'HTML::OSM >= 0.12 required for search => 0'
+		unless $HTML::OSM::VERSION >= 0.12;
+
+	$t->get_ok(_url(l => $places_spec, lat => 'lat', lon => 'lon'))->status_is(200);
+	my $body = $t->tx->res->body;
+	unlike($body, qr/id="search-box"/, 'no search input in the map page');
+	unlike($body, qr/id="clear-search-button"/, 'no clear-search button either');
+	unlike($body, qr/nominatim\.openstreetmap\.org/, 'no Nominatim fetch in the JS');
+	like($body, qr/id="reset-button"/, 'the Reset Map button is still there');
+};
+
+subtest 'max_zoom= caps the tile layer zoom' => sub {
+	plan skip_all => 'HTML::OSM >= 0.12 required for max_zoom'
+		unless $HTML::OSM::VERSION >= 0.12;
+
+	$t->get_ok(_url(l => $places_spec, lat => 'lat', lon => 'lon', max_zoom => 16))
+		->status_is(200);
+	like($t->tx->res->body, qr/maxZoom:\s*16/, '?max_zoom=16 sets maxZoom: 16 on the tile layer');
+
+	$t->get_ok(_url(l => $places_spec, lat => 'lat', lon => 'lon', max_zoom => 0))
+		->status_is(200);
+	like($t->tx->res->body, qr/maxZoom:\s*0/, '?max_zoom=0 is a legal value (zero is valid)');
+
+	$t->get_ok(_url(l => $places_spec, lat => 'lat', lon => 'lon'))
+		->status_is(200);
+	unlike($t->tx->res->body, qr/maxZoom/, 'absent max_zoom= means no maxZoom option emitted');
+};
+
+subtest 'max_zoom= can come from config (map_max_zoom)' => sub {
+	plan skip_all => 'HTML::OSM >= 0.12 required for max_zoom'
+		unless $HTML::OSM::VERSION >= 0.12;
+
+	local $t->app->config->{map_max_zoom} = 18;
+	$t->get_ok(_url(l => $places_spec, lat => 'lat', lon => 'lon'))->status_is(200);
+	like($t->tx->res->body, qr/maxZoom:\s*18/,
+		'map_max_zoom config key sets maxZoom when no URL param is supplied');
+
+	# URL param overrides config
+	$t->get_ok(_url(l => $places_spec, lat => 'lat', lon => 'lon', max_zoom => 14))
+		->status_is(200);
+	like($t->tx->res->body, qr/maxZoom:\s*14/,
+		'URL ?max_zoom= takes precedence over the config value');
+};
+
 subtest 'An unopenable source is a 404' => sub {
 	$t->get_ok(_url(l => 'path:/nonexistent/nothing.csv', loc => 'place'))
 		->status_is(404);
+};
+
+subtest 'Dashboard map panel exposes heat layer and zoom controls' => sub {
+	# The map panel in dashboard.html.tt should contain the new options row
+	# with the heatmap checkbox, weight column select, and zoom input.
+	$t->get_ok('/open?path=' . url_escape($places_csv))->status_is(200);
+	my $dash = $t->tx->res->body;
+	like($dash, qr/id="map-opts-row"/, 'map options row is in the panel');
+	like($dash, qr/id="map-heat-chk"/, 'heatmap layer checkbox is present');
+	like($dash, qr/id="map-weight-sel"/, 'heatmap weight column select is present');
+	like($dash, qr/id="map-zoom-inp"/, 'initial zoom input is present');
+	# Weight field starts hidden; it is shown when heatmap is checked
+	like($dash, qr/id="map-weight-field" hidden/, 'weight field starts hidden');
+};
+
+subtest 'Map panel colour-by select includes categorical columns' => sub {
+	# Before the fix, buildColorSelect filtered to numeric-only columns.
+	# Categorical columns (region) should now appear so eq/ne rules work.
+	# virginia_counties.csv has a non-numeric "region" column.
+	my $vc = File::Spec->catfile('data', 'virginia_counties.csv');
+	SKIP: {
+		skip 'data/virginia_counties.csv not found', 2 unless -f $vc;
+		$t->get_ok('/open?path=' . url_escape($vc))->status_is(200);
+		my $page = $t->tx->res->body;
+		# The color select options are built dynamically in JS from table headers,
+		# but the panel HTML must exist with the correct structure.
+		like($page, qr/id="map-color-sel"/, 'colour-by select is in the page');
+		# The JS function no longer filters to numeric-only: verify the
+		# numeric-guard line is absent from buildColorSelect specifically.
+		my $tpl = do { local $/; open(my $fh, '<', 'templates/web/en/dashboard.html.tt') or die; <$fh> };
+		# Extract just the buildColorSelect function body by finding it and
+		# the closing brace of the function's forEach callback.
+		my ($color_fn) = ($tpl =~ /(function buildColorSelect.*?^  \})/ms);
+		unlike($color_fn // '', qr/isNaN.*parseAccounting/,
+			'buildColorSelect no longer has the numeric-only filter');
+	}
 };
 
 done_testing();

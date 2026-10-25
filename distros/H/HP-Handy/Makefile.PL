@@ -5,7 +5,7 @@ use ExtUtils::MakeMaker;
 
 my %args = (
     'NAME'      => q{HP::Handy},
-    'VERSION'   => q{0.01},
+    'VERSION'   => q{0.02},
     'ABSTRACT'  => q{A tiny Jinja2-compatible template engine for Perl 5.5.3+},
     'PREREQ_PM' => {
         'Carp' => '0',
@@ -46,11 +46,11 @@ if ($ExtUtils::MakeMaker::VERSION >= 6.48) {
         'provides' => {
             'HP::Handy' => {
                 'file'    => 'lib/HP/Handy.pm',
-                'version' => '0.01',
+                'version' => '0.02',
             },
             'HP::Handy::SafeString' => {
                 'file'    => 'lib/HP/Handy.pm',
-                'version' => '0.01',
+                'version' => '0.02',
             }
         },
     };

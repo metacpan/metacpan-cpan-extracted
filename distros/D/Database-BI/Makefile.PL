@@ -52,10 +52,11 @@ WriteMakefile(
 		'MIME::Base64'		=> '3.11',	# For encode_base64url/decode_base64url in share tokens (Phase 4.6)
 		'Readonly'		=> 0,
 		'Socket'	=> '2.010',
+		'Excel::Writer::XLSX'	=> '1.07',
 		'POSIX'			=> 0,		# For floor/ceil in Calc.pm (core module, listed for completeness)
 		'Spreadsheet::ParseXLSX'	=> 0,
 		'Sub::Protected' => 0.03,
-		'Excel::Writer::XLSX'	=> '1.07',
+		'version'        => '0.77',
 	}, TEST_REQUIRES => {
 		'DBD::CSV' => 0,
 		'Encode' => 0,
@@ -94,7 +95,7 @@ WriteMakefile(
 					'Geo::Coder::Free' => '0.48',
 					# Rendering the map itself (Phase 6.1).  Also runtime-required: the
 					# rest of the application installs, starts and tests without it.
-					'HTML::OSM' => '0.11'
+					'HTML::OSM' => '0.12'
 				}
 			}, test => {
 				recommends => {

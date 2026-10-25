@@ -31,6 +31,7 @@
          "requires" : {
             "HTTP::Request" : "6.00",
             "JSON::MaybeXS" : "1.004000",
+            "LWP::Protocol::https" : "0",
             "LWP::UserAgent" : "6.00",
             "Moo" : "2.000000",
             "Safe::Isa" : "1.000005",
@@ -49,71 +50,71 @@
    "provides" : {
       "WWW::Crawl4AI" : {
          "file" : "lib/WWW/Crawl4AI.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       },
       "WWW::Crawl4AI::Attempt" : {
          "file" : "lib/WWW/Crawl4AI/Attempt.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       },
       "WWW::Crawl4AI::Client" : {
          "file" : "lib/WWW/Crawl4AI/Client.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       },
       "WWW::Crawl4AI::DeepCrawlIterator" : {
          "file" : "lib/WWW/Crawl4AI/DeepCrawlIterator.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       },
       "WWW::Crawl4AI::Detect" : {
          "file" : "lib/WWW/Crawl4AI/Detect.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       },
       "WWW::Crawl4AI::Error" : {
          "file" : "lib/WWW/Crawl4AI/Error.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       },
       "WWW::Crawl4AI::Markdown" : {
          "file" : "lib/WWW/Crawl4AI/Markdown.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       },
       "WWW::Crawl4AI::Request" : {
          "file" : "lib/WWW/Crawl4AI/Request.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       },
       "WWW::Crawl4AI::Result" : {
          "file" : "lib/WWW/Crawl4AI/Result.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       },
       "WWW::Crawl4AI::Strategy" : {
          "file" : "lib/WWW/Crawl4AI/Strategy.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       },
       "WWW::Crawl4AI::Strategy::Browser" : {
          "file" : "lib/WWW/Crawl4AI/Strategy/Browser.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       },
       "WWW::Crawl4AI::Strategy::Callback" : {
          "file" : "lib/WWW/Crawl4AI/Strategy/Callback.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       },
       "WWW::Crawl4AI::Strategy::CloakBrowser" : {
          "file" : "lib/WWW/Crawl4AI/Strategy/CloakBrowser.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       },
       "WWW::Crawl4AI::Strategy::Plain" : {
          "file" : "lib/WWW/Crawl4AI/Strategy/Plain.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       },
       "WWW::Crawl4AI::Strategy::Proxy" : {
          "file" : "lib/WWW/Crawl4AI/Strategy/Proxy.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       },
       "WWW::Crawl4AI::Strategy::Stealth" : {
          "file" : "lib/WWW/Crawl4AI/Strategy/Stealth.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       },
       "WWW::Crawl4AI::StrategyChain" : {
          "file" : "lib/WWW/Crawl4AI/StrategyChain.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       }
    },
    "release_status" : "stable",
@@ -128,7 +129,7 @@
          "web" : "https://github.com/Getty/p5-www-crawl4ai"
       }
    },
-   "version" : "0.006",
+   "version" : "0.007",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.040001"
@@ -154,6 +155,11 @@
             },
             "name" : "@Author::GETTY/Git::GatherDir",
             "version" : "2.052"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::GatherAgentContext",
+            "name" : "@Author::GETTY/GatherAgentContext",
+            "version" : "0.001"
          },
          {
             "class" : "Dist::Zilla::Plugin::ManifestSkip",
@@ -484,7 +490,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "0.006",
+                  "tag" : "0.007",
                   "tag_format" : "%v",
                   "tag_message" : "v%V"
                },
@@ -638,7 +644,7 @@
    },
    "x_authority" : "cpan:GETTY",
    "x_generated_by_perl" : "v5.40.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.52",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.53",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

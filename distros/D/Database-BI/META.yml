@@ -33,7 +33,7 @@ no_index:
     - inc
 recommends:
   Geo::Coder::Free: '0.48'
-  HTML::OSM: '0.11'
+  HTML::OSM: '0.12'
 requires:
   CGI::Info: '0'
   CGI::Lingua: '0.85'
@@ -72,8 +72,9 @@ requires:
   Spreadsheet::ParseXLSX: '0'
   Sub::Protected: '0.03'
   perl: '5.020000'
+  version: '0.77'
 resources:
   bugtracker: https://github.com/nigelhorne/Database-BI/issues
   repository: https://github.com/nigelhorne/Database-BI.git
-version: v0.016.0
+version: 0.017.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

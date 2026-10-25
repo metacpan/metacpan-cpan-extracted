@@ -1,0 +1,33 @@
+
+https://chatgpt.com/g/g-p-6a6d4b35638c8191989443b3cee06f65-nama/c/6ab427a0-3294-83e8-82b7-eb0d6ff46c32
+
+To make a unix shell
+
+In addition to filename and executable command completion,  and history, what other features to serve as a shell, this module
+￼
+ChatGPT said:
+Beyond completion and history, I’d prioritize these features for Tickit::Terminal::Prompt:
+
+Reliable editing: Ctrl-A/E, word movement and deletion, Ctrl-U/K, and a clear rule for Ctrl-D on an empty line.
+
+Persistent history: search with Ctrl-R, avoid consecutive duplicates, and let the application choose where history is saved.
+
+Output while editing: let background output arrive without losing the command being typed or its cursor position.
+
+Terminal handoff: let a child program such as less, vim, or an interactive command take over the terminal, then redraw the prompt when it exits.
+
+Resize, suspend, and exit behavior: preserve the current command through a resize; handle Ctrl-Z and Ctrl-C consistently; restore the terminal on errors.
+
+Long commands: horizontal scrolling or wrapping, with the prompt and cursor kept visible.
+
+I’d keep command parsing and execution in the application
+through on_enter. 
+
+The module could add a small with_terminal(sub { ... }) API
+for terminal handoff and a history interface.  That would
+make it useful as a shell front end without tying it to one
+command grammar. 
+
+I’d tackle output while editing and terminal handoff next,
+since both affect whether ordinary shell commands feel
+usable.

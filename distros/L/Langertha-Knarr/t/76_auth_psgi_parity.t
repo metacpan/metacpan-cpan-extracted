@@ -10,6 +10,9 @@ use Test2::V0;
 # anonymous exemption (A2A agent card), same 401 status/content type/body.
 # One table drives both transports so they cannot drift apart again, and
 # a streaming request must be rejected before the handler's stream starts.
+# The 401 body is in the route's protocol's error shape (k78): Anthropic's
+# typed error, Ollama's string, the OpenAI wire's object for every other
+# protocol and for Knarr's own manifest route.
 
 BEGIN {
   eval { require Plack::Test; require HTTP::Request::Common; 1 }
@@ -68,6 +71,24 @@ my %credentials = (
 );
 my %credential_ok = map { $_ => 1 } qw( bearer bearer_lc api_key );
 my %anonymous_action = ( a2a_card => 1 );
+
+# The 401 body by the route's protocol (k78); undef = no protocol.
+my %unauthorized_body = (
+  Anthropic => { type => 'error', error => { type => 'authentication_error', message => 'unauthorized' } },
+  Ollama    => { error => 'unauthorized' },
+  # JSON-RPC (k79); the request is not parsed before the key is checked, its
+  # id is read off the body (k80; every A2A request of this test has id 1)
+  A2A       => { jsonrpc => '2.0', id => 1,
+    error => { code => -32600, message => 'unauthorized', data => { status => 401 } } },
+  # ACP's Error object and AG-UI's RUN_ERROR event (k80)
+  ACP       => { code => 'invalid_input', message => 'unauthorized' },
+  AGUI      => { type => 'RUN_ERROR', code => 'invalid_input', message => 'unauthorized' },
+);
+sub unauthorized_body {
+  my ($route) = @_;
+  my ($name) = ( ref( $route->{protocol} ) // '' ) =~ /::(\w+)\z/;
+  return $unauthorized_body{ $name // '' } // { error => { message => 'unauthorized' } };
+}
 
 my $loop = IO::Async::Loop->new;
 my $http = Net::Async::HTTP->new( max_connections_per_host => 0 );
@@ -135,7 +156,7 @@ for my $route (@routes) {
           is( $psgi->header('Content-Type'), $native->header('Content-Type'),
             "$cell: same 401 content type" );
           is( $psgi->decoded_content, $native->decoded_content, "$cell: same 401 body" );
-          is( eval { $json->decode( $psgi->decoded_content ) }, { error => { message => 'unauthorized' } },
+          is( eval { $json->decode( $psgi->decoded_content ) }, unauthorized_body($route),
             "$cell: 401 body shape" );
           is( \%handler_calls, {}, "$cell: handler never reached (no stream started)" );
         }

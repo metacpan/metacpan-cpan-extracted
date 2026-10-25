@@ -28,6 +28,7 @@ MANIFEST			This list of files
 MANIFEST.SKIP
 README.md
 script/bi-alert
+script/bi-geocode
 script/database-bi
 t/alert.t
 t/basic.t

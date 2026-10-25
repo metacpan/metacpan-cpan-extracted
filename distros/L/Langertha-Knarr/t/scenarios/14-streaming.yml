@@ -1,0 +1,36 @@
+title: Token-by-token streaming from the backend reaches the client in its protocol and ends with the exact end marker
+setup:
+  config:
+    models:
+      live: { engine: KnarrVirtual, model: v-live }
+  backends:
+    v-live:
+      engine_args: { stream_chunk_size: 4 }
+      rules:
+        "Hello": { answer: "Hi there friend" }
+        "Weather?": { tool_calls: [ [ get_weather, { city: Berlin } ] ] }
+steps:
+  # 15 characters in pieces of 4: four content frames, joined to the whole answer
+  - chat: { protocol: openai, model: live, prompt: Hello, stream: true }
+    expect: { text: Hi there friend, chunks: 4, ended: 1, finish_reason: stop }
+    backend:
+      v-live: { requests: 1, body: { stream: true } }
+  - chat: { protocol: anthropic, model: live, prompt: Hello, stream: true }
+    expect: { text: Hi there friend, chunks: 4, ended: 1, finish_reason: end_turn }
+  - chat: { protocol: ollama, model: live, prompt: Hello, stream: true }
+    expect: { text: Hi there friend, chunks: 4, ended: 1, finish_reason: stop }
+  # a tool call streams as its protocol's fragments and reassembles to the same call
+  - chat: { protocol: openai, model: live, prompt: "Weather?", stream: true, tools: [ { name: get_weather } ] }
+    expect:
+      tool_calls: [ { name: get_weather, args: { city: Berlin } } ]
+      finish_reason: tool_calls
+      ended: 1
+  - chat: { protocol: anthropic, model: live, prompt: "Weather?", stream: true, tools: [ { name: get_weather } ] }
+    expect:
+      tool_calls: [ { name: get_weather, args: { city: Berlin } } ]
+      finish_reason: tool_use
+      ended: 1
+  - chat: { protocol: ollama, model: live, prompt: "Weather?", stream: true, tools: [ { name: get_weather } ] }
+    expect:
+      tool_calls: [ { name: get_weather, args: { city: Berlin } } ]
+      ended: 1

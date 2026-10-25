@@ -1,6 +1,6 @@
 package Langertha::Knarr::PSGI::FakeReq;
 # ABSTRACT: Header access on a PSGI environment, shaped like a Net::Async::HTTP::Server request
-our $VERSION = '1.102';
+our $VERSION = '1.103';
 use strict;
 use warnings;
 
@@ -52,7 +52,7 @@ Langertha::Knarr::PSGI::FakeReq - Header access on a PSGI environment, shaped li
 
 =head1 VERSION
 
-version 1.102
+version 1.103
 
 =head1 DESCRIPTION
 

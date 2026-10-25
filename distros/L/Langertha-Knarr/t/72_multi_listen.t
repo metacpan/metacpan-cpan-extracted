@@ -16,29 +16,22 @@ my $handler = Langertha::Knarr::Handler::Code->new(
   code => sub { 'multi-listen-ok' },
 );
 
-# Allocate two free ports up-front by binding then closing — this lets us
-# pass concrete ports to Knarr and connect to known addresses afterward.
-sub free_port {
-  require IO::Socket::INET;
-  my $s = IO::Socket::INET->new( Listen => 1, LocalAddr => '127.0.0.1', LocalPort => 0 )
-    or die "free_port: $!";
-  my $p = $s->sockport;
-  $s->close;
-  return $p;
-}
-my @ports = ( free_port(), free_port() );
-isnt( $ports[0], $ports[1], 'two distinct free ports allocated' );
-
+# Both listen sockets ask the kernel for port 0 and are read back from the
+# bound sockets: no port is picked first and bound later, where another test
+# running in parallel (-j) can take it in between (k79).
 my $knarr = Langertha::Knarr->new(
   handler => $handler,
   loop    => $loop,
   listen  => [
-    { host => '127.0.0.1', port => $ports[0] },
-    "127.0.0.1:$ports[1]",
+    { host => '127.0.0.1', port => 0 },
+    '127.0.0.1:0',
   ],
 );
 $knarr->start;
 ok( $knarr->_server, 'server bound on multiple addresses' );
+my @ports = map { $_->read_handle->sockport } @{ $knarr->_servers };
+is( scalar @ports, 2, 'two listen sockets' );
+isnt( $ports[0], $ports[1], 'two distinct ports from the kernel' );
 
 my $http = Net::Async::HTTP->new;
 $loop->add($http);

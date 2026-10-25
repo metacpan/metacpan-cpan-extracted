@@ -1,5 +1,43 @@
 Revision history for Database-BI
 
+0.017.0	Sat Oct 24 06:12:53 PM EDT 2026
+	[ New Features ]
+	- GET /geo/list, POST /geo/save, POST /geo/delete: coordinate-column
+	  preference CRUD.  Saves the user's choice of lat=, lon=, or loc=
+	  column for a given l= spec in .bi/models.json under geo.<spec>.columns.
+	  The Map panel now fetches /geo/list on open and pre-populates the
+	  column selects from the saved preferences, falling back to the existing
+	  name-heuristic when none are saved.  A "Remember columns" checkbox
+	  fires POST /geo/save on form submit.
+	- GET /map: new optional URL params.
+	  ?zoom=N (0-19): passes an initial zoom level to HTML::OSM instead of
+	    auto-fitting to the marker bounds.
+	  ?tiles=name: selects a named tile source from the tile_sources config
+	    key (unknown name returns 400).  Arbitrary URLs are never accepted.
+	  ?heat=1: adds a Leaflet heatmap layer over the regular markers using
+	    HTML::OSM->add_heatmap (present in HTML::OSM >= 0.11).
+	  ?weight=<col>: numeric column that drives heatmap point intensity;
+	    values are normalised to [0,1]; defaults to equal weight 1 when
+	    absent.
+	  ?max_zoom=N (0-28): sets the Leaflet tile layer maxZoom option so the
+	    user cannot zoom past what the tile server covers.  Also readable
+	    from the map_max_zoom config key; the URL param takes precedence.
+	    Requires HTML::OSM >= 0.12.
+	- GET /map: Nominatim live-search box is now suppressed (search => 0
+	  passed to HTML::OSM).  The Reset Map button is retained; only the
+	  search input and Nominatim egress are removed.  Requires HTML::OSM >=
+	  0.12.
+	- script/bi-geocode: new CLI warming script.
+	  Opens a dataset spec, geocodes every distinct value of the named
+	  column, and writes the resolved coordinates into the shared geocode
+	  cache in .bi/models.json.  Idempotent: a second run against a warm
+	  cache resolves zero places and writes nothing.  Suitable for cron.
+	  Flags: --spec, --col, --data-dir, --model-dir, --openaddr, --region,
+	  --dry-run, --verbose.
+	[ Dependency changes ]
+	- HTML::OSM minimum bumped from 0.11 to 0.12 (search => 0 and max_zoom
+	  constructor params; tile_url was already present in 0.11).
+
 0.016.0	Fri Oct 23 08:58:00 AM EDT 2026
 	[ New Features ]
 	- POST /api/ask: Natural language to analysis spec.

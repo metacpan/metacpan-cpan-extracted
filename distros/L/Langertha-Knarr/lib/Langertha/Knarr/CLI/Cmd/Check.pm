@@ -1,5 +1,5 @@
 package Langertha::Knarr::CLI::Cmd::Check;
-our $VERSION = '1.102';
+our $VERSION = '1.103';
 # ABSTRACT: Validate Knarr configuration file
 use Moo;
 with 'Langertha::Knarr::CLI::Role::GlobalOptions';
@@ -30,6 +30,28 @@ sub execute {
     exit 1;
   }
 
+  if ( $config->token_auth ) {
+    # The stack builds the token store, which needs DBD::Pg; nothing connects.
+    require Langertha::Knarr::Stack;
+    unless ( eval { Langertha::Knarr::Stack->new( config => $config )->build; 1 } ) {
+      ( my $err = $@ ) =~ s/ at \S+ line \d+\.?\n?\z//;
+      print "Configuration INVALID:\n  - $err\n";
+      exit 1;
+    }
+    print "Configuration OK\n";
+    print "  File: $config_file\n";
+    print "  Listen: ", join(', ', @{$config->listen}), "\n";
+    print "  Token auth: ", $config->token_auth->{backend},
+      " (routes: ", join(', ', sort keys %{ $config->routes }), ")\n";
+    print "  Models: from the tokens (no static list)\n";
+    print "  Admin routes: ", ($config->has_admin_key ? 'enabled' : 'disabled'), "\n";
+    my $lf = $config->langfuse;
+    my $lf_pub = $lf->{public_key} // $ENV{LANGFUSE_PUBLIC_KEY};
+    my $lf_sec = $lf->{secret_key} // $ENV{LANGFUSE_SECRET_KEY};
+    print "  Langfuse: ", ( $lf_pub && $lf_sec ? 'enabled' : 'disabled' ), "\n";
+    return;
+  }
+
   my $models = $config->models;
   my $model_count = scalar keys %$models;
   print "Configuration OK\n";
@@ -39,6 +61,9 @@ sub execute {
   print "  Default engine: ", ($config->default_engine ? $config->default_engine->{engine} : 'none'), "\n";
   print "  Auto-discover: ", ($config->auto_discover ? 'enabled' : 'disabled'), "\n";
   print "  Proxy auth: ", ($config->has_proxy_api_key && $config->proxy_api_key ? 'enabled' : 'disabled'), "\n";
+  # Whether, never which key (k75)
+  print "  Admin routes: ", ($config->has_admin_key ? 'enabled' : 'disabled'), "\n";
+  print "  Remote config: ", ($config->remote_config ? 'yes (a setup may arrive by PUT /knarr/admin/config)' : 'no'), "\n";
 
   # Check Langfuse
   my $lf = $config->langfuse;
@@ -66,14 +91,16 @@ Langertha::Knarr::CLI::Cmd::Check - Validate Knarr configuration file
 
 =head1 VERSION
 
-version 1.102
+version 1.103
 
 =head1 DESCRIPTION
 
 Implements the C<knarr check> command. Parses the config file, runs
 L<Langertha::Knarr::Config/validate>, and prints a status summary including
 listen addresses, model count, auto-discover state, proxy auth state, and
-Langfuse tracing state. Exits with a non-zero code on invalid config.
+Langfuse tracing state. With a C<token_auth:> section it reports the backend and
+routes (never the DSN, user, password or relation) instead of models and proxy
+auth, and fails when the backend's driver (C<DBD::Pg>) is missing. Exits with a non-zero code on invalid config.
 
 See L<knarr> for option details and L<Langertha::Knarr::Config> for the
 configuration file format.

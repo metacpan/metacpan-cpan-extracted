@@ -5,8 +5,7 @@ use warnings;
 use Test::Most tests => 26;
 use Test::NoWarnings;
 use Sys::Hostname;
-use lib 't/lib';
-use MyLogger;
+use Test::Log::Abstraction;
 
 BEGIN {
 	use_ok('CGI::Info');
@@ -17,7 +16,7 @@ HOSTNAMES: {
 	delete $ENV{'SERVER_NAME'};
 	$ENV{'SERVER_PORT'} = 80;
 
-	my $i = new_ok('CGI::Info' => [ logger => MyLogger->new() ]);
+	my $i = new_ok('CGI::Info' => [ logger => Test::Log::Abstraction->new() ]);
 
 	my $hostname = hostname;
 
@@ -58,7 +57,7 @@ HOSTNAMES: {
 	delete $ENV{'SCRIPT_URI'};
 	$ENV{'SERVER_NAME'} = 'www.bandsman.co.uk';
 
-	$i = new_ok('CGI::Info' => [{ logger => MyLogger->new() }]);
+	$i = new_ok('CGI::Info' => [{ logger => Test::Log::Abstraction->new() }]);
 	ok($i->cgi_host_url() eq 'http://www.bandsman.co.uk');
 	ok($i->host_name() eq 'www.bandsman.co.uk');
 	# Check calling twice return path
@@ -75,7 +74,7 @@ HOSTNAMES: {
 
 	$ENV{'SERVER_PORT'} = 80;
 
-	$i = new_ok('CGI::Info' => [ logger => MyLogger->new() ]);
+	$i = new_ok('CGI::Info' => [ logger => Test::Log::Abstraction->new() ]);
 	ok($i->cgi_host_url() eq 'http://www.bandsman.co.uk');
 	ok($i->host_name() eq 'www.bandsman.co.uk');
 	# Check calling twice return path

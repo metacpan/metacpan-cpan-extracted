@@ -107,14 +107,20 @@ sub reap {
 
 # The server runs in its own process, forked before any loop exists here.
 # $args{ready}, when given, tells from the port when the server is up
-# (default: ask answers); $args{class} replaces Langertha::Knarr.
+# (default: ask answers); $args{class} replaces Langertha::Knarr;
+# $args{stderr}, a file, takes the server's stderr -- for a server that is
+# meant to fail, so its complaint is checked instead of printed (k79).
 sub start_server {
   my (%args) = @_;
   my $ready = delete $args{ready} // \&ask;
   my $class = delete $args{class} // 'Langertha::Knarr';
+  my $stderr = delete $args{stderr};
   my $port = free_port();
   my $pid = fork // die "fork: $!";
   unless ($pid) {
+    if ( defined $stderr ) {
+      open STDERR, '>>', $stderr or die "stderr to $stderr: $!";
+    }
     my $ok = eval {
       $class->new(
         handler => Langertha::Knarr::Handler::Code->new( code => sub {
@@ -453,18 +459,23 @@ subtest 'a restart that cannot fork is retried, the others keep serving' => sub 
 subtest 'a first worker that cannot fork is fatal' => sub {
   my $log = path( tempdir( CLEANUP => 1 ), 'forks' );
   $log->touch;
+  my $err = path( $log->parent, 'stderr' );
   my ($super) = start_server(
     class     => 'TestForkKnarr',
     workers   => 2,
     fork_log  => "$log",
     fork_plan => { 2 => 'fail' },
     ready     => sub { 1 },
+    stderr    => "$err",
   );
   my $status = reap( $super, 20 );
   is( defined $status ? $status >> 8 : undef, 1, 'run() dies, the server exits with status 1' );
   my $first = forks($log)->{1};
   ok( $first, 'the first worker had started' );
   ok( !alive($first), '... and was stopped' ) if $first;
+  # The injected EAGAIN is the whole point of this subtest: the server says
+  # so on its stderr -- here, not on the test's (k79).
+  like( $err->slurp, qr/Cannot fork a worker: /, 'the server names the failed fork' );
 };
 
 subtest 'SIGTERM right after the fork ends only that worker' => sub {

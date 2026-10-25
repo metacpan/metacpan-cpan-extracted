@@ -1,6 +1,6 @@
 ---
 name: getty-git-usage
-description: "Use when committing, pushing, or landing work in a Getty repo — commit/push cadence, rebase vs merge, cleaning history before a PR, stacked branches, cutting a release. Commit wording: getty-git-commit-style."
+description: "Use when committing, pushing or landing work in a Getty repo — rebase vs merge, history cleanup, stacked branches, releases. Commit wording: getty-git-commit-style."
 ---
 
 # Git usage
@@ -41,12 +41,11 @@ where they are what makes `git bisect`, a one-commit revert and a cherry-pick po
 at all. Work parked in a working tree until it is "done" throws all three away and
 lands as a lump nobody can unpick later.
 
-**A skill file that arrived by hardlink is its own commit.** Anything under
-`.claude/skills/` is shared from the repo that owns it, so an edit made anywhere lands
-in every working tree linking it — as a change nobody made *here*. Commit it in this
-repo too, on its own, never folded into a code commit: it is someone else's edit
-passing through, and a shared commit would file it under a message that does not
-describe it.
+**Installed skills are not committed.** skilletor keeps the shared skills under
+`.claude/skills/` out of git; a repo commits `.claude/skilletor.json`,
+`.claude/.gitignore` and the skills it owns. A shared skill git still tracks surfaces
+as a change after every edit to its source — untrack it
+(`git rm -r --cached .claude/skills/<name>`) instead of committing it.
 
 Conventional prefixes (`feat:`, `fix:`, `docs:`, `test:`, `ci:`, `chore:`, `refactor:`),
 always `--signoff`. The prefix is not decoration where a release workflow reads it:

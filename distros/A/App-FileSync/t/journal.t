@@ -17,12 +17,12 @@ my $env = TestSync->new_env();
 my $admin = App::FileSync::Admin->new(root => $env->{server});
 
 sub events {
-    my (%args) = @_;
-    return $admin->journal_read(repo => 'docs', %args);
+	my (%args) = @_;
+	return $admin->journal_read(repo => 'docs', %args);
 }
 
 sub actions {
-    return [ map { $_->{action} } @{ events(@_) } ];
+	return [ map { $_->{action} } @{ events(@_) } ];
 }
 
 # A quiet repo journals nothing beyond what happened.
@@ -42,10 +42,10 @@ my @push_events = grep { $_->{action} eq 'push' } @{$pushed};
 is(scalar @push_events, 2, 'both pushes are journalled');
 
 for my $event (@push_events) {
-    ok(defined $event->{ts} && $event->{ts} =~ /\A\d+\z/, "$event->{path} has a timestamp");
-    is($event->{client}, 'test-1', "$event->{path} names the client");
-    like($event->{sha256}, qr/\A[0-9a-f]{64}\z/, "$event->{path} records the hash");
-    ok($event->{size} > 0, "$event->{path} records the size");
+	ok(defined $event->{ts} && $event->{ts} =~ /\A\d+\z/, "$event->{path} has a timestamp");
+	is($event->{client}, 'test-1', "$event->{path} names the client");
+	like($event->{sha256}, qr/\A[0-9a-f]{64}\z/, "$event->{path} records the hash");
+	ok($event->{size} > 0, "$event->{path} records the size");
 }
 
 my ($session) = grep { $_->{action} eq 'session' } @{$pushed};
@@ -54,9 +54,9 @@ is($session->{pushed}, 2, 'the session summary counts the pushes');
 ok(!$session->{dry_run}, 'a real run is not marked as a dry run');
 
 is_deeply(
-    [ sort map { $_->{path} } @push_events ],
-    [ 'a.txt', 'dir/b.txt' ],
-    'the journalled paths are the ones that were pushed',
+	[ sort map { $_->{path} } @push_events ],
+	[ 'a.txt', 'dir/b.txt' ],
+	'the journalled paths are the ones that were pushed',
 );
 
 unlink $env->client_path('dir/b.txt');
@@ -67,7 +67,7 @@ my ($deleted) = grep { $_->{action} eq 'delete' } @{ events() };
 ok($deleted, 'the deletion is journalled');
 is($deleted->{path}, 'dir/b.txt', 'the deleted path is recorded');
 like($deleted->{trash}, qr{dir[/\\]b\.txt\z},
-    'the journal records where it was trashed');
+	'the journal records where it was trashed');
 
 # --- a conflict is journalled with both sides -----------------------------
 
@@ -83,11 +83,11 @@ ok($conflict, 'the conflict is journalled');
 is($conflict->{path}, 'a.txt', 'the conflicted path is named');
 is($conflict->{winner}, 'client', 'the newer client version won');
 like($conflict->{loser_name}, qr{a\.conflict-test-1-\d{8}T\d{6}Z\.txt\z},
-    'the conflict copy is named in the journal');
+	'the conflict copy is named in the journal');
 like($conflict->{winner_sha256}, qr/\A[0-9a-f]{64}\z/, 'the winner hash is recorded');
 like($conflict->{loser_sha256}, qr/\A[0-9a-f]{64}\z/, 'the loser hash is recorded');
 ok($conflict->{winner_mtime} > $conflict->{loser_mtime},
-    'both mtimes are recorded and the winner is the newer one');
+	'both mtimes are recorded and the winner is the newer one');
 
 my ($copy) = grep { $_->{action} eq 'conflict_copy' } @{ events() };
 ok($copy, 'the preserved copy is journalled');
@@ -100,11 +100,11 @@ is_deeply(events(since => time + 86_400), [], 'nothing happened in the future');
 ok(scalar @{ events(since => 1) } > 0, 'a past --since matches everything');
 is(scalar @{ events(limit => 2) }, 2, 'the limit is applied');
 is((events(limit => 2))->[1]{action}, (events())->[-1]{action},
-    'the limit keeps the newest events');
+	'the limit keeps the newest events');
 is_deeply(events(since => '2999-01-01'), [], 'a date --since is accepted');
 
 throws_ok { events(since => 'last tuesday') } qr/Bad --since/,
-    'a nonsensical --since is refused';
+	'a nonsensical --since is refused';
 
 # --- a dry run neither changes anything nor writes to the journal -------
 
@@ -123,8 +123,8 @@ ok($planned && $planned->{a} eq 'push', 'the dry run planned the push it did not
 
 my $store = App::FileSync::Store->new(root => $env->{server}, repo => 'docs');
 my $repo_lock = App::FileSync::Lock::acquire(
-    path     => $store->lock_path(),
-    nonblock => 1,
+	path     => $store->lock_path(),
+	nonblock => 1,
 );
 ok($repo_lock, 'the test holds the server repo lock');
 
@@ -162,21 +162,21 @@ ok(!$fatal->{locked}, 'and is not a lock refusal');
 my $successes = events(exits => [0]);
 ok(scalar @{$successes} > 0, '--exit 0 selects completed sessions');
 is(scalar(grep { $_->{action} ne 'session' } @{$successes}), 0,
-    'only session outcomes carry an exit code');
+	'only session outcomes carry an exit code');
 is(scalar(grep { ($_->{exit} || 0) != 0 } @{$successes}), 0,
-    'and all of them succeeded');
+	'and all of them succeeded');
 
 is_deeply([ map { $_->{action} } @{ events(exits => [2]) } ], ['session'],
-    '--exit 2 selects only the lock refusal');
+	'--exit 2 selects only the lock refusal');
 is_deeply([ map { $_->{client} } @{ events(exits => [1]) } ], ['stranger'],
-    '--exit 1 selects only the failed session');
+	'--exit 1 selects only the failed session');
 
 # A session that kept a conflict copy reports the client's warning exit code.
 my ($conflicted) = grep { ($_->{exit} || 0) == 3 } @{ events() };
 ok($conflicted, 'a session that applied a conflict is journalled with exit 3');
 is($conflicted->{conflicts}, 1, 'and carries the conflict count');
 is_deeply([ map { $_->{action} } @{ events(exits => [3]) } ], ['session'],
-    '--exit 3 selects the conflict session');
+	'--exit 3 selects the conflict session');
 
 is(scalar @{ events(exits => [1, 2]) }, 2, '--exit can be repeated');
 is_deeply(events(exits => [9]), [], 'an exit code with no events selects nothing');
@@ -185,11 +185,11 @@ is_deeply(events(exits => [9]), [], 'an exit code with no events selects nothing
 # shows a run that kept the copies, which is what --warnings selects.
 my $warning_events = events(warnings => 1);
 is_deeply([ map { $_->{action} } @{$warning_events} ], ['session'],
-    '--warnings selects only the conflict session');
+	'--warnings selects only the conflict session');
 is($warning_events->[0]{conflicts}, 1, 'which recorded a conflict');
 is($warning_events->[0]{exit}, 3, 'with the warning exit code');
 is(scalar @{ events(warnings => 1, exits => [0]) }, 0,
-    '--warnings composes with --exit');
+	'--warnings composes with --exit');
 
 # --- filesync-admin log ---------------------------------------------------
 
@@ -213,12 +213,12 @@ like($output, qr/No journal entries/, 'a filter that matches nothing says so');
 $output = qx{$perl $admin_bin --root $env->{server} log docs --exit 2 2>&1};
 is($?, 0, '--exit exits 0');
 like($output, qr/test-1\s+session\s+exit=2 locked .*holds the lock/,
-    '--exit 2 shows the lock refusal and its reason');
+	'--exit 2 shows the lock refusal and its reason');
 unlike($output, qr/\s+push\s+/, '--exit 2 hides the pushes');
 
 $output = qx{$perl $admin_bin --root $env->{server} log docs --exit 1 2>&1};
 like($output, qr/stranger\s+session\s+exit=1 .*not allowed on repo/,
-    '--exit 1 shows the failed session');
+	'--exit 1 shows the failed session');
 
 $output = qx{$perl $admin_bin --root $env->{server} log docs --exit 3 2>&1};
 like($output, qr/session\s+exit=3 .*conflicts=1/, '--exit 3 shows the conflict session');
@@ -258,14 +258,14 @@ like($output, qr/No journal entries/, '--warnings composes with --exit');
 $admin->repo_create(name => 'notes');
 my $notes_store = App::FileSync::Store->new(root => $env->{server}, repo => 'notes');
 $notes_store->journal({
-    client  => 'test-1',
-    action  => 'session',
-    result  => 'ok',
-    exit    => 0,
-    pulled  => 0,
-    pushed  => 0,
-    deleted => 0,
-    conflicts => 0,
+	client  => 'test-1',
+	action  => 'session',
+	result  => 'ok',
+	exit    => 0,
+	pulled  => 0,
+	pushed  => 0,
+	deleted => 0,
+	conflicts => 0,
 });
 
 $output = qx{$perl $admin_bin --root $env->{server} log docs 2>&1};
@@ -277,16 +277,16 @@ is($?, 0, 'several names exit 0');
 like($output, qr/^docs:$/m, 'the first repo is headed');
 like($output, qr/^notes:$/m, 'the second repo is headed');
 like($output, qr/^docs:\n(?:  [^\n]*\n)*?  [^\n]*\sconflict\s+a\.txt/ms,
-    'the first repo lists its own events');
+	'the first repo lists its own events');
 like($output, qr/^notes:\n  \d{8}T\d{6}Z\s+test-1\s+session\s+exit=0/ms,
-    'the second repo follows under its own heading');
+	'the second repo follows under its own heading');
 
 $output = qx{$perl $admin_bin --root $env->{server} log docs notes --warnings 2>&1};
 is($?, 0, 'several names with --warnings exit 0');
 like($output, qr/^notes:\nNo journal entries for notes$/m,
-    'an empty repo says so under its heading');
+	'an empty repo says so under its heading');
 like($output, qr/session\s+exit=3 .*conflicts=1/,
-    'the repo with a conflict keeps its match');
+	'the repo with a conflict keeps its match');
 unlike($output, qr/^  .*\splan\s/m, 'the plan event is still excluded');
 
 $output = qx{$perl $admin_bin --root $env->{server} log docs nosuch 2>&1};
@@ -296,71 +296,71 @@ unlike($output, qr/^docs:$/m, 'and nothing was printed before the failure');
 
 # --- filesync-admin log --json -------------------------------------------
 {
-    my $output = qx{$perl $admin_bin --root $env->{server} log docs --json 2>&1};
-    is($?, 0, 'log --json exits 0');
+	my $output = qx{$perl $admin_bin --root $env->{server} log docs --json 2>&1};
+	is($?, 0, 'log --json exits 0');
 
-    my $data = App::FileSync::json_decode($output);
-    ok(ref($data) eq 'HASH', 'the JSON parses');
-    is(scalar @{ $data->{results} }, 1, 'one result for the named repo');
+	my $data = App::FileSync::json_decode($output);
+	ok(ref($data) eq 'HASH', 'the JSON parses');
+	is(scalar @{ $data->{results} }, 1, 'one result for the named repo');
 
-    my $result = $data->{results}[0];
-    is($result->{repo}, 'docs', 'the result names the repo');
-    like($result->{path}, qr{\.filesync[/\\]repos[/\\]docs[/\\]journal\z},
-        'and the journal directory');
-    is(scalar @{ $result->{events} }, scalar @{ events() }, 'every event is included');
-    is($result->{events}[-1]{action}, 'session', 'events are in journal order');
-    ok((grep { defined $_->{exit} } @{ $result->{events} }),
-        'session outcomes carry their exit codes');
+	my $result = $data->{results}[0];
+	is($result->{repo}, 'docs', 'the result names the repo');
+	like($result->{path}, qr{\.filesync[/\\]repos[/\\]docs[/\\]journal\z},
+		'and the journal directory');
+	is(scalar @{ $result->{events} }, scalar @{ events() }, 'every event is included');
+	is($result->{events}[-1]{action}, 'session', 'events are in journal order');
+	ok((grep { defined $_->{exit} } @{ $result->{events} }),
+		'session outcomes carry their exit codes');
 
-    $output = qx{$perl $admin_bin --root $env->{server} log docs --json --exit 2 2>&1};
-    $data = App::FileSync::json_decode($output);
-    is(scalar @{ $data->{results}[0]{events} }, 1, '--exit filters the JSON events');
-    is_deeply($data->{results}[0]{exits}, [2], 'and is echoed');
-    like($output, qr/"locked":1/, 'the refusal keeps its marker');
+	$output = qx{$perl $admin_bin --root $env->{server} log docs --json --exit 2 2>&1};
+	$data = App::FileSync::json_decode($output);
+	is(scalar @{ $data->{results}[0]{events} }, 1, '--exit filters the JSON events');
+	is_deeply($data->{results}[0]{exits}, [2], 'and is echoed');
+	like($output, qr/"locked":1/, 'the refusal keeps its marker');
 
-    $output = qx{$perl $admin_bin --root $env->{server} log docs --json --warnings 2>&1};
-    $data = App::FileSync::json_decode($output);
-    is($data->{results}[0]{warnings}, 1, '--warnings is echoed');
-    is(scalar @{ $data->{results}[0]{events} }, 1,
-        '--warnings filters the JSON events');
-    is($data->{results}[0]{events}[0]{action}, 'session',
-        'to the conflict session');
-    is($data->{results}[0]{events}[0]{conflicts}, 1, 'which recorded the conflict');
+	$output = qx{$perl $admin_bin --root $env->{server} log docs --json --warnings 2>&1};
+	$data = App::FileSync::json_decode($output);
+	is($data->{results}[0]{warnings}, 1, '--warnings is echoed');
+	is(scalar @{ $data->{results}[0]{events} }, 1,
+		'--warnings filters the JSON events');
+	is($data->{results}[0]{events}[0]{action}, 'session',
+		'to the conflict session');
+	is($data->{results}[0]{events}[0]{conflicts}, 1, 'which recorded the conflict');
 
-    $output = qx{$perl $admin_bin --root $env->{server} log docs --json --client stranger 2>&1};
-    $data = App::FileSync::json_decode($output);
-    is(scalar @{ $data->{results}[0]{events} }, 1, '--client filters the JSON events');
-    is($data->{results}[0]{events}[0]{client}, 'stranger', 'to the named client');
-    is($data->{results}[0]{client}, 'stranger', 'the client filter is echoed');
+	$output = qx{$perl $admin_bin --root $env->{server} log docs --json --client stranger 2>&1};
+	$data = App::FileSync::json_decode($output);
+	is(scalar @{ $data->{results}[0]{events} }, 1, '--client filters the JSON events');
+	is($data->{results}[0]{events}[0]{client}, 'stranger', 'to the named client');
+	is($data->{results}[0]{client}, 'stranger', 'the client filter is echoed');
 
-    $output = qx{$perl $admin_bin --root $env->{server} log docs --json --until 1970-01-01 2>&1};
-    $data = App::FileSync::json_decode($output);
-    is(scalar @{ $data->{results}[0]{events} }, 0,
-        'a window with no events gives an empty list, not a message');
-    is($data->{results}[0]{until}, 86_399, 'the cutoff is echoed as an epoch');
+	$output = qx{$perl $admin_bin --root $env->{server} log docs --json --until 1970-01-01 2>&1};
+	$data = App::FileSync::json_decode($output);
+	is(scalar @{ $data->{results}[0]{events} }, 0,
+		'a window with no events gives an empty list, not a message');
+	is($data->{results}[0]{until}, 86_399, 'the cutoff is echoed as an epoch');
 
-    $output = qx{$perl $admin_bin --root $env->{server} log docs --json -n 1 2>&1};
-    $data = App::FileSync::json_decode($output);
-    is(scalar @{ $data->{results}[0]{events} }, 1, '-n applies to the JSON events');
-    is($data->{results}[0]{events}[0]{action}, 'session', 'and keeps the newest');
+	$output = qx{$perl $admin_bin --root $env->{server} log docs --json -n 1 2>&1};
+	$data = App::FileSync::json_decode($output);
+	is(scalar @{ $data->{results}[0]{events} }, 1, '-n applies to the JSON events');
+	is($data->{results}[0]{events}[0]{action}, 'session', 'and keeps the newest');
 
-    $output = qx{$perl $admin_bin --root $env->{server} log docs notes --json 2>&1};
-    is($?, 0, 'several names with --json exit 0');
-    $data = App::FileSync::json_decode($output);
-    is_deeply([ map { $_->{repo} } @{ $data->{results} } ], [ 'docs', 'notes' ],
-        'one result per repo, in the order given');
-    is(scalar @{ $data->{results}[0]{events} }, scalar @{ events() },
-        'the first repo keeps every event');
-    is(scalar @{ $data->{results}[1]{events} }, 1, 'the second repo is queried too');
-    like($data->{results}[1]{path}, qr{repos[/\\]notes[/\\]journal\z},
-        'each result names its own journal directory');
+	$output = qx{$perl $admin_bin --root $env->{server} log docs notes --json 2>&1};
+	is($?, 0, 'several names with --json exit 0');
+	$data = App::FileSync::json_decode($output);
+	is_deeply([ map { $_->{repo} } @{ $data->{results} } ], [ 'docs', 'notes' ],
+		'one result per repo, in the order given');
+	is(scalar @{ $data->{results}[0]{events} }, scalar @{ events() },
+		'the first repo keeps every event');
+	is(scalar @{ $data->{results}[1]{events} }, 1, 'the second repo is queried too');
+	like($data->{results}[1]{path}, qr{repos[/\\]notes[/\\]journal\z},
+		'each result names its own journal directory');
 
-    $output = qx{$perl $admin_bin --root $env->{server} log docs notes --json --warnings 2>&1};
-    $data = App::FileSync::json_decode($output);
-    is_deeply([ map { scalar @{ $_->{events} } } @{ $data->{results} } ], [ 1, 0 ],
-        '--warnings filters each repo');
-    is_deeply([ map { $_->{warnings} } @{ $data->{results} } ], [ 1, 1 ],
-        'and is echoed on every result');
+	$output = qx{$perl $admin_bin --root $env->{server} log docs notes --json --warnings 2>&1};
+	$data = App::FileSync::json_decode($output);
+	is_deeply([ map { scalar @{ $_->{events} } } @{ $data->{results} } ], [ 1, 0 ],
+		'--warnings filters each repo');
+	is_deeply([ map { $_->{warnings} } @{ $data->{results} } ], [ 1, 1 ],
+		'and is echoed on every result');
 }
 
 done_testing();

@@ -20,10 +20,12 @@ _write(File::Spec->catfile($root, 'sub', 'deep', 'c.txt'), "gamma\n", 1_700_000_
 _write(File::Spec->catfile($root, 'ignored', 'd.txt'), "delta\n", 1_700_000_300);
 
 my $ignore = App::FileSync::Ignore->new(patterns => ['ignored']);
-my ($manifest, $stats, $skipped) = App::FileSync::Scan::scan(root => $root, ignore => $ignore);
+my $scan = App::FileSync::Scan::scan(root => $root, ignore => $ignore);
+my ($manifest, $stats, $skipped) = @{$scan}{qw(manifest stats skipped)};
+is(ref $scan, q{HASH}, q{scan returns one hashref rather than a list});
 
 is_deeply([sort keys %{$manifest}], [qw(a.txt empty sub/b.bin sub/deep/c.txt)],
-    'expected files and the empty directory are found, ignored tree is pruned');
+	'expected files and the empty directory are found, ignored tree is pruned');
 is($manifest->{'empty'}{t}, 'd', 'empty directory recorded as a directory');
 is($stats->{files}, 3, 'three files');
 is($stats->{hashed}, 3, 'everything hashed on the first pass');
@@ -35,45 +37,50 @@ is($manifest->{'a.txt'}{s}, 6, 'size recorded');
 is($manifest->{'a.txt'}{m}, 1_700_000_000, 'mtime recorded');
 like($manifest->{'a.txt'}{h}, qr/\A[0-9a-f]{64}\z/, 'sha256 recorded');
 
-my ($second, $second_stats) = App::FileSync::Scan::scan(
-    root => $root, ignore => $ignore, cache => $manifest,
-);
+my ($second, $second_stats) = _parts(App::FileSync::Scan::scan(
+	root => $root, ignore => $ignore, cache => $manifest,
+));
 is($second_stats->{hashed}, 0, 'second pass uses the stat cache');
 is($second_stats->{cached}, 3, 'every file came from the cache');
 is_deeply($second, $manifest, 'second manifest is identical');
 
 # Same size, different mtime: must be rehashed.
 _write(File::Spec->catfile($root, 'a.txt'), "beta!\n", 1_700_000_500);
-my ($third, $third_stats) = App::FileSync::Scan::scan(
-    root => $root, ignore => $ignore, cache => $manifest,
-);
+my ($third, $third_stats) = _parts(App::FileSync::Scan::scan(
+	root => $root, ignore => $ignore, cache => $manifest,
+));
 is($third_stats->{hashed}, 1, 'changed mtime forces a rehash');
 isnt($third->{'a.txt'}{h}, $manifest->{'a.txt'}{h}, 'hash changed with the content');
 
 # A missing root is reported, not fatal.
-my ($missing, $missing_stats) = App::FileSync::Scan::scan(
-    root => File::Spec->catdir($root, 'does-not-exist'),
-);
+my ($missing, $missing_stats) = _parts(App::FileSync::Scan::scan(
+	root => File::Spec->catdir($root, 'does-not-exist'),
+));
 is_deeply($missing, {}, 'missing root yields an empty manifest');
 ok($missing_stats->{skipped} > 0, 'missing root is reported as skipped');
 
 SKIP: {
-    skip 'symlinks are not available here', 1
-        unless eval { symlink(File::Spec->catfile($root, 'a.txt'), File::Spec->catfile($root, 'link.txt')) };
+	skip 'symlinks are not available here', 1
+		unless eval { symlink(File::Spec->catfile($root, 'a.txt'), File::Spec->catfile($root, 'link.txt')) };
 
-    my ($with_link, $link_stats) = App::FileSync::Scan::scan(root => $root, ignore => $ignore);
-    ok(!exists $with_link->{'link.txt'}, 'symlinks are skipped');
-    ok($link_stats->{skipped} >= 1, 'skipped symlink is reported');
-    unlink File::Spec->catfile($root, 'link.txt');
+	my ($with_link, $link_stats) = _parts(App::FileSync::Scan::scan(root => $root, ignore => $ignore));
+	ok(!exists $with_link->{'link.txt'}, 'symlinks are skipped');
+	ok($link_stats->{skipped} >= 1, 'skipped symlink is reported');
+	unlink File::Spec->catfile($root, 'link.txt');
+}
+
+sub _parts {
+	my ($scan) = @_;
+	return @{$scan}{qw(manifest stats skipped)};
 }
 
 sub _write {
-    my ($path, $content, $mtime) = @_;
-    open my $fh, '>', $path or die "Cannot write $path: $!";
-    binmode $fh;
-    print {$fh} $content;
-    close $fh;
-    utime($mtime, $mtime, $path);
+	my ($path, $content, $mtime) = @_;
+	open my $fh, '>', $path or die "Cannot write $path: $!";
+	binmode $fh;
+	print {$fh} $content;
+	close $fh;
+	utime($mtime, $mtime, $path);
 }
 
 done_testing();

@@ -12,7 +12,7 @@ use WWW::Crawl4AI::Detect ();
 use WWW::Crawl4AI::StrategyChain ();
 use WWW::Crawl4AI::DeepCrawlIterator ();
 
-our $VERSION = '0.006';
+our $VERSION = '0.007';
 
 
 has strategy_chain => (
@@ -319,10 +319,11 @@ WWW::Crawl4AI - Perl client and fallback orchestrator for Crawl4AI
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 
+  use feature 'say';
   use WWW::Crawl4AI;
 
   my $crawler = WWW::Crawl4AI->new(
@@ -502,7 +503,9 @@ per-call C<fallback> is B<not> honoured here; set it on the constructor.
 
 =head2 health
 
-True if the Crawl4AI server answers C<GET /health>.
+True if the Crawl4AI server answers C<GET /health> with a JSON object. A failed
+check answers C<0> and never dies; it warns once (C<crawl4ai health check
+failed: ...>) with the reason.
 
 =head2 screenshot
 

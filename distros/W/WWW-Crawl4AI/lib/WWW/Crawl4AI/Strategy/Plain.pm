@@ -1,5 +1,5 @@
 package WWW::Crawl4AI::Strategy::Plain;
-# ABSTRACT: cheapest Crawl4AI strategy — headless text mode, no escalation
+# ABSTRACT: cheapest Crawl4AI strategy - headless text mode, no escalation
 use Moo;
 use WWW::Crawl4AI::Request ();
 with 'WWW::Crawl4AI::Strategy';
@@ -31,11 +31,11 @@ __END__
 
 =head1 NAME
 
-WWW::Crawl4AI::Strategy::Plain - cheapest Crawl4AI strategy — headless text mode, no escalation
+WWW::Crawl4AI::Strategy::Plain - cheapest Crawl4AI strategy - headless text mode, no escalation
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 DESCRIPTION
 

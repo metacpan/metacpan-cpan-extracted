@@ -4,7 +4,7 @@ Database::BI - Web-based Business Intelligence viewer for data files
 
 ## Version
 
-0.016.0
+0.017.0
 
 ## Description
 
@@ -631,6 +631,21 @@ perl Makefile.PL
 
     Removes a date-normalisation pattern.  Body: `l=&col=`.
     Omit `col=` to clear all patterns for the spec.
+
+- `GET /geo/list`
+
+    Returns `{ columns: { col: { kind: "lat"|"lon"|"location" } } }` for the
+    saved coordinate-column preferences of the given `l=` spec.
+
+- `POST /geo/save`
+
+    Saves a coordinate-column preference.  Body: `l=&col=&kind=`,
+    where `kind` is `lat`, `lon`, or `location`.
+
+- `POST /geo/delete`
+
+    Removes a coordinate-column preference.  Body: `l=&col=`.
+    Omit `col=` to clear all preferences for the spec.
 
 - `GET /insights`
 

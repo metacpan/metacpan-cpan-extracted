@@ -1,0 +1,27 @@
+title: Request parameters the backend does not claim (temperature, response_format, ...) are not sent to it
+setup:
+  config:
+    models:
+      plain: { engine: KnarrVirtual, model: v-plain }
+  backends:
+    v-plain: { fallback: { answer: ok } }
+steps:
+  - chat:
+      protocol: openai
+      model: plain
+      prompt: x
+      extra: { temperature: 0.2, seed: 7, response_format: { type: json_object } }
+    expect: { text: ok }
+    backend:
+      v-plain:
+        body_absent: [ temperature, response_format ]
+  - chat:
+      protocol: openai
+      model: plain
+      messages:
+        - { role: system, content: Be brief. }
+        - { role: user, content: x }
+    expect: { text: ok }
+    backend:
+      v-plain:
+        body: { 'messages.0.role': system, 'messages.0.content': Be brief., 'messages.1.content': x }

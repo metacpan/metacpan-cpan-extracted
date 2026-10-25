@@ -1,0 +1,31 @@
+==== start svg ====
+XObject #1
+vb 0.00 0.00 200.00 100.00 (inferred) => bb 0.00 -100.00 200.00 0.00
+matrix( 1 0 0 -1 0 0)
+vb rect( 0.00 0.00 200.00 100.00)
+xo fill_color black (initial)
+  start handling text (SVGPDF::Text)
+  text stroke=none fill=(current) fill=#000000
+  text  x=10 y=50,70
+    xo save
+    txt* translate( 10.00, 50.00 ) scale( 1.0, -1.0 ) 41
+    txt* translate( 10.00, 70.00 ) scale( 1.0, -1.0 ) 42
+    xo restore
+  end handling text
+  start handling text (SVGPDF::Text)
+  text stroke=none fill=(current) fill=#000000
+  text  x=20,40 y=50
+    xo save
+    txt* translate( 20.00, 50.00 ) scale( 1.0, -1.0 ) 50
+    txt* translate( 40.00, 50.00 ) scale( 1.0, -1.0 ) 51
+    xo restore
+  end handling text
+  start handling text (SVGPDF::Text)
+  text stroke=none fill=(current) fill=#000000
+  text  x=40,40 y=50,70
+    xo save
+    txt* translate( 40.00, 50.00 ) scale( 1.0, -1.0 ) 58
+    txt* translate( 40.00, 70.00 ) scale( 1.0, -1.0 ) 59
+    xo restore
+  end handling text
+==== end svg ====

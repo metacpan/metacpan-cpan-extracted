@@ -13,7 +13,7 @@ use Path::Tiny qw/ path /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.2.2';
+our $VERSION = 'v0.2.3';
 
 
 sub exe {
@@ -30,13 +30,15 @@ __END__
 
 =encoding UTF-8
 
+=for stopwords exe
+
 =head1 NAME
 
 Alien::Brotli - Download and install Brotli compressor
 
 =head1 VERSION
 
-version v0.2.2
+version v0.2.3
 
 =head1 DESCRIPTION
 
@@ -62,7 +64,7 @@ L<https://github.com/google/brotli>
 =head1 SOURCE
 
 The development version is on github at L<https://github.com/robrwo/perl-Alien-Brotli>
-and may be cloned from L<git://github.com/robrwo/perl-Alien-Brotli.git>
+and may be cloned from L<https://github.com/robrwo/perl-Alien-Brotli.git>
 
 =head1 BUGS
 
@@ -73,19 +75,23 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-Robert Rothenberg <rrwo@cpan.org>
+=over 4
 
-=head1 CONTRIBUTOR
+=item *
 
-=for stopwords Michal Josef Špaček
+Robert Rothenberg <perl@rhizomnic.com>
 
-Michal Josef Špaček <skim@cpan.org>
+=item *
+
+Michal Josef Špaček <michal.josef.spacek@gmail.com>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2022 by Robert Rothenberg.
+This software is Copyright (c) 2022, 2026 by Robert Rothenberg.
 
 This is free software, licensed under:
 

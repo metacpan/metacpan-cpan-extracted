@@ -1,0 +1,60 @@
+---
+abstract: 'Send commands to milters and get responses'
+author:
+  - 'George S. Baugh <george@troglodyne.net>'
+build_requires:
+  Capture::Tiny: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  FindBin: '0'
+  FindBin::libs: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test2::Plugin::NoWarnings: '0'
+  Test2::V0: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150013'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Milter-Client
+no_index:
+  directory:
+    - docs
+    - t
+    - templates
+provides:
+  Milter::Client:
+    file: lib/Milter/Client.pm
+    version: '0.002'
+requires:
+  Cpanel::JSON::XS: '0'
+  Exporter: '0'
+  Getopt::Long: '0'
+  IO::Socket::IP: '0'
+  IO::Socket::UNIX: '0'
+  Pod::Usage: '0'
+  Socket: '0'
+  Sys::Hostname: '0'
+  Time::HiRes: '0'
+  constant: '0'
+  parent: '0'
+  perl: '5.014'
+  re: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/Troglodyne-Internet-Widgets/Milter-Client/issues
+  homepage: https://github.com/Troglodyne-Internet-Widgets/Milter-Client
+  repository: https://github.com/Troglodyne-Internet-Widgets/Milter-Client.git
+version: '0.002'
+x_contributors:
+  - 'Andy Baugh <andy@troglodyne.net>'
+  - 'troglodyne-bot <morpheus@troglodyne.net>'
+x_generated_by_perl: v5.44.0
+x_serialization_backend: 'YAML::Tiny version 1.76'
+x_spdx_expression: MIT

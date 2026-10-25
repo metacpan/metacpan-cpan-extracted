@@ -1,0 +1,14 @@
+configure:
+  requires:
+    Module::Build::Tiny: '0.039'
+runtime:
+  requires:
+    perl: '5.036'
+    IO::Async::Loop: 0
+    Tickit::Async: 0
+    Tickit::Widget::Entry: 0
+    Tickit::Widget::Scroller: 0
+    Tickit::Widget::Scroller::Item::Text: 0
+test:
+  requires:
+    Test::More: 0

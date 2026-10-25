@@ -76,6 +76,8 @@ sub _build_ua {
   return LWP::UserAgent->new(
     agent   => $self->user_agent_string,
     timeout => $self->timeout,
+    # A redirect would carry the bearer token to a foreign host - refuse them.
+    max_redirect => 0,
   );
 }
 
@@ -123,7 +125,10 @@ sub job_submit_request {
 sub job_status_request {
   my ( $self, $task_id ) = @_;
   croak "job_status_request needs a task_id" unless defined $task_id && length $task_id;
-  return $self->_request( GET => '/crawl/job/' . $task_id );
+  # The task id is one path segment: encode it, so it cannot address another
+  # endpoint and cannot split path and query.
+  my $segment = URI::Escape::uri_escape_utf8($task_id);
+  return $self->_request( GET => '/crawl/job/' . $segment );
 }
 
 sub health_request { $_[0]->_request( GET => '/health' ) }
@@ -198,17 +203,48 @@ sub _payload {
 # Response parsers (no I/O)
 #----------------------------------------------------------------------
 
+# The error text names status, method and path - never the token.
+sub _http_error_message {
+  my ( $self, $res, $reason ) = @_;
+  my $where = '-';
+  my $req = $res->request;
+  if ($req) {
+    my $method = $req->method;
+    my $path   = eval { $req->uri->path };
+    $path = '' unless defined $path;
+    $path = '/' unless length $path;
+    $where = defined $method ? $method . ' ' . $path : $path;
+  }
+  return 'Crawl4AI HTTP ' . $res->code . ': ' . $reason . ' (' . $where . ')';
+}
+
 sub _decode {
   my ( $self, $res, $backend ) = @_;
   my $code = $res->code;
   my $body = $res->decoded_content // $res->content // '';
-  my $data = eval { length $body ? $self->_json->decode($body) : undef };
+  my $data;
+  my $json_error;
+  if ( length $body ) {
+    $data = eval { $self->_json->decode($body) };
+    $json_error = $@;
+  }
   if ( !$res->is_success ) {
+    my $reason = $res->message;
+    $reason = 'error' unless defined $reason && length $reason;
     die WWW::Crawl4AI::Error->new(
       type        => 'api',
-      message     => "Crawl4AI HTTP $code: " . ( $res->message // 'error' ),
+      message     => $self->_http_error_message( $res, $reason ),
       response    => $res,
       data        => $data,
+      status_code => $code,
+      backend     => $backend,
+    );
+  }
+  if ($json_error) {
+    die WWW::Crawl4AI::Error->new(
+      type        => 'api',
+      message     => $self->_http_error_message( $res, 'the answer was no JSON' ),
+      response    => $res,
       status_code => $code,
       backend     => $backend,
     );
@@ -262,10 +298,9 @@ sub parse_job_status_response {
 
 sub parse_health_response {
   my ( $self, $res ) = @_;
-  return 0 unless $res->is_success;
-  my $data = eval { $self->_json->decode( $res->decoded_content // '' ) };
-  return $data if ref $data;
-  return 1;
+  my $data = $self->_decode( $res, undef );
+  return 0 unless defined $data;
+  return ref $data eq 'HASH' ? 1 : 0;
 }
 
 sub parse_screenshot_response {
@@ -422,11 +457,15 @@ sub do_request {
   croak "do_request needs an HTTP::Request" unless $self->is_request($req);
   my $max = $self->max_attempts;
   my $res;
+  my $is_transport = sub {
+    my $r = shift;
+    return $r->code == 599 || ( ( $r->header('Client-Warning') // '' ) eq 'Internal response' );
+  };
   for my $attempt ( 1 .. $max ) {
     $res = $self->ua->request($req);
     last if $res->is_success;
     my $code = $res->code;
-    my $transport = $code == 599 || ( ( $res->header('Client-Warning') // '' ) eq 'Internal response' );
+    my $transport = $is_transport->($res);
     my $retryable = $transport || $self->_retry_status_set->{$code};
     if ( $retryable && $attempt < $max ) {
       my $delay = $self->retry_backoff->[ $attempt - 1 ] // $self->retry_backoff->[-1] // 1;
@@ -439,7 +478,7 @@ sub do_request {
     }
     last;
   }
-  if ( !$res->is_success && ( $res->code == 599 ) ) {
+  if ( !$res->is_success && $is_transport->($res) ) {
     die WWW::Crawl4AI::Error->new(
       type        => 'transport',
       message     => "Crawl4AI transport error: " . ( $res->content // $res->message // 'unreachable' ),
@@ -482,9 +521,20 @@ sub job_status {
 
 sub health {
   my ( $self ) = @_;
-  my $res = eval { $self->do_request( $self->health_request ) };
-  return 0 if $@ || !$res;
-  return $self->parse_health_response($res) ? 1 : 0;
+  my $healthy = eval {
+    my $res = $self->do_request( $self->health_request );
+    $self->parse_health_response($res) ? 1 : 0;
+  };
+  if ( my $err = $@ ) {
+    my $message = ref $err && $err->$_isa('WWW::Crawl4AI::Error') ? $err->message : $err;
+    $message = '' unless defined $message;
+    # The reason is one line: LWP hangs a stack trace behind the connect error.
+    $message =~ s/\s*\n.*\z//s;
+    $message =~ s/\s+\z//;
+    warn 'crawl4ai health check failed: ' . $message . "\n" if length $message;
+    return 0;
+  }
+  return $healthy;
 }
 
 sub screenshot {
@@ -533,7 +583,7 @@ WWW::Crawl4AI::Client - UA-agnostic REST client for the Crawl4AI Docker API
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 
@@ -586,7 +636,9 @@ LWP request timeout in seconds (default 120). Crawling can be slow.
 
 =head2 ua
 
-The L<LWP::UserAgent>. Lazily built; inject your own to swap transports.
+The L<LWP::UserAgent>. Lazily built; inject your own to swap transports. The
+built agent does not follow redirects (C<max_redirect = 0>): a redirect would
+carry the bearer token to a foreign host, so a 3xx is reported as an error.
 
 =head2 max_attempts
 
@@ -630,6 +682,9 @@ True if the argument is an L<HTTP::Request>.
 
 Build the L<HTTP::Request> for each endpoint without performing I/O.
 
+C<job_status_request> encodes the task id as one percent encoded UTF-8 path
+segment, so it can neither address another endpoint nor split path and query.
+
 =head2 screenshot_request
 
 =head2 pdf_request
@@ -659,7 +714,15 @@ C<llm_request> takes a query plus optional C<provider>/C<temperature>/C<base_url
 =head2 parse_health_response
 
 Decode and normalize a response. They throw a L<WWW::Crawl4AI::Error> on API,
-transport or job failures.
+transport or job failures. An API error names status, method and path, e.g.
+C<Crawl4AI HTTP 302: Found (GET /crawl/job/abc)>.
+
+An answer that is no JSON is an error as well (C<the answer was no JSON>); an
+empty body stays allowed and is not decoded at all.
+
+C<parse_health_response> treats every failed status - a 3xx included - as an
+error instead of a silent C<0>. It answers C<1> for a JSON object and C<0>
+for every other answer, a JSON scalar and an empty body included.
 
 =head2 parse_screenshot_response
 
@@ -707,6 +770,10 @@ persistent connection failure.
 
 Convenience methods: build request, fire via L<LWP::UserAgent>, parse response.
 See the C<*_request>/C<parse_*_response> pairs for the no-I/O building blocks.
+
+C<health> answers C<1> or C<0> and never dies: a failed check warns once
+(C<crawl4ai health check failed: ...>) with the reason on one line and answers
+C<0>.
 
 =head2 screenshot
 

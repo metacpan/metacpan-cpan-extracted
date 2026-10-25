@@ -1,81 +1,90 @@
 ---
 abstract: 'Talk to a Mastodon server'
 author:
-  - 'José Joaquín Atria <jjatria@cpan.org>'
+  - 'José Joaquín Atria <jjatria@gmail.com>'
 build_requires:
-  Plack: '1.0043'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
   Test2::V0: '0.000126'
+  Test::More: '0'
   Test::Pod: '1.51'
-  Test::TCP: '2.17'
   perl: '5.010'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  Module::Build::Tiny: '0.034'
   perl: v5.10.0
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.040, CPAN::Meta::Converter version 2.150013'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Mastodon-Client
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
 provides:
   Mastodon::Client:
     file: lib/Mastodon/Client.pm
-    version: '0.017'
+    version: '0.019'
   Mastodon::Entity::Account:
     file: lib/Mastodon/Entity/Account.pm
-    version: '0.017'
+    version: '0.019'
   Mastodon::Entity::Application:
     file: lib/Mastodon/Entity/Application.pm
-    version: '0.017'
+    version: '0.019'
   Mastodon::Entity::Attachment:
     file: lib/Mastodon/Entity/Attachment.pm
-    version: '0.017'
+    version: '0.019'
   Mastodon::Entity::Card:
     file: lib/Mastodon/Entity/Card.pm
-    version: '0.017'
+    version: '0.019'
   Mastodon::Entity::Context:
     file: lib/Mastodon/Entity/Context.pm
-    version: '0.017'
+    version: '0.019'
   Mastodon::Entity::Error:
     file: lib/Mastodon/Entity/Error.pm
-    version: '0.017'
+    version: '0.019'
   Mastodon::Entity::Instance:
     file: lib/Mastodon/Entity/Instance.pm
-    version: '0.017'
+    version: '0.019'
   Mastodon::Entity::Mention:
     file: lib/Mastodon/Entity/Mention.pm
-    version: '0.017'
+    version: '0.019'
   Mastodon::Entity::Notification:
     file: lib/Mastodon/Entity/Notification.pm
-    version: '0.017'
+    version: '0.019'
   Mastodon::Entity::Relationship:
     file: lib/Mastodon/Entity/Relationship.pm
-    version: '0.017'
+    version: '0.019'
   Mastodon::Entity::Report:
     file: lib/Mastodon/Entity/Report.pm
-    version: '0.017'
+    version: '0.019'
   Mastodon::Entity::Results:
     file: lib/Mastodon/Entity/Results.pm
-    version: '0.017'
+    version: '0.019'
   Mastodon::Entity::Status:
     file: lib/Mastodon/Entity/Status.pm
-    version: '0.017'
+    version: '0.019'
   Mastodon::Entity::Tag:
     file: lib/Mastodon/Entity/Tag.pm
-    version: '0.017'
+    version: '0.019'
   Mastodon::Listener:
     file: lib/Mastodon/Listener.pm
-    version: '0.017'
+    version: '0.019'
   Mastodon::Role::Entity:
     file: lib/Mastodon/Role/Entity.pm
-    version: '0.017'
+    version: '0.019'
   Mastodon::Role::UserAgent:
     file: lib/Mastodon/Role/UserAgent.pm
-    version: '0.017'
+    version: '0.019'
   Mastodon::Types:
     file: lib/Mastodon/Types.pm
-    version: '0.017'
+    version: '0.019'
 requires:
   Class::Load: '0.25'
   DateTime: '1.51'
@@ -101,13 +110,15 @@ requires:
 resources:
   bugtracker: https://gitlab.com/jjatria/Mastodon-Client/issues
   repository: git://gitlab.com/jjatria/Mastodon-Client.git
-version: '0.017'
+version: '0.019'
 x_contributors:
   - 'Al Beano <albino@autistici.org>'
   - 'Alexander Zaitsev <shura0@yandex.ru>'
   - 'Eric Prestemon <ecp@prestemon.com>'
   - 'Florian Obser <florian+gitlab@narrans.de>'
+  - 'Jose Joaquin Atria <jjatria@cpan.org>'
   - 'Lance Wicks <lancew@cpan.org>'
   - 'Luc Didry <luc@didry.org>'
-x_generated_by_perl: v5.30.0
-x_serialization_backend: 'YAML::Tiny version 1.73'
+x_generated_by_perl: v5.42.2
+x_serialization_backend: 'YAML::Tiny version 1.76'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

@@ -6,7 +6,7 @@ use utf8;
 
 use parent 'SQL::Abstract';
 
-our $VERSION = '1.0';
+our $VERSION = '1.01';
 
 BEGIN { *puke = \&SQL::Abstract::puke }
 
@@ -26,6 +26,31 @@ sub new {
   };
 
   return $self;
+}
+
+sub _expand_insert_clause_from {
+  my ($self, undef, $data) = @_;
+
+  # Bulk insert (array of hashes)
+  return $self->SUPER::_expand_insert_clause_from(undef, $data)
+    unless ref $data eq 'ARRAY' && ref $data->[0] eq 'HASH' && grep { !/^-/ } keys %{$data->[0]};
+  puke 'bulk insert values must all be hash references' if grep { ref $_ ne 'HASH' } @$data;
+
+  my %fields = map { $_ => 1 } map { keys %$_ } @$data;
+  my @fields = sort keys %fields;
+  my @rows;
+  for my $row (@$data) {
+    push @rows, {
+      -row => [
+        map {
+          local $SQL::Abstract::Cur_Col_Meta = $_;
+          exists $row->{$_} ? $self->_expand_insert_value($row->{$_}) : {-keyword => 'default'}
+        } @fields
+      ]
+    };
+  }
+
+  return (from => {-values => \@rows}, fields => $self->expand_expr({-row => \@fields}, -ident));
 }
 
 sub _insert_returning {
@@ -217,7 +242,19 @@ structures.
 
 =head1 INSERT
 
-  $abstract->insert($table, \@values || \%fieldvals, \%options);
+  $abstract->insert($table, \@values || \%fieldvals || \@fieldvals, \%options);
+
+=head2 BULK INSERT
+
+The C<$data> argument now also accepts array references containing hash references, to generate C<INSERT> queries
+with multiple rows. Fields missing from some rows will be set to C<DEFAULT>. Keep in mind that PostgreSQL limits the
+number of bind values per query to 65535, so very large inserts need to be split up.
+
+  # "INSERT INTO t (a, b) VALUES ('c', 'd'), ('e', DEFAULT)"
+  $abstract->insert('t', [{a => 'c', b => 'd'}, {a => 'e'}]);
+
+  # "INSERT INTO t (a) VALUES ('b'), ('c') ON CONFLICT DO NOTHING RETURNING id"
+  $abstract->insert('t', [{a => 'b'}, {a => 'c'}], {on_conflict => undef, returning => 'id'});
 
 =head2 ON CONFLICT
 

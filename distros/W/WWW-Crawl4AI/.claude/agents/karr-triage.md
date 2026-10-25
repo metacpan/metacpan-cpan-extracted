@@ -1,7 +1,10 @@
 ---
 name: karr-triage
 description: Use when issues or PRDs on the karr board need triage — new/untriaged tickets, applying or moving triage labels, grooming the backlog, or deciding whether a ticket is agent-ready. Use proactively after creating new issues.
-tools: Bash, Read, Grep, Glob
+disallowedTools: Edit, Write, NotebookEdit
+briefing:
+  skills:
+    - kanban-issues-karr-coordination
 model: sonnet
 color: yellow
 ---

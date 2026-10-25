@@ -1,0 +1,17 @@
+title: OpenAI chat completion is answered by the backend and labeled with the configured upstream model
+setup:
+  config:
+    models:
+      fast: { engine: KnarrVirtual, model: v-fast }
+  backends:
+    v-fast:
+      rules:
+        "Hello": { answer: "Hi from the backend" }
+steps:
+  - chat: { protocol: openai, model: fast, prompt: Hello }
+    expect:
+      text: Hi from the backend
+      finish_reason: stop
+      model: v-fast
+    backend:
+      v-fast: { requests: 1, last_user_text: Hello, request_model: v-fast }

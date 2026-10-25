@@ -1,7 +1,7 @@
 package Langertha::Knarr::Protocol::Anthropic;
 # ABSTRACT: Anthropic-compatible wire protocol (/v1/messages) for Knarr
 
-our $VERSION = '1.102';
+our $VERSION = '1.103';
 use Moose;
 use JSON::MaybeXS;
 use Time::HiRes qw( time );
@@ -275,7 +275,7 @@ Langertha::Knarr::Protocol::Anthropic - Anthropic-compatible wire protocol (/v1/
 
 =head1 VERSION
 
-version 1.102
+version 1.103
 
 =head1 DESCRIPTION
 

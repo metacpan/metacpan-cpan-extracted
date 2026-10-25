@@ -73,11 +73,11 @@ md_config+=(hashed.h3=1 hashed.h4=1 hashed.h5=1 hashed.h6=1)
 
 #### Chaining Themes
 
-The `--theme` option is an array (`@` type). The default is `(hashed nomark)`, declared as a Bash array before `OPTS` (the OPTS default is empty; getoptlong.sh preserves pre-declared arrays). Themes support comma-separated values and repeated options. Themes accumulate (added to the default); use `--no-theme` to clear. Duplicate themes are removed by `uniq_array`. Themes are applied in order, each modifying `theme_light`/`theme_dark`:
+The `--theme` option is an array (`@` type). The default is `(hashed nomark markcell)`, declared as a Bash array before `OPTS` (the OPTS default is empty; getoptlong.sh preserves pre-declared arrays). Themes support comma-separated values and repeated options. Themes accumulate (added to the default); use `--no-theme` to clear. Duplicate themes are removed by `uniq_array`. Themes are applied in order, each modifying `theme_light`/`theme_dark`:
 
 ```bash
-mdee file.md                        # default: hashed + nomark
-mdee --theme=warm file.md           # hashed,nomark (default) + warm
+mdee file.md                        # default: hashed + nomark + markcell
+mdee --theme=warm file.md           # hashed,nomark,markcell (default) + warm
 mdee --no-theme file.md             # no theme (show all markup)
 mdee --no-theme --theme=warm        # warm only (clear default first)
 ```
@@ -131,6 +131,8 @@ The `default` associative array supports:
 | `default[base_color]` | `--base-color` | `DarkCyan` |
 
 Priority: command-line option > config default > built-in default.
+
+`md_config`/`pass_md` entries added by config.sh are set aside while it is sourced and appended again after the theme files, so a user setting such as `md_config+=(table_cell_mark=∙)` overrides the default themes (`markcell`, `nomark`). Order of application: themes → config.sh entries → `--config`.
 
 Config defaults for `default[theme]` are applied only when `--theme`/`--no-theme` is not specified on the command line. A `theme()` callback sets `_theme_specified` flag to track this.
 
@@ -405,6 +407,7 @@ Text folding is handled within the `App::Greple::md` module using `-Mtee` to pip
 - When `foldlist=1` in config, `finalize()` adds `--fold-by $foldwidth` to the module's default option
 - mdee passes `foldlist=1,foldwidth=$width` in config when fold is enabled
 - The `--fold-by` option in `__DATA__` uses `-Mtee "&ansifold"` with `--exclude` patterns for code blocks, HTML comments, and tables
+- Formatted tables are excluded from folding by `--exclude &__PACKAGE__::table_regions`: `table_regions()` builds its pattern from the config at run time and matches three or more consecutive lines that start with a border/rule character, a dash, whitespace, or the first character of a configured mark (`table_wrap_mark`, `table_cell_mark`) and contain a column separator, where the block must include a separator row such as `───┼───`, so that list items containing `|` are not mistaken for a table. It works in trim and non-trim, rule and non-rule modes, including wrapped continuation lines. A `define` in `__DATA__` cannot depend on the config because option text is expanded when the module is parsed, before `finalize()` runs. Non-ASCII characters in `__DATA__` patterns must be written as `\x{2502}`-style escapes: the pattern text is not decoded, so literal box-drawing characters never match decoded input
 
 #### Definition List Pattern
 
@@ -445,7 +448,8 @@ s{(^ {0,3}\|.+\|\n){3,}}{
         @$right  ? ('--table-right='  . join(',', @$right))  : (),
         @$center ? ('--table-center=' . join(',', @$center)) : (),
     );
-    my $formatted = call_ansicolumn($block, @sep_opt, '-o', $sep, '-t', '--cu=1', @align);
+    my @fit;   # -w table_width and/or --cell table_cell (see below)
+    my $formatted = call_ansicolumn($block, @sep_opt, '-o', $sep, '-t', '--cu=1', @align, @fit);
     fix_separator($formatted, $sep);
 }mge;
 ```
@@ -478,7 +482,9 @@ sub parse_separator {
    - Detects `:---:` (center) and `---:` (right) patterns; `:---` and `---` are left-aligned (default, no option needed)
    - Returns raw 1-based column numbers as `(\@right, \@center)` — caller applies offset and builds option strings
    - Minimizes dashes and strips colons (`s/:?-+:?/-/gr`) to prevent separator width from inflating column widths
-   - Requires App::ansicolumn >= 1.55 (for `--table-right`, `--table-center`, `--table-remove`, `--item-format`, `--padding`)
+   - Requires App::ansicolumn >= 1.59 (1.55 for `--table-right`, `--table-center`, `--table-remove`, `--item-format`, `--padding`; 1.58 for `-w` table fitting and `--cell` in table mode; 1.5801 gives width that wrapped columns leave unused back to the other wrapped columns; 1.59 for `--table-wrap-mark` and `--table-cell-mark`)
+
+**Cell wrapping** (`table_width`, `table_cell`): when `table_width > 0`, `-w $table_width` is appended and ansicolumn fits the table into that width. Columns that fit are untouched; over-wide columns share the remaining width equally (water level, floor 4) and their cells are wrapped by `Text::ANSI::Fold` (word boundary, kinsoku, run-in margin). In trim mode each column costs `content + 2` (item format) plus 1 per separator, so the budget is `table_width - (n-1)`. `table_cell` is converted from `0:10:<20` to `0,10,<20` and passed as `--cell`; in non-trim mode `0,` is prepended for the phantom first column. `table_wrap_mark` (default empty; the `markwrap` theme sets `›` U+203A) is passed as `--table-wrap-mark`; ansicolumn puts it at the start of the second and later lines of a wrapped cell in place of the item-format pad, so column widths do not change. Empty disables it. `table_cell_mark` (default empty; the default theme `markcell` sets `·` U+00B7) is passed as `--table-cell-mark` and marks the first line of every cell the same way, but only in a table that has a wrapped cell; ansicolumn marks the separator row too (to it, a row of `-` cells), so `format_table` puts the pad back on that row before `fix_separator`.
 
 2. **Column alignment** — `call_ansicolumn()` invokes `App::ansicolumn::ansicolumn()` via `Command::Run` (same pattern as the tee module's `call()` function):
    - `-rs '\s*\|\s*'` (trim) or `-s '|'` (non-trim): Input separator
@@ -522,6 +528,10 @@ Config parameters from mdee:
 - `table=1`: Enable table formatting (default enabled in md module)
 - `table_trim=1`: Enable cell whitespace trimming (default enabled in md module)
 - `rule=1`: Enable box-drawing characters (default enabled in md module)
+- `table_width=$width`: Fit tables into the fold width (passed whenever fold is enabled); over-wide columns are wrapped by ansicolumn (`-w`). `0` disables.
+- `table_cell=SPEC`: Per-column widths for ansicolumn `--cell`, colon-separated (`0:10:<20`) because commas separate config parameters; md module converts to commas and prepends `0,` in non-trim mode for the phantom first column. Not passed by mdee; set via `--config`.
+- `table_wrap_mark=STRING`: Mark for continuation lines of wrapped cells (default none; the `markwrap` theme sets `›` U+203A).
+- `table_cell_mark=STRING`: Mark for the first line of every cell in a table that has wrapped cells (default none; the default theme `markcell` sets `·` U+00B7).
 - Color labels (e.g., `h1=RD`): Override default colors (pre-declared in `Config->new()` with `undef`, applied in `setup_colors()` before `${base}` expansion)
 
 ### Field Visibility with --show Option

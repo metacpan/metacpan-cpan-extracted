@@ -5,13 +5,20 @@ Changes
 cpanfile
 lib/App/FileSync.pm
 lib/App/FileSync/Admin.pm
+lib/App/FileSync/Args.pm
+lib/App/FileSync/Base.pm
 lib/App/FileSync/CLI.pm
 lib/App/FileSync/Client.pm
 lib/App/FileSync/Config.pm
+lib/App/FileSync/Constants.pm
 lib/App/FileSync/Delta.pm
+lib/App/FileSync/I18N.pm
+lib/App/FileSync/I18N/en.pm
 lib/App/FileSync/Ignore.pm
+lib/App/FileSync/IO.pm
 lib/App/FileSync/Lock.pm
 lib/App/FileSync/Merge.pm
+lib/App/FileSync/Platform.pm
 lib/App/FileSync/Protocol.pm
 lib/App/FileSync/Scan.pm
 lib/App/FileSync/Server.pm
@@ -27,7 +34,6 @@ Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
 README.md
-SPEC.md
 t/00-load.t
 t/cli.t
 t/delta.t
@@ -36,10 +42,12 @@ t/ignore.t
 t/join.t
 t/journal.t
 t/lib/TestSync.pm
+t/locales.t
 t/log.t
 t/merge.t
 t/mtime.t
 t/paths.t
+t/regressions.t
 t/reindex.t
 t/replica.t
 t/restore.t

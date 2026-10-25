@@ -1,0 +1,50 @@
+title: Token usage of the backend reaches the client answer and the request log
+setup:
+  request_log: true
+  config:
+    models:
+      counted: { engine: KnarrVirtual, model: v-counted }
+      silent: { engine: KnarrVirtual, model: v-silent }
+      fallbackish: { engine: KnarrVirtual, model: v-default }
+  backends:
+    v-counted:
+      rules:
+        "Hello": { answer: "Hi there", usage: { prompt_tokens: 11, completion_tokens: 7 } }
+    v-silent:
+      rules:
+        "Hello": { answer: "Hi there" }
+    v-default:
+      engine_args: { default_usage: { prompt_tokens: 5, completion_tokens: 3 } }
+      rules:
+        "Hello": { answer: "Hi there" }
+        "Own": { answer: "mine", usage: { prompt_tokens: 20, completion_tokens: 1 } }
+steps:
+  - chat: { protocol: openai, model: counted, prompt: Hello }
+    expect:
+      text: Hi there
+      usage: { input: 11, output: 7 }
+      json: { 'usage.total_tokens': 18 }
+  - chat: { protocol: anthropic, model: counted, prompt: Hello }
+    expect: { text: Hi there, usage: { input: 11, output: 7 } }
+  - chat: { protocol: ollama, model: counted, prompt: Hello }
+    expect: { text: Hi there, usage: { input: 11, output: 7 } }
+  # a backend without usage: the wire formats that require the block say 0, the log records none
+  - chat: { protocol: openai, model: silent, prompt: Hello }
+    expect: { text: Hi there, usage: { input: 0, output: 0 } }
+  - chat: { protocol: anthropic, model: silent, prompt: Hello }
+    expect: { text: Hi there, usage: { input: 0, output: 0 } }
+  # default_usage fills the replies whose reaction gives none; a reaction's own usage wins
+  - chat: { protocol: openai, model: fallbackish, prompt: Hello }
+    expect: { usage: { input: 5, output: 3 } }
+  - chat: { protocol: openai, model: fallbackish, prompt: Own }
+    expect:
+      usage: { input: 20, output: 1 }
+      # the request log has one entry per answered request, in order
+      log:
+        - { model: counted, format: openai, status: ok, 'usage.input_tokens': 11, 'usage.output_tokens': 7, 'usage.total_tokens': 18 }
+        - { model: counted, format: anthropic, 'usage.input_tokens': 11, 'usage.output_tokens': 7 }
+        - { model: counted, format: ollama, 'usage.input_tokens': 11, 'usage.output_tokens': 7 }
+        - { model: silent, format: openai, usage: ~ }
+        - { model: silent, format: anthropic, usage: ~ }
+        - { model: fallbackish, 'usage.input_tokens': 5, 'usage.output_tokens': 3 }
+        - { model: fallbackish, 'usage.input_tokens': 20, 'usage.output_tokens': 1 }

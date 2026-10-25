@@ -5,14 +5,14 @@ use Test::Most;
 use App::FileSync::Ignore;
 
 my $ignore = App::FileSync::Ignore->new(patterns => [
-    '# a comment',
-    '',
-    '*.swp',
-    '.DS_Store',
-    'build/',
-    '**/cache',
-    'notes/*.txt',
-    '!notes/keep.txt',
+	'# a comment',
+	'',
+	'*.swp',
+	'.DS_Store',
+	'build/',
+	'**/cache',
+	'notes/*.txt',
+	'!notes/keep.txt',
 ]);
 
 ok($ignore->match('a.swp'), 'extension pattern matches at the root');

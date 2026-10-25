@@ -12,8 +12,7 @@ use Test::Most;
 use Test::Mockingbird 0.08 qw(mock restore_all);
 use Scalar::Util qw(blessed);
 use Readonly;
-use lib 't/lib';
-use MyLogger;
+use Test::Log::Abstraction;
 
 # Suppress noise from the Log::Abstraction logger Object::Configure injects.
 mock 'Log::Abstraction::_high_priority' => sub { };
@@ -49,7 +48,7 @@ sub warns_from {
 subtest 'new N1: normal ->new() succeeds' => sub {
 	plan tests => 1;
 	local %ENV;
-	isa_ok(CGI::Info->new(logger => MyLogger->new()), 'CGI::Info');
+	isa_ok(CGI::Info->new(logger => Test::Log::Abstraction->new()), 'CGI::Info');
 };
 
 subtest 'new N2: ::new() with no args sets class to __PACKAGE__ and succeeds' => sub {
@@ -70,7 +69,7 @@ subtest 'new N3: ::new() with args croaks (undef $class + params)' => sub {
 subtest 'new N4: explicit logger arg results in a logger in the object' => sub {
 	plan tests => 1;
 	local %ENV;
-	my $info = CGI::Info->new(logger => MyLogger->new());
+	my $info = CGI::Info->new(logger => Test::Log::Abstraction->new());
 	ok(Scalar::Util::blessed($info->{logger}), 'logger field is a blessed object');
 };
 
@@ -91,7 +90,7 @@ subtest 'new N6: expect is deprecated → croak' => sub {
 subtest 'new N7: clone path — basic clone is distinct object' => sub {
 	plan tests => 3;
 	local %ENV;
-	my $orig  = CGI::Info->new(logger => MyLogger->new());
+	my $orig  = CGI::Info->new(logger => Test::Log::Abstraction->new());
 	my $clone = $orig->new();
 	isa_ok($clone, 'CGI::Info', 'clone is CGI::Info');
 	isnt($orig,  $clone, 'clone is different reference');
@@ -101,7 +100,7 @@ subtest 'new N7: clone path — basic clone is distinct object' => sub {
 subtest 'new N8: clone has a logger after construction' => sub {
 	plan tests => 1;
 	local %ENV;
-	my $orig  = CGI::Info->new(logger => MyLogger->new());
+	my $orig  = CGI::Info->new(logger => Test::Log::Abstraction->new());
 	my $clone = $orig->new();
 	ok(defined($clone->{logger}), 'clone has a logger');
 };
@@ -109,7 +108,7 @@ subtest 'new N8: clone has a logger after construction' => sub {
 subtest 'new N9: clone with expect → croak' => sub {
 	plan tests => 1;
 	local %ENV;
-	my $orig = CGI::Info->new(logger => MyLogger->new());
+	my $orig = CGI::Info->new(logger => Test::Log::Abstraction->new());
 	throws_ok { $orig->new(expect => ['x']) }
 		qr/expect has been deprecated/,
 		'clone with expect croaks';
@@ -123,7 +122,7 @@ subtest 'new N10: clone drops cached paramref so new allow schema is applied' =>
 		QUERY_STRING      => 'foo=1',
 	);
 	CGI::Info->reset();
-	my $orig = CGI::Info->new(logger => MyLogger->new());
+	my $orig = CGI::Info->new(logger => Test::Log::Abstraction->new());
 	$orig->params();
 	ok($orig->{paramref}, 'original has paramref after params()');
 	my $clone = $orig->new(allow => { foo => qr/^\d+$/ });
@@ -142,7 +141,7 @@ subtest 'params P1: cache hit returns same ref' => sub {
 		QUERY_STRING      => 'a=1',
 	);
 	CGI::Info->reset();
-	my $info = CGI::Info->new(logger => MyLogger->new());
+	my $info = CGI::Info->new(logger => Test::Log::Abstraction->new());
 	my $r1 = $info->params();
 	my $r2 = $info->params();
 	is($r1, $r2, 'second params() call returns same cached ref');
@@ -153,7 +152,7 @@ subtest 'params P2: no CGI env, no ARGV, no stdin → undef' => sub {
 	local %ENV;
 	local @ARGV = ();
 	CGI::Info->reset();
-	my $info = CGI::Info->new(logger => MyLogger->new());
+	my $info = CGI::Info->new(logger => Test::Log::Abstraction->new());
 	is($info->params(), undef, 'no CGI env → undef');
 };
 
@@ -162,7 +161,7 @@ subtest 'params P3: no CGI env, ARGV --robot sets is_robot' => sub {
 	local %ENV;
 	local @ARGV = ('--robot', 'k=v');
 	CGI::Info->reset();
-	my $info = CGI::Info->new(logger => MyLogger->new());
+	my $info = CGI::Info->new(logger => Test::Log::Abstraction->new());
 	$info->params();
 	ok($info->{is_robot}, '--robot flag sets is_robot');
 };
@@ -172,7 +171,7 @@ subtest 'params P4: no CGI env, ARGV --mobile sets is_mobile' => sub {
 	local %ENV;
 	local @ARGV = ('--mobile', 'k=v');
 	CGI::Info->reset();
-	my $info = CGI::Info->new(logger => MyLogger->new());
+	my $info = CGI::Info->new(logger => Test::Log::Abstraction->new());
 	$info->params();
 	ok($info->{is_mobile}, '--mobile flag sets is_mobile');
 };
@@ -182,7 +181,7 @@ subtest 'params P5: no CGI env, ARGV --search-engine sets is_search_engine' => s
 	local %ENV;
 	local @ARGV = ('--search-engine', 'k=v');
 	CGI::Info->reset();
-	my $info = CGI::Info->new(logger => MyLogger->new());
+	my $info = CGI::Info->new(logger => Test::Log::Abstraction->new());
 	$info->params();
 	ok($info->{is_search_engine}, '--search-engine flag sets is_search_engine');
 };
@@ -192,7 +191,7 @@ subtest 'params P6: no CGI env, ARGV --tablet sets is_tablet' => sub {
 	local %ENV;
 	local @ARGV = ('--tablet', 'k=v');
 	CGI::Info->reset();
-	my $info = CGI::Info->new(logger => MyLogger->new());
+	my $info = CGI::Info->new(logger => Test::Log::Abstraction->new());
 	$info->params();
 	ok($info->{is_tablet}, '--tablet flag sets is_tablet');
 };
@@ -204,7 +203,7 @@ subtest 'params P7: GET with no QUERY_STRING → undef' => sub {
 		REQUEST_METHOD    => 'GET',
 	);
 	CGI::Info->reset();
-	my $info = CGI::Info->new(logger => MyLogger->new());
+	my $info = CGI::Info->new(logger => Test::Log::Abstraction->new());
 	is($info->params(), undef, 'GET with no QUERY_STRING → undef');
 };
 
@@ -217,7 +216,7 @@ subtest 'params P8: GET + multipart (no REMOTE_ADDR) → 501 + undef' => sub {
 		CONTENT_TYPE      => 'multipart/form-data',
 	);
 	CGI::Info->reset();
-	my $info = CGI::Info->new(logger => MyLogger->new());
+	my $info = CGI::Info->new(logger => Test::Log::Abstraction->new());
 	is($info->params(), undef, 'multipart GET → undef');
 	is($info->status(), 501,   'status 501 set');
 };
@@ -232,7 +231,7 @@ subtest 'params P9: GET + multipart + REMOTE_ADDR → IP in warning' => sub {
 		REMOTE_ADDR       => $REMOTE_IP,
 	);
 	CGI::Info->reset();
-	my $info = CGI::Info->new(logger => MyLogger->new());
+	my $info = CGI::Info->new(logger => Test::Log::Abstraction->new());
 	$info->params();
 	my @w = warns_from($info);
 	like($w[0]{message}, qr/$REMOTE_IP/, 'IP present in warning when REMOTE_ADDR set');
@@ -246,7 +245,7 @@ subtest 'params P10: POST missing CONTENT_LENGTH → 411' => sub {
 		CONTENT_TYPE      => 'application/x-www-form-urlencoded',
 	);
 	CGI::Info->reset();
-	my $info = CGI::Info->new(logger => MyLogger->new());
+	my $info = CGI::Info->new(logger => Test::Log::Abstraction->new());
 	is($info->params(), undef, 'missing CONTENT_LENGTH → undef');
 	is($info->status(), 411,   'status 411');
 };
@@ -260,7 +259,7 @@ subtest 'params P11: POST non-numeric CONTENT_LENGTH → 411' => sub {
 		CONTENT_LENGTH    => 'abc',
 	);
 	CGI::Info->reset();
-	my $info = CGI::Info->new(logger => MyLogger->new());
+	my $info = CGI::Info->new(logger => Test::Log::Abstraction->new());
 	is($info->params(), undef, 'non-numeric CONTENT_LENGTH → undef');
 	is($info->status(), 411,   'status 411');
 };
@@ -274,7 +273,7 @@ subtest 'params P12: POST exceeds max_upload_size → 413' => sub {
 		CONTENT_LENGTH    => 999_999_999,
 	);
 	CGI::Info->reset();
-	my $info = CGI::Info->new(logger => MyLogger->new());
+	my $info = CGI::Info->new(logger => Test::Log::Abstraction->new());
 	is($info->params(), undef, 'oversized upload → undef');
 	is($info->status(), 413,   'status 413');
 };
@@ -286,7 +285,7 @@ subtest 'params P13: OPTIONS → 405' => sub {
 		REQUEST_METHOD    => 'OPTIONS',
 	);
 	CGI::Info->reset();
-	my $info = CGI::Info->new(logger => MyLogger->new());
+	my $info = CGI::Info->new(logger => Test::Log::Abstraction->new());
 	is($info->params(), undef, 'OPTIONS → undef');
 	is($info->status(), 405,   'status 405');
 };
@@ -298,7 +297,7 @@ subtest 'params P14: DELETE → 405' => sub {
 		REQUEST_METHOD    => 'DELETE',
 	);
 	CGI::Info->reset();
-	my $info = CGI::Info->new(logger => MyLogger->new());
+	my $info = CGI::Info->new(logger => Test::Log::Abstraction->new());
 	is($info->params(), undef, 'DELETE → undef');
 	is($info->status(), 405,   'status 405');
 };
@@ -310,7 +309,7 @@ subtest 'params P15: unrecognised method → 501' => sub {
 		REQUEST_METHOD    => 'PATCH',
 	);
 	CGI::Info->reset();
-	my $info = CGI::Info->new(logger => MyLogger->new());
+	my $info = CGI::Info->new(logger => Test::Log::Abstraction->new());
 	is($info->params(), undef, 'PATCH → undef');
 	is($info->status(), 501,   'status 501');
 };
@@ -327,7 +326,7 @@ subtest 'params allow A1: scalar schema match passes' => sub {
 		QUERY_STRING      => 'mode=dark',
 	);
 	CGI::Info->reset();
-	my $info = CGI::Info->new(logger => MyLogger->new());
+	my $info = CGI::Info->new(logger => Test::Log::Abstraction->new());
 	my $p = $info->params(allow => { mode => 'dark' });
 	is($p->{mode}, 'dark', 'scalar match → value present');
 };
@@ -340,7 +339,7 @@ subtest 'params allow A2: scalar schema mismatch → 422, not in result' => sub 
 		QUERY_STRING      => 'mode=evil',
 	);
 	CGI::Info->reset();
-	my $info = CGI::Info->new(logger => MyLogger->new());
+	my $info = CGI::Info->new(logger => Test::Log::Abstraction->new());
 	my $p = $info->params(allow => { mode => 'dark' });
 	is($info->status(), 422,   'scalar mismatch → 422');
 	ok(!defined($p),           'no params returned');
@@ -354,7 +353,7 @@ subtest 'params allow A3: Regexp match passes' => sub {
 		QUERY_STRING      => 'id=42',
 	);
 	CGI::Info->reset();
-	my $info = CGI::Info->new(logger => MyLogger->new());
+	my $info = CGI::Info->new(logger => Test::Log::Abstraction->new());
 	my $p = $info->params(allow => { id => qr/^\d+$/ });
 	is($p->{id}, '42', 'regexp match → value present');
 };
@@ -367,7 +366,7 @@ subtest 'params allow A4: Regexp mismatch → 422' => sub {
 		QUERY_STRING      => 'id=notanumber',
 	);
 	CGI::Info->reset();
-	my $info = CGI::Info->new(logger => MyLogger->new());
+	my $info = CGI::Info->new(logger => Test::Log::Abstraction->new());
 	my $p = $info->params(allow => { id => qr/^\d+$/ });
 	is($info->status(), 422, 'regexp mismatch → 422');
 	ok(!defined($p),         'no params returned');
@@ -381,7 +380,7 @@ subtest 'params allow A5: CODE schema returning true passes' => sub {
 		QUERY_STRING      => 'x=hello',
 	);
 	CGI::Info->reset();
-	my $info = CGI::Info->new(logger => MyLogger->new());
+	my $info = CGI::Info->new(logger => Test::Log::Abstraction->new());
 	my $p = $info->params(allow => { x => sub { 1 } });
 	is($p->{x}, 'hello', 'coderef returning true passes');
 };
@@ -394,7 +393,7 @@ subtest 'params allow A6: CODE schema returning false blocks param' => sub {
 		QUERY_STRING      => 'x=hello',
 	);
 	CGI::Info->reset();
-	my $info = CGI::Info->new(logger => MyLogger->new());
+	my $info = CGI::Info->new(logger => Test::Log::Abstraction->new());
 	my $p = $info->params(allow => { x => sub { 0 } });
 	ok(!defined($p), 'coderef returning false blocks param → undef');
 };
@@ -407,7 +406,7 @@ subtest 'params allow A7: undef schema passes any value' => sub {
 		QUERY_STRING      => 'x=anything',
 	);
 	CGI::Info->reset();
-	my $info = CGI::Info->new(logger => MyLogger->new());
+	my $info = CGI::Info->new(logger => Test::Log::Abstraction->new());
 	my $p = $info->params(allow => { x => undef });
 	is($p->{x}, 'anything', 'undef schema allows any value');
 };
@@ -420,7 +419,7 @@ subtest 'params allow A8: key not in allow → 422' => sub {
 		QUERY_STRING      => 'forbidden=1',
 	);
 	CGI::Info->reset();
-	my $info = CGI::Info->new(logger => MyLogger->new());
+	my $info = CGI::Info->new(logger => Test::Log::Abstraction->new());
 	$info->params(allow => { allowed_key => qr/.*/ });
 	is($info->status(), 422, 'unknown key in allow → 422');
 };
@@ -437,7 +436,7 @@ subtest 'params V1: duplicate key with different value → comma-append' => sub 
 		QUERY_STRING      => 'c=alpha&c=beta',
 	);
 	CGI::Info->reset();
-	my $info = CGI::Info->new(logger => MyLogger->new());
+	my $info = CGI::Info->new(logger => Test::Log::Abstraction->new());
 	my $p = $info->params();
 	like($p->{c}, qr/alpha.*beta|beta.*alpha/, 'duplicate values joined');
 };
@@ -450,7 +449,7 @@ subtest 'params V2: zero-length value not added to FORM' => sub {
 		QUERY_STRING      => 'empty=',
 	);
 	CGI::Info->reset();
-	my $info = CGI::Info->new(logger => MyLogger->new());
+	my $info = CGI::Info->new(logger => Test::Log::Abstraction->new());
 	my $p = $info->params();
 	ok(!defined($p), 'empty-value param yields empty FORM → undef');
 };
@@ -467,7 +466,7 @@ subtest 'params WAF-SQL1: quote-style injection → 403' => sub {
 		QUERY_STRING      => "u=%27+OR+%271%27%3D%271",
 	);
 	CGI::Info->reset();
-	my $info = CGI::Info->new(logger => MyLogger->new());
+	my $info = CGI::Info->new(logger => Test::Log::Abstraction->new());
 	is($info->params(), undef,  'SQL quote injection → undef');
 	is($info->status(), 403,    'WAF sets 403');
 };
@@ -480,7 +479,7 @@ subtest 'params WAF-SQL2: SELECT FROM injection → 403' => sub {
 		QUERY_STRING      => 'q=SELECT+name+FROM+users',
 	);
 	CGI::Info->reset();
-	my $info = CGI::Info->new(logger => MyLogger->new());
+	my $info = CGI::Info->new(logger => Test::Log::Abstraction->new());
 	is($info->params(), undef,  'SELECT FROM → undef');
 	is($info->status(), 403,    'WAF sets 403');
 };
@@ -493,7 +492,7 @@ subtest 'params WAF-XSS1: percent-encoded angle brackets → 403' => sub {
 		QUERY_STRING      => 'q=%3Cscript%3Ealert(1)%3C%2Fscript%3E',
 	);
 	CGI::Info->reset();
-	my $info = CGI::Info->new(logger => MyLogger->new());
+	my $info = CGI::Info->new(logger => Test::Log::Abstraction->new());
 	is($info->params(), undef,  'XSS encoded → undef');
 	is($info->status(), 403,    'WAF sets 403');
 };
@@ -506,7 +505,7 @@ subtest 'params WAF-XSS2: javascript: URI scheme → 403' => sub {
 		QUERY_STRING      => 'url=javascript:alert(document.domain)',
 	);
 	CGI::Info->reset();
-	my $info = CGI::Info->new(logger => MyLogger->new());
+	my $info = CGI::Info->new(logger => Test::Log::Abstraction->new());
 	is($info->params(), undef,  'javascript: URI → undef');
 	is($info->status(), 403,    'WAF sets 403');
 };
@@ -519,7 +518,7 @@ subtest 'params WAF-DIR: directory traversal → 403' => sub {
 		QUERY_STRING      => 'f=../../etc/passwd',
 	);
 	CGI::Info->reset();
-	my $info = CGI::Info->new(logger => MyLogger->new());
+	my $info = CGI::Info->new(logger => Test::Log::Abstraction->new());
 	is($info->params(), undef,  'traversal → undef');
 	is($info->status(), 403,    'WAF sets 403');
 };
@@ -536,7 +535,7 @@ subtest 'param PA1: no field delegates to params() → hashref' => sub {
 		QUERY_STRING      => 'a=1',
 	);
 	CGI::Info->reset();
-	my $info = CGI::Info->new(logger => MyLogger->new());
+	my $info = CGI::Info->new(logger => Test::Log::Abstraction->new());
 	is(ref($info->param()), 'HASH', 'param() without arg returns hashref');
 };
 
@@ -548,7 +547,7 @@ subtest 'param PA2: field not in allow → warn + undef' => sub {
 		QUERY_STRING      => 'a=1',
 	);
 	CGI::Info->reset();
-	my $info = CGI::Info->new(logger => MyLogger->new());
+	my $info = CGI::Info->new(logger => Test::Log::Abstraction->new());
 	$info->params(allow => { a => qr/\d+/ });
 	ok(!defined($info->param('b')), 'unknown field → undef');
 	my @w = warns_from($info);
@@ -563,7 +562,7 @@ subtest 'param PA3: known field present → value returned' => sub {
 		QUERY_STRING      => 'score=99',
 	);
 	CGI::Info->reset();
-	my $info = CGI::Info->new(logger => MyLogger->new());
+	my $info = CGI::Info->new(logger => Test::Log::Abstraction->new());
 	is($info->param('score'), '99', 'known field returns value');
 };
 
@@ -575,7 +574,7 @@ subtest 'param PA4: field absent from form → undef' => sub {
 		QUERY_STRING      => 'a=1',
 	);
 	CGI::Info->reset();
-	my $info = CGI::Info->new(logger => MyLogger->new());
+	my $info = CGI::Info->new(logger => Test::Log::Abstraction->new());
 	is($info->param('missing'), undef, 'absent field → undef');
 };
 
@@ -587,7 +586,7 @@ subtest 'protocol R1: instance cache hit avoids re-evaluation' => sub {
 	plan tests => 2;
 	local %ENV = (SCRIPT_URI => 'https://example.com/cgi-bin/test.pl');
 	CGI::Info->reset();
-	my $info = CGI::Info->new(logger => MyLogger->new());
+	my $info = CGI::Info->new(logger => Test::Log::Abstraction->new());
 	my $p1 = $info->protocol();
 	my $p2 = $info->protocol();    # must hit cache
 	is($p1, $p2, 'second call returns same value');
@@ -598,21 +597,21 @@ subtest 'protocol R2: SCRIPT_URI → scheme extracted' => sub {
 	plan tests => 1;
 	local %ENV = (SCRIPT_URI => 'https://example.com/cgi');
 	CGI::Info->reset();
-	is(CGI::Info->new(logger => MyLogger->new())->protocol(), 'https', 'https extracted');
+	is(CGI::Info->new(logger => Test::Log::Abstraction->new())->protocol(), 'https', 'https extracted');
 };
 
 subtest 'protocol R3: SERVER_PROTOCOL HTTP/ → http' => sub {
 	plan tests => 1;
 	local %ENV = (SERVER_PROTOCOL => 'HTTP/1.1');
 	CGI::Info->reset();
-	is(CGI::Info->new(logger => MyLogger->new())->protocol(), 'http', 'SERVER_PROTOCOL → http');
+	is(CGI::Info->new(logger => Test::Log::Abstraction->new())->protocol(), 'http', 'SERVER_PROTOCOL → http');
 };
 
 subtest 'protocol R4: SERVER_PORT 443 → https' => sub {
 	plan tests => 1;
 	local %ENV = (SERVER_PORT => 443);
 	CGI::Info->reset();
-	is(CGI::Info->new(logger => MyLogger->new())->protocol(), 'https', 'port 443 → https');
+	is(CGI::Info->new(logger => Test::Log::Abstraction->new())->protocol(), 'https', 'port 443 → https');
 };
 
 subtest 'protocol R5: SERVER_PORT 80 → http' => sub {
@@ -621,14 +620,14 @@ subtest 'protocol R5: SERVER_PORT 80 → http' => sub {
 	CGI::Info->reset();
 	# getservbyport(80,'tcp') returns 'http' on most OSes;
 	# on Solaris it may return undef, falling to the port==80 branch — both → 'http'
-	is(CGI::Info->new(logger => MyLogger->new())->protocol(), 'http', 'port 80 → http');
+	is(CGI::Info->new(logger => Test::Log::Abstraction->new())->protocol(), 'http', 'port 80 → http');
 };
 
 subtest 'protocol R6: no env, no REMOTE_ADDR → undef silently' => sub {
 	plan tests => 2;
 	local %ENV;
 	CGI::Info->reset();
-	my $info = CGI::Info->new(logger => MyLogger->new());
+	my $info = CGI::Info->new(logger => Test::Log::Abstraction->new());
 	is($info->protocol(), undef, 'no env → undef');
 	my @w = warns_from($info);
 	is(scalar @w, 0, 'no warning without REMOTE_ADDR');
@@ -638,7 +637,7 @@ subtest 'protocol R7: no env, with REMOTE_ADDR → undef + warning' => sub {
 	plan tests => 2;
 	local %ENV = (REMOTE_ADDR => $REMOTE_IP);
 	CGI::Info->reset();
-	my $info = CGI::Info->new(logger => MyLogger->new());
+	my $info = CGI::Info->new(logger => Test::Log::Abstraction->new());
 	is($info->protocol(), undef, 'unknown protocol → undef');
 	my @w = warns_from($info);
 	like($w[0]{message}, qr/determine.*protocol/i, 'warning emitted');
@@ -657,7 +656,7 @@ subtest 'protocol R9: undef is cached with exists (not defined)' => sub {
 	plan tests => 2;
 	local %ENV;
 	CGI::Info->reset();
-	my $info = CGI::Info->new(logger => MyLogger->new());
+	my $info = CGI::Info->new(logger => Test::Log::Abstraction->new());
 	$info->protocol();    # should store undef
 	ok(exists($info->{protocol}), 'undef result stored via exists-safe cache');
 	is($info->{protocol}, undef, 'cached value is undef');
@@ -670,7 +669,7 @@ subtest 'protocol R9: undef is cached with exists (not defined)' => sub {
 subtest 'status S1: set status stores value and returns it' => sub {
 	plan tests => 2;
 	local %ENV;
-	my $info = CGI::Info->new(logger => MyLogger->new());
+	my $info = CGI::Info->new(logger => Test::Log::Abstraction->new());
 	is($info->status(403), 403, 'status(403) returns 403');
 	is($info->status(),    403, 'status() retrieves 403');
 };
@@ -678,31 +677,31 @@ subtest 'status S1: set status stores value and returns it' => sub {
 subtest 'status S2: not set, OPTIONS → 405' => sub {
 	plan tests => 1;
 	local %ENV = (REQUEST_METHOD => 'OPTIONS');
-	is(CGI::Info->new(logger => MyLogger->new())->status(), 405, 'OPTIONS → 405');
+	is(CGI::Info->new(logger => Test::Log::Abstraction->new())->status(), 405, 'OPTIONS → 405');
 };
 
 subtest 'status S3: not set, DELETE → 405' => sub {
 	plan tests => 1;
 	local %ENV = (REQUEST_METHOD => 'DELETE');
-	is(CGI::Info->new(logger => MyLogger->new())->status(), 405, 'DELETE → 405');
+	is(CGI::Info->new(logger => Test::Log::Abstraction->new())->status(), 405, 'DELETE → 405');
 };
 
 subtest 'status S4: not set, POST without CONTENT_LENGTH → 411' => sub {
 	plan tests => 1;
 	local %ENV = (REQUEST_METHOD => 'POST');
-	is(CGI::Info->new(logger => MyLogger->new())->status(), 411, 'POST without CL → 411');
+	is(CGI::Info->new(logger => Test::Log::Abstraction->new())->status(), 411, 'POST without CL → 411');
 };
 
 subtest 'status S5: not set, no method → 200' => sub {
 	plan tests => 1;
 	local %ENV;
-	is(CGI::Info->new(logger => MyLogger->new())->status(), 200, 'no method → 200');
+	is(CGI::Info->new(logger => Test::Log::Abstraction->new())->status(), 200, 'no method → 200');
 };
 
 subtest 'status S6: stored truthy status returned as-is' => sub {
 	plan tests => 1;
 	local %ENV;
-	my $info = CGI::Info->new(logger => MyLogger->new());
+	my $info = CGI::Info->new(logger => Test::Log::Abstraction->new());
 	$info->status(503);
 	is($info->status(), 503, 'stored 503 returned');
 };
@@ -710,7 +709,7 @@ subtest 'status S6: stored truthy status returned as-is' => sub {
 subtest 'status S7: stored 0 (falsy) returns 200 via || fallback' => sub {
 	plan tests => 1;
 	local %ENV;
-	my $info = CGI::Info->new(logger => MyLogger->new());
+	my $info = CGI::Info->new(logger => Test::Log::Abstraction->new());
 	$info->{status} = 0;    # force falsy stored value
 	is($info->status(), 200, 'falsy stored status → 200');
 };
@@ -722,13 +721,13 @@ subtest 'status S7: stored 0 (falsy) returns 200 via || fallback' => sub {
 subtest 'cookie C1: no HTTP_COOKIE jar → undef' => sub {
 	plan tests => 1;
 	local %ENV;
-	is(CGI::Info->new(logger => MyLogger->new())->cookie('x'), undef, 'no jar → undef');
+	is(CGI::Info->new(logger => Test::Log::Abstraction->new())->cookie('x'), undef, 'no jar → undef');
 };
 
 subtest 'cookie C2: known cookie present → value returned' => sub {
 	plan tests => 2;
 	local %ENV = (HTTP_COOKIE => 'session=tok123; uid=42');
-	my $info = CGI::Info->new(logger => MyLogger->new());
+	my $info = CGI::Info->new(logger => Test::Log::Abstraction->new());
 	is($info->cookie('session'), 'tok123', 'session cookie value');
 	is($info->cookie('uid'),     '42',     'uid cookie value');
 };
@@ -736,13 +735,13 @@ subtest 'cookie C2: known cookie present → value returned' => sub {
 subtest 'cookie C3: unknown cookie → undef' => sub {
 	plan tests => 1;
 	local %ENV = (HTTP_COOKIE => 'a=1');
-	is(CGI::Info->new(logger => MyLogger->new())->cookie('b'), undef, 'missing cookie → undef');
+	is(CGI::Info->new(logger => Test::Log::Abstraction->new())->cookie('b'), undef, 'missing cookie → undef');
 };
 
 subtest 'cookie C4: jar cached across calls (identity preserved)' => sub {
 	plan tests => 2;
 	local %ENV = (HTTP_COOKIE => 'k=v');
-	my $info = CGI::Info->new(logger => MyLogger->new());
+	my $info = CGI::Info->new(logger => Test::Log::Abstraction->new());
 	$info->cookie('k');
 	ok($info->{jar}, 'jar populated after first call');
 	my $j1 = $info->{jar};
@@ -753,7 +752,7 @@ subtest 'cookie C4: jar cached across calls (identity preserved)' => sub {
 subtest 'cookie C5: header injection via CR/LF is stripped' => sub {
 	plan tests => 2;
 	local %ENV = (HTTP_COOKIE => "good=ok\r\nSet-Cookie: evil=1");
-	my $info = CGI::Info->new(logger => MyLogger->new());
+	my $info = CGI::Info->new(logger => Test::Log::Abstraction->new());
 	is($info->cookie('good'),  'ok',  'legitimate cookie parsed');
 	is($info->cookie('evil'),  undef, 'injected cookie blocked');
 };
@@ -761,7 +760,7 @@ subtest 'cookie C5: header injection via CR/LF is stripped' => sub {
 subtest 'cookie C6: malformed token without = is filtered out' => sub {
 	plan tests => 2;
 	local %ENV = (HTTP_COOKIE => 'baretoken; valid=yes');
-	my $info = CGI::Info->new(logger => MyLogger->new());
+	my $info = CGI::Info->new(logger => Test::Log::Abstraction->new());
 	is($info->cookie('valid'),     'yes',  'valid token parsed');
 	is($info->cookie('baretoken'), undef,  'malformed token ignored');
 };
@@ -773,7 +772,7 @@ subtest 'cookie C6: malformed token without = is filtered out' => sub {
 subtest 'is_ai AI1: instance cache hit' => sub {
 	plan tests => 1;
 	local %ENV;
-	my $info = CGI::Info->new(logger => MyLogger->new());
+	my $info = CGI::Info->new(logger => Test::Log::Abstraction->new());
 	$info->{is_ai} = 1;
 	is($info->is_ai(), 1, 'cached is_ai=1 returned directly');
 };
@@ -781,31 +780,31 @@ subtest 'is_ai AI1: instance cache hit' => sub {
 subtest 'is_ai AI2: IS_AI env truthy → 1' => sub {
 	plan tests => 1;
 	local %ENV = (IS_AI => 1);
-	is(CGI::Info->new(logger => MyLogger->new())->is_ai(), 1, 'IS_AI=1 → 1');
+	is(CGI::Info->new(logger => Test::Log::Abstraction->new())->is_ai(), 1, 'IS_AI=1 → 1');
 };
 
 subtest 'is_ai AI3: IS_AI env falsy → 0' => sub {
 	plan tests => 1;
 	local %ENV = (IS_AI => 0);
-	is(CGI::Info->new(logger => MyLogger->new())->is_ai(), 0, 'IS_AI=0 → 0');
+	is(CGI::Info->new(logger => Test::Log::Abstraction->new())->is_ai(), 0, 'IS_AI=0 → 0');
 };
 
 subtest 'is_ai AI4: no REMOTE_ADDR → 0 regardless of UA' => sub {
 	plan tests => 1;
 	local %ENV = (HTTP_USER_AGENT => $AI_UA);
-	is(CGI::Info->new(logger => MyLogger->new())->is_ai(), 0, 'no REMOTE_ADDR → 0');
+	is(CGI::Info->new(logger => Test::Log::Abstraction->new())->is_ai(), 0, 'no REMOTE_ADDR → 0');
 };
 
 subtest 'is_ai AI5: no UA → 0 regardless of REMOTE_ADDR' => sub {
 	plan tests => 1;
 	local %ENV = (REMOTE_ADDR => $REMOTE_IP);
-	is(CGI::Info->new(logger => MyLogger->new())->is_ai(), 0, 'no UA → 0');
+	is(CGI::Info->new(logger => Test::Log::Abstraction->new())->is_ai(), 0, 'no UA → 0');
 };
 
 subtest 'is_ai AI6: ClaudeBot UA → 1 and sets is_robot' => sub {
 	plan tests => 2;
 	local %ENV = (HTTP_USER_AGENT => $AI_UA, REMOTE_ADDR => $REMOTE_IP);
-	my $info = CGI::Info->new(logger => MyLogger->new());
+	my $info = CGI::Info->new(logger => Test::Log::Abstraction->new());
 	is($info->is_ai(),      1, 'ClaudeBot → is_ai=1');
 	is($info->{is_robot},   1, 'is_robot also set to 1');
 };
@@ -813,13 +812,13 @@ subtest 'is_ai AI6: ClaudeBot UA → 1 and sets is_robot' => sub {
 subtest 'is_ai AI7: GPTBot UA → 1' => sub {
 	plan tests => 1;
 	local %ENV = (HTTP_USER_AGENT => 'GPTBot/1.1', REMOTE_ADDR => $REMOTE_IP);
-	is(CGI::Info->new(logger => MyLogger->new())->is_ai(), 1, 'GPTBot → 1');
+	is(CGI::Info->new(logger => Test::Log::Abstraction->new())->is_ai(), 1, 'GPTBot → 1');
 };
 
 subtest 'is_ai AI8: normal browser UA → 0' => sub {
 	plan tests => 1;
 	local %ENV = (HTTP_USER_AGENT => $GOOD_UA, REMOTE_ADDR => $REMOTE_IP);
-	is(CGI::Info->new(logger => MyLogger->new())->is_ai(), 0, 'normal UA → 0');
+	is(CGI::Info->new(logger => Test::Log::Abstraction->new())->is_ai(), 0, 'normal UA → 0');
 };
 
 # ===========================================================================
@@ -829,13 +828,13 @@ subtest 'is_ai AI8: normal browser UA → 0' => sub {
 subtest 'browser_type BT1: mobile UA → mobile' => sub {
 	plan tests => 1;
 	local %ENV = (HTTP_USER_AGENT => $MOBILE_UA, REMOTE_ADDR => $REMOTE_IP);
-	is(CGI::Info->new(logger => MyLogger->new())->browser_type(), 'mobile', 'mobile UA');
+	is(CGI::Info->new(logger => Test::Log::Abstraction->new())->browser_type(), 'mobile', 'mobile UA');
 };
 
 subtest 'browser_type BT2: AI crawler → ai' => sub {
 	plan tests => 1;
 	local %ENV = (HTTP_USER_AGENT => $AI_UA, REMOTE_ADDR => $REMOTE_IP);
-	is(CGI::Info->new(logger => MyLogger->new())->browser_type(), 'ai', 'AI UA');
+	is(CGI::Info->new(logger => Test::Log::Abstraction->new())->browser_type(), 'ai', 'AI UA');
 };
 
 subtest 'browser_type BT3: IS_SEARCH_ENGINE env → search' => sub {
@@ -845,19 +844,19 @@ subtest 'browser_type BT3: IS_SEARCH_ENGINE env → search' => sub {
 		HTTP_USER_AGENT  => $GOOD_UA,
 		REMOTE_ADDR      => $REMOTE_IP,
 	);
-	is(CGI::Info->new(logger => MyLogger->new())->browser_type(), 'search', 'search engine');
+	is(CGI::Info->new(logger => Test::Log::Abstraction->new())->browser_type(), 'search', 'search engine');
 };
 
 subtest 'browser_type BT4: robot UA → robot' => sub {
 	plan tests => 1;
 	local %ENV = (HTTP_USER_AGENT => $BOT_UA, REMOTE_ADDR => $REMOTE_IP);
-	is(CGI::Info->new(logger => MyLogger->new())->browser_type(), 'robot', 'robot UA');
+	is(CGI::Info->new(logger => Test::Log::Abstraction->new())->browser_type(), 'robot', 'robot UA');
 };
 
 subtest 'browser_type BT5: normal browser → web' => sub {
 	plan tests => 1;
 	local %ENV = (HTTP_USER_AGENT => $GOOD_UA, REMOTE_ADDR => $REMOTE_IP);
-	is(CGI::Info->new(logger => MyLogger->new())->browser_type(), 'web', 'normal UA → web');
+	is(CGI::Info->new(logger => Test::Log::Abstraction->new())->browser_type(), 'web', 'normal UA → web');
 };
 
 # ===========================================================================
@@ -867,7 +866,7 @@ subtest 'browser_type BT5: normal browser → web' => sub {
 subtest '_log L1: all-undef messages → silent (nothing pushed)' => sub {
 	plan tests => 1;
 	# No local %ENV — would clear HARNESS_ACTIVE and break Sub::Protected bypass
-	my $info = CGI::Info->new(logger => MyLogger->new());
+	my $info = CGI::Info->new(logger => Test::Log::Abstraction->new());
 	delete $info->{logger};
 	my $before = scalar @{$info->{messages} // []};
 	$info->_log('warn', undef, undef);
@@ -876,7 +875,7 @@ subtest '_log L1: all-undef messages → silent (nothing pushed)' => sub {
 
 subtest '_log L2: defined messages, no logger → pushed to messages only' => sub {
 	plan tests => 2;
-	my $info = CGI::Info->new(logger => MyLogger->new());
+	my $info = CGI::Info->new(logger => Test::Log::Abstraction->new());
 	delete $info->{logger};
 	$info->_log('info', 'alpha', 'beta');
 	my @msgs = @{$info->{messages} // []};
@@ -894,7 +893,7 @@ subtest '_log L3: defined messages with logger → logger method called' => sub 
 	*{'PathTFakeLogger::new'}  = sub { bless {}, 'PathTFakeLogger' };
 	*{'PathTFakeLogger::info'} = sub { push @calls, [@_[1..$#_]] };
 	*{'PathTFakeLogger::warn'} = sub { push @calls, [@_[1..$#_]] };
-	my $info = CGI::Info->new(logger => MyLogger->new());
+	my $info = CGI::Info->new(logger => Test::Log::Abstraction->new());
 	$info->{logger} = PathTFakeLogger->new();
 	$info->_log('info', 'payload');
 	is(scalar @calls, 1, 'logger->info called once');
@@ -907,7 +906,7 @@ subtest '_log L3: defined messages with logger → logger method called' => sub 
 
 subtest '_warn W1: without logger → carp fires' => sub {
 	plan tests => 1;
-	my $info = CGI::Info->new(logger => MyLogger->new());
+	my $info = CGI::Info->new(logger => Test::Log::Abstraction->new());
 	delete $info->{logger};
 	my $carped = 0;
 	local $SIG{__WARN__} = sub { $carped++ };
@@ -917,7 +916,7 @@ subtest '_warn W1: without logger → carp fires' => sub {
 
 subtest '_warn W2: with logger → no carp, message stored' => sub {
 	plan tests => 2;
-	my $info   = CGI::Info->new(logger => MyLogger->new());
+	my $info   = CGI::Info->new(logger => Test::Log::Abstraction->new());
 	my $carped = 0;
 	local $SIG{__WARN__} = sub { $carped++ };
 	$info->_warn('logged warning');
@@ -928,14 +927,14 @@ subtest '_warn W2: with logger → no carp, message stored' => sub {
 
 subtest '_error E1: without logger → croaks' => sub {
 	plan tests => 1;
-	my $info = CGI::Info->new(logger => MyLogger->new());
+	my $info = CGI::Info->new(logger => Test::Log::Abstraction->new());
 	delete $info->{logger};
 	throws_ok { $info->_error('fatal') } qr/fatal/, '_error without logger croaks';
 };
 
 subtest '_error E2: with logger → no croak, error stored' => sub {
 	plan tests => 2;
-	my $info = CGI::Info->new(logger => MyLogger->new());
+	my $info = CGI::Info->new(logger => Test::Log::Abstraction->new());
 	lives_ok { $info->_error('logged error') } '_error with logger does not croak';
 	my @errs = grep { $_->{level} eq 'error' } @{$info->messages() // []};
 	ok(@errs, 'error level message stored');
@@ -950,21 +949,21 @@ subtest '_get_env GE1: undefined variable → undef' => sub {
 	# Preserve HARNESS_ACTIVE so Sub::Protected bypass stays active
 	local %ENV = %ENV;
 	delete $ENV{__PATH_T_NONEXISTENT__};
-	my $info = CGI::Info->new(logger => MyLogger->new());
+	my $info = CGI::Info->new(logger => Test::Log::Abstraction->new());
 	is($info->_get_env('__PATH_T_NONEXISTENT__'), undef, 'absent var → undef');
 };
 
 subtest '_get_env GE2: variable with valid chars → returned unchanged' => sub {
 	plan tests => 1;
 	local %ENV = (HARNESS_ACTIVE => 1, SCRIPT_NAME => '/cgi-bin/test.pl');
-	my $info = CGI::Info->new(logger => MyLogger->new());
+	my $info = CGI::Info->new(logger => Test::Log::Abstraction->new());
 	is($info->_get_env('SCRIPT_NAME'), '/cgi-bin/test.pl', 'valid var returned');
 };
 
 subtest '_get_env GE3: variable with invalid chars → warn + undef' => sub {
 	plan tests => 2;
 	local %ENV = (HARNESS_ACTIVE => 1, SCRIPT_NAME => 'hello world');    # space is disallowed
-	my $info = CGI::Info->new(logger => MyLogger->new());
+	my $info = CGI::Info->new(logger => Test::Log::Abstraction->new());
 	is($info->_get_env('SCRIPT_NAME'), undef, 'invalid chars → undef');
 	my @w = warns_from($info);
 	like($w[0]{message}, qr/Invalid value/, 'warning mentions Invalid value');
@@ -977,7 +976,7 @@ subtest '_get_env GE3: variable with invalid chars → warn + undef' => sub {
 subtest 'AUTOLOAD AL1: DESTROY is silently ignored' => sub {
 	plan tests => 1;
 	local %ENV;
-	my $info = CGI::Info->new(logger => MyLogger->new());
+	my $info = CGI::Info->new(logger => Test::Log::Abstraction->new());
 	lives_ok { $info->DESTROY() } 'DESTROY does not croak';
 };
 
@@ -991,7 +990,7 @@ subtest 'AUTOLOAD AL2: called on class string → croak' => sub {
 subtest 'AUTOLOAD AL3: auto_load => 0 → croak' => sub {
 	plan tests => 1;
 	local %ENV;
-	my $info = CGI::Info->new(auto_load => 0, logger => MyLogger->new());
+	my $info = CGI::Info->new(auto_load => 0, logger => Test::Log::Abstraction->new());
 	throws_ok { $info->no_such_param() }
 		qr/Unknown method no_such_param/,
 		'auto_load disabled → croak';
@@ -1005,7 +1004,7 @@ subtest 'AUTOLOAD AL4: delegates to param() for real CGI param' => sub {
 		QUERY_STRING      => 'mykey=myval',
 	);
 	CGI::Info->reset();
-	my $info = CGI::Info->new(logger => MyLogger->new());
+	my $info = CGI::Info->new(logger => Test::Log::Abstraction->new());
 	is($info->mykey(), 'myval', 'AUTOLOAD → param() → value');
 };
 
@@ -1016,8 +1015,8 @@ subtest 'AUTOLOAD AL4: delegates to param() for real CGI param' => sub {
 subtest 'set_logger SL1: blessed logger stored as-is' => sub {
 	plan tests => 1;
 	local %ENV;
-	my $info = CGI::Info->new(logger => MyLogger->new());
-	my $log  = MyLogger->new();
+	my $info = CGI::Info->new(logger => Test::Log::Abstraction->new());
+	my $log  = Test::Log::Abstraction->new();
 	$info->set_logger($log);
 	is($info->{logger}, $log, 'blessed logger stored directly');
 };
@@ -1025,7 +1024,7 @@ subtest 'set_logger SL1: blessed logger stored as-is' => sub {
 subtest 'set_logger SL2: non-blessed string wrapped in Log::Abstraction' => sub {
 	plan tests => 1;
 	local %ENV;
-	my $info = CGI::Info->new(logger => MyLogger->new());
+	my $info = CGI::Info->new(logger => Test::Log::Abstraction->new());
 	$info->set_logger('syslog');
 	isa_ok($info->{logger}, 'Log::Abstraction', 'string arg wrapped');
 };
@@ -1033,7 +1032,7 @@ subtest 'set_logger SL2: non-blessed string wrapped in Log::Abstraction' => sub 
 subtest 'set_logger SL3: logger => undef creates fresh Log::Abstraction' => sub {
 	plan tests => 1;
 	local %ENV;
-	my $info = CGI::Info->new(logger => MyLogger->new());
+	my $info = CGI::Info->new(logger => Test::Log::Abstraction->new());
 	$info->set_logger(logger => undef);
 	isa_ok($info->{logger}, 'Log::Abstraction', 'undef logger arg → Log::Abstraction');
 };
@@ -1041,8 +1040,8 @@ subtest 'set_logger SL3: logger => undef creates fresh Log::Abstraction' => sub 
 subtest 'set_logger SL4: returns $self for method chaining' => sub {
 	plan tests => 1;
 	local %ENV;
-	my $info = CGI::Info->new(logger => MyLogger->new());
-	is($info->set_logger(MyLogger->new()), $info, 'set_logger returns self');
+	my $info = CGI::Info->new(logger => Test::Log::Abstraction->new());
+	is($info->set_logger(Test::Log::Abstraction->new()), $info, 'set_logger returns self');
 };
 
 # ===========================================================================
@@ -1052,20 +1051,20 @@ subtest 'set_logger SL4: returns $self for method chaining' => sub {
 subtest 'cache CA1: no arg → returns undef when not set' => sub {
 	plan tests => 1;
 	local %ENV;
-	is(CGI::Info->new(logger => MyLogger->new())->cache(), undef, 'no cache → undef');
+	is(CGI::Info->new(logger => Test::Log::Abstraction->new())->cache(), undef, 'no cache → undef');
 };
 
 subtest 'cache CA2: unblessed argument → croak' => sub {
 	plan tests => 1;
 	local %ENV;
-	my $info = CGI::Info->new(logger => MyLogger->new());
+	my $info = CGI::Info->new(logger => Test::Log::Abstraction->new());
 	throws_ok { $info->cache('scalar') } qr/is not an object/, 'scalar → croak';
 };
 
 subtest 'cache CA3: blessed but no get() → croak' => sub {
 	plan tests => 1;
 	local %ENV;
-	my $info = CGI::Info->new(logger => MyLogger->new());
+	my $info = CGI::Info->new(logger => Test::Log::Abstraction->new());
 	my $bad  = bless {}, 'CacheNoGet';
 	throws_ok { $info->cache($bad) }
 		qr/does not support the get\(\) method/,
@@ -1075,7 +1074,7 @@ subtest 'cache CA3: blessed but no get() → croak' => sub {
 subtest 'cache CA4: blessed with get() but no set() → croak' => sub {
 	plan tests => 1;
 	local %ENV;
-	my $info = CGI::Info->new(logger => MyLogger->new());
+	my $info = CGI::Info->new(logger => Test::Log::Abstraction->new());
 	my $bad  = bless {}, 'CacheNoSet';
 	{ no strict 'refs'; *{'CacheNoSet::get'} = sub { } }
 	throws_ok { $info->cache($bad) }
@@ -1086,7 +1085,7 @@ subtest 'cache CA4: blessed with get() but no set() → croak' => sub {
 subtest 'cache CA5: valid cache stored and returned' => sub {
 	plan tests => 2;
 	local %ENV;
-	my $info = CGI::Info->new(logger => MyLogger->new());
+	my $info = CGI::Info->new(logger => Test::Log::Abstraction->new());
 	my $mc   = bless {}, 'GoodCache';
 	{ no strict 'refs';
 	  *{'GoodCache::get'} = sub { undef };
@@ -1136,9 +1135,9 @@ subtest 'reset RE2: on wrong package → carps and returns' => sub {
 # ===========================================================================
 
 subtest 'dead code DC1: cookie() missing name → validate_strict croaks (not inner guard)' => sub {
-	plan tests => 1;
+	plan tests => 2;
 	local %ENV = (HTTP_COOKIE => 'a=1');
-	my $info = CGI::Info->new(logger => MyLogger->new());
+	my $info = CGI::Info->new(logger => new_ok('Test::Log::Abstraction'));
 	# The croak here originates in validate_strict, not in the !defined($field) guard
 	throws_ok { $info->cookie() } qr//, 'missing cookie name always croaks at validate_strict';
 };

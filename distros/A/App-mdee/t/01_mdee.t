@@ -4,6 +4,8 @@ use utf8;
 
 use Test::More;
 use File::Spec;
+use Encode qw(decode_utf8);
+use Text::ANSI::Fold::Util qw(ansi_width);
 
 # Skip tests on platforms without bash or with old bash
 BEGIN {
@@ -310,6 +312,19 @@ subtest 'config file defaults' => sub {
         unlike($out, qr/run_nup/, 'default[style]=pager removes nup');
     }
 
+    # Settings in config.sh take precedence over the default themes
+    {
+        open my $fh, '>', "$config_dir/config.sh" or die;
+        print $fh "md_config+=(table_cell_mark=+)\n";
+        print $fh "pass_md+=(--cm 'emphasis_mark=sub{\"@@\"}')\n";
+        close $fh;
+        my $md = File::Spec->rel2abs('t/table_wrap.md');
+        my $out = `XDG_CONFIG_HOME=$tmpdir $mdee -s cat -w 40 $md 2>&1`;
+        like($out, qr/^\+k1 /m, 'md_config in config.sh overrides the default markcell theme');
+        my $bold = `XDG_CONFIG_HOME=$tmpdir $mdee -s cat $test_md 2>&1`;
+        like($bold, qr/@@/, 'pass_md in config.sh overrides the default nomark theme');
+    }
+
     # Test default[width]
     {
         open my $fh, '>', "$config_dir/config.sh" or die;
@@ -443,6 +458,39 @@ subtest 'share theme warm' => sub {
     my $out = `$mdee -d --dryrun --mode=light --theme=warm $test_md 2>&1`;
     is($?, 0, 'warm theme loads successfully');
     like($out, qr/Coral/, 'warm theme uses Coral base color');
+};
+
+subtest 'share themes markcell and markwrap' => sub {
+    plan skip_all => 'share/theme/markcell.sh not found' unless -f 'share/theme/markcell.sh';
+    my $md = File::Spec->rel2abs('t/table_wrap.md');
+    my $item = decode_utf8(scalar `$mdee -s cat -w 40 --no-theme --theme=markcell $md`);
+    is($?, 0, 'markcell theme loads successfully');
+    like($item, qr/^\x{b7}k1\s+\x{2502}\x{b7}the quick/m, 'markcell marks the first line of every cell');
+    unlike($item, qr/\x{203A}/, 'markcell alone has no continuation mark');
+    my $wrap = decode_utf8(scalar `$mdee -s cat -w 40 --no-theme --theme=markwrap $md`);
+    is($?, 0, 'markwrap theme loads successfully');
+    like($wrap, qr/\x{2502}\x{203A}\S/, 'markwrap marks continuation lines');
+    unlike($wrap, qr/\x{b7}/, 'markwrap alone has no first-line mark');
+    my $both = decode_utf8(scalar `$mdee -s cat -w 40 --theme=markwrap $md`);
+    like($both, qr/^\x{b7}k1/m, 'default plus markwrap keeps the first-line mark');
+    like($both, qr/\x{2502}\x{203A}\S/, 'default plus markwrap adds the continuation mark');
+    my $none = decode_utf8(scalar `$mdee -s cat -w 40 --no-theme $md`);
+    unlike($none, qr/\x{b7}|\x{203A}/, '--no-theme uses no mark');
+};
+
+subtest 'table wrap' => sub {
+    my $md = File::Spec->rel2abs('t/table_wrap.md');
+    my $strip = sub { local $_ = shift; s/\e\[[0-9;]*[mK]//g; s/\e\]8;;[^\e]*\e\\//g; $_ };
+    my $tlines = sub { grep { /[\x{2502}\x{253C}]/ } map { $strip->($_) } split /\n/, decode_utf8(shift) };
+    my @t = $tlines->(scalar `$mdee -s cat -w 40 $md`);
+    ok(@t > 6, 'wide table is wrapped');
+    ok(!(grep { ansi_width($_) > 40 } @t), 'table fits in --width');
+    my @off = $tlines->(scalar `$mdee -s cat -w 40 --config table_width=0 $md`);
+    ok((grep { ansi_width($_) > 40 } @off), '--config table_width=0 disables wrapping');
+    my $cell = `$mdee -s cat -w 40 --config table_cell=0:10 $md`;
+    isnt($cell, scalar `$mdee -s cat -w 40 $md`, '--config table_cell changes the layout');
+    my $dry = `$mdee -ddn -s cat -w 40 $md 2>&1`;
+    like($dry, qr/table_width=40/, 'table_width is passed to the md module');
 };
 
 done_testing;

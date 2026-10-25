@@ -6,7 +6,7 @@ use Scalar::Util qw(blessed refaddr weaken);
 use Tickit 0.70 ();
 use Tk qw(Ev);
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 my %SPECIAL = (
     BackSpace => 'Backspace', Return => 'Enter', KP_Enter => 'Enter',

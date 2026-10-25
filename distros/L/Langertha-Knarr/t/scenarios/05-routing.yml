@@ -1,0 +1,27 @@
+title: Model names route to their own backend; an unknown model takes the default engine, or answers 404
+setup:
+  config:
+    models:
+      alpha: { engine: KnarrVirtual, model: v-alpha }
+      beta:  { engine: KnarrVirtual, model: v-beta }
+    default: { engine: KnarrVirtual, model: v-default }
+  backends:
+    v-alpha: { fallback: { answer: "from alpha" } }
+    v-beta:  { fallback: { answer: "from beta" } }
+    '*': { fallback: { answer: "from default" } }
+steps:
+  - chat: { protocol: openai, model: alpha, prompt: x }
+    expect: { text: from alpha, model: v-alpha }
+  - chat: { protocol: openai, model: beta, prompt: x }
+    expect: { text: from beta, model: v-beta }
+    backend:
+      v-alpha: { requests: 1 }
+      v-beta: { requests: 1 }
+  # the client's own model name replaces the default engine's model
+  - chat: { protocol: openai, model: gamma, prompt: x }
+    expect: { text: from default }
+    backend:
+      gamma: { requests: 1, request_model: gamma }
+  - http: { method: GET, path: /v1/models }
+    expect:
+      json: { 'data.0.id': alpha, 'data.1.id': beta }

@@ -1,0 +1,17 @@
+title: A streaming request to a backend that cannot stream still ends with the protocol's end marker
+setup:
+  config:
+    models:
+      plain: { engine: KnarrVirtual, model: v-plain }
+  backends:
+    v-plain: { engine_args: { no_streaming: 1 }, fallback: { answer: "whole answer" } }
+steps:
+  - chat: { protocol: openai, model: plain, prompt: x, stream: true }
+    expect:
+      body_like: 'whole answer.*data: \[DONE\]\s*\z'
+  - chat: { protocol: anthropic, model: plain, prompt: x, stream: true }
+    expect:
+      body_like: 'whole answer.*event: message_stop\ndata: [^\n]*\n\n\z'
+  - chat: { protocol: ollama, model: plain, prompt: x, stream: true }
+    expect:
+      body_like: 'whole answer.*"done":true[^\n]*\n\z'

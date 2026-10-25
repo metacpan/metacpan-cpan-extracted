@@ -1,5 +1,173 @@
 Revision history for Langertha-Knarr
 
+1.103     2026-10-24 21:13:31Z
+    - Langertha floor raised from 0.503 to 0.504: routed streams ask for
+      usage only on engines that claim stream_usage (k77), and the scenario
+      suite runs on Langertha::Engine::Virtual.
+
+    - New: token_auth (k82) -- per-model short-lived tokens checked against
+      a PostgreSQL view (CitiAI tester), through a pluggable authorizer
+      (Langertha::Knarr::Authorizer). The token is identified before the
+      body is parsed (401 for a missing, unknown or expired token, 503 while
+      the token store is unavailable: fail-closed) and authorized once
+      action and model are known (403 for another model; chat, sync and
+      stream, /api/show and the manifest). /v1/models, /api/tags and ACP
+      /agents list only the token's model; a request without a model (A2A,
+      ACP without agent_name) gets the token's model. auth_token /
+      proxy_api_key is now Authorizer::StaticKey, behaviour unchanged.
+
+    - New: TokenStore::Pg compares sha256(Bearer) in hex with the view's
+      hash column and requires expires_at > now(); identifiers are quoted.
+      DBD::Pg is optional (recommends); a missing driver stops knarr start
+      with a clear error. Under IO::Async the store is asynchronous
+      (pg_async + socket watch): LISTEN/NOTIFY drops the hit cache, a lost
+      connection drops it at once, reconnect backs off, a non-blocking TCP
+      probe precedes each connect. It connects in each serving process --
+      every prefork worker, never the supervisor. PSGI does a blocking
+      lookup, drains notifications first and has no cache.
+
+    - New: token_auth routes pick the backend by the token row's provider:
+      upstream plus key_env (OpenAI-compatible) or provider plus key_env
+      and optional url (that Langertha engine). A provider without a route
+      is 403, an unset key variable 503. The client's token never reaches
+      an upstream: no raw passthrough, Authorization and x-api-key are not
+      forwarded. Route engine classes load before the fork.
+
+    - New: Config validation for token_auth: it excludes proxy_api_key
+      (also KNARR_API_KEY), models, default, passthrough, auto_discover and
+      remote_config; token_auth needs routes and routes need token_auth;
+      keys are strict. token_auth and routes are start-only: an admin push
+      naming them, or one that would conflict, is 400, and
+      /knarr/admin/status reports only token_auth backend and connected.
+      Neither token, hash, DB password nor route key appears in logs,
+      traces, the request log, error texts or the admin status.
+
+    - Fix: a request body that is not JSON, or JSON that is no object
+      (array, string, number, null), is answered 400 in the protocol's error
+      shape (k81) -- OpenAI, Anthropic, Ollama, ACP and AG-UI, natively and
+      under PSGI -- with a fixed text; it was a 500 carrying the JSON
+      decoder's message, or an empty request for null. The check is
+      Protocol::request_body_error, run before the parse and before any
+      handler; the raw passthrough sees the same body unchanged. A2A keeps
+      its JSON-RPC answer (-32700 for bad JSON); a JSON null body is now
+      -32600 Invalid Request there too.
+
+    - Fix: ACP and AG-UI answer a sync error in their own shape (k80), not
+      the OpenAI wire's {"error":{"message":...} }: ACP its Error object
+      {"code":"server_error"|"not_found"|"invalid_input","message":...}
+      (top level, as in the ACP specification), AG-UI -- which defines no
+      error body, only the RUN_ERROR event -- that event as the JSON body,
+      the same object its stream sends once it has started. The HTTP status
+      is unchanged.
+
+    - Fix: an A2A error carries the request's JSON-RPC id (k80): a handler
+      failure, the 401 and the 503 (decided before the parse) read it off
+      the raw body. The id is null only where JSON-RPC 2.0 requires it --
+      the id could not be detected: a body that is not JSON answers 400,
+      -32700 Parse error, id null (it was a 500 with the decoder's text).
+      Protocol::format_error_response takes the raw body as 4th argument,
+      Protocol::error_uses_body tells PSGI to read it for such an error.
+
+    - Fix: errors Knarr answers itself no longer show Perl internals (k79):
+      the text a client gets has no " at /path/Module.pm line N.", no stack
+      frames, no @INC list and no source path; the log (and the request log)
+      keeps the full message, under PSGI too.
+
+    - Fix: a routed stream that fails after its first chunk ends with the
+      protocol's own error frame (k79) -- OpenAI a data: error object,
+      Anthropic event: error, Ollama an {"error":...} line, A2A a JSON-RPC
+      error event, ACP event: run.failed, AG-UI RUN_ERROR -- also when the
+      failure has no category (500), instead of an "[error: ...]" text chunk.
+      The error frame is the end of the stream; no success marker follows.
+
+    - Tests: t/72_multi_listen.t and t/98_listen_backlog.t take their listen
+      ports from the kernel (port 0, read back from the bound sockets)
+      instead of picking a free port, closing it and binding it later, where
+      a parallel test could take it in between (k79). t/97_workers_live.t
+      checks the "Cannot fork a worker" of its injected fork failure instead
+      of letting it spill onto stderr.
+
+    - Fix: A2A answers an error with a JSON-RPC response carrying an error
+      object (code, message, data.status) and the request's id, not
+      {"error":{"message":...} } (k79).
+
+    - Routed streams carry the backend's token usage (k77): the client's
+      stream (OpenAI usage chunk with include_usage, Anthropic message_delta,
+      Ollama done line), the request log and the Langfuse generation now
+      have the counts of a streamed answer from an OpenAI-wire engine.
+      Langertha asks the backend for it on engines that claim stream_usage;
+      needs a Langertha with Langertha::Role::StreamUsage. The scenario
+      runner skips a scenario whose needs: modules do not load.
+
+    - Tests: core-feature scenario suite (t/200_core_scenarios.t,
+      t/scenarios/*.yml) running a real Knarr over loopback against
+      Langertha::Engine::Virtual: protocols, tool calls, routing, proxy key,
+      backend errors, admin remote_config, request log, native streaming
+      (end markers, tool call fragments) and token usage. Skips without
+      Langertha::Engine::Virtual.
+
+    - Fix: the 401 of a missing or wrong proxy key and the 500 of a failed
+      backend are in the client protocol's error shape (k78), like 404, 503
+      and 504 already were: Anthropic clients get
+      {"type":"error","error":{"type":"authentication_error"|"api_error",...} },
+      Ollama clients {"error":"..."}; OpenAI, A2A, ACP and AG-UI keep
+      {"error":{"message":...} }. Natively and under PSGI, where a failed
+      handler no longer dies into the server's plain-text 500. A routed
+      stream sends its 200 only with its first chunk, so one whose backend
+      fails before that is answered with that status (504 for an upstream
+      timeout) instead of a 200 with an "[error: ...]" text chunk; response
+      headers now wait for the backend's first token. A backend that failed
+      before the stream's first read no longer looks like an empty, complete
+      stream (Langertha::Knarr::Stream->from_callback).
+
+    - Fix: the proxy key is compared in constant time (k76), as the admin key.
+
+    - Admin routes to deliver the routing setup at runtime, held in memory
+      only (k75): with admin_key / KNARR_ADMIN_KEY set, PUT
+      /knarr/admin/config replaces models, default, passthrough,
+      proxy_api_key and the other runtime keys from a JSON body, PATCH
+      /knarr/admin/keys swaps API keys per model name, GET
+      /knarr/admin/status reports generation, time, layers and model names
+      (never a key), DELETE /knarr/admin/config drops the delivered setup.
+      A pushed setup may not use api_key_env (400): keys come literally. A
+      pushed langfuse.url is accepted only with its own public_key and
+      secret_key, so the file's Langfuse keys never go to a pushed address.
+      A delivery is validated and every engine built before anything
+      changes; a broken one answers 400 and the running setup stays. The new
+      setup goes live in one step with a fresh engine cache; running streams
+      finish on their old engine. The admin key (at least 16 characters, not
+      the proxy key) opens only these routes and is refused with 401 on every
+      other; without it the routes are 404. Wrong keys lock the client
+      address out with growing pauses (429), bodies are limited to 1 MiB
+      (413), error messages never echo what was sent. remote_config /
+      KNARR_REMOTE_CONFIG / knarr start --remote-config allows a start
+      without models: 503 until the first delivery. The config file is
+      always in effect and a delivered setup lies over it as a layer in
+      memory (same model name: the delivery wins; DELETE falls back to the
+      file); a delivered langfuse section is accepted, logging is not. With an admin key Knarr runs one
+      worker (-w is set to 1 with a warning), and under a prefork PSGI server
+      the admin routes answer 501. New modules Langertha::Knarr::Admin and
+      Langertha::Knarr::Stack; knarr start builds its handler chain through
+      the latter.
+
+    - Handler::Passthrough's streaming path fails on a non-2xx upstream
+      answer (status line plus the upstream's error text, cut) like the
+      non-streaming path, instead of ending as an empty, successful stream
+      on a 401, 429 or 5xx (k74).
+    - An empty proxy_api_key / KNARR_API_KEY no longer counts as a configured
+      key: has_proxy_api_key is false, so start, check and the manifest agree
+      the proxy is open, and knarr start warns instead of logging
+      'Proxy auth: enabled' (k73).
+    - The release builds, tags and pushes the Docker image through
+      Dist::Zilla::Plugin::Docker::API (docker_image in dist.ini) over the
+      container engine's HTTP API instead of shelling out to docker build /
+      docker push, so a release works against rootless Podman.
+      KNARR_DOCKER_BUILD_ARGS is gone.
+    - The GitHub release is published by the bundle's GitHub::CreateRelease
+      after the tag is pushed, with the Changes section as release notes. The
+      gh calls in run_after_release are gone: they ran before the tag existed,
+      so the release tag landed on the commit before the release commit.
+
 1.102     2026-10-01 17:35:07Z
 
     - The JSONL request log (logging.file / logging.dir) now carries

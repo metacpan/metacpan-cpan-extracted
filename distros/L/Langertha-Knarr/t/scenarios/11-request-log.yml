@@ -1,0 +1,20 @@
+title: The JSONL request log records protocol, model, output and tool calls of each answered request
+setup:
+  request_log: true
+  config:
+    models:
+      tooly: { engine: KnarrVirtual, model: v-tool }
+  backends:
+    v-tool:
+      rules:
+        "Hello": { answer: "Hi there" }
+        "Weather?": { tool_calls: [ [ get_weather, { city: Berlin } ] ] }
+steps:
+  - chat: { protocol: openai, model: tooly, prompt: Hello }
+    expect: { text: Hi there }
+  - chat: { protocol: anthropic, model: tooly, prompt: "Weather?", tools: [ { name: get_weather } ] }
+    expect:
+      tool_calls: [ { name: get_weather, args: { city: Berlin } } ]
+      log:
+        - { model: tooly, format: openai, status: ok, output: Hi there, stream: false, 'messages.0.content': Hello }
+        - { model: tooly, format: anthropic, status: ok, 'tool_calls.0.name': get_weather }

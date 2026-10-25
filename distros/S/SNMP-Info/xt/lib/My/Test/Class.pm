@@ -351,7 +351,7 @@ sub mock_get {
       $iid ||= 0;
       my $new_iid = $iid;
       my $val     = $EMPTY;
-      my $data    = $c_data->{$leaf} || $c_data->{$oid_base} || {};
+      my $data    = _data_for($c_data, $leaf, $oid_base) || {};
       my $count   = scalar keys %{$data} || 0;
       if ($count > 1) {
         my $found = 0;
@@ -380,6 +380,7 @@ sub mock_get {
         $vars->[1] = $new_iid;
         $vars->[2] = $val;
       }
+      _non_leaf_tag($vars) if ref($vars) =~ /SNMP::Varbind/x && length $val;
       return (wantarray() ? $vars : $val);
     }
   );
@@ -425,7 +426,7 @@ sub mock_getnext {
         && ($self->{_fault_count}{$count_key} || 0) >= ($fault->{after} || 0))
       {
         return _apply_getnext_fault($self, $fault, $vars,
-          $c_data->{$leaf} || $c_data->{$leaf_oid});
+          _data_for($c_data, $leaf, $leaf_oid));
       }
 
       unless (defined $iid) {
@@ -433,7 +434,7 @@ sub mock_getnext {
       }
       my $new_iid = $iid;
       my $val     = $EMPTY;
-      my $data    = $c_data->{$leaf} || $c_data->{$leaf_oid};
+      my $data    = _data_for($c_data, $leaf, $leaf_oid);
       my $count   = scalar keys %{$data} || 0;
       if ($count) {
         my $found = 0;
@@ -461,6 +462,7 @@ sub mock_getnext {
       $vars->[0] = $leaf;
       $vars->[1] = $new_iid;
       $vars->[2] = $val;
+      _non_leaf_tag($vars, 1) if $leaf ne 'unknown';
       $self->{_fault_count}{$count_key}++ if $fault && $leaf ne 'unknown';
       return (wantarray() ? $vars : $val);
     }
@@ -495,7 +497,7 @@ sub mock_bulkwalk {
         return (undef);
       }
 
-      my $data = $self->{Data}{$leaf} || $self->{Data}{$leaf_oid} || {};
+      my $data = _data_for($self->{Data}, $leaf, $leaf_oid) || {};
       my @iids = sort keys %{$data};
 
       # Without NonIncreasing, Net-SNMP drops everything from the first
@@ -509,9 +511,45 @@ sub mock_bulkwalk {
       # misbehaving agent would, and the bulkwalk itself succeeds.
       splice @iids, ($fault->{after} || 0), 0, $iids[0] if $fault && @iids;
       my @rows = map { SNMP::Varbind->new([$leaf, $_, $data->{$_}]) } @iids;
+      _non_leaf_tag($_) foreach @rows;
       return (\@rows);
     }
   );
+  return;
+}
+
+# When no loaded MIB defines the column, net-snmp cannot tell where its iid
+# starts: it returns the whole OID as the tag and an empty iid (NON_LEAF_NAME
+# in perl/SNMP/SNMP.xs). Only getnext keeps the module prefix on that tag;
+# get and bulkwalk drop it.
+sub _non_leaf_tag {
+  my ($vars, $keep_module) = @_;
+  my $label = $vars->[0];
+  $label = SNMP::translateObj($label, 0, 1) // $EMPTY if $label =~ /^[.]?\d/x;
+  return unless $label =~ /::[^.]+[.]\d/x;
+  $label =~ s/^\S+:://x unless $keep_module;
+  $vars->[0] = join '.', $label, $vars->[1];
+  $vars->[1] = $EMPTY;
+  return;
+}
+
+# Data stored under one module's label must answer a request for the same
+# object under another: net-snmp names an object that two MIBs define (IF-MIB
+# and RFC1213-MIB both define ifDescr) after whichever MIB loaded first.
+sub _data_for {
+  my ($c_data, $leaf, $leaf_oid) = @_;
+
+  my $data = $c_data->{$leaf} || ($leaf_oid && $c_data->{$leaf_oid});
+  return $data if $data;
+
+  my ($object) = ($leaf // $EMPTY) =~ /::(\w+)$/x;
+  return unless $object && $leaf_oid;
+  (my $want = $leaf_oid) =~ s/^[.]//x;
+  foreach my $key (grep {/::\Q$object\E$/x} keys %{$c_data}) {
+    my $key_oid = SNMP::translateObj($key) or next;
+    $key_oid =~ s/^[.]//x;
+    return $c_data->{$key} if $key_oid eq $want;
+  }
   return;
 }
 

@@ -16,7 +16,7 @@ my @FIELDS   = qw( id type description state last_update time_zone
 my @INTERNAL = qw( _factory _observers );
 __PACKAGE__->mk_accessors( @FIELDS, @INTERNAL );
 
-$Workflow::VERSION = '2.11';
+$Workflow::VERSION = '2.12';
 
 use constant NO_CHANGE_VALUE => 'NOCHANGE';
 
@@ -450,7 +450,7 @@ Workflow - Simple, flexible system to implement workflows
 
 =head1 VERSION
 
-This documentation describes version 2.11 of Workflow
+This documentation describes version 2.12 of Workflow
 
 =head1 SYNOPSIS
 
@@ -1160,7 +1160,7 @@ Sets property to value or throws L<Workflow::Exception>
 =head3 add_observer( @observers )
 
 Adds one or more observers to a C<Workflow> instance. An observer is a
-function. See L</notify_observers> for its calling convention.
+function. See L</"notify_observers( @arguments )"> for its calling convention.
 
 This function is used internally by C<Workflow::Factory> to implement
 observability as documented in the section L</WORKFLOWS ARE OBSERVABLE>
@@ -1469,6 +1469,9 @@ Jonas B. (jonasbn) E<lt>jonasbn@cpan.orgE<gt>, current maintainer.
 Chris Winters E<lt>chris@cwinters.comE<gt>, original author.
 
 The following folks have also helped out (listed here in no particular order):
+
+Sean Anderson (sean-anderson-brivo), for adding missing whatis entries to the
+NAME sections of the documentation, PR #302, included in release 2.12
 
 Emmanuel Seyman (eseyman), for reporting the release tarball duplicating the
 whole distribution under build/, issue #288, resulting in release 2.11

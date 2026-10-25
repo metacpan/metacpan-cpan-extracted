@@ -1,5 +1,19 @@
 Revision history for Perl extension App-mdee
 
+1.09 2026-10-25T05:02:50Z
+
+    - Wrap over-wide table cells to the fold width (table_width,
+      table_cell); columns that fit keep their width
+    - Mark the first line of every cell of a wrapped table with ·
+      (table_cell_mark, theme markcell) and the continuation lines
+      with › (table_wrap_mark, theme markwrap)
+    - Make hashed,nomark,markcell the default themes
+    - Let md_config/pass_md settings in config.sh override the default
+      themes
+    - Require a separator row in the table fold-exclude pattern so that
+      list items containing | are not taken for a table
+    - Require Perl 5.26, App::ansicolumn 1.59 and Command::Run 1.04
+
 1.08 2026-04-04T15:42:40Z
 
     - Add --cat-v / -V option to visualize whitespace via cat-v

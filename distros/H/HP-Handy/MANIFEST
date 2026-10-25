@@ -21,6 +21,7 @@ t/0008-inheritance.t
 t/0010-escape.t
 t/0011-whitespace.t
 t/0012-api.t
+t/0013-jinja2-compat.t
 t/9001-load.t
 t/9010-encoding.t
 t/9020-perl5compat.t

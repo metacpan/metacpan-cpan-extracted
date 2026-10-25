@@ -1,0 +1,14 @@
+Revision history for Milter-Client
+
+0.002 2026-10-24 TEODESIAN
+    - sendmail takes SMFIR_SKIP, the answer of a milter that wants no more of the body, and sends the end of the message; before, it ended the conversation there, and milterprobe died on opendkim
+    - Export SMFIR_SKIP, in :constants, and SMFIP_SKIP, in :protocol
+
+0.001 2026-10-24 TEODESIAN
+    - Milter::Client moves here from Milter-Recipe, so that testing a milter does not install yamilter
+    - Add milterprobe, which gives a milter one message as an MTA would, and prints what the milter did
+    - Add Milter::Client::conversation and split_message, moved from Milter::Corpus::Replay::commands and Milter::Corpus
+    - Add Milter::Client::milter_socket, which connects by a socket spec as postfix writes it
+    - Add Milter::Client::decode, which reads a modification or a verdict
+    - sendmail obeys the milter's answer to OPTNEG: it leaves out the steps the milter declined, and waits for no reply where the milter sends none
+    - sendmail no longer strips a NUL from the end of the OPTNEG reply or a new body, where it is data
